@@ -162,8 +162,8 @@ bool DirectoryListing :: NextDirectory (string &s)
         else 
             retval = false;
 	}
-    //while (retval == true && ((GetFileAttributes(s.c_str()) & FILE_ATTRIBUTE_DIRECTORY) == 0 || s == "." || s == ".." || s == "CVS"));
-	while (retval == true && (stat(fullName(s).c_str(), &fileinfo) == -1 || (fileinfo.st_mode & _S_IFDIR) == 0 || s == "." || s == ".." || s == "CVS"));
+    //while (retval == true && ((GetFileAttributes(s.c_str()) & FILE_ATTRIBUTE_DIRECTORY) == 0 || s == "." || s == ".." || s == "CVS" || s == ".svn"));
+	while (retval == true && (stat(fullName(s).c_str(), &fileinfo) == -1 || (fileinfo.st_mode & _S_IFDIR) == 0 || s == "." || s == ".." || s == "CVS" || s == ".svn"));
 
 #else /* POSIX directory enumeration - more straightforward */
 
@@ -182,7 +182,7 @@ bool DirectoryListing :: NextDirectory (string &s)
         /* There are no more files in the list*/
         else retval = false;
     }
-    while (retval == true && (stat(fullName(s).c_str(), &fileinfo) == -1 || !S_ISDIR(fileinfo.st_mode) || s == "." || s == ".." || s == "CVS"));
+    while (retval == true && (stat(fullName(s).c_str(), &fileinfo) == -1 || !S_ISDIR(fileinfo.st_mode) || s == "." || s == ".." || s == "CVS" || s == ".svn"));
 
 #endif
 
