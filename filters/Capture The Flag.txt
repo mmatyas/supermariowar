@@ -1,0 +1,73 @@
+#Version
+1.7.0.4
+
+#Icon
+44
+
+#Maps
+0smw
+4highabove
+5fall
+Affe
+Allo
+Begging for sumo again
+Big Tree
+Block! Block!
+Blockfort
+Chainlink
+Cloudarena
+Clondarena2
+Cloudy day
+Death From Above
+Divine intervention
+Dm
+Drawbridge
+Field day
+Generic Hills
+Ghosthouse
+Gold
+Greeny
+Hanging Cactus Gardens
+High flying
+Hoog
+Icecap
+Icy hills
+Indoor
+Iron
+Islands of Questionable Support
+Item Frenzy
+Lockout
+Mario war
+Misstep
+Mountains
+Noteworld
+Piemont
+Pillars of glory
+Pipeland
+Pipelines
+Prepare to Joust Buzzard Bait
+Pride of ivalice
+Rubber Room
+Rubber factory
+Sky
+Sky realm
+Skyhigh
+Skyline
+Skywar
+Smb
+Smw
+Staircase
+Storage Building
+Suspended Craziness
+Symmetrical
+Synchro
+The pit
+Topwar
+Topwar2
+Vanilla sky
+Wacky Woods
+War
+Waterfall
+WhiteSky
+Wings of sand
+Wolkje

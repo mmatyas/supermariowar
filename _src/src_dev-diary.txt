@@ -1,0 +1,565 @@
+
+------------------------------------------------------------------------------
+ the SuperMarioWar development diary
+ --------------------------------------
+								2004 © Florian Hufsky
+								http://jnrdev.kbs-design.net
+
+								have a lot of fun
+------------------------------------------------------------------------------
+
+
+
+
+------------------------------------------------------------------------------
+07.10.2004 Thursday
+---------------------------------------
+
+added:
+ + enter on the map starts a random map
+ + -f -h command line options
+
+------------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------
+02.9.2004 Thursday
+---------------------------------------
+
+added:
+ + alt+enter toggles fullscreen (only ingame)
+
+------------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------
+26.8.2004 Friday
+---------------------------------------
+
+added:
+ + Makefile for linux (SuperMarioWar only - no leveleditor yet)
+ + changed some stuff to get linux compilation working
+
+------------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------
+25.8.2004 Thursday (00:18 ;) )
+---------------------------------------
+
+added:
+ + sdl_mixer
+    now the devcpp project won't work again until i`ve build a mingw32
+    sdl_mixer version.
+    but maybe i'll switch to something else as sdl_mixer gives some weird
+    after sound effect.
+ + restructured source (menu.cpp, splash.cpp, MapList.cpp)
+
+------------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------
+16.8.2004 Monday
+---------------------------------------
+
+changed:
+ - restructured folders
+    projects/devcpp  contains the devcpp project
+    projects/vc6     contains the vc++ 6 project
+
+------------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------
+03.7.2004 Saturday
+---------------------------------------
+
+fixed:
+ - i hope all float2int warnings
+   i replaced CPlayer.x,y by ix,iy,fx,fy (int and float representation).
+   fx,fy is only used for movement calculation to calculate fractions of a pixel.
+   ix,iy should be used for all other stuff for performance reasons.
+   
+   i hope i didn't introduce ugly bugs with this change.
+
+   btw: CPlayer.xi/xf/yi/yi() are used to set ix+fx/iy+fy with only one call
+added:
+ + sfxSound to unify the sound system.
+   there's no sound code in there yet, so sound is currently disabled
+ + a devcpp project
+ + added Armen's leveleditor save/load code - huge thanks!
+
+------------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------
+12.6.2004 Monday
+---------------------------------------
+
+fixed:
+ - ricardo cruz found a bug in the maplist
+ - removed int2float warnings from gamemodex.cpp
+added: 
+ + ricardo cruz's *nix maplist code
+ + ricardo cruz's makefile, install text
+
+------------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------
+06.5.2004 Thursday - bugfixes
+---------------------------------------
+
+fixed:
+ - infinite jumping bug (on top off screen)
+ - cpu wins deathmatch -> crash
+added: 
+ + on top of screen wrapping
+
+------------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------
+03.5.2004 Monday - ai, bugfixes
+---------------------------------------
+
+i've added mario piuks ai to the code.
+in the player selection menu you can set cpu marios by pressing right after
+four players have been added.
+
+and i've fixed the new level bugs. they occured because i forgot to
+check the special cases when you hit a tile row on the opposite side of the
+screen.
+
+and now smw uses .mp3 files instead of .wav files. mainly too make smw
+smaller (last month it caused 5gb traffic in 2.5 weeks)
+i wanted to use ogg vorbis (via sdl_sound), but sdl sound has no easy to use
+interface like sdl_mixer.
+but i think i'll use a mp3 only version of sdl mixer instead of fmod somewhen.
+
+and another change: when you hold the jump button while stomping another mario
+you jump higher off him. (like in the original mario games).
+(thanks to ... for this idea)
+
+------------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------
+24/25.4.2004 Sat/Sunday - gamemodes etc
+---------------------------------------
+
+changed the jumping system (you jump as long as you hold the button)
+tweaked the gamemode code
+and changed the pushback behaviour (now it depends on the speed of both
+players)
+
+i also rewrote the whole menu code.
+it's still a mess, but a easier to maintain one...
+
+i've also added the gamemodes timelimit and mariowar classic.
+
+i've also added the gamemodes getthechicken...
+
+------------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------
+12.4.2004 Monday - gamemodes
+---------------------------------------
+
+mario piuk sent me a new smw version with multiple game modes.
+while looking thourough his code i had a great idea on how to add new game
+modes.
+i've something like a leithweight ut2k4 mutator system.
+i've built the basic system and mario is going to add new game modes and
+add a gm selector to the menu.
+
+------------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------
+03.4.2004 Saturday - "beam" bug solved
+---------------------------------------
+
+i solved the stupid beaming bug by transfering the p2p collision detection
+and response to a seperate function: collision_handler_p2p().
+
+but i've created a level bug by changing the way the player is handled when
+he is visible on both sides of the screen (he is in the -on-both-sides-area-):
+-> if player.x < 0 then he is visible on both sides.
+this simplifies p2p collision detection (and removes the beam bug), but
+creates a level bug whitch i wasn't able to track down.
+
+but this bug is far less anoying than the other one, and i don't want to solve
+it now.
+
+------------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------
+21.2.2004 Friday - warnings in eyecandy.cpp
+---------------------------------------
+
+i removed all warnings in eyecandy.cpp today.
+note: i only removed those vc++6 gave me, i have to test with gcc also.
+
+and i saw a memory fault bug after closing the game, but it occured only once,
+and i don't know if another windows app caused it.
+
+and i made the playerwidth a bit smaller, so you can fall through 1 tile wide
+holes more easily.
+
+
+also added: you hear "excellent" if you killed more than one mario with one
+jump.
+hmm... i'll have to rewrite the collision detection system to make adding
+such features more easy.
+
+------------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------
+20.2.2004 Friday - 1.0 - FINALLY!
+---------------------------------------
+
+it's done.
+i've completed the menu and added some tweaks.
+the menu code is messier than ever, but it works fine.
+
+i know that there are some bugs left, but i want to take some time off smw to
+continue working on jnrdev.
+http://jnrdev.kbs-design.net
+
+but smw isn't done yet - there are way too much things i want to add.
+
+that's it for now - bye
+
+------------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------------
+19.2.2004 Friday - the menu
+---------------------------------------
+
+finally i've added the menu.
+
+i also cleaned the code a bit to help integrate the menu.
+
+the menu is not complete yet, but ready to go
+i've also added a sound for jumping and added the posibility to switch of
+sound and fps. there is no menu option to do so though...
+
+and i've added the mouse controls known from mario war.
+you can either choose mouse or NUM as control method for the 4th player by
+setting game_values.NUMmousecontrol (true - mouse control is default).
+also no menu entry for that yet.
+
+------------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------------
+18.2.2004 Thursday (during school ;)) - performance
+---------------------------------------
+
+i've changed the thing the map drawing is done, this gives about 30%
+fps increase.
+
+(map.draw() is only called once and the tiles are drawn to the background,
+in the game loop only the background is drawn)
+
+at home i've added 3 different mario colours.
+
+------------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------------
+17.2.2004 Tuesday - SOUND!
+---------------------------------------
+
+finally - SOUNDS!
+thanks for the fmod stuff to no_human!
+
+but smw now sucks quite some cpu power - i've got to optimize the code
+a little.
+i'll change the way the tile offsets are handled (precompute) and run a
+profiler over the code to see where the slow things are.
+
+i also cleaned the code a bit and removed some bugs.
+
+and now the marios are respawned on different positions.
+
+and now when pressing esc ingame you get back to the splash screen.
+i had to write some stupid things like cleanup() and eyecandy::clean() for
+that though.
+
+it'll get better when adding the menu.
+
+------------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------------
+15.2.2004 Sunday - killing spree, bugfixes
+---------------------------------------
+
+again some bugfixes.
+and i've changed the killing spree "award" system: now a eyecandy is created
+(EC_GravText) and the string (eg: killing spree) to show is passed to it.
+
+now adding new awards is very simple.
+see the code in CPlayer::think how this is done.
+
+and i added  a simple splash screen to remind everyone that this is still
+a beta.
+and you can select the number of players.
+
+------------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------------
+14.2.2004 Saturday - homepage
+---------------------------------------
+
+the smw homepage is now done.
+thanks to no_shorty (http://no-shorty.kbs-design.net) fot the design.
+
+------------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------------
+13.2.2004 Friday - leveleditor
+---------------------------------------
+
+i've improved the leveleditor and change the tile system.
+all the tiles are now stored in a single file and a tileset contains the
+collision information (->TileType)
+
+but: the code is now a little slower (i think it's the new CMap::draw(), 
+i'll check where the slow parts are)
+
+and i really have to sort the code and rewrite some parts.
+i want to do the menu first, but i think i'll have to rewrite some stuff for
+the menu anyway.
+
+
+i've also fixed a bug in the horizontal collision detection.
+there are still some bugs because of the
+-move-horizontal-over-screen-boundaries- code.
+but they aren't as important as the other bug.
+
+i also removed a bug in the corpse code. (caused by tile_solid_on_top)
+
+and i've cleaned the code a bit.
+
+------------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------------
+12.2.2004 Thursday - text
+---------------------------------------
+
+added:
+ + sfont
+ + 2 fonts
+ + scoreboard
+ + fps
+ + menu graphics
+
+------------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------------
+11.2.2004 Wednesday - bugfix, ... (during a lan party... :) )
+---------------------------------------
+
+i've fixed some bugs and prepared the code for the menu.
+and i've added an icon for super mario war and the level editor.
+
+------------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------------
+10.2.2004 Tuesday - eyecandy
+---------------------------------------
+
+i've added a neat eye candy system to the game.
+it's very easy to create new special effects: just make a new child class of
+class eyecandy and add it to the eyecandy container by calling
+eyecandycont.add().
+
+so far i've added corpses for dead marios (which stay for 200 frames after
+they dropped on the ground) and clouds.
+
+a better drawing routine would be nice, to sort the sprites so players are
+behind / in front of clouds (->sort by y coordinate).
+
+but a single object container is needed to achive that.
+the stupid array list_players should be removed anyway ;)
+
+maybe i'll add a quake 3 like entity system, whith things like
+build_solid_list to improve collision detection speed.
+but when i do this i also want to improve the stupid collision detection
+system (1. all objects-wall 2. all object-object) to something better.
+
+i'm still thinking of a better solution to this, but even looking through the
+quake 3 code gave me no ideas.
+(i like to look through the quake 3 sdk to get inspirations for my code)
+
+
+oh, and i've quickly hacked in a "killing spree!!!" text, that appears for 150
+frames after a player has stomped 3 marios without dieing.
+
+
+and while testing i found some nasty bugs in the collision detection routines
+(player-map and player-player).
+i'll solve them when i know a better method for screen wrapping and
+object-object collision detection.
+
+------------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------------
+7/8.2.2004, Sat/Sun - animations
+---------------------------------------
+
+when working on the animations of the game i found a memory leak in gfx.cpp
+the surfaces in gfxSprite and gfxAnimSprite are never freed. (i once commented
+that line out the avoid a bug, but it's gone now and i forgot to put it
+back in).
+
+i've changed that, i'll put the new gfx.h/.cpp in jnrdev1,2 somewhen.
+
+now the animations work fine, but i've found some odd behaviour in the
+player-player collision detection code.
+somewhen i'll rip out the whole p2p collision detection and replace it
+with something neat like quake3 traces (although i don't fully understand how
+they work, because the code for them is in the engine, not in the sdk)
+
+------------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------------
+1.2.2004, Sunday - release of smw beta 0.8 tomorrow (first public release)
+---------------------------------------
+
+i've implemented a horizontal player-player collision detection, so players
+can push each other away.
+this works the same as the collision detection for jump-on-head-killing.
+(calculate all new positions for the objects and use them for coldec)
+
+i think i should've used a seperate loop for this test (like CPlayer::move()),
+to avoid some errors, but when using such slow speeds as in smw it won't
+mather.
+
+i want to get a game finished, not 100% perfect code.
+now i know what the guys at 2dnow meant when speaking about the ugly code
+that's produced in real game development :).
+you just want to get things done and when something works after a long time,
+
+but you know that there are still some minor flaws you'll leave it like it is
+to get on with your game (->patch fun).
+
+------------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------------
+31.1.2004, Sunday - player-player coldec
+---------------------------------------
+
+i've got a lot of helpful tips in the forums. mainly advanced formulars for
+moving object-moving object collison detection but the main inspiration for
+my solution came from povrazor (the author off puffbomb) and some other people
+from 2dnow.
+
+player-player collision detection now works like this:
+
+	i've splitted player->think() into two functions:
+		- player->move() which moves the player and does player-map collision
+		  detection
+		- player->think() which does everything else (player-player coldec,
+		  etc)
+
+	now the whole game loop including player-player coldec works like this:
+		1. collide every object with the map -> new position
+		   (done in CPlayer::move)
+
+		2. now let every object test against every other object: (done
+		   in CPlayer::think)
+			
+			//the new position of both objects are used for testing
+
+			for(otherobjects){
+				if( left or right edge touches the other object ){
+					if(bottom is inside the object){
+						if(old bottom is above the top of the object){
+							-> we just jumped on someone else
+						}
+					}
+				}
+			}
+
+	i think this could be solved better, but it works quite well.
+
+	here are some methods i thought about:
+		a) 1. calculate new position of every object
+		   2. trace using the old+new pos of the testing object
+		   (now used)
+		b) 1. calculate new position of every object
+		   2. use the whole x movement of both objects for testing
+		   3. use the whole y movement of both objects for testing
+		      (at x position we got from 2.)
+	
+		   (
+		   this is also not perfect, because we should take into
+		   account every movement of every object to get a perfect
+		   collision detection.
+		   you see: collision detectio is a hairy thing...
+		   i'd rather use tokamak before inventing some strange new
+		   methods.
+		   )
+
+------------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------------
+24.1.2004, Sunday - day #1
+---------------------------------------
+
+today i've started smw.
+first i copied the required gfx from super mario allstars.
+then i copied the code from jnrdev #2 and fitted it to smw.
+	- removing the slope handling
+	- setting PLAYERWIDTH / HEIGHT appropiately
+	- settig TILEWIDTH to 32
+	- changing the player-map collision detection code to test only at the
+	  two edges of the player, instead of testing through the whole lenght.
+	  this was absolutely not necessary, and i don't really know why i've
+	  changed this, maybe i'll switch it back somewhen.
+
+then i've added an array for all players and implemented the player-player
+collision detection for jump-on-head-killing.
+this was quite nasty, and it still doesn't work perfectly.
+the problem that buggs me is how to handle collision detetion between two
+moving objects. testing each movement against the other movement seems like
+too much overhead.
+i've asked for help at 2dnow, gamedev and zfx.info
+
+------------------------------------------------------------------------------
+
+
+
+2004 © Florian Hufsky
+mailto:fhufsky@phorus.at
+http://jnrdev.kbs-design.net/smw

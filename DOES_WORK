@@ -1,0 +1,7 @@
+Currently (as of CVS HEAD) working correctly on:
+    [X] - Windows
+    [X] - Linux
+    [ ] - Mac OS
+
+Problem description(s):
+    Dirlisting seems mostly fixed, haven't gotten confirmation on Mac OS

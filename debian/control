@@ -1,0 +1,24 @@
+Source: smw
+Section: games
+Priority: optional
+Maintainer: Quinn Storm <livinglatexkali@gmail.com>
+Build-Depends: debhelper (>= 4.0.0), libsdl1.2-dev, libsdl-net1.2-dev, libsdl-mixer1.2-dev, libsdl-image1.2-dev
+Standards-Version: 3.6.2
+
+Package: smw-bin
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, smw-data-min
+Description: SuperMarioWar
+ Super Mario War
+ 
+Package: smw-data-min
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, smw-bin
+Description: Basic data needed to make SMW run
+ Super Mario War Basic Data
+
+Package: smw-leveledit
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, smw-data-min
+Description: SuperMarioWar Level Editor
+ Super Mario War Level Editor

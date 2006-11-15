@@ -1,0 +1,30 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SuperMarioWar", "SuperMarioWar.vcproj", "{0A6B6B64-38E7-42DD-BC75-D9BEAE22A48D}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Profile = Profile
+		Profile_FastCap = Profile_FastCap
+		Release = Release
+		Release_LTCG = Release_LTCG
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{0A6B6B64-38E7-42DD-BC75-D9BEAE22A48D}.Debug.ActiveCfg = Release|Xbox
+		{0A6B6B64-38E7-42DD-BC75-D9BEAE22A48D}.Debug.Build.0 = Release|Xbox
+		{0A6B6B64-38E7-42DD-BC75-D9BEAE22A48D}.Profile.ActiveCfg = Profile|Xbox
+		{0A6B6B64-38E7-42DD-BC75-D9BEAE22A48D}.Profile.Build.0 = Profile|Xbox
+		{0A6B6B64-38E7-42DD-BC75-D9BEAE22A48D}.Profile_FastCap.ActiveCfg = Profile_FastCap|Xbox
+		{0A6B6B64-38E7-42DD-BC75-D9BEAE22A48D}.Profile_FastCap.Build.0 = Profile_FastCap|Xbox
+		{0A6B6B64-38E7-42DD-BC75-D9BEAE22A48D}.Release.ActiveCfg = Release|Xbox
+		{0A6B6B64-38E7-42DD-BC75-D9BEAE22A48D}.Release.Build.0 = Release|Xbox
+		{0A6B6B64-38E7-42DD-BC75-D9BEAE22A48D}.Release_LTCG.ActiveCfg = Release_LTCG|Xbox
+		{0A6B6B64-38E7-42DD-BC75-D9BEAE22A48D}.Release_LTCG.Build.0 = Release_LTCG|Xbox
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

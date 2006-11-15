@@ -1,0 +1,51 @@
+smw (1.7-8) unstable; urgency=low
+
+  * some rather major changes to the package, new control stuff in.
+  Eventually I'll actually make the version number more sensible!
+
+ -- Quinn Storm <livinglatexkali@gmail.com>  Sun, 29 Jan 2006 00:06:07 -0500
+
+smw (1.7-7) unstable; urgency=low
+
+  * convertPathC put back in, should be ok
+
+ -- Quinn Storm <livinglatexkali@gmail.com>  Mon, 26 Dec 2005 07:27:48 -0500
+
+smw (1.7-6) unstable; urgency=low
+
+  * Well, convertPath is starting to come back.  A new dpkg can be made now
+  that at least somewhat runs.
+
+ -- Quinn Storm <livinglatexkali@gmail.com>  Mon, 26 Dec 2005 07:08:55 -0500
+
+smw (1.7-5) unstable; urgency=low
+
+  * think I fixed buffer sizes
+
+ -- Quinn Storm <livinglatexkali@gmail.com>  Wed, 14 Dec 2005 00:31:22 -0500
+
+smw (1.7-4) unstable; urgency=low
+
+  * fnord.  similar bug with Announcers though for some reason the code is in
+  the menu.cpp instead.  WTFD?!
+
+ -- Quinn Storm <livinglatexkali@gmail.com>  Tue, 13 Dec 2005 01:05:40 -0500
+
+smw (1.7-3) unstable; urgency=low
+
+  * oopsie in MapList (MusicList) 
+
+ -- Quinn Storm <livinglatexkali@gmail.com>  Tue, 13 Dec 2005 00:29:11 -0500
+
+smw (1.7-2) unstable; urgency=low
+
+  * ok now THIS should build right. 
+
+ -- Quinn Storm <livinglatexkali@gmail.com>  Sun, 11 Dec 2005 23:21:27 -0500
+
+smw (1.7-1) unstable; urgency=low
+
+  * Initial release
+
+ -- Quinn Storm <livinglatexkali@gmail.com>  Sun, 11 Dec 2005 23:21:23 -0500
+

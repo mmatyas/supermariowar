@@ -1,0 +1,352 @@
+
+------------------------------------------------------------------------------
+ Whats New?                                                         10.02.2006
+------------------------------------------------------------------------------
+
+
+1.7
+ - Game Graphics Pack, Menu Graphics Pack, and Sound Pack Support
+
+ - Graphics in PNG format
+
+ - Better menu system
+
+ - Support for map browsing by thumbnails
+
+ - New background/music system
+	* Includes support for any number of arbitrarily-named BGs
+	* Map makers may freely pick music categories in editor
+	* Music can now be in MP3 format
+	* Music packs for 1.6 will no longer work!  (But they can be upgraded)
+
+ - Fully customizable controls, including joystick support
+
+ - Game engine improved with support for carryable stuff
+
+ - Support for Tournament Tours
+
+ - Multiple A.I. difficulty settings
+
+ - New interaction blocks
+	* Blue throwable blocks
+	* ON/OFF blocks and switches (4 colors)
+
+ - Increased interaction block limit (shouldn't crash with too many bricks now)
+
+ - Players now gradually slow down on ice (there is now a little friction)
+
+ - 11 new items
+	* Shells (4 types - green, red, spiny, and buzzy)
+	* 2UP, 3UP, and 5UP mushrooms
+	* MOd Block
+	* Feather
+	* Mystery Mushroom
+	* Boomerang (includes three trajectory options - flat, SMB3, and Zelda)
+
+ - Item switch which lets you change which items appear and at what frequencies
+
+ - Bullet Bills are now color-coded and properly attribute kills
+	* If two Bullet Bills of different colors collide, they explode
+	* This can kill anyone, including the owners of the B.B.s
+	* Bullet Bills can also now kill enemies in Stomp mode
+	* If a player uses two B.B.s in succession, their effects now overlap
+
+ - 3 new modes
+	* Star
+	* Capture The Flag
+	* King Of The Hill
+
+ - Goomba mode expanded into Stomp mode, which now includes Cheep-Cheeps and Koopas
+	* Enemies in Stomp mode now also burn up by falling (just like players)
+
+ - Fire Frenzy, Hammer, and Bob-Omb modes combined into Frenzy mode
+	* Also includes 9 more cards
+	* You can still configure it so that it plays like the old modes
+
+ - Eggs in Yoshi's Eggs now have to be manually carried by players
+	* Can kick eggs to Yoshi and still get the points
+
+ - Jumping an already-owned player in Owned mode is now worth a 5-point bonus
+	* Chicken kill bonus is also 5 points now
+	* Tag death penalty also 5 points
+
+ - Podoboos and Bowser Fireballs added to Survival mode
+
+ - Most modes now have extended scoring options (i.e. you can set the goal higher)
+	* Point-based modes still only go to 1000 but you can select by 50s now
+	* As a result, 1UPs in point-based modes are now only worth 10 points
+
+ - Free Play mode removed (replaced by infinite limit in all modes)
+
+ - New configurable options available in most modes
+	* Too many to list here - see Readme for more info
+
+ - Random skin selection (pick a skin at random)
+
+ - "Random" skin selection (pick a skin at random at the beginning of each game)
+
+ - Skins are now alphabetized regardless of creator, like maps
+
+ - New option to turn off the bonus wheel after a tournament
+
+ - New option to clear currently stored powerups
+
+ - Moving platforms in maps (and test function in editor)
+
+ - Ability to filter maps based on several attributes and custom lists
+
+ - Ability to browse maps by thumbs
+
+ - Expanded and better-organized tileset
+
+ - Ability to limit or increase frames per second
+
+ - Respawn time now settable in half-seconds
+
+ - Configurable off-screen arrow time and item respawn rate
+
+ - Option to turn off warp locks
+
+ - Option to put the crown on the leader in-game (not just on the HUD)
+
+ - Lots of new projectile options (fireball life, shell life, etc.)
+
+ - New race lap and game-start sounds
+
+ - New chicken skin
+
+ - POW and MOd now animated
+
+ - Players are now animated on the team select screen
+
+ - Skin names are displayed on the team select screen
+
+ - "Ready" icon on team select screen
+
+ - At the end of the game, losers are shown with their aerial death sprite
+
+ - Pause button can now terminate the game when someone has won
+
+ - Lots of extra eyecandy added to lots of things
+
+ - Item no-spawn zones in editor (prevent coins, eggs, bases, etc. from spawning)
+
+ - Can now choose tile type for each tile on the map in editor
+
+ - Map screenshot option in editor
+
+ - Default map eyecandy set to None (was clouds)
+
+ - Tons of new maps and skins, and new and fixed BGs (thanks, forum regulars!)
+
+ - Skin error checking (skins of the wrong size or color depth won't work now)
+
+ - The game now detects no sound card and will default sound/music to off
+
+ - There is now an option to change music tracks instead of looping one repeatedly
+
+ - Spawning code greatly improved - players/items shouldn't spawn in blocks/walls now
+
+ - Bugfixes
+	When shielded, you can now kill Goombas &co and Bullet Bills
+	B.B. kills now register as such with Souls spawn
+	Fixed crash bug caused by one-off error in bonus wheel init
+	Fixed escape-on-squish -> messed-up screen bug
+	Fixed music bug when grabbing 1UP after end-of-game in Yoshi's Eggs mode
+	Fixed music bug when winning while opponent has a star
+	Dead corpses now fall through transparent ON/OFF and flip blocks
+	Fixed bug that allowed players to move through flip blocks on edges of map
+	Sprites going into warps now snap to the right place (no more sprite slicing)
+	Invincibility and clock sounds no longer strictly time-based
+	Invincible players no longer die when touching the sides of death tiles
+	Fixed screen-off-center-after-crunch bug
+	Fixed lost-with-more-than-0-when-grabbing-poison-and-life-shroom-at-once bug
+	Players now receive multikill credit for killing 2+ opponents w/ POW/MOd
+	Tag touch transfer now possible when shielded
+	Pressing Down and Jump now makes you jump when not on a solid-on-top tile
+	Lots of A.I. bugs fixed
+	Some XBOX-related bugs fixed
+
+ - Much-improved Readme
+
+ - Various minor bugfixes and whatnot
+
+ - And probably something else I forgot, because Two52 put in so much new stuff (yay)
+
+------------------------------------------------------------------------------
+
+1.6
+ - Readme in HTML format
+
+ - Tournament Mode
+
+ - 6 new powerups
+	Hammer
+	Poison Mushroom
+	Slowdown clock
+	Bob-omb
+	POW Block
+	Bullet Bill Frenzy
+
+ - Skins (and changed sprite structure for easier skin creation)
+	Mario
+	Bahamut
+	Black Mage
+	Bub/Bob
+	Classic Mario
+	Kirby
+	Link
+	Luigi
+	Monty Mole
+	Ninji
+	Pig (FF1)
+	Shyguy
+	Snifit
+	Tweeter
+	White Mage
+	DigDug
+	Fygar
+	Pooka
+	Mappy
+	Dino Torch
+	Flurry
+	Pacman
+	Ghost
+	Spike
+	Toad
+	Cecil
+	Buzzy Beetle
+
+ - Background Music
+	Customizable using config files in the music directory
+
+ - Team Play
+
+ - Warping pipes
+
+ - 5 New Game Modes
+	Jail
+	Goomba
+	Race
+	Owned
+	Hammers
+
+ - Updated Game Modes
+	Tag - now you can transfer the tag by touching other players
+
+ - Added new options on menu
+	Scoreboard placement
+	Announcer voice
+	Team kill (friendly fire)
+	Team colors (players on same team get same color)
+	Screen crunch
+	Map over layer like chains and railings
+
+ - Different options for cloud eye candy
+
+ - Fixed top row collision problems
+
+ - Fixed general collision detection problems where players would end up inside blocks
+	Improved performance
+
+ - New Maps (from 4matsy, j rok, nitsuja, ventuz, Xijar, Fernando Márquez and Quinn Storm)
+
+ - New map layers (4 tile layers + 1 block layer)
+
+ - Out-of-bounds indicator and timer
+
+ - Exit confirmation box
+
+ - Better powerup collision detection (no bouncing off of thin air)
+
+ - Coins, powerup cards, eggs and yoshi move if not collected in time
+
+ - Improved AI
+	Collects goal items like powerups and coins
+	Avoids threats like fireballs and thwomps
+	Attemps to avoid spikes (needs improvement)
+
+ - Improved spawn location performance
+
+ - Team colored fireballs/hammers
+
+ - Fixed player spawning under spikes
+
+ - Fixed CPU hogging (runs at 30% CPU on my 2ghz P4)
+
+ - Improved tools in the level editor
+	Select eyecandy
+	Select tiles and move them around
+	Copy tiles and paste them
+	Designate "no spawn" areas
+
+ - Adjustable music and sound volume
+
+ - Configurable respawn time
+
+------------------------------------------------------------------------------
+
+1.5
+ - New interaction blocks
+      Breakable blocks
+      Note blocks
+      Powerup blocks
+      Flip blocks
+      Bounce blocks
+      Donut blocks
+
+ - Powerups
+      Star
+      Fireflower
+      1up
+
+ - 17 new background images
+
+ - 280 tiles
+      Ice tiles
+      Death tiles (above only, below only or any side death)
+
+ - 7 New Game modes
+      Coin Limit
+      Yoshi's Eggs
+      Tag
+      Domination
+      Fire Frenzy
+      Bob-Omb
+      Survival
+
+ - Improved collision detection (fixed screen edge bugs)
+
+ - Chocobo sprites in Chicken Mode
+
+ - Down jumping through solid on top blocks
+
+ - Improved menu
+       Graphics
+       Map view
+       Player select (allows any player to be in any state: disabled, player, cpu)
+       Help keys at bottom of screen
+
+ - Choice of spawn styles
+      Added door and swirl to help you find your player when spawning
+
+ - Pause game feature
+
+ - Improved game scoreboard - game leader wears crown
+
+ - Two layers on map (one for tiles and one for blocks)
+
+ - 10 new maps and updated old maps with new blocks and backgrounds
+
+ - Various eyecandy effects like dust and explosions
+
+ - Friction jumping through air is less than on ground
+
+ - Added classic Mario sound effects
+
+ - More vibrantly colored player sprites
+
+------------------------------------------------------------------------------
+
+1.23 and before
+ - the game

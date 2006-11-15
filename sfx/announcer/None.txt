@@ -1,0 +1,24 @@
+#2 Kills In Row
+[none]
+#3 Kills In Row
+[none]
+#4 Kills In Row
+[none]
+#5 Kills In Row
+[none]
+#6 Kills In Row
+[none]
+#7 Kills In Row
+[none]
+#8 Kills In Row
+[none]
+#9 Kills In Row
+[none]
+#10 Kills In Row
+[none]
+#2 Kills In Air
+sfx/packs/Classic/cannon.wav
+#Stop Kills In Row
+sfx/packs/Classic/cannon.wav
+#Game Start
+sfx/announcer/Mario/enter-stage.wav

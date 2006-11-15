@@ -1,0 +1,72 @@
+#!/bin/sh
+
+# add a debug option, default off (--debug)
+DEBUG_OPTS=""
+
+# add a png-save option, default on (--no-png-save)
+PNG_SAVE_OPTS="-DPNG_SAVE_FORMAT"
+
+while [ $# != 0 ]
+do
+    case "$1" in
+        --help) echo
+                echo "Options:"
+                echo
+                echo "--help         Display this help text"
+                echo "--debug        Enable debugging support"
+                echo "--no-png-save  Disable saving screenshots in PNG format"
+                echo
+                exit ;;
+        --debug) DEBUG_OPTS="-ggdb3 -gstabs+ -D_DEBUG" ;;
+        --no-png-save) PNG_SAVE_OPTS="" ;;
+    esac
+    shift
+done
+
+# Reset existing configuration file
+rm -f configuration
+touch configuration
+
+# TODO: Add --debug= option
+CFLAGS=$CFLAGS" -Wall -I. "$DEBUG_OPTS" "$PNG_SAVE_OPTS
+
+# TODO: Make this better - we don't need it right now
+# CFLAGS=$CFLAGS' -DDATAFOLDER=\"data/\" -DMAPFOLDER=\"data/maps/\"'
+
+# Mac OS X configuration
+if [ "`uname`" = Darwin ]
+then
+#SDL_CFLAGS=`sdl-config --cflags`
+#SDL_LIBS=`sdl-config --libs`
+SDK="-arch ppc -arch i386 -isysroot /Developer/SDKs/MacOSX10.4u.sdk"
+SDL_CFLAGS="$SDK -I/Library/Frameworks/SDL.framework/Headers -I/Library/Frameworks/SDL_net.framework/Headers -I/Library/Frameworks/SDL_mixer.framework/Headers -I/Library/Frameworks/SDL_image.framework/Headers"
+SDL_LIBS="-F/Library/Frameworks -framework CoreFoundation -framework Cocoa -framework SDL"
+echo 'CFLAGS:=$(CFLAGS) -DLINUXFUNC -DPREFIXPATH=\"\" '$SDL_CFLAGS $CFLAGS >> configuration
+echo 'LDFLAGS:=$(LDFLAGS) '$SDL_LIBS $LDFLAGS -framework SDL_image -framework SDL_mixer >> configuration
+echo 'COMMON_OBJS:=$(COMMON_OBJS) build/linfunc.o build/SDLMain.o' >> configuration
+fi
+
+# Linux configuration
+if [ "`uname`" = Linux ]
+then echo 'CFLAGS:=$(CFLAGS) -DLINUXFUNC -DPREFIXPATH=\"/usr/share/smw\" '`sdl-config --cflags` $CFLAGS >> configuration
+echo 'LDFLAGS:=$(LDFLAGS) '`sdl-config --libs` $LDFLAGS -lSDL_image -lSDL_mixer >> configuration
+echo 'COMMON_OBJS:=$(COMMON_OBJS) build/linfunc.o' >> configuration
+fi
+
+# Windows configuration
+if uname | grep MINGW32
+then
+    if [ -d `pwd`/mingw-support ]
+    then
+        echo 'CFLAGS:=$(CFLAGS) '-I`pwd`/mingw-support/include -I`pwd`/mingw-support/include/SDL -Dmain=SDL_main $CFLAGS >> configuration
+        echo 'LDFLAGS:=$(LDFLAGS) '-L`pwd`/mingw-support/lib -lmingw32 -lSDLmain -lSDL -mwindows $LDFLAGS -lSDL_image -lSDL_mixer >> configuration
+    else
+    	echo 'Please check out mingw-support to build this project.'
+	echo '# cvs co mingw-support'
+	rm -f configuration
+        exit 1
+    fi
+fi
+
+mkdir -p build
+make clean
