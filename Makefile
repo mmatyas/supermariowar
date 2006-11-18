@@ -54,14 +54,10 @@ install-data : all
 	cp -ravx music $(DESTDIR)/usr/share/smw/
 	cp -ravx maps $(DESTDIR)/usr/share/smw/
 	cp -ravx tours $(DESTDIR)/usr/share/smw/
-	rm -rf $(DESTDIR)/usr/share/smw/*/CVS
-	rm -rf $(DESTDIR)/usr/share/smw/*/*/CVS
-	rm -rf $(DESTDIR)/usr/share/smw/*/*/*/CVS
-	rm -rf $(DESTDIR)/usr/share/smw/*/*/*/*/CVS
-	rm -rf $(DESTDIR)/usr/share/smw/*/.cvsignore
-	rm -rf $(DESTDIR)/usr/share/smw/*/*/.cvsignore
-	rm -rf $(DESTDIR)/usr/share/smw/*/*/*/.cvsignore
-	rm -rf $(DESTDIR)/usr/share/smw/*/*/*/*/.cvsignore
+	rm -rf $(DESTDIR)/usr/share/smw/*/.svn
+	rm -rf $(DESTDIR)/usr/share/smw/*/*/.svn
+	rm -rf $(DESTDIR)/usr/share/smw/*/*/*/.svn
+	rm -rf $(DESTDIR)/usr/share/smw/*/*/*/*/.svn
 	chmod a+w $(DESTDIR)/usr/share/smw/maps -R
 
 install-bin : all
@@ -74,7 +70,7 @@ install-leveledit : all
 	cp leveledit $(DESTDIR)/usr/bin/smw-leveledit
 
 clean :
-	rm -rf build/* 
+	rm -rf build/*
 	rm -f smw
 	rm -f leveledit
 	rm -f smw.exe
