@@ -126,22 +126,10 @@
  Last ReadMe update: 01 October 2006<br/>
  <a href="http://smw.72dpiarmy.com">Official Super Mario War website</a></p>
  
- <h2>Bugs and the Forums</h2>
- <div> 
-	<p>This is an early release and with it you will probably find some bugs or some undocumented
-	features.  We have been beta testing for just about forever now and this is (hopefully) a very
-	stable release.  If you do find a bug or would like to suggest a tweak to an existing feature,
-	please visit our forums at: <a href="http://forum.72dpiarmy.com">http://forum.72dpiarmy.com</a>.
-	You can also download new fan created content like skins, graphics, announcers, maps, music,
-	tours, and map filters there.  Plus there are some tutorials on things like how to make skins.
-	It's definitely worth a visit!
-	</p>
- </div>
-  
  <h2>A quick note</h2>
  <div>
 	<p>
-	If you have problems opening the Readme Sections in IE, you should disable the useless disabling
+	If you have problems opening the Readme Sections in IE, you should disable the automatic disabling
 	of Javascript. (If you're having problems, a security notice probably popped up somewhere in your
 	window.)  Even better, <a href="http://www.getfirefox.com">try an alternate browser!</a>
 	</p>
@@ -213,16 +201,21 @@
 	<p>(screenshots coming soon)</p>
 
 	<p>
-	From this screen, you can select what character you'd like to be, out of all the skins you have
-	on your machine, with Up and Down.  You can also select what team you want to be on with Left
-	and Right.  If you want to have the game select a skin for you at random, press Up and Down
-	together (or if using a joystick, press the Random button).  If you want to have a different
-	random skin at the beginning of each match, without being able to see it beforehand, press Left
-	and Right together (or with a joystick, press the Fast-Scroll and Random buttons together),
-	which will change your skin into an item box with the word "Random" on it.  Press your Turbo key
-	to lock in your selection, unless you're Player 1, who uses Enter.  (If you're using a joystick,
-	press Jump to lock in your selection, no matter which player you are.)  After all players have
-	locked in, you can press Enter on this screen to go to the Game Selection screen.
+	From this screen, you can configure who is using which character and is on which team.
+	<li>You can select what character you'd like to be, out of all the skins you have on your
+	machine, with Up and Down.
+	<li>You can select what team you want to be on with Left and Right.
+	<li>If you want to have the game select a skin for you at random, press Up and Down together
+	(or if using a joystick, press the Random button).
+	<li>If you want to have a different random skin at the beginning of each match, without being
+	able to see it beforehand, press Left and Right together (or with a joystick, press the
+	Fast-Scroll and Random buttons together), which will change your skin into an item box with
+	the word "Random" on it.
+	<li>Press your Turbo key to lock in your selection, unless you're Player 1, who uses Enter.
+	(If you're using a joystick, press Jump to lock in your selection, no matter which player you
+	are.)
+	</br>After all players have locked in, you can press Enter on this screen to go to the Game
+	Selection screen.
 	</p>
 
 	<h3>Game Selection</h3>
@@ -831,7 +824,8 @@
 	<li><b>Lose Bases</b> (whether your bases reset to neutral): <b>On</b>, Off
 	<li><b>Move Bases</b> (whether your bases move): On, <b>Off</b>
 	<li><b>Steal Bases</b> (whether your bases are taken by who killed you): On, <b>Off</b>
-	</br>Steal Bases overrides Lose Bases when it is on.
+	</p><p>
+	<li>Steal Bases overrides Lose Bases when it is on.
 	</p>
 
 
@@ -886,9 +880,7 @@
 	<p>
 	This mode has the same rules as Frag Limit, except special powerup cards will randomly
 	spawn around the map.  Collecting one of these cards has the same effect as getting that
-	item out of an item box, or in the case of shell cards, has the effect of grabbing or
-	kicking the shell out of midair.  (To grab a shell from a card, you need to be holding
-	Turbo, just like when grabbing regular shells.)  This just makes the basic deathmatch
+	item out of an item box, for the most part.  This just makes the basic deathmatch
 	just a little more exciting, not to mention that it lets you have items on maps that
 	usually don't.  There are twelve items that can appear on the cards: Bob-Ombs, Fire
 	Flowers, Hammers, Feathers, Boomerangs, POWs, MOds, Bullet Bills, and all four different
@@ -899,12 +891,18 @@
 	<li><b>Limit</b> (the number of item cards shown at once): Single Powerup, 1 to 5 Powerups,
 	<b># Players - 1</b>, # Players, </br># Players + 1 to 3
 	<li><b>Rate</b> (how long it takes for new cards to appear when they can): Instant, 1, 2, <b>3</b>, 5, 10, 15, 20, 25, or 30 seconds
+	<li><b>Store Shells</b> (see note): <b>On</b>, Off
 	<li><b>Sliders for Items</b> (comparative frequencies of each one appearing on cards): 0 to 10 each (defaults of 1 for Fire Flowers and Hammers, and 0 for everything else)</br>
-	</br>If Limit is set to Single Item, no more cards will appear until the person who picked up the
+	</p><p>
+	<li>If Limit is set to Single Item, no more cards will appear until the person who picked up the
 	first one uses it (in the case of Stored items or the Bob-Omb), no longer has it (in the case of
 	Weapon items or the Bob-Omb), or has touched it (in case of Shells).  In either case there is no
 	delay for the card to appear after the first time.  (This is the same way that the card in Bob-Omb
 	mode worked in version 1.5.)
+	<li>If Store Shells is set to On, then when you touch a shell card, the shell will become
+	a Stored item.  If it is set to Off, then touching a shell card has the same effect as touching
+	a regular shell (i.e. if you are holding Turbo then you will grab the shell; otherwise you will
+	just kick it out of midair).
 	</p>	
 	
 
@@ -1094,10 +1092,10 @@
 	<b>Type: <font color="ff0000">Weapon</font></b>
 	<p>
 	This item gives you the ability to shoot boomerangs.  Using the default behavior, Boomerangs
-	will travel straight ahead until they hit the edge of the screen, and then they turn around
-	and travel straight ahead until they hit the other edge.  However, there are other trajectory
-	types you can choose, under the Options menu (see below), if you don't like the default.
-	Boomerangs, like hammers, can be shot through solid walls.
+	will travel ahead in a long arc before turning around and going in a straight line until
+	they disappear.  However, there are other trajectory types you can choose, under the Options
+	menu (see below), if you don't like the default. Boomerangs, like hammers, can be shot through
+	solid walls.
 	</p>
 
 	<h3><img src="gfx/docs/i18.png"> Feather</h3>
@@ -1388,7 +1386,8 @@
 	<h4>Boomerang Style</h4>
 	<p>
 	With this, you can switch between Flat, SMB3, and Zelda styles.
-	<li>Flat style is the default behavior as described in the Items section of the manual.
+	<li>Flat style makes the boomerangs travel straight forward until they hit the edge of the screen,
+	after which they "bounce" back and travel straight towards the other edge of the screen.
 	<li>SMB3 style makes the boomerangs travel in a long forward arc before turning around and coming
 	back in a straight line.
 	<li>Zelda style makes the boomerangs travel straight forward for a short distance before turning
@@ -1525,7 +1524,7 @@
 	</p>
 
 	
-	<h4>Gfx Pack</h4>
+	<h4>Menu Gfx and Game Gfx</h4>
 	<p>
 	This allows you to select custom graphics packs if you have any installed on your machine.  Graphics
 	packs are installed by unzipping them into the gfx/packs subfolder of the game.  (Make sure that
