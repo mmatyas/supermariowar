@@ -266,7 +266,7 @@ bool LoadGameGraphics()
 
 #ifdef _DEBUG
 	_load_gfxck(spr_tanooki, convertPath("gfx/packs/powerups/tanooki.png", graphicspack));
-	_load_gfxck(spr_statue, convertPath("gfx/packs/powerups/statue.png", graphicspack));
+	_load_gfxck(spr_statue, convertPath("gfx/packs/projectiles/statue.png", graphicspack));
 #endif
 	_load_gfxck(spr_starpowerup, convertPath("gfx/packs/powerups/starpowerup.png", graphicspack));
 	_load_gfxck(spr_1uppowerup, convertPath("gfx/packs/powerups/1uppowerup.png", graphicspack));
