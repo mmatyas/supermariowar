@@ -27,9 +27,14 @@ bool File_Exists (const std::string fileName)
 #ifdef __MACOSX__
 #include <CoreFoundation/CoreFoundation.h>
 
+
 /* Call this when your application launches */
 void Initialize_Paths()
 {
+	if(SMW_Root_Data_Dir[0] != 0){ 
+		return; 
+	} 
+
     UInt8 temp[PATH_MAX];
     CFBundleRef mainBundle;
     CFURLRef dirURL;
@@ -38,16 +43,27 @@ void Initialize_Paths()
         cout << "Not running from an .app bundle" << endl;
         return;
     }
-    dirURL = CFBundleCopyResourcesDirectoryURL(mainBundle);
-    if (dirURL == NULL) {
+    
+	if(CFBundleCopyResourcesDirectoryURL(mainBundle) == NULL){ 
         cout << "Could not get resources directory URL" << endl;
         return;
     }
+
+	dirURL = CFBundleCopyBundleURL(mainBundle); 
     if (CFURLGetFileSystemRepresentation(dirURL, TRUE, temp,
         PATH_MAX) == NULL) {
         cout << "Could not get file system representation" << endl;
         return;
     }
+
+	strlcat(SMW_Root_Data_Dir, (char*)temp, PATH_MAX); 
+	int i = strlen(SMW_Root_Data_Dir) -1; 
+	while(SMW_Root_Data_Dir[i] !='/'){ 
+	   SMW_Root_Data_Dir[i] = 0; 
+	   --i; 
+	} 
+	SMW_Root_Data_Dir[i] = 0; 
+
     CFRelease(dirURL);
     cout << "Located data folder at: " << SMW_Root_Data_Dir << endl;
 }
@@ -161,3 +177,4 @@ const string getFileFromPath(const string &path)
 
 	return path;
 }
+
