@@ -1,7 +1,7 @@
 Currently (as of CVS HEAD) working correctly on:
-    [X] - Windows
-    [X] - Linux
-    [ ] - Mac OS
+    [X] - Windows - Two52
+    [X] - Linux - Dolorous
+    [X] - Mac OS - Some Mac Guy
 
 Problem description(s):
     Dirlisting seems mostly fixed, haven't gotten confirmation on Mac OS
