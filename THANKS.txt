@@ -34,6 +34,10 @@ Link901             for being a terrific moderator on the 72dpiarmy forums
 npodges             for creating and moderating the official content site 
                     www.smwstuff.com, maintaining the quality of uploads,
                     and registering #supermariowar on freenode for us
+Steven Graff        for completely overhauling the game and menu graphics
+Tim Radcliff        for helping moderate the 72dpiarmy forums and for his work on
+                    the New Super Mario War gfx pack
+Some Mac Guy        for maintaining the Mac builds
 
 
 other thanks in no particular order:
@@ -102,9 +106,9 @@ to make the game better.
 
 
 I'd also like to thank the xbox test crew: Brian Porter, Caesar Cypher,
-Brandon Stansbury, Brian Smith, Chris Schager, Alex Arnot, Jason Lumbert and
-Kevin King.  They have helped me find numerous bugs and have suggested tons of
-features.
+Brandon Stansbury, Brian Smith, Chris Schager, Alex Arnot, Jason Lumbert,
+Kevin King, and WasabiMario and his crew.  They have helped me find numerous 
+bugs and have suggested tons of features.
 
 THANKS!
 
