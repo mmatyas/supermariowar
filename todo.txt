@@ -767,7 +767,17 @@ Final
 [ ] Get Sgraff's new menu and game gfx and use as defaults
 [ ] Finalize map set
 [ ] Get some good default filters
+[ ] Update splash screen gfx to include "Steven Graff", "Jared McComb"
+[ ] Go through xbox controls in the docs and make sure they are right
+[ ] Make screenshots for manual:
 
+<JaredM> I'm thinking, for the two gameplay screens, have drastically different looking maps
+<JaredM> and for the tourny screens, have them both about half-done
+<JaredM> (try to be random in the game types for the plain tourney screen)
+<JaredM> (sorry if I am being control-freak-ish)
+<JaredM> and resize the screens down by 50% so they actually fit in there :P
+<JaredM> got that?
+<JaredM> >_>
 
 Thinking about 1.8...
 [ ] Expanded tileset -> spec it out - maybe allow a map only to choose 1 tileset it can use, need map between old and new tileset, need default tile types for each tileset
