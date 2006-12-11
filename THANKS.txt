@@ -29,15 +29,14 @@ dolorous            for maintaining the build for Linux systems and periodic
 Sgraff87            for putting in lots of work to create the awesome brand-
                     new default graphics which we're including in this release
 
-Link901             for being a terrific moderator on the 72dpiarmy forums
+Link901             for being a terrific moderator on the 72dpiarmy forums and
+                    for his work on the New Super Mario War gfx pack
 
 npodges             for creating and moderating the official content site 
                     www.smwstuff.com, maintaining the quality of uploads,
                     and registering #supermariowar on freenode for us
-Steven Graff        for completely overhauling the game and menu graphics
-Tim Radcliff        for helping moderate the 72dpiarmy forums and for his work on
-                    the New Super Mario War gfx pack
-Some Mac Guy        for maintaining the Mac builds
+
+Some Mac Guy        for maintaining the Macintosh builds of the game
 
 
 other thanks in no particular order:
@@ -110,7 +109,8 @@ Brandon Stansbury, Brian Smith, Chris Schager, Alex Arnot, Jason Lumbert,
 Kevin King, and WasabiMario and his crew.  They have helped me find numerous 
 bugs and have suggested tons of features.
 
-THANKS!
+
+THANKS AGAIN TO EVERYONE!
 
 
 Inevitably, we have forgotten to thank somebody for their contribution.  So
