@@ -26,7 +26,7 @@ Jared		    for contributing tons of ideas, managing user suggestions,
 dolorous            for maintaining the build for Linux systems and periodic
                     code review (catching lots of bugs)
 
-Sgraff87            for putting in lots of work to create the awesome brand-
+Steven Graff        for putting in lots of work to create the awesome brand-
                     new default graphics which we're including in this release
 
 Link901             for being a terrific moderator on the 72dpiarmy forums and
