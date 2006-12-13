@@ -29,6 +29,10 @@ and post a message on our forums.
 New maps, announcers and music packs are posted all the time, so please come
 visit!
 
+Also go visit out fan-made content repository at http://smwstuff.com
+It is full of new maps, music tracks, menu skins, announcers, tours, and
+lots more!
+
 Super Mario War was developed by Florian Hufsky, Two52 and many
 more contributors. For a complete list of great people see THANKS.txt
 
