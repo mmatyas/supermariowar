@@ -33,25 +33,21 @@ void Initialize_Paths()
 {
 	if(SMW_Root_Data_Dir[0] != 0){ 
 		return; 
-	} 
-
+	}
+#ifdef APPBUNDLE
     UInt8 temp[PATH_MAX];
     CFBundleRef mainBundle;
     CFURLRef dirURL;
     mainBundle = CFBundleGetMainBundle();
-    if (mainBundle == NULL) {
+    if (!mainBundle) {
         cout << "Not running from an .app bundle" << endl;
         return;
     }
-    
-	if(CFBundleCopyResourcesDirectoryURL(mainBundle) == NULL){ 
-        cout << "Could not get resources directory URL" << endl;
-        return;
-    }
 
-	dirURL = CFBundleCopyBundleURL(mainBundle); 
-    if (CFURLGetFileSystemRepresentation(dirURL, TRUE, temp,
-        PATH_MAX) == NULL) {
+	dirURL = CFBundleCopyBundleURL(mainBundle);
+	
+    if (!CFURLGetFileSystemRepresentation(dirURL, TRUE, temp,
+        PATH_MAX)) {
         cout << "Could not get file system representation" << endl;
         return;
     }
@@ -65,7 +61,10 @@ void Initialize_Paths()
 	SMW_Root_Data_Dir[i] = 0; 
 
     CFRelease(dirURL);
-    cout << "Located data folder at: " << SMW_Root_Data_Dir << endl;
+#else
+	strlcat(SMW_Root_Data_Dir, "./", 4);
+#endif
+	cout << "Located data folder at: " << SMW_Root_Data_Dir << endl;
 }
 #endif
 

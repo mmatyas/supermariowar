@@ -455,6 +455,7 @@
 					"-D__MACOSX__",
 					"$(OTHER_CFLAGS_QUOTED_1)",
 					"-DPNG_SAVE_FORMAT",
+					"-DAPPBUNDLE",
 				);
 				OTHER_CFLAGS_QUOTED_1 = "-DPREFIXPATH=\\\"\\\"";
 				OTHER_LDFLAGS = "";
@@ -486,6 +487,7 @@
 					"-D__MACOSX__",
 					"$(OTHER_CFLAGS_QUOTED_1)",
 					"-DPNG_SAVE_FORMAT",
+					"-DAPPBUNDLE",
 				);
 				OTHER_CFLAGS_QUOTED_1 = "-DPREFIXPATH=\\\"\\\"";
 				OTHER_LDFLAGS = "";
@@ -516,6 +518,7 @@
 					"-D__MACOSX__",
 					"$(OTHER_CFLAGS_QUOTED_1)",
 					"-DPNG_SAVE_FORMAT",
+					"-DAPPBUNDLE",
 				);
 				OTHER_CFLAGS_QUOTED_1 = "-DPREFIXPATH=\\\"\\\"";
 				OTHER_LDFLAGS = "";
@@ -542,6 +545,7 @@
 					"-D__MACOSX__",
 					"$(OTHER_CFLAGS_QUOTED_1)",
 					"-DPNG_SAVE_FORMAT",
+					"-DAPPBUNDLE",
 				);
 				OTHER_CFLAGS_QUOTED_1 = "-DPREFIXPATH=\\\"\\\"";
 				OTHER_LDFLAGS = "";

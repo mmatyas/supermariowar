@@ -53,7 +53,12 @@ void Menu::WriteGameOptions()
 #else
 #ifdef PREFIXPATH
     char * folder=getenv("HOME");
+#ifdef __MACOSX__
+	std::string optionsbin=std::string(folder)+
+		std::string("/Library/Preferences/smw.options.bin");
+#else
     std::string optionsbin=std::string(folder)+std::string("/.smw.options.bin");
+#endif
     fp= fopen(optionsbin.c_str(), "wb");
 #else
 	fp = fopen("options.bin", "wb");

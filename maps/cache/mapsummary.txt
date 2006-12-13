@@ -1,878 +1,220 @@
-0smw,0,0,0,1,1,0,0,0
-1-1,0,0,0,1,1,0,0,0
-1-2,0,0,0,1,0,0,0,0
+0smw,0,0,0,1,1,0,0,1
 1-3,0,0,0,1,0,0,0,1
-1-4,1,0,0,0,0,0,0,0
-101pain,1,1,0,1,0,0,0,0
-1986,1,1,1,1,1,0,0,0
-1highspeed,0,0,0,0,1,0,0,0
-1up 4realz,0,0,0,0,0,0,0,0
-2skyfight,0,0,0,0,1,0,0,0
-3blockforts,0,0,0,0,1,0,0,0
-3colormadness,0,0,0,0,0,0,0,0
-4 worlds,1,1,1,0,0,0,0,0
-4highabove,0,0,0,0,0,0,0,0
-4square,1,1,1,1,1,0,0,0
-5fall,0,0,0,0,0,0,0,0
-60 seconds,1,0,1,0,0,0,0,1
-7,0,0,0,1,0,0,0,0
-72dpiarmy,1,1,0,0,0,0,1,0
-A Square Dozen,0,0,0,1,0,0,0,0
-Abort abort,0,1,1,1,0,0,0,0
-Above the clouds,0,0,0,0,1,0,0,0
-Abovethedomes,0,1,0,1,0,0,0,0
-Acmlm's board,0,1,0,1,0,0,0,0
-Acmlm's bored,0,0,0,0,0,0,0,0
-Add,0,0,0,0,0,0,0,0
-Administration,1,1,0,1,0,0,0,0
-Advance apolgies for viet cong,1,1,0,1,0,0,0,0
-Adventure,1,0,1,1,1,1,0,0
-Aeropolis,0,0,0,1,0,0,0,0
-Affe,0,0,0,0,0,0,0,0
-Afterlife,1,1,1,1,0,0,0,0
-Air Fleet,0,0,0,1,0,0,0,1
-Airlift,0,0,1,0,0,0,0,0
-Airship 1,0,0,0,1,0,0,0,1
-Alaska,0,1,1,1,0,1,1,0
-Alinos gate,0,0,0,0,0,0,0,0
-Alinos perch,0,0,0,0,0,0,0,0
-Allo,0,1,0,1,0,0,0,0
-Alter,0,1,0,1,0,0,1,0
-Always different,1,0,0,1,0,1,1,0
-Another Boring Day,1,1,1,1,0,0,0,0
-Anothercastle,0,0,0,0,0,0,0,0
-Antiworld,1,1,1,1,0,0,0,0
-Aquarium,0,1,0,1,0,0,1,0
-Aquaticus,1,0,0,1,0,0,1,1
-Arcterra gate,1,0,1,1,0,0,0,0
-As seen on tv,0,1,0,1,0,0,1,0
-Asinine,0,0,0,1,0,0,0,0
-Aztec,0,0,0,1,0,0,0,0
-Backmaze,0,0,0,0,0,0,0,0
-Ballistic Boardwalks,0,0,0,1,0,0,0,0
-Barbecue,1,0,0,1,0,0,0,0
-BatteryDies,1,0,0,1,0,0,0,0
-Battle Creek,1,1,0,1,1,0,0,0
-Battle Field,1,0,0,0,0,0,0,0
-Battleblockarea,0,0,0,1,0,0,0,0
-Battlefield,0,0,0,1,0,1,1,0
-Begging for sumo,1,0,0,1,0,0,0,0
-Begging for sumo again,1,0,0,1,0,0,0,0
-Betterdropnow,0,1,1,0,0,0,0,1
+1986,1,1,1,1,1,0,0,1
+2skyfight,0,0,0,0,1,0,0,1
+3blockforts,0,0,0,0,1,0,0,1
+4highabove,0,0,0,0,0,0,0,1
+5fall,0,0,0,0,0,0,0,1
+Above the clouds,0,0,0,0,1,0,0,1
+Abovethedomes,0,1,0,1,0,0,0,1
+Affe,0,0,0,0,0,0,0,1
+Alinos gate,0,0,0,0,0,0,0,1
+Allo,0,1,0,1,0,0,0,1
+Arcterra gate,1,0,1,1,0,0,0,1
+As seen on tv,0,1,0,1,0,0,1,1
+Asinine,0,0,0,1,0,0,0,1
+Aztec,0,0,0,1,0,0,0,1
+Ballistic Boardwalks,0,0,0,1,0,0,0,1
+Battle Creek,1,1,0,1,1,0,0,1
+Battleblockarea,0,0,0,1,0,0,0,1
+Battlefield,0,0,0,1,0,1,1,1
+Begging for sumo,1,0,0,1,0,0,0,1
+Begging for sumo again,1,0,0,1,0,0,0,1
 Bewarehouse,0,1,0,1,0,0,0,1
-Bianco hills - big windmill,0,1,0,0,0,0,0,1
-Bianco hills - hillside cave secret,0,0,0,0,0,0,0,1
-Bianco hills - lake,0,0,0,1,0,0,0,1
-Bianco hills - windmill village,1,0,0,0,0,0,0,1
-Big Tree,0,0,0,1,0,0,0,0
-Big blue,1,0,0,1,0,0,0,0
-Bigger boo's fort,0,0,0,0,0,0,0,0
-Birabuto,0,0,0,1,0,0,0,0
-Black Maze,0,1,0,1,1,0,0,0
-Blagggh,1,0,0,1,0,0,0,0
-Blargg's Pit,1,0,0,1,0,0,0,0
-Blast Furnace,1,1,0,1,0,0,0,1
-Block Piles,0,0,0,1,0,1,0,0
-Block hop,1,1,1,1,0,0,0,0
-Block war,0,0,0,0,0,0,0,0
-Block! Block!,0,0,0,1,0,0,0,0
-BlockInvasion,0,0,0,0,0,0,1,0
-Blockarena,0,0,0,0,0,0,0,0
-Blockfactory,0,0,0,1,0,0,0,0
-Blockfort,0,0,0,1,0,0,0,0
-Blockfortess,0,0,0,0,1,0,0,0
-Blockswar,0,0,0,1,0,0,0,0
-Blood Gultch,0,1,0,0,0,0,0,0
-Blueprint,1,1,0,0,0,0,0,0
-Bluepyramid,0,0,0,0,0,0,0,0
-Blueworld,0,0,0,0,0,0,0,0
-Boarding Action,1,1,0,1,0,0,0,0
-Boddy residence,0,1,0,1,0,0,0,0
-Boingy Spiky Insanity,1,0,0,1,0,0,0,0
-Bombarded by bob-ombs,0,0,0,0,0,0,0,0
-Bonus Room,0,1,0,1,0,0,0,0
-Boo is Back,1,0,0,1,0,0,0,0
-Bossroom,0,0,0,0,1,0,0,0
-Bottle,0,0,0,0,1,0,0,0
-Bottles,0,0,1,0,0,0,1,0
-Bounce arena,0,0,1,1,0,0,0,1
-Bounce u sucka,0,0,0,1,0,0,0,0
-Bounce2lava,1,0,0,1,0,0,0,0
-Bouncetransport,0,1,1,1,0,0,0,0
-Bouncy Spikes,1,0,0,1,0,0,0,0
-Bound by duty,0,1,0,1,0,0,0,0
-Bowser's castle,1,0,0,1,1,0,0,1
-Box Arena,0,0,0,1,0,0,0,0
-Boxes of wonder,0,1,0,1,0,0,0,0
-Breakaway,0,0,0,1,1,0,0,0
-Breaker,0,0,0,1,1,0,0,0
-Brick Room,0,0,0,1,1,0,0,0
-Bring a towel,0,1,0,1,0,0,0,0
-Bubble bobble,0,0,0,0,0,0,0,0
-Bubblebobble,0,0,0,0,0,0,0,0
-Bubblebobble2,0,0,0,0,0,0,0,0
-Bump 'Em Burn 'Em Bridge,1,0,0,1,0,0,0,0
-Bunkers,0,1,0,1,0,0,1,0
-Burning Questions,1,0,0,1,0,0,0,1
-Busted,0,0,0,0,0,0,0,0
-Buster_Beetle_s_Tower,0,0,0,1,0,1,1,0
-Cactus canyon,1,1,0,1,0,0,0,0
-Castle,1,0,0,1,0,0,0,0
-Castle a go-go,0,0,0,0,0,0,0,0
-Castle defence,0,1,0,1,0,0,0,0
-Castle koopa,0,1,0,1,0,0,0,0
-Castle sewers,0,1,0,1,0,0,0,0
-Castlebase,1,1,0,1,0,0,0,0
-Castlebase2,1,1,0,1,0,0,0,0
-Castledungen,1,1,0,1,1,0,0,0
-Castleout,0,0,0,1,0,0,0,0
-Castlewar,0,0,0,0,0,0,0,0
-Castor wilds,1,0,0,1,1,0,0,0
-Cave,1,0,0,1,0,1,0,0
-Ccq,0,0,0,1,0,0,0,0
-Chainlink,0,0,0,1,0,1,0,0
-Chains,1,1,0,1,0,0,1,1
-Chaotic Caverns,1,0,0,1,1,0,0,0
-Checkerboard,1,0,0,1,0,1,0,0
-Cheerio,0,0,0,1,1,0,0,0
-Chicken,0,0,0,0,0,0,0,0
-Chill Out,0,1,0,1,0,0,0,0
-Chill cavern,0,0,0,1,0,0,0,0
-Chiron TL34,0,1,0,1,0,0,0,0
-Chomp beach,0,0,0,1,1,0,0,0
-Circuit,0,0,0,1,0,0,0,0
-Classicon,0,1,0,1,0,0,0,0
-Claustrophobia,0,1,0,1,0,0,0,0
-Claustrophobic,0,1,0,1,1,0,0,0
-Cliff,0,0,0,1,0,0,0,0
+Big Tree,0,0,0,1,0,0,0,1
+Block Piles,0,0,0,1,0,1,0,1
+Block! Block!,0,0,0,1,0,0,0,1
+Blockfort,0,0,0,1,0,0,0,1
+Blockswar,0,0,0,1,0,0,0,1
+Boo is Back,1,0,0,1,0,0,0,1
+Bottle,0,0,0,0,1,0,0,1
+Bounce2lava,1,0,0,1,0,0,0,1
+Bouncy Spikes,1,0,0,1,0,0,0,1
+Breakaway,0,0,0,1,1,0,0,1
+Breaker,0,0,0,1,1,0,0,1
+Bring a towel,0,1,0,1,0,0,0,1
+Bubble Bobble 2,0,0,0,0,0,0,0,0
+Buster_Beetle_s_Tower,0,0,0,1,0,1,1,1
+Cactus canyon,1,1,0,1,0,0,0,1
+Castleout,0,0,0,1,0,0,0,1
+Castor wilds,1,0,0,1,1,0,0,1
+Cave,1,0,0,1,0,1,0,1
+Chainlink,0,0,0,1,0,1,0,1
+Chomp beach,0,0,0,1,1,0,0,1
+Circuit,0,0,0,1,0,0,0,1
+Classicon,0,1,0,1,0,0,0,1
+Cliff,0,0,0,1,0,0,0,1
 Cliff tower,1,1,0,1,0,1,1,1
-Cliffs,1,0,0,1,1,1,1,0
-Cloggedconveyors,1,0,0,1,0,0,1,1
-Clondarena2,0,0,0,0,0,0,0,0
-Cloud Garden,0,0,1,1,1,0,0,0
-Cloud Props,0,0,0,1,0,0,0,0
-Cloud bounce,0,0,0,1,0,0,0,0
-Cloudallusion,0,1,0,1,1,0,0,0
-Cloudarena,0,0,0,0,0,0,0,0
-Cloudy day,0,0,0,0,0,0,0,0
-Cold Comfort Hot Death,1,1,1,1,0,0,0,1
-Cold caves,0,1,0,1,1,0,0,0
-Coldheat,1,0,1,1,0,0,0,0
-Colony,0,0,0,1,0,0,0,0
-Colorpile,1,0,0,0,0,0,0,0
-Colors,0,0,0,1,1,0,0,0
-Congo Jungle,0,0,0,1,0,0,0,1
-Constant lookout,0,0,0,0,0,0,0,0
-Constraint,0,0,0,1,0,0,0,0
+Cloud Garden,0,0,1,1,1,0,0,1
+Cloud Props,0,0,0,1,0,0,0,1
+Colorpile,1,0,0,0,0,0,0,1
 Coolnights,0,1,0,1,0,0,0,1
-Corona mountain - boat,0,0,0,0,0,0,0,0
-Corona mountain - cave,0,0,0,0,0,0,0,0
-Corona mountain - top,1,0,0,0,0,0,0,1
-Cpu Stupidity,1,1,0,1,0,0,0,0
-Cranium,0,0,0,1,0,0,1,0
-Crazy Chambers,1,0,0,1,1,0,0,0
-Crazy castle,0,0,0,0,0,0,0,0
-Crazy dungeon,0,0,1,1,0,1,1,0
-Cruel joke,0,0,0,0,0,0,0,0
-Crush caves,0,0,0,0,0,0,0,0
-Crystal caverns,0,0,0,0,0,0,0,0
-Crystal maze,0,0,0,0,0,0,0,0
-Cubicle,0,1,0,1,1,1,0,0
-Cyclotron,1,1,0,1,1,0,0,0
-Damnation,0,1,1,1,1,0,0,0
-Danger,1,1,0,1,0,0,1,0
-Danger Canyon,0,0,0,0,1,0,0,0
-Danger factory,1,0,0,1,0,0,1,1
-Dare,1,0,0,1,0,0,1,0
-Darkrock,1,1,0,1,0,0,0,0
-Deadly Cave,1,0,0,1,1,0,0,0
-Death From Above,0,0,0,1,0,0,0,0
-Death Island,1,0,0,1,0,0,0,0
-Death to iggy,1,0,0,0,0,0,0,0
-Deathpit,1,0,0,0,0,0,0,0
-Delemma,1,1,0,1,1,1,1,1
-Delfino airstrip,0,1,0,1,0,0,0,1
-Delfino plaza,0,0,0,0,0,0,0,1
-Derelict,0,1,0,1,0,0,0,0
-Desert,0,0,0,1,1,0,0,0
-Desert Deathtrap,1,0,0,1,0,0,0,0
-Desert hills,0,0,0,0,0,0,0,0
-Desert message,1,1,0,1,1,0,0,0
-Desert oasis,0,0,0,1,1,0,0,0
-Desert pit,1,1,0,1,0,0,0,0
-Devilevel,1,0,0,1,0,0,0,0
-Dig Dug,0,0,0,1,0,0,0,0
-Discoboogy,0,1,0,1,0,0,0,0
-Divide,0,0,0,0,0,0,0,0
-Divine intervention,0,1,0,0,0,0,0,0
-Division,0,0,0,1,0,0,0,0
-Dkjungle,0,0,0,1,0,0,0,0
-Dm,0,0,0,0,0,0,0,0
-Dm2,0,0,0,1,1,0,0,0
-Dm3,0,0,0,0,0,0,0,0
-Dm4,0,0,0,0,1,0,0,0
-Dodgefall,1,0,0,0,0,0,0,1
-Don't Look Down,1,1,0,1,1,0,0,0
-Don't burn up,0,0,0,0,0,0,0,0
-Don't do it,1,1,0,1,0,0,0,1
+Crazy castle,0,0,0,0,0,0,0,1
+Crazy dungeon,0,0,1,1,0,1,1,1
+Crystal caverns,0,0,0,0,0,0,0,1
+Danger Canyon,0,0,0,0,1,0,0,1
+Dare,1,0,0,1,0,0,1,1
+Darkrock,1,1,0,1,0,0,0,1
+Death From Above,0,0,0,1,0,0,0,1
+Death Island,1,0,0,1,0,0,0,1
+Death to iggy,1,0,0,0,0,0,0,1
+Derelict,0,1,0,1,0,0,0,1
+Desert,0,0,0,1,1,0,0,1
+Divine intervention,0,1,0,0,0,0,0,1
+Dkjungle,0,0,0,1,0,0,0,1
+Dm,0,0,0,0,0,0,0,1
 Donkey Kong,1,1,0,1,0,0,0,1
-Donkeykong,1,1,0,1,0,0,0,0
-Dont look down,1,1,0,1,1,0,0,0
-Doomship,0,0,0,1,0,0,0,1
-Doomship arena,1,1,0,1,1,1,1,1
-Doomship battle,0,1,0,1,1,1,1,1
-Doomship doubles,0,1,0,1,0,0,1,1
-Doors o' plenty,0,1,0,0,0,0,0,0
-Dottedplus,0,0,0,1,0,0,1,0
+Dottedplus,0,0,0,1,0,0,1,1
 Double Sting,1,1,0,1,0,0,0,1
-Double-t,0,0,0,1,1,0,0,0
-Doublecaps,0,1,0,1,0,0,0,0
-Doubledown,0,0,0,1,1,0,0,0
-Doublevision,1,1,1,1,1,0,0,0
-Down With Donuts,0,1,0,1,1,0,0,0
-DowntheUpEscalator,1,1,0,1,0,0,1,1
-Drawbridge,0,0,0,0,0,0,0,0
-Dreamland,1,1,0,1,1,1,1,1
-Drload,0,0,0,0,0,0,0,0
-Dropout,1,0,0,1,0,0,0,0
+Double-t,0,0,0,1,1,0,0,1
+Doubledown,0,0,0,1,1,0,0,1
+Doublevision,1,1,1,1,1,0,0,1
+Down With Donuts,0,1,0,1,1,0,0,1
 Dropouts,0,0,0,1,0,0,0,1
-Ds,1,1,0,1,1,0,0,0
-Duel of fates,1,0,0,0,0,0,0,1
-Dueling doomships,0,1,0,1,0,0,0,0
-Dune,0,1,0,1,0,0,0,0
-Dungeon,1,0,0,1,0,0,0,0
-Eighth Platform,0,1,0,1,1,1,0,0
-Elevate,0,0,0,1,0,0,0,1
-Elevated,0,1,0,1,1,0,0,0
-Elevator,0,0,0,1,0,0,1,1
-Elevator of doom,1,0,0,0,0,0,0,1
-Engine of doom,0,0,0,1,1,0,0,1
-Escalation,0,0,0,1,0,0,0,0
-Evening Fracas,1,1,0,1,0,0,1,0
-F you,0,0,0,1,0,0,0,0
-Factions,0,0,0,1,0,0,0,0
-Falling zone,0,0,0,0,0,0,0,0
-Fast action,0,0,0,0,0,0,0,0
+Dune,0,1,0,1,0,0,0,1
+Eighth Platform,0,1,0,1,1,1,0,1
+Elevated,0,1,0,1,1,0,0,1
+Evening Fracas,1,1,0,1,0,0,1,1
 Fastlane,1,0,0,1,0,0,0,1
-FatMan'sMisery,0,0,0,0,0,0,0,0
-Fate,1,1,0,1,0,0,0,0
-Fated circle,0,0,0,1,0,0,0,0
-Field day,0,0,0,1,1,0,0,0
-Finalfight,1,0,0,1,0,0,1,1
-Fire in the hole,1,1,0,1,0,0,0,0
-Firery fate,1,1,1,1,1,1,0,0
-First,1,1,0,1,0,0,0,0
-Flipblock maze,0,1,0,1,0,0,0,0
-Flipside,0,1,0,0,0,0,0,0
-Flood,0,0,0,1,0,0,1,1
-Florida,0,0,0,1,1,0,0,0
-Flux,0,1,0,1,1,0,0,0
-Foobar!,0,1,0,0,0,0,0,0
-Fortress,0,1,0,1,1,0,0,0
-Fortressitis,1,0,0,1,0,0,0,0
+Field day,0,0,0,1,1,0,0,1
+Fortress,0,1,0,1,1,0,0,1
 Fountain of Dreams,0,0,0,1,0,0,1,1
-Four Corners,0,0,0,1,0,0,0,0
-Frag-O-Matic Ruins,1,0,0,1,1,0,0,0
-Frappe snowland,0,0,0,0,0,0,0,0
-Freefall,0,0,0,0,0,0,0,0
-Friday13,0,0,0,1,1,0,0,0
-Frostburn,1,0,1,1,0,0,0,0
-Frozen Fortress,1,0,1,1,0,1,1,0
-Frozen fortress,1,0,1,1,1,0,0,0
-Funnel of love,1,0,0,1,0,0,0,0
-Gameboyadvance,0,1,0,1,0,0,0,0
-Gamecube,0,1,0,1,1,0,0,0
-Gatekeeper,1,0,0,1,0,0,1,0
-Gelato beach - hut,1,0,0,0,0,0,0,0
-Gelato beach - mirror,0,0,1,0,0,0,0,1
-Gelato beach - sandcastle,0,0,0,0,0,0,0,1
-Generic Hills,0,0,0,0,0,0,0,0
-Genocide city,1,0,0,1,0,0,0,0
-Gephyrophobia,0,1,1,1,1,0,0,0
-Geyser,0,1,0,1,0,0,0,1
-Geyser2,0,1,0,1,0,0,0,1
-Ghost palace,0,0,0,0,0,0,0,0
-Ghostclimb,1,0,0,1,0,0,0,0
-Ghosthouse,0,0,0,1,0,0,0,0
-Ghostly madness,0,0,0,1,0,0,0,0
-Ghostmansion,1,0,1,1,1,1,0,0
-GoForIt,0,1,0,1,0,1,1,0
-Gold,0,0,0,1,1,0,0,0
-Gold-half,0,0,0,0,1,0,0,0
-Golden temple,0,0,0,1,1,0,0,0
-Goldmine,1,0,0,1,1,0,0,0
-Goomba Genocide,1,0,0,0,0,0,0,0
-Goomba village,1,1,0,1,1,0,0,0
-Greden,0,1,0,0,1,0,0,0
-Green Hill Zone,1,0,0,0,0,0,0,0
-Green greens,0,0,0,1,0,0,0,0
-Greenhill,0,0,0,1,0,0,0,0
-Greeny,0,0,0,1,1,0,0,0
-Gritzy desert,0,0,0,1,0,0,1,0
-Guardian arena aqua,0,1,0,1,1,0,0,0
-Guardian arena pearl,0,1,0,1,1,0,0,0
-H4x0r,1,1,1,1,0,0,0,0
-Halberd,1,0,0,0,0,0,0,0
-Halo,0,1,0,1,1,0,0,0
-Hang 'Em High,0,0,0,0,1,0,0,0
-Hanging Cactus Gardens,0,0,0,1,0,0,0,0
-Hanging on,0,0,0,0,0,0,0,0
-Hanzou,0,0,0,1,0,0,0,0
-Hard to fly,0,0,0,0,0,0,0,0
-Haunted Temple,0,0,0,1,0,0,0,0
-Haunted hall,0,0,0,0,0,1,0,0
-Haxor,1,1,1,1,0,0,0,0
-Hazerdhell,1,0,0,0,0,0,1,1
-Heinous Heights,0,0,0,1,1,0,0,0
-Hell,1,1,0,0,1,0,0,0
-Hello world,0,0,0,1,1,0,0,0
-Hidenseek,0,1,0,1,0,0,0,0
-High Rise,1,1,1,1,0,0,0,0
-High flying,0,0,0,1,0,0,0,0
-Highvillage,0,0,0,0,0,0,0,0
-Hit me,0,1,1,1,0,0,1,0
-Hollijolli village,0,0,1,1,1,0,0,0
-Hoog,0,0,0,1,0,0,0,0
-Hot foot,1,1,0,1,1,0,0,0
-Hot lava,1,0,1,1,0,0,0,0
-Humanitary,0,1,1,1,0,0,0,0
-Hyrule Castle,0,0,0,1,0,0,0,0
-Hyruletemple,0,0,0,1,0,0,0,0
-I Have Fury,1,1,1,1,1,0,0,0
-Ice Fields,0,1,1,1,1,1,0,0
-Ice hill,0,0,0,0,0,0,0,0
-Ice pit,1,0,1,1,0,0,0,0
-Ice stair,1,0,1,1,1,0,0,0
-Ice warping,0,1,1,1,0,0,1,0
-Icecap,0,1,1,1,0,0,0,0
-Icecube,1,1,1,0,1,0,0,0
-Icefortress,1,0,1,1,1,1,0,0
+Frozen Frenzy,0,0,1,1,0,0,0,1
+Gatekeeper,1,0,0,1,0,0,1,1
+Ghosthouse,0,0,0,1,0,0,0,1
+Ghostly madness,0,0,0,1,0,0,0,1
+GoForIt,0,1,0,1,0,1,1,1
+Gold,0,0,0,1,1,0,0,1
+Greden,0,1,0,0,1,0,0,1
+Green Hill Zone,1,0,0,0,0,0,0,1
+Green greens,0,0,0,1,0,0,0,1
+Greenhill,0,0,0,1,0,0,0,1
+Greeny,0,0,0,1,1,0,0,1
+Hanging Cactus Gardens,0,0,0,1,0,0,0,1
+Hanzou,0,0,0,1,0,0,0,1
+Hard to fly,0,0,0,0,0,0,0,1
+Haunted Temple,0,0,0,1,0,0,0,1
+Heinous Heights,0,0,0,1,1,0,0,1
+Hello world,0,0,0,1,1,0,0,1
+Hidenseek,0,1,0,1,0,0,0,1
+High flying,0,0,0,1,0,0,0,1
+Hoog,0,0,0,1,0,0,0,1
+Humanitary,0,1,1,1,0,0,0,1
+Hyrule Castle,0,0,0,1,0,0,0,1
+Icecap,0,1,1,1,0,0,0,1
+Icecube,1,1,1,0,1,0,0,1
 Iceland,1,1,1,1,0,0,0,1
-Icelerate,0,1,1,1,0,0,0,0
-Icerink,0,0,1,1,1,1,0,0
 Icy hills,0,0,1,1,0,1,1,1
-Iggyscastle,0,0,0,1,0,0,1,1
-In the doomship,0,1,0,1,0,1,1,1
-Indoor,0,1,0,0,0,0,0,0
-Inebriation,0,1,1,1,0,0,0,0
-Inertia,0,0,0,0,0,0,0,0
-Inevitable,0,1,0,1,0,0,0,0
-Infinity,0,0,0,1,1,0,0,0
-Inner maze,0,0,0,0,0,0,0,0
-Interlink,0,1,0,1,1,0,0,0
-Internalcombustionengine,1,0,0,1,0,0,0,1
-Invisible Walls,0,0,0,1,0,0,0,0
-Iron,0,0,0,1,0,0,0,0
-Islands of Questionable Support,0,0,0,1,0,0,0,0
-Isle delfino,0,0,0,0,0,0,0,0
-It goin rain,0,1,0,1,0,0,0,0
-Item Frenzy,0,0,0,1,0,0,0,0
-Item factory,0,0,0,1,0,0,0,1
-Itembox,0,0,0,0,0,0,0,1
-Ivory tower,0,0,0,0,0,0,0,0
-Java,0,0,0,0,0,0,0,0
-Jerry,0,1,0,0,0,0,0,0
-Juanx0000,0,0,0,1,0,0,0,0
-Jukebox,0,0,0,1,1,0,0,0
-Jumpnbump,1,0,1,1,0,0,0,0
-Jungle,0,0,0,1,0,0,0,0
-Jungle Japes,0,0,0,1,0,0,0,0
-KeepItSimple,0,0,0,0,0,0,0,0
-Keeponrunning,0,0,0,0,0,0,0,0
-Killswitch,1,0,0,1,0,0,1,0
+Indoor,0,1,0,0,0,0,0,1
+Inebriation,0,1,1,1,0,0,0,1
+Inertia,0,0,0,0,0,0,0,1
+Iron,0,0,0,1,0,0,0,1
+Islands of Questionable Support,0,0,0,1,0,0,0,1
+Jump n Bump,1,0,1,1,0,0,0,0
+Jungle,0,0,0,1,0,0,0,1
+Jungle Japes,0,0,0,1,0,0,0,1
 King of the Hills,0,0,0,1,0,0,1,1
-King_of_the_hill,0,1,0,1,0,0,0,0
-Kirby canvas curse,0,1,0,1,1,0,0,0
+King_of_the_hill,0,1,0,1,0,0,0,1
 Kongo Jungle,0,0,0,1,0,0,0,1
-Koopa beach,0,0,0,1,1,0,0,0
-Koopaseum,0,1,0,1,0,0,0,0
-Kraid,1,1,0,1,0,0,1,0
-La Tour Eiffel,0,1,0,1,1,1,0,0
-Lava 'n' spike room,1,0,0,1,0,0,0,0
-Lavabattle,1,0,0,0,0,0,0,0
-Lavacave,1,0,0,1,0,0,0,0
-Lavaisland,1,0,0,1,0,0,0,0
-Lavaland,1,1,1,1,0,0,0,0
-Lazy eye,0,0,0,1,1,0,0,0
-Leave the Lights On,0,0,0,1,1,1,1,1
-Leonardo,0,0,0,1,0,0,0,0
-Lift,1,0,0,0,0,0,0,0
-Lockout,0,1,0,1,1,0,0,0
-Lol dialup,0,0,0,1,0,0,0,0
-Lol internet,0,0,0,1,0,0,0,0
-Lololo and lalala,0,1,0,0,0,0,0,0
-Longest,0,0,0,1,1,0,0,0
-Look_above,0,0,0,1,1,0,0,0
-Lost Woods,0,0,0,0,0,0,0,0
-Lost in new york,0,1,0,1,0,1,0,0
-Low bandwidth,0,1,0,0,0,0,0,0
-Low on ideas,0,0,0,1,1,0,0,0
+Lava Island,1,0,0,1,0,0,0,0
+Lockout,0,1,0,1,1,0,0,1
+Look_above,0,0,0,1,1,0,0,1
+Low bandwidth,0,1,0,0,0,0,0,1
 Lunar,1,1,0,1,1,1,1,1
-MK-Block Fort,0,0,0,1,0,0,0,0
-MK-Daisy Cruiser,1,1,0,1,0,0,0,0
-MK-Koopa Beach,0,0,0,1,1,0,0,0
-MK-Mario Circuit,0,1,0,1,1,0,0,0
-MK-Rainbow Road,1,1,0,1,0,0,0,0
-MK-Sky Garden,0,0,0,1,0,0,0,0
-MK-Toad's Turnpike,1,1,0,1,0,0,0,0
-MK-Waluigi Pinball,1,1,0,1,1,0,0,0
-MK-Wario Stadium,0,0,0,1,0,0,0,0
-MS DOS,1,1,0,1,0,0,0,0
-Magical note blocks,0,0,0,1,0,0,0,0
-Magical note blocks 2,0,0,0,0,0,0,0,0
-Make no mistakes,1,0,0,0,0,0,0,1
-Manic Mountain,0,0,0,1,0,0,0,0
-Manor,1,0,0,1,1,0,0,0
-Mansion maddness,0,0,0,0,0,0,0,0
-Map name too long,1,0,0,1,1,0,0,0
-Mario,1,1,0,1,1,0,0,0
-Mario & luigi partners in time,1,1,0,1,1,0,0,0
-Mario Bros.,1,1,0,1,0,0,0,0
-Mario mayhem,1,1,1,1,1,0,0,0
-Mario war,1,0,1,0,1,0,0,0
-Marketplace,0,0,0,1,0,0,0,0
-MasterSword,0,1,0,1,0,0,0,0
-Math,1,0,0,0,1,0,0,0
-Matter mania,0,0,0,1,0,0,1,1
-Maverick hunt,0,1,0,1,0,0,0,0
-Mayhem,0,0,0,1,0,0,0,0
-Maze,0,0,0,1,0,0,0,0
-Mbc,1,1,0,1,0,0,0,0
-Meadows,0,0,1,1,1,0,0,0
-Mini-airship 1,0,0,0,1,0,0,0,1
-Mirror palace,1,1,1,1,0,0,0,0
-Mishmash,1,1,0,1,0,0,0,0
-Misstep,0,0,0,0,0,0,0,0
-Mod shrine,0,0,0,0,0,0,0,0
-Momentum,1,1,1,1,1,0,0,0
-Mother brain,1,1,0,1,0,0,1,0
-Mountain King,1,1,0,1,0,0,0,0
-Mountain area,0,1,0,1,1,0,0,0
-Mountain waterfall,0,0,0,0,0,0,0,0
-Mountains,0,0,0,1,0,0,0,0
-Moving caves,0,1,0,1,0,1,1,1
-Moving mountains,1,1,0,1,0,1,1,1
-Mp5 - frozen frenzy,0,0,1,1,0,0,0,1
-Mp5 - squared away,0,0,0,0,0,0,0,0
-Mp5 - tube it or lose it,0,0,0,0,0,0,0,0
-Multiply,0,0,0,0,0,0,0,0
+Manic Mountain,0,0,0,1,0,0,0,1
+Manor,1,0,0,1,1,0,0,1
+Matmata,0,0,0,1,1,0,0,0
+Mbc,1,1,0,1,0,0,0,1
+Meadows,0,0,1,1,1,0,0,1
+Mishmash,1,1,0,1,0,0,0,1
+Mountain King,1,1,0,1,0,0,0,1
+Mountain waterfall,0,0,0,0,0,0,0,1
+Mountains,0,0,0,1,0,0,0,1
 Mushroom Kingdom,1,1,0,1,0,0,0,1
-MushroomMaze1,1,0,0,1,0,0,0,0
-MushroomMaze2,1,0,0,1,0,0,0,0
-Mushroomkingdom,1,0,0,1,1,0,0,1
 Mushroomkingdom2,0,0,0,1,0,0,0,1
-Music mania,0,0,0,0,0,0,0,0
-Mute City,0,1,0,1,0,0,0,0
-Mystery,0,0,0,1,0,0,0,0
-NSMB castle,1,0,0,1,0,0,1,1
-Neo Pinball,1,1,0,1,1,0,0,1
-Nes,0,0,0,0,0,0,0,0
-Ninja Gaiden 1 - 1-1,0,0,0,1,0,0,0,0
-Nintendo64,0,0,0,0,0,0,0,0
-Noki bay - bottle,0,0,1,0,0,0,0,0
-Noki bay - noki city,0,0,0,0,0,0,0,1
-Noki bay - tricky ruins,0,1,0,1,0,0,0,0
-Noki bay - water,1,0,0,0,0,0,0,1
-Nosebleed,0,0,0,1,1,0,0,0
+Ninja Gaiden 1 - 1-1,0,0,0,1,0,0,0,1
 Not so cave,1,0,0,1,0,0,1,1
-NotAnotherPipeMaze,0,1,0,0,1,1,0,0
-Noteworld,0,0,0,1,0,0,0,0
-Oblitzerator,1,1,0,1,0,0,0,0
-Old age,0,1,0,1,1,0,0,0
-On Again Off Again,1,0,0,1,0,1,1,1
-On-off realm,0,1,0,1,1,1,1,1
-One At a Time,1,0,0,1,0,1,1,1
-Onett,0,0,0,1,0,0,0,0
-Open up,0,0,0,0,0,0,0,0
-Outset Island,1,0,0,1,0,0,0,0
-Overhang,0,0,0,0,0,0,0,0
-Overthehill,0,0,0,1,1,0,0,0
-Pacman,0,1,0,1,0,1,0,0
-Pacman2,0,1,0,1,0,1,0,0
-Palace,0,1,0,1,0,0,0,0
-Panelicious,0,0,0,0,0,0,0,0
-Panic,0,0,0,0,0,0,0,0
-Paper mario,0,0,0,0,0,0,0,1
-Paper_mario,0,0,0,0,0,0,0,1
-Parabeetle challenge,0,0,0,0,0,0,0,0
-Pass,0,0,0,0,0,0,0,0
+Onett,0,0,0,1,0,0,0,1
 Peach Castle,0,0,0,1,0,0,1,1
 Peach's Castle,0,0,0,1,1,1,0,1
-Pepperland,0,1,0,0,0,0,0,0
-Pianta village - inferno,0,0,0,0,0,0,0,0
-Pianta village - spa,0,0,0,0,0,0,0,0
-Pianta village - underside,0,1,0,0,0,0,0,0
-Pianta village - village,0,0,0,0,0,0,0,0
-Piemont,0,1,0,1,0,0,0,0
-Pillar panic,1,0,0,1,0,0,0,1
-Pillars_of_glory,0,0,1,1,0,0,0,0
-Pinball,1,0,0,1,0,0,0,0
-Pink Paradise,0,0,0,1,0,0,0,0
-Pinna park - ferris wheel,0,0,0,1,0,0,0,1
-Pinna park - gate,0,1,0,0,1,0,0,0
-Pinna park - mecha-bowser,1,0,0,0,0,0,0,1
-Pinna park - wall,0,0,0,0,0,0,0,0
-Pinna park - yoshi-go-round,0,0,0,0,0,0,0,1
-Pipe 0 mania,0,1,0,1,0,0,0,0
-Pipe Corridors,0,1,0,1,0,0,0,0
-Pipe Town,1,1,1,1,1,0,0,0
-Pipe labyrinth,1,1,0,1,1,0,0,0
-Pipe network,0,1,0,1,1,1,0,0
-Pipe place,0,1,0,1,1,0,0,0
-Pipe-o-rama,0,1,0,1,1,1,1,1
-PipeRooms,0,1,0,1,1,0,0,0
-Pipe_organ,0,0,0,1,0,0,0,0
-Piped full of piranhas,0,0,0,0,0,0,0,0
-Pipedreams,0,0,0,1,0,0,0,0
-Pipeland,0,0,0,0,0,0,0,0
-Pipeland_06,0,1,0,1,0,0,0,0
-Pipelander,1,1,0,0,1,0,0,0
-Pipelines,0,0,0,1,0,0,0,0
-Pipemania,0,1,0,1,0,0,0,0
-Pipes,0,1,0,1,0,0,0,0
+Pianta village - village,0,0,0,0,0,0,0,1
+Piemont,0,1,0,1,0,0,0,1
+Pillars of glory,0,0,1,1,0,0,0,0
 Pipes at sea,1,0,0,1,1,1,0,1
-Pipes of wonder,0,1,0,1,0,0,1,1
-Pipesecret,1,1,0,1,0,1,0,0
-Pipestruck,0,1,0,1,0,0,0,0
-Piston Peril,0,0,0,1,0,0,1,1
-Pit of carkoon,0,0,0,0,0,0,0,0
-PlatShaft,0,0,0,1,0,0,0,1
-Platform peril,0,0,0,0,0,0,0,0
-Platformer,0,0,0,0,0,0,0,0
-Plinko,1,1,0,1,0,0,0,0
-Plumbing Terror,0,1,0,1,1,0,0,0
-Pow shrine,0,0,0,0,0,0,0,0
-Power block alley,0,0,0,1,0,0,0,0
-Precious Platforms,1,0,0,1,0,0,0,0
-Prepare to Joust Buzzard Bait,1,1,0,0,0,0,0,0
-Pretty Colors,0,1,0,0,0,0,0,0
-Pride,0,0,0,1,1,0,0,0
-Pride of ivalice,1,0,0,1,0,0,0,0
-Prison Break,0,0,0,0,0,0,0,0
-Prisoner,0,0,0,1,0,0,0,0
-Punchedunderneath,0,1,0,0,0,0,0,0
-Punk'd,1,1,0,1,1,0,0,0
-Pyramid,0,1,0,1,1,0,0,0
-Pyrazid,0,0,0,0,1,0,0,0
-Quarterblock,0,0,0,1,0,0,0,0
-Quest,0,0,0,1,0,0,0,0
-Quzza,1,0,0,1,0,0,0,0
-RSSFeed,0,0,0,0,0,0,0,0
-Ragnarok,0,0,0,0,0,0,0,0
-Rainbow road,0,1,0,1,0,0,0,0
+Pipestruck,0,1,0,1,0,0,0,1
+Prepare to Joust Buzzard Bait,1,1,0,0,0,0,0,1
+Pyramid,0,1,0,1,1,0,0,1
+Quarterblock,0,0,0,1,0,0,0,1
+Quzza,1,0,0,1,0,0,0,1
 Rainbowride,0,1,0,1,0,0,1,1
-Rainbowroadredux,0,1,0,1,0,0,0,0
-Random warping,1,1,1,1,0,0,0,0
-Raphael the raven,0,0,0,1,0,0,0,0
-Rat Race,0,1,0,1,0,0,0,0
-Reznor_pit,1,0,0,0,0,0,0,0
-Ricco harbor - city,0,1,0,0,0,0,0,0
-Ricco harbor - scaffolding,0,0,0,1,0,0,0,0
-Ricco harbor - tower,0,0,0,1,0,0,0,0
-Ricco harbor - water,0,0,0,0,0,0,0,1
-Ridley,1,1,0,1,0,0,1,0
-Rising_sun,0,0,0,1,0,0,0,0
-Risk,1,1,0,1,0,0,1,0
-Rock Climb,0,1,0,1,1,0,0,0
-Rockman 2 - Flashman,0,0,0,0,0,0,0,0
-Roger's castle,0,0,0,0,0,0,0,0
-Room 1 and 2,0,0,0,1,1,0,1,1
-Ropeland,0,0,0,0,0,0,0,0
-Rubber Room,0,0,0,1,0,0,0,0
-Rubber factory,0,0,0,1,0,0,0,0
-Rubber maze,0,0,0,0,0,0,0,0
-SMB1 - 6-2,1,1,1,1,0,0,0,0
-SMB1-SMB2J Weird Remix,0,0,0,1,1,0,0,0
-SMB2J - 4-1,1,1,0,1,0,0,0,0
-Saffron City,0,0,1,1,0,0,0,1
-Salt Flats,0,1,0,0,1,0,0,0
+Rainbowroadredux,0,1,0,1,0,0,0,1
+Rat Race,0,1,0,1,0,0,0,1
+Reznor pit,1,0,0,0,0,0,0,0
+Risk,1,1,0,1,0,0,1,1
+Rubber Room,0,0,0,1,0,0,0,1
 Salty dog,1,0,0,1,0,1,1,1
-Salvo the slime,1,0,0,0,0,0,0,0
-Sand bird,0,0,0,0,0,0,0,1
-Sandwhiched,0,0,0,1,0,0,1,1
-Scot,0,0,0,1,0,0,0,0
-Secret stash,0,0,0,0,0,0,0,0
-Septic Service,0,1,0,1,1,0,0,0
-Shafts,0,1,0,1,1,0,0,0
-Shell Caves,0,1,0,1,0,0,1,0
-Shells please,0,0,0,1,0,0,0,0
-Shifting Sands,0,0,0,0,0,0,0,1
 Shipwreck,1,0,0,1,0,0,1,1
-Shiver factory,0,0,0,0,0,0,0,0
-Side scrilling,0,0,0,0,0,0,0,0
-Sidewinder,0,1,1,1,1,0,0,0
-Sine Wave,0,1,0,0,0,0,0,0
-Sirena beach - beach,0,0,0,0,0,0,0,0
-Sirena beach - hotel,0,1,0,0,0,0,0,0
+Sidewinder,0,1,1,1,1,0,0,1
 Skull Depot,0,0,0,1,1,0,0,1
-Sky,0,0,0,0,0,0,0,0
-Sky garden,0,0,0,1,0,0,0,0
-Sky realm,0,0,0,1,1,0,0,0
-Skyfortress,0,0,0,1,1,0,0,0
-Skyhigh,0,0,0,1,1,0,0,0
-Skyline,0,0,0,0,0,0,0,0
-Skywar,0,0,0,0,0,0,0,0
-Slidin the slopes,0,0,0,0,0,0,0,0
-Slimeride,0,0,0,1,1,0,0,0
-Slip and fall,1,1,1,1,0,0,0,0
-Slip and slide,1,1,1,1,0,0,0,0
-Slip and spike,1,0,1,0,1,0,0,0
-Slipandswitch,0,1,1,1,0,0,1,0
-Slippery_When_Wet,0,1,1,1,0,0,0,0
-Slipperyfield,1,0,1,1,0,0,0,0
-Slipperywhenwet,1,1,1,0,0,0,0,0
-Slipslidesharp,1,0,1,1,0,0,0,0
-Smackdown,0,0,0,1,0,0,0,0
-Smash,0,0,0,1,0,0,1,1
-Smashtastic,0,0,0,1,0,0,1,1
-Smb,0,0,0,1,1,0,0,0
-Smb2,0,0,0,1,0,0,0,0
-Smb3 1-1,0,0,0,0,0,0,0,0
-Smb3 1-2,0,0,0,0,0,0,0,0
-Smb3 1-3,0,0,0,0,0,0,0,0
-Smb3 1-4,0,0,0,0,0,0,0,0
-Smb3 1-5,0,0,0,1,0,0,0,0
-Smb3 1-6,0,0,0,0,0,0,0,0
-Smb3 1-airship,0,0,0,0,0,0,0,1
-Smb3 1-fortress,0,0,0,0,0,0,0,0
-Smb3 2-1,0,0,0,0,0,0,0,0
-Smb3 2-2,0,0,0,0,1,0,0,1
-Smb3 2-3,0,0,0,0,0,0,0,0
-Smb3 2-4,0,0,0,0,0,0,0,0
-Smb3 2-5,0,0,0,0,0,0,0,0
-Smb3 2-airship,0,0,0,0,0,0,0,1
-Smb3 2-fortress,0,0,0,0,0,0,0,0
-Smb3 2-pyramid,0,0,0,0,1,0,0,0
-Smb3 2-sand,0,0,0,0,0,0,0,0
-Smb3 3-1,0,0,0,0,0,0,0,0
-Smb3 3-2,0,0,0,0,0,0,0,0
-Smb3 3-3,0,0,0,0,0,0,0,0
-Smb3 3-4,0,0,0,0,0,0,0,0
-Smb3 3-5,1,0,0,1,1,0,0,0
-Smb3 3-6,0,0,0,0,0,0,0,0
-Smb3 3-7,0,0,0,0,0,0,0,0
-Smb3 3-8,0,0,0,0,0,0,0,0
-Smb3 3-9,0,0,0,0,0,0,0,0
-Smb3 3-airship,0,0,0,0,0,0,0,1
-Smb3 3-fortress1,0,0,0,0,0,0,0,0
-Smb3 3-fortress2,1,0,0,0,0,0,0,0
-Smb3 4-1,0,0,0,0,0,0,0,0
-Smb3 4-2,0,0,0,0,0,0,0,0
-Smb3 4-3,0,0,0,1,1,0,0,0
-Smb3 4-4,0,0,0,0,0,0,0,0
-Smb3 4-5,0,0,0,0,0,0,0,0
-Smb3 4-6,0,0,0,0,0,0,0,0
-Smb3 4-airship,0,0,0,0,0,0,0,1
-Smb3 4-fortress1,0,0,0,0,0,0,0,0
-Smb3 4-fortress2,0,0,0,0,0,0,0,0
-Smb3 5-1,0,0,0,0,0,0,0,0
-Smb3 5-2,0,0,0,0,0,1,0,0
-Smb3 5-3,0,0,0,0,0,0,0,0
-Smb3 5-4,0,0,0,0,0,0,0,0
-Smb3 5-5,0,0,0,0,1,0,0,0
-Smb3 5-6,0,0,0,1,1,0,0,0
-Smb3 5-7,0,0,0,1,1,0,0,0
-Smb3 5-8,0,0,0,1,0,0,0,0
-Smb3 5-9,0,0,0,0,0,0,0,1
-Smb3 5-airship,0,0,0,0,0,0,0,1
-Smb3 5-fortress1,1,0,0,0,0,0,0,1
-Smb3 5-fortress2,1,0,0,0,0,0,0,0
-Smb3 5-tower,0,1,0,0,0,0,0,0
-Smb3 6-1,0,0,0,0,0,0,0,0
-Smb3 6-10,0,0,0,0,0,0,0,0
-Smb3 6-2,0,0,1,0,1,0,0,1
-Smb3 6-3,0,0,1,0,0,0,0,1
-Smb3 6-4,0,0,1,1,0,0,0,0
-Smb3 6-5,0,0,0,0,1,1,0,0
-Smb3 6-6,0,1,0,0,0,0,0,0
-Smb3 6-7,0,0,1,1,0,0,0,0
-Smb3 6-8,0,0,0,0,0,0,0,0
-Smb3 6-9,1,0,0,1,1,0,0,0
-Smb3 6-airship,0,0,0,0,0,0,0,1
-Smb3 6-fortress1,0,0,0,0,0,0,0,0
-Smb3 6-fortress2,1,0,1,0,0,0,0,1
-Smb3 6-fortress3,0,0,0,0,0,0,0,0
-Smb3 7-1,0,1,0,0,0,0,0,0
-Smb3 7-2,0,0,0,0,0,0,0,0
-Smb3 7-3,0,0,0,0,0,0,0,0
-Smb3 7-4,0,0,0,1,0,0,0,0
-Smb3 7-5,0,0,0,0,0,0,0,0
-Smb3 7-6,0,0,0,0,0,0,0,0
-Smb3 7-7,0,0,0,0,0,0,0,0
-Smb3 7-8,0,0,0,1,1,0,0,0
-Smb3 7-9,0,0,0,0,0,0,0,0
-Smb3 7-airship,0,0,0,1,0,0,0,1
-Smb3 7-fortress1,0,0,0,0,0,0,0,0
-Smb3 7-fortress2,0,0,0,0,0,0,0,0
-Smb3 7-plant1,1,0,0,0,0,0,0,1
-Smb3 7-plant2,0,0,0,0,0,0,0,0
-Smb3 8-1,0,0,0,1,0,0,0,0
-Smb3 8-2,0,0,0,0,0,0,0,0
-Smb3 8-castle,0,0,0,0,0,0,0,0
-Smb3 8-fleet,0,0,0,0,0,0,0,1
-Smb3 8-fortress,0,0,0,0,0,0,0,0
-Smb3 8-navy,1,0,0,0,0,0,0,1
-Smb3 8-tank1,0,0,0,0,0,0,0,0
-Smb3 8-tank2,0,0,0,0,0,0,0,0
-Smb3 8-trap1,0,0,0,0,0,0,0,0
-Smb3 8-trap2,0,0,0,0,0,0,0,0
-Smb3 8-trap3,0,0,0,0,0,0,0,0
-Smb3castle,0,1,0,1,0,0,0,0
-Smw,0,0,0,1,0,0,0,0
-Snes,0,1,0,1,0,0,0,0
-Snowball fight,0,0,0,0,0,0,0,0
-Space Station,0,1,0,1,0,1,1,0
-SpeakoftheDevil,0,1,0,1,0,0,0,0
-Spike Rising,1,0,0,1,0,1,1,1
-Spiny Spiral,1,0,0,1,0,0,0,0
-Spiny model,1,0,0,1,1,0,0,0
-Spiral tower,1,0,0,1,0,0,0,1
-Split,0,1,0,0,0,0,0,0
-Splitting Headache,0,0,0,1,0,0,0,0
-Squish tower,0,0,0,0,0,0,0,1
-Ssb smb2,0,0,0,1,1,0,0,0
-Ssbkingdom,1,1,0,1,1,0,0,0
-Ssbmjunglejapes,0,0,0,1,0,0,0,0
-Stabbystaircase,1,0,0,1,1,0,0,0
-Staircase,0,0,0,0,0,0,0,0
-StairwaytoHeaven,0,0,0,0,1,0,0,0
-State of Confusion,0,0,0,1,0,0,0,0
-Staticblock,0,0,0,1,0,0,0,0
-Stone Maze,0,1,0,1,0,0,1,0
-Stop the rock,0,0,0,1,1,0,0,0
-Storage Building,0,0,0,1,0,0,0,0
-Stripeland,0,0,0,1,0,0,0,0
-Stripey Place,0,0,0,1,0,0,0,0
-Subcon,0,0,0,0,0,0,0,0
-Subterranean,0,0,0,1,0,0,0,0
-Subtract,0,0,0,0,0,0,0,0
-Sunny hills,0,1,0,1,1,0,0,0
-Sunset hills,0,1,0,1,1,0,0,0
-Super Mario Warp,1,1,0,1,0,0,0,0
-Super mario 64 ds,0,1,0,1,0,0,0,0
-Super pipe maze,0,1,0,1,1,0,0,0
-Superdottedplus,0,0,0,1,0,0,1,0
-Surreal world,0,1,1,1,0,0,1,1
-Suspended Craziness,1,0,0,1,0,0,0,0
-Swim or die,1,0,0,0,0,0,0,1
-Swinging bars of doom,0,0,0,0,0,0,0,0
+Sky,0,0,0,0,0,0,0,1
+Sky Garden,0,0,0,1,0,0,0,0
+Sky realm,0,0,0,1,1,0,0,1
+Skyfortress,0,0,0,1,1,0,0,1
+Skyhigh,0,0,0,1,1,0,0,1
+Smb2,0,0,0,1,0,0,0,1
+Smw,0,0,0,1,0,0,0,1
+Snowball fight,0,0,0,0,0,0,0,1
+Splitting Headache,0,0,0,1,0,0,0,1
+Ssb smb2,0,0,0,1,1,0,0,1
+Ssbmjunglejapes,0,0,0,1,0,0,0,1
+Staircase,0,0,0,0,0,0,0,1
+Storage Building,0,0,0,1,0,0,0,1
+Subcon,0,0,0,0,0,0,0,1
+Subterranean,0,0,0,1,0,0,0,1
+Sunny hills,0,1,0,1,1,0,0,1
+Sunset hills,0,1,0,1,1,0,0,1
+Suspended Craziness,1,0,0,1,0,0,0,1
 Switch 'n' Squish,0,0,0,1,0,0,1,1
-Switchedfreefall,0,0,0,1,0,0,1,0
-Switches bloacks and pipes,0,1,0,1,0,0,1,0
-Switchmania,0,0,0,0,0,0,0,0
-Swoosh,0,1,1,1,0,0,0,0
-Symmetrical,0,0,0,0,0,0,0,0
-Synchro,0,0,0,0,0,0,0,0
-Teal Tunnels,1,1,0,1,1,0,0,0
-Teensieland,1,1,1,1,1,1,0,1
-Tetris,0,0,0,0,1,1,0,0
-Tetris 2,0,1,1,0,0,1,0,0
-The 10th,0,0,0,1,1,0,0,0
-The Haunted forest,1,1,0,1,1,0,0,0
-The big war,0,0,0,1,0,0,0,0
-The lake house,0,0,0,1,0,0,0,0
-The ol' switcheroo,0,0,0,0,0,0,0,0
-The pits,0,0,0,1,0,0,1,0
-The square circle,0,0,0,1,0,0,0,0
-The trap,0,1,0,1,1,0,0,0
-The trap2,0,1,0,1,0,1,1,0
-The year 14963,1,1,1,1,0,0,0,0
-Thecourtyard,0,0,0,0,0,0,0,0
-Theepit,0,1,1,1,0,0,0,0
-Theepit2,0,1,1,1,0,0,0,0
-Thepit,1,0,0,1,0,1,0,0
-Theskyisfalling,0,0,0,1,0,0,1,1
-Thin ice,0,0,0,0,0,0,0,0
-Thwomp volcano,1,0,0,1,0,0,0,0
-Tileset,1,1,1,1,0,0,0,0
-Timberland,0,0,0,1,1,0,0,0
-Timewarp dance,0,0,0,1,0,1,0,1
-Toadstools,0,1,0,1,0,0,0,0
-Toadwood forest,0,0,0,1,1,0,0,0
-Topwar,0,0,0,0,0,0,0,0
-Topwar2,0,0,0,0,0,0,0,0
-Torch,1,0,0,1,0,0,0,0
-Torture_chamber,1,1,0,1,0,1,0,1
-Toshinden,1,0,0,1,0,0,0,0
-Towers,0,0,0,0,0,0,0,0
-Transfer lock,0,0,0,0,0,0,0,0
-Trapped,1,0,0,1,0,0,0,0
-Trapper,0,1,0,1,0,0,1,0
-Traumatic Plains,1,0,0,1,0,0,0,0
+Symmetrical,0,0,0,0,0,0,0,1
+Synchro,0,0,0,0,0,0,0,1
+Teal Tunnels,1,1,0,1,1,0,0,1
+The 10th,0,0,0,1,1,0,0,1
+The pit,1,0,0,1,0,1,0,0
+Thecourtyard,0,0,0,0,0,0,0,1
+Timberland,0,0,0,1,1,0,0,1
+Toadstools,0,1,0,1,0,0,0,1
+Topwar,0,0,0,0,0,0,0,1
+Torch,1,0,0,1,0,0,0,1
+Toshinden,1,0,0,1,0,0,0,1
+Traumatic Plains,1,0,0,1,0,0,0,1
 Treefort,0,0,0,1,0,0,0,1
-Trench warfare,1,0,0,1,1,0,0,0
-Tresspass,0,0,0,0,1,0,0,0
-Tropical splash,0,1,0,1,1,0,0,0
-Tubularesque,0,0,0,1,0,0,0,1
-Tunnel,0,0,0,1,0,0,0,0
-Tunnels,0,0,0,0,0,0,0,0
-Tut rubble shuffle,0,0,0,0,1,0,0,0
-Two towers,0,1,0,1,0,0,0,0
-Under attack,1,1,0,1,0,1,1,1
-Undervalley,0,0,0,0,0,0,0,0
+Tresspass,0,0,0,0,1,0,0,1
+Tunnel,0,0,0,1,0,0,0,1
+Tunnels,0,0,0,0,0,0,0,1
 Underwater,0,0,0,1,0,0,1,1
-Unfeeling,0,0,0,0,0,0,0,0
-Unsightly Dryness,0,0,0,1,0,0,0,0
+Unfeeling,0,0,0,0,0,0,0,1
+Unsightly Dryness,0,0,0,1,0,0,0,1
 Up In The Hills,0,0,0,1,0,0,0,1
-Upside-down world,1,0,0,1,1,0,0,0
-UserPostedImage,1,1,0,1,0,0,0,0
-VDO gate,0,1,1,1,0,0,0,0
-Valley,0,0,0,1,1,0,0,0
-Van katoen,0,0,0,0,0,0,0,0
-Vanilla dome,1,0,0,1,0,0,0,0
-Vanilla_sky,0,0,0,0,1,0,0,0
-Vault,0,0,0,0,0,0,0,0
-Vegetable volley,0,0,0,0,0,0,0,0
-Viet cong,0,0,0,1,0,0,0,0
-Vortex,0,0,0,0,0,0,0,0
-Wacky Woods,0,0,0,1,0,0,0,0
-Walk On the Background,0,0,0,0,0,0,0,0
-WalkingOnSunshine,0,0,0,1,0,0,0,1
-Wall maze,0,0,0,0,0,0,0,0
-Waowser's Keep,1,0,0,0,0,0,0,0
-War,0,0,0,0,0,0,0,0
-War2,0,0,0,1,1,0,0,0
-War3,0,0,0,0,0,0,0,0
-Warp City,1,1,0,1,1,0,0,0
-Warp Pipe Mania,0,1,0,1,0,0,0,0
-Warp pipes,0,1,0,0,1,0,0,0
-Warpzone,0,1,0,0,0,0,0,0
-Wart's courtyard,0,1,0,0,0,0,0,0
-Water pressure,0,1,0,1,0,0,1,0
-Waterbattle,0,0,0,1,0,0,0,1
-Waterfall,0,0,0,0,0,0,0,0
-Waterworks,0,1,0,0,0,0,0,0
-What,0,1,0,1,0,0,0,0
-White ground,0,0,0,0,0,0,0,0
-WhiteSky,0,0,0,0,0,0,0,0
-WiiWillRockYou!,1,1,0,0,1,0,0,0
-Wiiwillrockyou,0,0,0,0,0,0,0,1
-Wild ride in the sky,0,0,0,1,1,0,0,1
-Wildlife,1,0,0,1,0,0,0,0
-WinMP,0,1,0,1,0,0,0,0
-Windows,0,0,0,1,0,0,0,0
-Wings_of_sand,0,0,0,1,1,0,0,0
-Wire Hallways,0,0,0,1,0,0,0,0
-Wire Tapping,1,1,0,1,0,1,0,0
-Wirehenge,1,0,0,1,0,0,0,0
-Wizard,0,0,0,1,1,0,0,0
-Wolkje,0,0,0,0,0,0,0,0
-Wonder Winterland,0,1,1,1,0,1,0,0
-Wood,0,0,0,1,0,0,0,0
-Wood 'n' Pipes,0,1,0,1,0,0,0,0
-Wood Pit,0,1,0,1,1,0,0,0
+Valley,0,0,0,1,1,0,0,1
+Van katoen,0,0,0,0,0,0,0,1
+Vanilla dome,1,0,0,1,0,0,0,1
+Vanilla sky,0,0,0,0,1,0,0,0
+Wacky Woods,0,0,0,1,0,0,0,1
+War2,0,0,0,1,1,0,0,1
+Warpzone,0,1,0,0,0,0,0,1
+What,0,1,0,1,0,0,0,1
+White ground,0,0,0,0,0,0,0,1
+WhiteSky,0,0,0,0,0,0,0,1
+Wildlife,1,0,0,1,0,0,0,1
+Wings of sand,0,0,0,1,1,0,0,0
+Wirehenge,1,0,0,1,0,0,0,1
+Wolkje,0,0,0,0,0,0,0,1
+Wonder Winterland,0,1,1,1,0,1,0,1
+Wood,0,0,0,1,0,0,0,1
+Wood Pit,0,1,0,1,1,0,0,1
 World1-2,0,0,0,1,1,0,0,1
-Wrong world,0,1,0,0,0,0,0,0
-Xbox,0,0,0,1,1,0,0,0
-Xboxed,0,1,0,1,1,0,0,0
-Yarg,0,1,0,1,0,0,0,0
-Yi3,0,0,0,0,0,0,1,1
-Yoob's belly,1,1,0,1,0,0,0,0
-Yoshi island,0,0,0,1,0,0,0,0
-Yoshi touch n' go,1,1,0,1,0,0,0,0
-Yoshisisland,0,0,0,1,0,0,0,0
-You can't leave,1,0,0,1,0,0,0,0
-Zelda 1 - 1st Quest Level 1,1,1,0,1,0,0,0,0
-Zomghax,1,1,1,1,0,0,0,0
-Zzmap,1,1,1,1,0,0,0,0
-Zzzzzzzzzzzzzz,1,0,1,1,0,0,0,0
+Yarg,0,1,0,1,0,0,0,1
+Yoshi island,0,0,0,1,0,0,0,1
+Yoshisisland,0,0,0,1,0,0,0,1
+ZZleveleditor,0,0,0,1,1,0,0,0
+Zelda 1 - 1st Quest Level 1,1,1,0,1,0,0,0,1
