@@ -1,60 +1,4 @@
-000000platformtest1,0,0,0,1,0,0,0,1
-0000downspike,1,0,0,0,0,0,0,1
-0000platformtest1,0,0,0,0,0,0,0,1
-0000platformtest2,0,0,0,0,0,0,0,1
-0000platformtest3,0,0,0,0,0,1,0,1
-0000platformtest4,0,0,0,0,0,0,0,0
-0000platformtest5,0,0,0,0,1,0,0,0
-0000platformtest6,0,0,0,0,0,0,0,0
-0000platformtest7,0,0,0,0,0,0,0,0
-0000platformtest8,0,0,0,0,0,1,0,0
-000breakwarptest,0,1,0,0,0,0,0,0
-000platformtest2,0,0,0,0,0,0,0,1
-000platformtest3,0,0,0,0,0,0,0,1
-000platformtest4,0,0,0,0,0,0,0,1
-000platformtest5,0,0,0,0,0,0,0,1
-000platformtest6,0,0,0,0,0,0,0,1
-000sideplatform,0,0,0,0,0,0,0,1
-000sideplatformtest,0,0,0,0,0,0,0,1
-000sideplatformtest2,0,0,0,0,0,0,0,1
-000switchtester,0,0,0,0,0,0,1,1
-000tester,0,1,0,1,0,0,0,0
-000tester2,0,1,0,0,0,0,0,0
-000throwblock,0,0,0,1,1,1,0,0
-000toomanyblocks,0,0,0,0,1,0,0,0
-00blocktest,0,0,0,0,1,0,0,0
-00blueblockwarp,0,1,0,0,0,1,0,0
-00borderwarp,0,1,0,0,0,0,0,0
-00onice,0,0,1,0,0,0,0,0
-00ontoptest,1,0,0,0,0,0,0,0
-00platformtest,0,0,0,1,0,0,0,0
-00test6,0,0,0,1,0,0,0,0
-00test7,0,0,0,1,0,0,0,0
-00tester,0,0,0,0,0,0,0,0
-00tester12,0,1,0,0,0,0,0,0
-00toomanywarps,0,1,0,0,0,0,0,0
-00toplevel,0,0,0,0,0,0,0,0
-00trap,0,0,0,0,0,0,0,0
-00trap2,0,0,0,0,0,0,0,0
-0fallplatforms,0,0,0,0,0,0,0,1
 0smw,0,0,0,1,1,0,0,0
-0test,0,0,0,0,0,0,0,0
-0test10,0,0,0,0,0,0,0,0
-0test11,0,0,0,0,0,0,0,0
-0test15,0,0,0,0,0,0,0,0
-0test5,0,0,0,0,0,0,0,0
-0test6,0,0,0,1,1,0,0,0
-0test9,0,0,0,0,0,0,0,0
-0testfour,0,0,0,0,0,0,0,0
-0testleft,0,0,0,0,0,0,0,0
-0testleft2,0,0,0,0,0,0,0,0
-0testright,0,0,0,0,0,0,0,0
-0testright2,0,0,0,0,0,0,0,0
-0testspike,1,0,0,0,0,0,0,0
-0testthis,1,0,0,0,1,0,0,0
-0testthree,0,1,0,0,0,0,0,0
-0testtwo,0,1,0,0,0,0,0,0
-0toptester,0,0,0,0,1,0,0,0
 1-1,0,0,0,1,1,0,0,0
 1-2,0,0,0,1,0,0,0,0
 1-3,0,0,0,1,0,0,0,1
@@ -291,6 +235,7 @@ Drawbridge,0,0,0,0,0,0,0,0
 Dreamland,1,1,0,1,1,1,1,1
 Drload,0,0,0,0,0,0,0,0
 Dropout,1,0,0,1,0,0,0,0
+Dropouts,0,0,0,1,0,0,0,1
 Ds,1,1,0,1,1,0,0,0
 Duel of fates,1,0,0,0,0,0,0,1
 Dueling doomships,0,1,0,1,0,0,0,0
@@ -927,7 +872,6 @@ Yoshi island,0,0,0,1,0,0,0,0
 Yoshi touch n' go,1,1,0,1,0,0,0,0
 Yoshisisland,0,0,0,1,0,0,0,0
 You can't leave,1,0,0,1,0,0,0,0
-ZZleveleditor,0,0,0,0,0,1,0,1
 Zelda 1 - 1st Quest Level 1,1,1,0,1,0,0,0,0
 Zomghax,1,1,1,1,0,0,0,0
 Zzmap,1,1,1,1,0,0,0,0
