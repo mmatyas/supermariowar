@@ -41,15 +41,16 @@ then
 SDK="-arch ppc -arch i386 -isysroot /Developer/SDKs/MacOSX10.4u.sdk"
 SDL_CFLAGS="$SDK -I/Library/Frameworks/SDL.framework/Headers -I/Library/Frameworks/SDL_net.framework/Headers -I/Library/Frameworks/SDL_mixer.framework/Headers -I/Library/Frameworks/SDL_image.framework/Headers"
 SDL_LIBS="-F/Library/Frameworks -framework CoreFoundation -framework Cocoa -framework SDL"
-echo 'CFLAGS:=$(CFLAGS) -DLINUXFUNC -DPREFIXPATH=\"\" '$SDL_CFLAGS $CFLAGS >> configuration
-echo 'LDFLAGS:=$(LDFLAGS) '$SDL_LIBS $LDFLAGS -framework SDL_image -framework SDL_mixer >> configuration
+echo 'CFLAGS:=$(CFLAGS) -D__MACOSX__ -DLINUXFUNC -DPREFIXPATH=\"\" '$SDL_CFLAGS $CFLAGS >> configuration
+echo 'LDFLAGS:=$(LDFLAGS) '$SDL_LIBS $LDFLAGS -framework SDL_image -framework SDL_mixer -framework png >> configuration
 echo 'COMMON_OBJS:=$(COMMON_OBJS) build/linfunc.o build/SDLMain.o' >> configuration
 fi
 
 # Linux configuration
 if [ "`uname`" = Linux ]
-then echo 'CFLAGS:=$(CFLAGS) -DLINUXFUNC -DPREFIXPATH=\"/usr/share/smw\" '`sdl-config --cflags` $CFLAGS >> configuration
-echo 'LDFLAGS:=$(LDFLAGS) '`sdl-config --libs` $LDFLAGS -lSDL_image -lSDL_mixer >> configuration
+then
+echo 'CFLAGS:=$(CFLAGS) -DLINUXFUNC -DPREFIXPATH=\"/usr/share/smw\" '`sdl-config --cflags` $CFLAGS >> configuration
+echo 'LDFLAGS:=$(LDFLAGS) '`sdl-config --libs` $LDFLAGS -lSDL_image -lSDL_mixer -lpng >> configuration
 echo 'COMMON_OBJS:=$(COMMON_OBJS) build/linfunc.o' >> configuration
 fi
 
