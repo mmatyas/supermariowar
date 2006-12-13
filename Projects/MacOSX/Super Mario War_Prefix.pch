@@ -1,0 +1,7 @@
+//
+// Prefix header for all source files of the 'Super Mario War' target in the 'Super Mario War' project
+//
+
+#ifdef __OBJC__
+    #import <Cocoa/Cocoa.h>
+#endif
