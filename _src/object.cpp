@@ -3997,7 +3997,9 @@ void CO_Egg::update()
 		{
 			if(inair)
 				velx -= VELAIRFRICTION;
-			else if(!onice)
+			else if(onice)
+				velx -= VELICEFRICTION;
+			else
 				velx -= VELMOVINGFRICTION;
 
 			if(velx < 0.0f)
@@ -4007,7 +4009,9 @@ void CO_Egg::update()
 		{
 			if(inair)
 				velx += VELAIRFRICTION;
-			else if(!onice)
+			else if(onice)
+				velx += VELICEFRICTION;
+			else
 				velx += VELMOVINGFRICTION;
 
 			if(velx > 0.0f)
@@ -4182,7 +4186,9 @@ void CO_Star::update()
 		{
 			if(inair)
 				velx -= VELAIRFRICTION;
-			else if(!onice)
+			else if(onice)
+				velx -= VELICEFRICTION;
+			else
 				velx -= VELMOVINGFRICTION;
 
 			if(velx < 0.0f)
@@ -4192,7 +4198,9 @@ void CO_Star::update()
 		{
 			if(inair)
 				velx += VELAIRFRICTION;
-			else if(!onice)
+			else if(onice)
+				velx += VELICEFRICTION;
+			else
 				velx += VELMOVINGFRICTION;
 
 			if(velx > 0.0f)
@@ -4515,7 +4523,9 @@ void CO_Flag::update()
 		{
 			if(inair)
 				velx -= VELAIRFRICTION;
-			else if(!onice)
+			else if(onice)
+				velx -= VELICEFRICTION;
+			else
 				velx -= VELMOVINGFRICTION;
 
 			if(velx < 0.0f)
@@ -4525,7 +4535,9 @@ void CO_Flag::update()
 		{
 			if(inair)
 				velx += VELAIRFRICTION;
-			else if(!onice)
+			else if(onice)
+				velx += VELICEFRICTION;
+			else
 				velx += VELMOVINGFRICTION;
 
 			if(velx > 0.0f)

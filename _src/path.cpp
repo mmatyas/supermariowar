@@ -3,7 +3,9 @@
 #include <sys/stat.h>
 
 #ifdef _WIN32
-	#ifndef _XBOX
+	#ifdef _XBOX
+		#include <xtl.h>
+	#else
 		#include <SDL_platform.h>
 	#endif
 #endif
@@ -15,10 +17,10 @@ char SMW_Root_Data_Dir[PATH_MAX + 2] = "";
 
 bool File_Exists (const std::string fileName)
 {
-   struct stat buffer;
-   int i = stat(fileName.c_str(), &buffer);
+	struct stat buffer;
+	int i = stat(fileName.c_str(), &buffer);
    
-   return (i == 0);
+	return (i == 0);
 }
 
 /*********************************************************************
@@ -118,7 +120,12 @@ const string convertPath(const string& source, const string& pack)
 	if(source.find("gfx/packs/") == 0)
 	{
 		string trailingdir = source.substr(9);
+
+#ifdef _XBOX		
+		const string s = convertPartialPath(pack + trailingdir);  //Hack because pack already has d:\ in it
+#else
 		const string s = convertPath(pack + trailingdir);
+#endif
 
 		//If the file exists, return the path to it
 		if(File_Exists(s))
@@ -131,7 +138,12 @@ const string convertPath(const string& source, const string& pack)
 	if(source.find("sfx/packs/") == 0)
 	{
 		string trailingdir = source.substr(9);
+
+#ifdef _XBOX		
+		const string s = convertPartialPath(pack + trailingdir);  //Hack because pack already has d:\ in it
+#else
 		const string s = convertPath(pack + trailingdir);
+#endif
 
 		//If the file exists, return the path to it
 		if(File_Exists(s))
