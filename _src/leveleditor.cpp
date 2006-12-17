@@ -195,6 +195,7 @@ bool copyselectedtiles();
 void clearselectedmaptiles();
 void pasteselectedtiles(int movex, int movey);
 void getcenterselection(int * x, int * y);
+void takescreenshot();
 
 bool viewblocks = true;
 bool view_only_layer = false;
