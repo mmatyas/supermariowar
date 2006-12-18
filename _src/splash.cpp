@@ -546,7 +546,7 @@ bool LoadAndSplashScreen()
 	"Discrosh", "Ikill4you", "Helix Snake", "tubesteak", "wasabimario", "Lee",
 	"Pikawil", "Marioman64", "Peardian", "Bob Ippolito", "Viper Snake", "neavea",
 	"Mr.Bob-omb", "milua", "bobmanperson", "DrTek", "somestrangeflea", "nes6502",
-	"XPort"};
+	"XPort", "Naphistim"};
 
 #define NUM_CONTRIBUTORS ((int)(sizeof(contributors)/sizeof(char*)))
 
