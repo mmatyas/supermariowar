@@ -791,6 +791,7 @@ Thinking about 1.8...
 [ ] Bug fixes/tweaks that needed to be done for 1.7, but due to risk were not put in
 [ ] Owned option to jail players instead of normal colored orb
 [ ] The invincibility music dosen't need to stop, when you pause.
+[ ] Ability to throw objects upwards like flags, stars, shells, blue blocks, eggs, ect.
 
 
 Things I don't want to do
