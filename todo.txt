@@ -757,27 +757,19 @@ TODO Ship
 [ ] Need to fully test music packs (including category subdirectories) on xbox
 
 Beta 2
-[ ] Come up with a good sample Tour
+[X] Come up with a good sample Tour
 
 RC 1
-[ ] Include some better tours
+[X] Include some better tours
 [ ] Announce AI programming competition
 
 Final
-[ ] Get Sgraff's new menu and game gfx and use as defaults
-[ ] Finalize map set
-[ ] Get some good default filters
-[ ] Update splash screen gfx to include "Steven Graff", "Jared McComb"
-[ ] Go through xbox controls in the docs and make sure they are right
-[ ] Make screenshots for manual:
-
-<JaredM> I'm thinking, for the two gameplay screens, have drastically different looking maps
-<JaredM> and for the tourny screens, have them both about half-done
-<JaredM> (try to be random in the game types for the plain tourney screen)
-<JaredM> (sorry if I am being control-freak-ish)
-<JaredM> and resize the screens down by 50% so they actually fit in there :P
-<JaredM> got that?
-<JaredM> >_>
+[X] Get Sgraff's new menu and game gfx and use as defaults
+[X] Finalize map set
+[X] Get some good default filters
+[X] Update splash screen gfx to include "Steven Graff", "Jared McComb"
+[X] Go through xbox controls in the docs and make sure they are right
+[X] Make screenshots for manual
 
 Thinking about 1.8...
 [ ] Expanded tileset -> spec it out - maybe allow a map only to choose 1 tileset it can use, need map between old and new tileset, need default tile types for each tileset
@@ -791,8 +783,8 @@ Thinking about 1.8...
 [ ] Bug fixes/tweaks that needed to be done for 1.7, but due to risk were not put in
 [ ] Owned option to jail players instead of normal colored orb
 [ ] The invincibility music dosen't need to stop, when you pause.
+[ ] Goomba sprites should flip when changing direction. GFX packs which use Goombas that change sprites while changing directions can make them look like they're walking backwards.
 [ ] Ability to throw objects upwards like flags, stars, shells, blue blocks, eggs, ect.
-
 
 Things I don't want to do
 - Anything having to do with new types of collision detection like slopes, water, and sliding or climbing tiles
