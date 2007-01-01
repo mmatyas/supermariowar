@@ -2730,7 +2730,7 @@ int save_as()
 	if(dialog("Save As", "Enter name:", fileName, 64))
 	{
 		save_map(convertPath(strcat(strcat(mapLocation, fileName),".map")));
-		maplist.add(convertPathC(strcat(fileName, ".map")));
+		maplist.add(strcat(fileName, ".map"));
 		maplist.find(fileName);
 		loadcurrentmap();
 	}
@@ -3125,7 +3125,7 @@ int newmap()
 		g_map.clearPlatforms();
 		g_map.eyecandyID = 0;
 		g_map.saveMap(convertPath(strcat(strcat(mapLocation, fileName),".map")));
-		maplist.add(convertPathC(strcat(fileName, ".map")));
+		maplist.add(strcat(fileName, ".map"));
 		maplist.find(fileName);
 		loadcurrentmap();
 	}
