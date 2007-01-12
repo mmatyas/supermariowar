@@ -350,6 +350,7 @@ Done  Pri  Description
 [ ]        Have "All Music" option for playlist field.  This would combine all music packs into a large list and play select from all music.
 [ ]        Configuration for number of throwable weapons on screen at once (like 1 or 3 fireballs at a time, etc)
 
+
 Considering for 1.7:
 --------------------------
 [X] Item selector (item weights that appear in ? box and bonus wheel)
@@ -755,6 +756,7 @@ TODO Ship
 [ ] On Xbox, the announcer titles in the announcer field have the full path name, not just the announcer name.  Fixed.  Need to test.
 [ ] Test players 2, 3, 4 changing their own controls and controlling the menu with joypads
 [ ] Need to fully test music packs (including category subdirectories) on xbox
+[ ] Search smw file tree for "svn" and remove all directories
 
 Beta 2
 [X] Come up with a good sample Tour
@@ -785,6 +787,7 @@ Thinking about 1.8...
 [ ] The invincibility music dosen't need to stop, when you pause.
 [ ] Goomba sprites should flip when changing direction. GFX packs which use Goombas that change sprites while changing directions can make them look like they're walking backwards.
 [ ] Ability to throw objects upwards like flags, stars, shells, blue blocks, eggs, ect.
+[ ] Input bug: if the menu select key is mapped to a letter, but then you select a map and press that letter to select the map, it won't select, but jump to the maps that begin with that letter!
 
 Things I don't want to do
 - Anything having to do with new types of collision detection like slopes, water, and sliding or climbing tiles
