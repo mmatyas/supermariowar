@@ -89,6 +89,7 @@ class MovingPlatform
 	friend class CMap;
 	friend void loadcurrentmap();
 	friend void takescreenshot();
+	friend void loadmap(char * szMapFile);
 
 };
 

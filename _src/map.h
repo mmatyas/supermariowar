@@ -212,6 +212,7 @@ class CMap
 		friend void draw_platform(short iPlatform);
 		friend void insert_platforms_into_map();
 		friend void loadcurrentmap();
+		friend void loadmap(char * szMapFile);
 		
 		friend class B_BreakableBlock;
 		friend class B_DonutBlock;
