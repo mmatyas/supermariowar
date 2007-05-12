@@ -149,6 +149,9 @@ float CapFallingVelocity(float f) {return 0.0f;}
 void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead) {}
 gfxSprite		spr_thumbnail_platformarrows;
 gfxSprite		spr_thumbnail_warps[2];
+gfxSprite		spr_awardsouls, spr_fireballexplosion;
+gfxSprite		spr_maplava, spr_mapwater, spr_mapwaterfall, spr_maplamp;
+CEyecandyContainer eyecandyfront;
 ///////
 
 SDL_Surface * s_eyecandy;

@@ -1,5 +1,5 @@
 #Version
-1.7.0.4
+1.7.0.5
 
 #Icon
 75
@@ -7,8 +7,8 @@
 #Maps
 0000platformtest2
 0smw
+Breakaway
 Cloud Garden
 Danger Canyon
-Devilevel
 Up In The Hills
 Vanilla dome

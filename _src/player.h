@@ -98,6 +98,7 @@ class CPlayer
 
 		void draw();
 		void drawarrows();
+		void updateswap();
 		void drawswap();
 		void move();
 		void mapcollisions();
@@ -110,14 +111,9 @@ class CPlayer
 		void AddKillsInRowInAirAward();
 		void SetupNewPlayer();
 
-		bool isready() {return state == player_ready;}
-		bool isspawning() {return state == player_spawning;}
-		bool iswarping() {return state > player_ready;}
-		bool isdead() {return state == player_dead;}
-
 		short getGlobalID() {return globalID;}
 
-		void bouncejump();
+		bool bouncejump();
 
 		short GetWarpPlane() {return warpplane;}
 		bool IsPlayerFacingRight();
@@ -130,6 +126,11 @@ class CPlayer
 		gfxSprite ** GetScoreboardSprite() {return pScoreboardSprite;}
 
 		void DecreaseProjectileLimit();
+
+		bool isready() {return state == player_ready;}
+		bool isspawning() {return state == player_spawning;}
+		bool iswarping() {return state > player_ready;}
+		bool isdead() {return state == player_dead;}
 
 	private:
 		void SetSprite();
@@ -150,7 +151,7 @@ class CPlayer
 		void flipsidesifneeded();
 		void fliptopifneeded();
 		void makeinvincible();
-		void turnslowdownon();
+		void turnslowdownon(bool fSuperFreeze);
 		bool isstomping(CPlayer &o);
 		void explodeawards();
 		void addswirlingawards();
@@ -166,13 +167,18 @@ class CPlayer
 		COutputControl * playerKeys;
 		short playerDevice;
 
-#ifdef _DEBUG
         // tanooki
         bool tanooki;
         bool statue_lock;
         int statue_timer;
         int konamiIndex;
-#endif
+
+		//super kick
+		short superKickIndex;
+
+		//secret spring
+		short secret_spring_index;
+		short secret_spike_index;
 
 		CScore *score;
 		short killsinrow;
@@ -210,7 +216,58 @@ class CPlayer
 		bool lockfire;		//the player is allowed to shoot a fireball
 		short throw_star;
 
+		int holddown;
+		int holddowntolerance;
+		int holdleft;
+		int holdlefttolerance;
+		int holdright;
+		int holdrighttolerance;
+
 		short featherjump;	//true when player has used a feather jump in air (only allow one feather jump per time in air)
+		bool flying;
+		short flyingtimer;
+
+		short ryu_fireball_index_left;
+		short ryu_fireball_index_right;
+		bool shoot_left_fireball;
+		bool shoot_right_fireball;
+
+		short super_sledge_hammer_throw_index;
+		bool shoot_super_sledge_hammer;
+
+		short super_hammer_throw_left_index;
+		short super_hammer_throw_right_index;
+		bool shoot_right_super_hammer;
+		bool shoot_left_super_hammer;
+
+		short super_boomerang_throw_index_left;
+		short super_boomerang_throw_index_right;
+		bool shoot_super_boomerang;
+
+		short super_bobomb_index;
+		bool shoot_super_bobomb;
+
+		short super_pow_index;
+		bool super_pow;
+		short super_pow_timer;
+
+		short super_mod_index;
+		bool super_mod;
+		short super_mod_timer;
+
+		short dashLeftIndex;
+		short dashRightIndex;
+		bool dashLeft;
+		bool dashRight;
+		short dashSparkleAnimationTimer;
+
+		short homingBillsIndex;
+		bool homingBills;
+
+		short redKoopaIndex;
+		short redThrowBlockIndex;
+		short viewBlockIndex;
+		short boss_index[3];
 
 		short superjumptimer;		//this is true when a player is able to do a super jump off a note block
 		short hammertimer;		//Only allow the player to throw powerful hammers so fast
@@ -327,6 +384,7 @@ class CPlayer
 		friend class CGM_Star;
 		friend class CGM_CaptureTheFlag;
 		friend class CGM_Stomp;
+		friend class CGM_Boss;
 		
 		friend class MI_InputDevice;
 		friend class MI_InputLeft;
@@ -351,6 +409,8 @@ class CPlayer
 		friend class PU_StarPowerup;
 		friend class PU_FirePowerup;
 		friend class PU_HammerPowerup;
+		friend class PU_SledgeHammerPowerup;
+		friend class PU_PodoboPowerup;
 		friend class PU_PoisonPowerup;
 		friend class PU_ClockPowerup;
 		friend class PU_BobombPowerup;
@@ -360,6 +420,7 @@ class CPlayer
 		friend class PU_FeatherPowerup;
 		friend class PU_MysteryMushroomPowerup;
         friend class PU_Tanooki;
+		friend class PU_BombPowerup;
 		friend class MysteryMushroomTempPlayer;
 		friend class MO_Coin;
 
@@ -378,12 +439,18 @@ class CPlayer
 
 		friend class MO_Fireball;
 		friend class MO_Hammer;
+		friend class MO_SledgeHammer;
 		friend class MO_Boomerang;
+		friend class MO_SuperFireball;
 		friend class CO_Shell;
 		friend class CO_ThrowBlock;
+		friend class CO_Spring;
+		friend class CO_Spike;
+		friend class CO_Bomb;
 
 		friend class MO_Goomba;
 		friend class MO_Koopa;
+		friend class MO_SledgeBrother;
 		friend class OMO_CheepCheep;
 		friend class OMO_BulletBill;
 		friend class OMO_FlagBase;

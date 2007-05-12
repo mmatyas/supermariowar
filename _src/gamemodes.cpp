@@ -39,8 +39,6 @@ void RemovePlayersButHighestScoring()
 
 void SetupScoreBoard(bool fOrderMatters)
 {
-	game_values.showscoreboard = true;
-
 	short i, j;
 	
 	bool draw[4] = {false, false, false, false};
@@ -79,8 +77,13 @@ void SetupScoreBoard(bool fOrderMatters)
 
 		draw[max] = true;	//this is the next biggest score - it doesn't belong to the remaining scores from now on
 	}
+}
 
-	for(i = 0; i < score_cnt; i++)
+void ShowScoreBoard()
+{
+	game_values.showscoreboard = true;
+
+	for(short i = 0; i < score_cnt; i++)
 	{
 		score[i]->destx = 309 - 34 * game_values.teamcounts[i];
 		score[i]->desty = score[i]->displayorder * 45 + 150;
@@ -91,6 +94,7 @@ void SetupScoreBoard(bool fOrderMatters)
 		ifsoundonstop(sfx_invinciblemusic);
 		ifsoundonstop(sfx_timewarning);
 		ifsoundonstop(sfx_slowdownmusic);
+		ifsoundonstop(sfx_bowserlaugh);
 		
 		backgroundmusic[1].play(true, false);
 	}
@@ -161,6 +165,7 @@ void CGameMode::playwarningsound()
 {
 	playedwarningsound = true;
 	ifsoundonstop(sfx_invinciblemusic);
+	ifsoundonstop(sfx_bowserlaugh);
 
 	if(game_values.music && game_values.sound)
 		backgroundmusic[0].stop();
@@ -338,6 +343,7 @@ bool CGM_Frag::CheckWinner(CPlayer &player)
 
 		RemovePlayersButTeam(winningteam);
 		SetupScoreBoard(false);
+		ShowScoreBoard();
 
 		return true;
 	}
@@ -409,6 +415,7 @@ void CGM_TimeLimit::think()
 	else if(timeleft == 0 && goal > 0)
 	{		//the game ends
 		SetupScoreBoard(false);
+		ShowScoreBoard();
 		timeleft--;
 
 		RemovePlayersButHighestScoring();
@@ -658,7 +665,7 @@ void CGM_Chicken::think()
 
 			static short counter = 0;
 
-			if(chicken->isready())
+			if(chicken->isready() && chicken->statue_timer == 0)
 			{
 				if(++counter >= game_values.pointspeed)
 				{
@@ -753,6 +760,7 @@ bool CGM_Chicken::CheckWinner(CPlayer &player)
 		gameover = true;
 
 		SetupScoreBoard(false);
+		ShowScoreBoard();
 		RemovePlayersButTeam(winningteam);
 		return true;
 	}
@@ -1012,6 +1020,7 @@ void CGM_Coins::think()
 
 					RemovePlayersButTeam(winningteam);
 					SetupScoreBoard(false);
+					ShowScoreBoard();
 				}
 				else if(list_players[i]->score->score >= goal - 2 && !playedwarningsound)
 				{
@@ -1054,6 +1063,7 @@ void CGM_Coins::playerextraguy(CPlayer &player, short iType)
 
 				RemovePlayersButTeam(winningteam);
 				SetupScoreBoard(false);
+				ShowScoreBoard();
 			}
 			else if(player.score->score >= goal - 2 && !playedwarningsound)
 			{
@@ -1103,6 +1113,7 @@ void CGM_Eggs::think()
 
 					RemovePlayersButTeam(winningteam);
 					SetupScoreBoard(false);
+					ShowScoreBoard();
 				}
 				else if(list_players[i]->score->score >= goal - 2 && !playedwarningsound)
 				{
@@ -1146,6 +1157,7 @@ void CGM_Eggs::playerextraguy(CPlayer &player, short iType)
 
 				RemovePlayersButTeam(winningteam);
 				SetupScoreBoard(false);
+				ShowScoreBoard();
 			}
 			else if(player.score->score >= goal - 2 && !playedwarningsound)
 			{
@@ -1287,7 +1299,7 @@ void CGM_Survival::think()
 					rate = game_values.gamemodesettings.survival.density;
 			}
 
-			//Randomly choose a powerup from the weighted list
+			//Randomly choose an enemy from the weighted list
 			int iRandEnemy = rand() % iEnemyWeightCount + 1;
 			iSelectedEnemy = 0;
 			int iWeightCount = game_values.gamemodesettings.survival.enemyweight[iSelectedEnemy];
@@ -1302,13 +1314,19 @@ void CGM_Survival::think()
 			}
 			else if(1 == iSelectedEnemy)
 			{
-				objectsfront.add(new OMO_Podobo(&spr_podobo, (short)(rand() % 608), -(float(rand() % 9) / 2.0f) - 8.0f));
+				objectsfront.add(new OMO_Podobo(&spr_podobo, (short)(rand() % 608), -(float(rand() % 9) / 2.0f) - 8.0f, -1, -1, -1));
 				timer = (short)(rand() % 21 - 10 + rate - 20);
 			}
 			else
 			{
 				float dSpeed = ((float)(rand() % 21 + 20)) / 10.0f;
-				objectsfront.add(new OMO_BowserFire(&spr_bowserfire, (short)(rand() % 448), (rand() % 2 ? dSpeed : -dSpeed)));
+				float dVel = rand() % 2 ? dSpeed : -dSpeed;
+
+				short x = -54;
+				if(dVel < 0)
+					x = 694;
+
+				objectsfront.add(new OMO_BowserFire(&spr_bowserfire, x, (short)(rand() % 448), dVel, 0.0f, -1, -1, -1));
 				timer = (short)(rand() % 21 - 10 + rate);
 			}
 		}
@@ -1362,6 +1380,7 @@ void CGM_Domination::think()
 
 					RemovePlayersButTeam(winningteam);
 					SetupScoreBoard(false);
+					ShowScoreBoard();
 				}
 				else if(list_players[i]->score->score >= goal * 0.8 && !playedwarningsound)
 				{
@@ -1405,6 +1424,7 @@ void CGM_Domination::playerextraguy(CPlayer &player, short iType)
 				gameover = true;
 
 				SetupScoreBoard(false);
+				ShowScoreBoard();
 				RemovePlayersButTeam(winningteam);
 			}
 			else if(player.score->score >= goal * 0.8 && !playedwarningsound)
@@ -1462,6 +1482,7 @@ void CGM_Owned::think()
 
 						RemovePlayersButTeam(winningteam);
 						SetupScoreBoard(false);
+						ShowScoreBoard();
 					}
 					else if(list_players[i]->score->score >= goal * 0.8 && !playedwarningsound)
 					{
@@ -1539,6 +1560,7 @@ bool CGM_Owned::CheckWinner(CPlayer &player)
 		gameover = true;
 
 		SetupScoreBoard(false);
+		ShowScoreBoard();
 		RemovePlayersButTeam(winningteam);
 		return true;
 	}
@@ -1653,6 +1675,7 @@ bool CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other)
 			RemovePlayersButTeam(winningteam);
 
 			SetupScoreBoard(false);
+			ShowScoreBoard();
 
 			return true;
 		}
@@ -1684,6 +1707,7 @@ void CGM_Jail::playerextraguy(CPlayer &player, short iType)
 
 			RemovePlayersButTeam(winningteam);
 			SetupScoreBoard(false);
+			ShowScoreBoard();
 		}
 		else if(player.score->score >= goal - 3 && !playedwarningsound)
 		{
@@ -1693,7 +1717,7 @@ void CGM_Jail::playerextraguy(CPlayer &player, short iType)
 }
 
 
-//Goomba Limit mode:
+//Stomp mode:
 //Kill randomly appearing goomobas on map
 //First one to kill the limit wins
 CGM_Stomp::CGM_Stomp() : CGameMode() 
@@ -1737,7 +1761,7 @@ void CGM_Stomp::think()
 		{
 			ResetSpawnTimer();
 
-			//Randomly choose a powerup from the weighted list
+			//Randomly choose an enemy from the weighted list
 			int iRandEnemy = rand() % iEnemyWeightCount + 1;
 			iSelectedEnemy = 0;
 			int iWeightCount = game_values.gamemodesettings.stomp.enemyweight[iSelectedEnemy];
@@ -1748,7 +1772,7 @@ void CGM_Stomp::think()
 			if(0 == iSelectedEnemy)
 				objectcollisionitems.add(new MO_Goomba(&spr_goomba, 2, 8, rand() % 2 == 0, 30, 20, 1, 11));
 			else if(1 == iSelectedEnemy)
-				objectcollisionitems.add(new MO_Koopa(&spr_koopa, 2, 8, rand() % 2 == 0, 30, 28, 1, 25));
+				objectcollisionitems.add(new MO_Koopa(game_values.redkoopas ? &spr_redkoopa : &spr_koopa, 2, 8, rand() % 2 == 0, 30, 28, 1, 25, game_values.redkoopas));
 			else
 				objectsfront.add(new OMO_CheepCheep(&spr_cheepcheep));
 		}
@@ -1791,6 +1815,7 @@ bool CGM_Stomp::CheckWinner(CPlayer &player)
 		gameover = true;
 
 		SetupScoreBoard(false);
+		ShowScoreBoard();
 		RemovePlayersButTeam(winningteam);
 		return true;
 	}
@@ -1863,6 +1888,7 @@ void CGM_Race::playerextraguy(CPlayer &player, short iType)
 
 			RemovePlayersButTeam(winningteam);
 			SetupScoreBoard(false);
+			ShowScoreBoard();
 		}
 		else if(player.score->score >= goal - 2 && !playedwarningsound)
 		{
@@ -1895,6 +1921,7 @@ void CGM_Race::setNextGoal(short teamID)
 				
 				RemovePlayersButTeam(winningteam);
 				SetupScoreBoard(false);
+				ShowScoreBoard();
 
 			}
 			else if(score[teamID]->score >= goal - 2 && !playedwarningsound)
@@ -2154,6 +2181,7 @@ void CGM_CaptureTheFlag::think()
 
 				RemovePlayersButTeam(winningteam);
 				SetupScoreBoard(false);
+				ShowScoreBoard();
 			}
 			else if(list_players[i]->score->score >= goal - 2 && !playedwarningsound)
 			{
@@ -2197,6 +2225,7 @@ void CGM_CaptureTheFlag::playerextraguy(CPlayer &player, short iType)
 
 			RemovePlayersButTeam(winningteam);
 			SetupScoreBoard(false);
+			ShowScoreBoard();
 		}
 		else if(player.score->score >= goal - 2 && !playedwarningsound)
 		{
@@ -2229,3 +2258,216 @@ bool CGM_KingOfTheHill::playerkilledself(CPlayer &player)
 {
 	return CGameMode::playerkilledself(player);
 }
+
+
+//Boss Mode
+//Person to score fatal hit to boss wins!
+CGM_Boss::CGM_Boss() : CGameMode() 
+{
+	gamemode = game_mode_boss;
+	SetupModeStrings("Boss", "Lives", 5);
+	iBossType = 0;
+}
+
+void CGM_Boss::init()
+{
+	CGameMode::init();
+	enemytimer = (short)(rand() % 120) + 120;
+	poweruptimer = 120;
+
+	for(short iScore = 0; iScore < score_cnt; iScore++)
+		score[iScore]->SetScore(5);
+
+	objectcollisionitems.add(new MO_SledgeBrother(&spr_sledgebrothers, (iBossType == 0 ? 256 : (iBossType == 1 ? 256 : 320)), iBossType));
+}
+
+
+void CGM_Boss::think()
+{
+	if(!gameover && list_players_cnt == 0)
+	{
+		gameover = true;
+
+		if(game_values.music)
+		{
+			ifsoundonstop(sfx_invinciblemusic);
+			ifsoundonstop(sfx_timewarning);
+			ifsoundonstop(sfx_slowdownmusic);
+			ifsoundonplay(sfx_gameover);
+			
+			backgroundmusic[1].stop();
+		}
+	}
+
+	if(gameover)
+	{
+		displayplayertext();
+	}
+	else
+	{
+		if(iBossType == 0)
+		{
+			//Randomly spawn koopas
+			if(--enemytimer <= 0)
+			{
+				objectcollisionitems.add(new MO_Koopa(game_values.redkoopas ? &spr_redkoopa : &spr_koopa, 2, 8, rand() % 2 == 0, 30, 28, 1, 25, game_values.redkoopas));
+				enemytimer = (short)(rand() % 120) + 120;  //Spawn koopas slowly
+			}
+		}
+		else if(iBossType == 1)
+		{
+		
+		}
+		else if(iBossType == 2)
+		{
+			if(--enemytimer <= 0)
+			{
+				objectsfront.add(new OMO_Podobo(&spr_podobo, (short)(rand() % 608), -(float(rand() % 9) / 2.0f) - 9.0f, -1, -1, -1));
+				enemytimer = (short)(rand() % 80 + 60);
+			}
+
+			if(--poweruptimer <= 0)
+			{
+				poweruptimer = (short)(rand() % 80 + 60);
+
+				if(objectsplayer.countTypes(object_frenzycard) < list_players_cnt)
+				{
+					objectsplayer.add(new MO_FrenzyCard(&spr_frenzycards, 12, 8, 0));
+				}
+			}
+		}
+	}
+}
+
+void CGM_Boss::draw()
+{
+	if(gameover)
+	{
+		if(winningteam > -1)
+		{
+			game_font_large.drawCentered(320, 96, "Congratulations!");
+			if(iBossType == 0)
+				game_font_large.drawCentered(320, 118, "The Powerful Sledge Hammer Is Yours");
+			else if(iBossType == 1)
+				game_font_large.drawCentered(320, 118, "The Super Bomb Is Yours");
+			else if(iBossType == 2)
+				game_font_large.drawCentered(320, 118, "The Golden Podobo Is Yours");
+		}
+		else
+		{
+			game_font_large.drawCentered(320, 96, "You Failed To Defeat");
+			
+			if(iBossType == 0)
+				game_font_large.drawCentered(320, 118, "The Mighty Sledge Brother");
+			else if(iBossType == 1)
+				game_font_large.drawCentered(320, 118, "The Mighty Bomb Brother");
+			else if(iBossType == 2)
+				game_font_large.drawCentered(320, 118, "The Mighty Flame Brother");
+		}
+	}
+}
+
+bool CGM_Boss::playerkilledplayer(CPlayer &inflictor, CPlayer &other)
+{
+	if(!gameover)
+	{
+		other.score->AdjustScore(-1);
+
+		if(!playedwarningsound)
+		{
+			short countscore = 0;
+			for(short k = 0; k < score_cnt; k++)
+				countscore += score[k]->score;
+
+			if(countscore <= 2)
+				playwarningsound();
+		}
+
+		if(other.score->score <= 0)
+		{
+			RemoveTeam(other.teamID);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool CGM_Boss::playerkilledself(CPlayer &player)
+{
+	CGameMode::playerkilledself(player);
+
+	if(!gameover)
+	{
+		player.score->AdjustScore(-1);
+
+		if(!playedwarningsound)
+		{
+			short countscore = 0;
+			for(short k = 0; k < score_cnt; k++)
+				countscore += score[k]->score;
+
+			if(countscore <= 2)
+				playwarningsound();
+		}
+
+		if(player.score->score <= 0)
+		{
+			RemoveTeam(player.teamID);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void CGM_Boss::playerextraguy(CPlayer &player, short iType)
+{
+	if(!gameover)
+		player.score->AdjustScore(iType);
+}
+
+bool CGM_Boss::SetWinner(CPlayer * player)
+{
+	winningteam = player->teamID;
+	gameover = true;
+
+	RemovePlayersButTeam(winningteam);
+
+	for(short iScore = 0; iScore < score_cnt; iScore++)
+	{
+		if(winningteam == iScore)
+			continue;
+
+		score[iScore]->SetScore(0);
+	}
+
+	SetupScoreBoard(false);
+
+	if(game_values.music)
+	{
+		ifsoundonstop(sfx_invinciblemusic);
+		ifsoundonstop(sfx_timewarning);
+		ifsoundonstop(sfx_slowdownmusic);
+		ifsoundonstop(sfx_bowserlaugh);
+		
+		backgroundmusic[1].play(true, false);
+	}
+
+	game_values.noexit = true;
+	
+	if(iBossType == 0)
+		objectcollisionitems.add(new PU_SledgeHammerPowerup(&spr_sledgehammerpowerup, 304, -32, 1, 32000, 30, 30, 1, 1));
+	else if(iBossType == 1)
+		objectcollisionitems.add(new PU_BombPowerup(&spr_bombpowerup, 304, -32, 1, 32000, 30, 30, 1, 1));
+	else if(iBossType == 2)
+		objectcollisionitems.add(new PU_PodoboPowerup(&spr_podobopowerup, 304, -32, 1, 32000, 30, 30, 1, 1));
+
+	return true;
+}
+
+void CGM_Boss::SetBossType(short bosstype)
+{
+	iBossType = bosstype;
+}
+

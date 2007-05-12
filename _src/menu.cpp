@@ -82,7 +82,7 @@ void Menu::WriteGameOptions()
 		fwrite(&game_values.screenResizeH, sizeof(float), 1, fp);
 #endif
 
-		unsigned char abyte[26];
+		unsigned char abyte[27];
 		abyte[0] = (unsigned char) game_values.spawnstyle;
 		abyte[1] = (unsigned char) game_values.awardstyle;
 		abyte[2] = (unsigned char) announcerlist.GetCurrentIndex();
@@ -109,7 +109,8 @@ void Menu::WriteGameOptions()
 		abyte[23] = (unsigned char) game_values.pointspeed;
 		abyte[24] = (unsigned char) game_values.swapstyle;
 		abyte[25] = (unsigned char) gamegraphicspacklist.GetCurrentIndex();
-		fwrite(abyte, sizeof(unsigned char), 26, fp); 
+		abyte[26] = (unsigned char) game_values.secrets;
+		fwrite(abyte, sizeof(unsigned char), 27, fp); 
 
 		fwrite(&game_values.spawninvincibility, sizeof(short), 1, fp);
 		fwrite(&game_values.itemrespawntime, sizeof(short), 1, fp);
@@ -495,7 +496,7 @@ void Menu::CreateMenu()
 	// Gameplay Options
 	//***********************
 
-	miRespawnField = new MI_SelectField(&spr_selectfield, 120, 100, "Respawn", 400, 180);
+	miRespawnField = new MI_SelectField(&spr_selectfield, 120, 80, "Respawn", 400, 180);
 	miRespawnField->Add("Instant", 0, "", false, false);
 	miRespawnField->Add("0.5 Seconds", 1, "", false, false);
 	miRespawnField->Add("1.0 Seconds", 2, "", false, false);
@@ -520,7 +521,7 @@ void Menu::CreateMenu()
 	miRespawnField->SetData(&game_values.respawn, NULL, NULL);
 	miRespawnField->SetKey(game_values.respawn);
 
-	miShieldField = new MI_SelectField(&spr_selectfield, 120, 140, "Shield", 400, 180);
+	miShieldField = new MI_SelectField(&spr_selectfield, 120, 120, "Shield", 400, 180);
 	miShieldField->Add("None", 0, "", false, false);
 	miShieldField->Add("0.5 Seconds", 31, "", false, false);
 	miShieldField->Add("1.0 Seconds", 62, "", false, false);
@@ -535,7 +536,7 @@ void Menu::CreateMenu()
 	miShieldField->SetData(&game_values.spawninvincibility, NULL, NULL);
 	miShieldField->SetKey(game_values.spawninvincibility);
 
-	miBoundsTimeField = new MI_SelectField(&spr_selectfield, 120, 180, "Bounds Time", 400, 180);
+	miBoundsTimeField = new MI_SelectField(&spr_selectfield, 120, 160, "Bounds Time", 400, 180);
 	miBoundsTimeField->Add("Infinite", 0, "", false, false);
 	miBoundsTimeField->Add("1 Second", 1, "", false, false);
 	miBoundsTimeField->Add("2 Seconds", 2, "", false, false);
@@ -550,7 +551,7 @@ void Menu::CreateMenu()
 	miBoundsTimeField->SetData(&game_values.outofboundstime, NULL, NULL);
 	miBoundsTimeField->SetKey(game_values.outofboundstime);
 
-	miWarpLocksField = new MI_SelectField(&spr_selectfield, 120, 220, "Warp Locks", 400, 180);
+	miWarpLocksField = new MI_SelectField(&spr_selectfield, 120, 200, "Warp Locks", 400, 180);
 	miWarpLocksField->Add("Off", 0, "", false, false);
 	miWarpLocksField->Add("1 Second", 62, "", false, false);
 	miWarpLocksField->Add("2 Seconds", 124, "", false, false);
@@ -565,7 +566,7 @@ void Menu::CreateMenu()
 	miWarpLocksField->SetData(&game_values.warplocks, NULL, NULL);
 	miWarpLocksField->SetKey(game_values.warplocks);
 
-	miBotsField = new MI_SelectField(&spr_selectfield, 120, 260, "Bots", 400, 180);
+	miBotsField = new MI_SelectField(&spr_selectfield, 120, 240, "Bots", 400, 180);
 	miBotsField->Add("Very Easy", 0, "", false, false);
 	miBotsField->Add("Easy", 1, "", false, false);
 	miBotsField->Add("Moderate", 2, "", false, false);
@@ -574,7 +575,7 @@ void Menu::CreateMenu()
 	miBotsField->SetData(&game_values.cpudifficulty, NULL, NULL);
 	miBotsField->SetKey(game_values.cpudifficulty);
 
-	miFrameLimiterField = new MI_SelectField(&spr_selectfield, 120, 300, "Frame Limit", 400, 180);
+	miFrameLimiterField = new MI_SelectField(&spr_selectfield, 120, 280, "Frame Limit", 400, 180);
 	miFrameLimiterField->Add("10 FPS", 100, "", false, false);
 	miFrameLimiterField->Add("15 FPS", 67, "", false, false);
 	miFrameLimiterField->Add("20 FPS", 50, "", false, false);
@@ -604,7 +605,7 @@ void Menu::CreateMenu()
 	miFrameLimiterField->SetData(&game_values.framelimiter, NULL, NULL);
 	miFrameLimiterField->SetKey(game_values.framelimiter);
 
-	miPointSpeedField = new MI_SelectField(&spr_selectfield, 120, 340, "Point Speed", 400, 180);
+	miPointSpeedField = new MI_SelectField(&spr_selectfield, 120, 320, "Point Speed", 400, 180);
 	miPointSpeedField->Add("Very Slow", 60, "", false, false);
 	miPointSpeedField->Add("Slow", 40, "", false, false);
 	miPointSpeedField->Add("Moderate", 20, "", false, false);
@@ -613,6 +614,13 @@ void Menu::CreateMenu()
 	miPointSpeedField->SetData(&game_values.pointspeed, NULL, NULL);
 	miPointSpeedField->SetKey(game_values.pointspeed);
 	
+	miSecretsField = new MI_SelectField(&spr_selectfield, 120, 360, "Secrets", 400, 180);
+	miSecretsField->Add("Off", 0, "", false, false);
+	miSecretsField->Add("On", 1, "", true, false);
+	miSecretsField->SetData(NULL, NULL, &game_values.secrets);
+	miSecretsField->SetKey(game_values.secrets ? 1 : 0);
+	miSecretsField->SetAutoAdvance(true);
+
 	miGameplayOptionsMenuBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
 	miGameplayOptionsMenuBackButton->SetCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 
@@ -626,9 +634,10 @@ void Menu::CreateMenu()
 	mGameplayOptionsMenu.AddControl(miWarpLocksField, miBoundsTimeField, miBotsField, NULL, miGameplayOptionsMenuBackButton);
 	mGameplayOptionsMenu.AddControl(miBotsField, miWarpLocksField, miFrameLimiterField, NULL, miGameplayOptionsMenuBackButton);
 	mGameplayOptionsMenu.AddControl(miFrameLimiterField, miBotsField, miPointSpeedField, NULL, miGameplayOptionsMenuBackButton);
-	mGameplayOptionsMenu.AddControl(miPointSpeedField, miFrameLimiterField, miGameplayOptionsMenuBackButton, NULL, miGameplayOptionsMenuBackButton);
+	mGameplayOptionsMenu.AddControl(miPointSpeedField, miFrameLimiterField, miSecretsField, NULL, miGameplayOptionsMenuBackButton);
+	mGameplayOptionsMenu.AddControl(miSecretsField, miPointSpeedField, miGameplayOptionsMenuBackButton, NULL, miGameplayOptionsMenuBackButton);
 	
-	mGameplayOptionsMenu.AddControl(miGameplayOptionsMenuBackButton, miPointSpeedField, miRespawnField, miPointSpeedField, NULL);
+	mGameplayOptionsMenu.AddControl(miGameplayOptionsMenuBackButton, miSecretsField, miRespawnField, miSecretsField, NULL);
 
 	mGameplayOptionsMenu.AddNonControl(miGameplayOptionsMenuLeftHeaderBar);
 	mGameplayOptionsMenu.AddNonControl(miGameplayOptionsMenuRightHeaderBar);
@@ -803,7 +812,7 @@ void Menu::CreateMenu()
 	miBoomerangLimitField->SetKey(game_values.boomeranglimit);
 
 	miHammerLifeField = new MI_SelectField(&spr_selectfield, 325, 80, "Life", 305, 105);
-	miHammerLifeField->Add("No Limit", 620, "", false, false);
+	miHammerLifeField->Add("No Limit", 310, "", false, false);
 	miHammerLifeField->Add("0.5 Seconds", 31, "", false, false);
 	miHammerLifeField->Add("0.6 Seconds", 37, "", false, false);
 	miHammerLifeField->Add("0.7 Seconds", 43, "", false, false);
@@ -2135,6 +2144,9 @@ void Menu::RunMenu()
 		if(game_values.gamemode->winningteam > -1)
 			miTournamentScoreboard->RefreshScores(game_values.gamemode->winningteam);
 	}
+
+	//Reset game mode back to the current game mode in case we came from boss mode
+	game_values.gamemode = gamemodes[currentgamemode];
 
 	//Keep track if we entered the menu loop as part of a tournament, if we exit the tournament
 	//we need to reset the menu music back to normal

@@ -1,13 +1,13 @@
 all : smw leveledit
 
 
-COMMON_OBJS:=build/MapList.o build/SFont.o build/dirlist.o build/gfx.o \
-           build/global.o build/input.o build/map.o \
-           build/movingplatform.o build/path.o build/savepng.o
-SMW_OBJS:= build/HashTable.o build/ai.o build/eyecandy.o \
-           build/gamemodes.o build/main.o build/map.o build/menu.o \
-           build/object.o build/player.o build/sfx.o build/splash.o \
-           build/uicontrol.o build/uimenu.o
+COMMON_OBJS:=build/MapList.o build/SFont.o build/dirlist.o \
+           build/eyecandy.o build/gfx.o build/global.o build/input.o \
+           build/map.o build/movingplatform.o build/path.o \
+           build/savepng.o
+SMW_OBJS:= build/HashTable.o build/ai.o build/gamemodes.o build/main.o \
+           build/map.o build/menu.o build/object.o build/player.o \
+           build/sfx.o build/splash.o build/uicontrol.o build/uimenu.o
 LEVELEDIT_OBJS:=build/leveleditor.o
 
 include configuration

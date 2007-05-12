@@ -354,9 +354,24 @@ void EC_SingleAnimation::draw()
 // class EC_LoopingAnimation
 //------------------------------------------------------------------------------
 
-EC_LoopingAnimation::EC_LoopingAnimation(gfxSprite *nspr, short nx, short ny, short iframes, short irate, short iloops) :
-	EC_SingleAnimation(nspr, nx, ny, iframes, irate)
+EC_LoopingAnimation::EC_LoopingAnimation(gfxSprite *nspr, short x, short y, short iframes, short irate, short iloops, short ioffsetx, short ioffsety, short istartoffsetx, short iwidth, short iheight) :
+	CEyecandy()
 {
+	spr = nspr;
+	ix = x;
+	iy = y;
+	frame = ioffsetx + istartoffsetx * iwidth;
+	counter = 0;
+	rate = irate - 1;
+
+	iw = iwidth;
+	ih = iheight;
+
+	iOffsetX = ioffsetx;
+	iOffsetY = ioffsety;
+
+	iAnimationWidth = ioffsetx + iframes * iwidth;
+
 	countloops = 0;
 	loops = iloops;
 }
@@ -366,18 +381,22 @@ void EC_LoopingAnimation::update()
 	if(++counter > rate)
 	{
 		counter = 0;
+		
 		frame += iw;
-
 		if(frame >= iAnimationWidth)
 		{
 			if(loops > 0 && ++countloops >= loops)
 				dead = true;
 
-			frame = 0;
+			frame = iOffsetX;
 		}
 	}
 }
 
+void EC_LoopingAnimation::draw()
+{
+	spr->draw(ix, iy, frame, iOffsetY, iw, ih);
+}
 
 //------------------------------------------------------------------------------
 // class award
@@ -638,7 +657,7 @@ void EC_SoulsAward::update()
 		float velx = speed * cos(angle);
 		float vely = speed * sin(angle);
 
-		eyecandyfront.add(new EC_RocketAward(&spr_awardsouls, x - 8, y - 8, velx, vely, ttl, id[count], 9));
+		eyecandyfront.add(new EC_RocketAward(&spr_awardsouls, x - 8, y - 8, velx, vely, ttl, id[count], 12));
 		
 		if(++count >= numSouls)
 		{
@@ -750,6 +769,60 @@ void EC_Door::draw()
 
 	spr->draw(x, y + offsety, frame * iw, 0, iw, ih - offsety);
 }
+
+//------------------------------------------------------------------------------
+// class EC_BossPeeker
+//------------------------------------------------------------------------------
+
+EC_BossPeeker::EC_BossPeeker(gfxSprite *nspr, short speed, short bossType) :
+	CEyecandy()
+{
+	spr = nspr;
+	iSpeed = speed;
+	iBossColorOffsetY = bossType * 64;
+
+	timer = 0;
+	state = 0;
+	ix = 592;
+	iy = 480;
+
+	game_values.bosspeeking = bossType;
+}
+
+
+void EC_BossPeeker::update()
+{
+	if(state == 0)
+	{
+		iy -= 2;
+		if(iy <= 432)
+		{
+			iy = 432;
+			state = 1;
+		}
+	}
+	else if(state == 1)
+	{
+		if(++timer == iSpeed)
+			state = 2;
+	}
+	else if(state == 2)
+	{
+		iy += 2;
+		if(iy >= 480)
+		{
+			dead = true;
+			game_values.bosspeeking = -1;
+		}
+	}
+}
+
+
+void EC_BossPeeker::draw()
+{
+	spr->draw(ix, iy, 192, iBossColorOffsetY, 48, 64);
+}
+
 //------------------------------------------------------------------------------
 // class eyecandy_container
 //------------------------------------------------------------------------------

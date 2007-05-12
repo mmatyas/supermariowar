@@ -284,7 +284,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 	if(version[0] == 1 && version[1] == 7)
 	{
 		//Read summary information here
-		if(version[2] >= 0 && version[3] > 1)
+		if((version[2] == 0 && version[3] > 1) || version[2] >= 1)
 		{
 			int iAutoFilterValues[NUM_AUTO_FILTERS + 1];
 			ReadIntChunk(iAutoFilterValues, NUM_AUTO_FILTERS + 1, mapfile);
@@ -334,13 +334,13 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 		}
 
 
-		if(version[2] >= 0 && version[3] > 1)
+		if((version[2] == 0 && version[3] > 1) || version[2] >= 1)
 		{
 			//Read in background to use
 			ReadString(szBackgroundFile, 128, mapfile);
 			//printf("Background: %s", szBackgroundFile);
 		}
-		else if(version[2] >= 0 && version[3] > 0)
+		else if(version[2] == 0 && version[3] == 1)
 		{
 			//Read in background to use
 			ReadString(szBackgroundFile, 128, mapfile);
@@ -365,7 +365,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 			strcpy(szBackgroundFile, g_szBackgroundConversion[backgroundID]);
 		}
 
-		if(version[2] >= 0 && version[3] > 0)
+		if((version[2] == 0 && version[3] > 0) || version[2] >= 1)
 		{
 			//Read on/off switches
 			for(short iSwitch = 0; iSwitch < 4; iSwitch++)
@@ -374,7 +374,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 			}
 		}
 
-		if(version[2] >= 0 && version[3] > 1)
+		if((version[2] == 0 && version[3] > 1) || version[2] >= 1)
 		{
 			loadPlatforms(mapfile, iReadType == read_type_preview);
 		}
@@ -382,7 +382,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 		//Read in eyecandy to use
 		eyecandyID = (short)ReadInt(mapfile);
 
-		if(version[2] >= 0 && version[3] > 0)
+		if((version[2] == 0 && version[3] > 0) || version[2] >= 1)
 			musicCategoryID = ReadInt(mapfile);
 		else
 			musicCategoryID = g_iMusicCategoryConversion[backgroundID];
@@ -486,12 +486,12 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 			drawareas[m].h = (Uint16)ReadInt(mapfile);
 		}
 
-		if(version[2] >= 0 && version[3] < 2)
+		if(version[2] == 0 && version[3] < 2)
 		{
 			loadPlatforms(mapfile, iReadType == read_type_preview);
 		}
 
-		if(version[2] >= 0 && version[3] == 0)
+		if(version[2] == 0 && version[3] == 0)
 		{
 			for(short iSwitch = 0; iSwitch < 4; iSwitch++)
 			{
@@ -1495,10 +1495,14 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks)
 
 
 
-void CMap::draw(SDL_Surface *targetSurface, int layer)
+void CMap::draw(SDL_Surface *targetSurface, int layer, bool fForeground)
 {
 	int i, j, ts;
-	
+
+	CEyecandyContainer * animatedtilesdest = &animatedtilesback;
+	if(fForeground)
+		animatedtilesdest = &animatedtilesfront;
+
 	//draw left to right full vertical
 	bltrect.x = 0;
 	for(i = 0; i < MAPWIDTH; i++)
@@ -1515,8 +1519,19 @@ void CMap::draw(SDL_Surface *targetSurface, int layer)
 
 			tilebltrect.x = iGameTileX[ts];
 			tilebltrect.y = iGameTileY[ts];
-		
-			SDL_BlitSurface(tilesetsurface[0], &tilebltrect, targetSurface, &bltrect);
+
+			if(ts >= 940 && ts <= 942)
+				animatedtilesdest->add(new EC_LoopingAnimation(&spr_maplava, bltrect.x, bltrect.y, 3, 8, 0, 0, TILESIZE, ts - 940, TILESIZE, TILESIZE));
+			else if(ts >= 652 && ts <= 655)
+				animatedtilesdest->add(new EC_LoopingAnimation(&spr_mapwater, bltrect.x, bltrect.y, 4, 8, 0, 0, 0, ts - 652, TILESIZE, TILESIZE));
+			else if(ts == 559 || ts == 495 || ts == 780)
+				animatedtilesdest->add(new EC_LoopingAnimation(&spr_mapwaterfall, bltrect.x, bltrect.y, 4, 8, 0, 0, 0, 0, TILESIZE, TILESIZE));
+			else if(ts == 591 || ts == 527 || ts == 812)
+				animatedtilesdest->add(new EC_LoopingAnimation(&spr_mapwaterfall, bltrect.x, bltrect.y, 4, 8, 0, 0, TILESIZE, 0, TILESIZE, TILESIZE));
+			else if(ts == 817)
+				animatedtilesdest->add(new EC_LoopingAnimation(&spr_maplamp, bltrect.x, bltrect.y, 4, 8, 0, 0, 0, 0, TILESIZE, TILESIZE));
+			else
+				SDL_BlitSurface(tilesetsurface[0], &tilebltrect, targetSurface, &bltrect);
 		}
 
 		bltrect.x += TILESIZE;
@@ -1823,13 +1838,13 @@ void CMap::predrawbackground(gfxSprite &background, gfxSprite &mapspr)
 
 	SDL_BlitSurface(background.getSurface(), NULL, mapspr.getSurface(), &r);
 	
-	draw(mapspr.getSurface(), 0);
-	draw(mapspr.getSurface(), 1);
+	draw(mapspr.getSurface(), 0, false);
+	draw(mapspr.getSurface(), 1, false);
 
 	if(!game_values.toplayer)
 	{
-		draw(mapspr.getSurface(), 2);
-		draw(mapspr.getSurface(), 3);
+		draw(mapspr.getSurface(), 2, false);
+		draw(mapspr.getSurface(), 3, false);
 	}
 
 	//Draws the spawn areas
@@ -1859,8 +1874,8 @@ void CMap::predrawforeground(gfxSprite &foregroundspr)
 	SDL_FillRect(foregroundspr.getSurface(), NULL, SDL_MapRGB(foregroundspr.getSurface()->format, 255, 0, 255));
 	SDL_SetColorKey(foregroundspr.getSurface(), SDL_SRCCOLORKEY, SDL_MapRGB(foregroundspr.getSurface()->format, 255, 0, 255));
 
-	draw(foregroundspr.getSurface(), 2);
-	draw(foregroundspr.getSurface(), 3);
+	draw(foregroundspr.getSurface(), 2, true);
+	draw(foregroundspr.getSurface(), 3, true);
 
 	/*
 	for(int k = 0; k < numdrawareas; k++)
@@ -1961,7 +1976,18 @@ void CMap::clearWarpLocks()
 	}
 }
 
-void CMap::updateWarpLocks()
+void CMap::drawWarpLocks()
+{
+	for(int k = 0; k < numwarpexits; k++)
+	{
+		if(warplocked[warpexits[k].connection])
+		{
+			spr_warplock.draw(warpexits[k].lockx, warpexits[k].locky);
+		}
+	}
+}
+
+void CMap::update()
 {
 	for(int k = 0; k <= maxConnection; k++)
 	{
@@ -1974,17 +2000,19 @@ void CMap::updateWarpLocks()
 			}
 		}
 	}
+
+	animatedtilesfront.update();
+	animatedtilesback.update();
 }
 
-void CMap::drawWarpLocks()
+void CMap::drawbackanimations()
 {
-	for(int k = 0; k < numwarpexits; k++)
-	{
-		if(warplocked[warpexits[k].connection])
-		{
-			spr_warplock.draw(warpexits[k].lockx, warpexits[k].locky);
-		}
-	}
+	animatedtilesback.draw();
+}
+
+void CMap::drawfrontanimations()
+{
+	animatedtilesfront.draw();
 }
 
 void CMap::findspawnpoint(short iType, short * x, short * y, short width, short height, bool tilealigned)
@@ -2198,6 +2226,12 @@ void CMap::ReadString(char * szString, short size, FILE * outFile)
 	delete [] szReadString;
 }
 
+void CMap::clearAnimations()
+{
+	animatedtilesback.clean();
+	animatedtilesfront.clean();
+}
+
 void CMap::optimize()
 {
 	for(int j = 0; j < MAPHEIGHT; j++)
@@ -2225,4 +2259,3 @@ void CMap::optimize()
 		}
 	}
 }
-

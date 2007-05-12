@@ -74,13 +74,16 @@ struct STextAward
 
 #define VELMOVING		4.0f		//velocity (speed) for moving left, right
 #define VELSLOWMOVING	2.2f		//velocity when slow down powerup is in effect
+#define VELDASHMOVING   10.0f		//velocity of invincible dashing
 #define	VELMOVING_CHICKEN 2.9f		//speed of the chicken in the gamemode capturethechicken
 #define VELMOVINGADD	0.5f
 #define VELMOVINGADDICE VELMOVINGADD / 4
+#define VELDASHADD      1.0f
 #define VELTURBOMOVING	5.5f
 #define VELJUMP			9.0f		//velocity for jumping
 #define VELSLOWJUMP		7.0f		//velocity for jumping when slow down powerup is in effect
 #define VELTURBOJUMP	10.2f		//velocity for turbo jumping
+#define VELSUPERJUMP	14.0f;		//super jump (hold down for 2 seconds, then jump on note blocks)
 #define VELPUSHBACK		5.0f
 #define VELMAXBREAKBLOCK 3.0f
 #define VELNOTEBLOCKBOUNCE 3.0f
@@ -284,6 +287,11 @@ extern sfxSound			sfx_spit;
 extern sfxSound			sfx_starwarning;
 extern sfxSound			sfx_powerdown;
 extern sfxSound			sfx_switchpress;
+extern sfxSound			sfx_superspring;
+extern sfxSound			sfx_secret;
+extern sfxSound			sfx_bowserlaugh;
+extern sfxSound			sfx_gameover;
+extern sfxSound			sfx_stun;
 
 extern sfxMusic			backgroundmusic[5];
 
@@ -295,6 +303,8 @@ extern gfxSprite		spr_3uppowerup;
 extern gfxSprite		spr_5uppowerup;
 extern gfxSprite		spr_firepowerup;
 extern gfxSprite		spr_hammerpowerup;
+extern gfxSprite		spr_sledgehammerpowerup;
+extern gfxSprite		spr_podobopowerup;
 extern gfxSprite		spr_poisonpowerup;
 extern gfxSprite		spr_mysterymushroompowerup;
 extern gfxSprite		spr_boomerangpowerup;
@@ -304,6 +314,7 @@ extern gfxSprite		spr_powpowerup;
 extern gfxSprite		spr_modpowerup;
 extern gfxSprite		spr_bulletbillpowerup;
 extern gfxSprite		spr_featherpowerup;
+extern gfxSprite		spr_bombpowerup;
 
 extern gfxSprite		spr_shade[3];
 extern gfxSprite		spr_timershade;
@@ -332,17 +343,25 @@ extern gfxSprite		spr_goomba;
 extern gfxSprite		spr_goombadead;
 extern gfxSprite		spr_goombadeadflying;
 extern gfxSprite		spr_koopa;
+extern gfxSprite		spr_sledgebrothers;
+extern gfxSprite		spr_sledgebrothersdead;
+extern gfxSprite		spr_redkoopa;
 extern gfxSprite		spr_cheepcheep;
 extern gfxSprite		spr_cheepcheepdead;
 extern gfxSprite		spr_bulletbill;
 extern gfxSprite		spr_bulletbilldead;
 
 extern gfxSprite		spr_fireball;
+extern gfxSprite		spr_superfireball;
 extern gfxSprite		spr_hammer;
+extern gfxSprite		spr_sledgehammer;
 extern gfxSprite		spr_boomerang;
 extern gfxSprite		spr_shell;
 extern gfxSprite		spr_shelldead;
 extern gfxSprite		spr_blueblock;
+extern gfxSprite		spr_spring;
+extern gfxSprite		spr_spike;
+extern gfxSprite		spr_bomb;
 
 extern gfxSprite		spr_fireballexplosion;
 extern gfxSprite		spr_frictionsmoke;
@@ -386,11 +405,17 @@ extern gfxSprite		spr_flipblock;
 extern gfxSprite		spr_bounceblock;
 extern gfxSprite		spr_throwblock;
 extern gfxSprite		spr_switchblocks;
+extern gfxSprite		spr_viewblock;
 #endif
 
 extern gfxSprite		spr_brokenyellowblock;
 extern gfxSprite		spr_brokenflipblock;
 extern gfxSprite		spr_brokenblueblock;
+
+extern gfxSprite		spr_maplava;
+extern gfxSprite		spr_mapwater;
+extern gfxSprite		spr_mapwaterfall;
+extern gfxSprite		spr_maplamp;
 
 extern gfxSprite		** spr_player[4];
 extern gfxSprite		** spr_chocobo[4];
@@ -634,6 +659,9 @@ struct gv
 	
 	short		slowdownon;
 	short		slowdowncounter;
+	bool		slowdownfreeze;
+
+	short		superboomerang[4];
 
 	short		storedpowerups[4];
 	short		gamepowerups[4];
@@ -647,12 +675,14 @@ struct gv
 
 	bool		screencrunch;
 	short		screenshaketimer;
-	CPlayer *	screenshakeplayer;
+	short		screenshakeplayerid;
+	short		screenshaketeamid;
 	bool		screenshakekillinair;
 	short		screenshakekillscount;
 
 	short		bulletbilltimer[4];
 	short		bulletbillspawntimer[4];
+	bool		bulletbillhoming[4];
 
 	bool		friendlyfire;
 	bool		toplayer;
@@ -678,8 +708,6 @@ struct gv
 	bool		gamehost;			//If this client is responsible for choosing game type, map, options
 	char *		hostaddress;        //String form of the host ip address
 
-	//FIXME:: Trying out new controls to see if they work
-	//Player controls configuration for both keyboard and joystick/gamepad
 	CInputPlayerControl inputConfiguration[4][2]; //[NumPlayers][Keyboard/Joystick]
 
 	//Player input used during game.  Reads SDL_Events and sets buttons that were pressed
@@ -736,6 +764,15 @@ struct gv
 	bool		fFiltersOn;
 
 	short		pointspeed;
+
+	bool		redkoopas;
+	bool		redthrowblocks;
+	bool		viewblocks;
+
+	bool		secrets;
+	short		bosspeeking;
+	bool		noexit;
+	short		enemyhammerkills;
 };
 
 extern gv game_values;

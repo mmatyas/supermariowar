@@ -2,6 +2,7 @@
 #include <math.h>
 
 extern bool SwapPlayers(short iUsingPlayerID);
+extern void EnterBossMode(short bossType);
 extern short g_iWinningPlayer;
 
 CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamID, short iColorID, gfxSprite * nsprites[PGFX_LAST], CScore *nscore, short * respawn, CPlayerAI * ai)
@@ -50,6 +51,10 @@ CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamI
 
 	pSuicideCreditPlayer = NULL;
 	iSuicideCreditTimer = 0;
+
+	konamiIndex = 0;
+	secret_spring_index = 0;
+	secret_spike_index = 0;
 }
 
 CPlayer::~CPlayer()
@@ -63,24 +68,562 @@ void CPlayer::move()
 	if(invincible)
 		game_values.playinvinciblesound = true;
 
-#ifdef _DEBUG
-    if (konamiIndex < 11)
-    {
-        static const int konami_code[11] = {1,1,2,2,4,8,4,8,48,48,48};
-        int keymask =
-            (playerKeys->game_jump.fPressed?1:0) |
-            (playerKeys->game_down.fPressed?2:0) |
-            (playerKeys->game_left.fPressed?4:0) |
-            (playerKeys->game_right.fPressed?8:0) |
-            (playerKeys->game_turbo.fPressed?16:0) |
-            (playerKeys->game_powerup.fPressed?32:0);
-        
-		if (keymask & konami_code[konamiIndex]) konamiIndex++;
-        else if (keymask & ~konami_code[konamiIndex]) konamiIndex=0;
-        
-		extern int g_tanookiFlag;
-        if (konamiIndex == 11) { ifsoundonplay(sfx_transform); g_tanookiFlag++; }
-    }
+	if(game_values.secrets)
+	{
+		int keymask =
+			(playerKeys->game_jump.fPressed?1:0) |
+			(playerKeys->game_down.fPressed?2:0) |
+			(playerKeys->game_left.fPressed?4:0) |
+			(playerKeys->game_right.fPressed?8:0) |
+			(playerKeys->game_turbo.fPressed?16:0) |
+			(playerKeys->game_powerup.fPressed?32:0);
+
+		for(short bossType = 0; bossType < 3; bossType++)
+		{
+			if(game_values.bosspeeking == bossType)
+			{
+				static const int boss_code[3][7] = { {2,1,4,8,16,16,32},
+													 {1,1,4,8,2,2,32},
+													 {4,8,4,8,16,16,0} };
+
+				static const int boss_code_length[3] = {7, 7, 6};
+		        
+				if (keymask & boss_code[bossType][boss_index[bossType]]) 
+					boss_index[bossType]++;
+				else if (keymask & ~boss_code[bossType][boss_index[bossType]]) 
+					boss_index[bossType] = 0;
+		        
+				if (boss_index[bossType] == boss_code_length[bossType])
+				{
+					boss_index[bossType] = 0;
+					EnterBossMode(bossType);
+				}
+			}
+			else
+			{
+				boss_index[bossType] = 0;
+			}
+		}
+
+		if (konamiIndex < 11)
+		{
+			static const int konami_code[11] = {1,1,2,2,4,8,4,8,48,48,48};
+	        
+			if (keymask & konami_code[konamiIndex]) 
+				konamiIndex++;
+			else if (keymask & ~konami_code[konamiIndex]) 
+				konamiIndex = 0;
+	        
+			extern int g_tanookiFlag;
+			if (konamiIndex == 11)
+			{
+				ifsoundonplay(sfx_transform); 
+				g_tanookiFlag++; 
+			}
+		}
+
+		//Super kick shells and BTBs
+		if(keymask & 2)
+			superKickIndex++;
+		else if(keymask & ~2)
+			superKickIndex = 0;
+
+		//Homing bullet bills
+		if (game_values.gamepowerups[globalID] == 10 && homingBillsIndex < 4)
+		{
+			static const int homingBillsCode[4] = {16, 16, 16, 32};
+	        
+			if (keymask & homingBillsCode[homingBillsIndex]) 
+				homingBillsIndex++;
+			else if (keymask & ~homingBillsCode[homingBillsIndex]) 
+				homingBillsIndex = 0;
+	        
+			if (homingBillsIndex == 4)
+			{
+				homingBillsIndex = 0;
+				ifsoundonplay(sfx_transform); 
+				homingBills = true;
+			}
+		}
+
+		if(game_values.gamepowerups[globalID] != 10 && powerupused != 10)
+			homingBills = false;
+
+		if (powerup == 2)
+		{
+			static const int super_hammer_throw_code_left[4] = {8, 8, 4, 16};
+		    
+			if (keymask & super_hammer_throw_code_left[super_hammer_throw_left_index]) 
+				super_hammer_throw_left_index++;
+			else if (keymask & ~super_hammer_throw_code_left[super_hammer_throw_left_index])
+				super_hammer_throw_left_index = 0;
+		    
+			if (super_hammer_throw_left_index >= 4)
+			{
+				super_hammer_throw_left_index = 0;
+				shoot_left_super_hammer = true;
+			}
+
+			static const int super_hammer_throw_code_right[4] = {4, 4, 8, 16};
+		        
+			if (keymask & super_hammer_throw_code_right[super_hammer_throw_right_index]) 
+				super_hammer_throw_right_index++;
+			else if (keymask & ~super_hammer_throw_code_right[super_hammer_throw_right_index])
+				super_hammer_throw_right_index = 0;
+		    
+			if (super_hammer_throw_right_index >= 4)
+			{
+				super_hammer_throw_right_index = 0;
+				shoot_right_super_hammer = true;
+			}
+		}
+		else
+		{
+			super_hammer_throw_left_index = 0;
+			super_hammer_throw_right_index = 0;
+
+			shoot_left_super_hammer = false;
+			shoot_right_super_hammer = false;
+		}
+
+		if (powerup == 5)
+		{
+			static const int super_sledge_hammer_throw_code[3] = {2, 2, 16};
+		    
+			if (keymask & super_sledge_hammer_throw_code[super_sledge_hammer_throw_index]) 
+				super_sledge_hammer_throw_index++;
+			else if (keymask & ~super_sledge_hammer_throw_code[super_sledge_hammer_throw_index])
+				super_sledge_hammer_throw_index = 0;
+		    
+			if (super_sledge_hammer_throw_index >= 3)
+			{
+				super_sledge_hammer_throw_index = 0;
+				shoot_super_sledge_hammer = true;
+			}
+		}
+		else
+		{
+			super_sledge_hammer_throw_index = 0;
+			shoot_super_sledge_hammer = false;
+		}
+
+		if (powerup == 4)
+		{
+			if(playerKeys->game_left.fDown)
+			{
+				holdleft++;
+				holdlefttolerance = 0;
+			}
+			else if(holdleft >= 60 && holdlefttolerance < 15)
+			{
+				holdlefttolerance++;
+			}
+			else
+			{
+				holdleft = 0;
+				holdlefttolerance = 0;
+				super_boomerang_throw_index_right = 0;
+			}
+
+			if(playerKeys->game_right.fDown)
+			{
+				holdright++;
+				holdrighttolerance = 0;
+			}
+			else if(holdright >= 60 && holdrighttolerance < 15)
+			{
+				holdrighttolerance++;
+			}
+			else
+			{
+				holdright = 0;
+				holdrighttolerance = 0;
+				super_boomerang_throw_index_left = 0;
+			}
+
+			if(holdleft >= 60)
+			{
+				static const int super_boomerang_throw_code_right[2] = {8, 16};
+		    
+				if (keymask & super_boomerang_throw_code_right[super_boomerang_throw_index_right]) 
+					super_boomerang_throw_index_right++;
+				else if (keymask & ~super_boomerang_throw_code_right[super_boomerang_throw_index_right])
+					super_boomerang_throw_index_right = 0;
+				
+				if (super_boomerang_throw_index_right >= 2)
+				{
+					super_boomerang_throw_index_right = 0;
+					shoot_super_boomerang = true;
+				}
+			}
+
+			if(holdright >= 60)
+			{
+				static const int super_boomerang_throw_code_left[2] = {4, 16};
+		    
+				if (keymask & super_boomerang_throw_code_left[super_boomerang_throw_index_left]) 
+					super_boomerang_throw_index_left++;
+				else if (keymask & ~super_boomerang_throw_code_left[super_boomerang_throw_index_left])
+					super_boomerang_throw_index_left = 0;
+				
+				if (super_boomerang_throw_index_left >= 2)
+				{
+					super_boomerang_throw_index_left = 0;
+					shoot_super_boomerang = true;
+				}
+			}
+		}
+		else
+		{
+			holdleft = 0;
+			holdlefttolerance = 0;
+			
+			holdright = 0;
+			holdrighttolerance = 0;
+
+			super_boomerang_throw_index_left = 0;
+			super_boomerang_throw_index_right = 0;
+
+			shoot_super_boomerang = false;
+		}
+
+		if (bobomb)
+		{
+			static const int super_bobomb_code[7] = {4, 8, 4, 8, 2, 2, 16};
+		        
+			if (keymask & super_bobomb_code[super_bobomb_index]) 
+				super_bobomb_index++;
+			else if (keymask & ~super_bobomb_code[super_bobomb_index])
+				super_bobomb_index = 0;
+		    
+			if (super_bobomb_index >= 7)
+			{
+				super_bobomb_index = 0;
+				shoot_super_bobomb = true;
+			}
+		}
+		else
+		{
+			super_bobomb_index = 0;
+			shoot_super_bobomb = false;
+		}
+
+		if(game_values.superboomerang[globalID] == 1)
+		{
+			if(keymask & 16)
+				game_values.superboomerang[globalID] = 2;
+		}
+
+		//Fly using feather
+		if(playerKeys->game_down.fDown)
+		{
+			holddown++;
+			holddowntolerance = 0;
+		}
+		else if(holddown >= 120 && holddowntolerance < 15)
+		{
+			holddowntolerance++;
+		}
+		else
+		{
+			holddown = 0;
+			holddowntolerance = 0;
+		}
+
+		int keymaskdown =
+			(playerKeys->game_jump.fDown?1:0) |
+			(playerKeys->game_down.fDown?2:0) |
+			(playerKeys->game_left.fDown?4:0) |
+			(playerKeys->game_right.fDown?8:0) |
+			(playerKeys->game_turbo.fDown?16:0) |
+			(playerKeys->game_powerup.fDown?32:0);
+
+		if(powerup == 1)
+		{
+			static const int ryu_fireball_code_left[4] = {2,6,4,20};
+
+			if (keymaskdown == ryu_fireball_code_left[ryu_fireball_index_left])
+				ryu_fireball_index_left++;
+			else if(ryu_fireball_index_left > 0 && keymaskdown == ryu_fireball_code_left[ryu_fireball_index_left - 1])
+			{}
+			else
+				ryu_fireball_index_left = 0;
+		    
+			if (ryu_fireball_index_left >= 4)
+			{
+				ryu_fireball_index_left = 0;
+				shoot_left_fireball = true;
+			}
+
+			static const int ryu_fireball_code_right[4] = {2,10,8,24};
+
+			if (keymaskdown == ryu_fireball_code_right[ryu_fireball_index_right])
+				ryu_fireball_index_right++;
+			else if(ryu_fireball_index_right > 0 && keymaskdown == ryu_fireball_code_right[ryu_fireball_index_right - 1])
+			{}
+			else
+				ryu_fireball_index_right = 0;
+		    
+			if (ryu_fireball_index_right >= 4)
+			{
+				ryu_fireball_index_right = 0;
+				shoot_right_fireball = true;
+			}
+		}
+		else
+		{
+			shoot_left_fireball = false;
+			shoot_right_fireball = false;
+
+			ryu_fireball_index_left = 0;
+			ryu_fireball_index_right = 0;
+		}
+
+		if(invincible)
+		{
+			if(keymask & 4)
+				dashLeftIndex++;
+			else if(keymask & ~4)
+				dashLeftIndex = 0;
+			
+			if(dashLeftIndex >= 3 && keymaskdown == 20)
+			{
+				dashLeftIndex = 0;
+				dashLeft = true;
+			}
+
+			if(keymaskdown != 20)
+				dashLeft = false;
+
+
+			if(keymask & 8)
+				dashRightIndex++;
+			else if(keymask & ~8)
+				dashRightIndex = 0;
+
+			if(dashRightIndex >= 3 && keymaskdown == 24)
+			{
+				dashRightIndex = 0;
+				dashRight = true;
+			}
+			
+			if(keymaskdown != 24)
+				dashRight = false;
+		}
+		else
+		{
+			dashLeft = false;
+			dashRight = false;
+		}
+
+		if(super_pow && (game_values.screenshaketimer > 0 || powerupused == 9))
+		{
+			if(game_values.screenshaketimer > 0)
+			{
+				if(++super_pow_timer >= 60)
+				{
+					game_values.screenshaketimer = 0;
+					super_pow_timer = 0;
+					super_pow = false;
+				}
+
+				if(keymask & 16)
+				{
+					game_values.screenshaketimer += 10;
+					
+					IO_Block * block = (IO_Block*)objectblocks.getRandomObject();
+
+					if(block)
+						block->triggerBehavior();
+				}
+			}
+		}
+		else
+		{
+			super_pow = false;
+			super_pow_timer = 0;
+		}
+
+		if(super_mod && (game_values.screenshaketimer > 0 || powerupused == 16))
+		{
+			if(game_values.screenshaketimer > 0)
+			{
+				if(++super_mod_timer >= 60)
+				{
+					game_values.screenshaketimer = 0;
+					super_mod_timer = 0;
+					super_mod = false;
+				}
+
+				if(keymask & 16)
+				{
+					game_values.screenshaketimer += 10;
+					
+					IO_Block * block = (IO_Block*)objectblocks.getRandomObject();
+
+					if(block)
+						block->triggerBehavior();
+				}
+			}
+		}
+		else
+		{
+			super_mod = false;
+			super_mod_timer = 0;
+		}
+
+		//Super Pow
+		if (game_values.gamepowerups[globalID] == 9)
+		{
+			static const int super_pow_code[3] = {2, 2, 32};
+	        
+			if (keymask & super_pow_code[super_pow_index]) 
+				super_pow_index++;
+			else if (keymask & ~super_pow_code[super_pow_index]) 
+				super_pow_index = 0;
+	        
+			if (super_pow_index >= 3)
+			{
+				super_pow_index = 0;
+				ifsoundonplay(sfx_transform); 
+				super_pow = true;
+			}
+		}
+
+		//Super Mod
+		if (game_values.gamepowerups[globalID] == 16)
+		{
+			static const int super_mod_code[3] = {1, 1, 32};
+	        
+			if (keymask & super_mod_code[super_mod_index]) 
+				super_mod_index++;
+			else if (keymask & ~super_mod_code[super_mod_index]) 
+				super_mod_index = 0;
+	        
+			if (super_mod_index >= 3)
+			{
+				super_mod_index = 0;
+				ifsoundonplay(sfx_transform); 
+				super_mod = true;
+			}
+		}
+
+		if(game_values.gamemode->gamemode == game_mode_stomp && !game_values.redkoopas)
+		{
+			if (redKoopaIndex < 7)
+			{
+				static const int red_koopa_code[7] = {2,2,4,2,8,2,1};
+		        
+				if (keymask & red_koopa_code[redKoopaIndex]) 
+					redKoopaIndex++;
+				else if (keymask & ~red_koopa_code[redKoopaIndex]) 
+					redKoopaIndex = 0;
+		        
+				if (redKoopaIndex == 7)
+				{
+					ifsoundonplay(sfx_transform); 
+					game_values.redkoopas = true; 
+				}
+			}
+		}
+
+		if(!game_values.redthrowblocks)
+		{
+			if (redThrowBlockIndex < 8)
+			{
+				static const int red_throw_block_code[8] = {1,2,1,2,8,4,1,2};
+		        
+				if (keymask & red_throw_block_code[redThrowBlockIndex]) 
+					redThrowBlockIndex++;
+				else if (keymask & ~red_throw_block_code[redThrowBlockIndex]) 
+					redThrowBlockIndex = 0;
+		        
+				if (redThrowBlockIndex == 8)
+				{
+					ifsoundonplay(sfx_transform); 
+					game_values.redthrowblocks = true;
+
+					for(short iBlock = 0; iBlock < objectblocks.list_end; iBlock++)
+					{
+						if(((IO_Block*)objectblocks.list[iBlock])->getBlockType() == block_throw)
+						{
+							((B_ThrowBlock*)objectblocks.list[iBlock])->SetType(true);
+						}
+					}
+				}
+			}
+		}
+
+		if(!game_values.viewblocks)
+		{
+			if (viewBlockIndex < 7)
+			{
+				static const int view_block_code[7] = {8,2,4,2,1,1,1};
+		        
+				if (keymask & view_block_code[viewBlockIndex]) 
+					viewBlockIndex++;
+				else if (keymask & ~view_block_code[viewBlockIndex]) 
+					viewBlockIndex = 0;
+		        
+				if (viewBlockIndex == 7)
+				{
+					ifsoundonplay(sfx_transform); 
+					game_values.viewblocks = true;
+
+					for(short iBlock = 0; iBlock < objectblocks.list_end; iBlock++)
+					{
+						IO_Block * block = (IO_Block*)objectblocks.list[iBlock];
+						if(block->getBlockType() == block_powerup)
+						{
+							block->dead = true;
+							B_ViewBlock * viewBlock = new B_ViewBlock(&spr_viewblock, block->col * TILESIZE, block->row * TILESIZE);
+							
+							if(block->state != 0)
+							{
+								viewBlock->state = 3;
+								viewBlock->timer = ((B_PowerupBlock*)block)->timer;
+							}
+
+							g_map.blockdata[block->col][block->row] = viewBlock;
+							objectblocks.add(viewBlock);
+						}
+					}
+				}
+			}
+		}
+
+		if (secret_spring_index < 9)
+		{
+			static const int secret_spring_code[9] = {2,1,2,1,2,1,2,2,16};
+	        
+			if (keymask & secret_spring_code[secret_spring_index]) 
+				secret_spring_index++;
+			else if (keymask & ~secret_spring_code[secret_spring_index]) 
+				secret_spring_index = 0;
+	        
+			if (secret_spring_index == 9)
+			{
+				ifsoundonplay(sfx_transform); 
+				objectsplayer.add(new CO_Spring(&spr_spring));
+			}
+		}
+
+		if (secret_spike_index < 6)
+		{
+			static const int secret_spike_code[6] = {16,2,4,8,1,16};
+	        
+			if (keymask & secret_spike_code[secret_spike_index]) 
+				secret_spike_index++;
+			else if (keymask & ~secret_spike_code[secret_spike_index]) 
+				secret_spike_index = 0;
+	        
+			if (secret_spike_index == 6)
+			{
+				ifsoundonplay(sfx_transform); 
+				objectsplayer.add(new CO_Spike(&spr_spike));
+			}
+		}
+	}
 
     if (tanooki && state == player_ready)
     {
@@ -92,7 +635,7 @@ void CPlayer::move()
         }
 
         // Become the tanooki
-        else if (playerKeys->game_turbo.fPressed && playerKeys->game_down.fDown && !statue_lock)
+        else if (playerKeys->game_turbo.fPressed && playerKeys->game_down.fDown && !statue_lock && !lockfire && powerupused == -1)
         {
             // set the amount of time you get to remain in statue form
             statue_timer = 123;
@@ -126,15 +669,18 @@ void CPlayer::move()
             spawninvincible = false;
 
             // Slight upward velocity to escape spikes / lava
-            vely = -8.0;
+            if(!inair)
+				vely = -8.0;
 
             // perform transformation effects
             eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + (HALFPW) - 16, iy + (HALFPH) - 16, 3, 8));
             ifsoundonplay(sfx_transform);
+
+			statue_lock = false;
         }
 
         // Player is a statue
-        else if (statue_timer>0)
+        else if (statue_timer > 0)
         {
             // Prevent player from shooting while a statue
             lockfire = true;
@@ -150,12 +696,10 @@ void CPlayer::move()
 
             // Become invincible
             spawninvincible = true;
-        }
 
-        // Lift statue lock when player touches ground
-        if (!inair) statue_lock = false;
+			statue_lock = true;
+        }
     }
-#endif
 
 	if(hammertimer > 0)
 		hammertimer--;
@@ -179,6 +723,8 @@ void CPlayer::move()
 		iSrcOffsetX = 160;
 	else if(game_values.gamemode->star == this)
 		iSrcOffsetX = game_values.gamemodesettings.star.shine ? 224 : 192;
+	else if(game_values.slowdownfreeze && game_values.slowdownon != teamID)
+		iSrcOffsetX = 256;
 	else if(spawninvincible)
 		iSrcOffsetX = 128;
 
@@ -233,6 +779,28 @@ void CPlayer::move()
 
 				if(spawnradius < 0.0f)
 					state = player_ready;
+			
+				if(++spawntimer > 1)
+				{
+					spawntimer = 0;
+
+					short ix1 = ix - PWOFFSET + (short)(spawnradius * cos(spawnangle));
+					short iy1 = iy - PHOFFSET + (short)(spawnradius * sin(spawnangle));
+						
+					short ix2 = ix - PWOFFSET + (short)(spawnradius * cos(spawnangle + HALF_PI));
+					short iy2 = iy - PHOFFSET + (short)(spawnradius * sin(spawnangle + HALF_PI));
+
+					short ix3 = ix - PWOFFSET + (short)(spawnradius * cos(spawnangle + PI));
+					short iy3 = iy - PHOFFSET + (short)(spawnradius * sin(spawnangle + PI));
+
+					short ix4 = ix - PWOFFSET + (short)(spawnradius * cos(spawnangle + THREE_HALF_PI));
+					short iy4 = iy - PHOFFSET + (short)(spawnradius * sin(spawnangle + THREE_HALF_PI));
+
+					eyecandyfront.add(new EC_SingleAnimation(&spr_spawnsmoke[colorID], ix1, iy1, 4, 4));
+					eyecandyfront.add(new EC_SingleAnimation(&spr_spawnsmoke[colorID], ix2, iy2, 4, 4));
+					eyecandyfront.add(new EC_SingleAnimation(&spr_spawnsmoke[colorID], ix3, iy3, 4, 4));
+					eyecandyfront.add(new EC_SingleAnimation(&spr_spawnsmoke[colorID], ix4, iy4, 4, 4));
+				}
 			}
 		}
 		else if(iswarping())
@@ -328,7 +896,7 @@ void CPlayer::move()
 				}
 				case 7:
 				{
-					turnslowdownon();
+					turnslowdownon(holddown > 310);
 					break;
 				}
 				case 8:
@@ -342,7 +910,8 @@ void CPlayer::move()
 				{
 					ifsoundonplay(sfx_thunder);
 					game_values.screenshaketimer = 20;
-					game_values.screenshakeplayer = this;
+					game_values.screenshakeplayerid = globalID;
+					game_values.screenshaketeamid = teamID;
 					game_values.screenshakekillinair = false;
 					game_values.screenshakekillscount = 0;
 					break;
@@ -351,6 +920,8 @@ void CPlayer::move()
 				{
 					game_values.bulletbilltimer[globalID] = 400;
 					game_values.bulletbillspawntimer[globalID] = 0;
+					game_values.bulletbillhoming[globalID] = homingBills;
+					homingBills = false;
 					break;
 				}
 				case 11:
@@ -391,7 +962,8 @@ void CPlayer::move()
 				{
 					ifsoundonplay(sfx_thunder);
 					game_values.screenshaketimer = 20;
-					game_values.screenshakeplayer = this;
+					game_values.screenshakeplayerid = globalID;
+					game_values.screenshaketeamid = teamID;
 					game_values.screenshakekillinair = true;
 					break;
 				}
@@ -412,6 +984,28 @@ void CPlayer::move()
 				{
 					powerup = 0;
 					SetPowerup(4);
+					break;
+				}
+				case 21:  //sledge hammer
+				{
+					powerup = 0;
+					SetPowerup(5);
+					break;
+				}
+				case 22:  //golden podobo
+				{
+					short numPodobos = rand() % 6 + 10;
+					for(short iPodobo = 0; iPodobo < numPodobos; iPodobo++)
+					{
+						objectsfront.add(new OMO_Podobo(&spr_podobo, (short)(rand() % 608), -(float(rand() % 9) / 2.0f) - 9.0f, globalID, teamID, colorID));
+					}
+					ifsoundonplay(sfx_thunder);
+					break;
+				}
+				case 23:  //bombs
+				{
+					powerup = 0;
+					SetPowerup(6);
 					break;
 				}
 			}
@@ -448,9 +1042,7 @@ void CPlayer::move()
 	{
 		//If player is shielded, count down that timer
 		if(spawninvincibletimer > 0)
-		{
 			spawninvincible = --spawninvincibletimer > 0;
-		}
 
 		short lrn = 0;	//move left-right-no: -1.. left 0 no 1 ... right
 
@@ -461,135 +1053,189 @@ void CPlayer::move()
 				cpu_think();
 		}
 
-#ifdef _DEBUG
-        if (!statue_timer)
+        if (!statue_timer && (!game_values.slowdownfreeze || game_values.slowdownon == teamID))
         {
-#endif
             if(playerKeys->game_right.fDown)
                 lrn++;
             
             if(playerKeys->game_left.fDown)
                 lrn--;
-#ifdef _DEBUG
         }
-#endif
 
 		//Used for bouncing off of note blocks
 		if(superjumptimer > 0)
 			superjumptimer--;
 
 		//jump pressed?
-		if(playerKeys->game_jump.fDown)
+		if(!game_values.slowdownfreeze || game_values.slowdownon == teamID)
 		{
-			if(!lockjump)
+			if(playerKeys->game_jump.fDown)
 			{
-				if(!inair && superjumptimer == 0)
-				{	//only if on the ground and the jump key was released somewhen after it was pressed the last time
-
-					bool fFellThrough = false;
-					if(playerKeys->game_down.fDown)
+				if(!lockjump)
+				{
+					if(powerup == 3 && holddown >= 120 && !flying)
 					{
-						//Check to see what the player is standing on
+						holddown = 0;
+						ifsoundonplay(sfx_collectfeather);
+						flying = true;
+						lockjump = true;
 
-						short txl = ix / TILESIZE;
-						short txr;
-						
-						fPrecalculatedY = fy + vely;
-
-						short ty = ((short)fPrecalculatedY + PH) / TILESIZE;
-
-						if(txl < 0)
-							txl += 20;
-						else if(txl > 19)
-							txl -= 20;
-
-						if(ix + PW >= 640)
-							txr = (ix + PW - 640) / TILESIZE;
-						else
-							txr = (ix + PW) / TILESIZE;
-
-						TileType lefttile = g_map.map(txl, ty);
-						TileType righttile = g_map.map(txr, ty);
-
-						if((lefttile == tile_solid_on_top && (righttile == tile_solid_on_top || righttile == tile_nonsolid)) ||
-							(righttile == tile_solid_on_top && (lefttile == tile_solid_on_top || lefttile == tile_nonsolid)))
+						if(game_values.featherlimit > 0)
 						{
-							fFellThrough = true;
+							DecreaseProjectileLimit();
 						}
+					}
+					else if(!inair && superjumptimer == 0)
+					{	//only if on the ground and the jump key was released somewhen after it was pressed the last time
 
-						if(!fFellThrough && platform)
+						bool fFellThrough = false;
+						if(playerKeys->game_down.fDown)
 						{
-							fPrecalculatedY += platform->fOldVelY;
-							platform->gettiletypes(this, &lefttile, &righttile);
+							//Check to see what the player is standing on
+
+							short txl = ix / TILESIZE;
+							short txr;
+							
+							fPrecalculatedY = fy + vely;
+
+							short ty = ((short)fPrecalculatedY + PH) / TILESIZE;
+
+							if(txl < 0)
+								txl += 20;
+							else if(txl > 19)
+								txl -= 20;
+
+							if(ix + PW >= 640)
+								txr = (ix + PW - 640) / TILESIZE;
+							else
+								txr = (ix + PW) / TILESIZE;
+
+							TileType lefttile = g_map.map(txl, ty);
+							TileType righttile = g_map.map(txr, ty);
 
 							if((lefttile == tile_solid_on_top && (righttile == tile_solid_on_top || righttile == tile_nonsolid)) ||
-							(righttile == tile_solid_on_top && (lefttile == tile_solid_on_top || lefttile == tile_nonsolid)))
+								(righttile == tile_solid_on_top && (lefttile == tile_solid_on_top || lefttile == tile_nonsolid)))
 							{
 								fFellThrough = true;
 							}
+
+							if(!fFellThrough && platform)
+							{
+								fPrecalculatedY += platform->fOldVelY;
+								platform->gettiletypes(this, &lefttile, &righttile);
+
+								if((lefttile == tile_solid_on_top && (righttile == tile_solid_on_top || righttile == tile_nonsolid)) ||
+								(righttile == tile_solid_on_top && (lefttile == tile_solid_on_top || lefttile == tile_nonsolid)))
+								{
+									fFellThrough = true;
+								}
+							}
 						}
-					}
 
-					if(fFellThrough)
-					{
-						lockfall = true;
-						fallthrough = true;
-					}
-					else
-					{
-						Jump(lrn, 1.0f);
-						ifsoundonplay(sfx_jump);
-					}
+						if(fFellThrough)
+						{
+							lockfall = true;
+							fallthrough = true;
+						}
+						else
+						{
+							Jump(lrn, 1.0f);
+							ifsoundonplay(sfx_jump);
+						}
 
-					lockjump = true;
-				}
-				else if(superjumptimer > 0)
-				{
-					vely = -VELTURBOJUMP;
-					ifsoundonplay(sfx_springjump);
-					superjumptimer = 0;
-					lockjump = true;
-				}
-				else if(powerup == 3 && featherjump < game_values.featherjumps)
-				{
-					if(game_values.featherlimit == 0 || projectilelimit > 0)
-					{
-						Jump(lrn, 0.8f);
-						ifsoundonplay(sfx_capejump);
-						featherjump++;
 						lockjump = true;
 					}
-
-					if(game_values.featherlimit > 0)
+					else if(superjumptimer > 0)
 					{
-						DecreaseProjectileLimit();
+						if(holddown > 60)
+						{
+							holddown = 0;
+							vely = -VELSUPERJUMP;
+							ifsoundonplay(sfx_superspring);
+						}
+						else
+						{
+							vely = -VELTURBOJUMP;
+							ifsoundonplay(sfx_springjump);
+						}
+
+						superjumptimer = 0;
+						lockjump = true;
+					}
+					else if(powerup == 3)
+					{
+						if(featherjump < game_values.featherjumps)
+						{
+							if(game_values.featherlimit == 0 || projectilelimit > 0)
+							{
+								if(featherjump < game_values.featherjumps)
+								{
+									Jump(lrn, 0.8f);
+									ifsoundonplay(sfx_capejump);
+									lockjump = true;
+								}
+								
+								featherjump++;	
+							}
+
+							if(game_values.featherlimit > 0)
+							{
+								DecreaseProjectileLimit();
+							}
+						}
 					}
 				}
 			}
-		}
-		else
-		{
-			lockjump = false;		//the jump key is not pressed: the player may jump again if he is on the ground
-
-			if(vely < -VELSTOPJUMP)
-				vely = -VELSTOPJUMP;
-		}
-
-		if(playerKeys->game_down.fDown)
-		{
-			if(!lockfall && !inair && playerDevice == DEVICE_KEYBOARD)
+			else
 			{
-				lockfall = true;
-				fallthrough = true;
+				lockjump = false;		//the jump key is not pressed: the player may jump again if he is on the ground
+
+				if(vely < -VELSTOPJUMP)
+					vely = -VELSTOPJUMP;
+
+				flying = false;
+				flyingtimer = 0;
 			}
 		}
-		else
+
+		if(flying)
 		{
-			lockfall = false;
+			if(++flyingtimer > 300)
+			{
+				flyingtimer = 0;
+				flying = false;
+			}
+
+			if(playerKeys->game_down.fDown && vely < 1.0f)
+			{
+				vely += 1.0f;
+			}
+			else if(!playerKeys->game_down.fDown && vely > -1.0f)
+			{
+				vely -= 1.0f;
+				inair = true;
+			}
+		}
+
+
+		if(!game_values.slowdownfreeze || game_values.slowdownon == teamID)
+		{
+			if(playerKeys->game_down.fDown)
+			{
+				if(!lockfall && !inair && playerDevice == DEVICE_KEYBOARD)
+				{
+					lockfall = true;
+					fallthrough = true;
+				}
+			}
+			else
+			{
+				lockfall = false;
+			}
 		}
 		
 		//POWERUP RELEASE
-		if(playerKeys->game_powerup.fDown)
+		if(playerKeys->game_powerup.fDown && (!game_values.slowdownfreeze || game_values.slowdownon == teamID) && statue_timer == 0)
 		{
 			if(game_values.gamepowerups[globalID] > -1)
 			{
@@ -606,101 +1252,204 @@ void CPlayer::move()
 		fPressedAcceptItem = playerKeys->game_turbo.fPressed;
 
 		//Projectiles
-		if(playerKeys->game_turbo.fDown)
+		if(!game_values.slowdownfreeze || game_values.slowdownon == teamID)
 		{
-			fAcceptingItem = carriedItem == NULL;
-
-			if(!lockfire)
+			if(playerKeys->game_turbo.fDown)
 			{
-				if(bobomb) //If we're a bob-omb, explode
+				fAcceptingItem = carriedItem == NULL;
+
+				if(!lockfire)
 				{
-					bobomb = false;
-					objectsfront.add(new OMO_Explosion(&spr_explosion, ix + HALFPW - 96, iy + HALFPH - 64, 2, 4, globalID, teamID));
-					ifsoundonplay(sfx_bobombsound);
-				}
-				else
-				{
-					if(powerup == 1 && projectiles[globalID] < 2)
+					if(bobomb) //If we're a bob-omb, explode
 					{
-						if(game_values.fireballlimit == 0 || projectilelimit > 0)
+						bobomb = false;
+
+						if(shoot_super_bobomb)
 						{
-							objectcollisionitems.add(new MO_Fireball(&spr_fireball, ix + 6, iy, 4, IsPlayerFacingRight(), 5, globalID, teamID, colorID));
+							shoot_super_bobomb = false;
+
+							CO_Bomb * bomb = new CO_Bomb(&spr_bomb, ix + HALFPW - 14, iy + 2, 0.0f, 0.0f, 4, globalID, teamID, colorID, rand() % 120 + 240);
 							
+							if(AcceptItem(bomb))
+							{
+								bomb->owner = this;
+								bomb->MoveToOwner();
+							}
+
+							objectsfront.add(bomb);
 							projectiles[globalID]++;
+							
+							eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
+							ifsoundonplay(sfx_transform);
+						}
+						else
+						{
+							objectsfront.add(new OMO_Explosion(&spr_explosion, ix + HALFPW - 96, iy + HALFPH - 64, 2, 4, globalID, teamID));
+							ifsoundonplay(sfx_bobombsound);
+						}
+					}
+					else
+					{
+						if(powerup == 1 && projectiles[globalID] < 2)
+						{
+							if(game_values.fireballlimit == 0 || projectilelimit > 0)
+							{
+								if(shoot_left_fireball)
+								{
+									objectsfront.add(new MO_SuperFireball(&spr_superfireball, ix + HALFPW - 30, iy + HALFPH - 16, 4, -6.0f, 0.0f, 4, globalID, teamID, colorID));
+									ifsoundonplay(sfx_spit); 
+								}
+								else if(shoot_right_fireball)
+								{
+									objectsfront.add(new MO_SuperFireball(&spr_superfireball, ix + HALFPW - 2, iy + HALFPH - 16, 4, 6.0f, 0.0f, 4, globalID, teamID, colorID));
+									ifsoundonplay(sfx_spit); 
+								}
+								else
+								{
+									objectcollisionitems.add(new MO_Fireball(&spr_fireball, ix + 6, iy, 4, IsPlayerFacingRight(), 5, globalID, teamID, colorID));
+									ifsoundonplay(sfx_fireball);
+								}
+
+								projectiles[globalID]++;
+							}
+
+							if(game_values.fireballlimit > 0)
+							{
+								DecreaseProjectileLimit();
+							}
+						}
+						else if(powerup == 2 && projectiles[globalID] < 2 && hammertimer == 0)
+						{
+							if(game_values.hammerlimit == 0 || projectilelimit > 0)
+							{
+								if(shoot_left_super_hammer || shoot_right_super_hammer)
+								{
+									shoot_left_super_hammer = false;
+									shoot_right_super_hammer = false;
+									objectsfront.add(new MO_Hammer(&spr_hammer, ix + 6, iy, 6, (IsPlayerFacingRight() ? 5.0f : -5.0f), -1.0f, 5, globalID, teamID, colorID, true));
+									objectsfront.add(new MO_Hammer(&spr_hammer, ix + 6, iy, 6, (IsPlayerFacingRight() ? 5.0f : -5.0f), 0.0f, 5, globalID, teamID, colorID, true));
+									objectsfront.add(new MO_Hammer(&spr_hammer, ix + 6, iy, 6, (IsPlayerFacingRight() ? 5.0f : -5.0f), 1.0f, 5, globalID, teamID, colorID, true));
+									projectiles[globalID] += 3;
+								}
+								else
+								{
+									if(IsPlayerFacingRight())
+										objectsfront.add(new MO_Hammer(&spr_hammer, ix + 8, iy, 6, velx + 2.0f, -HAMMERTHROW, 5, globalID, teamID, colorID, false));
+									else
+										objectsfront.add(new MO_Hammer(&spr_hammer, ix - 14, iy, 6, velx - 2.0f, -HAMMERTHROW, 5, globalID, teamID, colorID, false));
+
+									projectiles[globalID]++;
+								}
+								
+								hammertimer = game_values.hammerdelay;
+								ifsoundonplay(sfx_fireball);
+							}
+
+							if(game_values.hammerlimit > 0)
+							{
+								DecreaseProjectileLimit();
+							}
+						}
+						else if(powerup == 4 && projectiles[globalID] < 1) //only allow one boomerang
+						{
+							if(game_values.boomeranglimit == 0 || projectilelimit > 0)
+							{
+								objectsfront.add(new MO_Boomerang(&spr_boomerang, ix, iy + HALFPH - 16, 4, IsPlayerFacingRight(), 5, globalID, teamID, colorID, shoot_super_boomerang));
+								projectiles[globalID]++;
+
+								if(shoot_super_boomerang)
+									game_values.superboomerang[globalID] = 1;
+
+								shoot_super_boomerang = false;
+							}
+
+							if(game_values.boomeranglimit > 0)
+							{
+								DecreaseProjectileLimit();
+							}
+						}
+						else if(powerup == 5 && projectiles[globalID] < 1 && hammertimer == 0)
+						{
+							if(game_values.hammerlimit == 0 || projectilelimit > 0)
+							{
+								if(IsPlayerFacingRight())
+									objectsfront.add(new MO_SledgeHammer(&spr_sledgehammer, ix + 8, iy, 8, velx + 2.0f, -HAMMERTHROW, 5, globalID, teamID, colorID, shoot_super_sledge_hammer));
+								else
+								objectsfront.add(new MO_SledgeHammer(&spr_sledgehammer, ix - 18, iy, 8, velx - 2.0f, -HAMMERTHROW, 5, globalID, teamID, colorID, shoot_super_sledge_hammer));
+
+								shoot_super_sledge_hammer = false;
+
+								hammertimer = game_values.hammerdelay;
+								projectiles[globalID]++;
+								
+								ifsoundonplay(sfx_fireball);
+							}
+
+							if(game_values.hammerlimit > 0)
+							{
+								DecreaseProjectileLimit();
+							}
+						}
+						else if(powerup == 6 && projectiles[globalID] < 2)
+						{
+							CO_Bomb * bomb = new CO_Bomb(&spr_bomb, ix + HALFPW - 14, iy + 2, 0.0f, 0.0f, 4, globalID, teamID, colorID, rand() % 120 + 240);
+							
+							if(AcceptItem(bomb))
+							{
+								bomb->owner = this;
+								bomb->MoveToOwner();
+							}
+
+							objectsfront.add(bomb);
+							projectiles[globalID]++;
+							
 							ifsoundonplay(sfx_fireball);
 						}
-
-						if(game_values.fireballlimit > 0)
-						{
-							DecreaseProjectileLimit();
-						}
 					}
-					else if(powerup == 2 && projectiles[globalID] < 2 && hammertimer == 0)
-					{
-						if(game_values.hammerlimit == 0 || projectilelimit > 0)
-						{
-							objectsfront.add(new MO_Hammer(&spr_hammer, ix + 6, iy, 6, velx + (IsPlayerFacingRight() ? 2.0f : -2.0f), /*vely / 2.0f*/ - HAMMERTHROW, 5, globalID, teamID, colorID));
-							hammertimer = game_values.hammerdelay;
-						
-							projectiles[globalID]++;
-							ifsoundonplay(sfx_fireball);
-						}
 
-						if(game_values.hammerlimit > 0)
-						{
-							DecreaseProjectileLimit();
-						}
-					}
-					else if(powerup == 4 && projectiles[globalID] < 1) //only allow one boomerang
-					{
-						if(game_values.boomeranglimit == 0 || projectilelimit > 0)
-						{
-							objectsfront.add(new MO_Boomerang(&spr_boomerang, ix, iy + HALFPH - 16, 4, IsPlayerFacingRight(), 5, globalID, teamID, colorID));
-							projectiles[globalID]++;
-						}
-
-						if(game_values.boomeranglimit > 0)
-						{
-							DecreaseProjectileLimit();
-						}
-					}
+					lockfire = true;
 				}
-
-				lockfire = true;
 			}
-		}
-		else
-		{
-			lockfire = false;
-			fAcceptingItem = false;
-
-			if(carriedItem)
+			else
 			{
-				if(playerKeys->game_down.fDown)
-					carriedItem->Drop();
-				else
+				lockfire = false;
+				fAcceptingItem = false;
+
+				if(carriedItem)
 				{
-					//Make sure the shell/block is out in front of player before kicking it
-					if(carriedItem->getMovingObjectType() == movingobject_shell || carriedItem->getMovingObjectType() == movingobject_throwblock)
-						carriedItem->MoveToOwner();
+					if(playerKeys->game_down.fDown)
+						carriedItem->Drop();
+					else
+					{
+						//Make sure the shell/block is out in front of player before kicking it
+						if(carriedItem->getMovingObjectType() == movingobject_shell || carriedItem->getMovingObjectType() == movingobject_throwblock)
+							carriedItem->MoveToOwner();
 
-					carriedItem->Kick();
+						carriedItem->Kick(superKickIndex > 1);
+					}
+
+					carriedItem = NULL;
 				}
-
-				carriedItem = NULL;
 			}
 		}
+
+		shoot_left_fireball = false;
+		shoot_right_fireball = false;
 
 		if(lrn == 1)
 		{
 			if(onice)
 				velx += VELMOVINGADDICE;
+			else if(dashRight)
+				velx += VELDASHADD;
 			else
 				velx += VELMOVINGADD;		//move right
 
 			float maxVel = 0;
 			if((game_values.slowdownon != -1 && game_values.slowdownon != teamID) || jailed > 0)
-				maxVel = VELSLOWMOVING;
+				maxVel = game_values.slowdownfreeze ? 0.0f : VELSLOWMOVING;
+			else if(dashRight)
+				maxVel = VELDASHMOVING;
 			else if(playerKeys->game_turbo.fDown)
 				maxVel = VELTURBOMOVING + (game_values.gamemode->tagged == this ? TAGGEDBOOST : 0.0f);
 			else
@@ -716,12 +1465,16 @@ void CPlayer::move()
 		{
 			if(onice)
 				velx -= VELMOVINGADDICE;
+			else if(dashLeft)
+				velx -= VELDASHADD;
 			else
 				velx -= VELMOVINGADD;		//move left
 
 			float maxVel = 0;
 			if((game_values.slowdownon != -1 && game_values.slowdownon != teamID) || jailed > 0)
-				maxVel = -VELSLOWMOVING;
+				maxVel = game_values.slowdownfreeze ? 0.0f : -VELSLOWMOVING;
+			else if(dashLeft)
+				maxVel = -VELDASHMOVING;
 			else if(playerKeys->game_turbo.fDown)
 				maxVel = -VELTURBOMOVING - (game_values.gamemode->tagged == this ? TAGGEDBOOST : 0.0f);
 			else
@@ -1132,12 +1885,22 @@ void CPlayer::SetupNewPlayer()
 	bobomb = false;
 	hammertimer = 0;
 
-#ifdef _DEBUG
 	tanooki = false;
-    konamiIndex = 0;
     statue_lock = false;
     statue_timer = 0;
-#endif
+
+	//Only reset the tanooki index if it hasn't been triggered yet
+	if(konamiIndex != 11)
+		konamiIndex = 0;
+
+	//Only reset the secret spring index if it hasn't been triggered yet
+	if(secret_spring_index != 9)
+		secret_spring_index = 0;
+
+	if(secret_spike_index != 6)
+		secret_spike_index = 0;
+
+	superKickIndex = 0;
 
 	invincible = false;
 	invincibletimer = 0;
@@ -1149,6 +1912,59 @@ void CPlayer::SetupNewPlayer()
 	killsinrowinair = 0;
 	awardangle = 0.0f;
 	featherjump = 0;
+	holddown = 0;
+	holddowntolerance = 0;
+	holdleft = 0;
+	holdlefttolerance = 0;
+	holdright = 0;
+	holdrighttolerance = 0;
+	flying = false;
+	flyingtimer = 0;
+
+	ryu_fireball_index_left = 0;
+	ryu_fireball_index_right = 0;
+	shoot_left_fireball = false;
+	shoot_right_fireball = false;
+
+	super_hammer_throw_left_index = 0;
+	super_hammer_throw_right_index = 0;
+	shoot_left_super_hammer = false;
+	shoot_right_super_hammer = false;
+
+	super_bobomb_index = 0;
+	shoot_super_bobomb = false;
+
+	super_sledge_hammer_throw_index = 0;
+	shoot_super_sledge_hammer = false;
+
+	super_boomerang_throw_index_left = 0;
+	super_boomerang_throw_index_right = 0;
+	shoot_super_boomerang = false;
+
+	super_pow_index = 0;
+	super_pow = false;
+	super_pow_timer = 0;
+
+	super_mod_index = 0;
+	super_mod = false;
+	super_mod_timer = 0;
+
+	dashLeftIndex = 0;
+	dashRightIndex = 0;
+	dashLeft = false;
+	dashRight = false;
+	dashSparkleAnimationTimer = 0;
+
+	homingBillsIndex = 0;
+	homingBills = false;
+
+	redKoopaIndex = 0;
+	redThrowBlockIndex = 0;
+	viewBlockIndex = 0;
+	
+	for(short bossType = 0; bossType < 3; bossType++)
+		boss_index[bossType] = 0;
+
 	iCapeTimer = 0;
 	iCapeFrameX = 0;
 	iCapeFrameY = 0;
@@ -1222,16 +2038,18 @@ void CPlayer::spawnText(char * szText)
 	}
 }
 
-void CPlayer::bouncejump()
+bool CPlayer::bouncejump()
 {
 	if(playerKeys->game_jump.fDown)
 	{
 		lockjump = true;
 		vely = -VELJUMP;
+		return true;
 	}
 	else
 	{
 		vely = -VELJUMP / 2;	//jump a little off of collision object
+		return false;
 	}
 }
 
@@ -1428,6 +2246,22 @@ void AddAwardKill(CPlayer * killer, CPlayer * killed, killstyle style)
 {
 	killer->killsinrow++;
 
+	if(killer->killsinrow >= 10 && game_values.secrets)
+	{
+		if(rand() % 5 == 0)
+		{
+			if(!game_values.gamemode->gameover && game_values.bosspeeking == -1)
+			{
+				eyecandyfront.add(new EC_BossPeeker(&spr_sledgebrothers, rand()%90 + 90, 2));
+				
+				backgroundmusic[0].stop();
+				ifsoundonstop(sfx_invinciblemusic);
+				ifsoundonstop(sfx_timewarning);
+				ifsoundonplay(sfx_bowserlaugh);
+			}
+		}
+	}
+
 	if(killer->inair && (style == kill_style_stomp || style == kill_style_goomba || style == kill_style_koopa || style == kill_style_cheepcheep || style == kill_style_bulletbill || style == kill_style_feather))
 		killer->killsinrowinair++;
 
@@ -1618,7 +2452,7 @@ void _collisionhandler_p2p_pushback(CPlayer &o1, CPlayer &o2)
 	if(o1.ix + PW < 320 && o2.ix > 320)
 		overlapcollision = true;
 
-	if((o1.velx == 0 && !o2.iswarping() && o2.velx != 0) || o1.iswarping())
+	if((o1.velx == 0 && o2.iswarping() && o2.velx != 0) || o1.iswarping())
 	{
 		if(overlapcollision)
 		{//o2 reposition to the right side of o1, o1 stays
@@ -1682,10 +2516,10 @@ void _collisionhandler_p2p_pushback(CPlayer &o1, CPlayer &o2)
 		absv2 = ( o2.velx < 0 ? o2.velx : -1.0f ) * 1.5f;	//o2 right (only negative velx counts)
 	}
 
-	if(o1.isready())
+	if(o1.state == player_ready)
 		o1.velx = CapSideVelocity(absv2);
 	
-	if(o2.isready())
+	if(o2.state == player_ready)
 		o2.velx = CapSideVelocity(absv1);
 }
 
@@ -1693,150 +2527,130 @@ void _collisionhandler_p2p_pushback(CPlayer &o1, CPlayer &o2)
 void CPlayer::draw()
 {
 	//Don't draw a player that is waiting to respawn
-	if(state == player_wait)
+	if(state == player_wait || state == player_spawning)
 		return;
 
 	//Draw player
-	if(state == player_spawning)
+	pScoreboardSprite = sprites;
+
+	if (statue_timer)
+    {
+        if (isready() && (statue_timer < 50) && (statue_timer /3 %2))
+                /*|| statue_timer > 110*/   //Looks better with immediate transformation
+            return;
+
+		if(iswarping())
+			spr_statue.draw(ix - PWOFFSET, iy - 31, 0, 0, 32, 58, (short)state % 4, warpplane);
+		else
+			spr_statue.draw(ix - PWOFFSET, iy - 31);
+
+        return;
+    }
+	else if(bobomb) //draw him as bob-omb
 	{
-		if(game_values.spawnstyle == 2)
+		pScoreboardSprite = spr_bobomb[colorID];
+
+		//Add smoke to the top of the bomb
+		if(++bobombsmoketimer > 2 && (velx != 0.0f || vely != GRAVITATION) && state == player_ready)
 		{
-			if(++spawntimer > 1)
-			{
-				spawntimer = 0;
-
-				short ix1 = ix - PWOFFSET + (short)(spawnradius * cos(spawnangle));
-				short iy1 = iy - PHOFFSET + (short)(spawnradius * sin(spawnangle));
-					
-				short ix2 = ix - PWOFFSET + (short)(spawnradius * cos(spawnangle + HALF_PI));
-				short iy2 = iy - PHOFFSET + (short)(spawnradius * sin(spawnangle + HALF_PI));
-
-				short ix3 = ix - PWOFFSET + (short)(spawnradius * cos(spawnangle + PI));
-				short iy3 = iy - PHOFFSET + (short)(spawnradius * sin(spawnangle + PI));
-
-				short ix4 = ix - PWOFFSET + (short)(spawnradius * cos(spawnangle + THREE_HALF_PI));
-				short iy4 = iy - PHOFFSET + (short)(spawnradius * sin(spawnangle + THREE_HALF_PI));
-
-				eyecandyfront.add(new EC_SingleAnimation(&spr_spawnsmoke[colorID], ix1, iy1, 4, 4));
-				eyecandyfront.add(new EC_SingleAnimation(&spr_spawnsmoke[colorID], ix2, iy2, 4, 4));
-				eyecandyfront.add(new EC_SingleAnimation(&spr_spawnsmoke[colorID], ix3, iy3, 4, 4));
-				eyecandyfront.add(new EC_SingleAnimation(&spr_spawnsmoke[colorID], ix4, iy4, 4, 4));
-			}
+			bobombsmoketimer = 0;
+			eyecandyfront.add(new EC_SingleAnimation(&spr_bobombsmoke, ix + HALFPH - 8, iy - PHOFFSET - 8, 4, 4));
 		}
 	}
-	else
+	else if(game_values.gamemode->chicken == this) //draw him as chicken
 	{
-		pScoreboardSprite = sprites;
+		pScoreboardSprite = spr_chocobo[colorID];
+	}
 
-#ifdef _DEBUG
-		if (statue_timer)
-        {
-            if (isready() && (statue_timer < 50) && (statue_timer /3 %2))
-                    /*|| statue_timer > 110*/   //Looks better with immediate transformation
-                return;
-
-			if(iswarping())
-				spr_statue.draw(ix - PWOFFSET, iy - 31, 0, 0, 32, 58, (short)state % 4, warpplane);
-			else
-				spr_statue.draw(ix - PWOFFSET, iy - 31);
-
-            return;
-        }
-		else 
-#endif
-		if(bobomb) //draw him as bob-omb
-		{
-			pScoreboardSprite = spr_bobomb[colorID];
-
-			//Add smoke to the top of the bomb
-			if(++bobombsmoketimer > 2 && (velx != 0.0f || vely != GRAVITATION) && state == player_ready)
-			{
-				bobombsmoketimer = 0;
-				eyecandyfront.add(new EC_SingleAnimation(&spr_bobombsmoke, ix + HALFPH - 8, iy - PHOFFSET - 8, 4, 4));
-			}
-		}
-		else if(game_values.gamemode->chicken == this) //draw him as chicken
-		{
-			pScoreboardSprite = spr_chocobo[colorID];
-		}
-
-		if(ownerPlayerID > -1)
-		{
-			if(iswarping())
-				spr_ownedtags.draw(ix - PWOFFSET - 8, iy - PHOFFSET - 8, ownerColorOffsetX, 0, 48, 48, (short)state % 4, warpplane);
-			else
-				spr_ownedtags.draw(ix - PWOFFSET - 8, iy - PHOFFSET - 8, ownerColorOffsetX, 0, 48, 48);
-		}
-		
-		if(powerup == 3)
-			DrawCape();
-
-		if(state > player_ready) //warping
-			pScoreboardSprite[spr]->draw(ix - PWOFFSET, iy - PHOFFSET, iSrcOffsetX, 0, 32, 32, (short)state % 4, warpplane);
+	if(ownerPlayerID > -1)
+	{
+		if(iswarping())
+			spr_ownedtags.draw(ix - PWOFFSET - 8, iy - PHOFFSET - 8, ownerColorOffsetX, 0, 48, 48, (short)state % 4, warpplane);
 		else
-			pScoreboardSprite[spr]->draw(ix - PWOFFSET, iy - PHOFFSET, iSrcOffsetX, 0, 32, 32);
+			spr_ownedtags.draw(ix - PWOFFSET - 8, iy - PHOFFSET - 8, ownerColorOffsetX, 0, 48, 48);
+	}
+	
+	if(powerup == 3)
+		DrawCape();
 
-		//Draw the crown on the player
-		if(game_values.showwinningcrown && g_iWinningPlayer == teamID)
-			spr_crown.draw(ix + HALFPW - (IsPlayerFacingRight() ? 4 : 10), iy - 10);
+	if(state > player_ready) //warping
+		pScoreboardSprite[spr]->draw(ix - PWOFFSET, iy - PHOFFSET, iSrcOffsetX, 0, 32, 32, (short)state % 4, warpplane);
+	else
+		pScoreboardSprite[spr]->draw(ix - PWOFFSET, iy - PHOFFSET, iSrcOffsetX, 0, 32, 32);
 
-		if(state < player_ready)
-			return;
+	//Draw the crown on the player
+	if(game_values.showwinningcrown && g_iWinningPlayer == teamID)
+		spr_crown.draw(ix + HALFPW - (IsPlayerFacingRight() ? 4 : 10), iy - 10);
 
-		if(jailed > 0)
+	if(state < player_ready)
+		return;
+
+	if(jailed > 0)
+	{
+		if(state > player_ready) //warping
+			spr_jail.draw(ix - PWOFFSET - 6, iy - PHOFFSET - 6, 0, 0, 44, 44, (short)state % 4, warpplane);
+		else
+			spr_jail.draw(ix - PWOFFSET - 6, iy - PHOFFSET - 6);
+	}
+
+	//Draw the Ring awards
+	if(game_values.awardstyle == award_style_halo && killsinrow >= MINAWARDSNEEDED)
+	{
+		awardangle += 0.02f;
+
+		if(awardangle > TWO_PI)
+			awardangle -= TWO_PI;
+
+		short numawards = (killsinrow > MAXAWARDS ? MAXAWARDS : killsinrow);
+		float addangle = TWO_PI / (float)numawards;
+
+		short xoffset = ix + HALFPW - 8;
+		short yoffset = iy + HALFPH - 8;
+
+		for(short k = 0; k < numawards; k++)
 		{
+			float angle = (float)k * addangle + awardangle;
+			short awardx = xoffset + (short)(30.0f * cos(angle));
+			short awardy = yoffset + (short)(30.0f * sin(angle));
+
 			if(state > player_ready) //warping
-				spr_jail.draw(ix - PWOFFSET - 6, iy - PHOFFSET - 6, 0, 0, 44, 44, (short)state % 4, warpplane);
+				spr_award.draw(awardx, awardy, awards[k] * 16, 0, 16, 16, (short)state % 4, warpplane);
 			else
-				spr_jail.draw(ix - PWOFFSET - 6, iy - PHOFFSET - 6);
+				spr_award.draw(awardx, awardy, awards[k] * 16, 0, 16, 16);
 		}
+	}
 
-		//Draw the Ring awards
-		if(game_values.awardstyle == award_style_halo && killsinrow >= MINAWARDSNEEDED)
+	//Draw the powerup ring when a powerup is being used
+	if(powerupused > -1)
+	{
+		short numeyecandy = 8;
+		float addangle = TWO_PI / numeyecandy;
+		float displayangle = powerupangle;
+
+		for(short k = 0; k < numeyecandy; k++)
 		{
-			awardangle += 0.02f;
+			short powerupX = ix + HALFPW - 8 + (short)(powerupradius * cos(displayangle));
+			short powerupY = iy + HALFPH - 8 + (short)(powerupradius * sin(displayangle));
 
-			if(awardangle > TWO_PI)
-				awardangle -= TWO_PI;
-
-			short numawards = (killsinrow > MAXAWARDS ? MAXAWARDS : killsinrow);
-			float addangle = TWO_PI / (float)numawards;
-
-			short xoffset = ix + HALFPW - 8;
-			short yoffset = iy + HALFPH - 8;
-
-			for(short k = 0; k < numawards; k++)
-			{
-				float angle = (float)k * addangle + awardangle;
-				short awardx = xoffset + (short)(30.0f * cos(angle));
-				short awardy = yoffset + (short)(30.0f * sin(angle));
-
-				if(state > player_ready) //warping
-					spr_award.draw(awardx, awardy, awards[k] * 16, 0, 16, 16, (short)state % 4, warpplane);
-				else
-					spr_award.draw(awardx, awardy, awards[k] * 16, 0, 16, 16);
-			}
+			displayangle += addangle;
+		
+			if(state > player_ready) //warping
+				spr_storedpowerupsmall.draw(powerupX, powerupY, powerupused * 16, 0, 16, 16, (short)state %4, warpplane);
+			else
+				spr_storedpowerupsmall.draw(powerupX, powerupY, powerupused * 16, 0, 16, 16);
 		}
+	}
 
-		//Draw the powerup ring when a powerup is being used
-		if(powerupused > -1)
+
+	//game_font_large.drawf(ix, iy, "%d", super_boomerang_throw_index_left);
+	//game_font_large.drawf(ix, iy + 24, "%d", holdright);
+
+	if((dashLeft && velx < -VELDASHMOVING + 1) || (dashRight && velx > VELDASHMOVING - 1))
+	{
+		if(++dashSparkleAnimationTimer > 2)
 		{
-			short numeyecandy = 8;
-			float addangle = TWO_PI / numeyecandy;
-			float displayangle = powerupangle;
-
-			for(short k = 0; k < numeyecandy; k++)
-			{
-				short powerupX = ix + HALFPW - 8 + (short)(powerupradius * cos(displayangle));
-				short powerupY = iy + HALFPH - 8 + (short)(powerupradius * sin(displayangle));
-
-				displayangle += addangle;
-			
-				if(state > player_ready) //warping
-					spr_storedpowerupsmall.draw(powerupX, powerupY, powerupused * 16, 0, 16, 16, (short)state %4, warpplane);
-				else
-					spr_storedpowerupsmall.draw(powerupX, powerupY, powerupused * 16, 0, 16, 16);
-			}
+			dashSparkleAnimationTimer = 0;
+			eyecandyfront.add(new EC_SingleAnimation(&spr_coinsparkle, ix + HALFPW - 16, iy + HALFPH - 16, 7, 4));
 		}
 	}
 }
@@ -1919,14 +2733,11 @@ void CPlayer::drawarrows()
 	}
 }
 
-void CPlayer::drawswap()
+void CPlayer::updateswap()
 {
 	if(state != player_ready)
-	{
-		draw();
 		return;
-	}
-	
+
 	if(game_values.swapstyle == 1)
 	{
 		xf(game_values.swapplayersblink ? fOldSwapX : fNewSwapX);
@@ -1936,13 +2747,27 @@ void CPlayer::drawswap()
 	{
 		xf(((fNewSwapX - fOldSwapX) * game_values.swapplayersposition) + fOldSwapX);
 		yf(((fNewSwapY - fOldSwapY) * game_values.swapplayersposition) + fOldSwapY);
-		SetSprite();
 	}
+
+	if(carriedItem)
+		carriedItem->MoveToOwner();
+}
+
+void CPlayer::drawswap()
+{
+	if(state != player_ready)
+	{
+		draw();
+		return;
+	}
+	
+	if(game_values.swapstyle != 1)
+		SetSprite();
 	
 	draw();
 
 	if(carriedItem)
-		carriedItem->MoveToOwner();
+		carriedItem->draw();
 }
 
 void CPlayer::collision_detection_map()
@@ -2043,7 +2868,8 @@ void CPlayer::collision_detection_map()
 			//first check to see if player hit a warp
 			if(g_map.warp(tx,ty)->direction == 3 && g_map.warp(tx,ty2)->direction == 3 && playerKeys->game_right.fDown &&
 				g_map.warp(tx,ty)->connection == g_map.warp(tx,ty2)->connection && 
-				!g_map.isconnectionlocked(g_map.warp(tx,ty)->connection) && !g_map.isconnectionlocked(g_map.warp(tx,ty2)->connection))
+				!g_map.isconnectionlocked(g_map.warp(tx,ty)->connection) && !g_map.isconnectionlocked(g_map.warp(tx,ty2)->connection) &&
+				(!game_values.slowdownfreeze || game_values.slowdownon == teamID))
 			{
 				xf((float)(tx * TILESIZE - PW) - 0.2f);
 				enterwarp(g_map.warp(tx, ty2));
@@ -2122,7 +2948,8 @@ void CPlayer::collision_detection_map()
 			//first check to see if player hit a warp
 			if(g_map.warp(tx,ty)->direction == 1 && g_map.warp(tx,ty2)->direction == 1 && playerKeys->game_left.fDown && 
 				g_map.warp(tx,ty)->connection == g_map.warp(tx,ty2)->connection && 
-				!g_map.isconnectionlocked(g_map.warp(tx,ty)->connection) && !g_map.isconnectionlocked(g_map.warp(tx,ty2)->connection))
+				!g_map.isconnectionlocked(g_map.warp(tx,ty)->connection) && !g_map.isconnectionlocked(g_map.warp(tx,ty2)->connection) &&
+				(!game_values.slowdownfreeze || game_values.slowdownon == teamID))
 			{
 				xf((float)(tx * TILESIZE + TILESIZE) + 0.2f);
 				enterwarp(g_map.warp(tx, ty2));
@@ -2250,7 +3077,8 @@ void CPlayer::collision_detection_map()
 		
 		if(g_map.warp(alignedBlockX, ty)->direction == 2 && g_map.warp(unAlignedBlockX, ty)->direction == 2 && playerKeys->game_jump.fDown && 
 			g_map.warp(alignedBlockX, ty)->connection == g_map.warp(unAlignedBlockX, ty)->connection && 
-			!g_map.isconnectionlocked(g_map.warp(alignedBlockX, ty)->connection) && !g_map.isconnectionlocked(g_map.warp(unAlignedBlockX, ty)->connection))
+			!g_map.isconnectionlocked(g_map.warp(alignedBlockX, ty)->connection) && !g_map.isconnectionlocked(g_map.warp(unAlignedBlockX, ty)->connection) &&
+			(!game_values.slowdownfreeze || game_values.slowdownon == teamID))
 		{
 			yf((float)(ty * TILESIZE + TILESIZE) + 0.2f);
 			enterwarp(g_map.warp(unAlignedBlockX, ty));
@@ -2352,7 +3180,8 @@ void CPlayer::collision_detection_map()
 		
 		if(g_map.warp(txl,ty)->direction == 0 && g_map.warp(txr,ty)->direction == 0 && playerKeys->game_down.fDown && 
 			g_map.warp(txl, ty)->connection == g_map.warp(txr, ty)->connection && 
-			!g_map.isconnectionlocked(g_map.warp(txl,ty)->connection) && !g_map.isconnectionlocked(g_map.warp(txr,ty)->connection))
+			!g_map.isconnectionlocked(g_map.warp(txl,ty)->connection) && !g_map.isconnectionlocked(g_map.warp(txr,ty)->connection) && 
+			(!game_values.slowdownfreeze || game_values.slowdownon == teamID))
 		{
 			yf((float)(ty * TILESIZE - PH) - 0.2f);
 			enterwarp(g_map.warp(txr,ty));
@@ -2987,16 +3816,17 @@ void CPlayer::makeinvincible()
 	}
 }
 
-void CPlayer::turnslowdownon()
+void CPlayer::turnslowdownon(bool fSuperFreeze)
 {
 	game_values.slowdownon = teamID;
 	game_values.slowdowncounter = 0;
+	game_values.slowdownfreeze = fSuperFreeze;
 }
 
 //Returns true if player facing right, false if left
 bool CPlayer::IsPlayerFacingRight()
 {
-	if(game_values.swapplayers)
+	if(game_values.swapplayers && game_values.swapstyle == 0)
 	{
 		if(fNewSwapX < fOldSwapX)
 			return false;
@@ -3034,7 +3864,7 @@ bool CPlayer::IsPlayerFacingRight()
 
 bool CPlayer::AcceptItem(MO_CarriedObject * item)
 {
-	if(fAcceptingItem)
+	if(fAcceptingItem && statue_timer == 0)
 	{
 		carriedItem = item;
 		fAcceptingItem = false;
@@ -3047,7 +3877,7 @@ bool CPlayer::AcceptItem(MO_CarriedObject * item)
 void CPlayer::SetPowerup(short iPowerup)
 {
 	//Play sounds for collecting a powerup
-	if(powerup == iPowerup || (bobomb && iPowerup == 0) || iPowerup > 4)
+	if(powerup == iPowerup || (bobomb && iPowerup == 0) || iPowerup > 6)
 	{
 		ifsoundonplay(sfx_storepowerup);
 	}
@@ -3073,16 +3903,16 @@ void CPlayer::SetPowerup(short iPowerup)
 
 		bobomb = true;
 	}
-	else if(iPowerup > 4)
+	else if(iPowerup > 6)
 	{
-		if(iPowerup == 5)
+		if(iPowerup == 7)
 			game_values.gamepowerups[globalID] = 9;
-		else if(iPowerup == 6)
+		else if(iPowerup == 8)
 			game_values.gamepowerups[globalID] = 16;
-		else if(iPowerup == 7)
+		else if(iPowerup == 9)
 			game_values.gamepowerups[globalID] = 10;
-		else if(iPowerup > 7)
-			game_values.gamepowerups[globalID] = iPowerup + 4; //Storing shells
+		else if(iPowerup > 9)
+			game_values.gamepowerups[globalID] = iPowerup + 2; //Storing shells
 	}
 	else
 	{
@@ -3094,6 +3924,10 @@ void CPlayer::SetPowerup(short iPowerup)
 			game_values.gamepowerups[globalID] = 17;
 		else if(powerup == 4)
 			game_values.gamepowerups[globalID] = 19;
+		else if(powerup == 5)
+			game_values.gamepowerups[globalID] = 21;
+		else if(powerup == 6)
+			game_values.gamepowerups[globalID] = 23;
 
 		powerup = iPowerup;
 		projectilelimit = 0;
@@ -3117,6 +3951,11 @@ void CPlayer::SetPowerup(short iPowerup)
 		{
 			if(game_values.boomeranglimit > 0)
 				projectilelimit = game_values.boomeranglimit;
+		}
+		else if(powerup == 5)
+		{
+			if(game_values.hammerlimit > 0)
+				projectilelimit = game_values.hammerlimit;
 		}
 	}
 

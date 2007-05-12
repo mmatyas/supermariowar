@@ -30,7 +30,7 @@ extern SDL_Surface *screen;
 //[colorcomponents][numcolors]
 Uint8 * colorcodes[3];
 
-#define NUM_SCHEMES 8
+#define NUM_SCHEMES 9
 
 //[numplayers][colorscheme][colorcomponents][numcolors]
 Uint8 * colorschemes[4][NUM_SCHEMES][3]; 

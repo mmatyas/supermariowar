@@ -1,8 +1,9 @@
 #ifndef _OBJECT_H
 #define _OBJECT_H
 
-enum ObjectType{object_none = 0, object_block = 1, object_moving = 2, object_overmap = 3, object_area = 4, object_egg = 5, object_frenzycard = 6, object_yoshi = 7, object_explosion = 8, object_race_goal = 9, object_star = 10, object_flag = 11, object_flagbase = 12, object_thwomp = 13, object_podobo = 14, object_kingofthehill_area = 15, object_bowserfire = 16, object_coin = 17};
-enum MovingObjectType{movingobject_none = 0, movingobject_powerup = 1, movingobject_fireball = 2, movingobject_goomba = 3, movingobject_bulletbill = 4, movingobject_hammer = 5, movingobject_poisonpowerup = 6, movingobject_shell = 7, movingobject_throwblock = 8, movingobject_egg = 9, movingobject_star = 10, movingobject_flag = 11, movingobject_cheepcheep = 12, movingobject_koopa = 13, movingobject_mysterymushroompowerup = 15, movingobject_boomerang = 16};
+enum ObjectType{object_none = 0, object_block = 1, object_moving = 2, object_overmap = 3, object_area = 4, object_egg = 5, object_frenzycard = 6, object_yoshi = 7, object_explosion = 8, object_race_goal = 9, object_star = 10, object_flag = 11, object_flagbase = 12, object_thwomp = 13, object_kingofthehill_area = 14, object_bowserfire = 15, object_coin = 16};
+enum MovingObjectType{movingobject_none = 0, movingobject_powerup = 1, movingobject_fireball = 2, movingobject_goomba = 3, movingobject_bulletbill = 4, movingobject_hammer = 5, movingobject_poisonpowerup = 6, movingobject_shell = 7, movingobject_throwblock = 8, movingobject_egg = 9, movingobject_star = 10, movingobject_flag = 11, movingobject_cheepcheep = 12, movingobject_koopa = 13, movingobject_mysterymushroompowerup = 15, movingobject_boomerang = 16, movingobject_spring = 17, movingobject_sledgehammer = 18, movingobject_sledgebrother = 19, movingobject_spike = 20, movingobject_bomb = 21, movingobject_superfireball = 22, movingobject_podobo = 23};
+enum BlockType{block_none, block_powerup, block_view, block_breakable, block_note, block_donut, block_flip, block_bounce, block_throw, block_onoff_switch, block_onoff};
 
 class IO_MovingObject;
 
@@ -68,6 +69,7 @@ class IO_Block : public CObject
 		virtual bool collide(CPlayer * player, short direction, bool useBehavior);
 		virtual bool collide(IO_MovingObject * object, short direction);
 		ObjectType getObjectType(){return object_block;}
+		virtual BlockType getBlockType(){printf("CObject::getBlockType() - NO!\n"); return block_none;}
 
 		virtual bool isTransparent() {return false;}
 
@@ -81,12 +83,18 @@ class IO_Block : public CObject
 		virtual bool hitright(IO_MovingObject * object);
 		virtual bool hitleft(IO_MovingObject * object);
 	
+		virtual void triggerBehavior() {}
+
 	protected:
 		void BounceMovingObject(IO_MovingObject * object);
 
 		CPlayer * bumpPlayer;
 		float fposx, fposy;  //position to return to (for note and bumpable blocks)
 		short	  iposx, iposy; //position of the block (doesn't move)
+
+		short col, row;
+
+	friend class CPlayer;
 };
 
 class B_PowerupBlock : public IO_Block
@@ -94,6 +102,8 @@ class B_PowerupBlock : public IO_Block
 	public:
 		B_PowerupBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed);
 		~B_PowerupBlock(){};
+
+		BlockType getBlockType(){return block_powerup;}
 
 		void draw();
 		void update();
@@ -104,6 +114,9 @@ class B_PowerupBlock : public IO_Block
 		bool hittop(IO_MovingObject * object);
 		bool hitright(IO_MovingObject * object);
 		bool hitleft(IO_MovingObject * object);
+
+		void triggerBehavior();
+		virtual short SelectPowerup();
 
 	protected:
 		short timer;
@@ -113,6 +126,31 @@ class B_PowerupBlock : public IO_Block
 		short drawFrame;
 		short animationTimer;
 		short animationWidth;
+
+	friend class CPlayer;
+};
+
+class B_ViewBlock : public B_PowerupBlock
+{
+	public:
+		B_ViewBlock(gfxSprite *nspr, short x, short y);
+		~B_ViewBlock(){};
+
+		BlockType getBlockType(){return block_view;}
+
+		void draw();
+		void update();
+
+		short SelectPowerup();
+
+	protected:
+		void GetNextPowerup();
+
+		short poweruptimer;
+		short powerupindex;
+
+		bool fNoPowerupsSelected;
+		short iCountWeight;
 };
 
 class B_BreakableBlock : public IO_Block
@@ -120,6 +158,8 @@ class B_BreakableBlock : public IO_Block
 	public:
 		B_BreakableBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed);
 		~B_BreakableBlock(){};
+
+		BlockType getBlockType(){return block_breakable;}
 
 		void draw();
 		void update();
@@ -131,8 +171,9 @@ class B_BreakableBlock : public IO_Block
 		bool hitright(IO_MovingObject * object);
 		bool hitleft(IO_MovingObject * object);
 
+		void triggerBehavior();
+
 	private:
-		short col, row;
 		short iNumSprites;
 		short animationSpeed;
 		short drawFrame;
@@ -146,6 +187,8 @@ class B_NoteBlock : public IO_Block
 	public:
 		B_NoteBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed);
 		~B_NoteBlock(){};
+
+		BlockType getBlockType(){return block_note;}
 
 		void draw();
 		void update();
@@ -171,16 +214,19 @@ class B_DonutBlock : public IO_Block
 		B_DonutBlock(gfxSprite *nspr, short x, short y);
 		~B_DonutBlock(){};
 
+		BlockType getBlockType(){return block_donut;}
+
 		void draw();
 		void update();
 
 		bool hittop(CPlayer * player, bool useBehavior);
 
+		void triggerBehavior();
+
 	private:
 		short counter;
 		short jigglex;
 		short jigglecounter;
-		short col, row;
 };
 
 class B_FlipBlock : public IO_Block
@@ -188,6 +234,8 @@ class B_FlipBlock : public IO_Block
 	public:
 		B_FlipBlock(gfxSprite *nspr, short x, short y);
 		~B_FlipBlock(){};
+
+		BlockType getBlockType(){return block_flip;}
 
 		void draw();
 		void update();
@@ -204,8 +252,9 @@ class B_FlipBlock : public IO_Block
 		bool hitright(IO_MovingObject * object);
 		bool hitleft(IO_MovingObject * object);
 	
+		void triggerBehavior();
+
 	private:
-		short col, row;
 		short counter;
 		short frame;
 		short timer;
@@ -218,12 +267,15 @@ class B_BounceBlock : public IO_Block
 		B_BounceBlock(gfxSprite *nspr, short x, short y);
 		~B_BounceBlock(){};
 
+		BlockType getBlockType(){return block_bounce;}
+
 		void update();
 
 		bool hittop(CPlayer * player, bool useBehavior);
 		bool hitbottom(CPlayer * player, bool useBehavior);
 
 		bool hittop(IO_MovingObject * object);
+		void triggerBehavior();
 };
 
 class B_ThrowBlock : public IO_Block
@@ -231,6 +283,8 @@ class B_ThrowBlock : public IO_Block
 	public:
 		B_ThrowBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed);
 		~B_ThrowBlock(){};
+
+		BlockType getBlockType(){return block_throw;}
 
 		void draw();
 		void update();
@@ -240,14 +294,16 @@ class B_ThrowBlock : public IO_Block
 		bool hitleft(CPlayer * player, bool useBehavior);
 
 		void GiveBlockToPlayer(CPlayer * player);
+		void triggerBehavior();
+		void SetType(bool superblock);
 
 	private:
-		short col, row;
 		short iNumSprites;
 		short animationSpeed;
 		short drawFrame;
 		short animationTimer;
 		short animationWidth;
+		bool fSuper;
 };
 
 
@@ -256,6 +312,8 @@ class B_OnOffSwitchBlock : public IO_Block
 	public:
 		B_OnOffSwitchBlock(gfxSprite *nspr, short x, short y, short colorID, short state);
 		~B_OnOffSwitchBlock(){};
+
+		BlockType getBlockType(){return block_onoff_switch;}
 
 		void update();
 		void draw();
@@ -269,6 +327,8 @@ class B_OnOffSwitchBlock : public IO_Block
 
 		void FlipState() {state = (state < 3 ? state + 3 : state - 3);}
 
+		void triggerBehavior();
+
 	private:
 		short iColorID;
 		short iSrcX;
@@ -279,6 +339,8 @@ class B_SwitchBlock : public IO_Block
 	public:
 		B_SwitchBlock(gfxSprite *nspr, short x, short y, short colorID, short state);
 		~B_SwitchBlock(){};
+
+		BlockType getBlockType(){return block_onoff;}
 
 		void draw();
 		bool collide(CPlayer * player, short direction, bool useBehavior);
@@ -294,7 +356,7 @@ class B_SwitchBlock : public IO_Block
 		bool hitright(IO_MovingObject * object);
 		bool hitleft(IO_MovingObject * object);
 
-		void FlipState() {state = 1 - state;}
+		void FlipState() {state = 1 - state;}		
 
 	private:
 		short iSrcX;
@@ -318,7 +380,8 @@ class IO_MovingObject : public CObject
 		bool collision_detection_checksides();
 		void flipsidesifneeded();
 
-		virtual void Bounce() {}
+		virtual void SideBounce() {}
+		virtual float BottomBounce() {return bounce;}
 		void KillObjectMapHazard();
 
 	protected:
@@ -357,7 +420,7 @@ class IO_MovingObject : public CObject
 	friend class OMO_Explosion;
 	friend class B_OnOffSwitchBlock;
 	friend class B_SwitchBlock;
-
+	friend class MO_SledgeBrother;
 	friend class MovingPlatform;
 
 	friend void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead);
@@ -370,8 +433,8 @@ class MO_Powerup : public IO_MovingObject
 		MO_Powerup(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth = -1, short iCollisionHeight = -1, short iCollisionOffsetX = -1, short iCollisionOffsetY = -1);
 		virtual ~MO_Powerup(){};
 
-		void draw();
-		void update();
+		virtual void draw();
+		virtual void update();
 		virtual bool collide(CPlayer * player);
 		MovingObjectType getMovingObjectType() {return movingObjectType;}
 
@@ -445,6 +508,32 @@ class PU_HammerPowerup : public MO_Powerup
 		bool collide(CPlayer * player);
 };
 
+class PU_SledgeHammerPowerup : public MO_Powerup
+{
+	public:
+		PU_SledgeHammerPowerup(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY);
+		~PU_SledgeHammerPowerup(){};
+
+		void update();
+		void draw();
+		bool collide(CPlayer * player);
+		float BottomBounce();
+	
+	private:
+		short sparkleanimationtimer;
+		short sparkledrawframe;
+		short numbounces;
+};
+
+class PU_PodoboPowerup : public PU_SledgeHammerPowerup
+{
+	public:
+		PU_PodoboPowerup(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY);
+		~PU_PodoboPowerup(){};
+
+		bool collide(CPlayer * player);
+};
+
 class PU_ClockPowerup : public MO_Powerup
 {
 	public:
@@ -459,6 +548,15 @@ class PU_BobombPowerup : public MO_Powerup
 	public:
 		PU_BobombPowerup(gfxSprite *nspr, short x, short y, short iNumSpr, bool moveToRight, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY);
 		~PU_BobombPowerup(){};
+
+		bool collide(CPlayer * player);
+};
+
+class PU_BombPowerup : public PU_SledgeHammerPowerup
+{
+	public:
+		PU_BombPowerup(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY);
+		~PU_BombPowerup(){};
 
 		bool collide(CPlayer * player);
 };
@@ -534,10 +632,29 @@ class MO_Fireball : public IO_MovingObject
 		short ttl;
 };
 
+class MO_SuperFireball : public IO_MovingObject
+{
+	public:
+		MO_SuperFireball(gfxSprite *nspr, short x, short y, short iNumSpr, float fVelyX, float fVelyY, short aniSpeed, short iGlobalID, short iTeamID, short iColorID);
+		~MO_SuperFireball(){};
+
+		void update();
+		bool collide(CPlayer * player);
+		void draw();
+
+		short playerID;
+		short teamID;
+
+	private:
+		short colorOffset;
+		short directionOffset;
+		short ttl;
+};
+
 class MO_Hammer : public IO_MovingObject
 {
 	public:
-		MO_Hammer(gfxSprite *nspr, short x, short y, short iNumSpr, float fVelyX, float fVelyY, short aniSpeed, short iGlobalID, short iTeamID, short iColorID);
+		MO_Hammer(gfxSprite *nspr, short x, short y, short iNumSpr, float fVelyX, float fVelyY, short aniSpeed, short iGlobalID, short iTeamID, short iColorID, bool superHammer);
 		~MO_Hammer(){};
 
 		void update();
@@ -550,12 +667,33 @@ class MO_Hammer : public IO_MovingObject
 
 	private:
 		short ttl;
+		bool fSuper;
+};
+
+class MO_SledgeHammer : public IO_MovingObject
+{
+	public:
+		MO_SledgeHammer(gfxSprite *nspr, short x, short y, short iNumSpr, float fVelyX, float fVelyY, short aniSpeed, short iGlobalID, short iTeamID, short iColorID, bool superHammer);
+		~MO_SledgeHammer(){};
+
+		void update();
+		bool collide(CPlayer * player);
+		void explode();
+		void draw();
+
+		short playerID;
+		short teamID;
+		short colorOffset;
+
+	private:
+		short ttl;
+		bool fSuper;
 };
 
 class MO_Boomerang : public IO_MovingObject
 {
 	public:
-		MO_Boomerang(gfxSprite *nspr, short x, short y, short iNumSpr, bool moveToRight, short aniSpeed, short iGlobalID, short iTeamID, short iColorID);
+		MO_Boomerang(gfxSprite *nspr, short x, short y, short iNumSpr, bool moveToRight, short aniSpeed, short iGlobalID, short iTeamID, short iColorID, bool superBoomerang);
 		~MO_Boomerang(){};
 
 		void update();
@@ -574,6 +712,9 @@ class MO_Boomerang : public IO_MovingObject
 		short iStateTimer;
 
 		short iStyle;
+
+		bool fSuperBoomerang;
+		short smoketimer;
 };
 
 class MO_Coin : public IO_MovingObject
@@ -632,26 +773,40 @@ class OMO_Thwomp : public IO_OverMapObject
 		bool collide(CPlayer * player);
 };
 
-class OMO_Podobo : public IO_OverMapObject
+class OMO_Podobo : public IO_MovingObject
 {
 	public:
-		OMO_Podobo(gfxSprite *nspr, short x, float nspeed);
+		OMO_Podobo(gfxSprite *nspr, short x, float nspeed, short playerid, short teamid, short colorid);
 		~OMO_Podobo(){};
 
 		void update();
 		void draw();
 		bool collide(CPlayer * player);
+		void collide(IO_MovingObject * object);
+
+		short iPlayerID;
+
+	private:
+		
+		short iTeamID;
+		short iColorOffsetY;
+
 };
 
 class OMO_BowserFire : public IO_OverMapObject
 {
 	public:
-		OMO_BowserFire(gfxSprite *nspr, short y, float nspeed);
+		OMO_BowserFire(gfxSprite *nspr, short x, short y, float velx, float vely, short id, short teamid, short colorid);
 		~OMO_BowserFire(){};
 
 		void update();
 		void draw();
 		bool collide(CPlayer * player);
+
+	private:
+		short iPlayerID;
+		short iTeamID;
+		short iColorOffsetY;
 };
 
 class MO_CarriedObject : public IO_MovingObject
@@ -668,11 +823,12 @@ class MO_CarriedObject : public IO_MovingObject
 		virtual void MoveToOwner(){}
 
 		virtual void Drop() {}
-		virtual void Kick() {}
+		virtual void Kick(bool superkick) {}
 
 	protected:
 
 		CPlayer * owner;
+		bool fSmoking;
 
 	friend class B_ThrowBlock;
 };
@@ -691,7 +847,7 @@ class CO_Egg : public MO_CarriedObject
 
 		void placeEgg();
 		void Drop();
-		void Kick();
+		void Kick(bool superkick);
 
 	private:
 		short timer;
@@ -720,7 +876,7 @@ class CO_Star : public MO_CarriedObject
 
 		void placeStar();
 		void Drop();
-		void Kick();
+		void Kick(bool superkick);
 
 	private:
 		short timer;
@@ -778,7 +934,7 @@ class CO_Flag : public MO_CarriedObject
 
 		void placeFlag();
 		void Drop();
-		void Kick();
+		void Kick(bool superkick);
 
 		bool GetInBase() {return fInBase;}
 		short GetTeamID() {return teamID;}
@@ -829,10 +985,13 @@ class OMO_Area : public IO_OverMapObject
 	private:
 		short playerID;
 		short colorID;
+		short teamID;
 		short scoretimer;
 		short frame;
 		short relocatetimer;
 		short numareas;
+		short totalTouchingPlayers;
+		CPlayer * touchingPlayer;
 
 	friend class CObjectContainer;
 };
@@ -954,7 +1113,7 @@ class MO_Goomba : public IO_MovingObject
 class MO_Koopa : public MO_Goomba
 {
 	public:
-		MO_Koopa(gfxSprite *nspr, short iNumSpr, short aniSpeed, bool moveToRight, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY);
+		MO_Koopa(gfxSprite *nspr, short iNumSpr, short aniSpeed, bool moveToRight, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, bool red);
 		~MO_Koopa(){};
 
 		void update();
@@ -964,6 +1123,8 @@ class MO_Koopa : public MO_Goomba
 	private:
 		float spawnradius;
 		float spawnangle;
+
+		bool fRed;
 };
 
 class OMO_CheepCheep : public IO_MovingObject
@@ -990,7 +1151,7 @@ class OMO_CheepCheep : public IO_MovingObject
 class OMO_BulletBill : public IO_MovingObject
 {
 	public:
-		OMO_BulletBill(gfxSprite *nspr, short y, float nspeed, short playerID);
+		OMO_BulletBill(gfxSprite *nspr, short y, float nspeed, short playerID, bool homing);
 		~OMO_BulletBill(){};
 
 		void update();
@@ -1002,6 +1163,8 @@ class OMO_BulletBill : public IO_MovingObject
 		bool hitother(CPlayer * player);
 		
 		void Die();
+		void HomeToNearestPlayer();
+		void SetDirectionOffset();
 
 	private:
 		short iPlayerID;
@@ -1009,9 +1172,74 @@ class OMO_BulletBill : public IO_MovingObject
 		short iTeamID;
 		
 		short iColorOffsetY;
+		short iDirectionOffsetY;
+
+		bool fHoming;
+		CPlayer * pHomingPlayer;
+		float fMaxVel;
+		float fGoalVelX;
+		float fGoalVelY;
 
 	friend class MO_Goomba;
 	friend class OMO_CheepCheep;
+	friend class OMO_Podobo;
+};
+
+class MO_SledgeBrother : public IO_MovingObject
+{
+	public:
+		MO_SledgeBrother(gfxSprite *nspr, short platformY, short type);
+		virtual ~MO_SledgeBrother(){};
+
+		void draw();
+		void update();
+		bool collide(CPlayer * player);
+		void collide(IO_MovingObject * object);
+
+		bool hit(CPlayer * player);
+
+		void Die();
+		void Damage(short playerID);
+
+	protected:
+		
+		short iType;
+
+		short iActionState;
+		short iDestLocationX[5];
+
+		void randomaction();
+		void move(bool moveright);
+		void throwprojectile();
+		void taunt();
+		void turn();
+		void jump();
+		void wait(short min, short max);
+
+		short location;
+
+		short throwing_timer;
+		
+		short hit_timer;
+		short hit_movement_timer;
+		short hit_offset_y;
+
+		short leg_offset_x;
+		short leg_movement_timer;
+
+		short arm_offset_x;
+		short arm_movement_timer;
+
+		short taunt_timer;
+		short wait_timer;
+
+		short hit_points;
+		bool face_right;
+
+		short iDestX;
+		
+		short iPlatformY;
+		short need_attack;
 };
 
 class CO_Shell : public MO_CarriedObject
@@ -1033,12 +1261,13 @@ class CO_Shell : public MO_CarriedObject
 
 		bool KillPlayer(CPlayer * player);
 		void Drop();
-		void Kick();
+		void Kick(bool superkick);
 
 		void collide(IO_MovingObject * object);
+		void CheckAndDie();
 		void Die();
 
-		void Bounce();
+		void SideBounce();
 		void AddMovingKill(CPlayer * killer);
 
 		bool IsThreat() {return state == 1 || state == 3;}
@@ -1066,6 +1295,7 @@ class CO_Shell : public MO_CarriedObject
 	friend class OMO_BulletBill;
 	friend class MO_Goomba;
 	friend class MO_Koopa;
+	friend class MO_SledgeBrother;
 	friend class OMO_CheepCheep;
 	friend void RunGame();
 };
@@ -1073,7 +1303,7 @@ class CO_Shell : public MO_CarriedObject
 class CO_ThrowBlock : public MO_CarriedObject
 {
 	public:
-		CO_ThrowBlock(gfxSprite * nspr, short x, short y);
+		CO_ThrowBlock(gfxSprite * nspr, short x, short y, bool superblock);
 		~CO_ThrowBlock(){};
 
 		void update();
@@ -1087,25 +1317,97 @@ class CO_ThrowBlock : public MO_CarriedObject
 
 		bool KillPlayer(CPlayer * player);
 		void Drop();
-		void Kick();
+		void Kick(bool superkick);
 
 		void collide(IO_MovingObject * object);
 		void Die();
 
-		void Bounce();
+		void SideBounce();
 
 	private:
 		
 		short playerID;
 		short iDeathTime;
+		bool fSuper;
+		short iBounceCounter;
 
 	friend class CPlayer;
 	friend class OMO_Explosion;
 	friend class OMO_BulletBill;
 	friend class MO_Goomba;
+	friend class MO_SledgeBrother;
 	friend class OMO_CheepCheep;
 	friend class B_ThrowBlock;
 	friend void RunGame();
+};
+
+class CO_Spring : public MO_CarriedObject
+{
+	public:
+		CO_Spring(gfxSprite *nspr);
+		~CO_Spring(){};
+
+		void update();
+		void draw();
+		bool collide(CPlayer * player);
+
+		void MoveToOwner();
+
+		void place();
+		void Drop();
+		void Kick(bool superkick);
+
+	protected:
+
+		virtual void hittop(CPlayer * player);
+		void hitother(CPlayer * player);
+
+		float spawnradius;
+		float spawnangle;
+
+		short iSpawnIconX;
+
+	friend class CPlayer;
+};
+
+class CO_Spike : public CO_Spring
+{
+	public:
+		CO_Spike(gfxSprite *nspr);
+		~CO_Spike(){};
+
+	private:
+
+		void hittop(CPlayer * player);
+};
+
+class CO_Bomb : public MO_CarriedObject
+{
+	public:
+		CO_Bomb(gfxSprite *nspr, short x, short y, float fVelX, float fVelY, short aniSpeed, short iGlobalID, short iTeamID, short iColorID, short timetolive);
+		~CO_Bomb(){};
+
+		void update();
+		void draw();
+		bool collide(CPlayer * player);
+
+		void MoveToOwner();
+
+		void place();
+		void Drop();
+		void Kick(bool superkick);
+
+		void Die();
+
+		short playerID;
+		short teamID;
+		
+	protected:
+		
+		short iColorOffsetY;
+		short ttl;
+
+	friend class CPlayer;
 };
 
 //object container
@@ -1139,6 +1441,8 @@ class CObjectContainer
 		short countTypes(ObjectType type);
 		void adjustPlayerAreas(CPlayer * player, CPlayer * other);
 		void removePlayerRaceGoals(short id, short iGoal);
+
+		CObject * getRandomObject();
 
 	public:
 		CObject *list[MAXOBJECTS];

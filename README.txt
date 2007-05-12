@@ -1,6 +1,6 @@
 
 ------------------------------------------------------------------------------
- Super Mario War 1.7 ReadMe
+ Super Mario War 1.7 April Fools Edition ReadMe
                                                                    2004-2006 ©
                                         Florian Hufsky, Two52 and contributors
 

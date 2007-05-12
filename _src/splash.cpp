@@ -256,7 +256,17 @@ bool LoadGameGraphics()
 	_load_gfxck(spr_bounceblock, convertPath("gfx/packs/blocks/bounceblock.png", graphicspack));
 	_load_gfxck(spr_throwblock, convertPath("gfx/packs/blocks/throwblock.png", graphicspack));
 	_load_gfxck(spr_switchblocks, convertPath("gfx/packs/blocks/switchblock.png", graphicspack));
-	
+	_load_gfxck(spr_viewblock, convertPath("gfx/packs/blocks/viewblock.png", graphicspack));
+	_load_gfxck(spr_spring, convertPath("gfx/packs/powerups/spring.png", graphicspack));
+	_load_gfxck(spr_spike, convertPath("gfx/packs/powerups/spike.png", graphicspack));
+	spr_spring.SetWrap(true);
+	spr_spike.SetWrap(true);
+
+	_load_gfxck(spr_maplava, convertPath("gfx/packs/map/lava.png", graphicspack));
+	_load_gfxck(spr_mapwater, convertPath("gfx/packs/map/water.png", graphicspack));
+	_load_gfxck(spr_mapwaterfall, convertPath("gfx/packs/map/waterfall.png", graphicspack));
+	_load_gfxck(spr_maplamp, convertPath("gfx/packs/map/lamp.png", graphicspack));
+
 	_load_gfxck(spr_brokenyellowblock, convertPath("gfx/packs/eyecandy/brokenyellowblock.png", graphicspack));
 	_load_gfxck(spr_brokenflipblock, convertPath("gfx/packs/eyecandy/brokenflipblock.png", graphicspack));
 	_load_gfxck(spr_brokenblueblock, convertPath("gfx/packs/eyecandy/brokenblueblock.png", graphicspack));
@@ -264,10 +274,8 @@ bool LoadGameGraphics()
 	spr_brokenflipblock.SetWrap(true);
 	spr_brokenblueblock.SetWrap(true);
 
-#ifdef _DEBUG
 	_load_gfxck(spr_tanooki, convertPath("gfx/packs/powerups/tanooki.png", graphicspack));
 	_load_gfxck(spr_statue, convertPath("gfx/packs/projectiles/statue.png", graphicspack));
-#endif
 	_load_gfxck(spr_starpowerup, convertPath("gfx/packs/powerups/starpowerup.png", graphicspack));
 	_load_gfxck(spr_1uppowerup, convertPath("gfx/packs/powerups/1uppowerup.png", graphicspack));
 	_load_gfxck(spr_2uppowerup, convertPath("gfx/packs/powerups/2uppowerup.png", graphicspack));
@@ -275,6 +283,8 @@ bool LoadGameGraphics()
 	_load_gfxck(spr_5uppowerup, convertPath("gfx/packs/powerups/5uppowerup.png", graphicspack));
 	_load_gfxck(spr_firepowerup, convertPath("gfx/packs/powerups/fireflower.png", graphicspack));
 	_load_gfxck(spr_hammerpowerup, convertPath("gfx/packs/powerups/hammerpowerup.png", graphicspack));
+	_load_gfxck(spr_sledgehammerpowerup, convertPath("gfx/packs/powerups/sledgehammerpowerup.png", graphicspack));
+	_load_gfxck(spr_podobopowerup, convertPath("gfx/packs/powerups/podobopowerup.png", graphicspack));
 	_load_gfxck(spr_poisonpowerup, convertPath("gfx/packs/powerups/poisonpowerup.png", graphicspack));
 	_load_gfxck(spr_mysterymushroompowerup, convertPath("gfx/packs/powerups/mysterymushroom.png", graphicspack));
 	_load_gfxck(spr_boomerangpowerup, convertPath("gfx/packs/powerups/boomerangpowerup.png", graphicspack));
@@ -284,10 +294,9 @@ bool LoadGameGraphics()
 	_load_gfxck(spr_modpowerup, convertPath("gfx/packs/powerups/modpowerup.png", graphicspack));
 	_load_gfxck(spr_bulletbillpowerup, convertPath("gfx/packs/powerups/bulletbillpowerup.png", graphicspack));
 	_load_gfxck(spr_featherpowerup, convertPath("gfx/packs/powerups/featherpowerup.png", graphicspack));
-#ifdef _DEBUG
+	_load_gfxck(spr_bombpowerup, convertPath("gfx/packs/powerups/bombpowerup.png", graphicspack));
 	spr_tanooki.SetWrap(true);
 	spr_statue.SetWrap(true);
-#endif
 	spr_starpowerup.SetWrap(true);
 	spr_1uppowerup.SetWrap(true);
 	spr_2uppowerup.SetWrap(true);
@@ -295,6 +304,8 @@ bool LoadGameGraphics()
 	spr_5uppowerup.SetWrap(true);
 	spr_firepowerup.SetWrap(true);
 	spr_hammerpowerup.SetWrap(true);
+	spr_sledgehammerpowerup.SetWrap(true);
+	spr_podobopowerup.SetWrap(true);
 	spr_poisonpowerup.SetWrap(true);
 	spr_clockpowerup.SetWrap(true);
 	spr_bobombpowerup.SetWrap(true);
@@ -343,6 +354,9 @@ bool LoadGameGraphics()
 	_load_gfxck(spr_goombadead, convertPath("gfx/packs/eyecandy/goombadead.png", graphicspack));
 	_load_gfxck(spr_goombadeadflying, convertPath("gfx/packs/eyecandy/goombadeadflying.png", graphicspack));
 	_load_gfxck(spr_koopa, convertPath("gfx/packs/modeobjects/koopa.png", graphicspack));
+	_load_gfxck(spr_sledgebrothers, convertPath("gfx/packs/modeobjects/sledgebrothers.png", graphicspack));
+	_load_gfxck(spr_sledgebrothersdead, convertPath("gfx/packs/eyecandy/sledgebrothersdead.png", graphicspack));
+	_load_gfxck(spr_redkoopa, convertPath("gfx/packs/modeobjects/redkoopa.png", graphicspack));
 	_load_gfxck(spr_cheepcheep, convertPath("gfx/packs/modeobjects/cheepcheep.png", graphicspack));
 	_load_gfxck(spr_cheepcheepdead, convertPath("gfx/packs/eyecandy/cheepcheepdead.png", graphicspack));
 	_load_gfxck(spr_bulletbill, convertPath("gfx/packs/projectiles/bulletbill.png", graphicspack));
@@ -358,22 +372,30 @@ bool LoadGameGraphics()
 	spr_goombadead.SetWrap(true);
 	spr_goombadeadflying.SetWrap(true);
 	spr_koopa.SetWrap(true);
+	spr_sledgebrothers.SetWrap(true);
+	spr_sledgebrothersdead.SetWrap(true);
 	spr_cheepcheep.SetWrap(true);
 	spr_cheepcheepdead.SetWrap(true);
 	spr_chicken.SetWrap(true);
 	
 	_load_gfxck(spr_fireball, convertPath("gfx/packs/projectiles/fireball.png", graphicspack));
+	_load_gfxck(spr_superfireball, convertPath("gfx/packs/projectiles/superfire.png", graphicspack));
 	_load_gfxck(spr_hammer, convertPath("gfx/packs/projectiles/hammer.png", graphicspack));
+	_load_gfxck(spr_sledgehammer, convertPath("gfx/packs/projectiles/sledgehammer.png", graphicspack));
 	_load_gfxck(spr_boomerang, convertPath("gfx/packs/projectiles/boomerang.png", graphicspack));
 	_load_gfxck(spr_shell, convertPath("gfx/packs/projectiles/shell.png", graphicspack));
 	_load_gfxck(spr_shelldead, convertPath("gfx/packs/eyecandy/shelldead.png", graphicspack));
 	_load_gfxck(spr_blueblock, convertPath("gfx/packs/projectiles/throwblock.png", graphicspack));
+	_load_gfxck(spr_bomb, convertPath("gfx/packs/projectiles/bomb.png", graphicspack));
 	spr_fireball.SetWrap(true);
+	spr_superfireball.SetWrap(true);
 	spr_hammer.SetWrap(true);
+	spr_sledgehammer.SetWrap(true);
 	spr_boomerang.SetWrap(true);
 	spr_shell.SetWrap(true);
 	spr_shelldead.SetWrap(true);
 	spr_blueblock.SetWrap(true);
+	spr_bomb.SetWrap(true);
 	
 	_load_gfxa(spr_fireballexplosion, convertPath("gfx/packs/eyecandy/fireballexplosion.png", graphicspack), 160);
 	_load_gfxa(spr_frictionsmoke, convertPath("gfx/packs/eyecandy/frictionsmoke.png", graphicspack), 160);
@@ -508,6 +530,12 @@ bool LoadGameSounds()
 	_load_sfx(sfx_starwarning, convertPath("sfx/packs/starwarning.wav", soundpack));
 	_load_sfx(sfx_powerdown, convertPath("sfx/packs/powerdown.wav", soundpack));
 	_load_sfx(sfx_switchpress, convertPath("sfx/packs/switchpress.wav", soundpack));
+	_load_sfx(sfx_superspring, convertPath("sfx/packs/superspring.wav", soundpack));
+	_load_sfx(sfx_secret, convertPath("sfx/packs/secret.wav", soundpack));
+	_load_sfx(sfx_bowserlaugh, convertPath("sfx/packs/bowserlaugh.wav", soundpack));
+	_load_sfx(sfx_gameover, convertPath("sfx/packs/gameover.wav", soundpack));
+	_load_sfx(sfx_stun, convertPath("sfx/packs/stun.wav", soundpack));
+
 
 	game_values.soundcapable = true;
 	return true;
@@ -546,7 +574,7 @@ bool LoadAndSplashScreen()
 	"Discrosh", "Ikill4you", "Helix Snake", "tubesteak", "wasabimario", "Lee",
 	"Pikawil", "Marioman64", "Peardian", "Bob Ippolito", "Viper Snake", "neavea",
 	"Mr.Bob-omb", "milua", "bobmanperson", "DrTek", "somestrangeflea", "nes6502",
-	"XPort", "Naphistim"};
+	"XPort", "Naphistim", "Chaos", "NiGHTS"};
 
 #define NUM_CONTRIBUTORS ((int)(sizeof(contributors)/sizeof(char*)))
 

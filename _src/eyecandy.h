@@ -130,8 +130,8 @@ class EC_SingleAnimation : public CEyecandy
 {
 	public:
 		EC_SingleAnimation(gfxSprite *nspr, short nx, short ny, short iframes, short irate);
-		void draw();
 		void update();
+		void draw();
 
 	protected:
 		gfxSprite *spr;
@@ -142,15 +142,26 @@ class EC_SingleAnimation : public CEyecandy
 		short iAnimationWidth;
 };
 
-class EC_LoopingAnimation : public EC_SingleAnimation
+class EC_LoopingAnimation : public CEyecandy
 {
 	public:
-		EC_LoopingAnimation(gfxSprite *nspr, short nx, short ny, short iframes, short irate, short iloops);
+		EC_LoopingAnimation(gfxSprite *nspr, short x, short y, short iframes, short irate, short iloops, short ioffsetx, short ioffsety, short istartoffsetx, short iwidth, short iheight);
 		void update();
+		void draw();
 	
 	private:
+		gfxSprite *spr;
+		short ix, iy;
+		short frame, counter;
+		short iw, ih;
+		short rate;
+		short iAnimationWidth;
+
 		short countloops;
 		short loops;
+
+		short iOffsetX, iOffsetY;
+
 };
 
 /*
@@ -271,6 +282,23 @@ class EC_Door : public CEyecandy
 		short offsetx;
 		short offsety;
 };
+
+class EC_BossPeeker : public CEyecandy
+{
+	public:
+		EC_BossPeeker(gfxSprite *nspr, short speed, short bossType);
+		void draw();
+		void update();
+
+	private:
+		gfxSprite *spr;
+		int iSpeed;
+		int iBossColorOffsetY;
+		int timer;
+		int state;
+		int ix, iy;
+};
+
 
 //eyecandy container
 class CEyecandyContainer

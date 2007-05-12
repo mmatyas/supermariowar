@@ -127,6 +127,7 @@ class Menu
 		MI_SelectField * miBotsField;
 		MI_SelectField * miFrameLimiterField;
 		MI_SelectField * miPointSpeedField;
+		MI_SelectField * miSecretsField;
 		MI_Button * miGameplayOptionsMenuBackButton;
 
 		MI_Image * miGameplayOptionsMenuLeftHeaderBar;

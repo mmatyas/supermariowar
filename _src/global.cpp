@@ -1,6 +1,6 @@
 #include "global.h"
 
-short g_iVersion[] = {1, 7, 0, 5};
+short g_iVersion[] = {1, 7, 1, 0};
 
 //We're using these strings intead of the ugly ones returned by SDL_GetKeyName()
 char * Keynames[340] = {"Unknown", "", "", "", "", "", "", "", "Backspace", "Tab", 
@@ -265,5 +265,5 @@ short g_iDefaultMusicCategory[MAXMUSICCATEGORY] = {0, 0, 0, 0, 0, 1, 2, 3, 0, 0,
 char * g_szAutoFilterNames[NUM_AUTO_FILTERS] = {"Hazards", "Warps", "Ice", "Item Boxes", "Breakable Blocks", "Throwable Blocks", "On/Off Blocks", "Platforms"};
 short g_iAutoFilterIcons[NUM_AUTO_FILTERS] = {37, 29, 33, 1, 0, 6, 40, 73};
 
-short g_iPowerupToIcon[5] = {80, 176, 272, 304, 320};
+short g_iPowerupToIcon[6] = {80, 176, 272, 304, 336, 368};
 

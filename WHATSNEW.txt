@@ -1,10 +1,39 @@
 
 ------------------------------------------------------------------------------
- Whats New?                                                         10.02.2006
+ Whats New?                                                         04.01.2007
 ------------------------------------------------------------------------------
 
+1.7 April Fools Edition
+
+ - Animated lava and water tiles
+
+ - 20% chance of a held spiked shell dies when hitting another player 
+
+ - Hammers are fired from a better position relative to the player 
+
+ - Fixed Screen shake POW bug
+
+ - Fixes to AI to deal with podobos, bowser fire and new stuff 
+
+ - Fixed gfx bug when switching places with mystery mushroom while holding an item
+
+ - Menu option to turn off/on secret moves 
+
+ - More than 20 Secret April Fools Features.  Here are some hints:
+	* Some features are special moves for players based on what powerup they have or what they are carrying
+	* Some are new items and powerups
+	* Some are tweaks to existing features
+	* and some things don't fall into any of these categories...
+
+ - There is a contest at http://forum.72dpiarmy.com to see who can unlock the most hidden features
+	* Contest winner gets special forum status and badge on splash screen for next release of SMW!
+	* So keep checking the forums for the latest codes and unlocked features!
+
+
+------------------------------------------------------------------------------
 
 1.7
+
  - Game Graphics Pack, Menu Graphics Pack, and Sound Pack Support
 
  - Graphics in PNG format
@@ -176,6 +205,7 @@
 ------------------------------------------------------------------------------
 
 1.6
+
  - Readme in HTML format
 
  - Tournament Mode
@@ -287,6 +317,7 @@
 ------------------------------------------------------------------------------
 
 1.5
+
  - New interaction blocks
       Breakable blocks
       Note blocks

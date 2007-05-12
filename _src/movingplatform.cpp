@@ -1005,7 +1005,7 @@ void MovingPlatform::collide(IO_MovingObject * object)
 
 					removeifprojectile(object, true, true);
 
-					object->Bounce();
+					object->SideBounce();
 				}
 			}
 		}
@@ -1071,7 +1071,7 @@ void MovingPlatform::collide(IO_MovingObject * object)
 
 					removeifprojectile(object, true, true);
 
-					object->Bounce();
+					object->SideBounce();
 				}
 			}
 		}
@@ -1165,7 +1165,7 @@ void MovingPlatform::collide(IO_MovingObject * object)
 
 					object->fPrecalculatedY = ty * TILESIZE - object->collisionHeight - 0.2f + fy - iHalfHeight;
 					object->fOldY = object->fPrecalculatedY - fVelY;
-					object->vely = object->bounce;
+					object->vely = object->BottomBounce();
 					object->inair = false;
 					object->onice = false;
 				}
@@ -1188,7 +1188,7 @@ void MovingPlatform::collide(IO_MovingObject * object)
 
 					object->fPrecalculatedY = ty * TILESIZE - object->collisionHeight - 0.2f + fy - iHalfHeight;
 					object->fOldY = object->fPrecalculatedY - fVelY;
-					object->vely = object->bounce;
+					object->vely = object->BottomBounce();
 					object->inair = false;
 					
 					if((t1 == tile_ice && (t2 == tile_ice || t2 == tile_nonsolid)) ||

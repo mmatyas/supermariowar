@@ -118,8 +118,13 @@ class CMap
 		WarpExit * getRandomWarpExit(int connection, int currentID);
 
 		void clearWarpLocks();
-		void updateWarpLocks();
 		void drawWarpLocks();
+
+		void update();
+
+		void drawbackanimations();
+		void drawfrontanimations();
+		void clearAnimations();
 
 		void findspawnpoint(short iType, short * x, short * y, short width, short height, bool tilealigned);
 		void CalculatePlatformNoSpawnZones();
@@ -187,7 +192,10 @@ class CMap
 
 		bool		fAutoFilter[NUM_AUTO_FILTERS];
 
-		void draw(SDL_Surface *targetsurf, int layer);
+		CEyecandyContainer animatedtilesback;
+		CEyecandyContainer animatedtilesfront;
+
+		void draw(SDL_Surface *targetsurf, int layer, bool fFront);
 		void drawThumbnailPlatforms(SDL_Surface * targetSurface);
 		void drawPreview(SDL_Surface * targetsurf, int layer, bool fThumbnail);
 		void drawPreviewBlocks(SDL_Surface * targetSurface, bool fThumbnail);
@@ -222,6 +230,7 @@ class CMap
 
 		friend class MovingPlatform;
 		friend class MapList;
+		friend class CPlayer;
 };
 
 #endif
