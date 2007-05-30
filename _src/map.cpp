@@ -30,6 +30,7 @@ CMap::CMap()
 {
 	platforms = NULL;
 	iNumPlatforms = 0;
+	iNumMapItems = 0;
 
 	for(short iSwitch = 0; iSwitch < 4; iSwitch++)
 		iSwitches[iSwitch] = 0;
@@ -281,8 +282,176 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 	//TODO: Is this any faster than reading seperate ints at a time?
 	ReadIntChunk(version, 4, mapfile);
 
-	if(version[0] == 1 && version[1] == 7)
+	if(version[0] == 1 && version[1] == 8)
 	{
+		//Read summary information here
+		int iAutoFilterValues[NUM_AUTO_FILTERS + 1];
+		ReadIntChunk(iAutoFilterValues, NUM_AUTO_FILTERS + 1, mapfile);
+
+		for(short iFilter = 0; iFilter < NUM_AUTO_FILTERS; iFilter++)
+			fAutoFilter[iFilter] = iAutoFilterValues[iFilter] > 0;
+
+		if(iReadType == read_type_summary)
+		{
+			fclose(mapfile);
+			return;
+		}
+
+		clearPlatforms();
+
+		cout << "loading map " << file;
+	
+		if(iReadType == read_type_preview)
+			cout << " (preview)";
+		
+		cout << " ";
+
+		cout << "[Version " << version[0] << '.' << version[1] << '.'
+			<< version[2] << '.' << version[3] << " Map Detected]\n";
+
+		//2. load map data
+		for(j = 0; j < MAPHEIGHT; j++)
+		{
+			for(i = 0; i < MAPWIDTH; i++)
+			{
+				for(k = 0; k < MAPLAYERS; k++)
+				{
+					mapdata[i][j][k] = (short)ReadInt(mapfile);
+				}
+
+				objectdata[i][j] = (short)ReadInt(mapfile);
+			}
+		}
+
+
+		//Read in background to use
+		ReadString(szBackgroundFile, 128, mapfile);
+
+		//Read on/off switches
+		for(short iSwitch = 0; iSwitch < 4; iSwitch++)
+		{
+			iSwitches[iSwitch] = (short)ReadInt(mapfile);
+		}
+
+		loadPlatforms(mapfile, iReadType == read_type_preview);
+
+		//Load map items (like carryable spikes and springs)
+		iNumMapItems = ReadInt(mapfile);
+
+		for(j = 0; j < iNumMapItems; j++)
+		{
+			mapitems[j].itype = ReadInt(mapfile);
+			mapitems[j].ix = ReadInt(mapfile);
+			mapitems[j].iy = ReadInt(mapfile);
+		}
+
+		//Read in eyecandy to use
+		eyecandyID = (short)ReadInt(mapfile);
+
+		musicCategoryID = ReadInt(mapfile);
+
+		for(j = 0; j < MAPHEIGHT; j++)
+		{
+			for(i = 0; i < MAPWIDTH; i++)
+			{
+				mapdatatop[i][j] = (TileType)ReadInt(mapfile);
+				warpdata[i][j].direction = (short)ReadInt(mapfile);
+				warpdata[i][j].connection = (short)ReadInt(mapfile);
+				warpdata[i][j].id = (short)ReadInt(mapfile);
+				
+				for(short iType = 0; iType < NUMSPAWNAREATYPES; iType++)
+					nospawn[iType][i][j] = ReadInt(mapfile) == 0 ? false : true;
+			}
+		}
+
+		if(iReadType == read_type_preview)
+		{
+			fclose(mapfile);
+			return;
+		}
+
+		maxConnection = 0;
+
+		numwarpexits = (short)ReadInt(mapfile);
+		for(i = 0; i < numwarpexits && i < MAXWARPS; i++)
+		{
+			warpexits[i].direction = (short)ReadInt(mapfile);
+			warpexits[i].connection = (short)ReadInt(mapfile);
+			warpexits[i].id = (short)ReadInt(mapfile);
+			warpexits[i].x = (short)ReadInt(mapfile);
+			warpexits[i].y = (short)ReadInt(mapfile);
+
+			warpexits[i].lockx = (short)ReadInt(mapfile);
+			warpexits[i].locky = (short)ReadInt(mapfile);
+
+			warpexits[i].warpx = (short)ReadInt(mapfile);
+			warpexits[i].warpy = (short)ReadInt(mapfile);
+			warpexits[i].numblocks = (short)ReadInt(mapfile);
+
+			if(warpexits[i].connection > maxConnection)
+				maxConnection = warpexits[i].connection;
+		}
+
+		//Ignore any more warps than the max
+		for(i = 0; i < numwarpexits - MAXWARPS; i++)
+		{
+			for(j = 0; j < 10; j++)
+				ReadInt(mapfile);
+		}
+
+		if(numwarpexits > MAXWARPS)
+			numwarpexits = MAXWARPS;
+
+		//Read spawn areas
+
+		for(i = 0; i < NUMSPAWNAREATYPES; i++)
+		{
+			totalspawnsize[i] = 0;
+			numspawnareas[i] = (short)ReadInt(mapfile);
+
+			if(numspawnareas[i] > MAXSPAWNAREAS)
+			{
+				cout << endl << " ERROR: Number of spawn areas (" << numspawnareas[i]
+					<< ") was greater than max allowed (" << MAXSPAWNAREAS << ')'
+					<< endl;
+				return;
+			}
+
+			for(int m = 0; m < numspawnareas[i]; m++)
+			{
+				spawnareas[i][m].left = (short)ReadInt(mapfile);
+				spawnareas[i][m].top = (short)ReadInt(mapfile);
+				spawnareas[i][m].width = (short)ReadInt(mapfile);
+				spawnareas[i][m].height = (short)ReadInt(mapfile);
+				spawnareas[i][m].size = (short)ReadInt(mapfile);
+			
+				totalspawnsize[i] += spawnareas[i][m].size;
+			}
+		}
+
+		//Read draw areas (foreground tiles drawing optimization)
+		numdrawareas = (short)ReadInt(mapfile);
+
+		if(numdrawareas > MAXDRAWAREAS)
+		{
+			cout << endl << " ERROR: Number of draw areas (" << numdrawareas
+                << ") was greater than max allowed (" << MAXDRAWAREAS << ')'
+                << endl;
+			return;
+		}
+
+		//Load rects to help optimize drawing the foreground
+		for(int m = 0; m < numdrawareas; m++)
+		{
+			drawareas[m].x = (Sint16)ReadInt(mapfile);
+			drawareas[m].y = (Sint16)ReadInt(mapfile);
+			drawareas[m].w = (Uint16)ReadInt(mapfile);
+			drawareas[m].h = (Uint16)ReadInt(mapfile);
+		}
+	}
+	else if(version[0] == 1 && version[1] == 7)
+	{
+		iNumMapItems = 0;
 		//Read summary information here
 		if((version[2] == 0 && version[3] > 1) || version[2] >= 1)
 		{
@@ -330,6 +499,8 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 				}
 
 				objectdata[i][j] = (short)ReadInt(mapfile);
+				if(objectdata[i][j] == 15)
+					objectdata[i][j] = BLOCKSETSIZE;
 			}
 		}
 
@@ -501,6 +672,8 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 	}
 	else if(version[0] == 1 && version[1] == 6)
 	{
+		iNumMapItems = 0;
+
 		for(short iFilter = 0; iFilter < NUM_AUTO_FILTERS; iFilter++)
 			fAutoFilter[iFilter] = false;
 
@@ -683,6 +856,8 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 	}
 	else //If the version is unrecognized (1.5 maps didn't have version numbers)
 	{
+		iNumMapItems = 0;
+
 		for(short iFilter = 0; iFilter < NUM_AUTO_FILTERS; iFilter++)
 			fAutoFilter[iFilter] = false;
 
@@ -962,6 +1137,16 @@ void CMap::saveMap(const std::string& file)
 		WriteFloat(platforms[iPlatform]->pPath->fEndX, mapfile);
 		WriteFloat(platforms[iPlatform]->pPath->fEndY, mapfile);
 		WriteFloat(platforms[iPlatform]->pPath->fVelocity, mapfile);
+	}
+
+	//Write map items (carried springs, spikes, etc)
+	WriteInt(iNumMapItems, mapfile);
+	
+	for(short iMapItem = 0; iMapItem < iNumMapItems; iMapItem++)
+	{
+		WriteInt(mapitems[iMapItem].itype, mapfile);
+		WriteInt(mapitems[iMapItem].ix, mapfile);
+		WriteInt(mapitems[iMapItem].iy, mapfile);
 	}
 
 	//Write eyecandy ID
@@ -1290,6 +1475,7 @@ void CMap::saveThumbnail(const std::string &sFile, bool fUseClassicPack)
 	SDL_FreeSurface(sBackground);
 
 	preDrawPreviewBackground(sThumbnail, true);
+	preDrawPreviewMapItems(sThumbnail, true);
 	drawThumbnailPlatforms(sThumbnail);
 	preDrawPreviewForeground(sThumbnail, true);
 	preDrawPreviewWarps(sThumbnail, true);
@@ -1650,6 +1836,27 @@ void CMap::preDrawPreviewWarps(SDL_Surface * targetSurface, bool fThumbnail)
 	}
 }
 
+void CMap::preDrawPreviewMapItems(SDL_Surface * targetSurface, bool fThumbnail)
+{
+	short iTileSize = 16;
+	short iScreenshotSize = 0;
+
+	if(fThumbnail)
+	{
+		iTileSize = 8;
+		iScreenshotSize = 1;
+	}
+
+	for(int j = 0; j < iNumMapItems; j++)
+	{
+		
+		SDL_Rect rSrc = {mapitems[j].itype * iTileSize, 0, iTileSize, iTileSize};
+		SDL_Rect rDst = {mapitems[j].ix * iTileSize, mapitems[j].iy * iTileSize, iTileSize, iTileSize};
+
+		SDL_BlitSurface(spr_thumbnail_mapitems[iScreenshotSize].getSurface(), &rSrc, targetSurface, &rDst);
+	}
+}
+
 void CMap::preDrawPreviewBackground(SDL_Surface * targetSurface, bool fThumbnail)
 {
 	drawPreview(targetSurface, 0, fThumbnail);
@@ -1672,6 +1879,8 @@ void CMap::preDrawPreviewBackground(SDL_Surface * targetSurface, bool fThumbnail
 	}
 
 	drawPreviewBlocks(targetSurface, fThumbnail);
+
+
 }
 
 void CMap::preDrawPreviewBackground(gfxSprite * spr_background, SDL_Surface * targetSurface, bool fThumbnail)
@@ -1817,6 +2026,12 @@ void CMap::drawPreviewBlocks(SDL_Surface * targetSurface, bool fThumbnail)
 			if(ts >= 7 && ts <= 14)
 				if(iSwitches[(ts - 7) % 4] == 1)
 					rectSrc.y = iBlockSize * 31;
+
+			if(ts >= 15 && ts <= 18)
+			{
+				rectSrc.x = iBlockSize * (ts - 15);
+				rectSrc.y = iBlockSize * 31;
+			}
 		
 			if(fThumbnail)
 				SDL_BlitSurface(tilesetsurface[2], &rectSrc, targetSurface, &rectDst);

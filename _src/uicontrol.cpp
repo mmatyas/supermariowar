@@ -8,7 +8,6 @@ extern char * GameInputNames[NUM_KEYS];
 extern char * MenuInputNames[NUM_KEYS];
 
 extern bool LoadMenuSkin(short playerID, short skinID, short colorID);
-extern void loadMapObjects();
 
 extern bool __load_gfx(gfxSprite &g, const std::string& f);
 
@@ -2159,6 +2158,7 @@ void MI_MapField::LoadCurrentMap()
 	SDL_Delay(10);  //Sleeps to help the music from skipping
 
 	g_map.preDrawPreviewBackground(&spr_background, surfaceMapBackground, false);
+	g_map.preDrawPreviewMapItems(surfaceMapBackground, false);
 	SDL_Delay(10);  //Sleeps to help the music from skipping
 	g_map.preDrawPreviewForeground(surfaceMapForeground, false);
 	g_map.preDrawPreviewWarps(surfaceMapForeground, false);

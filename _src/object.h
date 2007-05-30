@@ -185,7 +185,7 @@ class B_BreakableBlock : public IO_Block
 class B_NoteBlock : public IO_Block
 {
 	public:
-		B_NoteBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed);
+		B_NoteBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short type);
 		~B_NoteBlock(){};
 
 		BlockType getBlockType(){return block_note;}
@@ -206,6 +206,8 @@ class B_NoteBlock : public IO_Block
 		short drawFrame;
 		short animationTimer;
 		short animationWidth;
+		short iType;
+		short iTypeOffsetY;
 };
 
 class B_DonutBlock : public IO_Block
@@ -1344,7 +1346,7 @@ class CO_ThrowBlock : public MO_CarriedObject
 class CO_Spring : public MO_CarriedObject
 {
 	public:
-		CO_Spring(gfxSprite *nspr);
+		CO_Spring(gfxSprite *nspr, short ix, short iy);
 		~CO_Spring(){};
 
 		void update();
@@ -1362,18 +1364,13 @@ class CO_Spring : public MO_CarriedObject
 		virtual void hittop(CPlayer * player);
 		void hitother(CPlayer * player);
 
-		float spawnradius;
-		float spawnangle;
-
-		short iSpawnIconX;
-
 	friend class CPlayer;
 };
 
 class CO_Spike : public CO_Spring
 {
 	public:
-		CO_Spike(gfxSprite *nspr);
+		CO_Spike(gfxSprite *nspr, short ix, short iy);
 		~CO_Spike(){};
 
 	private:

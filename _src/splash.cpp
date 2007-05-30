@@ -206,6 +206,8 @@ bool LoadMenuGraphics()
 	_load_gfxa(spr_thumbnail_platformarrows, convertPath("gfx/packs/menu/menu_platform_arrows.png", graphicspack), 128);
 	_load_gfxck(spr_thumbnail_warps[0], convertPath("gfx/packs/menu/menu_warp_preview.png", graphicspack));
 	_load_gfxck(spr_thumbnail_warps[1], convertPath("gfx/packs/menu/menu_warp_thumbnail.png", graphicspack));
+	_load_gfxck(spr_thumbnail_mapitems[0], convertPath("gfx/packs/menu/menu_mapitems_preview.png", graphicspack));
+	_load_gfxck(spr_thumbnail_mapitems[1], convertPath("gfx/packs/menu/menu_mapitems_thumbnail.png", graphicspack));
 
 	return true;
 }

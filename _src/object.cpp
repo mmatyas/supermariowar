@@ -808,20 +808,24 @@ void B_BreakableBlock::triggerBehavior()
 //------------------------------------------------------------------------------
 // class note block
 //------------------------------------------------------------------------------
-B_NoteBlock::B_NoteBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed) :
+B_NoteBlock::B_NoteBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short type) :
 	IO_Block(nspr, x, y)
 {
 	iw = (short)nspr->getWidth() >> 2;
+	ih = TILESIZE;
 	iNumSprites = iNumSpr;
 	animationSpeed = aniSpeed;
 	animationTimer = 0;
 	drawFrame = 0;
 	animationWidth = (short)spr->getWidth();
+
+	iType = type;
+	iTypeOffsetY = iType * TILESIZE;
 }
 
 void B_NoteBlock::draw()
 {
-	spr->draw(ix, iy, drawFrame, 0, iw, ih);
+	spr->draw(ix, iy, drawFrame, iTypeOffsetY, iw, ih);
 }
 
 void B_NoteBlock::update()
@@ -877,6 +881,7 @@ bool B_NoteBlock::hittop(CPlayer * player, bool useBehavior)
 	if(useBehavior)
 	{
 		player->superjumptimer = 4;
+		player->superjumptype = iType;
 		player->vely = -VELNOTEBLOCKREPEL;
 	
 		if(state == 0)
@@ -8012,20 +8017,13 @@ void CO_ThrowBlock::SideBounce()
 //------------------------------------------------------------------------------
 // class spring
 //------------------------------------------------------------------------------
-CO_Spring::CO_Spring(gfxSprite *nspr) :
-	MO_CarriedObject(nspr, 0, 0, 4, 4, 30, 30, 1, 1)
+CO_Spring::CO_Spring(gfxSprite *nspr, short ix, short iy) :
+	MO_CarriedObject(nspr, ix, iy, 4, 4, 30, 30, 1, 1)
 {
-	state = 0;
+	state = 1;
 	bounce = GRAVITATION;
 	objectType = object_moving;
 	movingObjectType = movingobject_spring;
-	
-	spawnradius = 100.0f;
-	spawnangle = (float)(rand()%1000 * 0.00628f);
-
-	iSpawnIconX = 160;
-
-	place();
 }
 
 bool CO_Spring::collide(CPlayer * player)
@@ -8055,6 +8053,7 @@ void CO_Spring::hittop(CPlayer * player)
 	player->featherjump = 0;
 
 	player->superjumptimer = 4;
+	player->superjumptype = 1;
 	player->vely = -VELNOTEBLOCKREPEL;
 	
 	ifsoundonplay(sfx_bump);
@@ -8070,67 +8069,56 @@ void CO_Spring::hitother(CPlayer * player)
 
 void CO_Spring::update()
 {
-	if(state == 0)
+	if(owner)
 	{
-		spawnradius -= 2.0f;
-		spawnangle += 0.05f;
-
-		if(spawnradius < 10.0f)
-			state = 1;
+		MoveToOwner();
 	}
 	else
 	{
-		if(owner)
+		//Add air/ground friction
+		if(velx > 0.0f)
 		{
-			MoveToOwner();
+			if(inair)
+				velx -= VELAIRFRICTION;
+			else if(onice)
+				velx -= VELICEFRICTION;
+			else
+				velx -= VELMOVINGFRICTION;
+
+			if(velx < 0.0f)
+				velx = 0.0f;
 		}
-		else
+		else if(velx < 0.0f)
 		{
-			//Add air/ground friction
+			if(inair)
+				velx += VELAIRFRICTION;
+			else if(onice)
+				velx += VELICEFRICTION;
+			else
+				velx += VELMOVINGFRICTION;
+
 			if(velx > 0.0f)
-			{
-				if(inair)
-					velx -= VELAIRFRICTION;
-				else if(onice)
-					velx -= VELICEFRICTION;
-				else
-					velx -= VELMOVINGFRICTION;
-
-				if(velx < 0.0f)
-					velx = 0.0f;
-			}
-			else if(velx < 0.0f)
-			{
-				if(inair)
-					velx += VELAIRFRICTION;
-				else if(onice)
-					velx += VELICEFRICTION;
-				else
-					velx += VELMOVINGFRICTION;
-
-				if(velx > 0.0f)
-					velx = 0.0f;
-			}
-
-			//Collision detect map
-			fOldX = fx;
-			fOldY = fy;
-
-			collision_detection_map();
+				velx = 0.0f;
 		}
 
-		if(state == 2)
+		//Collision detect map
+		fOldX = fx;
+		fOldY = fy;
+
+		collision_detection_map();
+	}
+
+	if(state == 2)
+	{
+		if(++animationtimer == animationspeed)
 		{
-			if(++animationtimer == animationspeed)
+			animationtimer = 0;
+			
+			drawframe += iw;
+			if(drawframe >= animationWidth)
 			{
-				animationtimer = 0;
-				
-				drawframe += iw;
-				if(drawframe >= animationWidth)
-				{
-					drawframe = 0;
-					state = 1;
-				}
+				drawframe = 0;
+				state = 1;
 			}
 		}
 	}
@@ -8138,35 +8126,16 @@ void CO_Spring::update()
 
 void CO_Spring::draw()
 {
-	if(state == 0)
+	if(owner)
 	{
-		short numeyecandy = 8;
-		float addangle = TWO_PI / numeyecandy;
-		float displayangle = spawnangle;
-
-		for(short k = 0; k < numeyecandy; k++)
-		{
-			short spawnX = ix + (collisionWidth >> 1) - 8 + (short)(spawnradius * cos(displayangle));
-			short spawnY = iy + (collisionHeight >> 1) - 8 + (short)(spawnradius * sin(displayangle));
-
-			displayangle += addangle;
-		
-			spr_awardsouls.draw(spawnX, spawnY, iSpawnIconX, 0, 16, 16);
-		}
+		if(owner->iswarping())
+			spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, 0, iw, ih, (short)owner->state % 4, owner->GetWarpPlane());
+		else
+			spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, 0, iw, ih);
 	}
 	else
 	{
-		if(owner)
-		{
-			if(owner->iswarping())
-				spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, 0, iw, ih, (short)owner->state % 4, owner->GetWarpPlane());
-			else
-				spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, 0, iw, ih);
-		}
-		else
-		{
-			spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, 0, iw, ih);
-		}
+		spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, 0, iw, ih);
 	}
 }
 
@@ -8210,15 +8179,13 @@ void CO_Spring::Kick(bool superkick)
 //------------------------------------------------------------------------------
 // class spike
 //------------------------------------------------------------------------------
-CO_Spike::CO_Spike(gfxSprite *nspr) :
-	CO_Spring(nspr)
+CO_Spike::CO_Spike(gfxSprite *nspr, short ix, short iy) :
+	CO_Spring(nspr, ix, iy)
 {
 	iw = 32;
 	ih = 32;
 
 	movingObjectType = movingobject_spike;
-
-	iSpawnIconX = 176;
 }
 
 void CO_Spike::hittop(CPlayer * player)

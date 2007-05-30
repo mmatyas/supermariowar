@@ -83,7 +83,7 @@ struct STextAward
 #define VELJUMP			9.0f		//velocity for jumping
 #define VELSLOWJUMP		7.0f		//velocity for jumping when slow down powerup is in effect
 #define VELTURBOJUMP	10.2f		//velocity for turbo jumping
-#define VELSUPERJUMP	14.0f;		//super jump (hold down for 2 seconds, then jump on note blocks)
+#define VELSUPERJUMP	13.0f;		//super jump (jumping off of orange note blocks)
 #define VELPUSHBACK		5.0f
 #define VELMAXBREAKBLOCK 3.0f
 #define VELNOTEBLOCKBOUNCE 3.0f
@@ -115,8 +115,9 @@ struct STextAward
 #define TILESIZE		32			//size of the tiles, should be dynamically read
 #define PREVIEWTILESIZE	16			//size of the preview tiles
 #define THUMBTILESIZE	8			//size of the thumbnail tiles
-#define BLOCKSETSIZE	15			//size of block set
+#define BLOCKSETSIZE	19			//size of block set
 #define	MAXWARPS		32
+#define MAXMAPITEMS		32
 
 #define NUMSPAWNAREATYPES 2
 #define MAXSPAWNAREAS   128
@@ -453,6 +454,7 @@ extern gfxSprite		spr_tour_markers;
 extern gfxSprite		spr_menu_boxed_numbers;
 extern gfxSprite		spr_thumbnail_platformarrows;
 extern gfxSprite		spr_thumbnail_warps[2];
+extern gfxSprite		spr_thumbnail_mapitems[2];
 
 extern MapList maplist;
 extern SkinList skinlist;
@@ -766,8 +768,6 @@ struct gv
 	short		pointspeed;
 
 	bool		redkoopas;
-	bool		redthrowblocks;
-	bool		viewblocks;
 
 	bool		secrets;
 	short		bosspeeking;

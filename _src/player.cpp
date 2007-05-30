@@ -527,6 +527,7 @@ void CPlayer::move()
 			}
 		}
 
+		/*
 		if(!game_values.redthrowblocks)
 		{
 			if (redThrowBlockIndex < 8)
@@ -553,7 +554,11 @@ void CPlayer::move()
 				}
 			}
 		}
+		*/
 
+		/*
+		//Keep this code for later reference:
+		//It is good code to swap out blocks on the fly
 		if(!game_values.viewblocks)
 		{
 			if (viewBlockIndex < 7)
@@ -591,7 +596,9 @@ void CPlayer::move()
 				}
 			}
 		}
+		*/
 
+		/*
 		if (secret_spring_index < 9)
 		{
 			static const int secret_spring_code[9] = {2,1,2,1,2,1,2,2,16};
@@ -623,6 +630,7 @@ void CPlayer::move()
 				objectsplayer.add(new CO_Spike(&spr_spike));
 			}
 		}
+		*/
 	}
 
     if (tanooki && state == player_ready)
@@ -1147,13 +1155,12 @@ void CPlayer::move()
 					}
 					else if(superjumptimer > 0)
 					{
-						if(holddown > 60)
+						if(superjumptype == 2)
 						{
-							holddown = 0;
 							vely = -VELSUPERJUMP;
 							ifsoundonplay(sfx_superspring);
 						}
-						else
+						else if(superjumptype == 1)
 						{
 							vely = -VELTURBOJUMP;
 							ifsoundonplay(sfx_springjump);
@@ -1880,6 +1887,7 @@ void CPlayer::SetupNewPlayer()
 	onice = false;
 	lockjump = true;
 	superjumptimer = 0;
+	superjumptype = 0;
 	powerup	= 0;
 	projectilelimit = 0;
 	bobomb = false;

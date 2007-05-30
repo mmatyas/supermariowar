@@ -270,6 +270,7 @@ class CPlayer
 		short boss_index[3];
 
 		short superjumptimer;		//this is true when a player is able to do a super jump off a note block
+		short superjumptype;		//type of the note block they hit
 		short hammertimer;		//Only allow the player to throw powerful hammers so fast
 		
 		short frictionslidetimer;  //this controls how much friction smoke is generated when sliding

@@ -100,6 +100,7 @@ gfxSprite		spr_tour_markers;
 gfxSprite		spr_menu_boxed_numbers;
 gfxSprite		spr_thumbnail_platformarrows;
 gfxSprite		spr_thumbnail_warps[2];
+gfxSprite		spr_thumbnail_mapitems[2];
 
 gfxSprite		spr_noteblock;
 gfxSprite		spr_breakableblock;
@@ -1204,8 +1205,6 @@ void RunGame()
 	game_values.screenfade = 255;
 	game_values.screenfadespeed = -8;
 	game_values.redkoopas = false;
-	game_values.redthrowblocks = false;
-	game_values.viewblocks = false;
 	game_values.bosspeeking = -1;
 	game_values.noexit = false;
 	game_values.enemyhammerkills = 0;
@@ -3029,7 +3028,7 @@ void LoadMapObjects()
 			}
 			else if(g_map.objectdata[x][y] == 5)
 			{
-				g_map.blockdata[x][y] = new B_NoteBlock(&spr_noteblock, x * TILESIZE, y * TILESIZE, 4, 10);
+				g_map.blockdata[x][y] = new B_NoteBlock(&spr_noteblock, x * TILESIZE, y * TILESIZE, 4, 10, 1);
 				objectblocks.add(g_map.blockdata[x][y]);
 			}
 			else if(g_map.objectdata[x][y] == 6)
@@ -3052,11 +3051,41 @@ void LoadMapObjects()
 				objectblocks.add(g_map.blockdata[x][y]);
 				g_map.switchBlocks[iSwitchType + 4].push_back(g_map.blockdata[x][y]);
 			}
+			else if(g_map.objectdata[x][y] == 15)
+			{
+				g_map.blockdata[x][y] = new B_ViewBlock(&spr_viewblock, x * TILESIZE, y * TILESIZE);
+				objectblocks.add(g_map.blockdata[x][y]);
+			}
+			else if(g_map.objectdata[x][y] == 16)
+			{
+				B_ThrowBlock * block = new B_ThrowBlock(&spr_throwblock, x * TILESIZE, y * TILESIZE, 4, 10);
+				block->SetType(true);
+				g_map.blockdata[x][y] = block;
+				objectblocks.add(block);
+			}
+			else if(g_map.objectdata[x][y] == 17 || g_map.objectdata[x][y] == 18)
+			{
+				g_map.blockdata[x][y] = new B_NoteBlock(&spr_noteblock, x * TILESIZE, y * TILESIZE, 4, 10, g_map.objectdata[x][y] == 17 ? 2 : 0);
+				objectblocks.add(g_map.blockdata[x][y]);
+			}
 			else
 			{
 				g_map.blockdata[x][y] = NULL;
 			}
 		}
+	}
+
+	for(short i = 0; i < g_map.iNumMapItems; i++)
+	{
+		MapItem * mapItem = &g_map.mapitems[i];
+		short iType = mapItem->itype;
+		short ix = mapItem->ix * TILESIZE;
+		short iy = mapItem->iy * TILESIZE;
+
+		if(iType == 0)
+			objectsplayer.add(new CO_Spring(&spr_spring, ix, iy));
+		else if(iType == 1)
+			objectsplayer.add(new CO_Spike(&spr_spike, ix, iy));
 	}
 }
 

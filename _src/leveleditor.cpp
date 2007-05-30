@@ -43,7 +43,7 @@
 
 #define MAPTITLESTRING "SMW 1.7 Leveleditor"
 
-enum {EDITOR_EDIT, EDITOR_TILES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_MAP, EDITOR_BLOCKS, NEW_MAP, SAVE, EDITOR_WARP, EDITOR_EYECANDY, DISPLAY_HELP, EDITOR_PLATFORM, EDITOR_TILETYPE, EDITOR_BACKGROUNDS};
+enum {EDITOR_EDIT, EDITOR_TILES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_MAP, EDITOR_BLOCKS, NEW_MAP, SAVE, EDITOR_WARP, EDITOR_EYECANDY, DISPLAY_HELP, EDITOR_PLATFORM, EDITOR_TILETYPE, EDITOR_BACKGROUNDS, EDITOR_MAPITEMS};
 
 #define MAX_PLATFORMS 8
 #define MAX_PLATFORM_VELOCITY 16
@@ -91,6 +91,7 @@ gfxSprite		spr_platformstarttile;
 gfxSprite		spr_platformendtile;
 gfxSprite		spr_dialog;
 gfxSprite		menu_shade;
+gfxSprite		spr_mapitems[3];
 
 gfxSprite		spr_platformarrows[3];
 gfxSprite		spr_warps[3];
@@ -106,6 +107,7 @@ bool			set_tile_drag = false;
 
 int				set_block = 0;
 TileType		set_tiletype = tile_nonsolid;
+int				set_mapitem = 0;
 
 int				set_direction = 0;
 int				set_connection = 0;
@@ -149,6 +151,7 @@ float CapFallingVelocity(float f) {return 0.0f;}
 void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead) {}
 gfxSprite		spr_thumbnail_platformarrows;
 gfxSprite		spr_thumbnail_warps[2];
+gfxSprite		spr_thumbnail_mapitems[2];
 gfxSprite		spr_awardsouls, spr_fireballexplosion;
 gfxSprite		spr_maplava, spr_mapwater, spr_mapwaterfall, spr_maplamp;
 CEyecandyContainer eyecandyfront;
@@ -187,6 +190,7 @@ int editor_warp();
 int editor_eyecandy();
 int	editor_tiles();
 int editor_blocks();
+int editor_mapitems();
 int editor_platforms();
 int editor_tiletype();
 int editor_backgrounds();
@@ -266,6 +270,10 @@ int main(int argc, char *argv[])
 	spr_platformstarttile.init(convertPath("gfx/leveleditor/leveleditor_platformstarttile.png"), 0, 0, 0, 64);
 	spr_platformendtile.init(convertPath("gfx/leveleditor/leveleditor_selectedtile.png"), 0, 0, 0, 64);
 
+	spr_mapitems[0].init(convertPath("gfx/leveleditor/leveleditor_mapitems.png"), 255, 0, 255);
+	spr_mapitems[1].init(convertPath("gfx/leveleditor/leveleditor_mapitems_preview.png"), 255, 0, 255);
+	spr_mapitems[2].init(convertPath("gfx/leveleditor/leveleditor_mapitems_thumbnail.png"), 255, 0, 255);
+
 	spr_dialog.init(convertPath("gfx/leveleditor/leveleditor_dialog.png"), 255, 0, 255, 255);
 	menu_shade.init(convertPath("gfx/leveleditor/leveleditor_shade.png"), 255, 0, 255, 128);
 
@@ -342,6 +350,10 @@ int main(int argc, char *argv[])
 
 			case EDITOR_BLOCKS:
 				state = editor_blocks();
+			break;
+
+			case EDITOR_MAPITEMS:
+				state = editor_mapitems();
 			break;
 
 			case EDITOR_WARP:
@@ -466,6 +478,9 @@ int editor_edit()
 
 					if(event.key.keysym.sym == SDLK_i)
 						return EDITOR_BLOCKS;
+
+					if(event.key.keysym.sym == SDLK_r)
+						return EDITOR_MAPITEMS;
 
 					//if 'B' is pressed, rotate backgrounds
 					if(event.key.keysym.sym == SDLK_b)
@@ -739,6 +754,36 @@ int editor_edit()
 						{
 							g_map.mapdatatop[event.button.x / TILESIZE][event.button.y / TILESIZE] = set_tiletype;
 						}
+						else if(edit_mode == 7)
+						{
+							//FIXME:: Don't place map item on solid tile or block
+							//and remove map item if block or solid tile is placed on it
+							if(g_map.iNumMapItems < MAXMAPITEMS)
+							{
+								short clickx = event.button.x / TILESIZE;
+								short clicky = event.button.y / TILESIZE;
+
+								bool fItemAlreadyThere = false;
+								for(short j = 0; j < g_map.iNumMapItems; j++)
+								{
+									if(g_map.mapitems[j].ix == clickx && g_map.mapitems[j].iy == clicky)
+									{
+										fItemAlreadyThere = true;
+										break;
+									}
+								}
+
+								if(!fItemAlreadyThere)
+								{
+									MapItem * mapitem = &g_map.mapitems[g_map.iNumMapItems];
+									mapitem->itype = set_mapitem;
+									mapitem->ix = event.button.x / TILESIZE;
+									mapitem->iy = event.button.y / TILESIZE;
+
+									g_map.iNumMapItems++;
+								}
+							}
+						}
 					}
 					else if(event.button.button == SDL_BUTTON_RIGHT)
 					{
@@ -788,6 +833,28 @@ int editor_edit()
 						else if(edit_mode == 6)
 						{
 							g_map.mapdatatop[event.button.x / TILESIZE][event.button.y / TILESIZE] = tile_nonsolid;
+						}
+						else if(edit_mode == 7)
+						{
+							short clickx = event.button.x / TILESIZE;
+							short clicky = event.button.y / TILESIZE;
+
+							for(short j = 0; j < g_map.iNumMapItems; j++)
+							{
+								if(g_map.mapitems[j].ix == clickx && g_map.mapitems[j].iy == clicky)
+								{
+									g_map.iNumMapItems--;
+
+									for(short i = j; i < g_map.iNumMapItems; i++)
+									{
+										g_map.mapitems[i].itype = g_map.mapitems[i + 1].itype;
+										g_map.mapitems[i].ix = g_map.mapitems[i + 1].ix;
+										g_map.mapitems[i].iy = g_map.mapitems[i + 1].iy;
+									}
+
+									break;
+								}
+							}
 						}
 					}
 				break;
@@ -1212,6 +1279,12 @@ void drawmap(bool fScreenshot, short iBlockSize)
 
 					if(displayblock >= 7 && displayblock <= 14)
 						rSrc.y = iBlockSize * (g_map.iSwitches[(displayblock - 7) % 4] + 30);
+
+					if(displayblock >= 15 && displayblock <= 18)
+					{
+						rSrc.x = (displayblock - 15) * iBlockSize;
+						rSrc.y = iBlockSize * 31;
+					}
 					
 					SDL_BlitSurface(g_map.tilesetsurface[iBlockSize == TILESIZE ? 0 : iBlockSize == PREVIEWTILESIZE ? 1 : 2], &rSrc, screen, &rDst);
 				}
@@ -1219,6 +1292,11 @@ void drawmap(bool fScreenshot, short iBlockSize)
 		}
 	}
 	
+	for(short j = 0; j < g_map.iNumMapItems; j++)
+	{
+		spr_mapitems[iBlockSize == TILESIZE ? 0 : iBlockSize == PREVIEWTILESIZE ? 1 : 2].draw(g_map.mapitems[j].ix * iBlockSize, g_map.mapitems[j].iy * iBlockSize, g_map.mapitems[j].itype * iBlockSize, 0, iBlockSize, iBlockSize);
+	}
+
 	if((view_only_layer && selected_layer == 2) || !view_only_layer)
 		drawlayer(2, false, iBlockSize);
 
@@ -2265,6 +2343,8 @@ int editor_blocks()
 						//Set the selected block to one of the interaction blocks
 						if(set_block_y == 0 && set_block_x >= 0 && set_block_x <= 6)
 							set_block = set_block_x;
+						else if(set_block_y == 0 && set_block_x >= 7 && set_block_x <= 10)
+							set_block = set_block_x + 8;
 						else if(set_block_y >= 1 && set_block_y <= 2 && set_block_x >= 0 && set_block_x <= 3)
 						{  //set the selected block to an on/off switch block
 							
@@ -2298,29 +2378,90 @@ int editor_blocks()
 
 		SDL_BlitSurface(g_map.tilesetsurface[0], &rSrc, screen, &rDst);
 
-		rSrc.x = 224;
-		rSrc.y = 960;
-		rSrc.w = 128;
-		rSrc.h = 64;
+		SDL_Rect rOnOffSrc = {224, 960, 128, 64};
+		SDL_Rect rOnOffDst = {0, 32, 128, 64};
+
+		SDL_BlitSurface(g_map.tilesetsurface[0], &rOnOffSrc, screen, &rOnOffDst);
+
+		SDL_Rect rOnOffBlockSrc = {352, 960, 128, 32};
+		SDL_Rect rOnOffBlockDst = {0, 96, 128, 32};
+
+		SDL_BlitSurface(g_map.tilesetsurface[0], &rOnOffBlockSrc, screen, &rOnOffBlockDst);
+
+		SDL_Rect rBlocksRow2Src = {0, 992, 128, 32};
+		SDL_Rect rBlocksRow2Dst = {224, 0, 128, 32};
+
+		SDL_BlitSurface(g_map.tilesetsurface[0], &rBlocksRow2Src, screen, &rBlocksRow2Dst);
+
+		font.drawRightJustified(640, 0, maplist.currentFilename());
+				
+		SDL_Flip(screen);
+
+		int delay = WAITTIME - (SDL_GetTicks() - framestart);
+		if(delay < 0)
+			delay = 0;
+		else if(delay > WAITTIME)
+			delay = WAITTIME;
 		
-		rDst.x = 0;
-		rDst.y = 32;
-		rDst.w = 128;
-		rDst.h = 64;
+		SDL_Delay(delay);
+	}
 
-		SDL_BlitSurface(g_map.tilesetsurface[0], &rSrc, screen, &rDst);
+	return EDITOR_QUIT;
+}
 
-		rSrc.x = 352;
-		rSrc.y = 960;
-		rSrc.w = 128;
-		rSrc.h = 32;
+
+int editor_mapitems()
+{
+	bool done = false;
+	
+	while (!done)
+	{
+		int framestart = SDL_GetTicks();
+
+		//handle messages
+		while(SDL_PollEvent(&event))
+		{
+			switch(event.type)
+			{
+				case SDL_QUIT:
+					done = true;
+				break;
+
+				case SDL_KEYDOWN:
+					edit_mode = 0;
+					return EDITOR_EDIT;
+				break;
+
+				case SDL_MOUSEBUTTONDOWN:
+					if(event.button.button == SDL_BUTTON_LEFT)
+					{
+						short set_item_x = event.button.x / TILESIZE;
+						short set_item_y = event.button.y / TILESIZE;
+
+						//Set the selected block to one of the interaction blocks
+						if(set_item_y == 0 && set_item_x >= 0 && set_item_x <= 1)
+							set_mapitem = set_item_x;
+
+						edit_mode = 7;
+
+						//The user must release the mouse button before trying to add a tile
+						ignoreclick = true;
+						return EDITOR_EDIT;
+					}
+				break;
+
+				default:
+					break;
+			}
+		}
+
+		drawmap(false, TILESIZE);
+		menu_shade.draw(0, 0);
 		
-		rDst.x = 0;
-		rDst.y = 96;
-		rDst.w = 128;
-		rDst.h = 32;
+		SDL_Rect rSrc = {0, 960, 224, 32};
+		SDL_Rect rDst = {0, 0, 224, 32};
 
-		SDL_BlitSurface(g_map.tilesetsurface[0], &rSrc, screen, &rDst);
+		spr_mapitems[0].draw(0, 0, 0, 0, 64, 32);
 
 		font.drawRightJustified(640, 0, maplist.currentFilename());
 				

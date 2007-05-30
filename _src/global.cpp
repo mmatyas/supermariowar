@@ -1,6 +1,6 @@
 #include "global.h"
 
-short g_iVersion[] = {1, 7, 1, 0};
+short g_iVersion[] = {1, 8, 0, 0};
 
 //We're using these strings intead of the ugly ones returned by SDL_GetKeyName()
 char * Keynames[340] = {"Unknown", "", "", "", "", "", "", "", "Backspace", "Tab", 

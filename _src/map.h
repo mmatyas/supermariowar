@@ -40,6 +40,13 @@ struct SpawnArea
 	short size;
 };
 
+struct MapItem
+{
+	short itype;
+	short ix;
+	short iy;
+};
+
 class IO_Block;
 
 class CMap
@@ -72,6 +79,7 @@ class CMap
 		void preDrawPreviewBackground(gfxSprite * spr_background, SDL_Surface * targetSurface, bool fThumbnail);
 		void preDrawPreviewForeground(SDL_Surface * targetSurface, bool fThumbnail);
 		void preDrawPreviewWarps(SDL_Surface * targetSurface, bool fThumbnail);
+		void preDrawPreviewMapItems(SDL_Surface * targetSurface, bool fThumbnail);
 
 		void drawfrontlayer();
 
@@ -157,6 +165,9 @@ class CMap
 
 		MovingPlatform ** platforms;
 		short		iNumPlatforms;
+
+		MapItem		mapitems[MAXMAPITEMS];
+		short		iNumMapItems;
 
 		SpawnArea	spawnareas[NUMSPAWNAREATYPES][MAXSPAWNAREAS];
 		short		numspawnareas[NUMSPAWNAREATYPES];
