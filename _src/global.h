@@ -531,7 +531,7 @@ struct TagGameModeSettings
 struct StarGameModeSettings
 {
 	short time;				//Time to get rid or keep star
-	bool shine;				//If we are playing shine mode vs. ztar mode
+	short shine;			//If we are playing shine mode vs. ztar vs. stars mode
 };
 
 struct DominationGameModeSettings
@@ -596,6 +596,9 @@ struct TourStop
 	short iPoints;
 	bool fBonusWheel;
 	char szName[128];
+
+	bool fUseSettings;
+	GameModeSettings gmsSettings;
 };
 
 //TODO:: Move menu settings form game_values to global menu context structure
@@ -718,6 +721,7 @@ struct gv
 	ts			tournament_scores[4];
 
 	GameModeSettings gamemodesettings;
+	GameModeSettings gamemodemenusettings;
 	
 	short		fireballttl;
 	short		fireballlimit;

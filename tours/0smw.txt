@@ -1,0 +1,113 @@
+#Tour files are loaded onto the tournament select field on the main menu
+#They contain a set number of "tour stops" that they players play through
+#Each tour stop consists of a map, mode and goal
+#If a map is not on the user's machine, it will choose a random map
+
+#Modes
+#0 = Classic
+#1 = Frag
+#2 = Time Limit
+#3 = Jail
+#4 = Coins
+#5 = Stomp
+#6 = Eggs
+#7 = CTF
+#8 = Chicken
+#9 = Tag
+#10 = Star
+#11 = Domination
+#12 = King of the Hill
+#13 = Race
+#14 = Owned
+#15 = Frenzy
+#16 = Survival
+
+#Version
+1.8.0.0
+
+#Tour Stops (maximum 10 stops)
+#Map,Mode,Goal,Points,Bonus Wheel,Name
+
+#Mode Options
+#0 - Classic - None
+#1 - Frag - None
+#2 - Time Limit - None
+
+#3 - Jail
+#Free Timer - None = 1, all other numbers greater than 1 are number of frames the jail will last (example: 620 is about 10 seconds)
+#Tag Free - 0 = Off, 1 = On
+
+#4 - Coins
+#Penalty - 0 = Off, 1 = On
+#Quantity - any number greater than 0
+
+#5 - Stomp
+#Rate - Relates to the number of frames between spawns. The smaller the number, the faster the spawning (example: 30 is "Very fast" and 120 is "Slow")
+#Goomba Weight - any positive number including 0, used in conjunction with the other weights below.  If goomba rate is 2 and koopa and cheep cheep is 1, then there will be a 50% chance the next enemy will be a goomba (2 + 1 + 1 = 4, 2 / 4 = 50%)
+#Koopa Weight - any positive number including 0
+#Cheep Cheep Weight - any positive number including 0
+
+#6 - Eggs - None
+
+#7 - CTF
+#Speed - 0 = stationary, any number greater than 0 causes bases to move.  The larger the number, the faster they go.
+#Touch Return - 0 = Off, 1 = On
+#Point Move - 0 = Off, 1 = On
+#Auto Return - 0 = No auto return, any number greater than 0 is the number of frames before it returns (example: 620 is about 10 seconds)
+#Need Home - 0 = Off, 1 = On
+
+#8 - Chicken
+#Show Target - 0 = Off, 1 = On
+
+#9 - Tag
+#Touch Tag - 0 = Off, 1 = On
+
+#10 - Star
+#Time - any number greater than 0, number of seconds between scores
+#Star Type - 0 = Ztar, 1 = Shine
+
+#11 - Domination
+#Quantity - 1 to 10 is that number of bases, 11 to 18 is #Players - 1 to #Players + 6, 19 on up is 2xPlayers - 3 on up
+#Relocate - 0 = Never, all other numbers greater than 1 are number of frames until the bases relocate (example: 620 is about 10 seconds)
+#Lose Bases on Death - 0 = Off, 1 = On
+#Move Bases on Death - 0 = Off, 1 = On
+#Steal Bases on Death - 0 = Off, 1 = On
+
+#12 - King of the Hill
+#Size - number greater than 1 (example: 3 for 3x3 base)
+#Relocate - 0 = never, all other numbers greater than 0 are number of frames until the zone moves (example: 620 is about 10 seconds)
+
+#13 - Race
+#Quantity - any number greater than 1
+#Speed - 0 = stationary, any number greater than 0 causes bases to move.  The larger the number, the faster they go. (2 is "Very Slow" and 6 is "Fast")
+#Penalty - 0 = none, 1 = one goal, 2 = all goals
+
+#14 - Owned - None
+
+#15 - Frenzy
+#Limit - 0 = single card (like old bob-omb mode), 1 to 5 = that number of cards, 6 on up = #players - 1 cards on up
+#Rate - 0 = instant, any number greater than 0 is the amount of time in frames that is between card spawns (example: 310 is about 5 seconds)
+#Store Shells - 0 = Off, 1 = On
+#Bob-omb Powerup Weight - any positive number including 0, used in conjunction with the other weights below.  If star powerup rate is 2 and flower is 3 and 1up is 1, then there will be a 33% chance the next powerup will be a star powerup (2 + 3 + 1 = 6, 2 / 6 = 33%)
+#Fire Flower Powerup Weight - any positive number including 0
+#Hammer Powerup Weight - any positive number including 0
+#Feather Powerup Weight - any positive number including 0
+#Boomerang Powerup Weight - any positive number including 0
+#POW Powerup Weight - any positive number including 0
+#MOd Powerup Weight - any positive number including 0
+#Bullet Bill Powerup Weight - any positive number including 0
+#Green Shell Powerup Weight - any positive number including 0
+#Red Shell Powerup Weight - any positive number including 0
+#Spiked Shell Powerup Weight - any positive number including 0
+#Buzzy Shell Powerup Weight - any positive number including 0
+
+#16 - Survival
+#Thwomp Weight - any positive number including 0, used in conjunction with the other weights below.  If thwomp rate is 2 and podoboo and bowser fire is 1, then there will be a 50% chance the next hazard will be a thwomp (2 + 1 + 1 = 4, 2 / 4 = 50%)
+#Podoboo Weight - any positive number including 0
+#Bowser Fire Weight - any positive number including 0
+#Density - number relating how fast the hazards appear, the smaller the number the faster they come (10 is "High" and 40 is "Very Low")
+#Speed - any number greater than 0.  The larger the number, the faster they go. (2 is "Very Slow" and 8 is "Very Fast")
+#Shield - 0 = Off, 1 = On
+
+0smw,16,200,1,0,1st Stop,1,5,0,8,4,1
+treefort,15,15,1,0,2nd Stop,3,310,0,2,1,1,0,0,1,0,0,1,0,0,0

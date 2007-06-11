@@ -333,7 +333,7 @@ class Menu
 		MI_Text * miFlagModeHeaderText;
 
 		//Chicken
-		MI_SelectField * miChickenModeTagOnTouchField;
+		MI_SelectField * miChickenModeShowTargetField;
 		MI_Button * miChickenModeBackButton;
 		
 		MI_Image * miChickenModeLeftHeaderBar;

@@ -5650,6 +5650,10 @@ OMO_KingOfTheHillZone::OMO_KingOfTheHillZone(gfxSprite *nspr) :
 	IO_OverMapObject(nspr, 0, 0, 5, 32000)
 {
 	size = game_values.gamemodesettings.kingofthehill.areasize;
+
+	if(size < 2)
+		game_values.gamemodesettings.kingofthehill.areasize = size = 2;
+
 	iw = TILESIZE * size;
 	collisionWidth = iw;
 	ih = TILESIZE * size;
@@ -5899,6 +5903,8 @@ OMO_RaceGoal::OMO_RaceGoal(gfxSprite *nspr, short id) :
 	placeRaceGoal();
 
 	speed = (float)game_values.gamemodesettings.race.speed / 4.0f;
+	quantity = game_values.gamemodesettings.race.quantity;
+	isfinishline = goalID == quantity - 1;
 }
 
 bool OMO_RaceGoal::collide(CPlayer * player)
@@ -5911,7 +5917,7 @@ bool OMO_RaceGoal::collide(CPlayer * player)
 		{
 			tagged[player->teamID] = player->colorID;
 			
-			if(goalID == game_values.gamemodesettings.race.quantity - 1)
+			if(isfinishline)
                 ifsoundonplay(sfx_racesound);
 			else
 				ifsoundonplay(sfx_areatag);
@@ -5925,7 +5931,7 @@ bool OMO_RaceGoal::collide(CPlayer * player)
 
 void OMO_RaceGoal::draw()
 {
-	if(goalID == game_values.gamemodesettings.race.quantity - 1)
+	if(isfinishline)
 	{
 		spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, 54, iw, ih);	
 	}
@@ -6008,7 +6014,7 @@ void OMO_RaceGoal::placeRaceGoal()
 		x = (short)(rand() % (640 - collisionWidth));
 		y = (short)(rand() % (480 - collisionHeight));
 	}
-	while(objectsfront.getClosestObject(x, y, object_race_goal) <= 250.0f - (game_values.gamemodesettings.race.quantity * 25.0f));
+	while(objectsfront.getClosestObject(x, y, object_race_goal) <= 250.0f - (quantity * 25.0f));
 
 	xi(x);
 	yi(y);

@@ -1047,6 +1047,8 @@ class OMO_RaceGoal : public IO_OverMapObject
 		float anglechange;
 		short anglechangetimer;
 		float speed;
+		short quantity;
+		bool isfinishline;
 			
 	friend class CObjectContainer;
 };

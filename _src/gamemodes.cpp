@@ -996,6 +996,9 @@ void CGM_Coins::init()
 {
 	CGameMode::init();
 
+	if(game_values.gamemodesettings.coins.quantity < 1)
+		game_values.gamemodesettings.coins.quantity = 1;
+
 	for(short iCoin = 0; iCoin < game_values.gamemodesettings.coins.quantity; iCoin++)
 		objectsplayer.add(new MO_Coin(&spr_coin, 4, 8));
 }
@@ -1351,6 +1354,9 @@ void CGM_Domination::init()
 	CGameMode::init();
 	
 	short iNumAreas = game_values.gamemodesettings.domination.quantity;
+
+	if(iNumAreas < 1)
+		game_values.gamemodesettings.domination.quantity = iNumAreas = 1;
 
 	if(iNumAreas > 18)
 		iNumAreas = 2 * list_players_cnt + iNumAreas - 22;
@@ -1836,6 +1842,8 @@ CGM_Race::CGM_Race() : CGameMode()
 {
 	goal = 10;
 	gamemode = game_mode_race;
+	quantity = 3;
+	penalty = 0;
 
 	SetupModeStrings("Race", "Laps", 5);
 }
@@ -1844,7 +1852,15 @@ void CGM_Race::init()
 {
 	CGameMode::init();
 	
-	for(short iRaceGoal = 0; iRaceGoal < game_values.gamemodesettings.race.quantity; iRaceGoal++)
+	quantity = game_values.gamemodesettings.race.quantity;
+	if(quantity < 2)
+		game_values.gamemodesettings.race.quantity = quantity = 2;
+
+	penalty = game_values.gamemodesettings.race.penalty;
+	if(penalty < 0 || penalty > 2)
+		game_values.gamemodesettings.race.penalty = penalty = 0;
+
+	for(short iRaceGoal = 0; iRaceGoal < quantity; iRaceGoal++)
 		objectsfront.add(new OMO_RaceGoal(&spr_racegoal, iRaceGoal));
 
 	for(short iPlayer = 0; iPlayer < 4; iPlayer++)
@@ -1900,7 +1916,7 @@ void CGM_Race::playerextraguy(CPlayer &player, short iType)
 
 void CGM_Race::setNextGoal(short teamID) 
 {
-	if(++nextGoal[teamID] >= game_values.gamemodesettings.race.quantity)
+	if(++nextGoal[teamID] >= quantity)
 	{
 		nextGoal[teamID] = 0;
 		objectsfront.removePlayerRaceGoals(teamID, -1);
@@ -1937,9 +1953,9 @@ void CGM_Race::PenalizeRaceGoals(CPlayer &player)
 {
 	objectsfront.removePlayerRaceGoals(player.teamID, nextGoal[player.teamID] - 1);
 
-	if(2 == game_values.gamemodesettings.race.penalty)
+	if(2 == penalty)
 		nextGoal[player.teamID] = 0;
-	else if(1 == game_values.gamemodesettings.race.penalty)
+	else if(1 == penalty)
 		if(nextGoal[player.teamID] > 0)
 			nextGoal[player.teamID]--;
 }
@@ -1959,7 +1975,13 @@ void CGM_Star::init()
 	CGM_TimeLimit::init();
 
 	timeleft = game_values.gamemodesettings.star.time;
+	if(timeleft < 1)
+		timeleft = 30;
+
 	SetDigitCounters();
+
+	if(game_values.gamemodesettings.star.shine < 0 || game_values.gamemodesettings.star.shine > 1)
+		game_values.gamemodesettings.star.shine = 0;
 
 	fReverseScoring = goal == -1;
 
@@ -2005,6 +2027,9 @@ void CGM_Star::think()
 	if(timeleft == 0)
 	{		//the game ends
 		timeleft = game_values.gamemodesettings.star.time;
+		if(timeleft < 1)
+			timeleft = 30;
+
 		SetDigitCounters();
 
 		ifsoundonplay(sfx_thunder);

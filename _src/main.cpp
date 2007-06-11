@@ -534,6 +534,7 @@ void DECLSPEC musicfinished()
 void RunGame();
 void CleanUp();
 bool LoadAndSplashScreen();
+void SetGameModeSettingsFromMenu();
 void LoadMapObjects();
 void UpdateScoreBoard();
 void PlayNextMusicTrack();
@@ -777,76 +778,76 @@ int main(int argc, char *argv[])
 	//Setup the default game mode settings
 
 	//Jail
-	game_values.gamemodesettings.jail.tagfree = true;		//players on same team can free player by touching
-	game_values.gamemodesettings.jail.timetofree = 1240;   //20 seconds of jail
+	game_values.gamemodemenusettings.jail.tagfree = true;		//players on same team can free player by touching
+	game_values.gamemodemenusettings.jail.timetofree = 1240;   //20 seconds of jail
 
 	//Coins
-	game_values.gamemodesettings.coins.penalty = false;		//no penalty for getting stomped
-	game_values.gamemodesettings.coins.quantity = 1;		//only 1 coin on screen
+	game_values.gamemodemenusettings.coins.penalty = false;		//no penalty for getting stomped
+	game_values.gamemodemenusettings.coins.quantity = 1;		//only 1 coin on screen
 
 	//Stomp
-	game_values.gamemodesettings.stomp.rate = 90; //Moderate
-	game_values.gamemodesettings.stomp.enemyweight[0] = 1; // turn on goombas, koopa and cheep cheeps by default
-	game_values.gamemodesettings.stomp.enemyweight[1] = 1;  
-	game_values.gamemodesettings.stomp.enemyweight[2] = 2;
+	game_values.gamemodemenusettings.stomp.rate = 90; //Moderate
+	game_values.gamemodemenusettings.stomp.enemyweight[0] = 1; // turn on goombas, koopa and cheep cheeps by default
+	game_values.gamemodemenusettings.stomp.enemyweight[1] = 1;  
+	game_values.gamemodemenusettings.stomp.enemyweight[2] = 2;
 
 	//Capture The Flag
-	game_values.gamemodesettings.flag.speed = 0;  //Bases don't move by default
-	game_values.gamemodesettings.flag.touchreturn = false;  //Don't return by touching
-	game_values.gamemodesettings.flag.pointmove = true;  //Move base after point
-	game_values.gamemodesettings.flag.autoreturn = 1240;  //Return flag automatically after 20 seconds
-	game_values.gamemodesettings.flag.homescore = false;  //Don't require flag to be home to score
+	game_values.gamemodemenusettings.flag.speed = 0;  //Bases don't move by default
+	game_values.gamemodemenusettings.flag.touchreturn = false;  //Don't return by touching
+	game_values.gamemodemenusettings.flag.pointmove = true;  //Move base after point
+	game_values.gamemodemenusettings.flag.autoreturn = 1240;  //Return flag automatically after 20 seconds
+	game_values.gamemodemenusettings.flag.homescore = false;  //Don't require flag to be home to score
 
 	//Chicken
-	game_values.gamemodesettings.chicken.usetarget = true;  //default to displaying a target around the chicken
+	game_values.gamemodemenusettings.chicken.usetarget = true;  //default to displaying a target around the chicken
 
 	//Tag
-	game_values.gamemodesettings.tag.tagontouch = true;  //default to transfer tag on touching other players
+	game_values.gamemodemenusettings.tag.tagontouch = true;  //default to transfer tag on touching other players
 
 	//Star
-	game_values.gamemodesettings.star.time = 30;			//default to 30 seconds
-	game_values.gamemodesettings.star.shine = false;		//default to hot potato (ztar)
+	game_values.gamemodemenusettings.star.time = 30;			//default to 30 seconds
+	game_values.gamemodemenusettings.star.shine = 0;		//default to hot potato (ztar)
 
 	//Domination
-	game_values.gamemodesettings.domination.loseondeath = true;
-	game_values.gamemodesettings.domination.stealondeath = false;
-	game_values.gamemodesettings.domination.relocateondeath = false;
-	game_values.gamemodesettings.domination.quantity = 13; //# Players + 1 = 13
-	game_values.gamemodesettings.domination.relocationfrequency = 1240;  //Relocate after 20 seconds = 1240
+	game_values.gamemodemenusettings.domination.loseondeath = true;
+	game_values.gamemodemenusettings.domination.stealondeath = false;
+	game_values.gamemodemenusettings.domination.relocateondeath = false;
+	game_values.gamemodemenusettings.domination.quantity = 13; //# Players + 1 = 13
+	game_values.gamemodemenusettings.domination.relocationfrequency = 1240;  //Relocate after 20 seconds = 1240
 	
 	//King Of The Hill
-	game_values.gamemodesettings.kingofthehill.areasize = 3;
-	game_values.gamemodesettings.kingofthehill.relocationfrequency = 1240;
+	game_values.gamemodemenusettings.kingofthehill.areasize = 3;
+	game_values.gamemodemenusettings.kingofthehill.relocationfrequency = 1240;
 
 	//Race
-	game_values.gamemodesettings.race.quantity = 4;
-	game_values.gamemodesettings.race.speed = 4;
-	game_values.gamemodesettings.race.penalty = 2;  //0 == none, 1 = 1 base, 2 = all bases lost on death
+	game_values.gamemodemenusettings.race.quantity = 4;
+	game_values.gamemodemenusettings.race.speed = 4;
+	game_values.gamemodemenusettings.race.penalty = 2;  //0 == none, 1 = 1 base, 2 = all bases lost on death
 		
 	//Frenzy
-	game_values.gamemodesettings.frenzy.quantity = 6; //#players - 1
-	game_values.gamemodesettings.frenzy.rate = 186; //3 seconds
-	game_values.gamemodesettings.frenzy.storedshells = true; //Shells are stored by default
-	game_values.gamemodesettings.frenzy.powerupweight[0] = 0;
-	game_values.gamemodesettings.frenzy.powerupweight[1] = 1;  // turn on flowers and hammers by default
-	game_values.gamemodesettings.frenzy.powerupweight[2] = 1;
-	game_values.gamemodesettings.frenzy.powerupweight[3] = 0;
-	game_values.gamemodesettings.frenzy.powerupweight[4] = 0;
-	game_values.gamemodesettings.frenzy.powerupweight[5] = 0;
-	game_values.gamemodesettings.frenzy.powerupweight[6] = 0;
-	game_values.gamemodesettings.frenzy.powerupweight[7] = 0;
-	game_values.gamemodesettings.frenzy.powerupweight[8] = 0;
-	game_values.gamemodesettings.frenzy.powerupweight[9] = 0;
-	game_values.gamemodesettings.frenzy.powerupweight[10] = 0;
-	game_values.gamemodesettings.frenzy.powerupweight[11] = 0;
+	game_values.gamemodemenusettings.frenzy.quantity = 6; //#players - 1
+	game_values.gamemodemenusettings.frenzy.rate = 186; //3 seconds
+	game_values.gamemodemenusettings.frenzy.storedshells = true; //Shells are stored by default
+	game_values.gamemodemenusettings.frenzy.powerupweight[0] = 0;
+	game_values.gamemodemenusettings.frenzy.powerupweight[1] = 1;  // turn on flowers and hammers by default
+	game_values.gamemodemenusettings.frenzy.powerupweight[2] = 1;
+	game_values.gamemodemenusettings.frenzy.powerupweight[3] = 0;
+	game_values.gamemodemenusettings.frenzy.powerupweight[4] = 0;
+	game_values.gamemodemenusettings.frenzy.powerupweight[5] = 0;
+	game_values.gamemodemenusettings.frenzy.powerupweight[6] = 0;
+	game_values.gamemodemenusettings.frenzy.powerupweight[7] = 0;
+	game_values.gamemodemenusettings.frenzy.powerupweight[8] = 0;
+	game_values.gamemodemenusettings.frenzy.powerupweight[9] = 0;
+	game_values.gamemodemenusettings.frenzy.powerupweight[10] = 0;
+	game_values.gamemodemenusettings.frenzy.powerupweight[11] = 0;
 
 	//Survival
-	game_values.gamemodesettings.survival.enemyweight[0] = 1;
-	game_values.gamemodesettings.survival.enemyweight[1] = 0;
-	game_values.gamemodesettings.survival.enemyweight[2] = 0;
-	game_values.gamemodesettings.survival.density = 20;
-	game_values.gamemodesettings.survival.speed = 4;
-	game_values.gamemodesettings.survival.shield = true;
+	game_values.gamemodemenusettings.survival.enemyweight[0] = 1;
+	game_values.gamemodemenusettings.survival.enemyweight[1] = 0;
+	game_values.gamemodemenusettings.survival.enemyweight[2] = 0;
+	game_values.gamemodemenusettings.survival.density = 20;
+	game_values.gamemodemenusettings.survival.speed = 4;
+	game_values.gamemodemenusettings.survival.shield = true;
 		
 
 	//Read saved settings from disk
@@ -964,7 +965,7 @@ int main(int argc, char *argv[])
 			for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
 				fread(&game_values.powerupweights[iPowerup], sizeof(short), 1, fp);
 
-			fread(&game_values.gamemodesettings, sizeof(GameModeSettings), 1, fp);
+			fread(&game_values.gamemodemenusettings, sizeof(GameModeSettings), 1, fp);
 
 			fread(&game_values.teamcounts, sizeof(short), 4, fp);
 			fread(&game_values.teamids, sizeof(short), 12, fp);
@@ -2363,6 +2364,7 @@ void RunGame()
 			if(game_values.gamestate == GS_START_GAME && game_values.screenfade == 255)
 			{
 				CleanUp();
+				SetGameModeSettingsFromMenu();
 				game_values.gamestate = GS_GAME;
 				game_values.gamemode = bossgamemode;  //boss type has already been set at this point
 
@@ -2990,6 +2992,15 @@ bool coldec_obj2obj(CObject &o1, CObject &o2)
 	}
 }
 
+void SetGameModeSettingsFromMenu()
+{
+	//If this is a tour stop and the tour has settings in it, use those.  Otherwise use the menu settings.
+	if(game_values.tour && game_values.tourstops[game_values.tourstopcurrent]->fUseSettings)
+		memcpy(&game_values.gamemodesettings, &game_values.tourstops[game_values.tourstopcurrent]->gmsSettings, sizeof(GameModeSettings));
+	else
+		memcpy(&game_values.gamemodesettings, &game_values.gamemodemenusettings, sizeof(GameModeSettings));
+}
+
 void LoadMapObjects()
 {
 	objectblocks.clean();
@@ -3074,6 +3085,8 @@ void LoadMapObjects()
 			}
 		}
 	}
+
+	objectsplayer.clean();
 
 	for(short i = 0; i < g_map.iNumMapItems; i++)
 	{
