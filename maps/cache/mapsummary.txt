@@ -272,4 +272,5 @@ World1-2,0,0,0,1,1,0,0,1
 Yarg,0,1,0,1,0,0,0,1
 Yoshi island,0,0,0,1,0,0,0,1
 Yoshisisland,0,0,0,1,0,0,0,1
+ZZleveleditor,0,0,0,1,0,0,0,1
 Zelda 1 - 1st Quest Level 1,1,1,0,1,0,0,0,1

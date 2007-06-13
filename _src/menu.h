@@ -21,6 +21,7 @@ class ScriptOperation
 };
 #endif
 
+enum MatchType {MATCH_TYPE_SINGLE_GAME, MATCH_TYPE_TOURNAMENT, MATCH_TYPE_TOUR, MATCH_TYPE_LEVEL};
 enum DisplayError {DISPLAY_ERROR_NONE, DISPLAY_ERROR_READ_TOUR_FILE, DISPLAY_ERROR_MAP_FILTER};
 
 class Menu
@@ -68,7 +69,6 @@ class Menu
 	
 		MI_Button * miMainStartButton;
 		MI_PlayerSelect * miPlayerSelect;
-		MI_SelectField * miTournamentField;
 	
 		MI_Button * miOptionsButton;
 		MI_Button * miControlsButton;
@@ -259,6 +259,22 @@ class Menu
 		MI_ScreenResize * miScreenResize;
 #endif
 	
+		//Match Selection Menu
+		UI_Menu mMatchSelectionMenu;
+		MI_Button * miSingleGameStartButton;
+		MI_Button * miTournamentStartButton;
+		MI_Button * miTourStartButton;
+		MI_Button * miLevelStartButton;
+
+		MI_SelectField * miTournamentField;
+		MI_SelectField * miTourField;
+		MI_SelectField * miLevelField;
+
+		MI_Image * miMatchSelectionMenuLeftHeaderBar;
+		MI_Image * miMatchSelectionMenuRightHeaderBar;
+		MI_Text * miMatchSelectionMenuHeaderText;
+
+
 		//Game Settings Menu
 		UI_Menu mGameSettingsMenu;
 

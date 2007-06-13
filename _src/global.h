@@ -9,7 +9,7 @@
 //----------------------------------------------------------------
 
 #define TITLESTRING "Super Mario War"
-#define VERSIONNUMBER "1.7"
+#define VERSIONNUMBER "1.8"
 
 #include <stdlib.h>	//srand/rand (maybe replace with an own version)
 #include <string.h>
@@ -215,6 +215,7 @@ std::string stripCreatorAndDotMap(const std::string &filename);
 //#include "HashTable.h"
 #include "eyecandy.h"
 #include "gamemodes.h"
+#include "level.h"
 
 
 //------------- global variables / etc -------------
@@ -464,6 +465,7 @@ extern GraphicsList menugraphicspacklist;
 extern GraphicsList gamegraphicspacklist;
 extern SoundsList soundpacklist;
 extern TourList tourlist;
+extern LevelList levellist;
 extern FiltersList filterslist;
 
 extern CGameMode	*gamemodes[GAMEMODE_LAST];
@@ -652,16 +654,19 @@ struct gv
 
 	bool		showscoreboard;
 	float		scorepercentmove;
-	
+
+	short		matchtype;
+
 	short		tournamentgames;
-	bool		tournament;
 	short		tournamentwinner;
 	
-	bool		tour;
+	short		tourindex;
 	short		tourstopcurrent;
 	short		tourstoptotal;
 	std::vector<TourStop*> tourstops;
 	
+	short		levelindex;
+
 	short		slowdownon;
 	short		slowdowncounter;
 	bool		slowdownfreeze;

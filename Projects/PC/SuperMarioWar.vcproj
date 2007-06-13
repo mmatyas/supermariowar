@@ -223,6 +223,12 @@
 				RelativePath="..\..\_src\input.h">
 			</File>
 			<File
+				RelativePath="..\..\_src\level.cpp">
+			</File>
+			<File
+				RelativePath="..\..\_src\level.h">
+			</File>
+			<File
 				RelativePath="..\..\_src\main.cpp">
 				<FileConfiguration
 					Name="Release|Win32">

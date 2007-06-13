@@ -181,46 +181,23 @@ void Menu::CreateMenu()
 	miSMWVersion = new MI_Image(&menu_version, 570, 10, 0, 0, 58, 32, 1, 1, 0);
 	//miSMWVersionText = new MI_Text("RC2", 630, 45, 0, 2, 2);
 	
-	miMainStartButton = new MI_Button(&spr_selectfield, 120, 180, "Start", 400, 0);
-	miMainStartButton->SetCode(MENU_CODE_TO_TEAM_SELECT_MENU);
+	miMainStartButton = new MI_Button(&spr_selectfield, 120, 210, "Start", 400, 0);
+	miMainStartButton->SetCode(MENU_CODE_TO_MATCH_SELECTION_MENU);
 
-	miPlayerSelect = new MI_PlayerSelect(&menu_player_select, 120, 220, "Players", 400, 140);
+	miPlayerSelect = new MI_PlayerSelect(&menu_player_select, 120, 250, "Players", 400, 140);
 	
-	miTournamentField = new MI_SelectField(&spr_selectfield, 120, 292, "Match", 400, 140);
-	miTournamentField->Add("Single Game", 1, "", false, false);
-	miTournamentField->Add("Tournament 2", 2, "", true, false);
-	miTournamentField->Add("Tournament 3", 3, "", true, false);
-	miTournamentField->Add("Tournament 4", 4, "", true, false);
-	miTournamentField->Add("Tournament 5", 5, "", true, false);
-	miTournamentField->Add("Tournament 6", 6, "", true, false);
-	miTournamentField->Add("Tournament 7", 7, "", true, false);
-	miTournamentField->Add("Tournament 8", 8, "", true, false);
-	miTournamentField->Add("Tournament 9", 9, "", true, false);
-	miTournamentField->Add("Tournament 10", 10, "", true, false);
-	miTournamentField->SetData(&game_values.tournamentgames, NULL, &game_values.tournament);
-	miTournamentField->SetKey(game_values.tournamentgames);
-	miTournamentField->SetItemChangedCode(MENU_CODE_TOURNAMENT_CHANGED);
-
-	for(short iTour = 0; iTour < tourlist.GetCount(); iTour++)
-	{
-		GetNameFromFileName(szTemp, tourlist.GetIndex(iTour));
-		strcat(szTemp, " Tour");
-		miTournamentField->Add(szTemp, iTour + 11, "", true, false);
-	}
-
-	miOptionsButton = new MI_Button(&spr_selectfield, 120, 332, "Options", 400, 0);
+	miOptionsButton = new MI_Button(&spr_selectfield, 120, 322, "Options", 400, 0);
 	miOptionsButton->SetCode(MENU_CODE_TO_OPTIONS_MENU);
 
-	miControlsButton = new MI_Button(&spr_selectfield, 120, 372, "Controls", 400, 0);
+	miControlsButton = new MI_Button(&spr_selectfield, 120, 362, "Controls", 400, 0);
 	miControlsButton->SetCode(MENU_CODE_TO_CONTROLS_MENU);
 
-	miExitButton = new MI_Button(&spr_selectfield, 120, 412, "Exit", 400, 0);
+	miExitButton = new MI_Button(&spr_selectfield, 120, 402, "Exit", 400, 0);
 	miExitButton->SetCode(MENU_CODE_EXIT_APPLICATION);
 
 	mMainMenu.AddControl(miMainStartButton, miExitButton, miPlayerSelect, NULL, NULL);
-	mMainMenu.AddControl(miPlayerSelect, miMainStartButton, miTournamentField, NULL, NULL);
-	mMainMenu.AddControl(miTournamentField, miPlayerSelect, miOptionsButton, NULL, NULL);
-	mMainMenu.AddControl(miOptionsButton, miTournamentField, miControlsButton, NULL, NULL);
+	mMainMenu.AddControl(miPlayerSelect, miMainStartButton, miOptionsButton, NULL, NULL);
+	mMainMenu.AddControl(miOptionsButton, miPlayerSelect, miControlsButton, NULL, NULL);
 	mMainMenu.AddControl(miControlsButton, miOptionsButton, miExitButton, NULL, NULL);
 	mMainMenu.AddControl(miExitButton, miControlsButton, miMainStartButton, NULL, NULL);
 	
@@ -1008,6 +985,10 @@ void Menu::CreateMenu()
 	miScreenSettingsMenuRightHeaderBar = new MI_Image(&menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
 	miScreenSettingsMenuHeaderText = new MI_Text("Screen Settings Menu", 320, 5, 0, 2, 1);
 
+	mScreenSettingsMenu.AddNonControl(miScreenSettingsMenuLeftHeaderBar);
+	mScreenSettingsMenu.AddNonControl(miScreenSettingsMenuRightHeaderBar);
+	mScreenSettingsMenu.AddNonControl(miScreenSettingsMenuHeaderText);
+
 	mScreenSettingsMenu.AddControl(miScreenResizeButton, miScreenSettingsMenuBackButton, miScreenHardwareFilterField, NULL, miScreenSettingsMenuBackButton);
 	mScreenSettingsMenu.AddControl(miScreenHardwareFilterField, miScreenResizeButton, miScreenFlickerFilterField, NULL, miScreenSettingsMenuBackButton);
 	mScreenSettingsMenu.AddControl(miScreenFlickerFilterField, miScreenHardwareFilterField, miScreenSoftFilterField, NULL, miScreenSettingsMenuBackButton);
@@ -1028,7 +1009,76 @@ void Menu::CreateMenu()
 	mScreenResizeMenu.SetHeadControl(miScreenResize);
 	mScreenResizeMenu.SetCancelCode(MENU_CODE_BACK_TO_SCREEN_SETTINGS_MENU);
 #endif
+
+	//***********************
+	// Match Selection Menu
+	//***********************
+
+	miSingleGameStartButton = new MI_Button(&spr_selectfield, 500, 60, "Start", 100, 0);
+	miSingleGameStartButton->SetCode(MENU_CODE_SINGLE_GAME_START);
+
+	miTournamentStartButton = new MI_Button(&spr_selectfield, 500, 180, "Start", 100, 0);
+	miTournamentStartButton->SetCode(MENU_CODE_TOURNAMENT_START);
+
+	miTourStartButton = new MI_Button(&spr_selectfield, 500, 300, "Start", 100, 0);
+	miTourStartButton->SetCode(MENU_CODE_TOUR_START);
+
+	miLevelStartButton = new MI_Button(&spr_selectfield, 500, 420, "Start", 100, 0);
+	miLevelStartButton->SetCode(MENU_CODE_LEVEL_START);
+
+	miTournamentField = new MI_SelectField(&spr_selectfield, 80, 180, "Wins", 380, 100);
+	miTournamentField->Add("2", 2, "", false, false);
+	miTournamentField->Add("3", 3, "", false, false);
+	miTournamentField->Add("4", 4, "", false, false);
+	miTournamentField->Add("5", 5, "", false, false);
+	miTournamentField->Add("6", 6, "", false, false);
+	miTournamentField->Add("7", 7, "", false, false);
+	miTournamentField->Add("8", 8, "", false, false);
+	miTournamentField->Add("9", 9, "", false, false);
+	miTournamentField->Add("10", 10, "", false, false);
+	miTournamentField->SetData(&game_values.tournamentgames, NULL, NULL);
+	miTournamentField->SetKey(game_values.tournamentgames);
 	
+	miTourField = new MI_SelectField(&spr_selectfield, 80, 300, "Tour", 380, 100);
+	for(short iTour = 0; iTour < tourlist.GetCount(); iTour++)
+	{
+		GetNameFromFileName(szTemp, tourlist.GetIndex(iTour));
+		//strcat(szTemp, " Tour");
+		miTourField->Add(szTemp, iTour, "", true, false);
+	}
+	miTourField->SetData(&game_values.tourindex, NULL, NULL);
+	miTourField->SetKey(game_values.tourindex);
+
+	miLevelField = new MI_SelectField(&spr_selectfield, 80, 420, "Level", 380, 100);
+	for(short iLevel = 0; iLevel < levellist.GetCount(); iLevel++)
+	{
+		GetNameFromFileName(szTemp, levellist.GetIndex(iLevel));
+		miLevelField->Add(szTemp, iLevel, "", true, false);
+	}
+	miLevelField->SetData(&game_values.levelindex, NULL, NULL);
+	miLevelField->SetKey(game_values.levelindex);
+
+	miMatchSelectionMenuLeftHeaderBar = new MI_Image(&menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
+	miMatchSelectionMenuRightHeaderBar = new MI_Image(&menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
+	miMatchSelectionMenuHeaderText = new MI_Text("Match Type Menu", 320, 5, 0, 2, 1);
+
+	mMatchSelectionMenu.AddNonControl(miMatchSelectionMenuLeftHeaderBar);
+	mMatchSelectionMenu.AddNonControl(miMatchSelectionMenuRightHeaderBar);
+	mMatchSelectionMenu.AddNonControl(miMatchSelectionMenuHeaderText);
+
+	mMatchSelectionMenu.AddControl(miSingleGameStartButton, miLevelStartButton, miTournamentStartButton, miTournamentField, NULL);
+	mMatchSelectionMenu.AddControl(miTournamentStartButton, miSingleGameStartButton, miTourStartButton, miTournamentField, NULL);
+	mMatchSelectionMenu.AddControl(miTourStartButton, miTournamentStartButton, miLevelStartButton, miTourField, NULL);
+	mMatchSelectionMenu.AddControl(miLevelStartButton, miTourStartButton, miSingleGameStartButton, miLevelField, NULL);
+	mMatchSelectionMenu.AddControl(miTournamentField, miLevelField, miTourField, NULL, miTournamentStartButton);
+	mMatchSelectionMenu.AddControl(miTourField, miTournamentField, miLevelField, NULL, miTourStartButton);
+	mMatchSelectionMenu.AddControl(miLevelField, miTourField, miTournamentField, NULL, miLevelStartButton);
+
+	mMatchSelectionMenu.SetHeadControl(miSingleGameStartButton);
+	mMatchSelectionMenu.SetCancelCode(MENU_CODE_TO_MAIN_MENU);
+
+	UI_Menu mMatchSelectionMenu;
+
 	//***********************
 	// Game Settings
 	//***********************
@@ -1914,7 +1964,7 @@ void Menu::CreateMenu()
 	mTeamSelectMenu.AddNonControl(miTeamSelectHeaderText);
 	
 	mTeamSelectMenu.SetHeadControl(miTeamSelect);
-	mTeamSelectMenu.SetCancelCode(MENU_CODE_TO_MAIN_MENU);
+	mTeamSelectMenu.SetCancelCode(MENU_CODE_BACK_TO_MATCH_SELECTION_MENU);
 
 	//***********************
 	// Tournament Scoreboard
@@ -2122,24 +2172,24 @@ void Menu::RunMenu()
 	fNeedMenuMusicReset = false;
 
 	if(game_values.gamemode->winningteam > -1 && game_values.tournamentwinner == -1 && 
-		((!game_values.tour && game_values.bonuswheel == 2) || (game_values.tour && game_values.tourstops[game_values.tourstopcurrent - 1]->fBonusWheel)))
+		((game_values.matchtype != MATCH_TYPE_TOUR && game_values.bonuswheel == 2) || (game_values.matchtype == MATCH_TYPE_TOUR && game_values.tourstops[game_values.tourstopcurrent - 1]->fBonusWheel)))
 	{
 		miBonusWheel->Reset(false);
 		mCurrentMenu = &mBonusWheelMenu;
 	}
-	else if(game_values.tour || game_values.tournament)
+	else if(game_values.matchtype == MATCH_TYPE_TOUR || game_values.matchtype == MATCH_TYPE_TOURNAMENT)
 	{
 		mCurrentMenu = &mTournamentScoreboardMenu;
 	}
 	
-	if(game_values.tour)
+	if(game_values.matchtype == MATCH_TYPE_TOUR)
 	{
 		miTournamentScoreboard->RefreshScores();
 
 		if(game_values.tourstopcurrent < game_values.tourstoptotal)
 			miTourStop->Refresh(game_values.tourstopcurrent);
 	}
-	else if(game_values.tournament)
+	else if(game_values.matchtype == MATCH_TYPE_TOURNAMENT)
 	{
 		miTournamentScoreboard->StopSwirl();
 		if(game_values.gamemode->winningteam > -1)
@@ -2151,14 +2201,14 @@ void Menu::RunMenu()
 
 	//Keep track if we entered the menu loop as part of a tournament, if we exit the tournament
 	//we need to reset the menu music back to normal
-	if(game_values.tournament)
+	if(game_values.matchtype == MATCH_TYPE_TOURNAMENT || game_values.matchtype == MATCH_TYPE_TOUR)
 		fNeedMenuMusicReset = true;
 
 	if(game_values.music)
 	{
 		if(game_values.tournamentwinner < 0)
 		{
-			if(game_values.tournament)
+			if(game_values.matchtype == MATCH_TYPE_TOURNAMENT || game_values.matchtype == MATCH_TYPE_TOUR)
 				backgroundmusic[3].play(false, false);
 			else
 				backgroundmusic[2].play(false, false);
@@ -2321,6 +2371,43 @@ void Menu::RunMenu()
 
 				mCurrentMenu = &mMainMenu;
 			}
+			else if(MENU_CODE_BACK_TO_MATCH_SELECTION_MENU == code)
+			{
+				mCurrentMenu = &mMatchSelectionMenu;
+			}
+			else if(MENU_CODE_TO_MATCH_SELECTION_MENU == code)
+			{
+				mCurrentMenu = &mMatchSelectionMenu;
+				mCurrentMenu->ResetMenu();
+			}
+			else if(MENU_CODE_SINGLE_GAME_START == code)
+			{
+				game_values.matchtype = MATCH_TYPE_SINGLE_GAME;
+				miTeamSelect->Reset();
+				mCurrentMenu = &mTeamSelectMenu;
+				mCurrentMenu->ResetMenu();
+			}
+			else if(MENU_CODE_TOURNAMENT_START == code)
+			{
+				game_values.matchtype = MATCH_TYPE_TOURNAMENT;
+				miTeamSelect->Reset();
+				mCurrentMenu = &mTeamSelectMenu;
+				mCurrentMenu->ResetMenu();
+			}
+			else if(MENU_CODE_TOUR_START == code)
+			{
+				game_values.matchtype = MATCH_TYPE_TOUR;
+				miTeamSelect->Reset();
+				mCurrentMenu = &mTeamSelectMenu;
+				mCurrentMenu->ResetMenu();
+			}
+			else if(MENU_CODE_LEVEL_START == code)
+			{
+				game_values.matchtype = MATCH_TYPE_LEVEL;
+				miTeamSelect->Reset();
+				mCurrentMenu = &mTeamSelectMenu;
+				mCurrentMenu->ResetMenu();
+			}
 			else if(MENU_CODE_TO_OPTIONS_MENU == code)
 			{
 				mCurrentMenu = &mOptionsMenu;
@@ -2404,18 +2491,15 @@ void Menu::RunMenu()
 			{
 				//Moves teams to the first arrays in the list and counts the number of teams
 				score_cnt = miTeamSelect->OrganizeTeams();
-				game_values.tour = false;
 				iDisplayError = DISPLAY_ERROR_NONE;
 				iDisplayErrorTimer = 0;
 				bool fErrorReadingTourFile = false;
 
 				//Load the tour here if one was selected
-				if(game_values.tournamentgames > 10)
+				if(game_values.matchtype == MATCH_TYPE_TOUR)
 				{
-					game_values.tour = true;
 					if(!ReadTourFile())
 					{
-						game_values.tour = false;
 						iDisplayError = DISPLAY_ERROR_READ_TOUR_FILE;
 						iDisplayErrorTimer = 120;
 						fErrorReadingTourFile = true;
@@ -2425,9 +2509,13 @@ void Menu::RunMenu()
 						miTournamentScoreboard->CreateScoreboard(score_cnt, game_values.tourstoptotal, &spr_tour_markers, true);
 					}
 				}
-				else
+				else if(game_values.matchtype == MATCH_TYPE_TOURNAMENT)
 				{
 					miTournamentScoreboard->CreateScoreboard(score_cnt, game_values.tournamentgames, &menu_mode_large, false);
+				}
+				else if(game_values.matchtype == MATCH_TYPE_LEVEL)
+				{
+					//Level selected
 				}
 
 				if(!fErrorReadingTourFile)
@@ -2437,18 +2525,14 @@ void Menu::RunMenu()
 					//Initialize tournament values
 					game_values.tournamentwinner = -1;
 					
+					//Setup wins counters for tournament/tour
 					for(int k = 0; k < 4; k++)
 					{
 						game_values.tournament_scores[k].wins = 0;
 						game_values.tournament_scores[k].total = 0;
 					}
 
-					if(game_values.tour)
-					{
-						mCurrentMenu = &mTourStopMenu;
-						mCurrentMenu->ResetMenu();
-					}
-					else
+					if(MATCH_TYPE_SINGLE_GAME == game_values.matchtype || MATCH_TYPE_TOURNAMENT == game_values.matchtype)
 					{
 						maplist.findexact(szCurrentMapName);
 						miMapField->LoadCurrentMap();
@@ -2465,6 +2549,27 @@ void Menu::RunMenu()
 						mCurrentMenu = &mGameSettingsMenu;
 						mCurrentMenu->ResetMenu();
 					}
+					else if(MATCH_TYPE_TOUR == game_values.matchtype)
+					{
+						mCurrentMenu = &mTourStopMenu;
+						mCurrentMenu->ResetMenu();
+					}
+					else if(MATCH_TYPE_LEVEL == game_values.matchtype)
+					{
+
+					}
+
+					//Setup items on next menu
+					for(short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++)
+					{
+						miGoalField[iGameMode]->HideItem(-1, game_values.matchtype == MATCH_TYPE_TOURNAMENT);
+					}
+
+					if(game_values.matchtype == MATCH_TYPE_TOURNAMENT || game_values.matchtype == MATCH_TYPE_TOUR)
+						miGameSettingsMenuHeaderText->SetText("Tournament Game Menu");
+					else
+						miGameSettingsMenuHeaderText->SetText("Single Game Menu");
+
 				}
 			}
 			else if(MENU_CODE_BACK_TO_GAME_SETUP_MENU == code)
@@ -2475,7 +2580,7 @@ void Menu::RunMenu()
 				}
 				else if(game_values.tournamentwinner > -1) //Tournament/Tour Won and Bonus Wheel will be spun
 				{
-					if(((!game_values.tour && game_values.bonuswheel == 0) || (game_values.tour && !game_values.tourstops[game_values.tourstopcurrent - 1]->fBonusWheel)))
+					if(((game_values.matchtype != MATCH_TYPE_TOUR && game_values.bonuswheel == 0) || (game_values.matchtype == MATCH_TYPE_TOUR && !game_values.tourstops[game_values.tourstopcurrent - 1]->fBonusWheel)))
 					{
 						ResetTournamentBackToMainMenu();
 					}
@@ -2487,7 +2592,7 @@ void Menu::RunMenu()
 				}
 				else  //Next Tour/Tourament Game
 				{
-					if(game_values.tour)
+					if(game_values.matchtype == MATCH_TYPE_TOUR)
 						mCurrentMenu = &mTourStopMenu;
 					else
 						mCurrentMenu = &mGameSettingsMenu;
@@ -2499,18 +2604,6 @@ void Menu::RunMenu()
 			{
 				mCurrentMenu = &mGameSettingsMenu;
 			}
-			else if(MENU_CODE_TOURNAMENT_CHANGED == code)
-			{
-				for(short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++)
-				{
-					miGoalField[iGameMode]->HideItem(-1, game_values.tournament);
-				}
-
-				if(game_values.tournament)
-					miGameSettingsMenuHeaderText->SetText("Tournament Game Menu");
-				else
-					miGameSettingsMenuHeaderText->SetText("Single Game Menu");
-			}
 			else if(MENU_CODE_MODE_CHANGED == code)
 			{
 				game_values.gamemode = gamemodes[miModeField->GetShortValue()];
@@ -2521,15 +2614,9 @@ void Menu::RunMenu()
 					miGoalField[iMode]->Show(miModeField->GetShortValue() == iMode);
 				}
 			}
-			else if(MENU_CODE_TO_TEAM_SELECT_MENU == code)
-			{
-				miTeamSelect->Reset();
-				mCurrentMenu = &mTeamSelectMenu;
-				mCurrentMenu->ResetMenu();
-			}
 			else if(MENU_CODE_BACK_TEAM_SELECT_MENU == code)
 			{
-				if(game_values.tour)
+				if(game_values.matchtype == MATCH_TYPE_TOUR)
 				{
 					miTourStopExitDialogImage->Show(true);
 					miTourStopExitDialogExitTourText->Show(true);
@@ -2542,7 +2629,7 @@ void Menu::RunMenu()
 					mTourStopMenu.SetCancelCode(MENU_CODE_NONE);
 					mTourStopMenu.ResetMenu();
 				}
-				else if(game_values.tournament)
+				else if(game_values.matchtype == MATCH_TYPE_TOURNAMENT)
 				{
 					miGameSettingsExitDialogImage->Show(true);
 					miGameSettingsExitDialogTournamentText->Show(true);
@@ -2618,8 +2705,8 @@ void Menu::RunMenu()
 			{
 				if(miBonusWheel->GetPowerupSelectionDone())
 				{
-					if((game_values.tournament || game_values.tour) && game_values.tournamentwinner == -1 &&
-						((!game_values.tour && game_values.bonuswheel == 2) || (game_values.tour && game_values.tourstops[game_values.tourstopcurrent - 1]->fBonusWheel)))
+					if((game_values.matchtype == MATCH_TYPE_TOUR || game_values.matchtype == MATCH_TYPE_TOURNAMENT) && game_values.tournamentwinner == -1 &&
+						((game_values.matchtype != MATCH_TYPE_TOUR && game_values.bonuswheel == 2) || (game_values.matchtype == MATCH_TYPE_TOUR && game_values.tourstops[game_values.tourstopcurrent - 1]->fBonusWheel)))
 						mCurrentMenu = &mTournamentScoreboardMenu;
 					else
 						ResetTournamentBackToMainMenu();
@@ -2750,7 +2837,7 @@ void Menu::RunMenu()
 			}
 			else if(MENU_CODE_MAP_CHANGED == code)
 			{
-				if(!game_values.tour)
+				if(game_values.matchtype != MATCH_TYPE_TOUR)
 					szCurrentMapName = miMapField->GetMapName();
 			}
 			else if(MENU_CODE_MAP_FILTER_EXIT == code)
@@ -2992,7 +3079,7 @@ bool Menu::ReadTourFile()
 	//FIXME:: Doesn't this just dump the reference to that memory and not delete it?
 	game_values.tourstops.clear();
 
-	FILE * fp = fopen(tourlist.GetIndex(game_values.tournamentgames - 11), "r");
+	FILE * fp = fopen(tourlist.GetIndex(game_values.tourindex), "r");
 
 	char buffer[256];
 	bool fReadVersion = false;
@@ -3487,7 +3574,7 @@ void Menu::ResetTournamentBackToMainMenu()
 	mCurrentMenu = &mMainMenu;
 	mCurrentMenu->ResetMenu();
 
-	if(game_values.tournament || game_values.tour)
+	if(game_values.matchtype == MATCH_TYPE_TOURNAMENT || game_values.matchtype == MATCH_TYPE_TOUR)
 	{
 		if(fNeedMenuMusicReset)
 		{

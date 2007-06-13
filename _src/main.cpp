@@ -330,6 +330,7 @@ GraphicsList menugraphicspacklist;
 GraphicsList gamegraphicspacklist;
 SoundsList soundpacklist;
 TourList tourlist;
+LevelList levellist;
 
 //Network stuff
 int g_iNextNetworkID = 0;
@@ -640,11 +641,13 @@ int main(int argc, char *argv[])
 	game_values.exityes				= false;
 	game_values.awardstyle			= award_style_fireworks;
 	game_values.spawnstyle			= 2;
-	game_values.tournamentgames		= 1;
+	game_values.tournamentgames		= 2;
 	game_values.tournamentwinner	= -1;
-	game_values.tour				= false;
+	game_values.matchtype			= MATCH_TYPE_SINGLE_GAME;
+	game_values.tourindex			= 0;
 	game_values.tourstopcurrent		= 0;
 	game_values.tourstoptotal		= 0;
+	game_values.levelindex			= 0;
 	game_values.slowdownon			= -1;
 	game_values.slowdowncounter		= 0;
 	game_values.slowdownfreeze		= false;
@@ -1415,7 +1418,7 @@ void RunGame()
 				{
 					endgametimer = (short)(rand() % 200);
 
-					if(game_values.tournament)
+					if(game_values.matchtype == MATCH_TYPE_TOURNAMENT || game_values.matchtype == MATCH_TYPE_TOUR)
 						UpdateScoreBoard();
 
 					CleanUp();
@@ -1702,7 +1705,7 @@ void RunGame()
 				{
 					if(game_values.gamemode->gameover)
 					{
-						if(game_values.tournament)
+						if(game_values.matchtype == MATCH_TYPE_TOURNAMENT || game_values.matchtype == MATCH_TYPE_TOUR)
 							UpdateScoreBoard();
 
 						CleanUp();
@@ -2808,7 +2811,7 @@ void CleanUp()
 
 void UpdateScoreBoard()
 {
-	if(game_values.tour && game_values.gamemode->winningteam > -1)
+	if(game_values.matchtype == MATCH_TYPE_TOUR && game_values.gamemode->winningteam > -1)
 	{
 		//For this game, set the player's place as the type of win
 		for(short iScore = 0; iScore < score_cnt; iScore++)
@@ -2864,7 +2867,7 @@ void UpdateScoreBoard()
 			backgroundmusic[4].play(true, true);
 		}
 	}
-	else if(game_values.tournament)
+	else if(game_values.matchtype == MATCH_TYPE_TOURNAMENT)
 	{
 		short maxScore = -1;  //Max score for game
 		short maxTeam = -1;  //Team ID with the max score -> reset to -1 if two teams tied for win
@@ -2995,7 +2998,7 @@ bool coldec_obj2obj(CObject &o1, CObject &o2)
 void SetGameModeSettingsFromMenu()
 {
 	//If this is a tour stop and the tour has settings in it, use those.  Otherwise use the menu settings.
-	if(game_values.tour && game_values.tourstops[game_values.tourstopcurrent]->fUseSettings)
+	if(game_values.matchtype == MATCH_TYPE_TOUR && game_values.tourstops[game_values.tourstopcurrent]->fUseSettings)
 		memcpy(&game_values.gamemodesettings, &game_values.tourstops[game_values.tourstopcurrent]->gmsSettings, sizeof(GameModeSettings));
 	else
 		memcpy(&game_values.gamemodesettings, &game_values.gamemodemenusettings, sizeof(GameModeSettings));
