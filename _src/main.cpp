@@ -216,6 +216,8 @@ gfxSprite		spr_powerupselector;
 gfxSprite		spr_scoreboard;
 gfxSprite		spr_abovearrows;
 
+gfxSprite		spr_overworld;
+
 //------ game relevant stuff ------
 CPlayer			*list_players[4];
 short			list_players_cnt = 0;
@@ -330,7 +332,8 @@ GraphicsList menugraphicspacklist;
 GraphicsList gamegraphicspacklist;
 SoundsList soundpacklist;
 TourList tourlist;
-LevelList levellist;
+WorldList worldlist;
+WorldMap g_worldmap;
 
 //Network stuff
 int g_iNextNetworkID = 0;
@@ -647,7 +650,7 @@ int main(int argc, char *argv[])
 	game_values.tourindex			= 0;
 	game_values.tourstopcurrent		= 0;
 	game_values.tourstoptotal		= 0;
-	game_values.levelindex			= 0;
+	game_values.worldindex			= 0;
 	game_values.slowdownon			= -1;
 	game_values.slowdowncounter		= 0;
 	game_values.slowdownfreeze		= false;

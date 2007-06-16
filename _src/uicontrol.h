@@ -3,6 +3,7 @@
 
 #include "uimenu.h"
 #include "input.h"
+#include "world.h"
 
 class UI_Menu;
 class SimpleFileList;
@@ -880,6 +881,41 @@ class MI_MapBrowser : public UI_Control
 		SDL_Rect srcRectBackground;
 		SDL_Rect dstRectBackground;
 };
+
+class MI_World : public UI_Control
+{
+	public:
+
+		MI_World(gfxSprite * spr_background);
+		virtual ~MI_World();
+
+		void Update();
+		void Draw();
+
+		MenuCodeEnum SendInput(CPlayerInput * playerInput);
+		MenuCodeEnum Modify(bool modify);
+
+		void SetPlayerPosition(short iCol, short iRow);
+		void SetControllingPlayer(short iPlayerID);
+
+	private:
+
+		gfxSprite * spr;
+
+		short iAnimationTimer;
+		short iAnimationFrame;
+
+		short iPlayerX;
+		short iPlayerY;
+		short iPlayerCurrentTileX;
+		short iPlayerCurrentTileY;
+		short iPlayerDestTileX;
+		short iPlayerDestTileY;
+
+		short iControllingPlayer;
+		short iPlayerState;
+};
+
 
 #endif //__UICONTROL_H_
 

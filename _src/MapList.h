@@ -176,10 +176,10 @@ class TourList : public SimpleFileList
         TourList() : SimpleFileList(convertPath("tours/"), ".txt"){;};
 };
 
-class LevelList : public SimpleFileList
+class WorldList : public SimpleFileList
 {
     public:
-        LevelList() : SimpleFileList(convertPath("levels/"), ".txt"){;};
+        WorldList() : SimpleFileList(convertPath("worlds/"), ".txt"){;};
 };
 
 class BackgroundList : public SimpleFileList

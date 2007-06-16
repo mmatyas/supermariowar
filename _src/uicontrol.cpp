@@ -12,6 +12,7 @@ extern bool LoadMenuSkin(short playerID, short skinID, short colorID);
 extern bool __load_gfx(gfxSprite &g, const std::string& f);
 
 extern short iScoreboardPlayerOffsetsX[3][3];
+extern WorldMap g_worldmap;
 
 UI_Control::UI_Control(short x, short y)
 {
@@ -4104,4 +4105,193 @@ void MI_MapBrowser::LoadPage(short page, bool fUseFilters)
 		mapNames[iMap] = (*itr).first.c_str();
 		mapListItr[iMap] = itr;
 	}
+}
+
+
+/**************************************
+ * MI_World Class
+ **************************************/
+
+MI_World::MI_World(gfxSprite * pspr) :
+	UI_Control(0, 0)
+{
+	spr = pspr;
+
+	iAnimationTimer = 0;
+	iAnimationFrame = 0;
+
+	iPlayerX = 0;
+	iPlayerY = 0;
+	iPlayerCurrentTileX = 0;
+	iPlayerCurrentTileY = 0;
+	iPlayerDestTileX = 0;
+	iPlayerDestTileY = 0;
+
+	iControllingPlayer = 0;
+	iPlayerState = 0;
+}
+
+MI_World::~MI_World()
+{
+	
+}
+
+void MI_World::SetPlayerPosition(short iCol, short iRow)
+{
+	iPlayerCurrentTileX = iPlayerDestTileX = iCol;
+	iPlayerCurrentTileY = iPlayerDestTileY = iRow;
+	iPlayerX = iCol * TILESIZE;
+	iPlayerY = iRow * TILESIZE;
+}
+
+void MI_World::SetControllingPlayer(short iPlayerID)
+{
+	iControllingPlayer = iPlayerID;
+}
+
+void MI_World::Update()
+{
+	if(++iAnimationTimer > 7)
+	{
+		iAnimationTimer = 0;
+
+		if(++iAnimationFrame > 3)
+			iAnimationFrame = 0;
+	}
+
+	//Player is moving from one tile to the next (up)
+	if(iPlayerState == 1)
+	{
+		if(--iPlayerY <= iPlayerDestTileY * TILESIZE)
+		{
+			iPlayerY = iPlayerDestTileY * TILESIZE;
+			iPlayerState = 0;
+
+			iPlayerCurrentTileY = iPlayerDestTileY;
+		}
+	}
+	else if(iPlayerState == 2) //down
+	{
+		if(++iPlayerY >= iPlayerDestTileY * TILESIZE)
+		{
+			iPlayerY = iPlayerDestTileY * TILESIZE;
+			iPlayerState = 0;
+			iPlayerCurrentTileY = iPlayerDestTileY;
+		}
+	}
+	else if(iPlayerState == 3) //left
+	{
+		if(--iPlayerX <= iPlayerDestTileX * TILESIZE)
+		{
+			iPlayerX = iPlayerDestTileX * TILESIZE;
+			iPlayerState = 0;
+			iPlayerCurrentTileX = iPlayerDestTileX;
+		}
+	}
+	else if(iPlayerState == 4) //right
+	{
+		if(++iPlayerX >= iPlayerDestTileX * TILESIZE)
+		{
+			iPlayerX = iPlayerDestTileX * TILESIZE;
+			iPlayerState = 0;
+			iPlayerCurrentTileX = iPlayerDestTileX;
+		}
+	}
+
+}
+
+void MI_World::Draw()
+{
+	if(!fShow)
+		return;
+
+	short iCenterOffsetX = TILESIZE * ((20 - g_worldmap.iWidth) / 2);
+	short iCenterOffsetY = TILESIZE * ((15 - g_worldmap.iHeight) / 2);
+
+	for(short iRow = 0; iRow < g_worldmap.iHeight; iRow++)
+	{
+		for(short iCol = 0; iCol < g_worldmap.iWidth; iCol++)
+		{
+			SDL_Rect r = {iCol * TILESIZE + iCenterOffsetX, iRow * TILESIZE + iCenterOffsetY, TILESIZE, TILESIZE};
+			
+			if(g_worldmap.tiles[iCol][iRow].iSprite == 0)
+				SDL_FillRect(screen, &r, SDL_MapRGB(screen->format, 0, 0, 0));
+			else if(g_worldmap.tiles[iCol][iRow].iSprite == 1)
+				SDL_FillRect(screen, &r, SDL_MapRGB(screen->format, 0, 255, 255));
+			else if(g_worldmap.tiles[iCol][iRow].iSprite == 2)
+				SDL_FillRect(screen, &r, SDL_MapRGB(screen->format, 255, 255, 0));
+			else if(g_worldmap.tiles[iCol][iRow].iSprite == 3)
+				SDL_FillRect(screen, &r, SDL_MapRGB(screen->format, 0, 255, 0));
+			else if(g_worldmap.tiles[iCol][iRow].iSprite == 4)
+				SDL_FillRect(screen, &r, SDL_MapRGB(screen->format, 0, 0, 255));
+			else
+				SDL_FillRect(screen, &r, SDL_MapRGB(screen->format, 255, 255, 255));
+			
+		}
+	}
+
+	SDL_Rect rPlayer = {iPlayerX + iCenterOffsetX, iPlayerY + iCenterOffsetY, 32, 32};
+	SDL_FillRect(screen, &rPlayer, SDL_MapRGB(screen->format, 255, 0, 0));
+}
+
+MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
+{
+	for(short iPlayer = 0; iPlayer < 4; iPlayer++)
+	{
+		COutputControl * playerKeys = &game_values.playerInput.outputControls[iPlayer];
+
+		if(iControllingPlayer == iPlayer && iPlayerState == 0 && game_values.playercontrol[iPlayer] > 0) //if this player is player or cpu
+		{
+			if(playerKeys->menu_up.fPressed)
+			{
+				if(g_worldmap.tiles[iPlayerCurrentTileX][iPlayerCurrentTileY].fConnection[0])
+				{
+					iPlayerDestTileY--;
+					iPlayerState = 1;
+				}
+			}
+			else if(playerKeys->menu_down.fPressed)
+			{
+				if(g_worldmap.tiles[iPlayerCurrentTileX][iPlayerCurrentTileY].fConnection[1])
+				{
+					iPlayerDestTileY++;
+					iPlayerState = 2;
+				}
+			}
+			else if(playerKeys->menu_left.fPressed)
+			{
+				if(g_worldmap.tiles[iPlayerCurrentTileX][iPlayerCurrentTileY].fConnection[2])
+				{
+					iPlayerDestTileX--;
+					iPlayerState = 3;
+				}
+			}
+			else if(playerKeys->menu_right.fPressed)
+			{
+				if(g_worldmap.tiles[iPlayerCurrentTileX][iPlayerCurrentTileY].fConnection[3])
+				{
+					iPlayerDestTileX++;
+					iPlayerState = 4;
+				}
+			}
+		}
+
+		if(playerInput->outputControls[iPlayer].menu_select.fPressed)
+		{
+		}
+
+		if(playerInput->outputControls[iPlayer].menu_cancel.fPressed)
+		{
+			fModifying = false;
+			return MENU_CODE_UNSELECT_ITEM;
+		}
+	}
+
+	return MENU_CODE_NONE;
+}
+
+MenuCodeEnum MI_World::Modify(bool modify)
+{
+	fModifying = modify;
+	return MENU_CODE_MODIFY_ACCEPTED;
 }

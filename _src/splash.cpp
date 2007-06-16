@@ -469,6 +469,8 @@ bool LoadGameGraphics()
 	_load_gfxck(spr_abovearrows, convertPath("gfx/packs/eyecandy/abovearrows.png", graphicspack));
 	spr_abovearrows.SetWrap(true);
 
+	_load_gfxck(spr_overworld, convertPath("gfx/packs/tileset.png", graphicspack));
+
 	std::string tileSetTLS = convertPath("maps/tileset.tls");
 	std::string tileSetPNG[3];
 	tileSetPNG[0] = convertPath("gfx/packs/tileset.png", graphicspack);
@@ -740,7 +742,7 @@ bool LoadAndSplashScreen()
 			menu_version.draw(570, 10);	//smw logo
 
 			menu_font_large.setalpha((Uint8)alpha);
-			//menu_font_large.drawRightJustified(630, 45, "RC2");
+			menu_font_large.drawRightJustified(630, 45, "Alpha");
 
 			menu_credits.setalpha((Uint8)alpha);
 			menu_credits.draw(227, 200);

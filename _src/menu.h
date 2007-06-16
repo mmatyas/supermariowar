@@ -21,8 +21,8 @@ class ScriptOperation
 };
 #endif
 
-enum MatchType {MATCH_TYPE_SINGLE_GAME, MATCH_TYPE_TOURNAMENT, MATCH_TYPE_TOUR, MATCH_TYPE_LEVEL};
-enum DisplayError {DISPLAY_ERROR_NONE, DISPLAY_ERROR_READ_TOUR_FILE, DISPLAY_ERROR_MAP_FILTER};
+enum MatchType {MATCH_TYPE_SINGLE_GAME, MATCH_TYPE_TOURNAMENT, MATCH_TYPE_TOUR, MATCH_TYPE_WORLD};
+enum DisplayError {DISPLAY_ERROR_NONE, DISPLAY_ERROR_READ_TOUR_FILE, DISPLAY_ERROR_READ_WORLD_FILE, DISPLAY_ERROR_MAP_FILTER};
 
 class Menu
 {
@@ -65,7 +65,7 @@ class Menu
 		
 		MI_Image * miSMWTitle;
 		MI_Image * miSMWVersion;
-		//MI_Text * miSMWVersionText;
+		MI_Text * miSMWVersionText;
 	
 		MI_Button * miMainStartButton;
 		MI_PlayerSelect * miPlayerSelect;
@@ -264,11 +264,11 @@ class Menu
 		MI_Button * miSingleGameStartButton;
 		MI_Button * miTournamentStartButton;
 		MI_Button * miTourStartButton;
-		MI_Button * miLevelStartButton;
+		MI_Button * miWorldStartButton;
 
 		MI_SelectField * miTournamentField;
 		MI_SelectField * miTourField;
-		MI_SelectField * miLevelField;
+		MI_SelectField * miWorldField;
 
 		MI_Image * miMatchSelectionMenuLeftHeaderBar;
 		MI_Image * miMatchSelectionMenuRightHeaderBar;
@@ -314,7 +314,16 @@ class Menu
 		MI_Button * miTourStopExitDialogYesButton;
 		MI_Button * miTourStopExitDialogNoButton;
 
-		
+		//World "Menu"
+		UI_Menu mWorldMenu;
+		MI_World * miWorld;
+
+		MI_Image * miWorldExitDialogImage;
+		MI_Text * miWorldExitDialogExitTourText;
+		MI_Button * miWorldExitDialogYesButton;
+		MI_Button * miWorldExitDialogNoButton;
+
+
 		//Game Mode Settings Menu
 		UI_Menu mModeSettingsMenu[17];
 

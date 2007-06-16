@@ -46,6 +46,8 @@ extern short LookupTeamID(short id);
 extern char * g_szAutoFilterNames[NUM_AUTO_FILTERS];
 extern short g_iAutoFilterIcons[NUM_AUTO_FILTERS];
 
+extern WorldMap g_worldmap;
+
 void Menu::WriteGameOptions()
 {
 	FILE *fp;
@@ -179,7 +181,7 @@ void Menu::CreateMenu()
 
 	miSMWTitle = new MI_Image(&menu_smw, 320 - ((short)menu_smw.getWidth() >> 1), 30, 0, 0, 372, 140, 1, 1, 0);
 	miSMWVersion = new MI_Image(&menu_version, 570, 10, 0, 0, 58, 32, 1, 1, 0);
-	//miSMWVersionText = new MI_Text("RC2", 630, 45, 0, 2, 2);
+	miSMWVersionText = new MI_Text("Alpha", 630, 45, 0, 2, 2);
 	
 	miMainStartButton = new MI_Button(&spr_selectfield, 120, 210, "Start", 400, 0);
 	miMainStartButton->SetCode(MENU_CODE_TO_MATCH_SELECTION_MENU);
@@ -208,7 +210,7 @@ void Menu::CreateMenu()
 
 	mMainMenu.AddNonControl(miSMWTitle);
 	mMainMenu.AddNonControl(miSMWVersion);
-	//mMainMenu.AddNonControl(miSMWVersionText);
+	mMainMenu.AddNonControl(miSMWVersionText);
 
 	//***********************
 	// Player Control Select Menu
@@ -1023,8 +1025,8 @@ void Menu::CreateMenu()
 	miTourStartButton = new MI_Button(&spr_selectfield, 500, 300, "Start", 100, 0);
 	miTourStartButton->SetCode(MENU_CODE_TOUR_START);
 
-	miLevelStartButton = new MI_Button(&spr_selectfield, 500, 420, "Start", 100, 0);
-	miLevelStartButton->SetCode(MENU_CODE_LEVEL_START);
+	miWorldStartButton = new MI_Button(&spr_selectfield, 500, 420, "Start", 100, 0);
+	miWorldStartButton->SetCode(MENU_CODE_WORLD_START);
 
 	miTournamentField = new MI_SelectField(&spr_selectfield, 80, 180, "Wins", 380, 100);
 	miTournamentField->Add("2", 2, "", false, false);
@@ -1049,14 +1051,14 @@ void Menu::CreateMenu()
 	miTourField->SetData(&game_values.tourindex, NULL, NULL);
 	miTourField->SetKey(game_values.tourindex);
 
-	miLevelField = new MI_SelectField(&spr_selectfield, 80, 420, "Level", 380, 100);
-	for(short iLevel = 0; iLevel < levellist.GetCount(); iLevel++)
+	miWorldField = new MI_SelectField(&spr_selectfield, 80, 420, "World", 380, 100);
+	for(short iWorld = 0; iWorld < worldlist.GetCount(); iWorld++)
 	{
-		GetNameFromFileName(szTemp, levellist.GetIndex(iLevel));
-		miLevelField->Add(szTemp, iLevel, "", true, false);
+		GetNameFromFileName(szTemp, worldlist.GetIndex(iWorld));
+		miWorldField->Add(szTemp, iWorld, "", true, false);
 	}
-	miLevelField->SetData(&game_values.levelindex, NULL, NULL);
-	miLevelField->SetKey(game_values.levelindex);
+	miWorldField->SetData(&game_values.worldindex, NULL, NULL);
+	miWorldField->SetKey(game_values.worldindex);
 
 	miMatchSelectionMenuLeftHeaderBar = new MI_Image(&menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
 	miMatchSelectionMenuRightHeaderBar = new MI_Image(&menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
@@ -1066,13 +1068,13 @@ void Menu::CreateMenu()
 	mMatchSelectionMenu.AddNonControl(miMatchSelectionMenuRightHeaderBar);
 	mMatchSelectionMenu.AddNonControl(miMatchSelectionMenuHeaderText);
 
-	mMatchSelectionMenu.AddControl(miSingleGameStartButton, miLevelStartButton, miTournamentStartButton, miTournamentField, NULL);
+	mMatchSelectionMenu.AddControl(miSingleGameStartButton, miWorldStartButton, miTournamentStartButton, miTournamentField, NULL);
 	mMatchSelectionMenu.AddControl(miTournamentStartButton, miSingleGameStartButton, miTourStartButton, miTournamentField, NULL);
-	mMatchSelectionMenu.AddControl(miTourStartButton, miTournamentStartButton, miLevelStartButton, miTourField, NULL);
-	mMatchSelectionMenu.AddControl(miLevelStartButton, miTourStartButton, miSingleGameStartButton, miLevelField, NULL);
-	mMatchSelectionMenu.AddControl(miTournamentField, miLevelField, miTourField, NULL, miTournamentStartButton);
-	mMatchSelectionMenu.AddControl(miTourField, miTournamentField, miLevelField, NULL, miTourStartButton);
-	mMatchSelectionMenu.AddControl(miLevelField, miTourField, miTournamentField, NULL, miLevelStartButton);
+	mMatchSelectionMenu.AddControl(miTourStartButton, miTournamentStartButton, miWorldStartButton, miTourField, NULL);
+	mMatchSelectionMenu.AddControl(miWorldStartButton, miTourStartButton, miSingleGameStartButton, miWorldField, NULL);
+	mMatchSelectionMenu.AddControl(miTournamentField, miWorldField, miTourField, NULL, miTournamentStartButton);
+	mMatchSelectionMenu.AddControl(miTourField, miTournamentField, miWorldField, NULL, miTourStartButton);
+	mMatchSelectionMenu.AddControl(miWorldField, miTourField, miTournamentField, NULL, miWorldStartButton);
 
 	mMatchSelectionMenu.SetHeadControl(miSingleGameStartButton);
 	mMatchSelectionMenu.SetCancelCode(MENU_CODE_TO_MAIN_MENU);
@@ -1251,6 +1253,40 @@ void Menu::CreateMenu()
 
 	mTourStopMenu.SetHeadControl(miTourStop);
 	mTourStopMenu.SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
+
+
+	//***********************
+	// World Menu
+	//***********************
+	
+	miWorld = new MI_World(&spr_overworld);
+	miWorld->SetAutoModify(true);
+	
+	//Exit tour dialog box
+	miWorldExitDialogImage = new MI_Image(&spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
+	miWorldExitDialogExitTourText = new MI_Text("Exit World", 320, 205, 0, 2, 1);
+
+	miWorldExitDialogYesButton = new MI_Button(&spr_selectfield, 235, 250, "Yes", 80, 1);
+	miWorldExitDialogNoButton = new MI_Button(&spr_selectfield, 325, 250, "No", 80, 1);
+	
+	miWorldExitDialogYesButton->SetCode(MENU_CODE_EXIT_WORLD_YES);
+	miWorldExitDialogNoButton->SetCode(MENU_CODE_EXIT_WORLD_NO);
+
+	miWorldExitDialogImage->Show(false);
+	miWorldExitDialogExitTourText->Show(false);
+	miWorldExitDialogYesButton->Show(false);
+	miWorldExitDialogNoButton->Show(false);
+	
+	mWorldMenu.AddControl(miWorld, NULL, NULL, NULL, NULL);
+
+	mWorldMenu.AddNonControl(miWorldExitDialogImage);
+	mWorldMenu.AddNonControl(miWorldExitDialogExitTourText);
+
+	mWorldMenu.AddControl(miWorldExitDialogYesButton, NULL, NULL, NULL, miWorldExitDialogNoButton);
+	mWorldMenu.AddControl(miWorldExitDialogNoButton, NULL, NULL, miWorldExitDialogYesButton, NULL);
+
+	mWorldMenu.SetHeadControl(miWorld);
+	mWorldMenu.SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
 
 
 	//***********************
@@ -2401,9 +2437,9 @@ void Menu::RunMenu()
 				mCurrentMenu = &mTeamSelectMenu;
 				mCurrentMenu->ResetMenu();
 			}
-			else if(MENU_CODE_LEVEL_START == code)
+			else if(MENU_CODE_WORLD_START == code)
 			{
-				game_values.matchtype = MATCH_TYPE_LEVEL;
+				game_values.matchtype = MATCH_TYPE_WORLD;
 				miTeamSelect->Reset();
 				mCurrentMenu = &mTeamSelectMenu;
 				mCurrentMenu->ResetMenu();
@@ -2513,9 +2549,19 @@ void Menu::RunMenu()
 				{
 					miTournamentScoreboard->CreateScoreboard(score_cnt, game_values.tournamentgames, &menu_mode_large, false);
 				}
-				else if(game_values.matchtype == MATCH_TYPE_LEVEL)
+				else if(game_values.matchtype == MATCH_TYPE_WORLD)
 				{
-					//Level selected
+					if(!g_worldmap.Load())
+					{
+						iDisplayError = DISPLAY_ERROR_READ_WORLD_FILE;
+						iDisplayErrorTimer = 120;
+						fErrorReadingTourFile = true;
+					}
+					else
+					{
+						miWorld->SetControllingPlayer(0);
+						miWorld->SetPlayerPosition(g_worldmap.iStartX, g_worldmap.iStartY);
+					}
 				}
 
 				if(!fErrorReadingTourFile)
@@ -2554,9 +2600,10 @@ void Menu::RunMenu()
 						mCurrentMenu = &mTourStopMenu;
 						mCurrentMenu->ResetMenu();
 					}
-					else if(MATCH_TYPE_LEVEL == game_values.matchtype)
+					else if(MATCH_TYPE_WORLD == game_values.matchtype)
 					{
-
+						mCurrentMenu = &mWorldMenu;
+						mCurrentMenu->ResetMenu();
 					}
 
 					//Setup items on next menu
@@ -2565,7 +2612,11 @@ void Menu::RunMenu()
 						miGoalField[iGameMode]->HideItem(-1, game_values.matchtype == MATCH_TYPE_TOURNAMENT);
 					}
 
-					if(game_values.matchtype == MATCH_TYPE_TOURNAMENT || game_values.matchtype == MATCH_TYPE_TOUR)
+					if(game_values.matchtype == MATCH_TYPE_WORLD)
+						miGameSettingsMenuHeaderText->SetText("World Game Menu");
+					else if(game_values.matchtype == MATCH_TYPE_TOUR)
+						miGameSettingsMenuHeaderText->SetText("Tour Game Menu");
+					else if(game_values.matchtype == MATCH_TYPE_TOURNAMENT)
 						miGameSettingsMenuHeaderText->SetText("Tournament Game Menu");
 					else
 						miGameSettingsMenuHeaderText->SetText("Single Game Menu");
@@ -2616,7 +2667,20 @@ void Menu::RunMenu()
 			}
 			else if(MENU_CODE_BACK_TEAM_SELECT_MENU == code)
 			{
-				if(game_values.matchtype == MATCH_TYPE_TOUR)
+				if(game_values.matchtype == MATCH_TYPE_WORLD)
+				{
+					miWorldExitDialogImage->Show(true);
+					miWorldExitDialogExitTourText->Show(true);
+					miWorldExitDialogYesButton->Show(true);
+					miWorldExitDialogNoButton->Show(true);
+
+					mWorldMenu.RememberCurrent();
+
+					mWorldMenu.SetHeadControl(miWorldExitDialogNoButton);
+					mWorldMenu.SetCancelCode(MENU_CODE_NONE);
+					mWorldMenu.ResetMenu();
+				}
+				else if(game_values.matchtype == MATCH_TYPE_TOUR)
 				{
 					miTourStopExitDialogImage->Show(true);
 					miTourStopExitDialogExitTourText->Show(true);
@@ -2699,6 +2763,21 @@ void Menu::RunMenu()
 				mTourStopMenu.RestoreCurrent();
 
 				if(MENU_CODE_EXIT_TOUR_YES == code)
+					ResetTournamentBackToMainMenu();
+			}
+			else if(MENU_CODE_EXIT_WORLD_YES == code || MENU_CODE_EXIT_WORLD_NO == code)
+			{
+				miWorldExitDialogImage->Show(false);
+				miWorldExitDialogExitTourText->Show(false);
+				miWorldExitDialogYesButton->Show(false);
+				miWorldExitDialogNoButton->Show(false);
+
+				mWorldMenu.SetHeadControl(miWorld);
+				mWorldMenu.SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
+
+				mWorldMenu.RestoreCurrent();
+
+				if(MENU_CODE_EXIT_WORLD_YES == code)
 					ResetTournamentBackToMainMenu();
 			}
 			else if(MENU_CODE_BONUS_DONE == code)
@@ -2934,7 +3013,11 @@ void Menu::RunMenu()
 
 		//--------------- draw everything ----------------------
 
-		menu_backdrop.draw(0,0);
+		//Don't draw backdrop for world
+		if(mCurrentMenu != &mWorldMenu)
+			menu_backdrop.draw(0,0);
+		else
+			SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
 
 		mCurrentMenu->Update();
 		mCurrentMenu->Draw();
@@ -2946,6 +3029,8 @@ void Menu::RunMenu()
 
 			if(iDisplayError == DISPLAY_ERROR_READ_TOUR_FILE)
 				menu_font_large.drawCentered(320, 405, "Error Reading Tour File!");
+			if(iDisplayError == DISPLAY_ERROR_READ_WORLD_FILE)
+				menu_font_large.drawCentered(320, 405, "Error Reading World File!");
 			else if(iDisplayError == DISPLAY_ERROR_MAP_FILTER)
 				menu_font_large.drawCentered(320, 405, "No Maps Meet All Filter Conditions!");
 			
@@ -3574,7 +3659,7 @@ void Menu::ResetTournamentBackToMainMenu()
 	mCurrentMenu = &mMainMenu;
 	mCurrentMenu->ResetMenu();
 
-	if(game_values.matchtype == MATCH_TYPE_TOURNAMENT || game_values.matchtype == MATCH_TYPE_TOUR)
+	if(game_values.matchtype != MATCH_TYPE_SINGLE_GAME)
 	{
 		if(fNeedMenuMusicReset)
 		{

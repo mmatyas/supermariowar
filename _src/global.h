@@ -215,7 +215,7 @@ std::string stripCreatorAndDotMap(const std::string &filename);
 //#include "HashTable.h"
 #include "eyecandy.h"
 #include "gamemodes.h"
-#include "level.h"
+#include "world.h"
 
 
 //------------- global variables / etc -------------
@@ -393,6 +393,8 @@ extern gfxSprite		spr_powerupselector;
 extern gfxSprite		spr_scoreboard;
 extern gfxSprite		spr_abovearrows;
 
+extern gfxSprite		spr_overworld;
+
 #ifndef _SMW_EDITOR
 extern gfxFont			menu_font_small;
 extern gfxFont			menu_font_large;
@@ -465,7 +467,7 @@ extern GraphicsList menugraphicspacklist;
 extern GraphicsList gamegraphicspacklist;
 extern SoundsList soundpacklist;
 extern TourList tourlist;
-extern LevelList levellist;
+extern WorldList worldlist;
 extern FiltersList filterslist;
 
 extern CGameMode	*gamemodes[GAMEMODE_LAST];
@@ -665,7 +667,7 @@ struct gv
 	short		tourstoptotal;
 	std::vector<TourStop*> tourstops;
 	
-	short		levelindex;
+	short		worldindex;
 
 	short		slowdownon;
 	short		slowdowncounter;

@@ -347,6 +347,12 @@
 			<File
 				RelativePath="..\..\_src\uimenu.h">
 			</File>
+			<File
+				RelativePath="..\..\_src\world.cpp">
+			</File>
+			<File
+				RelativePath="..\..\_src\world.h">
+			</File>
 		</Filter>
 		<Filter
 			Name="sdl"
