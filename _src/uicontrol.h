@@ -895,12 +895,24 @@ class MI_World : public UI_Control
 		MenuCodeEnum SendInput(CPlayerInput * playerInput);
 		MenuCodeEnum Modify(bool modify);
 
+		void Init();
 		void SetPlayerPosition(short iCol, short iRow);
-		void SetControllingPlayer(short iPlayerID);
+		void SetControllingTeam(short iPlayerID);
+		void SetCurrentStageToCompleted();
 
 	private:
 
+		void RepositionMapImage();
+		void DrawWorldMapToSurface();
+
 		gfxSprite * spr;
+
+		SDL_Surface * sMapSurface;
+		SDL_Rect * rectSrcSurface;
+		SDL_Rect * rectDstSurface;
+
+		short iCenterOffsetX;
+		short iCenterOffsetY;
 
 		short iAnimationTimer;
 		short iAnimationFrame;
@@ -912,8 +924,12 @@ class MI_World : public UI_Control
 		short iPlayerDestTileX;
 		short iPlayerDestTileY;
 
-		short iControllingPlayer;
+		short iMapOffsetX;
+		short iMapOffsetY;
+
+		short iControllingTeam;
 		short iPlayerState;
+		short iReturnDirection;
 };
 
 

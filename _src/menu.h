@@ -317,6 +317,7 @@ class Menu
 		//World "Menu"
 		UI_Menu mWorldMenu;
 		MI_World * miWorld;
+		MI_TourStop * miWorldStop;
 
 		MI_Image * miWorldExitDialogImage;
 		MI_Text * miWorldExitDialogExitTourText;

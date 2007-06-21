@@ -544,6 +544,8 @@ void UpdateScoreBoard();
 void PlayNextMusicTrack();
 void EnterBossMode(short type);
 bool IsExitAllowed();
+void ResetTourStops();
+TourStop * ParseTourStopLine(char * buffer, short iVersion[4]);
 
 Menu g_Menu;
 gv game_values;
@@ -1421,7 +1423,7 @@ void RunGame()
 				{
 					endgametimer = (short)(rand() % 200);
 
-					if(game_values.matchtype == MATCH_TYPE_TOURNAMENT || game_values.matchtype == MATCH_TYPE_TOUR)
+					if(game_values.matchtype != MATCH_TYPE_SINGLE_GAME)
 						UpdateScoreBoard();
 
 					CleanUp();
@@ -1708,7 +1710,7 @@ void RunGame()
 				{
 					if(game_values.gamemode->gameover)
 					{
-						if(game_values.matchtype == MATCH_TYPE_TOURNAMENT || game_values.matchtype == MATCH_TYPE_TOUR)
+						if(game_values.matchtype != MATCH_TYPE_SINGLE_GAME)
 							UpdateScoreBoard();
 
 						CleanUp();
@@ -2814,8 +2816,18 @@ void CleanUp()
 
 void UpdateScoreBoard()
 {
-	if(game_values.matchtype == MATCH_TYPE_TOUR && game_values.gamemode->winningteam > -1)
+	/*if(game_values.matchtype == MATCH_TYPE_WORLD)
 	{
+		//If no one won, then nothing on the world map has changed
+		if(game_values.gamemode->winningteam < 0)
+			return;
+	}
+	else*/ if(game_values.matchtype == MATCH_TYPE_TOUR)
+	{
+		//If no one won (tied game), then there is no need to update the scores because nothing has changed
+		if(game_values.gamemode->winningteam < 0)
+			return;
+
 		//For this game, set the player's place as the type of win
 		for(short iScore = 0; iScore < score_cnt; iScore++)
 		{
@@ -3001,7 +3013,8 @@ bool coldec_obj2obj(CObject &o1, CObject &o2)
 void SetGameModeSettingsFromMenu()
 {
 	//If this is a tour stop and the tour has settings in it, use those.  Otherwise use the menu settings.
-	if(game_values.matchtype == MATCH_TYPE_TOUR && game_values.tourstops[game_values.tourstopcurrent]->fUseSettings)
+	if((game_values.matchtype == MATCH_TYPE_TOUR && game_values.tourstops[game_values.tourstopcurrent]->fUseSettings) || 
+		game_values.matchtype == MATCH_TYPE_WORLD)
 		memcpy(&game_values.gamemodesettings, &game_values.tourstops[game_values.tourstopcurrent]->gmsSettings, sizeof(GameModeSettings));
 	else
 		memcpy(&game_values.gamemodesettings, &game_values.gamemodemenusettings, sizeof(GameModeSettings));
@@ -3256,3 +3269,366 @@ bool IsExitAllowed()
 	return true;
 }
 
+void ResetTourStops()
+{
+	game_values.tourstopcurrent = 0;
+	game_values.tourstoptotal = 0;
+	
+	std::vector<TourStop*>::iterator iterateAll = game_values.tourstops.begin();
+	
+	while (iterateAll != game_values.tourstops.end())
+	{
+		delete *iterateAll;
+		iterateAll++;
+	}
+
+	game_values.tourstops.clear();
+}
+
+TourStop * ParseTourStopLine(char * buffer, short iVersion[4])
+{
+	TourStop * ts = new TourStop();
+	ts->fUseSettings = false;
+
+	char * pszMap = strtok(buffer, ",\n");
+
+	//Using the maplist to cheat and find a map for us
+	maplist.SaveCurrent();
+
+	//If that map is not found
+	if(!maplist.findexact(pszMap))
+		maplist.random(false);
+	
+	ts->pszMapFile = maplist.currentShortmapname();
+	maplist.ResumeCurrent();
+	
+	//Get iterations on this operation
+	char * pszTemp = strtok(NULL, ",\n");
+
+	if(pszTemp)
+		ts->iMode = atoi(pszTemp);
+	else
+		ts->iMode = -1;
+
+	if(ts->iMode < 0 || ts->iMode >= GAMEMODE_LAST)
+		ts->iMode = rand() % GAMEMODE_LAST;
+
+	pszTemp = strtok(NULL, ",\n");
+	
+	//This gets the closest game mode to what the tour has
+	if(pszTemp)
+	{
+		//If it is commented out, this will allow things like 33 coins, 17 kill goals, etc.
+		//ts->iGoal = gamemodes[ts->iMode]->GetClosestGoal(atoi(pszTemp));
+		ts->iGoal = atoi(pszTemp);
+		
+		//Default to unlimited if an invalid goal was used
+		if(ts->iGoal <= 0)
+			ts->iGoal = gamemodes[ts->iMode]->GetOptions()[rand() % (GAMEMODE_NUM_OPTIONS - 1)].iValue;
+	}
+	else
+	{
+		ts->iGoal = gamemodes[ts->iMode]->GetOptions()[rand() % (GAMEMODE_NUM_OPTIONS - 1)].iValue;
+	}
+
+	//Read in point value for tour stop
+	if(iVersion[0] == 1 && ((iVersion[1] == 7 && iVersion[2] == 0 && iVersion[3] > 1) || iVersion[1] > 7))
+	{
+		pszTemp = strtok(NULL, ",\n");
+
+		if(pszTemp)
+			ts->iPoints = atoi(pszTemp);
+		else
+			ts->iPoints = 1;
+
+		pszTemp = strtok(NULL, ",\n");
+
+		if(pszTemp)
+			ts->fBonusWheel = atoi(pszTemp) == 1;
+		else
+			ts->fBonusWheel = false;
+
+		pszTemp = strtok(NULL, ",\n");
+
+		if(pszTemp)
+		{
+			strncpy(ts->szName, pszTemp, 127);
+			ts->szName[127] = 0;
+		}
+		else
+		{
+			sprintf(ts->szName, "Tour Stop %d", game_values.tourstoptotal + 1);
+		}
+	}
+	else
+	{
+		ts->iPoints = 1;
+		ts->fBonusWheel = false;
+		sprintf(ts->szName, "Tour Stop %d", game_values.tourstoptotal + 1);
+	}
+
+	if(iVersion[0] == 1 && iVersion[1] >= 8)
+	{
+		//jail
+		if(ts->iMode == 3)
+		{
+			ts->fUseSettings = true;
+			
+			pszTemp = strtok(NULL, ",\n");
+			if(pszTemp)
+				ts->gmsSettings.jail.timetofree = atoi(pszTemp);
+			else
+				ts->gmsSettings.jail.timetofree = game_values.gamemodemenusettings.jail.timetofree;
+
+			pszTemp = strtok(NULL, ",\n");
+			if(pszTemp)
+				ts->gmsSettings.jail.tagfree = atoi(pszTemp) == 1;
+			else
+				ts->gmsSettings.jail.tagfree = game_values.gamemodemenusettings.jail.tagfree;
+		}
+		else if(ts->iMode == 4) //coins
+		{
+			ts->fUseSettings = true;
+			
+			pszTemp = strtok(NULL, ",\n");
+			if(pszTemp)
+				ts->gmsSettings.coins.penalty = atoi(pszTemp) == 1;
+			else
+				ts->gmsSettings.coins.penalty = game_values.gamemodemenusettings.coins.penalty;
+
+			pszTemp = strtok(NULL, ",\n");
+			if(pszTemp)
+				ts->gmsSettings.coins.quantity = atoi(pszTemp);
+			else
+				ts->gmsSettings.coins.quantity = game_values.gamemodemenusettings.coins.quantity;
+
+		}
+		else if(ts->iMode == 5) //stomp
+		{
+			ts->fUseSettings = true;
+			
+			pszTemp = strtok(NULL, ",\n");
+			if(pszTemp)
+				ts->gmsSettings.stomp.rate = atoi(pszTemp);
+			else
+				ts->gmsSettings.stomp.rate = game_values.gamemodemenusettings.stomp.rate;
+
+			for(int iEnemy = 0; iEnemy < 3; iEnemy++)
+			{
+				pszTemp = strtok(NULL, ",\n");
+				if(pszTemp)
+					ts->gmsSettings.stomp.enemyweight[iEnemy] = atoi(pszTemp);
+				else
+					ts->gmsSettings.stomp.enemyweight[iEnemy] = game_values.gamemodemenusettings.stomp.enemyweight[iEnemy];
+			}
+		}
+		else if(ts->iMode == 7) //capture the flag
+		{
+			ts->fUseSettings = true;
+			
+			pszTemp = strtok(NULL, ",\n");
+			if(pszTemp)
+				ts->gmsSettings.flag.speed = atoi(pszTemp);
+			else
+				ts->gmsSettings.flag.speed = game_values.gamemodemenusettings.flag.speed;
+
+			pszTemp = strtok(NULL, ",\n");
+			if(pszTemp)
+				ts->gmsSettings.flag.touchreturn = atoi(pszTemp) == 1;
+			else
+				ts->gmsSettings.flag.touchreturn = game_values.gamemodemenusettings.flag.touchreturn;
+
+			pszTemp = strtok(NULL, ",\n");
+			if(pszTemp)
+				ts->gmsSettings.flag.pointmove = atoi(pszTemp) == 1;
+			else
+				ts->gmsSettings.flag.pointmove = game_values.gamemodemenusettings.flag.pointmove;
+
+			pszTemp = strtok(NULL, ",\n");
+			if(pszTemp)
+				ts->gmsSettings.flag.autoreturn = atoi(pszTemp);
+			else
+				ts->gmsSettings.flag.autoreturn = game_values.gamemodemenusettings.flag.autoreturn;
+
+			pszTemp = strtok(NULL, ",\n");
+			if(pszTemp)
+				ts->gmsSettings.flag.homescore = atoi(pszTemp) == 1;
+			else
+				ts->gmsSettings.flag.homescore = game_values.gamemodemenusettings.flag.homescore;
+		}
+		else if(ts->iMode == 8) //chicken
+		{
+			ts->fUseSettings = true;
+			
+			pszTemp = strtok(NULL, ",\n");
+			if(pszTemp)
+				ts->gmsSettings.chicken.usetarget = atoi(pszTemp) == 1;
+			else
+				ts->gmsSettings.chicken.usetarget = game_values.gamemodemenusettings.chicken.usetarget;
+		}
+		else if(ts->iMode == 9) //tag
+		{
+			ts->fUseSettings = true;
+			
+			pszTemp = strtok(NULL, ",\n");
+			if(pszTemp)
+				ts->gmsSettings.tag.tagontouch = atoi(pszTemp) == 1;
+			else
+				ts->gmsSettings.tag.tagontouch = game_values.gamemodemenusettings.tag.tagontouch;
+		}
+		else if(ts->iMode == 10) //star
+		{
+			ts->fUseSettings = true;
+			
+			pszTemp = strtok(NULL, ",\n");
+			if(pszTemp)
+				ts->gmsSettings.star.time = atoi(pszTemp);
+			else
+				ts->gmsSettings.star.time = game_values.gamemodemenusettings.star.time;
+
+			pszTemp = strtok(NULL, ",\n");
+			if(pszTemp)
+				ts->gmsSettings.star.shine = atoi(pszTemp);
+			else
+				ts->gmsSettings.star.shine = game_values.gamemodemenusettings.star.shine;
+
+		}
+		else if(ts->iMode == 11) //domination
+		{
+			ts->fUseSettings = true;
+			
+			pszTemp = strtok(NULL, ",\n");
+			if(pszTemp)
+				ts->gmsSettings.domination.quantity = atoi(pszTemp);
+			else
+				ts->gmsSettings.domination.quantity = game_values.gamemodemenusettings.domination.quantity;
+
+			pszTemp = strtok(NULL, ",\n");
+			if(pszTemp)
+				ts->gmsSettings.domination.relocationfrequency = atoi(pszTemp);
+			else
+				ts->gmsSettings.domination.relocationfrequency = game_values.gamemodemenusettings.domination.relocationfrequency;
+
+			pszTemp = strtok(NULL, ",\n");
+			if(pszTemp)
+				ts->gmsSettings.domination.loseondeath = atoi(pszTemp) == 1;
+			else
+				ts->gmsSettings.domination.loseondeath = game_values.gamemodemenusettings.domination.loseondeath;
+
+			pszTemp = strtok(NULL, ",\n");
+			if(pszTemp)
+				ts->gmsSettings.domination.relocateondeath = atoi(pszTemp) == 1;
+			else
+				ts->gmsSettings.domination.relocateondeath = game_values.gamemodemenusettings.domination.relocateondeath;
+
+			pszTemp = strtok(NULL, ",\n");
+			if(pszTemp)
+				ts->gmsSettings.domination.stealondeath = atoi(pszTemp) == 1;
+			else
+				ts->gmsSettings.domination.stealondeath = game_values.gamemodemenusettings.domination.stealondeath;
+		}
+		else if(ts->iMode == 12) //king of the hill
+		{
+			ts->fUseSettings = true;
+			
+			pszTemp = strtok(NULL, ",\n");
+			if(pszTemp)
+				ts->gmsSettings.kingofthehill.areasize = atoi(pszTemp);
+			else
+				ts->gmsSettings.kingofthehill.areasize = game_values.gamemodemenusettings.kingofthehill.areasize;
+
+			pszTemp = strtok(NULL, ",\n");
+			if(pszTemp)
+				ts->gmsSettings.kingofthehill.relocationfrequency = atoi(pszTemp);
+			else
+				ts->gmsSettings.kingofthehill.relocationfrequency = game_values.gamemodemenusettings.kingofthehill.relocationfrequency;
+
+		}
+		else if(ts->iMode == 13) //race
+		{
+			ts->fUseSettings = true;
+			
+			pszTemp = strtok(NULL, ",\n");
+			if(pszTemp)
+				ts->gmsSettings.race.quantity = atoi(pszTemp);
+			else
+				ts->gmsSettings.race.quantity = game_values.gamemodemenusettings.race.quantity;
+
+			pszTemp = strtok(NULL, ",\n");
+			if(pszTemp)
+				ts->gmsSettings.race.speed = atoi(pszTemp);
+			else
+				ts->gmsSettings.race.speed = game_values.gamemodemenusettings.race.speed;
+
+			pszTemp = strtok(NULL, ",\n");
+			if(pszTemp)
+				ts->gmsSettings.race.penalty = atoi(pszTemp);
+			else
+				ts->gmsSettings.race.penalty = game_values.gamemodemenusettings.race.penalty;
+		}
+		else if(ts->iMode == 15) //frenzy
+		{
+			ts->fUseSettings = true;
+			
+			pszTemp = strtok(NULL, ",\n");
+			if(pszTemp)
+				ts->gmsSettings.frenzy.quantity = atoi(pszTemp);
+			else
+				ts->gmsSettings.frenzy.quantity = game_values.gamemodemenusettings.frenzy.quantity;
+
+			pszTemp = strtok(NULL, ",\n");
+			if(pszTemp)
+				ts->gmsSettings.frenzy.rate = atoi(pszTemp);
+			else
+				ts->gmsSettings.frenzy.rate = game_values.gamemodemenusettings.frenzy.rate;
+
+			pszTemp = strtok(NULL, ",\n");
+			if(pszTemp)
+				ts->gmsSettings.frenzy.storedshells = atoi(pszTemp) == 1;
+			else
+				ts->gmsSettings.frenzy.storedshells = game_values.gamemodemenusettings.frenzy.storedshells;
+
+			for(short iPowerup = 0; iPowerup < 12; iPowerup++)
+			{
+				pszTemp = strtok(NULL, ",\n");
+				if(pszTemp)
+					ts->gmsSettings.frenzy.powerupweight[iPowerup] = atoi(pszTemp);
+				else
+					ts->gmsSettings.frenzy.powerupweight[iPowerup] = game_values.gamemodemenusettings.frenzy.powerupweight[iPowerup];
+			}
+		}
+		else if(ts->iMode == 16) //survival
+		{
+			ts->fUseSettings = true;
+			
+			for(short iEnemy = 0; iEnemy < 12; iEnemy++)
+			{
+				pszTemp = strtok(NULL, ",\n");
+				if(pszTemp)
+					ts->gmsSettings.survival.enemyweight[iEnemy] = atoi(pszTemp);
+				else
+					ts->gmsSettings.survival.enemyweight[iEnemy] = game_values.gamemodemenusettings.survival.enemyweight[iEnemy];
+			}
+
+			pszTemp = strtok(NULL, ",\n");
+			if(pszTemp)
+				ts->gmsSettings.survival.density = atoi(pszTemp);
+			else
+				ts->gmsSettings.survival.density = game_values.gamemodemenusettings.survival.density;
+
+			pszTemp = strtok(NULL, ",\n");
+			if(pszTemp)
+				ts->gmsSettings.survival.speed = atoi(pszTemp);
+			else
+				ts->gmsSettings.survival.speed = game_values.gamemodemenusettings.survival.speed;
+
+			pszTemp = strtok(NULL, ",\n");
+			if(pszTemp)
+				ts->gmsSettings.survival.shield = atoi(pszTemp) == 1;
+			else
+				ts->gmsSettings.survival.shield = game_values.gamemodemenusettings.survival.shield;
+		}
+	}
+
+	return ts;
+}

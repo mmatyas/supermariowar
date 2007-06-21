@@ -1,5 +1,8 @@
 #include "global.h"
 
+extern void ResetTourStops();
+extern TourStop * ParseTourStopLine(char * buffer, short iVersion[4]);
+
 WorldMap::WorldMap()
 {
 	iWidth = 0;
@@ -15,6 +18,7 @@ WorldMap::~WorldMap()
 bool WorldMap::Load()
 {
 	Cleanup();
+	ResetTourStops();
 
 	FILE * file = fopen(worldlist.GetIndex(game_values.worldindex), "r");
 
@@ -25,6 +29,8 @@ bool WorldMap::Load()
 	short iReadType = 0;
 	short iVersion[4] = {0, 0, 0, 0};
 	short iMapTileReadRow = 0;
+	short iMaxStageNumber = 0;
+	short iCurrentStage = 0;
 	
 	while(fgets(buffer, 256, file))
 	{
@@ -176,24 +182,42 @@ bool WorldMap::Load()
 
 				WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
 				tile->iType = atoi(psz);
-		
+
+				if(tile->iType > iMaxStageNumber)
+					iMaxStageNumber = tile->iType;
+
 				if(tile->iType == 1)
 				{
 					iStartX = iMapTileReadCol;
 					iStartY = iMapTileReadRow;
 				}
+				
+				tile->fCompleted = tile->iType <= 1;
 
 				psz = strtok(NULL, ",\n");
 			}
 
 			if(++iMapTileReadRow == iHeight)
+			{
 				iReadType = 6;
+				iMaxStageNumber--;  //offset down by 1 because #1 is the start 
+			}
+		}
+		else if(iReadType == 6)
+		{
+			TourStop * ts = ParseTourStopLine(buffer, iVersion);
+		
+			game_values.tourstops.push_back(ts);
+			game_values.tourstoptotal++;
+
+			if(++iCurrentStage >= iMaxStageNumber)
+				iReadType = 7;
 		}
 	}
 
 	fclose(file);
 
-	return iReadType == 6;
+	return iReadType == 7;
 }
 
 bool WorldMap::Save(char * szFileName)

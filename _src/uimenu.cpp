@@ -108,6 +108,7 @@ MenuCodeEnum UI_Menu::SendInput(CPlayerInput * playerInput)
 
 	for(short iPlayer = 0; iPlayer < 4; iPlayer++)
 	{
+		//Only let player 1 on the keyboard control the menu
 		if(iPlayer != 0 && game_values.playerInput.inputControls[iPlayer]->iDevice == DEVICE_KEYBOARD)
 			continue;
 

@@ -13,6 +13,7 @@ extern bool __load_gfx(gfxSprite &g, const std::string& f);
 
 extern short iScoreboardPlayerOffsetsX[3][3];
 extern WorldMap g_worldmap;
+extern short LookupTeamID(short id);
 
 UI_Control::UI_Control(short x, short y)
 {
@@ -2606,6 +2607,9 @@ void MI_TourStop::Update()
 		
 void MI_TourStop::Draw()
 {
+	if(!fShow)
+		return;
+
 	miStartButton->Draw();
 
 	miModeField->Draw();
@@ -4117,9 +4121,6 @@ MI_World::MI_World(gfxSprite * pspr) :
 {
 	spr = pspr;
 
-	iAnimationTimer = 0;
-	iAnimationFrame = 0;
-
 	iPlayerX = 0;
 	iPlayerY = 0;
 	iPlayerCurrentTileX = 0;
@@ -4127,13 +4128,46 @@ MI_World::MI_World(gfxSprite * pspr) :
 	iPlayerDestTileX = 0;
 	iPlayerDestTileY = 0;
 
-	iControllingPlayer = 0;
-	iPlayerState = 0;
+	iControllingTeam = 0;
+	iReturnDirection = 0;
+
+	//sMapSurface = SDL_CreateRGBSurface(screen->flags, 768, 608, screen->format->BitsPerPixel, 0, 0, 0, 0);
+	sMapSurface = SDL_CreateRGBSurface(screen->flags, 960, 640, screen->format->BitsPerPixel, 0, 0, 0, 0);
+	
+	rectSrcSurface = new SDL_Rect();
+	rectSrcSurface->x = 0;
+	rectSrcSurface->y = 0;
+	rectSrcSurface->w = 640;
+	rectSrcSurface->h = 480;
+
+	rectDstSurface = new SDL_Rect();
+	rectDstSurface->x = 0;
+	rectDstSurface->y = 0;
+	rectDstSurface->w = 640;
+	rectDstSurface->h = 480;
 }
 
 MI_World::~MI_World()
 {
-	
+	SDL_FreeSurface(sMapSurface);
+	delete rectSrcSurface;
+	delete rectDstSurface;
+}
+
+void MI_World::Init()
+{
+	iAnimationTimer = 0;
+	iAnimationFrame = 0;
+
+	iPlayerState = 0;
+
+	iCenterOffsetX = TILESIZE * ((20 - g_worldmap.iWidth) / 2);
+	iCenterOffsetY = TILESIZE * ((15 - g_worldmap.iHeight) / 2);
+
+	iMapOffsetX = (640 - (g_worldmap.iWidth * TILESIZE)) >> 1;
+	iMapOffsetY = (480 - (g_worldmap.iHeight * TILESIZE)) >> 1;
+
+	DrawWorldMapToSurface();
 }
 
 void MI_World::SetPlayerPosition(short iCol, short iRow)
@@ -4144,9 +4178,16 @@ void MI_World::SetPlayerPosition(short iCol, short iRow)
 	iPlayerY = iRow * TILESIZE;
 }
 
-void MI_World::SetControllingPlayer(short iPlayerID)
+void MI_World::SetControllingTeam(short iTeamID)
 {
-	iControllingPlayer = iPlayerID;
+	iControllingTeam = iTeamID;
+}
+
+void MI_World::SetCurrentStageToCompleted()
+{
+	WorldMapTile * tile = &g_worldmap.tiles[iPlayerCurrentTileX][iPlayerCurrentTileY];
+	tile->iSprite = 2;
+	tile->fCompleted = true;
 }
 
 void MI_World::Update()
@@ -4157,47 +4198,127 @@ void MI_World::Update()
 
 		if(++iAnimationFrame > 3)
 			iAnimationFrame = 0;
+
+		//update background map surface
+		DrawWorldMapToSurface();
 	}
 
 	//Player is moving from one tile to the next (up)
 	if(iPlayerState == 1)
 	{
-		if(--iPlayerY <= iPlayerDestTileY * TILESIZE)
+		iPlayerY -= 2;
+		if(iPlayerY <= iPlayerDestTileY * TILESIZE)
 		{
 			iPlayerY = iPlayerDestTileY * TILESIZE;
 			iPlayerState = 0;
-
 			iPlayerCurrentTileY = iPlayerDestTileY;
+
+			RepositionMapImage();
 		}
+
+		if(iMapOffsetY < 0)
+			iMapOffsetY += 2;
 	}
 	else if(iPlayerState == 2) //down
 	{
-		if(++iPlayerY >= iPlayerDestTileY * TILESIZE)
+		iPlayerY += 2;
+		if(iPlayerY >= iPlayerDestTileY * TILESIZE)
 		{
 			iPlayerY = iPlayerDestTileY * TILESIZE;
 			iPlayerState = 0;
 			iPlayerCurrentTileY = iPlayerDestTileY;
+
+			RepositionMapImage();
 		}
+
+		if(iMapOffsetY > 480 - g_worldmap.iHeight * TILESIZE)
+			iMapOffsetY -= 2;
 	}
 	else if(iPlayerState == 3) //left
 	{
-		if(--iPlayerX <= iPlayerDestTileX * TILESIZE)
+		iPlayerX -= 2;
+		if(iPlayerX <= iPlayerDestTileX * TILESIZE)
 		{
 			iPlayerX = iPlayerDestTileX * TILESIZE;
 			iPlayerState = 0;
 			iPlayerCurrentTileX = iPlayerDestTileX;
+
+			RepositionMapImage();
 		}
+
+		if(iMapOffsetX < 0)
+			iMapOffsetX += 2;
 	}
 	else if(iPlayerState == 4) //right
 	{
-		if(++iPlayerX >= iPlayerDestTileX * TILESIZE)
+		iPlayerX += 2;
+		if(iPlayerX >= iPlayerDestTileX * TILESIZE)
 		{
 			iPlayerX = iPlayerDestTileX * TILESIZE;
 			iPlayerState = 0;
 			iPlayerCurrentTileX = iPlayerDestTileX;
+
+			RepositionMapImage();
 		}
+
+		if(iMapOffsetX > 640 - g_worldmap.iWidth * TILESIZE)
+			iMapOffsetX -= 2;
 	}
 
+}
+
+void MI_World::RepositionMapImage()
+{
+
+}
+
+void MI_World::DrawWorldMapToSurface()
+{
+	/*
+	short iStartRow = 0;
+	short iStartCol = 0;
+	short iEndRow = g_worldmap.iHeight;
+	short iEndCol = g_worldmap.iWidth;
+
+	if(g_worldmap.iHeight > 15)
+	{
+		iStartRow = (g_worldmap.iHeight - 15) / 2;
+		iEndRow = iStartRow + 15;
+	}
+
+	if(g_worldmap.iWidth > 20)
+	{
+		iStartCol = (g_worldmap.iWidth - 20) / 2;
+		iEndCol = iStartCol + 20;
+	}
+	*/
+
+	for(short iRow = 0; iRow < g_worldmap.iHeight; iRow++)
+	{
+		for(short iCol = 0; iCol < g_worldmap.iWidth; iCol++)
+		{
+			//SDL_Rect r = {iCol * TILESIZE + iMapOffsetX, iRow * TILESIZE + iMapOffsetY, TILESIZE, TILESIZE};
+			SDL_Rect r = {iCol * TILESIZE, iRow * TILESIZE, TILESIZE, TILESIZE};
+			
+			short iSprite = g_worldmap.tiles[iCol][iRow].iSprite;
+
+			if(iSprite == 0)
+				SDL_FillRect(sMapSurface, &r, SDL_MapRGB(sMapSurface->format, 64, 64, 64));
+			else if(iSprite == 1)
+				SDL_FillRect(sMapSurface, &r, SDL_MapRGB(sMapSurface->format, 0, 255, 255));
+			else if(iSprite == 2)
+				SDL_FillRect(sMapSurface, &r, SDL_MapRGB(sMapSurface->format, 255, 255, rand() % 256));
+			else if(iSprite == 3)
+				SDL_FillRect(sMapSurface, &r, SDL_MapRGB(sMapSurface->format, 0, 255, 0));
+			else if(iSprite == 4)
+				SDL_FillRect(sMapSurface, &r, SDL_MapRGB(sMapSurface->format, 0, 0, 255));
+			else if(iSprite == 5)
+				SDL_FillRect(sMapSurface, &r, SDL_MapRGB(sMapSurface->format, 255, 0, 255));
+			else
+				SDL_FillRect(sMapSurface, &r, SDL_MapRGB(sMapSurface->format, 255, 255, 255));
+			
+		}
+	}		
 }
 
 void MI_World::Draw()
@@ -4205,32 +4326,18 @@ void MI_World::Draw()
 	if(!fShow)
 		return;
 
-	short iCenterOffsetX = TILESIZE * ((20 - g_worldmap.iWidth) / 2);
-	short iCenterOffsetY = TILESIZE * ((15 - g_worldmap.iHeight) / 2);
+	rectSrcSurface->x = 0;
+	rectSrcSurface->y = 0;
+	rectSrcSurface->w = 960;
+	rectSrcSurface->h = 640;
 
-	for(short iRow = 0; iRow < g_worldmap.iHeight; iRow++)
-	{
-		for(short iCol = 0; iCol < g_worldmap.iWidth; iCol++)
-		{
-			SDL_Rect r = {iCol * TILESIZE + iCenterOffsetX, iRow * TILESIZE + iCenterOffsetY, TILESIZE, TILESIZE};
-			
-			if(g_worldmap.tiles[iCol][iRow].iSprite == 0)
-				SDL_FillRect(screen, &r, SDL_MapRGB(screen->format, 0, 0, 0));
-			else if(g_worldmap.tiles[iCol][iRow].iSprite == 1)
-				SDL_FillRect(screen, &r, SDL_MapRGB(screen->format, 0, 255, 255));
-			else if(g_worldmap.tiles[iCol][iRow].iSprite == 2)
-				SDL_FillRect(screen, &r, SDL_MapRGB(screen->format, 255, 255, 0));
-			else if(g_worldmap.tiles[iCol][iRow].iSprite == 3)
-				SDL_FillRect(screen, &r, SDL_MapRGB(screen->format, 0, 255, 0));
-			else if(g_worldmap.tiles[iCol][iRow].iSprite == 4)
-				SDL_FillRect(screen, &r, SDL_MapRGB(screen->format, 0, 0, 255));
-			else
-				SDL_FillRect(screen, &r, SDL_MapRGB(screen->format, 255, 255, 255));
-			
-		}
-	}
+	rectDstSurface->x = iMapOffsetX;
+	rectDstSurface->y = iMapOffsetY;
 
-	SDL_Rect rPlayer = {iPlayerX + iCenterOffsetX, iPlayerY + iCenterOffsetY, 32, 32};
+	SDL_BlitSurface(sMapSurface, rectSrcSurface, blitdest, rectDstSurface);
+
+	SDL_Rect rPlayer = {iPlayerX + iMapOffsetX, iPlayerY + iMapOffsetY, 32, 32};
+	//SDL_Rect rPlayer = {304, 224, 32, 32};
 	SDL_FillRect(screen, &rPlayer, SDL_MapRGB(screen->format, 255, 0, 0));
 }
 
@@ -4240,50 +4347,73 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 	{
 		COutputControl * playerKeys = &game_values.playerInput.outputControls[iPlayer];
 
-		if(iControllingPlayer == iPlayer && iPlayerState == 0 && game_values.playercontrol[iPlayer] > 0) //if this player is player or cpu
+		if(iControllingTeam == LookupTeamID(iPlayer) && iPlayerState == 0 && game_values.playercontrol[iPlayer] > 0) //if this player is player or cpu
 		{
+			WorldMapTile * tile = &g_worldmap.tiles[iPlayerCurrentTileX][iPlayerCurrentTileY];
+
 			if(playerKeys->menu_up.fPressed)
 			{
-				if(g_worldmap.tiles[iPlayerCurrentTileX][iPlayerCurrentTileY].fConnection[0])
+				if(tile->fConnection[0] &&
+					(tile->fCompleted || iReturnDirection == 0))
 				{
 					iPlayerDestTileY--;
 					iPlayerState = 1;
+					iReturnDirection = 1;
 				}
 			}
 			else if(playerKeys->menu_down.fPressed)
 			{
-				if(g_worldmap.tiles[iPlayerCurrentTileX][iPlayerCurrentTileY].fConnection[1])
+				if(tile->fConnection[1]&&
+					(tile->fCompleted || iReturnDirection == 1))
 				{
 					iPlayerDestTileY++;
 					iPlayerState = 2;
+					iReturnDirection = 0;
 				}
 			}
 			else if(playerKeys->menu_left.fPressed)
 			{
-				if(g_worldmap.tiles[iPlayerCurrentTileX][iPlayerCurrentTileY].fConnection[2])
+				if(tile->fConnection[2]&&
+					(tile->fCompleted || iReturnDirection == 2))
 				{
 					iPlayerDestTileX--;
 					iPlayerState = 3;
+					iReturnDirection = 3;
 				}
 			}
 			else if(playerKeys->menu_right.fPressed)
 			{
-				if(g_worldmap.tiles[iPlayerCurrentTileX][iPlayerCurrentTileY].fConnection[3])
+				if(tile->fConnection[3]&&
+					(tile->fCompleted || iReturnDirection == 3))
 				{
 					iPlayerDestTileX++;
 					iPlayerState = 4;
+					iReturnDirection = 2;
+				}
+			}
+			else if(playerInput->outputControls[iPlayer].menu_select.fPressed)
+			{
+				//Lookup current tile and see if it is a type of tile you can interact with
+
+				//if it is a stage, then load the stage
+				WorldMapTile * tile = &g_worldmap.tiles[iPlayerCurrentTileX][iPlayerCurrentTileY];
+				short iType = tile->iType - 2;
+				if(iType >= 0 && !tile->fCompleted)
+				{
+					game_values.tourstopcurrent = iType;
+					return MENU_CODE_WORLD_STAGE_START;
 				}
 			}
 		}
 
-		if(playerInput->outputControls[iPlayer].menu_select.fPressed)
-		{
-		}
-
+		
 		if(playerInput->outputControls[iPlayer].menu_cancel.fPressed)
 		{
-			fModifying = false;
-			return MENU_CODE_UNSELECT_ITEM;
+			if(DEVICE_KEYBOARD != playerInput->inputControls[iPlayer]->iDevice || iPlayer == 0)
+			{
+				fModifying = false;
+				return MENU_CODE_UNSELECT_ITEM;
+			}
 		}
 	}
 

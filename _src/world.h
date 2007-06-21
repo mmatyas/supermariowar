@@ -7,7 +7,9 @@ struct WorldMapTile
 	short iSprite;
 
 	short iConnectionType;
-	bool fConnection[4];		
+	bool fConnection[4];
+
+	bool fCompleted;
 };
 
 class WorldMap

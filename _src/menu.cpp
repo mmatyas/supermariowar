@@ -46,7 +46,10 @@ extern short LookupTeamID(short id);
 extern char * g_szAutoFilterNames[NUM_AUTO_FILTERS];
 extern short g_iAutoFilterIcons[NUM_AUTO_FILTERS];
 
+extern void ResetTourStops();
 extern WorldMap g_worldmap;
+
+extern TourStop * ParseTourStopLine(char * buffer, short iVersion[4]);
 
 void Menu::WriteGameOptions()
 {
@@ -1262,6 +1265,9 @@ void Menu::CreateMenu()
 	miWorld = new MI_World(&spr_overworld);
 	miWorld->SetAutoModify(true);
 	
+	miWorldStop = new MI_TourStop(70, 45);
+	miWorldStop->Show(false);
+
 	//Exit tour dialog box
 	miWorldExitDialogImage = new MI_Image(&spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
 	miWorldExitDialogExitTourText = new MI_Text("Exit World", 320, 205, 0, 2, 1);
@@ -1284,6 +1290,8 @@ void Menu::CreateMenu()
 
 	mWorldMenu.AddControl(miWorldExitDialogYesButton, NULL, NULL, NULL, miWorldExitDialogNoButton);
 	mWorldMenu.AddControl(miWorldExitDialogNoButton, NULL, NULL, miWorldExitDialogYesButton, NULL);
+
+	mWorldMenu.AddControl(miWorldStop, NULL, NULL, NULL, NULL);
 
 	mWorldMenu.SetHeadControl(miWorld);
 	mWorldMenu.SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
@@ -2218,7 +2226,25 @@ void Menu::RunMenu()
 		mCurrentMenu = &mTournamentScoreboardMenu;
 	}
 	
-	if(game_values.matchtype == MATCH_TYPE_TOUR)
+	if(game_values.matchtype == MATCH_TYPE_WORLD)
+	{
+		if(game_values.gamemode->winningteam > -1 && game_values.tournamentwinner == -1)
+		{
+			miWorld->SetControllingTeam(game_values.gamemode->winningteam);
+			miWorld->SetCurrentStageToCompleted();
+
+			miWorldStop->Show(false);
+
+			mWorldMenu.SetHeadControl(miWorld);
+			mWorldMenu.SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
+
+			mWorldMenu.RestoreCurrent();
+		}
+
+		if(game_values.tourstopcurrent < game_values.tourstoptotal)
+			miTourStop->Refresh(game_values.tourstopcurrent);
+	}
+	else if(game_values.matchtype == MATCH_TYPE_TOUR)
 	{
 		miTournamentScoreboard->RefreshScores();
 
@@ -2559,7 +2585,8 @@ void Menu::RunMenu()
 					}
 					else
 					{
-						miWorld->SetControllingPlayer(0);
+						miWorld->Init();
+						miWorld->SetControllingTeam(rand() % score_cnt);
 						miWorld->SetPlayerPosition(g_worldmap.iStartX, g_worldmap.iStartY);
 					}
 				}
@@ -2902,6 +2929,26 @@ void Menu::RunMenu()
 					game_values.musicvolume = 0;
 				}
 			}
+			else if (MENU_CODE_WORLD_STAGE_START == code)
+			{
+				miWorldStop->Refresh(game_values.tourstopcurrent);
+				miWorldStop->Show(true);
+
+				mWorldMenu.RememberCurrent();
+
+				mWorldMenu.SetHeadControl(miWorldStop);
+				mWorldMenu.SetCancelCode(MENU_CODE_WORLD_STAGE_NO_START);
+				mWorldMenu.ResetMenu();
+			}
+			else if (MENU_CODE_WORLD_STAGE_NO_START == code)
+			{
+				miWorldStop->Show(false);
+
+				mWorldMenu.SetHeadControl(miWorld);
+				mWorldMenu.SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
+
+				mWorldMenu.RestoreCurrent();
+			}
 			else if (MENU_CODE_TOUR_STOP_CONTINUE == code)
 			{
 				short iGameMode = game_values.tourstops[game_values.tourstopcurrent]->iMode;
@@ -3158,11 +3205,7 @@ void Menu::RunMenu()
 
 bool Menu::ReadTourFile()
 {
-	game_values.tourstopcurrent = 0;
-	game_values.tourstoptotal = 0;
-	
-	//FIXME:: Doesn't this just dump the reference to that memory and not delete it?
-	game_values.tourstops.clear();
+	ResetTourStops();
 
 	FILE * fp = fopen(tourlist.GetIndex(game_values.tourindex), "r");
 
@@ -3197,348 +3240,7 @@ bool Menu::ReadTourFile()
 			continue;
 		}
 
-		TourStop * ts = new TourStop();
-		ts->fUseSettings = false;
-
-		char * pszMap = strtok(buffer, ",\n");
-
-		//Using the maplist to cheat and find a map for us
-		maplist.SaveCurrent();
-
-		//If that map is not found
-		if(!maplist.findexact(pszMap))
-			maplist.random(false);
-		
-		ts->pszMapFile = maplist.currentShortmapname();
-		maplist.ResumeCurrent();
-		
-		//Get iterations on this operation
-		char * pszTemp = strtok(NULL, ",\n");
-
-		if(pszTemp)
-			ts->iMode = atoi(pszTemp);
-		else
-			ts->iMode = -1;
-
-		if(ts->iMode < 0 || ts->iMode >= GAMEMODE_LAST)
-			ts->iMode = rand() % GAMEMODE_LAST;
-
-		pszTemp = strtok(NULL, ",\n");
-		
-		//This gets the closest game mode to what the tour has
-		if(pszTemp)
-		{
-			//If it is commented out, this will allow things like 33 coins, 17 kill goals, etc.
-			//ts->iGoal = gamemodes[ts->iMode]->GetClosestGoal(atoi(pszTemp));
-			ts->iGoal = atoi(pszTemp);
-			
-			//Default to unlimited if an invalid goal was used
-			if(ts->iGoal <= 0)
-				ts->iGoal = gamemodes[ts->iMode]->GetOptions()[rand() % (GAMEMODE_NUM_OPTIONS - 1)].iValue;
-		}
-		else
-		{
-			ts->iGoal = gamemodes[ts->iMode]->GetOptions()[rand() % (GAMEMODE_NUM_OPTIONS - 1)].iValue;
-		}
-
-		//Read in point value for tour stop
-		if(iVersion[0] == 1 && ((iVersion[1] == 7 && iVersion[2] == 0 && iVersion[3] > 1) || iVersion[1] > 7))
-		{
-			pszTemp = strtok(NULL, ",\n");
-
-			if(pszTemp)
-				ts->iPoints = atoi(pszTemp);
-			else
-				ts->iPoints = 1;
-
-			pszTemp = strtok(NULL, ",\n");
-
-			if(pszTemp)
-				ts->fBonusWheel = atoi(pszTemp) == 1;
-			else
-				ts->fBonusWheel = false;
-
-			pszTemp = strtok(NULL, ",\n");
-
-			if(pszTemp)
-			{
-				strncpy(ts->szName, pszTemp, 127);
-				ts->szName[127] = 0;
-			}
-			else
-			{
-				sprintf(ts->szName, "Tour Stop %d", game_values.tourstoptotal + 1);
-			}
-		}
-		else
-		{
-			ts->iPoints = 1;
-			ts->fBonusWheel = false;
-			sprintf(ts->szName, "Tour Stop %d", game_values.tourstoptotal + 1);
-		}
-
-		if(iVersion[0] == 1 && iVersion[1] >= 8)
-		{
-			//jail
-			if(ts->iMode == 3)
-			{
-				ts->fUseSettings = true;
-				
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.jail.timetofree = atoi(pszTemp);
-				else
-					ts->gmsSettings.jail.timetofree = game_values.gamemodemenusettings.jail.timetofree;
-
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.jail.tagfree = atoi(pszTemp) == 1;
-				else
-					ts->gmsSettings.jail.tagfree = game_values.gamemodemenusettings.jail.tagfree;
-			}
-			else if(ts->iMode == 4) //coins
-			{
-				ts->fUseSettings = true;
-				
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.coins.penalty = atoi(pszTemp) == 1;
-				else
-					ts->gmsSettings.coins.penalty = game_values.gamemodemenusettings.coins.penalty;
-
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.coins.quantity = atoi(pszTemp);
-				else
-					ts->gmsSettings.coins.quantity = game_values.gamemodemenusettings.coins.quantity;
-
-			}
-			else if(ts->iMode == 5) //stomp
-			{
-				ts->fUseSettings = true;
-				
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.stomp.rate = atoi(pszTemp);
-				else
-					ts->gmsSettings.stomp.rate = game_values.gamemodemenusettings.stomp.rate;
-
-				for(int iEnemy = 0; iEnemy < 3; iEnemy++)
-				{
-					pszTemp = strtok(NULL, ",\n");
-					if(pszTemp)
-						ts->gmsSettings.stomp.enemyweight[iEnemy] = atoi(pszTemp);
-					else
-						ts->gmsSettings.stomp.enemyweight[iEnemy] = game_values.gamemodemenusettings.stomp.enemyweight[iEnemy];
-				}
-			}
-			else if(ts->iMode == 7) //capture the flag
-			{
-				ts->fUseSettings = true;
-				
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.flag.speed = atoi(pszTemp);
-				else
-					ts->gmsSettings.flag.speed = game_values.gamemodemenusettings.flag.speed;
-
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.flag.touchreturn = atoi(pszTemp) == 1;
-				else
-					ts->gmsSettings.flag.touchreturn = game_values.gamemodemenusettings.flag.touchreturn;
-
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.flag.pointmove = atoi(pszTemp) == 1;
-				else
-					ts->gmsSettings.flag.pointmove = game_values.gamemodemenusettings.flag.pointmove;
-
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.flag.autoreturn = atoi(pszTemp);
-				else
-					ts->gmsSettings.flag.autoreturn = game_values.gamemodemenusettings.flag.autoreturn;
-
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.flag.homescore = atoi(pszTemp) == 1;
-				else
-					ts->gmsSettings.flag.homescore = game_values.gamemodemenusettings.flag.homescore;
-			}
-			else if(ts->iMode == 8) //chicken
-			{
-				ts->fUseSettings = true;
-				
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.chicken.usetarget = atoi(pszTemp) == 1;
-				else
-					ts->gmsSettings.chicken.usetarget = game_values.gamemodemenusettings.chicken.usetarget;
-			}
-			else if(ts->iMode == 9) //tag
-			{
-				ts->fUseSettings = true;
-				
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.tag.tagontouch = atoi(pszTemp) == 1;
-				else
-					ts->gmsSettings.tag.tagontouch = game_values.gamemodemenusettings.tag.tagontouch;
-			}
-			else if(ts->iMode == 10) //star
-			{
-				ts->fUseSettings = true;
-				
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.star.time = atoi(pszTemp);
-				else
-					ts->gmsSettings.star.time = game_values.gamemodemenusettings.star.time;
-
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.star.shine = atoi(pszTemp);
-				else
-					ts->gmsSettings.star.shine = game_values.gamemodemenusettings.star.shine;
-
-			}
-			else if(ts->iMode == 11) //domination
-			{
-				ts->fUseSettings = true;
-				
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.domination.quantity = atoi(pszTemp);
-				else
-					ts->gmsSettings.domination.quantity = game_values.gamemodemenusettings.domination.quantity;
-
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.domination.relocationfrequency = atoi(pszTemp);
-				else
-					ts->gmsSettings.domination.relocationfrequency = game_values.gamemodemenusettings.domination.relocationfrequency;
-
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.domination.loseondeath = atoi(pszTemp) == 1;
-				else
-					ts->gmsSettings.domination.loseondeath = game_values.gamemodemenusettings.domination.loseondeath;
-
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.domination.relocateondeath = atoi(pszTemp) == 1;
-				else
-					ts->gmsSettings.domination.relocateondeath = game_values.gamemodemenusettings.domination.relocateondeath;
-
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.domination.stealondeath = atoi(pszTemp) == 1;
-				else
-					ts->gmsSettings.domination.stealondeath = game_values.gamemodemenusettings.domination.stealondeath;
-			}
-			else if(ts->iMode == 12) //king of the hill
-			{
-				ts->fUseSettings = true;
-				
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.kingofthehill.areasize = atoi(pszTemp);
-				else
-					ts->gmsSettings.kingofthehill.areasize = game_values.gamemodemenusettings.kingofthehill.areasize;
-
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.kingofthehill.relocationfrequency = atoi(pszTemp);
-				else
-					ts->gmsSettings.kingofthehill.relocationfrequency = game_values.gamemodemenusettings.kingofthehill.relocationfrequency;
-
-			}
-			else if(ts->iMode == 13) //race
-			{
-				ts->fUseSettings = true;
-				
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.race.quantity = atoi(pszTemp);
-				else
-					ts->gmsSettings.race.quantity = game_values.gamemodemenusettings.race.quantity;
-
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.race.speed = atoi(pszTemp);
-				else
-					ts->gmsSettings.race.speed = game_values.gamemodemenusettings.race.speed;
-
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.race.penalty = atoi(pszTemp);
-				else
-					ts->gmsSettings.race.penalty = game_values.gamemodemenusettings.race.penalty;
-			}
-			else if(ts->iMode == 15) //frenzy
-			{
-				ts->fUseSettings = true;
-				
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.frenzy.quantity = atoi(pszTemp);
-				else
-					ts->gmsSettings.frenzy.quantity = game_values.gamemodemenusettings.frenzy.quantity;
-
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.frenzy.rate = atoi(pszTemp);
-				else
-					ts->gmsSettings.frenzy.rate = game_values.gamemodemenusettings.frenzy.rate;
-
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.frenzy.storedshells = atoi(pszTemp) == 1;
-				else
-					ts->gmsSettings.frenzy.storedshells = game_values.gamemodemenusettings.frenzy.storedshells;
-
-				for(short iPowerup = 0; iPowerup < 12; iPowerup++)
-				{
-					pszTemp = strtok(NULL, ",\n");
-					if(pszTemp)
-						ts->gmsSettings.frenzy.powerupweight[iPowerup] = atoi(pszTemp);
-					else
-						ts->gmsSettings.frenzy.powerupweight[iPowerup] = game_values.gamemodemenusettings.frenzy.powerupweight[iPowerup];
-				}
-			}
-			else if(ts->iMode == 16) //survival
-			{
-				ts->fUseSettings = true;
-				
-				for(short iEnemy = 0; iEnemy < 12; iEnemy++)
-				{
-					pszTemp = strtok(NULL, ",\n");
-					if(pszTemp)
-						ts->gmsSettings.survival.enemyweight[iEnemy] = atoi(pszTemp);
-					else
-						ts->gmsSettings.survival.enemyweight[iEnemy] = game_values.gamemodemenusettings.survival.enemyweight[iEnemy];
-				}
-
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.survival.density = atoi(pszTemp);
-				else
-					ts->gmsSettings.survival.density = game_values.gamemodemenusettings.survival.density;
-
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.survival.speed = atoi(pszTemp);
-				else
-					ts->gmsSettings.survival.speed = game_values.gamemodemenusettings.survival.speed;
-
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.survival.shield = atoi(pszTemp) == 1;
-				else
-					ts->gmsSettings.survival.shield = game_values.gamemodemenusettings.survival.shield;
-			}
-		}
+		TourStop * ts = ParseTourStopLine(buffer, iVersion);
 		
 		game_values.tourstops.push_back(ts);
 		game_values.tourstoptotal++;
