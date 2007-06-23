@@ -7,7 +7,8 @@ COMMON_OBJS:=build/MapList.o build/SFont.o build/dirlist.o \
            build/savepng.o
 SMW_OBJS:= build/HashTable.o build/ai.o build/gamemodes.o build/main.o \
            build/map.o build/menu.o build/object.o build/player.o \
-           build/sfx.o build/splash.o build/uicontrol.o build/uimenu.o
+           build/sfx.o build/splash.o build/uicontrol.o build/uimenu.o \
+           build/world.o
 LEVELEDIT_OBJS:=build/leveleditor.o
 
 include configuration
