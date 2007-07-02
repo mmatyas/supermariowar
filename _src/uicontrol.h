@@ -655,7 +655,7 @@ class MI_TourStop : public UI_Control
 {
 	public:
 
-		MI_TourStop(short x, short y);
+		MI_TourStop(short x, short y, bool fWorld);
 		virtual ~MI_TourStop();
 
 		MenuCodeEnum Modify(bool fModify);
@@ -672,9 +672,14 @@ class MI_TourStop : public UI_Control
 		MI_MapField * miMapField;
 		MI_Button * miStartButton;
 
+		MI_SelectField * miBonusField;
+		MI_Image * miEndStageImage;
+
 		MI_Image * miTourStopLeftHeaderBar;
 		MI_Image * miTourStopMenuRightHeaderBar;
 		MI_Text * miTourStopMenuHeaderText;
+
+		bool fIsWorld;
 };
 
 class MI_TournamentScoreboard : public UI_Control
@@ -895,8 +900,7 @@ class MI_World : public UI_Control
 		MenuCodeEnum SendInput(CPlayerInput * playerInput);
 		MenuCodeEnum Modify(bool modify);
 
-		void Init();
-		void SetPlayerPosition(short iCol, short iRow);
+		void Init(short iCol, short iRow);
 		void SetControllingTeam(short iPlayerID);
 		void SetCurrentStageToCompleted();
 
@@ -911,9 +915,6 @@ class MI_World : public UI_Control
 		SDL_Rect * rectSrcSurface;
 		SDL_Rect * rectDstSurface;
 
-		short iCenterOffsetX;
-		short iCenterOffsetY;
-
 		short iAnimationTimer;
 		short iAnimationFrame;
 
@@ -927,9 +928,15 @@ class MI_World : public UI_Control
 		short iMapOffsetX;
 		short iMapOffsetY;
 
+		short iMapDrawOffsetCol;
+		short iMapDrawOffsetRow;
+			
 		short iControllingTeam;
 		short iPlayerState;
 		short iReturnDirection;
+
+		short iMessageTimer;
+		char szMessage[128];
 };
 
 

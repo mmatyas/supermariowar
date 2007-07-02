@@ -311,7 +311,6 @@ sfxSound sfx_stun;
 
 sfxMusic backgroundmusic[5];
 
-CGM_Boss	*bossgamemode;
 CGameMode	*gamemodes[GAMEMODE_LAST];
 short		currentgamemode = 0;
 
@@ -440,7 +439,7 @@ void CleanDeadPlayers()
 		}
 	}
 
-	if(fCheckForGameOver && game_values.gamemode->gamemode != game_mode_boss)
+	if(fCheckForGameOver && (game_values.matchtype != MATCH_TYPE_WORLD || game_values.tourstops[game_values.tourstopcurrent]->iBonusType > 0))
 	{
 		short lastteam = -1;
 		if(!game_values.gamemode->gameover && CountAliveTeams(&lastteam) <= 1)
@@ -545,7 +544,7 @@ void PlayNextMusicTrack();
 void EnterBossMode(short type);
 bool IsExitAllowed();
 void ResetTourStops();
-TourStop * ParseTourStopLine(char * buffer, short iVersion[4]);
+TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld);
 
 Menu g_Menu;
 gv game_values;
@@ -776,8 +775,6 @@ int main(int argc, char *argv[])
 	gamemodes[14] = new CGM_Owned();
 	gamemodes[15] = new CGM_Frenzy();
 	gamemodes[16] = new CGM_Survival();
-
-	bossgamemode = new CGM_Boss();
 
 	currentgamemode = 0;
 	game_values.gamemode = gamemodes[currentgamemode];
@@ -1188,7 +1185,7 @@ void RunGame()
 			game_values.storedpowerups[iPlayer] = -1;
 		}
 
-		game_values.gamepowerups[iPlayer] = (game_values.gamemode->gamemode == game_mode_boss ? -1 : game_values.storedpowerups[iPlayer]);
+		game_values.gamepowerups[iPlayer] = game_values.storedpowerups[iPlayer];
 		game_values.bulletbilltimer[iPlayer] = 0;
 		game_values.bulletbillhoming[iPlayer] = false;
 		game_values.bulletbillspawntimer[iPlayer] = 0;
@@ -1214,9 +1211,8 @@ void RunGame()
 	game_values.screenfade = 255;
 	game_values.screenfadespeed = -8;
 	game_values.redkoopas = false;
-	game_values.bosspeeking = -1;
 	game_values.noexit = false;
-	game_values.enemyhammerkills = 0;
+	game_values.noexittimer = 0;
 
 	short totalspace = 0;
 	for(i = 0; i < score_cnt; i++)
@@ -1549,57 +1545,21 @@ void RunGame()
 					}
 					else if(event.key.keysym.sym == SDLK_4)
 					{
-						if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-						{
-							if(!game_values.gamemode->gameover && game_values.bosspeeking == -1)
-							{
-								eyecandyfront.add(new EC_BossPeeker(&spr_sledgebrothers, rand()%90 + 90, 0));
-								
-								backgroundmusic[0].stop();
-								ifsoundonstop(sfx_invinciblemusic);
-								ifsoundonstop(sfx_timewarning);
-								ifsoundonplay(sfx_bowserlaugh);
-							}
-						}
-						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
+						if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
 							objectsplayer.add(new CO_Shell(0, list_players[0]->ix + 32, list_players[0]->iy, true, true, true, false));
 						else
 							objectcollisionitems.add(new PU_ExtraGuyPowerup(&spr_3uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 32000, 30, 30, 1, 1, 3));
 					}
 					else if(event.key.keysym.sym == SDLK_5)
 					{
-						if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-						{
-							if(!game_values.gamemode->gameover && game_values.bosspeeking == -1)
-							{
-								eyecandyfront.add(new EC_BossPeeker(&spr_sledgebrothers, rand()%90 + 90, 1));
-								
-								backgroundmusic[0].stop();
-								ifsoundonstop(sfx_invinciblemusic);
-								ifsoundonstop(sfx_timewarning);
-								ifsoundonplay(sfx_bowserlaugh);
-							}
-						}
-						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
+						if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
 							objectsplayer.add(new CO_Shell(1, list_players[0]->ix + 32, list_players[0]->iy, false, true, true, false));
 						else
 							objectcollisionitems.add(new PU_ExtraGuyPowerup(&spr_5uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 32000, 30, 30, 1, 1, 5));
 					}
 					else if(event.key.keysym.sym == SDLK_6)
 					{
-						if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-						{
-							if(!game_values.gamemode->gameover && game_values.bosspeeking == -1)
-							{
-								eyecandyfront.add(new EC_BossPeeker(&spr_sledgebrothers, rand()%90 + 90, 2));
-								
-								backgroundmusic[0].stop();
-								ifsoundonstop(sfx_invinciblemusic);
-								ifsoundonstop(sfx_timewarning);
-								ifsoundonplay(sfx_bowserlaugh);
-							}
-						}
-						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
+						if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
 							objectsplayer.add(new CO_Shell(2, list_players[0]->ix + 32, list_players[0]->iy, false, false, true, true));
 						else
 							objectcollisionitems.add(new PU_FirePowerup(&spr_firepowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 32000, 30, 30, 1, 1));
@@ -1608,7 +1568,6 @@ void RunGame()
 					{
 						if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
 						{
-							game_values.bosspeeking = 0;
 							EnterBossMode(0);
 						}
 						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
@@ -1620,7 +1579,6 @@ void RunGame()
 					{
 						if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
 						{
-							game_values.bosspeeking = 1;
 							EnterBossMode(1);
 						}
 						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
@@ -1632,7 +1590,6 @@ void RunGame()
 					{
 						if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
 						{
-							game_values.bosspeeking = 2;
 							EnterBossMode(2);
 						}
 						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
@@ -1913,6 +1870,12 @@ void RunGame()
 							ifsoundonplay(sfx_bulletbillsound);
 						}
 					}
+				}
+
+				if(game_values.matchtype == MATCH_TYPE_WORLD && game_values.gamemode->gameover)
+				{
+					if(--game_values.noexittimer <= 0)
+						game_values.noexit = false;
 				}
 
 				//------------- update objects -----------------------
@@ -2374,6 +2337,8 @@ void RunGame()
 				CleanUp();
 				SetGameModeSettingsFromMenu();
 				game_values.gamestate = GS_GAME;
+				
+				/*
 				game_values.gamemode = bossgamemode;  //boss type has already been set at this point
 
 				if(bossgamemode->GetBossType() == 0)
@@ -2396,6 +2361,7 @@ void RunGame()
 				g_map.predrawbackground(spr_background, spr_backmap);
 				g_map.predrawforeground(spr_frontmap);
 				LoadMapObjects();
+				*/
 
 				if(game_values.music)
 				{
@@ -2510,6 +2476,7 @@ void RunGame()
 				}
 					
 				game_font_large.drawCentered(320, 100, gameovertext);
+
 			}
 
 			//in game scoreboards
@@ -2816,13 +2783,19 @@ void CleanUp()
 
 void UpdateScoreBoard()
 {
-	/*if(game_values.matchtype == MATCH_TYPE_WORLD)
+	if(game_values.matchtype == MATCH_TYPE_WORLD)
 	{
 		//If no one won, then nothing on the world map has changed
 		if(game_values.gamemode->winningteam < 0)
 			return;
+
+		if(game_values.tourstops[game_values.tourstopcurrent]->fEndStage)
+		{
+			game_values.tournamentwinner = 1;
+			backgroundmusic[4].play(true, true);
+		}
 	}
-	else*/ if(game_values.matchtype == MATCH_TYPE_TOUR)
+	else if(game_values.matchtype == MATCH_TYPE_TOUR)
 	{
 		//If no one won (tied game), then there is no need to update the scores because nothing has changed
 		if(game_values.gamemode->winningteam < 0)
@@ -2902,7 +2875,7 @@ void UpdateScoreBoard()
 
 		if(maxTeam > -1)
 		{
-			game_values.tournament_scores[maxTeam].type[game_values.tournament_scores[maxTeam].wins] = (game_values.gamemode->gamemode == game_mode_boss ? 18 : currentgamemode);
+			game_values.tournament_scores[maxTeam].type[game_values.tournament_scores[maxTeam].wins] = currentgamemode;
 
 			if(++game_values.tournament_scores[maxTeam].wins >= game_values.tournamentgames)
 			{
@@ -3215,7 +3188,7 @@ void EnterBossMode(short type)
 {
 	if(game_values.gamestate == GS_GAME && game_values.gamemode->gamemode != game_mode_boss)
 	{
-		bossgamemode->SetBossType(type);
+		//bossgamemode->SetBossType(type);
 
 		game_values.screenfade = 2;
 		game_values.screenfadespeed = 2;
@@ -3229,29 +3202,6 @@ void EnterBossMode(short type)
 		ifsoundonplay(sfx_secret);
 
 		game_values.gamestate = GS_START_GAME;
-	}
-}
-
-void AddHammerKill(short kills)
-{
-	game_values.enemyhammerkills += kills;
-
-	if(game_values.enemyhammerkills >= 5 && game_values.secrets)
-	{
-		if(rand() % 3 == 0)
-		{
-			if(!game_values.gamemode->gameover && game_values.bosspeeking == -1)
-			{
-				eyecandyfront.add(new EC_BossPeeker(&spr_sledgebrothers, rand()%90 + 90, 0));
-				
-				backgroundmusic[0].stop();
-				ifsoundonstop(sfx_invinciblemusic);
-				ifsoundonstop(sfx_timewarning);
-				ifsoundonplay(sfx_bowserlaugh);
-
-				game_values.enemyhammerkills = 0;
-			}
-		}
 	}
 }
 
@@ -3278,14 +3228,14 @@ void ResetTourStops()
 	
 	while (iterateAll != game_values.tourstops.end())
 	{
-		delete *iterateAll;
+		//delete *iterateAll;
 		iterateAll++;
 	}
 
 	game_values.tourstops.clear();
 }
 
-TourStop * ParseTourStopLine(char * buffer, short iVersion[4])
+TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 {
 	TourStop * ts = new TourStop();
 	ts->fUseSettings = false;
@@ -3344,9 +3294,9 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4])
 		pszTemp = strtok(NULL, ",\n");
 
 		if(pszTemp)
-			ts->fBonusWheel = atoi(pszTemp) == 1;
+			ts->iBonusType = atoi(pszTemp);
 		else
-			ts->fBonusWheel = false;
+			ts->iBonusType = 0;
 
 		pszTemp = strtok(NULL, ",\n");
 
@@ -3363,12 +3313,23 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4])
 	else
 	{
 		ts->iPoints = 1;
-		ts->fBonusWheel = false;
+		ts->iBonusType = 0;
 		sprintf(ts->szName, "Tour Stop %d", game_values.tourstoptotal + 1);
 	}
 
 	if(iVersion[0] == 1 && iVersion[1] >= 8)
 	{
+		if(fIsWorld)
+		{
+			//is this a world ending stage?
+			pszTemp = strtok(NULL, ",\n");
+
+			if(pszTemp)
+				ts->fEndStage = pszTemp[0] == '1';
+			else
+				ts->fEndStage = false;
+		}
+
 		//jail
 		if(ts->iMode == 3)
 		{
@@ -3601,7 +3562,7 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4])
 		{
 			ts->fUseSettings = true;
 			
-			for(short iEnemy = 0; iEnemy < 12; iEnemy++)
+			for(short iEnemy = 0; iEnemy < 3; iEnemy++)
 			{
 				pszTemp = strtok(NULL, ",\n");
 				if(pszTemp)

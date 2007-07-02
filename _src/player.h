@@ -424,6 +424,7 @@ class CPlayer
 		friend class PU_BombPowerup;
 		friend class MysteryMushroomTempPlayer;
 		friend class MO_Coin;
+		friend class PU_TreasureChestBonus;
 
 		friend class CO_Egg;
 		friend class CO_Star;

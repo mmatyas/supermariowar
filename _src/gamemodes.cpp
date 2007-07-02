@@ -77,6 +77,18 @@ void SetupScoreBoard(bool fOrderMatters)
 
 		draw[max] = true;	//this is the next biggest score - it doesn't belong to the remaining scores from now on
 	}
+
+	if(game_values.matchtype == MATCH_TYPE_WORLD && game_values.gamemode->winningteam > -1)
+	{
+		short iBonusType = game_values.tourstops[game_values.tourstopcurrent]->iBonusType;
+
+		if(iBonusType > 0)
+		{
+			objectcollisionitems.add(new PU_TreasureChestBonus(&spr_sledgehammerpowerup, 1, 32000, 30, 30, 1, 1, iBonusType == 1 ? rand() % NUM_POWERUPS : iBonusType - 2));
+			game_values.noexittimer = 310;
+			game_values.noexit = true;
+		}
+	}
 }
 
 void ShowScoreBoard()

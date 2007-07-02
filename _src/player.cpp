@@ -78,6 +78,7 @@ void CPlayer::move()
 			(playerKeys->game_turbo.fPressed?16:0) |
 			(playerKeys->game_powerup.fPressed?32:0);
 
+		/*
 		for(short bossType = 0; bossType < 3; bossType++)
 		{
 			if(game_values.bosspeeking == bossType)
@@ -103,7 +104,7 @@ void CPlayer::move()
 			{
 				boss_index[bossType] = 0;
 			}
-		}
+		}*/
 
 		if (konamiIndex < 11)
 		{
@@ -2254,6 +2255,7 @@ void AddAwardKill(CPlayer * killer, CPlayer * killed, killstyle style)
 {
 	killer->killsinrow++;
 
+	/*
 	if(killer->killsinrow >= 10 && game_values.secrets)
 	{
 		if(rand() % 5 == 0)
@@ -2269,6 +2271,7 @@ void AddAwardKill(CPlayer * killer, CPlayer * killed, killstyle style)
 			}
 		}
 	}
+	*/
 
 	if(killer->inair && (style == kill_style_stomp || style == kill_style_goomba || style == kill_style_koopa || style == kill_style_cheepcheep || style == kill_style_bulletbill || style == kill_style_feather))
 		killer->killsinrowinair++;

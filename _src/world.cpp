@@ -1,7 +1,7 @@
 #include "global.h"
 
 extern void ResetTourStops();
-extern TourStop * ParseTourStopLine(char * buffer, short iVersion[4]);
+extern TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld);
 
 WorldMap::WorldMap()
 {
@@ -34,7 +34,7 @@ bool WorldMap::Load()
 	
 	while(fgets(buffer, 256, file))
 	{
-		if(buffer[0] == '#' || buffer[0] == '\n' || buffer[0] == ' ' || buffer[0] == '\t')
+		if(buffer[0] == '#' || buffer[0] == '\n' || buffer[0] == '\r' || buffer[0] == ' ' || buffer[0] == '\t')
 			continue;
 
 		if(iReadType == 0)
@@ -79,7 +79,7 @@ bool WorldMap::Load()
 			for(short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++)
 			{
 				if(!psz)
-					return false;
+					goto RETURN;
 
 				WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
 				tile->iSprite = atoi(psz);
@@ -100,7 +100,7 @@ bool WorldMap::Load()
 			for(short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++)
 			{
 				if(!psz)
-					return false;
+					goto RETURN;
 
 				WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
 				tile->iConnectionType = atoi(psz);
@@ -178,7 +178,7 @@ bool WorldMap::Load()
 			for(short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++)
 			{
 				if(!psz)
-					return false;
+					goto RETURN;
 
 				WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
 				tile->iType = atoi(psz);
@@ -205,7 +205,7 @@ bool WorldMap::Load()
 		}
 		else if(iReadType == 6)
 		{
-			TourStop * ts = ParseTourStopLine(buffer, iVersion);
+			TourStop * ts = ParseTourStopLine(buffer, iVersion, true);
 		
 			game_values.tourstops.push_back(ts);
 			game_values.tourstoptotal++;
@@ -214,6 +214,8 @@ bool WorldMap::Load()
 				iReadType = 7;
 		}
 	}
+
+RETURN:
 
 	fclose(file);
 

@@ -536,6 +536,24 @@ class PU_PodoboPowerup : public PU_SledgeHammerPowerup
 		bool collide(CPlayer * player);
 };
 
+class PU_TreasureChestBonus : public MO_Powerup
+{
+	public:
+		PU_TreasureChestBonus(gfxSprite *nspr, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iBonusItem);
+		~PU_TreasureChestBonus(){};
+
+		void update();
+		void draw();
+		bool collide(CPlayer * player);
+		float BottomBounce();
+	
+	private:
+		short sparkleanimationtimer;
+		short sparkledrawframe;
+		short numbounces;
+		short bonusitem;
+};
+
 class PU_ClockPowerup : public MO_Powerup
 {
 	public:

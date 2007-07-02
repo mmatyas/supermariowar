@@ -283,6 +283,7 @@ class EC_Door : public CEyecandy
 		short offsety;
 };
 
+/*
 class EC_BossPeeker : public CEyecandy
 {
 	public:
@@ -298,7 +299,7 @@ class EC_BossPeeker : public CEyecandy
 		int state;
 		int ix, iy;
 };
-
+*/
 
 //eyecandy container
 class CEyecandyContainer

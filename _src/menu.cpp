@@ -49,7 +49,7 @@ extern short g_iAutoFilterIcons[NUM_AUTO_FILTERS];
 extern void ResetTourStops();
 extern WorldMap g_worldmap;
 
-extern TourStop * ParseTourStopLine(char * buffer, short iVersion[4]);
+extern TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld);
 
 void Menu::WriteGameOptions()
 {
@@ -1229,7 +1229,7 @@ void Menu::CreateMenu()
 	// Tour Stop
 	//***********************
 	
-	miTourStop = new MI_TourStop(70, 45);
+	miTourStop = new MI_TourStop(70, 45, false);
 	
 	//Exit tour dialog box
 	miTourStopExitDialogImage = new MI_Image(&spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
@@ -1265,7 +1265,7 @@ void Menu::CreateMenu()
 	miWorld = new MI_World(&spr_overworld);
 	miWorld->SetAutoModify(true);
 	
-	miWorldStop = new MI_TourStop(70, 45);
+	miWorldStop = new MI_TourStop(70, 45, true);
 	miWorldStop->Show(false);
 
 	//Exit tour dialog box
@@ -2216,7 +2216,7 @@ void Menu::RunMenu()
 	fNeedMenuMusicReset = false;
 
 	if(game_values.gamemode->winningteam > -1 && game_values.tournamentwinner == -1 && 
-		((game_values.matchtype != MATCH_TYPE_TOUR && game_values.bonuswheel == 2) || (game_values.matchtype == MATCH_TYPE_TOUR && game_values.tourstops[game_values.tourstopcurrent - 1]->fBonusWheel)))
+		((game_values.matchtype != MATCH_TYPE_TOUR && game_values.bonuswheel == 2) || (game_values.matchtype == MATCH_TYPE_TOUR && game_values.tourstops[game_values.tourstopcurrent - 1]->iBonusType)))
 	{
 		miBonusWheel->Reset(false);
 		mCurrentMenu = &mBonusWheelMenu;
@@ -2240,9 +2240,11 @@ void Menu::RunMenu()
 
 			mWorldMenu.RestoreCurrent();
 		}
-
-		if(game_values.tourstopcurrent < game_values.tourstoptotal)
-			miTourStop->Refresh(game_values.tourstopcurrent);
+		else if(game_values.tournamentwinner > -1)
+		{
+			miBonusWheel->Reset(false);
+			mCurrentMenu = &mBonusWheelMenu;
+		}
 	}
 	else if(game_values.matchtype == MATCH_TYPE_TOUR)
 	{
@@ -2263,14 +2265,14 @@ void Menu::RunMenu()
 
 	//Keep track if we entered the menu loop as part of a tournament, if we exit the tournament
 	//we need to reset the menu music back to normal
-	if(game_values.matchtype == MATCH_TYPE_TOURNAMENT || game_values.matchtype == MATCH_TYPE_TOUR)
+	if(game_values.matchtype != MATCH_TYPE_SINGLE_GAME)
 		fNeedMenuMusicReset = true;
 
 	if(game_values.music)
 	{
 		if(game_values.tournamentwinner < 0)
 		{
-			if(game_values.matchtype == MATCH_TYPE_TOURNAMENT || game_values.matchtype == MATCH_TYPE_TOUR)
+			if(game_values.matchtype != MATCH_TYPE_SINGLE_GAME)
 				backgroundmusic[3].play(false, false);
 			else
 				backgroundmusic[2].play(false, false);
@@ -2585,9 +2587,8 @@ void Menu::RunMenu()
 					}
 					else
 					{
-						miWorld->Init();
+						miWorld->Init(g_worldmap.iStartX, g_worldmap.iStartY);
 						miWorld->SetControllingTeam(rand() % score_cnt);
-						miWorld->SetPlayerPosition(g_worldmap.iStartX, g_worldmap.iStartY);
 					}
 				}
 
@@ -2658,7 +2659,7 @@ void Menu::RunMenu()
 				}
 				else if(game_values.tournamentwinner > -1) //Tournament/Tour Won and Bonus Wheel will be spun
 				{
-					if(((game_values.matchtype != MATCH_TYPE_TOUR && game_values.bonuswheel == 0) || (game_values.matchtype == MATCH_TYPE_TOUR && !game_values.tourstops[game_values.tourstopcurrent - 1]->fBonusWheel)))
+					if(((game_values.matchtype != MATCH_TYPE_TOUR && game_values.bonuswheel == 0) || (game_values.matchtype == MATCH_TYPE_TOUR && !game_values.tourstops[game_values.tourstopcurrent - 1]->iBonusType)))
 					{
 						ResetTournamentBackToMainMenu();
 					}
@@ -2812,7 +2813,7 @@ void Menu::RunMenu()
 				if(miBonusWheel->GetPowerupSelectionDone())
 				{
 					if((game_values.matchtype == MATCH_TYPE_TOUR || game_values.matchtype == MATCH_TYPE_TOURNAMENT) && game_values.tournamentwinner == -1 &&
-						((game_values.matchtype != MATCH_TYPE_TOUR && game_values.bonuswheel == 2) || (game_values.matchtype == MATCH_TYPE_TOUR && game_values.tourstops[game_values.tourstopcurrent - 1]->fBonusWheel)))
+						((game_values.matchtype != MATCH_TYPE_TOUR && game_values.bonuswheel == 2) || (game_values.matchtype == MATCH_TYPE_TOUR && game_values.tourstops[game_values.tourstopcurrent - 1]->iBonusType)))
 						mCurrentMenu = &mTournamentScoreboardMenu;
 					else
 						ResetTournamentBackToMainMenu();
@@ -3240,7 +3241,7 @@ bool Menu::ReadTourFile()
 			continue;
 		}
 
-		TourStop * ts = ParseTourStopLine(buffer, iVersion);
+		TourStop * ts = ParseTourStopLine(buffer, iVersion, false);
 		
 		game_values.tourstops.push_back(ts);
 		game_values.tourstoptotal++;
@@ -3252,7 +3253,7 @@ bool Menu::ReadTourFile()
 
 		//For old tours, turn on the bonus wheel at the end
 		if(iVersion[0] == 1 && iVersion[1] == 7 && iVersion[2] == 0 && iVersion[3] <= 1)
-			game_values.tourstops[game_values.tourstoptotal - 1]->fBonusWheel = true;
+			game_values.tourstops[game_values.tourstoptotal - 1]->iBonusType = 1;
 	}
 
 	fclose(fp);

@@ -2552,29 +2552,50 @@ void MI_StoredPowerupResetButton::Draw()
  * MI_TourStop Class
  **************************************/
 
+char * g_szWorldBonusNames[NUM_POWERUPS + 2] = {"None", "Random", "Poison Mushroom", "1up Mushroom", "2up Mushroom", "3up Mushroom", "5up Mushroom",
+												"Fire Flower", "Star", "Clock", "Bob-omb", "POW", "Bullet Bill", "Hammer", "Green Shell",
+												"Red Shell", "Spiked Shell", "Buzzy Shell", "MOd", "Feather", "Mystery Mushroom", "Boomerang"};
 //Call with x = 70 and y == 80
-MI_TourStop::MI_TourStop(short x, short y) :
+MI_TourStop::MI_TourStop(short x, short y, bool fWorld) :
 	UI_Control(x, y)
 {
-	miStartButton = new MI_Button(&spr_selectfield, 70, 45, "Start", 500, 0);
+	fIsWorld = fWorld;
+
+	if(fIsWorld)
+	{
+		miModeField = new MI_ImageSelectField(&spr_selectfielddisabled, &menu_mode_small, 70, 85, "Mode", 305, 90, 16, 16);
+		miGoalField = new MI_SelectField(&spr_selectfielddisabled, 370, 85, "Goal", 200, 90);
+		miPointsField = new MI_SelectField(&spr_selectfielddisabled, 370, 125, "Points", 200, 90);
+
+		miBonusField = new MI_SelectField(&spr_selectfielddisabled, 70, 125, "Bonus", 305, 90);
+		miBonusField->Disable(true);
+	}
+	else
+	{
+		miModeField = new MI_ImageSelectField(&spr_selectfielddisabled, &menu_mode_small, 70, 85, "Mode", 500, 120, 16, 16);
+		miGoalField = new MI_SelectField(&spr_selectfielddisabled, 70, 125, "Goal", 246, 120);
+		miPointsField = new MI_SelectField(&spr_selectfielddisabled, 70 + 254, 125, "Points", 246, 120);
+	
+		miBonusField = 0;
+	}
+
+	miStartButton = new MI_Button(&spr_selectfield, 70, 45, "Start", 500, 0);	
 	miStartButton->SetCode(MENU_CODE_TOUR_STOP_CONTINUE);
 	miStartButton->Select(true);
-
-	miModeField = new MI_ImageSelectField(&spr_selectfielddisabled, &menu_mode_small, 70, 85, "Mode", 500, 120, 16, 16);
-	miModeField->Disable(true);
-	
-	miGoalField = new MI_SelectField(&spr_selectfielddisabled, 70, 125, "Goal", 246, 120);
-	miGoalField->Disable(true);
-
-	miPointsField = new MI_SelectField(&spr_selectfielddisabled, 324, 125, "Points", 246, 120);
-	miPointsField->Disable(true);
 
 	miMapField = new MI_MapField(&spr_selectfielddisabled, 70, 165, "Map", 500, 120, false);
 	miMapField->Disable(true);
 
+	miModeField->Disable(true);
+	miGoalField->Disable(true);
+	miPointsField->Disable(true);
+	
+
 	miTourStopLeftHeaderBar = new MI_Image(&menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
 	miTourStopMenuRightHeaderBar = new MI_Image(&menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
 	miTourStopMenuHeaderText = new MI_Text("Tour Stop", 320, 5, 0, 2, 1);
+
+	
 }
 
 MI_TourStop::~MI_TourStop()
@@ -2584,6 +2605,12 @@ MI_TourStop::~MI_TourStop()
 	delete miPointsField;
 	delete miMapField;
 	delete miStartButton;
+
+	if(miBonusField)
+	{
+		delete miBonusField;
+		delete miEndStageImage;
+	}
 }
 
 MenuCodeEnum MI_TourStop::Modify(bool fModify)
@@ -2599,6 +2626,11 @@ void MI_TourStop::Update()
 	miGoalField->Update();
 	miPointsField->Update();
 	miMapField->Update();
+
+	if(fIsWorld)
+	{
+		miBonusField->Update();
+	}
 
 	miTourStopLeftHeaderBar->Update();
 	miTourStopMenuRightHeaderBar->Update();
@@ -2616,6 +2648,13 @@ void MI_TourStop::Draw()
 	miGoalField->Draw();
 	miPointsField->Draw();
 	miMapField->Draw();
+
+	if(fIsWorld)
+	{
+		miBonusField->Draw();
+
+		//if(game_
+	}
 
 	miTourStopLeftHeaderBar->Draw();
 	miTourStopMenuRightHeaderBar->Draw();
@@ -2641,6 +2680,14 @@ void MI_TourStop::Refresh(short iTourStop)
 
 	miMapField->SetMap(tourstop->pszMapFile);
 	miTourStopMenuHeaderText->SetText(tourstop->szName);
+
+	if(fIsWorld)
+	{
+		miBonusField->Clear();
+		miBonusField->Add(g_szWorldBonusNames[tourstop->iBonusType], tourstop->iBonusType, "", false, false);
+
+		//miEndStageImage->
+	}
 }
 
 /**************************************
@@ -2913,7 +2960,7 @@ void MI_TournamentScoreboard::CreateScoreboard(short numTeams, short numGames, g
 			tourPoints[iGame] = new MI_ScoreText(iTourPointX, GetYFromPlace(0));
 			tourPoints[iGame]->SetScore(game_values.tourstops[iGame]->iPoints);
 
-			if(game_values.tourstops[iGame]->fBonusWheel)
+			if(game_values.tourstops[iGame]->iBonusType)
 				tourBonus[iGame] = new MI_Image(sprBackground, iTourPointX - 19, GetYFromPlace(0) - 12, 372, 128, 38, 31, 2, 1, 8);
 			//else
 			//	tourBonus[iGame] = new MI_Image(sprBackground, iTourPointX - 11, GetYFromPlace(0) - 3, 448, 128, 22, 22, 1, 1, 0);
@@ -4131,20 +4178,21 @@ MI_World::MI_World(gfxSprite * pspr) :
 	iControllingTeam = 0;
 	iReturnDirection = 0;
 
-	//sMapSurface = SDL_CreateRGBSurface(screen->flags, 768, 608, screen->format->BitsPerPixel, 0, 0, 0, 0);
-	sMapSurface = SDL_CreateRGBSurface(screen->flags, 960, 640, screen->format->BitsPerPixel, 0, 0, 0, 0);
+	sMapSurface = SDL_CreateRGBSurface(screen->flags, 768, 608, screen->format->BitsPerPixel, 0, 0, 0, 0);
+	//sMapSurface = SDL_CreateRGBSurface(screen->flags, 960, 640, screen->format->BitsPerPixel, 0, 0, 0, 0);
 	
 	rectSrcSurface = new SDL_Rect();
 	rectSrcSurface->x = 0;
 	rectSrcSurface->y = 0;
-	rectSrcSurface->w = 640;
-	rectSrcSurface->h = 480;
+	rectSrcSurface->w = 768;
+	rectSrcSurface->h = 608;
 
 	rectDstSurface = new SDL_Rect();
 	rectDstSurface->x = 0;
 	rectDstSurface->y = 0;
 	rectDstSurface->w = 640;
 	rectDstSurface->h = 480;
+
 }
 
 MI_World::~MI_World()
@@ -4154,33 +4202,64 @@ MI_World::~MI_World()
 	delete rectDstSurface;
 }
 
-void MI_World::Init()
+void MI_World::Init(short iCol, short iRow)
 {
 	iAnimationTimer = 0;
 	iAnimationFrame = 0;
 
 	iPlayerState = 0;
 
-	iCenterOffsetX = TILESIZE * ((20 - g_worldmap.iWidth) / 2);
-	iCenterOffsetY = TILESIZE * ((15 - g_worldmap.iHeight) / 2);
-
-	iMapOffsetX = (640 - (g_worldmap.iWidth * TILESIZE)) >> 1;
-	iMapOffsetY = (480 - (g_worldmap.iHeight * TILESIZE)) >> 1;
-
-	DrawWorldMapToSurface();
-}
-
-void MI_World::SetPlayerPosition(short iCol, short iRow)
-{
 	iPlayerCurrentTileX = iPlayerDestTileX = iCol;
 	iPlayerCurrentTileY = iPlayerDestTileY = iRow;
 	iPlayerX = iCol * TILESIZE;
 	iPlayerY = iRow * TILESIZE;
+
+	iMapDrawOffsetCol = 0;
+	iMapDrawOffsetRow = 0;
+
+	iMessageTimer = 0;
+
+	if(g_worldmap.iWidth > 20)
+	{
+		if(iPlayerX < g_worldmap.iWidth * TILESIZE - 336 && iPlayerX > 304)
+			iMapOffsetX = 304 - iPlayerX;
+		else if(iPlayerX <= 304)
+			iMapOffsetX = 0;
+		else
+			iMapOffsetX = 640 - g_worldmap.iWidth * TILESIZE;
+	}
+	else
+	{
+		iMapOffsetX = (640 - g_worldmap.iWidth * TILESIZE) >> 1;
+	}
+
+	if(g_worldmap.iHeight > 15)
+	{
+		if(iPlayerY < g_worldmap.iHeight * TILESIZE - 256 && iPlayerY > 224)
+			iMapOffsetY = 224 - iPlayerY;
+		else if(iPlayerY <= 224)
+			iMapOffsetY = 0;
+		else
+			iMapOffsetY = 480 - g_worldmap.iHeight * TILESIZE;
+	}
+	else
+	{
+		iMapOffsetY = (480 - g_worldmap.iHeight * TILESIZE) >> 1;
+	}
+
+	RepositionMapImage();
 }
 
 void MI_World::SetControllingTeam(short iTeamID)
 {
 	iControllingTeam = iTeamID;
+
+	iMessageTimer = 120;
+
+	if(game_values.teamcounts[iTeamID] <= 1)
+		sprintf(szMessage, "Player %d Is In Control", game_values.teamids[iTeamID][0] + 1);
+	else
+		sprintf(szMessage, "Team %d Is In Control", iTeamID + 1);
 }
 
 void MI_World::SetCurrentStageToCompleted()
@@ -4216,7 +4295,7 @@ void MI_World::Update()
 			RepositionMapImage();
 		}
 
-		if(iMapOffsetY < 0)
+		if(g_worldmap.iHeight > 15 && iMapOffsetY < 0 && iPlayerY < g_worldmap.iHeight * TILESIZE - 256)
 			iMapOffsetY += 2;
 	}
 	else if(iPlayerState == 2) //down
@@ -4231,7 +4310,7 @@ void MI_World::Update()
 			RepositionMapImage();
 		}
 
-		if(iMapOffsetY > 480 - g_worldmap.iHeight * TILESIZE)
+		if(g_worldmap.iHeight > 15 && iMapOffsetY > 480 - g_worldmap.iHeight * TILESIZE && iPlayerY > 224)
 			iMapOffsetY -= 2;
 	}
 	else if(iPlayerState == 3) //left
@@ -4246,7 +4325,7 @@ void MI_World::Update()
 			RepositionMapImage();
 		}
 
-		if(iMapOffsetX < 0)
+		if(g_worldmap.iWidth > 20 && iMapOffsetX < 0 && iPlayerX < g_worldmap.iWidth * TILESIZE - 336)
 			iMapOffsetX += 2;
 	}
 	else if(iPlayerState == 4) //right
@@ -4261,7 +4340,7 @@ void MI_World::Update()
 			RepositionMapImage();
 		}
 
-		if(iMapOffsetX > 640 - g_worldmap.iWidth * TILESIZE)
+		if(g_worldmap.iWidth > 20 && iMapOffsetX > 640 - g_worldmap.iWidth * TILESIZE && iPlayerX > 304)
 			iMapOffsetX -= 2;
 	}
 
@@ -4269,7 +4348,25 @@ void MI_World::Update()
 
 void MI_World::RepositionMapImage()
 {
+	if(g_worldmap.iWidth > 24)
+	{
+		iMapDrawOffsetCol = iPlayerCurrentTileX - 11;
+		if(iMapDrawOffsetCol < 0)
+			iMapDrawOffsetCol = 0;
+		else if(iMapDrawOffsetCol > g_worldmap.iWidth - 24)
+			iMapDrawOffsetCol = g_worldmap.iWidth - 24;
+	}
 
+	if(g_worldmap.iHeight > 19)
+	{
+		iMapDrawOffsetRow = iPlayerCurrentTileY - 9;
+		if(iMapDrawOffsetRow < 0)
+			iMapDrawOffsetRow = 0;
+		else if(iMapDrawOffsetRow > g_worldmap.iHeight - 19)
+			iMapDrawOffsetRow = g_worldmap.iHeight - 19;
+	}
+
+	DrawWorldMapToSurface();
 }
 
 void MI_World::DrawWorldMapToSurface()
@@ -4293,14 +4390,14 @@ void MI_World::DrawWorldMapToSurface()
 	}
 	*/
 
-	for(short iRow = 0; iRow < g_worldmap.iHeight; iRow++)
+	for(short iRow = 0; iRow < 19 && iRow + iMapDrawOffsetRow < g_worldmap.iHeight; iRow++)
 	{
-		for(short iCol = 0; iCol < g_worldmap.iWidth; iCol++)
+		for(short iCol = 0; iCol < 24 && iCol + iMapDrawOffsetCol < g_worldmap.iWidth; iCol++)
 		{
 			//SDL_Rect r = {iCol * TILESIZE + iMapOffsetX, iRow * TILESIZE + iMapOffsetY, TILESIZE, TILESIZE};
 			SDL_Rect r = {iCol * TILESIZE, iRow * TILESIZE, TILESIZE, TILESIZE};
 			
-			short iSprite = g_worldmap.tiles[iCol][iRow].iSprite;
+			short iSprite = g_worldmap.tiles[iCol + iMapDrawOffsetCol][iRow + iMapDrawOffsetRow].iSprite;
 
 			if(iSprite == 0)
 				SDL_FillRect(sMapSurface, &r, SDL_MapRGB(sMapSurface->format, 64, 64, 64));
@@ -4328,17 +4425,31 @@ void MI_World::Draw()
 
 	rectSrcSurface->x = 0;
 	rectSrcSurface->y = 0;
-	rectSrcSurface->w = 960;
-	rectSrcSurface->h = 640;
+	
+	if(g_worldmap.iWidth > 24)
+		rectSrcSurface->w = 768;
+	else
+		rectSrcSurface->w = g_worldmap.iWidth * TILESIZE;
 
-	rectDstSurface->x = iMapOffsetX;
-	rectDstSurface->y = iMapOffsetY;
+	if(g_worldmap.iHeight > 19)
+		rectSrcSurface->h = 608;
+	else
+		rectSrcSurface->h = g_worldmap.iHeight * TILESIZE;
 
+	rectDstSurface->x = iMapOffsetX + iMapDrawOffsetCol * TILESIZE;
+	rectDstSurface->y = iMapOffsetY + iMapDrawOffsetRow * TILESIZE;
+	
 	SDL_BlitSurface(sMapSurface, rectSrcSurface, blitdest, rectDstSurface);
 
 	SDL_Rect rPlayer = {iPlayerX + iMapOffsetX, iPlayerY + iMapOffsetY, 32, 32};
 	//SDL_Rect rPlayer = {304, 224, 32, 32};
 	SDL_FillRect(screen, &rPlayer, SDL_MapRGB(screen->format, 255, 0, 0));
+
+	if(iMessageTimer > 0)
+	{
+		iMessageTimer--;
+		menu_font_large.drawCentered(320, 64, szMessage);
+	}
 }
 
 MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)

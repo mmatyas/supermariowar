@@ -598,8 +598,9 @@ struct TourStop
 	short iMode;
 	short iGoal;
 	short iPoints;
-	bool fBonusWheel;
+	short iBonusType;
 	char szName[128];
+	bool fEndStage;
 
 	bool fUseSettings;
 	GameModeSettings gmsSettings;
@@ -781,9 +782,8 @@ struct gv
 	bool		redkoopas;
 
 	bool		secrets;
-	short		bosspeeking;
 	bool		noexit;
-	short		enemyhammerkills;
+	short		noexittimer;
 };
 
 extern gv game_values;

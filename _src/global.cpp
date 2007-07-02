@@ -266,4 +266,3 @@ char * g_szAutoFilterNames[NUM_AUTO_FILTERS] = {"Hazards", "Warps", "Ice", "Item
 short g_iAutoFilterIcons[NUM_AUTO_FILTERS] = {37, 29, 33, 1, 0, 6, 40, 73};
 
 short g_iPowerupToIcon[6] = {80, 176, 272, 304, 336, 368};
-

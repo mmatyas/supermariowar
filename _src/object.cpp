@@ -9,7 +9,6 @@ extern void AddAwardKill(CPlayer * killer, CPlayer * killed, killstyle style);
 extern short LookupTeamID(short id);
 extern bool SwapPlayers(short iUsingPlayerID);
 extern short scorepowerupoffsets[3][3];
-extern void AddHammerKill(short numkills);
 
 extern CPlayer * GetPlayerFromGlobalID(short iGlobalID);
 
@@ -270,13 +269,11 @@ void IO_Block::BounceMovingObject(IO_MovingObject * object)
 		{
 			((MO_Goomba*)object)->Die();
 			style = kill_style_goomba;
-			game_values.enemyhammerkills = 0;
 		}
 		else if(type == movingobject_koopa)
 		{
 			((MO_Koopa*)object)->Die();
 			style = kill_style_koopa;
-			game_values.enemyhammerkills = 0;
 		}
 
 		if(!game_values.gamemode->gameover && bumpPlayer)
@@ -2980,6 +2977,84 @@ bool PU_BombPowerup::collide(CPlayer * player)
 	return false;
 }
 
+
+//------------------------------------------------------------------------------
+// class treasure chest powerup
+//------------------------------------------------------------------------------
+PU_TreasureChestBonus::PU_TreasureChestBonus(gfxSprite *nspr, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iBonusItem) :
+	MO_Powerup(nspr, 0, 0, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
+{
+	velx = 0.0f;
+
+	sparkleanimationtimer = 0;
+	sparkledrawframe = 0;
+	bounce = -VELPOWERUPBOUNCE * 2;
+	numbounces = 5;
+	state = 2;
+	bonusitem = iBonusItem;
+
+	g_map.findspawnpoint(1, &ix, &iy, collisionWidth, collisionHeight, false);
+	fx = (float)ix;
+	fy = (float)iy;
+}
+
+void PU_TreasureChestBonus::update()
+{
+	MO_Powerup::update();
+
+	if(++sparkleanimationtimer >= 4)
+	{
+		sparkleanimationtimer = 0;
+		sparkledrawframe += 32;
+		if(sparkledrawframe >= 480)
+			sparkledrawframe = 0;
+	}
+}
+
+void PU_TreasureChestBonus::draw()
+{
+	MO_Powerup::draw();
+
+	//Draw sparkles
+	spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, 0, 32, 32);
+}
+
+bool PU_TreasureChestBonus::collide(CPlayer * player)
+{
+	if(state == 1)
+	{
+		ifsoundonplay(sfx_storepowerup);
+		game_values.storedpowerups[player->globalID] = bonusitem;
+		game_values.gamepowerups[player->globalID] = bonusitem;
+		dead = true;
+		game_values.noexit = false;
+	}
+
+	return false;
+}
+
+float PU_TreasureChestBonus::BottomBounce()
+{
+	if(state == 2)
+	{
+		if(--numbounces <= 0)
+		{
+			numbounces = 0;
+			state = 1;
+			bounce = GRAVITATION;
+		}
+		else
+		{
+			if(vely > 0.0f)
+				bounce = -vely / 2.0f;
+			else
+				bounce /= 2.0f;
+		}
+	}
+
+	return bounce;
+}
+
 //------------------------------------------------------------------------------
 // class clock powerup
 //------------------------------------------------------------------------------
@@ -5607,6 +5682,7 @@ void OMO_Area::setOwner(CPlayer * player)
 		frame = (colorID + 1) * iw;
 		ifsoundonplay(sfx_areatag);
 
+		/*
 		if(game_values.secrets)
 		{
 			//See if all the areas are owned by this player to have a boss peek
@@ -5639,7 +5715,7 @@ void OMO_Area::setOwner(CPlayer * player)
 					ifsoundonplay(sfx_bowserlaugh);
 				}
 			}
-		}
+		}*/
 	}
 }
 
@@ -6221,19 +6297,16 @@ void OMO_Explosion::collide(IO_MovingObject * object)
 		{
 			ifsoundonplay(sfx_kicksound);
 			((MO_Goomba*)object)->Die();
-			game_values.enemyhammerkills = 0;
 		}
 		else if(type == movingobject_koopa)
 		{
 			ifsoundonplay(sfx_kicksound);
 			((MO_Koopa*)object)->Die();
-			game_values.enemyhammerkills = 0;
 		}
 		else if(type == movingobject_cheepcheep)
 		{
 			ifsoundonplay(sfx_kicksound);
 			((OMO_CheepCheep*)object)->Die();
-			game_values.enemyhammerkills = 0;
 		}
 		else if(type == movingobject_bulletbill)
 		{
@@ -6352,7 +6425,6 @@ bool MO_Goomba::collide(CPlayer * player)
 
 		ifsoundonplay(sfx_kicksound);
 		Die();
-		game_values.enemyhammerkills = 0;
 	}
 	else
 	{
@@ -6422,47 +6494,38 @@ void MO_Goomba::collide(IO_MovingObject * object)
 				if(type == movingobject_fireball)
 				{
 					iPlayerID = ((MO_Fireball*)object)->playerID;
-					game_values.enemyhammerkills = 0;
 				}
 				else if(type == movingobject_hammer)
 				{
 					iPlayerID = ((MO_Hammer*)object)->playerID;
-					AddHammerKill(1);
 				}
 				else if(type == movingobject_sledgehammer)
 				{
 					iPlayerID = ((MO_SledgeHammer*)object)->playerID;
-					AddHammerKill(2);
 				}
 				else if(type == movingobject_boomerang)
 				{
 					iPlayerID = ((MO_Boomerang*)object)->playerID;
-					game_values.enemyhammerkills = 0;
 				}
 				else if(type == movingobject_shell)
 				{
 					iPlayerID = ((CO_Shell*)object)->playerID;
-					game_values.enemyhammerkills = 0;
 				}
 				else if(type == movingobject_throwblock)
 				{
 					iPlayerID = ((CO_ThrowBlock*)object)->playerID;
-					game_values.enemyhammerkills = 0;
 				}
 				else if(type == movingobject_bulletbill)
 				{
 					iPlayerID = ((OMO_BulletBill*)object)->iPlayerID;
-					game_values.enemyhammerkills = 0;
 				}
 				else if(type == movingobject_superfireball)
 				{
 					iPlayerID = ((MO_SuperFireball*)object)->playerID;
-					game_values.enemyhammerkills = 0;
 				}
 				else if(type == movingobject_podobo)
 				{
 					iPlayerID = ((OMO_Podobo*)object)->iPlayerID;
-					game_values.enemyhammerkills = 0;
 				}
 
 				//Find the player that shot this fireball so we can attribute a kill
@@ -6641,7 +6704,6 @@ bool OMO_CheepCheep::collide(CPlayer * player)
 			player->score->AdjustScore(1);
 		
 		Die();
-		game_values.enemyhammerkills = 0;
 	}
 	else
 	{
@@ -6670,7 +6732,6 @@ bool OMO_CheepCheep::hittop(CPlayer * player)
 	ifsoundonplay(sfx_mip);
 	
 	Die();
-	game_values.enemyhammerkills = 0;
 
 	return false;
 }
@@ -6710,47 +6771,38 @@ void OMO_CheepCheep::collide(IO_MovingObject * object)
 				if(type == movingobject_fireball)
 				{
 					iPlayerID = ((MO_Fireball*)object)->playerID;
-					game_values.enemyhammerkills = 0;
 				}
 				else if(type == movingobject_hammer)
 				{
 					iPlayerID = ((MO_Hammer*)object)->playerID;
-					AddHammerKill(1);
 				}
 				else if(type == movingobject_sledgehammer)
 				{
 					iPlayerID = ((MO_SledgeHammer*)object)->playerID;
-					AddHammerKill(2);
 				}
 				else if(type == movingobject_boomerang)
 				{
 					iPlayerID = ((MO_Boomerang*)object)->playerID;
-					game_values.enemyhammerkills = 0;
 				}
 				else if(type == movingobject_shell)
 				{
 					iPlayerID = ((CO_Shell*)object)->playerID;
-					game_values.enemyhammerkills = 0;
 				}
 				else if(type == movingobject_throwblock)
 				{
 					iPlayerID = ((CO_ThrowBlock*)object)->playerID;
-					game_values.enemyhammerkills = 0;
 				}
 				else if(type == movingobject_bulletbill)
 				{
 					iPlayerID = ((OMO_BulletBill*)object)->iPlayerID;
-					game_values.enemyhammerkills = 0;
 				}
 				else if(type == movingobject_superfireball)
 				{
 					iPlayerID = ((MO_SuperFireball*)object)->playerID;
-					game_values.enemyhammerkills = 0;
 				}
 				else if(type == movingobject_podobo)
 				{
 					iPlayerID = ((OMO_Podobo*)object)->iPlayerID;
-					game_values.enemyhammerkills = 0;
 				}
 
 				//Find the player that shot this projectile so we can attribute a kill
