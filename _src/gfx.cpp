@@ -280,7 +280,7 @@ SDL_Surface * gfx_createskinsurface(SDL_Surface * skin, short spriteindex, Uint8
 }
 
 
-bool gfx_createmenuskin(gfxSprite ** gSprite, const std::string& filename, Uint8 r, Uint8 g, Uint8 b, short colorScheme)
+bool gfx_createmenuskin(gfxSprite ** gSprite, const std::string& filename, Uint8 r, Uint8 g, Uint8 b, short colorScheme, bool fLoadBothDirections)
 {
     // Load the BMP file into a surface
 	SDL_Surface * skin = IMG_Load(filename.c_str());
@@ -308,6 +308,24 @@ bool gfx_createmenuskin(gfxSprite ** gSprite, const std::string& filename, Uint8
 		}
 
 		gSprite[iSprite * 2]->setSurface(skinSurface);
+	}
+
+	if(fLoadBothDirections)
+	{
+		for(short iSprite = 0; iSprite < 2; iSprite++)
+		{
+			SDL_Surface * skinSurface = gfx_createskinsurface(skin, iSprite, r, g, b, colorScheme, true, true);
+
+			if (skinSurface == NULL)
+			{
+				cout << endl << " ERROR: Couldn't create menu skin from " << filename
+					<< ": " << SDL_GetError() << endl;
+
+				return false;
+			}
+
+			gSprite[iSprite * 2 + 1]->setSurface(skinSurface);
+		}
 	}
 
 	SDL_FreeSurface(skin);

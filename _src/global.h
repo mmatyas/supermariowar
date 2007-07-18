@@ -459,6 +459,8 @@ extern gfxSprite		spr_thumbnail_platformarrows;
 extern gfxSprite		spr_thumbnail_warps[2];
 extern gfxSprite		spr_thumbnail_mapitems[2];
 
+extern gfxSprite		spr_worldimages;
+
 extern MapList maplist;
 extern SkinList skinlist;
 extern AnnouncerList announcerlist;

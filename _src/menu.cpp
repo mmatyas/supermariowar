@@ -33,8 +33,8 @@ extern bool LoadStartGraphics();
 extern bool LoadMenuGraphics();
 extern bool LoadGameGraphics();
 extern bool LoadGameSounds();
-bool LoadFullSkin(gfxSprite ** sprites, short skinID, short colorID);
-bool LoadMenuSkin(short playerID, short skinID, short colorID);
+extern bool LoadFullSkin(gfxSprite ** sprites, short skinID, short colorID);
+//bool LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDirections);
 
 //Rearrange display of powerups
 short iPowerupDisplayMap[NUM_POWERUPS] = { 4, 0, 1, 2, 3, 6, 10, 12, 11, 14, 13, 7, 16, 17, 18, 19, 15, 9, 5, 8};
@@ -2231,7 +2231,7 @@ void Menu::RunMenu()
 		if(game_values.gamemode->winningteam > -1 && game_values.tournamentwinner == -1)
 		{
 			miWorld->SetControllingTeam(game_values.gamemode->winningteam);
-			miWorld->SetCurrentStageToCompleted();
+			miWorld->SetCurrentStageToCompleted(game_values.gamemode->winningteam);
 
 			miWorldStop->Show(false);
 

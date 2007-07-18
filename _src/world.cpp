@@ -82,7 +82,8 @@ bool WorldMap::Load()
 					goto RETURN;
 
 				WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
-				tile->iSprite = atoi(psz);
+				tile->iBackgroundSprite = atoi(psz);
+				tile->fAnimated = tile->iBackgroundSprite == 0 || (tile->iBackgroundSprite > 18 && tile->iBackgroundSprite <= 44);
 				
 				psz = strtok(NULL, ",\n");
 			}
@@ -103,6 +104,30 @@ bool WorldMap::Load()
 					goto RETURN;
 
 				WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
+				tile->iForegroundSprite = atoi(psz);
+
+				if(!tile->fAnimated)
+					tile->fAnimated = tile->iForegroundSprite >= 3 && tile->iForegroundSprite <= 6;
+				
+				psz = strtok(NULL, ",\n");
+			}
+
+			if(++iMapTileReadRow == iHeight)
+			{
+				iReadType = 5;
+				iMapTileReadRow = 0;
+			}
+		}
+		else if(iReadType == 5)
+		{
+			char * psz = strtok(buffer, ",\n");
+			
+			for(short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++)
+			{
+				if(!psz)
+					goto RETURN;
+
+				WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
 				tile->iConnectionType = atoi(psz);
 		
 				psz = strtok(NULL, ",\n");
@@ -110,7 +135,7 @@ bool WorldMap::Load()
 
 			if(++iMapTileReadRow == iHeight)
 			{
-				iReadType = 5;
+				iReadType = 6;
 				iMapTileReadRow = 0;
 
 				//1 == |  2 == -  3 == -!  4 == L  5 == ,-  6 == -,
@@ -171,7 +196,7 @@ bool WorldMap::Load()
 				}
 			}
 		}
-		else if(iReadType == 5)
+		else if(iReadType == 6)
 		{
 			char * psz = strtok(buffer, ",\n");
 			
@@ -199,11 +224,11 @@ bool WorldMap::Load()
 
 			if(++iMapTileReadRow == iHeight)
 			{
-				iReadType = 6;
+				iReadType = 7;
 				iMaxStageNumber--;  //offset down by 1 because #1 is the start 
 			}
 		}
-		else if(iReadType == 6)
+		else if(iReadType == 7)
 		{
 			TourStop * ts = ParseTourStopLine(buffer, iVersion, true);
 		
@@ -211,7 +236,7 @@ bool WorldMap::Load()
 			game_values.tourstoptotal++;
 
 			if(++iCurrentStage >= iMaxStageNumber)
-				iReadType = 7;
+				iReadType = 8;
 		}
 	}
 
@@ -219,7 +244,7 @@ RETURN:
 
 	fclose(file);
 
-	return iReadType == 7;
+	return iReadType == 8;
 }
 
 bool WorldMap::Save(char * szFileName)

@@ -4,12 +4,14 @@
 struct WorldMapTile
 {
 	short iType;
-	short iSprite;
+	short iBackgroundSprite;
+	short iForegroundSprite;
 
 	short iConnectionType;
 	bool fConnection[4];
 
 	bool fCompleted;
+	bool fAnimated;
 };
 
 class WorldMap

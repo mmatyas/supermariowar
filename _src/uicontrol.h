@@ -902,12 +902,12 @@ class MI_World : public UI_Control
 
 		void Init(short iCol, short iRow);
 		void SetControllingTeam(short iPlayerID);
-		void SetCurrentStageToCompleted();
+		void SetCurrentStageToCompleted(short iWinningTeam);
 
 	private:
 
 		void RepositionMapImage();
-		void DrawWorldMapToSurface();
+		void DrawWorldMapToSurface(bool fInit);
 
 		gfxSprite * spr;
 
@@ -934,6 +934,9 @@ class MI_World : public UI_Control
 		short iControllingTeam;
 		short iPlayerState;
 		short iReturnDirection;
+		short iDrawPlayerSprite;
+		short iPlayerAnimationFrame;
+		short iDrawPlayerDirection;
 
 		short iMessageTimer;
 		char szMessage[128];

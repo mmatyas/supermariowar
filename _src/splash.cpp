@@ -19,11 +19,10 @@ using std::string;
 
 extern bool g_fLoadMessages;
 
-extern bool gfx_createmenuskin(gfxSprite ** gSprites, const std::string& filename, Uint8 r, Uint8 g, Uint8 b, short colorScheme);
+extern bool gfx_createmenuskin(gfxSprite ** gSprites, const std::string& filename, Uint8 r, Uint8 g, Uint8 b, short colorScheme, bool fLoadBothDirections);
 extern bool gfx_createfullskin(gfxSprite ** gSprites, const std::string& filename, Uint8 r, Uint8 g, Uint8 b, short colorScheme);
 
-
-bool LoadMenuSkin(short playerID, short skinID, short colorID);
+bool LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDirections);
 bool LoadFullSkin(gfxSprite ** sprites, const std::string&  filename, short colorID);
 
 extern CEyecandyContainer eyecandyfront;
@@ -97,9 +96,9 @@ bool __load_gfxa(gfxSprite &g, const std::string& f, Uint8 alpha)
 	return true;
 }
 
-bool __load_gfxmenuskin(gfxSprite ** g, const std::string& f, short colorscheme)
+bool __load_gfxmenuskin(gfxSprite ** g, const std::string& f, short colorscheme, bool fLoadBothDirections)
 {
-	if(! gfx_createmenuskin(g, f, 255, 0, 255, colorscheme) )
+	if(! gfx_createmenuskin(g, f, 255, 0, 255, colorscheme, fLoadBothDirections) )
 	{
 		char msg[512];
 		sprintf(msg, "error loading color keyed sprite %s", f.c_str());
@@ -209,6 +208,8 @@ bool LoadMenuGraphics()
 	_load_gfxck(spr_thumbnail_mapitems[0], convertPath("gfx/packs/menu/menu_mapitems_preview.png", graphicspack));
 	_load_gfxck(spr_thumbnail_mapitems[1], convertPath("gfx/packs/menu/menu_mapitems_thumbnail.png", graphicspack));
 
+	_load_gfxck(spr_worldimages, convertPath("gfx/packs/overworld.png", graphicspack));
+
 	return true;
 }
 
@@ -230,7 +231,7 @@ bool LoadGameGraphics()
 	//Just load menu skins for now (just standing right sprite)
 	for(short k = 0; k < 4; k++)
 	{
-		//LoadMenuSkin(k, game_values.skinids[k], game_values.colorids[k]);
+		//LoadMenuSkin(k, game_values.skinids[k], game_values.colorids[k], false);
 		LoadFullSkin(spr_chocobo[k], convertPath("gfx/packs/modeskins/chicken.bmp", graphicspack), k);
 		LoadFullSkin(spr_bobomb[k], convertPath("gfx/packs/modeskins/bobomb.bmp", graphicspack), k);
 	}
@@ -843,9 +844,9 @@ bool LoadAndSplashScreen()
 	return true;
 }
 
-bool LoadMenuSkin(short playerID, short skinID, short colorID)
+bool LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDirections)
 {
-	return __load_gfxmenuskin(spr_player[playerID], skinlist.GetIndex(skinID), colorID);
+	return __load_gfxmenuskin(spr_player[playerID], skinlist.GetIndex(skinID), colorID, fLoadBothDirections);
 }
 
 bool LoadFullSkin(gfxSprite ** sprites, const std::string& filename, short colorID)
