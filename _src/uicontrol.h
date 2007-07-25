@@ -891,7 +891,7 @@ class MI_World : public UI_Control
 {
 	public:
 
-		MI_World(gfxSprite * spr_background);
+		MI_World();
 		virtual ~MI_World();
 
 		void Update();
@@ -909,7 +909,7 @@ class MI_World : public UI_Control
 		void RepositionMapImage();
 		void DrawWorldMapToSurface(bool fInit);
 
-		gfxSprite * spr;
+		WorldVehicle * worldVehicle;
 
 		SDL_Surface * sMapSurface;
 		SDL_Rect * rectSrcSurface;

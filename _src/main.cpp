@@ -102,7 +102,8 @@ gfxSprite		spr_thumbnail_platformarrows;
 gfxSprite		spr_thumbnail_warps[2];
 gfxSprite		spr_thumbnail_mapitems[2];
 
-gfxSprite		spr_worldimages;
+gfxSprite		spr_worldbackground;
+gfxSprite		spr_worldobjects;
 
 gfxSprite		spr_noteblock;
 gfxSprite		spr_breakableblock;

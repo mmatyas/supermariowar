@@ -2570,7 +2570,7 @@ MI_TourStop::MI_TourStop(short x, short y, bool fWorld) :
 		miBonusField = new MI_SelectField(&spr_selectfielddisabled, 70, 125, "Bonus", 305, 90);
 		miBonusField->Disable(true);
 
-		miEndStageImage = new MI_Image(&spr_worldimages, 200, 300, 0, 0, 100, 40, 1, 1, 32000);
+		miEndStageImage = new MI_Image(&spr_worldbackground, 200, 300, 0, 0, 100, 40, 1, 1, 32000);
 		miEndStageImage->Show(false);
 	}
 	else
@@ -4168,11 +4168,9 @@ void MI_MapBrowser::LoadPage(short page, bool fUseFilters)
  * MI_World Class
  **************************************/
 
-MI_World::MI_World(gfxSprite * pspr) :
+MI_World::MI_World() :
 	UI_Control(0, 0)
 {
-	spr = pspr;
-
 	iPlayerX = 0;
 	iPlayerY = 0;
 	iPlayerCurrentTileX = 0;
@@ -4198,6 +4196,7 @@ MI_World::MI_World(gfxSprite * pspr) :
 	rectDstSurface->w = 640;
 	rectDstSurface->h = 480;
 
+	worldVehicle = NULL;
 }
 
 MI_World::~MI_World()
@@ -4205,6 +4204,9 @@ MI_World::~MI_World()
 	SDL_FreeSurface(sMapSurface);
 	delete rectSrcSurface;
 	delete rectDstSurface;
+
+	if(worldVehicle)
+		delete worldVehicle;
 }
 
 void MI_World::Init(short iCol, short iRow)
@@ -4256,6 +4258,8 @@ void MI_World::Init(short iCol, short iRow)
 	}
 
 	RepositionMapImage();
+
+	worldVehicle = new WorldVehicle(iCol, iRow, 0, 0);
 }
 
 void MI_World::SetControllingTeam(short iTeamID)
@@ -4288,6 +4292,12 @@ void MI_World::SetCurrentStageToCompleted(short iWinningTeam)
 
 void MI_World::Update()
 {
+	if(worldVehicle)
+	{
+		worldVehicle->SetNextDest();
+		worldVehicle->Update();
+	}
+
 	if(++iAnimationTimer > 15)
 	{
 		iAnimationTimer = 0;
@@ -4408,29 +4418,37 @@ void MI_World::DrawWorldMapToSurface(bool fInit)
 				if(iBackgroundSprite == 0 || (iBackgroundSprite > 18 && iBackgroundSprite <= 44))
 				{
 					SDL_Rect rSrc = {iAnimationFrame, 0, TILESIZE, TILESIZE};
-					SDL_BlitSurface(spr_worldimages.getSurface(), &rSrc, sMapSurface, &r);
+					SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, sMapSurface, &r);
 
 					if(iBackgroundSprite > 18 && iBackgroundSprite <= 44)
 					{
-						SDL_Rect rSrc = {TILESIZE, (iBackgroundSprite - 18) << 5, TILESIZE, TILESIZE};
-						SDL_BlitSurface(spr_worldimages.getSurface(), &rSrc, sMapSurface, &r);
+						if(iBackgroundSprite > 31)
+						{
+							SDL_Rect rSrc = {TILESIZE + TILESIZE, (iBackgroundSprite - 31) << 5, TILESIZE, TILESIZE};
+							SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, sMapSurface, &r);
+						}
+						else
+						{
+							SDL_Rect rSrc = {TILESIZE, (iBackgroundSprite - 18) << 5, TILESIZE, TILESIZE};
+							SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, sMapSurface, &r);
+						}
 					}
 				}
 				else if(iBackgroundSprite > 0 && iBackgroundSprite <= 18)
 				{
 					SDL_Rect rSrc = {0, iBackgroundSprite << 5, TILESIZE, TILESIZE};
-					SDL_BlitSurface(spr_worldimages.getSurface(), &rSrc, sMapSurface, &r);
+					SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, sMapSurface, &r);
 				}
 
 				if(iForegroundSprite == 1 || iForegroundSprite == 2)
 				{
-					SDL_Rect rSrc = {64, iForegroundSprite << 5, TILESIZE, TILESIZE};
-					SDL_BlitSurface(spr_worldimages.getSurface(), &rSrc, sMapSurface, &r);
+					SDL_Rect rSrc = {96, iForegroundSprite << 5, TILESIZE, TILESIZE};
+					SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, sMapSurface, &r);
 				}
 				else if(iForegroundSprite >= 3 && iForegroundSprite <= 6)
 				{
-					SDL_Rect rSrc = {64 + iAnimationFrame, iForegroundSprite << 5, TILESIZE, TILESIZE};
-					SDL_BlitSurface(spr_worldimages.getSurface(), &rSrc, sMapSurface, &r);
+					SDL_Rect rSrc = {iAnimationFrame, (iForegroundSprite + 14) << 5, TILESIZE, TILESIZE};
+					SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, sMapSurface, &r);
 				}
 			}
 		}
@@ -4467,6 +4485,9 @@ void MI_World::Draw()
 		iMessageTimer--;
 		menu_font_large.drawCentered(320, 64, szMessage);
 	}
+
+	if(worldVehicle)
+		worldVehicle->Draw(iMapOffsetX, iMapOffsetY);
 }
 
 MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
@@ -4491,7 +4512,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 			}
 			else if(playerKeys->menu_down.fPressed)
 			{
-				if(tile->fConnection[1]&&
+				if(tile->fConnection[1] &&
 					(tile->fCompleted || iReturnDirection == 1))
 				{
 					iPlayerDestTileY++;
@@ -4501,7 +4522,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 			}
 			else if(playerKeys->menu_left.fPressed)
 			{
-				if(tile->fConnection[2]&&
+				if(tile->fConnection[2] &&
 					(tile->fCompleted || iReturnDirection == 2))
 				{
 					iPlayerDestTileX--;
@@ -4512,7 +4533,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 			}
 			else if(playerKeys->menu_right.fPressed)
 			{
-				if(tile->fConnection[3]&&
+				if(tile->fConnection[3] &&
 					(tile->fCompleted || iReturnDirection == 3))
 				{
 					iPlayerDestTileX++;

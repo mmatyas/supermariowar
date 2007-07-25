@@ -1262,7 +1262,7 @@ void Menu::CreateMenu()
 	// World Menu
 	//***********************
 	
-	miWorld = new MI_World(&spr_overworld);
+	miWorld = new MI_World();
 	miWorld->SetAutoModify(true);
 	
 	miWorldStop = new MI_TourStop(70, 45, true);

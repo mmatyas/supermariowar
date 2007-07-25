@@ -32,6 +32,8 @@ void gfx_setresolution(int w, int h, bool fullscreen);
 void gfx_close();
 bool gfx_loadpalette();
 
+void gfx_setrect(SDL_Rect * rect, short x, short y, short w, short h);
+
 class gfxSprite
 {
 	public:

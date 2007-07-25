@@ -397,6 +397,14 @@ bool gfx_createfullskin(gfxSprite ** gSprites, const std::string& filename, Uint
 	return true;
 }
 
+void gfx_setrect(SDL_Rect * rect, short x, short y, short w, short h)
+{
+	rect->x = x;
+	rect->y = y;
+	rect->w = w;
+	rect->h = h;
+}
+
 //gfxSprite
 
 gfxSprite::gfxSprite()
@@ -870,4 +878,3 @@ void gfxFont::setalpha(Uint8 alpha)
 		printf("\n ERROR: couldn't set alpha on sprite: %s\n", SDL_GetError());
 	}
 }
-

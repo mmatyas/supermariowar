@@ -2,6 +2,143 @@
 
 extern void ResetTourStops();
 extern TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld);
+extern WorldMap g_worldmap;
+
+WorldVehicle::WorldVehicle(short iCol, short iRow, short iAction, short iSprite)
+{
+	iX = iCol * TILESIZE;
+	iY = iRow * TILESIZE;
+	iCurrentTileX = iCol;
+	iCurrentTileY = iRow;
+	iDestTileX = iCol;
+	iDestTileY = iRow;
+		
+	iState = 0;
+	iDrawSprite = iSprite;
+	
+	short iRectOffsetX = 0;
+	short iRectOffsetY = 0;
+
+	if(iDrawSprite == 0)
+	{
+		iRectOffsetX = 0;
+		iRectOffsetY = 0;
+	}
+
+	for(short iRect = 0; iRect < 4; iRect++)
+		gfx_setrect(&srcRects[iRect], iRect * TILESIZE + iRectOffsetX, iRectOffsetY, 32, 32);
+
+	iDrawDirection = 0;
+	iAnimationFrame = 0;
+	iAnimationTimer = 0;
+	
+	iNumMoves = 0;
+	iActionId = iAction;
+
+}
+
+WorldVehicle::~WorldVehicle()
+{}
+
+void WorldVehicle::SetNextDest()
+{
+	if(iState != 0)
+		return;
+	
+	WorldMapTile * tile = &g_worldmap.tiles[iCurrentTileX][iCurrentTileY];
+
+	short iConnections[4];
+	short iNumConnections = 0;
+	for(short iDirection = 0; iDirection < 4; iDirection ++)
+	{
+		if(tile->fConnection[iDirection])
+			iConnections[iNumConnections++] = iDirection;
+	}
+
+	short iConnection = iConnections[rand() % iNumConnections];
+
+	if(iConnection == 0)
+	{
+		iDestTileY--;
+		iState = 1;
+	}
+	else if(iConnection == 1)
+	{
+		iDestTileY++;
+		iState = 2;
+	}
+	else if(iConnection == 2)
+	{
+		iDestTileX--;
+		iState = 3;
+		iDrawDirection = 0;
+	}
+	else if(iConnection == 3)
+	{
+		iDestTileX++;
+		iState = 4;
+		iDrawDirection = 2;
+	}
+}
+
+void WorldVehicle::Update()
+{
+	if(++iAnimationTimer > 15)
+	{
+		iAnimationTimer = 0;
+		if(++iAnimationFrame > 1)
+			iAnimationFrame = 0;
+	}
+
+	//Player is moving from one tile to the next (up)
+	if(iState == 1)
+	{
+		iY -= 2;
+		if(iY <= iDestTileY * TILESIZE)
+		{
+			iY = iDestTileY * TILESIZE;
+			iState = 0;
+			iCurrentTileY = iDestTileY;
+		}
+	}
+	else if(iState == 2) //down
+	{
+		iY += 2;
+		if(iY >= iDestTileY * TILESIZE)
+		{
+			iY = iDestTileY * TILESIZE;
+			iState = 0;
+			iCurrentTileY = iDestTileY;
+		}
+	}
+	else if(iState == 3) //left
+	{
+		iX -= 2;
+		if(iX <= iDestTileX * TILESIZE)
+		{
+			iX = iDestTileX * TILESIZE;
+			iState = 0;
+			iCurrentTileX = iDestTileX;
+		}
+	}
+	else if(iState == 4) //right
+	{
+		iX += 2;
+		if(iX >= iDestTileX * TILESIZE)
+		{
+			iX = iDestTileX * TILESIZE;
+			iState = 0;
+			iCurrentTileX = iDestTileX;
+		}
+	}
+}
+
+void WorldVehicle::Draw(short iWorldOffsetX, short iWorldOffsetY)
+{
+	SDL_Rect rDst = {iX + iWorldOffsetX, iY + iWorldOffsetY, 32, 32};
+	SDL_BlitSurface(spr_worldobjects.getSurface(), &srcRects[iDrawDirection + iAnimationFrame], blitdest, &rDst);
+}
+
 
 WorldMap::WorldMap()
 {
