@@ -3,11 +3,36 @@
 extern void ResetTourStops();
 extern TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld);
 extern WorldMap g_worldmap;
+extern bool LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDirections);
 
-WorldVehicle::WorldVehicle(short iCol, short iRow, short iAction, short iSprite)
+
+/**********************************
+* WorldMovingObject
+**********************************/
+
+WorldMovingObject::WorldMovingObject()
 {
-	iX = iCol * TILESIZE;
-	iY = iRow * TILESIZE;
+	ix = 0;
+	iy = 0;
+	iCurrentTileX = 0;
+	iCurrentTileY = 0;
+	iDestTileX = 0;
+	iDestTileY = 0;
+		
+	iState = 0;
+	iDrawSprite = 0;
+	iDrawDirection = 0;
+	iAnimationFrame = 0;
+	iAnimationTimer = 0;
+}
+
+WorldMovingObject::~WorldMovingObject()
+{}
+
+void WorldMovingObject::Init(short iCol, short iRow, short iSprite)
+{
+	ix = iCol * TILESIZE;
+	iy = iRow * TILESIZE;
 	iCurrentTileX = iCol;
 	iCurrentTileY = iRow;
 	iDestTileX = iCol;
@@ -15,37 +40,193 @@ WorldVehicle::WorldVehicle(short iCol, short iRow, short iAction, short iSprite)
 		
 	iState = 0;
 	iDrawSprite = iSprite;
-	
+	iDrawDirection = 0;
+	iAnimationFrame = 0;
+	iAnimationTimer = 0;
+}
+
+void WorldMovingObject::Move(short iDirection)
+{
+	if(iDirection == 0)
+	{
+		iDestTileY--;
+		iState = 1;
+	}
+	else if(iDirection == 1)
+	{
+		iDestTileY++;
+		iState = 2;
+	}
+	else if(iDirection == 2)
+	{
+		iDestTileX--;
+		iState = 3;
+		iDrawDirection = 1;
+	}
+	else if(iDirection == 3)
+	{
+		iDestTileX++;
+		iState = 4;
+		iDrawDirection = 0;
+	}
+}
+
+bool WorldMovingObject::Update()
+{
+	if(++iAnimationTimer > 15)
+	{
+		iAnimationTimer = 0;
+		iAnimationFrame += 2;
+		if(iAnimationFrame > 2)
+			iAnimationFrame = 0;
+	}
+
+	if(iState == 1)
+	{
+		iy -= 2;
+		if(iy <= iDestTileY * TILESIZE)
+		{
+			iy = iDestTileY * TILESIZE;
+			iState = 0;
+			iCurrentTileY = iDestTileY;
+
+			return true;
+		}
+	}
+	else if(iState == 2) //down
+	{
+		iy += 2;
+		if(iy >= iDestTileY * TILESIZE)
+		{
+			iy = iDestTileY * TILESIZE;
+			iState = 0;
+			iCurrentTileY = iDestTileY;
+
+			return true;
+		}
+	}
+	else if(iState == 3) //left
+	{
+		ix -= 2;
+		if(ix <= iDestTileX * TILESIZE)
+		{
+			ix = iDestTileX * TILESIZE;
+			iState = 0;
+			iCurrentTileX = iDestTileX;
+
+			return true;
+		}
+	}
+	else if(iState == 4) //right
+	{
+		ix += 2;
+		if(ix >= iDestTileX * TILESIZE)
+		{
+			ix = iDestTileX * TILESIZE;
+			iState = 0;
+			iCurrentTileX = iDestTileX;
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/**********************************
+* WorldPlayer
+**********************************/
+
+WorldPlayer::WorldPlayer() :
+	WorldMovingObject()
+{}
+
+WorldPlayer::~WorldPlayer()
+{}
+
+void WorldPlayer::Init(short iCol, short iRow)
+{
+	WorldMovingObject::Init(iCol, iRow, 0);
+}
+
+void WorldPlayer::Draw(short iMapOffsetX, short iMapOffsetY)
+{
+	spr_player[iDrawSprite][iAnimationFrame + iDrawDirection]->draw(ix + iMapOffsetX, iy + iMapOffsetY, 0, 0, 32, 32);
+}
+
+void WorldPlayer::SetSprite(short iPlayer)
+{
+	while(!LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], true))
+	{
+		if(++game_values.skinids[iPlayer] >= skinlist.GetCount())
+			game_values.skinids[iPlayer] = 0;
+	}
+
+	iDrawSprite = iPlayer;
+}
+
+
+/**********************************
+* WorldVehicle
+**********************************/
+
+WorldVehicle::WorldVehicle() :
+	WorldMovingObject()
+{}
+
+WorldVehicle::~WorldVehicle()
+{}
+
+void WorldVehicle::Init(short iCol, short iRow, short iAction, short iSprite, short minMoves, short maxMoves)
+{
+	WorldMovingObject::Init(iCol, iRow, iSprite);
+
+	fEnabled = true;
+
 	short iRectOffsetX = 0;
 	short iRectOffsetY = 0;
 
-	if(iDrawSprite == 0)
+	if(iDrawSprite >= 0 && iDrawSprite <= 2)
 	{
 		iRectOffsetX = 0;
-		iRectOffsetY = 0;
+		iRectOffsetY = iDrawSprite * TILESIZE;
 	}
 
 	for(short iRect = 0; iRect < 4; iRect++)
 		gfx_setrect(&srcRects[iRect], iRect * TILESIZE + iRectOffsetX, iRectOffsetY, 32, 32);
 
-	iDrawDirection = 0;
-	iAnimationFrame = 0;
-	iAnimationTimer = 0;
-	
 	iNumMoves = 0;
 	iActionId = iAction;
 
+	iMinMoves = minMoves;
+	iMaxMoves = maxMoves;
 }
 
-WorldVehicle::~WorldVehicle()
-{}
+void WorldVehicle::Move()
+{
+	iNumMoves = rand() % (iMaxMoves - iMinMoves + 1) + iMinMoves;
+	SetNextDest();
+}
 
 void WorldVehicle::SetNextDest()
 {
 	if(iState != 0)
 		return;
-	
+
 	WorldMapTile * tile = &g_worldmap.tiles[iCurrentTileX][iCurrentTileY];
+
+	short iPlayerCurrentTileX, iPlayerCurrentTileY;
+	g_worldmap.GetPlayerCurrentTile(&iPlayerCurrentTileX, &iPlayerCurrentTileY);
+
+	if(--iNumMoves <= 0)
+	{
+		if(tile->iType == 0 && (iPlayerCurrentTileX != iCurrentTileX || iPlayerCurrentTileY != iCurrentTileY))
+			return;
+	}
+
+	//Don't allow vehicle to move forever, cap it at 10 moves over the number attempted
+	if(iNumMoves <= -10)
+		return;
 
 	short iConnections[4];
 	short iNumConnections = 0;
@@ -57,94 +238,38 @@ void WorldVehicle::SetNextDest()
 
 	short iConnection = iConnections[rand() % iNumConnections];
 
-	if(iConnection == 0)
-	{
-		iDestTileY--;
-		iState = 1;
-	}
-	else if(iConnection == 1)
-	{
-		iDestTileY++;
-		iState = 2;
-	}
-	else if(iConnection == 2)
-	{
-		iDestTileX--;
-		iState = 3;
-		iDrawDirection = 0;
-	}
-	else if(iConnection == 3)
-	{
-		iDestTileX++;
-		iState = 4;
-		iDrawDirection = 2;
-	}
+	WorldMovingObject::Move(iConnection);
 }
 
-void WorldVehicle::Update()
+bool WorldVehicle::Update()
 {
-	if(++iAnimationTimer > 15)
-	{
-		iAnimationTimer = 0;
-		if(++iAnimationFrame > 1)
-			iAnimationFrame = 0;
-	}
+	bool fMoveDone = WorldMovingObject::Update();
 
-	//Player is moving from one tile to the next (up)
-	if(iState == 1)
-	{
-		iY -= 2;
-		if(iY <= iDestTileY * TILESIZE)
-		{
-			iY = iDestTileY * TILESIZE;
-			iState = 0;
-			iCurrentTileY = iDestTileY;
-		}
-	}
-	else if(iState == 2) //down
-	{
-		iY += 2;
-		if(iY >= iDestTileY * TILESIZE)
-		{
-			iY = iDestTileY * TILESIZE;
-			iState = 0;
-			iCurrentTileY = iDestTileY;
-		}
-	}
-	else if(iState == 3) //left
-	{
-		iX -= 2;
-		if(iX <= iDestTileX * TILESIZE)
-		{
-			iX = iDestTileX * TILESIZE;
-			iState = 0;
-			iCurrentTileX = iDestTileX;
-		}
-	}
-	else if(iState == 4) //right
-	{
-		iX += 2;
-		if(iX >= iDestTileX * TILESIZE)
-		{
-			iX = iDestTileX * TILESIZE;
-			iState = 0;
-			iCurrentTileX = iDestTileX;
-		}
-	}
+	if(fMoveDone)
+		SetNextDest();
+
+	return false;
 }
 
 void WorldVehicle::Draw(short iWorldOffsetX, short iWorldOffsetY)
 {
-	SDL_Rect rDst = {iX + iWorldOffsetX, iY + iWorldOffsetY, 32, 32};
+	SDL_Rect rDst = {ix + iWorldOffsetX, iy + iWorldOffsetY, 32, 32};
 	SDL_BlitSurface(spr_worldobjects.getSurface(), &srcRects[iDrawDirection + iAnimationFrame], blitdest, &rDst);
 }
 
+
+/**********************************
+* WorldMap
+**********************************/
 
 WorldMap::WorldMap()
 {
 	iWidth = 0;
 	iHeight = 0;
-	tiles = NULL;	
+	tiles = NULL;
+	vehicles = NULL;
+	iNumVehicles = 0;
+	iNumStages = 0;
 }
 
 WorldMap::~WorldMap()
@@ -166,15 +291,15 @@ bool WorldMap::Load()
 	short iReadType = 0;
 	short iVersion[4] = {0, 0, 0, 0};
 	short iMapTileReadRow = 0;
-	short iMaxStageNumber = 0;
 	short iCurrentStage = 0;
+	short iCurrentVehicle = 0;
 	
 	while(fgets(buffer, 256, file))
 	{
 		if(buffer[0] == '#' || buffer[0] == '\n' || buffer[0] == '\r' || buffer[0] == ' ' || buffer[0] == '\t')
 			continue;
 
-		if(iReadType == 0)
+		if(iReadType == 0)  //Read version number
 		{
 			char * psz = strtok(buffer, ".\n");
 			if(psz)
@@ -194,12 +319,12 @@ bool WorldMap::Load()
 
 			iReadType = 1;
 		}
-		else if(iReadType == 1)
+		else if(iReadType == 1) //world width
 		{
 			iWidth = atoi(buffer);
 			iReadType = 2;
 		}
-		else if(iReadType == 2)
+		else if(iReadType == 2) //world height
 		{
 			iHeight = atoi(buffer);
 			iReadType = 3;
@@ -209,7 +334,7 @@ bool WorldMap::Load()
 			for(short iCol = 0; iCol < iWidth; iCol++)
 				tiles[iCol] = new WorldMapTile[iHeight];
 		}
-		else if(iReadType == 3)
+		else if(iReadType == 3) //background sprites
 		{
 			char * psz = strtok(buffer, ",\n");
 			
@@ -231,7 +356,7 @@ bool WorldMap::Load()
 				iMapTileReadRow = 0;
 			}
 		}
-		else if(iReadType == 4)
+		else if(iReadType == 4) //foreground sprites
 		{
 			char * psz = strtok(buffer, ",\n");
 			
@@ -255,7 +380,7 @@ bool WorldMap::Load()
 				iMapTileReadRow = 0;
 			}
 		}
-		else if(iReadType == 5)
+		else if(iReadType == 5) //path connections
 		{
 			char * psz = strtok(buffer, ",\n");
 			
@@ -333,7 +458,7 @@ bool WorldMap::Load()
 				}
 			}
 		}
-		else if(iReadType == 6)
+		else if(iReadType == 6) //stages
 		{
 			char * psz = strtok(buffer, ",\n");
 			
@@ -344,9 +469,6 @@ bool WorldMap::Load()
 
 				WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
 				tile->iType = atoi(psz);
-
-				if(tile->iType > iMaxStageNumber)
-					iMaxStageNumber = tile->iType;
 
 				if(tile->iType == 1)
 				{
@@ -360,20 +482,61 @@ bool WorldMap::Load()
 			}
 
 			if(++iMapTileReadRow == iHeight)
-			{
 				iReadType = 7;
-				iMaxStageNumber--;  //offset down by 1 because #1 is the start 
-			}
 		}
-		else if(iReadType == 7)
+		else if(iReadType == 7) //number of stages
+		{
+			iNumStages = atoi(buffer);
+			iReadType = 8;
+		}
+		else if(iReadType == 8) //stage details
 		{
 			TourStop * ts = ParseTourStopLine(buffer, iVersion, true);
 		
 			game_values.tourstops.push_back(ts);
 			game_values.tourstoptotal++;
 
-			if(++iCurrentStage >= iMaxStageNumber)
-				iReadType = 8;
+			if(++iCurrentStage >= iNumStages)
+				iReadType = 9;
+		}
+		else if(iReadType == 9) //number of vehicles
+		{
+			iNumVehicles = atoi(buffer);
+			vehicles = new WorldVehicle[iNumVehicles];
+			iReadType = 10;
+		}
+		else if(iReadType == 10) //moving objects
+		{
+			char * psz = strtok(buffer, ",\n");
+			
+			if(!psz)
+				goto RETURN;
+
+			short iSprite = atoi(psz);
+
+			psz = strtok(NULL, ",\n");
+
+			short iStage = atoi(psz);
+
+			if(iStage > iNumStages)
+				iStage = 0;
+
+			psz = strtok(NULL, ",\n");
+			short iCol = atoi(psz);
+
+			psz = strtok(NULL, ",\n");
+			short iRow = atoi(psz);
+
+			psz = strtok(NULL, ",\n");
+			short iMinMoves = atoi(psz);
+
+			psz = strtok(NULL, ",\n");
+			short iMaxMoves = atoi(psz);
+
+			vehicles[iCurrentVehicle].Init(iCol, iRow, iStage, iSprite, iMinMoves, iMaxMoves);
+
+			if(++iCurrentVehicle >= iNumVehicles)
+				iReadType = 11;
 		}
 	}
 
@@ -381,12 +544,51 @@ RETURN:
 
 	fclose(file);
 
-	return iReadType == 8;
+	return iReadType == 11;
 }
 
 bool WorldMap::Save(char * szFileName)
 {
 	return false;
+}
+
+void WorldMap::InitPlayer()
+{
+	player.Init(iStartX, iStartY);
+}
+
+bool WorldMap::Update()
+{
+	bool fPlayMovingVehicleSound = false;
+
+	for(short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++)
+	{
+		if(!vehicles[iVehicle].fEnabled)
+			continue;
+
+		vehicles[iVehicle].Update();
+
+		if(vehicles[iVehicle].iState > 0)
+			fPlayMovingVehicleSound = true;
+	}
+
+	if(fPlayMovingVehicleSound && !sfx_boomerang.isplaying())
+		ifsoundonplay(sfx_boomerang);
+
+	return player.Update();
+}
+
+void WorldMap::Draw(short iMapOffsetX, short iMapOffsetY)
+{
+	for(short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++)
+	{
+		if(!vehicles[iVehicle].fEnabled)
+			continue;
+
+		vehicles[iVehicle].Draw(iMapOffsetX, iMapOffsetY);
+	}
+
+	player.Draw(iMapOffsetX, iMapOffsetY);
 }
 
 void WorldMap::Cleanup()
@@ -400,4 +602,87 @@ void WorldMap::Cleanup()
 
 		tiles = NULL;
 	}
+
+	if(vehicles)
+	{
+		delete [] vehicles;
+		vehicles = NULL;
+	}
+}
+
+void WorldMap::SetPlayerSprite(short iPlayerSprite)
+{
+	player.SetSprite(iPlayerSprite);
+}
+
+bool WorldMap::IsVehicleMoving()
+{
+	for(short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++)
+	{
+		if(!vehicles[iVehicle].fEnabled)
+			continue;
+
+		if(vehicles[iVehicle].iState > 0)
+			return true;
+	}
+
+	return false;
+}
+
+void WorldMap::GetPlayerPosition(short * iPlayerX, short * iPlayerY)
+{
+	*iPlayerX = player.ix;
+	*iPlayerY = player.iy;
+}
+
+void WorldMap::GetPlayerCurrentTile(short * iPlayerCurrentTileX, short * iPlayerCurrentTileY)
+{
+	*iPlayerCurrentTileX = player.iCurrentTileX;
+	*iPlayerCurrentTileY = player.iCurrentTileY;
+}
+
+short WorldMap::GetPlayerState()
+{
+	return player.iState;
+}
+
+short WorldMap::GetVehicleInPlayerTile(short * vehicleIndex)
+{
+	for(short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++)
+	{
+		WorldVehicle * vehicle = &vehicles[iVehicle];
+
+		if(!vehicle->fEnabled)
+			continue;
+
+		if(vehicle->iCurrentTileX == player.iCurrentTileX && vehicle->iCurrentTileY == player.iCurrentTileY)
+		{
+			*vehicleIndex = iVehicle;
+			return vehicle->iActionId;
+		}
+	}
+
+	*vehicleIndex = -1;
+	return -1;
+}
+
+void WorldMap::MovePlayer(short iDirection)
+{
+	player.Move(iDirection);
+}
+
+void WorldMap::MoveVehicles()
+{
+	for(short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++)
+	{
+		if(!vehicles[iVehicle].fEnabled)
+			continue;
+
+		vehicles[iVehicle].Move();
+	}
+}
+
+void WorldMap::RemoveVehicle(short iVehicleIndex)
+{
+	vehicles[iVehicleIndex].fEnabled = false;
 }

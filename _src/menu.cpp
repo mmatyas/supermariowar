@@ -2587,7 +2587,7 @@ void Menu::RunMenu()
 					}
 					else
 					{
-						miWorld->Init(g_worldmap.iStartX, g_worldmap.iStartY);
+						miWorld->Init();
 						miWorld->SetControllingTeam(rand() % score_cnt);
 					}
 				}

@@ -900,7 +900,7 @@ class MI_World : public UI_Control
 		MenuCodeEnum SendInput(CPlayerInput * playerInput);
 		MenuCodeEnum Modify(bool modify);
 
-		void Init(short iCol, short iRow);
+		void Init();
 		void SetControllingTeam(short iPlayerID);
 		void SetCurrentStageToCompleted(short iWinningTeam);
 
@@ -909,21 +909,12 @@ class MI_World : public UI_Control
 		void RepositionMapImage();
 		void DrawWorldMapToSurface(bool fInit);
 
-		WorldVehicle * worldVehicle;
-
 		SDL_Surface * sMapSurface;
 		SDL_Rect * rectSrcSurface;
 		SDL_Rect * rectDstSurface;
 
 		short iAnimationTimer;
 		short iAnimationFrame;
-
-		short iPlayerX;
-		short iPlayerY;
-		short iPlayerCurrentTileX;
-		short iPlayerCurrentTileY;
-		short iPlayerDestTileX;
-		short iPlayerDestTileY;
 
 		short iMapOffsetX;
 		short iMapOffsetY;
@@ -932,14 +923,12 @@ class MI_World : public UI_Control
 		short iMapDrawOffsetRow;
 			
 		short iControllingTeam;
-		short iPlayerState;
 		short iReturnDirection;
-		short iDrawPlayerSprite;
-		short iPlayerAnimationFrame;
-		short iDrawPlayerDirection;
 
 		short iMessageTimer;
 		char szMessage[128];
+
+		short iVehicleId;
 };
 
 
