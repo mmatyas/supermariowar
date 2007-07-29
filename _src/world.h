@@ -22,7 +22,7 @@ class WorldMovingObject
 		WorldMovingObject();
 		virtual ~WorldMovingObject();
 
-		void Init(short iCol, short iRow, short iSprite);
+		void Init(short iCol, short iRow, short iSprite, short iInitialDirection);
 		virtual void Move(short iDirection);
 		virtual bool Update();
 		virtual void Draw(short iWorldOffsetX, short iWorldOffsetY) = 0;
@@ -68,7 +68,7 @@ class WorldVehicle : public WorldMovingObject
 		WorldVehicle();
 		~WorldVehicle();
 
-		void Init(short iCol, short iRow, short iAction, short iSprite, short iMinMoves, short iMaxMoves);
+		void Init(short iCol, short iRow, short iAction, short iSprite, short iMinMoves, short iMaxMoves, bool fSpritePaces, short iInitialDirection);
 		void Move();
 		
 		bool Update();
@@ -87,6 +87,10 @@ class WorldVehicle : public WorldMovingObject
 		short iActionId;
 
 		bool fEnabled;
+
+		bool fSpritePaces;
+		short iPaceOffset;
+		short iPaceTimer;
 
 	friend class WorldMap;
 };
@@ -119,6 +123,8 @@ class WorldMap
 		void MoveVehicles();
 
 		void RemoveVehicle(short iVehicleIndex);
+
+		short NumVehiclesInTile(short iTileX, short iTileY);
 
 	private:
 

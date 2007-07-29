@@ -4482,6 +4482,8 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 						g_worldmap.MovePlayer(1);
 						iReturnDirection = 0;
 					}
+
+					g_worldmap.MoveVehicles();
 				}
 				else if(playerKeys->menu_left.fPressed)
 				{

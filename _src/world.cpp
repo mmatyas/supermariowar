@@ -29,7 +29,7 @@ WorldMovingObject::WorldMovingObject()
 WorldMovingObject::~WorldMovingObject()
 {}
 
-void WorldMovingObject::Init(short iCol, short iRow, short iSprite)
+void WorldMovingObject::Init(short iCol, short iRow, short iSprite, short iInitialDirection)
 {
 	ix = iCol * TILESIZE;
 	iy = iRow * TILESIZE;
@@ -40,7 +40,7 @@ void WorldMovingObject::Init(short iCol, short iRow, short iSprite)
 		
 	iState = 0;
 	iDrawSprite = iSprite;
-	iDrawDirection = 0;
+	iDrawDirection = iInitialDirection;
 	iAnimationFrame = 0;
 	iAnimationTimer = 0;
 }
@@ -146,7 +146,7 @@ WorldPlayer::~WorldPlayer()
 
 void WorldPlayer::Init(short iCol, short iRow)
 {
-	WorldMovingObject::Init(iCol, iRow, 0);
+	WorldMovingObject::Init(iCol, iRow, 0, 0);
 }
 
 void WorldPlayer::Draw(short iMapOffsetX, short iMapOffsetY)
@@ -177,9 +177,9 @@ WorldVehicle::WorldVehicle() :
 WorldVehicle::~WorldVehicle()
 {}
 
-void WorldVehicle::Init(short iCol, short iRow, short iAction, short iSprite, short minMoves, short maxMoves)
+void WorldVehicle::Init(short iCol, short iRow, short iAction, short iSprite, short minMoves, short maxMoves, bool spritePaces, short iInitialDirection)
 {
-	WorldMovingObject::Init(iCol, iRow, iSprite);
+	WorldMovingObject::Init(iCol, iRow, iSprite, iInitialDirection);
 
 	fEnabled = true;
 
@@ -200,17 +200,28 @@ void WorldVehicle::Init(short iCol, short iRow, short iAction, short iSprite, sh
 
 	iMinMoves = minMoves;
 	iMaxMoves = maxMoves;
+
+	fSpritePaces = spritePaces;
+	iPaceOffset = 0;
+	iPaceTimer = 0;
 }
 
 void WorldVehicle::Move()
 {
 	iNumMoves = rand() % (iMaxMoves - iMinMoves + 1) + iMinMoves;
+
+	if(iNumMoves > 0)
+	{
+		iPaceOffset = 0;
+		iPaceTimer = 0;
+	}
+
 	SetNextDest();
 }
 
 void WorldVehicle::SetNextDest()
 {
-	if(iState != 0)
+	if(iState != 0 || iMaxMoves == 0)
 		return;
 
 	WorldMapTile * tile = &g_worldmap.tiles[iCurrentTileX][iCurrentTileY];
@@ -218,9 +229,10 @@ void WorldVehicle::SetNextDest()
 	short iPlayerCurrentTileX, iPlayerCurrentTileY;
 	g_worldmap.GetPlayerCurrentTile(&iPlayerCurrentTileX, &iPlayerCurrentTileY);
 
-	if(--iNumMoves <= 0)
+	if(iNumMoves-- <= 0)
 	{
-		if(tile->iType == 0 && (iPlayerCurrentTileX != iCurrentTileX || iPlayerCurrentTileY != iCurrentTileY))
+		if(tile->iType == 0 && (iPlayerCurrentTileX != iCurrentTileX || iPlayerCurrentTileY != iCurrentTileY) && 
+			g_worldmap.NumVehiclesInTile(iCurrentTileX, iCurrentTileY) <= 1)
 			return;
 	}
 
@@ -248,12 +260,29 @@ bool WorldVehicle::Update()
 	if(fMoveDone)
 		SetNextDest();
 
+	//If we're done moving, start pacing in place
+	if(fSpritePaces && iState == 0 && ++iPaceTimer > 1)
+	{
+		iPaceTimer = 0;
+
+		if(iDrawDirection)
+		{
+			if(--iPaceOffset <= -16)
+				iDrawDirection = 0;
+		}
+		else
+		{
+			if(++iPaceOffset >= 16)
+				iDrawDirection = 1;
+		}
+	}
+
 	return false;
 }
 
 void WorldVehicle::Draw(short iWorldOffsetX, short iWorldOffsetY)
 {
-	SDL_Rect rDst = {ix + iWorldOffsetX, iy + iWorldOffsetY, 32, 32};
+	SDL_Rect rDst = {ix + iWorldOffsetX + iPaceOffset, iy + iWorldOffsetY, 32, 32};
 	SDL_BlitSurface(spr_worldobjects.getSurface(), &srcRects[iDrawDirection + iAnimationFrame], blitdest, &rDst);
 }
 
@@ -530,10 +559,25 @@ bool WorldMap::Load()
 			psz = strtok(NULL, ",\n");
 			short iMinMoves = atoi(psz);
 
+			if(iMinMoves < 0)
+				iMinMoves = 0;
+
 			psz = strtok(NULL, ",\n");
 			short iMaxMoves = atoi(psz);
 
-			vehicles[iCurrentVehicle].Init(iCol, iRow, iStage, iSprite, iMinMoves, iMaxMoves);
+			if(iMaxMoves < iMinMoves)
+				iMaxMoves = iMinMoves;
+
+			psz = strtok(NULL, ",\n");
+			bool fSpritePaces = atoi(psz) == 1;
+
+			psz = strtok(NULL, ",\n");
+			short iInitialDirection = atoi(psz);
+
+			if(iInitialDirection != 0)
+				iInitialDirection = 1;
+
+			vehicles[iCurrentVehicle].Init(iCol, iRow, iStage, iSprite, iMinMoves, iMaxMoves, fSpritePaces, iInitialDirection);
 
 			if(++iCurrentVehicle >= iNumVehicles)
 				iReadType = 11;
@@ -685,4 +729,21 @@ void WorldMap::MoveVehicles()
 void WorldMap::RemoveVehicle(short iVehicleIndex)
 {
 	vehicles[iVehicleIndex].fEnabled = false;
+}
+
+short WorldMap::NumVehiclesInTile(short iTileX, short iTileY)
+{
+	short iVehicleCount = 0;
+	for(short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++)
+	{
+		WorldVehicle * vehicle = &vehicles[iVehicle];
+
+		if(!vehicle->fEnabled)
+			continue;
+
+		if(vehicle->iCurrentTileX == iTileX && vehicle->iCurrentTileY == iTileY)
+			iVehicleCount++;
+	}
+
+	return iVehicleCount;
 }
