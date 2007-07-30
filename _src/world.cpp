@@ -747,3 +747,8 @@ short WorldMap::NumVehiclesInTile(short iTileX, short iTileY)
 
 	return iVehicleCount;
 }
+
+short WorldMap::GetVehicleStageScore(short iVehicleIndex)
+{
+	return game_values.tourstops[vehicles[iVehicleIndex].iActionId]->iPoints;
+}

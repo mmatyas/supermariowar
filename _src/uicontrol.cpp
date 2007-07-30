@@ -3037,20 +3037,23 @@ void MI_TournamentScoreboard::RefreshScores()
 			miPlayerImages[iTeam][iPlayer]->SetPosition(ix + iScoreboardPlayerOffsetsX[iTeamCounts[iTeam] - 1][iPlayer] - 40, iTeamY + 16);
 		}
 
-		for(short iGame = 0; iGame < game_values.tourstopcurrent; iGame++)
+		if(game_values.matchtype != MATCH_TYPE_WORLD)
 		{
-			miIconImages[iTeam][iGame]->SetImage(fTour ? 0 : game_values.tournament_scores[iTeam].type[iGame] * 32, fTour ? game_values.tournament_scores[iTeam].type[iGame] * 32 : 0, 32, 32);
+			for(short iGame = 0; iGame < game_values.tourstopcurrent; iGame++)
+			{
+				miIconImages[iTeam][iGame]->SetImage(fTour ? 0 : game_values.tournament_scores[iTeam].type[iGame] * 32, fTour ? game_values.tournament_scores[iTeam].type[iGame] * 32 : 0, 32, 32);
 
-			miIconImages[iTeam][iGame]->SetPosition(ix + 128 + (short)dSpacing + (short)((float)iGame * (32.0f + dSpacing)) - 40, iTeamY + 16);
+				miIconImages[iTeam][iGame]->SetPosition(ix + 128 + (short)dSpacing + (short)((float)iGame * (32.0f + dSpacing)) - 40, iTeamY + 16);
 
-			miIconImages[iTeam][iGame]->SetSwirl(false, 0.0f, 0.0f, 0.0f, 0.0f);
-			miIconImages[iTeam][iGame]->SetPulse(false);
-			miIconImages[iTeam][iGame]->Show(true);
-		}
+				miIconImages[iTeam][iGame]->SetSwirl(false, 0.0f, 0.0f, 0.0f, 0.0f);
+				miIconImages[iTeam][iGame]->SetPulse(false);
+				miIconImages[iTeam][iGame]->Show(true);
+			}
 
-		for(short iGame = game_values.tourstopcurrent; iGame < game_values.tourstoptotal; iGame++)
-		{
-			miIconImages[iTeam][iGame]->Show(false);
+			for(short iGame = game_values.tourstopcurrent; iGame < game_values.tourstoptotal; iGame++)
+			{
+				miIconImages[iTeam][iGame]->Show(false);
+			}
 		}
 
 		tourScores[iTeam]->SetPosition(ix + 508, iTeamY + 24);
@@ -4188,8 +4191,6 @@ MI_World::MI_World() :
 	rectDstSurface->y = 0;
 	rectDstSurface->w = 640;
 	rectDstSurface->h = 480;
-
-	iVehicleId = -1;
 }
 
 MI_World::~MI_World()
@@ -4265,6 +4266,7 @@ void MI_World::SetCurrentStageToCompleted(short iWinningTeam)
 {
 	if(iVehicleId >= 0)
 	{
+		game_values.tournament_scores[iWinningTeam].total += g_worldmap.GetVehicleStageScore(iVehicleId);
 		g_worldmap.RemoveVehicle(iVehicleId);
 	}
 	else
@@ -4277,6 +4279,8 @@ void MI_World::SetCurrentStageToCompleted(short iWinningTeam)
 		tile->iForegroundSprite = iWinningTeam; //Update with team completed sprite
 		tile->fAnimated = false; //Update with team completed sprite
 		tile->fCompleted = true;
+
+		game_values.tournament_scores[iWinningTeam].total += game_values.tourstops[tile->iType - 2]->iPoints;
 	}
 
 	g_worldmap.MoveVehicles();
@@ -4482,8 +4486,6 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 						g_worldmap.MovePlayer(1);
 						iReturnDirection = 0;
 					}
-
-					g_worldmap.MoveVehicles();
 				}
 				else if(playerKeys->menu_left.fPressed)
 				{
@@ -4506,15 +4508,6 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 				else if(playerInput->outputControls[iPlayer].menu_select.fPressed)
 				{
 					//Lookup current tile and see if it is a type of tile you can interact with
-					//if it is a stage, then load the stage
-					WorldMapTile * tile = &g_worldmap.tiles[iPlayerCurrentTileX][iPlayerCurrentTileY];
-					short iType = tile->iType - 2;
-					if(iType >= 0 && !tile->fCompleted)
-					{
-						game_values.tourstopcurrent = iType;
-						return MENU_CODE_WORLD_STAGE_START;
-					}
-
 					//If there is a vehicle on this tile, then load it's stage
 					short iStage = g_worldmap.GetVehicleInPlayerTile(&iVehicleId);
 					if(iStage >= 0)
@@ -4522,6 +4515,16 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 						game_values.tourstopcurrent = iStage;
 						return MENU_CODE_WORLD_STAGE_START;
 					}
+
+					//if it is a stage, then load the stage
+					WorldMapTile * tile = &g_worldmap.tiles[iPlayerCurrentTileX][iPlayerCurrentTileY];
+
+					short iType = tile->iType - 2;
+					if(iType >= 0 && !tile->fCompleted)
+					{
+						game_values.tourstopcurrent = iType;
+						return MENU_CODE_WORLD_STAGE_START;
+					}					
 				}
 			}
 

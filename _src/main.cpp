@@ -1670,7 +1670,7 @@ void RunGame()
 				{
 					if(game_values.gamemode->gameover)
 					{
-						if(game_values.matchtype != MATCH_TYPE_SINGLE_GAME)
+						if(game_values.matchtype == MATCH_TYPE_TOUR || game_values.matchtype == MATCH_TYPE_TOURNAMENT)
 							UpdateScoreBoard();
 
 						CleanUp();
@@ -2796,6 +2796,21 @@ void UpdateScoreBoard()
 		{
 			game_values.tournamentwinner = 1;
 			backgroundmusic[4].play(true, true);
+		}
+
+		//Add up all the winnings so far and determine overall place in the standings
+		for(short iScore = 0; iScore < score_cnt; iScore++)
+			game_values.tournament_scores[iScore].wins = 0;
+
+		for(short iMyScore = 0; iMyScore < score_cnt; iMyScore++)
+		{
+			for(short iTheirScore = 0; iTheirScore < score_cnt; iTheirScore++)
+			{
+				if(game_values.tournament_scores[iMyScore].total > game_values.tournament_scores[iTheirScore].total)
+				{
+					game_values.tournament_scores[iTheirScore].wins++;
+				}
+			}
 		}
 	}
 	else if(game_values.matchtype == MATCH_TYPE_TOUR)

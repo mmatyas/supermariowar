@@ -34,7 +34,8 @@ extern bool LoadMenuGraphics();
 extern bool LoadGameGraphics();
 extern bool LoadGameSounds();
 extern bool LoadFullSkin(gfxSprite ** sprites, short skinID, short colorID);
-//bool LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDirections);
+
+extern void UpdateScoreBoard();
 
 //Rearrange display of powerups
 short iPowerupDisplayMap[NUM_POWERUPS] = { 4, 0, 1, 2, 3, 6, 10, 12, 11, 14, 13, 7, 16, 17, 18, 19, 15, 9, 5, 8};
@@ -2221,14 +2222,14 @@ void Menu::RunMenu()
 		miBonusWheel->Reset(false);
 		mCurrentMenu = &mBonusWheelMenu;
 	}
-	else if(game_values.matchtype == MATCH_TYPE_TOUR || game_values.matchtype == MATCH_TYPE_TOURNAMENT)
+	else if(game_values.matchtype != MATCH_TYPE_SINGLE_GAME)
 	{
 		mCurrentMenu = &mTournamentScoreboardMenu;
 	}
 	
 	if(game_values.matchtype == MATCH_TYPE_WORLD)
 	{
-		if(game_values.gamemode->winningteam > -1 && game_values.tournamentwinner == -1)
+		if(game_values.gamemode->winningteam > -1 && game_values.tournamentwinner == -1)  //Stage is completed
 		{
 			miWorld->SetControllingTeam(game_values.gamemode->winningteam);
 			miWorld->SetCurrentStageToCompleted(game_values.gamemode->winningteam);
@@ -2240,11 +2241,14 @@ void Menu::RunMenu()
 
 			mWorldMenu.RestoreCurrent();
 		}
-		else if(game_values.tournamentwinner > -1)
+		else if(game_values.tournamentwinner > -1) //World is completed
 		{
 			miBonusWheel->Reset(false);
 			mCurrentMenu = &mBonusWheelMenu;
 		}
+
+		UpdateScoreBoard();
+		miTournamentScoreboard->RefreshScores();
 	}
 	else if(game_values.matchtype == MATCH_TYPE_TOUR)
 	{
@@ -2279,8 +2283,11 @@ void Menu::RunMenu()
 		}
 	}
 
-	if(mCurrentMenu == &mGameSettingsMenu || mCurrentMenu == &mTournamentScoreboardMenu)
-		miMapField->LoadCurrentMap();
+	if(game_values.matchtype == MATCH_TYPE_TOUR || game_values.matchtype == MATCH_TYPE_TOURNAMENT)
+	{
+		if(mCurrentMenu == &mGameSettingsMenu || mCurrentMenu == &mTournamentScoreboardMenu)
+			miMapField->LoadCurrentMap();
+	}
 
 	float realfps = 0, flipfps = 0;
 	unsigned int framestart, ticks;
@@ -2587,6 +2594,8 @@ void Menu::RunMenu()
 					}
 					else
 					{
+						miTournamentScoreboard->CreateScoreboard(score_cnt, 0, &spr_tour_markers, true);
+
 						miWorld->Init();
 						miWorld->SetControllingTeam(rand() % score_cnt);
 					}
@@ -2653,28 +2662,38 @@ void Menu::RunMenu()
 			}
 			else if(MENU_CODE_BACK_TO_GAME_SETUP_MENU == code)
 			{
-				if(game_values.tournamentwinner == -2) //Tied Tour Result
+				if(game_values.matchtype == MATCH_TYPE_WORLD)
 				{
-					ResetTournamentBackToMainMenu();
+					if(game_values.tournamentwinner == -2 || game_values.tournamentwinner > -1) //If world is over then return back to main menu
+						ResetTournamentBackToMainMenu();
+					else 
+						mCurrentMenu = &mWorldMenu;
 				}
-				else if(game_values.tournamentwinner > -1) //Tournament/Tour Won and Bonus Wheel will be spun
+				else
 				{
-					if(((game_values.matchtype != MATCH_TYPE_TOUR && game_values.bonuswheel == 0) || (game_values.matchtype == MATCH_TYPE_TOUR && !game_values.tourstops[game_values.tourstopcurrent - 1]->iBonusType)))
+					if(game_values.tournamentwinner == -2) //Tied Tour Result
 					{
 						ResetTournamentBackToMainMenu();
 					}
-					else
+					else if(game_values.tournamentwinner > -1) //Tournament/Tour Won and Bonus Wheel will be spun
 					{
-						miBonusWheel->Reset(true);
-						mCurrentMenu = &mBonusWheelMenu;
+						if(((game_values.matchtype != MATCH_TYPE_TOUR && game_values.bonuswheel == 0) || (game_values.matchtype == MATCH_TYPE_TOUR && !game_values.tourstops[game_values.tourstopcurrent - 1]->iBonusType)))
+						{
+							ResetTournamentBackToMainMenu();
+						}
+						else
+						{
+							miBonusWheel->Reset(true);
+							mCurrentMenu = &mBonusWheelMenu;
+						}
 					}
-				}
-				else  //Next Tour/Tourament Game
-				{
-					if(game_values.matchtype == MATCH_TYPE_TOUR)
-						mCurrentMenu = &mTourStopMenu;
-					else
-						mCurrentMenu = &mGameSettingsMenu;
+					else  //Next Tour/Tourament Game
+					{
+						if(game_values.matchtype == MATCH_TYPE_TOUR)
+							mCurrentMenu = &mTourStopMenu;
+						else
+							mCurrentMenu = &mGameSettingsMenu;
+					}
 				}
 
 				mCurrentMenu->ResetMenu();
@@ -2812,11 +2831,21 @@ void Menu::RunMenu()
 			{
 				if(miBonusWheel->GetPowerupSelectionDone())
 				{
-					if((game_values.matchtype == MATCH_TYPE_TOUR || game_values.matchtype == MATCH_TYPE_TOURNAMENT) && game_values.tournamentwinner == -1 &&
-						((game_values.matchtype != MATCH_TYPE_TOUR && game_values.bonuswheel == 2) || (game_values.matchtype == MATCH_TYPE_TOUR && game_values.tourstops[game_values.tourstopcurrent - 1]->iBonusType)))
-						mCurrentMenu = &mTournamentScoreboardMenu;
+					if(game_values.matchtype == MATCH_TYPE_WORLD)
+					{
+						if(game_values.tournamentwinner == -1)
+							mCurrentMenu = &mTournamentScoreboardMenu;
+						else
+							ResetTournamentBackToMainMenu();
+					}
 					else
-						ResetTournamentBackToMainMenu();
+					{
+						if((game_values.matchtype == MATCH_TYPE_TOUR || game_values.matchtype == MATCH_TYPE_TOURNAMENT) && game_values.tournamentwinner == -1 &&
+							((game_values.matchtype != MATCH_TYPE_TOUR && game_values.bonuswheel == 2) || (game_values.matchtype == MATCH_TYPE_TOUR && game_values.tourstops[game_values.tourstopcurrent - 1]->iBonusType)))
+							mCurrentMenu = &mTournamentScoreboardMenu;
+						else
+							ResetTournamentBackToMainMenu();
+					}
 				}
 			}
 			else if (MENU_CODE_TO_POWERUP_SELECTION_MENU == code)

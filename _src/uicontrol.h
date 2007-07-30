@@ -929,6 +929,7 @@ class MI_World : public UI_Control
 		char szMessage[128];
 
 		short iVehicleId;
+
 };
 
 

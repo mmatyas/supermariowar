@@ -126,6 +126,8 @@ class WorldMap
 
 		short NumVehiclesInTile(short iTileX, short iTileY);
 
+		short GetVehicleStageScore(short iVehicleIndex);
+
 	private:
 
 		void Cleanup();
