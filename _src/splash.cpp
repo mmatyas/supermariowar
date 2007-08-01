@@ -210,6 +210,8 @@ bool LoadMenuGraphics()
 
 	_load_gfxck(spr_worldbackground, convertPath("gfx/packs/overworld.png", graphicspack));
 	_load_gfxck(spr_worldobjects, convertPath("gfx/packs/mapbits.png", graphicspack));
+	_load_gfxck(spr_worlditems, convertPath("gfx/packs/menu/world_items.png", graphicspack));
+	_load_gfxck(spr_worlditempopup, convertPath("gfx/packs/menu/world_item_popup.png", graphicspack));
 
 	return true;
 }

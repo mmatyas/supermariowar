@@ -143,6 +143,7 @@ struct STextAward
 #define MINAWARDSNEEDED 3
 
 #define MAXTOURNAMENTGAMES 10
+#define MAXWORLDITEMS 32
 
 #define ifsoundonplay(x) (game_values.sound ? x.play() : -1)
 #define ifsoundonandreadyplay(x) (x.isready() && game_values.sound ? x.play() : -1)
@@ -461,6 +462,8 @@ extern gfxSprite		spr_thumbnail_mapitems[2];
 
 extern gfxSprite		spr_worldbackground;
 extern gfxSprite		spr_worldobjects;
+extern gfxSprite		spr_worlditems;
+extern gfxSprite		spr_worlditempopup;
 
 extern MapList maplist;
 extern SkinList skinlist;
@@ -496,6 +499,10 @@ struct ts
 	short		wins;
 	short		type[MAXTOURNAMENTGAMES];
 	short		total;		//used for running total in a tour
+
+	//for world match types
+	short		numitems;
+	short		items[MAXWORLDITEMS];
 };
 
 struct JailGameModeSettings

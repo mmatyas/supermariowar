@@ -4212,6 +4212,10 @@ void MI_World::Init()
 
 	iMessageTimer = 0;
 
+	iState = -1;
+	iStateTransition = 0;
+	iItemPopupDrawY = 0;
+
 	iVehicleId = -1;
 
 	short iPlayerX, iPlayerY;
@@ -4334,6 +4338,32 @@ void MI_World::Update()
 		if(g_worldmap.iWidth > 20 && iMapOffsetX > 640 - g_worldmap.iWidth * TILESIZE && iPlayerX > 304)
 			iMapOffsetX -= 2;
 	}
+
+	if(iState >= 0)
+	{
+		if(iStateTransition == 1)
+		{
+			iItemPopupDrawY += 4;
+
+			if(iItemPopupDrawY >= 32)
+			{
+				iItemPopupDrawY = 32;
+				iStateTransition = 0;
+			}
+		}
+		else if(iStateTransition == 2)
+		{
+			iItemPopupDrawY -= 4;
+
+			if(iItemPopupDrawY <= 0)
+			{
+				iState = -1;
+
+				iItemPopupDrawY = 0;
+				iStateTransition = 0;
+			}
+		}		
+	}
 }
 
 void MI_World::RepositionMapImage()
@@ -4448,6 +4478,23 @@ void MI_World::Draw()
 	}
 
 	g_worldmap.Draw(iMapOffsetX, iMapOffsetY);
+
+	//If the item selector for a player is displayed
+	if(iState >= 0)
+	{
+		spr_worlditempopup.draw(0, 448 - iItemPopupDrawY, 0, iState * 64 + 32 - iItemPopupDrawY, 320, iItemPopupDrawY << 1);
+		spr_worlditempopup.draw(320, 448 - iItemPopupDrawY, 192, iState * 64 + 32 - iItemPopupDrawY, 320, iItemPopupDrawY << 1);
+
+		if(iStateTransition == 0)
+		{
+			spr_worlditempopup.draw(iItemCol * 52 + 114, 424, iState * 48, 256, 48, 48);
+
+			for(short iItem = 0; iItem < 8; iItem++)
+			{
+				spr_worlditems.draw(iItem * 52 + 122, 432, iItem * 64, 0, 32, 32);
+			}
+		}
+	}
 }
 
 MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
@@ -4460,80 +4507,141 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 
 		if(!g_worldmap.IsVehicleMoving())
 		{
-			if(iControllingTeam == LookupTeamID(iPlayer) && iPlayerState == 0 && game_values.playercontrol[iPlayer] > 0) //if this player is player or cpu
+			if(iState == -1)
 			{
-				short iPlayerCurrentTileX, iPlayerCurrentTileY;
-				g_worldmap.GetPlayerCurrentTile(&iPlayerCurrentTileX, &iPlayerCurrentTileY);
+				if(iControllingTeam == LookupTeamID(iPlayer) && iPlayerState == 0 && game_values.playercontrol[iPlayer] > 0) //if this player is player or cpu
+				{
+					short iPlayerCurrentTileX, iPlayerCurrentTileY;
+					g_worldmap.GetPlayerCurrentTile(&iPlayerCurrentTileX, &iPlayerCurrentTileY);
 
-				WorldMapTile * tile = &g_worldmap.tiles[iPlayerCurrentTileX][iPlayerCurrentTileY];
+					WorldMapTile * tile = &g_worldmap.tiles[iPlayerCurrentTileX][iPlayerCurrentTileY];
 
-				short iTemp; //Just a temp value so we can call the GetVehicleInPlayerTile method
+					short iTemp; //Just a temp value so we can call the GetVehicleInPlayerTile method
+					if(playerKeys->menu_up.fPressed)
+					{
+						//Make sure there is a path connection and that there is no stage or vehicle blocking the way
+						if(tile->fConnection[0] &&
+							((tile->fCompleted && g_worldmap.GetVehicleInPlayerTile(&iTemp) == -1) || iReturnDirection == 0))
+						{
+							g_worldmap.MovePlayer(0);
+							iReturnDirection = 1;
+						}
+					}
+					else if(playerKeys->menu_down.fPressed)
+					{
+						if(tile->fConnection[1] &&
+							((tile->fCompleted && g_worldmap.GetVehicleInPlayerTile(&iTemp) == -1) || iReturnDirection == 1))
+						{
+							g_worldmap.MovePlayer(1);
+							iReturnDirection = 0;
+						}
+					}
+					else if(playerKeys->menu_left.fPressed)
+					{
+						if(tile->fConnection[2] &&
+							((tile->fCompleted && g_worldmap.GetVehicleInPlayerTile(&iTemp) == -1) || iReturnDirection == 2))
+						{
+							g_worldmap.MovePlayer(2);
+							iReturnDirection = 3;
+						}
+					}
+					else if(playerKeys->menu_right.fPressed)
+					{
+						if(tile->fConnection[3] &&
+							((tile->fCompleted && g_worldmap.GetVehicleInPlayerTile(&iTemp) == -1) || iReturnDirection == 3))
+						{
+							g_worldmap.MovePlayer(3);
+							iReturnDirection = 2;
+						}
+					}
+					else if(playerInput->outputControls[iPlayer].menu_select.fPressed)
+					{
+						//Lookup current tile and see if it is a type of tile you can interact with
+						//If there is a vehicle on this tile, then load it's stage
+						short iStage = g_worldmap.GetVehicleInPlayerTile(&iVehicleId);
+						if(iStage >= 0)
+						{
+							game_values.tourstopcurrent = iStage;
+							return MENU_CODE_WORLD_STAGE_START;
+						}
+
+						//if it is a stage, then load the stage
+						WorldMapTile * tile = &g_worldmap.tiles[iPlayerCurrentTileX][iPlayerCurrentTileY];
+
+						short iType = tile->iType - 2;
+						if(iType >= 0 && !tile->fCompleted)
+						{
+							game_values.tourstopcurrent = iType;
+							return MENU_CODE_WORLD_STAGE_START;
+						}					
+					}
+				}
+			}
+			else if (iStateTransition == 0) //not transitioning to or from the item popup menu
+			{
 				if(playerKeys->menu_up.fPressed)
 				{
-					//Make sure there is a path connection and that there is no stage or vehicle blocking the way
-					if(tile->fConnection[0] &&
-						((tile->fCompleted && g_worldmap.GetVehicleInPlayerTile(&iTemp) == -1) || iReturnDirection == 0))
-					{
-						g_worldmap.MovePlayer(0);
-						iReturnDirection = 1;
-					}
+					if(iItemPage > 0)
+						iItemPage--;
 				}
 				else if(playerKeys->menu_down.fPressed)
 				{
-					if(tile->fConnection[1] &&
-						((tile->fCompleted && g_worldmap.GetVehicleInPlayerTile(&iTemp) == -1) || iReturnDirection == 1))
-					{
-						g_worldmap.MovePlayer(1);
-						iReturnDirection = 0;
-					}
+					if(iItemPage < 3)
+						iItemPage++;
 				}
 				else if(playerKeys->menu_left.fPressed)
 				{
-					if(tile->fConnection[2] &&
-						((tile->fCompleted && g_worldmap.GetVehicleInPlayerTile(&iTemp) == -1) || iReturnDirection == 2))
+					if(iItemCol > 0)
+						iItemCol--;
+					else if(iItemCol == 0 && iItemPage > 0)
 					{
-						g_worldmap.MovePlayer(2);
-						iReturnDirection = 3;
+						iItemCol = 7;
+						iItemPage--;
 					}
 				}
 				else if(playerKeys->menu_right.fPressed)
 				{
-					if(tile->fConnection[3] &&
-						((tile->fCompleted && g_worldmap.GetVehicleInPlayerTile(&iTemp) == -1) || iReturnDirection == 3))
+					if(iItemCol < 7)
+						iItemCol++;
+					else if(iItemCol == 7 && iItemPage < 3)
 					{
-						g_worldmap.MovePlayer(3);
-						iReturnDirection = 2;
+						iItemCol = 0;
+						iItemPage++;
 					}
 				}
 				else if(playerInput->outputControls[iPlayer].menu_select.fPressed)
 				{
-					//Lookup current tile and see if it is a type of tile you can interact with
-					//If there is a vehicle on this tile, then load it's stage
-					short iStage = g_worldmap.GetVehicleInPlayerTile(&iVehicleId);
-					if(iStage >= 0)
-					{
-						game_values.tourstopcurrent = iStage;
-						return MENU_CODE_WORLD_STAGE_START;
-					}
+					short iIndex = iItemPage * 8 + iItemCol;
+					short iNumItems = --game_values.tournament_scores[iPlayer].numitems;
 
-					//if it is a stage, then load the stage
-					WorldMapTile * tile = &g_worldmap.tiles[iPlayerCurrentTileX][iPlayerCurrentTileY];
-
-					short iType = tile->iType - 2;
-					if(iType >= 0 && !tile->fCompleted)
-					{
-						game_values.tourstopcurrent = iType;
-						return MENU_CODE_WORLD_STAGE_START;
-					}					
+					for(short iItem = iIndex; iItem < iNumItems; iItem++)
+						game_values.tournament_scores[iPlayer].items[iItem] = game_values.tournament_scores[iPlayer].items[iItem + 1];
 				}
 			}
 
-			if(playerInput->outputControls[iPlayer].menu_cancel.fPressed)
+			if(playerKeys->menu_cancel.fPressed)
 			{
 				if(DEVICE_KEYBOARD != playerInput->inputControls[iPlayer]->iDevice || iPlayer == 0)
 				{
 					fModifying = false;
 					return MENU_CODE_UNSELECT_ITEM;
+				}
+			}
+			
+			if (playerKeys->menu_random.fPressed ||
+				(iPlayer != 0 && playerInput->inputControls[iPlayer]->iDevice == DEVICE_KEYBOARD && playerKeys->menu_cancel.fPressed))
+			{
+				if(iState == -1)
+				{
+					iState = iPlayer;
+					iStateTransition = 1;
+
+					iItemPage = 0;
+					iItemCol = 0;
+				}
+				else if (iState == iPlayer)
+				{
+					iStateTransition = 2;
 				}
 			}
 		}

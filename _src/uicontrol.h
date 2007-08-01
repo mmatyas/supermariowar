@@ -909,6 +909,13 @@ class MI_World : public UI_Control
 		void RepositionMapImage();
 		void DrawWorldMapToSurface(bool fInit);
 
+		short iState;
+		short iStateTransition;
+		short iItemPopupDrawY;
+
+		short iItemCol;
+		short iItemPage;
+
 		SDL_Surface * sMapSurface;
 		SDL_Rect * rectSrcSurface;
 		SDL_Rect * rectDstSurface;
@@ -929,7 +936,6 @@ class MI_World : public UI_Control
 		char szMessage[128];
 
 		short iVehicleId;
-
 };
 
 

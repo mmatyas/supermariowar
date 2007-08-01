@@ -2613,6 +2613,8 @@ void Menu::RunMenu()
 					{
 						game_values.tournament_scores[k].wins = 0;
 						game_values.tournament_scores[k].total = 0;
+
+						game_values.tournament_scores[k].numitems = 0;
 					}
 
 					if(MATCH_TYPE_SINGLE_GAME == game_values.matchtype || MATCH_TYPE_TOURNAMENT == game_values.matchtype)

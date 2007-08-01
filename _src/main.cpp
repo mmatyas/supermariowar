@@ -104,6 +104,8 @@ gfxSprite		spr_thumbnail_mapitems[2];
 
 gfxSprite		spr_worldbackground;
 gfxSprite		spr_worldobjects;
+gfxSprite		spr_worlditems;
+gfxSprite		spr_worlditempopup;
 
 gfxSprite		spr_noteblock;
 gfxSprite		spr_breakableblock;
