@@ -591,9 +591,88 @@ RETURN:
 	return iReadType == 11;
 }
 
-bool WorldMap::Save(char * szFileName)
+//Saves world to file
+bool WorldMap::Save(const char * szPath)
 {
-	return false;
+	return true;
+}
+
+void WorldMap::Clear()
+{
+	if(tiles)
+	{
+		for(short iCol = 0; iCol < iWidth; iCol++)
+		{
+			tiles[iCol]->iBackgroundSprite = 0;
+			tiles[iCol]->iForegroundSprite = 0;
+			tiles[iCol]->iConnectionType = 0;
+			tiles[iCol]->iType = 0;
+		}
+	}
+
+	if(vehicles)
+	{
+		delete [] vehicles;
+		vehicles = NULL;
+	}
+}
+
+//Creates clears world and resizes (essentially creating a new world to work on for editor)
+void WorldMap::New(short w, short h)
+{
+	Cleanup();
+	
+	tiles = new WorldMapTile*[w];
+
+	for(short iCol = 0; iCol < w; iCol++)
+		tiles[iCol] = new WorldMapTile[h];
+}
+
+//Resizes world keeping intact current tiles (if possible)
+void WorldMap::Resize(short w, short h)
+{
+	//Copy tiles from old map
+	WorldMapTile ** tempTiles = NULL;
+
+	if(tiles)
+	{
+		WorldMapTile ** tempTiles = new WorldMapTile*[iWidth];
+
+		for(short iCol = 0; iCol < iWidth; iCol++)
+		{
+			tempTiles[iCol] = new WorldMapTile[iHeight];
+			
+			for(short iRow = 0; iRow < iHeight; iRow++)
+			{
+				tempTiles[iCol][iRow].iBackgroundSprite = tiles[iCol][iRow].iBackgroundSprite;
+				tempTiles[iCol][iRow].iForegroundSprite = tiles[iCol][iRow].iForegroundSprite;
+				tempTiles[iCol][iRow].iConnectionType = tiles[iCol][iRow].iConnectionType;
+				tempTiles[iCol][iRow].iType = tiles[iCol][iRow].iType;
+			}
+		}
+	}
+
+	//Create new map
+	New(iWidth, iHeight);
+
+	//Copy into new map
+	if(tempTiles)
+	{
+		for(short iCol = 0; iCol < w && iCol < iWidth; iCol++)
+		{
+			for(short iRow = 0; iRow < h && iRow < iHeight; iRow++)
+			{
+				tiles[iCol][iRow].iBackgroundSprite = tempTiles[iCol][iRow].iBackgroundSprite;
+				tiles[iCol][iRow].iForegroundSprite = tempTiles[iCol][iRow].iForegroundSprite;
+				tiles[iCol][iRow].iConnectionType = tempTiles[iCol][iRow].iConnectionType;
+				tiles[iCol][iRow].iType = tempTiles[iCol][iRow].iType;
+			}
+
+			delete [] tempTiles[iCol];
+		}
+
+		delete [] tempTiles;
+	}
 }
 
 void WorldMap::InitPlayer()
@@ -633,6 +712,60 @@ void WorldMap::Draw(short iMapOffsetX, short iMapOffsetY)
 	}
 
 	player.Draw(iMapOffsetX, iMapOffsetY);
+}
+
+void WorldMap::DrawMapToSurface(bool fInit, SDL_Surface * surface, short iMapDrawOffsetCol, short iMapDrawOffsetRow, short iAnimationFrame)
+{
+	for(short iRow = 0; iRow < 19 && iRow + iMapDrawOffsetRow < iHeight; iRow++)
+	{
+		for(short iCol = 0; iCol < 24 && iCol + iMapDrawOffsetCol < iWidth; iCol++)
+		{
+			SDL_Rect r = {iCol * TILESIZE, iRow * TILESIZE, TILESIZE, TILESIZE};
+		
+			WorldMapTile * tile = &tiles[iCol + iMapDrawOffsetCol][iRow + iMapDrawOffsetRow];
+			short iBackgroundSprite = tile->iBackgroundSprite;
+			short iForegroundSprite = tile->iForegroundSprite;
+
+			if(tile->fAnimated || fInit)
+			{
+				if(iBackgroundSprite == 0 || (iBackgroundSprite > 18 && iBackgroundSprite <= 44))
+				{
+					SDL_Rect rSrc = {iAnimationFrame, 0, TILESIZE, TILESIZE};
+					SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, surface, &r);
+
+					if(iBackgroundSprite > 18 && iBackgroundSprite <= 44)
+					{
+						if(iBackgroundSprite > 31)
+						{
+							SDL_Rect rSrc = {TILESIZE + TILESIZE, (iBackgroundSprite - 31) << 5, TILESIZE, TILESIZE};
+							SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, surface, &r);
+						}
+						else
+						{
+							SDL_Rect rSrc = {TILESIZE, (iBackgroundSprite - 18) << 5, TILESIZE, TILESIZE};
+							SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, surface, &r);
+						}
+					}
+				}
+				else if(iBackgroundSprite > 0 && iBackgroundSprite <= 18)
+				{
+					SDL_Rect rSrc = {0, iBackgroundSprite << 5, TILESIZE, TILESIZE};
+					SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, surface, &r);
+				}
+
+				if(iForegroundSprite == 1 || iForegroundSprite == 2)
+				{
+					SDL_Rect rSrc = {96, iForegroundSprite << 5, TILESIZE, TILESIZE};
+					SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, surface, &r);
+				}
+				else if(iForegroundSprite >= 3 && iForegroundSprite <= 6)
+				{
+					SDL_Rect rSrc = {iAnimationFrame, (iForegroundSprite + 14) << 5, TILESIZE, TILESIZE};
+					SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, surface, &r);
+				}
+			}
+		}
+	}		
 }
 
 void WorldMap::Cleanup()

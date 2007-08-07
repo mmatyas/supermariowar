@@ -168,6 +168,12 @@
 				RelativePath="..\..\_src\eyecandy.h">
 			</File>
 			<File
+				RelativePath="..\..\_src\FileList.cpp">
+			</File>
+			<File
+				RelativePath="..\..\_src\FileList.h">
+			</File>
+			<File
 				RelativePath="..\..\_src\gamemodes.cpp">
 				<FileConfiguration
 					Name="Debug|Win32">

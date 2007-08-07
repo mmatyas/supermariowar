@@ -103,12 +103,17 @@ class WorldMap
 		~WorldMap();
 
 		bool Load();
-		bool Save(char * szFileName);
+		bool Save(const char * szPath);
+
+		void New(short iWidth, short iHeight);
+		void Resize(short iWidth, short iHeight);
+		void Clear();
 
 		void InitPlayer();
 
 		bool Update();
 		void Draw(short iMapOffsetX, short iMapOffsetY);
+		void DrawMapToSurface(bool fInit, SDL_Surface * surface, short iMapDrawOffsetCol, short iMapDrawOffsetRow, short iAnimationFrame);
 
 		void SetPlayerSprite(short iPlayerSprite);
 		bool IsVehicleMoving();
@@ -147,6 +152,8 @@ class WorldMap
 	friend class MI_World;
 	friend class WorldVehicle;
 
+	friend void drawmap(bool fScreenshot, short iBlockSize);
+	friend int editor_edit();
 };
 
 #endif //__WORLD_H_

@@ -4178,7 +4178,6 @@ MI_World::MI_World() :
 	iReturnDirection = 0;
 
 	sMapSurface = SDL_CreateRGBSurface(screen->flags, 768, 608, screen->format->BitsPerPixel, 0, 0, 0, 0);
-	//sMapSurface = SDL_CreateRGBSurface(screen->flags, 960, 640, screen->format->BitsPerPixel, 0, 0, 0, 0);
 	
 	rectSrcSurface = new SDL_Rect();
 	rectSrcSurface->x = 0;
@@ -4290,7 +4289,7 @@ void MI_World::SetCurrentStageToCompleted(short iWinningTeam)
 	g_worldmap.MoveVehicles();
 
 	//Update the completed stage with team colored tile on the map
-	DrawWorldMapToSurface(true);
+	g_worldmap.DrawMapToSurface(true, sMapSurface, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
 }
 
 void MI_World::Update()
@@ -4311,7 +4310,7 @@ void MI_World::Update()
 			iAnimationFrame = 0;
 
 		//update background map surface
-		DrawWorldMapToSurface(false);
+		g_worldmap.DrawMapToSurface(false, sMapSurface, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
 	}
 
 	if(fPlayerMoveDone)
@@ -4389,62 +4388,9 @@ void MI_World::RepositionMapImage()
 			iMapDrawOffsetRow = g_worldmap.iHeight - 19;
 	}
 
-	DrawWorldMapToSurface(true);
+	g_worldmap.DrawMapToSurface(true, sMapSurface, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
 }
 
-void MI_World::DrawWorldMapToSurface(bool fInit)
-{
-	for(short iRow = 0; iRow < 19 && iRow + iMapDrawOffsetRow < g_worldmap.iHeight; iRow++)
-	{
-		for(short iCol = 0; iCol < 24 && iCol + iMapDrawOffsetCol < g_worldmap.iWidth; iCol++)
-		{
-			SDL_Rect r = {iCol * TILESIZE, iRow * TILESIZE, TILESIZE, TILESIZE};
-		
-			WorldMapTile * tile = &g_worldmap.tiles[iCol + iMapDrawOffsetCol][iRow + iMapDrawOffsetRow];
-			short iBackgroundSprite = tile->iBackgroundSprite;
-			short iForegroundSprite = tile->iForegroundSprite;
-
-			if(tile->fAnimated || fInit)
-			{
-				if(iBackgroundSprite == 0 || (iBackgroundSprite > 18 && iBackgroundSprite <= 44))
-				{
-					SDL_Rect rSrc = {iAnimationFrame, 0, TILESIZE, TILESIZE};
-					SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, sMapSurface, &r);
-
-					if(iBackgroundSprite > 18 && iBackgroundSprite <= 44)
-					{
-						if(iBackgroundSprite > 31)
-						{
-							SDL_Rect rSrc = {TILESIZE + TILESIZE, (iBackgroundSprite - 31) << 5, TILESIZE, TILESIZE};
-							SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, sMapSurface, &r);
-						}
-						else
-						{
-							SDL_Rect rSrc = {TILESIZE, (iBackgroundSprite - 18) << 5, TILESIZE, TILESIZE};
-							SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, sMapSurface, &r);
-						}
-					}
-				}
-				else if(iBackgroundSprite > 0 && iBackgroundSprite <= 18)
-				{
-					SDL_Rect rSrc = {0, iBackgroundSprite << 5, TILESIZE, TILESIZE};
-					SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, sMapSurface, &r);
-				}
-
-				if(iForegroundSprite == 1 || iForegroundSprite == 2)
-				{
-					SDL_Rect rSrc = {96, iForegroundSprite << 5, TILESIZE, TILESIZE};
-					SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, sMapSurface, &r);
-				}
-				else if(iForegroundSprite >= 3 && iForegroundSprite <= 6)
-				{
-					SDL_Rect rSrc = {iAnimationFrame, (iForegroundSprite + 14) << 5, TILESIZE, TILESIZE};
-					SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, sMapSurface, &r);
-				}
-			}
-		}
-	}		
-}
 
 void MI_World::Draw()
 {
@@ -4476,8 +4422,6 @@ void MI_World::Draw()
 		iMessageTimer--;
 		menu_font_large.drawCentered(320, 64, szMessage);
 	}
-
-	g_worldmap.Draw(iMapOffsetX, iMapOffsetY);
 
 	//If the item selector for a player is displayed
 	if(iState >= 0)

@@ -155,6 +155,7 @@ gfxSprite		spr_thumbnail_mapitems[2];
 gfxSprite		spr_awardsouls, spr_fireballexplosion;
 gfxSprite		spr_maplava, spr_mapwater, spr_mapwaterfall, spr_maplamp;
 CEyecandyContainer eyecandyfront;
+CGameMode		*gamemodes[GAMEMODE_LAST];
 ///////
 
 SDL_Surface * s_eyecandy;

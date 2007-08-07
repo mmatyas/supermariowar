@@ -148,6 +148,12 @@
 				RelativePath="..\..\_src\eyecandy.h">
 			</File>
 			<File
+				RelativePath="..\..\_src\FileList.cpp">
+			</File>
+			<File
+				RelativePath="..\..\_src\FileList.h">
+			</File>
+			<File
 				RelativePath="..\..\_src\global.cpp">
 			</File>
 			<File

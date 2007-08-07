@@ -209,6 +209,7 @@ std::string stripCreatorAndDotMap(const std::string &filename);
 #include "uicontrol.h"
 #include "menu.h"
 #include "MapList.h"
+#include "FileList.h"
 #include "movingplatform.h"
 #include "map.h"
 #include "player.h"
