@@ -5,6 +5,7 @@ extern TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWo
 extern WorldMap g_worldmap;
 extern bool LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDirections);
 
+extern short g_iVersion[];
 
 /**********************************
 * WorldMovingObject
@@ -283,7 +284,7 @@ bool WorldVehicle::Update()
 void WorldVehicle::Draw(short iWorldOffsetX, short iWorldOffsetY)
 {
 	SDL_Rect rDst = {ix + iWorldOffsetX + iPaceOffset, iy + iWorldOffsetY, 32, 32};
-	SDL_BlitSurface(spr_worldobjects.getSurface(), &srcRects[iDrawDirection + iAnimationFrame], blitdest, &rDst);
+	SDL_BlitSurface(spr_worldvehicle.getSurface(), &srcRects[iDrawDirection + iAnimationFrame], blitdest, &rDst);
 }
 
 
@@ -592,8 +593,97 @@ RETURN:
 }
 
 //Saves world to file
+bool WorldMap::Save()
+{
+	return Save(worldlist.GetIndex(game_values.worldindex));
+}
+
 bool WorldMap::Save(const char * szPath)
 {
+	FILE * file = fopen(szPath, "w");
+
+	if(!file)
+		return false;
+
+	fprintf(file, "#Version\n");
+	fprintf(file, "%d.%d.%d.%d\n\n", g_iVersion[0], g_iVersion[1], g_iVersion[2], g_iVersion[3]);
+
+	fprintf(file, "#Width\n");
+	fprintf(file, "%d\n\n", iWidth);
+
+	fprintf(file, "#Height\n");
+	fprintf(file, "%d\n\n", iHeight);
+
+	fprintf(file, "#Sprite Backgroud Layer\n");
+
+	for(short iMapTileReadRow = 0; iMapTileReadRow < iHeight; iMapTileReadRow++)
+	{
+		for(short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++)
+		{
+			WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
+			fprintf(file, "%d", tile->iBackgroundSprite);
+			
+			if(iMapTileReadCol == iWidth - 1)
+				fprintf(file, "\n");
+			else
+				fprintf(file, ",");
+		}
+	}
+	fprintf(file, "\n");
+
+	fprintf(file, "#Sprite Foregroud Layer\n");
+
+	for(short iMapTileReadRow = 0; iMapTileReadRow < iHeight; iMapTileReadRow++)
+	{
+		for(short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++)
+		{
+			WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
+			fprintf(file, "%d", tile->iForegroundSprite);
+			
+			if(iMapTileReadCol == iWidth - 1)
+				fprintf(file, "\n");
+			else
+				fprintf(file, ",");
+		}
+	}
+	fprintf(file, "\n");
+
+	fprintf(file, "#Connections\n");
+
+	for(short iMapTileReadRow = 0; iMapTileReadRow < iHeight; iMapTileReadRow++)
+	{
+		for(short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++)
+		{
+			WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
+			fprintf(file, "%d", tile->iConnectionType);
+			
+			if(iMapTileReadCol == iWidth - 1)
+				fprintf(file, "\n");
+			else
+				fprintf(file, ",");
+		}
+	}
+	fprintf(file, "\n");
+
+	fprintf(file, "#Tile Types\n");
+
+	for(short iMapTileReadRow = 0; iMapTileReadRow < iHeight; iMapTileReadRow++)
+	{
+		for(short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++)
+		{
+			WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
+			fprintf(file, "%d", tile->iType);
+			
+			if(iMapTileReadCol == iWidth - 1)
+				fprintf(file, "\n");
+			else
+				fprintf(file, ",");
+		}
+	}
+	fprintf(file, "\n");
+
+	fclose(file);
+
 	return true;
 }
 
@@ -603,10 +693,13 @@ void WorldMap::Clear()
 	{
 		for(short iCol = 0; iCol < iWidth; iCol++)
 		{
-			tiles[iCol]->iBackgroundSprite = 0;
-			tiles[iCol]->iForegroundSprite = 0;
-			tiles[iCol]->iConnectionType = 0;
-			tiles[iCol]->iType = 0;
+			for(short iRow = 0; iRow < iHeight; iRow++)
+			{
+				tiles[iCol][iRow].iBackgroundSprite = 0;
+				tiles[iCol][iRow].iForegroundSprite = 0;
+				tiles[iCol][iRow].iConnectionType = 0;
+				tiles[iCol][iRow].iType = 0;
+			}
 		}
 	}
 
@@ -622,10 +715,15 @@ void WorldMap::New(short w, short h)
 {
 	Cleanup();
 	
-	tiles = new WorldMapTile*[w];
+	iWidth = w;
+	iHeight = h;
 
-	for(short iCol = 0; iCol < w; iCol++)
-		tiles[iCol] = new WorldMapTile[h];
+	tiles = new WorldMapTile*[iWidth];
+
+	for(short iCol = 0; iCol < iWidth; iCol++)
+		tiles[iCol] = new WorldMapTile[iHeight];
+
+	Clear();
 }
 
 //Resizes world keeping intact current tiles (if possible)

@@ -40,6 +40,8 @@ class gfxSprite
 		gfxSprite();
 		~gfxSprite();
 
+		void clearSurface();
+
 		bool init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b); //color keyed
 		bool init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b, Uint8 a);	//color keyed + alpha
 		bool init(const std::string& filename);							//non color keyed

@@ -462,7 +462,8 @@ extern gfxSprite		spr_thumbnail_warps[2];
 extern gfxSprite		spr_thumbnail_mapitems[2];
 
 extern gfxSprite		spr_worldbackground;
-extern gfxSprite		spr_worldobjects;
+extern gfxSprite		spr_worldforeground;
+extern gfxSprite		spr_worldvehicle;
 extern gfxSprite		spr_worlditems;
 extern gfxSprite		spr_worlditempopup;
 

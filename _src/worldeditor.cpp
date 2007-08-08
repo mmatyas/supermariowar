@@ -45,6 +45,8 @@ SDL_Surface		*sMapSurface;
 
 SDL_Rect		rectSrcSurface = {0, 0, 768, 608};
 SDL_Rect		rectDstSurface = {0, 0, 640, 480};
+bool			fNeedBlackBackground = false;
+short			iWorldWidth, iWorldHeight;
 
 SDL_Event		event;
 
@@ -58,17 +60,21 @@ gfxSprite		spr_dialog;
 gfxSprite		menu_shade;
 
 gfxSprite		spr_warps[3];
-//gfxSprite		spr_backgroundtiles[3];
-//gfxSprite		spr_foregroundtiles[3];
-gfxSprite		spr_worldbackground;
-gfxSprite		spr_worldobjects;
+gfxSprite		spr_backgroundtiles[3];
+gfxSprite		spr_foregroundtiles[3];
 gfxSprite		spr_vehicles[3];
+
+gfxSprite		spr_worldbackground;
+gfxSprite		spr_worldforeground;
+gfxSprite		spr_worldvehicle;
 
 int				set_tile = 0;
 
 int				edit_mode = 0;
 
-int				draw_offset_x = 0;
+int				draw_offset_col = 0;  //col and row offset for drawing map to surface
+int				draw_offset_row = 0;
+int				draw_offset_x = 0;  //x and y offset for drawing maps smaller than screensize
 int				draw_offset_y = 0;
 
 int				state;
@@ -127,7 +133,6 @@ void loadcurrentworld();
 int savecurrentworld();
 int findcurrentstring();
 int new_world();
-void save_world(const std::string &file);
 
 int editor_edit();
 int editor_warp();
@@ -180,25 +185,25 @@ int main(int argc, char *argv[])
 
 	printf("\n---------------- load world ----------------\n");
 
-	spr_worldbackground.init(convertPath("gfx/packs/Classic/overworld.png"), 255, 0, 255);
-	//spr_backgroundtiles[0].init(convertPath("gfx/packs/Classic/overworld.png"), 255, 0, 255);
-	//spr_backgroundtiles[1].init(convertPath("gfx/packs/Classic/overworld_medium.png"), 255, 0, 255);
-	//spr_backgroundtiles[2].init(convertPath("gfx/packs/Classic/overworld_small.png"), 255, 0, 255);
-	
-	spr_worldobjects.init(convertPath("gfx/packs/Classic/mapbits.png"), 255, 0, 255);
-	//spr_foregroundtiles[0].init(convertPath("gfx/packs/Classic/mapbits.png"), 255, 0, 255);
-	//spr_foregroundtiles[1].init(convertPath("gfx/packs/Classic/mapbits_medium.png"), 255, 0, 255);
-	//spr_foregroundtiles[2].init(convertPath("gfx/packs/Classic/mapbits_small.png"), 255, 0, 255);
+	spr_backgroundtiles[0].init(convertPath("gfx/packs/Classic/world_background.png"), 255, 0, 255);
+	//spr_backgroundtiles[1].init(convertPath("gfx/packs/Classic/world_background_medium.png"), 255, 0, 255);
+	//spr_backgroundtiles[2].init(convertPath("gfx/packs/Classic/world_background_small.png"), 255, 0, 255);
+	spr_worldbackground.setSurface(spr_backgroundtiles[0].getSurface());
+
+	spr_foregroundtiles[0].init(convertPath("gfx/packs/Classic/world_foreground.png"), 255, 0, 255);
+	//spr_foregroundtiles[1].init(convertPath("gfx/packs/Classic/world_foreground_medium.png"), 255, 0, 255);
+	//spr_foregroundtiles[2].init(convertPath("gfx/packs/Classic/world_foreground_small.png"), 255, 0, 255);
+	spr_worldforeground.setSurface(spr_foregroundtiles[0].getSurface());
 
 	spr_vehicles[0].init(convertPath("gfx/packs/Classic/world_vehicles.png"), 255, 0, 255);
 	//vehicles[1].init(convertPath("gfx/packs/Classic/world_vehicles_medium.png"), 255, 0, 255);
 	//vehicles[2].init(convertPath("gfx/packs/Classic/world_vehicles_small.png"), 255, 0, 255);
+	spr_worldvehicle.setSurface(spr_vehicles[0].getSurface());
 
 	sMapSurface = SDL_CreateRGBSurface(screen->flags, 768, 608, screen->format->BitsPerPixel, 0, 0, 0, 0);
 
 	game_values.worldindex = 0;
 	loadcurrentworld();
-	updateworldsurface();
 	
 	printf("\n---------------- ready, steady, go! ----------------\n");
 
@@ -264,6 +269,12 @@ int main(int argc, char *argv[])
 
 	SDL_FreeSurface(sMapSurface);
 
+	//These two surfaces share the same surface as the world editor back/foreground gfx array as a memory optimization
+	//Clear them here so they don't get freed twice
+	spr_worldbackground.clearSurface();
+	spr_worldforeground.clearSurface();
+	spr_worldvehicle.clearSurface();
+
 	printf("\n---------------- save world ----------------\n");
 
 	g_worldmap.Save(convertPath("worlds/ZZworldeditor.txt").c_str());
@@ -290,10 +301,13 @@ int editor_edit()
 			switch(event.type)
 			{
 				case SDL_QUIT:
+				{
 					done = true;
-				break;
+					break;
+				}
 
 				case SDL_KEYDOWN:
+				{
 					if(event.key.keysym.sym == SDLK_ESCAPE)
 					{
 						if(g_musiccategorydisplaytimer > 0)
@@ -353,10 +367,45 @@ int editor_edit()
 					if(event.key.keysym.sym == SDLK_h || event.key.keysym.sym == SDLK_F1)
 						return DISPLAY_HELP;
 
+					if(event.key.keysym.sym == SDLK_UP)
+					{
+						if(draw_offset_row > 0)
+						{
+							draw_offset_row--;
+							updateworldsurface();
+						}
+					}
+					else if(event.key.keysym.sym == SDLK_DOWN)
+					{
+						if(draw_offset_row < iWorldHeight - 15)
+						{
+							draw_offset_row++;
+							updateworldsurface();
+						}
+					}
+					else if(event.key.keysym.sym == SDLK_LEFT)
+					{
+						if(draw_offset_col > 0)
+						{
+							draw_offset_col--;
+							updateworldsurface();
+						}
+					}
+					else if(event.key.keysym.sym == SDLK_RIGHT)
+					{
+						if(draw_offset_col < iWorldWidth - 20)
+						{
+							draw_offset_col++;
+							updateworldsurface();
+						}
+					}
+
 					if(event.key.keysym.sym == SDLK_PAGEUP)
 					{
 						if(--game_values.worldindex < 0)
 							game_values.worldindex = worldlist.GetCount() - 1;
+
+						worldlist.prev();
 
 						loadcurrentworld();
 					}
@@ -366,128 +415,161 @@ int editor_edit()
 						if(++game_values.worldindex >= worldlist.GetCount())
 							game_values.worldindex = 0;
 
+						worldlist.next();
+
 						loadcurrentworld();
 					}
 
-				break;
+					break;
+				}
 
 				case SDL_MOUSEBUTTONDOWN:
-					if(event.button.button == SDL_BUTTON_LEFT && !ignoreclick)
-					{
-						if(edit_mode == 0) //selected background
-						{
-							g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iBackgroundSprite = set_tile;
-							updateworldsurface();
-						}
-						else if(edit_mode == 1) //selected foreground
-						{
-							g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iForegroundSprite = set_tile;
-						}
-						else if(edit_mode == 2) //selected connection
-						{
-							g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iConnectionType = set_tile;
-						}
-						else if(edit_mode == 3) //selected type
-						{
-							g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iType = set_tile;
-						}
-						/*
-						else if(edit_mode == 4) //selected vehicle
-						{
-							g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iConnectionType = set_tile;
-						}
-						else if(edit_mode == 5) //selected warp
-						{
-							g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iConnectionType = set_tile;
-						}*/
-					}
-					else if(event.button.button == SDL_BUTTON_RIGHT)
-					{
-						if(edit_mode == 0)
-						{
-							g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iBackgroundSprite = 0;
-						}
-						else if(edit_mode == 1)
-						{
-							g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iForegroundSprite = 0;
-						}
-						else if(edit_mode == 2)
-						{
-							g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iConnectionType = 0;
-						}
-						else if(edit_mode == 3)
-						{
-							g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iType = 0;
-						}
-						/*
-						else if(edit_mode == 4)
-						{
-							g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iType = 0;
-						}
-						else if(edit_mode == 5)
-						{
-							g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iType = 0;
-						}*/
-					}
-				break;
+				{
+					short iButtonX = event.button.x - draw_offset_x;
+					short iButtonY = event.button.y - draw_offset_y;
+					short iCol = iButtonX / TILESIZE + draw_offset_col;
+					short iRow = iButtonY / TILESIZE + draw_offset_row;
 
+					if(iButtonX >= 0 && iButtonY >= 0 && iButtonX < iWorldWidth * TILESIZE && iButtonY < iWorldHeight * TILESIZE)
+					{
+						if(event.button.button == SDL_BUTTON_LEFT && !ignoreclick)
+						{
+							if(edit_mode == 0) //selected background
+							{
+								if(g_worldmap.tiles[iCol][iRow].iBackgroundSprite != set_tile)
+								{
+									g_worldmap.tiles[iCol][iRow].iBackgroundSprite = set_tile;
+									updateworldsurface();
+								}
+							}
+							else if(edit_mode == 1) //selected foreground
+							{
+								g_worldmap.tiles[iCol][iRow].iForegroundSprite = set_tile;
+							}
+							else if(edit_mode == 2) //selected connection
+							{
+								g_worldmap.tiles[iCol][iRow].iConnectionType = set_tile;
+							}
+							else if(edit_mode == 3) //selected type
+							{
+								g_worldmap.tiles[iCol][iRow].iType = set_tile;
+							}
+							/*
+							else if(edit_mode == 4) //selected vehicle
+							{
+								g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iConnectionType = set_tile;
+							}
+							else if(edit_mode == 5) //selected warp
+							{
+								g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iConnectionType = set_tile;
+							}*/
+						}
+						else if(event.button.button == SDL_BUTTON_RIGHT)
+						{
+							if(edit_mode == 0)
+							{
+								if(g_worldmap.tiles[iCol][iRow].iBackgroundSprite != 0)
+								{
+									g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 0;
+									updateworldsurface();
+								}
+							}
+							else if(edit_mode == 1)
+							{
+								g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iForegroundSprite = 0;
+							}
+							else if(edit_mode == 2)
+							{
+								g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iConnectionType = 0;
+							}
+							else if(edit_mode == 3)
+							{
+								g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iType = 0;
+							}
+							/*
+							else if(edit_mode == 4)
+							{
+								g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iType = 0;
+							}
+							else if(edit_mode == 5)
+							{
+								g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iType = 0;
+							}*/
+						}
+					}
+					
+					break;
+				}
 				//Painting tiles with mouse movement
 				case SDL_MOUSEMOTION:
-					if(event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT) && !ignoreclick)
+				{
+					short iButtonX = event.button.x - draw_offset_x;
+					short iButtonY = event.button.y - draw_offset_y;
+					short iCol = iButtonX / TILESIZE + draw_offset_col;
+					short iRow = iButtonY / TILESIZE + draw_offset_row;
+
+					if(iButtonX >= 0 && iButtonY >= 0 && iButtonX < iWorldWidth * TILESIZE && iButtonY < iWorldHeight * TILESIZE)
 					{
-						if(edit_mode == 0)
+						if(event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT) && !ignoreclick)
 						{
-							g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iBackgroundSprite = set_tile;
+							if(edit_mode == 0) //selected background
+							{
+								if(g_worldmap.tiles[iCol][iRow].iBackgroundSprite != set_tile)
+								{
+									g_worldmap.tiles[iCol][iRow].iBackgroundSprite = set_tile;
+									updateworldsurface();
+								}
+							}
+							else if(edit_mode == 1)
+							{
+								g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iForegroundSprite = set_tile;
+							}
+							else if(edit_mode == 2)
+							{
+								g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iConnectionType = set_tile;
+							}
+							else if(edit_mode == 3)
+							{
+								g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iType = set_tile;
+							}
 						}
-						else if(edit_mode == 1)
+						else if(event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT))
 						{
-							g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iForegroundSprite = set_tile;
-						}
-						else if(edit_mode == 2)
-						{
-							g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iConnectionType = set_tile;
-						}
-						else if(edit_mode == 3)
-						{
-							g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iType = set_tile;
+							if(edit_mode == 0) //selected background
+							{
+								if(g_worldmap.tiles[iCol][iRow].iBackgroundSprite != 0)
+								{
+									g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 0;
+									updateworldsurface();
+								}
+							}
+							else if(edit_mode == 1)
+							{
+								g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iForegroundSprite = 0;
+							}
+							else if(edit_mode == 2)
+							{
+								g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iConnectionType = 0;
+							}
+							else if(edit_mode == 3)
+							{
+								g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iType = 0;
+							}
 						}
 					}
-					else if(event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT))
-					{
-						if(edit_mode == 0)
-						{
-							g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iBackgroundSprite = 0;
-						}
-						else if(edit_mode == 1)
-						{
-							g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iForegroundSprite = 0;
-						}
-						else if(edit_mode == 2)
-						{
-							g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iConnectionType = 0;
-						}
-						else if(edit_mode == 3)
-						{
-							g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iType = 0;
-						}
-						/*
-						else if(edit_mode == 4)
-						{
-							g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iType = 0;
-						}
-						else if(edit_mode == 5)
-						{
-							g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iType = 0;
-						}*/
-					}
-				break;
 				
+					break;
+				}
+
 				case SDL_MOUSEBUTTONUP:
+				{
 					if(event.button.button == SDL_BUTTON_LEFT)
 					{
 						ignoreclick = false;
 					}
-				break;
+				
+					break;
+				}
 
 				default:
 					break;
@@ -527,30 +609,17 @@ int editor_edit()
 
 void updateworldsurface()
 {
-	g_worldmap.DrawMapToSurface(true, sMapSurface, draw_offset_x, draw_offset_y, 0);
+	g_worldmap.DrawMapToSurface(true, sMapSurface, draw_offset_col, draw_offset_row, 0);
 }
 
 void drawmap(bool fScreenshot, short iBlockSize)
 {
-	rectSrcSurface.x = 0;
-	rectSrcSurface.y = 0;
-	
-	if(g_worldmap.iWidth > 24)
-		rectSrcSurface.w = 768;
-	else
-		rectSrcSurface.w = g_worldmap.iWidth * TILESIZE;
+	if(fNeedBlackBackground)
+		SDL_FillRect(screen, NULL, 0x0);
 
-	if(g_worldmap.iHeight > 19)
-		rectSrcSurface.h = 608;
-	else
-		rectSrcSurface.h = g_worldmap.iHeight * TILESIZE;
-
-	rectDstSurface.x = draw_offset_x * TILESIZE;
-	rectDstSurface.y = draw_offset_x * TILESIZE;
-	
 	SDL_BlitSurface(sMapSurface, &rectSrcSurface, blitdest, &rectDstSurface);
 
-	//g_worldmap.Draw(draw_offset_x, draw_offset_y);
+	//g_worldmap.Draw(draw_offset_col, draw_offset_row);
 
 	//Draw warp arrows
 	/*
@@ -663,14 +732,6 @@ int editor_background()
 	r.w = 640;
 	r.h = 480;
 
-	/*
-	short iCurrentTile = 0;
-	short iConvertedTile[300];
-
-	for(short iTile = 0; iTile < 300; iTile++)
-		iConvertedTile[iTile] = g_iTileConversion[iTile];
-	*/
-
 	while (!done)
 	{
 		int framestart = SDL_GetTicks();
@@ -712,8 +773,7 @@ int editor_background()
 
 		SDL_FillRect(screen, NULL, 0x0);
 
-		//spr_backgroundtiles[0].draw(0, 0, 0, 0, 640, 480);
-		spr_worldbackground.draw(0, 0, 0, 0, 640, 480);
+		spr_backgroundtiles[0].draw(0, 0, 0, 0, 640, 480);
 
 		SDL_Flip(screen);
 
@@ -788,9 +848,7 @@ int editor_foreground()
 
 		SDL_FillRect(screen, NULL, 0x0);
 
-		//spr_backgroundtiles[0].draw(0, 0, 0, 0, 640, 480);
-		spr_worldbackground.draw(0, 0, 0, 0, 640, 480);
-		
+		spr_foregroundtiles[0].draw(0, 0, 0, 0, 640, 480);
 
 		SDL_Flip(screen);
 
@@ -1024,9 +1082,9 @@ int save_as()
 
 	if(dialog("Save As", "Enter name:", fileName, 64))
 	{
-		save_world(convertPath(strcat(strcat(mapLocation, fileName),".map")));
 		worldlist.add(strcat(fileName, ".map"));
 		worldlist.find(fileName);
+		savecurrentworld();
 		loadcurrentworld();
 	}
 
@@ -1181,6 +1239,7 @@ int find()
 int clear_world()
 { 
 	g_worldmap.Clear();
+	updateworldsurface();
 
 	printf("World Cleared\n");
 	return 0;
@@ -1189,17 +1248,50 @@ int clear_world()
 void loadcurrentworld()
 {
 	g_worldmap.Load();
+
+	draw_offset_col = 0;
+	draw_offset_row = 0;
+
+	rectSrcSurface.x = 0;
+	rectSrcSurface.y = 0;
+	fNeedBlackBackground = false;
+
+	g_worldmap.GetWorldSize(&iWorldWidth, &iWorldHeight);
+
+	if(iWorldWidth >= 20)
+	{
+		rectSrcSurface.w = 640;
+		draw_offset_x = 0;
+	}
+	else
+	{
+		rectSrcSurface.w = iWorldWidth * TILESIZE;
+		draw_offset_x = (640 - iWorldWidth * TILESIZE) >> 1;
+		fNeedBlackBackground = true;
+	}
+
+	if(iWorldHeight >= 15)
+	{
+		rectSrcSurface.h = 480;
+		draw_offset_y = 0;
+	}
+	else
+	{
+		rectSrcSurface.h = iWorldHeight * TILESIZE;
+		draw_offset_y = (480 - iWorldHeight * TILESIZE) >> 1;
+		fNeedBlackBackground = true;
+	}
+
+	rectDstSurface.x = draw_offset_x;
+	rectDstSurface.y = draw_offset_y;
+
+	updateworldsurface();
 }
 
 int savecurrentworld()
 {
-	save_world(worldlist.current_name());
+	g_worldmap.Save();
 	return 0;
-}
-
-void save_world(const std::string &file)
-{
-	g_worldmap.Save(file.c_str());
 }
 
 int findcurrentstring()
@@ -1236,10 +1328,11 @@ int new_world()
 			iHeight = 1;
 
 		g_worldmap.New(iWidth, iHeight);
-		worldlist.add(strcat(fileName, ".txt"));
+		worldlist.add(strcat(worldLocation, strcat(fileName, ".txt")));
 		worldlist.find(fileName);
 		game_values.worldindex = worldlist.GetCurrentIndex();
 		savecurrentworld();
+		loadcurrentworld();
 	}
 
 	return 0;

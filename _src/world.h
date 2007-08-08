@@ -103,6 +103,7 @@ class WorldMap
 		~WorldMap();
 
 		bool Load();
+		bool Save();
 		bool Save(const char * szPath);
 
 		void New(short iWidth, short iHeight);
@@ -117,6 +118,8 @@ class WorldMap
 
 		void SetPlayerSprite(short iPlayerSprite);
 		bool IsVehicleMoving();
+
+		void GetWorldSize(short * w, short * h) {*w = iWidth; *h = iHeight;}
 
 		void GetPlayerPosition(short * iPlayerX, short * iPlayerY);
 		void GetPlayerCurrentTile(short * iPlayerCurrentTileX, short * iPlayerCurrentTileY);
@@ -152,7 +155,6 @@ class WorldMap
 	friend class MI_World;
 	friend class WorldVehicle;
 
-	friend void drawmap(bool fScreenshot, short iBlockSize);
 	friend int editor_edit();
 };
 

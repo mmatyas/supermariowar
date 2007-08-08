@@ -409,6 +409,17 @@ void gfx_setrect(SDL_Rect * rect, short x, short y, short w, short h)
 
 gfxSprite::gfxSprite()
 {
+	clearSurface();
+}
+
+gfxSprite::~gfxSprite()
+{
+	//free the allocated BMP surface 
+	freeSurface();
+}
+
+void gfxSprite::clearSurface()
+{
 	m_bltrect.x = 0;
 	m_bltrect.y = 0;
 	m_bltrect.w = 0;
@@ -420,12 +431,6 @@ gfxSprite::gfxSprite()
 	iHiddenValue = 0;
 
 	fWrap = false;
-}
-
-gfxSprite::~gfxSprite()
-{
-	//free the allocated BMP surface 
-	freeSurface();
 }
 
 bool gfxSprite::init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b)
