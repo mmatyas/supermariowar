@@ -45,7 +45,7 @@ Super\ Mario\ War.app : smw
 	cp smw '$@/Contents/MacOS/Super Mario War'
 	cp macosx/Info.plist '$@/Contents/'
 	echo -n 'APPL????' > '$@/Contents/PkgInfo'
-	cp -r macosx/smw.icns gfx maps music sfx tours \
+	cp -r macosx/smw.icns gfx maps music sfx tours worlds \
 		'$@/Contents/Resources/'
 
 appbundle : Super\ Mario\ War.app
@@ -54,11 +54,12 @@ install : install-data install-bin install-leveledit install-worldedit
 
 install-data : all
 	mkdir -p $(DESTDIR)/usr/share/games/smw/
-	cp -ravx sfx $(DESTDIR)/usr/share/games/smw/
 	cp -ravx gfx $(DESTDIR)/usr/share/games/smw/
-	cp -ravx music $(DESTDIR)/usr/share/games/smw/
 	cp -ravx maps $(DESTDIR)/usr/share/games/smw/
+	cp -ravx music $(DESTDIR)/usr/share/games/smw/
+	cp -ravx sfx $(DESTDIR)/usr/share/games/smw/
 	cp -ravx tours $(DESTDIR)/usr/share/games/smw/
+	cp -ravx worlds $(DESTDIR)/usr/share/games/smw/
 	rm -rf $(DESTDIR)/usr/share/games/smw/*/.svn
 	rm -rf $(DESTDIR)/usr/share/games/smw/*/*/.svn
 	rm -rf $(DESTDIR)/usr/share/games/smw/*/*/*/.svn
