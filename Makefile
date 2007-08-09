@@ -1,15 +1,16 @@
-all : smw leveledit
+all : smw leveledit worldedit
 
 
-COMMON_OBJS:=build/MapList.o build/SFont.o build/dirlist.o \
-           build/eyecandy.o build/gfx.o build/global.o build/input.o \
-           build/map.o build/movingplatform.o build/path.o \
-           build/savepng.o
+COMMON_OBJS:=build/FileList.o build/MapList.o build/SFont.o \
+           build/dirlist.o build/eyecandy.o build/gfx.o build/global.o \
+           build/input.o build/map.o build/movingplatform.o \
+           build/path.o build/savepng.o
 SMW_OBJS:= build/HashTable.o build/ai.o build/gamemodes.o build/main.o \
            build/map.o build/menu.o build/object.o build/player.o \
            build/sfx.o build/splash.o build/uicontrol.o build/uimenu.o \
            build/world.o
 LEVELEDIT_OBJS:=build/leveleditor.o
+WORLDEDIT_OBJS:=build/worldeditor.o
 
 include configuration
 #here because of one .c file among a .cpp project (o_O)
@@ -21,6 +22,9 @@ smw : $(COMMON_OBJS) $(SMW_OBJS)
 	$(CXX) $(CFLAGS) $^ $(LDFLAGS) -o $@
 
 leveledit : $(COMMON_OBJS) $(LEVELEDIT_OBJS)
+	$(CXX) $(CFLAGS) $^ $(LDFLAGS) -o $@
+
+worldedit : $(COMMON_OBJS) $(WORLDEDIT_OBJS)
 	$(CXX) $(CFLAGS) $^ $(LDFLAGS) -o $@
 
 build/SFont.o : _src/SFont.c
@@ -46,36 +50,42 @@ Super\ Mario\ War.app : smw
 
 appbundle : Super\ Mario\ War.app
 
-install : install-data install-bin install-leveledit
+install : install-data install-bin install-leveledit install-worldedit
 
 install-data : all
-	mkdir -p $(DESTDIR)/usr/share/smw/
-	cp -ravx sfx $(DESTDIR)/usr/share/smw/
-	cp -ravx gfx $(DESTDIR)/usr/share/smw/
-	cp -ravx music $(DESTDIR)/usr/share/smw/
-	cp -ravx maps $(DESTDIR)/usr/share/smw/
-	cp -ravx tours $(DESTDIR)/usr/share/smw/
-	rm -rf $(DESTDIR)/usr/share/smw/*/.svn
-	rm -rf $(DESTDIR)/usr/share/smw/*/*/.svn
-	rm -rf $(DESTDIR)/usr/share/smw/*/*/*/.svn
-	rm -rf $(DESTDIR)/usr/share/smw/*/*/*/*/.svn
-	chmod a+w $(DESTDIR)/usr/share/smw/maps -R
+	mkdir -p $(DESTDIR)/usr/share/games/smw/
+	cp -ravx sfx $(DESTDIR)/usr/share/games/smw/
+	cp -ravx gfx $(DESTDIR)/usr/share/games/smw/
+	cp -ravx music $(DESTDIR)/usr/share/games/smw/
+	cp -ravx maps $(DESTDIR)/usr/share/games/smw/
+	cp -ravx tours $(DESTDIR)/usr/share/games/smw/
+	rm -rf $(DESTDIR)/usr/share/games/smw/*/.svn
+	rm -rf $(DESTDIR)/usr/share/games/smw/*/*/.svn
+	rm -rf $(DESTDIR)/usr/share/games/smw/*/*/*/.svn
+	rm -rf $(DESTDIR)/usr/share/games/smw/*/*/*/*/.svn
+	chmod a+w $(DESTDIR)/usr/share/games/smw/maps -R
 
 install-bin : all
 	#assume DESTDIR is the prefix for installing
-	mkdir -p $(DESTDIR)/usr/bin/
-	cp smw $(DESTDIR)/usr/bin/
+	mkdir -p $(DESTDIR)/usr/games/
+	cp smw $(DESTDIR)/usr/games/
 
 install-leveledit : all
-	mkdir -p $(DESTDIR)/usr/bin/
-	cp leveledit $(DESTDIR)/usr/bin/smw-leveledit
+	mkdir -p $(DESTDIR)/usr/games/
+	cp leveledit $(DESTDIR)/usr/games/smw-leveledit
+
+install-worldedit : all
+	mkdir -p $(DESTDIR)/usr/games/
+	cp worldedit $(DESTDIR)/usr/games/smw-worldedit
 
 clean :
 	rm -rf build/*
 	rm -f smw
 	rm -f leveledit
+	rm -f worldedit
 	rm -f smw.exe
 	rm -f leveledit.exe
+	rm -f worldedit.exe
 	rm -f options.bin
 	rm -rf 'Super Mario War.app'
 

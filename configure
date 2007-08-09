@@ -49,7 +49,7 @@ fi
 # Linux configuration
 if [ "`uname`" = Linux ]
 then
-echo 'CFLAGS:=$(CFLAGS) -DLINUXFUNC -DPREFIXPATH=\"/usr/share/smw\" '`sdl-config --cflags` $CFLAGS >> configuration
+echo 'CFLAGS:=$(CFLAGS) -DLINUXFUNC -DPREFIXPATH=\"/usr/share/games/smw\" '`sdl-config --cflags` $CFLAGS >> configuration
 echo 'LDFLAGS:=$(LDFLAGS) '`sdl-config --libs` $LDFLAGS -lSDL_image -lSDL_mixer -lpng >> configuration
 echo 'COMMON_OBJS:=$(COMMON_OBJS) build/linfunc.o' >> configuration
 fi
