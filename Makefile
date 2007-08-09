@@ -10,7 +10,7 @@ SMW_OBJS:= build/HashTable.o build/ai.o build/gamemodes.o build/main.o \
            build/sfx.o build/splash.o build/uicontrol.o build/uimenu.o \
            build/world.o
 LEVELEDIT_OBJS:=build/leveleditor.o
-WORLDEDIT_OBJS:=build/worldeditor.o
+WORLDEDIT_OBJS:=build/sfx.o build/world.o build/worldeditor.o
 
 include configuration
 #here because of one .c file among a .cpp project (o_O)
