@@ -6,6 +6,7 @@ class MI_World;
 struct WorldMapTile
 {
 	short iType;
+	short iBackgroundStyle;
 	short iBackgroundSprite;
 	short iForegroundSprite;
 
@@ -156,6 +157,10 @@ class WorldMap
 	friend class WorldVehicle;
 
 	friend int editor_edit();
+	friend void AutoSetTile(short iCol, short iRow);
+	friend void AutoSetPath(short iCol, short iRow);
+	friend void AutoSetPathSprite(short iCol, short iRow);
+	friend short AdjustForeground(short iSprite, short iCol, short iRow);
 };
 
 #endif //__WORLD_H_

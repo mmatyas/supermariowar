@@ -2734,7 +2734,7 @@ int display_help()
 	fontbig.drawCentered(320, 15, "Help");
 	
 	int offsety = 55;
-	int offsetx = 50;
+	int offsetx = 20;
 	font.draw(offsetx, offsety, "Modes:");
 	offsety += font.getHeight() + 2;
 	font.draw(offsetx, offsety, "[t] - Tile Mode");
@@ -2781,7 +2781,7 @@ int display_help()
 	offsety += font.getHeight() + 2;
 	font.draw(offsetx, offsety, "[pagedown] - Go To Next Map");
 
-	offsetx = 320;
+	offsetx = 305;
 	offsety = 55;
 
 	font.draw(offsetx, offsety, "Tile, Warp and Block Modes:");

@@ -1533,21 +1533,24 @@ void CPlayer::move()
 	if(state == player_ready)
 	{
 		//Deal with terminal burnup velocity
-		if(vely >= MAXVELY && !invincible)
+		if(vely >= MAXVELY)
 		{
-			if(++burnupstarttimer >= 20)
+			if(!invincible && !spawninvincible)
 			{
-				if(burnupstarttimer == 20)
-					ifsoundonplay(sfx_burnup);
+				if(++burnupstarttimer >= 20)
+				{
+					if(burnupstarttimer == 20)
+						ifsoundonplay(sfx_burnup);
 
-				if(++burnuptimer > 80)
-				{
-					KillPlayerMapHazard();
-					return;
-				}
-				else
-				{
-					eyecandyback.add(new EC_SingleAnimation(&spr_burnup, ix + HALFPW - 16, iy + HALFPH - 16, 5, 4));
+					if(++burnuptimer > 80)
+					{
+						KillPlayerMapHazard();
+						return;
+					}
+					else
+					{
+						eyecandyback.add(new EC_SingleAnimation(&spr_burnup, ix + HALFPW - 16, iy + HALFPH - 16, 5, 4));
+					}
 				}
 			}
 		}
@@ -2008,6 +2011,8 @@ void CPlayer::SetupNewPlayer()
 	iHorizontalPlatformCollision = -1;
 	iVerticalPlatformCollision = -1;
 
+	spawninvincible = false;
+	spawninvincibletimer = 0;
 	
 	if(game_values.gamemode->getgamemode() == game_mode_survival)
 	{

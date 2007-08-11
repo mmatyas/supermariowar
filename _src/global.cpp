@@ -626,17 +626,182 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 	return ts;
 }
 
+void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
+{
+	char szTemp[32];
+
+	strcpy(buffer, ts->pszMapFile);
+	strcat(buffer, ",");
+
+	sprintf(szTemp, "%d,", ts->iMode);
+	strcat(buffer, szTemp);
+	
+	sprintf(szTemp, "%d,", ts->iGoal);
+	strcat(buffer, szTemp);
+
+	sprintf(szTemp, "%d,", ts->iPoints);
+	strcat(buffer, szTemp);
+
+	sprintf(szTemp, "%d,", ts->iBonusType);
+	strcat(buffer, szTemp);
+
+	strcat(buffer, ts->szName);
+	strcat(buffer, ",");
+
+	if(fIsWorld)
+	{
+		sprintf(szTemp, "%d", ts->fEndStage);
+		strcat(buffer, szTemp);
+	}
+
+	if(ts->fUseSettings)
+	{
+		if(ts->iMode == 3) //jail
+		{
+			sprintf(szTemp, ",%d", ts->gmsSettings.jail.timetofree);
+			strcat(buffer, szTemp);
+
+			sprintf(szTemp, ",%d", ts->gmsSettings.jail.tagfree);
+			strcat(buffer, szTemp);
+		}
+		else if(ts->iMode == 4) //coins
+		{
+			sprintf(szTemp, ",%d", ts->gmsSettings.coins.penalty);
+			strcat(buffer, szTemp);
+
+			sprintf(szTemp, ",%d", ts->gmsSettings.coins.quantity);
+			strcat(buffer, szTemp);
+		}
+		else if(ts->iMode == 5) //stomp
+		{
+			sprintf(szTemp, ",%d", ts->gmsSettings.stomp.rate);
+			strcat(buffer, szTemp);
+
+			for(int iEnemy = 0; iEnemy < 3; iEnemy++)
+			{
+				sprintf(szTemp, ",%d", ts->gmsSettings.stomp.enemyweight[iEnemy]);
+				strcat(buffer, szTemp);
+			}
+		}
+		else if(ts->iMode == 7) //capture the flag
+		{
+			sprintf(szTemp, ",%d", ts->gmsSettings.flag.speed);
+			strcat(buffer, szTemp);
+
+			sprintf(szTemp, ",%d", ts->gmsSettings.flag.touchreturn);
+			strcat(buffer, szTemp);
+
+			sprintf(szTemp, ",%d", ts->gmsSettings.flag.pointmove);
+			strcat(buffer, szTemp);
+
+			sprintf(szTemp, ",%d", ts->gmsSettings.flag.autoreturn);
+			strcat(buffer, szTemp);
+
+			sprintf(szTemp, ",%d", ts->gmsSettings.flag.homescore);
+			strcat(buffer, szTemp);
+		}
+		else if(ts->iMode == 8) //chicken
+		{
+			sprintf(szTemp, ",%d", ts->gmsSettings.chicken.usetarget);
+			strcat(buffer, szTemp);
+		}
+		else if(ts->iMode == 9) //tag
+		{
+			sprintf(szTemp, ",%d", ts->gmsSettings.tag.tagontouch);
+			strcat(buffer, szTemp);
+		}
+		else if(ts->iMode == 10) //star
+		{
+			sprintf(szTemp, ",%d", ts->gmsSettings.star.time);
+			strcat(buffer, szTemp);
+
+			sprintf(szTemp, ",%d", ts->gmsSettings.star.shine);
+			strcat(buffer, szTemp);
+		}
+		else if(ts->iMode == 11) //domination
+		{
+			sprintf(szTemp, ",%d", ts->gmsSettings.domination.quantity);
+			strcat(buffer, szTemp);
+
+			sprintf(szTemp, ",%d", ts->gmsSettings.domination.relocationfrequency);
+			strcat(buffer, szTemp);
+
+			sprintf(szTemp, ",%d", ts->gmsSettings.domination.loseondeath);
+			strcat(buffer, szTemp);
+
+			sprintf(szTemp, ",%d", ts->gmsSettings.domination.relocateondeath);
+			strcat(buffer, szTemp);
+
+			sprintf(szTemp, ",%d", ts->gmsSettings.domination.stealondeath);
+			strcat(buffer, szTemp);
+		}
+		else if(ts->iMode == 12) //king of the hill
+		{
+			sprintf(szTemp, ",%d", ts->gmsSettings.kingofthehill.areasize);
+			strcat(buffer, szTemp);
+
+			sprintf(szTemp, ",%d", ts->gmsSettings.kingofthehill.relocationfrequency);
+			strcat(buffer, szTemp);
+		}
+		else if(ts->iMode == 13) //race
+		{
+			sprintf(szTemp, ",%d", ts->gmsSettings.race.quantity);
+			strcat(buffer, szTemp);
+
+			sprintf(szTemp, ",%d", ts->gmsSettings.race.speed);
+			strcat(buffer, szTemp);
+
+			sprintf(szTemp, ",%d", ts->gmsSettings.race.penalty);
+			strcat(buffer, szTemp);
+		}
+		else if(ts->iMode == 15) //frenzy
+		{
+			sprintf(szTemp, ",%d", ts->gmsSettings.frenzy.quantity);
+			strcat(buffer, szTemp);
+
+			sprintf(szTemp, ",%d", ts->gmsSettings.frenzy.rate);
+			strcat(buffer, szTemp);
+
+			sprintf(szTemp, ",%d", ts->gmsSettings.frenzy.storedshells);
+			strcat(buffer, szTemp);
+
+			for(short iPowerup = 0; iPowerup < 12; iPowerup++)
+			{
+				sprintf(szTemp, ",%d", ts->gmsSettings.frenzy.powerupweight[iPowerup]);
+				strcat(buffer, szTemp);
+			}
+		}
+		else if(ts->iMode == 16) //survival
+		{
+			for(short iEnemy = 0; iEnemy < 3; iEnemy++)
+			{
+				sprintf(szTemp, ",%d", ts->gmsSettings.survival.enemyweight[iEnemy]);
+				strcat(buffer, szTemp);
+			}
+
+			sprintf(szTemp, ",%d", ts->gmsSettings.survival.density);
+			strcat(buffer, szTemp);
+
+			sprintf(szTemp, ",%d", ts->gmsSettings.survival.speed);
+			strcat(buffer, szTemp);
+
+			sprintf(szTemp, ",%d", ts->gmsSettings.survival.shield);
+			strcat(buffer, szTemp);
+		}
+	}
+
+	strcat(buffer, "\n");
+}
+
+
 void ResetTourStops()
 {
 	game_values.tourstopcurrent = 0;
 	game_values.tourstoptotal = 0;
 	
-	std::vector<TourStop*>::iterator iterateAll = game_values.tourstops.begin();
-	
-	while (iterateAll != game_values.tourstops.end())
+	for(short iTourStop = 0; iTourStop < (short)game_values.tourstops.size(); iTourStop++)
 	{
-		//delete *iterateAll;
-		iterateAll++;
+		delete game_values.tourstops[iTourStop];
 	}
 
 	game_values.tourstops.clear();

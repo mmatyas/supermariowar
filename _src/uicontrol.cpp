@@ -4553,13 +4553,15 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 						iItemPage++;
 					}
 				}
-				else if(playerInput->outputControls[iPlayer].menu_select.fPressed)
+				else if(playerKeys->menu_select.fPressed)
 				{
 					short iIndex = iItemPage * 8 + iItemCol;
 					short iNumItems = --game_values.tournament_scores[iPlayer].numitems;
 
 					for(short iItem = iIndex; iItem < iNumItems; iItem++)
 						game_values.tournament_scores[iPlayer].items[iItem] = game_values.tournament_scores[iPlayer].items[iItem + 1];
+
+					iStateTransition = 2;	
 				}
 			}
 
@@ -4577,13 +4579,13 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 			{
 				if(iState == -1)
 				{
-					iState = iPlayer;
+					iState = game_values.colorids[iPlayer];
 					iStateTransition = 1;
 
 					iItemPage = 0;
 					iItemCol = 0;
 				}
-				else if (iState == iPlayer)
+				else if (iState == game_values.colorids[iPlayer])
 				{
 					iStateTransition = 2;
 				}

@@ -2,6 +2,7 @@
 
 extern void ResetTourStops();
 extern TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld);
+extern void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld);
 extern WorldMap g_worldmap;
 extern bool LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDirections);
 
@@ -249,9 +250,11 @@ void WorldVehicle::SetNextDest()
 			iConnections[iNumConnections++] = iDirection;
 	}
 
-	short iConnection = iConnections[rand() % iNumConnections];
-
-	WorldMovingObject::Move(iConnection);
+	if(iNumConnections > 0)
+	{
+		short iConnection = iConnections[rand() % iNumConnections];
+		WorldMovingObject::Move(iConnection);
+	}
 }
 
 bool WorldVehicle::Update()
@@ -310,7 +313,6 @@ WorldMap::~WorldMap()
 bool WorldMap::Load()
 {
 	Cleanup();
-	ResetTourStops();
 
 	FILE * file = fopen(worldlist.GetIndex(game_values.worldindex), "r");
 
@@ -375,7 +377,8 @@ bool WorldMap::Load()
 
 				WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
 				tile->iBackgroundSprite = atoi(psz);
-				tile->fAnimated = tile->iBackgroundSprite == 0 || (tile->iBackgroundSprite > 18 && tile->iBackgroundSprite <= 44);
+				tile->iBackgroundStyle = 0;
+				tile->fAnimated = tile->iBackgroundSprite == 0 || (tile->iBackgroundSprite >= 2 && tile->iBackgroundSprite <= 27);
 				
 				psz = strtok(NULL, ",\n");
 			}
@@ -517,7 +520,8 @@ bool WorldMap::Load()
 		else if(iReadType == 7) //number of stages
 		{
 			iNumStages = atoi(buffer);
-			iReadType = 8;
+			
+			iReadType = iNumStages == 0 ? 9 : 8;
 		}
 		else if(iReadType == 8) //stage details
 		{
@@ -533,7 +537,8 @@ bool WorldMap::Load()
 		{
 			iNumVehicles = atoi(buffer);
 			vehicles = new WorldVehicle[iNumVehicles];
-			iReadType = 10;
+
+			iReadType = iNumVehicles == 0 ? 11 : 10;
 		}
 		else if(iReadType == 10) //moving objects
 		{
@@ -682,6 +687,37 @@ bool WorldMap::Save(const char * szPath)
 	}
 	fprintf(file, "\n");
 
+	fprintf(file, "#Stages\n");
+	fprintf(file, "#Map,Mode,Goal,Points,Bonus,Name,End World, then mode settings (see sample tour file for details)\n");
+
+	fprintf(file, "%d\n", game_values.tourstoptotal);
+
+	for(short iStage = 0; iStage < game_values.tourstoptotal; iStage++)
+	{
+		char szLine[1024];
+		WriteTourStopLine(game_values.tourstops[iStage], szLine, true);
+		fprintf(file, szLine);
+	}
+	fprintf(file, "\n");
+
+	fprintf(file, "#Vehicles\n");
+	fprintf(file, "#Sprite,Stage Type, Start Column, Start Row, Min Moves, Max Moves, Sprite Paces\n");
+
+	fprintf(file, "%d\n", iNumVehicles);
+
+	for(short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++)
+	{
+		fprintf(file, "%d,", vehicles[iVehicle].iDrawSprite);
+		fprintf(file, "%d,", vehicles[iVehicle].iActionId);
+		fprintf(file, "%d,", vehicles[iVehicle].iCurrentTileX);
+		fprintf(file, "%d,", vehicles[iVehicle].iCurrentTileY);
+		fprintf(file, "%d,", vehicles[iVehicle].iMinMoves);
+		fprintf(file, "%d,", vehicles[iVehicle].iMaxMoves);
+		fprintf(file, "%d,", vehicles[iVehicle].fSpritePaces);
+		fprintf(file, "%d\n", vehicles[iVehicle].iDrawDirection);
+	}
+	fprintf(file, "\n");
+
 	fclose(file);
 
 	return true;
@@ -696,6 +732,7 @@ void WorldMap::Clear()
 			for(short iRow = 0; iRow < iHeight; iRow++)
 			{
 				tiles[iCol][iRow].iBackgroundSprite = 0;
+				tiles[iCol][iRow].iBackgroundStyle = 0;
 				tiles[iCol][iRow].iForegroundSprite = 0;
 				tiles[iCol][iRow].iConnectionType = 0;
 				tiles[iCol][iRow].iType = 0;
@@ -708,6 +745,8 @@ void WorldMap::Clear()
 		delete [] vehicles;
 		vehicles = NULL;
 	}
+
+	iNumVehicles = 0;
 }
 
 //Creates clears world and resizes (essentially creating a new world to work on for editor)
@@ -743,6 +782,7 @@ void WorldMap::Resize(short w, short h)
 			for(short iRow = 0; iRow < iHeight; iRow++)
 			{
 				tempTiles[iCol][iRow].iBackgroundSprite = tiles[iCol][iRow].iBackgroundSprite;
+				tempTiles[iCol][iRow].iBackgroundStyle = tiles[iCol][iRow].iBackgroundStyle;
 				tempTiles[iCol][iRow].iForegroundSprite = tiles[iCol][iRow].iForegroundSprite;
 				tempTiles[iCol][iRow].iConnectionType = tiles[iCol][iRow].iConnectionType;
 				tempTiles[iCol][iRow].iType = tiles[iCol][iRow].iType;
@@ -761,6 +801,7 @@ void WorldMap::Resize(short w, short h)
 			for(short iRow = 0; iRow < h && iRow < iHeight; iRow++)
 			{
 				tiles[iCol][iRow].iBackgroundSprite = tempTiles[iCol][iRow].iBackgroundSprite;
+				tiles[iCol][iRow].iBackgroundStyle = tempTiles[iCol][iRow].iBackgroundStyle;
 				tiles[iCol][iRow].iForegroundSprite = tempTiles[iCol][iRow].iForegroundSprite;
 				tiles[iCol][iRow].iConnectionType = tempTiles[iCol][iRow].iConnectionType;
 				tiles[iCol][iRow].iType = tempTiles[iCol][iRow].iType;
@@ -822,35 +863,64 @@ void WorldMap::DrawMapToSurface(bool fInit, SDL_Surface * surface, short iMapDra
 		
 			WorldMapTile * tile = &tiles[iCol + iMapDrawOffsetCol][iRow + iMapDrawOffsetRow];
 			short iBackgroundSprite = tile->iBackgroundSprite;
+			short iBackgroundStyle = tile->iBackgroundStyle;
 			short iForegroundSprite = tile->iForegroundSprite;
 
 			if(tile->fAnimated || fInit)
 			{
-				if(iBackgroundSprite == 0 || (iBackgroundSprite > 18 && iBackgroundSprite <= 44))
+				if(iBackgroundSprite == 0 || (iBackgroundSprite >= 2 && iBackgroundSprite <= 27) || (iBackgroundSprite >= 45 && iBackgroundSprite <= 48))
 				{
 					SDL_Rect rSrc = {iAnimationFrame, 0, TILESIZE, TILESIZE};
 					SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, surface, &r);
 
-					if(iBackgroundSprite > 18 && iBackgroundSprite <= 44)
+					if((iBackgroundSprite >= 2 && iBackgroundSprite <= 27) || (iBackgroundSprite >= 45 && iBackgroundSprite <= 48))
 					{
-						if(iBackgroundSprite > 31)
+						if(iBackgroundSprite >= 45)
 						{
-							SDL_Rect rSrc = {TILESIZE + TILESIZE, (iBackgroundSprite - 31) << 5, TILESIZE, TILESIZE};
+							SDL_Rect rSrc = {96, (iBackgroundSprite - 44) << 5, TILESIZE, TILESIZE};
+							SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, surface, &r);
+						}
+						else if(iBackgroundSprite >= 16)
+						{
+							SDL_Rect rSrc = {TILESIZE, (iBackgroundSprite - 14) << 5, TILESIZE, TILESIZE};
 							SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, surface, &r);
 						}
 						else
 						{
-							SDL_Rect rSrc = {TILESIZE, (iBackgroundSprite - 18) << 5, TILESIZE, TILESIZE};
+							SDL_Rect rSrc = {0, iBackgroundSprite << 5, TILESIZE, TILESIZE};
 							SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, surface, &r);
 						}
 					}
 				}
-				else if(iBackgroundSprite > 0 && iBackgroundSprite <= 18)
+				else if(iBackgroundSprite == 1)
 				{
-					SDL_Rect rSrc = {0, iBackgroundSprite << 5, TILESIZE, TILESIZE};
+					SDL_Rect rSrc = {TILESIZE, TILESIZE, TILESIZE, TILESIZE};
+					SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, surface, &r);
+				}
+				else if(iBackgroundSprite == 28 || iBackgroundSprite == 29)
+				{
+					SDL_Rect rSrc = {TILESIZE, (iBackgroundSprite - 14) << 5, TILESIZE, TILESIZE};
+					SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, surface, &r);
+				}
+				else if(iBackgroundSprite >= 30 && iBackgroundSprite <= 44)
+				{
+					SDL_Rect rSrc = {64, (iBackgroundSprite - 29) << 5, TILESIZE, TILESIZE};
 					SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, surface, &r);
 				}
 
+				if(iForegroundSprite >= 1 && iForegroundSprite <= 10)
+				{
+					SDL_Rect rSrc = {0, (iForegroundSprite - 1) << 5, TILESIZE, TILESIZE};
+					SDL_BlitSurface(spr_worldforeground.getSurface(), &rSrc, surface, &r);
+				}
+				else if(iForegroundSprite >= 17 && iForegroundSprite <= 18)
+				{
+					SDL_Rect rSrc = {128, (iForegroundSprite - 17) << 5, TILESIZE, TILESIZE};
+					SDL_BlitSurface(spr_worldforeground.getSurface(), &rSrc, surface, &r);
+				}
+
+
+				/*
 				if(iForegroundSprite == 1 || iForegroundSprite == 2)
 				{
 					SDL_Rect rSrc = {96, iForegroundSprite << 5, TILESIZE, TILESIZE};
@@ -861,6 +931,7 @@ void WorldMap::DrawMapToSurface(bool fInit, SDL_Surface * surface, short iMapDra
 					SDL_Rect rSrc = {iAnimationFrame, (iForegroundSprite + 14) << 5, TILESIZE, TILESIZE};
 					SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, surface, &r);
 				}
+				*/
 			}
 		}
 	}		
@@ -868,6 +939,8 @@ void WorldMap::DrawMapToSurface(bool fInit, SDL_Surface * surface, short iMapDra
 
 void WorldMap::Cleanup()
 {
+	ResetTourStops();
+
 	if(tiles)
 	{
 		for(short iCol = 0; iCol < iWidth; iCol++)
@@ -883,6 +956,8 @@ void WorldMap::Cleanup()
 		delete [] vehicles;
 		vehicles = NULL;
 	}
+
+	iNumVehicles = 0;
 }
 
 void WorldMap::SetPlayerSprite(short iPlayerSprite)
