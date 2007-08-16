@@ -14,18 +14,10 @@ extern short g_iVersion[];
 
 WorldMovingObject::WorldMovingObject()
 {
-	ix = 0;
-	iy = 0;
-	iCurrentTileX = 0;
-	iCurrentTileY = 0;
-	iDestTileX = 0;
-	iDestTileY = 0;
-		
-	iState = 0;
 	iDrawSprite = 0;
 	iDrawDirection = 0;
-	iAnimationFrame = 0;
-	iAnimationTimer = 0;
+
+	SetPosition(0, 0);
 }
 
 WorldMovingObject::~WorldMovingObject()
@@ -33,18 +25,10 @@ WorldMovingObject::~WorldMovingObject()
 
 void WorldMovingObject::Init(short iCol, short iRow, short iSprite, short iInitialDirection)
 {
-	ix = iCol * TILESIZE;
-	iy = iRow * TILESIZE;
-	iCurrentTileX = iCol;
-	iCurrentTileY = iRow;
-	iDestTileX = iCol;
-	iDestTileY = iRow;
+	SetPosition(iCol, iRow);
 		
-	iState = 0;
 	iDrawSprite = iSprite;
 	iDrawDirection = iInitialDirection;
-	iAnimationFrame = 0;
-	iAnimationTimer = 0;
 }
 
 void WorldMovingObject::Move(short iDirection)
@@ -135,6 +119,25 @@ bool WorldMovingObject::Update()
 	return false;
 }
 
+void WorldMovingObject::FaceDirection(short iDirection)
+{
+	iDrawDirection = iDirection;
+}
+
+void WorldMovingObject::SetPosition(short iCol, short iRow)
+{
+	ix = iCol * TILESIZE;
+	iy = iRow * TILESIZE;
+	iCurrentTileX = iCol;
+	iCurrentTileY = iRow;
+	iDestTileX = iCol;
+	iDestTileY = iRow;
+		
+	iState = 0;
+	iAnimationFrame = 0;
+	iAnimationTimer = 0;
+}
+
 /**********************************
 * WorldPlayer
 **********************************/
@@ -188,7 +191,7 @@ void WorldVehicle::Init(short iCol, short iRow, short iAction, short iSprite, sh
 	short iRectOffsetX = 0;
 	short iRectOffsetY = 0;
 
-	if(iDrawSprite >= 0 && iDrawSprite <= 2)
+	if(iDrawSprite >= 0 && iDrawSprite <= 8)
 	{
 		iRectOffsetX = 0;
 		iRectOffsetY = iDrawSprite * TILESIZE;
@@ -292,6 +295,46 @@ void WorldVehicle::Draw(short iWorldOffsetX, short iWorldOffsetY)
 
 
 /**********************************
+* WorldWarp
+**********************************/
+
+WorldWarp::WorldWarp()
+{
+	iCol1 = 0;
+	iRow1 = 0;
+	iCol2 = 0;
+	iRow2 = 0;
+}
+
+void WorldWarp::Init(short col1, short row1, short col2, short row2)
+{
+	iCol1 = col1;
+	iRow1 = row1;
+	iCol2 = col2;
+	iRow2 = row2;
+}
+
+void WorldWarp::GetOtherSide(short iCol, short iRow, short * iOtherCol, short * iOtherRow)
+{
+	if(iCol1 == iCol && iRow1 == iRow)
+	{
+		*iOtherCol = iCol2;
+		*iOtherRow = iRow2;
+	}
+	else if(iCol2 == iCol && iRow2 == iRow)
+	{
+		*iOtherCol = iCol1;
+		*iOtherRow = iRow1;
+	}
+	else
+	{
+		*iOtherCol = iCol;
+		*iOtherRow = iRow;
+	}
+}
+
+
+/**********************************
 * WorldMap
 **********************************/
 
@@ -301,8 +344,10 @@ WorldMap::WorldMap()
 	iHeight = 0;
 	tiles = NULL;
 	vehicles = NULL;
+	warps = NULL;
 	iNumVehicles = 0;
 	iNumStages = 0;
+	iNumWarps = 0;
 }
 
 WorldMap::~WorldMap()
@@ -324,6 +369,7 @@ bool WorldMap::Load()
 	short iVersion[4] = {0, 0, 0, 0};
 	short iMapTileReadRow = 0;
 	short iCurrentStage = 0;
+	short iCurrentWarp = 0;
 	short iCurrentVehicle = 0;
 	
 	while(fgets(buffer, 256, file))
@@ -402,7 +448,10 @@ bool WorldMap::Load()
 				tile->iForegroundSprite = atoi(psz);
 
 				if(!tile->fAnimated)
-					tile->fAnimated = tile->iForegroundSprite >= 3 && tile->iForegroundSprite <= 6;
+					tile->fAnimated = tile->iForegroundSprite >= 3 && tile->iForegroundSprite <= 10;
+
+				if(!tile->fAnimated)
+					tile->fAnimated = tile->iForegroundSprite >= WORLD_FOREGROUND_SPRITE_OFFSET && tile->iForegroundSprite <= WORLD_FOREGROUND_SPRITE_OFFSET + 399;
 				
 				psz = strtok(NULL, ",\n");
 			}
@@ -502,6 +551,7 @@ bool WorldMap::Load()
 
 				WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
 				tile->iType = atoi(psz);
+				tile->iWarp = -1;
 
 				if(tile->iType == 1)
 				{
@@ -533,14 +583,68 @@ bool WorldMap::Load()
 			if(++iCurrentStage >= iNumStages)
 				iReadType = 9;
 		}
-		else if(iReadType == 9) //number of vehicles
+		else if(iReadType == 9) //number of warps
+		{
+			iNumWarps = atoi(buffer);
+
+			if(iNumWarps < 0)
+				iNumWarps = 0;
+
+			if(iNumWarps > 0)
+				warps = new WorldWarp[iNumWarps];
+			
+			iReadType = iNumWarps == 0 ? 11 : 10;
+		}
+		else if(iReadType == 10) //warp details
+		{
+			char * psz = strtok(buffer, ",\n");
+			
+			if(!psz)
+				goto RETURN;
+
+			short iCol1 = atoi(psz);
+			if(iCol1 < 0)
+				iCol1 = 0;
+
+			psz = strtok(NULL, ",\n");
+
+			short iRow1 = atoi(psz);
+			if(iRow1 < 0)
+				iRow1 = 0;
+
+			psz = strtok(NULL, ",\n");
+
+			short iCol2 = atoi(psz);
+			if(iCol2 < 0)
+				iCol2 = 0;
+
+			psz = strtok(NULL, ",\n");
+
+			short iRow2 = atoi(psz);
+			if(iRow2 < 0)
+				iRow2 = 0;
+			
+			warps[iCurrentWarp].Init(iCol1, iRow1, iCol2, iRow2);
+
+			tiles[iCol1][iRow1].iWarp = iCurrentWarp;
+			tiles[iCol2][iRow2].iWarp = iCurrentWarp;
+
+			if(++iCurrentWarp >= iNumWarps)
+				iReadType = 11;
+		}
+		else if(iReadType == 11) //number of vehicles
 		{
 			iNumVehicles = atoi(buffer);
-			vehicles = new WorldVehicle[iNumVehicles];
 
-			iReadType = iNumVehicles == 0 ? 11 : 10;
+			if(iNumVehicles < 0)
+				iNumVehicles = 0;
+
+			if(iNumVehicles > 0)
+				vehicles = new WorldVehicle[iNumVehicles];
+
+			iReadType = iNumVehicles == 0 ? 13 : 12;
 		}
-		else if(iReadType == 10) //moving objects
+		else if(iReadType == 12) //moving objects
 		{
 			char * psz = strtok(buffer, ",\n");
 			
@@ -586,7 +690,7 @@ bool WorldMap::Load()
 			vehicles[iCurrentVehicle].Init(iCol, iRow, iStage, iSprite, iMinMoves, iMaxMoves, fSpritePaces, iInitialDirection);
 
 			if(++iCurrentVehicle >= iNumVehicles)
-				iReadType = 11;
+				iReadType = 13;
 		}
 	}
 
@@ -594,7 +698,7 @@ RETURN:
 
 	fclose(file);
 
-	return iReadType == 11;
+	return iReadType == 13;
 }
 
 //Saves world to file
@@ -700,8 +804,22 @@ bool WorldMap::Save(const char * szPath)
 	}
 	fprintf(file, "\n");
 
+	fprintf(file, "#Warps\n");
+	fprintf(file, "#location 1 x, y, location 2 x, y\n");
+
+	fprintf(file, "%d\n", iNumWarps);
+
+	for(short iWarp = 0; iWarp < iNumWarps; iWarp++)
+	{
+		fprintf(file, "%d,", warps[iWarp].iCol1);
+		fprintf(file, "%d,", warps[iWarp].iRow1);
+		fprintf(file, "%d,", warps[iWarp].iCol2);
+		fprintf(file, "%d\n", warps[iWarp].iRow2);
+	}
+	fprintf(file, "\n");
+
 	fprintf(file, "#Vehicles\n");
-	fprintf(file, "#Sprite,Stage Type, Start Column, Start Row, Min Moves, Max Moves, Sprite Paces\n");
+	fprintf(file, "#Sprite,Stage Type, Start Column, Start Row, Min Moves, Max Moves, Sprite Paces, Sprite Direction\n");
 
 	fprintf(file, "%d\n", iNumVehicles);
 
@@ -747,6 +865,14 @@ void WorldMap::Clear()
 	}
 
 	iNumVehicles = 0;
+
+	if(warps)
+	{
+		delete [] warps;
+		warps = NULL;
+	}
+
+	iNumWarps = 0;
 }
 
 //Creates clears world and resizes (essentially creating a new world to work on for editor)
@@ -908,17 +1034,40 @@ void WorldMap::DrawMapToSurface(bool fInit, SDL_Surface * surface, short iMapDra
 					SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, surface, &r);
 				}
 
-				if(iForegroundSprite >= 1 && iForegroundSprite <= 10)
+				if(iForegroundSprite == 1 || iForegroundSprite == 2)
 				{
 					SDL_Rect rSrc = {0, (iForegroundSprite - 1) << 5, TILESIZE, TILESIZE};
-					SDL_BlitSurface(spr_worldforeground.getSurface(), &rSrc, surface, &r);
+					SDL_BlitSurface(spr_worldpaths.getSurface(), &rSrc, surface, &r);
 				}
-				else if(iForegroundSprite >= 17 && iForegroundSprite <= 18)
+				else if(iForegroundSprite >= 3 && iForegroundSprite <= 10)
 				{
-					SDL_Rect rSrc = {128, (iForegroundSprite - 17) << 5, TILESIZE, TILESIZE};
+					SDL_Rect rSrc = {iAnimationFrame, (iForegroundSprite - 1) << 5, TILESIZE, TILESIZE};
+					SDL_BlitSurface(spr_worldpaths.getSurface(), &rSrc, surface, &r);
+				}
+				else if(iForegroundSprite >= 11 && iForegroundSprite <= 18)
+				{
+					short iSpriteX = (((iForegroundSprite - 11) / 2) + 1) << 5;
+					short iSpriteY = ((iForegroundSprite - 11) % 2) << 5;
+
+					SDL_Rect rSrc = {iSpriteX, iSpriteY, TILESIZE, TILESIZE};
+					SDL_BlitSurface(spr_worldpaths.getSurface(), &rSrc, surface, &r);
+				}
+				else if(iForegroundSprite >= WORLD_FOREGROUND_SPRITE_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_SPRITE_OFFSET + 399)
+				{
+					short iTileColor = (iForegroundSprite - WORLD_FOREGROUND_SPRITE_OFFSET) / 100;
+					SDL_Rect rSrc = {320 + iAnimationFrame, iTileColor << 5, TILESIZE, TILESIZE};
+					SDL_BlitSurface(spr_worldforeground.getSurface(), &rSrc, surface, &r);
+
+					short iTileNumber = (iForegroundSprite - WORLD_FOREGROUND_SPRITE_OFFSET) % 100;
+					rSrc.x = (iTileNumber % 10) << 5;
+					rSrc.y = (iTileNumber / 10) << 5;
 					SDL_BlitSurface(spr_worldforeground.getSurface(), &rSrc, surface, &r);
 				}
-
+				else if(iForegroundSprite >= WORLD_WINNING_TEAM_SPRITE_OFFSET && iForegroundSprite <= WORLD_WINNING_TEAM_SPRITE_OFFSET + 3)
+				{
+					SDL_Rect rSrc = {(iForegroundSprite - WORLD_WINNING_TEAM_SPRITE_OFFSET + 15) << 5, TILESIZE, TILESIZE, TILESIZE};
+					SDL_BlitSurface(spr_worldforeground.getSurface(), &rSrc, surface, &r);
+				}
 
 				/*
 				if(iForegroundSprite == 1 || iForegroundSprite == 2)
@@ -958,6 +1107,14 @@ void WorldMap::Cleanup()
 	}
 
 	iNumVehicles = 0;
+
+	if(warps)
+	{
+		delete [] warps;
+		warps = NULL;
+	}
+
+	iNumWarps = 0;
 }
 
 void WorldMap::SetPlayerSprite(short iPlayerSprite)
@@ -983,6 +1140,11 @@ void WorldMap::GetPlayerPosition(short * iPlayerX, short * iPlayerY)
 {
 	*iPlayerX = player.ix;
 	*iPlayerY = player.iy;
+}
+
+void WorldMap::SetPlayerPosition(short iPlayerCol, short iPlayerRow)
+{
+	player.SetPosition(iPlayerCol, iPlayerRow);
 }
 
 void WorldMap::GetPlayerCurrentTile(short * iPlayerCurrentTileX, short * iPlayerCurrentTileY)
@@ -1016,9 +1178,25 @@ short WorldMap::GetVehicleInPlayerTile(short * vehicleIndex)
 	return -1;
 }
 
+bool WorldMap::GetWarpInPlayerTile(short * iWarpCol, short * iWarpRow)
+{
+	short iWarp = tiles[player.iCurrentTileX][player.iCurrentTileY].iWarp;
+
+	if(iWarp < 0)
+		return false;
+
+	warps[iWarp].GetOtherSide(player.iCurrentTileX, player.iCurrentTileY, iWarpCol, iWarpRow);
+	return true;
+}
+
 void WorldMap::MovePlayer(short iDirection)
 {
 	player.Move(iDirection);
+}
+
+void WorldMap::FacePlayer(short iDirection)
+{
+	player.FaceDirection(iDirection);
 }
 
 void WorldMap::MoveVehicles()

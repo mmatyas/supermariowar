@@ -35,9 +35,9 @@
 
 #define MAPTITLESTRING "SMW 1.7 World Editor"
 
-enum {EDITOR_EDIT, EDITOR_BACKGROUND, EDITOR_FOREGROUND, EDITOR_VEHICLES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_WORLD, NEW_WORLD, SAVE, EDITOR_WARP, DISPLAY_HELP, EDITOR_PATH};
+enum {EDITOR_EDIT, EDITOR_BACKGROUND, EDITOR_FOREGROUND, EDITOR_PATHSPRITE, EDITOR_VEHICLES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_WORLD, NEW_WORLD, SAVE, EDITOR_WARP, DISPLAY_HELP, EDITOR_PATH};
 
-char * szEditModes[7] = {"Background Mode", "Foreground Mode", "Path Mode", "Stage Mode", "Vehicle Mode", "Warp Mode", "Move Mode"};
+char * szEditModes[8] = {"Background Mode", "Foreground Mode", "Path Sprite Mode", "Stage Mode", "Path Mode", "Vehicle Mode", "Warp Mode", "Move Mode"};
 
 SDL_Surface		*screen;
 SDL_Surface		*blitdest;
@@ -63,10 +63,12 @@ gfxSprite		spr_warps[3];
 gfxSprite		spr_path;
 gfxSprite		spr_backgroundtiles[3];
 gfxSprite		spr_foregroundtiles[3];
+gfxSprite		spr_pathtiles[3];
 gfxSprite		spr_vehicles[3];
 
 gfxSprite		spr_worldbackground;
 gfxSprite		spr_worldforeground;
+gfxSprite		spr_worldpaths;
 gfxSprite		spr_worldvehicle;
 
 int				set_tile = 0;
@@ -130,6 +132,7 @@ int display_help();
 
 void drawmap(bool fScreenshot, short iBlockSize);
 
+void UpdateForeground(short iCol, short iRow);
 void UpdatePath(short iCol, short iRow);
 void UpdateCoastline(short iCol, short iRow);
 void UpdatePathSprite(short iCol, short iRow);
@@ -148,6 +151,7 @@ int	editor_background();
 int editor_foreground();
 int editor_vehicles();
 int	editor_path();
+int editor_pathsprite();
 
 void updateworldsurface();
 void takescreenshot();
@@ -196,19 +200,24 @@ int main(int argc, char *argv[])
 
 	printf("\n---------------- load world ----------------\n");
 
-	spr_backgroundtiles[0].init(convertPath("gfx/packs/Classic/world_background.png"), 255, 0, 255);
-	//spr_backgroundtiles[1].init(convertPath("gfx/packs/Classic/world_background_medium.png"), 255, 0, 255);
-	//spr_backgroundtiles[2].init(convertPath("gfx/packs/Classic/world_background_small.png"), 255, 0, 255);
+	spr_backgroundtiles[0].init(convertPath("gfx/packs/Classic/world/world_background.png"), 255, 0, 255);
+	//spr_backgroundtiles[1].init(convertPath("gfx/packs/Classic/world/world_background_medium.png"), 255, 0, 255);
+	//spr_backgroundtiles[2].init(convertPath("gfx/packs/Classic/world/world_background_small.png"), 255, 0, 255);
 	spr_worldbackground.setSurface(spr_backgroundtiles[0].getSurface());
 
-	spr_foregroundtiles[0].init(convertPath("gfx/packs/Classic/world_foreground.png"), 255, 0, 255);
-	//spr_foregroundtiles[1].init(convertPath("gfx/packs/Classic/world_foreground_medium.png"), 255, 0, 255);
-	//spr_foregroundtiles[2].init(convertPath("gfx/packs/Classic/world_foreground_small.png"), 255, 0, 255);
+	spr_foregroundtiles[0].init(convertPath("gfx/packs/Classic/world/world_foreground.png"), 255, 0, 255);
+	//spr_foregroundtiles[1].init(convertPath("gfx/packs/Classic/world/world_foreground_medium.png"), 255, 0, 255);
+	//spr_foregroundtiles[2].init(convertPath("gfx/packs/Classic/world/world_foreground_small.png"), 255, 0, 255);
 	spr_worldforeground.setSurface(spr_foregroundtiles[0].getSurface());
 
-	spr_vehicles[0].init(convertPath("gfx/packs/Classic/world_vehicles.png"), 255, 0, 255);
-	//vehicles[1].init(convertPath("gfx/packs/Classic/world_vehicles_medium.png"), 255, 0, 255);
-	//vehicles[2].init(convertPath("gfx/packs/Classic/world_vehicles_small.png"), 255, 0, 255);
+	spr_pathtiles[0].init(convertPath("gfx/packs/Classic/world/world_paths.png"), 255, 0, 255);
+	//spr_pathtiles[1].init(convertPath("gfx/packs/Classic/world/world_paths_medium.png"), 255, 0, 255);
+	//spr_pathtiles[2].init(convertPath("gfx/packs/Classic/world/world_paths_small.png"), 255, 0, 255);
+	spr_worldpaths.setSurface(spr_pathtiles[0].getSurface());
+
+	spr_vehicles[0].init(convertPath("gfx/packs/Classic/world/world_vehicles.png"), 255, 0, 255);
+	//vehicles[1].init(convertPath("gfx/packs/Classic/world/world_vehicles_medium.png"), 255, 0, 255);
+	//vehicles[2].init(convertPath("gfx/packs/Classic/world/world_vehicles_small.png"), 255, 0, 255);
 	spr_worldvehicle.setSurface(spr_vehicles[0].getSurface());
 
 	sMapSurface = SDL_CreateRGBSurface(screen->flags, 768, 608, screen->format->BitsPerPixel, 0, 0, 0, 0);
@@ -242,6 +251,10 @@ int main(int argc, char *argv[])
 			
 			case EDITOR_PATH:
 				state = editor_path();
+			break;
+
+			case EDITOR_PATHSPRITE:
+				state = editor_pathsprite();
 			break;
 
 			case EDITOR_WARP:
@@ -288,6 +301,7 @@ int main(int argc, char *argv[])
 	//Clear them here so they don't get freed twice
 	spr_worldbackground.clearSurface();
 	spr_worldforeground.clearSurface();
+	spr_worldpaths.clearSurface();
 	spr_worldvehicle.clearSurface();
 
 	printf("\n---------------- save world ----------------\n");
@@ -341,9 +355,12 @@ int editor_edit()
 						return EDITOR_FOREGROUND;
 
 					if(event.key.keysym.sym == SDLK_3)
-						return EDITOR_VEHICLES;
+						return EDITOR_PATHSPRITE;
 
 					if(event.key.keysym.sym == SDLK_4)
+						return EDITOR_VEHICLES;
+
+					if(event.key.keysym.sym == SDLK_5)
 						return EDITOR_PATH;
 
 					if(event.key.keysym.sym == SDLK_a)
@@ -463,6 +480,7 @@ int editor_edit()
 								if(g_worldmap.tiles[iCol][iRow].iBackgroundSprite != set_tile || fAutoPaint)
 								{
 									g_worldmap.tiles[iCol][iRow].iBackgroundSprite = set_tile;
+									UpdateForeground(iCol, iRow);
 
 									if(set_tile < 2 && fAutoPaint)
 										UpdateCoastline(iCol, iRow);								
@@ -472,13 +490,9 @@ int editor_edit()
 							}
 							else if(edit_mode == 1) //selected foreground
 							{
-								if(g_worldmap.tiles[iCol][iRow].iForegroundSprite != set_tile || fAutoPaint)
+								if(g_worldmap.tiles[iCol][iRow].iForegroundSprite != set_tile)
 								{
-									g_worldmap.tiles[iCol][iRow].iForegroundSprite = AdjustForeground(set_tile, iCol, iRow);
-
-									if(fAutoPaint)
-										UpdatePathSprite(iCol, iRow);
-
+									g_worldmap.tiles[iCol][iRow].iForegroundSprite = set_tile;
 									updateworldsurface();
 								}
 							}
@@ -493,12 +507,25 @@ int editor_edit()
 							{
 								g_worldmap.tiles[iCol][iRow].iType = set_tile;
 							}
+							else if(edit_mode == 4) //selected foreground
+							{
+								short iAdjustedTile = AdjustForeground(set_tile, iCol, iRow);
+								if(g_worldmap.tiles[iCol][iRow].iForegroundSprite != iAdjustedTile || fAutoPaint)
+								{
+									g_worldmap.tiles[iCol][iRow].iForegroundSprite = iAdjustedTile;
+
+									if(fAutoPaint)
+										UpdatePathSprite(iCol, iRow);
+
+									updateworldsurface();
+								}
+							}
 							/*
-							else if(edit_mode == 4) //selected vehicle
+							else if(edit_mode == 5) //selected vehicle
 							{
 								g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iConnectionType = set_tile;
 							}
-							else if(edit_mode == 5) //selected warp
+							else if(edit_mode == 6) //selected warp
 							{
 								g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iConnectionType = set_tile;
 							}*/
@@ -510,19 +537,19 @@ int editor_edit()
 								if(g_worldmap.tiles[iCol][iRow].iBackgroundSprite != 0 || fAutoPaint)
 								{
 									g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 0;
-									UpdateCoastline(iCol, iRow);
+									UpdateForeground(iCol, iRow);
+
+									if(fAutoPaint)
+										UpdateCoastline(iCol, iRow);
+									
 									updateworldsurface();
 								}
 							}
 							else if(edit_mode == 1)
 							{
-								if(g_worldmap.tiles[iCol][iRow].iForegroundSprite != 0 || fAutoPaint)
+								if(g_worldmap.tiles[iCol][iRow].iForegroundSprite != 0)
 								{
 									g_worldmap.tiles[iCol][iRow].iForegroundSprite = 0;
-
-									if(fAutoPaint)
-										UpdatePathSprite(iCol, iRow);								
-
 									updateworldsurface();
 								}
 							}
@@ -537,12 +564,24 @@ int editor_edit()
 							{
 								g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iType = 0;
 							}
-							/*
 							else if(edit_mode == 4)
+							{
+								if(g_worldmap.tiles[iCol][iRow].iForegroundSprite != 0 || fAutoPaint)
+								{
+									g_worldmap.tiles[iCol][iRow].iForegroundSprite = 0;
+
+									if(fAutoPaint)
+										UpdatePathSprite(iCol, iRow);								
+
+									updateworldsurface();
+								}
+							}
+							/*
+							else if(edit_mode == 5)
 							{
 								g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iType = 0;
 							}
-							else if(edit_mode == 5)
+							else if(edit_mode == 6)
 							{
 								g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iType = 0;
 							}*/
@@ -568,6 +607,7 @@ int editor_edit()
 								if(g_worldmap.tiles[iCol][iRow].iBackgroundSprite != set_tile || fAutoPaint)
 								{
 									g_worldmap.tiles[iCol][iRow].iBackgroundSprite = set_tile;
+									UpdateForeground(iCol, iRow);
 
 									if(set_tile < 2 && fAutoPaint)
 										UpdateCoastline(iCol, iRow);								
@@ -577,13 +617,9 @@ int editor_edit()
 							}
 							else if(edit_mode == 1)
 							{
-								if(g_worldmap.tiles[iCol][iRow].iForegroundSprite != set_tile || fAutoPaint)
+								if(g_worldmap.tiles[iCol][iRow].iForegroundSprite != set_tile)
 								{
-									g_worldmap.tiles[iCol][iRow].iForegroundSprite = AdjustForeground(set_tile, iCol, iRow);
-
-									if(fAutoPaint)
-										UpdatePathSprite(iCol, iRow);								
-
+									g_worldmap.tiles[iCol][iRow].iForegroundSprite = set_tile;
 									updateworldsurface();
 								}
 							}
@@ -598,6 +634,19 @@ int editor_edit()
 							{
 								g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iType = set_tile;
 							}
+							else if(edit_mode == 4)
+							{
+								short iAdjustedTile = AdjustForeground(set_tile, iCol, iRow);
+								if(g_worldmap.tiles[iCol][iRow].iForegroundSprite != iAdjustedTile || fAutoPaint)
+								{
+									g_worldmap.tiles[iCol][iRow].iForegroundSprite = iAdjustedTile;
+
+									if(fAutoPaint)
+										UpdatePathSprite(iCol, iRow);								
+
+									updateworldsurface();
+								}
+							}
 						}
 						else if(event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT))
 						{
@@ -606,19 +655,19 @@ int editor_edit()
 								if(g_worldmap.tiles[iCol][iRow].iBackgroundSprite != 0 || fAutoPaint)
 								{
 									g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 0;
-									UpdateCoastline(iCol, iRow);
+									UpdateForeground(iCol, iRow);
+
+									if(fAutoPaint)
+										UpdateCoastline(iCol, iRow);
+
 									updateworldsurface();
 								}
 							}
 							else if(edit_mode == 1)
 							{
-								if(g_worldmap.tiles[iCol][iRow].iForegroundSprite != 0 || fAutoPaint)
+								if(g_worldmap.tiles[iCol][iRow].iForegroundSprite != 0)
 								{
 									g_worldmap.tiles[iCol][iRow].iForegroundSprite = 0;
-
-									if(fAutoPaint)
-										UpdatePathSprite(iCol, iRow);								
-
 									updateworldsurface();
 								}
 							}
@@ -632,6 +681,18 @@ int editor_edit()
 							else if(edit_mode == 3)
 							{
 								g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iType = 0;
+							}
+							else if(edit_mode == 4)
+							{
+								if(g_worldmap.tiles[iCol][iRow].iForegroundSprite != 0 || fAutoPaint)
+								{
+									g_worldmap.tiles[iCol][iRow].iForegroundSprite = 0;
+
+									if(fAutoPaint)
+										UpdatePathSprite(iCol, iRow);								
+
+									updateworldsurface();
+								}
 							}
 						}
 					}
@@ -755,7 +816,53 @@ void AutoSetPathSprite(short iCol, short iRow)
 //Convert foreground sprite to match the background sprite
 short AdjustForeground(short iSprite, short iCol, short iRow)
 {
-	if(g_worldmap.tiles[iCol][iRow].iBackgroundSprite != 1)
+	short iBackgroundSprite = g_worldmap.tiles[iCol][iRow].iBackgroundSprite;
+
+	//Convert already adjusted sprites back to their "base" sprite 
+	if(iSprite >= 11 && iSprite <= 18)
+		iSprite = 2 - (iSprite % 2);
+	else if(iSprite >= 7 && iSprite <= 10)
+		iSprite -= 4;
+	
+	if(iBackgroundSprite == 1)
+		return iSprite;
+
+	if(iSprite == 2 && (iBackgroundSprite == 12 || iBackgroundSprite == 20 || iBackgroundSprite == 23 || 
+		iBackgroundSprite == 24 || iBackgroundSprite == 27 || iBackgroundSprite == 32 || iBackgroundSprite == 36 ||
+		iBackgroundSprite == 37 || iBackgroundSprite == 40))
+	{
+		iSprite = 14;
+	}
+	else if(iSprite == 2 && (iBackgroundSprite == 13 || iBackgroundSprite == 21 || iBackgroundSprite == 22 || 
+		iBackgroundSprite == 25 || iBackgroundSprite == 26 || iBackgroundSprite == 33 || iBackgroundSprite == 34 ||
+		iBackgroundSprite == 35 || iBackgroundSprite == 41))
+	{
+		iSprite = 16;
+	}
+	else if(iSprite == 1 && (iBackgroundSprite == 14 || iBackgroundSprite == 18 || iBackgroundSprite == 19 || 
+		iBackgroundSprite == 26 || iBackgroundSprite == 27 || iBackgroundSprite == 31 || iBackgroundSprite == 34 ||
+		iBackgroundSprite == 37 || iBackgroundSprite == 39))
+	{
+		iSprite = 13;
+	}
+	else if(iSprite == 1 && (iBackgroundSprite == 15 || iBackgroundSprite == 16 || iBackgroundSprite == 17 || 
+		iBackgroundSprite == 24 || iBackgroundSprite == 25 || iBackgroundSprite == 30 || iBackgroundSprite == 35 ||
+		iBackgroundSprite == 36 || iBackgroundSprite == 38))
+	{
+		iSprite = 15;
+	}
+	else if(iSprite == 2 && (iBackgroundSprite == 28 || iBackgroundSprite == 38 || iBackgroundSprite == 39 ||
+		iBackgroundSprite == 43))
+	{
+		iSprite = 12;
+	}
+	else if(iSprite == 1 && (iBackgroundSprite == 28 || iBackgroundSprite == 40 || iBackgroundSprite == 41 ||
+		 iBackgroundSprite == 42))
+	{
+		iSprite = 11;	
+	}
+
+	else
 	{
 		if(iSprite == 1 || iSprite == 2)
 			iSprite += 16;
@@ -817,6 +924,11 @@ void AutoSetPath(short iCol, short iRow)
 	g_worldmap.tiles[iCol][iRow].iConnectionType = iPathTypes[iPath];
 }
 
+void UpdateForeground(short iCol, short iRow)
+{
+	g_worldmap.tiles[iCol][iRow].iForegroundSprite = AdjustForeground(g_worldmap.tiles[iCol][iRow].iForegroundSprite, iCol, iRow);
+}
+
 void UpdateCoastline(short iCol, short iRow)
 {
 	short iStartCol = iCol == 0 ? 0 : iCol - 1;
@@ -830,6 +942,7 @@ void UpdateCoastline(short iCol, short iRow)
 		for(short iAutoCol = iStartCol; iAutoCol <= iEndCol; iAutoCol++)
 		{
 			AutoSetTile(iAutoCol, iAutoRow);
+			UpdateForeground(iAutoCol, iAutoRow);
 		}
 	}	
 }
@@ -1169,12 +1282,6 @@ int editor_background()
 {
 	bool done = false;
 	
-	SDL_Rect r;
-	r.x = 0;
-	r.y = 0;
-	r.w = 640;
-	r.h = 480;
-
 	while (!done)
 	{
 		int framestart = SDL_GetTicks();
@@ -1266,20 +1373,6 @@ int editor_foreground()
 {
 	bool done = false;
 	
-	SDL_Rect r;
-	r.x = 0;
-	r.y = 0;
-	r.w = 640;
-	r.h = 480;
-
-	/*
-	short iCurrentTile = 0;
-	short iConvertedTile[300];
-
-	for(short iTile = 0; iTile < 300; iTile++)
-		iConvertedTile[iTile] = g_iTileConversion[iTile];
-	*/
-
 	while (!done)
 	{
 		int framestart = SDL_GetTicks();
@@ -1347,6 +1440,76 @@ int editor_foreground()
 	return EDITOR_QUIT;
 }
 
+int editor_pathsprite()
+{
+	bool done = false;
+
+	while (!done)
+	{
+		int framestart = SDL_GetTicks();
+
+		//handle messages
+		while(SDL_PollEvent(&event))
+		{
+			switch(event.type)
+			{
+				case SDL_QUIT:
+					done = true;
+				break;
+
+				case SDL_KEYDOWN:
+				{	
+					if(event.key.keysym.sym == SDLK_ESCAPE)
+					{
+						return EDITOR_EDIT;
+					}
+
+					break;
+				}
+
+				case SDL_MOUSEBUTTONDOWN:
+				{
+					if(event.button.button == SDL_BUTTON_LEFT)
+					{
+						short iButtonX = event.button.x / TILESIZE;
+						short iButtonY = event.button.y / TILESIZE;
+
+						if(iButtonX >= 0 && iButtonX < 1)
+						{
+							if(iButtonY >= 0 && iButtonY < 6)
+								set_tile = iButtonY + 1;
+						}
+
+						ignoreclick = true;
+						edit_mode = 4;
+						return EDITOR_EDIT;
+					}
+					
+					break;
+				}
+
+				default:
+					break;
+			}
+		}
+
+		SDL_FillRect(screen, NULL, 0x0);
+
+		spr_pathtiles[0].draw(0, 0, 0, 0, 32, 192);
+
+		SDL_Flip(screen);
+
+		int delay = WAITTIME - (SDL_GetTicks() - framestart);
+		if(delay < 0)
+			delay = 0;
+		else if(delay > WAITTIME)
+			delay = WAITTIME;
+		
+		SDL_Delay(delay);
+	}
+
+	return EDITOR_QUIT;
+}
 
 int editor_vehicles()
 {

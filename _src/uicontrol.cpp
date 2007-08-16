@@ -4217,39 +4217,8 @@ void MI_World::Init()
 
 	iVehicleId = -1;
 
-	short iPlayerX, iPlayerY;
-	g_worldmap.GetPlayerPosition(&iPlayerX, &iPlayerY);
-
-	if(g_worldmap.iWidth > 20)
-	{
-		if(iPlayerX < g_worldmap.iWidth * TILESIZE - 336 && iPlayerX > 304)
-			iMapOffsetX = 304 - iPlayerX;
-		else if(iPlayerX <= 304)
-			iMapOffsetX = 0;
-		else
-			iMapOffsetX = 640 - g_worldmap.iWidth * TILESIZE;
-	}
-	else
-	{
-		iMapOffsetX = (640 - g_worldmap.iWidth * TILESIZE) >> 1;
-	}
-
-	if(g_worldmap.iHeight > 15)
-	{
-		if(iPlayerY < g_worldmap.iHeight * TILESIZE - 256 && iPlayerY > 224)
-			iMapOffsetY = 224 - iPlayerY;
-		else if(iPlayerY <= 224)
-			iMapOffsetY = 0;
-		else
-			iMapOffsetY = 480 - g_worldmap.iHeight * TILESIZE;
-	}
-	else
-	{
-		iMapOffsetY = (480 - g_worldmap.iHeight * TILESIZE) >> 1;
-	}
-
+	SetMapOffset();
 	RepositionMapImage();
-
 }
 
 void MI_World::SetControllingTeam(short iTeamID)
@@ -4278,8 +4247,7 @@ void MI_World::SetCurrentStageToCompleted(short iWinningTeam)
 		g_worldmap.GetPlayerCurrentTile(&iPlayerCurrentTileX, &iPlayerCurrentTileY);
 
 		WorldMapTile * tile = &g_worldmap.tiles[iPlayerCurrentTileX][iPlayerCurrentTileY];
-		tile->iBackgroundSprite = 1;
-		tile->iForegroundSprite = iWinningTeam; //Update with team completed sprite
+		tile->iForegroundSprite = iWinningTeam + WORLD_WINNING_TEAM_SPRITE_OFFSET; //Update with team completed sprite
 		tile->fAnimated = false; //Update with team completed sprite
 		tile->fCompleted = true;
 
@@ -4338,7 +4306,7 @@ void MI_World::Update()
 			iMapOffsetX -= 2;
 	}
 
-	if(iState >= 0)
+	if(iState >= 0 && iState <= 3)
 	{
 		if(iStateTransition == 1)
 		{
@@ -4361,10 +4329,63 @@ void MI_World::Update()
 				iItemPopupDrawY = 0;
 				iStateTransition = 0;
 			}
-		}		
+		}
+	}
+	else if(iState == 4 || iState == 5)
+	{
+		iScreenfade += iScreenfadeRate;
+
+		if(iState == 4 && iScreenfade > 255)
+		{
+			g_worldmap.SetPlayerPosition(iWarpCol, iWarpRow);
+			SetMapOffset();
+			RepositionMapImage();
+
+			iState = 5;
+			iScreenfade = 255;
+			iScreenfadeRate = -8;
+		}
+		else if(iState == 5 && iScreenfade < 0)
+		{
+			iState = -1;
+			iScreenfade = 0;
+		}
 	}
 }
 
+void MI_World::SetMapOffset()
+{
+	short iPlayerX, iPlayerY;
+	g_worldmap.GetPlayerPosition(&iPlayerX, &iPlayerY);
+
+	if(g_worldmap.iWidth > 20)
+	{
+		if(iPlayerX < g_worldmap.iWidth * TILESIZE - 336 && iPlayerX > 304)
+			iMapOffsetX = 304 - iPlayerX;
+		else if(iPlayerX <= 304)
+			iMapOffsetX = 0;
+		else
+			iMapOffsetX = 640 - g_worldmap.iWidth * TILESIZE;
+	}
+	else
+	{
+		iMapOffsetX = (640 - g_worldmap.iWidth * TILESIZE) >> 1;
+	}
+
+	if(g_worldmap.iHeight > 15)
+	{
+		if(iPlayerY < g_worldmap.iHeight * TILESIZE - 256 && iPlayerY > 224)
+			iMapOffsetY = 224 - iPlayerY;
+		else if(iPlayerY <= 224)
+			iMapOffsetY = 0;
+		else
+			iMapOffsetY = 480 - g_worldmap.iHeight * TILESIZE;
+	}
+	else
+	{
+		iMapOffsetY = (480 - g_worldmap.iHeight * TILESIZE) >> 1;
+	}
+}
 void MI_World::RepositionMapImage()
 {
 	short iPlayerCurrentTileX, iPlayerCurrentTileY;
@@ -4424,7 +4445,7 @@ void MI_World::Draw()
 	}
 
 	//If the item selector for a player is displayed
-	if(iState >= 0)
+	if(iState >= 0 && iState <= 3)
 	{
 		spr_worlditempopup.draw(0, 448 - iItemPopupDrawY, 0, iState * 64 + 32 - iItemPopupDrawY, 320, iItemPopupDrawY << 1);
 		spr_worlditempopup.draw(320, 448 - iItemPopupDrawY, 192, iState * 64 + 32 - iItemPopupDrawY, 320, iItemPopupDrawY << 1);
@@ -4438,6 +4459,11 @@ void MI_World::Draw()
 				spr_worlditems.draw(iItem * 52 + 122, 432, iItem * 64, 0, 32, 32);
 			}
 		}
+	}
+	else if(iState >= 4)
+	{
+		menu_shade.setalpha((Uint8)iScreenfade);
+		menu_shade.draw(0, 0);
 	}
 }
 
@@ -4488,6 +4514,10 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 							g_worldmap.MovePlayer(2);
 							iReturnDirection = 3;
 						}
+						else
+						{
+							g_worldmap.FacePlayer(1);
+						}
 					}
 					else if(playerKeys->menu_right.fPressed)
 					{
@@ -4496,6 +4526,10 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 						{
 							g_worldmap.MovePlayer(3);
 							iReturnDirection = 2;
+						}
+						else
+						{
+							g_worldmap.FacePlayer(0);
 						}
 					}
 					else if(playerInput->outputControls[iPlayer].menu_select.fPressed)
@@ -4509,6 +4543,15 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 							return MENU_CODE_WORLD_STAGE_START;
 						}
 
+						if(g_worldmap.GetWarpInPlayerTile(&iWarpCol, &iWarpRow))
+						{
+							iState = 4;
+							iScreenfade = 0;
+							iScreenfadeRate = 8;
+
+							ifsoundonplay(sfx_pipe);
+						}
+
 						//if it is a stage, then load the stage
 						WorldMapTile * tile = &g_worldmap.tiles[iPlayerCurrentTileX][iPlayerCurrentTileY];
 
@@ -4517,11 +4560,11 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 						{
 							game_values.tourstopcurrent = iType;
 							return MENU_CODE_WORLD_STAGE_START;
-						}					
+						}		
 					}
 				}
 			}
-			else if (iStateTransition == 0) //not transitioning to or from the item popup menu
+			else if (iState == game_values.colorids[iPlayer] && iStateTransition == 0) //not transitioning to or from the item popup menu
 			{
 				if(playerKeys->menu_up.fPressed)
 				{
@@ -4565,29 +4608,32 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 				}
 			}
 
-			if(playerKeys->menu_cancel.fPressed)
+			if(iState < 4)
 			{
-				if(DEVICE_KEYBOARD != playerInput->inputControls[iPlayer]->iDevice || iPlayer == 0)
+				if(playerKeys->menu_cancel.fPressed)
 				{
-					fModifying = false;
-					return MENU_CODE_UNSELECT_ITEM;
+					if(DEVICE_KEYBOARD != playerInput->inputControls[iPlayer]->iDevice || iPlayer == 0)
+					{
+						fModifying = false;
+						return MENU_CODE_UNSELECT_ITEM;
+					}
 				}
-			}
-			
-			if (playerKeys->menu_random.fPressed ||
-				(iPlayer != 0 && playerInput->inputControls[iPlayer]->iDevice == DEVICE_KEYBOARD && playerKeys->menu_cancel.fPressed))
-			{
-				if(iState == -1)
+				
+				if (playerKeys->menu_random.fPressed ||
+					(iPlayer != 0 && playerInput->inputControls[iPlayer]->iDevice == DEVICE_KEYBOARD && playerKeys->menu_cancel.fPressed))
 				{
-					iState = game_values.colorids[iPlayer];
-					iStateTransition = 1;
+					if(iState == -1)
+					{
+						iState = game_values.colorids[iPlayer];
+						iStateTransition = 1;
 
-					iItemPage = 0;
-					iItemCol = 0;
-				}
-				else if (iState == game_values.colorids[iPlayer])
-				{
-					iStateTransition = 2;
+						iItemPage = 0;
+						iItemCol = 0;
+					}
+					else if (iState == game_values.colorids[iPlayer])
+					{
+						iStateTransition = 2;
+					}
 				}
 			}
 		}

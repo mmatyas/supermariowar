@@ -208,9 +208,10 @@ bool LoadMenuGraphics()
 	_load_gfxck(spr_thumbnail_mapitems[0], convertPath("gfx/packs/menu/menu_mapitems_preview.png", graphicspack));
 	_load_gfxck(spr_thumbnail_mapitems[1], convertPath("gfx/packs/menu/menu_mapitems_thumbnail.png", graphicspack));
 
-	_load_gfxck(spr_worldbackground, convertPath("gfx/packs/world_background.png", graphicspack));
-	_load_gfxck(spr_worldforeground, convertPath("gfx/packs/world_foreground.png", graphicspack));
-	_load_gfxck(spr_worldvehicle, convertPath("gfx/packs/world_vehicles.png", graphicspack));
+	_load_gfxck(spr_worldbackground, convertPath("gfx/packs/world/world_background.png", graphicspack));
+	_load_gfxck(spr_worldforeground, convertPath("gfx/packs/world/world_foreground.png", graphicspack));
+	_load_gfxck(spr_worldpaths, convertPath("gfx/packs/world/world_paths.png", graphicspack));
+	_load_gfxck(spr_worldvehicle, convertPath("gfx/packs/world/world_vehicles.png", graphicspack));
 	_load_gfxck(spr_worlditems, convertPath("gfx/packs/menu/world_items.png", graphicspack));
 	_load_gfxck(spr_worlditempopup, convertPath("gfx/packs/menu/world_item_popup.png", graphicspack));
 

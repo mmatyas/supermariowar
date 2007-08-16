@@ -13,6 +13,8 @@ struct WorldMapTile
 	short iConnectionType;
 	bool fConnection[4];
 
+	short iWarp;
+
 	bool fCompleted;
 	bool fAnimated;
 };
@@ -27,6 +29,8 @@ class WorldMovingObject
 		virtual void Move(short iDirection);
 		virtual bool Update();
 		virtual void Draw(short iWorldOffsetX, short iWorldOffsetY) = 0;
+		void FaceDirection(short iDirection);
+		void SetPosition(short iCol, short iRow);
 
 	protected:
 
@@ -96,6 +100,20 @@ class WorldVehicle : public WorldMovingObject
 	friend class WorldMap;
 };
 
+class WorldWarp
+{
+	public:
+		WorldWarp();
+		void Init(short col1, short row1, short col2, short row2);
+		void GetOtherSide(short iCol, short iRow, short * iOtherCol, short * iOtherRow);
+
+	private:
+		short iCol1, iRow1;
+		short iCol2, iRow2;
+
+	friend class WorldMap;
+};
+
 class WorldMap
 {
 	public:
@@ -123,12 +141,16 @@ class WorldMap
 		void GetWorldSize(short * w, short * h) {*w = iWidth; *h = iHeight;}
 
 		void GetPlayerPosition(short * iPlayerX, short * iPlayerY);
+		void SetPlayerPosition(short iPlayerCol, short iPlayerRow);
+
 		void GetPlayerCurrentTile(short * iPlayerCurrentTileX, short * iPlayerCurrentTileY);
 		short GetPlayerState();
 
 		short GetVehicleInPlayerTile(short * iVehicleIndex);
+		bool GetWarpInPlayerTile(short * iWarpCol, short * iWarpRow);
 
 		void MovePlayer(short iDirection);
+		void FacePlayer(short iDirection);
 		void MoveVehicles();
 
 		void RemoveVehicle(short iVehicleIndex);
@@ -146,12 +168,13 @@ class WorldMap
 		short iStartX, iStartY;
 
 		short iNumStages;
+		short iNumWarps;
 		short iNumVehicles;
 
 		WorldMapTile ** tiles;
 		WorldPlayer player;
 		WorldVehicle * vehicles;
-
+		WorldWarp * warps;
 
 	friend class MI_World;
 	friend class WorldVehicle;
@@ -161,6 +184,7 @@ class WorldMap
 	friend void AutoSetPath(short iCol, short iRow);
 	friend void AutoSetPathSprite(short iCol, short iRow);
 	friend short AdjustForeground(short iSprite, short iCol, short iRow);
+	friend void UpdateForeground(short iCol, short iRow);
 };
 
 #endif //__WORLD_H_

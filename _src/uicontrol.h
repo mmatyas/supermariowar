@@ -906,6 +906,7 @@ class MI_World : public UI_Control
 
 	private:
 
+		void SetMapOffset();
 		void RepositionMapImage();
 		void DrawWorldMapToSurface(bool fInit);
 
@@ -936,6 +937,11 @@ class MI_World : public UI_Control
 		char szMessage[128];
 
 		short iVehicleId;
+
+		short iWarpCol, iWarpRow;
+
+		short iScreenfade;
+		short iScreenfadeRate;
 };
 
 

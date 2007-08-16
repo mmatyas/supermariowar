@@ -104,6 +104,7 @@ gfxSprite		spr_thumbnail_mapitems[2];
 
 gfxSprite		spr_worldbackground;
 gfxSprite		spr_worldforeground;
+gfxSprite		spr_worldpaths;
 gfxSprite		spr_worldvehicle;
 gfxSprite		spr_worlditems;
 gfxSprite		spr_worlditempopup;
