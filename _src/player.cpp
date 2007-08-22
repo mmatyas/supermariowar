@@ -509,6 +509,7 @@ void CPlayer::move()
 			}
 		}
 
+		/*
 		if(game_values.gamemode->gamemode == game_mode_stomp && !game_values.redkoopas)
 		{
 			if (redKoopaIndex < 7)
@@ -526,7 +527,7 @@ void CPlayer::move()
 					game_values.redkoopas = true; 
 				}
 			}
-		}
+		}*/
 
 		/*
 		if(!game_values.redthrowblocks)

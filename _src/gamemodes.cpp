@@ -84,7 +84,7 @@ void SetupScoreBoard(bool fOrderMatters)
 
 		if(iBonusType > 0)
 		{
-			objectcollisionitems.add(new PU_TreasureChestBonus(&spr_sledgehammerpowerup, 1, 32000, 30, 30, 1, 1, iBonusType == 1 ? rand() % NUM_POWERUPS : iBonusType - 2));
+			objectcollisionitems.add(new PU_TreasureChestBonus(&spr_bonuschest, 1, 32000, 30, 30, 1, 1, iBonusType == 1 ? rand() % NUM_POWERUPS : iBonusType - 2));
 			game_values.noexittimer = 310;
 			game_values.noexit = true;
 		}
@@ -1750,7 +1750,7 @@ void CGM_Stomp::init()
 	ResetSpawnTimer();
 
 	iEnemyWeightCount = 0;
-	for(short iEnemy = 0; iEnemy < 3; iEnemy++)
+	for(short iEnemy = 0; iEnemy < 4; iEnemy++)
 		iEnemyWeightCount += game_values.gamemodesettings.stomp.enemyweight[iEnemy];
 
 	if(iEnemyWeightCount == 0)
@@ -1790,9 +1790,11 @@ void CGM_Stomp::think()
 			if(0 == iSelectedEnemy)
 				objectcollisionitems.add(new MO_Goomba(&spr_goomba, 2, 8, rand() % 2 == 0, 30, 20, 1, 11));
 			else if(1 == iSelectedEnemy)
-				objectcollisionitems.add(new MO_Koopa(game_values.redkoopas ? &spr_redkoopa : &spr_koopa, 2, 8, rand() % 2 == 0, 30, 28, 1, 25, game_values.redkoopas));
-			else
+				objectcollisionitems.add(new MO_Koopa(&spr_koopa, 2, 8, rand() % 2 == 0, 30, 28, 1, 25, false));
+			else if(2 == iSelectedEnemy)
 				objectsfront.add(new OMO_CheepCheep(&spr_cheepcheep));
+			else
+				objectcollisionitems.add(new MO_Koopa(&spr_redkoopa, 2, 8, rand() % 2 == 0, 30, 28, 1, 25, true));
 		}
 	}
 }
@@ -2347,7 +2349,7 @@ void CGM_Boss::think()
 			//Randomly spawn koopas
 			if(--enemytimer <= 0)
 			{
-				objectcollisionitems.add(new MO_Koopa(game_values.redkoopas ? &spr_redkoopa : &spr_koopa, 2, 8, rand() % 2 == 0, 30, 28, 1, 25, game_values.redkoopas));
+				objectcollisionitems.add(new MO_Koopa(&spr_koopa, 2, 8, rand() % 2 == 0, 30, 28, 1, 25, false));
 				enemytimer = (short)(rand() % 120) + 120;  //Spawn koopas slowly
 			}
 		}

@@ -175,6 +175,8 @@ gfxSprite		spr_jail;
 gfxSprite		spr_racegoal;
 gfxSprite		spr_chicken;
 
+gfxSprite		spr_bonuschest;
+
 gfxSprite		spr_goomba;
 gfxSprite		spr_goombadead;
 gfxSprite		spr_goombadeadflying;
@@ -800,6 +802,7 @@ int main(int argc, char *argv[])
 	game_values.gamemodemenusettings.stomp.enemyweight[0] = 1; // turn on goombas, koopa and cheep cheeps by default
 	game_values.gamemodemenusettings.stomp.enemyweight[1] = 1;  
 	game_values.gamemodemenusettings.stomp.enemyweight[2] = 2;
+	game_values.gamemodemenusettings.stomp.enemyweight[3] = 1;
 
 	//Capture The Flag
 	game_values.gamemodemenusettings.flag.speed = 0;  //Bases don't move by default
@@ -1215,7 +1218,6 @@ void RunGame()
 	game_values.swapplayersblinkcount = 0;
 	game_values.screenfade = 255;
 	game_values.screenfadespeed = -8;
-	game_values.redkoopas = false;
 	game_values.noexit = false;
 	game_values.noexittimer = 0;
 

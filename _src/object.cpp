@@ -2996,6 +2996,9 @@ PU_TreasureChestBonus::PU_TreasureChestBonus(gfxSprite *nspr, short iNumSpr, sho
 	g_map.findspawnpoint(1, &ix, &iy, collisionWidth, collisionHeight, false);
 	fx = (float)ix;
 	fy = (float)iy;
+
+	drawbonusitemy = 0;
+	drawbonusitemtimer = 0;
 }
 
 void PU_TreasureChestBonus::update()
@@ -3009,14 +3012,37 @@ void PU_TreasureChestBonus::update()
 		if(sparkledrawframe >= 480)
 			sparkledrawframe = 0;
 	}
+
+	//Draw rising powerup from chest
+	if (state == 3)
+	{
+		drawbonusitemy -= 2;
+
+		if(--drawbonusitemtimer <= 0)
+			state = 4;
+	}
+	else if (state == 4)
+	{
+		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix, drawbonusitemy, 3, 8));
+
+		dead = true;
+		game_values.noexit = false;
+	}
 }
 
 void PU_TreasureChestBonus::draw()
 {
-	MO_Powerup::draw();
+	if(state < 3)
+	{
+		MO_Powerup::draw();
 
-	//Draw sparkles
-	spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, 0, 32, 32);
+		//Draw sparkles
+		spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, 0, 32, 32);
+	}
+	else
+	{
+		spr_worlditems.draw(ix, drawbonusitemy, bonusitem << 5, 0, 32, 32);
+	}
 }
 
 bool PU_TreasureChestBonus::collide(CPlayer * player)
@@ -3024,10 +3050,13 @@ bool PU_TreasureChestBonus::collide(CPlayer * player)
 	if(state == 1)
 	{
 		ifsoundonplay(sfx_storepowerup);
-		game_values.storedpowerups[player->globalID] = bonusitem;
-		game_values.gamepowerups[player->globalID] = bonusitem;
-		dead = true;
-		game_values.noexit = false;
+		game_values.worldpowerups[player->teamID][game_values.worldpowerupcount[player->teamID]++] = bonusitem;
+		state = 3;
+
+		drawbonusitemy = iy;
+		drawbonusitemtimer = 60;
+
+		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix, iy, 3, 8));
 	}
 
 	return false;

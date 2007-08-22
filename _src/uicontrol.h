@@ -911,6 +911,7 @@ class MI_World : public UI_Control
 		void DrawWorldMapToSurface(bool fInit);
 
 		short iState;
+		short iTeam;
 		short iStateTransition;
 		short iItemPopupDrawY;
 

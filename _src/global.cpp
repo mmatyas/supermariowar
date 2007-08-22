@@ -406,7 +406,7 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 			else
 				ts->gmsSettings.stomp.rate = game_values.gamemodemenusettings.stomp.rate;
 
-			for(int iEnemy = 0; iEnemy < 3; iEnemy++)
+			for(int iEnemy = 0; iEnemy < 4; iEnemy++)
 			{
 				pszTemp = strtok(NULL, ",\n");
 				if(pszTemp)
@@ -677,7 +677,7 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
 			sprintf(szTemp, ",%d", ts->gmsSettings.stomp.rate);
 			strcat(buffer, szTemp);
 
-			for(int iEnemy = 0; iEnemy < 3; iEnemy++)
+			for(int iEnemy = 0; iEnemy < 4; iEnemy++)
 			{
 				sprintf(szTemp, ",%d", ts->gmsSettings.stomp.enemyweight[iEnemy]);
 				strcat(buffer, szTemp);

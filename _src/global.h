@@ -346,6 +346,8 @@ extern gfxSprite		spr_jail;
 extern gfxSprite		spr_racegoal;
 extern gfxSprite		spr_chicken;
 
+extern gfxSprite		spr_bonuschest;
+
 extern gfxSprite		spr_goomba;
 extern gfxSprite		spr_goombadead;
 extern gfxSprite		spr_goombadeadflying;
@@ -505,10 +507,6 @@ struct ts
 	short		wins;
 	short		type[MAXTOURNAMENTGAMES];
 	short		total;		//used for running total in a tour
-
-	//for world match types
-	short		numitems;
-	short		items[MAXWORLDITEMS];
 };
 
 struct JailGameModeSettings
@@ -526,7 +524,7 @@ struct CoinGameModeSettings
 struct StompGameModeSettings
 {
 	short rate;				//How fast they spawn
-	short enemyweight[3];	//What ratio the powerups are chosen
+	short enemyweight[4];	//What ratio the enemies are chosen
 };
 
 struct FlagGameModeSettings
@@ -696,6 +694,9 @@ struct gv
 	short		gamepowerups[4];
 	short		powerupweights[NUM_POWERUPS];
 
+	short		worldpowerups[4][32];
+	short		worldpowerupcount[4];
+
 	short		teamids[4][3];
 	short		teamcounts[4];
 	short		skinids[4];
@@ -794,8 +795,6 @@ struct gv
 	bool		fFiltersOn;
 
 	short		pointspeed;
-
-	bool		redkoopas;
 
 	bool		secrets;
 	bool		noexit;

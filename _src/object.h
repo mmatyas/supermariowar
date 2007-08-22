@@ -552,6 +552,8 @@ class PU_TreasureChestBonus : public MO_Powerup
 		short sparkledrawframe;
 		short numbounces;
 		short bonusitem;
+		short drawbonusitemy;
+		short drawbonusitemtimer;
 };
 
 class PU_ClockPowerup : public MO_Powerup

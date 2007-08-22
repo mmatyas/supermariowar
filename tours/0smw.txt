@@ -25,9 +25,6 @@
 #Version
 1.8.0.0
 
-#Tour Stops (maximum 10 stops)
-#Map,Mode,Goal,Points,Bonus Wheel,Name
-
 #Mode Options
 #0 - Classic - None
 #1 - Frag - None
@@ -46,6 +43,7 @@
 #Goomba Weight - any positive number including 0, used in conjunction with the other weights below.  If goomba rate is 2 and koopa and cheep cheep is 1, then there will be a 50% chance the next enemy will be a goomba (2 + 1 + 1 = 4, 2 / 4 = 50%)
 #Koopa Weight - any positive number including 0
 #Cheep Cheep Weight - any positive number including 0
+#Red Koopa Weight - any positive number inclusing 0
 
 #6 - Eggs - None
 
@@ -109,5 +107,8 @@
 #Speed - any number greater than 0.  The larger the number, the faster they go. (2 is "Very Slow" and 8 is "Very Fast")
 #Shield - 0 = Off, 1 = On
 
-0smw,16,200,1,0,1st Stop,1,5,0,8,4,1
-treefort,15,15,1,0,2nd Stop,3,310,0,2,1,1,0,0,1,0,0,1,0,0,0
+#Tour Stops (maximum 10 stops)
+#Map,Mode,Goal,Points,Bonus Wheel,Name,Options(see above)
+subcon,5,30,2,1,1st Stop,60,1,0,0,1
+0smw,16,200,1,0,2nd Stop,1,5,0,8,4,1
+treefort,15,15,1,0,3rd Stop,3,310,0,2,1,1,0,0,1,0,0,1,0,0,0

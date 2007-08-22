@@ -4212,6 +4212,7 @@ void MI_World::Init()
 	iMessageTimer = 0;
 
 	iState = -1;
+	iTeam = -1;
 	iStateTransition = 0;
 	iItemPopupDrawY = 0;
 
@@ -4452,11 +4453,15 @@ void MI_World::Draw()
 
 		if(iStateTransition == 0)
 		{
-			spr_worlditempopup.draw(iItemCol * 52 + 114, 424, iState * 48, 256, 48, 48);
+			short iNumPowerups = game_values.worldpowerupcount[iTeam];
+			
+			if(iNumPowerups > 0)
+				spr_worlditempopup.draw(iItemCol * 52 + 114, 424, iState * 48, 256, 48, 48);
 
-			for(short iItem = 0; iItem < 8; iItem++)
+			short iStartItem = iItemPage << 3;
+			for(short iItem = iStartItem; iItem < iStartItem + 8 && iItem < iNumPowerups; iItem++)
 			{
-				spr_worlditems.draw(iItem * 52 + 122, 432, iItem * 64, 0, 32, 32);
+				spr_worlditems.draw((iItem - iItemPage * 8) * 52 + 122, 432, game_values.worldpowerups[iTeam][iItem] * 32, 0, 32, 32);
 			}
 		}
 	}
@@ -4569,17 +4574,25 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 				if(playerKeys->menu_up.fPressed)
 				{
 					if(iItemPage > 0)
+					{
 						iItemPage--;
+						iItemCol = 0;
+					}
 				}
 				else if(playerKeys->menu_down.fPressed)
 				{
-					if(iItemPage < 3)
+					if(iItemPage < 3 && (iItemPage + 1) * 8 < game_values.worldpowerupcount[iTeam])
+					{
 						iItemPage++;
+						iItemCol = 0;
+					}
 				}
 				else if(playerKeys->menu_left.fPressed)
 				{
 					if(iItemCol > 0)
+					{
 						iItemCol--;
+					}
 					else if(iItemCol == 0 && iItemPage > 0)
 					{
 						iItemCol = 7;
@@ -4588,21 +4601,40 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 				}
 				else if(playerKeys->menu_right.fPressed)
 				{
-					if(iItemCol < 7)
-						iItemCol++;
-					else if(iItemCol == 7 && iItemPage < 3)
+					if(iItemPage * 8 + iItemCol + 1 < game_values.worldpowerupcount[iTeam])
 					{
-						iItemCol = 0;
-						iItemPage++;
+						if(iItemCol < 7)
+						{
+							iItemCol++;
+						}
+						else if(iItemCol == 7 && iItemPage < 3)
+						{
+							iItemCol = 0;
+							iItemPage++;
+						}
 					}
 				}
 				else if(playerKeys->menu_select.fPressed)
 				{
-					short iIndex = iItemPage * 8 + iItemCol;
-					short iNumItems = --game_values.tournament_scores[iPlayer].numitems;
+					if(game_values.worldpowerupcount[iTeam] > 0)
+					{
+						short iIndex = iItemPage * 8 + iItemCol;
+						short iNumItems = --game_values.worldpowerupcount[iTeam];
+						short iPowerup = game_values.worldpowerups[iTeam][iIndex];
 
-					for(short iItem = iIndex; iItem < iNumItems; iItem++)
-						game_values.tournament_scores[iPlayer].items[iItem] = game_values.tournament_scores[iPlayer].items[iItem + 1];
+						for(short iItem = iIndex; iItem < iNumItems; iItem++)
+							game_values.worldpowerups[iTeam][iItem] = game_values.worldpowerups[iTeam][iItem + 1];
+
+						ifsoundonplay(sfx_collectpowerup);
+
+						if(iPowerup < NUM_POWERUPS)
+						{
+							for(short iPlayer = 0; iPlayer < game_values.teamcounts[iTeam]; iPlayer++)
+							{
+								game_values.storedpowerups[game_values.teamids[iTeam][iPlayer]] = iPowerup;
+							}
+						}
+					}
 
 					iStateTransition = 2;	
 				}
@@ -4625,6 +4657,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 					if(iState == -1)
 					{
 						iState = game_values.colorids[iPlayer];
+						iTeam = LookupTeamID(iPlayer);
 						iStateTransition = 1;
 
 						iItemPage = 0;

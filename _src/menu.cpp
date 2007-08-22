@@ -1772,7 +1772,7 @@ void Menu::CreateMenu()
 	// Stomp Mode Settings
 	//***********************
 
-	miStompModeRateField = new MI_SelectField(&spr_selectfield, 120, 160, "Rate", 400, 180);
+	miStompModeRateField = new MI_SelectField(&spr_selectfield, 120, 140, "Rate", 400, 180);
 	miStompModeRateField->Add("Very Slow", 150, "", false, false);
 	miStompModeRateField->Add("Slow", 120, "", false, false);
 	miStompModeRateField->Add("Moderate", 90, "", false, false);
@@ -1781,9 +1781,9 @@ void Menu::CreateMenu()
 	miStompModeRateField->SetData(&game_values.gamemodemenusettings.stomp.rate, NULL, NULL);
 	miStompModeRateField->SetKey(game_values.gamemodemenusettings.stomp.rate);
 
-	for(short iEnemy = 0; iEnemy < 3; iEnemy++)
+	for(short iEnemy = 0; iEnemy < 4; iEnemy++)
 	{
-		miStompModeEnemySlider[iEnemy] = new MI_PowerupSlider(&spr_selectfield, &menu_slider_bar, &menu_stomp, 120, 200 + 40 * iEnemy, 400, iEnemy);
+		miStompModeEnemySlider[iEnemy] = new MI_PowerupSlider(&spr_selectfield, &menu_slider_bar, &menu_stomp, 120, 180 + 40 * iEnemy, 400, iEnemy);
 		miStompModeEnemySlider[iEnemy]->Add("", 0, "", false, false);
 		miStompModeEnemySlider[iEnemy]->Add("", 1, "", false, false);
 		miStompModeEnemySlider[iEnemy]->Add("", 2, "", false, false);
@@ -1812,9 +1812,10 @@ void Menu::CreateMenu()
 	
 	mModeSettingsMenu[5].AddControl(miStompModeEnemySlider[0], miStompModeRateField,      miStompModeEnemySlider[1], NULL, miStompModeBackButton);
 	mModeSettingsMenu[5].AddControl(miStompModeEnemySlider[1], miStompModeEnemySlider[0], miStompModeEnemySlider[2], NULL, miStompModeBackButton);
-	mModeSettingsMenu[5].AddControl(miStompModeEnemySlider[2], miStompModeEnemySlider[1], miStompModeBackButton,     NULL, miStompModeBackButton);
+	mModeSettingsMenu[5].AddControl(miStompModeEnemySlider[2], miStompModeEnemySlider[1], miStompModeEnemySlider[3], NULL, miStompModeBackButton);
+	mModeSettingsMenu[5].AddControl(miStompModeEnemySlider[3], miStompModeEnemySlider[2], miStompModeBackButton,     NULL, miStompModeBackButton);
 
-	mModeSettingsMenu[5].AddControl(miStompModeBackButton, miStompModeEnemySlider[2], miStompModeRateField, miStompModeEnemySlider[2], NULL);
+	mModeSettingsMenu[5].AddControl(miStompModeBackButton, miStompModeEnemySlider[3], miStompModeRateField, miStompModeEnemySlider[3], NULL);
 	
 	mModeSettingsMenu[5].AddNonControl(miStompModeLeftHeaderBar);
 	mModeSettingsMenu[5].AddNonControl(miStompModeRightHeaderBar);
@@ -2596,6 +2597,15 @@ void Menu::RunMenu()
 					{
 						miTournamentScoreboard->CreateScoreboard(score_cnt, 0, &spr_tour_markers, true);
 
+						for(short iPlayer = 0; iPlayer < 4; iPlayer++)
+						{
+							//game_values.worldpowerupcount[iPlayer] = 0;
+							game_values.worldpowerupcount[iPlayer] = rand() % 32;
+
+							for(short iItem = 0; iItem < game_values.worldpowerupcount[iPlayer]; iItem++)
+								game_values.worldpowerups[iPlayer][iItem] = rand() % NUM_POWERUPS;
+						}
+
 						miWorld->Init();
 						miWorld->SetControllingTeam(rand() % score_cnt);
 					}
@@ -2613,8 +2623,6 @@ void Menu::RunMenu()
 					{
 						game_values.tournament_scores[k].wins = 0;
 						game_values.tournament_scores[k].total = 0;
-
-						game_values.tournament_scores[k].numitems = 0;
 					}
 
 					if(MATCH_TYPE_SINGLE_GAME == game_values.matchtype || MATCH_TYPE_TOURNAMENT == game_values.matchtype)

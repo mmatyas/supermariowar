@@ -419,7 +419,7 @@ class Menu
 
 		//Stomp
 		MI_SelectField * miStompModeRateField;
-		MI_PowerupSlider * miStompModeEnemySlider[3];
+		MI_PowerupSlider * miStompModeEnemySlider[4];
 		MI_Button * miStompModeBackButton;
 		
 		MI_Image * miStompModeLeftHeaderBar;

@@ -265,6 +265,7 @@ bool LoadGameGraphics()
 	_load_gfxck(spr_throwblock, convertPath("gfx/packs/blocks/throwblock.png", graphicspack));
 	_load_gfxck(spr_switchblocks, convertPath("gfx/packs/blocks/switchblock.png", graphicspack));
 	_load_gfxck(spr_viewblock, convertPath("gfx/packs/blocks/viewblock.png", graphicspack));
+	
 	_load_gfxck(spr_spring, convertPath("gfx/packs/powerups/spring.png", graphicspack));
 	_load_gfxck(spr_spike, convertPath("gfx/packs/powerups/spike.png", graphicspack));
 	spr_spring.SetWrap(true);
@@ -372,6 +373,9 @@ bool LoadGameGraphics()
 	_load_gfxa(spr_chicken, convertPath("gfx/packs/modeobjects/chicken.png", graphicspack), 160);
 	_load_gfxck(spr_racegoal, convertPath("gfx/packs/modeobjects/racegoal.png", graphicspack));
 
+	_load_gfxck(spr_bonuschest, convertPath("gfx/packs/modeobjects/bonuschest.png", graphicspack));
+	spr_bonuschest.SetWrap(true);
+
 	spr_yoshi.SetWrap(true);
 	spr_coin.SetWrap(true);
 	spr_thwomp.SetWrap(true);
@@ -380,6 +384,7 @@ bool LoadGameGraphics()
 	spr_goombadead.SetWrap(true);
 	spr_goombadeadflying.SetWrap(true);
 	spr_koopa.SetWrap(true);
+	spr_redkoopa.SetWrap(true);
 	spr_sledgebrothers.SetWrap(true);
 	spr_sledgebrothersdead.SetWrap(true);
 	spr_cheepcheep.SetWrap(true);
