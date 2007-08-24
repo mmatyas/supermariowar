@@ -176,6 +176,7 @@ gfxSprite		spr_racegoal;
 gfxSprite		spr_chicken;
 
 gfxSprite		spr_bonuschest;
+gfxSprite		spr_teleportstar;
 
 gfxSprite		spr_goomba;
 gfxSprite		spr_goombadead;

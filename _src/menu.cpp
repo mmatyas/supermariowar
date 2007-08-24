@@ -1285,14 +1285,14 @@ void Menu::CreateMenu()
 	miWorldExitDialogNoButton->Show(false);
 	
 	mWorldMenu.AddControl(miWorld, NULL, NULL, NULL, NULL);
+	
+	mWorldMenu.AddControl(miWorldStop, NULL, NULL, NULL, NULL);
 
 	mWorldMenu.AddNonControl(miWorldExitDialogImage);
 	mWorldMenu.AddNonControl(miWorldExitDialogExitTourText);
 
 	mWorldMenu.AddControl(miWorldExitDialogYesButton, NULL, NULL, NULL, miWorldExitDialogNoButton);
 	mWorldMenu.AddControl(miWorldExitDialogNoButton, NULL, NULL, miWorldExitDialogYesButton, NULL);
-
-	mWorldMenu.AddControl(miWorldStop, NULL, NULL, NULL, NULL);
 
 	mWorldMenu.SetHeadControl(miWorld);
 	mWorldMenu.SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
@@ -2835,7 +2835,10 @@ void Menu::RunMenu()
 				mWorldMenu.RestoreCurrent();
 
 				if(MENU_CODE_EXIT_WORLD_YES == code)
+				{
 					ResetTournamentBackToMainMenu();
+					miWorldStop->Show(false);
+				}
 			}
 			else if(MENU_CODE_BONUS_DONE == code)
 			{
@@ -2978,6 +2981,7 @@ void Menu::RunMenu()
 
 				mWorldMenu.SetHeadControl(miWorldStop);
 				mWorldMenu.SetCancelCode(MENU_CODE_WORLD_STAGE_NO_START);
+				
 				mWorldMenu.ResetMenu();
 			}
 			else if (MENU_CODE_WORLD_STAGE_NO_START == code)
@@ -2989,8 +2993,12 @@ void Menu::RunMenu()
 
 				mWorldMenu.RestoreCurrent();
 			}
-			else if (MENU_CODE_TOUR_STOP_CONTINUE == code)
+			else if (MENU_CODE_TOUR_STOP_CONTINUE == code || MENU_CODE_TOUR_STOP_CONTINUE_FORCED == code)
 			{
+				//If this tour stop is forced, we need to load the map first
+				if(MENU_CODE_TOUR_STOP_CONTINUE_FORCED == code)
+					miWorldStop->Refresh(game_values.tourstopcurrent);
+
 				short iGameMode = game_values.tourstops[game_values.tourstopcurrent]->iMode;
 				gamemodes[iGameMode]->goal = game_values.tourstops[game_values.tourstopcurrent]->iGoal;
 				game_values.gamemode = gamemodes[iGameMode];

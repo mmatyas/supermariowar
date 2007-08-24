@@ -374,6 +374,7 @@ bool LoadGameGraphics()
 	_load_gfxck(spr_racegoal, convertPath("gfx/packs/modeobjects/racegoal.png", graphicspack));
 
 	_load_gfxck(spr_bonuschest, convertPath("gfx/packs/modeobjects/bonuschest.png", graphicspack));
+	_load_gfxck(spr_teleportstar, convertPath("gfx/packs/eyecandy/teleportstar.png", graphicspack));
 	spr_bonuschest.SetWrap(true);
 
 	spr_yoshi.SetWrap(true);

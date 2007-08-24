@@ -937,12 +937,18 @@ class MI_World : public UI_Control
 		short iMessageTimer;
 		char szMessage[128];
 
+		bool fForceStageStart;
 		short iVehicleId;
 
 		short iWarpCol, iWarpRow;
 
 		short iScreenfade;
 		short iScreenfadeRate;
+
+		float dTeleportStarRadius;
+		float dTeleportStarAngle;
+		short iTeleportStarAnimationFrame;
+		short iTeleportStarAnimationTimer;
 };
 
 

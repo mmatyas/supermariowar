@@ -265,7 +265,15 @@ bool WorldVehicle::Update()
 	bool fMoveDone = WorldMovingObject::Update();
 
 	if(fMoveDone)
+	{
+		short iPlayerTileX, iPlayerTileY;
+		g_worldmap.GetPlayerCurrentTile(&iPlayerTileX, &iPlayerTileY);
+
+		if(iCurrentTileX == iPlayerTileX && iCurrentTileY == iPlayerTileY)
+			return true;
+
 		SetNextDest();
+	}
 
 	//If we're done moving, start pacing in place
 	if(fSpritePaces && iState == 0 && ++iPaceTimer > 1)
@@ -945,16 +953,19 @@ void WorldMap::InitPlayer()
 	player.Init(iStartX, iStartY);
 }
 
-bool WorldMap::Update()
+bool WorldMap::Update(bool * fPlayerVehicleCollision)
 {
 	bool fPlayMovingVehicleSound = false;
 
+	bool fPlayerDoneMove = player.Update();
+
+	*fPlayerVehicleCollision = false;
 	for(short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++)
 	{
 		if(!vehicles[iVehicle].fEnabled)
 			continue;
 
-		vehicles[iVehicle].Update();
+		*fPlayerVehicleCollision |= vehicles[iVehicle].Update();
 
 		if(vehicles[iVehicle].iState > 0)
 			fPlayMovingVehicleSound = true;
@@ -963,10 +974,10 @@ bool WorldMap::Update()
 	if(fPlayMovingVehicleSound && !sfx_boomerang.isplaying())
 		ifsoundonplay(sfx_boomerang);
 
-	return player.Update();
+	return fPlayerDoneMove;
 }
 
-void WorldMap::Draw(short iMapOffsetX, short iMapOffsetY)
+void WorldMap::Draw(short iMapOffsetX, short iMapOffsetY, bool fDrawPlayer)
 {
 	for(short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++)
 	{
@@ -976,7 +987,8 @@ void WorldMap::Draw(short iMapOffsetX, short iMapOffsetY)
 		vehicles[iVehicle].Draw(iMapOffsetX, iMapOffsetY);
 	}
 
-	player.Draw(iMapOffsetX, iMapOffsetY);
+	if(fDrawPlayer)
+		player.Draw(iMapOffsetX, iMapOffsetY);
 }
 
 void WorldMap::DrawMapToSurface(bool fInit, SDL_Surface * surface, short iMapDrawOffsetCol, short iMapDrawOffsetRow, short iAnimationFrame)

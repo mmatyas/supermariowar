@@ -131,8 +131,8 @@ class WorldMap
 
 		void InitPlayer();
 
-		bool Update();
-		void Draw(short iMapOffsetX, short iMapOffsetY);
+		bool Update(bool * fPlayerVehicleCollision);
+		void Draw(short iMapOffsetX, short iMapOffsetY, bool fDrawPlayer);
 		void DrawMapToSurface(bool fInit, SDL_Surface * surface, short iMapDrawOffsetCol, short iMapDrawOffsetRow, short iAnimationFrame);
 
 		void SetPlayerSprite(short iPlayerSprite);

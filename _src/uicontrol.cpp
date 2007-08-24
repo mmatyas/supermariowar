@@ -4211,7 +4211,7 @@ void MI_World::Init()
 
 	iMessageTimer = 0;
 
-	iState = -1;
+	iState = -2;
 	iTeam = -1;
 	iStateTransition = 0;
 	iItemPopupDrawY = 0;
@@ -4220,6 +4220,13 @@ void MI_World::Init()
 
 	SetMapOffset();
 	RepositionMapImage();
+
+	dTeleportStarRadius = 300.0f;
+	dTeleportStarAngle = 0.0f;
+	iTeleportStarAnimationFrame = 0;
+	iTeleportStarAnimationTimer = 0;
+
+	fForceStageStart = false;
 }
 
 void MI_World::SetControllingTeam(short iTeamID)
@@ -4257,13 +4264,16 @@ void MI_World::SetCurrentStageToCompleted(short iWinningTeam)
 
 	g_worldmap.MoveVehicles();
 
+	//TODO:: Switch bridge states (open/closed)
+
 	//Update the completed stage with team colored tile on the map
 	g_worldmap.DrawMapToSurface(true, sMapSurface, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
 }
 
 void MI_World::Update()
 {
-	bool fPlayerMoveDone = g_worldmap.Update();
+	bool fPlayerVehicleCollision = false;
+	bool fPlayerMoveDone = g_worldmap.Update(&fPlayerVehicleCollision);
 
 	short iPlayerX, iPlayerY;
 	g_worldmap.GetPlayerPosition(&iPlayerX, &iPlayerY);
@@ -4284,6 +4294,16 @@ void MI_World::Update()
 
 	if(fPlayerMoveDone)
 		RepositionMapImage();
+
+	if(fPlayerVehicleCollision || fPlayerMoveDone)
+	{
+		short iStage = g_worldmap.GetVehicleInPlayerTile(&iVehicleId);
+		if(iStage >= 0)
+		{
+			game_values.tourstopcurrent = iStage;
+			fForceStageStart = true;
+		}
+	}
 
 	//Player is moving from one tile to the next (up)
 	if(iPlayerState == 1)
@@ -4307,6 +4327,29 @@ void MI_World::Update()
 			iMapOffsetX -= 2;
 	}
 
+	if(iState == -2 || iState == 4 || iState == 5)
+	{
+		dTeleportStarRadius += (iState == -2 ? -5.0f : (iState == 4 ? 5.0f : -5.0f));
+		dTeleportStarAngle -= 0.15f;
+
+		if(++iTeleportStarAnimationTimer >= 3)
+		{
+			iTeleportStarAnimationTimer = 0;
+			iTeleportStarAnimationFrame += 32;
+			
+			if(iTeleportStarAnimationFrame > 32)
+				iTeleportStarAnimationFrame = 0;
+		}
+
+		if(dTeleportStarRadius <= 0.0f)
+		{
+			if(iState == -2)
+				iState = -1;
+
+			dTeleportStarRadius = 0.0f;
+		}
+	}
+	
 	if(iState >= 0 && iState <= 3)
 	{
 		if(iStateTransition == 1)
@@ -4387,6 +4430,7 @@ void MI_World::SetMapOffset()
 		iMapOffsetY = (480 - g_worldmap.iHeight * TILESIZE) >> 1;
 	}
 }
+
 void MI_World::RepositionMapImage()
 {
 	short iPlayerCurrentTileX, iPlayerCurrentTileY;
@@ -4437,7 +4481,7 @@ void MI_World::Draw()
 	
 	SDL_BlitSurface(sMapSurface, rectSrcSurface, blitdest, rectDstSurface);
 
-	g_worldmap.Draw(iMapOffsetX, iMapOffsetY);
+	g_worldmap.Draw(iMapOffsetX, iMapOffsetY, iState != -2 && iState != 4 && iState != 5);
 
 	if(iMessageTimer > 0)
 	{
@@ -4446,6 +4490,21 @@ void MI_World::Draw()
 	}
 
 	//If the item selector for a player is displayed
+	if(iState == -2 || iState == 4 || iState == 5)
+	{
+		short iPlayerX, iPlayerY;
+		g_worldmap.GetPlayerPosition(&iPlayerX, &iPlayerY);
+
+		for(short iStar = 0; iStar < 10; iStar++)
+		{
+			float dAngle = dTeleportStarAngle + (TWO_PI / 10.0f) * (float)iStar;
+			short iStarX = (short)(dTeleportStarRadius * cos(dAngle));
+			short iStarY = (short)(dTeleportStarRadius * sin(dAngle));
+
+			spr_teleportstar.draw(iStarX + iPlayerX + iMapOffsetX, iStarY + iPlayerY + iMapOffsetY, iTeleportStarAnimationFrame, 0, 32, 32);
+		}
+	}
+	
 	if(iState >= 0 && iState <= 3)
 	{
 		spr_worlditempopup.draw(0, 448 - iItemPopupDrawY, 0, iState * 64 + 32 - iItemPopupDrawY, 320, iItemPopupDrawY << 1);
@@ -4474,199 +4533,212 @@ void MI_World::Draw()
 
 MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 {
+	//Don't allow any input while vehicles are moving
+	if(g_worldmap.IsVehicleMoving())
+		return MENU_CODE_NONE;
+
+	//If the player and a vehicle collided, force the start of that level
+	if(fForceStageStart)
+	{
+		fForceStageStart = false;
+		return MENU_CODE_TOUR_STOP_CONTINUE_FORCED;
+	}
+
 	short iPlayerState = g_worldmap.GetPlayerState();
 
 	for(short iPlayer = 0; iPlayer < 4; iPlayer++)
 	{
 		COutputControl * playerKeys = &game_values.playerInput.outputControls[iPlayer];
-
-		if(!g_worldmap.IsVehicleMoving())
+		
+		if(iState == -1)
 		{
-			if(iState == -1)
+			if(playerKeys->menu_scrollfast.fPressed)
 			{
-				if(iControllingTeam == LookupTeamID(iPlayer) && iPlayerState == 0 && game_values.playercontrol[iPlayer] > 0) //if this player is player or cpu
-				{
-					short iPlayerCurrentTileX, iPlayerCurrentTileY;
-					g_worldmap.GetPlayerCurrentTile(&iPlayerCurrentTileX, &iPlayerCurrentTileY);
-
-					WorldMapTile * tile = &g_worldmap.tiles[iPlayerCurrentTileX][iPlayerCurrentTileY];
-
-					short iTemp; //Just a temp value so we can call the GetVehicleInPlayerTile method
-					if(playerKeys->menu_up.fPressed)
-					{
-						//Make sure there is a path connection and that there is no stage or vehicle blocking the way
-						if(tile->fConnection[0] &&
-							((tile->fCompleted && g_worldmap.GetVehicleInPlayerTile(&iTemp) == -1) || iReturnDirection == 0))
-						{
-							g_worldmap.MovePlayer(0);
-							iReturnDirection = 1;
-						}
-					}
-					else if(playerKeys->menu_down.fPressed)
-					{
-						if(tile->fConnection[1] &&
-							((tile->fCompleted && g_worldmap.GetVehicleInPlayerTile(&iTemp) == -1) || iReturnDirection == 1))
-						{
-							g_worldmap.MovePlayer(1);
-							iReturnDirection = 0;
-						}
-					}
-					else if(playerKeys->menu_left.fPressed)
-					{
-						if(tile->fConnection[2] &&
-							((tile->fCompleted && g_worldmap.GetVehicleInPlayerTile(&iTemp) == -1) || iReturnDirection == 2))
-						{
-							g_worldmap.MovePlayer(2);
-							iReturnDirection = 3;
-						}
-						else
-						{
-							g_worldmap.FacePlayer(1);
-						}
-					}
-					else if(playerKeys->menu_right.fPressed)
-					{
-						if(tile->fConnection[3] &&
-							((tile->fCompleted && g_worldmap.GetVehicleInPlayerTile(&iTemp) == -1) || iReturnDirection == 3))
-						{
-							g_worldmap.MovePlayer(3);
-							iReturnDirection = 2;
-						}
-						else
-						{
-							g_worldmap.FacePlayer(0);
-						}
-					}
-					else if(playerInput->outputControls[iPlayer].menu_select.fPressed)
-					{
-						//Lookup current tile and see if it is a type of tile you can interact with
-						//If there is a vehicle on this tile, then load it's stage
-						short iStage = g_worldmap.GetVehicleInPlayerTile(&iVehicleId);
-						if(iStage >= 0)
-						{
-							game_values.tourstopcurrent = iStage;
-							return MENU_CODE_WORLD_STAGE_START;
-						}
-
-						if(g_worldmap.GetWarpInPlayerTile(&iWarpCol, &iWarpRow))
-						{
-							iState = 4;
-							iScreenfade = 0;
-							iScreenfadeRate = 8;
-
-							ifsoundonplay(sfx_pipe);
-						}
-
-						//if it is a stage, then load the stage
-						WorldMapTile * tile = &g_worldmap.tiles[iPlayerCurrentTileX][iPlayerCurrentTileY];
-
-						short iType = tile->iType - 2;
-						if(iType >= 0 && !tile->fCompleted)
-						{
-							game_values.tourstopcurrent = iType;
-							return MENU_CODE_WORLD_STAGE_START;
-						}		
-					}
-				}
+				g_worldmap.MoveVehicles();
 			}
-			else if (iState == game_values.colorids[iPlayer] && iStateTransition == 0) //not transitioning to or from the item popup menu
+
+			if(iControllingTeam == LookupTeamID(iPlayer) && iPlayerState == 0 && game_values.playercontrol[iPlayer] > 0) //if this player is player or cpu
 			{
+				short iPlayerCurrentTileX, iPlayerCurrentTileY;
+				g_worldmap.GetPlayerCurrentTile(&iPlayerCurrentTileX, &iPlayerCurrentTileY);
+
+				WorldMapTile * tile = &g_worldmap.tiles[iPlayerCurrentTileX][iPlayerCurrentTileY];
+
+				short iTemp; //Just a temp value so we can call the GetVehicleInPlayerTile method
 				if(playerKeys->menu_up.fPressed)
 				{
-					if(iItemPage > 0)
+					//Make sure there is a path connection and that there is no stage or vehicle blocking the way
+					if(tile->fConnection[0] &&
+						((tile->fCompleted && g_worldmap.GetVehicleInPlayerTile(&iTemp) == -1) || iReturnDirection == 0))
 					{
-						iItemPage--;
-						iItemCol = 0;
+						g_worldmap.MovePlayer(0);
+						iReturnDirection = 1;
 					}
 				}
 				else if(playerKeys->menu_down.fPressed)
 				{
-					if(iItemPage < 3 && (iItemPage + 1) * 8 < game_values.worldpowerupcount[iTeam])
+					if(tile->fConnection[1] &&
+						((tile->fCompleted && g_worldmap.GetVehicleInPlayerTile(&iTemp) == -1) || iReturnDirection == 1))
 					{
-						iItemPage++;
-						iItemCol = 0;
+						g_worldmap.MovePlayer(1);
+						iReturnDirection = 0;
 					}
 				}
 				else if(playerKeys->menu_left.fPressed)
 				{
-					if(iItemCol > 0)
+					if(tile->fConnection[2] &&
+						((tile->fCompleted && g_worldmap.GetVehicleInPlayerTile(&iTemp) == -1) || iReturnDirection == 2))
 					{
-						iItemCol--;
+						g_worldmap.MovePlayer(2);
+						iReturnDirection = 3;
 					}
-					else if(iItemCol == 0 && iItemPage > 0)
+					else
 					{
-						iItemCol = 7;
-						iItemPage--;
+						g_worldmap.FacePlayer(1);
 					}
 				}
 				else if(playerKeys->menu_right.fPressed)
 				{
-					if(iItemPage * 8 + iItemCol + 1 < game_values.worldpowerupcount[iTeam])
+					if(tile->fConnection[3] &&
+						((tile->fCompleted && g_worldmap.GetVehicleInPlayerTile(&iTemp) == -1) || iReturnDirection == 3))
 					{
-						if(iItemCol < 7)
-						{
-							iItemCol++;
-						}
-						else if(iItemCol == 7 && iItemPage < 3)
-						{
-							iItemCol = 0;
-							iItemPage++;
-						}
+						g_worldmap.MovePlayer(3);
+						iReturnDirection = 2;
+					}
+					else
+					{
+						g_worldmap.FacePlayer(0);
 					}
 				}
-				else if(playerKeys->menu_select.fPressed)
+				else if(playerInput->outputControls[iPlayer].menu_select.fPressed)
 				{
-					if(game_values.worldpowerupcount[iTeam] > 0)
+					//Lookup current tile and see if it is a type of tile you can interact with
+					//If there is a vehicle on this tile, then load it's stage
+					short iStage = g_worldmap.GetVehicleInPlayerTile(&iVehicleId);
+					if(iStage >= 0)
 					{
-						short iIndex = iItemPage * 8 + iItemCol;
-						short iNumItems = --game_values.worldpowerupcount[iTeam];
-						short iPowerup = game_values.worldpowerups[iTeam][iIndex];
-
-						for(short iItem = iIndex; iItem < iNumItems; iItem++)
-							game_values.worldpowerups[iTeam][iItem] = game_values.worldpowerups[iTeam][iItem + 1];
-
-						ifsoundonplay(sfx_collectpowerup);
-
-						if(iPowerup < NUM_POWERUPS)
-						{
-							for(short iPlayer = 0; iPlayer < game_values.teamcounts[iTeam]; iPlayer++)
-							{
-								game_values.storedpowerups[game_values.teamids[iTeam][iPlayer]] = iPowerup;
-							}
-						}
+						game_values.tourstopcurrent = iStage;
+						return MENU_CODE_WORLD_STAGE_START;
 					}
 
-					iStateTransition = 2;	
+					if(g_worldmap.GetWarpInPlayerTile(&iWarpCol, &iWarpRow))
+					{
+						iState = 4;
+						iScreenfade = 0;
+						iScreenfadeRate = 8;
+
+						ifsoundonplay(sfx_pipe);
+					}
+
+					//if it is a stage, then load the stage
+					WorldMapTile * tile = &g_worldmap.tiles[iPlayerCurrentTileX][iPlayerCurrentTileY];
+
+					short iType = tile->iType - 2;
+					if(iType >= 0 && !tile->fCompleted)
+					{
+						game_values.tourstopcurrent = iType;
+						return MENU_CODE_WORLD_STAGE_START;
+					}		
 				}
 			}
-
-			if(iState < 4)
+		}
+		else if (iState == game_values.colorids[iPlayer] && iStateTransition == 0) //not transitioning to or from the item popup menu
+		{
+			if(playerKeys->menu_up.fPressed)
 			{
-				if(playerKeys->menu_cancel.fPressed)
+				if(iItemPage > 0)
 				{
-					if(DEVICE_KEYBOARD != playerInput->inputControls[iPlayer]->iDevice || iPlayer == 0)
+					iItemPage--;
+					iItemCol = 0;
+				}
+			}
+			else if(playerKeys->menu_down.fPressed)
+			{
+				if(iItemPage < 3 && (iItemPage + 1) * 8 < game_values.worldpowerupcount[iTeam])
+				{
+					iItemPage++;
+					iItemCol = 0;
+				}
+			}
+			else if(playerKeys->menu_left.fPressed)
+			{
+				if(iItemCol > 0)
+				{
+					iItemCol--;
+				}
+				else if(iItemCol == 0 && iItemPage > 0)
+				{
+					iItemCol = 7;
+					iItemPage--;
+				}
+			}
+			else if(playerKeys->menu_right.fPressed)
+			{
+				if(iItemPage * 8 + iItemCol + 1 < game_values.worldpowerupcount[iTeam])
+				{
+					if(iItemCol < 7)
 					{
-						fModifying = false;
-						return MENU_CODE_UNSELECT_ITEM;
+						iItemCol++;
+					}
+					else if(iItemCol == 7 && iItemPage < 3)
+					{
+						iItemCol = 0;
+						iItemPage++;
 					}
 				}
-				
-				if (playerKeys->menu_random.fPressed ||
-					(iPlayer != 0 && playerInput->inputControls[iPlayer]->iDevice == DEVICE_KEYBOARD && playerKeys->menu_cancel.fPressed))
+			}
+			else if(playerKeys->menu_select.fPressed)
+			{
+				if(game_values.worldpowerupcount[iTeam] > 0)
 				{
-					if(iState == -1)
-					{
-						iState = game_values.colorids[iPlayer];
-						iTeam = LookupTeamID(iPlayer);
-						iStateTransition = 1;
+					short iIndex = iItemPage * 8 + iItemCol;
+					short iNumItems = --game_values.worldpowerupcount[iTeam];
+					short iPowerup = game_values.worldpowerups[iTeam][iIndex];
 
-						iItemPage = 0;
-						iItemCol = 0;
-					}
-					else if (iState == game_values.colorids[iPlayer])
+					for(short iItem = iIndex; iItem < iNumItems; iItem++)
+						game_values.worldpowerups[iTeam][iItem] = game_values.worldpowerups[iTeam][iItem + 1];
+
+					ifsoundonplay(sfx_collectpowerup);
+
+					if(iPowerup < NUM_POWERUPS)
 					{
-						iStateTransition = 2;
+						for(short iPlayer = 0; iPlayer < game_values.teamcounts[iTeam]; iPlayer++)
+						{
+							game_values.storedpowerups[game_values.teamids[iTeam][iPlayer]] = iPowerup;
+						}
 					}
+				}
+
+				iStateTransition = 2;	
+			}
+		}
+
+		if(iState > -2 && iState < 4)
+		{
+			if(playerKeys->menu_cancel.fPressed)
+			{
+				if(DEVICE_KEYBOARD != playerInput->inputControls[iPlayer]->iDevice || iPlayer == 0)
+				{
+					fModifying = false;
+					return MENU_CODE_UNSELECT_ITEM;
+				}
+			}
+			
+			if (playerKeys->menu_random.fPressed ||
+				(iPlayer != 0 && playerInput->inputControls[iPlayer]->iDevice == DEVICE_KEYBOARD && playerKeys->menu_cancel.fPressed))
+			{
+				if(iState == -1)
+				{
+					iState = game_values.colorids[iPlayer];
+					iTeam = LookupTeamID(iPlayer);
+					iStateTransition = 1;
+
+					iItemPage = 0;
+					iItemCol = 0;
+				}
+				else if (iState == game_values.colorids[iPlayer])
+				{
+					iStateTransition = 2;
 				}
 			}
 		}

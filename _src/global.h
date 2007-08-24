@@ -347,6 +347,7 @@ extern gfxSprite		spr_racegoal;
 extern gfxSprite		spr_chicken;
 
 extern gfxSprite		spr_bonuschest;
+extern gfxSprite		spr_teleportstar;
 
 extern gfxSprite		spr_goomba;
 extern gfxSprite		spr_goombadead;
