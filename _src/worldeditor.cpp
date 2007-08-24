@@ -134,8 +134,11 @@ void drawmap(bool fScreenshot, short iBlockSize);
 
 void UpdateForeground(short iCol, short iRow);
 void UpdatePath(short iCol, short iRow);
+void AutoSetPath(short iCol, short iRow);
 void UpdateCoastline(short iCol, short iRow);
+void AutoSetTile(short iCol, short iRow);
 void UpdatePathSprite(short iCol, short iRow);
+void AutoSetPathSprite(short iCol, short iRow);
 short AdjustForeground(short iSprite, short iCol, short iRow);
 
 WorldMap g_worldmap;
