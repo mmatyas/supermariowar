@@ -2603,7 +2603,7 @@ void Menu::RunMenu()
 							game_values.worldpowerupcount[iPlayer] = rand() % 32;
 
 							for(short iItem = 0; iItem < game_values.worldpowerupcount[iPlayer]; iItem++)
-								game_values.worldpowerups[iPlayer][iItem] = rand() % NUM_POWERUPS;
+								game_values.worldpowerups[iPlayer][iItem] = rand() % NUM_POWERUPS + 9;
 						}
 
 						miWorld->Init();

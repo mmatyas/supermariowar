@@ -3041,7 +3041,10 @@ void PU_TreasureChestBonus::draw()
 	}
 	else
 	{
-		spr_worlditems.draw(ix, drawbonusitemy, bonusitem << 5, 0, 32, 32);
+		if(bonusitem >= NUM_POWERUPS)
+			spr_worlditems.draw(ix, drawbonusitemy, (bonusitem - NUM_POWERUPS) << 5, 0, 32, 32);
+		else
+			spr_storedpoweruplarge.draw(ix, drawbonusitemy, bonusitem << 5, 0, 32, 32);
 	}
 }
 

@@ -497,6 +497,9 @@ int editor_edit()
 								{
 									g_worldmap.tiles[iCol][iRow].iForegroundSprite = set_tile;
 									updateworldsurface();
+
+									if(set_tile >= WORLD_BRIDGE_SPRITE_OFFSET && set_tile <= WORLD_BRIDGE_SPRITE_OFFSET + 3)
+										g_worldmap.tiles[iCol][iRow].iConnectionType = set_tile - WORLD_BRIDGE_SPRITE_OFFSET + 12;
 								}
 							}
 							else if(edit_mode == 2) //selected connection

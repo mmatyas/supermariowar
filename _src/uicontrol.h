@@ -910,6 +910,8 @@ class MI_World : public UI_Control
 		void RepositionMapImage();
 		void DrawWorldMapToSurface(bool fInit);
 
+		void AdvanceTurn();
+
 		short iState;
 		short iTeam;
 		short iStateTransition;
@@ -949,6 +951,7 @@ class MI_World : public UI_Control
 		float dTeleportStarAngle;
 		short iTeleportStarAnimationFrame;
 		short iTeleportStarAnimationTimer;
+
 };
 
 

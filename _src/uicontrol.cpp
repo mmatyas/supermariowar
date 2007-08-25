@@ -4262,9 +4262,13 @@ void MI_World::SetCurrentStageToCompleted(short iWinningTeam)
 		game_values.tournament_scores[iWinningTeam].total += game_values.tourstops[tile->iType - 2]->iPoints;
 	}
 
-	g_worldmap.MoveVehicles();
+	AdvanceTurn();
+}
 
-	//TODO:: Switch bridge states (open/closed)
+void MI_World::AdvanceTurn()
+{
+	g_worldmap.MoveVehicles();
+	g_worldmap.MoveBridges();
 
 	//Update the completed stage with team colored tile on the map
 	g_worldmap.DrawMapToSurface(true, sMapSurface, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
@@ -4520,7 +4524,11 @@ void MI_World::Draw()
 			short iStartItem = iItemPage << 3;
 			for(short iItem = iStartItem; iItem < iStartItem + 8 && iItem < iNumPowerups; iItem++)
 			{
-				spr_worlditems.draw((iItem - iItemPage * 8) * 52 + 122, 432, game_values.worldpowerups[iTeam][iItem] * 32, 0, 32, 32);
+				short iPowerup = game_values.worldpowerups[iTeam][iItem];
+				if(iPowerup >= NUM_POWERUPS)
+					spr_worlditems.draw((iItem - iItemPage * 8) * 52 + 122, 432, (iPowerup - NUM_POWERUPS) << 5, 0, 32, 32);
+				else
+					spr_storedpoweruplarge.draw((iItem - iItemPage * 8) * 52 + 122, 432, iPowerup << 5, 0, 32, 32);
 			}
 		}
 	}
@@ -4552,10 +4560,11 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 		
 		if(iState == -1)
 		{
+
+#ifdef _DEBUG
 			if(playerKeys->menu_scrollfast.fPressed)
-			{
-				g_worldmap.MoveVehicles();
-			}
+				AdvanceTurn();
+#endif
 
 			if(iControllingTeam == LookupTeamID(iPlayer) && iPlayerState == 0 && game_values.playercontrol[iPlayer] > 0) //if this player is player or cpu
 			{
@@ -4706,6 +4715,10 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 						{
 							game_values.storedpowerups[game_values.teamids[iTeam][iPlayer]] = iPowerup;
 						}
+					}
+					else if(iPowerup == NUM_POWERUPS + 3)
+					{
+						AdvanceTurn();
 					}
 				}
 

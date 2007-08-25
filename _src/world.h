@@ -158,10 +158,12 @@ class WorldMap
 		short NumVehiclesInTile(short iTileX, short iTileY);
 
 		short GetVehicleStageScore(short iVehicleIndex);
+		void MoveBridges();
 
 	private:
 
 		void Cleanup();
+		void SetTileConnections(short iCol, short iRow);
 
 		short iWidth;
 		short iHeight;

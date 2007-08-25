@@ -212,8 +212,8 @@ bool LoadMenuGraphics()
 	_load_gfxck(spr_worldforeground, convertPath("gfx/packs/world/world_foreground.png", graphicspack));
 	_load_gfxck(spr_worldpaths, convertPath("gfx/packs/world/world_paths.png", graphicspack));
 	_load_gfxck(spr_worldvehicle, convertPath("gfx/packs/world/world_vehicles.png", graphicspack));
-	_load_gfxck(spr_worlditems, convertPath("gfx/packs/menu/world_items.png", graphicspack));
-	_load_gfxck(spr_worlditempopup, convertPath("gfx/packs/menu/world_item_popup.png", graphicspack));
+	_load_gfxck(spr_worlditems, convertPath("gfx/packs/world/world_powerups.png", graphicspack));
+	_load_gfxck(spr_worlditempopup, convertPath("gfx/packs/world/world_item_popup.png", graphicspack));
 
 	return true;
 }

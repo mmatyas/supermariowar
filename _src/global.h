@@ -203,8 +203,10 @@ std::string stripCreatorAndDotMap(const std::string &filename);
 
 #define NUM_AUTO_FILTERS 8
 
-#define WORLD_WINNING_TEAM_SPRITE_OFFSET 500
 #define WORLD_FOREGROUND_SPRITE_OFFSET 100
+#define WORLD_WINNING_TEAM_SPRITE_OFFSET 500
+#define WORLD_DOOR_SPRITE_OFFSET 504
+#define WORLD_BRIDGE_SPRITE_OFFSET 508
 
 //------------- data structures / selfmade include files -------------
 #include "input.h"

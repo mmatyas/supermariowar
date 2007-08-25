@@ -492,59 +492,14 @@ bool WorldMap::Load()
 
 				//1 == |  2 == -  3 == -!  4 == L  5 == ,-  6 == -,
 				//7 == -|  8 == -`-  9 == |-  10 == -,-  11 == +
+				//12 == horizontal bridge starts open,  13 == horizontal bridge closed
+				//14 == vertical bridge starts open,  15 == vertical bridge closed
 				for(short iRow = 0; iRow < iHeight; iRow++)
 				{
 					for(short iCol = 0; iCol < iWidth; iCol++)
 					{
-						WorldMapTile * tile = &tiles[iCol][iRow];
-
-						for(short iDirection = 0; iDirection < 4; iDirection++)
-							tile->fConnection[iDirection] = false;
-
-						if(iRow > 0)
-						{
-							WorldMapTile * topTile = &tiles[iCol][iRow - 1];
-
-							tile->fConnection[0] = (topTile->iConnectionType == 1 || topTile->iConnectionType == 5 || topTile->iConnectionType == 6 || 
-								topTile->iConnectionType == 7 || topTile->iConnectionType == 9 || topTile->iConnectionType == 10 ||
-								topTile->iConnectionType == 11) && (tile->iConnectionType == 1 || tile->iConnectionType == 3 ||
-								tile->iConnectionType == 4 || tile->iConnectionType == 7 || tile->iConnectionType == 8 ||
-								tile->iConnectionType == 9 || tile->iConnectionType == 11);
-						}
-
-						if(iRow < iHeight - 1)
-						{
-							WorldMapTile * bottomTile = &tiles[iCol][iRow + 1];
-
-							tile->fConnection[1] = (bottomTile->iConnectionType == 1 || bottomTile->iConnectionType == 3 || bottomTile->iConnectionType == 4 || 
-								bottomTile->iConnectionType == 7 || bottomTile->iConnectionType == 8 || bottomTile->iConnectionType == 9 ||
-								bottomTile->iConnectionType == 11) && (tile->iConnectionType == 1 || tile->iConnectionType == 5 ||
-								tile->iConnectionType == 6 || tile->iConnectionType == 7 || tile->iConnectionType == 9 ||
-								tile->iConnectionType == 10 || tile->iConnectionType == 11);
-						}
-
-						if(iCol > 0)
-						{
-							WorldMapTile * leftTile = &tiles[iCol - 1][iRow];
-
-							tile->fConnection[2] = (leftTile->iConnectionType == 2 || leftTile->iConnectionType == 4 || leftTile->iConnectionType == 5 || 
-								leftTile->iConnectionType == 8 || leftTile->iConnectionType == 9 || leftTile->iConnectionType == 10 ||
-								leftTile->iConnectionType == 11) && (tile->iConnectionType == 2 || tile->iConnectionType == 3 ||
-								tile->iConnectionType == 6 || tile->iConnectionType == 7 || tile->iConnectionType == 8 ||
-								tile->iConnectionType == 10 || tile->iConnectionType == 11);
-						}
-
-						if(iCol < iWidth - 1)
-						{
-							WorldMapTile * rightTile = &tiles[iCol + 1][iRow];
-
-							tile->fConnection[3] = (rightTile->iConnectionType == 2 || rightTile->iConnectionType == 3 || rightTile->iConnectionType == 6 || 
-								rightTile->iConnectionType == 7 || rightTile->iConnectionType == 8 || rightTile->iConnectionType == 10 ||
-								rightTile->iConnectionType == 11) && (tile->iConnectionType == 2 || tile->iConnectionType == 4 ||
-								tile->iConnectionType == 5 || tile->iConnectionType == 8 || tile->iConnectionType == 9 ||
-								tile->iConnectionType == 10 || tile->iConnectionType == 11);
-						}
-					}	
+						SetTileConnections(iCol, iRow);
+					}
 				}
 			}
 		}
@@ -707,6 +662,63 @@ RETURN:
 	fclose(file);
 
 	return iReadType == 13;
+}
+
+void WorldMap::SetTileConnections(short iCol, short iRow)
+{
+	if(iCol < 0 || iRow < 0 || iCol >= iWidth || iRow >= iHeight)
+		return;
+
+	WorldMapTile * tile = &tiles[iCol][iRow];
+
+	for(short iDirection = 0; iDirection < 4; iDirection++)
+		tile->fConnection[iDirection] = false;
+
+	if(iRow > 0)
+	{
+		WorldMapTile * topTile = &tiles[iCol][iRow - 1];
+
+		tile->fConnection[0] = (topTile->iConnectionType == 1 || topTile->iConnectionType == 5 || topTile->iConnectionType == 6 || 
+			topTile->iConnectionType == 7 || topTile->iConnectionType == 9 || topTile->iConnectionType == 10 ||
+			topTile->iConnectionType == 11 || topTile->iConnectionType == 15) && (tile->iConnectionType == 1 || 
+			tile->iConnectionType == 3 || tile->iConnectionType == 4 || tile->iConnectionType == 7 || 
+			tile->iConnectionType == 8 || tile->iConnectionType == 9 || tile->iConnectionType == 11 || 
+			tile->iConnectionType == 15);
+	}
+
+	if(iRow < iHeight - 1)
+	{
+		WorldMapTile * bottomTile = &tiles[iCol][iRow + 1];
+
+		tile->fConnection[1] = (bottomTile->iConnectionType == 1 || bottomTile->iConnectionType == 3 || bottomTile->iConnectionType == 4 || 
+			bottomTile->iConnectionType == 7 || bottomTile->iConnectionType == 8 || bottomTile->iConnectionType == 9 ||
+			bottomTile->iConnectionType == 11 || bottomTile->iConnectionType == 15) && (tile->iConnectionType == 1 || 
+			tile->iConnectionType == 5 || tile->iConnectionType == 6 || tile->iConnectionType == 7 || 
+			tile->iConnectionType == 9 || tile->iConnectionType == 10 || tile->iConnectionType == 11 || 
+			tile->iConnectionType == 15);
+	}
+
+	if(iCol > 0)
+	{
+		WorldMapTile * leftTile = &tiles[iCol - 1][iRow];
+
+		tile->fConnection[2] = (leftTile->iConnectionType == 2 || leftTile->iConnectionType == 4 || leftTile->iConnectionType == 5 || 
+			leftTile->iConnectionType == 8 || leftTile->iConnectionType == 9 || leftTile->iConnectionType == 10 ||
+			leftTile->iConnectionType == 11 || leftTile->iConnectionType == 13) && (tile->iConnectionType == 2 || tile->iConnectionType == 3 ||
+			tile->iConnectionType == 6 || tile->iConnectionType == 7 || tile->iConnectionType == 8 ||
+			tile->iConnectionType == 10 || tile->iConnectionType == 11 || tile->iConnectionType == 13);
+	}
+
+	if(iCol < iWidth - 1)
+	{
+		WorldMapTile * rightTile = &tiles[iCol + 1][iRow];
+
+		tile->fConnection[3] = (rightTile->iConnectionType == 2 || rightTile->iConnectionType == 3 || rightTile->iConnectionType == 6 || 
+			rightTile->iConnectionType == 7 || rightTile->iConnectionType == 8 || rightTile->iConnectionType == 10 ||
+			rightTile->iConnectionType == 11 || rightTile->iConnectionType == 13) && (tile->iConnectionType == 2 || tile->iConnectionType == 4 ||
+			tile->iConnectionType == 5 || tile->iConnectionType == 8 || tile->iConnectionType == 9 ||
+			tile->iConnectionType == 10 || tile->iConnectionType == 11 || tile->iConnectionType == 13);
+	}
 }
 
 //Saves world to file
@@ -1077,22 +1089,19 @@ void WorldMap::DrawMapToSurface(bool fInit, SDL_Surface * surface, short iMapDra
 				}
 				else if(iForegroundSprite >= WORLD_WINNING_TEAM_SPRITE_OFFSET && iForegroundSprite <= WORLD_WINNING_TEAM_SPRITE_OFFSET + 3)
 				{
-					SDL_Rect rSrc = {(iForegroundSprite - WORLD_WINNING_TEAM_SPRITE_OFFSET + 15) << 5, TILESIZE, TILESIZE, TILESIZE};
+					SDL_Rect rSrc = {(iForegroundSprite - WORLD_WINNING_TEAM_SPRITE_OFFSET + 15) << 5, 32, TILESIZE, TILESIZE};
 					SDL_BlitSurface(spr_worldforeground.getSurface(), &rSrc, surface, &r);
 				}
-
-				/*
-				if(iForegroundSprite == 1 || iForegroundSprite == 2)
+				else if(iForegroundSprite >= WORLD_DOOR_SPRITE_OFFSET && iForegroundSprite <= WORLD_DOOR_SPRITE_OFFSET + 3)
 				{
-					SDL_Rect rSrc = {96, iForegroundSprite << 5, TILESIZE, TILESIZE};
-					SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, surface, &r);
+					SDL_Rect rSrc = {(iForegroundSprite - WORLD_DOOR_SPRITE_OFFSET + 14) << 5, 64, TILESIZE, TILESIZE};
+					SDL_BlitSurface(spr_worldforeground.getSurface(), &rSrc, surface, &r);
 				}
-				else if(iForegroundSprite >= 3 && iForegroundSprite <= 6)
+				else if(iForegroundSprite >= WORLD_BRIDGE_SPRITE_OFFSET && iForegroundSprite <= WORLD_BRIDGE_SPRITE_OFFSET + 3)
 				{
-					SDL_Rect rSrc = {iAnimationFrame, (iForegroundSprite + 14) << 5, TILESIZE, TILESIZE};
-					SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, surface, &r);
+					SDL_Rect rSrc = {(iForegroundSprite - WORLD_BRIDGE_SPRITE_OFFSET + 14) << 5, 96, TILESIZE, TILESIZE};
+					SDL_BlitSurface(spr_worldforeground.getSurface(), &rSrc, surface, &r);
 				}
-				*/
 			}
 		}
 	}		
@@ -1247,4 +1256,51 @@ short WorldMap::NumVehiclesInTile(short iTileX, short iTileY)
 short WorldMap::GetVehicleStageScore(short iVehicleIndex)
 {
 	return game_values.tourstops[vehicles[iVehicleIndex].iActionId]->iPoints;
+}
+
+void WorldMap::MoveBridges()
+{
+	for(short iRow = 0; iRow < iHeight; iRow++)
+	{
+		for(short iCol = 0; iCol < iWidth; iCol++)
+		{
+			if(tiles[iCol][iRow].iConnectionType == 12)
+			{
+				tiles[iCol][iRow].iConnectionType = 13;
+				SetTileConnections(iCol, iRow);
+				SetTileConnections(iCol - 1, iRow);
+				SetTileConnections(iCol + 1, iRow);
+			}
+			else if(tiles[iCol][iRow].iConnectionType == 13)
+			{
+				tiles[iCol][iRow].iConnectionType = 12;
+				SetTileConnections(iCol, iRow);
+				SetTileConnections(iCol - 1, iRow);
+				SetTileConnections(iCol + 1, iRow);
+			}
+			else if(tiles[iCol][iRow].iConnectionType == 14)
+			{
+				tiles[iCol][iRow].iConnectionType = 15;
+				SetTileConnections(iCol, iRow);
+				SetTileConnections(iCol, iRow - 1);
+				SetTileConnections(iCol, iRow + 1);
+			}
+			else if(tiles[iCol][iRow].iConnectionType == 15)
+			{
+				tiles[iCol][iRow].iConnectionType = 14;
+				SetTileConnections(iCol, iRow);
+				SetTileConnections(iCol, iRow - 1);
+				SetTileConnections(iCol, iRow + 1);
+			}
+
+			if(tiles[iCol][iRow].iForegroundSprite == WORLD_BRIDGE_SPRITE_OFFSET)
+				tiles[iCol][iRow].iForegroundSprite = WORLD_BRIDGE_SPRITE_OFFSET + 1;
+			else if(tiles[iCol][iRow].iForegroundSprite == WORLD_BRIDGE_SPRITE_OFFSET + 1)
+				tiles[iCol][iRow].iForegroundSprite = WORLD_BRIDGE_SPRITE_OFFSET;
+			else if(tiles[iCol][iRow].iForegroundSprite == WORLD_BRIDGE_SPRITE_OFFSET + 2)
+				tiles[iCol][iRow].iForegroundSprite = WORLD_BRIDGE_SPRITE_OFFSET + 3;
+			else if(tiles[iCol][iRow].iForegroundSprite == WORLD_BRIDGE_SPRITE_OFFSET + 3)
+				tiles[iCol][iRow].iForegroundSprite = WORLD_BRIDGE_SPRITE_OFFSET + 2;
+		}
+	}
 }
