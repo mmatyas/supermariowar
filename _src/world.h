@@ -160,6 +160,9 @@ class WorldMap
 		short GetVehicleStageScore(short iVehicleIndex);
 		void MoveBridges();
 
+		bool IsDoor(short iCol, short iRow);
+		short UseKey(short iKeytype, short iCol, short iRow);
+
 	private:
 
 		void Cleanup();

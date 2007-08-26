@@ -4271,7 +4271,7 @@ void MI_World::AdvanceTurn()
 	g_worldmap.MoveBridges();
 
 	//Update the completed stage with team colored tile on the map
-	g_worldmap.DrawMapToSurface(true, sMapSurface, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
+	UpdateMapSurface();
 }
 
 void MI_World::Update()
@@ -4293,7 +4293,7 @@ void MI_World::Update()
 			iAnimationFrame = 0;
 
 		//update background map surface
-		g_worldmap.DrawMapToSurface(false, sMapSurface, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
+		UpdateMapSurface();
 	}
 
 	if(fPlayerMoveDone)
@@ -4331,9 +4331,9 @@ void MI_World::Update()
 			iMapOffsetX -= 2;
 	}
 
-	if(iState == -2 || iState == 4 || iState == 5)
+	if(iState == -2 || iState >= 4)
 	{
-		dTeleportStarRadius += (iState == -2 ? -5.0f : (iState == 4 ? 5.0f : -5.0f));
+		dTeleportStarRadius += (iState == 4 || iState == 6 ? 5.0f : -5.0f);
 		dTeleportStarAngle -= 0.15f;
 
 		if(++iTeleportStarAnimationTimer >= 3)
@@ -4347,7 +4347,7 @@ void MI_World::Update()
 
 		if(dTeleportStarRadius <= 0.0f)
 		{
-			if(iState == -2)
+			if(iState == -2 || iState == 7)
 				iState = -1;
 
 			dTeleportStarRadius = 0.0f;
@@ -4399,6 +4399,16 @@ void MI_World::Update()
 			iScreenfade = 0;
 		}
 	}
+	else if(iState == 6)
+	{
+		if(dTeleportStarRadius > 150.0f)
+			iState = 7;
+	}
+}
+
+void MI_World::UpdateMapSurface()
+{
+	g_worldmap.DrawMapToSurface(true, sMapSurface, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
 }
 
 void MI_World::SetMapOffset()
@@ -4458,7 +4468,7 @@ void MI_World::RepositionMapImage()
 			iMapDrawOffsetRow = g_worldmap.iHeight - 19;
 	}
 
-	g_worldmap.DrawMapToSurface(true, sMapSurface, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
+	UpdateMapSurface();
 }
 
 
@@ -4485,7 +4495,7 @@ void MI_World::Draw()
 	
 	SDL_BlitSurface(sMapSurface, rectSrcSurface, blitdest, rectDstSurface);
 
-	g_worldmap.Draw(iMapOffsetX, iMapOffsetY, iState != -2 && iState != 4 && iState != 5);
+	g_worldmap.Draw(iMapOffsetX, iMapOffsetY, iState != -2 && iState < 4);
 
 	if(iMessageTimer > 0)
 	{
@@ -4494,7 +4504,7 @@ void MI_World::Draw()
 	}
 
 	//If the item selector for a player is displayed
-	if(iState == -2 || iState == 4 || iState == 5)
+	if(iState == -2 || iState >= 4)
 	{
 		short iPlayerX, iPlayerY;
 		g_worldmap.GetPlayerPosition(&iPlayerX, &iPlayerY);
@@ -4532,7 +4542,7 @@ void MI_World::Draw()
 			}
 		}
 	}
-	else if(iState >= 4)
+	else if(iState == 4 || iState == 5)
 	{
 		menu_shade.setalpha((Uint8)iScreenfade);
 		menu_shade.draw(0, 0);
@@ -4548,6 +4558,10 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 	//If the player and a vehicle collided, force the start of that level
 	if(fForceStageStart)
 	{
+		iState = -1;
+		iItemPopupDrawY = 0;
+		iStateTransition = 0;
+
 		fForceStageStart = false;
 		return MENU_CODE_TOUR_STOP_CONTINUE_FORCED;
 	}
@@ -4558,6 +4572,9 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 	{
 		COutputControl * playerKeys = &game_values.playerInput.outputControls[iPlayer];
 		
+		short iPlayerCurrentTileX, iPlayerCurrentTileY;
+		g_worldmap.GetPlayerCurrentTile(&iPlayerCurrentTileX, &iPlayerCurrentTileY);
+
 		if(iState == -1)
 		{
 
@@ -4568,16 +4585,13 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 
 			if(iControllingTeam == LookupTeamID(iPlayer) && iPlayerState == 0 && game_values.playercontrol[iPlayer] > 0) //if this player is player or cpu
 			{
-				short iPlayerCurrentTileX, iPlayerCurrentTileY;
-				g_worldmap.GetPlayerCurrentTile(&iPlayerCurrentTileX, &iPlayerCurrentTileY);
-
 				WorldMapTile * tile = &g_worldmap.tiles[iPlayerCurrentTileX][iPlayerCurrentTileY];
 
 				short iTemp; //Just a temp value so we can call the GetVehicleInPlayerTile method
 				if(playerKeys->menu_up.fPressed)
 				{
 					//Make sure there is a path connection and that there is no stage or vehicle blocking the way
-					if(tile->fConnection[0] &&
+					if(tile->fConnection[0] && !g_worldmap.IsDoor(iPlayerCurrentTileX, iPlayerCurrentTileY - 1) &&
 						((tile->fCompleted && g_worldmap.GetVehicleInPlayerTile(&iTemp) == -1) || iReturnDirection == 0))
 					{
 						g_worldmap.MovePlayer(0);
@@ -4586,7 +4600,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 				}
 				else if(playerKeys->menu_down.fPressed)
 				{
-					if(tile->fConnection[1] &&
+					if(tile->fConnection[1] && !g_worldmap.IsDoor(iPlayerCurrentTileX, iPlayerCurrentTileY + 1) &&
 						((tile->fCompleted && g_worldmap.GetVehicleInPlayerTile(&iTemp) == -1) || iReturnDirection == 1))
 					{
 						g_worldmap.MovePlayer(1);
@@ -4595,7 +4609,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 				}
 				else if(playerKeys->menu_left.fPressed)
 				{
-					if(tile->fConnection[2] &&
+					if(tile->fConnection[2] && !g_worldmap.IsDoor(iPlayerCurrentTileX - 1, iPlayerCurrentTileY) &&
 						((tile->fCompleted && g_worldmap.GetVehicleInPlayerTile(&iTemp) == -1) || iReturnDirection == 2))
 					{
 						g_worldmap.MovePlayer(2);
@@ -4608,7 +4622,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 				}
 				else if(playerKeys->menu_right.fPressed)
 				{
-					if(tile->fConnection[3] &&
+					if(tile->fConnection[3] && !g_worldmap.IsDoor(iPlayerCurrentTileX + 1, iPlayerCurrentTileY) &&
 						((tile->fCompleted && g_worldmap.GetVehicleInPlayerTile(&iTemp) == -1) || iReturnDirection == 3))
 					{
 						g_worldmap.MovePlayer(3);
@@ -4642,7 +4656,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 					//if it is a stage, then load the stage
 					WorldMapTile * tile = &g_worldmap.tiles[iPlayerCurrentTileX][iPlayerCurrentTileY];
 
-					short iType = tile->iType - 2;
+					short iType = tile->iType - 6;
 					if(iType >= 0 && !tile->fCompleted)
 					{
 						game_values.tourstopcurrent = iType;
@@ -4701,13 +4715,9 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 				if(game_values.worldpowerupcount[iTeam] > 0)
 				{
 					short iIndex = iItemPage * 8 + iItemCol;
-					short iNumItems = --game_values.worldpowerupcount[iTeam];
 					short iPowerup = game_values.worldpowerups[iTeam][iIndex];
 
-					for(short iItem = iIndex; iItem < iNumItems; iItem++)
-						game_values.worldpowerups[iTeam][iItem] = game_values.worldpowerups[iTeam][iItem + 1];
-
-					ifsoundonplay(sfx_collectpowerup);
+					bool fUsedItem = false;
 
 					if(iPowerup < NUM_POWERUPS)
 					{
@@ -4715,14 +4725,70 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 						{
 							game_values.storedpowerups[game_values.teamids[iTeam][iPlayer]] = iPowerup;
 						}
+
+						ifsoundonplay(sfx_collectpowerup);
+						fUsedItem = true;
 					}
-					else if(iPowerup == NUM_POWERUPS + 3)
+					else if(iPowerup == NUM_POWERUPS + 2) //Player Switch
+					{
+						short iPlayerTeam = LookupTeamID(iPlayer);
+						if(iControllingTeam != iPlayerTeam)
+						{
+							SetControllingTeam(iPlayerTeam);
+							fUsedItem = true;
+							ifsoundonplay(sfx_switchpress);
+							iState = 6;
+						}
+					}
+					else if(iPowerup == NUM_POWERUPS + 3) //Advance Turn
 					{
 						AdvanceTurn();
+						fUsedItem = true;
+						ifsoundonplay(sfx_switchpress);
+					}
+					else if(iPowerup >= NUM_POWERUPS + 5 && iPowerup <= NUM_POWERUPS + 8) //Door Keys
+					{
+						short iDoorsOpened = g_worldmap.UseKey(iPowerup - NUM_POWERUPS - 5, iPlayerCurrentTileX, iPlayerCurrentTileY);
+
+						if(iDoorsOpened > 0)
+						{
+							UpdateMapSurface();
+							ifsoundonplay(sfx_transform);
+
+							short iPlayerX = (iPlayerCurrentTileX << 5) + iMapOffsetX;
+							short iPlayerY = (iPlayerCurrentTileY << 5) + iMapOffsetY;
+
+							if(iDoorsOpened & 0x1)
+								uiMenu->AddEyeCandy(new EC_SingleAnimation(&spr_fireballexplosion, iPlayerX - TILESIZE, iPlayerY, 3, 8));
+
+							if(iDoorsOpened & 0x2)
+								uiMenu->AddEyeCandy(new EC_SingleAnimation(&spr_fireballexplosion, iPlayerX + TILESIZE, iPlayerY, 3, 8));
+				
+							if(iDoorsOpened & 0x4)
+								uiMenu->AddEyeCandy(new EC_SingleAnimation(&spr_fireballexplosion, iPlayerX, iPlayerY - TILESIZE, 3, 8));
+
+							if(iDoorsOpened & 0x8)
+								uiMenu->AddEyeCandy(new EC_SingleAnimation(&spr_fireballexplosion, iPlayerX, iPlayerY + TILESIZE, 3, 8));
+
+							fUsedItem = true;
+
+						}
+					}
+
+					if(fUsedItem)
+					{
+						short iNumItems = --game_values.worldpowerupcount[iTeam];
+
+						for(short iItem = iIndex; iItem < iNumItems; iItem++)
+							game_values.worldpowerups[iTeam][iItem] = game_values.worldpowerups[iTeam][iItem + 1];
+
+						iStateTransition = 2;
+					}
+					else
+					{
+						ifsoundonplay(sfx_stun);
 					}
 				}
-
-				iStateTransition = 2;	
 			}
 		}
 

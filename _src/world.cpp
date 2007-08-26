@@ -247,9 +247,19 @@ void WorldVehicle::SetNextDest()
 
 	short iConnections[4];
 	short iNumConnections = 0;
-	for(short iDirection = 0; iDirection < 4; iDirection ++)
+	for(short iDirection = 0; iDirection < 4; iDirection++)
 	{
-		if(tile->fConnection[iDirection])
+		bool fIsDoor = false;
+		if(iDirection == 0)
+			fIsDoor = g_worldmap.IsDoor(iCurrentTileX, iCurrentTileY - 1);
+		else if(iDirection == 1)
+			fIsDoor = g_worldmap.IsDoor(iCurrentTileX, iCurrentTileY + 1);
+		else if(iDirection == 2)
+			fIsDoor = g_worldmap.IsDoor(iCurrentTileX - 1, iCurrentTileY);
+		else if(iDirection == 3)
+			fIsDoor = g_worldmap.IsDoor(iCurrentTileX + 1, iCurrentTileY);
+
+		if(tile->fConnection[iDirection] && !fIsDoor)
 			iConnections[iNumConnections++] = iDirection;
 	}
 
@@ -522,7 +532,7 @@ bool WorldMap::Load()
 					iStartY = iMapTileReadRow;
 				}
 				
-				tile->fCompleted = tile->iType <= 1;
+				tile->fCompleted = tile->iType <= 5;
 
 				psz = strtok(NULL, ",\n");
 			}
@@ -1092,14 +1102,16 @@ void WorldMap::DrawMapToSurface(bool fInit, SDL_Surface * surface, short iMapDra
 					SDL_Rect rSrc = {(iForegroundSprite - WORLD_WINNING_TEAM_SPRITE_OFFSET + 15) << 5, 32, TILESIZE, TILESIZE};
 					SDL_BlitSurface(spr_worldforeground.getSurface(), &rSrc, surface, &r);
 				}
-				else if(iForegroundSprite >= WORLD_DOOR_SPRITE_OFFSET && iForegroundSprite <= WORLD_DOOR_SPRITE_OFFSET + 3)
-				{
-					SDL_Rect rSrc = {(iForegroundSprite - WORLD_DOOR_SPRITE_OFFSET + 14) << 5, 64, TILESIZE, TILESIZE};
-					SDL_BlitSurface(spr_worldforeground.getSurface(), &rSrc, surface, &r);
-				}
 				else if(iForegroundSprite >= WORLD_BRIDGE_SPRITE_OFFSET && iForegroundSprite <= WORLD_BRIDGE_SPRITE_OFFSET + 3)
 				{
 					SDL_Rect rSrc = {(iForegroundSprite - WORLD_BRIDGE_SPRITE_OFFSET + 14) << 5, 96, TILESIZE, TILESIZE};
+					SDL_BlitSurface(spr_worldforeground.getSurface(), &rSrc, surface, &r);
+				}
+
+				short iType = tile->iType;
+				if(iType >= 2 && iType <= 5)
+				{
+					SDL_Rect rSrc = {(iType + 12) << 5, 64, TILESIZE, TILESIZE};
 					SDL_BlitSurface(spr_worldforeground.getSurface(), &rSrc, surface, &r);
 				}
 			}
@@ -1303,4 +1315,59 @@ void WorldMap::MoveBridges()
 				tiles[iCol][iRow].iForegroundSprite = WORLD_BRIDGE_SPRITE_OFFSET + 2;
 		}
 	}
+}
+
+bool WorldMap::IsDoor(short iCol, short iRow)
+{
+	if(iCol >= 0 && iRow >= 0 && iCol < iWidth && iRow < iHeight)
+	{
+		short iType = tiles[iCol][iRow].iType;
+		if(iType >= 2 && iType <= 5)
+			return true;
+	}
+
+	return false;
+}
+
+short WorldMap::UseKey(short iKeyType, short iCol, short iRow)
+{
+	short iDoorsOpened = 0;
+
+	if(iCol > 0)
+	{
+		if(tiles[iCol - 1][iRow].iType - 2 == iKeyType)
+		{
+			tiles[iCol - 1][iRow].iType = 0;
+			iDoorsOpened |= 1;
+		}
+	}
+
+	if(iCol < iWidth - 1)
+	{
+		if(tiles[iCol + 1][iRow].iType - 2 == iKeyType)
+		{
+			tiles[iCol + 1][iRow].iType = 0;
+			iDoorsOpened |= 2;
+		}
+	}
+
+	if(iRow > 0)
+	{
+		if(tiles[iCol][iRow - 1].iType - 2 == iKeyType)
+		{
+			tiles[iCol][iRow - 1].iType = 0;
+			iDoorsOpened |= 4;
+		}
+	}
+
+	if(iCol < iHeight - 1)
+	{
+		if(tiles[iCol][iRow + 1].iType - 2 == iKeyType)
+		{
+			tiles[iCol][iRow + 1].iType = 0;
+			iDoorsOpened |= 8;
+		}
+	}
+
+	return iDoorsOpened;
 }

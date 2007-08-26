@@ -911,6 +911,7 @@ class MI_World : public UI_Control
 		void DrawWorldMapToSurface(bool fInit);
 
 		void AdvanceTurn();
+		void UpdateMapSurface();
 
 		short iState;
 		short iTeam;
