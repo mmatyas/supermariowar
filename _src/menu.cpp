@@ -3000,6 +3000,8 @@ void Menu::RunMenu()
 				if(MENU_CODE_TOUR_STOP_CONTINUE_FORCED == code)
 					miWorldStop->Refresh(game_values.tourstopcurrent);
 
+				miWorld->ClearCloud();
+
 				short iGameMode = game_values.tourstops[game_values.tourstopcurrent]->iMode;
 				gamemodes[iGameMode]->goal = game_values.tourstops[game_values.tourstopcurrent]->iGoal;
 				game_values.gamemode = gamemodes[iGameMode];

@@ -903,6 +903,7 @@ class MI_World : public UI_Control
 		void Init();
 		void SetControllingTeam(short iPlayerID);
 		void SetCurrentStageToCompleted(short iWinningTeam);
+		void ClearCloud() {fUsingCloud = false;}
 
 	private:
 
@@ -912,6 +913,7 @@ class MI_World : public UI_Control
 
 		void AdvanceTurn();
 		void UpdateMapSurface();
+		void UseCloud(bool fUseCloud);
 
 		short iState;
 		short iTeam;
@@ -956,6 +958,7 @@ class MI_World : public UI_Control
 		bool fNoInterestingMoves;
 
 		short iSleepTurns;
+		bool fUsingCloud;
 };
 
 

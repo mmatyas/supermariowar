@@ -4309,7 +4309,7 @@ void MI_World::Update()
 	if(fPlayerMoveDone)
 		RepositionMapImage();
 
-	if(iSleepTurns <= 0 && (fPlayerVehicleCollision || fPlayerMoveDone))
+	if(iSleepTurns <= 0 && !fUsingCloud && (fPlayerVehicleCollision || fPlayerMoveDone))
 	{
 		short iStage = g_worldmap.GetVehicleInPlayerTile(&iVehicleId);
 		if(iStage >= 0)
@@ -4487,6 +4487,9 @@ void MI_World::Draw()
 	if(!fShow)
 		return;
 
+	short iPlayerX, iPlayerY;
+	g_worldmap.GetPlayerPosition(&iPlayerX, &iPlayerY);
+
 	rectSrcSurface->x = 0;
 	rectSrcSurface->y = 0;
 	
@@ -4505,7 +4508,10 @@ void MI_World::Draw()
 	
 	SDL_BlitSurface(sMapSurface, rectSrcSurface, blitdest, rectDstSurface);
 
-	g_worldmap.Draw(iMapOffsetX, iMapOffsetY, iState != -2 && iState < 4, iSleepTurns > 0);
+	g_worldmap.Draw(iMapOffsetX, iMapOffsetY, iState != -2 && iState < 4 && !fUsingCloud, iSleepTurns > 0);
+
+	if(fUsingCloud && iState != -2 && iState < 4)
+		spr_worlditems.draw(iPlayerX + iMapOffsetX, iPlayerY + iMapOffsetY, 32, 0, 32, 32);
 
 	if(iMessageTimer > 0)
 	{
@@ -4516,9 +4522,6 @@ void MI_World::Draw()
 	//If the item selector for a player is displayed
 	if(iState == -2 || iState >= 4)
 	{
-		short iPlayerX, iPlayerY;
-		g_worldmap.GetPlayerPosition(&iPlayerX, &iPlayerY);
-
 		for(short iStar = 0; iStar < 10; iStar++)
 		{
 			float dAngle = dTeleportStarAngle + (TWO_PI / 10.0f) * (float)iStar;
@@ -4559,6 +4562,8 @@ void MI_World::Draw()
 	}
 }
 
+//TODO:: need a way for AI to use world items like keys
+//Also, there is a problem if you put a key into a stage but someone exits before it is collected
 MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 {
 	//Don't allow any input while vehicles are moving
@@ -4656,12 +4661,17 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 				WorldMapTile * tile = &g_worldmap.tiles[iPlayerCurrentTileX][iPlayerCurrentTileY];
 
 				short iTemp; //Just a temp value so we can call the GetVehicleInPlayerTile method
+				bool fVehicleInTile = g_worldmap.GetVehicleInPlayerTile(&iTemp) >= 0;
+
 				if(playerKeys->menu_up.fPressed)
 				{
 					//Make sure there is a path connection and that there is no stage or vehicle blocking the way
 					if(tile->fConnection[0] && !g_worldmap.IsDoor(iPlayerCurrentTileX, iPlayerCurrentTileY - 1) &&
-						((tile->fCompleted && (g_worldmap.GetVehicleInPlayerTile(&iTemp) == -1 || iSleepTurns > 0)) || iReturnDirection == 0))
+						((tile->fCompleted && (!fVehicleInTile || iSleepTurns > 0)) || iReturnDirection == 0 || fUsingCloud))
 					{
+						if(fUsingCloud && (!tile->fCompleted || fVehicleInTile) && iReturnDirection != 0)
+							UseCloud(false);
+
 						g_worldmap.MovePlayer(0);
 						iReturnDirection = 1;
 					}
@@ -4669,8 +4679,11 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 				else if(playerKeys->menu_down.fPressed)
 				{
 					if(tile->fConnection[1] && !g_worldmap.IsDoor(iPlayerCurrentTileX, iPlayerCurrentTileY + 1) &&
-						((tile->fCompleted && (g_worldmap.GetVehicleInPlayerTile(&iTemp) == -1 || iSleepTurns > 0)) || iReturnDirection == 1))
+						((tile->fCompleted && (!fVehicleInTile || iSleepTurns > 0)) || iReturnDirection == 1 || fUsingCloud))
 					{
+						if(fUsingCloud && (!tile->fCompleted || fVehicleInTile) && iReturnDirection != 1)
+							UseCloud(false);
+
 						g_worldmap.MovePlayer(1);
 						iReturnDirection = 0;
 					}
@@ -4678,8 +4691,11 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 				else if(playerKeys->menu_left.fPressed)
 				{
 					if(tile->fConnection[2] && !g_worldmap.IsDoor(iPlayerCurrentTileX - 1, iPlayerCurrentTileY) &&
-						((tile->fCompleted && (g_worldmap.GetVehicleInPlayerTile(&iTemp) == -1 || iSleepTurns > 0)) || iReturnDirection == 2))
+						((tile->fCompleted && (!fVehicleInTile || iSleepTurns > 0)) || iReturnDirection == 2 || fUsingCloud))
 					{
+						if(fUsingCloud && (!tile->fCompleted || fVehicleInTile) && iReturnDirection != 2)
+							UseCloud(false);
+
 						g_worldmap.MovePlayer(2);
 						iReturnDirection = 3;
 					}
@@ -4691,8 +4707,11 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 				else if(playerKeys->menu_right.fPressed)
 				{
 					if(tile->fConnection[3] && !g_worldmap.IsDoor(iPlayerCurrentTileX + 1, iPlayerCurrentTileY) &&
-						((tile->fCompleted && (g_worldmap.GetVehicleInPlayerTile(&iTemp) == -1 || iSleepTurns > 0)) || iReturnDirection == 3))
+						((tile->fCompleted && (!fVehicleInTile || iSleepTurns > 0)) || iReturnDirection == 3 || fUsingCloud))
 					{
+						if(fUsingCloud && (!tile->fCompleted || fVehicleInTile) && iReturnDirection != 3)
+							UseCloud(false);
+
 						g_worldmap.MovePlayer(3);
 						iReturnDirection = 2;
 					}
@@ -4732,12 +4751,12 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 					if(iType >= 0 && !tile->fCompleted)
 					{
 						game_values.tourstopcurrent = iType;
-						
+
 						if(fNeedAiControl)
 							return MENU_CODE_TOUR_STOP_CONTINUE_FORCED;
 						else
 							return MENU_CODE_WORLD_STAGE_START;
-					}		
+					}
 				}
 			}
 		}
@@ -4809,7 +4828,12 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 					{
 						iSleepTurns = rand() % 4 + 2;
 						fUsedItem = true;
-						ifsoundonplay(sfx_switchpress);
+						ifsoundonplay(sfx_collectpowerup);
+					}
+					else if(iPowerup == NUM_POWERUPS + 1) //Cloud (allows player to skip stages)
+					{
+						UseCloud(true);
+						fUsedItem = true;
 					}
 					else if(iPowerup == NUM_POWERUPS + 2) //Player Switch
 					{
@@ -4913,4 +4937,14 @@ MenuCodeEnum MI_World::Modify(bool modify)
 {
 	fModifying = modify;
 	return MENU_CODE_MODIFY_ACCEPTED;
+}
+
+void MI_World::UseCloud(bool fUseCloud)
+{
+	fUsingCloud = fUseCloud;
+	ifsoundonplay(sfx_transform);
+
+	short iPlayerX, iPlayerY;
+	g_worldmap.GetPlayerPosition(&iPlayerX, &iPlayerY);
+	uiMenu->AddEyeCandy(new EC_SingleAnimation(&spr_fireballexplosion, iPlayerX + iMapOffsetX, iPlayerY + iMapOffsetY, 3, 8));
 }
