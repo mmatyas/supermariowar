@@ -4227,6 +4227,8 @@ void MI_World::Init()
 	iTeleportStarAnimationTimer = 0;
 
 	fForceStageStart = false;
+	fNoInterestingMoves = false;
+	iSleepTurns = 0;
 }
 
 void MI_World::SetControllingTeam(short iTeamID)
@@ -4240,6 +4242,8 @@ void MI_World::SetControllingTeam(short iTeamID)
 		sprintf(szMessage, "Player %d Is In Control", game_values.teamids[iTeamID][0] + 1);
 	else
 		sprintf(szMessage, "Team %d Is In Control", iTeamID + 1);
+
+	fNoInterestingMoves = false;
 }
 
 void MI_World::SetCurrentStageToCompleted(short iWinningTeam)
@@ -4259,7 +4263,7 @@ void MI_World::SetCurrentStageToCompleted(short iWinningTeam)
 		tile->fAnimated = false; //Update with team completed sprite
 		tile->fCompleted = true;
 
-		game_values.tournament_scores[iWinningTeam].total += game_values.tourstops[tile->iType - 2]->iPoints;
+		game_values.tournament_scores[iWinningTeam].total += game_values.tourstops[tile->iType - 6]->iPoints;
 	}
 
 	AdvanceTurn();
@@ -4267,11 +4271,17 @@ void MI_World::SetCurrentStageToCompleted(short iWinningTeam)
 
 void MI_World::AdvanceTurn()
 {
-	g_worldmap.MoveVehicles();
+	if(iSleepTurns > 0)
+		iSleepTurns--;
+	else
+		g_worldmap.MoveVehicles();
+
 	g_worldmap.MoveBridges();
 
 	//Update the completed stage with team colored tile on the map
 	UpdateMapSurface();
+
+	fNoInterestingMoves = false;
 }
 
 void MI_World::Update()
@@ -4299,7 +4309,7 @@ void MI_World::Update()
 	if(fPlayerMoveDone)
 		RepositionMapImage();
 
-	if(fPlayerVehicleCollision || fPlayerMoveDone)
+	if(iSleepTurns <= 0 && (fPlayerVehicleCollision || fPlayerMoveDone))
 	{
 		short iStage = g_worldmap.GetVehicleInPlayerTile(&iVehicleId);
 		if(iStage >= 0)
@@ -4495,7 +4505,7 @@ void MI_World::Draw()
 	
 	SDL_BlitSurface(sMapSurface, rectSrcSurface, blitdest, rectDstSurface);
 
-	g_worldmap.Draw(iMapOffsetX, iMapOffsetY, iState != -2 && iState < 4);
+	g_worldmap.Draw(iMapOffsetX, iMapOffsetY, iState != -2 && iState < 4, iSleepTurns > 0);
 
 	if(iMessageTimer > 0)
 	{
@@ -4568,6 +4578,64 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 
 	short iPlayerState = g_worldmap.GetPlayerState();
 
+	//Handle AI movement
+	bool fNeedAiControl = false;
+	if(iState == -1 && iPlayerState == 0)
+	{
+		if(!fNoInterestingMoves)
+		{
+			fNeedAiControl = true;
+			for(short iTeamMember = 0; iTeamMember < game_values.teamcounts[iControllingTeam]; iTeamMember++)
+			{
+				if(game_values.playercontrol[game_values.teamids[iControllingTeam][iTeamMember]] == 1)
+				{
+					fNeedAiControl = false;
+					break;
+				}
+			}
+
+			if(fNeedAiControl)
+			{
+				short iPlayerCurrentTileX, iPlayerCurrentTileY;
+				g_worldmap.GetPlayerCurrentTile(&iPlayerCurrentTileX, &iPlayerCurrentTileY);
+				short iNextMove = g_worldmap.GetNextInterestingMove(iPlayerCurrentTileX, iPlayerCurrentTileY);
+
+				//Clear out all input from cpu controlled team
+				COutputControl * playerKeys = NULL;
+				for(short iTeamMember = 0; iTeamMember < game_values.teamcounts[iControllingTeam]; iTeamMember++)
+				{
+					playerKeys = &game_values.playerInput.outputControls[game_values.teamids[iControllingTeam][iTeamMember]];
+
+					playerKeys->menu_up.fPressed = false;
+					playerKeys->menu_down.fPressed = false;
+					playerKeys->menu_left.fPressed = false;
+					playerKeys->menu_right.fPressed = false;
+					playerKeys->menu_select.fPressed = false;
+					playerKeys->menu_random.fPressed = false;
+
+					if(iControllingTeam != 0)
+						playerKeys->menu_cancel.fPressed = false;
+
+				}
+				
+				playerKeys = &game_values.playerInput.outputControls[game_values.teamids[iControllingTeam][0]];
+
+				if(iNextMove == -1)
+					fNoInterestingMoves = true;
+				if(iNextMove == 0)
+					playerKeys->menu_up.fPressed = true;
+				else if(iNextMove == 1)
+					playerKeys->menu_down.fPressed = true;
+				else if(iNextMove == 2)
+					playerKeys->menu_left.fPressed = true;
+				else if(iNextMove == 3)
+					playerKeys->menu_right.fPressed = true;
+				else if(iNextMove == 4)
+					playerKeys->menu_select.fPressed = true;
+			}
+		}
+	}
+
 	for(short iPlayer = 0; iPlayer < 4; iPlayer++)
 	{
 		COutputControl * playerKeys = &game_values.playerInput.outputControls[iPlayer];
@@ -4592,7 +4660,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 				{
 					//Make sure there is a path connection and that there is no stage or vehicle blocking the way
 					if(tile->fConnection[0] && !g_worldmap.IsDoor(iPlayerCurrentTileX, iPlayerCurrentTileY - 1) &&
-						((tile->fCompleted && g_worldmap.GetVehicleInPlayerTile(&iTemp) == -1) || iReturnDirection == 0))
+						((tile->fCompleted && (g_worldmap.GetVehicleInPlayerTile(&iTemp) == -1 || iSleepTurns > 0)) || iReturnDirection == 0))
 					{
 						g_worldmap.MovePlayer(0);
 						iReturnDirection = 1;
@@ -4601,7 +4669,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 				else if(playerKeys->menu_down.fPressed)
 				{
 					if(tile->fConnection[1] && !g_worldmap.IsDoor(iPlayerCurrentTileX, iPlayerCurrentTileY + 1) &&
-						((tile->fCompleted && g_worldmap.GetVehicleInPlayerTile(&iTemp) == -1) || iReturnDirection == 1))
+						((tile->fCompleted && (g_worldmap.GetVehicleInPlayerTile(&iTemp) == -1 || iSleepTurns > 0)) || iReturnDirection == 1))
 					{
 						g_worldmap.MovePlayer(1);
 						iReturnDirection = 0;
@@ -4610,7 +4678,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 				else if(playerKeys->menu_left.fPressed)
 				{
 					if(tile->fConnection[2] && !g_worldmap.IsDoor(iPlayerCurrentTileX - 1, iPlayerCurrentTileY) &&
-						((tile->fCompleted && g_worldmap.GetVehicleInPlayerTile(&iTemp) == -1) || iReturnDirection == 2))
+						((tile->fCompleted && (g_worldmap.GetVehicleInPlayerTile(&iTemp) == -1 || iSleepTurns > 0)) || iReturnDirection == 2))
 					{
 						g_worldmap.MovePlayer(2);
 						iReturnDirection = 3;
@@ -4623,7 +4691,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 				else if(playerKeys->menu_right.fPressed)
 				{
 					if(tile->fConnection[3] && !g_worldmap.IsDoor(iPlayerCurrentTileX + 1, iPlayerCurrentTileY) &&
-						((tile->fCompleted && g_worldmap.GetVehicleInPlayerTile(&iTemp) == -1) || iReturnDirection == 3))
+						((tile->fCompleted && (g_worldmap.GetVehicleInPlayerTile(&iTemp) == -1 || iSleepTurns > 0)) || iReturnDirection == 3))
 					{
 						g_worldmap.MovePlayer(3);
 						iReturnDirection = 2;
@@ -4641,7 +4709,11 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 					if(iStage >= 0)
 					{
 						game_values.tourstopcurrent = iStage;
-						return MENU_CODE_WORLD_STAGE_START;
+						
+						if(fNeedAiControl)
+							return MENU_CODE_TOUR_STOP_CONTINUE_FORCED;
+						else
+							return MENU_CODE_WORLD_STAGE_START;
 					}
 
 					if(g_worldmap.GetWarpInPlayerTile(&iWarpCol, &iWarpRow))
@@ -4660,7 +4732,11 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 					if(iType >= 0 && !tile->fCompleted)
 					{
 						game_values.tourstopcurrent = iType;
-						return MENU_CODE_WORLD_STAGE_START;
+						
+						if(fNeedAiControl)
+							return MENU_CODE_TOUR_STOP_CONTINUE_FORCED;
+						else
+							return MENU_CODE_WORLD_STAGE_START;
 					}		
 				}
 			}
@@ -4729,6 +4805,12 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 						ifsoundonplay(sfx_collectpowerup);
 						fUsedItem = true;
 					}
+					else if(iPowerup == NUM_POWERUPS) //Music Box (put vehicles to sleep)
+					{
+						iSleepTurns = rand() % 4 + 2;
+						fUsedItem = true;
+						ifsoundonplay(sfx_switchpress);
+					}
 					else if(iPowerup == NUM_POWERUPS + 2) //Player Switch
 					{
 						short iPlayerTeam = LookupTeamID(iPlayer);
@@ -4738,6 +4820,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 							fUsedItem = true;
 							ifsoundonplay(sfx_switchpress);
 							iState = 6;
+							fNoInterestingMoves = false;
 						}
 					}
 					else if(iPowerup == NUM_POWERUPS + 3) //Advance Turn
@@ -4771,7 +4854,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 								uiMenu->AddEyeCandy(new EC_SingleAnimation(&spr_fireballexplosion, iPlayerX, iPlayerY + TILESIZE, 3, 8));
 
 							fUsedItem = true;
-
+							fNoInterestingMoves = false;
 						}
 					}
 
@@ -4803,8 +4886,8 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 				}
 			}
 			
-			if (playerKeys->menu_random.fPressed ||
-				(iPlayer != 0 && playerInput->inputControls[iPlayer]->iDevice == DEVICE_KEYBOARD && playerKeys->menu_cancel.fPressed))
+			if ((game_values.playercontrol[iPlayer] == 1 || fNoInterestingMoves) && (playerKeys->menu_random.fPressed ||
+				(iPlayer != 0 && playerInput->inputControls[iPlayer]->iDevice == DEVICE_KEYBOARD && playerKeys->menu_cancel.fPressed)))
 			{
 				if(iState == -1)
 				{

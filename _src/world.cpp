@@ -7,6 +7,8 @@ extern WorldMap g_worldmap;
 extern bool LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDirections);
 
 extern short g_iVersion[];
+using std::queue;
+using std::map;
 
 /**********************************
 * WorldMovingObject
@@ -197,7 +199,7 @@ void WorldVehicle::Init(short iCol, short iRow, short iAction, short iSprite, sh
 		iRectOffsetY = iDrawSprite * TILESIZE;
 	}
 
-	for(short iRect = 0; iRect < 4; iRect++)
+	for(short iRect = 0; iRect < 5; iRect++)
 		gfx_setrect(&srcRects[iRect], iRect * TILESIZE + iRectOffsetX, iRectOffsetY, 32, 32);
 
 	iNumMoves = 0;
@@ -305,10 +307,18 @@ bool WorldVehicle::Update()
 	return false;
 }
 
-void WorldVehicle::Draw(short iWorldOffsetX, short iWorldOffsetY)
+void WorldVehicle::Draw(short iWorldOffsetX, short iWorldOffsetY, bool fVehiclesSleeping)
 {
-	SDL_Rect rDst = {ix + iWorldOffsetX + iPaceOffset, iy + iWorldOffsetY, 32, 32};
-	SDL_BlitSurface(spr_worldvehicle.getSurface(), &srcRects[iDrawDirection + iAnimationFrame], blitdest, &rDst);
+	if(fVehiclesSleeping)
+	{
+		SDL_Rect rDst = {ix + iWorldOffsetX, iy + iWorldOffsetY, 32, 32};
+		SDL_BlitSurface(spr_worldvehicle.getSurface(), &srcRects[4], blitdest, &rDst);
+	}
+	else
+	{
+		SDL_Rect rDst = {ix + iWorldOffsetX + iPaceOffset, iy + iWorldOffsetY, 32, 32};
+		SDL_BlitSurface(spr_worldvehicle.getSurface(), &srcRects[iDrawDirection + iAnimationFrame], blitdest, &rDst);
+	}
 }
 
 
@@ -443,6 +453,10 @@ bool WorldMap::Load()
 				tile->iBackgroundSprite = atoi(psz);
 				tile->iBackgroundStyle = 0;
 				tile->fAnimated = tile->iBackgroundSprite == 0 || (tile->iBackgroundSprite >= 2 && tile->iBackgroundSprite <= 27);
+				
+				tile->iID = iMapTileReadRow * iWidth + iMapTileReadCol;
+				tile->iCol = iMapTileReadCol;
+				tile->iRow = iMapTileReadRow;
 				
 				psz = strtok(NULL, ",\n");
 			}
@@ -999,14 +1013,14 @@ bool WorldMap::Update(bool * fPlayerVehicleCollision)
 	return fPlayerDoneMove;
 }
 
-void WorldMap::Draw(short iMapOffsetX, short iMapOffsetY, bool fDrawPlayer)
+void WorldMap::Draw(short iMapOffsetX, short iMapOffsetY, bool fDrawPlayer, bool fVehiclesSleeping)
 {
 	for(short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++)
 	{
 		if(!vehicles[iVehicle].fEnabled)
 			continue;
 
-		vehicles[iVehicle].Draw(iMapOffsetX, iMapOffsetY);
+		vehicles[iVehicle].Draw(iMapOffsetX, iMapOffsetY, fVehiclesSleeping);
 	}
 
 	if(fDrawPlayer)
@@ -1371,3 +1385,152 @@ short WorldMap::UseKey(short iKeyType, short iCol, short iRow)
 
 	return iDoorsOpened;
 }
+
+//Implements breadth first search to find a stage or vehicle of interest
+short WorldMap::GetNextInterestingMove(short iCol, short iRow)
+{
+	WorldMapTile * currentTile = &tiles[iCol][iRow];
+
+	if((currentTile->iType >= 6 && !currentTile->fCompleted) || NumVehiclesInTile(iCol, iRow) > 0)
+		return 4; //Signal to press select on this tile
+
+	short iCurrentId = currentTile->iID;
+	
+	std::queue<WorldMapTile*> next;
+	std::map<short, short> visitedTiles;
+	visitedTiles[currentTile->iID] = -1;
+	next.push(currentTile);
+
+	while (!next.empty()) 
+	{
+		WorldMapTile * tile = next.front();
+		
+		if(tile == NULL)
+			return -1;
+
+		next.pop();
+
+		if((tile->iType >= 6 && !tile->fCompleted) || NumVehiclesInTile(tile->iCol, tile->iRow) > 0)
+		{
+			short iBackTileDirection = visitedTiles[tile->iID];
+			short iBackTileId = tile->iID;
+
+			while(true)
+			{
+				if(iBackTileDirection == 0)
+					iBackTileId -= iWidth;
+				else if(iBackTileDirection == 1)
+					iBackTileId += iWidth;
+				else if(iBackTileDirection == 2)
+					iBackTileId -= 1;
+				else if(iBackTileDirection == 3)
+					iBackTileId += 1;
+				else if(iBackTileDirection == 4)
+				{
+					short iWarpCol, iWarpRow;
+					short iCol = iBackTileId % iWidth;
+					short iRow = iBackTileId / iWidth;
+
+					warps[tiles[iCol][iRow].iWarp].GetOtherSide(iCol, iRow, &iWarpCol, &iWarpRow);
+					iBackTileId = tiles[iWarpCol][iWarpRow].iID;
+				}
+
+				if(iBackTileId == iCurrentId)
+				{
+					if(iBackTileDirection == 0 || iBackTileDirection == 1)
+						return 1 - iBackTileDirection;
+					else if(iBackTileDirection == 2 || iBackTileDirection == 3)
+						return 5 - iBackTileDirection;
+					else 
+						return iBackTileDirection;				
+				}
+
+				iBackTileDirection = visitedTiles[iBackTileId];
+			}
+		}
+
+		for(short iNeighbor = 0; iNeighbor < 4; iNeighbor++)
+		{
+			if(tile->fConnection[iNeighbor])
+			{
+				if(iNeighbor == 0 && tile->iRow > 0)
+				{
+					WorldMapTile * topTile = &tiles[tile->iCol][tile->iRow - 1];
+
+					//Stop at door tiles
+					if(topTile->iType >= 2 && topTile->iType <= 5)
+						continue;
+
+					if(visitedTiles.find(topTile->iID) == visitedTiles.end())
+					{
+						visitedTiles[topTile->iID] = 1;
+						next.push(topTile);
+					}
+				}
+				else if(iNeighbor == 1 && tile->iRow < iHeight - 1)
+				{
+					WorldMapTile * bottomTile = &tiles[tile->iCol][tile->iRow + 1];
+
+					//Stop at door tiles
+					if(bottomTile->iType >= 2 && bottomTile->iType <= 5)
+						continue;
+
+					if(visitedTiles.find(bottomTile->iID) == visitedTiles.end())
+					{
+						visitedTiles[bottomTile->iID] = 0;
+						next.push(bottomTile);
+					}
+				}
+				else if(iNeighbor == 2 && tile->iCol > 0)
+				{
+					WorldMapTile * leftTile = &tiles[tile->iCol - 1][tile->iRow];
+
+					//Stop at door tiles
+					if(leftTile->iType >= 2 && leftTile->iType <= 5)
+						continue;
+
+					if(visitedTiles.find(leftTile->iID) == visitedTiles.end())
+					{
+						visitedTiles[leftTile->iID] = 3;
+						next.push(leftTile);
+					}
+				}
+				else if(iNeighbor == 3 && tile->iCol < iWidth - 1)
+				{
+					WorldMapTile * rightTile = &tiles[tile->iCol + 1][tile->iRow];
+
+					//Stop at door tiles
+					if(rightTile->iType >= 2 && rightTile->iType <= 5)
+						continue;
+
+					if(visitedTiles.find(rightTile->iID) == visitedTiles.end())
+					{
+						visitedTiles[rightTile->iID] = 2;
+						next.push(rightTile);
+					}
+				}
+			}
+
+			if(tile->iWarp >= 0)
+			{
+				short iWarpCol, iWarpRow;
+				warps[tile->iWarp].GetOtherSide(tile->iCol, tile->iRow, &iWarpCol, &iWarpRow);
+
+				WorldMapTile * warpTile = &tiles[iWarpCol][iWarpRow];
+
+				//Stop at door tiles
+				if(warpTile->iType >= 2 && warpTile->iType <= 5)
+					continue;
+
+				if(visitedTiles.find(warpTile->iID) == visitedTiles.end())
+				{
+					visitedTiles[warpTile->iID] = 4;
+					next.push(warpTile);
+				}
+			}
+		}
+	}
+
+	return -1;
+}
+

@@ -1,10 +1,15 @@
 #ifndef __WORLD_H_
 #define __WORLD_H_
 
+#include <queue>
+
 class MI_World;
 
 struct WorldMapTile
 {
+	//Id is used for searching for AI
+	short iID;
+
 	short iType;
 	short iBackgroundStyle;
 	short iBackgroundSprite;
@@ -17,6 +22,9 @@ struct WorldMapTile
 
 	bool fCompleted;
 	bool fAnimated;
+
+	short iCol;
+	short iRow;
 };
 
 class WorldMovingObject
@@ -28,7 +36,7 @@ class WorldMovingObject
 		void Init(short iCol, short iRow, short iSprite, short iInitialDirection);
 		virtual void Move(short iDirection);
 		virtual bool Update();
-		virtual void Draw(short iWorldOffsetX, short iWorldOffsetY) = 0;
+		void Draw(short iWorldOffsetX, short iWorldOffsetY);
 		void FaceDirection(short iDirection);
 		void SetPosition(short iCol, short iRow);
 
@@ -77,13 +85,13 @@ class WorldVehicle : public WorldMovingObject
 		void Move();
 		
 		bool Update();
-		void Draw(short iWorldOffsetX, short iWorldOffsetY);
+		void Draw(short iWorldOffsetX, short iWorldOffsetY, bool fVehiclesSleeping);
 
 	private:
 
 		void SetNextDest();
 					
-		SDL_Rect srcRects[4];
+		SDL_Rect srcRects[5];
 
 		short iMinMoves;
 		short iMaxMoves;
@@ -132,7 +140,7 @@ class WorldMap
 		void InitPlayer();
 
 		bool Update(bool * fPlayerVehicleCollision);
-		void Draw(short iMapOffsetX, short iMapOffsetY, bool fDrawPlayer);
+		void Draw(short iMapOffsetX, short iMapOffsetY, bool fDrawPlayer, bool fVehiclesSleeping);
 		void DrawMapToSurface(bool fInit, SDL_Surface * surface, short iMapDrawOffsetCol, short iMapDrawOffsetRow, short iAnimationFrame);
 
 		void SetPlayerSprite(short iPlayerSprite);
@@ -162,6 +170,8 @@ class WorldMap
 
 		bool IsDoor(short iCol, short iRow);
 		short UseKey(short iKeytype, short iCol, short iRow);
+
+		short GetNextInterestingMove(short iCol, short iRow);
 
 	private:
 

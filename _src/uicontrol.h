@@ -953,6 +953,9 @@ class MI_World : public UI_Control
 		short iTeleportStarAnimationFrame;
 		short iTeleportStarAnimationTimer;
 
+		bool fNoInterestingMoves;
+
+		short iSleepTurns;
 };
 
 
