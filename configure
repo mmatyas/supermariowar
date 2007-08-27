@@ -54,6 +54,14 @@ echo 'LDFLAGS:=$(LDFLAGS) '`sdl-config --libs` $LDFLAGS -lSDL_image -lSDL_mixer 
 echo 'COMMON_OBJS:=$(COMMON_OBJS) build/linfunc.o' >> configuration
 fi
 
+# SkyOS configuration 
+if [ "`uname`" = skyos ] 
+then 
+echo 'CFLAGS:=$(CFLAGS) -DPREFIXPATH=\"/usr/share/smw\" '`sdl-config --cflags` $CFLAGS >> configuration 
+echo 'LDFLAGS:=$(LDFLAGS) '`sdl-config --libs` $LDFLAGS -lSDL_image -lSDL_mixer -lpng >> configuration 
+echo 'COMMON_OBJS:=$(COMMON_OBJS) build/linfunc.o' >> configuration 
+fi
+
 # Windows configuration
 if uname | grep MINGW32
 then
