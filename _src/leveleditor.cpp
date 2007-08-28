@@ -415,7 +415,7 @@ int main(int argc, char *argv[])
 
 	printf("\n---------------- save map ----------------\n");
 
-	g_map.saveMap(convertPath("maps/ZZleveleditor.map"));
+	save_map(convertPath("maps/ZZleveleditor.map"));
 	g_map.saveTileSet(convertPath("maps/tileset.tls"));
 
 

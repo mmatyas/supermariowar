@@ -807,10 +807,10 @@ class OMO_Podobo : public IO_MovingObject
 		void collide(IO_MovingObject * object);
 
 		short iPlayerID;
+		short iTeamID;
 
 	private:
 		
-		short iTeamID;
 		short iColorOffsetY;
 
 };
@@ -1309,6 +1309,7 @@ class CO_Shell : public MO_CarriedObject
 		bool fKillBouncePlayer;
 
 		short iDeathTime;
+		short iNoOwnerKillTime;
 		
 		short iColorOffsetY;
 		short iBounceCounter;
@@ -1354,6 +1355,7 @@ class CO_ThrowBlock : public MO_CarriedObject
 		short iDeathTime;
 		bool fSuper;
 		short iBounceCounter;
+		short iNoOwnerKillTime;
 
 	friend class CPlayer;
 	friend class OMO_Explosion;

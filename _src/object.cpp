@@ -1724,6 +1724,14 @@ bool B_ThrowBlock::hittop(CPlayer * player, bool useBehavior)
 {
 	if(useBehavior)
 	{
+		player->yf((float)(iposy - PH) - 0.2f);
+		player->fOldY = player->fy;
+		player->inair = false;
+		player->fallthrough = false;
+		player->killsinrowinair = 0;
+		player->featherjump = 0;
+		player->vely = GRAVITATION;
+
 		if(player->PressedAcceptItemKey() && player->IsAcceptingItem())
 		{
 			GiveBlockToPlayer(player);
@@ -1731,13 +1739,6 @@ bool B_ThrowBlock::hittop(CPlayer * player, bool useBehavior)
 		}
 		else
 		{
-			player->yf((float)(iposy - PH) - 0.2f);
-			player->fOldY = player->fy;
-			player->inair = false;
-			player->fallthrough = false;
-			player->killsinrowinair = 0;
-			player->featherjump = 0;
-			player->vely = GRAVITATION;
 			return false;
 		}
 	}
@@ -1749,6 +1750,12 @@ bool B_ThrowBlock::hitright(CPlayer * player, bool useBehavior)
 {
 	if(useBehavior)
 	{
+		player->xf((float)(iposx + iw) + 0.2f);
+		player->fOldX = player->fx;
+
+		if(player->velx < 0.0f)
+			player->velx = 0.0f;
+
 		if(player->IsAcceptingItem())
 		{
 			GiveBlockToPlayer(player);
@@ -1756,12 +1763,6 @@ bool B_ThrowBlock::hitright(CPlayer * player, bool useBehavior)
 		}
 		else
 		{
-			player->xf((float)(iposx + iw) + 0.2f);
-			player->fOldX = player->fx;
-
-			if(player->velx < 0.0f)
-				player->velx = 0.0f;
-
 			return false;
 		}
 	}
@@ -1773,6 +1774,12 @@ bool B_ThrowBlock::hitleft(CPlayer * player, bool useBehavior)
 {
 	if(useBehavior)
 	{
+		player->xf((float)(iposx - PW) - 0.2f);
+		player->fOldX = player->fx;
+
+		if(player->velx > 0.0f)
+			player->velx = 0.0f;
+
 		if(player->IsAcceptingItem())
 		{
 			GiveBlockToPlayer(player);
@@ -1780,12 +1787,6 @@ bool B_ThrowBlock::hitleft(CPlayer * player, bool useBehavior)
 		}
 		else
 		{
-			player->xf((float)(iposx - PW) - 0.2f);
-			player->fOldX = player->fx;
-
-			if(player->velx > 0.0f)
-				player->velx = 0.0f;
-
 			return false;
 		}
 	}
@@ -4728,7 +4729,7 @@ void OMO_BulletBill::HomeToNearestPlayer()
 	int iDistance = 640000;
 	for(short k = 0; k < list_players_cnt; k++)
 	{
-		if(list_players[k]->globalID == iPlayerID)
+		if(list_players[k]->teamID == iTeamID)
 			continue;
 
 		if(list_players[k]->isready())
@@ -7402,6 +7403,7 @@ CO_Shell::CO_Shell(short type, short x, short y, bool dieOnMovingPlayerCollision
 	iColorOffsetY = type * 32;
 
 	iKillCounter = 0;
+	iNoOwnerKillTime = 0;
 }
 
 bool CO_Shell::collide(CPlayer * player)
@@ -7547,10 +7549,8 @@ bool CO_Shell::HitOther(CPlayer * player)
 		else if(ix + iw < 320 && player->ix > 320)
 			flipx = -640;
 
-		if((player->ix + HALFPW + flipx >= ix + (iw >> 1) && velx > 0.0f) || (player->ix + HALFPW + flipx < ix + (iw >> 1) && velx < 0.0f))
-		{
+		if(iNoOwnerKillTime == 0 || player->globalID != playerID || player->ix + HALFPW + flipx >= ix + (iw >> 1) && velx > 0.0f || player->ix + HALFPW + flipx < ix + (iw >> 1) && velx < 0.0f)
 			return KillPlayer(player);
-		}
 	}
 	else if(state == 3)  //Holding
 	{
@@ -7663,6 +7663,9 @@ void CO_Shell::collide(IO_MovingObject * object)
 
 void CO_Shell::update()
 {
+	if(iNoOwnerKillTime > 0)
+		iNoOwnerKillTime--;
+
 	if(state == 1)
 	{
 		if(game_values.shellttl > 0 && ++iDeathTime >= game_values.shellttl)
@@ -7791,6 +7794,7 @@ void CO_Shell::Kick(bool superkick)
 	playerID = owner->globalID;
 
 	owner = NULL;
+	iNoOwnerKillTime = 30;
 
 	state = 1;
 	
@@ -7856,6 +7860,7 @@ CO_ThrowBlock::CO_ThrowBlock(gfxSprite * nspr, short x, short y, bool superblock
 
 	iDeathTime = 0;
 	iBounceCounter = 0;
+	iNoOwnerKillTime = 0;
 }
 
 bool CO_ThrowBlock::collide(CPlayer * player)
@@ -7909,7 +7914,7 @@ bool CO_ThrowBlock::HitOther(CPlayer * player)
 		else if(ix + iw < 320 && player->ix > 320)
 			flipx = -640;
 
-		if((player->ix + flipx > ix && velx > 0.0f) || (player->ix + flipx <= ix && velx < 0.0f))
+		if(iNoOwnerKillTime == 0 || player->globalID != playerID || player->ix + flipx > ix && velx > 0.0f || player->ix + flipx <= ix && velx < 0.0f)
 		{
 			return KillPlayer(player);
 		}
@@ -7991,6 +7996,9 @@ void CO_ThrowBlock::collide(IO_MovingObject * object)
 
 void CO_ThrowBlock::update()
 {
+	if(iNoOwnerKillTime > 0)
+		iNoOwnerKillTime--;
+
 	if(game_values.blueblockttl > 0 && ++iDeathTime >= game_values.blueblockttl)
 	{
 		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix, iy, 3, 8));
@@ -8066,6 +8074,7 @@ void CO_ThrowBlock::Kick(bool superkick)
 	playerID = owner->globalID;
 
 	owner = NULL;
+	iNoOwnerKillTime = 30;
 
 	state = 1;
 	ifsoundonplay(sfx_kicksound);
