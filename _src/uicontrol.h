@@ -692,9 +692,11 @@ class MI_TournamentScoreboard : public UI_Control
 		void Update();
 		void Draw();
 
-		void CreateScoreboard(short numTeams, short numGames, gfxSprite * spr_icons, bool tour);
-		void RefreshScores();
-		void RefreshScores(short gameWinner);
+		void CreateScoreboard(short numTeams, short numGames, gfxSprite * spr_icons);
+		void RefreshWorldScores(short gameWinner);
+		void RefreshTourScores();
+		void RefreshTournamentScores(short gameWinner);
+		void DetermineScoreboardWinners();
 		void StopSwirl();
 
 	private:
@@ -704,7 +706,6 @@ class MI_TournamentScoreboard : public UI_Control
 		float GetIconSpacing() {return (float)(372 - iNumGames * 32) / (float)(iNumGames + 1);}
 
 		bool fCreated;
-		bool fTour;
 
 		MI_Image ** miTeamImages;
 		MI_Image *** miIconImages;
@@ -732,6 +733,8 @@ class MI_TournamentScoreboard : public UI_Control
 		MI_ScoreText * tourPoints[10];
 		MI_Image * miTourPointBar;
 		MI_Image * tourBonus[10];
+
+		MI_Image * worldBonus[4];
 };
 
 class MI_BonusWheel : public UI_Control

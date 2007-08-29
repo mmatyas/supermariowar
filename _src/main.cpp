@@ -703,6 +703,7 @@ int main(int argc, char *argv[])
 	game_values.pointspeed			= 20;
 	game_values.swapstyle			= 1;	//Blink then swap
 	game_values.secrets				= true; //enable secrets by default
+	game_values.worldpointsbonus	= -1; //no world multiplier until player uses item to boost it
 
 	game_values.pfFilters			= new bool[NUM_AUTO_FILTERS + filterslist.GetCount()];
 	game_values.piFilterIcons		= new short[NUM_AUTO_FILTERS + filterslist.GetCount()];

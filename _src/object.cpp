@@ -3025,9 +3025,7 @@ void PU_TreasureChestBonus::update()
 	else if (state == 4)
 	{
 		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix, drawbonusitemy, 3, 8));
-
 		dead = true;
-		game_values.noexit = false;
 	}
 }
 
@@ -3065,6 +3063,8 @@ bool PU_TreasureChestBonus::collide(CPlayer * player)
 		drawbonusitemtimer = 60;
 
 		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix, iy, 3, 8));
+
+		game_values.noexit = false;
 	}
 
 	return false;
@@ -3434,7 +3434,7 @@ bool MO_SuperFireball::collide(CPlayer * player)
 
 				if(killer)
 				{
-					PlayerKilledPlayer(*killer, *player, death_style_jump, kill_style_hammer);
+					PlayerKilledPlayer(*killer, *player, death_style_jump, kill_style_fireball);
 				}
 				else
 				{

@@ -1,14 +1,11 @@
 #Version
-1.7.0.5
+1.8.0.0
 
 #Icon
 75
 
 #Maps
-0000platformtest2
-0smw
-Breakaway
-Cloud Garden
-Danger Canyon
-Up In The Hills
-Vanilla dome
+Sunny hills
+Wolkje
+Wood Pit
+Yoshisisland

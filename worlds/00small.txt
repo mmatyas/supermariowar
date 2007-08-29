@@ -57,7 +57,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 0,0,0,0,0,0,0,1,0,0,0,0,0,0,0
 0,0,0,0,0,0,0,6,0,0,0,0,0,0,0
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,8,0,0,0,0,0,0,0
 0,0,0,0,3,0,0,0,0,0,0,0,0,0,0
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
@@ -66,9 +66,9 @@
 #Stages
 #Map,Mode,Goal,Points,Bonus,Name,End World, then mode settings (see sample tour file for details)
 3
-0smw,16,5,1,20,1st Stop,0,1,5,0,8,4,1
+0smw,16,5,3,20,1st Stop,0,1,5,0,8,4,1
 Treefort,15,3,1,12,2nd Stop,1,3,310,0,2,1,1,0,0,1,0,0,1,0,0,0
-Mountain waterfall,14,200,1,0,mountain waterfall,0
+Mountain waterfall,14,10,1,0,mountain waterfall,0
 
 #Warps
 #location 1 x, y, location 2 x, y

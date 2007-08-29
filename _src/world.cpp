@@ -1113,7 +1113,7 @@ void WorldMap::DrawMapToSurface(bool fInit, SDL_Surface * surface, short iMapDra
 				}
 				else if(iForegroundSprite >= WORLD_WINNING_TEAM_SPRITE_OFFSET && iForegroundSprite <= WORLD_WINNING_TEAM_SPRITE_OFFSET + 3)
 				{
-					SDL_Rect rSrc = {(iForegroundSprite - WORLD_WINNING_TEAM_SPRITE_OFFSET + 15) << 5, 32, TILESIZE, TILESIZE};
+					SDL_Rect rSrc = {(iForegroundSprite - WORLD_WINNING_TEAM_SPRITE_OFFSET + 14) << 5, 32, TILESIZE, TILESIZE};
 					SDL_BlitSurface(spr_worldforeground.getSurface(), &rSrc, surface, &r);
 				}
 				else if(iForegroundSprite >= WORLD_BRIDGE_SPRITE_OFFSET && iForegroundSprite <= WORLD_BRIDGE_SPRITE_OFFSET + 3)

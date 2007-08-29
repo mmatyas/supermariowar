@@ -699,6 +699,8 @@ struct gv
 	short		worldpowerups[4][32];
 	short		worldpowerupcount[4];
 
+	short		worldpointsbonus;
+
 	short		teamids[4][3];
 	short		teamcounts[4];
 	short		skinids[4];

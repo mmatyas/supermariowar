@@ -2249,11 +2249,11 @@ void Menu::RunMenu()
 		}
 
 		UpdateScoreBoard();
-		miTournamentScoreboard->RefreshScores();
+		miTournamentScoreboard->RefreshWorldScores(game_values.gamemode->winningteam);
 	}
 	else if(game_values.matchtype == MATCH_TYPE_TOUR)
 	{
-		miTournamentScoreboard->RefreshScores();
+		miTournamentScoreboard->RefreshTourScores();
 
 		if(game_values.tourstopcurrent < game_values.tourstoptotal)
 			miTourStop->Refresh(game_values.tourstopcurrent);
@@ -2262,7 +2262,7 @@ void Menu::RunMenu()
 	{
 		miTournamentScoreboard->StopSwirl();
 		if(game_values.gamemode->winningteam > -1)
-			miTournamentScoreboard->RefreshScores(game_values.gamemode->winningteam);
+			miTournamentScoreboard->RefreshTournamentScores(game_values.gamemode->winningteam);
 	}
 
 	//Reset game mode back to the current game mode in case we came from boss mode
@@ -2578,12 +2578,12 @@ void Menu::RunMenu()
 					}
 					else
 					{
-						miTournamentScoreboard->CreateScoreboard(score_cnt, game_values.tourstoptotal, &spr_tour_markers, true);
+						miTournamentScoreboard->CreateScoreboard(score_cnt, game_values.tourstoptotal, &spr_tour_markers);
 					}
 				}
 				else if(game_values.matchtype == MATCH_TYPE_TOURNAMENT)
 				{
-					miTournamentScoreboard->CreateScoreboard(score_cnt, game_values.tournamentgames, &menu_mode_large, false);
+					miTournamentScoreboard->CreateScoreboard(score_cnt, game_values.tournamentgames, &menu_mode_large);
 				}
 				else if(game_values.matchtype == MATCH_TYPE_WORLD)
 				{
@@ -2595,7 +2595,7 @@ void Menu::RunMenu()
 					}
 					else
 					{
-						miTournamentScoreboard->CreateScoreboard(score_cnt, 0, &spr_tour_markers, true);
+						miTournamentScoreboard->CreateScoreboard(score_cnt, 0, &spr_tour_markers);
 
 						for(short iPlayer = 0; iPlayer < 4; iPlayer++)
 						{
@@ -2604,7 +2604,7 @@ void Menu::RunMenu()
 							game_values.storedpowerups[iPlayer] = -1;
 
 							for(short iItem = 0; iItem < game_values.worldpowerupcount[iPlayer]; iItem++)
-								game_values.worldpowerups[iPlayer][iItem] = rand() % NUM_POWERUPS + 9;
+								game_values.worldpowerups[iPlayer][iItem] = rand() % NUM_POWERUPS + 15;
 						}
 
 						miWorld->Init();
@@ -2677,7 +2677,7 @@ void Menu::RunMenu()
 				{
 					if(game_values.tournamentwinner == -2 || game_values.tournamentwinner > -1) //If world is over then return back to main menu
 						ResetTournamentBackToMainMenu();
-					else 
+					else
 						mCurrentMenu = &mWorldMenu;
 				}
 				else
