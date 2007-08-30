@@ -80,13 +80,18 @@ void SetupScoreBoard(bool fOrderMatters)
 
 	if(game_values.matchtype == MATCH_TYPE_WORLD && game_values.gamemode->winningteam > -1)
 	{
-		short iBonusType = game_values.tourstops[game_values.tourstopcurrent]->iBonusType;
+		TourStop * tourStop = game_values.tourstops[game_values.tourstopcurrent];
+		short iNumBonuses = tourStop->iNumBonuses;
 
-		if(iBonusType > 0)
+		for(short iBonus = 0; iBonus < iNumBonuses; iBonus++)
 		{
-			objectcollisionitems.add(new PU_TreasureChestBonus(&spr_bonuschest, 1, 32000, 30, 30, 1, 1, iBonusType == 1 ? rand() % NUM_POWERUPS : iBonusType - 2));
-			game_values.noexittimer = 310;
-			game_values.noexit = true;
+			if(tourStop->wsbBonuses[iBonus].iWinnerPlace == 0)
+			{
+				short iBonusType = tourStop->wsbBonuses[iBonus].iBonus;
+				objectcollisionitems.add(new PU_TreasureChestBonus(&spr_bonuschest, 1, 32000, 30, 30, 1, 1, iBonusType));
+				game_values.noexittimer = 0;
+				game_values.noexit = false;
+			}
 		}
 	}
 }

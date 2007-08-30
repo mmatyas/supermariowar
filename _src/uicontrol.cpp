@@ -4931,9 +4931,16 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 					}
 					else if(iPowerup == NUM_POWERUPS + 3) //Advance Turn
 					{
-						AdvanceTurn();
-						fUsedItem = true;
-						ifsoundonplay(sfx_switchpress);
+						short iDestX, iDestY;
+						g_worldmap.GetPlayerDestTile(&iDestX, &iDestY);
+						short iSprite = g_worldmap.tiles[iDestX][iDestY].iForegroundSprite;
+
+						if(iSprite < WORLD_BRIDGE_SPRITE_OFFSET || iSprite > WORLD_BRIDGE_SPRITE_OFFSET + 3)
+						{
+							AdvanceTurn();
+							fUsedItem = true;
+							ifsoundonplay(sfx_switchpress);
+						}
 					}
 					else if(iPowerup >= NUM_POWERUPS + 5 && iPowerup <= NUM_POWERUPS + 8) //Door Keys
 					{

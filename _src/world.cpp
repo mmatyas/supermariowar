@@ -679,13 +679,43 @@ bool WorldMap::Load()
 			if(++iCurrentVehicle >= iNumVehicles)
 				iReadType = 13;
 		}
+		else if(iReadType == 13) //initial bonus items
+		{
+			char * psz = strtok(buffer, ",\n");
+
+			iNumInitialBonuses = 0;
+
+			while(psz != NULL)
+			{
+				//0 indicates no initial bonuses
+				if(psz[0] == '0')
+					break;
+
+				short iBonusOffset = 0;
+				if(psz[0] == 'w' || psz[0] == 'W')
+					iBonusOffset += NUM_POWERUPS;
+
+				psz++;
+
+				short iBonus = atoi(psz) + iBonusOffset;
+
+				if(iNumInitialBonuses < 32)
+					iInitialBonuses[iNumInitialBonuses++] = iBonus;
+				else
+					iInitialBonuses[31] = iBonus;
+
+				psz = strtok(NULL, ",\n");
+			}
+
+			iReadType = 14;
+		}
 	}
 
 RETURN:
 
 	fclose(file);
 
-	return iReadType == 13;
+	return iReadType == 14;
 }
 
 void WorldMap::SetTileConnections(short iCol, short iRow)
@@ -836,7 +866,7 @@ bool WorldMap::Save(const char * szPath)
 	fprintf(file, "\n");
 
 	fprintf(file, "#Stages\n");
-	fprintf(file, "#Map,Mode,Goal,Points,Bonus,Name,End World, then mode settings (see sample tour file for details)\n");
+	fprintf(file, "#Map,Mode,Goal,Points,Bonus List(Max 10),Name,End World, then mode settings (see sample tour file for details)\n");
 
 	fprintf(file, "%d\n", game_values.tourstoptotal);
 
@@ -877,6 +907,25 @@ bool WorldMap::Save(const char * szPath)
 		fprintf(file, "%d,", vehicles[iVehicle].iMaxMoves);
 		fprintf(file, "%d,", vehicles[iVehicle].fSpritePaces);
 		fprintf(file, "%d\n", vehicles[iVehicle].iDrawDirection);
+	}
+	fprintf(file, "\n");
+
+	fprintf(file, "#Initial Items\n");
+
+	for(short iItem = 0; iItem < iNumInitialBonuses; iItem++)
+	{
+		if(iItem != 0)
+			fprintf(file, ",");
+
+		short iBonus = iInitialBonuses[iItem];
+		char cBonusType = 'p';
+		if(iBonus >= NUM_POWERUPS)
+		{
+			iBonus -= NUM_POWERUPS;
+			cBonusType = 'w';
+		}
+
+		fprintf(file, "%c%d", cBonusType, iBonus);
 	}
 	fprintf(file, "\n");
 
@@ -1198,6 +1247,12 @@ void WorldMap::GetPlayerCurrentTile(short * iPlayerCurrentTileX, short * iPlayer
 {
 	*iPlayerCurrentTileX = player.iCurrentTileX;
 	*iPlayerCurrentTileY = player.iCurrentTileY;
+}
+
+void WorldMap::GetPlayerDestTile(short * iPlayerDestTileX, short * iPlayerDestTileY)
+{
+	*iPlayerDestTileX = player.iDestTileX;
+	*iPlayerDestTileY = player.iDestTileY;
 }
 
 short WorldMap::GetPlayerState()
@@ -1534,3 +1589,13 @@ short WorldMap::GetNextInterestingMove(short iCol, short iRow)
 	return -1;
 }
 
+void WorldMap::SetInitialPowerups()
+{
+	for(short iTeam = 0; iTeam < 4; iTeam++)
+	{
+		game_values.worldpowerupcount[iTeam] = iNumInitialBonuses;
+
+		for(short iItem = 0; iItem < iNumInitialBonuses; iItem++)
+			game_values.worldpowerups[iTeam][iItem] = iInitialBonuses[iItem];
+	}
+}

@@ -449,7 +449,7 @@ void CleanDeadPlayers()
 		}
 	}
 
-	if(fCheckForGameOver && (game_values.matchtype != MATCH_TYPE_WORLD || game_values.tourstops[game_values.tourstopcurrent]->iBonusType > 0))
+	if(fCheckForGameOver)
 	{
 		short lastteam = -1;
 		if(!game_values.gamemode->gameover && CountAliveTeams(&lastteam) <= 1)
@@ -2815,6 +2815,23 @@ void UpdateScoreBoard()
 				if(game_values.tournament_scores[iMyScore].total > game_values.tournament_scores[iTheirScore].total)
 				{
 					game_values.tournament_scores[iTheirScore].wins++;
+				}
+			}
+		}
+
+		//Give players the item bonuses that were won
+		TourStop * tourStop = game_values.tourstops[game_values.tourstopcurrent];
+
+		for(short iScore = 0; iScore < score_cnt; iScore++)
+		{
+			for(short iBonus = 0; iBonus < tourStop->iNumBonuses; iBonus++)
+			{
+				if(tourStop->wsbBonuses[iBonus].iWinnerPlace == score[iScore]->place)
+				{
+					if(game_values.worldpowerupcount[iScore] < 32)
+						game_values.worldpowerups[iScore][game_values.worldpowerupcount[iScore]++] = tourStop->wsbBonuses[iBonus].iBonus;
+					else
+						game_values.worldpowerups[iScore][31] = tourStop->wsbBonuses[iBonus].iBonus;	
 				}
 			}
 		}

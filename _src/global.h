@@ -608,6 +608,13 @@ struct GameModeSettings
 	SurvivalGameModeSettings survival;
 };
 
+struct WorldStageBonus
+{
+	short iWinnerPlace;
+	short iBonus;
+	char szBonusString[8];
+};
+
 struct TourStop
 {
 	const char * pszMapFile;
@@ -616,7 +623,10 @@ struct TourStop
 	short iPoints;
 	short iBonusType;
 	char szName[128];
+	
 	bool fEndStage;
+	short iNumBonuses;
+	WorldStageBonus wsbBonuses[10];
 
 	bool fUseSettings;
 	GameModeSettings gmsSettings;

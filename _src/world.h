@@ -152,6 +152,8 @@ class WorldMap
 		void SetPlayerPosition(short iPlayerCol, short iPlayerRow);
 
 		void GetPlayerCurrentTile(short * iPlayerCurrentTileX, short * iPlayerCurrentTileY);
+		void GetPlayerDestTile(short * iPlayerDestTileX, short * iPlayerDestTileY);
+
 		short GetPlayerState();
 
 		short GetVehicleInPlayerTile(short * iVehicleIndex);
@@ -173,6 +175,8 @@ class WorldMap
 
 		short GetNextInterestingMove(short iCol, short iRow);
 
+		void SetInitialPowerups();
+
 	private:
 
 		void Cleanup();
@@ -190,6 +194,9 @@ class WorldMap
 		WorldPlayer player;
 		WorldVehicle * vehicles;
 		WorldWarp * warps;
+
+		short iNumInitialBonuses;
+		short iInitialBonuses[32];
 
 	friend class MI_World;
 	friend class WorldVehicle;

@@ -3052,10 +3052,10 @@ bool PU_TreasureChestBonus::collide(CPlayer * player)
 	if(state == 1)
 	{
 		ifsoundonplay(sfx_storepowerup);
-		if(game_values.worldpowerupcount[player->teamID] < 32)
-            game_values.worldpowerups[player->teamID][game_values.worldpowerupcount[player->teamID]++] = bonusitem;
-		else
-			game_values.worldpowerups[player->teamID][31] = bonusitem;
+		//if(game_values.worldpowerupcount[player->teamID] < 32)
+        //    game_values.worldpowerups[player->teamID][game_values.worldpowerupcount[player->teamID]++] = bonusitem;
+		//else
+		//	game_values.worldpowerups[player->teamID][31] = bonusitem;
 
 		state = 3;
 

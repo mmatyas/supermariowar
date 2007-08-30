@@ -2599,12 +2599,8 @@ void Menu::RunMenu()
 
 						for(short iPlayer = 0; iPlayer < 4; iPlayer++)
 						{
-							//game_values.worldpowerupcount[iPlayer] = 0;
-							game_values.worldpowerupcount[iPlayer] = rand() % 32;
 							game_values.storedpowerups[iPlayer] = -1;
-
-							for(short iItem = 0; iItem < game_values.worldpowerupcount[iPlayer]; iItem++)
-								game_values.worldpowerups[iPlayer][iItem] = rand() % NUM_POWERUPS + 15;
+							g_worldmap.SetInitialPowerups();
 						}
 
 						miWorld->Init();

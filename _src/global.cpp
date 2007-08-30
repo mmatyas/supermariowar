@@ -313,11 +313,11 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 		ts->iGoal = gamemodes[ts->iMode]->GetOptions()[rand() % (GAMEMODE_NUM_OPTIONS - 1)].iValue;
 	}
 
-	//Read in point value for tour stop
 	if(iVersion[0] == 1 && ((iVersion[1] == 7 && iVersion[2] == 0 && iVersion[3] > 1) || iVersion[1] > 7))
 	{
 		pszTemp = strtok(NULL, ",\n");
 
+		//Read in point value for tour stop
 		if(pszTemp)
 			ts->iPoints = atoi(pszTemp);
 		else
@@ -325,10 +325,58 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 
 		pszTemp = strtok(NULL, ",\n");
 
-		if(pszTemp)
-			ts->iBonusType = atoi(pszTemp);
-		else
+		if(fIsWorld)
+		{
 			ts->iBonusType = 0;
+			ts->iNumBonuses = 0;
+
+			char * pszStart = pszTemp;
+
+			while(pszStart != NULL)
+			{
+				char * pszEnd = strstr(pszStart, "|");
+				if(pszEnd)
+					*pszEnd = 0;
+
+				//if it is "0", then no bonuses
+				short iWinnerPlace = pszStart[0] - 48;
+				if(iWinnerPlace == 0)
+					break;
+				else if(iWinnerPlace < 1 || iWinnerPlace > 4)
+					iWinnerPlace = 1;
+
+				strcpy(ts->wsbBonuses[ts->iNumBonuses].szBonusString, pszStart);
+				
+				ts->wsbBonuses[ts->iNumBonuses].iWinnerPlace = iWinnerPlace - 1;
+				
+				short iPowerupOffset = 0;
+				if(pszStart[1] == 'w' || pszStart[1] == 'W')
+					iPowerupOffset += NUM_POWERUPS;
+
+				pszStart += 2;
+
+				short iBonus = atoi(pszStart) + iPowerupOffset;
+				if(iBonus < 0)
+					iBonus = 0;
+
+				ts->wsbBonuses[ts->iNumBonuses].iBonus = iBonus;
+
+				if(++ts->iNumBonuses >= 10)
+					break;
+
+				if(pszEnd)
+					pszStart = pszEnd + 1;
+				else
+					pszStart = NULL;
+			}
+		}
+		else
+		{
+			if(pszTemp)
+				ts->iBonusType = atoi(pszTemp);
+			else
+				ts->iBonusType = 0;
+		}
 
 		pszTemp = strtok(NULL, ",\n");
 
@@ -642,8 +690,30 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
 	sprintf(szTemp, "%d,", ts->iPoints);
 	strcat(buffer, szTemp);
 
-	sprintf(szTemp, "%d,", ts->iBonusType);
-	strcat(buffer, szTemp);
+	if(fIsWorld)
+	{
+		if(ts->iNumBonuses == 0)
+		{
+			strcat(buffer, "0");
+		}
+		else
+		{
+			for(short iBonus = 0; iBonus < ts->iNumBonuses; iBonus++)
+			{
+				if(iBonus > 0)
+					strcat(buffer, "|");
+
+				strcat(buffer, ts->wsbBonuses[iBonus].szBonusString);
+			}
+		}
+		
+		strcat(buffer, ",");
+	}
+	else
+	{
+		sprintf(szTemp, "%d,", ts->iBonusType);
+		strcat(buffer, szTemp);
+	}
 
 	strcat(buffer, ts->szName);
 	strcat(buffer, ",");
