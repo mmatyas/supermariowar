@@ -108,6 +108,8 @@ gfxSprite		spr_worldpaths;
 gfxSprite		spr_worldvehicle;
 gfxSprite		spr_worlditems;
 gfxSprite		spr_worlditempopup;
+gfxSprite		spr_worlditemssmall;
+gfxSprite		spr_worlditemsplace;
 
 gfxSprite		spr_noteblock;
 gfxSprite		spr_breakableblock;

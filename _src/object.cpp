@@ -1031,7 +1031,17 @@ bool B_DonutBlock::hittop(CPlayer * player, bool useBehavior)
 
 void B_DonutBlock::triggerBehavior()
 {
-	eyecandyfront.add(new EC_FallingObject(&spr_donutblock, ix, iy, 0.0f, 0, 0, 0, 0));
+	//eyecandyfront.add(new EC_FallingObject(&spr_donutblock, ix, iy, 0.0f, 0, 0, 0, 0));
+	
+	short ** tiledata = new short*[1];
+	tiledata[0] = new short[1];
+	tiledata[0][0] = 509;
+
+	MovingPlatformPath * path = new MovingPlatformPath(0.0f, (float)ix + 16.0f, (float)iy + 16.0f, 0.0f, 0.0f, true); 
+	MovingPlatform * platform = new MovingPlatform(tiledata, 1, 1, path, true, 0, false);
+
+	g_map.AddTemporaryPlatform(platform);
+
 	dead = true;
 	g_map.blockdata[col][row] = NULL;
 }

@@ -75,6 +75,7 @@ class MI_Image : public UI_Control
 		void SetPosition(short x, short y) {ix = x; iy = y;}
 		void SetAnimationSpeed(short speed) {iSpeed = speed;}
 		void SetImage(short srcx, short srcy, short w, short h) {isrcx = srcx; isrcy = srcy; iw = w; ih = h; iXFrame = srcx; iYFrame = srcy;}
+		void SetImageSource(gfxSprite * nspr) {spr = nspr;}
 
 		void SetPulse(bool pulse) {fPulse = pulse;}
 		void SetSwirl(bool swirl, float radius, float angle, float radiusSpeed, float angleSpeed) {fSwirl = swirl; dSwirlRadius = radius; dSwirlAngle = angle; dSwirlRadiusSpeed = radiusSpeed; dSwirlAngleSpeed = angleSpeed;}
@@ -675,6 +676,9 @@ class MI_TourStop : public UI_Control
 		MI_SelectField * miBonusField;
 		MI_Image * miEndStageImage;
 
+		MI_Image * miBonusIcon[10];
+		MI_Image * miBonusBackground[10];
+
 		MI_Image * miTourStopLeftHeaderBar;
 		MI_Image * miTourStopMenuRightHeaderBar;
 		MI_Text * miTourStopMenuHeaderText;
@@ -734,7 +738,9 @@ class MI_TournamentScoreboard : public UI_Control
 		MI_Image * miTourPointBar;
 		MI_Image * tourBonus[10];
 
-		MI_Image * worldBonus[4];
+		MI_Image * worldBonus[4][5];
+		MI_Image * worldScoreModifier[4];
+		MI_Image * worldPlace[4];
 };
 
 class MI_BonusWheel : public UI_Control

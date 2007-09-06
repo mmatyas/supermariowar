@@ -58,17 +58,33 @@
 0,0,0,0,0,0,0,1,0,0,0,0,0,0,0
 0,0,0,0,0,0,0,6,0,0,0,0,0,0,0
 0,0,0,0,0,0,0,8,0,0,0,0,0,0,0
-0,0,0,0,3,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+
+#Vehicle Boundaries
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,2,0,0,0,2,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,1,0,0,0,0,0,0,0,0,0,0
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 
 #Stages
-#Map,Mode,Goal,Points,Bonus List(Max 10),Name,End World, then mode settings (see sample tour file for details)
-3
-0smw,16,5,3,1p20|1p15|1w3|2p0,1st Stop,0,1,5,0,8,4,1
-Treefort,15,3,1,1p12,2nd Stop,1,3,310,0,2,1,1,0,0,1,0,0,1,0,0,0
-Mountain waterfall,14,10,1,0,mountain waterfall,0
+#Stage Type 0,Map,Mode,Goal,Points,Bonus List(Max 10),Name,End World, then mode settings (see sample tour file for details)
+#Stage Type 1,Bonus House Name,Sequential/Random Order,Powerup List
+4
+0,0smw,16,5,3,1p20|1p15|1w3|2p0|2p4|3p1|3p19|3p6|3p8|4w1|4w2,1st Stop,0,1,5,0,8,4,1
+0,Treefort,15,3,1,1p12,2nd Stop,1,3,310,0,2,1,1,0,0,1,0,0,1,0,0,0
+0,Mountain waterfall,14,10,1,0,mountain waterfall,0
+1,Toad's House,1,p5,p8,w2,w3,s2
 
 #Warps
 #location 1 x, y, location 2 x, y
@@ -76,9 +92,10 @@ Mountain waterfall,14,10,1,0,mountain waterfall,0
 4,6,13,10
 
 #Vehicles
-#Sprite,Stage Type, Start Column, Start Row, Min Moves, Max Moves, Sprite Paces, Sprite Direction
-1
-2,0,4,9,5,8,1,0
+#Sprite,Stage Type, Start Column, Start Row, Min Moves, Max Moves, Sprite Paces, Sprite Direction, Boundary
+2
+2,0,4,9,5,8,1,0,1
+1,0,4,6,5,8,1,0,2
 
 #Initial Items
-p12,p15,w0,w9,p6
+w4,p12,p15,w0,w9,p6

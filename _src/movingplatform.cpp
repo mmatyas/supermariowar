@@ -8,13 +8,14 @@ extern short y_shake;
 // Moving Platform
 //------------------------------------------------------------------------------
 
-MovingPlatformPath::MovingPlatformPath(float vel, float startX, float startY, float endX, float endY)
+MovingPlatformPath::MovingPlatformPath(float vel, float startX, float startY, float endX, float endY, bool falling)
 {
 	fVelocity = vel;
 	fStartX = startX;
 	fStartY = startY;
 	fEndX = endX;
 	fEndY = endY;
+	fFalling = falling;
 
 	CalculateAngle();
 }
@@ -27,6 +28,7 @@ MovingPlatformPath::MovingPlatformPath()
 	fStartY = 48.0f;
 	fEndX = 304.0f;
 	fEndY = 432.0f;
+	fFalling = false;
 
 	CalculateAngle();
 }
@@ -59,6 +61,8 @@ void MovingPlatformPath::CalculateAngle()
 
 MovingPlatform::MovingPlatform(short ** tiledata, short w, short h, MovingPlatformPath * path, bool forwardDirection, short startPathNode, bool fPreview)
 {
+	fDead = false;
+
 	short iTileSize = TILESIZE;
 	SDL_Surface * tilesurface = g_map.tilesetsurface[0];
 		
@@ -316,91 +320,113 @@ void MovingPlatform::update()
 	fx += fVelX;
 	fy += fVelY;
 
-	//See if we're at the end of the path
-	if(fVelX < -0.01f)
+	if(pPath->fFalling)
 	{
-		if(fVelY < -0.01f)
+		fVelY = CapFallingVelocity(fVelY + GRAVITATION);
+		
+		if(fy - iHalfHeight > 480.0f)
 		{
-			if(fx <= fEndPointX && fy <= fEndPointY)
+			//If a player is standing on this platform, clear him off
+			for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++)
 			{
-				xf(fEndPointX);
-				yf(fEndPointY);
-				FlipDirection();
+				if(list_players[iPlayer]->platform == this)
+				{
+					list_players[iPlayer]->platform = NULL;
+					list_players[iPlayer]->vely = fVelY;
+				}
 			}
-		}
-		else if(fVelY > 0.01f)
-		{
-			if(fx <= fEndPointX && fy >= fEndPointY)
-			{
-				xf(fEndPointX);
-				yf(fEndPointY);
-				FlipDirection();
-			}
-		}
-		else
-		{
-			if(fx <= fEndPointX)
-			{
-				xf(fEndPointX);
-				yf(fEndPointY);
-				FlipDirection();
-			}
-		}
-	}
-	else if(fVelX > 0.01f)
-	{
-		if(fVelY < -0.01f)
-		{
-			if(fx >= fEndPointX && fy <= fEndPointY)
-			{
-				xf(fEndPointX);
-				yf(fEndPointY);
-				FlipDirection();
-			}
-		}
-		else if(fVelY > 0.01f)
-		{
-			if(fx >= fEndPointX && fy >= fEndPointY)
-			{
-				xf(fEndPointX);
-				yf(fEndPointY);
-				FlipDirection();
-			}
-		}
-		else
-		{
-			if(fx >= fEndPointX)
-			{
-				xf(fEndPointX);
-				yf(fEndPointY);
-				FlipDirection();
-			}
+
+			fDead = true;
 		}
 	}
 	else
 	{
-		if(fVelY > 0.01f)
+		//See if we're at the end of the path
+		if(fVelX < -0.01f)
 		{
-			if(fy >= fEndPointY)
+			if(fVelY < -0.01f)
 			{
-				xf(fEndPointX);
-				yf(fEndPointY);
-				FlipDirection();
+				if(fx <= fEndPointX && fy <= fEndPointY)
+				{
+					xf(fEndPointX);
+					yf(fEndPointY);
+					FlipDirection();
+				}
+			}
+			else if(fVelY > 0.01f)
+			{
+				if(fx <= fEndPointX && fy >= fEndPointY)
+				{
+					xf(fEndPointX);
+					yf(fEndPointY);
+					FlipDirection();
+				}
+			}
+			else
+			{
+				if(fx <= fEndPointX)
+				{
+					xf(fEndPointX);
+					yf(fEndPointY);
+					FlipDirection();
+				}
 			}
 		}
-		else if(fVelY < -0.01f)
+		else if(fVelX > 0.01f)
 		{
-			if(fy <= fEndPointY)
+			if(fVelY < -0.01f)
 			{
-				xf(fEndPointX);
-				yf(fEndPointY);
-				FlipDirection();
+				if(fx >= fEndPointX && fy <= fEndPointY)
+				{
+					xf(fEndPointX);
+					yf(fEndPointY);
+					FlipDirection();
+				}
+			}
+			else if(fVelY > 0.01f)
+			{
+				if(fx >= fEndPointX && fy >= fEndPointY)
+				{
+					xf(fEndPointX);
+					yf(fEndPointY);
+					FlipDirection();
+				}
+			}
+			else
+			{
+				if(fx >= fEndPointX)
+				{
+					xf(fEndPointX);
+					yf(fEndPointY);
+					FlipDirection();
+				}
 			}
 		}
 		else
 		{
-			//Platform is not moving!
-			printf("Platform is not moving.  This is probably a problem!\n");
+			if(fVelY > 0.01f)
+			{
+				if(fy >= fEndPointY)
+				{
+					xf(fEndPointX);
+					yf(fEndPointY);
+					FlipDirection();
+				}
+			}
+			else if(fVelY < -0.01f)
+			{
+				if(fy <= fEndPointY)
+				{
+					xf(fEndPointX);
+					yf(fEndPointY);
+					FlipDirection();
+				}
+			}
+			else
+			{
+				//Platform is not moving!
+				printf("Platform is not moving.  This is probably a problem!\n");
+			}
 		}
 	}
 
@@ -421,7 +447,6 @@ void MovingPlatform::ResetPath()
 
 void MovingPlatform::FlipDirection()
 {
-
 	fForwardDirection = !fForwardDirection;
 
 	fEndPointX = fForwardDirection ? pPath->fEndX : pPath->fStartX;
@@ -450,11 +475,6 @@ void MovingPlatform::FlipDirection()
 
 void MovingPlatform::collide(CPlayer * player)
 {
-	/*
-	if(player->globalID != 0)
-		return;
-	*/
-
 	if(!coldec_player(player))
 	{
 		if(player->platform == this)
@@ -469,6 +489,9 @@ void MovingPlatform::collide(CPlayer * player)
 		*/
 		return;
 	}
+
+	if(fDead)
+		return;
 
 	float fColVelX = player->velx - fOldVelX;
 	float fColVelY = player->vely - fOldVelY;
@@ -898,6 +921,9 @@ void MovingPlatform::collide(IO_MovingObject * object)
 
 		return;
 	}
+
+	if(fDead)
+		return;
 
 	float fColVelX = object->velx - fOldVelX;
 	float fColVelY = object->vely - fOldVelY;

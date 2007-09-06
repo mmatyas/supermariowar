@@ -3001,6 +3001,7 @@ void Menu::RunMenu()
 				short iGameMode = game_values.tourstops[game_values.tourstopcurrent]->iMode;
 				gamemodes[iGameMode]->goal = game_values.tourstops[game_values.tourstopcurrent]->iGoal;
 				game_values.gamemode = gamemodes[iGameMode];
+				
 				StartGame();
 			}
 			else if (MENU_CODE_RESET_STORED_POWERUPS == code)
@@ -3156,10 +3157,36 @@ void Menu::RunMenu()
 
 		if(GS_START_GAME == game_values.gamestate && game_values.screenfade == 255)
 		{
+			/*
+				game_values.gamemode = bossgamemode;  //boss type has already been set at this point
+
+				if(bossgamemode->GetBossType() == 0)
+					g_map.loadMap(convertPath("maps/special/dungeon.map"), read_type_full);
+				else if(bossgamemode->GetBossType() == 1)
+					g_map.loadMap(convertPath("maps/special/hills.map"), read_type_full);
+				else if(bossgamemode->GetBossType() == 2)
+					g_map.loadMap(convertPath("maps/special/volcano.map"), read_type_full);
+
+				char filename[128];
+				sprintf(filename, "gfx/packs/backgrounds/%s", g_map.szBackgroundFile);
+				std::string path = convertPath(filename, gamegraphicspacklist.current_name());
+
+				//if the background file doesn't exist, use the classic background
+				if(!File_Exists(path))
+					path = convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist.current_name());
+
+				__load_gfx(spr_background, path);
+
+				g_map.predrawbackground(spr_background, spr_backmap);
+				g_map.predrawforeground(spr_frontmap);
+				LoadMapObjects();
+			*/
+
 			game_values.gamestate = GS_GAME;
 
 			SetGameModeSettingsFromMenu();
 			g_map.loadMap(maplist.currentFilename(), read_type_full);
+			
 			g_map.predrawbackground(spr_background, spr_backmap);
 			g_map.predrawforeground(spr_frontmap);
 			LoadMapObjects();

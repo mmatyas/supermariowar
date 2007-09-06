@@ -156,6 +156,8 @@ gfxSprite		spr_awardsouls, spr_fireballexplosion;
 gfxSprite		spr_maplava, spr_mapwater, spr_mapwaterfall, spr_maplamp;
 CEyecandyContainer eyecandyfront;
 CGameMode		*gamemodes[GAMEMODE_LAST];
+CPlayer			*list_players[4];
+short			list_players_cnt = 0;
 ///////
 
 SDL_Surface * s_eyecandy;
@@ -3149,7 +3151,7 @@ void insert_platforms_into_map()
 		float fEndX = (float)(g_Platforms[iPlatform].iEndX * TILESIZE) + (float)(iWidth * TILESIZE) / 2.0f;
 		float fEndY = (float)(g_Platforms[iPlatform].iEndY * TILESIZE) + (float)(iHeight * TILESIZE) / 2.0f;
 				
-		MovingPlatformPath * path = new MovingPlatformPath(fVelocity, fStartX, fStartY, fEndX, fEndY);
+		MovingPlatformPath * path = new MovingPlatformPath(fVelocity, fStartX, fStartY, fEndX, fEndY, false);
 
 		g_map.platforms[iPlatform] = new MovingPlatform(tiles, iWidth, iHeight, path, true, 0, false);
 	}
@@ -3269,6 +3271,7 @@ int newmap()
 		g_map.clearMap();
 		g_map.clearPlatforms();
 		g_map.eyecandyID = 0;
+		g_map.iNumMapItems = 0;
 		g_map.saveMap(convertPath(strcat(strcat(mapLocation, fileName),".map")));
 		maplist.add(strcat(fileName, ".map"));
 		maplist.find(fileName);

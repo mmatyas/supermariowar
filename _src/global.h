@@ -197,6 +197,7 @@ struct STextAward
 #define MENU_ITEM_NEIGHBOR_RIGHT 3
 
 #define NUM_POWERUPS 20
+#define NUM_WORLD_POWERUPS 15
 
 void GetNameFromFileName(char * szName, const char * szFileName);
 std::string stripCreatorAndDotMap(const std::string &filename);
@@ -474,6 +475,8 @@ extern gfxSprite		spr_worldpaths;
 extern gfxSprite		spr_worldvehicle;
 extern gfxSprite		spr_worlditems;
 extern gfxSprite		spr_worlditempopup;
+extern gfxSprite		spr_worlditemssmall;
+extern gfxSprite		spr_worlditemsplace;
 
 extern MapList maplist;
 extern SkinList skinlist;
@@ -627,6 +630,7 @@ struct TourStop
 	bool fEndStage;
 	short iNumBonuses;
 	WorldStageBonus wsbBonuses[10];
+	short iStageType;
 
 	bool fUseSettings;
 	GameModeSettings gmsSettings;

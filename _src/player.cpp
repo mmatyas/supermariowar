@@ -2847,6 +2847,9 @@ void CPlayer::collision_detection_map()
 		fOldY = (float)(-PH - 1);
 		fallthrough = false;
 		onice = false;
+		
+		//Clear the platform if the player wrapped to the top of the screen
+		platform = NULL;
 
 		return;
 	}

@@ -247,6 +247,16 @@ void CMap::clearPlatforms()
 	
 		iNumPlatforms = 0;
 	}
+
+	std::list<MovingPlatform*>::iterator iter = tempPlatforms.begin(), lim = tempPlatforms.end();
+	
+	while (iter != lim)
+	{
+		delete (*iter);
+		++iter;
+	}
+
+	tempPlatforms.clear();
 }
 
 void CMap::loadMap(const std::string& file, ReadType iReadType)
@@ -948,7 +958,7 @@ void CMap::loadPlatforms(FILE * mapfile, bool fPreview)
 		float fEndY = ReadFloat(mapfile);
 		float fVelocity = ReadFloat(mapfile);
 		
-		MovingPlatformPath * path = new MovingPlatformPath(fVelocity, fStartX, fStartY, fEndX, fEndY);
+		MovingPlatformPath * path = new MovingPlatformPath(fVelocity, fStartX, fStartY, fEndX, fEndY, false);
 
 		platforms[iPlatform] = new MovingPlatform(tiles, iWidth, iHeight, path, true, 0, fPreview);
 	}
@@ -2113,6 +2123,39 @@ void CMap::updatePlatforms()
 	{
 		platforms[iPlatform]->update();
 	}
+
+	std::list<MovingPlatform*>::iterator iter = tempPlatforms.begin(), lim = tempPlatforms.end();
+	
+	while (iter != lim)
+	{
+		if((*iter)->fDead)
+		{
+			delete (*iter);
+			
+			iter = tempPlatforms.erase(iter);
+			lim = tempPlatforms.end();
+		}
+		else
+		{
+			(*iter)->update();
+			++iter;
+		}
+	}
+
+	/*
+	while (iter != lim)
+	{
+		if((*iterateAll)->fDead)
+		{
+			iterateAll = tempPlatforms.erase(iterateAll);
+			--iterateAll;
+		}
+		else
+		{
+			(*iterateAll)->update();
+			++iterateAll;
+		}
+	}*/
 }
 
 void CMap::drawPlatforms()
@@ -2120,6 +2163,13 @@ void CMap::drawPlatforms()
 	for(short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++)
 	{
 		platforms[iPlatform]->draw();
+	}
+
+	std::list<MovingPlatform*>::iterator iterateAll = tempPlatforms.begin(), lim = tempPlatforms.end();
+	while (iterateAll != lim)
+	{
+		(*iterateAll)->draw();
+		iterateAll++;
 	}
 }
 
@@ -2140,6 +2190,17 @@ void CMap::movingPlatformCollision(CPlayer * player)
 		if(!player->isready())
 			return;
 	}
+
+	std::list<MovingPlatform*>::iterator iterateAll = tempPlatforms.begin(), lim = tempPlatforms.end();
+	while (iterateAll != lim)
+	{
+		(*iterateAll)->collide(player);
+
+		if(!player->isready())
+			return;
+		
+		iterateAll++;
+	}
 }
 
 void CMap::movingPlatformCollision(IO_MovingObject * object)
@@ -2147,6 +2208,13 @@ void CMap::movingPlatformCollision(IO_MovingObject * object)
 	for(short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++)
 	{
 		platforms[iPlatform]->collide(object);
+	}
+
+	std::list<MovingPlatform*>::iterator iterateAll = tempPlatforms.begin(), lim = tempPlatforms.end();
+	while (iterateAll != lim)
+	{
+		(*iterateAll)->collide(object);		
+		iterateAll++;
 	}
 }
 
@@ -2156,6 +2224,16 @@ void CMap::resetPlatforms()
 	{
 		platforms[iPlatform]->ResetPath();
 	}
+
+	std::list<MovingPlatform*>::iterator iter = tempPlatforms.begin(), lim = tempPlatforms.end();
+	
+	while (iter != lim)
+	{
+		delete (*iter);
+		++iter;
+	}
+
+	tempPlatforms.clear();
 }
 
 WarpExit * CMap::getRandomWarpExit(int connection, int currentID)
@@ -2250,6 +2328,13 @@ void CMap::findspawnpoint(short iType, short * x, short * y, short width, short 
 	for(short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++)
 		platforms[iPlatform]->CalculateNoSpawnZone(dPathTime);
 
+	std::list<MovingPlatform*>::iterator iterateAll = tempPlatforms.begin(), lim = tempPlatforms.end();
+	while (iterateAll != lim)
+	{
+		(*iterateAll)->CalculateNoSpawnZone(dPathTime);
+		iterateAll++;
+	}
+
 	bool fDone = false;
 	short iTries = 0;
 	while(iTries++ < MAX_PLAYER_SPAWN_TRIES && !fDone)
@@ -2309,13 +2394,36 @@ void CMap::findspawnpoint(short iType, short * x, short * y, short width, short 
 			if(!fDone)
 				break;
 		}
+
+		std::list<MovingPlatform*>::iterator iterateAll = tempPlatforms.begin(), lim = tempPlatforms.end();
+		while (iterateAll != lim)
+		{
+			fDone = !(*iterateAll)->IsInNoSpawnZone(*x, *y, width, height);
+
+			if(!fDone)
+				break;
+
+			iterateAll++;
+		}
 	}
+}
+
+void CMap::AddTemporaryPlatform(MovingPlatform * platform)
+{
+	tempPlatforms.push_back(platform);
 }
 
 void CMap::CalculatePlatformNoSpawnZones()
 {
 	for(short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++)
 		platforms[iPlatform]->CalculateNoSpawnZone(0.0f);
+
+	std::list<MovingPlatform*>::iterator iterateAll = tempPlatforms.begin(), lim = tempPlatforms.end();
+	while (iterateAll != lim)
+	{
+		(*iterateAll)->CalculateNoSpawnZone(0.0f);
+		iterateAll++;
+	}
 }
 
 bool CMap::IsInPlatformNoSpawnZone(short x, short y, short width, short height)
@@ -2324,6 +2432,15 @@ bool CMap::IsInPlatformNoSpawnZone(short x, short y, short width, short height)
 	{
 		if(platforms[iPlatform]->IsInNoSpawnZone(x, y, width, height))
 			return true;
+	}
+
+	std::list<MovingPlatform*>::iterator iterateAll = tempPlatforms.begin(), lim = tempPlatforms.end();
+	while (iterateAll != lim)
+	{
+		if((*iterateAll)->IsInNoSpawnZone(x, y, width, height))
+			return true;
+
+		iterateAll++;
 	}
 
 	return false;

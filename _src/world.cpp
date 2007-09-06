@@ -184,7 +184,7 @@ WorldVehicle::WorldVehicle() :
 WorldVehicle::~WorldVehicle()
 {}
 
-void WorldVehicle::Init(short iCol, short iRow, short iAction, short iSprite, short minMoves, short maxMoves, bool spritePaces, short iInitialDirection)
+void WorldVehicle::Init(short iCol, short iRow, short iAction, short iSprite, short minMoves, short maxMoves, bool spritePaces, short iInitialDirection, short boundary)
 {
 	WorldMovingObject::Init(iCol, iRow, iSprite, iInitialDirection);
 
@@ -211,6 +211,8 @@ void WorldVehicle::Init(short iCol, short iRow, short iAction, short iSprite, sh
 	fSpritePaces = spritePaces;
 	iPaceOffset = 0;
 	iPaceTimer = 0;
+
+	iBoundary = boundary;
 }
 
 void WorldVehicle::Move()
@@ -253,13 +255,13 @@ void WorldVehicle::SetNextDest()
 	{
 		bool fIsDoor = false;
 		if(iDirection == 0)
-			fIsDoor = g_worldmap.IsDoor(iCurrentTileX, iCurrentTileY - 1);
+			fIsDoor = g_worldmap.IsDoor(iCurrentTileX, iCurrentTileY - 1) || g_worldmap.GetVehicleBoundary(iCurrentTileX, iCurrentTileY - 1) == iBoundary;
 		else if(iDirection == 1)
-			fIsDoor = g_worldmap.IsDoor(iCurrentTileX, iCurrentTileY + 1);
+			fIsDoor = g_worldmap.IsDoor(iCurrentTileX, iCurrentTileY + 1) || g_worldmap.GetVehicleBoundary(iCurrentTileX, iCurrentTileY + 1) == iBoundary;
 		else if(iDirection == 2)
-			fIsDoor = g_worldmap.IsDoor(iCurrentTileX - 1, iCurrentTileY);
+			fIsDoor = g_worldmap.IsDoor(iCurrentTileX - 1, iCurrentTileY) || g_worldmap.GetVehicleBoundary(iCurrentTileX - 1, iCurrentTileY) == iBoundary;
 		else if(iDirection == 3)
-			fIsDoor = g_worldmap.IsDoor(iCurrentTileX + 1, iCurrentTileY);
+			fIsDoor = g_worldmap.IsDoor(iCurrentTileX + 1, iCurrentTileY) || g_worldmap.GetVehicleBoundary(iCurrentTileX + 1, iCurrentTileY) == iBoundary;
 
 		if(tile->fConnection[iDirection] && !fIsDoor)
 			iConnections[iNumConnections++] = iDirection;
@@ -546,21 +548,42 @@ bool WorldMap::Load()
 					iStartY = iMapTileReadRow;
 				}
 				
-				tile->fCompleted = tile->iType <= 5;
+				tile->iCompleted = tile->iType <= 5 ? -1 : -2;
 
 				psz = strtok(NULL, ",\n");
 			}
 
 			if(++iMapTileReadRow == iHeight)
+			{
 				iReadType = 7;
+				iMapTileReadRow = 0;
+			}
 		}
-		else if(iReadType == 7) //number of stages
+		else if(iReadType == 7) //vehicle boundaries
+		{
+			char * psz = strtok(buffer, ",\n");
+			
+			for(short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++)
+			{
+				if(!psz)
+					goto RETURN;
+
+				WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
+				tile->iVehicleBoundary = atoi(psz);
+
+				psz = strtok(NULL, ",\n");
+			}
+
+			if(++iMapTileReadRow == iHeight)
+				iReadType = 8;
+		}
+		else if(iReadType == 8) //number of stages
 		{
 			iNumStages = atoi(buffer);
 			
-			iReadType = iNumStages == 0 ? 9 : 8;
+			iReadType = iNumStages == 0 ? 10 : 9;
 		}
-		else if(iReadType == 8) //stage details
+		else if(iReadType == 9) //stage details
 		{
 			TourStop * ts = ParseTourStopLine(buffer, iVersion, true);
 		
@@ -568,9 +591,9 @@ bool WorldMap::Load()
 			game_values.tourstoptotal++;
 
 			if(++iCurrentStage >= iNumStages)
-				iReadType = 9;
+				iReadType = 10;
 		}
-		else if(iReadType == 9) //number of warps
+		else if(iReadType == 10) //number of warps
 		{
 			iNumWarps = atoi(buffer);
 
@@ -580,9 +603,9 @@ bool WorldMap::Load()
 			if(iNumWarps > 0)
 				warps = new WorldWarp[iNumWarps];
 			
-			iReadType = iNumWarps == 0 ? 11 : 10;
+			iReadType = iNumWarps == 0 ? 12 : 11;
 		}
-		else if(iReadType == 10) //warp details
+		else if(iReadType == 11) //warp details
 		{
 			char * psz = strtok(buffer, ",\n");
 			
@@ -617,9 +640,9 @@ bool WorldMap::Load()
 			tiles[iCol2][iRow2].iWarp = iCurrentWarp;
 
 			if(++iCurrentWarp >= iNumWarps)
-				iReadType = 11;
+				iReadType = 12;
 		}
-		else if(iReadType == 11) //number of vehicles
+		else if(iReadType == 12) //number of vehicles
 		{
 			iNumVehicles = atoi(buffer);
 
@@ -629,9 +652,9 @@ bool WorldMap::Load()
 			if(iNumVehicles > 0)
 				vehicles = new WorldVehicle[iNumVehicles];
 
-			iReadType = iNumVehicles == 0 ? 13 : 12;
+			iReadType = iNumVehicles == 0 ? 14 : 13;
 		}
-		else if(iReadType == 12) //moving objects
+		else if(iReadType == 13) //moving objects
 		{
 			char * psz = strtok(buffer, ",\n");
 			
@@ -674,12 +697,15 @@ bool WorldMap::Load()
 			if(iInitialDirection != 0)
 				iInitialDirection = 1;
 
-			vehicles[iCurrentVehicle].Init(iCol, iRow, iStage, iSprite, iMinMoves, iMaxMoves, fSpritePaces, iInitialDirection);
+			psz = strtok(NULL, ",\n");
+			short iBoundary = atoi(psz);
+
+			vehicles[iCurrentVehicle].Init(iCol, iRow, iStage, iSprite, iMinMoves, iMaxMoves, fSpritePaces, iInitialDirection, iBoundary);
 
 			if(++iCurrentVehicle >= iNumVehicles)
-				iReadType = 13;
+				iReadType = 14;
 		}
-		else if(iReadType == 13) //initial bonus items
+		else if(iReadType == 14) //initial bonus items
 		{
 			char * psz = strtok(buffer, ",\n");
 
@@ -699,6 +725,9 @@ bool WorldMap::Load()
 
 				short iBonus = atoi(psz) + iBonusOffset;
 
+				if(iBonus < 0 || iBonus >= NUM_POWERUPS + NUM_WORLD_POWERUPS)
+					iBonus = 0;
+
 				if(iNumInitialBonuses < 32)
 					iInitialBonuses[iNumInitialBonuses++] = iBonus;
 				else
@@ -707,7 +736,7 @@ bool WorldMap::Load()
 				psz = strtok(NULL, ",\n");
 			}
 
-			iReadType = 14;
+			iReadType = 15;
 		}
 	}
 
@@ -715,7 +744,7 @@ RETURN:
 
 	fclose(file);
 
-	return iReadType == 14;
+	return iReadType == 15;
 }
 
 void WorldMap::SetTileConnections(short iCol, short iRow)
@@ -865,8 +894,26 @@ bool WorldMap::Save(const char * szPath)
 	}
 	fprintf(file, "\n");
 
+	fprintf(file, "#Vehicle Boundaries\n");
+
+	for(short iMapTileReadRow = 0; iMapTileReadRow < iHeight; iMapTileReadRow++)
+	{
+		for(short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++)
+		{
+			WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
+			fprintf(file, "%d", tile->iVehicleBoundary);
+			
+			if(iMapTileReadCol == iWidth - 1)
+				fprintf(file, "\n");
+			else
+				fprintf(file, ",");
+		}
+	}
+	fprintf(file, "\n");
+
 	fprintf(file, "#Stages\n");
-	fprintf(file, "#Map,Mode,Goal,Points,Bonus List(Max 10),Name,End World, then mode settings (see sample tour file for details)\n");
+	fprintf(file, "#Stage Type 0,Map,Mode,Goal,Points,Bonus List(Max 10),Name,End World, then mode settings (see sample tour file for details)\n");
+	fprintf(file, "#Stage Type 1,Bonus House Name,Sequential/Random Order,Powerup List\n");
 
 	fprintf(file, "%d\n", game_values.tourstoptotal);
 
@@ -893,7 +940,7 @@ bool WorldMap::Save(const char * szPath)
 	fprintf(file, "\n");
 
 	fprintf(file, "#Vehicles\n");
-	fprintf(file, "#Sprite,Stage Type, Start Column, Start Row, Min Moves, Max Moves, Sprite Paces, Sprite Direction\n");
+	fprintf(file, "#Sprite,Stage Type, Start Column, Start Row, Min Moves, Max Moves, Sprite Paces, Sprite Direction, Boundary\n");
 
 	fprintf(file, "%d\n", iNumVehicles);
 
@@ -906,7 +953,8 @@ bool WorldMap::Save(const char * szPath)
 		fprintf(file, "%d,", vehicles[iVehicle].iMinMoves);
 		fprintf(file, "%d,", vehicles[iVehicle].iMaxMoves);
 		fprintf(file, "%d,", vehicles[iVehicle].fSpritePaces);
-		fprintf(file, "%d\n", vehicles[iVehicle].iDrawDirection);
+		fprintf(file, "%d,", vehicles[iVehicle].iDrawDirection);
+		fprintf(file, "%d\n", vehicles[iVehicle].iBoundary);
 	}
 	fprintf(file, "\n");
 
@@ -1131,44 +1179,47 @@ void WorldMap::DrawMapToSurface(bool fInit, SDL_Surface * surface, short iMapDra
 					SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, surface, &r);
 				}
 
-				if(iForegroundSprite == 1 || iForegroundSprite == 2)
+				if(tile->iCompleted >= 0)
 				{
-					SDL_Rect rSrc = {0, (iForegroundSprite - 1) << 5, TILESIZE, TILESIZE};
-					SDL_BlitSurface(spr_worldpaths.getSurface(), &rSrc, surface, &r);
+					SDL_Rect rSrc = {(tile->iCompleted + 14) << 5, 32, TILESIZE, TILESIZE};
+					SDL_BlitSurface(spr_worldforeground.getSurface(), &rSrc, surface, &r);
 				}
-				else if(iForegroundSprite >= 3 && iForegroundSprite <= 10)
+				else
 				{
-					SDL_Rect rSrc = {iAnimationFrame, (iForegroundSprite - 1) << 5, TILESIZE, TILESIZE};
-					SDL_BlitSurface(spr_worldpaths.getSurface(), &rSrc, surface, &r);
-				}
-				else if(iForegroundSprite >= 11 && iForegroundSprite <= 18)
-				{
-					short iSpriteX = (((iForegroundSprite - 11) / 2) + 1) << 5;
-					short iSpriteY = ((iForegroundSprite - 11) % 2) << 5;
+					if(iForegroundSprite == 1 || iForegroundSprite == 2)
+					{
+						SDL_Rect rSrc = {0, (iForegroundSprite - 1) << 5, TILESIZE, TILESIZE};
+						SDL_BlitSurface(spr_worldpaths.getSurface(), &rSrc, surface, &r);
+					}
+					else if(iForegroundSprite >= 3 && iForegroundSprite <= 10)
+					{
+						SDL_Rect rSrc = {iAnimationFrame, (iForegroundSprite - 1) << 5, TILESIZE, TILESIZE};
+						SDL_BlitSurface(spr_worldpaths.getSurface(), &rSrc, surface, &r);
+					}
+					else if(iForegroundSprite >= 11 && iForegroundSprite <= 18)
+					{
+						short iSpriteX = (((iForegroundSprite - 11) / 2) + 1) << 5;
+						short iSpriteY = ((iForegroundSprite - 11) % 2) << 5;
 
-					SDL_Rect rSrc = {iSpriteX, iSpriteY, TILESIZE, TILESIZE};
-					SDL_BlitSurface(spr_worldpaths.getSurface(), &rSrc, surface, &r);
-				}
-				else if(iForegroundSprite >= WORLD_FOREGROUND_SPRITE_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_SPRITE_OFFSET + 399)
-				{
-					short iTileColor = (iForegroundSprite - WORLD_FOREGROUND_SPRITE_OFFSET) / 100;
-					SDL_Rect rSrc = {320 + iAnimationFrame, iTileColor << 5, TILESIZE, TILESIZE};
-					SDL_BlitSurface(spr_worldforeground.getSurface(), &rSrc, surface, &r);
+						SDL_Rect rSrc = {iSpriteX, iSpriteY, TILESIZE, TILESIZE};
+						SDL_BlitSurface(spr_worldpaths.getSurface(), &rSrc, surface, &r);
+					}
+					else if(iForegroundSprite >= WORLD_FOREGROUND_SPRITE_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_SPRITE_OFFSET + 399)
+					{
+						short iTileColor = (iForegroundSprite - WORLD_FOREGROUND_SPRITE_OFFSET) / 100;
+						SDL_Rect rSrc = {320 + iAnimationFrame, iTileColor << 5, TILESIZE, TILESIZE};
+						SDL_BlitSurface(spr_worldforeground.getSurface(), &rSrc, surface, &r);
 
-					short iTileNumber = (iForegroundSprite - WORLD_FOREGROUND_SPRITE_OFFSET) % 100;
-					rSrc.x = (iTileNumber % 10) << 5;
-					rSrc.y = (iTileNumber / 10) << 5;
-					SDL_BlitSurface(spr_worldforeground.getSurface(), &rSrc, surface, &r);
-				}
-				else if(iForegroundSprite >= WORLD_WINNING_TEAM_SPRITE_OFFSET && iForegroundSprite <= WORLD_WINNING_TEAM_SPRITE_OFFSET + 3)
-				{
-					SDL_Rect rSrc = {(iForegroundSprite - WORLD_WINNING_TEAM_SPRITE_OFFSET + 14) << 5, 32, TILESIZE, TILESIZE};
-					SDL_BlitSurface(spr_worldforeground.getSurface(), &rSrc, surface, &r);
-				}
-				else if(iForegroundSprite >= WORLD_BRIDGE_SPRITE_OFFSET && iForegroundSprite <= WORLD_BRIDGE_SPRITE_OFFSET + 3)
-				{
-					SDL_Rect rSrc = {(iForegroundSprite - WORLD_BRIDGE_SPRITE_OFFSET + 14) << 5, 96, TILESIZE, TILESIZE};
-					SDL_BlitSurface(spr_worldforeground.getSurface(), &rSrc, surface, &r);
+						short iTileNumber = (iForegroundSprite - WORLD_FOREGROUND_SPRITE_OFFSET) % 100;
+						rSrc.x = (iTileNumber % 10) << 5;
+						rSrc.y = (iTileNumber / 10) << 5;
+						SDL_BlitSurface(spr_worldforeground.getSurface(), &rSrc, surface, &r);
+					}
+					else if(iForegroundSprite >= WORLD_BRIDGE_SPRITE_OFFSET && iForegroundSprite <= WORLD_BRIDGE_SPRITE_OFFSET + 3)
+					{
+						SDL_Rect rSrc = {(iForegroundSprite - WORLD_BRIDGE_SPRITE_OFFSET + 14) << 5, 96, TILESIZE, TILESIZE};
+						SDL_BlitSurface(spr_worldforeground.getSurface(), &rSrc, surface, &r);
+					}
 				}
 
 				short iType = tile->iType;
@@ -1441,12 +1492,17 @@ short WorldMap::UseKey(short iKeyType, short iCol, short iRow)
 	return iDoorsOpened;
 }
 
+short WorldMap::GetVehicleBoundary(short iCol, short iRow)
+{
+	return tiles[iCol][iRow].iVehicleBoundary;
+}
+
 //Implements breadth first search to find a stage or vehicle of interest
 short WorldMap::GetNextInterestingMove(short iCol, short iRow)
 {
 	WorldMapTile * currentTile = &tiles[iCol][iRow];
 
-	if((currentTile->iType >= 6 && !currentTile->fCompleted) || NumVehiclesInTile(iCol, iRow) > 0)
+	if((currentTile->iType >= 6 && currentTile->iCompleted == -1) || NumVehiclesInTile(iCol, iRow) > 0)
 		return 4; //Signal to press select on this tile
 
 	short iCurrentId = currentTile->iID;
@@ -1465,7 +1521,7 @@ short WorldMap::GetNextInterestingMove(short iCol, short iRow)
 
 		next.pop();
 
-		if((tile->iType >= 6 && !tile->fCompleted) || NumVehiclesInTile(tile->iCol, tile->iRow) > 0)
+		if((tile->iType >= 6 && tile->iCompleted == -2) || NumVehiclesInTile(tile->iCol, tile->iRow) > 0)
 		{
 			short iBackTileDirection = visitedTiles[tile->iID];
 			short iBackTileId = tile->iID;
@@ -1599,3 +1655,4 @@ void WorldMap::SetInitialPowerups()
 			game_values.worldpowerups[iTeam][iItem] = iInitialBonuses[iItem];
 	}
 }
+

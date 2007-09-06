@@ -20,11 +20,13 @@ struct WorldMapTile
 
 	short iWarp;
 
-	bool fCompleted;
+	short iCompleted;
 	bool fAnimated;
 
 	short iCol;
 	short iRow;
+
+	short iVehicleBoundary;
 };
 
 class WorldMovingObject
@@ -81,7 +83,7 @@ class WorldVehicle : public WorldMovingObject
 		WorldVehicle();
 		~WorldVehicle();
 
-		void Init(short iCol, short iRow, short iAction, short iSprite, short iMinMoves, short iMaxMoves, bool fSpritePaces, short iInitialDirection);
+		void Init(short iCol, short iRow, short iAction, short iSprite, short iMinMoves, short iMaxMoves, bool fSpritePaces, short iInitialDirection, short iBoundary);
 		void Move();
 		
 		bool Update();
@@ -104,6 +106,8 @@ class WorldVehicle : public WorldMovingObject
 		bool fSpritePaces;
 		short iPaceOffset;
 		short iPaceTimer;
+
+		short iBoundary;
 
 	friend class WorldMap;
 };
@@ -172,6 +176,8 @@ class WorldMap
 
 		bool IsDoor(short iCol, short iRow);
 		short UseKey(short iKeytype, short iCol, short iRow);
+
+		short GetVehicleBoundary(short iCol, short iRow);
 
 		short GetNextInterestingMove(short iCol, short iRow);
 

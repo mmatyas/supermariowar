@@ -134,6 +134,8 @@ class CMap
 		void drawfrontanimations();
 		void clearAnimations();
 
+		void AddTemporaryPlatform(MovingPlatform * platform);
+
 		void findspawnpoint(short iType, short * x, short * y, short width, short height, bool tilealigned);
 		void CalculatePlatformNoSpawnZones();
 		bool IsInPlatformNoSpawnZone(short x, short y, short width, short height);
@@ -142,6 +144,7 @@ class CMap
 		short backgroundID;
 		short eyecandyID;
 		short musicCategoryID;
+		short iNumMapItems;
 
 		void WriteInt(int out, FILE * outFile);
 		int ReadInt(FILE * inFile);
@@ -166,8 +169,9 @@ class CMap
 		MovingPlatform ** platforms;
 		short		iNumPlatforms;
 
+		std::list<MovingPlatform*> tempPlatforms;
+
 		MapItem		mapitems[MAXMAPITEMS];
-		short		iNumMapItems;
 
 		SpawnArea	spawnareas[NUMSPAWNAREATYPES][MAXSPAWNAREAS];
 		short		numspawnareas[NUMSPAWNAREATYPES];

@@ -122,6 +122,9 @@ void DECLSPEC musicfinished(){}
 sfxSound * g_PlayingSoundChannels[NUM_SOUND_CHANNELS];
 CEyecandyContainer eyecandyfront;
 gfxSprite		spr_frontmap;
+
+CPlayer			*list_players[4];
+short			list_players_cnt = 0;
 ///////
 
 int save_as();

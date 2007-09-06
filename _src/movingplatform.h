@@ -9,7 +9,7 @@ class MovingPlatformPath
 {
 	public:
 		MovingPlatformPath();
-		MovingPlatformPath(float vel, float startX, float startY, float endX, float endY);
+		MovingPlatformPath(float vel, float startX, float startY, float endX, float endY, bool falling);
 		~MovingPlatformPath();
 
 		float fVelocity;
@@ -17,6 +17,8 @@ class MovingPlatformPath
 
 		float fStartX, fStartY;
 		float fEndX, fEndY;
+
+		bool fFalling;
 
 	protected:
 
@@ -59,6 +61,8 @@ class MovingPlatform
 		short iWidth, iHeight;
 		short iTileWidth, iTileHeight;
 		short iHalfWidth, iHalfHeight;
+
+		bool fDead;
 
 		float fx, fy;
 		float fOldX, fOldY;

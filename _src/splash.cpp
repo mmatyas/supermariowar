@@ -214,6 +214,8 @@ bool LoadMenuGraphics()
 	_load_gfxck(spr_worldvehicle, convertPath("gfx/packs/world/world_vehicles.png", graphicspack));
 	_load_gfxck(spr_worlditems, convertPath("gfx/packs/world/world_powerups.png", graphicspack));
 	_load_gfxck(spr_worlditempopup, convertPath("gfx/packs/world/world_item_popup.png", graphicspack));
+	_load_gfxck(spr_worlditemssmall, convertPath("gfx/packs/world/world_powerupssmall.png", graphicspack));
+	_load_gfxck(spr_worlditemsplace, convertPath("gfx/packs/world/world_bonusplace.png", graphicspack));
 
 	return true;
 }
@@ -564,6 +566,9 @@ bool LoadAndSplashScreen()
 	gfxSprite menu_dpi_logo;
 	_load_gfx(menu_dpi_logo, convertPath("gfx/packs/menu/splash_72dpi.png", menugraphicspacklist.current_name()));
 
+	gfxSprite menu_contest_winners;
+	_load_gfx(menu_contest_winners, convertPath("gfx/packs/menu/splash_contest_winners.png", menugraphicspacklist.current_name()));
+
 	gfxSprite menu_credits;
 	_load_gfxck(menu_credits, convertPath("gfx/packs/menu/splash_credits.png", menugraphicspacklist.current_name()));
 
@@ -678,9 +683,9 @@ bool LoadAndSplashScreen()
 				game_values.playerInput.outputControls[iPlayer].menu_cancel.fPressed ||
 				game_values.playerInput.outputControls[iPlayer].menu_random.fPressed)
 			{
-				if(state <= 3)
+				if(state <= 6)
 				{
-					state = 3;
+					state = 6;
 					alpha = 255;
 				}
 				else
@@ -700,7 +705,7 @@ bool LoadAndSplashScreen()
 			}
 		}
 
-		if(state == 0)
+		if(state == 0 || state == 3)
 		{
 			alpha += 4;
 			if(alpha >= 255)
@@ -709,14 +714,15 @@ bool LoadAndSplashScreen()
 				state++;
 			}
 		}
-		else if(state == 1)
+		else if(state == 1 || state == 4)
 		{
 			if(--timer <= 0)
 			{
+				timer = 120;
 				state++;
 			}
 		}
-		else if(state == 2)
+		else if(state == 2 || state == 5)
 		{
 			alpha -= 4;
 			if(alpha <= 0)
@@ -725,7 +731,7 @@ bool LoadAndSplashScreen()
 				state++;
 			}
 		}
-		else if(state == 3)
+		else if(state == 6)
 		{
 			alpha += 5;
 			if(alpha >= 255)
@@ -744,6 +750,11 @@ bool LoadAndSplashScreen()
 		}
 		else if(state == 3 || state == 4 || state == 5)
 		{
+			menu_contest_winners.setalpha((Uint8)alpha);
+			menu_contest_winners.draw(0, 0);
+		}
+		else if(state == 6 || state == 7 || state == 8)
+		{
 			menu_backdrop.setalpha((Uint8)alpha);
 			menu_backdrop.draw(0, 0);
 
@@ -760,12 +771,12 @@ bool LoadAndSplashScreen()
 			menu_credits.draw(227, 200);
 		}
 
-		if(state == 4)
+		if(state == 7)
 		{
 			_load_drawmsg("Loading...");
 			menu_font_large.drawCentered(320, 420, "Loading...");
 		}
-		else if(state == 5)
+		else if(state == 8)
 		{
 			_load_drawmsg("Press Any Key To Continue");
 
@@ -787,7 +798,7 @@ bool LoadAndSplashScreen()
 
 		SDL_Flip(screen);
 
-		if(state == 4)
+		if(state == 7)
 		{
 			backgroundmusic[2].load(musiclist.GetMusic(1));
 

@@ -2564,14 +2564,23 @@ MI_TourStop::MI_TourStop(short x, short y, bool fWorld) :
 	if(fIsWorld)
 	{
 		miModeField = new MI_ImageSelectField(&spr_selectfielddisabled, &menu_mode_small, 70, 85, "Mode", 305, 90, 16, 16);
-		miGoalField = new MI_SelectField(&spr_selectfielddisabled, 370, 85, "Goal", 200, 90);
-		miPointsField = new MI_SelectField(&spr_selectfielddisabled, 370, 125, "Score", 200, 90);
+		miGoalField = new MI_SelectField(&spr_selectfielddisabled, 380, 85, "Goal", 190, 90);
+		miPointsField = new MI_SelectField(&spr_selectfielddisabled, 380, 125, "Score", 190, 90);
 
 		miBonusField = new MI_SelectField(&spr_selectfielddisabled, 70, 125, "Bonus", 305, 90);
 		miBonusField->Disable(true);
 
 		miEndStageImage = new MI_Image(&spr_worldbackground, 200, 300, 0, 0, 100, 40, 1, 1, 32000);
 		miEndStageImage->Show(false);
+
+		for(short iBonus = 0; iBonus < 10; iBonus++)
+		{
+			miBonusIcon[iBonus] = new MI_Image(&spr_worlditemssmall, 170 + iBonus * 20, 133, 0, 0, 16, 16, 1, 1, 0); 
+			miBonusBackground[iBonus] = new MI_Image(&spr_worlditemsplace, 168 + iBonus * 20, 131, 0, 0, 20, 20, 1, 1, 0); 
+
+			miBonusIcon[iBonus]->Show(false);
+			miBonusBackground[iBonus]->Show(false);
+		}
 	}
 	else
 	{
@@ -2593,12 +2602,9 @@ MI_TourStop::MI_TourStop(short x, short y, bool fWorld) :
 	miGoalField->Disable(true);
 	miPointsField->Disable(true);
 	
-
 	miTourStopLeftHeaderBar = new MI_Image(&menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
 	miTourStopMenuRightHeaderBar = new MI_Image(&menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
 	miTourStopMenuHeaderText = new MI_Text("Tour Stop", 320, 5, 0, 2, 1);
-
-	
 }
 
 MI_TourStop::~MI_TourStop()
@@ -2609,10 +2615,16 @@ MI_TourStop::~MI_TourStop()
 	delete miMapField;
 	delete miStartButton;
 
-	if(miBonusField)
+	if(fIsWorld)
 	{
 		delete miBonusField;
 		delete miEndStageImage;
+
+		for(short iBonus = 0; iBonus < 10; iBonus++)
+		{
+			delete miBonusIcon[iBonus];
+			delete miBonusBackground[iBonus];
+		}
 	}
 }
 
@@ -2656,6 +2668,12 @@ void MI_TourStop::Draw()
 	{
 		miBonusField->Draw();
 		miEndStageImage->Draw();
+
+		for(short iBonus = 0; iBonus < 10; iBonus++)
+		{
+			miBonusBackground[iBonus]->Draw();
+			miBonusIcon[iBonus]->Draw();
+		}
 	}
 
 	miTourStopLeftHeaderBar->Draw();
@@ -2667,31 +2685,46 @@ void MI_TourStop::Refresh(short iTourStop)
 {
 	TourStop * tourstop = game_values.tourstops[iTourStop];
 
-	miModeField->Clear();
-	miModeField->Add(gamemodes[tourstop->iMode]->GetModeName(), tourstop->iMode, "", false, false);
-
-	miGoalField->Clear();
-	char szTemp[16];
-	sprintf(szTemp, "%d", tourstop->iGoal);
-	miGoalField->Add(szTemp, 0, "", false, false);
-	miGoalField->SetTitle(gamemodes[tourstop->iMode]->GetGoalName());
-
-	miPointsField->Clear();
-	sprintf(szTemp, "%d", tourstop->iPoints);
-	miPointsField->Add(szTemp, 0, "", false, false);
-
-	miMapField->SetMap(tourstop->pszMapFile);
-	miTourStopMenuHeaderText->SetText(tourstop->szName);
-
-	if(fIsWorld)
+	if(tourstop->iStageType == 0)
 	{
-		miBonusField->Clear();
-		miBonusField->Add(g_szWorldBonusNames[tourstop->iBonusType], tourstop->iBonusType, "", false, false);
+		miModeField->Clear();
+		miModeField->Add(gamemodes[tourstop->iMode]->GetModeName(), tourstop->iMode, "", false, false);
 
-		if(tourstop->fEndStage)
-			miEndStageImage->Show(true);
-		else
-			miEndStageImage->Show(false);
+		miGoalField->Clear();
+		char szTemp[16];
+		sprintf(szTemp, "%d", tourstop->iGoal);
+		miGoalField->Add(szTemp, 0, "", false, false);
+		miGoalField->SetTitle(gamemodes[tourstop->iMode]->GetGoalName());
+
+		miPointsField->Clear();
+		sprintf(szTemp, "%d", tourstop->iPoints);
+		miPointsField->Add(szTemp, 0, "", false, false);
+
+		miMapField->SetMap(tourstop->pszMapFile);
+		miTourStopMenuHeaderText->SetText(tourstop->szName);
+
+		if(fIsWorld)
+		{
+			miBonusField->Clear();
+			//miBonusField->Add(g_szWorldBonusNames[tourstop->iBonusType], tourstop->iBonusType, "", false, false);
+
+			miEndStageImage->Show(tourstop->fEndStage);
+
+			for(short iBonus = 0; iBonus < 10; iBonus++)
+			{
+				bool fShowBonus = iBonus < tourstop->iNumBonuses;
+				if(fShowBonus)
+				{
+					short iBonusIcon = tourstop->wsbBonuses[iBonus].iBonus;
+					miBonusIcon[iBonus]->SetImageSource(iBonusIcon < NUM_POWERUPS ? &spr_storedpowerupsmall : &spr_worlditemssmall);
+					miBonusIcon[iBonus]->SetImage((iBonusIcon < NUM_POWERUPS ? iBonusIcon : iBonusIcon - NUM_POWERUPS) << 4, 0, 16, 16);
+					miBonusBackground[iBonus]->SetImage(tourstop->wsbBonuses[iBonus].iWinnerPlace * 20, 0, 20, 20);
+				}
+				
+				miBonusIcon[iBonus]->Show(fShowBonus);
+				miBonusBackground[iBonus]->Show(fShowBonus);
+			}
+		}
 	}
 }
 
@@ -2706,13 +2739,19 @@ MI_TournamentScoreboard::MI_TournamentScoreboard(gfxSprite * spr_background, sho
 	sprBackground = spr_background;
 	fCreated = false;
 
-	for(int iTeam = 0; iTeam < 4; iTeam++)
+	for(short iTeam = 0; iTeam < 4; iTeam++)
 	{
 		tourScores[iTeam] = NULL;
-		worldBonus[iTeam] = NULL;
+		
+		worldScoreModifier[iTeam] = NULL;
+
+		for(short iBonus = 0; iBonus < 5; iBonus++)
+			worldBonus[iTeam][iBonus] = NULL;
+
+		worldPlace[iTeam] = NULL;
 	}
 
-	for(int iGame = 0; iGame < 10; iGame++)
+	for(short iGame = 0; iGame < 10; iGame++)
 	{
 		tourPoints[iGame] = NULL;
 		tourBonus[iGame] = NULL;
@@ -2731,7 +2770,7 @@ void MI_TournamentScoreboard::FreeScoreboard()
 	if(!fCreated)
 		return;
 
-	for(int iTeam = 0; iTeam < iNumTeams; iTeam++)
+	for(short iTeam = 0; iTeam < iNumTeams; iTeam++)
 	{
 		for(int iGame = 0; iGame < iNumGames; iGame++)
 		{
@@ -2753,14 +2792,29 @@ void MI_TournamentScoreboard::FreeScoreboard()
 			tourScores[iTeam] = NULL;
 		}
 
-		if(worldBonus[iTeam])
+		if(worldPlace[iTeam])
 		{
-			delete worldBonus[iTeam];
-			worldBonus[iTeam] = NULL;
+			delete worldPlace[iTeam];
+			worldPlace[iTeam] = NULL;
+		}
+
+		for(short iBonus = 0; iBonus < 5; iBonus++)
+		{
+			if(worldBonus[iTeam][iBonus])
+			{
+				delete worldBonus[iTeam][iBonus];
+				worldBonus[iTeam][iBonus] = NULL;
+			}
+		}
+
+		if(worldScoreModifier[iTeam])
+		{
+			delete worldScoreModifier[iTeam];
+			worldScoreModifier[iTeam] = NULL;
 		}
 	}
 
-	for(int iGame = 0; iGame < iNumGames; iGame++)
+	for(short iGame = 0; iGame < iNumGames; iGame++)
 	{
 		if(tourPoints[iGame])
 		{
@@ -2908,7 +2962,13 @@ void MI_TournamentScoreboard::Draw()
 		for(short iTeam = 0; iTeam < iNumTeams; iTeam++)
 		{
 			tourScores[iTeam]->Draw();
-			worldBonus[iTeam]->Draw();
+			worldScoreModifier[iTeam]->Draw();
+			worldPlace[iTeam]->Draw();
+
+			for(short iBonus = 0; iBonus < 5; iBonus++)
+			{
+				worldBonus[iTeam][iBonus]->Draw();
+			}
 		}
 	}
 }
@@ -2980,10 +3040,17 @@ void MI_TournamentScoreboard::CreateScoreboard(short numTeams, short numGames, g
 
 		if(game_values.matchtype == MATCH_TYPE_WORLD)
 		{
-			worldBonus[iTeam] = new MI_Image(&spr_worlditems, 300, iTeamY + 16, 0, 0, 32, 32, 1, 1, 0);
-			worldBonus[iTeam]->Show(false);
+			worldScoreModifier[iTeam] = new MI_Image(&spr_worlditems, ix + 400, iTeamY + 16, 0, 0, 32, 32, 1, 1, 0);
+			worldScoreModifier[iTeam]->Show(false);
+
+			worldPlace[iTeam] = new MI_Image(sprIcons, ix + 110, iTeamY + 16, 0, 0, 32, 32, 4, 1, 8);
+
+			for(short iBonus = 0; iBonus < 5; iBonus++)
+			{
+				worldBonus[iTeam][iBonus] = new MI_Image(&spr_worlditems, ix + 200 + 40 * iBonus, iTeamY + 16, 0, 0, 32, 32, 1, 1, 0);
+				worldBonus[iTeam][iBonus]->Show(false);
+			}
 		}
-	
 	}
 
 	if(fTour)
@@ -3030,12 +3097,54 @@ void MI_TournamentScoreboard::RefreshWorldScores(short gameWinner)
 
 		if(game_values.worldpointsbonus >= 0 && iGameWinner == game_values.tournament_scores[iTeam].wins)
 		{
-			worldBonus[iTeam]->Show(true);
-			worldBonus[iTeam]->SetImage((game_values.worldpointsbonus + 9) << 5, 0, 32, 32);
+			worldScoreModifier[iTeam]->Show(true);
+			worldScoreModifier[iTeam]->SetImage((game_values.worldpointsbonus + 9) << 5, 0, 32, 32);
 		}
 		else
 		{
-			worldBonus[iTeam]->Show(false);
+			worldScoreModifier[iTeam]->Show(false);
+		}
+
+		worldPlace[iTeam]->SetPosition(ix + 110, iTeamY + 16);
+		worldPlace[iTeam]->SetImage(0, score[iTeam]->place << 5, 32, 32);
+		worldPlace[iTeam]->Show(gameWinner >= 0);
+	}
+
+	short iBonusCounts[4] = {0, 0, 0, 0};
+	
+	if(gameWinner >= 0)
+	{
+		TourStop * tourStop = game_values.tourstops[game_values.tourstopcurrent];
+		for(short iBonus = 0; iBonus < tourStop->iNumBonuses; iBonus++)
+		{
+			WorldStageBonus * bonus = &tourStop->wsbBonuses[iBonus];
+
+			if(bonus->iWinnerPlace < iNumTeams)
+			{
+				for(short iTeam = 0; iTeam < iNumTeams; iTeam++)
+				{
+					if(score[iTeam]->place == bonus->iWinnerPlace)
+					{
+						short iDisplayPosition = game_values.tournament_scores[iTeam].wins;
+
+						worldBonus[iDisplayPosition][iBonusCounts[iDisplayPosition]]->Show(true);
+						worldBonus[iDisplayPosition][iBonusCounts[iDisplayPosition]]->SetImageSource(bonus->iBonus < NUM_POWERUPS ? &spr_storedpoweruplarge : &spr_worlditems);
+						worldBonus[iDisplayPosition][iBonusCounts[iDisplayPosition]]->SetImage((bonus->iBonus < NUM_POWERUPS ? bonus->iBonus : bonus->iBonus - NUM_POWERUPS) << 5, 0, 32, 32);
+
+						iBonusCounts[iDisplayPosition]++;
+
+						break;
+					}
+				}			
+			}
+		}
+	}
+
+	for(short iTeam = 0; iTeam < 4; iTeam++)
+	{
+		for(short iBonus = iBonusCounts[iTeam]; iBonus < 5; iBonus++)
+		{
+			worldBonus[iTeam][iBonus]->Show(false);
 		}
 	}
 
@@ -4336,9 +4445,9 @@ void MI_World::SetCurrentStageToCompleted(short iWinningTeam)
 		g_worldmap.GetPlayerCurrentTile(&iPlayerCurrentTileX, &iPlayerCurrentTileY);
 
 		WorldMapTile * tile = &g_worldmap.tiles[iPlayerCurrentTileX][iPlayerCurrentTileY];
-		tile->iForegroundSprite = game_values.colorids[game_values.teamids[iWinningTeam][0]] + WORLD_WINNING_TEAM_SPRITE_OFFSET; //Update with team completed sprite
-		tile->fAnimated = false; //Update with team completed sprite
-		tile->fCompleted = true;
+		//tile->iForegroundSprite = game_values.colorids[game_values.teamids[iWinningTeam][0]] + WORLD_WINNING_TEAM_SPRITE_OFFSET; //Update with team completed sprite
+		//tile->fAnimated = false; //Update with team completed sprite
+		tile->iCompleted = game_values.colorids[game_values.teamids[iWinningTeam][0]];
 
 		game_values.tournament_scores[iWinningTeam].total += game_values.tourstops[tile->iType - 6]->iPoints * iBonusMult + iBonusAdd;
 	}
@@ -4749,9 +4858,9 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 				{
 					//Make sure there is a path connection and that there is no stage or vehicle blocking the way
 					if(tile->fConnection[0] && !g_worldmap.IsDoor(iPlayerCurrentTileX, iPlayerCurrentTileY - 1) &&
-						((tile->fCompleted && (!fVehicleInTile || iSleepTurns > 0)) || iReturnDirection == 0 || fUsingCloud))
+						((tile->iCompleted >= -1 && (!fVehicleInTile || iSleepTurns > 0)) || iReturnDirection == 0 || fUsingCloud))
 					{
-						if(fUsingCloud && (!tile->fCompleted || fVehicleInTile) && iReturnDirection != 0)
+						if(fUsingCloud && (tile->iCompleted == -2 || fVehicleInTile) && iReturnDirection != 0)
 							UseCloud(false);
 
 						g_worldmap.MovePlayer(0);
@@ -4761,9 +4870,9 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 				else if(playerKeys->menu_down.fPressed)
 				{
 					if(tile->fConnection[1] && !g_worldmap.IsDoor(iPlayerCurrentTileX, iPlayerCurrentTileY + 1) &&
-						((tile->fCompleted && (!fVehicleInTile || iSleepTurns > 0)) || iReturnDirection == 1 || fUsingCloud))
+						((tile->iCompleted >= -1 && (!fVehicleInTile || iSleepTurns > 0)) || iReturnDirection == 1 || fUsingCloud))
 					{
-						if(fUsingCloud && (!tile->fCompleted || fVehicleInTile) && iReturnDirection != 1)
+						if(fUsingCloud && (tile->iCompleted == -2 || fVehicleInTile) && iReturnDirection != 1)
 							UseCloud(false);
 
 						g_worldmap.MovePlayer(1);
@@ -4773,9 +4882,9 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 				else if(playerKeys->menu_left.fPressed)
 				{
 					if(tile->fConnection[2] && !g_worldmap.IsDoor(iPlayerCurrentTileX - 1, iPlayerCurrentTileY) &&
-						((tile->fCompleted && (!fVehicleInTile || iSleepTurns > 0)) || iReturnDirection == 2 || fUsingCloud))
+						((tile->iCompleted >= -1 && (!fVehicleInTile || iSleepTurns > 0)) || iReturnDirection == 2 || fUsingCloud))
 					{
-						if(fUsingCloud && (!tile->fCompleted || fVehicleInTile) && iReturnDirection != 2)
+						if(fUsingCloud && (tile->iCompleted == -2 || fVehicleInTile) && iReturnDirection != 2)
 							UseCloud(false);
 
 						g_worldmap.MovePlayer(2);
@@ -4789,9 +4898,9 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 				else if(playerKeys->menu_right.fPressed)
 				{
 					if(tile->fConnection[3] && !g_worldmap.IsDoor(iPlayerCurrentTileX + 1, iPlayerCurrentTileY) &&
-						((tile->fCompleted && (!fVehicleInTile || iSleepTurns > 0)) || iReturnDirection == 3 || fUsingCloud))
+						((tile->iCompleted >= -1 && (!fVehicleInTile || iSleepTurns > 0)) || iReturnDirection == 3 || fUsingCloud))
 					{
-						if(fUsingCloud && (!tile->fCompleted || fVehicleInTile) && iReturnDirection != 3)
+						if(fUsingCloud && (tile->iCompleted == -2 || fVehicleInTile) && iReturnDirection != 3)
 							UseCloud(false);
 
 						g_worldmap.MovePlayer(3);
@@ -4830,7 +4939,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 					WorldMapTile * tile = &g_worldmap.tiles[iPlayerCurrentTileX][iPlayerCurrentTileY];
 
 					short iType = tile->iType - 6;
-					if(iType >= 0 && !tile->fCompleted)
+					if(iType >= 0 && tile->iCompleted == -2)
 					{
 						game_values.tourstopcurrent = iType;
 
@@ -4940,6 +5049,23 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 							AdvanceTurn();
 							fUsedItem = true;
 							ifsoundonplay(sfx_switchpress);
+						}
+					}
+					else if(iPowerup == NUM_POWERUPS + 4) //Revive stage
+					{
+						short iDestX, iDestY;
+						g_worldmap.GetPlayerDestTile(&iDestX, &iDestY);
+						WorldMapTile * tile = &g_worldmap.tiles[iDestX][iDestY];
+
+						if(tile->iType >= 6 && tile->iCompleted >= 0)
+						{
+							tile->iCompleted = -2;
+							UpdateMapSurface();
+
+							uiMenu->AddEyeCandy(new EC_SingleAnimation(&spr_fireballexplosion, (iDestX << 5) + iMapOffsetX, (iDestY << 5) + iMapOffsetY, 3, 8));
+
+							fUsedItem = true;
+							ifsoundonplay(sfx_transform);
 						}
 					}
 					else if(iPowerup >= NUM_POWERUPS + 5 && iPowerup <= NUM_POWERUPS + 8) //Door Keys
