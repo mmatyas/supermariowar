@@ -28,7 +28,7 @@ class MovingPlatformPath
 class MovingPlatform
 {
 	public:
-		MovingPlatform(short ** tiledata, short w, short h, MovingPlatformPath * path, bool forwardDirection, short startPathNode, bool preview);
+		MovingPlatform(short ** tiledata, TileType ** tiletypes, short w, short h, MovingPlatformPath * path, bool forwardDirection, short startPathNode, bool preview);
 		~MovingPlatform();
 
 		void draw();
@@ -57,6 +57,7 @@ class MovingPlatform
 	protected:
 
 		short ** iTileData;
+		TileType ** iTileType;
 		short ix, iy;
 		short iWidth, iHeight;
 		short iTileWidth, iTileHeight;

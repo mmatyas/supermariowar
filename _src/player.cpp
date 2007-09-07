@@ -1123,8 +1123,8 @@ void CPlayer::move()
 							TileType lefttile = g_map.map(txl, ty);
 							TileType righttile = g_map.map(txr, ty);
 
-							if((lefttile == tile_solid_on_top && (righttile == tile_solid_on_top || righttile == tile_nonsolid)) ||
-								(righttile == tile_solid_on_top && (lefttile == tile_solid_on_top || lefttile == tile_nonsolid)))
+							if((lefttile == tile_solid_on_top && (righttile == tile_solid_on_top || righttile == tile_nonsolid || righttile == tile_gap)) ||
+								(righttile == tile_solid_on_top && (lefttile == tile_solid_on_top || lefttile == tile_nonsolid || lefttile == tile_gap)))
 							{
 								fFellThrough = true;
 							}
@@ -1134,8 +1134,8 @@ void CPlayer::move()
 								fPrecalculatedY += platform->fOldVelY;
 								platform->gettiletypes(this, &lefttile, &righttile);
 
-								if((lefttile == tile_solid_on_top && (righttile == tile_solid_on_top || righttile == tile_nonsolid)) ||
-								(righttile == tile_solid_on_top && (lefttile == tile_solid_on_top || lefttile == tile_nonsolid)))
+								if((lefttile == tile_solid_on_top && (righttile == tile_solid_on_top || righttile == tile_nonsolid || righttile == tile_gap)) ||
+								(righttile == tile_solid_on_top && (lefttile == tile_solid_on_top || lefttile == tile_nonsolid || lefttile == tile_gap)))
 								{
 									fFellThrough = true;
 								}
@@ -3258,9 +3258,10 @@ void CPlayer::collision_detection_map()
 		TileType lefttile = g_map.map(txl, ty);
 		TileType righttile = g_map.map(txr, ty);
 
+		bool fGapSupport = (velx >= VELTURBOMOVING || velx <= -VELTURBOMOVING) && (lefttile == tile_gap || righttile == tile_gap);
 		bool fSolidTileUnderPlayer = (lefttile & 0x5) == 1 || lefttile == tile_death_on_bottom || (righttile & 0x5) == 1 || righttile == tile_death_on_bottom;
 
-		if((lefttile == tile_solid_on_top || righttile == tile_solid_on_top) && fOldY + PH <= ty * TILESIZE)
+		if((lefttile == tile_solid_on_top || righttile == tile_solid_on_top || fGapSupport) && fOldY + PH <= ty * TILESIZE)
 		{	//on ground
 			//Deal with player down jumping through solid on top tiles
 			if(fallthrough && !fSolidTileUnderPlayer)
@@ -3314,7 +3315,7 @@ void CPlayer::collision_detection_map()
 			{
 				TileType alignedtile = g_map.map(alignedBlockX, ty);
 
-				if(alignedtile == tile_ice || (alignedtile == tile_nonsolid && g_map.map(unAlignedBlockX, ty) == tile_ice))
+				if(alignedtile == tile_ice || ((alignedtile == tile_nonsolid || alignedtile == tile_gap) && g_map.map(unAlignedBlockX, ty) == tile_ice))
 					onice = true;
 				else 
 					onice = false;
@@ -3403,10 +3404,15 @@ bool CPlayer::collision_detection_checktop()
 	if(txr < 0 || txr >= MAPWIDTH)
 		return false;
 	
-	if((g_map.map(txl, ty) != tile_nonsolid && g_map.map(txl, ty) != tile_solid_on_top) || 
-		(g_map.map(txr, ty) != tile_nonsolid && g_map.map(txr, ty) != tile_solid_on_top) ||
-		(g_map.block(txl, ty) && !g_map.block(txl, ty)->isTransparent()) || 
-		(g_map.block(txr, ty) && !g_map.block(txr, ty)->isTransparent()))
+	TileType leftTile = g_map.map(txl, ty);
+	TileType rightTile = g_map.map(txr, ty);
+	IO_Block * leftBlock = g_map.block(txl, ty);
+	IO_Block * rightBlock = g_map.block(txr, ty);
+
+	if((leftTile != tile_nonsolid && leftTile != tile_gap && leftTile != tile_solid_on_top) || 
+		(rightTile != tile_nonsolid && rightTile != tile_gap && rightTile != tile_solid_on_top) ||
+		(leftBlock && !leftBlock->isTransparent()) || 
+		(rightBlock && !rightBlock->isTransparent()))
 	{
 		yf((float)(ty * TILESIZE + TILESIZE) + 0.2f);
 		return true;
@@ -3435,10 +3441,15 @@ bool CPlayer::collision_detection_checkleft()
 	if(tx < 0 || tx >= MAPWIDTH)
 		return false;
 
-	if((g_map.map(tx, ty) != tile_nonsolid && g_map.map(tx, ty) != tile_solid_on_top) ||
-		(g_map.map(tx, ty2) != tile_nonsolid && g_map.map(tx, ty2) != tile_solid_on_top) ||
-		(g_map.block(tx, ty) && !g_map.block(tx, ty)->isTransparent()) || 
-		(g_map.block(tx, ty2) && !g_map.block(tx, ty2)->isTransparent()))
+	TileType topTile = g_map.map(tx, ty);
+	TileType bottomTile = g_map.map(tx, ty2);
+	IO_Block * topBlock = g_map.block(tx, ty);
+	IO_Block * bottomBlock = g_map.block(tx, ty2);
+
+	if((topTile != tile_nonsolid && topTile != tile_gap && topTile != tile_solid_on_top) ||
+		(bottomTile != tile_nonsolid && bottomTile != tile_gap && bottomTile != tile_solid_on_top) ||
+		(topBlock && !topBlock->isTransparent()) || 
+		(bottomBlock && !bottomBlock->isTransparent()))
 	{
 		xf((float)(tx * TILESIZE + TILESIZE) + 0.2f);
 		flipsidesifneeded();
@@ -3473,10 +3484,15 @@ bool CPlayer::collision_detection_checkright()
 	if(tx < 0 || tx >= MAPWIDTH)
 		return false;
 
-	if((g_map.map(tx, ty) != tile_nonsolid && g_map.map(tx, ty) != tile_solid_on_top) ||
-		(g_map.map(tx, ty2) != tile_nonsolid && g_map.map(tx, ty2) != tile_solid_on_top) ||
-		(g_map.block(tx, ty) && !g_map.block(tx, ty)->isTransparent()) || 
-		(g_map.block(tx, ty2) && !g_map.block(tx, ty2)->isTransparent()))
+	TileType topTile = g_map.map(tx, ty);
+	TileType bottomTile = g_map.map(tx, ty2);
+	IO_Block * topBlock = g_map.block(tx, ty);
+	IO_Block * bottomBlock = g_map.block(tx, ty2);
+
+	if((topTile != tile_nonsolid && topTile != tile_gap && topTile != tile_solid_on_top) ||
+		(bottomTile != tile_nonsolid && bottomTile != tile_gap && bottomTile != tile_solid_on_top) ||
+		(topBlock && !topBlock->isTransparent()) || 
+		(bottomBlock && !bottomBlock->isTransparent()))
 	{
 		xf((float)(tx * TILESIZE - PW) - 0.2f);
 		flipsidesifneeded();

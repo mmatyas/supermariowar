@@ -343,7 +343,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 			iSwitches[iSwitch] = (short)ReadInt(mapfile);
 		}
 
-		loadPlatforms(mapfile, iReadType == read_type_preview);
+		loadPlatforms(mapfile, iReadType == read_type_preview, version);
 
 		//Load map items (like carryable spikes and springs)
 		iNumMapItems = ReadInt(mapfile);
@@ -557,7 +557,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 
 		if((version[2] == 0 && version[3] > 1) || version[2] >= 1)
 		{
-			loadPlatforms(mapfile, iReadType == read_type_preview);
+			loadPlatforms(mapfile, iReadType == read_type_preview, version);
 		}
 
 		//Read in eyecandy to use
@@ -669,7 +669,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 
 		if(version[2] == 0 && version[3] < 2)
 		{
-			loadPlatforms(mapfile, iReadType == read_type_preview);
+			loadPlatforms(mapfile, iReadType == read_type_preview, version);
 		}
 
 		if(version[2] == 0 && version[3] == 0)
@@ -895,6 +895,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 			{
 				//Read everything into layer 1
 				mapdata[i][j][1] = (short)ReadInt(mapfile);
+				mapdatatop[i][j] = tileset[mapdata[i][j][1]];
 			}
 		}
 
@@ -927,7 +928,94 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
     cout << " done" << endl;
 }
 
-void CMap::loadPlatforms(FILE * mapfile, bool fPreview)
+void CMap::UpdateAllTileGaps()
+{
+	//Detect 1 tile gaps between solid tiles
+	for(short j = 0; j < MAPHEIGHT; j++)
+	{
+		for(short i = 0; i < MAPWIDTH; i++)
+		{
+			SetTileGap(i, j);
+		}
+	}
+}
+
+void CMap::UpdateTileGap(short i, short j)
+{
+	for(short iRow = j; iRow <= j + 1; iRow++)
+	{
+		for(short iCol = i - 1; iCol <= i + 1; iCol++)
+		{
+			if(iRow >= MAPHEIGHT)
+				break;
+
+			short ix = iCol;
+			if(ix < 0)
+				ix = MAPWIDTH - 1;
+			else if(ix >= MAPWIDTH)
+				ix = 0;
+				
+			SetTileGap(ix, iRow);
+		}
+	}
+}
+
+void CMap::SetTileGap(short i, short j)
+{
+	short iLeftTile = i - 1;
+	if(iLeftTile < 0)
+		iLeftTile = MAPWIDTH - 1;
+
+	short iRightTile = i + 1;
+	if(iRightTile >= MAPWIDTH)
+		iRightTile = 0;
+
+	TileType topLeftTile = tile_nonsolid;
+	TileType topCenterTile = tile_nonsolid;
+	TileType topRightTile = tile_nonsolid;
+
+	IO_Block * topLeftBlock = NULL;
+	IO_Block * topCenterBlock = NULL;
+	IO_Block * topRightBlock = NULL;
+
+	if(j > 0)
+	{
+		topLeftTile = mapdatatop[iLeftTile][j - 1];
+		topCenterTile = mapdatatop[i][j - 1];
+		topRightTile = mapdatatop[iRightTile][j - 1];
+
+		topLeftBlock = blockdata[iLeftTile][j - 1];
+		topCenterBlock = blockdata[i][j - 1];
+		topRightBlock = blockdata[iRightTile][j - 1];
+	}
+
+	TileType leftTile = mapdatatop[iLeftTile][j];
+	TileType centerTile = mapdatatop[i][j];
+	TileType rightTile = mapdatatop[iRightTile][j];
+
+	IO_Block * leftBlock = blockdata[iLeftTile][j];
+	IO_Block * centerBlock = blockdata[i][j];
+	IO_Block * rightBlock = blockdata[iRightTile][j];
+
+	bool fLeftSolid = (leftTile != tile_nonsolid && leftTile != tile_gap) || (leftBlock && !leftBlock->isTransparent());
+	bool fCenterSolid = centerTile != tile_nonsolid || (centerBlock && !centerBlock->isTransparent());
+	bool fRightSolid = (rightTile != tile_nonsolid && rightTile != tile_gap) || (rightBlock && !rightBlock->isTransparent());
+
+	bool fTopLeftSolid = (topLeftTile != tile_nonsolid && topLeftTile != tile_gap && topLeftTile != tile_solid_on_top) || (topLeftBlock && !topLeftBlock->isTransparent());
+	bool fTopCenterSolid = (topCenterTile != tile_nonsolid && topCenterTile != tile_gap && topCenterTile != tile_solid_on_top) || (topCenterBlock && !topCenterBlock->isTransparent());
+	bool fTopRightSolid = (topRightTile != tile_nonsolid && topRightTile != tile_gap && topRightTile != tile_solid_on_top) || (topRightBlock && !topRightBlock->isTransparent());
+
+	if(fLeftSolid && !fCenterSolid && fRightSolid && !fTopLeftSolid && !fTopCenterSolid && !fTopRightSolid)
+	{
+		mapdatatop[i][j] = tile_gap;
+	}
+	else if(mapdatatop[i][j] == tile_gap)
+	{
+		mapdatatop[i][j] = tile_nonsolid;
+	}
+}
+
+void CMap::loadPlatforms(FILE * mapfile, bool fPreview, int version[4])
 {
 	clearPlatforms();
 
@@ -941,14 +1029,21 @@ void CMap::loadPlatforms(FILE * mapfile, bool fPreview)
 		short iHeight = (short)ReadInt(mapfile);
 
 		short ** tiles = new short*[iWidth];
+		TileType ** types = new TileType*[iWidth];
 
 		for(short iCol = 0; iCol < iWidth; iCol++)
 		{
 			tiles[iCol] = new short[iHeight];
+			types[iCol] = new TileType[iHeight];
 
 			for(short iRow = 0; iRow < iHeight; iRow++)
 			{
 				tiles[iCol][iRow] = (short)ReadInt(mapfile);
+
+				if(version[0] > 1 || (version[0] == 1 && version[1] >= 8))
+					types[iCol][iRow] = (TileType)ReadInt(mapfile);
+				else
+					types[iCol][iRow] = tileset[tiles[iCol][iRow]];
 			}
 		}
 	
@@ -960,7 +1055,7 @@ void CMap::loadPlatforms(FILE * mapfile, bool fPreview)
 		
 		MovingPlatformPath * path = new MovingPlatformPath(fVelocity, fStartX, fStartY, fEndX, fEndY, false);
 
-		platforms[iPlatform] = new MovingPlatform(tiles, iWidth, iHeight, path, true, 0, fPreview);
+		platforms[iPlatform] = new MovingPlatform(tiles, types, iWidth, iHeight, path, true, 0, fPreview);
 	}
 }
 
@@ -1089,7 +1184,7 @@ void CMap::saveMap(const std::string& file)
 			if(objectdata[i][j] >= 11 && objectdata[i][j] <= 14) //On/Off Block
 				iOnOffBlockCount++;
 
-			if(mapdatatop[i][j] != tile_nonsolid && mapdatatop[i][j] != tile_solid_on_top)
+			if(mapdatatop[i][j] != tile_nonsolid && mapdatatop[i][j] != tile_gap && mapdatatop[i][j] != tile_solid_on_top)
 				iDensity++;
 		}
 	}
@@ -1139,6 +1234,7 @@ void CMap::saveMap(const std::string& file)
 			for(short iRow = 0; iRow < platforms[iPlatform]->iTileHeight; iRow++)	
 			{
 				WriteInt(platforms[iPlatform]->iTileData[iCol][iRow], mapfile);
+				WriteInt(platforms[iPlatform]->iTileType[iCol][iRow], mapfile);
 			}
 		}
 
@@ -1186,7 +1282,8 @@ void CMap::saveMap(const std::string& file)
 			TileType type = tile_nonsolid;
 			for(k = MAPLAYERS - 1; k >= 0; k--)
 			{
-				if(tileset[mapdata[i][j][k]] != tile_nonsolid)
+				TileType type = tileset[mapdata[i][j][k]];
+				if(type != tile_nonsolid && type != tile_gap)
 				{
 					type = tileset[mapdata[i][j][k]];
 					break;
@@ -1525,7 +1622,7 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks)
 					fUsed = true;
 			}
 
-			if(!fUsed && mapdatatop[i][j] != tile_nonsolid && mapdatatop[i][j] != tile_solid_on_top)
+			if(!fUsed && mapdatatop[i][j] != tile_nonsolid && mapdatatop[i][j] != tile_gap && mapdatatop[i][j] != tile_solid_on_top)
 			{
 				fUsed = true;
 			}
@@ -1558,7 +1655,10 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks)
 					int m;
 					for(m = j; m < MAPHEIGHT; m++)
 					{
-						if(mapdatatop[i][m] == tile_death_on_top || mapdatatop[i][m] == tile_death)
+						TileType type = mapdatatop[i][m];
+						short block = objectdata[i][m];
+
+						if(type == tile_death_on_top || type == tile_death)
 						{
 							fUsed = true;
 							break;
@@ -1566,14 +1666,14 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks)
 						
 						if(fUseTempBlocks)
 						{
-							if(mapdatatop[i][m] != tile_nonsolid || objectdata[i][m] != BLOCKSETSIZE)
+							if((type != tile_nonsolid && type != tile_gap) || block != BLOCKSETSIZE)
 							{
 								break;
 							}
 						}
 						else
 						{
-							if(mapdatatop[i][m] != tile_nonsolid || (objectdata[i][m] != BLOCKSETSIZE && objectdata[i][m] != 0 && objectdata[i][m] != 2 && objectdata[i][m] != 6 && objectdata[i][m] < 11))
+							if((type != tile_nonsolid && type != tile_gap) || (block != BLOCKSETSIZE && block != 0 && block != 2 && block != 6 && block < 11))
 							{
 								break;
 							}
@@ -1585,7 +1685,10 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks)
 					{
 						for(m = 0; m < j; m++)
 						{
-							if(mapdatatop[i][m] == tile_death_on_top || mapdatatop[i][m] == tile_death)
+							TileType type = mapdatatop[i][m];
+							short block = objectdata[i][m];
+
+							if(type == tile_death_on_top || type == tile_death)
 							{
 								fUsed = true;
 								break;
@@ -1593,14 +1696,14 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks)
 							
 							if(fUseTempBlocks)
 							{
-								if(mapdatatop[i][m] != tile_nonsolid || objectdata[i][m] != BLOCKSETSIZE)
+								if((type != tile_nonsolid && type != tile_gap) || block != BLOCKSETSIZE)
 								{
 									break;
 								}
 							}
 							else
 							{
-								if(mapdatatop[i][m] != tile_nonsolid || (objectdata[i][m] != BLOCKSETSIZE && objectdata[i][m] != 0 && objectdata[i][m] != 2))
+								if((type != tile_nonsolid && type != tile_gap) || (block != BLOCKSETSIZE && block != 0 && block != 2))
 								{
 									break;
 								}
@@ -2450,6 +2553,21 @@ void CMap::drawfrontlayer()
 {
 	for(int k = 0; k < numdrawareas; k++)
 		spr_frontmap.draw(drawareas[k].x, drawareas[k].y, drawareas[k].x, drawareas[k].y, drawareas[k].w, drawareas[k].h);
+
+	/*
+	//Draw gaps in pink for debugging
+	for(short i = 0; i < MAPHEIGHT; i++)
+	{
+		for(short j = 0; j < MAPWIDTH; j++)
+		{
+			if(mapdatatop[j][i] == tile_gap)
+			{
+				SDL_Rect r = {j * TILESIZE, i * TILESIZE, TILESIZE, TILESIZE};
+				SDL_FillRect(blitdest, &r, SDL_MapRGB(blitdest->format, 255, 0, 255));
+			}
+		}	
+	}
+	*/
 }
 
 void CMap::WriteInt(int out, FILE * outFile)
@@ -2572,7 +2690,8 @@ void CMap::optimize()
 		{
 			for(int m = 1; m < MAPLAYERS; m++)
 			{
-				if(tileset[mapdata[i][j][m]] != tile_nonsolid && tileset[mapdata[i][j][m]] != tile_solid_on_top)
+				TileType type = tileset[mapdata[i][j][m]];
+				if(type != tile_nonsolid && type != tile_gap && type != tile_solid_on_top)
 				{
 					for(int k = m - 1; k >= 0; k--)
 					{

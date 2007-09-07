@@ -2284,7 +2284,7 @@ void Menu::RunMenu()
 		}
 	}
 
-	if(game_values.matchtype == MATCH_TYPE_TOUR || game_values.matchtype == MATCH_TYPE_TOURNAMENT)
+	if(game_values.matchtype != MATCH_TYPE_WORLD)
 	{
 		if(mCurrentMenu == &mGameSettingsMenu || mCurrentMenu == &mTournamentScoreboardMenu)
 			miMapField->LoadCurrentMap();

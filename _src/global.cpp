@@ -961,4 +961,3 @@ void ResetTourStops()
 
 	game_values.tourstops.clear();
 }
-

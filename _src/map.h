@@ -2,7 +2,7 @@
 #ifndef SMW_MAP_H
 #define SMW_MAP_H
 
-enum TileType{tile_nonsolid = 0, tile_solid = 1, tile_solid_on_top = 2, tile_ice = 3, tile_death = 4, tile_death_on_top = 5, tile_death_on_bottom = 6};
+enum TileType{tile_nonsolid = 0, tile_solid = 1, tile_solid_on_top = 2, tile_ice = 3, tile_death = 4, tile_death_on_top = 5, tile_death_on_bottom = 6, tile_gap = 8};
 enum ReadType{read_type_full = 0, read_type_preview = 1, read_type_summary = 2};
 
 class MovingPlatform;
@@ -66,7 +66,10 @@ class CMap
 		void saveMap(const std::string& file);
 		void saveThumbnail(const std::string &file, bool fUseClassicPack);
 
-		void loadPlatforms(FILE * mapfile, bool fPreview);
+		void UpdateAllTileGaps();
+		void UpdateTileGap(short i, short j);
+
+		void loadPlatforms(FILE * mapfile, bool fPreview, int version[4]);
 
 		void convertMap();
 
@@ -156,8 +159,11 @@ class CMap
 		void WriteString(char * szString, FILE * outFile);
 		void ReadString(char * szString, short size, FILE * outFile);
 
+		TileType * GetTileSet() {return tileset;}
+
 	private:
 		
+		void SetTileGap(short i, short j);
 		void calculatespawnareas(short iType, bool fUseTempBlocks);
 		
 		short		mapdata[MAPWIDTH][MAPHEIGHT][MAPLAYERS];		//0 to TILESETSIZE-1: tiles, TILESETSIZE: no tile
@@ -232,7 +238,7 @@ class CMap
 		friend int save_as();
 		friend int load();
 		friend void LoadMapObjects();
-		friend void draw_platform(short iPlatform);
+		friend void draw_platform(short iPlatform, bool fDrawTileTypes);
 		friend void insert_platforms_into_map();
 		friend void loadcurrentmap();
 		friend void loadmap(char * szMapFile);

@@ -485,7 +485,7 @@ bool LoadGameGraphics()
 
 	_load_gfxck(spr_overworld, convertPath("gfx/packs/tileset.png", graphicspack));
 
-	std::string tileSetTLS = convertPath("maps/tileset.tls");
+	std::string tileSetTLS = convertPath("maps/tileset/tileset.tls");
 	std::string tileSetPNG[3];
 	tileSetPNG[0] = convertPath("gfx/packs/tileset.png", graphicspack);
 	tileSetPNG[1] = convertPath("gfx/packs/tileset_medium.png", graphicspack);

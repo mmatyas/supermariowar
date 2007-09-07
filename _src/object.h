@@ -358,7 +358,7 @@ class B_SwitchBlock : public IO_Block
 		bool hitright(IO_MovingObject * object);
 		bool hitleft(IO_MovingObject * object);
 
-		void FlipState() {state = 1 - state;}		
+		void FlipState();
 
 	private:
 		short iSrcX;

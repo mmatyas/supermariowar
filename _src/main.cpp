@@ -1330,7 +1330,7 @@ void RunGame()
 						blocktype = g_map.blockat(x, y);
 					}
 
-					if( (tile != tile_nonsolid && tile != tile_solid_on_top) || 
+					if( (tile != tile_nonsolid && tile != tile_gap && tile != tile_solid_on_top) || 
 						(block && blocktype != 3 && blocktype < 11))
 					{
 						game_values.pausegame = true;
@@ -1383,7 +1383,7 @@ void RunGame()
 								blocktype = g_map.blockat(corners[0][j], corners[1][i]);
 							}
 
-							if( (tile != tile_nonsolid && tile != tile_solid_on_top) || 
+							if( (tile != tile_nonsolid && tile != tile_gap && tile != tile_solid_on_top) || 
 								(block && blocktype != 3 && blocktype < 11))
 							{
 								game_values.pausegame = true;
@@ -3135,6 +3135,8 @@ void LoadMapObjects()
 		else if(iType == 1)
 			objectsplayer.add(new CO_Spike(&spr_spike, ix, iy));
 	}
+
+	g_map.UpdateAllTileGaps();
 }
 
 bool SwapPlayers(short iUsingPlayerID)

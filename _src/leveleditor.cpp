@@ -41,7 +41,7 @@
     #endif
 #endif
 
-#define MAPTITLESTRING "SMW 1.7 Leveleditor"
+#define MAPTITLESTRING "SMW 1.8 Leveleditor"
 
 enum {EDITOR_EDIT, EDITOR_TILES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_MAP, EDITOR_BLOCKS, NEW_MAP, SAVE, EDITOR_WARP, EDITOR_EYECANDY, DISPLAY_HELP, EDITOR_PLATFORM, EDITOR_TILETYPE, EDITOR_BACKGROUNDS, EDITOR_MAPITEMS};
 
@@ -62,6 +62,7 @@ class MapPlatform
 {
 	public:
 		short tiles[MAPWIDTH][MAPHEIGHT];
+		TileType types[MAPWIDTH][MAPHEIGHT];
 		SDL_Rect rIcon[2];
 		short iVelocity;
 		short iStartX;
@@ -304,7 +305,7 @@ int main(int argc, char *argv[])
 	tileSetPNG[0] = convertPath("gfx/packs/Classic/tileset.png");
 	tileSetPNG[1] = convertPath("gfx/packs/Classic/tileset_medium.png");
 	tileSetPNG[2] = convertPath("gfx/packs/Classic/tileset_small.png");
-	g_map.loadTileSet(convertPath("maps/tileset.tls"), tileSetPNG);
+	g_map.loadTileSet(convertPath("maps/tileset/tileset.tls"), tileSetPNG);
 	
 	//Setup Platforms
 	for(short iPlatform = 0; iPlatform < MAX_PLATFORMS; iPlatform++)
@@ -324,6 +325,7 @@ int main(int argc, char *argv[])
 			for(short iRow = 0; iRow < MAPHEIGHT; iRow++)
 			{
 				g_Platforms[iPlatform].tiles[iCol][iRow] = TILESETSIZE;
+				g_Platforms[iPlatform].types[iCol][iRow] = tile_nonsolid;
 			}
 		}
 
@@ -418,8 +420,7 @@ int main(int argc, char *argv[])
 	printf("\n---------------- save map ----------------\n");
 
 	save_map(convertPath("maps/ZZleveleditor.map"));
-	g_map.saveTileSet(convertPath("maps/tileset.tls"));
-
+	g_map.saveTileSet(convertPath("maps/tileset/tileset.tls"));
 
 	printf("\n---------------- shutdown ----------------\n");
 	return 0;
@@ -1590,7 +1591,7 @@ int editor_platforms()
 	rPath[5].w = 32;
 	rPath[5].h = 32;
 
-	enum {PLATFORM_EDIT_STATE_SELECT, PLATFORM_EDIT_STATE_EDIT, PLATFORM_EDIT_STATE_PATH, PLATFORM_EDIT_STATE_TEST};
+	enum {PLATFORM_EDIT_STATE_SELECT, PLATFORM_EDIT_STATE_EDIT, PLATFORM_EDIT_STATE_PATH, PLATFORM_EDIT_STATE_TEST, PLATFORM_EDIT_STATE_TILETYPE};
 
 	short iPlatformEditState = PLATFORM_EDIT_STATE_SELECT;
 	short iEditPlatform = 0;
@@ -1606,14 +1607,28 @@ int editor_platforms()
 			switch(event.type)
 			{
 				case SDL_QUIT:
+				{
 					done = true;
-				break;
-
+					break;
+				}
 				case SDL_KEYDOWN:
+				{
 					if(event.key.keysym.sym == SDLK_t)
 					{
-						if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState)
+						if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
+						{
 							editor_tiles();
+							iPlatformEditState = PLATFORM_EDIT_STATE_EDIT;
+						}
+					}
+					else if(event.key.keysym.sym == SDLK_l)
+					{
+						if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
+						{
+							editor_tiletype();
+							iPlatformEditState = PLATFORM_EDIT_STATE_TILETYPE;
+							ignoreclick = false;
+						}
 					}
 					else if(event.key.keysym.sym == SDLK_c)
 					{
@@ -1636,6 +1651,7 @@ int editor_platforms()
 									for(short iRow = 0; iRow < MAPHEIGHT; iRow++)
 									{
 										g_Platforms[iPlatform].tiles[iCol][iRow] = g_Platforms[iPlatform + 1].tiles[iCol][iRow];
+										g_Platforms[iPlatform].types[iCol][iRow] = g_Platforms[iPlatform + 1].types[iCol][iRow];
 									}
 								}
 
@@ -1660,7 +1676,7 @@ int editor_platforms()
 						{
 							iPlatformEditState = PLATFORM_EDIT_STATE_SELECT;
 						}
-						else if(PLATFORM_EDIT_STATE_PATH == iPlatformEditState)
+						else if(PLATFORM_EDIT_STATE_PATH == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
 						{
 							iPlatformEditState = PLATFORM_EDIT_STATE_EDIT;
 						}
@@ -1671,7 +1687,7 @@ int editor_platforms()
 					}
 					else if(event.key.keysym.sym == SDLK_KP_MINUS || event.key.keysym.sym == SDLK_MINUS)
 					{
-						if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState)
+						if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
 						{
 							if(g_Platforms[iEditPlatform].iVelocity > 2)
 								g_Platforms[iEditPlatform].iVelocity--;
@@ -1679,7 +1695,7 @@ int editor_platforms()
 					}
 					else if(event.key.keysym.sym == SDLK_KP_PLUS || event.key.keysym.sym == SDLK_EQUALS)
 					{
-						if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState)
+						if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
 						{
 							if(g_Platforms[iEditPlatform].iVelocity < MAX_PLATFORM_VELOCITY)
 								g_Platforms[iEditPlatform].iVelocity++;
@@ -1687,16 +1703,17 @@ int editor_platforms()
 					}
 					else if(event.key.keysym.sym == SDLK_p)
 					{
-						if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState)
+						if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
 						{
 							iPlatformEditState = PLATFORM_EDIT_STATE_PATH;
 							CalculatePlatformDims(iEditPlatform, &iPlatformLeft, &iPlatformTop, &iPlatformWidth, &iPlatformHeight);
 						}
 					}
 
-				break;
-
+					break;
+				}
 				case SDL_MOUSEBUTTONDOWN:
+				{
 					if(event.button.button == SDL_BUTTON_LEFT)
 					{
 						if(PLATFORM_EDIT_STATE_SELECT == iPlatformEditState)
@@ -1738,9 +1755,22 @@ int editor_platforms()
 									for(short j = 0; j < set_tile_rows; j++)
 									{
 										if(ix + i >= 0 && ix + i < MAPWIDTH && iy + j >= 0 && iy + j < MAPHEIGHT)
+										{
 											g_Platforms[iEditPlatform].tiles[ix + i][iy + j] = (set_tile_start_y + j) * TILESETWIDTH + set_tile_start_x + i;
+											g_Platforms[iEditPlatform].types[ix + i][iy + j] = g_map.GetTileSet()[g_Platforms[iEditPlatform].tiles[ix + i][iy + j]];
+										}
 									}
 								}
+							}
+						}
+						else if(PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
+						{
+							if(!ignoreclick)
+							{
+								short ix = event.button.x / TILESIZE;
+								short iy = event.button.y / TILESIZE;
+
+								g_Platforms[iEditPlatform].types[ix][iy] = set_tiletype;
 							}
 						}
 						else if(PLATFORM_EDIT_STATE_PATH == iPlatformEditState)
@@ -1787,6 +1817,11 @@ int editor_platforms()
 						if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState)
 						{
 							g_Platforms[iEditPlatform].tiles[event.button.x / TILESIZE][event.button.y / TILESIZE] = TILESETSIZE;
+							g_Platforms[iEditPlatform].types[event.button.x / TILESIZE][event.button.y / TILESIZE] = tile_nonsolid;
+						}
+						else if(PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
+						{
+							g_Platforms[iEditPlatform].types[event.button.x / TILESIZE][event.button.y / TILESIZE] = tile_nonsolid;
 						}
 						else if(PLATFORM_EDIT_STATE_PATH == iPlatformEditState)
 						{
@@ -1828,8 +1863,9 @@ int editor_platforms()
 							}
 						}
 					}
-				
+				}
 				case SDL_MOUSEMOTION:
+				{
 					if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState)
 					{
 						if(event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT) && !ignoreclick)
@@ -1842,24 +1878,41 @@ int editor_platforms()
 								for(short j = 0; j < set_tile_rows; j++)
 								{
 									if(ix + i >= 0 && ix + i < MAPWIDTH && iy + j >= 0 && iy + j < MAPHEIGHT)
+									{
 										g_Platforms[iEditPlatform].tiles[ix + i][iy + j] = (set_tile_start_y + j) * TILESETWIDTH + set_tile_start_x + i;
+										g_Platforms[iEditPlatform].types[ix + i][iy + j] = g_map.GetTileSet()[g_Platforms[iEditPlatform].tiles[ix + i][iy + j]];
+									}
 								}
 							}
 						}
 						else if(event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT))
 						{
 							g_Platforms[iEditPlatform].tiles[event.button.x / TILESIZE][event.button.y / TILESIZE] = TILESETSIZE;
+							g_Platforms[iEditPlatform].types[event.button.x / TILESIZE][event.button.y / TILESIZE] = tile_nonsolid;
 						}
+					}
+					else if(PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
+					{
+						short ix = event.button.x / TILESIZE;
+						short iy = event.button.y / TILESIZE;
+
+						if(event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT) && !ignoreclick)
+							g_Platforms[iEditPlatform].types[ix][iy] = set_tiletype;
+						else if(event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT))
+							g_Platforms[iEditPlatform].types[ix][iy] = tile_nonsolid;
 					}
 
 					break;
-
+				}
 				case SDL_MOUSEBUTTONUP:
+				{
 					if(event.button.button == SDL_BUTTON_LEFT)
 					{
 						ignoreclick = false;
 					}
+					
 					break;
+				}
 
 				default:
 					break;
@@ -1867,7 +1920,6 @@ int editor_platforms()
 		}
 
 		//Draw platform editing
-		
 		drawmap(false, TILESIZE);
 
 		if(PLATFORM_EDIT_STATE_TEST != iPlatformEditState)
@@ -1893,10 +1945,10 @@ int editor_platforms()
 				SDL_BlitSurface(s_platform, &rNewButton[0], screen, &rNewButton[1]);
 
 		}
-		else if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState)
+		else if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
 		{
-			font.draw(0, 480 - font.getHeight(), "Edit Platform: [esc] Exit  [t] Tiles  [del] Delete  [p] Path  [+/-] Velocity");
-			draw_platform(iEditPlatform);
+			font.draw(0, 480 - font.getHeight(), "Edit Platform: [esc] Exit  [t] Tiles  [l] Types [del] Delete  [p] Path  [+/-] Velocity");
+			draw_platform(iEditPlatform, PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState);
 
 			rVelocity[3].x = 404 + (g_Platforms[iEditPlatform].iVelocity - 1) * 12;
 
@@ -1999,7 +2051,7 @@ int editor_platforms()
 	return EDITOR_QUIT;
 }
 
-void draw_platform(short iPlatform)
+void draw_platform(short iPlatform, bool fDrawTileTypes)
 {
 	SDL_Rect bltrect, tilebltrect;
 	
@@ -2017,16 +2069,19 @@ void draw_platform(short iPlatform)
 		{
 			short ts = g_Platforms[iPlatform].tiles[iCol][iRow];
 			
-			if(ts == TILESETSIZE)
+			if(ts != TILESETSIZE)
 			{
-				bltrect.y += TILESIZE;
-				continue;
+				tilebltrect.x = (ts % TILESETWIDTH) * TILESIZE;
+				tilebltrect.y = (ts / TILESETWIDTH) * TILESIZE;
+			
+				SDL_BlitSurface(g_map.tilesetsurface[0], &tilebltrect, screen, &bltrect);
 			}
 
-			tilebltrect.x = (ts % TILESETWIDTH) * TILESIZE;
-			tilebltrect.y = (ts / TILESETWIDTH) * TILESIZE;
-		
-			SDL_BlitSurface(g_map.tilesetsurface[0], &tilebltrect, screen, &bltrect);
+			if(fDrawTileTypes)
+			{
+				TileType type = g_Platforms[iPlatform].types[iCol][iRow];
+				spr_transparenttiles.draw(iCol * TILESIZE, iRow * TILESIZE, (type - 1) * TILESIZE, 0, TILESIZE, TILESIZE);
+			}
 
 			bltrect.y += TILESIZE;
 		}
@@ -3080,10 +3135,12 @@ void loadcurrentmap()
 				if(iCol < g_map.platforms[iPlatform]->iTileWidth && iRow < g_map.platforms[iPlatform]->iTileHeight)
 				{
 					g_Platforms[iPlatform].tiles[iCol][iRow] = g_map.platforms[iPlatform]->iTileData[iCol][iRow];
+					g_Platforms[iPlatform].types[iCol][iRow] = g_map.platforms[iPlatform]->iTileType[iCol][iRow];
 				}
 				else
 				{
 					g_Platforms[iPlatform].tiles[iCol][iRow] = TILESETSIZE;
+					g_Platforms[iPlatform].types[iCol][iRow] = tile_nonsolid;
 				}
 			}
 		}
@@ -3103,6 +3160,7 @@ void SetPlatformToDefaults(short iPlatform)
 		for(short iRow = 0; iRow < MAPHEIGHT; iRow++)
 		{
 			g_Platforms[iPlatform].tiles[iCol][iRow] = TILESETSIZE;
+			g_Platforms[iPlatform].types[iCol][iRow] = tile_nonsolid;
 		}
 	}
 
@@ -3133,14 +3191,17 @@ void insert_platforms_into_map()
 		CalculatePlatformDims(iPlatform, &iLeft, &iTop, &iWidth, &iHeight);
 
 		short ** tiles = new short*[iWidth];
+		TileType ** types = new TileType*[iWidth];
 
 		for(short iCol = 0; iCol < iWidth; iCol++)
 		{
 			tiles[iCol] = new short[iHeight];
+			types[iCol] = new TileType[iHeight];
 
 			for(short iRow = 0; iRow < iHeight; iRow++)
 			{
 				tiles[iCol][iRow] = g_Platforms[iPlatform].tiles[iCol + iLeft][iRow + iTop];
+				types[iCol][iRow] = g_Platforms[iPlatform].types[iCol + iLeft][iRow + iTop];
 			}
 		}
 	
@@ -3153,7 +3214,7 @@ void insert_platforms_into_map()
 				
 		MovingPlatformPath * path = new MovingPlatformPath(fVelocity, fStartX, fStartY, fEndX, fEndY, false);
 
-		g_map.platforms[iPlatform] = new MovingPlatform(tiles, iWidth, iHeight, path, true, 0, false);
+		g_map.platforms[iPlatform] = new MovingPlatform(tiles, types, iWidth, iHeight, path, true, 0, false);
 	}
 }
 

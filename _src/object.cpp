@@ -659,6 +659,7 @@ void B_BreakableBlock::update()
 			bumpPlayer = NULL;
 			dead = true;
 			g_map.blockdata[col][row] = NULL;
+			g_map.UpdateTileGap(col, row);
 		}
 	}
 
@@ -1037,13 +1038,18 @@ void B_DonutBlock::triggerBehavior()
 	tiledata[0] = new short[1];
 	tiledata[0][0] = 509;
 
+	TileType ** typedata = new TileType*[1];
+	typedata[0] = new TileType[1];
+	typedata[0][0] = tile_solid;
+
 	MovingPlatformPath * path = new MovingPlatformPath(0.0f, (float)ix + 16.0f, (float)iy + 16.0f, 0.0f, 0.0f, true); 
-	MovingPlatform * platform = new MovingPlatform(tiledata, 1, 1, path, true, 0, false);
+	MovingPlatform * platform = new MovingPlatform(tiledata, typedata, 1, 1, path, true, 0, false);
 
 	g_map.AddTemporaryPlatform(platform);
 
 	dead = true;
 	g_map.blockdata[col][row] = NULL;
+	g_map.UpdateTileGap(col, row);
 }
 
 //------------------------------------------------------------------------------
@@ -1100,6 +1106,8 @@ void B_FlipBlock::update()
 			counter = 0;
 			timer = 0;
 			state = 0;
+
+			g_map.UpdateTileGap(col, row);
 		}
 	}
 }
@@ -1231,6 +1239,7 @@ bool B_FlipBlock::hitright(IO_MovingObject * object)
 
 			dead = true;
 			g_map.blockdata[col][row] = NULL;
+			g_map.UpdateTileGap(col, row);
 		}
 	}
 
@@ -1265,6 +1274,7 @@ bool B_FlipBlock::hitleft(IO_MovingObject * object)
 
 			dead = true;
 			g_map.blockdata[col][row] = NULL;
+			g_map.UpdateTileGap(col, row);
 		}
 	}
 
@@ -1277,6 +1287,8 @@ void B_FlipBlock::triggerBehavior()
 	{
 		state = 1;
 		frame = iw;
+
+		g_map.UpdateTileGap(col, row);
 	}
 }
 
@@ -1604,6 +1616,12 @@ bool B_SwitchBlock::hitleft(IO_MovingObject * object)
 	return true;
 }
 
+void B_SwitchBlock::FlipState()
+{
+	state = 1 - state;
+	g_map.UpdateTileGap(col, row);
+}
+
 //------------------------------------------------------------------------------
 // class bounce block
 //------------------------------------------------------------------------------
@@ -1808,6 +1826,7 @@ void B_ThrowBlock::GiveBlockToPlayer(CPlayer * player)
 {
 	dead = true;
 	g_map.blockdata[col][row] = NULL;
+	g_map.UpdateTileGap(col, row);
 
 	CO_ThrowBlock * block = new CO_ThrowBlock(&spr_blueblock, ix, iy, fSuper);
 	if(player->AcceptItem(block))
@@ -1824,6 +1843,7 @@ void B_ThrowBlock::triggerBehavior()
 {
 	dead = true;
 	g_map.blockdata[col][row] = NULL;
+	g_map.UpdateTileGap(col, row);
 
 	eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix, iy, -1.5f, -7.0f, 6, 2, 0, fSuper ? 16 : 0, 16, 16));
 	eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix + 16, iy, 1.5f, -7.0f, 6, 2, 0, fSuper ? 16 : 0, 16, 16));
@@ -2278,8 +2298,8 @@ void IO_MovingObject::collision_detection_map()
 			{
 				inair = false;
 
-				if((leftTile == tile_ice && (rightTile == tile_ice || rightTile == tile_nonsolid)) ||
-					(rightTile == tile_ice && (leftTile == tile_ice || leftTile == tile_nonsolid)))
+				if((leftTile == tile_ice && (rightTile == tile_ice || rightTile == tile_nonsolid || rightTile == tile_gap)) ||
+					(rightTile == tile_ice && (leftTile == tile_ice || leftTile == tile_nonsolid || leftTile == tile_gap)))
 					onice = true;
 				else 
 					onice = false;
@@ -5548,10 +5568,15 @@ void OMO_Yoshi::placeYoshi()
 		short iyt = iy / TILESIZE;
 		short iyb = (iy + ih) / TILESIZE;
 
-		if((g_map.map(ixl, iyt) == tile_nonsolid || g_map.map(ixl, iyt) == tile_solid_on_top) &&
-		   (g_map.map(ixr, iyt) == tile_nonsolid || g_map.map(ixr, iyt) == tile_solid_on_top) &&
-		   (g_map.map(ixl, iyb) == tile_nonsolid || g_map.map(ixl, iyb) == tile_solid_on_top) &&
-		   (g_map.map(ixr, iyb) == tile_nonsolid || g_map.map(ixr, iyb) == tile_solid_on_top) &&
+		TileType upperLeft = g_map.map(ixl, iyt);
+		TileType upperRight = g_map.map(ixr, iyt);
+		TileType lowerLeft = g_map.map(ixl, iyb);
+		TileType lowerRight = g_map.map(ixr, iyb);
+
+		if((upperLeft == tile_nonsolid || upperLeft == tile_gap || upperLeft == tile_solid_on_top) &&
+		   (upperRight == tile_nonsolid || upperRight == tile_gap || upperRight == tile_solid_on_top) &&
+		   (lowerLeft == tile_nonsolid || lowerLeft == tile_gap || lowerLeft == tile_solid_on_top) &&
+		   (lowerRight == tile_nonsolid || lowerRight == tile_gap || lowerRight == tile_solid_on_top) &&
 			!g_map.block(ixl, iyt) && !g_map.block(ixr, iyt) && !g_map.block(ixl, iyb) && !g_map.block(ixr, iyb))
 		{
 			//spawn on ground, but not on spikes
