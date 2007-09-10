@@ -47,6 +47,14 @@ struct MapItem
 	short iy;
 };
 
+struct AnimatedTile
+{
+	short id;
+	short layers[4];
+	SDL_Rect rSrc[4][4];
+	SDL_Rect rDest;
+};
+
 class IO_Block;
 
 class CMap
@@ -133,10 +141,6 @@ class CMap
 
 		void update();
 
-		void drawbackanimations();
-		void drawfrontanimations();
-		void clearAnimations();
-
 		void AddTemporaryPlatform(MovingPlatform * platform);
 
 		void findspawnpoint(short iType, short * x, short * y, short width, short height, bool tilealigned);
@@ -171,6 +175,8 @@ class CMap
 		short		objectdata[MAPWIDTH][MAPHEIGHT];
 		IO_Block*   blockdata[MAPWIDTH][MAPHEIGHT];
 		bool		nospawn[NUMSPAWNAREATYPES][MAPWIDTH][MAPHEIGHT];
+
+		std::list<AnimatedTile*> animatedtiles;
 
 		MovingPlatform ** platforms;
 		short		iNumPlatforms;
@@ -213,10 +219,13 @@ class CMap
 
 		bool		fAutoFilter[NUM_AUTO_FILTERS];
 
-		CEyecandyContainer animatedtilesback;
-		CEyecandyContainer animatedtilesfront;
+		short		iTileAnimationTimer;
+		short		iTileAnimationFrame;
 
-		void draw(SDL_Surface *targetsurf, int layer, bool fFront);
+		void AnimateTiles();
+		void ClearAnimatedTiles();
+
+		void draw(SDL_Surface *targetsurf, int layer);
 		void drawThumbnailPlatforms(SDL_Surface * targetSurface);
 		void drawPreview(SDL_Surface * targetsurf, int layer, bool fThumbnail);
 		void drawPreviewBlocks(SDL_Surface * targetSurface, bool fThumbnail);

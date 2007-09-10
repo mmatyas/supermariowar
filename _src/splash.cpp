@@ -273,10 +273,7 @@ bool LoadGameGraphics()
 	spr_spring.SetWrap(true);
 	spr_spike.SetWrap(true);
 
-	_load_gfxck(spr_maplava, convertPath("gfx/packs/map/lava.png", graphicspack));
-	_load_gfxck(spr_mapwater, convertPath("gfx/packs/map/water.png", graphicspack));
-	_load_gfxck(spr_mapwaterfall, convertPath("gfx/packs/map/waterfall.png", graphicspack));
-	_load_gfxck(spr_maplamp, convertPath("gfx/packs/map/lamp.png", graphicspack));
+	_load_gfxck(spr_tileanimation, convertPath("gfx/packs/eyecandy/tile_animation.png", graphicspack));
 
 	_load_gfxck(spr_brokenyellowblock, convertPath("gfx/packs/eyecandy/brokenyellowblock.png", graphicspack));
 	_load_gfxck(spr_brokenflipblock, convertPath("gfx/packs/eyecandy/brokenflipblock.png", graphicspack));

@@ -259,8 +259,26 @@ void CMap::clearPlatforms()
 	tempPlatforms.clear();
 }
 
+void CMap::ClearAnimatedTiles()
+{
+	std::list<AnimatedTile*>::iterator iter = animatedtiles.begin(), lim = animatedtiles.end();
+	
+	while (iter != lim)
+	{
+		delete (*iter);
+		++iter;
+	}
+
+	animatedtiles.clear();
+}
+
 void CMap::loadMap(const std::string& file, ReadType iReadType)
 {
+	iTileAnimationTimer = 0;
+	iTileAnimationFrame = 0;
+	
+	ClearAnimatedTiles();
+
 	FILE * mapfile;
 	short i, j, k;
 
@@ -1792,15 +1810,33 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks)
 	}
 }
 
+void CMap::AnimateTiles()
+{
+	//For each animated tile
+	std::list<AnimatedTile*>::iterator iter = animatedtiles.begin(), lim = animatedtiles.end();
+	while (iter != lim)
+	{
+		SDL_BlitSurface(spr_background.getSurface(), &((*iter)->rDest), spr_backmap.getSurface(), &((*iter)->rDest));
 
+		for(short iLayer = 0; iLayer < 2; iLayer++)
+		{
+			if((*iter)->layers[iLayer] < TILESETSIZE)
+			{
+				SDL_BlitSurface(tilesetsurface[0], &((*iter)->rSrc[iLayer][0]), spr_backmap.getSurface(), &((*iter)->rDest));
+			}
+			else if((*iter)->layers[iLayer] > TILESETSIZE)
+			{
+				SDL_BlitSurface(spr_tileanimation.getSurface(), &((*iter)->rSrc[iLayer][iTileAnimationFrame]), spr_backmap.getSurface(), &((*iter)->rDest));
+			}
+		}
 
-void CMap::draw(SDL_Surface *targetSurface, int layer, bool fForeground)
+		++iter;
+	}
+}
+
+void CMap::draw(SDL_Surface *targetSurface, int layer)
 {
 	int i, j, ts;
-
-	CEyecandyContainer * animatedtilesdest = &animatedtilesback;
-	if(fForeground)
-		animatedtilesdest = &animatedtilesfront;
 
 	//draw left to right full vertical
 	bltrect.x = 0;
@@ -1819,18 +1855,58 @@ void CMap::draw(SDL_Surface *targetSurface, int layer, bool fForeground)
 			tilebltrect.x = iGameTileX[ts];
 			tilebltrect.y = iGameTileY[ts];
 
-			if(ts >= 940 && ts <= 942)
-				animatedtilesdest->add(new EC_LoopingAnimation(&spr_maplava, bltrect.x, bltrect.y, 3, 8, 0, 0, TILESIZE, ts - 940, TILESIZE, TILESIZE));
-			else if(ts >= 652 && ts <= 655)
-				animatedtilesdest->add(new EC_LoopingAnimation(&spr_mapwater, bltrect.x, bltrect.y, 4, 8, 0, 0, 0, ts - 652, TILESIZE, TILESIZE));
-			else if(ts == 559 || ts == 495 || ts == 780)
-				animatedtilesdest->add(new EC_LoopingAnimation(&spr_mapwaterfall, bltrect.x, bltrect.y, 4, 8, 0, 0, 0, 0, TILESIZE, TILESIZE));
-			else if(ts == 591 || ts == 527 || ts == 812)
-				animatedtilesdest->add(new EC_LoopingAnimation(&spr_mapwaterfall, bltrect.x, bltrect.y, 4, 8, 0, 0, TILESIZE, 0, TILESIZE, TILESIZE));
-			else if(ts == 817)
-				animatedtilesdest->add(new EC_LoopingAnimation(&spr_maplamp, bltrect.x, bltrect.y, 4, 8, 0, 0, 0, 0, TILESIZE, TILESIZE));
+			//If this is an animated tile, then setup an animated tile struct for use in drawing
+			if(ts > TILESETSIZE)
+			{
+				//See if we already have this tile
+				bool fNeedNewAnimatedTile = true;
+
+				short iNewTileId = j * MAPWIDTH + i;
+				std::list<AnimatedTile*>::iterator iter = animatedtiles.begin(), lim = animatedtiles.end();
+				while (iter != lim)
+				{
+					if(iNewTileId == (*iter)->id)
+					{
+						fNeedNewAnimatedTile = false;
+						break;
+					}
+
+					++iter;
+				}
+
+				if(fNeedNewAnimatedTile)
+				{
+					AnimatedTile * animatedtile = new AnimatedTile();
+					animatedtile->id = iNewTileId;
+					
+					for(short iLayer = 0; iLayer < 4; iLayer++)
+					{
+						short iTile = mapdata[i][j][iLayer];
+						animatedtile->layers[iLayer] = iTile;
+
+						if(iTile < TILESETSIZE)
+						{
+							gfx_setrect(&(animatedtile->rSrc[iLayer][0]), (iTile % 32) * TILESIZE, (iTile / 32) * TILESIZE, TILESIZE, TILESIZE);
+						}
+						else if(iTile > TILESETSIZE)
+						{
+							iTile -= (TILESETSIZE + 1);
+
+							for(short iRect = 0; iRect < 4; iRect++)
+							{
+								gfx_setrect(&(animatedtile->rSrc[iLayer][iRect]), iRect * TILESIZE, iTile * TILESIZE, TILESIZE, TILESIZE);
+							}
+						}
+					}
+
+					gfx_setrect(&(animatedtile->rDest), bltrect.x, bltrect.y, TILESIZE, TILESIZE);
+					animatedtiles.push_back(animatedtile);
+				}
+			}
 			else
+			{
 				SDL_BlitSurface(tilesetsurface[0], &tilebltrect, targetSurface, &bltrect);
+			}
 		}
 
 		bltrect.x += TILESIZE;
@@ -1992,8 +2068,6 @@ void CMap::preDrawPreviewBackground(SDL_Surface * targetSurface, bool fThumbnail
 	}
 
 	drawPreviewBlocks(targetSurface, fThumbnail);
-
-
 }
 
 void CMap::preDrawPreviewBackground(gfxSprite * spr_background, SDL_Surface * targetSurface, bool fThumbnail)
@@ -2081,6 +2155,10 @@ void CMap::drawPreview(SDL_Surface * targetSurface, int layer, bool fThumbnail)
 			if(ts == TILESETSIZE)
 				continue;
 
+			//TODO:: Handle drawing preview for animated tiles
+			if(ts > TILESETSIZE)
+				continue;
+
 			if(fThumbnail)
 			{
 				rectSrc.x = iThumbTileX[ts];
@@ -2166,13 +2244,13 @@ void CMap::predrawbackground(gfxSprite &background, gfxSprite &mapspr)
 
 	SDL_BlitSurface(background.getSurface(), NULL, mapspr.getSurface(), &r);
 	
-	draw(mapspr.getSurface(), 0, false);
-	draw(mapspr.getSurface(), 1, false);
+	draw(mapspr.getSurface(), 0);
+	draw(mapspr.getSurface(), 1);
 
 	if(!game_values.toplayer)
 	{
-		draw(mapspr.getSurface(), 2, false);
-		draw(mapspr.getSurface(), 3, false);
+		draw(mapspr.getSurface(), 2);
+		draw(mapspr.getSurface(), 3);
 	}
 
 	//Draws the spawn areas
@@ -2202,8 +2280,10 @@ void CMap::predrawforeground(gfxSprite &foregroundspr)
 	SDL_FillRect(foregroundspr.getSurface(), NULL, SDL_MapRGB(foregroundspr.getSurface()->format, 255, 0, 255));
 	SDL_SetColorKey(foregroundspr.getSurface(), SDL_SRCCOLORKEY, SDL_MapRGB(foregroundspr.getSurface()->format, 255, 0, 255));
 
-	draw(foregroundspr.getSurface(), 2, true);
-	draw(foregroundspr.getSurface(), 3, true);
+	draw(foregroundspr.getSurface(), 2);
+	draw(foregroundspr.getSurface(), 3);
+
+	AnimateTiles();
 
 	/*
 	for(int k = 0; k < numdrawareas; k++)
@@ -2397,18 +2477,15 @@ void CMap::update()
 		}
 	}
 
-	animatedtilesfront.update();
-	animatedtilesback.update();
-}
+	if(++iTileAnimationTimer > 7)
+	{
+		iTileAnimationTimer = 0;
 
-void CMap::drawbackanimations()
-{
-	animatedtilesback.draw();
-}
+		if(++iTileAnimationFrame > 3)
+			iTileAnimationFrame = 0;
 
-void CMap::drawfrontanimations()
-{
-	animatedtilesfront.draw();
+		AnimateTiles();
+	}
 }
 
 void CMap::findspawnpoint(short iType, short * x, short * y, short width, short height, bool tilealigned)
@@ -2674,12 +2751,6 @@ void CMap::ReadString(char * szString, short size, FILE * outFile)
 	szString[size - 1] = 0;
 
 	delete [] szReadString;
-}
-
-void CMap::clearAnimations()
-{
-	animatedtilesback.clean();
-	animatedtilesfront.clean();
 }
 
 void CMap::optimize()

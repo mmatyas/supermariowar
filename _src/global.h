@@ -115,7 +115,7 @@ struct STextAward
 #define TILESIZE		32			//size of the tiles, should be dynamically read
 #define PREVIEWTILESIZE	16			//size of the preview tiles
 #define THUMBTILESIZE	8			//size of the thumbnail tiles
-#define BLOCKSETSIZE	19			//size of block set
+
 #define	MAXWARPS		32
 #define MAXMAPITEMS		32
 
@@ -128,6 +128,9 @@ struct STextAward
 #define TILESETSIZE		960			//30*32 Tiles by 32 pixel in a 1024*1024 bmp
 #define TILESETHEIGHT   30
 #define TILESETWIDTH	32
+
+#define BLOCKSETSIZE	19			//size of block set
+#define TILEANIMATIONSIZE	1		//number of tile animations
 
 #define MAXMUSICCATEGORY	11
 #define MAXCATEGORYTRACKS	64
@@ -426,10 +429,7 @@ extern gfxSprite		spr_brokenyellowblock;
 extern gfxSprite		spr_brokenflipblock;
 extern gfxSprite		spr_brokenblueblock;
 
-extern gfxSprite		spr_maplava;
-extern gfxSprite		spr_mapwater;
-extern gfxSprite		spr_mapwaterfall;
-extern gfxSprite		spr_maplamp;
+extern gfxSprite		spr_tileanimation;
 
 extern gfxSprite		** spr_player[4];
 extern gfxSprite		** spr_chocobo[4];

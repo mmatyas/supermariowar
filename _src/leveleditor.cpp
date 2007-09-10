@@ -43,7 +43,7 @@
 
 #define MAPTITLESTRING "SMW 1.8 Leveleditor"
 
-enum {EDITOR_EDIT, EDITOR_TILES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_MAP, EDITOR_BLOCKS, NEW_MAP, SAVE, EDITOR_WARP, EDITOR_EYECANDY, DISPLAY_HELP, EDITOR_PLATFORM, EDITOR_TILETYPE, EDITOR_BACKGROUNDS, EDITOR_MAPITEMS};
+enum {EDITOR_EDIT, EDITOR_TILES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_MAP, EDITOR_BLOCKS, NEW_MAP, SAVE, EDITOR_WARP, EDITOR_EYECANDY, DISPLAY_HELP, EDITOR_PLATFORM, EDITOR_TILETYPE, EDITOR_BACKGROUNDS, EDITOR_MAPITEMS, EDITOR_ANIMATION};
 
 #define MAX_PLATFORMS 8
 #define MAX_PLATFORM_VELOCITY 16
@@ -93,6 +93,7 @@ gfxSprite		spr_platformendtile;
 gfxSprite		spr_dialog;
 gfxSprite		menu_shade;
 gfxSprite		spr_mapitems[3];
+gfxSprite		spr_tileanimation;
 
 gfxSprite		spr_platformarrows[3];
 gfxSprite		spr_warps[3];
@@ -129,6 +130,8 @@ int				move_drag_start_y = 0;
 int				move_drag_offset_x = 0;
 int				move_drag_offset_y = 0;
 
+int				set_animation = 0;
+
 CMap			g_map;
 int				state;
 bool			selectedtiles[MAPWIDTH][MAPHEIGHT];
@@ -154,7 +157,8 @@ gfxSprite		spr_thumbnail_platformarrows;
 gfxSprite		spr_thumbnail_warps[2];
 gfxSprite		spr_thumbnail_mapitems[2];
 gfxSprite		spr_awardsouls, spr_fireballexplosion;
-gfxSprite		spr_maplava, spr_mapwater, spr_mapwaterfall, spr_maplamp;
+
+gfxSprite		spr_backmap;
 CEyecandyContainer eyecandyfront;
 CGameMode		*gamemodes[GAMEMODE_LAST];
 CPlayer			*list_players[4];
@@ -198,6 +202,7 @@ int editor_mapitems();
 int editor_platforms();
 int editor_tiletype();
 int editor_backgrounds();
+int editor_animation();
 
 void resetselectedtiles();
 void copymoveselection();
@@ -280,6 +285,8 @@ int main(int argc, char *argv[])
 
 	spr_dialog.init(convertPath("gfx/leveleditor/leveleditor_dialog.png"), 255, 0, 255, 255);
 	menu_shade.init(convertPath("gfx/leveleditor/leveleditor_shade.png"), 255, 0, 255, 128);
+
+	spr_tileanimation.init(convertPath("gfx/packs/Classic/eyecandy/tile_animation.png"), 255, 0, 255, 255);
 
 	if( SDL_SetColorKey(s_eyecandy, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(s_eyecandy->format, 255, 0, 255)) < 0)
 	{
@@ -381,6 +388,10 @@ int main(int argc, char *argv[])
 				state = editor_backgrounds();
 			break;
 
+			case EDITOR_ANIMATION:
+				state = editor_animation();
+			break;
+
 			case EDITOR_QUIT:
 				done = true;
 			break;
@@ -460,10 +471,13 @@ int editor_edit()
 			switch(event.type)
 			{
 				case SDL_QUIT:
+				{
 					done = true;
-				break;
+					break;
+				}
 
 				case SDL_KEYDOWN:
+				{
 					if(event.key.keysym.sym == SDLK_ESCAPE)
 					{
 						if(g_musiccategorydisplaytimer > 0)
@@ -482,6 +496,9 @@ int editor_edit()
 
 					if(event.key.keysym.sym == SDLK_i)
 						return EDITOR_BLOCKS;
+
+					if(event.key.keysym.sym == SDLK_a)
+						return EDITOR_ANIMATION;
 
 					if(event.key.keysym.sym == SDLK_r)
 						return EDITOR_MAPITEMS;
@@ -659,15 +676,18 @@ int editor_edit()
 						}
 					}
 
-
-				break;
+					break;
+				}
 
 				case SDL_KEYUP:
+				{
 					if(event.key.keysym.sym == SDLK_LCTRL)
 						move_nodrag = false;
 					break;
+				}
 
 				case SDL_MOUSEBUTTONDOWN:
+				{
 					if(event.button.button == SDL_BUTTON_LEFT && !ignoreclick)
 					{
 						if(edit_mode == 0) //selected blocks
@@ -788,12 +808,16 @@ int editor_edit()
 								}
 							}
 						}
+						else if(edit_mode == 8)
+						{
+							g_map.mapdata[event.button.x / TILESIZE][event.button.y / TILESIZE][selected_layer] = set_animation + TILESETSIZE + 1;
+						}
 					}
 					else if(event.button.button == SDL_BUTTON_RIGHT)
 					{
 						if(edit_mode == 0)
 							g_map.objectdata[event.button.x / TILESIZE][event.button.y / TILESIZE] = BLOCKSETSIZE;
-						else if(edit_mode == 1)
+						else if(edit_mode == 1 || edit_mode == 8)
 						{
 							short x = event.button.x / TILESIZE;
 							short y = event.button.y / TILESIZE;
@@ -861,9 +885,12 @@ int editor_edit()
 							}
 						}
 					}
-				break;
+					
+					break;
+				}
 
 				case SDL_MOUSEMOTION:
+				{
 					if(event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT) && !ignoreclick)
 					{
 						if(edit_mode == 0)
@@ -915,12 +942,16 @@ int editor_edit()
 						{
 							g_map.mapdatatop[event.button.x / TILESIZE][event.button.y / TILESIZE] = set_tiletype;
 						}
+						else if(edit_mode == 8)
+						{
+							g_map.mapdata[event.button.x / TILESIZE][event.button.y / TILESIZE][selected_layer] = set_animation + TILESETSIZE + 1;
+						}
 					}
 					else if(event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT))
 					{
 						if(edit_mode == 0)
 							g_map.objectdata[event.button.x / TILESIZE][event.button.y / TILESIZE] = BLOCKSETSIZE;
-						else if(edit_mode == 1)
+						else if(edit_mode == 1 || edit_mode == 8)
 						{
 							short x = event.button.x / TILESIZE;
 							short y = event.button.y / TILESIZE;
@@ -950,9 +981,12 @@ int editor_edit()
 							g_map.mapdatatop[event.button.x / TILESIZE][event.button.y / TILESIZE] = tile_nonsolid;
 						}
 					}
-				break;
 				
+					break;
+				}
+
 				case SDL_MOUSEBUTTONUP:
+				{
 					if(event.button.button == SDL_BUTTON_LEFT)
 					{
 						ignoreclick = false;
@@ -989,7 +1023,9 @@ int editor_edit()
 
 						move_mode = 0;
 					}
-				break;
+				
+					break;
+				}
 
 				default:
 					break;
@@ -1026,9 +1062,14 @@ int editor_edit()
 		{
 			font.draw(0,0, "Block Mode");
 		}
-		else if(edit_mode == 1)
+		else if(edit_mode == 1 || edit_mode == 8)
 		{
-			char modestring[128] = "Tile Mode - ";
+			char modestring[128] = "";
+
+			if(edit_mode == 1)
+				strcpy(modestring, "Tile Mode - ");
+			else
+				strcpy(modestring, "Animated Tile Mode - ");
 			
 			if(selected_layer == 0)
 				strcat(modestring, "Bottom Background");
@@ -1053,8 +1094,7 @@ int editor_edit()
 		{
 			font.draw(0,0, "Warp Mode");
 		}
-
-		if(edit_mode == 3)
+		else if(edit_mode == 3)
 		{
 			for(int k = 0; k < MAPHEIGHT; k++)
 			{
@@ -1197,10 +1237,23 @@ void drawlayer(int layer, bool fUseCopied, short iBlockSize)
 			if(ts == TILESETSIZE)
 				continue;
 
-			tilebltrect.x = (ts % TILESETWIDTH) * iBlockSize;
-			tilebltrect.y = (ts / TILESETWIDTH) * iBlockSize;
+			if(ts < TILESETSIZE)
+			{
+				tilebltrect.x = (ts % TILESETWIDTH) * iBlockSize;
+				tilebltrect.y = (ts / TILESETWIDTH) * iBlockSize;
 
-			SDL_BlitSurface(g_map.tilesetsurface[iBlockSize == TILESIZE ? 0 : iBlockSize == PREVIEWTILESIZE ? 1 : 2], &tilebltrect, screen, &bltrect);
+				SDL_BlitSurface(g_map.tilesetsurface[iBlockSize == TILESIZE ? 0 : iBlockSize == PREVIEWTILESIZE ? 1 : 2], &tilebltrect, screen, &bltrect);
+			}
+			else
+			{
+				//TODO:: Fix doing thumbnail/preview size
+				ts -= (TILESETSIZE + 1);
+				tilebltrect.x = 0;
+				tilebltrect.y = ts * iBlockSize;
+
+				SDL_BlitSurface(spr_tileanimation.getSurface(), &tilebltrect, screen, &bltrect);
+			
+			}
 		}
 
 		bltrect.x += iBlockSize;
@@ -2747,6 +2800,74 @@ int editor_backgrounds()
 		SDL_FreeSurface(sBackgrounds[iSurface]);
 
 	return EDITOR_EDIT;
+}
+
+int editor_animation()
+{
+	bool done = false;
+	
+	while (!done)
+	{
+		int framestart = SDL_GetTicks();
+
+		//handle messages
+		while(SDL_PollEvent(&event))
+		{
+			switch(event.type)
+			{
+				case SDL_QUIT:
+					done = true;
+				break;
+
+				case SDL_KEYDOWN:
+					edit_mode = 8;
+					return EDITOR_EDIT;
+				break;
+
+				case SDL_MOUSEBUTTONDOWN:
+					if(event.button.button == SDL_BUTTON_LEFT)
+					{
+						short set_animation_x = event.button.x / TILESIZE;
+						short set_animation_y = event.button.y / TILESIZE;
+
+						if(set_animation_x == 1 && set_animation_y == 1)
+							set_animation = 0;
+
+						edit_mode = 8;
+
+						//The user must release the mouse button before trying to add a tile
+						ignoreclick = true;
+						return EDITOR_EDIT;
+					}
+				break;
+
+				default:
+					break;
+			}
+		}
+
+		drawmap(false, TILESIZE);
+		menu_shade.draw(0, 0);
+
+		for(short iTile = 0; iTile < TILEANIMATIONSIZE; iTile++)
+		{
+			spr_tileanimation.draw(iTile * TILESIZE, 0, 0, iTile * TILESIZE, TILESIZE, TILESIZE);
+		}
+
+		font.drawRightJustified(640, 0, maplist.currentFilename());
+				
+		SDL_Flip(screen);
+
+		int delay = WAITTIME - (SDL_GetTicks() - framestart);
+		if(delay < 0)
+			delay = 0;
+		else if(delay > WAITTIME)
+			delay = WAITTIME;
+		
+		SDL_Delay(delay);
+	}
+
+	return EDITOR_QUIT;
 }
 
 void LoadBackgroundPage(SDL_Surface ** sBackgrounds, short iPage)

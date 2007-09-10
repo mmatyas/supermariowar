@@ -125,10 +125,7 @@ gfxSprite		spr_brokenyellowblock;
 gfxSprite		spr_brokenflipblock;
 gfxSprite		spr_brokenblueblock;
 
-gfxSprite		spr_maplava;
-gfxSprite		spr_mapwater;
-gfxSprite		spr_mapwaterfall;
-gfxSprite		spr_maplamp;
+gfxSprite		spr_tileanimation;
 
 gfxSprite		spr_starpowerup;
 gfxSprite		spr_1uppowerup;
@@ -2416,7 +2413,6 @@ void RunGame()
 			}
 
 			spr_backmap.draw(0, 0);
-			g_map.drawbackanimations();
 
 			//draw back eyecandy behind players
 			objectblocks.draw();
@@ -2436,13 +2432,9 @@ void RunGame()
 
 #ifdef _XBOX
 			g_map.drawfrontlayer();
-			g_map.drawfrontanimations();
 #else
 			if(game_values.toplayer)
-			{
 				g_map.drawfrontlayer();
-				g_map.drawfrontanimations();
-			}
 #endif
 			g_map.drawWarpLocks();
 
@@ -2781,8 +2773,7 @@ void CleanUp()
 	LoadMapObjects();
 	g_map.clearWarpLocks();
 	g_map.resetPlatforms();
-	g_map.clearAnimations();
-
+	
 	//Stop all game sounds
 	sfx_stopallsounds();
 	sfx_invinciblemusic.resetpause();
