@@ -125,7 +125,7 @@ gfxSprite		spr_brokenyellowblock;
 gfxSprite		spr_brokenflipblock;
 gfxSprite		spr_brokenblueblock;
 
-gfxSprite		spr_tileanimation;
+gfxSprite		spr_tileanimation[3];
 
 gfxSprite		spr_starpowerup;
 gfxSprite		spr_1uppowerup;
@@ -321,6 +321,7 @@ sfxSound sfx_stun;
 sfxMusic backgroundmusic[5];
 
 CGameMode	*gamemodes[GAMEMODE_LAST];
+CGM_Bonus	*bonushousemode = NULL;
 short		currentgamemode = 0;
 
 short g_iWinningPlayer;
@@ -451,7 +452,7 @@ void CleanDeadPlayers()
 	if(fCheckForGameOver)
 	{
 		short lastteam = -1;
-		if(!game_values.gamemode->gameover && CountAliveTeams(&lastteam) <= 1)
+		if(!game_values.gamemode->gameover && CountAliveTeams(&lastteam) <= 1 && game_values.gamemode->gamemode != game_mode_bonus)
 		{
 			game_values.gamemode->gameover = true;
 			game_values.gamemode->winningteam = lastteam;
@@ -703,6 +704,7 @@ int main(int argc, char *argv[])
 	game_values.swapstyle			= 1;	//Blink then swap
 	game_values.secrets				= true; //enable secrets by default
 	game_values.worldpointsbonus	= -1; //no world multiplier until player uses item to boost it
+	game_values.singleplayermode	= -1;
 
 	game_values.pfFilters			= new bool[NUM_AUTO_FILTERS + filterslist.GetCount()];
 	game_values.piFilterIcons		= new short[NUM_AUTO_FILTERS + filterslist.GetCount()];
@@ -787,6 +789,8 @@ int main(int argc, char *argv[])
 	currentgamemode = 0;
 	game_values.gamemode = gamemodes[currentgamemode];
 
+	//Special modes
+	bonushousemode = new CGM_Bonus();
 
 	//Setup the default game mode settings
 
@@ -1063,9 +1067,7 @@ int main(int argc, char *argv[])
             case GS_QUIT: // added because of warning on not handling all of enum
             break;
 		}
-	}
-	
-	
+	}	
 
 	printf("\n---------------- shutdown ----------------\n");
 	
@@ -1176,7 +1178,7 @@ void RunGame()
 		projectiles[iPlayer] = 0;
 		respawn[iPlayer] = 0;
 
-		if(game_values.playercontrol[iPlayer] > 0)
+		if(game_values.playercontrol[iPlayer] > 0 && (game_values.singleplayermode == -1 || game_values.singleplayermode == iPlayer))
 		{
 			short teamid, subteamid;
 			LookupTeamID(iPlayer, &teamid, &subteamid);
@@ -2445,120 +2447,123 @@ void RunGame()
 			g_iWinningPlayer = -1;
 			short mostkills = 0;
 			
-			bool fReverseScoring = game_values.gamemode->GetReverseScoring();
-			if(fReverseScoring)
-				mostkills = 32000;
-			
-			for(i = 0; i < score_cnt; i++)
+			//Draw scoreboards for all games (except special cases where we have a single player walking the map)
+			if(game_values.singleplayermode == -1)
 			{
-				if((score[i]->score > mostkills && !fReverseScoring) || (score[i]->score < mostkills && fReverseScoring))
+				bool fReverseScoring = game_values.gamemode->GetReverseScoring();
+				if(fReverseScoring)
+					mostkills = 32000;
+				
+				for(i = 0; i < score_cnt; i++)
 				{
-					mostkills = score[i]->score;
-					g_iWinningPlayer = i;
-				}
-				else if(score[i]->score == mostkills)
-				{
-					g_iWinningPlayer = -1;
-				}
-			}
-			
-			//big end game scoreboard (sorted)
-			if(game_values.showscoreboard)
-			{
-				char gameovertext[128] = "";
-				if(game_values.gamemode->winningteam > -1)
-				{
-					if(game_values.teamcounts[game_values.gamemode->winningteam] == 1)
-						sprintf(gameovertext, "Player %d Wins!", game_values.teamids[game_values.gamemode->winningteam][0] + 1);
-					else
-						sprintf(gameovertext, "Team %d Wins!", game_values.gamemode->winningteam + 1);
-				}
-				else
-				{
-					sprintf(gameovertext, "Tie Game");
-				}
-					
-				game_font_large.drawCentered(320, 100, gameovertext);
-
-			}
-
-			//in game scoreboards
-			for(i = 0; i < score_cnt; i++)
-			{
-				spr_shade[game_values.teamcounts[i] - 1].draw(score[i]->x, score[i]->y);
-
-				for(short k = 0; k < game_values.teamcounts[i]; k++)
-				{
-					short globalID = game_values.teamids[i][k];
-
-					//If player is respawning, draw the egg
-					if(respawn[globalID] > 0 && !game_values.gamemode->gameover)
+					if((score[i]->score > mostkills && !fReverseScoring) || (score[i]->score < mostkills && fReverseScoring))
 					{
-						spr_spawneggs.draw(score[i]->x + scoreoffsets[k], score[i]->y + 2, ((respawn[globalID] - 1) >> 1) * 32, game_values.colorids[globalID] * 32, 32, 32);
+						mostkills = score[i]->score;
+						g_iWinningPlayer = i;
 					}
-					else  //otherwise draw the player's skin in the scoreboard
+					else if(score[i]->score == mostkills)
 					{
-						short iScoreboardSprite;
-						if(game_values.gamemode->gameover)
-						{
-							if(g_iWinningPlayer != i)
-								iScoreboardSprite = PGFX_DEADFLYING;
-							else
-								iScoreboardSprite = PGFX_JUMPING_R;
-						}
-						else
-						{
-							iScoreboardSprite = PGFX_STANDING_R;
-						}
-						
-						//Search for player state to display
-						CPlayer * player = GetPlayerFromGlobalID(globalID);
-						
-						if(player && !game_values.gamemode->gameover)
-						{
-							short iScoreOffsetX = score[i]->x + scoreoffsets[k];
-							short iScoreOffsetY = score[i]->y + 2;
-
-							if(player->ownerPlayerID > -1)
-								spr_ownedtags.draw(iScoreOffsetX - 8, iScoreOffsetY - 8, player->ownerColorOffsetX, 0, 48, 48);
-	
-							player->GetScoreboardSprite()[iScoreboardSprite]->draw(iScoreOffsetX, iScoreOffsetY, player->iSrcOffsetX, 0, 32, 32);
-
-							if(player->jailed > 0)
-								spr_jail.draw(iScoreOffsetX - 6, iScoreOffsetY - 6);
-
-							if(player->powerup > 0)
-								spr_storedpowerupsmall.draw(iScoreOffsetX, iScoreOffsetY + 16, g_iPowerupToIcon[player->powerup - 1], 0, 16, 16);
-						}
-						else
-						{
-							spr_player[globalID][iScoreboardSprite]->draw(score[i]->x + scoreoffsets[k], score[i]->y + 2, 0, 0, 32, 32);
-						}
-					
-						//give crown to player(s) with most kills
-						if(g_iWinningPlayer == i)
-							spr_crown.draw(score[i]->x + scoreoffsets[k] + 12, score[i]->y - 4);
-					}
-
-					short storedpowerupid = game_values.gamepowerups[globalID];
-
-					if(storedpowerupid != -1)
-					{
-						if(!game_values.swapplayers)
-						{
-							spr_storedpowerupsmall.draw(score[i]->x + scorepowerupoffsets[game_values.teamcounts[i] - 1][k], score[i]->y + 25, storedpowerupid * 16, 0, 16, 16);
-						}
+						g_iWinningPlayer = -1;
 					}
 				}
 				
-				short iScoreX = score[i]->x + iScoreTextOffset[i];
-				short iScoreY = score[i]->y + 4;
+				//big end game scoreboard (sorted)
+				if(game_values.showscoreboard)
+				{
+					char gameovertext[128] = "";
+					if(game_values.gamemode->winningteam > -1)
+					{
+						if(game_values.teamcounts[game_values.gamemode->winningteam] == 1)
+							sprintf(gameovertext, "Player %d Wins!", game_values.teamids[game_values.gamemode->winningteam][0] + 1);
+						else
+							sprintf(gameovertext, "Team %d Wins!", game_values.gamemode->winningteam + 1);
+					}
+					else
+					{
+						sprintf(gameovertext, "Tie Game");
+					}
+						
+					game_font_large.drawCentered(320, 100, gameovertext);
 
-				spr_scoretext.draw(iScoreX, iScoreY, score[i]->iDigitLeft, (score[i]->iDigitLeft == 0 ? 16 : 0), 16, 16);
-				spr_scoretext.draw(iScoreX + 18, iScoreY, score[i]->iDigitMiddle, (score[i]->iDigitLeft == 0 && score[i]->iDigitMiddle == 0 ? 16 : 0), 16, 16);
-				spr_scoretext.draw(iScoreX + 36, iScoreY, score[i]->iDigitRight, 0, 16, 16);
+				}
+
+				//in game scoreboards
+				for(i = 0; i < score_cnt; i++)
+				{
+					spr_shade[game_values.teamcounts[i] - 1].draw(score[i]->x, score[i]->y);
+
+					for(short k = 0; k < game_values.teamcounts[i]; k++)
+					{
+						short globalID = game_values.teamids[i][k];
+
+						//If player is respawning, draw the egg
+						if(respawn[globalID] > 0 && !game_values.gamemode->gameover)
+						{
+							spr_spawneggs.draw(score[i]->x + scoreoffsets[k], score[i]->y + 2, ((respawn[globalID] - 1) >> 1) * 32, game_values.colorids[globalID] * 32, 32, 32);
+						}
+						else  //otherwise draw the player's skin in the scoreboard
+						{
+							short iScoreboardSprite;
+							if(game_values.gamemode->gameover)
+							{
+								if(g_iWinningPlayer != i)
+									iScoreboardSprite = PGFX_DEADFLYING;
+								else
+									iScoreboardSprite = PGFX_JUMPING_R;
+							}
+							else
+							{
+								iScoreboardSprite = PGFX_STANDING_R;
+							}
+							
+							//Search for player state to display
+							CPlayer * player = GetPlayerFromGlobalID(globalID);
+							
+							if(player && !game_values.gamemode->gameover)
+							{
+								short iScoreOffsetX = score[i]->x + scoreoffsets[k];
+								short iScoreOffsetY = score[i]->y + 2;
+
+								if(player->ownerPlayerID > -1)
+									spr_ownedtags.draw(iScoreOffsetX - 8, iScoreOffsetY - 8, player->ownerColorOffsetX, 0, 48, 48);
+		
+								player->GetScoreboardSprite()[iScoreboardSprite]->draw(iScoreOffsetX, iScoreOffsetY, player->iSrcOffsetX, 0, 32, 32);
+
+								if(player->jailed > 0)
+									spr_jail.draw(iScoreOffsetX - 6, iScoreOffsetY - 6);
+
+								if(player->powerup > 0)
+									spr_storedpowerupsmall.draw(iScoreOffsetX, iScoreOffsetY + 16, g_iPowerupToIcon[player->powerup - 1], 0, 16, 16);
+							}
+							else
+							{
+								spr_player[globalID][iScoreboardSprite]->draw(score[i]->x + scoreoffsets[k], score[i]->y + 2, 0, 0, 32, 32);
+							}
+						
+							//give crown to player(s) with most kills
+							if(g_iWinningPlayer == i)
+								spr_crown.draw(score[i]->x + scoreoffsets[k] + 12, score[i]->y - 4);
+						}
+
+						short storedpowerupid = game_values.gamepowerups[globalID];
+
+						if(storedpowerupid != -1)
+						{
+							if(!game_values.swapplayers)
+							{
+								spr_storedpowerupsmall.draw(score[i]->x + scorepowerupoffsets[game_values.teamcounts[i] - 1][k], score[i]->y + 25, storedpowerupid * 16, 0, 16, 16);
+							}
+						}
+					}
+					
+					short iScoreX = score[i]->x + iScoreTextOffset[i];
+					short iScoreY = score[i]->y + 4;
+
+					spr_scoretext.draw(iScoreX, iScoreY, score[i]->iDigitLeft, (score[i]->iDigitLeft == 0 ? 16 : 0), 16, 16);
+					spr_scoretext.draw(iScoreX + 18, iScoreY, score[i]->iDigitMiddle, (score[i]->iDigitLeft == 0 && score[i]->iDigitMiddle == 0 ? 16 : 0), 16, 16);
+					spr_scoretext.draw(iScoreX + 36, iScoreY, score[i]->iDigitRight, 0, 16, 16);
+				}
 			}
-
 
 			//draw arrows for being above the top of the screen
 			for(i = 0; i < list_players_cnt; i++)

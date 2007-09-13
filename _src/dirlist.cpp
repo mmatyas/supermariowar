@@ -49,8 +49,8 @@ DirectoryListing::DirectoryListing(string path, string file_ext)
 
     /* Windows Directory Enumeration*/
     #ifdef _WIN32
-        //TODO: check if this does what we want:
-        string search = path+"*";
+
+		string search = path+"*";
         findhandle = FindFirstFile(search.c_str(), &finddata);
         Success = findhandle != INVALID_HANDLE_VALUE;
         Stored_Filename = finddata.cFileName;

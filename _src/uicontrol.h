@@ -916,6 +916,8 @@ class MI_World : public UI_Control
 
 	private:
 
+		MenuCodeEnum InitGame(short iStage, short iPlayer, bool fNeedAiControl);
+
 		void SetMapOffset();
 		void RepositionMapImage();
 		void DrawWorldMapToSurface(bool fInit);

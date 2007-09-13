@@ -8,9 +8,9 @@
 12
 
 #Sprite Backgroud Layer
-0,0,5,13,13,7,13,13,13,13,4,0,0,0,0
-0,5,25,1,1,42,1,1,1,1,14,0,0,0,0
-0,15,1,1,1,19,20,43,43,43,8,5,13,13,4
+0,0,5,13,13,7,13,13,13,13,4,0,5,13,4
+0,5,25,1,1,42,1,1,1,1,14,0,15,1,14
+0,15,1,1,1,19,20,43,43,43,8,5,21,43,8
 0,2,24,1,1,26,17,1,1,1,14,15,1,1,14
 5,13,25,1,1,1,41,1,1,39,22,25,1,1,14
 15,1,1,1,1,1,1,1,1,1,1,1,1,1,14
@@ -56,7 +56,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 0,0,0,0,0,0,0,1,0,0,0,0,0,0,0
-0,0,0,0,0,0,0,6,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,9,0,0,0,0,0,0,0
 0,0,0,0,0,0,0,8,0,0,0,0,0,0,0
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
@@ -79,12 +79,12 @@
 
 #Stages
 #Stage Type 0,Map,Mode,Goal,Points,Bonus List(Max 10),Name,End World, then mode settings (see sample tour file for details)
-#Stage Type 1,Bonus House Name,Sequential/Random Order,Powerup List
+#Stage Type 1,Bonus House Name,Sequential/Random Order,Display Text,Powerup List
 4
-0,0smw,16,5,3,1p20|1p15|1w3|2p0|2p4|3p1|3p19|3p6|3p8|4w1|4w2,1st Stop,0,1,5,0,8,4,1
+0,0smw,16,5,3,1p20|1p15|1w3|2p0|2p4|3p1|3p19|3p6|3p8|4w1,1st Stop,0,1,5,0,8,4,1
 0,Treefort,15,3,1,1p12,2nd Stop,1,3,310,0,2,1,1,0,0,1,0,0,1,0,0,0
 0,Mountain waterfall,14,10,1,0,mountain waterfall,0
-1,Toad's House,1,p5,p8,w2,w3,s2
+1,Toad's House,0,This item will|help you on your way!,p5,p8,w2,w3,s2
 
 #Warps
 #location 1 x, y, location 2 x, y
@@ -93,9 +93,10 @@
 
 #Vehicles
 #Sprite,Stage Type, Start Column, Start Row, Min Moves, Max Moves, Sprite Paces, Sprite Direction, Boundary
-2
+3
 2,0,4,9,5,8,1,0,1
 1,0,4,6,5,8,1,0,2
+7,2,8,5,2,5,1,0,0
 
 #Initial Items
 w4,p12,p15,w0,w9,p6

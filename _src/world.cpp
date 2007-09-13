@@ -913,13 +913,13 @@ bool WorldMap::Save(const char * szPath)
 
 	fprintf(file, "#Stages\n");
 	fprintf(file, "#Stage Type 0,Map,Mode,Goal,Points,Bonus List(Max 10),Name,End World, then mode settings (see sample tour file for details)\n");
-	fprintf(file, "#Stage Type 1,Bonus House Name,Sequential/Random Order,Powerup List\n");
+	fprintf(file, "#Stage Type 1,Bonus House Name,Sequential/Random Order,Display Text,Powerup List\n");
 
 	fprintf(file, "%d\n", game_values.tourstoptotal);
 
 	for(short iStage = 0; iStage < game_values.tourstoptotal; iStage++)
 	{
-		char szLine[1024];
+		char szLine[4096];
 		WriteTourStopLine(game_values.tourstops[iStage], szLine, true);
 		fprintf(file, szLine);
 	}

@@ -66,11 +66,14 @@ Abovethedomes,0,1,0,1,0,0,0,1
 Affe,0,0,0,0,0,0,0,1
 Alinos gate,0,0,0,0,0,0,0,1
 Allo,0,1,0,1,0,0,0,1
+Ambitions of the Abyss,1,0,0,1,0,0,0,1
+Aquatic Ruins,0,0,0,1,0,0,0,0
 Arcterra gate,1,0,1,1,0,0,0,1
 As seen on tv,0,1,0,1,0,0,1,1
 Asinine,0,0,0,1,0,0,0,1
 Aztec,0,0,0,1,0,0,0,1
 Ballistic Boardwalks,0,0,0,1,0,0,0,1
+Battle City,0,0,0,1,0,0,0,0
 Battle Creek,1,1,0,1,1,0,0,1
 Battleblockarea,0,0,0,1,0,0,0,1
 Battlefield,0,0,0,1,0,1,1,1
@@ -78,44 +81,57 @@ Begging for sumo,1,0,0,1,0,0,0,1
 Begging for sumo again,1,0,0,1,0,0,0,1
 Bewarehouse,0,1,0,1,0,0,0,1
 Big Tree,0,0,0,1,0,0,0,1
+Black Hole,1,0,0,1,0,0,1,1
 Block Piles,0,0,0,1,0,1,0,1
 Block! Block!,0,0,0,1,0,0,0,1
 Blockfort,0,0,0,1,0,0,0,1
 Blockswar,0,0,0,1,0,0,0,1
+Bonus Room,0,1,0,1,0,0,0,1
 Boo is Back,1,0,0,1,0,0,0,1
+Boos Mansion,1,1,0,1,0,0,1,1
 Bottle,0,0,0,0,1,0,0,1
 Bounce2lava,1,0,0,1,0,0,0,1
 Bouncy Spikes,1,0,0,1,0,0,0,1
+Bouncy Water,0,0,0,1,0,0,0,1
+Bowsers Castle,1,0,0,1,0,0,1,1
 Breakaway,0,0,0,1,1,0,0,1
 Breaker,0,0,0,1,1,0,0,1
 Bring a towel,0,1,0,1,0,0,0,1
 Bubble Bobble 2,0,0,0,0,0,0,0,0
 Buster_Beetle_s_Tower,0,0,0,1,0,1,1,1
 Cactus canyon,1,1,0,1,0,0,0,1
+Canyon with Waterfalls,0,1,0,1,0,0,0,0
+Castle Wall,0,1,0,1,0,0,1,0
 Castleout,0,0,0,1,0,0,0,1
 Castor wilds,1,0,0,1,1,0,0,1
 Cave,1,0,0,1,0,1,0,1
 Chainlink,0,0,0,1,0,1,0,1
 Chomp beach,0,0,0,1,1,0,0,1
 Circuit,0,0,0,1,0,0,0,1
+Classicka,0,1,0,1,1,0,0,0
 Classicon,0,1,0,1,0,0,0,1
 Cliff,0,0,0,1,0,0,0,1
 Cliff tower,1,1,0,1,0,1,1,1
 Cloud Garden,0,0,1,1,1,0,0,1
 Cloud Props,0,0,0,1,0,0,0,1
+Coal Mine,1,0,0,1,1,1,1,0
 Colorpile,1,0,0,0,0,0,0,1
 Coolnights,0,1,0,1,0,0,0,1
 Crazy castle,0,0,0,0,0,0,0,1
 Crazy dungeon,0,0,1,1,0,1,1,1
+Crevice Canyon,0,0,0,1,0,1,0,1
 Crystal caverns,0,0,0,0,0,0,0,1
 Danger Canyon,0,0,0,0,1,0,0,1
 Dare,1,0,0,1,0,0,1,1
+Dark forest,0,0,0,1,0,0,0,1
 Darkrock,1,1,0,1,0,0,0,1
 Death From Above,0,0,0,1,0,0,0,1
 Death Island,1,0,0,1,0,0,0,1
 Death to iggy,1,0,0,0,0,0,0,1
 Derelict,0,1,0,1,0,0,0,1
 Desert,0,0,0,1,1,0,0,1
+Desert Canyon,0,1,0,0,0,0,1,0
+Dirty Pipes,1,1,0,1,1,1,1,0
 Divine intervention,0,1,0,0,0,0,0,1
 Dkjungle,0,0,0,1,0,0,0,1
 Dm,0,0,0,0,0,0,0,1
@@ -131,12 +147,15 @@ Dune,0,1,0,1,0,0,0,1
 Eighth Platform,0,1,0,1,1,1,0,1
 Elevated,0,1,0,1,1,0,0,1
 Evening Fracas,1,1,0,1,0,0,1,1
+FK Base,0,0,0,1,0,0,0,0
 Fastlane,1,0,0,1,0,0,0,1
 Field day,0,0,0,1,1,0,0,1
+Forced Switch,0,0,0,1,0,0,1,0
 Fortress,0,1,0,1,1,0,0,1
 Fountain of Dreams,0,0,0,1,0,0,1,1
 Frozen Frenzy,0,0,1,1,0,0,0,1
 Gatekeeper,1,0,0,1,0,0,1,1
+Germany,0,0,0,1,0,0,0,0
 Ghosthouse,0,0,0,1,0,0,0,1
 Ghostly madness,0,0,0,1,0,0,0,1
 GoForIt,0,1,0,1,0,1,1,1
@@ -154,9 +173,12 @@ Heinous Heights,0,0,0,1,1,0,0,1
 Hello world,0,0,0,1,1,0,0,1
 Hidenseek,0,1,0,1,0,0,0,1
 High flying,0,0,0,1,0,0,0,1
+Hill,0,0,0,1,0,0,1,0
 Hoog,0,0,0,1,0,0,0,1
+Hot Spot,1,0,1,0,0,0,0,1
 Humanitary,0,1,1,1,0,0,0,1
 Hyrule Castle,0,0,0,1,0,0,0,1
+Ice Cave,0,0,1,1,0,0,0,0
 Icecap,0,1,1,1,0,0,0,1
 Icecube,1,1,1,0,1,0,0,1
 Iceland,1,1,1,1,0,0,0,1
@@ -168,17 +190,21 @@ Iron,0,0,0,1,0,0,0,1
 Islands of Questionable Support,0,0,0,1,0,0,0,1
 Jump n Bump,1,0,1,1,0,0,0,0
 Jungle,0,0,0,1,0,0,0,1
+Jungle Bridge,0,0,0,1,0,0,0,0
 Jungle Japes,0,0,0,1,0,0,0,1
 King of the Hills,0,0,0,1,0,0,1,1
 King_of_the_hill,0,1,0,1,0,0,0,1
 Kongo Jungle,0,0,0,1,0,0,0,1
+Lake Paradox,0,1,0,1,0,0,0,0
 Lava Island,1,0,0,1,0,0,0,0
 Lockout,0,1,0,1,1,0,0,1
+Log Balancing,1,0,0,1,0,0,0,1
 Look_above,0,0,0,1,1,0,0,1
 Low bandwidth,0,1,0,0,0,0,0,1
 Lunar,1,1,0,1,1,1,1,1
 Manic Mountain,0,0,0,1,0,0,0,1
 Manor,1,0,0,1,1,0,0,1
+Map in the Sky,0,0,0,1,0,0,0,1
 Matmata,0,0,0,1,1,0,0,0
 Mbc,1,1,0,1,0,0,0,1
 Meadows,0,0,1,1,1,0,0,1
@@ -207,6 +233,7 @@ Rainbowroadredux,0,1,0,1,0,0,0,1
 Rat Race,0,1,0,1,0,0,0,1
 Reznor pit,1,0,0,0,0,0,0,0
 Risk,1,1,0,1,0,0,1,1
+Room 824,0,1,1,1,0,1,1,0
 Rubber Room,0,0,0,1,0,0,0,1
 Salty dog,1,0,0,1,0,1,1,1
 Shipwreck,1,0,0,1,0,0,1,1
@@ -214,26 +241,31 @@ Sidewinder,0,1,1,1,1,0,0,1
 Skull Depot,0,0,0,1,1,0,0,1
 Sky,0,0,0,0,0,0,0,1
 Sky Garden,0,0,0,1,0,0,0,0
+Sky Ruins,0,0,0,1,0,0,1,0
 Sky realm,0,0,0,1,1,0,0,1
 Skyfortress,0,0,0,1,1,0,0,1
 Skyhigh,0,0,0,1,1,0,0,1
 Smb2,0,0,0,1,0,0,0,1
 Smw,0,0,0,1,0,0,0,1
 Snowball fight,0,0,0,0,0,0,0,1
+SpaceIceLavaStuff,1,1,1,1,0,1,1,1
 Splitting Headache,0,0,0,1,0,0,0,1
 Ssb smb2,0,0,0,1,1,0,0,1
 Ssbmjunglejapes,0,0,0,1,0,0,0,1
 Staircase,0,0,0,0,0,0,0,1
+Stairway,0,0,0,1,0,0,0,0
 Storage Building,0,0,0,1,0,0,0,1
 Subcon,0,0,0,0,0,0,0,1
 Subterranean,0,0,0,1,0,0,0,1
 Sunny hills,0,1,0,1,1,0,0,1
 Sunset hills,0,1,0,1,1,0,0,1
+Super Mario Bros 2,0,1,0,0,0,0,1,1
 Suspended Craziness,1,0,0,1,0,0,0,1
 Switch 'n' Squish,0,0,0,1,0,0,1,1
 Symmetrical,0,0,0,0,0,0,0,1
 Synchro,0,0,0,0,0,0,0,1
 Teal Tunnels,1,1,0,1,1,0,0,1
+Tewi Stage,0,0,0,1,0,0,0,1
 The 10th,0,0,0,1,1,0,0,1
 The pit,1,0,0,1,0,1,0,0
 Thecourtyard,0,0,0,0,0,0,0,1
@@ -257,6 +289,7 @@ Vanilla dome,1,0,0,1,0,0,0,1
 Vanilla sky,0,0,0,0,1,0,0,0
 Wacky Woods,0,0,0,1,0,0,0,1
 War2,0,0,0,1,1,0,0,1
+Warios Castle,0,0,0,1,0,0,1,0
 Warpzone,0,1,0,0,0,0,0,1
 What,0,1,0,1,0,0,0,1
 White ground,0,0,0,0,0,0,0,1

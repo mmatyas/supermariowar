@@ -307,7 +307,6 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 	//version[2] = ReadInt(mapfile); //Micro
 	//version[3] = ReadInt(mapfile); //Build
 
-	//TODO: Is this any faster than reading seperate ints at a time?
 	ReadIntChunk(version, 4, mapfile);
 
 	if(version[0] == 1 && version[1] == 8)
@@ -1814,11 +1813,16 @@ void CMap::AnimateTiles()
 {
 	//For each animated tile
 	std::list<AnimatedTile*>::iterator iter = animatedtiles.begin(), lim = animatedtiles.end();
+	
+	short iBackgroundLayers = 2;
+	if(!game_values.toplayer)
+		iBackgroundLayers = 4;
+
 	while (iter != lim)
 	{
 		SDL_BlitSurface(spr_background.getSurface(), &((*iter)->rDest), spr_backmap.getSurface(), &((*iter)->rDest));
 
-		for(short iLayer = 0; iLayer < 2; iLayer++)
+		for(short iLayer = 0; iLayer < iBackgroundLayers; iLayer++)
 		{
 			if((*iter)->layers[iLayer] < TILESETSIZE)
 			{
@@ -1826,7 +1830,22 @@ void CMap::AnimateTiles()
 			}
 			else if((*iter)->layers[iLayer] > TILESETSIZE)
 			{
-				SDL_BlitSurface(spr_tileanimation.getSurface(), &((*iter)->rSrc[iLayer][iTileAnimationFrame]), spr_backmap.getSurface(), &((*iter)->rDest));
+				SDL_BlitSurface(spr_tileanimation[0].getSurface(), &((*iter)->rSrc[iLayer][iTileAnimationFrame]), spr_backmap.getSurface(), &((*iter)->rDest));
+			}
+		}
+
+		if(game_values.toplayer)
+		{
+			for(short iLayer = 2; iLayer < 4; iLayer++)
+			{
+				if((*iter)->layers[iLayer] < TILESETSIZE)
+				{
+					SDL_BlitSurface(tilesetsurface[0], &((*iter)->rSrc[iLayer][0]), spr_frontmap.getSurface(), &((*iter)->rDest));
+				}
+				else if((*iter)->layers[iLayer] > TILESETSIZE)
+				{
+					SDL_BlitSurface(spr_tileanimation[0].getSurface(), &((*iter)->rSrc[iLayer][iTileAnimationFrame]), spr_frontmap.getSurface(), &((*iter)->rDest));
+				}
 			}
 		}
 
@@ -2155,25 +2174,30 @@ void CMap::drawPreview(SDL_Surface * targetSurface, int layer, bool fThumbnail)
 			if(ts == TILESETSIZE)
 				continue;
 
-			//TODO:: Handle drawing preview for animated tiles
+			//Handle drawing preview for animated tiles
 			if(ts > TILESETSIZE)
-				continue;
-
-			if(fThumbnail)
 			{
-				rectSrc.x = iThumbTileX[ts];
-				rectSrc.y = iThumbTileY[ts];
+				ts -= (TILESETSIZE + 1);
+				rectSrc.x = 0;
+				rectSrc.y = ts * iBlockSize;
+				
+				SDL_BlitSurface(spr_tileanimation[fThumbnail ? 2 : 1].getSurface(), &rectSrc, targetSurface, &rectDst);
 			}
 			else
 			{
-				rectSrc.x = iPreviewTileX[ts];
-				rectSrc.y = iPreviewTileY[ts];
+				if(fThumbnail)
+				{
+					rectSrc.x = iThumbTileX[ts];
+					rectSrc.y = iThumbTileY[ts];
+					SDL_BlitSurface(tilesetsurface[2], &rectSrc, targetSurface, &rectDst);
+				}
+				else
+				{
+					rectSrc.x = iPreviewTileX[ts];
+					rectSrc.y = iPreviewTileY[ts];
+					SDL_BlitSurface(tilesetsurface[1], &rectSrc, targetSurface, &rectDst);
+				}
 			}
-		
-			if(fThumbnail)
-				SDL_BlitSurface(tilesetsurface[2], &rectSrc, targetSurface, &rectDst);
-			else
-				SDL_BlitSurface(tilesetsurface[1], &rectSrc, targetSurface, &rectDst);
 		}
 
 		rectDst.x += iBlockSize;

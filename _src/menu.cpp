@@ -50,6 +50,8 @@ extern short g_iAutoFilterIcons[NUM_AUTO_FILTERS];
 extern void ResetTourStops();
 extern WorldMap g_worldmap;
 
+extern void LoadCurrentMapBackground();
+
 extern TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld);
 
 void Menu::WriteGameOptions()
@@ -2998,10 +3000,19 @@ void Menu::RunMenu()
 
 				miWorld->ClearCloud();
 
-				short iGameMode = game_values.tourstops[game_values.tourstopcurrent]->iMode;
-				gamemodes[iGameMode]->goal = game_values.tourstops[game_values.tourstopcurrent]->iGoal;
-				game_values.gamemode = gamemodes[iGameMode];
-				
+				//Tour bonus house
+				if(game_values.matchtype == MATCH_TYPE_WORLD && game_values.tourstops[game_values.tourstopcurrent]->iStageType == 1)
+				{
+					bonushousemode->goal = 0;
+					game_values.gamemode = bonushousemode;
+				}
+				else
+				{
+					short iGameMode = game_values.tourstops[game_values.tourstopcurrent]->iMode;
+					gamemodes[iGameMode]->goal = game_values.tourstops[game_values.tourstopcurrent]->iGoal;
+					game_values.gamemode = gamemodes[iGameMode];
+				}
+
 				StartGame();
 			}
 			else if (MENU_CODE_RESET_STORED_POWERUPS == code)
@@ -3157,6 +3168,21 @@ void Menu::RunMenu()
 
 		if(GS_START_GAME == game_values.gamestate && game_values.screenfade == 255)
 		{
+			if(game_values.matchtype == MATCH_TYPE_WORLD && game_values.tourstops[game_values.tourstopcurrent]->iStageType == 1)
+			{
+				g_map.loadMap(convertPath("maps/special/bonushouse.map"), read_type_full);
+				LoadCurrentMapBackground();
+			}
+			else
+			{
+				g_map.loadMap(maplist.currentFilename(), read_type_full);
+				
+				//Allows all players to start the game
+				game_values.singleplayermode = -1;
+			}
+
+			game_values.gamestate = GS_GAME;
+
 			/*
 				game_values.gamemode = bossgamemode;  //boss type has already been set at this point
 
@@ -3167,25 +3193,16 @@ void Menu::RunMenu()
 				else if(bossgamemode->GetBossType() == 2)
 					g_map.loadMap(convertPath("maps/special/volcano.map"), read_type_full);
 
-				char filename[128];
-				sprintf(filename, "gfx/packs/backgrounds/%s", g_map.szBackgroundFile);
-				std::string path = convertPath(filename, gamegraphicspacklist.current_name());
-
-				//if the background file doesn't exist, use the classic background
-				if(!File_Exists(path))
-					path = convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist.current_name());
-
-				__load_gfx(spr_background, path);
+				LoadCurrentMapBackground();
 
 				g_map.predrawbackground(spr_background, spr_backmap);
 				g_map.predrawforeground(spr_frontmap);
 				LoadMapObjects();
 			*/
 
-			game_values.gamestate = GS_GAME;
+			
 
 			SetGameModeSettingsFromMenu();
-			g_map.loadMap(maplist.currentFilename(), read_type_full);
 			
 			g_map.predrawbackground(spr_background, spr_backmap);
 			g_map.predrawforeground(spr_frontmap);

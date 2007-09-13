@@ -556,6 +556,22 @@ class PU_TreasureChestBonus : public MO_Powerup
 		short drawbonusitemtimer;
 };
 
+class PU_BonusHouseChest : public MO_Powerup
+{
+	public:
+		PU_BonusHouseChest(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iBonusItem);
+		~PU_BonusHouseChest(){};
+
+		void update();
+		void draw();
+		bool collide(CPlayer * player);
+	
+	private:
+		short bonusitem;
+		short drawbonusitemy;
+		short drawbonusitemtimer;
+};
+
 class PU_ClockPowerup : public MO_Powerup
 {
 	public:

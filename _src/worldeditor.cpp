@@ -50,8 +50,8 @@ short			iWorldWidth, iWorldHeight;
 
 SDL_Event		event;
 
-gfxFont			font;
-gfxFont			fontbig;
+gfxFont			menu_font_small;
+gfxFont			menu_font_large;
 
 gfxSprite		spr_tilesetworld;
 gfxSprite		spr_selectedtile;
@@ -107,7 +107,7 @@ gfxSprite		spr_thumbnail_platformarrows;
 gfxSprite		spr_thumbnail_warps[2];
 gfxSprite		spr_thumbnail_mapitems[2];
 gfxSprite		spr_awardsouls, spr_fireballexplosion;
-gfxSprite		spr_tileanimation;
+gfxSprite		spr_tileanimation[3];
 gfxSprite		spr_backmap;
 gfxSprite		spr_background;
 sfxSound		sfx_boomerang;
@@ -127,6 +127,7 @@ gfxSprite		spr_frontmap;
 
 CPlayer			*list_players[4];
 short			list_players_cnt = 0;
+bool			g_fLoadMessages = true;
 ///////
 
 int save_as();
@@ -203,8 +204,8 @@ int main(int argc, char *argv[])
 	spr_dialog.init(convertPath("gfx/leveleditor/leveleditor_dialog.png"), 255, 0, 255, 255);
 	menu_shade.init(convertPath("gfx/leveleditor/leveleditor_shade.png"), 255, 0, 255, 128);
 
-	font.init(convertPath("gfx/packs/Classic/fonts/font_small.png"));
-	fontbig.init(convertPath("gfx/packs/Classic/fonts/font_large.png"));
+	menu_font_small.init(convertPath("gfx/packs/Classic/fonts/font_small.png"));
+	menu_font_large.init(convertPath("gfx/packs/Classic/fonts/font_large.png"));
 
 	printf("\n---------------- load world ----------------\n");
 
@@ -743,23 +744,23 @@ int editor_edit()
 			}
 		}
 
-		font.draw(0, 0, szEditModes[edit_mode]);
+		menu_font_small.draw(0, 0, szEditModes[edit_mode]);
 		
 		if(fAutoPaint)
-			font.draw(0, 16, "Auto Paint");
+			menu_font_small.draw(0, 16, "Auto Paint");
 
-		font.drawRightJustified(640, 0, worldlist.current_name());
+		menu_font_small.drawRightJustified(640, 0, worldlist.current_name());
 		
 
 		/*
 		if(--g_musiccategorydisplaytimer > 0)
 		{
 			spr_dialog.draw(224, 176);
-			font.drawCentered(320, 195, "Music Category");
-			fontbig.drawCentered(320, 220, g_szMusicCategoryNames[g_map.musicCategoryID]);
+			menu_font_small.drawCentered(320, 195, "Music Category");
+			menu_font_large.drawCentered(320, 220, g_szMusicCategoryNames[g_map.musicCategoryID]);
 
-			font.drawCentered(320, 255, "Press 'R' Again");
-			font.drawCentered(320, 270, "To Change");
+			menu_font_small.drawCentered(320, 255, "Press 'R' Again");
+			menu_font_small.drawCentered(320, 270, "To Change");
 		}*/
 		
 		SDL_Flip(screen);
@@ -1273,7 +1274,7 @@ int editor_warp()
 		menu_shade.draw(0, 0);
 
 		SDL_BlitSurface(spr_warps[0].getSurface(), NULL, screen, &r);
-		font.drawRightJustified(640, 0, worldlist.current_name());
+		menu_font_small.drawRightJustified(640, 0, worldlist.current_name());
 
 		SDL_Flip(screen);
 
@@ -1576,7 +1577,7 @@ int editor_vehicles()
 
 		//spr_mapitems[0].draw(0, 0, 0, 0, 64, 32);
 
-		font.drawRightJustified(640, 0, worldlist.current_name());
+		menu_font_small.drawRightJustified(640, 0, worldlist.current_name());
 				
 		SDL_Flip(screen);
 
@@ -1673,104 +1674,104 @@ int display_help()
 
 	drawmap(false, TILESIZE);
 	menu_shade.draw(0, 0);
-	fontbig.drawCentered(320, 15, "Help");
+	menu_font_large.drawCentered(320, 15, "Help");
 	
 	int offsety = 55;
 	int offsetx = 50;
-	font.draw(offsetx, offsety, "Modes:");
-	offsety += font.getHeight() + 2;
-	font.draw(offsetx, offsety, "[t] - Tile Mode");
-	offsety += font.getHeight() + 2;
-	font.draw(offsetx, offsety, "[i] - Block Mode");
-	offsety += font.getHeight() + 2;
-	font.draw(offsetx, offsety, "[w] - Warp Mode");
-	offsety += font.getHeight() + 2;
-	font.draw(offsetx, offsety, "[m] - Move Mode");
-	offsety += font.getHeight() + 2;
-	font.draw(offsetx, offsety, "[l] - Tile Type Mode");
-	offsety += font.getHeight() + 2;
-	font.draw(offsetx, offsety, "[p] - Platform Mode");
-	offsety += font.getHeight() + 2;
-	font.draw(offsetx, offsety, "[x] - No Player Spawn Area");
-	offsety += font.getHeight() + 2;
-	font.draw(offsetx, offsety, "[z] - No Item Spawn Area");
-	offsety += font.getHeight() + 20;
+	menu_font_small.draw(offsetx, offsety, "Modes:");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[t] - Tile Mode");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[i] - Block Mode");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[w] - Warp Mode");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[m] - Move Mode");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[l] - Tile Type Mode");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[p] - Platform Mode");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[x] - No Player Spawn Area");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[z] - No Item Spawn Area");
+	offsety += menu_font_small.getHeight() + 20;
 
-	font.draw(offsetx, offsety, "Layers:");
-	offsety += font.getHeight() + 2;
-	font.draw(offsetx, offsety, "[v] - Hide Blocks");
-	offsety += font.getHeight() + 2;
-	font.draw(offsetx, offsety, "[y] - Select Active Tile Layer");
-	offsety += font.getHeight() + 2;
-	font.draw(offsetx, offsety, "[u] - Hide Inactive Tile Layers");
-	offsety += font.getHeight() + 2;
-	font.draw(offsetx, offsety, "[o] - Optimize Layers");
-	offsety += font.getHeight() + 20;
+	menu_font_small.draw(offsetx, offsety, "Layers:");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[v] - Hide Blocks");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[y] - Select Active Tile Layer");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[u] - Hide Inactive Tile Layers");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[o] - Optimize Layers");
+	offsety += menu_font_small.getHeight() + 20;
 
-	font.draw(offsetx, offsety, "File:");
-	offsety += font.getHeight() + 2;
-	font.draw(offsetx, offsety, "[n] - New Map");
-	offsety += font.getHeight() + 2;
-	font.draw(offsetx, offsety, "[s] - Save Map");
-	offsety += font.getHeight() + 2;
-	font.draw(offsetx, offsety, "[shift] + [s] - Save As");
-	offsety += font.getHeight() + 2;
-	font.draw(offsetx, offsety, "[f] - Find Map");
-	offsety += font.getHeight() + 2;
-	font.draw(offsetx, offsety, "[shift] + [f] - New Search");
-	offsety += font.getHeight() + 2;
-	font.draw(offsetx, offsety, "[pageup] - Go To Previous Map");
-	offsety += font.getHeight() + 2;
-	font.draw(offsetx, offsety, "[pagedown] - Go To Next Map");
+	menu_font_small.draw(offsetx, offsety, "File:");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[n] - New Map");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[s] - Save Map");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[shift] + [s] - Save As");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[f] - Find Map");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[shift] + [f] - New Search");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[pageup] - Go To Previous Map");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[pagedown] - Go To Next Map");
 
 	offsetx = 320;
 	offsety = 55;
 
-	font.draw(offsetx, offsety, "Tile, Warp and Block Modes:");
-	offsety += font.getHeight() + 2;
-	font.draw(offsetx, offsety, "[Left Mouse Button] - Place Item");
-	offsety += font.getHeight() + 2;
-	font.draw(offsetx, offsety, "[Right Mouse Button] - Remove Item");
-	offsety += font.getHeight() + 20;
+	menu_font_small.draw(offsetx, offsety, "Tile, Warp and Block Modes:");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[Left Mouse Button] - Place Item");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[Right Mouse Button] - Remove Item");
+	offsety += menu_font_small.getHeight() + 20;
 
-	font.draw(offsetx, offsety, "Move Mode:");
-	offsety += font.getHeight() + 2;
-	font.draw(offsetx, offsety, "[Right Mouse Button] - Select Area");
-	offsety += font.getHeight() + 2;
-	font.draw(offsetx, offsety, "[Left Mouse Button] - Unselect Area");
-	offsety += font.getHeight() + 2;
-	font.draw(offsetx, offsety, "Select And Drag - Move Selections");
-	offsety += font.getHeight() + 2;
-	font.draw(offsetx, offsety, "Hold [shift] - Multiple Selections");
-	offsety += font.getHeight() + 2;
-	font.draw(offsetx, offsety, "Hold [ctrl] - Freehand Selections");
-	offsety += font.getHeight() + 2;
-	font.draw(offsetx, offsety, "[delete] - Delete Selection");
-	offsety += font.getHeight() + 2;
-	font.draw(offsetx, offsety, "[c] - Copy Selection");
-	offsety += font.getHeight() + 20;
+	menu_font_small.draw(offsetx, offsety, "Move Mode:");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[Right Mouse Button] - Select Area");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[Left Mouse Button] - Unselect Area");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "Select And Drag - Move Selections");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "Hold [shift] - Multiple Selections");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "Hold [ctrl] - Freehand Selections");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[delete] - Delete Selection");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[c] - Copy Selection");
+	offsety += menu_font_small.getHeight() + 20;
 
-	font.draw(offsetx, offsety, "Platforms:");
-	offsety += font.getHeight() + 2;
-	font.draw(offsetx, offsety, "[p] - Path");
-	offsety += font.getHeight() + 2;
-	font.draw(offsetx, offsety, "[+/-] - Change Speed");
-	offsety += font.getHeight() + 2;
-	font.draw(offsetx, offsety, "[delete] - Delete");
-	offsety += font.getHeight() + 20;
+	menu_font_small.draw(offsetx, offsety, "Platforms:");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[p] - Path");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[+/-] - Change Speed");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[delete] - Delete");
+	offsety += menu_font_small.getHeight() + 20;
 
-	font.draw(offsetx, offsety, "Miscellaneous:");
-	offsety += font.getHeight() + 2;
-	font.draw(offsetx, offsety, "[b] - Background Thumbnails");
-	offsety += font.getHeight() + 2;
-	font.draw(offsetx, offsety, "[g] - Change Backgrounds");
-	offsety += font.getHeight() + 2;
-	font.draw(offsetx, offsety, "[r] - Change Music Category");
-	offsety += font.getHeight() + 2;
-	font.draw(offsetx, offsety, "[e] - Change Floating Eyecandy");
-	offsety += font.getHeight() + 2;
-	font.draw(offsetx, offsety, "[ctrl] + [delete] - Clear All");
-	offsety += font.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "Miscellaneous:");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[b] - Background Thumbnails");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[g] - Change Backgrounds");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[r] - Change Music Category");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[e] - Change Floating Eyecandy");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[ctrl] + [delete] - Clear All");
+	offsety += menu_font_small.getHeight() + 2;
 
 
 	SDL_Flip(screen);
@@ -1833,9 +1834,9 @@ bool dialog(char * title, char * instructions, char * input, int inputsize)
 	drawmap(false, TILESIZE);
 	menu_shade.draw(0, 0);
 	spr_dialog.draw(224, 176);
-	fontbig.drawCentered(320, 200, title);
-	font.draw(240, 235, instructions);
-	font.drawRightJustified(640, 0, worldlist.current_name());
+	menu_font_large.drawCentered(320, 200, title);
+	menu_font_small.draw(240, 235, instructions);
+	menu_font_small.drawRightJustified(640, 0, worldlist.current_name());
 	SDL_Flip(screen);
 
     while (true)
@@ -1870,10 +1871,10 @@ bool dialog(char * title, char * instructions, char * input, int inputsize)
 							drawmap(false, TILESIZE);
 							menu_shade.draw(0, 0);
 							spr_dialog.draw(224, 176);
-							fontbig.drawCentered(320, 200, title);
-							font.draw(240, 235, instructions);
-							font.draw(240, 255, input);
-							font.drawRightJustified(640, 0, worldlist.current_name());
+							menu_font_large.drawCentered(320, 200, title);
+							menu_font_small.draw(240, 235, instructions);
+							menu_font_small.draw(240, 255, input);
+							menu_font_small.drawRightJustified(640, 0, worldlist.current_name());
 							SDL_Flip(screen);
 							
 							currentChar--;
@@ -1926,10 +1927,10 @@ bool dialog(char * title, char * instructions, char * input, int inputsize)
 							drawmap(false, TILESIZE);
 							menu_shade.draw(0, 0);
 							spr_dialog.draw(224, 176);
-							fontbig.drawCentered(320, 200, title);
-							font.draw(240, 235, instructions);
-							font.draw(240, 255, input);
-							font.drawRightJustified(640, 0, worldlist.current_name());
+							menu_font_large.drawCentered(320, 200, title);
+							menu_font_small.draw(240, 235, instructions);
+							menu_font_small.draw(240, 255, input);
+							menu_font_small.drawRightJustified(640, 0, worldlist.current_name());
 							SDL_Flip(screen);
 						}
 					}	

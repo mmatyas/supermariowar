@@ -78,7 +78,7 @@ void SetupScoreBoard(bool fOrderMatters)
 		draw[max] = true;	//this is the next biggest score - it doesn't belong to the remaining scores from now on
 	}
 
-	if(game_values.matchtype == MATCH_TYPE_WORLD && game_values.gamemode->winningteam > -1)
+	if(game_values.matchtype == MATCH_TYPE_WORLD && game_values.gamemode->winningteam > -1 && game_values.gamemode->gamemode != game_mode_bonus)
 	{
 		TourStop * tourStop = game_values.tourstops[game_values.tourstopcurrent];
 		short iNumBonuses = tourStop->iNumBonuses;
@@ -2515,3 +2515,30 @@ void CGM_Boss::SetBossType(short bosstype)
 	iBossType = bosstype;
 }
 
+
+
+//Bonus Mode (not really a game mode, but involves using the map so we need a mode to play)
+CGM_Bonus::CGM_Bonus() : CGameMode() 
+{
+	gamemode = game_mode_bonus;
+	SetupModeStrings("Bonus", "", 0);
+}
+
+void CGM_Bonus::init()
+{
+	CGameMode::init();
+}
+
+
+void CGM_Bonus::think()
+{
+	
+}
+
+void CGM_Bonus::draw()
+{
+	//Draw Toad
+
+	//Draw Bonus House Text
+
+}

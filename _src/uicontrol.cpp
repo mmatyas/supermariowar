@@ -9,11 +9,11 @@ extern char * MenuInputNames[NUM_KEYS];
 
 extern bool LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDirections);
 
-extern bool __load_gfx(gfxSprite &g, const std::string& f);
-
 extern short iScoreboardPlayerOffsetsX[3][3];
 extern WorldMap g_worldmap;
 extern short LookupTeamID(short id);
+
+extern void LoadCurrentMapBackground();
 
 UI_Control::UI_Control(short x, short y)
 {
@@ -2147,15 +2147,7 @@ void MI_MapField::LoadCurrentMap()
 	g_map.loadMap(maplist.currentFilename(), read_type_preview);
 	SDL_Delay(10);  //Sleeps to help the music from skipping
 	
-	char filename[128];
-	sprintf(filename, "gfx/packs/backgrounds/%s", g_map.szBackgroundFile);
-	std::string path = convertPath(filename, gamegraphicspacklist.current_name());
-
-	//if the background file doesn't exist, use the classic background
-	if(!File_Exists(path))
-		path = convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist.current_name());
-
-	__load_gfx(spr_background, path);
+	LoadCurrentMapBackground();
 
 	SDL_Delay(10);  //Sleeps to help the music from skipping
 
@@ -3140,7 +3132,7 @@ void MI_TournamentScoreboard::RefreshWorldScores(short gameWinner)
 		}
 	}
 
-	for(short iTeam = 0; iTeam < 4; iTeam++)
+	for(short iTeam = 0; iTeam < iNumTeams;  iTeam++)
 	{
 		for(short iBonus = iBonusCounts[iTeam]; iBonus < 5; iBonus++)
 		{
@@ -4918,12 +4910,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 					short iStage = g_worldmap.GetVehicleInPlayerTile(&iVehicleId);
 					if(iStage >= 0)
 					{
-						game_values.tourstopcurrent = iStage;
-						
-						if(fNeedAiControl)
-							return MENU_CODE_TOUR_STOP_CONTINUE_FORCED;
-						else
-							return MENU_CODE_WORLD_STAGE_START;
+						return InitGame(iStage, iPlayer, fNeedAiControl);
 					}
 
 					if(g_worldmap.GetWarpInPlayerTile(&iWarpCol, &iWarpRow))
@@ -4941,12 +4928,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 					short iType = tile->iType - 6;
 					if(iType >= 0 && tile->iCompleted == -2)
 					{
-						game_values.tourstopcurrent = iType;
-
-						if(fNeedAiControl)
-							return MENU_CODE_TOUR_STOP_CONTINUE_FORCED;
-						else
-							return MENU_CODE_WORLD_STAGE_START;
+						return InitGame(iType, iPlayer, fNeedAiControl);
 					}
 				}
 			}
@@ -5152,6 +5134,21 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 	}
 
 	return MENU_CODE_NONE;
+}
+
+MenuCodeEnum MI_World::InitGame(short iStage, short iPlayer, bool fNeedAiControl)
+{
+	game_values.tourstopcurrent = iStage;
+
+	bool fBonusHouse = game_values.tourstops[game_values.tourstopcurrent]->iStageType == 1;
+
+	if(fBonusHouse)
+		game_values.singleplayermode = iPlayer;
+
+	if(fNeedAiControl || fBonusHouse)
+		return MENU_CODE_TOUR_STOP_CONTINUE_FORCED;
+	else
+		return MENU_CODE_WORLD_STAGE_START;
 }
 
 MenuCodeEnum MI_World::Modify(bool modify)

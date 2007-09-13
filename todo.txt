@@ -791,3 +791,14 @@ Thinking about 1.8...
 
 Things I don't want to do
 - Anything having to do with new types of collision detection like slopes, water, and sliding or climbing tiles
+
+
+Gfx Work Needed:
+1) World editor yellow transparent paths for bridge tiles
+2) Thumbnail sizes for new blocks
+3) Thumbnail sizes for new map items
+4) Thumbnail/preview sizes for animation tiles
+5) Move all animatated tiles into new tileanimation.png
+6) All the world tiles
+7) Toad, house display, large treasure chest gfx for bonus house
+8) Fix tubesteak_mountain waterfall.map with new waterfall animation gfx

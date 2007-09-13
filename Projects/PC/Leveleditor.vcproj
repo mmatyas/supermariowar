@@ -274,6 +274,12 @@
 			<File
 				RelativePath="..\..\_src\SFont.h">
 			</File>
+			<File
+				RelativePath="..\..\_src\sfx.cpp">
+			</File>
+			<File
+				RelativePath="..\..\_src\sfx.h">
+			</File>
 		</Filter>
 		<Filter
 			Name="icon"

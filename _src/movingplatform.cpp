@@ -304,7 +304,7 @@ void MovingPlatform::update()
 	fOldX = fx;
 	fOldY = fy;
 	
-	//TODO: if the path is a straight line, we don't need to calculate the adjustment each frame!
+	//If the path is a straight line, we don't need to calculate the adjustment each frame!
 	/*
 	if(fForwardDirection)
 	{

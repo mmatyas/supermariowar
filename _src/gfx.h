@@ -108,5 +108,8 @@ class gfxFont
 		SFont_Font *m_font;
 };
 
+bool gfx_createfullskin(gfxSprite ** gSprites, const std::string& filename, Uint8 r, Uint8 g, Uint8 b, short colorScheme);
+bool gfx_createmenuskin(gfxSprite ** gSprite, const std::string& filename, Uint8 r, Uint8 g, Uint8 b, short colorScheme, bool fLoadBothDirections);
+
 #endif
 

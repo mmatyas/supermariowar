@@ -119,8 +119,7 @@ MapList::~MapList()
 
 void MapList::add(const char * name)
 {
-	//TODO: remove std::string conversion after re-enabling convertPath
-	std::string fullName = (std::string)(convertPath("maps/")) + name;	//why does name end with .map???
+	std::string fullName = convertPath("maps/") + name;
 
 	for(std::map<std::string, MapListNode*>::iterator i = maps.begin(); i != maps.end(); ++i)
 	{

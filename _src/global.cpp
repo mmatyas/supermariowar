@@ -1,5 +1,8 @@
 #include "global.h"
 
+#include "gfx.h"
+extern bool g_fLoadMessages;
+
 short g_iVersion[] = {1, 8, 0, 0};
 
 //We're using these strings intead of the ugly ones returned by SDL_GetKeyName()
@@ -177,6 +180,118 @@ short g_iNewTileConversion[] = {
 940,941,942,943,944,945,946,947,948,949,950,951,954,955,956,957,958,959,958,959};
 */
 
+void _load_drawmsg(const std::string& f)
+{
+	if(g_fLoadMessages)
+	{
+		/*
+		static SDL_Rect r;
+		r.x = 0;
+		r.y = 0;
+		r.w = 500;
+		r.h = (Uint16)menu_font_small.getHeight();
+		Uint32 col = SDL_MapRGB(screen->format, 189, 251, 255);
+		SDL_FillRect(screen, &r, col);		//fill empty area
+		*/
+
+		menu_font_small.draw(0, 0, f.c_str());
+	}
+}
+void _load_waitforkey()
+{
+	SDL_Event event;
+	while (true)
+	{
+		while(SDL_PollEvent(&event))
+		{
+			if(event.type == SDL_KEYDOWN)
+				return;
+			if(event.type == SDL_JOYBUTTONDOWN)
+				return;
+		}
+
+		SDL_Delay(10);
+	}
+}
+
+bool __load_gfxck(gfxSprite &g, const std::string& f)
+{
+	if(! g.init(f, 255, 0, 255) )
+	{
+		char msg[512];
+		sprintf(msg, "error loading color keyed sprite %s", f.c_str());
+
+		_load_drawmsg(msg);
+
+		return false;
+	}
+
+	return true;
+}
+
+bool __load_gfxa(gfxSprite &g, const std::string& f, Uint8 alpha)
+{
+	if(! g.init(f, 255, 0, 255, alpha) )
+	{
+		char msg[512];
+		sprintf(msg, "error loading alpha color keyed sprite %s", f.c_str());
+
+		_load_drawmsg(msg);
+
+		return false;
+	}
+
+	return true;
+}
+
+bool __load_gfxmenuskin(gfxSprite ** g, const std::string& f, short colorscheme, bool fLoadBothDirections)
+{
+	if(! gfx_createmenuskin(g, f, 255, 0, 255, colorscheme, fLoadBothDirections) )
+	{
+		char msg[512];
+		sprintf(msg, "error loading color keyed sprite %s", f.c_str());
+		_load_drawmsg(msg);
+		return false;
+	}
+
+	return true;
+}
+bool __load_gfxfullskin(gfxSprite ** g, const std::string& f, short colorscheme)
+{
+	if(! gfx_createfullskin(g, f, 255, 0, 255, colorscheme) )
+	{
+		char msg[512];
+		sprintf(msg, "error loading color keyed sprite %s", f.c_str());
+		_load_drawmsg(msg);
+		return false;
+	}
+
+	return true;
+}
+bool __load_gfx(gfxSprite &g, const std::string& f)
+{
+	if(! g.init(f))
+	{
+		char msg[512];
+		sprintf(msg, "error loading sprite %s", f.c_str());
+		_load_drawmsg(msg);
+		return false;
+	}
+
+	return true;
+}
+bool __load_sfx(sfxSound &s, const std::string& f)
+{
+	if(! s.init(f) )
+	{
+		char msg[512];
+		sprintf(msg, "error loading sound %s", f.c_str());
+		_load_drawmsg(msg);
+		return false;
+	}
+
+	return true;
+}
 
 void GetNameFromFileName(char * szName, const char * szFileName)
 {
@@ -707,6 +822,28 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 		ts->iNumBonuses = 0;
 		pszTemp = strtok(NULL, ",\n");
 
+		ts->iBonusType = 0;
+		ts->iNumBonuses = 0;
+
+		char * pszStart = pszTemp;
+
+		ts->iBonusTextLines = 0;
+		while(pszStart != NULL)
+		{
+			char * pszEnd = strstr(pszStart, "|");
+			
+			if(pszEnd)
+				*pszEnd = 0;
+
+			strcpy(ts->szBonusText[ts->iBonusTextLines], pszStart);
+
+			if(++ts->iBonusTextLines >= 5 || !pszEnd)
+				break;
+
+			pszStart = pszEnd + 1;
+		}
+	
+		pszTemp = strtok(NULL, ",\n");
 		while(pszTemp)
 		{
 			strcpy(ts->wsbBonuses[ts->iNumBonuses].szBonusString, pszTemp);
@@ -935,8 +1072,16 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
 		strcat(buffer, ts->szName);
 		strcat(buffer, ",");
 
-		sprintf(szTemp, "%d", ts->iBonusType);
+		sprintf(szTemp, "%d,", ts->iBonusType);
 		strcat(buffer, szTemp);
+
+		for(short iText = 0; iText < ts->iBonusTextLines; iText++)
+		{
+			if(iText != 0)
+				strcat(buffer, "|");
+
+			strcat(buffer, ts->szBonusText[iText]);
+		}
 
 		for(short iBonus = 0; iBonus < ts->iNumBonuses; iBonus++)
 		{
@@ -960,4 +1105,17 @@ void ResetTourStops()
 	}
 
 	game_values.tourstops.clear();
+}
+
+void LoadCurrentMapBackground()
+{
+	char filename[128];
+	sprintf(filename, "gfx/packs/backgrounds/%s", g_map.szBackgroundFile);
+	std::string path = convertPath(filename, gamegraphicspacklist.current_name());
+
+	//if the background file doesn't exist, use the classic background
+	if(!File_Exists(path))
+		path = convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist.current_name());
+
+	__load_gfx(spr_background, path);
 }

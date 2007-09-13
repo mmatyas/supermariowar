@@ -3122,6 +3122,78 @@ float PU_TreasureChestBonus::BottomBounce()
 	return bounce;
 }
 
+
+//------------------------------------------------------------------------------
+// class treasure chest powerup
+//------------------------------------------------------------------------------
+PU_BonusHouseChest::PU_BonusHouseChest(gfxSprite *nspr, short ix, short iy, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iBonusItem) :
+	MO_Powerup(nspr, ix, iy, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
+{
+	state = 1;
+	bonusitem = iBonusItem;
+
+	drawbonusitemy = 0;
+	drawbonusitemtimer = 0;
+}
+
+void PU_BonusHouseChest::update()
+{
+	MO_Powerup::update();
+
+	//Draw rising powerup from chest
+	if (state == 2)
+	{
+		drawbonusitemy -= 2;
+
+		if(--drawbonusitemtimer <= 0)
+			state = 3;
+	}
+	else if (state == 3)
+	{
+		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix, drawbonusitemy, 3, 8));
+		dead = true;
+	}
+}
+
+void PU_BonusHouseChest::draw()
+{
+	if(state < 2)
+	{
+		MO_Powerup::draw();
+	}
+	else
+	{
+		if(bonusitem >= NUM_POWERUPS)
+			spr_worlditems.draw(ix, drawbonusitemy, (bonusitem - NUM_POWERUPS) << 5, 0, 32, 32);
+		else
+			spr_storedpoweruplarge.draw(ix, drawbonusitemy, bonusitem << 5, 0, 32, 32);
+	}
+}
+
+bool PU_BonusHouseChest::collide(CPlayer * player)
+{
+	if(state == 1)
+	{
+		ifsoundonplay(sfx_storepowerup);
+		//if(game_values.worldpowerupcount[player->teamID] < 32)
+        //    game_values.worldpowerups[player->teamID][game_values.worldpowerupcount[player->teamID]++] = bonusitem;
+		//else
+		//	game_values.worldpowerups[player->teamID][31] = bonusitem;
+
+		state = 2;
+
+		drawbonusitemy = iy;
+		drawbonusitemtimer = 60;
+
+		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix, iy, 3, 8));
+
+		game_values.noexit = false;
+	}
+
+	return false;
+}
+
+
 //------------------------------------------------------------------------------
 // class clock powerup
 //------------------------------------------------------------------------------

@@ -429,7 +429,7 @@ extern gfxSprite		spr_brokenyellowblock;
 extern gfxSprite		spr_brokenflipblock;
 extern gfxSprite		spr_brokenblueblock;
 
-extern gfxSprite		spr_tileanimation;
+extern gfxSprite		spr_tileanimation[3];
 
 extern gfxSprite		** spr_player[4];
 extern gfxSprite		** spr_chocobo[4];
@@ -490,6 +490,7 @@ extern WorldList worldlist;
 extern FiltersList filterslist;
 
 extern CGameMode	*gamemodes[GAMEMODE_LAST];
+extern CGM_Bonus	*bonushousemode;
 extern short		currentgamemode;
 
 extern float CapFallingVelocity(float vel);
@@ -502,6 +503,21 @@ extern char szIPString[32];
 //extern NetClient netClient;
 
 extern short g_iDefaultPowerupWeights[];
+
+void _load_drawmsg(const std::string& f);
+void _load_waitforkey();
+
+bool __load_gfxck(gfxSprite &g, const std::string& f);
+bool __load_gfxa(gfxSprite &g, const std::string& f, Uint8 alpha);
+bool __load_gfxmenuskin(gfxSprite ** g, const std::string& f, short colorscheme, bool fLoadBothDirections);
+bool __load_gfxfullskin(gfxSprite ** g, const std::string& f, short colorscheme);
+bool __load_gfx(gfxSprite &g, const std::string& f);
+bool __load_sfx(sfxSound &s, const std::string& f);
+
+#define _load_gfxck(g,f)			if(!__load_gfxck(g,f)){_load_waitforkey();return false;};
+#define _load_gfxa(g,f,a)			if(!__load_gfxa(g,f,a)){_load_waitforkey();return false;};
+#define _load_gfx(g,f)				if(!__load_gfx(g,f)){_load_waitforkey();return false;};
+#define _load_sfx(s,f)				if(!__load_sfx(s,f)){_load_waitforkey();return false;};
 
 //----------------- game options all parts of the game need -----------
 enum gs{GS_MENU, GS_START_GAME, GS_GAME, GS_QUIT};
@@ -634,6 +650,9 @@ struct TourStop
 
 	bool fUseSettings;
 	GameModeSettings gmsSettings;
+
+	short iBonusTextLines;
+	char szBonusText[5][128];
 };
 
 //TODO:: Move menu settings form game_values to global menu context structure
@@ -817,6 +836,8 @@ struct gv
 	bool		secrets;
 	bool		noexit;
 	short		noexittimer;
+
+	short		singleplayermode;
 };
 
 extern gv game_values;

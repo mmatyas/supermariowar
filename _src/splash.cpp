@@ -33,123 +33,6 @@ extern Uint8 GetScreenBackgroundFade();
 //-----------------------------------------------------------------------------
 //that's a bunch of ugly code, maybe i'll throw it out again
 
-void _load_drawmsg(const string& f)
-{
-	if(g_fLoadMessages)
-	{
-		/*
-		static SDL_Rect r;
-		r.x = 0;
-		r.y = 0;
-		r.w = 500;
-		r.h = (Uint16)menu_font_small.getHeight();
-		Uint32 col = SDL_MapRGB(screen->format, 189, 251, 255);
-		SDL_FillRect(screen, &r, col);		//fill empty area
-		*/
-
-		menu_font_small.draw(0, 0, f.c_str());
-	}
-}
-void _load_waitforkey()
-{
-	SDL_Event event;
-	while (true)
-	{
-		while(SDL_PollEvent(&event))
-		{
-			if(event.type == SDL_KEYDOWN)
-				return;
-			if(event.type == SDL_JOYBUTTONDOWN)
-				return;
-		}
-
-		SDL_Delay(10);
-	}
-}
-bool __load_gfxck(gfxSprite &g, const string& f)
-{
-	if(! g.init(f, 255, 0, 255) )
-	{
-		char msg[512];
-		sprintf(msg, "error loading color keyed sprite %s", f.c_str());
-
-		_load_drawmsg(msg);
-
-		return false;
-	}
-
-	return true;
-}
-
-bool __load_gfxa(gfxSprite &g, const std::string& f, Uint8 alpha)
-{
-	if(! g.init(f, 255, 0, 255, alpha) )
-	{
-		char msg[512];
-		sprintf(msg, "error loading alpha color keyed sprite %s", f.c_str());
-
-		_load_drawmsg(msg);
-
-		return false;
-	}
-
-	return true;
-}
-
-bool __load_gfxmenuskin(gfxSprite ** g, const std::string& f, short colorscheme, bool fLoadBothDirections)
-{
-	if(! gfx_createmenuskin(g, f, 255, 0, 255, colorscheme, fLoadBothDirections) )
-	{
-		char msg[512];
-		sprintf(msg, "error loading color keyed sprite %s", f.c_str());
-		_load_drawmsg(msg);
-		return false;
-	}
-
-	return true;
-}
-bool __load_gfxfullskin(gfxSprite ** g, const std::string& f, short colorscheme)
-{
-	if(! gfx_createfullskin(g, f, 255, 0, 255, colorscheme) )
-	{
-		char msg[512];
-		sprintf(msg, "error loading color keyed sprite %s", f.c_str());
-		_load_drawmsg(msg);
-		return false;
-	}
-
-	return true;
-}
-bool __load_gfx(gfxSprite &g, const std::string& f)
-{
-	if(! g.init(f))
-	{
-		char msg[512];
-		sprintf(msg, "error loading sprite %s", f.c_str());
-		_load_drawmsg(msg);
-		return false;
-	}
-
-	return true;
-}
-bool __load_sfx(sfxSound &s, const string& f)
-{
-	if(! s.init(f) )
-	{
-		char msg[512];
-		sprintf(msg, "error loading sound %s", f.c_str());
-		_load_drawmsg(msg);
-		return false;
-	}
-
-	return true;
-}
-
-#define _load_gfxck(g,f)			if(!__load_gfxck(g,f)){_load_waitforkey();return false;};
-#define _load_gfxa(g,f,a)			if(!__load_gfxa(g,f,a)){_load_waitforkey();return false;};
-#define _load_gfx(g,f)				if(!__load_gfx(g,f)){_load_waitforkey();return false;};
-#define _load_sfx(s,f)				if(!__load_sfx(s,f)){_load_waitforkey();return false;};
-
 bool LoadStartGraphics()
 {
 	const char * graphicspack = menugraphicspacklist.current_name();
@@ -273,7 +156,9 @@ bool LoadGameGraphics()
 	spr_spring.SetWrap(true);
 	spr_spike.SetWrap(true);
 
-	_load_gfxck(spr_tileanimation, convertPath("gfx/packs/eyecandy/tile_animation.png", graphicspack));
+	_load_gfxck(spr_tileanimation[0], convertPath("gfx/packs/eyecandy/tile_animation.png", graphicspack));
+	_load_gfxck(spr_tileanimation[1], convertPath("gfx/packs/eyecandy/tile_animation_preview.png", graphicspack));
+	_load_gfxck(spr_tileanimation[2], convertPath("gfx/packs/eyecandy/tile_animation_thumbnail.png", graphicspack));
 
 	_load_gfxck(spr_brokenyellowblock, convertPath("gfx/packs/eyecandy/brokenyellowblock.png", graphicspack));
 	_load_gfxck(spr_brokenflipblock, convertPath("gfx/packs/eyecandy/brokenflipblock.png", graphicspack));

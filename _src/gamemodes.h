@@ -4,7 +4,7 @@
 #define GAMEMODE_NUM_OPTIONS 21
 
 //Enum for each game mode
-enum GameModeType{game_mode_frag, game_mode_timelimit, game_mode_coins, game_mode_classic, game_mode_chicken, game_mode_tag, game_mode_frenzy, game_mode_survival, game_mode_eggs, game_mode_domination, game_mode_owned, game_mode_jail, game_mode_stomp, game_mode_race, game_mode_star, game_mode_ctf, game_mode_koth, GAMEMODE_LAST, game_mode_boss};
+enum GameModeType{game_mode_frag, game_mode_timelimit, game_mode_coins, game_mode_classic, game_mode_chicken, game_mode_tag, game_mode_frenzy, game_mode_survival, game_mode_eggs, game_mode_domination, game_mode_owned, game_mode_jail, game_mode_stomp, game_mode_race, game_mode_star, game_mode_ctf, game_mode_koth, GAMEMODE_LAST, game_mode_boss, game_mode_bonus};
 
 struct SModeOption
 {
@@ -455,6 +455,28 @@ class CGM_Boss : public CGameMode
 		
 		short enemytimer, poweruptimer;
 		short iBossType;
+};
+
+
+//Similar to coin mode but you have to smash the most goombas/cheeps/koopas
+class CGM_Bonus : public CGameMode
+{
+	public:
+        CGM_Bonus();
+		virtual ~CGM_Bonus() {;};
+		
+		void init();
+		void think();
+		void draw();
+
+		bool playerkilledplayer(CPlayer &inflictor, CPlayer &other) {return false;}
+		bool playerkilledself(CPlayer &player) {return false;}
+		void playerextraguy(CPlayer &player, short iType) {}
+
+		//char *getMenuString(char *buffer64);
+
+	private:
+		
 };
 
 #endif
