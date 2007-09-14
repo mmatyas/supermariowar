@@ -394,7 +394,7 @@ bool WorldMap::Load()
 	if(!file)
 		return false;
 
-	char buffer[256];
+	char buffer[1024];
 	short iReadType = 0;
 	short iVersion[4] = {0, 0, 0, 0};
 	short iMapTileReadRow = 0;
@@ -402,7 +402,7 @@ bool WorldMap::Load()
 	short iCurrentWarp = 0;
 	short iCurrentVehicle = 0;
 	
-	while(fgets(buffer, 256, file))
+	while(fgets(buffer, 1024, file))
 	{
 		if(buffer[0] == '#' || buffer[0] == '\n' || buffer[0] == '\r' || buffer[0] == ' ' || buffer[0] == '\t')
 			continue;

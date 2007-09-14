@@ -467,7 +467,7 @@ bool CGM_TimeLimit::playerkilledself(CPlayer &player)
 	return false;
 }
 
-void CGM_TimeLimit::draw()
+void CGM_TimeLimit::draw_foreground()
 {
 	drawtime();
 }
@@ -696,7 +696,7 @@ void CGM_Chicken::think()
 	}
 }
 
-void CGM_Chicken::draw()
+void CGM_Chicken::draw_foreground()
 {
 	//Draw the chicken indicator around the chicken
 	if(game_values.gamemodesettings.chicken.usetarget && !gameover && chicken)
@@ -2142,7 +2142,7 @@ void CGM_Star::think()
 	}
 }
 
-void CGM_Star::draw()
+void CGM_Star::draw_foreground()
 {
 	if(!gameover)
 		drawtime();
@@ -2383,7 +2383,7 @@ void CGM_Boss::think()
 	}
 }
 
-void CGM_Boss::draw()
+void CGM_Boss::draw_foreground()
 {
 	if(gameover)
 	{
@@ -2527,18 +2527,78 @@ CGM_Bonus::CGM_Bonus() : CGameMode()
 void CGM_Bonus::init()
 {
 	CGameMode::init();
+
+	//Unlock the chests
+	game_values.lockbonuschests = false;
+
+	//Add number of treasure chests to the bonus house
+	tsTourStop = game_values.tourstops[game_values.tourstopcurrent];
+	short iNumBonuses = tsTourStop->iNumBonuses;
+
+	bool fChestUsed[MAX_BONUS_CHESTS];
+	short iChestOrder[MAX_BONUS_CHESTS];
+	short iNumChests = 0;
+
+	if(tsTourStop->iBonusType == 0)
+	{
+		for(short iChest = 0; iChest < iNumBonuses; iChest++)
+			iChestOrder[iNumChests++] = iChest;
+	}
+	else
+	{
+		for(short iChest = 0; iChest < iNumBonuses; iChest++)
+			fChestUsed[iChest] = false;
+
+		for(short iChest = 0; iChest < iNumBonuses; iChest++)
+		{
+			short iRandChest = rand() % iNumBonuses;
+		
+			while(fChestUsed[iRandChest])
+			{
+				if(++iRandChest >= iNumBonuses)
+					iRandChest = 0;
+			}
+
+			fChestUsed[iRandChest] = true;
+			iChestOrder[iNumChests++] = iRandChest;
+		}
+	}
+	
+	float dSpacing = (384.0f - (float)(iNumBonuses * 64)) / (float)(iNumBonuses + 1);
+
+	float dx = 128.0f + dSpacing;
+
+	//float dx = 288.0f - (dSpacing * (float)(iNumBonuses - 1) / 2.0f) ;
+	for(short iChest = 0; iChest < iNumBonuses; iChest++)
+	{
+		objectcollisionitems.add(new MO_BonusHouseChest(&spr_worldbonushouse, (short)dx, 384, tsTourStop->wsbBonuses[iChestOrder[iChest]].iBonus));
+		dx += dSpacing + 64.0f;
+	}
 }
 
 
 void CGM_Bonus::think()
 {
-	
+	if(game_values.lockbonuschests)
+		game_values.gamemode->gameover = true;
 }
 
-void CGM_Bonus::draw()
+void CGM_Bonus::draw_background()
 {
 	//Draw Toad
+	spr_worldbonushouse.draw(544, 266, 192, 10, 32, 54);
+
+	//Draw Bonus House Title
+	menu_plain_field.draw(0, 0, 0, 0, 320, 32);
+	menu_plain_field.draw(320, 0, 192, 0, 320, 32);
+	game_font_large.drawCentered(320, 5, tsTourStop->szName);
 
 	//Draw Bonus House Text
+	if(tsTourStop->iBonusTextLines > 0)
+	{
+		spr_worldbonushouse.draw(128, 128, 0, 64, 384, 128);
 
+		for(short iTextLine = 0; iTextLine < tsTourStop->iBonusTextLines; iTextLine++)
+			game_font_large.drawChopRight(136, 132 + 24 * iTextLine, 372, tsTourStop->szBonusText[iTextLine]);
+	}
 }

@@ -12,6 +12,8 @@ struct SModeOption
 	short iValue;
 };
 
+struct TourStop;
+
 //gamemode base class
 class CGameMode
 {
@@ -22,7 +24,8 @@ class CGameMode
 		
 		virtual void init();  //called once when the game is started
 		virtual void think() {}	//called once a frame
-		virtual void draw() {}
+		virtual void draw_background() {}
+		virtual void draw_foreground() {}
 		//called when a player stomps another player, after the p2p logic has run
 		//returns true if the other was deleted
 		virtual bool playerkilledplayer(CPlayer &inflictor, CPlayer &other);
@@ -104,7 +107,7 @@ class CGM_TimeLimit : public CGameMode
 		
 		void init();
 		void think();
-		void draw();
+		void draw_foreground();
 		void drawtime();
 		bool playerkilledplayer(CPlayer &inflictor, CPlayer &other);
 		bool playerkilledself(CPlayer &player);
@@ -158,7 +161,7 @@ class CGM_Chicken : public CGameMode
 		virtual ~CGM_Chicken() {;};
 	
 		void think();
-		void draw();
+		void draw_foreground();
 		bool playerkilledplayer(CPlayer &inflictor, CPlayer &other);
 		bool playerkilledself(CPlayer &player);
 		void playerextraguy(CPlayer &player, short iType);
@@ -379,7 +382,7 @@ class CGM_Star : public CGM_TimeLimit
 		
 		void init();
 		void think();
-		void draw();
+		void draw_foreground();
 		bool playerkilledplayer(CPlayer &inflictor, CPlayer &other);
 		bool playerkilledself(CPlayer &player);
 		void playerextraguy(CPlayer &player, short iType);
@@ -439,7 +442,7 @@ class CGM_Boss : public CGameMode
 		
 		void init();
 		void think();
-		void draw();
+		void draw_foreground();
 
 		bool playerkilledplayer(CPlayer &inflictor, CPlayer &other);
 		bool playerkilledself(CPlayer &player);
@@ -467,7 +470,7 @@ class CGM_Bonus : public CGameMode
 		
 		void init();
 		void think();
-		void draw();
+		void draw_background();
 
 		bool playerkilledplayer(CPlayer &inflictor, CPlayer &other) {return false;}
 		bool playerkilledself(CPlayer &player) {return false;}
@@ -476,7 +479,8 @@ class CGM_Bonus : public CGameMode
 		//char *getMenuString(char *buffer64);
 
 	private:
-		
+
+		TourStop * tsTourStop;
 };
 
 #endif

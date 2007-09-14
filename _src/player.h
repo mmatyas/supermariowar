@@ -457,6 +457,8 @@ class CPlayer
 		friend class OMO_BulletBill;
 		friend class OMO_FlagBase;
 
+		friend class MO_BonusHouseChest;
+
 		friend class MovingPlatform;
 
 		friend bool SwapPlayers(short iUsingPlayerID);

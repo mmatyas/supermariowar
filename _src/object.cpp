@@ -3126,9 +3126,12 @@ float PU_TreasureChestBonus::BottomBounce()
 //------------------------------------------------------------------------------
 // class treasure chest powerup
 //------------------------------------------------------------------------------
-PU_BonusHouseChest::PU_BonusHouseChest(gfxSprite *nspr, short ix, short iy, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iBonusItem) :
-	MO_Powerup(nspr, ix, iy, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
+MO_BonusHouseChest::MO_BonusHouseChest(gfxSprite *nspr, short ix, short iy, short iBonusItem) :
+	IO_MovingObject(nspr, ix, iy, 1, 32000, 64, 64, 0, 0)
 {
+	iw = 64;
+	ih = 64;
+
 	state = 1;
 	bonusitem = iBonusItem;
 
@@ -3136,10 +3139,8 @@ PU_BonusHouseChest::PU_BonusHouseChest(gfxSprite *nspr, short ix, short iy, shor
 	drawbonusitemtimer = 0;
 }
 
-void PU_BonusHouseChest::update()
+void MO_BonusHouseChest::update()
 {
-	MO_Powerup::update();
-
 	//Draw rising powerup from chest
 	if (state == 2)
 	{
@@ -3155,11 +3156,11 @@ void PU_BonusHouseChest::update()
 	}
 }
 
-void PU_BonusHouseChest::draw()
+void MO_BonusHouseChest::draw()
 {
 	if(state < 2)
 	{
-		MO_Powerup::draw();
+		spr->draw(ix, iy, 0, 0, iw, ih);
 	}
 	else
 	{
@@ -3170,9 +3171,9 @@ void PU_BonusHouseChest::draw()
 	}
 }
 
-bool PU_BonusHouseChest::collide(CPlayer * player)
+bool MO_BonusHouseChest::collide(CPlayer * player)
 {
-	if(state == 1)
+	if(state == 1 && !game_values.lockbonuschests && player->playerKeys->game_turbo.fPressed)
 	{
 		ifsoundonplay(sfx_storepowerup);
 		//if(game_values.worldpowerupcount[player->teamID] < 32)
@@ -3187,7 +3188,8 @@ bool PU_BonusHouseChest::collide(CPlayer * player)
 
 		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix, iy, 3, 8));
 
-		game_values.noexit = false;
+		game_values.forceexittimer = 180;
+		game_values.lockbonuschests = true;
 	}
 
 	return false;

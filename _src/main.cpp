@@ -110,6 +110,7 @@ gfxSprite		spr_worlditems;
 gfxSprite		spr_worlditempopup;
 gfxSprite		spr_worlditemssmall;
 gfxSprite		spr_worlditemsplace;
+gfxSprite		spr_worldbonushouse;
 
 gfxSprite		spr_noteblock;
 gfxSprite		spr_breakableblock;
@@ -1202,7 +1203,6 @@ void RunGame()
 		game_values.bulletbillspawntimer[iPlayer] = 0;
 	}
 
-	game_values.gamemode->init();
 	game_values.pausegame = false;
 	game_values.exitinggame = false;
 	game_values.exityes = false;
@@ -1223,6 +1223,10 @@ void RunGame()
 	game_values.screenfadespeed = -8;
 	game_values.noexit = false;
 	game_values.noexittimer = 0;
+	game_values.forceexittimer = 0;
+
+	//Initialize game mode
+	game_values.gamemode->init();
 
 	short totalspace = 0;
 	for(i = 0; i < score_cnt; i++)
@@ -1645,6 +1649,17 @@ void RunGame()
 
 		if(game_values.screenfade == 0)
 		{
+			//If the cancel button is pressed
+			if(game_values.forceexittimer > 0)
+			{
+				if(--game_values.forceexittimer <= 0)
+				{
+					game_values.gamestate = GS_END_GAME;
+					game_values.screenfade = 8;
+					game_values.screenfadespeed = 8;
+				}
+			}
+
 			for(int iPlayer = 0; iPlayer < 4; iPlayer++)
 			{
 				COutputControl * playerKeys = &game_values.playerInput.outputControls[iPlayer];
@@ -1672,7 +1687,6 @@ void RunGame()
 				//if(iPlayer != 0)
 				//	continue;
 
-				//If the cancel button is pressed
 				if((playerKeys->game_cancel.fPressed || (playerKeys->game_start.fPressed && game_values.gamemode->gameover)) && IsExitAllowed())
 				{
 					if(game_values.gamemode->gameover)
@@ -2342,45 +2356,54 @@ void RunGame()
 				}
 			}
 
-			if(game_values.gamestate == GS_START_GAME && game_values.screenfade == 255)
+			if(game_values.screenfade == 255)
 			{
-				CleanUp();
-				SetGameModeSettingsFromMenu();
-				game_values.gamestate = GS_GAME;
-				
-				/*
-				game_values.gamemode = bossgamemode;  //boss type has already been set at this point
-
-				if(bossgamemode->GetBossType() == 0)
-					g_map.loadMap(convertPath("maps/special/dungeon.map"), read_type_full);
-				else if(bossgamemode->GetBossType() == 1)
-					g_map.loadMap(convertPath("maps/special/hills.map"), read_type_full);
-				else if(bossgamemode->GetBossType() == 2)
-					g_map.loadMap(convertPath("maps/special/volcano.map"), read_type_full);
-
-				char filename[128];
-				sprintf(filename, "gfx/packs/backgrounds/%s", g_map.szBackgroundFile);
-				std::string path = convertPath(filename, gamegraphicspacklist.current_name());
-
-				//if the background file doesn't exist, use the classic background
-				if(!File_Exists(path))
-					path = convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist.current_name());
-
-				__load_gfx(spr_background, path);
-
-				g_map.predrawbackground(spr_background, spr_backmap);
-				g_map.predrawforeground(spr_frontmap);
-				LoadMapObjects();
-				*/
-
-				if(game_values.music)
+				if(game_values.gamestate == GS_START_GAME)
 				{
-					musiclist.SetRandomMusic(g_map.musicCategoryID, "", "");
-					backgroundmusic[0].load(musiclist.GetCurrentMusic());
-					backgroundmusic[0].play(game_values.playnextmusic, false);
-				}
+					CleanUp();
+					SetGameModeSettingsFromMenu();
+					game_values.gamestate = GS_GAME;
+					
+					/*
+					game_values.gamemode = bossgamemode;  //boss type has already been set at this point
 
-				return;
+					if(bossgamemode->GetBossType() == 0)
+						g_map.loadMap(convertPath("maps/special/dungeon.map"), read_type_full);
+					else if(bossgamemode->GetBossType() == 1)
+						g_map.loadMap(convertPath("maps/special/hills.map"), read_type_full);
+					else if(bossgamemode->GetBossType() == 2)
+						g_map.loadMap(convertPath("maps/special/volcano.map"), read_type_full);
+
+					char filename[128];
+					sprintf(filename, "gfx/packs/backgrounds/%s", g_map.szBackgroundFile);
+					std::string path = convertPath(filename, gamegraphicspacklist.current_name());
+
+					//if the background file doesn't exist, use the classic background
+					if(!File_Exists(path))
+						path = convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist.current_name());
+
+					__load_gfx(spr_background, path);
+
+					g_map.predrawbackground(spr_background, spr_backmap);
+					g_map.predrawforeground(spr_frontmap);
+					LoadMapObjects();
+					*/
+
+					if(game_values.music)
+					{
+						musiclist.SetRandomMusic(g_map.musicCategoryID, "", "");
+						backgroundmusic[0].load(musiclist.GetCurrentMusic());
+						backgroundmusic[0].play(game_values.playnextmusic, false);
+					}
+
+					return;
+				}
+				else if(game_values.gamestate == GS_END_GAME)
+				{
+					CleanUp();
+					game_values.gamestate = GS_MENU;
+					game_values.screenfadespeed = -8;
+				}
 			}
 
 			if(game_values.playinvinciblesound)
@@ -2420,6 +2443,8 @@ void RunGame()
 			objectblocks.draw();
 			eyecandyback.draw();
 
+			game_values.gamemode->draw_background();
+
 			objectcollisionitems.draw();
 
 			if(!game_values.swapplayers)
@@ -2442,7 +2467,7 @@ void RunGame()
 
 			objectsfront.draw();
 			eyecandyfront.draw();
-			game_values.gamemode->draw();
+			game_values.gamemode->draw_foreground();
 		
 			g_iWinningPlayer = -1;
 			short mostkills = 0;

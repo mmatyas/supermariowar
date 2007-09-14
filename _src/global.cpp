@@ -819,16 +819,12 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 
 		ts->iBonusType = iBonusOrdering;
 
-		ts->iNumBonuses = 0;
 		pszTemp = strtok(NULL, ",\n");
-
-		ts->iBonusType = 0;
-		ts->iNumBonuses = 0;
 
 		char * pszStart = pszTemp;
 
 		ts->iBonusTextLines = 0;
-		while(pszStart != NULL)
+		while(pszStart != NULL && pszStart[0] != '-')
 		{
 			char * pszEnd = strstr(pszStart, "|");
 			
@@ -842,7 +838,8 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 
 			pszStart = pszEnd + 1;
 		}
-	
+
+		ts->iNumBonuses = 0;
 		pszTemp = strtok(NULL, ",\n");
 		while(pszTemp)
 		{
@@ -860,7 +857,7 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 
 			ts->wsbBonuses[ts->iNumBonuses].iBonus = iBonus;
 
-			if(++ts->iNumBonuses >= 10)
+			if(++ts->iNumBonuses >= MAX_BONUS_CHESTS)
 				break;
 
 			pszTemp = strtok(NULL, ",\n");

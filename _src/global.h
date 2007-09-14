@@ -125,6 +125,8 @@ struct STextAward
 
 #define MAX_PLAYER_SPAWN_TRIES 16
 
+#define	MAX_BONUS_CHESTS	5
+
 #define TILESETSIZE		960			//30*32 Tiles by 32 pixel in a 1024*1024 bmp
 #define TILESETHEIGHT   30
 #define TILESETWIDTH	32
@@ -477,6 +479,7 @@ extern gfxSprite		spr_worlditems;
 extern gfxSprite		spr_worlditempopup;
 extern gfxSprite		spr_worlditemssmall;
 extern gfxSprite		spr_worlditemsplace;
+extern gfxSprite		spr_worldbonushouse;
 
 extern MapList maplist;
 extern SkinList skinlist;
@@ -520,7 +523,7 @@ bool __load_sfx(sfxSound &s, const std::string& f);
 #define _load_sfx(s,f)				if(!__load_sfx(s,f)){_load_waitforkey();return false;};
 
 //----------------- game options all parts of the game need -----------
-enum gs{GS_MENU, GS_START_GAME, GS_GAME, GS_QUIT};
+enum gs{GS_MENU, GS_START_GAME, GS_END_GAME, GS_GAME, GS_QUIT};
 
 //tournament scores
 struct ts
@@ -836,8 +839,11 @@ struct gv
 	bool		secrets;
 	bool		noexit;
 	short		noexittimer;
+	short		forceexittimer;
 
 	short		singleplayermode;
+
+	bool		lockbonuschests;
 };
 
 extern gv game_values;

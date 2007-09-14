@@ -556,11 +556,11 @@ class PU_TreasureChestBonus : public MO_Powerup
 		short drawbonusitemtimer;
 };
 
-class PU_BonusHouseChest : public MO_Powerup
+class MO_BonusHouseChest : public IO_MovingObject
 {
 	public:
-		PU_BonusHouseChest(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iBonusItem);
-		~PU_BonusHouseChest(){};
+		MO_BonusHouseChest(gfxSprite *nspr, short ix, short iy, short iBonusItem);
+		~MO_BonusHouseChest(){};
 
 		void update();
 		void draw();
