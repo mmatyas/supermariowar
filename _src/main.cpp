@@ -706,6 +706,7 @@ int main(int argc, char *argv[])
 	game_values.secrets				= true; //enable secrets by default
 	game_values.worldpointsbonus	= -1; //no world multiplier until player uses item to boost it
 	game_values.singleplayermode	= -1;
+	game_values.worldskipscoreboard = false;
 
 	game_values.pfFilters			= new bool[NUM_AUTO_FILTERS + filterslist.GetCount()];
 	game_values.piFilterIcons		= new short[NUM_AUTO_FILTERS + filterslist.GetCount()];
@@ -1896,7 +1897,7 @@ void RunGame()
 					}
 				}
 
-				if(game_values.matchtype == MATCH_TYPE_WORLD && game_values.gamemode->gameover)
+				if(game_values.matchtype == MATCH_TYPE_WORLD && game_values.gamemode->gameover && game_values.forceexittimer <= 0)
 				{
 					if(--game_values.noexittimer <= 0)
 						game_values.noexit = false;
@@ -2403,6 +2404,8 @@ void RunGame()
 					CleanUp();
 					game_values.gamestate = GS_MENU;
 					game_values.screenfadespeed = -8;
+
+					return;
 				}
 			}
 

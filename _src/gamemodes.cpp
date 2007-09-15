@@ -2529,7 +2529,10 @@ void CGM_Bonus::init()
 	CGameMode::init();
 
 	//Unlock the chests
-	game_values.lockbonuschests = false;
+	game_values.noexit = true;
+
+	//Will cause the flow to skip the scoreboard screen and go straight back to the world map
+	game_values.worldskipscoreboard = true;
 
 	//Add number of treasure chests to the bonus house
 	tsTourStop = game_values.tourstops[game_values.tourstopcurrent];
@@ -2577,16 +2580,10 @@ void CGM_Bonus::init()
 }
 
 
-void CGM_Bonus::think()
-{
-	if(game_values.lockbonuschests)
-		game_values.gamemode->gameover = true;
-}
-
 void CGM_Bonus::draw_background()
 {
 	//Draw Toad
-	spr_worldbonushouse.draw(544, 266, 192, 10, 32, 54);
+	spr_worldbonushouse.draw(544, 266, list_players[0]->ix > 544 ? 224 : 192, 10, 32, 54);
 
 	//Draw Bonus House Title
 	menu_plain_field.draw(0, 0, 0, 0, 320, 32);

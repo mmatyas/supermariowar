@@ -469,7 +469,6 @@ class CGM_Bonus : public CGameMode
 		virtual ~CGM_Bonus() {;};
 		
 		void init();
-		void think();
 		void draw_background();
 
 		bool playerkilledplayer(CPlayer &inflictor, CPlayer &other) {return false;}

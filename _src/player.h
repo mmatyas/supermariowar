@@ -386,6 +386,7 @@ class CPlayer
 		friend class CGM_CaptureTheFlag;
 		friend class CGM_Stomp;
 		friend class CGM_Boss;
+		friend class CGM_Bonus;
 		
 		friend class MI_InputDevice;
 		friend class MI_InputLeft;

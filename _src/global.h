@@ -843,7 +843,7 @@ struct gv
 
 	short		singleplayermode;
 
-	bool		lockbonuschests;
+	bool		worldskipscoreboard;
 };
 
 extern gv game_values;

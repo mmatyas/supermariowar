@@ -3147,12 +3147,10 @@ void MO_BonusHouseChest::update()
 		drawbonusitemy -= 2;
 
 		if(--drawbonusitemtimer <= 0)
+		{
+			eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + 16, drawbonusitemy, 3, 8));
 			state = 3;
-	}
-	else if (state == 3)
-	{
-		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix, drawbonusitemy, 3, 8));
-		dead = true;
+		}
 	}
 }
 
@@ -3162,34 +3160,40 @@ void MO_BonusHouseChest::draw()
 	{
 		spr->draw(ix, iy, 0, 0, iw, ih);
 	}
-	else
+
+	if(state >= 2)
+		spr->draw(ix, iy, 128, 0, iw, ih);
+
+	if(state == 2)
 	{
 		if(bonusitem >= NUM_POWERUPS)
-			spr_worlditems.draw(ix, drawbonusitemy, (bonusitem - NUM_POWERUPS) << 5, 0, 32, 32);
+			spr_worlditems.draw(ix + 16, drawbonusitemy, (bonusitem - NUM_POWERUPS) << 5, 0, 32, 32);
 		else
-			spr_storedpoweruplarge.draw(ix, drawbonusitemy, bonusitem << 5, 0, 32, 32);
+			spr_storedpoweruplarge.draw(ix + 16, drawbonusitemy, bonusitem << 5, 0, 32, 32);
 	}
+
+	if(state >= 2)
+		spr->draw(ix, iy, 64, 0, iw, ih);
 }
 
 bool MO_BonusHouseChest::collide(CPlayer * player)
 {
-	if(state == 1 && !game_values.lockbonuschests && player->playerKeys->game_turbo.fPressed)
+	if(state == 1 && !game_values.gamemode->gameover && player->playerKeys->game_turbo.fPressed)
 	{
-		ifsoundonplay(sfx_storepowerup);
-		//if(game_values.worldpowerupcount[player->teamID] < 32)
-        //    game_values.worldpowerups[player->teamID][game_values.worldpowerupcount[player->teamID]++] = bonusitem;
-		//else
-		//	game_values.worldpowerups[player->teamID][31] = bonusitem;
+		if(game_values.worldpowerupcount[player->teamID] < 32)
+            game_values.worldpowerups[player->teamID][game_values.worldpowerupcount[player->teamID]++] = bonusitem;
+		else
+			game_values.worldpowerups[player->teamID][31] = bonusitem;
 
+		ifsoundonplay(sfx_storepowerup);
 		state = 2;
 
-		drawbonusitemy = iy;
-		drawbonusitemtimer = 60;
-
-		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix, iy, 3, 8));
+		drawbonusitemy = iy + 32;
+		drawbonusitemtimer = 75;
 
 		game_values.forceexittimer = 180;
-		game_values.lockbonuschests = true;
+		game_values.gamemode->gameover = true;
+		game_values.gamemode->winningteam = player->teamID;
 	}
 
 	return false;

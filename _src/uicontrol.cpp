@@ -5139,6 +5139,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 MenuCodeEnum MI_World::InitGame(short iStage, short iPlayer, bool fNeedAiControl)
 {
 	game_values.tourstopcurrent = iStage;
+	game_values.worldskipscoreboard = false;
 
 	bool fBonusHouse = game_values.tourstops[game_values.tourstopcurrent]->iStageType == 1;
 
