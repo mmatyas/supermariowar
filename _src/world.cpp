@@ -1186,17 +1186,17 @@ void WorldMap::DrawMapToSurface(bool fInit, SDL_Surface * surface, short iMapDra
 				}
 				else
 				{
-					if(iForegroundSprite == 1 || iForegroundSprite == 2)
+					if(iForegroundSprite == 1 || iForegroundSprite == 2)  //Non-animated straight paths
 					{
 						SDL_Rect rSrc = {0, (iForegroundSprite - 1) << 5, TILESIZE, TILESIZE};
 						SDL_BlitSurface(spr_worldpaths.getSurface(), &rSrc, surface, &r);
 					}
-					else if(iForegroundSprite >= 3 && iForegroundSprite <= 10)
+					else if(iForegroundSprite >= 3 && iForegroundSprite <= 10) //Animated paths with "coins" in them
 					{
 						SDL_Rect rSrc = {iAnimationFrame, (iForegroundSprite - 1) << 5, TILESIZE, TILESIZE};
 						SDL_BlitSurface(spr_worldpaths.getSurface(), &rSrc, surface, &r);
 					}
-					else if(iForegroundSprite >= 11 && iForegroundSprite <= 18)
+					else if(iForegroundSprite >= 11 && iForegroundSprite <= 18) //Non-animated straight paths over water
 					{
 						short iSpriteX = (((iForegroundSprite - 11) / 2) + 1) << 5;
 						short iSpriteY = ((iForegroundSprite - 11) % 2) << 5;

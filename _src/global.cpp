@@ -856,6 +856,7 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 				iBonus = 0;
 
 			ts->wsbBonuses[ts->iNumBonuses].iBonus = iBonus;
+			ts->wsbBonuses[ts->iNumBonuses].iWinnerPlace = -1;
 
 			if(++ts->iNumBonuses >= MAX_BONUS_CHESTS)
 				break;

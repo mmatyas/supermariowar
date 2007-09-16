@@ -1818,33 +1818,50 @@ void CMap::AnimateTiles()
 	if(!game_values.toplayer)
 		iBackgroundLayers = 4;
 
+	SDL_Surface * animatedTileSurface = spr_tileanimation[0].getSurface();
+	SDL_Surface * tileSurface = tilesetsurface[0];
+
+	SDL_Surface * frontmap = spr_frontmap.getSurface();
+	SDL_Surface * backmap = spr_backmap.getSurface();
+
+	int color = SDL_MapRGB(frontmap->format, 255, 0, 255);
+
 	while (iter != lim)
 	{
-		SDL_BlitSurface(spr_background.getSurface(), &((*iter)->rDest), spr_backmap.getSurface(), &((*iter)->rDest));
+		AnimatedTile * tile = *iter;
+		SDL_Rect * rDest = &(tile->rDest);
 
-		for(short iLayer = 0; iLayer < iBackgroundLayers; iLayer++)
+		if(tile->fBackgroundAnimated)
 		{
-			if((*iter)->layers[iLayer] < TILESETSIZE)
+			SDL_BlitSurface(spr_background.getSurface(), rDest, backmap, rDest);
+
+			for(short iLayer = 0; iLayer < iBackgroundLayers; iLayer++)
 			{
-				SDL_BlitSurface(tilesetsurface[0], &((*iter)->rSrc[iLayer][0]), spr_backmap.getSurface(), &((*iter)->rDest));
-			}
-			else if((*iter)->layers[iLayer] > TILESETSIZE)
-			{
-				SDL_BlitSurface(spr_tileanimation[0].getSurface(), &((*iter)->rSrc[iLayer][iTileAnimationFrame]), spr_backmap.getSurface(), &((*iter)->rDest));
+				short iTile = tile->layers[iLayer];
+				if(iTile < TILESETSIZE)
+				{
+					SDL_BlitSurface(tileSurface, &(tile->rSrc[iLayer][0]), backmap, rDest);
+				}
+				else if(iTile > TILESETSIZE)
+				{
+					SDL_BlitSurface(animatedTileSurface, &(tile->rSrc[iLayer][iTileAnimationFrame]), backmap, rDest);
+				}
 			}
 		}
 
-		if(game_values.toplayer)
+		if(tile->fForegroundAnimated)
 		{
+			SDL_FillRect(frontmap, rDest, color);
 			for(short iLayer = 2; iLayer < 4; iLayer++)
 			{
-				if((*iter)->layers[iLayer] < TILESETSIZE)
+				short iTile = tile->layers[iLayer];
+				if(iTile < TILESETSIZE)
 				{
-					SDL_BlitSurface(tilesetsurface[0], &((*iter)->rSrc[iLayer][0]), spr_frontmap.getSurface(), &((*iter)->rDest));
+					SDL_BlitSurface(tileSurface, &(tile->rSrc[iLayer][0]), frontmap, rDest);
 				}
-				else if((*iter)->layers[iLayer] > TILESETSIZE)
+				else if(iTile > TILESETSIZE)
 				{
-					SDL_BlitSurface(spr_tileanimation[0].getSurface(), &((*iter)->rSrc[iLayer][iTileAnimationFrame]), spr_frontmap.getSurface(), &((*iter)->rDest));
+					SDL_BlitSurface(animatedTileSurface, &(tile->rSrc[iLayer][iTileAnimationFrame]), frontmap, rDest);
 				}
 			}
 		}
@@ -1898,6 +1915,9 @@ void CMap::draw(SDL_Surface *targetSurface, int layer)
 					AnimatedTile * animatedtile = new AnimatedTile();
 					animatedtile->id = iNewTileId;
 					
+					animatedtile->fBackgroundAnimated = false;
+					animatedtile->fForegroundAnimated = false;
+
 					for(short iLayer = 0; iLayer < 4; iLayer++)
 					{
 						short iTile = mapdata[i][j][iLayer];
@@ -1915,6 +1935,14 @@ void CMap::draw(SDL_Surface *targetSurface, int layer)
 							{
 								gfx_setrect(&(animatedtile->rSrc[iLayer][iRect]), iRect * TILESIZE, iTile * TILESIZE, TILESIZE, TILESIZE);
 							}
+
+							//Background is animated if it is a background layer or if it is a foreground layer and we are not displaying the foreground
+							if(iLayer < 2 || !game_values.toplayer)
+								animatedtile->fBackgroundAnimated = true;
+
+							//Foreground is animated if it is a foreground layer and we are displaying the foreground
+							if(iLayer >= 2 && game_values.toplayer)
+								animatedtile->fForegroundAnimated = true;
 						}
 					}
 

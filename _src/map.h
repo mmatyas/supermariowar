@@ -53,6 +53,8 @@ struct AnimatedTile
 	short layers[4];
 	SDL_Rect rSrc[4][4];
 	SDL_Rect rDest;
+	bool fBackgroundAnimated;
+	bool fForegroundAnimated;
 };
 
 class IO_Block;

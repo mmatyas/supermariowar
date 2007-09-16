@@ -2839,8 +2839,8 @@ int editor_animation()
 						short set_animation_x = event.button.x / TILESIZE;
 						short set_animation_y = event.button.y / TILESIZE;
 
-						if(set_animation_x == 1 && set_animation_y == 1)
-							set_animation = 0;
+						if(set_animation_y == 0 && set_animation_x >= 0 && set_animation_x < TILEANIMATIONSIZE)
+							set_animation = set_animation_x;
 
 						edit_mode = 8;
 

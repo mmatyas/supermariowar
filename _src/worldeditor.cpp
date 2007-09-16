@@ -75,7 +75,6 @@ int				set_tile = 0;
 bool			fAutoPaint = true;
 
 int				edit_mode = 0;
-bool			view_path = true;
 
 int				draw_offset_col = 0;  //col and row offset for drawing map to surface
 int				draw_offset_row = 0;
@@ -196,7 +195,7 @@ int main(int argc, char *argv[])
 	spr_warps[1].init(convertPath("gfx/leveleditor/leveleditor_warp_preview.png"), 255, 0, 255);
 	spr_warps[2].init(convertPath("gfx/leveleditor/leveleditor_warp_thumbnail.png"), 255, 0, 255);
 
-	spr_path.init(convertPath("gfx/leveleditor/leveleditor_world_path.png"), 255, 0, 255, 160);
+	spr_path.init(convertPath("gfx/leveleditor/leveleditor_world_path.png"), 255, 0, 255);
 
 	spr_selectedtile.init(convertPath("gfx/leveleditor/leveleditor_selectedtile.png"), 0, 0, 0, 128);
 	spr_worldstarttile.init(convertPath("gfx/leveleditor/leveleditor_platformstarttile.png"), 0, 0, 0, 64);
@@ -350,6 +349,11 @@ int editor_edit()
 					{
 						if(g_musiccategorydisplaytimer > 0)
 							g_musiccategorydisplaytimer = 0;
+						else if(edit_mode != 0)
+						{
+							edit_mode = 0;
+							set_tile = 0;
+						}
 						else
 							done = true;
 					}
@@ -374,9 +378,6 @@ int editor_edit()
 
 					if(event.key.keysym.sym == SDLK_a)
 						fAutoPaint = !fAutoPaint;
-
-					if(event.key.keysym.sym == SDLK_v)
-						view_path = !view_path;
 					
 					/*
 					if(event.key.keysym.sym == SDLK_r)
@@ -730,7 +731,7 @@ int editor_edit()
 		drawmap(false, TILESIZE);
 		
 		//Draw Paths
-		if(view_path)
+		if(edit_mode == 2)
 		{
 			for(short iRow = draw_offset_row; iRow < draw_offset_row + 15 && iRow < iWorldHeight; iRow++)
 			{
@@ -798,7 +799,8 @@ void AutoSetPathSprite(short iCol, short iRow)
 	short iPath = 0;
 	short iNeighborIndex = 0;
 
-	if(g_worldmap.tiles[iCol][iRow].iForegroundSprite == 0)
+	short iForegroundSprite = g_worldmap.tiles[iCol][iRow].iForegroundSprite;
+	if(iForegroundSprite == 0 || iForegroundSprite > 18)
 		return;
 
 	for(short iAutoRow = iRow - 1; iAutoRow <= iRow + 1; iAutoRow++)
@@ -812,7 +814,10 @@ void AutoSetPathSprite(short iCol, short iRow)
 			{
 				if(iAutoRow >= 0 && iAutoRow < iWorldHeight && iAutoCol >= 0 && iAutoCol < iWorldWidth)
 				{
-					if(g_worldmap.tiles[iAutoCol][iAutoRow].iForegroundSprite > 0)
+					iForegroundSprite = g_worldmap.tiles[iAutoCol][iAutoRow].iForegroundSprite;
+					if((iForegroundSprite >= 1 && iForegroundSprite <= 18) || 
+						(iForegroundSprite >= WORLD_BRIDGE_SPRITE_OFFSET && iForegroundSprite <= WORLD_BRIDGE_SPRITE_OFFSET + 3) || 
+						(iForegroundSprite >= WORLD_FOREGROUND_SPRITE_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_SPRITE_OFFSET + 399))
 						iPath += 1 << iNeighborIndex;
 				}
 				
@@ -933,7 +938,19 @@ void AutoSetPath(short iCol, short iRow)
 	//#1 == |  2 == -  3 == -!  4 == L  5 == ,-  6 == -,
 	//#7 == -|  8 == -`-  9 == |-  10 == -,-  11 == +
 
-	g_worldmap.tiles[iCol][iRow].iConnectionType = iPathTypes[iPath];
+	short iPathType = iPathTypes[iPath];
+	short iForegroundSprite = g_worldmap.tiles[iCol][iRow].iForegroundSprite;
+
+	if(iPathType == 2 && iForegroundSprite >= WORLD_BRIDGE_SPRITE_OFFSET && iForegroundSprite <= WORLD_BRIDGE_SPRITE_OFFSET + 1)
+	{
+		iPathType = iForegroundSprite - WORLD_BRIDGE_SPRITE_OFFSET + 12;
+	}
+	else if(iPathType == 1 && iForegroundSprite >= WORLD_BRIDGE_SPRITE_OFFSET + 2 && iForegroundSprite <= WORLD_BRIDGE_SPRITE_OFFSET + 3)
+	{
+		iPathType = iForegroundSprite - WORLD_BRIDGE_SPRITE_OFFSET + 12;
+	}
+
+	g_worldmap.tiles[iCol][iRow].iConnectionType = iPathType;
 }
 
 void UpdateForeground(short iCol, short iRow)
@@ -1384,6 +1401,7 @@ int editor_background()
 int editor_foreground()
 {
 	bool done = false;
+	short iForegroundScreen = 0;
 	
 	while (!done)
 	{
@@ -1400,9 +1418,31 @@ int editor_foreground()
 
 				case SDL_KEYDOWN:
 				{	
-					if(event.key.keysym.sym == SDLK_ESCAPE)
+					SDLKey key = event.key.keysym.sym;
+
+					if(key == SDLK_ESCAPE)
 					{
 						return EDITOR_EDIT;
+					}
+					else if(key == SDLK_1)
+					{
+						iForegroundScreen = 0;
+					}
+					else if(key == SDLK_2)
+					{
+						iForegroundScreen = 1;
+					}
+					else if(key == SDLK_3)
+					{
+						iForegroundScreen = 2;
+					}
+					else if(key == SDLK_4)
+					{
+						iForegroundScreen = 3;
+					}
+					else if(key == SDLK_5)
+					{
+						iForegroundScreen = 4;
 					}
 
 					break;
@@ -1415,10 +1455,21 @@ int editor_foreground()
 						short iButtonX = event.button.x / TILESIZE;
 						short iButtonY = event.button.y / TILESIZE;
 
-						if(iButtonX >= 0 && iButtonX < 1)
+						if(iForegroundScreen < 4)
 						{
-							if(iButtonY >= 0 && iButtonY < 6)
-								set_tile = iButtonY + 1;
+							if(iButtonX >= 0 && iButtonX < 10)
+							{
+								if(iButtonY >= 0 && iButtonY < 10)
+									set_tile = WORLD_FOREGROUND_SPRITE_OFFSET + iButtonY * 10 + iButtonX + iForegroundScreen * 100;
+							}
+						}
+						else if(iForegroundScreen == 4)
+						{
+							if(iButtonX >= 0 && iButtonX < 4)
+							{
+								if(iButtonY >= 0 && iButtonY < 1)
+									set_tile = WORLD_BRIDGE_SPRITE_OFFSET + iButtonX;
+							}
 						}
 
 						ignoreclick = true;
@@ -1436,7 +1487,22 @@ int editor_foreground()
 
 		SDL_FillRect(screen, NULL, 0x0);
 
-		spr_foregroundtiles[0].draw(0, 0, 0, 0, 32, 192);
+		if(iForegroundScreen < 4)
+		{
+			for(short iRow = 0; iRow < 10; iRow++)
+			{
+				for(short iCol = 0; iCol < 10; iCol++)
+				{
+					spr_foregroundtiles[0].draw(iCol << 5, iRow << 5, 384, iForegroundScreen << 5, 32, 32);
+				}
+			}
+
+			spr_foregroundtiles[0].draw(0, 0, 0, 0, 320, 320);
+		}
+		else if(iForegroundScreen == 4)
+		{
+			spr_foregroundtiles[0].draw(0, 0, 448, 96, 128, 32);
+		}
 
 		SDL_Flip(screen);
 
