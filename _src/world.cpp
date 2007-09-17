@@ -453,7 +453,7 @@ bool WorldMap::Load()
 
 				WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
 				tile->iBackgroundSprite = atoi(psz);
-				tile->iBackgroundStyle = 0;
+				tile->iBackgroundStyle = 2;
 				tile->fAnimated = tile->iBackgroundSprite == 0 || (tile->iBackgroundSprite >= 2 && tile->iBackgroundSprite <= 27);
 				
 				tile->iID = iMapTileReadRow * iWidth + iMapTileReadCol;
@@ -1134,50 +1134,58 @@ void WorldMap::DrawMapToSurface(bool fInit, SDL_Surface * surface, short iMapDra
 		
 			WorldMapTile * tile = &tiles[iCol + iMapDrawOffsetCol][iRow + iMapDrawOffsetRow];
 			short iBackgroundSprite = tile->iBackgroundSprite;
-			short iBackgroundStyle = tile->iBackgroundStyle;
+			short iBackgroundStyleOffset = tile->iBackgroundStyle * 128;
 			short iForegroundSprite = tile->iForegroundSprite;
 
 			if(tile->fAnimated || fInit)
 			{
-				if(iBackgroundSprite == 0 || (iBackgroundSprite >= 2 && iBackgroundSprite <= 27) || (iBackgroundSprite >= 45 && iBackgroundSprite <= 48))
+				//if(iBackgroundSprite == 0 || (iBackgroundSprite >= 2 && iBackgroundSprite <= 27) || (iBackgroundSprite >= 45 && iBackgroundSprite <= 48))
+				if(iBackgroundSprite == 0 || (iBackgroundSprite >= 2 && iBackgroundSprite <= 48))
 				{
-					SDL_Rect rSrc = {iAnimationFrame, 0, TILESIZE, TILESIZE};
+					SDL_Rect rSrc = {iAnimationFrame + iBackgroundStyleOffset, 0, TILESIZE, TILESIZE};
 					SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, surface, &r);
 
-					if((iBackgroundSprite >= 2 && iBackgroundSprite <= 27) || (iBackgroundSprite >= 45 && iBackgroundSprite <= 48))
+					//if((iBackgroundSprite >= 2 && iBackgroundSprite <= 27) || (iBackgroundSprite >= 45 && iBackgroundSprite <= 48))
+					if((iBackgroundSprite >= 2 && iBackgroundSprite <= 48))
 					{
 						if(iBackgroundSprite >= 45)
 						{
-							SDL_Rect rSrc = {96, (iBackgroundSprite - 44) << 5, TILESIZE, TILESIZE};
+							SDL_Rect rSrc = {96 + iBackgroundStyleOffset, (iBackgroundSprite - 44) << 5, TILESIZE, TILESIZE};
+							SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, surface, &r);
+						}
+						else if(iBackgroundSprite >= 30)
+						{
+							SDL_Rect rSrc = {64 + iBackgroundStyleOffset, (iBackgroundSprite - 29) << 5, TILESIZE, TILESIZE};
 							SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, surface, &r);
 						}
 						else if(iBackgroundSprite >= 16)
 						{
-							SDL_Rect rSrc = {TILESIZE, (iBackgroundSprite - 14) << 5, TILESIZE, TILESIZE};
+							SDL_Rect rSrc = {32 + iBackgroundStyleOffset, (iBackgroundSprite - 14) << 5, TILESIZE, TILESIZE};
 							SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, surface, &r);
 						}
 						else
 						{
-							SDL_Rect rSrc = {0, iBackgroundSprite << 5, TILESIZE, TILESIZE};
+							SDL_Rect rSrc = {iBackgroundStyleOffset, iBackgroundSprite << 5, TILESIZE, TILESIZE};
 							SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, surface, &r);
 						}
 					}
 				}
 				else if(iBackgroundSprite == 1)
 				{
-					SDL_Rect rSrc = {TILESIZE, TILESIZE, TILESIZE, TILESIZE};
+					SDL_Rect rSrc = {32 + iBackgroundStyleOffset, 32, TILESIZE, TILESIZE};
 					SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, surface, &r);
 				}
 				else if(iBackgroundSprite == 28 || iBackgroundSprite == 29)
 				{
-					SDL_Rect rSrc = {TILESIZE, (iBackgroundSprite - 14) << 5, TILESIZE, TILESIZE};
+					SDL_Rect rSrc = {32 + iBackgroundStyleOffset, (iBackgroundSprite - 14) << 5, TILESIZE, TILESIZE};
 					SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, surface, &r);
 				}
+				/*
 				else if(iBackgroundSprite >= 30 && iBackgroundSprite <= 44)
 				{
 					SDL_Rect rSrc = {64, (iBackgroundSprite - 29) << 5, TILESIZE, TILESIZE};
 					SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, surface, &r);
-				}
+				}*/
 
 				if(tile->iCompleted >= 0)
 				{
