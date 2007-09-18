@@ -103,9 +103,9 @@ MapList::MapList()
 
 MapList::~MapList()
 {
-	std::map<std::string, MapListNode*>::iterator iterateAll = maps.begin();
+	std::map<std::string, MapListNode*>::iterator iterateAll = maps.begin(), lim = maps.end();
 	
-	while (iterateAll != maps.end())
+	while (iterateAll != lim)
 	{
 		delete (iterateAll->second);
 		iterateAll++;
@@ -308,9 +308,9 @@ void MapList::WriteFilters()
 
 			fprintf(fp, "#Maps\n");
 			
-			std::map<std::string, MapListNode*>::iterator itr = maps.begin();
+			std::map<std::string, MapListNode*>::iterator itr = maps.begin(), lim = maps.end();
 
-			while(itr != maps.end())
+			while(itr != lim)
 			{
 				if((*itr).second->pfFilters[iFilter + NUM_AUTO_FILTERS])
 					fprintf(fp, "%s\n", (*itr).first.c_str());
@@ -440,9 +440,9 @@ void MapList::ReadFilters()
 //Forces all the maps to reload the auto filters from the live map files (flush the cache)
 void MapList::ReloadMapAutoFilters()
 {
-	std::map<std::string, MapListNode*>::iterator itr = maps.begin();
+	std::map<std::string, MapListNode*>::iterator itr = maps.begin(), lim = maps.end();
 
-	while(itr != maps.end())
+	while(itr != lim)
 	{
 		MapListNode * mln = itr->second;
 		g_map.loadMap(mln->filename, read_type_summary);
@@ -459,9 +459,9 @@ void MapList::WriteMapSummaryCache()
 	if(!fp)
 		return;
 
-	std::map<std::string, MapListNode*>::iterator itr = maps.begin();
+	std::map<std::string, MapListNode*>::iterator itr = maps.begin(), lim = maps.end();
 
-	while(itr != maps.end())
+	while(itr != lim)
 	{
 		fprintf(fp, itr->first.c_str());
 
@@ -480,11 +480,11 @@ void MapList::WriteMapSummaryCache()
 //will show up in the map field or in the thumbnail browser
 void MapList::ApplyFilters(bool * pfFilters)
 {
-	std::map<std::string, MapListNode*>::iterator itr = maps.begin();
+	std::map<std::string, MapListNode*>::iterator itr = maps.begin(), lim = maps.end();
 
 	iFilteredMapCount = 0;
 	short iTotalCount = 0;
-	while(itr != maps.end())
+	while(itr != lim)
 	{
 		bool fMatched = true;
 		for(short iFilter = 0; iFilter < NUM_AUTO_FILTERS + filterslist.GetCount(); iFilter++)

@@ -212,6 +212,7 @@ std::string stripCreatorAndDotMap(const std::string &filename);
 #define WORLD_FOREGROUND_SPRITE_OFFSET 100
 #define WORLD_WINNING_TEAM_SPRITE_OFFSET 500
 #define WORLD_BRIDGE_SPRITE_OFFSET 504
+#define WORLD_START_SPRITE_OFFSET 508
 
 //------------- data structures / selfmade include files -------------
 #include "input.h"

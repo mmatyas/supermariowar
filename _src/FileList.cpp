@@ -113,9 +113,9 @@ SkinList::SkinList()
 		}
 		else
 		{
-			std::vector<SkinListNode*>::iterator itr = skins.begin();
+			std::vector<SkinListNode*>::iterator itr = skins.begin(), lim = skins.end();
 
-			while(itr != skins.end())
+			while(itr != lim)
 			{
 				if(sShortSkinName.compare((*itr)->sSkinName) < 0)
 					break;

@@ -255,13 +255,13 @@ void WorldVehicle::SetNextDest()
 	{
 		bool fIsDoor = false;
 		if(iDirection == 0)
-			fIsDoor = g_worldmap.IsDoor(iCurrentTileX, iCurrentTileY - 1) || g_worldmap.GetVehicleBoundary(iCurrentTileX, iCurrentTileY - 1) == iBoundary;
+			fIsDoor = g_worldmap.IsDoor(iCurrentTileX, iCurrentTileY - 1) || (iBoundary != 0 && g_worldmap.GetVehicleBoundary(iCurrentTileX, iCurrentTileY - 1) == iBoundary);
 		else if(iDirection == 1)
-			fIsDoor = g_worldmap.IsDoor(iCurrentTileX, iCurrentTileY + 1) || g_worldmap.GetVehicleBoundary(iCurrentTileX, iCurrentTileY + 1) == iBoundary;
+			fIsDoor = g_worldmap.IsDoor(iCurrentTileX, iCurrentTileY + 1) || (iBoundary != 0 && g_worldmap.GetVehicleBoundary(iCurrentTileX, iCurrentTileY + 1) == iBoundary);
 		else if(iDirection == 2)
-			fIsDoor = g_worldmap.IsDoor(iCurrentTileX - 1, iCurrentTileY) || g_worldmap.GetVehicleBoundary(iCurrentTileX - 1, iCurrentTileY) == iBoundary;
+			fIsDoor = g_worldmap.IsDoor(iCurrentTileX - 1, iCurrentTileY) || (iBoundary != 0 && g_worldmap.GetVehicleBoundary(iCurrentTileX - 1, iCurrentTileY) == iBoundary);
 		else if(iDirection == 3)
-			fIsDoor = g_worldmap.IsDoor(iCurrentTileX + 1, iCurrentTileY) || g_worldmap.GetVehicleBoundary(iCurrentTileX + 1, iCurrentTileY) == iBoundary;
+			fIsDoor = g_worldmap.IsDoor(iCurrentTileX + 1, iCurrentTileY) || (iBoundary != 0 && g_worldmap.GetVehicleBoundary(iCurrentTileX + 1, iCurrentTileY) == iBoundary);
 
 		if(tile->fConnection[iDirection] && !fIsDoor)
 			iConnections[iNumConnections++] = iDirection;
@@ -1226,6 +1226,11 @@ void WorldMap::DrawMapToSurface(bool fInit, SDL_Surface * surface, short iMapDra
 					else if(iForegroundSprite >= WORLD_BRIDGE_SPRITE_OFFSET && iForegroundSprite <= WORLD_BRIDGE_SPRITE_OFFSET + 3)
 					{
 						SDL_Rect rSrc = {(iForegroundSprite - WORLD_BRIDGE_SPRITE_OFFSET + 14) << 5, 96, TILESIZE, TILESIZE};
+						SDL_BlitSurface(spr_worldforeground.getSurface(), &rSrc, surface, &r);
+					}
+					else if(iForegroundSprite >= WORLD_START_SPRITE_OFFSET && iForegroundSprite <= WORLD_START_SPRITE_OFFSET + 1)
+					{
+						SDL_Rect rSrc = {(iForegroundSprite - WORLD_START_SPRITE_OFFSET + 14) << 5, 0, TILESIZE, TILESIZE};
 						SDL_BlitSurface(spr_worldforeground.getSurface(), &rSrc, surface, &r);
 					}
 				}

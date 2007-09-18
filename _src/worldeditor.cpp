@@ -35,9 +35,9 @@
 
 #define MAPTITLESTRING "SMW 1.8 World Editor"
 
-enum {EDITOR_EDIT, EDITOR_BACKGROUND, EDITOR_FOREGROUND, EDITOR_PATHSPRITE, EDITOR_VEHICLES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_WORLD, NEW_WORLD, SAVE, EDITOR_WARP, DISPLAY_HELP, EDITOR_PATH};
+enum {EDITOR_EDIT, EDITOR_BACKGROUND, EDITOR_FOREGROUND, EDITOR_PATHSPRITE, EDITOR_VEHICLES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_WORLD, NEW_WORLD, SAVE, EDITOR_WARP, DISPLAY_HELP, EDITOR_PATH, EDITOR_TYPE};
 
-char * szEditModes[8] = {"Background Mode", "Foreground Mode", "Path Sprite Mode", "Stage Mode", "Path Mode", "Vehicle Mode", "Warp Mode", "Move Mode"};
+char * szEditModes[8] = {"Background Mode", "Foreground Mode", "Path Sprite Mode", "Stage Mode", "Path Mode", "Vehicle Mode", "Warp Mode", "Stage/Door Mode"};
 
 SDL_Surface		*screen;
 SDL_Surface		*blitdest;
@@ -146,6 +146,11 @@ void UpdatePathSprite(short iCol, short iRow);
 void AutoSetPathSprite(short iCol, short iRow);
 short AdjustForeground(short iSprite, short iCol, short iRow);
 
+void ReadVehiclesIntoEditor();
+void WriteVehiclesIntoWorld();
+void AddVehicleToTile(short iCol, short iRow, short iType);
+void RemoveVehicleFromTile(short iCol, short iRow);
+
 WorldMap g_worldmap;
 WorldList worldlist;
 void loadcurrentworld();
@@ -160,6 +165,7 @@ int editor_foreground();
 int editor_vehicles();
 int	editor_path();
 int editor_pathsprite();
+int editor_type();
 
 void updateworldsurface();
 void takescreenshot();
@@ -170,6 +176,9 @@ char findstring[FILEBUFSIZE] = "";
 
 extern char * g_szMusicCategoryNames[8];
 short g_musiccategorydisplaytimer = 0;
+
+//Vehicle stuff
+std::vector<WorldVehicle*> vehiclelist;
 
 //main main main
 int main(int argc, char *argv[])
@@ -269,6 +278,10 @@ int main(int argc, char *argv[])
 				state = editor_warp();
 			break;
 
+			case EDITOR_TYPE:
+				state = editor_type();
+			break;
+
 			case EDITOR_QUIT:
 				done = true;
 			break;
@@ -314,6 +327,7 @@ int main(int argc, char *argv[])
 
 	printf("\n---------------- save world ----------------\n");
 
+	WriteVehiclesIntoWorld();
 	g_worldmap.Save(convertPath("worlds/ZZworldeditor.txt").c_str());
 
 	printf("\n---------------- shutdown ----------------\n");
@@ -371,10 +385,13 @@ int editor_edit()
 						return EDITOR_PATHSPRITE;
 
 					if(event.key.keysym.sym == SDLK_4)
-						return EDITOR_VEHICLES;
+						return EDITOR_TYPE;
 
 					if(event.key.keysym.sym == SDLK_5)
 						return EDITOR_PATH;
+
+					if(event.key.keysym.sym == SDLK_6)
+						return EDITOR_VEHICLES;
 
 					if(event.key.keysym.sym == SDLK_a)
 						fAutoPaint = !fAutoPaint;
@@ -518,7 +535,17 @@ int editor_edit()
 							}
 							else if(edit_mode == 3) //selected type
 							{
-								g_worldmap.tiles[iCol][iRow].iType = set_tile;
+								if(set_tile <= 1)
+								{
+									g_worldmap.tiles[iCol][iRow].iType = 1;
+									g_worldmap.tiles[iCol][iRow].iForegroundSprite = set_tile + WORLD_START_SPRITE_OFFSET;
+								}
+								else
+								{
+									g_worldmap.tiles[iCol][iRow].iType = set_tile;
+								}
+
+								updateworldsurface();
 							}
 							else if(edit_mode == 4) //selected foreground
 							{
@@ -533,11 +560,11 @@ int editor_edit()
 									updateworldsurface();
 								}
 							}
-							/*
 							else if(edit_mode == 5) //selected vehicle
 							{
-								g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iConnectionType = set_tile;
+								AddVehicleToTile(iCol, iRow, set_tile);
 							}
+							/*
 							else if(edit_mode == 6) //selected warp
 							{
 								g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iConnectionType = set_tile;
@@ -573,9 +600,13 @@ int editor_edit()
 								if(fAutoPaint)
 									UpdatePath(iCol, iRow);
 							}
-							else if(edit_mode == 3)
+							else if(edit_mode == 3) //selected start/door/stage
 							{
-								g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iType = 0;
+								if(g_worldmap.tiles[iCol][iRow].iType == 1)
+									g_worldmap.tiles[iCol][iRow].iForegroundSprite = 0;
+
+								g_worldmap.tiles[iCol][iRow].iType = 0;
+								updateworldsurface();
 							}
 							else if(edit_mode == 4)
 							{
@@ -589,15 +620,16 @@ int editor_edit()
 									updateworldsurface();
 								}
 							}
-							/*
 							else if(edit_mode == 5)
 							{
-								g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iType = 0;
+								RemoveVehicleFromTile(iCol, iRow);
 							}
+							/*
 							else if(edit_mode == 6)
 							{
 								g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iType = 0;
 							}*/
+							
 						}
 					}
 					
@@ -643,9 +675,19 @@ int editor_edit()
 								if(fAutoPaint)
 									UpdatePath(iCol, iRow);
 							}
-							else if(edit_mode == 3)
+							else if(edit_mode == 3) //selected stage/door
 							{
-								g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iType = set_tile;
+								if(set_tile <= 1)
+								{
+									g_worldmap.tiles[iCol][iRow].iType = 1;
+									g_worldmap.tiles[iCol][iRow].iForegroundSprite = set_tile + WORLD_START_SPRITE_OFFSET;
+								}
+								else
+								{
+									g_worldmap.tiles[iCol][iRow].iType = set_tile;
+								}
+
+								updateworldsurface();
 							}
 							else if(edit_mode == 4)
 							{
@@ -659,6 +701,10 @@ int editor_edit()
 
 									updateworldsurface();
 								}
+							}
+							else if(edit_mode == 5)
+							{
+								AddVehicleToTile(iCol, iRow, set_tile);
 							}
 						}
 						else if(event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT))
@@ -693,7 +739,11 @@ int editor_edit()
 							}
 							else if(edit_mode == 3)
 							{
-								g_worldmap.tiles[event.button.x / TILESIZE][event.button.y / TILESIZE].iType = 0;
+								if(g_worldmap.tiles[iCol][iRow].iType == 1)
+									g_worldmap.tiles[iCol][iRow].iForegroundSprite = 0;
+
+								g_worldmap.tiles[iCol][iRow].iType = 0;
+								updateworldsurface();
 							}
 							else if(edit_mode == 4)
 							{
@@ -706,6 +756,10 @@ int editor_edit()
 
 									updateworldsurface();
 								}
+							}
+							else if(edit_mode == 5)
+							{
+								RemoveVehicleFromTile(iCol, iRow);
 							}
 						}
 					}
@@ -744,6 +798,42 @@ int editor_edit()
 				}
 			}
 		}
+		else if(edit_mode == 3) //draw stages
+		{
+			int color = SDL_MapRGB(blitdest->format, 0, 0, 255);
+			for(short iRow = draw_offset_row; iRow < draw_offset_row + 15 && iRow < iWorldHeight; iRow++)
+			{
+				for(short iCol = draw_offset_col; iCol <= draw_offset_col + 20 && iCol < iWorldWidth; iCol++)
+				{
+					short iType = g_worldmap.tiles[iCol][iRow].iType - 6;
+
+					if(iType >= 0)
+					{
+						short ix = (iCol - draw_offset_col) * TILESIZE + draw_offset_x;
+						short iy = (iRow - draw_offset_row) * TILESIZE + draw_offset_y;
+						SDL_Rect r = {ix, iy, 32, 32};
+						SDL_FillRect(blitdest, &r, color);
+
+						spr_foregroundtiles[0].draw(ix, iy, (iType % 10) << 5, (iType / 10) << 5, 32, 32);
+					}
+				}
+			}
+		}
+		else if(edit_mode == 5)
+		{
+			std::vector<WorldVehicle*>::iterator itr = vehiclelist.begin(), lim = vehiclelist.end();
+			while(itr != lim)
+			{
+				WorldVehicle * vehicle = *itr;
+
+				short ix = (vehicle->iCurrentTileX  - draw_offset_col) * TILESIZE + draw_offset_x;
+				short iy = (vehicle->iCurrentTileY - draw_offset_row) * TILESIZE + draw_offset_y;
+
+				spr_worldvehicle.draw(ix, iy, vehicle->iDrawDirection << 5, vehicle->iDrawSprite << 5, 32, 32);
+
+				itr++;
+			}
+		}
 
 		menu_font_small.draw(0, 0, szEditModes[edit_mode]);
 		
@@ -776,6 +866,106 @@ int editor_edit()
 	}
 
 	return EDITOR_QUIT;
+}
+
+void ReadVehiclesIntoEditor()
+{
+	for(short iVehicle = 0; iVehicle < g_worldmap.iNumVehicles; iVehicle++)
+	{
+		WorldVehicle * vehicle = &g_worldmap.vehicles[iVehicle];
+		WorldVehicle * vehiclecopy = new WorldVehicle();
+		
+		vehiclecopy->iDrawSprite = vehicle->iDrawSprite;
+		vehiclecopy->iActionId = vehicle->iActionId;
+		vehiclecopy->iCurrentTileX = vehicle->iCurrentTileX;
+		vehiclecopy->iCurrentTileY = vehicle->iCurrentTileY;
+		vehiclecopy->iMinMoves = vehicle->iMinMoves;
+		vehiclecopy->iMaxMoves = vehicle->iMaxMoves;
+		vehiclecopy->fSpritePaces = vehicle->fSpritePaces;
+		vehiclecopy->iDrawDirection = vehicle->iDrawDirection;
+		vehiclecopy->iBoundary = vehicle->iBoundary;
+
+		vehiclelist.push_back(vehiclecopy);
+	}
+}
+
+void WriteVehiclesIntoWorld()
+{
+	//Cleanup old vehicles
+	delete [] g_worldmap.vehicles;
+
+	//Insert new vehicles
+	g_worldmap.iNumVehicles = vehiclelist.size();
+	g_worldmap.vehicles = new WorldVehicle[g_worldmap.iNumVehicles];
+	
+	for(short iVehicle = 0; iVehicle < g_worldmap.iNumVehicles; iVehicle++)
+	{
+		WorldVehicle * vehicle = vehiclelist[iVehicle];
+		WorldVehicle * vehiclecopy = &g_worldmap.vehicles[iVehicle];
+
+		vehiclecopy->iDrawSprite = vehicle->iDrawSprite;
+		vehiclecopy->iActionId = vehicle->iActionId;
+		vehiclecopy->iCurrentTileX = vehicle->iCurrentTileX;
+		vehiclecopy->iCurrentTileY = vehicle->iCurrentTileY;
+		vehiclecopy->iMinMoves = vehicle->iMinMoves;
+		vehiclecopy->iMaxMoves = vehicle->iMaxMoves;
+		vehiclecopy->fSpritePaces = vehicle->fSpritePaces;
+		vehiclecopy->iDrawDirection = vehicle->iDrawDirection;
+		vehiclecopy->iBoundary = vehicle->iBoundary;
+	}
+}
+
+void AddVehicleToTile(short iCol, short iRow, short iType)
+{
+	std::vector<WorldVehicle*>::iterator itr = vehiclelist.begin(), lim = vehiclelist.end();
+	WorldVehicle * newvehicle = NULL;
+	while(itr != lim)
+	{
+		WorldVehicle * vehicle = *itr;
+		if(vehicle->iCurrentTileX == iCol && vehicle->iCurrentTileY == iRow)
+		{
+			newvehicle = vehicle;
+			break;
+		}
+
+		itr++;
+	}
+
+	if(!newvehicle)
+	{
+		newvehicle = new WorldVehicle();
+		newvehicle->iCurrentTileX = iCol;
+		newvehicle->iCurrentTileY = iRow;
+		vehiclelist.push_back(newvehicle);
+	}
+
+	newvehicle->iDrawSprite = iType;
+	newvehicle->iActionId = 0;
+	newvehicle->iMinMoves = 5;
+	newvehicle->iMaxMoves = 8;
+	newvehicle->fSpritePaces = true;
+	newvehicle->iDrawDirection = 0;
+	newvehicle->iBoundary = 0;
+}
+
+void RemoveVehicleFromTile(short iCol, short iRow)
+{
+	std::vector<WorldVehicle*>::iterator itr = vehiclelist.begin(), lim = vehiclelist.end();
+	while(itr != lim)
+	{
+		WorldVehicle * vehicle = *itr;
+		if(vehicle->iCurrentTileX == iCol && vehicle->iCurrentTileY == iRow)
+		{
+			delete (*itr);
+			
+			itr = vehiclelist.erase(itr);
+			lim = vehiclelist.end();
+		
+			return;
+		}
+
+		itr++;
+	}
 }
 
 void UpdatePathSprite(short iCol, short iRow)
@@ -1256,15 +1446,21 @@ int editor_warp()
 			switch(event.type)
 			{
 				case SDL_QUIT:
+				{
 					done = true;
-				break;
+					break;
+				}
 
 				case SDL_KEYDOWN:
-					edit_mode = 2;  //change to edit mode using warps
+				{
+					edit_mode = 6;  //change to edit mode using warps
 					return EDITOR_EDIT;
-				break;
-
+				
+					break;
+				}
+			
 				case SDL_MOUSEBUTTONDOWN:
+				{
 					if(event.button.button == SDL_BUTTON_LEFT)
 					{
 						if(event.button.x / TILESIZE < 10 && event.button.y / TILESIZE < 4)
@@ -1272,14 +1468,16 @@ int editor_warp()
 							set_tile = event.button.x / TILESIZE;
 						}
 
-						edit_mode = 2;  //change to edit mode using warps
+						edit_mode = 6;  //change to edit mode using warps
 						
 						//The user must release the mouse button before trying to add a tile
 						ignoreclick = true;
 						
 						return EDITOR_EDIT;
 					}
-				break;
+				
+					break;
+				}
 
 				default:
 					break;
@@ -1291,6 +1489,105 @@ int editor_warp()
 		menu_shade.draw(0, 0);
 
 		SDL_BlitSurface(spr_warps[0].getSurface(), NULL, screen, &r);
+		menu_font_small.drawRightJustified(640, 0, worldlist.current_name());
+
+		SDL_Flip(screen);
+
+		int delay = WAITTIME - (SDL_GetTicks() - framestart);
+		if(delay < 0)
+			delay = 0;
+		else if(delay > WAITTIME)
+			delay = WAITTIME;
+		
+		SDL_Delay(delay);
+	}
+
+	return EDITOR_QUIT;
+}
+
+int editor_type()
+{
+	bool done = false;
+	
+	SDL_Rect r;
+	r.x = 0;
+	r.y = 0;
+	r.w = 640;
+	r.h = 480;
+
+	while (!done)
+	{
+		int framestart = SDL_GetTicks();
+
+		//handle messages
+		while(SDL_PollEvent(&event))
+		{
+			switch(event.type)
+			{
+				case SDL_QUIT:
+				{
+					done = true;
+					break;
+				}
+
+				case SDL_KEYDOWN:
+				{
+					edit_mode = 3;  //change to edit mode using stages/doors/start
+					return EDITOR_EDIT;
+				
+					break;
+				}
+
+				case SDL_MOUSEBUTTONDOWN:
+				{
+					if(event.button.button == SDL_BUTTON_LEFT)
+					{
+						short iButtonX = event.button.x / TILESIZE;
+						short iButtonY = event.button.y / TILESIZE;
+
+						if(iButtonX >= 0 && iButtonX <= 5 && iButtonY == 0)
+						{
+							set_tile = iButtonX;
+						}
+						else if(iButtonX >= 0 && iButtonX < g_worldmap.iNumStages && iButtonY == 1)
+						{
+							set_tile = iButtonX + 6;
+						}
+
+						edit_mode = 3;  //change to edit mode using warps
+						
+						//The user must release the mouse button before trying to add a tile
+						ignoreclick = true;
+						
+						return EDITOR_EDIT;
+					}
+				
+					break;
+				}
+
+				default:
+					break;
+			}
+		}
+
+		
+		drawmap(false, TILESIZE);
+		menu_shade.draw(0, 0);
+
+		spr_foregroundtiles[0].draw(0, 0, 448, 0, 64, 32);
+		spr_foregroundtiles[0].draw(64, 0, 448, 64, 128, 32);
+
+		int color = SDL_MapRGB(blitdest->format, 0, 0, 255);
+		for(short iStage = 0; iStage < g_worldmap.iNumStages; iStage++)
+		{
+			SDL_Rect r = {iStage << 5, 32, 32, 32};
+			SDL_FillRect(blitdest, &r, color);
+
+			spr_foregroundtiles[0].draw(iStage << 5, 32, (iStage % 10) << 5, (iStage / 10) << 5, 32, 32);
+		}
+
+		spr_foregroundtiles[0].draw(64, 0, 448, 64, 128, 32);
+		
 		menu_font_small.drawRightJustified(640, 0, worldlist.current_name());
 
 		SDL_Flip(screen);
@@ -1321,17 +1618,15 @@ int editor_background()
 			switch(event.type)
 			{
 				case SDL_QUIT:
+				{
 					done = true;
-				break;
+					break;
+				}
 
 				case SDL_KEYDOWN:
 				{	
-					if(event.key.keysym.sym == SDLK_ESCAPE)
-					{
-						return EDITOR_EDIT;
-					}
-
-					break;
+					edit_mode = 0;
+					return EDITOR_EDIT;
 				}
 
 				case SDL_MOUSEBUTTONDOWN:
@@ -1413,36 +1708,23 @@ int editor_foreground()
 			switch(event.type)
 			{
 				case SDL_QUIT:
+				{
 					done = true;
-				break;
+					break;
+				}
 
 				case SDL_KEYDOWN:
 				{	
 					SDLKey key = event.key.keysym.sym;
 
-					if(key == SDLK_ESCAPE)
+					if(key >= SDLK_1 && key <= SDLK_5)
 					{
+						iForegroundScreen = key - SDLK_1;
+					}
+					else
+					{
+						edit_mode = 1;
 						return EDITOR_EDIT;
-					}
-					else if(key == SDLK_1)
-					{
-						iForegroundScreen = 0;
-					}
-					else if(key == SDLK_2)
-					{
-						iForegroundScreen = 1;
-					}
-					else if(key == SDLK_3)
-					{
-						iForegroundScreen = 2;
-					}
-					else if(key == SDLK_4)
-					{
-						iForegroundScreen = 3;
-					}
-					else if(key == SDLK_5)
-					{
-						iForegroundScreen = 4;
 					}
 
 					break;
@@ -1532,17 +1814,15 @@ int editor_pathsprite()
 			switch(event.type)
 			{
 				case SDL_QUIT:
+				{
 					done = true;
-				break;
+					break;
+				}
 
 				case SDL_KEYDOWN:
 				{	
-					if(event.key.keysym.sym == SDLK_ESCAPE)
-					{
-						return EDITOR_EDIT;
-					}
-
-					break;
+					edit_mode = 4;
+					return EDITOR_EDIT;
 				}
 
 				case SDL_MOUSEBUTTONDOWN:
@@ -1603,32 +1883,40 @@ int editor_vehicles()
 			switch(event.type)
 			{
 				case SDL_QUIT:
+				{
 					done = true;
-				break;
+					break;
+				}
 
 				case SDL_KEYDOWN:
-					edit_mode = 0;
+				{
+					edit_mode = 5;
 					return EDITOR_EDIT;
-				break;
-
+				}
+				
 				case SDL_MOUSEBUTTONDOWN:
+				{
 					if(event.button.button == SDL_BUTTON_LEFT)
 					{
 						short set_item_x = event.button.x / TILESIZE;
 						short set_item_y = event.button.y / TILESIZE;
 
 						//Set the selected block to one of the interaction blocks
-						set_tile = set_item_x;
+						if(set_item_x >= 0 && set_item_x <= 8 && set_item_y == 0)
+						{
+							set_tile = set_item_x;
 
-						edit_mode = 0;
+							edit_mode = 5;
 
-						//The user must release the mouse button before trying to add a tile
-						ignoreclick = true;
-						
-						edit_mode = 4;
-						return EDITOR_EDIT;
+							//The user must release the mouse button before trying to add a tile
+							ignoreclick = true;
+							
+							return EDITOR_EDIT;
+						}
 					}
-				break;
+				
+					break;
+				}
 
 				default:
 					break;
@@ -1638,10 +1926,10 @@ int editor_vehicles()
 		drawmap(false, TILESIZE);
 		menu_shade.draw(0, 0);
 		
-		SDL_Rect rSrc = {0, 960, 224, 32};
-		SDL_Rect rDst = {0, 0, 224, 32};
-
-		//spr_mapitems[0].draw(0, 0, 0, 0, 64, 32);
+		for(short iVehicle = 0; iVehicle < 9; iVehicle++)
+		{
+			spr_worldvehicle.draw(iVehicle << 5, 0, 0, iVehicle << 5, 32, 32);
+		}
 
 		menu_font_small.drawRightJustified(640, 0, worldlist.current_name());
 				
@@ -1679,17 +1967,15 @@ int editor_path()
 			switch(event.type)
 			{
 				case SDL_QUIT:
+				{
 					done = true;
-				break;
+					break;
+				}
 
 				case SDL_KEYDOWN:
 				{	
-					if(event.key.keysym.sym == SDLK_ESCAPE)
-					{
-						return EDITOR_EDIT;
-					}
-
-					break;
+					edit_mode = 2;
+					return EDITOR_EDIT;
 				}
 
 				case SDL_MOUSEBUTTONDOWN:
@@ -2050,6 +2336,7 @@ int clear_world()
 void loadcurrentworld()
 {
 	g_worldmap.Load();
+	ReadVehiclesIntoEditor();
 
 	draw_offset_col = 0;
 	draw_offset_row = 0;
@@ -2092,6 +2379,7 @@ void loadcurrentworld()
 
 int savecurrentworld()
 {
+	WriteVehiclesIntoWorld();
 	g_worldmap.Save();
 	return 0;
 }
