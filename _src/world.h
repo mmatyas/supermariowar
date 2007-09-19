@@ -121,14 +121,20 @@ class WorldWarp
 {
 	public:
 		WorldWarp();
-		void Init(short col1, short row1, short col2, short row2);
+		void Init(short id, short col1, short row1, short col2, short row2);
 		void GetOtherSide(short iCol, short iRow, short * iOtherCol, short * iOtherRow);
 
 	private:
 		short iCol1, iRow1;
 		short iCol2, iRow2;
+		short iID;
 
 	friend class WorldMap;
+	friend void AddWarpToTile(short iCol, short iRow, short iType);
+	friend void RemoveWarpFromTile(short iCol, short iRow);
+	friend void ReadWarpsIntoEditor();
+	friend void WriteWarpsIntoWorld();
+	friend int editor_edit();
 };
 
 class WorldMap
@@ -222,6 +228,8 @@ class WorldMap
 
 	friend void ReadVehiclesIntoEditor();
 	friend void WriteVehiclesIntoWorld();
+	friend void ReadWarpsIntoEditor();
+	friend void WriteWarpsIntoWorld();
 };
 
 #endif //__WORLD_H_

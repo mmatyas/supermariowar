@@ -93,6 +93,7 @@ bool LoadMenuGraphics()
 
 	_load_gfxck(spr_worldbackground, convertPath("gfx/packs/world/world_background.png", graphicspack));
 	_load_gfxck(spr_worldforeground, convertPath("gfx/packs/world/world_foreground.png", graphicspack));
+	_load_gfxck(spr_worldforegroundspecial, convertPath("gfx/packs/world/world_foreground_special.png", graphicspack));
 	_load_gfxck(spr_worldpaths, convertPath("gfx/packs/world/world_paths.png", graphicspack));
 	_load_gfxck(spr_worldvehicle, convertPath("gfx/packs/world/world_vehicles.png", graphicspack));
 	_load_gfxck(spr_worlditems, convertPath("gfx/packs/world/world_powerups.png", graphicspack));

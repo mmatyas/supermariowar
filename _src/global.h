@@ -209,10 +209,12 @@ std::string stripCreatorAndDotMap(const std::string &filename);
 
 #define NUM_AUTO_FILTERS 8
 
-#define WORLD_FOREGROUND_SPRITE_OFFSET 100
+#define WORLD_FOREGROUND_STAGE_OFFSET 100
 #define WORLD_WINNING_TEAM_SPRITE_OFFSET 500
 #define WORLD_BRIDGE_SPRITE_OFFSET 504
 #define WORLD_START_SPRITE_OFFSET 508
+#define WORLD_FOREGROUND_SPRITE_OFFSET 600
+#define WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET 800
 
 //------------- data structures / selfmade include files -------------
 #include "input.h"
@@ -474,6 +476,7 @@ extern gfxSprite		spr_thumbnail_mapitems[2];
 
 extern gfxSprite		spr_worldbackground;
 extern gfxSprite		spr_worldforeground;
+extern gfxSprite		spr_worldforegroundspecial;
 extern gfxSprite		spr_worldpaths;
 extern gfxSprite		spr_worldvehicle;
 extern gfxSprite		spr_worlditems;
