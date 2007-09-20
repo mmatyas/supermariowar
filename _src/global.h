@@ -216,6 +216,8 @@ std::string stripCreatorAndDotMap(const std::string &filename);
 #define WORLD_FOREGROUND_SPRITE_OFFSET 600
 #define WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET 800
 
+#define WORLD_BACKGROUND_SPRITE_SET_SIZE 60
+
 //------------- data structures / selfmade include files -------------
 #include "input.h"
 #include "uimenu.h"

@@ -778,7 +778,6 @@ void gfxSprite::freeSurface()
 
 
 // gfxFont
-
 gfxFont::gfxFont()
 {
 	m_font = NULL;

@@ -35,7 +35,7 @@
 
 #define MAPTITLESTRING "SMW 1.8 World Editor"
 
-enum {EDITOR_EDIT, EDITOR_BACKGROUND, EDITOR_FOREGROUND, EDITOR_PATHSPRITE, EDITOR_VEHICLES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_WORLD, NEW_WORLD, SAVE, EDITOR_WARP, DISPLAY_HELP, EDITOR_PATH, EDITOR_TYPE};
+enum {EDITOR_EDIT, EDITOR_WATER, EDITOR_BACKGROUND, EDITOR_FOREGROUND, EDITOR_PATHSPRITE, EDITOR_VEHICLES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_WORLD, NEW_WORLD, SAVE, EDITOR_WARP, DISPLAY_HELP, EDITOR_PATH, EDITOR_TYPE};
 
 char * szEditModes[8] = {"Background Mode", "Foreground Mode", "Path Sprite Mode", "Stage Mode", "Path Mode", "Vehicle Mode", "Warp Mode", "Stage/Door Mode"};
 
@@ -167,6 +167,7 @@ int new_world();
 
 int editor_edit();
 int editor_warp();
+int editor_water();
 int	editor_background();
 int editor_foreground();
 int editor_vehicles();
@@ -267,6 +268,10 @@ int main(int argc, char *argv[])
 		{
 			case EDITOR_EDIT:
 				state = editor_edit();
+			break;
+
+			case EDITOR_WATER:
+				state = editor_water();
 			break;
 
 			case EDITOR_BACKGROUND:
@@ -392,12 +397,15 @@ int editor_edit()
 						takescreenshot();
 
 					if(event.key.keysym.sym == SDLK_1)
-						return EDITOR_BACKGROUND;
+						return EDITOR_WATER;
 
 					if(event.key.keysym.sym == SDLK_2)
-						return EDITOR_FOREGROUND;
+						return EDITOR_BACKGROUND;
 
 					if(event.key.keysym.sym == SDLK_3)
+						return EDITOR_FOREGROUND;
+
+					if(event.key.keysym.sym == SDLK_4)
 						return EDITOR_PATHSPRITE;
 
 					if(event.key.keysym.sym == SDLK_t)
@@ -525,7 +533,7 @@ int editor_edit()
 									g_worldmap.tiles[iCol][iRow].iBackgroundSprite = set_tile;
 									UpdateForeground(iCol, iRow);
 
-									if(set_tile < 2 && fAutoPaint)
+									if((set_tile % WORLD_BACKGROUND_SPRITE_SET_SIZE) < 2 && fAutoPaint)
 										UpdateCoastline(iCol, iRow);								
 
 									updateworldsurface();
@@ -583,6 +591,14 @@ int editor_edit()
 							else if(edit_mode == 6) //selected warp
 							{
 								AddWarpToTile(iCol, iRow, set_tile);
+							}
+							else if(edit_mode == 7) //water
+							{
+								if(g_worldmap.tiles[iCol][iRow].iBackgroundWater != set_tile)
+								{
+									g_worldmap.tiles[iCol][iRow].iBackgroundWater = set_tile;							
+									updateworldsurface();
+								}
 							}
 						}
 						else if(event.button.button == SDL_BUTTON_RIGHT)
@@ -643,6 +659,14 @@ int editor_edit()
 							{
 								RemoveWarpFromTile(iCol, iRow);
 							}
+							else if(edit_mode == 7) //water
+							{
+								if(g_worldmap.tiles[iCol][iRow].iBackgroundWater != 0)
+								{
+									g_worldmap.tiles[iCol][iRow].iBackgroundWater = 0;
+									updateworldsurface();
+								}
+							}
 						}
 					}
 					
@@ -667,7 +691,7 @@ int editor_edit()
 									g_worldmap.tiles[iCol][iRow].iBackgroundSprite = set_tile;
 									UpdateForeground(iCol, iRow);
 
-									if(set_tile < 2 && fAutoPaint)
+									if((set_tile % WORLD_BACKGROUND_SPRITE_SET_SIZE) < 2 && fAutoPaint)
 										UpdateCoastline(iCol, iRow);								
 
 									updateworldsurface();
@@ -723,6 +747,14 @@ int editor_edit()
 							{
 								AddWarpToTile(iCol, iRow, set_tile);
 							}
+							else if(edit_mode == 7) //water
+							{
+								if(g_worldmap.tiles[iCol][iRow].iBackgroundWater != set_tile)
+								{
+									g_worldmap.tiles[iCol][iRow].iBackgroundWater = set_tile;							
+									updateworldsurface();
+								}
+							}
 						}
 						else if(event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT))
 						{
@@ -774,13 +806,21 @@ int editor_edit()
 									updateworldsurface();
 								}
 							}
-							else if(edit_mode == 5)
+							else if(edit_mode == 5) //vehicles
 							{
 								RemoveVehicleFromTile(iCol, iRow);
 							}
-							else if(edit_mode == 6)
+							else if(edit_mode == 6) //Warps
 							{
 								RemoveWarpFromTile(iCol, iRow);
+							}
+							else if(edit_mode == 7) //water
+							{
+								if(g_worldmap.tiles[iCol][iRow].iBackgroundWater != 0)
+								{
+									g_worldmap.tiles[iCol][iRow].iBackgroundWater = 0;							
+									updateworldsurface();
+								}
 							}
 						}
 					}
@@ -1366,11 +1406,13 @@ void UpdateCoastline(short iCol, short iRow)
 void AutoSetTile(short iCol, short iRow)
 {
 	//Don't need to do anything if this tile is solid
-	if(g_worldmap.tiles[iCol][iRow].iBackgroundSprite == 1)
+	if(g_worldmap.tiles[iCol][iRow].iBackgroundSprite % WORLD_BACKGROUND_SPRITE_SET_SIZE == 1)
 		return;
 
 	bool iTile[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 	short iNeighborIndex = 0;
+
+	short iNeighborStyle[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 	for(short iAutoRow = iRow - 1; iAutoRow <= iRow + 1; iAutoRow++)
 	{
@@ -1381,201 +1423,217 @@ void AutoSetTile(short iCol, short iRow)
 
 			if(iAutoRow >= 0 && iAutoRow < iWorldHeight && iAutoCol >= 0 && iAutoCol < iWorldWidth)
 			{
-				if(g_worldmap.tiles[iAutoCol][iAutoRow].iBackgroundSprite == 1)
+				short iBackgroundSprite = g_worldmap.tiles[iAutoCol][iAutoRow].iBackgroundSprite;
+
+				if(iBackgroundSprite % WORLD_BACKGROUND_SPRITE_SET_SIZE == 1)
+				{
 					iTile[iNeighborIndex] = true;
+					iNeighborStyle[iBackgroundSprite / WORLD_BACKGROUND_SPRITE_SET_SIZE]++;
+				}
 			}
 			
 			iNeighborIndex++;
 		}
 	}
 
+	short iMaxStyle = 0;
+	short iTileStyleOffset = 0;
+	for(short iStyle = 0; iStyle < 10; iStyle++)
+	{
+		if(iNeighborStyle[iStyle] > iMaxStyle)
+		{
+			iMaxStyle = iNeighborStyle[iStyle];
+			iTileStyleOffset = iStyle * WORLD_BACKGROUND_SPRITE_SET_SIZE;
+		}
+	}
+
 	if(iTile[0] && !iTile[1] && iTile[2] && !iTile[3] && !iTile[4] && iTile[5] && !iTile[6] && iTile[7])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 44;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 44;
 	}
 	else if(iTile[0] && !iTile[1] && !iTile[3] && iTile[4] && iTile[5] && !iTile[6])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 30;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 30;
 	}
 	else if(!iTile[1] && iTile[2] && iTile[3] && !iTile[4] && !iTile[6] && iTile[7])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 31;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 31;
 	}
 	else if(iTile[1] && !iTile[3] && !iTile[4] && iTile[5] && !iTile[6] && iTile[7])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 32;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 32;
 	}
 	else if(iTile[0] && !iTile[1] && iTile[2] && !iTile[3] && !iTile[4] && iTile[6])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 33;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 33;
 	}
 	else if(!iTile[1] && iTile[2] && iTile[3] && !iTile[4] && iTile[6])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 34;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 34;
 	}
 	else if(iTile[0] && !iTile[1] && !iTile[3] && iTile[4] && iTile[6])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 35;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 35;
 	}
 	else if(iTile[1] && !iTile[3] && iTile[4] && iTile[5] && !iTile[6])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 36;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 36;
 	}
 	else if(iTile[1] && iTile[3] && !iTile[4] && !iTile[6] && iTile[7])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 37;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 37;
 	}
 	else if(iTile[0] && !iTile[1] && iTile[2] && !iTile[4] && iTile[7])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 45;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 45;
 	}
 	else if(iTile[2] && !iTile[4] && iTile[5] && !iTile[6] && iTile[7])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 46;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 46;
 	}
 	else if(iTile[0] && !iTile[3] && iTile[5] && !iTile[6] && iTile[7])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 47;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 47;
 	}
 	else if(iTile[0] && !iTile[1] && iTile[2] && !iTile[3] && iTile[5])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 48;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 48;
 	}
 	else if(iTile[1] && iTile[3] && iTile[4] && iTile[6])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 28;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 28;
 	}
 	else if(iTile[1] && !iTile[3] && iTile[4] && iTile[6])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 38;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 38;
 	}
 	else if(iTile[1] && iTile[3] && !iTile[4] && iTile[6])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 39;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 39;
 	}
 	else if(iTile[1] && iTile[3] && iTile[4] && !iTile[6])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 40;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 40;
 	}
 	else if(!iTile[1] && iTile[3] && iTile[4] && iTile[6])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 41;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 41;
 	}
 	else if(!iTile[1] && iTile[3] && iTile[4] && !iTile[6])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 42;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 42;
 	}
 	else if(iTile[1] && !iTile[3] && !iTile[4] && iTile[6])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 43;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 43;
 	}
 	else if(iTile[0] && !iTile[1] && iTile[4])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 16;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 16;
 	}
 	else if(iTile[4] && iTile[5] && !iTile[6])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 17;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 17;
 	}
 	else if(iTile[3] && !iTile[6] && iTile[7])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 18;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 18;
 	}
 	else if(!iTile[1] && iTile[2] && iTile[3])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 19;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 19;
 	}
 	else if(iTile[1] && !iTile[4] && iTile[7])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 20;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 20;
 	}
 	else if(iTile[2] && !iTile[4] && iTile[6])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 21;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 21;
 	}
 	else if(iTile[0] && !iTile[3] && iTile[6])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 22;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 22;
 	}
 	else if(iTile[1] && !iTile[3] && iTile[5])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 23;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 23;
 	}
 	else if(iTile[0] && !iTile[1] && iTile[2])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 6;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 6;
 	}
 	else if(iTile[5] && !iTile[6] && iTile[7])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 7;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 7;
 	}
 	else if(iTile[0] && !iTile[3] && iTile[5])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 8;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 8;
 	}
 	else if(iTile[2] && !iTile[4] && iTile[7])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 9;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 9;
 	}
 	else if(iTile[1] && iTile[4])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 24;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 24;
 	}
 	else if(iTile[4] && iTile[6])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 25;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 25;
 	}
 	else if(iTile[3] && iTile[6])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 26;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 26;
 	}
 	else if(iTile[1] && iTile[3])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 27;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 27;
 	}
 	else if(iTile[2] && iTile[5])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 10;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 10;
 	}
 	else if(iTile[0] && iTile[7])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 11;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 11;
 	}
 	else if(iTile[1])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 12;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 12;
 	}
 	else if(iTile[6])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 13;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 13;
 	}
 	else if(iTile[3])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 14;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 14;
 	}
 	else if(iTile[4])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 15;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 15;
 	}
 	else if(iTile[2])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 2;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 2;
 	}
 	else if(iTile[0])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 3;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 3;
 	}
 	else if(iTile[5])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 4;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 4;
 	}
 	else if(iTile[7])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 5;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 5;
 	}
 	else
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 0;
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 0;
 	}
 }
 
@@ -1797,7 +1855,7 @@ int editor_type()
 	return EDITOR_QUIT;
 }
 
-int editor_background()
+int editor_water()
 {
 	bool done = false;
 	
@@ -1818,7 +1876,7 @@ int editor_background()
 
 				case SDL_KEYDOWN:
 				{	
-					edit_mode = 0;
+					edit_mode = 7;
 					return EDITOR_EDIT;
 				}
 
@@ -1826,34 +1884,123 @@ int editor_background()
 				{
 					if(event.button.button == SDL_BUTTON_LEFT)
 					{
-						short iButtonX = event.button.x;
-						short iButtonY = event.button.y;
+						short iButtonX = event.button.x / TILESIZE;
+						short iButtonY = event.button.y / TILESIZE;
 
-						if(iButtonX >= 0 && iButtonX < TILESIZE)
+						if(iButtonY == 0)
 						{
-							if(iButtonY >= 0 && iButtonY < TILESIZE)
-								set_tile = 0;
-							else if(iButtonY >= 32 && iButtonY < 480)
-								set_tile = iButtonY / TILESIZE + 1;
-						}
-						else if(iButtonX >= TILESIZE && iButtonX < 64)
-						{
-							if(iButtonY >= 0 && iButtonY < TILESIZE)
-								set_tile = 1;
-							else if(iButtonY >= 32 && iButtonY < 480)
-								set_tile = iButtonY / TILESIZE + 15;
-						}
-						else if(iButtonX >= 64 && iButtonX < 96)
-						{
-							if(iButtonY >= 0 && iButtonY < 480)
-								set_tile = iButtonY / TILESIZE + 30;
-						}
-						else if(iButtonX >= 96 && iButtonX < 128)
-						{
-							if(iButtonY >= 0 && iButtonY < 128)
-								set_tile = iButtonY / TILESIZE + 45;
+							if(iButtonX >= 0 && iButtonX <= 2)
+							{
+								set_tile = iButtonX + 4;
+							}
 						}
 						
+						ignoreclick = true;
+						edit_mode = 7;
+						return EDITOR_EDIT;
+					}
+					
+					break;
+				}
+
+				default:
+					break;
+			}
+		}
+
+		SDL_FillRect(screen, NULL, 0x0);
+		
+		for(short iWater = 0; iWater < 3; iWater++)
+			spr_backgroundtiles[0].draw(iWater << 5, 0, 512 + (iWater << 7), 0, 32, 32);
+		
+		SDL_Flip(screen);
+
+		int delay = WAITTIME - (SDL_GetTicks() - framestart);
+		if(delay < 0)
+			delay = 0;
+		else if(delay > WAITTIME)
+			delay = WAITTIME;
+		
+		SDL_Delay(delay);
+	}
+
+	return EDITOR_QUIT;
+}
+
+int editor_background()
+{
+	bool done = false;
+	short iPage = 0;
+
+	while (!done)
+	{
+		int framestart = SDL_GetTicks();
+
+		//handle messages
+		while(SDL_PollEvent(&event))
+		{
+			switch(event.type)
+			{
+				case SDL_QUIT:
+				{
+					done = true;
+					break;
+				}
+
+				case SDL_KEYDOWN:
+				{	
+					SDLKey key = event.key.keysym.sym;
+					if(key >= SDLK_1 && key <= SDLK_2)
+					{
+						iPage = key - SDLK_1;
+					}
+					else
+					{
+						edit_mode = 0;
+						return EDITOR_EDIT;
+					}
+
+					break;
+				}
+
+				case SDL_MOUSEBUTTONDOWN:
+				{
+					if(event.button.button == SDL_BUTTON_LEFT)
+					{
+						short iButtonX = event.button.x / TILESIZE;
+						short iButtonY = event.button.y / TILESIZE;
+
+						short iTileStyleOffset = ((iButtonX / 4) + (iPage * 5)) * WORLD_BACKGROUND_SPRITE_SET_SIZE;
+
+						iButtonX %= 4;
+
+						if(iButtonX == 0)
+						{
+							if(iButtonY == 0)
+								set_tile = 0;
+							else if(iButtonY >= 1 && iButtonY < 15)
+								set_tile = iButtonY + 1;
+						}
+						else if(iButtonX == 1)
+						{
+							if(iButtonY == 0)
+								set_tile = 1;
+							else if(iButtonY >= 1 && iButtonY < 15)
+								set_tile = iButtonY + 15;
+						}
+						else if(iButtonX == 2)
+						{
+							if(iButtonY >= 0 && iButtonY < 15)
+								set_tile = iButtonY + 30;
+						}
+						else if(iButtonX == 3)
+						{
+							if(iButtonY >= 0 && iButtonY < 15)
+								set_tile = iButtonY + 45;
+						}
+						
+						set_tile += iTileStyleOffset;
+
 						ignoreclick = true;
 						edit_mode = 0;
 						return EDITOR_EDIT;
@@ -1869,8 +2016,7 @@ int editor_background()
 
 		SDL_FillRect(screen, NULL, 0x0);
 
-		spr_backgroundtiles[0].draw(0, 0, 0, 32, 128, 480);
-		spr_backgroundtiles[0].draw(0, 0, 0, 0, 32, 32);
+		spr_backgroundtiles[0].draw(0, 0, iPage * 640, 32, 640, 480);
 
 		SDL_Flip(screen);
 

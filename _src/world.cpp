@@ -453,13 +453,7 @@ bool WorldMap::Load()
 					goto RETURN;
 
 				WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
-				tile->iBackgroundSprite = atoi(psz);
-				tile->iBackgroundStyle = 2;
-				tile->fAnimated = tile->iBackgroundSprite == 0 || (tile->iBackgroundSprite >= 2 && tile->iBackgroundSprite <= 27);
-				
-				tile->iID = iMapTileReadRow * iWidth + iMapTileReadCol;
-				tile->iCol = iMapTileReadCol;
-				tile->iRow = iMapTileReadRow;
+				tile->iBackgroundWater = atoi(psz);
 				
 				psz = strtok(NULL, ",\n");
 			}
@@ -470,7 +464,33 @@ bool WorldMap::Load()
 				iMapTileReadRow = 0;
 			}
 		}
-		else if(iReadType == 4) //foreground sprites
+		else if(iReadType == 4) //background sprites
+		{
+			char * psz = strtok(buffer, ",\n");
+			
+			for(short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++)
+			{
+				if(!psz)
+					goto RETURN;
+
+				WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
+				tile->iBackgroundSprite = atoi(psz);
+				tile->fAnimated = tile->iBackgroundSprite == 0 || (tile->iBackgroundSprite >= 2 && tile->iBackgroundSprite <= 48);
+				
+				tile->iID = iMapTileReadRow * iWidth + iMapTileReadCol;
+				tile->iCol = iMapTileReadCol;
+				tile->iRow = iMapTileReadRow;
+				
+				psz = strtok(NULL, ",\n");
+			}
+
+			if(++iMapTileReadRow == iHeight)
+			{
+				iReadType = 5;
+				iMapTileReadRow = 0;
+			}
+		}
+		else if(iReadType == 5) //foreground sprites
 		{
 			char * psz = strtok(buffer, ",\n");
 			
@@ -493,11 +513,11 @@ bool WorldMap::Load()
 
 			if(++iMapTileReadRow == iHeight)
 			{
-				iReadType = 5;
+				iReadType = 6;
 				iMapTileReadRow = 0;
 			}
 		}
-		else if(iReadType == 5) //path connections
+		else if(iReadType == 6) //path connections
 		{
 			char * psz = strtok(buffer, ",\n");
 			
@@ -514,7 +534,7 @@ bool WorldMap::Load()
 
 			if(++iMapTileReadRow == iHeight)
 			{
-				iReadType = 6;
+				iReadType = 7;
 				iMapTileReadRow = 0;
 
 				//1 == |  2 == -  3 == -!  4 == L  5 == ,-  6 == -,
@@ -530,7 +550,7 @@ bool WorldMap::Load()
 				}
 			}
 		}
-		else if(iReadType == 6) //stages
+		else if(iReadType == 7) //stages
 		{
 			char * psz = strtok(buffer, ",\n");
 			
@@ -556,11 +576,11 @@ bool WorldMap::Load()
 
 			if(++iMapTileReadRow == iHeight)
 			{
-				iReadType = 7;
+				iReadType = 8;
 				iMapTileReadRow = 0;
 			}
 		}
-		else if(iReadType == 7) //vehicle boundaries
+		else if(iReadType == 8) //vehicle boundaries
 		{
 			char * psz = strtok(buffer, ",\n");
 			
@@ -576,15 +596,15 @@ bool WorldMap::Load()
 			}
 
 			if(++iMapTileReadRow == iHeight)
-				iReadType = 8;
+				iReadType = 9;
 		}
-		else if(iReadType == 8) //number of stages
+		else if(iReadType == 9) //number of stages
 		{
 			iNumStages = atoi(buffer);
 			
-			iReadType = iNumStages == 0 ? 10 : 9;
+			iReadType = iNumStages == 0 ? 11 : 10;
 		}
-		else if(iReadType == 9) //stage details
+		else if(iReadType == 10) //stage details
 		{
 			TourStop * ts = ParseTourStopLine(buffer, iVersion, true);
 		
@@ -592,9 +612,9 @@ bool WorldMap::Load()
 			game_values.tourstoptotal++;
 
 			if(++iCurrentStage >= iNumStages)
-				iReadType = 10;
+				iReadType = 11;
 		}
-		else if(iReadType == 10) //number of warps
+		else if(iReadType == 11) //number of warps
 		{
 			iNumWarps = atoi(buffer);
 
@@ -604,9 +624,9 @@ bool WorldMap::Load()
 			if(iNumWarps > 0)
 				warps = new WorldWarp[iNumWarps];
 			
-			iReadType = iNumWarps == 0 ? 12 : 11;
+			iReadType = iNumWarps == 0 ? 13 : 12;
 		}
-		else if(iReadType == 11) //warp details
+		else if(iReadType == 12) //warp details
 		{
 			char * psz = strtok(buffer, ",\n");
 			
@@ -641,9 +661,9 @@ bool WorldMap::Load()
 			tiles[iCol2][iRow2].iWarp = iCurrentWarp;
 
 			if(++iCurrentWarp >= iNumWarps)
-				iReadType = 12;
+				iReadType = 13;
 		}
-		else if(iReadType == 12) //number of vehicles
+		else if(iReadType == 13) //number of vehicles
 		{
 			iNumVehicles = atoi(buffer);
 
@@ -653,9 +673,9 @@ bool WorldMap::Load()
 			if(iNumVehicles > 0)
 				vehicles = new WorldVehicle[iNumVehicles];
 
-			iReadType = iNumVehicles == 0 ? 14 : 13;
+			iReadType = iNumVehicles == 0 ? 15 : 14;
 		}
-		else if(iReadType == 13) //moving objects
+		else if(iReadType == 14) //moving objects
 		{
 			char * psz = strtok(buffer, ",\n");
 			
@@ -704,9 +724,9 @@ bool WorldMap::Load()
 			vehicles[iCurrentVehicle].Init(iCol, iRow, iStage, iSprite, iMinMoves, iMaxMoves, fSpritePaces, iInitialDirection, iBoundary);
 
 			if(++iCurrentVehicle >= iNumVehicles)
-				iReadType = 14;
+				iReadType = 15;
 		}
-		else if(iReadType == 14) //initial bonus items
+		else if(iReadType == 15) //initial bonus items
 		{
 			char * psz = strtok(buffer, ",\n");
 
@@ -737,7 +757,7 @@ bool WorldMap::Load()
 				psz = strtok(NULL, ",\n");
 			}
 
-			iReadType = 15;
+			iReadType = 16;
 		}
 	}
 
@@ -745,7 +765,7 @@ RETURN:
 
 	fclose(file);
 
-	return iReadType == 15;
+	return iReadType == 16;
 }
 
 void WorldMap::SetTileConnections(short iCol, short iRow)
@@ -826,6 +846,23 @@ bool WorldMap::Save(const char * szPath)
 
 	fprintf(file, "#Height\n");
 	fprintf(file, "%d\n\n", iHeight);
+
+	fprintf(file, "#Sprite Water Layer\n");
+
+	for(short iMapTileReadRow = 0; iMapTileReadRow < iHeight; iMapTileReadRow++)
+	{
+		for(short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++)
+		{
+			WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
+			fprintf(file, "%d", tile->iBackgroundWater);
+			
+			if(iMapTileReadCol == iWidth - 1)
+				fprintf(file, "\n");
+			else
+				fprintf(file, ",");
+		}
+	}
+	fprintf(file, "\n");
 
 	fprintf(file, "#Sprite Backgroud Layer\n");
 
@@ -992,7 +1029,7 @@ void WorldMap::Clear()
 			for(short iRow = 0; iRow < iHeight; iRow++)
 			{
 				tiles[iCol][iRow].iBackgroundSprite = 0;
-				tiles[iCol][iRow].iBackgroundStyle = 0;
+				tiles[iCol][iRow].iBackgroundWater = 0;
 				tiles[iCol][iRow].iForegroundSprite = 0;
 				tiles[iCol][iRow].iConnectionType = 0;
 				tiles[iCol][iRow].iType = 0;
@@ -1050,7 +1087,7 @@ void WorldMap::Resize(short w, short h)
 			for(short iRow = 0; iRow < iHeight; iRow++)
 			{
 				tempTiles[iCol][iRow].iBackgroundSprite = tiles[iCol][iRow].iBackgroundSprite;
-				tempTiles[iCol][iRow].iBackgroundStyle = tiles[iCol][iRow].iBackgroundStyle;
+				tempTiles[iCol][iRow].iBackgroundWater = tiles[iCol][iRow].iBackgroundWater;
 				tempTiles[iCol][iRow].iForegroundSprite = tiles[iCol][iRow].iForegroundSprite;
 				tempTiles[iCol][iRow].iConnectionType = tiles[iCol][iRow].iConnectionType;
 				tempTiles[iCol][iRow].iType = tiles[iCol][iRow].iType;
@@ -1069,7 +1106,7 @@ void WorldMap::Resize(short w, short h)
 			for(short iRow = 0; iRow < h && iRow < iHeight; iRow++)
 			{
 				tiles[iCol][iRow].iBackgroundSprite = tempTiles[iCol][iRow].iBackgroundSprite;
-				tiles[iCol][iRow].iBackgroundStyle = tempTiles[iCol][iRow].iBackgroundStyle;
+				tiles[iCol][iRow].iBackgroundWater = tempTiles[iCol][iRow].iBackgroundWater;
 				tiles[iCol][iRow].iForegroundSprite = tempTiles[iCol][iRow].iForegroundSprite;
 				tiles[iCol][iRow].iConnectionType = tempTiles[iCol][iRow].iConnectionType;
 				tiles[iCol][iRow].iType = tempTiles[iCol][iRow].iType;
@@ -1135,15 +1172,19 @@ void WorldMap::DrawMapToSurface(bool fInit, SDL_Surface * surface, short iMapDra
 		
 			WorldMapTile * tile = &tiles[iCol + iMapDrawOffsetCol][iRow + iMapDrawOffsetRow];
 			short iBackgroundSprite = tile->iBackgroundSprite;
-			short iBackgroundStyleOffset = tile->iBackgroundStyle * 128;
+			short iBackgroundWater = tile->iBackgroundWater;
 			short iForegroundSprite = tile->iForegroundSprite;
+
+			short iBackgroundStyleOffset = iBackgroundSprite / WORLD_BACKGROUND_SPRITE_SET_SIZE * 128;
+
+			iBackgroundSprite %= WORLD_BACKGROUND_SPRITE_SET_SIZE;
 
 			if(tile->fAnimated || fInit)
 			{
 				//if(iBackgroundSprite == 0 || (iBackgroundSprite >= 2 && iBackgroundSprite <= 27) || (iBackgroundSprite >= 45 && iBackgroundSprite <= 48))
 				if(iBackgroundSprite == 0 || (iBackgroundSprite >= 2 && iBackgroundSprite <= 48))
 				{
-					SDL_Rect rSrc = {iAnimationFrame + iBackgroundStyleOffset, 0, TILESIZE, TILESIZE};
+					SDL_Rect rSrc = {iAnimationFrame + (iBackgroundWater << 7), 0, TILESIZE, TILESIZE};
 					SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, surface, &r);
 
 					//if((iBackgroundSprite >= 2 && iBackgroundSprite <= 27) || (iBackgroundSprite >= 45 && iBackgroundSprite <= 48))

@@ -11,7 +11,7 @@ struct WorldMapTile
 	short iID;
 
 	short iType;
-	short iBackgroundStyle;
+	short iBackgroundWater;
 	short iBackgroundSprite;
 	short iForegroundSprite;
 
