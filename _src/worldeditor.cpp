@@ -1224,7 +1224,10 @@ void AutoSetPathSprite(short iCol, short iRow)
 	short iNeighborIndex = 0;
 
 	short iForegroundSprite = g_worldmap.tiles[iCol][iRow].iForegroundSprite;
-	if(iForegroundSprite == 0 || iForegroundSprite > 18)
+	short iForegroundStyle = iForegroundSprite / WORLD_PATH_SPRITE_SET_SIZE;
+	short iPathSprite = iForegroundSprite % WORLD_PATH_SPRITE_SET_SIZE;
+
+	if(iForegroundSprite == 0 || iForegroundSprite >= WORLD_FOREGROUND_STAGE_OFFSET)
 		return;
 
 	for(short iAutoRow = iRow - 1; iAutoRow <= iRow + 1; iAutoRow++)
@@ -1239,13 +1242,20 @@ void AutoSetPathSprite(short iCol, short iRow)
 				if(iAutoRow >= 0 && iAutoRow < iWorldHeight && iAutoCol >= 0 && iAutoCol < iWorldWidth)
 				{
 					iForegroundSprite = g_worldmap.tiles[iAutoCol][iAutoRow].iForegroundSprite;
-					if((iForegroundSprite >= 1 && iForegroundSprite <= 18) || 
-						(iForegroundSprite >= WORLD_BRIDGE_SPRITE_OFFSET && iForegroundSprite <= WORLD_BRIDGE_SPRITE_OFFSET + 3) || 
+					
+					if((iForegroundSprite >= WORLD_BRIDGE_SPRITE_OFFSET && iForegroundSprite <= WORLD_BRIDGE_SPRITE_OFFSET + 3) || 
 						(iForegroundSprite >= WORLD_FOREGROUND_STAGE_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_STAGE_OFFSET + 399) ||
 						(iForegroundSprite >= WORLD_FOREGROUND_SPRITE_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_SPRITE_OFFSET + 179) ||
 						(iForegroundSprite >= WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET + 29) ||
 						(iForegroundSprite >= WORLD_START_SPRITE_OFFSET && iForegroundSprite <= WORLD_START_SPRITE_OFFSET + 1))
 						iPath += 1 << iNeighborIndex;
+					else if(iForegroundSprite >= 0 && iForegroundSprite < WORLD_FOREGROUND_STAGE_OFFSET)
+					{
+						short iPathSprite = iForegroundSprite % WORLD_PATH_SPRITE_SET_SIZE;
+							
+						if(iPathSprite >= 1 && iPathSprite <= 18)
+							iPath += 1 << iNeighborIndex;
+					}
 				}
 				
 				iNeighborIndex++;
@@ -1254,13 +1264,19 @@ void AutoSetPathSprite(short iCol, short iRow)
 	}
 
 	//#1 == -  2 == |  3 == -o  4 == !  5 == -`  6 == o
-	g_worldmap.tiles[iCol][iRow].iForegroundSprite = AdjustForeground(iPathTypes[iPath], iCol, iRow);
+	g_worldmap.tiles[iCol][iRow].iForegroundSprite = AdjustForeground(iPathTypes[iPath] + iForegroundStyle * WORLD_PATH_SPRITE_SET_SIZE, iCol, iRow);
 }
 
 //Convert foreground sprite to match the background sprite
 short AdjustForeground(short iSprite, short iCol, short iRow)
 {
-	short iBackgroundSprite = g_worldmap.tiles[iCol][iRow].iBackgroundSprite;
+	if(iSprite >= WORLD_FOREGROUND_STAGE_OFFSET)
+		return iSprite;
+
+	short iBackgroundSprite = g_worldmap.tiles[iCol][iRow].iBackgroundSprite % WORLD_BACKGROUND_SPRITE_SET_SIZE;
+
+	short iPathStyle = iSprite / WORLD_PATH_SPRITE_SET_SIZE;
+	iSprite %= WORLD_PATH_SPRITE_SET_SIZE;
 
 	//Convert already adjusted sprites back to their "base" sprite 
 	if(iSprite >= 11 && iSprite <= 18)
@@ -1269,7 +1285,7 @@ short AdjustForeground(short iSprite, short iCol, short iRow)
 		iSprite -= 4;
 	
 	if(iBackgroundSprite == 1)
-		return iSprite;
+		return iSprite + iPathStyle * WORLD_PATH_SPRITE_SET_SIZE;
 
 	if(iSprite == 2 && (iBackgroundSprite == 12 || iBackgroundSprite == 20 || iBackgroundSprite == 23 || 
 		iBackgroundSprite == 24 || iBackgroundSprite == 27 || iBackgroundSprite == 32 || iBackgroundSprite == 36 ||
@@ -1305,7 +1321,6 @@ short AdjustForeground(short iSprite, short iCol, short iRow)
 	{
 		iSprite = 11;	
 	}
-
 	else
 	{
 		if(iSprite == 1 || iSprite == 2)
@@ -1314,7 +1329,7 @@ short AdjustForeground(short iSprite, short iCol, short iRow)
 			iSprite += 4;
 	}
 
-	return iSprite;
+	return iSprite + iPathStyle * WORLD_PATH_SPRITE_SET_SIZE;
 }
 
 
@@ -2190,10 +2205,10 @@ int editor_pathsprite()
 						short iButtonX = event.button.x / TILESIZE;
 						short iButtonY = event.button.y / TILESIZE;
 
-						if(iButtonX >= 0 && iButtonX < 1)
+						if(iButtonX >= 0 && iButtonX < 8)
 						{
 							if(iButtonY >= 0 && iButtonY < 6)
-								set_tile = iButtonY + 1;
+								set_tile = iButtonY + 1 + iButtonX * WORLD_PATH_SPRITE_SET_SIZE;
 						}
 
 						ignoreclick = true;
@@ -2211,7 +2226,10 @@ int editor_pathsprite()
 
 		SDL_FillRect(screen, NULL, 0x0);
 
-		spr_pathtiles[0].draw(0, 0, 0, 0, 32, 192);
+		for(short iPath = 0; iPath < 8; iPath++)
+		{
+			spr_pathtiles[0].draw(iPath << 5, 0, (iPath % 4) * 160, (iPath / 4) * 320, 32, 192);
+		}
 
 		SDL_Flip(screen);
 
@@ -2390,60 +2408,50 @@ int display_help()
 	int offsetx = 50;
 	menu_font_small.draw(offsetx, offsety, "Modes:");
 	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[t] - Tile Mode");
+	menu_font_small.draw(offsetx, offsety, "[1] - Water Mode");
 	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[i] - Block Mode");
+	menu_font_small.draw(offsetx, offsety, "[2] - Land Mode");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[3] - Objects Mode");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[4] - Path Mode");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[p] - Connection Mode");
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[w] - Warp Mode");
 	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[m] - Move Mode");
+	menu_font_small.draw(offsetx, offsety, "[v] - Vehicle");
 	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[l] - Tile Type Mode");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[p] - Platform Mode");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[x] - No Player Spawn Area");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[z] - No Item Spawn Area");
-	offsety += menu_font_small.getHeight() + 20;
-
-	menu_font_small.draw(offsetx, offsety, "Layers:");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[v] - Hide Blocks");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[y] - Select Active Tile Layer");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[u] - Hide Inactive Tile Layers");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[o] - Optimize Layers");
+	menu_font_small.draw(offsetx, offsety, "[t] - Stages and Doors");
 	offsety += menu_font_small.getHeight() + 20;
 
 	menu_font_small.draw(offsetx, offsety, "File:");
 	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[n] - New Map");
+	menu_font_small.draw(offsetx, offsety, "[n] - New World");
 	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[s] - Save Map");
+	menu_font_small.draw(offsetx, offsety, "[s] - Save World");
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[shift] + [s] - Save As");
 	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[f] - Find Map");
+	menu_font_small.draw(offsetx, offsety, "[f] - Find World");
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[shift] + [f] - New Search");
 	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[pageup] - Go To Previous Map");
+	menu_font_small.draw(offsetx, offsety, "[pageup] - Go To Previous World");
 	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[pagedown] - Go To Next Map");
+	menu_font_small.draw(offsetx, offsety, "[pagedown] - Go To Next World");
 
 	offsetx = 320;
 	offsety = 55;
 
-	menu_font_small.draw(offsetx, offsety, "Tile, Warp and Block Modes:");
+	menu_font_small.draw(offsetx, offsety, "Place Tiles:");
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[Left Mouse Button] - Place Item");
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[Right Mouse Button] - Remove Item");
 	offsety += menu_font_small.getHeight() + 20;
 
+	/*
 	menu_font_small.draw(offsetx, offsety, "Move Mode:");
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[Right Mouse Button] - Select Area");
@@ -2460,29 +2468,18 @@ int display_help()
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[c] - Copy Selection");
 	offsety += menu_font_small.getHeight() + 20;
-
-	menu_font_small.draw(offsetx, offsety, "Platforms:");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[p] - Path");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[+/-] - Change Speed");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[delete] - Delete");
-	offsety += menu_font_small.getHeight() + 20;
+	*/
 
 	menu_font_small.draw(offsetx, offsety, "Miscellaneous:");
 	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[b] - Background Thumbnails");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[g] - Change Backgrounds");
-	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[r] - Change Music Category");
 	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[e] - Change Floating Eyecandy");
+	menu_font_small.draw(offsetx, offsety, "[Arrow Keys] - Navigate World");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[a] - Automatic Path/Land");
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[ctrl] + [delete] - Clear All");
 	offsety += menu_font_small.getHeight() + 2;
-
 
 	SDL_Flip(screen);
 
@@ -2784,6 +2781,24 @@ int new_world()
 		savecurrentworld();
 		loadcurrentworld();
 	}
+
+	std::vector<WorldVehicle*>::iterator itrVehicle = vehiclelist.begin(), limVehicle = vehiclelist.end();
+	while(itrVehicle != limVehicle)
+	{
+		delete (*itrVehicle);
+		itrVehicle++;
+	}
+
+	vehiclelist.clear();
+
+	std::vector<WorldWarp*>::iterator itrWarp = warplist.begin(), limWarp = warplist.end();
+	while(itrWarp != limWarp)
+	{
+		delete (*itrWarp);
+		itrWarp++;
+	}
+
+	warplist.clear();
 
 	return 0;
 }
