@@ -202,7 +202,7 @@ bool sfxMusic::load(const string& filename)
 
 void sfxMusic::play(bool fPlayonce, bool fResume)
 {
-	Mix_PlayMusic(music, (fPlayonce ? 0 : -1));
+	Mix_PlayMusic(music, fPlayonce ? 0 : -1);
 	fResumeMusic = fResume;
 }
 

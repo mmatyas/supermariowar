@@ -69,6 +69,7 @@ bool LoadMenuGraphics()
 	_load_gfxck(menu_player_select, convertPath("gfx/packs/menu/menu_player_select.png", graphicspack));
 	_load_gfxck(menu_dialog, convertPath("gfx/packs/menu/menu_dialog.png", graphicspack));
 	_load_gfxck(menu_map_filter, convertPath("gfx/packs/menu/menu_map_filter.png", graphicspack));
+	_load_gfxck(menu_match_select, convertPath("gfx/packs/menu/menu_match_select.png", graphicspack));
 
 	_load_gfxck(menu_mode_small, convertPath("gfx/packs/menu/menu_mode_small.png", graphicspack));
 	_load_gfxck(menu_mode_large, convertPath("gfx/packs/menu/menu_mode_large.png", graphicspack));

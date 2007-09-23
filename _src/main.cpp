@@ -80,6 +80,7 @@ gfxSprite		menu_version;
 gfxSprite		menu_plain_field;
 gfxSprite		menu_player_select;
 gfxSprite		menu_map_filter;
+gfxSprite		menu_match_select;
 gfxSprite		menu_dialog;
 gfxSprite		menu_slider_bar;
 gfxSprite		menu_stomp;
@@ -320,7 +321,7 @@ sfxSound sfx_bowserlaugh;
 sfxSound sfx_gameover;
 sfxSound sfx_stun;
 
-sfxMusic backgroundmusic[5];
+sfxMusic backgroundmusic[6];
 
 CGameMode	*gamemodes[GAMEMODE_LAST];
 CGM_Bonus	*bonushousemode = NULL;
@@ -339,6 +340,7 @@ MapList maplist;
 SkinList skinlist;
 AnnouncerList announcerlist;
 MusicList musiclist;
+WorldMusicList worldmusiclist;
 GraphicsList menugraphicspacklist;
 GraphicsList gamegraphicspacklist;
 SoundsList soundpacklist;
@@ -532,7 +534,7 @@ void DECLSPEC musicfinished()
 		if(game_values.playnextmusic)
 		{
 			musiclist.SetNextMusic(g_map.musicCategoryID, maplist.currentShortmapname(), g_map.szBackgroundFile);
-			backgroundmusic[0].load(musiclist.GetCurrentMusic());
+			backgroundmusic[0].load(musiclist.GetCurrentMusic()); //In Game Music
 		}
 
 		backgroundmusic[0].play(game_values.playnextmusic, false);

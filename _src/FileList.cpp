@@ -53,7 +53,7 @@ void SimpleFileList::next()
 		currentIndex = 0;
 	else
 		currentIndex++;
-};
+}
 
 void SimpleFileList::prev()
 {
@@ -64,7 +64,7 @@ void SimpleFileList::prev()
 		currentIndex = filelist.size() - 1;
 	else
 		currentIndex--;
-};
+}
 
 const char * SimpleFileList::GetIndex(unsigned int index)
 {
@@ -169,7 +169,7 @@ SimpleDirectoryList::SimpleDirectoryList(const std::string &path)
 ///////////// MusicList ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 MusicList::MusicList()
 {
-	DirectoryListing d(convertPath("music/"));
+	DirectoryListing d(convertPath("music/game/"));
 	std::string currentdir;
 	while(d.NextDirectory(currentdir))
 	{
@@ -195,6 +195,8 @@ MusicList::~MusicList()
 	{
 		delete entries[i];
 	}
+
+	entries.clear();
 }
 
 string MusicList::GetMusic(int musicID)
@@ -224,7 +226,7 @@ void MusicList::next()
 		currentIndex = 0;
 	else
 		currentIndex++;
-};
+}
 
 void MusicList::prev()
 {
@@ -232,7 +234,7 @@ void MusicList::prev()
 		currentIndex = entries.size()-1;
 	else
 		currentIndex--;
-};
+}
 		
 
 ///////////// MusicEntry ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -484,7 +486,7 @@ MusicEntry::MusicEntry(const std::string & musicdirectory)
 			printf("%d\n", songsforcategory[i][k]);
 	}
 	*/
-};
+}
 
 
 
@@ -564,3 +566,172 @@ string MusicEntry::GetNextMusic(int iMusicCategory, const char * szMapName, cons
 	return songFileNames[4];
 }
 
+
+
+///////////// MusicList ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+WorldMusicList::WorldMusicList()
+{
+	DirectoryListing d(convertPath("music/world/"));
+	std::string currentdir;
+	while(d.NextDirectory(currentdir))
+	{
+		WorldMusicEntry *m = new WorldMusicEntry(d.fullName(currentdir));
+		if (!m->fError)
+			entries.push_back(m);
+		else
+			delete m;
+	}
+	
+	if(entries.empty())
+	{
+		printf("ERROR: Empty Music directory!\n");
+		exit(0);
+	}
+
+	currentIndex = 0;
+}
+
+WorldMusicList::~WorldMusicList()
+{
+	for(unsigned int i = 0; i < entries.size(); i++)
+	{
+		delete entries[i];
+	}
+
+	entries.clear();
+}
+
+string WorldMusicList::GetMusic(int musicID)
+{
+	return entries[currentIndex]->GetMusic(musicID);
+}
+
+string WorldMusicList::GetCurrentMusic()
+{
+	return CurrentMusic;
+}
+
+
+void WorldMusicList::next()
+{
+	if(currentIndex+1 == int(entries.size()))
+		currentIndex = 0;
+	else
+		currentIndex++;
+}
+
+void WorldMusicList::prev()
+{
+	if(currentIndex == 0)
+		currentIndex = entries.size()-1;
+	else
+		currentIndex--;
+}
+		
+
+///////////// WorldMusicEntry ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+WorldMusicEntry::WorldMusicEntry(const std::string & musicdirectory)
+{
+	fError = false;
+	iCurrentMusic = 0;
+
+	int i, k;
+
+	char * szDir = (char*)(musicdirectory.c_str());
+	
+	char musiclistname[FILEBUFSIZE];
+#ifdef _XBOX
+	sprintf(musiclistname, szDir + 9);
+#else
+    char * p = strrchr(szDir, '/');
+    if (!p) p=szDir; else p++;
+    strcpy(musiclistname, p);
+#endif
+
+	for(i = (int)strlen(musiclistname); i >= 0; i--)
+	{
+		if(musiclistname[i] == '.')
+		{
+			musiclistname[i] = '\0';
+			break;
+		}
+	}
+
+	name = musiclistname;
+
+	std::string musicfile = musicdirectory + getDirectorySeperator() + std::string("Music.txt");
+
+	FILE * in = fopen(musicfile.c_str(), "r");
+
+	if(!in)
+	{
+		printf("Error: Could not open: %s\n", musicfile.c_str());
+		fError = true;
+		return;
+	}
+
+	int iAddToCategory = -1;
+	char szBuffer[256];
+	while(fgets(szBuffer, 256, in))
+	{
+		//Ignore comment lines
+		if(szBuffer[0] == '#' || szBuffer[0] == ' ' || szBuffer[0] == '\t' || szBuffer[0] == '\n' || szBuffer[0] == '\r')
+			continue;
+
+		//Chop off line ending
+		int stringLength = strlen(szBuffer);
+		for(k = 0; k < stringLength; k++)
+		{
+			if(szBuffer[k] == '\r' || szBuffer[k] == '\n')
+			{
+				szBuffer[k] = '\0';
+				break;
+			}
+		}
+
+		//If we found a category header
+		if(szBuffer[0] == '[')
+		{
+			if(!stricmp(szBuffer, "[grass]"))
+				iAddToCategory = 0;
+			else if(!stricmp(szBuffer, "[desert]"))
+				iAddToCategory = 1;
+			else if(!stricmp(szBuffer, "[water]"))
+				iAddToCategory = 2;
+			else if(!stricmp(szBuffer, "[desert]"))
+				iAddToCategory = 3;
+			else if(!stricmp(szBuffer, "[sky]"))
+				iAddToCategory = 4;
+			else if(!stricmp(szBuffer, "[ice]"))
+				iAddToCategory = 5;
+			else if(!stricmp(szBuffer, "[pipe]"))
+				iAddToCategory = 6;
+			else if(!stricmp(szBuffer, "[dark]"))
+				iAddToCategory = 7;
+			else if(!stricmp(szBuffer, "[space]"))
+				iAddToCategory = 8;
+
+			continue;
+		}
+
+		if(iAddToCategory > -1 && iAddToCategory < MAXWORLDMUSICCATEGORY)
+		{
+			std::string sPath = musicdirectory + getDirectorySeperator() + convertPartialPath(std::string(szBuffer));
+
+			if(File_Exists(sPath.c_str()))
+				songFileNames[iAddToCategory] = sPath;
+		}
+	}
+
+	fclose(in);
+}
+
+
+
+string WorldMusicEntry::GetMusic(unsigned int musicID)
+{
+    if (musicID < 0 || musicID >= MAXWORLDMUSICCATEGORY)
+        return songFileNames[0];
+
+    return songFileNames[musicID];
+}

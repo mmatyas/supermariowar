@@ -194,6 +194,8 @@ class WorldMap
 
 		void SetInitialPowerups();
 
+		short GetMusicCategory() {return iMusicCategory;}
+
 	private:
 
 		void Cleanup();
@@ -214,6 +216,8 @@ class WorldMap
 
 		short iNumInitialBonuses;
 		short iInitialBonuses[32];
+
+		short iMusicCategory;
 
 	friend class MI_World;
 	friend class WorldVehicle;

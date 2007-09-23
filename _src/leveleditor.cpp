@@ -231,7 +231,7 @@ short g_iNumPlatforms = 0;
 MapPlatform g_Platforms[MAX_PLATFORMS];
 
 BackgroundList backgroundlist;
-extern char * g_szMusicCategoryNames[8];
+extern char * g_szMusicCategoryNames[MAXMUSICCATEGORY];
 extern char * g_szBackgroundConversion[26];
 extern short g_iMusicCategoryConversion[26];
 short g_musiccategorydisplaytimer = 0;

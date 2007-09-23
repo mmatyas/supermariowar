@@ -1814,6 +1814,8 @@ void CMap::AnimateTiles()
 	//For each animated tile
 	std::list<AnimatedTile*>::iterator iter = animatedtiles.begin(), lim = animatedtiles.end();
 	
+	//TODO:  Move this to an initialize function and carry these non changing vars as member variables
+	//This will only incur a one time setup cost instead of every animation update
 	short iBackgroundLayers = 2;
 	if(!game_values.toplayer)
 		iBackgroundLayers = 4;
@@ -1821,10 +1823,11 @@ void CMap::AnimateTiles()
 	SDL_Surface * animatedTileSurface = spr_tileanimation[0].getSurface();
 	SDL_Surface * tileSurface = tilesetsurface[0];
 
-	SDL_Surface * frontmap = spr_frontmap.getSurface();
-	SDL_Surface * backmap = spr_backmap.getSurface();
+	SDL_Surface * frontmapSurface = spr_frontmap.getSurface();
+	SDL_Surface * backmapSurface = spr_backmap.getSurface();
+	SDL_Surface * backgroundSurface = spr_background.getSurface();
 
-	int color = SDL_MapRGB(frontmap->format, 255, 0, 255);
+	int color = SDL_MapRGB(frontmapSurface->format, 255, 0, 255);
 
 	while (iter != lim)
 	{
@@ -1833,35 +1836,35 @@ void CMap::AnimateTiles()
 
 		if(tile->fBackgroundAnimated)
 		{
-			SDL_BlitSurface(spr_background.getSurface(), rDest, backmap, rDest);
+			SDL_BlitSurface(backgroundSurface, rDest, backmapSurface, rDest);
 
 			for(short iLayer = 0; iLayer < iBackgroundLayers; iLayer++)
 			{
 				short iTile = tile->layers[iLayer];
 				if(iTile < TILESETSIZE)
 				{
-					SDL_BlitSurface(tileSurface, &(tile->rSrc[iLayer][0]), backmap, rDest);
+					SDL_BlitSurface(tileSurface, &(tile->rSrc[iLayer][0]), backmapSurface, rDest);
 				}
 				else if(iTile > TILESETSIZE)
 				{
-					SDL_BlitSurface(animatedTileSurface, &(tile->rSrc[iLayer][iTileAnimationFrame]), backmap, rDest);
+					SDL_BlitSurface(animatedTileSurface, &(tile->rSrc[iLayer][iTileAnimationFrame]), backmapSurface, rDest);
 				}
 			}
 		}
 
 		if(tile->fForegroundAnimated)
 		{
-			SDL_FillRect(frontmap, rDest, color);
+			SDL_FillRect(frontmapSurface, rDest, color);
 			for(short iLayer = 2; iLayer < 4; iLayer++)
 			{
 				short iTile = tile->layers[iLayer];
 				if(iTile < TILESETSIZE)
 				{
-					SDL_BlitSurface(tileSurface, &(tile->rSrc[iLayer][0]), frontmap, rDest);
+					SDL_BlitSurface(tileSurface, &(tile->rSrc[iLayer][0]), frontmapSurface, rDest);
 				}
 				else if(iTile > TILESETSIZE)
 				{
-					SDL_BlitSurface(animatedTileSurface, &(tile->rSrc[iLayer][iTileAnimationFrame]), frontmap, rDest);
+					SDL_BlitSurface(animatedTileSurface, &(tile->rSrc[iLayer][iTileAnimationFrame]), frontmapSurface, rDest);
 				}
 			}
 		}

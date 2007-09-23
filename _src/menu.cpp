@@ -1022,19 +1022,19 @@ void Menu::CreateMenu()
 	// Match Selection Menu
 	//***********************
 
-	miSingleGameStartButton = new MI_Button(&spr_selectfield, 500, 60, "Start", 100, 0);
-	miSingleGameStartButton->SetCode(MENU_CODE_SINGLE_GAME_START);
+	miMatchSelectionStartButton = new MI_Button(&spr_selectfield, 270, 420, "Start", 100, 0);
+	miMatchSelectionStartButton->SetCode(MENU_CODE_MATCH_SELECTION_START);
 
-	miTournamentStartButton = new MI_Button(&spr_selectfield, 500, 180, "Start", 100, 0);
-	miTournamentStartButton->SetCode(MENU_CODE_TOURNAMENT_START);
+	miMatchSelectionField = new MI_SelectField(&spr_selectfield, 130, 340, "Match", 380, 100);
+	miMatchSelectionField->Add("Single Game", 0, "", false, false);
+	miMatchSelectionField->Add("Tournament", 1, "", false, false);
+	miMatchSelectionField->Add("Tour", 2, "", false, false);
+	miMatchSelectionField->Add("World", 3, "", false, false);
+	miMatchSelectionField->SetData(&game_values.matchtype, NULL, NULL);
+	miMatchSelectionField->SetKey(game_values.matchtype);
+	miMatchSelectionField->SetItemChangedCode(MENU_CODE_MATCH_SELECTION_MATCH_CHANGED);
 
-	miTourStartButton = new MI_Button(&spr_selectfield, 500, 300, "Start", 100, 0);
-	miTourStartButton->SetCode(MENU_CODE_TOUR_START);
-
-	miWorldStartButton = new MI_Button(&spr_selectfield, 500, 420, "Start", 100, 0);
-	miWorldStartButton->SetCode(MENU_CODE_WORLD_START);
-
-	miTournamentField = new MI_SelectField(&spr_selectfield, 80, 180, "Wins", 380, 100);
+	miTournamentField = new MI_SelectField(&spr_selectfield, 130, 380, "Wins", 380, 100);
 	miTournamentField->Add("2", 2, "", false, false);
 	miTournamentField->Add("3", 3, "", false, false);
 	miTournamentField->Add("4", 4, "", false, false);
@@ -1046,8 +1046,9 @@ void Menu::CreateMenu()
 	miTournamentField->Add("10", 10, "", false, false);
 	miTournamentField->SetData(&game_values.tournamentgames, NULL, NULL);
 	miTournamentField->SetKey(game_values.tournamentgames);
+	miTournamentField->Show(false);
 	
-	miTourField = new MI_SelectField(&spr_selectfield, 80, 300, "Tour", 380, 100);
+	miTourField = new MI_SelectField(&spr_selectfield, 130, 380, "Tour", 380, 100);
 	for(short iTour = 0; iTour < tourlist.GetCount(); iTour++)
 	{
 		GetNameFromFileName(szTemp, tourlist.GetIndex(iTour));
@@ -1056,8 +1057,9 @@ void Menu::CreateMenu()
 	}
 	miTourField->SetData(&game_values.tourindex, NULL, NULL);
 	miTourField->SetKey(game_values.tourindex);
+	miTourField->Show(false);
 
-	miWorldField = new MI_SelectField(&spr_selectfield, 80, 420, "World", 380, 100);
+	miWorldField = new MI_SelectField(&spr_selectfield, 130, 380, "World", 380, 100);
 	for(short iWorld = 0; iWorld < worldlist.GetCount(); iWorld++)
 	{
 		GetNameFromFileName(szTemp, worldlist.GetIndex(iWorld));
@@ -1065,27 +1067,28 @@ void Menu::CreateMenu()
 	}
 	miWorldField->SetData(&game_values.worldindex, NULL, NULL);
 	miWorldField->SetKey(game_values.worldindex);
+	miWorldField->Show(false);
 
 	miMatchSelectionMenuLeftHeaderBar = new MI_Image(&menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
 	miMatchSelectionMenuRightHeaderBar = new MI_Image(&menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
 	miMatchSelectionMenuHeaderText = new MI_Text("Match Type Menu", 320, 5, 0, 2, 1);
 
+	miMatchSelectionDisplayImage = new MI_Image(&menu_match_select, 160, 80, 0, 0, 320, 240, 1, 1, 0);
+
 	mMatchSelectionMenu.AddNonControl(miMatchSelectionMenuLeftHeaderBar);
 	mMatchSelectionMenu.AddNonControl(miMatchSelectionMenuRightHeaderBar);
 	mMatchSelectionMenu.AddNonControl(miMatchSelectionMenuHeaderText);
 
-	mMatchSelectionMenu.AddControl(miSingleGameStartButton, miWorldStartButton, miTournamentStartButton, miTournamentField, NULL);
-	mMatchSelectionMenu.AddControl(miTournamentStartButton, miSingleGameStartButton, miTourStartButton, miTournamentField, NULL);
-	mMatchSelectionMenu.AddControl(miTourStartButton, miTournamentStartButton, miWorldStartButton, miTourField, NULL);
-	mMatchSelectionMenu.AddControl(miWorldStartButton, miTourStartButton, miSingleGameStartButton, miWorldField, NULL);
-	mMatchSelectionMenu.AddControl(miTournamentField, miWorldField, miTourField, NULL, miTournamentStartButton);
-	mMatchSelectionMenu.AddControl(miTourField, miTournamentField, miWorldField, NULL, miTourStartButton);
-	mMatchSelectionMenu.AddControl(miWorldField, miTourField, miTournamentField, NULL, miWorldStartButton);
+	mMatchSelectionMenu.AddNonControl(miMatchSelectionDisplayImage);
 
-	mMatchSelectionMenu.SetHeadControl(miSingleGameStartButton);
+	mMatchSelectionMenu.AddControl(miMatchSelectionField, miMatchSelectionStartButton, miTournamentField, NULL, NULL);
+	mMatchSelectionMenu.AddControl(miTournamentField, miMatchSelectionField, miTourField, NULL, NULL);
+	mMatchSelectionMenu.AddControl(miTourField, miTournamentField, miWorldField, NULL, NULL);
+	mMatchSelectionMenu.AddControl(miWorldField, miTourField, miMatchSelectionStartButton, NULL, NULL);
+	mMatchSelectionMenu.AddControl(miMatchSelectionStartButton, miWorldField, miMatchSelectionField, NULL, NULL);
+
+	mMatchSelectionMenu.SetHeadControl(miMatchSelectionStartButton);
 	mMatchSelectionMenu.SetCancelCode(MENU_CODE_TO_MAIN_MENU);
-
-	UI_Menu mMatchSelectionMenu;
 
 	//***********************
 	// Game Settings
@@ -2288,10 +2291,12 @@ void Menu::RunMenu()
 	{
 		if(game_values.tournamentwinner < 0)
 		{
-			if(game_values.matchtype != MATCH_TYPE_SINGLE_GAME)
-				backgroundmusic[3].play(false, false);
-			else
+			if(game_values.matchtype == MATCH_TYPE_SINGLE_GAME)
 				backgroundmusic[2].play(false, false);
+			else if(game_values.matchtype == MATCH_TYPE_WORLD)
+				backgroundmusic[6].play(false, false);
+			else
+				backgroundmusic[3].play(false, false);
 		}
 	}
 
@@ -2463,33 +2468,21 @@ void Menu::RunMenu()
 				mCurrentMenu = &mMatchSelectionMenu;
 				mCurrentMenu->ResetMenu();
 			}
-			else if(MENU_CODE_SINGLE_GAME_START == code)
+			else if(MENU_CODE_MATCH_SELECTION_START == code)
 			{
-				game_values.matchtype = MATCH_TYPE_SINGLE_GAME;
 				miTeamSelect->Reset();
 				mCurrentMenu = &mTeamSelectMenu;
 				mCurrentMenu->ResetMenu();
 			}
-			else if(MENU_CODE_TOURNAMENT_START == code)
+			else if(MENU_CODE_MATCH_SELECTION_MATCH_CHANGED == code)
 			{
-				game_values.matchtype = MATCH_TYPE_TOURNAMENT;
-				miTeamSelect->Reset();
-				mCurrentMenu = &mTeamSelectMenu;
-				mCurrentMenu->ResetMenu();
-			}
-			else if(MENU_CODE_TOUR_START == code)
-			{
-				game_values.matchtype = MATCH_TYPE_TOUR;
-				miTeamSelect->Reset();
-				mCurrentMenu = &mTeamSelectMenu;
-				mCurrentMenu->ResetMenu();
-			}
-			else if(MENU_CODE_WORLD_START == code)
-			{
-				game_values.matchtype = MATCH_TYPE_WORLD;
-				miTeamSelect->Reset();
-				mCurrentMenu = &mTeamSelectMenu;
-				mCurrentMenu->ResetMenu();
+				miTournamentField->Show(game_values.matchtype == MATCH_TYPE_TOURNAMENT);
+				miTourField->Show(game_values.matchtype == MATCH_TYPE_TOUR);
+				miWorldField->Show(game_values.matchtype == MATCH_TYPE_WORLD);
+
+				miMatchSelectionDisplayImage->Show(game_values.matchtype != MATCH_TYPE_WORLD);
+				miMatchSelectionDisplayImage->SetImage(0, 240 * game_values.matchtype, 320, 240);
+
 			}
 			else if(MENU_CODE_TO_OPTIONS_MENU == code)
 			{
@@ -2657,8 +2650,8 @@ void Menu::RunMenu()
 					}
 					else if(MATCH_TYPE_WORLD == game_values.matchtype)
 					{
-						mCurrentMenu = &mWorldMenu;
-						mCurrentMenu->ResetMenu();
+						game_values.screenfadespeed = 8;
+						game_values.screenfade = 8;
 					}
 
 					//Setup items on next menu
@@ -3226,6 +3219,18 @@ void Menu::RunMenu()
 
 			return;
 		}
+		else if(game_values.screenfade == 255) //Fade to world match type
+		{
+			game_values.screenfadespeed = -8;
+
+			mCurrentMenu = &mWorldMenu;
+			mCurrentMenu->ResetMenu();
+
+			backgroundmusic[2].stop();
+			backgroundmusic[6].load(worldmusiclist.GetMusic(g_worldmap.GetMusicCategory()));
+			backgroundmusic[6].play(false, false);
+			fNeedMenuMusicReset = true;
+		}
 
 		if(fGenerateMapThumbs)
 		{
@@ -3438,9 +3443,9 @@ void Menu::StartGame()
 	if(game_values.loadedmusic != musiclist.GetCurrentIndex())
 	{
 		game_values.loadedmusic = (short)musiclist.GetCurrentIndex();
-		backgroundmusic[1].load(musiclist.GetMusic(0));
-		backgroundmusic[3].load(musiclist.GetMusic(2));
-		backgroundmusic[4].load(musiclist.GetMusic(3));
+		backgroundmusic[1].load(musiclist.GetMusic(0)); //Stage Clear
+		backgroundmusic[3].load(musiclist.GetMusic(2)); //Tournament Menu
+		backgroundmusic[4].load(musiclist.GetMusic(3)); //Tournament Over
 	}
 
 	backgroundmusic[2].stop();

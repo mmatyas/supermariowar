@@ -428,22 +428,27 @@ bool WorldMap::Load()
 
 			iReadType = 1;
 		}
-		else if(iReadType == 1) //world width
+		else if(iReadType == 1) //music category
 		{
-			iWidth = atoi(buffer);
+			iMusicCategory = atoi(buffer);
 			iReadType = 2;
 		}
-		else if(iReadType == 2) //world height
+		else if(iReadType == 2) //world width
+		{
+			iWidth = atoi(buffer);
+			iReadType = 3;
+		}
+		else if(iReadType == 3) //world height
 		{
 			iHeight = atoi(buffer);
-			iReadType = 3;
+			iReadType = 4;
 
 			tiles = new WorldMapTile*[iWidth];
 
 			for(short iCol = 0; iCol < iWidth; iCol++)
 				tiles[iCol] = new WorldMapTile[iHeight];
 		}
-		else if(iReadType == 3) //background sprites
+		else if(iReadType == 4) //background sprites
 		{
 			char * psz = strtok(buffer, ",\n");
 			
@@ -460,11 +465,11 @@ bool WorldMap::Load()
 
 			if(++iMapTileReadRow == iHeight)
 			{
-				iReadType = 4;
+				iReadType = 5;
 				iMapTileReadRow = 0;
 			}
 		}
-		else if(iReadType == 4) //background sprites
+		else if(iReadType == 5) //background sprites
 		{
 			char * psz = strtok(buffer, ",\n");
 			
@@ -486,11 +491,11 @@ bool WorldMap::Load()
 
 			if(++iMapTileReadRow == iHeight)
 			{
-				iReadType = 5;
+				iReadType = 6;
 				iMapTileReadRow = 0;
 			}
 		}
-		else if(iReadType == 5) //foreground sprites
+		else if(iReadType == 6) //foreground sprites
 		{
 			char * psz = strtok(buffer, ",\n");
 			
@@ -521,11 +526,11 @@ bool WorldMap::Load()
 
 			if(++iMapTileReadRow == iHeight)
 			{
-				iReadType = 6;
+				iReadType = 7;
 				iMapTileReadRow = 0;
 			}
 		}
-		else if(iReadType == 6) //path connections
+		else if(iReadType == 7) //path connections
 		{
 			char * psz = strtok(buffer, ",\n");
 			
@@ -542,7 +547,7 @@ bool WorldMap::Load()
 
 			if(++iMapTileReadRow == iHeight)
 			{
-				iReadType = 7;
+				iReadType = 8;
 				iMapTileReadRow = 0;
 
 				//1 == |  2 == -  3 == -!  4 == L  5 == ,-  6 == -,
@@ -558,7 +563,7 @@ bool WorldMap::Load()
 				}
 			}
 		}
-		else if(iReadType == 7) //stages
+		else if(iReadType == 8) //stages
 		{
 			char * psz = strtok(buffer, ",\n");
 			
@@ -584,11 +589,11 @@ bool WorldMap::Load()
 
 			if(++iMapTileReadRow == iHeight)
 			{
-				iReadType = 8;
+				iReadType = 9;
 				iMapTileReadRow = 0;
 			}
 		}
-		else if(iReadType == 8) //vehicle boundaries
+		else if(iReadType == 9) //vehicle boundaries
 		{
 			char * psz = strtok(buffer, ",\n");
 			
@@ -604,15 +609,15 @@ bool WorldMap::Load()
 			}
 
 			if(++iMapTileReadRow == iHeight)
-				iReadType = 9;
+				iReadType = 10;
 		}
-		else if(iReadType == 9) //number of stages
+		else if(iReadType == 10) //number of stages
 		{
 			iNumStages = atoi(buffer);
 			
-			iReadType = iNumStages == 0 ? 11 : 10;
+			iReadType = iNumStages == 0 ? 12 : 11;
 		}
-		else if(iReadType == 10) //stage details
+		else if(iReadType == 11) //stage details
 		{
 			TourStop * ts = ParseTourStopLine(buffer, iVersion, true);
 		
@@ -620,9 +625,9 @@ bool WorldMap::Load()
 			game_values.tourstoptotal++;
 
 			if(++iCurrentStage >= iNumStages)
-				iReadType = 11;
+				iReadType = 12;
 		}
-		else if(iReadType == 11) //number of warps
+		else if(iReadType == 12) //number of warps
 		{
 			iNumWarps = atoi(buffer);
 
@@ -632,9 +637,9 @@ bool WorldMap::Load()
 			if(iNumWarps > 0)
 				warps = new WorldWarp[iNumWarps];
 			
-			iReadType = iNumWarps == 0 ? 13 : 12;
+			iReadType = iNumWarps == 0 ? 14 : 13;
 		}
-		else if(iReadType == 12) //warp details
+		else if(iReadType == 13) //warp details
 		{
 			char * psz = strtok(buffer, ",\n");
 			
@@ -669,9 +674,9 @@ bool WorldMap::Load()
 			tiles[iCol2][iRow2].iWarp = iCurrentWarp;
 
 			if(++iCurrentWarp >= iNumWarps)
-				iReadType = 13;
+				iReadType = 14;
 		}
-		else if(iReadType == 13) //number of vehicles
+		else if(iReadType == 14) //number of vehicles
 		{
 			iNumVehicles = atoi(buffer);
 
@@ -681,9 +686,9 @@ bool WorldMap::Load()
 			if(iNumVehicles > 0)
 				vehicles = new WorldVehicle[iNumVehicles];
 
-			iReadType = iNumVehicles == 0 ? 15 : 14;
+			iReadType = iNumVehicles == 0 ? 16 : 15;
 		}
-		else if(iReadType == 14) //moving objects
+		else if(iReadType == 15) //moving objects
 		{
 			char * psz = strtok(buffer, ",\n");
 			
@@ -732,9 +737,9 @@ bool WorldMap::Load()
 			vehicles[iCurrentVehicle].Init(iCol, iRow, iStage, iSprite, iMinMoves, iMaxMoves, fSpritePaces, iInitialDirection, iBoundary);
 
 			if(++iCurrentVehicle >= iNumVehicles)
-				iReadType = 15;
+				iReadType = 16;
 		}
-		else if(iReadType == 15) //initial bonus items
+		else if(iReadType == 16) //initial bonus items
 		{
 			char * psz = strtok(buffer, ",\n");
 
@@ -765,7 +770,7 @@ bool WorldMap::Load()
 				psz = strtok(NULL, ",\n");
 			}
 
-			iReadType = 16;
+			iReadType = 17;
 		}
 	}
 
@@ -773,7 +778,7 @@ RETURN:
 
 	fclose(file);
 
-	return iReadType == 16;
+	return iReadType == 17;
 }
 
 void WorldMap::SetTileConnections(short iCol, short iRow)
@@ -848,6 +853,9 @@ bool WorldMap::Save(const char * szPath)
 
 	fprintf(file, "#Version\n");
 	fprintf(file, "%d.%d.%d.%d\n\n", g_iVersion[0], g_iVersion[1], g_iVersion[2], g_iVersion[3]);
+
+	fprintf(file, "#Music Category\n");
+	fprintf(file, "%d\n\n", iMusicCategory);
 
 	fprintf(file, "#Width\n");
 	fprintf(file, "%d\n\n", iWidth);

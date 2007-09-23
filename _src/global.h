@@ -135,6 +135,7 @@ struct STextAward
 #define TILEANIMATIONSIZE	13		//number of tile animations
 
 #define MAXMUSICCATEGORY	11
+#define MAXWORLDMUSICCATEGORY	9
 #define MAXCATEGORYTRACKS	64
 
 #define MAXEYECANDY		192
@@ -313,7 +314,7 @@ extern sfxSound			sfx_bowserlaugh;
 extern sfxSound			sfx_gameover;
 extern sfxSound			sfx_stun;
 
-extern sfxMusic			backgroundmusic[5];
+extern sfxMusic			backgroundmusic[6];
 
 extern gfxSprite        spr_tanooki, spr_statue;
 extern gfxSprite		spr_starpowerup;
@@ -456,6 +457,7 @@ extern gfxSprite		menu_slider_bar;
 extern gfxSprite		menu_plain_field;
 extern gfxSprite		menu_player_select;
 extern gfxSprite		menu_map_filter;
+extern gfxSprite		menu_match_select;
 extern gfxSprite		menu_dialog;
 extern gfxSprite		menu_stomp;
 extern gfxSprite		menu_survival;
@@ -492,6 +494,7 @@ extern MapList maplist;
 extern SkinList skinlist;
 extern AnnouncerList announcerlist;
 extern MusicList musiclist;
+extern WorldMusicList worldmusiclist;
 extern GraphicsList menugraphicspacklist;
 extern GraphicsList gamegraphicspacklist;
 extern SoundsList soundpacklist;

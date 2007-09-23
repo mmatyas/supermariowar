@@ -182,7 +182,7 @@ bool ignoreclick = false;
 
 char findstring[FILEBUFSIZE] = "";
 
-extern char * g_szMusicCategoryNames[8];
+extern char * g_szWorldMusicCategoryNames[MAXWORLDMUSICCATEGORY];
 short g_musiccategorydisplaytimer = 0;
 
 //Vehicle stuff
@@ -423,14 +423,13 @@ int editor_edit()
 					if(event.key.keysym.sym == SDLK_a)
 						fAutoPaint = !fAutoPaint;
 					
-					/*
 					if(event.key.keysym.sym == SDLK_r)
 					{
-						if(g_musiccategorydisplaytimer > 0 && ++g_map.musicCategoryID >= MAXMUSICCATEGORY)
-							g_map.musicCategoryID = 0;
+						if(g_musiccategorydisplaytimer > 0 && ++g_worldmap.iMusicCategory >= MAXWORLDMUSICCATEGORY)
+							g_worldmap.iMusicCategory = 0;
 						
 						g_musiccategorydisplaytimer = 90;
-					}*/
+					}
 					
 					if(event.key.keysym.sym == SDLK_s )
 					{
@@ -932,16 +931,15 @@ int editor_edit()
 		menu_font_small.drawRightJustified(640, 0, worldlist.current_name());
 		
 
-		/*
 		if(--g_musiccategorydisplaytimer > 0)
 		{
 			spr_dialog.draw(224, 176);
 			menu_font_small.drawCentered(320, 195, "Music Category");
-			menu_font_large.drawCentered(320, 220, g_szMusicCategoryNames[g_map.musicCategoryID]);
+			menu_font_large.drawCentered(320, 220, g_szWorldMusicCategoryNames[g_worldmap.iMusicCategory]);
 
 			menu_font_small.drawCentered(320, 255, "Press 'R' Again");
 			menu_font_small.drawCentered(320, 270, "To Change");
-		}*/
+		}
 		
 		SDL_Flip(screen);
 
@@ -2358,17 +2356,17 @@ int editor_path()
 				{
 					if(event.button.button == SDL_BUTTON_LEFT)
 					{
-						short iButtonX = event.button.x;
-						short iButtonY = event.button.y;
+						short iButtonX = event.button.x / TILESIZE;
+						short iButtonY = event.button.y / TILESIZE;
 
-						if(iButtonX >= 0 && iButtonX < 352 && iButtonY >= 0 && iButtonY < TILESIZE)
+						if(iButtonX >= 0 && iButtonX <= 15 && iButtonY == 0)
 						{
-							set_tile = iButtonX / TILESIZE + 1;
+							set_tile = iButtonX + 1;
+
+							ignoreclick = true;
+							edit_mode = 2;
+							return EDITOR_EDIT;
 						}
-						
-						ignoreclick = true;
-						edit_mode = 2;
-						return EDITOR_EDIT;
 					}
 					
 					break;
@@ -2380,7 +2378,7 @@ int editor_path()
 		}
 
 		SDL_FillRect(screen, NULL, 0x0);
-		spr_path.draw(0, 0, 0, 0, 352, 32);
+		spr_path.draw(0, 0, 0, 0, 480, 32);
 
 		SDL_Flip(screen);
 

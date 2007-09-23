@@ -210,3 +210,47 @@ class MusicList
         int currentIndex;
 };
 
+class WorldMusicEntry
+{
+    public:
+        WorldMusicEntry(const std::string & musicdirectory);
+		~WorldMusicEntry() {}
+
+        std::string GetMusic(unsigned int musicID);
+
+        std::string songFileNames[MAXWORLDMUSICCATEGORY];
+        std::string name;
+		unsigned short iCurrentMusic;
+
+        bool fError;
+};
+
+class WorldMusicList
+{
+    public:
+		WorldMusicList();
+		~WorldMusicList();
+
+		std::string GetMusic(int musicID);
+		std::string GetCurrentMusic();
+
+		int GetCurrentIndex(){return currentIndex;}
+		void SetCurrent(unsigned int index)
+		{
+			if(index < entries.size())
+				currentIndex = index;
+			else
+				currentIndex = 0;
+		};
+
+		const char * current_name(){return entries[currentIndex]->name.c_str();}
+		void next();
+		void prev();
+		void random() {currentIndex = rand()%entries.size();}
+
+    private:
+        std::string CurrentMusic;
+        std::vector<WorldMusicEntry*> entries;
+        int currentIndex;
+};
+
