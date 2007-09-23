@@ -91,7 +91,7 @@ void Menu::WriteGameOptions()
 		fwrite(&game_values.screenResizeH, sizeof(float), 1, fp);
 #endif
 
-		unsigned char abyte[27];
+		unsigned char abyte[28];
 		abyte[0] = (unsigned char) game_values.spawnstyle;
 		abyte[1] = (unsigned char) game_values.awardstyle;
 		abyte[2] = (unsigned char) announcerlist.GetCurrentIndex();
@@ -106,20 +106,21 @@ void Menu::WriteGameOptions()
 		abyte[11] = (unsigned char) game_values.soundvolume;
 		abyte[12] = (unsigned char) game_values.respawn;
 		abyte[13] = (unsigned char) musiclist.GetCurrentIndex();
-		abyte[14] = (unsigned char) game_values.outofboundstime;
-		abyte[15] = (unsigned char) game_values.cpudifficulty;
-		abyte[16] = (unsigned char) menugraphicspacklist.GetCurrentIndex();
-		abyte[17] = (unsigned char) soundpacklist.GetCurrentIndex();
-		abyte[18] = (unsigned char) game_values.framelimiter;
-		abyte[19] = (unsigned char) game_values.bonuswheel;
-		abyte[20] = (unsigned char) game_values.keeppowerup;
-		abyte[21] = (unsigned char) game_values.showwinningcrown;
-		abyte[22] = (unsigned char) game_values.playnextmusic;
-		abyte[23] = (unsigned char) game_values.pointspeed;
-		abyte[24] = (unsigned char) game_values.swapstyle;
-		abyte[25] = (unsigned char) gamegraphicspacklist.GetCurrentIndex();
-		abyte[26] = (unsigned char) game_values.secrets;
-		fwrite(abyte, sizeof(unsigned char), 27, fp); 
+		abyte[14] = (unsigned char) worldmusiclist.GetCurrentIndex();
+		abyte[15] = (unsigned char) game_values.outofboundstime;
+		abyte[16] = (unsigned char) game_values.cpudifficulty;
+		abyte[17] = (unsigned char) menugraphicspacklist.GetCurrentIndex();
+		abyte[18] = (unsigned char) soundpacklist.GetCurrentIndex();
+		abyte[19] = (unsigned char) game_values.framelimiter;
+		abyte[20] = (unsigned char) game_values.bonuswheel;
+		abyte[21] = (unsigned char) game_values.keeppowerup;
+		abyte[22] = (unsigned char) game_values.showwinningcrown;
+		abyte[23] = (unsigned char) game_values.playnextmusic;
+		abyte[24] = (unsigned char) game_values.pointspeed;
+		abyte[25] = (unsigned char) game_values.swapstyle;
+		abyte[26] = (unsigned char) gamegraphicspacklist.GetCurrentIndex();
+		abyte[27] = (unsigned char) game_values.secrets;
+		fwrite(abyte, sizeof(unsigned char), 28, fp); 
 
 		fwrite(&game_values.spawninvincibility, sizeof(short), 1, fp);
 		fwrite(&game_values.itemrespawntime, sizeof(short), 1, fp);

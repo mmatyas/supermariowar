@@ -915,8 +915,8 @@ int main(int argc, char *argv[])
 				SDL_XBOX_SetScreenStretch(game_values.screenResizeW, game_values.screenResizeH);
 			#endif
 
-			unsigned char abyte[27];
-			fread(abyte, sizeof(unsigned char), 27, fp);
+			unsigned char abyte[28];
+			fread(abyte, sizeof(unsigned char), 28, fp);
 			game_values.spawnstyle = (short) abyte[0];
 			game_values.awardstyle = (short) abyte[1];
 			game_values.friendlyfire = ((short)abyte[3] > 0 ? true : false);
@@ -929,16 +929,16 @@ int main(int argc, char *argv[])
 			game_values.musicvolume = (short)abyte[10];
 			game_values.soundvolume = (short)abyte[11];
 			game_values.respawn = (short)abyte[12];
-			game_values.outofboundstime = (short)abyte[14];
-			game_values.cpudifficulty = (short)abyte[15];
-			game_values.framelimiter = (short)abyte[18];
-			game_values.bonuswheel = (short)abyte[19];
-			game_values.keeppowerup = ((short)abyte[20] > 0 ? true : false);
-			game_values.showwinningcrown = ((short)abyte[21] > 0 ? true : false);
-			game_values.playnextmusic = ((short)abyte[22] > 0 ? true : false);
-			game_values.pointspeed = (short)abyte[23];
-			game_values.swapstyle = (short)abyte[24];
-			game_values.secrets = ((short)abyte[26] > 0 ? true : false);
+			game_values.outofboundstime = (short)abyte[15];
+			game_values.cpudifficulty = (short)abyte[16];
+			game_values.framelimiter = (short)abyte[19];
+			game_values.bonuswheel = (short)abyte[20];
+			game_values.keeppowerup = ((short)abyte[21] > 0 ? true : false);
+			game_values.showwinningcrown = ((short)abyte[22] > 0 ? true : false);
+			game_values.playnextmusic = ((short)abyte[23] > 0 ? true : false);
+			game_values.pointspeed = (short)abyte[24];
+			game_values.swapstyle = (short)abyte[25];
+			game_values.secrets = ((short)abyte[27] > 0 ? true : false);
 			
 			fread(&game_values.spawninvincibility, sizeof(short), 1, fp);
 			fread(&game_values.itemrespawntime, sizeof(short), 1, fp);
@@ -1005,9 +1005,10 @@ int main(int argc, char *argv[])
 
 			announcerlist.SetCurrent((short) abyte[2]);
 			musiclist.SetCurrent((short) abyte[13]);
-			menugraphicspacklist.SetCurrent((short) abyte[16]);
-			gamegraphicspacklist.SetCurrent((short) abyte[25]);
-			soundpacklist.SetCurrent((short) abyte[17]);
+			musiclist.SetCurrent((short) abyte[14]);
+			menugraphicspacklist.SetCurrent((short) abyte[17]);
+			gamegraphicspacklist.SetCurrent((short) abyte[26]);
+			soundpacklist.SetCurrent((short) abyte[18]);
 
 			sfx_setmusicvolume(game_values.musicvolume);
 			sfx_setsoundvolume(game_values.soundvolume);
