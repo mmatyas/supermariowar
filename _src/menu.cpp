@@ -289,7 +289,7 @@ void Menu::CreateMenu()
 	miGraphicsOptionsMenuButton = new MI_Button(&spr_selectfield, 120, 280, "Graphics", 400, 1);
 	miGraphicsOptionsMenuButton->SetCode(MENU_CODE_TO_GRAPHICS_OPTIONS_MENU);
 	
-	miSoundOptionsMenuButton = new MI_Button((game_values.soundcapable ? &spr_selectfield : &spr_selectfielddisabled), 120, 320, "Sound", 400, 1);
+	miSoundOptionsMenuButton = new MI_Button((game_values.soundcapable ? &spr_selectfield : &spr_selectfielddisabled), 120, 320, "Music & Sound", 400, 1);
 	
 	if(game_values.soundcapable)
 		miSoundOptionsMenuButton->SetCode(MENU_CODE_TO_SOUND_OPTIONS_MENU);
@@ -637,7 +637,7 @@ void Menu::CreateMenu()
 	// Sound Options
 	//***********************
 
-	miSoundVolumeField = new MI_SliderField(&spr_selectfield, &menu_slider_bar, 120, 120, "Sound", 400, 150, 384);
+	miSoundVolumeField = new MI_SliderField(&spr_selectfield, &menu_slider_bar, 120, 100, "Sound", 400, 160, 384);
 	miSoundVolumeField->Add("Off", 0, "", false, false);
 	miSoundVolumeField->Add("1", 16, "", false, false);
 	miSoundVolumeField->Add("2", 32, "", false, false);
@@ -652,7 +652,7 @@ void Menu::CreateMenu()
 	miSoundVolumeField->SetNoWrap(true);
 	miSoundVolumeField->SetItemChangedCode(MENU_CODE_SOUND_VOLUME_CHANGED);
 	
-	miMusicVolumeField = new MI_SliderField(&spr_selectfield, &menu_slider_bar, 120, 160, "Music", 400, 150, 384);
+	miMusicVolumeField = new MI_SliderField(&spr_selectfield, &menu_slider_bar, 120, 140, "Music", 400, 160, 384);
 	miMusicVolumeField->Add("Off", 0, "", false, false);
 	miMusicVolumeField->Add("1", 16, "", false, false);
 	miMusicVolumeField->Add("2", 32, "", false, false);
@@ -667,16 +667,37 @@ void Menu::CreateMenu()
 	miMusicVolumeField->SetNoWrap(true);
 	miMusicVolumeField->SetItemChangedCode(MENU_CODE_MUSIC_VOLUME_CHANGED);
 
-	miPlayNextMusicField = new MI_SelectField(&spr_selectfield, 120, 200, "Next Music", 400, 150);
+	miPlayNextMusicField = new MI_SelectField(&spr_selectfield, 120, 180, "Next Music", 400, 160);
 	miPlayNextMusicField->Add("Off", 0, "", false, false);
 	miPlayNextMusicField->Add("On", 1, "", true, false);
 	miPlayNextMusicField->SetData(NULL, NULL, &game_values.playnextmusic);
 	miPlayNextMusicField->SetKey(game_values.playnextmusic ? 1 : 0);
 	miPlayNextMusicField->SetAutoAdvance(true);
 
-	miAnnouncerField = new MI_AnnouncerField(&spr_selectfield, 120, 240, "Announcer", 400, 150, &announcerlist);
-	miPlaylistField = new MI_PlaylistField(&spr_selectfield, 120, 280, "Playlist", 400, 150);
-	miSoundPackField = new MI_PacksField(&spr_selectfield, 120, 320, "Sfx Pack", 400, 150, &soundpacklist, MENU_CODE_SOUND_PACK_CHANGED);
+	miAnnouncerField = new MI_AnnouncerField(&spr_selectfield, 120, 220, "Announcer", 400, 160, &announcerlist);
+	miPlaylistField = new MI_PlaylistField(&spr_selectfield, 120, 260, "Playlist", 400, 160);
+	miSoundPackField = new MI_PacksField(&spr_selectfield, 120, 300, "Sfx Pack", 400, 160, &soundpacklist, MENU_CODE_SOUND_PACK_CHANGED);
+
+	miWorldMusicField = new MI_SelectField(&spr_selectfield, 120, 340, "World Music", 400, 160);
+	
+	int iCurrentMusic = worldmusiclist.GetCurrentIndex();
+	worldmusiclist.SetCurrent(0);
+	for(short iMusic = 0; iMusic < worldmusiclist.GetCount(); iMusic++)
+	{
+		miWorldMusicField->Add(worldmusiclist.current_name(), iMusic, "", false, false);
+		worldmusiclist.next();
+	}
+	miWorldMusicField->SetKey(iCurrentMusic);
+	worldmusiclist.SetCurrent(iCurrentMusic);
+	miWorldMusicField->SetItemChangedCode(MENU_CODE_WORLD_MUSIC_CHANGED);
+	
+	miPointSpeedField->Add("Very Slow", 60, "", false, false);
+	miPointSpeedField->Add("Slow", 40, "", false, false);
+	miPointSpeedField->Add("Moderate", 20, "", false, false);
+	miPointSpeedField->Add("Fast", 10, "", false, false);
+	miPointSpeedField->Add("Very Fast", 5, "", false, false);
+	miPointSpeedField->SetData(&game_values.pointspeed, NULL, NULL);
+	miPointSpeedField->SetKey(game_values.pointspeed);
 
 	miSoundOptionsMenuBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
 	miSoundOptionsMenuBackButton->SetCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
@@ -690,8 +711,9 @@ void Menu::CreateMenu()
 	mSoundOptionsMenu.AddControl(miPlayNextMusicField, miMusicVolumeField, miAnnouncerField, NULL, miSoundOptionsMenuBackButton);
 	mSoundOptionsMenu.AddControl(miAnnouncerField, miPlayNextMusicField, miPlaylistField, NULL, miSoundOptionsMenuBackButton);
 	mSoundOptionsMenu.AddControl(miPlaylistField, miAnnouncerField, miSoundPackField, NULL, miSoundOptionsMenuBackButton);
-	mSoundOptionsMenu.AddControl(miSoundPackField, miPlaylistField, miSoundOptionsMenuBackButton, NULL, miSoundOptionsMenuBackButton);
-	mSoundOptionsMenu.AddControl(miSoundOptionsMenuBackButton, miSoundPackField, miSoundVolumeField, miSoundPackField, NULL);
+	mSoundOptionsMenu.AddControl(miSoundPackField, miPlaylistField, miWorldMusicField, NULL, miSoundOptionsMenuBackButton);
+	mSoundOptionsMenu.AddControl(miWorldMusicField, miSoundPackField, miSoundOptionsMenuBackButton, NULL, miSoundOptionsMenuBackButton);
+	mSoundOptionsMenu.AddControl(miSoundOptionsMenuBackButton, miWorldMusicField, miSoundVolumeField, miSoundPackField, NULL);
 	
 	mSoundOptionsMenu.AddNonControl(miSoundOptionsMenuLeftHeaderBar);
 	mSoundOptionsMenu.AddNonControl(miSoundOptionsMenuRightHeaderBar);
@@ -1068,6 +1090,7 @@ void Menu::CreateMenu()
 	}
 	miWorldField->SetData(&game_values.worldindex, NULL, NULL);
 	miWorldField->SetKey(game_values.worldindex);
+	miWorldField->SetItemChangedCode(MENU_CODE_WORLD_MAP_CHANGED);
 	miWorldField->Show(false);
 
 	miMatchSelectionMenuLeftHeaderBar = new MI_Image(&menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
@@ -1075,12 +1098,15 @@ void Menu::CreateMenu()
 	miMatchSelectionMenuHeaderText = new MI_Text("Match Type Menu", 320, 5, 0, 2, 1);
 
 	miMatchSelectionDisplayImage = new MI_Image(&menu_match_select, 160, 80, 0, 0, 320, 240, 1, 1, 0);
+	miWorldPreviewDisplay = new MI_WorldPreviewDisplay(160, 80, 20, 15);
+	miWorldPreviewDisplay->Show(false);
 
 	mMatchSelectionMenu.AddNonControl(miMatchSelectionMenuLeftHeaderBar);
 	mMatchSelectionMenu.AddNonControl(miMatchSelectionMenuRightHeaderBar);
 	mMatchSelectionMenu.AddNonControl(miMatchSelectionMenuHeaderText);
 
 	mMatchSelectionMenu.AddNonControl(miMatchSelectionDisplayImage);
+	mMatchSelectionMenu.AddNonControl(miWorldPreviewDisplay);
 
 	mMatchSelectionMenu.AddControl(miMatchSelectionField, miMatchSelectionStartButton, miTournamentField, NULL, NULL);
 	mMatchSelectionMenu.AddControl(miTournamentField, miMatchSelectionField, miTourField, NULL, NULL);
@@ -2466,6 +2492,8 @@ void Menu::RunMenu()
 			}
 			else if(MENU_CODE_TO_MATCH_SELECTION_MENU == code)
 			{
+				miWorldPreviewDisplay->SetWorld();
+
 				mCurrentMenu = &mMatchSelectionMenu;
 				mCurrentMenu->ResetMenu();
 			}
@@ -2482,8 +2510,13 @@ void Menu::RunMenu()
 				miWorldField->Show(game_values.matchtype == MATCH_TYPE_WORLD);
 
 				miMatchSelectionDisplayImage->Show(game_values.matchtype != MATCH_TYPE_WORLD);
+				miWorldPreviewDisplay->Show(game_values.matchtype == MATCH_TYPE_WORLD);
 				miMatchSelectionDisplayImage->SetImage(0, 240 * game_values.matchtype, 320, 240);
 
+			}
+			else if(MENU_CODE_WORLD_MAP_CHANGED == code)
+			{
+				miWorldPreviewDisplay->SetWorld();
 			}
 			else if(MENU_CODE_TO_OPTIONS_MENU == code)
 			{
@@ -2592,7 +2625,7 @@ void Menu::RunMenu()
 				}
 				else if(game_values.matchtype == MATCH_TYPE_WORLD)
 				{
-					if(!g_worldmap.Load())
+					if(!g_worldmap.Load(TILESIZE))
 					{
 						iDisplayError = DISPLAY_ERROR_READ_WORLD_FILE;
 						iDisplayErrorTimer = 120;
@@ -2994,6 +3027,10 @@ void Menu::RunMenu()
 				mWorldMenu.SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
 
 				mWorldMenu.RestoreCurrent();
+			}
+			else if(MENU_CODE_WORLD_MUSIC_CHANGED == code)
+			{
+				worldmusiclist.SetCurrent(miWorldMusicField->GetShortValue());
 			}
 			else if (MENU_CODE_TOUR_STOP_CONTINUE == code || MENU_CODE_TOUR_STOP_CONTINUE_FORCED == code)
 			{

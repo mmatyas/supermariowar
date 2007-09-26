@@ -248,6 +248,8 @@ class WorldMusicList
 		void prev();
 		void random() {currentIndex = rand()%entries.size();}
 
+		int GetCount() {return entries.size();}
+
     private:
         std::string CurrentMusic;
         std::vector<WorldMusicEntry*> entries;

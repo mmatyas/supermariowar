@@ -2273,7 +2273,6 @@ void AddAwardKill(CPlayer * killer, CPlayer * killed, killstyle style)
 				backgroundmusic[0].stop();
 				ifsoundonstop(sfx_invinciblemusic);
 				ifsoundonstop(sfx_timewarning);
-				ifsoundonplay(sfx_bowserlaugh);
 			}
 		}
 	}

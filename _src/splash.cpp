@@ -434,11 +434,11 @@ bool LoadGameSounds()
 	_load_sfx(sfx_powerdown, convertPath("sfx/packs/powerdown.wav", soundpack));
 	_load_sfx(sfx_switchpress, convertPath("sfx/packs/switchpress.wav", soundpack));
 	_load_sfx(sfx_superspring, convertPath("sfx/packs/superspring.wav", soundpack));
-	_load_sfx(sfx_secret, convertPath("sfx/packs/secret.wav", soundpack));
-	_load_sfx(sfx_bowserlaugh, convertPath("sfx/packs/bowserlaugh.wav", soundpack));
 	_load_sfx(sfx_gameover, convertPath("sfx/packs/gameover.wav", soundpack));
 	_load_sfx(sfx_stun, convertPath("sfx/packs/stun.wav", soundpack));
-
+	_load_sfx(sfx_inventory, convertPath("sfx/packs/inventory.wav", soundpack));
+	_load_sfx(sfx_worldmove, convertPath("sfx/packs/mapmove.wav", soundpack));
+	_load_sfx(sfx_treasurechest, convertPath("sfx/packs/treasurechest.wav", soundpack));
 
 	game_values.soundcapable = true;
 	return true;

@@ -2164,6 +2164,77 @@ void MI_MapField::SetMap(const char * szMapName)
 	LoadCurrentMap();
 }
 
+
+
+/**************************************
+ * MI_WorldPreviewDisplay Class
+ **************************************/
+
+MI_WorldPreviewDisplay::MI_WorldPreviewDisplay(short x, short y, short cols, short rows) :
+	UI_Control(x, y)
+{
+	sMapSurface = SDL_CreateRGBSurface(screen->flags, 384, 304, screen->format->BitsPerPixel, 0, 0, 0, 0);
+
+	iCols = cols;
+	iRows = rows;
+
+	iMapOffsetX = 0;
+	iMapOffsetY = 0;
+	
+	iMapDrawOffsetCol = 0;
+	iMapDrawOffsetRow = 0;
+}
+
+MI_WorldPreviewDisplay::~MI_WorldPreviewDisplay()
+{
+	if(sMapSurface)
+	{
+		SDL_FreeSurface(sMapSurface);
+		sMapSurface = NULL;
+	}
+}
+
+void MI_WorldPreviewDisplay::Update()
+{}
+
+void MI_WorldPreviewDisplay::Draw()
+{
+	if(!fShow)
+		return;
+
+	SDL_Rect rectSrcSurface;
+	rectSrcSurface.x = 0;
+	rectSrcSurface.y = 0;
+	
+	if(g_worldmap.iWidth > 24)
+		rectSrcSurface.w = 384;
+	else
+		rectSrcSurface.w = g_worldmap.iWidth * PREVIEWTILESIZE;
+
+	if(g_worldmap.iHeight > 19)
+		rectSrcSurface.h = 304;
+	else
+		rectSrcSurface.h = g_worldmap.iHeight * PREVIEWTILESIZE;
+
+	SDL_Rect rectDstSurface;
+	rectDstSurface.w = 320;
+	rectDstSurface.h = 240;
+
+	rectDstSurface.x = ix + iMapOffsetX + iMapDrawOffsetCol * PREVIEWTILESIZE;
+	rectDstSurface.y = iy + iMapOffsetY + iMapDrawOffsetRow * PREVIEWTILESIZE;
+	
+	SDL_BlitSurface(sMapSurface, &rectSrcSurface, blitdest, &rectDstSurface);
+
+	g_worldmap.Draw(ix + iMapOffsetX, iy + iMapOffsetY, false, false);
+}
+
+void MI_WorldPreviewDisplay::SetWorld()
+{
+	g_worldmap.Load(PREVIEWTILESIZE);
+	g_worldmap.DrawMapToSurface(true, sMapSurface, 0, 0, 0, 4); 
+}
+
+
 /**************************************
  * MI_AnnouncerField Class
  **************************************/
@@ -2562,7 +2633,7 @@ MI_TourStop::MI_TourStop(short x, short y, bool fWorld) :
 		miBonusField = new MI_SelectField(&spr_selectfielddisabled, 70, 125, "Bonus", 305, 90);
 		miBonusField->Disable(true);
 
-		miEndStageImage = new MI_Image(&spr_worldbackground, 200, 300, 0, 0, 100, 40, 1, 1, 32000);
+		miEndStageImage = new MI_Image(&spr_worlditemsplace, 240, 440, 0, 20, 160, 32, 1, 1, 0);
 		miEndStageImage->Show(false);
 
 		for(short iBonus = 0; iBonus < 10; iBonus++)
@@ -4345,24 +4416,20 @@ MI_World::MI_World() :
 
 	sMapSurface = SDL_CreateRGBSurface(screen->flags, 768, 608, screen->format->BitsPerPixel, 0, 0, 0, 0);
 	
-	rectSrcSurface = new SDL_Rect();
-	rectSrcSurface->x = 0;
-	rectSrcSurface->y = 0;
-	rectSrcSurface->w = 768;
-	rectSrcSurface->h = 608;
+	rectSrcSurface.x = 0;
+	rectSrcSurface.y = 0;
+	rectSrcSurface.w = 768;
+	rectSrcSurface.h = 608;
 
-	rectDstSurface = new SDL_Rect();
-	rectDstSurface->x = 0;
-	rectDstSurface->y = 0;
-	rectDstSurface->w = 640;
-	rectDstSurface->h = 480;
+	rectDstSurface.x = 0;
+	rectDstSurface.y = 0;
+	rectDstSurface.w = 640;
+	rectDstSurface.h = 480;
 }
 
 MI_World::~MI_World()
 {
 	SDL_FreeSurface(sMapSurface);
-	delete rectSrcSurface;
-	delete rectDstSurface;
 }
 
 void MI_World::Init()
@@ -4596,7 +4663,7 @@ void MI_World::Update()
 
 void MI_World::UpdateMapSurface()
 {
-	g_worldmap.DrawMapToSurface(true, sMapSurface, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
+	g_worldmap.DrawMapToSurface(true, sMapSurface, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame, 5);
 }
 
 void MI_World::SetMapOffset()
@@ -4668,23 +4735,23 @@ void MI_World::Draw()
 	short iPlayerX, iPlayerY;
 	g_worldmap.GetPlayerPosition(&iPlayerX, &iPlayerY);
 
-	rectSrcSurface->x = 0;
-	rectSrcSurface->y = 0;
+	rectSrcSurface.x = 0;
+	rectSrcSurface.y = 0;
 	
 	if(g_worldmap.iWidth > 24)
-		rectSrcSurface->w = 768;
+		rectSrcSurface.w = 768;
 	else
-		rectSrcSurface->w = g_worldmap.iWidth * TILESIZE;
+		rectSrcSurface.w = g_worldmap.iWidth * TILESIZE;
 
 	if(g_worldmap.iHeight > 19)
-		rectSrcSurface->h = 608;
+		rectSrcSurface.h = 608;
 	else
-		rectSrcSurface->h = g_worldmap.iHeight * TILESIZE;
+		rectSrcSurface.h = g_worldmap.iHeight * TILESIZE;
 
-	rectDstSurface->x = iMapOffsetX + iMapDrawOffsetCol * TILESIZE;
-	rectDstSurface->y = iMapOffsetY + iMapDrawOffsetRow * TILESIZE;
+	rectDstSurface.x = iMapOffsetX + iMapDrawOffsetCol * TILESIZE;
+	rectDstSurface.y = iMapOffsetY + iMapDrawOffsetRow * TILESIZE;
 	
-	SDL_BlitSurface(sMapSurface, rectSrcSurface, blitdest, rectDstSurface);
+	SDL_BlitSurface(sMapSurface, &rectSrcSurface, blitdest, &rectDstSurface);
 
 	g_worldmap.Draw(iMapOffsetX, iMapOffsetY, iState != -2 && iState < 4 && !fUsingCloud, iSleepTurns > 0);
 
@@ -4857,6 +4924,8 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 
 						g_worldmap.MovePlayer(0);
 						iReturnDirection = 1;
+
+						ifsoundonplay(sfx_worldmove);
 					}
 				}
 				else if(playerKeys->menu_down.fPressed)
@@ -4869,6 +4938,8 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 
 						g_worldmap.MovePlayer(1);
 						iReturnDirection = 0;
+
+						ifsoundonplay(sfx_worldmove);
 					}
 				}
 				else if(playerKeys->menu_left.fPressed)
@@ -4881,6 +4952,8 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 
 						g_worldmap.MovePlayer(2);
 						iReturnDirection = 3;
+
+						ifsoundonplay(sfx_worldmove);
 					}
 					else
 					{
@@ -4897,6 +4970,8 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 
 						g_worldmap.MovePlayer(3);
 						iReturnDirection = 2;
+
+						ifsoundonplay(sfx_worldmove);
 					}
 					else
 					{
@@ -5124,6 +5199,8 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 
 					iItemPage = 0;
 					iItemCol = 0;
+
+					ifsoundonplay(sfx_inventory);
 				}
 				else if (iState == game_values.colorids[iPlayer])
 				{

@@ -538,7 +538,7 @@ class MI_MapField : public UI_Control
 		void Update();
 
 		//Draws every frame
-		virtual void Draw();
+		void Draw();
 
 		void Disable(bool disable) {fDisable = disable;}
 
@@ -571,6 +571,34 @@ class MI_MapField : public UI_Control
 		short iSlideListOutGoal;
 
 		bool fDisable;
+};
+
+class MI_WorldPreviewDisplay : public UI_Control
+{
+	public:
+
+		MI_WorldPreviewDisplay(short x, short y, short cols, short rows);
+		virtual ~MI_WorldPreviewDisplay();
+
+		//Updates animations or other events every frame
+		void Update();
+
+		//Draws every frame
+		void Draw();
+
+		void RefreshWorld();
+		
+		void SetWorld();
+
+	protected:
+		
+		SDL_Surface * sMapSurface;
+		SDL_Rect rectDst;
+
+		short iCols, iRows;
+
+		short iMapOffsetX, iMapOffsetY;
+		short iMapDrawOffsetCol, iMapDrawOffsetRow;
 };
 
 class MI_AnnouncerField : public UI_Control
@@ -935,8 +963,8 @@ class MI_World : public UI_Control
 		short iItemPage;
 
 		SDL_Surface * sMapSurface;
-		SDL_Rect * rectSrcSurface;
-		SDL_Rect * rectDstSurface;
+		SDL_Rect rectSrcSurface;
+		SDL_Rect rectDstSurface;
 
 		short iAnimationTimer;
 		short iAnimationFrame;

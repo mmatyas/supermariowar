@@ -1652,7 +1652,7 @@ void AutoSetTile(short iCol, short iRow)
 
 void updateworldsurface()
 {
-	g_worldmap.DrawMapToSurface(true, sMapSurface, draw_offset_col, draw_offset_row, 0);
+	g_worldmap.DrawMapToSurface(true, sMapSurface, draw_offset_col, draw_offset_row, 0, 5);
 }
 
 void drawmap(bool fScreenshot, short iBlockSize)
@@ -2688,7 +2688,7 @@ int clear_world()
 
 void loadcurrentworld()
 {
-	g_worldmap.Load();
+	g_worldmap.Load(TILESIZE);
 	ReadVehiclesIntoEditor();
 	ReadWarpsIntoEditor();
 

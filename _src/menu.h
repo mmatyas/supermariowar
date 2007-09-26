@@ -233,6 +233,7 @@ class Menu
 		MI_SelectField * miPlayNextMusicField;
 		MI_AnnouncerField * miAnnouncerField;
 		MI_PlaylistField * miPlaylistField;
+		MI_SelectField * miWorldMusicField;
 		MI_PacksField * miSoundPackField;
 		MI_Button * miSoundOptionsMenuBackButton;
 
@@ -262,6 +263,7 @@ class Menu
 		//Match Selection Menu
 		UI_Menu mMatchSelectionMenu;
 
+		MI_WorldPreviewDisplay * miWorldPreviewDisplay;
 		MI_Image * miMatchSelectionDisplayImage;
 		MI_SelectField * miMatchSelectionField;
 

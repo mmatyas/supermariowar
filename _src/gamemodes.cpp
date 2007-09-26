@@ -111,7 +111,6 @@ void ShowScoreBoard()
 		ifsoundonstop(sfx_invinciblemusic);
 		ifsoundonstop(sfx_timewarning);
 		ifsoundonstop(sfx_slowdownmusic);
-		ifsoundonstop(sfx_bowserlaugh);
 		
 		backgroundmusic[1].play(true, false);
 	}
@@ -182,7 +181,6 @@ void CGameMode::playwarningsound()
 {
 	playedwarningsound = true;
 	ifsoundonstop(sfx_invinciblemusic);
-	ifsoundonstop(sfx_bowserlaugh);
 
 	if(game_values.music && game_values.sound)
 		backgroundmusic[0].stop();
@@ -2493,7 +2491,6 @@ bool CGM_Boss::SetWinner(CPlayer * player)
 		ifsoundonstop(sfx_invinciblemusic);
 		ifsoundonstop(sfx_timewarning);
 		ifsoundonstop(sfx_slowdownmusic);
-		ifsoundonstop(sfx_bowserlaugh);
 		
 		backgroundmusic[1].play(true, false);
 	}

@@ -316,10 +316,11 @@ sfxSound sfx_starwarning;
 sfxSound sfx_powerdown;
 sfxSound sfx_switchpress;
 sfxSound sfx_superspring;
-sfxSound sfx_secret;
-sfxSound sfx_bowserlaugh;
 sfxSound sfx_gameover;
 sfxSound sfx_stun;
+sfxSound sfx_inventory;
+sfxSound sfx_worldmove;
+sfxSound sfx_treasurechest;
 
 sfxMusic backgroundmusic[6];
 
@@ -731,6 +732,7 @@ int main(int argc, char *argv[])
 
 	announcerlist.SetCurrent(0);
 	musiclist.SetCurrent(0);
+	worldmusiclist.SetCurrent(0);
 	menugraphicspacklist.SetCurrent(0);
 	gamegraphicspacklist.SetCurrent(0);
 	soundpacklist.SetCurrent(0);
@@ -1005,7 +1007,7 @@ int main(int argc, char *argv[])
 
 			announcerlist.SetCurrent((short) abyte[2]);
 			musiclist.SetCurrent((short) abyte[13]);
-			musiclist.SetCurrent((short) abyte[14]);
+			worldmusiclist.SetCurrent((short) abyte[14]);
 			menugraphicspacklist.SetCurrent((short) abyte[17]);
 			gamegraphicspacklist.SetCurrent((short) abyte[26]);
 			soundpacklist.SetCurrent((short) abyte[18]);
@@ -2415,7 +2417,7 @@ void RunGame()
 
 			if(game_values.playinvinciblesound)
 			{
-				if(!sfx_secret.isplaying() && !sfx_bowserlaugh.isplaying() && !sfx_invinciblemusic.isplaying() && !sfx_timewarning.isplaying() && !backgroundmusic[0].isplaying())
+				if(!sfx_invinciblemusic.isplaying() && !sfx_timewarning.isplaying() && !backgroundmusic[0].isplaying())
 					ifsoundonplay(sfx_invinciblemusic);
 			}
 			else
@@ -2425,7 +2427,7 @@ void RunGame()
 			}
 
 			//If no background music is playing, then play some
-			if(!backgroundmusic[0].isplaying() && !sfx_invinciblemusic.isplaying() && !sfx_secret.isplaying() && !sfx_bowserlaugh.isplaying() && !sfx_timewarning.isplaying() && !game_values.gamemode->gameover)
+			if(!backgroundmusic[0].isplaying() && !sfx_invinciblemusic.isplaying() && !sfx_timewarning.isplaying() && !game_values.gamemode->gameover)
 			{
 				if(game_values.playnextmusic)
 				{
@@ -3270,9 +3272,6 @@ void EnterBossMode(short type)
 		ifsoundonstop(sfx_invinciblemusic);
 		ifsoundonstop(sfx_timewarning);
 		ifsoundonstop(sfx_slowdownmusic);
-		ifsoundonstop(sfx_bowserlaugh);
-
-		ifsoundonplay(sfx_secret);
 
 		game_values.gamestate = GS_START_GAME;
 	}

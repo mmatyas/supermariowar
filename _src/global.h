@@ -309,10 +309,11 @@ extern sfxSound			sfx_starwarning;
 extern sfxSound			sfx_powerdown;
 extern sfxSound			sfx_switchpress;
 extern sfxSound			sfx_superspring;
-extern sfxSound			sfx_secret;
-extern sfxSound			sfx_bowserlaugh;
 extern sfxSound			sfx_gameover;
 extern sfxSound			sfx_stun;
+extern sfxSound			sfx_inventory;
+extern sfxSound			sfx_worldmove;
+extern sfxSound			sfx_treasurechest;
 
 extern sfxMusic			backgroundmusic[6];
 

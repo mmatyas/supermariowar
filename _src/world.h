@@ -35,7 +35,7 @@ class WorldMovingObject
 		WorldMovingObject();
 		virtual ~WorldMovingObject();
 
-		void Init(short iCol, short iRow, short iSprite, short iInitialDirection);
+		void Init(short iCol, short iRow, short iSprite, short iInitialDirection, short tilesize);
 		virtual void Move(short iDirection);
 		virtual bool Update();
 		void Draw(short iWorldOffsetX, short iWorldOffsetY);
@@ -56,6 +56,8 @@ class WorldMovingObject
 		short iDrawDirection;
 		short iAnimationFrame;
 		short iAnimationTimer;
+
+		short iTileSize;
 	
 	friend class WorldMap;
 };
@@ -83,7 +85,7 @@ class WorldVehicle : public WorldMovingObject
 		WorldVehicle();
 		~WorldVehicle();
 
-		void Init(short iCol, short iRow, short iAction, short iSprite, short iMinMoves, short iMaxMoves, bool fSpritePaces, short iInitialDirection, short iBoundary);
+		void Init(short iCol, short iRow, short iAction, short iSprite, short iMinMoves, short iMaxMoves, bool fSpritePaces, short iInitialDirection, short iBoundary, short tilesize);
 		void Move();
 		
 		bool Update();
@@ -144,7 +146,7 @@ class WorldMap
 		WorldMap();
 		~WorldMap();
 
-		bool Load();
+		bool Load(short iTileSize);
 		bool Save();
 		bool Save(const char * szPath);
 
@@ -156,7 +158,7 @@ class WorldMap
 
 		bool Update(bool * fPlayerVehicleCollision);
 		void Draw(short iMapOffsetX, short iMapOffsetY, bool fDrawPlayer, bool fVehiclesSleeping);
-		void DrawMapToSurface(bool fInit, SDL_Surface * surface, short iMapDrawOffsetCol, short iMapDrawOffsetRow, short iAnimationFrame);
+		void DrawMapToSurface(bool fInit, SDL_Surface * surface, short iMapDrawOffsetCol, short iMapDrawOffsetRow, short iAnimationFrame, short iTileSizeShift);
 
 		void SetPlayerSprite(short iPlayerSprite);
 		bool IsVehicleMoving();
@@ -220,6 +222,7 @@ class WorldMap
 		short iMusicCategory;
 
 	friend class MI_World;
+	friend class MI_WorldPreviewDisplay;
 	friend class WorldVehicle;
 
 	friend int editor_edit();

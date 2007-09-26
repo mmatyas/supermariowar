@@ -3081,7 +3081,7 @@ bool PU_TreasureChestBonus::collide(CPlayer * player)
 {
 	if(state == 1)
 	{
-		ifsoundonplay(sfx_storepowerup);
+		ifsoundonplay(sfx_treasurechest);
 		//if(game_values.worldpowerupcount[player->teamID] < 32)
         //    game_values.worldpowerups[player->teamID][game_values.worldpowerupcount[player->teamID]++] = bonusitem;
 		//else
@@ -3185,7 +3185,7 @@ bool MO_BonusHouseChest::collide(CPlayer * player)
 		else
 			game_values.worldpowerups[player->teamID][31] = bonusitem;
 
-		ifsoundonplay(sfx_storepowerup);
+		ifsoundonplay(sfx_treasurechest);
 		state = 2;
 
 		drawbonusitemy = iy + 32;
@@ -5862,7 +5862,6 @@ void OMO_Area::setOwner(CPlayer * player)
 					backgroundmusic[0].stop();
 					ifsoundonstop(sfx_invinciblemusic);
 					ifsoundonstop(sfx_timewarning);
-					ifsoundonplay(sfx_bowserlaugh);
 				}
 			}
 		}*/

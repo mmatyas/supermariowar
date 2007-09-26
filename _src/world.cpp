@@ -25,8 +25,9 @@ WorldMovingObject::WorldMovingObject()
 WorldMovingObject::~WorldMovingObject()
 {}
 
-void WorldMovingObject::Init(short iCol, short iRow, short iSprite, short iInitialDirection)
+void WorldMovingObject::Init(short iCol, short iRow, short iSprite, short iInitialDirection, short tilesize)
 {
+	iTileSize = tilesize;
 	SetPosition(iCol, iRow);
 		
 	iDrawSprite = iSprite;
@@ -72,9 +73,9 @@ bool WorldMovingObject::Update()
 	if(iState == 1)
 	{
 		iy -= 2;
-		if(iy <= iDestTileY * TILESIZE)
+		if(iy <= iDestTileY * iTileSize)
 		{
-			iy = iDestTileY * TILESIZE;
+			iy = iDestTileY * iTileSize;
 			iState = 0;
 			iCurrentTileY = iDestTileY;
 
@@ -84,9 +85,9 @@ bool WorldMovingObject::Update()
 	else if(iState == 2) //down
 	{
 		iy += 2;
-		if(iy >= iDestTileY * TILESIZE)
+		if(iy >= iDestTileY * iTileSize)
 		{
-			iy = iDestTileY * TILESIZE;
+			iy = iDestTileY * iTileSize;
 			iState = 0;
 			iCurrentTileY = iDestTileY;
 
@@ -96,9 +97,9 @@ bool WorldMovingObject::Update()
 	else if(iState == 3) //left
 	{
 		ix -= 2;
-		if(ix <= iDestTileX * TILESIZE)
+		if(ix <= iDestTileX * iTileSize)
 		{
-			ix = iDestTileX * TILESIZE;
+			ix = iDestTileX * iTileSize;
 			iState = 0;
 			iCurrentTileX = iDestTileX;
 
@@ -108,9 +109,9 @@ bool WorldMovingObject::Update()
 	else if(iState == 4) //right
 	{
 		ix += 2;
-		if(ix >= iDestTileX * TILESIZE)
+		if(ix >= iDestTileX * iTileSize)
 		{
-			ix = iDestTileX * TILESIZE;
+			ix = iDestTileX * iTileSize;
 			iState = 0;
 			iCurrentTileX = iDestTileX;
 
@@ -128,8 +129,8 @@ void WorldMovingObject::FaceDirection(short iDirection)
 
 void WorldMovingObject::SetPosition(short iCol, short iRow)
 {
-	ix = iCol * TILESIZE;
-	iy = iRow * TILESIZE;
+	ix = iCol * iTileSize;
+	iy = iRow * iTileSize;
 	iCurrentTileX = iCol;
 	iCurrentTileY = iRow;
 	iDestTileX = iCol;
@@ -153,7 +154,7 @@ WorldPlayer::~WorldPlayer()
 
 void WorldPlayer::Init(short iCol, short iRow)
 {
-	WorldMovingObject::Init(iCol, iRow, 0, 0);
+	WorldMovingObject::Init(iCol, iRow, 0, 0, 32);
 }
 
 void WorldPlayer::Draw(short iMapOffsetX, short iMapOffsetY)
@@ -184,9 +185,9 @@ WorldVehicle::WorldVehicle() :
 WorldVehicle::~WorldVehicle()
 {}
 
-void WorldVehicle::Init(short iCol, short iRow, short iAction, short iSprite, short minMoves, short maxMoves, bool spritePaces, short iInitialDirection, short boundary)
+void WorldVehicle::Init(short iCol, short iRow, short iAction, short iSprite, short minMoves, short maxMoves, bool spritePaces, short iInitialDirection, short boundary, short tilesize)
 {
-	WorldMovingObject::Init(iCol, iRow, iSprite, iInitialDirection);
+	WorldMovingObject::Init(iCol, iRow, iSprite, iInitialDirection, tilesize);
 
 	fEnabled = true;
 
@@ -200,7 +201,7 @@ void WorldVehicle::Init(short iCol, short iRow, short iAction, short iSprite, sh
 	}
 
 	for(short iRect = 0; iRect < 5; iRect++)
-		gfx_setrect(&srcRects[iRect], iRect * TILESIZE + iRectOffsetX, iRectOffsetY, 32, 32);
+		gfx_setrect(&srcRects[iRect], iRect * tilesize + iRectOffsetX, iRectOffsetY, tilesize, tilesize);
 
 	iNumMoves = 0;
 	iActionId = iAction;
@@ -296,12 +297,12 @@ bool WorldVehicle::Update()
 
 		if(iDrawDirection)
 		{
-			if(--iPaceOffset <= -16)
+			if(--iPaceOffset <= -(iTileSize >> 1))
 				iDrawDirection = 0;
 		}
 		else
 		{
-			if(++iPaceOffset >= 16)
+			if(++iPaceOffset >= (iTileSize >> 1))
 				iDrawDirection = 1;
 		}
 	}
@@ -313,12 +314,12 @@ void WorldVehicle::Draw(short iWorldOffsetX, short iWorldOffsetY, bool fVehicles
 {
 	if(fVehiclesSleeping)
 	{
-		SDL_Rect rDst = {ix + iWorldOffsetX, iy + iWorldOffsetY, 32, 32};
+		SDL_Rect rDst = {ix + iWorldOffsetX, iy + iWorldOffsetY, iTileSize, iTileSize};
 		SDL_BlitSurface(spr_worldvehicle.getSurface(), &srcRects[4], blitdest, &rDst);
 	}
 	else
 	{
-		SDL_Rect rDst = {ix + iWorldOffsetX + iPaceOffset, iy + iWorldOffsetY, 32, 32};
+		SDL_Rect rDst = {ix + iWorldOffsetX + iPaceOffset, iy + iWorldOffsetY, iTileSize, iTileSize};
 		SDL_BlitSurface(spr_worldvehicle.getSurface(), &srcRects[iDrawDirection + iAnimationFrame], blitdest, &rDst);
 	}
 }
@@ -386,7 +387,7 @@ WorldMap::~WorldMap()
 	Cleanup();
 }
 
-bool WorldMap::Load()
+bool WorldMap::Load(short iTileSize)
 {
 	Cleanup();
 
@@ -688,7 +689,7 @@ bool WorldMap::Load()
 
 			iReadType = iNumVehicles == 0 ? 16 : 15;
 		}
-		else if(iReadType == 15) //moving objects
+		else if(iReadType == 15) //vehicles
 		{
 			char * psz = strtok(buffer, ",\n");
 			
@@ -734,7 +735,7 @@ bool WorldMap::Load()
 			psz = strtok(NULL, ",\n");
 			short iBoundary = atoi(psz);
 
-			vehicles[iCurrentVehicle].Init(iCol, iRow, iStage, iSprite, iMinMoves, iMaxMoves, fSpritePaces, iInitialDirection, iBoundary);
+			vehicles[iCurrentVehicle].Init(iCol, iRow, iStage, iSprite, iMinMoves, iMaxMoves, fSpritePaces, iInitialDirection, iBoundary, iTileSize);
 
 			if(++iCurrentVehicle >= iNumVehicles)
 				iReadType = 16;
@@ -1181,20 +1182,22 @@ void WorldMap::Draw(short iMapOffsetX, short iMapOffsetY, bool fDrawPlayer, bool
 		player.Draw(iMapOffsetX, iMapOffsetY);
 }
 
-void WorldMap::DrawMapToSurface(bool fInit, SDL_Surface * surface, short iMapDrawOffsetCol, short iMapDrawOffsetRow, short iAnimationFrame)
+void WorldMap::DrawMapToSurface(bool fInit, SDL_Surface * surface, short iMapDrawOffsetCol, short iMapDrawOffsetRow, short iAnimationFrame, short iTileSizeShift)
 {
+	short iTileSize = 1 << iTileSizeShift;
+
 	for(short iRow = 0; iRow < 19 && iRow + iMapDrawOffsetRow < iHeight; iRow++)
 	{
 		for(short iCol = 0; iCol < 24 && iCol + iMapDrawOffsetCol < iWidth; iCol++)
 		{
-			SDL_Rect r = {iCol * TILESIZE, iRow * TILESIZE, TILESIZE, TILESIZE};
+			SDL_Rect r = {iCol * iTileSize, iRow * iTileSize, iTileSize, iTileSize};
 		
 			WorldMapTile * tile = &tiles[iCol + iMapDrawOffsetCol][iRow + iMapDrawOffsetRow];
 			short iBackgroundSprite = tile->iBackgroundSprite;
 			short iBackgroundWater = tile->iBackgroundWater;
 			short iForegroundSprite = tile->iForegroundSprite;
 
-			short iBackgroundStyleOffset = iBackgroundSprite / WORLD_BACKGROUND_SPRITE_SET_SIZE * 128;
+			short iBackgroundStyleOffset = iBackgroundSprite / WORLD_BACKGROUND_SPRITE_SET_SIZE * (4 << iTileSizeShift);
 
 			iBackgroundSprite %= WORLD_BACKGROUND_SPRITE_SET_SIZE;
 
@@ -1203,7 +1206,7 @@ void WorldMap::DrawMapToSurface(bool fInit, SDL_Surface * surface, short iMapDra
 				//if(iBackgroundSprite == 0 || (iBackgroundSprite >= 2 && iBackgroundSprite <= 27) || (iBackgroundSprite >= 45 && iBackgroundSprite <= 48))
 				if(iBackgroundSprite == 0 || (iBackgroundSprite >= 2 && iBackgroundSprite <= 48))
 				{
-					SDL_Rect rSrc = {iAnimationFrame + (iBackgroundWater << 7), 0, TILESIZE, TILESIZE};
+					SDL_Rect rSrc = {iAnimationFrame + (iBackgroundWater << (2 + iTileSizeShift)), 0, iTileSize, iTileSize};
 					SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, surface, &r);
 
 					//if((iBackgroundSprite >= 2 && iBackgroundSprite <= 27) || (iBackgroundSprite >= 45 && iBackgroundSprite <= 48))
@@ -1211,40 +1214,40 @@ void WorldMap::DrawMapToSurface(bool fInit, SDL_Surface * surface, short iMapDra
 					{
 						if(iBackgroundSprite >= 45)
 						{
-							SDL_Rect rSrc = {96 + iBackgroundStyleOffset, (iBackgroundSprite - 44) << 5, TILESIZE, TILESIZE};
+							SDL_Rect rSrc = {(3 << iTileSizeShift) + iBackgroundStyleOffset, (iBackgroundSprite - 44) << iTileSizeShift, iTileSize, iTileSize};
 							SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, surface, &r);
 						}
 						else if(iBackgroundSprite >= 30)
 						{
-							SDL_Rect rSrc = {64 + iBackgroundStyleOffset, (iBackgroundSprite - 29) << 5, TILESIZE, TILESIZE};
+							SDL_Rect rSrc = {(2 << iTileSizeShift) + iBackgroundStyleOffset, (iBackgroundSprite - 29) << iTileSizeShift, iTileSize, iTileSize};
 							SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, surface, &r);
 						}
 						else if(iBackgroundSprite >= 16)
 						{
-							SDL_Rect rSrc = {32 + iBackgroundStyleOffset, (iBackgroundSprite - 14) << 5, TILESIZE, TILESIZE};
+							SDL_Rect rSrc = {iTileSize + iBackgroundStyleOffset, (iBackgroundSprite - 14) << iTileSizeShift, iTileSize, iTileSize};
 							SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, surface, &r);
 						}
 						else
 						{
-							SDL_Rect rSrc = {iBackgroundStyleOffset, iBackgroundSprite << 5, TILESIZE, TILESIZE};
+							SDL_Rect rSrc = {iBackgroundStyleOffset, iBackgroundSprite << iTileSizeShift, iTileSize, iTileSize};
 							SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, surface, &r);
 						}
 					}
 				}
 				else if(iBackgroundSprite == 1)
 				{
-					SDL_Rect rSrc = {32 + iBackgroundStyleOffset, 32, TILESIZE, TILESIZE};
+					SDL_Rect rSrc = {iTileSize + iBackgroundStyleOffset, iTileSize, iTileSize, iTileSize};
 					SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, surface, &r);
 				}
 				else if(iBackgroundSprite == 28 || iBackgroundSprite == 29)
 				{
-					SDL_Rect rSrc = {32 + iBackgroundStyleOffset, (iBackgroundSprite - 14) << 5, TILESIZE, TILESIZE};
+					SDL_Rect rSrc = {iTileSize + iBackgroundStyleOffset, (iBackgroundSprite - 14) << iTileSizeShift, iTileSize, iTileSize};
 					SDL_BlitSurface(spr_worldbackground.getSurface(), &rSrc, surface, &r);
 				}
 
 				if(tile->iCompleted >= 0)
 				{
-					SDL_Rect rSrc = {(tile->iCompleted + 10) << 5, 160, TILESIZE, TILESIZE};
+					SDL_Rect rSrc = {(tile->iCompleted + 10) << iTileSizeShift, 5 << iTileSizeShift, iTileSize, iTileSize};
 					SDL_BlitSurface(spr_worldforegroundspecial.getSurface(), &rSrc, surface, &r);
 				}
 				else
@@ -1252,60 +1255,60 @@ void WorldMap::DrawMapToSurface(bool fInit, SDL_Surface * surface, short iMapDra
 					if(iForegroundSprite >= 0 && iForegroundSprite < WORLD_FOREGROUND_STAGE_OFFSET)
 					{
 						short iPathStyle = iForegroundSprite / WORLD_PATH_SPRITE_SET_SIZE;
-						short iPathOffsetX = (iPathStyle % 4) * 160;
-						short iPathOffsetY = (iPathStyle >> 2) * 320;
+						short iPathOffsetX = (iPathStyle % 4) * (5 << iTileSizeShift);
+						short iPathOffsetY = (iPathStyle >> 2) * (10 << iTileSizeShift);
 						iForegroundSprite %= WORLD_PATH_SPRITE_SET_SIZE;
 						
 						if(iForegroundSprite == 1 || iForegroundSprite == 2)  //Non-animated straight paths
 						{
-							SDL_Rect rSrc = {iPathOffsetX, ((iForegroundSprite - 1) << 5) + iPathOffsetY, TILESIZE, TILESIZE};
+							SDL_Rect rSrc = {iPathOffsetX, ((iForegroundSprite - 1) << 5) + iPathOffsetY, iTileSize, iTileSize};
 							SDL_BlitSurface(spr_worldpaths.getSurface(), &rSrc, surface, &r);
 						}
 						else if(iForegroundSprite >= 3 && iForegroundSprite <= 10) //Animated paths with "coins" in them
 						{
-							SDL_Rect rSrc = {iPathOffsetX + iAnimationFrame, ((iForegroundSprite - 1) << 5) + iPathOffsetY, TILESIZE, TILESIZE};
+							SDL_Rect rSrc = {iPathOffsetX + iAnimationFrame, ((iForegroundSprite - 1) << 5) + iPathOffsetY, iTileSize, iTileSize};
 							SDL_BlitSurface(spr_worldpaths.getSurface(), &rSrc, surface, &r);
 						}
 						else if(iForegroundSprite >= 11 && iForegroundSprite <= 18) //Non-animated straight paths over water
 						{
-							short iSpriteX = (((iForegroundSprite - 11) / 2) + 1) << 5;
-							short iSpriteY = ((iForegroundSprite - 11) % 2) << 5;
+							short iSpriteX = (((iForegroundSprite - 11) / 2) + 1) << iTileSizeShift;
+							short iSpriteY = ((iForegroundSprite - 11) % 2) << iTileSizeShift;
 
-							SDL_Rect rSrc = {iPathOffsetX + iSpriteX, iSpriteY + iPathOffsetY, TILESIZE, TILESIZE};
+							SDL_Rect rSrc = {iPathOffsetX + iSpriteX, iSpriteY + iPathOffsetY, iTileSize, iTileSize};
 							SDL_BlitSurface(spr_worldpaths.getSurface(), &rSrc, surface, &r);
 						}
 					}
 					else if(iForegroundSprite >= WORLD_FOREGROUND_STAGE_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_STAGE_OFFSET + 399)
 					{
 						short iTileColor = (iForegroundSprite - WORLD_FOREGROUND_STAGE_OFFSET) / 100;
-						SDL_Rect rSrc = {320 + iAnimationFrame, iTileColor << 5, TILESIZE, TILESIZE};
+						SDL_Rect rSrc = {(10 << iTileSizeShift) + iAnimationFrame, iTileColor << iTileSizeShift, iTileSize, iTileSize};
 						SDL_BlitSurface(spr_worldforegroundspecial.getSurface(), &rSrc, surface, &r);
 
 						short iTileNumber = (iForegroundSprite - WORLD_FOREGROUND_STAGE_OFFSET) % 100;
-						rSrc.x = (iTileNumber % 10) << 5;
-						rSrc.y = (iTileNumber / 10) << 5;
+						rSrc.x = (iTileNumber % 10) << iTileSizeShift;
+						rSrc.y = (iTileNumber / 10) << iTileSizeShift;
 						SDL_BlitSurface(spr_worldforegroundspecial.getSurface(), &rSrc, surface, &r);
 					}
 					else if(iForegroundSprite >= WORLD_BRIDGE_SPRITE_OFFSET && iForegroundSprite <= WORLD_BRIDGE_SPRITE_OFFSET + 3)
 					{
-						SDL_Rect rSrc = {(iForegroundSprite - WORLD_BRIDGE_SPRITE_OFFSET + 10) << 5, 224, TILESIZE, TILESIZE};
+						SDL_Rect rSrc = {(iForegroundSprite - WORLD_BRIDGE_SPRITE_OFFSET + 10) << iTileSizeShift, 7 << iTileSizeShift, iTileSize, iTileSize};
 						SDL_BlitSurface(spr_worldforegroundspecial.getSurface(), &rSrc, surface, &r);
 					}
 					else if(iForegroundSprite >= WORLD_START_SPRITE_OFFSET && iForegroundSprite <= WORLD_START_SPRITE_OFFSET + 1)
 					{
-						SDL_Rect rSrc = {(iForegroundSprite - WORLD_START_SPRITE_OFFSET + 10) << 5, 128, TILESIZE, TILESIZE};
+						SDL_Rect rSrc = {(iForegroundSprite - WORLD_START_SPRITE_OFFSET + 10) << iTileSizeShift, 4 << iTileSizeShift, iTileSize, iTileSize};
 						SDL_BlitSurface(spr_worldforegroundspecial.getSurface(), &rSrc, surface, &r);
 					}
 					else if(iForegroundSprite >= WORLD_FOREGROUND_SPRITE_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_SPRITE_OFFSET + 179)
 					{
 						short iSprite = iForegroundSprite - WORLD_FOREGROUND_SPRITE_OFFSET;
-						SDL_Rect rSrc = {(iSprite % 12) << 5, (iSprite / 12) << 5, TILESIZE, TILESIZE};
+						SDL_Rect rSrc = {(iSprite % 12) << iTileSizeShift, (iSprite / 12) << iTileSizeShift, iTileSize, iTileSize};
 						SDL_BlitSurface(spr_worldforeground.getSurface(), &rSrc, surface, &r);
 					}
 					else if(iForegroundSprite >= WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET + 29)
 					{
 						short iSprite = iForegroundSprite - WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET;
-						SDL_Rect rSrc = {(iSprite >= 15 ? 512 : 384) + iAnimationFrame, (iSprite % 15) << 5, TILESIZE, TILESIZE};
+						SDL_Rect rSrc = {(iSprite >= 15 ? (16 << iTileSizeShift) : (12 << iTileSizeShift)) + iAnimationFrame, (iSprite % 15) << iTileSizeShift, iTileSize, iTileSize};
 						SDL_BlitSurface(spr_worldforeground.getSurface(), &rSrc, surface, &r);
 					}
 				}
@@ -1313,7 +1316,7 @@ void WorldMap::DrawMapToSurface(bool fInit, SDL_Surface * surface, short iMapDra
 				short iType = tile->iType;
 				if(iType >= 2 && iType <= 5)
 				{
-					SDL_Rect rSrc = {(iType + 8) << 5, 192, TILESIZE, TILESIZE};
+					SDL_Rect rSrc = {(iType + 8) << iTileSizeShift, 6 << iTileSizeShift, iTileSize, iTileSize};
 					SDL_BlitSurface(spr_worldforegroundspecial.getSurface(), &rSrc, surface, &r);
 				}
 			}
