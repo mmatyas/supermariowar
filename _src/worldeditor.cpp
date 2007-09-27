@@ -61,17 +61,12 @@ gfxSprite		menu_shade;
 
 gfxSprite		spr_warps[3];
 gfxSprite		spr_path;
-gfxSprite		spr_backgroundtiles[3];
-gfxSprite		spr_foregroundtiles[3];
-gfxSprite		spr_foregroundspecialtiles[3];
-gfxSprite		spr_pathtiles[3];
-gfxSprite		spr_vehicles[3];
 
-gfxSprite		spr_worldbackground;
-gfxSprite		spr_worldforeground;
-gfxSprite		spr_worldforegroundspecial;
-gfxSprite		spr_worldpaths;
-gfxSprite		spr_worldvehicle;
+gfxSprite		spr_worldbackground[2];
+gfxSprite		spr_worldforeground[2];
+gfxSprite		spr_worldforegroundspecial[2];
+gfxSprite		spr_worldpaths[2];
+gfxSprite		spr_worldvehicle[2];
 
 int				set_tile = 0;
 bool			fAutoPaint = true;
@@ -228,31 +223,21 @@ int main(int argc, char *argv[])
 
 	printf("\n---------------- load world ----------------\n");
 
-	spr_backgroundtiles[0].init(convertPath("gfx/packs/Classic/world/world_background.png"), 255, 0, 255);
-	//spr_backgroundtiles[1].init(convertPath("gfx/packs/Classic/world/world_background_medium.png"), 255, 0, 255);
-	//spr_backgroundtiles[2].init(convertPath("gfx/packs/Classic/world/world_background_small.png"), 255, 0, 255);
-	spr_worldbackground.setSurface(spr_backgroundtiles[0].getSurface());
+	spr_worldbackground[0].init(convertPath("gfx/packs/Classic/world/world_background.png"), 255, 0, 255);
+	spr_worldbackground[1].init(convertPath("gfx/packs/Classic/world/preview/world_background.png"), 255, 0, 255);
 
-	spr_foregroundtiles[0].init(convertPath("gfx/packs/Classic/world/world_foreground.png"), 255, 0, 255);
-	//spr_foregroundtiles[1].init(convertPath("gfx/packs/Classic/world/world_foreground_medium.png"), 255, 0, 255);
-	//spr_foregroundtiles[2].init(convertPath("gfx/packs/Classic/world/world_foreground_small.png"), 255, 0, 255);
-	spr_worldforeground.setSurface(spr_foregroundtiles[0].getSurface());
+	spr_worldforeground[0].init(convertPath("gfx/packs/Classic/world/world_foreground.png"), 255, 0, 255);
+	spr_worldforeground[1].init(convertPath("gfx/packs/Classic/world/preview/world_foreground.png"), 255, 0, 255);
 
-	spr_foregroundspecialtiles[0].init(convertPath("gfx/packs/Classic/world/world_foreground_special.png"), 255, 0, 255);
-	//spr_foregroundspecialtiles[1].init(convertPath("gfx/packs/Classic/world/world_foregroundspecial_medium.png"), 255, 0, 255);
-	//spr_foregroundspecialtiles[2].init(convertPath("gfx/packs/Classic/world/world_foregroundspecial_small.png"), 255, 0, 255);
-	spr_worldforegroundspecial.setSurface(spr_foregroundspecialtiles[0].getSurface());
+	spr_worldforegroundspecial[0].init(convertPath("gfx/packs/Classic/world/world_foreground_special.png"), 255, 0, 255);
+	spr_worldforegroundspecial[1].init(convertPath("gfx/packs/Classic/world/preview/world_foregroundspecial.png"), 255, 0, 255);
 
-	spr_pathtiles[0].init(convertPath("gfx/packs/Classic/world/world_paths.png"), 255, 0, 255);
-	//spr_pathtiles[1].init(convertPath("gfx/packs/Classic/world/world_paths_medium.png"), 255, 0, 255);
-	//spr_pathtiles[2].init(convertPath("gfx/packs/Classic/world/world_paths_small.png"), 255, 0, 255);
-	spr_worldpaths.setSurface(spr_pathtiles[0].getSurface());
+	spr_worldpaths[0].init(convertPath("gfx/packs/Classic/world/world_paths.png"), 255, 0, 255);
+	spr_worldpaths[1].init(convertPath("gfx/packs/Classic/world/preview/world_paths.png"), 255, 0, 255);
 
-	spr_vehicles[0].init(convertPath("gfx/packs/Classic/world/world_vehicles.png"), 255, 0, 255);
-	//vehicles[1].init(convertPath("gfx/packs/Classic/world/world_vehicles_medium.png"), 255, 0, 255);
-	//vehicles[2].init(convertPath("gfx/packs/Classic/world/world_vehicles_small.png"), 255, 0, 255);
-	spr_worldvehicle.setSurface(spr_vehicles[0].getSurface());
-
+	spr_worldvehicle[0].init(convertPath("gfx/packs/Classic/world/world_vehicles.png"), 255, 0, 255);
+	spr_worldvehicle[1].init(convertPath("gfx/packs/Classic/world/preview/world_vehicles.png"), 255, 0, 255);
+	
 	sMapSurface = SDL_CreateRGBSurface(screen->flags, 768, 608, screen->format->BitsPerPixel, 0, 0, 0, 0);
 
 	game_values.worldindex = 0;
@@ -337,13 +322,6 @@ int main(int argc, char *argv[])
 	}
 
 	SDL_FreeSurface(sMapSurface);
-
-	//These two surfaces share the same surface as the world editor back/foreground gfx array as a memory optimization
-	//Clear them here so they don't get freed twice
-	spr_worldbackground.clearSurface();
-	spr_worldforeground.clearSurface();
-	spr_worldpaths.clearSurface();
-	spr_worldvehicle.clearSurface();
 
 	printf("\n---------------- save world ----------------\n");
 
@@ -874,7 +852,7 @@ int editor_edit()
 						SDL_Rect r = {ix, iy, 32, 32};
 						SDL_FillRect(blitdest, &r, color);
 
-						spr_foregroundspecialtiles[0].draw(ix, iy, (iType % 10) << 5, (iType / 10) << 5, 32, 32);
+						spr_worldforegroundspecial[0].draw(ix, iy, (iType % 10) << 5, (iType / 10) << 5, 32, 32);
 					}
 				}
 			}
@@ -889,7 +867,7 @@ int editor_edit()
 				short ix = (vehicle->iCurrentTileX  - draw_offset_col) * TILESIZE + draw_offset_x;
 				short iy = (vehicle->iCurrentTileY - draw_offset_row) * TILESIZE + draw_offset_y;
 
-				spr_worldvehicle.draw(ix, iy, vehicle->iDrawDirection << 5, vehicle->iDrawSprite << 5, 32, 32);
+				spr_worldvehicle[0].draw(ix, iy, vehicle->iDrawDirection << 5, vehicle->iDrawSprite << 5, 32, 32);
 
 				itr++;
 			}
@@ -1652,7 +1630,7 @@ void AutoSetTile(short iCol, short iRow)
 
 void updateworldsurface()
 {
-	g_worldmap.DrawMapToSurface(true, sMapSurface, draw_offset_col, draw_offset_row, 0, 5);
+	g_worldmap.DrawMapToSurface(true, sMapSurface, draw_offset_col, draw_offset_row, 0);
 }
 
 void drawmap(bool fScreenshot, short iBlockSize)
@@ -1838,8 +1816,8 @@ int editor_type()
 		drawmap(false, TILESIZE);
 		menu_shade.draw(0, 0);
 
-		spr_foregroundspecialtiles[0].draw(0, 0, 320, 128, 64, 32);
-		spr_foregroundspecialtiles[0].draw(64, 0, 320, 192, 128, 32);
+		spr_worldforegroundspecial[0].draw(0, 0, 320, 128, 64, 32);
+		spr_worldforegroundspecial[0].draw(64, 0, 320, 192, 128, 32);
 
 		int color = SDL_MapRGB(blitdest->format, 0, 0, 255);
 		for(short iStage = 0; iStage < g_worldmap.iNumStages; iStage++)
@@ -1847,10 +1825,10 @@ int editor_type()
 			SDL_Rect r = {iStage << 5, 32, 32, 32};
 			SDL_FillRect(blitdest, &r, color);
 
-			spr_foregroundspecialtiles[0].draw(iStage << 5, 32, (iStage % 10) << 5, (iStage / 10) << 5, 32, 32);
+			spr_worldforegroundspecial[0].draw(iStage << 5, 32, (iStage % 10) << 5, (iStage / 10) << 5, 32, 32);
 		}
 
-		spr_foregroundspecialtiles[0].draw(64, 0, 448, 64, 128, 32);
+		spr_worldforegroundspecial[0].draw(64, 0, 448, 64, 128, 32);
 		
 		menu_font_small.drawRightJustified(640, 0, worldlist.current_name());
 
@@ -1924,7 +1902,7 @@ int editor_water()
 		SDL_FillRect(screen, NULL, 0x0);
 		
 		for(short iWater = 0; iWater < 3; iWater++)
-			spr_backgroundtiles[0].draw(iWater << 5, 0, 512 + (iWater << 7), 0, 32, 32);
+			spr_worldbackground[0].draw(iWater << 5, 0, 512 + (iWater << 7), 0, 32, 32);
 		
 		SDL_Flip(screen);
 
@@ -2029,7 +2007,7 @@ int editor_background()
 
 		SDL_FillRect(screen, NULL, 0x0);
 
-		spr_backgroundtiles[0].draw(0, 0, iPage * 640, 32, 640, 480);
+		spr_worldbackground[0].draw(0, 0, iPage * 640, 32, 640, 480);
 
 		SDL_Flip(screen);
 
@@ -2141,20 +2119,20 @@ int editor_foreground()
 			{
 				for(short iCol = 0; iCol < 10; iCol++)
 				{
-					spr_foregroundspecialtiles[0].draw(iCol << 5, iRow << 5, 384, iForegroundScreen << 5, 32, 32);
+					spr_worldforegroundspecial[0].draw(iCol << 5, iRow << 5, 384, iForegroundScreen << 5, 32, 32);
 				}
 			}
 
-			spr_foregroundspecialtiles[0].draw(0, 0, 0, 0, 320, 320);
+			spr_worldforegroundspecial[0].draw(0, 0, 0, 0, 320, 320);
 		}
 		else if(iForegroundScreen == 4)
 		{
-			spr_foregroundspecialtiles[0].draw(0, 0, 320, 224, 128, 32);
+			spr_worldforegroundspecial[0].draw(0, 0, 320, 224, 128, 32);
 		}
 		else if(iForegroundScreen == 5)
 		{
-			spr_foregroundtiles[0].draw(0, 0, 0, 0, 416, 480);
-			spr_foregroundtiles[0].draw(416, 0, 512, 0, 32, 480);
+			spr_worldforeground[0].draw(0, 0, 0, 0, 416, 480);
+			spr_worldforeground[0].draw(416, 0, 512, 0, 32, 480);
 		}
 
 		SDL_Flip(screen);
@@ -2226,7 +2204,7 @@ int editor_pathsprite()
 
 		for(short iPath = 0; iPath < 8; iPath++)
 		{
-			spr_pathtiles[0].draw(iPath << 5, 0, (iPath % 4) * 160, (iPath / 4) * 320, 32, 192);
+			spr_worldpaths[0].draw(iPath << 5, 0, (iPath % 4) * 160, (iPath / 4) * 320, 32, 192);
 		}
 
 		SDL_Flip(screen);
@@ -2302,7 +2280,7 @@ int editor_vehicles()
 		
 		for(short iVehicle = 0; iVehicle < 9; iVehicle++)
 		{
-			spr_worldvehicle.draw(iVehicle << 5, 0, 0, iVehicle << 5, 32, 32);
+			spr_worldvehicle[0].draw(iVehicle << 5, 0, 0, iVehicle << 5, 32, 32);
 		}
 
 		menu_font_small.drawRightJustified(640, 0, worldlist.current_name());
@@ -2772,6 +2750,24 @@ int new_world()
 		if(iHeight < 1)
 			iHeight = 1;
 
+		std::vector<WorldVehicle*>::iterator itrVehicle = vehiclelist.begin(), limVehicle = vehiclelist.end();
+		while(itrVehicle != limVehicle)
+		{
+			delete (*itrVehicle);
+			itrVehicle++;
+		}
+
+		vehiclelist.clear();
+
+		std::vector<WorldWarp*>::iterator itrWarp = warplist.begin(), limWarp = warplist.end();
+		while(itrWarp != limWarp)
+		{
+			delete (*itrWarp);
+			itrWarp++;
+		}
+
+		warplist.clear();
+
 		g_worldmap.New(iWidth, iHeight);
 		worldlist.add(strcat(worldLocation, strcat(fileName, ".txt")));
 		worldlist.find(fileName);
@@ -2779,24 +2775,6 @@ int new_world()
 		savecurrentworld();
 		loadcurrentworld();
 	}
-
-	std::vector<WorldVehicle*>::iterator itrVehicle = vehiclelist.begin(), limVehicle = vehiclelist.end();
-	while(itrVehicle != limVehicle)
-	{
-		delete (*itrVehicle);
-		itrVehicle++;
-	}
-
-	vehiclelist.clear();
-
-	std::vector<WorldWarp*>::iterator itrWarp = warplist.begin(), limWarp = warplist.end();
-	while(itrWarp != limWarp)
-	{
-		delete (*itrWarp);
-		itrWarp++;
-	}
-
-	warplist.clear();
 
 	return 0;
 }

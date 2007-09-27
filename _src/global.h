@@ -480,11 +480,12 @@ extern gfxSprite		spr_thumbnail_platformarrows;
 extern gfxSprite		spr_thumbnail_warps[2];
 extern gfxSprite		spr_thumbnail_mapitems[2];
 
-extern gfxSprite		spr_worldbackground;
-extern gfxSprite		spr_worldforeground;
-extern gfxSprite		spr_worldforegroundspecial;
-extern gfxSprite		spr_worldpaths;
-extern gfxSprite		spr_worldvehicle;
+extern gfxSprite		spr_worldbackground[2];
+extern gfxSprite		spr_worldforeground[2];
+extern gfxSprite		spr_worldforegroundspecial[2];
+extern gfxSprite		spr_worldpaths[2];
+extern gfxSprite		spr_worldvehicle[2];
+
 extern gfxSprite		spr_worlditems;
 extern gfxSprite		spr_worlditempopup;
 extern gfxSprite		spr_worlditemssmall;

@@ -2396,6 +2396,13 @@ void Menu::RunMenu()
 					}
 
 #ifndef _XBOX
+
+#ifdef _DEBUG
+					if(event.key.keysym.sym == SDLK_F2)
+					{
+						game_values.frameadvance = !game_values.frameadvance;
+					}
+#endif
 					if(event.key.keysym.mod & (KMOD_LALT | KMOD_RALT))
 					{
 						//ALT + F4 = close window
@@ -3275,6 +3282,25 @@ void Menu::RunMenu()
 			menu_font_large.drawCentered(320, 405, "Refreshing Map Thumbnails");
 			menu_font_large.drawCentered(320, 430, "Please Wait...");
 		}
+
+		//Debug code to slow framerate down to 1 fps to see exact movement
+#ifdef _DEBUG
+		if(game_values.frameadvance)
+		{
+			delay = (short)(1000 - SDL_GetTicks() + framestart);
+
+			if(delay > 0)
+			{
+				if(delay > 1000)
+					delay = 1000;
+				
+				SDL_Delay(delay);
+			}
+
+			while(SDL_GetTicks() - framestart < 1000)
+				SDL_Delay(0);
+		}
+#endif
 
 		ticks = SDL_GetTicks() - framestart;
 		if(ticks == 0)

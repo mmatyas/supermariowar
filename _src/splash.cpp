@@ -92,11 +92,21 @@ bool LoadMenuGraphics()
 	_load_gfxck(spr_thumbnail_mapitems[0], convertPath("gfx/packs/menu/menu_mapitems_preview.png", graphicspack));
 	_load_gfxck(spr_thumbnail_mapitems[1], convertPath("gfx/packs/menu/menu_mapitems_thumbnail.png", graphicspack));
 
-	_load_gfxck(spr_worldbackground, convertPath("gfx/packs/world/world_background.png", graphicspack));
-	_load_gfxck(spr_worldforeground, convertPath("gfx/packs/world/world_foreground.png", graphicspack));
-	_load_gfxck(spr_worldforegroundspecial, convertPath("gfx/packs/world/world_foreground_special.png", graphicspack));
-	_load_gfxck(spr_worldpaths, convertPath("gfx/packs/world/world_paths.png", graphicspack));
-	_load_gfxck(spr_worldvehicle, convertPath("gfx/packs/world/world_vehicles.png", graphicspack));
+	_load_gfxck(spr_worldbackground[0], convertPath("gfx/packs/world/world_background.png", graphicspack));
+	_load_gfxck(spr_worldbackground[1], convertPath("gfx/packs/world/preview/world_background.png", graphicspack));
+
+	_load_gfxck(spr_worldforeground[0], convertPath("gfx/packs/world/world_foreground.png", graphicspack));
+	_load_gfxck(spr_worldforeground[1], convertPath("gfx/packs/world/preview/world_foreground.png", graphicspack));
+
+	_load_gfxck(spr_worldforegroundspecial[0], convertPath("gfx/packs/world/world_foreground_special.png", graphicspack));
+	_load_gfxck(spr_worldforegroundspecial[1], convertPath("gfx/packs/world/preview/world_foreground_special.png", graphicspack));
+
+	_load_gfxck(spr_worldpaths[0], convertPath("gfx/packs/world/world_paths.png", graphicspack));
+	_load_gfxck(spr_worldpaths[1], convertPath("gfx/packs/world/preview/world_paths.png", graphicspack));
+
+	_load_gfxck(spr_worldvehicle[0], convertPath("gfx/packs/world/world_vehicles.png", graphicspack));
+	_load_gfxck(spr_worldvehicle[1], convertPath("gfx/packs/world/preview/world_vehicles.png", graphicspack));
+
 	_load_gfxck(spr_worlditems, convertPath("gfx/packs/world/world_powerups.png", graphicspack));
 	_load_gfxck(spr_worlditempopup, convertPath("gfx/packs/world/world_item_popup.png", graphicspack));
 	_load_gfxck(spr_worlditemssmall, convertPath("gfx/packs/world/world_powerupssmall.png", graphicspack));

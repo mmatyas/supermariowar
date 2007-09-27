@@ -58,6 +58,7 @@ class WorldMovingObject
 		short iAnimationTimer;
 
 		short iTileSize;
+		short iTileSheet;
 	
 	friend class WorldMap;
 };
@@ -158,7 +159,7 @@ class WorldMap
 
 		bool Update(bool * fPlayerVehicleCollision);
 		void Draw(short iMapOffsetX, short iMapOffsetY, bool fDrawPlayer, bool fVehiclesSleeping);
-		void DrawMapToSurface(bool fInit, SDL_Surface * surface, short iMapDrawOffsetCol, short iMapDrawOffsetRow, short iAnimationFrame, short iTileSizeShift);
+		void DrawMapToSurface(bool fInit, SDL_Surface * surface, short iMapDrawOffsetCol, short iMapDrawOffsetRow, short iAnimationFrame);
 
 		void SetPlayerSprite(short iPlayerSprite);
 		bool IsVehicleMoving();
@@ -220,6 +221,10 @@ class WorldMap
 		short iInitialBonuses[32];
 
 		short iMusicCategory;
+		
+		short iTileSize;
+		short iTileSizeShift;
+		short iTileSheet;
 
 	friend class MI_World;
 	friend class MI_WorldPreviewDisplay;

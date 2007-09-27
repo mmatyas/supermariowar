@@ -2178,11 +2178,10 @@ MI_WorldPreviewDisplay::MI_WorldPreviewDisplay(short x, short y, short cols, sho
 	iCols = cols;
 	iRows = rows;
 
-	iMapOffsetX = 0;
-	iMapOffsetY = 0;
-	
-	iMapDrawOffsetCol = 0;
-	iMapDrawOffsetRow = 0;
+	iScrollCols = 0;
+	iScrollRows = 0;
+
+	Init();
 }
 
 MI_WorldPreviewDisplay::~MI_WorldPreviewDisplay()
@@ -2194,44 +2193,200 @@ MI_WorldPreviewDisplay::~MI_WorldPreviewDisplay()
 	}
 }
 
+void MI_WorldPreviewDisplay::Init()
+{
+	iMapOffsetX = 0;
+	iMapOffsetY = 0;
+	
+	iMapDrawOffsetCol = 0;
+	iMapDrawOffsetRow = 0;
+
+	iMoveDirection = iScrollCols > 0 ? 0 : (iScrollRows > 0 ? 1 : -1);
+
+	iAnimationTimer = 0;
+	iAnimationFrame = 0;
+
+	if(g_worldmap.iWidth > 20)
+		rectSrcSurface.w = 320;
+	else
+		rectSrcSurface.w = g_worldmap.iWidth * PREVIEWTILESIZE;
+
+	if(g_worldmap.iHeight > 15)
+		rectSrcSurface.h = 240;
+	else
+		rectSrcSurface.h = g_worldmap.iHeight * PREVIEWTILESIZE;
+
+	rectDstSurface.w = 320;
+	rectDstSurface.h = 240;
+	rectDstSurface.x = ix;
+	rectDstSurface.y = iy;
+
+	if(g_worldmap.iWidth < 20)
+		rectDstSurface.x += (20 - g_worldmap.iWidth) * 8;
+
+	if(g_worldmap.iHeight < 15)
+		rectDstSurface.y += (15 - g_worldmap.iHeight) * 8;
+}
+
 void MI_WorldPreviewDisplay::Update()
-{}
+{
+	if(!fShow)
+		return;
+
+	bool fNeedMapSurfaceUpdate = false;
+	if(++iAnimationTimer > 15)
+	{
+		iAnimationTimer = 0;
+		iAnimationFrame += PREVIEWTILESIZE;
+
+		if(iAnimationFrame >= 64)
+			iAnimationFrame = 0;
+
+		fNeedMapSurfaceUpdate = true;		
+	}
+
+	if(iMoveDirection == 0)
+	{
+		if(++iMapOffsetX >= PREVIEWTILESIZE)
+		{
+			iMapOffsetX = 0;
+
+			fNeedMapSurfaceUpdate = true;
+
+			if(++iMapDrawOffsetCol >= iScrollCols)
+			{
+				if(iScrollRows > 0)
+				{
+					iMoveDirection = 1;
+					iMapOffsetY = 0;
+				}
+				else
+				{
+					iMoveDirection = 2;
+					iMapOffsetX = PREVIEWTILESIZE;
+					--iMapDrawOffsetCol;
+				}
+			}
+		}
+	}
+	else if(iMoveDirection == 1)
+	{
+		if(++iMapOffsetY >= PREVIEWTILESIZE)
+		{
+			iMapOffsetY = 0;
+
+			fNeedMapSurfaceUpdate = true;
+
+			if(++iMapDrawOffsetRow >= iScrollRows)
+			{
+				if(iScrollCols > 0)
+				{
+					iMoveDirection = 2;
+					iMapOffsetX = PREVIEWTILESIZE;
+					--iMapDrawOffsetCol;
+				}
+				else
+				{
+					iMoveDirection = 3;
+					iMapOffsetY = PREVIEWTILESIZE;
+					--iMapDrawOffsetRow;
+				}
+			}
+		}
+	}
+	else if(iMoveDirection == 2)
+	{
+		if(--iMapOffsetX <= 0)
+		{
+			fNeedMapSurfaceUpdate = true;
+
+			if(--iMapDrawOffsetCol < 0)
+			{
+				iMapDrawOffsetCol = 0;
+
+				if(iScrollRows > 0)
+				{
+					iMoveDirection = 3;
+					iMapOffsetY = PREVIEWTILESIZE;
+					--iMapDrawOffsetRow;
+				}
+				else
+				{
+					iMoveDirection = 0;
+					iMapOffsetX = 0;
+				}
+			}
+			else
+			{
+				iMapOffsetX = PREVIEWTILESIZE;
+			}
+		}
+	}
+	else if(iMoveDirection == 3)
+	{
+		if(--iMapOffsetY <= 0)
+		{
+			fNeedMapSurfaceUpdate = true;
+
+			if(--iMapDrawOffsetRow < 0)
+			{
+				iMapDrawOffsetRow = 0;
+				iMoveDirection = iScrollCols > 0 ? 0 : 1;
+
+				if(iScrollCols > 0)
+				{
+					iMoveDirection = 0;
+					iMapOffsetX = 0;
+				}
+				else
+				{
+					iMoveDirection = 1;
+					iMapOffsetY = 0;
+				}
+			}
+			else
+			{
+				iMapOffsetY = PREVIEWTILESIZE;
+			}
+		}
+	}
+
+	if(fNeedMapSurfaceUpdate)
+		UpdateMapSurface();
+}
 
 void MI_WorldPreviewDisplay::Draw()
 {
 	if(!fShow)
 		return;
 
-	SDL_Rect rectSrcSurface;
-	rectSrcSurface.x = 0;
-	rectSrcSurface.y = 0;
-	
-	if(g_worldmap.iWidth > 24)
-		rectSrcSurface.w = 384;
-	else
-		rectSrcSurface.w = g_worldmap.iWidth * PREVIEWTILESIZE;
-
-	if(g_worldmap.iHeight > 19)
-		rectSrcSurface.h = 304;
-	else
-		rectSrcSurface.h = g_worldmap.iHeight * PREVIEWTILESIZE;
-
-	SDL_Rect rectDstSurface;
-	rectDstSurface.w = 320;
-	rectDstSurface.h = 240;
-
-	rectDstSurface.x = ix + iMapOffsetX + iMapDrawOffsetCol * PREVIEWTILESIZE;
-	rectDstSurface.y = iy + iMapOffsetY + iMapDrawOffsetRow * PREVIEWTILESIZE;
+	rectSrcSurface.x = iMapOffsetX;
+	rectSrcSurface.y = iMapOffsetY;
 	
 	SDL_BlitSurface(sMapSurface, &rectSrcSurface, blitdest, &rectDstSurface);
 
-	g_worldmap.Draw(ix + iMapOffsetX, iy + iMapOffsetY, false, false);
+	//TODO: Need a way to not draw vehicles that are not in preview
+	//g_worldmap.Draw(ix + iMapOffsetX, iy + iMapOffsetY, false, false);
 }
 
 void MI_WorldPreviewDisplay::SetWorld()
 {
 	g_worldmap.Load(PREVIEWTILESIZE);
-	g_worldmap.DrawMapToSurface(true, sMapSurface, 0, 0, 0, 4); 
+
+	short w, h;
+	g_worldmap.GetWorldSize(&w, &h);
+
+	iScrollCols = w > 20 ? w - 20 : 0;
+	iScrollRows = h > 15 ? h - 15 : 0;
+
+	Init();
+
+	UpdateMapSurface();
+}
+
+void MI_WorldPreviewDisplay::UpdateMapSurface()
+{
+	g_worldmap.DrawMapToSurface(true, sMapSurface, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame); 
 }
 
 
@@ -4663,7 +4818,7 @@ void MI_World::Update()
 
 void MI_World::UpdateMapSurface()
 {
-	g_worldmap.DrawMapToSurface(true, sMapSurface, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame, 5);
+	g_worldmap.DrawMapToSurface(true, sMapSurface, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
 }
 
 void MI_World::SetMapOffset()

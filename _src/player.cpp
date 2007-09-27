@@ -907,6 +907,10 @@ void CPlayer::move()
 				case 7:
 				{
 					turnslowdownon(holddown > 310);
+
+					outofarenatimer = 0;
+					outofarenadisplaytimer = game_values.outofboundstime - 1;
+
 					break;
 				}
 				case 8:

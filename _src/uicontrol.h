@@ -592,6 +592,9 @@ class MI_WorldPreviewDisplay : public UI_Control
 
 	protected:
 		
+		void Init();
+		void UpdateMapSurface();
+
 		SDL_Surface * sMapSurface;
 		SDL_Rect rectDst;
 
@@ -599,6 +602,15 @@ class MI_WorldPreviewDisplay : public UI_Control
 
 		short iMapOffsetX, iMapOffsetY;
 		short iMapDrawOffsetCol, iMapDrawOffsetRow;
+
+		short iMoveDirection;
+
+		short iAnimationTimer;
+		short iAnimationFrame;
+
+		short iScrollCols, iScrollRows;
+
+		SDL_Rect rectSrcSurface, rectDstSurface;
 };
 
 class MI_AnnouncerField : public UI_Control

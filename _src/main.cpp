@@ -103,11 +103,12 @@ gfxSprite		spr_thumbnail_platformarrows;
 gfxSprite		spr_thumbnail_warps[2];
 gfxSprite		spr_thumbnail_mapitems[2];
 
-gfxSprite		spr_worldbackground;
-gfxSprite		spr_worldforeground;
-gfxSprite		spr_worldforegroundspecial;
-gfxSprite		spr_worldpaths;
-gfxSprite		spr_worldvehicle;
+gfxSprite		spr_worldbackground[2];
+gfxSprite		spr_worldforeground[2];
+gfxSprite		spr_worldforegroundspecial[2];
+gfxSprite		spr_worldpaths[2];
+gfxSprite		spr_worldvehicle[2];
+
 gfxSprite		spr_worlditems;
 gfxSprite		spr_worlditempopup;
 gfxSprite		spr_worlditemssmall;
