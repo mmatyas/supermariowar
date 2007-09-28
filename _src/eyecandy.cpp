@@ -4,6 +4,11 @@
 
 #include "global.h"
 
+extern SDL_Rect rectSuperStompLeftSrc[8];
+extern SDL_Rect rectSuperStompRightSrc[8];
+extern SDL_Rect rectSuperStompLeftDst[8];
+extern SDL_Rect rectSuperStompRightDst[8];
+
 //------------------------------------------------------------------------------
 // class cloud
 //------------------------------------------------------------------------------
@@ -823,6 +828,43 @@ void EC_BossPeeker::draw()
 	spr->draw(ix, iy, 192, iBossColorOffsetY, 48, 64);
 }
 */
+
+//------------------------------------------------------------------------------
+// class EC_SuperStompExplosion
+//------------------------------------------------------------------------------
+EC_SuperStompExplosion::EC_SuperStompExplosion(gfxSprite *nspr, short x, short y, short irate)
+{
+	spr = nspr;
+	iRate = irate;
+	ix = x;
+	iy = y;
+	
+	iAnimationFrame = 0;
+	iAnimationTimer = 0;
+}
+
+void EC_SuperStompExplosion::update()
+{
+	if(++iAnimationTimer >= iRate)
+	{
+		iAnimationTimer = 0;
+
+		if(++iAnimationFrame > 7)
+		{
+			dead = true;
+		}
+	}
+}
+
+void EC_SuperStompExplosion::draw()
+{
+	if(dead)
+		return;
+
+	spr->draw(rectSuperStompLeftDst[iAnimationFrame].x + ix, rectSuperStompLeftDst[iAnimationFrame].y + iy, rectSuperStompLeftSrc[iAnimationFrame].x, rectSuperStompLeftSrc[iAnimationFrame].y, rectSuperStompLeftSrc[iAnimationFrame].w, rectSuperStompLeftSrc[iAnimationFrame].h);
+	spr->draw(rectSuperStompRightDst[iAnimationFrame].x + ix, rectSuperStompRightDst[iAnimationFrame].y + iy, rectSuperStompRightSrc[iAnimationFrame].x, rectSuperStompRightSrc[iAnimationFrame].y, rectSuperStompRightSrc[iAnimationFrame].w, rectSuperStompRightSrc[iAnimationFrame].h);
+}
+
 //------------------------------------------------------------------------------
 // class eyecandy_container
 //------------------------------------------------------------------------------

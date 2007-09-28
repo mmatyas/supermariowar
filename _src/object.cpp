@@ -407,7 +407,7 @@ bool B_PowerupBlock::hittop(CPlayer * player, bool useBehavior)
 
 	if(state == 1)
 	{
-		if(bumpPlayer && !player->invincible && !player->spawninvincible && (player->teamID != bumpPlayer->teamID || game_values.friendlyfire))
+		if(bumpPlayer && !player->IsInvincibleOnBottom() && (player->teamID != bumpPlayer->teamID || game_values.friendlyfire))
 			PlayerKilledPlayer(*bumpPlayer, *player, death_style_jump, kill_style_bounce);
 		else
 			player->vely = -VELNOTEBLOCKREPEL;
@@ -415,6 +415,12 @@ bool B_PowerupBlock::hittop(CPlayer * player, bool useBehavior)
 	else if(useBehavior)
 	{
 		player->vely = GRAVITATION;
+
+		if(player->IsSuperStomping())
+		{
+			state = 1;
+			side = player->ix + HALFPW < ix + (iw >> 1);
+		}
 	}
 
 	return false;
@@ -682,7 +688,7 @@ bool B_BreakableBlock::hittop(CPlayer * player, bool useBehavior)
 
 	if(state == 1 || state == 2)
 	{
-		if(bumpPlayer && !player->invincible && !player->spawninvincible && (player->teamID != bumpPlayer->teamID || game_values.friendlyfire))
+		if(bumpPlayer && !player->IsInvincibleOnBottom() && (player->teamID != bumpPlayer->teamID || game_values.friendlyfire))
 			PlayerKilledPlayer(*bumpPlayer, *player, death_style_jump, kill_style_bounce);
 		else
 			player->vely = -VELNOTEBLOCKREPEL;
@@ -690,6 +696,12 @@ bool B_BreakableBlock::hittop(CPlayer * player, bool useBehavior)
 	else if(useBehavior)
 	{
 		player->vely = GRAVITATION;
+
+		if(player->IsSuperStomping() && state == 0)
+		{
+			triggerBehavior();
+			return true;
+		}
 	}
 
 	return false;
@@ -1136,6 +1148,13 @@ bool B_FlipBlock::hittop(CPlayer * player, bool useBehavior)
 		player->killsinrowinair = 0;
 		player->featherjump = 0;
 		player->vely = GRAVITATION;
+
+		if(player->IsSuperStomping())
+		{
+			explode();
+			return true;
+		}
+
 		return false;
 	}
 
@@ -1230,16 +1249,7 @@ bool B_FlipBlock::hitright(IO_MovingObject * object)
 					return false;
 			}
 
-			eyecandyfront.add(new EC_FallingObject(&spr_brokenflipblock, ix, iy, -2.2f, -10.0f, 4, 2, 0, 0, 0, 0));
-			eyecandyfront.add(new EC_FallingObject(&spr_brokenflipblock, ix + 16, iy, 2.2f, -10.0f, 4, 2, 0, 0, 0, 0));
-			eyecandyfront.add(new EC_FallingObject(&spr_brokenflipblock, ix, iy + 16, -2.2f, -5.5f, 4, 2, 0, 0, 0, 0));
-			eyecandyfront.add(new EC_FallingObject(&spr_brokenflipblock, ix + 16, iy + 16, 2.2f, -5.5f, 4, 2, 0, 0, 0, 0));
-
-			ifsoundonplay(sfx_breakblock);
-
-			dead = true;
-			g_map.blockdata[col][row] = NULL;
-			g_map.UpdateTileGap(col, row);
+			explode();
 		}
 	}
 
@@ -1265,16 +1275,7 @@ bool B_FlipBlock::hitleft(IO_MovingObject * object)
 					return false;
 			}
 
-			eyecandyfront.add(new EC_FallingObject(&spr_brokenflipblock, ix, iy, -2.2f, -10.0f, 4, 2, 0, 0, 0, 0));
-			eyecandyfront.add(new EC_FallingObject(&spr_brokenflipblock, ix + 16, iy, 2.2f, -10.0f, 4, 2, 0, 0, 0, 0));
-			eyecandyfront.add(new EC_FallingObject(&spr_brokenflipblock, ix, iy + 16, -2.2f, -5.5f, 4, 2, 0, 0, 0, 0));
-			eyecandyfront.add(new EC_FallingObject(&spr_brokenflipblock, ix + 16, iy + 16, 2.2f, -5.5f, 4, 2, 0, 0, 0, 0));
-			
-			ifsoundonplay(sfx_breakblock);
-
-			dead = true;
-			g_map.blockdata[col][row] = NULL;
-			g_map.UpdateTileGap(col, row);
+			explode();
 		}
 	}
 
@@ -1290,6 +1291,20 @@ void B_FlipBlock::triggerBehavior()
 
 		g_map.UpdateTileGap(col, row);
 	}
+}
+
+void B_FlipBlock::explode()
+{
+	eyecandyfront.add(new EC_FallingObject(&spr_brokenflipblock, ix, iy, -2.2f, -10.0f, 4, 2, 0, 0, 0, 0));
+	eyecandyfront.add(new EC_FallingObject(&spr_brokenflipblock, ix + 16, iy, 2.2f, -10.0f, 4, 2, 0, 0, 0, 0));
+	eyecandyfront.add(new EC_FallingObject(&spr_brokenflipblock, ix, iy + 16, -2.2f, -5.5f, 4, 2, 0, 0, 0, 0));
+	eyecandyfront.add(new EC_FallingObject(&spr_brokenflipblock, ix + 16, iy + 16, 2.2f, -5.5f, 4, 2, 0, 0, 0, 0));
+	
+	ifsoundonplay(sfx_breakblock);
+
+	dead = true;
+	g_map.blockdata[col][row] = NULL;
+	g_map.UpdateTileGap(col, row);
 }
 
 //------------------------------------------------------------------------------
@@ -1341,7 +1356,7 @@ bool B_OnOffSwitchBlock::hittop(CPlayer * player, bool useBehavior)
 
 	if(state == 1 || state == 4)
 	{
-		if(bumpPlayer && !player->invincible && !player->spawninvincible && (player->teamID != bumpPlayer->teamID || game_values.friendlyfire))
+		if(bumpPlayer && !player->IsInvincibleOnBottom() && (player->teamID != bumpPlayer->teamID || game_values.friendlyfire))
 			PlayerKilledPlayer(*bumpPlayer, *player, death_style_jump, kill_style_bounce);
 		else
 			player->vely = -VELNOTEBLOCKREPEL;
@@ -1656,7 +1671,7 @@ bool B_BounceBlock::hittop(CPlayer * player, bool useBehavior)
 
 	if(state == 1)
 	{
-		if(bumpPlayer && !player->invincible && !player->spawninvincible && (player->teamID != bumpPlayer->teamID || game_values.friendlyfire))
+		if(bumpPlayer && !player->IsInvincibleOnBottom() && (player->teamID != bumpPlayer->teamID || game_values.friendlyfire))
 			PlayerKilledPlayer(*bumpPlayer, *player, death_style_jump, kill_style_bounce);
 		else
 			player->vely = -VELNOTEBLOCKREPEL;

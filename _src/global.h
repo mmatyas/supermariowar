@@ -99,6 +99,7 @@ struct STextAward
 #define VELSTOPJUMP     5.0f
 #define BOUNCESTRENGTH  0.5f
 #define TAGGEDBOOST    1.0f
+#define VELSUPERSTOMP	10.0f
 
 #define	GRAVITATION		0.40f		
 
@@ -387,6 +388,7 @@ extern gfxSprite		spr_blueblock;
 extern gfxSprite		spr_spring;
 extern gfxSprite		spr_spike;
 extern gfxSprite		spr_bomb;
+extern gfxSprite		spr_kuriboshoe;
 
 extern gfxSprite		spr_fireballexplosion;
 extern gfxSprite		spr_frictionsmoke;
@@ -408,6 +410,7 @@ extern gfxSprite		spr_warplock;
 extern gfxSprite		spr_coinsparkle;
 extern gfxSprite		spr_shinesparkle;
 extern gfxSprite		spr_shellbounce;
+extern gfxSprite		spr_superstomp;
 
 extern gfxSprite		spr_storedpowerupsmall;
 extern gfxSprite		spr_storedpoweruplarge;

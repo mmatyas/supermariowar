@@ -301,6 +301,20 @@ class EC_BossPeeker : public CEyecandy
 };
 */
 
+class EC_SuperStompExplosion : public CEyecandy
+{
+	public:
+		EC_SuperStompExplosion(gfxSprite *nspr, short x, short y, short irate);
+		void update();
+		void draw();
+
+	protected:
+		gfxSprite *spr;
+		short ix, iy;
+		short iAnimationFrame, iAnimationTimer;
+		short iRate;
+};
+
 //eyecandy container
 class CEyecandyContainer
 {

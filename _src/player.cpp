@@ -29,9 +29,6 @@ CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamI
 		sprites[i] = nsprites[i];
 
 	sprswitch = 0;
-
-	spawninvincible = false;
-	spawninvincibletimer = 0;
 	
 	carriedItem = NULL;
 	ownerPlayerID = -1;
@@ -53,8 +50,6 @@ CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamI
 	iSuicideCreditTimer = 0;
 
 	konamiIndex = 0;
-	secret_spring_index = 0;
-	secret_spike_index = 0;
 }
 
 CPlayer::~CPlayer()
@@ -711,6 +706,13 @@ void CPlayer::move()
         }
     }
 
+	if(fSuperStomp && !inair)
+	{
+		eyecandyfront.add(new EC_SuperStompExplosion(&spr_superstomp, ix + HALFPW, iy + PH, 4));
+		ifsoundonplay(sfx_bobombsound);
+		fSuperStomp = false;
+	}
+
 	if(hammertimer > 0)
 		hammertimer--;
 
@@ -1051,9 +1053,46 @@ void CPlayer::move()
 		}
 	}
 
+	if(fKuriboShoe)
+	{
+		if(++iKuriboShoeAnimationTimer > 7)
+		{
+			iKuriboShoeAnimationTimer = 0;
+			iKuriboShoeAnimationFrame += 32;
+
+			if(iKuriboShoeAnimationFrame > 32)
+				iKuriboShoeAnimationFrame = 0;
+		}
+	}
+
 	//if player is warping or spawning don't pay attention to controls
 	if(state == player_ready)
 	{
+		//Super stomp
+		if(fKuriboShoe && inair && !fSuperStomp && ((playerKeys->game_down.fPressed && playerDevice == DEVICE_KEYBOARD) || 
+			(playerKeys->game_jump.fPressed && playerKeys->game_down.fDown)))
+		{
+			iSuperStompTimer = 8;
+			lockfall = true;
+		}
+
+		//Hold super stomping player in mid air then accelerate them downwards
+		if(iSuperStompTimer > 0)
+		{
+			if(--iSuperStompTimer <= 0)
+			{
+				fSuperStomp = true;
+				vely = VELSUPERSTOMP;
+
+				lockfall = true;
+			}
+			else
+			{
+				velx = 0.0f;
+				vely = 0.0f;
+			}
+		}
+
 		//If player is shielded, count down that timer
 		if(spawninvincibletimer > 0)
 			spawninvincible = --spawninvincibletimer > 0;
@@ -1067,7 +1106,7 @@ void CPlayer::move()
 				cpu_think();
 		}
 
-        if (!statue_timer && (!game_values.slowdownfreeze || game_values.slowdownon == teamID))
+        if (!statue_timer && (!game_values.slowdownfreeze || game_values.slowdownon == teamID) && !fSuperStomp)
         {
             if(playerKeys->game_right.fDown)
                 lrn++;
@@ -1175,7 +1214,7 @@ void CPlayer::move()
 						superjumptimer = 0;
 						lockjump = true;
 					}
-					else if(powerup == 3)
+					else if(powerup == 3 && !fKuriboShoe)
 					{
 						if(featherjump < game_values.featherjumps)
 						{
@@ -1471,8 +1510,13 @@ void CPlayer::move()
 			if(velx > maxVel)
 				velx = maxVel;
 
-			if(velx < 0.0f && !inair)
-				game_values.playskidsound = true;
+			if(!inair)
+			{
+				if(fKuriboShoe)
+					velx = 0.0f;
+				else if(velx < 0.0f)
+					game_values.playskidsound = true;
+			}
 		}
 		else if(lrn == -1)
 		{
@@ -1496,8 +1540,13 @@ void CPlayer::move()
 			if(velx < maxVel)
 				velx = maxVel;
 
-			if(velx > 0.0f && !inair)
-				game_values.playskidsound = true;
+			if(!inair)
+			{
+				if(fKuriboShoe)
+					velx = 0.0f;
+				else if(velx > 0.0f)
+					game_values.playskidsound = true;
+			}
 		}
 		else
 		{
@@ -1525,6 +1574,12 @@ void CPlayer::move()
 
 				if(velx > 0.0f)
 					velx = 0.0f;
+			}
+
+			//Stop ground velocity when wearing the shoe
+			if(!inair && fKuriboShoe)
+			{
+				velx = 0.0f;
 			}
 		}
 		
@@ -1910,13 +1965,6 @@ void CPlayer::SetupNewPlayer()
 	if(konamiIndex != 11)
 		konamiIndex = 0;
 
-	//Only reset the secret spring index if it hasn't been triggered yet
-	if(secret_spring_index != 9)
-		secret_spring_index = 0;
-
-	if(secret_spike_index != 6)
-		secret_spike_index = 0;
-
 	superKickIndex = 0;
 
 	invincible = false;
@@ -2018,6 +2066,13 @@ void CPlayer::SetupNewPlayer()
 
 	spawninvincible = false;
 	spawninvincibletimer = 0;
+
+	fKuriboShoe = true;
+	iKuriboShoeAnimationTimer = 0;
+	iKuriboShoeAnimationFrame = 0;
+
+	fSuperStomp = false;
+	iSuperStompTimer = 0;
 	
 	if(game_values.gamemode->getgamemode() == game_mode_survival)
 	{
@@ -2093,6 +2148,8 @@ bool CPlayer::isstomping(CPlayer &o)
 			fKillPotential = true;
 
 		bouncejump();
+		fSuperStomp = false;
+		iSuperStompTimer = 0;
 
 		if(fKillPotential)
 		{
@@ -2590,13 +2647,25 @@ void CPlayer::draw()
 			spr_ownedtags.draw(ix - PWOFFSET - 8, iy - PHOFFSET - 8, ownerColorOffsetX, 0, 48, 48);
 	}
 	
-	if(powerup == 3)
+	if(powerup == 3 && !fKuriboShoe) //Don't allow cape to be used with shoe
 		DrawCape();
 
+	short iPlayerKuriboOffsetY = 0;
+	if(fKuriboShoe)
+		iPlayerKuriboOffsetY = 16;
+
 	if(state > player_ready) //warping
-		pScoreboardSprite[spr]->draw(ix - PWOFFSET, iy - PHOFFSET, iSrcOffsetX, 0, 32, 32, (short)state % 4, warpplane);
+		pScoreboardSprite[spr]->draw(ix - PWOFFSET, iy - PHOFFSET - iPlayerKuriboOffsetY, iSrcOffsetX, 0, 32, 32, (short)state % 4, warpplane);
 	else
-		pScoreboardSprite[spr]->draw(ix - PWOFFSET, iy - PHOFFSET, iSrcOffsetX, 0, 32, 32);
+		pScoreboardSprite[spr]->draw(ix - PWOFFSET, iy - PHOFFSET - iPlayerKuriboOffsetY, iSrcOffsetX, 0, 32, 32);
+
+	if(fKuriboShoe)
+	{
+		if(state > player_ready) //warping
+			spr_kuriboshoe.draw(ix - PWOFFSET, iy - PHOFFSET, iKuriboShoeAnimationFrame, (spr & 0x1) == 0 ? 0 : 32, 32, 32, (short)state % 4, warpplane);
+		else
+			spr_kuriboshoe.draw(ix - PWOFFSET, iy - PHOFFSET, iKuriboShoeAnimationFrame, (spr & 0x1) == 0 ? 0 : 32, 32, 32);
+	}
 
 	//Draw the crown on the player
 	if(game_values.showwinningcrown && g_iWinningPlayer == teamID)
@@ -3307,7 +3376,7 @@ void CPlayer::collision_detection_map()
 		}
 		
 		if(fSolidTileUnderPlayer ||
-			((invincible || spawninvincible) && (lefttile == tile_death_on_top || righttile == tile_death_on_top ||
+			((invincible || spawninvincible || fKuriboShoe) && (lefttile == tile_death_on_top || righttile == tile_death_on_top ||
 			lefttile == tile_death || righttile == tile_death)))
 		{	//on ground
 
@@ -3903,7 +3972,7 @@ bool CPlayer::IsPlayerFacingRight()
 
 bool CPlayer::AcceptItem(MO_CarriedObject * item)
 {
-	if(fAcceptingItem && statue_timer == 0)
+	if(fAcceptingItem && statue_timer == 0 && !fKuriboShoe)
 	{
 		carriedItem = item;
 		fAcceptingItem = false;

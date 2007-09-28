@@ -118,7 +118,7 @@ class CPlayer
 		short GetWarpPlane() {return warpplane;}
 		bool IsPlayerFacingRight();
 		
-		bool IsAcceptingItem() {return fAcceptingItem;}
+		bool IsAcceptingItem() {return fAcceptingItem && statue_timer == 0 && !fKuriboShoe;}
 		bool PressedAcceptItemKey() {return fPressedAcceptItem;}
 		bool AcceptItem(MO_CarriedObject * item);
 
@@ -131,6 +131,9 @@ class CPlayer
 		bool isspawning() {return state == player_spawning;}
 		bool iswarping() {return state > player_ready;}
 		bool isdead() {return state == player_dead;}
+
+		bool IsInvincibleOnBottom() {return invincible || spawninvincible || fKuriboShoe;}
+		bool IsSuperStomping() {return fSuperStomp;}
 
 	private:
 		void SetSprite();
@@ -175,10 +178,6 @@ class CPlayer
 
 		//super kick
 		short superKickIndex;
-
-		//secret spring
-		short secret_spring_index;
-		short secret_spike_index;
 
 		CScore *score;
 		short killsinrow;
@@ -290,6 +289,12 @@ class CPlayer
 
 		bool spawninvincible;
 		short spawninvincibletimer;
+
+		bool fKuriboShoe;
+		short iKuriboShoeAnimationTimer;
+		short iKuriboShoeAnimationFrame;
+		bool fSuperStomp;
+		short iSuperStompTimer;
 
 		short burnuptimer;
 		short burnupstarttimer;

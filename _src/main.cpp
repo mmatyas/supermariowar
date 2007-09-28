@@ -162,6 +162,7 @@ gfxSprite		spr_cape;
 gfxSprite		spr_coinsparkle;
 gfxSprite		spr_shinesparkle;
 gfxSprite		spr_shellbounce;
+gfxSprite		spr_superstomp;
 
 gfxSprite		spr_coin;
 gfxSprite		spr_egg;
@@ -204,6 +205,7 @@ gfxSprite		spr_blueblock;
 gfxSprite		spr_spring;
 gfxSprite		spr_spike;
 gfxSprite		spr_bomb;
+gfxSprite		spr_kuriboshoe;
 
 gfxSprite		spr_fireballexplosion;
 gfxSprite		spr_frictionsmoke;

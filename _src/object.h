@@ -257,6 +257,9 @@ class B_FlipBlock : public IO_Block
 		void triggerBehavior();
 
 	private:
+		
+		void explode();
+
 		short counter;
 		short frame;
 		short timer;

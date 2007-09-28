@@ -166,8 +166,10 @@ bool LoadGameGraphics()
 	
 	_load_gfxck(spr_spring, convertPath("gfx/packs/powerups/spring.png", graphicspack));
 	_load_gfxck(spr_spike, convertPath("gfx/packs/powerups/spike.png", graphicspack));
+	_load_gfxck(spr_kuriboshoe, convertPath("gfx/packs/powerups/kuriboshoe.png", graphicspack));
 	spr_spring.SetWrap(true);
 	spr_spike.SetWrap(true);
+	spr_kuriboshoe.SetWrap(true);
 
 	_load_gfxck(spr_tileanimation[0], convertPath("gfx/packs/eyecandy/tile_animation.png", graphicspack));
 	_load_gfxck(spr_tileanimation[1], convertPath("gfx/packs/eyecandy/tile_animation_preview.png", graphicspack));
@@ -236,7 +238,9 @@ bool LoadGameGraphics()
 	_load_gfxck(spr_coinsparkle, convertPath("gfx/packs/eyecandy/coinsparks.png", graphicspack));
 	_load_gfxck(spr_shinesparkle, convertPath("gfx/packs/eyecandy/shinesparks.png", graphicspack));
 	_load_gfxck(spr_shellbounce, convertPath("gfx/packs/eyecandy/shellbounce.png", graphicspack));
+	_load_gfxck(spr_superstomp, convertPath("gfx/packs/eyecandy/supersmash.png", graphicspack));
 	spr_crown.SetWrap(true); // Wrap crown for players wearing crown during game
+	spr_cape.SetWrap(true);
 	spr_shellbounce.SetWrap(true);
 
 	_load_gfxck(spr_egg, convertPath("gfx/packs/modeobjects/egg.png", graphicspack));
