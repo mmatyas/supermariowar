@@ -861,6 +861,12 @@ void EC_SuperStompExplosion::draw()
 	if(dead)
 		return;
 
+	static const SDL_Rect rectSuperStompLeftSrc[8] = {{0,0,48,40},{0,40,54,42},{0,82,48,58},{0,140,42,70},{0,210,44,78},{108,0,44,82},{96,82,42,76},{88,158,34,74}};
+	static const SDL_Rect rectSuperStompRightSrc[8] = {{48,0,48,40},{54,40,54,42},{48,82,48,58},{42,140,42,70},{44,210,44,78},{152,0,44,82},{138,82,42,76},{122,158,34,74}};
+
+	static const SDL_Rect rectSuperStompLeftDst[8] = {{-48,-40,48,40},{-56,-42,54,42},{-66,-58,48,58},{-68,-70,42,70},{-72,-78,44,78},{-74,-82,44,82},{-74,-76,42,76},{-70,-74,34,74}};
+	static const SDL_Rect rectSuperStompRightDst[8] = {{0,-40,48,40},{2,-42,54,42},{18,-58,48,58},{26,-70,42,70},{28,-78,44,78},{30,-82,44,82},{32,-76,42,76},{36,-74,34,74}};
+
 	spr->draw(rectSuperStompLeftDst[iAnimationFrame].x + ix, rectSuperStompLeftDst[iAnimationFrame].y + iy, rectSuperStompLeftSrc[iAnimationFrame].x, rectSuperStompLeftSrc[iAnimationFrame].y, rectSuperStompLeftSrc[iAnimationFrame].w, rectSuperStompLeftSrc[iAnimationFrame].h);
 	spr->draw(rectSuperStompRightDst[iAnimationFrame].x + ix, rectSuperStompRightDst[iAnimationFrame].y + iy, rectSuperStompRightSrc[iAnimationFrame].x, rectSuperStompRightSrc[iAnimationFrame].y, rectSuperStompRightSrc[iAnimationFrame].w, rectSuperStompRightSrc[iAnimationFrame].h);
 }

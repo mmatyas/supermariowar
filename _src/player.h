@@ -293,6 +293,9 @@ class CPlayer
 		bool fKuriboShoe;
 		short iKuriboShoeAnimationTimer;
 		short iKuriboShoeAnimationFrame;
+		short iKuriboShoeExitTimer;
+		short iKuriboShoeExitIndex;
+
 		bool fSuperStomp;
 		short iSuperStompTimer;
 
@@ -455,6 +458,7 @@ class CPlayer
 		friend class CO_Spring;
 		friend class CO_Spike;
 		friend class CO_Bomb;
+		friend class CO_KuriboShoe;
 
 		friend class MO_Goomba;
 		friend class MO_Koopa;

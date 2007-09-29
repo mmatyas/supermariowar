@@ -416,10 +416,14 @@ bool B_PowerupBlock::hittop(CPlayer * player, bool useBehavior)
 	{
 		player->vely = GRAVITATION;
 
-		if(player->IsSuperStomping())
+		if(state == 0)
 		{
-			state = 1;
-			side = player->ix + HALFPW < ix + (iw >> 1);
+			if(player->IsSuperStomping())
+			{
+				state = 1;
+				vely = -VELBLOCKBOUNCE;
+				side = player->ix + HALFPW < ix + (iw >> 1);
+			}
 		}
 	}
 
@@ -1094,7 +1098,8 @@ B_FlipBlock::B_FlipBlock(gfxSprite *nspr, short x, short y) :
 
 void B_FlipBlock::draw()
 {
-	spr->draw(ix, iy, frame, 0, iw, ih);
+	if(state == 0 || state == 1)
+		spr->draw(ix, iy, frame, 0, iw, ih);
 }
 
 void B_FlipBlock::update()
@@ -1122,17 +1127,27 @@ void B_FlipBlock::update()
 			g_map.UpdateTileGap(col, row);
 		}
 	}
+	else if(state == 2)
+	{
+		state = 3;
+	}
+	else if(state == 3)
+	{
+		dead = true;
+		g_map.blockdata[col][row] = NULL;
+		g_map.UpdateTileGap(col, row);
+	}
 }
 
 bool B_FlipBlock::collide(CPlayer * player, short direction, bool useBehavior)
 {
-	if(player->fOldY + PH <= iposy && direction == 2)
+	if((player->fOldY + PH <= iposy || state > 1) && direction == 2)
 		return hittop(player, useBehavior);
-	else if(player->fOldY >= iposy + ih && direction == 0)
+	else if((player->fOldY >= iposy + ih || state > 1) && direction == 0)
 		return hitbottom(player, useBehavior);
-	else if(player->fOldX + PW <= iposx && direction == 1)
+	else if((player->fOldX + PW <= iposx || state > 1) && direction == 1)
 		return hitleft(player, useBehavior);
-	else if(player->fOldX >= iposx + iw && direction == 3)
+	else if((player->fOldX >= iposx + iw || state > 1) && direction == 3)
 		return hitright(player, useBehavior);
 
 	return true;
@@ -1140,17 +1155,20 @@ bool B_FlipBlock::collide(CPlayer * player, short direction, bool useBehavior)
 
 bool B_FlipBlock::hittop(CPlayer * player, bool useBehavior)
 {
-	if(useBehavior && state == 0)
+	if(state == 2 || state == 3)
 	{
-		player->yf((float)(iposy - PH) - 0.2f);
-		player->inair = false;
-		player->fallthrough = false;
-		player->killsinrowinair = 0;
-		player->featherjump = 0;
-		player->vely = GRAVITATION;
+		IO_Block::hittop(player, useBehavior);
+
+		player->vely = -VELNOTEBLOCKREPEL;
+		return false;
+	}
+	else if(state == 0)
+	{
+		IO_Block::hittop(player, useBehavior);
 
 		if(player->IsSuperStomping())
 		{
+			state = 2;
 			explode();
 			return true;
 		}
@@ -1249,6 +1267,7 @@ bool B_FlipBlock::hitright(IO_MovingObject * object)
 					return false;
 			}
 
+			state = 2;
 			explode();
 		}
 	}
@@ -1275,6 +1294,7 @@ bool B_FlipBlock::hitleft(IO_MovingObject * object)
 					return false;
 			}
 
+			state = 2;
 			explode();
 		}
 	}
@@ -1301,10 +1321,6 @@ void B_FlipBlock::explode()
 	eyecandyfront.add(new EC_FallingObject(&spr_brokenflipblock, ix + 16, iy + 16, 2.2f, -5.5f, 4, 2, 0, 0, 0, 0));
 	
 	ifsoundonplay(sfx_breakblock);
-
-	dead = true;
-	g_map.blockdata[col][row] = NULL;
-	g_map.UpdateTileGap(col, row);
 }
 
 //------------------------------------------------------------------------------
@@ -1364,6 +1380,9 @@ bool B_OnOffSwitchBlock::hittop(CPlayer * player, bool useBehavior)
 	else if(useBehavior)
 	{
 		player->vely = GRAVITATION;
+
+		if((state == 0 || state == 3) && player->IsSuperStomping())
+			triggerBehavior();
 	}
 
 	return false;
@@ -1380,7 +1399,6 @@ bool B_OnOffSwitchBlock::hitbottom(CPlayer * player, bool useBehavior)
 		if(state == 0 || state == 3)
 		{
 			bumpPlayer = player;
-			
 			triggerBehavior();
 		}
 		else
@@ -7580,7 +7598,7 @@ bool CO_Shell::collide(CPlayer * player)
 
 bool CO_Shell::HitTop(CPlayer * player)
 {
-	if(player->invincible)
+	if(player->invincible || player->fKuriboShoe)
 	{
 		Die();
 		fSmoking = false;
@@ -8422,6 +8440,33 @@ void CO_Spike::hittop(CPlayer * player)
 {
 	if(player->isready() && !player->spawninvincible && !player->invincible)
 		player->KillPlayerMapHazard();
+}
+
+
+//------------------------------------------------------------------------------
+// class spike
+//------------------------------------------------------------------------------
+CO_KuriboShoe::CO_KuriboShoe(gfxSprite *nspr, short ix, short iy) :
+	CO_Spring(nspr, ix, iy + 15)
+{
+	iw = 32;
+	ih = 32;
+
+	collisionOffsetY = 15;
+	collisionHeight = 16;
+
+	movingObjectType = movingobject_kuriboshoe;
+}
+
+void CO_KuriboShoe::hittop(CPlayer * player)
+{
+	if(!player->fKuriboShoe)
+	{
+		dead = true;
+		player->fKuriboShoe = true;
+		ifsoundonplay(sfx_transform);
+		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, player->ix + HALFPW - 16, player->iy + HALFPH - 16, 3, 8));
+	}
 }
 
 //------------------------------------------------------------------------------

@@ -63,16 +63,16 @@ void CPlayer::move()
 	if(invincible)
 		game_values.playinvinciblesound = true;
 
+	int keymask =
+		(playerKeys->game_jump.fPressed?1:0) |
+		(playerKeys->game_down.fPressed?2:0) |
+		(playerKeys->game_left.fPressed?4:0) |
+		(playerKeys->game_right.fPressed?8:0) |
+		(playerKeys->game_turbo.fPressed?16:0) |
+		(playerKeys->game_powerup.fPressed?32:0);
+
 	if(game_values.secrets)
 	{
-		int keymask =
-			(playerKeys->game_jump.fPressed?1:0) |
-			(playerKeys->game_down.fPressed?2:0) |
-			(playerKeys->game_left.fPressed?4:0) |
-			(playerKeys->game_right.fPressed?8:0) |
-			(playerKeys->game_turbo.fPressed?16:0) |
-			(playerKeys->game_powerup.fPressed?32:0);
-
 		/*
 		for(short bossType = 0; bossType < 3; bossType++)
 		{
@@ -630,6 +630,42 @@ void CPlayer::move()
 		*/
 	}
 
+	//Free player from the kuribo shoe
+	if (fKuriboShoe && state == player_ready)
+	{
+		static const int iExitKuriboShoeCode[4] = {4, 8, 4, 8};
+
+		if(iKuriboShoeExitIndex > 0)
+		{
+			if(++iKuriboShoeExitTimer >= 32)
+			{
+				iKuriboShoeExitIndex = 0;
+				iKuriboShoeExitTimer = 0;
+			}
+		}
+	    
+		if (keymask & iExitKuriboShoeCode[iKuriboShoeExitIndex]) 
+			iKuriboShoeExitIndex++;
+		else if (keymask & ~iExitKuriboShoeCode[iKuriboShoeExitIndex])
+		{
+			iKuriboShoeExitIndex = 0;
+			iKuriboShoeExitTimer = 0;
+		}
+	    
+		if (iKuriboShoeExitIndex == 4 && iKuriboShoeExitTimer < 32)
+		{
+			iKuriboShoeExitIndex = 0;
+			iKuriboShoeExitTimer = 0;
+			ifsoundonplay(sfx_transform); 
+			fKuriboShoe = false;
+			fSuperStomp = false;
+			iSuperStompTimer = 0;
+			
+			objectsplayer.add(new CO_KuriboShoe(&spr_kuriboshoe, ix - PWOFFSET, iy - PHOFFSET));
+			eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
+		}
+	}
+
     if (tanooki && state == player_ready)
     {
         // If the down key is ever released, manually untransform by releasing the down key
@@ -646,7 +682,7 @@ void CPlayer::move()
             statue_timer = 123;
 
             // perform tansformation effects
-            eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + (HALFPW) - 16, iy + (HALFPH) - 16, 3, 8));
+            eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
             ifsoundonplay(sfx_transform);
 
             // Neutralize lateral velocity
@@ -678,7 +714,7 @@ void CPlayer::move()
 				vely = -8.0;
 
             // perform transformation effects
-            eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + (HALFPW) - 16, iy + (HALFPH) - 16, 3, 8));
+            eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
             ifsoundonplay(sfx_transform);
 
 			statue_lock = false;
@@ -1918,6 +1954,11 @@ void CPlayer::die(short deathStyle, bool fTeamRemoved)
 		carriedItem = NULL;
 	}
 
+	if(fKuriboShoe)
+	{
+		objectsplayer.add(new CO_KuriboShoe(&spr_kuriboshoe, ix - PWOFFSET, iy - PHOFFSET));
+	}
+
 	if(!fTeamRemoved)
 	{
 		if(game_values.screencrunch)
@@ -2067,9 +2108,11 @@ void CPlayer::SetupNewPlayer()
 	spawninvincible = false;
 	spawninvincibletimer = 0;
 
-	fKuriboShoe = true;
+	fKuriboShoe = false;
 	iKuriboShoeAnimationTimer = 0;
 	iKuriboShoeAnimationFrame = 0;
+	iKuriboShoeExitTimer = 0;
+	iKuriboShoeExitIndex = 0;
 
 	fSuperStomp = false;
 	iSuperStompTimer = 0;

@@ -1305,6 +1305,8 @@ void RunGame()
 		iScoreTextOffset[iTeam] = 34 * game_values.teamcounts[iTeam] + 1;
 	}
 
+
+
 	while (true)
 	{
 		framestart = SDL_GetTicks();
@@ -1794,7 +1796,7 @@ void RunGame()
 						if(!game_values.friendlyfire && game_values.screenshaketeamid == list_players[k]->teamID)
 							continue;
 						
-						if(!list_players[k]->invincible && !list_players[k]->spawninvincible && list_players[k]->isready())
+						if(!list_players[k]->invincible && !list_players[k]->spawninvincible && !list_players[k]->fKuriboShoe && list_players[k]->isready())
 						{
 							if(game_values.screenshakekillinair == list_players[k]->inair)
 							{
@@ -3167,6 +3169,8 @@ void LoadMapObjects()
 			objectsplayer.add(new CO_Spring(&spr_spring, ix, iy));
 		else if(iType == 1)
 			objectsplayer.add(new CO_Spike(&spr_spike, ix, iy));
+		else if(iType == 2)
+			objectsplayer.add(new CO_KuriboShoe(&spr_kuriboshoe, ix, iy));
 	}
 
 	g_map.UpdateAllTileGaps();
