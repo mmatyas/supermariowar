@@ -2957,16 +2957,18 @@ MI_TournamentScoreboard::MI_TournamentScoreboard(gfxSprite * spr_background, sho
 	sprBackground = spr_background;
 	fCreated = false;
 
+	worldScore = NULL;
+	worldScoreModifier = NULL;
+
 	for(short iTeam = 0; iTeam < 4; iTeam++)
 	{
 		tourScores[iTeam] = NULL;
 		
-		worldScoreModifier[iTeam] = NULL;
-
-		for(short iBonus = 0; iBonus < 5; iBonus++)
+		for(short iBonus = 0; iBonus < MAX_WORLD_BONUSES_AWARDED; iBonus++)
 			worldBonus[iTeam][iBonus] = NULL;
 
 		worldPlace[iTeam] = NULL;
+		worldPointsBackground[iTeam] = NULL;
 	}
 
 	for(short iGame = 0; iGame < 10; iGame++)
@@ -3016,7 +3018,7 @@ void MI_TournamentScoreboard::FreeScoreboard()
 			worldPlace[iTeam] = NULL;
 		}
 
-		for(short iBonus = 0; iBonus < 5; iBonus++)
+		for(short iBonus = 0; iBonus < MAX_WORLD_BONUSES_AWARDED; iBonus++)
 		{
 			if(worldBonus[iTeam][iBonus])
 			{
@@ -3025,10 +3027,10 @@ void MI_TournamentScoreboard::FreeScoreboard()
 			}
 		}
 
-		if(worldScoreModifier[iTeam])
+		if(worldPointsBackground[iTeam])
 		{
-			delete worldScoreModifier[iTeam];
-			worldScoreModifier[iTeam] = NULL;
+			delete worldPointsBackground[iTeam];
+			worldPointsBackground[iTeam] = NULL;
 		}
 	}
 
@@ -3052,8 +3054,19 @@ void MI_TournamentScoreboard::FreeScoreboard()
 		delete miTourPointBar;
 		miTourPointBar = NULL;
 	}
-	
 
+	if(worldScore)
+	{
+		delete worldScore;
+		worldScore = NULL;
+	}
+
+	if(worldScoreModifier)
+	{
+		delete worldScoreModifier;
+		worldScoreModifier = NULL;
+	}
+	
 	delete [] miPlayerImages;
 	delete [] miIconImages;
 }
@@ -3073,6 +3086,9 @@ void MI_TournamentScoreboard::Update()
 		{
 			miPlayerImages[iTeam][iPlayer]->Update();
 		}
+
+		if(worldPointsBackground[iTeam])
+			worldPointsBackground[iTeam]->Update();
 	}
 
 	if(game_values.matchtype == MATCH_TYPE_TOUR)
@@ -3179,15 +3195,22 @@ void MI_TournamentScoreboard::Draw()
 	{
 		for(short iTeam = 0; iTeam < iNumTeams; iTeam++)
 		{
+			worldPointsBackground[iTeam]->Draw();
+		}
+
+		for(short iTeam = 0; iTeam < iNumTeams; iTeam++)
+		{
 			tourScores[iTeam]->Draw();
-			worldScoreModifier[iTeam]->Draw();
 			worldPlace[iTeam]->Draw();
 
-			for(short iBonus = 0; iBonus < 5; iBonus++)
+			for(short iBonus = 0; iBonus < MAX_WORLD_BONUSES_AWARDED; iBonus++)
 			{
 				worldBonus[iTeam][iBonus]->Draw();
 			}
 		}
+
+		worldScoreModifier->Draw();
+		worldScore->Draw();
 	}
 }
 
@@ -3233,7 +3256,7 @@ void MI_TournamentScoreboard::CreateScoreboard(short numTeams, short numGames, g
 		if(fTour)
 			iTeamY += 28; //shift down 28 pxls for extra tour points bar
 
-		miTeamImages[iTeam] = new MI_Image(sprBackground, ix - (fNotTournament ? 40 : 0), iTeamY, 0, 0, fNotTournament ? 580 : 500, 64, 1, 2, 0);
+		miTeamImages[iTeam] = new MI_Image(sprBackground, ix - (fNotTournament ? 40 : 0), iTeamY, 0, game_values.matchtype == MATCH_TYPE_WORLD ? 160 : 0, fNotTournament ? 580 : 500, 64, 1, 2, 0);
 		miIconImages[iTeam] = new MI_Image * [iNumGames];
 		miPlayerImages[iTeam] = new MI_Image * [iTeamCounts[iTeam]];
 
@@ -3258,17 +3281,21 @@ void MI_TournamentScoreboard::CreateScoreboard(short numTeams, short numGames, g
 
 		if(game_values.matchtype == MATCH_TYPE_WORLD)
 		{
-			worldScoreModifier[iTeam] = new MI_Image(&spr_worlditems, ix + 400, iTeamY + 16, 0, 0, 32, 32, 1, 1, 0);
-			worldScoreModifier[iTeam]->Show(false);
+			worldPointsBackground[iTeam] = new MI_Image(sprBackground, ix + 476, iTeamY, 516, 160, 64, 64, 1, 2, 0);
+			worldPlace[iTeam] = new MI_Image(sprIcons, ix + 102, iTeamY + 14, 0, 0, 32, 32, 4, 1, 8);
 
-			worldPlace[iTeam] = new MI_Image(sprIcons, ix + 110, iTeamY + 16, 0, 0, 32, 32, 4, 1, 8);
-
-			for(short iBonus = 0; iBonus < 5; iBonus++)
+			for(short iBonus = 0; iBonus < MAX_WORLD_BONUSES_AWARDED; iBonus++)
 			{
-				worldBonus[iTeam][iBonus] = new MI_Image(&spr_worlditems, ix + 200 + 40 * iBonus, iTeamY + 16, 0, 0, 32, 32, 1, 1, 0);
+				worldBonus[iTeam][iBonus] = new MI_Image(&spr_worlditems, ix + 180 + 38 * iBonus, iTeamY + 14, 0, 0, 32, 32, 1, 1, 0);
 				worldBonus[iTeam][iBonus]->Show(false);
 			}
 		}
+	}
+
+	if(game_values.matchtype == MATCH_TYPE_WORLD)
+	{
+		worldScoreModifier = new MI_Image(&spr_worlditems, 0, 0, 0, 0, 32, 32, 1, 1, 0);
+		worldScore = new MI_ScoreText(0, 0);
 	}
 
 	if(fTour)
@@ -3297,6 +3324,8 @@ void MI_TournamentScoreboard::RefreshWorldScores(short gameWinner)
 	iGameWinner = gameWinner;
 	DetermineScoreboardWinners();
 
+	TourStop * tourStop = game_values.tourstops[game_values.tourstopcurrent];
+
 	for(short iTeam = 0; iTeam < iNumTeams; iTeam++)
 	{
 		short iTeamY = GetYFromPlace(game_values.tournament_scores[iTeam].wins);
@@ -3304,6 +3333,7 @@ void MI_TournamentScoreboard::RefreshWorldScores(short gameWinner)
 		float dSpacing = GetIconSpacing();
 
 		miTeamImages[iTeam]->SetPosition(ix - 40, iTeamY);
+		worldPointsBackground[iTeam]->SetPosition(ix + 476, iTeamY);
 
 		for(short iPlayer = 0; iPlayer < iTeamCounts[iTeam]; iPlayer++)
 		{
@@ -3313,17 +3343,37 @@ void MI_TournamentScoreboard::RefreshWorldScores(short gameWinner)
 		tourScores[iTeam]->SetPosition(ix + 508, iTeamY + 24);
 		tourScores[iTeam]->SetScore(game_values.tournament_scores[iTeam].total);
 
-		if(game_values.worldpointsbonus >= 0 && iGameWinner == game_values.tournament_scores[iTeam].wins)
+		if(iGameWinner == -1)
 		{
-			worldScoreModifier[iTeam]->Show(true);
-			worldScoreModifier[iTeam]->SetImage((game_values.worldpointsbonus + 9) << 5, 0, 32, 32);
+			worldScore->Show(false);
+			worldScoreModifier->Show(false);
+		}
+
+		if(iGameWinner == iTeam)
+		{
+			worldScore->SetPosition(ix + 350, iTeamY + 24);
+			worldScore->SetScore(tourStop->iPoints);
+			worldScore->Show(true);
+
+			miTeamImages[iTeam]->SetImage(0, 160, 496, 64);
+
+			if(game_values.worldpointsbonus >= 0)
+			{
+				worldScoreModifier->SetImage((game_values.worldpointsbonus + 9) << 5, 0, 32, 32);
+				worldScoreModifier->SetPosition(ix + 410, iTeamY + 14);
+				worldScoreModifier->Show(true);
+			}
+			else
+			{
+				worldScoreModifier->Show(false);
+			}
 		}
 		else
 		{
-			worldScoreModifier[iTeam]->Show(false);
+			miTeamImages[iTeam]->SetImage(0, 160, 344, 64);
 		}
 
-		worldPlace[iTeam]->SetPosition(ix + 110, iTeamY + 16);
+		worldPlace[iTeam]->SetPosition(ix + 102, iTeamY + 14);
 		worldPlace[iTeam]->SetImage(0, score[iTeam]->place << 5, 32, 32);
 		worldPlace[iTeam]->Show(gameWinner >= 0);
 	}
@@ -3332,7 +3382,6 @@ void MI_TournamentScoreboard::RefreshWorldScores(short gameWinner)
 	
 	if(gameWinner >= 0)
 	{
-		TourStop * tourStop = game_values.tourstops[game_values.tourstopcurrent];
 		for(short iBonus = 0; iBonus < tourStop->iNumBonuses; iBonus++)
 		{
 			WorldStageBonus * bonus = &tourStop->wsbBonuses[iBonus];
@@ -3345,22 +3394,23 @@ void MI_TournamentScoreboard::RefreshWorldScores(short gameWinner)
 					{
 						short iDisplayPosition = game_values.tournament_scores[iTeam].wins;
 
-						worldBonus[iDisplayPosition][iBonusCounts[iDisplayPosition]]->Show(true);
-						worldBonus[iDisplayPosition][iBonusCounts[iDisplayPosition]]->SetImageSource(bonus->iBonus < NUM_POWERUPS ? &spr_storedpoweruplarge : &spr_worlditems);
-						worldBonus[iDisplayPosition][iBonusCounts[iDisplayPosition]]->SetImage((bonus->iBonus < NUM_POWERUPS ? bonus->iBonus : bonus->iBonus - NUM_POWERUPS) << 5, 0, 32, 32);
+						if(iBonusCounts[iDisplayPosition] < MAX_WORLD_BONUSES_AWARDED)
+						{
+							worldBonus[iDisplayPosition][iBonusCounts[iDisplayPosition]]->Show(true);
+							worldBonus[iDisplayPosition][iBonusCounts[iDisplayPosition]]->SetImageSource(bonus->iBonus < NUM_POWERUPS ? &spr_storedpoweruplarge : &spr_worlditems);
+							worldBonus[iDisplayPosition][iBonusCounts[iDisplayPosition]]->SetImage((bonus->iBonus < NUM_POWERUPS ? bonus->iBonus : bonus->iBonus - NUM_POWERUPS) << 5, 0, 32, 32);
 
-						iBonusCounts[iDisplayPosition]++;
-
-						break;
+							iBonusCounts[iDisplayPosition]++;
+						}
 					}
-				}			
+				}
 			}
 		}
 	}
 
 	for(short iTeam = 0; iTeam < iNumTeams;  iTeam++)
 	{
-		for(short iBonus = iBonusCounts[iTeam]; iBonus < 5; iBonus++)
+		for(short iBonus = iBonusCounts[iTeam]; iBonus < MAX_WORLD_BONUSES_AWARDED; iBonus++)
 		{
 			worldBonus[iTeam][iBonus]->Show(false);
 		}
@@ -3449,7 +3499,10 @@ void MI_TournamentScoreboard::DetermineScoreboardWinners()
 
 		//Flash the background of the winning teams
 		for(short iTeam = 0; iTeam < iNumWinningTeams; iTeam++)
+		{
 			miTeamImages[iWinningTeams[iTeam]]->SetAnimationSpeed(20);
+			worldPointsBackground[iWinningTeams[iTeam]]->SetAnimationSpeed(20);
+		}
 	}
 }
 
@@ -3464,6 +3517,7 @@ void MI_TournamentScoreboard::RefreshTournamentScores(short gameWinner)
 	{
 		iTournamentWinner = iGameWinner;
 		miTeamImages[iTournamentWinner]->SetAnimationSpeed(20);
+		worldPointsBackground[iTournamentWinner]->SetAnimationSpeed(20);
 	}
 
 	for(short iTeam = 0; iTeam < iNumTeams; iTeam++)
@@ -4031,6 +4085,9 @@ MI_ScoreText::MI_ScoreText(short x, short y) :
 
 void MI_ScoreText::Draw()
 {
+	if(!fShow)
+		return;
+
 	spr_scoretext.draw(iDigitRightDstX, iy, iDigitRightSrcX, 0, 16, 16);
 	
 	if(iDigitLeftSrcX > 0)

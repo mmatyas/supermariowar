@@ -2799,8 +2799,9 @@ void CMap::ReadString(char * szString, short size, FILE * outFile)
 
 	char * szReadString = new char[iLen];
 	fread(szReadString, sizeof(char), iLen, outFile);
+	szReadString[iLen - 1] = 0;
 
-	//Prevent buffer overflow
+	//Prevent buffer overflow  5253784 5253928
 	strncpy(szString, szReadString, size - 1);
 	szString[size - 1] = 0;
 

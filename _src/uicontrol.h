@@ -778,9 +778,11 @@ class MI_TournamentScoreboard : public UI_Control
 		MI_Image * miTourPointBar;
 		MI_Image * tourBonus[10];
 
-		MI_Image * worldBonus[4][5];
-		MI_Image * worldScoreModifier[4];
+		MI_Image * worldBonus[4][MAX_WORLD_BONUSES_AWARDED];
+		MI_Image * worldScoreModifier;
 		MI_Image * worldPlace[4];
+		MI_ScoreText * worldScore;
+		MI_Image * worldPointsBackground[4];
 };
 
 class MI_BonusWheel : public UI_Control

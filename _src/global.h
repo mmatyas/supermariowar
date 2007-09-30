@@ -127,6 +127,7 @@ struct STextAward
 #define MAX_PLAYER_SPAWN_TRIES 16
 
 #define	MAX_BONUS_CHESTS	5
+#define MAX_WORLD_BONUSES_AWARDED 3
 
 #define TILESETSIZE		960			//30*32 Tiles by 32 pixel in a 1024*1024 bmp
 #define TILESETHEIGHT   30

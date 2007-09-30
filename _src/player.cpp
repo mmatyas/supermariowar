@@ -1323,7 +1323,7 @@ void CPlayer::move()
 		}
 		
 		//POWERUP RELEASE
-		if(playerKeys->game_powerup.fDown && (!game_values.slowdownfreeze || game_values.slowdownon == teamID) && statue_timer == 0)
+		if(playerKeys->game_powerup.fDown && (!game_values.slowdownfreeze || game_values.slowdownon == teamID) && statue_timer == 0 && game_values.gamemode->gamemode != game_mode_bonus)
 		{
 			if(game_values.gamepowerups[globalID] > -1)
 			{

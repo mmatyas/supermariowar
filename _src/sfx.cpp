@@ -184,7 +184,7 @@ bool sfxMusic::load(const string& filename)
 	if(music)
 		reset();
 
-    cout << "load "<< filename<< "..."<< endl;
+    cout << "load " << filename << "..." << endl;
 	music = Mix_LoadMUS(filename.c_str());
 	
 	if(!music)

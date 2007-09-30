@@ -2321,7 +2321,7 @@ void Menu::RunMenu()
 			if(game_values.matchtype == MATCH_TYPE_SINGLE_GAME)
 				backgroundmusic[2].play(false, false);
 			else if(game_values.matchtype == MATCH_TYPE_WORLD)
-				backgroundmusic[6].play(false, false);
+				backgroundmusic[5].play(false, false);
 			else
 				backgroundmusic[3].play(false, false);
 		}
@@ -3272,8 +3272,8 @@ void Menu::RunMenu()
 			mCurrentMenu->ResetMenu();
 
 			backgroundmusic[2].stop();
-			backgroundmusic[6].load(worldmusiclist.GetMusic(g_worldmap.GetMusicCategory()));
-			backgroundmusic[6].play(false, false);
+			backgroundmusic[5].load(worldmusiclist.GetMusic(g_worldmap.GetMusicCategory()));
+			backgroundmusic[5].play(false, false);
 			fNeedMenuMusicReset = true;
 		}
 
