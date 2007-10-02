@@ -234,6 +234,7 @@ bool LoadGameGraphics()
 
 	_load_gfxck(spr_crown, convertPath("gfx/packs/eyecandy/crown.png", graphicspack));
 	_load_gfxck(spr_cape, convertPath("gfx/packs/eyecandy/cape.png", graphicspack));
+	_load_gfxck(spr_tail, convertPath("gfx/packs/eyecandy/tail.png", graphicspack));
 	_load_gfxck(spr_warplock, convertPath("gfx/packs/eyecandy/warplock.png", graphicspack));
 	_load_gfxck(spr_coinsparkle, convertPath("gfx/packs/eyecandy/coinsparks.png", graphicspack));
 	_load_gfxck(spr_shinesparkle, convertPath("gfx/packs/eyecandy/shinesparks.png", graphicspack));
@@ -241,6 +242,7 @@ bool LoadGameGraphics()
 	_load_gfxck(spr_superstomp, convertPath("gfx/packs/eyecandy/supersmash.png", graphicspack));
 	spr_crown.SetWrap(true); // Wrap crown for players wearing crown during game
 	spr_cape.SetWrap(true);
+	spr_tail.SetWrap(true);
 	spr_shellbounce.SetWrap(true);
 
 	_load_gfxck(spr_egg, convertPath("gfx/packs/modeobjects/egg.png", graphicspack));
@@ -419,6 +421,7 @@ bool LoadGameSounds()
 	_load_sfx(sfx_sprout, convertPath("sfx/packs/sprout.wav", soundpack));
 	_load_sfx(sfx_collectpowerup, convertPath("sfx/packs/collectpowerup.wav", soundpack));
 	_load_sfx(sfx_collectfeather, convertPath("sfx/packs/feather.wav", soundpack));
+	_load_sfx(sfx_tailspin, convertPath("sfx/packs/tail.wav", soundpack));
 	_load_sfx(sfx_storepowerup, convertPath("sfx/packs/storeitem.wav", soundpack));
 	_load_sfx(sfx_breakblock, convertPath("sfx/packs/breakblock.wav", soundpack));
 	_load_sfx(sfx_bump, convertPath("sfx/packs/bump.wav", soundpack));

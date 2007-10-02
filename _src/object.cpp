@@ -71,8 +71,11 @@ CObject::CObject(gfxSprite *nspr1, short x, short y)
 	xi(x);
 	yi(y);
 
-	iw = (short)spr->getWidth();
-	ih = (short)spr->getHeight();
+	if(spr)
+	{
+		iw = (short)spr->getWidth();
+		ih = (short)spr->getHeight();
+	}
 
 	velx = 0.0f;
 	vely = 0.0f;
@@ -1901,14 +1904,16 @@ IO_MovingObject::IO_MovingObject(gfxSprite *nspr, short x, short y, short iNumSp
 
 	if(iAnimationWidth > -1)
 		iw = iAnimationWidth;
-	else
+	else if(spr)
 		iw = (short)spr->getWidth() / iNumSprites;
 
 	if(iAnimationHeight > -1)
 		ih = iAnimationHeight;
 
 	animationtimer = 0;
-	animationWidth = (short)spr->getWidth();
+
+	if(spr)
+		animationWidth = (short)spr->getWidth();
 
 	fOldX = fx;
 	fOldY = fy - ih;
@@ -6298,9 +6303,9 @@ bool MO_FrenzyCard::collide(CPlayer * player)
 {
 	if(type < 8 || game_values.gamemodesettings.frenzy.storedshells)
 	{
-		//Hack to skip sledge hammer and bombs for now
+		//Hack to skip sledge hammer, bombs and leaf for now
 		if(type > 4)
-			type += 2;
+			type += 3;
 
 		player->SetPowerup(type);
 		game_values.gamemode->frenzyowner = player;
@@ -8444,7 +8449,7 @@ void CO_Spike::hittop(CPlayer * player)
 
 
 //------------------------------------------------------------------------------
-// class spike
+// class kuribo's shoe
 //------------------------------------------------------------------------------
 CO_KuriboShoe::CO_KuriboShoe(gfxSprite *nspr, short ix, short iy) :
 	CO_Spring(nspr, ix, iy + 15)
@@ -8463,9 +8468,109 @@ void CO_KuriboShoe::hittop(CPlayer * player)
 	if(!player->fKuriboShoe)
 	{
 		dead = true;
-		player->fKuriboShoe = true;
+		player->SetKuriboShoe();
 		ifsoundonplay(sfx_transform);
 		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, player->ix + HALFPW - 16, player->iy + HALFPH - 16, 3, 8));
+	}
+}
+
+//------------------------------------------------------------------------------
+// class spin death (spinning cape or tail)
+//------------------------------------------------------------------------------
+OMO_SpinDeath::OMO_SpinDeath(short playerId, short style, bool direction, short offsety) :
+	IO_MovingObject(NULL, 0, 0, 0, 0, 24, 12, 0, 0)
+{
+	iPlayerID = playerId;
+	iStyle = style;
+	fDirection = direction;
+	iOffsetY = offsety;
+
+	state = 1;
+	objectType = object_moving;
+	movingObjectType = movingobject_shell; //hack to get it to use the shell's collision detection
+
+	iTimer = 0;
+}
+
+bool OMO_SpinDeath::collide(CPlayer * player)
+{
+	if(player->spawninvincible || player->invincible || dead || iTimer < 5)
+		return false;
+
+	CPlayer * killer = GetPlayerFromGlobalID(iPlayerID);
+
+	if(killer && killer->globalID == player->globalID)
+		return false;
+
+	if(killer)
+	{
+		PlayerKilledPlayer(*killer, *player, death_style_jump, iStyle == 0 ? kill_style_feather : kill_style_feather);
+	}
+	else
+	{
+		player->DeathAwards();
+
+		if(!game_values.gamemode->playerkilledself(*player))
+			player->die(0, false);
+
+		ifsoundonplay(sfx_deathsound);
+	}
+
+	return true;
+}
+
+/*
+void OMO_SpinDeath::draw()
+{
+	if(iTimer >= 5 && !dead)
+	{
+		SDL_Rect r = {ix, iy, collisionWidth, collisionHeight};
+		SDL_FillRect(blitdest, &r, 0xffff);
+	}
+}
+*/
+
+void OMO_SpinDeath::update()
+{
+	CPlayer * owner = GetPlayerFromGlobalID(iPlayerID);
+
+	if(++iTimer > 16)
+		dead = true;
+
+	if(owner)
+	{
+		xi(owner->ix - PWOFFSET + (fDirection ? 24 : -16));
+		yi(owner->iy + PH - iOffsetY);
+	}
+	else
+	{
+		dead = true;
+	}
+}
+
+void OMO_SpinDeath::collide(IO_MovingObject * object)
+{
+	if(dead || iTimer < 5)
+		return;
+
+	MovingObjectType type = object->getMovingObjectType();
+
+	if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_bulletbill)
+	{
+		if(type == movingobject_shell)
+		{
+			((CO_Shell*)object)->Die();
+		}
+		else if(type == movingobject_throwblock)
+		{
+			((CO_ThrowBlock*) object)->Die();
+		}
+		else if(type == movingobject_bulletbill)
+		{
+			((OMO_BulletBill*) object)->Die();
+		}
+
+		ifsoundonplay(sfx_kicksound);
 	}
 }
 

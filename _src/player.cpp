@@ -752,6 +752,19 @@ void CPlayer::move()
 	if(hammertimer > 0)
 		hammertimer--;
 
+	if(iSpinState > 0)
+	{
+		if(++iSpinTimer > 3)
+		{
+			iSpinTimer = 0;
+			iSpinState++;
+			if(iSpinState == 6 || iSpinState == 12)
+			{
+				iSpinState = 0;
+			}
+		}
+	}
+
 	if(throw_star > 0)
 		throw_star--;
 
@@ -1060,6 +1073,11 @@ void CPlayer::move()
 					SetPowerup(6);
 					break;
 				}
+				case 24:  //leaf
+				{
+					SetPowerup(7);
+					break;
+				}
 			}
 				
 			powerupused = -1;
@@ -1267,10 +1285,20 @@ void CPlayer::move()
 							}
 
 							if(game_values.featherlimit > 0)
-							{
 								DecreaseProjectileLimit();
-							}
 						}
+					}
+					else if(powerup == 7 && !fKuriboShoe && iTailState == 0)
+					{
+						if(game_values.leaflimit == 0 || projectilelimit > 0)
+						{
+							ShakeTail();
+							lockjump = true;
+						}
+
+						if(game_values.featherlimit > 0)
+							DecreaseProjectileLimit();
+
 					}
 				}
 			}
@@ -1438,6 +1466,16 @@ void CPlayer::move()
 								DecreaseProjectileLimit();
 							}
 						}
+						else if(powerup == 3 && iSpinState == 0 && !fKuriboShoe)
+						{
+							if(game_values.featherlimit == 0 || projectilelimit > 0)
+							{
+								SpinCape(); //Cause cape spin
+							}
+
+							if(game_values.featherlimit > 0)
+								DecreaseProjectileLimit();
+						}
 						else if(powerup == 4 && projectiles[globalID] < 1) //only allow one boomerang
 						{
 							if(game_values.boomeranglimit == 0 || projectilelimit > 0)
@@ -1463,7 +1501,7 @@ void CPlayer::move()
 								if(IsPlayerFacingRight())
 									objectsfront.add(new MO_SledgeHammer(&spr_sledgehammer, ix + 8, iy, 8, velx + 2.0f, -HAMMERTHROW, 5, globalID, teamID, colorID, shoot_super_sledge_hammer));
 								else
-								objectsfront.add(new MO_SledgeHammer(&spr_sledgehammer, ix - 18, iy, 8, velx - 2.0f, -HAMMERTHROW, 5, globalID, teamID, colorID, shoot_super_sledge_hammer));
+									objectsfront.add(new MO_SledgeHammer(&spr_sledgehammer, ix - 18, iy, 8, velx - 2.0f, -HAMMERTHROW, 5, globalID, teamID, colorID, shoot_super_sledge_hammer));
 
 								shoot_super_sledge_hammer = false;
 
@@ -1492,6 +1530,16 @@ void CPlayer::move()
 							projectiles[globalID]++;
 							
 							ifsoundonplay(sfx_fireball);
+						}
+						else if(powerup == 7 && iSpinState == 0 && !fKuriboShoe) //Racoon tail spin
+						{
+							if(game_values.leaflimit == 0 || projectilelimit > 0)
+							{
+								SpinTail(); //Cause tail spin
+							}
+
+							if(game_values.leaflimit > 0)
+								DecreaseProjectileLimit();
 						}
 					}
 
@@ -1704,7 +1752,12 @@ void CPlayer::SetSprite()
 		}
 
 		//lockjump is true when we are in the air (even if we fell of an edge)
-		if(state == player_spawning)
+		if(iSpinState > 0)
+		{
+			static int iStateToSprite[12] = {PGFX_JUMPING_R, PGFX_STOPPING_R, PGFX_STOPPING_L, PGFX_STANDING_L, PGFX_STOPPING_L, PGFX_STOPPING_R, PGFX_JUMPING_L, PGFX_STOPPING_L, PGFX_STOPPING_R, PGFX_STANDING_R, PGFX_STOPPING_R, PGFX_STOPPING_L};
+			spr = iStateToSprite[iSpinState];
+		}
+		else if(state == player_spawning)
 		{
 			if((spr & 0x1) == 0)
 				spr = PGFX_JUMPING_R;
@@ -1971,6 +2024,17 @@ void CPlayer::die(short deathStyle, bool fTeamRemoved)
 	}
 }
 
+void CPlayer::SetKuriboShoe()
+{
+	fKuriboShoe = true;
+
+	if(carriedItem)
+	{
+		carriedItem->Drop();
+		carriedItem = NULL;
+	}
+}
+
 void CPlayer::SetupNewPlayer()
 {
 	pScoreboardSprite = sprites;
@@ -2026,6 +2090,13 @@ void CPlayer::SetupNewPlayer()
 	holdrighttolerance = 0;
 	flying = false;
 	flyingtimer = 0;
+	
+	iTailTimer = 0;
+	iTailState = 0;
+	iTailFrame = 0;
+
+	iSpinTimer = 0;
+	iSpinState = 0;
 
 	ryu_fireball_index_left = 0;
 	ryu_fireball_index_right = 0;
@@ -2690,8 +2761,10 @@ void CPlayer::draw()
 			spr_ownedtags.draw(ix - PWOFFSET - 8, iy - PHOFFSET - 8, ownerColorOffsetX, 0, 48, 48);
 	}
 	
-	if(powerup == 3 && !fKuriboShoe) //Don't allow cape to be used with shoe
+	if(powerup == 3 && !fKuriboShoe) //Don't allow cape or tail to be used with shoe
 		DrawCape();
+	else if(powerup == 7 && !fKuriboShoe)
+		DrawTail();
 
 	short iPlayerKuriboOffsetY = 0;
 	if(fKuriboShoe)
@@ -2787,11 +2860,29 @@ void CPlayer::draw()
 	}
 }
 
+void CPlayer::SpinCape()
+{
+	ifsoundonplay(sfx_tailspin);
+	
+	iCapeTimer = 4; //Add one extra frame to sync with spinning player sprite
+
+	SpinPlayer();
+
+	objectsplayer.add(new OMO_SpinDeath(globalID, 0, IsPlayerFacingRight(), 24));
+}
+
 void CPlayer::DrawCape()
 {
 	if(++iCapeTimer > 3)
 	{
-		if((!inair && velx != 0.0f) || (inair && vely < 1.0f))
+		if(iSpinState > 0)
+		{
+			static short iSpinStateToCapeSprite[12] = {0, 32, 32, 0, 32, 32, 0, 32, 32, 0, 32, 32};
+			iCapeFrameX = iSpinStateToCapeSprite[iSpinState];
+			iCapeFrameY = 32;
+			iCapeYOffset = -8;
+		}
+		else if((!inair && velx != 0.0f) || (inair && vely < 1.0f))
 		{
 			iCapeFrameX += 32;
 			if(iCapeFrameX > 96)
@@ -2816,19 +2907,6 @@ void CPlayer::DrawCape()
 			iCapeFrameY = 96;
 			iCapeYOffset = 0;
 		}
-		/*
-		//This code will draw a different jumping cape animation (currently not used)
-		else if(inair && vely < 1.0f)
-		{
-			iCapeFrameX += 32;
-			if(iCapeFrameX > 64)
-				iCapeFrameX = 0;
-
-			iCapeFrameY = 32;
-			fCapeUp = true;
-			iCapeYOffset = -8;
-		}
-		*/
 		else if(inair)
 		{
 			iCapeFrameX += 32;
@@ -2843,11 +2921,123 @@ void CPlayer::DrawCape()
 		iCapeTimer = 0;
 	}
 
-	bool fPlayerFacingRight = IsPlayerFacingRight();
-	if(iswarping())
-		spr_cape.draw(ix - PWOFFSET + (fPlayerFacingRight ? - 18 : 18), iy - PHOFFSET + 4 + iCapeYOffset, 0 + (fPlayerFacingRight ? 128 : 0) + iCapeFrameX, iCapeFrameY, 32, 32, (short)state %4, warpplane);
+	bool fPlayerFacingRight = true;
+	if(iSpinState > 0)
+	{
+		if((iSpinState >= 2 && iSpinState <= 4) || iSpinState == 7 || iSpinState == 11)
+			fPlayerFacingRight = false;
+	}
 	else
-		spr_cape.draw(ix - PWOFFSET + (fPlayerFacingRight ? - 18 : 18), iy - PHOFFSET + 4 + iCapeYOffset, 0 + (fPlayerFacingRight ? 128 : 0) + iCapeFrameX, iCapeFrameY, 32, 32);
+	{
+		fPlayerFacingRight = IsPlayerFacingRight();
+	}
+	
+	if(iswarping())
+		spr_cape.draw(ix - PWOFFSET + (fPlayerFacingRight ? - 18 : 18), iy - PHOFFSET + 4 + iCapeYOffset, (fPlayerFacingRight ? 128 : 0) + iCapeFrameX, iCapeFrameY, 32, 32, (short)state %4, warpplane);
+	else
+		spr_cape.draw(ix - PWOFFSET + (fPlayerFacingRight ? - 18 : 18), iy - PHOFFSET + 4 + iCapeYOffset, (fPlayerFacingRight ? 128 : 0) + iCapeFrameX, iCapeFrameY, 32, 32);
+}
+
+void CPlayer::SpinPlayer()
+{
+	iSpinState = IsPlayerFacingRight() ? 1 : 7;
+	iSpinTimer = 0;
+}
+
+void CPlayer::ShakeTail()
+{
+	if(vely > 0.0f)
+		vely = 0.0f;
+
+	ifsoundonstop(sfx_tailspin);
+	ifsoundonplay(sfx_tailspin);
+	lockjump = true;
+	
+	iTailState = 1; //cause tail to shake
+	iTailTimer = 0;
+	iTailFrame = 110;
+}
+
+void CPlayer::SpinTail()
+{
+	ifsoundonplay(sfx_tailspin);
+	
+	iTailState = 2; //cause tail to shake
+	iTailTimer = -1; //Add one extra frame to sync with spinning player sprite
+	iTailFrame = 22;
+
+	SpinPlayer();
+
+	objectsplayer.add(new OMO_SpinDeath(globalID, 1, IsPlayerFacingRight(), 10));
+}
+
+void CPlayer::DrawTail()
+{
+	short iOffsetY = 0;
+	if(iTailState == 1)
+	{
+		if(++iTailTimer >= 4)
+		{
+			iTailTimer = 0;
+			iTailFrame -= 22;
+
+			if(iTailFrame < 66)
+				iTailState = 0;
+		}
+	}
+	else if(iTailState == 2)
+	{
+		iOffsetY = 52;
+		if(++iTailTimer >= 4)
+		{
+			iTailTimer = 0;
+			iTailFrame += 22;
+			if(iTailFrame > 110)
+			{
+				iTailState = 0;
+				iTailFrame = 66;
+			}
+		}
+	}
+
+	if(iTailState == 0)
+	{
+		if(++iTailTimer >= 4)
+		{
+			iTailTimer = 0;
+
+			if(!inair && velx != 0.0f)
+			{
+				iTailFrame += 22;
+				if(iTailFrame > 66)
+					iTailFrame = 22;
+			}
+			else if(!inair)
+			{
+				iTailFrame = 22;
+			}
+			else if(inair)
+			{
+				iTailFrame = 66;
+			}
+		}
+	}
+
+	bool fPlayerFacingRight = true;
+	if(iTailState == 2)
+	{
+		if((iSpinState >= 2 && iSpinState <= 4) || iSpinState == 7 || iSpinState == 11)
+			fPlayerFacingRight = false;
+	}
+	else
+	{
+		fPlayerFacingRight = IsPlayerFacingRight();
+	}
+
+	if(iswarping())
+		spr_tail.draw(ix + (fPlayerFacingRight ? - 18 : 18), iy + 6, iTailFrame, (fPlayerFacingRight ? 0 : 26) + iOffsetY, 22, 26, (short)state %4, warpplane);
+	else
+		spr_tail.draw(ix + (fPlayerFacingRight ? - 18 : 18), iy + 6, iTailFrame, (fPlayerFacingRight ? 0 : 26) + iOffsetY, 22, 26);
 }
 
 void CPlayer::drawarrows()
@@ -4028,7 +4218,7 @@ bool CPlayer::AcceptItem(MO_CarriedObject * item)
 void CPlayer::SetPowerup(short iPowerup)
 {
 	//Play sounds for collecting a powerup
-	if(powerup == iPowerup || (bobomb && iPowerup == 0) || iPowerup > 6)
+	if(powerup == iPowerup || (bobomb && iPowerup == 0) || iPowerup > 7)
 	{
 		ifsoundonplay(sfx_storepowerup);
 	}
@@ -4054,16 +4244,16 @@ void CPlayer::SetPowerup(short iPowerup)
 
 		bobomb = true;
 	}
-	else if(iPowerup > 6)
+	else if(iPowerup > 7)
 	{
-		if(iPowerup == 7)
+		if(iPowerup == 8)
 			game_values.gamepowerups[globalID] = 9;
-		else if(iPowerup == 8)
-			game_values.gamepowerups[globalID] = 16;
 		else if(iPowerup == 9)
+			game_values.gamepowerups[globalID] = 16;
+		else if(iPowerup == 10)
 			game_values.gamepowerups[globalID] = 10;
-		else if(iPowerup > 9)
-			game_values.gamepowerups[globalID] = iPowerup + 2; //Storing shells
+		else if(iPowerup > 10)
+			game_values.gamepowerups[globalID] = iPowerup + 1; //Storing shells
 	}
 	else
 	{
@@ -4079,6 +4269,8 @@ void CPlayer::SetPowerup(short iPowerup)
 			game_values.gamepowerups[globalID] = 21;
 		else if(powerup == 6)
 			game_values.gamepowerups[globalID] = 23;
+		else if(powerup == 7)
+			game_values.gamepowerups[globalID] = 24;
 
 		powerup = iPowerup;
 		projectilelimit = 0;
@@ -4107,6 +4299,11 @@ void CPlayer::SetPowerup(short iPowerup)
 		{
 			if(game_values.hammerlimit > 0)
 				projectilelimit = game_values.hammerlimit;
+		}
+		else if(powerup == 7)
+		{
+			if(game_values.leaflimit > 0)
+				projectilelimit = game_values.leaflimit;
 		}
 	}
 

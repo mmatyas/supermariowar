@@ -132,13 +132,22 @@ class CPlayer
 		bool iswarping() {return state > player_ready;}
 		bool isdead() {return state == player_dead;}
 
+		void SetKuriboShoe();
 		bool IsInvincibleOnBottom() {return invincible || spawninvincible || fKuriboShoe;}
 		bool IsSuperStomping() {return fSuperStomp;}
 
 	private:
 		void SetSprite();
 		void Jump(short iMove, float jumpModifier);
+		
+		void SpinCape();
 		void DrawCape();
+
+		void SpinPlayer();
+
+		void ShakeTail();
+		void SpinTail();
+		void DrawTail();
 
 		void xf(float xf){fx = xf; ix = (short)fx;};
  		void xi(short xi){ix = xi; fx = (float)ix;};
@@ -225,6 +234,13 @@ class CPlayer
 		short featherjump;	//true when player has used a feather jump in air (only allow one feather jump per time in air)
 		bool flying;
 		short flyingtimer;
+
+		short iTailTimer;
+		short iTailState;
+		short iTailFrame;
+		
+		short iSpinTimer;
+		short iSpinState;
 
 		short ryu_fireball_index_left;
 		short ryu_fireball_index_right;
@@ -445,6 +461,7 @@ class CPlayer
 		friend class OMO_Area;
 		friend class OMO_RaceGoal;
 		friend class OMO_Explosion;
+		friend class OMO_SpinDeath;
 
 		friend class MO_CarriedObject;
 

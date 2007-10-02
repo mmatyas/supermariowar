@@ -135,6 +135,7 @@ void Menu::WriteGameOptions()
 		fwrite(&game_values.boomeranglimit, sizeof(short), 1, fp);
 		fwrite(&game_values.featherjumps, sizeof(short), 1, fp);
 		fwrite(&game_values.featherlimit, sizeof(short), 1, fp);
+		fwrite(&game_values.leaflimit, sizeof(short), 1, fp);
 		fwrite(&game_values.shellttl, sizeof(short), 1, fp);
 		fwrite(&game_values.blueblockttl, sizeof(short), 1, fp);
 		fwrite(&game_values.storedpowerupdelay, sizeof(short), 1, fp);

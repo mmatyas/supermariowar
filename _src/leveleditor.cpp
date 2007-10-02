@@ -1178,6 +1178,10 @@ int editor_edit()
 
 			menu_font_small.draw(0, 0, "Tile Type Mode");
 		}
+		else if(edit_mode == 7)
+		{
+			menu_font_small.draw(0, 0, "Map Item Mode");
+		}
 
 		menu_font_small.drawRightJustified(640, 0, maplist.currentFilename());
 
@@ -2548,7 +2552,7 @@ int editor_mapitems()
 				break;
 
 				case SDL_KEYDOWN:
-					edit_mode = 0;
+					edit_mode = 7;
 					return EDITOR_EDIT;
 				break;
 

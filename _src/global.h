@@ -100,6 +100,7 @@ struct STextAward
 #define BOUNCESTRENGTH  0.5f
 #define TAGGEDBOOST    1.0f
 #define VELSUPERSTOMP	10.0f
+#define VELTAILSHAKE	1.0f
 
 #define	GRAVITATION		0.40f		
 
@@ -283,6 +284,7 @@ extern sfxSound			sfx_sprout;
 extern sfxSound			sfx_collectpowerup;
 extern sfxSound			sfx_collectfeather;
 extern sfxSound			sfx_storepowerup;
+extern sfxSound			sfx_tailspin;
 extern sfxSound			sfx_breakblock;
 extern sfxSound			sfx_bump;
 extern sfxSound			sfx_coin;
@@ -347,6 +349,7 @@ extern gfxSprite		spr_scoretext;
 extern gfxSprite		spr_racetext;
 extern gfxSprite		spr_crown;
 extern gfxSprite		spr_cape;
+extern gfxSprite		spr_tail;
 
 extern gfxSprite		spr_egg;
 extern gfxSprite		spr_star;
@@ -818,6 +821,8 @@ struct gv
 
 	short		featherjumps;
 	short		featherlimit;
+
+	short		leaflimit;
 
 	short		shellttl;
 	short		blueblockttl;

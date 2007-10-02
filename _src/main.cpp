@@ -159,6 +159,7 @@ gfxSprite		spr_racetext;
 gfxSprite		spr_crown;
 gfxSprite		spr_warplock;
 gfxSprite		spr_cape;
+gfxSprite		spr_tail;
 gfxSprite		spr_coinsparkle;
 gfxSprite		spr_shinesparkle;
 gfxSprite		spr_shellbounce;
@@ -291,6 +292,7 @@ sfxSound sfx_sprout;
 sfxSound sfx_collectpowerup;
 sfxSound sfx_collectfeather;
 sfxSound sfx_storepowerup;
+sfxSound sfx_tailspin;
 sfxSound sfx_breakblock;
 sfxSound sfx_bump;
 sfxSound sfx_coin;
@@ -703,6 +705,7 @@ int main(int argc, char *argv[])
 	game_values.boomeranglimit		= 0;	//Unlimited
 	game_values.featherjumps		= 1;	//Allow one extra cape jump
 	game_values.featherlimit		= 0;	//Unlimited
+	game_values.leaflimit			= 0;	//Unlimited
 	game_values.storedpowerupdelay	= 4;
 	game_values.bonuswheel			= 1;
 	game_values.keeppowerup			= false;
@@ -742,7 +745,7 @@ int main(int argc, char *argv[])
 
 	for(short iPlayer = 0; iPlayer < 4; iPlayer++)
 	{
-		game_values.storedpowerups[iPlayer] = -1;
+		game_values.storedpowerups[iPlayer] = 24;
 		game_values.gamepowerups[iPlayer] = -1;
 		game_values.teamids[iPlayer][0] = iPlayer;
 		game_values.teamcounts[iPlayer] = 1;
@@ -958,6 +961,7 @@ int main(int argc, char *argv[])
 			fread(&game_values.boomeranglimit, sizeof(short), 1, fp);
 			fread(&game_values.featherjumps, sizeof(short), 1, fp);
 			fread(&game_values.featherlimit, sizeof(short), 1, fp);
+			fread(&game_values.leaflimit, sizeof(short), 1, fp);
 			fread(&game_values.shellttl, sizeof(short), 1, fp);
 			fread(&game_values.blueblockttl, sizeof(short), 1, fp);
 			fread(&game_values.storedpowerupdelay, sizeof(short), 1, fp);

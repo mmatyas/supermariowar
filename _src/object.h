@@ -1432,6 +1432,26 @@ class CO_KuriboShoe : public CO_Spring
 		void hittop(CPlayer * player);
 };
 
+class OMO_SpinDeath : public IO_MovingObject
+{
+	public:
+		OMO_SpinDeath(short playerID, short style, bool direction, short offsety);
+		~OMO_SpinDeath(){};
+
+		void update();
+		void draw() {} //This is invisible
+
+		bool collide(CPlayer * player);
+		void collide(IO_MovingObject * object);
+
+	private:
+		short iPlayerID;
+		short iStyle;
+		bool fDirection;
+		short iTimer;
+		short iOffsetY;
+};
+
 class CO_Bomb : public MO_CarriedObject
 {
 	public:
