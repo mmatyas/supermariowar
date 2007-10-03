@@ -661,7 +661,7 @@ void CPlayer::move()
 			fSuperStomp = false;
 			iSuperStompTimer = 0;
 			
-			objectsplayer.add(new CO_KuriboShoe(&spr_kuriboshoe, ix - PWOFFSET, iy - PHOFFSET));
+			objectsplayer.add(new CO_KuriboShoe(&spr_kuriboshoe, ix - PWOFFSET, iy - PHOFFSET - 2));
 			eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
 		}
 	}
@@ -1126,8 +1126,11 @@ void CPlayer::move()
 		if(fKuriboShoe && inair && !fSuperStomp && ((playerKeys->game_down.fPressed && playerDevice == DEVICE_KEYBOARD) || 
 			(playerKeys->game_jump.fPressed && playerKeys->game_down.fDown)))
 		{
-			iSuperStompTimer = 8;
-			lockfall = true;
+			if(superjumptype != 3 || superjumptimer <= 0)
+			{
+				iSuperStompTimer = 8;
+				lockfall = true;
+			}
 		}
 
 		//Hold super stomping player in mid air then accelerate them downwards
@@ -1246,7 +1249,7 @@ void CPlayer::move()
 						}
 						else
 						{
-							Jump(lrn, 1.0f);
+							Jump(lrn, 1.0f, false);
 							ifsoundonplay(sfx_jump);
 						}
 
@@ -1254,6 +1257,11 @@ void CPlayer::move()
 					}
 					else if(superjumptimer > 0)
 					{
+						if(superjumptype == 3) //Kuribo's Shoe Jump
+						{
+							Jump(lrn, 1.0f, false);
+							ifsoundonplay(sfx_jump);
+						}
 						if(superjumptype == 2)
 						{
 							vely = -VELSUPERJUMP;
@@ -1276,7 +1284,7 @@ void CPlayer::move()
 							{
 								if(featherjump < game_values.featherjumps)
 								{
-									Jump(lrn, 0.8f);
+									Jump(lrn, 0.8f, false);
 									ifsoundonplay(sfx_capejump);
 									lockjump = true;
 								}
@@ -1288,7 +1296,7 @@ void CPlayer::move()
 								DecreaseProjectileLimit();
 						}
 					}
-					else if(powerup == 7 && !fKuriboShoe && iTailState == 0)
+					else if(powerup == 7 && !fKuriboShoe && iSpinState == 0)
 					{
 						if(game_values.leaflimit == 0 || projectilelimit > 0)
 						{
@@ -1597,7 +1605,12 @@ void CPlayer::move()
 			if(!inair)
 			{
 				if(fKuriboShoe)
-					velx = 0.0f;
+				{
+					//velx = 0.0f;
+					Jump(lrn, 1.0f, true);
+					superjumptype = 3;
+					superjumptimer = 18;
+				}
 				else if(velx < 0.0f)
 					game_values.playskidsound = true;
 			}
@@ -1627,7 +1640,12 @@ void CPlayer::move()
 			if(!inair)
 			{
 				if(fKuriboShoe)
-					velx = 0.0f;
+				{
+					//velx = 0.0f;
+					Jump(lrn, 1.0f, true);
+					superjumptype = 3;
+					superjumptimer = 18;
+				}
 				else if(velx > 0.0f)
 					game_values.playskidsound = true;
 			}
@@ -1661,10 +1679,10 @@ void CPlayer::move()
 			}
 
 			//Stop ground velocity when wearing the shoe
-			if(!inair && fKuriboShoe)
-			{
-				velx = 0.0f;
-			}
+			//if(!inair && fKuriboShoe)
+			//{
+				//velx = 0.0f;
+			//}
 		}
 		
 		fOldX = fx;
@@ -1884,9 +1902,11 @@ void CPlayer::SetSprite()
 	}
 }
 
-void CPlayer::Jump(short iMove, float jumpModifier)
+void CPlayer::Jump(short iMove, float jumpModifier, bool fKuriboBounce)
 {
-	if((game_values.slowdownon != -1 && game_values.slowdownon != teamID) || jailed > 0)
+	if(fKuriboBounce)
+		vely = -VELKURIBOBOUNCE;
+	else if((game_values.slowdownon != -1 && game_values.slowdownon != teamID) || jailed > 0)
 		vely = -VELSLOWJUMP * jumpModifier;
 	else if(ABS(velx) > VELMOVING && iMove != 0 && playerKeys->game_turbo.fDown)
 		vely = -VELTURBOJUMP * jumpModifier;
@@ -2696,15 +2716,29 @@ void _collisionhandler_p2p_pushback(CPlayer &o1, CPlayer &o2)
 	float absv1 = 0.0f;
 	float absv2 = 0.0f;
 	
+	float dPlayer1Pushback = 1.5f;
+	float dPlayer2Pushback = 1.5f;
+
+	if(o1.fKuriboShoe && !o2.fKuriboShoe)
+	{
+		dPlayer1Pushback = 0.5f;
+		dPlayer2Pushback = 2.5f;
+	}
+	else if(!o1.fKuriboShoe && o2.fKuriboShoe)
+	{
+		dPlayer1Pushback = 2.5f;
+		dPlayer2Pushback = 0.5f;
+	}
+
 	if(overlapcollision)
 	{
-		absv1 = ( o1.velx < 0 ? o1.velx : -1.0f ) * 1.5f;	//o1 is on the left side (only positive velx counts)
-		absv2 = ( o2.velx > 0 ? o2.velx : 1.0f ) * 1.5f;	//o2 right (only negative velx counts)
+		absv1 = ( o1.velx < 0 ? o1.velx : -1.0f ) * dPlayer2Pushback;	//o1 is on the left side (only positive velx counts)
+		absv2 = ( o2.velx > 0 ? o2.velx : 1.0f ) * dPlayer1Pushback;	//o2 right (only negative velx counts)
 	}
 	else
 	{
-		absv1 = ( o1.velx > 0 ? o1.velx : 1.0f ) * 1.5f;	//o1 is on the left side (only positive velx counts)
-		absv2 = ( o2.velx < 0 ? o2.velx : -1.0f ) * 1.5f;	//o2 right (only negative velx counts)
+		absv1 = ( o1.velx > 0 ? o1.velx : 1.0f ) * dPlayer2Pushback;	//o1 is on the left side (only positive velx counts)
+		absv2 = ( o2.velx < 0 ? o2.velx : -1.0f ) * dPlayer1Pushback;	//o2 right (only negative velx counts)
 	}
 
 	if(o1.state == player_ready)
@@ -2968,7 +3002,7 @@ void CPlayer::SpinTail()
 
 	SpinPlayer();
 
-	objectsplayer.add(new OMO_SpinDeath(globalID, 1, IsPlayerFacingRight(), 10));
+	objectsplayer.add(new OMO_SpinDeath(globalID, 1, IsPlayerFacingRight(), 12));
 }
 
 void CPlayer::DrawTail()
@@ -3018,7 +3052,10 @@ void CPlayer::DrawTail()
 			}
 			else if(inair)
 			{
-				iTailFrame = 66;
+				if(vely <= 0.0f)
+					iTailFrame = 66;
+				else
+					iTailFrame = 110;
 			}
 		}
 	}

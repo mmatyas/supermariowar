@@ -138,7 +138,7 @@ class CPlayer
 
 	private:
 		void SetSprite();
-		void Jump(short iMove, float jumpModifier);
+		void Jump(short iMove, float jumpModifier, bool fKuriboBounce);
 		
 		void SpinCape();
 		void DrawCape();

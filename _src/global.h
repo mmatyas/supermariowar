@@ -101,6 +101,7 @@ struct STextAward
 #define TAGGEDBOOST    1.0f
 #define VELSUPERSTOMP	10.0f
 #define VELTAILSHAKE	1.0f
+#define VELKURIBOBOUNCE	3.0f
 
 #define	GRAVITATION		0.40f		
 

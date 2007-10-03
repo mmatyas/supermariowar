@@ -1610,7 +1610,8 @@ short WorldMap::GetNextInterestingMove(short iCol, short iRow)
 {
 	WorldMapTile * currentTile = &tiles[iCol][iRow];
 
-	if((currentTile->iType >= 6 && currentTile->iCompleted == -1) || NumVehiclesInTile(iCol, iRow) > 0)
+	//Look for stages or vehicles, but not bonus houses
+	if((currentTile->iType >= 6 && currentTile->iCompleted == -2) || NumVehiclesInTile(iCol, iRow) > 0)
 		return 4; //Signal to press select on this tile
 
 	short iCurrentId = currentTile->iID;
@@ -1629,6 +1630,7 @@ short WorldMap::GetNextInterestingMove(short iCol, short iRow)
 
 		next.pop();
 
+		//Look for stages or vehicles, but not bonus houses
 		if((tile->iType >= 6 && tile->iCompleted == -2) || NumVehiclesInTile(tile->iCol, tile->iRow) > 0)
 		{
 			short iBackTileDirection = visitedTiles[tile->iID];

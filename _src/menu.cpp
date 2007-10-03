@@ -2282,7 +2282,6 @@ void Menu::RunMenu()
 		}
 
 		UpdateScoreBoard();
-		miTournamentScoreboard->RefreshWorldScores(game_values.gamemode->winningteam);
 
 		//If we're suposed to skip the scoreboard, then reset back to the world map
 		if(game_values.worldskipscoreboard)
@@ -2291,6 +2290,10 @@ void Menu::RunMenu()
 			mCurrentMenu->ResetMenu();
 
 			game_values.worldskipscoreboard = false;
+		}
+		else
+		{
+			miTournamentScoreboard->RefreshWorldScores(game_values.gamemode->winningteam);
 		}
 	}
 	else if(game_values.matchtype == MATCH_TYPE_TOUR)
@@ -2720,7 +2723,10 @@ void Menu::RunMenu()
 					if(game_values.tournamentwinner == -2 || game_values.tournamentwinner > -1) //If world is over then return back to main menu
 						ResetTournamentBackToMainMenu();
 					else
+					{
 						mCurrentMenu = &mWorldMenu;
+						miWorldStop->Refresh(game_values.tourstopcurrent);
+					}
 				}
 				else
 				{

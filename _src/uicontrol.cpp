@@ -3501,7 +3501,9 @@ void MI_TournamentScoreboard::DetermineScoreboardWinners()
 		for(short iTeam = 0; iTeam < iNumWinningTeams; iTeam++)
 		{
 			miTeamImages[iWinningTeams[iTeam]]->SetAnimationSpeed(20);
-			worldPointsBackground[iWinningTeams[iTeam]]->SetAnimationSpeed(20);
+			
+			if(worldPointsBackground[iWinningTeams[iTeam]])
+				worldPointsBackground[iWinningTeams[iTeam]]->SetAnimationSpeed(20);
 		}
 	}
 }
@@ -3517,7 +3519,9 @@ void MI_TournamentScoreboard::RefreshTournamentScores(short gameWinner)
 	{
 		iTournamentWinner = iGameWinner;
 		miTeamImages[iTournamentWinner]->SetAnimationSpeed(20);
-		worldPointsBackground[iTournamentWinner]->SetAnimationSpeed(20);
+
+		if(worldPointsBackground[iTournamentWinner])
+			worldPointsBackground[iTournamentWinner]->SetAnimationSpeed(20);
 	}
 
 	for(short iTeam = 0; iTeam < iNumTeams; iTeam++)
@@ -5139,6 +5143,10 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 
 						ifsoundonplay(sfx_worldmove);
 					}
+					else
+					{
+						ifsoundonplay(sfx_hit);
+					}
 				}
 				else if(playerKeys->menu_down.fPressed)
 				{
@@ -5152,6 +5160,10 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 						iReturnDirection = 0;
 
 						ifsoundonplay(sfx_worldmove);
+					}
+					else
+					{
+						ifsoundonplay(sfx_hit);
 					}
 				}
 				else if(playerKeys->menu_left.fPressed)
@@ -5170,6 +5182,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 					else
 					{
 						g_worldmap.FacePlayer(1);
+						ifsoundonplay(sfx_hit);
 					}
 				}
 				else if(playerKeys->menu_right.fPressed)
@@ -5188,6 +5201,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 					else
 					{
 						g_worldmap.FacePlayer(0);
+						ifsoundonplay(sfx_hit);
 					}
 				}
 				else if(playerInput->outputControls[iPlayer].menu_select.fPressed)
@@ -5417,6 +5431,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 				else if (iState == game_values.colorids[iPlayer])
 				{
 					iStateTransition = 2;
+					ifsoundonplay(sfx_inventory);
 				}
 			}
 		}

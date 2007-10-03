@@ -447,6 +447,9 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 				else if(goal->getObjectType() == object_flag && carriedItem->getObjectType() != object_flag)
 					playerKeys->game_turbo.fDown = false;
 			}
+
+			if(goal->getObjectType() == object_moving && ((IO_MovingObject*)goal)->getMovingObjectType() == movingobject_treasurechest)
+				playerKeys->game_turbo.fPressed = true;
 		}
 		else if(actionType == 2)  //Evade Threat
 		{
@@ -858,12 +861,17 @@ void CPlayerAI::GetNearestObjects()
 				{
 					DistanceToObject(objectcollisionitems.list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
 				}
+				else if(movingobject_treasurechest == movingtype)
+				{
+					DistanceToObject(objectcollisionitems.list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
+				}
 				else
 				{
 					continue;
 				}
 				break;
 			}
+
 			case object_area:
 			{
 				if(((OMO_Area*)objectcollisionitems.list[i])->getColorID() == pPlayer->colorID)

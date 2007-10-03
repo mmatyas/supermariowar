@@ -3061,7 +3061,7 @@ PU_TreasureChestBonus::PU_TreasureChestBonus(gfxSprite *nspr, short iNumSpr, sho
 	numbounces = 5;
 	state = 2;
 	bonusitem = iBonusItem;
-
+	
 	g_map.findspawnpoint(1, &ix, &iy, collisionWidth, collisionHeight, false);
 	fx = (float)ix;
 	fy = (float)iy;
@@ -3175,6 +3175,8 @@ MO_BonusHouseChest::MO_BonusHouseChest(gfxSprite *nspr, short ix, short iy, shor
 
 	drawbonusitemy = 0;
 	drawbonusitemtimer = 0;
+
+	movingObjectType = movingobject_treasurechest;
 }
 
 void MO_BonusHouseChest::update()
@@ -8478,7 +8480,7 @@ void CO_KuriboShoe::hittop(CPlayer * player)
 // class spin death (spinning cape or tail)
 //------------------------------------------------------------------------------
 OMO_SpinDeath::OMO_SpinDeath(short playerId, short style, bool direction, short offsety) :
-	IO_MovingObject(NULL, 0, 0, 0, 0, 24, 12, 0, 0)
+	IO_MovingObject(NULL, 0, 0, 1, 0, 24, 12, 0, 0)
 {
 	iPlayerID = playerId;
 	iStyle = style;
@@ -8541,6 +8543,54 @@ void OMO_SpinDeath::update()
 	{
 		xi(owner->ix - PWOFFSET + (fDirection ? 24 : -16));
 		yi(owner->iy + PH - iOffsetY);
+
+		if(iTimer < 5)
+			return;
+
+		//Check block collisions
+		short iTop = iy / TILESIZE;
+		short iBottom = (iy + collisionHeight) / TILESIZE;
+		short iLeft = ix / TILESIZE;
+		short iRight = (ix + collisionWidth) / TILESIZE;
+
+		IO_Block * topleftblock = NULL;
+		IO_Block * toprightblock = NULL;
+		IO_Block * bottomleftblock = NULL;
+		IO_Block * bottomrightblock = NULL;
+
+		if(iTop >= 0 && iTop < 15)
+		{
+			if(iLeft >= 0 && iLeft < 20)
+				topleftblock = g_map.block(iLeft, iTop);
+
+			if(iRight >= 0 && iRight < 20)
+				toprightblock = g_map.block(iRight, iTop);
+		}
+
+		if(iBottom >= 0 && iBottom < 15)
+		{
+			if(iLeft >= 0 && iLeft < 20)
+				bottomleftblock = g_map.block(iLeft, iBottom);
+
+			if(iRight >= 0 && iRight < 20)
+				bottomrightblock = g_map.block(iRight, iBottom);
+		}
+
+		bool fHitBlock = false;
+		if(topleftblock && !topleftblock->isTransparent())
+			fHitBlock = topleftblock->collide(this, 3);
+		
+		if(!fHitBlock && toprightblock && !toprightblock->isTransparent())
+			fHitBlock = toprightblock->collide(this, 1);
+
+		if(!fHitBlock && bottomleftblock && !bottomleftblock->isTransparent())
+			fHitBlock = bottomleftblock->collide(this, 3);
+		
+		if(!fHitBlock && bottomrightblock && !bottomrightblock->isTransparent())
+			fHitBlock = bottomrightblock->collide(this, 1);
+
+		if(fHitBlock)
+			dead = true;
 	}
 	else
 	{
