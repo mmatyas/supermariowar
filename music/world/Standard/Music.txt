@@ -8,7 +8,7 @@ bonus.ogg
 
 #Sleep plays when a music box world item is used
 [Sleep]
-bonus.ogg
+sleep.ogg
 
 
 #Standard world categories that are settable from the world editor

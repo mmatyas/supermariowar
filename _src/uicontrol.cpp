@@ -5248,6 +5248,11 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 				{
 					iItemPage--;
 					iItemCol = 0;
+					ifsoundonplay(sfx_worldmove);
+				}
+				else
+				{
+					ifsoundonplay(sfx_hit);
 				}
 			}
 			else if(playerKeys->menu_down.fPressed)
@@ -5256,6 +5261,11 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 				{
 					iItemPage++;
 					iItemCol = 0;
+					ifsoundonplay(sfx_worldmove);
+				}
+				else
+				{
+					ifsoundonplay(sfx_hit);
 				}
 			}
 			else if(playerKeys->menu_left.fPressed)
@@ -5263,11 +5273,17 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 				if(iItemCol > 0)
 				{
 					iItemCol--;
+					ifsoundonplay(sfx_worldmove);
 				}
 				else if(iItemCol == 0 && iItemPage > 0)
 				{
 					iItemCol = 7;
 					iItemPage--;
+					ifsoundonplay(sfx_worldmove);
+				}
+				else
+				{
+					ifsoundonplay(sfx_hit);
 				}
 			}
 			else if(playerKeys->menu_right.fPressed)
@@ -5277,11 +5293,17 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 					if(iItemCol < 7)
 					{
 						iItemCol++;
+						ifsoundonplay(sfx_worldmove);
 					}
 					else if(iItemCol == 7 && iItemPage < 3)
 					{
 						iItemCol = 0;
 						iItemPage++;
+						ifsoundonplay(sfx_worldmove);
+					}
+					else
+					{
+						ifsoundonplay(sfx_hit);
 					}
 				}
 			}
