@@ -710,11 +710,15 @@ WorldMusicEntry::WorldMusicEntry(const std::string & musicdirectory)
 				iAddToCategory = 7;
 			else if(!stricmp(szBuffer, "[space]"))
 				iAddToCategory = 8;
+			else if(!stricmp(szBuffer, "[bonus]"))
+				iAddToCategory = WORLDMUSICBONUS;
+			else if(!stricmp(szBuffer, "[sleep]"))
+				iAddToCategory = WORLDMUSICSLEEP;
 
 			continue;
 		}
 
-		if(iAddToCategory > -1 && iAddToCategory < MAXWORLDMUSICCATEGORY)
+		if(iAddToCategory > -1 && iAddToCategory <= WORLDMUSICSLEEP)
 		{
 			std::string sPath = musicdirectory + getDirectorySeperator() + convertPartialPath(std::string(szBuffer));
 
@@ -730,7 +734,7 @@ WorldMusicEntry::WorldMusicEntry(const std::string & musicdirectory)
 
 string WorldMusicEntry::GetMusic(unsigned int musicID)
 {
-    if (musicID < 0 || musicID >= MAXWORLDMUSICCATEGORY)
+    if (musicID < 0 || musicID > WORLDMUSICSLEEP)
         return songFileNames[0];
 
     return songFileNames[musicID];

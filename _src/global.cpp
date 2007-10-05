@@ -384,10 +384,36 @@ short g_iAutoFilterIcons[NUM_AUTO_FILTERS] = {37, 29, 33, 1, 0, 6, 40, 73};
 
 short g_iPowerupToIcon[7] = {80, 176, 272, 304, 336, 368, 384};
 
+short ReadTourStopSetting(short * iSetting, bool * fSetting, short iDefault, bool fDefault)
+{
+	char * pszTemp = strtok(NULL, ",\n");
+	if(pszTemp)
+	{
+		if(iSetting)
+			*iSetting = atoi(pszTemp);
+
+		if(fSetting)
+			*fSetting = atoi(pszTemp) == 1;
+
+		return 1;
+	}
+	else
+	{
+		if(iSetting)
+			*iSetting = iDefault;
+
+		if(fSetting)
+			*fSetting = fDefault;
+	}
+
+	return 0;
+}
+
 TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 {
 	TourStop * ts = new TourStop();
 	ts->fUseSettings = false;
+	ts->iNumUsedSettings = 0;
 
 	char * pszTemp = strtok(buffer, ",\n");
 
@@ -545,259 +571,100 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 			{
 				ts->fUseSettings = true;
 				
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.jail.timetofree = atoi(pszTemp);
-				else
-					ts->gmsSettings.jail.timetofree = game_values.gamemodemenusettings.jail.timetofree;
-
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.jail.tagfree = atoi(pszTemp) == 1;
-				else
-					ts->gmsSettings.jail.tagfree = game_values.gamemodemenusettings.jail.tagfree;
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.jail.timetofree, NULL, game_values.gamemodemenusettings.jail.timetofree, NULL);
+				ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.jail.tagfree, NULL, game_values.gamemodemenusettings.jail.tagfree);
 			}
 			else if(ts->iMode == 4) //coins
 			{
 				ts->fUseSettings = true;
-				
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.coins.penalty = atoi(pszTemp) == 1;
-				else
-					ts->gmsSettings.coins.penalty = game_values.gamemodemenusettings.coins.penalty;
 
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.coins.quantity = atoi(pszTemp);
-				else
-					ts->gmsSettings.coins.quantity = game_values.gamemodemenusettings.coins.quantity;
-
+				ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.coins.penalty, NULL, game_values.gamemodemenusettings.coins.penalty);
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.coins.quantity, NULL, game_values.gamemodemenusettings.coins.quantity, NULL);
 			}
 			else if(ts->iMode == 5) //stomp
 			{
 				ts->fUseSettings = true;
 				
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.stomp.rate = atoi(pszTemp);
-				else
-					ts->gmsSettings.stomp.rate = game_values.gamemodemenusettings.stomp.rate;
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.stomp.rate, NULL, game_values.gamemodemenusettings.stomp.rate, NULL);
 
 				for(int iEnemy = 0; iEnemy < 4; iEnemy++)
-				{
-					pszTemp = strtok(NULL, ",\n");
-					if(pszTemp)
-						ts->gmsSettings.stomp.enemyweight[iEnemy] = atoi(pszTemp);
-					else
-						ts->gmsSettings.stomp.enemyweight[iEnemy] = game_values.gamemodemenusettings.stomp.enemyweight[iEnemy];
-				}
+					ts->iNumUsedSettings += ReadTourStopSetting(&(ts->gmsSettings.stomp.enemyweight[iEnemy]), NULL, game_values.gamemodemenusettings.stomp.enemyweight[iEnemy], NULL);
 			}
 			else if(ts->iMode == 7) //capture the flag
 			{
 				ts->fUseSettings = true;
 				
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.flag.speed = atoi(pszTemp);
-				else
-					ts->gmsSettings.flag.speed = game_values.gamemodemenusettings.flag.speed;
-
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.flag.touchreturn = atoi(pszTemp) == 1;
-				else
-					ts->gmsSettings.flag.touchreturn = game_values.gamemodemenusettings.flag.touchreturn;
-
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.flag.pointmove = atoi(pszTemp) == 1;
-				else
-					ts->gmsSettings.flag.pointmove = game_values.gamemodemenusettings.flag.pointmove;
-
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.flag.autoreturn = atoi(pszTemp);
-				else
-					ts->gmsSettings.flag.autoreturn = game_values.gamemodemenusettings.flag.autoreturn;
-
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.flag.homescore = atoi(pszTemp) == 1;
-				else
-					ts->gmsSettings.flag.homescore = game_values.gamemodemenusettings.flag.homescore;
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.flag.speed, NULL, game_values.gamemodemenusettings.flag.speed, NULL);
+				ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.flag.touchreturn, NULL, game_values.gamemodemenusettings.flag.touchreturn);
+				ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.flag.pointmove, NULL, game_values.gamemodemenusettings.flag.pointmove);
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.flag.autoreturn, NULL, game_values.gamemodemenusettings.flag.autoreturn, NULL);
+				ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.flag.homescore, NULL, game_values.gamemodemenusettings.flag.homescore);
 			}
 			else if(ts->iMode == 8) //chicken
 			{
 				ts->fUseSettings = true;
 				
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.chicken.usetarget = atoi(pszTemp) == 1;
-				else
-					ts->gmsSettings.chicken.usetarget = game_values.gamemodemenusettings.chicken.usetarget;
+				ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.chicken.usetarget, NULL, game_values.gamemodemenusettings.chicken.usetarget);
 			}
 			else if(ts->iMode == 9) //tag
 			{
 				ts->fUseSettings = true;
 				
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.tag.tagontouch = atoi(pszTemp) == 1;
-				else
-					ts->gmsSettings.tag.tagontouch = game_values.gamemodemenusettings.tag.tagontouch;
+				ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.tag.tagontouch, NULL, game_values.gamemodemenusettings.tag.tagontouch);
 			}
 			else if(ts->iMode == 10) //star
 			{
 				ts->fUseSettings = true;
 				
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.star.time = atoi(pszTemp);
-				else
-					ts->gmsSettings.star.time = game_values.gamemodemenusettings.star.time;
-
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.star.shine = atoi(pszTemp);
-				else
-					ts->gmsSettings.star.shine = game_values.gamemodemenusettings.star.shine;
-
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.star.time, NULL, game_values.gamemodemenusettings.star.time, NULL);
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.star.shine, NULL, game_values.gamemodemenusettings.star.shine, NULL);
 			}
 			else if(ts->iMode == 11) //domination
 			{
 				ts->fUseSettings = true;
 				
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.domination.quantity = atoi(pszTemp);
-				else
-					ts->gmsSettings.domination.quantity = game_values.gamemodemenusettings.domination.quantity;
-
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.domination.relocationfrequency = atoi(pszTemp);
-				else
-					ts->gmsSettings.domination.relocationfrequency = game_values.gamemodemenusettings.domination.relocationfrequency;
-
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.domination.loseondeath = atoi(pszTemp) == 1;
-				else
-					ts->gmsSettings.domination.loseondeath = game_values.gamemodemenusettings.domination.loseondeath;
-
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.domination.relocateondeath = atoi(pszTemp) == 1;
-				else
-					ts->gmsSettings.domination.relocateondeath = game_values.gamemodemenusettings.domination.relocateondeath;
-
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.domination.stealondeath = atoi(pszTemp) == 1;
-				else
-					ts->gmsSettings.domination.stealondeath = game_values.gamemodemenusettings.domination.stealondeath;
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.domination.quantity, NULL, game_values.gamemodemenusettings.domination.quantity, NULL);
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.domination.relocationfrequency, NULL, game_values.gamemodemenusettings.domination.relocationfrequency, NULL);
+				ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.domination.loseondeath, NULL, game_values.gamemodemenusettings.domination.loseondeath);
+				ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.domination.relocateondeath, NULL, game_values.gamemodemenusettings.domination.relocateondeath);
+				ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.domination.stealondeath, NULL, game_values.gamemodemenusettings.domination.stealondeath);
 			}
 			else if(ts->iMode == 12) //king of the hill
 			{
 				ts->fUseSettings = true;
 				
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.kingofthehill.areasize = atoi(pszTemp);
-				else
-					ts->gmsSettings.kingofthehill.areasize = game_values.gamemodemenusettings.kingofthehill.areasize;
-
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.kingofthehill.relocationfrequency = atoi(pszTemp);
-				else
-					ts->gmsSettings.kingofthehill.relocationfrequency = game_values.gamemodemenusettings.kingofthehill.relocationfrequency;
-
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.kingofthehill.areasize, NULL, game_values.gamemodemenusettings.kingofthehill.areasize, NULL);
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.kingofthehill.relocationfrequency, NULL, game_values.gamemodemenusettings.kingofthehill.relocationfrequency, NULL);
 			}
 			else if(ts->iMode == 13) //race
 			{
 				ts->fUseSettings = true;
 				
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.race.quantity = atoi(pszTemp);
-				else
-					ts->gmsSettings.race.quantity = game_values.gamemodemenusettings.race.quantity;
-
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.race.speed = atoi(pszTemp);
-				else
-					ts->gmsSettings.race.speed = game_values.gamemodemenusettings.race.speed;
-
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.race.penalty = atoi(pszTemp);
-				else
-					ts->gmsSettings.race.penalty = game_values.gamemodemenusettings.race.penalty;
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.race.quantity, NULL, game_values.gamemodemenusettings.race.quantity, NULL);
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.race.speed, NULL, game_values.gamemodemenusettings.race.speed, NULL);
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.race.penalty, NULL, game_values.gamemodemenusettings.race.penalty, NULL);
 			}
 			else if(ts->iMode == 15) //frenzy
 			{
 				ts->fUseSettings = true;
 				
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.frenzy.quantity = atoi(pszTemp);
-				else
-					ts->gmsSettings.frenzy.quantity = game_values.gamemodemenusettings.frenzy.quantity;
-
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.frenzy.rate = atoi(pszTemp);
-				else
-					ts->gmsSettings.frenzy.rate = game_values.gamemodemenusettings.frenzy.rate;
-
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.frenzy.storedshells = atoi(pszTemp) == 1;
-				else
-					ts->gmsSettings.frenzy.storedshells = game_values.gamemodemenusettings.frenzy.storedshells;
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.frenzy.quantity, NULL, game_values.gamemodemenusettings.frenzy.quantity, NULL);
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.frenzy.rate, NULL, game_values.gamemodemenusettings.frenzy.rate, NULL);
+				ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.frenzy.storedshells, NULL, game_values.gamemodemenusettings.frenzy.storedshells);
 
 				for(short iPowerup = 0; iPowerup < 12; iPowerup++)
-				{
-					pszTemp = strtok(NULL, ",\n");
-					if(pszTemp)
-						ts->gmsSettings.frenzy.powerupweight[iPowerup] = atoi(pszTemp);
-					else
-						ts->gmsSettings.frenzy.powerupweight[iPowerup] = game_values.gamemodemenusettings.frenzy.powerupweight[iPowerup];
-				}
+					ts->iNumUsedSettings += ReadTourStopSetting(&(ts->gmsSettings.frenzy.powerupweight[iPowerup]), NULL, game_values.gamemodemenusettings.frenzy.powerupweight[iPowerup], NULL);
 			}
 			else if(ts->iMode == 16) //survival
 			{
 				ts->fUseSettings = true;
 				
 				for(short iEnemy = 0; iEnemy < 3; iEnemy++)
-				{
-					pszTemp = strtok(NULL, ",\n");
-					if(pszTemp)
-						ts->gmsSettings.survival.enemyweight[iEnemy] = atoi(pszTemp);
-					else
-						ts->gmsSettings.survival.enemyweight[iEnemy] = game_values.gamemodemenusettings.survival.enemyweight[iEnemy];
-				}
+					ts->iNumUsedSettings += ReadTourStopSetting(&(ts->gmsSettings.survival.enemyweight[iEnemy]), NULL, game_values.gamemodemenusettings.survival.enemyweight[iEnemy], NULL);
 
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.survival.density = atoi(pszTemp);
-				else
-					ts->gmsSettings.survival.density = game_values.gamemodemenusettings.survival.density;
-
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.survival.speed = atoi(pszTemp);
-				else
-					ts->gmsSettings.survival.speed = game_values.gamemodemenusettings.survival.speed;
-
-				pszTemp = strtok(NULL, ",\n");
-				if(pszTemp)
-					ts->gmsSettings.survival.shield = atoi(pszTemp) == 1;
-				else
-					ts->gmsSettings.survival.shield = game_values.gamemodemenusettings.survival.shield;
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.survival.density, NULL, game_values.gamemodemenusettings.survival.density, NULL);
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.survival.speed, NULL, game_values.gamemodemenusettings.survival.speed, NULL);
+				ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.survival.shield, NULL, game_values.gamemodemenusettings.survival.shield);
 			}
 		}
 	}
@@ -935,135 +802,234 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
 		{
 			if(ts->iMode == 3) //jail
 			{
-				sprintf(szTemp, ",%d", ts->gmsSettings.jail.timetofree);
-				strcat(buffer, szTemp);
+				if(ts->iNumUsedSettings > 0)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.jail.timetofree);
+					strcat(buffer, szTemp);
+				}
 
-				sprintf(szTemp, ",%d", ts->gmsSettings.jail.tagfree);
-				strcat(buffer, szTemp);
+				if(ts->iNumUsedSettings > 1)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.jail.tagfree);
+					strcat(buffer, szTemp);
+				}
 			}
 			else if(ts->iMode == 4) //coins
 			{
-				sprintf(szTemp, ",%d", ts->gmsSettings.coins.penalty);
-				strcat(buffer, szTemp);
+				if(ts->iNumUsedSettings > 0)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.coins.penalty);
+					strcat(buffer, szTemp);
+				}
 
-				sprintf(szTemp, ",%d", ts->gmsSettings.coins.quantity);
-				strcat(buffer, szTemp);
+				if(ts->iNumUsedSettings > 1)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.coins.quantity);
+					strcat(buffer, szTemp);
+				}
 			}
 			else if(ts->iMode == 5) //stomp
 			{
-				sprintf(szTemp, ",%d", ts->gmsSettings.stomp.rate);
-				strcat(buffer, szTemp);
+				if(ts->iNumUsedSettings > 0)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.stomp.rate);
+					strcat(buffer, szTemp);
+				}
 
 				for(int iEnemy = 0; iEnemy < 4; iEnemy++)
 				{
-					sprintf(szTemp, ",%d", ts->gmsSettings.stomp.enemyweight[iEnemy]);
-					strcat(buffer, szTemp);
+					if(ts->iNumUsedSettings > iEnemy + 1)
+					{
+						sprintf(szTemp, ",%d", ts->gmsSettings.stomp.enemyweight[iEnemy]);
+						strcat(buffer, szTemp);
+					}
 				}
 			}
 			else if(ts->iMode == 7) //capture the flag
 			{
-				sprintf(szTemp, ",%d", ts->gmsSettings.flag.speed);
-				strcat(buffer, szTemp);
+				if(ts->iNumUsedSettings > 0)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.flag.speed);
+					strcat(buffer, szTemp);
+				}
 
-				sprintf(szTemp, ",%d", ts->gmsSettings.flag.touchreturn);
-				strcat(buffer, szTemp);
+				if(ts->iNumUsedSettings > 1)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.flag.touchreturn);
+					strcat(buffer, szTemp);
+				}
 
-				sprintf(szTemp, ",%d", ts->gmsSettings.flag.pointmove);
-				strcat(buffer, szTemp);
+				if(ts->iNumUsedSettings > 2)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.flag.pointmove);
+					strcat(buffer, szTemp);
+				}
 
-				sprintf(szTemp, ",%d", ts->gmsSettings.flag.autoreturn);
-				strcat(buffer, szTemp);
+				if(ts->iNumUsedSettings > 3)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.flag.autoreturn);
+					strcat(buffer, szTemp);
+				}
 
-				sprintf(szTemp, ",%d", ts->gmsSettings.flag.homescore);
-				strcat(buffer, szTemp);
+				if(ts->iNumUsedSettings > 4)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.flag.homescore);
+					strcat(buffer, szTemp);
+				}
 			}
 			else if(ts->iMode == 8) //chicken
 			{
-				sprintf(szTemp, ",%d", ts->gmsSettings.chicken.usetarget);
-				strcat(buffer, szTemp);
+				if(ts->iNumUsedSettings > 0)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.chicken.usetarget);
+					strcat(buffer, szTemp);
+				}
 			}
 			else if(ts->iMode == 9) //tag
 			{
-				sprintf(szTemp, ",%d", ts->gmsSettings.tag.tagontouch);
-				strcat(buffer, szTemp);
+				if(ts->iNumUsedSettings > 0)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.tag.tagontouch);
+					strcat(buffer, szTemp);
+				}
 			}
 			else if(ts->iMode == 10) //star
 			{
-				sprintf(szTemp, ",%d", ts->gmsSettings.star.time);
-				strcat(buffer, szTemp);
+				if(ts->iNumUsedSettings > 0)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.star.time);
+					strcat(buffer, szTemp);
+				}
 
-				sprintf(szTemp, ",%d", ts->gmsSettings.star.shine);
-				strcat(buffer, szTemp);
+				if(ts->iNumUsedSettings > 1)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.star.shine);
+					strcat(buffer, szTemp);
+				}
 			}
 			else if(ts->iMode == 11) //domination
 			{
-				sprintf(szTemp, ",%d", ts->gmsSettings.domination.quantity);
-				strcat(buffer, szTemp);
+				if(ts->iNumUsedSettings > 0)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.domination.quantity);
+					strcat(buffer, szTemp);
+				}
 
-				sprintf(szTemp, ",%d", ts->gmsSettings.domination.relocationfrequency);
-				strcat(buffer, szTemp);
+				if(ts->iNumUsedSettings > 1)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.domination.relocationfrequency);
+					strcat(buffer, szTemp);
+				}
 
-				sprintf(szTemp, ",%d", ts->gmsSettings.domination.loseondeath);
-				strcat(buffer, szTemp);
+				if(ts->iNumUsedSettings > 2)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.domination.loseondeath);
+					strcat(buffer, szTemp);
+				}
 
-				sprintf(szTemp, ",%d", ts->gmsSettings.domination.relocateondeath);
-				strcat(buffer, szTemp);
+				if(ts->iNumUsedSettings > 3)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.domination.relocateondeath);
+					strcat(buffer, szTemp);
+				}
 
-				sprintf(szTemp, ",%d", ts->gmsSettings.domination.stealondeath);
-				strcat(buffer, szTemp);
+				if(ts->iNumUsedSettings > 4)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.domination.stealondeath);
+					strcat(buffer, szTemp);
+				}
 			}
 			else if(ts->iMode == 12) //king of the hill
 			{
-				sprintf(szTemp, ",%d", ts->gmsSettings.kingofthehill.areasize);
-				strcat(buffer, szTemp);
+				if(ts->iNumUsedSettings > 0)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.kingofthehill.areasize);
+					strcat(buffer, szTemp);
+				}
 
-				sprintf(szTemp, ",%d", ts->gmsSettings.kingofthehill.relocationfrequency);
-				strcat(buffer, szTemp);
+				if(ts->iNumUsedSettings > 1)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.kingofthehill.relocationfrequency);
+					strcat(buffer, szTemp);
+				}
 			}
 			else if(ts->iMode == 13) //race
 			{
-				sprintf(szTemp, ",%d", ts->gmsSettings.race.quantity);
-				strcat(buffer, szTemp);
+				if(ts->iNumUsedSettings > 0)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.race.quantity);
+					strcat(buffer, szTemp);
+				}
 
-				sprintf(szTemp, ",%d", ts->gmsSettings.race.speed);
-				strcat(buffer, szTemp);
+				if(ts->iNumUsedSettings > 1)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.race.speed);
+					strcat(buffer, szTemp);
+				}
 
-				sprintf(szTemp, ",%d", ts->gmsSettings.race.penalty);
-				strcat(buffer, szTemp);
+				if(ts->iNumUsedSettings > 2)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.race.penalty);
+					strcat(buffer, szTemp);
+				}
 			}
 			else if(ts->iMode == 15) //frenzy
 			{
-				sprintf(szTemp, ",%d", ts->gmsSettings.frenzy.quantity);
-				strcat(buffer, szTemp);
+				if(ts->iNumUsedSettings > 0)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.frenzy.quantity);
+					strcat(buffer, szTemp);
+				}
 
-				sprintf(szTemp, ",%d", ts->gmsSettings.frenzy.rate);
-				strcat(buffer, szTemp);
+				if(ts->iNumUsedSettings > 1)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.frenzy.rate);
+					strcat(buffer, szTemp);
+				}
 
-				sprintf(szTemp, ",%d", ts->gmsSettings.frenzy.storedshells);
-				strcat(buffer, szTemp);
+				if(ts->iNumUsedSettings > 2)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.frenzy.storedshells);
+					strcat(buffer, szTemp);
+				}
 
 				for(short iPowerup = 0; iPowerup < 12; iPowerup++)
 				{
-					sprintf(szTemp, ",%d", ts->gmsSettings.frenzy.powerupweight[iPowerup]);
-					strcat(buffer, szTemp);
+					if(ts->iNumUsedSettings > iPowerup + 3)
+					{
+						sprintf(szTemp, ",%d", ts->gmsSettings.frenzy.powerupweight[iPowerup]);
+						strcat(buffer, szTemp);
+					}
 				}
 			}
 			else if(ts->iMode == 16) //survival
 			{
 				for(short iEnemy = 0; iEnemy < 3; iEnemy++)
 				{
-					sprintf(szTemp, ",%d", ts->gmsSettings.survival.enemyweight[iEnemy]);
+					if(ts->iNumUsedSettings > iEnemy)
+					{
+						sprintf(szTemp, ",%d", ts->gmsSettings.survival.enemyweight[iEnemy]);
+						strcat(buffer, szTemp);
+					}
+				}
+
+				if(ts->iNumUsedSettings > 3)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.survival.density);
 					strcat(buffer, szTemp);
 				}
 
-				sprintf(szTemp, ",%d", ts->gmsSettings.survival.density);
-				strcat(buffer, szTemp);
+				if(ts->iNumUsedSettings > 4)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.survival.speed);
+					strcat(buffer, szTemp);
+				}
 
-				sprintf(szTemp, ",%d", ts->gmsSettings.survival.speed);
-				strcat(buffer, szTemp);
-
-				sprintf(szTemp, ",%d", ts->gmsSettings.survival.shield);
-				strcat(buffer, szTemp);
+				if(ts->iNumUsedSettings > 5)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.survival.shield);
+					strcat(buffer, szTemp);
+				}
 			}
 		}
 	}

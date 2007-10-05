@@ -140,6 +140,8 @@ struct STextAward
 
 #define MAXMUSICCATEGORY	11
 #define MAXWORLDMUSICCATEGORY	9
+#define WORLDMUSICBONUS MAXWORLDMUSICCATEGORY
+#define WORLDMUSICSLEEP MAXWORLDMUSICCATEGORY + 1
 #define MAXCATEGORYTRACKS	64
 
 #define MAXEYECANDY		192
@@ -672,6 +674,7 @@ struct TourStop
 	short iStageType;
 
 	bool fUseSettings;
+	short iNumUsedSettings;
 	GameModeSettings gmsSettings;
 
 	short iBonusTextLines;

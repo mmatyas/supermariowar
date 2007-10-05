@@ -218,7 +218,7 @@ class WorldMusicEntry
 
         std::string GetMusic(unsigned int musicID);
 
-        std::string songFileNames[MAXWORLDMUSICCATEGORY];
+        std::string songFileNames[MAXWORLDMUSICCATEGORY + 2];
         std::string name;
 		unsigned short iCurrentMusic;
 

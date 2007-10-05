@@ -1362,9 +1362,12 @@ void drawmap(bool fScreenshot, short iBlockSize)
 		}
 	}
 	
-	for(short j = 0; j < g_map.iNumMapItems; j++)
+	if(!view_only_layer || fScreenshot)
 	{
-		spr_mapitems[iBlockSize == TILESIZE ? 0 : iBlockSize == PREVIEWTILESIZE ? 1 : 2].draw(g_map.mapitems[j].ix * iBlockSize, g_map.mapitems[j].iy * iBlockSize, g_map.mapitems[j].itype * iBlockSize, 0, iBlockSize, iBlockSize);
+		for(short j = 0; j < g_map.iNumMapItems; j++)
+		{
+			spr_mapitems[iBlockSize == TILESIZE ? 0 : iBlockSize == PREVIEWTILESIZE ? 1 : 2].draw(g_map.mapitems[j].ix * iBlockSize, g_map.mapitems[j].iy * iBlockSize, g_map.mapitems[j].itype * iBlockSize, 0, iBlockSize, iBlockSize);
+		}
 	}
 
 	if((view_only_layer && selected_layer == 2) || !view_only_layer)
@@ -3219,6 +3222,7 @@ int clearMap()
 { 
 	g_map.clearMap();
 	g_iNumPlatforms = 0;
+
 
 	printf("Map Cleared\n");
 	return 0;

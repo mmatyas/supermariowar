@@ -1,6 +1,17 @@
 #Version
 1.8.0.0
 
+#Special music
+#Bonus plays in bonus houses
+[Bonus]
+bonus.ogg
+
+#Sleep plays when a music box world item is used
+[Sleep]
+bonus.ogg
+
+
+#Standard world categories that are settable from the world editor
 [Grass]
 grassland.ogg
 

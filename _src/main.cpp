@@ -1193,22 +1193,25 @@ void RunGame()
 		projectiles[iPlayer] = 0;
 		respawn[iPlayer] = 0;
 
-		if(game_values.playercontrol[iPlayer] > 0 && (game_values.singleplayermode == -1 || game_values.singleplayermode == iPlayer))
+		if(game_values.singleplayermode == -1 || game_values.singleplayermode == iPlayer)
 		{
-			short teamid, subteamid;
-			LookupTeamID(iPlayer, &teamid, &subteamid);
+			if(game_values.playercontrol[iPlayer] > 0)
+			{
+				short teamid, subteamid;
+				LookupTeamID(iPlayer, &teamid, &subteamid);
 
-			CPlayerAI * ai = NULL;
-			if(game_values.playercontrol[iPlayer] == 2)
-				ai = new CPlayerAI();
+				CPlayerAI * ai = NULL;
+				if(game_values.playercontrol[iPlayer] == 2)
+					ai = new CPlayerAI();
 
-			list_players[list_players_cnt] = new CPlayer(iPlayer, list_players_cnt, teamid, subteamid, game_values.colorids[iPlayer], spr_player[iPlayer], score[teamid], &(respawn[iPlayer]), ai);
-			list_players_cnt++;
-		}
-		else if(!game_values.keeppowerup)
-		{
-			//Reset off player's stored powerups
-			game_values.storedpowerups[iPlayer] = -1;
+				list_players[list_players_cnt] = new CPlayer(iPlayer, list_players_cnt, teamid, subteamid, game_values.colorids[iPlayer], spr_player[iPlayer], score[teamid], &(respawn[iPlayer]), ai);
+				list_players_cnt++;
+			}
+			else if(!game_values.keeppowerup)
+			{
+				//Reset off player's stored powerups
+				game_values.storedpowerups[iPlayer] = -1;
+			}
 		}
 
 		game_values.gamepowerups[iPlayer] = game_values.storedpowerups[iPlayer];

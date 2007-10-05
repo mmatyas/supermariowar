@@ -2274,6 +2274,13 @@ void Menu::RunMenu()
 			mWorldMenu.SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
 
 			mWorldMenu.RestoreCurrent();
+			
+			//Clear out the stored powerups after a game that had a winner
+			if(!game_values.worldskipscoreboard)
+			{
+				for(short iPlayer = 0; iPlayer < 4; iPlayer++)
+					game_values.storedpowerups[iPlayer] = -1;
+			}
 		}
 		else if(game_values.tournamentwinner > -1) //World is completed
 		{
@@ -2647,10 +2654,9 @@ void Menu::RunMenu()
 						miTournamentScoreboard->CreateScoreboard(score_cnt, 0, &spr_tour_markers);
 
 						for(short iPlayer = 0; iPlayer < 4; iPlayer++)
-						{
 							game_values.storedpowerups[iPlayer] = -1;
-							g_worldmap.SetInitialPowerups();
-						}
+						
+						g_worldmap.SetInitialPowerups();
 
 						miWorld->Init();
 						miWorld->SetControllingTeam(rand() % score_cnt);
@@ -3226,6 +3232,12 @@ void Menu::RunMenu()
 			{
 				g_map.loadMap(convertPath("maps/special/bonushouse.map"), read_type_full);
 				LoadCurrentMapBackground();
+
+				if(game_values.music)
+				{
+					backgroundmusic[0].load(worldmusiclist.GetMusic(WORLDMUSICBONUS));
+					backgroundmusic[0].play(false, false);
+				}
 			}
 			else
 			{
@@ -3233,6 +3245,14 @@ void Menu::RunMenu()
 				
 				//Allows all players to start the game
 				game_values.singleplayermode = -1;
+
+				if(game_values.music)
+				{
+					musiclist.SetRandomMusic(g_map.musicCategoryID, maplist.currentShortmapname(), g_map.szBackgroundFile);
+					backgroundmusic[0].load(musiclist.GetCurrentMusic());
+					backgroundmusic[0].play(game_values.playnextmusic, false);
+				}
+
 			}
 
 			game_values.gamestate = GS_GAME;
@@ -3261,13 +3281,6 @@ void Menu::RunMenu()
 			g_map.predrawbackground(spr_background, spr_backmap);
 			g_map.predrawforeground(spr_frontmap);
 			LoadMapObjects();
-
-			if(game_values.music)
-			{
-				musiclist.SetRandomMusic(g_map.musicCategoryID, maplist.currentShortmapname(), g_map.szBackgroundFile);
-				backgroundmusic[0].load(musiclist.GetCurrentMusic());
-				backgroundmusic[0].play(game_values.playnextmusic, false);
-			}
 
 			return;
 		}

@@ -4733,7 +4733,13 @@ void MI_World::SetCurrentStageToCompleted(short iWinningTeam)
 void MI_World::AdvanceTurn()
 {
 	if(iSleepTurns > 0)
-		iSleepTurns--;
+	{
+		if(--iSleepTurns <= 0)
+		{
+			backgroundmusic[5].load(worldmusiclist.GetMusic(g_worldmap.GetMusicCategory()));
+			backgroundmusic[5].play(false, false);
+		}
+	}
 	else
 		g_worldmap.MoveVehicles();
 
@@ -5303,6 +5309,9 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 						iSleepTurns = rand() % 4 + 2;
 						fUsedItem = true;
 						ifsoundonplay(sfx_collectpowerup);
+
+						backgroundmusic[5].load(worldmusiclist.GetMusic(WORLDMUSICSLEEP));
+						backgroundmusic[5].play(false, false);
 					}
 					else if(iPowerup == NUM_POWERUPS + 1) //Cloud (allows player to skip stages)
 					{
