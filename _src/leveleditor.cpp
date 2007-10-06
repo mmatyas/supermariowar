@@ -187,7 +187,7 @@ int display_help();
 #endif
 
 void drawmap(bool fScreenshot, short iBlockSize);
-void draw_platform(short iPlatform);
+void draw_platform(short iPlatform, bool fDrawTileTypes);
 void SetPlatformToDefaults(short iPlatform);
 
 MapList maplist;
