@@ -54,6 +54,8 @@
 SDL_Surface		*screen;		//for gfx (maybe the gfx system should be improved -> resource manager)
 SDL_Surface		*blitdest;		//the destination surface for all drawing (can be swapped from screen to another surface)
 
+short			g_iCurrentDrawIndex = 0;
+
 short			x_shake = 0;
 short			y_shake = 0;
 
@@ -65,8 +67,8 @@ gfxSprite		** spr_bobomb[4];
 gfxSprite		spr_clouds[2];
 gfxSprite		spr_ghosts[3];
 gfxSprite		spr_background;
-gfxSprite		spr_backmap;
-gfxSprite		spr_frontmap;
+gfxSprite		spr_backmap[2];
+gfxSprite		spr_frontmap[2];
 gfxSprite		menu_backdrop;
 
 gfxFont			menu_font_small;
@@ -130,6 +132,7 @@ gfxSprite		spr_brokenflipblock;
 gfxSprite		spr_brokenblueblock;
 
 gfxSprite		spr_tileanimation[3];
+gfxSprite		spr_maptiles[3];
 
 gfxSprite		spr_starpowerup;
 gfxSprite		spr_1uppowerup;
@@ -231,8 +234,6 @@ gfxSprite		spr_powerupselector;
 
 gfxSprite		spr_scoreboard;
 gfxSprite		spr_abovearrows;
-
-gfxSprite		spr_overworld;
 
 //------ game relevant stuff ------
 CPlayer			*list_players[4];
@@ -2405,6 +2406,7 @@ void RunGame()
 
 					g_map.predrawbackground(spr_background, spr_backmap);
 					g_map.predrawforeground(spr_frontmap);
+					g_map.SetupAnimatedTiles();
 					LoadMapObjects();
 					*/
 
@@ -2458,7 +2460,7 @@ void RunGame()
 				SDL_FillRect(screen, &rect, 0x0);		//fill empty area with black
 			}
 
-			spr_backmap.draw(0, 0);
+			spr_backmap[g_iCurrentDrawIndex].draw(0, 0);
 
 			//draw back eyecandy behind players
 			objectblocks.draw();
@@ -2618,6 +2620,7 @@ void RunGame()
 
 			if(game_values.screenfadespeed != 0)
 			{
+				g_map.update();
 				game_values.screenfade += game_values.screenfadespeed;
 
 				if(game_values.screenfade <= 0)
@@ -2785,7 +2788,7 @@ void RunGame()
 
 		avgFPS += realfps;
 
-		if(++outputtimer == 60)
+		if(++outputtimer == 1)
 		{
 			FILE * out = fopen("fps.txt", "a+");
 
@@ -2795,11 +2798,9 @@ void RunGame()
 
 			avgFPS = 0.0f;
 			outputtimer = 0;
-		}
-		*/
+		}*/
 	}
 
-	
 	//we never get here
 
 	return;

@@ -5122,12 +5122,6 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 
 		if(iState == -1)
 		{
-
-#ifdef _DEBUG
-			if(playerKeys->menu_scrollfast.fPressed)
-				AdvanceTurn();
-#endif
-
 			if(iControllingTeam == LookupTeamID(iPlayer) && iPlayerState == 0 && game_values.playercontrol[iPlayer] > 0) //if this player is player or cpu
 			{
 				WorldMapTile * tile = &g_worldmap.tiles[iPlayerCurrentTileX][iPlayerCurrentTileY];

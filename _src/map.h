@@ -52,6 +52,7 @@ struct AnimatedTile
 	short id;
 	short layers[4];
 	SDL_Rect rSrc[4][4];
+	SDL_Rect rAnimationSrc[2][4];
 	SDL_Rect rDest;
 	bool fBackgroundAnimated;
 	bool fForegroundAnimated;
@@ -65,7 +66,7 @@ class CMap
 		CMap();
 		~CMap();
 
-		void loadTileSet(const std::string& tilesetfile, const std::string tilesetpng[3]);
+		void loadTileSet(const std::string& tilesetfile);
 		void saveTileSet(const std::string& tilesetfile);
 		void clearTileSet();
 
@@ -87,6 +88,8 @@ class CMap
 
 		void predrawbackground(gfxSprite &background, gfxSprite &mapspr);
 		void predrawforeground(gfxSprite &foregroundspr);
+
+		void SetupAnimatedTiles();
 		
 		void preDrawPreviewBackground(SDL_Surface * targetSurface, bool fThumbnail);
 		void preDrawPreviewBackground(gfxSprite * spr_background, SDL_Surface * targetSurface, bool fThumbnail);
@@ -178,7 +181,7 @@ class CMap
 		IO_Block*   blockdata[MAPWIDTH][MAPHEIGHT];
 		bool		nospawn[NUMSPAWNAREATYPES][MAPWIDTH][MAPHEIGHT];
 
-		std::list<AnimatedTile*> animatedtiles;
+		std::vector<AnimatedTile*> animatedtiles;
 
 		MovingPlatform ** platforms;
 		short		iNumPlatforms;
@@ -199,7 +202,6 @@ class CMap
 		short		maxConnection;
 
 		TileType	tileset[TILESETSIZE+1];
-		SDL_Surface	*tilesetsurface[3];
 
 		SDL_Rect	tilebltrect;
 		SDL_Rect    bltrect;
@@ -224,7 +226,16 @@ class CMap
 		short		iTileAnimationTimer;
 		short		iTileAnimationFrame;
 
-		void AnimateTiles();
+		short iAnimatedBackgroundLayers;
+		SDL_Surface * animatedFrontmapSurface;
+		SDL_Surface * animatedBackmapSurface;
+
+		SDL_Surface * animatedTilesSurface;
+
+		short iAnimatedTileCount;
+		short iAnimatedVectorIndices[NUM_FRAMES_BETWEEN_TILE_ANIMATION + 1];
+
+		void AnimateTiles(short iFrame);
 		void ClearAnimatedTiles();
 
 		void draw(SDL_Surface *targetsurf, int layer);

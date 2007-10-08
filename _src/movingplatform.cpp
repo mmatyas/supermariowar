@@ -64,12 +64,12 @@ MovingPlatform::MovingPlatform(short ** tiledata, TileType ** tiletypes, short w
 	fDead = false;
 
 	short iTileSize = TILESIZE;
-	SDL_Surface * tilesurface = g_map.tilesetsurface[0];
+	SDL_Surface * tilesurface = spr_maptiles[0].getSurface();
 		
 	if(fPreview)
 	{
 		iTileSize = PREVIEWTILESIZE;
-		tilesurface = g_map.tilesetsurface[1];
+		tilesurface = spr_maptiles[1].getSurface();
 
 		path->fEndX /= 2.0f;
 		path->fEndY /= 2.0f;

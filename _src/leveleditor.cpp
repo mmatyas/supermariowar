@@ -79,7 +79,7 @@ gfxFont			menu_font_small;
 gfxFont			menu_font_large;
 
 gfxSprite		spr_background;
-gfxSprite		spr_frontmap;
+gfxSprite		spr_frontmap[2];
 gfxSprite		spr_tiletypes[6];
 gfxSprite		spr_transparenttiles;
 
@@ -94,6 +94,7 @@ gfxSprite		spr_dialog;
 gfxSprite		menu_shade;
 gfxSprite		spr_mapitems[3];
 gfxSprite		spr_tileanimation[3];
+gfxSprite		spr_maptiles[3];
 
 gfxSprite		spr_platformarrows[3];
 gfxSprite		spr_warps[3];
@@ -158,7 +159,7 @@ gfxSprite		spr_thumbnail_warps[2];
 gfxSprite		spr_thumbnail_mapitems[2];
 gfxSprite		spr_awardsouls, spr_fireballexplosion;
 
-gfxSprite		spr_backmap;
+gfxSprite		spr_backmap[2];
 CEyecandyContainer eyecandyfront;
 CGameMode		*gamemodes[GAMEMODE_LAST];
 CPlayer			*list_players[4];
@@ -170,6 +171,7 @@ bool			fResumeMusic;
 void DECLSPEC soundfinished(int channel){}
 void DECLSPEC musicfinished(){}
 sfxSound * g_PlayingSoundChannels[NUM_SOUND_CHANNELS];
+short			g_iCurrentDrawIndex = 0;
 ///////
 
 SDL_Surface * s_eyecandy;
@@ -297,6 +299,10 @@ int main(int argc, char *argv[])
 	spr_tileanimation[1].init(convertPath("gfx/packs/Classic/eyecandy/tile_animation_preview.png"), 255, 0, 255, 255);
 	spr_tileanimation[2].init(convertPath("gfx/packs/Classic/eyecandy/tile_animation_thumbnail.png"), 255, 0, 255, 255);
 
+	spr_maptiles[0].init(convertPath("gfx/packs/Classic/tileset.png"), 255, 0, 255, 255);
+	spr_maptiles[1].init(convertPath("gfx/packs/Classic/tileset_medium.png"), 255, 0, 255, 255);
+	spr_maptiles[2].init(convertPath("gfx/packs/Classic/tileset_small.png"), 255, 0, 255, 255);
+
 	if( SDL_SetColorKey(s_eyecandy, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(s_eyecandy->format, 255, 0, 255)) < 0)
 	{
 		printf("\n ERROR: Couldn't set ColorKey + RLE: %s\n", SDL_GetError());
@@ -317,11 +323,7 @@ int main(int argc, char *argv[])
 
 	printf("\n---------------- load map ----------------\n");
 
-	std::string tileSetPNG[3];
-	tileSetPNG[0] = convertPath("gfx/packs/Classic/tileset.png");
-	tileSetPNG[1] = convertPath("gfx/packs/Classic/tileset_medium.png");
-	tileSetPNG[2] = convertPath("gfx/packs/Classic/tileset_small.png");
-	g_map.loadTileSet(convertPath("maps/tileset/tileset.tls"), tileSetPNG);
+	g_map.loadTileSet(convertPath("maps/tileset/tileset.tls"));
 	
 	//Setup Platforms
 	for(short iPlatform = 0; iPlatform < MAX_PLATFORMS; iPlatform++)
@@ -1256,7 +1258,7 @@ void drawlayer(int layer, bool fUseCopied, short iBlockSize)
 				tilebltrect.x = (ts % TILESETWIDTH) * iBlockSize;
 				tilebltrect.y = (ts / TILESETWIDTH) * iBlockSize;
 
-				SDL_BlitSurface(g_map.tilesetsurface[iTilesetIndex], &tilebltrect, screen, &bltrect);
+				SDL_BlitSurface(spr_maptiles[iTilesetIndex].getSurface(), &tilebltrect, screen, &bltrect);
 			}
 			else
 			{
@@ -1356,7 +1358,7 @@ void drawmap(bool fScreenshot, short iBlockSize)
 						rSrc.y = iBlockSize * 31;
 					}
 					
-					SDL_BlitSurface(g_map.tilesetsurface[iBlockSize == TILESIZE ? 0 : iBlockSize == PREVIEWTILESIZE ? 1 : 2], &rSrc, screen, &rDst);
+					SDL_BlitSurface(spr_maptiles[iBlockSize == TILESIZE ? 0 : iBlockSize == PREVIEWTILESIZE ? 1 : 2].getSurface(), &rSrc, screen, &rDst);
 				}
 			}
 		}
@@ -2143,7 +2145,7 @@ void draw_platform(short iPlatform, bool fDrawTileTypes)
 				tilebltrect.x = (ts % TILESETWIDTH) * TILESIZE;
 				tilebltrect.y = (ts / TILESETWIDTH) * TILESIZE;
 			
-				SDL_BlitSurface(g_map.tilesetsurface[0], &tilebltrect, screen, &bltrect);
+				SDL_BlitSurface(spr_maptiles[0].getSurface(), &tilebltrect, screen, &bltrect);
 			}
 
 			if(fDrawTileTypes)
@@ -2372,7 +2374,7 @@ int editor_tiles()
 		rectSrc.w = 512;
 		rectSrc.h = 480;
 
-		SDL_BlitSurface(g_map.tilesetsurface[0], &rectSrc, screen, &r);
+		SDL_BlitSurface(spr_maptiles[0].getSurface(), &rectSrc, screen, &r);
 		//menu_font_small.drawRightJustified(640, 0, maplist.currentFilename());
 		
 		short iTileOffset = (selected_tileset > 1 ? 480 : 0) + (selected_tileset % 2 ? 16 : 0);
@@ -2503,22 +2505,22 @@ int editor_blocks()
 		SDL_Rect rSrc = {0, 960, 224, 32};
 		SDL_Rect rDst = {0, 0, 224, 32};
 
-		SDL_BlitSurface(g_map.tilesetsurface[0], &rSrc, screen, &rDst);
+		SDL_BlitSurface(spr_maptiles[0].getSurface(), &rSrc, screen, &rDst);
 
 		SDL_Rect rOnOffSrc = {224, 960, 128, 64};
 		SDL_Rect rOnOffDst = {0, 32, 128, 64};
 
-		SDL_BlitSurface(g_map.tilesetsurface[0], &rOnOffSrc, screen, &rOnOffDst);
+		SDL_BlitSurface(spr_maptiles[0].getSurface(), &rOnOffSrc, screen, &rOnOffDst);
 
 		SDL_Rect rOnOffBlockSrc = {352, 960, 128, 32};
 		SDL_Rect rOnOffBlockDst = {0, 96, 128, 32};
 
-		SDL_BlitSurface(g_map.tilesetsurface[0], &rOnOffBlockSrc, screen, &rOnOffBlockDst);
+		SDL_BlitSurface(spr_maptiles[0].getSurface(), &rOnOffBlockSrc, screen, &rOnOffBlockDst);
 
 		SDL_Rect rBlocksRow2Src = {0, 992, 128, 32};
 		SDL_Rect rBlocksRow2Dst = {224, 0, 128, 32};
 
-		SDL_BlitSurface(g_map.tilesetsurface[0], &rBlocksRow2Src, screen, &rBlocksRow2Dst);
+		SDL_BlitSurface(spr_maptiles[0].getSurface(), &rBlocksRow2Src, screen, &rBlocksRow2Dst);
 
 		menu_font_small.drawRightJustified(640, 0, maplist.currentFilename());
 				
@@ -3701,7 +3703,7 @@ void takescreenshot()
 						rDst.x = (g_Platforms[iPlatform].iStartX + iPlatformX) * iTileSize;
 						rDst.y = (g_Platforms[iPlatform].iStartY + iPlatformY) * iTileSize;
 
-						SDL_BlitSurface(g_map.tilesetsurface[iScreenshotSize], &rSrc, blitdest, &rDst);
+						SDL_BlitSurface(spr_maptiles[iScreenshotSize].getSurface(), &rSrc, blitdest, &rDst);
 					}
 				}
 			}

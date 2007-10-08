@@ -175,6 +175,10 @@ bool LoadGameGraphics()
 	_load_gfxck(spr_tileanimation[1], convertPath("gfx/packs/eyecandy/tile_animation_preview.png", graphicspack));
 	_load_gfxck(spr_tileanimation[2], convertPath("gfx/packs/eyecandy/tile_animation_thumbnail.png", graphicspack));
 
+	_load_gfxck(spr_maptiles[0], convertPath("gfx/packs/tileset.png", graphicspack));
+	_load_gfxck(spr_maptiles[1], convertPath("gfx/packs/tileset_medium.png", graphicspack));
+	_load_gfxck(spr_maptiles[2], convertPath("gfx/packs/tileset_small.png", graphicspack));
+
 	_load_gfxck(spr_brokenyellowblock, convertPath("gfx/packs/eyecandy/brokenyellowblock.png", graphicspack));
 	_load_gfxck(spr_brokenflipblock, convertPath("gfx/packs/eyecandy/brokenflipblock.png", graphicspack));
 	_load_gfxck(spr_brokenblueblock, convertPath("gfx/packs/eyecandy/brokenblueblock.png", graphicspack));
@@ -384,15 +388,7 @@ bool LoadGameGraphics()
 	_load_gfxck(spr_abovearrows, convertPath("gfx/packs/eyecandy/abovearrows.png", graphicspack));
 	spr_abovearrows.SetWrap(true);
 
-	_load_gfxck(spr_overworld, convertPath("gfx/packs/tileset.png", graphicspack));
-
-	std::string tileSetTLS = convertPath("maps/tileset/tileset.tls");
-	std::string tileSetPNG[3];
-	tileSetPNG[0] = convertPath("gfx/packs/tileset.png", graphicspack);
-	tileSetPNG[1] = convertPath("gfx/packs/tileset_medium.png", graphicspack);
-	tileSetPNG[2] = convertPath("gfx/packs/tileset_small.png", graphicspack);
-
-	g_map.loadTileSet(tileSetTLS, tileSetPNG);
+	g_map.loadTileSet(convertPath("maps/tileset/tileset.tls"));
 
 	return true;
 }
@@ -726,8 +722,10 @@ bool LoadAndSplashScreen()
 			LoadMenuGraphics();
 			LoadGameGraphics();
 
-			_load_gfx(spr_backmap, convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist.current_name()));
-			_load_gfx(spr_frontmap, convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist.current_name()));
+			_load_gfx(spr_backmap[0], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist.current_name()));
+			_load_gfx(spr_backmap[1], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist.current_name()));
+			_load_gfx(spr_frontmap[0], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist.current_name()));
+			_load_gfx(spr_frontmap[1], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist.current_name()));
 
 			LoadGameSounds();
 

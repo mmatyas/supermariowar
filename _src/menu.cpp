@@ -3255,31 +3255,17 @@ void Menu::RunMenu()
 
 			}
 
-			game_values.gamestate = GS_GAME;
-
-			/*
-				game_values.gamemode = bossgamemode;  //boss type has already been set at this point
-
-				if(bossgamemode->GetBossType() == 0)
-					g_map.loadMap(convertPath("maps/special/dungeon.map"), read_type_full);
-				else if(bossgamemode->GetBossType() == 1)
-					g_map.loadMap(convertPath("maps/special/hills.map"), read_type_full);
-				else if(bossgamemode->GetBossType() == 2)
-					g_map.loadMap(convertPath("maps/special/volcano.map"), read_type_full);
-
-				LoadCurrentMapBackground();
-
-				g_map.predrawbackground(spr_background, spr_backmap);
-				g_map.predrawforeground(spr_frontmap);
-				LoadMapObjects();
-			*/
-
-			
+			game_values.gamestate = GS_GAME;			
 
 			SetGameModeSettingsFromMenu();
+
+			g_map.predrawbackground(spr_background, spr_backmap[0]);
+			g_map.predrawforeground(spr_frontmap[0]);
 			
-			g_map.predrawbackground(spr_background, spr_backmap);
-			g_map.predrawforeground(spr_frontmap);
+			g_map.predrawbackground(spr_background, spr_backmap[1]);
+			g_map.predrawforeground(spr_frontmap[1]);
+
+			g_map.SetupAnimatedTiles();
 			LoadMapObjects();
 
 			return;

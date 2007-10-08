@@ -20,7 +20,7 @@ using std::endl;
 
 #define fopen(f,m) fopen(f.c_str(),m)
 
-extern gfxSprite spr_frontmap;
+extern gfxSprite spr_frontmap[2];
 extern short g_iTileConversion[];
 extern short g_iVersion[];
 extern char * g_szBackgroundConversion[26];
@@ -31,6 +31,8 @@ CMap::CMap()
 	platforms = NULL;
 	iNumPlatforms = 0;
 	iNumMapItems = 0;
+
+	animatedTilesSurface = NULL;
 
 	for(short iSwitch = 0; iSwitch < 4; iSwitch++)
 		iSwitches[iSwitch] = 0;
@@ -49,26 +51,17 @@ CMap::CMap()
 }
 
 CMap::~CMap()
-{
-	for(short iTileSet = 0; iTileSet < 3; iTileSet++)
-	{
-		if(tilesetsurface[iTileSet])
-		{
-			SDL_FreeSurface(tilesetsurface[iTileSet]);
-			tilesetsurface[iTileSet] = NULL;
-		}
-	}
-}
+{}
 
 
-void CMap::loadTileSet(const std::string& tilesetfile, const std::string tilesetpng[3])
+void CMap::loadTileSet(const std::string& tilesetfile)
 {
 	FILE *tsf;
 	int i;
 
 	clearTileSet();
 
-	//1. load tileset file
+	//load tileset file
     cout << "loading tileset from " << tilesetfile << " ... ";
 
 	tsf = fopen(tilesetfile, "rb");
@@ -87,43 +80,6 @@ void CMap::loadTileSet(const std::string& tilesetfile, const std::string tileset
 
 	fclose(tsf);
     cout << "done" << endl;
-	
-	//2. load tileset graphics
-    
-	for(short iTileSet = 0; iTileSet < 3; iTileSet++)
-	{
-		cout << "loading tile set suface from " << tilesetpng[iTileSet] << " ... ";
-
-		if(tilesetsurface[iTileSet] != NULL)
-		{
-			SDL_FreeSurface(tilesetsurface[iTileSet]);
-			tilesetsurface[iTileSet] = NULL;
-		}
-
-		SDL_Surface *temp = IMG_Load(tilesetpng[iTileSet].c_str());
-
-		if (temp == NULL)
-		{
-			cout << endl << " ERROR: Couldn't load " << tilesetpng[iTileSet] << ": " << SDL_GetError() << endl;
-			return;
-		}
-
-		if( SDL_SetColorKey(temp, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(temp->format, 255, 0, 255)) < 0)
-		{
-			cout << endl << " ERROR: Couldn't set ColorKey + RLE: " << SDL_GetError() << endl;
-			return;
-		}
-
-		if( (tilesetsurface[iTileSet] = SDL_DisplayFormat(temp)) == NULL)
-		{
-			cout << endl << " ERROR: Couldn't convert tileset to the display's "
-				<< "pixel format: " << SDL_GetError() << endl;
-			return;
-		}
-
-		SDL_FreeSurface(temp);
-		cout << "done" << endl;
-	}
 }
 
 //With the new 32x30 tile set, we need to convert old maps to use the 
@@ -201,6 +157,7 @@ void CMap::clearTileSet()
 	{
 		tileset[i] = tile_nonsolid;
 	}
+
 	tilebltrect.w = TILESIZE;
 	tilebltrect.h = TILESIZE;
 }
@@ -261,7 +218,7 @@ void CMap::clearPlatforms()
 
 void CMap::ClearAnimatedTiles()
 {
-	std::list<AnimatedTile*>::iterator iter = animatedtiles.begin(), lim = animatedtiles.end();
+	std::vector<AnimatedTile*>::iterator iter = animatedtiles.begin(), lim = animatedtiles.end();
 	
 	while (iter != lim)
 	{
@@ -1809,67 +1766,30 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks)
 	}
 }
 
-void CMap::AnimateTiles()
+void CMap::AnimateTiles(short iFrame)
 {
 	//For each animated tile
-	std::list<AnimatedTile*>::iterator iter = animatedtiles.begin(), lim = animatedtiles.end();
-	
-	//TODO:  Move this to an initialize function and carry these non changing vars as member variables
-	//This will only incur a one time setup cost instead of every animation update
-	short iBackgroundLayers = 2;
-	if(!game_values.toplayer)
-		iBackgroundLayers = 4;
+	if(iAnimatedVectorIndices[iFrame] == iAnimatedVectorIndices[iFrame + 1])
+		return;
 
-	SDL_Surface * animatedTileSurface = spr_tileanimation[0].getSurface();
-	SDL_Surface * tileSurface = tilesetsurface[0];
-
-	SDL_Surface * frontmapSurface = spr_frontmap.getSurface();
-	SDL_Surface * backmapSurface = spr_backmap.getSurface();
-	SDL_Surface * backgroundSurface = spr_background.getSurface();
-
-	int color = SDL_MapRGB(frontmapSurface->format, 255, 0, 255);
-
-	while (iter != lim)
+	//FIXME:: There is an issue here where there is excessive memory page faults when you put a
+	//non animated tile on layer 0 (or layer 2) and then an animated tile on layer 1 (or 3)
+	//This causes the working set to contain the static tileset + the backmap surface that is swapped
+	//every 8 frames, needing to be loaded back into the working set.  This causes serious slowdown.
+	for(short iTile = iAnimatedVectorIndices[iFrame]; iTile < iAnimatedVectorIndices[iFrame + 1]; iTile++)
 	{
-		AnimatedTile * tile = *iter;
-		SDL_Rect * rDest = &(tile->rDest);
+		AnimatedTile * tile = animatedtiles[iTile];
+		SDL_Rect * rDst = &(tile->rDest);
 
 		if(tile->fBackgroundAnimated)
 		{
-			SDL_BlitSurface(backgroundSurface, rDest, backmapSurface, rDest);
-
-			for(short iLayer = 0; iLayer < iBackgroundLayers; iLayer++)
-			{
-				short iTile = tile->layers[iLayer];
-				if(iTile < TILESETSIZE)
-				{
-					SDL_BlitSurface(tileSurface, &(tile->rSrc[iLayer][0]), backmapSurface, rDest);
-				}
-				else if(iTile > TILESETSIZE)
-				{
-					SDL_BlitSurface(animatedTileSurface, &(tile->rSrc[iLayer][iTileAnimationFrame]), backmapSurface, rDest);
-				}
-			}
+			SDL_BlitSurface(animatedTilesSurface, &(tile->rAnimationSrc[0][iTileAnimationFrame]), animatedBackmapSurface, rDst);
 		}
 
 		if(tile->fForegroundAnimated)
 		{
-			SDL_FillRect(frontmapSurface, rDest, color);
-			for(short iLayer = 2; iLayer < 4; iLayer++)
-			{
-				short iTile = tile->layers[iLayer];
-				if(iTile < TILESETSIZE)
-				{
-					SDL_BlitSurface(tileSurface, &(tile->rSrc[iLayer][0]), frontmapSurface, rDest);
-				}
-				else if(iTile > TILESETSIZE)
-				{
-					SDL_BlitSurface(animatedTileSurface, &(tile->rSrc[iLayer][iTileAnimationFrame]), frontmapSurface, rDest);
-				}
-			}
+			SDL_BlitSurface(animatedTilesSurface, &(tile->rAnimationSrc[1][iTileAnimationFrame]), animatedFrontmapSurface, rDst);
 		}
-
-		++iter;
 	}
 }
 
@@ -1901,7 +1821,7 @@ void CMap::draw(SDL_Surface *targetSurface, int layer)
 				bool fNeedNewAnimatedTile = true;
 
 				short iNewTileId = j * MAPWIDTH + i;
-				std::list<AnimatedTile*>::iterator iter = animatedtiles.begin(), lim = animatedtiles.end();
+				std::vector<AnimatedTile*>::iterator iter = animatedtiles.begin(), lim = animatedtiles.end();
 				while (iter != lim)
 				{
 					if(iNewTileId == (*iter)->id)
@@ -1955,7 +1875,7 @@ void CMap::draw(SDL_Surface *targetSurface, int layer)
 			}
 			else
 			{
-				SDL_BlitSurface(tilesetsurface[0], &tilebltrect, targetSurface, &bltrect);
+				SDL_BlitSurface(spr_maptiles[0].getSurface(), &tilebltrect, targetSurface, &bltrect);
 			}
 		}
 
@@ -1996,7 +1916,7 @@ void CMap::drawThumbnailPlatforms(SDL_Surface * targetSurface)
 					rDst.x = (iStartX + iPlatformX) * iTileSize;
 					rDst.y = (iStartY + iPlatformY) * iTileSize;
 
-					SDL_BlitSurface(tilesetsurface[2], &rSrc, blitdest, &rDst);
+					SDL_BlitSurface(spr_maptiles[2].getSurface(), &rSrc, blitdest, &rDst);
 				}
 			}
 		}
@@ -2219,13 +2139,13 @@ void CMap::drawPreview(SDL_Surface * targetSurface, int layer, bool fThumbnail)
 				{
 					rectSrc.x = iThumbTileX[ts];
 					rectSrc.y = iThumbTileY[ts];
-					SDL_BlitSurface(tilesetsurface[2], &rectSrc, targetSurface, &rectDst);
+					SDL_BlitSurface(spr_maptiles[2].getSurface(), &rectSrc, targetSurface, &rectDst);
 				}
 				else
 				{
 					rectSrc.x = iPreviewTileX[ts];
 					rectSrc.y = iPreviewTileY[ts];
-					SDL_BlitSurface(tilesetsurface[1], &rectSrc, targetSurface, &rectDst);
+					SDL_BlitSurface(spr_maptiles[1].getSurface(), &rectSrc, targetSurface, &rectDst);
 				}
 			}
 		}
@@ -2279,9 +2199,9 @@ void CMap::drawPreviewBlocks(SDL_Surface * targetSurface, bool fThumbnail)
 			}
 		
 			if(fThumbnail)
-				SDL_BlitSurface(tilesetsurface[2], &rectSrc, targetSurface, &rectDst);
+				SDL_BlitSurface(spr_maptiles[2].getSurface(), &rectSrc, targetSurface, &rectDst);
 			else
-				SDL_BlitSurface(tilesetsurface[1], &rectSrc, targetSurface, &rectDst);
+				SDL_BlitSurface(spr_maptiles[1].getSurface(), &rectSrc, targetSurface, &rectDst);
 		}
 
 		rectDst.x += iBlockSize;
@@ -2337,8 +2257,6 @@ void CMap::predrawforeground(gfxSprite &foregroundspr)
 	draw(foregroundspr.getSurface(), 2);
 	draw(foregroundspr.getSurface(), 3);
 
-	AnimateTiles();
-
 	/*
 	for(int k = 0; k < numdrawareas; k++)
 	{
@@ -2352,6 +2270,140 @@ void CMap::predrawforeground(gfxSprite &foregroundspr)
 		SDL_FillRect(foregroundspr.getSurface(), &rect, color);
 	}
 	*/
+}
+
+void CMap::SetupAnimatedTiles()
+{
+	iAnimatedBackgroundLayers = 2;
+	if(!game_values.toplayer)
+		iAnimatedBackgroundLayers = 4;
+
+	g_iCurrentDrawIndex = 0;
+
+	iAnimatedTileCount = animatedtiles.size();
+
+	if(animatedTilesSurface)
+	{
+		SDL_FreeSurface(animatedTilesSurface);
+		animatedTilesSurface = NULL;
+	}
+
+	if(iAnimatedTileCount > 0)
+	{
+		SDL_Surface * backgroundSurface = spr_background.getSurface();
+		SDL_Surface * tileSurface = spr_tileanimation[0].getSurface();
+		SDL_Surface * tilesetSurface = spr_maptiles[0].getSurface();
+
+		animatedFrontmapSurface = spr_frontmap[g_iCurrentDrawIndex].getSurface();
+		animatedBackmapSurface = spr_backmap[g_iCurrentDrawIndex].getSurface();
+		animatedTilesSurface = SDL_CreateRGBSurface(screen->flags, 1024, 1024, screen->format->BitsPerPixel, 0, 0, 0, 0);
+
+		int iTransparentColor = SDL_MapRGB(animatedTilesSurface->format, 255, 0, 255);
+
+		std::vector<AnimatedTile*>::iterator iter = animatedtiles.begin(), lim = animatedtiles.end();
+		
+		SDL_Rect rDst = {0, 0, 32, 32};
+		while (iter != lim)
+		{
+			AnimatedTile * tile = *iter;
+			SDL_Rect * rSrc = &(tile->rDest);
+
+			if(tile->fBackgroundAnimated)
+			{
+				for(short iTileAnimationFrame = 0; iTileAnimationFrame < 4; iTileAnimationFrame++)
+				{
+					gfx_setrect(&tile->rAnimationSrc[0][iTileAnimationFrame], &rDst);
+
+					SDL_BlitSurface(backgroundSurface, rSrc, animatedTilesSurface, &rDst);
+
+					for(short iLayer = 0; iLayer < iAnimatedBackgroundLayers; iLayer++)
+					{
+						short iTile = tile->layers[iLayer];
+						if(iTile < TILESETSIZE)
+						{
+							SDL_BlitSurface(tilesetSurface, &(tile->rSrc[iLayer][0]), animatedTilesSurface, &rDst);
+						}
+						else if(iTile > TILESETSIZE)
+						{
+							SDL_BlitSurface(tileSurface, &(tile->rSrc[iLayer][iTileAnimationFrame]), animatedTilesSurface, &rDst);
+						}
+					}
+
+					rDst.x += 32;
+					if(rDst.x >= 1024)
+					{
+						rDst.x = 0;
+						rDst.y += 32;
+						if(rDst.y >= 1024)
+						{
+							tile->fForegroundAnimated = false;
+							++iter;
+							break;
+						}
+					}
+				}
+			}
+
+			if(tile->fForegroundAnimated)
+			{
+				for(short iTileAnimationFrame = 0; iTileAnimationFrame < 4; iTileAnimationFrame++)
+				{
+					gfx_setrect(&tile->rAnimationSrc[1][iTileAnimationFrame], &rDst);
+
+					SDL_FillRect(animatedTilesSurface, &rDst, iTransparentColor);
+
+					for(short iLayer = 2; iLayer < 4; iLayer++)
+					{
+						short iTile = tile->layers[iLayer];
+						if(iTile < TILESETSIZE)
+						{
+							SDL_BlitSurface(tilesetSurface, &(tile->rSrc[iLayer][0]), animatedTilesSurface, &rDst);
+						}
+						else if(iTile > TILESETSIZE)
+						{
+							SDL_BlitSurface(tileSurface, &(tile->rSrc[iLayer][iTileAnimationFrame]), animatedTilesSurface, &rDst);
+						}
+					}
+
+					rDst.x += 32;
+					if(rDst.x >= 1024)
+					{
+						rDst.x = 0;
+						rDst.y += 32;
+						if(rDst.y >= 1024)
+						{
+							++iter;
+							break;
+						}
+					}
+				}
+			}
+
+			++iter;
+		}
+
+		//Turn off animation for the tiles that couldn't fit onto our animation page (256 tiles max)
+		while (iter != lim)
+		{
+			AnimatedTile * tile = *iter;
+
+			tile->fBackgroundAnimated = false;
+			tile->fForegroundAnimated = false;
+
+			++iter;
+		}
+
+		for(short iAnimatedFrame = 0; iAnimatedFrame <= NUM_FRAMES_BETWEEN_TILE_ANIMATION; iAnimatedFrame++)
+			iAnimatedVectorIndices[iAnimatedFrame] = (iAnimatedFrame * iAnimatedTileCount) / NUM_FRAMES_BETWEEN_TILE_ANIMATION;
+	
+		for(short iFrame = 0; iFrame < NUM_FRAMES_BETWEEN_TILE_ANIMATION; iFrame++)
+			AnimateTiles(iFrame);
+
+		animatedFrontmapSurface = spr_frontmap[1 - g_iCurrentDrawIndex].getSurface();
+		animatedBackmapSurface = spr_backmap[1 - g_iCurrentDrawIndex].getSurface();
+
+		AnimateTiles(0);
+	}
 }
 
 void CMap::updatePlatforms()
@@ -2531,15 +2583,21 @@ void CMap::update()
 		}
 	}
 
-	if(++iTileAnimationTimer > 7)
+	if(++iTileAnimationTimer >= NUM_FRAMES_BETWEEN_TILE_ANIMATION)
 	{
 		iTileAnimationTimer = 0;
 
-		if(++iTileAnimationFrame > 3)
-			iTileAnimationFrame = 0;
+		animatedFrontmapSurface = spr_frontmap[g_iCurrentDrawIndex].getSurface();
+		animatedBackmapSurface = spr_backmap[g_iCurrentDrawIndex].getSurface();
 
-		AnimateTiles();
+		g_iCurrentDrawIndex = 1 - g_iCurrentDrawIndex;
+
+		if(++iTileAnimationFrame >= NUM_FRAMES_IN_TILE_ANIMATION)
+			iTileAnimationFrame = 0;
 	}
+
+	if(iAnimatedTileCount > 0)
+		AnimateTiles(iTileAnimationTimer);
 }
 
 void CMap::findspawnpoint(short iType, short * x, short * y, short width, short height, bool tilealigned)
@@ -2683,10 +2741,10 @@ bool CMap::IsInPlatformNoSpawnZone(short x, short y, short width, short height)
 void CMap::drawfrontlayer()
 {
 	for(int k = 0; k < numdrawareas; k++)
-		spr_frontmap.draw(drawareas[k].x, drawareas[k].y, drawareas[k].x, drawareas[k].y, drawareas[k].w, drawareas[k].h);
+		spr_frontmap[g_iCurrentDrawIndex].draw(drawareas[k].x, drawareas[k].y, drawareas[k].x, drawareas[k].y, drawareas[k].w, drawareas[k].h);
 
-	/*
 	//Draw gaps in pink for debugging
+	/*
 	for(short i = 0; i < MAPHEIGHT; i++)
 	{
 		for(short j = 0; j < MAPWIDTH; j++)
@@ -2697,8 +2755,7 @@ void CMap::drawfrontlayer()
 				SDL_FillRect(blitdest, &r, SDL_MapRGB(blitdest->format, 255, 0, 255));
 			}
 		}	
-	}
-	*/
+	}*/
 }
 
 void CMap::WriteInt(int out, FILE * outFile)

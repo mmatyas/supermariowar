@@ -104,7 +104,8 @@ gfxSprite		spr_thumbnail_warps[2];
 gfxSprite		spr_thumbnail_mapitems[2];
 gfxSprite		spr_awardsouls, spr_fireballexplosion;
 gfxSprite		spr_tileanimation[3];
-gfxSprite		spr_backmap;
+gfxSprite		spr_maptiles[3];
+gfxSprite		spr_backmap[2];
 gfxSprite		spr_background;
 sfxSound		sfx_boomerang;
 SkinList		skinlist;
@@ -119,11 +120,12 @@ void DECLSPEC musicfinished(){}
 
 sfxSound * g_PlayingSoundChannels[NUM_SOUND_CHANNELS];
 CEyecandyContainer eyecandyfront;
-gfxSprite		spr_frontmap;
+gfxSprite		spr_frontmap[2];
 
 CPlayer			*list_players[4];
 short			list_players_cnt = 0;
 bool			g_fLoadMessages = true;
+short			g_iCurrentDrawIndex = 0;
 ///////
 
 int save_as();

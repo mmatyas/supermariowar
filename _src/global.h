@@ -226,6 +226,9 @@ std::string stripCreatorAndDotMap(const std::string &filename);
 #define WORLD_BACKGROUND_SPRITE_SET_SIZE 60
 #define WORLD_PATH_SPRITE_SET_SIZE 20
 
+#define NUM_FRAMES_IN_TILE_ANIMATION 4
+#define NUM_FRAMES_BETWEEN_TILE_ANIMATION 8
+
 //------------- data structures / selfmade include files -------------
 #include "input.h"
 #include "uimenu.h"
@@ -426,8 +429,6 @@ extern gfxSprite		spr_powerupselector;
 extern gfxSprite		spr_scoreboard;
 extern gfxSprite		spr_abovearrows;
 
-extern gfxSprite		spr_overworld;
-
 #ifndef _SMW_EDITOR
 extern gfxFont			menu_font_small;
 extern gfxFont			menu_font_large;
@@ -450,6 +451,7 @@ extern gfxSprite		spr_brokenflipblock;
 extern gfxSprite		spr_brokenblueblock;
 
 extern gfxSprite		spr_tileanimation[3];
+extern gfxSprite		spr_maptiles[3];
 
 extern gfxSprite		** spr_player[4];
 extern gfxSprite		** spr_chocobo[4];
@@ -457,8 +459,8 @@ extern gfxSprite		** spr_bobomb[4];
 extern gfxSprite		spr_clouds[2];
 extern gfxSprite		spr_ghosts[3];
 extern gfxSprite		spr_background;
-extern gfxSprite		spr_backmap;
-extern gfxSprite		spr_frontmap;
+extern gfxSprite		spr_backmap[2];
+extern gfxSprite		spr_frontmap[2];
 extern gfxSprite		menu_backdrop;
 
 extern gfxSprite		menu_shade;
@@ -528,6 +530,8 @@ extern char szIPString[32];
 //extern NetClient netClient;
 
 extern short g_iDefaultPowerupWeights[];
+
+extern short g_iCurrentDrawIndex;
 
 void _load_drawmsg(const std::string& f);
 void _load_waitforkey();

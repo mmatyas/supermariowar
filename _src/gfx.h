@@ -33,6 +33,7 @@ void gfx_close();
 bool gfx_loadpalette();
 
 void gfx_setrect(SDL_Rect * rect, short x, short y, short w, short h);
+void gfx_setrect(SDL_Rect * rect, SDL_Rect * copyrect);
 
 class gfxSprite
 {
@@ -53,10 +54,10 @@ class gfxSprite
 
 		void setalpha(Uint8 alpha);
 
-		int getWidth(){return m_picture->w;};
-		int getHeight(){return m_picture->h;};
+		int getWidth(){return m_picture->w;}
+		int getHeight(){return m_picture->h;}
 
-		SDL_Surface *getSurface(){return m_picture;};
+		SDL_Surface *getSurface(){return m_picture;}
 		
 		void setSurface(SDL_Surface * surface)
 		{

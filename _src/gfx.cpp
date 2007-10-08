@@ -405,6 +405,14 @@ void gfx_setrect(SDL_Rect * rect, short x, short y, short w, short h)
 	rect->h = h;
 }
 
+void gfx_setrect(SDL_Rect * rect, SDL_Rect * copyrect)
+{
+	rect->x = copyrect->x;
+	rect->y = copyrect->y;
+	rect->w = copyrect->w;
+	rect->h = copyrect->h;
+}
+
 //gfxSprite
 
 gfxSprite::gfxSprite()
@@ -414,7 +422,7 @@ gfxSprite::gfxSprite()
 
 gfxSprite::~gfxSprite()
 {
-	//free the allocated BMP surface 
+	//free the allocated surface 
 	freeSurface();
 }
 
