@@ -1634,7 +1634,9 @@ void RunGame()
 					}
 					else if(event.key.keysym.sym == SDLK_0)
 					{
-						if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
+						if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
+							objectcollisionitems.add(new PU_LeafPowerup(&spr_leafpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, 32000, 30, 30, 1, 1));
+						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
 							objectcollisionitems.add(new PU_BoomerangPowerup(&spr_boomerangpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 32000, 30, 30, 1, 1));
 						else
 							objectcollisionitems.add(new PU_MysteryMushroomPowerup(&spr_mysterymushroompowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 32000, 30, 30, 1, 1));
@@ -2077,7 +2079,7 @@ void RunGame()
 										{
 											MovingObjectType type = ((IO_MovingObject*)objectsplayer.list[j])->getMovingObjectType();
 
-											if((type == movingobject_shell || type == movingobject_throwblock) && !objectsplayer.list[j]->GetDead())
+											if((type == movingobject_shell || type == movingobject_throwblock || type == movingobject_spinattack) && !objectsplayer.list[j]->GetDead())
 											{
 												if(coldec_obj2obj(*(objectcollisionitems.list[i]), *(objectsplayer.list[j])))
 												{
@@ -2173,7 +2175,7 @@ void RunGame()
 											{
 												MovingObjectType type = ((IO_MovingObject*)objectsplayer.list[j])->getMovingObjectType();
 
-												if((type == movingobject_shell || type == movingobject_throwblock) && !objectsplayer.list[j]->GetDead())
+												if((type == movingobject_shell || type == movingobject_throwblock || type == movingobject_spinattack) && !objectsplayer.list[j]->GetDead())
 												{
 													if(coldec_obj2obj(*(objectsfront.list[i]), *(objectsplayer.list[j])))
 													{
@@ -2197,7 +2199,7 @@ void RunGame()
 								{
 									IO_MovingObject * object = (IO_MovingObject*)objectsplayer.list[i];
 
-									if(object->getMovingObjectType() == movingobject_shell || object->getMovingObjectType() == movingobject_throwblock)
+									if(object->getMovingObjectType() == movingobject_shell || object->getMovingObjectType() == movingobject_throwblock || object->getMovingObjectType() == movingobject_spinattack)
 									{
 										//shell/throwblock to goomba and shell/throwblock to fireball
 										for(j = 0; j < objectcollisionitems.list_end; j++)
@@ -2229,7 +2231,7 @@ void RunGame()
 											{
 												MovingObjectType type = ((IO_MovingObject*)objectsplayer.list[j])->getMovingObjectType();
 
-												if((type == movingobject_shell || type == movingobject_throwblock) && !objectsplayer.list[j]->GetDead())
+												if((type == movingobject_shell || type == movingobject_throwblock || type == movingobject_spinattack) && !objectsplayer.list[j]->GetDead())
 												{
 													if(coldec_obj2obj(*(objectsplayer.list[i]), *(objectsplayer.list[j])))
 													{

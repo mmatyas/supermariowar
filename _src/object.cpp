@@ -337,8 +337,6 @@ void B_PowerupBlock::update()
 
 			short iSelectedPowerup = SelectPowerup();
 
-			iSelectedPowerup = 24;
-
             if(0 == iSelectedPowerup)
 				objectcollisionitems.add(new PU_PoisonPowerup(&spr_poisonpowerup, ix + 1, iy - 1, 1, side, 32000, 30, 30, 1, 1));
 			else if(1 == iSelectedPowerup)
@@ -387,10 +385,9 @@ void B_PowerupBlock::update()
 				objectcollisionitems.add(new PU_BombPowerup(&spr_bombpowerup, ix + 1, iy - 1, 1, 32000, 30, 30, 1, 1));
 			else if(23 == iSelectedPowerup) 
 				objectcollisionitems.add(new PU_PodoboPowerup(&spr_podobopowerup, ix + 1, iy - 1, 1, 32000, 30, 30, 1, 1));
-			else if(24 == iSelectedPowerup) 
+			else if(24 == iSelectedPowerup)
 				objectcollisionitems.add(new PU_LeafPowerup(&spr_leafpowerup, ix + 1, iy - 1, 1, 32000, 30, 30, 1, 1));
              
-
 			ifsoundonplay(sfx_sprout);
 		}
 		else if(state == 3)
@@ -494,7 +491,7 @@ bool B_PowerupBlock::hitright(IO_MovingObject * object)
 		object->velx = -object->velx;
 
 	MovingObjectType type = object->getMovingObjectType();
-	if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_egg /*|| type == movingobject_star*/)
+	if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_egg || type == movingobject_spinattack /*|| type == movingobject_star*/)
 	{
 		if(type == movingobject_shell)
 		{
@@ -528,7 +525,7 @@ bool B_PowerupBlock::hitleft(IO_MovingObject * object)
 		object->velx = -object->velx;
 
 	MovingObjectType type = object->getMovingObjectType();
-	if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_egg /*|| type == movingobject_star*/)
+	if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_egg || type == movingobject_spinattack /*|| type == movingobject_star*/)
 	{
 		if(type == movingobject_shell)
 		{
@@ -774,7 +771,7 @@ bool B_BreakableBlock::hitright(IO_MovingObject * object)
 			object->velx = -object->velx;
 
 		MovingObjectType type = object->getMovingObjectType();
-		if(type == movingobject_shell || type == movingobject_throwblock /*|| type == movingobject_egg || type == movingobject_star*/)
+		if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_spinattack /*|| type == movingobject_egg || type == movingobject_star*/)
 		{
 			if(type == movingobject_shell)
 			{
@@ -802,7 +799,7 @@ bool B_BreakableBlock::hitleft(IO_MovingObject * object)
 			object->velx = -object->velx;
 
 		MovingObjectType type = object->getMovingObjectType();
-		if(type == movingobject_shell || type == movingobject_throwblock /*|| type == movingobject_egg || type == movingobject_star*/)
+		if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_spinattack /*|| type == movingobject_egg || type == movingobject_star*/)
 		{
 			if(type == movingobject_shell)
 			{
@@ -1273,7 +1270,7 @@ bool B_FlipBlock::hitright(IO_MovingObject * object)
 			object->velx = -object->velx;
 
 		MovingObjectType type = object->getMovingObjectType();
-		if(type == movingobject_shell || type == movingobject_throwblock)
+		if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_spinattack)
 		{
 			if(type == movingobject_shell)
 			{
@@ -1300,7 +1297,7 @@ bool B_FlipBlock::hitleft(IO_MovingObject * object)
 			object->velx = -object->velx;
 
 		MovingObjectType type = object->getMovingObjectType();
-		if(type == movingobject_shell || type == movingobject_throwblock)
+		if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_spinattack)
 		{
 			if(type == movingobject_shell)
 			{
@@ -1452,7 +1449,7 @@ bool B_OnOffSwitchBlock::hitright(IO_MovingObject * object)
 		object->velx = -object->velx;
 
 	MovingObjectType type = object->getMovingObjectType();
-	if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_egg /*|| type == movingobject_star*/)
+	if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_egg  || type == movingobject_spinattack/*|| type == movingobject_star*/)
 	{
 		if(type == movingobject_shell)
 		{
@@ -1486,7 +1483,7 @@ bool B_OnOffSwitchBlock::hitleft(IO_MovingObject * object)
 		object->velx = -object->velx;
 
 	MovingObjectType type = object->getMovingObjectType();
-	if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_egg /*|| type == movingobject_star*/)
+	if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_egg  || type == movingobject_spinattack/*|| type == movingobject_star*/)
 	{
 		if(type == movingobject_shell)
 		{
@@ -4826,7 +4823,7 @@ void OMO_BulletBill::collide(IO_MovingObject * object)
 
 	MovingObjectType type = object->getMovingObjectType();
 
-	if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_bulletbill)
+	if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_bulletbill  || type == movingobject_spinattack)
 	{
 		//Don't kill things with shells that are sitting still
 		if(type == movingobject_shell && ((CO_Shell*)object)->state == 2)
@@ -4865,6 +4862,12 @@ void OMO_BulletBill::collide(IO_MovingObject * object)
 
 			objectsfront.add(new OMO_Explosion(&spr_explosion, iCenterX - 96, iCenterY - 64, 2, 4, -1, -1));
 			ifsoundonplay(sfx_bobombsound);
+		}
+		else if(type == movingobject_spinattack)
+		{
+			((OMO_SpinAttack*) object)->Die();
+			ifsoundonplay(sfx_kicksound);
+			Die();
 		}
 	}
 }
@@ -6677,7 +6680,7 @@ void MO_Goomba::collide(IO_MovingObject * object)
 
 		MovingObjectType type = object->getMovingObjectType();
 
-		if(type == movingobject_fireball || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_sledgehammer || type == movingobject_boomerang || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_bulletbill || type == movingobject_podobo)
+		if(type == movingobject_fireball || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_sledgehammer || type == movingobject_boomerang || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_bulletbill || type == movingobject_podobo || type == movingobject_spinattack)
 		{
 			//Don't kill goombas with non-moving shells
 			if(type == movingobject_shell && ((CO_Shell*)object)->state == 2)
@@ -6722,6 +6725,10 @@ void MO_Goomba::collide(IO_MovingObject * object)
 				{
 					iPlayerID = ((OMO_Podobo*)object)->iPlayerID;
 				}
+				else if(type == movingobject_spinattack)
+				{
+					iPlayerID = ((OMO_SpinAttack*)object)->iPlayerID;
+				}
 
 				//Find the player that shot this fireball so we can attribute a kill
 				CPlayer * killer = GetPlayerFromGlobalID(iPlayerID);
@@ -6751,6 +6758,10 @@ void MO_Goomba::collide(IO_MovingObject * object)
 			else if(type == movingobject_bulletbill)
 			{
 				((OMO_BulletBill*)object)->Die();
+			}
+			else if(type == movingobject_spinattack)
+			{
+				((OMO_SpinAttack*)object)->Die();
 			}
 		}
 	}
@@ -6954,7 +6965,7 @@ void OMO_CheepCheep::collide(IO_MovingObject * object)
 
 		MovingObjectType type = object->getMovingObjectType();
 
-		if(type == movingobject_fireball || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_sledgehammer || type == movingobject_boomerang || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_bulletbill || type == movingobject_podobo)
+		if(type == movingobject_fireball || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_sledgehammer || type == movingobject_boomerang || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_bulletbill || type == movingobject_podobo || type == movingobject_spinattack)
 		{
 			//Don't kill goombas with non-moving shells
 			if(type == movingobject_shell && ((CO_Shell*)object)->state == 2)
@@ -6999,6 +7010,10 @@ void OMO_CheepCheep::collide(IO_MovingObject * object)
 				{
 					iPlayerID = ((OMO_Podobo*)object)->iPlayerID;
 				}
+				else if(type == movingobject_spinattack)
+				{
+					iPlayerID = ((OMO_SpinAttack*)object)->iPlayerID;
+				}
 
 				//Find the player that shot this projectile so we can attribute a kill
 				CPlayer * killer = GetPlayerFromGlobalID(iPlayerID);
@@ -7028,6 +7043,10 @@ void OMO_CheepCheep::collide(IO_MovingObject * object)
 			else if(type == movingobject_bulletbill)
 			{
 				((OMO_BulletBill*)object)->Die();
+			}
+			else if(type == movingobject_spinattack)
+			{
+				((OMO_SpinAttack*)object)->Die();
 			}
 		}
 	}
@@ -7469,7 +7488,7 @@ void MO_SledgeBrother::collide(IO_MovingObject * object)
 
 		MovingObjectType type = object->getMovingObjectType();
 
-		if(iType == 0 && (type == movingobject_shell || type == movingobject_throwblock))
+		if(iType == 0 && (type == movingobject_shell || type == movingobject_throwblock || type == movingobject_spinattack))
 		{
 			if(type == movingobject_shell && ((CO_Shell*)object)->state == 2)
 				return;
@@ -7491,6 +7510,10 @@ void MO_SledgeBrother::collide(IO_MovingObject * object)
 			else if(type == movingobject_throwblock)
 			{
 				((CO_ThrowBlock*)object)->Die();
+			}
+			else if(type == movingobject_spinattack)
+			{
+				((OMO_SpinAttack*)object)->Die();
 			}
 		}
 	}
@@ -7791,7 +7814,7 @@ void CO_Shell::collide(IO_MovingObject * object)
 
 		MovingObjectType type = object->getMovingObjectType();
 
-		if(type == movingobject_fireball || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_sledgehammer || type == movingobject_boomerang || type == movingobject_shell || type == movingobject_throwblock)
+		if(type == movingobject_fireball || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_sledgehammer || type == movingobject_boomerang || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_spinattack)
 		{
 			if(type == movingobject_shell)
 			{
@@ -8485,24 +8508,28 @@ void CO_KuriboShoe::hittop(CPlayer * player)
 //------------------------------------------------------------------------------
 // class spin death (spinning cape or tail)
 //------------------------------------------------------------------------------
-OMO_SpinDeath::OMO_SpinDeath(short playerId, short style, bool direction, short offsety) :
+OMO_SpinAttack::OMO_SpinAttack(short playerId, short teamId, short style, bool direction, short offsety) :
 	IO_MovingObject(NULL, 0, 0, 1, 0, 24, 12, 0, 0)
 {
 	iPlayerID = playerId;
+	iTeamID = teamId;
 	iStyle = style;
 	fDirection = direction;
 	iOffsetY = offsety;
 
 	state = 1;
 	objectType = object_moving;
-	movingObjectType = movingobject_shell; //hack to get it to use the shell's collision detection
+	movingObjectType = movingobject_spinattack; //hack to get it to use the shell's collision detection
 
 	iTimer = 0;
 }
 
-bool OMO_SpinDeath::collide(CPlayer * player)
+bool OMO_SpinAttack::collide(CPlayer * player)
 {
 	if(player->spawninvincible || player->invincible || dead || iTimer < 5)
+		return false;
+
+	if(!game_values.friendlyfire && player->teamID == iTeamID)
 		return false;
 
 	CPlayer * killer = GetPlayerFromGlobalID(iPlayerID);
@@ -8528,7 +8555,7 @@ bool OMO_SpinDeath::collide(CPlayer * player)
 }
 
 /*
-void OMO_SpinDeath::draw()
+void OMO_SpinAttack::draw()
 {
 	if(iTimer >= 5 && !dead)
 	{
@@ -8538,7 +8565,7 @@ void OMO_SpinDeath::draw()
 }
 */
 
-void OMO_SpinDeath::update()
+void OMO_SpinAttack::update()
 {
 	CPlayer * owner = GetPlayerFromGlobalID(iPlayerID);
 
@@ -8604,14 +8631,14 @@ void OMO_SpinDeath::update()
 	}
 }
 
-void OMO_SpinDeath::collide(IO_MovingObject * object)
+void OMO_SpinAttack::collide(IO_MovingObject * object)
 {
 	if(dead || iTimer < 5)
 		return;
 
 	MovingObjectType type = object->getMovingObjectType();
 
-	if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_bulletbill)
+	if(type == movingobject_shell || type == movingobject_throwblock)
 	{
 		if(type == movingobject_shell)
 		{
@@ -8619,15 +8646,20 @@ void OMO_SpinDeath::collide(IO_MovingObject * object)
 		}
 		else if(type == movingobject_throwblock)
 		{
-			((CO_ThrowBlock*) object)->Die();
-		}
-		else if(type == movingobject_bulletbill)
-		{
-			((OMO_BulletBill*) object)->Die();
+			CO_ThrowBlock * block = (CO_ThrowBlock*) object;
+
+			if(!block->owner || block->owner->globalID != iPlayerID)
+				block->Die();
 		}
 
+		Die();
 		ifsoundonplay(sfx_kicksound);
 	}
+}
+
+void OMO_SpinAttack::Die()
+{
+	dead = true;
 }
 
 //------------------------------------------------------------------------------

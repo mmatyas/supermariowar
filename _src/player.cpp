@@ -2908,7 +2908,7 @@ void CPlayer::SpinCape()
 
 	SpinPlayer();
 
-	objectsplayer.add(new OMO_SpinDeath(globalID, 0, IsPlayerFacingRight(), 24));
+	objectsplayer.add(new OMO_SpinAttack(globalID, teamID, 0, IsPlayerFacingRight(), 24));
 }
 
 void CPlayer::DrawCape()
@@ -3008,7 +3008,7 @@ void CPlayer::SpinTail()
 
 	SpinPlayer();
 
-	objectsplayer.add(new OMO_SpinDeath(globalID, 1, IsPlayerFacingRight(), 12));
+	objectsplayer.add(new OMO_SpinAttack(globalID, teamID, 1, IsPlayerFacingRight(), 12));
 }
 
 void CPlayer::DrawTail()
