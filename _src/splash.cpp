@@ -206,6 +206,7 @@ bool LoadGameGraphics()
 	_load_gfxck(spr_modpowerup, convertPath("gfx/packs/powerups/modpowerup.png", graphicspack));
 	_load_gfxck(spr_bulletbillpowerup, convertPath("gfx/packs/powerups/bulletbillpowerup.png", graphicspack));
 	_load_gfxck(spr_featherpowerup, convertPath("gfx/packs/powerups/featherpowerup.png", graphicspack));
+	_load_gfxck(spr_leafpowerup, convertPath("gfx/packs/powerups/leafpowerup.png", graphicspack));
 	_load_gfxck(spr_bombpowerup, convertPath("gfx/packs/powerups/bombpowerup.png", graphicspack));
 	spr_tanooki.SetWrap(true);
 	spr_statue.SetWrap(true);
@@ -225,6 +226,7 @@ bool LoadGameGraphics()
 	spr_modpowerup.SetWrap(true);
 	spr_bulletbillpowerup.SetWrap(true);
 	spr_featherpowerup.SetWrap(true);
+	spr_leafpowerup.SetWrap(true);
 	spr_mysterymushroompowerup.SetWrap(true);
 	spr_boomerangpowerup.SetWrap(true);
 

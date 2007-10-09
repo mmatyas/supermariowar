@@ -208,8 +208,9 @@ struct STextAward
 #define MENU_ITEM_NEIGHBOR_LEFT 2
 #define MENU_ITEM_NEIGHBOR_RIGHT 3
 
-#define NUM_POWERUPS 20
+#define NUM_POWERUPS 25
 #define NUM_WORLD_POWERUPS 15
+#define NUM_WORLD_SCORE_BONUSES 20
 
 void GetNameFromFileName(char * szName, const char * szFileName);
 std::string stripCreatorAndDotMap(const std::string &filename);
@@ -346,6 +347,7 @@ extern gfxSprite		spr_powpowerup;
 extern gfxSprite		spr_modpowerup;
 extern gfxSprite		spr_bulletbillpowerup;
 extern gfxSprite		spr_featherpowerup;
+extern gfxSprite		spr_leafpowerup;
 extern gfxSprite		spr_bombpowerup;
 
 extern gfxSprite		spr_shade[3];

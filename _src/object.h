@@ -522,15 +522,13 @@ class PU_SledgeHammerPowerup : public MO_Powerup
 		void update();
 		void draw();
 		bool collide(CPlayer * player);
-		float BottomBounce();
 	
 	private:
 		short sparkleanimationtimer;
 		short sparkledrawframe;
-		short numbounces;
 };
 
-class PU_PodoboPowerup : public PU_SledgeHammerPowerup
+class PU_PodoboPowerup : public MO_Powerup
 {
 	public:
 		PU_PodoboPowerup(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY);
@@ -593,7 +591,7 @@ class PU_BobombPowerup : public MO_Powerup
 		bool collide(CPlayer * player);
 };
 
-class PU_BombPowerup : public PU_SledgeHammerPowerup
+class PU_BombPowerup : public MO_Powerup
 {
 	public:
 		PU_BombPowerup(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY);
@@ -632,18 +630,27 @@ class PU_BulletBillPowerup : public MO_Powerup
 class PU_FeatherPowerup : public IO_MovingObject
 {
 	public:
-		PU_FeatherPowerup(gfxSprite *nspr, short x, short y, short iNumSpr, bool moveToRight, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY);
+		PU_FeatherPowerup(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY);
 		~PU_FeatherPowerup(){};
 
 		void update();
 		void draw();
-		bool collide(CPlayer * player);
+		virtual bool collide(CPlayer * player);
 
 	private:
 		bool fFloatDirectionRight;
 		float dFloatAngle;
 		float desty;
 		float dFloatCenterX, dFloatCenterY;
+};
+
+class PU_LeafPowerup : public PU_FeatherPowerup
+{
+	public:
+		PU_LeafPowerup(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY);
+		~PU_LeafPowerup(){};
+
+		bool collide(CPlayer * player);
 };
 
 class PU_BoomerangPowerup : public MO_Powerup

@@ -38,8 +38,8 @@ extern bool LoadFullSkin(gfxSprite ** sprites, short skinID, short colorID);
 extern void UpdateScoreBoard();
 
 //Rearrange display of powerups
-short iPowerupDisplayMap[NUM_POWERUPS] = { 4, 0, 1, 2, 3, 6, 10, 12, 11, 14, 13, 7, 16, 17, 18, 19, 15, 9, 5, 8};
-short iPowerupPositionMap[NUM_POWERUPS] = { 1, 2, 3, 4, 0, 18, 5, 11, 19, 17, 6, 8, 7, 10, 9, 16, 12, 13, 14, 15};
+short iPowerupDisplayMap[NUM_POWERUPS] = { 4, 0, 1, 2, 3, 6, 10, 12, 11, 14, 13, 7, 16, 17, 18, 19, 15, 9, 5, 8, 20, 21, 22, 23, 24};
+short iPowerupPositionMap[NUM_POWERUPS] = { 1, 2, 3, 4, 0, 18, 5, 11, 19, 17, 6, 8, 7, 10, 9, 16, 12, 13, 14, 15, 20, 21, 22, 23, 24};
 
 extern Uint8 GetScreenBackgroundFade();
 extern short LookupTeamID(short id);

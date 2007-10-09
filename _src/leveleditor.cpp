@@ -511,7 +511,7 @@ int editor_edit()
 					if(event.key.keysym.sym == SDLK_a)
 						return EDITOR_ANIMATION;
 
-					if(event.key.keysym.sym == SDLK_r)
+					if(event.key.keysym.sym == SDLK_o)
 						return EDITOR_MAPITEMS;
 
 					//if 'B' is pressed, rotate backgrounds
@@ -657,7 +657,7 @@ int editor_edit()
 					}
 #endif
 
-					if(event.key.keysym.sym == SDLK_o)
+					if(event.key.keysym.sym == SDLK_END)
 						g_map.optimize();
 
 					if(event.key.keysym.sym == SDLK_m)
@@ -2924,15 +2924,17 @@ int display_help()
 
 	drawmap(false, TILESIZE);
 	menu_shade.draw(0, 0);
-	menu_font_large.drawCentered(320, 15, "Help");
+	//menu_font_large.drawCentered(320, 15, "Help");
 	
-	int offsety = 55;
+	int offsety = 30;
 	int offsetx = 20;
 	menu_font_small.draw(offsetx, offsety, "Modes:");
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[t] - Tile Mode");
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[i] - Block Mode");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[o] - Map Item Mode");
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[w] - Warp Mode");
 	offsety += menu_font_small.getHeight() + 2;
@@ -2955,7 +2957,7 @@ int display_help()
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[u] - Hide Inactive Tile Layers");
 	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[o] - Optimize Layers");
+	menu_font_small.draw(offsetx, offsety, "[end] - Optimize Layers");
 	offsety += menu_font_small.getHeight() + 20;
 
 	menu_font_small.draw(offsetx, offsety, "File:");
@@ -2975,7 +2977,7 @@ int display_help()
 	menu_font_small.draw(offsetx, offsety, "[pagedown] - Go To Next Map");
 
 	offsetx = 305;
-	offsety = 55;
+	offsety = 30;
 
 	menu_font_small.draw(offsetx, offsety, "Tile, Warp and Block Modes:");
 	offsety += menu_font_small.getHeight() + 2;
@@ -2986,9 +2988,9 @@ int display_help()
 
 	menu_font_small.draw(offsetx, offsety, "Move Mode:");
 	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[Right Mouse Button] - Select Area");
+	menu_font_small.draw(offsetx, offsety, "[Left Mouse Button] - Select Area");
 	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[Left Mouse Button] - Unselect Area");
+	menu_font_small.draw(offsetx, offsety, "[Right Mouse Button] - Unselect Area");
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "Select And Drag - Move Selections");
 	offsety += menu_font_small.getHeight() + 2;
@@ -3771,3 +3773,4 @@ void takescreenshot()
 	screen = old_screen;
 	blitdest = screen;
 }
+

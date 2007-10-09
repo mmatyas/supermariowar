@@ -152,6 +152,7 @@ gfxSprite		spr_powpowerup;
 gfxSprite		spr_modpowerup;
 gfxSprite		spr_bulletbillpowerup;
 gfxSprite		spr_featherpowerup;
+gfxSprite		spr_leafpowerup;
 gfxSprite		spr_bombpowerup;
 
 gfxSprite		spr_shade[3];
@@ -746,7 +747,7 @@ int main(int argc, char *argv[])
 
 	for(short iPlayer = 0; iPlayer < 4; iPlayer++)
 	{
-		game_values.storedpowerups[iPlayer] = 24;
+		game_values.storedpowerups[iPlayer] = -1;
 		game_values.gamepowerups[iPlayer] = -1;
 		game_values.teamids[iPlayer][0] = iPlayer;
 		game_values.teamcounts[iPlayer] = 1;
@@ -1627,7 +1628,7 @@ void RunGame()
 							EnterBossMode(2);
 						}
 						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-							objectcollisionitems.add(new PU_FeatherPowerup(&spr_featherpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 32000, 30, 30, 1, 1));
+							objectcollisionitems.add(new PU_FeatherPowerup(&spr_featherpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, 32000, 30, 30, 1, 1));
 						else
 							objectcollisionitems.add(new PU_ClockPowerup(&spr_clockpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 32000, 30, 30, 1, 1));
 					}

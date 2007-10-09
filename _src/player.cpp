@@ -1051,6 +1051,12 @@ void CPlayer::move()
 					SetPowerup(4);
 					break;
 				}
+				case 20: //tanooki
+				{
+					ifsoundonplay(sfx_collectpowerup);
+					tanooki = true;
+					break;
+				}
 				case 21:  //sledge hammer
 				{
 					powerup = 0;
@@ -4267,6 +4273,11 @@ void CPlayer::SetPowerup(short iPowerup)
 	else if(iPowerup == 3)
 	{
 		ifsoundonplay(sfx_collectfeather);
+		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
+	}
+	else if(iPowerup == 7)
+	{
+		ifsoundonplay(sfx_collectpowerup);
 		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
 	}
 	else

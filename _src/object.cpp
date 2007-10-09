@@ -337,9 +337,9 @@ void B_PowerupBlock::update()
 
 			short iSelectedPowerup = SelectPowerup();
 
-            if (-1 == iSelectedPowerup) 
-				objectcollisionitems.add(new PU_Tanooki(ix + 1, iy + 1));
-            else if(0 == iSelectedPowerup)
+			iSelectedPowerup = 24;
+
+            if(0 == iSelectedPowerup)
 				objectcollisionitems.add(new PU_PoisonPowerup(&spr_poisonpowerup, ix + 1, iy - 1, 1, side, 32000, 30, 30, 1, 1));
 			else if(1 == iSelectedPowerup)
 				objectcollisionitems.add(new PU_ExtraGuyPowerup(&spr_1uppowerup, ix + 1, iy - 1, 1, side, 32000, 30, 30, 1, 1, 1));
@@ -374,12 +374,23 @@ void B_PowerupBlock::update()
 			else if(16 == iSelectedPowerup)
 				objectcollisionitems.add(new PU_ModPowerup(&spr_modpowerup, ix + 1, iy - 1, 8, side, 8, 30, 30, 1, 1));
 			else if(17 == iSelectedPowerup)
-				objectcollisionitems.add(new PU_FeatherPowerup(&spr_featherpowerup, ix + 1, iy - 1, 1, side, 32000, 30, 30, 1, 1));
+				objectcollisionitems.add(new PU_FeatherPowerup(&spr_featherpowerup, ix + 1, iy - 1, 1, 32000, 30, 30, 1, 1));
 			else if(18 == iSelectedPowerup)
 				objectcollisionitems.add(new PU_MysteryMushroomPowerup(&spr_mysterymushroompowerup, ix + 1, iy - 1, 1, side, 32000, 30, 30, 1, 1));
 			else if(19 == iSelectedPowerup)
 				objectcollisionitems.add(new PU_BoomerangPowerup(&spr_boomerangpowerup, ix + 1, iy - 1, 1, side, 32000, 30, 26, 1, 5));
-			
+			else if(20 == iSelectedPowerup) 
+				objectcollisionitems.add(new PU_Tanooki(ix + 1, iy + 1));
+			else if(21 == iSelectedPowerup) 
+				objectcollisionitems.add(new PU_SledgeHammerPowerup(&spr_sledgehammerpowerup, ix + 1, iy - 1, 1, 32000, 30, 30, 1, 1));
+			else if(22 == iSelectedPowerup) 
+				objectcollisionitems.add(new PU_BombPowerup(&spr_bombpowerup, ix + 1, iy - 1, 1, 32000, 30, 30, 1, 1));
+			else if(23 == iSelectedPowerup) 
+				objectcollisionitems.add(new PU_PodoboPowerup(&spr_podobopowerup, ix + 1, iy - 1, 1, 32000, 30, 30, 1, 1));
+			else if(24 == iSelectedPowerup) 
+				objectcollisionitems.add(new PU_LeafPowerup(&spr_leafpowerup, ix + 1, iy - 1, 1, 32000, 30, 30, 1, 1));
+             
+
 			ifsoundonplay(sfx_sprout);
 		}
 		else if(state == 3)
@@ -2774,6 +2785,7 @@ bool PU_Tanooki :: collide (CPlayer *player)
 		ifsoundonplay(sfx_collectpowerup);
         player->tanooki = true;
     }
+
     return false;
 }
 
@@ -2939,9 +2951,6 @@ PU_SledgeHammerPowerup::PU_SledgeHammerPowerup(gfxSprite *nspr, short x, short y
 
 	sparkleanimationtimer = 0;
 	sparkledrawframe = 0;
-	bounce = -VELPOWERUPBOUNCE * 2;
-	numbounces = 5;
-	state = 2;
 }
 
 void PU_SledgeHammerPowerup::update()
@@ -2962,66 +2971,31 @@ void PU_SledgeHammerPowerup::draw()
 	MO_Powerup::draw();
 
 	//Draw sparkles
-	spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, 0, 32, 32);
+	if(state == 1)
+		spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, 0, 32, 32);
 }
 
 bool PU_SledgeHammerPowerup::collide(CPlayer * player)
 {
-	//player->SetPowerup(5);
-
-	if(state == 1)
-	{
-		ifsoundonplay(sfx_storepowerup);
-		game_values.storedpowerups[player->globalID] = 21;
-		game_values.gamepowerups[player->globalID] = 21;
-		dead = true;
-		game_values.noexit = false;
-	}
-
+	player->SetPowerup(5);
+	dead = true;
 	return false;
 }
-
-float PU_SledgeHammerPowerup::BottomBounce()
-{
-	if(state == 2)
-	{
-		if(--numbounces <= 0)
-		{
-			numbounces = 0;
-			state = 1;
-			bounce = GRAVITATION;
-		}
-		else
-		{
-			if(vely > 0.0f)
-				bounce = -vely / 2.0f;
-			else
-				bounce /= 2.0f;
-		}
-	}
-
-	return bounce;
-}
-
 
 //------------------------------------------------------------------------------
 // class podobo powerup
 //------------------------------------------------------------------------------
 PU_PodoboPowerup::PU_PodoboPowerup(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY) :
-	PU_SledgeHammerPowerup(nspr, x, y, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
-{}
+	MO_Powerup(nspr, x, y, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
+{
+	velx = 0.0f;
+}
 
 bool PU_PodoboPowerup::collide(CPlayer * player)
 {
-	if(state == 1)
-	{
-		ifsoundonplay(sfx_storepowerup);
-		game_values.storedpowerups[player->globalID] = 22;
-		game_values.gamepowerups[player->globalID] = 22;
-		dead = true;
-		game_values.noexit = false;
-	}
-
+	dead = true;
+	ifsoundonplay(sfx_storepowerup);
+	game_values.gamepowerups[player->globalID] = 22;
 	return false;
 }
 
@@ -3029,23 +3003,17 @@ bool PU_PodoboPowerup::collide(CPlayer * player)
 // class bomb powerup
 //------------------------------------------------------------------------------
 PU_BombPowerup::PU_BombPowerup(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY) :
-	PU_SledgeHammerPowerup(nspr, x, y, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
-{}
+	MO_Powerup(nspr, x, y, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
+{
+	velx = 0.0f;
+}
 
 bool PU_BombPowerup::collide(CPlayer * player)
 {
-	if(state == 1)
-	{
-		ifsoundonplay(sfx_storepowerup);
-		game_values.storedpowerups[player->globalID] = 23;
-		game_values.gamepowerups[player->globalID] = 23;
-		dead = true;
-		game_values.noexit = false;
-	}
-
+	player->SetPowerup(6);
+	dead = true;
 	return false;
 }
-
 
 //------------------------------------------------------------------------------
 // class treasure chest powerup
@@ -3206,9 +3174,16 @@ void MO_BonusHouseChest::draw()
 
 	if(state == 2)
 	{
-		if(bonusitem >= NUM_POWERUPS)
+		if(bonusitem >= NUM_POWERUPS + NUM_WORLD_POWERUPS) //Score bonuses
+		{
+			short iBonus = bonusitem - NUM_POWERUPS - NUM_WORLD_POWERUPS;
+			short iBonusX = (iBonus % 10) << 5;
+			short iBonusY = ((iBonus / 10) << 5) + 32;
+			spr_worlditems.draw(ix + 16, drawbonusitemy, iBonusX, iBonusY, 32, 32);
+		}
+		else if(bonusitem >= NUM_POWERUPS) //World Item
 			spr_worlditems.draw(ix + 16, drawbonusitemy, (bonusitem - NUM_POWERUPS) << 5, 0, 32, 32);
-		else
+		else //Normal Powerup
 			spr_storedpoweruplarge.draw(ix + 16, drawbonusitemy, bonusitem << 5, 0, 32, 32);
 	}
 
@@ -3220,10 +3195,26 @@ bool MO_BonusHouseChest::collide(CPlayer * player)
 {
 	if(state == 1 && !game_values.gamemode->gameover && player->playerKeys->game_turbo.fPressed)
 	{
-		if(game_values.worldpowerupcount[player->teamID] < 32)
-            game_values.worldpowerups[player->teamID][game_values.worldpowerupcount[player->teamID]++] = bonusitem;
+		if(bonusitem < NUM_POWERUPS + NUM_WORLD_POWERUPS)
+		{
+			if(game_values.worldpowerupcount[player->teamID] < 32)
+				game_values.worldpowerups[player->teamID][game_values.worldpowerupcount[player->teamID]++] = bonusitem;
+			else
+				game_values.worldpowerups[player->teamID][31] = bonusitem;
+		}
 		else
-			game_values.worldpowerups[player->teamID][31] = bonusitem;
+		{
+			short iBonus = bonusitem - NUM_POWERUPS - NUM_WORLD_POWERUPS;
+			if(iBonus < 10)
+				iBonus = iBonus + 1;
+			else
+				iBonus = 9 - iBonus;
+
+			game_values.tournament_scores[player->teamID].total += iBonus;
+
+			if(game_values.tournament_scores[player->teamID].total < 0)
+				game_values.tournament_scores[player->teamID].total = 0;
+		}
 
 		ifsoundonplay(sfx_treasurechest);
 		state = 2;
@@ -3251,6 +3242,8 @@ PU_ClockPowerup::PU_ClockPowerup(gfxSprite *nspr, short x, short y, short iNumSp
 
 bool PU_ClockPowerup::collide(CPlayer * player)
 {
+		velx = 0.0f;
+
 	dead = true;
 	ifsoundonplay(sfx_storepowerup);
 	game_values.gamepowerups[player->globalID] = 7;
@@ -3340,7 +3333,7 @@ bool PU_BulletBillPowerup::collide(CPlayer * player)
 //------------------------------------------------------------------------------
 // class feather powerup
 //------------------------------------------------------------------------------
-PU_FeatherPowerup::PU_FeatherPowerup(gfxSprite *nspr, short x, short y, short iNumSpr, bool, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY) :
+PU_FeatherPowerup::PU_FeatherPowerup(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY) :
 	IO_MovingObject(nspr, x, y, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
 {
 	desty = fy - collisionHeight;
@@ -3427,7 +3420,20 @@ void PU_FeatherPowerup::update()
 bool PU_FeatherPowerup::collide(CPlayer * player)
 {
 	player->SetPowerup(3);
-	eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, player->ix + (HALFPW) - 16, player->iy + (HALFPH) - 16, 3, 8));
+	dead = true;
+	return false;
+}
+
+//------------------------------------------------------------------------------
+// class leaf powerup
+//------------------------------------------------------------------------------
+PU_LeafPowerup::PU_LeafPowerup(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY) :
+	PU_FeatherPowerup(nspr, x, y, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
+{}
+
+bool PU_LeafPowerup::collide(CPlayer * player)
+{
+	player->SetPowerup(7);
 	dead = true;
 	return false;
 }
@@ -8283,11 +8289,11 @@ CO_Spring::CO_Spring(gfxSprite *nspr, short ix, short iy) :
 
 bool CO_Spring::collide(CPlayer * player)
 {
-	if(state == 1 && owner == NULL)
+	if(owner == NULL)
 	{
 		if(player->fOldY + PH <= fOldY && player->iy + PH >= iy)
 			hittop(player);
-		else
+		else if(state == 1)
 			hitother(player);
 	}
 	
@@ -8445,7 +8451,7 @@ CO_Spike::CO_Spike(gfxSprite *nspr, short ix, short iy) :
 
 void CO_Spike::hittop(CPlayer * player)
 {
-	if(player->isready() && !player->spawninvincible && !player->invincible)
+	if(player->isready() && !player->spawninvincible && !player->invincible && !player->fKuriboShoe)
 		player->KillPlayerMapHazard();
 }
 

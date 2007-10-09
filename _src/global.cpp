@@ -717,11 +717,13 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 			short iPowerupOffset = 0;
 			if(pszTemp[0] == 'w' || pszTemp[0] == 'W')
 				iPowerupOffset += NUM_POWERUPS;
+			else if(pszTemp[0] == 's' || pszTemp[0] == 'S')
+				iPowerupOffset += NUM_POWERUPS + NUM_WORLD_POWERUPS - 1;
 
 			pszTemp++;
 	
 			short iBonus = atoi(pszTemp) + iPowerupOffset;
-			if(iBonus < 0 || iBonus >= NUM_POWERUPS + NUM_WORLD_POWERUPS)
+			if(iBonus < 0 || iBonus >= NUM_POWERUPS + NUM_WORLD_POWERUPS + NUM_WORLD_SCORE_BONUSES)
 				iBonus = 0;
 
 			ts->wsbBonuses[ts->iNumBonuses].iBonus = iBonus;
@@ -1085,3 +1087,4 @@ void LoadCurrentMapBackground()
 
 	__load_gfx(spr_background, path);
 }
+
