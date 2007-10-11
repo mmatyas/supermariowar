@@ -1576,7 +1576,7 @@ void RunGame()
 					else if(event.key.keysym.sym == SDLK_3)
 					{
 						if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-						objectcollisionitems.add(new PU_PodoboPowerup(&spr_podobopowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, 32000, 30, 30, 1, 1));
+							objectcollisionitems.add(new PU_PodoboPowerup(&spr_podobopowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, 32000, 30, 30, 1, 1));
 						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
 							objectcollisionitems.add(new PU_BulletBillPowerup(&spr_bulletbillpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 32000, 30, 30, 1, 1));
 						else
@@ -1584,14 +1584,18 @@ void RunGame()
 					}
 					else if(event.key.keysym.sym == SDLK_4)
 					{
-						if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
+						if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
+							objectcollisionitems.add(new PU_PWingsPowerup(&spr_pwingspowerup, list_players[0]->ix + 32, list_players[0]->iy));
+						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
 							objectsplayer.add(new CO_Shell(0, list_players[0]->ix + 32, list_players[0]->iy, true, true, true, false));
 						else
 							objectcollisionitems.add(new PU_ExtraGuyPowerup(&spr_3uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 32000, 30, 30, 1, 1, 3));
 					}
 					else if(event.key.keysym.sym == SDLK_5)
 					{
-						if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
+						if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
+							objectcollisionitems.add(new PU_PWingsPowerup(&spr_pwingspowerup, list_players[0]->ix + 32, list_players[0]->iy));
+						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
 							objectsplayer.add(new CO_Shell(1, list_players[0]->ix + 32, list_players[0]->iy, false, true, true, false));
 						else
 							objectcollisionitems.add(new PU_ExtraGuyPowerup(&spr_5uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 32000, 30, 30, 1, 1, 5));
@@ -1606,9 +1610,7 @@ void RunGame()
 					else if(event.key.keysym.sym == SDLK_7)
 					{
 						if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-						{
-							EnterBossMode(0);
-						}
+							objectsplayer.add(new CO_Spring(&spr_spring, list_players[0]->ix + 32, list_players[0]->iy));
 						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
 							objectsplayer.add(new CO_Shell(3, list_players[0]->ix + 32, list_players[0]->iy, false, true, false, false));
 						else
@@ -1617,9 +1619,7 @@ void RunGame()
 					else if(event.key.keysym.sym == SDLK_8)
 					{
 						if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-						{
-							EnterBossMode(1);
-						}
+							objectsplayer.add(new CO_Spike(&spr_spike, list_players[0]->ix + 32, list_players[0]->iy));
 						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
 							objectcollisionitems.add(new PU_ModPowerup(&spr_modpowerup, list_players[0]->ix + 32, list_players[0]->iy, 8, true, 8, 30, 30, 1, 1));
 						else
@@ -1628,9 +1628,7 @@ void RunGame()
 					else if(event.key.keysym.sym == SDLK_9)
 					{
 						if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-						{
-							EnterBossMode(2);
-						}
+							objectsplayer.add(new CO_KuriboShoe(&spr_kuriboshoe, list_players[0]->ix + 32, list_players[0]->iy));
 						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
 							objectcollisionitems.add(new PU_FeatherPowerup(&spr_featherpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, 32000, 30, 30, 1, 1));
 						else
