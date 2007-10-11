@@ -283,27 +283,6 @@ void CPlayer::move()
 			shoot_super_boomerang = false;
 		}
 
-		if (bobomb)
-		{
-			static const int super_bobomb_code[7] = {4, 8, 4, 8, 2, 2, 16};
-		        
-			if (keymask & super_bobomb_code[super_bobomb_index]) 
-				super_bobomb_index++;
-			else if (keymask & ~super_bobomb_code[super_bobomb_index])
-				super_bobomb_index = 0;
-		    
-			if (super_bobomb_index >= 7)
-			{
-				super_bobomb_index = 0;
-				shoot_super_bobomb = true;
-			}
-		}
-		else
-		{
-			super_bobomb_index = 0;
-			shoot_super_bobomb = false;
-		}
-
 		if(game_values.superboomerang[globalID] == 1)
 		{
 			if(keymask & 16)
@@ -311,21 +290,6 @@ void CPlayer::move()
 		}
 
 		//Fly using feather
-		if(playerKeys->game_down.fDown)
-		{
-			holddown++;
-			holddowntolerance = 0;
-		}
-		else if(holddown >= 120 && holddowntolerance < 15)
-		{
-			holddowntolerance++;
-		}
-		else
-		{
-			holddown = 0;
-			holddowntolerance = 0;
-		}
-
 		int keymaskdown =
 			(playerKeys->game_jump.fDown?1:0) |
 			(playerKeys->game_down.fDown?2:0) |
@@ -957,7 +921,7 @@ void CPlayer::move()
 				}
 				case 7:
 				{
-					turnslowdownon(holddown > 310);
+					turnslowdownon(false);
 
 					outofarenatimer = 0;
 					outofarenadisplaytimer = game_values.outofboundstime - 1;
@@ -1084,6 +1048,11 @@ void CPlayer::move()
 					SetPowerup(7);
 					break;
 				}
+				case 25:  //pwings
+				{
+					SetPowerup(8);
+					break;
+				}
 			}
 				
 			powerupused = -1;
@@ -1189,19 +1158,7 @@ void CPlayer::move()
 			{
 				if(!lockjump)
 				{
-					if(powerup == 3 && holddown >= 120 && !flying)
-					{
-						holddown = 0;
-						ifsoundonplay(sfx_collectfeather);
-						flying = true;
-						lockjump = true;
-
-						if(game_values.featherlimit > 0)
-						{
-							DecreaseProjectileLimit();
-						}
-					}
-					else if(!inair && superjumptimer == 0)
+					if(!inair && superjumptimer == 0)
 					{	//only if on the ground and the jump key was released somewhen after it was pressed the last time
 
 						bool fFellThrough = false;
@@ -1284,18 +1241,18 @@ void CPlayer::move()
 					}
 					else if(powerup == 3 && !fKuriboShoe)
 					{
-						if(featherjump < game_values.featherjumps)
+						if(extrajumps < game_values.featherjumps)
 						{
 							if(game_values.featherlimit == 0 || projectilelimit > 0)
 							{
-								if(featherjump < game_values.featherjumps)
+								if(extrajumps < game_values.featherjumps)
 								{
 									Jump(lrn, 0.8f, false);
 									ifsoundonplay(sfx_capejump);
 									lockjump = true;
 								}
 								
-								featherjump++;	
+								extrajumps++;	
 							}
 
 							if(game_values.featherlimit > 0)
@@ -1312,7 +1269,16 @@ void CPlayer::move()
 
 						if(game_values.featherlimit > 0)
 							DecreaseProjectileLimit();
+					}
+					else if(powerup == 8 && !fKuriboShoe && !flying && extrajumps == 0)
+					{
+						ifsoundonplay(sfx_collectfeather);
+						flying = true;
+						lockjump = true;
+						extrajumps++;
 
+						if(game_values.pwingslimit > 0)
+							DecreaseProjectileLimit();
 					}
 				}
 			}
@@ -1393,30 +1359,8 @@ void CPlayer::move()
 					if(bobomb) //If we're a bob-omb, explode
 					{
 						bobomb = false;
-
-						if(shoot_super_bobomb)
-						{
-							shoot_super_bobomb = false;
-
-							CO_Bomb * bomb = new CO_Bomb(&spr_bomb, ix + HALFPW - 14, iy + 2, 0.0f, 0.0f, 4, globalID, teamID, colorID, rand() % 120 + 240);
-							
-							if(AcceptItem(bomb))
-							{
-								bomb->owner = this;
-								bomb->MoveToOwner();
-							}
-
-							objectsfront.add(bomb);
-							projectiles[globalID]++;
-							
-							eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
-							ifsoundonplay(sfx_transform);
-						}
-						else
-						{
-							objectsfront.add(new OMO_Explosion(&spr_explosion, ix + HALFPW - 96, iy + HALFPH - 64, 2, 4, globalID, teamID));
-							ifsoundonplay(sfx_bobombsound);
-						}
+						objectsfront.add(new OMO_Explosion(&spr_explosion, ix + HALFPW - 96, iy + HALFPH - 64, 2, 4, globalID, teamID, kill_style_bobomb));
+						ifsoundonplay(sfx_bobombsound);
 					}
 					else
 					{
@@ -1532,7 +1476,7 @@ void CPlayer::move()
 						}
 						else if(powerup == 6 && projectiles[globalID] < 2)
 						{
-							CO_Bomb * bomb = new CO_Bomb(&spr_bomb, ix + HALFPW - 14, iy + 2, 0.0f, 0.0f, 4, globalID, teamID, colorID, rand() % 120 + 240);
+							CO_Bomb * bomb = new CO_Bomb(&spr_bomb, ix + HALFPW - 14, iy - 8, IsPlayerFacingRight() ? 3.0f : -3.0f, -3.0f, 4, globalID, teamID, colorID, rand() % 120 + 240);
 							
 							if(AcceptItem(bomb))
 							{
@@ -2107,9 +2051,7 @@ void CPlayer::SetupNewPlayer()
 	killsinrow = 0;
 	killsinrowinair = 0;
 	awardangle = 0.0f;
-	featherjump = 0;
-	holddown = 0;
-	holddowntolerance = 0;
+	extrajumps = 0;
 	holdleft = 0;
 	holdlefttolerance = 0;
 	holdright = 0;
@@ -2133,9 +2075,6 @@ void CPlayer::SetupNewPlayer()
 	super_hammer_throw_right_index = 0;
 	shoot_left_super_hammer = false;
 	shoot_right_super_hammer = false;
-
-	super_bobomb_index = 0;
-	shoot_super_bobomb = false;
 
 	super_sledge_hammer_throw_index = 0;
 	shoot_super_sledge_hammer = false;
@@ -2293,7 +2232,17 @@ bool CPlayer::isstomping(CPlayer &o)
 
 		if(fKillPotential)
 		{
-			PlayerKilledPlayer(*this, o, death_style_squish, (featherjump > 0 ? kill_style_feather : kill_style_stomp));
+			killstyle style = kill_style_stomp;
+			if(flying)
+				style = kill_style_pwings;
+			else if(fKuriboShoe)
+				style = kill_style_kuriboshoe;
+			else if(iTailState > 0)
+				style = kill_style_leaf;
+			else if(extrajumps > 0)
+				style = kill_style_feather;
+
+			PlayerKilledPlayer(*this, o, death_style_squish, style);
 		}
 		else
 		{
@@ -3008,7 +2957,7 @@ void CPlayer::SpinTail()
 
 	SpinPlayer();
 
-	objectsplayer.add(new OMO_SpinAttack(globalID, teamID, 1, IsPlayerFacingRight(), 12));
+	objectsplayer.add(new OMO_SpinAttack(globalID, teamID, 1, IsPlayerFacingRight(), 13));
 }
 
 void CPlayer::DrawTail()
@@ -3630,7 +3579,7 @@ void CPlayer::collision_detection_map()
 				if(!platform)
 				{
 					inair = false;
-					featherjump = 0;
+					extrajumps = 0;
 					killsinrowinair = 0;
 				}
 			}
@@ -3669,7 +3618,7 @@ void CPlayer::collision_detection_map()
 					onice = false;
 
 				inair = false;
-				featherjump = 0;
+				extrajumps = 0;
 				killsinrowinair = 0;
 			}
 			platform = NULL;
@@ -4261,7 +4210,7 @@ bool CPlayer::AcceptItem(MO_CarriedObject * item)
 void CPlayer::SetPowerup(short iPowerup)
 {
 	//Play sounds for collecting a powerup
-	if(powerup == iPowerup || (bobomb && iPowerup == 0) || iPowerup > 7)
+	if(powerup == iPowerup || (bobomb && iPowerup == 0) || iPowerup > 8)
 	{
 		ifsoundonplay(sfx_storepowerup);
 	}
@@ -4292,16 +4241,16 @@ void CPlayer::SetPowerup(short iPowerup)
 
 		bobomb = true;
 	}
-	else if(iPowerup > 7)
+	else if(iPowerup > 8)
 	{
-		if(iPowerup == 8)
+		if(iPowerup == 9)
 			game_values.gamepowerups[globalID] = 9;
-		else if(iPowerup == 9)
-			game_values.gamepowerups[globalID] = 16;
 		else if(iPowerup == 10)
+			game_values.gamepowerups[globalID] = 16;
+		else if(iPowerup == 11)
 			game_values.gamepowerups[globalID] = 10;
-		else if(iPowerup > 10)
-			game_values.gamepowerups[globalID] = iPowerup + 1; //Storing shells
+		else if(iPowerup > 12)
+			game_values.gamepowerups[globalID] = iPowerup; //Storing shells
 	}
 	else
 	{
@@ -4319,6 +4268,8 @@ void CPlayer::SetPowerup(short iPowerup)
 			game_values.gamepowerups[globalID] = 23;
 		else if(powerup == 7)
 			game_values.gamepowerups[globalID] = 24;
+		else if(powerup == 8)
+			game_values.gamepowerups[globalID] = 25;
 
 		powerup = iPowerup;
 		projectilelimit = 0;
@@ -4352,6 +4303,11 @@ void CPlayer::SetPowerup(short iPowerup)
 		{
 			if(game_values.leaflimit > 0)
 				projectilelimit = game_values.leaflimit;
+		}
+		else if(powerup == 8)
+		{
+			if(game_values.pwingslimit > 0)
+				projectilelimit = game_values.pwingslimit;
 		}
 	}
 

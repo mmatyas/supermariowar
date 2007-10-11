@@ -1146,13 +1146,13 @@ void CMap::saveMap(const std::string& file)
 			if(mapdatatop[i][j] == tile_ice)
 				iIceCount++;
 
-			if(objectdata[i][j] == 1) //Powerup Block
+			if(objectdata[i][j] == 1 || objectdata[i][j] == 15) //Powerup/View Block
 				iPowerupBlockCount++;
 
 			if(objectdata[i][j] == 0) //Breakable Block
 				iBreakableBlockCount++;
 			
-			if(objectdata[i][j] == 6) //Throw Block
+			if(objectdata[i][j] == 6 || objectdata[i][j] == 16) //Blue/Red Throw Block
 				iThrowBlockCount++;
 
 			if(objectdata[i][j] >= 11 && objectdata[i][j] <= 14) //On/Off Block

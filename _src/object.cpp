@@ -163,7 +163,7 @@ bool IO_Block::hittop(CPlayer * player, bool useBehavior)
 		player->inair = false;
 		player->fallthrough = false;
 		player->killsinrowinair = 0;
-		player->featherjump = 0;
+		player->extrajumps = 0;
 		player->vely = GRAVITATION;
 	}
 
@@ -378,7 +378,7 @@ void B_PowerupBlock::update()
 			else if(19 == iSelectedPowerup)
 				objectcollisionitems.add(new PU_BoomerangPowerup(&spr_boomerangpowerup, ix + 1, iy - 1, 1, side, 32000, 30, 26, 1, 5));
 			else if(20 == iSelectedPowerup) 
-				objectcollisionitems.add(new PU_Tanooki(ix + 1, iy + 1));
+				objectcollisionitems.add(new PU_Tanooki(ix + 1, iy - 1));
 			else if(21 == iSelectedPowerup) 
 				objectcollisionitems.add(new PU_SledgeHammerPowerup(&spr_sledgehammerpowerup, ix + 1, iy - 1, 1, 32000, 30, 30, 1, 1));
 			else if(22 == iSelectedPowerup) 
@@ -387,6 +387,8 @@ void B_PowerupBlock::update()
 				objectcollisionitems.add(new PU_PodoboPowerup(&spr_podobopowerup, ix + 1, iy - 1, 1, 32000, 30, 30, 1, 1));
 			else if(24 == iSelectedPowerup)
 				objectcollisionitems.add(new PU_LeafPowerup(&spr_leafpowerup, ix + 1, iy - 1, 1, 32000, 30, 30, 1, 1));
+			else if(25 == iSelectedPowerup) 
+				objectcollisionitems.add(new PU_PWingsPowerup(&spr_pwingspowerup, ix + 1, iy - 1));
              
 			ifsoundonplay(sfx_sprout);
 		}
@@ -1801,7 +1803,7 @@ bool B_ThrowBlock::hittop(CPlayer * player, bool useBehavior)
 		player->inair = false;
 		player->fallthrough = false;
 		player->killsinrowinair = 0;
-		player->featherjump = 0;
+		player->extrajumps = 0;
 		player->vely = GRAVITATION;
 
 		if(player->PressedAcceptItemKey() && player->IsAcceptingItem())
@@ -2785,6 +2787,21 @@ bool PU_Tanooki :: collide (CPlayer *player)
 
     return false;
 }
+
+//------------------------------------------------------------------------------
+// pwings
+//------------------------------------------------------------------------------
+PU_PWingsPowerup::PU_PWingsPowerup(gfxSprite * nspr, short x, short y)
+    : MO_Powerup(nspr, x, y, 1, 32000, 30, 30, 1, 1)
+{}
+
+bool PU_PWingsPowerup :: collide (CPlayer *player)
+{
+	player->SetPowerup(8);
+	dead = true;
+	return false;
+}
+
 
 //------------------------------------------------------------------------------
 // class star powerup
@@ -3784,7 +3801,7 @@ bool MO_SledgeHammer::collide(CPlayer * player)
 
 				if(killer)
 				{
-					PlayerKilledPlayer(*killer, *player, death_style_jump, kill_style_hammer);
+					PlayerKilledPlayer(*killer, *player, death_style_jump, kill_style_sledge);
 				}
 				else
 				{
@@ -3810,7 +3827,7 @@ void MO_SledgeHammer::explode()
 	{
 		if(fSuper)
 		{
-			objectsfront.add(new OMO_Explosion(&spr_explosion, ix + (iw >> 2) - 96, iy + (ih >> 2) - 64, 2, 4, playerID, teamID));
+			objectsfront.add(new OMO_Explosion(&spr_explosion, ix + (iw >> 2) - 96, iy + (ih >> 2) - 64, 2, 4, playerID, teamID, kill_style_sledge));
 			ifsoundonplay(sfx_bobombsound);
 		}
 		else
@@ -3901,7 +3918,7 @@ void MO_Boomerang::update()
 	{
 		removeifprojectile(this, false, true);
 
-		objectsfront.add(new OMO_Explosion(&spr_explosion, ix + (iw >> 2) - 96, iy + (ih >> 2) - 64, 2, 4, playerID, teamID));
+		objectsfront.add(new OMO_Explosion(&spr_explosion, ix + (iw >> 2) - 96, iy + (ih >> 2) - 64, 2, 4, playerID, teamID, kill_style_boomerang));
 		ifsoundonplay(sfx_bobombsound);
 	}
 
@@ -4206,7 +4223,7 @@ void MO_Boomerang::draw()
 // class bomb
 //------------------------------------------------------------------------------
 CO_Bomb::CO_Bomb(gfxSprite *nspr, short x, short y, float fVelX, float fVelY, short aniSpeed, short iGlobalID, short iTeamID, short iColorID, short timetolive) :
-	MO_CarriedObject(nspr, x, y, 5, aniSpeed, 24, 24, 4, 14)
+	MO_CarriedObject(nspr, x, y, 5, aniSpeed, 24, 24, 4, 13)
 {
 	iw = 28;
 	ih = 38;
@@ -4356,7 +4373,7 @@ void CO_Bomb::Die()
 		projectiles[playerID]--;
 
 	dead = true;
-	objectsfront.add(new OMO_Explosion(&spr_explosion, ix + (iw >> 2) - 96, iy + (ih >> 2) - 64, 2, 4, playerID, teamID));
+	objectsfront.add(new OMO_Explosion(&spr_explosion, ix + (iw >> 2) - 96, iy + (ih >> 2) - 64, 2, 4, playerID, teamID, kill_style_bomb));
 	ifsoundonplay(sfx_bobombsound);
 }
 
@@ -4565,7 +4582,7 @@ bool OMO_Podobo::collide(CPlayer * player)
 
 		if(killer)
 		{
-			PlayerKilledPlayer(*killer, *player, death_style_jump, kill_style_bounce);
+			PlayerKilledPlayer(*killer, *player, death_style_jump, kill_style_podobo);
 		}
 		else
 		{
@@ -4860,7 +4877,7 @@ void OMO_BulletBill::collide(IO_MovingObject * object)
 			short iCenterX = ((ix + iOffsetX - bulletbill->ix) >> 1) + (bulletbill->ix + (bulletbill->iw >> 1));
 			short iCenterY = ((iy - bulletbill->iy) >> 1) + (bulletbill->iy + (bulletbill->ih >> 1));
 
-			objectsfront.add(new OMO_Explosion(&spr_explosion, iCenterX - 96, iCenterY - 64, 2, 4, -1, -1));
+			objectsfront.add(new OMO_Explosion(&spr_explosion, iCenterX - 96, iCenterY - 64, 2, 4, -1, -1, kill_style_bulletbill));
 			ifsoundonplay(sfx_bobombsound);
 		}
 		else if(type == movingobject_spinattack)
@@ -6316,7 +6333,7 @@ bool MO_FrenzyCard::collide(CPlayer * player)
 	{
 		//Hack to skip sledge hammer, bombs and leaf for now
 		if(type > 4)
-			type += 3;
+			type += 4;
 
 		player->SetPowerup(type);
 		game_values.gamemode->frenzyowner = player;
@@ -6413,7 +6430,7 @@ void MO_FrenzyCard::placeFrenzyCard()
 //------------------------------------------------------------------------------
 // class explosion (for bob-omb mode)
 //------------------------------------------------------------------------------
-OMO_Explosion::OMO_Explosion(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short playerid, short iTeamID) :
+OMO_Explosion::OMO_Explosion(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short playerid, short iTeamID, killstyle style) :
 	IO_OverMapObject(nspr, x, y, iNumSpr, aniSpeed)
 {
 	state = 1;
@@ -6421,6 +6438,7 @@ OMO_Explosion::OMO_Explosion(gfxSprite *nspr, short x, short y, short iNumSpr, s
 	teamID = iTeamID;
 	timer = 0;
 	objectType = object_explosion;
+	iStyle = style;
 }
 
 bool OMO_Explosion::collide(CPlayer * player)
@@ -6432,7 +6450,7 @@ bool OMO_Explosion::collide(CPlayer * player)
 
 		if(killer)
 		{
-			PlayerKilledPlayer(*killer, *player, death_style_jump, kill_style_bobomb);
+			PlayerKilledPlayer(*killer, *player, death_style_jump, iStyle);
 		}
 		else
 		{
@@ -8334,7 +8352,7 @@ void CO_Spring::hittop(CPlayer * player)
 	player->inair = false;
 	player->fallthrough = false;
 	player->killsinrowinair = 0;
-	player->featherjump = 0;
+	player->extrajumps = 0;
 
 	player->superjumptimer = 4;
 	player->superjumptype = 1;
@@ -8539,7 +8557,7 @@ bool OMO_SpinAttack::collide(CPlayer * player)
 
 	if(killer)
 	{
-		PlayerKilledPlayer(*killer, *player, death_style_jump, iStyle == 0 ? kill_style_feather : kill_style_feather);
+		PlayerKilledPlayer(*killer, *player, death_style_jump, iStyle == 0 ? kill_style_feather : kill_style_leaf);
 	}
 	else
 	{
@@ -8560,7 +8578,7 @@ void OMO_SpinAttack::draw()
 	if(iTimer >= 5 && !dead)
 	{
 		SDL_Rect r = {ix, iy, collisionWidth, collisionHeight};
-		SDL_FillRect(blitdest, &r, 0xffff);
+		SDL_FillRect(blitdest, &r, 0xff00);
 	}
 }
 */
@@ -8577,14 +8595,32 @@ void OMO_SpinAttack::update()
 		xi(owner->ix - PWOFFSET + (fDirection ? 24 : -16));
 		yi(owner->iy + PH - iOffsetY);
 
-		if(iTimer < 5)
+		if(iTimer < 5 || iy + collisionHeight < 0)
 			return;
 
 		//Check block collisions
 		short iTop = iy / TILESIZE;
 		short iBottom = (iy + collisionHeight) / TILESIZE;
-		short iLeft = ix / TILESIZE;
+
+		short iLeft;
+		if(ix < 0)
+			iLeft = (ix + 640) / TILESIZE;
+		else
+			iLeft = ix / TILESIZE;
+
 		short iRight = (ix + collisionWidth) / TILESIZE;
+
+		if(iLeft < 0)
+			iLeft += 20;
+
+		if(iLeft >= 20)
+			iLeft -= 20;
+
+		if(iRight < 0)
+			iRight += 20;
+
+		if(iRight >= 20)
+			iRight -= 20;
 
 		IO_Block * topleftblock = NULL;
 		IO_Block * toprightblock = NULL;
@@ -8593,20 +8629,14 @@ void OMO_SpinAttack::update()
 
 		if(iTop >= 0 && iTop < 15)
 		{
-			if(iLeft >= 0 && iLeft < 20)
-				topleftblock = g_map.block(iLeft, iTop);
-
-			if(iRight >= 0 && iRight < 20)
-				toprightblock = g_map.block(iRight, iTop);
+			topleftblock = g_map.block(iLeft, iTop);
+			toprightblock = g_map.block(iRight, iTop);
 		}
 
 		if(iBottom >= 0 && iBottom < 15)
 		{
-			if(iLeft >= 0 && iLeft < 20)
-				bottomleftblock = g_map.block(iLeft, iBottom);
-
-			if(iRight >= 0 && iRight < 20)
-				bottomrightblock = g_map.block(iRight, iBottom);
+			bottomleftblock = g_map.block(iLeft, iBottom);
+			bottomrightblock = g_map.block(iRight, iBottom);
 		}
 
 		bool fHitBlock = false;

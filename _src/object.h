@@ -454,6 +454,13 @@ class PU_Tanooki : public MO_Powerup
         bool collide(CPlayer *player);
 };
 
+class PU_PWingsPowerup : public MO_Powerup
+{
+    public:
+        PU_PWingsPowerup(gfxSprite * nspr, short x, short y);
+        bool collide(CPlayer *player);
+};
+
 class PU_StarPowerup : public MO_Powerup
 {
 	public:
@@ -1121,7 +1128,7 @@ class MO_FrenzyCard : public IO_MovingObject
 class OMO_Explosion : public IO_OverMapObject
 {
 	public:
-		OMO_Explosion(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short id, short iTeamID);
+		OMO_Explosion(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short id, short iTeamID, killstyle style);
 		~OMO_Explosion(){};
 
 		void update();
@@ -1131,6 +1138,7 @@ class OMO_Explosion : public IO_OverMapObject
 		short playerID;
 		short teamID;
 		short timer;
+		killstyle iStyle;
 };
 
 class MO_Goomba : public IO_MovingObject

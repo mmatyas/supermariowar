@@ -797,7 +797,7 @@ void MovingPlatform::collide(CPlayer * player)
 						player->vely = GRAVITATION;
 						player->inair = false;
 						player->killsinrowinair = 0;
-						player->featherjump = 0;
+						player->extrajumps = 0;
 						//printf("Hit Solid On Top Platform\n");
 					}
 				}
@@ -830,7 +830,7 @@ void MovingPlatform::collide(CPlayer * player)
 					player->vely = GRAVITATION;
 					player->inair = false;
 					player->killsinrowinair = 0;
-					player->featherjump = 0;
+					player->extrajumps = 0;
 					
 					if((t1 == tile_ice && (t2 == tile_ice || t2 == tile_nonsolid || t2 == tile_gap)) ||
 						t2 == tile_ice && (t1 == tile_ice || t1 == tile_nonsolid || t1 == tile_gap))

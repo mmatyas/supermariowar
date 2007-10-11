@@ -60,7 +60,6 @@ short			x_shake = 0;
 short			y_shake = 0;
 
 //------ sprites (maybe this should be done in a resource manger) ------
-gfxSprite       spr_tanooki, spr_statue;
 gfxSprite		** spr_player[4];	//all player sprites (see global.h)
 gfxSprite		** spr_chocobo[4];
 gfxSprite		** spr_bobomb[4];
@@ -154,6 +153,8 @@ gfxSprite		spr_bulletbillpowerup;
 gfxSprite		spr_featherpowerup;
 gfxSprite		spr_leafpowerup;
 gfxSprite		spr_bombpowerup;
+gfxSprite		spr_pwingspowerup;
+gfxSprite       spr_tanooki, spr_statue;
 
 gfxSprite		spr_shade[3];
 gfxSprite		spr_timershade;
@@ -581,6 +582,7 @@ bool g_fRecordTest = false;
 
 // ------ MAIN ------
 int main(int argc, char *argv[])
+
 {
 	printf("-------------------------------------------------------------------------------\n");
 	printf(" %s %s\n", TITLESTRING, VERSIONNUMBER);
@@ -708,6 +710,7 @@ int main(int argc, char *argv[])
 	game_values.featherjumps		= 1;	//Allow one extra cape jump
 	game_values.featherlimit		= 0;	//Unlimited
 	game_values.leaflimit			= 0;	//Unlimited
+	game_values.pwingslimit			= 0;	//Unlimited
 	game_values.storedpowerupdelay	= 4;
 	game_values.bonuswheel			= 1;
 	game_values.keeppowerup			= false;
@@ -964,6 +967,7 @@ int main(int argc, char *argv[])
 			fread(&game_values.featherjumps, sizeof(short), 1, fp);
 			fread(&game_values.featherlimit, sizeof(short), 1, fp);
 			fread(&game_values.leaflimit, sizeof(short), 1, fp);
+			fread(&game_values.pwingslimit, sizeof(short), 1, fp);
 			fread(&game_values.shellttl, sizeof(short), 1, fp);
 			fread(&game_values.blueblockttl, sizeof(short), 1, fp);
 			fread(&game_values.storedpowerupdelay, sizeof(short), 1, fp);

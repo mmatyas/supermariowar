@@ -208,7 +208,7 @@ struct STextAward
 #define MENU_ITEM_NEIGHBOR_LEFT 2
 #define MENU_ITEM_NEIGHBOR_RIGHT 3
 
-#define NUM_POWERUPS 25
+#define NUM_POWERUPS 26
 #define NUM_WORLD_POWERUPS 15
 #define NUM_WORLD_SCORE_BONUSES 20
 
@@ -349,6 +349,7 @@ extern gfxSprite		spr_bulletbillpowerup;
 extern gfxSprite		spr_featherpowerup;
 extern gfxSprite		spr_leafpowerup;
 extern gfxSprite		spr_bombpowerup;
+extern gfxSprite		spr_pwingspowerup;
 
 extern gfxSprite		spr_shade[3];
 extern gfxSprite		spr_timershade;
@@ -833,6 +834,7 @@ struct gv
 	short		featherlimit;
 
 	short		leaflimit;
+	short		pwingslimit;
 
 	short		shellttl;
 	short		blueblockttl;

@@ -38,8 +38,8 @@ extern bool LoadFullSkin(gfxSprite ** sprites, short skinID, short colorID);
 extern void UpdateScoreBoard();
 
 //Rearrange display of powerups
-short iPowerupDisplayMap[NUM_POWERUPS] = { 4, 0, 1, 2, 3, 6, 10, 12, 11, 14, 13, 7, 16, 17, 18, 19, 15, 9, 5, 8, 20, 21, 22, 23, 24};
-short iPowerupPositionMap[NUM_POWERUPS] = { 1, 2, 3, 4, 0, 18, 5, 11, 19, 17, 6, 8, 7, 10, 9, 16, 12, 13, 14, 15, 20, 21, 22, 23, 24};
+short iPowerupDisplayMap[NUM_POWERUPS] = { 4, 0, 1, 2, 3, 6, 10, 12, 11, 14, 13, 7, 16, 17, 18, 19, 15, 9, 5, 8, 20, 21, 22, 23, 24, 25};
+short iPowerupPositionMap[NUM_POWERUPS] = { 1, 2, 3, 4, 0, 18, 5, 11, 19, 17, 6, 8, 7, 10, 9, 16, 12, 13, 14, 15, 20, 21, 22, 23, 24, 25};
 
 extern Uint8 GetScreenBackgroundFade();
 extern short LookupTeamID(short id);
@@ -136,6 +136,7 @@ void Menu::WriteGameOptions()
 		fwrite(&game_values.featherjumps, sizeof(short), 1, fp);
 		fwrite(&game_values.featherlimit, sizeof(short), 1, fp);
 		fwrite(&game_values.leaflimit, sizeof(short), 1, fp);
+		fwrite(&game_values.pwingslimit, sizeof(short), 1, fp);
 		fwrite(&game_values.shellttl, sizeof(short), 1, fp);
 		fwrite(&game_values.blueblockttl, sizeof(short), 1, fp);
 		fwrite(&game_values.storedpowerupdelay, sizeof(short), 1, fp);
