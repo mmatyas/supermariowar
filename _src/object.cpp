@@ -3179,9 +3179,7 @@ void MO_BonusHouseChest::update()
 void MO_BonusHouseChest::draw()
 {
 	if(state < 2)
-	{
 		spr->draw(ix, iy, 0, 0, iw, ih);
-	}
 
 	if(state >= 2)
 		spr->draw(ix, iy, 128, 0, iw, ih);

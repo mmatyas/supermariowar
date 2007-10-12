@@ -566,6 +566,7 @@ void UpdateScoreBoard();
 void PlayNextMusicTrack();
 void EnterBossMode(short type);
 bool IsExitAllowed();
+bool IsPauseAllowed();
 
 Menu g_Menu;
 gv game_values;
@@ -1690,7 +1691,7 @@ void RunGame()
 				COutputControl * playerKeys = &game_values.playerInput.outputControls[iPlayer];
 
 				//If the start key is pressed (pause key)
-				if(playerKeys->game_start.fPressed)
+				if(playerKeys->game_start.fPressed && IsPauseAllowed())
 				{
 					if(!game_values.showscoreboard && !game_values.exitinggame)
 					{
@@ -3309,6 +3310,11 @@ bool IsExitAllowed()
 	}
 
 	return true;
+}
+
+bool IsPauseAllowed()
+{
+	return !game_values.noexit;
 }
 
 

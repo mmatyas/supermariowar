@@ -2252,7 +2252,7 @@ void Menu::RunMenu()
 	fNeedMenuMusicReset = false;
 
 	if(game_values.gamemode->winningteam > -1 && game_values.tournamentwinner == -1 && 
-		((game_values.matchtype != MATCH_TYPE_TOUR && game_values.bonuswheel == 2) || (game_values.matchtype == MATCH_TYPE_TOUR && game_values.tourstops[game_values.tourstopcurrent - 1]->iBonusType)))
+		(((game_values.matchtype == MATCH_TYPE_SINGLE_GAME || game_values.matchtype == MATCH_TYPE_TOURNAMENT) && game_values.bonuswheel == 2) || (game_values.matchtype == MATCH_TYPE_TOUR && game_values.tourstops[game_values.tourstopcurrent - 1]->iBonusType)))
 	{
 		miBonusWheel->Reset(false);
 		mCurrentMenu = &mBonusWheelMenu;

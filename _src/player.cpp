@@ -1045,11 +1045,13 @@ void CPlayer::move()
 				}
 				case 24:  //leaf
 				{
+					powerup = 0;
 					SetPowerup(7);
 					break;
 				}
 				case 25:  //pwings
 				{
+					powerup = 0;
 					SetPowerup(8);
 					break;
 				}
