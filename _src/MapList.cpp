@@ -195,6 +195,7 @@ bool MapList::FindFilteredMap()
 	return true;
 }
 
+//Update to allow key combos like "hy" to do "hyrule castle"
 bool MapList::startswith(char letter)
 {
 	//Captialize the letter becuase all maps have first letter in caps

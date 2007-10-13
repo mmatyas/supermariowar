@@ -2378,7 +2378,11 @@ bool IO_MovingObject::collision_detection_checksides()
 	//First figure out where the corners of this object are touching
 	Uint8 iCase = 0;
 
-	short txl = ix / TILESIZE;
+	short txl = -1;
+	if(ix < 0)
+		txl = (ix + 640) / TILESIZE;
+	else
+		txl = ix / TILESIZE;
 
 	short txr = -1;
 	if(ix + collisionWidth >= 640)
@@ -7838,11 +7842,19 @@ void CO_Shell::collide(IO_MovingObject * object)
 
 				//Green shells should die on collision, other shells should not,
 				//except if they also hit a non dead on collision shell
-				if(fDieOnMovingPlayerCollision || state == 2 || (!shell->fDieOnMovingPlayerCollision && shell->state != 2))
-					Die();
 
-				if(shell->fDieOnMovingPlayerCollision || shell->state == 2 || (!fDieOnMovingPlayerCollision && state != 2))
+				if(shell->fSmoking && !fSmoking)
+					Die();
+				else if(!shell->fSmoking && fSmoking)
 					shell->Die();
+				else
+				{
+					if(fDieOnMovingPlayerCollision || state == 2 || (!shell->fDieOnMovingPlayerCollision && shell->state != 2))
+						Die();
+
+					if(shell->fDieOnMovingPlayerCollision || shell->state == 2 || (!fDieOnMovingPlayerCollision && state != 2))
+						shell->Die();
+				}
 			}
 			else if(type == movingobject_throwblock)
 			{
@@ -8274,9 +8286,11 @@ void CO_ThrowBlock::Kick(bool superkick)
 	iNoOwnerKillTime = 30;
 
 	state = 1;
-	ifsoundonplay(sfx_kicksound);
 
-	collision_detection_checksides();
+	if(collision_detection_checksides())
+		Die();
+	else
+		ifsoundonplay(sfx_kicksound);
 }
 
 void CO_ThrowBlock::Die()

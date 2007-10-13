@@ -15,7 +15,7 @@
 | blocks/maplist/2-layers/extended tile set added 15.07.2005|
 |                                                  by Two52 |
 |															|
-|				© 2004 Florian Hufsky <fhufsky@phorus.at>	|
+|		© 2004 Florian Hufsky <florian.hufsky@gmail.com>	|
 +----------------------------------------------------------*/
 
 #define _SMW_EDITOR
@@ -56,6 +56,7 @@ class MapTile
 		Warp		warp;
 		bool		nospawn[NUMSPAWNAREATYPES];
 		TileType	tiletype;
+		int			item;
 };
 
 class MapPlatform
@@ -125,6 +126,7 @@ int				move_start_y = 0;
 int				move_offset_x = 0;
 int				move_offset_y = 0;
 bool			move_nodrag = false;
+bool			move_replace = true;
 
 int				move_drag_start_x = 0;
 int				move_drag_start_y = 0;
@@ -465,6 +467,50 @@ void UpdateTileType(short x, short y)
 }
 
 
+void AdjustMapItems(short iClickX, short iClickY)
+{
+	for(short j = 0; j < g_map.iNumMapItems; j++)
+	{
+		if(g_map.mapitems[j].ix == iClickX && g_map.mapitems[j].iy == iClickY)
+		{
+			if(g_map.mapdatatop[iClickX][iClickY] != tile_nonsolid && g_map.mapdatatop[iClickX][iClickY] != tile_solid_on_top ||
+				g_map.objectdata[iClickX][iClickY] != BLOCKSETSIZE)
+			{
+				g_map.iNumMapItems--;
+
+				for(short k = j; k < g_map.iNumMapItems - 1; k++)
+				{
+					g_map.mapitems[k].itype = g_map.mapitems[k + 1].itype;
+					g_map.mapitems[k].ix = g_map.mapitems[k + 1].ix;
+					g_map.mapitems[k].iy = g_map.mapitems[k + 1].iy;
+				}
+			}
+
+			break;
+		}
+	}
+}
+
+void RemoveMapItemAt(short x, short y)
+{
+	for(short j = 0; j < g_map.iNumMapItems; j++)
+	{
+		if(g_map.mapitems[j].ix == x && g_map.mapitems[j].iy == y)
+		{
+			g_map.iNumMapItems--;
+
+			for(short k = j; k < g_map.iNumMapItems; k++)
+			{
+				g_map.mapitems[k].itype = g_map.mapitems[k + 1].itype;
+				g_map.mapitems[k].ix = g_map.mapitems[k + 1].ix;
+				g_map.mapitems[k].iy = g_map.mapitems[k + 1].iy;
+			}
+
+			break;
+		}
+	}
+}
+
 int editor_edit()
 {
 	bool done = false;
@@ -661,7 +707,12 @@ int editor_edit()
 						g_map.optimize();
 
 					if(event.key.keysym.sym == SDLK_m)
+					{
+						if(edit_mode == 3)
+							move_replace = !move_replace;
+
 						edit_mode = 3;
+					}
 
 					if(event.key.keysym.sym == SDLK_x)
 						edit_mode = 4;
@@ -699,37 +750,39 @@ int editor_edit()
 
 				case SDL_MOUSEBUTTONDOWN:
 				{
+					short iClickX = event.button.x / TILESIZE;
+					short iClickY = event.button.y / TILESIZE;
+
 					if(event.button.button == SDL_BUTTON_LEFT && !ignoreclick)
 					{
 						if(edit_mode == 0) //selected blocks
 						{
-							g_map.objectdata[event.button.x / TILESIZE][event.button.y / TILESIZE] = set_block;
+							g_map.objectdata[iClickX][iClickY] = set_block;
+							AdjustMapItems(iClickX, iClickY);
 						}
 						else if(edit_mode == 1) //selected tile(s)
 						{
-							short ix = event.button.x / TILESIZE;
-							short iy = event.button.y / TILESIZE;
-
 							for(short i = 0; i < set_tile_cols; i++)
 							{
-								short iLocalX = ix + i;
+								short iLocalX = iClickX + i;
 
 								for(short j = 0; j < set_tile_rows; j++)
 								{
-									short iLocalY = iy + j;
+									short iLocalY = iClickY + j;
 
 									if(iLocalX >= 0 && iLocalX < MAPWIDTH && iLocalY >= 0 && iLocalY < MAPHEIGHT)
 									{
 										g_map.mapdata[iLocalX][iLocalY][selected_layer] = (set_tile_start_y + j) * TILESETWIDTH + set_tile_start_x + i;
 										UpdateTileType(iLocalX, iLocalY);
+										AdjustMapItems(iLocalX, iLocalY);
 									}
 								}
 							}
 						}
 						else if(edit_mode == 2)
 						{
-							g_map.warpdata[event.button.x / TILESIZE][event.button.y / TILESIZE].direction = set_direction;
-							g_map.warpdata[event.button.x / TILESIZE][event.button.y / TILESIZE].connection = set_connection;
+							g_map.warpdata[iClickX][iClickY].direction = set_direction;
+							g_map.warpdata[iClickX][iClickY].connection = set_connection;
 						}
 						else if(edit_mode == 3)
 						{
@@ -748,7 +801,7 @@ int editor_edit()
 							}
 							else
 							{
-								if(selectedtiles[event.button.x / TILESIZE][event.button.y / TILESIZE])
+								if(selectedtiles[iClickX][iClickY])
 								{	
 									if(copyselectedtiles())
 									{
@@ -763,57 +816,56 @@ int editor_edit()
 
 									if(move_nodrag)
 									{
-										selectedtiles[event.button.x / TILESIZE][event.button.y / TILESIZE] = true;
+										selectedtiles[iClickX][iClickY] = true;
 									}
 									else
 									{
 										move_mode = 2;
-										move_drag_start_x = event.button.x / TILESIZE;
-										move_drag_start_y = event.button.y / TILESIZE;
+										move_drag_start_x = iClickX;
+										move_drag_start_y = iClickY;
 									}
 								}
 
-								move_start_x = event.button.x / TILESIZE;
-								move_start_y = event.button.y / TILESIZE;
+								move_start_x = iClickX;
+								move_start_y = iClickY;
 							}
 						}
 						else if(edit_mode == 4)
 						{
-							g_map.nospawn[0][event.button.x / TILESIZE][event.button.y / TILESIZE] = true;
+							g_map.nospawn[0][iClickX][iClickY] = true;
 						}
 						else if(edit_mode == 5)
 						{
-							g_map.nospawn[1][event.button.x / TILESIZE][event.button.y / TILESIZE] = true;
+							g_map.nospawn[1][iClickX][iClickY] = true;
 						}
 						else if(edit_mode == 6)
 						{
-							g_map.mapdatatop[event.button.x / TILESIZE][event.button.y / TILESIZE] = set_tiletype;
+							g_map.mapdatatop[iClickX][iClickY] = set_tiletype;
+							AdjustMapItems(iClickX, iClickY);
 						}
 						else if(edit_mode == 7)
 						{
-							//FIXME:: Don't place map item on solid tile or block
-							//and remove map item if block or solid tile is placed on it
 							if(g_map.iNumMapItems < MAXMAPITEMS)
 							{
-								short clickx = event.button.x / TILESIZE;
-								short clicky = event.button.y / TILESIZE;
-
-								bool fItemAlreadyThere = false;
+								bool fTileNotAvailable = false;
 								for(short j = 0; j < g_map.iNumMapItems; j++)
 								{
-									if(g_map.mapitems[j].ix == clickx && g_map.mapitems[j].iy == clicky)
+									if(g_map.mapitems[j].ix == iClickX && g_map.mapitems[j].iy == iClickY)
 									{
-										fItemAlreadyThere = true;
+										fTileNotAvailable = true;
 										break;
 									}
 								}
 
-								if(!fItemAlreadyThere)
+								if(g_map.mapdatatop[iClickX][iClickY] != tile_nonsolid && g_map.mapdatatop[iClickX][iClickY] != tile_solid_on_top)
+									fTileNotAvailable = true;
+
+								if(!fTileNotAvailable)
 								{
 									MapItem * mapitem = &g_map.mapitems[g_map.iNumMapItems];
 									mapitem->itype = set_mapitem;
-									mapitem->ix = event.button.x / TILESIZE;
-									mapitem->iy = event.button.y / TILESIZE;
+									mapitem->ix = iClickX;
+									mapitem->iy = iClickY;
 
 									g_map.iNumMapItems++;
 								}
@@ -821,24 +873,22 @@ int editor_edit()
 						}
 						else if(edit_mode == 8)
 						{
-							g_map.mapdata[event.button.x / TILESIZE][event.button.y / TILESIZE][selected_layer] = set_animation + TILESETSIZE + 1;
+							g_map.mapdata[iClickX][iClickY][selected_layer] = set_animation + TILESETSIZE + 1;
 						}
 					}
 					else if(event.button.button == SDL_BUTTON_RIGHT)
 					{
 						if(edit_mode == 0)
-							g_map.objectdata[event.button.x / TILESIZE][event.button.y / TILESIZE] = BLOCKSETSIZE;
+							g_map.objectdata[iClickX][iClickY] = BLOCKSETSIZE;
 						else if(edit_mode == 1 || edit_mode == 8)
 						{
-							short x = event.button.x / TILESIZE;
-							short y = event.button.y / TILESIZE;
-                            g_map.mapdata[x][y][selected_layer] = TILESETSIZE;
-							UpdateTileType(x, y);
+                            g_map.mapdata[iClickX][iClickY][selected_layer] = TILESETSIZE;
+							UpdateTileType(iClickX, iClickY);
 						}
 						else if(edit_mode == 2)
 						{
-							g_map.warpdata[event.button.x / TILESIZE][event.button.y / TILESIZE].direction = -1;
-							g_map.warpdata[event.button.x / TILESIZE][event.button.y / TILESIZE].connection = -1;
+							g_map.warpdata[iClickX][iClickY].direction = -1;
+							g_map.warpdata[iClickX][iClickY].connection = -1;
 						}
 						else if(edit_mode == 3)
 						{
@@ -851,9 +901,9 @@ int editor_edit()
 							}
 							else
 							{
-								if(selectedtiles[event.button.x / TILESIZE][event.button.y / TILESIZE])
+								if(selectedtiles[iClickX][iClickY])
 								{
-									selectedtiles[event.button.x / TILESIZE][event.button.y / TILESIZE] = false;
+									selectedtiles[iClickX][iClickY] = false;
 								}
 								else
 								{
@@ -863,37 +913,19 @@ int editor_edit()
 						}
 						else if(edit_mode == 4)
 						{
-							g_map.nospawn[0][event.button.x / TILESIZE][event.button.y / TILESIZE] = false;
+							g_map.nospawn[0][iClickX][iClickY] = false;
 						}
 						else if(edit_mode == 5)
 						{
-							g_map.nospawn[1][event.button.x / TILESIZE][event.button.y / TILESIZE] = false;
+							g_map.nospawn[1][iClickX][iClickY] = false;
 						}
 						else if(edit_mode == 6)
 						{
-							g_map.mapdatatop[event.button.x / TILESIZE][event.button.y / TILESIZE] = tile_nonsolid;
+							g_map.mapdatatop[iClickX][iClickY] = tile_nonsolid;
 						}
 						else if(edit_mode == 7)
 						{
-							short clickx = event.button.x / TILESIZE;
-							short clicky = event.button.y / TILESIZE;
-
-							for(short j = 0; j < g_map.iNumMapItems; j++)
-							{
-								if(g_map.mapitems[j].ix == clickx && g_map.mapitems[j].iy == clicky)
-								{
-									g_map.iNumMapItems--;
-
-									for(short i = j; i < g_map.iNumMapItems; i++)
-									{
-										g_map.mapitems[i].itype = g_map.mapitems[i + 1].itype;
-										g_map.mapitems[i].ix = g_map.mapitems[i + 1].ix;
-										g_map.mapitems[i].iy = g_map.mapitems[i + 1].iy;
-									}
-
-									break;
-								}
-							}
+							RemoveMapItemAt(iClickX, iClickY);
 						}
 					}
 					
@@ -902,94 +934,95 @@ int editor_edit()
 
 				case SDL_MOUSEMOTION:
 				{
+					short iClickX = event.button.x / TILESIZE;
+					short iClickY = event.button.y / TILESIZE;
+
 					if(event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT) && !ignoreclick)
 					{
 						if(edit_mode == 0)
 						{
-							g_map.objectdata[event.button.x / TILESIZE][event.button.y / TILESIZE] = set_block;
+							g_map.objectdata[iClickX][iClickY] = set_block;
+							AdjustMapItems(iClickX, iClickY);
 						}
 						else if(edit_mode == 1)
 						{
-							short ix = event.button.x / TILESIZE;
-							short iy = event.button.y / TILESIZE;
-
 							for(short i = 0; i < set_tile_cols; i++)
 							{
-								short iLocalX = ix + i;
+								short iLocalX = iClickX + i;
 
 								for(short j = 0; j < set_tile_rows; j++)
 								{
-									short iLocalY = iy + j;
+									short iLocalY = iClickY + j;
 
 									if(iLocalX >= 0 && iLocalX < MAPWIDTH && iLocalY >= 0 && iLocalY < MAPHEIGHT)
 									{
 										g_map.mapdata[iLocalX][iLocalY][selected_layer] = (set_tile_start_y + j) * TILESETWIDTH + set_tile_start_x + i;
 										UpdateTileType(iLocalX, iLocalY);
+										AdjustMapItems(iLocalY, iLocalY);
 									}
 								}
 							}
 						}
 						else if(edit_mode == 2)
 						{
-							g_map.warpdata[event.button.x / TILESIZE][event.button.y / TILESIZE].direction = set_direction;
-							g_map.warpdata[event.button.x / TILESIZE][event.button.y / TILESIZE].connection = set_connection;
+							g_map.warpdata[iClickX][iClickY].direction = set_direction;
+							g_map.warpdata[iClickX][iClickY].connection = set_connection;
 						}
 						else if(edit_mode == 3)
 						{
 							if(move_mode == 0)
 							{
-								selectedtiles[event.button.x / TILESIZE][event.button.y / TILESIZE] = true;
+								selectedtiles[iClickX][iClickY] = true;
 							}
 						}
 						else if(edit_mode == 4)
 						{
-							g_map.nospawn[0][event.button.x / TILESIZE][event.button.y / TILESIZE] = true;
+							g_map.nospawn[0][iClickX][iClickY] = true;
 						}
 						else if(edit_mode == 5)
 						{
-							g_map.nospawn[1][event.button.x / TILESIZE][event.button.y / TILESIZE] = true;
+							g_map.nospawn[1][iClickX][iClickY] = true;
 						}
 						else if(edit_mode == 6)
 						{
-							g_map.mapdatatop[event.button.x / TILESIZE][event.button.y / TILESIZE] = set_tiletype;
+							g_map.mapdatatop[iClickX][iClickY] = set_tiletype;
+							AdjustMapItems(iClickX, iClickY);
 						}
 						else if(edit_mode == 8)
 						{
-							g_map.mapdata[event.button.x / TILESIZE][event.button.y / TILESIZE][selected_layer] = set_animation + TILESETSIZE + 1;
+							g_map.mapdata[iClickX][iClickY][selected_layer] = set_animation + TILESETSIZE + 1;
 						}
 					}
 					else if(event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT))
 					{
 						if(edit_mode == 0)
-							g_map.objectdata[event.button.x / TILESIZE][event.button.y / TILESIZE] = BLOCKSETSIZE;
+							g_map.objectdata[iClickX][iClickY] = BLOCKSETSIZE;
 						else if(edit_mode == 1 || edit_mode == 8)
 						{
-							short x = event.button.x / TILESIZE;
-							short y = event.button.y / TILESIZE;
-							g_map.mapdata[x][y][selected_layer] = TILESETSIZE;
-							UpdateTileType(x, y);
+							g_map.mapdata[iClickX][iClickY][selected_layer] = TILESETSIZE;
+							UpdateTileType(iClickX, iClickY);
 						}
 						else if(edit_mode == 2)
 						{
-							g_map.warpdata[event.button.x / TILESIZE][event.button.y / TILESIZE].direction = -1;
-							g_map.warpdata[event.button.x / TILESIZE][event.button.y / TILESIZE].connection = -1;
+							g_map.warpdata[iClickX][iClickY].direction = -1;
+							g_map.warpdata[iClickX][iClickY].connection = -1;
 						}
 						else if(edit_mode == 3)
 						{
 							if(move_mode == 0)
-								selectedtiles[event.button.x / TILESIZE][event.button.y / TILESIZE] = false;
+								selectedtiles[iClickX][iClickY] = false;
 						}
 						else if(edit_mode == 4)
 						{
-							g_map.nospawn[0][event.button.x / TILESIZE][event.button.y / TILESIZE] = false;
+							g_map.nospawn[0][iClickX][iClickY] = false;
 						}
 						else if(edit_mode == 5)
 						{
-							g_map.nospawn[1][event.button.x / TILESIZE][event.button.y / TILESIZE] = false;
+							g_map.nospawn[1][iClickX][iClickY] = false;
 						}
 						else if(edit_mode == 6)
 						{
-							g_map.mapdatatop[event.button.x / TILESIZE][event.button.y / TILESIZE] = tile_nonsolid;
+							g_map.mapdatatop[iClickX][iClickY] = tile_nonsolid;
 						}
 					}
 				
@@ -998,6 +1031,9 @@ int editor_edit()
 
 				case SDL_MOUSEBUTTONUP:
 				{
+					short iClickX = event.button.x / TILESIZE;
+					short iClickY = event.button.y / TILESIZE;
+
 					if(event.button.button == SDL_BUTTON_LEFT)
 					{
 						ignoreclick = false;
@@ -1015,13 +1051,10 @@ int editor_edit()
 						}
 						else if(move_mode == 2)
 						{
-							int currentx = event.button.x / TILESIZE;
-							int currenty = event.button.y / TILESIZE;
-
-							int left = move_drag_start_x < currentx ? move_drag_start_x : currentx;
-							int top = move_drag_start_y < currenty ? move_drag_start_y : currenty;
-							int right = move_drag_start_x < currentx ? currentx : move_drag_start_x;
-							int bottom = move_drag_start_y < currenty ? currenty : move_drag_start_y;
+							int left = move_drag_start_x < iClickX ? move_drag_start_x : iClickX;
+							int top = move_drag_start_y < iClickY ? move_drag_start_y : iClickY;
+							int right = move_drag_start_x < iClickX ? iClickX : move_drag_start_x;
+							int bottom = move_drag_start_y < iClickY ? iClickY : move_drag_start_y;
 
 							for(int k = top; k <= bottom; k++)
 							{
@@ -1134,7 +1167,10 @@ int editor_edit()
 				}
 			}
 
-			menu_font_small.draw(0,0, "Move Mode");
+			if(move_replace)
+				menu_font_small.draw(0,0, "Move Mode - Replace");
+			else
+				menu_font_small.draw(0,0, "Move Mode - Merge");
 
 			if(view_only_layer)
 				spr_backgroundlevel.draw(2, 18 + (3 - selected_layer) * 18, selected_layer * 16, (3 - selected_layer) * 18, 16, 16);
@@ -1215,7 +1251,6 @@ void drawlayer(int layer, bool fUseCopied, short iBlockSize)
 {
 	int i, j, ts;
 	SDL_Rect bltrect, tilebltrect;
-	
 	
 	tilebltrect.w = iBlockSize;
 	tilebltrect.h = iBlockSize;
@@ -1369,6 +1404,26 @@ void drawmap(bool fScreenshot, short iBlockSize)
 		for(short j = 0; j < g_map.iNumMapItems; j++)
 		{
 			spr_mapitems[iBlockSize == TILESIZE ? 0 : iBlockSize == PREVIEWTILESIZE ? 1 : 2].draw(g_map.mapitems[j].ix * iBlockSize, g_map.mapitems[j].iy * iBlockSize, g_map.mapitems[j].itype * iBlockSize, 0, iBlockSize, iBlockSize);
+		}
+
+		if(!fScreenshot)
+		{
+			for(int j = 0; j < MAPHEIGHT; j++)
+			{
+				for(int i = 0; i < MAPWIDTH; i++)
+				{
+					short iNewX = i - move_offset_x;
+					short iNewY = j - move_offset_y;
+
+					if((move_mode == 1 || move_mode == 3) && iNewX >= 0 && iNewX < MAPWIDTH &&
+						iNewY >= 0 && iNewY < MAPHEIGHT && 
+						selectedtiles[iNewX][iNewY])
+					{
+						if(copiedtiles[iNewX][iNewY].item >= 0)
+							spr_mapitems[0].draw(i << 5, j << 5, copiedtiles[iNewX][iNewY].item << 5, 0, TILESIZE, TILESIZE);
+					}
+				}
+			}
 		}
 	}
 
@@ -3470,8 +3525,6 @@ int newmap()
 	{
 		g_map.clearMap();
 		g_map.clearPlatforms();
-		g_map.eyecandyID = 0;
-		g_map.iNumMapItems = 0;
 		g_map.saveMap(convertPath(strcat(strcat(mapLocation, fileName),".map")));
 		maplist.add(strcat(fileName, ".map"));
 		maplist.find(fileName);
@@ -3549,6 +3602,16 @@ bool copyselectedtiles()
 				
 				for(short iType = 0; iType < NUMSPAWNAREATYPES; iType++)
 					copiedtiles[j][k].nospawn[iType] = g_map.nospawn[iType][j][k];
+
+				copiedtiles[j][k].item = -1;
+				for(short iMapItem = 0; iMapItem < g_map.iNumMapItems; iMapItem++)
+				{
+					if(g_map.mapitems[iMapItem].ix == j && g_map.mapitems[iMapItem].iy == k)
+					{
+						copiedtiles[j][k].item = g_map.mapitems[iMapItem].itype;
+						break;
+					}
+				}
 			}
 		}
 	}
@@ -3585,11 +3648,30 @@ void clearselectedmaptiles()
 
 					for(short iType = 0; iType < NUMSPAWNAREATYPES; iType++)
 						g_map.nospawn[iType][j][k] = false;
+
+					RemoveMapItemAt(j, k);
 				}
 
 				UpdateTileType(j, k);
 			}
 		}
+	}
+}
+
+void replacetile(short * iDstTile, short iSrcTile, short iType)
+{
+	if(move_replace)
+	{
+		*iDstTile = iSrcTile;
+	}
+	else
+	{
+		if(iType == 0 && iSrcTile != TILESETSIZE)
+			*iDstTile = iSrcTile;
+		else if(iType == 1 && iSrcTile != BLOCKSETSIZE)
+			*iDstTile = iSrcTile;
+		else if(iType == 2)
+			*iDstTile = iSrcTile;
 	}
 }
 
@@ -3606,27 +3688,49 @@ void pasteselectedtiles(int movex, int movey)
 				if(j + movex >= 0 && j + movex < MAPWIDTH && 
 					k + movey >= 0 && k + movey < MAPHEIGHT)
 				{
+					short iNewX = j + movex;
+					short iNewY = k + movey;
+
 					if(view_only_layer)
 					{
-						g_map.mapdata[j + movex][k + movey][selected_layer] = copiedtiles[j][k].tile[copiedlayer];
+						replacetile(&g_map.mapdata[iNewX][iNewY][selected_layer], copiedtiles[j][k].tile[copiedlayer], 0);
 					}
 					else
 					{
-						g_map.mapdata[j + movex][k + movey][0] = copiedtiles[j][k].tile[0];
-						g_map.mapdata[j + movex][k + movey][1] = copiedtiles[j][k].tile[1];
-						g_map.mapdata[j + movex][k + movey][2] = copiedtiles[j][k].tile[2];
-						g_map.mapdata[j + movex][k + movey][3] = copiedtiles[j][k].tile[3];
+						replacetile(&g_map.mapdata[iNewX][iNewY][0], copiedtiles[j][k].tile[0], 0);
+						replacetile(&g_map.mapdata[iNewX][iNewY][1], copiedtiles[j][k].tile[1], 0);
+						replacetile(&g_map.mapdata[iNewX][iNewY][2], copiedtiles[j][k].tile[2], 0);
+						replacetile(&g_map.mapdata[iNewX][iNewY][3], copiedtiles[j][k].tile[3], 0);
 
-						g_map.objectdata[j + movex][k + movey] = copiedtiles[j][k].block;
+						replacetile(&g_map.objectdata[iNewX][iNewY], copiedtiles[j][k].block, 1);
 
-						g_map.warpdata[j + movex][k + movey].connection = copiedtiles[j][k].warp.connection;
-						g_map.warpdata[j + movex][k + movey].direction = copiedtiles[j][k].warp.direction;
-						g_map.warpdata[j + movex][k + movey].id = copiedtiles[j][k].warp.id;
+						replacetile(&g_map.warpdata[iNewX][iNewY].connection, copiedtiles[j][k].warp.connection, copiedtiles[j][k].warp.connection == -1 ? -1 : 2);
+						replacetile(&g_map.warpdata[iNewX][iNewY].direction, copiedtiles[j][k].warp.direction, copiedtiles[j][k].warp.connection == -1 ? -1 : 2);
+						replacetile(&g_map.warpdata[iNewX][iNewY].id, copiedtiles[j][k].warp.id, copiedtiles[j][k].warp.connection == -1 ? -1 : 2);
 
-						g_map.mapdatatop[j + movex][k + movey] = copiedtiles[j][k].tiletype;
+						if(move_replace)
+							g_map.mapdatatop[iNewX][iNewY] = copiedtiles[j][k].tiletype;
+						else
+							UpdateTileType(j, k);
 						
 						for(short iType = 0; iType < NUMSPAWNAREATYPES; iType++)
-							g_map.nospawn[iType][j + movex][k + movey] = copiedtiles[j][k].nospawn[iType];
+							g_map.nospawn[iType][iNewX][iNewY] = copiedtiles[j][k].nospawn[iType];
+
+						if(move_replace)
+							RemoveMapItemAt(j, k);
+
+						if(g_map.iNumMapItems < MAXMAPITEMS && copiedtiles[j][k].item >= 0)
+						{
+							if(!move_replace)
+								RemoveMapItemAt(j, k);
+
+							MapItem * mapitem = &g_map.mapitems[g_map.iNumMapItems];
+							mapitem->itype = copiedtiles[j][k].item;
+							mapitem->ix = iNewX;
+							mapitem->iy = iNewY;
+
+							g_map.iNumMapItems++;
+						}
 					}
 				}
 			}

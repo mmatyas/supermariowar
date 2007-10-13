@@ -153,10 +153,8 @@ void CMap::saveTileSet(const std::string& tilesetfile)
 void CMap::clearTileSet()
 {
 	int i;
-	for(i=0; i<TILESETSIZE; i++)
-	{
+	for(i = 0; i < TILESETSIZE; i++)
 		tileset[i] = tile_nonsolid;
-	}
 
 	tilebltrect.w = TILESIZE;
 	tilebltrect.h = TILESIZE;
@@ -185,6 +183,9 @@ void CMap::clearMap()
 			nospawn[1][i][j] = false;
 		}
 	}
+
+	eyecandyID = 0;
+	iNumMapItems = 0;
 
 	bltrect.w = TILESIZE;
 	bltrect.h = TILESIZE;

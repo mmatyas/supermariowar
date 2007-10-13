@@ -252,6 +252,8 @@ class CMap
 		friend void pasteselectedtiles(int movex, int movey);
 
 		friend void UpdateTileType(short x, short y);
+		friend void AdjustMapItems(short iClickX, short iClickY);
+		friend void RemoveMapItemAt(short x, short y);
 
 		friend int editor_edit();
 		friend int editor_tiles();

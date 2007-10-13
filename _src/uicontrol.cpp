@@ -3337,7 +3337,9 @@ void MI_TournamentScoreboard::RefreshWorldScores(short gameWinner)
 
 		for(short iPlayer = 0; iPlayer < iTeamCounts[iTeam]; iPlayer++)
 		{
+			static short iPlaceSprite[4] = {4, 0, 8, 9};
 			miPlayerImages[iTeam][iPlayer]->SetPosition(ix + iScoreboardPlayerOffsetsX[iTeamCounts[iTeam] - 1][iPlayer] - 40, iTeamY + 16);
+			miPlayerImages[iTeam][iPlayer]->SetImageSource(spr_player[iTeamIDs[iTeam][iPlayer]][iPlaceSprite[game_values.tournament_scores[iTeam].wins]]);
 		}
 
 		tourScores[iTeam]->SetPosition(ix + 508, iTeamY + 24);
@@ -3436,7 +3438,9 @@ void MI_TournamentScoreboard::RefreshTourScores()
 
 		for(short iPlayer = 0; iPlayer < iTeamCounts[iTeam]; iPlayer++)
 		{
+			static short iPlaceSprite[4] = {4, 0, 8, 9};
 			miPlayerImages[iTeam][iPlayer]->SetPosition(ix + iScoreboardPlayerOffsetsX[iTeamCounts[iTeam] - 1][iPlayer] - 40, iTeamY + 16);
+			miPlayerImages[iTeam][iPlayer]->SetImageSource(spr_player[iTeamIDs[iTeam][iPlayer]][iPlaceSprite[game_values.tournament_scores[iTeam].wins]]);
 		}
 
 		for(short iGame = 0; iGame < game_values.tourstopcurrent; iGame++)

@@ -93,8 +93,8 @@ short controlkeys[2][2][4][NUM_KEYS] = { { { {SDLK_LEFT, SDLK_RIGHT, SDLK_UP, SD
 char * GameInputNames[NUM_KEYS] = {"Left", "Right", "Jump", "Down", "Turbo", "Use Item", "Pause", "Exit"};
 char * MenuInputNames[NUM_KEYS] = {"Up", "Down", "Left", "Right", "Select", "Cancel", "Random", "Fast Map"};
 
-//Poison, 1up, 2up, 3up, 5up, firepower, star, clock, bobomb, POW, Bullet Bill, hammer, Green Shell, Red Shell, Spiny Shell, Buzzy Shell, MOd, Feather
-short g_iDefaultPowerupWeights[] = {5, 10, 4, 2, 1, 10, 8, 4, 4, 2, 2, 4, 8, 4, 2, 4, 2, 4, 5, 6};
+//Poison, 1up, 2up, 3up, 5up, firepower, star, clock, bobomb, POW, Bullet Bill, hammer, Green Shell, Red Shell, Spiny Shell, Buzzy Shell, MOd, Feather, Tanooki, Sledge, Podobo, Bombs, Leaf, Pwings
+short g_iDefaultPowerupWeights[] = {5, 10, 4, 2, 1, 10, 8, 4, 4, 2, 2, 4, 8, 4, 2, 4, 2, 4, 5, 6, 6, 2, 4, 4, 5, 3};
 
 //Conversion to switch 1.6 tiles into 1.7 tiles
 short g_iTileConversion[] =    {0,1,2,3,4,5,6,7,8,9,

@@ -583,7 +583,6 @@ bool g_fRecordTest = false;
 
 // ------ MAIN ------
 int main(int argc, char *argv[])
-
 {
 	printf("-------------------------------------------------------------------------------\n");
 	printf(" %s %s\n", TITLESTRING, VERSIONNUMBER);
