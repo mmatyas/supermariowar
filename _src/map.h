@@ -158,16 +158,6 @@ class CMap
 		short musicCategoryID;
 		short iNumMapItems;
 
-		void WriteInt(int out, FILE * outFile);
-		int ReadInt(FILE * inFile);
-		void ReadIntChunk(int * mem, size_t iQuantity, FILE * inFile);
-
-		void WriteFloat(float out, FILE * outFile);
-		float ReadFloat(FILE * inFile);
-
-		void WriteString(char * szString, FILE * outFile);
-		void ReadString(char * szString, short size, FILE * outFile);
-
 		TileType * GetTileSet() {return tileset;}
 
 	private:
@@ -253,7 +243,7 @@ class CMap
 
 		friend void UpdateTileType(short x, short y);
 		friend void AdjustMapItems(short iClickX, short iClickY);
-		friend void RemoveMapItemAt(short x, short y);
+		friend void RemoveMapItemAt(short x, short y);	
 
 		friend int editor_edit();
 		friend int editor_tiles();

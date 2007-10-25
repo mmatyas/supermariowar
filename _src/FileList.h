@@ -1,3 +1,6 @@
+#ifndef __FILELIST_H_
+#define __FILELIST_H_
+
 #include <string>
 
 //it was kinda a bad idea to have skinlist and announcer list based on this, because both are accessed in different ways (skinlist like an vector and announcer list like a list). grrrr
@@ -6,7 +9,7 @@ class SimpleFileList
     public:
 		SimpleFileList() {};
         SimpleFileList(const std::string &path, const std::string &extension);
-        virtual ~SimpleFileList(){;};	//i have no idea how to do that virtual destructor crap right. i guess this might do it.
+        virtual ~SimpleFileList(){;};
         const char * GetIndex(unsigned int index);
         int GetCount() {return filelist.size();}
 
@@ -255,4 +258,6 @@ class WorldMusicList
         std::vector<WorldMusicEntry*> entries;
         int currentIndex;
 };
+
+#endif //__FILELIST_H_
 

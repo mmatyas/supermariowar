@@ -238,6 +238,7 @@ std::string stripCreatorAndDotMap(const std::string &filename);
 #include "MapList.h"
 #include "FileList.h"
 #include "movingplatform.h"
+#include "fileio.h"
 #include "map.h"
 #include "player.h"
 #include "object.h"
@@ -245,6 +246,7 @@ std::string stripCreatorAndDotMap(const std::string &filename);
 #include "eyecandy.h"
 #include "gamemodes.h"
 #include "world.h"
+#include "TilesetManager.h"
 
 
 //------------- global variables / etc -------------
