@@ -168,6 +168,12 @@
 				RelativePath="..\..\_src\eyecandy.h">
 			</File>
 			<File
+				RelativePath="..\..\_src\FileIO.cpp">
+			</File>
+			<File
+				RelativePath="..\..\_src\FileIO.h">
+			</File>
+			<File
 				RelativePath="..\..\_src\FileList.cpp">
 			</File>
 			<File
@@ -342,6 +348,12 @@
 				RelativePath="..\..\_src\splash.cpp">
 			</File>
 			<File
+				RelativePath="..\..\_src\TilesetManager.cpp">
+			</File>
+			<File
+				RelativePath="..\..\_src\TilesetManager.h">
+			</File>
+			<File
 				RelativePath="..\..\_src\uicontrol.cpp">
 			</File>
 			<File
@@ -427,18 +439,6 @@
 				RelativePath="..\..\_src\sfx.h">
 			</File>
 		</Filter>
-		<File
-			RelativePath="..\..\_src\FileIO.cpp">
-		</File>
-		<File
-			RelativePath="..\..\_src\FileIO.h">
-		</File>
-		<File
-			RelativePath="..\..\_src\TilesetManager.cpp">
-		</File>
-		<File
-			RelativePath="..\..\_src\TilesetManager.h">
-		</File>
 	</Files>
 	<Globals>
 		<Global

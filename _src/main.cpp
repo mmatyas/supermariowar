@@ -256,6 +256,7 @@ extern short controlkeys[2][2][4][NUM_KEYS];
 extern short g_iVersion[];
 
 CMap			g_map;
+CTilesetManager g_tilesetmanager;
 
 CEyecandyContainer eyecandyback;
 CEyecandyContainer eyecandyfront;
@@ -591,6 +592,8 @@ int main(int argc, char *argv[])
 
 	gfx_init(640, 480, false);		//initialize the graphics (SDL)
 	blitdest = screen;
+	
+	g_tilesetmanager.Init();
 
 	/*
 	//Comment this in to performance test the preview map loading

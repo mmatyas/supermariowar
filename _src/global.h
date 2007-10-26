@@ -259,6 +259,7 @@ extern short			x_shake;
 extern short			y_shake;
 
 extern CMap				g_map;
+extern CTilesetManager	g_tilesetmanager;
 extern CPlayer			*list_players[4];
 extern short			list_players_cnt;
 

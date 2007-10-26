@@ -1812,6 +1812,7 @@ void CMap::draw(SDL_Surface *targetSurface, int layer)
 			if(ts == TILESETSIZE)
 				continue;
 
+			//TODO:: Remove this tile optimization in favor of the new tilesetmanager
 			tilebltrect.x = iGameTileX[ts];
 			tilebltrect.y = iGameTileY[ts];
 
@@ -1876,6 +1877,7 @@ void CMap::draw(SDL_Surface *targetSurface, int layer)
 			}
 			else
 			{
+				//g_tilesetmanager.Draw(targetSurface, 0, 0, ts % 32, ts / 32, i, j);
 				SDL_BlitSurface(spr_maptiles[0].getSurface(), &tilebltrect, targetSurface, &bltrect);
 			}
 		}

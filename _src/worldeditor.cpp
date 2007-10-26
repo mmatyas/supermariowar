@@ -114,6 +114,7 @@ CGameMode		*gamemodes[GAMEMODE_LAST];
 bool			fResumeMusic;
 MapList			maplist;
 CMap			g_map;
+CTilesetManager g_tilesetmanager;
 
 void DECLSPEC soundfinished(int channel){}
 void DECLSPEC musicfinished(){}
@@ -204,6 +205,7 @@ int main(int argc, char *argv[])
 
 	gfx_init(640,480, false);
 	blitdest = screen;
+	g_tilesetmanager.Init();
 
 	SDL_WM_SetCaption(MAPTITLESTRING, "worldeditor.ico");
 

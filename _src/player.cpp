@@ -1315,7 +1315,6 @@ void CPlayer::move()
 			}
 		}
 
-
 		if(!game_values.slowdownfreeze || game_values.slowdownon == teamID)
 		{
 			if(playerKeys->game_down.fDown)

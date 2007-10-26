@@ -136,6 +136,7 @@ int				move_drag_offset_y = 0;
 int				set_animation = 0;
 
 CMap			g_map;
+CTilesetManager g_tilesetmanager;
 int				state;
 bool			selectedtiles[MAPWIDTH][MAPHEIGHT];
 bool			moveselectedtiles[MAPWIDTH][MAPHEIGHT];
@@ -255,6 +256,7 @@ int main(int argc, char *argv[])
 
 	gfx_init(640,480, false);
 	blitdest = screen;
+	g_tilesetmanager.Init();
 
 	SDL_WM_SetCaption(MAPTITLESTRING, "leveleditor.ico");
 
