@@ -238,7 +238,7 @@ std::string stripCreatorAndDotMap(const std::string &filename);
 #include "MapList.h"
 #include "FileList.h"
 #include "movingplatform.h"
-#include "fileio.h"
+#include "FileIO.h"
 #include "map.h"
 #include "player.h"
 #include "object.h"

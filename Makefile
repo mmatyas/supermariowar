@@ -1,10 +1,11 @@
 all : smw leveledit worldedit
 
 
-COMMON_OBJS:=build/FileList.o build/MapList.o build/SFont.o \
-           build/dirlist.o build/eyecandy.o build/gfx.o build/global.o \
-           build/input.o build/map.o build/movingplatform.o \
-           build/path.o build/savepng.o build/sfx.o
+COMMON_OBJS:=build/FileIO.o build/FileList.o build/MapList.o \
+           build/SFont.o build/TilesetManager.o build/dirlist.o \
+           build/eyecandy.o build/gfx.o build/global.o build/input.o \
+           build/map.o build/movingplatform.o build/path.o \
+           build/savepng.o build/sfx.o
 SMW_OBJS:= build/HashTable.o build/ai.o build/gamemodes.o build/main.o \
            build/map.o build/menu.o build/object.o build/player.o \
            build/splash.o build/uicontrol.o build/uimenu.o build/world.o
