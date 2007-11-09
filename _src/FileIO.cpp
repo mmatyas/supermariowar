@@ -92,12 +92,12 @@ void WriteString(char * szString, FILE * outFile)
 	fwrite(szString, sizeof(char), iLen, outFile);
 }
 
-void ReadString(char * szString, short size, FILE * outFile)
+void ReadString(char * szString, short size, FILE * inFile)
 {
-	int iLen = ReadInt(outFile);
+	int iLen = ReadInt(inFile);
 
 	char * szReadString = new char[iLen];
-	fread(szReadString, sizeof(char), iLen, outFile);
+	fread(szReadString, sizeof(char), iLen, inFile);
 	szReadString[iLen - 1] = 0;
 
 	//Prevent buffer overflow  5253784 5253928
@@ -105,5 +105,20 @@ void ReadString(char * szString, short size, FILE * outFile)
 	szString[size - 1] = 0;
 
 	delete [] szReadString;
+}
+
+
+void WriteByteFromShort(short out, FILE * outFile)
+{
+	char b = (char)out;
+	fwrite(&b, sizeof(char), 1, outFile);
+}
+
+short ReadByteAsShort(FILE * inFile)
+{
+	char b;
+	fread(&b, sizeof(char), 1, inFile);
+
+	return (short)b;
 }
 

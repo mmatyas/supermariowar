@@ -13,22 +13,22 @@ CTileset::CTileset(const char * szpath)
 
 	strcpy(szFile, szpath);
 	strcat(szFile, "/large.png");
-	__load_gfxck(sSprites[0], szFile);
+	__load_gfxck(sSprites[0], convertPartialPath(szFile));
 
 	sSurfaces[0] = sSprites[0].getSurface(); //optimization for repeat surface use
 
-	iWidth = sSprites[0].getWidth();
-	iHeight = sSprites[0].getHeight();
+	iWidth = sSprites[0].getWidth() / TILESIZE;
+	iHeight = sSprites[0].getHeight() / TILESIZE;
 
 	strcpy(szFile, szpath);
 	strcat(szFile, "/medium.png");
-	__load_gfxck(sSprites[1], szFile);
+	__load_gfxck(sSprites[1], convertPartialPath(szFile));
 
 	sSurfaces[1] = sSprites[1].getSurface();
 
 	strcpy(szFile, szpath);
 	strcat(szFile, "/small.png");
-	__load_gfxck(sSprites[2], szFile);
+	__load_gfxck(sSprites[2], convertPartialPath(szFile));
 
 	sSurfaces[2] = sSprites[2].getSurface();
 
@@ -74,9 +74,33 @@ CTileset::~CTileset()
 	tiletypes = NULL;
 }
 
+TileType CTileset::GetTileType(short iTileCol, short iTileRow)
+{
+	return tiletypes[iTileCol + iTileRow * iWidth];
+}
+
 void CTileset::SetTileType(short iTileCol, short iTileRow, TileType type)
 {
 	tiletypes[iTileCol + iTileRow * iWidth] = type;
+}
+
+void CTileset::IncrementTileType(short iTileCol, short iTileRow)
+{
+	short iTile = iTileCol + iTileRow * iWidth;
+	if(tiletypes[iTile] == tile_nonsolid)
+		tiletypes[iTile] = tile_solid;
+	else if(tiletypes[iTile] == tile_solid)
+		tiletypes[iTile] = tile_solid_on_top;
+	else if(tiletypes[iTile] == tile_solid_on_top)
+		tiletypes[iTile] = tile_ice;
+	else if(tiletypes[iTile] == tile_ice)
+		tiletypes[iTile] = tile_death;
+	else if(tiletypes[iTile] == tile_death)
+		tiletypes[iTile] = tile_death_on_top;
+	else if(tiletypes[iTile] == tile_death_on_top)
+		tiletypes[iTile] = tile_death_on_bottom;
+	else if(tiletypes[iTile] == tile_death_on_bottom)
+		tiletypes[iTile] = tile_nonsolid;
 }
 
 void CTileset::Draw(SDL_Surface * dstSurface, short iTileSize, SDL_Rect * srcRect, SDL_Rect * dstRect)
@@ -147,3 +171,13 @@ void CTilesetManager::Draw(SDL_Surface * dstSurface, short iTilesetID, short iTi
 {
 	tilesetlist[iTilesetID]->Draw(dstSurface, iTileSize, &rRects[iTileSize][iSrcTileCol][iSrcTileRow], &rRects[iTileSize][iDstTileCol][iDstTileRow]);
 }
+
+
+CTileset * CTilesetManager::GetTileset(short iTilesetID)
+{
+	if(iTilesetID < 0 || iTilesetID >= (short)tilesetlist.size())
+		return NULL;
+
+	return tilesetlist[iTilesetID];
+}
+

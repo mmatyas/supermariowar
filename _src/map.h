@@ -47,10 +47,20 @@ struct MapItem
 	short iy;
 };
 
+struct TilesetTile
+{
+	short iID;
+	short iCol;
+	short iRow;
+
+	// This is needed for backwards compatibility with older map formats
+	short iData;
+};
+
 struct AnimatedTile
 {
 	short id;
-	short layers[4];
+	TilesetTile layers[4];
 	SDL_Rect rSrc[4][4];
 	SDL_Rect rAnimationSrc[2][4];
 	SDL_Rect rDest;
@@ -82,7 +92,7 @@ class CMap
 
 		void loadPlatforms(FILE * mapfile, bool fPreview, int version[4]);
 
-		void convertMap();
+		//void convertMap();
 
 		void shift(int xshift, int yshift);
 
@@ -165,7 +175,7 @@ class CMap
 		void SetTileGap(short i, short j);
 		void calculatespawnareas(short iType, bool fUseTempBlocks);
 		
-		short		mapdata[MAPWIDTH][MAPHEIGHT][MAPLAYERS];		//0 to TILESETSIZE-1: tiles, TILESETSIZE: no tile
+		TilesetTile	mapdata[MAPWIDTH][MAPHEIGHT][MAPLAYERS];
 		TileType	mapdatatop[MAPWIDTH][MAPHEIGHT];
 		short		objectdata[MAPWIDTH][MAPHEIGHT];
 		IO_Block*   blockdata[MAPWIDTH][MAPHEIGHT];

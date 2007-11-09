@@ -59,17 +59,17 @@ void MovingPlatformPath::CalculateAngle()
 }
 
 
-MovingPlatform::MovingPlatform(short ** tiledata, TileType ** tiletypes, short w, short h, MovingPlatformPath * path, bool forwardDirection, short startPathNode, bool fPreview)
+MovingPlatform::MovingPlatform(TilesetTile ** tiledata, TileType ** tiletypes, short w, short h, MovingPlatformPath * path, bool forwardDirection, short startPathNode, bool fPreview)
 {
 	fDead = false;
 
 	short iTileSize = TILESIZE;
-	SDL_Surface * tilesurface = spr_maptiles[0].getSurface();
-		
+	short iTileSizeIndex = 0;
+
 	if(fPreview)
 	{
 		iTileSize = PREVIEWTILESIZE;
-		tilesurface = spr_maptiles[1].getSurface();
+		iTileSizeIndex = 1;
 
 		path->fEndX /= 2.0f;
 		path->fEndY /= 2.0f;
@@ -77,6 +77,8 @@ MovingPlatform::MovingPlatform(short ** tiledata, TileType ** tiletypes, short w
 		path->fStartY /= 2.0f;
 		path->fVelocity /= 2.0f;
 	}
+
+	SDL_Surface * tilesurface = spr_maptiles[iTileSizeIndex].getSurface();
 
 	iTileData = tiledata;
 	iTileType = tiletypes;
@@ -103,13 +105,12 @@ MovingPlatform::MovingPlatform(short ** tiledata, TileType ** tiletypes, short w
 
 	pPath = path;
 
-	sSurface = SDL_CreateRGBSurface(0, w * iTileSize, h * iTileSize, 16, 0, 0, 0, 0);
-	SDL_FillRect(sSurface, NULL, SDL_MapRGB(sSurface->format, 255, 0, 255));
+	sSurface = SDL_CreateRGBSurface(tilesurface->flags, w * iTileSize, h * iTileSize, tilesurface->format->BitsPerPixel, 0, 0, 0, 0);
 
-	rSrcRect.x = 0;
-	rSrcRect.y = 0;
-	rSrcRect.w = iTileSize;
-	rSrcRect.h = iTileSize;
+	if( SDL_SetColorKey(sSurface, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(sSurface->format, 255, 0, 255)) < 0)
+		printf("\n ERROR: Couldn't set ColorKey for moving platform: %s\n", SDL_GetError());
+
+	SDL_FillRect(sSurface, NULL, SDL_MapRGB(sSurface->format, 255, 0, 255));
 
 	rDstRect.x = 0;
 	rDstRect.y = 0;
@@ -120,28 +121,21 @@ MovingPlatform::MovingPlatform(short ** tiledata, TileType ** tiletypes, short w
 	{
 		for(short iRow = 0; iRow < iTileHeight; iRow++)
 		{
-			short ts = iTileData[iCol][iRow];
-			if(ts == TILESETSIZE)
+			TilesetTile * tile = &iTileData[iCol][iRow];
+
+			if(tile->iID == TILESETNONE)
 			{
 				rDstRect.y += iTileSize;
 				continue;
 			}
 
-			rSrcRect.x = (ts % TILESETWIDTH) * iTileSize;
-			rSrcRect.y = (ts / TILESETWIDTH) * iTileSize;
-		
-			SDL_BlitSurface(tilesurface, &rSrcRect, sSurface, &rDstRect);
+			SDL_BlitSurface(tilesurface, &g_tilesetmanager.rRects[iTileSizeIndex][tile->iCol][tile->iRow], sSurface, &rDstRect);
 
 			rDstRect.y += iTileSize;
 		}
 
 		rDstRect.y = 0;
 		rDstRect.x += iTileSize;
-	}
-
-	if( SDL_SetColorKey(sSurface, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(sSurface->format, 255, 0, 255)) < 0)
-	{
-		printf("\n ERROR: Couldn't set ColorKey for moving platform: %s\n", SDL_GetError());
 	}
 
 	rSrcRect.x = 0;

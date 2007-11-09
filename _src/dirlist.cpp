@@ -135,6 +135,8 @@ bool DirectoryListing :: operator() (string &s)
 
 bool DirectoryListing :: NextDirectory (string &s)
 {
+	if (!Success) return false;
+
     bool retval;
         /* Microsoft directory enumeration - here we retval = a stored filename first,
          * and then fetch the next directory from microsoft */

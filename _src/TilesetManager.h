@@ -10,8 +10,15 @@ class CTileset
 		bool ReadTileTypeFile(char * szFile);
 		char * GetName() {return szName;}
 
+		TileType GetTileType(short iTileCol, short iTileRow);
 		void SetTileType(short iTileCol, short iTileRow, TileType type);
+		void IncrementTileType(short iTileCol, short iTileRow);
+		
 		void Draw(SDL_Surface * dstSurface, short iTileSize, SDL_Rect * srcRect, SDL_Rect * dstRect);
+
+		short GetHeight() {return iHeight;}
+		short GetWidth() {return iWidth;}
+		
 
 	private:
 		char szName[256];
@@ -36,10 +43,11 @@ class CTilesetManager : public SimpleDirectoryList
 
 		void Draw(SDL_Surface * dstSurface, short iTilesetID, short iTileSize, short iSrcTileCol, short iSrcTileRow, short iDstTileCol, short iDstTileRow);
 
+		CTileset * GetTileset(short iID);
+		SDL_Rect rRects[3][32][32];
+
     private:
         std::vector<CTileset*> tilesetlist;
-
-		SDL_Rect rRects[3][32][32];
 };
 
 #endif //__TILESETMANAGER_H_

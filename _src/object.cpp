@@ -1063,9 +1063,11 @@ void B_DonutBlock::triggerBehavior()
 {
 	//eyecandyfront.add(new EC_FallingObject(&spr_donutblock, ix, iy, 0.0f, 0, 0, 0, 0));
 	
-	short ** tiledata = new short*[1];
-	tiledata[0] = new short[1];
-	tiledata[0][0] = 509;
+	TilesetTile ** tiledata = new TilesetTile*[1];
+	tiledata[0] = new TilesetTile[1];
+	tiledata[0][0].iID = 0;
+	tiledata[0][0].iCol = 29;
+	tiledata[0][0].iRow = 15;
 
 	TileType ** typedata = new TileType*[1];
 	typedata[0] = new TileType[1];

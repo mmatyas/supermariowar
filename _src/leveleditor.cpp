@@ -51,7 +51,7 @@ enum {EDITOR_EDIT, EDITOR_TILES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_MAP, EDITOR_B
 class MapTile
 {
 	public:
-		int			tile[MAPLAYERS];
+		TilesetTile	tile[MAPLAYERS];
 		int			block;
 		Warp		warp;
 		bool		nospawn[NUMSPAWNAREATYPES];
@@ -62,7 +62,7 @@ class MapTile
 class MapPlatform
 {
 	public:
-		short tiles[MAPWIDTH][MAPHEIGHT];
+		TilesetTile tiles[MAPWIDTH][MAPHEIGHT];
 		TileType types[MAPWIDTH][MAPHEIGHT];
 		SDL_Rect rIcon[2];
 		short iVelocity;
@@ -103,11 +103,15 @@ gfxSprite		spr_warps[3];
 TileType		set_type = tile_solid;
 int				set_tile_rows = 0;
 int				set_tile_cols = 0;
+int				set_tile_tileset = 0;
 int				set_tile_start_x = 0;
 int				set_tile_start_y = 0;
 int				set_tile_end_x = 0;
 int				set_tile_end_y = 0;
 bool			set_tile_drag = false;
+
+int				view_tileset_x = 0;
+int				view_tileset_y = 0;
 
 int				set_block = 0;
 TileType		set_tiletype = tile_nonsolid;
@@ -118,7 +122,6 @@ int				set_connection = 0;
 
 int				edit_mode = 1;
 int				selected_layer = 0;
-int				selected_tileset = 0;
 
 int				move_mode = 0;
 int				move_start_x = 0;
@@ -241,6 +244,26 @@ extern char * g_szBackgroundConversion[26];
 extern short g_iMusicCategoryConversion[26];
 short g_musiccategorydisplaytimer = 0;
 
+void CopyTilesetTile(TilesetTile * to, TilesetTile * from)
+{
+	to->iID = from->iID;
+	to->iCol = from->iCol;
+	to->iRow = from->iRow;
+	to->iData = from->iData;
+}
+
+void SetTilesetTile(TilesetTile * tile, short iTileset, short iCol, short iRow)
+{
+	tile->iID = iTileset;
+	tile->iCol = iCol;
+	tile->iRow = iRow;
+}
+
+void ClearTilesetTile(TilesetTile * tile)
+{
+	SetTilesetTile(tile, TILESETNONE, 0, 0);
+}
+
 //main main main
 int main(int argc, char *argv[])
 {
@@ -299,13 +322,13 @@ int main(int argc, char *argv[])
 	spr_dialog.init(convertPath("gfx/leveleditor/leveleditor_dialog.png"), 255, 0, 255, 255);
 	menu_shade.init(convertPath("gfx/leveleditor/leveleditor_shade.png"), 255, 0, 255, 128);
 
-	spr_tileanimation[0].init(convertPath("gfx/packs/Classic/eyecandy/tile_animation.png"), 255, 0, 255, 255);
-	spr_tileanimation[1].init(convertPath("gfx/packs/Classic/eyecandy/tile_animation_preview.png"), 255, 0, 255, 255);
-	spr_tileanimation[2].init(convertPath("gfx/packs/Classic/eyecandy/tile_animation_thumbnail.png"), 255, 0, 255, 255);
+	spr_tileanimation[0].init(convertPath("gfx/packs/Classic/eyecandy/tile_animation.png"), 255, 0, 255);
+	spr_tileanimation[1].init(convertPath("gfx/packs/Classic/eyecandy/tile_animation_preview.png"), 255, 0, 255);
+	spr_tileanimation[2].init(convertPath("gfx/packs/Classic/eyecandy/tile_animation_thumbnail.png"), 255, 0, 255);
 
-	spr_maptiles[0].init(convertPath("gfx/packs/Classic/tileset.png"), 255, 0, 255, 255);
-	spr_maptiles[1].init(convertPath("gfx/packs/Classic/tileset_medium.png"), 255, 0, 255, 255);
-	spr_maptiles[2].init(convertPath("gfx/packs/Classic/tileset_small.png"), 255, 0, 255, 255);
+	spr_maptiles[0].init(convertPath("gfx/packs/Classic/tileset.png"), 255, 0, 255);
+	spr_maptiles[1].init(convertPath("gfx/packs/Classic/tileset_medium.png"), 255, 0, 255);
+	spr_maptiles[2].init(convertPath("gfx/packs/Classic/tileset_small.png"), 255, 0, 255);
 
 	if( SDL_SetColorKey(s_eyecandy, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(s_eyecandy->format, 255, 0, 255)) < 0)
 	{
@@ -346,7 +369,7 @@ int main(int argc, char *argv[])
 		{
 			for(short iRow = 0; iRow < MAPHEIGHT; iRow++)
 			{
-				g_Platforms[iPlatform].tiles[iCol][iRow] = TILESETSIZE;
+				ClearTilesetTile(&g_Platforms[iPlatform].tiles[iCol][iRow]);
 				g_Platforms[iPlatform].types[iCol][iRow] = tile_nonsolid;
 			}
 		}
@@ -452,15 +475,17 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
-
 void UpdateTileType(short x, short y)
 {
 	TileType type = tile_nonsolid;
 	for(short k = MAPLAYERS - 1; k >= 0; k--)
 	{
-		if(g_map.tileset[g_map.mapdata[x][y][k]] != tile_nonsolid)
+		TilesetTile * tile = &g_map.mapdata[x][y][k];
+		TileType iTileType = g_map.tileset[tile->iCol + tile->iRow * TILESETWIDTH];
+
+		if(iTileType != tile_nonsolid)
 		{
-			type = g_map.tileset[g_map.mapdata[x][y][k]];
+			type = iTileType;
 			break;
 		}
 	}
@@ -518,9 +543,52 @@ int editor_edit()
 	bool done = false;
 	g_musiccategorydisplaytimer = 0;
 
+	//int iTickStart = 0, iTicks = 0;
+	//int iMax = 0, iMin = 100000000, iTotal = 0;
+	//int iLoops = 0;
+	//bool fTestSwitch = false;
+
+	//maplist.next(false);
+	//maplist.next(false);
+	//maplist.next(false);
+	//maplist.next(false);
+
 	while (!done)
 	{
 		int framestart = SDL_GetTicks();
+
+		/*
+		if(iLoops < 100)
+		{
+			iTickStart = SDL_GetTicks();
+			
+			if(fTestSwitch)
+				maplist.next(false);
+			else
+				maplist.prev(false);
+				
+			fTestSwitch = !fTestSwitch;
+
+			loadcurrentmap();
+			
+			iTicks = SDL_GetTicks() - iTickStart;
+
+			if(iTicks > iMax)
+				iMax = iTicks;
+
+			if(iTicks < iMin)
+				iMin = iTicks;
+
+			iTotal += iTicks;
+
+			printf("%s: %d\n", maplist.currentShortmapname(), iTicks);
+
+			if(++iLoops >= 100)
+			{
+				printf("Map Load Timer - Avg: %d  Min: %d  Max: %d", iTotal / 100, iMin, iMax);
+			}
+		}
+		*/
 
 		//handle messages
 		while(SDL_PollEvent(&event))
@@ -774,7 +842,8 @@ int editor_edit()
 
 									if(iLocalX >= 0 && iLocalX < MAPWIDTH && iLocalY >= 0 && iLocalY < MAPHEIGHT)
 									{
-										g_map.mapdata[iLocalX][iLocalY][selected_layer] = (set_tile_start_y + j) * TILESETWIDTH + set_tile_start_x + i;
+										SetTilesetTile(&g_map.mapdata[iLocalX][iLocalY][selected_layer], set_tile_tileset, set_tile_start_x + i, set_tile_start_y + j);
+										
 										UpdateTileType(iLocalX, iLocalY);
 										AdjustMapItems(iLocalX, iLocalY);
 									}
@@ -875,7 +944,7 @@ int editor_edit()
 						}
 						else if(edit_mode == 8)
 						{
-							g_map.mapdata[iClickX][iClickY][selected_layer] = set_animation + TILESETSIZE + 1;
+							SetTilesetTile(&g_map.mapdata[iClickX][iClickY][selected_layer], TILESETANIMATED, 0, set_animation);
 						}
 					}
 					else if(event.button.button == SDL_BUTTON_RIGHT)
@@ -884,7 +953,7 @@ int editor_edit()
 							g_map.objectdata[iClickX][iClickY] = BLOCKSETSIZE;
 						else if(edit_mode == 1 || edit_mode == 8)
 						{
-                            g_map.mapdata[iClickX][iClickY][selected_layer] = TILESETSIZE;
+							g_map.mapdata[iClickX][iClickY][selected_layer].iID = TILESETNONE;
 							UpdateTileType(iClickX, iClickY);
 						}
 						else if(edit_mode == 2)
@@ -958,7 +1027,8 @@ int editor_edit()
 
 									if(iLocalX >= 0 && iLocalX < MAPWIDTH && iLocalY >= 0 && iLocalY < MAPHEIGHT)
 									{
-										g_map.mapdata[iLocalX][iLocalY][selected_layer] = (set_tile_start_y + j) * TILESETWIDTH + set_tile_start_x + i;
+										SetTilesetTile(&g_map.mapdata[iLocalX][iLocalY][selected_layer], set_tile_tileset, set_tile_start_x + i, set_tile_start_y + j);
+
 										UpdateTileType(iLocalX, iLocalY);
 										AdjustMapItems(iLocalY, iLocalY);
 									}
@@ -992,7 +1062,7 @@ int editor_edit()
 						}
 						else if(edit_mode == 8)
 						{
-							g_map.mapdata[iClickX][iClickY][selected_layer] = set_animation + TILESETSIZE + 1;
+							SetTilesetTile(&g_map.mapdata[iClickX][iClickY][selected_layer], TILESETANIMATED, 0, set_animation);
 						}
 					}
 					else if(event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT))
@@ -1001,7 +1071,7 @@ int editor_edit()
 							g_map.objectdata[iClickX][iClickY] = BLOCKSETSIZE;
 						else if(edit_mode == 1 || edit_mode == 8)
 						{
-							g_map.mapdata[iClickX][iClickY][selected_layer] = TILESETSIZE;
+							g_map.mapdata[iClickX][iClickY][selected_layer].iID = TILESETNONE;
 							UpdateTileType(iClickX, iClickY);
 						}
 						else if(edit_mode == 2)
@@ -1085,8 +1155,7 @@ int editor_edit()
 			move_offset_x = (mousex / TILESIZE) - move_start_x;
 			move_offset_y = (mousey / TILESIZE) - move_start_y;
 		}
-
-		if(move_mode == 2)
+		else if(move_mode == 2)
 		{
 			int mousex, mousey;
 			SDL_GetMouseState(&mousex, &mousey);
@@ -1251,7 +1320,6 @@ int editor_edit()
 
 void drawlayer(int layer, bool fUseCopied, short iBlockSize)
 {
-	int i, j, ts;
 	SDL_Rect bltrect, tilebltrect;
 	
 	tilebltrect.w = iBlockSize;
@@ -1259,52 +1327,50 @@ void drawlayer(int layer, bool fUseCopied, short iBlockSize)
 	bltrect.w = iBlockSize;
 	bltrect.h = iBlockSize;
 	
+	short iTilesetIndex = iBlockSize == TILESIZE ? 0 : iBlockSize == PREVIEWTILESIZE ? 1 : 2;
+
 	//draw left to right full vertical
 	bltrect.x = 0;
-	for(i = 0; i < MAPWIDTH; i++)
+	for(short i = 0; i < MAPWIDTH; i++)
 	{
 		bltrect.y = -iBlockSize;	//this is okay, see
 
-		for(j = 0; j < MAPHEIGHT; j++)
+		for(short j = 0; j < MAPHEIGHT; j++)
 		{
 			bltrect.y += iBlockSize;	// here
 
+			TilesetTile * tile = NULL;
 			if((move_mode == 1 || move_mode == 3) && i - move_offset_x >= 0 && i - move_offset_x < MAPWIDTH &&
 				j - move_offset_y >= 0 && j - move_offset_y < MAPHEIGHT && 
 				selectedtiles[i - move_offset_x][j - move_offset_y])
 			{
 				if(fUseCopied)
-					ts = copiedtiles[i - move_offset_x][j - move_offset_y].tile[layer];
-				else
-					ts = TILESETSIZE;
+					tile = &copiedtiles[i - move_offset_x][j - move_offset_y].tile[layer];
 			}
 			else
 			{
-				if(fUseCopied)
-					ts = TILESETSIZE;
-				else
-					ts = g_map.mapdata[i][j][layer];
+				if(!fUseCopied)
+					tile = &g_map.mapdata[i][j][layer];
 			}
 
-			if(ts == TILESETSIZE)
+			if(!tile || tile->iID == TILESETNONE)
 				continue;
-
-			short iTilesetIndex = iBlockSize == TILESIZE ? 0 : iBlockSize == PREVIEWTILESIZE ? 1 : 2;
-			if(ts < TILESETSIZE)
-			{
-				tilebltrect.x = (ts % TILESETWIDTH) * iBlockSize;
-				tilebltrect.y = (ts / TILESETWIDTH) * iBlockSize;
-
-				SDL_BlitSurface(spr_maptiles[iTilesetIndex].getSurface(), &tilebltrect, screen, &bltrect);
-			}
-			else
-			{
-				ts -= (TILESETSIZE + 1);
-				tilebltrect.x = 0;
-				tilebltrect.y = ts * iBlockSize;
-
-				SDL_BlitSurface(spr_tileanimation[iTilesetIndex].getSurface(), &tilebltrect, screen, &bltrect);
 			
+			if(tile->iID >= 0)
+			{
+				//TODO:: Fix this - it isn't needed because map files should not contain row/cols above 32
+				//Need to fix zelda level 1 map first
+				if(tile->iCol < 32 && tile->iRow < 32)
+					SDL_BlitSurface(spr_maptiles[iTilesetIndex].getSurface(), &g_tilesetmanager.rRects[iTilesetIndex][tile->iCol][tile->iRow], screen, &bltrect);
+			}
+			else if(tile->iID == TILESETANIMATED)
+			{
+				SDL_BlitSurface(spr_tileanimation[iTilesetIndex].getSurface(), &g_tilesetmanager.rRects[iTilesetIndex][tile->iCol << 2][tile->iRow], screen, &bltrect);
+			}
+			else if(tile->iID == TILESETUNKNOWN)
+			{
+				//TODO: Draw Red X Tiles where tile is unknown
+				//SDL_BlitSurface(spr_tileanimation[iTilesetIndex].getSurface(), &g_tilesetmanager.rRects[iTilesetIndex][tile->iCol << 2][tile->iRow], screen, &bltrect);
 			}
 		}
 
@@ -1359,8 +1425,9 @@ void drawmap(bool fScreenshot, short iBlockSize)
 
 	if((viewblocks && !view_only_layer) || fScreenshot)
 	{
+		short iTilesizeIndex = iBlockSize == 32 ? 0 : iBlockSize == 16 ? 1 : 2;
+
 		SDL_Rect rSrc = {0, 0, iBlockSize, iBlockSize};
-		SDL_Rect rDst = {0, 0, iBlockSize, iBlockSize};
 
 		for(int j = 0; j < MAPHEIGHT; j++)
 		{
@@ -1378,24 +1445,25 @@ void drawmap(bool fScreenshot, short iBlockSize)
 					displayblock = g_map.objectdata[i][j];
 				}
 
-				if(displayblock != BLOCKSETSIZE)
+				if(displayblock < BLOCKSETSIZE)
 				{
-					rSrc.x = displayblock * iBlockSize;
-					rSrc.y = iBlockSize * 30;
-
-					rDst.x = i * iBlockSize;
-					rDst.y = j * iBlockSize;
-
+					if(displayblock < 7)
+					{
+						rSrc.x = displayblock * iBlockSize;
+						rSrc.y = iBlockSize * 30;
+					}
 					if(displayblock >= 7 && displayblock <= 14)
+					{
+						rSrc.x = displayblock * iBlockSize;
 						rSrc.y = iBlockSize * (g_map.iSwitches[(displayblock - 7) % 4] + 30);
-
-					if(displayblock >= 15 && displayblock <= 18)
+					}
+					else if(displayblock >= 15 && displayblock <= 18)
 					{
 						rSrc.x = (displayblock - 15) * iBlockSize;
 						rSrc.y = iBlockSize * 31;
 					}
 					
-					SDL_BlitSurface(spr_maptiles[iBlockSize == TILESIZE ? 0 : iBlockSize == PREVIEWTILESIZE ? 1 : 2].getSurface(), &rSrc, screen, &rDst);
+					SDL_BlitSurface(spr_maptiles[iTilesizeIndex].getSurface(), &rSrc, screen, &g_tilesetmanager.rRects[iTilesizeIndex][i][j]);
 				}
 			}
 		}
@@ -1778,7 +1846,7 @@ int editor_platforms()
 								{
 									for(short iRow = 0; iRow < MAPHEIGHT; iRow++)
 									{
-										g_Platforms[iPlatform].tiles[iCol][iRow] = g_Platforms[iPlatform + 1].tiles[iCol][iRow];
+										CopyTilesetTile(&g_Platforms[iPlatform].tiles[iCol][iRow], &g_Platforms[iPlatform + 1].tiles[iCol][iRow]);
 										g_Platforms[iPlatform].types[iCol][iRow] = g_Platforms[iPlatform + 1].types[iCol][iRow];
 									}
 								}
@@ -1884,8 +1952,9 @@ int editor_platforms()
 									{
 										if(ix + i >= 0 && ix + i < MAPWIDTH && iy + j >= 0 && iy + j < MAPHEIGHT)
 										{
-											g_Platforms[iEditPlatform].tiles[ix + i][iy + j] = (set_tile_start_y + j) * TILESETWIDTH + set_tile_start_x + i;
-											g_Platforms[iEditPlatform].types[ix + i][iy + j] = g_map.GetTileSet()[g_Platforms[iEditPlatform].tiles[ix + i][iy + j]];
+											TilesetTile * tile = &g_Platforms[iEditPlatform].tiles[ix + i][iy + j];
+											SetTilesetTile(tile, set_tile_tileset, set_tile_start_x + i, set_tile_start_y + j);
+											g_Platforms[iEditPlatform].types[ix + i][iy + j] = g_map.GetTileSet()[tile->iCol + tile->iRow * g_tilesetmanager.GetTileset(set_tile_tileset)->GetWidth()];
 										}
 									}
 								}
@@ -1942,14 +2011,17 @@ int editor_platforms()
 					}
 					else if(event.button.button == SDL_BUTTON_RIGHT)
 					{
+						short ix = event.button.x / TILESIZE;
+						short iy = event.button.y / TILESIZE;
+
 						if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState)
 						{
-							g_Platforms[iEditPlatform].tiles[event.button.x / TILESIZE][event.button.y / TILESIZE] = TILESETSIZE;
-							g_Platforms[iEditPlatform].types[event.button.x / TILESIZE][event.button.y / TILESIZE] = tile_nonsolid;
+							ClearTilesetTile(&g_Platforms[iEditPlatform].tiles[ix][iy]);
+							g_Platforms[iEditPlatform].types[ix][iy] = tile_nonsolid;
 						}
 						else if(PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
 						{
-							g_Platforms[iEditPlatform].types[event.button.x / TILESIZE][event.button.y / TILESIZE] = tile_nonsolid;
+							g_Platforms[iEditPlatform].types[ix][iy] = tile_nonsolid;
 						}
 						else if(PLATFORM_EDIT_STATE_PATH == iPlatformEditState)
 						{
@@ -1957,35 +2029,33 @@ int editor_platforms()
 							{
 								short iTempStartX = g_Platforms[iEditPlatform].iStartX;
 								short iTempStartY = g_Platforms[iEditPlatform].iStartY;
-								short iTempEndX = event.button.x / TILESIZE;
-								short iTempEndY = event.button.y / TILESIZE;
 							
-								if(iTempEndX >= 0 && iTempEndX <= MAPWIDTH - iPlatformWidth &&
-									iTempEndY >= 0 && iTempEndY <= MAPHEIGHT - iPlatformHeight)
+								if(ix >= 0 && ix <= MAPWIDTH - iPlatformWidth &&
+									iy >= 0 && iy <= MAPHEIGHT - iPlatformHeight)
 								{
 
 									//If the start isn't in the same row or column, then move the end point so that it is
-									if(iTempStartX != iTempEndX &&
-										iTempStartY != iTempEndY)
+									if(iTempStartX != ix &&
+										iTempStartY != iy)
 									{
-										short iXDiff = abs(iTempStartX - iTempEndX);
-										short iYDiff = abs(iTempStartY - iTempEndY);
+										short iXDiff = abs(iTempStartX - ix);
+										short iYDiff = abs(iTempStartY - iy);
 
 										//If the x difference is smaller, move it so it lines up
 										if(iYDiff > iXDiff)
-											iTempStartX = iTempEndX;
+											iTempStartX = ix;
 										else
-											iTempStartY = iTempEndY;
+											iTempStartY = iy;
 									}
 
 									//If the start and end are the same point, then don't allow this change
-									if(iTempStartX != iTempEndX ||
-										iTempStartY != iTempEndY)
+									if(iTempStartX != ix ||
+										iTempStartY != iy)
 									{
 										g_Platforms[iEditPlatform].iStartX = iTempStartX;
 										g_Platforms[iEditPlatform].iStartY = iTempStartY;
-										g_Platforms[iEditPlatform].iEndX = iTempEndX;
-										g_Platforms[iEditPlatform].iEndY = iTempEndY;
+										g_Platforms[iEditPlatform].iEndX = ix;
+										g_Platforms[iEditPlatform].iEndY = iy;
 									}
 								}
 							}
@@ -1994,36 +2064,34 @@ int editor_platforms()
 				}
 				case SDL_MOUSEMOTION:
 				{
+					short ix = event.button.x / TILESIZE;
+					short iy = event.button.y / TILESIZE;
+
 					if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState)
 					{
 						if(event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT) && !ignoreclick)
 						{
-							short ix = event.button.x / TILESIZE;
-							short iy = event.button.y / TILESIZE;
-
 							for(short i = 0; i < set_tile_cols; i++)
 							{
 								for(short j = 0; j < set_tile_rows; j++)
 								{
 									if(ix + i >= 0 && ix + i < MAPWIDTH && iy + j >= 0 && iy + j < MAPHEIGHT)
 									{
-										g_Platforms[iEditPlatform].tiles[ix + i][iy + j] = (set_tile_start_y + j) * TILESETWIDTH + set_tile_start_x + i;
-										g_Platforms[iEditPlatform].types[ix + i][iy + j] = g_map.GetTileSet()[g_Platforms[iEditPlatform].tiles[ix + i][iy + j]];
+										TilesetTile * tile = &g_Platforms[iEditPlatform].tiles[ix + i][iy + j];
+										SetTilesetTile(tile, set_tile_tileset, set_tile_start_x + i, set_tile_start_y + j);
+										g_Platforms[iEditPlatform].types[ix + i][iy + j] = g_map.GetTileSet()[tile->iCol + tile->iRow * g_tilesetmanager.GetTileset(set_tile_tileset)->GetWidth()];
 									}
 								}
 							}
 						}
 						else if(event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT))
 						{
-							g_Platforms[iEditPlatform].tiles[event.button.x / TILESIZE][event.button.y / TILESIZE] = TILESETSIZE;
-							g_Platforms[iEditPlatform].types[event.button.x / TILESIZE][event.button.y / TILESIZE] = tile_nonsolid;
+							ClearTilesetTile(&g_Platforms[iEditPlatform].tiles[ix][iy]);
+							g_Platforms[iEditPlatform].types[ix][iy] = tile_nonsolid;
 						}
 					}
 					else if(PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
 					{
-						short ix = event.button.x / TILESIZE;
-						short iy = event.button.y / TILESIZE;
-
 						if(event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT) && !ignoreclick)
 							g_Platforms[iEditPlatform].types[ix][iy] = set_tiletype;
 						else if(event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT))
@@ -2181,11 +2249,8 @@ int editor_platforms()
 
 void draw_platform(short iPlatform, bool fDrawTileTypes)
 {
-	SDL_Rect bltrect, tilebltrect;
-	
-	tilebltrect.w = TILESIZE;
-	tilebltrect.h = TILESIZE;
-	
+	SDL_Rect bltrect;
+		
 	bltrect.x = 0;
 	bltrect.y = 0;
 	bltrect.w = TILESIZE;
@@ -2195,14 +2260,11 @@ void draw_platform(short iPlatform, bool fDrawTileTypes)
 	{
 		for(short iRow = 0; iRow < MAPHEIGHT; iRow++)
 		{
-			short ts = g_Platforms[iPlatform].tiles[iCol][iRow];
+			TilesetTile * tile = &g_Platforms[iPlatform].tiles[iCol][iRow];
 			
-			if(ts != TILESETSIZE)
+			if(tile->iID != TILESETNONE)
 			{
-				tilebltrect.x = (ts % TILESETWIDTH) * TILESIZE;
-				tilebltrect.y = (ts / TILESETWIDTH) * TILESIZE;
-			
-				SDL_BlitSurface(spr_maptiles[0].getSurface(), &tilebltrect, screen, &bltrect);
+				SDL_BlitSurface(spr_maptiles[0].getSurface(), &g_tilesetmanager.rRects[0][tile->iCol][tile->iRow], screen, &bltrect);
 			}
 
 			if(fDrawTileTypes)
@@ -2221,7 +2283,7 @@ void draw_platform(short iPlatform, bool fDrawTileTypes)
 
 int editor_tiles()
 {
-	int i, j, t;
+	int i, j;
 	bool done = false;
 	
 	SDL_Rect r;
@@ -2240,6 +2302,8 @@ int editor_tiles()
 
 	set_tile_drag = false;
 
+	CTileset * tileset = g_tilesetmanager.GetTileset(set_tile_tileset);
+
 	while (!done)
 	{
 		int framestart = SDL_GetTicks();
@@ -2257,17 +2321,49 @@ int editor_tiles()
 				{	
 					if(!set_tile_drag)
 					{
-						if(event.key.keysym.sym >= SDLK_1 && event.key.keysym.sym <= SDLK_4)
-							selected_tileset = event.key.keysym.sym - SDLK_1;
-						else if(event.key.keysym.sym == SDLK_UP || event.key.keysym.sym == SDLK_LEFT || event.key.keysym.sym == SDLK_PAGEUP)
+						if(event.key.keysym.sym >= SDLK_1 && event.key.keysym.sym <= SDLK_9 && event.key.keysym.sym < SDLK_1 + g_tilesetmanager.GetCount())
 						{
-							if(selected_tileset > 0)
-								selected_tileset--;
+							set_tile_tileset = event.key.keysym.sym - SDLK_1;
 						}
-						else if(event.key.keysym.sym == SDLK_DOWN || event.key.keysym.sym == SDLK_RIGHT || event.key.keysym.sym == SDLK_PAGEDOWN)
+						else if(event.key.keysym.sym == SDLK_PAGEUP)
 						{
-							if(selected_tileset < 3)
-								selected_tileset++;
+							if(set_tile_tileset > 0)
+							{
+								set_tile_tileset--;
+								tileset = g_tilesetmanager.GetTileset(set_tile_tileset);
+								view_tileset_x = 0;
+								view_tileset_y = 0;
+							}
+						}
+						else if(event.key.keysym.sym == SDLK_PAGEDOWN)
+						{
+							if(set_tile_tileset < g_tilesetmanager.GetCount() - 1)
+							{
+								set_tile_tileset++;
+								tileset = g_tilesetmanager.GetTileset(set_tile_tileset);
+								view_tileset_x = 0;
+								view_tileset_y = 0;
+							}
+						}
+						else if(event.key.keysym.sym == SDLK_UP)
+						{
+							if(view_tileset_y > 0)
+								view_tileset_y--;
+						}
+						else if(event.key.keysym.sym == SDLK_DOWN)
+						{
+							if(view_tileset_y < g_tilesetmanager.GetTileset(set_tile_tileset)->GetHeight() - 15)
+								view_tileset_y++;
+						}
+						else if(event.key.keysym.sym == SDLK_LEFT)
+						{
+							if(view_tileset_x > 0)
+								view_tileset_x--;
+						}
+						else if(event.key.keysym.sym == SDLK_RIGHT)
+						{
+							if(view_tileset_x < g_tilesetmanager.GetTileset(set_tile_tileset)->GetWidth() - 20)
+								view_tileset_x++;
 						}
 						else
 						{
@@ -2282,60 +2378,26 @@ int editor_tiles()
 
 				case SDL_MOUSEBUTTONDOWN:
 				{
+					short iCol = event.button.x / TILESIZE + view_tileset_x;
+					short iRow = event.button.y / TILESIZE + view_tileset_y;
+
 					if(event.button.button == SDL_BUTTON_LEFT)
 					{
-						if(event.button.x < 512)
+						CTileset * tileset = g_tilesetmanager.GetTileset(set_tile_tileset);
+
+						if(iCol < tileset->GetWidth() && iRow < tileset->GetHeight())
 						{
-							set_tile_start_x = event.button.x / TILESIZE;
-							set_tile_start_y = event.button.y / TILESIZE;
+							set_tile_start_x = iCol;
+							set_tile_start_y = iRow;
 							set_tile_end_x = set_tile_start_x;
 							set_tile_end_y = set_tile_start_y;
 
 							set_tile_drag = true;
 						}
-						else
-						{
-							for(short i = 0; i < 4; i++)
-							{
-								if(event.button.x >= 565 + i * 18 && event.button.x < 565 + i * 18 + 16 &&
-									event.button.y >= 459 && event.button.y < 475)
-								{
-									selected_tileset = i;
-								}
-							}
-						}
 					}
 					else if(event.button.button == SDL_BUTTON_RIGHT)
 					{
-						t = (event.button.x / TILESIZE) + (event.button.y / TILESIZE) * TILESETWIDTH;
-						
-						if(selected_tileset == 1 || selected_tileset == 3)
-							t += 16;
-
-						if(selected_tileset == 2 || selected_tileset == 3)
-							t += 480;
-
-						if(t >= TILESETSIZE)
-							t = 0; 
-
-						set_type = g_map.tileset[t];
-
-						if(set_type == tile_nonsolid)
-							set_type = tile_solid;
-						else if(set_type == tile_solid)
-							set_type = tile_solid_on_top;
-						else if(set_type == tile_solid_on_top)
-							set_type = tile_ice;
-						else if(set_type == tile_ice)
-							set_type = tile_death;
-						else if(set_type == tile_death)
-							set_type = tile_death_on_top;
-						else if(set_type == tile_death_on_top)
-							set_type = tile_death_on_bottom;
-						else if(set_type == tile_death_on_bottom)
-							set_type = tile_nonsolid;
-
-						g_map.tileset[t] = set_type;	
+						tileset->IncrementTileType(iCol, iRow);
 					}
 					
 					break;
@@ -2343,22 +2405,13 @@ int editor_tiles()
 
 				case SDL_MOUSEBUTTONUP:
 				{
+					short iCol = event.button.x / TILESIZE + view_tileset_x;
+					short iRow = event.button.y / TILESIZE + view_tileset_y;
+
 					if(event.button.button == SDL_BUTTON_LEFT)
 					{
-						if(event.button.x < 512)
+						if(iCol < tileset->GetWidth() && iRow < tileset->GetHeight())
 						{
-							if(selected_tileset == 1 || selected_tileset == 3)
-							{
-								set_tile_start_x += 16;
-								set_tile_end_x += 16;
-							}
-						
-							if(selected_tileset == 2 || selected_tileset == 3)
-							{
-								set_tile_start_y += 15;
-								set_tile_end_y += 15;
-							}
-
 							set_tile_cols = set_tile_end_x - set_tile_start_x + 1;
 							set_tile_rows = set_tile_end_y - set_tile_start_y + 1;
 
@@ -2374,39 +2427,28 @@ int editor_tiles()
 
 				case SDL_MOUSEMOTION:
 				{
-					if(event.button.x < 512)
+					short iCol = event.button.x / TILESIZE + view_tileset_x;
+					short iRow = event.button.y / TILESIZE + view_tileset_y;
+
+					if(iCol < tileset->GetWidth() && iRow < tileset->GetHeight())
 					{
 						if(event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT))
 						{
-							short x = event.button.x / TILESIZE;
-							short y = event.button.y / TILESIZE;
-
-							if(x < set_tile_start_x)
-								set_tile_start_x = x;
+							if(iCol < set_tile_start_x)
+								set_tile_start_x = iCol;
 							
-							if(x > set_tile_end_x)
-								set_tile_end_x = x;
+							if(iCol > set_tile_end_x)
+								set_tile_end_x = iCol;
 
-							if(y < set_tile_start_y)
-								set_tile_start_y = y;
+							if(iRow < set_tile_start_y)
+								set_tile_start_y = iRow;
 							
-							if(y > set_tile_end_y)
-								set_tile_end_y = y;
+							if(iRow > set_tile_end_y)
+								set_tile_end_y = iRow;
 						}
 						else if(event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT))
 						{
-							t = (event.button.x / TILESIZE) + (event.button.y / TILESIZE) * TILESETWIDTH;
-							
-							if(selected_tileset == 1 || selected_tileset == 3)
-								t += 16;
-
-							if(selected_tileset == 2 || selected_tileset == 3)
-								t += 480;
-
-							if(t >= TILESETSIZE)
-								t = 0; 
-
-							g_map.tileset[t] = set_type;
+							tileset->SetTileType(iCol, iRow, set_type);
 						}
 					}
 					
@@ -2426,29 +2468,24 @@ int editor_tiles()
 		SDL_FillRect(screen, NULL, 0x0);
 
 		SDL_Rect rectSrc;
-		rectSrc.x = selected_tileset % 2 * 512;
-		rectSrc.y = selected_tileset / 2 * 480;
-		rectSrc.w = 512;
-		rectSrc.h = 480;
+		rectSrc.x = view_tileset_x << 5;
+		rectSrc.y = view_tileset_y << 5;
+		rectSrc.w = tileset->GetWidth() > 20 ? 640 : tileset->GetWidth() << 5;
+		rectSrc.h = tileset->GetHeight() > 15 ? 480 : tileset->GetHeight() << 5;
 
+		//TODO:  Use tileset surfaces from tileset manager
 		SDL_BlitSurface(spr_maptiles[0].getSurface(), &rectSrc, screen, &r);
 		//menu_font_small.drawRightJustified(640, 0, maplist.currentFilename());
 		
-		short iTileOffset = (selected_tileset > 1 ? 480 : 0) + (selected_tileset % 2 ? 16 : 0);
-
-		for(i = 0; i < TILESETWIDTH >> 1; i++)
+		for(i = view_tileset_x; i < view_tileset_x + 20 && i < tileset->GetWidth(); i++)
 		{
-			for(j = 0; j < TILESETHEIGHT >> 1; j++)
+			for(j = view_tileset_y; j < view_tileset_y + 15 && j < tileset->GetHeight(); j++)
 			{
-				t = g_map.tileset[i + j * TILESETWIDTH + iTileOffset];
+				TileType t = tileset->GetTileType(i, j);
 				if(t != tile_nonsolid)
-					spr_tiletypes[t-1].draw(i*TILESIZE, j*TILESIZE);
+					spr_tiletypes[t-1].draw((i - view_tileset_x) << 5, (j - view_tileset_y) << 5);
 			}
 		}
-
-		//Draw the selected tileset indicator
-		for(i = 0; i < 4; i++)
-			spr_tilesetlevel.draw(565 + i * 18, 459, i * 16, selected_tileset == i ? 0 : 16, 16, 16);
 
 		if(set_tile_drag)
 		{
@@ -2456,7 +2493,7 @@ int editor_tiles()
 			{
 				for(j = set_tile_start_y; j <= set_tile_end_y; j++)
 				{
-					spr_selectedtile.draw(i * TILESIZE, j * TILESIZE);
+					spr_selectedtile.draw((i - view_tileset_x) << 5, (j - view_tileset_y) << 5);
 				}
 			}
 		}
@@ -3330,12 +3367,12 @@ void loadcurrentmap()
 			{
 				if(iCol < g_map.platforms[iPlatform]->iTileWidth && iRow < g_map.platforms[iPlatform]->iTileHeight)
 				{
-					g_Platforms[iPlatform].tiles[iCol][iRow] = g_map.platforms[iPlatform]->iTileData[iCol][iRow];
+					CopyTilesetTile(&g_Platforms[iPlatform].tiles[iCol][iRow], &g_map.platforms[iPlatform]->iTileData[iCol][iRow]);
 					g_Platforms[iPlatform].types[iCol][iRow] = g_map.platforms[iPlatform]->iTileType[iCol][iRow];
 				}
 				else
 				{
-					g_Platforms[iPlatform].tiles[iCol][iRow] = TILESETSIZE;
+					ClearTilesetTile(&g_Platforms[iPlatform].tiles[iCol][iRow]);
 					g_Platforms[iPlatform].types[iCol][iRow] = tile_nonsolid;
 				}
 			}
@@ -3355,7 +3392,7 @@ void SetPlatformToDefaults(short iPlatform)
 	{
 		for(short iRow = 0; iRow < MAPHEIGHT; iRow++)
 		{
-			g_Platforms[iPlatform].tiles[iCol][iRow] = TILESETSIZE;
+			ClearTilesetTile(&g_Platforms[iPlatform].tiles[iCol][iRow]);
 			g_Platforms[iPlatform].types[iCol][iRow] = tile_nonsolid;
 		}
 	}
@@ -3386,17 +3423,17 @@ void insert_platforms_into_map()
 		short iTop, iLeft, iWidth, iHeight;
 		CalculatePlatformDims(iPlatform, &iLeft, &iTop, &iWidth, &iHeight);
 
-		short ** tiles = new short*[iWidth];
+		TilesetTile ** tiles = new TilesetTile*[iWidth];
 		TileType ** types = new TileType*[iWidth];
 
 		for(short iCol = 0; iCol < iWidth; iCol++)
 		{
-			tiles[iCol] = new short[iHeight];
+			tiles[iCol] = new TilesetTile[iHeight];
 			types[iCol] = new TileType[iHeight];
 
 			for(short iRow = 0; iRow < iHeight; iRow++)
 			{
-				tiles[iCol][iRow] = g_Platforms[iPlatform].tiles[iCol + iLeft][iRow + iTop];
+				CopyTilesetTile(&tiles[iCol][iRow], &g_Platforms[iPlatform].tiles[iCol + iLeft][iRow + iTop]);
 				types[iCol][iRow] = g_Platforms[iPlatform].types[iCol + iLeft][iRow + iTop];
 			}
 		}
@@ -3430,7 +3467,7 @@ void CalculatePlatformDims(short iPlatform, short * ix, short * iy, short * iw, 
 	{
 		for(short iRow = 0; iRow < MAPHEIGHT; iRow++)
 		{
-			if(g_Platforms[iPlatform].tiles[iCol][iRow] != TILESETSIZE)
+			if(g_Platforms[iPlatform].tiles[iCol][iRow].iID != TILESETNONE)
 			{
 				if(iTop > iRow)
 					iTop = iRow;
@@ -3589,10 +3626,10 @@ bool copyselectedtiles()
 			if(selectedtiles[j][k])
 			{
 				ret = true;
-				copiedtiles[j][k].tile[0] = g_map.mapdata[j][k][0];
-				copiedtiles[j][k].tile[1] = g_map.mapdata[j][k][1];
-				copiedtiles[j][k].tile[2] = g_map.mapdata[j][k][2];
-				copiedtiles[j][k].tile[3] = g_map.mapdata[j][k][3];
+				for(short iLayer = 0; iLayer < MAPLAYERS; iLayer++)
+				{
+					CopyTilesetTile(&copiedtiles[j][k].tile[iLayer], &g_map.mapdata[j][k][iLayer]);
+				}
 
 				copiedtiles[j][k].block = g_map.objectdata[j][k];
 
@@ -3633,14 +3670,12 @@ void clearselectedmaptiles()
 			{
 				if(view_only_layer)
 				{
-					g_map.mapdata[j][k][selected_layer] = TILESETSIZE;
+					g_map.mapdata[j][k][selected_layer].iID = TILESETNONE;
 				}
 				else
 				{
-					g_map.mapdata[j][k][0] = TILESETSIZE;
-					g_map.mapdata[j][k][1] = TILESETSIZE;
-					g_map.mapdata[j][k][2] = TILESETSIZE;
-					g_map.mapdata[j][k][3] = TILESETSIZE;
+					for(short iLayer = 0; iLayer < MAPLAYERS; iLayer++)
+						g_map.mapdata[j][k][iLayer].iID = TILESETNONE;
 					
 					g_map.objectdata[j][k] = BLOCKSETSIZE;
 
@@ -3668,12 +3703,30 @@ void replacetile(short * iDstTile, short iSrcTile, short iType)
 	}
 	else
 	{
-		if(iType == 0 && iSrcTile != TILESETSIZE)
-			*iDstTile = iSrcTile;
-		else if(iType == 1 && iSrcTile != BLOCKSETSIZE)
+		if(iType == 1 && iSrcTile != BLOCKSETSIZE)
 			*iDstTile = iSrcTile;
 		else if(iType == 2)
 			*iDstTile = iSrcTile;
+	}
+}
+
+void copytilesettile(TilesetTile * dst, TilesetTile * src)
+{
+	dst->iID = src->iID;
+	dst->iCol = src->iCol;
+	dst->iRow = src->iRow;
+}
+
+void replacetile(TilesetTile * dstTile, TilesetTile * srcTile)
+{
+	if(move_replace)
+	{
+		copytilesettile(dstTile, srcTile);
+	}
+	else
+	{
+		if(srcTile->iID != TILESETNONE)
+			copytilesettile(dstTile, srcTile);
 	}
 }
 
@@ -3695,14 +3748,12 @@ void pasteselectedtiles(int movex, int movey)
 
 					if(view_only_layer)
 					{
-						replacetile(&g_map.mapdata[iNewX][iNewY][selected_layer], copiedtiles[j][k].tile[copiedlayer], 0);
+						replacetile(&g_map.mapdata[iNewX][iNewY][selected_layer], &copiedtiles[j][k].tile[copiedlayer]);
 					}
 					else
 					{
-						replacetile(&g_map.mapdata[iNewX][iNewY][0], copiedtiles[j][k].tile[0], 0);
-						replacetile(&g_map.mapdata[iNewX][iNewY][1], copiedtiles[j][k].tile[1], 0);
-						replacetile(&g_map.mapdata[iNewX][iNewY][2], copiedtiles[j][k].tile[2], 0);
-						replacetile(&g_map.mapdata[iNewX][iNewY][3], copiedtiles[j][k].tile[3], 0);
+						for(short iLayer = 0; iLayer < MAPLAYERS; iLayer++)
+							replacetile(&g_map.mapdata[iNewX][iNewY][iLayer], &copiedtiles[j][k].tile[iLayer]);
 
 						replacetile(&g_map.objectdata[iNewX][iNewY], copiedtiles[j][k].block, 1);
 
@@ -3779,7 +3830,7 @@ void getcenterselection(int * x, int * y)
 //take screenshots in full and thumbnail sizes
 void takescreenshot()
 {
-	short iTileSizes[3] = {32, 16, 8};
+	short iTileSizes[3] = {TILESIZE, PREVIEWTILESIZE, THUMBTILESIZE};
 	SDL_Surface * old_screen = screen;
 
 	for(short iScreenshotSize = 0; iScreenshotSize < 3; iScreenshotSize++)
@@ -3792,26 +3843,17 @@ void takescreenshot()
 		drawmap(true, iTileSize);
 
 		//Draw platforms to screenshot
-		SDL_Rect rSrc = {0, 0, iTileSize, iTileSize};
-		SDL_Rect rDst = {0, 0, iTileSize, iTileSize};
-
 		for(short iPlatform = 0; iPlatform < g_iNumPlatforms; iPlatform++)
 		{
 			for(short iPlatformX = 0; iPlatformX < g_map.platforms[iPlatform]->iTileWidth; iPlatformX++)
 			{
 				for(short iPlatformY = 0; iPlatformY < g_map.platforms[iPlatform]->iTileHeight; iPlatformY++)
 				{
-					short iTile = g_Platforms[iPlatform].tiles[iPlatformX][iPlatformY];
+					TilesetTile * tile = &g_Platforms[iPlatform].tiles[iPlatformX][iPlatformY];
 
-					if(iTile != TILESETSIZE)
+					if(tile->iID != TILESETNONE)
 					{
-						rSrc.x = iTile % TILESETWIDTH * iTileSize;
-						rSrc.y = iTile / TILESETWIDTH * iTileSize;
-
-						rDst.x = (g_Platforms[iPlatform].iStartX + iPlatformX) * iTileSize;
-						rDst.y = (g_Platforms[iPlatform].iStartY + iPlatformY) * iTileSize;
-
-						SDL_BlitSurface(spr_maptiles[iScreenshotSize].getSurface(), &rSrc, blitdest, &rDst);
+						SDL_BlitSurface(spr_maptiles[iScreenshotSize].getSurface(), &g_tilesetmanager.rRects[iScreenshotSize][tile->iCol][tile->iRow], blitdest, &g_tilesetmanager.rRects[iScreenshotSize][g_Platforms[iPlatform].iStartX + iPlatformX][g_Platforms[iPlatform].iStartY + iPlatformY]);
 					}
 				}
 			}

@@ -135,6 +135,10 @@ struct STextAward
 #define TILESETHEIGHT   30
 #define TILESETWIDTH	32
 
+#define TILESETANIMATED	-1
+#define TILESETNONE		-2
+#define TILESETUNKNOWN	-3
+
 #define BLOCKSETSIZE	19			//size of block set
 #define TILEANIMATIONSIZE	13		//number of tile animations
 
