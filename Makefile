@@ -34,7 +34,7 @@ build/SDLMain.o : macosx/SDLMain.m
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 Super\ Mario\ War.app : smw
-	mkdir -p '$@/Contents/Resources' 
+	mkdir -p '$@/Contents/Resources'
 	mkdir -p '$@/Contents/MacOS'
 	mkdir -p '$@/Contents/Frameworks'
 	cp -r /Library/Frameworks/SDL.framework \

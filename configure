@@ -54,12 +54,12 @@ echo 'LDFLAGS:=$(LDFLAGS) '`sdl-config --libs` $LDFLAGS -lSDL_image -lSDL_mixer 
 echo 'COMMON_OBJS:=$(COMMON_OBJS) build/linfunc.o' >> configuration
 fi
 
-# SkyOS configuration 
-if [ "`uname`" = skyos ] 
-then 
-echo 'CFLAGS:=$(CFLAGS) -DPREFIXPATH=\"/usr/share/smw\" '`sdl-config --cflags` $CFLAGS >> configuration 
-echo 'LDFLAGS:=$(LDFLAGS) '`sdl-config --libs` $LDFLAGS -lSDL_image -lSDL_mixer -lpng >> configuration 
-echo 'COMMON_OBJS:=$(COMMON_OBJS) build/linfunc.o' >> configuration 
+# SkyOS configuration
+if [ "`uname`" = skyos ]
+then
+echo 'CFLAGS:=$(CFLAGS) -DPREFIXPATH=\"/usr/share/smw\" '`sdl-config --cflags` $CFLAGS >> configuration
+echo 'LDFLAGS:=$(LDFLAGS) '`sdl-config --libs` $LDFLAGS -lSDL_image -lSDL_mixer -lpng >> configuration
+echo 'COMMON_OBJS:=$(COMMON_OBJS) build/linfunc.o' >> configuration
 fi
 
 # Windows configuration
@@ -70,9 +70,9 @@ then
         echo 'CFLAGS:=$(CFLAGS) '-I`pwd`/mingw-support/include -I`pwd`/mingw-support/include/SDL -Dmain=SDL_main $CFLAGS >> configuration
         echo 'LDFLAGS:=$(LDFLAGS) '-L`pwd`/mingw-support/lib -lmingw32 -lSDLmain -lSDL -mwindows $LDFLAGS -lSDL_image -lSDL_mixer >> configuration
     else
-    	echo 'Please check out mingw-support to build this project.'
-	echo '# cvs co mingw-support'
-	rm -f configuration
+        echo 'Please check out mingw-support to build this project.'
+        echo '# cvs co mingw-support'
+        rm -f configuration
         exit 1
     fi
 fi
