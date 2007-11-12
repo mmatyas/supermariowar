@@ -2286,6 +2286,9 @@ int editor_tiles()
 
 	CTileset * tileset = g_tilesetmanager.GetTileset(set_tile_tileset);
 
+	short view_tileset_repeat_direction = -1;
+	short view_tileset_repeat_timer = 0;
+
 	while (!done)
 	{
 		int framestart = SDL_GetTicks();
@@ -2330,22 +2333,38 @@ int editor_tiles()
 						else if(event.key.keysym.sym == SDLK_UP)
 						{
 							if(view_tileset_y > 0)
+							{
 								view_tileset_y--;
+								view_tileset_repeat_direction = 0;
+								view_tileset_repeat_timer = 30;
+							}
 						}
 						else if(event.key.keysym.sym == SDLK_DOWN)
 						{
 							if(view_tileset_y < g_tilesetmanager.GetTileset(set_tile_tileset)->GetHeight() - 15)
+							{
 								view_tileset_y++;
+								view_tileset_repeat_direction = 1;
+								view_tileset_repeat_timer = 30;
+							}
 						}
 						else if(event.key.keysym.sym == SDLK_LEFT)
 						{
 							if(view_tileset_x > 0)
+							{
 								view_tileset_x--;
+								view_tileset_repeat_direction = 2;
+								view_tileset_repeat_timer = 30;
+							}
 						}
 						else if(event.key.keysym.sym == SDLK_RIGHT)
 						{
 							if(view_tileset_x < g_tilesetmanager.GetTileset(set_tile_tileset)->GetWidth() - 20)
+							{
 								view_tileset_x++;
+								view_tileset_repeat_direction = 3;
+								view_tileset_repeat_timer = 30;
+							}
 						}
 						else
 						{
@@ -2355,6 +2374,18 @@ int editor_tiles()
 						}
 					}
 				
+					break;
+				}
+
+				case SDL_KEYUP:
+				{
+					if(event.key.keysym.sym == SDLK_UP || event.key.keysym.sym == SDLK_DOWN ||
+						event.key.keysym.sym == SDLK_LEFT || event.key.keysym.sym == SDLK_RIGHT)
+					{
+						view_tileset_repeat_direction = -1;
+						view_tileset_repeat_timer = 0;
+					}
+					
 					break;
 				}
 
@@ -2379,7 +2410,7 @@ int editor_tiles()
 					}
 					else if(event.button.button == SDL_BUTTON_RIGHT)
 					{
-						tileset->IncrementTileType(iCol, iRow);
+						set_type = tileset->IncrementTileType(iCol, iRow);
 					}
 					
 					break;
@@ -2440,6 +2471,32 @@ int editor_tiles()
 
 				default:
 					break;
+			}
+		}
+
+		//Allow auto-scrolling of tilesets when the arrow keys are held down
+		if(view_tileset_repeat_direction >= 0 && view_tileset_repeat_timer > 0)
+		{
+			if(--view_tileset_repeat_timer <= 0)
+			{
+				view_tileset_repeat_timer = 5;
+
+				if(view_tileset_repeat_direction == 0 && view_tileset_y > 0)
+				{
+					view_tileset_y--;
+				}
+				else if(view_tileset_repeat_direction == 1 && view_tileset_y < g_tilesetmanager.GetTileset(set_tile_tileset)->GetHeight() - 15)
+				{
+					view_tileset_y++;
+				}
+				else if(view_tileset_repeat_direction == 2 && view_tileset_x > 0)
+				{
+					view_tileset_x--;
+				}
+				else if(view_tileset_repeat_direction == 3 && view_tileset_x < g_tilesetmanager.GetTileset(set_tile_tileset)->GetWidth() - 20)
+				{
+					view_tileset_x++;
+				}
 			}
 		}
 

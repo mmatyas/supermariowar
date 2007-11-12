@@ -101,7 +101,7 @@ void CTileset::SetTileType(short iTileCol, short iTileRow, TileType type)
 	tiletypes[iTileCol + iTileRow * iWidth] = type;
 }
 
-void CTileset::IncrementTileType(short iTileCol, short iTileRow)
+TileType CTileset::IncrementTileType(short iTileCol, short iTileRow)
 {
 	short iTile = iTileCol + iTileRow * iWidth;
 	if(tiletypes[iTile] == tile_nonsolid)
@@ -118,6 +118,8 @@ void CTileset::IncrementTileType(short iTileCol, short iTileRow)
 		tiletypes[iTile] = tile_death_on_bottom;
 	else if(tiletypes[iTile] == tile_death_on_bottom)
 		tiletypes[iTile] = tile_nonsolid;
+
+	return tiletypes[iTile];
 }
 
 void CTileset::Draw(SDL_Surface * dstSurface, short iTileSize, SDL_Rect * srcRect, SDL_Rect * dstRect)

@@ -349,6 +349,9 @@ int editor_edit()
 	bool done = false;
 	g_musiccategorydisplaytimer = 0;
 
+	short view_repeat_direction = -1;
+	short view_repeat_timer = 0;
+
 	while (!done)
 	{
 		int framestart = SDL_GetTicks();
@@ -455,6 +458,9 @@ int editor_edit()
 						{
 							draw_offset_row--;
 							updateworldsurface();
+
+							view_repeat_direction = 0;
+							view_repeat_timer = 30;
 						}
 					}
 					else if(event.key.keysym.sym == SDLK_DOWN)
@@ -463,6 +469,9 @@ int editor_edit()
 						{
 							draw_offset_row++;
 							updateworldsurface();
+
+							view_repeat_direction = 1;
+							view_repeat_timer = 30;
 						}
 					}
 					else if(event.key.keysym.sym == SDLK_LEFT)
@@ -471,6 +480,9 @@ int editor_edit()
 						{
 							draw_offset_col--;
 							updateworldsurface();
+
+							view_repeat_direction = 2;
+							view_repeat_timer = 30;
 						}
 					}
 					else if(event.key.keysym.sym == SDLK_RIGHT)
@@ -479,6 +491,9 @@ int editor_edit()
 						{
 							draw_offset_col++;
 							updateworldsurface();
+
+							view_repeat_direction = 3;
+							view_repeat_timer = 30;
 						}
 					}
 
@@ -502,6 +517,18 @@ int editor_edit()
 						loadcurrentworld();
 					}
 
+					break;
+				}
+
+				case SDL_KEYUP:
+				{
+					if(event.key.keysym.sym == SDLK_UP || event.key.keysym.sym == SDLK_DOWN ||
+						event.key.keysym.sym == SDLK_LEFT || event.key.keysym.sym == SDLK_RIGHT)
+					{
+						view_repeat_direction = -1;
+						view_repeat_timer = 0;
+					}
+					
 					break;
 				}
 
@@ -838,6 +865,36 @@ int editor_edit()
 
 				default:
 					break;
+			}
+		}
+
+		//Allow auto-scrolling of world when the arrow keys are held down
+		if(view_repeat_direction >= 0 && view_repeat_timer > 0)
+		{
+			if(--view_repeat_timer <= 0)
+			{
+				view_repeat_timer = 5;
+
+				if(view_repeat_direction == 0 && draw_offset_row > 0)
+				{
+					draw_offset_row--;
+					updateworldsurface();
+				}
+				else if(view_repeat_direction == 1 && draw_offset_row < iWorldHeight - 15)
+				{
+					draw_offset_row++;
+					updateworldsurface();
+				}
+				else if(view_repeat_direction == 2 && draw_offset_col > 0)
+				{
+					draw_offset_col--;
+					updateworldsurface();
+				}
+				else if(view_repeat_direction == 3 && draw_offset_col < iWorldWidth - 20)
+				{
+					draw_offset_col++;
+					updateworldsurface();
+				}
 			}
 		}
 
