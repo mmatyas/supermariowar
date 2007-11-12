@@ -95,10 +95,12 @@ gfxSprite		spr_dialog;
 gfxSprite		menu_shade;
 gfxSprite		spr_mapitems[3];
 gfxSprite		spr_tileanimation[3];
-gfxSprite		spr_maptiles[3];
 
 gfxSprite		spr_platformarrows[3];
 gfxSprite		spr_warps[3];
+
+gfxSprite		spr_blocks[3];
+gfxSprite		spr_unknowntile[3];
 
 TileType		set_type = tile_solid;
 int				set_tile_rows = 0;
@@ -249,7 +251,6 @@ void CopyTilesetTile(TilesetTile * to, TilesetTile * from)
 	to->iID = from->iID;
 	to->iCol = from->iCol;
 	to->iRow = from->iRow;
-	to->iData = from->iData;
 }
 
 void SetTilesetTile(TilesetTile * tile, short iTileset, short iCol, short iRow)
@@ -326,9 +327,13 @@ int main(int argc, char *argv[])
 	spr_tileanimation[1].init(convertPath("gfx/packs/Classic/eyecandy/tile_animation_preview.png"), 255, 0, 255);
 	spr_tileanimation[2].init(convertPath("gfx/packs/Classic/eyecandy/tile_animation_thumbnail.png"), 255, 0, 255);
 
-	spr_maptiles[0].init(convertPath("gfx/packs/Classic/tileset.png"), 255, 0, 255);
-	spr_maptiles[1].init(convertPath("gfx/packs/Classic/tileset_medium.png"), 255, 0, 255);
-	spr_maptiles[2].init(convertPath("gfx/packs/Classic/tileset_small.png"), 255, 0, 255);
+	spr_blocks[0].init(convertPath("gfx/packs/Classic/blocks.png"), 255, 0, 255);
+	spr_blocks[1].init(convertPath("gfx/packs/Classic/blocks_preview.png"), 255, 0, 255);
+	spr_blocks[2].init(convertPath("gfx/packs/Classic/blocks_thumbnail.png"), 255, 0, 255);
+
+	spr_unknowntile[0].init(convertPath("gfx/packs/Classic/unknown_tile.png"), 255, 0, 255);
+	spr_unknowntile[1].init(convertPath("gfx/packs/Classic/unknown_tile_preview.png"), 255, 0, 255);
+	spr_unknowntile[2].init(convertPath("gfx/packs/Classic/unknown_tile_thumbnail.png"), 255, 0, 255);
 
 	if( SDL_SetColorKey(s_eyecandy, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(s_eyecandy->format, 255, 0, 255)) < 0)
 	{
@@ -350,8 +355,6 @@ int main(int argc, char *argv[])
 
 	printf("\n---------------- load map ----------------\n");
 
-	g_map.loadTileSet(convertPath("maps/tileset/tileset.tls"));
-	
 	//Setup Platforms
 	for(short iPlatform = 0; iPlatform < MAX_PLATFORMS; iPlatform++)
 	{
@@ -469,7 +472,8 @@ int main(int argc, char *argv[])
 	printf("\n---------------- save map ----------------\n");
 
 	save_map(convertPath("maps/ZZleveleditor.map"));
-	g_map.saveTileSet(convertPath("maps/tileset/tileset.tls"));
+	//g_map.saveTileSet(convertPath("maps/tileset/tileset.tls"));
+	g_tilesetmanager.SaveTilesets();
 
 	printf("\n---------------- shutdown ----------------\n");
 	return 0;
@@ -481,7 +485,10 @@ void UpdateTileType(short x, short y)
 	for(short k = MAPLAYERS - 1; k >= 0; k--)
 	{
 		TilesetTile * tile = &g_map.mapdata[x][y][k];
-		TileType iTileType = g_map.tileset[tile->iCol + tile->iRow * TILESETWIDTH];
+
+		TileType iTileType = tile_nonsolid;
+		if(tile->iID >= 0)
+			iTileType = g_tilesetmanager.GetTileset(tile->iID)->GetTileType(tile->iCol, tile->iRow);
 
 		if(iTileType != tile_nonsolid)
 		{
@@ -1319,26 +1326,14 @@ int editor_edit()
 }
 
 void drawlayer(int layer, bool fUseCopied, short iBlockSize)
-{
-	SDL_Rect bltrect, tilebltrect;
-	
-	tilebltrect.w = iBlockSize;
-	tilebltrect.h = iBlockSize;
-	bltrect.w = iBlockSize;
-	bltrect.h = iBlockSize;
-	
+{	
 	short iTilesetIndex = iBlockSize == TILESIZE ? 0 : iBlockSize == PREVIEWTILESIZE ? 1 : 2;
 
 	//draw left to right full vertical
-	bltrect.x = 0;
 	for(short i = 0; i < MAPWIDTH; i++)
 	{
-		bltrect.y = -iBlockSize;	//this is okay, see
-
 		for(short j = 0; j < MAPHEIGHT; j++)
 		{
-			bltrect.y += iBlockSize;	// here
-
 			TilesetTile * tile = NULL;
 			if((move_mode == 1 || move_mode == 3) && i - move_offset_x >= 0 && i - move_offset_x < MAPWIDTH &&
 				j - move_offset_y >= 0 && j - move_offset_y < MAPHEIGHT && 
@@ -1358,23 +1353,18 @@ void drawlayer(int layer, bool fUseCopied, short iBlockSize)
 			
 			if(tile->iID >= 0)
 			{
-				//TODO:: Fix this - it isn't needed because map files should not contain row/cols above 32
-				//Need to fix zelda level 1 map first
-				if(tile->iCol < 32 && tile->iRow < 32)
-					SDL_BlitSurface(spr_maptiles[iTilesetIndex].getSurface(), &g_tilesetmanager.rRects[iTilesetIndex][tile->iCol][tile->iRow], screen, &bltrect);
+				g_tilesetmanager.Draw(screen, tile->iID, iTilesetIndex, tile->iCol, tile->iRow, i, j);
+				//SDL_BlitSurface(g_tilesetmanager.GetTileset(tile->iID)->GetSurface(iTilesetIndex), &g_tilesetmanager.rRects[iTilesetIndex][tile->iCol][tile->iRow], screen, &bltrect);
 			}
 			else if(tile->iID == TILESETANIMATED)
 			{
-				SDL_BlitSurface(spr_tileanimation[iTilesetIndex].getSurface(), &g_tilesetmanager.rRects[iTilesetIndex][tile->iCol << 2][tile->iRow], screen, &bltrect);
+				SDL_BlitSurface(spr_tileanimation[iTilesetIndex].getSurface(), &g_tilesetmanager.rRects[iTilesetIndex][tile->iCol << 2][tile->iRow], screen, &g_tilesetmanager.rRects[iTilesetIndex][i][j]);
 			}
 			else if(tile->iID == TILESETUNKNOWN)
 			{
-				//TODO: Draw Red X Tiles where tile is unknown
-				//SDL_BlitSurface(spr_tileanimation[iTilesetIndex].getSurface(), &g_tilesetmanager.rRects[iTilesetIndex][tile->iCol << 2][tile->iRow], screen, &bltrect);
+				SDL_BlitSurface(spr_unknowntile[iTilesetIndex].getSurface(), &g_tilesetmanager.rRects[iTilesetIndex][0][0], screen, &g_tilesetmanager.rRects[iTilesetIndex][i][j]);
 			}
 		}
-
-		bltrect.x += iBlockSize;
 	}
 }
 
@@ -1450,20 +1440,20 @@ void drawmap(bool fScreenshot, short iBlockSize)
 					if(displayblock < 7)
 					{
 						rSrc.x = displayblock * iBlockSize;
-						rSrc.y = iBlockSize * 30;
+						rSrc.y = 0;
 					}
 					if(displayblock >= 7 && displayblock <= 14)
 					{
 						rSrc.x = displayblock * iBlockSize;
-						rSrc.y = iBlockSize * (g_map.iSwitches[(displayblock - 7) % 4] + 30);
+						rSrc.y = iBlockSize * g_map.iSwitches[(displayblock - 7) % 4];
 					}
 					else if(displayblock >= 15 && displayblock <= 18)
 					{
 						rSrc.x = (displayblock - 15) * iBlockSize;
-						rSrc.y = iBlockSize * 31;
+						rSrc.y = iBlockSize;
 					}
 					
-					SDL_BlitSurface(spr_maptiles[iTilesizeIndex].getSurface(), &rSrc, screen, &g_tilesetmanager.rRects[iTilesizeIndex][i][j]);
+					SDL_BlitSurface(spr_blocks[iTilesizeIndex].getSurface(), &rSrc, screen, &g_tilesetmanager.rRects[iTilesizeIndex][i][j]);
 				}
 			}
 		}
@@ -1823,7 +1813,6 @@ int editor_platforms()
 						{
 							editor_tiletype();
 							iPlatformEditState = PLATFORM_EDIT_STATE_TILETYPE;
-							ignoreclick = false;
 						}
 					}
 					else if(event.key.keysym.sym == SDLK_c)
@@ -1910,7 +1899,7 @@ int editor_platforms()
 				}
 				case SDL_MOUSEBUTTONDOWN:
 				{
-					if(event.button.button == SDL_BUTTON_LEFT)
+					if(event.button.button == SDL_BUTTON_LEFT && !ignoreclick)
 					{
 						if(PLATFORM_EDIT_STATE_SELECT == iPlatformEditState)
 						{
@@ -1954,7 +1943,7 @@ int editor_platforms()
 										{
 											TilesetTile * tile = &g_Platforms[iEditPlatform].tiles[ix + i][iy + j];
 											SetTilesetTile(tile, set_tile_tileset, set_tile_start_x + i, set_tile_start_y + j);
-											g_Platforms[iEditPlatform].types[ix + i][iy + j] = g_map.GetTileSet()[tile->iCol + tile->iRow * g_tilesetmanager.GetTileset(set_tile_tileset)->GetWidth()];
+											g_Platforms[iEditPlatform].types[ix + i][iy + j] = g_tilesetmanager.GetTileset(tile->iID)->GetTileType(tile->iCol, tile->iRow);
 										}
 									}
 								}
@@ -2079,7 +2068,7 @@ int editor_platforms()
 									{
 										TilesetTile * tile = &g_Platforms[iEditPlatform].tiles[ix + i][iy + j];
 										SetTilesetTile(tile, set_tile_tileset, set_tile_start_x + i, set_tile_start_y + j);
-										g_Platforms[iEditPlatform].types[ix + i][iy + j] = g_map.GetTileSet()[tile->iCol + tile->iRow * g_tilesetmanager.GetTileset(set_tile_tileset)->GetWidth()];
+										g_Platforms[iEditPlatform].types[ix + i][iy + j] = g_tilesetmanager.GetTileset(tile->iID)->GetTileType(tile->iCol, tile->iRow);
 									}
 								}
 							}
@@ -2248,23 +2237,21 @@ int editor_platforms()
 }
 
 void draw_platform(short iPlatform, bool fDrawTileTypes)
-{
-	SDL_Rect bltrect;
-		
-	bltrect.x = 0;
-	bltrect.y = 0;
-	bltrect.w = TILESIZE;
-	bltrect.h = TILESIZE;
-	
+{	
 	for(short iCol = 0; iCol < MAPWIDTH; iCol++)
 	{
 		for(short iRow = 0; iRow < MAPHEIGHT; iRow++)
 		{
 			TilesetTile * tile = &g_Platforms[iPlatform].tiles[iCol][iRow];
 			
-			if(tile->iID != TILESETNONE)
+			if(tile->iID >= 0)
 			{
-				SDL_BlitSurface(spr_maptiles[0].getSurface(), &g_tilesetmanager.rRects[0][tile->iCol][tile->iRow], screen, &bltrect);
+				g_tilesetmanager.Draw(screen, tile->iID, 0, tile->iCol, tile->iRow, iCol, iRow);
+				//SDL_BlitSurface(g_tilesetmanager.GetTileset(tile->iID)->GetSurface(0), &g_tilesetmanager.rRects[0][tile->iCol][tile->iRow], screen, &bltrect);
+			}
+			else if(tile->iID == TILESETUNKNOWN)
+			{
+				SDL_BlitSurface(spr_unknowntile[0].getSurface(), &g_tilesetmanager.rRects[0][0][0], screen, &g_tilesetmanager.rRects[0][iCol][iRow]);
 			}
 
 			if(fDrawTileTypes)
@@ -2272,12 +2259,7 @@ void draw_platform(short iPlatform, bool fDrawTileTypes)
 				TileType type = g_Platforms[iPlatform].types[iCol][iRow];
 				spr_transparenttiles.draw(iCol * TILESIZE, iRow * TILESIZE, (type - 1) * TILESIZE, 0, TILESIZE, TILESIZE);
 			}
-
-			bltrect.y += TILESIZE;
 		}
-
-		bltrect.x += TILESIZE;
-		bltrect.y = 0;
 	}
 }
 
@@ -2473,9 +2455,8 @@ int editor_tiles()
 		rectSrc.w = tileset->GetWidth() > 20 ? 640 : tileset->GetWidth() << 5;
 		rectSrc.h = tileset->GetHeight() > 15 ? 480 : tileset->GetHeight() << 5;
 
-		//TODO:  Use tileset surfaces from tileset manager
-		SDL_BlitSurface(spr_maptiles[0].getSurface(), &rectSrc, screen, &r);
-		//menu_font_small.drawRightJustified(640, 0, maplist.currentFilename());
+		SDL_BlitSurface(g_tilesetmanager.GetTileset(set_tile_tileset)->GetSurface(0), &rectSrc, screen, &r);
+		menu_font_small.drawRightJustified(640, 0, maplist.currentFilename());
 		
 		for(i = view_tileset_x; i < view_tileset_x + 20 && i < tileset->GetWidth(); i++)
 		{
@@ -2596,25 +2577,25 @@ int editor_blocks()
 		drawmap(false, TILESIZE);
 		menu_shade.draw(0, 0);
 		
-		SDL_Rect rSrc = {0, 960, 224, 32};
+		SDL_Rect rSrc = {0, 0, 224, 32};
 		SDL_Rect rDst = {0, 0, 224, 32};
 
-		SDL_BlitSurface(spr_maptiles[0].getSurface(), &rSrc, screen, &rDst);
+		SDL_BlitSurface(spr_blocks[0].getSurface(), &rSrc, screen, &rDst);
 
-		SDL_Rect rOnOffSrc = {224, 960, 128, 64};
+		SDL_Rect rOnOffSrc = {224, 0, 128, 64};
 		SDL_Rect rOnOffDst = {0, 32, 128, 64};
 
-		SDL_BlitSurface(spr_maptiles[0].getSurface(), &rOnOffSrc, screen, &rOnOffDst);
+		SDL_BlitSurface(spr_blocks[0].getSurface(), &rOnOffSrc, screen, &rOnOffDst);
 
-		SDL_Rect rOnOffBlockSrc = {352, 960, 128, 32};
+		SDL_Rect rOnOffBlockSrc = {352, 0, 128, 32};
 		SDL_Rect rOnOffBlockDst = {0, 96, 128, 32};
 
-		SDL_BlitSurface(spr_maptiles[0].getSurface(), &rOnOffBlockSrc, screen, &rOnOffBlockDst);
+		SDL_BlitSurface(spr_blocks[0].getSurface(), &rOnOffBlockSrc, screen, &rOnOffBlockDst);
 
-		SDL_Rect rBlocksRow2Src = {0, 992, 128, 32};
+		SDL_Rect rBlocksRow2Src = {0, 32, 128, 32};
 		SDL_Rect rBlocksRow2Dst = {224, 0, 128, 32};
 
-		SDL_BlitSurface(spr_maptiles[0].getSurface(), &rBlocksRow2Src, screen, &rBlocksRow2Dst);
+		SDL_BlitSurface(spr_blocks[0].getSurface(), &rBlocksRow2Src, screen, &rBlocksRow2Dst);
 
 		menu_font_small.drawRightJustified(640, 0, maplist.currentFilename());
 				
@@ -3851,9 +3832,14 @@ void takescreenshot()
 				{
 					TilesetTile * tile = &g_Platforms[iPlatform].tiles[iPlatformX][iPlatformY];
 
-					if(tile->iID != TILESETNONE)
+					if(tile->iID >= 0)
 					{
-						SDL_BlitSurface(spr_maptiles[iScreenshotSize].getSurface(), &g_tilesetmanager.rRects[iScreenshotSize][tile->iCol][tile->iRow], blitdest, &g_tilesetmanager.rRects[iScreenshotSize][g_Platforms[iPlatform].iStartX + iPlatformX][g_Platforms[iPlatform].iStartY + iPlatformY]);
+						g_tilesetmanager.Draw(blitdest, tile->iID, iScreenshotSize, tile->iCol, tile->iRow, g_Platforms[iPlatform].iStartX + iPlatformX, g_Platforms[iPlatform].iStartY + iPlatformY);
+						//SDL_BlitSurface(spr_maptiles[iScreenshotSize].getSurface(), &g_tilesetmanager.rRects[iScreenshotSize][tile->iCol][tile->iRow], blitdest, &g_tilesetmanager.rRects[iScreenshotSize][g_Platforms[iPlatform].iStartX + iPlatformX][g_Platforms[iPlatform].iStartY + iPlatformY]);
+					}
+					else if(tile->iID == TILESETUNKNOWN)
+					{
+						//Draw unknown tile
 					}
 				}
 			}

@@ -34,34 +34,51 @@ CTileset::CTileset(const char * szpath)
 
 	strcpy(szFile, szpath);
 	strcat(szFile, "/tileset.tls");
-	ReadTileTypeFile(szFile);
+
+	strcpy(szTilesetPath, convertPartialPath(szFile).c_str());
+	ReadTileTypeFile(szTilesetPath);
 }
 
 bool CTileset::ReadTileTypeFile(char * szFile)
 {
-	FILE * tsf = fopen(szFile, "rb");
-	if(tsf == NULL)
+	//Detect if the tiletype file already exists, if not create it
+	if(File_Exists(szFile))
 	{
-		printf("ERROR: couldn't open tileset file: %s\n", szFile);
-		return false;
-	}
-	
-	short iTileTypeSize = ReadInt(tsf);
+		FILE * tsf = fopen(szFile, "rb");
+		if(tsf == NULL)
+		{
+			printf("ERROR: couldn't open tileset file: %s\n", szFile);
+			return false;
+		}
+		
+		iTileTypeSize = ReadInt(tsf);
 
-	if(iTileTypeSize <= 0 || iTileTypeSize > 1024)
-	{
+		if(iTileTypeSize <= 0 || iTileTypeSize > 1024)
+		{
+			fclose(tsf);
+			return false;
+		}
+
+		tiletypes = new TileType[iTileTypeSize];
+
+		for(short i = 0; i < iTileTypeSize; i++)
+		{
+			tiletypes[i] = (TileType)ReadInt(tsf);
+		}
+
 		fclose(tsf);
-		return false;
 	}
-
-	tiletypes = new TileType[iTileTypeSize];
-
-	for(short i = 0; i < iTileTypeSize; i++)
+	else
 	{
-		tiletypes[i] = (TileType)ReadInt(tsf);
+		iTileTypeSize = iWidth * iHeight;
+		tiletypes = new TileType[iTileTypeSize];
+
+		for(short i = 0; i < iTileTypeSize; i++)
+		{
+			tiletypes[i] = tile_nonsolid;
+		}
 	}
 
-	fclose(tsf);
 	return true;
 }
 
@@ -108,6 +125,25 @@ void CTileset::Draw(SDL_Surface * dstSurface, short iTileSize, SDL_Rect * srcRec
 	SDL_BlitSurface(sSurfaces[iTileSize], srcRect, dstSurface, dstRect);
 }
 
+void CTileset::SaveTileset()
+{
+	FILE * tsf = fopen(szTilesetPath, "wb");
+	if(tsf == NULL)
+	{
+		printf("ERROR: couldn't open tileset file to save tile types: %s\n", szTilesetPath);
+		return;
+	}
+	
+	WriteInt(iTileTypeSize, tsf);
+
+	for(short i = 0; i < iTileTypeSize; i++)
+	{
+		WriteInt(tiletypes[i], tsf);
+	}
+
+	fclose(tsf);
+}
+
 /*********************************
 *  CTilesetManager
 *********************************/
@@ -134,6 +170,8 @@ CTilesetManager::CTilesetManager() :
 		y2 += PREVIEWTILESIZE;
 		y3 += THUMBTILESIZE;
 	}
+
+	tClassicTileset = NULL;
 }
 
 CTilesetManager::~CTilesetManager()
@@ -141,21 +179,23 @@ CTilesetManager::~CTilesetManager()
 
 void CTilesetManager::Init()
 {
-	std::vector<std::string>::iterator itr = filelist.begin(), lim = filelist.end();
+	short iLength = filelist.size();
 
-	while(itr != lim)
+	for(short i = 0; i < iLength; i++)
 	{
-		CTileset * tileset = new CTileset(itr->c_str());
+		CTileset * tileset = new CTileset(filelist[i].c_str());
 		tilesetlist.push_back(tileset);
 
-		itr++;
+		if(!strcmp(tileset->GetName(), "Classic"))
+		{
+			tClassicTileset = tileset;
+			iClassicTilesetIndex = i;
+		}
 	}
 }
 
 short CTilesetManager::GetIndexFromName(char * szName)
 {
-	std::vector<CTileset*>::iterator itr = tilesetlist.begin(), lim = tilesetlist.end();
-
 	short iLength = tilesetlist.size();
 
 	for(short i = 0; i < iLength; i++)
@@ -164,7 +204,7 @@ short CTilesetManager::GetIndexFromName(char * szName)
 			return i;
 	}
 
-	return -1;
+	return TILESETUNKNOWN;
 }
 
 void CTilesetManager::Draw(SDL_Surface * dstSurface, short iTilesetID, short iTileSize, short iSrcTileCol, short iSrcTileRow, short iDstTileCol, short iDstTileRow)
@@ -181,3 +221,12 @@ CTileset * CTilesetManager::GetTileset(short iTilesetID)
 	return tilesetlist[iTilesetID];
 }
 
+void CTilesetManager::SaveTilesets()
+{
+	short iLength = tilesetlist.size();
+
+	for(short i = 0; i < iLength; i++)
+	{
+		tilesetlist[i]->SaveTileset();
+	}
+}

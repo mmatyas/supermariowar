@@ -52,9 +52,12 @@ struct TilesetTile
 	short iID;
 	short iCol;
 	short iRow;
+};
 
-	// This is needed for backwards compatibility with older map formats
-	short iData;
+struct TilesetTranslation
+{
+	short iID;
+	char szName[128];
 };
 
 struct AnimatedTile
@@ -76,10 +79,6 @@ class CMap
 		CMap();
 		~CMap();
 
-		void loadTileSet(const std::string& tilesetfile);
-		void saveTileSet(const std::string& tilesetfile);
-		void clearTileSet();
-
 		void clearMap();
 		void clearPlatforms();
 
@@ -90,7 +89,7 @@ class CMap
 		void UpdateAllTileGaps();
 		void UpdateTileGap(short i, short j);
 
-		void loadPlatforms(FILE * mapfile, bool fPreview, int version[4]);
+		void loadPlatforms(FILE * mapfile, bool fPreview, int version[4], short * translationid);
 
 		//void convertMap();
 
@@ -168,13 +167,12 @@ class CMap
 		short musicCategoryID;
 		short iNumMapItems;
 
-		TileType * GetTileSet() {return tileset;}
 
 	private:
-		
+
 		void SetTileGap(short i, short j);
 		void calculatespawnareas(short iType, bool fUseTempBlocks);
-		
+
 		TilesetTile	mapdata[MAPWIDTH][MAPHEIGHT][MAPLAYERS];
 		TileType	mapdatatop[MAPWIDTH][MAPHEIGHT];
 		short		objectdata[MAPWIDTH][MAPHEIGHT];
@@ -201,8 +199,6 @@ class CMap
 		bool		warplocked[10];
 		short		maxConnection;
 
-		TileType	tileset[TILESETSIZE+1];
-
 		SDL_Rect	tilebltrect;
 		SDL_Rect    bltrect;
 
@@ -211,15 +207,6 @@ class CMap
 
 		short		iSwitches[4];
 		std::list<IO_Block*> switchBlocks[8];
-
-		short		iThumbTileX[TILESETSIZE]; //Optimization for drawing preview map
-		short		iThumbTileY[TILESETSIZE]; 
-
-		short		iPreviewTileX[TILESETSIZE]; //Optimization for drawing preview map
-		short		iPreviewTileY[TILESETSIZE]; 
-
-		short		iGameTileX[TILESETSIZE]; //Optimization for drawing real map on load
-		short		iGameTileY[TILESETSIZE]; 
 
 		bool		fAutoFilter[NUM_AUTO_FILTERS];
 

@@ -131,7 +131,8 @@ gfxSprite		spr_brokenflipblock;
 gfxSprite		spr_brokenblueblock;
 
 gfxSprite		spr_tileanimation[3];
-gfxSprite		spr_maptiles[3];
+gfxSprite		spr_blocks[3];
+gfxSprite		spr_unknowntile[3];
 
 gfxSprite		spr_starpowerup;
 gfxSprite		spr_1uppowerup;

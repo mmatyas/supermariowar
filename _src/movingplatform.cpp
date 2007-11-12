@@ -78,8 +78,6 @@ MovingPlatform::MovingPlatform(TilesetTile ** tiledata, TileType ** tiletypes, s
 		path->fVelocity /= 2.0f;
 	}
 
-	SDL_Surface * tilesurface = spr_maptiles[iTileSizeIndex].getSurface();
-
 	iTileData = tiledata;
 	iTileType = tiletypes;
 
@@ -105,17 +103,12 @@ MovingPlatform::MovingPlatform(TilesetTile ** tiledata, TileType ** tiletypes, s
 
 	pPath = path;
 
-	sSurface = SDL_CreateRGBSurface(tilesurface->flags, w * iTileSize, h * iTileSize, tilesurface->format->BitsPerPixel, 0, 0, 0, 0);
+	sSurface = SDL_CreateRGBSurface(screen->flags, w * iTileSize, h * iTileSize, screen->format->BitsPerPixel, 0, 0, 0, 0);
 
 	if( SDL_SetColorKey(sSurface, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(sSurface->format, 255, 0, 255)) < 0)
 		printf("\n ERROR: Couldn't set ColorKey for moving platform: %s\n", SDL_GetError());
 
 	SDL_FillRect(sSurface, NULL, SDL_MapRGB(sSurface->format, 255, 0, 255));
-
-	rDstRect.x = 0;
-	rDstRect.y = 0;
-	rDstRect.w = iTileSize;
-	rDstRect.h = iTileSize;
 
 	for(short iCol = 0; iCol < iTileWidth; iCol++)
 	{
@@ -124,18 +117,18 @@ MovingPlatform::MovingPlatform(TilesetTile ** tiledata, TileType ** tiletypes, s
 			TilesetTile * tile = &iTileData[iCol][iRow];
 
 			if(tile->iID == TILESETNONE)
-			{
-				rDstRect.y += iTileSize;
 				continue;
+
+			if(tile->iID >= 0)
+			{
+				g_tilesetmanager.Draw(sSurface, tile->iID, iTileSizeIndex, tile->iCol, tile->iRow, iCol, iRow);
+				//SDL_BlitSurface(g_tilesetmanager.GetTileset(tile->iID)->getsur, &g_tilesetmanager.rRects[iTileSizeIndex][tile->iCol][tile->iRow], sSurface, &rDstRect);
 			}
-
-			SDL_BlitSurface(tilesurface, &g_tilesetmanager.rRects[iTileSizeIndex][tile->iCol][tile->iRow], sSurface, &rDstRect);
-
-			rDstRect.y += iTileSize;
+			else if(tile->iID == TILESETUNKNOWN)
+			{
+				SDL_BlitSurface(spr_unknowntile[iTileSizeIndex].getSurface(), &g_tilesetmanager.rRects[iTileSizeIndex][0][0], sSurface, &g_tilesetmanager.rRects[iTileSizeIndex][iCol][iRow]);				
+			}
 		}
-
-		rDstRect.y = 0;
-		rDstRect.x += iTileSize;
 	}
 
 	rSrcRect.x = 0;

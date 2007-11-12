@@ -36,51 +36,11 @@ CMap::CMap()
 
 	for(short iSwitch = 0; iSwitch < 4; iSwitch++)
 		iSwitches[iSwitch] = 0;
-
-	for(short iTile = 0; iTile < TILESETSIZE; iTile++)
-	{
-		iThumbTileX[iTile] = (iTile % TILESETWIDTH) * THUMBTILESIZE;
-		iThumbTileY[iTile] = (iTile / TILESETWIDTH) * THUMBTILESIZE;
-
-		iPreviewTileX[iTile] = (iTile % TILESETWIDTH) * PREVIEWTILESIZE;
-		iPreviewTileY[iTile] = (iTile / TILESETWIDTH) * PREVIEWTILESIZE;
-
-		iGameTileX[iTile] = (iTile % TILESETWIDTH) * TILESIZE;
-		iGameTileY[iTile] = (iTile / TILESETWIDTH) * TILESIZE;
-	}
 }
 
 CMap::~CMap()
 {}
 
-
-void CMap::loadTileSet(const std::string& tilesetfile)
-{
-	FILE *tsf;
-	int i;
-
-	clearTileSet();
-
-	//load tileset file
-    cout << "loading tileset from " << tilesetfile << " ... ";
-
-	tsf = fopen(tilesetfile, "rb");
-	if(tsf == NULL)
-	{
-        cout << endl << " ERROR: couldn't open tileset file." << endl;
-		return;
-	}
-	
-	for(i = 0; i < TILESETSIZE; i++)
-	{
-		tileset[i] = (TileType)ReadInt(tsf);
-	}
-
-	tileset[TILESETSIZE] = tile_nonsolid;	//this is the no tile selected tile
-
-	fclose(tsf);
-    cout << "done" << endl;
-}
 
 //With the new 32x30 tile set, we need to convert old maps to use the 
 //correct indexes into the tile set
@@ -123,43 +83,6 @@ void CMap::convertMap()
 		}
 	}
 }*/
-
-void CMap::saveTileSet(const std::string& tilesetfile)
-{
-	FILE *mapfile;
-	int i;
-
-    cout << "saving tileset " << tilesetfile << " ... ";
-
-	mapfile = fopen(tilesetfile, "wb");
-	if(mapfile == NULL)
-	{
-        cout << endl << " ERROR: couldn't open tileset file." << endl;
-		return;
-	}
-
-	//save tileset
-	for(i = 0; i < TILESETSIZE; i++)
-	{
-		WriteInt(tileset[i], mapfile);
-	}
-	
-
-	fclose(mapfile);
-
-    cout << "done" << endl;
-}
-
-
-void CMap::clearTileSet()
-{
-	int i;
-	for(i = 0; i < TILESETSIZE; i++)
-		tileset[i] = tile_nonsolid;
-
-	tilebltrect.w = TILESIZE;
-	tilebltrect.h = TILESIZE;
-}
 
 void CMap::clearMap()
 {
@@ -290,21 +213,34 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 		if(iReadType == read_type_preview)
 			cout << " (preview)";
 		
-		cout << " ";
-
-		cout << "[Version " << version[0] << '.' << version[1] << '.'
+		cout << " [Version " << version[0] << '.' << version[1] << '.'
 			<< version[2] << '.' << version[3] << " Map Detected]\n";
 
 		//Load tileset information
 		short iNumTilesets = ReadInt(mapfile);
 
+		TilesetTranslation * translation = new TilesetTranslation[iNumTilesets];
+
+		short iMaxTilesetID = 0; //Figure out how big the translation array needs to be
 		for(short iTileset = 0; iTileset < iNumTilesets; iTileset++)
 		{
-			short iTileID = ReadInt(mapfile);
-			
-			char szTilesetName[128];
-			ReadString(szTilesetName, 128, mapfile);
+			short iTilesetID = ReadInt(mapfile);
+			translation[iTileset].iID = iTilesetID;
+
+			if(iTilesetID > iMaxTilesetID)
+				iMaxTilesetID = iTilesetID;
+
+			ReadString(translation[iTileset].szName, 128, mapfile);
 		}
+
+		short * translationid = new short[iMaxTilesetID + 1];
+
+		for(short iTileset = 0; iTileset < iNumTilesets; iTileset++)
+		{
+			translationid[translation[iTileset].iID] = g_tilesetmanager.GetIndexFromName(translation[iTileset].szName);
+		}
+
+		delete [] translation;
 
 		//2. load map data
 		for(j = 0; j < MAPHEIGHT; j++)
@@ -316,9 +252,14 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 					//mapdata[i][j][k] = (short)ReadInt(mapfile);
 
 					TilesetTile * tile = &mapdata[i][j][k];
-					tile->iID = (short)ReadByteAsShort(mapfile);
-					tile->iCol = (short)ReadByteAsShort(mapfile);
-					tile->iRow = (short)ReadByteAsShort(mapfile);
+					tile->iID = ReadByteAsShort(mapfile);
+
+					//Convert tileset ids into the current game's tileset's ids
+					if(tile->iID >= 0)
+						tile->iID = translationid[tile->iID];
+
+					tile->iCol = ReadByteAsShort(mapfile);
+					tile->iRow = ReadByteAsShort(mapfile);
 				}
 
 				objectdata[i][j] = (short)ReadInt(mapfile);
@@ -335,7 +276,10 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 			iSwitches[iSwitch] = (short)ReadInt(mapfile);
 		}
 
-		loadPlatforms(mapfile, iReadType == read_type_preview, version);
+		loadPlatforms(mapfile, iReadType == read_type_preview, version, translationid);
+
+		//All tiles have been loaded so the translation is no longer needed
+		delete [] translationid;
 
 		//Load map items (like carryable spikes and springs)
 		iNumMapItems = ReadInt(mapfile);
@@ -490,7 +434,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 		cout << "[Version " << version[0] << '.' << version[1] << '.'
 			<< version[2] << '.' << version[3] << " Map Detected]\n";
 
-		//TODO:: Setup tileset for Classic only
+		short iClassicTilesetID = g_tilesetmanager.GetIndexFromName("Classic");
 
 		//2. load map data
 		for(j = 0; j < MAPHEIGHT; j++)
@@ -511,7 +455,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 					}
 					else
 					{
-						tile->iID = 0;
+						tile->iID = iClassicTilesetID;
 						tile->iCol = iTileID % 32;
 						tile->iRow = iTileID / 32;
 					}
@@ -566,7 +510,8 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 
 		if((version[2] == 0 && version[3] > 1) || version[2] >= 1)
 		{
-			loadPlatforms(mapfile, iReadType == read_type_preview, version);
+			short translationid[1] = {g_tilesetmanager.GetIndexFromName("Classic")};
+			loadPlatforms(mapfile, iReadType == read_type_preview, version, translationid);
 		}
 
 		//Read in eyecandy to use
@@ -678,7 +623,8 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 
 		if(version[2] == 0 && version[3] < 2)
 		{
-			loadPlatforms(mapfile, iReadType == read_type_preview, version);
+			short translationid[1] = {g_tilesetmanager.GetIndexFromName("Classic")};
+			loadPlatforms(mapfile, iReadType == read_type_preview, version, translationid);
 		}
 
 		if(version[2] == 0 && version[3] == 0)
@@ -709,8 +655,6 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
         cout << "[Version " << version[0] << '.' << version[1] << '.'
             << version[2] << '.' << version[3] << " Map Detected]\n";
 
-		//TODO:: Setup for Classic Tileset Only Here!
-
 		//2. load map data
 		for(j = 0; j < MAPHEIGHT; j++)
 		{
@@ -730,19 +674,20 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 						short iTileID = g_iTileConversion[iTile];
 
 						TilesetTile * tile = &mapdata[i][j][k];
-						tile->iID = 0;
+						tile->iID = g_tilesetmanager.GetClassicTilesetIndex();
 						tile->iCol = iTileID % 32;
 						tile->iRow = iTileID / 32;
-						tile->iData = iTileID;
 					}
 				}
 
 				mapdatatop[i][j] = tile_nonsolid;
 				for(k = MAPLAYERS - 1; k >= 0; k--)
 				{
-					if(tileset[mapdata[i][j][k].iData] != tile_nonsolid)
+					TilesetTile * tile = &mapdata[i][j][k];
+					TileType type = g_tilesetmanager.GetClassicTileset()->GetTileType(tile->iCol, tile->iRow);
+					if(type != tile_nonsolid)
 					{
-						mapdatatop[i][j] = tileset[mapdata[i][j][k].iData];
+						mapdatatop[i][j] = type;
 						break;
 					}
 				}
@@ -918,11 +863,11 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 				short iTileID = (short)ReadInt(mapfile);
 
 				TilesetTile * tile = &mapdata[i][j][1];
-				tile->iID = 0;
+				tile->iID = g_tilesetmanager.GetClassicTilesetIndex();
 				tile->iCol = iTileID % 32;
 				tile->iRow = iTileID / 32;
 
-				mapdatatop[i][j] = tileset[iTileID];
+				mapdatatop[i][j] = g_tilesetmanager.GetClassicTileset()->GetTileType(tile->iCol, tile->iRow);
 
 				mapdata[i][j][0].iID = TILESETNONE;
 				mapdata[i][j][2].iID = TILESETNONE;
@@ -1046,7 +991,7 @@ void CMap::SetTileGap(short i, short j)
 	}
 }
 
-void CMap::loadPlatforms(FILE * mapfile, bool fPreview, int version[4])
+void CMap::loadPlatforms(FILE * mapfile, bool fPreview, int version[4], short * translationid)
 {
 	clearPlatforms();
 
@@ -1070,14 +1015,29 @@ void CMap::loadPlatforms(FILE * mapfile, bool fPreview, int version[4])
 			for(short iRow = 0; iRow < iHeight; iRow++)
 			{
 				TilesetTile * tile = &tiles[iCol][iRow];
-				tile->iID = ReadByteAsShort(mapfile);
-				tile->iCol = ReadByteAsShort(mapfile);
-				tile->iRow = ReadByteAsShort(mapfile);
 
 				if(version[0] > 1 || (version[0] == 1 && version[1] >= 8))
+				{
+					tile->iID = ReadByteAsShort(mapfile);
+
+					//Convert tileset ids into the current game's tileset's ids
+					if(tile->iID >= 0)
+						tile->iID = translationid[tile->iID];
+
+					tile->iCol = ReadByteAsShort(mapfile);
+					tile->iRow = ReadByteAsShort(mapfile);
+
 					types[iCol][iRow] = (TileType)ReadInt(mapfile);
+				}
 				else
-					types[iCol][iRow] = tileset[tile->iCol + tile->iRow * TILESETWIDTH];
+				{
+					short iTile = ReadInt(mapfile);
+					tile->iID = g_tilesetmanager.GetClassicTilesetIndex();
+					tile->iCol = iTile % TILESETWIDTH;
+					tile->iRow = iTile / TILESETWIDTH;
+
+					types[iCol][iRow] = g_tilesetmanager.GetClassicTileset()->GetTileType(tile->iCol, tile->iRow);
+				}
 			}
 		}
 	
@@ -1237,17 +1197,62 @@ void CMap::saveMap(const std::string& file)
 
 	//Write tileset names and indexes for translation at load time
 	//Number of tilesets used by this map
-	WriteInt(1, mapfile);
+	short iTilesetCount = g_tilesetmanager.GetCount();
+	bool * fTilesetUsed = new bool[iTilesetCount];
+	for(short iTileset = 0; iTileset < iTilesetCount; iTileset++)
+		fTilesetUsed[iTileset] = false;
+
+	//Scan map to see how many tilesets were used
+	for(j = 0; j < MAPHEIGHT; j++)
+	{
+		for(i = 0; i < MAPWIDTH; i++)
+		{
+			for(k = 0; k < MAPLAYERS; k++)
+			{
+				if(mapdata[i][j][k].iID >= 0)
+					fTilesetUsed[mapdata[i][j][k].iID] = true;
+			}
+		}
+	}
+
+	//Scan platforms too for tilesets used
+	for(short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++)
+	{
+		for(short iCol = 0; iCol < platforms[iPlatform]->iTileWidth; iCol++)
+		{
+			for(short iRow = 0; iRow < platforms[iPlatform]->iTileHeight; iRow++)	
+			{
+				TilesetTile * tile = &platforms[iPlatform]->iTileData[iCol][iRow];
+
+				if(tile->iID >= 0)
+					fTilesetUsed[tile->iID] = true;
+			}
+		}
+	}
+
+	short iUsedTilesets = 0;
+	for(short iTileset = 0; iTileset < iTilesetCount; iTileset++)
+	{
+		if(fTilesetUsed[iTileset])
+			iUsedTilesets++;
+	}
+
+	WriteInt(iUsedTilesets, mapfile);
 
 	//Write each of the tileset names with the index that will be used by this mapfile to represent that tileset
-	for(short iTileset = 0; iTileset < 1; iTileset++)
+	for(short iTileset = 0; iTileset < iTilesetCount; iTileset++)
 	{
-		//Tileset ID
-		WriteInt(0, mapfile);
+		if(fTilesetUsed[iTileset])
+		{
+			//Tileset ID
+			WriteInt(iTileset, mapfile);
 
-		//Tileset Name
-		WriteString("Classic", mapfile);
+			//Tileset Name
+			WriteString(g_tilesetmanager.GetTileset(iTileset)->GetName(), mapfile);
+		}
 	}
+
+	delete [] fTilesetUsed;
 
 	//save map tiles and blocks
 	for(j = 0; j < MAPHEIGHT; j++)
@@ -1335,21 +1340,7 @@ void CMap::saveMap(const std::string& file)
 	for(j = 0; j < MAPHEIGHT; j++)
 	{
 		for(i = 0; i < MAPWIDTH; i++)
-		{
-			/*
-			//Figure out what the top tile's type is
-			TileType type = tile_nonsolid;
-			for(k = MAPLAYERS - 1; k >= 0; k--)
-			{
-				TileType type = tileset[mapdata[i][j][k]];
-				if(type != tile_nonsolid && type != tile_gap)
-				{
-					type = tileset[mapdata[i][j][k]];
-					break;
-				}
-			}
-			*/
-			
+		{			
 			WriteInt(mapdatatop[i][j], mapfile);
 			WriteInt(warpdata[i][j].direction, mapfile);
 			WriteInt(warpdata[i][j].connection, mapfile);
@@ -1895,15 +1886,16 @@ void CMap::draw(SDL_Surface *targetSurface, int layer)
 			TilesetTile * tile = &mapdata[i][j][layer];
 			
 			//If there is no tile to draw, continue
-			if(tile->iID <= TILESETNONE)
+			if(tile->iID == TILESETNONE)
 				continue;
 
-			//TODO:: Remove this tile optimization in favor of the new tilesetmanager
-			tilebltrect.x = tile->iCol << 5;
-			tilebltrect.y = tile->iRow << 5;
-
 			//If this is an animated tile, then setup an animated tile struct for use in drawing
-			if(tile->iID == TILESETANIMATED)
+			if(tile->iID >= 0)
+			{
+				g_tilesetmanager.Draw(targetSurface, tile->iID, 0, tile->iCol, tile->iRow, i, j);
+				//SDL_BlitSurface(spr_maptiles[0].getSurface(), &g_tilesetmanager.rRects[0][tile->iCol][tile->iRow], targetSurface, &bltrect);
+			}
+			else if(tile->iID == TILESETANIMATED)
 			{
 				//See if we already have this tile
 				bool fNeedNewAnimatedTile = true;
@@ -1963,10 +1955,9 @@ void CMap::draw(SDL_Surface *targetSurface, int layer)
 					animatedtiles.push_back(animatedtile);
 				}
 			}
-			else
+			else if(tile->iID == TILESETUNKNOWN) //Draw red X where tile should be
 			{
-				//g_tilesetmanager.Draw(targetSurface, 0, 0, ts % 32, ts / 32, i, j);
-				SDL_BlitSurface(spr_maptiles[0].getSurface(), &tilebltrect, targetSurface, &bltrect);
+				SDL_BlitSurface(spr_unknowntile[0].getSurface(), &g_tilesetmanager.rRects[0][0][0], targetSurface, &bltrect);
 			}
 		}
 
@@ -1999,9 +1990,14 @@ void CMap::drawThumbnailPlatforms(SDL_Surface * targetSurface)
 			{
 				TilesetTile * tile = &platforms[iPlatform]->iTileData[iPlatformX][iPlatformY];
 
-				if(tile->iID != TILESETNONE)
+				if(tile->iID >= 0)
 				{
-					SDL_BlitSurface(spr_maptiles[2].getSurface(), &g_tilesetmanager.rRects[2][tile->iCol][tile->iRow], blitdest, &g_tilesetmanager.rRects[2][iStartX + iPlatformX][iStartY + iPlatformY]);
+					g_tilesetmanager.Draw(blitdest, tile->iID, 2, tile->iCol, tile->iRow, iStartX + iPlatformX, iStartY + iPlatformY);
+					//SDL_BlitSurface(spr_maptiles[2].getSurface(), &g_tilesetmanager.rRects[2][tile->iCol][tile->iRow], blitdest, &g_tilesetmanager.rRects[2][iStartX + iPlatformX][iStartY + iPlatformY]);
+				}
+				else if(tile->iID == TILESETUNKNOWN)
+				{
+					spr_unknowntile[2].draw(tile->iCol << 3, tile->iRow << 3);
 				}
 			}
 		}
@@ -2182,59 +2178,34 @@ void CMap::drawPreview(SDL_Surface * targetSurface, int layer, bool fThumbnail)
 	int i, j;
 
 	//draw left to right full vertical
-
-	short iBlockSize = PREVIEWTILESIZE;
+	short iTilesetIndex = 1;
 
 	if(fThumbnail)
-		iBlockSize = THUMBTILESIZE;
+		iTilesetIndex = 2;
 
-	SDL_Rect rectSrc;
-	rectSrc.w = iBlockSize;
-	rectSrc.h = iBlockSize;
-
-	SDL_Rect rectDst;
-	rectDst.w = iBlockSize;
-	rectDst.h = iBlockSize;
-
-	rectDst.x = 0;
 	for(i = 0; i < MAPWIDTH; i++)
 	{
-		rectDst.y = -iBlockSize;	//this is okay, see
-
 		for(j = 0; j < MAPHEIGHT; j++)
 		{
-			rectDst.y += iBlockSize;	// here
-
 			TilesetTile * tile = &mapdata[i][j][layer];
-			if(tile->iID <= TILESETNONE)
+			if(tile->iID == TILESETNONE)
 				continue;
 
 			//Handle drawing preview for animated tiles
-			if(tile->iID == TILESETANIMATED)
+			if(tile->iID >= 0)
 			{
-				rectSrc.x = 0;
-				rectSrc.y = tile->iData * iBlockSize;
-				
-				SDL_BlitSurface(spr_tileanimation[fThumbnail ? 2 : 1].getSurface(), &rectSrc, targetSurface, &rectDst);
+				g_tilesetmanager.Draw(targetSurface, tile->iID, iTilesetIndex, tile->iCol, tile->iRow, i, j);
+				//SDL_BlitSurface(spr_maptiles[iTilesetIndex].getSurface(), &g_tilesetmanager.rRects[iTilesetIndex][tile->iCol][tile->iRow], targetSurface, &rectDst);
 			}
-			else
-			{
-				if(fThumbnail)
-				{
-					rectSrc.x = tile->iCol << 3;
-					rectSrc.y = tile->iRow << 3;
-					SDL_BlitSurface(spr_maptiles[2].getSurface(), &rectSrc, targetSurface, &rectDst);
-				}
-				else
-				{
-					rectSrc.x = tile->iCol << 4;
-					rectSrc.y = tile->iRow << 4;
-					SDL_BlitSurface(spr_maptiles[1].getSurface(), &rectSrc, targetSurface, &rectDst);
-				}
+			else if(tile->iID == TILESETANIMATED)
+			{				
+				SDL_BlitSurface(spr_tileanimation[iTilesetIndex].getSurface(), &g_tilesetmanager.rRects[iTilesetIndex][tile->iCol][tile->iRow], targetSurface, &g_tilesetmanager.rRects[iTilesetIndex][i][j]);
+			}
+			else if(tile->iID == TILESETUNKNOWN)
+			{	
+				SDL_BlitSurface(spr_unknowntile[iTilesetIndex].getSurface(), &g_tilesetmanager.rRects[iTilesetIndex][0][0], targetSurface, &g_tilesetmanager.rRects[iTilesetIndex][i][j]);
 			}
 		}
-
-		rectDst.x += iBlockSize;
 	}
 }
 
@@ -2269,23 +2240,23 @@ void CMap::drawPreviewBlocks(SDL_Surface * targetSurface, bool fThumbnail)
 				continue;
 
 			rectSrc.x = (Sint16)(ts * iBlockSize);
-			rectSrc.y = iBlockSize * 30;
+			rectSrc.y = 0;
 
 			//Draw the turned off switch blocks too
 			if(ts >= 7 && ts <= 14)
 				if(iSwitches[(ts - 7) % 4] == 1)
-					rectSrc.y = iBlockSize * 31;
+					rectSrc.y = iBlockSize;
 
 			if(ts >= 15 && ts <= 18)
 			{
 				rectSrc.x = iBlockSize * (ts - 15);
-				rectSrc.y = iBlockSize * 31;
+				rectSrc.y = iBlockSize;
 			}
 		
 			if(fThumbnail)
-				SDL_BlitSurface(spr_maptiles[2].getSurface(), &rectSrc, targetSurface, &rectDst);
+				SDL_BlitSurface(spr_blocks[2].getSurface(), &rectSrc, targetSurface, &rectDst);
 			else
-				SDL_BlitSurface(spr_maptiles[1].getSurface(), &rectSrc, targetSurface, &rectDst);
+				SDL_BlitSurface(spr_blocks[1].getSurface(), &rectSrc, targetSurface, &rectDst);
 		}
 
 		rectDst.x += iBlockSize;
@@ -2376,7 +2347,6 @@ void CMap::SetupAnimatedTiles()
 	{
 		SDL_Surface * backgroundSurface = spr_background.getSurface();
 		SDL_Surface * animatedTileSrcSurface = spr_tileanimation[0].getSurface();
-		SDL_Surface * staticTileSrcSurface = spr_maptiles[0].getSurface();
 
 		animatedFrontmapSurface = spr_frontmap[g_iCurrentDrawIndex].getSurface();
 		animatedBackmapSurface = spr_backmap[g_iCurrentDrawIndex].getSurface();
@@ -2405,11 +2375,15 @@ void CMap::SetupAnimatedTiles()
 						TilesetTile * tilesetTile = &tile->layers[iLayer];
 						if(tilesetTile->iID >= 0)
 						{
-							SDL_BlitSurface(staticTileSrcSurface, &(tile->rSrc[iLayer][0]), animatedTilesSurface, &rDst);
+							SDL_BlitSurface(g_tilesetmanager.GetTileset(tilesetTile->iID)->GetSurface(0), &(tile->rSrc[iLayer][0]), animatedTilesSurface, &rDst);
 						}
 						else if(tilesetTile->iID == TILESETANIMATED)
 						{
 							SDL_BlitSurface(animatedTileSrcSurface, &(tile->rSrc[iLayer][iTileAnimationFrame]), animatedTilesSurface, &rDst);
+						}
+						else if(tilesetTile->iID == TILESETUNKNOWN)
+						{
+							SDL_BlitSurface(spr_unknowntile[0].getSurface(), &g_tilesetmanager.rRects[0][0][0], animatedTilesSurface, &rDst);
 						}
 					}
 
@@ -2441,11 +2415,15 @@ void CMap::SetupAnimatedTiles()
 						TilesetTile * tilesetTile = &tile->layers[iLayer];
 						if(tilesetTile->iID >= 0)
 						{
-							SDL_BlitSurface(staticTileSrcSurface, &(tile->rSrc[iLayer][0]), animatedTilesSurface, &rDst);
+							SDL_BlitSurface(g_tilesetmanager.GetTileset(tilesetTile->iID)->GetSurface(0), &(tile->rSrc[iLayer][0]), animatedTilesSurface, &rDst);
 						}
 						else if(tilesetTile->iID == TILESETANIMATED)
 						{
 							SDL_BlitSurface(animatedTileSrcSurface, &(tile->rSrc[iLayer][iTileAnimationFrame]), animatedTilesSurface, &rDst);
+						}
+						else if(tilesetTile->iID == TILESETUNKNOWN)
+						{
+							SDL_BlitSurface(spr_unknowntile[0].getSurface(), &g_tilesetmanager.rRects[0][0][0], animatedTilesSurface, &rDst);
 						}
 					}
 
@@ -2851,7 +2829,7 @@ void CMap::optimize()
 			for(int m = 1; m < MAPLAYERS; m++)
 			{
 				TilesetTile * tile = &mapdata[i][j][m];
-				TileType type = tileset[tile->iCol + tile->iRow * 32];
+				TileType type = g_tilesetmanager.GetTileset(tile->iID)->GetTileType(tile->iCol, tile->iRow);
 				if(type != tile_nonsolid && type != tile_gap && type != tile_solid_on_top)
 				{
 					for(int k = m - 1; k >= 0; k--)
@@ -2863,9 +2841,10 @@ void CMap::optimize()
 							compareTile->iID = fromTile->iID;
 							compareTile->iCol = fromTile->iCol;
 							compareTile->iRow = fromTile->iRow;
-							compareTile->iData = fromTile->iData;
 
 							fromTile->iID = TILESETNONE;
+							fromTile->iCol = 0;
+							fromTile->iRow = 0;
 						}
 						else
 						{

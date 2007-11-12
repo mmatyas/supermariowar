@@ -175,10 +175,14 @@ bool LoadGameGraphics()
 	_load_gfxck(spr_tileanimation[1], convertPath("gfx/packs/eyecandy/tile_animation_preview.png", graphicspack));
 	_load_gfxck(spr_tileanimation[2], convertPath("gfx/packs/eyecandy/tile_animation_thumbnail.png", graphicspack));
 
-	_load_gfxck(spr_maptiles[0], convertPath("gfx/packs/tileset.png", graphicspack));
-	_load_gfxck(spr_maptiles[1], convertPath("gfx/packs/tileset_medium.png", graphicspack));
-	_load_gfxck(spr_maptiles[2], convertPath("gfx/packs/tileset_small.png", graphicspack));
-
+	_load_gfxck(spr_blocks[0], convertPath("gfx/packs/blocks.png", graphicspack));
+	_load_gfxck(spr_blocks[1], convertPath("gfx/packs/blocks_preview.png", graphicspack));
+	_load_gfxck(spr_blocks[2], convertPath("gfx/packs/blocks_thumbnail.png", graphicspack));
+	
+	_load_gfxck(spr_unknowntile[0], convertPath("gfx/packs/unknown_tile.png", graphicspack));
+	_load_gfxck(spr_unknowntile[1], convertPath("gfx/packs/unknown_tile_preview.png", graphicspack));
+	_load_gfxck(spr_unknowntile[2], convertPath("gfx/packs/unknown_tile_thumbnail.png", graphicspack));
+	
 	_load_gfxck(spr_brokenyellowblock, convertPath("gfx/packs/eyecandy/brokenyellowblock.png", graphicspack));
 	_load_gfxck(spr_brokenflipblock, convertPath("gfx/packs/eyecandy/brokenflipblock.png", graphicspack));
 	_load_gfxck(spr_brokenblueblock, convertPath("gfx/packs/eyecandy/brokenblueblock.png", graphicspack));
@@ -391,8 +395,6 @@ bool LoadGameGraphics()
 
 	_load_gfxck(spr_abovearrows, convertPath("gfx/packs/eyecandy/abovearrows.png", graphicspack));
 	spr_abovearrows.SetWrap(true);
-
-	g_map.loadTileSet(convertPath("maps/tileset/tileset.tls"));
 
 	return true;
 }

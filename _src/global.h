@@ -461,7 +461,8 @@ extern gfxSprite		spr_brokenflipblock;
 extern gfxSprite		spr_brokenblueblock;
 
 extern gfxSprite		spr_tileanimation[3];
-extern gfxSprite		spr_maptiles[3];
+extern gfxSprite		spr_blocks[3];
+extern gfxSprite		spr_unknowntile[3];
 
 extern gfxSprite		** spr_player[4];
 extern gfxSprite		** spr_chocobo[4];
