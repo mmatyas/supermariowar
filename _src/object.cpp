@@ -294,8 +294,6 @@ void IO_Block::BounceMovingObject(IO_MovingObject * object)
 //------------------------------------------------------------------------------
 // class powerup block
 //------------------------------------------------------------------------------
-int g_tanookiFlag = 0;
-
 B_PowerupBlock::B_PowerupBlock(gfxSprite *nspr1, short x, short y, short iNumSpr, short aniSpeed) :
 	IO_Block(nspr1, x, y)
 {
@@ -566,12 +564,6 @@ void B_PowerupBlock::triggerBehavior()
 
 short B_PowerupBlock::SelectPowerup()
 {
-	if (g_tanookiFlag) 
-	{
-		g_tanookiFlag--; 
-		return -1;
-	}
-
 	short iCountWeight = 0;
 	for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
 		iCountWeight += game_values.powerupweights[iPowerup];

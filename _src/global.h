@@ -317,6 +317,7 @@ extern sfxSound			sfx_burnup;
 extern sfxSound			sfx_pipe;
 extern sfxSound			sfx_thunder;
 extern sfxSound			sfx_slowdownmusic;
+extern sfxSound			sfx_flyingsound;
 extern sfxSound			sfx_storedpowerupsound;
 extern sfxSound			sfx_kicksound;
 extern sfxSound			sfx_racesound;
@@ -762,7 +763,6 @@ struct gv
 
 	short		slowdownon;
 	short		slowdowncounter;
-	bool		slowdownfreeze;
 
 	short		superboomerang[4];
 
@@ -849,6 +849,7 @@ struct gv
 
 	bool		playskidsound;
 	bool		playinvinciblesound;
+	bool		playflyingsound;
 
 	short		swapstyle;
 	bool		swapplayers;

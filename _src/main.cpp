@@ -316,6 +316,7 @@ sfxSound sfx_burnup;
 sfxSound sfx_pipe;
 sfxSound sfx_thunder;
 sfxSound sfx_slowdownmusic;
+sfxSound sfx_flyingsound;
 sfxSound sfx_storedpowerupsound;
 sfxSound sfx_kicksound;
 sfxSound sfx_racesound;
@@ -680,7 +681,6 @@ int main(int argc, char *argv[])
 	game_values.worldindex			= 0;
 	game_values.slowdownon			= -1;
 	game_values.slowdowncounter		= 0;
-	game_values.slowdownfreeze		= false;
 	game_values.friendlyfire		= false;
 	game_values.screencrunch		= true;
 	game_values.screenshaketimer	= 0;
@@ -1237,11 +1237,11 @@ void RunGame()
 	game_values.screenshaketimer = 0;
 	game_values.slowdownon = -1;
 	game_values.slowdowncounter	= 0;
-	game_values.slowdownfreeze	= false;
 	game_values.showscoreboard = false;
 	game_values.scorepercentmove = 0.0f;
 	game_values.playskidsound = false;
 	game_values.playinvinciblesound = false;
+	game_values.playflyingsound = false;
 	game_values.swapplayers = false;
 	game_values.swapplayersposition = 0.0f;
 	game_values.swapplayersblink = false;
@@ -1975,6 +1975,7 @@ void RunGame()
 
 				game_values.playskidsound = false;
 				game_values.playinvinciblesound = false;
+				game_values.playflyingsound = false;
 
 				for(i = 0; i < list_players_cnt; i++)
 					list_players[i]->move();	//move all objects before doing object-object collision detection in
@@ -1991,6 +1992,17 @@ void RunGame()
 					{
 						if(sfx_skid.isplaying())
 							ifsoundonstop(sfx_skid);
+					}
+
+					if(game_values.playflyingsound)
+					{
+						if(!sfx_flyingsound.isplaying())
+							ifsoundonplay(sfx_flyingsound);
+					}
+					else
+					{
+						if(sfx_flyingsound.isplaying())
+							ifsoundonstop(sfx_flyingsound);
 					}
 
 					objectblocks.update();
@@ -2334,7 +2346,6 @@ void RunGame()
 							{
 								game_values.slowdownon = -1;
 								game_values.slowdowncounter = 0;
-								game_values.slowdownfreeze = false;
 							}
 						}
 						else

@@ -222,12 +222,14 @@ SDL_Surface * gfx_createskinsurface(SDL_Surface * skin, short spriteindex, Uint8
 			if(reverse)
 				reverseoffset = (31 - (i * 2)) * 3;
 
+			Uint8 iColorByte1 = ((Uint8*)skin->pixels)[skincounter];
+			Uint8 iColorByte2 = ((Uint8*)skin->pixels)[skincounter + 1];
+			Uint8 iColorByte3 = ((Uint8*)skin->pixels)[skincounter + 2];
+
 			bool fFoundColor = false;
 			for(int m = 0; m < numcolors; m++)
 			{
-				if( ((Uint8*)skin->pixels)[skincounter] == colorcodes[0][m] && 
-					((Uint8*)skin->pixels)[skincounter + 1] == colorcodes[1][m] &&
-					((Uint8*)skin->pixels)[skincounter + 2] == colorcodes[2][m])
+				if(iColorByte1 == colorcodes[0][m] && iColorByte2 == colorcodes[1][m] && iColorByte3 == colorcodes[2][m])
 				{
 					for(int k = 0; k < loops; k++)
 					{
@@ -245,9 +247,9 @@ SDL_Surface * gfx_createskinsurface(SDL_Surface * skin, short spriteindex, Uint8
 			{
 				for(int k = 0; k < loops; k++)
 				{
-					((Uint8*)temp->pixels)[tempcounter + k * 96 + reverseoffset] = ((Uint8*)skin->pixels)[skincounter];
-					((Uint8*)temp->pixels)[tempcounter + k * 96 + reverseoffset + 1] = ((Uint8*)skin->pixels)[skincounter + 1];
-					((Uint8*)temp->pixels)[tempcounter + k * 96 + reverseoffset + 2] = ((Uint8*)skin->pixels)[skincounter + 2];
+					((Uint8*)temp->pixels)[tempcounter + k * 96 + reverseoffset] = iColorByte1;
+					((Uint8*)temp->pixels)[tempcounter + k * 96 + reverseoffset + 1] = iColorByte2;
+					((Uint8*)temp->pixels)[tempcounter + k * 96 + reverseoffset + 2] = iColorByte3;
 				}
 			}
 
@@ -396,6 +398,110 @@ bool gfx_createfullskin(gfxSprite ** gSprites, const std::string& filename, Uint
 	
 	return true;
 }
+
+SDL_Surface * gfx_createteamcoloredsurface(SDL_Surface * sImage, short iColor, Uint8 r, Uint8 g, Uint8 b)
+{
+	//Blit over loaded skin into player image set
+	SDL_Surface * sTempImage = SDL_CreateRGBSurface(sImage->flags, sImage->w, sImage->h, sImage->format->BitsPerPixel, 0, 0, 0, 0);
+	
+	//Take the loaded image and colorize it
+	if(SDL_MUSTLOCK(sTempImage))
+		SDL_LockSurface(sTempImage);
+
+	if(SDL_MUSTLOCK(sImage))
+		SDL_LockSurface(sImage);
+
+	//Need two counters because the pitch of the surfaces could be different
+	int iSrcPixelCounter = 0;
+	int iDstPixelCounter = 0;
+
+	for(int j = 0; j < sImage->w; j++)
+	{
+		for(int i = 0; i < sImage->h; i++)
+		{
+			Uint8 iColorByte1 = ((Uint8*)sImage->pixels)[iSrcPixelCounter];
+			Uint8 iColorByte2 = ((Uint8*)sImage->pixels)[iSrcPixelCounter + 1];
+			Uint8 iColorByte3 = ((Uint8*)sImage->pixels)[iSrcPixelCounter + 2];
+
+			bool fFoundColor = false;
+			for(int m = 0; m < numcolors; m++)
+			{
+				if(iColorByte1 == colorcodes[0][m] && iColorByte2 == colorcodes[1][m] && iColorByte3 == colorcodes[2][m])
+				{
+					((Uint8*)sTempImage->pixels)[iDstPixelCounter] = colorschemes[iColor][0][0][m];
+					((Uint8*)sTempImage->pixels)[iDstPixelCounter + 1] = colorschemes[iColor][0][1][m];
+					((Uint8*)sTempImage->pixels)[iDstPixelCounter + 2] = colorschemes[iColor][0][2][m];
+					
+					fFoundColor = true;
+					break;
+				}
+			}
+
+			if(!fFoundColor)
+			{
+				((Uint8*)sTempImage->pixels)[iDstPixelCounter] = iColorByte1;
+				((Uint8*)sTempImage->pixels)[iDstPixelCounter + 1] = iColorByte2;
+				((Uint8*)sTempImage->pixels)[iDstPixelCounter + 2] = iColorByte3;
+			}
+
+			iSrcPixelCounter += 3;
+			iDstPixelCounter += 3;
+		}
+
+		iSrcPixelCounter += sImage->pitch;
+		iDstPixelCounter += sTempImage->pitch;
+	}
+
+	SDL_UnlockSurface(sImage);
+	SDL_UnlockSurface(sTempImage);
+
+	if( SDL_SetColorKey(sTempImage, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(sTempImage->format, r, g, b)) < 0)
+	{
+		printf("\n ERROR: Couldn't set ColorKey + RLE for new team colored surface: %s\n", SDL_GetError());
+		return NULL;
+	}
+
+	SDL_Surface * sFinalImage = SDL_DisplayFormat(sTempImage);
+	if(!sFinalImage)
+	{
+		printf("\n ERROR: Couldn't create new surface using SDL_DisplayFormat(): %s\n", SDL_GetError());
+		return NULL;
+	}
+	SDL_FreeSurface(sTempImage);
+
+	return sFinalImage;
+}
+
+bool gfx_loadteamcoloredimage(gfxSprite ** gSprites, const std::string& filename, Uint8 r, Uint8 g, Uint8 b)
+{
+	//Load the image into a surface
+	SDL_Surface * sImage = IMG_Load(filename.c_str());
+
+    if (sImage == NULL)
+	{
+        cout << endl << " ERROR: Couldn't load " << filename << ": " << SDL_GetError() << endl;
+        return false;
+    }
+
+	for(short k = 0; k < 4; k++)
+	{
+		SDL_Surface * sTeamColoredSurface = gfx_createteamcoloredsurface(sImage, k, r, g, b);
+
+		if (sTeamColoredSurface == NULL)
+		{
+            cout << endl << " ERROR: Couldn't create menu skin from " << filename << ": " << SDL_GetError() << endl;
+			SDL_FreeSurface(sTeamColoredSurface);
+			return false;
+		}
+
+		gSprites[k]->setSurface(sTeamColoredSurface);
+	}
+
+	SDL_FreeSurface(sImage);
+	
+	return true;
+}
+
 
 void gfx_setrect(SDL_Rect * rect, short x, short y, short w, short h)
 {

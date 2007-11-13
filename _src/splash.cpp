@@ -443,6 +443,7 @@ bool LoadGameSounds()
 	_load_sfx(sfx_pipe, convertPath("sfx/packs/warp.wav", soundpack));
 	_load_sfx(sfx_thunder, convertPath("sfx/packs/thunder.wav", soundpack));
 	_load_sfx(sfx_slowdownmusic, convertPath("sfx/packs/clock.wav", soundpack));
+	_load_sfx(sfx_flyingsound, convertPath("sfx/packs/slowdown.wav", soundpack));
 	_load_sfx(sfx_storedpowerupsound, convertPath("sfx/packs/storedpowerup.wav", soundpack));
 	_load_sfx(sfx_kicksound, convertPath("sfx/packs/kick.wav", soundpack));
 	_load_sfx(sfx_racesound, convertPath("sfx/packs/race.wav", soundpack));

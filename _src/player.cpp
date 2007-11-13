@@ -63,6 +63,9 @@ void CPlayer::move()
 	if(invincible)
 		game_values.playinvinciblesound = true;
 
+	if(flying)
+		game_values.playflyingsound = true;
+
 	int keymask =
 		(playerKeys->game_jump.fPressed?1:0) |
 		(playerKeys->game_down.fPressed?2:0) |
@@ -101,6 +104,7 @@ void CPlayer::move()
 			}
 		}*/
 
+		/*
 		if (konamiIndex < 11)
 		{
 			static const int konami_code[11] = {1,1,2,2,4,8,4,8,48,48,48};
@@ -116,7 +120,7 @@ void CPlayer::move()
 				ifsoundonplay(sfx_transform); 
 				g_tanookiFlag++; 
 			}
-		}
+		}*/
 
 		//Super kick shells and BTBs
 		if(keymask & 2)
@@ -289,7 +293,6 @@ void CPlayer::move()
 				game_values.superboomerang[globalID] = 2;
 		}
 
-		//Fly using feather
 		int keymaskdown =
 			(playerKeys->game_jump.fDown?1:0) |
 			(playerKeys->game_down.fDown?2:0) |
@@ -298,6 +301,7 @@ void CPlayer::move()
 			(playerKeys->game_turbo.fDown?16:0) |
 			(playerKeys->game_powerup.fDown?32:0);
 
+		//Shoot super fireball
 		if(powerup == 1)
 		{
 			static const int ryu_fireball_code_left[4] = {2,6,4,20};
@@ -339,6 +343,7 @@ void CPlayer::move()
 			ryu_fireball_index_right = 0;
 		}
 
+		//Invincible Dash
 		if(invincible)
 		{
 			if(keymask & 4)
@@ -376,6 +381,7 @@ void CPlayer::move()
 			dashRight = false;
 		}
 
+		//Active Super POW destroys and triggers blocks
 		if(super_pow && (game_values.screenshaketimer > 0 || powerupused == 9))
 		{
 			if(game_values.screenshaketimer > 0)
@@ -404,6 +410,7 @@ void CPlayer::move()
 			super_pow_timer = 0;
 		}
 
+		//Active Super MOd Destroys and triggers blocks
 		if(super_mod && (game_values.screenshaketimer > 0 || powerupused == 16))
 		{
 			if(game_values.screenshaketimer > 0)
@@ -696,7 +703,7 @@ void CPlayer::move()
             // Don't fall through passable platforms
             fallthrough = false;
 
-            // Decrement statue timer
+            // Decrement statue timer3
             statue_timer--;
 
             // Become invincible
@@ -748,7 +755,7 @@ void CPlayer::move()
 		iSrcOffsetX = 160;
 	else if(game_values.gamemode->star == this)
 		iSrcOffsetX = game_values.gamemodesettings.star.shine ? 224 : 192;
-	else if(game_values.slowdownfreeze && game_values.slowdownon != teamID)
+	else if(frozen)
 		iSrcOffsetX = 256;
 	else if(spawninvincible)
 		iSrcOffsetX = 128;
@@ -921,7 +928,7 @@ void CPlayer::move()
 				}
 				case 7:
 				{
-					turnslowdownon(false);
+					turnslowdownon();
 
 					outofarenatimer = 0;
 					outofarenadisplaytimer = game_values.outofboundstime - 1;
@@ -1084,6 +1091,15 @@ void CPlayer::move()
 		}
 	}
 
+	if(frozen)
+	{
+		if(--frozentimer <= 0)
+		{
+			frozentimer = 0;
+			frozen = false;
+		}
+	}
+
 	if(fKuriboShoe)
 	{
 		if(++iKuriboShoeAnimationTimer > 7)
@@ -1140,22 +1156,23 @@ void CPlayer::move()
 				cpu_think();
 		}
 
-        if (!statue_timer && (!game_values.slowdownfreeze || game_values.slowdownon == teamID) && !fSuperStomp)
-        {
-            if(playerKeys->game_right.fDown)
-                lrn++;
-            
-            if(playerKeys->game_left.fDown)
-                lrn--;
-        }
-
 		//Used for bouncing off of note blocks
 		if(superjumptimer > 0)
 			superjumptimer--;
 
-		//jump pressed?
-		if(!game_values.slowdownfreeze || game_values.slowdownon == teamID)
+		if(!frozen)
 		{
+			//Determine move direction pressed
+			if (!statue_timer && !fSuperStomp)
+			{
+				if(playerKeys->game_right.fDown)
+					lrn++;
+	            
+				if(playerKeys->game_left.fDown)
+					lrn--;
+			}
+
+			//jump pressed?
 			if(playerKeys->game_jump.fDown)
 			{
 				if(!lockjump)
@@ -1274,8 +1291,9 @@ void CPlayer::move()
 					}
 					else if(powerup == 8 && !fKuriboShoe && !flying && extrajumps == 0)
 					{
-						ifsoundonplay(sfx_collectfeather);
 						flying = true;
+						game_values.playflyingsound = true;
+
 						lockjump = true;
 						extrajumps++;
 
@@ -1294,29 +1312,7 @@ void CPlayer::move()
 				flying = false;
 				flyingtimer = 0;
 			}
-		}
-
-		if(flying)
-		{
-			if(++flyingtimer > 300)
-			{
-				flyingtimer = 0;
-				flying = false;
-			}
-
-			if(playerKeys->game_down.fDown && vely < 1.0f)
-			{
-				vely += 1.0f;
-			}
-			else if(!playerKeys->game_down.fDown && vely > -1.0f)
-			{
-				vely -= 1.0f;
-				inair = true;
-			}
-		}
-
-		if(!game_values.slowdownfreeze || game_values.slowdownon == teamID)
-		{
+		
 			if(playerKeys->game_down.fDown)
 			{
 				if(!lockfall && !inair && playerDevice == DEVICE_KEYBOARD)
@@ -1329,28 +1325,25 @@ void CPlayer::move()
 			{
 				lockfall = false;
 			}
-		}
-		
-		//POWERUP RELEASE
-		if(playerKeys->game_powerup.fDown && (!game_values.slowdownfreeze || game_values.slowdownon == teamID) && statue_timer == 0 && game_values.gamemode->gamemode != game_mode_bonus)
-		{
-			if(game_values.gamepowerups[globalID] > -1)
+				
+			//POWERUP RELEASE
+			if(playerKeys->game_powerup.fDown && statue_timer == 0 && game_values.gamemode->gamemode != game_mode_bonus)
 			{
-				powerupused = game_values.gamepowerups[globalID];
-				game_values.gamepowerups[globalID] = -1;
+				if(game_values.gamepowerups[globalID] > -1)
+				{
+					powerupused = game_values.gamepowerups[globalID];
+					game_values.gamepowerups[globalID] = -1;
 
-				powerupradius = 100.0f;
-				powerupangle = (float)(rand()%1000 * 0.00628f);
+					powerupradius = 100.0f;
+					powerupangle = (float)(rand()%1000 * 0.00628f);
 
-				ifsoundonplay(sfx_storedpowerupsound);
+					ifsoundonplay(sfx_storedpowerupsound);
+				}
 			}
-		}
-		
-		fPressedAcceptItem = playerKeys->game_turbo.fPressed;
+			
+			fPressedAcceptItem = playerKeys->game_turbo.fPressed;
 
-		//Projectiles
-		if(!game_values.slowdownfreeze || game_values.slowdownon == teamID)
-		{
+			//Projectiles
 			if(playerKeys->game_turbo.fDown)
 			{
 				fAcceptingItem = carriedItem == NULL;
@@ -1528,6 +1521,25 @@ void CPlayer::move()
 			}
 		}
 
+		if(flying)
+		{
+			if(++flyingtimer > 300)
+			{
+				flyingtimer = 0;
+				flying = false;
+			}
+
+			if(playerKeys->game_down.fDown && vely < 1.0f)
+			{
+				vely += 1.0f;
+			}
+			else if(!playerKeys->game_down.fDown && vely > -1.0f)
+			{
+				vely -= 1.0f;
+				inair = true;
+			}
+		}
+
 		shoot_left_fireball = false;
 		shoot_right_fireball = false;
 
@@ -1540,15 +1552,18 @@ void CPlayer::move()
 			else
 				velx += VELMOVINGADD;		//move right
 
-			float maxVel = 0;
-			if((game_values.slowdownon != -1 && game_values.slowdownon != teamID) || jailed > 0)
-				maxVel = game_values.slowdownfreeze ? 0.0f : VELSLOWMOVING;
-			else if(dashRight)
-				maxVel = VELDASHMOVING;
-			else if(playerKeys->game_turbo.fDown)
-				maxVel = VELTURBOMOVING + (game_values.gamemode->tagged == this ? TAGGEDBOOST : 0.0f);
-			else
-				maxVel = VELMOVING + (game_values.gamemode->tagged == this ? TAGGEDBOOST : 0.0f);
+			float maxVel = 0.0f;
+			if(!frozen)
+			{
+				if((game_values.slowdownon != -1 && game_values.slowdownon != teamID) || jailed > 0)
+					maxVel = VELSLOWMOVING;
+				else if(dashRight)
+					maxVel = VELDASHMOVING;
+				else if(playerKeys->game_turbo.fDown)
+					maxVel = VELTURBOMOVING + (game_values.gamemode->tagged == this ? TAGGEDBOOST : 0.0f);
+				else
+					maxVel = VELMOVING + (game_values.gamemode->tagged == this ? TAGGEDBOOST : 0.0f);
+			}
 			
 			if(velx > maxVel)
 				velx = maxVel;
@@ -1575,15 +1590,18 @@ void CPlayer::move()
 			else
 				velx -= VELMOVINGADD;		//move left
 
-			float maxVel = 0;
-			if((game_values.slowdownon != -1 && game_values.slowdownon != teamID) || jailed > 0)
-				maxVel = game_values.slowdownfreeze ? 0.0f : -VELSLOWMOVING;
-			else if(dashLeft)
-				maxVel = -VELDASHMOVING;
-			else if(playerKeys->game_turbo.fDown)
-				maxVel = -VELTURBOMOVING - (game_values.gamemode->tagged == this ? TAGGEDBOOST : 0.0f);
-			else
-				maxVel = -VELMOVING - (game_values.gamemode->tagged == this ? TAGGEDBOOST : 0.0f);
+			float maxVel = 0.0f;
+			if(!frozen)
+			{
+				if((game_values.slowdownon != -1 && game_values.slowdownon != teamID) || jailed > 0)
+					maxVel = -VELSLOWMOVING;
+				else if(dashLeft)
+					maxVel = -VELDASHMOVING;
+				else if(playerKeys->game_turbo.fDown)
+					maxVel = -VELTURBOMOVING - (game_values.gamemode->tagged == this ? TAGGEDBOOST : 0.0f);
+				else
+					maxVel = -VELMOVING - (game_values.gamemode->tagged == this ? TAGGEDBOOST : 0.0f);
+			}
 			
 			if(velx < maxVel)
 				velx = maxVel;
@@ -1958,7 +1976,7 @@ void CPlayer::cpu_think()
 
 void CPlayer::die(short deathStyle, bool fTeamRemoved)
 {
-	short iDeathSprite = deathStyle == 0 ? PGFX_DEADFLYING : PGFX_DEAD;
+	short iDeathSprite = deathStyle == death_style_jump ? PGFX_DEADFLYING : PGFX_DEAD;
 
 	gfxSprite * corpseSprite = sprites[iDeathSprite];
 
@@ -1967,10 +1985,17 @@ void CPlayer::die(short deathStyle, bool fTeamRemoved)
 	else if(diedas == 2 || bobomb)
 		corpseSprite = spr_bobomb[colorID][iDeathSprite];
 	
-	if(deathStyle == 0)
+	if(deathStyle == death_style_jump)
 		eyecandyfront.add(new EC_FallingObject(corpseSprite, ix + HALFPW - 16, iy + PH - 32, -VELTURBOJUMP, iSrcOffsetX, 0, 32, 32));
-	else
+	else if(deathStyle == death_style_squish)
 		eyecandyback.add(new EC_Corpse(corpseSprite, (float)(ix - PWOFFSET), (float)(iy+PH-32), iSrcOffsetX));
+	else if(deathStyle == death_style_shatter)
+	{
+		eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix + HALFPW - 16, iy + HALFPH - 16, -1.5f, -7.0f, 6, 2, 0, 0, 16, 16));
+		eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix + HALFPW, iy + HALFPH - 16, 1.5f, -7.0f, 6, 2, 0, 0, 16, 16));
+		eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix + HALFPW - 16, iy + HALFPH, -1.5f, -4.0f, 6, 2, 0, 0, 16, 16));
+		eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix + HALFPW, iy + HALFPH, 1.5f, -4.0f, 6, 2, 0, 0, 16, 16));
+	}
 
 	if(carriedItem)
 	{
@@ -1980,7 +2005,10 @@ void CPlayer::die(short deathStyle, bool fTeamRemoved)
 
 	if(fKuriboShoe)
 	{
-		objectsplayer.add(new CO_KuriboShoe(&spr_kuriboshoe, ix - PWOFFSET, iy - PHOFFSET));
+		CO_KuriboShoe * shoe = new CO_KuriboShoe(&spr_kuriboshoe, ix - PWOFFSET, iy - PHOFFSET);
+		shoe->collision_detection_checksides();
+
+		objectsplayer.add(shoe);
 	}
 
 	if(!fTeamRemoved)
@@ -2045,6 +2073,9 @@ void CPlayer::SetupNewPlayer()
 
 	invincible = false;
 	invincibletimer = 0;
+
+	frozen = false;
+	frozentimer = 0;
 
 	animationstate = 0;
 	animationtimer = 0;
@@ -2380,10 +2411,12 @@ void PlayerKilledPlayer(CPlayer &killer, CPlayer &killed, short deathstyle, kill
 	}
 	else
 	{
-		if(deathstyle == 0)
+		if(deathstyle == death_style_jump)
 			ifsoundonplay(sfx_deathsound);
-		else
+		else if(deathstyle == death_style_squish)
 			ifsoundonplay(sfx_mip);
+		else if(deathstyle == death_style_shatter)
+			ifsoundonplay(sfx_deathsound);
 	}
 
 	if(killer.teamID != killed.teamID)
@@ -2544,12 +2577,34 @@ void collisionhandler_p2p(CPlayer &o1, CPlayer &o2)
 			return;
 	}
 
-	//--- 1. is player invincible? ---
+	//--- 1. Is player frozen? ---
+	if(o1.frozen && o2.frozen)
+	{
+		PlayerKilledPlayer(o1, o2, death_style_jump, kill_style_star);
+		PlayerKilledPlayer(o2, o1, death_style_jump, kill_style_star);
+		return;
+	}
+
+	if(o1.frozen)
+	{
+		PlayerKilledPlayer(o2, o1, death_style_shatter, kill_style_frozen);
+		return;
+	}
+
+	if(o2.frozen)
+	{
+		PlayerKilledPlayer(o1, o2, death_style_shatter, kill_style_frozen);
+		return;
+	
+	}
+
+	//--- 2. is player invincible? ---
 	if(o1.invincible && !o2.invincible && !o2.spawninvincible)
 	{
 		PlayerKilledPlayer(o1, o2, death_style_jump, kill_style_star);
 		return;
 	}
+	
 	if(!o1.invincible && !o1.spawninvincible && o2.invincible)
 	{
 		PlayerKilledPlayer(o2, o1, death_style_jump, kill_style_star);
@@ -2561,7 +2616,7 @@ void collisionhandler_p2p(CPlayer &o1, CPlayer &o2)
 		(o1.iswarping() && o2.iswarping()))
 		return;
 
-	//--- 2. stomping other player? ---
+	//--- 3. stomping other player? ---
 	if(!o2.spawninvincible && !o2.invincible && o1.isstomping(o2))
 		return;
 	if(!o1.spawninvincible && !o1.invincible && o2.isstomping(o1))
@@ -2572,7 +2627,7 @@ void collisionhandler_p2p(CPlayer &o1, CPlayer &o2)
 		(o2.spawninvincible && (game_values.gamemode->tagged != &o2 || !game_values.gamemodesettings.tag.tagontouch)))
 		return;
 
-	//--- 3. push back (horizontal) ---
+	//--- 4. push back (horizontal) ---
 	if(o1.ix < o2.ix)				//o1 is left -> o1 pushback left, o2 pushback right
 		_collisionhandler_p2p_pushback(o1, o2);
 	else
@@ -3187,7 +3242,7 @@ void CPlayer::collision_detection_map()
 			if(g_map.warp(tx,ty)->direction == 3 && g_map.warp(tx,ty2)->direction == 3 && playerKeys->game_right.fDown &&
 				g_map.warp(tx,ty)->connection == g_map.warp(tx,ty2)->connection && 
 				!g_map.isconnectionlocked(g_map.warp(tx,ty)->connection) && !g_map.isconnectionlocked(g_map.warp(tx,ty2)->connection) &&
-				(!game_values.slowdownfreeze || game_values.slowdownon == teamID))
+				!frozen)
 			{
 				xf((float)(tx * TILESIZE - PW) - 0.2f);
 				enterwarp(g_map.warp(tx, ty2));
@@ -3267,7 +3322,7 @@ void CPlayer::collision_detection_map()
 			if(g_map.warp(tx,ty)->direction == 1 && g_map.warp(tx,ty2)->direction == 1 && playerKeys->game_left.fDown && 
 				g_map.warp(tx,ty)->connection == g_map.warp(tx,ty2)->connection && 
 				!g_map.isconnectionlocked(g_map.warp(tx,ty)->connection) && !g_map.isconnectionlocked(g_map.warp(tx,ty2)->connection) &&
-				(!game_values.slowdownfreeze || game_values.slowdownon == teamID))
+				!frozen)
 			{
 				xf((float)(tx * TILESIZE + TILESIZE) + 0.2f);
 				enterwarp(g_map.warp(tx, ty2));
@@ -3396,7 +3451,7 @@ void CPlayer::collision_detection_map()
 		if(g_map.warp(alignedBlockX, ty)->direction == 2 && g_map.warp(unAlignedBlockX, ty)->direction == 2 && playerKeys->game_jump.fDown && 
 			g_map.warp(alignedBlockX, ty)->connection == g_map.warp(unAlignedBlockX, ty)->connection && 
 			!g_map.isconnectionlocked(g_map.warp(alignedBlockX, ty)->connection) && !g_map.isconnectionlocked(g_map.warp(unAlignedBlockX, ty)->connection) &&
-			(!game_values.slowdownfreeze || game_values.slowdownon == teamID))
+			!frozen)
 		{
 			yf((float)(ty * TILESIZE + TILESIZE) + 0.2f);
 			enterwarp(g_map.warp(unAlignedBlockX, ty));
@@ -3499,7 +3554,7 @@ void CPlayer::collision_detection_map()
 		if(g_map.warp(txl,ty)->direction == 0 && g_map.warp(txr,ty)->direction == 0 && playerKeys->game_down.fDown && 
 			g_map.warp(txl, ty)->connection == g_map.warp(txr, ty)->connection && 
 			!g_map.isconnectionlocked(g_map.warp(txl,ty)->connection) && !g_map.isconnectionlocked(g_map.warp(txr,ty)->connection) && 
-			(!game_values.slowdownfreeze || game_values.slowdownon == teamID))
+			!frozen)
 		{
 			yf((float)(ty * TILESIZE - PH) - 0.2f);
 			enterwarp(g_map.warp(txr,ty));
@@ -4150,11 +4205,16 @@ void CPlayer::makeinvincible()
 	}
 }
 
-void CPlayer::turnslowdownon(bool fSuperFreeze)
+void CPlayer::makefrozen(short iTime)
+{
+	frozen = true;
+	frozentimer = iTime;
+}
+
+void CPlayer::turnslowdownon()
 {
 	game_values.slowdownon = teamID;
 	game_values.slowdowncounter = 0;
-	game_values.slowdownfreeze = fSuperFreeze;
 }
 
 //Returns true if player facing right, false if left
@@ -4274,6 +4334,8 @@ void CPlayer::SetPowerup(short iPowerup)
 
 		powerup = iPowerup;
 		projectilelimit = 0;
+
+		flying = false;
 
 		if(powerup == 1)
 		{
