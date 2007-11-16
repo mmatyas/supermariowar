@@ -3,6 +3,7 @@
 	ProjectType="Visual C++"
 	Version="7.10"
 	Name="SuperMarioWar"
+	ProjectGUID="{6A5E367D-CF8E-4B07-BB90-2115716D19D3}"
 	SccProjectName=""
 	SccLocalPath="">
 	<Platforms>

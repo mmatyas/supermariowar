@@ -149,6 +149,8 @@ class CPlayer
 		void SpinTail();
 		void DrawTail();
 
+		void DrawWings();
+
 		void xf(float xf){fx = xf; ix = (short)fx;};
  		void xi(short xi){ix = xi; fx = (float)ix;};
 		void yf(float yf){fy = yf; iy = (short)fy;};
@@ -242,6 +244,9 @@ class CPlayer
 		
 		short iSpinTimer;
 		short iSpinState;
+
+		short iWingsTimer;
+		short iWingsFrame;
 
 		short ryu_fireball_index_left;
 		short ryu_fireball_index_right;

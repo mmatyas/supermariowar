@@ -323,17 +323,17 @@ int main(int argc, char *argv[])
 	spr_dialog.init(convertPath("gfx/leveleditor/leveleditor_dialog.png"), 255, 0, 255, 255);
 	menu_shade.init(convertPath("gfx/leveleditor/leveleditor_shade.png"), 255, 0, 255, 128);
 
-	spr_tileanimation[0].init(convertPath("gfx/packs/Classic/eyecandy/tile_animation.png"), 255, 0, 255);
-	spr_tileanimation[1].init(convertPath("gfx/packs/Classic/eyecandy/tile_animation_preview.png"), 255, 0, 255);
-	spr_tileanimation[2].init(convertPath("gfx/packs/Classic/eyecandy/tile_animation_thumbnail.png"), 255, 0, 255);
+	spr_tileanimation[0].init(convertPath("gfx/packs/Classic/tilesets/tile_animation.png"), 255, 0, 255);
+	spr_tileanimation[1].init(convertPath("gfx/packs/Classic/tilesets/tile_animation_preview.png"), 255, 0, 255);
+	spr_tileanimation[2].init(convertPath("gfx/packs/Classic/tilesets/tile_animation_thumbnail.png"), 255, 0, 255);
 
-	spr_blocks[0].init(convertPath("gfx/packs/Classic/blocks.png"), 255, 0, 255);
-	spr_blocks[1].init(convertPath("gfx/packs/Classic/blocks_preview.png"), 255, 0, 255);
-	spr_blocks[2].init(convertPath("gfx/packs/Classic/blocks_thumbnail.png"), 255, 0, 255);
+	spr_blocks[0].init(convertPath("gfx/packs/Classic/tilesets/blocks.png"), 255, 0, 255);
+	spr_blocks[1].init(convertPath("gfx/packs/Classic/tilesets/blocks_preview.png"), 255, 0, 255);
+	spr_blocks[2].init(convertPath("gfx/packs/Classic/tilesets/blocks_thumbnail.png"), 255, 0, 255);
 
-	spr_unknowntile[0].init(convertPath("gfx/packs/Classic/unknown_tile.png"), 255, 0, 255);
-	spr_unknowntile[1].init(convertPath("gfx/packs/Classic/unknown_tile_preview.png"), 255, 0, 255);
-	spr_unknowntile[2].init(convertPath("gfx/packs/Classic/unknown_tile_thumbnail.png"), 255, 0, 255);
+	spr_unknowntile[0].init(convertPath("gfx/packs/Classic/tilesets/unknown_tile.png"), 255, 0, 255);
+	spr_unknowntile[1].init(convertPath("gfx/packs/Classic/tilesets/unknown_tile_preview.png"), 255, 0, 255);
+	spr_unknowntile[2].init(convertPath("gfx/packs/Classic/tilesets/unknown_tile_thumbnail.png"), 255, 0, 255);
 
 	if( SDL_SetColorKey(s_eyecandy, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(s_eyecandy->format, 255, 0, 255)) < 0)
 	{
@@ -2998,7 +2998,12 @@ int editor_animation()
 
 		for(short iTile = 0; iTile < TILEANIMATIONSIZE; iTile++)
 		{
-			spr_tileanimation[0].draw(iTile * TILESIZE, 0, 0, iTile * TILESIZE, TILESIZE, TILESIZE);
+			short iDestX = (iTile % 16) << 5;
+			short iDestY = (iTile / 16) << 5;
+			short iSrcX = (iTile / 16) << 7;
+			short iSrcY = (iTile % 16) << 5;
+
+			spr_tileanimation[0].draw(iDestX, iDestY, iSrcX, iSrcY, TILESIZE, TILESIZE);
 		}
 
 		menu_font_small.drawRightJustified(640, 0, maplist.currentFilename());

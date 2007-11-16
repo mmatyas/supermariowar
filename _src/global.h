@@ -140,7 +140,7 @@ struct STextAward
 #define TILESETUNKNOWN	-3
 
 #define BLOCKSETSIZE	19			//size of block set
-#define TILEANIMATIONSIZE	13		//number of tile animations
+#define TILEANIMATIONSIZE	38		//number of tile animations
 
 #define MAXMUSICCATEGORY	11
 #define MAXWORLDMUSICCATEGORY	9
@@ -367,6 +367,7 @@ extern gfxSprite		spr_racetext;
 extern gfxSprite		spr_crown;
 extern gfxSprite		spr_cape;
 extern gfxSprite		spr_tail;
+extern gfxSprite		spr_wings;
 
 extern gfxSprite		spr_egg;
 extern gfxSprite		spr_star;
@@ -504,11 +505,11 @@ extern gfxSprite		spr_thumbnail_platformarrows;
 extern gfxSprite		spr_thumbnail_warps[2];
 extern gfxSprite		spr_thumbnail_mapitems[2];
 
-extern gfxSprite		spr_worldbackground[2];
-extern gfxSprite		spr_worldforeground[2];
-extern gfxSprite		spr_worldforegroundspecial[2];
-extern gfxSprite		spr_worldpaths[2];
-extern gfxSprite		spr_worldvehicle[2];
+extern gfxSprite		spr_worldbackground[3];
+extern gfxSprite		spr_worldforeground[3];
+extern gfxSprite		spr_worldforegroundspecial[3];
+extern gfxSprite		spr_worldpaths[3];
+extern gfxSprite		spr_worldvehicle[3];
 
 extern gfxSprite		spr_worlditems;
 extern gfxSprite		spr_worlditempopup;
@@ -547,18 +548,6 @@ extern short g_iCurrentDrawIndex;
 
 void _load_drawmsg(const std::string& f);
 void _load_waitforkey();
-
-bool __load_gfxck(gfxSprite &g, const std::string& f);
-bool __load_gfxa(gfxSprite &g, const std::string& f, Uint8 alpha);
-bool __load_gfxmenuskin(gfxSprite ** g, const std::string& f, short colorscheme, bool fLoadBothDirections);
-bool __load_gfxfullskin(gfxSprite ** g, const std::string& f, short colorscheme);
-bool __load_gfx(gfxSprite &g, const std::string& f);
-bool __load_sfx(sfxSound &s, const std::string& f);
-
-#define _load_gfxck(g,f)			if(!__load_gfxck(g,f)){_load_waitforkey();return false;};
-#define _load_gfxa(g,f,a)			if(!__load_gfxa(g,f,a)){_load_waitforkey();return false;};
-#define _load_gfx(g,f)				if(!__load_gfx(g,f)){_load_waitforkey();return false;};
-#define _load_sfx(s,f)				if(!__load_sfx(s,f)){_load_waitforkey();return false;};
 
 //----------------- game options all parts of the game need -----------
 enum gs{GS_MENU, GS_START_GAME, GS_END_GAME, GS_GAME, GS_QUIT};

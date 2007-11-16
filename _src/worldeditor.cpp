@@ -62,11 +62,11 @@ gfxSprite		menu_shade;
 gfxSprite		spr_warps[3];
 gfxSprite		spr_path;
 
-gfxSprite		spr_worldbackground[2];
-gfxSprite		spr_worldforeground[2];
-gfxSprite		spr_worldforegroundspecial[2];
-gfxSprite		spr_worldpaths[2];
-gfxSprite		spr_worldvehicle[2];
+gfxSprite		spr_worldbackground[3];
+gfxSprite		spr_worldforeground[3];
+gfxSprite		spr_worldforegroundspecial[3];
+gfxSprite		spr_worldpaths[3];
+gfxSprite		spr_worldvehicle[3];
 
 int				set_tile = 0;
 bool			fAutoPaint = true;
@@ -231,18 +231,23 @@ int main(int argc, char *argv[])
 
 	spr_worldbackground[0].init(convertPath("gfx/packs/Classic/world/world_background.png"), 255, 0, 255);
 	spr_worldbackground[1].init(convertPath("gfx/packs/Classic/world/preview/world_background.png"), 255, 0, 255);
+	spr_worldbackground[2].init(convertPath("gfx/packs/Classic/world/thumbnail/world_background.png"), 255, 0, 255);
 
 	spr_worldforeground[0].init(convertPath("gfx/packs/Classic/world/world_foreground.png"), 255, 0, 255);
 	spr_worldforeground[1].init(convertPath("gfx/packs/Classic/world/preview/world_foreground.png"), 255, 0, 255);
+	spr_worldforeground[2].init(convertPath("gfx/packs/Classic/world/thumbnail/world_foreground.png"), 255, 0, 255);
 
 	spr_worldforegroundspecial[0].init(convertPath("gfx/packs/Classic/world/world_foreground_special.png"), 255, 0, 255);
-	spr_worldforegroundspecial[1].init(convertPath("gfx/packs/Classic/world/preview/world_foregroundspecial.png"), 255, 0, 255);
+	spr_worldforegroundspecial[1].init(convertPath("gfx/packs/Classic/world/preview/world_foreground_special.png"), 255, 0, 255);
+	spr_worldforegroundspecial[2].init(convertPath("gfx/packs/Classic/world/thumbnail/world_foreground_special.png"), 255, 0, 255);
 
 	spr_worldpaths[0].init(convertPath("gfx/packs/Classic/world/world_paths.png"), 255, 0, 255);
 	spr_worldpaths[1].init(convertPath("gfx/packs/Classic/world/preview/world_paths.png"), 255, 0, 255);
+	spr_worldpaths[2].init(convertPath("gfx/packs/Classic/world/thumbnail/world_paths.png"), 255, 0, 255);
 
 	spr_worldvehicle[0].init(convertPath("gfx/packs/Classic/world/world_vehicles.png"), 255, 0, 255);
 	spr_worldvehicle[1].init(convertPath("gfx/packs/Classic/world/preview/world_vehicles.png"), 255, 0, 255);
+	spr_worldvehicle[2].init(convertPath("gfx/packs/Classic/world/thumbnail/world_vehicles.png"), 255, 0, 255);
 	
 	sMapSurface = SDL_CreateRGBSurface(screen->flags, 768, 608, screen->format->BitsPerPixel, 0, 0, 0, 0);
 
@@ -2962,85 +2967,22 @@ int new_world()
 //take screenshots in full and thumbnail sizes
 void takescreenshot()
 {
-	/*
-	short iTileSizes[3] = {32, 16, 8};
-	SDL_Surface * old_screen = screen;
+	short iTileSizes[3] = {16, 8, 32};
 
 	for(short iScreenshotSize = 0; iScreenshotSize < 3; iScreenshotSize++)
 	{
 		short iTileSize = iTileSizes[iScreenshotSize];
+		g_worldmap.Load(iTileSize);
 
-		SDL_Surface * screenshot = SDL_CreateRGBSurface(old_screen->flags, iTileSize * 20, iTileSize * 15, old_screen->format->BitsPerPixel, 0, 0, 0, 0);
-		blitdest = screenshot;
-		screen = screenshot;
-		drawmap(true, iTileSize);
+		short w, h;
+		g_worldmap.GetWorldSize(&w, &h);
 
-		//Draw platforms to screenshot
-		SDL_Rect rSrc = {0, 0, iTileSize, iTileSize};
-		SDL_Rect rDst = {0, 0, iTileSize, iTileSize};
-
-		for(short iPlatform = 0; iPlatform < g_iNumPlatforms; iPlatform++)
-		{
-			for(short iPlatformX = 0; iPlatformX < g_map.platforms[iPlatform]->iTileWidth; iPlatformX++)
-			{
-				for(short iPlatformY = 0; iPlatformY < g_map.platforms[iPlatform]->iTileHeight; iPlatformY++)
-				{
-					short iTile = g_Platforms[iPlatform].tiles[iPlatformX][iPlatformY];
-
-					if(iTile != TILESETSIZE)
-					{
-						rSrc.x = iTile % TILESETWIDTH * iTileSize;
-						rSrc.y = iTile / TILESETWIDTH * iTileSize;
-
-						rDst.x = (g_Platforms[iPlatform].iStartX + iPlatformX) * iTileSize;
-						rDst.y = (g_Platforms[iPlatform].iStartY + iPlatformY) * iTileSize;
-
-						SDL_BlitSurface(g_map.tilesetsurface[iScreenshotSize], &rSrc, blitdest, &rDst);
-					}
-				}
-			}
-		}
-	
-		//And add platform paths
-		for(short iPlatform = 0; iPlatform < g_iNumPlatforms; iPlatform++)
-		{
-			if(g_Platforms[iPlatform].iStartX != g_Platforms[iPlatform].iEndX)
-			{
-				short iCenterOffsetY = (g_map.platforms[iPlatform]->iHeight >> 1) - 16;
-				iCenterOffsetY >>= iScreenshotSize; //Resize for preview and thumbnails
-
-				bool fMoveToRight = g_Platforms[iPlatform].iStartX < g_Platforms[iPlatform].iEndX;
-
-				short iSpotLeft = (fMoveToRight ? g_Platforms[iPlatform].iStartX : g_Platforms[iPlatform].iEndX) + 1;
-				short iSpotRight = (fMoveToRight ? g_Platforms[iPlatform].iEndX : g_Platforms[iPlatform].iStartX) - 2 + g_map.platforms[iPlatform]->iTileWidth;
-
-				for(short iSpot = iSpotLeft; iSpot <= iSpotRight; iSpot++)
-					spr_platformarrows[iScreenshotSize].draw(iSpot * iTileSize, g_Platforms[iPlatform].iStartY * iTileSize + iCenterOffsetY, iTileSize * 5, 0, iTileSize, iTileSize);
-
-				spr_platformarrows[iScreenshotSize].draw((iSpotLeft - 1) * iTileSize, g_Platforms[iPlatform].iStartY * iTileSize + iCenterOffsetY, iTileSize * 2, 0, iTileSize, iTileSize);
-				spr_platformarrows[iScreenshotSize].draw((iSpotRight + 1) * iTileSize, g_Platforms[iPlatform].iStartY * iTileSize + iCenterOffsetY, iTileSize * 3, 0, iTileSize, iTileSize);
-			}
-			else
-			{
-				short iCenterOffsetX = (g_map.platforms[iPlatform]->iWidth >> 1) - 16;
-				iCenterOffsetX >>= iScreenshotSize; //Resize for preview and thumbnails
-
-				bool fMoveUp = g_Platforms[iPlatform].iStartY < g_Platforms[iPlatform].iEndY;
-
-				short iSpotTop = (fMoveUp ? g_Platforms[iPlatform].iStartY : g_Platforms[iPlatform].iEndY) + 1;
-				short iSpotBottom = (fMoveUp ? g_Platforms[iPlatform].iEndY : g_Platforms[iPlatform].iStartY) - 2 + g_map.platforms[iPlatform]->iTileHeight;
-
-				for(short iSpot = iSpotTop; iSpot <= iSpotBottom; iSpot++)
-					spr_platformarrows[iScreenshotSize].draw(g_Platforms[iPlatform].iStartX * iTileSize + iCenterOffsetX, iSpot * iTileSize, iTileSize * 4, 0, iTileSize, iTileSize);
-
-				spr_platformarrows[iScreenshotSize].draw(g_Platforms[iPlatform].iStartX * iTileSize + iCenterOffsetX, (iSpotTop - 1) * iTileSize, 0, 0, iTileSize, iTileSize);
-				spr_platformarrows[iScreenshotSize].draw(g_Platforms[iPlatform].iStartX * iTileSize + iCenterOffsetX, (iSpotBottom + 1) * iTileSize, iTileSize, 0, iTileSize, iTileSize);
-			}
-		}
+		SDL_Surface * sScreenshot = SDL_CreateRGBSurface(screen->flags, iTileSize * w, iTileSize * h, screen->format->BitsPerPixel, 0, 0, 0, 0);
+		g_worldmap.DrawMapToSurface(sScreenshot); 
 
 		//Save the screenshot with the same name as the map file
 		char szSaveFile[256];
-		strcpy(szSaveFile, "maps/screenshots/");
+		strcpy(szSaveFile, "worlds/screenshots/");
 		char * pszSaveFile = szSaveFile + strlen(szSaveFile);
 		GetNameFromFileName(pszSaveFile, worldlist.current_name());
 		
@@ -3051,18 +2993,14 @@ void takescreenshot()
 
 #ifdef PNG_SAVE_FORMAT
 		strcat(szSaveFile, ".png");
-		IMG_SavePNG(screenshot, szSaveFile);
+		IMG_SavePNG(sScreenshot, szSaveFile);
 #else
 		strcat(szSaveFile, ".bmp");
-		SDL_SaveBMP(screenshot, szSaveFile);
+		SDL_SaveBMP(sScreenshot, szSaveFile);
 #endif
 
-		SDL_FreeSurface(screenshot);
+		SDL_FreeSurface(sScreenshot);
 	}
-
-	screen = old_screen;
-	blitdest = screen;
-	*/
 }
 
 

@@ -197,6 +197,7 @@ void _load_drawmsg(const std::string& f)
 		menu_font_small.draw(0, 0, f.c_str());
 	}
 }
+
 void _load_waitforkey()
 {
 	SDL_Event event;
@@ -212,85 +213,6 @@ void _load_waitforkey()
 
 		SDL_Delay(10);
 	}
-}
-
-bool __load_gfxck(gfxSprite &g, const std::string& f)
-{
-	if(! g.init(f, 255, 0, 255) )
-	{
-		char msg[512];
-		sprintf(msg, "error loading color keyed sprite %s", f.c_str());
-
-		_load_drawmsg(msg);
-
-		return false;
-	}
-
-	return true;
-}
-
-bool __load_gfxa(gfxSprite &g, const std::string& f, Uint8 alpha)
-{
-	if(! g.init(f, 255, 0, 255, alpha) )
-	{
-		char msg[512];
-		sprintf(msg, "error loading alpha color keyed sprite %s", f.c_str());
-
-		_load_drawmsg(msg);
-
-		return false;
-	}
-
-	return true;
-}
-
-bool __load_gfxmenuskin(gfxSprite ** g, const std::string& f, short colorscheme, bool fLoadBothDirections)
-{
-	if(! gfx_createmenuskin(g, f, 255, 0, 255, colorscheme, fLoadBothDirections) )
-	{
-		char msg[512];
-		sprintf(msg, "error loading color keyed sprite %s", f.c_str());
-		_load_drawmsg(msg);
-		return false;
-	}
-
-	return true;
-}
-bool __load_gfxfullskin(gfxSprite ** g, const std::string& f, short colorscheme)
-{
-	if(! gfx_createfullskin(g, f, 255, 0, 255, colorscheme) )
-	{
-		char msg[512];
-		sprintf(msg, "error loading color keyed sprite %s", f.c_str());
-		_load_drawmsg(msg);
-		return false;
-	}
-
-	return true;
-}
-bool __load_gfx(gfxSprite &g, const std::string& f)
-{
-	if(! g.init(f))
-	{
-		char msg[512];
-		sprintf(msg, "error loading sprite %s", f.c_str());
-		_load_drawmsg(msg);
-		return false;
-	}
-
-	return true;
-}
-bool __load_sfx(sfxSound &s, const std::string& f)
-{
-	if(! s.init(f) )
-	{
-		char msg[512];
-		sprintf(msg, "error loading sound %s", f.c_str());
-		_load_drawmsg(msg);
-		return false;
-	}
-
-	return true;
 }
 
 void GetNameFromFileName(char * szName, const char * szFileName)
@@ -1085,6 +1007,6 @@ void LoadCurrentMapBackground()
 	if(!File_Exists(path))
 		path = convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist.current_name());
 
-	__load_gfx(spr_background, path);
+	gfx_loadimagenocolorkey(&spr_background, path);
 }
 

@@ -13,7 +13,7 @@ CTileset::CTileset(const char * szpath)
 
 	strcpy(szFile, szpath);
 	strcat(szFile, "/large.png");
-	__load_gfxck(sSprites[0], convertPartialPath(szFile));
+	gfx_loadimage(&sSprites[0], convertPartialPath(szFile), false);
 
 	sSurfaces[0] = sSprites[0].getSurface(); //optimization for repeat surface use
 
@@ -22,13 +22,13 @@ CTileset::CTileset(const char * szpath)
 
 	strcpy(szFile, szpath);
 	strcat(szFile, "/medium.png");
-	__load_gfxck(sSprites[1], convertPartialPath(szFile));
+	gfx_loadimage(&sSprites[1], convertPartialPath(szFile), false);
 
 	sSurfaces[1] = sSprites[1].getSurface();
 
 	strcpy(szFile, szpath);
 	strcat(szFile, "/small.png");
-	__load_gfxck(sSprites[2], convertPartialPath(szFile));
+	gfx_loadimage(&sSprites[2], convertPartialPath(szFile), false);
 
 	sSurfaces[2] = sSprites[2].getSurface();
 

@@ -159,6 +159,8 @@ class WorldMap
 
 		bool Update(bool * fPlayerVehicleCollision);
 		void Draw(short iMapOffsetX, short iMapOffsetY, bool fDrawPlayer, bool fVehiclesSleeping);
+		
+		void DrawMapToSurface(SDL_Surface * surface);
 		void DrawMapToSurface(bool fInit, SDL_Surface * surface, short iMapDrawOffsetCol, short iMapDrawOffsetRow, short iAnimationFrame);
 
 		void SetPlayerSprite(short iPlayerSprite);
@@ -203,6 +205,8 @@ class WorldMap
 
 		void Cleanup();
 		void SetTileConnections(short iCol, short iRow);
+
+		void DrawTileToSurface(SDL_Surface * surface, short iCol, short iRow, short iMapDrawOffsetCol, short iMapDrawOffsetRow, bool fInit, short iAnimationFrame);
 
 		short iWidth;
 		short iHeight;

@@ -28,6 +28,10 @@
 |								  http://smw.72dpiarmy.com	|
 +----------------------------------------------------------*/
 
+//TODO:
+//1) World screenshot thumbnail sized gfx
+
+
 #ifdef _XBOX
 	#include <xtl.h>
 #endif
@@ -104,11 +108,11 @@ gfxSprite		spr_thumbnail_platformarrows;
 gfxSprite		spr_thumbnail_warps[2];
 gfxSprite		spr_thumbnail_mapitems[2];
 
-gfxSprite		spr_worldbackground[2];
-gfxSprite		spr_worldforeground[2];
-gfxSprite		spr_worldforegroundspecial[2];
-gfxSprite		spr_worldpaths[2];
-gfxSprite		spr_worldvehicle[2];
+gfxSprite		spr_worldbackground[3];
+gfxSprite		spr_worldforeground[3];
+gfxSprite		spr_worldforegroundspecial[3];
+gfxSprite		spr_worldpaths[3];
+gfxSprite		spr_worldvehicle[3];
 
 gfxSprite		spr_worlditems;
 gfxSprite		spr_worlditempopup;
@@ -166,6 +170,7 @@ gfxSprite		spr_crown;
 gfxSprite		spr_warplock;
 gfxSprite		spr_cape;
 gfxSprite		spr_tail;
+gfxSprite		spr_wings;
 gfxSprite		spr_coinsparkle;
 gfxSprite		spr_shinesparkle;
 gfxSprite		spr_shellbounce;
@@ -345,7 +350,6 @@ extern short g_iPowerupToIcon[6];
 
 extern void SetupScoreBoard(bool fOrderMatters);
 extern void ShowScoreBoard();
-extern bool __load_gfx(gfxSprite &g, const std::string& f);
 
 FiltersList filterslist;  //Filters list must be initiallized before maps list because it is used in maplist constructor
 MapList maplist;
@@ -2422,7 +2426,7 @@ void RunGame()
 					if(!File_Exists(path))
 						path = convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist.current_name());
 
-					__load_gfx(spr_background, path);
+					gfx_loadimagenocolorkey(spr_background, path, false);
 
 					g_map.predrawbackground(spr_background, spr_backmap);
 					g_map.predrawforeground(spr_frontmap);

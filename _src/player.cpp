@@ -2098,6 +2098,9 @@ void CPlayer::SetupNewPlayer()
 	iSpinTimer = 0;
 	iSpinState = 0;
 
+	iWingsTimer = 0;
+	iWingsFrame = 0;
+
 	ryu_fireball_index_left = 0;
 	ryu_fireball_index_right = 0;
 	shoot_left_fireball = false;
@@ -2806,10 +2809,16 @@ void CPlayer::draw()
 			spr_ownedtags.draw(ix - PWOFFSET - 8, iy - PHOFFSET - 8, ownerColorOffsetX, 0, 48, 48);
 	}
 	
-	if(powerup == 3 && !fKuriboShoe) //Don't allow cape or tail to be used with shoe
-		DrawCape();
-	else if(powerup == 7 && !fKuriboShoe)
-		DrawTail();
+	//Don't allow cape, tail, wings to be used with shoe
+	if(!fKuriboShoe)
+	{
+		if(powerup == 3) 
+			DrawCape();
+		else if(powerup == 7)
+			DrawTail();
+		else if(powerup == 8)
+			DrawWings();
+	}
 
 	short iPlayerKuriboOffsetY = 0;
 	if(fKuriboShoe)
@@ -3086,6 +3095,31 @@ void CPlayer::DrawTail()
 		spr_tail.draw(ix + (fPlayerFacingRight ? - 18 : 18), iy + 6, iTailFrame, (fPlayerFacingRight ? 0 : 26) + iOffsetY, 22, 26, (short)state %4, warpplane);
 	else
 		spr_tail.draw(ix + (fPlayerFacingRight ? - 18 : 18), iy + 6, iTailFrame, (fPlayerFacingRight ? 0 : 26) + iOffsetY, 22, 26);
+}
+
+void CPlayer::DrawWings()
+{
+	if(flying)
+	{
+		if(++iWingsTimer >= 8)
+		{
+			iWingsTimer = 0;
+			iWingsFrame += 26;
+
+			if(iWingsFrame > 26)
+				iWingsFrame = 0;
+		}
+	}
+	else 
+	{
+		iWingsFrame = 26;
+	}
+
+	bool fPlayerFacingRight = IsPlayerFacingRight();
+	if(iswarping())
+		spr_wings.draw(ix + (fPlayerFacingRight ? - 19 : 15), iy - 10, iWingsFrame, fPlayerFacingRight ? 0 : 32, 26, 32, (short)state %4, warpplane);
+	else
+		spr_wings.draw(ix + (fPlayerFacingRight ? - 19 : 15), iy - 10, iWingsFrame, fPlayerFacingRight ? 0 : 32, 26, 32);
 }
 
 void CPlayer::drawarrows()
