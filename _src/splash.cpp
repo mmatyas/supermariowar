@@ -128,6 +128,8 @@ bool LoadGameGraphics()
 {
 	const char * graphicspack = gamegraphicspacklist.current_name();
 
+	g_tilesetmanager.Init(graphicspack);
+
 	bool loadok = true;
 	loadok &= game_font_small.init(convertPath("gfx/packs/fonts/font_small.png", graphicspack));
 	loadok &= game_font_large.init(convertPath("gfx/packs/fonts/font_large.png", graphicspack));
@@ -275,16 +277,11 @@ bool LoadGameGraphics()
 	gfx_loadimage(&spr_bobombsmoke, convertPath("gfx/packs/eyecandy/bobombsmoke.png", graphicspack), 160, true);
 	gfx_loadimage(&spr_explosion, convertPath("gfx/packs/eyecandy/explosion.png", graphicspack), true);
 	gfx_loadimage(&spr_burnup, convertPath("gfx/packs/eyecandy/burnup.png", graphicspack), 192, true);
+	gfx_loadimage(&spr_fireworks, convertPath("gfx/packs/eyecandy/fireworks.png", graphicspack), true);
+	gfx_loadimage(&spr_poof, convertPath("gfx/packs/eyecandy/poof.png", graphicspack), true);
 
-	gfx_loadimage(&spr_spawnsmoke[0], convertPath("gfx/packs/eyecandy/spawnsmoke1.png", graphicspack), 128, true);
-	gfx_loadimage(&spr_spawnsmoke[1], convertPath("gfx/packs/eyecandy/spawnsmoke2.png", graphicspack), 128, true);
-	gfx_loadimage(&spr_spawnsmoke[2], convertPath("gfx/packs/eyecandy/spawnsmoke3.png", graphicspack), 128, true);
-	gfx_loadimage(&spr_spawnsmoke[3], convertPath("gfx/packs/eyecandy/spawnsmoke4.png", graphicspack), 128, true);
-
-	gfx_loadimage(&spr_spawndoor[0], convertPath("gfx/packs/eyecandy/spawndoor1.png", graphicspack), true);
-	gfx_loadimage(&spr_spawndoor[1], convertPath("gfx/packs/eyecandy/spawndoor2.png", graphicspack), true);
-	gfx_loadimage(&spr_spawndoor[2], convertPath("gfx/packs/eyecandy/spawndoor3.png", graphicspack), true);
-	gfx_loadimage(&spr_spawndoor[3], convertPath("gfx/packs/eyecandy/spawndoor4.png", graphicspack), true);
+	gfx_loadimage(&spr_spawnsmoke, convertPath("gfx/packs/eyecandy/spawnsmoke.png", graphicspack), 128, true);
+	gfx_loadimage(&spr_spawndoor, convertPath("gfx/packs/eyecandy/spawndoor.png", graphicspack), true);
 
 	gfx_loadimage(&spr_bonus, convertPath("gfx/packs/eyecandy/bonus.png", graphicspack), true);
 	gfx_loadimage(&spr_extralife, convertPath("gfx/packs/eyecandy/extralife.png", graphicspack), true);
@@ -294,14 +291,10 @@ bool LoadGameGraphics()
 	gfx_loadimage(&spr_awardsouls, convertPath("gfx/packs/awards/souls.png", graphicspack), true);
 	gfx_loadimage(&spr_awardsoulspawn, convertPath("gfx/packs/awards/soulspawn.png", graphicspack), true);
 
-	gfx_loadimage(&spr_awardkillsinrow[0], convertPath("gfx/packs/awards/killsinrownumbers1.png", graphicspack), true);
-	gfx_loadimage(&spr_awardkillsinrow[1], convertPath("gfx/packs/awards/killsinrownumbers2.png", graphicspack), true);
-	gfx_loadimage(&spr_awardkillsinrow[2], convertPath("gfx/packs/awards/killsinrownumbers3.png", graphicspack), true);
-	gfx_loadimage(&spr_awardkillsinrow[3], convertPath("gfx/packs/awards/killsinrownumbers4.png", graphicspack), true);
-
-	gfx_loadteamcoloredimage(&spr_flagbases, convertPath("gfx/packs/modeobjects/flagbases.png", graphicspack), 255, 0, 255, 160, false, false);
-
-	//gfx_loadimage(&spr_flagbases, convertPath("gfx/packs/modeobjects/flagbases.png", graphicspack), 160, true);
+	gfx_loadimage(&spr_awardkillsinrow, convertPath("gfx/packs/awards/killsinrownumbers.png", graphicspack), true);
+	
+	//gfx_loadteamcoloredimage(&spr_flagbases, convertPath("gfx/packs/modeobjects/flagbases.png", graphicspack), 255, 0, 255, 160, false, false);
+	gfx_loadimage(&spr_flagbases, convertPath("gfx/packs/modeobjects/flagbases.png", graphicspack), 160, true);
 	gfx_loadimage(&spr_ownedtags, convertPath("gfx/packs/modeobjects/ownedtags.png", graphicspack), 160, true);
 
 	gfx_loadimage(&spr_storedpowerupsmall, convertPath("gfx/packs/powerups/small.png", graphicspack), true);

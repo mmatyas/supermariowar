@@ -33,6 +33,8 @@ class CTileset
 
 		short iWidth, iHeight;
 
+		char szGfxPack[256];
+
 		TileType * tiletypes;
 };
 
@@ -43,7 +45,7 @@ class CTilesetManager : public SimpleDirectoryList
     public:
 		CTilesetManager();
         virtual ~CTilesetManager();
-		void Init();
+		void Init(const char * szGfxPack);
 
 		short GetIndexFromName(char * szName);
 

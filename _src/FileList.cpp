@@ -157,9 +157,6 @@ SimpleDirectoryList::SimpleDirectoryList(const std::string &path)
 	{
 		printf("ERROR: Empty directory.  %s\n", path.c_str());
 		//exit(0);
-
-		char hi;
-		scanf("%c", &hi);
 	}
 
 	currentIndex = 0;

@@ -151,7 +151,7 @@ void CTileset::SaveTileset()
 *********************************/
 
 CTilesetManager::CTilesetManager() :
-	SimpleDirectoryList(convertPath("gfx/tilesets/"))
+	SimpleDirectoryList(convertPath("gfx/packs/Classic/tilesets/"))
 {
 	short y1 = 0, y2 = 0, y3 = 0;
 	for(short i = 0; i < 32; i++)
@@ -179,19 +179,71 @@ CTilesetManager::CTilesetManager() :
 CTilesetManager::~CTilesetManager()
 {}
 
-void CTilesetManager::Init()
+void CTilesetManager::Init(const char * szGfxPack)
 {
-	short iLength = filelist.size();
+	//Remove all existing tilesets
+	std::vector<CTileset*>::iterator iter = tilesetlist.begin(), lim = tilesetlist.end();
+	while (iter != lim)
+	{
+		delete (*iter);
+		
+		iter = tilesetlist.erase(iter);
+		lim = tilesetlist.end();
+	}
 
+	//Add in tilesets from the new gfxpack (if it isn't "Classic")
+	if(strcmp(getFileFromPath(szGfxPack).c_str(), "Classic"))
+	{
+		std::string s = convertPath("gfx/packs/tilesets", szGfxPack) + getDirectorySeperator();
+		SimpleDirectoryList dirlist(s);
+
+		short iLength = dirlist.GetCount();
+		for(short i = 0; i < iLength; i++)
+		{
+			CTileset * tileset = new CTileset(dirlist.current_name());
+			tilesetlist.push_back(tileset);
+
+			if(!strcmp(tileset->GetName(), "Classic"))
+			{
+				tClassicTileset = tileset;
+				iClassicTilesetIndex = i;
+			}
+
+			dirlist.next();
+		}
+	}
+
+	//Add in tilesets from the classic tileset to fill the gaps
+	short iLength = filelist.size();
+	char szTilesetName[128];
 	for(short i = 0; i < iLength; i++)
 	{
-		CTileset * tileset = new CTileset(filelist[i].c_str());
-		tilesetlist.push_back(tileset);
+		strncpy(szTilesetName, getFileFromPath(filelist[i]).c_str(), 128);
+		szTilesetName[127] = 0;
 
-		if(!strcmp(tileset->GetName(), "Classic"))
+		//See if the new tileset already exists and if it does, skip it
+		short iTilesetSize = tilesetlist.size();
+		bool fFound = false;
+		for(short iTileset = 0; iTileset < iTilesetSize; iTileset++)
 		{
-			tClassicTileset = tileset;
-			iClassicTilesetIndex = i;
+			if(!strcmp(tilesetlist[iTileset]->GetName(), szTilesetName))
+			{
+				fFound = true;
+				break;
+			}
+		}
+
+		//Add the tileset if another one by the same name isn't already in the tileset
+		if(!fFound)
+		{
+			CTileset * tileset = new CTileset(filelist[i].c_str());
+			tilesetlist.push_back(tileset);
+
+			if(!strcmp(tileset->GetName(), "Classic"))
+			{
+				tClassicTileset = tileset;
+				iClassicTilesetIndex = i;
+			}
 		}
 	}
 }
@@ -214,7 +266,6 @@ void CTilesetManager::Draw(SDL_Surface * dstSurface, short iTilesetID, short iTi
 	tilesetlist[iTilesetID]->Draw(dstSurface, iTileSize, &rRects[iTileSize][iSrcTileCol][iSrcTileRow], &rRects[iTileSize][iDstTileCol][iDstTileRow]);
 }
 
-
 CTileset * CTilesetManager::GetTileset(short iTilesetID)
 {
 	if(iTilesetID < 0 || iTilesetID >= (short)tilesetlist.size())
@@ -232,3 +283,4 @@ void CTilesetManager::SaveTilesets()
 		tilesetlist[i]->SaveTileset();
 	}
 }
+

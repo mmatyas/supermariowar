@@ -3272,19 +3272,7 @@ PU_BobombPowerup::PU_BobombPowerup(gfxSprite *nspr, short x, short y, short iNum
 bool PU_BobombPowerup::collide(CPlayer * player)
 {
 	dead = true;
-
-	if(player->bobomb)
-	{
-		ifsoundonplay(sfx_storepowerup);
-		game_values.gamepowerups[player->globalID] = 8;
-	}
-	else
-	{
-		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, player->ix + (HALFPW) - 16, player->iy + (HALFPH) - 16, 3, 8));
-		ifsoundonplay(sfx_transform);
-		player->bobomb = true;
-	}
-
+	player->SetPowerup(0);
 	return false;
 }
 

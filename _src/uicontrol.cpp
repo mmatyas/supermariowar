@@ -3106,23 +3106,38 @@ void MI_TournamentScoreboard::Update()
 		{
 			if(--iFireworksCounter < 0 && iTournamentWinner >= 0)
 			{
-				iFireworksCounter = (short)(rand() % 100 + 25);
-
-				ifsoundonplay(sfx_cannon);
-
-				float dAngle = 0.0f; 
-				short iRandX = (short)(rand() % 440 + 100);
-				short iRandY = (short)(rand() % 280 + 100);
-
-				for(short iBlock = 0; iBlock < 28; iBlock++)
+				iFireworksCounter = (short)(rand() % 30 + 10);
+				
+				if(--iExplosionCounter < 0)
 				{
-					float dVel = 7.0f + ((iBlock % 2) * 5.0f);
-					float dVelX = dVel * cos(dAngle);
-					float dVelY = dVel * sin(dAngle);
-					
+					iExplosionCounter = (short)(rand() % 6 + 5);
+
+					ifsoundonplay(sfx_thunder);
+
+					float dAngle = 0.0f; 
+					short iRandX = (short)(rand() % 440 + 100);
+					short iRandY = (short)(rand() % 280 + 100);
+
+					for(short iBlock = 0; iBlock < 28; iBlock++)
+					{
+						float dVel = 7.0f + ((iBlock % 2) * 5.0f);
+						float dVelX = dVel * cos(dAngle);
+						float dVelY = dVel * sin(dAngle);
+						
+						short iRandomColor = (short)(rand() % iTeamCounts[iTournamentWinner]);
+						uiMenu->AddEyeCandy(new EC_FallingObject(&spr_bonus, iRandX, iRandY, dVelX, dVelY, 4, 2, 0, game_values.colorids[iTeamIDs[iTournamentWinner][iRandomColor]] << 4, 16, 16));
+						dAngle -= (float)PI / 14;
+					}
+				}
+				else
+				{
+					ifsoundonplay(sfx_cannon);
+
+					short iRandX = (short)(rand() % 576);
+					short iRandY = (short)(rand() % 416);
 					short iRandomColor = (short)(rand() % iTeamCounts[iTournamentWinner]);
-					uiMenu->AddEyeCandy(new EC_FallingObject(&spr_bonus, iRandX, iRandY, dVelX, dVelY, 4, 2, 0, game_values.colorids[iTeamIDs[iTournamentWinner][iRandomColor]] * 16, 16, 16));
-					dAngle -= (float)PI / 14;
+
+					uiMenu->AddEyeCandy(new EC_SingleAnimation(&spr_fireworks, iRandX, iRandY, 8, 4, 0, game_values.colorids[iTeamIDs[iTournamentWinner][iRandomColor]] << 6, 64, 64));
 				}
 			}
 
@@ -3236,6 +3251,7 @@ void MI_TournamentScoreboard::CreateScoreboard(short numTeams, short numGames, g
 	iSwirlIconTeam = -1;
 	iSwirlIconGame = -1;
 
+	iExplosionCounter = 0;
 	iFireworksCounter = 0;
 	iWinnerTextCounter = 0;
 
@@ -5374,7 +5390,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 							tile->iCompleted = -2;
 							UpdateMapSurface();
 
-							uiMenu->AddEyeCandy(new EC_SingleAnimation(&spr_fireballexplosion, (iDestX << 5) + iMapOffsetX, (iDestY << 5) + iMapOffsetY, 3, 8));
+							uiMenu->AddEyeCandy(new EC_SingleAnimation(&spr_poof, (iDestX << 5) + iMapOffsetX - 8, (iDestY << 5) + iMapOffsetY - 8, 4, 5));
 
 							fUsedItem = true;
 							ifsoundonplay(sfx_transform);
@@ -5498,5 +5514,5 @@ void MI_World::UseCloud(bool fUseCloud)
 
 	short iPlayerX, iPlayerY;
 	g_worldmap.GetPlayerPosition(&iPlayerX, &iPlayerY);
-	uiMenu->AddEyeCandy(new EC_SingleAnimation(&spr_fireballexplosion, iPlayerX + iMapOffsetX, iPlayerY + iMapOffsetY, 3, 8));
+	uiMenu->AddEyeCandy(new EC_SingleAnimation(&spr_poof, iPlayerX + iMapOffsetX - 8, iPlayerY + iMapOffsetY - 8, 4, 5));
 }

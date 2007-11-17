@@ -28,9 +28,6 @@
 |								  http://smw.72dpiarmy.com	|
 +----------------------------------------------------------*/
 
-//TODO:
-//1) World screenshot thumbnail sized gfx
-
 
 #ifdef _XBOX
 	#include <xtl.h>
@@ -224,15 +221,18 @@ gfxSprite		spr_frictionsmoke;
 gfxSprite		spr_bobombsmoke;
 gfxSprite		spr_explosion;
 gfxSprite		spr_burnup;
-gfxSprite		spr_spawnsmoke[4];
-gfxSprite		spr_spawndoor[4];
+gfxSprite		spr_fireworks;
+gfxSprite		spr_poof;
+
+gfxSprite		spr_spawnsmoke;
+gfxSprite		spr_spawndoor;
 gfxSprite		spr_bonus;
 gfxSprite		spr_extralife;
 gfxSprite		spr_award;
 gfxSprite		spr_awardsolid;
 gfxSprite		spr_awardsouls;
 gfxSprite		spr_awardsoulspawn;
-gfxSprite		spr_awardkillsinrow[4];
+gfxSprite		spr_awardkillsinrow;
 gfxSprite		spr_flagbases;
 gfxSprite		spr_ownedtags;
 
@@ -599,8 +599,6 @@ int main(int argc, char *argv[])
 	gfx_init(640, 480, false);		//initialize the graphics (SDL)
 	blitdest = screen;
 	
-	g_tilesetmanager.Init();
-
 	/*
 	//Comment this in to performance test the preview map loading
 	MI_MapField * miMapField = new MI_MapField(&spr_selectfield, 70, 165, "Map", 500, 120);

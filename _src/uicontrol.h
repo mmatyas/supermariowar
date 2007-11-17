@@ -766,6 +766,7 @@ class MI_TournamentScoreboard : public UI_Control
 
 		short iFireworksCounter;
 		short iWinnerTextCounter;
+		short iExplosionCounter;
 
 		gfxSprite * sprBackground;
 		gfxSprite * sprIcons;

@@ -2199,7 +2199,7 @@ void CMap::drawPreview(SDL_Surface * targetSurface, int layer, bool fThumbnail)
 			}
 			else if(tile->iID == TILESETANIMATED)
 			{				
-				SDL_BlitSurface(spr_tileanimation[iTilesetIndex].getSurface(), &g_tilesetmanager.rRects[iTilesetIndex][tile->iCol][tile->iRow], targetSurface, &g_tilesetmanager.rRects[iTilesetIndex][i][j]);
+				SDL_BlitSurface(spr_tileanimation[iTilesetIndex].getSurface(), &g_tilesetmanager.rRects[iTilesetIndex][tile->iCol << 2][tile->iRow], targetSurface, &g_tilesetmanager.rRects[iTilesetIndex][i][j]);
 			}
 			else if(tile->iID == TILESETUNKNOWN)
 			{	

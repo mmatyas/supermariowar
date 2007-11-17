@@ -709,30 +709,23 @@ void CGM_Chicken::draw_foreground()
 
 bool CGM_Chicken::playerkilledplayer(CPlayer &inflictor, CPlayer &other)
 {
-	if(!chicken)
+	if(!chicken || &other == chicken)
 	{
 		chicken = &inflictor;
-		eyecandyfront.add(new EC_GravText(&game_font_large, inflictor.ix + (HALFPW), inflictor.iy + PH, "Chicken!", -VELJUMP*1.5));
-		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, inflictor.ix + (HALFPW) - 16, inflictor.iy + (HALFPH) - 16, 3, 8));
+		eyecandyfront.add(new EC_GravText(&game_font_large, inflictor.ix + HALFPW, inflictor.iy + PH, "Chicken!", -VELJUMP*1.5));
+		//eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, inflictor.ix + (HALFPW) - 16, inflictor.iy + (HALFPH) - 16, 3, 8));
+		eyecandyfront.add(new EC_SingleAnimation(&spr_poof, inflictor.ix + HALFPW - 24, inflictor.iy + HALFPH - 24, 4, 5));
 		ifsoundonplay(sfx_transform);
-	}
-	else
-	{
+
 		if(&other == chicken)
-		{
 			other.diedas = 1; //flag to use chicken corpse sprite
-			chicken = &inflictor;
-			eyecandyfront.add(new EC_GravText(&game_font_large, inflictor.ix + (HALFPW), inflictor.iy + PH, "Chicken!", -VELJUMP*1.5));
-			eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, inflictor.ix + (HALFPW) - 16, inflictor.iy + (HALFPH) - 16, 3, 8));
-			ifsoundonplay(sfx_transform);
-		}
-		else if(&inflictor == chicken)
+	}
+	else if(&inflictor == chicken)
+	{
+		if(!gameover)
 		{
-			if(!gameover)
-			{
-				inflictor.score->AdjustScore(5);
-				return CheckWinner(inflictor);
-			}
+			inflictor.score->AdjustScore(5);
+			return CheckWinner(inflictor);
 		}
 	}
 	

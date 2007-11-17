@@ -146,7 +146,7 @@ other moving object enums you'll probably want to use:
 movingobject_throwblock, movingobject_egg, movingobject_star, movingobject_flag
 
 6. Player powerups
-pPlayer->powerup == 0 for none, 1 for fireballs, 2 for hammer, 3 for feather, 4 for boomerang
+pPlayer->powerup == -1 for none, 0 for bobomb, 1 for fireballs, 2 for hammer, 3 for feather, 4 for boomerang
 
 7. Figure out what direction the player is facing (good for knowing if you should throw a shell or other object)
 pPlayer->IsPlayerFacingRight();
@@ -282,7 +282,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 		}
 		else
 		{
-			if(pPlayer->powerup == 0 || !(rand() % 20))
+			if(pPlayer->powerup == -1 || !(rand() % 20))
 				playerKeys->game_turbo.fDown = true;
 
 			if(carriedItem)
@@ -681,7 +681,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 			playerKeys->game_powerup.fDown = true;
 		}
 		else if(((iStoredPowerup == 5 || iStoredPowerup == 11 || iStoredPowerup == 17 || iStoredPowerup == 19 || iStoredPowerup == 21 || iStoredPowerup == 23) && 
-				pPlayer->powerup == 0) || //Use fireflower, hammer, feather, boomerang
+				pPlayer->powerup == -1) || //Use fireflower, hammer, feather, boomerang
 				(iStoredPowerup == 6 && !pPlayer->invincible) || //Use star
 				(iStoredPowerup == 8 && !pPlayer->bobomb) || //use bob-omb
 				(iStoredPowerup >= 12 && iStoredPowerup <= 15 && !carriedItem)) //Use shell 

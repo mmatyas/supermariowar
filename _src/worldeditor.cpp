@@ -206,7 +206,7 @@ int main(int argc, char *argv[])
 
 	gfx_init(640,480, false);
 	blitdest = screen;
-	g_tilesetmanager.Init();
+	g_tilesetmanager.Init(convertPath("gfx/Classic/tilesets").c_str());
 
 	SDL_WM_SetCaption(MAPTITLESTRING, "worldeditor.ico");
 

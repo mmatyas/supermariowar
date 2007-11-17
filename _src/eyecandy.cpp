@@ -324,35 +324,55 @@ EC_SingleAnimation::EC_SingleAnimation(gfxSprite *nspr, short nx, short ny, shor
 	x = (float)nx;
 	y = (float)ny;
 	frames = iframes;
-	frame = 0;
 	counter = 0;
 	rate = irate - 1;
 
 	iw = (short)spr->getWidth() / iframes;
 	ih = (short)spr->getHeight();
 
+	iOffsetX = 0;
+	iOffsetY = 0;
+
 	iAnimationWidth = (short)spr->getWidth();
 }
 
+EC_SingleAnimation::EC_SingleAnimation(gfxSprite *nspr, short nx, short ny, short iframes, short irate, short offsetx, short offsety, short w, short h) :
+	CEyecandy()
+{
+	spr = nspr;
+	x = (float)nx;
+	y = (float)ny;
+	
+	frames = iframes;
+	counter = 0;
+	rate = irate - 1;
+
+	iw = w;
+	ih = h;
+
+	iOffsetX = offsetx;
+	iOffsetY = offsety;
+
+	iAnimationWidth = (short)spr->getWidth() + iOffsetX;
+}
 
 void EC_SingleAnimation::update()
 {
 	if(++counter > rate)
 	{
 		counter = 0;
-		frame += iw;
+		iOffsetX += iw;
 
-		if(frame >= iAnimationWidth)
+		if(iOffsetX >= iAnimationWidth)
 		{
 			dead = true;
 		}
 	}
 }
 
-
 void EC_SingleAnimation::draw()
 {
-	spr->draw((short)x, (short)y, frame, 0, iw, ih);
+	spr->draw((short)x, (short)y, iOffsetX, iOffsetY, iw, ih);
 }
 
 //------------------------------------------------------------------------------
@@ -477,7 +497,7 @@ void EC_ExplodingAward::draw()
 // class EC_SwirlingAward
 //------------------------------------------------------------------------------
 
-EC_SwirlingAward::EC_SwirlingAward(gfxSprite *nspr, short nx, short ny, float nangle, float nradius, float nvel, short timetolive, short awardID) :
+EC_SwirlingAward::EC_SwirlingAward(gfxSprite *nspr, short nx, short ny, float nangle, float nradius, float nvel, short timetolive, short srcX, short srcY, short iw, short ih) :
 	CEyecandy()
 {
 	spr = nspr;
@@ -489,10 +509,11 @@ EC_SwirlingAward::EC_SwirlingAward(gfxSprite *nspr, short nx, short ny, float na
 	timer = 0;
 	ttl = timetolive;
 
-	w = (short)spr->getWidth() / 10;
-	h = (short)spr->getHeight();
+	w = iw;
+	h = ih;
 
-	id = awardID * w;
+	iSrcX = srcX * w;
+	iSrcY = srcY * h;
 }
 
 
@@ -517,7 +538,7 @@ void EC_SwirlingAward::draw()
 	short awardx = x + (short)(radius * cos(angle));
 	short awardy = y + (short)(radius * sin(angle));
 		
-	spr->draw(awardx, awardy, id, 0, w, h);
+	spr->draw(awardx, awardy, iSrcX, iSrcY, w, h);
 }
 
 
@@ -525,7 +546,7 @@ void EC_SwirlingAward::draw()
 // class EC_RocketAward
 //------------------------------------------------------------------------------
 
-EC_RocketAward::EC_RocketAward(gfxSprite *nspr, short nx, short ny, float nvelx, float nvely, short timetolive, short awardID, short numAwards) :
+EC_RocketAward::EC_RocketAward(gfxSprite *nspr, short nx, short ny, float nvelx, float nvely, short timetolive, short srcX, short srcY, short iw, short ih) :
 	CEyecandy()
 {
 	spr = nspr;
@@ -537,10 +558,11 @@ EC_RocketAward::EC_RocketAward(gfxSprite *nspr, short nx, short ny, float nvelx,
 	timer = 0;
 	ttl = timetolive;
 	
-	w = (short)spr->getWidth() / numAwards;
-	h = (short)spr->getHeight();
+	w = iw;
+	h = ih;
 
-	id = awardID * w;
+	iSrcX = srcX * w;
+	iSrcY = srcY * h;
 }
 
 
@@ -561,7 +583,7 @@ void EC_RocketAward::update()
 
 void EC_RocketAward::draw()
 {
-	spr->draw((short)x, (short)y, id, 0, w, h);
+	spr->draw((short)x, (short)y, iSrcX, iSrcY, w, h);
 }
 
 //------------------------------------------------------------------------------
@@ -662,7 +684,7 @@ void EC_SoulsAward::update()
 		float velx = speed * cos(angle);
 		float vely = speed * sin(angle);
 
-		eyecandyfront.add(new EC_RocketAward(&spr_awardsouls, x - 8, y - 8, velx, vely, ttl, id[count], 12));
+		eyecandyfront.add(new EC_RocketAward(&spr_awardsouls, x - 8, y - 8, velx, vely, ttl, id[count], 0, 16, 16));
 		
 		if(++count >= numSouls)
 		{
@@ -694,7 +716,7 @@ void EC_SoulsAward::draw()
 // class EC_DoorFront
 //------------------------------------------------------------------------------
 
-EC_Door::EC_Door(gfxSprite *nspr, gfxSprite *nmariospr, short nx, short ny, short irate, short xOffset) :
+EC_Door::EC_Door(gfxSprite *nspr, gfxSprite *nmariospr, short nx, short ny, short irate, short xOffset, short iColor) :
 	CEyecandy()
 {
 	spr = nspr;
@@ -705,14 +727,15 @@ EC_Door::EC_Door(gfxSprite *nspr, gfxSprite *nmariospr, short nx, short ny, shor
 	timer = 0;
 	rate = irate;
 
-	iw = (short)spr->getWidth() / 10;
-	ih = (short)spr->getHeight();
+	iw = 32;
+	ih = 32;
 
 	offsety = ih;
 	state = 0;
 	frame = 0;
 
 	offsetx = xOffset;
+	colorOffset = iColor << 5; //select which color door to use
 }
 
 
@@ -767,12 +790,12 @@ void EC_Door::update()
 
 void EC_Door::draw()
 {
-	spr->draw(x, y + offsety, 0, 0, iw, ih - offsety);
+	spr->draw(x, y + offsety, 0, colorOffset, iw, ih - offsety);
 
 	if(state == 1)
 		mariospr->draw(x + 16 - HALFPW - PWOFFSET, y + 16 - HALFPH - PHOFFSET + offsety, offsetx, 0, iw, ih - offsety);
 
-	spr->draw(x, y + offsety, frame * iw, 0, iw, ih - offsety);
+	spr->draw(x, y + offsety, frame * iw, colorOffset, iw, ih - offsety);
 }
 
 //------------------------------------------------------------------------------

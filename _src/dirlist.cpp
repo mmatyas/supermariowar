@@ -190,3 +190,4 @@ bool DirectoryListing :: NextDirectory (string &s)
 
     return retval;
 }
+

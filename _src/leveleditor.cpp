@@ -138,7 +138,8 @@ int				move_drag_start_y = 0;
 int				move_drag_offset_x = 0;
 int				move_drag_offset_y = 0;
 
-int				set_animation = 0;
+int				set_animation_x = 0;
+int				set_animation_y = 0;
 
 CMap			g_map;
 CTilesetManager g_tilesetmanager;
@@ -280,7 +281,7 @@ int main(int argc, char *argv[])
 
 	gfx_init(640,480, false);
 	blitdest = screen;
-	g_tilesetmanager.Init();
+	g_tilesetmanager.Init(convertPath("gfx/Classic/tilesets").c_str());
 
 	SDL_WM_SetCaption(MAPTITLESTRING, "leveleditor.ico");
 
@@ -951,7 +952,7 @@ int editor_edit()
 						}
 						else if(edit_mode == 8)
 						{
-							SetTilesetTile(&g_map.mapdata[iClickX][iClickY][selected_layer], TILESETANIMATED, 0, set_animation);
+							SetTilesetTile(&g_map.mapdata[iClickX][iClickY][selected_layer], TILESETANIMATED, set_animation_y, set_animation_x);
 						}
 					}
 					else if(event.button.button == SDL_BUTTON_RIGHT)
@@ -1069,7 +1070,7 @@ int editor_edit()
 						}
 						else if(edit_mode == 8)
 						{
-							SetTilesetTile(&g_map.mapdata[iClickX][iClickY][selected_layer], TILESETANIMATED, 0, set_animation);
+							SetTilesetTile(&g_map.mapdata[iClickX][iClickY][selected_layer], TILESETANIMATED, set_animation_y, set_animation_x);
 						}
 					}
 					else if(event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT))
@@ -2974,17 +2975,21 @@ int editor_animation()
 				case SDL_MOUSEBUTTONDOWN:
 					if(event.button.button == SDL_BUTTON_LEFT)
 					{
-						short set_animation_x = event.button.x / TILESIZE;
-						short set_animation_y = event.button.y / TILESIZE;
+						short animation_x = event.button.x / TILESIZE;
+						short animation_y = event.button.y / TILESIZE;
 
-						if(set_animation_y == 0 && set_animation_x >= 0 && set_animation_x < TILEANIMATIONSIZE)
-							set_animation = set_animation_x;
+						if((animation_y >= 0 && animation_y <= 1 && animation_x >= 0 && animation_x < 16) ||
+							(animation_y == 2 && animation_x >= 0 && animation_x < 6))
+						{
+							set_animation_x = animation_x;
+							set_animation_y = animation_y;
 
-						edit_mode = 8;
+							edit_mode = 8;
 
-						//The user must release the mouse button before trying to add a tile
-						ignoreclick = true;
-						return EDITOR_EDIT;
+							//The user must release the mouse button before trying to add a tile
+							ignoreclick = true;
+							return EDITOR_EDIT;
+						}						
 					}
 				break;
 

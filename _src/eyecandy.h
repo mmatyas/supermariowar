@@ -130,13 +130,15 @@ class EC_SingleAnimation : public CEyecandy
 {
 	public:
 		EC_SingleAnimation(gfxSprite *nspr, short nx, short ny, short iframes, short irate);
+		EC_SingleAnimation(gfxSprite *nspr, short nx, short ny, short iframes, short irate, short offsetx, short offsety, short w, short h);
 		void update();
 		void draw();
 
 	protected:
 		gfxSprite *spr;
 		float x, y;
-		short frames, frame, counter;
+		short frames, counter;
+		short iOffsetX, iOffsetY;
 		short iw, ih;
 		short rate;
 		short iAnimationWidth;
@@ -197,7 +199,7 @@ class EC_ExplodingAward : public CEyecandy
 class EC_SwirlingAward : public CEyecandy
 {
 	public:
-		EC_SwirlingAward(gfxSprite *nspr, short nx, short ny, float nangle, float nradius, float nvel, short timetolive, short awardID);
+		EC_SwirlingAward(gfxSprite *nspr, short nx, short ny, float nangle, float nradius, float nvel, short timetolive, short srcX, short srcY, short iw, short ih);
 		void draw();
 		void update();
 
@@ -205,14 +207,15 @@ class EC_SwirlingAward : public CEyecandy
 		gfxSprite *spr;
 		short x, y;
 		short w, h;
-		short timer, ttl, id;
+		short timer, ttl;
+		short iSrcX, iSrcY;
 		float vel, angle, radius;
 };
 
 class EC_RocketAward : public CEyecandy
 {
 	public:
-		EC_RocketAward(gfxSprite *nspr, short nx, short ny, float nvelx, float nvely, short timetolive, short awardID, short numAwards);
+		EC_RocketAward(gfxSprite *nspr, short nx, short ny, float nvelx, float nvely, short timetolive, short srcX, short srcY, short iw, short ih);
 		void draw();
 		void update();
 
@@ -221,7 +224,8 @@ class EC_RocketAward : public CEyecandy
 		float x, y;
 		short w, h;
 		float velx, vely;
-		short timer, ttl, id;
+		short timer, ttl;
+		short iSrcX, iSrcY;
 };
 
 class EC_FloatingObject : public CEyecandy
@@ -266,7 +270,7 @@ class EC_SoulsAward : public CEyecandy
 class EC_Door : public CEyecandy
 {
 	public:
-		EC_Door(gfxSprite *nspr, gfxSprite *mario, short nx, short ny, short irate, short iOffsetX);
+		EC_Door(gfxSprite *nspr, gfxSprite *mario, short nx, short ny, short irate, short iOffsetX, short iColor);
 		virtual void draw();
 		virtual void update();
 	
@@ -281,6 +285,7 @@ class EC_Door : public CEyecandy
 		short state;
 		short offsetx;
 		short offsety;
+		short colorOffset;
 };
 
 /*

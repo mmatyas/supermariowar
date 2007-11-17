@@ -782,7 +782,7 @@ void CPlayer::move()
 				}
 				else if(game_values.spawnstyle == 1)
 				{
-					eyecandyback.add(new EC_Door(&spr_spawndoor[colorID], sprites[spr], ix + HALFPW - 16, iy + HALFPH - 16, 1, iSrcOffsetX));
+					eyecandyback.add(new EC_Door(&spr_spawndoor, sprites[spr], ix + HALFPW - 16, iy + HALFPH - 16, 1, iSrcOffsetX, colorID));
 				}
 			}
 
@@ -828,10 +828,10 @@ void CPlayer::move()
 					short ix4 = ix - PWOFFSET + (short)(spawnradius * cos(spawnangle + THREE_HALF_PI));
 					short iy4 = iy - PHOFFSET + (short)(spawnradius * sin(spawnangle + THREE_HALF_PI));
 
-					eyecandyfront.add(new EC_SingleAnimation(&spr_spawnsmoke[colorID], ix1, iy1, 4, 4));
-					eyecandyfront.add(new EC_SingleAnimation(&spr_spawnsmoke[colorID], ix2, iy2, 4, 4));
-					eyecandyfront.add(new EC_SingleAnimation(&spr_spawnsmoke[colorID], ix3, iy3, 4, 4));
-					eyecandyfront.add(new EC_SingleAnimation(&spr_spawnsmoke[colorID], ix4, iy4, 4, 4));
+					eyecandyfront.add(new EC_SingleAnimation(&spr_spawnsmoke, ix1, iy1, 4, 4, 0, colorID << 5, 32, 32));
+					eyecandyfront.add(new EC_SingleAnimation(&spr_spawnsmoke, ix2, iy2, 4, 4, 0, colorID << 5, 32, 32));
+					eyecandyfront.add(new EC_SingleAnimation(&spr_spawnsmoke, ix3, iy3, 4, 4, 0, colorID << 5, 32, 32));
+					eyecandyfront.add(new EC_SingleAnimation(&spr_spawnsmoke, ix4, iy4, 4, 4, 0, colorID << 5, 32, 32));
 				}
 			}
 		}
@@ -937,9 +937,9 @@ void CPlayer::move()
 				}
 				case 8:
 				{
-					eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
-					ifsoundonplay(sfx_transform);
-					bobomb = true;
+					powerup = 0;
+					bobomb = false;
+					SetPowerup(0);
 					break;
 				}
 				case 9:
@@ -1523,7 +1523,7 @@ void CPlayer::move()
 
 		if(flying)
 		{
-			if(++flyingtimer > 300)
+			if(++flyingtimer > 200)
 			{
 				flyingtimer = 0;
 				flying = false;
@@ -2056,7 +2056,7 @@ void CPlayer::SetupNewPlayer()
 	lockjump = true;
 	superjumptimer = 0;
 	superjumptype = 0;
-	powerup	= 0;
+	powerup	= -1;
 	projectilelimit = 0;
 	bobomb = false;
 	hammertimer = 0;
@@ -2346,7 +2346,7 @@ void CPlayer::addswirlingawards()
 	for(short k = 0; k < numawards; k++)
 	{
 		float angle = (float)k * addangle + awardangle;
-		eyecandyfront.add(new EC_SwirlingAward(&spr_awardkillsinrow[colorID], ix + HALFPW - 8, iy + HALFPH - 8, angle, 30.0f, 0.05f, 60, numawards - 1));
+		eyecandyfront.add(new EC_SwirlingAward(&spr_awardkillsinrow, ix + HALFPW - 8, iy + HALFPH - 8, angle, 30.0f, 0.05f, 60, numawards - 1, colorID, 16, 16));
 	}
 }
 
@@ -2368,7 +2368,7 @@ void CPlayer::addrocketawards()
 		float awardvelx = 9.0f * cos(angle);
 		float awardvely = 9.0f * sin(angle);
 			
-		eyecandyfront.add(new EC_RocketAward(&spr_awardkillsinrow[colorID], ix + HALFPW - 8, iy + HALFPH - 8, awardvelx, awardvely, 80, numawards - 1, 10));
+		eyecandyfront.add(new EC_RocketAward(&spr_awardkillsinrow, ix + HALFPW - 8, iy + HALFPH - 8, awardvelx, awardvely, 80, numawards - 1, colorID, 16, 16));
 	}
 }
 
@@ -2403,9 +2403,7 @@ void PlayerKilledPlayer(CPlayer &killer, CPlayer &killed, short deathstyle, kill
 	if(killed.bobomb)
 	{
 		killed.diedas = 2;
-		killer.bobomb = true;
-		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, killer.ix + HALFPW - 16, killer.iy + HALFPH - 16, 3, 8));
-		ifsoundonplay(sfx_transform);
+		killer.SetPowerup(0);
 	}
 
 	if(game_values.gamemode->chicken == &killer && style != kill_style_pow)
@@ -3132,7 +3130,7 @@ void CPlayer::drawarrows()
 
 			//This displays the out of arena timer before the player is killed
 			if(game_values.outofboundstime > 0)
-				spr_awardkillsinrow[colorID].draw(ix - PWOFFSET + 8, 18, outofarenadisplaytimer * 16, 0, 16, 16);
+				spr_awardkillsinrow.draw(ix - PWOFFSET + 8, 18, outofarenadisplaytimer << 4, colorID << 4, 16, 16);
 		}
 	}
 }
@@ -4312,14 +4310,14 @@ void CPlayer::SetPowerup(short iPowerup)
 	else if(iPowerup == 0)
 	{
 		ifsoundonplay(sfx_transform);
-		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
+		eyecandyfront.add(new EC_SingleAnimation(&spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
 	}
 	else if(iPowerup == 3)
 	{
 		ifsoundonplay(sfx_collectfeather);
 		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
 	}
-	else if(iPowerup == 7)
+	else if(iPowerup == 7 || iPowerup == 8)
 	{
 		ifsoundonplay(sfx_collectpowerup);
 		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
