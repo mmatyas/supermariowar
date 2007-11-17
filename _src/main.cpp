@@ -1591,7 +1591,7 @@ void RunGame()
 					else if(event.key.keysym.sym == SDLK_4)
 					{
 						if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-							objectcollisionitems.add(new PU_PWingsPowerup(&spr_pwingspowerup, list_players[0]->ix + 32, list_players[0]->iy));
+							objectcollisionitems.add(new PU_Tanooki(list_players[0]->ix + 32, list_players[0]->iy));
 						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
 							objectsplayer.add(new CO_Shell(0, list_players[0]->ix + 32, list_players[0]->iy, true, true, true, false));
 						else
