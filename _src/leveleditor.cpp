@@ -2269,12 +2269,6 @@ int editor_tiles()
 	int i, j;
 	bool done = false;
 	
-	SDL_Rect r;
-	r.x = 0;
-	r.y = 0;
-	r.w = 640;
-	r.h = 480;
-
 	/*
 	short iCurrentTile = 0;
 	short iConvertedTile[300];
@@ -2310,6 +2304,9 @@ int editor_tiles()
 						if(event.key.keysym.sym >= SDLK_1 && event.key.keysym.sym <= SDLK_9 && event.key.keysym.sym < SDLK_1 + g_tilesetmanager.GetCount())
 						{
 							set_tile_tileset = event.key.keysym.sym - SDLK_1;
+							tileset = g_tilesetmanager.GetTileset(set_tile_tileset);
+							view_tileset_x = 0;
+							view_tileset_y = 0;
 						}
 						else if(event.key.keysym.sym == SDLK_PAGEUP)
 						{
@@ -2512,6 +2509,12 @@ int editor_tiles()
 		rectSrc.y = view_tileset_y << 5;
 		rectSrc.w = tileset->GetWidth() > 20 ? 640 : tileset->GetWidth() << 5;
 		rectSrc.h = tileset->GetHeight() > 15 ? 480 : tileset->GetHeight() << 5;
+
+		SDL_Rect r;
+		r.x = 0;
+		r.y = 0;
+		r.w = 640;
+		r.h = 480;
 
 		SDL_BlitSurface(g_tilesetmanager.GetTileset(set_tile_tileset)->GetSurface(0), &rectSrc, screen, &r);
 		menu_font_small.drawRightJustified(640, 0, maplist.currentFilename());

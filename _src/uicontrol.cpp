@@ -3112,7 +3112,7 @@ void MI_TournamentScoreboard::Update()
 				{
 					iExplosionCounter = (short)(rand() % 6 + 5);
 
-					ifsoundonplay(sfx_thunder);
+					ifsoundonplay(sfx_bobombsound);
 
 					float dAngle = 0.0f; 
 					short iRandX = (short)(rand() % 440 + 100);

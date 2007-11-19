@@ -1143,6 +1143,13 @@ void CPlayer::move()
 			}
 		}
 
+		//If player is shaking tail, slow decent
+		if(iTailState == 1)
+		{
+			if(vely > 1.5f)
+				vely = 1.5f;
+		}
+
 		//If player is shielded, count down that timer
 		if(spawninvincibletimer > 0)
 			spawninvincible = --spawninvincibletimer > 0;
@@ -1468,7 +1475,7 @@ void CPlayer::move()
 								DecreaseProjectileLimit();
 							}
 						}
-						else if(powerup == 6 && projectiles[globalID] < 2)
+						else if(powerup == 6 && projectiles[globalID] < 1)
 						{
 							CO_Bomb * bomb = new CO_Bomb(&spr_bomb, ix + HALFPW - 14, iy - 8, IsPlayerFacingRight() ? 3.0f : -3.0f, -3.0f, 4, globalID, teamID, colorID, rand() % 120 + 240);
 							
@@ -1535,7 +1542,7 @@ void CPlayer::move()
 			}
 			else if(!playerKeys->game_down.fDown && vely > -1.0f)
 			{
-				vely -= 1.0f;
+				vely -= 1.5f;
 				inair = true;
 			}
 		}
@@ -2998,9 +3005,6 @@ void CPlayer::SpinPlayer()
 
 void CPlayer::ShakeTail()
 {
-	if(vely > 0.0f)
-		vely = 0.0f;
-
 	ifsoundonstop(sfx_tailspin);
 	ifsoundonplay(sfx_tailspin);
 	lockjump = true;
