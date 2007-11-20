@@ -188,6 +188,9 @@ bool LoadGameGraphics()
 	gfx_loadimage(&spr_brokenyellowblock, convertPath("gfx/packs/eyecandy/brokenyellowblock.png", graphicspack), true);
 	gfx_loadimage(&spr_brokenflipblock, convertPath("gfx/packs/eyecandy/brokenflipblock.png", graphicspack), true);
 	gfx_loadimage(&spr_brokenblueblock, convertPath("gfx/packs/eyecandy/brokenblueblock.png", graphicspack), true);
+	
+	gfx_loadimage(&spr_brokeniceblock, convertPath("gfx/packs/eyecandy/icecube.png", graphicspack), true);
+	gfx_loadimage(&spr_iceblock, convertPath("gfx/packs/eyecandy/iceblock.png", graphicspack), true);
 
 	gfx_loadimage(&spr_tanooki, convertPath("gfx/packs/powerups/tanooki.png", graphicspack), true);
 	gfx_loadimage(&spr_statue, convertPath("gfx/packs/projectiles/statue.png", graphicspack), true);

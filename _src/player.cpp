@@ -653,13 +653,22 @@ void CPlayer::move()
             statue_timer = 123;
 
             // perform tansformation effects
-            eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
+			eyecandyfront.add(new EC_SingleAnimation(&spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
             ifsoundonplay(sfx_transform);
 
             // Neutralize lateral velocity
             const float tv = 1.6f;
-            if (velx > tv) velx = tv;
-            else if (velx < -tv) velx = -tv;
+            if (velx > tv)
+				velx = tv;
+            else if (velx < -tv) 
+				velx = -tv;
+
+			// Cause statue to super stomp to ground
+			if(inair && !fSuperStomp && iSuperStompTimer <= 0)
+			{
+				iSuperStompTimer = 8;
+				lockfall = true;
+			}
 
             // Prevent you from shooting
             lockfire = true;
@@ -671,46 +680,49 @@ void CPlayer::move()
             statue_lock = true;
         }
 
-        // Count down the statue timer, which leads to a forced detransformation
-        if (statue_timer == 1)
-        {
-            // Untransform from statue
-            statue_timer = 0;
+		if(!fSuperStomp && iSuperStompTimer <= 0)
+		{
+			// Count down the statue timer, which leads to a forced detransformation
+			if (statue_timer == 1)
+			{
+				// Untransform from statue
+				statue_timer = 0;
 
-            // Release invincibility
-            spawninvincible = false;
+				// Release invincibility
+				spawninvincible = false;
 
-            // Slight upward velocity to escape spikes / lava
-            if(!inair)
-				vely = -8.0;
+				// Slight upward velocity to escape spikes / lava
+				if(!inair)
+					vely = -8.0;
 
-            // perform transformation effects
-            eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
-            ifsoundonplay(sfx_transform);
+				// perform transformation effects
+				eyecandyfront.add(new EC_SingleAnimation(&spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
+				ifsoundonplay(sfx_transform);
 
-			statue_lock = false;
-        }
+				statue_lock = false;
+			}
 
-        // Player is a statue
-        else if (statue_timer > 0)
-        {
-            // Prevent player from shooting while a statue
-            lockfire = true;
+			// Player is a statue
+			else if (statue_timer > 0)
+			{
+				// Prevent player from shooting while a statue
+				lockfire = true;
 
-            // Prevent player from jumping
-            lockjump = true;
+				// Prevent player from jumping
+				lockjump = true;
 
-            // Don't fall through passable platforms
-            fallthrough = false;
+				// Don't fall through passable platforms
+				fallthrough = false;
 
-            // Decrement statue timer3
-            statue_timer--;
+				// Decrement statue timer3
+				statue_timer--;
 
-            // Become invincible
-            spawninvincible = true;
+				// Become invincible
+				spawninvincible = true;
 
-			statue_lock = true;
-        }
+				statue_lock = true;
+			}
+		}
     }
 
 	if(fSuperStomp && !inair)
@@ -1119,7 +1131,8 @@ void CPlayer::move()
 		if(fKuriboShoe && inair && !fSuperStomp && ((playerKeys->game_down.fPressed && playerDevice == DEVICE_KEYBOARD) || 
 			(playerKeys->game_jump.fPressed && playerKeys->game_down.fDown)))
 		{
-			if(superjumptype != 3 || superjumptimer <= 0)
+			if((superjumptype != 3 || superjumptimer <= 0) &&
+				(inair && !fSuperStomp && iSuperStompTimer <= 0))
 			{
 				iSuperStompTimer = 8;
 				lockfall = true;
@@ -1582,7 +1595,7 @@ void CPlayer::move()
 					//velx = 0.0f;
 					Jump(lrn, 1.0f, true);
 					superjumptype = 3;
-					superjumptimer = 18;
+					superjumptimer = 16;
 				}
 				else if(velx < 0.0f)
 					game_values.playskidsound = true;
@@ -1620,7 +1633,7 @@ void CPlayer::move()
 					//velx = 0.0f;
 					Jump(lrn, 1.0f, true);
 					superjumptype = 3;
-					superjumptimer = 18;
+					superjumptimer = 16;
 				}
 				else if(velx > 0.0f)
 					game_values.playskidsound = true;
@@ -1998,10 +2011,10 @@ void CPlayer::die(short deathStyle, bool fTeamRemoved)
 		eyecandyback.add(new EC_Corpse(corpseSprite, (float)(ix - PWOFFSET), (float)(iy+PH-32), iSrcOffsetX));
 	else if(deathStyle == death_style_shatter)
 	{
-		eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix + HALFPW - 16, iy + HALFPH - 16, -1.5f, -7.0f, 6, 2, 0, 0, 16, 16));
-		eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix + HALFPW, iy + HALFPH - 16, 1.5f, -7.0f, 6, 2, 0, 0, 16, 16));
-		eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix + HALFPW - 16, iy + HALFPH, -1.5f, -4.0f, 6, 2, 0, 0, 16, 16));
-		eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix + HALFPW, iy + HALFPH, 1.5f, -4.0f, 6, 2, 0, 0, 16, 16));
+		eyecandyfront.add(new EC_FallingObject(&spr_brokeniceblock, ix + HALFPW - 16, iy + HALFPH - 16, -1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
+		eyecandyfront.add(new EC_FallingObject(&spr_brokeniceblock, ix + HALFPW, iy + HALFPH - 16, 1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
+		eyecandyfront.add(new EC_FallingObject(&spr_brokeniceblock, ix + HALFPW - 16, iy + HALFPH, -1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
+		eyecandyfront.add(new EC_FallingObject(&spr_brokeniceblock, ix + HALFPW, iy + HALFPH, 1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
 	}
 
 	if(carriedItem)
@@ -2813,7 +2826,7 @@ void CPlayer::draw()
 		else
 			spr_ownedtags.draw(ix - PWOFFSET - 8, iy - PHOFFSET - 8, ownerColorOffsetX, 0, 48, 48);
 	}
-	
+
 	//Don't allow cape, tail, wings to be used with shoe
 	if(!fKuriboShoe)
 	{
@@ -2844,10 +2857,18 @@ void CPlayer::draw()
 
 	//Draw the crown on the player
 	if(game_values.showwinningcrown && g_iWinningPlayer == teamID)
-		spr_crown.draw(ix + HALFPW - (IsPlayerFacingRight() ? 4 : 10), iy - 10);
+		spr_crown.draw(ix + HALFPW - (IsPlayerFacingRight() ? 4 : 10), iy - 10 - (fKuriboShoe ? 16 : 0));
 
 	if(state < player_ready)
 		return;
+
+	if(frozen)
+	{
+		if(iswarping())
+			spr_iceblock.draw(ix - PWOFFSET, iy - PHOFFSET, 0, 0, 32, 32, (short)state % 4, warpplane);
+		else
+			spr_iceblock.draw(ix - PWOFFSET, iy - PHOFFSET, 0, 0, 32, 32);
+	}
 
 	if(jailed > 0)
 	{
@@ -3735,7 +3756,10 @@ void CPlayer::collision_detection_map()
 
 			if(!platform)
 			{
-				superjumptimer = 0;
+				//If we're not hopping with kuribo's shoe, then zero out our super jump timer
+				if(superjumptype != 3)
+					superjumptimer = 0;
+
 				inair = true;
 			}
 		}

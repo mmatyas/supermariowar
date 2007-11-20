@@ -131,6 +131,9 @@ gfxSprite		spr_brokenyellowblock;
 gfxSprite		spr_brokenflipblock;
 gfxSprite		spr_brokenblueblock;
 
+gfxSprite		spr_brokeniceblock;
+gfxSprite		spr_iceblock;
+
 gfxSprite		spr_tileanimation[3];
 gfxSprite		spr_blocks[3];
 gfxSprite		spr_unknowntile[3];
@@ -819,6 +822,7 @@ int main(int argc, char *argv[])
 	//Setup the default game mode settings
 
 	//Jail
+	game_values.gamemodemenusettings.jail.style = 1;			//defaults to color jail play
 	game_values.gamemodemenusettings.jail.tagfree = true;		//players on same team can free player by touching
 	game_values.gamemodemenusettings.jail.timetofree = 1240;   //20 seconds of jail
 
@@ -1558,6 +1562,11 @@ void RunGame()
 							if(!game_values.gamemode->playerkilledself(*(list_players[k])))
 								list_players[k]->die(0, false);
 						}
+					}
+					else if(event.key.keysym.sym == SDLK_x)
+					{
+						short iplayer = rand() % list_players_cnt;
+						list_players[iplayer]->makefrozen(300);
 					}
 					else if(event.key.keysym.sym == SDLK_1)
 					{
@@ -3332,6 +3341,4 @@ bool IsPauseAllowed()
 {
 	return !game_values.noexit;
 }
-
-
 

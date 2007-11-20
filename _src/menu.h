@@ -332,6 +332,7 @@ class Menu
 		UI_Menu mModeSettingsMenu[17];
 
 		//Jail
+		MI_SelectField * miJailModeStyleField;
 		MI_SelectField * miJailModeTagFreeField;
 		MI_SelectField * miJailModeTimeFreeField;
 		MI_Button * miJailModeBackButton;

@@ -1336,6 +1336,13 @@ void Menu::CreateMenu()
 	// Jail Mode Settings
 	//***********************
 
+	miJailModeStyleField = new MI_SelectField(&spr_selectfield, 120, 240, "Style", 400, 180);
+	miJailModeStyleField->Add("Classic", 0, "", false, false);
+	miJailModeStyleField->Add("Owned", 1, "", true, false);
+	miJailModeStyleField->Add("Free For All", 2, "", true, false);
+	miJailModeStyleField->SetData(&game_values.gamemodemenusettings.jail.style, NULL, NULL);
+	miJailModeStyleField->SetKey(game_values.gamemodemenusettings.jail.style);
+
 	miJailModeTimeFreeField = new MI_SelectField(&spr_selectfield, 120, 200, "Free Timer", 400, 180);
 	miJailModeTimeFreeField->Add("None", 1, "", false, false);
 	miJailModeTimeFreeField->Add("5 Seconds", 310, "", false, false);

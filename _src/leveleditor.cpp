@@ -138,9 +138,6 @@ int				move_drag_start_y = 0;
 int				move_drag_offset_x = 0;
 int				move_drag_offset_y = 0;
 
-int				set_animation_x = 0;
-int				set_animation_y = 0;
-
 CMap			g_map;
 CTilesetManager g_tilesetmanager;
 int				state;
@@ -952,7 +949,19 @@ int editor_edit()
 						}
 						else if(edit_mode == 8)
 						{
-							SetTilesetTile(&g_map.mapdata[iClickX][iClickY][selected_layer], TILESETANIMATED, set_animation_y, set_animation_x);
+							for(short i = 0; i < set_tile_cols; i++)
+							{
+								short iLocalX = iClickX + i;
+
+								for(short j = 0; j < set_tile_rows; j++)
+								{
+									short iLocalY = iClickY + j;
+
+									if(iLocalX >= 0 && iLocalX < MAPWIDTH && iLocalY >= 0 && iLocalY < MAPHEIGHT)
+									{										SetTilesetTile(&g_map.mapdata[iLocalX][iLocalY][selected_layer], TILESETANIMATED, set_tile_start_y + j, set_tile_start_x + i);
+									}
+								}
+							}
 						}
 					}
 					else if(event.button.button == SDL_BUTTON_RIGHT)
@@ -1070,7 +1079,20 @@ int editor_edit()
 						}
 						else if(edit_mode == 8)
 						{
-							SetTilesetTile(&g_map.mapdata[iClickX][iClickY][selected_layer], TILESETANIMATED, set_animation_y, set_animation_x);
+							for(short i = 0; i < set_tile_cols; i++)
+							{
+								short iLocalX = iClickX + i;
+
+								for(short j = 0; j < set_tile_rows; j++)
+								{
+									short iLocalY = iClickY + j;
+
+									if(iLocalX >= 0 && iLocalX < MAPWIDTH && iLocalY >= 0 && iLocalY < MAPHEIGHT)
+									{
+										SetTilesetTile(&g_map.mapdata[iLocalX][iLocalY][selected_layer], TILESETANIMATED, set_tile_start_y + j, set_tile_start_x + i);
+									}
+								}
+							}							
 						}
 					}
 					else if(event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT))
@@ -2957,6 +2979,8 @@ int editor_animation()
 {
 	bool done = false;
 	
+	set_tile_drag = false;
+
 	while (!done)
 	{
 		int framestart = SDL_GetTicks();
@@ -2964,37 +2988,89 @@ int editor_animation()
 		//handle messages
 		while(SDL_PollEvent(&event))
 		{
+			short iCol = event.button.x / TILESIZE;
+			short iRow = event.button.y / TILESIZE;
+
+			bool fInValidTile = (iRow >= 0 && iRow <= 1 && iCol >= 0 && iCol < 13) || (iRow == 2 && iCol >= 0 && iCol < 12);
+
 			switch(event.type)
 			{
 				case SDL_QUIT:
+				{
 					done = true;
-				break;
+					break;
+				}
 
 				case SDL_KEYDOWN:
-					edit_mode = 8;
-					return EDITOR_EDIT;
-				break;
+				{
+					if(!set_tile_drag)
+					{
+						edit_mode = 8;
+						return EDITOR_EDIT;
+					}
+					
+					break;
+				}				
 
 				case SDL_MOUSEBUTTONDOWN:
+				{
 					if(event.button.button == SDL_BUTTON_LEFT)
 					{
-						short animation_x = event.button.x / TILESIZE;
-						short animation_y = event.button.y / TILESIZE;
-
-						if((animation_y >= 0 && animation_y <= 1 && animation_x >= 0 && animation_x < 16) ||
-							(animation_y == 2 && animation_x >= 0 && animation_x < 6))
+						if(fInValidTile)
 						{
-							set_animation_x = animation_x;
-							set_animation_y = animation_y;
+							set_tile_start_x = iCol;
+							set_tile_start_y = iRow;
+							set_tile_end_x = set_tile_start_x;
+							set_tile_end_y = set_tile_start_y;
 
-							edit_mode = 8;
-
-							//The user must release the mouse button before trying to add a tile
-							ignoreclick = true;
-							return EDITOR_EDIT;
-						}						
+							set_tile_drag = true;
+						}
 					}
-				break;
+				
+					break;
+				}
+
+				case SDL_MOUSEBUTTONUP:
+				{
+					if(event.button.button == SDL_BUTTON_LEFT)
+					{
+						if(fInValidTile)
+						{
+							set_tile_cols = set_tile_end_x - set_tile_start_x + 1;
+							set_tile_rows = set_tile_end_y - set_tile_start_y + 1;
+
+							set_tile_drag = false;
+							edit_mode = 8;  //change to edit mode using tiles
+							return EDITOR_EDIT;
+							
+						}
+					}
+									
+					break;
+				}
+
+				case SDL_MOUSEMOTION:
+				{
+					if(fInValidTile)
+					{
+						if(event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT))
+						{
+							if(iCol < set_tile_start_x)
+								set_tile_start_x = iCol;
+							
+							if(iCol > set_tile_end_x)
+								set_tile_end_x = iCol;
+
+							if(iRow < set_tile_start_y)
+								set_tile_start_y = iRow;
+							
+							if(iRow > set_tile_end_y)
+								set_tile_end_y = iRow;
+						}
+					}
+					
+					break;
+				}
 
 				default:
 					break;
@@ -3004,7 +3080,7 @@ int editor_animation()
 		drawmap(false, TILESIZE);
 		menu_shade.draw(0, 0);
 
-		for(short iTile = 0; iTile < TILEANIMATIONSIZE; iTile++)
+		for(short iTile = 0; iTile < 64; iTile++)
 		{
 			short iDestX = (iTile % 16) << 5;
 			short iDestY = (iTile / 16) << 5;
@@ -3012,6 +3088,17 @@ int editor_animation()
 			short iSrcY = (iTile % 16) << 5;
 
 			spr_tileanimation[0].draw(iDestX, iDestY, iSrcX, iSrcY, TILESIZE, TILESIZE);
+		}
+
+		if(set_tile_drag)
+		{
+			for(short i = set_tile_start_x; i <= set_tile_end_x; i++)
+			{
+				for(short j = set_tile_start_y; j <= set_tile_end_y; j++)
+				{
+					spr_selectedtile.draw((i - view_tileset_x) << 5, (j - view_tileset_y) << 5);
+				}
+			}
 		}
 
 		menu_font_small.drawRightJustified(640, 0, maplist.currentFilename());

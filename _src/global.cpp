@@ -493,6 +493,7 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 			{
 				ts->fUseSettings = true;
 				
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.jail.style, NULL, game_values.gamemodemenusettings.jail.style, false);
 				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.jail.timetofree, NULL, game_values.gamemodemenusettings.jail.timetofree, false);
 				ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.jail.tagfree, 0, game_values.gamemodemenusettings.jail.tagfree);
 			}
@@ -728,11 +729,17 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
 			{
 				if(ts->iNumUsedSettings > 0)
 				{
-					sprintf(szTemp, ",%d", ts->gmsSettings.jail.timetofree);
+					sprintf(szTemp, ",%d", ts->gmsSettings.jail.style);
 					strcat(buffer, szTemp);
 				}
 
 				if(ts->iNumUsedSettings > 1)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.jail.timetofree);
+					strcat(buffer, szTemp);
+				}
+
+				if(ts->iNumUsedSettings > 2)
 				{
 					sprintf(szTemp, ",%d", ts->gmsSettings.jail.tagfree);
 					strcat(buffer, szTemp);

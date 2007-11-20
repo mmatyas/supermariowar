@@ -465,6 +465,9 @@ extern gfxSprite		spr_brokenyellowblock;
 extern gfxSprite		spr_brokenflipblock;
 extern gfxSprite		spr_brokenblueblock;
 
+extern gfxSprite		spr_brokeniceblock;
+extern gfxSprite		spr_iceblock;
+
 extern gfxSprite		spr_tileanimation[3];
 extern gfxSprite		spr_blocks[3];
 extern gfxSprite		spr_unknowntile[3];
@@ -565,6 +568,7 @@ struct ts
 
 struct JailGameModeSettings
 {
+	short style;			//Style of play: classic, owned, free for all
 	bool tagfree;			//Free jailed player by tagging on same team
 	short timetofree;		//Time it takes for a jailed player to be freed
 };
