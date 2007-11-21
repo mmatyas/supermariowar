@@ -1336,14 +1336,14 @@ void Menu::CreateMenu()
 	// Jail Mode Settings
 	//***********************
 
-	miJailModeStyleField = new MI_SelectField(&spr_selectfield, 120, 240, "Style", 400, 180);
+	miJailModeStyleField = new MI_SelectField(&spr_selectfield, 120, 180, "Style", 400, 180);
 	miJailModeStyleField->Add("Classic", 0, "", false, false);
 	miJailModeStyleField->Add("Owned", 1, "", true, false);
 	miJailModeStyleField->Add("Free For All", 2, "", true, false);
 	miJailModeStyleField->SetData(&game_values.gamemodemenusettings.jail.style, NULL, NULL);
 	miJailModeStyleField->SetKey(game_values.gamemodemenusettings.jail.style);
 
-	miJailModeTimeFreeField = new MI_SelectField(&spr_selectfield, 120, 200, "Free Timer", 400, 180);
+	miJailModeTimeFreeField = new MI_SelectField(&spr_selectfield, 120, 220, "Free Timer", 400, 180);
 	miJailModeTimeFreeField->Add("None", 1, "", false, false);
 	miJailModeTimeFreeField->Add("5 Seconds", 310, "", false, false);
 	miJailModeTimeFreeField->Add("10 Seconds", 620, "", false, false);
@@ -1360,7 +1360,7 @@ void Menu::CreateMenu()
 	miJailModeTimeFreeField->SetData(&game_values.gamemodemenusettings.jail.timetofree, NULL, NULL);
 	miJailModeTimeFreeField->SetKey(game_values.gamemodemenusettings.jail.timetofree);
 
-	miJailModeTagFreeField = new MI_SelectField(&spr_selectfield, 120, 240, "Tag Free", 400, 180);
+	miJailModeTagFreeField = new MI_SelectField(&spr_selectfield, 120, 260, "Tag Free", 400, 180);
 	miJailModeTagFreeField->Add("Off", 0, "", false, false);
 	miJailModeTagFreeField->Add("On", 1, "", true, false);
 	miJailModeTagFreeField->SetData(NULL, NULL, &game_values.gamemodemenusettings.jail.tagfree);
@@ -1374,15 +1374,16 @@ void Menu::CreateMenu()
 	miJailModeRightHeaderBar = new MI_Image(&menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
 	miJailModeHeaderText = new MI_Text("Jail Mode Menu", 320, 5, 0, 2, 1);
 
-	mModeSettingsMenu[3].AddControl(miJailModeTimeFreeField, miJailModeBackButton, miJailModeTagFreeField, NULL, miJailModeBackButton);
+	mModeSettingsMenu[3].AddControl(miJailModeStyleField, miJailModeBackButton, miJailModeTimeFreeField, NULL, miJailModeBackButton);
+	mModeSettingsMenu[3].AddControl(miJailModeTimeFreeField, miJailModeStyleField, miJailModeTagFreeField, NULL, miJailModeBackButton);
 	mModeSettingsMenu[3].AddControl(miJailModeTagFreeField, miJailModeTimeFreeField, miJailModeBackButton, NULL, miJailModeBackButton);
-	mModeSettingsMenu[3].AddControl(miJailModeBackButton, miJailModeTagFreeField, miJailModeTimeFreeField, miJailModeTagFreeField, NULL);
+	mModeSettingsMenu[3].AddControl(miJailModeBackButton, miJailModeTagFreeField, miJailModeStyleField, miJailModeTagFreeField, NULL);
 	
 	mModeSettingsMenu[3].AddNonControl(miJailModeLeftHeaderBar);
 	mModeSettingsMenu[3].AddNonControl(miJailModeRightHeaderBar);
 	mModeSettingsMenu[3].AddNonControl(miJailModeHeaderText);
 	
-	mModeSettingsMenu[3].SetHeadControl(miJailModeTimeFreeField);
+	mModeSettingsMenu[3].SetHeadControl(miJailModeStyleField);
 	mModeSettingsMenu[3].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
 	

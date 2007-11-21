@@ -33,7 +33,9 @@ CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamI
 	carriedItem = NULL;
 	ownerPlayerID = -1;
 	ownerColorOffsetX = 0;
-	jailed = 0;
+	jail = -1;
+	jailcolor = 0;
+	jailtimer = 0;
 
 	spawntext = 20;  //set it to 20 so there is an immediate text spawned upon winning
 	
@@ -1575,7 +1577,7 @@ void CPlayer::move()
 			float maxVel = 0.0f;
 			if(!frozen)
 			{
-				if((game_values.slowdownon != -1 && game_values.slowdownon != teamID) || jailed > 0)
+				if((game_values.slowdownon != -1 && game_values.slowdownon != teamID) || jailtimer > 0)
 					maxVel = VELSLOWMOVING;
 				else if(dashRight)
 					maxVel = VELDASHMOVING;
@@ -1613,7 +1615,7 @@ void CPlayer::move()
 			float maxVel = 0.0f;
 			if(!frozen)
 			{
-				if((game_values.slowdownon != -1 && game_values.slowdownon != teamID) || jailed > 0)
+				if((game_values.slowdownon != -1 && game_values.slowdownon != teamID) || jailtimer > 0)
 					maxVel = -VELSLOWMOVING;
 				else if(dashLeft)
 					maxVel = -VELDASHMOVING;
@@ -1730,11 +1732,12 @@ void CPlayer::move()
 		}
 
 		//Deal with release from jail timer
-		if(jailed > 0 && game_values.gamemodesettings.jail.timetofree > 1)
+		if(jailtimer > 0 && game_values.gamemodesettings.jail.timetofree > 1)
 		{
-			if(--jailed <= 0)
+			if(--jailtimer <= 0)
 			{
-				jailed = 0;
+				jailtimer = 0;
+				jail = -1;
 				eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
 				ifsoundonplay(sfx_transform);
 			}
@@ -1895,7 +1898,7 @@ void CPlayer::Jump(short iMove, float jumpModifier, bool fKuriboBounce)
 {
 	if(fKuriboBounce)
 		vely = -VELKURIBOBOUNCE;
-	else if((game_values.slowdownon != -1 && game_values.slowdownon != teamID) || jailed > 0)
+	else if((game_values.slowdownon != -1 && game_values.slowdownon != teamID) || jailtimer > 0)
 		vely = -VELSLOWJUMP * jumpModifier;
 	else if(ABS(velx) > VELMOVING && iMove != 0 && playerKeys->game_turbo.fDown)
 		vely = -VELTURBOJUMP * jumpModifier;
@@ -2578,18 +2581,18 @@ void collisionhandler_p2p(CPlayer &o1, CPlayer &o2)
 	{
 		if(game_values.gamemode->gamemode == game_mode_jail && game_values.gamemodesettings.jail.tagfree)
 		{
-			if(o1.jailed > 0)
+			if(o1.jailtimer > 0)
 			{
 				eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, o1.ix + HALFPW - 16, o1.iy + HALFPH - 16, 3, 8));
 				ifsoundonplay(sfx_transform);
-				o1.jailed = 0;
+				o1.jailtimer = 0;
 			}
 
-			if(o2.jailed > 0)
+			if(o2.jailtimer > 0)
 			{
 				eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, o2.ix + HALFPW - 16, o2.iy + HALFPH - 16, 3, 8));
 				ifsoundonplay(sfx_transform);
-				o2.jailed = 0;
+				o2.jailtimer = 0;
 			}
 		}
 		
@@ -2870,12 +2873,12 @@ void CPlayer::draw()
 			spr_iceblock.draw(ix - PWOFFSET, iy - PHOFFSET, 0, 0, 32, 32);
 	}
 
-	if(jailed > 0)
+	if(jailtimer > 0)
 	{
 		if(state > player_ready) //warping
-			spr_jail.draw(ix - PWOFFSET - 6, iy - PHOFFSET - 6, 0, 0, 44, 44, (short)state % 4, warpplane);
+			spr_jail.draw(ix - PWOFFSET - 6, iy - PHOFFSET - 6, (jailcolor + 1) * 44, 0, 44, 44, (short)state % 4, warpplane);
 		else
-			spr_jail.draw(ix - PWOFFSET - 6, iy - PHOFFSET - 6);
+			spr_jail.draw(ix - PWOFFSET - 6, iy - PHOFFSET - 6, (jailcolor + 1) * 44, 0, 44, 44);
 	}
 
 	//Draw the Ring awards

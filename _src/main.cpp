@@ -2608,8 +2608,8 @@ void RunGame()
 		
 								player->GetScoreboardSprite()[iScoreboardSprite]->draw(iScoreOffsetX, iScoreOffsetY, player->iSrcOffsetX, 0, 32, 32);
 
-								if(player->jailed > 0)
-									spr_jail.draw(iScoreOffsetX - 6, iScoreOffsetY - 6);
+								if(player->jailtimer > 0)
+									spr_jail.draw(iScoreOffsetX - 6, iScoreOffsetY - 6, (player->jailcolor + 1) * 44, 0, 44, 44);
 
 								if(player->powerup > 0)
 									spr_storedpowerupsmall.draw(iScoreOffsetX, iScoreOffsetY + 16, g_iPowerupToIcon[player->powerup - 1], 0, 16, 16);

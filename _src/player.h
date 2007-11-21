@@ -368,7 +368,9 @@ class CPlayer
 		short ownerPlayerID;
 		short ownerColorOffsetX;
 		//If greater than 0, the player is jailed and moves slowly for Jail mode
-		short jailed;
+		short jail;
+		short jailcolor;
+		short jailtimer;
 
 		bool fallthrough;
 

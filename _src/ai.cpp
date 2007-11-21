@@ -167,7 +167,7 @@ game_values.gamemode->chicken == pPlayer
 game_values.gamemode->star == pPlayer
 
 13. If greater than 0, player is jailed in jail mode:
-pPlayer->jailed;
+pPlayer->jailtimer;
 
 14. When true, these actions were pressed and need to be released before pressing action again:
 pPlayer->lockfall
@@ -1015,7 +1015,7 @@ void CPlayerAI::GetNearestObjects()
 		//Find players in jail on own team to tag
 		if(game_values.gamemode->gamemode == game_mode_jail)
 		{
-			if(list_players[iPlayer]->jailed > 0 && list_players[iPlayer]->teamID == iTeamID)
+			if(list_players[iPlayer]->jailtimer > 0 && list_players[iPlayer]->teamID == iTeamID)
 			{
 				DistanceToPlayer(list_players[iPlayer], &nearestObjects.teammate, &nearestObjects.teammatedistance, &nearestObjects.teammatewrap);
 			}
