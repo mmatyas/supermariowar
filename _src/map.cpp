@@ -63,7 +63,7 @@ void CMap::convertMap()
 					fTilesNeedConversion = false;
 			}
 
-			if(objectdata[i][j] == BLOCKSETSIZE)
+			if(objectdata[i][j.iType == BLOCKSETSIZE)
 				fBlocksNeedConversion = false;
 		}
 	}
@@ -99,7 +99,7 @@ void CMap::clearMap()
 			}
 
 			mapdatatop[i][j] = tile_nonsolid;
-			objectdata[i][j] = BLOCKSETSIZE;
+			objectdata[i][j].iType = BLOCKSETSIZE;
 			warpdata[i][j].direction = -1;
 			warpdata[i][j].connection = -1;
 
@@ -262,10 +262,10 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 					tile->iRow = ReadByteAsShort(mapfile);
 				}
 
-				objectdata[i][j] = (short)ReadInt(mapfile);
+				objectdata[i][j].iType = ReadByteAsShort(mapfile);
+				objectdata[i][j].fHidden = ReadBool(mapfile);
 			}
 		}
-
 
 		//Read in background to use
 		ReadString(szBackgroundFile, 128, mapfile);
@@ -394,6 +394,18 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 			drawareas[m].w = (Uint16)ReadInt(mapfile);
 			drawareas[m].h = (Uint16)ReadInt(mapfile);
 		}
+
+		int iNumExtendedDataBlocks = ReadInt(mapfile);
+
+		for(short iBlock = 0; iBlock < iNumExtendedDataBlocks; iBlock++)
+		{
+			short iCol = ReadByteAsShort(mapfile);
+			short iRow = ReadByteAsShort(mapfile);
+
+			short iNumSettings = ReadByteAsShort(mapfile);
+			for(short iSetting = 0; iSetting < iNumSettings; iSetting++)
+				objectdata[iCol][iRow].iSettings[iSetting] = ReadByteAsShort(mapfile);
+		}
 	}
 	else if(version[0] == 1 && version[1] == 7)
 	{
@@ -461,12 +473,19 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 					}
 				}
 
-				objectdata[i][j] = (short)ReadInt(mapfile);
-				if(objectdata[i][j] == 15)
-					objectdata[i][j] = BLOCKSETSIZE;
+				objectdata[i][j].iType = (short)ReadInt(mapfile);
+				if(objectdata[i][j].iType == 15)
+					objectdata[i][j].iType = BLOCKSETSIZE;
+
+				objectdata[i][j].fHidden = false;
+				
+				if(objectdata[i][j].iType == 1)
+				{
+					for(short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++)
+						objectdata[i][j].iSettings[iSetting] = g_iDefaultPowerupWeights[iSetting];
+				}
 			}
 		}
-
 
 		if((version[2] == 0 && version[3] > 1) || version[2] >= 1)
 		{
@@ -692,9 +711,17 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 					}
 				}
 
-				objectdata[i][j] = (short)ReadInt(mapfile);
-				if(objectdata[i][j] == 6)
-					objectdata[i][j] = BLOCKSETSIZE;
+				objectdata[i][j].iType = (short)ReadInt(mapfile);
+				if(objectdata[i][j].iType == 6)
+					objectdata[i][j].iType = BLOCKSETSIZE;
+
+				objectdata[i][j].fHidden = false;
+				
+				if(objectdata[i][j].iType == 1)
+				{
+					for(short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++)
+						objectdata[i][j].iSettings[iSetting] = g_iDefaultPowerupWeights[iSetting];
+				}
 
 				warpdata[i][j].direction = (short)ReadInt(mapfile);
 				warpdata[i][j].connection = (short)ReadInt(mapfile);
@@ -880,9 +907,17 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 		{
 			for(i = 0; i < MAPWIDTH; i++)
 			{
-				objectdata[i][j] = (short)ReadInt(mapfile);
-				if(objectdata[i][j] == 6)
-					objectdata[i][j] = BLOCKSETSIZE;
+				objectdata[i][j].iType = (short)ReadInt(mapfile);
+				if(objectdata[i][j].iType == 6)
+					objectdata[i][j].iType = BLOCKSETSIZE;
+
+				objectdata[i][j].fHidden = false;
+				
+				if(objectdata[i][j].iType == 1)
+				{
+					for(short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++)
+						objectdata[i][j].iSettings[iSetting] = g_iDefaultPowerupWeights[iSetting];
+				}
 			}
 		}
 
@@ -1167,16 +1202,16 @@ void CMap::saveMap(const std::string& file)
 			if(mapdatatop[i][j] == tile_ice)
 				iIceCount++;
 
-			if(objectdata[i][j] == 1 || objectdata[i][j] == 15) //Powerup/View Block
+			if(objectdata[i][j].iType == 1 || objectdata[i][j].iType == 15) //Powerup/View Block
 				iPowerupBlockCount++;
 
-			if(objectdata[i][j] == 0) //Breakable Block
+			if(objectdata[i][j].iType == 0) //Breakable Block
 				iBreakableBlockCount++;
 			
-			if(objectdata[i][j] == 6 || objectdata[i][j] == 16) //Blue/Red Throw Block
+			if(objectdata[i][j].iType == 6 || objectdata[i][j].iType == 16) //Blue/Red Throw Block
 				iThrowBlockCount++;
 
-			if(objectdata[i][j] >= 11 && objectdata[i][j] <= 14) //On/Off Block
+			if(objectdata[i][j].iType >= 11 && objectdata[i][j].iType <= 14) //On/Off Block
 				iOnOffBlockCount++;
 
 			if(mapdatatop[i][j] != tile_nonsolid && mapdatatop[i][j] != tile_gap && mapdatatop[i][j] != tile_solid_on_top)
@@ -1270,7 +1305,8 @@ void CMap::saveMap(const std::string& file)
 			}
 			
 			//Interaction blocks
-			WriteInt(objectdata[i][j], mapfile);
+			WriteByteFromShort(objectdata[i][j].iType, mapfile);
+			WriteBool(objectdata[i][j].fHidden, mapfile);
 		}
 	}
 
@@ -1561,6 +1597,38 @@ void CMap::saveMap(const std::string& file)
 		WriteInt(drawareas[m].h, mapfile);
 	}
 
+	//Write supplement info for blocks (like powerup weights for powerup blocks)
+	short iBlockCount = 0;
+	for(j = 0; j < MAPHEIGHT; j++)
+	{
+		for(i = 0; i < MAPWIDTH; i++)
+		{
+			if(objectdata[i][j].iType == 1) //powerup block
+			{
+				iBlockCount++;
+			}
+		}
+	}
+
+	//Write the number of blocks we have supplement info for
+	WriteInt(iBlockCount, mapfile);
+
+	for(j = 0; j < MAPHEIGHT; j++)
+	{
+		for(i = 0; i < MAPWIDTH; i++)
+		{
+			if(objectdata[i][j].iType == 1 || objectdata[i][j].iType == 15) //powerup or view block
+			{
+				WriteByteFromShort(i, mapfile);
+				WriteByteFromShort(j, mapfile);
+				
+				WriteByteFromShort(NUM_BLOCK_SETTINGS, mapfile);
+				for(short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++)
+					WriteByteFromShort(objectdata[i][j].iSettings[iSetting], mapfile);
+			}
+		}
+	}
+
 	fclose(mapfile);
 
     cout << "done" << endl;
@@ -1680,7 +1748,7 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks)
 			//If there is a block there
 			if(!fUsed)
 			{
-				if(objectdata[i][j] != BLOCKSETSIZE)
+				if(objectdata[i][j].iType != BLOCKSETSIZE)
 					fUsed = true;
 			}
 
@@ -1706,7 +1774,7 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks)
 					for(m = j; m < MAPHEIGHT; m++)
 					{
 						TileType type = mapdatatop[i][m];
-						short block = objectdata[i][m];
+						short block = objectdata[i][m].iType;
 
 						if(type == tile_death_on_top || type == tile_death)
 						{
@@ -1736,7 +1804,7 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks)
 						for(m = 0; m < j; m++)
 						{
 							TileType type = mapdatatop[i][m];
-							short block = objectdata[i][m];
+							short block = objectdata[i][m].iType;
 
 							if(type == tile_death_on_top || type == tile_death)
 							{
@@ -2235,7 +2303,7 @@ void CMap::drawPreviewBlocks(SDL_Surface * targetSurface, bool fThumbnail)
 		{
 			rectDst.y += iBlockSize;	// here
 
-			ts = objectdata[i][j];
+			ts = objectdata[i][j].iType;
 			if(ts == BLOCKSETSIZE)
 				continue;
 

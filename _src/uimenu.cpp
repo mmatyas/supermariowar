@@ -114,22 +114,22 @@ MenuCodeEnum UI_Menu::SendInput(CPlayerInput * playerInput)
 
 		if(playerInput->outputControls[iPlayer].menu_up.fPressed)
 		{
-			MoveNextControl(MENU_ITEM_NEIGHBOR_UP);
+			return MoveNextControl(MENU_CODE_NEIGHBOR_UP);
 		}
 
 		if(playerInput->outputControls[iPlayer].menu_down.fPressed)
 		{
-			MoveNextControl(MENU_ITEM_NEIGHBOR_DOWN);
+			return MoveNextControl(MENU_CODE_NEIGHBOR_DOWN);
 		}
 		
 		if(playerInput->outputControls[iPlayer].menu_left.fPressed)
 		{
-			MoveNextControl(MENU_ITEM_NEIGHBOR_LEFT);
+			return MoveNextControl(MENU_CODE_NEIGHBOR_LEFT);
 		}
 
 		if(playerInput->outputControls[iPlayer].menu_right.fPressed)
 		{
-			MoveNextControl(MENU_ITEM_NEIGHBOR_RIGHT);
+			return MoveNextControl(MENU_CODE_NEIGHBOR_RIGHT);
 		}
 
 		if(playerInput->outputControls[iPlayer].menu_select.fPressed)
@@ -160,7 +160,7 @@ MenuCodeEnum UI_Menu::SendInput(CPlayerInput * playerInput)
 	return MENU_CODE_NONE;
 }
 
-void UI_Menu::MoveNextControl(short iDirection)
+MenuCodeEnum UI_Menu::MoveNextControl(MenuCodeEnum iDirection)
 {
 	UI_Control * neighbor = current->GetNeighbor(iDirection);
 
@@ -174,7 +174,10 @@ void UI_Menu::MoveNextControl(short iDirection)
 		current->Select(false);
 		current = neighbor;
 		fModifyingItem = current->Select(true);
+		return iDirection;
 	}
+
+	return MENU_CODE_NONE;
 }
 
 void UI_Menu::RememberCurrent()

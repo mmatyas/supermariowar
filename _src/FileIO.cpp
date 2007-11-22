@@ -122,3 +122,28 @@ short ReadByteAsShort(FILE * inFile)
 	return (short)b;
 }
 
+void WriteBool(bool out, FILE * outFile)
+{
+	fwrite(&out, sizeof(bool), 1, outFile);
+}
+
+bool ReadBool(FILE * inFile)
+{
+	bool b;
+	fread(&b, sizeof(bool), 1, inFile);
+
+	return b;
+}
+
+void WriteByte(Uint8 out, FILE * outFile)
+{
+	fwrite(&out, sizeof(Uint8), 1, outFile);
+}
+
+Uint8 ReadByte(FILE * inFile)
+{
+	Uint8 b;
+	fread(&b, sizeof(Uint8), 1, inFile);
+
+	return b;
+}

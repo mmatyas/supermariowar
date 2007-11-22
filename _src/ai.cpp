@@ -67,7 +67,7 @@ TileType is an enum of all the types of tiles like solid, solid-on-top, death-on
 
 Second is the interaction blocks in the map.  You might want to know where a [?] block is so you can go hit it.
 
-short blocktype = g_map.blockat(col, row);
+short blocktype = g_map.blockat(col, row)->iType;
 
 blocktype will now be set to the type id for the block in that column and row.  If it is set to BLOCKSETSIZE, then
 there is no interaction block in that space.
@@ -87,7 +87,7 @@ in a [?] that has been used and won't give you a powerup.
 
 To get this information, we use:
 
-if(g_map.blockat(col, row) == 1)
+if(g_map.blockat(col, row)->iType == 1)
 {
 	B_PowerupBlock * block = (B_PowerupBlock*) g_map.block(col, row);
 	if(block->GetState() == 0)
@@ -98,7 +98,7 @@ if(g_map.blockat(col, row) == 1)
 
 Flip blocks and On/Off Blocks have a solid state and a fall through state.  To get this information, use:
 
-if(g_map.blockat(col, row) == 3)
+if(g_map.blockat(col, row)->iType == 3)
 {
 	B_FlipBlock * block = (B_FlipBlock*) g_map.block(col, row);
 	if(block->isTransparent())

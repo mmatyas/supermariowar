@@ -215,6 +215,7 @@ struct STextAward
 #define NUM_POWERUPS 26
 #define NUM_WORLD_POWERUPS 15
 #define NUM_WORLD_SCORE_BONUSES 20
+#define NUM_BLOCK_SETTINGS NUM_POWERUPS
 
 void GetNameFromFileName(char * szName, const char * szFileName);
 std::string stripCreatorAndDotMap(const std::string &filename);
@@ -882,6 +883,8 @@ struct gv
 	short		singleplayermode;
 
 	bool		worldskipscoreboard;
+
+	bool		overridepowerupsettings;
 };
 
 extern gv game_values;

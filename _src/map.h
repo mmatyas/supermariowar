@@ -71,6 +71,13 @@ struct AnimatedTile
 	bool fForegroundAnimated;
 };
 
+struct MapBlock
+{
+	short iType;
+	short iSettings[NUM_BLOCK_SETTINGS];
+	bool fHidden;
+};
+
 class IO_Block;
 
 class CMap
@@ -127,9 +134,9 @@ class CMap
 			return &warpdata[x][y];
 		}
 
-		short blockat(short x, short y)
+		MapBlock * blockat(short x, short y)
 		{
-			return objectdata[x][y];
+			return &objectdata[x][y];
 		}
 
 		bool spawn(short iType, short x, short y)
@@ -175,7 +182,7 @@ class CMap
 
 		TilesetTile	mapdata[MAPWIDTH][MAPHEIGHT][MAPLAYERS];
 		TileType	mapdatatop[MAPWIDTH][MAPHEIGHT];
-		short		objectdata[MAPWIDTH][MAPHEIGHT];
+		MapBlock	objectdata[MAPWIDTH][MAPHEIGHT];
 		IO_Block*   blockdata[MAPWIDTH][MAPHEIGHT];
 		bool		nospawn[NUMSPAWNAREATYPES][MAPWIDTH][MAPHEIGHT];
 

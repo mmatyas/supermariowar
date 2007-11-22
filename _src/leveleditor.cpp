@@ -52,7 +52,7 @@ class MapTile
 {
 	public:
 		TilesetTile	tile[MAPLAYERS];
-		int			block;
+		MapBlock	block;
 		Warp		warp;
 		bool		nospawn[NUMSPAWNAREATYPES];
 		TileType	tiletype;
@@ -506,7 +506,7 @@ void AdjustMapItems(short iClickX, short iClickY)
 		if(g_map.mapitems[j].ix == iClickX && g_map.mapitems[j].iy == iClickY)
 		{
 			if(g_map.mapdatatop[iClickX][iClickY] != tile_nonsolid && g_map.mapdatatop[iClickX][iClickY] != tile_solid_on_top ||
-				g_map.objectdata[iClickX][iClickY] != BLOCKSETSIZE)
+				g_map.objectdata[iClickX][iClickY].iType != BLOCKSETSIZE)
 			{
 				g_map.iNumMapItems--;
 
@@ -832,7 +832,15 @@ int editor_edit()
 					{
 						if(edit_mode == 0) //selected blocks
 						{
-							g_map.objectdata[iClickX][iClickY] = set_block;
+							g_map.objectdata[iClickX][iClickY].iType = set_block;
+							g_map.objectdata[iClickX][iClickY].fHidden = false;
+
+							if(set_block == 1)
+							{
+								for(short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++)
+									g_map.objectdata[iClickX][iClickY].iSettings[iSetting] = (Uint8)g_iDefaultPowerupWeights[iSetting];
+							}
+
 							AdjustMapItems(iClickX, iClickY);
 						}
 						else if(edit_mode == 1) //selected tile(s)
@@ -967,7 +975,7 @@ int editor_edit()
 					else if(event.button.button == SDL_BUTTON_RIGHT)
 					{
 						if(edit_mode == 0)
-							g_map.objectdata[iClickX][iClickY] = BLOCKSETSIZE;
+							g_map.objectdata[iClickX][iClickY].iType = BLOCKSETSIZE;
 						else if(edit_mode == 1 || edit_mode == 8)
 						{
 							g_map.mapdata[iClickX][iClickY][selected_layer].iID = TILESETNONE;
@@ -1029,7 +1037,7 @@ int editor_edit()
 					{
 						if(edit_mode == 0)
 						{
-							g_map.objectdata[iClickX][iClickY] = set_block;
+							g_map.objectdata[iClickX][iClickY].iType = set_block;
 							AdjustMapItems(iClickX, iClickY);
 						}
 						else if(edit_mode == 1)
@@ -1098,7 +1106,7 @@ int editor_edit()
 					else if(event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT))
 					{
 						if(edit_mode == 0)
-							g_map.objectdata[iClickX][iClickY] = BLOCKSETSIZE;
+							g_map.objectdata[iClickX][iClickY].iType = BLOCKSETSIZE;
 						else if(edit_mode == 1 || edit_mode == 8)
 						{
 							g_map.mapdata[iClickX][iClickY][selected_layer].iID = TILESETNONE;
@@ -1451,11 +1459,11 @@ void drawmap(bool fScreenshot, short iBlockSize)
 					j - move_offset_y >= 0 && j - move_offset_y < MAPHEIGHT && 
 					selectedtiles[i - move_offset_x][j - move_offset_y])
 				{
-					displayblock = copiedtiles[i - move_offset_x][j - move_offset_y].block;
+					displayblock = copiedtiles[i - move_offset_x][j - move_offset_y].block.iType;
 				}
 				else
 				{
-					displayblock = g_map.objectdata[i][j];
+					displayblock = g_map.objectdata[i][j].iType;
 				}
 
 				if(displayblock < BLOCKSETSIZE)
@@ -3769,7 +3777,10 @@ bool copyselectedtiles()
 					CopyTilesetTile(&copiedtiles[j][k].tile[iLayer], &g_map.mapdata[j][k][iLayer]);
 				}
 
-				copiedtiles[j][k].block = g_map.objectdata[j][k];
+				copiedtiles[j][k].block.iType = g_map.objectdata[j][k].iType;
+				for(short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++)
+					copiedtiles[j][k].block.iSettings[iSetting] = g_map.objectdata[j][k].iSettings[iSetting];
+				copiedtiles[j][k].block.fHidden = g_map.objectdata[j][k].fHidden;
 
 				copiedtiles[j][k].warp.connection = g_map.warpdata[j][k].connection;
 				copiedtiles[j][k].warp.direction = g_map.warpdata[j][k].direction;
@@ -3815,7 +3826,7 @@ void clearselectedmaptiles()
 					for(short iLayer = 0; iLayer < MAPLAYERS; iLayer++)
 						g_map.mapdata[j][k][iLayer].iID = TILESETNONE;
 					
-					g_map.objectdata[j][k] = BLOCKSETSIZE;
+					g_map.objectdata[j][k].iType = BLOCKSETSIZE;
 
 					g_map.warpdata[j][k].connection = -1;
 					g_map.warpdata[j][k].direction = -1;
@@ -3833,7 +3844,7 @@ void clearselectedmaptiles()
 	}
 }
 
-void replacetile(short * iDstTile, short iSrcTile, short iType)
+void replacetile(short * iDstTile, short iSrcTile, bool fAllowReplace)
 {
 	if(move_replace)
 	{
@@ -3841,9 +3852,7 @@ void replacetile(short * iDstTile, short iSrcTile, short iType)
 	}
 	else
 	{
-		if(iType == 1 && iSrcTile != BLOCKSETSIZE)
-			*iDstTile = iSrcTile;
-		else if(iType == 2)
+		if(fAllowReplace)
 			*iDstTile = iSrcTile;
 	}
 }
@@ -3865,6 +3874,28 @@ void replacetile(TilesetTile * dstTile, TilesetTile * srcTile)
 	{
 		if(srcTile->iID != TILESETNONE)
 			copytilesettile(dstTile, srcTile);
+	}
+}
+
+void copymapblock(MapBlock * dst, MapBlock * src)
+{
+	dst->iType = src->iType;
+	dst->fHidden = src->fHidden;
+	
+	for(short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++)
+		dst->iSettings[iSetting] = src->iSettings[iSetting];
+}
+
+void replacetile(MapBlock * dstTile, MapBlock * srcTile)
+{
+	if(move_replace)
+	{
+		copymapblock(dstTile, srcTile);
+	}
+	else
+	{
+		if(srcTile->iType != BLOCKSETSIZE)
+			copymapblock(dstTile, srcTile);
 	}
 }
 
@@ -3893,11 +3924,11 @@ void pasteselectedtiles(int movex, int movey)
 						for(short iLayer = 0; iLayer < MAPLAYERS; iLayer++)
 							replacetile(&g_map.mapdata[iNewX][iNewY][iLayer], &copiedtiles[j][k].tile[iLayer]);
 
-						replacetile(&g_map.objectdata[iNewX][iNewY], copiedtiles[j][k].block, 1);
+						replacetile(&g_map.objectdata[iNewX][iNewY], &copiedtiles[j][k].block);
 
-						replacetile(&g_map.warpdata[iNewX][iNewY].connection, copiedtiles[j][k].warp.connection, copiedtiles[j][k].warp.connection == -1 ? -1 : 2);
-						replacetile(&g_map.warpdata[iNewX][iNewY].direction, copiedtiles[j][k].warp.direction, copiedtiles[j][k].warp.connection == -1 ? -1 : 2);
-						replacetile(&g_map.warpdata[iNewX][iNewY].id, copiedtiles[j][k].warp.id, copiedtiles[j][k].warp.connection == -1 ? -1 : 2);
+						replacetile(&g_map.warpdata[iNewX][iNewY].connection, copiedtiles[j][k].warp.connection, copiedtiles[j][k].warp.connection != -1);
+						replacetile(&g_map.warpdata[iNewX][iNewY].direction, copiedtiles[j][k].warp.direction, copiedtiles[j][k].warp.connection != -1);
+						replacetile(&g_map.warpdata[iNewX][iNewY].id, copiedtiles[j][k].warp.id, copiedtiles[j][k].warp.connection != -1);
 
 						if(move_replace)
 							g_map.mapdatatop[iNewX][iNewY] = copiedtiles[j][k].tiletype;

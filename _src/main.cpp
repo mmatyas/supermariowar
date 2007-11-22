@@ -731,6 +731,7 @@ int main(int argc, char *argv[])
 	game_values.worldpointsbonus	= -1; //no world multiplier until player uses item to boost it
 	game_values.singleplayermode	= -1;
 	game_values.worldskipscoreboard = false;
+	game_values.overridepowerupsettings = false;
 
 	game_values.pfFilters			= new bool[NUM_AUTO_FILTERS + filterslist.GetCount()];
 	game_values.piFilterIcons		= new short[NUM_AUTO_FILTERS + filterslist.GetCount()];
@@ -938,8 +939,8 @@ int main(int argc, char *argv[])
 				SDL_XBOX_SetScreenStretch(game_values.screenResizeW, game_values.screenResizeH);
 			#endif
 
-			unsigned char abyte[28];
-			fread(abyte, sizeof(unsigned char), 28, fp);
+			unsigned char abyte[29];
+			fread(abyte, sizeof(unsigned char), 29, fp);
 			game_values.spawnstyle = (short) abyte[0];
 			game_values.awardstyle = (short) abyte[1];
 			game_values.friendlyfire = ((short)abyte[3] > 0 ? true : false);
@@ -962,6 +963,7 @@ int main(int argc, char *argv[])
 			game_values.pointspeed = (short)abyte[24];
 			game_values.swapstyle = (short)abyte[25];
 			game_values.secrets = ((short)abyte[27] > 0 ? true : false);
+			game_values.overridepowerupsettings = ((short)abyte[28] > 0 ? true : false);
 			
 			fread(&game_values.spawninvincibility, sizeof(short), 1, fp);
 			fread(&game_values.itemrespawntime, sizeof(short), 1, fp);
@@ -1365,7 +1367,7 @@ void RunGame()
 					{
 						tile = g_map.map(x, y);
 						block = g_map.block(x, y);
-						blocktype = g_map.blockat(x, y);
+						blocktype = g_map.blockat(x, y)->iType;
 					}
 
 					if( (tile != tile_nonsolid && tile != tile_gap && tile != tile_solid_on_top) || 
@@ -1418,7 +1420,7 @@ void RunGame()
 							{
 								tile = g_map.map(corners[0][j], corners[1][i]);
 								block = g_map.block(corners[0][j], corners[1][i]);
-								blocktype = g_map.blockat(corners[0][j], corners[1][i]);
+								blocktype = g_map.blockat(corners[0][j], corners[1][i])->iType;
 							}
 
 							if( (tile != tile_nonsolid && tile != tile_gap && tile != tile_solid_on_top) || 
@@ -3121,71 +3123,71 @@ void LoadMapObjects()
 	{
 		for(short y = 0; y < MAPHEIGHT; y++)
 		{
-			if(g_map.objectdata[x][y] == 0)
+			if(g_map.objectdata[x][y].iType == 0)
 			{
 				g_map.blockdata[x][y] = new B_BreakableBlock(&spr_breakableblock, x * TILESIZE, y * TILESIZE, 4, 10);
 				objectblocks.add(g_map.blockdata[x][y]);
 			}
-			else if(g_map.objectdata[x][y] == 1)
+			else if(g_map.objectdata[x][y].iType == 1)
 			{
-				g_map.blockdata[x][y] = new B_PowerupBlock(&spr_powerupblock, x * TILESIZE, y * TILESIZE, 4, 10);
+				g_map.blockdata[x][y] = new B_PowerupBlock(&spr_powerupblock, x * TILESIZE, y * TILESIZE, 4, 10, g_map.objectdata[x][y].fHidden, g_map.objectdata[x][y].iSettings);
 				objectblocks.add(g_map.blockdata[x][y]);
 			}
-			else if(g_map.objectdata[x][y] == 2)
+			else if(g_map.objectdata[x][y].iType == 2)
 			{
 				g_map.blockdata[x][y] = new B_DonutBlock(&spr_donutblock, x * TILESIZE, y * TILESIZE);
 				objectblocks.add(g_map.blockdata[x][y]);
 			}
-			else if(g_map.objectdata[x][y] == 3)
+			else if(g_map.objectdata[x][y].iType == 3)
 			{
 				g_map.blockdata[x][y] = new B_FlipBlock(&spr_flipblock, x * TILESIZE, y * TILESIZE);
 				objectblocks.add(g_map.blockdata[x][y]);
 			}
-			else if(g_map.objectdata[x][y] == 4)
+			else if(g_map.objectdata[x][y].iType == 4)
 			{
 				g_map.blockdata[x][y] = new B_BounceBlock(&spr_bounceblock, x * TILESIZE, y * TILESIZE);
 				objectblocks.add(g_map.blockdata[x][y]);
 			}
-			else if(g_map.objectdata[x][y] == 5)
+			else if(g_map.objectdata[x][y].iType == 5)
 			{
 				g_map.blockdata[x][y] = new B_NoteBlock(&spr_noteblock, x * TILESIZE, y * TILESIZE, 4, 10, 1);
 				objectblocks.add(g_map.blockdata[x][y]);
 			}
-			else if(g_map.objectdata[x][y] == 6)
+			else if(g_map.objectdata[x][y].iType == 6)
 			{
 				g_map.blockdata[x][y] = new B_ThrowBlock(&spr_throwblock, x * TILESIZE, y * TILESIZE, 4, 10);
 				objectblocks.add(g_map.blockdata[x][y]);
 			}
-			else if(g_map.objectdata[x][y] >= 7 && g_map.objectdata[x][y] <= 10)
+			else if(g_map.objectdata[x][y].iType >= 7 && g_map.objectdata[x][y].iType <= 10)
 			{
-				short iSwitchType = g_map.objectdata[x][y] - 7;
+				short iSwitchType = g_map.objectdata[x][y].iType - 7;
 				g_map.blockdata[x][y] = new B_OnOffSwitchBlock(&spr_switchblocks, x * TILESIZE, y * TILESIZE, iSwitchType, g_map.iSwitches[iSwitchType]);
 				objectblocks.add(g_map.blockdata[x][y]);
 				g_map.switchBlocks[iSwitchType].push_back(g_map.blockdata[x][y]);
 			}
-			else if(g_map.objectdata[x][y] >= 11 && g_map.objectdata[x][y] <= 14)
+			else if(g_map.objectdata[x][y].iType >= 11 && g_map.objectdata[x][y].iType <= 14)
 			{
-				short iSwitchType = g_map.objectdata[x][y] - 11;
+				short iSwitchType = g_map.objectdata[x][y].iType - 11;
 
 				g_map.blockdata[x][y] = new B_SwitchBlock(&spr_switchblocks, x * TILESIZE, y * TILESIZE, iSwitchType, g_map.iSwitches[iSwitchType]);
 				objectblocks.add(g_map.blockdata[x][y]);
 				g_map.switchBlocks[iSwitchType + 4].push_back(g_map.blockdata[x][y]);
 			}
-			else if(g_map.objectdata[x][y] == 15)
+			else if(g_map.objectdata[x][y].iType == 15)
 			{
-				g_map.blockdata[x][y] = new B_ViewBlock(&spr_viewblock, x * TILESIZE, y * TILESIZE);
+				g_map.blockdata[x][y] = new B_ViewBlock(&spr_viewblock, x * TILESIZE, y * TILESIZE, g_map.objectdata[x][y].fHidden, g_map.objectdata[x][y].iSettings);
 				objectblocks.add(g_map.blockdata[x][y]);
 			}
-			else if(g_map.objectdata[x][y] == 16)
+			else if(g_map.objectdata[x][y].iType == 16)
 			{
 				B_ThrowBlock * block = new B_ThrowBlock(&spr_throwblock, x * TILESIZE, y * TILESIZE, 4, 10);
 				block->SetType(true);
 				g_map.blockdata[x][y] = block;
 				objectblocks.add(block);
 			}
-			else if(g_map.objectdata[x][y] == 17 || g_map.objectdata[x][y] == 18)
+			else if(g_map.objectdata[x][y].iType == 17 || g_map.objectdata[x][y].iType == 18)
 			{
-				g_map.blockdata[x][y] = new B_NoteBlock(&spr_noteblock, x * TILESIZE, y * TILESIZE, 4, 10, g_map.objectdata[x][y] == 17 ? 2 : 0);
+				g_map.blockdata[x][y] = new B_NoteBlock(&spr_noteblock, x * TILESIZE, y * TILESIZE, 4, 10, g_map.objectdata[x][y].iType == 17 ? 2 : 0);
 				objectblocks.add(g_map.blockdata[x][y]);
 			}
 			else

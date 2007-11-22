@@ -12,6 +12,10 @@ void WriteString(char * szString, FILE * outFile);
 void ReadString(char * szString, short size, FILE * outFile);
 void WriteByteFromShort(short out, FILE * outFile);
 short ReadByteAsShort(FILE * inFile);
+void WriteBool(bool out, FILE * outFile);
+bool ReadBool(FILE * inFile);
+void WriteByte(Uint8 out, FILE * outFile);
+Uint8 ReadByte(FILE * inFile);
 
 #endif //__FILEIO_H_
 

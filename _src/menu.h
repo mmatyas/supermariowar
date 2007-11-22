@@ -146,9 +146,11 @@ class Menu
 
 		//Powerup Weight Selection
 		UI_Menu mPowerupSelectionMenu;
-		MI_PowerupSlider * miPowerupSlider[NUM_POWERUPS];
-		MI_Button * miPowerupSelectionBackButton;
-		MI_Button * miPowerupSelectionRestoreDefaultsButton;
+		MI_PowerupSelection * miPowerupSelection;
+
+		//MI_PowerupSlider * miPowerupSlider[NUM_POWERUPS];
+		//MI_Button * miPowerupSelectionBackButton;
+		//MI_Button * miPowerupSelectionRestoreDefaultsButton;
 
 		MI_Image * miPowerupSelectionLeftHeaderBar;
 		MI_Image * miPowerupSelectionMenuRightHeaderBar;

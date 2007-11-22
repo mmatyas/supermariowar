@@ -1778,12 +1778,18 @@ MI_SliderField::MI_SliderField(gfxSprite * nspr, gfxSprite * nsprSlider, short x
 	iIndent2 = indent2;
 	sprSlider = nsprSlider;
 
-	miModifyImageLeft->SetPosition(ix + indent1 - 26, iy + 4);
-	miModifyImageRight->SetPosition(ix + iWidth - 16, iy + 4);
+	SetPosition(x, y);
 }
 
 MI_SliderField::~MI_SliderField()
 {}
+
+void MI_SliderField::SetPosition(short x, short y)
+{
+	MI_SelectField::SetPosition(x, y);
+	miModifyImageLeft->SetPosition(ix + iIndent - 26, iy + 4);
+	miModifyImageRight->SetPosition(ix + iWidth - 16, iy + 4);
+}
 
 void MI_SliderField::Draw()
 {
@@ -1894,6 +1900,270 @@ void MI_PowerupSlider::Draw()
 
 	if(current != --items.end() || !fNoWrap)
 		miModifyImageRight->Draw();
+}
+
+/**************************************
+ * MI_PowerupSelection Class
+ **************************************/
+
+//Rearrange display of powerups
+short iPowerupDisplayMap[NUM_POWERUPS] = { 4, 0, 1, 2, 3, 6, 10, 12, 11, 14, 13, 7, 16, 17, 18, 19, 15, 9, 5, 8, 20, 21, 22, 23, 24, 25};
+short iPowerupPositionMap[NUM_POWERUPS] = { 1, 2, 3, 4, 0, 18, 5, 11, 19, 17, 6, 8, 7, 10, 9, 16, 12, 13, 14, 15, 20, 21, 22, 23, 24, 25};
+
+MI_PowerupSelection::MI_PowerupSelection(short x, short y, short width, short numlines) :
+	UI_Control(x, y)
+{
+	iWidth = width;
+	iNumLines = numlines;
+
+	iIndex = 0;
+	iOffset = 0;
+
+	iTopStop = ((iNumLines - 1) >> 1) + 1;
+	iBottomStop = (NUM_POWERUPS >> 1) - iNumLines + iTopStop;
+
+	mMenu = new UI_Menu();
+
+	miOverride = new MI_SelectField(&spr_selectfield, 170, iy, "Override", 300, 150);
+	miOverride->Add("No", 0, "", false, false);
+	miOverride->Add("Yes", 1, "", true, false);
+	miOverride->SetData(NULL, NULL, &game_values.overridepowerupsettings);
+	miOverride->SetKey(game_values.overridepowerupsettings ? 1 : 0);
+	miOverride->SetAutoAdvance(true);
+	//miOverride->SetItemChangedCode(MENU_CODE_POWERUP_OVERRIDE_CHANGED);
+
+	for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
+	{
+		miPowerupSlider[iPowerup] = new MI_PowerupSlider(&spr_selectfield, &menu_slider_bar, &spr_storedpoweruplarge, 0, 0, 245, iPowerup);
+		miPowerupSlider[iPowerup]->Add("", 0, "", false, false);
+		miPowerupSlider[iPowerup]->Add("", 1, "", false, false);
+		miPowerupSlider[iPowerup]->Add("", 2, "", false, false);
+		miPowerupSlider[iPowerup]->Add("", 3, "", false, false);
+		miPowerupSlider[iPowerup]->Add("", 4, "", false, false);
+		miPowerupSlider[iPowerup]->Add("", 5, "", false, false);
+		miPowerupSlider[iPowerup]->Add("", 6, "", false, false);
+		miPowerupSlider[iPowerup]->Add("", 7, "", false, false);
+		miPowerupSlider[iPowerup]->Add("", 8, "", false, false);
+		miPowerupSlider[iPowerup]->Add("", 9, "", false, false);
+		miPowerupSlider[iPowerup]->Add("", 10, "", false, false);
+		miPowerupSlider[iPowerup]->SetNoWrap(true);
+		miPowerupSlider[iPowerup]->SetData(&game_values.powerupweights[iPowerup], NULL, NULL);
+		miPowerupSlider[iPowerup]->SetKey(game_values.powerupweights[iPowerup]);
+	}
+	
+	miRestoreDefaultsButton = new MI_Button(&spr_selectfield, 220, 432, "Restore Defaults", 245, 1);
+	miRestoreDefaultsButton->SetCode(MENU_CODE_RESTORE_DEFAULT_POWERUP_WEIGHTS);
+
+	//Are You Sure dialog box
+	miDialogImage = new MI_Image(&spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
+	miDialogAreYouText = new MI_Text("Are You", 320, 195, 0, 2, 1);
+	miDialogSureText = new MI_Text("Sure?", 320, 220, 0, 2, 1);
+	miDialogYesButton = new MI_Button(&spr_selectfield, 235, 250, "Yes", 80, 1);
+	miDialogNoButton = new MI_Button(&spr_selectfield, 325, 250, "No", 80, 1);
+	
+	miDialogYesButton->SetCode(MENU_CODE_POWERUP_RESET_YES);
+	miDialogNoButton->SetCode(MENU_CODE_POWERUP_RESET_NO);
+
+	miDialogImage->Show(false);
+	miDialogAreYouText->Show(false);
+	miDialogSureText->Show(false);
+	miDialogYesButton->Show(false);
+	miDialogNoButton->Show(false);
+
+	mMenu->AddControl(miOverride, NULL, miPowerupSlider[0], NULL, NULL);
+
+	for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
+	{
+		UI_Control * upcontrol = NULL;
+		if(iPowerup == 0)
+			upcontrol = miOverride;
+		else
+			upcontrol = miPowerupSlider[iPowerup - 2];
+
+		UI_Control * downcontrol = NULL;
+		if(iPowerup >= NUM_POWERUPS - 2)
+			downcontrol = miRestoreDefaultsButton;
+		else
+			downcontrol = miPowerupSlider[iPowerup + 2];
+
+		mMenu->AddControl(miPowerupSlider[iPowerup], upcontrol, downcontrol, NULL, miPowerupSlider[iPowerup + 1]);
+
+		if(++iPowerup < NUM_POWERUPS)
+		{
+			upcontrol = NULL;
+			if(iPowerup == 1)
+				upcontrol = miOverride;
+			else
+				upcontrol = miPowerupSlider[iPowerup - 2];
+
+			UI_Control * downcontrol = NULL;
+			if(iPowerup >= NUM_POWERUPS - 2)
+				downcontrol = miRestoreDefaultsButton;
+			else
+				downcontrol = miPowerupSlider[iPowerup + 2];
+
+			mMenu->AddControl(miPowerupSlider[iPowerup], upcontrol, downcontrol, miPowerupSlider[iPowerup - 1], NULL);
+		}
+	}
+
+	//Setup positions and visible powerups
+	SetupPowerupFields();
+
+	//Set enabled based on if we are overriding or not
+	//EnablePowerupFields();
+
+	mMenu->AddControl(miRestoreDefaultsButton, miPowerupSlider[NUM_POWERUPS - 1], NULL, NULL, NULL);
+
+	mMenu->AddNonControl(miDialogImage);
+	mMenu->AddNonControl(miDialogAreYouText);
+	mMenu->AddNonControl(miDialogSureText);
+
+	mMenu->AddControl(miDialogYesButton, NULL, NULL, NULL, miDialogNoButton);
+	mMenu->AddControl(miDialogNoButton, NULL, NULL, miDialogYesButton, NULL);
+
+	mMenu->SetHeadControl(miOverride);
+	mMenu->SetCancelCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
+}
+
+MI_PowerupSelection::~MI_PowerupSelection()
+{
+	delete mMenu;
+}
+
+void MI_PowerupSelection::SetupPowerupFields()
+{
+	for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
+	{
+		short iPosition = iPowerupPositionMap[iPowerup];
+		MI_PowerupSlider * slider = miPowerupSlider[iPosition];
+
+		if((iPosition >> 1) < iOffset || (iPosition >> 1) >= iOffset + iNumLines)
+			slider->Show(false);
+		else
+		{
+			slider->Show(true);
+			slider->SetPosition(ix + (iPosition % 2) * 295, iy + 44 + 38 * (iPosition / 2 - iOffset));
+		}
+	}
+}
+
+void MI_PowerupSelection::EnablePowerupFields()
+{
+	for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
+	{
+		miPowerupSlider[iPowerup]->Disable(!game_values.overridepowerupsettings);
+	}
+
+	miOverride->SetNeighbor(1, game_values.overridepowerupsettings ? miPowerupSlider[0] : NULL);
+}
+
+MenuCodeEnum MI_PowerupSelection::Modify(bool modify)
+{
+	mMenu->ResetMenu();
+	iOffset = 0;
+	iIndex = 0;
+	SetupPowerupFields();
+
+	fModifying = modify;
+	return MENU_CODE_MODIFY_ACCEPTED;
+}
+
+MenuCodeEnum MI_PowerupSelection::SendInput(CPlayerInput * playerInput)
+{
+	MenuCodeEnum ret = mMenu->SendInput(playerInput);
+
+	if(MENU_CODE_CANCEL_INPUT == ret)
+	{
+		fModifying = false;
+		return MENU_CODE_UNSELECT_ITEM;
+	}
+	else if (MENU_CODE_RESTORE_DEFAULT_POWERUP_WEIGHTS == ret)
+	{
+		miDialogImage->Show(true);
+		miDialogAreYouText->Show(true);
+		miDialogSureText->Show(true);
+		miDialogYesButton->Show(true);
+		miDialogNoButton->Show(true);
+
+		mMenu->RememberCurrent();
+
+		mMenu->SetHeadControl(miDialogNoButton);
+		mMenu->SetCancelCode(MENU_CODE_POWERUP_RESET_NO);
+		mMenu->ResetMenu();
+	}
+	else if(MENU_CODE_POWERUP_RESET_YES == ret || MENU_CODE_POWERUP_RESET_NO == ret)
+	{
+		miDialogImage->Show(false);
+		miDialogAreYouText->Show(false);
+		miDialogSureText->Show(false);
+		miDialogYesButton->Show(false);
+		miDialogNoButton->Show(false);
+
+		mMenu->SetHeadControl(miPowerupSlider[iPowerupPositionMap[0]]);
+		mMenu->SetCancelCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
+
+		mMenu->RestoreCurrent();
+
+		if(MENU_CODE_POWERUP_RESET_YES == ret)
+		{
+			//restore default powerup weights for powerup selection menu
+			for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
+			{
+				miPowerupSlider[iPowerup]->SetKey(g_iDefaultPowerupWeights[iPowerup]);
+				game_values.powerupweights[iPowerup] = g_iDefaultPowerupWeights[iPowerup];
+			}
+		}
+	}
+	else if(MENU_CODE_NEIGHBOR_UP == ret)
+	{
+		MovePrev();
+	}
+	else if(MENU_CODE_NEIGHBOR_DOWN == ret)
+	{
+		MoveNext();
+	}
+	/*
+	else if(MENU_CODE_POWERUP_OVERRIDE_CHANGED == ret)
+	{
+		EnablePowerupFields();
+	}*/
+
+	return ret;
+}
+
+void MI_PowerupSelection::Update()
+{
+	mMenu->Update();
+}
+
+void MI_PowerupSelection::Draw()
+{
+	if(!fShow)
+		return;
+
+	mMenu->Draw();
+}
+
+void MI_PowerupSelection::MoveNext()
+{
+	iIndex++;
+
+	if(iIndex > iTopStop && iIndex <= iBottomStop)
+	{
+		iOffset++;
+		SetupPowerupFields();
+	}
+}
+
+void MI_PowerupSelection::MovePrev()
+{
+	iIndex--;
+
+	if(iIndex >= iTopStop && iIndex < iBottomStop)
+	{
+		iOffset--;
+		SetupPowerupFields();
+	}
 }
 
 

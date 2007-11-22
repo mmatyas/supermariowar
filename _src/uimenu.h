@@ -2,6 +2,10 @@
 #define __UIMENU_H_
 
 enum MenuCodeEnum {
+	MENU_CODE_NEIGHBOR_UP = 0,
+	MENU_CODE_NEIGHBOR_DOWN = 1,
+	MENU_CODE_NEIGHBOR_LEFT = 2,
+	MENU_CODE_NEIGHBOR_RIGHT = 3,
 	MENU_CODE_NONE, 
 	MENU_CODE_UNSELECT_ITEM, 
 	MENU_CODE_INPUT_TYPE_CHANGED, 
@@ -74,7 +78,8 @@ enum MenuCodeEnum {
 	MENU_CODE_WORLD_STAGE_NO_START,
 	MENU_CODE_TOUR_STOP_CONTINUE_FORCED,
 	MENU_CODE_WORLD_MUSIC_CHANGED,
-	MENU_CODE_WORLD_MAP_CHANGED
+	MENU_CODE_WORLD_MAP_CHANGED,
+	MENU_CODE_POWERUP_OVERRIDE_CHANGED
 };
 
 #include "uicontrol.h"
@@ -111,7 +116,7 @@ class UI_Menu
 
 	protected:
 
-		void MoveNextControl(short iDirection);
+		MenuCodeEnum MoveNextControl(MenuCodeEnum iDirection);
 
 		std::list<UI_Control*> controls;
 		

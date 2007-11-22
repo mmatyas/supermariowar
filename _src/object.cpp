@@ -294,7 +294,7 @@ void IO_Block::BounceMovingObject(IO_MovingObject * object)
 //------------------------------------------------------------------------------
 // class powerup block
 //------------------------------------------------------------------------------
-B_PowerupBlock::B_PowerupBlock(gfxSprite *nspr1, short x, short y, short iNumSpr, short aniSpeed) :
+B_PowerupBlock::B_PowerupBlock(gfxSprite *nspr1, short x, short y, short iNumSpr, short aniSpeed, bool fHidden, short * piSettings) :
 	IO_Block(nspr1, x, y)
 {
 	iw = (short)spr->getWidth() >> 2;
@@ -307,12 +307,19 @@ B_PowerupBlock::B_PowerupBlock(gfxSprite *nspr1, short x, short y, short iNumSpr
 	animationTimer = 0;
 	animationWidth = (short)spr->getWidth();
 	drawFrame = 0;
+
+	oldhidden = hidden = fHidden;
+	settings = piSettings;
+
+	if(settings[0] == -1 || game_values.overridepowerupsettings)
+		settings = game_values.powerupweights;
 }
 
 
 void B_PowerupBlock::draw()
 {
-	spr->draw(ix, iy, drawFrame, state == 0 ? 0 : ih, iw, ih);
+	if(!hidden)
+		spr->draw(ix, iy, drawFrame, state == 0 ? 0 : ih, iw, ih);
 }
 
 void B_PowerupBlock::update()
@@ -380,9 +387,9 @@ void B_PowerupBlock::update()
 			else if(21 == iSelectedPowerup) 
 				objectcollisionitems.add(new PU_SledgeHammerPowerup(&spr_sledgehammerpowerup, ix + 1, iy - 1, 1, 32000, 30, 30, 1, 1));
 			else if(22 == iSelectedPowerup) 
-				objectcollisionitems.add(new PU_BombPowerup(&spr_bombpowerup, ix + 1, iy - 1, 1, 32000, 30, 30, 1, 1));
-			else if(23 == iSelectedPowerup) 
 				objectcollisionitems.add(new PU_PodoboPowerup(&spr_podobopowerup, ix + 1, iy - 1, 1, 32000, 30, 30, 1, 1));
+			else if(23 == iSelectedPowerup) 
+				objectcollisionitems.add(new PU_BombPowerup(&spr_bombpowerup, ix + 1, iy - 1, 1, 32000, 30, 30, 1, 1));
 			else if(24 == iSelectedPowerup)
 				objectcollisionitems.add(new PU_LeafPowerup(&spr_leafpowerup, ix + 1, iy - 1, 1, 32000, 30, 30, 1, 1));
 			else if(25 == iSelectedPowerup) 
@@ -450,6 +457,8 @@ bool B_PowerupBlock::hitbottom(CPlayer * player, bool useBehavior)
 		player->yf((float)(iposy + ih) + 0.2f);
 
 		ifsoundonplay(sfx_bump);
+
+		hidden = false;
 
 		if(state == 0)
 		{
@@ -566,17 +575,18 @@ short B_PowerupBlock::SelectPowerup()
 {
 	short iCountWeight = 0;
 	for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
-		iCountWeight += game_values.powerupweights[iPowerup];
+		iCountWeight += settings[iPowerup];
 
 	if(iCountWeight == 0)
 		iCountWeight = 1;
 
 	int iRandPowerup = rand() % iCountWeight + 1;
 	int iSelectedPowerup = 0;
-	int iPowerupWeightCount = game_values.powerupweights[iSelectedPowerup];
+
+	int iPowerupWeightCount = settings[iSelectedPowerup];
 
 	while(iPowerupWeightCount < iRandPowerup)
-		iPowerupWeightCount += game_values.powerupweights[++iSelectedPowerup];
+		iPowerupWeightCount += settings[++iSelectedPowerup];
 
 	return iSelectedPowerup;
 }
@@ -584,8 +594,8 @@ short B_PowerupBlock::SelectPowerup()
 //------------------------------------------------------------------------------
 // class view powerup block
 //------------------------------------------------------------------------------
-B_ViewBlock::B_ViewBlock(gfxSprite *nspr1, short x, short y) :
-	B_PowerupBlock(nspr1, x, y, 1, 32000)
+B_ViewBlock::B_ViewBlock(gfxSprite *nspr1, short x, short y, bool fHidden, short * piSettings) :
+	B_PowerupBlock(nspr1, x, y, 1, 32000, fHidden, piSettings)
 {
 	poweruptimer = 0;
 	powerupindex = rand() % NUM_POWERUPS;
@@ -595,7 +605,7 @@ B_ViewBlock::B_ViewBlock(gfxSprite *nspr1, short x, short y) :
 
 	iCountWeight = 0;
 	for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
-		iCountWeight += game_values.powerupweights[iPowerup];
+		iCountWeight += settings[iPowerup];
 
 	fNoPowerupsSelected = iCountWeight == 0;
 	GetNextPowerup();
@@ -617,7 +627,7 @@ void B_ViewBlock::update()
 
 	if(state == 0 && !fNoPowerupsSelected)
 	{
-		if(++poweruptimer > game_values.powerupweights[powerupindex] * 10)
+		if(++poweruptimer > settings[powerupindex] * 10)
 		{
 			poweruptimer = 0;
 
@@ -635,10 +645,10 @@ void B_ViewBlock::GetNextPowerup()
 {
 	int iRandPowerup = rand() % iCountWeight + 1;
 	powerupindex = 0;
-	int iPowerupWeightCount = game_values.powerupweights[powerupindex];
+	int iPowerupWeightCount = settings[powerupindex];
 
 	while(iPowerupWeightCount < iRandPowerup)
-		iPowerupWeightCount += game_values.powerupweights[++powerupindex];
+		iPowerupWeightCount += settings[++powerupindex];
 }
 
 //------------------------------------------------------------------------------

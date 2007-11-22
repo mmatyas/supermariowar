@@ -37,10 +37,6 @@ extern bool LoadFullSkin(gfxSprite ** sprites, short skinID, short colorID);
 
 extern void UpdateScoreBoard();
 
-//Rearrange display of powerups
-short iPowerupDisplayMap[NUM_POWERUPS] = { 4, 0, 1, 2, 3, 6, 10, 12, 11, 14, 13, 7, 16, 17, 18, 19, 15, 9, 5, 8, 20, 21, 22, 23, 24, 25};
-short iPowerupPositionMap[NUM_POWERUPS] = { 1, 2, 3, 4, 0, 18, 5, 11, 19, 17, 6, 8, 7, 10, 9, 16, 12, 13, 14, 15, 20, 21, 22, 23, 24, 25};
-
 extern Uint8 GetScreenBackgroundFade();
 extern short LookupTeamID(short id);
 
@@ -91,7 +87,7 @@ void Menu::WriteGameOptions()
 		fwrite(&game_values.screenResizeH, sizeof(float), 1, fp);
 #endif
 
-		unsigned char abyte[28];
+		unsigned char abyte[29];
 		abyte[0] = (unsigned char) game_values.spawnstyle;
 		abyte[1] = (unsigned char) game_values.awardstyle;
 		abyte[2] = (unsigned char) announcerlist.GetCurrentIndex();
@@ -120,7 +116,8 @@ void Menu::WriteGameOptions()
 		abyte[25] = (unsigned char) game_values.swapstyle;
 		abyte[26] = (unsigned char) gamegraphicspacklist.GetCurrentIndex();
 		abyte[27] = (unsigned char) game_values.secrets;
-		fwrite(abyte, sizeof(unsigned char), 28, fp); 
+		abyte[28] = (unsigned char) game_values.overridepowerupsettings;
+		fwrite(abyte, sizeof(unsigned char), 29, fp); 
 
 		fwrite(&game_values.spawninvincibility, sizeof(short), 1, fp);
 		fwrite(&game_values.itemrespawntime, sizeof(short), 1, fp);
@@ -2085,6 +2082,7 @@ void Menu::CreateMenu()
 	// Powerup Selection Menu
 	//***********************
 	
+	/*
 	for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
 	{
 		miPowerupSlider[iPowerup] = new MI_PowerupSlider(&spr_selectfield, &menu_slider_bar, &spr_storedpoweruplarge, 50 + (iPowerupDisplayMap[iPowerup] < 10 ? 0 : 295), 44 + 38 * (iPowerupDisplayMap[iPowerup] < 10 ? iPowerupDisplayMap[iPowerup] : iPowerupDisplayMap[iPowerup] - 10), 245, iPowerup);
@@ -2109,12 +2107,17 @@ void Menu::CreateMenu()
 	
 	miPowerupSelectionRestoreDefaultsButton = new MI_Button(&spr_selectfield, 220, 432, "Restore Defaults", 245, 1);
 	miPowerupSelectionRestoreDefaultsButton->SetCode(MENU_CODE_RESTORE_DEFAULT_POWERUP_WEIGHTS);
+	*/
+
+	miPowerupSelection = new MI_PowerupSelection(50, 44, 640, 9);
+	miPowerupSelection->SetAutoModify(true);
 
 	miPowerupSelectionLeftHeaderBar = new MI_Image(&menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
 	miPowerupSelectionMenuRightHeaderBar = new MI_Image(&menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
 	miPowerupSelectionMenuHeaderText = new MI_Text("Item Selection Menu", 320, 5, 0, 2, 1);
 
 	//Are You Sure dialog box
+	/*
 	miPowerupSelectionDialogImage = new MI_Image(&spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
 	miPowerupSelectionDialogExitText = new MI_Text("Are You", 320, 195, 0, 2, 1);
 	miPowerupSelectionDialogTournamentText = new MI_Text("Sure?", 320, 220, 0, 2, 1);
@@ -2155,21 +2158,25 @@ void Menu::CreateMenu()
 	mPowerupSelectionMenu.AddControl(miPowerupSelectionRestoreDefaultsButton, miPowerupSlider[iPowerupPositionMap[9]], miPowerupSlider[iPowerupPositionMap[10]], NULL, miPowerupSelectionBackButton);
 
 	mPowerupSelectionMenu.AddControl(miPowerupSelectionBackButton, miPowerupSlider[iPowerupPositionMap[19]], miPowerupSlider[iPowerupPositionMap[0]], miPowerupSelectionRestoreDefaultsButton, NULL);
+	*/
+
+	mPowerupSelectionMenu.AddControl(miPowerupSelection, NULL, NULL, NULL, NULL);
 
 	mPowerupSelectionMenu.AddNonControl(miPowerupSelectionLeftHeaderBar);
 	mPowerupSelectionMenu.AddNonControl(miPowerupSelectionMenuRightHeaderBar);
 	mPowerupSelectionMenu.AddNonControl(miPowerupSelectionMenuHeaderText);
 	
+	/*
 	mPowerupSelectionMenu.AddNonControl(miPowerupSelectionDialogImage);
 	mPowerupSelectionMenu.AddNonControl(miPowerupSelectionDialogTournamentText);
 	mPowerupSelectionMenu.AddNonControl(miPowerupSelectionDialogExitText);
 
 	mPowerupSelectionMenu.AddControl(miPowerupSelectionDialogYesButton, NULL, NULL, NULL, miPowerupSelectionDialogNoButton);
 	mPowerupSelectionMenu.AddControl(miPowerupSelectionDialogNoButton, NULL, NULL, miPowerupSelectionDialogYesButton, NULL);
+	*/
 
-	mPowerupSelectionMenu.SetHeadControl(miPowerupSlider[iPowerupPositionMap[0]]);
+	mPowerupSelectionMenu.SetHeadControl(miPowerupSelection);
 	mPowerupSelectionMenu.SetCancelCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
-
 
 	//***********************
 	// Powerup Settings Menu
@@ -2934,7 +2941,7 @@ void Menu::RunMenu()
 			{
 				mCurrentMenu = &mPowerupSettingsMenu;
 				mCurrentMenu->ResetMenu();
-			}
+			}/*
 			else if (MENU_CODE_RESTORE_DEFAULT_POWERUP_WEIGHTS == code)
 			{
 				miPowerupSelectionDialogImage->Show(true);
@@ -2971,7 +2978,7 @@ void Menu::RunMenu()
 						game_values.powerupweights[iPowerup] = g_iDefaultPowerupWeights[iPowerup];
 					}
 				}
-			}
+			}*/
 			else if (MENU_CODE_TO_GRAPHICS_OPTIONS_MENU == code)
 			{
 				mCurrentMenu = &mGraphicsOptionsMenu;

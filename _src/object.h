@@ -100,7 +100,7 @@ class IO_Block : public CObject
 class B_PowerupBlock : public IO_Block
 {
 	public:
-		B_PowerupBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed);
+		B_PowerupBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, bool fHidden, short * piSettings);
 		~B_PowerupBlock(){};
 
 		BlockType getBlockType(){return block_powerup;}
@@ -127,13 +127,16 @@ class B_PowerupBlock : public IO_Block
 		short animationTimer;
 		short animationWidth;
 
+		bool hidden, oldhidden;
+		short * settings;
+
 	friend class CPlayer;
 };
 
 class B_ViewBlock : public B_PowerupBlock
 {
 	public:
-		B_ViewBlock(gfxSprite *nspr, short x, short y);
+		B_ViewBlock(gfxSprite *nspr, short x, short y, bool fHidden, short * piSettings);
 		~B_ViewBlock(){};
 
 		BlockType getBlockType(){return block_view;}

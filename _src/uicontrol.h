@@ -495,6 +495,8 @@ class MI_SliderField : public MI_SelectField
 		MI_SliderField(gfxSprite * nspr, gfxSprite * nsprSlider, short x, short y, char * name, short width, short indent1, short indent2);
 		virtual ~MI_SliderField();
 
+		void SetPosition(short x, short y);
+
 		//Draws every frame
 		virtual void Draw();
 		//Sends player input to control on every frame
@@ -522,6 +524,47 @@ class MI_PowerupSlider : public MI_SliderField
 		gfxSprite * sprPowerup;
 		short iPowerupIndex;
 		short iHalfWidth;
+};
+
+class MI_PowerupSelection : public UI_Control
+{
+	public:
+
+		MI_PowerupSelection(short x, short y, short width, short numlines);
+		virtual ~MI_PowerupSelection();
+
+		MenuCodeEnum Modify(bool modify);
+		MenuCodeEnum SendInput(CPlayerInput * playerInput);
+
+		void Update();
+		void Draw();
+
+		void MoveNext();
+		void MovePrev();
+
+	private:
+		
+		void SetupPowerupFields();
+		void EnablePowerupFields();
+
+		short iIndex, iOffset;
+		short iTopStop, iBottomStop;
+		short iNumLines;
+		short iWidth;
+
+		UI_Menu * mMenu;
+
+		MI_SelectField * miOverride;
+
+		MI_PowerupSlider * miPowerupSlider[NUM_POWERUPS];
+		MI_Button * miRestoreDefaultsButton;
+
+		MI_Image * miDialogImage;
+		MI_Text * miDialogAreYouText;
+		MI_Text * miDialogSureText;
+		MI_Button * miDialogYesButton;
+		MI_Button * miDialogNoButton;
+	
 };
 
 class MI_MapField : public UI_Control
