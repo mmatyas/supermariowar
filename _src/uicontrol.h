@@ -1056,6 +1056,9 @@ class MI_World : public UI_Control
 
 		short iSleepTurns;
 		bool fUsingCloud;
+
+		short iPressSelectTimer;
+		COutputControl * pressSelectKeys;
 };
 
 

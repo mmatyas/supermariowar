@@ -313,6 +313,10 @@ B_PowerupBlock::B_PowerupBlock(gfxSprite *nspr1, short x, short y, short iNumSpr
 
 	if(settings[0] == -1 || game_values.overridepowerupsettings)
 		settings = game_values.powerupweights;
+
+	iCountWeight = 0;
+	for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
+		iCountWeight += settings[iPowerup];
 }
 
 
@@ -421,6 +425,9 @@ void B_PowerupBlock::update()
 
 bool B_PowerupBlock::hittop(CPlayer * player, bool useBehavior)
 {
+	if(hidden)
+		return false;
+
 	IO_Block::hittop(player, useBehavior);
 
 	if(state == 1)
@@ -450,6 +457,9 @@ bool B_PowerupBlock::hittop(CPlayer * player, bool useBehavior)
 
 bool B_PowerupBlock::hitbottom(CPlayer * player, bool useBehavior)
 {
+	if(hidden)
+		return false;
+
 	if(useBehavior)
 	{
 		//Player bounces off 
@@ -472,8 +482,27 @@ bool B_PowerupBlock::hitbottom(CPlayer * player, bool useBehavior)
 	return false;
 }
 
+bool B_PowerupBlock::hitleft(CPlayer * player, bool useBehavior)
+{
+	if(hidden)
+		return false;
+
+	return IO_Block::hitleft(player, useBehavior);
+}
+
+bool B_PowerupBlock::hitright(CPlayer * player, bool useBehavior)
+{
+	if(hidden)
+		return false;
+
+	return IO_Block::hitright(player, useBehavior);
+}
+
 bool B_PowerupBlock::hittop(IO_MovingObject * object)
 {
+	if(hidden)
+		return false;
+
 	object->yf((float)(iposy - object->collisionHeight) - 0.2f);
 	object->fOldY = object->fy;
 	
@@ -490,8 +519,20 @@ bool B_PowerupBlock::hittop(IO_MovingObject * object)
 	return true;
 }
 
+
+bool B_PowerupBlock::hitbottom(IO_MovingObject * object)
+{
+	if(hidden)
+		return false;
+
+	return IO_Block::hitbottom(object);
+}
+
 bool B_PowerupBlock::hitright(IO_MovingObject * object)
 {
+	if(hidden)
+		return false;
+
 	//Object bounces off
 	object->xf((float)(iposx + iw) + 0.2f);
 	object->fOldX = object->fx;
@@ -526,6 +567,9 @@ bool B_PowerupBlock::hitright(IO_MovingObject * object)
 
 bool B_PowerupBlock::hitleft(IO_MovingObject * object)
 {
+	if(hidden)
+		return false;
+
 	//Object bounces off
 	object->xf((float)(iposx - object->collisionWidth) - 0.2f);
 	object->fOldX = object->fx;
@@ -573,12 +617,8 @@ void B_PowerupBlock::triggerBehavior()
 
 short B_PowerupBlock::SelectPowerup()
 {
-	short iCountWeight = 0;
-	for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
-		iCountWeight += settings[iPowerup];
-
 	if(iCountWeight == 0)
-		iCountWeight = 1;
+		return -1;
 
 	int iRandPowerup = rand() % iCountWeight + 1;
 	int iSelectedPowerup = 0;
@@ -614,6 +654,9 @@ B_ViewBlock::B_ViewBlock(gfxSprite *nspr1, short x, short y, bool fHidden, short
 
 void B_ViewBlock::draw()
 {
+	if(hidden)
+		return;
+
 	//Draw powerup behind block
 	if(state == 0 && !fNoPowerupsSelected)
 		spr_storedpoweruplarge.draw(ix, iy, powerupindex * 32, 0, 32, 32);
@@ -630,7 +673,6 @@ void B_ViewBlock::update()
 		if(++poweruptimer > settings[powerupindex] * 10)
 		{
 			poweruptimer = 0;
-
 			GetNextPowerup();
 		}
 	}
@@ -638,11 +680,17 @@ void B_ViewBlock::update()
 
 short B_ViewBlock::SelectPowerup()
 {
+	if(fNoPowerupsSelected)
+		return -1;
+
 	return powerupindex;
 }
 
 void B_ViewBlock::GetNextPowerup()
 {
+	if(fNoPowerupsSelected)
+		return;
+
 	int iRandPowerup = rand() % iCountWeight + 1;
 	powerupindex = 0;
 	int iPowerupWeightCount = settings[powerupindex];
@@ -2708,6 +2756,13 @@ void IO_MovingObject::KillObjectMapHazard()
 				dead = false;
 				((CO_Flag*)this)->placeFlag();
 			}
+			else if(movingObjectType == movingobject_bomb)
+			{
+				short iPlayerID = ((CO_Bomb*)this)->playerID;
+
+				if(iPlayerID > -1 && projectiles[iPlayerID] > 0)
+					projectiles[iPlayerID]--;
+			}
 		}
 	}
 }
@@ -3056,6 +3111,7 @@ PU_TreasureChestBonus::PU_TreasureChestBonus(gfxSprite *nspr, short iNumSpr, sho
 	fx = (float)ix;
 	fy = (float)iy;
 
+	drawbonusitemx = 0;
 	drawbonusitemy = 0;
 	drawbonusitemtimer = 0;
 }
@@ -3099,9 +3155,9 @@ void PU_TreasureChestBonus::draw()
 	else
 	{
 		if(bonusitem >= NUM_POWERUPS)
-			spr_worlditems.draw(ix, drawbonusitemy, (bonusitem - NUM_POWERUPS) << 5, 0, 32, 32);
+			spr_worlditems.draw(drawbonusitemx, drawbonusitemy, (bonusitem - NUM_POWERUPS) << 5, 0, 32, 32);
 		else
-			spr_storedpoweruplarge.draw(ix, drawbonusitemy, bonusitem << 5, 0, 32, 32);
+			spr_storedpoweruplarge.draw(drawbonusitemx, drawbonusitemy, bonusitem << 5, 0, 32, 32);
 	}
 }
 
@@ -3117,6 +3173,7 @@ bool PU_TreasureChestBonus::collide(CPlayer * player)
 
 		state = 3;
 
+		drawbonusitemx = ix;
 		drawbonusitemy = iy;
 		drawbonusitemtimer = 60;
 

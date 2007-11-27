@@ -2719,6 +2719,7 @@ void Menu::RunMenu()
 					{
 						game_values.screenfadespeed = 8;
 						game_values.screenfade = 8;
+						game_values.gamestate = GS_START_WORLD;
 					}
 
 					//Setup items on next menu
@@ -3242,61 +3243,66 @@ void Menu::RunMenu()
 			menu_shade.draw(0, 0);
 		}
 
-		if(GS_START_GAME == game_values.gamestate && game_values.screenfade == 255)
+		if(game_values.screenfade == 255)
 		{
-			if(game_values.matchtype == MATCH_TYPE_WORLD && game_values.tourstops[game_values.tourstopcurrent]->iStageType == 1)
+			if(GS_START_GAME == game_values.gamestate)
 			{
-				g_map.loadMap(convertPath("maps/special/bonushouse.map"), read_type_full);
-				LoadCurrentMapBackground();
-
-				if(game_values.music)
+				if(game_values.matchtype == MATCH_TYPE_WORLD && game_values.tourstops[game_values.tourstopcurrent]->iStageType == 1)
 				{
-					backgroundmusic[0].load(worldmusiclist.GetMusic(WORLDMUSICBONUS));
-					backgroundmusic[0].play(false, false);
+					g_map.loadMap(convertPath("maps/special/bonushouse.map"), read_type_full);
+					LoadCurrentMapBackground();
+
+					if(game_values.music)
+					{
+						backgroundmusic[0].load(worldmusiclist.GetMusic(WORLDMUSICBONUS));
+						backgroundmusic[0].play(false, false);
+					}
 				}
-			}
-			else
-			{
-				g_map.loadMap(maplist.currentFilename(), read_type_full);
+				else
+				{
+					g_map.loadMap(maplist.currentFilename(), read_type_full);
+					
+					//Allows all players to start the game
+					game_values.singleplayermode = -1;
+
+					if(game_values.music)
+					{
+						musiclist.SetRandomMusic(g_map.musicCategoryID, maplist.currentShortmapname(), g_map.szBackgroundFile);
+						backgroundmusic[0].load(musiclist.GetCurrentMusic());
+						backgroundmusic[0].play(game_values.playnextmusic, false);
+					}
+
+				}
+
+				game_values.gamestate = GS_GAME;			
+
+				SetGameModeSettingsFromMenu();
+
+				g_map.predrawbackground(spr_background, spr_backmap[0]);
+				g_map.predrawforeground(spr_frontmap[0]);
 				
-				//Allows all players to start the game
-				game_values.singleplayermode = -1;
+				g_map.predrawbackground(spr_background, spr_backmap[1]);
+				g_map.predrawforeground(spr_frontmap[1]);
 
-				if(game_values.music)
-				{
-					musiclist.SetRandomMusic(g_map.musicCategoryID, maplist.currentShortmapname(), g_map.szBackgroundFile);
-					backgroundmusic[0].load(musiclist.GetCurrentMusic());
-					backgroundmusic[0].play(game_values.playnextmusic, false);
-				}
+				g_map.SetupAnimatedTiles();
+				LoadMapObjects();
 
+				return;
 			}
+			else if(GS_START_WORLD == game_values.gamestate) //Fade to world match type
+			{
+				game_values.screenfadespeed = -8;
 
-			game_values.gamestate = GS_GAME;			
+				mCurrentMenu = &mWorldMenu;
+				mCurrentMenu->ResetMenu();
 
-			SetGameModeSettingsFromMenu();
+				backgroundmusic[2].stop();
+				backgroundmusic[5].load(worldmusiclist.GetMusic(g_worldmap.GetMusicCategory()));
+				backgroundmusic[5].play(false, false);
+				fNeedMenuMusicReset = true;
 
-			g_map.predrawbackground(spr_background, spr_backmap[0]);
-			g_map.predrawforeground(spr_frontmap[0]);
-			
-			g_map.predrawbackground(spr_background, spr_backmap[1]);
-			g_map.predrawforeground(spr_frontmap[1]);
-
-			g_map.SetupAnimatedTiles();
-			LoadMapObjects();
-
-			return;
-		}
-		else if(game_values.screenfade == 255) //Fade to world match type
-		{
-			game_values.screenfadespeed = -8;
-
-			mCurrentMenu = &mWorldMenu;
-			mCurrentMenu->ResetMenu();
-
-			backgroundmusic[2].stop();
-			backgroundmusic[5].load(worldmusiclist.GetMusic(g_worldmap.GetMusicCategory()));
-			backgroundmusic[5].play(false, false);
-			fNeedMenuMusicReset = true;
+				game_values.gamestate = GS_MENU;
+			}
 		}
 
 		if(fGenerateMapThumbs)

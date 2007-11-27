@@ -557,7 +557,7 @@ void _load_drawmsg(const std::string& f);
 void _load_waitforkey();
 
 //----------------- game options all parts of the game need -----------
-enum gs{GS_MENU, GS_START_GAME, GS_END_GAME, GS_GAME, GS_QUIT};
+enum gs{GS_MENU, GS_START_GAME, GS_START_WORLD, GS_END_GAME, GS_GAME, GS_QUIT};
 
 //tournament scores
 struct ts

@@ -4970,6 +4970,9 @@ void MI_World::Init()
 	iSleepTurns = 0;
 	fUsingCloud = false;
 	game_values.worldpointsbonus = -1;
+
+	iPressSelectTimer = 0;
+	pressSelectKeys = NULL;
 }
 
 void MI_World::SetControllingTeam(short iWinningTeam)
@@ -5363,42 +5366,60 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 
 			if(fNeedAiControl)
 			{
-				short iPlayerCurrentTileX, iPlayerCurrentTileY;
-				g_worldmap.GetPlayerCurrentTile(&iPlayerCurrentTileX, &iPlayerCurrentTileY);
-				short iNextMove = g_worldmap.GetNextInterestingMove(iPlayerCurrentTileX, iPlayerCurrentTileY);
-
-				//Clear out all input from cpu controlled team
-				COutputControl * playerKeys = NULL;
-				for(short iTeamMember = 0; iTeamMember < game_values.teamcounts[iControllingTeam]; iTeamMember++)
+				if(iPressSelectTimer == 0)
 				{
-					playerKeys = &game_values.playerInput.outputControls[game_values.teamids[iControllingTeam][iTeamMember]];
+					short iPlayerCurrentTileX, iPlayerCurrentTileY;
+					g_worldmap.GetPlayerCurrentTile(&iPlayerCurrentTileX, &iPlayerCurrentTileY);
+					short iNextMove = g_worldmap.GetNextInterestingMove(iPlayerCurrentTileX, iPlayerCurrentTileY);
 
-					playerKeys->menu_up.fPressed = false;
-					playerKeys->menu_down.fPressed = false;
-					playerKeys->menu_left.fPressed = false;
-					playerKeys->menu_right.fPressed = false;
-					playerKeys->menu_select.fPressed = false;
-					playerKeys->menu_random.fPressed = false;
+					//Clear out all input from cpu controlled team
+					COutputControl * playerKeys = NULL;
+					for(short iTeamMember = 0; iTeamMember < game_values.teamcounts[iControllingTeam]; iTeamMember++)
+					{
+						playerKeys = &game_values.playerInput.outputControls[game_values.teamids[iControllingTeam][iTeamMember]];
 
-					if(iControllingTeam != 0)
-						playerKeys->menu_cancel.fPressed = false;
+						playerKeys->menu_up.fPressed = false;
+						playerKeys->menu_down.fPressed = false;
+						playerKeys->menu_left.fPressed = false;
+						playerKeys->menu_right.fPressed = false;
+						playerKeys->menu_select.fPressed = false;
+						playerKeys->menu_random.fPressed = false;
 
+						if(iControllingTeam != 0)
+							playerKeys->menu_cancel.fPressed = false;
+
+					}
+					
+					playerKeys = &game_values.playerInput.outputControls[game_values.teamids[iControllingTeam][0]];
+
+					if(iNextMove == -1)
+						fNoInterestingMoves = true;
+					if(iNextMove == 0)
+						playerKeys->menu_up.fPressed = true;
+					else if(iNextMove == 1)
+						playerKeys->menu_down.fPressed = true;
+					else if(iNextMove == 2)
+						playerKeys->menu_left.fPressed = true;
+					else if(iNextMove == 3)
+						playerKeys->menu_right.fPressed = true;
+					else if(iNextMove == 4)
+					{
+						pressSelectKeys = playerKeys;
+						iPressSelectTimer = 60;
+					}
 				}
-				
-				playerKeys = &game_values.playerInput.outputControls[game_values.teamids[iControllingTeam][0]];
-
-				if(iNextMove == -1)
-					fNoInterestingMoves = true;
-				if(iNextMove == 0)
-					playerKeys->menu_up.fPressed = true;
-				else if(iNextMove == 1)
-					playerKeys->menu_down.fPressed = true;
-				else if(iNextMove == 2)
-					playerKeys->menu_left.fPressed = true;
-				else if(iNextMove == 3)
-					playerKeys->menu_right.fPressed = true;
-				else if(iNextMove == 4)
-					playerKeys->menu_select.fPressed = true;
+				else
+				{
+					if(--iPressSelectTimer <= 0)
+					{
+						iPressSelectTimer = 0;
+						pressSelectKeys->menu_select.fPressed = true;
+					}
+				}
+			}
+			else
+			{
+				iPressSelectTimer = 0;
 			}
 		}
 	}

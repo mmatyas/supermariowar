@@ -108,10 +108,15 @@ class B_PowerupBlock : public IO_Block
 		void draw();
 		void update();
 
+		bool isTransparent() {return hidden;}
+
 		bool hittop(CPlayer * player, bool useBehavior);
 		bool hitbottom(CPlayer * player, bool useBehavior);
+		bool hitleft(CPlayer * player, bool useBehavior);
+		bool hitright(CPlayer * player, bool useBehavior);
 
 		bool hittop(IO_MovingObject * object);
+		bool hitbottom(IO_MovingObject * object);
 		bool hitright(IO_MovingObject * object);
 		bool hitleft(IO_MovingObject * object);
 
@@ -119,6 +124,8 @@ class B_PowerupBlock : public IO_Block
 		virtual short SelectPowerup();
 
 	protected:
+		short iCountWeight;
+
 		short timer;
 		bool side;
 		short iNumSprites;
@@ -196,6 +203,8 @@ class B_NoteBlock : public IO_Block
 		void draw();
 		void update();
 
+		bool isTransparent() {return hidden;}
+
 		bool hittop(CPlayer * player, bool useBehavior);
 		bool hitbottom(CPlayer * player, bool useBehavior);
 		bool hitright(CPlayer * player, bool useBehavior);
@@ -211,6 +220,8 @@ class B_NoteBlock : public IO_Block
 		short animationWidth;
 		short iType;
 		short iTypeOffsetY;
+
+		bool hidden, oldhidden;
 };
 
 class B_DonutBlock : public IO_Block
@@ -279,11 +290,16 @@ class B_BounceBlock : public IO_Block
 
 		void update();
 
+		bool isTransparent() {return hidden;}
+
 		bool hittop(CPlayer * player, bool useBehavior);
 		bool hitbottom(CPlayer * player, bool useBehavior);
 
 		bool hittop(IO_MovingObject * object);
 		void triggerBehavior();
+
+	private:
+		bool hidden, oldhidden;
 };
 
 class B_ThrowBlock : public IO_Block
@@ -563,7 +579,7 @@ class PU_TreasureChestBonus : public MO_Powerup
 		short sparkledrawframe;
 		short numbounces;
 		short bonusitem;
-		short drawbonusitemy;
+		short drawbonusitemx, drawbonusitemy;
 		short drawbonusitemtimer;
 };
 

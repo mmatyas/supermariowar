@@ -1603,7 +1603,7 @@ void CMap::saveMap(const std::string& file)
 	{
 		for(i = 0; i < MAPWIDTH; i++)
 		{
-			if(objectdata[i][j].iType == 1) //powerup block
+			if(objectdata[i][j].iType == 1 || objectdata[i][j].iType == 15) //powerup block
 			{
 				iBlockCount++;
 			}
@@ -2305,6 +2305,10 @@ void CMap::drawPreviewBlocks(SDL_Surface * targetSurface, bool fThumbnail)
 
 			ts = objectdata[i][j].iType;
 			if(ts == BLOCKSETSIZE)
+				continue;
+
+			//Don't draw hidden blocks
+			if(objectdata[i][j].fHidden)
 				continue;
 
 			rectSrc.x = (Sint16)(ts * iBlockSize);

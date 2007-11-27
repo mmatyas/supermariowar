@@ -645,7 +645,21 @@ bool WorldMap::Load(short tilesize)
 			game_values.tourstoptotal++;
 
 			if(++iCurrentStage >= iNumStages)
+			{
+				//Scan stage IDs and make sure we have a stage for each one
+				short iMaxStage = game_values.tourstoptotal + 5;
+				for(short iRow = 0; iRow < iHeight; iRow++)
+				{
+					for(short iCol = 0; iCol < iWidth; iCol++)
+					{
+						short iType = tiles[iCol][iRow].iType;
+						if(iType < 0 || iType > iMaxStage)
+							goto RETURN;
+					}
+				}
+			
 				iReadType = 12;
+			}
 		}
 		else if(iReadType == 12) //number of warps
 		{

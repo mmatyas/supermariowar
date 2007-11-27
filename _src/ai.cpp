@@ -673,18 +673,19 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 
 	if(iStoredPowerup > -1)
 	{
-		//use 1up, clock, pow, bulletbill, mod right away
+		//use 1-5up, clock, pow, bulletbill, mod, podobo, right away
 		if(iStoredPowerup == 1  || iStoredPowerup == 2 || iStoredPowerup == 3 || iStoredPowerup == 4 ||
 			iStoredPowerup == 7 || iStoredPowerup == 9 || iStoredPowerup == 10 || iStoredPowerup == 16 || 
 			iStoredPowerup == 22)
 		{
 			playerKeys->game_powerup.fDown = true;
 		}
-		else if(((iStoredPowerup == 5 || iStoredPowerup == 11 || iStoredPowerup == 17 || iStoredPowerup == 19 || iStoredPowerup == 21 || iStoredPowerup == 23) && 
-				pPlayer->powerup == -1) || //Use fireflower, hammer, feather, boomerang
+		else if(((iStoredPowerup == 5 || iStoredPowerup == 11 || iStoredPowerup == 17 || iStoredPowerup == 19 || iStoredPowerup == 21 || iStoredPowerup == 23 || iStoredPowerup == 24 || iStoredPowerup == 25) && 
+				pPlayer->powerup == -1) || //Use fireflower, hammer, feather, boomerang, cape, wings, sledge, bombs
 				(iStoredPowerup == 6 && !pPlayer->invincible) || //Use star
 				(iStoredPowerup == 8 && !pPlayer->bobomb) || //use bob-omb
-				(iStoredPowerup >= 12 && iStoredPowerup <= 15 && !carriedItem)) //Use shell 
+				(iStoredPowerup >= 12 && iStoredPowerup <= 15 && !carriedItem) || //Use shell 
+				(iStoredPowerup == 20 && !pPlayer->tanooki)) //use tanooki
 		{
 			playerKeys->game_powerup.fDown = true;
 		}

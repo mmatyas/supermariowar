@@ -940,21 +940,6 @@ int editor_edit()
 				}
 			}
 		}
-		else if(edit_mode == 5) //draw vehicles
-		{
-			std::vector<WorldVehicle*>::iterator itr = vehiclelist.begin(), lim = vehiclelist.end();
-			while(itr != lim)
-			{
-				WorldVehicle * vehicle = *itr;
-
-				short ix = (vehicle->iCurrentTileX  - draw_offset_col) * TILESIZE + draw_offset_x;
-				short iy = (vehicle->iCurrentTileY - draw_offset_row) * TILESIZE + draw_offset_y;
-
-				spr_worldvehicle[0].draw(ix, iy, vehicle->iDrawDirection << 5, vehicle->iDrawSprite << 5, 32, 32);
-
-				itr++;
-			}
-		}
 		else if(edit_mode == 6) //draw warps
 		{
 			std::vector<WorldWarp*>::iterator itr = warplist.begin(), lim = warplist.end();
@@ -1004,6 +989,39 @@ int editor_edit()
 				}
 			}
 		}
+
+		if(edit_mode == 5 || edit_mode == 8) //draw vehicles
+		{
+			std::vector<WorldVehicle*>::iterator itr = vehiclelist.begin(), lim = vehiclelist.end();
+			int color = SDL_MapRGB(blitdest->format, 0, 0, 128);
+			while(itr != lim)
+			{
+				WorldVehicle * vehicle = *itr;
+
+				short ix = (vehicle->iCurrentTileX  - draw_offset_col) * TILESIZE + draw_offset_x;
+				short iy = (vehicle->iCurrentTileY - draw_offset_row) * TILESIZE + draw_offset_y;
+
+				if(edit_mode == 8)
+				{
+					SDL_Rect r = {ix, iy, 32, 32};
+					SDL_FillRect(blitdest, &r, color);
+				}
+				
+				spr_worldvehicle[0].draw(ix, iy, vehicle->iDrawDirection << 5, vehicle->iDrawSprite << 5, 32, 32);
+
+				itr++;
+
+				if(edit_mode == 8)
+				{
+					short iBoundary = vehicle->iBoundary - 1;
+					if(iBoundary == -1)
+                        spr_worldforegroundspecial[0].draw(ix, iy, 288, 288, 32, 32);
+					else
+						spr_worldforegroundspecial[0].draw(ix, iy, (iBoundary % 10) << 5, (iBoundary / 10) << 5, 32, 32);
+				}
+			}
+		}
+
 		menu_font_small.draw(0, 0, szEditModes[edit_mode]);
 		
 		if(fAutoPaint)

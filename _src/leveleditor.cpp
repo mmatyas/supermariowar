@@ -43,7 +43,7 @@
 
 #define MAPTITLESTRING "SMW 1.8 Leveleditor"
 
-enum {EDITOR_EDIT, EDITOR_TILES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_MAP, EDITOR_BLOCKS, NEW_MAP, SAVE, EDITOR_WARP, EDITOR_EYECANDY, DISPLAY_HELP, EDITOR_PLATFORM, EDITOR_TILETYPE, EDITOR_BACKGROUNDS, EDITOR_MAPITEMS, EDITOR_ANIMATION};
+enum {EDITOR_EDIT, EDITOR_TILES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_MAP, EDITOR_BLOCKS, NEW_MAP, SAVE, EDITOR_WARP, EDITOR_EYECANDY, DISPLAY_HELP, EDITOR_PLATFORM, EDITOR_TILETYPE, EDITOR_BACKGROUNDS, EDITOR_MAPITEMS, EDITOR_ANIMATION, EDITOR_PROPERTIES};
 
 #define MAX_PLATFORMS 8
 #define MAX_PLATFORM_VELOCITY 16
@@ -101,6 +101,10 @@ gfxSprite		spr_warps[3];
 
 gfxSprite		spr_blocks[3];
 gfxSprite		spr_unknowntile[3];
+
+gfxSprite		spr_powerups;
+gfxSprite		spr_powerupselector;
+gfxSprite		spr_hidden_marker;
 
 TileType		set_type = tile_solid;
 int				set_tile_rows = 0;
@@ -218,6 +222,7 @@ int editor_platforms();
 int editor_tiletype();
 int editor_backgrounds();
 int editor_animation();
+int editor_properties(short iBlockCol, short iBlockRow);
 
 void resetselectedtiles();
 void copymoveselection();
@@ -332,6 +337,10 @@ int main(int argc, char *argv[])
 	spr_unknowntile[0].init(convertPath("gfx/packs/Classic/tilesets/unknown_tile.png"), 255, 0, 255);
 	spr_unknowntile[1].init(convertPath("gfx/packs/Classic/tilesets/unknown_tile_preview.png"), 255, 0, 255);
 	spr_unknowntile[2].init(convertPath("gfx/packs/Classic/tilesets/unknown_tile_thumbnail.png"), 255, 0, 255);
+
+	spr_powerups.init(convertPath("gfx/packs/Classic/powerups/large.png"), 255, 0, 255);
+	spr_powerupselector.init(convertPath("gfx/leveleditor/leveleditor_powerup_selector.png"), 255, 0, 255, 128);
+	spr_hidden_marker.init(convertPath("gfx/leveleditor/leveleditor_hidden_marker.png"), 255, 0, 255);
 
 	if( SDL_SetColorKey(s_eyecandy, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(s_eyecandy->format, 255, 0, 255)) < 0)
 	{
@@ -635,6 +644,20 @@ int editor_edit()
 					if(event.key.keysym.sym == SDLK_o)
 						return EDITOR_MAPITEMS;
 
+					if(event.key.keysym.sym == SDLK_k)
+					{
+						int iMouseX, iMouseY;
+						SDL_GetMouseState(&iMouseX, &iMouseY);
+						iMouseX >>= 5;
+						iMouseY >>= 5;
+
+						short iType = g_map.objectdata[iMouseX][iMouseY].iType;
+						if(iType == 1 || iType == 15 || iType == 4 || iType == 5)
+						{
+							editor_properties(iMouseX, iMouseY);
+						}
+					}
+
 					//if 'B' is pressed, rotate backgrounds
 					if(event.key.keysym.sym == SDLK_b)
 						return EDITOR_BACKGROUNDS;
@@ -835,10 +858,10 @@ int editor_edit()
 							g_map.objectdata[iClickX][iClickY].iType = set_block;
 							g_map.objectdata[iClickX][iClickY].fHidden = false;
 
-							if(set_block == 1)
+							if(set_block == 1 || set_block == 15)
 							{
 								for(short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++)
-									g_map.objectdata[iClickX][iClickY].iSettings[iSetting] = (Uint8)g_iDefaultPowerupWeights[iSetting];
+									g_map.objectdata[iClickX][iClickY].iSettings[iSetting] = g_iDefaultPowerupWeights[iSetting];
 							}
 
 							AdjustMapItems(iClickX, iClickY);
@@ -1468,6 +1491,10 @@ void drawmap(bool fScreenshot, short iBlockSize)
 
 				if(displayblock < BLOCKSETSIZE)
 				{
+					//Don't screenshot hidden blocks
+					if(fScreenshot && g_map.objectdata[i][j].fHidden)
+						continue;
+
 					if(displayblock < 7)
 					{
 						rSrc.x = displayblock * iBlockSize;
@@ -1713,6 +1740,192 @@ int editor_eyecandy()
 		SDL_BlitSurface(s_eyecandyindicator, NULL, screen, &ri);
 
 		menu_font_small.draw(0,480-menu_font_small.getHeight(), "eyecandy mode: [e] edit mode, [LMB] choose eyecandy");
+		menu_font_small.drawRightJustified(640, 0, maplist.currentFilename());
+
+		SDL_Flip(screen);
+
+		int delay = WAITTIME - (SDL_GetTicks() - framestart);
+		if(delay < 0)
+			delay = 0;
+		else if(delay > WAITTIME)
+			delay = WAITTIME;
+		
+		SDL_Delay(delay);
+	}
+
+	return EDITOR_QUIT;
+}
+
+short * GetBlockProperty(short x, short y, short iBlockCol, short iBlockRow, short * iSettingIndex)
+{
+	for(short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++)
+	{
+		short ix = (iSetting % 6) * 100 + 35;
+		short iy = (iSetting / 6) * 62 + 65;
+
+		if(x >= ix - 10 && x < ix + 80 && y >= iy - 10 && y < iy + 42)
+		{
+			if(iSettingIndex)
+				*iSettingIndex = iSetting;
+
+			return &g_map.objectdata[iBlockCol][iBlockRow].iSettings[iSetting];
+		}
+	}
+
+	return NULL;
+}
+
+int editor_properties(short iBlockCol, short iBlockRow)
+{
+	bool done = false;
+	short iBlockType = g_map.objectdata[iBlockCol][iBlockRow].iType;
+
+	while (!done)
+	{
+		int framestart = SDL_GetTicks();
+
+		//handle messages
+		while(SDL_PollEvent(&event))
+		{
+			switch(event.type)
+			{
+				case SDL_QUIT:
+				{
+					done = true;
+					break;
+				}
+
+				case SDL_KEYDOWN:
+				{
+					if(event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_k)
+					{
+						return EDITOR_EDIT;	
+					}
+					else if((iBlockType == 1 || iBlockType == 15) && ((event.key.keysym.sym >= SDLK_0 && event.key.keysym.sym <= SDLK_9) || event.key.keysym.sym == SDLK_BACKQUOTE || event.key.keysym.sym == SDLK_d))
+					{
+						int iMouseX, iMouseY;
+						SDL_GetMouseState(&iMouseX, &iMouseY);
+
+						short iSettingIndex;
+						short * piSetting = GetBlockProperty(iMouseX, iMouseY, iBlockCol, iBlockRow, &iSettingIndex);
+
+						if(piSetting)
+						{
+							short iValue = event.key.keysym.sym - SDLK_0;
+							if(event.key.keysym.sym == SDLK_0)
+								iValue = 10;
+							else if(event.key.keysym.sym == SDLK_BACKQUOTE)
+								iValue = 0;
+							else if(event.key.keysym.sym == SDLK_d)
+								iValue = g_iDefaultPowerupWeights[iSettingIndex];
+
+							*piSetting = iValue;
+						}
+					}
+				}
+
+				case SDL_MOUSEBUTTONDOWN:
+				{
+					short iHiddenCheckboxY = 0;
+					if(iBlockType == 1 || iBlockType == 15)
+					{
+						short iSettingIndex;
+						short * piSetting = GetBlockProperty(event.button.x, event.button.y, iBlockCol, iBlockRow, &iSettingIndex);
+
+						if(piSetting)
+						{
+							int iMouseX, iMouseY;
+							Uint8 iMouseState = SDL_GetMouseState(&iMouseX, &iMouseY);
+
+							if((event.button.button == SDL_BUTTON_RIGHT && (iMouseState & SDL_BUTTON_LMASK)) ||
+								(event.button.button == SDL_BUTTON_LEFT && (iMouseState & SDL_BUTTON_RMASK)))
+							{
+								*piSetting = g_iDefaultPowerupWeights[iSettingIndex];
+							}
+							else if(event.button.button == SDL_BUTTON_LEFT)
+							{
+								if(*piSetting < 10)
+									(*piSetting)++;
+							}
+							else if(event.button.button == SDL_BUTTON_RIGHT)
+							{
+								if(*piSetting > 0)
+									(*piSetting)--;
+							}
+						}
+						
+						iHiddenCheckboxY = 365;
+					}
+					else if(iBlockType == 4 || iBlockType == 5)
+					{
+						iHiddenCheckboxY = 214;
+					}
+
+					if(event.button.x >= 270 && event.button.x < 370 && event.button.y >= iHiddenCheckboxY && event.button.y < iHiddenCheckboxY + 52)
+					{
+						if(event.button.button == SDL_BUTTON_LEFT)
+						{
+							g_map.objectdata[iBlockCol][iBlockRow].fHidden = !g_map.objectdata[iBlockCol][iBlockRow].fHidden;
+						}
+					}
+
+					break;
+				}
+
+				default:
+					break;
+			}
+		}
+
+		
+		drawmap(false, TILESIZE);
+		menu_shade.draw(0, 0);
+
+		int iMouseX, iMouseY;
+		SDL_GetMouseState(&iMouseX, &iMouseY);
+
+		short iHiddenCheckboxY = 0;
+
+		if(iBlockType == 1 || iBlockType == 15)
+		{
+			for(short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++)
+			{
+				short ix = (iSetting % 6) * 100 + 35;
+				short iy = (iSetting / 6) * 62 + 65;
+
+				if(iMouseX >= ix - 10 && iMouseX < ix + 80 && iMouseY >= iy - 10 && iMouseY < iy + 42)
+					spr_powerupselector.draw(ix - 10, iy - 10, 0, 0, 90, 52);
+				else
+					spr_powerupselector.draw(ix - 10, iy - 10, 0, 52, 90, 52);
+
+				spr_powerups.draw(ix, iy, iSetting << 5, 0, 32, 32);
+
+				char szNum[8];
+				sprintf(szNum, "%d", g_map.objectdata[iBlockCol][iBlockRow].iSettings[iSetting]);
+				menu_font_large.drawCentered(ix + 55, iy + 5, szNum);
+			}
+
+			iHiddenCheckboxY = 365;
+
+			menu_font_small.draw(0,480-menu_font_small.getHeight() * 2, "Block Property Mode");
+			menu_font_small.draw(0,480-menu_font_small.getHeight(), "[0-9] Set Value [LMB] Increase [RMB] Decrease [D] Default");
+		}
+		else if(iBlockType == 4 || iBlockType == 5)
+		{
+			menu_font_small.draw(0,480-menu_font_small.getHeight(), "Block Property Mode");
+			iHiddenCheckboxY = 214;
+		}
+
+		if(iMouseX >= 270 && iMouseX < 370 && iMouseY >= iHiddenCheckboxY && iMouseY < iHiddenCheckboxY + 52)
+			spr_powerupselector.draw(270, iHiddenCheckboxY, 90, 0, 100, 52);
+		else
+			spr_powerupselector.draw(270, iHiddenCheckboxY, 90, 52, 100, 52);
+
+		menu_font_large.drawCentered(320, iHiddenCheckboxY + 3, "Hidden");
+
+		if(g_map.objectdata[iBlockCol][iBlockRow].fHidden)
+			spr_hidden_marker.draw(310, iHiddenCheckboxY + 27);
+
 		menu_font_small.drawRightJustified(640, 0, maplist.currentFilename());
 
 		SDL_Flip(screen);

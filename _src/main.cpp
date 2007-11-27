@@ -28,6 +28,8 @@
 |								  http://smw.72dpiarmy.com	|
 +----------------------------------------------------------*/
 
+//TODO:
+//1) Need to deal with hidden powerup, bounce, view, and note blocks
 
 #ifdef _XBOX
 	#include <xtl.h>
