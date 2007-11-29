@@ -1924,12 +1924,13 @@ MI_PowerupSelection::MI_PowerupSelection(short x, short y, short width, short nu
 
 	mMenu = new UI_Menu();
 
-	miOverride = new MI_SelectField(&spr_selectfield, 170, iy, "Override", 300, 150);
-	miOverride->Add("No", 0, "", false, false);
-	miOverride->Add("Yes", 1, "", true, false);
-	miOverride->SetData(NULL, NULL, &game_values.overridepowerupsettings);
-	miOverride->SetKey(game_values.overridepowerupsettings ? 1 : 0);
-	miOverride->SetAutoAdvance(true);
+	miOverride = new MI_SelectField(&spr_selectfield, 170, iy, "Use From", 300, 150);
+	miOverride->Add("Map Only", 0, "", false, false);
+	miOverride->Add("Game Only", 1, "", false, false);
+	miOverride->Add("Average", 2, "", false, false);
+	miOverride->Add("Weighted", 3, "", false, false);
+	miOverride->SetData(&game_values.overridepowerupsettings, NULL, NULL);
+	miOverride->SetKey(game_values.overridepowerupsettings);
 	//miOverride->SetItemChangedCode(MENU_CODE_POWERUP_OVERRIDE_CHANGED);
 
 	for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
@@ -2051,10 +2052,10 @@ void MI_PowerupSelection::EnablePowerupFields()
 {
 	for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
 	{
-		miPowerupSlider[iPowerup]->Disable(!game_values.overridepowerupsettings);
+		miPowerupSlider[iPowerup]->Disable(game_values.overridepowerupsettings == 0);
 	}
 
-	miOverride->SetNeighbor(1, game_values.overridepowerupsettings ? miPowerupSlider[0] : NULL);
+	miOverride->SetNeighbor(1, game_values.overridepowerupsettings > 0 ? miPowerupSlider[0] : NULL);
 }
 
 MenuCodeEnum MI_PowerupSelection::Modify(bool modify)

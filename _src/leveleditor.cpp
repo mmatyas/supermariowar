@@ -652,7 +652,7 @@ int editor_edit()
 						iMouseY >>= 5;
 
 						short iType = g_map.objectdata[iMouseX][iMouseY].iType;
-						if(iType == 1 || iType == 15 || iType == 4 || iType == 5)
+						if(iType == 1 || iType == 15 || iType == 4 || iType == 5 || iType == 17 || iType == 18 || iType == 3)
 						{
 							editor_properties(iMouseX, iMouseY);
 						}
@@ -1856,7 +1856,7 @@ int editor_properties(short iBlockCol, short iBlockRow)
 						
 						iHiddenCheckboxY = 365;
 					}
-					else if(iBlockType == 4 || iBlockType == 5)
+					else if(iBlockType == 4 || iBlockType == 5 || iBlockType == 17 || iBlockType == 18 || iBlockType == 3)
 					{
 						iHiddenCheckboxY = 214;
 					}
@@ -1910,7 +1910,7 @@ int editor_properties(short iBlockCol, short iBlockRow)
 			menu_font_small.draw(0,480-menu_font_small.getHeight() * 2, "Block Property Mode");
 			menu_font_small.draw(0,480-menu_font_small.getHeight(), "[0-9] Set Value [LMB] Increase [RMB] Decrease [D] Default");
 		}
-		else if(iBlockType == 4 || iBlockType == 5)
+		else if(iBlockType == 4 || iBlockType == 5 || iBlockType == 17 || iBlockType == 18 || iBlockType == 3)
 		{
 			menu_font_small.draw(0,480-menu_font_small.getHeight(), "Block Property Mode");
 			iHiddenCheckboxY = 214;

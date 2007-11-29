@@ -68,6 +68,7 @@ gfxSprite		** spr_chocobo[4];
 gfxSprite		** spr_bobomb[4];
 gfxSprite		spr_clouds[2];
 gfxSprite		spr_ghosts[3];
+gfxSprite		spr_leaves;
 gfxSprite		spr_background;
 gfxSprite		spr_backmap[2];
 gfxSprite		spr_frontmap[2];
@@ -733,7 +734,7 @@ int main(int argc, char *argv[])
 	game_values.worldpointsbonus	= -1; //no world multiplier until player uses item to boost it
 	game_values.singleplayermode	= -1;
 	game_values.worldskipscoreboard = false;
-	game_values.overridepowerupsettings = false;
+	game_values.overridepowerupsettings = 0;
 
 	game_values.pfFilters			= new bool[NUM_AUTO_FILTERS + filterslist.GetCount()];
 	game_values.piFilterIcons		= new short[NUM_AUTO_FILTERS + filterslist.GetCount()];
@@ -965,7 +966,7 @@ int main(int argc, char *argv[])
 			game_values.pointspeed = (short)abyte[24];
 			game_values.swapstyle = (short)abyte[25];
 			game_values.secrets = ((short)abyte[27] > 0 ? true : false);
-			game_values.overridepowerupsettings = ((short)abyte[28] > 0 ? true : false);
+			game_values.overridepowerupsettings = (short)abyte[28];
 			
 			fread(&game_values.spawninvincibility, sizeof(short), 1, fp);
 			fread(&game_values.itemrespawntime, sizeof(short), 1, fp);
@@ -1337,6 +1338,15 @@ void RunGame()
 	while (true)
 	{
 		framestart = SDL_GetTicks();
+
+		/*
+		static leafcounter = 0;
+
+		if(++leafcounter > 30)
+		{
+			leafcounter = 0;
+			eyecandyfront.add(new EC_Leaf(&spr_leaves, (float)(rand() % 640), -20.0f));
+		}*/
 
 /*
 #ifdef _XBOX
@@ -3142,17 +3152,17 @@ void LoadMapObjects()
 			}
 			else if(g_map.objectdata[x][y].iType == 3)
 			{
-				g_map.blockdata[x][y] = new B_FlipBlock(&spr_flipblock, x * TILESIZE, y * TILESIZE);
+				g_map.blockdata[x][y] = new B_FlipBlock(&spr_flipblock, x * TILESIZE, y * TILESIZE, g_map.objectdata[x][y].fHidden);
 				objectblocks.add(g_map.blockdata[x][y]);
 			}
 			else if(g_map.objectdata[x][y].iType == 4)
 			{
-				g_map.blockdata[x][y] = new B_BounceBlock(&spr_bounceblock, x * TILESIZE, y * TILESIZE);
+				g_map.blockdata[x][y] = new B_BounceBlock(&spr_bounceblock, x * TILESIZE, y * TILESIZE, g_map.objectdata[x][y].fHidden);
 				objectblocks.add(g_map.blockdata[x][y]);
 			}
 			else if(g_map.objectdata[x][y].iType == 5)
 			{
-				g_map.blockdata[x][y] = new B_NoteBlock(&spr_noteblock, x * TILESIZE, y * TILESIZE, 4, 10, 1);
+				g_map.blockdata[x][y] = new B_NoteBlock(&spr_noteblock, x * TILESIZE, y * TILESIZE, 4, 10, 1, g_map.objectdata[x][y].fHidden);
 				objectblocks.add(g_map.blockdata[x][y]);
 			}
 			else if(g_map.objectdata[x][y].iType == 6)
@@ -3189,7 +3199,7 @@ void LoadMapObjects()
 			}
 			else if(g_map.objectdata[x][y].iType == 17 || g_map.objectdata[x][y].iType == 18)
 			{
-				g_map.blockdata[x][y] = new B_NoteBlock(&spr_noteblock, x * TILESIZE, y * TILESIZE, 4, 10, g_map.objectdata[x][y].iType == 17 ? 2 : 0);
+				g_map.blockdata[x][y] = new B_NoteBlock(&spr_noteblock, x * TILESIZE, y * TILESIZE, 4, 10, g_map.objectdata[x][y].iType == 17 ? 2 : 0, g_map.objectdata[x][y].fHidden);
 				objectblocks.add(g_map.blockdata[x][y]);
 			}
 			else
@@ -3278,7 +3288,7 @@ bool SwapPlayers(short iUsingPlayerID)
 		//Give credit for deaths to the player that used the mystery mushroom
 		if(iUsingPlayerID == iNewSpot)
 		{
-			list_players[iPlayer]->pSuicideCreditPlayer = list_players[iNewSpot];
+			list_players[iPlayer]->iSuicideCreditPlayerID = list_players[iNewSpot]->globalID;
 			list_players[iPlayer]->iSuicideCreditTimer = 62;
 		}
 	}

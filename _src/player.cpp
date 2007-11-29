@@ -48,7 +48,7 @@ CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamI
 	fAcceptingItem = false;
 	fPressedAcceptItem = false;
 
-	pSuicideCreditPlayer = NULL;
+	iSuicideCreditPlayerID = -1;
 	iSuicideCreditTimer = 0;
 
 	konamiIndex = 0;
@@ -753,12 +753,12 @@ void CPlayer::move()
 	if(throw_star > 0)
 		throw_star--;
 
-	if(pSuicideCreditPlayer)
+	if(iSuicideCreditPlayerID >= 0)
 	{
 		if(--iSuicideCreditTimer <= 0)
 		{
 			iSuicideCreditTimer = 0;
-			pSuicideCreditPlayer = NULL;
+			iSuicideCreditPlayerID = -1;
 		}
 	}
 
@@ -931,7 +931,7 @@ void CPlayer::move()
 				}
 				case 5:
 				{
-					powerup = 0;
+					powerup = -1;
 					SetPowerup(1);
 					break;
 				}
@@ -951,7 +951,7 @@ void CPlayer::move()
 				}
 				case 8:
 				{
-					powerup = 0;
+					powerup = -1;
 					bobomb = false;
 					SetPowerup(0);
 					break;
@@ -976,7 +976,7 @@ void CPlayer::move()
 				}
 				case 11:
 				{
-					powerup = 0;
+					powerup = -1;
 					SetPowerup(2);
 					break;
 				}
@@ -1032,7 +1032,7 @@ void CPlayer::move()
 				}
 				case 19:
 				{
-					powerup = 0;
+					powerup = -1;
 					SetPowerup(4);
 					break;
 				}
@@ -1044,7 +1044,7 @@ void CPlayer::move()
 				}
 				case 21:  //sledge hammer
 				{
-					powerup = 0;
+					powerup = -1;
 					SetPowerup(5);
 					break;
 				}
@@ -1060,19 +1060,19 @@ void CPlayer::move()
 				}
 				case 23:  //bombs
 				{
-					powerup = 0;
+					powerup = -1;
 					SetPowerup(6);
 					break;
 				}
 				case 24:  //leaf
 				{
-					powerup = 0;
+					powerup = -1;
 					SetPowerup(7);
 					break;
 				}
 				case 25:  //pwings
 				{
-					powerup = 0;
+					powerup = -1;
 					SetPowerup(8);
 					break;
 				}
@@ -2009,7 +2009,7 @@ void CPlayer::die(short deathStyle, bool fTeamRemoved)
 		corpseSprite = spr_bobomb[colorID][iDeathSprite];
 	
 	if(deathStyle == death_style_jump)
-		eyecandyfront.add(new EC_FallingObject(corpseSprite, ix + HALFPW - 16, iy + PH - 32, -VELTURBOJUMP, iSrcOffsetX, 0, 32, 32));
+		eyecandyfront.add(new EC_FallingObject(corpseSprite, ix + HALFPW - 16, iy + PH - 32, 0.0f, -VELTURBOJUMP, 1, 0, iSrcOffsetX, 0, 32, 32));
 	else if(deathStyle == death_style_squish)
 		eyecandyback.add(new EC_Corpse(corpseSprite, (float)(ix - PWOFFSET), (float)(iy+PH-32), iSrcOffsetX));
 	else if(deathStyle == death_style_shatter)
@@ -2414,6 +2414,25 @@ void CPlayer::AddKillsInRowInAirAward()
 		
 		eyecandyfront.add(new EC_FallingObject(&spr_bonus, ix + HALFPW - 8, iy + HALFPH - 8, awardvelx, awardvely, 4, 2, 0, colorID * 16, 16, 16));
 		angle -= (float)PI / 14;
+	}
+}
+
+void PlayerKilledPlayer(short iKiller, CPlayer &killed, short deathstyle, killstyle style)
+{
+	CPlayer * killer = GetPlayerFromGlobalID(iKiller);
+
+	if(killer && killer->globalID != killed.globalID)
+	{
+		PlayerKilledPlayer(*killer, killed, deathstyle, style);
+	}
+	else
+	{
+		killed.DeathAwards();
+			
+		if(!game_values.gamemode->playerkilledself(killed))
+			killed.die(death_style_jump, false);
+
+		ifsoundonplay(sfx_deathsound);
 	}
 }
 
@@ -3450,25 +3469,23 @@ void CPlayer::collision_detection_map()
 	//  then y axis (|)
 	//-----------------------------------------------------------------
 
-	short txl = -1, txr = -1, txc = -1;
+	short txl = 0, txr = 0, txc = 0;
+	short iPlayerL = ix, iPlayerC = ix + HALFPW, iPlayerR = ix + PW;
 
-	txl = ix / TILESIZE;
+	if(iPlayerL < 0)
+		iPlayerL += 640;
+	else if(iPlayerL >= 640)
+		iPlayerL -= 640;
 
-	if(txl < 0)
-		txl += 20;
-	else if(txl > 19)
-		txl -= 20;
+	if(iPlayerC >= 640)
+		iPlayerC -= 640;
 
-	if(ix + HALFPW >= 640)
-		txc = (ix + HALFPW - 640) / TILESIZE;
-	else
-		txc = (ix + HALFPW) / TILESIZE;
+	if(iPlayerR >= 640)
+        iPlayerR -= 640;
 
-	if(ix + PW >= 640)
-        txr = (ix + PW - 640) / TILESIZE;
-	else
-		txr = (ix + PW) / TILESIZE;
-
+	txl = iPlayerL / TILESIZE;
+	txc = iPlayerC / TILESIZE;
+	txr = iPlayerR / TILESIZE;
 
 	//What block is the player aligned to (this will be the block that has the action on it)
 	short alignedBlockX = 0;
@@ -3478,8 +3495,6 @@ void CPlayer::collision_detection_map()
 	//printf("Before Y - ix: %d\tiy: %d\toldx: %.2f\toldy: %d\tty: %.2f\tty2: %d\ttxl: %d\ttxr: %d\tfx: %.2f\tfy: %.2f\tvelx: %.2f\tvely: %.2f\n", ix, iy, fOldX, fOldY, (int)(fPrecalculatedY) / TILESIZE, ((int)(fPrecalculatedY) + PH) / TILESIZE, txl, txr, fx, fy, velx, vely);
 
 	short overlaptxl = txl * TILESIZE + TILESIZE + 1;
-	if(overlaptxl > 639)
-		overlaptxl -= 640;
 
 	if(ix + HALFPW < overlaptxl)
 	{
@@ -3555,7 +3570,7 @@ void CPlayer::collision_detection_map()
 
 		if(leftblock && !leftblock->isTransparent()) //then left
 		{	
-			bool useBehavior = alignedBlockX == txl || rightblock == NULL || rightblock->isTransparent();
+			bool useBehavior = alignedBlockX == txl || rightblock == NULL || rightblock->isTransparent() || rightblock->isHidden();
 				
 			if(!leftblock->collide(this, 0, useBehavior))
 			{
@@ -3568,7 +3583,7 @@ void CPlayer::collision_detection_map()
 
 		if(rightblock && !rightblock->isTransparent()) //then right
 		{	
-			bool useBehavior = alignedBlockX == txr || leftblock == NULL || leftblock->isTransparent();
+			bool useBehavior = alignedBlockX == txr || leftblock == NULL || leftblock->isTransparent() || leftblock->isHidden();
 				
 			if(!rightblock->collide(this, 0, useBehavior))
 			{
@@ -3640,7 +3655,7 @@ void CPlayer::collision_detection_map()
 			bool collisionresult = true;
 			if(leftblock && !leftblock->isTransparent()) //collide with left block
 			{	
-				collisionresult &= leftblock->collide(this, 2, alignedBlockX == txl || rightblock == NULL || rightblock->isTransparent());
+				collisionresult &= leftblock->collide(this, 2, alignedBlockX == txl || rightblock == NULL || rightblock->isTransparent() || rightblock->isHidden());
 				
 				//If player was bumped and killed then return
 				if(state != player_ready)
@@ -3649,7 +3664,7 @@ void CPlayer::collision_detection_map()
 			
 			if(rightblock && !rightblock->isTransparent()) //then right
 			{	
-				collisionresult &= rightblock->collide(this, 2, alignedBlockX == txr || leftblock == NULL || leftblock->isTransparent());
+				collisionresult &= rightblock->collide(this, 2, alignedBlockX == txr || leftblock == NULL || leftblock->isTransparent() || leftblock->isHidden());
 
 				//If player was bumped and killed then return
 				if(state != player_ready)
@@ -3781,9 +3796,9 @@ void CPlayer::collision_detection_map()
 
 void CPlayer::KillPlayerMapHazard()
 {
-	if(pSuicideCreditPlayer)
+	if(iSuicideCreditPlayerID >= 0)
 	{
-		PlayerKilledPlayer(*pSuicideCreditPlayer, *this, death_style_jump, kill_style_bounce);
+		PlayerKilledPlayer(iSuicideCreditPlayerID, *this, death_style_jump, kill_style_bounce);
 	}
 	else
 	{
@@ -3827,8 +3842,8 @@ bool CPlayer::collision_detection_checktop()
 
 	if((leftTile != tile_nonsolid && leftTile != tile_gap && leftTile != tile_solid_on_top) || 
 		(rightTile != tile_nonsolid && rightTile != tile_gap && rightTile != tile_solid_on_top) ||
-		(leftBlock && !leftBlock->isTransparent()) || 
-		(rightBlock && !rightBlock->isTransparent()))
+		(leftBlock && !leftBlock->isTransparent() && !leftBlock->isHidden()) || 
+		(rightBlock && !rightBlock->isTransparent() && !rightBlock->isHidden()))
 	{
 		yf((float)(ty * TILESIZE + TILESIZE) + 0.2f);
 		return true;
@@ -3864,8 +3879,8 @@ bool CPlayer::collision_detection_checkleft()
 
 	if((topTile != tile_nonsolid && topTile != tile_gap && topTile != tile_solid_on_top) ||
 		(bottomTile != tile_nonsolid && bottomTile != tile_gap && bottomTile != tile_solid_on_top) ||
-		(topBlock && !topBlock->isTransparent()) || 
-		(bottomBlock && !bottomBlock->isTransparent()))
+		(topBlock && !topBlock->isTransparent() && !topBlock->isHidden()) || 
+		(bottomBlock && !bottomBlock->isTransparent() && !bottomBlock->isHidden()))
 	{
 		xf((float)(tx * TILESIZE + TILESIZE) + 0.2f);
 		flipsidesifneeded();
@@ -3907,8 +3922,8 @@ bool CPlayer::collision_detection_checkright()
 
 	if((topTile != tile_nonsolid && topTile != tile_gap && topTile != tile_solid_on_top) ||
 		(bottomTile != tile_nonsolid && bottomTile != tile_gap && bottomTile != tile_solid_on_top) ||
-		(topBlock && !topBlock->isTransparent()) || 
-		(bottomBlock && !bottomBlock->isTransparent()))
+		(topBlock && !topBlock->isTransparent() && !topBlock->isHidden()) || 
+		(bottomBlock && !bottomBlock->isTransparent() && !bottomBlock->isHidden()))
 	{
 		xf((float)(tx * TILESIZE - PW) - 0.2f);
 		flipsidesifneeded();
@@ -3942,7 +3957,7 @@ void CPlayer::collision_detection_checksides()
 			{
 				IO_Block * block = g_map.block(txl, ty);
 
-				if((block && !block->isTransparent()) || (g_map.map(txl, ty) & 0x5) > 0)
+				if((block && !block->isTransparent() && !block->isHidden()) || (g_map.map(txl, ty) & 0x5) > 0)
 				{
 					iCase |= 0x01;
 				}
@@ -3952,7 +3967,7 @@ void CPlayer::collision_detection_checksides()
 			{
 				IO_Block * block = g_map.block(txr, ty);
 
-				if((block && !block->isTransparent()) || (g_map.map(txr, ty) & 0x5) > 0)
+				if((block && !block->isTransparent() && !block->isHidden()) || (g_map.map(txr, ty) & 0x5) > 0)
 				{
 					iCase |= 0x02;
 				}
@@ -3969,7 +3984,7 @@ void CPlayer::collision_detection_checksides()
 			{
 				IO_Block * block = g_map.block(txl, ty2);
 
-				if((block && !block->isTransparent()) || (g_map.map(txl, ty2) & 0x5) > 0)
+				if((block && !block->isTransparent() && !block->isHidden()) || (g_map.map(txl, ty2) & 0x5) > 0)
 				{
 					iCase |= 0x04;
 				}
@@ -3979,7 +3994,7 @@ void CPlayer::collision_detection_checksides()
 			{
 				IO_Block * block = g_map.block(txr, ty2);
 
-				if((block && !block->isTransparent()) || (g_map.map(txr, ty2) & 0x5) > 0)
+				if((block && !block->isTransparent() && !block->isHidden()) || (g_map.map(txr, ty2) & 0x5) > 0)
 				{
 					iCase |= 0x08;
 				}
@@ -4447,7 +4462,7 @@ void CPlayer::DecreaseProjectileLimit()
 	if(--projectilelimit <= 0)
 	{
 		projectilelimit = 0;
-		powerup = 0;
+		powerup = -1;
 		ifsoundonplay(sfx_powerdown);
 	}
 }

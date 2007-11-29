@@ -478,6 +478,7 @@ extern gfxSprite		** spr_chocobo[4];
 extern gfxSprite		** spr_bobomb[4];
 extern gfxSprite		spr_clouds[2];
 extern gfxSprite		spr_ghosts[3];
+extern gfxSprite		spr_leaves;
 extern gfxSprite		spr_background;
 extern gfxSprite		spr_backmap[2];
 extern gfxSprite		spr_frontmap[2];
@@ -884,7 +885,7 @@ struct gv
 
 	bool		worldskipscoreboard;
 
-	bool		overridepowerupsettings;
+	short		overridepowerupsettings;
 };
 
 extern gv game_values;

@@ -378,7 +378,7 @@ class CPlayer
 
 		short spawntext;
 
-		CPlayer * pSuicideCreditPlayer;
+		short iSuicideCreditPlayerID;
 		short iSuicideCreditTimer;
 
 		friend bool coldec_player2player(CPlayer &o1, CPlayer &o2);
@@ -388,6 +388,7 @@ class CPlayer
 		friend bool coldec_player2obj(CPlayer &o1, CObject &o2);
 		friend bool collisionhandler_p2o(CPlayer &o1, CObject &o2);
 
+		friend void PlayerKilledPlayer(short iKiller, CPlayer &killed, short deathstyle, killstyle style);
 		friend void PlayerKilledPlayer(CPlayer &killer, CPlayer &killed, short deathstyle, killstyle style);
 		friend void AddAwardKill(CPlayer * killer, CPlayer * killed, killstyle style);
 		friend void RemovePlayersButHighestScoring();

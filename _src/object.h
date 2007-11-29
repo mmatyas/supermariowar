@@ -66,12 +66,16 @@ class IO_Block : public CObject
 
 		virtual void draw();
 		virtual void update();
+		
+		//Returns true if we should continue to check for collisions in this direction
 		virtual bool collide(CPlayer * player, short direction, bool useBehavior);
 		virtual bool collide(IO_MovingObject * object, short direction);
+		
 		ObjectType getObjectType(){return object_block;}
 		virtual BlockType getBlockType(){printf("CObject::getBlockType() - NO!\n"); return block_none;}
 
 		virtual bool isTransparent() {return false;}
+		virtual bool isHidden() {return hidden;}
 
 		virtual bool hittop(CPlayer * player, bool useBehavior);
 		virtual bool hitbottom(CPlayer * player, bool useBehavior);
@@ -88,9 +92,13 @@ class IO_Block : public CObject
 	protected:
 		void BounceMovingObject(IO_MovingObject * object);
 
-		CPlayer * bumpPlayer;
+		short iBumpPlayerID;
+		short iBumpPlayerTeam;
+
 		float fposx, fposy;  //position to return to (for note and bumpable blocks)
-		short	  iposx, iposy; //position of the block (doesn't move)
+		short iposx, iposy; //position of the block (doesn't move)
+
+		bool hidden, oldhidden;
 
 		short col, row;
 
@@ -108,15 +116,13 @@ class B_PowerupBlock : public IO_Block
 		void draw();
 		void update();
 
-		bool isTransparent() {return hidden;}
+		bool collide(CPlayer * player, short direction, bool useBehavior);
+		bool collide(IO_MovingObject * object, short direction);
 
 		bool hittop(CPlayer * player, bool useBehavior);
 		bool hitbottom(CPlayer * player, bool useBehavior);
-		bool hitleft(CPlayer * player, bool useBehavior);
-		bool hitright(CPlayer * player, bool useBehavior);
 
 		bool hittop(IO_MovingObject * object);
-		bool hitbottom(IO_MovingObject * object);
 		bool hitright(IO_MovingObject * object);
 		bool hitleft(IO_MovingObject * object);
 
@@ -134,8 +140,7 @@ class B_PowerupBlock : public IO_Block
 		short animationTimer;
 		short animationWidth;
 
-		bool hidden, oldhidden;
-		short * settings;
+		short settings[NUM_POWERUPS];
 
 	friend class CPlayer;
 };
@@ -195,7 +200,7 @@ class B_BreakableBlock : public IO_Block
 class B_NoteBlock : public IO_Block
 {
 	public:
-		B_NoteBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short type);
+		B_NoteBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short type, bool fHidden);
 		~B_NoteBlock(){};
 
 		BlockType getBlockType(){return block_note;}
@@ -203,7 +208,8 @@ class B_NoteBlock : public IO_Block
 		void draw();
 		void update();
 
-		bool isTransparent() {return hidden;}
+		bool collide(CPlayer * player, short direction, bool useBehavior);
+		bool collide(IO_MovingObject * object, short direction);
 
 		bool hittop(CPlayer * player, bool useBehavior);
 		bool hitbottom(CPlayer * player, bool useBehavior);
@@ -220,8 +226,6 @@ class B_NoteBlock : public IO_Block
 		short animationWidth;
 		short iType;
 		short iTypeOffsetY;
-
-		bool hidden, oldhidden;
 };
 
 class B_DonutBlock : public IO_Block
@@ -248,7 +252,7 @@ class B_DonutBlock : public IO_Block
 class B_FlipBlock : public IO_Block
 {
 	public:
-		B_FlipBlock(gfxSprite *nspr, short x, short y);
+		B_FlipBlock(gfxSprite *nspr, short x, short y, bool fHidden);
 		~B_FlipBlock(){};
 
 		BlockType getBlockType(){return block_flip;}
@@ -256,6 +260,8 @@ class B_FlipBlock : public IO_Block
 		void draw();
 		void update();
 		bool collide(CPlayer * player, short direction, bool useBehavior);
+		bool collide(IO_MovingObject * object, short direction);
+
 		bool isTransparent() {return state == 1;}
 
 		bool hittop(CPlayer * player, bool useBehavior);
@@ -283,23 +289,23 @@ class B_FlipBlock : public IO_Block
 class B_BounceBlock : public IO_Block
 {
 	public:
-		B_BounceBlock(gfxSprite *nspr, short x, short y);
+		B_BounceBlock(gfxSprite *nspr, short x, short y, bool fHidden);
 		~B_BounceBlock(){};
 
 		BlockType getBlockType(){return block_bounce;}
 
 		void update();
+		void draw();
 
-		bool isTransparent() {return hidden;}
+		bool collide(CPlayer * player, short direction, bool useBehavior);
+		bool collide(IO_MovingObject * object, short direction);
 
 		bool hittop(CPlayer * player, bool useBehavior);
 		bool hitbottom(CPlayer * player, bool useBehavior);
 
 		bool hittop(IO_MovingObject * object);
-		void triggerBehavior();
 
-	private:
-		bool hidden, oldhidden;
+		void triggerBehavior();
 };
 
 class B_ThrowBlock : public IO_Block

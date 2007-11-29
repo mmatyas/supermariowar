@@ -12,6 +12,59 @@ extern SDL_Rect rectSuperStompRightDst[8];
 //------------------------------------------------------------------------------
 // class cloud
 //------------------------------------------------------------------------------
+EC_Animated::EC_Animated(gfxSprite * nspr, short dstx, short dsty, short srcx, short srcy, short w, short h, short speed, short frames)
+{
+	spr = nspr;
+
+	iAnimationX = srcx;
+	iAnimationY = srcy;
+	iAnimationW = w;
+	iAnimationH = h;
+
+	if(iAnimationW == 0)
+		iAnimationW = (short)spr->getWidth();
+
+	if(iAnimationH == 0)
+		iAnimationH = (short)spr->getHeight();
+
+	iAnimationSpeed = speed;
+	iAnimationFrames = frames * iAnimationW + iAnimationX;
+
+	iAnimationTimer = 0;
+	iAnimationFrame = iAnimationX;
+
+	ix = dstx;
+	iy = dsty;
+}
+
+void EC_Animated::animate()
+{
+	if(iAnimationSpeed > 0 && ++iAnimationTimer >= iAnimationSpeed)
+	{
+		iAnimationTimer = 0;
+		iAnimationFrame += iAnimationW;
+
+		if(iAnimationFrame >= iAnimationFrames)
+		{
+			iAnimationFrame = iAnimationX;
+		}
+	}
+}
+
+void EC_Animated::update()
+{
+	animate();
+}
+
+void EC_Animated::draw()
+{
+	if(!dead)
+		spr->draw(ix, iy, iAnimationFrame, iAnimationY, iAnimationW, iAnimationH);
+}
+
+//------------------------------------------------------------------------------
+// class cloud
+//------------------------------------------------------------------------------
 EC_Cloud::EC_Cloud(gfxSprite *nspr, float nx, float ny, float nvelx)
 {
 	spr = nspr;
@@ -42,49 +95,59 @@ void EC_Cloud::update()
 //------------------------------------------------------------------------------
 // class ghost
 //------------------------------------------------------------------------------
-EC_Ghost::EC_Ghost(gfxSprite *nspr, float nx, float ny, float nvelx, short ianimationspeed, short inumframes)
+EC_Ghost::EC_Ghost(gfxSprite *nspr, float nx, float ny, float nvelx, short ianimationspeed, short inumframes) :
+	EC_Animated(nspr, (short)nx, (short)ny, 0, nvelx < 0.0f ? 32 : 0, 32, 32, ianimationspeed, inumframes)
 {
-	spr = nspr;
-	x = nx;
-	y = ny;
+	dx = nx;
+	dy = ny;
 	velx = nvelx;
-	w = (short)spr->getWidth() >> 1;
-	h = (short)spr->getHeight() >> 1;
-
-	animationoffset = nvelx < 0.0f ? 32 : 0;
-	animationspeed = ianimationspeed - 1;
-	animationtimer = 0;
-	animationframe = 0;
-	animationwidth = (short)spr->getWidth();
-	numframes = inumframes;
 }
-
-
-void EC_Ghost::draw()
-{
-	spr->draw((short)x, (short)y, animationframe, animationoffset, w, h);
-}
-
 
 void EC_Ghost::update()
 {
-	x += velx;
+	animate();
 
-	if( x > 639.0f)
-		x -= 639.0f;
-	else if( x < 0.0f)
-		x += 640.0f;
+	dx += velx;
 
-	if(++animationtimer > animationspeed)
-	{
-		animationtimer = 0;
-		animationframe += w;
+	if(dx >= 640.0f)
+		dx -= 640.0f;
+	else if(dx < 0.0f)
+		dx += 640.0f;
 
-		if(++animationframe >= animationwidth)
-		{
-			animationframe = 0;
-		}
-	}
+	ix = (short)dx;
+	iy = (short)dy;
+}
+
+//------------------------------------------------------------------------------
+// class leaf
+//------------------------------------------------------------------------------
+EC_Leaf::EC_Leaf(gfxSprite *nspr, float nx, float ny) :
+	EC_Animated(nspr, (short)nx, (short)ny, 0, 0, 16, 16, 8, 2)
+{
+	dx = nx;
+	dy = ny;
+
+	velx = 2.0f;
+	vely = 2.0f;
+}
+
+void EC_Leaf::update()
+{
+	animate();
+
+	dx += velx;
+	dy += vely;
+
+	if(dx >= 640.0f)
+		dx -= 640.0f;
+	else if(dx < 0.0f)
+		dx += 640.0f;
+
+	ix = (short)dx;
+	iy = (short)dy;
+
+	if(iy >= 480)
+		dy = -20.0f;
 }
 
 //------------------------------------------------------------------------------
@@ -227,65 +290,26 @@ EC_GravText::~EC_GravText()
 // class EC_FallingObject
 //------------------------------------------------------------------------------
 
-EC_FallingObject::EC_FallingObject(gfxSprite *nspr, short x, short y, float nvelx, float nvely, short numSprites, short animationRate, short srcOffsetX, short srcOffsetY, short w, short h) :
-	CEyecandy()
+EC_FallingObject::EC_FallingObject(gfxSprite *nspr, short x, short y, float nvelx, float nvely, short animationframes, short animationspeed, short srcOffsetX, short srcOffsetY, short w, short h) :
+	EC_Animated(nspr, x, y, srcOffsetX, srcOffsetY, w, h, animationspeed, animationframes)
 {
-	spr = nspr;
 	fx = (float)x;
 	fy = (float)y;
-	vely = nvely;
+
 	velx = nvelx;
-	
-	iSrcOffsetX = srcOffsetX;
-	iSrcOffsetY = srcOffsetY;
-
-	iw = w;
-	if(iw == 0)
-		iw = (short)spr->getWidth() / numSprites;
-
-	ih = h;
-	if(ih == 0)
-		ih = (short)spr->getHeight();
-	
-	iNumSprites = numSprites;
-	iAnimationRate = animationRate;
-	iDrawFrame = iSrcOffsetX;
-	iAnimationTimer = 0;
-	iAnimationWidth = iNumSprites * iw;
-}
-
-EC_FallingObject::EC_FallingObject(gfxSprite *nspr, short x, short y, float nvely, short srcOffsetX, short srcOffsetY, short w, short h) :
-	CEyecandy()
-{
-	spr = nspr;
-	fx = (float)x;
-	fy = (float)y;
 	vely = nvely;
-	velx = 0.0f;
-	
-	iSrcOffsetX = srcOffsetX;
-	iSrcOffsetY = srcOffsetY;
-	
-	iw = w;
-	if(iw == 0)
-		iw = (short)spr->getWidth();
-
-	ih = h;
-	if(ih == 0)
-		ih = (short)spr->getHeight();
-
-	iNumSprites = 1;
-	iAnimationRate = 0;
-	iDrawFrame = iSrcOffsetX;
-	iAnimationTimer = 0;
-	iAnimationWidth = iw;
 }
 
 void EC_FallingObject::update()
 {
+	animate();
+
 	fy += vely;
 	fx += velx;
 	
+	ix = (short)fx;
+	iy = (short)fy;
+
 	if(fy >= 480.0f)
 	{
 		dead = true;
@@ -293,134 +317,50 @@ void EC_FallingObject::update()
 	}
 
 	vely += GRAVITATION;
-
-	if(iAnimationRate > 0)
-	{
-		if(++iAnimationTimer == iAnimationRate)
-		{
-			iAnimationTimer = 0;
-			iDrawFrame += iw;
-
-			if(iDrawFrame >= iAnimationWidth)
-				iDrawFrame = iSrcOffsetX;
-		}
-	}
 }
 
-
-void EC_FallingObject::draw()
-{
-	spr->draw((short)fx, (short)fy, iDrawFrame, iSrcOffsetY, iw, ih);	
-}
 
 //------------------------------------------------------------------------------
 // class EC_SingleAnimation
 //------------------------------------------------------------------------------
 
-EC_SingleAnimation::EC_SingleAnimation(gfxSprite *nspr, short nx, short ny, short iframes, short irate) :
-	CEyecandy()
-{
-	spr = nspr;
-	x = (float)nx;
-	y = (float)ny;
-	frames = iframes;
-	counter = 0;
-	rate = irate - 1;
+EC_SingleAnimation::EC_SingleAnimation(gfxSprite *nspr, short x, short y, short iframes, short irate) :
+	EC_Animated(nspr, x, y, 0, 0, (short)nspr->getWidth() / iframes, 0, irate, iframes)
+{}
 
-	iw = (short)spr->getWidth() / iframes;
-	ih = (short)spr->getHeight();
-
-	iOffsetX = 0;
-	iOffsetY = 0;
-
-	iAnimationWidth = (short)spr->getWidth();
-}
-
-EC_SingleAnimation::EC_SingleAnimation(gfxSprite *nspr, short nx, short ny, short iframes, short irate, short offsetx, short offsety, short w, short h) :
-	CEyecandy()
-{
-	spr = nspr;
-	x = (float)nx;
-	y = (float)ny;
-	
-	frames = iframes;
-	counter = 0;
-	rate = irate - 1;
-
-	iw = w;
-	ih = h;
-
-	iOffsetX = offsetx;
-	iOffsetY = offsety;
-
-	iAnimationWidth = (short)spr->getWidth() + iOffsetX;
-}
+EC_SingleAnimation::EC_SingleAnimation(gfxSprite *nspr, short x, short y, short iframes, short irate, short offsetx, short offsety, short w, short h) :
+	EC_Animated(nspr, x, y, offsetx, offsety, w, h, irate, iframes)
+{}
 
 void EC_SingleAnimation::update()
 {
-	if(++counter > rate)
-	{
-		counter = 0;
-		iOffsetX += iw;
+	animate();
 
-		if(iOffsetX >= iAnimationWidth)
-		{
-			dead = true;
-		}
-	}
-}
-
-void EC_SingleAnimation::draw()
-{
-	spr->draw((short)x, (short)y, iOffsetX, iOffsetY, iw, ih);
+	//This means that the animation wrapped and it is time to kill it
+	if(iAnimationTimer == 0 && iAnimationFrame == iAnimationX)
+		dead = true;
 }
 
 //------------------------------------------------------------------------------
 // class EC_LoopingAnimation
 //------------------------------------------------------------------------------
 
-EC_LoopingAnimation::EC_LoopingAnimation(gfxSprite *nspr, short x, short y, short iframes, short irate, short iloops, short ioffsetx, short ioffsety, short istartoffsetx, short iwidth, short iheight) :
-	CEyecandy()
+EC_LoopingAnimation::EC_LoopingAnimation(gfxSprite *nspr, short x, short y, short iframes, short irate, short loops, short ioffsetx, short ioffsety, short w, short h) :
+	EC_Animated(nspr, x, y, ioffsetx, ioffsety, w, h, irate, iframes)
 {
-	spr = nspr;
-	ix = x;
-	iy = y;
-	frame = ioffsetx + istartoffsetx * iwidth;
-	counter = 0;
-	rate = irate - 1;
-
-	iw = iwidth;
-	ih = iheight;
-
-	iOffsetX = ioffsetx;
-	iOffsetY = ioffsety;
-
-	iAnimationWidth = ioffsetx + iframes * iwidth;
-
-	countloops = 0;
-	loops = iloops;
+	iCountLoops = 0;
+	iLoops = loops;
 }
 
 void EC_LoopingAnimation::update()
 {
-	if(++counter > rate)
+	animate();
+
+	if(iAnimationTimer == 0 && iAnimationFrame == iAnimationX)
 	{
-		counter = 0;
-		
-		frame += iw;
-		if(frame >= iAnimationWidth)
-		{
-			if(loops > 0 && ++countloops >= loops)
-				dead = true;
-
-			frame = iOffsetX;
-		}
+		if(iLoops > 0 && ++iCountLoops >= iLoops)
+			dead = true;
 	}
-}
-
-void EC_LoopingAnimation::draw()
-{
-	spr->draw(ix, iy, frame, iOffsetY, iw, ih);
 }
 
 //------------------------------------------------------------------------------

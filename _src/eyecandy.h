@@ -11,10 +11,10 @@ class CEyecandy
 {
 	public:
 		CEyecandy() {dead = false;}
-		virtual ~CEyecandy(){;};
+		virtual ~CEyecandy() {}
 
-		virtual void draw(){printf("CEyecandy::draw() - NO!\n");};
-		virtual void update(){printf("CEyecandy::update() - NO!\n");};
+		virtual void update() = 0;
+		virtual void draw() = 0;
 	
 	protected:
 		bool dead;
@@ -22,16 +22,38 @@ class CEyecandy
 	friend class CEyecandyContainer;
 };
 
+//animated eyecandy base class
+class EC_Animated : public CEyecandy
+{
+	public:
+		EC_Animated(gfxSprite * nspr, short dstx, short dsty, short srcx, short srcy, short w, short h, short speed, short frames);
+		virtual ~EC_Animated() {}
+		
+		void animate();
 
+		virtual void update();
+		virtual void draw();
+		
+	protected:
+		gfxSprite * spr;
 
+		short iAnimationX, iAnimationY;
+		short iAnimationW, iAnimationH;
+		short iAnimationSpeed;
+		short iAnimationFrames;
 
+		short iAnimationTimer;
+		short iAnimationFrame;
+
+		short ix, iy;
+};
 
 //actual eyecandy implementations
 class EC_Corpse : public CEyecandy
 {
 	public:
 		EC_Corpse(gfxSprite *nspr, float nx, float ny, short iSrcOffsetX);
-		~EC_Corpse(){;};
+		~EC_Corpse() {}
 		void draw();
 		void update();
 
@@ -49,7 +71,7 @@ class EC_Cloud : public CEyecandy
 {
 	public:
 		EC_Cloud(gfxSprite *nspr, float nx, float ny, float nvelx);
-		~EC_Cloud(){;};
+		~EC_Cloud() {}
 		void draw();
 		void update();
 
@@ -60,29 +82,30 @@ class EC_Cloud : public CEyecandy
 		short w;
 };
 
-
-class EC_Ghost : public CEyecandy
+class EC_Ghost : public EC_Animated
 {
 	public:
 		EC_Ghost(gfxSprite *nspr, float nx, float ny, float nvelx, short ianimationspeed, short inumframes);
-		~EC_Ghost(){;};
-		void draw();
+		~EC_Ghost() {}
 		void update();
 
 	private:
-		gfxSprite *spr;
-		float x, y;
+		float dx, dy;
 		float velx;
-		short w, h;
-
-		short animationoffset;
-		short animationspeed;
-		short animationtimer;
-		short animationframe;
-		short animationwidth;
-		short numframes;
 };
 
+class EC_Leaf : public EC_Animated
+{
+	public:
+		EC_Leaf(gfxSprite *nspr, float nx, float ny);
+		~EC_Leaf() {}
+
+		void update();
+
+	private:
+		float dx, dy;
+		float velx, vely;
+};
 
 
 class EC_GravText : public CEyecandy
@@ -101,69 +124,36 @@ class EC_GravText : public CEyecandy
 		char *text;
 };
 
-class EC_FallingObject : public CEyecandy
+class EC_FallingObject : public EC_Animated
 {
 	public:
-		EC_FallingObject(gfxSprite *nspr, short x, short y, float nvelx, float nvely, short numSprites, short animationRate, short srcOffsetX, short srcOffsetY, short w, short h);
-		EC_FallingObject(gfxSprite *nspr, short x, short y, float nvely, short srcOffsetX, short srcOffsetY, short w, short h);
+		EC_FallingObject(gfxSprite *nspr, short x, short y, float nvelx, float nvely, short animationframes, short animationspeed, short srcOffsetX, short srcOffsetY, short w, short h);
 
-		void draw();
 		void update();
 
 	private:
-		gfxSprite *spr;
 		float fx, fy;
-		short iw, ih;
 		float vely, velx;
-		
-		short iSrcOffsetX;
-		short iSrcOffsetY;
-
-		short iNumSprites;
-		short iAnimationRate;
-		short iDrawFrame;
-		short iAnimationTimer;
-		short iAnimationWidth;
 };
 
-class EC_SingleAnimation : public CEyecandy
+class EC_SingleAnimation : public EC_Animated
 {
 	public:
 		EC_SingleAnimation(gfxSprite *nspr, short nx, short ny, short iframes, short irate);
 		EC_SingleAnimation(gfxSprite *nspr, short nx, short ny, short iframes, short irate, short offsetx, short offsety, short w, short h);
-		void update();
-		void draw();
 
-	protected:
-		gfxSprite *spr;
-		float x, y;
-		short frames, counter;
-		short iOffsetX, iOffsetY;
-		short iw, ih;
-		short rate;
-		short iAnimationWidth;
+		void update();
 };
 
-class EC_LoopingAnimation : public CEyecandy
+class EC_LoopingAnimation : public EC_Animated
 {
 	public:
-		EC_LoopingAnimation(gfxSprite *nspr, short x, short y, short iframes, short irate, short iloops, short ioffsetx, short ioffsety, short istartoffsetx, short iwidth, short iheight);
+		EC_LoopingAnimation(gfxSprite *nspr, short x, short y, short iframes, short irate, short loops, short ioffsetx, short ioffsety, short w, short h);
 		void update();
-		void draw();
 	
 	private:
-		gfxSprite *spr;
-		short ix, iy;
-		short frame, counter;
-		short iw, ih;
-		short rate;
-		short iAnimationWidth;
-
-		short countloops;
-		short loops;
-
-		short iOffsetX, iOffsetY;
-
+		short iCountLoops;
+		short iLoops;
 };
 
 /*
@@ -172,7 +162,7 @@ class EC_Award : public EC_LoopingAnimation
 {
 	public:
 		EC_Award(gfxSprite *nspr, short ix, short iy, short destx, short desty, short iframes, short irate);
-		~EC_Award(){;};
+		~EC_Award() {}
 		void update();
 
 	private:
