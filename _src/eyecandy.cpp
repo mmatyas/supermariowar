@@ -238,11 +238,11 @@ void EC_Leaf::NextLeaf()
 	if(iRand < 10)
 		iAnimationY = 0;
 	else if(iRand < 14)
-		iAnimationY = 1;
+		iAnimationY = 16;
 	else if(iRand < 18)
-		iAnimationY = 2;
+		iAnimationY = 32;
 	else
-		iAnimationY = 3;
+		iAnimationY = 48;
 
 	velx = (float)(rand() % 9) / 4.0f;
 	vely = (float)(rand() % 9) / 4.0f + 1.0f;
