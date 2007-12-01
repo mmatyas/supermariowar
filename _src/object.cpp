@@ -319,7 +319,7 @@ B_PowerupBlock::B_PowerupBlock(gfxSprite *nspr1, short x, short y, short iNumSpr
 
 	oldhidden = hidden = fHidden;
 
-	if(settings[0] == -1 || game_values.overridepowerupsettings == 1) //Game Only
+	if(piSettings[0] == -1 || game_values.overridepowerupsettings == 1) //Game Only
 	{
 		for(short iSetting = 0; iSetting < NUM_POWERUPS; iSetting++)
 			settings[iSetting] = game_values.powerupweights[iSetting];
@@ -344,11 +344,9 @@ B_PowerupBlock::B_PowerupBlock(gfxSprite *nspr1, short x, short y, short iNumSpr
 		for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
 			dGameWeightCount += game_values.powerupweights[iPowerup];
 
-		float dTotal = dMapWeightCount + dGameWeightCount;
 		for(short iSetting = 0; iSetting < NUM_POWERUPS; iSetting++)
 		{
-			float dWeight = ((float)piSettings[iSetting] / dMapWeightCount + (float)game_values.powerupweights[iSetting] / dGameWeightCount) / 2.0f;
-			dWeight *= dTotal;
+			float dWeight = ((float)piSettings[iSetting] / dMapWeightCount + (float)game_values.powerupweights[iSetting] / dGameWeightCount) * 100.0f;
 
 			//Cap lowest value at 1
 			if(dWeight < 1.0f && dWeight > 0.0f)

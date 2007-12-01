@@ -9,8 +9,36 @@ extern SDL_Rect rectSuperStompRightSrc[8];
 extern SDL_Rect rectSuperStompLeftDst[8];
 extern SDL_Rect rectSuperStompRightDst[8];
 
+EC_StillImage::EC_StillImage(gfxSprite * nspr, short dstx, short dsty, short srcx, short srcy, short w, short h)
+{
+	spr = nspr;
+
+	iSrcX = srcx;
+	iSrcY = srcy;
+
+	ix = dstx;
+	iy = dsty;
+
+	iw = w;
+	ih = h;
+
+	if(iw == 0)
+		iw = (short)spr->getWidth();
+
+	if(ih == 0)
+		ih = (short)spr->getHeight();
+
+}
+
+void EC_StillImage::draw()
+{
+	if(!dead)
+		spr->draw(ix, iy, iSrcX, iSrcY, iw, ih);	
+}
+
+
 //------------------------------------------------------------------------------
-// class cloud
+// base class animated
 //------------------------------------------------------------------------------
 EC_Animated::EC_Animated(gfxSprite * nspr, short dstx, short dsty, short srcx, short srcy, short w, short h, short speed, short frames)
 {
@@ -63,32 +91,59 @@ void EC_Animated::draw()
 }
 
 //------------------------------------------------------------------------------
+// base class OscillatingAnimation
+//------------------------------------------------------------------------------
+
+EC_OscillatingAnimation::EC_OscillatingAnimation(gfxSprite * nspr, short dstx, short dsty, short srcx, short srcy, short w, short h, short speed, short frames) :
+	EC_Animated(nspr, dstx, dsty, srcx, srcy, w, h, speed, frames)
+{
+	fForward = true;
+}
+
+void EC_OscillatingAnimation::animate()
+{
+	if(iAnimationSpeed > 0 && ++iAnimationTimer >= iAnimationSpeed)
+	{
+		iAnimationTimer = 0;
+
+		if(fForward)
+		{
+			iAnimationFrame += iAnimationW;
+
+			if(iAnimationFrame >= iAnimationFrames - iAnimationW)
+				fForward = false;
+		}
+		else
+		{
+			iAnimationFrame -= iAnimationW;
+
+			if(iAnimationFrame <= 0)
+				fForward = true;
+		}
+	}
+}
+
+//------------------------------------------------------------------------------
 // class cloud
 //------------------------------------------------------------------------------
-EC_Cloud::EC_Cloud(gfxSprite *nspr, float nx, float ny, float nvelx)
+EC_Cloud::EC_Cloud(gfxSprite *nspr, float nx, float ny, float nvelx) :
+	EC_StillImage(nspr, (short)nx, (short)ny, 0, 0, 0, 0)
 {
-	spr = nspr;
-	x = nx;
-	y = ny;
+	dx = nx;
+	dy = ny;
 	velx = nvelx;
-	w = (short)spr->getWidth();
 }
-
-
-void EC_Cloud::draw()
-{
-	spr->draw((short)x, (short)y);
-}
-
 
 void EC_Cloud::update()
 {
-	x += velx;
+	dx += velx;
 	
-	if( x > 639.0f)
-		x -= 639.0f;
-	else if( x < 0.0f)
-		x += 640.0f;
+	if(dx > 640.0f)
+		dx -= 640.0f;
+	else if(dx < 0.0f)
+		dx += 640.0f;
+
+	ix = (short)dx;	
 }
 
 
@@ -122,70 +177,159 @@ void EC_Ghost::update()
 // class leaf
 //------------------------------------------------------------------------------
 EC_Leaf::EC_Leaf(gfxSprite *nspr, float nx, float ny) :
-	EC_Animated(nspr, (short)nx, (short)ny, 0, 0, 16, 16, 8, 2)
+	EC_OscillatingAnimation(nspr, (short)nx, (short)ny, 0, 0, 16, 16, 16, 4)
 {
 	dx = nx;
 	dy = ny;
 
-	velx = 2.0f;
-	vely = 2.0f;
+	//Create random drag for each leaf to give the effect some variance
+	NextLeaf();
 }
 
 void EC_Leaf::update()
 {
 	animate();
 
-	dx += velx;
-	dy += vely;
+	dx += velx + game_values.gamewindx;
+	dy += vely + game_values.gamewindy;
 
 	if(dx >= 640.0f)
 		dx -= 640.0f;
 	else if(dx < 0.0f)
 		dx += 640.0f;
 
+	if(vely > 0.0f && iy >= 480)
+	{
+		dy = -16.0f;
+		dx = (float)(rand() % 640);
+
+		NextLeaf();
+	}
+	else if(vely < 0.0f && iy < -16)
+	{
+		dy = 480.0f;
+		dx = (float)(rand() % 640);
+
+		NextLeaf();
+	}
+
+	if(velx > 0.0f && ix >= 640)
+	{
+		dx = -16.0f;
+		dy = (float)(rand() % 480);
+
+		NextLeaf();
+	}
+	else if(velx < 0.0f && ix < -16)
+	{
+		dx = 640.0f;
+		dy = (float)(rand() % 480);
+
+		NextLeaf();
+	}
+
 	ix = (short)dx;
 	iy = (short)dy;
-
-	if(iy >= 480)
-		dy = -20.0f;
 }
+
+void EC_Leaf::NextLeaf()
+{
+	short iRand = rand() % 20;
+	if(iRand < 10)
+		iAnimationY = 0;
+	else if(iRand < 14)
+		iAnimationY = 1;
+	else if(iRand < 18)
+		iAnimationY = 2;
+	else
+		iAnimationY = 3;
+
+	velx = (float)(rand() % 9) / 4.0f;
+	vely = (float)(rand() % 9) / 4.0f + 1.0f;
+
+	fForward = (rand() % 2) == 0;
+	iAnimationFrame = ((rand() % 3) + (fForward ? 0 : 1)) * iAnimationW;
+	iAnimationTimer = rand() % 16;
+}
+
+//------------------------------------------------------------------------------
+// class snow
+//------------------------------------------------------------------------------
+EC_Snow::EC_Snow(gfxSprite *nspr, float nx, float ny) :
+	EC_StillImage(nspr, (short)nx, (short)ny, (rand() % 2) << 4, 0, 16, 16)
+{
+	dx = nx;
+	dy = ny;
+
+	velx = (float)(rand() % 9) / 4.0f;
+	vely = (float)(rand() % 9) / 4.0f + 1.0f;
+}
+
+void EC_Snow::update()
+{
+	dx += velx + game_values.gamewindx;
+	dy += vely + game_values.gamewindy;
+
+	if(dx >= 640.0f)
+		dx -= 640.0f;
+	else if(dx < 0.0f)
+		dx += 640.0f;
+
+	if(vely > 0.0f && iy >= 480)
+	{
+		dy = -16.0f;
+		dx = (float)(rand() % 640);
+	}
+	else if(vely < 0.0f && iy < -16)
+	{
+		dy = 480.0f;
+		dx = (float)(rand() % 640);
+	}
+
+	if(velx > 0.0f && ix >= 640)
+	{
+		dx = -16.0f;
+		dy = (float)(rand() % 480);
+	}
+	else if(velx < 0.0f && ix < -16)
+	{
+		dx = 640.0f;
+		dy = (float)(rand() % 480);
+	}
+
+	ix = (short)dx;
+	iy = (short)dy;
+}
+
 
 //------------------------------------------------------------------------------
 // class corpse
 //------------------------------------------------------------------------------
 EC_Corpse::EC_Corpse(gfxSprite *nspr, float nx, float ny, short iSrcOffsetX) :
-	CEyecandy()
+	EC_StillImage(nspr, (short)nx, (short)ny, 0, 0, 0, 0)
 {
-	spr = nspr;
-	x = nx;
-	y = ny;
-	vely = 1.0f;
+	dx = nx;
+	dy = ny;
+	vely = GRAVITATION;
 	timeleft = CORPSESTAY;
 	offsetx = iSrcOffsetX;
 
-	if(x + PWOFFSET < 0.0f)
-		tx = (short) ( (x + 640.0f + PWOFFSET) / TILESIZE );
+	if(ix + PWOFFSET < 0)
+		tx = (ix + 640 + PWOFFSET) / TILESIZE;
 	else
-		tx = (short) ( (x + PWOFFSET) / TILESIZE );
+		tx = (ix + PWOFFSET) / TILESIZE;
 
-	if(x + PWOFFSET + PW >= 640.0f)
-		tx2 = (short) ( (x + PWOFFSET + PW - 640.0f) / TILESIZE );
+	if(ix + PWOFFSET + PW >= 640)
+		tx2 = (ix + PWOFFSET + PW - 640) / TILESIZE;
 	else
-		tx2 = (short) ( (x + PWOFFSET + PW) / TILESIZE );
+		tx2 = (ix + PWOFFSET + PW) / TILESIZE;
 }
-
-
-void EC_Corpse::draw()
-{
-	spr->draw((short)x, (short)y, offsetx, 0, 32, 32);
-}
-
 
 void EC_Corpse::update()
 {
 	if(vely != 0.0f)
 	{
-		short nexty = (short)(y + 32.0f + vely);
+		short nexty = (short)(dy + 32.0f + vely);
 
 		if(nexty >= 480)
 		{
@@ -199,10 +343,12 @@ void EC_Corpse::update()
 			
 			if(g_map.map(tx, ty) == tile_solid_on_top || g_map.map(tx2, ty) == tile_solid_on_top)
 			{	//on ground on tile solid_on_top
-				if((y + 32.0f - vely) / TILESIZE < ty)
+				if((dy + 32.0f - vely) / TILESIZE < ty)
 				{	//only if we were above the tile in the previous frame
-					y		= (float) (ty * TILESIZE - 32);
-					vely	= 0.0f;
+					dy = (float) (ty * TILESIZE - 32);
+					vely = 0.0f;
+					iy = (short)dy;
+
 					return;
 				}
 			}
@@ -213,15 +359,17 @@ void EC_Corpse::update()
 			if((g_map.map(tx, ty) & 0x05) > 0 || (g_map.map(tx2, ty) & 0x05) > 0 ||
 				(leftblock && !leftblock->isTransparent()) || (rightblock && !rightblock->isTransparent()))
 			{	//on ground
-				y		= (float) (ty * TILESIZE - 32);
-				vely	= 0.0f;
+				dy = (float) (ty * TILESIZE - 32);
+				vely = 0.0f;
+				iy = (short)dy;
+
 				return;
 			}
 		}
 		
 		//falling (in air)
-		y		+= vely;
-		vely	= CapFallingVelocity(GRAVITATION + vely);
+		dy += vely;
+		vely = CapFallingVelocity(GRAVITATION + vely);
 	}
 	else
 	{
@@ -230,6 +378,8 @@ void EC_Corpse::update()
 		else
 			dead = true;
 	}
+
+	iy = (short)dy;
 }
 
 

@@ -22,6 +22,23 @@ class CEyecandy
 	friend class CEyecandyContainer;
 };
 
+class EC_StillImage : public CEyecandy
+{
+	public:
+		EC_StillImage(gfxSprite * nspr, short dstx, short dsty, short srcx, short srcy, short w, short h);
+		virtual ~EC_StillImage() {}
+
+		virtual void update() {}
+		virtual void draw();
+
+	protected:
+		gfxSprite * spr;
+
+		short iSrcX, iSrcY;
+		short ix, iy;
+		short iw, ih;
+};
+
 //animated eyecandy base class
 class EC_Animated : public CEyecandy
 {
@@ -29,7 +46,7 @@ class EC_Animated : public CEyecandy
 		EC_Animated(gfxSprite * nspr, short dstx, short dsty, short srcx, short srcy, short w, short h, short speed, short frames);
 		virtual ~EC_Animated() {}
 		
-		void animate();
+		virtual void animate();
 
 		virtual void update();
 		virtual void draw();
@@ -48,18 +65,28 @@ class EC_Animated : public CEyecandy
 		short ix, iy;
 };
 
+class EC_OscillatingAnimation : public EC_Animated
+{
+	public:
+		EC_OscillatingAnimation(gfxSprite * nspr, short dstx, short dsty, short srcx, short srcy, short w, short h, short speed, short frames);
+		virtual ~EC_OscillatingAnimation() {}
+		
+		virtual void animate();
+
+	protected:
+		bool fForward;
+};
+
 //actual eyecandy implementations
-class EC_Corpse : public CEyecandy
+class EC_Corpse : public EC_StillImage
 {
 	public:
 		EC_Corpse(gfxSprite *nspr, float nx, float ny, short iSrcOffsetX);
 		~EC_Corpse() {}
-		void draw();
 		void update();
 
 	private:
-		gfxSprite *spr;
-		float x, y;
+		float dx, dy;
 		short tx, tx2;
 		float vely;
 		short timeleft;
@@ -67,19 +94,16 @@ class EC_Corpse : public CEyecandy
 };
 
 
-class EC_Cloud : public CEyecandy
+class EC_Cloud : public EC_StillImage
 {
 	public:
 		EC_Cloud(gfxSprite *nspr, float nx, float ny, float nvelx);
 		~EC_Cloud() {}
-		void draw();
 		void update();
 
 	private:
-		gfxSprite *spr;
-		float x, y;
+		float dx, dy;
 		float velx;
-		short w;
 };
 
 class EC_Ghost : public EC_Animated
@@ -94,11 +118,26 @@ class EC_Ghost : public EC_Animated
 		float velx;
 };
 
-class EC_Leaf : public EC_Animated
+class EC_Leaf : public EC_OscillatingAnimation
 {
 	public:
 		EC_Leaf(gfxSprite *nspr, float nx, float ny);
 		~EC_Leaf() {}
+
+		void update();
+
+	private:
+		void NextLeaf();
+
+		float dx, dy;
+		float velx, vely;
+};
+
+class EC_Snow : public EC_StillImage
+{
+	public:
+		EC_Snow(gfxSprite *nspr, float nx, float ny);
+		~EC_Snow() {}
 
 		void update();
 

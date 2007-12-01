@@ -160,6 +160,7 @@ bool LoadGameGraphics()
 	gfx_loadimage(&spr_ghosts[2], convertPath("gfx/packs/eyecandy/ghost3.png", graphicspack), 128, true);
 
 	gfx_loadimage(&spr_leaves, convertPath("gfx/packs/eyecandy/leaves.png", graphicspack), true);
+	gfx_loadimage(&spr_snow, convertPath("gfx/packs/eyecandy/snow.png", graphicspack), true);
 
 	gfx_loadimage(&spr_noteblock, convertPath("gfx/packs/blocks/noteblock.png", graphicspack), false);
 	gfx_loadimage(&spr_breakableblock, convertPath("gfx/packs/blocks/breakableblock.png", graphicspack), false);

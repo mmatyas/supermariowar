@@ -184,8 +184,7 @@ sfxSound * g_PlayingSoundChannels[NUM_SOUND_CHANNELS];
 short			g_iCurrentDrawIndex = 0;
 ///////
 
-SDL_Surface * s_eyecandy;
-SDL_Surface * s_eyecandyindicator;
+gfxSprite spr_eyecandy;
 SDL_Surface * s_platform;
 
 int save_as();
@@ -300,8 +299,7 @@ int main(int argc, char *argv[])
 	spr_backgroundlevel.init(convertPath("gfx/leveleditor/leveleditor_background_levels.png"), 255, 0, 255);
 	spr_tilesetlevel.init(convertPath("gfx/leveleditor/leveleditor_tileset_levels.png"), 255, 0, 255);
 	
-	s_eyecandy = IMG_Load(convertPathC("gfx/leveleditor/leveleditor_eyecandy.png"));
-	s_eyecandyindicator = IMG_Load(convertPathC("gfx/leveleditor/leveleditor_eyecandyindicator.png"));
+	spr_eyecandy.init(convertPathC("gfx/leveleditor/leveleditor_eyecandy.png"), 255, 0, 255);
 
 	s_platform = IMG_Load(convertPathC("gfx/leveleditor/leveleditor_platform.png"));
 
@@ -341,16 +339,6 @@ int main(int argc, char *argv[])
 	spr_powerups.init(convertPath("gfx/packs/Classic/powerups/large.png"), 255, 0, 255);
 	spr_powerupselector.init(convertPath("gfx/leveleditor/leveleditor_powerup_selector.png"), 255, 0, 255, 128);
 	spr_hidden_marker.init(convertPath("gfx/leveleditor/leveleditor_hidden_marker.png"), 255, 0, 255);
-
-	if( SDL_SetColorKey(s_eyecandy, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(s_eyecandy->format, 255, 0, 255)) < 0)
-	{
-		printf("\n ERROR: Couldn't set ColorKey + RLE: %s\n", SDL_GetError());
-	}
-
-	if( SDL_SetColorKey(s_eyecandyindicator, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(s_eyecandyindicator->format, 255, 0, 255)) < 0)
-	{
-		printf("\n ERROR: Couldn't set ColorKey + RLE: %s\n", SDL_GetError());
-	}
 
 	if( SDL_SetColorKey(s_platform, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(s_platform->format, 255, 0, 255)) < 0)
 	{
@@ -1675,22 +1663,11 @@ int editor_warp()
 	return EDITOR_QUIT;
 }
 
+char * szEyecandyNames[4] = {"Clouds", "Ghosts", "Leaves", "Snow"};
 int editor_eyecandy()
 {
 	bool done = false;
 	
-	SDL_Rect r;
-	r.x = 224;
-	r.y = 128;
-	r.w = 192;
-	r.h = 224;
-
-	SDL_Rect ri;
-	ri.x = r.x + 20;
-	ri.y = r.y + 50 + g_map.eyecandyID * 55;
-	ri.w = 152;
-	ri.h = 24;
-
 	while (!done)
 	{
 		int framestart = SDL_GetTicks();
@@ -1701,31 +1678,39 @@ int editor_eyecandy()
 			switch(event.type)
 			{
 				case SDL_QUIT:
+				{
 					done = true;
-				break;
+					break;
+				}
 
 				case SDL_KEYDOWN:
-						return EDITOR_EDIT;
-				break;
+				{
+					if(event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_e)
+					{
+						return EDITOR_EDIT;	
+					}
+				}
 
 				case SDL_MOUSEBUTTONDOWN:
+				{
 					if(event.button.button == SDL_BUTTON_LEFT)
 					{
-						for(int k = 0; k < 3; k++)
+						for(int k = 0; k < 4; k++)
 						{
-							if(event.button.x >= r.x && event.button.x < r.x + r.w &&
-								event.button.y >= r.y + 30 + k * 60 && event.button.y < r.y + 30 + (k + 1) * 60)
+							if(event.button.x >= 275 && event.button.x < 365 &&
+								event.button.y >= k * 80 + 100 && event.button.y < k * 80 + 152)
 							{
-								g_map.eyecandyID = k;
-								ri.y = r.y + 50 + g_map.eyecandyID * 55;
-								
-								//The user must release the mouse button before trying to add a tile
-								ignoreclick = true;
-								return EDITOR_EDIT;
+								short mask = 1 << k;
+								if(g_map.eyecandyID & mask)
+									g_map.eyecandyID &= ~mask;
+								else
+									g_map.eyecandyID |= mask;
 							}
 						}
 					}
-				break;
+				
+					break;
+				}
 
 				default:
 					break;
@@ -1736,8 +1721,27 @@ int editor_eyecandy()
 		drawmap(false, TILESIZE);
 		menu_shade.draw(0, 0);
 
-		SDL_BlitSurface(s_eyecandy, NULL, screen, &r);
-		SDL_BlitSurface(s_eyecandyindicator, NULL, screen, &ri);
+		int iMouseX, iMouseY;
+		SDL_GetMouseState(&iMouseX, &iMouseY);
+
+		for(int k = 0; k < 4; k++)
+		{
+			short ix = 275;
+			short iy = k * 80 + 100;
+
+			if(iMouseX >= ix && iMouseX < ix + 90 && iMouseY >= iy && iMouseY < iy + 52)
+				spr_powerupselector.draw(ix, iy, 0, 0, 90, 52);
+			else
+				spr_powerupselector.draw(ix, iy, 0, 52, 90, 52);
+
+			spr_eyecandy.draw(ix + 10, iy + 10, k << 5, 0, 32, 32);
+
+			short mask = 1 << k;
+			if(g_map.eyecandyID & mask)
+				spr_hidden_marker.draw(ix + 57, iy + 16);
+
+			menu_font_small.drawCentered(320, iy - menu_font_small.getHeight(), szEyecandyNames[k]);
+		}
 
 		menu_font_small.draw(0,480-menu_font_small.getHeight(), "eyecandy mode: [e] edit mode, [LMB] choose eyecandy");
 		menu_font_small.drawRightJustified(640, 0, maplist.currentFilename());
@@ -1869,6 +1873,21 @@ int editor_properties(short iBlockCol, short iBlockRow)
 						}
 					}
 
+					if(iBlockType == 1 || iBlockType == 15)
+					{
+						if(event.button.x >= 390 && event.button.x < 490 && event.button.y >= iHiddenCheckboxY && event.button.y < iHiddenCheckboxY + 52)
+						{
+							if(event.button.button == SDL_BUTTON_LEFT)
+							{
+								if(g_map.objectdata[iBlockCol][iBlockRow].iSettings[0] >= 0)
+									g_map.objectdata[iBlockCol][iBlockRow].iSettings[0] = -1;
+								else
+									g_map.objectdata[iBlockCol][iBlockRow].iSettings[0] = g_iDefaultPowerupWeights[0];
+							}
+						}
+					}
+
+
 					break;
 				}
 
@@ -1888,12 +1907,14 @@ int editor_properties(short iBlockCol, short iBlockRow)
 
 		if(iBlockType == 1 || iBlockType == 15)
 		{
+			bool fUseGame = g_map.objectdata[iBlockCol][iBlockRow].iSettings[0] == -1;
+
 			for(short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++)
 			{
 				short ix = (iSetting % 6) * 100 + 35;
 				short iy = (iSetting / 6) * 62 + 65;
 
-				if(iMouseX >= ix - 10 && iMouseX < ix + 80 && iMouseY >= iy - 10 && iMouseY < iy + 42)
+				if(iMouseX >= ix - 10 && iMouseX < ix + 80 && iMouseY >= iy - 10 && iMouseY < iy + 42 && !fUseGame)
 					spr_powerupselector.draw(ix - 10, iy - 10, 0, 0, 90, 52);
 				else
 					spr_powerupselector.draw(ix - 10, iy - 10, 0, 52, 90, 52);
@@ -1901,7 +1922,11 @@ int editor_properties(short iBlockCol, short iBlockRow)
 				spr_powerups.draw(ix, iy, iSetting << 5, 0, 32, 32);
 
 				char szNum[8];
-				sprintf(szNum, "%d", g_map.objectdata[iBlockCol][iBlockRow].iSettings[iSetting]);
+				if(fUseGame)
+					sprintf(szNum, "X");
+				else
+					sprintf(szNum, "%d", g_map.objectdata[iBlockCol][iBlockRow].iSettings[iSetting]);
+
 				menu_font_large.drawCentered(ix + 55, iy + 5, szNum);
 			}
 
@@ -1925,6 +1950,21 @@ int editor_properties(short iBlockCol, short iBlockRow)
 
 		if(g_map.objectdata[iBlockCol][iBlockRow].fHidden)
 			spr_hidden_marker.draw(310, iHiddenCheckboxY + 27);
+
+		//Display "Use Game" option
+		if(iBlockType == 1 || iBlockType == 15)
+		{
+			if(iMouseX >= 390 && iMouseX < 490 && iMouseY >= iHiddenCheckboxY && iMouseY < iHiddenCheckboxY + 52)
+				spr_powerupselector.draw(390, iHiddenCheckboxY, 90, 0, 100, 52);
+			else
+				spr_powerupselector.draw(390, iHiddenCheckboxY, 90, 52, 100, 52);
+
+			menu_font_large.drawCentered(440, iHiddenCheckboxY + 3, "Use Game");
+
+			if(g_map.objectdata[iBlockCol][iBlockRow].iSettings[0] == -1)
+				spr_hidden_marker.draw(430, iHiddenCheckboxY + 27);
+		}
+
 
 		menu_font_small.drawRightJustified(640, 0, maplist.currentFilename());
 

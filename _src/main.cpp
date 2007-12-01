@@ -29,7 +29,7 @@
 +----------------------------------------------------------*/
 
 //TODO:
-//1) Need to deal with hidden powerup, bounce, view, and note blocks
+//1) Need to add "Default" option to powerup/view blocks to default to game's powerup settings
 
 #ifdef _XBOX
 	#include <xtl.h>
@@ -69,6 +69,7 @@ gfxSprite		** spr_bobomb[4];
 gfxSprite		spr_clouds[2];
 gfxSprite		spr_ghosts[3];
 gfxSprite		spr_leaves;
+gfxSprite		spr_snow;
 gfxSprite		spr_background;
 gfxSprite		spr_backmap[2];
 gfxSprite		spr_frontmap[2];
@@ -1262,6 +1263,8 @@ void RunGame()
 	game_values.noexit = false;
 	game_values.noexittimer = 0;
 	game_values.forceexittimer = 0;
+	game_values.gamewindx = 0.0f;
+	game_values.gamewindy = 0.0f;
 
 	//Initialize game mode
 	game_values.gamemode->init();
@@ -1296,7 +1299,7 @@ void RunGame()
 		score[i]->order = -1;
 	}
 
-	if(g_map.eyecandyID == 1)
+	if(g_map.eyecandyID & 0x1)
 	{
 		for(i = 0; i < 4; i++)
 		{
@@ -1313,7 +1316,8 @@ void RunGame()
 			eyecandyfront.add(new EC_Cloud(&spr_clouds[c], (float)(rand()%640), (float)(rand()%100), velx));
 		}
 	}
-	else if(g_map.eyecandyID == 2)
+	
+	if(g_map.eyecandyID & 0x2)
 	{
 		for(i = 0; i < 12; i++)
 		{
@@ -1327,6 +1331,19 @@ void RunGame()
 		}
 	}
 	
+	if(g_map.eyecandyID & 0x4)
+	//if(true)
+	{
+		for(i = 0; i < 20; i++)
+			eyecandyfront.add(new EC_Leaf(&spr_leaves, (float)(rand() % 640), (float)(rand() % 480)));
+	}
+
+	if(g_map.eyecandyID & 0x8)
+	{
+		for(i = 0; i < 20; i++)
+			eyecandyfront.add(new EC_Snow(&spr_snow, (float)(rand() % 640), (float)(rand() % 480)));
+	}
+	
 	short iScoreTextOffset[4];
 	for(short iTeam = 0; iTeam < score_cnt; iTeam++)
 	{
@@ -1334,19 +1351,39 @@ void RunGame()
 	}
 
 
+	short iWindTimer = 0;
+	float dNextWind = (float)((rand() % 41) - 20) / 4.0f;
+	game_values.gamewindx = (float)((rand() % 41) - 20) / 4.0f;
 
 	while (true)
 	{
 		framestart = SDL_GetTicks();
 
-		/*
-		static leafcounter = 0;
-
-		if(++leafcounter > 30)
+		if(iWindTimer == 0)
 		{
-			leafcounter = 0;
-			eyecandyfront.add(new EC_Leaf(&spr_leaves, (float)(rand() % 640), -20.0f));
-		}*/
+			//Then trigger next wind event
+			if(game_values.gamewindx < dNextWind)
+			{
+				game_values.gamewindx += 0.02f;
+
+				if(game_values.gamewindx >= dNextWind)
+					iWindTimer = (rand() % 60) + 30;
+			}
+			if(game_values.gamewindx > dNextWind)
+			{
+				game_values.gamewindx -= 0.02f;
+
+				if(game_values.gamewindx <= dNextWind)
+					iWindTimer = (rand() % 60) + 30;
+			}
+		}
+		else
+		{
+			if(--iWindTimer <= 0)
+			{
+				dNextWind = (float)((rand() % 41) - 20) / 4.0f;
+			}
+		}
 
 /*
 #ifdef _XBOX
