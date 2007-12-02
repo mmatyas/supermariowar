@@ -732,6 +732,9 @@ void CPlayer::move()
 		eyecandyfront.add(new EC_SuperStompExplosion(&spr_superstomp, ix + HALFPW, iy + PH, 4));
 		ifsoundonplay(sfx_bobombsound);
 		fSuperStomp = false;
+
+		objectsplayer.add(new OMO_AttackZone(globalID, teamID, ix - 32, iy, 32, PH, 8, kill_style_kuriboshoe, false));
+		objectsplayer.add(new OMO_AttackZone(globalID, teamID, ix + PW, iy, 32, PH, 8, kill_style_kuriboshoe, false));
 	}
 
 	if(hammertimer > 0)
@@ -2970,7 +2973,7 @@ void CPlayer::SpinCape()
 
 	SpinPlayer();
 
-	objectsplayer.add(new OMO_SpinAttack(globalID, teamID, 0, IsPlayerFacingRight(), 24));
+	objectsplayer.add(new OMO_SpinAttack(globalID, teamID,  kill_style_feather, IsPlayerFacingRight(), 24));
 }
 
 void CPlayer::DrawCape()
@@ -3067,7 +3070,7 @@ void CPlayer::SpinTail()
 
 	SpinPlayer();
 
-	objectsplayer.add(new OMO_SpinAttack(globalID, teamID, 1, IsPlayerFacingRight(), 13));
+	objectsplayer.add(new OMO_SpinAttack(globalID, teamID, kill_style_leaf, IsPlayerFacingRight(), 13));
 }
 
 void CPlayer::DrawTail()

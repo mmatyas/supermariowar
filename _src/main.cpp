@@ -2159,7 +2159,7 @@ void RunGame()
 										{
 											MovingObjectType type = ((IO_MovingObject*)objectsplayer.list[j])->getMovingObjectType();
 
-											if((type == movingobject_shell || type == movingobject_throwblock || type == movingobject_spinattack) && !objectsplayer.list[j]->GetDead())
+											if((type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone) && !objectsplayer.list[j]->GetDead())
 											{
 												if(coldec_obj2obj(*(objectcollisionitems.list[i]), *(objectsplayer.list[j])))
 												{
@@ -2255,7 +2255,7 @@ void RunGame()
 											{
 												MovingObjectType type = ((IO_MovingObject*)objectsplayer.list[j])->getMovingObjectType();
 
-												if((type == movingobject_shell || type == movingobject_throwblock || type == movingobject_spinattack) && !objectsplayer.list[j]->GetDead())
+												if((type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone) && !objectsplayer.list[j]->GetDead())
 												{
 													if(coldec_obj2obj(*(objectsfront.list[i]), *(objectsplayer.list[j])))
 													{
@@ -2279,7 +2279,7 @@ void RunGame()
 								{
 									IO_MovingObject * object = (IO_MovingObject*)objectsplayer.list[i];
 
-									if(object->getMovingObjectType() == movingobject_shell || object->getMovingObjectType() == movingobject_throwblock || object->getMovingObjectType() == movingobject_spinattack)
+									if(object->getMovingObjectType() == movingobject_shell || object->getMovingObjectType() == movingobject_throwblock || object->getMovingObjectType() == movingobject_attackzone)
 									{
 										//shell/throwblock to goomba and shell/throwblock to fireball
 										for(j = 0; j < objectcollisionitems.list_end; j++)
@@ -2311,7 +2311,7 @@ void RunGame()
 											{
 												MovingObjectType type = ((IO_MovingObject*)objectsplayer.list[j])->getMovingObjectType();
 
-												if((type == movingobject_shell || type == movingobject_throwblock || type == movingobject_spinattack) && !objectsplayer.list[j]->GetDead())
+												if((type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone) && !objectsplayer.list[j]->GetDead())
 												{
 													if(coldec_obj2obj(*(objectsplayer.list[i]), *(objectsplayer.list[j])))
 													{

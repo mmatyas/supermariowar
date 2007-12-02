@@ -471,6 +471,7 @@ class CPlayer
 		friend class OMO_RaceGoal;
 		friend class OMO_Explosion;
 		friend class OMO_SpinAttack;
+		friend class OMO_AttackZone;
 
 		friend class MO_CarriedObject;
 

@@ -235,9 +235,9 @@ void EC_Leaf::update()
 void EC_Leaf::NextLeaf()
 {
 	short iRand = rand() % 20;
-	if(iRand < 10)
+	if(iRand < 12)
 		iAnimationY = 0;
-	else if(iRand < 14)
+	else if(iRand < 15)
 		iAnimationY = 16;
 	else if(iRand < 18)
 		iAnimationY = 32;
@@ -306,7 +306,7 @@ void EC_Snow::update()
 // class corpse
 //------------------------------------------------------------------------------
 EC_Corpse::EC_Corpse(gfxSprite *nspr, float nx, float ny, short iSrcOffsetX) :
-	EC_StillImage(nspr, (short)nx, (short)ny, 0, 0, 0, 0)
+	EC_StillImage(nspr, (short)nx, (short)ny, iSrcOffsetX, 0, 32, 32)
 {
 	dx = nx;
 	dy = ny;
