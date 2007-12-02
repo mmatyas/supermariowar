@@ -1879,24 +1879,16 @@ void RunGame()
 						{
 							if(game_values.screenshakekillinair == list_players[k]->inair)
 							{
+								PlayerKilledPlayer(game_values.screenshakeplayerid, *list_players[k], death_style_jump, kill_style_pow);
+
 								CPlayer * killer = GetPlayerFromGlobalID(game_values.screenshakeplayerid);
 
 								if(killer)
 								{
-									PlayerKilledPlayer(*(killer), *list_players[k], death_style_jump, kill_style_pow);
 									game_values.screenshakekillscount++;
 									
 									if(killer->inair)
 										killer->killsinrowinair--;  //Don't want to give both shake and in air award
-								}
-								else
-								{
-									list_players[k]->DeathAwards();
-
-									if(!game_values.gamemode->playerkilledself(*list_players[k]))
-										list_players[k]->die(0, false);
-
-									ifsoundonplay(sfx_deathsound);
 								}
 							}
 						}
@@ -1943,7 +1935,7 @@ void RunGame()
 								{
 									CO_Shell * shell = (CO_Shell*)object;
 									if(!shell->owner || shell->owner->inair == game_values.screenshakekillinair)
-										shell->Die();
+										shell->Flip();
 								}
 								else if(object->getMovingObjectType() == movingobject_throwblock)
 								{

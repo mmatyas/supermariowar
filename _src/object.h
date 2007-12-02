@@ -1355,7 +1355,11 @@ class CO_Shell : public MO_CarriedObject
 
 		bool IsThreat() {return state == 1 || state == 3;}
 
+		void Flip();
+
 	private:
+		void Stop();
+
 		short iShellType;
 
 		short playerID;
@@ -1373,6 +1377,10 @@ class CO_Shell : public MO_CarriedObject
 		short iColorOffsetY;
 		short iBounceCounter;
 		short iKillCounter;
+
+		bool fFlipped;
+		short iFlippedOffset;
+		short iFlippedTimer;
 
 	friend class CPlayer;
 	friend class OMO_Explosion;

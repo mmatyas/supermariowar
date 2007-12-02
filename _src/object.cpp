@@ -7695,6 +7695,10 @@ CO_Shell::CO_Shell(short type, short x, short y, bool dieOnMovingPlayerCollision
 
 	iKillCounter = 0;
 	iNoOwnerKillTime = 0;
+
+	fFlipped = false;
+	iFlippedOffset = 0;
+	iFlippedTimer = 0;
 }
 
 bool CO_Shell::collide(CPlayer * player)
@@ -7751,7 +7755,7 @@ bool CO_Shell::HitTop(CPlayer * player)
 		return false;
 	}
 
-	if(fKillBouncePlayer)
+	if(fKillBouncePlayer && !fFlipped)
 	{
 		KillPlayer(player);
 	}
@@ -7769,17 +7773,12 @@ bool CO_Shell::HitTop(CPlayer * player)
 	}
 	else if(state == 1 && iIgnoreBounceTimer == 0)  //Moving
 	{
-		owner = NULL;
-		velx = 0.0f;
-		state = 2;
-		fSmoking = false;
-		ifsoundonplay(sfx_kicksound);
+		Stop();
 
 		player->yi(iy - PH - 1);
 		player->bouncejump();
 		player->collision_detection_checktop();
 		player->platform = NULL;
-		iKillCounter = 0;
 	}
 	else if(state == 3) //Holding
 	{
@@ -7915,7 +7914,7 @@ void CO_Shell::collide(IO_MovingObject * object)
 
 		MovingObjectType type = object->getMovingObjectType();
 
-		if(type == movingobject_fireball || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_sledgehammer || type == movingobject_boomerang || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone)
+		if(type == movingobject_fireball || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_sledgehammer || type == movingobject_boomerang || type == movingobject_shell || type == movingobject_throwblock)
 		{
 			if(type == movingobject_shell)
 			{
@@ -7956,6 +7955,9 @@ void CO_Shell::update()
 	if(iNoOwnerKillTime > 0)
 		iNoOwnerKillTime--;
 
+	if(iFlippedTimer > 0)
+		iFlippedTimer--;
+
 	if(state == 1)
 	{
 		if(game_values.shellttl > 0 && ++iDeathTime >= game_values.shellttl)
@@ -7974,7 +7976,9 @@ void CO_Shell::update()
 		}
 	}
 	else
+	{
 		iDeathTime = 0;
+	}
 	
 	//Have the powerup grow out of the powerup block
 	if(state == 0)
@@ -8028,16 +8032,16 @@ void CO_Shell::draw()
 	else if(owner)
 	{
 		if(owner->iswarping())
-			spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, iColorOffsetY, iw, ih, (short)owner->state % 4, owner->GetWarpPlane());
+			spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, iColorOffsetY + iFlippedOffset, iw, ih, (short)owner->state % 4, owner->GetWarpPlane());
 		else
-			spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, iColorOffsetY, iw, ih);
+			spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, iColorOffsetY + iFlippedOffset, iw, ih);
 	}
 	else
 	{
 		if(state == 2)
-			spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, iColorOffsetY, iw, ih);
+			spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, iColorOffsetY + iFlippedOffset, iw, ih);
 		else if(state == 1)
-			spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, iColorOffsetY, iw, ih);
+			spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, iColorOffsetY + iFlippedOffset, iw, ih);
 	}
 
 	if(fSmoking)
@@ -8130,7 +8134,29 @@ void CO_Shell::SideBounce()
 	}
 }
 
+void CO_Shell::Flip()
+{
+	if(iFlippedTimer > 0)
+		return;
 
+	fFlipped = !fFlipped;
+	iFlippedOffset = fFlipped ? 128 : 0;
+	iFlippedTimer = 20;
+
+	Stop();
+
+	vely = -VELJUMP / 2.0;
+}
+
+void CO_Shell::Stop()
+{
+	owner = NULL;
+	velx = 0.0f;
+	state = 2;
+	fSmoking = false;
+	ifsoundonplay(sfx_kicksound);
+	iKillCounter = 0;
+}
 
 //------------------------------------------------------------------------------
 // class throwable block projectile
@@ -8802,15 +8828,28 @@ void OMO_SpinAttack::update()
 
 void OMO_SpinAttack::collide(IO_MovingObject * object)
 {
-	if(dead || iTimer < 5)
+	if(dead || iTimer > 11)
 		return;
-
-	OMO_AttackZone::collide(object);
 
 	MovingObjectType type = object->getMovingObjectType();
 
 	if(type == movingobject_shell || type == movingobject_throwblock)
+	{
+		if(type == movingobject_shell)
+		{
+			((CO_Shell*)object)->Flip();
+		}
+		else if(type == movingobject_throwblock)
+		{
+			CO_ThrowBlock * block = (CO_ThrowBlock*) object;
+
+			if(!block->owner || block->owner->globalID != iPlayerID)
+				block->Die();
+		}
+
+		ifsoundonplay(sfx_kicksound);
 		Die();
+	}	
 }
 
 
