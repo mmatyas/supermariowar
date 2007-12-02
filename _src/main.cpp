@@ -3196,7 +3196,7 @@ void LoadMapObjects()
 			}
 			else if(g_map.objectdata[x][y].iType == 6)
 			{
-				g_map.blockdata[x][y] = new B_ThrowBlock(&spr_throwblock, x * TILESIZE, y * TILESIZE, 4, 10);
+				g_map.blockdata[x][y] = new B_ThrowBlock(&spr_throwblock, x * TILESIZE, y * TILESIZE, 4, 10, 0);
 				objectblocks.add(g_map.blockdata[x][y]);
 			}
 			else if(g_map.objectdata[x][y].iType >= 7 && g_map.objectdata[x][y].iType <= 10)
@@ -3221,10 +3221,8 @@ void LoadMapObjects()
 			}
 			else if(g_map.objectdata[x][y].iType == 16)
 			{
-				B_ThrowBlock * block = new B_ThrowBlock(&spr_throwblock, x * TILESIZE, y * TILESIZE, 4, 10);
-				block->SetType(true);
-				g_map.blockdata[x][y] = block;
-				objectblocks.add(block);
+				g_map.blockdata[x][y] = new B_ThrowBlock(&spr_throwblock, x * TILESIZE, y * TILESIZE, 4, 10, 2);
+				objectblocks.add(g_map.blockdata[x][y]);
 			}
 			else if(g_map.objectdata[x][y].iType == 17 || g_map.objectdata[x][y].iType == 18)
 			{

@@ -1049,6 +1049,14 @@ int editor_edit()
 						if(edit_mode == 0)
 						{
 							g_map.objectdata[iClickX][iClickY].iType = set_block;
+							g_map.objectdata[iClickX][iClickY].fHidden = false;
+
+							if(set_block == 1 || set_block == 15)
+							{
+								for(short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++)
+									g_map.objectdata[iClickX][iClickY].iSettings[iSetting] = g_iDefaultPowerupWeights[iSetting];
+							}
+
 							AdjustMapItems(iClickX, iClickY);
 						}
 						else if(edit_mode == 1)

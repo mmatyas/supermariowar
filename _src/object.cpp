@@ -294,6 +294,10 @@ void IO_Block::BounceMovingObject(IO_MovingObject * object)
 			}
 		}
 	}
+	else if(type == movingobject_shell)
+	{
+		((CO_Shell*)object)->Flip();
+	}
 	else
 	{
 		object->vely = -VELNOTEBLOCKREPEL;
@@ -912,10 +916,10 @@ void B_BreakableBlock::triggerBehavior()
 {
 	if(state == 0)
 	{
-		eyecandyfront.add(new EC_FallingObject(&spr_brokenyellowblock, ix, iy, -2.2f, -10.0f, 4, 2, 0, 0, 0, 0));
-		eyecandyfront.add(new EC_FallingObject(&spr_brokenyellowblock, ix + 16, iy, 2.2f, -10.0f, 4, 2, 0, 0, 0, 0));
-		eyecandyfront.add(new EC_FallingObject(&spr_brokenyellowblock, ix, iy + 16, -2.2f, -5.5f, 4, 2, 0, 0, 0, 0));
-		eyecandyfront.add(new EC_FallingObject(&spr_brokenyellowblock, ix + 16, iy + 16, 2.2f, -5.5f, 4, 2, 0, 0, 0, 0));
+		eyecandyfront.add(new EC_FallingObject(&spr_brokenyellowblock, ix, iy, -2.2f, -10.0f, 4, 2, 0, 0, 16, 16));
+		eyecandyfront.add(new EC_FallingObject(&spr_brokenyellowblock, ix + 16, iy, 2.2f, -10.0f, 4, 2, 0, 0, 16, 16));
+		eyecandyfront.add(new EC_FallingObject(&spr_brokenyellowblock, ix, iy + 16, -2.2f, -5.5f, 4, 2, 0, 0, 16, 16));
+		eyecandyfront.add(new EC_FallingObject(&spr_brokenyellowblock, ix + 16, iy + 16, 2.2f, -5.5f, 4, 2, 0, 0, 16, 16));
 
 		state = 1;
 		ifsoundonplay(sfx_breakblock);
@@ -1503,10 +1507,10 @@ void B_FlipBlock::triggerBehavior()
 
 void B_FlipBlock::explode()
 {
-	eyecandyfront.add(new EC_FallingObject(&spr_brokenflipblock, ix, iy, -2.2f, -10.0f, 4, 2, 0, 0, 0, 0));
-	eyecandyfront.add(new EC_FallingObject(&spr_brokenflipblock, ix + 16, iy, 2.2f, -10.0f, 4, 2, 0, 0, 0, 0));
-	eyecandyfront.add(new EC_FallingObject(&spr_brokenflipblock, ix, iy + 16, -2.2f, -5.5f, 4, 2, 0, 0, 0, 0));
-	eyecandyfront.add(new EC_FallingObject(&spr_brokenflipblock, ix + 16, iy + 16, 2.2f, -5.5f, 4, 2, 0, 0, 0, 0));
+	eyecandyfront.add(new EC_FallingObject(&spr_brokenflipblock, ix, iy, -2.2f, -10.0f, 4, 2, 0, 0, 16, 16));
+	eyecandyfront.add(new EC_FallingObject(&spr_brokenflipblock, ix + 16, iy, 2.2f, -10.0f, 4, 2, 0, 0, 16, 16));
+	eyecandyfront.add(new EC_FallingObject(&spr_brokenflipblock, ix, iy + 16, -2.2f, -5.5f, 4, 2, 0, 0, 16, 16));
+	eyecandyfront.add(new EC_FallingObject(&spr_brokenflipblock, ix + 16, iy + 16, 2.2f, -5.5f, 4, 2, 0, 0, 16, 16));
 	
 	ifsoundonplay(sfx_breakblock);
 }
@@ -1983,22 +1987,22 @@ void B_BounceBlock::triggerBehavior()
 //------------------------------------------------------------------------------
 // class throw block
 //------------------------------------------------------------------------------
-B_ThrowBlock::B_ThrowBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed) :
+B_ThrowBlock::B_ThrowBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short type) :
 	IO_Block(nspr, x, y)
 {
-	iw = nspr->getWidth() >> 2;
-	ih = nspr->getHeight() >> 1;
+	iw = 32;
+	ih = 32;
 	iNumSprites = iNumSpr;
 	animationSpeed = aniSpeed;
 	animationTimer = 0;
 	drawFrame = 0;
 	animationWidth = (short)nspr->getWidth();
-	fSuper = false;
+	iType = type;
 }
 
 void B_ThrowBlock::draw()
 {
-	spr->draw(ix, iy, drawFrame, fSuper ? 32 : 0, iw, ih);
+	spr->draw(ix, iy, drawFrame, iType << 5, iw, ih);
 }
 
 void B_ThrowBlock::update()
@@ -2095,7 +2099,7 @@ void B_ThrowBlock::GiveBlockToPlayer(CPlayer * player)
 	g_map.blockdata[col][row] = NULL;
 	g_map.UpdateTileGap(col, row);
 
-	CO_ThrowBlock * block = new CO_ThrowBlock(&spr_blueblock, ix, iy, fSuper);
+	CO_ThrowBlock * block = new CO_ThrowBlock(&spr_blueblock, ix, iy, iType);
 	if(player->AcceptItem(block))
 	{
 		block->owner = player;
@@ -2112,17 +2116,12 @@ void B_ThrowBlock::triggerBehavior()
 	g_map.blockdata[col][row] = NULL;
 	g_map.UpdateTileGap(col, row);
 
-	eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix, iy, -1.5f, -7.0f, 6, 2, 0, fSuper ? 16 : 0, 16, 16));
-	eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix + 16, iy, 1.5f, -7.0f, 6, 2, 0, fSuper ? 16 : 0, 16, 16));
-	eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix, iy + 16, -1.5f, -4.0f, 6, 2, 0, fSuper ? 16 : 0, 16, 16));
-	eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix + 16, iy + 16, 1.5f, -4.0f, 6, 2, 0, fSuper ? 16 : 0, 16, 16));
+	eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix, iy, -1.5f, -7.0f, 6, 2, 0, iType << 4, 16, 16));
+	eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix + 16, iy, 1.5f, -7.0f, 6, 2, 0, iType << 4, 16, 16));
+	eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix, iy + 16, -1.5f, -4.0f, 6, 2, 0, iType << 4, 16, 16));
+	eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix + 16, iy + 16, 1.5f, -4.0f, 6, 2, 0, iType << 4, 16, 16));
 	
 	ifsoundonplay(sfx_breakblock);
-}
-
-void B_ThrowBlock::SetType(bool superblock)
-{
-	fSuper = superblock;
 }
 
 //------------------------------------------------------------------------------
@@ -8163,16 +8162,20 @@ void CO_Shell::Stop()
 //------------------------------------------------------------------------------
 //State 1: Moving
 //State 2: Holding
-CO_ThrowBlock::CO_ThrowBlock(gfxSprite * nspr, short x, short y, bool superblock) :
+CO_ThrowBlock::CO_ThrowBlock(gfxSprite * nspr, short x, short y, short type) :
 	MO_CarriedObject(nspr, x, y, 4, 2, 30, 30, 1, 1)
 {
 	state = 2;
-	ih = nspr->getHeight() >> 1;
+	ih = 32;
 	bounce = GRAVITATION;
 	objectType = object_moving;
 	movingObjectType = movingobject_throwblock;
 	playerID = -1;
-	fSuper = superblock;
+	
+	fDieOnBounce = type != 2;
+	fDieOnPlayerCollision = type == 0;
+
+	iType = type;
 
 	iDeathTime = 0;
 	iBounceCounter = 0;
@@ -8268,7 +8271,7 @@ bool CO_ThrowBlock::KillPlayer(CPlayer * player)
 	if(player->spawninvincible)
 		return false;
 
-	if(!fSuper)
+	if(fDieOnPlayerCollision)
 		Die();
 
 	//Find the player that shot this shell so we can attribute a kill
@@ -8342,9 +8345,9 @@ void CO_ThrowBlock::update()
 void CO_ThrowBlock::draw()
 {
 	if(owner && owner->iswarping())
-		spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, fSuper ? 32 : 0, iw, ih, (short)owner->state % 4, owner->GetWarpPlane());
+		spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, iType << 5, iw, ih, (short)owner->state % 4, owner->GetWarpPlane());
 	else
-		spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, fSuper ? 32 : 0, iw, ih);
+		spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, iType << 5, iw, ih);
 
 	if(fSmoking)
 	{
@@ -8387,10 +8390,10 @@ void CO_ThrowBlock::Kick(bool superkick)
 
 void CO_ThrowBlock::Die()
 {
-	eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix, iy, -1.5f, -7.0f, 6, 2, 0, fSuper ? 16 : 0, 16, 16));
-	eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix + 16, iy, 1.5f, -7.0f, 6, 2, 0, fSuper ? 16 : 0, 16, 16));
-	eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix, iy + 16, -1.5f, -4.0f, 6, 2, 0, fSuper ? 16 : 0, 16, 16));
-	eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix + 16, iy + 16, 1.5f, -4.0f, 6, 2, 0, fSuper ? 16 : 0, 16, 16));
+	eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix, iy, -1.5f, -7.0f, 6, 2, 0, iType << 4, 16, 16));
+	eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix + 16, iy, 1.5f, -7.0f, 6, 2, 0, iType << 4, 16, 16));
+	eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix, iy + 16, -1.5f, -4.0f, 6, 2, 0, iType << 4, 16, 16));
+	eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix + 16, iy + 16, 1.5f, -4.0f, 6, 2, 0, iType << 4, 16, 16));
 	
 	dead = true;
 	ifsoundonplay(sfx_breakblock);
@@ -8404,7 +8407,7 @@ void CO_ThrowBlock::Die()
 
 void CO_ThrowBlock::SideBounce()
 {
-	if(!fSuper)
+	if(fDieOnBounce)
 	{
 		Die();
 	}

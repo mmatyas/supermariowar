@@ -311,7 +311,7 @@ class B_BounceBlock : public IO_Block
 class B_ThrowBlock : public IO_Block
 {
 	public:
-		B_ThrowBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed);
+		B_ThrowBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short type);
 		~B_ThrowBlock(){};
 
 		BlockType getBlockType(){return block_throw;}
@@ -325,7 +325,6 @@ class B_ThrowBlock : public IO_Block
 
 		void GiveBlockToPlayer(CPlayer * player);
 		void triggerBehavior();
-		void SetType(bool superblock);
 
 	private:
 		short iNumSprites;
@@ -333,7 +332,7 @@ class B_ThrowBlock : public IO_Block
 		short drawFrame;
 		short animationTimer;
 		short animationWidth;
-		bool fSuper;
+		short iType;
 };
 
 
@@ -1395,7 +1394,7 @@ class CO_Shell : public MO_CarriedObject
 class CO_ThrowBlock : public MO_CarriedObject
 {
 	public:
-		CO_ThrowBlock(gfxSprite * nspr, short x, short y, bool superblock);
+		CO_ThrowBlock(gfxSprite * nspr, short x, short y, short type);
 		~CO_ThrowBlock(){};
 
 		void update();
@@ -1417,10 +1416,12 @@ class CO_ThrowBlock : public MO_CarriedObject
 		void SideBounce();
 
 	private:
+		short iType;
 		
 		short playerID;
 		short iDeathTime;
-		bool fSuper;
+		bool fDieOnBounce;
+		bool fDieOnPlayerCollision;
 		short iBounceCounter;
 		short iNoOwnerKillTime;
 
