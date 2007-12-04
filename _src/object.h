@@ -1379,7 +1379,6 @@ class CO_Shell : public MO_CarriedObject
 
 		bool fFlipped;
 		short iFlippedOffset;
-		short iFlippedTimer;
 
 	friend class CPlayer;
 	friend class OMO_Explosion;

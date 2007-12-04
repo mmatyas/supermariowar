@@ -2,7 +2,7 @@
 #ifndef SMW_MAP_H
 #define SMW_MAP_H
 
-enum TileType{tile_nonsolid = 0, tile_solid = 1, tile_solid_on_top = 2, tile_ice = 3, tile_death = 4, tile_death_on_top = 5, tile_death_on_bottom = 6, tile_gap = 8};
+enum TileType{tile_nonsolid = 0, tile_solid = 1, tile_solid_on_top = 2, tile_ice = 3, tile_death = 4, tile_death_on_top = 5, tile_death_on_bottom = 6, tile_death_on_left = 7, tile_death_on_right = 8, tile_gap = 16};
 enum ReadType{read_type_full = 0, read_type_preview = 1, read_type_summary = 2};
 
 class MovingPlatform;

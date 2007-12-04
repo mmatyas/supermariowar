@@ -2337,7 +2337,7 @@ void IO_MovingObject::collision_detection_map()
 					SideBounce();
 				}
 			}
-			else if((g_map.map(tx, ty) & 0x05) > 0 || (g_map.map(tx, ty2) & 0x05) > 0)
+			else if((g_map.map(tx, ty) & 13) > 0 || (g_map.map(tx, ty2) & 13) > 0)
 			{	//collision on the right side.
 
 				if(iHorizontalPlatformCollision == 3)
@@ -2406,7 +2406,7 @@ void IO_MovingObject::collision_detection_map()
 					SideBounce();
 				}
 			}
-			else if((g_map.map(tx, ty) & 0x05) > 0 || (g_map.map(tx, ty2) & 0x05) > 0)
+			else if((g_map.map(tx, ty) & 13) > 0 || (g_map.map(tx, ty2) & 13) > 0)
 			{
 				if(iHorizontalPlatformCollision == 1)
 				{
@@ -2470,7 +2470,7 @@ void IO_MovingObject::collision_detection_map()
 			return;
 		}
 
-		if((g_map.map(txl, ty) & 0x05) > 0 || (g_map.map(txr, ty) & 0x05) > 0)
+		if((g_map.map(txl, ty) & 13) > 0 || (g_map.map(txr, ty) & 13) > 0)
 		{
 			if(iVerticalPlatformCollision == 2)
 				KillObjectMapHazard();
@@ -2560,7 +2560,7 @@ void IO_MovingObject::collision_detection_map()
 			}
 		}
 
-		if((leftTile & 0x05) > 0 || (rightTile & 0x05) > 0)
+		if((leftTile & 13) > 0 || (rightTile & 13) > 0)
 		{	
 			vely = BottomBounce();
 			yf((float)(ty * TILESIZE - collisionHeight) - 0.2f);
@@ -2625,7 +2625,7 @@ bool IO_MovingObject::collision_detection_checksides()
 			{
 				IO_Block * block = g_map.block(txl, ty);
 
-				if((block && !block->isTransparent() && !block->isHidden()) || (g_map.map(txl, ty) & 0x5) > 0)
+				if((block && !block->isTransparent() && !block->isHidden()) || (g_map.map(txl, ty) & 13) > 0)
 				{
 					iCase |= 0x01;
 				}
@@ -2635,7 +2635,7 @@ bool IO_MovingObject::collision_detection_checksides()
 			{
 				IO_Block * block = g_map.block(txr, ty);
 
-				if((block && !block->isTransparent() && !block->isHidden()) || (g_map.map(txr, ty) & 0x5) > 0)
+				if((block && !block->isTransparent() && !block->isHidden()) || (g_map.map(txr, ty) & 13) > 0)
 				{
 					iCase |= 0x02;
 				}
@@ -2652,7 +2652,7 @@ bool IO_MovingObject::collision_detection_checksides()
 			{
 				IO_Block * block = g_map.block(txl, ty2);
 
-				if((block && !block->isTransparent() && !block->isHidden()) || (g_map.map(txl, ty2) & 0x5) > 0)
+				if((block && !block->isTransparent() && !block->isHidden()) || (g_map.map(txl, ty2) & 13) > 0)
 				{
 					iCase |= 0x04;
 				}
@@ -2662,7 +2662,7 @@ bool IO_MovingObject::collision_detection_checksides()
 			{
 				IO_Block * block = g_map.block(txr, ty2);
 
-				if((block && !block->isTransparent() && !block->isHidden()) || (g_map.map(txr, ty2) & 0x5) > 0)
+				if((block && !block->isTransparent() && !block->isHidden()) || (g_map.map(txr, ty2) & 13) > 0)
 				{
 					iCase |= 0x08;
 				}
@@ -5837,8 +5837,8 @@ void OMO_Yoshi::placeYoshi()
 				TileType ttLeftTile = g_map.map(iDeathX1, iDeathY);
 				TileType ttRightTile = g_map.map(iDeathX2, iDeathY);
 
-				if(ttLeftTile == tile_solid || ttLeftTile == tile_solid_on_top || ttLeftTile == tile_death_on_bottom || ttLeftTile == tile_ice ||
-					ttRightTile == tile_solid || ttRightTile == tile_solid_on_top || ttRightTile == tile_death_on_bottom || ttRightTile == tile_ice ||
+				if(ttLeftTile == tile_solid || ttLeftTile == tile_solid_on_top || ttLeftTile == tile_death_on_bottom || ttLeftTile == tile_death_on_left || ttLeftTile == tile_death_on_right || ttLeftTile == tile_ice ||
+					ttRightTile == tile_solid || ttRightTile == tile_solid_on_top || ttRightTile == tile_death_on_bottom || ttRightTile == tile_death_on_left || ttRightTile == tile_death_on_right || ttRightTile == tile_ice ||
 					g_map.block(iDeathX1, iDeathY) || g_map.block(iDeathX2, iDeathY))
 				{
 					short top = (iDeathY * TILESIZE - ih) / TILESIZE;
@@ -6191,7 +6191,7 @@ void OMO_KingOfTheHillZone::placeArea()
 			for(short iCol = 0; iCol < size; iCol++)
 			{
 				TileType type = g_map.map(x + iCol, iFindY);
-				if(type == tile_solid_on_top || type == tile_solid || type == tile_death_on_bottom || type == tile_ice || g_map.block(x + iCol, iFindY))
+				if(type == tile_solid_on_top || type == tile_solid || type == tile_death_on_bottom || type == tile_death_on_left || type == tile_death_on_right || type == tile_ice || g_map.block(x + iCol, iFindY))
 				{
 					fDone = true;
 					break;
@@ -6223,7 +6223,7 @@ void OMO_KingOfTheHillZone::placeArea()
 			for(short iCol = 0; iCol < size; iCol++)
 			{
 				//If there is a solid tile inside the zone
-				if((g_map.map(x + iCol, y + iRow) & 0x5) > 0 || !g_map.spawn(1, x + iCol, y + iRow) || g_map.block(x + iCol, y + iRow))
+				if((g_map.map(x + iCol, y + iRow) & 13) || !g_map.spawn(1, x + iCol, y + iRow) || g_map.block(x + iCol, y + iRow))
 				{
 					iCountSolidTiles++;
 
@@ -7697,7 +7697,6 @@ CO_Shell::CO_Shell(short type, short x, short y, bool dieOnMovingPlayerCollision
 
 	fFlipped = false;
 	iFlippedOffset = 0;
-	iFlippedTimer = 0;
 }
 
 bool CO_Shell::collide(CPlayer * player)
@@ -7954,9 +7953,6 @@ void CO_Shell::update()
 	if(iNoOwnerKillTime > 0)
 		iNoOwnerKillTime--;
 
-	if(iFlippedTimer > 0)
-		iFlippedTimer--;
-
 	if(state == 1)
 	{
 		if(game_values.shellttl > 0 && ++iDeathTime >= game_values.shellttl)
@@ -8135,12 +8131,11 @@ void CO_Shell::SideBounce()
 
 void CO_Shell::Flip()
 {
-	if(iFlippedTimer > 0)
+	if(fFlipped)
 		return;
 
-	fFlipped = !fFlipped;
-	iFlippedOffset = fFlipped ? 128 : 0;
-	iFlippedTimer = 20;
+	fFlipped = true;
+	iFlippedOffset = 128;
 
 	Stop();
 

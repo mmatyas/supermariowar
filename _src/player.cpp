@@ -3222,6 +3222,19 @@ void CPlayer::drawswap()
 		carriedItem->draw();
 }
 
+/*
+	tile_nonsolid = 0			0	0	0	0	0
+	tile_solid = 1				0	0	0	0	1
+	tile_solid_on_top = 2		0	0	0	1	0
+	tile_ice = 3				0	0	0	1	1
+	tile_death = 4				0	0	1	0	0
+	tile_death_on_top = 5		0	0	1	0	1
+	tile_death_on_bottom = 6	0	0	1	1	0
+	tile_death_on_left = 7		0	0	1	1	1
+	tile_death_on_right = 8		0	1	0	0	0
+	tile_gap = 16				1	0	0	0	0
+*/
+
 void CPlayer::collision_detection_map()
 {
 	xf(fx + velx);
@@ -3319,6 +3332,9 @@ void CPlayer::collision_detection_map()
 
 			IO_Block * topblock = g_map.block(tx, ty);
 			IO_Block * bottomblock = g_map.block(tx, ty2);
+			
+			TileType toptile = g_map.map(tx, ty);
+			TileType bottomtile = g_map.map(tx, ty2);
 
 			//first check to see if player hit a warp
 			if(g_map.warp(tx,ty)->direction == 3 && g_map.warp(tx,ty2)->direction == 3 && playerKeys->game_right.fDown &&
@@ -3364,14 +3380,15 @@ void CPlayer::collision_detection_map()
 					flipsidesifneeded();
 				}
 			}
-			else if((g_map.map(tx, ty) == tile_death || g_map.map(tx, ty2) == tile_death) && !invincible && !spawninvincible)
+			else if((toptile == tile_death || bottomtile == tile_death || toptile == tile_death_on_left || bottomtile == tile_death_on_left) 
+				&& !invincible && !spawninvincible)
 			{
 				KillPlayerMapHazard();
 				return;
 			}
-			else if(g_map.map(tx, ty) & 0x05 || g_map.map(tx, ty2) & 0x05)
-			{	//collision on the right side.
-
+			//collision on the right side.
+			else if((toptile & 13) || (bottomtile & 13)) //collide with solid, ice, and death and all sides death
+			{
 				if(iHorizontalPlatformCollision == 3)
 				{
 					KillPlayerMapHazard();
@@ -3399,6 +3416,9 @@ void CPlayer::collision_detection_map()
 
 			IO_Block * topblock = g_map.block(tx, ty);
 			IO_Block * bottomblock = g_map.block(tx, ty2);
+
+			short toptile = g_map.map(tx, ty);
+			short bottomtile = g_map.map(tx, ty2);
 
 			//first check to see if player hit a warp
 			if(g_map.warp(tx,ty)->direction == 1 && g_map.warp(tx,ty2)->direction == 1 && playerKeys->game_left.fDown && 
@@ -3444,12 +3464,13 @@ void CPlayer::collision_detection_map()
 					flipsidesifneeded();
 				}
 			}
-			else if((g_map.map(tx, ty) == tile_death || g_map.map(tx, ty2) == tile_death) && !invincible && !spawninvincible)
+			else if((toptile == tile_death || bottomtile == tile_death || toptile == tile_death_on_right || bottomtile == tile_death_on_right) 
+				&& !invincible && !spawninvincible)
 			{
 				KillPlayerMapHazard();
 				return;
 			}
-			else if(g_map.map(tx, ty) & 0x05 || g_map.map(tx, ty2) & 0x05)
+			else if((toptile & 13) || (bottomtile & 13)) // collide with solid, ice, death and all sides death
 			{
 				if(iHorizontalPlatformCollision == 1)
 				{
@@ -3556,8 +3577,9 @@ void CPlayer::collision_detection_map()
 
 		//Player hit a solid, ice or death on top
 		//or if the player is invincible and hits death or death on bottom
-		if(g_map.map(alignedBlockX, ty) & 0x1 ||
-			((invincible || spawninvincible) && (g_map.map(alignedBlockX, ty) & 0x4)))
+		TileType alignedBlockType = g_map.map(alignedBlockX, ty);
+		if(alignedBlockType & 1 || alignedBlockType == tile_death_on_right ||
+			((invincible || spawninvincible) && (alignedBlockType & 4)))
 		{
 			yf((float)(ty * TILESIZE + TILESIZE) + 0.2f);
 			fOldY = fy - 1.0f;
@@ -3599,8 +3621,9 @@ void CPlayer::collision_detection_map()
 		
 		//Player squeezed around the block, ice or death on top
 		//or if the player is invincible and hits death or death on bottom
-		if(g_map.map(unAlignedBlockX, ty) & 0x1 ||
-			((invincible || spawninvincible) && (g_map.map(unAlignedBlockX, ty) & 0x4)))
+		TileType unalignedBlockType = g_map.map(unAlignedBlockX, ty);
+		if(unalignedBlockType & 1 || unalignedBlockType == tile_death_on_right ||
+			((invincible || spawninvincible) && (unalignedBlockType & 4)))
 		{
 			xf(unAlignedBlockFX);
 			fOldX = fx;
@@ -3608,7 +3631,7 @@ void CPlayer::collision_detection_map()
 			yf(fPrecalculatedY);
 			vely += GRAVITATION;
 		}
-		else if(g_map.map(alignedBlockX, ty) & 0x4 || g_map.map(unAlignedBlockX, ty) & 0x4)
+		else if(alignedBlockType & 4 || unalignedBlockType & 4)
 		{
 			KillPlayerMapHazard();
 			return;
@@ -3690,7 +3713,9 @@ void CPlayer::collision_detection_map()
 		TileType righttile = g_map.map(txr, ty);
 
 		bool fGapSupport = (velx >= VELTURBOMOVING || velx <= -VELTURBOMOVING) && (lefttile == tile_gap || righttile == tile_gap);
-		bool fSolidTileUnderPlayer = (lefttile & 0x5) == 1 || lefttile == tile_death_on_bottom || (righttile & 0x5) == 1 || righttile == tile_death_on_bottom;
+		
+		bool fSolidTileUnderPlayer = lefttile == tile_solid || lefttile == tile_ice || lefttile == tile_death_on_bottom || lefttile == tile_death_on_right || lefttile == tile_death_on_left ||
+			righttile == tile_solid || righttile == tile_ice || righttile == tile_death_on_bottom || righttile == tile_death_on_right || righttile == tile_death_on_left;
 
 		if((lefttile == tile_solid_on_top || righttile == tile_solid_on_top || fGapSupport) && fOldY + PH <= ty * TILESIZE)
 		{	//on ground
@@ -3960,7 +3985,7 @@ void CPlayer::collision_detection_checksides()
 			{
 				IO_Block * block = g_map.block(txl, ty);
 
-				if((block && !block->isTransparent() && !block->isHidden()) || (g_map.map(txl, ty) & 0x5) > 0)
+				if((block && !block->isTransparent() && !block->isHidden()) || (g_map.map(txl, ty) & 13) > 0)
 				{
 					iCase |= 0x01;
 				}
@@ -3970,7 +3995,7 @@ void CPlayer::collision_detection_checksides()
 			{
 				IO_Block * block = g_map.block(txr, ty);
 
-				if((block && !block->isTransparent() && !block->isHidden()) || (g_map.map(txr, ty) & 0x5) > 0)
+				if((block && !block->isTransparent() && !block->isHidden()) || (g_map.map(txr, ty) & 13) > 0)
 				{
 					iCase |= 0x02;
 				}
@@ -3987,7 +4012,7 @@ void CPlayer::collision_detection_checksides()
 			{
 				IO_Block * block = g_map.block(txl, ty2);
 
-				if((block && !block->isTransparent() && !block->isHidden()) || (g_map.map(txl, ty2) & 0x5) > 0)
+				if((block && !block->isTransparent() && !block->isHidden()) || (g_map.map(txl, ty2) & 13) > 0)
 				{
 					iCase |= 0x04;
 				}
@@ -3997,7 +4022,7 @@ void CPlayer::collision_detection_checksides()
 			{
 				IO_Block * block = g_map.block(txr, ty2);
 
-				if((block && !block->isTransparent() && !block->isHidden()) || (g_map.map(txr, ty2) & 0x5) > 0)
+				if((block && !block->isTransparent() && !block->isHidden()) || (g_map.map(txr, ty2) & 13) > 0)
 				{
 					iCase |= 0x08;
 				}

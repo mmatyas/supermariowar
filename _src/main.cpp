@@ -1410,7 +1410,7 @@ void RunGame()
 
 					TileType tile = tile_nonsolid;
 					IO_Block * block = NULL;
-					short blocktype = BLOCKSETSIZE;
+					short blocktype = -1;
 
 					if(list_players[k]->iy + HALFPH >= 0 && list_players[k]->iy + HALFPH < 480)
 					{
@@ -1463,7 +1463,7 @@ void RunGame()
 						{
 							TileType tile = tile_nonsolid;
 							IO_Block * block = NULL;
-							short blocktype = BLOCKSETSIZE;
+							short blocktype = -1;
 
 							if(actualvalues[0][j] >= 0 && actualvalues[0][j] < 640 && actualvalues[1][i] > 0 && actualvalues[1][i] < 480)
 							{
@@ -3227,6 +3227,11 @@ void LoadMapObjects()
 			else if(g_map.objectdata[x][y].iType == 17 || g_map.objectdata[x][y].iType == 18)
 			{
 				g_map.blockdata[x][y] = new B_NoteBlock(&spr_noteblock, x * TILESIZE, y * TILESIZE, 4, 10, g_map.objectdata[x][y].iType == 17 ? 2 : 0, g_map.objectdata[x][y].fHidden);
+				objectblocks.add(g_map.blockdata[x][y]);
+			}
+			else if(g_map.objectdata[x][y].iType == 19)
+			{
+				g_map.blockdata[x][y] = new B_ThrowBlock(&spr_throwblock, x * TILESIZE, y * TILESIZE, 4, 10, 1);
 				objectblocks.add(g_map.blockdata[x][y]);
 			}
 			else

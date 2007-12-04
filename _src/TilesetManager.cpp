@@ -117,6 +117,10 @@ TileType CTileset::IncrementTileType(short iTileCol, short iTileRow)
 	else if(tiletypes[iTile] == tile_death_on_top)
 		tiletypes[iTile] = tile_death_on_bottom;
 	else if(tiletypes[iTile] == tile_death_on_bottom)
+		tiletypes[iTile] = tile_death_on_left;
+	else if(tiletypes[iTile] == tile_death_on_left)
+		tiletypes[iTile] = tile_death_on_right;
+	else if(tiletypes[iTile] == tile_death_on_right)
 		tiletypes[iTile] = tile_nonsolid;
 
 	return tiletypes[iTile];

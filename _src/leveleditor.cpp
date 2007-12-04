@@ -81,7 +81,7 @@ gfxFont			menu_font_large;
 
 gfxSprite		spr_background;
 gfxSprite		spr_frontmap[2];
-gfxSprite		spr_tiletypes[6];
+gfxSprite		spr_tiletypes;
 gfxSprite		spr_transparenttiles;
 
 gfxSprite		spr_backgroundlevel;
@@ -288,12 +288,7 @@ int main(int argc, char *argv[])
 
 	printf("\n---------------- loading graphics ----------------\n");
 
-	spr_tiletypes[0].init(convertPath("gfx/leveleditor/leveleditor_solid.png"));
-	spr_tiletypes[1].init(convertPath("gfx/leveleditor/leveleditor_solid_on_top.png"));
-	spr_tiletypes[2].init(convertPath("gfx/leveleditor/leveleditor_ice.png"));
-	spr_tiletypes[3].init(convertPath("gfx/leveleditor/leveleditor_deadly.png"));
-	spr_tiletypes[4].init(convertPath("gfx/leveleditor/leveleditor_death_on_top.png"));
-	spr_tiletypes[5].init(convertPath("gfx/leveleditor/leveleditor_death_on_bottom.png"));
+	spr_tiletypes.init(convertPath("gfx/leveleditor/leveleditor_tile_types.png"));
 	spr_transparenttiles.init(convertPath("gfx/leveleditor/leveleditor_transparent_tiles.png"), 255, 0, 255, 160);
 	
 	spr_backgroundlevel.init(convertPath("gfx/leveleditor/leveleditor_background_levels.png"), 255, 0, 255);
@@ -503,7 +498,7 @@ void AdjustMapItems(short iClickX, short iClickY)
 		if(g_map.mapitems[j].ix == iClickX && g_map.mapitems[j].iy == iClickY)
 		{
 			if(g_map.mapdatatop[iClickX][iClickY] != tile_nonsolid && g_map.mapdatatop[iClickX][iClickY] != tile_solid_on_top ||
-				g_map.objectdata[iClickX][iClickY].iType != BLOCKSETSIZE)
+				g_map.objectdata[iClickX][iClickY].iType != -1)
 			{
 				g_map.iNumMapItems--;
 
@@ -986,7 +981,7 @@ int editor_edit()
 					else if(event.button.button == SDL_BUTTON_RIGHT)
 					{
 						if(edit_mode == 0)
-							g_map.objectdata[iClickX][iClickY].iType = BLOCKSETSIZE;
+							g_map.objectdata[iClickX][iClickY].iType = -1;
 						else if(edit_mode == 1 || edit_mode == 8)
 						{
 							g_map.mapdata[iClickX][iClickY][selected_layer].iID = TILESETNONE;
@@ -1125,7 +1120,7 @@ int editor_edit()
 					else if(event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT))
 					{
 						if(edit_mode == 0)
-							g_map.objectdata[iClickX][iClickY].iType = BLOCKSETSIZE;
+							g_map.objectdata[iClickX][iClickY].iType = -1;
 						else if(edit_mode == 1 || edit_mode == 8)
 						{
 							g_map.mapdata[iClickX][iClickY][selected_layer].iID = TILESETNONE;
@@ -1473,7 +1468,7 @@ void drawmap(bool fScreenshot, short iBlockSize)
 		{
 			for(int i = 0; i < MAPWIDTH; i++)
 			{
-				int displayblock = BLOCKSETSIZE;
+				int displayblock = -1;
 				if((move_mode == 1 || move_mode == 3) && i - move_offset_x >= 0 && i - move_offset_x < MAPWIDTH &&
 					j - move_offset_y >= 0 && j - move_offset_y < MAPHEIGHT && 
 					selectedtiles[i - move_offset_x][j - move_offset_y])
@@ -1485,7 +1480,7 @@ void drawmap(bool fScreenshot, short iBlockSize)
 					displayblock = g_map.objectdata[i][j].iType;
 				}
 
-				if(displayblock < BLOCKSETSIZE)
+				if(displayblock > -1)
 				{
 					//Don't screenshot hidden blocks
 					if(fScreenshot && g_map.objectdata[i][j].fHidden)
@@ -1501,7 +1496,7 @@ void drawmap(bool fScreenshot, short iBlockSize)
 						rSrc.x = displayblock * iBlockSize;
 						rSrc.y = iBlockSize * g_map.iSwitches[(displayblock - 7) % 4];
 					}
-					else if(displayblock >= 15 && displayblock <= 18)
+					else if(displayblock >= 15 && displayblock <= 19)
 					{
 						rSrc.x = (displayblock - 15) * iBlockSize;
 						rSrc.y = iBlockSize;
@@ -2809,6 +2804,7 @@ int editor_tiles()
 
 		SDL_BlitSurface(g_tilesetmanager.GetTileset(set_tile_tileset)->GetSurface(0), &rectSrc, screen, &r);
 		menu_font_small.drawRightJustified(640, 0, maplist.currentFilename());
+		menu_font_small.draw(0, 480 - menu_font_small.getHeight(), tileset->GetName());
 		
 		for(i = view_tileset_x; i < view_tileset_x + 20 && i < tileset->GetWidth(); i++)
 		{
@@ -2816,7 +2812,7 @@ int editor_tiles()
 			{
 				TileType t = tileset->GetTileType(i, j);
 				if(t != tile_nonsolid)
-					spr_tiletypes[t-1].draw((i - view_tileset_x) << 5, (j - view_tileset_y) << 5);
+					spr_tiletypes.draw((i - view_tileset_x) << 5, (j - view_tileset_y) << 5, (t-1) << 3, 0, 8, 8);
 			}
 		}
 
@@ -2899,7 +2895,7 @@ int editor_blocks()
 						//Set the selected block to one of the interaction blocks
 						if(set_block_y == 0 && set_block_x >= 0 && set_block_x <= 6)
 							set_block = set_block_x;
-						else if(set_block_y == 0 && set_block_x >= 7 && set_block_x <= 10)
+						else if(set_block_y == 0 && set_block_x >= 7 && set_block_x <= 11)
 							set_block = set_block_x + 8;
 						else if(set_block_y >= 1 && set_block_y <= 2 && set_block_x >= 0 && set_block_x <= 3)
 						{  //set the selected block to an on/off switch block
@@ -2944,8 +2940,8 @@ int editor_blocks()
 
 		SDL_BlitSurface(spr_blocks[0].getSurface(), &rOnOffBlockSrc, screen, &rOnOffBlockDst);
 
-		SDL_Rect rBlocksRow2Src = {0, 32, 128, 32};
-		SDL_Rect rBlocksRow2Dst = {224, 0, 128, 32};
+		SDL_Rect rBlocksRow2Src = {0, 32, 160, 32};
+		SDL_Rect rBlocksRow2Dst = {224, 0, 160, 32};
 
 		SDL_BlitSurface(spr_blocks[0].getSurface(), &rBlocksRow2Src, screen, &rBlocksRow2Dst);
 
@@ -3062,9 +3058,12 @@ int editor_tiletype()
 				{
 					if(event.button.button == SDL_BUTTON_LEFT)
 					{
-						if(event.button.x < 192 && event.button.y < 32)
+						short iCol = event.button.x / TILESIZE;
+						short iRow = event.button.y / TILESIZE;
+
+						if(iCol < 8 && iRow == 0)
 						{
-							set_tiletype = (TileType)((event.button.x / TILESIZE) + 1);
+							set_tiletype = (TileType)(iCol + 1);
 
 							edit_mode = 6;
 							ignoreclick = true;
@@ -4087,7 +4086,7 @@ void clearselectedmaptiles()
 					for(short iLayer = 0; iLayer < MAPLAYERS; iLayer++)
 						g_map.mapdata[j][k][iLayer].iID = TILESETNONE;
 					
-					g_map.objectdata[j][k].iType = BLOCKSETSIZE;
+					g_map.objectdata[j][k].iType = -1;
 
 					g_map.warpdata[j][k].connection = -1;
 					g_map.warpdata[j][k].direction = -1;
@@ -4155,7 +4154,7 @@ void replacetile(MapBlock * dstTile, MapBlock * srcTile)
 	}
 	else
 	{
-		if(srcTile->iType != BLOCKSETSIZE)
+		if(srcTile->iType != -1)
 			copymapblock(dstTile, srcTile);
 	}
 }

@@ -356,7 +356,7 @@ void EC_Corpse::update()
 			IO_Block * leftblock = g_map.block(tx, ty);
 			IO_Block * rightblock = g_map.block(tx2, ty);
 
-			if((g_map.map(tx, ty) & 0x05) > 0 || (g_map.map(tx2, ty) & 0x05) > 0 ||
+			if((g_map.map(tx, ty) & 0x13) > 0 || (g_map.map(tx2, ty) & 0x13) > 0 ||
 				(leftblock && !leftblock->isTransparent()) || (rightblock && !rightblock->isTransparent()))
 			{	//on ground
 				dy = (float) (ty * TILESIZE - 32);

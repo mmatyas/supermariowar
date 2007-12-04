@@ -69,7 +69,7 @@ Second is the interaction blocks in the map.  You might want to know where a [?]
 
 short blocktype = g_map.blockat(col, row)->iType;
 
-blocktype will now be set to the type id for the block in that column and row.  If it is set to BLOCKSETSIZE, then
+blocktype will now be set to the type id for the block in that column and row.  If it is set to -1, then
 there is no interaction block in that space.
 
 0 == Breakable block

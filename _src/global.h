@@ -139,7 +139,7 @@ struct STextAward
 #define TILESETNONE		-2
 #define TILESETUNKNOWN	-3
 
-#define BLOCKSETSIZE	19			//size of block set
+#define BLOCKSETSIZE	20			//size of block set
 #define TILEANIMATIONSIZE	38		//number of tile animations
 
 #define MAXMUSICCATEGORY	11

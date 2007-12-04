@@ -553,9 +553,10 @@ void MovingPlatform::collide(CPlayer * player)
 			if(fRelativeY2 >= 0.0f && fRelativeY2 < iHeight)
 				t2 = iTileType[tx][(short)fRelativeY2 / TILESIZE];
 
-			if((t1 & 0x05) > 0 || (t2 & 0x05) > 0)
+			if((t1 & 13) || (t2 & 13))
 			{
-				if(player->iHorizontalPlatformCollision == 3)
+				if(player->iHorizontalPlatformCollision == 3 || ((t1 == tile_death || t2 == tile_death || t1 == tile_death_on_left || t2 == tile_death_on_left) &&
+					(!player->invincible && !player->spawninvincible)))
 				{
 					player->KillPlayerMapHazard();
 					//printf("Platform Right Side Killed Player\n");
@@ -582,8 +583,8 @@ void MovingPlatform::collide(CPlayer * player)
 
 					if((topblock && !topblock->isTransparent()) || 
 						(bottomblock && !bottomblock->isTransparent()) ||
-						(g_map.map(iTestBackgroundX, iTestBackgroundY) & 0x05) > 0 || 
-						(g_map.map(iTestBackgroundX, iTestBackgroundY2) & 0x05) > 0)
+						(g_map.map(iTestBackgroundX, iTestBackgroundY) & 13)|| 
+						(g_map.map(iTestBackgroundX, iTestBackgroundY2) & 13))
 					{
 						player->xf((float)(iTestBackgroundX * TILESIZE - PW) - 0.2f);
 						player->flipsidesifneeded();
@@ -623,13 +624,14 @@ void MovingPlatform::collide(CPlayer * player)
 			if(fRelativeY2 >= 0 && fRelativeY2 < iHeight)
 				t2 = iTileType[tx][(short)fRelativeY2 / TILESIZE];
 
-			if(t1 & 0x05 || t2 & 0x05)
+			if((t1 & 13) || (t2 & 13))
 			{
-				if(player->iHorizontalPlatformCollision == 1)
+				if(player->iHorizontalPlatformCollision == 1 || ((t1 == tile_death || t2 == tile_death || t1 == tile_death_on_right || t2 == tile_death_on_right) &&
+					(!player->invincible && !player->spawninvincible)))
 				{
 					player->KillPlayerMapHazard();
 					//printf("Platform Left Side Killed Player\n");
-					return;
+					return;				
 				}
 				else
 				{
@@ -646,8 +648,8 @@ void MovingPlatform::collide(CPlayer * player)
 
 					if((topblock && !topblock->isTransparent()) || 
 						(bottomblock && !bottomblock->isTransparent()) ||
-						(g_map.map(iTestBackgroundX, iTestBackgroundY) & 0x05) > 0 || 
-						(g_map.map(iTestBackgroundX, iTestBackgroundY2) & 0x05) > 0)
+						(g_map.map(iTestBackgroundX, iTestBackgroundY) & 13) || 
+						(g_map.map(iTestBackgroundX, iTestBackgroundY2) & 13))
 					{
 						player->xf((float)(iTestBackgroundX * TILESIZE + TILESIZE) + 0.2f);
 						player->flipsidesifneeded();
@@ -702,8 +704,8 @@ void MovingPlatform::collide(CPlayer * player)
 			if(fRelativeX2 >= 0.0f && fRelativeX2 < iWidth)
 				t2 = iTileType[(short)fRelativeX2 / TILESIZE][ty];
 		
-			if((t1 & 0x1) || (t2 & 0x1) ||
-				((player->invincible || player->spawninvincible) && ((t1 & 0x4) || (t2 & 0x4))))
+			if((t1 & 1) || (t2 & 1) || t1 == tile_death_on_right || t2 == tile_death_on_right ||
+				((player->invincible || player->spawninvincible) && ((t1 & 4) || (t2 & 4))))
 			{
 				if(player->iVerticalPlatformCollision == 2)
 				{
@@ -729,7 +731,7 @@ void MovingPlatform::collide(CPlayer * player)
 
 				return;
 			}
-			else if((t1 & 0x4) || (t2 & 0x4))
+			else if((t1 & 4) || (t2 & 4))
 			{
 				player->KillPlayerMapHazard();
 				return;
@@ -755,7 +757,8 @@ void MovingPlatform::collide(CPlayer * player)
 			if(fRelativeX2 >= 0.0f && fRelativeX2 < iWidth)
 				t2 = iTileType[(short)fRelativeX2 / TILESIZE][ty];
 
-			bool fSolidTileUnderPlayer = (t1 & 0x5) == 1 || t1 == tile_death_on_bottom || (t2 & 0x5) == 1 || t2 == tile_death_on_bottom;
+			bool fSolidTileUnderPlayer = t1 == tile_solid || t1 == tile_ice || t1 == tile_death_on_bottom || t1 == tile_death_on_right || t1 == tile_death_on_left ||
+				t2 == tile_solid || t2 == tile_ice || t2 == tile_death_on_bottom || t2 == tile_death_on_right || t2 == tile_death_on_left;
 
 			if((t1 == tile_solid_on_top || t2 == tile_solid_on_top) && player->fOldY + PH <= ty * TILESIZE + fOldY - iHalfHeight)
 			{
@@ -796,7 +799,7 @@ void MovingPlatform::collide(CPlayer * player)
 				return;
 			}
 			else if(fSolidTileUnderPlayer ||
-				((player->invincible || player->spawninvincible) && (t1 == tile_death_on_top || t2 == tile_death_on_top ||
+				((player->invincible || player->spawninvincible || player->fKuriboShoe) && (t1 == tile_death_on_top || t2 == tile_death_on_top ||
 				t1 == tile_death || t2 == tile_death)))
 			{	//on ground
 
@@ -1003,8 +1006,8 @@ void MovingPlatform::collide(IO_MovingObject * object)
 
 					if((topblock && !topblock->isTransparent()) || 
 						(bottomblock && !bottomblock->isTransparent()) ||
-						(g_map.map(iTestBackgroundX, iTestBackgroundY) & 0x05) > 0 || 
-						(g_map.map(iTestBackgroundX, iTestBackgroundY2) & 0x05) > 0)
+						(g_map.map(iTestBackgroundX, iTestBackgroundY) & 13) || 
+						(g_map.map(iTestBackgroundX, iTestBackgroundY2) & 13))
 					{
 						object->xf((float)(iTestBackgroundX * TILESIZE - object->collisionWidth) - 0.2f);
 						object->flipsidesifneeded();
@@ -1069,8 +1072,8 @@ void MovingPlatform::collide(IO_MovingObject * object)
 
 					if((topblock && !topblock->isTransparent()) || 
 						(bottomblock && !bottomblock->isTransparent()) ||
-						(g_map.map(iTestBackgroundX, iTestBackgroundY) & 0x05) > 0 || 
-						(g_map.map(iTestBackgroundX, iTestBackgroundY2) & 0x05) > 0)
+						(g_map.map(iTestBackgroundX, iTestBackgroundY) & 13) || 
+						(g_map.map(iTestBackgroundX, iTestBackgroundY2) & 13))
 					{
 						object->xf((float)(iTestBackgroundX * TILESIZE + TILESIZE) + 0.2f);
 						object->flipsidesifneeded();
@@ -1124,7 +1127,7 @@ void MovingPlatform::collide(IO_MovingObject * object)
 			if(fRelativeX2 >= 0.0f && fRelativeX2 < iWidth)
 				t2 = iTileType[(short)fRelativeX2 / TILESIZE][ty];
 		
-			if((t1 & 0x05) > 0 || (t2 & 0x05) > 0)
+			if((t1 & 13) || (t2 & 13))
 			{
 				if(object->iVerticalPlatformCollision == 2)
 				{
@@ -1189,7 +1192,7 @@ void MovingPlatform::collide(IO_MovingObject * object)
 
 				return;
 			}
-			else if((t1 & 0x05) > 0 || (t2 & 0x05) > 0)
+			else if((t1 & 13) || (t2 & 13))
 			{	//on ground
 				if(object->iVerticalPlatformCollision == 0)
 				{

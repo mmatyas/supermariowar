@@ -63,7 +63,7 @@ void CMap::convertMap()
 					fTilesNeedConversion = false;
 			}
 
-			if(objectdata[i][j.iType == BLOCKSETSIZE)
+			if(objectdata[i][j.iType == -1)
 				fBlocksNeedConversion = false;
 		}
 	}
@@ -99,7 +99,7 @@ void CMap::clearMap()
 			}
 
 			mapdatatop[i][j] = tile_nonsolid;
-			objectdata[i][j].iType = BLOCKSETSIZE;
+			objectdata[i][j].iType = -1;
 			warpdata[i][j].direction = -1;
 			warpdata[i][j].connection = -1;
 
@@ -475,7 +475,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 
 				objectdata[i][j].iType = (short)ReadInt(mapfile);
 				if(objectdata[i][j].iType == 15)
-					objectdata[i][j].iType = BLOCKSETSIZE;
+					objectdata[i][j].iType = -1;
 
 				objectdata[i][j].fHidden = false;
 				
@@ -713,7 +713,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 
 				objectdata[i][j].iType = (short)ReadInt(mapfile);
 				if(objectdata[i][j].iType == 6)
-					objectdata[i][j].iType = BLOCKSETSIZE;
+					objectdata[i][j].iType = -1;
 
 				objectdata[i][j].fHidden = false;
 				
@@ -909,7 +909,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 			{
 				objectdata[i][j].iType = (short)ReadInt(mapfile);
 				if(objectdata[i][j].iType == 6)
-					objectdata[i][j].iType = BLOCKSETSIZE;
+					objectdata[i][j].iType = -1;
 
 				objectdata[i][j].fHidden = false;
 				
@@ -1141,7 +1141,7 @@ void CMap::saveMap(const std::string& file)
 				if(tile->iID != TILESETNONE)
 					iPlatformCount++;
 
-				if(type == tile_death || type == tile_death_on_top || type == tile_death_on_bottom)
+				if(type == tile_death || type == tile_death_on_top || type == tile_death_on_bottom  || type == tile_death_on_left || type == tile_death_on_right)
 					iHazardCount++;
 
 				if(type == tile_ice)
@@ -1193,7 +1193,7 @@ void CMap::saveMap(const std::string& file)
 			}
 
 			//Calculate auto map filters
-			if(mapdatatop[i][j] == tile_death || mapdatatop[i][j] == tile_death_on_top || mapdatatop[i][j] == tile_death_on_bottom)
+			if(mapdatatop[i][j] == tile_death || mapdatatop[i][j] == tile_death_on_top || mapdatatop[i][j] == tile_death_on_bottom || mapdatatop[i][j] == tile_death_on_left || mapdatatop[i][j] == tile_death_on_right)
 				iHazardCount++;
 
 			if(warpdata[i][j].connection != -1)
@@ -1748,7 +1748,7 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks)
 			//If there is a block there
 			if(!fUsed)
 			{
-				if(objectdata[i][j].iType != BLOCKSETSIZE)
+				if(objectdata[i][j].iType != -1)
 					fUsed = true;
 			}
 
@@ -1784,14 +1784,14 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks)
 						
 						if(fUseTempBlocks)
 						{
-							if((type != tile_nonsolid && type != tile_gap) || block != BLOCKSETSIZE)
+							if((type != tile_nonsolid && type != tile_gap) || block != -1)
 							{
 								break;
 							}
 						}
 						else
 						{
-							if((type != tile_nonsolid && type != tile_gap) || (block != BLOCKSETSIZE && block != 0 && block != 2 && block != 6 && block < 11))
+							if((type != tile_nonsolid && type != tile_gap) || (block != -1 && block != 0 && block != 2 && block != 6 && block < 11))
 							{
 								break;
 							}
@@ -1814,14 +1814,14 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks)
 							
 							if(fUseTempBlocks)
 							{
-								if((type != tile_nonsolid && type != tile_gap) || block != BLOCKSETSIZE)
+								if((type != tile_nonsolid && type != tile_gap) || block != -1)
 								{
 									break;
 								}
 							}
 							else
 							{
-								if((type != tile_nonsolid && type != tile_gap) || (block != BLOCKSETSIZE && block != 0 && block != 2))
+								if((type != tile_nonsolid && type != tile_gap) || (block != -1 && block != 0 && block != 2))
 								{
 									break;
 								}
@@ -2304,7 +2304,7 @@ void CMap::drawPreviewBlocks(SDL_Surface * targetSurface, bool fThumbnail)
 			rectDst.y += iBlockSize;	// here
 
 			ts = objectdata[i][j].iType;
-			if(ts == BLOCKSETSIZE)
+			if(ts == -1)
 				continue;
 
 			//Don't draw hidden blocks
