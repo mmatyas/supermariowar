@@ -976,10 +976,8 @@ void MovingPlatform::collide(IO_MovingObject * object)
 			if(fRelativeY2 >= 0.0f && fRelativeY2 < iHeight)
 				t2 = iTileType[tx][(short)fRelativeY2 / TILESIZE];
 
-			if(t1 == tile_solid || t1 == tile_death_on_top || 
-			   t1 == tile_death_on_bottom || t1 == tile_ice ||
-			   t2 == tile_solid || t2 == tile_death_on_top || 
-			   t2 == tile_death_on_bottom || t2 == tile_ice)
+			if(t1 != tile_nonsolid && t1 != tile_gap && t1 != tile_solid_on_top && 
+				t2 != tile_nonsolid && t2 != tile_gap && t2 != tile_solid_on_top)
 			{
 				if(object->iHorizontalPlatformCollision == 3)
 				{
@@ -1047,10 +1045,8 @@ void MovingPlatform::collide(IO_MovingObject * object)
 			if(fRelativeY2 >= 0 && fRelativeY2 < iHeight)
 				t2 = iTileType[tx][(short)fRelativeY2 / TILESIZE];
 
-			if(t1 == tile_solid || t1 == tile_death_on_top || 
-			   t1 == tile_death_on_bottom || t1 == tile_ice ||
-			   t2 == tile_solid || t2 == tile_death_on_top || 
-			   t2 == tile_death_on_bottom || t2 == tile_ice)
+			if(t1 != tile_nonsolid && t1 != tile_gap && t1 != tile_solid_on_top && 
+				t2 != tile_nonsolid && t2 != tile_gap && t2 != tile_solid_on_top)
 			{
 				if(object->iHorizontalPlatformCollision == 1)
 				{
