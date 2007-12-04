@@ -2319,10 +2319,15 @@ void CMap::drawPreviewBlocks(SDL_Surface * targetSurface, bool fThumbnail)
 				if(iSwitches[(ts - 7) % 4] == 1)
 					rectSrc.y = iBlockSize;
 
-			if(ts >= 15 && ts <= 18)
+			if(ts >= 15 && ts <= 19)
 			{
 				rectSrc.x = iBlockSize * (ts - 15);
 				rectSrc.y = iBlockSize;
+			}
+			else if(ts >= 20 && ts <= 22)
+			{
+				rectSrc.x = iBlockSize * (ts - 20);
+				rectSrc.y = iBlockSize << 1;
 			}
 		
 			if(fThumbnail)

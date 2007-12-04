@@ -268,6 +268,7 @@ class CMap
 		friend class B_ThrowBlock;
 		friend class B_OnOffSwitchBlock;
 		friend class B_FlipBlock;
+		friend class B_WeaponBreakableBlock;
 
 		friend class MovingPlatform;
 		friend class MapList;

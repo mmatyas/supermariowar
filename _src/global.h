@@ -139,7 +139,6 @@ struct STextAward
 #define TILESETNONE		-2
 #define TILESETUNKNOWN	-3
 
-#define BLOCKSETSIZE	20			//size of block set
 #define TILEANIMATIONSIZE	38		//number of tile animations
 
 #define MAXMUSICCATEGORY	11
@@ -460,6 +459,7 @@ extern gfxSprite		spr_bounceblock;
 extern gfxSprite		spr_throwblock;
 extern gfxSprite		spr_switchblocks;
 extern gfxSprite		spr_viewblock;
+extern gfxSprite		spr_weaponbreakableblock;
 #endif
 
 extern gfxSprite		spr_brokenyellowblock;

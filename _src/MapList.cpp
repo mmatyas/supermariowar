@@ -74,6 +74,13 @@ MapList::MapList()
 		MapListNode * node = new MapListNode(debugMapDir.fullName(curname));
 		maps[stripCreatorAndDotMap(curname)] = node;
 	}
+
+	DirectoryListing specialMapDir(convertPath("maps/special/"), ".map");
+	while(specialMapDir(curname))
+	{
+		MapListNode * node = new MapListNode(specialMapDir.fullName(curname));
+		maps[stripCreatorAndDotMap(curname)] = node;
+	}
 #endif
 
 	//TODO: add proper test via size

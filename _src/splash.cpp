@@ -171,6 +171,7 @@ bool LoadGameGraphics()
 	gfx_loadimage(&spr_throwblock, convertPath("gfx/packs/blocks/throwblock.png", graphicspack), false);
 	gfx_loadimage(&spr_switchblocks, convertPath("gfx/packs/blocks/switchblock.png", graphicspack), false);
 	gfx_loadimage(&spr_viewblock, convertPath("gfx/packs/blocks/viewblock.png", graphicspack), false);
+	gfx_loadimage(&spr_weaponbreakableblock, convertPath("gfx/packs/blocks/weaponbreakableblock.png", graphicspack), false);
 	
 	gfx_loadimage(&spr_spring, convertPath("gfx/packs/powerups/spring.png", graphicspack), true);
 	gfx_loadimage(&spr_spike, convertPath("gfx/packs/powerups/spike.png", graphicspack), true);

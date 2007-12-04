@@ -439,6 +439,7 @@ class CPlayer
 		friend class B_ThrowBlock;
 		friend class B_OnOffSwitchBlock;
 		friend class B_SwitchBlock;
+		friend class B_WeaponBreakableBlock;
 
 		friend class PU_ExtraGuyPowerup;
 		friend class PU_StarPowerup;

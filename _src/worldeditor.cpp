@@ -2,12 +2,12 @@
 | Super Mario War World Editor								|
 |															|
 |															|
-| this sourcecode is released under the GPL.				|
+| this sourcecode is released under the GPLv2.				|
 |															|
 | start:		3.8.2007									|
 | last changes:	3.8.2007									|
 |															|
-|		   © 2007 Florian Hufsky <florian.hufsky@gmail.com>	|
+|	© 2003-2007 Florian Hufsky <florian.hufsky@gmail.com>	|
 +----------------------------------------------------------*/
 
 #define _SMW_EDITOR

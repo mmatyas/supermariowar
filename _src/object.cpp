@@ -867,16 +867,9 @@ bool B_BreakableBlock::hitright(IO_MovingObject * object)
 			object->velx = -object->velx;
 
 		MovingObjectType type = object->getMovingObjectType();
-		if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone /*|| type == movingobject_egg || type == movingobject_star*/)
+		if((type == movingobject_shell && object->state == 1) || type == movingobject_throwblock || type == movingobject_attackzone /*|| type == movingobject_egg || type == movingobject_star*/)
 		{
-			if(type == movingobject_shell)
-			{
-				if(object->state != 1)
-					return false;
-			}
-
 			triggerBehavior();
-
 			return true;
 		}
 	}
@@ -895,16 +888,9 @@ bool B_BreakableBlock::hitleft(IO_MovingObject * object)
 			object->velx = -object->velx;
 
 		MovingObjectType type = object->getMovingObjectType();
-		if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone /*|| type == movingobject_egg || type == movingobject_star*/)
+		if((type == movingobject_shell && object->state == 1) || type == movingobject_throwblock || type == movingobject_attackzone /*|| type == movingobject_egg || type == movingobject_star*/)
 		{
-			if(type == movingobject_shell)
-			{
-				if(object->state != 1)
-					return false;
-			}
-
-			triggerBehavior();
-			
+			triggerBehavior();	
 			return true;
 		}
 	}
@@ -2123,6 +2109,219 @@ void B_ThrowBlock::triggerBehavior()
 	
 	ifsoundonplay(sfx_breakblock);
 }
+
+
+//------------------------------------------------------------------------------
+// class weapon breakable block
+//------------------------------------------------------------------------------
+B_WeaponBreakableBlock::B_WeaponBreakableBlock(gfxSprite *nspr, short x, short y, short type) :
+	IO_Block(nspr, x, y)
+{
+	iType = type;
+	iw = TILESIZE;
+	ih = TILESIZE;
+
+	iDrawOffsetX = type << 5;
+}
+
+void B_WeaponBreakableBlock::draw()
+{
+	if(state == 0)
+		spr->draw(ix, iy, iDrawOffsetX, 0, iw, ih);
+}
+
+void B_WeaponBreakableBlock::update()
+{
+	if(state > 0)
+	{
+		if(state == 1)
+		{
+			state = 2;
+		}
+		else if(state == 2)
+		{
+			iBumpPlayerID = -1;
+			dead = true;
+			g_map.blockdata[col][row] = NULL;
+			g_map.UpdateTileGap(col, row);
+		}
+	}
+}
+
+
+bool B_WeaponBreakableBlock::hittop(CPlayer * player, bool useBehavior)
+{
+	IO_Block::hittop(player, useBehavior);
+
+	if(state == 1 || state == 2)
+	{
+		if(iBumpPlayerID >= 0 && !player->IsInvincibleOnBottom() && (player->teamID != iBumpPlayerTeam || game_values.friendlyfire))
+			PlayerKilledPlayer(iBumpPlayerID, *player, death_style_jump, kill_style_bounce);
+		else
+			player->vely = -VELNOTEBLOCKREPEL;
+	}
+	else if(useBehavior)
+	{
+		player->vely = GRAVITATION;
+
+		/*
+		//Save this for when we create a super stomp destroyable block
+		if(player->IsSuperStomping() && state == 0)
+		{
+			triggerBehavior();
+			return true;
+		}
+		*/
+	}
+
+	return false;
+}
+
+bool B_WeaponBreakableBlock::hitbottom(CPlayer * player, bool useBehavior)
+{
+	if(useBehavior && state == 0)
+	{
+		//If the player has a cape and they used it for a feather destroyable block, then kill it
+		bool fTriggerBlock = false;
+		if(iType == 1 && player->powerup == 3 && player->extrajumps > 0)
+		{
+			fTriggerBlock = true;
+		}
+		
+		if(fTriggerBlock)
+		{
+			triggerBehavior();
+			player->vely = CapFallingVelocity(-player->vely * BOUNCESTRENGTH);
+			player->yf((float)(iposy + ih) + 0.2f);
+			
+			iBumpPlayerID = player->globalID;
+			iBumpPlayerTeam = player->teamID;
+		}
+		else
+		{
+			return IO_Block::hitbottom(player, useBehavior);
+		}
+	}
+
+	return false;
+}
+
+bool B_WeaponBreakableBlock::hitleft(CPlayer * player, bool useBehavior)
+{
+	//TODO:: Expand these for blocks destroyed from the sides
+	return IO_Block::hitleft(player, useBehavior);
+}
+
+bool B_WeaponBreakableBlock::hitright(CPlayer * player, bool useBehavior)
+{
+	//TODO:: Expand these for blocks destroyed from the sides
+	return IO_Block::hitright(player, useBehavior);
+}
+
+bool B_WeaponBreakableBlock::hittop(IO_MovingObject * object)
+{
+	IO_Block::hittop(object);
+	
+	if((state == 1  || state == 2) && object->bounce == GRAVITATION)
+	{
+		BounceMovingObject(object);
+		return false;
+	}
+
+	if(state != 0)
+		return true;
+
+	MovingObjectType type = object->getMovingObjectType();
+
+	if(iType == 0 && type == movingobject_fireball)
+	{
+		triggerBehavior();
+		removeifprojectile(object, false, true);
+		return false;
+	}
+
+	return true;
+}
+
+bool B_WeaponBreakableBlock::hitbottom(IO_MovingObject * object)
+{
+	if(state != 0)
+		return true;
+
+	IO_Block::hitbottom(object);
+	
+	MovingObjectType type = object->getMovingObjectType();
+
+	if(iType == 0 && type == movingobject_fireball)
+	{
+		triggerBehavior();
+		removeifprojectile(object, false, true);
+		return false;
+	}
+
+	return true;
+}
+
+bool B_WeaponBreakableBlock::hitright(IO_MovingObject * object)
+{
+	if(state != 0)
+		return true;
+
+	IO_Block::hitright(object);
+
+	MovingObjectType type = object->getMovingObjectType();
+	if(iType == 2 && ((type == movingobject_shell && object->state == 1) || type == movingobject_throwblock))
+	{
+		triggerBehavior();
+		return false;
+	}
+	else if(iType == 0 && type == movingobject_fireball)
+	{
+		triggerBehavior();
+		removeifprojectile(object, false, true);
+		return false;
+	}
+
+	return true;
+}
+
+bool B_WeaponBreakableBlock::hitleft(IO_MovingObject * object)
+{
+	if(state != 0)
+		return true;
+
+	IO_Block::hitleft(object);
+
+	MovingObjectType type = object->getMovingObjectType();
+	if(iType == 2 && ((type == movingobject_shell && object->state == 1) || type == movingobject_throwblock))
+	{
+		triggerBehavior();
+		return false;
+	}
+	else if(iType == 0 && type == movingobject_fireball)
+	{
+		triggerBehavior();
+		removeifprojectile(object, false, true);
+		return false;
+	}
+
+	return true;
+}
+
+void B_WeaponBreakableBlock::triggerBehavior()
+{
+	if(state == 0)
+	{
+		eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix, iy, -2.2f, -10.0f, 4, 2, 0, 16, 16, 16));
+		eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix + 16, iy, 2.2f, -10.0f, 4, 2, 0, 16, 16, 16));
+		eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix, iy + 16, -2.2f, -5.5f, 4, 2, 0, 16, 16, 16));
+		eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix + 16, iy + 16, 2.2f, -5.5f, 4, 2, 0, 16, 16, 16));
+
+		state = 1;
+		ifsoundonplay(sfx_breakblock);
+	}
+}
+
 
 //------------------------------------------------------------------------------
 // class MovingObject (all moving objects inheirit from this class)

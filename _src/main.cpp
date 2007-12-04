@@ -7,7 +7,7 @@
 | you can read the tutorial on http://jnrdev.72dpiarmy.net	|
 |															|
 |															|
-| this sourcecode is released under the GPL.				|
+| this sourcecode is released under the GPLv2.				|
 |															|
 |															|
 | the code is a bit messy and contains a few things i'm not	|
@@ -22,7 +22,7 @@
 | start:		24.01.2003									|
 | last changes:	03.26.2007									|
 |															|
-|									 2007 © Florian Hufsky  |
+|								© 2003-2007 Florian Hufsky  |
 |								  florian.hufsky@gmail.com	|
 |                                     mtschaffer@gmail.com  |
 |								  http://smw.72dpiarmy.com	|
@@ -130,6 +130,7 @@ gfxSprite		spr_bounceblock;
 gfxSprite		spr_throwblock;
 gfxSprite		spr_switchblocks;
 gfxSprite		spr_viewblock;
+gfxSprite		spr_weaponbreakableblock;
 
 gfxSprite		spr_brokenyellowblock;
 gfxSprite		spr_brokenflipblock;
@@ -3164,74 +3165,80 @@ void LoadMapObjects()
 	{
 		for(short y = 0; y < MAPHEIGHT; y++)
 		{
-			if(g_map.objectdata[x][y].iType == 0)
+			short iType = g_map.objectdata[x][y].iType;
+			if(iType == 0)
 			{
 				g_map.blockdata[x][y] = new B_BreakableBlock(&spr_breakableblock, x * TILESIZE, y * TILESIZE, 4, 10);
 				objectblocks.add(g_map.blockdata[x][y]);
 			}
-			else if(g_map.objectdata[x][y].iType == 1)
+			else if(iType == 1)
 			{
 				g_map.blockdata[x][y] = new B_PowerupBlock(&spr_powerupblock, x * TILESIZE, y * TILESIZE, 4, 10, g_map.objectdata[x][y].fHidden, g_map.objectdata[x][y].iSettings);
 				objectblocks.add(g_map.blockdata[x][y]);
 			}
-			else if(g_map.objectdata[x][y].iType == 2)
+			else if(iType == 2)
 			{
 				g_map.blockdata[x][y] = new B_DonutBlock(&spr_donutblock, x * TILESIZE, y * TILESIZE);
 				objectblocks.add(g_map.blockdata[x][y]);
 			}
-			else if(g_map.objectdata[x][y].iType == 3)
+			else if(iType == 3)
 			{
 				g_map.blockdata[x][y] = new B_FlipBlock(&spr_flipblock, x * TILESIZE, y * TILESIZE, g_map.objectdata[x][y].fHidden);
 				objectblocks.add(g_map.blockdata[x][y]);
 			}
-			else if(g_map.objectdata[x][y].iType == 4)
+			else if(iType == 4)
 			{
 				g_map.blockdata[x][y] = new B_BounceBlock(&spr_bounceblock, x * TILESIZE, y * TILESIZE, g_map.objectdata[x][y].fHidden);
 				objectblocks.add(g_map.blockdata[x][y]);
 			}
-			else if(g_map.objectdata[x][y].iType == 5)
+			else if(iType == 5)
 			{
 				g_map.blockdata[x][y] = new B_NoteBlock(&spr_noteblock, x * TILESIZE, y * TILESIZE, 4, 10, 1, g_map.objectdata[x][y].fHidden);
 				objectblocks.add(g_map.blockdata[x][y]);
 			}
-			else if(g_map.objectdata[x][y].iType == 6)
+			else if(iType == 6)
 			{
 				g_map.blockdata[x][y] = new B_ThrowBlock(&spr_throwblock, x * TILESIZE, y * TILESIZE, 4, 10, 0);
 				objectblocks.add(g_map.blockdata[x][y]);
 			}
-			else if(g_map.objectdata[x][y].iType >= 7 && g_map.objectdata[x][y].iType <= 10)
+			else if(iType >= 7 && iType <= 10)
 			{
-				short iSwitchType = g_map.objectdata[x][y].iType - 7;
+				short iSwitchType = iType - 7;
 				g_map.blockdata[x][y] = new B_OnOffSwitchBlock(&spr_switchblocks, x * TILESIZE, y * TILESIZE, iSwitchType, g_map.iSwitches[iSwitchType]);
 				objectblocks.add(g_map.blockdata[x][y]);
 				g_map.switchBlocks[iSwitchType].push_back(g_map.blockdata[x][y]);
 			}
-			else if(g_map.objectdata[x][y].iType >= 11 && g_map.objectdata[x][y].iType <= 14)
+			else if(iType >= 11 && iType <= 14)
 			{
-				short iSwitchType = g_map.objectdata[x][y].iType - 11;
+				short iSwitchType = iType - 11;
 
 				g_map.blockdata[x][y] = new B_SwitchBlock(&spr_switchblocks, x * TILESIZE, y * TILESIZE, iSwitchType, g_map.iSwitches[iSwitchType]);
 				objectblocks.add(g_map.blockdata[x][y]);
 				g_map.switchBlocks[iSwitchType + 4].push_back(g_map.blockdata[x][y]);
 			}
-			else if(g_map.objectdata[x][y].iType == 15)
+			else if(iType == 15)
 			{
 				g_map.blockdata[x][y] = new B_ViewBlock(&spr_viewblock, x * TILESIZE, y * TILESIZE, g_map.objectdata[x][y].fHidden, g_map.objectdata[x][y].iSettings);
 				objectblocks.add(g_map.blockdata[x][y]);
 			}
-			else if(g_map.objectdata[x][y].iType == 16)
+			else if(iType == 16)
 			{
 				g_map.blockdata[x][y] = new B_ThrowBlock(&spr_throwblock, x * TILESIZE, y * TILESIZE, 4, 10, 2);
 				objectblocks.add(g_map.blockdata[x][y]);
 			}
-			else if(g_map.objectdata[x][y].iType == 17 || g_map.objectdata[x][y].iType == 18)
+			else if(iType == 17 || iType == 18)
 			{
-				g_map.blockdata[x][y] = new B_NoteBlock(&spr_noteblock, x * TILESIZE, y * TILESIZE, 4, 10, g_map.objectdata[x][y].iType == 17 ? 2 : 0, g_map.objectdata[x][y].fHidden);
+				g_map.blockdata[x][y] = new B_NoteBlock(&spr_noteblock, x * TILESIZE, y * TILESIZE, 4, 10, iType == 17 ? 2 : 0, g_map.objectdata[x][y].fHidden);
 				objectblocks.add(g_map.blockdata[x][y]);
 			}
-			else if(g_map.objectdata[x][y].iType == 19)
+			else if(iType == 19)
 			{
 				g_map.blockdata[x][y] = new B_ThrowBlock(&spr_throwblock, x * TILESIZE, y * TILESIZE, 4, 10, 1);
+				objectblocks.add(g_map.blockdata[x][y]);
+			}
+			else if(iType >= 20 && iType <= 22)
+			{
+				g_map.blockdata[x][y] = new B_WeaponBreakableBlock(&spr_weaponbreakableblock, x * TILESIZE, y * TILESIZE, iType - 20);
 				objectblocks.add(g_map.blockdata[x][y]);
 			}
 			else

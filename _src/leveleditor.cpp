@@ -7,15 +7,12 @@
 | ...with some improvements									|
 |															|
 |															|
-| this sourcecode is released under the GPL.				|
+| this sourcecode is released under the GPLv2.				|
 |															|
 | start:		18.12.2003									|
-| last changes:	20.02.2004									|
-| save/load added 03.7.2004 by Armen - thanks!				|
-| blocks/maplist/2-layers/extended tile set added 15.07.2005|
-|                                                  by Two52 |
+| last changes:	 3.12.2007									|
 |															|
-|		© 2004 Florian Hufsky <florian.hufsky@gmail.com>	|
+|	© 2003-2007 Florian Hufsky <florian.hufsky@gmail.com>	|
 +----------------------------------------------------------*/
 
 #define _SMW_EDITOR
@@ -1501,6 +1498,11 @@ void drawmap(bool fScreenshot, short iBlockSize)
 						rSrc.x = (displayblock - 15) * iBlockSize;
 						rSrc.y = iBlockSize;
 					}
+					else if(displayblock >= 20 && displayblock <= 22)
+					{
+						rSrc.x = (displayblock - 20) * iBlockSize;
+						rSrc.y = iBlockSize << 1;
+					}
 					
 					SDL_BlitSurface(spr_blocks[iTilesizeIndex].getSurface(), &rSrc, screen, &g_tilesetmanager.rRects[iTilesizeIndex][i][j]);
 				}
@@ -2908,6 +2910,11 @@ int editor_blocks()
 							
 							set_block = set_block_x + 11;
 						}
+						else if(set_block_y == 4 && set_block_x >= 0 && set_block_x <= 2)
+						{  //set the selected block to a switch block
+							
+							set_block = set_block_x + 20;
+						}
 
 						edit_mode = 0;
 
@@ -2944,6 +2951,11 @@ int editor_blocks()
 		SDL_Rect rBlocksRow2Dst = {224, 0, 160, 32};
 
 		SDL_BlitSurface(spr_blocks[0].getSurface(), &rBlocksRow2Src, screen, &rBlocksRow2Dst);
+
+		SDL_Rect rBlocksRow3Src = {0, 64, 96, 32};
+		SDL_Rect rBlocksRow3Dst = {0, 128, 160, 32};
+
+		SDL_BlitSurface(spr_blocks[0].getSurface(), &rBlocksRow3Src, screen, &rBlocksRow3Dst);
 
 		menu_font_small.drawRightJustified(640, 0, maplist.currentFilename());
 				
