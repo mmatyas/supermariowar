@@ -76,6 +76,16 @@ static NSString *getApplicationName(void)
     event.type = SDL_QUIT;
     SDL_PushEvent(&event);
 }
+
+- (void)sendEvent:(NSEvent *)anEvent
+{
+	if(NSKeyDown == [anEvent type] || NSKeyUp == [anEvent type]){
+		if([anEvent modifierFlags] & NSCommandKeyMask && [[anEvent characters] rangeOfString:@"q"].location != NSNotFound){
+			[super sendEvent: anEvent];
+		}
+	}
+}
+
 @end
 
 /* The main class of the application, the application's delegate */
@@ -296,7 +306,10 @@ static void CustomApplicationMain (int argc, char **argv)
     /* Set the main menu to contain the real app name instead of "SDL App" */
     [self fixMenu:[NSApp mainMenu] withAppName:getApplicationName()];
 #endif
-
+	
+	/* Allow SDL to pass key presses to NSApp */
+	setenv("SDL_ENABLEAPPEVENTS", "1", 1);
+	
     /* Hand off to main application code */
     gCalledAppMainline = TRUE;
     status = SDL_main (gArgc, gArgv);
@@ -304,6 +317,9 @@ static void CustomApplicationMain (int argc, char **argv)
     /* We're done, thank you for playing */
     exit(status);
 }
+
+/* Pause the game if the user hides the application. */
+
 @end
 
 
