@@ -11,13 +11,13 @@ void WriteInt(int out, FILE * outFile)
     ((char*)&out)[3] = ((char*)&t)[0];
 #endif
 
-	fwrite(&out, sizeof(int), 1, outFile);
+	fwrite(&out, sizeof(Uint32), 1, outFile);
 }
 
 int ReadInt(FILE * inFile)
 {
 	int in;
-	fread(&in, sizeof(int), 1, inFile);
+	fread(&in, sizeof(Uint32), 1, inFile);
 
 #if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
 	int t = in;
@@ -36,7 +36,7 @@ void ReadIntChunk(int * mem, size_t iQuantity, FILE * inFile)
 {
 	for(unsigned int i = 0; i < iQuantity; i++)
 	{
-		fread(&mem[i], sizeof(int), 1, inFile);
+		fread(&mem[i], sizeof(Uint32), 1, inFile);
 
 		int t = mem[i];
 
@@ -49,7 +49,7 @@ void ReadIntChunk(int * mem, size_t iQuantity, FILE * inFile)
 #else
 void ReadIntChunk(int * mem, size_t iQuantity, FILE * inFile)
 {
-	fread(mem, sizeof(int), iQuantity, inFile);
+	fread(mem, sizeof(Uint32), iQuantity, inFile);
 }
 #endif
 
@@ -89,7 +89,7 @@ void WriteString(char * szString, FILE * outFile)
 {
 	int iLen = strlen(szString) + 1;
 	WriteInt(iLen, outFile);
-	fwrite(szString, sizeof(char), iLen, outFile);
+	fwrite(szString, sizeof(Uint8), iLen, outFile);
 }
 
 void ReadString(char * szString, short size, FILE * inFile)
@@ -97,7 +97,7 @@ void ReadString(char * szString, short size, FILE * inFile)
 	int iLen = ReadInt(inFile);
 
 	char * szReadString = new char[iLen];
-	fread(szReadString, sizeof(char), iLen, inFile);
+	fread(szReadString, sizeof(Uint8), iLen, inFile);
 	szReadString[iLen - 1] = 0;
 
 	//Prevent buffer overflow  5253784 5253928
@@ -111,26 +111,26 @@ void ReadString(char * szString, short size, FILE * inFile)
 void WriteByteFromShort(short out, FILE * outFile)
 {
 	char b = (char)out;
-	fwrite(&b, sizeof(char), 1, outFile);
+	fwrite(&b, sizeof(Uint8), 1, outFile);
 }
 
 short ReadByteAsShort(FILE * inFile)
 {
 	char b;
-	fread(&b, sizeof(char), 1, inFile);
+	fread(&b, sizeof(Uint8), 1, inFile);
 
 	return (short)b;
 }
 
 void WriteBool(bool out, FILE * outFile)
 {
-	fwrite(&out, sizeof(bool), 1, outFile);
+	fwrite(&out, sizeof(Uint8), 1, outFile);
 }
 
 bool ReadBool(FILE * inFile)
 {
 	bool b;
-	fread(&b, sizeof(bool), 1, inFile);
+	fread(&b, sizeof(Uint8), 1, inFile);
 
 	return b;
 }
