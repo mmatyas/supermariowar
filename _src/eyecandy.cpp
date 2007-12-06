@@ -126,8 +126,8 @@ void EC_OscillatingAnimation::animate()
 //------------------------------------------------------------------------------
 // class cloud
 //------------------------------------------------------------------------------
-EC_Cloud::EC_Cloud(gfxSprite *nspr, float nx, float ny, float nvelx) :
-	EC_StillImage(nspr, (short)nx, (short)ny, 0, 0, 0, 0)
+EC_Cloud::EC_Cloud(gfxSprite *nspr, float nx, float ny, float nvelx, short srcx, short srcy, short w, short h) :
+	EC_StillImage(nspr, (short)nx, (short)ny, srcx, srcy, w, h)
 {
 	dx = nx;
 	dy = ny;
@@ -150,8 +150,8 @@ void EC_Cloud::update()
 //------------------------------------------------------------------------------
 // class ghost
 //------------------------------------------------------------------------------
-EC_Ghost::EC_Ghost(gfxSprite *nspr, float nx, float ny, float nvelx, short ianimationspeed, short inumframes) :
-	EC_Animated(nspr, (short)nx, (short)ny, 0, nvelx < 0.0f ? 32 : 0, 32, 32, ianimationspeed, inumframes)
+EC_Ghost::EC_Ghost(gfxSprite *nspr, float nx, float ny, float nvelx, short ianimationspeed, short inumframes, short srcx, short srcy, short w, short h) :
+	EC_Animated(nspr, (short)nx, (short)ny, srcx, srcy, w, h, ianimationspeed, inumframes)
 {
 	dx = nx;
 	dy = ny;

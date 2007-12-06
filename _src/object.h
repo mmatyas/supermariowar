@@ -95,7 +95,7 @@ class IO_Block : public CObject
 		void BounceMovingObject(IO_MovingObject * object);
 
 		short iBumpPlayerID;
-		short iBumpPlayerTeam;
+		short iBumpTeamID;
 
 		float fposx, fposy;  //position to return to (for note and bumpable blocks)
 		short iposx, iposy; //position of the block (doesn't move)
@@ -414,9 +414,11 @@ class B_WeaponBreakableBlock : public IO_Block
 		bool hitright(IO_MovingObject * object);
 		bool hitleft(IO_MovingObject * object);
 
-		void triggerBehavior();
+		void triggerBehavior(short iPlayerID, short iTeamID);
 
 	private:
+		bool objecthitside(IO_MovingObject * object);
+
 		short iType;
 		short iDrawOffsetX;
 };
@@ -942,6 +944,7 @@ class MO_CarriedObject : public IO_MovingObject
 		bool fSmoking;
 
 	friend class B_ThrowBlock;
+	friend class CPlayer;
 };
 
 class CO_Egg : public MO_CarriedObject
@@ -1394,6 +1397,8 @@ class CO_Shell : public MO_CarriedObject
 		short iShellType;
 
 		short playerID;
+		short teamID;
+
 		short iIgnoreBounceTimer;
 		short iDestY;
 
@@ -1419,6 +1424,9 @@ class CO_Shell : public MO_CarriedObject
 	friend class MO_Koopa;
 	friend class MO_SledgeBrother;
 	friend class OMO_CheepCheep;
+	
+	friend class B_WeaponBreakableBlock;
+	
 	friend void RunGame();
 };
 
@@ -1450,6 +1458,8 @@ class CO_ThrowBlock : public MO_CarriedObject
 		short iType;
 		
 		short playerID;
+		short teamID;
+
 		short iDeathTime;
 		bool fDieOnBounce;
 		bool fDieOnPlayerCollision;
@@ -1462,9 +1472,11 @@ class CO_ThrowBlock : public MO_CarriedObject
 	friend class MO_Goomba;
 	friend class MO_SledgeBrother;
 	friend class OMO_CheepCheep;
-	friend class B_ThrowBlock;
 	friend class OMO_SpinAttack;
 	friend class OMO_AttackZone;
+
+	friend class B_ThrowBlock;
+	friend class B_WeaponBreakableBlock;
 
 	friend void RunGame();
 };

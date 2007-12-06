@@ -97,7 +97,7 @@ class EC_Corpse : public EC_StillImage
 class EC_Cloud : public EC_StillImage
 {
 	public:
-		EC_Cloud(gfxSprite *nspr, float nx, float ny, float nvelx);
+		EC_Cloud(gfxSprite *nspr, float nx, float ny, float nvelx, short srcx, short srcy, short w, short h);
 		~EC_Cloud() {}
 		void update();
 
@@ -109,7 +109,7 @@ class EC_Cloud : public EC_StillImage
 class EC_Ghost : public EC_Animated
 {
 	public:
-		EC_Ghost(gfxSprite *nspr, float nx, float ny, float nvelx, short ianimationspeed, short inumframes);
+		EC_Ghost(gfxSprite *nspr, float nx, float ny, float nvelx, short ianimationspeed, short inumframes, short srcx, short srcy, short w, short h);
 		~EC_Ghost() {}
 		void update();
 

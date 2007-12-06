@@ -123,7 +123,7 @@ IO_Block::IO_Block(gfxSprite *nspr, short x, short y) :
 	CObject(nspr, x, y)
 {
 	iBumpPlayerID = -1;
-	iBumpPlayerTeam = -1;
+	iBumpTeamID = -1;
 
 	fposx = fx;
 	fposy = fy;
@@ -495,7 +495,7 @@ bool B_PowerupBlock::hittop(CPlayer * player, bool useBehavior)
 
 	if(state == 1)
 	{
-		if(iBumpPlayerID >= 0 && !player->IsInvincibleOnBottom() && (player->teamID != iBumpPlayerTeam || game_values.friendlyfire))
+		if(iBumpPlayerID >= 0 && !player->IsInvincibleOnBottom() && (player->teamID != iBumpTeamID || game_values.friendlyfire))
 			PlayerKilledPlayer(iBumpPlayerID, *player, death_style_jump, kill_style_bounce);
 		else
 			player->vely = -VELNOTEBLOCKREPEL;
@@ -533,7 +533,7 @@ bool B_PowerupBlock::hitbottom(CPlayer * player, bool useBehavior)
 			ifsoundonplay(sfx_bump);
 
 			iBumpPlayerID = player->globalID;
-			iBumpPlayerTeam = player->teamID;
+			iBumpTeamID = player->teamID;
 
 			vely = -VELBLOCKBOUNCE;
 			state = 1;
@@ -798,7 +798,7 @@ bool B_BreakableBlock::hittop(CPlayer * player, bool useBehavior)
 
 	if(state == 1 || state == 2)
 	{
-		if(iBumpPlayerID >= 0 && !player->IsInvincibleOnBottom() && (player->teamID != iBumpPlayerTeam || game_values.friendlyfire))
+		if(iBumpPlayerID >= 0 && !player->IsInvincibleOnBottom() && (player->teamID != iBumpTeamID || game_values.friendlyfire))
 			PlayerKilledPlayer(iBumpPlayerID, *player, death_style_jump, kill_style_bounce);
 		else
 			player->vely = -VELNOTEBLOCKREPEL;
@@ -832,7 +832,7 @@ bool B_BreakableBlock::hitbottom(CPlayer * player, bool useBehavior)
 		player->yf((float)(iposy + ih) + 0.2f);
 		
 		iBumpPlayerID = player->globalID;
-		iBumpPlayerTeam = player->teamID;
+		iBumpTeamID = player->teamID;
 	}
 
 	return false;
@@ -1037,7 +1037,7 @@ bool B_NoteBlock::hitbottom(CPlayer * player, bool useBehavior)
 		if(state == 0)
 		{
 			iBumpPlayerID = player->globalID;
-			iBumpPlayerTeam = player->teamID;
+			iBumpTeamID = player->teamID;
 
 			vely = -VELNOTEBLOCKBOUNCE;
 			state = 3;
@@ -1345,7 +1345,7 @@ bool B_FlipBlock::hitbottom(CPlayer * player, bool useBehavior)
 		player->yf((float)(iposy + ih) + 0.2f);
 		
 		iBumpPlayerID = player->globalID;
-		iBumpPlayerTeam = player->teamID;
+		iBumpTeamID = player->teamID;
 
 		hidden = false;
 
@@ -1550,7 +1550,7 @@ bool B_OnOffSwitchBlock::hittop(CPlayer * player, bool useBehavior)
 
 	if(state == 1 || state == 4)
 	{
-		if(iBumpPlayerID >= 0 && !player->IsInvincibleOnBottom() && (player->teamID != iBumpPlayerTeam || game_values.friendlyfire))
+		if(iBumpPlayerID >= 0 && !player->IsInvincibleOnBottom() && (player->teamID != iBumpTeamID || game_values.friendlyfire))
 			PlayerKilledPlayer(iBumpPlayerID, *player, death_style_jump, kill_style_bounce);
 		else
 			player->vely = -VELNOTEBLOCKREPEL;
@@ -1577,7 +1577,7 @@ bool B_OnOffSwitchBlock::hitbottom(CPlayer * player, bool useBehavior)
 		if(state == 0 || state == 3)
 		{
 			iBumpPlayerID = player->globalID;
-			iBumpPlayerTeam = player->teamID;
+			iBumpTeamID = player->teamID;
 
 			triggerBehavior();
 		}
@@ -1895,7 +1895,7 @@ bool B_BounceBlock::hittop(CPlayer * player, bool useBehavior)
 
 	if(state == 1)
 	{
-		if(iBumpPlayerID >= 0 && !player->IsInvincibleOnBottom() && (player->teamID != iBumpPlayerTeam || game_values.friendlyfire))
+		if(iBumpPlayerID >= 0 && !player->IsInvincibleOnBottom() && (player->teamID != iBumpTeamID || game_values.friendlyfire))
 			PlayerKilledPlayer(iBumpPlayerID, *player, death_style_jump, kill_style_bounce);
 		else
 			player->vely = -VELNOTEBLOCKREPEL;
@@ -1917,7 +1917,7 @@ bool B_BounceBlock::hitbottom(CPlayer * player, bool useBehavior)
 		player->yf((float)(iposy + ih) + 0.2f);
 
 		iBumpPlayerID = player->globalID;
-		iBumpPlayerTeam = player->teamID;
+		iBumpTeamID = player->teamID;
 
 		triggerBehavior();
 
@@ -2155,7 +2155,7 @@ bool B_WeaponBreakableBlock::hittop(CPlayer * player, bool useBehavior)
 
 	if(state == 1 || state == 2)
 	{
-		if(iBumpPlayerID >= 0 && !player->IsInvincibleOnBottom() && (player->teamID != iBumpPlayerTeam || game_values.friendlyfire))
+		if(iBumpPlayerID >= 0 && !player->IsInvincibleOnBottom() && (player->teamID != iBumpTeamID || game_values.friendlyfire))
 			PlayerKilledPlayer(iBumpPlayerID, *player, death_style_jump, kill_style_bounce);
 		else
 			player->vely = -VELNOTEBLOCKREPEL;
@@ -2168,7 +2168,7 @@ bool B_WeaponBreakableBlock::hittop(CPlayer * player, bool useBehavior)
 		//Save this for when we create a super stomp destroyable block
 		if(player->IsSuperStomping() && state == 0)
 		{
-			triggerBehavior();
+			triggerBehavior(player->globalID, player->teamID);
 			return true;
 		}
 		*/
@@ -2190,12 +2190,9 @@ bool B_WeaponBreakableBlock::hitbottom(CPlayer * player, bool useBehavior)
 		
 		if(fTriggerBlock)
 		{
-			triggerBehavior();
+			triggerBehavior(player->globalID, player->teamID);
 			player->vely = CapFallingVelocity(-player->vely * BOUNCESTRENGTH);
 			player->yf((float)(iposy + ih) + 0.2f);
-			
-			iBumpPlayerID = player->globalID;
-			iBumpPlayerTeam = player->teamID;
 		}
 		else
 		{
@@ -2235,7 +2232,8 @@ bool B_WeaponBreakableBlock::hittop(IO_MovingObject * object)
 
 	if(iType == 0 && type == movingobject_fireball)
 	{
-		triggerBehavior();
+		MO_Fireball * fireball = (MO_Fireball*)object;
+		triggerBehavior(fireball->playerID, fireball->teamID);
 		removeifprojectile(object, false, true);
 		return false;
 	}
@@ -2254,7 +2252,8 @@ bool B_WeaponBreakableBlock::hitbottom(IO_MovingObject * object)
 
 	if(iType == 0 && type == movingobject_fireball)
 	{
-		triggerBehavior();
+		MO_Fireball * fireball = (MO_Fireball*)object;
+		triggerBehavior(fireball->playerID, fireball->teamID);
 		removeifprojectile(object, false, true);
 		return false;
 	}
@@ -2269,20 +2268,7 @@ bool B_WeaponBreakableBlock::hitright(IO_MovingObject * object)
 
 	IO_Block::hitright(object);
 
-	MovingObjectType type = object->getMovingObjectType();
-	if(iType == 2 && ((type == movingobject_shell && object->state == 1) || type == movingobject_throwblock))
-	{
-		triggerBehavior();
-		return false;
-	}
-	else if(iType == 0 && type == movingobject_fireball)
-	{
-		triggerBehavior();
-		removeifprojectile(object, false, true);
-		return false;
-	}
-
-	return true;
+	return objecthitside(object);
 }
 
 bool B_WeaponBreakableBlock::hitleft(IO_MovingObject * object)
@@ -2292,23 +2278,10 @@ bool B_WeaponBreakableBlock::hitleft(IO_MovingObject * object)
 
 	IO_Block::hitleft(object);
 
-	MovingObjectType type = object->getMovingObjectType();
-	if(iType == 2 && ((type == movingobject_shell && object->state == 1) || type == movingobject_throwblock))
-	{
-		triggerBehavior();
-		return false;
-	}
-	else if(iType == 0 && type == movingobject_fireball)
-	{
-		triggerBehavior();
-		removeifprojectile(object, false, true);
-		return false;
-	}
-
-	return true;
+	return objecthitside(object);
 }
 
-void B_WeaponBreakableBlock::triggerBehavior()
+void B_WeaponBreakableBlock::triggerBehavior(short iPlayerID, short iTeamID)
 {
 	if(state == 0)
 	{
@@ -2319,9 +2292,46 @@ void B_WeaponBreakableBlock::triggerBehavior()
 
 		state = 1;
 		ifsoundonplay(sfx_breakblock);
+
+		iBumpPlayerID = iPlayerID;
+		iBumpTeamID = iTeamID;
 	}
 }
 
+bool B_WeaponBreakableBlock::objecthitside(IO_MovingObject * object)
+{
+	MovingObjectType type = object->getMovingObjectType();
+	
+	if(iType == 2 && ((type == movingobject_shell && object->state == 1) || type == movingobject_throwblock))
+	{
+		short iPlayerID = -1;
+		short iTeamID = -1;
+		if(type == movingobject_shell)
+		{
+			CO_Shell * shell = (CO_Shell*)object;
+			iPlayerID = shell->playerID;
+			iTeamID = shell->teamID;
+		}
+		else if(type == movingobject_throwblock)
+		{
+			CO_ThrowBlock * throwblock = (CO_ThrowBlock*)object;
+			iPlayerID = throwblock->playerID;
+			iTeamID = throwblock->teamID;
+		}
+
+		triggerBehavior(iPlayerID, iTeamID);
+		return false;
+	}
+	else if(iType == 0 && type == movingobject_fireball)
+	{
+		MO_Fireball * fireball = (MO_Fireball*)object;
+		triggerBehavior(fireball->playerID, fireball->teamID);
+		removeifprojectile(object, false, true);
+		return false;
+	}
+
+	return true;
+}
 
 //------------------------------------------------------------------------------
 // class MovingObject (all moving objects inheirit from this class)
@@ -7876,7 +7886,10 @@ CO_Shell::CO_Shell(short type, short x, short y, bool dieOnMovingPlayerCollision
 	bounce = GRAVITATION;
 	objectType = object_moving;
 	movingObjectType = movingobject_shell;
+	
 	playerID = -1;
+	teamID = -1;
+
 	iIgnoreBounceTimer = 0;
 	iBounceCounter = 0;
 
@@ -8007,6 +8020,7 @@ bool CO_Shell::HitOther(CPlayer * player)
 			{
 				owner = player;
 				playerID = owner->globalID;
+				teamID = owner->teamID;
 				state = 3;
 			}
 			else
@@ -8044,6 +8058,7 @@ bool CO_Shell::HitOther(CPlayer * player)
 		if(player != owner && (game_values.friendlyfire || player->teamID != owner->teamID))
 		{
 			playerID = owner->globalID;
+			teamID = owner->teamID;
 			return KillPlayer(player);
 		}
 	}
@@ -8280,6 +8295,7 @@ void CO_Shell::Kick(bool superkick)
 	vely = 0.0f;
 
 	playerID = owner->globalID;
+	teamID = owner->teamID;
 
 	owner = NULL;
 	iNoOwnerKillTime = 30;
@@ -8330,14 +8346,13 @@ void CO_Shell::SideBounce()
 
 void CO_Shell::Flip()
 {
-	if(fFlipped)
-		return;
-
-	fFlipped = true;
-	iFlippedOffset = 128;
+	if(!fFlipped)
+	{
+		fFlipped = true;
+		iFlippedOffset = 128;
+	}
 
 	Stop();
-
 	vely = -VELJUMP / 2.0;
 }
 
@@ -8365,6 +8380,7 @@ CO_ThrowBlock::CO_ThrowBlock(gfxSprite * nspr, short x, short y, short type) :
 	objectType = object_moving;
 	movingObjectType = movingobject_throwblock;
 	playerID = -1;
+	teamID = -1;
 	
 	fDieOnBounce = type != 2;
 	fDieOnPlayerCollision = type == 0;
@@ -8437,6 +8453,7 @@ bool CO_ThrowBlock::HitOther(CPlayer * player)
 		if(player != owner)
 		{
 			playerID = owner->globalID;
+			teamID = owner->teamID;
 			return KillPlayer(player);
 		}
 	}
@@ -8570,6 +8587,7 @@ void CO_ThrowBlock::Kick(bool superkick)
 	vely = 0.0f;
 
 	playerID = owner->globalID;
+	teamID = owner->teamID;
 
 	owner = NULL;
 	iNoOwnerKillTime = 30;

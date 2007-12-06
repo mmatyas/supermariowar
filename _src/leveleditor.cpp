@@ -1668,7 +1668,7 @@ int editor_warp()
 	return EDITOR_QUIT;
 }
 
-char * szEyecandyNames[4] = {"Clouds", "Ghosts", "Leaves", "Snow"};
+char * szEyecandyNames[5] = {"Clouds", "Ghosts", "Leaves", "Snow", "Fish"};
 int editor_eyecandy()
 {
 	bool done = false;
@@ -1700,10 +1700,10 @@ int editor_eyecandy()
 				{
 					if(event.button.button == SDL_BUTTON_LEFT)
 					{
-						for(int k = 0; k < 4; k++)
+						for(int k = 0; k < 5; k++)
 						{
 							if(event.button.x >= 275 && event.button.x < 365 &&
-								event.button.y >= k * 80 + 100 && event.button.y < k * 80 + 152)
+								event.button.y >= k * 80 + 60 && event.button.y < k * 80 + 112)
 							{
 								short mask = 1 << k;
 								if(g_map.eyecandyID & mask)
@@ -1729,10 +1729,10 @@ int editor_eyecandy()
 		int iMouseX, iMouseY;
 		SDL_GetMouseState(&iMouseX, &iMouseY);
 
-		for(int k = 0; k < 4; k++)
+		for(int k = 0; k < 5; k++)
 		{
 			short ix = 275;
-			short iy = k * 80 + 100;
+			short iy = k * 80 + 60;
 
 			if(iMouseX >= ix && iMouseX < ix + 90 && iMouseY >= iy && iMouseY < iy + 52)
 				spr_powerupselector.draw(ix, iy, 0, 0, 90, 52);

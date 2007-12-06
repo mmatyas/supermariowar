@@ -1534,6 +1534,9 @@ void CPlayer::move()
 						carriedItem->Drop();
 					else
 					{
+						//Make sure the owner of the object we are kicking is this player
+						carriedItem->owner = this;
+
 						//Make sure the shell/block is out in front of player before kicking it
 						if(carriedItem->getMovingObjectType() == movingobject_shell || carriedItem->getMovingObjectType() == movingobject_throwblock)
 							carriedItem->MoveToOwner();
@@ -4367,6 +4370,8 @@ bool CPlayer::AcceptItem(MO_CarriedObject * item)
 	if(fAcceptingItem && statue_timer == 0 && !fKuriboShoe)
 	{
 		carriedItem = item;
+		item->owner = this;
+
 		fAcceptingItem = false;
 		return true;
 	}

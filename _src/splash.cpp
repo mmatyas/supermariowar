@@ -152,12 +152,9 @@ bool LoadGameGraphics()
 	gfx_loadimage(&menu_survival, convertPath("gfx/packs/modeobjects/menu_survival.png", graphicspack), false);
 	gfx_loadimage(&menu_stomp, convertPath("gfx/packs/modeobjects/menu_stomp.png", graphicspack), false);
 
-	gfx_loadimage(&spr_clouds[0], convertPath("gfx/packs/eyecandy/cloud1.png", graphicspack), 255, true);
-	gfx_loadimage(&spr_clouds[1], convertPath("gfx/packs/eyecandy/cloud2.png", graphicspack), 255, true);
-
-	gfx_loadimage(&spr_ghosts[0], convertPath("gfx/packs/eyecandy/ghost1.png", graphicspack), 128, true);
-	gfx_loadimage(&spr_ghosts[1], convertPath("gfx/packs/eyecandy/ghost2.png", graphicspack), 128, true);
-	gfx_loadimage(&spr_ghosts[2], convertPath("gfx/packs/eyecandy/ghost3.png", graphicspack), 128, true);
+	gfx_loadimage(&spr_clouds, convertPath("gfx/packs/eyecandy/cloud.png", graphicspack), 255, true);
+	gfx_loadimage(&spr_ghosts, convertPath("gfx/packs/eyecandy/ghost.png", graphicspack), 128, true);
+	gfx_loadimage(&spr_fish, convertPath("gfx/packs/eyecandy/fish.png", graphicspack), 128, true);
 
 	gfx_loadimage(&spr_leaves, convertPath("gfx/packs/eyecandy/leaves.png", graphicspack), true);
 	gfx_loadimage(&spr_snow, convertPath("gfx/packs/eyecandy/snow.png", graphicspack), true);

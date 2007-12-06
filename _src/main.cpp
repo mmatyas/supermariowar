@@ -29,7 +29,8 @@
 +----------------------------------------------------------*/
 
 //TODO:
-//1) Need to add "Default" option to powerup/view blocks to default to game's powerup settings
+//1) There is/was a crashing bug related to shells (kicking carried items that had a null owner)
+//   This caused a crash and needs to be tested more.
 
 #ifdef _XBOX
 	#include <xtl.h>
@@ -66,8 +67,9 @@ short			y_shake = 0;
 gfxSprite		** spr_player[4];	//all player sprites (see global.h)
 gfxSprite		** spr_chocobo[4];
 gfxSprite		** spr_bobomb[4];
-gfxSprite		spr_clouds[2];
-gfxSprite		spr_ghosts[3];
+gfxSprite		spr_clouds;
+gfxSprite		spr_ghosts;
+gfxSprite		spr_fish;
 gfxSprite		spr_leaves;
 gfxSprite		spr_snow;
 gfxSprite		spr_background;
@@ -1300,49 +1302,99 @@ void RunGame()
 		score[i]->order = -1;
 	}
 
+	//Clouds
 	if(g_map.eyecandyID & 0x1)
 	{
 		for(i = 0; i < 4; i++)
 		{
-			short c = (short)(rand() % 2);	//cloud type (0... small cloud, 1... big cloud)
 			float velx;			//speed of cloud, small clouds are slower than big ones
-			if(c == 0)
-				velx = (short)(rand()%51-25)/10.0f;	//big clouds: -3 - +3 pixel/frame
+			short srcy, w, h;
+
+			if(rand() % 2)
+			{
+				velx = (short)(rand() % 51 - 25) / 10.0f;	//big clouds: -3 - +3 pixel/frame
+				srcy = 0;
+				w = 60;
+				h = 28;
+			}
 			else
-				velx = (short)(rand()%41-20)/10.0f;	//small clouds: -2 - +2 pixel/frame
+			{
+				velx = (short)(rand() % 41 - 20) / 10.0f;	//small clouds: -2 - +2 pixel/frame
+				srcy = 28;
+				w = 28;
+				h = 12;
+			}
 			
 			velx = velx < 0.5f && velx > -0.5f ? 1 : velx;	//no static clouds please
 
 			//add cloud to eyecandy array
-			eyecandyfront.add(new EC_Cloud(&spr_clouds[c], (float)(rand()%640), (float)(rand()%100), velx));
+			eyecandyfront.add(new EC_Cloud(&spr_clouds, (float)(rand()%640), (float)(rand()%100), velx, 0, srcy, w, h));
 		}
 	}
 	
+	//Ghosts
 	if(g_map.eyecandyID & 0x2)
 	{
 		for(i = 0; i < 12; i++)
 		{
-			short c = (short)(rand() % 3);	//ghost type
-			float velx = (short)(rand()%51-25)/10.0f;	//big clouds: -3 - +3 pixel/frame
+			short iGhostSrcY = (short)(rand() % 3) << 5;	//ghost type
+			float velx = (short)(rand() % 51 - 25) / 10.0f;	//big clouds: -3 - +3 pixel/frame
 			
 			velx = velx < 0.5f && velx > -0.5f ? (rand() % 1 ? 1.0f : -1.0f) : velx;	//no static clouds please
 
 			//add cloud to eyecandy array
-			eyecandyfront.add(new EC_Ghost(&spr_ghosts[c], (float)(rand()%640), (float)(rand()%100), velx, 8, 2));
+			eyecandyfront.add(new EC_Ghost(&spr_ghosts, (float)(rand() % 640), (float)(rand() % 100), velx, 8, 2, velx < 0.0f ? 64 : 0, iGhostSrcY, 32, 32));
 		}
 	}
-	
+
+	//Leaves
 	if(g_map.eyecandyID & 0x4)
-	//if(true)
 	{
 		for(i = 0; i < 20; i++)
 			eyecandyfront.add(new EC_Leaf(&spr_leaves, (float)(rand() % 640), (float)(rand() % 480)));
 	}
 
+	//Snow
 	if(g_map.eyecandyID & 0x8)
 	{
 		for(i = 0; i < 20; i++)
 			eyecandyfront.add(new EC_Snow(&spr_snow, (float)(rand() % 640), (float)(rand() % 480)));
+	}
+
+	//Fish
+	short iFishWeights[] = {30, 30, 20, 10, 10};
+	short iFishSettings[][4] = { {0, 0, 64, 44}, {0, 44, 64, 44}, {0, 44, 48, 44}, {32, 32, 16, 12}, {32, 44, 16, 12}}; 
+	if(g_map.eyecandyID & 0x16)
+	{
+		for(i = 0; i < 10; i++)
+		{
+			float velx = (short)(rand() % 41 - 20) / 10.0f;
+			velx = velx < 0.5f && velx > -0.5f ? 1.0f : velx; //Keep fish from moving too slowly
+
+			short srcx, srcy, w, h;
+
+			short iRandomFish = rand() % 100;
+			
+			short iFishWeightCount = 0;
+			for(short iFish = 0; iFish < 5; iFish++)
+			{
+				iFishWeightCount += iFishWeights[iFish];
+
+				if(iRandomFish < iFishWeightCount)
+				{
+					srcx = iFishSettings[iFish][0];
+					srcy = iFishSettings[iFish][1];
+					w = iFishSettings[iFish][2];
+					h = iFishSettings[iFish][3];
+					break;
+				}
+			}
+
+			//add cloud to eyecandy array
+			short iPossibleY = (480 - h) / 10;
+			float dDestY = (float)(rand() % iPossibleY + iPossibleY * i);
+			eyecandyfront.add(new EC_Cloud(&spr_fish, (float)(rand()%640), dDestY, velx, srcx + (velx > 0.0f ? 64 : 0), srcy, w, h));
+		}
 	}
 	
 	short iScoreTextOffset[4];
