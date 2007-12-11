@@ -406,6 +406,21 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 			for(short iSetting = 0; iSetting < iNumSettings; iSetting++)
 				objectdata[iCol][iRow].iSettings[iSetting] = ReadByteAsShort(mapfile);
 		}
+
+		//read mode item locations like flags and race goals
+		iNumRaceGoals = (short)ReadInt(mapfile);
+		for(j = 0; j < iNumRaceGoals; j++)
+		{
+			racegoallocations[j].x = (short)ReadInt(mapfile);
+			racegoallocations[j].y = (short)ReadInt(mapfile);
+		}
+
+		iNumFlagBases = (short)ReadInt(mapfile);
+		for(j = 0; j < iNumFlagBases; j++)
+		{
+			flagbaselocations[j].x = (short)ReadInt(mapfile);
+			flagbaselocations[j].y = (short)ReadInt(mapfile);
+		}
 	}
 	else if(version[0] == 1 && version[1] == 7)
 	{
@@ -1627,6 +1642,21 @@ void CMap::saveMap(const std::string& file)
 					WriteByteFromShort(objectdata[i][j].iSettings[iSetting], mapfile);
 			}
 		}
+	}
+
+	//Write mode item locations like flags and race goals
+	WriteInt(iNumRaceGoals, mapfile);
+	for(j = 0; j < iNumRaceGoals; j++)
+	{
+		WriteInt(racegoallocations[j].x, mapfile);
+		WriteInt(racegoallocations[j].y, mapfile);
+	}
+
+	WriteInt(iNumFlagBases, mapfile);
+	for(j = 0; j < iNumFlagBases; j++)
+	{
+		WriteInt(flagbaselocations[j].x, mapfile);
+		WriteInt(flagbaselocations[j].y, mapfile);
 	}
 
 	fclose(mapfile);

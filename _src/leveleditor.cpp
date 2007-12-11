@@ -40,7 +40,7 @@
 
 #define MAPTITLESTRING "SMW 1.8 Leveleditor"
 
-enum {EDITOR_EDIT, EDITOR_TILES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_MAP, EDITOR_BLOCKS, NEW_MAP, SAVE, EDITOR_WARP, EDITOR_EYECANDY, DISPLAY_HELP, EDITOR_PLATFORM, EDITOR_TILETYPE, EDITOR_BACKGROUNDS, EDITOR_MAPITEMS, EDITOR_ANIMATION, EDITOR_PROPERTIES};
+enum {EDITOR_EDIT, EDITOR_TILES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_MAP, EDITOR_BLOCKS, NEW_MAP, SAVE, EDITOR_WARP, EDITOR_EYECANDY, DISPLAY_HELP, EDITOR_PLATFORM, EDITOR_TILETYPE, EDITOR_BACKGROUNDS, EDITOR_MAPITEMS, EDITOR_ANIMATION, EDITOR_PROPERTIES, EDITOR_MODEITEMS};
 
 #define MAX_PLATFORMS 8
 #define MAX_PLATFORM_VELOCITY 16
@@ -219,6 +219,7 @@ int editor_tiletype();
 int editor_backgrounds();
 int editor_animation();
 int editor_properties(short iBlockCol, short iBlockRow);
+int editor_modeitems();
 
 void resetselectedtiles();
 void copymoveselection();
@@ -394,6 +395,10 @@ int main(int argc, char *argv[])
 
 			case EDITOR_MAPITEMS:
 				state = editor_mapitems();
+			break;
+
+			case EDITOR_MODEITEMS:
+				state = editor_modeitems();
 			break;
 
 			case EDITOR_WARP:
@@ -623,6 +628,9 @@ int editor_edit()
 
 					if(event.key.keysym.sym == SDLK_o)
 						return EDITOR_MAPITEMS;
+
+					if(event.key.keysym.sym == SDLK_j)
+						return EDITOR_MODEITEMS;
 
 					if(event.key.keysym.sym == SDLK_k)
 					{
@@ -3023,6 +3031,103 @@ int editor_mapitems()
 		menu_shade.draw(0, 0);
 		
 		spr_mapitems[0].draw(0, 0, 0, 0, 96, 32);
+
+		menu_font_small.drawRightJustified(640, 0, maplist.currentFilename());
+				
+		SDL_Flip(screen);
+
+		int delay = WAITTIME - (SDL_GetTicks() - framestart);
+		if(delay < 0)
+			delay = 0;
+		else if(delay > WAITTIME)
+			delay = WAITTIME;
+		
+		SDL_Delay(delay);
+	}
+
+	return EDITOR_QUIT;
+}
+
+
+int editor_modeitems()
+{
+	bool done = false;
+	short modeitemmode = 0;
+	
+	while (!done)
+	{
+		int framestart = SDL_GetTicks();
+
+		//handle messages
+		while(SDL_PollEvent(&event))
+		{
+			switch(event.type)
+			{
+				case SDL_QUIT:
+				{
+					done = true;
+					break;
+				}
+
+				case SDL_KEYDOWN:
+				{
+					if(event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_j)
+					{
+						return EDITOR_EDIT;
+					}
+					else if(event.key.keysym.sym >= SDLK_1 && event.key.keysym.sym <= SDLK_2)
+					{
+						modeitemmode = event.key.keysym.sym - SDLK_1;
+					}
+					else if(event.key.keysym.sym == SDLK_r)
+					{
+						//Set this mode item set to random
+						if(menuitemmode == 0)
+						{
+							if(g_map.iNumRaceGoals == 0)
+								g_map.iNumRaceGoals = MAXRACEGOALS;
+							else
+								g_map.iNumRaceGoals = 0;
+						}	
+						else if(menuitemmode == 1)
+						{
+							if(g_map.iNumFlagBases == 0)
+								g_map.iNumFlagBases = 4;
+							else
+								g_map.iNumFlagBases = 0;
+						}
+					}
+				}
+
+				case SDL_MOUSEBUTTONDOWN:
+				{
+					if(event.button.button == SDL_BUTTON_LEFT)
+					{
+						short iMouseX = event.button.x / TILESIZE;
+						short iMouseY = event.button.y / TILESIZE;
+
+						//Move mode items around with mouse dragging
+					}
+				
+					break;
+				}
+
+				default:
+					break;
+			}
+		}
+
+		drawmap(false, TILESIZE);
+		menu_shade.draw(0, 0);
+		
+		//spr_mapitems[0].draw(0, 0, 0, 0, 96, 32);
+		
+		//draw race goals
+		if(modeitemmode == 0)
+		{
+			
+		}
+
 
 		menu_font_small.drawRightJustified(640, 0, maplist.currentFilename());
 				

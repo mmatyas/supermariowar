@@ -158,7 +158,9 @@ struct STextAward
 #define MINAWARDSNEEDED 3
 
 #define MAXTOURNAMENTGAMES 10
-#define MAXWORLDITEMS 32
+#define MAXWORLDITEMS	32
+
+#define MAXRACEGOALS	8
 
 #define ifsoundonplay(x) (game_values.sound ? x.play() : -1)
 #define ifsoundonandreadyplay(x) (x.isready() && game_values.sound ? x.play() : -1)

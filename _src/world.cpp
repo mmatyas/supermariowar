@@ -1591,9 +1591,11 @@ short WorldMap::UseKey(short iKeyType, short iCol, short iRow)
 {
 	short iDoorsOpened = 0;
 
+	WorldMapTile * tile = &tiles[iCol][iRow];
+
 	if(iCol > 0)
 	{
-		if(tiles[iCol - 1][iRow].iType - 2 == iKeyType)
+		if(tile->iCompleted >= -1 && tiles[iCol - 1][iRow].iType - 2 == iKeyType)
 		{
 			tiles[iCol - 1][iRow].iType = 0;
 			iDoorsOpened |= 1;
@@ -1602,7 +1604,7 @@ short WorldMap::UseKey(short iKeyType, short iCol, short iRow)
 
 	if(iCol < iWidth - 1)
 	{
-		if(tiles[iCol + 1][iRow].iType - 2 == iKeyType)
+		if(tile->iCompleted >= -1 && tiles[iCol + 1][iRow].iType - 2 == iKeyType)
 		{
 			tiles[iCol + 1][iRow].iType = 0;
 			iDoorsOpened |= 2;
@@ -1611,7 +1613,7 @@ short WorldMap::UseKey(short iKeyType, short iCol, short iRow)
 
 	if(iRow > 0)
 	{
-		if(tiles[iCol][iRow - 1].iType - 2 == iKeyType)
+		if(tile->iCompleted >= -1 && tiles[iCol][iRow - 1].iType - 2 == iKeyType)
 		{
 			tiles[iCol][iRow - 1].iType = 0;
 			iDoorsOpened |= 4;
@@ -1620,7 +1622,7 @@ short WorldMap::UseKey(short iKeyType, short iCol, short iRow)
 
 	if(iCol < iHeight - 1)
 	{
-		if(tiles[iCol][iRow + 1].iType - 2 == iKeyType)
+		if(tile->iCompleted >= -1 && tiles[iCol][iRow + 1].iType - 2 == iKeyType)
 		{
 			tiles[iCol][iRow + 1].iType = 0;
 			iDoorsOpened |= 8;

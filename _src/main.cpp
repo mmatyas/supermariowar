@@ -29,8 +29,8 @@
 +----------------------------------------------------------*/
 
 //TODO:
-//1) There is/was a crashing bug related to shells (kicking carried items that had a null owner)
-//   This caused a crash and needs to be tested more.
+//1) Look into when bonus wheel is displayed for world 
+//   And test all other combinations of other game types and bonus wheel settings
 
 #ifdef _XBOX
 	#include <xtl.h>
@@ -1303,7 +1303,7 @@ void RunGame()
 	}
 
 	//Clouds
-	if(g_map.eyecandyID & 0x1)
+	if(g_map.eyecandyID & 1)
 	{
 		for(i = 0; i < 4; i++)
 		{
@@ -1333,7 +1333,7 @@ void RunGame()
 	}
 	
 	//Ghosts
-	if(g_map.eyecandyID & 0x2)
+	if(g_map.eyecandyID & 2)
 	{
 		for(i = 0; i < 12; i++)
 		{
@@ -1348,23 +1348,23 @@ void RunGame()
 	}
 
 	//Leaves
-	if(g_map.eyecandyID & 0x4)
+	if(g_map.eyecandyID & 4)
 	{
 		for(i = 0; i < 20; i++)
 			eyecandyfront.add(new EC_Leaf(&spr_leaves, (float)(rand() % 640), (float)(rand() % 480)));
 	}
 
 	//Snow
-	if(g_map.eyecandyID & 0x8)
+	if(g_map.eyecandyID & 8)
 	{
 		for(i = 0; i < 20; i++)
 			eyecandyfront.add(new EC_Snow(&spr_snow, (float)(rand() % 640), (float)(rand() % 480)));
 	}
 
 	//Fish
-	short iFishWeights[] = {30, 30, 20, 10, 10};
-	short iFishSettings[][4] = { {0, 0, 64, 44}, {0, 44, 64, 44}, {0, 44, 48, 44}, {32, 32, 16, 12}, {32, 44, 16, 12}}; 
-	if(g_map.eyecandyID & 0x16)
+	short iFishWeights[] = {20, 20, 15, 10, 10, 5, 10, 10};
+	short iFishSettings[][4] = { {0, 0, 64, 44}, {0, 44, 64, 44}, {0, 44, 48, 44}, {32, 32, 16, 12}, {32, 44, 16, 12}, {32, 16, 16, 28}, {32, 0, 32, 28}, {32, 44, 32, 28}}; 
+	if(g_map.eyecandyID & 16)
 	{
 		for(i = 0; i < 10; i++)
 		{
@@ -1376,7 +1376,7 @@ void RunGame()
 			short iRandomFish = rand() % 100;
 			
 			short iFishWeightCount = 0;
-			for(short iFish = 0; iFish < 5; iFish++)
+			for(short iFish = 0; iFish < 8; iFish++)
 			{
 				iFishWeightCount += iFishWeights[iFish];
 

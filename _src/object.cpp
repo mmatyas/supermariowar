@@ -5659,7 +5659,7 @@ OMO_FlagBase::OMO_FlagBase(gfxSprite *nspr, short iTeamID, short iColorID) :
 
 	homeflag = NULL;
 
-	placeFlagBase();
+	placeFlagBase(true);
 
 	speed = (float)game_values.gamemodesettings.flag.speed / 4.0f;
 }
@@ -5734,18 +5734,27 @@ void OMO_FlagBase::update()
 	}
 }
 
-void OMO_FlagBase::placeFlagBase()
+void OMO_FlagBase::placeFlagBase(bool fInit)
 {
-	short tries = 0;
 	short x = 0, y = 0;
-	do
-	{
-		if(++tries > 32)
-			break;
 
-		g_map.findspawnpoint(1, &x, &y, collisionWidth, collisionHeight, true);
+	if(fInit && teamID < g_map.iNumFlagBases)
+	{
+		x = g_map.flagbaselocations[teamID].x;
+		y = g_map.flagbaselocations[teamID].y;
 	}
-	while(objectcollisionitems.getClosestObject(x, y, object_flagbase) <= 200.0f);
+	else
+	{
+		short tries = 0;
+		do
+		{
+			if(++tries > 32)
+				break;
+
+			g_map.findspawnpoint(1, &x, &y, collisionWidth, collisionHeight, true);
+		}
+		while(objectcollisionitems.getClosestObject(x, y, object_flagbase) <= 200.0f);
+	}
 
 	xi(x);
 	yi(y);
@@ -5788,7 +5797,7 @@ void OMO_FlagBase::scoreFlag(CO_Flag * flag, CPlayer * player)
 		{
 			ix = 1280;
 			iy = 960;
-			placeFlagBase();
+			placeFlagBase(false);
 		}
 	}
 }
@@ -6608,17 +6617,26 @@ void OMO_RaceGoal::update()
 
 void OMO_RaceGoal::placeRaceGoal()
 {
-	short tries = 0;
 	short x = 0, y = 0;
-	do
-	{
-		if(++tries > 32)
-			break;
 
-		x = (short)(rand() % (640 - collisionWidth));
-		y = (short)(rand() % (480 - collisionHeight));
+	if(goalID < g_map.iNumRaceGoals)
+	{
+		x = g_map.racegoallocations[goalID].x;
+		y = g_map.racegoallocations[goalID].y;
 	}
-	while(objectsfront.getClosestObject(x, y, object_race_goal) <= 250.0f - (quantity * 25.0f));
+	else
+	{
+		short tries = 0;
+		do
+		{
+			if(++tries > 32)
+				break;
+
+			x = (short)(rand() % (640 - collisionWidth));
+			y = (short)(rand() % (480 - collisionHeight));
+		}
+		while(objectsfront.getClosestObject(x, y, object_race_goal) <= 250.0f - (quantity * 25.0f));
+	}
 
 	xi(x);
 	yi(y);

@@ -1015,7 +1015,7 @@ class OMO_FlagBase : public IO_OverMapObject
 		void update();
 		bool collide(CPlayer * player);
 		void collide(IO_MovingObject * object);
-		void placeFlagBase();
+		void placeFlagBase(bool fInit);
 		void scoreFlag(CO_Flag * flag, CPlayer * player);
 		void setFlag(CO_Flag * flag) {homeflag = flag;}
 

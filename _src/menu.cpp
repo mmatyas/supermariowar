@@ -1765,7 +1765,7 @@ void Menu::CreateMenu()
 	miRaceModeQuantityField->Add("5", 5, "", false, false);
 	miRaceModeQuantityField->Add("6", 6, "", false, false);
 	miRaceModeQuantityField->Add("7", 7, "", false, false);
-	miRaceModeQuantityField->Add("8", 8, "", false, false);
+	miRaceModeQuantityField->Add("8", MAXRACEGOALS, "", false, false);
 	miRaceModeQuantityField->SetData(&game_values.gamemodemenusettings.race.quantity, NULL, NULL);
 	miRaceModeQuantityField->SetKey(game_values.gamemodemenusettings.race.quantity);
 
@@ -2298,11 +2298,11 @@ void Menu::RunMenu()
 					game_values.storedpowerups[iPlayer] = -1;
 			}
 		}
-		else if(game_values.tournamentwinner > -1) //World is completed
+		/*else if(game_values.tournamentwinner > -1) //World is completed
 		{
-			miBonusWheel->Reset(false);
+			miBonusWheel->Reset(true);
 			mCurrentMenu = &mBonusWheelMenu;
-		}
+		}*/
 
 		UpdateScoreBoard();
 
@@ -2743,8 +2743,15 @@ void Menu::RunMenu()
 			{
 				if(game_values.matchtype == MATCH_TYPE_WORLD)
 				{
-					if(game_values.tournamentwinner == -2 || game_values.tournamentwinner > -1) //If world is over then return back to main menu
+					if(game_values.tournamentwinner == -2 || (game_values.tournamentwinner >= 0 && game_values.bonuswheel == 0))
+					{
 						ResetTournamentBackToMainMenu();
+					}
+					else if(game_values.tournamentwinner >= 0)
+					{
+						miBonusWheel->Reset(true);
+						mCurrentMenu = &mBonusWheelMenu;
+					}
 					else
 					{
 						mCurrentMenu = &mWorldMenu;
@@ -2757,9 +2764,9 @@ void Menu::RunMenu()
 					{
 						ResetTournamentBackToMainMenu();
 					}
-					else if(game_values.tournamentwinner > -1) //Tournament/Tour Won and Bonus Wheel will be spun
+					else if(game_values.tournamentwinner >= 0) //Tournament/Tour Won and Bonus Wheel will be spun
 					{
-						if(((game_values.matchtype != MATCH_TYPE_TOUR && game_values.bonuswheel == 0) || (game_values.matchtype == MATCH_TYPE_TOUR && !game_values.tourstops[game_values.tourstopcurrent - 1]->iBonusType)))
+						if(game_values.bonuswheel == 0 || (game_values.matchtype == MATCH_TYPE_TOUR && !game_values.tourstops[game_values.tourstopcurrent - 1]->iBonusType))
 						{
 							ResetTournamentBackToMainMenu();
 						}

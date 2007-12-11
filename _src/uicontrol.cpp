@@ -3788,6 +3788,8 @@ void MI_TournamentScoreboard::DetermineScoreboardWinners()
 		else
 			iTournamentWinner = -2;
 
+		game_values.tournamentwinner = iTournamentWinner;
+
 		//Flash the background of the winning teams
 		for(short iTeam = 0; iTeam < iNumWinningTeams; iTeam++)
 		{
@@ -5444,8 +5446,8 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 				if(playerKeys->menu_up.fPressed)
 				{
 					//Make sure there is a path connection and that there is no stage or vehicle blocking the way
-					if(tile->fConnection[0] && !g_worldmap.IsDoor(iPlayerCurrentTileX, iPlayerCurrentTileY - 1) &&
-						((tile->iCompleted >= -1 && (!fVehicleInTile || iSleepTurns > 0)) || iReturnDirection == 0 || fUsingCloud))
+					if((tile->fConnection[0] || tile->iConnectionType == 14) && !g_worldmap.IsDoor(iPlayerCurrentTileX, iPlayerCurrentTileY - 1) &&
+						(((tile->iCompleted >= -1 || (tile->iType >= 6 && game_values.tourstops[tile->iType - 6]->iStageType == 1)) && (!fVehicleInTile || iSleepTurns > 0)) || iReturnDirection == 0 || fUsingCloud))
 					{
 						if(fUsingCloud && (tile->iCompleted == -2 || fVehicleInTile) && iReturnDirection != 0)
 							UseCloud(false);
@@ -5462,8 +5464,8 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 				}
 				else if(playerKeys->menu_down.fPressed)
 				{
-					if(tile->fConnection[1] && !g_worldmap.IsDoor(iPlayerCurrentTileX, iPlayerCurrentTileY + 1) &&
-						((tile->iCompleted >= -1 && (!fVehicleInTile || iSleepTurns > 0)) || iReturnDirection == 1 || fUsingCloud))
+					if((tile->fConnection[1] || tile->iConnectionType == 14) && !g_worldmap.IsDoor(iPlayerCurrentTileX, iPlayerCurrentTileY + 1) &&
+						(((tile->iCompleted >= -1 || (tile->iType >= 6 && game_values.tourstops[tile->iType - 6]->iStageType == 1)) && (!fVehicleInTile || iSleepTurns > 0)) || iReturnDirection == 1 || fUsingCloud))
 					{
 						if(fUsingCloud && (tile->iCompleted == -2 || fVehicleInTile) && iReturnDirection != 1)
 							UseCloud(false);
@@ -5480,8 +5482,8 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 				}
 				else if(playerKeys->menu_left.fPressed)
 				{
-					if(tile->fConnection[2] && !g_worldmap.IsDoor(iPlayerCurrentTileX - 1, iPlayerCurrentTileY) &&
-						((tile->iCompleted >= -1 && (!fVehicleInTile || iSleepTurns > 0)) || iReturnDirection == 2 || fUsingCloud))
+					if((tile->fConnection[2] || tile->iConnectionType == 12) && !g_worldmap.IsDoor(iPlayerCurrentTileX - 1, iPlayerCurrentTileY) &&
+						(((tile->iCompleted >= -1 || (tile->iType >= 6 && game_values.tourstops[tile->iType - 6]->iStageType == 1)) && (!fVehicleInTile || iSleepTurns > 0)) || iReturnDirection == 2 || fUsingCloud))
 					{
 						if(fUsingCloud && (tile->iCompleted == -2 || fVehicleInTile) && iReturnDirection != 2)
 							UseCloud(false);
@@ -5499,8 +5501,8 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 				}
 				else if(playerKeys->menu_right.fPressed)
 				{
-					if(tile->fConnection[3] && !g_worldmap.IsDoor(iPlayerCurrentTileX + 1, iPlayerCurrentTileY) &&
-						((tile->iCompleted >= -1 && (!fVehicleInTile || iSleepTurns > 0)) || iReturnDirection == 3 || fUsingCloud))
+					if((tile->fConnection[3] || tile->iConnectionType == 12) && !g_worldmap.IsDoor(iPlayerCurrentTileX + 1, iPlayerCurrentTileY) &&
+						(((tile->iCompleted >= -1 || (tile->iType >= 6 && game_values.tourstops[tile->iType - 6]->iStageType == 1)) && (!fVehicleInTile || iSleepTurns > 0)) || iReturnDirection == 3 || fUsingCloud))
 					{
 						if(fUsingCloud && (tile->iCompleted == -2 || fVehicleInTile) && iReturnDirection != 3)
 							UseCloud(false);

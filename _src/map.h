@@ -7,6 +7,11 @@ enum ReadType{read_type_full = 0, read_type_preview = 1, read_type_summary = 2};
 
 class MovingPlatform;
 
+struct ScreenPoint
+{
+	short x, y;
+};
+
 struct Warp
 {
 	short direction;
@@ -217,6 +222,12 @@ class CMap
 
 		bool		fAutoFilter[NUM_AUTO_FILTERS];
 
+		short		iNumRaceGoals;
+		ScreenPoint	racegoallocations[MAXRACEGOALS];
+		
+		short		iNumFlagBases;
+		ScreenPoint flagbaselocations[4];
+
 		short		iTileAnimationTimer;
 		short		iTileAnimationFrame;
 
@@ -273,6 +284,9 @@ class CMap
 		friend class MovingPlatform;
 		friend class MapList;
 		friend class CPlayer;
+
+		friend class OMO_FlagBase;
+		friend class OMO_RaceGoal;
 };
 
 #endif

@@ -1991,9 +1991,9 @@ int editor_type()
 						{
 							set_tile = iButtonX;
 						}
-						else if(iButtonX >= 0 && iButtonX < g_worldmap.iNumStages && iButtonY == 1)
+						else if(iButtonX >= 0 && iButtonX < g_worldmap.iNumStages - ((iButtonY - 1) * 20) && iButtonY >= 1 && iButtonY <= (g_worldmap.iNumStages - 1) / 20 + 1)
 						{
-							set_tile = iButtonX + 6;
+							set_tile = iButtonX + (iButtonY - 1) * 20 + 6;
 						}
 
 						edit_mode = 3;  //change to edit mode using warps
@@ -2003,7 +2003,7 @@ int editor_type()
 						
 						return EDITOR_EDIT;
 					}
-				
+			
 					break;
 				}
 
@@ -2022,10 +2022,13 @@ int editor_type()
 		int color = SDL_MapRGB(blitdest->format, 0, 0, 255);
 		for(short iStage = 0; iStage < g_worldmap.iNumStages; iStage++)
 		{
-			SDL_Rect r = {iStage << 5, 32, 32, 32};
+			short ix = (iStage % 20) << 5;
+			short iy = ((iStage / 20) << 5) + 32;
+
+			SDL_Rect r = {ix, iy, 32, 32};
 			SDL_FillRect(blitdest, &r, color);
 
-			spr_worldforegroundspecial[0].draw(iStage << 5, 32, (iStage % 10) << 5, (iStage / 10) << 5, 32, 32);
+			spr_worldforegroundspecial[0].draw(ix, iy, (iStage % 10) << 5, (iStage / 10) << 5, 32, 32);
 		}
 
 		spr_worldforegroundspecial[0].draw(64, 0, 448, 64, 128, 32);
