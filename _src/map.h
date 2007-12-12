@@ -178,6 +178,8 @@ class CMap
 		short eyecandyID;
 		short musicCategoryID;
 		short iNumMapItems;
+		short iNumRaceGoals;
+		short iNumFlagBases;
 
 
 	private:
@@ -222,10 +224,8 @@ class CMap
 
 		bool		fAutoFilter[NUM_AUTO_FILTERS];
 
-		short		iNumRaceGoals;
 		ScreenPoint	racegoallocations[MAXRACEGOALS];
 		
-		short		iNumFlagBases;
 		ScreenPoint flagbaselocations[4];
 
 		short		iTileAnimationTimer;
