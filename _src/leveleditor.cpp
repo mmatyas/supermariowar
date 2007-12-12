@@ -3082,14 +3082,14 @@ int editor_modeitems()
 					else if(event.key.keysym.sym == SDLK_r)
 					{
 						//Set this mode item set to random
-						if(menuitemmode == 0)
+						if(modeitemmode == 0)
 						{
 							if(g_map.iNumRaceGoals == 0)
 								g_map.iNumRaceGoals = MAXRACEGOALS;
 							else
 								g_map.iNumRaceGoals = 0;
 						}	
-						else if(menuitemmode == 1)
+						else if(modeitemmode == 1)
 						{
 							if(g_map.iNumFlagBases == 0)
 								g_map.iNumFlagBases = 4;

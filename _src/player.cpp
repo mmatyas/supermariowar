@@ -3,6 +3,7 @@
 
 extern bool SwapPlayers(short iUsingPlayerID);
 extern void EnterBossMode(short bossType);
+extern CPlayer * GetPlayerFromGlobalID(short iGlobalID);
 extern short g_iWinningPlayer;
 
 CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamID, short iColorID, gfxSprite * nsprites[PGFX_LAST], CScore *nscore, short * respawn, CPlayerAI * ai)
