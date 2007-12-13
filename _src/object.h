@@ -38,6 +38,8 @@ class CObject
 		short GetState() {return state;}
 		bool GetDead() {return dead;}
 
+		void CObject::GetCollisionBlocks(IO_Block * blocks[4]);
+
 		//virtual short writeNetworkUpdate(char * pData);
 		//virtual void readNetworkUpdate(short size, char * pData);
 
@@ -421,6 +423,11 @@ class B_WeaponBreakableBlock : public IO_Block
 
 		short iType;
 		short iDrawOffsetX;
+
+	friend class MO_Hammer;
+	friend class MO_SledgeHammer;
+	friend class MO_Boomerang;
+	friend class OMO_Explosion;
 };
 
 
@@ -1550,6 +1557,8 @@ class OMO_AttackZone : public IO_MovingObject
 		short iTeamID;
 		short iTimer;
 		killstyle iStyle;
+
+	friend class B_WeaponBreakableBlock;
 };
 
 

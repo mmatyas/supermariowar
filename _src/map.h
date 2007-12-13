@@ -264,7 +264,9 @@ class CMap
 		friend int editor_tiles();
 		friend int editor_blocks();
 		friend int editor_warp();
+		friend int editor_modeitems();
 		friend int editor_properties(short iBlockCol, short iBlockRow);
+
 		friend short * GetBlockProperty(short x, short y, short iBlockCol, short iBlockRow, short * iSettingIndex);
 		friend int save_as();
 		friend int load();

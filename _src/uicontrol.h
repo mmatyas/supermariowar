@@ -833,7 +833,7 @@ class MI_BonusWheel : public UI_Control
 {
 	public:
 
-		MI_BonusWheel(gfxSprite * spr_background, gfxSprite * spr_icons, short x, short y);
+		MI_BonusWheel(short x, short y);
 		virtual ~MI_BonusWheel();
 
 		MenuCodeEnum Modify(bool modify);
@@ -846,21 +846,28 @@ class MI_BonusWheel : public UI_Control
 
 	private:
 
-		gfxSprite * spr;
-		MI_Image ** miBonusImages;
+		MI_Image * miBonusImages[NUMBONUSITEMSONWHEEL];
 		MI_Image ** miPlayerImages;
 
 		MI_Button * miContinueButton;
 
-		short iPowerupOrder[NUM_POWERUPS];
+		short iChosenPowerups[NUMBONUSITEMSONWHEEL];
 
+		bool fPressedSelect;
 		bool fPowerupSelectionDone;
 
 		short iSelectorAnimation;
 		short iSelectorAnimationCounter;
+
 		float dSelectionSpeed;
 		float dSelectionAngle;
 		short iSelectedPowerup;
+
+		float dFinalAngle;
+		float dSelectionWinddownSpeed;
+
+		float dSelectionSpeedGoal;
+		short iSelectionSpeedTimer;
 
 		short iNumPlayers;
 		short iWinningTeam;

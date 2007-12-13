@@ -650,7 +650,7 @@ void CPlayer::move()
         }
 
         // Become the tanooki
-        else if (playerKeys->game_turbo.fPressed && playerKeys->game_down.fDown && !statue_lock && !lockfire && powerupused == -1)
+        else if (playerKeys->game_turbo.fPressed && playerKeys->game_down.fDown && !statue_lock && !lockfire && powerupused == -1 && !fKuriboShoe)
         {
             // set the amount of time you get to remain in statue form
             statue_timer = 123;

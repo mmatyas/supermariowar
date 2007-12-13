@@ -162,6 +162,8 @@ struct STextAward
 
 #define MAXRACEGOALS	8
 
+#define NUMBONUSITEMSONWHEEL 10
+
 #define ifsoundonplay(x) (game_values.sound ? x.play() : -1)
 #define ifsoundonandreadyplay(x) (x.isready() && game_values.sound ? x.play() : -1)
 #define ifsoundonplayloop(x,y) (game_values.sound ? x.playloop(y) : -1)

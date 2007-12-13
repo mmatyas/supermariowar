@@ -103,6 +103,8 @@ gfxSprite		spr_powerups;
 gfxSprite		spr_powerupselector;
 gfxSprite		spr_hidden_marker;
 
+gfxSprite		spr_flagbases, spr_racegoals;	
+
 TileType		set_type = tile_solid;
 int				set_tile_rows = 0;
 int				set_tile_cols = 0;
@@ -332,6 +334,9 @@ int main(int argc, char *argv[])
 	spr_powerups.init(convertPath("gfx/packs/Classic/powerups/large.png"), 255, 0, 255);
 	spr_powerupselector.init(convertPath("gfx/leveleditor/leveleditor_powerup_selector.png"), 255, 0, 255, 128);
 	spr_hidden_marker.init(convertPath("gfx/leveleditor/leveleditor_hidden_marker.png"), 255, 0, 255);
+
+	spr_flagbases.init(convertPath("gfx/packs/Classic/modeobjects/flagbases.png"), 255, 0, 255);
+	spr_racegoals.init(convertPath("gfx/packs/Classic/modeobjects/racegoal.png"), 255, 0, 255);	
 
 	if( SDL_SetColorKey(s_platform, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(s_platform->format, 255, 0, 255)) < 0)
 	{
@@ -1506,7 +1511,7 @@ void drawmap(bool fScreenshot, short iBlockSize)
 						rSrc.x = (displayblock - 15) * iBlockSize;
 						rSrc.y = iBlockSize;
 					}
-					else if(displayblock >= 20 && displayblock <= 22)
+					else if(displayblock >= 20 && displayblock <= 29)
 					{
 						rSrc.x = (displayblock - 20) * iBlockSize;
 						rSrc.y = iBlockSize << 1;
@@ -2918,7 +2923,7 @@ int editor_blocks()
 							
 							set_block = set_block_x + 11;
 						}
-						else if(set_block_y == 4 && set_block_x >= 0 && set_block_x <= 2)
+						else if(set_block_y == 4 && set_block_x >= 0 && set_block_x <= 9)
 						{  //set the selected block to a switch block
 							
 							set_block = set_block_x + 20;
@@ -2960,8 +2965,8 @@ int editor_blocks()
 
 		SDL_BlitSurface(spr_blocks[0].getSurface(), &rBlocksRow2Src, screen, &rBlocksRow2Dst);
 
-		SDL_Rect rBlocksRow3Src = {0, 64, 96, 32};
-		SDL_Rect rBlocksRow3Dst = {0, 128, 160, 32};
+		SDL_Rect rBlocksRow3Src = {0, 64, 320, 32};
+		SDL_Rect rBlocksRow3Dst = {0, 128, 320, 32};
 
 		SDL_BlitSurface(spr_blocks[0].getSurface(), &rBlocksRow3Src, screen, &rBlocksRow3Dst);
 
@@ -3033,6 +3038,7 @@ int editor_mapitems()
 		spr_mapitems[0].draw(0, 0, 0, 0, 96, 32);
 
 		menu_font_small.drawRightJustified(640, 0, maplist.currentFilename());
+		menu_font_small.drawRightJustified(0, 480 - menu_font_small.getHeight(), "Map Items");
 				
 		SDL_Flip(screen);
 
@@ -3053,7 +3059,10 @@ int editor_modeitems()
 {
 	bool done = false;
 	short modeitemmode = 0;
-	
+	short dragmodeitem = -1;
+	short dragoffsetx = 0;
+	short dragoffsety = 0;
+
 	while (!done)
 	{
 		int framestart = SDL_GetTicks();
@@ -3071,7 +3080,13 @@ int editor_modeitems()
 
 				case SDL_KEYDOWN:
 				{
-					if(event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_j)
+					dragmodeitem = -1;
+
+					if(event.key.keysym.sym == SDLK_s)
+					{
+						savecurrentmap();
+					}
+					else if(event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_j)
 					{
 						return EDITOR_EDIT;
 					}
@@ -3103,13 +3118,68 @@ int editor_modeitems()
 				{
 					if(event.button.button == SDL_BUTTON_LEFT)
 					{
-						short iMouseX = event.button.x / TILESIZE;
-						short iMouseY = event.button.y / TILESIZE;
+						short iMouseX = event.button.x;
+						short iMouseY = event.button.y;
+
+						dragmodeitem = -1;
+						if(modeitemmode == 0)
+						{
+							for(short iGoal = 0; iGoal < g_map.iNumRaceGoals; iGoal++)
+							{
+								if(iMouseX >= g_map.racegoallocations[iGoal].x && iMouseX < g_map.racegoallocations[iGoal].x + 36 &&
+									iMouseY >= g_map.racegoallocations[iGoal].y && iMouseY < g_map.racegoallocations[iGoal].y + 36)
+								{
+									dragmodeitem = iGoal;
+									dragoffsetx = iMouseX - g_map.racegoallocations[iGoal].x;
+									dragoffsety = iMouseY - g_map.racegoallocations[iGoal].y;
+								}
+							}
+						}
+						else if(modeitemmode == 1)
+						{
+							for(short iBase = 0; iBase < g_map.iNumFlagBases; iBase++)
+							{
+								if(iMouseX >= g_map.flagbaselocations[iBase].x && iMouseX < g_map.flagbaselocations[iBase].x + 32 &&
+									iMouseY >= g_map.flagbaselocations[iBase].y && iMouseY < g_map.flagbaselocations[iBase].y + 32)
+								{
+									dragmodeitem = iBase;
+									dragoffsetx = iMouseX - g_map.flagbaselocations[iBase].x;
+									dragoffsety = iMouseY - g_map.flagbaselocations[iBase].y;
+								}
+							}
+						}
 
 						//Move mode items around with mouse dragging
 					}
 				
 					break;
+				}
+
+				case SDL_MOUSEBUTTONUP:
+				{
+					if(event.button.button == SDL_BUTTON_LEFT)
+					{
+						dragmodeitem = -1;
+					}
+
+					break;
+				}
+
+				case SDL_MOUSEMOTION:
+				{
+					if(dragmodeitem >= 0 && event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT))
+					{
+						if(modeitemmode == 0)
+						{
+							g_map.racegoallocations[dragmodeitem].x = event.motion.x - dragoffsetx;
+							g_map.racegoallocations[dragmodeitem].y = event.motion.y - dragoffsety;
+						}
+						else if(modeitemmode == 1)
+						{
+							g_map.flagbaselocations[dragmodeitem].x = event.motion.x - dragoffsetx;
+							g_map.flagbaselocations[dragmodeitem].y = event.motion.y - dragoffsety;
+						}
+					}
 				}
 
 				default:
@@ -3125,9 +3195,41 @@ int editor_modeitems()
 		//draw race goals
 		if(modeitemmode == 0)
 		{
-			
-		}
+			if(g_map.iNumRaceGoals == 0)
+			{
+				menu_font_large.drawCentered(320, 200, "Race goals are set to random.");
+				menu_font_large.drawCentered(320, 220, "Press 'R' to manually set them.");
+			}
+			else
+			{
+				for(short iGoal = 0; iGoal < g_map.iNumRaceGoals; iGoal++)
+				{
+					spr_racegoals.draw(g_map.racegoallocations[iGoal].x - 16, g_map.racegoallocations[iGoal].y - 18, 0, 0, 68, 54);
+					char szNum[4];
+					sprintf(szNum, "%d", iGoal + 1);
+					menu_font_large.drawCentered(g_map.racegoallocations[iGoal].x + 18, g_map.racegoallocations[iGoal].y + 6, szNum);
+				}
+			}
 
+			menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "Set Race Goal Locations - Press [2] for Flag Bases");
+		}
+		else if(modeitemmode == 1)
+		{
+			if(g_map.iNumFlagBases == 0)
+			{
+				menu_font_large.drawCentered(320, 200, "Flag bases are set to random.");
+				menu_font_large.drawCentered(320, 220, "Press 'R' to manually set them.");
+			}
+			else
+			{
+				for(short iBase = 0; iBase < g_map.iNumFlagBases; iBase++)
+				{
+					spr_flagbases.draw(g_map.flagbaselocations[iBase].x - 8, g_map.flagbaselocations[iBase].y - 8, iBase * 48, 0, 48, 48);
+				}
+			}
+			
+			menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "Set Flag Base Locations - Press [1] for Race Goals");
+		}
 
 		menu_font_small.drawRightJustified(640, 0, maplist.currentFilename());
 				
@@ -3866,6 +3968,24 @@ void convertAll()
 void loadcurrentmap()
 {
 	g_map.loadMap(maplist.currentFilename(), read_type_full);
+
+	if(g_map.iNumRaceGoals == 0)
+	{
+		for(short iGoal = 0; iGoal < MAXRACEGOALS; iGoal++)
+		{
+			g_map.racegoallocations[iGoal].x = iGoal * 80 + 20;
+			g_map.racegoallocations[iGoal].y = 18;
+		}
+	}
+
+	if(g_map.iNumFlagBases == 0)
+	{
+		for(short iBase = 0; iBase < 4; iBase++)
+		{
+			g_map.flagbaselocations[iBase].x = iBase * 80 + 20;
+			g_map.flagbaselocations[iBase].y = 18;
+		}
+	}
 
 	char filename[128];
 	sprintf(filename, "gfx/packs/Classic/backgrounds/%s", g_map.szBackgroundFile);

@@ -2354,7 +2354,7 @@ void CMap::drawPreviewBlocks(SDL_Surface * targetSurface, bool fThumbnail)
 				rectSrc.x = iBlockSize * (ts - 15);
 				rectSrc.y = iBlockSize;
 			}
-			else if(ts >= 20 && ts <= 22)
+			else if(ts >= 20 && ts <= 29)
 			{
 				rectSrc.x = iBlockSize * (ts - 20);
 				rectSrc.y = iBlockSize << 1;

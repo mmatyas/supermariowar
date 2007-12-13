@@ -1770,6 +1770,7 @@ void Menu::CreateMenu()
 	miRaceModeQuantityField->SetKey(game_values.gamemodemenusettings.race.quantity);
 
 	miRaceModeSpeedField = new MI_SelectField(&spr_selectfield, 120, 220, "Speed", 400, 180);
+	miRaceModeSpeedField->Add("Stationary", 0, "", false, false);
 	miRaceModeSpeedField->Add("Very Slow", 2, "", false, false);
 	miRaceModeSpeedField->Add("Slow", 3, "", false, false);
 	miRaceModeSpeedField->Add("Moderate", 4, "", false, false);
@@ -2072,7 +2073,7 @@ void Menu::CreateMenu()
 	// Bonus Wheel
 	//***********************
 
-	miBonusWheel = new MI_BonusWheel(&spr_tournament_powerup_splash, &spr_storedpoweruplarge, 144, 38);
+	miBonusWheel = new MI_BonusWheel(144, 38);
 
 	mBonusWheelMenu.AddControl(miBonusWheel, NULL, NULL, NULL, NULL);
 	mBonusWheelMenu.SetHeadControl(miBonusWheel);

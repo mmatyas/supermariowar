@@ -3288,7 +3288,7 @@ void LoadMapObjects()
 				g_map.blockdata[x][y] = new B_ThrowBlock(&spr_throwblock, x * TILESIZE, y * TILESIZE, 4, 10, 1);
 				objectblocks.add(g_map.blockdata[x][y]);
 			}
-			else if(iType >= 20 && iType <= 22)
+			else if(iType >= 20 && iType <= 29)
 			{
 				g_map.blockdata[x][y] = new B_WeaponBreakableBlock(&spr_weaponbreakableblock, x * TILESIZE, y * TILESIZE, iType - 20);
 				objectblocks.add(g_map.blockdata[x][y]);

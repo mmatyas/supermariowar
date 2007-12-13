@@ -3856,8 +3856,277 @@ void MI_TournamentScoreboard::StopSwirl()
  * MI_BonusWheel Class
  **************************************/
 
+MI_BonusWheel::MI_BonusWheel(short x, short y) :
+	UI_Control(x, y)
+{
+	miPlayerImages = NULL;
+
+	for(short iImage = 0; iImage < NUMBONUSITEMSONWHEEL; iImage++)
+	{
+		float dAngle = (float)iImage * TWO_PI / (float)(NUMBONUSITEMSONWHEEL);
+		short iPowerupX = x + 160 + (short)(120.0f * cos(dAngle));
+		short iPowerupY = y + 210 + (short)(120.0f * sin(dAngle));
+
+		miBonusImages[iImage] = new MI_Image(&spr_storedpoweruplarge, iPowerupX, iPowerupY, 0, 0, 32, 32, 1, 1, 0);
+	}
+
+	miContinueButton = new MI_Button(&menu_plain_field, ix + 76, iy + 390, "Continue", 200, 1);
+	miContinueButton->Show(false);
+	miContinueButton->SetCode(MENU_CODE_BONUS_DONE);
+
+	//Reset(true);
+}
+
+MI_BonusWheel::~MI_BonusWheel()
+{
+	if(miBonusImages)
+	{
+		for(int iImage = 0; iImage < NUMBONUSITEMSONWHEEL; iImage++)
+			delete miBonusImages[iImage];
+	}
+
+	if(miPlayerImages)
+	{
+		for(int iPlayer = 0; iPlayer < iNumPlayers; iPlayer++)
+			delete miPlayerImages[iPlayer];
+		
+		delete [] miPlayerImages;
+	}
+}
+
+MenuCodeEnum MI_BonusWheel::Modify(bool fModify)
+{
+	if(!fPressedSelect)
+	{
+		fPressedSelect = true;
+
+		float dNumWinddownSteps = dSelectionSpeed / 0.0005f - 1;
+		float dWinddownAngle = dSelectionSpeed / 2.0f * dNumWinddownSteps;
+		dFinalAngle = dSelectionAngle + dWinddownAngle;
+		
+		//Bring the radians back down to between 0 and TWO_PI to do comparisons to the powerups on the wheel
+		while(dFinalAngle > TWO_PI)
+			dFinalAngle -= TWO_PI;
+
+		float dSectorSize = TWO_PI / NUMBONUSITEMSONWHEEL;
+		for(short iSector = 0; iSector < NUMBONUSITEMSONWHEEL; iSector++)
+		{
+			if(dFinalAngle >= iSector * dSectorSize && dFinalAngle < (iSector + 1) * dSectorSize)
+			{
+				iSelectedPowerup = iChosenPowerups[iSector];
+				float dNewWinddownAngle = dWinddownAngle + (iSector + 1) * dSectorSize - dFinalAngle;
+				
+				//dSelectionWinddownSpeed = dSelectionSpeeddNewWinddownAngle / dNumWinddownSteps;
+
+				dSelectionWinddownSpeed = dSelectionSpeed / (dNewWinddownAngle * 2.0f / dSelectionSpeed + 1.0f);
+				break;
+			}
+		}
+	}
+
+	if(fPowerupSelectionDone)
+		return miContinueButton->Modify(fModify);
+
+	return MENU_CODE_NONE;
+}
+
+void MI_BonusWheel::Update()
+{
+	for(int iImage = 0; iImage < NUMBONUSITEMSONWHEEL; iImage++)
+	{
+		miBonusImages[iImage]->Update();
+	}
+
+	for(int iPlayer = 0; iPlayer < iNumPlayers; iPlayer++)
+	{
+		miPlayerImages[iPlayer]->Update();
+	}
+
+	miContinueButton->Update();
+
+	if(++iSelectorAnimationCounter > 8)
+	{
+		iSelectorAnimationCounter = 0;
+		
+		if(++iSelectorAnimation > 1)
+			iSelectorAnimation = 0;
+	}
+
+	if(iSelectionSpeedTimer > 0)
+	{
+		if(--iSelectionSpeedTimer <= 0)
+		{
+			dSelectionSpeedGoal = (float)(rand() % 100 + 200) * 0.0005f;
+			iSelectionSpeedTimer = 0;
+		}
+	}
+
+	if(fPressedSelect)
+	{
+		dSelectionSpeed -= dSelectionWinddownSpeed;
+	}
+	else
+	{
+		if(dSelectionSpeed < dSelectionSpeedGoal)
+		{
+			dSelectionSpeed += 0.0005f;
+
+			if(dSelectionSpeed >= dSelectionSpeedGoal)
+			{
+				dSelectionSpeed = dSelectionSpeedGoal;
+				iSelectionSpeedTimer = rand() % 60 + 30;
+			}
+		}
+		else if(dSelectionSpeed > dSelectionSpeedGoal)
+		{
+			dSelectionSpeed -= 0.0005f;
+
+			if(dSelectionSpeed <= dSelectionSpeedGoal)
+			{
+				dSelectionSpeed = dSelectionSpeedGoal;
+				iSelectionSpeedTimer = rand() % 60 + 30;
+			}
+		}
+	}
+
+	if(dSelectionSpeed <= 0.0f)
+	{
+		dSelectionSpeed = 0.0f;
+		
+		if(!fPowerupSelectionDone)
+		{
+			fPowerupSelectionDone = true;
+			miContinueButton->Show(true);
+			miContinueButton->Select(true);
+
+			//Reset all player's stored item
+			if(!game_values.keeppowerup)
+			{
+				for(short iPlayer = 0; iPlayer < 4; iPlayer++)
+					game_values.storedpowerups[iPlayer] = -1;
+			}
+
+			//Give the newly won stored item to the winning players
+			for(short iPlayer = 0; iPlayer < game_values.teamcounts[iWinningTeam]; iPlayer++)
+				game_values.storedpowerups[game_values.teamids[iWinningTeam][iPlayer]] = iSelectedPowerup;
+
+			ifsoundonplay(sfx_collectpowerup);
+		}
+	}
+
+	dSelectionAngle += dSelectionSpeed;
+
+	while(dSelectionAngle > TWO_PI)
+		dSelectionAngle -= TWO_PI;
+}
+		
+void MI_BonusWheel::Draw()
+{
+	if(!fShow)
+		return;
+
+	spr_tournament_powerup_splash.draw(ix, iy);
+
+	short iSelectorX = ix + 144 + (short)(120.0f * cos(dSelectionAngle));
+	short iSelectorY = iy + 192 + (short)(120.0f * sin(dSelectionAngle));
+
+	spr_powerupselector.draw(iSelectorX, iSelectorY, iSelectorAnimation * 64, 0, 64, 64);
+
+	for(int iImage = 0; iImage < NUMBONUSITEMSONWHEEL; iImage++)
+	{
+		miBonusImages[iImage]->Draw();
+	}
+
+	for(int iPlayer = 0; iPlayer < iNumPlayers; iPlayer++)
+	{
+		miPlayerImages[iPlayer]->Draw();
+	}
+
+	miContinueButton->Draw();
+
+	if(dFinalAngle != 0.0f)
+	{
+		short iPowerupX = ix + 160 + (short)(120.0f * cos(dFinalAngle));
+		short iPowerupY = iy + 210 + (short)(120.0f * sin(dFinalAngle));
+
+		spr_storedpoweruplarge.draw(iPowerupX, iPowerupY, 0, 0, 32, 32);
+	}
+}
+
+void MI_BonusWheel::Reset(bool fTournament)
+{
+	if(fTournament)
+		iWinningTeam = game_values.tournamentwinner;
+	else
+		iWinningTeam = game_values.gamemode->winningteam;
+
+	//Randomly display the powerups around the ring
+	bool fPowerupUsed[NUM_POWERUPS - 1];
+	for(short iPowerup = 0; iPowerup < NUM_POWERUPS - 1; iPowerup++)
+		fPowerupUsed[iPowerup] = false;
+
+	short iCountWeight = 0;
+	for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
+		iCountWeight += game_values.powerupweights[iPowerup];
+
+	for(short iPowerup = 0; iPowerup < NUMBONUSITEMSONWHEEL; iPowerup++)
+	{
+		int iChoosePowerup = 0;
+
+		if(iCountWeight > 0)
+		{
+			int iRandPowerup = rand() % iCountWeight + 1;
+			int iPowerupWeightCount = game_values.powerupweights[iChoosePowerup];
+
+			while(iPowerupWeightCount < iRandPowerup)
+				iPowerupWeightCount += game_values.powerupweights[++iChoosePowerup];
+		}
+
+		miBonusImages[iPowerup]->SetImage(iChoosePowerup << 5, 0, 32, 32);
+		iChosenPowerups[iPowerup] = iChoosePowerup;
+	}
+	
+	//Setup player images on wheel
+	if(miPlayerImages)
+	{
+		for(short iPlayer = 0; iPlayer < iNumPlayers; iPlayer++)
+			delete miPlayerImages[iPlayer];
+
+		delete [] miPlayerImages;
+	}
+
+	iNumPlayers = game_values.teamcounts[iWinningTeam];
+
+	miPlayerImages = new MI_Image * [iNumPlayers];
+
+	short iPlayerX = ix + 160 - ((iNumPlayers - 1) * 17);
+	for(short iPlayer = 0; iPlayer < iNumPlayers; iPlayer++)
+	{
+		miPlayerImages[iPlayer] = new MI_Image(spr_player[game_values.teamids[iWinningTeam][iPlayer]][PGFX_JUMPING_R], iPlayerX, iy + 210, 0, 0, 32, 32, 1, 1, 0);
+		iPlayerX += 34;
+	}
+
+	//Indicate that the player hasn't choosen a powerup yet
+	fPressedSelect = false;
+	fPowerupSelectionDone = false;
+	miContinueButton->Show(false);
+
+	//Counters to animate the selector's wings
+	iSelectorAnimation = 0;
+	iSelectorAnimationCounter = 0;
+
+	//Figure out the initial position and speed of the selector
+	dSelectionSpeed = (float)(rand() % 100 + 200) * 0.0005f;
+	dSelectionAngle = (float)(rand() % NUMBONUSITEMSONWHEEL) * TWO_PI / (float)(NUMBONUSITEMSONWHEEL);
+	dSelectionSpeedGoal = (float)(rand() % 100 + 200) * 0.0005f;
+	iSelectionSpeedTimer = 0;
+
+	dFinalAngle = 0.0f;
+}
+
 //Call with x = 144 and y == 64
 //The spr_player full set of sprites needs to be created via loadfullskin() to use this class
+/*
 MI_BonusWheel::MI_BonusWheel(gfxSprite * spr_background, gfxSprite * spr_icons, short x, short y) :
 	UI_Control(x, y)
 {
@@ -4064,6 +4333,7 @@ void MI_BonusWheel::Reset(bool fTournament)
 
 	miContinueButton->Show(false);
 }
+*/
 
 /**************************************
  * MI_ScreenResize Class

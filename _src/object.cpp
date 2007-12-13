@@ -114,6 +114,44 @@ void CObject::readNetworkUpdate(short size, char * pData)
 	ReadFloatFromBuffer(&vely, &pData[12]);
 }*/
 
+//returns the blocks touching each of the four corners
+void CObject::GetCollisionBlocks(IO_Block * blocks[4])
+{
+	short xl = 0;
+	if(ix < 0)
+		xl = (ix + 640) / TILESIZE;
+	else
+		xl = ix / TILESIZE;
+
+	short xr = 0;
+	if(ix + iw >= 640)
+		xr = (ix + iw - 640) / TILESIZE;
+	else
+		xr = (ix + iw) / TILESIZE;
+
+	blocks[0] = NULL;
+	blocks[1] = NULL;
+
+	if(iy >= 0)
+	{
+		short yt = iy / TILESIZE;
+
+		blocks[0] = g_map.block(xl, yt);
+		blocks[1] = g_map.block(xr, yt);
+	}
+
+	blocks[2] = NULL;
+	blocks[3] = NULL;
+
+	if(iy + ih >= 0)
+	{
+		short yb = (iy + ih) / TILESIZE;
+
+		blocks[2] = g_map.block(xl, yb);
+		blocks[3] = g_map.block(xr, yb);
+	}
+}
+
 
 //------------------------------------------------------------------------------
 // class Block base class
@@ -2164,14 +2202,17 @@ bool B_WeaponBreakableBlock::hittop(CPlayer * player, bool useBehavior)
 	{
 		player->vely = GRAVITATION;
 
-		/*
 		//Save this for when we create a super stomp destroyable block
-		if(player->IsSuperStomping() && state == 0)
+		if(iType == 6 && player->IsSuperStomping() && state == 0)
 		{
 			triggerBehavior(player->globalID, player->teamID);
-			return true;
+			return false;
 		}
-		*/
+		else if(iType == 8 && player->invincible)
+		{
+			triggerBehavior(player->globalID, player->teamID);
+			return false;
+		}
 	}
 
 	return false;
@@ -2187,17 +2228,19 @@ bool B_WeaponBreakableBlock::hitbottom(CPlayer * player, bool useBehavior)
 		{
 			fTriggerBlock = true;
 		}
+		else if(iType == 7 && player->powerup == 8 && player->flying)
+		{
+			fTriggerBlock = true;
+		}
+		else if(iType == 8 && player->invincible)
+		{
+			fTriggerBlock = true;
+		}
 		
 		if(fTriggerBlock)
-		{
 			triggerBehavior(player->globalID, player->teamID);
-			player->vely = CapFallingVelocity(-player->vely * BOUNCESTRENGTH);
-			player->yf((float)(iposy + ih) + 0.2f);
-		}
-		else
-		{
-			return IO_Block::hitbottom(player, useBehavior);
-		}
+	
+		return IO_Block::hitbottom(player, useBehavior);
 	}
 
 	return false;
@@ -2205,14 +2248,28 @@ bool B_WeaponBreakableBlock::hitbottom(CPlayer * player, bool useBehavior)
 
 bool B_WeaponBreakableBlock::hitleft(CPlayer * player, bool useBehavior)
 {
-	//TODO:: Expand these for blocks destroyed from the sides
-	return IO_Block::hitleft(player, useBehavior);
+	if(useBehavior && state == 0)
+	{
+		if(iType == 8 && player->invincible)
+			triggerBehavior(player->globalID, player->teamID);
+
+		return IO_Block::hitleft(player, useBehavior);
+	}
+	
+	return false;
 }
 
 bool B_WeaponBreakableBlock::hitright(CPlayer * player, bool useBehavior)
 {
-	//TODO:: Expand these for blocks destroyed from the sides
-	return IO_Block::hitright(player, useBehavior);
+	if(useBehavior && state == 0)
+	{
+		if(iType == 8 && player->invincible)
+			triggerBehavior(player->globalID, player->teamID);
+
+		return IO_Block::hitright(player, useBehavior);
+	}
+	
+	return false;
 }
 
 bool B_WeaponBreakableBlock::hittop(IO_MovingObject * object)
@@ -2328,6 +2385,17 @@ bool B_WeaponBreakableBlock::objecthitside(IO_MovingObject * object)
 		triggerBehavior(fireball->playerID, fireball->teamID);
 		removeifprojectile(object, false, true);
 		return false;
+	}
+	else if(type == movingobject_attackzone)
+	{
+		OMO_AttackZone * zone = (OMO_AttackZone*)object;
+
+		if((zone->iStyle == kill_style_leaf && iType == 9) || (zone->iStyle == kill_style_feather && iType == 1))
+		{
+			triggerBehavior(zone->iPlayerID, zone->iTeamID);
+			zone->Die();
+			return false;
+		}
 	}
 
 	return true;
@@ -4088,6 +4156,23 @@ void MO_Hammer::update()
 	
 	if(iy > 480 || --ttl <= 0 || (fSuper && iy < -ih))
 		removeifprojectile(this, false, true);
+
+	//Detection collision with hammer breakable blocks
+	IO_Block * blocks[4];
+	GetCollisionBlocks(blocks);
+	for(short iBlock = 0; iBlock < 4; iBlock++)
+	{
+		if(blocks[iBlock] && blocks[iBlock]->getBlockType() == block_weaponbreakable)
+		{
+			B_WeaponBreakableBlock * weaponbreakableblock = (B_WeaponBreakableBlock*)blocks[iBlock];
+			if(weaponbreakableblock->iType == 5)
+			{
+				weaponbreakableblock->triggerBehavior(playerID, teamID);
+				removeifprojectile(this, false, false);
+				return;
+			}
+		}
+	}
 }
 
 bool MO_Hammer::collide(CPlayer * player)
@@ -4170,7 +4255,28 @@ void MO_SledgeHammer::update()
 		xi(ix - 640);
 	
 	if(iy >= 480)
+	{
 		removeifprojectile(this, false, true);
+		return;
+	}
+
+	//Detection collision with hammer breakable blocks
+	IO_Block * blocks[4];
+	GetCollisionBlocks(blocks);
+	for(short iBlock = 0; iBlock < 4; iBlock++)
+	{
+		if(blocks[iBlock] && blocks[iBlock]->getBlockType() == block_weaponbreakable)
+		{
+			B_WeaponBreakableBlock * weaponbreakableblock = (B_WeaponBreakableBlock*)blocks[iBlock];
+			if(weaponbreakableblock->iType == 5)
+			{
+				weaponbreakableblock->triggerBehavior(playerID, teamID);
+				removeifprojectile(this, false, true);
+				return;
+			}
+		}
+	}
+
 }
 
 bool MO_SledgeHammer::collide(CPlayer * player)
@@ -4292,6 +4398,23 @@ void MO_Boomerang::update()
 
 		objectsfront.add(new OMO_Explosion(&spr_explosion, ix + (iw >> 2) - 96, iy + (ih >> 2) - 64, 2, 4, playerID, teamID, kill_style_boomerang));
 		ifsoundonplay(sfx_bobombsound);
+	}
+
+	//Detection collision with boomerang breakable blocks
+	IO_Block * blocks[4];
+	GetCollisionBlocks(blocks);
+	for(short iBlock = 0; iBlock < 4; iBlock++)
+	{
+		if(blocks[iBlock] && blocks[iBlock]->getBlockType() == block_weaponbreakable)
+		{
+			B_WeaponBreakableBlock * weaponbreakableblock = (B_WeaponBreakableBlock*)blocks[iBlock];
+			if(weaponbreakableblock->iType == 4)
+			{
+				weaponbreakableblock->triggerBehavior(playerID, teamID);
+				forcedead();
+				return;
+			}
+		}
 	}
 
 	if(iStyle == 0) //Flat style
@@ -6792,6 +6915,48 @@ void OMO_Explosion::update()
 		drawframe += iw;
 		if(drawframe >= animationWidth)
 			drawframe = 0;
+	}
+
+	//If this is the first frame, look for blocks to kill
+	if(timer == 0)
+	{
+		short iTestY = iy;
+
+		for(short iRow = 0; iRow < 5; iRow++)
+		{
+			short iTestX = ix;
+
+			if(iTestX < 0)
+				iTestX += 640;			
+
+			if(iTestY >= 0 && iTestY < 480)
+			{
+				short iTestRow = iTestY / TILESIZE;
+				for(short iCol = 0; iCol < 7; iCol++)
+				{
+					IO_Block * block = g_map.block(iTestX / TILESIZE, iTestRow);
+					if(block && block->getBlockType() == block_weaponbreakable)
+					{
+						B_WeaponBreakableBlock * weaponbreakableblock = (B_WeaponBreakableBlock*)block;
+						if(weaponbreakableblock->iType == 3)
+						{
+							weaponbreakableblock->triggerBehavior(playerID, teamID);
+						}
+					}
+				
+					iTestX += TILESIZE;
+
+					if(iTestX >= 640)
+						iTestX -= 640;
+				}
+			}
+
+			
+			iTestY += TILESIZE;
+
+			if(iTestY >= 480)
+				break;
+		}
 	}
 
 	if(++timer >= 48)
