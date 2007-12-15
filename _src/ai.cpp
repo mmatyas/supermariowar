@@ -56,14 +56,14 @@ Accessing The Map
 There are some things that will probably be useful when creating your own AI that the current code doesn't use.
 First is the map tiles.  This will tell you what tiles are in the map to help you write path finding.  Use:
 
-TileType tile = g_map.map(column, row); 
+int tile = g_map.map(column, row); 
 
 to get the tile at that column and row.  There are 20 columns and 15 rows.  To convert object position to map
 col and row, use:
 
-TileType tile = g_map.map(object->x / TILESIZE, object->y / TILESIZE); 
+int tile = g_map.map(object->x / TILESIZE, object->y / TILESIZE); 
 
-TileType is an enum of all the types of tiles like solid, solid-on-top, death-on-top, nonsolid, etc.
+The int returned is an bit flag int of all the attributes of tiles like solid, solid-on-top, death on various sides, ice, etc.
 
 Second is the interaction blocks in the map.  You might want to know where a [?] block is so you can go hit it.
 
@@ -599,17 +599,16 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 	//short depth = -1;
 	while(iDeathY < MAPHEIGHT)
 	{
-		TileType ttLeftTile = g_map.map(iDeathX1, iDeathY);
-		TileType ttRightTile = g_map.map(iDeathX2, iDeathY);
+		int ttLeftTile = g_map.map(iDeathX1, iDeathY);
+		int ttRightTile = g_map.map(iDeathX2, iDeathY);
 
-		if((ttLeftTile == tile_solid || ttLeftTile == tile_solid_on_top || ttLeftTile == tile_death_on_bottom || ttLeftTile == tile_ice || g_map.block(iDeathX1, iDeathY)) &&
-			(ttRightTile == tile_solid || ttRightTile == tile_solid_on_top || ttRightTile == tile_death_on_bottom || ttRightTile == tile_ice || g_map.block(iDeathX2, iDeathY)))
+		if(((ttLeftTile & tile_flag_solid && (ttLeftTile & tile_flag_death_on_top) == 0) || ttLeftTile & tile_flag_solid_on_top || g_map.block(iDeathX1, iDeathY)) &&
+			((ttRightTile & tile_flag_solid && (ttRightTile & tile_flag_death_on_top) == 0) || ttRightTile & tile_flag_solid_on_top || g_map.block(iDeathX2, iDeathY)))
 		{
 			iFallDanger = 0;
 			break;
 		}
-		else if(ttLeftTile == tile_death_on_top || ttLeftTile == tile_death ||
-			ttRightTile == tile_death_on_top || ttRightTile == tile_death)
+		else if(ttLeftTile & tile_flag_death_on_top || ttRightTile & tile_flag_death_on_top)
 		{
 			//depth = iDeathY - (iy / TILESIZE);
 			if(iFallDanger == 0)
@@ -647,17 +646,16 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 	short heightlimit = 3;
 	while(iDeathY >= 0 && heightlimit > 0)
 	{
-		TileType ttLeftTile = g_map.map(iDeathX1, iDeathY);
-		TileType ttRightTile = g_map.map(iDeathX2, iDeathY);
+		int ttLeftTile = g_map.map(iDeathX1, iDeathY);
+		int ttRightTile = g_map.map(iDeathX2, iDeathY);
 
-		if(ttLeftTile == tile_solid || ttLeftTile == tile_death_on_top || ttLeftTile == tile_ice ||
-			ttRightTile == tile_solid || ttRightTile == tile_death_on_top || ttRightTile == tile_ice ||
+		if((ttLeftTile & tile_flag_solid && (ttLeftTile & tile_flag_death_on_bottom) == 0) ||
+			(ttRightTile & tile_flag_solid && (ttRightTile & tile_flag_death_on_bottom) == 0) ||
 			g_map.block(iDeathX1, iDeathY) || g_map.block(iDeathX2, iDeathY))
 		{
 			break;
 		}
-		else if(ttLeftTile == tile_death_on_bottom || ttLeftTile == tile_death ||
-			ttRightTile == tile_death_on_bottom || ttRightTile == tile_death)
+		else if(ttLeftTile & tile_flag_death_on_bottom || ttRightTile & tile_flag_death_on_bottom)
 		{
 			playerKeys->game_jump.fDown = false;
 			break;

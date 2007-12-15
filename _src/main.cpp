@@ -28,9 +28,8 @@
 |								  http://smw.72dpiarmy.com	|
 +----------------------------------------------------------*/
 
-//TODO:
-//1) Look into when bonus wheel is displayed for world 
-//   And test all other combinations of other game types and bonus wheel settings
+//TODO
+//Add helper text to bonus wheel to tell player to press button
 
 #ifdef _XBOX
 	#include <xtl.h>
@@ -1461,7 +1460,7 @@ void RunGame()
 
 					short y = (list_players[k]->iy + HALFPH) / TILESIZE;
 
-					TileType tile = tile_nonsolid;
+					int tile = tile_flag_nonsolid;
 					IO_Block * block = NULL;
 					short blocktype = -1;
 
@@ -1472,7 +1471,7 @@ void RunGame()
 						blocktype = g_map.blockat(x, y)->iType;
 					}
 
-					if( (tile != tile_nonsolid && tile != tile_gap && tile != tile_solid_on_top) || 
+					if((tile & tile_flag_solid) || 
 						(block && blocktype != 3 && blocktype < 11))
 					{
 						game_values.pausegame = true;
@@ -1514,7 +1513,7 @@ void RunGame()
 					{
 						for(short j = 0; j < 2; j++)
 						{
-							TileType tile = tile_nonsolid;
+							int tile = tile_flag_nonsolid;
 							IO_Block * block = NULL;
 							short blocktype = -1;
 
@@ -1525,7 +1524,7 @@ void RunGame()
 								blocktype = g_map.blockat(corners[0][j], corners[1][i])->iType;
 							}
 
-							if( (tile != tile_nonsolid && tile != tile_gap && tile != tile_solid_on_top) || 
+							if( (tile & tile_flag_solid) || 
 								(block && blocktype != 3 && blocktype < 11))
 							{
 								game_values.pausegame = true;

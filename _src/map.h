@@ -2,8 +2,27 @@
 #ifndef SMW_MAP_H
 #define SMW_MAP_H
 
-enum TileType{tile_nonsolid = 0, tile_solid = 1, tile_solid_on_top = 2, tile_ice = 3, tile_death = 4, tile_death_on_top = 5, tile_death_on_bottom = 6, tile_death_on_left = 7, tile_death_on_right = 8, tile_gap = 16};
+enum TileType{tile_nonsolid = 0, tile_solid = 1, tile_solid_on_top = 2, tile_ice = 3, tile_death = 4, tile_death_on_top = 5, tile_death_on_bottom = 6, tile_death_on_left = 7, tile_death_on_right = 8, tile_ice_on_top = 9, tile_ice_death_on_bottom = 10, tile_ice_death_on_left = 11, tile_ice_death_on_right = 12, tile_gap = 13};
 enum ReadType{read_type_full = 0, read_type_preview = 1, read_type_summary = 2};
+
+enum TileTypeFlag {tile_flag_nonsolid = 0, tile_flag_solid = 1, tile_flag_solid_on_top = 2, tile_flag_ice = 4, tile_flag_death_on_top = 8, tile_flag_death_on_bottom = 16, tile_flag_death_on_left = 32, tile_flag_death_on_right = 64, tile_flag_gap = 128, tile_flag_has_death = 120};
+
+/*
+	tile_nonsolid = 0				0	0	0	0	0	0	0	0
+	tile_solid = 1					0	0	0	0	0	0	0	1
+	tile_solid_on_top = 2			0	0	0	0	0	0	1	0
+	tile_ice_on_top = 6				0	0	0	0	0	1	1	0
+	tile_ice = 5					0	0	0	0	0	1	0	1
+	tile_death = 121				0	1	1	1	1	0	0	1
+	tile_death_on_top = 9			0	0	0	0	1	0	0	1
+	tile_death_on_bottom = 17		0	0	0	1	0	0	0	1
+	tile_death_on_left = 33			0	0	1	0	0	0	0	1
+	tile_death_on_right = 65		0	1	0	0	0	0	0	1
+	tile_ice_death_on_bottom = 21	0	0	0	1	0	1	0	1
+	tile_ice_death_on_left = 37		0	0	1	0	0	1	0	1
+	tile_ice_death_on_right = 69	0	1	0	0	0	1	0	1
+	tile_gap = 128					1	0	0	0	0	0	0	0
+*/
 
 class MovingPlatform;
 
@@ -76,6 +95,12 @@ struct AnimatedTile
 	bool fForegroundAnimated;
 };
 
+struct MapTile
+{
+	TileType iType;
+	int iFlags;
+};
+
 struct MapBlock
 {
 	short iType;
@@ -124,9 +149,9 @@ class CMap
 
 		//returns the tiletype at the specific position (map coordinates) of the
 		//front most visible tile
-		TileType map(int x, int y)
+		int map(int x, int y)
 		{
-			return mapdatatop[x][y];
+			return mapdatatop[x][y].iFlags;
 		}
 
 		IO_Block * block(short x, short y)
@@ -188,7 +213,7 @@ class CMap
 		void calculatespawnareas(short iType, bool fUseTempBlocks);
 
 		TilesetTile	mapdata[MAPWIDTH][MAPHEIGHT][MAPLAYERS];
-		TileType	mapdatatop[MAPWIDTH][MAPHEIGHT];
+		MapTile		mapdatatop[MAPWIDTH][MAPHEIGHT];
 		MapBlock	objectdata[MAPWIDTH][MAPHEIGHT];
 		IO_Block*   blockdata[MAPWIDTH][MAPHEIGHT];
 		bool		nospawn[NUMSPAWNAREATYPES][MAPWIDTH][MAPHEIGHT];

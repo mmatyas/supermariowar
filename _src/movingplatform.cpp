@@ -59,7 +59,7 @@ void MovingPlatformPath::CalculateAngle()
 }
 
 
-MovingPlatform::MovingPlatform(TilesetTile ** tiledata, TileType ** tiletypes, short w, short h, MovingPlatformPath * path, bool forwardDirection, short startPathNode, bool fPreview)
+MovingPlatform::MovingPlatform(TilesetTile ** tiledata, MapTile ** tiletypes, short w, short h, MovingPlatformPath * path, bool forwardDirection, short startPathNode, bool fPreview)
 {
 	fDead = false;
 
@@ -544,19 +544,19 @@ void MovingPlatform::collide(CPlayer * player)
 		{
 			short tx = (short)fRelativeX / TILESIZE;
 		
-			TileType t1 = tile_nonsolid;
-			TileType t2 = tile_nonsolid;
+			int t1 = tile_flag_nonsolid;
+			int t2 = tile_flag_nonsolid;
 
 			if(fRelativeY1 >= 0.0f && fRelativeY1 < iHeight)
-				t1 = iTileType[tx][(short)fRelativeY1 / TILESIZE];
+				t1 = iTileType[tx][(short)fRelativeY1 / TILESIZE].iFlags;
 
 			if(fRelativeY2 >= 0.0f && fRelativeY2 < iHeight)
-				t2 = iTileType[tx][(short)fRelativeY2 / TILESIZE];
+				t2 = iTileType[tx][(short)fRelativeY2 / TILESIZE].iFlags;
 
-			if((t1 & 13) || (t2 & 13))
+			if((t1 & tile_flag_solid) || (t2 & tile_flag_solid))
 			{
-				if(player->iHorizontalPlatformCollision == 3 || ((t1 == tile_death || t2 == tile_death || t1 == tile_death_on_left || t2 == tile_death_on_left) &&
-					(!player->invincible && !player->spawninvincible)))
+				if(player->iHorizontalPlatformCollision == 3 || (((t1 & tile_flag_death_on_left) || (t2 & tile_flag_death_on_left)) &&
+					!player->invincible && !player->spawninvincible))
 				{
 					player->KillPlayerMapHazard();
 					//printf("Platform Right Side Killed Player\n");
@@ -583,8 +583,8 @@ void MovingPlatform::collide(CPlayer * player)
 
 					if((topblock && !topblock->isTransparent()) || 
 						(bottomblock && !bottomblock->isTransparent()) ||
-						(g_map.map(iTestBackgroundX, iTestBackgroundY) & 13)|| 
-						(g_map.map(iTestBackgroundX, iTestBackgroundY2) & 13))
+						(g_map.map(iTestBackgroundX, iTestBackgroundY) & tile_flag_solid)|| 
+						(g_map.map(iTestBackgroundX, iTestBackgroundY2) & tile_flag_solid))
 					{
 						player->xf((float)(iTestBackgroundX * TILESIZE - PW) - 0.2f);
 						player->flipsidesifneeded();
@@ -615,19 +615,19 @@ void MovingPlatform::collide(CPlayer * player)
 		{
 			short tx = (short)fRelativeX / TILESIZE;
 
-			TileType t1 = tile_nonsolid;
-			TileType t2 = tile_nonsolid;
+			int t1 = tile_flag_nonsolid;
+			int t2 = tile_flag_nonsolid;
 
 			if(fRelativeY1 >= 0 && fRelativeY1 < iHeight)
-				t1 = iTileType[tx][(short)fRelativeY1 / TILESIZE];
+				t1 = iTileType[tx][(short)fRelativeY1 / TILESIZE].iFlags;
 
 			if(fRelativeY2 >= 0 && fRelativeY2 < iHeight)
-				t2 = iTileType[tx][(short)fRelativeY2 / TILESIZE];
+				t2 = iTileType[tx][(short)fRelativeY2 / TILESIZE].iFlags;
 
-			if((t1 & 13) || (t2 & 13))
+			if((t1 & tile_flag_solid) || (t2 & tile_flag_solid))
 			{
-				if(player->iHorizontalPlatformCollision == 1 || ((t1 == tile_death || t2 == tile_death || t1 == tile_death_on_right || t2 == tile_death_on_right) &&
-					(!player->invincible && !player->spawninvincible)))
+				if(player->iHorizontalPlatformCollision == 1 || (((t1 & tile_flag_death_on_right) || (t2 & tile_flag_death_on_right)) &&
+					!player->invincible && !player->spawninvincible))
 				{
 					player->KillPlayerMapHazard();
 					//printf("Platform Left Side Killed Player\n");
@@ -648,8 +648,8 @@ void MovingPlatform::collide(CPlayer * player)
 
 					if((topblock && !topblock->isTransparent()) || 
 						(bottomblock && !bottomblock->isTransparent()) ||
-						(g_map.map(iTestBackgroundX, iTestBackgroundY) & 13) || 
-						(g_map.map(iTestBackgroundX, iTestBackgroundY2) & 13))
+						(g_map.map(iTestBackgroundX, iTestBackgroundY) & tile_flag_solid) || 
+						(g_map.map(iTestBackgroundX, iTestBackgroundY2) & tile_flag_solid))
 					{
 						player->xf((float)(iTestBackgroundX * TILESIZE + TILESIZE) + 0.2f);
 						player->flipsidesifneeded();
@@ -695,17 +695,17 @@ void MovingPlatform::collide(CPlayer * player)
 		{
 			short ty = (short)fRelativeY / TILESIZE;
 
-			TileType t1 = tile_nonsolid;
-			TileType t2 = tile_nonsolid;
+			int t1 = tile_flag_nonsolid;
+			int t2 = tile_flag_nonsolid;
 
 			if(fRelativeX1 >= 0.0f && fRelativeX1 < iWidth)
-				t1 = iTileType[(short)fRelativeX1 / TILESIZE][ty];
+				t1 = iTileType[(short)fRelativeX1 / TILESIZE][ty].iFlags;
 
 			if(fRelativeX2 >= 0.0f && fRelativeX2 < iWidth)
-				t2 = iTileType[(short)fRelativeX2 / TILESIZE][ty];
+				t2 = iTileType[(short)fRelativeX2 / TILESIZE][ty].iFlags;
 		
-			if((t1 & 1) || (t2 & 1) || t1 == tile_death_on_right || t2 == tile_death_on_right ||
-				((player->invincible || player->spawninvincible) && ((t1 & 4) || (t2 & 4))))
+			if(((t1 & tile_flag_solid) || (t2 & tile_flag_solid)) && (((t1 & tile_flag_death_on_bottom) == 0 && (t2 & tile_flag_death_on_bottom) == 0) || 
+				player->invincible || player->spawninvincible))
 			{
 				if(player->iVerticalPlatformCollision == 2)
 				{
@@ -731,7 +731,7 @@ void MovingPlatform::collide(CPlayer * player)
 
 				return;
 			}
-			else if((t1 & 4) || (t2 & 4))
+			else if((t1 & tile_flag_death_on_bottom) || (t2 & tile_flag_death_on_bottom))
 			{
 				player->KillPlayerMapHazard();
 				return;
@@ -748,19 +748,18 @@ void MovingPlatform::collide(CPlayer * player)
 		{
 			short ty = (short)fRelativeY / TILESIZE;
 
-			TileType t1 = tile_nonsolid;
-			TileType t2 = tile_nonsolid;
+			int t1 = tile_flag_nonsolid;
+			int t2 = tile_flag_nonsolid;
 
 			if(fRelativeX1 >= 0.0f && fRelativeX1 < iWidth)
-				t1 = iTileType[(short)fRelativeX1 / TILESIZE][ty];
+				t1 = iTileType[(short)fRelativeX1 / TILESIZE][ty].iFlags;
 
 			if(fRelativeX2 >= 0.0f && fRelativeX2 < iWidth)
-				t2 = iTileType[(short)fRelativeX2 / TILESIZE][ty];
+				t2 = iTileType[(short)fRelativeX2 / TILESIZE][ty].iFlags;
 
-			bool fSolidTileUnderPlayer = t1 == tile_solid || t1 == tile_ice || t1 == tile_death_on_bottom || t1 == tile_death_on_right || t1 == tile_death_on_left ||
-				t2 == tile_solid || t2 == tile_ice || t2 == tile_death_on_bottom || t2 == tile_death_on_right || t2 == tile_death_on_left;
+			bool fSolidTileUnderPlayer = (t1 & tile_flag_solid) || (t2 & tile_flag_solid);
 
-			if((t1 == tile_solid_on_top || t2 == tile_solid_on_top) && player->fOldY + PH <= ty * TILESIZE + fOldY - iHalfHeight)
+			if((t1 & tile_flag_solid_on_top || t2 & tile_flag_solid_on_top) && player->fOldY + PH <= ty * TILESIZE + fOldY - iHalfHeight)
 			{
 				//Deal with player down jumping through solid on top tiles
 				if(player->fallthrough && !fSolidTileUnderPlayer)
@@ -798,9 +797,8 @@ void MovingPlatform::collide(CPlayer * player)
 				
 				return;
 			}
-			else if(fSolidTileUnderPlayer ||
-				((player->invincible || player->spawninvincible || player->fKuriboShoe) && (t1 == tile_death_on_top || t2 == tile_death_on_top ||
-				t1 == tile_death || t2 == tile_death)))
+			else if(fSolidTileUnderPlayer && (((t1 & tile_flag_death_on_top) == 0 && (t2 & tile_flag_death_on_top) == 0) ||  
+				player->invincible || player->spawninvincible || player->fKuriboShoe))
 			{	//on ground
 
 				if(player->iVerticalPlatformCollision == 0)
@@ -822,8 +820,8 @@ void MovingPlatform::collide(CPlayer * player)
 					player->killsinrowinair = 0;
 					player->extrajumps = 0;
 					
-					if((t1 == tile_ice && (t2 == tile_ice || t2 == tile_nonsolid || t2 == tile_gap)) ||
-						t2 == tile_ice && (t1 == tile_ice || t1 == tile_nonsolid || t1 == tile_gap))
+					if((t1 & tile_flag_ice && ((t2 & tile_flag_ice) || t2 == tile_flag_nonsolid || t2 == tile_flag_gap)) ||
+						(t2 & tile_flag_ice && ((t1 & tile_flag_ice) || t1 == tile_flag_nonsolid || t1 == tile_flag_gap)))
 						player->onice = true;
 					else 
 						player->onice = false;
@@ -835,8 +833,7 @@ void MovingPlatform::collide(CPlayer * player)
 					return;
 				}
 			}
-			else if(t1 == tile_death_on_top || t2 == tile_death_on_top ||
-				t1 == tile_death || t2 == tile_death)
+			else if(t1 & tile_flag_death_on_top || t2 & tile_flag_death_on_top)
 			{
 				player->KillPlayerMapHazard();
 				return;
@@ -879,10 +876,10 @@ bool MovingPlatform::coldec_player(CPlayer * player)
 	}
 }
 
-void MovingPlatform::gettiletypes(CPlayer * player, TileType * lefttile, TileType * righttile)
+void MovingPlatform::gettiletypes(CPlayer * player, int * lefttile, int * righttile)
 {
-	*lefttile = tile_nonsolid;
-	*righttile = tile_nonsolid;
+	*lefttile = tile_flag_nonsolid;
+	*righttile = tile_flag_nonsolid;
 
 	float fRelativeY = player->fPrecalculatedY + PH - fy + iHalfHeight;
 
@@ -900,10 +897,10 @@ void MovingPlatform::gettiletypes(CPlayer * player, TileType * lefttile, TileTyp
 		fRelativeX2 = player->fx + PW - fx + iHalfWidth;
 
 	if(fRelativeX1 >= 0.0f && fRelativeX1 < iWidth)
-		*lefttile = iTileType[(short)fRelativeX1 / TILESIZE][ty];
+		*lefttile = iTileType[(short)fRelativeX1 / TILESIZE][ty].iFlags;
 
 	if(fRelativeX2 >= 0.0f && fRelativeX2 < iWidth)
-		*righttile = iTileType[(short)fRelativeX2 / TILESIZE][ty];
+		*righttile = iTileType[(short)fRelativeX2 / TILESIZE][ty].iFlags;
 }
 
 void MovingPlatform::collide(IO_MovingObject * object)
@@ -967,17 +964,16 @@ void MovingPlatform::collide(IO_MovingObject * object)
 		{
 			short tx = (short)fRelativeX / TILESIZE;
 		
-			TileType t1 = tile_nonsolid;
-			TileType t2 = tile_nonsolid;
+			int t1 = tile_flag_nonsolid;
+			int t2 = tile_flag_nonsolid;
 
 			if(fRelativeY1 >= 0.0f && fRelativeY1 < iHeight)
-				t1 = iTileType[tx][(short)fRelativeY1 / TILESIZE];
+				t1 = iTileType[tx][(short)fRelativeY1 / TILESIZE].iFlags;
 
 			if(fRelativeY2 >= 0.0f && fRelativeY2 < iHeight)
-				t2 = iTileType[tx][(short)fRelativeY2 / TILESIZE];
+				t2 = iTileType[tx][(short)fRelativeY2 / TILESIZE].iFlags;
 
-			if(t1 != tile_nonsolid && t1 != tile_gap && t1 != tile_solid_on_top && 
-				t2 != tile_nonsolid && t2 != tile_gap && t2 != tile_solid_on_top)
+			if((t1 & tile_flag_solid) || (t2 & tile_flag_solid))
 			{
 				if(object->iHorizontalPlatformCollision == 3)
 				{
@@ -1004,8 +1000,8 @@ void MovingPlatform::collide(IO_MovingObject * object)
 
 					if((topblock && !topblock->isTransparent()) || 
 						(bottomblock && !bottomblock->isTransparent()) ||
-						(g_map.map(iTestBackgroundX, iTestBackgroundY) & 13) || 
-						(g_map.map(iTestBackgroundX, iTestBackgroundY2) & 13))
+						(g_map.map(iTestBackgroundX, iTestBackgroundY) & tile_flag_solid) || 
+						(g_map.map(iTestBackgroundX, iTestBackgroundY2) & tile_flag_solid))
 					{
 						object->xf((float)(iTestBackgroundX * TILESIZE - object->collisionWidth) - 0.2f);
 						object->flipsidesifneeded();
@@ -1036,17 +1032,16 @@ void MovingPlatform::collide(IO_MovingObject * object)
 		{
 			short tx = (short)fRelativeX / TILESIZE;
 
-			TileType t1 = tile_nonsolid;
-			TileType t2 = tile_nonsolid;
+			int t1 = tile_flag_nonsolid;
+			int t2 = tile_flag_nonsolid;
 
 			if(fRelativeY1 >= 0 && fRelativeY1 < iHeight)
-				t1 = iTileType[tx][(short)fRelativeY1 / TILESIZE];
+				t1 = iTileType[tx][(short)fRelativeY1 / TILESIZE].iFlags;
 
 			if(fRelativeY2 >= 0 && fRelativeY2 < iHeight)
-				t2 = iTileType[tx][(short)fRelativeY2 / TILESIZE];
+				t2 = iTileType[tx][(short)fRelativeY2 / TILESIZE].iFlags;
 
-			if(t1 != tile_nonsolid && t1 != tile_gap && t1 != tile_solid_on_top && 
-				t2 != tile_nonsolid && t2 != tile_gap && t2 != tile_solid_on_top)
+			if((t1 & tile_flag_solid) || (t2 & tile_flag_solid))
 			{
 				if(object->iHorizontalPlatformCollision == 1)
 				{
@@ -1068,8 +1063,8 @@ void MovingPlatform::collide(IO_MovingObject * object)
 
 					if((topblock && !topblock->isTransparent()) || 
 						(bottomblock && !bottomblock->isTransparent()) ||
-						(g_map.map(iTestBackgroundX, iTestBackgroundY) & 13) || 
-						(g_map.map(iTestBackgroundX, iTestBackgroundY2) & 13))
+						(g_map.map(iTestBackgroundX, iTestBackgroundY) & tile_flag_solid) || 
+						(g_map.map(iTestBackgroundX, iTestBackgroundY2) & tile_flag_solid))
 					{
 						object->xf((float)(iTestBackgroundX * TILESIZE + TILESIZE) + 0.2f);
 						object->flipsidesifneeded();
@@ -1114,16 +1109,16 @@ void MovingPlatform::collide(IO_MovingObject * object)
 		{
 			short ty = (short)fRelativeY / TILESIZE;
 
-			TileType t1 = tile_nonsolid;
-			TileType t2 = tile_nonsolid;
+			int t1 = tile_flag_nonsolid;
+			int t2 = tile_flag_nonsolid;
 
 			if(fRelativeX1 >= 0.0f && fRelativeX1 < iWidth)
-				t1 = iTileType[(short)fRelativeX1 / TILESIZE][ty];
+				t1 = iTileType[(short)fRelativeX1 / TILESIZE][ty].iFlags;
 
 			if(fRelativeX2 >= 0.0f && fRelativeX2 < iWidth)
-				t2 = iTileType[(short)fRelativeX2 / TILESIZE][ty];
+				t2 = iTileType[(short)fRelativeX2 / TILESIZE][ty].iFlags;
 		
-			if((t1 & 13) || (t2 & 13))
+			if((t1 & tile_flag_solid) || (t2 & tile_flag_solid))
 			{
 				if(object->iVerticalPlatformCollision == 2)
 				{
@@ -1156,16 +1151,16 @@ void MovingPlatform::collide(IO_MovingObject * object)
 		{
 			short ty = (short)fRelativeY / TILESIZE;
 
-			TileType t1 = tile_nonsolid;
-			TileType t2 = tile_nonsolid;
+			int t1 = tile_flag_nonsolid;
+			int t2 = tile_flag_nonsolid;
 
 			if(fRelativeX1 >= 0.0f && fRelativeX1 < iWidth)
-				t1 = iTileType[(short)fRelativeX1 / TILESIZE][ty];
+				t1 = iTileType[(short)fRelativeX1 / TILESIZE][ty].iFlags;
 
 			if(fRelativeX2 >= 0.0f && fRelativeX2 < iWidth)
-				t2 = iTileType[(short)fRelativeX2 / TILESIZE][ty];
+				t2 = iTileType[(short)fRelativeX2 / TILESIZE][ty].iFlags;
 
-			if((t1 == tile_solid_on_top || t2 == tile_solid_on_top) && object->fOldY + object->collisionHeight <= ty * TILESIZE + fOldY - iHalfHeight)
+			if(((t1 & tile_flag_solid_on_top) || (t2 & tile_flag_solid_on_top)) && object->fOldY + object->collisionHeight <= ty * TILESIZE + fOldY - iHalfHeight)
 			{
 				if(object->iVerticalPlatformCollision == 0)
 				{
@@ -1188,7 +1183,7 @@ void MovingPlatform::collide(IO_MovingObject * object)
 
 				return;
 			}
-			else if((t1 & 13) || (t2 & 13))
+			else if((t1 & tile_flag_solid) || (t2 & tile_flag_solid))
 			{	//on ground
 				if(object->iVerticalPlatformCollision == 0)
 				{
@@ -1207,8 +1202,8 @@ void MovingPlatform::collide(IO_MovingObject * object)
 					object->vely = object->BottomBounce();
 					object->inair = false;
 					
-					if((t1 == tile_ice && (t2 == tile_ice || t2 == tile_nonsolid || t2 == tile_gap)) ||
-						t2 == tile_ice && (t1 == tile_ice || t1 == tile_nonsolid || t1 == tile_gap))
+					if((t1 & tile_flag_ice && ((t2 & tile_flag_ice) || t2 == tile_flag_nonsolid || t2 == tile_flag_gap)) ||
+						(t2 & tile_flag_ice && ((t1 & tile_flag_ice) || t1 == tile_flag_nonsolid || t1 == tile_flag_gap)))
 						object->onice = true;
 					else 
 						object->onice = false;

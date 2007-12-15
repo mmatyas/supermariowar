@@ -3863,18 +3863,20 @@ MI_BonusWheel::MI_BonusWheel(short x, short y) :
 
 	for(short iImage = 0; iImage < NUMBONUSITEMSONWHEEL; iImage++)
 	{
-		float dAngle = (float)iImage * TWO_PI / (float)(NUMBONUSITEMSONWHEEL);
-		short iPowerupX = x + 160 + (short)(120.0f * cos(dAngle));
-		short iPowerupY = y + 210 + (short)(120.0f * sin(dAngle));
+		dSelectionSector[iImage] = (float)iImage * TWO_PI / (float)(NUMBONUSITEMSONWHEEL);
+		
+		short iPowerupX = x + 160 + (short)(110.0f * cos(dSelectionSector[iImage]));
+		short iPowerupY = y + 208 + (short)(110.0f * sin(dSelectionSector[iImage]));
 
 		miBonusImages[iImage] = new MI_Image(&spr_storedpoweruplarge, iPowerupX, iPowerupY, 0, 0, 32, 32, 1, 1, 0);
 	}
 
+	//Fix the last sector to allow correct detection of sector for tick sound
+	dSelectionSector[NUMBONUSITEMSONWHEEL] = TWO_PI;
+
 	miContinueButton = new MI_Button(&menu_plain_field, ix + 76, iy + 390, "Continue", 200, 1);
 	miContinueButton->Show(false);
 	miContinueButton->SetCode(MENU_CODE_BONUS_DONE);
-
-	//Reset(true);
 }
 
 MI_BonusWheel::~MI_BonusWheel()
@@ -3902,7 +3904,7 @@ MenuCodeEnum MI_BonusWheel::Modify(bool fModify)
 
 		float dNumWinddownSteps = dSelectionSpeed / 0.0005f - 1;
 		float dWinddownAngle = dSelectionSpeed / 2.0f * dNumWinddownSteps;
-		dFinalAngle = dSelectionAngle + dWinddownAngle;
+		float dFinalAngle = dSelectionAngle + dWinddownAngle;
 		
 		//Bring the radians back down to between 0 and TWO_PI to do comparisons to the powerups on the wheel
 		while(dFinalAngle > TWO_PI)
@@ -3913,11 +3915,10 @@ MenuCodeEnum MI_BonusWheel::Modify(bool fModify)
 		{
 			if(dFinalAngle >= iSector * dSectorSize && dFinalAngle < (iSector + 1) * dSectorSize)
 			{
-				iSelectedPowerup = iChosenPowerups[iSector];
+				iSelectedPowerup = iChosenPowerups[iSector + 1 >= NUMBONUSITEMSONWHEEL ? 0 : iSector + 1];
 				float dNewWinddownAngle = dWinddownAngle + (iSector + 1) * dSectorSize - dFinalAngle;
-				
-				//dSelectionWinddownSpeed = dSelectionSpeeddNewWinddownAngle / dNumWinddownSteps;
 
+				//Determine the speed we need to exactly hit the selected powerup when the selector winds down
 				dSelectionWinddownSpeed = dSelectionSpeed / (dNewWinddownAngle * 2.0f / dSelectionSpeed + 1.0f);
 				break;
 			}
@@ -3932,92 +3933,126 @@ MenuCodeEnum MI_BonusWheel::Modify(bool fModify)
 
 void MI_BonusWheel::Update()
 {
-	for(int iImage = 0; iImage < NUMBONUSITEMSONWHEEL; iImage++)
+	if(iState == 0)
 	{
-		miBonusImages[iImage]->Update();
-	}
-
-	for(int iPlayer = 0; iPlayer < iNumPlayers; iPlayer++)
-	{
-		miPlayerImages[iPlayer]->Update();
-	}
-
-	miContinueButton->Update();
-
-	if(++iSelectorAnimationCounter > 8)
-	{
-		iSelectorAnimationCounter = 0;
-		
-		if(++iSelectorAnimation > 1)
-			iSelectorAnimation = 0;
-	}
-
-	if(iSelectionSpeedTimer > 0)
-	{
-		if(--iSelectionSpeedTimer <= 0)
+		if(--iDisplayPowerupTimer <= 0)
 		{
-			dSelectionSpeedGoal = (float)(rand() % 100 + 200) * 0.0005f;
-			iSelectionSpeedTimer = 0;
-		}
-	}
+			iDisplayPowerupTimer = 20;
 
-	if(fPressedSelect)
-	{
-		dSelectionSpeed -= dSelectionWinddownSpeed;
+			short iPoofX = ix + 152 + (short)(110.0f * cos(dSelectionSector[iDisplayPowerupIndex]));
+			short iPoofY = iy + 200 + (short)(110.0f * sin(dSelectionSector[iDisplayPowerupIndex]));
+
+			uiMenu->AddEyeCandy(new EC_SingleAnimation(&spr_poof, iPoofX, iPoofY, 4, 5));
+
+			ifsoundonplay(sfx_cannon);
+
+			if(++iDisplayPowerupIndex >= NUMBONUSITEMSONWHEEL)
+			{
+				iState = 1;
+			}
+		}
 	}
 	else
 	{
-		if(dSelectionSpeed < dSelectionSpeedGoal)
-		{
-			dSelectionSpeed += 0.0005f;
+		if(!fPressedSelect && ++iPressSelectTimer > 620)
+			Modify(false);
 
-			if(dSelectionSpeed >= dSelectionSpeedGoal)
+		for(int iImage = 0; iImage < NUMBONUSITEMSONWHEEL; iImage++)
+		{
+			miBonusImages[iImage]->Update();
+		}
+
+		for(int iPlayer = 0; iPlayer < iNumPlayers; iPlayer++)
+		{
+			miPlayerImages[iPlayer]->Update();
+		}
+
+		miContinueButton->Update();
+
+		if(++iSelectorAnimationCounter > 8)
+		{
+			iSelectorAnimationCounter = 0;
+			
+			if(++iSelectorAnimation > 1)
+				iSelectorAnimation = 0;
+		}
+
+		if(iSelectionSpeedTimer > 0)
+		{
+			if(--iSelectionSpeedTimer <= 0)
 			{
-				dSelectionSpeed = dSelectionSpeedGoal;
-				iSelectionSpeedTimer = rand() % 60 + 30;
+				dSelectionSpeedGoal = (float)(rand() % 100 + 200) * 0.0005f;
+				iSelectionSpeedTimer = 0;
 			}
 		}
-		else if(dSelectionSpeed > dSelectionSpeedGoal)
-		{
-			dSelectionSpeed -= 0.0005f;
 
-			if(dSelectionSpeed <= dSelectionSpeedGoal)
+		if(fPressedSelect)
+		{
+			dSelectionSpeed -= dSelectionWinddownSpeed;
+		}
+		else
+		{
+			if(dSelectionSpeed < dSelectionSpeedGoal)
 			{
-				dSelectionSpeed = dSelectionSpeedGoal;
-				iSelectionSpeedTimer = rand() % 60 + 30;
+				dSelectionSpeed += 0.0005f;
+
+				if(dSelectionSpeed >= dSelectionSpeedGoal)
+				{
+					dSelectionSpeed = dSelectionSpeedGoal;
+					iSelectionSpeedTimer = rand() % 60 + 30;
+				}
+			}
+			else if(dSelectionSpeed > dSelectionSpeedGoal)
+			{
+				dSelectionSpeed -= 0.0005f;
+
+				if(dSelectionSpeed <= dSelectionSpeedGoal)
+				{
+					dSelectionSpeed = dSelectionSpeedGoal;
+					iSelectionSpeedTimer = rand() % 60 + 30;
+				}
 			}
 		}
+
+		if(dSelectionSpeed <= 0.0f)
+		{
+			dSelectionSpeed = 0.0f;
+			
+			if(!fPowerupSelectionDone)
+			{
+				fPowerupSelectionDone = true;
+				miContinueButton->Show(true);
+				miContinueButton->Select(true);
+
+				//Reset all player's stored item
+				if(!game_values.keeppowerup)
+				{
+					for(short iPlayer = 0; iPlayer < 4; iPlayer++)
+						game_values.storedpowerups[iPlayer] = -1;
+				}
+
+				//Give the newly won stored item to the winning players
+				for(short iPlayer = 0; iPlayer < game_values.teamcounts[iWinningTeam]; iPlayer++)
+					game_values.storedpowerups[game_values.teamids[iWinningTeam][iPlayer]] = iSelectedPowerup;
+
+				ifsoundonplay(sfx_collectpowerup);
+			}
+		}
+
+		dSelectionAngle += dSelectionSpeed;
+
+		//If we hit the next powerup, play a tick sound
+		if(dSelectionAngle >= dSelectionSector[iNextSelectionSoundIndex])
+		{
+			ifsoundonplay(sfx_worldmove);
+
+			if(++iNextSelectionSoundIndex > NUMBONUSITEMSONWHEEL)
+				iNextSelectionSoundIndex = 1;
+		}
+
+		while(dSelectionAngle > TWO_PI)
+			dSelectionAngle -= TWO_PI;
 	}
-
-	if(dSelectionSpeed <= 0.0f)
-	{
-		dSelectionSpeed = 0.0f;
-		
-		if(!fPowerupSelectionDone)
-		{
-			fPowerupSelectionDone = true;
-			miContinueButton->Show(true);
-			miContinueButton->Select(true);
-
-			//Reset all player's stored item
-			if(!game_values.keeppowerup)
-			{
-				for(short iPlayer = 0; iPlayer < 4; iPlayer++)
-					game_values.storedpowerups[iPlayer] = -1;
-			}
-
-			//Give the newly won stored item to the winning players
-			for(short iPlayer = 0; iPlayer < game_values.teamcounts[iWinningTeam]; iPlayer++)
-				game_values.storedpowerups[game_values.teamids[iWinningTeam][iPlayer]] = iSelectedPowerup;
-
-			ifsoundonplay(sfx_collectpowerup);
-		}
-	}
-
-	dSelectionAngle += dSelectionSpeed;
-
-	while(dSelectionAngle > TWO_PI)
-		dSelectionAngle -= TWO_PI;
 }
 		
 void MI_BonusWheel::Draw()
@@ -4027,13 +4062,17 @@ void MI_BonusWheel::Draw()
 
 	spr_tournament_powerup_splash.draw(ix, iy);
 
-	short iSelectorX = ix + 144 + (short)(120.0f * cos(dSelectionAngle));
-	short iSelectorY = iy + 192 + (short)(120.0f * sin(dSelectionAngle));
+	short iSelectorX = ix + 144 + (short)(110.0f * cos(dSelectionAngle));
+	short iSelectorY = iy + 190 + (short)(110.0f * sin(dSelectionAngle));
 
-	spr_powerupselector.draw(iSelectorX, iSelectorY, iSelectorAnimation * 64, 0, 64, 64);
+	if(iState > 0)
+		spr_powerupselector.draw(iSelectorX, iSelectorY, iSelectorAnimation * 64, 0, 64, 64);
 
 	for(int iImage = 0; iImage < NUMBONUSITEMSONWHEEL; iImage++)
 	{
+		if(iImage >= iDisplayPowerupIndex)
+			break;
+
 		miBonusImages[iImage]->Draw();
 	}
 
@@ -4044,17 +4083,17 @@ void MI_BonusWheel::Draw()
 
 	miContinueButton->Draw();
 
-	if(dFinalAngle != 0.0f)
-	{
-		short iPowerupX = ix + 160 + (short)(120.0f * cos(dFinalAngle));
-		short iPowerupY = iy + 210 + (short)(120.0f * sin(dFinalAngle));
-
-		spr_storedpoweruplarge.draw(iPowerupX, iPowerupY, 0, 0, 32, 32);
-	}
+	if(iState == 1 && !fPressedSelect)
+		menu_font_large.drawCentered(320, iy + 390, "Press a Button To Stop The Wheel");
 }
 
 void MI_BonusWheel::Reset(bool fTournament)
 {
+	//Setup the state so that we make powerups appear one by one before the wheel starts spinning
+	iState = 0;
+	iDisplayPowerupIndex = 0;
+	iDisplayPowerupTimer = 0;
+
 	if(fTournament)
 		iWinningTeam = game_values.tournamentwinner;
 	else
@@ -4107,6 +4146,7 @@ void MI_BonusWheel::Reset(bool fTournament)
 	}
 
 	//Indicate that the player hasn't choosen a powerup yet
+	iPressSelectTimer = 0;
 	fPressedSelect = false;
 	fPowerupSelectionDone = false;
 	miContinueButton->Show(false);
@@ -4121,7 +4161,13 @@ void MI_BonusWheel::Reset(bool fTournament)
 	dSelectionSpeedGoal = (float)(rand() % 100 + 200) * 0.0005f;
 	iSelectionSpeedTimer = 0;
 
-	dFinalAngle = 0.0f;
+	for(short iSector = 0; iSector < NUMBONUSITEMSONWHEEL; iSector++)
+	{
+		if(dSelectionAngle > dSelectionSector[iSector])
+			iNextSelectionSoundIndex = iSector + 1;
+		else
+			break;
+	}
 }
 
 //Call with x = 144 and y == 64

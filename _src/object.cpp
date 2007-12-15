@@ -1230,9 +1230,10 @@ void B_DonutBlock::triggerBehavior()
 	tiledata[0][0].iCol = 29;
 	tiledata[0][0].iRow = 15;
 
-	TileType ** typedata = new TileType*[1];
-	typedata[0] = new TileType[1];
-	typedata[0][0] = tile_solid;
+	MapTile ** typedata = new MapTile*[1];
+	typedata[0] = new MapTile[1];
+	typedata[0][0].iType = tile_solid;
+	typedata[0][0].iFlags = tile_flag_solid;
 
 	MovingPlatformPath * path = new MovingPlatformPath(0.0f, (float)ix + 16.0f, (float)iy + 16.0f, 0.0f, 0.0f, true); 
 	MovingPlatform * platform = new MovingPlatform(tiledata, typedata, 1, 1, path, true, 0, false);
@@ -2614,7 +2615,7 @@ void IO_MovingObject::collision_detection_map()
 					SideBounce();
 				}
 			}
-			else if((g_map.map(tx, ty) & 13) > 0 || (g_map.map(tx, ty2) & 13) > 0)
+			else if((g_map.map(tx, ty) & tile_flag_solid) || (g_map.map(tx, ty2) & tile_flag_solid))
 			{	//collision on the right side.
 
 				if(iHorizontalPlatformCollision == 3)
@@ -2683,7 +2684,7 @@ void IO_MovingObject::collision_detection_map()
 					SideBounce();
 				}
 			}
-			else if((g_map.map(tx, ty) & 13) > 0 || (g_map.map(tx, ty2) & 13) > 0)
+			else if((g_map.map(tx, ty) & tile_flag_solid) || (g_map.map(tx, ty2) & tile_flag_solid))
 			{
 				if(iHorizontalPlatformCollision == 1)
 				{
@@ -2747,7 +2748,7 @@ void IO_MovingObject::collision_detection_map()
 			return;
 		}
 
-		if((g_map.map(txl, ty) & 13) > 0 || (g_map.map(txr, ty) & 13) > 0)
+		if((g_map.map(txl, ty) & tile_flag_solid) || (g_map.map(txr, ty) & tile_flag_solid))
 		{
 			if(iVerticalPlatformCollision == 2)
 				KillObjectMapHazard();
@@ -2811,10 +2812,10 @@ void IO_MovingObject::collision_detection_map()
 			return;
 		}
 
-		TileType leftTile = g_map.map(txl, ty);
-		TileType rightTile = g_map.map(txr, ty);
+		int leftTile = g_map.map(txl, ty);
+		int rightTile = g_map.map(txr, ty);
 
-		if(leftTile == tile_solid_on_top || rightTile == tile_solid_on_top)
+		if((leftTile & tile_flag_solid_on_top) || (rightTile & tile_flag_solid_on_top))
 		{
 			if((fOldY + collisionHeight) / TILESIZE < ty)
 			{
@@ -2837,7 +2838,7 @@ void IO_MovingObject::collision_detection_map()
 			}
 		}
 
-		if((leftTile & 13) > 0 || (rightTile & 13) > 0)
+		if((leftTile & tile_flag_solid) || (rightTile & tile_flag_solid))
 		{	
 			vely = BottomBounce();
 			yf((float)(ty * TILESIZE - collisionHeight) - 0.2f);
@@ -2847,8 +2848,8 @@ void IO_MovingObject::collision_detection_map()
 			{
 				inair = false;
 
-				if((leftTile == tile_ice && (rightTile == tile_ice || rightTile == tile_nonsolid || rightTile == tile_gap)) ||
-					(rightTile == tile_ice && (leftTile == tile_ice || leftTile == tile_nonsolid || leftTile == tile_gap)))
+				if((leftTile & tile_flag_ice && ((rightTile & tile_flag_ice) || rightTile == tile_flag_nonsolid || rightTile == tile_flag_gap)) ||
+					(rightTile & tile_flag_ice && ((leftTile & tile_flag_ice) || leftTile == tile_flag_nonsolid || leftTile == tile_flag_gap)))
 					onice = true;
 				else 
 					onice = false;
@@ -2902,7 +2903,7 @@ bool IO_MovingObject::collision_detection_checksides()
 			{
 				IO_Block * block = g_map.block(txl, ty);
 
-				if((block && !block->isTransparent() && !block->isHidden()) || (g_map.map(txl, ty) & 13) > 0)
+				if((block && !block->isTransparent() && !block->isHidden()) || (g_map.map(txl, ty) & tile_flag_solid) > 0)
 				{
 					iCase |= 0x01;
 				}
@@ -2912,7 +2913,7 @@ bool IO_MovingObject::collision_detection_checksides()
 			{
 				IO_Block * block = g_map.block(txr, ty);
 
-				if((block && !block->isTransparent() && !block->isHidden()) || (g_map.map(txr, ty) & 13) > 0)
+				if((block && !block->isTransparent() && !block->isHidden()) || (g_map.map(txr, ty) & tile_flag_solid) > 0)
 				{
 					iCase |= 0x02;
 				}
@@ -2929,7 +2930,7 @@ bool IO_MovingObject::collision_detection_checksides()
 			{
 				IO_Block * block = g_map.block(txl, ty2);
 
-				if((block && !block->isTransparent() && !block->isHidden()) || (g_map.map(txl, ty2) & 13) > 0)
+				if((block && !block->isTransparent() && !block->isHidden()) || (g_map.map(txl, ty2) & tile_flag_solid) > 0)
 				{
 					iCase |= 0x04;
 				}
@@ -2939,7 +2940,7 @@ bool IO_MovingObject::collision_detection_checksides()
 			{
 				IO_Block * block = g_map.block(txr, ty2);
 
-				if((block && !block->isTransparent() && !block->isHidden()) || (g_map.map(txr, ty2) & 13) > 0)
+				if((block && !block->isTransparent() && !block->isHidden()) || (g_map.map(txr, ty2) & tile_flag_solid) > 0)
 				{
 					iCase |= 0x08;
 				}
@@ -6157,15 +6158,13 @@ void OMO_Yoshi::placeYoshi()
 		short iyt = iy / TILESIZE;
 		short iyb = (iy + ih) / TILESIZE;
 
-		TileType upperLeft = g_map.map(ixl, iyt);
-		TileType upperRight = g_map.map(ixr, iyt);
-		TileType lowerLeft = g_map.map(ixl, iyb);
-		TileType lowerRight = g_map.map(ixr, iyb);
+		int upperLeft = g_map.map(ixl, iyt);
+		int upperRight = g_map.map(ixr, iyt);
+		int lowerLeft = g_map.map(ixl, iyb);
+		int lowerRight = g_map.map(ixr, iyb);
 
-		if((upperLeft == tile_nonsolid || upperLeft == tile_gap || upperLeft == tile_solid_on_top) &&
-		   (upperRight == tile_nonsolid || upperRight == tile_gap || upperRight == tile_solid_on_top) &&
-		   (lowerLeft == tile_nonsolid || lowerLeft == tile_gap || lowerLeft == tile_solid_on_top) &&
-		   (lowerRight == tile_nonsolid || lowerRight == tile_gap || lowerRight == tile_solid_on_top) &&
+		if((upperLeft & tile_flag_solid) == 0 && (upperRight & tile_flag_solid) == 0 &&
+			(lowerLeft & tile_flag_solid) == 0 && (lowerRight & tile_flag_solid) == 0 && 
 			!g_map.block(ixl, iyt) && !g_map.block(ixr, iyt) && !g_map.block(ixl, iyb) && !g_map.block(ixr, iyb))
 		{
 			//spawn on ground, but not on spikes
@@ -6175,11 +6174,11 @@ void OMO_Yoshi::placeYoshi()
 			
 			while(iDeathY < MAPHEIGHT)
 			{
-				TileType ttLeftTile = g_map.map(iDeathX1, iDeathY);
-				TileType ttRightTile = g_map.map(iDeathX2, iDeathY);
+				int ttLeftTile = g_map.map(iDeathX1, iDeathY);
+				int ttRightTile = g_map.map(iDeathX2, iDeathY);
 
-				if(ttLeftTile == tile_solid || ttLeftTile == tile_solid_on_top || ttLeftTile == tile_death_on_bottom || ttLeftTile == tile_death_on_left || ttLeftTile == tile_death_on_right || ttLeftTile == tile_ice ||
-					ttRightTile == tile_solid || ttRightTile == tile_solid_on_top || ttRightTile == tile_death_on_bottom || ttRightTile == tile_death_on_left || ttRightTile == tile_death_on_right || ttRightTile == tile_ice ||
+				if(((ttLeftTile & tile_flag_solid || ttLeftTile & tile_flag_solid_on_top) && (ttLeftTile & tile_flag_death_on_top) == 0) ||  
+					((ttRightTile & tile_flag_solid || ttRightTile & tile_flag_solid_on_top) && (ttRightTile & tile_flag_death_on_top) == 0) ||
 					g_map.block(iDeathX1, iDeathY) || g_map.block(iDeathX2, iDeathY))
 				{
 					short top = (iDeathY * TILESIZE - ih) / TILESIZE;
@@ -6194,8 +6193,7 @@ void OMO_Yoshi::placeYoshi()
 
 					break;
 				}
-				else if(ttLeftTile == tile_death_on_top || ttRightTile == tile_death_on_top ||
-					ttLeftTile == tile_death || ttRightTile == tile_death)
+				else if(ttLeftTile & tile_flag_death_on_top || ttRightTile & tile_flag_death_on_top)
 				{
 					break;
 				}
@@ -6531,8 +6529,8 @@ void OMO_KingOfTheHillZone::placeArea()
 		{
 			for(short iCol = 0; iCol < size; iCol++)
 			{
-				TileType type = g_map.map(x + iCol, iFindY);
-				if(type == tile_solid_on_top || type == tile_solid || type == tile_death_on_bottom || type == tile_death_on_left || type == tile_death_on_right || type == tile_ice || g_map.block(x + iCol, iFindY))
+				int type = g_map.map(x + iCol, iFindY);
+				if(((type & tile_flag_solid_on_top || type & tile_flag_solid) && (type & tile_flag_death_on_top) == 0) || g_map.block(x + iCol, iFindY))
 				{
 					fDone = true;
 					break;
@@ -6564,7 +6562,7 @@ void OMO_KingOfTheHillZone::placeArea()
 			for(short iCol = 0; iCol < size; iCol++)
 			{
 				//If there is a solid tile inside the zone
-				if((g_map.map(x + iCol, y + iRow) & 13) || !g_map.spawn(1, x + iCol, y + iRow) || g_map.block(x + iCol, y + iRow))
+				if((g_map.map(x + iCol, y + iRow) & tile_flag_solid) || !g_map.spawn(1, x + iCol, y + iRow) || g_map.block(x + iCol, y + iRow))
 				{
 					iCountSolidTiles++;
 

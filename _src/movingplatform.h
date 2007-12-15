@@ -28,7 +28,7 @@ class MovingPlatformPath
 class MovingPlatform
 {
 	public:
-		MovingPlatform(TilesetTile ** tiledata, TileType ** tiletypes, short w, short h, MovingPlatformPath * path, bool forwardDirection, short startPathNode, bool preview);
+		MovingPlatform(TilesetTile ** tiledata, MapTile ** tiletypes, short w, short h, MovingPlatformPath * path, bool forwardDirection, short startPathNode, bool preview);
 		~MovingPlatform();
 
 		void draw();
@@ -41,7 +41,7 @@ class MovingPlatform
 		void collide(CPlayer * player);
 		bool coldec_player(CPlayer * player);
 
-		void gettiletypes(CPlayer * player, TileType * lefttile, TileType * righttile);
+		void gettiletypes(CPlayer * player, int * lefttile, int * righttile);
 
 		void collide(IO_MovingObject * object);
 		bool coldec_object(IO_MovingObject * object);
@@ -57,7 +57,7 @@ class MovingPlatform
 	protected:
 
 		TilesetTile ** iTileData;
-		TileType ** iTileType;
+		MapTile ** iTileType;
 		short ix, iy;
 		short iWidth, iHeight;
 		short iTileWidth, iTileHeight;

@@ -45,7 +45,7 @@ enum {EDITOR_EDIT, EDITOR_TILES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_MAP, EDITOR_B
 #define MAX_PLATFORMS 8
 #define MAX_PLATFORM_VELOCITY 16
 
-class MapTile
+class EditorMapTile
 {
 	public:
 		TilesetTile	tile[MAPLAYERS];
@@ -146,7 +146,7 @@ CTilesetManager g_tilesetmanager;
 int				state;
 bool			selectedtiles[MAPWIDTH][MAPHEIGHT];
 bool			moveselectedtiles[MAPWIDTH][MAPHEIGHT];
-MapTile			copiedtiles[MAPWIDTH][MAPHEIGHT];
+EditorMapTile	copiedtiles[MAPWIDTH][MAPHEIGHT];
 int				copiedlayer;
 
 //// Global stuff that the map editor doesn't need, but has references to
@@ -494,7 +494,7 @@ void UpdateTileType(short x, short y)
 		}
 	}
 
-	g_map.mapdatatop[x][y] = type;
+	g_map.mapdatatop[x][y].iType = type;
 }
 
 
@@ -504,7 +504,9 @@ void AdjustMapItems(short iClickX, short iClickY)
 	{
 		if(g_map.mapitems[j].ix == iClickX && g_map.mapitems[j].iy == iClickY)
 		{
-			if(g_map.mapdatatop[iClickX][iClickY] != tile_nonsolid && g_map.mapdatatop[iClickX][iClickY] != tile_solid_on_top ||
+			if((g_map.mapdatatop[iClickX][iClickY].iType != tile_nonsolid && 
+				g_map.mapdatatop[iClickX][iClickY].iType != tile_solid_on_top &&
+				g_map.mapdatatop[iClickX][iClickY].iType != tile_ice_on_top) ||
 				g_map.objectdata[iClickX][iClickY].iType != -1)
 			{
 				g_map.iNumMapItems--;
@@ -940,7 +942,7 @@ int editor_edit()
 						}
 						else if(edit_mode == 6)
 						{
-							g_map.mapdatatop[iClickX][iClickY] = set_tiletype;
+							g_map.mapdatatop[iClickX][iClickY].iType = set_tiletype;
 							AdjustMapItems(iClickX, iClickY);
 						}
 						else if(edit_mode == 7)
@@ -957,7 +959,9 @@ int editor_edit()
 									}
 								}
 
-								if(g_map.mapdatatop[iClickX][iClickY] != tile_nonsolid && g_map.mapdatatop[iClickX][iClickY] != tile_solid_on_top)
+								if(g_map.mapdatatop[iClickX][iClickY].iType != tile_nonsolid && 
+									g_map.mapdatatop[iClickX][iClickY].iType != tile_solid_on_top && 
+									g_map.mapdatatop[iClickX][iClickY].iType != tile_ice_on_top)
 									fTileNotAvailable = true;
 
 								if(!fTileNotAvailable)
@@ -1033,7 +1037,7 @@ int editor_edit()
 						}
 						else if(edit_mode == 6)
 						{
-							g_map.mapdatatop[iClickX][iClickY] = tile_nonsolid;
+							g_map.mapdatatop[iClickX][iClickY].iType = tile_nonsolid;
 						}
 						else if(edit_mode == 7)
 						{
@@ -1106,7 +1110,7 @@ int editor_edit()
 						}
 						else if(edit_mode == 6)
 						{
-							g_map.mapdatatop[iClickX][iClickY] = set_tiletype;
+							g_map.mapdatatop[iClickX][iClickY].iType = set_tiletype;
 							AdjustMapItems(iClickX, iClickY);
 						}
 						else if(edit_mode == 8)
@@ -1156,7 +1160,7 @@ int editor_edit()
 						}
 						else if(edit_mode == 6)
 						{
-							g_map.mapdatatop[iClickX][iClickY] = tile_nonsolid;
+							g_map.mapdatatop[iClickX][iClickY].iType = tile_nonsolid;
 						}
 					}
 				
@@ -1342,8 +1346,8 @@ int editor_edit()
 			{
 				for(int j = 0; j < MAPWIDTH; j++)
 				{
-					if(g_map.mapdatatop[j][k] > 0)
-						spr_transparenttiles.draw(j * TILESIZE, k * TILESIZE, (g_map.mapdatatop[j][k] - 1) * TILESIZE, 0, TILESIZE, TILESIZE);
+					if(g_map.mapdatatop[j][k].iType != tile_nonsolid)
+						spr_transparenttiles.draw(j * TILESIZE, k * TILESIZE, (g_map.mapdatatop[j][k].iType - 1) * TILESIZE, 0, TILESIZE, TILESIZE);
 				}
 			}
 
@@ -3280,7 +3284,7 @@ int editor_tiletype()
 						short iCol = event.button.x / TILESIZE;
 						short iRow = event.button.y / TILESIZE;
 
-						if(iCol < 8 && iRow == 0)
+						if(iCol <= 11 && iRow == 0)
 						{
 							set_tiletype = (TileType)(iCol + 1);
 
@@ -4011,7 +4015,7 @@ void loadcurrentmap()
 				if(iCol < g_map.platforms[iPlatform]->iTileWidth && iRow < g_map.platforms[iPlatform]->iTileHeight)
 				{
 					CopyTilesetTile(&g_Platforms[iPlatform].tiles[iCol][iRow], &g_map.platforms[iPlatform]->iTileData[iCol][iRow]);
-					g_Platforms[iPlatform].types[iCol][iRow] = g_map.platforms[iPlatform]->iTileType[iCol][iRow];
+					g_Platforms[iPlatform].types[iCol][iRow] = g_map.platforms[iPlatform]->iTileType[iCol][iRow].iType;
 				}
 				else
 				{
@@ -4067,17 +4071,17 @@ void insert_platforms_into_map()
 		CalculatePlatformDims(iPlatform, &iLeft, &iTop, &iWidth, &iHeight);
 
 		TilesetTile ** tiles = new TilesetTile*[iWidth];
-		TileType ** types = new TileType*[iWidth];
+		MapTile ** types = new MapTile*[iWidth];
 
 		for(short iCol = 0; iCol < iWidth; iCol++)
 		{
 			tiles[iCol] = new TilesetTile[iHeight];
-			types[iCol] = new TileType[iHeight];
+			types[iCol] = new MapTile[iHeight];
 
 			for(short iRow = 0; iRow < iHeight; iRow++)
 			{
 				CopyTilesetTile(&tiles[iCol][iRow], &g_Platforms[iPlatform].tiles[iCol + iLeft][iRow + iTop]);
-				types[iCol][iRow] = g_Platforms[iPlatform].types[iCol + iLeft][iRow + iTop];
+				types[iCol][iRow].iType = g_Platforms[iPlatform].types[iCol + iLeft][iRow + iTop];
 			}
 		}
 	
@@ -4283,7 +4287,7 @@ bool copyselectedtiles()
 				copiedtiles[j][k].warp.direction = g_map.warpdata[j][k].direction;
 				copiedtiles[j][k].warp.id = g_map.warpdata[j][k].id;
 
-				copiedtiles[j][k].tiletype = g_map.mapdatatop[j][k];
+				copiedtiles[j][k].tiletype = g_map.mapdatatop[j][k].iType;
 				
 				for(short iType = 0; iType < NUMSPAWNAREATYPES; iType++)
 					copiedtiles[j][k].nospawn[iType] = g_map.nospawn[iType][j][k];
@@ -4428,7 +4432,7 @@ void pasteselectedtiles(int movex, int movey)
 						replacetile(&g_map.warpdata[iNewX][iNewY].id, copiedtiles[j][k].warp.id, copiedtiles[j][k].warp.connection != -1);
 
 						if(move_replace)
-							g_map.mapdatatop[iNewX][iNewY] = copiedtiles[j][k].tiletype;
+							g_map.mapdatatop[iNewX][iNewY].iType = copiedtiles[j][k].tiletype;
 						else
 							UpdateTileType(j, k);
 						

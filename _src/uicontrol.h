@@ -846,6 +846,10 @@ class MI_BonusWheel : public UI_Control
 
 	private:
 
+		short iState;
+		short iDisplayPowerupIndex;
+		short iDisplayPowerupTimer;
+
 		MI_Image * miBonusImages[NUMBONUSITEMSONWHEEL];
 		MI_Image ** miPlayerImages;
 
@@ -853,6 +857,7 @@ class MI_BonusWheel : public UI_Control
 
 		short iChosenPowerups[NUMBONUSITEMSONWHEEL];
 
+		short iPressSelectTimer;
 		bool fPressedSelect;
 		bool fPowerupSelectionDone;
 
@@ -862,8 +867,9 @@ class MI_BonusWheel : public UI_Control
 		float dSelectionSpeed;
 		float dSelectionAngle;
 		short iSelectedPowerup;
+		short iNextSelectionSoundIndex;
+		float dSelectionSector[NUMBONUSITEMSONWHEEL + 1];
 
-		float dFinalAngle;
 		float dSelectionWinddownSpeed;
 
 		float dSelectionSpeedGoal;
