@@ -444,6 +444,7 @@ class IO_MovingObject : public CObject
 		void collide(IO_MovingObject *){}
 		ObjectType getObjectType(){return objectType;}
 		MovingObjectType getMovingObjectType() {return movingObjectType;}
+		void applyfriction();
 		void collision_detection_map();
 		bool collision_detection_checksides();
 		void flipsidesifneeded();
@@ -840,7 +841,7 @@ class MO_Boomerang : public IO_MovingObject
 class MO_Coin : public IO_MovingObject
 {
 	public:
-		MO_Coin(gfxSprite *nspr, short iNumSpr, short aniSpeed);
+		MO_Coin(gfxSprite *nspr, float velx, float vely, short ix, short iy, short color, short type, short uncollectabletime);
 		~MO_Coin(){};
 
 		void update();
@@ -852,6 +853,8 @@ class MO_Coin : public IO_MovingObject
 		short timer;
 		short sparkleanimationtimer;
 		short sparkledrawframe;
+
+		short iType;
 };
 
 class IO_OverMapObject : public CObject

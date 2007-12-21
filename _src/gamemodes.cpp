@@ -208,7 +208,7 @@ void CGameMode::SetupModeStrings(char * szMode, char * szGoal, short iGoalSpacin
 	}
 }
 
-bool CGameMode::playerkilledplayer(CPlayer &inflictor, CPlayer &other)
+short CGameMode::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
 {
 	//Penalize killing your team mates
 	if(!gameover)
@@ -219,15 +219,15 @@ bool CGameMode::playerkilledplayer(CPlayer &inflictor, CPlayer &other)
 			inflictor.score->AdjustScore(1);
 	}
 
-	return false;
+	return player_kill_normal;
 };
 
-bool CGameMode::playerkilledself(CPlayer &player)
+short CGameMode::playerkilledself(CPlayer &player, killstyle style)
 {
 	if(player.bobomb)
 		player.diedas = 2; //flag to use bobomb corpse sprite
 
-	return false;
+	return player_kill_normal;
 }
 
 void CGameMode::playerextraguy(CPlayer &player, short iType)
@@ -311,7 +311,7 @@ void CGM_Frag::think()
 }
 
 
-bool CGM_Frag::playerkilledplayer(CPlayer &inflictor, CPlayer &other)
+short CGM_Frag::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
 {
 	if(!gameover)
 	{
@@ -324,17 +324,17 @@ bool CGM_Frag::playerkilledplayer(CPlayer &inflictor, CPlayer &other)
 		return CheckWinner(inflictor);
 	}
 
-	return false;
+	return player_kill_normal;
 }
 
-bool CGM_Frag::playerkilledself(CPlayer &player)
+short CGM_Frag::playerkilledself(CPlayer &player, killstyle style)
 {
-	CGameMode::playerkilledself(player);
+	CGameMode::playerkilledself(player, style);
 
 	if(!gameover)
 		player.score->AdjustScore(-1);
 
-	return false;
+	return player_kill_normal;
 }
 
 void CGM_Frag::playerextraguy(CPlayer &player, short iType)
@@ -346,10 +346,10 @@ void CGM_Frag::playerextraguy(CPlayer &player, short iType)
 	}
 }
 
-bool CGM_Frag::CheckWinner(CPlayer &player)
+short CGM_Frag::CheckWinner(CPlayer &player)
 {
 	if(goal == -1)
-		return false;
+		return player_kill_normal;
 
 	if(player.score->score >= goal)
 	{
@@ -360,14 +360,14 @@ bool CGM_Frag::CheckWinner(CPlayer &player)
 		SetupScoreBoard(false);
 		ShowScoreBoard();
 
-		return true;
+		return player_kill_removed;
 	}
 	else if(player.score->score >= goal - 2 && !playedwarningsound)
 	{
 		playwarningsound();
 	}
 
-	return false;
+	return player_kill_normal;
 }
 
 
@@ -441,7 +441,7 @@ void CGM_TimeLimit::think()
 }
 
 
-bool CGM_TimeLimit::playerkilledplayer(CPlayer &inflictor, CPlayer &other)
+short CGM_TimeLimit::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
 {
 	if(!gameover)
 	{
@@ -452,17 +452,17 @@ bool CGM_TimeLimit::playerkilledplayer(CPlayer &inflictor, CPlayer &other)
 			inflictor.score->AdjustScore(1);
 	}
 
-	return false;
+	return player_kill_normal;
 }
 
-bool CGM_TimeLimit::playerkilledself(CPlayer &player)
+short CGM_TimeLimit::playerkilledself(CPlayer &player, killstyle style)
 {
-	CGameMode::playerkilledself(player);
+	CGameMode::playerkilledself(player, style);
 
 	if(player.score->score > 0 && !gameover)
 		player.score->AdjustScore(-1);
 
-	return false;
+	return player_kill_normal;
 }
 
 void CGM_TimeLimit::draw_foreground()
@@ -548,7 +548,7 @@ void CGM_Classic::think()
 }
 
 
-bool CGM_Classic::playerkilledplayer(CPlayer &inflictor, CPlayer &other)
+short CGM_Classic::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
 {
 	if(!gameover)
 	{
@@ -580,17 +580,17 @@ bool CGM_Classic::playerkilledplayer(CPlayer &inflictor, CPlayer &other)
 			if(other.score->score <= 0)
 			{
 				RemoveTeam(other.teamID);
-				return true;
+				return player_kill_removed;
 			}
 		}
 	}
 
-	return false;
+	return player_kill_normal;
 }
 
-bool CGM_Classic::playerkilledself(CPlayer &player)
+short CGM_Classic::playerkilledself(CPlayer &player, killstyle style)
 {
-	CGameMode::playerkilledself(player);
+	CGameMode::playerkilledself(player, style);
 
 	if(!gameover)
 	{
@@ -632,11 +632,12 @@ bool CGM_Classic::playerkilledself(CPlayer &player)
 			if(player.score->score <= 0)
 			{
 				RemoveTeam(player.teamID);
-				return true;
+				return player_kill_removed;
 			}
 		}
 	}
-	return false;
+
+	return player_kill_normal;
 }
 
 void CGM_Classic::playerextraguy(CPlayer &player, short iType)
@@ -707,7 +708,7 @@ void CGM_Chicken::draw_foreground()
 }
 
 
-bool CGM_Chicken::playerkilledplayer(CPlayer &inflictor, CPlayer &other)
+short CGM_Chicken::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
 {
 	if(!chicken || &other == chicken)
 	{
@@ -729,12 +730,12 @@ bool CGM_Chicken::playerkilledplayer(CPlayer &inflictor, CPlayer &other)
 		}
 	}
 	
-	return false;
+	return player_kill_normal;
 }
 
-bool CGM_Chicken::playerkilledself(CPlayer &player)
+short CGM_Chicken::playerkilledself(CPlayer &player, killstyle style)
 {
-	CGameMode::playerkilledself(player);
+	CGameMode::playerkilledself(player, style);
 
 	if(chicken == &player)
 	{
@@ -744,7 +745,7 @@ bool CGM_Chicken::playerkilledself(CPlayer &player)
 			chicken = NULL;
 	}
 
-	return false;
+	return player_kill_normal;
 }
 
 void CGM_Chicken::playerextraguy(CPlayer &player, short iType)
@@ -756,10 +757,10 @@ void CGM_Chicken::playerextraguy(CPlayer &player, short iType)
 	}
 }
 
-bool CGM_Chicken::CheckWinner(CPlayer &player)
+short CGM_Chicken::CheckWinner(CPlayer &player)
 {
 	if(goal == -1)
-		return false;
+		return player_kill_normal;
 
 	if(player.score->score >= goal)
 	{
@@ -770,14 +771,14 @@ bool CGM_Chicken::CheckWinner(CPlayer &player)
 		SetupScoreBoard(false);
 		ShowScoreBoard();
 		RemovePlayersButTeam(winningteam);
-		return true;
+		return player_kill_removed;
 	}
 	else if(player.score->score >= goal * 0.8 && !playedwarningsound)
 	{
 		playwarningsound();
 	}
 
-	return false;
+	return player_kill_normal;
 }
 
 
@@ -874,7 +875,7 @@ void CGM_Tag::think()
 	}
 }
 
-bool CGM_Tag::playerkilledplayer(CPlayer &inflictor, CPlayer &other)
+short CGM_Tag::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
 {
 	if(&inflictor == tagged)
 	{
@@ -891,7 +892,7 @@ bool CGM_Tag::playerkilledplayer(CPlayer &inflictor, CPlayer &other)
 		if(fReverseScoring)
 		{
 			other.score->AdjustScore(5);
-			return false;
+			return player_kill_normal;
 		}
 		else
 		{
@@ -917,23 +918,23 @@ bool CGM_Tag::playerkilledplayer(CPlayer &inflictor, CPlayer &other)
 			other.score->SetScore(0);
 			
 			RemoveTeam(other.teamID);
-			return true;
+			return player_kill_removed;
 		}
 	}
 
-	return false;
+	return player_kill_normal;
 }
 
-bool CGM_Tag::playerkilledself(CPlayer &player)
+short CGM_Tag::playerkilledself(CPlayer &player, killstyle style)
 {
-	CGameMode::playerkilledself(player);
+	CGameMode::playerkilledself(player, style);
 
 	if(!gameover)
 	{
 		if(fReverseScoring)
 		{
 			player.score->AdjustScore(5);
-			return false;
+			return player_kill_normal;
 		}
 		else
 		{
@@ -970,11 +971,11 @@ bool CGM_Tag::playerkilledself(CPlayer &player)
 		{
 			player.score->SetScore(0);
 			RemoveTeam(player.teamID);
-			return true;
+			return player_kill_removed;
 		}
 	}
 	
-	return false;
+	return player_kill_normal;
 }
 
 void CGM_Tag::playerextraguy(CPlayer &player, short iType)
@@ -1008,7 +1009,7 @@ void CGM_Coins::init()
 		game_values.gamemodesettings.coins.quantity = 1;
 
 	for(short iCoin = 0; iCoin < game_values.gamemodesettings.coins.quantity; iCoin++)
-		objectsplayer.add(new MO_Coin(&spr_coin, 4, 8));
+		objectsplayer.add(new MO_Coin(&spr_coin, 0.0f, 0.0f, 0, 0, 2, 0, 0));
 }
 
 
@@ -1043,20 +1044,20 @@ void CGM_Coins::think()
 }
 
 
-bool CGM_Coins::playerkilledplayer(CPlayer &player, CPlayer &other)
+short CGM_Coins::playerkilledplayer(CPlayer &player, CPlayer &other, killstyle style)
 {
 	if(game_values.gamemodesettings.coins.penalty)
 		other.score->AdjustScore(-1);
 
-	return false;
+	return player_kill_normal;
 }
 
-bool CGM_Coins::playerkilledself(CPlayer &player)
+short CGM_Coins::playerkilledself(CPlayer &player, killstyle style)
 {
 	if(game_values.gamemodesettings.coins.penalty)
 		player.score->AdjustScore(-1);
 
-	return false;
+	return player_kill_normal;
 }
 
 void CGM_Coins::playerextraguy(CPlayer &player, short iType)
@@ -1136,21 +1137,21 @@ void CGM_Eggs::think()
 }
 
 
-bool CGM_Eggs::playerkilledplayer(CPlayer &, CPlayer &)
+short CGM_Eggs::playerkilledplayer(CPlayer &, CPlayer &, killstyle)
 {
-	return false;
+	return player_kill_normal;
 }
 
-bool CGM_Eggs::playerkilledself(CPlayer &player)
+short CGM_Eggs::playerkilledself(CPlayer &player, killstyle style)
 {
-	CGameMode::playerkilledself(player);
+	CGameMode::playerkilledself(player, style);
 
 	if(player.carriedItem && player.carriedItem->getObjectType() == object_egg)
 	{
 		((CO_Egg*)player.carriedItem)->placeEgg();
 	}
 
-	return false;
+	return player_kill_normal;
 }
 
 void CGM_Eggs::playerextraguy(CPlayer &player, short iType)
@@ -1405,22 +1406,22 @@ void CGM_Domination::think()
 	}
 }
 
-bool CGM_Domination::playerkilledplayer(CPlayer &player, CPlayer &other)
+short CGM_Domination::playerkilledplayer(CPlayer &player, CPlayer &other, killstyle style)
 {
 	//Update areas the dead player owned
 	objectcollisionitems.adjustPlayerAreas(&player, &other);
 	
-	return false;
+	return player_kill_normal;
 }
 
-bool CGM_Domination::playerkilledself(CPlayer &player)
+short CGM_Domination::playerkilledself(CPlayer &player, killstyle style)
 {
-	CGameMode::playerkilledself(player);
+	CGameMode::playerkilledself(player, style);
 
 	//Update areas the dead player owned
 	objectcollisionitems.adjustPlayerAreas(NULL, &player);
 
-	return false;
+	return player_kill_normal;
 }
 
 void CGM_Domination::playerextraguy(CPlayer &player, short iType)
@@ -1508,7 +1509,7 @@ void CGM_Owned::think()
 	}
 }
 
-bool CGM_Owned::playerkilledplayer(CPlayer &inflictor, CPlayer &other)
+short CGM_Owned::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
 {
 	if(!gameover)
 	{
@@ -1535,12 +1536,12 @@ bool CGM_Owned::playerkilledplayer(CPlayer &inflictor, CPlayer &other)
 		return CheckWinner(inflictor);
 	}
 
-	return false;
+	return player_kill_normal;
 }
 
-bool CGM_Owned::playerkilledself(CPlayer &player)
+short CGM_Owned::playerkilledself(CPlayer &player, killstyle style)
 {
-	CGameMode::playerkilledself(player);
+	CGameMode::playerkilledself(player, style);
 
 	for(short i = 0; i < list_players_cnt; i++)
 	{
@@ -1550,7 +1551,7 @@ bool CGM_Owned::playerkilledself(CPlayer &player)
 		}
 	}
 	
-	return false;
+	return player_kill_normal;
 }
 
 void CGM_Owned::playerextraguy(CPlayer &player, short iType)
@@ -1562,10 +1563,10 @@ void CGM_Owned::playerextraguy(CPlayer &player, short iType)
 	}
 }
 
-bool CGM_Owned::CheckWinner(CPlayer &player)
+short CGM_Owned::CheckWinner(CPlayer &player)
 {
 	if(goal == -1)
-		return false;
+		return player_kill_normal;
 	
 	if(player.score->score >= goal)
 	{
@@ -1576,14 +1577,14 @@ bool CGM_Owned::CheckWinner(CPlayer &player)
 		SetupScoreBoard(false);
 		ShowScoreBoard();
 		RemovePlayersButTeam(winningteam);
-		return true;
+		return player_kill_removed;
 	}
 	else if(player.score->score >= goal * 0.8 && !playedwarningsound)
 	{
 		playwarningsound();
 	}
 
-	return false;
+	return player_kill_normal;
 }
 
 
@@ -1597,7 +1598,7 @@ CGM_Jail::CGM_Jail() : CGM_Frag()
 	strcpy(szModeName, "Jail");
 }
 
-bool CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other)
+short CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
 {
 	if(!gameover)
 	{
@@ -1780,7 +1781,7 @@ bool CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other)
 
 		//Don't end the game if the goal is infinite
 		if(goal == -1)
-			return false;
+			return player_kill_normal;
 
 		if(inflictor.score->score >= goal)
 		{
@@ -1792,7 +1793,7 @@ bool CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other)
 			SetupScoreBoard(false);
 			ShowScoreBoard();
 
-			return true;
+			return player_kill_removed;
 		}
 		else if(inflictor.score->score >= goal - 3 && !playedwarningsound)
 		{
@@ -1800,7 +1801,7 @@ bool CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other)
 		}
 	}
 
-	return false;
+	return player_kill_normal;
 }
 
 void CGM_Jail::playerextraguy(CPlayer &player, short iType)
@@ -1896,14 +1897,14 @@ void CGM_Stomp::think()
 	}
 }
 
-bool CGM_Stomp::playerkilledplayer(CPlayer &player, CPlayer &other)
+short CGM_Stomp::playerkilledplayer(CPlayer &player, CPlayer &other, killstyle style)
 {
-	return false;
+	return player_kill_normal;
 }
 
-bool CGM_Stomp::playerkilledself(CPlayer &player)
+short CGM_Stomp::playerkilledself(CPlayer &player, killstyle style)
 {
-	return false;
+	return player_kill_normal;
 }
 
 void CGM_Stomp::playerextraguy(CPlayer &player, short iType)
@@ -1920,10 +1921,10 @@ void CGM_Stomp::ResetSpawnTimer()
 	spawntimer = (short)(rand() % game_values.gamemodesettings.stomp.rate) + game_values.gamemodesettings.stomp.rate;
 }
 
-bool CGM_Stomp::CheckWinner(CPlayer &player)
+short CGM_Stomp::CheckWinner(CPlayer &player)
 {
 	if(goal == -1)
-		return false;
+		return player_kill_normal;
 
 	if(player.score->score >= goal)
 	{
@@ -1934,14 +1935,14 @@ bool CGM_Stomp::CheckWinner(CPlayer &player)
 		SetupScoreBoard(false);
 		ShowScoreBoard();
 		RemovePlayersButTeam(winningteam);
-		return true;
+		return player_kill_removed;
 	}
 	else if(player.score->score >= goal - 2 && !playedwarningsound)
 	{
 		playwarningsound();
 	}
 
-	return false;
+	return player_kill_normal;
 }
 
 
@@ -1984,17 +1985,18 @@ void CGM_Race::think()
 		displayplayertext();
 }
 
-bool CGM_Race::playerkilledplayer(CPlayer &, CPlayer &other)
+short CGM_Race::playerkilledplayer(CPlayer &, CPlayer &other, killstyle style)
 {
 	PenalizeRaceGoals(other);
-	return false;
+	return player_kill_normal;
 }
 
-bool CGM_Race::playerkilledself(CPlayer &player)
+short CGM_Race::playerkilledself(CPlayer &player, killstyle style)
 {
-	CGameMode::playerkilledself(player);
+	CGameMode::playerkilledself(player, style);
+
 	PenalizeRaceGoals(player);
-	return false;
+	return player_kill_normal;
 }
 
 void CGM_Race::playerextraguy(CPlayer &player, short iType)
@@ -2241,14 +2243,14 @@ void CGM_Star::draw_foreground()
 }
 
 
-bool CGM_Star::playerkilledplayer(CPlayer &, CPlayer &)
+short CGM_Star::playerkilledplayer(CPlayer &, CPlayer &, killstyle)
 {
-	return false;
+	return player_kill_normal;
 }
 
-bool CGM_Star::playerkilledself(CPlayer &player)
+short CGM_Star::playerkilledself(CPlayer &player, killstyle style)
 {
-	return CGameMode::playerkilledself(player);
+	return CGameMode::playerkilledself(player, style);
 }
 
 void CGM_Star::playerextraguy(CPlayer &player, short iType)
@@ -2328,21 +2330,21 @@ void CGM_CaptureTheFlag::think()
 }
 
 
-bool CGM_CaptureTheFlag::playerkilledplayer(CPlayer &, CPlayer &)
+short CGM_CaptureTheFlag::playerkilledplayer(CPlayer &, CPlayer &, killstyle)
 {
-	return false;
+	return player_kill_normal;
 }
 
-bool CGM_CaptureTheFlag::playerkilledself(CPlayer &player)
+short CGM_CaptureTheFlag::playerkilledself(CPlayer &player, killstyle style)
 {
-	CGameMode::playerkilledself(player);
+	CGameMode::playerkilledself(player, style);
 
 	if(player.carriedItem && player.carriedItem->getObjectType() == object_flag)
 	{
 		((CO_Flag*)player.carriedItem)->placeFlag();
 	}
 
-	return false;
+	return player_kill_normal;
 }
 
 void CGM_CaptureTheFlag::playerextraguy(CPlayer &player, short iType)
@@ -2385,14 +2387,136 @@ void CGM_KingOfTheHill::init()
 	objectsfront.add(new OMO_KingOfTheHillZone(&spr_kingofthehillarea));
 }
 
-bool CGM_KingOfTheHill::playerkilledplayer(CPlayer &inflictor, CPlayer &other)
+short CGM_KingOfTheHill::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
 {
-	return false;
+	return player_kill_normal;
 }
 
-bool CGM_KingOfTheHill::playerkilledself(CPlayer &player)
+short CGM_KingOfTheHill::playerkilledself(CPlayer &player, killstyle style)
 {
-	return CGameMode::playerkilledself(player);
+	return CGameMode::playerkilledself(player, style);
+}
+
+//Greed - steal other players coins - if you have 0 coins, you're removed from the game!
+CGM_Greed::CGM_Greed() : CGM_Classic()
+{
+	goal = 100;
+	gamemode = game_mode_greed;
+
+	SetupModeStrings("Greed", "Coins", 10);
+};
+
+void CGM_Greed::init()
+{
+	CGameMode::init();
+
+	for(short iScore = 0; iScore < score_cnt; iScore++)
+	{
+		score[iScore]->SetScore(goal);
+	}
+}
+
+short CGM_Greed::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
+{
+	if(!gameover)
+	{
+		if(fReverseScoring)
+		{
+			other.score->AdjustScore(1);
+		}
+		else
+		{
+			other.score->AdjustScore(-1);
+
+			if(!playedwarningsound)
+			{
+				short countscore = 0;
+				for(short k = 0; k < score_cnt; k++)
+				{
+					if(inflictor.score == score[k])
+						continue;
+
+					countscore += score[k]->score;
+				}
+
+				if(countscore <= 2)
+				{
+					playwarningsound();
+				}
+			}
+
+			if(other.score->score <= 0)
+			{
+				RemoveTeam(other.teamID);
+				return player_kill_removed;
+			}
+		}
+	}
+
+	return player_kill_normal;
+}
+
+short CGM_Greed::playerkilledself(CPlayer &player, killstyle style)
+{
+	CGameMode::playerkilledself(player, style);
+
+	if(!gameover)
+	{
+		if(fReverseScoring)
+		{
+			player.score->AdjustScore(1);
+		}
+		else
+		{
+			player.score->AdjustScore(-1);
+
+			if(!playedwarningsound)
+			{
+				short countscore = 0;
+				bool playwarning = false;
+				for(short j = 0; j < score_cnt; j++)
+				{
+					for(short k = 0; k < score_cnt; k++)
+					{
+						if(j == k)
+							continue;
+
+						countscore += score[k]->score;
+					}
+
+					if(countscore <= 2)
+					{
+						playwarning = true;
+						break;
+					}
+
+					countscore = 0;
+				}
+
+				if(playwarning)
+					playwarningsound();
+			}
+
+			if(player.score->score <= 0)
+			{
+				RemoveTeam(player.teamID);
+				return player_kill_removed;
+			}
+		}
+	}
+
+	return player_kill_normal;
+}
+
+void CGM_Greed::playerextraguy(CPlayer &player, short iType)
+{
+	if(!gameover)
+	{
+		if(fReverseScoring)
+			player.score->AdjustScore(-iType);
+		else
+        	player.score->AdjustScore(iType);
+	}
 }
 
 
@@ -2503,7 +2627,7 @@ void CGM_Boss::draw_foreground()
 	}
 }
 
-bool CGM_Boss::playerkilledplayer(CPlayer &inflictor, CPlayer &other)
+short CGM_Boss::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
 {
 	if(!gameover)
 	{
@@ -2522,16 +2646,16 @@ bool CGM_Boss::playerkilledplayer(CPlayer &inflictor, CPlayer &other)
 		if(other.score->score <= 0)
 		{
 			RemoveTeam(other.teamID);
-			return true;
+			return player_kill_removed;
 		}
 	}
 
-	return false;
+	return player_kill_normal;
 }
 
-bool CGM_Boss::playerkilledself(CPlayer &player)
+short CGM_Boss::playerkilledself(CPlayer &player, killstyle style)
 {
-	CGameMode::playerkilledself(player);
+	CGameMode::playerkilledself(player, style);
 
 	if(!gameover)
 	{
@@ -2550,11 +2674,11 @@ bool CGM_Boss::playerkilledself(CPlayer &player)
 		if(player.score->score <= 0)
 		{
 			RemoveTeam(player.teamID);
-			return true;
+			return player_kill_removed;
 		}
 	}
 
-	return false;
+	return player_kill_normal;
 }
 
 void CGM_Boss::playerextraguy(CPlayer &player, short iType)

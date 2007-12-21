@@ -92,7 +92,7 @@ short			x_shake = 0;
 short			y_shake = 0;
 gv				game_values;
 void CPlayer::flipsidesifneeded() {}
-void CPlayer::KillPlayerMapHazard() {}
+short CPlayer::KillPlayerMapHazard() {return 0;}
 void IO_MovingObject::flipsidesifneeded() {}
 void IO_MovingObject::KillObjectMapHazard() {}
 float CapFallingVelocity(float f) {return 0.0f;}

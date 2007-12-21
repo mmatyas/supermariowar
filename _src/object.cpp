@@ -2497,6 +2497,35 @@ bool IO_MovingObject::collide(CPlayer *)
 	return false;
 }
 
+void IO_MovingObject::applyfriction()
+{
+	//Add air/ground friction
+	if(velx > 0.0f)
+	{
+		if(inair)
+			velx -= VELAIRFRICTION;
+		else if(onice)
+			velx -= VELICEFRICTION;
+		else
+			velx -= VELMOVINGFRICTION;
+
+		if(velx < 0.0f)
+			velx = 0.0f;
+	}
+	else if(velx < 0.0f)
+	{
+		if(inair)
+			velx += VELAIRFRICTION;
+		else if(onice)
+			velx += VELICEFRICTION;
+		else
+			velx += VELMOVINGFRICTION;
+
+		if(velx > 0.0f)
+			velx = 0.0f;
+	}
+}
+
 void IO_MovingObject::collision_detection_map()
 {
 	xf(fx + velx);
@@ -3399,7 +3428,7 @@ bool PU_PoisonPowerup::collide(CPlayer * player)
 
 	player->DeathAwards();
 	
-	if(!game_values.gamemode->playerkilledself(*player))
+	if(!game_values.gamemode->playerkilledself(*player, kill_style_poisonmushroom))
 		player->die(0, false);
 	
 	ifsoundonplay(sfx_deathsound);
@@ -4761,31 +4790,7 @@ void CO_Bomb::update()
 	}
 	else
 	{
-		//Add air/ground friction
-		if(velx > 0.0f)
-		{
-			if(inair)
-				velx -= VELAIRFRICTION;
-			else if(onice)
-				velx -= VELICEFRICTION;
-			else
-				velx -= VELMOVINGFRICTION;
-
-			if(velx < 0.0f)
-				velx = 0.0f;
-		}
-		else if(velx < 0.0f)
-		{
-			if(inair)
-				velx += VELAIRFRICTION;
-			else if(onice)
-				velx += VELICEFRICTION;
-			else
-				velx += VELMOVINGFRICTION;
-
-			if(velx > 0.0f)
-				velx = 0.0f;
-		}
+		applyfriction();
 
 		//Collision detect map
 		fOldX = fx;
@@ -4861,8 +4866,8 @@ void CO_Bomb::Die()
 //------------------------------------------------------------------------------
 // class coin (for coin mode)
 //------------------------------------------------------------------------------
-MO_Coin::MO_Coin(gfxSprite *nspr, short iNumSpr, short aniSpeed) :
-	IO_MovingObject(nspr, 0, 0, iNumSpr, aniSpeed)
+MO_Coin::MO_Coin(gfxSprite *nspr, float velx, float vely, short ix, short iy, short color, short type, short uncollectabletime) :
+	IO_MovingObject(nspr, ix, iy, 4, 8, 30, 30, 1, 1, 0, color << 5, 32, 32)
 {
 	state = 1;
 	objectType = object_coin;
@@ -4870,7 +4875,10 @@ MO_Coin::MO_Coin(gfxSprite *nspr, short iNumSpr, short aniSpeed) :
 	sparkleanimationtimer = 0;
 	sparkledrawframe = 0;
 
-	placeCoin();
+	iType = type;
+
+	if(iType == 0)
+		placeCoin();
 }
 
 bool MO_Coin::collide(CPlayer * player)
@@ -4881,31 +4889,43 @@ bool MO_Coin::collide(CPlayer * player)
 	eyecandyfront.add(new EC_SingleAnimation(&spr_coinsparkle, ix, iy, 7, 4));
 
 	ifsoundonplay(sfx_coin);
-	placeCoin();
+	
+	if(iType == 0)
+		placeCoin();
+	else
+		dead = true;
 
 	return false;
 }
 
 void MO_Coin::update()
 {
-	if(++animationtimer >= animationspeed)
+	if(iType == 0)
 	{
-		animationtimer = 0;
-		drawframe += iw;
-		if(drawframe >= animationWidth)
-			drawframe = 0;
-	}
+		if(++animationtimer >= animationspeed)
+		{
+			animationtimer = 0;
+			drawframe += iw;
+			if(drawframe >= animationWidth)
+				drawframe = 0;
+		}
 
-	if(++sparkleanimationtimer >= 4)
+		if(++sparkleanimationtimer >= 4)
+		{
+			sparkleanimationtimer = 0;
+			sparkledrawframe += 32;
+			if(sparkledrawframe >= 480)
+				sparkledrawframe = 0;
+		}
+
+		if(++timer > 1500)
+			placeCoin();
+	}
+	else
 	{
-		sparkleanimationtimer = 0;
-		sparkledrawframe += 32;
-		if(sparkledrawframe >= 480)
-			sparkledrawframe = 0;
+		applyfriction();
+		IO_MovingObject::update();
 	}
-
-	if(++timer > 1500)
-		placeCoin();
 }
 
 void MO_Coin::draw()
@@ -5001,7 +5021,7 @@ bool OMO_Thwomp::collide(CPlayer * player)
 	{
 		player->DeathAwards();
 		
-		if(!game_values.gamemode->playerkilledself(*player))
+		if(!game_values.gamemode->playerkilledself(*player, kill_style_environment))
 			player->die(0, false);
 
 		ifsoundonplay(sfx_deathsound);
@@ -5459,31 +5479,7 @@ void CO_Egg::update()
 			owner_throw = NULL;
 		}
 
-		//Add air/ground friction
-		if(velx > 0.0f)
-		{
-			if(inair)
-				velx -= VELAIRFRICTION;
-			else if(onice)
-				velx -= VELICEFRICTION;
-			else
-				velx -= VELMOVINGFRICTION;
-
-			if(velx < 0.0f)
-				velx = 0.0f;
-		}
-		else if(velx < 0.0f)
-		{
-			if(inair)
-				velx += VELAIRFRICTION;
-			else if(onice)
-				velx += VELICEFRICTION;
-			else
-				velx += VELMOVINGFRICTION;
-
-			if(velx > 0.0f)
-				velx = 0.0f;
-		}
+		applyfriction();
 
 		//Collision detect map
 		IO_MovingObject::update();
@@ -5648,31 +5644,7 @@ void CO_Star::update()
 	}
 	else
 	{
-		//Add air/ground friction
-		if(velx > 0.0f)
-		{
-			if(inair)
-				velx -= VELAIRFRICTION;
-			else if(onice)
-				velx -= VELICEFRICTION;
-			else
-				velx -= VELMOVINGFRICTION;
-
-			if(velx < 0.0f)
-				velx = 0.0f;
-		}
-		else if(velx < 0.0f)
-		{
-			if(inair)
-				velx += VELAIRFRICTION;
-			else if(onice)
-				velx += VELICEFRICTION;
-			else
-				velx += VELMOVINGFRICTION;
-
-			if(velx > 0.0f)
-				velx = 0.0f;
-		}
+		applyfriction();
 		
 		//Collision detect map
 		IO_MovingObject::update();
@@ -5994,31 +5966,7 @@ void CO_Flag::update()
 			owner_throw = NULL;
 		}
 
-		//Add air/ground friction
-		if(velx > 0.0f)
-		{
-			if(inair)
-				velx -= VELAIRFRICTION;
-			else if(onice)
-				velx -= VELICEFRICTION;
-			else
-				velx -= VELMOVINGFRICTION;
-
-			if(velx < 0.0f)
-				velx = 0.0f;
-		}
-		else if(velx < 0.0f)
-		{
-			if(inair)
-				velx += VELAIRFRICTION;
-			else if(onice)
-				velx += VELICEFRICTION;
-			else
-				velx += VELMOVINGFRICTION;
-
-			if(velx > 0.0f)
-				velx = 0.0f;
-		}
+		applyfriction();
 
 		//Collision detect map
 		fOldX = fx;
@@ -7160,7 +7108,7 @@ bool MO_Goomba::hitother(CPlayer * player)
 
 	player->DeathAwards();
 
-	if(!game_values.gamemode->playerkilledself(*player))
+	if(!game_values.gamemode->playerkilledself(*player, kill_style_environment))
 		player->die(0, false);
 
 	ifsoundonplay(sfx_deathsound);
@@ -7448,7 +7396,7 @@ bool OMO_CheepCheep::hitother(CPlayer * player)
 
 	player->DeathAwards();
 
-	if(!game_values.gamemode->playerkilledself(*player))
+	if(!game_values.gamemode->playerkilledself(*player, kill_style_environment))
 		player->die(0, false);
 
 	ifsoundonplay(sfx_deathsound);
@@ -7955,7 +7903,7 @@ bool MO_SledgeBrother::hit(CPlayer * player)
 
 	player->DeathAwards();
 
-	if(!game_values.gamemode->playerkilledself(*player))
+	if(!game_values.gamemode->playerkilledself(*player, kill_style_environment))
 		player->die(0, false);
 
 	ifsoundonplay(sfx_deathsound);
@@ -8877,31 +8825,7 @@ void CO_Spring::update()
 	}
 	else
 	{
-		//Add air/ground friction
-		if(velx > 0.0f)
-		{
-			if(inair)
-				velx -= VELAIRFRICTION;
-			else if(onice)
-				velx -= VELICEFRICTION;
-			else
-				velx -= VELMOVINGFRICTION;
-
-			if(velx < 0.0f)
-				velx = 0.0f;
-		}
-		else if(velx < 0.0f)
-		{
-			if(inair)
-				velx += VELAIRFRICTION;
-			else if(onice)
-				velx += VELICEFRICTION;
-			else
-				velx += VELMOVINGFRICTION;
-
-			if(velx > 0.0f)
-				velx = 0.0f;
-		}
+		applyfriction();
 
 		//Collision detect map
 		fOldX = fx;

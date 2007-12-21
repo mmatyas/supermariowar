@@ -29,7 +29,9 @@
 +----------------------------------------------------------*/
 
 //TODO
-//Add helper text to bonus wheel to tell player to press button
+//2) Finish collecting video when delete maps folder and rename "copy of maps" to "maps"
+//3) When PlayerKilledPlayer does not kill a player, then it hidden blocks that were hit could result in a player getting trapped in htem
+//   Also, a player would not bounce off of a bounce block if hit from below and not killed
 
 #ifdef _XBOX
 	#include <xtl.h>
@@ -819,6 +821,7 @@ int main(int argc, char *argv[])
 	gamemodes[14] = new CGM_Owned();
 	gamemodes[15] = new CGM_Frenzy();
 	gamemodes[16] = new CGM_Survival();
+	gamemodes[17] = new CGM_Greed();
 
 	currentgamemode = 0;
 	game_values.gamemode = gamemodes[currentgamemode];
@@ -1662,7 +1665,7 @@ void RunGame()
 						{
 							list_players[k]->DeathAwards();
 
-							if(!game_values.gamemode->playerkilledself(*(list_players[k])))
+							if(!game_values.gamemode->playerkilledself(*(list_players[k]), kill_style_environment))
 								list_players[k]->die(0, false);
 						}
 					}
@@ -2046,7 +2049,7 @@ void RunGame()
 					{
 						list_players[k]->DeathAwards();
 
-						if(!game_values.gamemode->playerkilledself(*(list_players[k])))
+						if(!game_values.gamemode->playerkilledself(*(list_players[k]), kill_style_environment))
 							list_players[k]->die(0, false);
 					}
 				}

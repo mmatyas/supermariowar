@@ -2225,7 +2225,7 @@ void CPlayer::SetupNewPlayer()
 			if(game_values.spawninvincibility > 0)
 				spawninvincibletimer = game_values.spawninvincibility;
 			else
-				spawninvincibletimer = 62;
+				spawninvincibletimer = 60;
 
 			spawninvincible = true;
 		}
@@ -2241,7 +2241,16 @@ void CPlayer::SetupNewPlayer()
 
 void CPlayer::FindSpawnPoint()
 {
-	g_map.findspawnpoint(0, &ix, &iy, PW, PH, false);
+	if(game_values.gamemode->gamemode == game_mode_ctf && teamID < g_map.iNumFlagBases)
+	{
+		ix = g_map.flagbaselocations[teamID].x + 16 - HALFPW;
+		iy = g_map.flagbaselocations[teamID].y + 16 - HALFPH;
+	}
+	else
+	{
+		g_map.findspawnpoint(0, &ix, &iy, PW, PH, false);
+	}
+
 	fx = (float)ix;
 	fy = (float)iy;
 }
@@ -2424,49 +2433,41 @@ void CPlayer::AddKillsInRowInAirAward()
 	}
 }
 
-void PlayerKilledPlayer(short iKiller, CPlayer &killed, short deathstyle, killstyle style)
+short PlayerKilledPlayer(short iKiller, CPlayer &killed, short deathstyle, killstyle style)
 {
 	CPlayer * killer = GetPlayerFromGlobalID(iKiller);
 
 	if(killer && killer->globalID != killed.globalID)
 	{
-		PlayerKilledPlayer(*killer, killed, deathstyle, style);
+		return PlayerKilledPlayer(*killer, killed, deathstyle, style);
 	}
 	else
 	{
 		killed.DeathAwards();
-			
-		if(!game_values.gamemode->playerkilledself(killed))
+		
+		short iKillType = game_values.gamemode->playerkilledself(killed, style);
+
+		if(player_kill_normal == iKillType)
 			killed.die(death_style_jump, false);
 
-		ifsoundonplay(sfx_deathsound);
+		if(player_kill_nonkill != iKillType)
+			ifsoundonplay(sfx_deathsound);
+
+		return iKillType;
 	}
 }
 
-void PlayerKilledPlayer(CPlayer &killer, CPlayer &killed, short deathstyle, killstyle style)
+short PlayerKilledPlayer(CPlayer &killer, CPlayer &killed, short deathstyle, killstyle style)
 {
 	//If this player is already dead, then don't kill him again
 	if(killed.state != player_ready)
-		return;
-
-	if(killed.bobomb)
-	{
-		killed.diedas = 2;
-		killer.SetPowerup(0);
-	}
-
+		return player_kill_none;
+	
+	bool fSoundPlayed = false;
 	if(game_values.gamemode->chicken == &killer && style != kill_style_pow)
 	{
 		ifsoundonplay(sfx_chicken);
-	}
-	else
-	{
-		if(deathstyle == death_style_jump)
-			ifsoundonplay(sfx_deathsound);
-		else if(deathstyle == death_style_squish)
-			ifsoundonplay(sfx_mip);
-		else if(deathstyle == death_style_shatter)
-			ifsoundonplay(sfx_deathsound);
+		fSoundPlayed = true;
 	}
 
 	if(killer.teamID != killed.teamID)
@@ -2475,20 +2476,29 @@ void PlayerKilledPlayer(CPlayer &killer, CPlayer &killed, short deathstyle, kill
 	if(game_values.awardstyle != award_style_none)
 		killed.DeathAwards();
 	
-	/*
-	if ( ! game_values.gamemode->playerkilledplayer(killer, killed) )
-	{	//true if the player was deleted
-		
-		//now kill the player (don't call this function earlier because we need the old position, etc.	
-		if(deathstyle == 0)
-			killed.jumpDeath();
-		else
-			killed.die();
-	}*/
-
 	//now kill the player (don't call this function earlier because we need the old position, etc.	
-	if(!game_values.gamemode->playerkilledplayer(killer, killed))
+	short iKillType = game_values.gamemode->playerkilledplayer(killer, killed, style);
+	
+	if(player_kill_nonkill != iKillType)
+	{
+		if(killed.bobomb)
+		{
+			killed.diedas = 2;
+			killer.SetPowerup(0);
+		}
+
+		if(deathstyle == death_style_jump)
+			ifsoundonplay(sfx_deathsound);
+		else if(deathstyle == death_style_squish)
+			ifsoundonplay(sfx_mip);
+		else if(deathstyle == death_style_shatter)
+			ifsoundonplay(sfx_deathsound);
+	}
+
+	if(player_kill_normal == iKillType)
 		killed.die(deathstyle, false);
+
+	return iKillType;
 }
 
 void AddAwardKill(CPlayer * killer, CPlayer * killed, killstyle style)
@@ -3819,20 +3829,23 @@ void CPlayer::collision_detection_map()
 	//printf("After Y - ix: %d\tiy: %d\toldx: %.2f\toldy: %.2f\tty: %d\tty2: %d\ttxl: %d\ttxr: %d\tfx: %.2f\tfy: %.2f\tvelx: %.2f\tvely: %.2f\n\n", ix, iy, fOldX, fOldY, ty, ty, txl, txr, fx, fy, velx, vely);
 }
 
-void CPlayer::KillPlayerMapHazard()
+short CPlayer::KillPlayerMapHazard()
 {
 	if(iSuicideCreditPlayerID >= 0)
 	{
-		PlayerKilledPlayer(iSuicideCreditPlayerID, *this, death_style_jump, kill_style_bounce);
+		return PlayerKilledPlayer(iSuicideCreditPlayerID, *this, death_style_jump, kill_style_environment);
 	}
 	else
 	{
 		DeathAwards();
-			
-		if(!game_values.gamemode->playerkilledself(*this))
+		
+		short iKillType = game_values.gamemode->playerkilledself(*this, kill_style_environment);
+		if(player_kill_normal == iKillType)
 			die(death_style_jump, false);
 
 		ifsoundonplay(sfx_deathsound);
+
+		return iKillType;
 	}
 }
 

@@ -306,7 +306,14 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 			{
 				TileType iType = (TileType)ReadInt(mapfile);
 				mapdatatop[i][j].iType = iType;
-				mapdatatop[i][j].iFlags = g_iTileTypeConversion[iType];
+
+				if(iType >= 0 && iType <= 12)
+					mapdatatop[i][j].iFlags = g_iTileTypeConversion[iType];
+				else
+				{
+					mapdatatop[i][j].iType = tile_nonsolid;
+					mapdatatop[i][j].iFlags = tile_flag_nonsolid;
+				}
 
 				warpdata[i][j].direction = (short)ReadInt(mapfile);
 				warpdata[i][j].connection = (short)ReadInt(mapfile);

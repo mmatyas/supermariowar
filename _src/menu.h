@@ -284,7 +284,7 @@ class Menu
 		UI_Menu mGameSettingsMenu;
 
 		MI_ImageSelectField * miModeField;
-		MI_SelectField * miGoalField[17];
+		MI_SelectField * miGoalField[18];
 		MI_Button * miModeSettingsButton;
 		MI_MapField * miMapField;
 		MI_Button * miSettingsStartButton;

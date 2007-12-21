@@ -158,7 +158,7 @@ short			x_shake = 0;
 short			y_shake = 0;
 gv				game_values;
 void CPlayer::flipsidesifneeded() {}
-void CPlayer::KillPlayerMapHazard() {}
+short CPlayer::KillPlayerMapHazard() {return 0;}
 void IO_MovingObject::flipsidesifneeded() {}
 void IO_MovingObject::KillObjectMapHazard() {}
 float CapFallingVelocity(float f) {return 0.0f;}
@@ -1845,7 +1845,22 @@ int editor_properties(short iBlockCol, short iBlockRow)
 							else if(event.key.keysym.sym == SDLK_d)
 								iValue = g_iDefaultPowerupWeights[iSettingIndex];
 
-							*piSetting = iValue;
+							//If shift is held, set all powerups to this setting
+							Uint8 * keystate = SDL_GetKeyState(NULL);
+							if (keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT]) 
+							{
+								for(short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++)
+								{
+									if(event.key.keysym.sym == SDLK_d)
+										iValue = g_iDefaultPowerupWeights[iSetting];
+
+									g_map.objectdata[iBlockCol][iBlockRow].iSettings[iSetting] = iValue;
+								}
+							}
+							else
+							{
+								*piSetting = iValue;
+							}
 						}
 					}
 				}
@@ -1954,8 +1969,9 @@ int editor_properties(short iBlockCol, short iBlockRow)
 
 			iHiddenCheckboxY = 365;
 
-			menu_font_small.draw(0,480-menu_font_small.getHeight() * 2, "Block Property Mode");
-			menu_font_small.draw(0,480-menu_font_small.getHeight(), "[0-9] Set Value [LMB] Increase [RMB] Decrease [D] Default");
+			menu_font_small.draw(0,480-menu_font_small.getHeight() * 3, "Block Property Mode");
+			menu_font_small.draw(0,480-menu_font_small.getHeight() * 2, "[0-9] Set Value [LMB] Increase [RMB] Decrease [D] Default");
+			menu_font_small.draw(0,480-menu_font_small.getHeight(), "[Shift] + [0-9 or D] Set All To Value");
 		}
 		else if(iBlockType == 4 || iBlockType == 5 || iBlockType == 17 || iBlockType == 18 || iBlockType == 3)
 		{
@@ -3173,15 +3189,30 @@ int editor_modeitems()
 				{
 					if(dragmodeitem >= 0 && event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT))
 					{
+						Uint8 * keystate = SDL_GetKeyState(NULL);
+						bool fShiftDown = keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT];
+							
 						if(modeitemmode == 0)
 						{
 							g_map.racegoallocations[dragmodeitem].x = event.motion.x - dragoffsetx;
 							g_map.racegoallocations[dragmodeitem].y = event.motion.y - dragoffsety;
+
+							if(fShiftDown)
+							{
+								g_map.racegoallocations[dragmodeitem].x = (event.motion.x >> 5) << 5;
+								g_map.racegoallocations[dragmodeitem].y = (event.motion.y >> 5) << 5;
+							}
 						}
 						else if(modeitemmode == 1)
 						{
 							g_map.flagbaselocations[dragmodeitem].x = event.motion.x - dragoffsetx;
 							g_map.flagbaselocations[dragmodeitem].y = event.motion.y - dragoffsety;
+
+							if(fShiftDown)
+							{
+								g_map.flagbaselocations[dragmodeitem].x = (event.motion.x >> 5) << 5;
+								g_map.flagbaselocations[dragmodeitem].y = (event.motion.y >> 5) << 5;
+							}
 						}
 					}
 				}
