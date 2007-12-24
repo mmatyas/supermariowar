@@ -29,9 +29,10 @@
 +----------------------------------------------------------*/
 
 //TODO
-//2) Finish collecting video when delete maps folder and rename "copy of maps" to "maps"
 //3) When PlayerKilledPlayer does not kill a player, then it hidden blocks that were hit could result in a player getting trapped in htem
-//   Also, a player would not bounce off of a bounce block if hit from below and not killed
+//   This happens if the player is sitting still when the hidden block is revealed
+//4) Strange coin error where it falls very fast in greed mode -> need more debugging time!
+//5) Needs lots of testing around not killing a player with various kill methods - test greed mode vs. frag mode kills
 
 #ifdef _XBOX
 	#include <xtl.h>
@@ -1934,7 +1935,7 @@ void RunGame()
 						{
 							if(game_values.screenshakekillinair == list_players[k]->inair)
 							{
-								PlayerKilledPlayer(game_values.screenshakeplayerid, *list_players[k], death_style_jump, kill_style_pow);
+								PlayerKilledPlayer(game_values.screenshakeplayerid, *list_players[k], death_style_jump, kill_style_pow, false);
 
 								CPlayer * killer = GetPlayerFromGlobalID(game_values.screenshakeplayerid);
 

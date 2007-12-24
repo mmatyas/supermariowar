@@ -1704,7 +1704,7 @@ void CPlayer::move()
 
 					if(++burnuptimer > 80)
 					{
-						KillPlayerMapHazard();
+						KillPlayerMapHazard(false);
 						return;
 					}
 					else
@@ -1731,7 +1731,7 @@ void CPlayer::move()
 
 					if(--outofarenadisplaytimer < 0)
 					{
-						KillPlayerMapHazard();
+						KillPlayerMapHazard(false);
 						return;
 					}
 				}
@@ -2316,7 +2316,7 @@ bool CPlayer::isstomping(CPlayer &o)
 			else if(extrajumps > 0)
 				style = kill_style_feather;
 
-			PlayerKilledPlayer(*this, o, death_style_squish, style);
+			PlayerKilledPlayer(*this, o, death_style_squish, style, false);
 		}
 		else
 		{
@@ -2433,13 +2433,13 @@ void CPlayer::AddKillsInRowInAirAward()
 	}
 }
 
-short PlayerKilledPlayer(short iKiller, CPlayer &killed, short deathstyle, killstyle style)
+short PlayerKilledPlayer(short iKiller, CPlayer &killed, short deathstyle, killstyle style, bool fForce)
 {
 	CPlayer * killer = GetPlayerFromGlobalID(iKiller);
 
 	if(killer && killer->globalID != killed.globalID)
 	{
-		return PlayerKilledPlayer(*killer, killed, deathstyle, style);
+		return PlayerKilledPlayer(*killer, killed, deathstyle, style, fForce);
 	}
 	else
 	{
@@ -2447,7 +2447,7 @@ short PlayerKilledPlayer(short iKiller, CPlayer &killed, short deathstyle, kills
 		
 		short iKillType = game_values.gamemode->playerkilledself(killed, style);
 
-		if(player_kill_normal == iKillType)
+		if(player_kill_normal == iKillType || (fForce && player_kill_nonkill == iKillType))
 			killed.die(death_style_jump, false);
 
 		if(player_kill_nonkill != iKillType)
@@ -2457,7 +2457,7 @@ short PlayerKilledPlayer(short iKiller, CPlayer &killed, short deathstyle, kills
 	}
 }
 
-short PlayerKilledPlayer(CPlayer &killer, CPlayer &killed, short deathstyle, killstyle style)
+short PlayerKilledPlayer(CPlayer &killer, CPlayer &killed, short deathstyle, killstyle style, bool fForce)
 {
 	//If this player is already dead, then don't kill him again
 	if(killed.state != player_ready)
@@ -2479,7 +2479,7 @@ short PlayerKilledPlayer(CPlayer &killer, CPlayer &killed, short deathstyle, kil
 	//now kill the player (don't call this function earlier because we need the old position, etc.	
 	short iKillType = game_values.gamemode->playerkilledplayer(killer, killed, style);
 	
-	if(player_kill_nonkill != iKillType)
+	if(player_kill_nonkill != iKillType || fForce)
 	{
 		if(killed.bobomb)
 		{
@@ -2495,7 +2495,7 @@ short PlayerKilledPlayer(CPlayer &killer, CPlayer &killed, short deathstyle, kil
 			ifsoundonplay(sfx_deathsound);
 	}
 
-	if(player_kill_normal == iKillType)
+	if(player_kill_normal == iKillType || (fForce && player_kill_nonkill == iKillType))
 		killed.die(deathstyle, false);
 
 	return iKillType;
@@ -2640,20 +2640,20 @@ void collisionhandler_p2p(CPlayer &o1, CPlayer &o2)
 	//--- 1. Is player frozen? ---
 	if(o1.frozen && o2.frozen)
 	{
-		PlayerKilledPlayer(o1, o2, death_style_jump, kill_style_star);
-		PlayerKilledPlayer(o2, o1, death_style_jump, kill_style_star);
+		PlayerKilledPlayer(o1, o2, death_style_shatter, kill_style_frozen, true);
+		PlayerKilledPlayer(o2, o1, death_style_shatter, kill_style_frozen, true);
 		return;
 	}
 
 	if(o1.frozen)
 	{
-		PlayerKilledPlayer(o2, o1, death_style_shatter, kill_style_frozen);
+		PlayerKilledPlayer(o2, o1, death_style_shatter, kill_style_frozen, true);
 		return;
 	}
 
 	if(o2.frozen)
 	{
-		PlayerKilledPlayer(o1, o2, death_style_shatter, kill_style_frozen);
+		PlayerKilledPlayer(o1, o2, death_style_shatter, kill_style_frozen, true);
 		return;
 	
 	}
@@ -2661,13 +2661,13 @@ void collisionhandler_p2p(CPlayer &o1, CPlayer &o2)
 	//--- 2. is player invincible? ---
 	if(o1.invincible && !o2.invincible && !o2.spawninvincible)
 	{
-		PlayerKilledPlayer(o1, o2, death_style_jump, kill_style_star);
+		PlayerKilledPlayer(o1, o2, death_style_jump, kill_style_star, false);
 		return;
 	}
 	
 	if(!o1.invincible && !o1.spawninvincible && o2.invincible)
 	{
-		PlayerKilledPlayer(o2, o1, death_style_jump, kill_style_star);
+		PlayerKilledPlayer(o2, o1, death_style_jump, kill_style_star, false);
 		return;
 	}
 	
@@ -3361,7 +3361,7 @@ void CPlayer::collision_detection_map()
 				{	
 					if(iHorizontalPlatformCollision == 3)
 					{
-						KillPlayerMapHazard();
+						KillPlayerMapHazard(true);
 						return;
 					}
 
@@ -3373,7 +3373,7 @@ void CPlayer::collision_detection_map()
 				{	
 					if(iHorizontalPlatformCollision == 3)
 					{
-						KillPlayerMapHazard();
+						KillPlayerMapHazard(true);
 						return;
 					}
 
@@ -3384,7 +3384,7 @@ void CPlayer::collision_detection_map()
 			else if(((toptile & tile_flag_death_on_left) || (bottomtile & tile_flag_death_on_left)) &&
 				!invincible && !spawninvincible)
 			{
-				KillPlayerMapHazard();
+				KillPlayerMapHazard(false);
 				return;
 			}
 			//collision on the right side.
@@ -3392,7 +3392,7 @@ void CPlayer::collision_detection_map()
 			{
 				if(iHorizontalPlatformCollision == 3)
 				{
-					KillPlayerMapHazard();
+					KillPlayerMapHazard(true);
 					return;
 				}
 
@@ -3445,7 +3445,7 @@ void CPlayer::collision_detection_map()
 				{	
 					if(iHorizontalPlatformCollision == 1)
 					{
-						KillPlayerMapHazard();
+						KillPlayerMapHazard(true);
 						return;
 					}
 
@@ -3457,7 +3457,7 @@ void CPlayer::collision_detection_map()
 				{	
 					if(iHorizontalPlatformCollision == 1)
 					{
-						KillPlayerMapHazard();
+						KillPlayerMapHazard(true);
 						return;
 					}
 
@@ -3468,14 +3468,14 @@ void CPlayer::collision_detection_map()
 			else if(((toptile & tile_flag_death_on_right) || (bottomtile & tile_flag_death_on_right)) &&
 				!invincible && !spawninvincible)
 			{
-				KillPlayerMapHazard();
+				KillPlayerMapHazard(false);
 				return;
 			}
 			else if((toptile & tile_flag_solid) || (bottomtile & tile_flag_solid)) // collide with solid, ice, death and all sides death
 			{
 				if(iHorizontalPlatformCollision == 1)
 				{
-					KillPlayerMapHazard();
+					KillPlayerMapHazard(true);
 					return;
 				}
 
@@ -3570,7 +3570,7 @@ void CPlayer::collision_detection_map()
 			if(!centerblock->collide(this, 0, true))
 			{
 				if(iVerticalPlatformCollision == 2)
-					KillPlayerMapHazard();
+					KillPlayerMapHazard(true);
 
 				return;
 			}
@@ -3589,7 +3589,7 @@ void CPlayer::collision_detection_map()
 				vely = -vely * BOUNCESTRENGTH;
 			
 			if(iVerticalPlatformCollision == 2)
-				KillPlayerMapHazard();
+				KillPlayerMapHazard(true);
 
 			return;
 		}
@@ -3601,7 +3601,7 @@ void CPlayer::collision_detection_map()
 			if(!leftblock->collide(this, 0, useBehavior))
 			{
 				if(iVerticalPlatformCollision == 2)
-					KillPlayerMapHazard();
+					KillPlayerMapHazard(true);
 
 				return;
 			}
@@ -3614,7 +3614,7 @@ void CPlayer::collision_detection_map()
 			if(!rightblock->collide(this, 0, useBehavior))
 			{
 				if(iVerticalPlatformCollision == 2)
-					KillPlayerMapHazard();
+					KillPlayerMapHazard(true);
 
 				return;
 			}
@@ -3634,7 +3634,7 @@ void CPlayer::collision_detection_map()
 		}
 		else if((alignedTileType & tile_flag_death_on_bottom) || (unalignedTileType & tile_flag_death_on_bottom))
 		{
-			KillPlayerMapHazard();
+			KillPlayerMapHazard(false);
 			return;
 		}
 		else
@@ -3704,7 +3704,7 @@ void CPlayer::collision_detection_map()
 				onice = false;
 
 				if(iVerticalPlatformCollision == 0)
-					KillPlayerMapHazard();
+					KillPlayerMapHazard(true);
 
 				return;
 			}
@@ -3762,7 +3762,7 @@ void CPlayer::collision_detection_map()
 			platform = NULL;
 
 			if(iVerticalPlatformCollision == 0)
-				KillPlayerMapHazard();
+				KillPlayerMapHazard(true);
 
 			return;
 		}
@@ -3792,13 +3792,13 @@ void CPlayer::collision_detection_map()
 
 			if(iVerticalPlatformCollision == 0)
 			{
-				KillPlayerMapHazard();
+				KillPlayerMapHazard(true);
 				return;
 			}
 		}
 		else if((lefttile & tile_flag_death_on_top) || (righttile & tile_flag_death_on_top))
 		{
-			KillPlayerMapHazard();
+			KillPlayerMapHazard(false);
 			return;
 		}
 		else
@@ -3829,18 +3829,18 @@ void CPlayer::collision_detection_map()
 	//printf("After Y - ix: %d\tiy: %d\toldx: %.2f\toldy: %.2f\tty: %d\tty2: %d\ttxl: %d\ttxr: %d\tfx: %.2f\tfy: %.2f\tvelx: %.2f\tvely: %.2f\n\n", ix, iy, fOldX, fOldY, ty, ty, txl, txr, fx, fy, velx, vely);
 }
 
-short CPlayer::KillPlayerMapHazard()
+short CPlayer::KillPlayerMapHazard(bool fForce)
 {
 	if(iSuicideCreditPlayerID >= 0)
 	{
-		return PlayerKilledPlayer(iSuicideCreditPlayerID, *this, death_style_jump, kill_style_environment);
+		return PlayerKilledPlayer(iSuicideCreditPlayerID, *this, death_style_jump, kill_style_environment, fForce);
 	}
 	else
 	{
 		DeathAwards();
 		
 		short iKillType = game_values.gamemode->playerkilledself(*this, kill_style_environment);
-		if(player_kill_normal == iKillType)
+		if(player_kill_normal == iKillType || (player_kill_nonkill == iKillType && fForce))
 			die(death_style_jump, false);
 
 		ifsoundonplay(sfx_deathsound);

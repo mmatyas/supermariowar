@@ -4,8 +4,8 @@
 #include "global.h"
 
 extern short iKingOfTheHillZoneLimits[4][4];
-extern void PlayerKilledPlayer(short iKiller, CPlayer &killed, short deathstyle, short killstyle);
-extern void PlayerKilledPlayer(CPlayer &killer, CPlayer &killed, short deathstyle, short killstyle);
+extern void PlayerKilledPlayer(short iKiller, CPlayer &killed, short deathstyle, short killstyle, bool fForce);
+extern void PlayerKilledPlayer(CPlayer &killer, CPlayer &killed, short deathstyle, short killstyle, bool fForce);
 extern void AddAwardKill(CPlayer * killer, CPlayer * killed, killstyle style);
 extern short LookupTeamID(short id);
 extern bool SwapPlayers(short iUsingPlayerID);
@@ -520,7 +520,7 @@ bool B_PowerupBlock::collide(CPlayer * player, short direction, bool useBehavior
 	}
 	else if(oldhidden)
 	{
-		PlayerKilledPlayer(iBumpPlayerID, *player, death_style_jump, kill_style_bounce);
+		PlayerKilledPlayer(iBumpPlayerID, *player, death_style_jump, kill_style_bounce, true);
 		return false;
 	}
 
@@ -533,9 +533,11 @@ bool B_PowerupBlock::hittop(CPlayer * player, bool useBehavior)
 
 	if(state == 1)
 	{
+		short iKillType = player_kill_nonkill;
 		if(iBumpPlayerID >= 0 && !player->IsInvincibleOnBottom() && (player->teamID != iBumpTeamID || game_values.friendlyfire))
-			PlayerKilledPlayer(iBumpPlayerID, *player, death_style_jump, kill_style_bounce);
-		else
+			iKillType = PlayerKilledPlayer(iBumpPlayerID, *player, death_style_jump, kill_style_bounce, false);
+		
+		if(player_kill_nonkill == iKillType)
 			player->vely = -VELNOTEBLOCKREPEL;
 	}
 	else if(useBehavior)
@@ -836,9 +838,11 @@ bool B_BreakableBlock::hittop(CPlayer * player, bool useBehavior)
 
 	if(state == 1 || state == 2)
 	{
+		short iKillType = player_kill_nonkill;
 		if(iBumpPlayerID >= 0 && !player->IsInvincibleOnBottom() && (player->teamID != iBumpTeamID || game_values.friendlyfire))
-			PlayerKilledPlayer(iBumpPlayerID, *player, death_style_jump, kill_style_bounce);
-		else
+			iKillType = PlayerKilledPlayer(iBumpPlayerID, *player, death_style_jump, kill_style_bounce, false);
+		
+		if(player_kill_nonkill == iKillType)
 			player->vely = -VELNOTEBLOCKREPEL;
 	}
 	else if(useBehavior)
@@ -1036,7 +1040,7 @@ bool B_NoteBlock::collide(CPlayer * player, short direction, bool useBehavior)
 	}
 	else if(oldhidden)
 	{
-		PlayerKilledPlayer(iBumpPlayerID, *player, death_style_jump, kill_style_bounce);
+		PlayerKilledPlayer(iBumpPlayerID, *player, death_style_jump, kill_style_bounce, true);
 		return false;
 	}
 
@@ -1334,7 +1338,7 @@ bool B_FlipBlock::collide(CPlayer * player, short direction, bool useBehavior)
 	}
 	else if(oldhidden)
 	{
-		PlayerKilledPlayer(iBumpPlayerID, *player, death_style_jump, kill_style_bounce);
+		PlayerKilledPlayer(iBumpPlayerID, *player, death_style_jump, kill_style_bounce, true);
 		return false;
 	}
 
@@ -1589,9 +1593,11 @@ bool B_OnOffSwitchBlock::hittop(CPlayer * player, bool useBehavior)
 
 	if(state == 1 || state == 4)
 	{
+		short iKillType = player_kill_nonkill;
 		if(iBumpPlayerID >= 0 && !player->IsInvincibleOnBottom() && (player->teamID != iBumpTeamID || game_values.friendlyfire))
-			PlayerKilledPlayer(iBumpPlayerID, *player, death_style_jump, kill_style_bounce);
-		else
+			iKillType = PlayerKilledPlayer(iBumpPlayerID, *player, death_style_jump, kill_style_bounce, false);
+		
+		if(player_kill_nonkill == iKillType)
 			player->vely = -VELNOTEBLOCKREPEL;
 	}
 	else if(useBehavior)
@@ -1921,7 +1927,7 @@ bool B_BounceBlock::collide(CPlayer * player, short direction, bool useBehavior)
 	}
 	else if(oldhidden)
 	{
-		PlayerKilledPlayer(iBumpPlayerID, *player, death_style_jump, kill_style_bounce);
+		PlayerKilledPlayer(iBumpPlayerID, *player, death_style_jump, kill_style_bounce, true);
 		return false;
 	}
 
@@ -1934,9 +1940,11 @@ bool B_BounceBlock::hittop(CPlayer * player, bool useBehavior)
 
 	if(state == 1)
 	{
+		short iKillType = player_kill_nonkill;
 		if(iBumpPlayerID >= 0 && !player->IsInvincibleOnBottom() && (player->teamID != iBumpTeamID || game_values.friendlyfire))
-			PlayerKilledPlayer(iBumpPlayerID, *player, death_style_jump, kill_style_bounce);
-		else
+			iKillType = PlayerKilledPlayer(iBumpPlayerID, *player, death_style_jump, kill_style_bounce, false);
+		
+		if(player_kill_nonkill == iKillType)
 			player->vely = -VELNOTEBLOCKREPEL;
 	}
 	else if(useBehavior)
@@ -2194,9 +2202,11 @@ bool B_WeaponBreakableBlock::hittop(CPlayer * player, bool useBehavior)
 
 	if(state == 1 || state == 2)
 	{
+		short iKillType = player_kill_nonkill;
 		if(iBumpPlayerID >= 0 && !player->IsInvincibleOnBottom() && (player->teamID != iBumpTeamID || game_values.friendlyfire))
-			PlayerKilledPlayer(iBumpPlayerID, *player, death_style_jump, kill_style_bounce);
-		else
+			PlayerKilledPlayer(iBumpPlayerID, *player, death_style_jump, kill_style_bounce, false);
+		
+		if(player_kill_nonkill == iKillType)
 			player->vely = -VELNOTEBLOCKREPEL;
 	}
 	else if(useBehavior)
@@ -4044,7 +4054,7 @@ bool MO_Fireball::collide(CPlayer * player)
 			if(!player->invincible)
 			{
 				//Find the player that shot this fireball so we can attribute a kill
-				PlayerKilledPlayer(playerID, *player, death_style_jump, kill_style_fireball);
+				PlayerKilledPlayer(playerID, *player, death_style_jump, kill_style_fireball, false);
 				return true;
 			}
 		}
@@ -4113,7 +4123,7 @@ bool MO_SuperFireball::collide(CPlayer * player)
 			if(!player->invincible)
 			{
 				//Find the player that shot this hammer so we can attribute a kill
-				PlayerKilledPlayer(playerID, *player, death_style_jump, kill_style_fireball);
+				PlayerKilledPlayer(playerID, *player, death_style_jump, kill_style_fireball, false);
 				return true;
 			}
 		}
@@ -4216,7 +4226,7 @@ bool MO_Hammer::collide(CPlayer * player)
 			if(!player->invincible)
 			{
 				//Find the player that shot this hammer so we can attribute a kill
-				PlayerKilledPlayer(playerID, *player, death_style_jump, kill_style_hammer);
+				PlayerKilledPlayer(playerID, *player, death_style_jump, kill_style_hammer, false);
 				return true;
 			}
 		}
@@ -4320,7 +4330,7 @@ bool MO_SledgeHammer::collide(CPlayer * player)
 			if(!player->invincible)
 			{
 				//Find the player that shot this hammer so we can attribute a kill
-				PlayerKilledPlayer(playerID, *player, death_style_jump, kill_style_sledge);
+				PlayerKilledPlayer(playerID, *player, death_style_jump, kill_style_sledge, false);
 				return true;
 			}
 		}
@@ -4702,7 +4712,7 @@ bool MO_Boomerang::collide(CPlayer * player)
 			if(!player->invincible)
 			{
 				//Find the player that shot this boomerang so we can attribute a kill
-				PlayerKilledPlayer(playerID, *player, death_style_jump, kill_style_boomerang);
+				PlayerKilledPlayer(playerID, *player, death_style_jump, kill_style_boomerang, false);
 				return true;
 			}
 		}
@@ -4866,23 +4876,33 @@ void CO_Bomb::Die()
 //------------------------------------------------------------------------------
 // class coin (for coin mode)
 //------------------------------------------------------------------------------
-MO_Coin::MO_Coin(gfxSprite *nspr, float velx, float vely, short ix, short iy, short color, short type, short uncollectabletime) :
+MO_Coin::MO_Coin(gfxSprite *nspr, float dvelx, float dvely, short ix, short iy, short color, short type, short uncollectabletime) :
 	IO_MovingObject(nspr, ix, iy, 4, 8, 30, 30, 1, 1, 0, color << 5, 32, 32)
 {
 	state = 1;
 	objectType = object_coin;
+	bounce = GRAVITATION;
 
 	sparkleanimationtimer = 0;
 	sparkledrawframe = 0;
 
 	iType = type;
 
+	iUncollectableTime = uncollectabletime;
+	velx = dvelx;
+	vely = dvely;
+	
 	if(iType == 0)
 		placeCoin();
+	else
+		collision_detection_checksides();
 }
 
 bool MO_Coin::collide(CPlayer * player)
 {
+	if(iType == 1 && iUncollectableTime > 0)
+		return false;
+
 	if(!game_values.gamemode->gameover)
 		player->score->AdjustScore(1);
 
@@ -4925,6 +4945,12 @@ void MO_Coin::update()
 	{
 		applyfriction();
 		IO_MovingObject::update();
+
+		if(--iUncollectableTime < -120)
+		{
+			eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix, iy, 3, 8));
+			dead = true;
+		}
 	}
 }
 
@@ -4933,7 +4959,8 @@ void MO_Coin::draw()
 	IO_MovingObject::draw();
 
 	//Draw sparkles
-	spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, 0, 32, 32);
+	if(iType == 0)
+		spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, 0, 32, 32);
 }
 
 void MO_Coin::placeCoin()
@@ -5079,7 +5106,7 @@ bool OMO_Podobo::collide(CPlayer * player)
 	if(player->globalID != iPlayerID && (game_values.friendlyfire || iTeamID != player->teamID) && !player->invincible && !player->spawninvincible)
 	{
 		//Find the player that made this explosion so we can attribute a kill
-		PlayerKilledPlayer(iPlayerID, *player, death_style_jump, kill_style_podobo);
+		PlayerKilledPlayer(iPlayerID, *player, death_style_jump, kill_style_podobo, false);
 		return true;
 	}
 
@@ -5158,7 +5185,7 @@ bool OMO_BowserFire::collide(CPlayer * player)
 	if(player->globalID != iPlayerID && (game_values.friendlyfire || iTeamID != player->teamID) && !player->invincible && !player->spawninvincible)
 	{
 		//Find the player that made this explosion so we can attribute a kill
-		PlayerKilledPlayer(iPlayerID, *player, death_style_jump, kill_style_fireball);
+		PlayerKilledPlayer(iPlayerID, *player, death_style_jump, kill_style_fireball, false);
 		return true;
 	}
 
@@ -5286,7 +5313,7 @@ bool OMO_BulletBill::hitother(CPlayer * player)
 		return false;
 
 	//Find the player that owns this bullet bill so we can attribute a kill
-	PlayerKilledPlayer(iPlayerID, *player, death_style_jump, kill_style_bulletbill);
+	PlayerKilledPlayer(iPlayerID, *player, death_style_jump, kill_style_bulletbill, false);
 
 	return true;
 }
@@ -6846,7 +6873,7 @@ bool OMO_Explosion::collide(CPlayer * player)
 	if(player->globalID != playerID && (game_values.friendlyfire || teamID != player->teamID) && !player->invincible && !player->spawninvincible)
 	{
 		//Find the player that made this explosion so we can attribute a kill
-		PlayerKilledPlayer(playerID, *player, death_style_jump, iStyle);
+		PlayerKilledPlayer(playerID, *player, death_style_jump, iStyle, false);
 		return true;
 	}
 
@@ -8223,7 +8250,7 @@ bool CO_Shell::KillPlayer(CPlayer * player)
 	CheckAndDie();
 
 	//Find the player that shot this shell so we can attribute a kill
-	PlayerKilledPlayer(playerID, *player, death_style_jump, kill_style_shell);
+	PlayerKilledPlayer(playerID, *player, death_style_jump, kill_style_shell, false);
 
 	CPlayer * killer = GetPlayerFromGlobalID(playerID);
 	if(killer && playerID != player->globalID)
@@ -8615,7 +8642,7 @@ bool CO_ThrowBlock::KillPlayer(CPlayer * player)
 		Die();
 
 	//Find the player that shot this shell so we can attribute a kill
-	PlayerKilledPlayer(playerID, *player, death_style_jump, kill_style_throwblock);
+	PlayerKilledPlayer(playerID, *player, death_style_jump, kill_style_throwblock, false);
 	return true;
 }
 
@@ -8917,7 +8944,7 @@ CO_Spike::CO_Spike(gfxSprite *nspr, short ix, short iy) :
 void CO_Spike::hittop(CPlayer * player)
 {
 	if(player->isready() && !player->spawninvincible && !player->invincible && !player->fKuriboShoe)
-		player->KillPlayerMapHazard();
+		player->KillPlayerMapHazard(false);
 }
 
 
@@ -8980,7 +9007,7 @@ bool OMO_AttackZone::collide(CPlayer * player)
 	if(killer && killer->globalID == player->globalID)
 		return false;
 
-	PlayerKilledPlayer(iPlayerID, *player, death_style_jump, iStyle);
+	PlayerKilledPlayer(iPlayerID, *player, death_style_jump, iStyle, false);
 
 	Die();
 

@@ -855,6 +855,7 @@ class MO_Coin : public IO_MovingObject
 		short sparkledrawframe;
 
 		short iType;
+		short iUncollectableTime;
 };
 
 class IO_OverMapObject : public CObject

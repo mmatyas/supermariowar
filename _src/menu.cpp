@@ -1205,25 +1205,16 @@ void Menu::CreateMenu()
 	
 	mGameSettingsMenu.AddControl(miSettingsStartButton, miMapThumbnailsButton, miModeField, NULL, NULL);
 	mGameSettingsMenu.AddControl(miModeField, miSettingsStartButton, miGoalField[0], NULL, NULL);
+	
 	mGameSettingsMenu.AddControl(miGoalField[0], miModeField, miGoalField[1], NULL, miModeSettingsButton);
-	mGameSettingsMenu.AddControl(miGoalField[1], miGoalField[0], miGoalField[2], miGoalField[0], miModeSettingsButton);
-	mGameSettingsMenu.AddControl(miGoalField[2], miGoalField[1], miGoalField[3], miGoalField[1], miModeSettingsButton);
-	mGameSettingsMenu.AddControl(miGoalField[3], miGoalField[2], miGoalField[4], miGoalField[2], miModeSettingsButton);
-	mGameSettingsMenu.AddControl(miGoalField[4], miGoalField[3], miGoalField[5], miGoalField[3], miModeSettingsButton);
-	mGameSettingsMenu.AddControl(miGoalField[5], miGoalField[4], miGoalField[6], miGoalField[4], miModeSettingsButton);
-	mGameSettingsMenu.AddControl(miGoalField[6], miGoalField[5], miGoalField[7], miGoalField[5], miModeSettingsButton);
-	mGameSettingsMenu.AddControl(miGoalField[7], miGoalField[6], miGoalField[8], miGoalField[6], miModeSettingsButton);
-	mGameSettingsMenu.AddControl(miGoalField[8], miGoalField[7], miGoalField[9], miGoalField[7], miModeSettingsButton);
-	mGameSettingsMenu.AddControl(miGoalField[9], miGoalField[8], miGoalField[10], miGoalField[8], miModeSettingsButton);
-	mGameSettingsMenu.AddControl(miGoalField[10], miGoalField[9], miGoalField[11], miGoalField[9], miModeSettingsButton);
-	mGameSettingsMenu.AddControl(miGoalField[11], miGoalField[10], miGoalField[12], miGoalField[10], miModeSettingsButton);
-	mGameSettingsMenu.AddControl(miGoalField[12], miGoalField[11], miGoalField[13], miGoalField[11], miModeSettingsButton);
-	mGameSettingsMenu.AddControl(miGoalField[13], miGoalField[12], miGoalField[14], miGoalField[12], miModeSettingsButton);
-	mGameSettingsMenu.AddControl(miGoalField[14], miGoalField[13], miGoalField[15], miGoalField[13], miModeSettingsButton);
-	mGameSettingsMenu.AddControl(miGoalField[15], miGoalField[14], miGoalField[16], miGoalField[14], miModeSettingsButton);
-	mGameSettingsMenu.AddControl(miGoalField[16], miGoalField[15], miMapField, miGoalField[15], miModeSettingsButton);
-	mGameSettingsMenu.AddControl(miModeSettingsButton, miModeField, miMapField, miGoalField[16], NULL);
-	mGameSettingsMenu.AddControl(miMapField, miGoalField[16], miMapFiltersButton, NULL, NULL);
+	
+	for(short iGoalField = 1; iGoalField < GAMEMODE_LAST - 1; iGoalField++)
+		mGameSettingsMenu.AddControl(miGoalField[iGoalField], miGoalField[iGoalField - 1], miGoalField[iGoalField + 1], miGoalField[iGoalField - 1], miModeSettingsButton);
+
+	mGameSettingsMenu.AddControl(miGoalField[GAMEMODE_LAST - 1], miGoalField[GAMEMODE_LAST - 2], miMapField, miGoalField[GAMEMODE_LAST - 2], miModeSettingsButton);
+	
+	mGameSettingsMenu.AddControl(miModeSettingsButton, miModeField, miMapField, miGoalField[17], NULL);
+	mGameSettingsMenu.AddControl(miMapField, miGoalField[17], miMapFiltersButton, NULL, NULL);
 	mGameSettingsMenu.AddControl(miMapFiltersButton, miMapField, miMapThumbnailsButton, NULL, NULL);
 	mGameSettingsMenu.AddControl(miMapThumbnailsButton, miMapFiltersButton, miSettingsStartButton, NULL, NULL);
 
@@ -2507,7 +2498,7 @@ void Menu::RunMenu()
 		{
 			MenuCodeEnum code = mCurrentMenu->SendInput(&game_values.playerInput);
 
-			bool fShowSettingsButton[] = {false, false, false, true, true, true, false, true, true, true, true, true, true, true, false, true, true};
+			bool fShowSettingsButton[GAMEMODE_LAST] = {false, false, false, true, true, true, false, true, true, true, true, true, true, true, false, true, true, false};
 
 			if(MENU_CODE_EXIT_APPLICATION == code)
 			{

@@ -555,11 +555,16 @@ void MovingPlatform::collide(CPlayer * player)
 
 			if((t1 & tile_flag_solid) || (t2 & tile_flag_solid))
 			{
-				if(player->iHorizontalPlatformCollision == 3 || (((t1 & tile_flag_death_on_left) || (t2 & tile_flag_death_on_left)) &&
-					!player->invincible && !player->spawninvincible))
+				if(player->iHorizontalPlatformCollision == 3)
 				{
-					player->KillPlayerMapHazard();
+					player->KillPlayerMapHazard(true);
 					//printf("Platform Right Side Killed Player\n");
+					return;
+				}
+				else if(((t1 & tile_flag_death_on_left) || (t2 & tile_flag_death_on_left)) &&
+					!player->invincible && !player->spawninvincible)
+				{
+					player->KillPlayerMapHazard(false);
 					return;
 				}
 				else
@@ -626,11 +631,16 @@ void MovingPlatform::collide(CPlayer * player)
 
 			if((t1 & tile_flag_solid) || (t2 & tile_flag_solid))
 			{
-				if(player->iHorizontalPlatformCollision == 1 || (((t1 & tile_flag_death_on_right) || (t2 & tile_flag_death_on_right)) &&
-					!player->invincible && !player->spawninvincible))
+				if(player->iHorizontalPlatformCollision == 1)
 				{
-					player->KillPlayerMapHazard();
+					player->KillPlayerMapHazard(true);
 					//printf("Platform Left Side Killed Player\n");
+					return;				
+				}
+				else if(((t1 & tile_flag_death_on_right) || (t2 & tile_flag_death_on_right)) &&
+					!player->invincible && !player->spawninvincible)
+				{
+					player->KillPlayerMapHazard(false);
 					return;				
 				}
 				else
@@ -709,7 +719,7 @@ void MovingPlatform::collide(CPlayer * player)
 			{
 				if(player->iVerticalPlatformCollision == 2)
 				{
-					player->KillPlayerMapHazard();
+					player->KillPlayerMapHazard(true);
 					//printf("Platform Bottom Killed Player\n");
 					return;
 				}
@@ -733,7 +743,7 @@ void MovingPlatform::collide(CPlayer * player)
 			}
 			else if((t1 & tile_flag_death_on_bottom) || (t2 & tile_flag_death_on_bottom))
 			{
-				player->KillPlayerMapHazard();
+				player->KillPlayerMapHazard(false);
 				return;
 			}
 		}
@@ -773,7 +783,7 @@ void MovingPlatform::collide(CPlayer * player)
 				{
 					if(player->iVerticalPlatformCollision == 0)
 					{
-						player->KillPlayerMapHazard();
+						player->KillPlayerMapHazard(true);
 						//printf("Solid On Top Platform Killed Player\n");
 						return;
 					}
@@ -803,7 +813,7 @@ void MovingPlatform::collide(CPlayer * player)
 
 				if(player->iVerticalPlatformCollision == 0)
 				{
-					player->KillPlayerMapHazard();
+					player->KillPlayerMapHazard(true);
 					//printf("Platform Top Killed Player\n");
 					return;
 				}
@@ -835,7 +845,7 @@ void MovingPlatform::collide(CPlayer * player)
 			}
 			else if(t1 & tile_flag_death_on_top || t2 & tile_flag_death_on_top)
 			{
-				player->KillPlayerMapHazard();
+				player->KillPlayerMapHazard(false);
 				return;
 			}
 			else

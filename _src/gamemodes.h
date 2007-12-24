@@ -446,6 +446,8 @@ class CGM_Greed : public CGM_Classic
 		short playerkilledself(CPlayer &player, killstyle style);
 		void playerextraguy(CPlayer &player, short iType);
 
+		short ReleaseCoins(CPlayer &player, killstyle style);
+
 #ifdef _DEBUG
 		void setdebuggoal() {goal = 10;}
 #endif

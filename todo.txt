@@ -773,27 +773,25 @@ Final
 [X] Go through xbox controls in the docs and make sure they are right
 [X] Make screenshots for manual
 
+
+
 Thinking about 1.8...
 [X] Expanded tileset -> spec it out - maybe allow a map only to choose 1 tileset it can use, need map between old and new tileset, need default tile types for each tileset
 [X] Save platform tile types like the map tile types are saved so that tileset.tls isn't read by the game at all.  Need to add a way to specify the platform tile types in the level editor and update the map files to include this information.
-[ ] Side spikes and ice-solid-on-top tiles
+[X] Side spikes tile type
+[X] ice-solid-on-top tile type
 [ ] Map hazards -> bullet bills, canons, flame throwers, rotating fire shafts, rotodiscs, pirhana plants, nippers?
 [X] Special animated tiles like water, lava
 [X] Add mode options to tours -> If the tours are expanded in the future, they should allow you to set goals according to the number of players. I've found when making tours, certain goals on 2 player are fine, but add 2 other players and you're in for a long match, and vice versa. So, if you could manually set the goals depending on the number of players, it would allow you to great balanced tours for any number of players...
 [X] Jail mode updated to jail free for all where players only are released after a certain period of time or stomp another player or tag a team mate.  No bonuses for jailing all other players.
 [ ] Cash Dash mode added
-[ ] Bug fixes/tweaks that needed to be done for 1.7, but due to risk were not put in
 [X] Owned option to jail players instead of normal colored orb
 [ ] The invincibility music dosen't need to stop, when you pause.
 [ ] Goomba sprites should flip when changing direction. GFX packs which use Goombas that change sprites while changing directions can make them look like they're walking backwards.
 [ ] Ability to throw objects upwards like flags, stars, shells, blue blocks, eggs, ect.
 [ ] Input bug: if the menu select key is mapped to a letter, but then you select a map and press that letter to select the map, it won't select, but jump to the maps that begin with that letter!
-
-Things I don't want to do
-- Anything having to do with new types of collision detection like slopes, water, and sliding or climbing tiles
-
-
 [X] New powerup weight menu to support arbitrary number of powerups
+[ ] Solid on top ice tile type
 [ ] New bonus wheel (something like pick 6 or 8 powerups and have a user controlled stopping point of the spinning, more like bomberman)
 [X] Fix bug where when beating a vehicle on a closed bridge, the bridge will open and trap the player in that spot.  Even hourglass powerups don't work when trapped (intentionally, because you're on a bridge! :))
 [ ] New ice wand powerup: Throwable shattering ice ball (maybe remotely triggered like the exploding boomerang) that shatters into crystals
@@ -802,7 +800,7 @@ Things I don't want to do
 [ ] Match 3 cards mode (cards can be bumped out and stolen by other players)
 [ ] Health mode - different attacks do different damage
 [X] Hidden blocks that popup when hit from below
-[ ] Object destroyable blocks like fire, hammer, bomb, boomerang
+[ ] Object destroyable blocks like fire, hammer, bomb, boomerang - done, need gfx
 [X] Powerup weights should be controlled by level creator with a global override in game
 [ ] New SuperUp powerup to allow special behavior for hammer, fireball, boomerang, shells/blueblocks.  What key combo to use to activate special behavior?
 [X] The game will crash if you go to a map with a view block with no powerups on.
@@ -824,3 +822,7 @@ Things I don't want to do
 [X] GTBs that multikill but do not bounce
 [X] Finish fish types for fish eyecandy
  
+Things I don't want to do
+- Anything having to do with new types of collision detection like slopes, water, and sliding or climbing tiles
+
+

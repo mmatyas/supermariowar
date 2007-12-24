@@ -1,5 +1,8 @@
 #include "global.h"
-extern	gfxFont			font[3];
+#include <math.h>
+
+extern	gfxFont font[3];
+extern CScore *score[4];
 
 #include <string.h>
 
@@ -2156,13 +2159,13 @@ void CGM_Star::think()
 
 				//Let the cleanup function remove the player on the last kill
 				if(score[list_players[iPlayer]->teamID]->score > 1)
-					list_players[iPlayer]->KillPlayerMapHazard();
+					list_players[iPlayer]->KillPlayerMapHazard(true);
 			}
 		}
 		else
 		{
 			if(score[star->teamID]->score > 1)
-				star->KillPlayerMapHazard();
+				star->KillPlayerMapHazard(true);
 		}
 
 		if(game_values.gamemodesettings.star.shine)
@@ -2398,127 +2401,111 @@ short CGM_KingOfTheHill::playerkilledself(CPlayer &player, killstyle style)
 }
 
 //Greed - steal other players coins - if you have 0 coins, you're removed from the game!
+short g_iKillStyleDamage[KILL_STYLE_LAST] = {5,5,3,8,3,5,2,3,3,5,5,2,2,3,5,3,3,8,5,5,8,8,3,3};
+
 CGM_Greed::CGM_Greed() : CGM_Classic()
 {
-	goal = 100;
+	goal = 50;
 	gamemode = game_mode_greed;
 
-	SetupModeStrings("Greed", "Coins", 10);
+	SetupModeStrings("Greed", "Coins", 5);
 };
 
 void CGM_Greed::init()
 {
 	CGameMode::init();
 
+	short iGoal = goal;
+	if(goal == -1)
+		iGoal = 50;
+
 	for(short iScore = 0; iScore < score_cnt; iScore++)
 	{
-		score[iScore]->SetScore(goal);
+		score[iScore]->SetScore(iGoal);
 	}
 }
 
 short CGM_Greed::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
 {
-	if(!gameover)
-	{
-		if(fReverseScoring)
-		{
-			other.score->AdjustScore(1);
-		}
-		else
-		{
-			other.score->AdjustScore(-1);
-
-			if(!playedwarningsound)
-			{
-				short countscore = 0;
-				for(short k = 0; k < score_cnt; k++)
-				{
-					if(inflictor.score == score[k])
-						continue;
-
-					countscore += score[k]->score;
-				}
-
-				if(countscore <= 2)
-				{
-					playwarningsound();
-				}
-			}
-
-			if(other.score->score <= 0)
-			{
-				RemoveTeam(other.teamID);
-				return player_kill_removed;
-			}
-		}
-	}
-
-	return player_kill_normal;
+	//create coins around player
+	return ReleaseCoins(other, style);
 }
 
 short CGM_Greed::playerkilledself(CPlayer &player, killstyle style)
 {
-	CGameMode::playerkilledself(player, style);
-
-	if(!gameover)
-	{
-		if(fReverseScoring)
-		{
-			player.score->AdjustScore(1);
-		}
-		else
-		{
-			player.score->AdjustScore(-1);
-
-			if(!playedwarningsound)
-			{
-				short countscore = 0;
-				bool playwarning = false;
-				for(short j = 0; j < score_cnt; j++)
-				{
-					for(short k = 0; k < score_cnt; k++)
-					{
-						if(j == k)
-							continue;
-
-						countscore += score[k]->score;
-					}
-
-					if(countscore <= 2)
-					{
-						playwarning = true;
-						break;
-					}
-
-					countscore = 0;
-				}
-
-				if(playwarning)
-					playwarningsound();
-			}
-
-			if(player.score->score <= 0)
-			{
-				RemoveTeam(player.teamID);
-				return player_kill_removed;
-			}
-		}
-	}
-
-	return player_kill_normal;
+	//create coins around player
+	return ReleaseCoins(player, style);
 }
 
 void CGM_Greed::playerextraguy(CPlayer &player, short iType)
 {
 	if(!gameover)
 	{
-		if(fReverseScoring)
-			player.score->AdjustScore(-iType);
-		else
-        	player.score->AdjustScore(iType);
+        player.score->AdjustScore(iType);
 	}
 }
 
+short CGM_Greed::ReleaseCoins(CPlayer &player, killstyle style)
+{
+	player.spawninvincible = true;
+	player.spawninvincibletimer = 60;
+
+	short iDamage = g_iKillStyleDamage[style];
+
+	if(player.score->score < iDamage)
+		iDamage = player.score->score;
+
+	player.score->AdjustScore(-iDamage);
+
+	float angle = 0.0f; 
+	short ix = player.ix + HALFPW - 16;
+	short iy = player.iy + HALFPH - 16;
+
+	for(short k = 0; k < iDamage; k++)
+	{
+		float vel = 7.0f + (float)(rand() % 9) / 2.0f;
+		float angle = -(float)(rand() % 314) / 100.0f;
+		float velx = vel * cos(angle);
+		float vely = vel * sin(angle);
+		
+		objectsplayer.add(new MO_Coin(&spr_coin, velx, vely, ix, iy, player.colorID, 1, 30));
+		//angle -= PI / (float)(iDamage - 1);
+	}
+
+	//Play warning sound if game is almost over
+	if(!playedwarningsound)
+	{
+		bool playwarning = false;
+		for(short j = 0; j < score_cnt; j++)
+		{
+			short countscore = 0;
+			for(short k = 0; k < score_cnt; k++)
+			{
+				if(j == k)
+					continue;
+
+				countscore += score[k]->score;
+			}
+
+			if(countscore <= 10)
+			{
+				playwarning = true;
+				break;
+			}
+		}
+
+		if(playwarning)
+			playwarningsound();
+	}
+
+	if(goal != -1 && player.score->score <= 0)
+	{
+		RemoveTeam(player.teamID);
+		return player_kill_removed;
+	}
+
+	return player_kill_nonkill;
+}
 
 //Boss Mode
 //Person to score fatal hit to boss wins!
