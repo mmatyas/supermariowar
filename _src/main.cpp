@@ -823,6 +823,8 @@ int main(int argc, char *argv[])
 	gamemodes[15] = new CGM_Frenzy();
 	gamemodes[16] = new CGM_Survival();
 	gamemodes[17] = new CGM_Greed();
+	gamemodes[18] = new CGM_Classic();
+	gamemodes[19] = new CGM_Frag();
 
 	currentgamemode = 0;
 	game_values.gamemode = gamemodes[currentgamemode];

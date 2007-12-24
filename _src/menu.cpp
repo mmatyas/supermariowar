@@ -2498,7 +2498,7 @@ void Menu::RunMenu()
 		{
 			MenuCodeEnum code = mCurrentMenu->SendInput(&game_values.playerInput);
 
-			bool fShowSettingsButton[GAMEMODE_LAST] = {false, false, false, true, true, true, false, true, true, true, true, true, true, true, false, true, true, false};
+			bool fShowSettingsButton[GAMEMODE_LAST] = {false, false, false, true, true, true, false, true, true, true, true, true, true, true, false, true, true, false, false, false};
 
 			if(MENU_CODE_EXIT_APPLICATION == code)
 			{

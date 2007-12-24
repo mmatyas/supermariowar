@@ -2405,7 +2405,7 @@ short g_iKillStyleDamage[KILL_STYLE_LAST] = {5,5,3,8,3,5,2,3,3,5,5,2,2,3,5,3,3,8
 
 CGM_Greed::CGM_Greed() : CGM_Classic()
 {
-	goal = 50;
+	goal = 40;
 	gamemode = game_mode_greed;
 
 	SetupModeStrings("Greed", "Coins", 5);
@@ -2427,12 +2427,18 @@ void CGM_Greed::init()
 
 short CGM_Greed::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
 {
+	if(gameover)
+		return player_kill_normal;
+
 	//create coins around player
 	return ReleaseCoins(other, style);
 }
 
 short CGM_Greed::playerkilledself(CPlayer &player, killstyle style)
 {
+	if(gameover)
+		return player_kill_normal;
+
 	//create coins around player
 	return ReleaseCoins(player, style);
 }
@@ -2440,13 +2446,13 @@ short CGM_Greed::playerkilledself(CPlayer &player, killstyle style)
 void CGM_Greed::playerextraguy(CPlayer &player, short iType)
 {
 	if(!gameover)
-	{
         player.score->AdjustScore(iType);
-	}
 }
 
 short CGM_Greed::ReleaseCoins(CPlayer &player, killstyle style)
 {
+	ifsoundonplay(sfx_cannon);
+
 	player.spawninvincible = true;
 	player.spawninvincibletimer = 60;
 

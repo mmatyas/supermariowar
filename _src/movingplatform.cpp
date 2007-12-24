@@ -564,8 +564,8 @@ void MovingPlatform::collide(CPlayer * player)
 				else if(((t1 & tile_flag_death_on_left) || (t2 & tile_flag_death_on_left)) &&
 					!player->invincible && !player->spawninvincible)
 				{
-					player->KillPlayerMapHazard(false);
-					return;
+					if(player_kill_nonkill != player->KillPlayerMapHazard(false))
+						return;
 				}
 				else
 				{
@@ -640,8 +640,8 @@ void MovingPlatform::collide(CPlayer * player)
 				else if(((t1 & tile_flag_death_on_right) || (t2 & tile_flag_death_on_right)) &&
 					!player->invincible && !player->spawninvincible)
 				{
-					player->KillPlayerMapHazard(false);
-					return;				
+					if(player_kill_nonkill != player->KillPlayerMapHazard(false))
+						return;				
 				}
 				else
 				{
@@ -743,8 +743,8 @@ void MovingPlatform::collide(CPlayer * player)
 			}
 			else if((t1 & tile_flag_death_on_bottom) || (t2 & tile_flag_death_on_bottom))
 			{
-				player->KillPlayerMapHazard(false);
-				return;
+				if(player_kill_nonkill != player->KillPlayerMapHazard(false))
+					return;
 			}
 		}
 	}
@@ -845,8 +845,8 @@ void MovingPlatform::collide(CPlayer * player)
 			}
 			else if(t1 & tile_flag_death_on_top || t2 & tile_flag_death_on_top)
 			{
-				player->KillPlayerMapHazard(false);
-				return;
+				if(player_kill_nonkill != player->KillPlayerMapHazard(false))
+					return;
 			}
 			else
 			{

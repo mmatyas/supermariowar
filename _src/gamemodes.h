@@ -4,7 +4,7 @@
 #define GAMEMODE_NUM_OPTIONS 21
 
 //Enum for each game mode
-enum GameModeType{game_mode_frag, game_mode_timelimit, game_mode_coins, game_mode_classic, game_mode_chicken, game_mode_tag, game_mode_frenzy, game_mode_survival, game_mode_eggs, game_mode_domination, game_mode_owned, game_mode_jail, game_mode_stomp, game_mode_race, game_mode_star, game_mode_ctf, game_mode_koth, game_mode_greed, GAMEMODE_LAST, game_mode_boss, game_mode_bonus};
+enum GameModeType{game_mode_frag, game_mode_timelimit, game_mode_coins, game_mode_classic, game_mode_chicken, game_mode_tag, game_mode_frenzy, game_mode_survival, game_mode_eggs, game_mode_domination, game_mode_owned, game_mode_jail, game_mode_stomp, game_mode_race, game_mode_star, game_mode_ctf, game_mode_koth, game_mode_greed, game_mode_health, game_mode_cards, GAMEMODE_LAST, game_mode_boss, game_mode_bonus};
 enum PlayerKillType{player_kill_none, player_kill_normal, player_kill_removed, player_kill_nonkill};
 
 struct SModeOption

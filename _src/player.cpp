@@ -1704,8 +1704,8 @@ void CPlayer::move()
 
 					if(++burnuptimer > 80)
 					{
-						KillPlayerMapHazard(false);
-						return;
+						if(player_kill_nonkill != KillPlayerMapHazard(false))
+							return;
 					}
 					else
 					{
@@ -1731,8 +1731,8 @@ void CPlayer::move()
 
 					if(--outofarenadisplaytimer < 0)
 					{
-						KillPlayerMapHazard(false);
-						return;
+						if(player_kill_nonkill != KillPlayerMapHazard(false))
+							return;
 					}
 				}
 			}
@@ -2417,6 +2417,9 @@ void CPlayer::DeathAwards()
 		explodeawards();
 	else if(game_values.awardstyle == award_style_souls && killsinrow >= MINAWARDSNEEDED)
 		eyecandyfront.add(new EC_SoulsAward(&spr_awardsouls, &spr_awardsoulspawn, ix + HALFPW, iy + HALFPH, 60, 9.0f, killsinrow, awards));
+
+	killsinrow = 0;
+	killsinrowinair = 0;
 }
 
 void CPlayer::AddKillsInRowInAirAward()
@@ -3193,7 +3196,7 @@ void CPlayer::drawarrows()
 			spr_abovearrows.draw(ix - PWOFFSET, 0, colorID * 32, 0, 32, 26);
 
 			//This displays the out of arena timer before the player is killed
-			if(game_values.outofboundstime > 0)
+			if(game_values.outofboundstime > 0 && outofarenadisplaytimer >= 0)
 				spr_awardkillsinrow.draw(ix - PWOFFSET + 8, 18, outofarenadisplaytimer << 4, colorID << 4, 16, 16);
 		}
 	}
@@ -3384,8 +3387,8 @@ void CPlayer::collision_detection_map()
 			else if(((toptile & tile_flag_death_on_left) || (bottomtile & tile_flag_death_on_left)) &&
 				!invincible && !spawninvincible)
 			{
-				KillPlayerMapHazard(false);
-				return;
+				if(player_kill_nonkill != KillPlayerMapHazard(false))
+					return;
 			}
 			//collision on the right side.
 			else if((toptile & tile_flag_solid) || (bottomtile & tile_flag_solid)) //collide with solid, ice, and death and all sides death
@@ -3468,8 +3471,8 @@ void CPlayer::collision_detection_map()
 			else if(((toptile & tile_flag_death_on_right) || (bottomtile & tile_flag_death_on_right)) &&
 				!invincible && !spawninvincible)
 			{
-				KillPlayerMapHazard(false);
-				return;
+				if(player_kill_nonkill != KillPlayerMapHazard(false))
+					return;
 			}
 			else if((toptile & tile_flag_solid) || (bottomtile & tile_flag_solid)) // collide with solid, ice, death and all sides death
 			{
@@ -3634,8 +3637,8 @@ void CPlayer::collision_detection_map()
 		}
 		else if((alignedTileType & tile_flag_death_on_bottom) || (unalignedTileType & tile_flag_death_on_bottom))
 		{
-			KillPlayerMapHazard(false);
-			return;
+			if(player_kill_nonkill != KillPlayerMapHazard(false))
+				return;
 		}
 		else
 		{
@@ -3798,8 +3801,8 @@ void CPlayer::collision_detection_map()
 		}
 		else if((lefttile & tile_flag_death_on_top) || (righttile & tile_flag_death_on_top))
 		{
-			KillPlayerMapHazard(false);
-			return;
+			if(player_kill_nonkill != KillPlayerMapHazard(false))
+				return;
 		}
 		else
 		{
