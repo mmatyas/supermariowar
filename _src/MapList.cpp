@@ -183,11 +183,11 @@ bool MapList::findexact(const char * name)
 		if(!strcmp(szCurrentName, szLookForName))
 			fFound = true;
 
-		free(szCurrentName);
+		delete[] szCurrentName;
 	}
 	while(current != oldCurrent && !fFound);
 
-	free(szLookForName);
+	delete[] szLookForName;
 
 	return fFound;
 }
