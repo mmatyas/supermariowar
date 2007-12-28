@@ -38,7 +38,7 @@ class CObject
 		short GetState() {return state;}
 		bool GetDead() {return dead;}
 
-		void CObject::GetCollisionBlocks(IO_Block * blocks[4]);
+		void GetCollisionBlocks(IO_Block * blocks[4]);
 
 		//virtual short writeNetworkUpdate(char * pData);
 		//virtual void readNetworkUpdate(short size, char * pData);
