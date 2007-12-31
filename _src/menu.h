@@ -331,7 +331,7 @@ class Menu
 
 
 		//Game Mode Settings Menu
-		UI_Menu mModeSettingsMenu[17];
+		UI_Menu mModeSettingsMenu[20];
 
 		//Jail
 		MI_SelectField * miJailModeStyleField;
@@ -453,6 +453,16 @@ class Menu
 		MI_Image * miSurvivalModeLeftHeaderBar;
 		MI_Image * miSurvivalModeRightHeaderBar;
 		MI_Text * miSurvivalModeHeaderText;
+
+		//Health
+		MI_SelectField * miHealthModeStartLife;
+		MI_SelectField * miHealthModeMaxLife;
+		MI_SliderField * miHealthModePercentExtraLife;
+		MI_Button * miHealthModeBackButton;
+		
+		MI_Image * miHealthModeLeftHeaderBar;
+		MI_Image * miHealthModeRightHeaderBar;
+		MI_Text * miHealthModeHeaderText;
 
 
 		//Team Select

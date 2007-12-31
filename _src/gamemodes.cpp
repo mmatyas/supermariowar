@@ -2408,7 +2408,7 @@ CGM_Greed::CGM_Greed() : CGM_Classic()
 	goal = 40;
 	gamemode = game_mode_greed;
 
-	SetupModeStrings("Greed", "Coins", 5);
+	SetupModeStrings("Greed", "Coins", 10);
 };
 
 void CGM_Greed::init()
@@ -2511,6 +2511,79 @@ short CGM_Greed::ReleaseCoins(CPlayer &player, killstyle style)
 	}
 
 	return player_kill_nonkill;
+}
+
+//mariowar (x lives - counting down)
+CGM_Health::CGM_Health() : CGM_Classic()
+{
+	goal = 10;
+	gamemode = game_mode_health;
+
+	SetupModeStrings("Health", "Lives", 1);
+};
+
+void CGM_Health::init()
+{
+	CGM_Classic::init();
+
+	for(short iScore = 0; iScore < score_cnt; iScore++)
+	{
+		score[iScore]->subscore[0] = game_values.gamemodesettings.health.startlife;
+		score[iScore]->subscore[1] = score[iScore]->subscore[0];
+	}
+}
+
+short CGM_Health::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
+{
+	if(gameover)
+		return player_kill_normal;
+
+	if(--other.score->subscore[0] <= 0)
+	{
+		other.score->subscore[0] = other.score->subscore[1];
+		return CGM_Classic::playerkilledplayer(inflictor, other, style);
+	}
+	else
+	{
+		ifsoundonplay(sfx_powerdown);
+
+		other.spawninvincible = true;
+		other.spawninvincibletimer = 60;
+	}
+	
+	return player_kill_nonkill;
+}
+
+short CGM_Health::playerkilledself(CPlayer &player, killstyle style)
+{
+	if(gameover)
+		return player_kill_normal;
+
+	if(--player.score->subscore[0] <= 0)
+	{
+		player.score->subscore[0] = player.score->subscore[1];
+		return CGM_Classic::playerkilledself(player, style);
+	}
+	else
+	{
+		ifsoundonplay(sfx_powerdown);
+
+		player.spawninvincible = true;
+		player.spawninvincibletimer = 60;
+	}
+	
+	return player_kill_nonkill;
+}
+
+void CGM_Health::playerextraguy(CPlayer &player, short iType)
+{
+	if(!gameover)
+	{
+		player.score->subscore[0] += iType;
+
+		if(player.score->subscore[0] > player.score->subscore[1])
+			player.score->subscore[0] = player.score->subscore[1];
+	}
 }
 
 //Boss Mode

@@ -171,6 +171,8 @@ gfxSprite		spr_pwingspowerup;
 gfxSprite       spr_tanooki, spr_statue;
 
 gfxSprite		spr_shade[3];
+gfxSprite		spr_scorehearts;
+
 gfxSprite		spr_timershade;
 gfxSprite		spr_spawneggs;
 gfxSprite		spr_scoretext;
@@ -823,7 +825,7 @@ int main(int argc, char *argv[])
 	gamemodes[15] = new CGM_Frenzy();
 	gamemodes[16] = new CGM_Survival();
 	gamemodes[17] = new CGM_Greed();
-	gamemodes[18] = new CGM_Classic();
+	gamemodes[18] = new CGM_Health();
 	gamemodes[19] = new CGM_Frag();
 
 	currentgamemode = 0;
@@ -907,8 +909,12 @@ int main(int argc, char *argv[])
 	game_values.gamemodemenusettings.survival.density = 20;
 	game_values.gamemodemenusettings.survival.speed = 4;
 	game_values.gamemodemenusettings.survival.shield = true;
-		
-
+	
+	//Health
+	game_values.gamemodemenusettings.health.startlife = 6;			//Start with 3 whole hearts (each increment is a half heart)
+	game_values.gamemodemenusettings.health.maxlife = 10;			//Maximum of 5 hearts
+	game_values.gamemodemenusettings.health.percentextralife = 20;	//20% chance of a heart spawning
+	
 	//Read saved settings from disk
 	FILE *fp;
 
@@ -1002,6 +1008,7 @@ int main(int argc, char *argv[])
 			//and this will cause a crash
 			fread(game_values.inputConfiguration, sizeof(CInputPlayerControl), 8, fp);
 
+			//setup player input controls for game
 			for(short iPlayer = 0; iPlayer < 4; iPlayer++)
 			{
 				short iDevice;
@@ -1218,6 +1225,7 @@ void RunGame()
 	y_shake = 0;
 	x_shake = 0;
 
+	//Create players for this game
 	for(short iPlayer = 0; iPlayer < 4; iPlayer++)
 	{
 		projectiles[iPlayer] = 0;
@@ -1239,7 +1247,7 @@ void RunGame()
 			}
 			else if(!game_values.keeppowerup)
 			{
-				//Reset off player's stored powerups
+				//Reset off player's stored powerups if they are not playing
 				game_values.storedpowerups[iPlayer] = -1;
 			}
 		}
@@ -1668,7 +1676,7 @@ void RunGame()
 						{
 							list_players[k]->DeathAwards();
 
-							if(!game_values.gamemode->playerkilledself(*(list_players[k]), kill_style_environment))
+							if(game_values.gamemode->playerkilledself(*(list_players[k]), kill_style_environment) == player_kill_normal)
 								list_players[k]->die(0, false);
 						}
 					}
@@ -2670,7 +2678,10 @@ void RunGame()
 				//in game scoreboards
 				for(i = 0; i < score_cnt; i++)
 				{
-					spr_shade[game_values.teamcounts[i] - 1].draw(score[i]->x, score[i]->y);
+					if(game_values.gamemode->gamemode == game_mode_health)
+						spr_shade[game_values.teamcounts[i] - 1].draw(score[i]->x, score[i]->y);
+					else
+						spr_shade[game_values.teamcounts[i] - 1].draw(score[i]->x, score[i]->y, 0, 0, 256, 41);
 
 					for(short k = 0; k < game_values.teamcounts[i]; k++)
 					{
@@ -2727,6 +2738,7 @@ void RunGame()
 
 						short storedpowerupid = game_values.gamepowerups[globalID];
 
+						//Draw stored powerup
 						if(storedpowerupid != -1)
 						{
 							if(!game_values.swapplayers)
@@ -2734,6 +2746,25 @@ void RunGame()
 								spr_storedpowerupsmall.draw(score[i]->x + scorepowerupoffsets[game_values.teamcounts[i] - 1][k], score[i]->y + 25, storedpowerupid * 16, 0, 16, 16);
 							}
 						}
+					}
+
+					//Draw hearts for health mode
+					if(game_values.gamemode->gamemode == game_mode_health)
+					{
+						short iLife = score[i]->subscore[0];
+						short iHeartX = score[i]->x + scorepowerupoffsets[game_values.teamcounts[i] - 1][0] - 9;
+
+						for(short iHeart = 0; iHeart < iLife - 1; iHeart += 2)
+							spr_scorehearts.draw(iHeartX + iHeart * 6, score[i]->y + 43, 0, 0, 11, 15);
+
+						if(iLife % 2)
+						{
+							spr_scorehearts.draw(iHeartX + iHeart * 6, score[i]->y + 43, 11, 0, 11, 15);
+							iLife++;
+						}
+
+						for(short iHeart = iLife; iHeart < score[i]->subscore[1]; iHeart += 2)
+							spr_scorehearts.draw(iHeartX + iHeart * 6, score[i]->y + 43, 22, 0, 11, 15);
 					}
 					
 					short iScoreX = score[i]->x + iScoreTextOffset[i];

@@ -14,7 +14,12 @@ class CScore
 		{
 			place = iPlace;
 			displayorder = iPlace;
+			
 			score = 0;
+
+			for(short iSubScore = 0; iSubScore < 3; iSubScore++)
+				subscore[iSubScore] = 0;
+			
 			x = 0;
 			y = 0;
 			destx = 0;
@@ -45,7 +50,11 @@ class CScore
 			SetDigitCounters();
 		}
 
+		//keeps track of what the actual score value is
 		short score;
+
+		//keeps track of other scoring elements for some games (health, collected cards, etc)
+		short subscore[3];
 
 		//Where to display score
 		short x;
@@ -79,7 +88,7 @@ class CScore
 			iDigitRight = iDigits % 10 * 16;
 		}
 
-	friend class CGM_Star;
+	//friend class CGM_Star;
 };
 
 
@@ -420,6 +429,7 @@ class CPlayer
 		friend class CGM_CaptureTheFlag;
 		friend class CGM_Stomp;
 		friend class CGM_Greed;
+		friend class CGM_Health;
 
 		friend class CGM_Boss;
 		friend class CGM_Bonus;

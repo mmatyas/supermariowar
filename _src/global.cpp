@@ -589,6 +589,14 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.survival.speed, NULL, game_values.gamemodemenusettings.survival.speed, false);
 				ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.survival.shield, 0, game_values.gamemodemenusettings.survival.shield);
 			}
+			else if(ts->iMode == 18) //health
+			{
+				ts->fUseSettings = true;
+				
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.health.startlife, NULL, game_values.gamemodemenusettings.health.startlife, false);
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.health.maxlife, NULL, game_values.gamemodemenusettings.health.maxlife, false);
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.health.percentextralife, NULL, game_values.gamemodemenusettings.health.percentextralife, false);
+			}
 		}
 	}
 	else if(iStageType == 1) //Bonus House
@@ -959,6 +967,26 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
 				if(ts->iNumUsedSettings > 5)
 				{
 					sprintf(szTemp, ",%d", ts->gmsSettings.survival.shield);
+					strcat(buffer, szTemp);
+				}
+			}
+			else if(ts->iMode == 18) //health
+			{
+				if(ts->iNumUsedSettings > 0)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.health.startlife);
+					strcat(buffer, szTemp);
+				}
+
+				if(ts->iNumUsedSettings > 1)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.health.maxlife);
+					strcat(buffer, szTemp);
+				}
+
+				if(ts->iNumUsedSettings > 2)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.health.percentextralife);
 					strcat(buffer, szTemp);
 				}
 			}

@@ -454,6 +454,25 @@ class CGM_Greed : public CGM_Classic
 
 };
 
+//health mode
+class CGM_Health : public CGM_Classic
+{
+	public:
+        CGM_Health();
+		virtual ~CGM_Health() {}
+		
+		virtual void init();
+		virtual short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
+		virtual short playerkilledself(CPlayer &player, killstyle style);
+		virtual void playerextraguy(CPlayer &player, short iType);
+
+#ifdef _DEBUG
+		void setdebuggoal() {goal = 5;}
+#endif
+
+};
+
+
 //Special mode where players try to kill a boss
 class CGM_Boss : public CGameMode
 {

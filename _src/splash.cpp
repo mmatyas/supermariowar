@@ -220,6 +220,8 @@ bool LoadGameGraphics()
 	gfx_loadimage(&spr_shade[0], convertPath("gfx/packs/eyecandy/shade1.png", graphicspack), 64, false);
 	gfx_loadimage(&spr_shade[1], convertPath("gfx/packs/eyecandy/shade2.png", graphicspack), 64, false);
 	gfx_loadimage(&spr_shade[2], convertPath("gfx/packs/eyecandy/shade3.png", graphicspack), 64, false);
+	gfx_loadimage(&spr_scorehearts, convertPath("gfx/packs/menu/score_hearts.png", graphicspack), false);	
+	
 	gfx_loadimage(&spr_timershade, convertPath("gfx/packs/eyecandy/timershade.png", graphicspack), 64, false);
 	gfx_loadimage(&spr_spawneggs, convertPath("gfx/packs/eyecandy/spawneggs.png", graphicspack), false);
 	gfx_loadimage(&spr_scoretext, convertPath("gfx/packs/fonts/score.png", graphicspack), false);

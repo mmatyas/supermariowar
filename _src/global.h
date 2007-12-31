@@ -364,6 +364,8 @@ extern gfxSprite		spr_bombpowerup;
 extern gfxSprite		spr_pwingspowerup;
 
 extern gfxSprite		spr_shade[3];
+extern gfxSprite		spr_scorehearts;
+
 extern gfxSprite		spr_timershade;
 extern gfxSprite		spr_spawneggs;
 extern gfxSprite		spr_scoretext;
@@ -656,6 +658,13 @@ struct SurvivalGameModeSettings
 	bool shield;				//Players are shielded when spawning
 };
 
+struct HealthGameModeSettings
+{
+	short startlife;			//Number of hearts players start with
+	short maxlife;				//Number of hearts players can have
+	short percentextralife;		//Percent chance an extra heart with come from a powerup block
+};
+
 struct GameModeSettings
 {
 	JailGameModeSettings jail;
@@ -670,6 +679,7 @@ struct GameModeSettings
 	RaceGameModeSettings race;
 	FrenzyGameModeSettings frenzy;
 	SurvivalGameModeSettings survival;
+	HealthGameModeSettings health;
 };
 
 struct WorldStageBonus

@@ -1213,8 +1213,8 @@ void Menu::CreateMenu()
 
 	mGameSettingsMenu.AddControl(miGoalField[GAMEMODE_LAST - 1], miGoalField[GAMEMODE_LAST - 2], miMapField, miGoalField[GAMEMODE_LAST - 2], miModeSettingsButton);
 	
-	mGameSettingsMenu.AddControl(miModeSettingsButton, miModeField, miMapField, miGoalField[17], NULL);
-	mGameSettingsMenu.AddControl(miMapField, miGoalField[17], miMapFiltersButton, NULL, NULL);
+	mGameSettingsMenu.AddControl(miModeSettingsButton, miModeField, miMapField, miGoalField[GAMEMODE_LAST - 1], NULL);
+	mGameSettingsMenu.AddControl(miMapField, miGoalField[GAMEMODE_LAST - 1], miMapFiltersButton, NULL, NULL);
 	mGameSettingsMenu.AddControl(miMapFiltersButton, miMapField, miMapThumbnailsButton, NULL, NULL);
 	mGameSettingsMenu.AddControl(miMapThumbnailsButton, miMapFiltersButton, miSettingsStartButton, NULL, NULL);
 
@@ -2024,6 +2024,85 @@ void Menu::CreateMenu()
 
 
 	//***********************
+	// Health Mode Settings
+	//***********************		
+	miHealthModeStartLife = new MI_SelectField(&spr_selectfield, 120, 180, "Start Life", 400, 150);
+	miHealthModeStartLife->Add("2", 2, "", false, false);
+	miHealthModeStartLife->Add("3", 3, "", false, false);
+	miHealthModeStartLife->Add("4", 4, "", false, false);
+	miHealthModeStartLife->Add("5", 5, "", false, false);
+	miHealthModeStartLife->Add("6", 6, "", false, false);
+	miHealthModeStartLife->Add("7", 7, "", false, false);
+	miHealthModeStartLife->Add("8", 8, "", false, false);
+	miHealthModeStartLife->Add("9", 9, "", false, false);
+	miHealthModeStartLife->Add("10", 10, "", false, false);
+	miHealthModeStartLife->SetData(&game_values.gamemodemenusettings.health.startlife, NULL, NULL);
+	miHealthModeStartLife->SetKey(game_values.gamemodemenusettings.health.startlife);
+	miHealthModeStartLife->SetNoWrap(true);
+	miHealthModeStartLife->SetItemChangedCode(MENU_CODE_HEALTH_MODE_START_LIFE_CHANGED);
+
+	miHealthModeMaxLife = new MI_SelectField(&spr_selectfield, 120, 220, "Max Life", 400, 150);
+	miHealthModeMaxLife->Add("2", 2, "", false, false);
+	miHealthModeMaxLife->Add("3", 3, "", false, false);
+	miHealthModeMaxLife->Add("4", 4, "", false, false);
+	miHealthModeMaxLife->Add("5", 5, "", false, false);
+	miHealthModeMaxLife->Add("6", 6, "", false, false);
+	miHealthModeMaxLife->Add("7", 7, "", false, false);
+	miHealthModeMaxLife->Add("8", 8, "", false, false);
+	miHealthModeMaxLife->Add("9", 9, "", false, false);
+	miHealthModeMaxLife->Add("10", 10, "", false, false);
+	miHealthModeMaxLife->SetData(&game_values.gamemodemenusettings.health.maxlife, NULL, NULL);
+	miHealthModeMaxLife->SetKey(game_values.gamemodemenusettings.health.maxlife);
+	miHealthModeMaxLife->SetNoWrap(true);
+	miHealthModeMaxLife->SetItemChangedCode(MENU_CODE_HEALTH_MODE_MAX_LIFE_CHANGED);
+
+	miHealthModePercentExtraLife = new MI_SliderField(&spr_selectfield, &menu_slider_bar, 120, 260, "Extra Life", 400, 150, 384);
+	miHealthModePercentExtraLife->Add("0", 0, "", false, false);
+	miHealthModePercentExtraLife->Add("5", 5, "", false, false);
+	miHealthModePercentExtraLife->Add("10", 10, "", false, false);
+	miHealthModePercentExtraLife->Add("15", 15, "", false, false);
+	miHealthModePercentExtraLife->Add("20", 20, "", false, false);
+	miHealthModePercentExtraLife->Add("25", 25, "", false, false);
+	miHealthModePercentExtraLife->Add("30", 30, "", false, false);
+	miHealthModePercentExtraLife->Add("35", 35, "", false, false);
+	miHealthModePercentExtraLife->Add("40", 40, "", false, false);
+	miHealthModePercentExtraLife->Add("45", 45, "", false, false);
+	miHealthModePercentExtraLife->Add("50", 50, "", false, false);
+	miHealthModePercentExtraLife->Add("55", 55, "", false, false);
+	miHealthModePercentExtraLife->Add("60", 60, "", false, false);
+	miHealthModePercentExtraLife->Add("65", 65, "", false, false);
+	miHealthModePercentExtraLife->Add("70", 70, "", false, false);
+	miHealthModePercentExtraLife->Add("75", 75, "", false, false);
+	miHealthModePercentExtraLife->Add("80", 80, "", false, false);
+	miHealthModePercentExtraLife->Add("85", 85, "", false, false);
+	miHealthModePercentExtraLife->Add("90", 90, "", false, false);
+	miHealthModePercentExtraLife->Add("95", 95, "", false, false);
+	miHealthModePercentExtraLife->Add("100", 100, "", false, false);
+	miHealthModePercentExtraLife->SetData(&game_values.gamemodemenusettings.health.percentextralife, NULL, NULL);
+	miHealthModePercentExtraLife->SetKey(game_values.gamemodemenusettings.health.percentextralife);
+	miHealthModePercentExtraLife->SetNoWrap(true);
+
+	miHealthModeBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
+	miHealthModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
+
+	miHealthModeLeftHeaderBar = new MI_Image(&menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
+	miHealthModeRightHeaderBar = new MI_Image(&menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
+	miHealthModeHeaderText = new MI_Text("Health Mode Menu", 320, 5, 0, 2, 1);
+
+	mModeSettingsMenu[18].AddControl(miHealthModeStartLife, miHealthModeBackButton, miHealthModeMaxLife, NULL, miHealthModeBackButton);
+	mModeSettingsMenu[18].AddControl(miHealthModeMaxLife, miHealthModeStartLife, miHealthModePercentExtraLife, NULL, miHealthModeBackButton);
+	mModeSettingsMenu[18].AddControl(miHealthModePercentExtraLife, miHealthModeMaxLife, miHealthModeBackButton, NULL, miHealthModeBackButton);
+	mModeSettingsMenu[18].AddControl(miHealthModeBackButton, miHealthModePercentExtraLife, miHealthModeStartLife, miHealthModePercentExtraLife, NULL);
+	
+	mModeSettingsMenu[18].AddNonControl(miHealthModeLeftHeaderBar);
+	mModeSettingsMenu[18].AddNonControl(miHealthModeRightHeaderBar);
+	mModeSettingsMenu[18].AddNonControl(miHealthModeHeaderText);
+	
+	mModeSettingsMenu[18].SetHeadControl(miHealthModeStartLife);
+	mModeSettingsMenu[18].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
+
+
+	//***********************
 	// Team Select Settings
 	//***********************
 	
@@ -2498,7 +2577,7 @@ void Menu::RunMenu()
 		{
 			MenuCodeEnum code = mCurrentMenu->SendInput(&game_values.playerInput);
 
-			bool fShowSettingsButton[GAMEMODE_LAST] = {false, false, false, true, true, true, false, true, true, true, true, true, true, true, false, true, true, false, false, false};
+			bool fShowSettingsButton[GAMEMODE_LAST] = {false, false, false, true, true, true, false, true, true, true, true, true, true, true, false, true, true, false, true, false};
 
 			if(MENU_CODE_EXIT_APPLICATION == code)
 			{
@@ -3189,6 +3268,22 @@ void Menu::RunMenu()
 				if(MENU_CODE_GENERATE_THUMBS_RESET_YES == code)
 				{
 					fGenerateMapThumbs = true;
+				}
+			}
+			else if(MENU_CODE_HEALTH_MODE_START_LIFE_CHANGED == code)
+			{
+				short iMaxLife = miHealthModeMaxLife->GetShortValue();
+				if(miHealthModeStartLife->GetShortValue() > iMaxLife)
+				{
+					miHealthModeStartLife->SetKey(iMaxLife);
+				}
+			}
+			else if(MENU_CODE_HEALTH_MODE_MAX_LIFE_CHANGED == code)
+			{
+				short iStartLife = miHealthModeStartLife->GetShortValue();
+				if(miHealthModeMaxLife->GetShortValue() < iStartLife)
+				{
+					miHealthModeMaxLife->SetKey(iStartLife);
 				}
 			}
 		}
