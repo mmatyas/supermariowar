@@ -333,6 +333,14 @@ class Menu
 		//Game Mode Settings Menu
 		UI_Menu mModeSettingsMenu[20];
 
+		//Time Limit
+		MI_SliderField * miTimeLimitModePercentExtraTime;
+		MI_Button * miTimeLimitModeBackButton;
+		
+		MI_Image * miTimeLimitModeLeftHeaderBar;
+		MI_Image * miTimeLimitModeRightHeaderBar;
+		MI_Text * miTimeLimitModeHeaderText;
+
 		//Jail
 		MI_SelectField * miJailModeStyleField;
 		MI_SelectField * miJailModeTagFreeField;
@@ -383,6 +391,7 @@ class Menu
 		//Star
 		MI_SelectField * miStarModeTimeField;
 		MI_SelectField * miStarModeShineField;
+		MI_SliderField * miStarModePercentExtraTime;
 		MI_Button * miStarModeBackButton;
 		
 		MI_Image * miStarModeLeftHeaderBar;

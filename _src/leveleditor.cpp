@@ -459,7 +459,7 @@ int main(int argc, char *argv[])
 			break;
 
 			default:
-				printf(" PANIC: WEIRD GAMESTATE: %d\n", state);
+				printf(" PANIC: WEIRD STATE: %d\n", state);
 			break;
 		}
 	}
@@ -986,7 +986,8 @@ int editor_edit()
 									short iLocalY = iClickY + j;
 
 									if(iLocalX >= 0 && iLocalX < MAPWIDTH && iLocalY >= 0 && iLocalY < MAPHEIGHT)
-									{										SetTilesetTile(&g_map.mapdata[iLocalX][iLocalY][selected_layer], TILESETANIMATED, set_tile_start_y + j, set_tile_start_x + i);
+									{										
+										SetTilesetTile(&g_map.mapdata[iLocalX][iLocalY][selected_layer], TILESETANIMATED, set_tile_start_y + j, set_tile_start_x + i);
 									}
 								}
 							}

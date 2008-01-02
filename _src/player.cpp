@@ -1704,7 +1704,7 @@ void CPlayer::move()
 
 					if(++burnuptimer > 80)
 					{
-						if(player_kill_nonkill != KillPlayerMapHazard(false))
+						if(player_kill_nonkill != KillPlayerMapHazard(true))
 							return;
 					}
 					else
@@ -2338,6 +2338,9 @@ bool CPlayer::isstomping(CPlayer &o)
 				eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, game_values.gamemode->tagged->ix + HALFPW - 16, game_values.gamemode->tagged->iy + HALFPH - 16, 3, 8));
 				ifsoundonplay(sfx_transform);
 			}
+
+			iSuicideCreditPlayerID = o.globalID;
+			iSuicideCreditTimer = 20;
 		}
 
 		return true;
@@ -2816,10 +2819,18 @@ void _collisionhandler_p2p_pushback(CPlayer &o1, CPlayer &o2)
 	}
 
 	if(o1.state == player_ready)
+	{
 		o1.velx = CapSideVelocity(absv2);
+		o1.iSuicideCreditPlayerID = o2.globalID;
+		o1.iSuicideCreditTimer = 62;
+	}
 	
 	if(o2.state == player_ready)
+	{
 		o2.velx = CapSideVelocity(absv1);
+		o2.iSuicideCreditPlayerID = o1.globalID;
+		o2.iSuicideCreditTimer = 62;
+	}
 }
 
 
@@ -3362,7 +3373,7 @@ void CPlayer::collision_detection_map()
 			{
 				if(topblock && !topblock->isTransparent()) //collide with top block
 				{	
-					if(iHorizontalPlatformCollision == 3)
+					if(iHorizontalPlatformCollision == 3 && !topblock->isHidden())
 					{
 						KillPlayerMapHazard(true);
 						return;
@@ -3374,7 +3385,7 @@ void CPlayer::collision_detection_map()
 				
 				if(bottomblock && !bottomblock->isTransparent()) //then bottom
 				{	
-					if(iHorizontalPlatformCollision == 3)
+					if(iHorizontalPlatformCollision == 3 && !bottomblock->isHidden())
 					{
 						KillPlayerMapHazard(true);
 						return;
@@ -3387,7 +3398,7 @@ void CPlayer::collision_detection_map()
 			else if(((toptile & tile_flag_death_on_left) || (bottomtile & tile_flag_death_on_left)) &&
 				!invincible && !spawninvincible)
 			{
-				if(player_kill_nonkill != KillPlayerMapHazard(false))
+				if(player_kill_nonkill != KillPlayerMapHazard(true))
 					return;
 			}
 			//collision on the right side.
@@ -3446,7 +3457,7 @@ void CPlayer::collision_detection_map()
 			{
 				if(topblock && !topblock->isTransparent()) //collide with top block
 				{	
-					if(iHorizontalPlatformCollision == 1)
+					if(iHorizontalPlatformCollision == 1 && !topblock->isHidden())
 					{
 						KillPlayerMapHazard(true);
 						return;
@@ -3458,7 +3469,7 @@ void CPlayer::collision_detection_map()
 				
 				if(bottomblock && !bottomblock->isTransparent()) //then bottom
 				{	
-					if(iHorizontalPlatformCollision == 1)
+					if(iHorizontalPlatformCollision == 1 && !bottomblock->isHidden())
 					{
 						KillPlayerMapHazard(true);
 						return;
@@ -3471,7 +3482,7 @@ void CPlayer::collision_detection_map()
 			else if(((toptile & tile_flag_death_on_right) || (bottomtile & tile_flag_death_on_right)) &&
 				!invincible && !spawninvincible)
 			{
-				if(player_kill_nonkill != KillPlayerMapHazard(false))
+				if(player_kill_nonkill != KillPlayerMapHazard(true))
 					return;
 			}
 			else if((toptile & tile_flag_solid) || (bottomtile & tile_flag_solid)) // collide with solid, ice, death and all sides death
@@ -3572,7 +3583,7 @@ void CPlayer::collision_detection_map()
 		{
 			if(!centerblock->collide(this, 0, true))
 			{
-				if(iVerticalPlatformCollision == 2)
+				if(iVerticalPlatformCollision == 2 && !centerblock->isHidden())
 					KillPlayerMapHazard(true);
 
 				return;
@@ -3603,7 +3614,7 @@ void CPlayer::collision_detection_map()
 				
 			if(!leftblock->collide(this, 0, useBehavior))
 			{
-				if(iVerticalPlatformCollision == 2)
+				if(iVerticalPlatformCollision == 2 && !leftblock->isHidden())
 					KillPlayerMapHazard(true);
 
 				return;
@@ -3616,7 +3627,7 @@ void CPlayer::collision_detection_map()
 				
 			if(!rightblock->collide(this, 0, useBehavior))
 			{
-				if(iVerticalPlatformCollision == 2)
+				if(iVerticalPlatformCollision == 2 && !rightblock->isHidden())
 					KillPlayerMapHazard(true);
 
 				return;
@@ -3637,7 +3648,7 @@ void CPlayer::collision_detection_map()
 		}
 		else if((alignedTileType & tile_flag_death_on_bottom) || (unalignedTileType & tile_flag_death_on_bottom))
 		{
-			if(player_kill_nonkill != KillPlayerMapHazard(false))
+			if(player_kill_nonkill != KillPlayerMapHazard(true))
 				return;
 		}
 		else
@@ -3801,7 +3812,7 @@ void CPlayer::collision_detection_map()
 		}
 		else if((lefttile & tile_flag_death_on_top) || (righttile & tile_flag_death_on_top))
 		{
-			if(player_kill_nonkill != KillPlayerMapHazard(false))
+			if(player_kill_nonkill != KillPlayerMapHazard(true))
 				return;
 		}
 		else

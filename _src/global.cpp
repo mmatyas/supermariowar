@@ -497,6 +497,11 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.jail.timetofree, NULL, game_values.gamemodemenusettings.jail.timetofree, false);
 				ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.jail.tagfree, 0, game_values.gamemodemenusettings.jail.tagfree);
 			}
+			else if(ts->iMode == 2) //time
+			{
+				ts->fUseSettings = true;
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.time.percentextratime, NULL, game_values.gamemodemenusettings.time.percentextratime, false);
+			}
 			else if(ts->iMode == 4) //coins
 			{
 				ts->fUseSettings = true;
@@ -541,6 +546,7 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 				
 				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.star.time, NULL, game_values.gamemodemenusettings.star.time, false);
 				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.star.shine, NULL, game_values.gamemodemenusettings.star.shine, false);
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.star.percentextratime, NULL, game_values.gamemodemenusettings.star.percentextratime, false);
 			}
 			else if(ts->iMode == 11) //domination
 			{

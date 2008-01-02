@@ -1113,6 +1113,10 @@ void CMap::loadPlatforms(FILE * mapfile, bool fPreview, int version[4], short * 
 					tile->iRow = iTile / TILESETWIDTH;
 
 					TileType type = g_tilesetmanager.GetClassicTileset()->GetTileType(tile->iCol, tile->iRow);
+
+					//if(type < 0 || type > 12)
+					//	type = tile_nonsolid;
+
 					types[iCol][iRow].iType = type;
 					types[iCol][iRow].iFlags = g_iTileTypeConversion[type];
 				}
@@ -1342,9 +1346,21 @@ void CMap::saveMap(const std::string& file)
 				//Tile sprites (4 layers)
 				//WriteInt(mapdata[i][j][k], mapfile);
 
-				WriteByteFromShort(mapdata[i][j][k].iID, mapfile);
-				WriteByteFromShort(mapdata[i][j][k].iCol, mapfile);
-				WriteByteFromShort(mapdata[i][j][k].iRow, mapfile);
+				TilesetTile * tile = &mapdata[i][j][k];
+
+				//Make sure the tile's col and row are within the tileset
+				if(tile->iID >= 0)
+				{
+					if(tile->iCol < 0 || tile->iCol >= g_tilesetmanager.GetTileset(tile->iID)->GetWidth())
+						tile->iCol = 0;
+
+					if(tile->iRow < 0 || tile->iRow >= g_tilesetmanager.GetTileset(tile->iID)->GetHeight())
+						tile->iRow = 0;
+				}
+
+				WriteByteFromShort(tile->iID, mapfile);
+				WriteByteFromShort(tile->iCol, mapfile);
+				WriteByteFromShort(tile->iRow, mapfile);
 			}
 			
 			//Interaction blocks
@@ -1373,6 +1389,17 @@ void CMap::saveMap(const std::string& file)
 			for(short iRow = 0; iRow < platforms[iPlatform]->iTileHeight; iRow++)	
 			{
 				TilesetTile * tile = &platforms[iPlatform]->iTileData[iCol][iRow];
+				
+				//Make sure the tile's col and row are within the tileset
+				if(tile->iID >= 0)
+				{
+					if(tile->iCol < 0 || tile->iCol >= g_tilesetmanager.GetTileset(tile->iID)->GetWidth())
+						tile->iCol = 0;
+
+					if(tile->iRow < 0 || tile->iRow >= g_tilesetmanager.GetTileset(tile->iID)->GetHeight())
+						tile->iRow = 0;
+				}
+
 				WriteByteFromShort(tile->iID, mapfile);
 				WriteByteFromShort(tile->iCol, mapfile);
 				WriteByteFromShort(tile->iRow, mapfile);

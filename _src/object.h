@@ -735,6 +735,24 @@ class PU_BoomerangPowerup : public MO_Powerup
 		bool collide(CPlayer * player);
 };
 
+class PU_ExtraHeartPowerup : public MO_Powerup
+{
+	public:
+		PU_ExtraHeartPowerup(gfxSprite *nspr, short x, short y);
+		~PU_ExtraHeartPowerup(){};
+
+		bool collide(CPlayer * player);
+};
+
+class PU_ExtraTimePowerup : public MO_Powerup
+{
+	public:
+		PU_ExtraTimePowerup(gfxSprite *nspr, short x, short y);
+		~PU_ExtraTimePowerup(){};
+
+		bool collide(CPlayer * player);
+};
+
 class MO_Fireball : public IO_MovingObject
 {
 	public:

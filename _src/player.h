@@ -471,6 +471,7 @@ class CPlayer
 		friend class PU_MysteryMushroomPowerup;
         friend class PU_Tanooki;
 		friend class PU_BombPowerup;
+		friend class PU_ExtraHeartPowerup;
 		friend class MysteryMushroomTempPlayer;
 		friend class MO_Coin;
 		friend class PU_TreasureChestBonus;

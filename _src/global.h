@@ -362,6 +362,8 @@ extern gfxSprite		spr_featherpowerup;
 extern gfxSprite		spr_leafpowerup;
 extern gfxSprite		spr_bombpowerup;
 extern gfxSprite		spr_pwingspowerup;
+extern gfxSprite		spr_extraheartpowerup;
+extern gfxSprite		spr_extratimepowerup;
 
 extern gfxSprite		spr_shade[3];
 extern gfxSprite		spr_scorehearts;
@@ -576,6 +578,11 @@ struct ts
 	short		total;		//used for running total in a tour
 };
 
+struct TimeGameModeSettings
+{
+	short percentextratime; //percent chance a stopwatch with extra game time will spawn
+};
+
 struct JailGameModeSettings
 {
 	short style;			//Style of play: classic, owned, free for all
@@ -618,6 +625,7 @@ struct StarGameModeSettings
 {
 	short time;				//Time to get rid or keep star
 	short shine;			//If we are playing shine mode vs. ztar vs. stars mode
+	short percentextratime; //percent chance a stopwatch with extra game time will spawn
 };
 
 struct DominationGameModeSettings
@@ -667,6 +675,7 @@ struct HealthGameModeSettings
 
 struct GameModeSettings
 {
+	TimeGameModeSettings time;
 	JailGameModeSettings jail;
 	CoinGameModeSettings coins;
 	StompGameModeSettings stomp;

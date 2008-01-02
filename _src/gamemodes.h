@@ -113,6 +113,8 @@ class CGM_TimeLimit : public CGameMode
 		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
 		short playerkilledself(CPlayer &player, killstyle style);
 
+		void addtime(short iTime);
+
 #ifdef _DEBUG
 		void setdebuggoal() {goal = 30;}
 #endif

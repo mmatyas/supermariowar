@@ -217,6 +217,9 @@ bool LoadGameGraphics()
 	gfx_loadimage(&spr_bombpowerup, convertPath("gfx/packs/powerups/bombpowerup.png", graphicspack), true);
 	gfx_loadimage(&spr_pwingspowerup, convertPath("gfx/packs/powerups/pwings.png", graphicspack), true);
 
+	gfx_loadimage(&spr_extraheartpowerup, convertPath("gfx/packs/powerups/heartpowerup.png", graphicspack), true);
+	gfx_loadimage(&spr_extratimepowerup, convertPath("gfx/packs/powerups/extratimepowerup.png", graphicspack), true);
+
 	gfx_loadimage(&spr_shade[0], convertPath("gfx/packs/eyecandy/shade1.png", graphicspack), 64, false);
 	gfx_loadimage(&spr_shade[1], convertPath("gfx/packs/eyecandy/shade2.png", graphicspack), 64, false);
 	gfx_loadimage(&spr_shade[2], convertPath("gfx/packs/eyecandy/shade3.png", graphicspack), 64, false);

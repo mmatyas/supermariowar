@@ -564,7 +564,7 @@ void MovingPlatform::collide(CPlayer * player)
 				else if(((t1 & tile_flag_death_on_left) || (t2 & tile_flag_death_on_left)) &&
 					!player->invincible && !player->spawninvincible)
 				{
-					if(player_kill_nonkill != player->KillPlayerMapHazard(false))
+					if(player_kill_nonkill != player->KillPlayerMapHazard(true))
 						return;
 				}
 				else
@@ -586,8 +586,8 @@ void MovingPlatform::collide(CPlayer * player)
 					IO_Block * topblock = g_map.block(iTestBackgroundX, iTestBackgroundY);
 					IO_Block * bottomblock = g_map.block(iTestBackgroundX, iTestBackgroundY2);
 
-					if((topblock && !topblock->isTransparent()) || 
-						(bottomblock && !bottomblock->isTransparent()) ||
+					if((topblock && !topblock->isTransparent() && !topblock->isHidden()) || 
+						(bottomblock && !bottomblock->isTransparent() && !bottomblock->isHidden()) ||
 						(g_map.map(iTestBackgroundX, iTestBackgroundY) & tile_flag_solid)|| 
 						(g_map.map(iTestBackgroundX, iTestBackgroundY2) & tile_flag_solid))
 					{
@@ -640,7 +640,7 @@ void MovingPlatform::collide(CPlayer * player)
 				else if(((t1 & tile_flag_death_on_right) || (t2 & tile_flag_death_on_right)) &&
 					!player->invincible && !player->spawninvincible)
 				{
-					if(player_kill_nonkill != player->KillPlayerMapHazard(false))
+					if(player_kill_nonkill != player->KillPlayerMapHazard(true))
 						return;				
 				}
 				else
@@ -656,8 +656,8 @@ void MovingPlatform::collide(CPlayer * player)
 					IO_Block * topblock = g_map.block(iTestBackgroundX, iTestBackgroundY);
 					IO_Block * bottomblock = g_map.block(iTestBackgroundX, iTestBackgroundY2);
 
-					if((topblock && !topblock->isTransparent()) || 
-						(bottomblock && !bottomblock->isTransparent()) ||
+					if((topblock && !topblock->isTransparent() && !topblock->isHidden()) || 
+						(bottomblock && !bottomblock->isTransparent() && !bottomblock->isHidden()) ||
 						(g_map.map(iTestBackgroundX, iTestBackgroundY) & tile_flag_solid) || 
 						(g_map.map(iTestBackgroundX, iTestBackgroundY2) & tile_flag_solid))
 					{
@@ -743,7 +743,7 @@ void MovingPlatform::collide(CPlayer * player)
 			}
 			else if((t1 & tile_flag_death_on_bottom) || (t2 & tile_flag_death_on_bottom))
 			{
-				if(player_kill_nonkill != player->KillPlayerMapHazard(false))
+				if(player_kill_nonkill != player->KillPlayerMapHazard(true))
 					return;
 			}
 		}
@@ -845,7 +845,7 @@ void MovingPlatform::collide(CPlayer * player)
 			}
 			else if(t1 & tile_flag_death_on_top || t2 & tile_flag_death_on_top)
 			{
-				if(player_kill_nonkill != player->KillPlayerMapHazard(false))
+				if(player_kill_nonkill != player->KillPlayerMapHazard(true))
 					return;
 			}
 			else
@@ -1008,8 +1008,8 @@ void MovingPlatform::collide(IO_MovingObject * object)
 					IO_Block * topblock = g_map.block(iTestBackgroundX, iTestBackgroundY);
 					IO_Block * bottomblock = g_map.block(iTestBackgroundX, iTestBackgroundY2);
 
-					if((topblock && !topblock->isTransparent()) || 
-						(bottomblock && !bottomblock->isTransparent()) ||
+					if((topblock && !topblock->isTransparent() && !topblock->isHidden()) || 
+						(bottomblock && !bottomblock->isTransparent() && !bottomblock->isHidden()) ||
 						(g_map.map(iTestBackgroundX, iTestBackgroundY) & tile_flag_solid) || 
 						(g_map.map(iTestBackgroundX, iTestBackgroundY2) & tile_flag_solid))
 					{
@@ -1071,8 +1071,8 @@ void MovingPlatform::collide(IO_MovingObject * object)
 					IO_Block * topblock = g_map.block(iTestBackgroundX, iTestBackgroundY);
 					IO_Block * bottomblock = g_map.block(iTestBackgroundX, iTestBackgroundY2);
 
-					if((topblock && !topblock->isTransparent()) || 
-						(bottomblock && !bottomblock->isTransparent()) ||
+					if((topblock && !topblock->isTransparent() && !topblock->isHidden()) || 
+						(bottomblock && !bottomblock->isTransparent() && !bottomblock->isHidden()) ||
 						(g_map.map(iTestBackgroundX, iTestBackgroundY) & tile_flag_solid) || 
 						(g_map.map(iTestBackgroundX, iTestBackgroundY2) & tile_flag_solid))
 					{

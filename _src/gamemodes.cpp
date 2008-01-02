@@ -91,7 +91,7 @@ void SetupScoreBoard(bool fOrderMatters)
 			if(tourStop->wsbBonuses[iBonus].iWinnerPlace == 0)
 			{
 				short iBonusType = tourStop->wsbBonuses[iBonus].iBonus;
-				objectcollisionitems.add(new PU_TreasureChestBonus(&spr_bonuschest, 1, 32000, 30, 30, 1, 1, iBonusType));
+				objectcollisionitems.add(new PU_TreasureChestBonus(&spr_bonuschest, 1, 0, 30, 30, 1, 1, iBonusType));
 				game_values.noexittimer = 0;
 				game_values.noexit = false;
 			}
@@ -103,10 +103,14 @@ void ShowScoreBoard()
 {
 	game_values.showscoreboard = true;
 
+	short iScoreboardElementHeight = 45;
+	if(game_values.gamemode->gamemode == game_mode_health)
+		iScoreboardElementHeight = 63;
+
 	for(short i = 0; i < score_cnt; i++)
 	{
 		score[i]->destx = 309 - 34 * game_values.teamcounts[i];
-		score[i]->desty = score[i]->displayorder * 45 + 150;
+		score[i]->desty = score[i]->displayorder * iScoreboardElementHeight + 140;
 	}
 
 	if(game_values.music)
@@ -517,6 +521,12 @@ void CGM_TimeLimit::SetDigitCounters()
 		iDigitMiddleDstX = iScoreOffsetX + 21;
 		iDigitRightDstX = iScoreOffsetX + 39;
 	}
+}
+
+void CGM_TimeLimit::addtime(short iTime)
+{
+	timeleft += iTime;
+	SetDigitCounters();
 }
 
 //mariowar (x lives - counting down)
@@ -2540,8 +2550,12 @@ short CGM_Health::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killsty
 
 	if(--other.score->subscore[0] <= 0)
 	{
-		other.score->subscore[0] = other.score->subscore[1];
-		return CGM_Classic::playerkilledplayer(inflictor, other, style);
+		short iRet = CGM_Classic::playerkilledplayer(inflictor, other, style);
+
+		if(iRet == player_kill_normal)
+			other.score->subscore[0] = other.score->subscore[1];
+
+		return iRet;
 	}
 	else
 	{
@@ -2561,8 +2575,12 @@ short CGM_Health::playerkilledself(CPlayer &player, killstyle style)
 
 	if(--player.score->subscore[0] <= 0)
 	{
-		player.score->subscore[0] = player.score->subscore[1];
-		return CGM_Classic::playerkilledself(player, style);
+		short iRet = CGM_Classic::playerkilledself(player, style);
+
+		if(iRet == player_kill_normal)
+			player.score->subscore[0] = player.score->subscore[1];
+
+		return iRet;
 	}
 	else
 	{
@@ -2782,11 +2800,11 @@ bool CGM_Boss::SetWinner(CPlayer * player)
 	game_values.noexit = true;
 	
 	if(iBossType == 0)
-		objectcollisionitems.add(new PU_SledgeHammerPowerup(&spr_sledgehammerpowerup, 304, -32, 1, 32000, 30, 30, 1, 1));
+		objectcollisionitems.add(new PU_SledgeHammerPowerup(&spr_sledgehammerpowerup, 304, -32, 1, 0, 30, 30, 1, 1));
 	else if(iBossType == 1)
-		objectcollisionitems.add(new PU_BombPowerup(&spr_bombpowerup, 304, -32, 1, 32000, 30, 30, 1, 1));
+		objectcollisionitems.add(new PU_BombPowerup(&spr_bombpowerup, 304, -32, 1, 0, 30, 30, 1, 1));
 	else if(iBossType == 2)
-		objectcollisionitems.add(new PU_PodoboPowerup(&spr_podobopowerup, 304, -32, 1, 32000, 30, 30, 1, 1));
+		objectcollisionitems.add(new PU_PodoboPowerup(&spr_podobopowerup, 304, -32, 1, 0, 30, 30, 1, 1));
 
 	return true;
 }

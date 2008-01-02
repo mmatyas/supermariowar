@@ -1319,6 +1319,53 @@ void Menu::CreateMenu()
 	mWorldMenu.SetHeadControl(miWorld);
 	mWorldMenu.SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
 
+	//***********************
+	// Time Limit Mode Settings
+	//***********************
+
+	miTimeLimitModePercentExtraTime = new MI_SliderField(&spr_selectfield, &menu_slider_bar, 120, 220, "Extra Time", 400, 150, 384);
+	miTimeLimitModePercentExtraTime->Add("0", 0, "", false, false);
+	miTimeLimitModePercentExtraTime->Add("5", 5, "", false, false);
+	miTimeLimitModePercentExtraTime->Add("10", 10, "", false, false);
+	miTimeLimitModePercentExtraTime->Add("15", 15, "", false, false);
+	miTimeLimitModePercentExtraTime->Add("20", 20, "", false, false);
+	miTimeLimitModePercentExtraTime->Add("25", 25, "", false, false);
+	miTimeLimitModePercentExtraTime->Add("30", 30, "", false, false);
+	miTimeLimitModePercentExtraTime->Add("35", 35, "", false, false);
+	miTimeLimitModePercentExtraTime->Add("40", 40, "", false, false);
+	miTimeLimitModePercentExtraTime->Add("45", 45, "", false, false);
+	miTimeLimitModePercentExtraTime->Add("50", 50, "", false, false);
+	miTimeLimitModePercentExtraTime->Add("55", 55, "", false, false);
+	miTimeLimitModePercentExtraTime->Add("60", 60, "", false, false);
+	miTimeLimitModePercentExtraTime->Add("65", 65, "", false, false);
+	miTimeLimitModePercentExtraTime->Add("70", 70, "", false, false);
+	miTimeLimitModePercentExtraTime->Add("75", 75, "", false, false);
+	miTimeLimitModePercentExtraTime->Add("80", 80, "", false, false);
+	miTimeLimitModePercentExtraTime->Add("85", 85, "", false, false);
+	miTimeLimitModePercentExtraTime->Add("90", 90, "", false, false);
+	miTimeLimitModePercentExtraTime->Add("95", 95, "", false, false);
+	miTimeLimitModePercentExtraTime->Add("100", 100, "", false, false);
+	miTimeLimitModePercentExtraTime->SetData(&game_values.gamemodemenusettings.time.percentextratime, NULL, NULL);
+	miTimeLimitModePercentExtraTime->SetKey(game_values.gamemodemenusettings.time.percentextratime);
+	miTimeLimitModePercentExtraTime->SetNoWrap(true);
+
+	miTimeLimitModeBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
+	miTimeLimitModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
+
+	miTimeLimitModeLeftHeaderBar = new MI_Image(&menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
+	miTimeLimitModeRightHeaderBar = new MI_Image(&menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
+	miTimeLimitModeHeaderText = new MI_Text("Jail Mode Menu", 320, 5, 0, 2, 1);
+
+	mModeSettingsMenu[2].AddControl(miTimeLimitModePercentExtraTime, miTimeLimitModeBackButton, miTimeLimitModeBackButton, NULL, miTimeLimitModeBackButton);
+	mModeSettingsMenu[2].AddControl(miTimeLimitModeBackButton, miTimeLimitModePercentExtraTime, miTimeLimitModePercentExtraTime, miTimeLimitModePercentExtraTime, NULL);
+	
+	mModeSettingsMenu[2].AddNonControl(miTimeLimitModeLeftHeaderBar);
+	mModeSettingsMenu[2].AddNonControl(miTimeLimitModeRightHeaderBar);
+	mModeSettingsMenu[2].AddNonControl(miTimeLimitModeHeaderText);
+	
+	mModeSettingsMenu[2].SetHeadControl(miTimeLimitModePercentExtraTime);
+	mModeSettingsMenu[2].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
+
 
 	//***********************
 	// Jail Mode Settings
@@ -1558,7 +1605,7 @@ void Menu::CreateMenu()
 	// Star Mode Settings
 	//***********************
 
-	miStarModeTimeField = new MI_SelectField(&spr_selectfield, 120, 200, "Time", 400, 180);
+	miStarModeTimeField = new MI_SelectField(&spr_selectfield, 120, 180, "Time", 400, 150);
 	miStarModeTimeField->Add("5 Seconds", 5, "", false, false);
 	miStarModeTimeField->Add("10 Seconds", 10, "", false, false);
 	miStarModeTimeField->Add("15 Seconds", 15, "", false, false);
@@ -1574,12 +1621,38 @@ void Menu::CreateMenu()
 	miStarModeTimeField->SetData(&game_values.gamemodemenusettings.star.time, NULL, NULL);
 	miStarModeTimeField->SetKey(game_values.gamemodemenusettings.star.time);
 
-	miStarModeShineField = new MI_SelectField(&spr_selectfield, 120, 240, "Star Type", 400, 180);
+	miStarModeShineField = new MI_SelectField(&spr_selectfield, 120, 220, "Star Type", 400, 150);
 	miStarModeShineField->Add("Ztar", 0, "", false, false);
 	miStarModeShineField->Add("Shine", 1, "", false, false);
 	miStarModeShineField->SetData(&game_values.gamemodemenusettings.star.shine, NULL, NULL);
 	miStarModeShineField->SetKey(game_values.gamemodemenusettings.star.shine);
 	miStarModeShineField->SetAutoAdvance(true);
+
+	miStarModePercentExtraTime = new MI_SliderField(&spr_selectfield, &menu_slider_bar, 120, 260, "Extra Time", 400, 150, 384);
+	miStarModePercentExtraTime->Add("0", 0, "", false, false);
+	miStarModePercentExtraTime->Add("5", 5, "", false, false);
+	miStarModePercentExtraTime->Add("10", 10, "", false, false);
+	miStarModePercentExtraTime->Add("15", 15, "", false, false);
+	miStarModePercentExtraTime->Add("20", 20, "", false, false);
+	miStarModePercentExtraTime->Add("25", 25, "", false, false);
+	miStarModePercentExtraTime->Add("30", 30, "", false, false);
+	miStarModePercentExtraTime->Add("35", 35, "", false, false);
+	miStarModePercentExtraTime->Add("40", 40, "", false, false);
+	miStarModePercentExtraTime->Add("45", 45, "", false, false);
+	miStarModePercentExtraTime->Add("50", 50, "", false, false);
+	miStarModePercentExtraTime->Add("55", 55, "", false, false);
+	miStarModePercentExtraTime->Add("60", 60, "", false, false);
+	miStarModePercentExtraTime->Add("65", 65, "", false, false);
+	miStarModePercentExtraTime->Add("70", 70, "", false, false);
+	miStarModePercentExtraTime->Add("75", 75, "", false, false);
+	miStarModePercentExtraTime->Add("80", 80, "", false, false);
+	miStarModePercentExtraTime->Add("85", 85, "", false, false);
+	miStarModePercentExtraTime->Add("90", 90, "", false, false);
+	miStarModePercentExtraTime->Add("95", 95, "", false, false);
+	miStarModePercentExtraTime->Add("100", 100, "", false, false);
+	miStarModePercentExtraTime->SetData(&game_values.gamemodemenusettings.star.percentextratime, NULL, NULL);
+	miStarModePercentExtraTime->SetKey(game_values.gamemodemenusettings.star.percentextratime);
+	miStarModePercentExtraTime->SetNoWrap(true);
 
 	miStarModeBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
 	miStarModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
@@ -1589,8 +1662,9 @@ void Menu::CreateMenu()
 	miStarModeHeaderText = new MI_Text("Star Mode Menu", 320, 5, 0, 2, 1);
 
 	mModeSettingsMenu[10].AddControl(miStarModeTimeField, miStarModeBackButton, miStarModeShineField, NULL, miStarModeBackButton);
-	mModeSettingsMenu[10].AddControl(miStarModeShineField, miStarModeTimeField, miStarModeBackButton, NULL, miStarModeBackButton);
-	mModeSettingsMenu[10].AddControl(miStarModeBackButton, miStarModeShineField, miStarModeTimeField, miStarModeShineField, NULL);
+	mModeSettingsMenu[10].AddControl(miStarModeShineField, miStarModeTimeField, miStarModePercentExtraTime, NULL, miStarModeBackButton);
+	mModeSettingsMenu[10].AddControl(miStarModePercentExtraTime, miStarModeShineField, miStarModeBackButton, NULL, miStarModeBackButton);
+	mModeSettingsMenu[10].AddControl(miStarModeBackButton, miStarModePercentExtraTime, miStarModeTimeField, miStarModePercentExtraTime, NULL);
 	
 	mModeSettingsMenu[10].AddNonControl(miStarModeLeftHeaderBar);
 	mModeSettingsMenu[10].AddNonControl(miStarModeRightHeaderBar);
@@ -2577,7 +2651,7 @@ void Menu::RunMenu()
 		{
 			MenuCodeEnum code = mCurrentMenu->SendInput(&game_values.playerInput);
 
-			bool fShowSettingsButton[GAMEMODE_LAST] = {false, false, false, true, true, true, false, true, true, true, true, true, true, true, false, true, true, false, true, false};
+			bool fShowSettingsButton[GAMEMODE_LAST] = {false, false, true, true, true, true, false, true, true, true, true, true, true, true, false, true, true, false, true, false};
 
 			if(MENU_CODE_EXIT_APPLICATION == code)
 			{

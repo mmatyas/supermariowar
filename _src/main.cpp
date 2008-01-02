@@ -31,8 +31,8 @@
 //TODO
 //3) When PlayerKilledPlayer does not kill a player, then it hidden blocks that were hit could result in a player getting trapped in htem
 //   This happens if the player is sitting still when the hidden block is revealed
-//4) Strange coin error where it falls very fast in greed mode -> need more debugging time!
-//5) Needs lots of testing around not killing a player with various kill methods - test greed mode vs. frag mode kills
+
+//4) Still reports of disappearing map tiles - caused when rRects is used out of bounds causing w and h to be set to 0 - happened with platform with tile using row 960
 
 #ifdef _XBOX
 	#include <xtl.h>
@@ -169,6 +169,8 @@ gfxSprite		spr_leafpowerup;
 gfxSprite		spr_bombpowerup;
 gfxSprite		spr_pwingspowerup;
 gfxSprite       spr_tanooki, spr_statue;
+gfxSprite		spr_extraheartpowerup;
+gfxSprite		spr_extratimepowerup;
 
 gfxSprite		spr_shade[3];
 gfxSprite		spr_scorehearts;
@@ -836,6 +838,9 @@ int main(int argc, char *argv[])
 
 	//Setup the default game mode settings
 
+	//Time Limit
+	game_values.gamemodemenusettings.time.percentextratime = 10;	//10% chance of a heart spawning
+
 	//Jail
 	game_values.gamemodemenusettings.jail.style = 1;			//defaults to color jail play
 	game_values.gamemodemenusettings.jail.tagfree = true;		//players on same team can free player by touching
@@ -866,8 +871,9 @@ int main(int argc, char *argv[])
 	game_values.gamemodemenusettings.tag.tagontouch = true;  //default to transfer tag on touching other players
 
 	//Star
-	game_values.gamemodemenusettings.star.time = 30;			//default to 30 seconds
-	game_values.gamemodemenusettings.star.shine = 0;		//default to hot potato (ztar)
+	game_values.gamemodemenusettings.star.time = 30;				//default to 30 seconds
+	game_values.gamemodemenusettings.star.shine = 0;				//default to hot potato (ztar)
+	game_values.gamemodemenusettings.star.percentextratime = 10;	//10 percent chance of an extra time poweurp spawning
 
 	//Domination
 	game_values.gamemodemenusettings.domination.loseondeath = true;
@@ -1688,31 +1694,29 @@ void RunGame()
 					else if(event.key.keysym.sym == SDLK_1)
 					{
 						if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-							objectcollisionitems.add(new PU_SledgeHammerPowerup(&spr_sledgehammerpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, 32000, 30, 30, 1, 1));
+							objectcollisionitems.add(new PU_SledgeHammerPowerup(&spr_sledgehammerpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, 0, 30, 30, 1, 1));
 						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-							objectcollisionitems.add(new PU_BobombPowerup(&spr_bobombpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 32000, 30, 30, 1, 1));	
+							objectcollisionitems.add(new PU_BobombPowerup(&spr_bobombpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));	
 						else
 							objectcollisionitems.add(new PU_StarPowerup(&spr_starpowerup, list_players[0]->ix + 32, list_players[0]->iy, 4, true, 2, 30, 30, 1, 1));
 					}
 					else if(event.key.keysym.sym == SDLK_2)
 					{
 						if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-						{
-							objectcollisionitems.add(new PU_BombPowerup(&spr_bombpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, 32000, 30, 30, 1, 1));
-						}
+							objectcollisionitems.add(new PU_BombPowerup(&spr_bombpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, 0, 30, 30, 1, 1));
 						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
 							objectcollisionitems.add(new PU_PowPowerup(&spr_powpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 8, true, 8, 30, 30, 1, 1));
 						else
-							objectcollisionitems.add(new PU_ExtraGuyPowerup(&spr_1uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 32000, 30, 30, 1, 1, 1));
+							objectcollisionitems.add(new PU_ExtraGuyPowerup(&spr_1uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1, 1));
 					}
 					else if(event.key.keysym.sym == SDLK_3)
 					{
 						if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-							objectcollisionitems.add(new PU_PodoboPowerup(&spr_podobopowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, 32000, 30, 30, 1, 1));
+							objectcollisionitems.add(new PU_PodoboPowerup(&spr_podobopowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, 0, 30, 30, 1, 1));
 						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-							objectcollisionitems.add(new PU_BulletBillPowerup(&spr_bulletbillpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 32000, 30, 30, 1, 1));
+							objectcollisionitems.add(new PU_BulletBillPowerup(&spr_bulletbillpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));
 						else
-							objectcollisionitems.add(new PU_ExtraGuyPowerup(&spr_2uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 32000, 30, 30, 1, 1, 2));
+							objectcollisionitems.add(new PU_ExtraGuyPowerup(&spr_2uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1, 2));
 					}
 					else if(event.key.keysym.sym == SDLK_4)
 					{
@@ -1721,7 +1725,7 @@ void RunGame()
 						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
 							objectsplayer.add(new CO_Shell(0, list_players[0]->ix + 32, list_players[0]->iy, true, true, true, false));
 						else
-							objectcollisionitems.add(new PU_ExtraGuyPowerup(&spr_3uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 32000, 30, 30, 1, 1, 3));
+							objectcollisionitems.add(new PU_ExtraGuyPowerup(&spr_3uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1, 3));
 					}
 					else if(event.key.keysym.sym == SDLK_5)
 					{
@@ -1730,14 +1734,14 @@ void RunGame()
 						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
 							objectsplayer.add(new CO_Shell(1, list_players[0]->ix + 32, list_players[0]->iy, false, true, true, false));
 						else
-							objectcollisionitems.add(new PU_ExtraGuyPowerup(&spr_5uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 32000, 30, 30, 1, 1, 5));
+							objectcollisionitems.add(new PU_ExtraGuyPowerup(&spr_5uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1, 5));
 					}
 					else if(event.key.keysym.sym == SDLK_6)
 					{
 						if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
 							objectsplayer.add(new CO_Shell(2, list_players[0]->ix + 32, list_players[0]->iy, false, false, true, true));
 						else
-							objectcollisionitems.add(new PU_FirePowerup(&spr_firepowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 32000, 30, 30, 1, 1));
+							objectcollisionitems.add(new PU_FirePowerup(&spr_firepowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1));
 					}
 					else if(event.key.keysym.sym == SDLK_7)
 					{
@@ -1746,7 +1750,7 @@ void RunGame()
 						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
 							objectsplayer.add(new CO_Shell(3, list_players[0]->ix + 32, list_players[0]->iy, false, true, false, false));
 						else
-							objectcollisionitems.add(new PU_HammerPowerup(&spr_hammerpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 32000, 30, 30, 1, 1));
+							objectcollisionitems.add(new PU_HammerPowerup(&spr_hammerpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1));
 					}
 					else if(event.key.keysym.sym == SDLK_8)
 					{
@@ -1755,25 +1759,25 @@ void RunGame()
 						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
 							objectcollisionitems.add(new PU_ModPowerup(&spr_modpowerup, list_players[0]->ix + 32, list_players[0]->iy, 8, true, 8, 30, 30, 1, 1));
 						else
-							objectcollisionitems.add(new PU_PoisonPowerup(&spr_poisonpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 32000, 30, 30, 1, 1));
+							objectcollisionitems.add(new PU_PoisonPowerup(&spr_poisonpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1));
 					}
 					else if(event.key.keysym.sym == SDLK_9)
 					{
 						if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
 							objectsplayer.add(new CO_KuriboShoe(&spr_kuriboshoe, list_players[0]->ix + 32, list_players[0]->iy));
 						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-							objectcollisionitems.add(new PU_FeatherPowerup(&spr_featherpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, 32000, 30, 30, 1, 1));
+							objectcollisionitems.add(new PU_FeatherPowerup(&spr_featherpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, 0, 30, 30, 1, 1));
 						else
-							objectcollisionitems.add(new PU_ClockPowerup(&spr_clockpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 32000, 30, 30, 1, 1));
+							objectcollisionitems.add(new PU_ClockPowerup(&spr_clockpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));
 					}
 					else if(event.key.keysym.sym == SDLK_0)
 					{
 						if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-							objectcollisionitems.add(new PU_LeafPowerup(&spr_leafpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, 32000, 30, 30, 1, 1));
+							objectcollisionitems.add(new PU_LeafPowerup(&spr_leafpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, 0, 30, 30, 1, 1));
 						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-							objectcollisionitems.add(new PU_BoomerangPowerup(&spr_boomerangpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 32000, 30, 30, 1, 1));
+							objectcollisionitems.add(new PU_BoomerangPowerup(&spr_boomerangpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));
 						else
-							objectcollisionitems.add(new PU_MysteryMushroomPowerup(&spr_mysterymushroompowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 32000, 30, 30, 1, 1));
+							objectcollisionitems.add(new PU_MysteryMushroomPowerup(&spr_mysterymushroompowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));
 					}
 					else if(event.key.keysym.sym == SDLK_INSERT)
 					{
@@ -2671,7 +2675,7 @@ void RunGame()
 						sprintf(gameovertext, "Tie Game");
 					}
 						
-					game_font_large.drawCentered(320, 100, gameovertext);
+					game_font_large.drawCentered(320, 90, gameovertext);
 
 				}
 
@@ -2752,19 +2756,24 @@ void RunGame()
 					if(game_values.gamemode->gamemode == game_mode_health)
 					{
 						short iLife = score[i]->subscore[0];
-						short iHeartX = score[i]->x + scorepowerupoffsets[game_values.teamcounts[i] - 1][0] - 9;
+						short iMax = score[i]->subscore[1];
+						short iHeartX = score[i]->x + scorepowerupoffsets[game_values.teamcounts[i] - 1][0] - 32;
 
-						for(short iHeart = 0; iHeart < iLife - 1; iHeart += 2)
-							spr_scorehearts.draw(iHeartX + iHeart * 6, score[i]->y + 43, 0, 0, 11, 15);
-
-						if(iLife % 2)
+						for(short iHeart = 0; iHeart < iLife; iHeart++)
 						{
-							spr_scorehearts.draw(iHeartX + iHeart * 6, score[i]->y + 43, 11, 0, 11, 15);
-							iLife++;
+							if(iHeart == iMax - 1 && iHeart % 2 == 0)
+								spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, 32, 0, 8, 16);
+							else
+								spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, iHeart % 2 ? 8 : 0, 0, 8, 16);
 						}
 
-						for(short iHeart = iLife; iHeart < score[i]->subscore[1]; iHeart += 2)
-							spr_scorehearts.draw(iHeartX + iHeart * 6, score[i]->y + 43, 22, 0, 11, 15);
+						for(short iHeart = iLife; iHeart < iMax; iHeart++)
+						{
+							if(iHeart == iMax - 1 && iHeart % 2 == 0)
+								spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, 40, 0, 8, 16);
+							else
+								spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, iHeart % 2 ? 24 : 16, 0, 8, 16);
+						}
 					}
 					
 					short iScoreX = score[i]->x + iScoreTextOffset[i];

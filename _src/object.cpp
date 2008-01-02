@@ -430,61 +430,73 @@ void B_PowerupBlock::update()
 			state = 3;
 			yi(iposy);
 
-			short iSelectedPowerup = SelectPowerup();
+			if(game_values.gamemode->gamemode == game_mode_health && rand() % 100 < game_values.gamemodesettings.health.percentextralife)
+			{
+				objectcollisionitems.add(new PU_ExtraHeartPowerup(&spr_extraheartpowerup, ix + 1, iy - 1));
+			}
+			else if((game_values.gamemode->gamemode == game_mode_timelimit && rand() % 100 < game_values.gamemodesettings.time.percentextratime) ||
+				(game_values.gamemode->gamemode == game_mode_star && rand() % 100 < game_values.gamemodesettings.star.percentextratime))
+			{
+				objectcollisionitems.add(new PU_ExtraTimePowerup(&spr_extratimepowerup, ix + 1, iy - 1));				
+			}
+			else
+			{
+				short iSelectedPowerup = SelectPowerup();
 
-            if(0 == iSelectedPowerup)
-				objectcollisionitems.add(new PU_PoisonPowerup(&spr_poisonpowerup, ix + 1, iy - 1, 1, side, 32000, 30, 30, 1, 1));
-			else if(1 == iSelectedPowerup)
-				objectcollisionitems.add(new PU_ExtraGuyPowerup(&spr_1uppowerup, ix + 1, iy - 1, 1, side, 32000, 30, 30, 1, 1, 1));
-			else if(2 == iSelectedPowerup)
-				objectcollisionitems.add(new PU_ExtraGuyPowerup(&spr_2uppowerup, ix + 1, iy - 1, 1, side, 32000, 30, 30, 1, 1, 2));
-			else if(3 == iSelectedPowerup)
-				objectcollisionitems.add(new PU_ExtraGuyPowerup(&spr_3uppowerup, ix + 1, iy - 1, 1, side, 32000, 30, 30, 1, 1, 3));
-			else if(4 == iSelectedPowerup)
-				objectcollisionitems.add(new PU_ExtraGuyPowerup(&spr_5uppowerup, ix + 1, iy - 1, 1, side, 32000, 30, 30, 1, 1, 5));
-			else if(5 == iSelectedPowerup)
-				objectcollisionitems.add(new PU_FirePowerup(&spr_firepowerup, ix + 1, iy - 1, 1, side, 32000, 30, 30, 1, 1));
-			else if(6 == iSelectedPowerup)
-				objectcollisionitems.add(new PU_StarPowerup(&spr_starpowerup, ix + 1, iy - 1, 4, side, 2, 30, 30, 1, 1));
-			else if(7 == iSelectedPowerup)
-				objectcollisionitems.add(new PU_ClockPowerup(&spr_clockpowerup, ix + 1, iy - 1, 1, side, 32000, 30, 30, 1, 1));
-			else if(8 == iSelectedPowerup)
-				objectcollisionitems.add(new PU_BobombPowerup(&spr_bobombpowerup, ix + 1, iy - 1, 1, side, 32000, 30, 30, 1, 1));
-			else if(9 == iSelectedPowerup)
-				objectcollisionitems.add(new PU_PowPowerup(&spr_powpowerup, ix + 1, iy - 1, 8, side, 8, 30, 30, 1, 1));
-			else if(10 == iSelectedPowerup)
-				objectcollisionitems.add(new PU_BulletBillPowerup(&spr_bulletbillpowerup, ix + 1, iy - 1, 1, side, 32000, 30, 30, 1, 1));
-			else if(11 == iSelectedPowerup)
-				objectcollisionitems.add(new PU_HammerPowerup(&spr_hammerpowerup, ix + 1, iy - 1, 1, side, 32000, 30, 30, 1, 1));
-			else if(12 == iSelectedPowerup)
-				objectsplayer.add(new CO_Shell(0, ix + 1, iy - 1, true, true, true, false));
-			else if(13 == iSelectedPowerup)
-				objectsplayer.add(new CO_Shell(1, ix + 1, iy - 1, false, true, true, false));
-			else if(14 == iSelectedPowerup)
-				objectsplayer.add(new CO_Shell(2, ix + 1, iy - 1, false, false, true, true));
-			else if(15 == iSelectedPowerup)
-				objectsplayer.add(new CO_Shell(3, ix + 1, iy - 1, false, true, false, false));
-			else if(16 == iSelectedPowerup)
-				objectcollisionitems.add(new PU_ModPowerup(&spr_modpowerup, ix + 1, iy - 1, 8, side, 8, 30, 30, 1, 1));
-			else if(17 == iSelectedPowerup)
-				objectcollisionitems.add(new PU_FeatherPowerup(&spr_featherpowerup, ix + 1, iy - 1, 1, 32000, 30, 30, 1, 1));
-			else if(18 == iSelectedPowerup)
-				objectcollisionitems.add(new PU_MysteryMushroomPowerup(&spr_mysterymushroompowerup, ix + 1, iy - 1, 1, side, 32000, 30, 30, 1, 1));
-			else if(19 == iSelectedPowerup)
-				objectcollisionitems.add(new PU_BoomerangPowerup(&spr_boomerangpowerup, ix + 1, iy - 1, 1, side, 32000, 30, 26, 1, 5));
-			else if(20 == iSelectedPowerup) 
-				objectcollisionitems.add(new PU_Tanooki(ix + 1, iy - 1));
-			else if(21 == iSelectedPowerup) 
-				objectcollisionitems.add(new PU_SledgeHammerPowerup(&spr_sledgehammerpowerup, ix + 1, iy - 1, 1, 32000, 30, 30, 1, 1));
-			else if(22 == iSelectedPowerup) 
-				objectcollisionitems.add(new PU_PodoboPowerup(&spr_podobopowerup, ix + 1, iy - 1, 1, 32000, 30, 30, 1, 1));
-			else if(23 == iSelectedPowerup) 
-				objectcollisionitems.add(new PU_BombPowerup(&spr_bombpowerup, ix + 1, iy - 1, 1, 32000, 30, 30, 1, 1));
-			else if(24 == iSelectedPowerup)
-				objectcollisionitems.add(new PU_LeafPowerup(&spr_leafpowerup, ix + 1, iy - 1, 1, 32000, 30, 30, 1, 1));
-			else if(25 == iSelectedPowerup) 
-				objectcollisionitems.add(new PU_PWingsPowerup(&spr_pwingspowerup, ix + 1, iy - 1));
-             
+				if(0 == iSelectedPowerup)
+					objectcollisionitems.add(new PU_PoisonPowerup(&spr_poisonpowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1));
+				else if(1 == iSelectedPowerup)
+					objectcollisionitems.add(new PU_ExtraGuyPowerup(&spr_1uppowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1, 1));
+				else if(2 == iSelectedPowerup)
+					objectcollisionitems.add(new PU_ExtraGuyPowerup(&spr_2uppowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1, 2));
+				else if(3 == iSelectedPowerup)
+					objectcollisionitems.add(new PU_ExtraGuyPowerup(&spr_3uppowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1, 3));
+				else if(4 == iSelectedPowerup)
+					objectcollisionitems.add(new PU_ExtraGuyPowerup(&spr_5uppowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1, 5));
+				else if(5 == iSelectedPowerup)
+					objectcollisionitems.add(new PU_FirePowerup(&spr_firepowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1));
+				else if(6 == iSelectedPowerup)
+					objectcollisionitems.add(new PU_StarPowerup(&spr_starpowerup, ix + 1, iy - 1, 4, side, 2, 30, 30, 1, 1));
+				else if(7 == iSelectedPowerup)
+					objectcollisionitems.add(new PU_ClockPowerup(&spr_clockpowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1));
+				else if(8 == iSelectedPowerup)
+					objectcollisionitems.add(new PU_BobombPowerup(&spr_bobombpowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1));
+				else if(9 == iSelectedPowerup)
+					objectcollisionitems.add(new PU_PowPowerup(&spr_powpowerup, ix + 1, iy - 1, 8, side, 8, 30, 30, 1, 1));
+				else if(10 == iSelectedPowerup)
+					objectcollisionitems.add(new PU_BulletBillPowerup(&spr_bulletbillpowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1));
+				else if(11 == iSelectedPowerup)
+					objectcollisionitems.add(new PU_HammerPowerup(&spr_hammerpowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1));
+				else if(12 == iSelectedPowerup)
+					objectsplayer.add(new CO_Shell(0, ix + 1, iy - 1, true, true, true, false));
+				else if(13 == iSelectedPowerup)
+					objectsplayer.add(new CO_Shell(1, ix + 1, iy - 1, false, true, true, false));
+				else if(14 == iSelectedPowerup)
+					objectsplayer.add(new CO_Shell(2, ix + 1, iy - 1, false, false, true, true));
+				else if(15 == iSelectedPowerup)
+					objectsplayer.add(new CO_Shell(3, ix + 1, iy - 1, false, true, false, false));
+				else if(16 == iSelectedPowerup)
+					objectcollisionitems.add(new PU_ModPowerup(&spr_modpowerup, ix + 1, iy - 1, 8, side, 8, 30, 30, 1, 1));
+				else if(17 == iSelectedPowerup)
+					objectcollisionitems.add(new PU_FeatherPowerup(&spr_featherpowerup, ix + 1, iy - 1, 1, 0, 30, 30, 1, 1));
+				else if(18 == iSelectedPowerup)
+					objectcollisionitems.add(new PU_MysteryMushroomPowerup(&spr_mysterymushroompowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1));
+				else if(19 == iSelectedPowerup)
+					objectcollisionitems.add(new PU_BoomerangPowerup(&spr_boomerangpowerup, ix + 1, iy - 1, 1, side, 0, 30, 26, 1, 5));
+				else if(20 == iSelectedPowerup) 
+					objectcollisionitems.add(new PU_Tanooki(ix + 1, iy - 1));
+				else if(21 == iSelectedPowerup) 
+					objectcollisionitems.add(new PU_SledgeHammerPowerup(&spr_sledgehammerpowerup, ix + 1, iy - 1, 1, 0, 30, 30, 1, 1));
+				else if(22 == iSelectedPowerup) 
+					objectcollisionitems.add(new PU_PodoboPowerup(&spr_podobopowerup, ix + 1, iy - 1, 1, 0, 30, 30, 1, 1));
+				else if(23 == iSelectedPowerup) 
+					objectcollisionitems.add(new PU_BombPowerup(&spr_bombpowerup, ix + 1, iy - 1, 1, 0, 30, 30, 1, 1));
+				else if(24 == iSelectedPowerup)
+					objectcollisionitems.add(new PU_LeafPowerup(&spr_leafpowerup, ix + 1, iy - 1, 1, 0, 30, 30, 1, 1));
+				else if(25 == iSelectedPowerup) 
+					objectcollisionitems.add(new PU_PWingsPowerup(&spr_pwingspowerup, ix + 1, iy - 1));
+			}
+
 			ifsoundonplay(sfx_sprout);
 		}
 		else if(state == 3)
@@ -3297,7 +3309,7 @@ void MO_Powerup::update()
 		collision_detection_map();
 	}
 	
-	if(++animationtimer == animationspeed)
+	if(animationspeed > 0 && ++animationtimer == animationspeed)
 	{
 		animationtimer = 0;
 		
@@ -3305,7 +3317,6 @@ void MO_Powerup::update()
 		if(drawframe >= animationWidth)
 			drawframe = 0;
 	}
-
 }
 
 bool MO_Powerup::collide(CPlayer *)
@@ -3318,7 +3329,7 @@ bool MO_Powerup::collide(CPlayer *)
 // tanooki suit
 //------------------------------------------------------------------------------
 PU_Tanooki::PU_Tanooki(short x, short y)
-    : MO_Powerup(&spr_tanooki, x, y, 1, 32000, 30, 30, 1, 1)
+    : MO_Powerup(&spr_tanooki, x, y, 1, 0, 30, 30, 1, 1)
 {
 }
 
@@ -3344,7 +3355,7 @@ bool PU_Tanooki :: collide (CPlayer *player)
 // pwings
 //------------------------------------------------------------------------------
 PU_PWingsPowerup::PU_PWingsPowerup(gfxSprite * nspr, short x, short y)
-    : MO_Powerup(nspr, x, y, 1, 32000, 30, 30, 1, 1)
+    : MO_Powerup(nspr, x, y, 1, 0, 30, 30, 1, 1)
 {}
 
 bool PU_PWingsPowerup :: collide (CPlayer *player)
@@ -3701,7 +3712,7 @@ float PU_TreasureChestBonus::BottomBounce()
 // class treasure chest powerup
 //------------------------------------------------------------------------------
 MO_BonusHouseChest::MO_BonusHouseChest(gfxSprite *nspr, short ix, short iy, short iBonusItem) :
-	IO_MovingObject(nspr, ix, iy, 1, 32000, 64, 64, 0, 0)
+	IO_MovingObject(nspr, ix, iy, 1, 0, 64, 64, 0, 0)
 {
 	iw = 64;
 	ih = 64;
@@ -4007,6 +4018,52 @@ bool PU_BoomerangPowerup::collide(CPlayer * player)
 	dead = true;
 	return false;
 }	
+
+
+//------------------------------------------------------------------------------
+// class special heart powerup for health mode
+//------------------------------------------------------------------------------
+PU_ExtraHeartPowerup::PU_ExtraHeartPowerup(gfxSprite *nspr, short x, short y) :
+	MO_Powerup(nspr, x, y, 1, 0, 30, 30, 1, 1)
+{
+	velx = 0.0f;
+}
+
+bool PU_ExtraHeartPowerup::collide(CPlayer * player)
+{
+	if(game_values.gamemode->gamemode == game_mode_health)
+	{
+		if(player->score->subscore[1] < game_values.gamemodesettings.health.maxlife)
+			player->score->subscore[1]++;
+
+		if(player->score->subscore[0] < game_values.gamemodesettings.health.maxlife)
+			player->score->subscore[0]++;
+	}
+
+	dead = true;
+	return false;
+}
+
+//------------------------------------------------------------------------------
+// class special extra time powerup for timed or star mode
+//------------------------------------------------------------------------------
+PU_ExtraTimePowerup::PU_ExtraTimePowerup(gfxSprite *nspr, short x, short y) :
+	MO_Powerup(nspr, x, y, 1, 0, 30, 30, 1, 1)
+{
+	velx = 0.0f;
+}
+
+bool PU_ExtraTimePowerup::collide(CPlayer * player)
+{
+	if(game_values.gamemode->gamemode == game_mode_timelimit || game_values.gamemode->gamemode == game_mode_star)
+	{
+		CGM_TimeLimit * timelimitmode = (CGM_TimeLimit*)game_values.gamemode;
+		timelimitmode->addtime(30);
+	}
+
+	dead = true;
+	return false;
+}
 
 //------------------------------------------------------------------------------
 // class fireball
@@ -5014,7 +5071,7 @@ void IO_OverMapObject::update()
 	xf(fx + velx);
 	yf(fy + vely);
 
-	if(++animationtimer == animationspeed)
+	if(animationspeed > 0 && ++animationtimer == animationspeed)
 	{
 		animationtimer = 0;
 		drawframe += iw;
@@ -5028,7 +5085,7 @@ void IO_OverMapObject::update()
 // class thwomp (for thwomp mode)
 //------------------------------------------------------------------------------
 OMO_Thwomp::OMO_Thwomp(gfxSprite *nspr, short x, float nspeed) :
-	IO_OverMapObject(nspr, x, (short)-nspr->getHeight(), 1, 32000)
+	IO_OverMapObject(nspr, x, (short)-nspr->getHeight(), 1, 0)
 {
 	objectType = object_thwomp;
 	vely = nspeed;
@@ -5761,7 +5818,7 @@ void CO_Star::Kick(bool superkick)
 // class flag base (for CTF mode)
 //------------------------------------------------------------------------------
 OMO_FlagBase::OMO_FlagBase(gfxSprite *nspr, short iTeamID, short iColorID) :
-	IO_OverMapObject(nspr, 1280, 960, 5, 32000)  //use 1280 and 960 so when placing base, it doesn't interfere (look in getClosestObject())
+	IO_OverMapObject(nspr, 1280, 960, 5, 0)  //use 1280 and 960 so when placing base, it doesn't interfere (look in getClosestObject())
 {
 	state = 1;
 	iw = 32;
@@ -6207,7 +6264,7 @@ void OMO_Yoshi::collide(IO_MovingObject * object)
 // class area (for Domination mode)
 //------------------------------------------------------------------------------
 OMO_Area::OMO_Area(gfxSprite *nspr, short iNumAreas) :
-	IO_OverMapObject(nspr, 1280, 960, 5, 32000)
+	IO_OverMapObject(nspr, 1280, 960, 5, 0)
 {
 	iw = (short)spr->getWidth() / 5;
 	collisionWidth = iw;
@@ -6356,7 +6413,7 @@ void OMO_Area::setOwner(CPlayer * player)
 // class KingOfTheHillArea (for King of the Hill mode)
 //------------------------------------------------------------------------------
 OMO_KingOfTheHillZone::OMO_KingOfTheHillZone(gfxSprite *nspr) :
-	IO_OverMapObject(nspr, 0, 0, 5, 32000)
+	IO_OverMapObject(nspr, 0, 0, 5, 0)
 {
 	size = game_values.gamemodesettings.kingofthehill.areasize;
 

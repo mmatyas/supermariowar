@@ -28,7 +28,9 @@
 #Mode Options
 #0 - Classic - None
 #1 - Frag - None
-#2 - Time Limit - None
+
+#2 - Time Limit
+#Percent Extra Time - number between 0 and 100 indicating the percent chance extra time will appear from a powerup block
 
 #3 - Jail
 #Free Timer - None = 1, all other numbers greater than 1 are number of frames the jail will last (example: 620 is about 10 seconds)
@@ -63,6 +65,7 @@
 #10 - Star
 #Time - any number greater than 0, number of seconds between scores
 #Star Type - 0 = Ztar, 1 = Shine
+#Percent Extra Time - number between 0 and 100 indicating the percent chance extra time will appear from a powerup block
 
 #11 - Domination
 #Quantity - 1 to 10 is that number of bases, 11 to 18 is #Players - 1 to #Players + 6, 19 on up is 2xPlayers - 3 on up
@@ -106,6 +109,15 @@
 #Density - number relating how fast the hazards appear, the smaller the number the faster they come (10 is "High" and 40 is "Very Low")
 #Speed - any number greater than 0.  The larger the number, the faster they go. (2 is "Very Slow" and 8 is "Very Fast")
 #Shield - 0 = Off, 1 = On
+
+#17 - Greed - None
+
+#18 - Health
+#Start Life - Number of hearts each team starts with - number between 1 and 10
+#Max Life - Number of hearts that a team can collect up to - number between 1 and 10
+#Percent Extra Life - Percent chance a special heart powerup will spawn from a powerup block - number between 0 and 100
+
+#19 - Cards - None
 
 #Tour Stops (maximum 10 stops)
 #Map,Mode,Goal,Points,Bonus Wheel,Name,Options(see above)
