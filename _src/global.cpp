@@ -488,19 +488,28 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 					ts->fEndStage = false;
 			}
 
-			//jail
-			if(ts->iMode == 3)
+			if(ts->iMode == 0) //classic
+			{
+				ts->fUseSettings = true;
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.classic.style, NULL, game_values.gamemodemenusettings.classic.style, false);
+			}
+			else if(ts->iMode == 1) //frag
+			{
+				ts->fUseSettings = true;
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.frag.style, NULL, game_values.gamemodemenusettings.frag.style, false);
+			}
+			else if(ts->iMode == 2) //time
+			{
+				ts->fUseSettings = true;
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.time.percentextratime, NULL, game_values.gamemodemenusettings.time.percentextratime, false);
+			}
+			else if(ts->iMode == 3) //jail
 			{
 				ts->fUseSettings = true;
 				
 				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.jail.style, NULL, game_values.gamemodemenusettings.jail.style, false);
 				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.jail.timetofree, NULL, game_values.gamemodemenusettings.jail.timetofree, false);
 				ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.jail.tagfree, 0, game_values.gamemodemenusettings.jail.tagfree);
-			}
-			else if(ts->iMode == 2) //time
-			{
-				ts->fUseSettings = true;
-				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.time.percentextratime, NULL, game_values.gamemodemenusettings.time.percentextratime, false);
 			}
 			else if(ts->iMode == 4) //coins
 			{
@@ -603,6 +612,15 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.health.maxlife, NULL, game_values.gamemodemenusettings.health.maxlife, false);
 				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.health.percentextralife, NULL, game_values.gamemodemenusettings.health.percentextralife, false);
 			}
+			else if(ts->iMode == 19) //card collection
+			{
+				ts->fUseSettings = true;
+				
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.collection.quantity, NULL, game_values.gamemodemenusettings.collection.quantity, false);
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.collection.rate, NULL, game_values.gamemodemenusettings.collection.rate, false);
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.collection.banktime, NULL, game_values.gamemodemenusettings.collection.banktime, false);
+			}
+			
 		}
 	}
 	else if(iStageType == 1) //Bonus House
@@ -739,7 +757,31 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
 
 		if(ts->fUseSettings)
 		{
-			if(ts->iMode == 3) //jail
+			if(ts->iMode == 0) //classic
+			{
+				if(ts->iNumUsedSettings > 0)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.classic.style);
+					strcat(buffer, szTemp);
+				}
+			}
+			else if(ts->iMode == 1) //frag
+			{
+				if(ts->iNumUsedSettings > 0)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.frag.style);
+					strcat(buffer, szTemp);
+				}
+			}
+			else if(ts->iMode == 2) //time
+			{
+				if(ts->iNumUsedSettings > 0)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.time.percentextratime);
+					strcat(buffer, szTemp);
+				}
+			}
+			else if(ts->iMode == 3) //jail
 			{
 				if(ts->iNumUsedSettings > 0)
 				{
@@ -996,6 +1038,36 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
 					strcat(buffer, szTemp);
 				}
 			}
+			else if(ts->iMode == 19) //card collection
+			{
+				if(ts->iNumUsedSettings > 0)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.collection.quantity);
+					strcat(buffer, szTemp);
+				}
+
+				if(ts->iNumUsedSettings > 1)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.collection.rate);
+					strcat(buffer, szTemp);
+				}
+
+				if(ts->iNumUsedSettings > 2)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.collection.banktime);
+					strcat(buffer, szTemp);
+				}
+
+				for(short iPowerup = 0; iPowerup < 12; iPowerup++)
+				{
+					if(ts->iNumUsedSettings > iPowerup + 3)
+					{
+						sprintf(szTemp, ",%d", ts->gmsSettings.frenzy.powerupweight[iPowerup]);
+						strcat(buffer, szTemp);
+					}
+				}
+			}
+
 		}
 	}
 	else if(ts->iStageType == 1) //Bonus House

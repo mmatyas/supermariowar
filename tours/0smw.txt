@@ -26,8 +26,11 @@
 1.8.0.0
 
 #Mode Options
-#0 - Classic - None
-#1 - Frag - None
+#0 - Classic
+#Style - 0 for respawning on kill, 1 for shield and player keeps playing
+
+#1 - Frag
+#Style - 0 for respawning on kill, 1 for shield and player keeps playing
 
 #2 - Time Limit
 #Percent Extra Time - number between 0 and 100 indicating the percent chance extra time will appear from a powerup block
@@ -117,7 +120,11 @@
 #Max Life - Number of hearts that a team can collect up to - number between 1 and 10
 #Percent Extra Life - Percent chance a special heart powerup will spawn from a powerup block - number between 0 and 100
 
-#19 - Cards - None
+#19 - Cards
+#Limit - 1 to 5 = that number of cards, 6 on up = #players - 1 cards on up
+#Rate - 0 = instant, any number greater than 0 is the amount of time in frames that is between card spawns (example: 310 is about 5 seconds)
+#Bank Time - 0 = instant, any number greater than 0 is the amount of time in frames that is between card spawns (example: 310 is about 5 seconds)
+
 
 #Tour Stops (maximum 10 stops)
 #Map,Mode,Goal,Points,Bonus Wheel,Name,Options(see above)

@@ -104,7 +104,7 @@ void ShowScoreBoard()
 	game_values.showscoreboard = true;
 
 	short iScoreboardElementHeight = 45;
-	if(game_values.gamemode->gamemode == game_mode_health)
+	if(game_values.gamemode->gamemode == game_mode_health || game_values.gamemode->gamemode == game_mode_collection)
 		iScoreboardElementHeight = 63;
 
 	for(short i = 0; i < score_cnt; i++)
@@ -320,18 +320,26 @@ void CGM_Frag::think()
 
 short CGM_Frag::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
 {
-	if(!gameover)
-	{
-		//Penalize killing your team mates
-		if(inflictor.teamID == other.teamID)
-			inflictor.score->AdjustScore(-1);
-		else
-			inflictor.score->AdjustScore(1);
+	if(gameover)
+		return player_kill_normal;
 
-		return CheckWinner(inflictor);
+	//Penalize killing your team mates
+	if(inflictor.teamID == other.teamID)
+		inflictor.score->AdjustScore(-1);
+	else
+		inflictor.score->AdjustScore(1);
+
+	short iRet = CheckWinner(inflictor);
+
+	if(game_values.gamemode->gamemode == game_mode_frag && game_values.gamemodesettings.frag.style == 1)
+	{
+		other.spawninvincible = true;
+		other.spawninvincibletimer = 60;
+
+		return player_kill_nonkill;
 	}
 
-	return player_kill_normal;
+	return iRet;
 }
 
 short CGM_Frag::playerkilledself(CPlayer &player, killstyle style)
@@ -339,7 +347,17 @@ short CGM_Frag::playerkilledself(CPlayer &player, killstyle style)
 	CGameMode::playerkilledself(player, style);
 
 	if(!gameover)
+	{
 		player.score->AdjustScore(-1);
+
+		if(game_values.gamemode->gamemode == game_mode_frag && game_values.gamemodesettings.frag.style == 1)
+		{
+			player.spawninvincible = true;
+			player.spawninvincibletimer = 60;
+
+			return player_kill_nonkill;
+		}
+	}
 
 	return player_kill_normal;
 }
@@ -355,25 +373,25 @@ void CGM_Frag::playerextraguy(CPlayer &player, short iType)
 
 short CGM_Frag::CheckWinner(CPlayer &player)
 {
-	if(goal == -1)
-		return player_kill_normal;
-
-	if(player.score->score >= goal)
+	if(goal > -1)
 	{
-		winningteam = player.teamID;
-		gameover = true;
+		if(player.score->score >= goal)
+		{
+			winningteam = player.teamID;
+			gameover = true;
 
-		RemovePlayersButTeam(winningteam);
-		SetupScoreBoard(false);
-		ShowScoreBoard();
+			RemovePlayersButTeam(winningteam);
+			SetupScoreBoard(false);
+			ShowScoreBoard();
 
-		return player_kill_removed;
+			return player_kill_removed;
+		}
+		else if(player.score->score >= goal - 2 && !playedwarningsound)
+		{
+			playwarningsound();
+		}
 	}
-	else if(player.score->score >= goal - 2 && !playedwarningsound)
-	{
-		playwarningsound();
-	}
-
+	
 	return player_kill_normal;
 }
 
@@ -596,6 +614,14 @@ short CGM_Classic::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killst
 				return player_kill_removed;
 			}
 		}
+
+		if(game_values.gamemode->gamemode == game_mode_classic && game_values.gamemodesettings.classic.style == 1)
+		{
+			other.spawninvincible = true;
+			other.spawninvincibletimer = 60;
+
+			return player_kill_nonkill;
+		}
 	}
 
 	return player_kill_normal;
@@ -647,6 +673,14 @@ short CGM_Classic::playerkilledself(CPlayer &player, killstyle style)
 				RemoveTeam(player.teamID);
 				return player_kill_removed;
 			}
+		}
+
+		if(game_values.gamemode->gamemode == game_mode_classic && game_values.gamemodesettings.classic.style == 1)
+		{
+			player.spawninvincible = true;
+			player.spawninvincibletimer = 60;
+
+			return player_kill_nonkill;
 		}
 	}
 
@@ -1194,7 +1228,7 @@ void CGM_Eggs::playerextraguy(CPlayer &player, short iType)
 
 
 //Fireball:
-//Frag limit death match, but firepower cards appear randomly
+//Frag limit death match, but powerup cards appear randomly
 CGM_Frenzy::CGM_Frenzy() : CGM_Frag()
 {
 	gamemode = game_mode_frenzy;
@@ -1244,7 +1278,7 @@ void CGM_Frenzy::think()
 				while(iWeightCount < iRandPowerup)
 					iWeightCount += game_values.gamemodesettings.frenzy.powerupweight[++iSelectedPowerup];
 
-				objectsplayer.add(new MO_FrenzyCard(&spr_frenzycards, 12, 8, iSelectedPowerup));
+				objectsplayer.add(new MO_FrenzyCard(&spr_frenzycards, iSelectedPowerup));
 			}
 		}
 	}
@@ -1280,7 +1314,7 @@ void CGM_Frenzy::think()
 }
 
 
-//Thwomp Mode! - just like mario war classic, but you have
+//Survival Mode! - just like mario war classic, but you have
 // to dodge thwomps from the sky.  Idea from ziotok.
 CGM_Survival::CGM_Survival() : CGM_Classic()
 {
@@ -2473,7 +2507,6 @@ short CGM_Greed::ReleaseCoins(CPlayer &player, killstyle style)
 
 	player.score->AdjustScore(-iDamage);
 
-	float angle = 0.0f; 
 	short ix = player.ix + HALFPW - 16;
 	short iy = player.iy + HALFPH - 16;
 
@@ -2485,7 +2518,6 @@ short CGM_Greed::ReleaseCoins(CPlayer &player, killstyle style)
 		float vely = vel * sin(angle);
 		
 		objectsplayer.add(new MO_Coin(&spr_coin, velx, vely, ix, iy, player.colorID, 1, 30));
-		//angle -= PI / (float)(iDamage - 1);
 	}
 
 	//Play warning sound if game is almost over
@@ -2604,6 +2636,146 @@ void CGM_Health::playerextraguy(CPlayer &player, short iType)
 	}
 }
 
+
+//Collection (collect cards for points)
+CGM_Collection::CGM_Collection() : CGameMode()
+{
+	goal = 30;
+	gamemode = game_mode_collection;
+
+	SetupModeStrings("Card Collection", "Points", 10);
+}
+
+void CGM_Collection::init()
+{
+	CGameMode::init();
+	timer = 0;
+
+	//Zero out the number of cards teams have
+	for(short iScore = 0; iScore < score_cnt; iScore++)
+	{
+		score[iScore]->subscore[0] = 0;
+		score[iScore]->subscore[1] = 0;
+	}
+}
+
+void CGM_Collection::think()
+{
+	if(++timer >= game_values.gamemodesettings.collection.rate)
+	{
+		timer = 0;
+
+		short iPowerupQuantity = game_values.gamemodemenusettings.collection.quantity;
+
+		if(5 < iPowerupQuantity)
+			iPowerupQuantity = list_players_cnt + iPowerupQuantity - 7;
+
+		if(objectsplayer.countTypes(object_collectioncard) < iPowerupQuantity)
+		{
+			objectsplayer.add(new MO_CollectionCard(&spr_collectcards, 0, rand() % 3, 0, 0.0f, 0.0f, 0, 0));
+		}
+	}
+
+	if(gameover)
+		displayplayertext();
+
+	//Check if this team has collected 3 cards
+	for(short iScore = 0; iScore < score_cnt; iScore++)
+	{
+		if(score[iScore]->subscore[0] >= 3)
+		{
+			if(++score[iScore]->subscore[2] >= game_values.gamemodemenusettings.collection.banktime)
+			{
+				short iPoints = 1;
+
+				if((score[iScore]->subscore[1] & 63) == 0) //All Mushrooms
+					iPoints = 2;
+				else if((score[iScore]->subscore[1] & 63) == 21) //All Flowers
+					iPoints = 3;
+				else if((score[iScore]->subscore[1] & 63) == 42) //All Stars
+					iPoints = 5;
+
+				score[iScore]->AdjustScore(iPoints);
+
+				score[iScore]->subscore[0] = 0;
+				score[iScore]->subscore[1] = 0;
+				score[iScore]->subscore[2] = 0;
+			}
+		}
+	}
+}
+
+short CGM_Collection::playerkilledplayer(CPlayer &player, CPlayer &other, killstyle style)
+{
+	//Causes a card to come out of the player
+	ReleaseCard(other);
+
+	return player_kill_normal;
+}
+
+short CGM_Collection::playerkilledself(CPlayer &player, killstyle style)
+{
+	CGameMode::playerkilledself(player, style);
+
+	//Causes a card to come out of the player
+	ReleaseCard(player);
+
+	return player_kill_normal;
+}
+
+void CGM_Collection::ReleaseCard(CPlayer &player)
+{
+	short ix = player.ix + HALFPW - 16;
+	short iy = player.iy + HALFPH - 16;
+
+	float vel = 7.0f + (float)(rand() % 9) / 2.0f;
+	float angle = -(float)(rand() % 314) / 100.0f;
+	float velx = vel * cos(angle);
+	float vely = vel * sin(angle);
+	
+	if(player.score->subscore[0] > 0)
+	{
+		player.score->subscore[0]--;
+
+		short iCardMask = 3 << (player.score->subscore[0] << 1);
+		short iCardMaskInverted = ~iCardMask;
+
+		short iValue = (player.score->subscore[1] & iCardMask) >> (player.score->subscore[0] << 1);
+
+		player.score->subscore[1] &= iCardMaskInverted;
+
+		objectsplayer.add(new MO_CollectionCard(&spr_collectcards, 1, iValue, 30, velx, vely, ix, iy));
+	}
+}
+
+void CGM_Collection::playerextraguy(CPlayer &player, short iType)
+{
+	if(!gameover)
+	{
+		player.score->AdjustScore(iType);
+
+		if(goal > -1)
+		{
+			if(player.score->score >= goal)
+			{
+				player.score->SetScore(goal);
+				winningteam = player.teamID;
+				gameover = true;
+
+				SetupScoreBoard(false);
+				ShowScoreBoard();
+				RemovePlayersButTeam(winningteam);
+			}
+			else if(player.score->score >= goal * 0.8 && !playedwarningsound)
+			{
+				playwarningsound();
+			}
+		}
+	}
+}
+
+
+
 //Boss Mode
 //Person to score fatal hit to boss wins!
 CGM_Boss::CGM_Boss() : CGameMode() 
@@ -2676,7 +2848,7 @@ void CGM_Boss::think()
 
 				if(objectsplayer.countTypes(object_frenzycard) < list_players_cnt)
 				{
-					objectsplayer.add(new MO_FrenzyCard(&spr_frenzycards, 12, 8, 0));
+					objectsplayer.add(new MO_FrenzyCard(&spr_frenzycards, 0));
 				}
 			}
 		}

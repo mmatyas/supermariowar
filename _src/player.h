@@ -430,6 +430,7 @@ class CPlayer
 		friend class CGM_Stomp;
 		friend class CGM_Greed;
 		friend class CGM_Health;
+		friend class CGM_Collection;
 
 		friend class CGM_Boss;
 		friend class CGM_Bonus;
@@ -473,12 +474,15 @@ class CPlayer
 		friend class PU_BombPowerup;
 		friend class PU_ExtraHeartPowerup;
 		friend class MysteryMushroomTempPlayer;
-		friend class MO_Coin;
 		friend class PU_TreasureChestBonus;
 
 		friend class CO_Egg;
 		friend class CO_Star;
 		friend class CO_Flag;
+		
+		friend class MO_Coin;
+		friend class MO_CollectionCard;
+
 		friend class OMO_Yoshi;
 		friend class OMO_Thwomp;
 		friend class OMO_Podobo;

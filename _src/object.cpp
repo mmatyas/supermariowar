@@ -2502,8 +2502,13 @@ void IO_MovingObject::update()
 	fOldY = fy;
 
 	collision_detection_map();
-	
-	if(++animationtimer == animationspeed)
+
+	animate();
+}
+
+void IO_MovingObject::animate()
+{
+	if(animationspeed > 0 && ++animationtimer >= animationspeed)
 	{
 		animationtimer = 0;
 		
@@ -3309,14 +3314,7 @@ void MO_Powerup::update()
 		collision_detection_map();
 	}
 	
-	if(animationspeed > 0 && ++animationtimer == animationspeed)
-	{
-		animationtimer = 0;
-		
-		drawframe += iw;
-		if(drawframe >= animationWidth)
-			drawframe = 0;
-	}
+	animate();
 }
 
 bool MO_Powerup::collide(CPlayer *)
@@ -4148,14 +4146,7 @@ MO_SuperFireball::MO_SuperFireball(gfxSprite *nspr, short x, short y, short iNum
 
 void MO_SuperFireball::update()
 {
-	if(++animationtimer == animationspeed)
-	{
-		animationtimer = 0;
-		
-		drawframe += iw;
-		if(drawframe >= animationWidth)
-			drawframe = 0;
-	}
+	animate();
 
 	xf(fx + velx);
 	yf(fy + vely);
@@ -4480,14 +4471,7 @@ void MO_Boomerang::update()
 	if(!sfx_boomerang.isplaying())
 		ifsoundonplay(sfx_boomerang);
 
-	if(++animationtimer == animationspeed)
-	{
-		animationtimer = 0;
-		
-		drawframe += iw;
-		if(drawframe >= animationWidth)
-			drawframe = 0;
-	}
+	animate();
 
 	if(game_values.superboomerang[playerID] == 2)
 	{
@@ -4866,16 +4850,7 @@ void CO_Bomb::update()
 		collision_detection_map();
 	}
 
-	if(++animationtimer == animationspeed)
-	{
-		animationtimer = 0;
-		
-		drawframe += iw;
-		if(drawframe >= animationWidth)
-		{
-			drawframe = 0;
-		}
-	}
+	animate();
 }
 
 void CO_Bomb::draw()
@@ -4979,13 +4954,7 @@ void MO_Coin::update()
 {
 	if(iType == 0)
 	{
-		if(++animationtimer >= animationspeed)
-		{
-			animationtimer = 0;
-			drawframe += iw;
-			if(drawframe >= animationWidth)
-				drawframe = 0;
-		}
+		animate();
 
 		if(++sparkleanimationtimer >= 4)
 		{
@@ -5071,6 +5040,11 @@ void IO_OverMapObject::update()
 	xf(fx + velx);
 	yf(fy + vely);
 
+	animate();
+}
+
+void IO_OverMapObject::animate()
+{
 	if(animationspeed > 0 && ++animationtimer == animationspeed)
 	{
 		animationtimer = 0;
@@ -5141,13 +5115,7 @@ void OMO_Podobo::update()
 	xf(fx + velx);
 	yf(fy + vely);
 
-	if(++animationtimer == animationspeed)
-	{
-		animationtimer = 0;
-		drawframe += iw;
-		if(drawframe >= animationWidth)
-			drawframe = 0;
-	}
+	animate();
 
 	if(iy > 479 && vely > 0.0f)
 		dead = true;
@@ -5306,14 +5274,7 @@ void OMO_BulletBill::update()
 	xf(fx + velx);
 	yf(fy + vely);
 
-	if(++animationtimer == animationspeed)
-	{
-		animationtimer = 0;
-		
-		drawframe += iw;
-		if(drawframe >= animationWidth)
-			drawframe = 0;
-	}
+	animate();
 
 	if((velx < 0 && ix < -iw) || (velx > 0 && ix > 640))
 		dead = true;
@@ -6059,14 +6020,7 @@ void CO_Flag::update()
 		collision_detection_map();
 	}
 
-	if(++animationtimer == animationspeed)
-	{
-		animationtimer = 0;
-		
-		drawframe += iw;
-		if(drawframe >= animationWidth)
-			drawframe = animationOffsetX;
-	}
+	animate();
 }
 
 void CO_Flag::draw()
@@ -6164,13 +6118,7 @@ bool OMO_Yoshi::collide(CPlayer * player)
 
 void OMO_Yoshi::update()
 {
-	if(++animationtimer == animationspeed)
-	{
-		animationtimer = 0;
-		drawframe += iw;
-		if(drawframe >= animationWidth)
-			drawframe = 0;
-	}
+	animate();
 
 	if(++timer > 2000)
 		placeYoshi();
@@ -6798,8 +6746,8 @@ void OMO_RaceGoal::placeRaceGoal()
 //------------------------------------------------------------------------------
 // class frenzycard (for fire frenzy mode)
 //------------------------------------------------------------------------------
-MO_FrenzyCard::MO_FrenzyCard(gfxSprite *nspr, short iNumSpr, short aniSpeed, short iType) :
-	IO_MovingObject(nspr, 0, 0, iNumSpr, aniSpeed, -1, -1, -1, -1, 0, iType * 32, 32, 32)
+MO_FrenzyCard::MO_FrenzyCard(gfxSprite *nspr, short iType) :
+	IO_MovingObject(nspr, 0, 0, 12, 8, -1, -1, -1, -1, 0, iType * 32, 32, 32)
 {
 	state = 1;
 	objectType = object_frenzycard;
@@ -6808,7 +6756,7 @@ MO_FrenzyCard::MO_FrenzyCard(gfxSprite *nspr, short iNumSpr, short aniSpeed, sho
 	sparkleanimationtimer = 0;
 	sparkledrawframe = 0;
 
-	placeFrenzyCard();
+	placeCard();
 }
 
 bool MO_FrenzyCard::collide(CPlayer * player)
@@ -6863,14 +6811,7 @@ bool MO_FrenzyCard::collide(CPlayer * player)
 
 void MO_FrenzyCard::update()
 {
-	if(++animationtimer == animationspeed)
-	{
-		animationtimer = 0;
-		
-		drawframe += iw;
-		if(drawframe >= animationWidth)
-			drawframe = 0;
-	}
+	animate();
 
 	if(++sparkleanimationtimer >= 4)
 	{
@@ -6881,7 +6822,7 @@ void MO_FrenzyCard::update()
 	}
 
 	if(++timer > 1500)
-		placeFrenzyCard();
+		placeCard();
 }
 
 void MO_FrenzyCard::draw()
@@ -6892,7 +6833,7 @@ void MO_FrenzyCard::draw()
 	spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, 0, 32, 32);
 }
 
-void MO_FrenzyCard::placeFrenzyCard()
+void MO_FrenzyCard::placeCard()
 {
 	timer = 0;
 
@@ -6906,6 +6847,147 @@ void MO_FrenzyCard::placeFrenzyCard()
 		g_map.findspawnpoint(1, &x, &y, collisionWidth, collisionHeight, false);
 	}
 	while(objectsplayer.getClosestObject(x, y, object_frenzycard) <= 150.0f);
+
+	xi(x);
+	yi(y);
+}
+
+//------------------------------------------------------------------------------
+// class collection card (for card collection mode)
+//------------------------------------------------------------------------------
+MO_CollectionCard::MO_CollectionCard(gfxSprite *nspr, short iType, short iValue, short iUncollectableTime, float dvelx, float dvely, short ix, short iy) :
+	IO_MovingObject(nspr, ix, iy, 6, 8, -1, -1, -1, -1, 0, 0, 32, 32)
+{
+	state = 1;
+	objectType = object_collectioncard;
+	bounce = GRAVITATION;
+	
+	sparkleanimationtimer = 0;
+	sparkledrawframe = 0;
+
+	type = iType;
+	value = iValue;
+
+	uncollectabletime = iUncollectableTime;
+	velx = dvelx;
+	vely = dvely;
+	
+	if(iType == 0)
+	{
+		placeCard();
+	}
+	else
+	{
+		collision_detection_checksides();
+		animationOffsetY = (value + 1) << 5;
+	}
+}
+
+bool MO_CollectionCard::collide(CPlayer * player)
+{
+	//If it is not collectable, return
+	if((type == 1 && uncollectabletime > 0) || state != 1)
+		return false;
+
+	//Add this card to the team's score
+	if(player->score->subscore[0] < 3)
+	{
+		player->score->subscore[1] |= value << (player->score->subscore[0] << 1);
+		player->score->subscore[0]++;
+	}
+	else
+	{
+		player->score->subscore[1] &= ~48; //Clear previous card in 3rd slot
+		player->score->subscore[1] |= value << 4; //Set card to newly collected one in 3rd slot
+	}
+
+	player->score->subscore[2] = 0;
+
+	if(type == 1)
+		dead = true;
+	else
+	{
+		state = 2;
+		animationspeed = 4;
+		animationtimer = 0;
+		animationOffsetY = animationOffsetY = (value + 1) << 5;
+		drawframe = 96;
+	}
+
+	timer = 0;
+
+	return false;
+}
+
+void MO_CollectionCard::update()
+{
+	if(type == 1 || state < 3)
+		animate();
+	
+	//Handle flipping over a card to reveal it's value
+	if(state == 2 && drawframe == 0)
+	{
+		state = 3;
+		timer = 0;
+	}
+	else if(state == 3)
+	{
+		if(++timer > 200)
+		{
+			dead = true;
+			eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix, iy, 3, 8));
+		}
+	}
+
+
+	if(++sparkleanimationtimer >= 4)
+	{
+		sparkleanimationtimer = 0;
+		sparkledrawframe += 32;
+		if(sparkledrawframe >= 480)
+			sparkledrawframe = 0;
+	}
+
+	if(type == 0)
+	{
+		if(++timer > 1500)
+			placeCard();
+	}
+	else
+	{
+		applyfriction();
+		IO_MovingObject::update();
+
+		if(--uncollectabletime < -300)
+		{
+			eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix, iy, 3, 8));
+			dead = true;
+		}
+	}
+}
+
+void MO_CollectionCard::draw()
+{
+	IO_MovingObject::draw();
+	
+	//Draw sparkles
+	spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, 0, 32, 32);
+}
+
+void MO_CollectionCard::placeCard()
+{
+	timer = 0;
+
+	short tries = 0;
+	short x = 0, y = 0;
+	do
+	{
+		if(++tries > 32)
+			break;
+
+		g_map.findspawnpoint(1, &x, &y, collisionWidth, collisionHeight, false);
+	}
+	while(objectsplayer.getClosestObject(x, y, object_collectioncard) <= 150.0f);
 
 	xi(x);
 	yi(y);
@@ -6939,13 +7021,7 @@ bool OMO_Explosion::collide(CPlayer * player)
 
 void OMO_Explosion::update()
 {
-	if(++animationtimer == animationspeed)
-	{
-		animationtimer = 0;
-		drawframe += iw;
-		if(drawframe >= animationWidth)
-			drawframe = 0;
-	}
+	animate();
 
 	//If this is the first frame, look for blocks to kill
 	if(timer == 0)
@@ -7411,14 +7487,7 @@ void OMO_CheepCheep::update()
 	//Cheep cheep gravitation
 	vely += 0.2f;
 
-	if(++animationtimer == animationspeed)
-	{
-		animationtimer = 0;
-		
-		drawframe += iw;
-		if(drawframe >= animationWidth)
-			drawframe = 0;
-	}
+	animate();
 
 	//Remove if cheep cheep has fallen below bottom of screen
 	if(vely > 0.0f && iy > 480)
@@ -8430,18 +8499,7 @@ void CO_Shell::update()
 	}
 	else
 	{
-		fOldX = fx;
-		fOldY = fy;
-
-		collision_detection_map();
-		
-		if(++animationtimer == animationspeed)
-		{
-			animationtimer = 0;
-			drawframe += iw;
-			if(drawframe >= animationWidth)
-				drawframe = 0;
-		}
+		IO_MovingObject::update();
 	}
 }
 
@@ -8757,13 +8815,7 @@ void CO_ThrowBlock::update()
 		collision_detection_map();
 	}
 
-	if(++animationtimer == animationspeed)
-	{
-		animationtimer = 0;
-		drawframe += iw;
-		if(drawframe >= animationWidth)
-			drawframe = 0;
-	}
+	animate();
 }
 
 void CO_ThrowBlock::draw()

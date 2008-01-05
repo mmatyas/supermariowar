@@ -333,6 +333,22 @@ class Menu
 		//Game Mode Settings Menu
 		UI_Menu mModeSettingsMenu[20];
 
+		//Classic
+		MI_SelectField * miClassicModeStyleField;
+		MI_Button * miClassicModeBackButton;
+		
+		MI_Image * miClassicModeLeftHeaderBar;
+		MI_Image * miClassicModeRightHeaderBar;
+		MI_Text * miClassicModeHeaderText;
+
+		//Frag
+		MI_SelectField * miFragModeStyleField;
+		MI_Button * miFragModeBackButton;
+		
+		MI_Image * miFragModeLeftHeaderBar;
+		MI_Image * miFragModeRightHeaderBar;
+		MI_Text * miFragModeHeaderText;
+
 		//Time Limit
 		MI_SliderField * miTimeLimitModePercentExtraTime;
 		MI_Button * miTimeLimitModeBackButton;
@@ -472,6 +488,16 @@ class Menu
 		MI_Image * miHealthModeLeftHeaderBar;
 		MI_Image * miHealthModeRightHeaderBar;
 		MI_Text * miHealthModeHeaderText;
+
+		//Card Collection
+		MI_SelectField * miCollectionModeQuantityField;
+		MI_SelectField * miCollectionModeRateField;
+		MI_SelectField * miCollectionModeBankTimeField;
+		MI_Button * miCollectionModeBackButton;
+		
+		MI_Image * miCollectionModeLeftHeaderBar;
+		MI_Image * miCollectionModeRightHeaderBar;
+		MI_Text * miCollectionModeHeaderText;
 
 
 		//Team Select

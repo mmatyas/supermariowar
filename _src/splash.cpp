@@ -223,7 +223,8 @@ bool LoadGameGraphics()
 	gfx_loadimage(&spr_shade[0], convertPath("gfx/packs/eyecandy/shade1.png", graphicspack), 64, false);
 	gfx_loadimage(&spr_shade[1], convertPath("gfx/packs/eyecandy/shade2.png", graphicspack), 64, false);
 	gfx_loadimage(&spr_shade[2], convertPath("gfx/packs/eyecandy/shade3.png", graphicspack), 64, false);
-	gfx_loadimage(&spr_scorehearts, convertPath("gfx/packs/menu/score_hearts.png", graphicspack), false);	
+	gfx_loadimage(&spr_scorehearts, convertPath("gfx/packs/menu/score_hearts.png", graphicspack), false);
+	gfx_loadimage(&spr_scorecards, convertPath("gfx/packs/menu/score_cards.png", graphicspack), false);
 	
 	gfx_loadimage(&spr_timershade, convertPath("gfx/packs/eyecandy/timershade.png", graphicspack), 64, false);
 	gfx_loadimage(&spr_spawneggs, convertPath("gfx/packs/eyecandy/spawneggs.png", graphicspack), false);
@@ -245,6 +246,7 @@ bool LoadGameGraphics()
 	gfx_loadimage(&spr_star, convertPath("gfx/packs/modeobjects/star.png", graphicspack), true);
 	gfx_loadimage(&spr_flags, convertPath("gfx/packs/modeobjects/flags.png", graphicspack), true);
 	gfx_loadimage(&spr_frenzycards, convertPath("gfx/packs/modeobjects/frenzycards.png", graphicspack), true);
+	gfx_loadimage(&spr_collectcards, convertPath("gfx/packs/modeobjects/collectcards.png", graphicspack), true);
 	
 	gfx_loadimage(&spr_yoshi, convertPath("gfx/packs/modeobjects/yoshi.png", graphicspack), true);
 	gfx_loadimage(&spr_coin, convertPath("gfx/packs/modeobjects/coin.png", graphicspack), true);
@@ -416,7 +418,8 @@ bool LoadAndSplashScreen()
 	"Discrosh", "Ikill4you", "Helix Snake", "tubesteak", "wasabimario", "Lee",
 	"Pikawil", "Marioman64", "Peardian", "Bob Ippolito", "Viper Snake", "neavea",
 	"Mr.Bob-omb", "milua", "bobmanperson", "DrTek", "somestrangeflea", "nes6502",
-	"XPort", "Naphistim", "Chaos", "NiGHTS", "Kutter"};
+	"XPort", "Naphistim", "Chaos", "NiGHTS", "Kutter", "Maximilian",
+	"Felix the Ghost"};
 
 #define NUM_CONTRIBUTORS ((int)(sizeof(contributors)/sizeof(char*)))
 

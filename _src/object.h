@@ -1,7 +1,7 @@
 #ifndef _OBJECT_H
 #define _OBJECT_H
 
-enum ObjectType{object_none = 0, object_block = 1, object_moving = 2, object_overmap = 3, object_area = 4, object_egg = 5, object_frenzycard = 6, object_yoshi = 7, object_explosion = 8, object_race_goal = 9, object_star = 10, object_flag = 11, object_flagbase = 12, object_thwomp = 13, object_kingofthehill_area = 14, object_bowserfire = 15, object_coin = 16};
+enum ObjectType{object_none = 0, object_block = 1, object_moving = 2, object_overmap = 3, object_area = 4, object_egg = 5, object_frenzycard = 6, object_yoshi = 7, object_explosion = 8, object_race_goal = 9, object_star = 10, object_flag = 11, object_flagbase = 12, object_thwomp = 13, object_kingofthehill_area = 14, object_bowserfire = 15, object_coin = 16, object_collectioncard = 17};
 enum MovingObjectType{movingobject_none = 0, movingobject_powerup = 1, movingobject_fireball = 2, movingobject_goomba = 3, movingobject_bulletbill = 4, movingobject_hammer = 5, movingobject_poisonpowerup = 6, movingobject_shell = 7, movingobject_throwblock = 8, movingobject_egg = 9, movingobject_star = 10, movingobject_flag = 11, movingobject_cheepcheep = 12, movingobject_koopa = 13, movingobject_mysterymushroompowerup = 15, movingobject_boomerang = 16, movingobject_spring = 17, movingobject_sledgehammer = 18, movingobject_sledgebrother = 19, movingobject_spike = 20, movingobject_bomb = 21, movingobject_superfireball = 22, movingobject_podobo = 23, movingobject_kuriboshoe = 24, movingobject_treasurechest = 25, movingobject_attackzone = 26};
 enum BlockType{block_none, block_powerup, block_view, block_breakable, block_note, block_donut, block_flip, block_bounce, block_throw, block_onoff_switch, block_onoff, block_weaponbreakable};
 
@@ -439,6 +439,8 @@ class IO_MovingObject : public CObject
 
 		virtual void draw();
 		virtual void update();
+		virtual void animate();
+
 		virtual bool collide(CPlayer * player);
 		
 		void collide(IO_MovingObject *){}
@@ -884,6 +886,8 @@ class IO_OverMapObject : public CObject
 
 		virtual void draw();
 		virtual void update();
+		virtual void animate();
+
 		virtual bool collide(CPlayer *){return false;}
 		virtual void collide(IO_MovingObject *){}
 
@@ -1197,13 +1201,13 @@ class OMO_RaceGoal : public IO_OverMapObject
 class MO_FrenzyCard : public IO_MovingObject
 {
 	public:
-		MO_FrenzyCard(gfxSprite *nspr, short iNumSpr, short aniSpeed, short iType);
+		MO_FrenzyCard(gfxSprite *nspr, short iType);
 		~MO_FrenzyCard(){};
 
 		void update();
 		void draw();
 		bool collide(CPlayer * player);
-		void placeFrenzyCard();
+		void placeCard();
 
 	private:
 		short timer;
@@ -1211,6 +1215,28 @@ class MO_FrenzyCard : public IO_MovingObject
 
 		short sparkleanimationtimer;
 		short sparkledrawframe;
+};
+
+class MO_CollectionCard : public IO_MovingObject
+{
+	public:
+		MO_CollectionCard(gfxSprite *nspr, short iType, short iValue, short iUncollectableTime, float dvelx, float dvely, short ix, short iy);
+		~MO_CollectionCard(){};
+
+		void update();
+		void draw();
+		bool collide(CPlayer * player);
+		void placeCard();
+
+	private:
+		short timer;
+		short type;
+		short value;
+
+		short sparkleanimationtimer;
+		short sparkledrawframe;
+
+		short uncollectabletime;
 };
 
 class OMO_Explosion : public IO_OverMapObject

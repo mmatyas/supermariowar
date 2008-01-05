@@ -367,6 +367,7 @@ extern gfxSprite		spr_extratimepowerup;
 
 extern gfxSprite		spr_shade[3];
 extern gfxSprite		spr_scorehearts;
+extern gfxSprite		spr_scorecards;
 
 extern gfxSprite		spr_timershade;
 extern gfxSprite		spr_spawneggs;
@@ -381,6 +382,7 @@ extern gfxSprite		spr_egg;
 extern gfxSprite		spr_star;
 extern gfxSprite		spr_flags;
 extern gfxSprite		spr_frenzycards;
+extern gfxSprite		spr_collectcards;
 extern gfxSprite		spr_yoshi;
 extern gfxSprite		spr_coin;
 extern gfxSprite		spr_thwomp;
@@ -578,6 +580,16 @@ struct ts
 	short		total;		//used for running total in a tour
 };
 
+struct ClassicGameModeSettings
+{
+	short style;			//on kill, either respawn the player or shield them and let them keep playing
+};
+
+struct FragGameModeSettings
+{
+	short style;			//on kill, either respawn the player or shield them and let them keep playing
+};
+
 struct TimeGameModeSettings
 {
 	short percentextratime; //percent chance a stopwatch with extra game time will spawn
@@ -673,8 +685,17 @@ struct HealthGameModeSettings
 	short percentextralife;		//Percent chance an extra heart with come from a powerup block
 };
 
+struct CollectionGameModeSettings
+{
+	short quantity;				//How many cards spawn
+	short rate;					//How fast they spawn
+	short banktime;				//Amount of time needed to bank cards to score
+};
+
 struct GameModeSettings
 {
+	ClassicGameModeSettings classic;
+	FragGameModeSettings frag;
 	TimeGameModeSettings time;
 	JailGameModeSettings jail;
 	CoinGameModeSettings coins;
@@ -689,6 +710,7 @@ struct GameModeSettings
 	FrenzyGameModeSettings frenzy;
 	SurvivalGameModeSettings survival;
 	HealthGameModeSettings health;
+	CollectionGameModeSettings collection;
 };
 
 struct WorldStageBonus

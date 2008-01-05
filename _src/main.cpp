@@ -174,6 +174,7 @@ gfxSprite		spr_extratimepowerup;
 
 gfxSprite		spr_shade[3];
 gfxSprite		spr_scorehearts;
+gfxSprite		spr_scorecards;
 
 gfxSprite		spr_timershade;
 gfxSprite		spr_spawneggs;
@@ -193,6 +194,7 @@ gfxSprite		spr_coin;
 gfxSprite		spr_egg;
 gfxSprite		spr_star;
 gfxSprite		spr_frenzycards;
+gfxSprite		spr_collectcards;
 gfxSprite		spr_flags;
 gfxSprite		spr_yoshi;
 gfxSprite		spr_thwomp;
@@ -828,7 +830,7 @@ int main(int argc, char *argv[])
 	gamemodes[16] = new CGM_Survival();
 	gamemodes[17] = new CGM_Greed();
 	gamemodes[18] = new CGM_Health();
-	gamemodes[19] = new CGM_Frag();
+	gamemodes[19] = new CGM_Collection();
 
 	currentgamemode = 0;
 	game_values.gamemode = gamemodes[currentgamemode];
@@ -837,6 +839,12 @@ int main(int argc, char *argv[])
 	bonushousemode = new CGM_Bonus();
 
 	//Setup the default game mode settings
+
+	//Classic
+	game_values.gamemodemenusettings.classic.style = 0;		//Respawn on death
+
+	//Frag
+	game_values.gamemodemenusettings.frag.style = 0;		//Respawn on death
 
 	//Time Limit
 	game_values.gamemodemenusettings.time.percentextratime = 10;	//10% chance of a heart spawning
@@ -920,6 +928,11 @@ int main(int argc, char *argv[])
 	game_values.gamemodemenusettings.health.startlife = 6;			//Start with 3 whole hearts (each increment is a half heart)
 	game_values.gamemodemenusettings.health.maxlife = 10;			//Maximum of 5 hearts
 	game_values.gamemodemenusettings.health.percentextralife = 20;	//20% chance of a heart spawning
+
+	//Health
+	game_values.gamemodemenusettings.collection.quantity = 6;		//#players - 1
+	game_values.gamemodemenusettings.collection.rate = 186;			//3 seconds to spawn
+	game_values.gamemodemenusettings.collection.banktime = 310;		//5 seconds to bank
 	
 	//Read saved settings from disk
 	FILE *fp;
@@ -2682,7 +2695,7 @@ void RunGame()
 				//in game scoreboards
 				for(i = 0; i < score_cnt; i++)
 				{
-					if(game_values.gamemode->gamemode == game_mode_health)
+					if(game_values.gamemode->gamemode == game_mode_health || game_values.gamemode->gamemode == game_mode_collection)
 						spr_shade[game_values.teamcounts[i] - 1].draw(score[i]->x, score[i]->y);
 					else
 						spr_shade[game_values.teamcounts[i] - 1].draw(score[i]->x, score[i]->y, 0, 0, 256, 41);
@@ -2773,6 +2786,22 @@ void RunGame()
 								spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, 40, 0, 8, 16);
 							else
 								spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, iHeart % 2 ? 24 : 16, 0, 8, 16);
+						}
+					}
+					else if(game_values.gamemode->gamemode == game_mode_collection) //Draw cards for collection mode
+					{
+						//Flash collected cards if 3 have been collected
+						if(score[i]->subscore[0] < 3 || score[i]->subscore[2] % 20 < 10)
+						{
+							short iNumCards = score[i]->subscore[0];
+							short iCardValues = score[i]->subscore[1];
+							short iCardX = score[i]->x + scorepowerupoffsets[game_values.teamcounts[i] - 1][0] - 20;
+
+							for(short iCard = 0; iCard < iNumCards; iCard++)
+							{
+								spr_scorecards.draw(iCardX + iCard * 20, score[i]->y + 43, (iCardValues & 3) << 4, 0, 16, 16);
+								iCardValues >>= 2;
+							}
 						}
 					}
 					

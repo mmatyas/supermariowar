@@ -1320,6 +1320,62 @@ void Menu::CreateMenu()
 	mWorldMenu.SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
 
 	//***********************
+	// Classic Mode Settings
+	//***********************
+
+	miClassicModeStyleField = new MI_SelectField(&spr_selectfield, 120, 220, "On Kill", 400, 180);
+	miClassicModeStyleField->Add("Respawn", 0, "", false, false);
+	miClassicModeStyleField->Add("Shield", 1, "", false, false);
+	miClassicModeStyleField->SetData(&game_values.gamemodemenusettings.classic.style, NULL, NULL);
+	miClassicModeStyleField->SetKey(game_values.gamemodemenusettings.classic.style);
+
+	miClassicModeBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
+	miClassicModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
+
+	miClassicModeLeftHeaderBar = new MI_Image(&menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
+	miClassicModeRightHeaderBar = new MI_Image(&menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
+	miClassicModeHeaderText = new MI_Text("Classic Mode Menu", 320, 5, 0, 2, 1);
+
+	mModeSettingsMenu[0].AddControl(miClassicModeStyleField, miClassicModeBackButton, miClassicModeBackButton, NULL, miClassicModeBackButton);
+	mModeSettingsMenu[0].AddControl(miClassicModeBackButton, miClassicModeStyleField, miClassicModeStyleField, miClassicModeStyleField, NULL);
+	
+	mModeSettingsMenu[0].AddNonControl(miClassicModeLeftHeaderBar);
+	mModeSettingsMenu[0].AddNonControl(miClassicModeRightHeaderBar);
+	mModeSettingsMenu[0].AddNonControl(miClassicModeHeaderText);
+	
+	mModeSettingsMenu[0].SetHeadControl(miClassicModeStyleField);
+	mModeSettingsMenu[0].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
+
+
+	//***********************
+	// Frag Mode Settings
+	//***********************
+
+	miFragModeStyleField = new MI_SelectField(&spr_selectfield, 120, 220, "On Kill", 400, 180);
+	miFragModeStyleField->Add("Respawn", 0, "", false, false);
+	miFragModeStyleField->Add("Shield", 1, "", false, false);
+	miFragModeStyleField->SetData(&game_values.gamemodemenusettings.frag.style, NULL, NULL);
+	miFragModeStyleField->SetKey(game_values.gamemodemenusettings.frag.style);
+
+	miFragModeBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
+	miFragModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
+
+	miFragModeLeftHeaderBar = new MI_Image(&menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
+	miFragModeRightHeaderBar = new MI_Image(&menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
+	miFragModeHeaderText = new MI_Text("Frag Mode Menu", 320, 5, 0, 2, 1);
+
+	mModeSettingsMenu[1].AddControl(miFragModeStyleField, miFragModeBackButton, miFragModeBackButton, NULL, miFragModeBackButton);
+	mModeSettingsMenu[1].AddControl(miFragModeBackButton, miFragModeStyleField, miFragModeStyleField, miFragModeStyleField, NULL);
+	
+	mModeSettingsMenu[1].AddNonControl(miFragModeLeftHeaderBar);
+	mModeSettingsMenu[1].AddNonControl(miFragModeRightHeaderBar);
+	mModeSettingsMenu[1].AddNonControl(miFragModeHeaderText);
+	
+	mModeSettingsMenu[1].SetHeadControl(miFragModeStyleField);
+	mModeSettingsMenu[1].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
+
+
+	//***********************
 	// Time Limit Mode Settings
 	//***********************
 
@@ -2177,6 +2233,73 @@ void Menu::CreateMenu()
 
 
 	//***********************
+	// Card Collection Mode Settings
+	//***********************
+
+	miCollectionModeQuantityField = new MI_SelectField(&spr_selectfield, 120, 180, "Limit", 400, 180);
+	miCollectionModeQuantityField->Add("1 Card", 1, "", false, false);
+	miCollectionModeQuantityField->Add("2 Cards", 2, "", false, false);
+	miCollectionModeQuantityField->Add("3 Cards", 3, "", false, false);
+	miCollectionModeQuantityField->Add("4 Cards", 4, "", false, false);
+	miCollectionModeQuantityField->Add("5 Cards", 5, "", false, false);
+	miCollectionModeQuantityField->Add("# Players - 1", 6, "", false, false);
+	miCollectionModeQuantityField->Add("# Players", 7, "", false, false);
+	miCollectionModeQuantityField->Add("# Players + 1", 8, "", false, false);
+	miCollectionModeQuantityField->Add("# Players + 2", 9, "", false, false);
+	miCollectionModeQuantityField->Add("# Players + 3", 10, "", false, false);
+	miCollectionModeQuantityField->SetData(&game_values.gamemodemenusettings.collection.quantity, NULL, NULL);
+	miCollectionModeQuantityField->SetKey(game_values.gamemodemenusettings.collection.quantity);
+
+	miCollectionModeRateField = new MI_SelectField(&spr_selectfield, 120, 220, "Rate", 400, 180);
+	miCollectionModeRateField->Add("Instant", 0, "", false, false);
+	miCollectionModeRateField->Add("1 Second", 62, "", false, false);
+	miCollectionModeRateField->Add("2 Seconds", 124, "", false, false);
+	miCollectionModeRateField->Add("3 Seconds", 186, "", false, false);
+	miCollectionModeRateField->Add("5 Seconds", 310, "", false, false);
+	miCollectionModeRateField->Add("10 Seconds", 620, "", false, false);
+	miCollectionModeRateField->Add("15 Seconds", 930, "", false, false);
+	miCollectionModeRateField->Add("20 Seconds", 1240, "", false, false);
+	miCollectionModeRateField->Add("25 Seconds", 1550, "", false, false);
+	miCollectionModeRateField->Add("30 Seconds", 1860, "", false, false);
+	miCollectionModeRateField->SetData(&game_values.gamemodemenusettings.collection.rate, NULL, NULL);
+	miCollectionModeRateField->SetKey(game_values.gamemodemenusettings.collection.rate);
+
+	miCollectionModeBankTimeField = new MI_SelectField(&spr_selectfield, 120, 260, "Bank Time", 400, 180);
+	miCollectionModeBankTimeField->Add("Instant", 0, "", false, false);
+	miCollectionModeBankTimeField->Add("1 Second", 62, "", false, false);
+	miCollectionModeBankTimeField->Add("2 Seconds", 124, "", false, false);
+	miCollectionModeBankTimeField->Add("3 Seconds", 186, "", false, false);
+	miCollectionModeBankTimeField->Add("4 Seconds", 248, "", false, false);
+	miCollectionModeBankTimeField->Add("5 Seconds", 310, "", false, false);
+	miCollectionModeBankTimeField->Add("6 Seconds", 372, "", false, false);
+	miCollectionModeBankTimeField->Add("7 Seconds", 434, "", false, false);
+	miCollectionModeBankTimeField->Add("8 Seconds", 496, "", false, false);
+	miCollectionModeBankTimeField->Add("9 Seconds", 558, "", false, false);
+	miCollectionModeBankTimeField->Add("10 Seconds", 620, "", false, false);
+	miCollectionModeBankTimeField->SetData(&game_values.gamemodemenusettings.collection.banktime, NULL, NULL);
+	miCollectionModeBankTimeField->SetKey(game_values.gamemodemenusettings.collection.banktime);
+
+	miCollectionModeBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
+	miCollectionModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
+
+	miCollectionModeLeftHeaderBar = new MI_Image(&menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
+	miCollectionModeRightHeaderBar = new MI_Image(&menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
+	miCollectionModeHeaderText = new MI_Text("Card Collection Mode Menu", 320, 5, 0, 2, 1);
+
+	mModeSettingsMenu[19].AddControl(miCollectionModeQuantityField, miCollectionModeBackButton, miCollectionModeRateField, NULL, miCollectionModeBackButton);
+	mModeSettingsMenu[19].AddControl(miCollectionModeRateField, miCollectionModeQuantityField, miCollectionModeBankTimeField, NULL, miCollectionModeBackButton);
+	mModeSettingsMenu[19].AddControl(miCollectionModeBankTimeField, miCollectionModeRateField, miCollectionModeBackButton, NULL, miCollectionModeBackButton);
+	mModeSettingsMenu[19].AddControl(miCollectionModeBackButton, miCollectionModeBankTimeField, miCollectionModeQuantityField, miCollectionModeBankTimeField, NULL);
+	
+	mModeSettingsMenu[19].AddNonControl(miCollectionModeLeftHeaderBar);
+	mModeSettingsMenu[19].AddNonControl(miCollectionModeRightHeaderBar);
+	mModeSettingsMenu[19].AddNonControl(miCollectionModeHeaderText);
+	
+	mModeSettingsMenu[19].SetHeadControl(miCollectionModeQuantityField);
+	mModeSettingsMenu[19].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
+
+
+	//***********************
 	// Team Select Settings
 	//***********************
 	
@@ -2651,7 +2774,7 @@ void Menu::RunMenu()
 		{
 			MenuCodeEnum code = mCurrentMenu->SendInput(&game_values.playerInput);
 
-			bool fShowSettingsButton[GAMEMODE_LAST] = {false, false, true, true, true, true, false, true, true, true, true, true, true, true, false, true, true, false, true, false};
+			bool fShowSettingsButton[GAMEMODE_LAST] = {true, true, true, true, true, true, false, true, true, true, true, true, true, true, false, true, true, false, true, true};
 
 			if(MENU_CODE_EXIT_APPLICATION == code)
 			{
