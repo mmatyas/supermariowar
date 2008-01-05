@@ -2795,6 +2795,7 @@ void CMap::drawWarpLocks()
 
 void CMap::update()
 {
+	//Unlock locked warps if the time is up
 	for(int k = 0; k <= maxConnection; k++)
 	{
 		if(warplocked[k])
@@ -2807,6 +2808,7 @@ void CMap::update()
 		}
 	}
 
+	//Animate the animated tiles
 	if(++iTileAnimationTimer >= NUM_FRAMES_BETWEEN_TILE_ANIMATION)
 	{
 		iTileAnimationTimer = 0;

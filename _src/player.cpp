@@ -1960,6 +1960,16 @@ void CPlayer::chooseWarpExit()
 		velx = 0.0f;
 		vely = -4.0f;
 		warpplane = exit->warpy * TILESIZE;
+
+		//Trigger block that we warp into
+		short iCol = ix / TILESIZE;
+		short iRow = iy / TILESIZE;
+
+		if(iRow - 1 >= 0)
+		{
+			IO_Block * block = g_map.block(iCol, iRow - 1);
+			block->triggerBehavior();
+		}
 	}
 	else if(exit->direction == 1)
 	{
@@ -1968,6 +1978,16 @@ void CPlayer::chooseWarpExit()
 		velx = 1.0f;
 		vely = 1.0f;
 		warpplane = exit->warpx * TILESIZE + TILESIZE;
+
+		//Trigger block that we warp into
+		short iCol = ix / TILESIZE;
+		short iRow = iy / TILESIZE;
+
+		if(iCol + 1 >= 20)
+			iCol -= 20;
+		
+		IO_Block * block = g_map.block(iCol + 1, iRow);
+		block->triggerBehavior();
 	}
 	else if(exit->direction == 2)
 	{
@@ -1977,6 +1997,16 @@ void CPlayer::chooseWarpExit()
 		vely = 1.1f;
 		inair = true;
 		warpplane = exit->warpy * TILESIZE + TILESIZE;
+
+		//Trigger block that we warp into
+		short iCol = ix / TILESIZE;
+		short iRow = iy / TILESIZE;
+
+		if(iRow + 1 < 15)
+		{
+			IO_Block * block = g_map.block(iCol, iRow + 1);
+			block->triggerBehavior();
+		}
 	}
 	else if(exit->direction == 3)
 	{
@@ -1985,6 +2015,16 @@ void CPlayer::chooseWarpExit()
 		velx = -1.0f;
 		vely = 1.0f;
 		warpplane = exit->warpx * TILESIZE;
+
+		//Trigger block that we warp into
+		short iCol = ix / TILESIZE;
+		short iRow = iy / TILESIZE;
+
+		if(iCol - 1 < 0)
+			iCol += 20;
+		
+		IO_Block * block = g_map.block(iCol - 1, iRow);
+		block->triggerBehavior();
 	}
 
 	if(game_values.spawninvincibility > 0)

@@ -839,7 +839,6 @@ int main(int argc, char *argv[])
 	bonushousemode = new CGM_Bonus();
 
 	//Setup the default game mode settings
-
 	//Classic
 	game_values.gamemodemenusettings.classic.style = 0;		//Respawn on death
 
