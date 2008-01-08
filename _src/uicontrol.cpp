@@ -1924,7 +1924,7 @@ MI_PowerupSelection::MI_PowerupSelection(short x, short y, short width, short nu
 
 	mMenu = new UI_Menu();
 
-	miOverride = new MI_SelectField(&spr_selectfield, 170, iy, "Use From", 300, 150);
+	miOverride = new MI_SelectField(&spr_selectfield, 70, iy, "Use Settings From", 500, 250);
 	miOverride->Add("Map Only", 0, "", false, false);
 	miOverride->Add("Game Only", 1, "", false, false);
 	miOverride->Add("Average", 2, "", false, false);

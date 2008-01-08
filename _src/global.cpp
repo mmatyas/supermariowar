@@ -527,6 +527,16 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 				for(int iEnemy = 0; iEnemy < 4; iEnemy++)
 					ts->iNumUsedSettings += ReadTourStopSetting(&(ts->gmsSettings.stomp.enemyweight[iEnemy]), NULL, game_values.gamemodemenusettings.stomp.enemyweight[iEnemy], false);
 			}
+			else if(ts->iMode == 6) //egg
+			{
+				ts->fUseSettings = true;
+				
+				for(int iEgg = 0; iEgg < 4; iEgg++)
+					ts->iNumUsedSettings += ReadTourStopSetting(&(ts->gmsSettings.egg.eggs[iEgg]), NULL, game_values.gamemodemenusettings.egg.eggs[iEgg], false);
+
+				for(int iYoshi = 0; iYoshi < 4; iYoshi++)
+					ts->iNumUsedSettings += ReadTourStopSetting(&(ts->gmsSettings.egg.yoshis[iEgg]), NULL, game_values.gamemodemenusettings.egg.yoshis[iEgg], false);
+			}
 			else if(ts->iMode == 7) //capture the flag
 			{
 				ts->fUseSettings = true;
@@ -828,6 +838,26 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
 					if(ts->iNumUsedSettings > iEnemy + 1)
 					{
 						sprintf(szTemp, ",%d", ts->gmsSettings.stomp.enemyweight[iEnemy]);
+						strcat(buffer, szTemp);
+					}
+				}
+			}
+			else if(ts->iMode == 6) //egg
+			{
+				for(int iEgg = 0; iEgg < 4; iEgg++)
+				{
+					if(ts->iNumUsedSettings > iEgg)
+					{
+						sprintf(szTemp, ",%d", ts->gmsSettings.egg.eggs[iEgg]);
+						strcat(buffer, szTemp);
+					}
+				}
+
+				for(int iYoshi = 0; iYoshi < 4; iYoshi++)
+				{
+					if(ts->iNumUsedSettings > iYoshi + 4)
+					{
+						sprintf(szTemp, ",%d", ts->gmsSettings.egg.yoshis[iYoshi]);
 						strcat(buffer, szTemp);
 					}
 				}

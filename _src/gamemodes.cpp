@@ -1148,8 +1148,27 @@ void CGM_Eggs::init()
 {
 	CGameMode::init();
 
-	objectsplayer.add(new OMO_Yoshi(&spr_yoshi));
-	objectsplayer.add(new CO_Egg(&spr_egg));
+	for(short iEggs = 0; iEggs < 4; iEggs++)
+	{
+		for(short iEgg = 0; iEgg < game_values.gamemodesettings.egg.eggs[iEggs]; iEgg++)
+		{
+			if(iEgg > 9)
+				break;
+
+			objectsplayer.add(new CO_Egg(&spr_egg, iEggs));
+		}
+	}
+
+	for(short iYoshis = 0; iYoshis < 4; iYoshis++)
+	{
+		for(short iYoshi = 0; iYoshi < game_values.gamemodesettings.egg.yoshis[iYoshis]; iYoshi++)
+		{
+			if(iYoshi > 9)
+				break;
+
+			objectsplayer.add(new OMO_Yoshi(&spr_yoshi, iYoshis));
+		}
+	}	
 }
 
 
@@ -2580,8 +2599,14 @@ short CGM_Health::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killsty
 	if(gameover)
 		return player_kill_normal;
 
-	if(--other.score->subscore[0] <= 0)
+	if(style == kill_style_bobomb || style == kill_style_bomb)
+		other.score->subscore[0] -= 2;
+	else
+		other.score->subscore[0]--;
+
+	if(other.score->subscore[0] <= 0)
 	{
+		other.score->subscore[0] = 0;
 		short iRet = CGM_Classic::playerkilledplayer(inflictor, other, style);
 
 		if(iRet == player_kill_normal)
@@ -2605,8 +2630,14 @@ short CGM_Health::playerkilledself(CPlayer &player, killstyle style)
 	if(gameover)
 		return player_kill_normal;
 
-	if(--player.score->subscore[0] <= 0)
+	if(style == kill_style_bobomb || style == kill_style_bomb)
+		player.score->subscore[0] -= 2;
+	else
+		player.score->subscore[0]--;
+
+	if(player.score->subscore[0] <= 0)
 	{
+		player.score->subscore[0] = 0;
 		short iRet = CGM_Classic::playerkilledself(player, style);
 
 		if(iRet == player_kill_normal)

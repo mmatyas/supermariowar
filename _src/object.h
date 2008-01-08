@@ -881,7 +881,7 @@ class MO_Coin : public IO_MovingObject
 class IO_OverMapObject : public CObject
 {
 	public:
-		IO_OverMapObject(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed);
+		IO_OverMapObject(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth = -1, short iCollisionHeight = -1, short iCollisionOffsetX = -1, short iCollisionOffsetY = -1, short iAnimationOffsetX = -1, short iAnimationOffsetY = -1, short iAnimationHeight = -1, short iAnimationWidth = -1);
 		virtual ~IO_OverMapObject(){};
 
 		virtual void draw();
@@ -900,6 +900,8 @@ class IO_OverMapObject : public CObject
 		short drawframe;
 		short animationtimer;
 		short animationWidth;
+
+		short animationOffsetX, animationOffsetY;
 
 		float bounce;
 
@@ -983,7 +985,7 @@ class MO_CarriedObject : public IO_MovingObject
 class CO_Egg : public MO_CarriedObject
 {
 	public:
-		CO_Egg(gfxSprite *nspr);
+		CO_Egg(gfxSprite *nspr, short iColor);
 		~CO_Egg(){};
 
 		void update();
@@ -1004,6 +1006,8 @@ class CO_Egg : public MO_CarriedObject
 		short sparkleanimationtimer;
 		short sparkledrawframe;
 	
+		short color;
+
 	friend class CPlayer;
 	friend class OMO_Yoshi;
 	friend class CGM_Eggs;
@@ -1103,7 +1107,7 @@ class CO_Flag : public MO_CarriedObject
 class OMO_Yoshi : public IO_OverMapObject
 {
 	public:
-		OMO_Yoshi(gfxSprite *nspr);
+		OMO_Yoshi(gfxSprite *nspr, short iColor);
 		~OMO_Yoshi(){};
 
 		void update();
@@ -1113,6 +1117,7 @@ class OMO_Yoshi : public IO_OverMapObject
 
 	private:
 		short timer;
+		short color;
 };
 
 class OMO_Area : public IO_OverMapObject

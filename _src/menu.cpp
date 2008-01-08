@@ -137,7 +137,8 @@ void Menu::WriteGameOptions()
 		fwrite(&game_values.shellttl, sizeof(short), 1, fp);
 		fwrite(&game_values.blueblockttl, sizeof(short), 1, fp);
 		fwrite(&game_values.storedpowerupdelay, sizeof(short), 1, fp);
-		fwrite(&game_values.warplocks, sizeof(short), 1, fp);
+		fwrite(&game_values.warplockstyle, sizeof(short), 1, fp);
+		fwrite(&game_values.warplocktime, sizeof(short), 1, fp);
 
 		fwrite(game_values.inputConfiguration, sizeof(CInputPlayerControl), 8, fp);
 
@@ -348,14 +349,14 @@ void Menu::CreateMenu()
 	// Graphics Options
 	//***********************
 
-	miSpawnStyleField = new MI_SelectField(&spr_selectfield, 120, 60, "Spawn", 400, 150);
+	miSpawnStyleField = new MI_SelectField(&spr_selectfield, 70, 60, "Spawn Style", 500, 220);
 	miSpawnStyleField->Add("Instant", 0, "", false, false);
 	miSpawnStyleField->Add("Door", 1, "", false, false);
 	miSpawnStyleField->Add("Swirl", 2, "", false, false);
 	miSpawnStyleField->SetData(&game_values.spawnstyle, NULL, NULL);
 	miSpawnStyleField->SetKey(game_values.spawnstyle);
 
-	miAwardStyleField = new MI_SelectField(&spr_selectfield, 120, 100, "Awards", 400, 150);
+	miAwardStyleField = new MI_SelectField(&spr_selectfield, 70, 100, "Award Style", 500, 220);
 	miAwardStyleField->Add("None", 0, "", false, false);
 	miAwardStyleField->Add("Fireworks", 1, "", false, false);
 	miAwardStyleField->Add("Spiral", 2, "", false, false);
@@ -365,28 +366,28 @@ void Menu::CreateMenu()
 	miAwardStyleField->SetData(&game_values.awardstyle, NULL, NULL);
 	miAwardStyleField->SetKey(game_values.awardstyle);
 
-	miScoreStyleField = new MI_SelectField(&spr_selectfield, 120, 140, "Scores", 400, 150);
+	miScoreStyleField = new MI_SelectField(&spr_selectfield, 70, 140, "Score Style", 500, 220);
 	miScoreStyleField->Add("Top", 0, "", false, false);
 	miScoreStyleField->Add("Bottom", 1, "", false, false);
 	miScoreStyleField->Add("Corners", 2, "", false, false);
 	miScoreStyleField->SetData(&game_values.scoreboardstyle, NULL, NULL);
 	miScoreStyleField->SetKey(game_values.scoreboardstyle);
 
-	miCrunchField = new MI_SelectField(&spr_selectfield, 120, 180, "Crunch", 400, 150);
+	miCrunchField = new MI_SelectField(&spr_selectfield, 70, 180, "Screen Crunch", 500, 220);
 	miCrunchField->Add("Off", 0, "", false, false);
 	miCrunchField->Add("On", 1, "", true, false);
 	miCrunchField->SetData(NULL, NULL, &game_values.screencrunch);
 	miCrunchField->SetKey(game_values.screencrunch ? 1 : 0);
 	miCrunchField->SetAutoAdvance(true);
 
-	miTopLayerField = new MI_SelectField(&spr_selectfield, 120, 220, "Top Layer", 400, 150);
+	miTopLayerField = new MI_SelectField(&spr_selectfield, 70, 220, "Draw Top Layer", 500, 220);
 	miTopLayerField->Add("Background", 0, "", false, false);
 	miTopLayerField->Add("Foreground", 1, "", true, false);
 	miTopLayerField->SetData(NULL, NULL, &game_values.toplayer);
 	miTopLayerField->SetKey(game_values.toplayer ? 1 : 0);
 	miTopLayerField->SetAutoAdvance(true);
 
-	miWinningCrownField = new MI_SelectField(&spr_selectfield, 120, 260, "Crown", 400, 150);
+	miWinningCrownField = new MI_SelectField(&spr_selectfield, 70, 260, "Leader Crown", 500, 220);
 	miWinningCrownField->Add("Off", 0, "", false, false);
 	miWinningCrownField->Add("On", 1, "", true, false);
 	miWinningCrownField->SetData(NULL, NULL, &game_values.showwinningcrown);
@@ -394,10 +395,10 @@ void Menu::CreateMenu()
 	miWinningCrownField->SetAutoAdvance(true);
 
 #ifdef _XBOX
-	miScreenSettingsButton = new MI_Button(&spr_selectfield, 120, 300, "Screen Settings", 400, 0);
+	miScreenSettingsButton = new MI_Button(&spr_selectfield, 70, 300, "Screen Settings", 500, 0);
 	miScreenSettingsButton->SetCode(MENU_CODE_TO_SCREEN_SETTINGS);
 #else
-	miFullscreenField = new MI_SelectField(&spr_selectfield, 120, 300, "Screen", 400, 150);
+	miFullscreenField = new MI_SelectField(&spr_selectfield, 70, 300, "Screen Size", 500, 220);
 	miFullscreenField->Add("Windowed", 0, "", false, false);
 	miFullscreenField->Add("Fullscreen", 1, "", true, false);
 	miFullscreenField->SetData(NULL, NULL, &game_values.fullscreen);
@@ -406,8 +407,8 @@ void Menu::CreateMenu()
 	miFullscreenField->SetItemChangedCode(MENU_CODE_TOGGLE_FULLSCREEN);
 #endif //_XBOX
 
-	miMenuGraphicsPackField = new MI_PacksField(&spr_selectfield, 120, 340, "Menu Gfx", 400, 150, &menugraphicspacklist, MENU_CODE_MENU_GRAPHICS_PACK_CHANGED);
-	miGameGraphicsPackField = new MI_PacksField(&spr_selectfield, 120, 380, "Game Gfx", 400, 150, &gamegraphicspacklist, MENU_CODE_GAME_GRAPHICS_PACK_CHANGED);
+	miMenuGraphicsPackField = new MI_PacksField(&spr_selectfield, 70, 340, "Menu Graphics", 500, 220, &menugraphicspacklist, MENU_CODE_MENU_GRAPHICS_PACK_CHANGED);
+	miGameGraphicsPackField = new MI_PacksField(&spr_selectfield, 70, 380, "Game Graphics", 500, 220, &gamegraphicspacklist, MENU_CODE_GAME_GRAPHICS_PACK_CHANGED);
 
 	miGraphicsOptionsMenuBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
 	miGraphicsOptionsMenuBackButton->SetCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
@@ -446,14 +447,14 @@ void Menu::CreateMenu()
 	//***********************
 
 
-	miTeamKillsField = new MI_SelectField(&spr_selectfield, 120, 200, "Kills", 400, 150);
+	miTeamKillsField = new MI_SelectField(&spr_selectfield, 70, 200, "Kills", 500, 220);
 	miTeamKillsField->Add("Off", 0, "", false, false);
 	miTeamKillsField->Add("On", 1, "", true, false);
 	miTeamKillsField->SetData(NULL, NULL, &game_values.friendlyfire);
 	miTeamKillsField->SetKey(game_values.friendlyfire ? 1 : 0);
 	miTeamKillsField->SetAutoAdvance(true);
 
-	miTeamColorsField = new MI_SelectField(&spr_selectfield, 120, 240, "Colors", 400, 150);
+	miTeamColorsField = new MI_SelectField(&spr_selectfield, 70, 240, "Colors", 500, 220);
 	miTeamColorsField->Add("Off", 0, "", false, false);
 	miTeamColorsField->Add("On", 1, "", true, false);
 	miTeamColorsField->SetData(NULL, NULL, &game_values.teamcolors);
@@ -482,7 +483,7 @@ void Menu::CreateMenu()
 	// Gameplay Options
 	//***********************
 
-	miRespawnField = new MI_SelectField(&spr_selectfield, 120, 80, "Respawn", 400, 180);
+	miRespawnField = new MI_SelectField(&spr_selectfield, 70, 60, "Respawn Time", 500, 220);
 	miRespawnField->Add("Instant", 0, "", false, false);
 	miRespawnField->Add("0.5 Seconds", 1, "", false, false);
 	miRespawnField->Add("1.0 Seconds", 2, "", false, false);
@@ -507,7 +508,7 @@ void Menu::CreateMenu()
 	miRespawnField->SetData(&game_values.respawn, NULL, NULL);
 	miRespawnField->SetKey(game_values.respawn);
 
-	miShieldField = new MI_SelectField(&spr_selectfield, 120, 120, "Shield", 400, 180);
+	miShieldField = new MI_SelectField(&spr_selectfield, 70, 100, "Shield Time", 500, 220);
 	miShieldField->Add("None", 0, "", false, false);
 	miShieldField->Add("0.5 Seconds", 31, "", false, false);
 	miShieldField->Add("1.0 Seconds", 62, "", false, false);
@@ -522,7 +523,7 @@ void Menu::CreateMenu()
 	miShieldField->SetData(&game_values.spawninvincibility, NULL, NULL);
 	miShieldField->SetKey(game_values.spawninvincibility);
 
-	miBoundsTimeField = new MI_SelectField(&spr_selectfield, 120, 160, "Bounds Time", 400, 180);
+	miBoundsTimeField = new MI_SelectField(&spr_selectfield, 70, 140, "Bounds Time", 500, 220);
 	miBoundsTimeField->Add("Infinite", 0, "", false, false);
 	miBoundsTimeField->Add("1 Second", 1, "", false, false);
 	miBoundsTimeField->Add("2 Seconds", 2, "", false, false);
@@ -537,22 +538,31 @@ void Menu::CreateMenu()
 	miBoundsTimeField->SetData(&game_values.outofboundstime, NULL, NULL);
 	miBoundsTimeField->SetKey(game_values.outofboundstime);
 
-	miWarpLocksField = new MI_SelectField(&spr_selectfield, 120, 200, "Warp Locks", 400, 180);
-	miWarpLocksField->Add("Off", 0, "", false, false);
-	miWarpLocksField->Add("1 Second", 62, "", false, false);
-	miWarpLocksField->Add("2 Seconds", 124, "", false, false);
-	miWarpLocksField->Add("3 Seconds", 186, "", false, false);
-	miWarpLocksField->Add("4 Seconds", 248, "", false, false);
-	miWarpLocksField->Add("5 Seconds", 310, "", false, false);
-	miWarpLocksField->Add("6 Seconds", 372, "", false, false);
-	miWarpLocksField->Add("7 Seconds", 434, "", false, false);
-	miWarpLocksField->Add("8 Seconds", 496, "", false, false);
-	miWarpLocksField->Add("9 Seconds", 558, "", false, false);
-	miWarpLocksField->Add("10 Seconds", 620, "", false, false);
-	miWarpLocksField->SetData(&game_values.warplocks, NULL, NULL);
-	miWarpLocksField->SetKey(game_values.warplocks);
+	miWarpLockStyleField = new MI_SelectField(&spr_selectfield, 70, 180, "Warp Lock Style", 500, 220);
+	miWarpLockStyleField->Add("Entrance Only", 0, "", false, false);
+	miWarpLockStyleField->Add("Exit Only", 1, "", false, false);
+	miWarpLockStyleField->Add("Entrance and Exit", 2, "", false, false);
+	miWarpLockStyleField->Add("Entire Connection", 3, "", false, false);
+	miWarpLockStyleField->Add("All Warps", 4, "", false, false);
+	miWarpLockStyleField->SetData(&game_values.warplockstyle, NULL, NULL);
+	miWarpLockStyleField->SetKey(game_values.warplockstyle);
 
-	miBotsField = new MI_SelectField(&spr_selectfield, 120, 240, "Bots", 400, 180);
+	miWarpLockTimeField = new MI_SelectField(&spr_selectfield, 70, 220, "Warp Lock Time", 500, 220);
+	miWarpLockTimeField->Add("Off", 0, "", false, false);
+	miWarpLockTimeField->Add("1 Second", 62, "", false, false);
+	miWarpLockTimeField->Add("2 Seconds", 124, "", false, false);
+	miWarpLockTimeField->Add("3 Seconds", 186, "", false, false);
+	miWarpLockTimeField->Add("4 Seconds", 248, "", false, false);
+	miWarpLockTimeField->Add("5 Seconds", 310, "", false, false);
+	miWarpLockTimeField->Add("6 Seconds", 372, "", false, false);
+	miWarpLockTimeField->Add("7 Seconds", 434, "", false, false);
+	miWarpLockTimeField->Add("8 Seconds", 496, "", false, false);
+	miWarpLockTimeField->Add("9 Seconds", 558, "", false, false);
+	miWarpLockTimeField->Add("10 Seconds", 620, "", false, false);
+	miWarpLockTimeField->SetData(&game_values.warplocktime, NULL, NULL);
+	miWarpLockTimeField->SetKey(game_values.warplocktime);
+
+	miBotsField = new MI_SelectField(&spr_selectfield, 70, 260, "Bot Difficulty", 500, 220);
 	miBotsField->Add("Very Easy", 0, "", false, false);
 	miBotsField->Add("Easy", 1, "", false, false);
 	miBotsField->Add("Moderate", 2, "", false, false);
@@ -561,7 +571,7 @@ void Menu::CreateMenu()
 	miBotsField->SetData(&game_values.cpudifficulty, NULL, NULL);
 	miBotsField->SetKey(game_values.cpudifficulty);
 
-	miFrameLimiterField = new MI_SelectField(&spr_selectfield, 120, 280, "Frame Limit", 400, 180);
+	miFrameLimiterField = new MI_SelectField(&spr_selectfield, 70, 300, "Frame Limit", 500, 220);
 	miFrameLimiterField->Add("10 FPS", 100, "", false, false);
 	miFrameLimiterField->Add("15 FPS", 67, "", false, false);
 	miFrameLimiterField->Add("20 FPS", 50, "", false, false);
@@ -591,7 +601,7 @@ void Menu::CreateMenu()
 	miFrameLimiterField->SetData(&game_values.framelimiter, NULL, NULL);
 	miFrameLimiterField->SetKey(game_values.framelimiter);
 
-	miPointSpeedField = new MI_SelectField(&spr_selectfield, 120, 320, "Point Speed", 400, 180);
+	miPointSpeedField = new MI_SelectField(&spr_selectfield, 70, 340, "Point Speed", 500, 220);
 	miPointSpeedField->Add("Very Slow", 60, "", false, false);
 	miPointSpeedField->Add("Slow", 40, "", false, false);
 	miPointSpeedField->Add("Moderate", 20, "", false, false);
@@ -600,7 +610,7 @@ void Menu::CreateMenu()
 	miPointSpeedField->SetData(&game_values.pointspeed, NULL, NULL);
 	miPointSpeedField->SetKey(game_values.pointspeed);
 	
-	miSecretsField = new MI_SelectField(&spr_selectfield, 120, 360, "Secrets", 400, 180);
+	miSecretsField = new MI_SelectField(&spr_selectfield, 70, 380, "Special Moves", 500, 220);
 	miSecretsField->Add("Off", 0, "", false, false);
 	miSecretsField->Add("On", 1, "", true, false);
 	miSecretsField->SetData(NULL, NULL, &game_values.secrets);
@@ -616,9 +626,10 @@ void Menu::CreateMenu()
 
 	mGameplayOptionsMenu.AddControl(miRespawnField, miGameplayOptionsMenuBackButton, miShieldField, NULL, miGameplayOptionsMenuBackButton);
 	mGameplayOptionsMenu.AddControl(miShieldField, miRespawnField, miBoundsTimeField, NULL, miGameplayOptionsMenuBackButton);
-	mGameplayOptionsMenu.AddControl(miBoundsTimeField, miShieldField, miWarpLocksField, NULL, miGameplayOptionsMenuBackButton);
-	mGameplayOptionsMenu.AddControl(miWarpLocksField, miBoundsTimeField, miBotsField, NULL, miGameplayOptionsMenuBackButton);
-	mGameplayOptionsMenu.AddControl(miBotsField, miWarpLocksField, miFrameLimiterField, NULL, miGameplayOptionsMenuBackButton);
+	mGameplayOptionsMenu.AddControl(miBoundsTimeField, miShieldField, miWarpLockStyleField, NULL, miGameplayOptionsMenuBackButton);
+	mGameplayOptionsMenu.AddControl(miWarpLockStyleField, miBoundsTimeField, miWarpLockTimeField, NULL, miGameplayOptionsMenuBackButton);
+	mGameplayOptionsMenu.AddControl(miWarpLockTimeField, miWarpLockStyleField, miBotsField, NULL, miGameplayOptionsMenuBackButton);
+	mGameplayOptionsMenu.AddControl(miBotsField, miWarpLockTimeField, miFrameLimiterField, NULL, miGameplayOptionsMenuBackButton);
 	mGameplayOptionsMenu.AddControl(miFrameLimiterField, miBotsField, miPointSpeedField, NULL, miGameplayOptionsMenuBackButton);
 	mGameplayOptionsMenu.AddControl(miPointSpeedField, miFrameLimiterField, miSecretsField, NULL, miGameplayOptionsMenuBackButton);
 	mGameplayOptionsMenu.AddControl(miSecretsField, miPointSpeedField, miGameplayOptionsMenuBackButton, NULL, miGameplayOptionsMenuBackButton);
@@ -636,7 +647,7 @@ void Menu::CreateMenu()
 	// Sound Options
 	//***********************
 
-	miSoundVolumeField = new MI_SliderField(&spr_selectfield, &menu_slider_bar, 120, 100, "Sound", 400, 160, 384);
+	miSoundVolumeField = new MI_SliderField(&spr_selectfield, &menu_slider_bar, 70, 100, "Sound Volume", 500, 220, 484);
 	miSoundVolumeField->Add("Off", 0, "", false, false);
 	miSoundVolumeField->Add("1", 16, "", false, false);
 	miSoundVolumeField->Add("2", 32, "", false, false);
@@ -651,7 +662,7 @@ void Menu::CreateMenu()
 	miSoundVolumeField->SetNoWrap(true);
 	miSoundVolumeField->SetItemChangedCode(MENU_CODE_SOUND_VOLUME_CHANGED);
 	
-	miMusicVolumeField = new MI_SliderField(&spr_selectfield, &menu_slider_bar, 120, 140, "Music", 400, 160, 384);
+	miMusicVolumeField = new MI_SliderField(&spr_selectfield, &menu_slider_bar, 70, 140, "Music Volume", 500, 220, 484);
 	miMusicVolumeField->Add("Off", 0, "", false, false);
 	miMusicVolumeField->Add("1", 16, "", false, false);
 	miMusicVolumeField->Add("2", 32, "", false, false);
@@ -666,18 +677,18 @@ void Menu::CreateMenu()
 	miMusicVolumeField->SetNoWrap(true);
 	miMusicVolumeField->SetItemChangedCode(MENU_CODE_MUSIC_VOLUME_CHANGED);
 
-	miPlayNextMusicField = new MI_SelectField(&spr_selectfield, 120, 180, "Next Music", 400, 160);
+	miPlayNextMusicField = new MI_SelectField(&spr_selectfield, 70, 180, "Next Music", 500, 220);
 	miPlayNextMusicField->Add("Off", 0, "", false, false);
 	miPlayNextMusicField->Add("On", 1, "", true, false);
 	miPlayNextMusicField->SetData(NULL, NULL, &game_values.playnextmusic);
 	miPlayNextMusicField->SetKey(game_values.playnextmusic ? 1 : 0);
 	miPlayNextMusicField->SetAutoAdvance(true);
 
-	miAnnouncerField = new MI_AnnouncerField(&spr_selectfield, 120, 220, "Announcer", 400, 160, &announcerlist);
-	miPlaylistField = new MI_PlaylistField(&spr_selectfield, 120, 260, "Playlist", 400, 160);
-	miSoundPackField = new MI_PacksField(&spr_selectfield, 120, 300, "Sfx Pack", 400, 160, &soundpacklist, MENU_CODE_SOUND_PACK_CHANGED);
+	miAnnouncerField = new MI_AnnouncerField(&spr_selectfield, 70, 220, "Announcer", 500, 220, &announcerlist);
+	miSoundPackField = new MI_PacksField(&spr_selectfield, 70, 260, "Sound Pack", 500, 220, &soundpacklist, MENU_CODE_SOUND_PACK_CHANGED);
 
-	miWorldMusicField = new MI_SelectField(&spr_selectfield, 120, 340, "World Music", 400, 160);
+	miPlaylistField = new MI_PlaylistField(&spr_selectfield, 70, 300, "Game Music Pack", 500, 220);
+	miWorldMusicField = new MI_SelectField(&spr_selectfield, 70, 340, "World Music Pack", 500, 220);
 	
 	int iCurrentMusic = worldmusiclist.GetCurrentIndex();
 	worldmusiclist.SetCurrent(0);
@@ -708,10 +719,10 @@ void Menu::CreateMenu()
 	mSoundOptionsMenu.AddControl(miSoundVolumeField, miSoundOptionsMenuBackButton, miMusicVolumeField, NULL, miSoundOptionsMenuBackButton);
 	mSoundOptionsMenu.AddControl(miMusicVolumeField, miSoundVolumeField, miPlayNextMusicField, NULL, miSoundOptionsMenuBackButton);
 	mSoundOptionsMenu.AddControl(miPlayNextMusicField, miMusicVolumeField, miAnnouncerField, NULL, miSoundOptionsMenuBackButton);
-	mSoundOptionsMenu.AddControl(miAnnouncerField, miPlayNextMusicField, miPlaylistField, NULL, miSoundOptionsMenuBackButton);
-	mSoundOptionsMenu.AddControl(miPlaylistField, miAnnouncerField, miSoundPackField, NULL, miSoundOptionsMenuBackButton);
-	mSoundOptionsMenu.AddControl(miSoundPackField, miPlaylistField, miWorldMusicField, NULL, miSoundOptionsMenuBackButton);
-	mSoundOptionsMenu.AddControl(miWorldMusicField, miSoundPackField, miSoundOptionsMenuBackButton, NULL, miSoundOptionsMenuBackButton);
+	mSoundOptionsMenu.AddControl(miAnnouncerField, miPlayNextMusicField, miSoundPackField, NULL, miSoundOptionsMenuBackButton);
+	mSoundOptionsMenu.AddControl(miSoundPackField, miAnnouncerField, miPlaylistField, NULL, miSoundOptionsMenuBackButton);
+	mSoundOptionsMenu.AddControl(miPlaylistField, miSoundPackField, miWorldMusicField, NULL, miSoundOptionsMenuBackButton);
+	mSoundOptionsMenu.AddControl(miWorldMusicField, miPlaylistField, miSoundOptionsMenuBackButton, NULL, miSoundOptionsMenuBackButton);
 	mSoundOptionsMenu.AddControl(miSoundOptionsMenuBackButton, miWorldMusicField, miSoundVolumeField, miSoundPackField, NULL);
 	
 	mSoundOptionsMenu.AddNonControl(miSoundOptionsMenuLeftHeaderBar);
@@ -966,7 +977,7 @@ void Menu::CreateMenu()
 	miScreenResizeButton = new MI_Button(&spr_selectfield, 120, 160, "Resize Screen", 400, 0);
 	miScreenResizeButton->SetCode(MENU_CODE_TO_SCREEN_RESIZE);
 
-	miScreenHardwareFilterField = new MI_SelectField(&spr_selectfield, 120, 200, "Screen Filter", 400, 180);
+	miScreenHardwareFilterField = new MI_SelectField(&spr_selectfield, 70, 200, "Screen Filter", 500, 220);
 	//miScreenHardwareFilterField->Add("None", 0, "", false, false);
 	miScreenHardwareFilterField->Add("Point", 1, "", false, false);
 	miScreenHardwareFilterField->Add("Bilinear", 2, "", false, false);
@@ -978,7 +989,7 @@ void Menu::CreateMenu()
 	miScreenHardwareFilterField->SetKey(game_values.hardwarefilter);
 	miScreenHardwareFilterField->SetItemChangedCode(MENU_CODE_SCREEN_FILTER_CHANGED);
 
-	miScreenFlickerFilterField = new MI_SliderField(&spr_selectfield, &menu_slider_bar, 120, 240, "Flicker Filter", 400, 180, 380);
+	miScreenFlickerFilterField = new MI_SliderField(&spr_selectfield, &menu_slider_bar, 70, 240, "Flicker Filter", 500, 220, 380);
 	miScreenFlickerFilterField->Add("0", 0, "", false, false);
 	miScreenFlickerFilterField->Add("1", 1, "", false, false);
 	miScreenFlickerFilterField->Add("2", 2, "", false, false);
@@ -990,7 +1001,7 @@ void Menu::CreateMenu()
 	miScreenFlickerFilterField->SetNoWrap(true);
 	miScreenFlickerFilterField->SetItemChangedCode(MENU_CODE_SCREEN_SETTINGS_CHANGED);
 
-	miScreenSoftFilterField = new MI_SelectField(&spr_selectfield, 120, 280, "Soften Filter", 400, 180);
+	miScreenSoftFilterField = new MI_SelectField(&spr_selectfield, 70, 280, "Soften Filter", 500, 220);
 	miScreenSoftFilterField->Add("Off", 0, "", false, false);
 	miScreenSoftFilterField->Add("On", 1, "", true, false);
 	miScreenSoftFilterField->SetData(&game_values.softfilter, NULL, NULL);
@@ -999,7 +1010,7 @@ void Menu::CreateMenu()
 	miScreenSoftFilterField->SetItemChangedCode(MENU_CODE_SCREEN_SETTINGS_CHANGED);
 
 	/*
-	miScreenAspectRatioField = new MI_SelectField(&spr_selectfield, 120, 300, "10x11 Aspect", 400, 180);
+	miScreenAspectRatioField = new MI_SelectField(&spr_selectfield, 70, 300, "10x11 Aspect", 500, 220);
 	miScreenAspectRatioField->Add("Off", 0, "", false, false);
 	miScreenAspectRatioField->Add("On", 1, "", true, false);
 	miScreenAspectRatioField->SetData(NULL, NULL, &game_values.aspectratio10x11);
@@ -1515,6 +1526,65 @@ void Menu::CreateMenu()
 	
 	mModeSettingsMenu[4].SetHeadControl(miCoinModePenaltyField);
 	mModeSettingsMenu[4].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
+	
+	//***********************
+	// Yoshi's Eggs Mode Settings
+	//***********************
+
+	//TODO: Use egg and yoshi icons instead of title text below
+	char * szEggFields[4] = {"Green Eggs", "Red Eggs", "Yellow Eggs", "Blue Eggs"};
+	for(short iEggField = 0; iEggField < 4; iEggField++)
+	{
+		miEggModeEggQuantityField[iEggField] = new MI_SliderField(&spr_selectfield, &menu_slider_bar, 120, 80 + iEggField * 40, szEggFields[iEggField], 400, 180, 380);
+		miEggModeEggQuantityField[iEggField]->Add("0", 0, "", false, false);
+		miEggModeEggQuantityField[iEggField]->Add("1", 1, "", false, false);
+		miEggModeEggQuantityField[iEggField]->Add("2", 2, "", false, false);
+		miEggModeEggQuantityField[iEggField]->Add("3", 3, "", false, false);
+		miEggModeEggQuantityField[iEggField]->Add("4", 4, "", false, false);
+		miEggModeEggQuantityField[iEggField]->SetData(&game_values.gamemodemenusettings.egg.eggs[iEggField], NULL, NULL);
+		miEggModeEggQuantityField[iEggField]->SetKey(game_values.gamemodemenusettings.egg.eggs[iEggField]);
+		miEggModeEggQuantityField[iEggField]->SetNoWrap(true);
+	}
+
+	char * szYoshiFields[4] = {"Green Yoshis", "Red Yoshis", "Yellow Yoshis", "Blue Yoshis"};
+	for(short iYoshiField = 0; iYoshiField < 4; iYoshiField++)
+	{
+		miEggModeYoshiQuantityField[iYoshiField] = new MI_SliderField(&spr_selectfield, &menu_slider_bar, 120, 240 + iYoshiField * 40, szYoshiFields[iYoshiField], 400, 180, 380);
+		miEggModeYoshiQuantityField[iYoshiField]->Add("0", 0, "", false, false);
+		miEggModeYoshiQuantityField[iYoshiField]->Add("1", 1, "", false, false);
+		miEggModeYoshiQuantityField[iYoshiField]->Add("2", 2, "", false, false);
+		miEggModeYoshiQuantityField[iYoshiField]->Add("3", 3, "", false, false);
+		miEggModeYoshiQuantityField[iYoshiField]->Add("4", 4, "", false, false);
+		miEggModeYoshiQuantityField[iYoshiField]->SetData(&game_values.gamemodemenusettings.egg.yoshis[iYoshiField], NULL, NULL);
+		miEggModeYoshiQuantityField[iYoshiField]->SetKey(game_values.gamemodemenusettings.egg.yoshis[iYoshiField]);
+		miEggModeYoshiQuantityField[iYoshiField]->SetNoWrap(true);
+	}
+
+	miEggModeBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
+	miEggModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
+
+	miEggModeLeftHeaderBar = new MI_Image(&menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
+	miEggModeRightHeaderBar = new MI_Image(&menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
+	miEggModeHeaderText = new MI_Text("Yoshi's Eggs Mode Menu", 320, 5, 0, 2, 1);
+
+	mModeSettingsMenu[6].AddControl(miEggModeEggQuantityField[0], miEggModeBackButton, miEggModeEggQuantityField[1], NULL, miEggModeBackButton);
+	mModeSettingsMenu[6].AddControl(miEggModeEggQuantityField[1], miEggModeEggQuantityField[0], miEggModeEggQuantityField[2], NULL, miEggModeBackButton);
+	mModeSettingsMenu[6].AddControl(miEggModeEggQuantityField[2], miEggModeEggQuantityField[1], miEggModeEggQuantityField[3], NULL, miEggModeBackButton);
+	mModeSettingsMenu[6].AddControl(miEggModeEggQuantityField[3], miEggModeEggQuantityField[2], miEggModeYoshiQuantityField[0], NULL, miEggModeBackButton);
+
+	mModeSettingsMenu[6].AddControl(miEggModeYoshiQuantityField[0], miEggModeEggQuantityField[3], miEggModeYoshiQuantityField[1], NULL, miEggModeBackButton);
+	mModeSettingsMenu[6].AddControl(miEggModeYoshiQuantityField[1], miEggModeYoshiQuantityField[0], miEggModeYoshiQuantityField[2], NULL, miEggModeBackButton);
+	mModeSettingsMenu[6].AddControl(miEggModeYoshiQuantityField[2], miEggModeYoshiQuantityField[1], miEggModeYoshiQuantityField[3], NULL, miEggModeBackButton);
+	mModeSettingsMenu[6].AddControl(miEggModeYoshiQuantityField[3], miEggModeYoshiQuantityField[2], miEggModeBackButton, NULL, miEggModeBackButton);
+
+	mModeSettingsMenu[6].AddControl(miEggModeBackButton, miEggModeYoshiQuantityField[3], miEggModeEggQuantityField[0], miEggModeYoshiQuantityField[3], NULL);
+	
+	mModeSettingsMenu[6].AddNonControl(miEggModeLeftHeaderBar);
+	mModeSettingsMenu[6].AddNonControl(miEggModeRightHeaderBar);
+	mModeSettingsMenu[6].AddNonControl(miEggModeHeaderText);
+	
+	mModeSettingsMenu[6].SetHeadControl(miEggModeEggQuantityField[0]);
+	mModeSettingsMenu[6].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 	
 	//***********************
 	// Flag Mode Settings
@@ -2450,7 +2520,7 @@ void Menu::CreateMenu()
 	// Powerup Settings Menu
 	//***********************
 	
-	miStoredPowerupDelayField = new MI_SelectField(&spr_selectfield, 120, 120, "Stored Use", 400, 180);
+	miStoredPowerupDelayField = new MI_SelectField(&spr_selectfield, 70, 120, "Item Use Speed", 500, 220);
 	miStoredPowerupDelayField->Add("Very Slow", 2, "", false, false);
 	miStoredPowerupDelayField->Add("Slow", 3, "", false, false);
 	miStoredPowerupDelayField->Add("Moderate", 4, "", false, false);
@@ -2459,7 +2529,7 @@ void Menu::CreateMenu()
 	miStoredPowerupDelayField->SetData(&game_values.storedpowerupdelay, NULL, NULL);
 	miStoredPowerupDelayField->SetKey(game_values.storedpowerupdelay);
 
-	miItemRespawnField = new MI_SelectField(&spr_selectfield, 120, 160, "Item Spawn", 400, 180);
+	miItemRespawnField = new MI_SelectField(&spr_selectfield, 70, 160, "Item Spawn", 500, 220);
 	miItemRespawnField->Add("5 Seconds", 310, "", false, false);
 	miItemRespawnField->Add("10 Seconds", 620, "", false, false);
 	miItemRespawnField->Add("15 Seconds", 930, "", false, false);
@@ -2475,28 +2545,28 @@ void Menu::CreateMenu()
 	miItemRespawnField->SetData(&game_values.itemrespawntime, NULL, NULL);
 	miItemRespawnField->SetKey(game_values.itemrespawntime);
 
-	miSwapStyleField = new MI_SelectField(&spr_selectfield, 120, 200, "Swap Style", 400, 180);
+	miSwapStyleField = new MI_SelectField(&spr_selectfield, 70, 200, "Swap Style", 500, 220);
 	miSwapStyleField->Add("Walk", 0, "", false, false);
 	miSwapStyleField->Add("Blink", 1, "", false, false);
 	miSwapStyleField->Add("Instant", 2, "", false, false);
 	miSwapStyleField->SetData(&game_values.swapstyle, NULL, NULL);
 	miSwapStyleField->SetKey(game_values.swapstyle);
 
-	miBonusWheelField = new MI_SelectField(&spr_selectfield, 120, 240, "Bonus Wheel", 400, 180);
+	miBonusWheelField = new MI_SelectField(&spr_selectfield, 70, 240, "Bonus Wheel", 500, 220);
 	miBonusWheelField->Add("Off", 0, "", false, false);
 	miBonusWheelField->Add("Tournament Win", 1, "", false, false);
 	miBonusWheelField->Add("Every Game", 2, "", false, false);
 	miBonusWheelField->SetData(&game_values.bonuswheel, NULL, NULL);
 	miBonusWheelField->SetKey(game_values.bonuswheel);
 
-	miKeepPowerupField = new MI_SelectField(&spr_selectfield, 120, 280, "Bonus Item", 400, 180);
+	miKeepPowerupField = new MI_SelectField(&spr_selectfield, 70, 280, "Bonus Item", 500, 220);
 	miKeepPowerupField->Add("Until Next Spin", 0, "", false, false);
 	miKeepPowerupField->Add("Keep Always", 1, "", true, false);
 	miKeepPowerupField->SetData(NULL, NULL, &game_values.keeppowerup);
 	miKeepPowerupField->SetKey(game_values.keeppowerup ? 1 : 0);
 	miKeepPowerupField->SetAutoAdvance(true);
 
-	miStoredPowerupResetButton = new MI_StoredPowerupResetButton(&spr_selectfield, 120, 320, "Reset Stored Items", 400, 0);
+	miStoredPowerupResetButton = new MI_StoredPowerupResetButton(&spr_selectfield, 70, 320, "Reset Stored Items", 500, 0);
 	miStoredPowerupResetButton->SetCode(MENU_CODE_RESET_STORED_POWERUPS);
 
 	miPowerupSettingsMenuBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
@@ -2774,7 +2844,7 @@ void Menu::RunMenu()
 		{
 			MenuCodeEnum code = mCurrentMenu->SendInput(&game_values.playerInput);
 
-			bool fShowSettingsButton[GAMEMODE_LAST] = {true, true, true, true, true, true, false, true, true, true, true, true, true, true, false, true, true, false, true, true};
+			bool fShowSettingsButton[GAMEMODE_LAST] = {true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, true, true, false, true, true};
 
 			if(MENU_CODE_EXIT_APPLICATION == code)
 			{

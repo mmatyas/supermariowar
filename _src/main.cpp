@@ -718,7 +718,8 @@ int main(int argc, char *argv[])
 	game_values.respawn				= 2;
 	game_values.itemrespawntime		= 1860;  //default item respawn is 30 seconds (30 * 62 fps)
 	game_values.outofboundstime		= 5;
-	game_values.warplocks			= 186;  // 3 seconds
+	game_values.warplockstyle		= 1;	// Lock Warp Exit Only
+	game_values.warplocktime		= 186;  // 3 seconds
 	game_values.cpudifficulty		= 2;
 	game_values.fireballttl			= 310;  // 5 seconds
 	game_values.shellttl			= 496;  // 8 seconds
@@ -863,6 +864,16 @@ int main(int argc, char *argv[])
 	game_values.gamemodemenusettings.stomp.enemyweight[1] = 1;  
 	game_values.gamemodemenusettings.stomp.enemyweight[2] = 2;
 	game_values.gamemodemenusettings.stomp.enemyweight[3] = 1;
+
+	//Eggs
+	game_values.gamemodemenusettings.egg.eggs[0] = 1;
+	game_values.gamemodemenusettings.egg.eggs[1] = 0;
+	game_values.gamemodemenusettings.egg.eggs[2] = 0;
+	game_values.gamemodemenusettings.egg.eggs[3] = 0;
+	game_values.gamemodemenusettings.egg.yoshis[0] = 1;
+	game_values.gamemodemenusettings.egg.yoshis[1] = 0;
+	game_values.gamemodemenusettings.egg.yoshis[2] = 0;
+	game_values.gamemodemenusettings.egg.yoshis[3] = 0;
 
 	//Capture The Flag
 	game_values.gamemodemenusettings.flag.speed = 0;  //Bases don't move by default
@@ -1019,7 +1030,8 @@ int main(int argc, char *argv[])
 			fread(&game_values.shellttl, sizeof(short), 1, fp);
 			fread(&game_values.blueblockttl, sizeof(short), 1, fp);
 			fread(&game_values.storedpowerupdelay, sizeof(short), 1, fp);
-			fread(&game_values.warplocks, sizeof(short), 1, fp);
+			fread(&game_values.warplockstyle, sizeof(short), 1, fp);
+			fread(&game_values.warplocktime, sizeof(short), 1, fp);
 
 			//TODO: Need to test what happens when you unplug some controllers from the xbox
 			//and then start up (device index will probably point to a gamepad that isn't in the list)

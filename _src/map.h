@@ -53,6 +53,8 @@ struct WarpExit
 	short warpx;  //map grid location for first block in warp
 	short warpy;
 	short numblocks;  //number of warp blocks for this warp
+
+	short locktimer;  //If > 0, then warp is locked and has this many frames left until unlock
 };
 
 struct SpawnArea
@@ -145,6 +147,8 @@ class CMap
 
 		void drawfrontlayer();
 
+		bool checkforwarp(short iData1, short iData2, short iData3, short iDirection);
+
 		void optimize();
 
 		//returns the tiletype at the specific position (map coordinates) of the
@@ -183,7 +187,7 @@ class CMap
 		void movingPlatformCollision(IO_MovingObject * object);
 
 		bool isconnectionlocked(int connection) {return warplocked[connection];}
-		void lockconnection(int connection) {warplocked[connection] = true;}
+		void lockconnection(int connection);
 
 		WarpExit * getRandomWarpExit(int connection, int currentID);
 

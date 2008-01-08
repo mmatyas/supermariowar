@@ -1968,7 +1968,9 @@ void CPlayer::chooseWarpExit()
 		if(iRow - 1 >= 0)
 		{
 			IO_Block * block = g_map.block(iCol, iRow - 1);
-			block->triggerBehavior();
+			
+			if(block && !block->isTransparent() && !block->isHidden())
+				block->triggerBehavior();
 		}
 	}
 	else if(exit->direction == 1)
@@ -1987,7 +1989,9 @@ void CPlayer::chooseWarpExit()
 			iCol -= 20;
 		
 		IO_Block * block = g_map.block(iCol + 1, iRow);
-		block->triggerBehavior();
+		
+		if(block && !block->isTransparent() && !block->isHidden())
+			block->triggerBehavior();
 	}
 	else if(exit->direction == 2)
 	{
@@ -2005,7 +2009,9 @@ void CPlayer::chooseWarpExit()
 		if(iRow + 1 < 15)
 		{
 			IO_Block * block = g_map.block(iCol, iRow + 1);
-			block->triggerBehavior();
+			
+			if(block && !block->isTransparent() && !block->isHidden())
+				block->triggerBehavior();
 		}
 	}
 	else if(exit->direction == 3)
@@ -2024,9 +2030,12 @@ void CPlayer::chooseWarpExit()
 			iCol += 20;
 		
 		IO_Block * block = g_map.block(iCol - 1, iRow);
-		block->triggerBehavior();
+		
+		if(block && !block->isTransparent() && !block->isHidden())
+			block->triggerBehavior();
 	}
 
+	//Make player shielded when exiting the warp (if that option is turned on)
 	if(game_values.spawninvincibility > 0)
 	{
 		if(!spawninvincible || spawninvincibletimer < game_values.spawninvincibility)
@@ -2034,6 +2043,13 @@ void CPlayer::chooseWarpExit()
 			spawninvincibletimer = game_values.spawninvincibility;
 			spawninvincible = true;
 		}
+	}
+
+	//Lock the warp (if that option is turned on)
+	if(game_values.warplocktime > 0)
+	{
+		if(game_values.warplockstyle == 1 || game_values.warplockstyle == 2) //Lock the warp exit
+			exit->locktimer = game_values.warplocktime;
 	}
 }
 
@@ -3392,10 +3408,7 @@ void CPlayer::collision_detection_map()
 			int bottomtile = g_map.map(tx, ty2);
 
 			//first check to see if player hit a warp
-			if(g_map.warp(tx,ty)->direction == 3 && g_map.warp(tx,ty2)->direction == 3 && playerKeys->game_right.fDown &&
-				g_map.warp(tx,ty)->connection == g_map.warp(tx,ty2)->connection && 
-				!g_map.isconnectionlocked(g_map.warp(tx,ty)->connection) && !g_map.isconnectionlocked(g_map.warp(tx,ty2)->connection) &&
-				!frozen)
+			if(playerKeys->game_right.fDown && !frozen && g_map.checkforwarp(tx, ty, ty2, 3))
 			{
 				xf((float)(tx * TILESIZE - PW) - 0.2f);
 				enterwarp(g_map.warp(tx, ty2));
@@ -3476,10 +3489,7 @@ void CPlayer::collision_detection_map()
 			int bottomtile = g_map.map(tx, ty2);
 
 			//first check to see if player hit a warp
-			if(g_map.warp(tx,ty)->direction == 1 && g_map.warp(tx,ty2)->direction == 1 && playerKeys->game_left.fDown && 
-				g_map.warp(tx,ty)->connection == g_map.warp(tx,ty2)->connection && 
-				!g_map.isconnectionlocked(g_map.warp(tx,ty)->connection) && !g_map.isconnectionlocked(g_map.warp(tx,ty2)->connection) &&
-				!frozen)
+			if(playerKeys->game_left.fDown && !frozen && g_map.checkforwarp(tx, ty, ty2, 1))
 			{
 				xf((float)(tx * TILESIZE + TILESIZE) + 0.2f);
 				enterwarp(g_map.warp(tx, ty2));
@@ -3602,10 +3612,7 @@ void CPlayer::collision_detection_map()
 		IO_Block * centerblock = g_map.block(txc, ty);
 		IO_Block * rightblock = g_map.block(txr, ty);
 		
-		if(g_map.warp(alignedBlockX, ty)->direction == 2 && g_map.warp(unAlignedBlockX, ty)->direction == 2 && playerKeys->game_jump.fDown && 
-			g_map.warp(alignedBlockX, ty)->connection == g_map.warp(unAlignedBlockX, ty)->connection && 
-			!g_map.isconnectionlocked(g_map.warp(alignedBlockX, ty)->connection) && !g_map.isconnectionlocked(g_map.warp(unAlignedBlockX, ty)->connection) &&
-			!frozen)
+		if(playerKeys->game_jump.fDown && !frozen && g_map.checkforwarp(alignedBlockX, unAlignedBlockX, ty, 2))
 		{
 			yf((float)(ty * TILESIZE + TILESIZE) + 0.2f);
 			enterwarp(g_map.warp(unAlignedBlockX, ty));
@@ -3707,10 +3714,7 @@ void CPlayer::collision_detection_map()
 	{	//moving down / on ground
 		ty = ((short)fPrecalculatedY + PH) / TILESIZE;
 		
-		if(g_map.warp(txl,ty)->direction == 0 && g_map.warp(txr,ty)->direction == 0 && playerKeys->game_down.fDown && 
-			g_map.warp(txl, ty)->connection == g_map.warp(txr, ty)->connection && 
-			!g_map.isconnectionlocked(g_map.warp(txl,ty)->connection) && !g_map.isconnectionlocked(g_map.warp(txr,ty)->connection) && 
-			!frozen)
+		if(playerKeys->game_down.fDown && !frozen && g_map.checkforwarp(txl, txr, ty, 0))
 		{
 			yf((float)(ty * TILESIZE - PH) - 0.2f);
 			enterwarp(g_map.warp(txr,ty));
@@ -4326,8 +4330,15 @@ void CPlayer::enterwarp(Warp * warp)
 	warpconnection = warp->connection;
 	warpid = warp->id;
 
-	if(game_values.warplocks > 0)
-		g_map.lockconnection(warpconnection);
+	if(game_values.warplocktime > 0)
+	{
+		if(game_values.warplockstyle == 0 || game_values.warplockstyle == 2) //Lock the entrance
+			g_map.warpexits[warp->id].locktimer = game_values.warplocktime;
+		else if(game_values.warplockstyle == 3) //Lock the connection
+			g_map.lockconnection(warpconnection);
+		else if(game_values.warplockstyle == 4) //Lock all warps
+			g_map.lockconnection(-1);
+	}
 
 	ifsoundonplay(sfx_pipe);
 }

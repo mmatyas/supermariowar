@@ -123,7 +123,8 @@ class Menu
 		MI_SelectField * miRespawnField;
 		MI_SelectField * miShieldField;
 		MI_SelectField * miBoundsTimeField;
-		MI_SelectField * miWarpLocksField;
+		MI_SelectField * miWarpLockStyleField;
+		MI_SelectField * miWarpLockTimeField;
 		MI_SelectField * miBotsField;
 		MI_SelectField * miFrameLimiterField;
 		MI_SelectField * miPointSpeedField;
@@ -375,6 +376,15 @@ class Menu
 		MI_Image * miCoinModeLeftHeaderBar;
 		MI_Image * miCoinModeRightHeaderBar;
 		MI_Text * miCoinModeHeaderText;
+
+		//Yoshi's Eggs
+		MI_SelectField * miEggModeEggQuantityField[4];
+		MI_SelectField * miEggModeYoshiQuantityField[4];
+		MI_Button * miEggModeBackButton;
+
+		MI_Image * miEggModeLeftHeaderBar;
+		MI_Image * miEggModeRightHeaderBar;
+		MI_Text * miEggModeHeaderText;
 
 		//Capture The Flag
 		MI_SliderField * miFlagModeSpeedField;

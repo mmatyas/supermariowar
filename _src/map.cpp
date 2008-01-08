@@ -1197,11 +1197,15 @@ void CMap::saveMap(const std::string& file)
 		}
 	}
 
-	short numWarps = 0;
+	//Examine tiles to calculate map summary data (i.e. presence of death blocks, powerups, ice, switches, etc.)
+	short numWarpExits = 0;
 	for(j = 0; j < MAPHEIGHT; j++)
 	{
 		for(i = 0; i < MAPWIDTH; i++)
 		{
+			//Calculate what warp tiles belong together (any warps that have the same connection that are 
+			//next to each other are merged into a single warp)
+			//If there are too many warps, then remove any warp encountered that is over that limit
 			if(warpdata[i][j].connection != -1 && !usedtile[i][j])
 			{
 				int movex = 0, movey = 0;
@@ -1222,9 +1226,9 @@ void CMap::saveMap(const std::string& file)
 
 					usedtile[currentx][currenty] = true;
 					
-					if(numWarps < MAXWARPS)
+					if(numWarpExits < MAXWARPS)
 					{
-						warpdata[currentx][currenty].id = numWarps;
+						warpdata[currentx][currenty].id = numWarpExits;
 					}
 					else
 					{
@@ -1236,7 +1240,7 @@ void CMap::saveMap(const std::string& file)
 					currenty += movey;
 				}
 
-				numWarps++;
+				numWarpExits++;
 			}
 
 			//Calculate auto map filters
@@ -1447,18 +1451,22 @@ void CMap::saveMap(const std::string& file)
 	{
 		for(i = 0; i < MAPWIDTH; i++)
 		{			
+			//Write tile collision types (ice, solid, death, etc.)
 			WriteInt(mapdatatop[i][j].iType, mapfile);
+			
+			//Write per tile warp data
 			WriteInt(warpdata[i][j].direction, mapfile);
 			WriteInt(warpdata[i][j].connection, mapfile);
 			WriteInt(warpdata[i][j].id, mapfile);
 			
+			//Write per tile allowed spawn types (player, item, possibly team specific TBD)
 			for(short iType = 0; iType < NUMSPAWNAREATYPES; iType++)
 				WriteInt((int)nospawn[iType][i][j], mapfile);
 		}
 	}
 
-	//Write number of warp zones
-	WriteInt(numWarps, mapfile);
+	//Write number of warp exits
+	WriteInt(numWarpExits, mapfile);
 
 	for(j = 0; j < MAPHEIGHT; j++)
 		for(i = 0; i < MAPWIDTH; i++)
@@ -1505,14 +1513,13 @@ void CMap::saveMap(const std::string& file)
 				WriteInt(warpdata[i][j].direction, mapfile);
 				WriteInt(warpdata[i][j].connection, mapfile);
 				WriteInt(warpdata[i][j].id, mapfile);
-				
+
+				//Write out warp exit x,y position for player and position for lock icon to display
 				if(warpdata[i][j].direction == 0)
 				{
-					//Write out warp exit for player
 					WriteInt(((currentx * TILESIZE + TILESIZE - i * TILESIZE) >> 1) + i * TILESIZE - HALFPW, mapfile);
 					WriteInt(j * TILESIZE - 1 + PHOFFSET, mapfile);
 
-					//Write out position for lock icon
 					WriteInt(((currentx * TILESIZE + TILESIZE - i * TILESIZE) >> 1) + i * TILESIZE - 16, mapfile);
 					WriteInt(j * TILESIZE, mapfile);
 				}
@@ -2749,6 +2756,22 @@ void CMap::resetPlatforms()
 	tempPlatforms.clear();
 }
 
+void CMap::lockconnection(int connection)
+{
+	//Lock all warp connections
+	if(connection == -1)
+	{
+		for(short iConnection = 0; iConnection <= maxConnection; iConnection++)
+		{
+			warplocked[iConnection] = true;
+		}
+	}
+	else //otherwise just lock the one connection
+	{
+		warplocked[connection] = true;
+	}
+}
+
 WarpExit * CMap::getRandomWarpExit(int connection, int currentID)
 {
 	int indices[MAXWARPS];
@@ -2775,20 +2798,25 @@ WarpExit * CMap::getRandomWarpExit(int connection, int currentID)
 
 void CMap::clearWarpLocks()
 {
-	for(int k = 0; k < 10; k++)
+	for(short iConnection = 0; iConnection < 10; iConnection++)
 	{
-		warplocktimer[k] = 0;
-		warplocked[k] = false;
+		warplocktimer[iConnection] = 0;
+		warplocked[iConnection] = false;
+	}
+
+	for(short iWarpExit = 0; iWarpExit < numwarpexits; iWarpExit++)
+	{
+		warpexits[iWarpExit].locktimer = 0;
 	}
 }
 
 void CMap::drawWarpLocks()
 {
-	for(int k = 0; k < numwarpexits; k++)
+	for(int iWarpExit = 0; iWarpExit < numwarpexits; iWarpExit++)
 	{
-		if(warplocked[warpexits[k].connection])
+		if(warplocked[warpexits[iWarpExit].connection] || warpexits[iWarpExit].locktimer > 0)
 		{
-			spr_warplock.draw(warpexits[k].lockx, warpexits[k].locky);
+			spr_warplock.draw(warpexits[iWarpExit].lockx, warpexits[iWarpExit].locky);
 		}
 	}
 }
@@ -2796,16 +2824,23 @@ void CMap::drawWarpLocks()
 void CMap::update()
 {
 	//Unlock locked warps if the time is up
-	for(int k = 0; k <= maxConnection; k++)
+	for(short iConnection = 0; iConnection <= maxConnection; iConnection++)
 	{
-		if(warplocked[k])
+		if(warplocked[iConnection])
 		{
-			if(++warplocktimer[k] > game_values.warplocks)
+			if(++warplocktimer[iConnection] > game_values.warplocktime)
 			{
-				warplocked[k] = false;
-				warplocktimer[k] = 0;
+				warplocked[iConnection] = false;
+				warplocktimer[iConnection] = 0;
 			}
 		}
+	}
+
+	//If warp is individually locked, then reduce lock timer
+	for(short iWarpExit = 0; iWarpExit < numwarpexits; iWarpExit++)
+	{
+		if(warpexits[iWarpExit].locktimer > 0)
+			--warpexits[iWarpExit].locktimer;
 	}
 
 	//Animate the animated tiles
@@ -2982,6 +3017,26 @@ void CMap::drawfrontlayer()
 			}
 		}	
 	}*/
+}
+
+bool CMap::checkforwarp(short iData1, short iData2, short iData3, short iDirection)
+{
+	Warp * warp1 = NULL;
+	Warp * warp2 = NULL;
+
+	if(iDirection == 0 || iDirection == 2)
+	{
+		warp1 = &warpdata[iData1][iData3];
+		warp2 = &warpdata[iData2][iData3];
+	}
+	else
+	{
+		warp1 = &warpdata[iData1][iData2];
+		warp2 = &warpdata[iData1][iData3];
+	}
+
+	return warp1->id == warp2->id && warp1->direction == iDirection &&
+		!warplocked[warp1->connection] && warpexits[warp1->id].locktimer <= 0;
 }
 
 void CMap::optimize()

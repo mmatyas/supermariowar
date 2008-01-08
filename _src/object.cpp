@@ -5011,27 +5011,53 @@ void MO_Coin::placeCoin()
 //------------------------------------------------------------------------------
 // class OverMapObject - moving objects that don't collide with map or objects, just player
 //------------------------------------------------------------------------------
-IO_OverMapObject::IO_OverMapObject(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed) :
+IO_OverMapObject::IO_OverMapObject(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iAnimationOffsetX, short iAnimationOffsetY, short iAnimationHeight, short iAnimationWidth) :
 	CObject(nspr, x, y)
 {
+	objectType = object_overmap;
+	movingObjectType = movingobject_none;
+
 	iNumSprites = iNumSpr;
 
-	iw = (short)spr->getWidth() / iNumSprites;
-	collisionWidth = iw;
-	drawframe = 0;
+	if(iAnimationWidth > -1)
+		iw = iAnimationWidth;
+	else if(spr)
+		iw = (short)spr->getWidth() / iNumSprites;
+
+	if(iAnimationHeight > -1)
+		ih = iAnimationHeight;
 
 	animationspeed = aniSpeed;
 	animationtimer = 0;
-	animationWidth = (short)spr->getWidth();
 
-	objectType = object_overmap;
-	movingObjectType = movingobject_none;
+	if(spr)
+		animationWidth = (short)spr->getWidth();
+
+	if(iCollisionWidth > -1)
+	{
+		collisionWidth = iCollisionWidth;
+		collisionHeight = iCollisionHeight;
+		collisionOffsetX = iCollisionOffsetX;
+		collisionOffsetY = iCollisionOffsetY;
+	}
+
+	if(iAnimationOffsetX > -1)
+	{
+		animationOffsetX = iAnimationOffsetX;
+		animationOffsetY = iAnimationOffsetY;
+	}
+	else
+	{
+		animationOffsetX = 0;
+		animationOffsetY = 0;
+	}
+
+	drawframe = animationOffsetX;
 }
-
 
 void IO_OverMapObject::draw()
 {
-	spr->draw(ix, iy, drawframe, 0, iw, ih);
+	spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, animationOffsetY, iw, ih);
 }
 
 
@@ -5050,7 +5076,7 @@ void IO_OverMapObject::animate()
 		animationtimer = 0;
 		drawframe += iw;
 		if(drawframe >= animationWidth)
-			drawframe = 0;
+			drawframe = animationOffsetX;
 	}
 }
 
@@ -5472,20 +5498,22 @@ MO_CarriedObject::~MO_CarriedObject()
 //------------------------------------------------------------------------------
 // class egg (for egg mode)
 //------------------------------------------------------------------------------
-CO_Egg::CO_Egg(gfxSprite *nspr) :
-	MO_CarriedObject(nspr, 0, 0, 2, 8, 30, 30, 1, 1)
+CO_Egg::CO_Egg(gfxSprite *nspr, short iColor) :
+	MO_CarriedObject(nspr, 0, 0, 2, 8, 30, 30, 1, 1, 0, iColor << 5, 32, 32)
 {
 	state = 1;
-	iw = 32;
 	bounce = GRAVITATION;
 	objectType = object_egg;
 	movingObjectType = movingobject_egg;
+
 	owner_throw = NULL;
 	owner_throw_timer = 0;
 
 	sparkleanimationtimer = 0;
 	sparkledrawframe = 0;
 	
+	color = iColor;
+
 	placeEgg();
 }
 
@@ -5544,16 +5572,16 @@ void CO_Egg::draw()
 	if(owner)
 	{
 		if(owner->iswarping())
-			spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 64, 0, iw, ih, (short)owner->state % 4, owner->GetWarpPlane());
+			spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 64, color << 5, iw, ih, (short)owner->state % 4, owner->GetWarpPlane());
 		else
-			spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 64, 0, iw, ih);
+			spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 64, color << 5, iw, ih);
 	}
 	else
 	{
 		if(velx != 0.0f)
-			spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 64, 0, iw, ih);  //keep the egg still while it's moving
+			spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 64, color << 5, iw, ih);  //keep the egg still while it's moving
 		else
-			spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, 0, iw, ih);
+			spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, color << 5, iw, ih);
 	}
 }
 
@@ -6090,27 +6118,35 @@ void CO_Flag::Kick(bool superkick)
 //------------------------------------------------------------------------------
 // class yoshi (for egg mode)
 //------------------------------------------------------------------------------
-OMO_Yoshi::OMO_Yoshi(gfxSprite *nspr) :
-	IO_OverMapObject(nspr, 0, 0, 2, 8)
+OMO_Yoshi::OMO_Yoshi(gfxSprite *nspr, short iColor) :
+	IO_OverMapObject(nspr, 0, 0, 2, 8, 52, 56, 0, 0, 0, iColor * 56, 56, 52)
 {
-	state = 1;
-	placeYoshi();
 	objectType = object_yoshi;
+	state = 1;
+
+	color = iColor;
+
+	placeYoshi();
 }
 
 bool OMO_Yoshi::collide(CPlayer * player)
 {
 	if(player->carriedItem && player->carriedItem->getObjectType() == object_egg)
 	{
-		if(!game_values.gamemode->gameover)
-			player->score->AdjustScore(1);
-	
-		placeYoshi();
-
 		CO_Egg * egg = (CO_Egg*)player->carriedItem;
-		egg->placeEgg();
 
-		ifsoundonplay(sfx_yoshi);
+		if(egg->color == color)
+		{
+			if(!game_values.gamemode->gameover)
+				player->score->AdjustScore(1);
+		
+			placeYoshi();
+
+			CO_Egg * egg = (CO_Egg*)player->carriedItem;
+			egg->placeEgg();
+
+			ifsoundonplay(sfx_yoshi);
+		}
 	}
 
 	return false;
@@ -6193,7 +6229,7 @@ void OMO_Yoshi::collide(IO_MovingObject * object)
 	{
 		CO_Egg * egg = (CO_Egg*)object;
 
-		if(egg->owner_throw)
+		if(egg->color == color && egg->owner_throw)
 		{
 			CPlayer * player = egg->owner_throw;
 

@@ -614,6 +614,12 @@ struct StompGameModeSettings
 	short enemyweight[4];	//What ratio the enemies are chosen
 };
 
+struct EggGameModeSettings
+{
+	short eggs[4];			//Number of eggs of each color in game
+	short yoshis[4];		//Nunber of yoshis of each color in game
+};
+
 struct FlagGameModeSettings
 {
 	short speed;			//How fast to move bases
@@ -700,6 +706,7 @@ struct GameModeSettings
 	JailGameModeSettings jail;
 	CoinGameModeSettings coins;
 	StompGameModeSettings stomp;
+	EggGameModeSettings egg;
 	FlagGameModeSettings flag;
 	ChickenGameModeSettings chicken;
 	TagGameModeSettings tag;
@@ -851,7 +858,8 @@ struct gv
 	short		itemrespawntime;
 	short		outofboundstime;
 
-	short		warplocks;
+	short		warplockstyle;
+	short		warplocktime;
 
 	short		cputurn;
 	short		cpudifficulty;
