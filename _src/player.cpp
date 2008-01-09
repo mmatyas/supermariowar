@@ -1704,7 +1704,7 @@ void CPlayer::move()
 
 					if(++burnuptimer > 80)
 					{
-						if(player_kill_nonkill != KillPlayerMapHazard(true))
+						if(player_kill_nonkill != KillPlayerMapHazard(true, kill_style_environment))
 							return;
 					}
 					else
@@ -1731,7 +1731,7 @@ void CPlayer::move()
 
 					if(--outofarenadisplaytimer < 0)
 					{
-						if(player_kill_nonkill != KillPlayerMapHazard(false))
+						if(player_kill_nonkill != KillPlayerMapHazard(false, kill_style_environment))
 							return;
 					}
 				}
@@ -2376,24 +2376,7 @@ bool CPlayer::isstomping(CPlayer &o)
 		}
 		else
 		{
-			if(game_values.gamemode->tagged == &o && isready() && o.isready())
-			{
-				game_values.gamemode->tagged = this;
-				o.spawninvincible = true;
-				o.spawninvincibletimer = 60;
-				eyecandyfront.add(new EC_GravText(&game_font_large, game_values.gamemode->tagged->ix + HALFPW, game_values.gamemode->tagged->iy + PH, "Tagged!", -VELJUMP*1.5));
-				eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, game_values.gamemode->tagged->ix + HALFPW - 16, game_values.gamemode->tagged->iy + HALFPH - 16, 3, 8));
-				ifsoundonplay(sfx_transform);
-			}
-			else if(game_values.gamemode->tagged == this && isready() && o.isready())
-			{
-				game_values.gamemode->tagged = &o;
-				spawninvincibletimer = 60;
-				spawninvincible = true;
-				eyecandyfront.add(new EC_GravText(&game_font_large, game_values.gamemode->tagged->ix + HALFPW, game_values.gamemode->tagged->iy + PH, "Tagged!", -VELJUMP*1.5));
-				eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, game_values.gamemode->tagged->ix + HALFPW - 16, game_values.gamemode->tagged->iy + HALFPH - 16, 3, 8));
-				ifsoundonplay(sfx_transform);
-			}
+			TransferTag(o, *this);
 
 			iSuicideCreditPlayerID = o.globalID;
 			iSuicideCreditTimer = 20;
@@ -2693,10 +2676,37 @@ void collisionhandler_p2p(CPlayer &o1, CPlayer &o2)
 				o2.jailtimer = 0;
 			}
 		}
+
+		if(game_values.teamcollision == 1 || game_values.gamemodesettings.tag.tagontouch)
+			TransferTag(o1, o2);
 		
 		//Don't collision detect players on same team if friendly fire is turned off
-		if(!game_values.friendlyfire)
+		if(game_values.teamcollision == 0)
 			return;
+
+		//Team assist is enabled so allow powerup trading and super jumping
+		if(game_values.teamcollision == 1)
+		{
+			BounceAssistPlayer(o1, o2);
+			BounceAssistPlayer(o2, o1);
+
+			//Allow players on team to swap stored items
+			if(o1.playerKeys->game_powerup.fPressed || o2.playerKeys->game_powerup.fPressed)
+			{
+				short iTempPowerup = game_values.gamepowerups[o1.globalID];
+				game_values.gamepowerups[o1.globalID] = game_values.gamepowerups[o2.globalID];
+				game_values.gamepowerups[o2.globalID] = iTempPowerup;
+
+				ifsoundonplay(sfx_storepowerup);
+
+				o1.playerKeys->game_powerup.fPressed = false;
+				o1.playerKeys->game_powerup.fDown = false;
+				o2.playerKeys->game_powerup.fPressed = false;
+				o2.playerKeys->game_powerup.fDown = false;
+			}
+
+			return;
+		}
 	}
 
 	//--- 1. Is player frozen? ---
@@ -2770,27 +2780,8 @@ void _collisionhandler_p2p_pushback(CPlayer &o1, CPlayer &o2)
 	//-----------
 
 	//Transfer tag on touching other players
-	if(game_values.gamemode->gamemode == game_mode_tag && game_values.gamemodesettings.tag.tagontouch)
-	{
-		if(game_values.gamemode->tagged == &o1 && o1.isready() && o2.isready())
-		{
-			game_values.gamemode->tagged = &o2;
-			o1.spawninvincible = true;
-			o1.spawninvincibletimer = 60;
-			eyecandyfront.add(new EC_GravText(&game_font_large, game_values.gamemode->tagged->ix + HALFPW, game_values.gamemode->tagged->iy + PH, "Tagged!", -VELJUMP*1.5));
-			eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, game_values.gamemode->tagged->ix + HALFPW - 16, game_values.gamemode->tagged->iy + HALFPH - 16, 3, 8));
-			ifsoundonplay(sfx_transform);
-		}
-		else if(game_values.gamemode->tagged == &o2 && o1.isready() && o2.isready())
-		{
-			game_values.gamemode->tagged = &o1;
-			o2.spawninvincible = true;
-			o2.spawninvincibletimer = 60;
-			eyecandyfront.add(new EC_GravText(&game_font_large, game_values.gamemode->tagged->ix + HALFPW, game_values.gamemode->tagged->iy + PH, "Tagged!", -VELJUMP*1.5));
-			eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, game_values.gamemode->tagged->ix + HALFPW - 16, game_values.gamemode->tagged->iy + HALFPH - 16, 3, 8));
-			ifsoundonplay(sfx_transform);
-		}
-	}
+	if(game_values.gamemodesettings.tag.tagontouch)
+		TransferTag(o1, o2);
 
 	bool overlapcollision = false;
 	if(o1.ix + PW < 320 && o2.ix > 320)
@@ -2889,6 +2880,46 @@ void _collisionhandler_p2p_pushback(CPlayer &o1, CPlayer &o2)
 	}
 }
 
+void TransferTag(CPlayer &o1, CPlayer &o2)
+{
+	if(game_values.gamemode->gamemode != game_mode_tag)
+		return;
+
+	if(game_values.gamemode->tagged == &o1 && o1.isready() && o2.isready() && !o2.spawninvincible)
+	{
+		game_values.gamemode->tagged = &o2;
+		o1.spawninvincible = true;
+		o1.spawninvincibletimer = 60;
+		eyecandyfront.add(new EC_GravText(&game_font_large, game_values.gamemode->tagged->ix + HALFPW, game_values.gamemode->tagged->iy + PH, "Tagged!", -VELJUMP*1.5));
+		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, game_values.gamemode->tagged->ix + HALFPW - 16, game_values.gamemode->tagged->iy + HALFPH - 16, 3, 8));
+		ifsoundonplay(sfx_transform);
+	}
+	else if(game_values.gamemode->tagged == &o2 && o1.isready() && o2.isready() && !o1.spawninvincible)
+	{
+		game_values.gamemode->tagged = &o1;
+		o2.spawninvincible = true;
+		o2.spawninvincibletimer = 60;
+		eyecandyfront.add(new EC_GravText(&game_font_large, game_values.gamemode->tagged->ix + HALFPW, game_values.gamemode->tagged->iy + PH, "Tagged!", -VELJUMP*1.5));
+		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, game_values.gamemode->tagged->ix + HALFPW - 16, game_values.gamemode->tagged->iy + HALFPH - 16, 3, 8));
+		ifsoundonplay(sfx_transform);
+	}
+}
+
+void BounceAssistPlayer(CPlayer &o1, CPlayer &o2)
+{
+	if(o1.state == player_ready && o1.fOldY + PH <= o2.fOldY && o1.iy + PH >= o2.iy && o1.playerKeys->game_jump.fDown)
+	{
+		o1.yi(o2.iy - PH);		//set new position to top of other player
+		o1.collision_detection_checktop();
+		o1.platform = NULL;
+		o1.vely = -VELSUPERJUMP;
+		
+		o1.fSuperStomp = false;
+		o1.iSuperStompTimer = 0;
+
+		ifsoundonplay(sfx_superspring);
+	}
+}
 
 void CPlayer::draw()
 {
@@ -3428,7 +3459,7 @@ void CPlayer::collision_detection_map()
 				{	
 					if(iHorizontalPlatformCollision == 3 && !topblock->isHidden())
 					{
-						KillPlayerMapHazard(true);
+						KillPlayerMapHazard(true, kill_style_environment);
 						return;
 					}
 
@@ -3440,7 +3471,7 @@ void CPlayer::collision_detection_map()
 				{	
 					if(iHorizontalPlatformCollision == 3 && !bottomblock->isHidden())
 					{
-						KillPlayerMapHazard(true);
+						KillPlayerMapHazard(true, kill_style_environment);
 						return;
 					}
 
@@ -3451,7 +3482,7 @@ void CPlayer::collision_detection_map()
 			else if(((toptile & tile_flag_death_on_left) || (bottomtile & tile_flag_death_on_left)) &&
 				!invincible && !spawninvincible)
 			{
-				if(player_kill_nonkill != KillPlayerMapHazard(true))
+				if(player_kill_nonkill != KillPlayerMapHazard(true, kill_style_environment))
 					return;
 			}
 			//collision on the right side.
@@ -3459,7 +3490,7 @@ void CPlayer::collision_detection_map()
 			{
 				if(iHorizontalPlatformCollision == 3)
 				{
-					KillPlayerMapHazard(true);
+					KillPlayerMapHazard(true, kill_style_environment);
 					return;
 				}
 
@@ -3509,7 +3540,7 @@ void CPlayer::collision_detection_map()
 				{	
 					if(iHorizontalPlatformCollision == 1 && !topblock->isHidden())
 					{
-						KillPlayerMapHazard(true);
+						KillPlayerMapHazard(true, kill_style_environment);
 						return;
 					}
 
@@ -3521,7 +3552,7 @@ void CPlayer::collision_detection_map()
 				{	
 					if(iHorizontalPlatformCollision == 1 && !bottomblock->isHidden())
 					{
-						KillPlayerMapHazard(true);
+						KillPlayerMapHazard(true, kill_style_environment);
 						return;
 					}
 
@@ -3532,14 +3563,14 @@ void CPlayer::collision_detection_map()
 			else if(((toptile & tile_flag_death_on_right) || (bottomtile & tile_flag_death_on_right)) &&
 				!invincible && !spawninvincible)
 			{
-				if(player_kill_nonkill != KillPlayerMapHazard(true))
+				if(player_kill_nonkill != KillPlayerMapHazard(true, kill_style_environment))
 					return;
 			}
 			else if((toptile & tile_flag_solid) || (bottomtile & tile_flag_solid)) // collide with solid, ice, death and all sides death
 			{
 				if(iHorizontalPlatformCollision == 1)
 				{
-					KillPlayerMapHazard(true);
+					KillPlayerMapHazard(true, kill_style_environment);
 					return;
 				}
 
@@ -3631,7 +3662,7 @@ void CPlayer::collision_detection_map()
 			if(!centerblock->collide(this, 0, true))
 			{
 				if(iVerticalPlatformCollision == 2 && !centerblock->isHidden())
-					KillPlayerMapHazard(true);
+					KillPlayerMapHazard(true, kill_style_environment);
 
 				return;
 			}
@@ -3650,7 +3681,7 @@ void CPlayer::collision_detection_map()
 				vely = -vely * BOUNCESTRENGTH;
 			
 			if(iVerticalPlatformCollision == 2)
-				KillPlayerMapHazard(true);
+				KillPlayerMapHazard(true, kill_style_environment);
 
 			return;
 		}
@@ -3662,7 +3693,7 @@ void CPlayer::collision_detection_map()
 			if(!leftblock->collide(this, 0, useBehavior))
 			{
 				if(iVerticalPlatformCollision == 2 && !leftblock->isHidden())
-					KillPlayerMapHazard(true);
+					KillPlayerMapHazard(true, kill_style_environment);
 
 				return;
 			}
@@ -3675,7 +3706,7 @@ void CPlayer::collision_detection_map()
 			if(!rightblock->collide(this, 0, useBehavior))
 			{
 				if(iVerticalPlatformCollision == 2 && !rightblock->isHidden())
-					KillPlayerMapHazard(true);
+					KillPlayerMapHazard(true, kill_style_environment);
 
 				return;
 			}
@@ -3695,7 +3726,7 @@ void CPlayer::collision_detection_map()
 		}
 		else if((alignedTileType & tile_flag_death_on_bottom) || (unalignedTileType & tile_flag_death_on_bottom))
 		{
-			if(player_kill_nonkill != KillPlayerMapHazard(true))
+			if(player_kill_nonkill != KillPlayerMapHazard(true, kill_style_environment))
 				return;
 		}
 		else
@@ -3762,7 +3793,7 @@ void CPlayer::collision_detection_map()
 				onice = false;
 
 				if(iVerticalPlatformCollision == 0)
-					KillPlayerMapHazard(true);
+					KillPlayerMapHazard(true, kill_style_environment);
 
 				return;
 			}
@@ -3820,7 +3851,7 @@ void CPlayer::collision_detection_map()
 			platform = NULL;
 
 			if(iVerticalPlatformCollision == 0)
-				KillPlayerMapHazard(true);
+				KillPlayerMapHazard(true, kill_style_environment);
 
 			return;
 		}
@@ -3850,13 +3881,13 @@ void CPlayer::collision_detection_map()
 
 			if(iVerticalPlatformCollision == 0)
 			{
-				KillPlayerMapHazard(true);
+				KillPlayerMapHazard(true, kill_style_environment);
 				return;
 			}
 		}
 		else if((lefttile & tile_flag_death_on_top) || (righttile & tile_flag_death_on_top))
 		{
-			if(player_kill_nonkill != KillPlayerMapHazard(true))
+			if(player_kill_nonkill != KillPlayerMapHazard(true, kill_style_environment))
 				return;
 		}
 		else
@@ -3887,17 +3918,17 @@ void CPlayer::collision_detection_map()
 	//printf("After Y - ix: %d\tiy: %d\toldx: %.2f\toldy: %.2f\tty: %d\tty2: %d\ttxl: %d\ttxr: %d\tfx: %.2f\tfy: %.2f\tvelx: %.2f\tvely: %.2f\n\n", ix, iy, fOldX, fOldY, ty, ty, txl, txr, fx, fy, velx, vely);
 }
 
-short CPlayer::KillPlayerMapHazard(bool fForce)
+short CPlayer::KillPlayerMapHazard(bool fForce, killstyle style)
 {
 	if(iSuicideCreditPlayerID >= 0)
 	{
-		return PlayerKilledPlayer(iSuicideCreditPlayerID, *this, death_style_jump, kill_style_environment, fForce);
+		return PlayerKilledPlayer(iSuicideCreditPlayerID, *this, death_style_jump, style, fForce);
 	}
 	else
 	{
 		DeathAwards();
 		
-		short iKillType = game_values.gamemode->playerkilledself(*this, kill_style_environment);
+		short iKillType = game_values.gamemode->playerkilledself(*this, style);
 		if(player_kill_normal == iKillType || (player_kill_nonkill == iKillType && fForce))
 			die(death_style_jump, false);
 

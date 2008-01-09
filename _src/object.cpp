@@ -546,7 +546,7 @@ bool B_PowerupBlock::hittop(CPlayer * player, bool useBehavior)
 	if(state == 1)
 	{
 		short iKillType = player_kill_nonkill;
-		if(iBumpPlayerID >= 0 && !player->IsInvincibleOnBottom() && (player->teamID != iBumpTeamID || game_values.friendlyfire))
+		if(iBumpPlayerID >= 0 && !player->IsInvincibleOnBottom() && (player->teamID != iBumpTeamID || game_values.teamcollision == 2))
 			iKillType = PlayerKilledPlayer(iBumpPlayerID, *player, death_style_jump, kill_style_bounce, false);
 		
 		if(player_kill_nonkill == iKillType)
@@ -851,7 +851,7 @@ bool B_BreakableBlock::hittop(CPlayer * player, bool useBehavior)
 	if(state == 1 || state == 2)
 	{
 		short iKillType = player_kill_nonkill;
-		if(iBumpPlayerID >= 0 && !player->IsInvincibleOnBottom() && (player->teamID != iBumpTeamID || game_values.friendlyfire))
+		if(iBumpPlayerID >= 0 && !player->IsInvincibleOnBottom() && (player->teamID != iBumpTeamID || game_values.teamcollision == 2))
 			iKillType = PlayerKilledPlayer(iBumpPlayerID, *player, death_style_jump, kill_style_bounce, false);
 		
 		if(player_kill_nonkill == iKillType)
@@ -1606,7 +1606,7 @@ bool B_OnOffSwitchBlock::hittop(CPlayer * player, bool useBehavior)
 	if(state == 1 || state == 4)
 	{
 		short iKillType = player_kill_nonkill;
-		if(iBumpPlayerID >= 0 && !player->IsInvincibleOnBottom() && (player->teamID != iBumpTeamID || game_values.friendlyfire))
+		if(iBumpPlayerID >= 0 && !player->IsInvincibleOnBottom() && (player->teamID != iBumpTeamID || game_values.teamcollision == 2))
 			iKillType = PlayerKilledPlayer(iBumpPlayerID, *player, death_style_jump, kill_style_bounce, false);
 		
 		if(player_kill_nonkill == iKillType)
@@ -1953,7 +1953,7 @@ bool B_BounceBlock::hittop(CPlayer * player, bool useBehavior)
 	if(state == 1)
 	{
 		short iKillType = player_kill_nonkill;
-		if(iBumpPlayerID >= 0 && !player->IsInvincibleOnBottom() && (player->teamID != iBumpTeamID || game_values.friendlyfire))
+		if(iBumpPlayerID >= 0 && !player->IsInvincibleOnBottom() && (player->teamID != iBumpTeamID || game_values.teamcollision == 2))
 			iKillType = PlayerKilledPlayer(iBumpPlayerID, *player, death_style_jump, kill_style_bounce, false);
 		
 		if(player_kill_nonkill == iKillType)
@@ -2215,7 +2215,7 @@ bool B_WeaponBreakableBlock::hittop(CPlayer * player, bool useBehavior)
 	if(state == 1 || state == 2)
 	{
 		short iKillType = player_kill_nonkill;
-		if(iBumpPlayerID >= 0 && !player->IsInvincibleOnBottom() && (player->teamID != iBumpTeamID || game_values.friendlyfire))
+		if(iBumpPlayerID >= 0 && !player->IsInvincibleOnBottom() && (player->teamID != iBumpTeamID || game_values.teamcollision == 2))
 			PlayerKilledPlayer(iBumpPlayerID, *player, death_style_jump, kill_style_bounce, false);
 		
 		if(player_kill_nonkill == iKillType)
@@ -3445,16 +3445,7 @@ bool PU_PoisonPowerup::collide(CPlayer * player)
 	if(player->spawninvincible)
 		return false;
 
-	player->DeathAwards();
-	
-	if(!game_values.gamemode->playerkilledself(*player, kill_style_poisonmushroom))
-		player->die(0, false);
-	
-	ifsoundonplay(sfx_deathsound);
-
-	dead = true;
-
-	return true;
+	return player->KillPlayerMapHazard(false, kill_style_poisonmushroom) != player_kill_nonkill;
 }
 
 //------------------------------------------------------------------------------
@@ -4100,7 +4091,7 @@ void MO_Fireball::update()
 
 bool MO_Fireball::collide(CPlayer * player)
 {
-	if(playerID != player->globalID && (game_values.friendlyfire || teamID != player->teamID))
+	if(playerID != player->globalID && (game_values.teamcollision == 2|| teamID != player->teamID))
 	{
 		if(!player->spawninvincible)
 		{
@@ -4162,7 +4153,7 @@ void MO_SuperFireball::update()
 
 bool MO_SuperFireball::collide(CPlayer * player)
 {
-	if(playerID != player->globalID && (game_values.friendlyfire || teamID != player->teamID))
+	if(playerID != player->globalID && (game_values.teamcollision == 2|| teamID != player->teamID))
 	{
 		if(!player->spawninvincible)
 		{
@@ -4265,7 +4256,7 @@ void MO_Hammer::update()
 
 bool MO_Hammer::collide(CPlayer * player)
 {
-	if(playerID != player->globalID && (game_values.friendlyfire || teamID != player->teamID))
+	if(playerID != player->globalID && (game_values.teamcollision == 2|| teamID != player->teamID))
 	{
 		if(!player->spawninvincible)
 		{
@@ -4369,7 +4360,7 @@ void MO_SledgeHammer::update()
 
 bool MO_SledgeHammer::collide(CPlayer * player)
 {
-	if(playerID != player->globalID && (game_values.friendlyfire || teamID != player->teamID))
+	if(playerID != player->globalID && (game_values.teamcollision == 2|| teamID != player->teamID))
 	{
 		if(!player->spawninvincible)
 		{
@@ -4744,7 +4735,7 @@ void MO_Boomerang::forcedead()
 
 bool MO_Boomerang::collide(CPlayer * player)
 {
-	if(playerID != player->globalID && (game_values.friendlyfire || teamID != player->teamID))
+	if(playerID != player->globalID && (game_values.teamcollision == 2|| teamID != player->teamID))
 	{
 		if(!player->spawninvincible)
 		{
@@ -5102,15 +5093,8 @@ void OMO_Thwomp::update()
 bool OMO_Thwomp::collide(CPlayer * player)
 {
 	if(!player->invincible && !player->spawninvincible && (player->score->score > 0 || game_values.gamemode->goal == -1))
-	{
-		player->DeathAwards();
-		
-		if(!game_values.gamemode->playerkilledself(*player, kill_style_environment))
-			player->die(0, false);
+		return player->KillPlayerMapHazard(false, kill_style_environment) != player_kill_nonkill;
 
-		ifsoundonplay(sfx_deathsound);
-		return true;
-	}
 	return false;
 }
 
@@ -5154,7 +5138,7 @@ void OMO_Podobo::draw()
 
 bool OMO_Podobo::collide(CPlayer * player)
 {
-	if(player->globalID != iPlayerID && (game_values.friendlyfire || iTeamID != player->teamID) && !player->invincible && !player->spawninvincible)
+	if(player->globalID != iPlayerID && (game_values.teamcollision == 2|| iTeamID != player->teamID) && !player->invincible && !player->spawninvincible)
 	{
 		//Find the player that made this explosion so we can attribute a kill
 		PlayerKilledPlayer(iPlayerID, *player, death_style_jump, kill_style_podobo, false);
@@ -5233,7 +5217,7 @@ void OMO_BowserFire::draw()
 
 bool OMO_BowserFire::collide(CPlayer * player)
 {
-	if(player->globalID != iPlayerID && (game_values.friendlyfire || iTeamID != player->teamID) && !player->invincible && !player->spawninvincible)
+	if(player->globalID != iPlayerID && (game_values.teamcollision == 2|| iTeamID != player->teamID) && !player->invincible && !player->spawninvincible)
 	{
 		//Find the player that made this explosion so we can attribute a kill
 		PlayerKilledPlayer(iPlayerID, *player, death_style_jump, kill_style_fireball, false);
@@ -5353,7 +5337,7 @@ bool OMO_BulletBill::hitother(CPlayer * player)
 	if(player->spawninvincible || player->globalID == iPlayerID)
 		return false;
 
-	if(!game_values.friendlyfire && iTeamID == player->teamID)
+	if(game_values.teamcollision != 2 && iTeamID == player->teamID)
 		return false;
 
 	//Find the player that owns this bullet bill so we can attribute a kill
@@ -7045,7 +7029,7 @@ OMO_Explosion::OMO_Explosion(gfxSprite *nspr, short x, short y, short iNumSpr, s
 
 bool OMO_Explosion::collide(CPlayer * player)
 {
-	if(player->globalID != playerID && (game_values.friendlyfire || teamID != player->teamID) && !player->invincible && !player->spawninvincible)
+	if(player->globalID != playerID && (game_values.teamcollision == 2|| teamID != player->teamID) && !player->invincible && !player->spawninvincible)
 	{
 		//Find the player that made this explosion so we can attribute a kill
 		PlayerKilledPlayer(playerID, *player, death_style_jump, iStyle, false);
@@ -7302,14 +7286,7 @@ bool MO_Goomba::hitother(CPlayer * player)
 	if(player->spawninvincible)
 		return false;
 
-	player->DeathAwards();
-
-	if(!game_values.gamemode->playerkilledself(*player, kill_style_environment))
-		player->die(0, false);
-
-	ifsoundonplay(sfx_deathsound);
-
-	return true;
+	return player->KillPlayerMapHazard(false, kill_style_environment) != player_kill_nonkill;
 }
 
 void MO_Goomba::collide(IO_MovingObject * object)
@@ -7583,14 +7560,7 @@ bool OMO_CheepCheep::hitother(CPlayer * player)
 	if(player->spawninvincible)
 		return false;
 
-	player->DeathAwards();
-
-	if(!game_values.gamemode->playerkilledself(*player, kill_style_environment))
-		player->die(0, false);
-
-	ifsoundonplay(sfx_deathsound);
-
-	return true;
+	return player->KillPlayerMapHazard(false, kill_style_environment) != player_kill_nonkill;
 }
 
 void OMO_CheepCheep::collide(IO_MovingObject * object)
@@ -8090,14 +8060,7 @@ bool MO_SledgeBrother::hit(CPlayer * player)
 	if(player->spawninvincible)
 		return false;
 
-	player->DeathAwards();
-
-	if(!game_values.gamemode->playerkilledself(*player, kill_style_environment))
-		player->die(0, false);
-
-	ifsoundonplay(sfx_deathsound);
-
-	return true;
+	return player->KillPlayerMapHazard(false, kill_style_environment) != player_kill_nonkill;
 }
 
 void MO_SledgeBrother::collide(IO_MovingObject * object)
@@ -8310,7 +8273,7 @@ bool CO_Shell::HitTop(CPlayer * player)
 	}
 	else if(state == 3) //Holding
 	{
-		if(player != owner && (game_values.friendlyfire || player->teamID != owner->teamID))
+		if(player != owner && (game_values.teamcollision == 2|| player->teamID != owner->teamID))
 		{
 			if(owner)
 				owner->carriedItem = NULL;
@@ -8373,7 +8336,7 @@ bool CO_Shell::HitOther(CPlayer * player)
 	}
 	else if(state == 3)  //Holding
 	{
-		if(player != owner && (game_values.friendlyfire || player->teamID != owner->teamID))
+		if(player != owner && (game_values.teamcollision == 2|| player->teamID != owner->teamID))
 		{
 			playerID = owner->globalID;
 			teamID = owner->teamID;
@@ -9089,7 +9052,7 @@ CO_Spike::CO_Spike(gfxSprite *nspr, short ix, short iy) :
 void CO_Spike::hittop(CPlayer * player)
 {
 	if(player->isready() && !player->spawninvincible && !player->invincible && !player->fKuriboShoe)
-		player->KillPlayerMapHazard(false);
+		player->KillPlayerMapHazard(false, kill_style_environment);
 }
 
 
@@ -9144,7 +9107,7 @@ bool OMO_AttackZone::collide(CPlayer * player)
 	if(player->spawninvincible || player->invincible || dead)
 		return false;
 
-	if(!game_values.friendlyfire && player->teamID == iTeamID)
+	if(game_values.teamcollision != 2 && player->teamID == iTeamID)
 		return false;
 
 	CPlayer * killer = GetPlayerFromGlobalID(iPlayerID);
@@ -9344,6 +9307,53 @@ void OMO_SpinAttack::collide(IO_MovingObject * object)
 	}	
 }
 
+//------------------------------------------------------------------------------
+// class OMO Orbit Hazard - component of the fireball string or rotodisc
+//------------------------------------------------------------------------------
+OMO_OrbitHazard::OMO_OrbitHazard(gfxSprite *nspr, short x, short y, float radius, float vel, float angle, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iAnimationOffsetX, short iAnimationOffsetY, short iAnimationHeight, short iAnimationWidth) :
+	IO_OverMapObject(nspr, x, y, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY, iAnimationOffsetX, iAnimationOffsetY, iAnimationHeight, iAnimationWidth)
+{
+	objectType = object_orbithazard;
+	
+	dRadius = radius;
+	dVel = vel;
+	dAngle = angle;
+
+	dCenterX = (float)x;
+	dCenterY = (float)y;
+
+	CalculatePosition();
+}
+
+void OMO_OrbitHazard::update()
+{
+	animate();
+
+	dAngle += dVel;
+
+	if(dAngle < 0.0f)
+		dAngle += TWO_PI;
+	else if(dAngle >= TWO_PI)
+		dAngle -= TWO_PI;
+
+	CalculatePosition();
+}
+
+bool OMO_OrbitHazard::collide(CPlayer * player)
+{
+	if(!player->invincible && !player->spawninvincible && (player->score->score > 0 || game_values.gamemode->goal == -1))
+	{
+		return player->KillPlayerMapHazard(false, kill_style_environment) != player_kill_nonkill;
+	}
+
+	return false;
+}
+
+void OMO_OrbitHazard::CalculatePosition()
+{
+	xf(dCenterX + dRadius * cos(dAngle) - 9.0f);
+	yf(dCenterY + dRadius * sin(dAngle) - 9.0f);
+}
 
 //------------------------------------------------------------------------------
 // class object_container

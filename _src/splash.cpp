@@ -151,6 +151,7 @@ bool LoadGameGraphics()
 
 	gfx_loadimage(&menu_survival, convertPath("gfx/packs/modeobjects/menu_survival.png", graphicspack), false);
 	gfx_loadimage(&menu_stomp, convertPath("gfx/packs/modeobjects/menu_stomp.png", graphicspack), false);
+	gfx_loadimage(&menu_egg, convertPath("gfx/packs/modeobjects/menu_egg.png", graphicspack), false);
 
 	gfx_loadimage(&spr_clouds, convertPath("gfx/packs/eyecandy/cloud.png", graphicspack), 255, true);
 	gfx_loadimage(&spr_ghosts, convertPath("gfx/packs/eyecandy/ghost.png", graphicspack), 128, true);
@@ -283,6 +284,9 @@ bool LoadGameGraphics()
 	gfx_loadimage(&spr_blueblock, convertPath("gfx/packs/projectiles/throwblock.png", graphicspack), true);
 	gfx_loadimage(&spr_bomb, convertPath("gfx/packs/projectiles/bomb.png", graphicspack), true);
 	
+	gfx_loadimage(&spr_hazard_fireball, convertPath("gfx/packs/hazards/fireball.png", graphicspack), true);
+	gfx_loadimage(&spr_hazard_rotodisc, convertPath("gfx/packs/hazards/rotodisc.png", graphicspack), true);
+
 	gfx_loadimage(&spr_fireballexplosion, convertPath("gfx/packs/eyecandy/fireballexplosion.png", graphicspack), 160, true);
 	gfx_loadimage(&spr_frictionsmoke, convertPath("gfx/packs/eyecandy/frictionsmoke.png", graphicspack), 160, true);
 	gfx_loadimage(&spr_bobombsmoke, convertPath("gfx/packs/eyecandy/bobombsmoke.png", graphicspack), 160, true);

@@ -91,7 +91,7 @@ void Menu::WriteGameOptions()
 		abyte[0] = (unsigned char) game_values.spawnstyle;
 		abyte[1] = (unsigned char) game_values.awardstyle;
 		abyte[2] = (unsigned char) announcerlist.GetCurrentIndex();
-		abyte[3] = (unsigned char) game_values.friendlyfire;
+		abyte[3] = (unsigned char) game_values.teamcollision;
 		abyte[4] = (unsigned char) game_values.screencrunch;
 		abyte[5] = (unsigned char) game_values.toplayer;
 		abyte[6] = (unsigned char) game_values.scoreboardstyle;
@@ -442,17 +442,17 @@ void Menu::CreateMenu()
 	mGraphicsOptionsMenu.SetHeadControl(miSpawnStyleField);
 	mGraphicsOptionsMenu.SetCancelCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 
+
 	//***********************
 	// Team Options
 	//***********************
-
-
-	miTeamKillsField = new MI_SelectField(&spr_selectfield, 70, 200, "Kills", 500, 220);
+	
+	miTeamKillsField = new MI_SelectField(&spr_selectfield, 70, 200, "Player Collision", 500, 220);
 	miTeamKillsField->Add("Off", 0, "", false, false);
-	miTeamKillsField->Add("On", 1, "", true, false);
-	miTeamKillsField->SetData(NULL, NULL, &game_values.friendlyfire);
-	miTeamKillsField->SetKey(game_values.friendlyfire ? 1 : 0);
-	miTeamKillsField->SetAutoAdvance(true);
+	miTeamKillsField->Add("Assist", 1, "", false, false);
+	miTeamKillsField->Add("On", 2, "", false, false);
+	miTeamKillsField->SetData(&game_values.teamcollision, NULL, NULL);
+	miTeamKillsField->SetKey(game_values.teamcollision);
 
 	miTeamColorsField = new MI_SelectField(&spr_selectfield, 70, 240, "Colors", 500, 220);
 	miTeamColorsField->Add("Off", 0, "", false, false);
@@ -1531,11 +1531,9 @@ void Menu::CreateMenu()
 	// Yoshi's Eggs Mode Settings
 	//***********************
 
-	//TODO: Use egg and yoshi icons instead of title text below
-	char * szEggFields[4] = {"Green Eggs", "Red Eggs", "Yellow Eggs", "Blue Eggs"};
 	for(short iEggField = 0; iEggField < 4; iEggField++)
 	{
-		miEggModeEggQuantityField[iEggField] = new MI_SliderField(&spr_selectfield, &menu_slider_bar, 120, 80 + iEggField * 40, szEggFields[iEggField], 400, 180, 380);
+		miEggModeEggQuantityField[iEggField] = new MI_PowerupSlider(&spr_selectfield, &menu_slider_bar, &menu_egg, 170, 80 + 40 * iEggField, 300, iEggField);
 		miEggModeEggQuantityField[iEggField]->Add("0", 0, "", false, false);
 		miEggModeEggQuantityField[iEggField]->Add("1", 1, "", false, false);
 		miEggModeEggQuantityField[iEggField]->Add("2", 2, "", false, false);
@@ -1546,10 +1544,9 @@ void Menu::CreateMenu()
 		miEggModeEggQuantityField[iEggField]->SetNoWrap(true);
 	}
 
-	char * szYoshiFields[4] = {"Green Yoshis", "Red Yoshis", "Yellow Yoshis", "Blue Yoshis"};
 	for(short iYoshiField = 0; iYoshiField < 4; iYoshiField++)
 	{
-		miEggModeYoshiQuantityField[iYoshiField] = new MI_SliderField(&spr_selectfield, &menu_slider_bar, 120, 240 + iYoshiField * 40, szYoshiFields[iYoshiField], 400, 180, 380);
+		miEggModeYoshiQuantityField[iYoshiField] = new MI_PowerupSlider(&spr_selectfield, &menu_slider_bar, &menu_egg, 170, 240 + 40 * iYoshiField, 300, iYoshiField + 4);
 		miEggModeYoshiQuantityField[iYoshiField]->Add("0", 0, "", false, false);
 		miEggModeYoshiQuantityField[iYoshiField]->Add("1", 1, "", false, false);
 		miEggModeYoshiQuantityField[iYoshiField]->Add("2", 2, "", false, false);

@@ -2222,13 +2222,13 @@ void CGM_Star::think()
 
 				//Let the cleanup function remove the player on the last kill
 				if(score[list_players[iPlayer]->teamID]->score > 1)
-					list_players[iPlayer]->KillPlayerMapHazard(true);
+					list_players[iPlayer]->KillPlayerMapHazard(true, kill_style_environment);
 			}
 		}
 		else
 		{
 			if(score[star->teamID]->score > 1)
-				star->KillPlayerMapHazard(true);
+				star->KillPlayerMapHazard(true, kill_style_environment);
 		}
 
 		if(game_values.gamemodesettings.star.shine)

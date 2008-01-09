@@ -422,6 +422,9 @@ extern gfxSprite		spr_spike;
 extern gfxSprite		spr_bomb;
 extern gfxSprite		spr_kuriboshoe;
 
+extern gfxSprite		spr_hazard_fireball;
+extern gfxSprite		spr_hazard_rotodisc;
+
 extern gfxSprite		spr_fireballexplosion;
 extern gfxSprite		spr_frictionsmoke;
 extern gfxSprite		spr_bobombsmoke;
@@ -505,8 +508,11 @@ extern gfxSprite		menu_player_select;
 extern gfxSprite		menu_map_filter;
 extern gfxSprite		menu_match_select;
 extern gfxSprite		menu_dialog;
+
 extern gfxSprite		menu_stomp;
 extern gfxSprite		menu_survival;
+extern gfxSprite		menu_egg;
+
 extern gfxSprite		menu_mode_small;
 extern gfxSprite		menu_mode_large;
 extern gfxSprite		spr_dialog;
@@ -844,7 +850,7 @@ struct gv
 	short		bulletbillspawntimer[4];
 	bool		bulletbillhoming[4];
 
-	bool		friendlyfire;
+	short		teamcollision;
 	bool		toplayer;
 	short		scoreboardstyle;
 	bool		teamcolors;

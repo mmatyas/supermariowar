@@ -93,8 +93,11 @@ gfxSprite		menu_map_filter;
 gfxSprite		menu_match_select;
 gfxSprite		menu_dialog;
 gfxSprite		menu_slider_bar;
+
 gfxSprite		menu_stomp;
 gfxSprite		menu_survival;
+gfxSprite		menu_egg;
+
 gfxSprite		menu_mode_small;
 gfxSprite		menu_mode_large;
 gfxSprite		spr_dialog;
@@ -233,6 +236,9 @@ gfxSprite		spr_spring;
 gfxSprite		spr_spike;
 gfxSprite		spr_bomb;
 gfxSprite		spr_kuriboshoe;
+
+gfxSprite		spr_hazard_fireball;
+gfxSprite		spr_hazard_rotodisc;
 
 gfxSprite		spr_fireballexplosion;
 gfxSprite		spr_frictionsmoke;
@@ -701,7 +707,7 @@ int main(int argc, char *argv[])
 	game_values.worldindex			= 0;
 	game_values.slowdownon			= -1;
 	game_values.slowdowncounter		= 0;
-	game_values.friendlyfire		= false;
+	game_values.teamcollision		= 0;
 	game_values.screencrunch		= true;
 	game_values.screenshaketimer	= 0;
 	game_values.screenshakeplayerid = -1;
@@ -990,7 +996,7 @@ int main(int argc, char *argv[])
 			fread(abyte, sizeof(unsigned char), 29, fp);
 			game_values.spawnstyle = (short) abyte[0];
 			game_values.awardstyle = (short) abyte[1];
-			game_values.friendlyfire = ((short)abyte[3] > 0 ? true : false);
+			game_values.teamcollision = (short)abyte[3];
 			game_values.screencrunch = ((short)abyte[4] > 0 ? true : false);
 			game_values.toplayer = ((short)abyte[5] > 0 ? true : false);
 			game_values.scoreboardstyle = (short)abyte[6];
@@ -1966,7 +1972,7 @@ void RunGame()
 						if(list_players[k]->globalID == game_values.screenshakeplayerid)
 							continue;
 
-						if(!game_values.friendlyfire && game_values.screenshaketeamid == list_players[k]->teamID)
+						if(game_values.teamcollision != 2 && game_values.screenshaketeamid == list_players[k]->teamID)
 							continue;
 						
 						if(!list_players[k]->invincible && !list_players[k]->spawninvincible && !list_players[k]->fKuriboShoe && list_players[k]->isready())
@@ -2094,6 +2100,7 @@ void RunGame()
 				}
 #endif
 
+				//Advance the cpu's turn (AI only calculates player's actions 1 out of 4 frames)
 				if(++game_values.cputurn > 3)
 					game_values.cputurn = 0;
 
@@ -2119,6 +2126,7 @@ void RunGame()
 					}
 				}
 				
+				//Move platforms
 				g_map.updatePlatforms();
 
 				game_values.playskidsound = false;
@@ -2131,6 +2139,7 @@ void RunGame()
 
 				if(!game_values.swapplayers)
 				{
+					//Play sound for skidding players
 					if(game_values.playskidsound)
 					{
 						if(!sfx_skid.isplaying())
@@ -2142,6 +2151,7 @@ void RunGame()
 							ifsoundonstop(sfx_skid);
 					}
 
+					//Play sound for players using PWings
 					if(game_values.playflyingsound)
 					{
 						if(!sfx_flyingsound.isplaying())
@@ -3295,9 +3305,11 @@ void LoadMapObjects()
 {
 	objectblocks.clean();
 
+	//Clear all the previous switch settings
 	for(short iSwitch = 0; iSwitch < 8; iSwitch++)
 		g_map.switchBlocks[iSwitch].clear();
 	
+	//Add blocks (breakable, note, switch, throwable, etc)
 	for(short x = 0; x < MAPWIDTH; x++)
 	{
 		for(short y = 0; y < MAPHEIGHT; y++)
@@ -3387,6 +3399,7 @@ void LoadMapObjects()
 
 	objectsplayer.clean();
 
+	//Add map objects like springs, shoes and spikes
 	for(short i = 0; i < g_map.iNumMapItems; i++)
 	{
 		MapItem * mapItem = &g_map.mapitems[i];
@@ -3402,7 +3415,24 @@ void LoadMapObjects()
 			objectsplayer.add(new CO_KuriboShoe(&spr_kuriboshoe, ix, iy));
 	}
 
+	//Set all the 1x1 gaps up so players can run across them
 	g_map.UpdateAllTileGaps();
+
+	//Add map hazards like spinning fireball strings and pirhana plants
+	for(short iFireball = 0; iFireball < 8; iFireball++)
+		objectsfront.add(new OMO_OrbitHazard(&spr_hazard_fireball, 320, 240, iFireball * 24, 0.02f, QUARTER_PI, 4, 8, 18, 18, 0, 0, 0, 18, 18, 18));
+
+	/*
+	for(short iFireball = 0; iFireball < 3; iFireball++)
+		objectsfront.add(new OMO_OrbitHazard(&spr_hazard_fireball, 120, 120, iFireball * 24, -0.01f, PI, 4, 8, 18, 18, 0, 0, 0, 18, 18, 18));
+
+	for(short iFireball = 0; iFireball < 4; iFireball++)
+		objectsfront.add(new OMO_OrbitHazard(&spr_hazard_fireball, 500, 340, iFireball * 24, 0.005f, TWO_PI, 4, 8, 18, 18, 0, 0, 0, 0, 18, 18));
+	*/
+
+	for(short iRotoDisc = 0; iRotoDisc < 2; iRotoDisc++)
+		objectsfront.add(new OMO_OrbitHazard(&spr_hazard_rotodisc, 320, 240, 150.0f, 0.02f, iRotoDisc * PI, 3, 8, 32, 32, 0, 0, 0, 0, 32, 32));
+
 }
 
 bool SwapPlayers(short iUsingPlayerID)

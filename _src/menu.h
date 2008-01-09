@@ -378,8 +378,8 @@ class Menu
 		MI_Text * miCoinModeHeaderText;
 
 		//Yoshi's Eggs
-		MI_SelectField * miEggModeEggQuantityField[4];
-		MI_SelectField * miEggModeYoshiQuantityField[4];
+		MI_PowerupSlider * miEggModeEggQuantityField[4];
+		MI_PowerupSlider * miEggModeYoshiQuantityField[4];
 		MI_Button * miEggModeBackButton;
 
 		MI_Image * miEggModeLeftHeaderBar;
