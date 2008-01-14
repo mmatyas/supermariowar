@@ -535,7 +535,7 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 					ts->iNumUsedSettings += ReadTourStopSetting(&(ts->gmsSettings.egg.eggs[iEgg]), NULL, game_values.gamemodemenusettings.egg.eggs[iEgg], false);
 
 				for(int iYoshi = 0; iYoshi < 4; iYoshi++)
-					ts->iNumUsedSettings += ReadTourStopSetting(&(ts->gmsSettings.egg.yoshis[iEgg]), NULL, game_values.gamemodemenusettings.egg.yoshis[iEgg], false);
+					ts->iNumUsedSettings += ReadTourStopSetting(&(ts->gmsSettings.egg.yoshis[iYoshi]), NULL, game_values.gamemodemenusettings.egg.yoshis[iYoshi], false);
 			}
 			else if(ts->iMode == 7) //capture the flag
 			{
