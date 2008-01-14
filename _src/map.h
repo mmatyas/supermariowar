@@ -73,6 +73,16 @@ struct MapItem
 	short iy;
 };
 
+struct MapHazard
+{
+	short itype;
+	short ix;
+	short iy;
+
+	short iparam[NUMMAPHAZARDPARAMS];
+	float dparam[NUMMAPHAZARDPARAMS];
+};
+
 struct TilesetTile
 {
 	short iID;
@@ -206,7 +216,10 @@ class CMap
 		short backgroundID;
 		short eyecandyID;
 		short musicCategoryID;
+		
 		short iNumMapItems;
+		short iNumMapHazards;
+
 		short iNumRaceGoals;
 		short iNumFlagBases;
 
@@ -230,6 +243,7 @@ class CMap
 		std::list<MovingPlatform*> tempPlatforms;
 
 		MapItem		mapitems[MAXMAPITEMS];
+		MapHazard	maphazards[MAXMAPHAZARDS];
 
 		SpawnArea	spawnareas[NUMSPAWNAREATYPES][MAXSPAWNAREAS];
 		short		numspawnareas[NUMSPAWNAREATYPES];
@@ -295,6 +309,8 @@ class CMap
 		friend int editor_warp();
 		friend int editor_modeitems();
 		friend int editor_properties(short iBlockCol, short iBlockRow);
+		friend int editor_maphazards();
+		friend short NewMapHazard();
 
 		friend short * GetBlockProperty(short x, short y, short iBlockCol, short iBlockRow, short * iSettingIndex);
 		friend int save_as();

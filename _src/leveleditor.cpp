@@ -24,6 +24,7 @@
 
 #include <string.h>
 #include <ctype.h>
+#include <math.h>
 
 #ifdef _WIN32
 	#include <windows.h>
@@ -40,7 +41,7 @@
 
 #define MAPTITLESTRING "SMW 1.8 Leveleditor"
 
-enum {EDITOR_EDIT, EDITOR_TILES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_MAP, EDITOR_BLOCKS, NEW_MAP, SAVE, EDITOR_WARP, EDITOR_EYECANDY, DISPLAY_HELP, EDITOR_PLATFORM, EDITOR_TILETYPE, EDITOR_BACKGROUNDS, EDITOR_MAPITEMS, EDITOR_ANIMATION, EDITOR_PROPERTIES, EDITOR_MODEITEMS};
+enum {EDITOR_EDIT, EDITOR_TILES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_MAP, EDITOR_BLOCKS, NEW_MAP, SAVE, EDITOR_WARP, EDITOR_EYECANDY, DISPLAY_HELP, EDITOR_PLATFORM, EDITOR_TILETYPE, EDITOR_BACKGROUNDS, EDITOR_MAPITEMS, EDITOR_ANIMATION, EDITOR_PROPERTIES, EDITOR_MODEITEMS, EDITOR_MAPHAZARDS};
 
 #define MAX_PLATFORMS 8
 #define MAX_PLATFORM_VELOCITY 16
@@ -88,6 +89,7 @@ gfxSprite		spr_nospawntile;
 gfxSprite		spr_noitemspawntile;
 gfxSprite		spr_platformstarttile;
 gfxSprite		spr_platformendtile;
+gfxSprite		spr_maphazardbuttons;
 gfxSprite		spr_dialog;
 gfxSprite		menu_shade;
 gfxSprite		spr_mapitems[3];
@@ -104,6 +106,9 @@ gfxSprite		spr_powerupselector;
 gfxSprite		spr_hidden_marker;
 
 gfxSprite		spr_flagbases, spr_racegoals;	
+
+gfxSprite		spr_fireball;
+gfxSprite		spr_rotodisc;
 
 TileType		set_type = tile_solid;
 int				set_tile_rows = 0;
@@ -185,6 +190,7 @@ short			g_iCurrentDrawIndex = 0;
 
 gfxSprite spr_eyecandy;
 SDL_Surface * s_platform;
+SDL_Surface * s_maphazardbuttons;
 
 int save_as();
 int find();
@@ -217,11 +223,15 @@ int	editor_tiles();
 int editor_blocks();
 int editor_mapitems();
 int editor_platforms();
+int editor_maphazards();
 int editor_tiletype();
 int editor_backgrounds();
 int editor_animation();
 int editor_properties(short iBlockCol, short iBlockRow);
 int editor_modeitems();
+
+void UpdatePlatformPathStart(short iEditPlatform, short iClickX, short iClickY, short iPlatformWidth, short iPlatformHeight);
+void UpdatePlatformPathEnd(short iEditPlatform, short iClickX, short iClickY, short iPlatformWidth, short iPlatformHeight);
 
 void resetselectedtiles();
 void copymoveselection();
@@ -267,6 +277,10 @@ void ClearTilesetTile(TilesetTile * tile)
 	SetTilesetTile(tile, TILESETNONE, 0, 0);
 }
 
+short NewMapHazard();
+void DrawMapHazard(MapHazard * hazard);
+void AdjustMapHazardRadius(MapHazard * hazard, short iClickX, short iClickY);
+
 //main main main
 int main(int argc, char *argv[])
 {
@@ -297,6 +311,7 @@ int main(int argc, char *argv[])
 	spr_eyecandy.init(convertPathC("gfx/leveleditor/leveleditor_eyecandy.png"), 255, 0, 255);
 
 	s_platform = IMG_Load(convertPathC("gfx/leveleditor/leveleditor_platform.png"));
+	s_maphazardbuttons = IMG_Load(convertPathC("gfx/leveleditor/leveleditor_maphazard_buttons.png"));
 
 	spr_warps[0].init(convertPath("gfx/leveleditor/leveleditor_warp.png"), 255, 0, 255);
 	spr_warps[1].init(convertPath("gfx/leveleditor/leveleditor_warp_preview.png"), 255, 0, 255);
@@ -338,7 +353,15 @@ int main(int argc, char *argv[])
 	spr_flagbases.init(convertPath("gfx/packs/Classic/modeobjects/flagbases.png"), 255, 0, 255);
 	spr_racegoals.init(convertPath("gfx/packs/Classic/modeobjects/racegoal.png"), 255, 0, 255);	
 
+	spr_fireball.init(convertPath("gfx/packs/Classic/hazards/fireball.png"), 255, 0, 255);	
+	spr_rotodisc.init(convertPath("gfx/packs/Classic/hazards/rotodisc.png"), 255, 0, 255);	
+
 	if( SDL_SetColorKey(s_platform, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(s_platform->format, 255, 0, 255)) < 0)
+	{
+		printf("\n ERROR: Couldn't set ColorKey + RLE: %s\n", SDL_GetError());
+	}
+
+	if( SDL_SetColorKey(s_maphazardbuttons, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(s_maphazardbuttons->format, 255, 0, 255)) < 0)
 	{
 		printf("\n ERROR: Couldn't set ColorKey + RLE: %s\n", SDL_GetError());
 	}
@@ -351,13 +374,13 @@ int main(int argc, char *argv[])
 	//Setup Platforms
 	for(short iPlatform = 0; iPlatform < MAX_PLATFORMS; iPlatform++)
 	{
-		g_Platforms[iPlatform].rIcon[0].x = (iPlatform % 6) * 32;
-		g_Platforms[iPlatform].rIcon[0].y = (iPlatform / 6) * 32 + 224;
+		g_Platforms[iPlatform].rIcon[0].x = (iPlatform % 8) * 32;
+		g_Platforms[iPlatform].rIcon[0].y = (iPlatform / 8) * 32 + 224;
 		g_Platforms[iPlatform].rIcon[0].w = 32;
 		g_Platforms[iPlatform].rIcon[0].h = 32;
 
 		g_Platforms[iPlatform].rIcon[1].x = (iPlatform % 4) * 42 + 240;
-		g_Platforms[iPlatform].rIcon[1].y = (iPlatform / 4) * 42 + 174;
+		g_Platforms[iPlatform].rIcon[1].y = (iPlatform / 4) * 42 + 180;
 		g_Platforms[iPlatform].rIcon[1].w = 32;
 		g_Platforms[iPlatform].rIcon[1].h = 32;
 
@@ -416,6 +439,10 @@ int main(int argc, char *argv[])
 
 			case EDITOR_PLATFORM:
 				state = editor_platforms();
+			break;
+
+			case EDITOR_MAPHAZARDS:
+				state = editor_maphazards();
 			break;
 
 			case EDITOR_TILETYPE:
@@ -639,6 +666,9 @@ int editor_edit()
 					if(event.key.keysym.sym == SDLK_j)
 						return EDITOR_MODEITEMS;
 
+					if(event.key.keysym.sym == SDLK_h)
+						return EDITOR_MAPHAZARDS;
+
 					if(event.key.keysym.sym == SDLK_k)
 					{
 						int iMouseX, iMouseY;
@@ -728,7 +758,7 @@ int editor_edit()
 					if(event.key.keysym.sym == SDLK_l)
 						return EDITOR_TILETYPE;
 
-					if(event.key.keysym.sym == SDLK_h || event.key.keysym.sym == SDLK_F1)
+					if(event.key.keysym.sym == SDLK_F1)
 						return DISPLAY_HELP;
 
 					if(event.key.keysym.sym == SDLK_PAGEUP)
@@ -848,7 +878,7 @@ int editor_edit()
 
 					if(event.button.button == SDL_BUTTON_LEFT && !ignoreclick)
 					{
-						if(edit_mode == 0) //selected blocks
+						if(edit_mode == 0) //paint selected blocks
 						{
 							g_map.objectdata[iClickX][iClickY].iType = set_block;
 							g_map.objectdata[iClickX][iClickY].fHidden = false;
@@ -861,7 +891,7 @@ int editor_edit()
 
 							AdjustMapItems(iClickX, iClickY);
 						}
-						else if(edit_mode == 1) //selected tile(s)
+						else if(edit_mode == 1) //paint selected tile(s)
 						{
 							for(short i = 0; i < set_tile_cols; i++)
 							{
@@ -881,12 +911,12 @@ int editor_edit()
 								}
 							}
 						}
-						else if(edit_mode == 2)
+						else if(edit_mode == 2) //warps
 						{
 							g_map.warpdata[iClickX][iClickY].direction = set_direction;
 							g_map.warpdata[iClickX][iClickY].connection = set_connection;
 						}
-						else if(edit_mode == 3)
+						else if(edit_mode == 3) //move tiles
 						{
 							if(move_mode == 3)
 							{
@@ -932,20 +962,20 @@ int editor_edit()
 								move_start_y = iClickY;
 							}
 						}
-						else if(edit_mode == 4)
+						else if(edit_mode == 4) //no player spawn areas
 						{
 							g_map.nospawn[0][iClickX][iClickY] = true;
 						}
-						else if(edit_mode == 5)
+						else if(edit_mode == 5) // no item spawn areas
 						{
 							g_map.nospawn[1][iClickX][iClickY] = true;
 						}
-						else if(edit_mode == 6)
+						else if(edit_mode == 6) //tile types
 						{
 							g_map.mapdatatop[iClickX][iClickY].iType = set_tiletype;
 							AdjustMapItems(iClickX, iClickY);
 						}
-						else if(edit_mode == 7)
+						else if(edit_mode == 7) //map items
 						{
 							if(g_map.iNumMapItems < MAXMAPITEMS)
 							{
@@ -975,7 +1005,7 @@ int editor_edit()
 								}
 							}
 						}
-						else if(edit_mode == 8)
+						else if(edit_mode == 8) //animated tiles
 						{
 							for(short i = 0; i < set_tile_cols; i++)
 							{
@@ -2026,20 +2056,22 @@ int editor_platforms()
 	bool done = false;
 	
 	SDL_Rect r;
-	r.x = 224;
+	r.x = 192;
 	r.y = 128;
-	r.w = 192;
+	r.w = 256;
 	r.h = 224;
 
+	/*
 	SDL_Rect ri;
 	ri.x = r.x + 20;
 	ri.y = r.y + 50 + g_map.eyecandyID * 55;
 	ri.w = 152;
 	ri.h = 24;
+	*/
 
 	SDL_Rect rNewButton[2];
 	rNewButton[0].x = 0;
-	rNewButton[0].y = 288;
+	rNewButton[0].y = 352;
 	rNewButton[0].w = 76;
 	rNewButton[0].h = 32;
 
@@ -2050,7 +2082,7 @@ int editor_platforms()
 
 	SDL_Rect rVelocity[4];
 	rVelocity[0].x = 12;
-	rVelocity[0].y = 320;
+	rVelocity[0].y = 384;
 	rVelocity[0].w = 172;
 	rVelocity[0].h = 13;
 
@@ -2060,7 +2092,7 @@ int editor_platforms()
 	rVelocity[1].h = 13;
 
 	rVelocity[2].x = 184;
-	rVelocity[2].y = 320;
+	rVelocity[2].y = 384;
 	rVelocity[2].w = 8;
 	rVelocity[2].h = 16;
 
@@ -2070,8 +2102,8 @@ int editor_platforms()
 	rVelocity[3].h = 16;
 
 	SDL_Rect rPath[6];
-	rPath[0].x = 0;
-	rPath[0].y = 336;
+	rPath[0].x = 76;
+	rPath[0].y = 352;
 	rPath[0].w = 32;
 	rPath[0].h = 32;
 
@@ -2080,8 +2112,8 @@ int editor_platforms()
 	rPath[1].w = 32;
 	rPath[1].h = 32;
 
-	rPath[2].x = 32;
-	rPath[2].y = 336;
+	rPath[2].x = 108;
+	rPath[2].y = 352;
 	rPath[2].w = 32;
 	rPath[2].h = 32;
 
@@ -2090,8 +2122,8 @@ int editor_platforms()
 	rPath[3].w = 32;
 	rPath[3].h = 32;
 
-	rPath[4].x = 64;
-	rPath[4].y = 336;
+	rPath[4].x = 140;
+	rPath[4].y = 352;
 	rPath[4].w = 32;
 	rPath[4].h = 32;
 
@@ -2122,7 +2154,11 @@ int editor_platforms()
 				}
 				case SDL_KEYDOWN:
 				{
-					if(event.key.keysym.sym == SDLK_t)
+					if(event.key.keysym.sym == SDLK_s)
+					{
+						savecurrentmap();
+					}
+					else if(event.key.keysym.sym == SDLK_t)
 					{
 						if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
 						{
@@ -2149,7 +2185,7 @@ int editor_platforms()
 					}
 					else if(event.key.keysym.sym == SDLK_DELETE)
 					{
-						if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState)
+						if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
 						{
 							//Copy platforms into empty spot
 							for(short iPlatform = iEditPlatform; iPlatform < g_iNumPlatforms - 1; iPlatform++)
@@ -2284,40 +2320,7 @@ int editor_platforms()
 						}
 						else if(PLATFORM_EDIT_STATE_PATH == iPlatformEditState)
 						{
-							if(!ignoreclick)
-							{
-								short iTempStartX = event.button.x / TILESIZE;
-								short iTempStartY = event.button.y / TILESIZE;
-								short iTempEndX = g_Platforms[iEditPlatform].iEndX;
-								short iTempEndY = g_Platforms[iEditPlatform].iEndY;
-
-								if(iTempStartX >= 0 && iTempStartX <= MAPWIDTH - iPlatformWidth &&
-									iTempStartY >= 0 && iTempStartY <= MAPHEIGHT - iPlatformHeight)
-								{
-									//If the start isn't in the same row or column, then move the end point so that it is
-									if(iTempStartX != iTempEndX && iTempStartY != iTempEndY)
-									{
-										short iXDiff = abs(iTempStartX - iTempEndX);
-										short iYDiff = abs(iTempStartY - iTempEndY);
-
-										//If the x difference is smaller, move it so it lines up
-										if(iYDiff > iXDiff)
-											iTempEndX = iTempStartX;
-										else
-											iTempEndY = iTempStartY;
-									}
-
-									//If the start and end are the same point, then don't allow this change
-									if(iTempStartX != iTempEndX ||
-										iTempStartY != iTempEndY)
-									{
-										g_Platforms[iEditPlatform].iStartX = iTempStartX;
-										g_Platforms[iEditPlatform].iStartY = iTempStartY;
-										g_Platforms[iEditPlatform].iEndX = iTempEndX;
-										g_Platforms[iEditPlatform].iEndY = iTempEndY;
-									}
-								}
-							}
+							UpdatePlatformPathStart(iEditPlatform, event.button.x / TILESIZE, event.button.y / TILESIZE, iPlatformWidth, iPlatformHeight);
 						}
 						break;
 					}
@@ -2337,40 +2340,7 @@ int editor_platforms()
 						}
 						else if(PLATFORM_EDIT_STATE_PATH == iPlatformEditState)
 						{
-							if(!ignoreclick)
-							{
-								short iTempStartX = g_Platforms[iEditPlatform].iStartX;
-								short iTempStartY = g_Platforms[iEditPlatform].iStartY;
-							
-								if(ix >= 0 && ix <= MAPWIDTH - iPlatformWidth &&
-									iy >= 0 && iy <= MAPHEIGHT - iPlatformHeight)
-								{
-
-									//If the start isn't in the same row or column, then move the end point so that it is
-									if(iTempStartX != ix &&
-										iTempStartY != iy)
-									{
-										short iXDiff = abs(iTempStartX - ix);
-										short iYDiff = abs(iTempStartY - iy);
-
-										//If the x difference is smaller, move it so it lines up
-										if(iYDiff > iXDiff)
-											iTempStartX = ix;
-										else
-											iTempStartY = iy;
-									}
-
-									//If the start and end are the same point, then don't allow this change
-									if(iTempStartX != ix ||
-										iTempStartY != iy)
-									{
-										g_Platforms[iEditPlatform].iStartX = iTempStartX;
-										g_Platforms[iEditPlatform].iStartY = iTempStartY;
-										g_Platforms[iEditPlatform].iEndX = ix;
-										g_Platforms[iEditPlatform].iEndY = iy;
-									}
-								}
-							}
+							UpdatePlatformPathEnd(iEditPlatform, ix, iy, iPlatformWidth, iPlatformHeight);
 						}
 					}
 				}
@@ -2409,6 +2379,13 @@ int editor_platforms()
 						else if(event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT))
 							g_Platforms[iEditPlatform].types[ix][iy] = tile_nonsolid;
 					}
+					else if(PLATFORM_EDIT_STATE_PATH == iPlatformEditState)
+					{
+						if(event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT))
+							UpdatePlatformPathStart(iEditPlatform, ix, iy, iPlatformWidth, iPlatformHeight);
+						else if(event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT))
+							UpdatePlatformPathEnd(iEditPlatform, ix, iy, iPlatformWidth, iPlatformHeight);
+					}
 
 					break;
 				}
@@ -2438,10 +2415,11 @@ int editor_platforms()
 			SDL_Rect rp;
 			rp.x = 0;
 			rp.y = 0;
-			rp.w = 192;
+			rp.w = 256;
 			rp.h = 224;
 
 			SDL_BlitSurface(s_platform, &rp, screen, &r);
+			menu_font_small.drawCentered(320, 146, "Platforms");
 
 			menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "Platform Mode: [esc] Exit  [c] Check Paths");
 			menu_font_small.drawRightJustified(640, 0, maplist.currentFilename());
@@ -2559,6 +2537,82 @@ int editor_platforms()
 	return EDITOR_QUIT;
 }
 
+void UpdatePlatformPathStart(short iEditPlatform, short iClickX, short iClickY, short iPlatformWidth, short iPlatformHeight)
+{
+	if(!ignoreclick)
+	{
+		short iTempStartX = iClickX;
+		short iTempStartY = iClickY;
+		short iTempEndX = g_Platforms[iEditPlatform].iEndX;
+		short iTempEndY = g_Platforms[iEditPlatform].iEndY;
+
+		if(iTempStartX >= 0 && iTempStartX <= MAPWIDTH - iPlatformWidth &&
+			iTempStartY >= 0 && iTempStartY <= MAPHEIGHT - iPlatformHeight)
+		{
+			//If the start isn't in the same row or column, then move the end point so that it is
+			if(iTempStartX != iTempEndX && iTempStartY != iTempEndY)
+			{
+				short iXDiff = abs(iTempStartX - iTempEndX);
+				short iYDiff = abs(iTempStartY - iTempEndY);
+
+				//If the x difference is smaller, move it so it lines up
+				if(iYDiff > iXDiff)
+					iTempEndX = iTempStartX;
+				else
+					iTempEndY = iTempStartY;
+			}
+
+			//If the start and end are the same point, then don't allow this change
+			if(iTempStartX != iTempEndX ||
+				iTempStartY != iTempEndY)
+			{
+				g_Platforms[iEditPlatform].iStartX = iTempStartX;
+				g_Platforms[iEditPlatform].iStartY = iTempStartY;
+				g_Platforms[iEditPlatform].iEndX = iTempEndX;
+				g_Platforms[iEditPlatform].iEndY = iTempEndY;
+			}
+		}
+	}
+}
+
+void UpdatePlatformPathEnd(short iEditPlatform, short iClickX, short iClickY, short iPlatformWidth, short iPlatformHeight)
+{
+	if(!ignoreclick)
+	{
+		short iTempStartX = g_Platforms[iEditPlatform].iStartX;
+		short iTempStartY = g_Platforms[iEditPlatform].iStartY;
+	
+		if(iClickX >= 0 && iClickX <= MAPWIDTH - iPlatformWidth &&
+			iClickY >= 0 && iClickY <= MAPHEIGHT - iPlatformHeight)
+		{
+
+			//If the start isn't in the same row or column, then move the end point so that it is
+			if(iTempStartX != iClickX &&
+				iTempStartY != iClickY)
+			{
+				short iXDiff = abs(iTempStartX - iClickX);
+				short iYDiff = abs(iTempStartY - iClickY);
+
+				//If the x difference is smaller, move it so it lines up
+				if(iYDiff > iXDiff)
+					iTempStartX = iClickX;
+				else
+					iTempStartY = iClickY;
+			}
+
+			//If the start and end are the same point, then don't allow this change
+			if(iTempStartX != iClickX ||
+				iTempStartY != iClickY)
+			{
+				g_Platforms[iEditPlatform].iStartX = iTempStartX;
+				g_Platforms[iEditPlatform].iStartY = iTempStartY;
+				g_Platforms[iEditPlatform].iEndX = iClickX;
+				g_Platforms[iEditPlatform].iEndY = iClickY;
+			}
+		}
+	}
+}
+
 void draw_platform(short iPlatform, bool fDrawTileTypes)
 {	
 	for(short iCol = 0; iCol < MAPWIDTH; iCol++)
@@ -2583,6 +2637,649 @@ void draw_platform(short iPlatform, bool fDrawTileTypes)
 				spr_transparenttiles.draw(iCol * TILESIZE, iRow * TILESIZE, (type - 1) * TILESIZE, 0, TILESIZE, TILESIZE);
 			}
 		}
+	}
+}
+
+int editor_maphazards()
+{
+	bool done = false;
+	
+	enum {MAPHAZARD_EDIT_STATE_SELECT, MAPHAZARD_EDIT_STATE_TYPE, MAPHAZARD_EDIT_STATE_LOCATION, MAPHAZARD_EDIT_STATE_PROPERTY1, MAPHAZARD_EDIT_STATE_PROPERTY2, MAPHAZARD_EDIT_STATE_PROPERTY3, MAPHAZARD_EDIT_STATE_PROPERTY4, MAPHAZARD_EDIT_STATE_PROPERTY5};
+
+	short iEditState = MAPHAZARD_EDIT_STATE_SELECT;
+	short iEditMapHazard = 0;
+
+	SDL_Rect rBackground[2];
+	rBackground[0].x = 0;
+	rBackground[0].y = 0;
+	rBackground[0].w = 256;
+	rBackground[0].h = 224;
+
+	rBackground[1].x = 320 - (rBackground[0].w >> 1);
+	rBackground[1].y = 240 - (rBackground[0].h >> 1);
+	rBackground[1].w = 256;
+	rBackground[1].h = 224;
+
+	SDL_Rect rNewButton[2];
+	rNewButton[0].x = 0;
+	rNewButton[0].y = 352;
+	rNewButton[0].w = 76;
+	rNewButton[0].h = 32;
+
+	rNewButton[1].x = rBackground[1].x + (rBackground[1].w >> 1) - (rNewButton[0].w >> 1);
+	rNewButton[1].y = rBackground[1].y + rBackground[1].h + 8;
+	rNewButton[1].w = 76;
+	rNewButton[1].h = 32;
+
+	SDL_Rect rTypeButton[8][4];
+	
+	for(short iType = 0; iType < 8; iType++)
+	{
+		rTypeButton[iType][0].x = 0;
+		rTypeButton[iType][0].y = 0;
+		rTypeButton[iType][0].w = 192;
+		rTypeButton[iType][0].h = 32;
+
+		rTypeButton[iType][1].x = 320 - (rTypeButton[iType][0].w >> 1);
+		rTypeButton[iType][1].y = 84 + iType * 40;
+		rTypeButton[iType][1].w = 192;
+		rTypeButton[iType][1].h = 32;
+
+		rTypeButton[iType][2].x = 24 * iType;
+		rTypeButton[iType][2].y = 32;
+		rTypeButton[iType][2].w = 24;
+		rTypeButton[iType][2].h = 24;
+
+		rTypeButton[iType][3].x = rTypeButton[iType][1].x + 8;
+		rTypeButton[iType][3].y = rTypeButton[iType][1].y + 4;
+		rTypeButton[iType][3].w = 24;
+		rTypeButton[iType][3].h = 24;
+	}
+
+	//Setup Map Hazard Icons
+	SDL_Rect rIconRects[MAXMAPHAZARDS][2];
+	for(short iMapHazard = 0; iMapHazard < MAXMAPHAZARDS; iMapHazard++)
+	{
+		rIconRects[iMapHazard][0].x = (iMapHazard % 8) * 32;
+		rIconRects[iMapHazard][0].y = (iMapHazard / 8) * 32 + 224;
+		rIconRects[iMapHazard][0].w = 32;
+		rIconRects[iMapHazard][0].h = 32;
+
+		rIconRects[iMapHazard][1].x = (iMapHazard % 6) * 40 + 204;
+		rIconRects[iMapHazard][1].y = (iMapHazard / 6) * 40 + rBackground[1].y + 16;
+		rIconRects[iMapHazard][1].w = 32;
+		rIconRects[iMapHazard][1].h = 32;
+	}
+
+	char * szHazardNames[8] = {"Fireballs", "Rotodisc", "Bullet Bill", "Flame Thrower", "Green Pirhana", "Red Pirhana", "Tall Pirhana", "Short Pirhana"};
+
+	while (!done)
+	{
+		int framestart = SDL_GetTicks();
+
+		//handle messages
+		while(SDL_PollEvent(&event))
+		{
+			switch(event.type)
+			{
+				case SDL_QUIT:
+				{
+					done = true;
+					break;
+				}
+				case SDL_KEYDOWN:
+				{
+					if(event.key.keysym.sym == SDLK_s)
+					{
+						savecurrentmap();
+					}
+					else if(event.key.keysym.sym == SDLK_1)
+					{
+						if(MAPHAZARD_EDIT_STATE_SELECT != iEditState)
+						{
+							iEditState = MAPHAZARD_EDIT_STATE_LOCATION;
+						}
+					}
+					else if(event.key.keysym.sym == SDLK_2)
+					{
+						if(MAPHAZARD_EDIT_STATE_SELECT != iEditState)
+						{
+							iEditState = MAPHAZARD_EDIT_STATE_PROPERTY1;
+						}
+					}
+					else if(event.key.keysym.sym == SDLK_3)
+					{
+						if(MAPHAZARD_EDIT_STATE_SELECT != iEditState)
+						{
+							iEditState = MAPHAZARD_EDIT_STATE_PROPERTY2;
+						}
+					}
+					else if(event.key.keysym.sym == SDLK_4)
+					{
+						if(MAPHAZARD_EDIT_STATE_SELECT != iEditState)
+						{
+							iEditState = MAPHAZARD_EDIT_STATE_PROPERTY3;
+						}
+					}
+					else if(event.key.keysym.sym == SDLK_DELETE)
+					{
+						if(MAPHAZARD_EDIT_STATE_PROPERTY1 == iEditState || MAPHAZARD_EDIT_STATE_PROPERTY2 == iEditState || MAPHAZARD_EDIT_STATE_PROPERTY3 == iEditState || MAPHAZARD_EDIT_STATE_PROPERTY4 == iEditState)
+						{
+							//Copy platforms into empty spot
+							for(short iMapHazard = iEditMapHazard; iMapHazard < g_map.iNumMapHazards - 1; iMapHazard++)
+							{
+								g_map.maphazards[iMapHazard].itype = g_map.maphazards[iMapHazard + 1].itype;
+								g_map.maphazards[iMapHazard].ix = g_map.maphazards[iMapHazard + 1].ix;
+								g_map.maphazards[iMapHazard].iy = g_map.maphazards[iMapHazard + 1].iy;
+								
+								for(short iParam = 0; iParam < NUMMAPHAZARDPARAMS; iParam++)
+								{
+									g_map.maphazards[iMapHazard].iparam[iParam] = g_map.maphazards[iMapHazard + 1].iparam[iParam];
+									g_map.maphazards[iMapHazard].dparam[iParam] = g_map.maphazards[iMapHazard + 1].dparam[iParam];
+								}
+							}
+							
+							g_map.iNumMapHazards--;
+							iEditState = MAPHAZARD_EDIT_STATE_SELECT;
+						}
+					}
+					else if(event.key.keysym.sym == SDLK_ESCAPE)
+					{
+						if(MAPHAZARD_EDIT_STATE_SELECT == iEditState)
+						{
+							return EDITOR_EDIT;
+						}
+						else if(MAPHAZARD_EDIT_STATE_TYPE == iEditState || MAPHAZARD_EDIT_STATE_LOCATION == iEditState || MAPHAZARD_EDIT_STATE_PROPERTY1 == iEditState || MAPHAZARD_EDIT_STATE_PROPERTY2 == iEditState || MAPHAZARD_EDIT_STATE_PROPERTY3 == iEditState || MAPHAZARD_EDIT_STATE_PROPERTY4 == iEditState)
+						{
+							iEditState = MAPHAZARD_EDIT_STATE_SELECT;
+						}
+					}
+					else if(event.key.keysym.sym == SDLK_KP_MINUS || event.key.keysym.sym == SDLK_MINUS)
+					{
+						if(MAPHAZARD_EDIT_STATE_PROPERTY1 == iEditState && g_map.maphazards[iEditMapHazard].itype == 0)
+						{
+							if(g_map.maphazards[iEditMapHazard].dparam[0] > -0.1f)
+								g_map.maphazards[iEditMapHazard].dparam[0] -= 0.01f;
+						}
+					}
+					else if(event.key.keysym.sym == SDLK_KP_PLUS || event.key.keysym.sym == SDLK_EQUALS)
+					{
+						if(MAPHAZARD_EDIT_STATE_PROPERTY1 == iEditState && g_map.maphazards[iEditMapHazard].itype == 0)
+						{
+							if(g_map.maphazards[iEditMapHazard].dparam[0] < 0.1f)
+								g_map.maphazards[iEditMapHazard].dparam[0] += 0.01f;
+						}
+					}
+					else if(event.key.keysym.sym == SDLK_n)
+					{
+						if(MAPHAZARD_EDIT_STATE_SELECT == iEditState)
+						{
+							iEditMapHazard = NewMapHazard();
+							iEditState = MAPHAZARD_EDIT_STATE_TYPE;
+						}
+					}
+
+					break;
+				}
+				case SDL_MOUSEBUTTONDOWN:
+				{
+					if(event.button.button == SDL_BUTTON_LEFT && !ignoreclick)
+					{
+						short iClickX = event.button.x;
+						short iClickY = event.button.y;
+
+						if(MAPHAZARD_EDIT_STATE_SELECT == iEditState)
+						{
+							//check clicks on existing platforms
+							for(int iMapHazard = 0; iMapHazard < g_map.iNumMapHazards; iMapHazard++)
+							{
+								if(iClickX >= rIconRects[iMapHazard][1].x && iClickX < rIconRects[iMapHazard][1].x + rIconRects[iMapHazard][1].w &&
+								   iClickY >= rIconRects[iMapHazard][1].y && iClickY < rIconRects[iMapHazard][1].y + rIconRects[iMapHazard][1].h)
+								{
+									iEditMapHazard = iMapHazard;
+									iEditState = MAPHAZARD_EDIT_STATE_PROPERTY1;
+									ignoreclick = true;
+									
+									break;
+								}
+							}
+
+							//check click on the new button
+							if(g_map.iNumMapHazards < MAXMAPHAZARDS && iClickX >= rNewButton[1].x && iClickX < rNewButton[1].x + rNewButton[1].w &&
+							   iClickY >= rNewButton[1].y && iClickY < rNewButton[1].y + rNewButton[1].h)
+							{
+								iEditMapHazard = NewMapHazard();
+								iEditState = MAPHAZARD_EDIT_STATE_TYPE;
+								ignoreclick = true;
+							}
+						}
+						else if(MAPHAZARD_EDIT_STATE_TYPE == iEditState && !ignoreclick)
+						{
+							for(int iType = 0; iType < 5; iType++)
+							{
+								if(iClickX >= rTypeButton[iType][1].x && iClickX < rTypeButton[iType][1].x + rTypeButton[iType][1].w &&
+								   iClickY >= rTypeButton[iType][1].y && iClickY < rTypeButton[iType][1].y + rTypeButton[iType][1].h)
+								{
+									MapHazard * hazard = &g_map.maphazards[iEditMapHazard];
+									hazard->itype = iType;
+									iEditState = MAPHAZARD_EDIT_STATE_LOCATION;
+									ignoreclick = true;
+
+									//Set some default values for the selected type
+									if(iType == 0)
+									{
+										hazard->iparam[0] = 5; //Number of fireballs in string
+										hazard->dparam[0] = 0.02f; //Angular velocity
+										hazard->dparam[1] = 0.0f; //Start Angle
+									}
+									else if(iType == 1)
+									{
+										hazard->iparam[0] = 2; //Number of fireballs in string
+										hazard->dparam[0] = 0.02f; //Angular velocity
+										hazard->dparam[1] = 0.0f; //Start Angle
+										hazard->dparam[2] = 112.0f; //Radius
+									}
+
+									break;
+								}
+							}
+						}
+						else if(MAPHAZARD_EDIT_STATE_LOCATION == iEditState && !ignoreclick)
+						{
+							g_map.maphazards[iEditMapHazard].ix = iClickX / TILESIZE;
+							g_map.maphazards[iEditMapHazard].iy = iClickY / TILESIZE;
+						}
+						else if(MAPHAZARD_EDIT_STATE_PROPERTY1 == iEditState && !ignoreclick)
+						{
+							MapHazard * hazard = &g_map.maphazards[iEditMapHazard];
+							short iType = hazard->itype;
+							if(iType == 0) //Edit fireball string
+							{
+								AdjustMapHazardRadius(hazard, iClickX, iClickY);
+							}
+							else if (iType == 1) //rotodisc
+							{
+								AdjustMapHazardRadius(hazard, iClickX, iClickY);
+							}
+						}
+						else if(MAPHAZARD_EDIT_STATE_PROPERTY2 == iEditState && !ignoreclick)
+						{
+							short iType = g_map.maphazards[iEditMapHazard].itype;
+							if(iType == 0) //Edit fireball string
+							{
+								if(g_map.maphazards[iEditMapHazard].dparam[0] < 0.1f)
+									g_map.maphazards[iEditMapHazard].dparam[0] += 0.01f;
+							}
+							else if (iType == 1) //rotodisc
+							{
+							
+							}
+						}
+						else if(MAPHAZARD_EDIT_STATE_PROPERTY3 == iEditState && !ignoreclick)
+						{
+							short iType = g_map.maphazards[iEditMapHazard].itype;
+							if(iType == 0) //Edit fireball string
+							{
+							
+							}
+							else if (iType == 1) //rotodisc
+							{
+							
+							}
+						}
+						break;
+					}
+					else if(event.button.button == SDL_BUTTON_RIGHT)
+					{
+						short iClickX = event.button.x;
+						short iClickY = event.button.y;
+
+						if(MAPHAZARD_EDIT_STATE_PROPERTY2 == iEditState)
+						{
+							short iType = g_map.maphazards[iEditMapHazard].itype;
+							if(iType == 0) //Edit fireball string
+							{
+								if(g_map.maphazards[iEditMapHazard].dparam[0] > -0.1f)
+									g_map.maphazards[iEditMapHazard].dparam[0] -= 0.01f;
+							}
+							else if (iType == 1) //rotodisc
+							{
+							
+							}
+						}
+					}
+				}
+				case SDL_MOUSEMOTION:
+				{
+					short iClickX = event.button.x;
+					short iClickY = event.button.y;
+
+					if(event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT) && !ignoreclick)
+					{
+						if(MAPHAZARD_EDIT_STATE_LOCATION == iEditState && !ignoreclick)
+						{
+							g_map.maphazards[iEditMapHazard].ix = iClickX / TILESIZE;
+							g_map.maphazards[iEditMapHazard].iy = iClickY / TILESIZE;
+						}
+						else if(MAPHAZARD_EDIT_STATE_PROPERTY1 == iEditState)
+						{
+							MapHazard * hazard = &g_map.maphazards[iEditMapHazard];
+							short iType = hazard->itype;
+							if(iType == 0) //Edit fireball string
+							{
+								AdjustMapHazardRadius(hazard, iClickX, iClickY);
+							}
+							else if (iType == 1) //rotodisc
+							{
+								AdjustMapHazardRadius(hazard, iClickX, iClickY);
+							}
+						}
+					}
+
+					break;
+				}
+				case SDL_MOUSEBUTTONUP:
+				{
+					if(event.button.button == SDL_BUTTON_LEFT)
+					{
+						ignoreclick = false;
+					}
+					
+					break;
+				}
+
+				default:
+					break;
+			}
+		}
+
+		//Draw platform editing
+		drawmap(false, TILESIZE);
+
+		menu_shade.draw(0, 0);
+
+		if(MAPHAZARD_EDIT_STATE_SELECT == iEditState)
+		{
+			SDL_BlitSurface(s_platform, &rBackground[0], screen, &rBackground[1]);
+
+			menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "Map Hazard Mode: [esc] Exit");
+
+			for(int iMapHazard = 0; iMapHazard < g_map.iNumMapHazards; iMapHazard++)
+				SDL_BlitSurface(s_platform, &rIconRects[iMapHazard][0], screen, &rIconRects[iMapHazard][1]);
+
+			if(g_map.iNumMapHazards < MAXMAPHAZARDS)
+				SDL_BlitSurface(s_platform, &rNewButton[0], screen, &rNewButton[1]);
+
+			menu_font_small.drawCentered(320, rBackground[1].y - 18, "Hazards");
+		}
+		else if(MAPHAZARD_EDIT_STATE_TYPE == iEditState)
+		{
+			//SDL_BlitSurface(s_platform, &rBackground[0], screen, &rBackground[1]);
+
+			//Draw map hazard options
+			for(short iType = 0; iType < 8; iType++)
+			{
+				SDL_BlitSurface(s_maphazardbuttons, &rTypeButton[iType][0], screen, &rTypeButton[iType][1]);
+				SDL_BlitSurface(s_maphazardbuttons, &rTypeButton[iType][2], screen, &rTypeButton[iType][3]);
+
+				menu_font_large.draw(rTypeButton[iType][1].x + 36, rTypeButton[iType][1].y + 6, szHazardNames[iType]);
+			}
+
+			menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "Map Hazard Choose Type: [esc] Exit");
+		}
+		else if(MAPHAZARD_EDIT_STATE_LOCATION == iEditState)
+		{
+			DrawMapHazard(&g_map.maphazards[iEditMapHazard]);
+
+			menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "Map Hazard Location");
+		}
+		else if(MAPHAZARD_EDIT_STATE_PROPERTY1 == iEditState)
+		{
+			MapHazard * hazard = &g_map.maphazards[iEditMapHazard];
+			DrawMapHazard(hazard);
+
+			if(hazard->itype == 0)
+			{
+				menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "Fireball String Radius");
+			}
+			else if(hazard->itype == 1)
+			{
+				menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "Rotodisc Radius");
+			}
+		}
+		
+		/*
+		else if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
+		{
+			menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "Edit Platform: [esc] Exit  [t] Tiles  [l] Types [del] Delete  [p] Path  [+/-] Velocity");
+			draw_platform(iEditPlatform, PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState);
+
+			rVelocity[3].x = 404 + (g_Platforms[iEditPlatform].iVelocity - 1) * 12;
+
+			SDL_BlitSurface(s_platform, &rVelocity[0], screen, &rVelocity[1]);
+			SDL_BlitSurface(s_platform, &rVelocity[2], screen, &rVelocity[3]);
+
+			menu_font_small.drawRightJustified(413, 10, "Slow");
+			menu_font_small.draw(594, 10, "Fast");
+		}
+		else if(PLATFORM_EDIT_STATE_PATH == iPlatformEditState)
+		{
+			for(short iCol = g_Platforms[iEditPlatform].iStartX; iCol < g_Platforms[iEditPlatform].iStartX + iPlatformWidth; iCol++)
+			{
+				for(short iRow = g_Platforms[iEditPlatform].iStartY; iRow < g_Platforms[iEditPlatform].iStartY + iPlatformHeight; iRow++)
+				{
+					spr_platformstarttile.draw(iCol * TILESIZE, iRow * TILESIZE);
+				}
+			}
+
+			for(short iCol = g_Platforms[iEditPlatform].iEndX; iCol < g_Platforms[iEditPlatform].iEndX + iPlatformWidth; iCol++)
+			{
+				for(short iRow = g_Platforms[iEditPlatform].iEndY; iRow < g_Platforms[iEditPlatform].iEndY + iPlatformHeight; iRow++)
+				{
+					spr_platformendtile.draw(iCol * TILESIZE, iRow * TILESIZE);
+				}
+			}
+
+			menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "Edit Path: [esc] Exit  [LMB] Set Start Point  [RMB] Set End Point");
+
+			rPath[1].x = g_Platforms[iEditPlatform].iStartX * 32;
+			rPath[1].y = g_Platforms[iEditPlatform].iStartY * 32;
+
+			rPath[3].x = g_Platforms[iEditPlatform].iEndX * 32;
+			rPath[3].y = g_Platforms[iEditPlatform].iEndY * 32;
+
+			SDL_BlitSurface(s_platform, &rPath[0], screen, &rPath[1]);
+			SDL_BlitSurface(s_platform, &rPath[2], screen, &rPath[3]);
+
+			if(g_Platforms[iEditPlatform].iStartX != g_Platforms[iEditPlatform].iEndX)
+			{
+				short iSpotLeft = (g_Platforms[iEditPlatform].iStartX < g_Platforms[iEditPlatform].iEndX ? g_Platforms[iEditPlatform].iStartX + 1 : g_Platforms[iEditPlatform].iEndX + 1);
+				short iSpotRight = (g_Platforms[iEditPlatform].iStartX < g_Platforms[iEditPlatform].iEndX ? g_Platforms[iEditPlatform].iEndX - 1 : g_Platforms[iEditPlatform].iStartX - 1);
+
+				for(short iSpot = iSpotLeft; iSpot <= iSpotRight; iSpot++)
+				{
+					rPath[5].x = iSpot * TILESIZE;
+					rPath[5].y = g_Platforms[iEditPlatform].iStartY * TILESIZE;
+					SDL_BlitSurface(s_platform, &rPath[4], screen, &rPath[5]);
+				}
+			}
+			else
+			{
+				short iSpotTop = (g_Platforms[iEditPlatform].iStartY < g_Platforms[iEditPlatform].iEndY ? g_Platforms[iEditPlatform].iStartY + 1 : g_Platforms[iEditPlatform].iEndY + 1);
+				short iSpotBottom = (g_Platforms[iEditPlatform].iStartY < g_Platforms[iEditPlatform].iEndY ? g_Platforms[iEditPlatform].iEndY - 1 : g_Platforms[iEditPlatform].iStartY - 1);
+
+				for(short iSpot = iSpotTop; iSpot <= iSpotBottom; iSpot++)
+				{
+					rPath[5].x = g_Platforms[iEditPlatform].iStartX * TILESIZE;
+					rPath[5].y = iSpot * TILESIZE;
+					SDL_BlitSurface(s_platform, &rPath[4], screen, &rPath[5]);
+				}
+			}
+		}
+		else if(PLATFORM_EDIT_STATE_TEST == iPlatformEditState)
+		{
+			menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "Check Paths: [esc] Exit");
+			
+			g_map.updatePlatforms();
+			g_map.drawPlatforms();
+		}
+		*/
+
+		menu_font_small.drawRightJustified(640, 0, maplist.currentFilename());
+		SDL_Flip(screen);
+
+		int delay = WAITTIME - (SDL_GetTicks() - framestart);
+		if(delay < 0)
+			delay = 0;
+		else if(delay > WAITTIME)
+			delay = WAITTIME;
+		
+		SDL_Delay(delay);
+	}
+
+	return EDITOR_QUIT;
+}
+
+short NewMapHazard()
+{
+	//Clear new map hazard
+	short iEditMapHazard = g_map.iNumMapHazards;
+
+	MapHazard * hazard = &g_map.maphazards[iEditMapHazard];
+	hazard->itype = 0;
+	hazard->ix = 10;
+	hazard->iy = 7;
+
+	for(short iMapHazard = 0; iMapHazard < NUMMAPHAZARDPARAMS; iMapHazard++)
+	{
+		hazard->iparam[iMapHazard] = 0;
+		hazard->dparam[iMapHazard] = 0.0f;
+	}
+
+	g_map.iNumMapHazards++;
+	
+	return iEditMapHazard;
+}
+
+void DrawMapHazard(MapHazard * hazard)
+{
+	SDL_Rect rLocation[2] = {{76, 352, 32, 32},{0, 0, 32, 32}};
+	SDL_Rect rDot[2] = {{150, 362, 12, 12},{0, 0, 12, 12}};
+
+	//Draw center of location
+	rLocation[1].x = hazard->ix << 5;
+	rLocation[1].y = hazard->iy << 5;
+
+	SDL_BlitSurface(s_platform, &rLocation[0], screen, &rLocation[1]);
+
+	if(hazard->itype == 0)
+	{
+		short iNumDots = 16;
+		float dRadius = (float)((hazard->iparam[0] - 1) * 24 + 6);
+		float dAngle = hazard->dparam[1];
+		for(short iDot = 0; iDot < iNumDots; iDot++)
+		{
+			rDot[1].x = (short)(dRadius * cos(dAngle)) + rLocation[1].x + 10;
+			rDot[1].y = (short)(dRadius * sin(dAngle)) + rLocation[1].y + 10;
+			rDot[1].h = rDot[1].w = 12;
+			
+			SDL_BlitSurface(s_platform, &rDot[0], screen, &rDot[1]);
+
+			dAngle += TWO_PI / iNumDots;
+		}
+
+		//Draw the fireball string
+		for(short iFireball = 0; iFireball < hazard->iparam[0]; iFireball++)
+		{
+			short x = (hazard->ix << 5) + (short)((float)(iFireball * 24) * cos(hazard->dparam[1])) + 7;
+			short y = (hazard->iy << 5) + (short)((float)(iFireball * 24) * sin(hazard->dparam[1])) + 7;
+
+			spr_fireball.draw(x, y, 0, 0, 18, 18);
+		}
+	}
+	else if(hazard->itype == 1)
+	{
+		short iNumDots = 16;
+		float dRadius = hazard->dparam[2] + 10;
+		float dAngle = hazard->dparam[1];
+		for(short iDot = 0; iDot < iNumDots; iDot++)
+		{
+			rDot[1].x = (short)(dRadius * cos(dAngle)) + rLocation[1].x + 10;
+			rDot[1].y = (short)(dRadius * sin(dAngle)) + rLocation[1].y + 10;
+			rDot[1].h = rDot[1].w = 12;
+			
+			SDL_BlitSurface(s_platform, &rDot[0], screen, &rDot[1]);
+
+			dAngle += TWO_PI / iNumDots;
+		}
+
+		//Draw the fireball string
+		float dSector = TWO_PI / hazard->iparam[0];
+		dAngle = hazard->dparam[1];
+		dRadius = hazard->dparam[2];
+		for(short iRotodisc = 0; iRotodisc < hazard->iparam[0]; iRotodisc++)
+		{
+			short x = rLocation[1].x + (short)(dRadius * cos(dAngle));
+			short y = rLocation[1].y + (short)(dRadius * sin(dAngle));
+
+			spr_rotodisc.draw(x, y, 0, 0, 32, 32);
+
+			dAngle += dSector;
+		}
+	}
+}
+
+void AdjustMapHazardRadius(MapHazard * hazard, short iClickX, short iClickY)
+{
+	short iDiffX = iClickX - ((hazard->ix << 5) + 16);
+	short iDiffY = iClickY - ((hazard->iy << 5) + 16);
+
+	float radius = (float)sqrt((double)(iDiffX * iDiffX + iDiffY * iDiffY));
+	float angle = (float)atan2((double)iDiffY, (double)iDiffX);
+
+	if(angle < 0.0f)
+		angle += TWO_PI;
+
+	Uint8 * keystate = SDL_GetKeyState(NULL);
+	if(keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT])
+	{
+		float dSector = TWO_PI / 16;
+		angle += TWO_PI / 32;
+
+		if(angle > TWO_PI)
+			angle -= TWO_PI;
+
+		for(short iSector = 0; iSector < 16; iSector++)
+		{
+			if(angle >= dSector * iSector && angle < dSector * (iSector + 1))
+			{
+				angle = dSector * iSector;
+				break;
+			}
+		}
+	}
+
+	if(hazard->itype == 0)
+	{
+		if(radius >= 24.0f)
+		{
+			hazard->iparam[0] = (short)radius / 24 + 1;
+			hazard->dparam[1] = angle;
+		}
+		else 
+		{
+			hazard->iparam[0] = 1;
+			hazard->dparam[1] = 0.0f;
+		}
+	}
+	else if(hazard->itype == 1)
+	{
+		hazard->dparam[1] = angle;
+
+		if(radius > 32.0f)
+			hazard->dparam[2] = radius - 16.0f;
+		else
+			hazard->dparam[2] = 16.0f;
 	}
 }
 

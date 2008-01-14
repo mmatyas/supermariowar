@@ -33,6 +33,7 @@ CMap::CMap()
 	platforms = NULL;
 	iNumPlatforms = 0;
 	iNumMapItems = 0;
+	iNumMapHazards = 0;
 
 	animatedTilesSurface = NULL;
 
@@ -114,6 +115,7 @@ void CMap::clearMap()
 
 	eyecandyID = 0;
 	iNumMapItems = 0;
+	iNumMapHazards = 0;
 
 	bltrect.w = TILESIZE;
 	bltrect.h = TILESIZE;
@@ -295,6 +297,22 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 			mapitems[j].iy = ReadInt(mapfile);
 		}
 
+		//Load map hazards (like fireball strings, rotodiscs, pirhana plants)
+		iNumMapHazards = ReadInt(mapfile);
+
+		for(short iMapHazard = 0; iMapHazard < iNumMapHazards; iMapHazard++)
+		{
+			maphazards[iMapHazard].itype = ReadInt(mapfile);
+			maphazards[iMapHazard].ix = ReadInt(mapfile);
+			maphazards[iMapHazard].iy = ReadInt(mapfile);
+
+			for(short iParam = 0; iParam < NUMMAPHAZARDPARAMS; iParam++)
+				maphazards[iMapHazard].iparam[iParam] = ReadInt(mapfile);
+			
+			for(short iParam = 0; iParam < NUMMAPHAZARDPARAMS; iParam++)
+				maphazards[iMapHazard].dparam[iParam] = ReadFloat(mapfile);
+		}
+
 		//Read in eyecandy to use
 		eyecandyID = (short)ReadInt(mapfile);
 
@@ -439,6 +457,8 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 	else if(version[0] == 1 && version[1] == 7)
 	{
 		iNumMapItems = 0;
+		iNumMapHazards = 0;
+
 		//Read summary information here
 		if((version[2] == 0 && version[3] > 1) || version[2] >= 1)
 		{
@@ -689,6 +709,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 	else if(version[0] == 1 && version[1] == 6)
 	{
 		iNumMapItems = 0;
+		iNumMapHazards = 0;
 
 		for(short iFilter = 0; iFilter < NUM_AUTO_FILTERS; iFilter++)
 			fAutoFilter[iFilter] = false;
@@ -895,6 +916,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 	else //If the version is unrecognized (1.5 maps didn't have version numbers)
 	{
 		iNumMapItems = 0;
+		iNumMapHazards = 0;
 
 		for(short iFilter = 0; iFilter < NUM_AUTO_FILTERS; iFilter++)
 			fAutoFilter[iFilter] = false;
@@ -1425,8 +1447,24 @@ void CMap::saveMap(const std::string& file)
 	for(short iMapItem = 0; iMapItem < iNumMapItems; iMapItem++)
 	{
 		WriteInt(mapitems[iMapItem].itype, mapfile);
-		WriteInt(mapitems[iMapItem].ix, mapfile);
+		WriteInt(mapitems[iMapItem].ix, mapfile);  //tile aligned
 		WriteInt(mapitems[iMapItem].iy, mapfile);
+	}
+
+	//Write map hazards (fireball strings, rotodiscs, pirhana plants, etc)
+	WriteInt(iNumMapHazards, mapfile);
+
+	for(short iMapHazard = 0; iMapHazard < iNumMapHazards; iMapHazard++)
+	{
+		WriteInt(maphazards[iMapHazard].itype, mapfile);
+		WriteInt(maphazards[iMapHazard].ix, mapfile);
+		WriteInt(maphazards[iMapHazard].iy, mapfile);
+
+		for(short iParam = 0; iParam < NUMMAPHAZARDPARAMS; iParam++)
+			WriteInt(maphazards[iMapHazard].iparam[iParam], mapfile);
+		
+		for(short iParam = 0; iParam < NUMMAPHAZARDPARAMS; iParam++)
+			WriteFloat(maphazards[iMapHazard].dparam[iParam], mapfile);
 	}
 
 	//Write eyecandy ID

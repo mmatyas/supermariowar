@@ -3418,21 +3418,36 @@ void LoadMapObjects()
 	//Set all the 1x1 gaps up so players can run across them
 	g_map.UpdateAllTileGaps();
 
+	for(short iMapHazard = 0; iMapHazard < g_map.iNumMapHazards; iMapHazard++)
+	{
+		MapHazard * hazard = &g_map.maphazards[iMapHazard];
+		if(hazard->itype == 0)
+		{
+			for(short iFireball = 0; iFireball < hazard->iparam[0]; iFireball++)
+				objectsfront.add(new OMO_OrbitHazard(&spr_hazard_fireball, (hazard->ix << 5) + 16, (hazard->iy << 5) + 16, (float)(iFireball * 24), hazard->dparam[0], hazard->dparam[1], 4, 8, 18, 18, 0, 0, 0, hazard->dparam[0] < 0.0f ? 18 : 0, 18, 18));
+		}
+		else if(hazard->itype == 1)
+		{
+			float dSector = TWO_PI / hazard->iparam[0];
+			for(short iRotoDisc = 0; iRotoDisc < hazard->iparam[0]; iRotoDisc++)
+			{
+				float dAngle = hazard->dparam[1] + iRotoDisc * dSector;
+				if(dAngle > TWO_PI)
+					dAngle -= TWO_PI;
+
+				objectsfront.add(new OMO_OrbitHazard(&spr_hazard_rotodisc, (hazard->ix << 5) + 16, (hazard->iy << 5) + 16, hazard->dparam[2], hazard->dparam[0], dAngle, 3, 8, 32, 32, 0, 0, 0, 0, 32, 32));
+			}
+		}
+	}
+
 	//Add map hazards like spinning fireball strings and pirhana plants
+	/*
 	for(short iFireball = 0; iFireball < 8; iFireball++)
 		objectsfront.add(new OMO_OrbitHazard(&spr_hazard_fireball, 320, 240, iFireball * 24, 0.02f, QUARTER_PI, 4, 8, 18, 18, 0, 0, 0, 18, 18, 18));
 
-	/*
-	for(short iFireball = 0; iFireball < 3; iFireball++)
-		objectsfront.add(new OMO_OrbitHazard(&spr_hazard_fireball, 120, 120, iFireball * 24, -0.01f, PI, 4, 8, 18, 18, 0, 0, 0, 18, 18, 18));
-
-	for(short iFireball = 0; iFireball < 4; iFireball++)
-		objectsfront.add(new OMO_OrbitHazard(&spr_hazard_fireball, 500, 340, iFireball * 24, 0.005f, TWO_PI, 4, 8, 18, 18, 0, 0, 0, 0, 18, 18));
-	*/
-
 	for(short iRotoDisc = 0; iRotoDisc < 2; iRotoDisc++)
 		objectsfront.add(new OMO_OrbitHazard(&spr_hazard_rotodisc, 320, 240, 150.0f, 0.02f, iRotoDisc * PI, 3, 8, 32, 32, 0, 0, 0, 0, 32, 32));
-
+	*/
 }
 
 bool SwapPlayers(short iUsingPlayerID)

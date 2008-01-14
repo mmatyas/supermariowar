@@ -9351,8 +9351,8 @@ bool OMO_OrbitHazard::collide(CPlayer * player)
 
 void OMO_OrbitHazard::CalculatePosition()
 {
-	xf(dCenterX + dRadius * cos(dAngle) - 9.0f);
-	yf(dCenterY + dRadius * sin(dAngle) - 9.0f);
+	xf(dCenterX + dRadius * cos(dAngle) - (float)iw / 2.0f);
+	yf(dCenterY + dRadius * sin(dAngle) - (float)ih / 2.0f);
 }
 
 //------------------------------------------------------------------------------
