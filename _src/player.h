@@ -288,9 +288,6 @@ class CPlayer
 		bool dashRight;
 		short dashSparkleAnimationTimer;
 
-		short homingBillsIndex;
-		bool homingBills;
-
 		short redKoopaIndex;
 		short redThrowBlockIndex;
 		short viewBlockIndex;
@@ -496,6 +493,7 @@ class CPlayer
 		friend class OMO_SpinAttack;
 		friend class OMO_AttackZone;
 		friend class OMO_OrbitHazard;
+		friend class IO_FlameCannon;
 
 		friend class MO_CarriedObject;
 

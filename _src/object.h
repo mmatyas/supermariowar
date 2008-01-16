@@ -1,7 +1,7 @@
 #ifndef _OBJECT_H
 #define _OBJECT_H
 
-enum ObjectType{object_none = 0, object_block = 1, object_moving = 2, object_overmap = 3, object_area = 4, object_egg = 5, object_frenzycard = 6, object_yoshi = 7, object_explosion = 8, object_race_goal = 9, object_star = 10, object_flag = 11, object_flagbase = 12, object_thwomp = 13, object_kingofthehill_area = 14, object_bowserfire = 15, object_coin = 16, object_collectioncard = 17, object_orbithazard = 18};
+enum ObjectType{object_none = 0, object_block = 1, object_moving = 2, object_overmap = 3, object_area = 4, object_egg = 5, object_frenzycard = 6, object_yoshi = 7, object_explosion = 8, object_race_goal = 9, object_star = 10, object_flag = 11, object_flagbase = 12, object_thwomp = 13, object_kingofthehill_area = 14, object_bowserfire = 15, object_coin = 16, object_collectioncard = 17, object_orbithazard = 18, object_bulletbillcannon = 19, object_flamecannon = 20};
 enum MovingObjectType{movingobject_none = 0, movingobject_powerup = 1, movingobject_fireball = 2, movingobject_goomba = 3, movingobject_bulletbill = 4, movingobject_hammer = 5, movingobject_poisonpowerup = 6, movingobject_shell = 7, movingobject_throwblock = 8, movingobject_egg = 9, movingobject_star = 10, movingobject_flag = 11, movingobject_cheepcheep = 12, movingobject_koopa = 13, movingobject_mysterymushroompowerup = 15, movingobject_boomerang = 16, movingobject_spring = 17, movingobject_sledgehammer = 18, movingobject_sledgebrother = 19, movingobject_spike = 20, movingobject_bomb = 21, movingobject_superfireball = 22, movingobject_podobo = 23, movingobject_kuriboshoe = 24, movingobject_treasurechest = 25, movingobject_attackzone = 26};
 enum BlockType{block_none, block_powerup, block_view, block_breakable, block_note, block_donut, block_flip, block_bounce, block_throw, block_onoff_switch, block_onoff, block_weaponbreakable};
 
@@ -1325,7 +1325,7 @@ class OMO_CheepCheep : public IO_MovingObject
 class OMO_BulletBill : public IO_MovingObject
 {
 	public:
-		OMO_BulletBill(gfxSprite *nspr, short y, float nspeed, short playerID, bool homing);
+		OMO_BulletBill(gfxSprite *nspr, gfxSprite *nsprdead, short x, short y, float nspeed, short playerID, bool isspawned);
 		~OMO_BulletBill(){};
 
 		void update();
@@ -1337,10 +1337,11 @@ class OMO_BulletBill : public IO_MovingObject
 		bool hitother(CPlayer * player);
 		
 		void Die();
-		void HomeToNearestPlayer();
 		void SetDirectionOffset();
 
 	private:
+		gfxSprite * spr_dead;
+
 		short iPlayerID;
 		short iColorID;
 		short iTeamID;
@@ -1348,11 +1349,9 @@ class OMO_BulletBill : public IO_MovingObject
 		short iColorOffsetY;
 		short iDirectionOffsetY;
 
-		bool fHoming;
-		CPlayer * pHomingPlayer;
-		float fMaxVel;
-		float fGoalVelX;
-		float fGoalVelY;
+		bool fIsSpawned;
+		short iHiddenDirection;
+		short iHiddenPlane;
 
 	friend class MO_Goomba;
 	friend class OMO_CheepCheep;
@@ -1663,7 +1662,7 @@ class OMO_OrbitHazard : public IO_OverMapObject
 {
 	public:
 		OMO_OrbitHazard(gfxSprite *nspr, short x, short y, float radius, float vel, float angle, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iAnimationOffsetX, short iAnimationOffsetY, short iAnimationHeight, short iAnimationWidth);
-		~OMO_OrbitHazard() {};
+		~OMO_OrbitHazard() {}
 
 		void update();
 
@@ -1677,6 +1676,52 @@ class OMO_OrbitHazard : public IO_OverMapObject
 		float dCenterX, dCenterY;
 };
 
+class IO_BulletBillCannon : public CObject
+{
+	public:
+		IO_BulletBillCannon(short x, short y, short freq, float vel);
+		~IO_BulletBillCannon() {}
+
+		void draw() {}
+		void update();
+
+		bool collide(CPlayer *) {return false;}
+		void collide() {}
+		
+		ObjectType getObjectType(){return object_bulletbillcannon;}
+		
+
+	private:
+		void SetNewTimer();
+
+		short iFreq, iTimer;
+		float dVel;
+
+};
+
+
+class IO_FlameCannon : public CObject
+{
+	public:
+		IO_FlameCannon(short x, short y, short freq, bool isfacingright);
+		~IO_FlameCannon() {}
+
+		void draw();
+		void update();
+
+		bool collide(CPlayer * player);
+		void collide() {}
+		
+		ObjectType getObjectType(){return object_flamecannon;}
+		
+
+	private:
+		void SetNewTimer();
+
+		short iFreq, iTimer, iCycle;
+		short iFlameX, iFlameY;
+
+};
 //object container
 class CObjectContainer
 {

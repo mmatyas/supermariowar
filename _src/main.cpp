@@ -239,6 +239,7 @@ gfxSprite		spr_kuriboshoe;
 
 gfxSprite		spr_hazard_fireball;
 gfxSprite		spr_hazard_rotodisc;
+gfxSprite		spr_hazard_flame;
 
 gfxSprite		spr_fireballexplosion;
 gfxSprite		spr_frictionsmoke;
@@ -1290,7 +1291,6 @@ void RunGame()
 
 		game_values.gamepowerups[iPlayer] = game_values.storedpowerups[iPlayer];
 		game_values.bulletbilltimer[iPlayer] = 0;
-		game_values.bulletbillhoming[iPlayer] = false;
 		game_values.bulletbillspawntimer[iPlayer] = 0;
 	}
 
@@ -2073,7 +2073,7 @@ void RunGame()
 						{
 							game_values.bulletbillspawntimer[iPlayer] = (short)(rand() % 20 + 25);
 							float speed = ((float)(rand() % 21 + 20)) / 10.0f;
-							objectsfront.add(new OMO_BulletBill(&spr_bulletbill, (short)(rand() % 448), (rand() % 2 ? speed : -speed), iPlayer, game_values.bulletbillhoming[iPlayer]));
+							objectsfront.add(new OMO_BulletBill(&spr_bulletbill, &spr_bulletbilldead, 0, (short)(rand() % 448), (rand() % 2 ? speed : -speed), iPlayer, false));
 							ifsoundonplay(sfx_bulletbillsound);
 						}
 					}
@@ -3438,16 +3438,15 @@ void LoadMapObjects()
 				objectsfront.add(new OMO_OrbitHazard(&spr_hazard_rotodisc, (hazard->ix << 5) + 16, (hazard->iy << 5) + 16, hazard->dparam[2], hazard->dparam[0], dAngle, 3, 8, 32, 32, 0, 0, 0, 0, 32, 32));
 			}
 		}
+		else if(hazard->itype == 2)
+		{
+			objectblocks.add(new IO_BulletBillCannon(hazard->ix << 5, hazard->iy << 5, hazard->iparam[0], hazard->dparam[0]));
+		}
+		else if(hazard->itype == 3)
+		{
+			objectsfront.add(new IO_FlameCannon(hazard->ix << 5, hazard->iy << 5, hazard->iparam[0], hazard->iparam[1] == 1));
+		}
 	}
-
-	//Add map hazards like spinning fireball strings and pirhana plants
-	/*
-	for(short iFireball = 0; iFireball < 8; iFireball++)
-		objectsfront.add(new OMO_OrbitHazard(&spr_hazard_fireball, 320, 240, iFireball * 24, 0.02f, QUARTER_PI, 4, 8, 18, 18, 0, 0, 0, 18, 18, 18));
-
-	for(short iRotoDisc = 0; iRotoDisc < 2; iRotoDisc++)
-		objectsfront.add(new OMO_OrbitHazard(&spr_hazard_rotodisc, 320, 240, 150.0f, 0.02f, iRotoDisc * PI, 3, 8, 32, 32, 0, 0, 0, 0, 32, 32));
-	*/
 }
 
 bool SwapPlayers(short iUsingPlayerID)

@@ -131,27 +131,6 @@ void CPlayer::move()
 		else if(keymask & ~2)
 			superKickIndex = 0;
 
-		//Homing bullet bills
-		if (game_values.gamepowerups[globalID] == 10 && homingBillsIndex < 4)
-		{
-			static const int homingBillsCode[4] = {16, 16, 16, 32};
-	        
-			if (keymask & homingBillsCode[homingBillsIndex]) 
-				homingBillsIndex++;
-			else if (keymask & ~homingBillsCode[homingBillsIndex]) 
-				homingBillsIndex = 0;
-	        
-			if (homingBillsIndex == 4)
-			{
-				homingBillsIndex = 0;
-				ifsoundonplay(sfx_transform); 
-				homingBills = true;
-			}
-		}
-
-		if(game_values.gamepowerups[globalID] != 10 && powerupused != 10)
-			homingBills = false;
-
 		if (powerup == 2)
 		{
 			static const int super_hammer_throw_code_left[4] = {8, 8, 4, 16};
@@ -671,6 +650,9 @@ void CPlayer::move()
 			{
 				iSuperStompTimer = 8;
 				lockfall = true;
+
+				// Become invincible
+				spawninvincible = true;
 			}
 
             // Prevent you from shooting
@@ -974,8 +956,6 @@ void CPlayer::move()
 				{
 					game_values.bulletbilltimer[globalID] = 400;
 					game_values.bulletbillspawntimer[globalID] = 0;
-					game_values.bulletbillhoming[globalID] = homingBills;
-					homingBills = false;
 					break;
 				}
 				case 11:
@@ -2217,9 +2197,6 @@ void CPlayer::SetupNewPlayer()
 	dashLeft = false;
 	dashRight = false;
 	dashSparkleAnimationTimer = 0;
-
-	homingBillsIndex = 0;
-	homingBills = false;
 
 	redKoopaIndex = 0;
 	redThrowBlockIndex = 0;

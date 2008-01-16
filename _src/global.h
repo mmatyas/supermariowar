@@ -426,6 +426,7 @@ extern gfxSprite		spr_kuriboshoe;
 
 extern gfxSprite		spr_hazard_fireball;
 extern gfxSprite		spr_hazard_rotodisc;
+extern gfxSprite		spr_hazard_flame;
 
 extern gfxSprite		spr_fireballexplosion;
 extern gfxSprite		spr_frictionsmoke;
@@ -850,7 +851,6 @@ struct gv
 
 	short		bulletbilltimer[4];
 	short		bulletbillspawntimer[4];
-	bool		bulletbillhoming[4];
 
 	short		teamcollision;
 	bool		toplayer;

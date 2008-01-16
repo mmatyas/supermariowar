@@ -5230,59 +5230,60 @@ bool OMO_BowserFire::collide(CPlayer * player)
 //------------------------------------------------------------------------------
 // class thwomp (for thwomp mode)
 //------------------------------------------------------------------------------
-OMO_BulletBill::OMO_BulletBill(gfxSprite *nspr, short y, float nspeed, short playerID, bool homing) :
-	IO_MovingObject(nspr, 0, y, 3, 8, 30, 28, 1, 2)
+OMO_BulletBill::OMO_BulletBill(gfxSprite *nspr, gfxSprite *nsprdead, short x, short y, float nspeed, short playerID, bool isspawned) :
+	IO_MovingObject(nspr, x, y, 3, 8, 30, 28, 1, 2)
 {
-	fMaxVel = fabs(nspeed);
+	spr_dead = nsprdead;
+
 	velx = nspeed;
 	vely = 0.0f;
-
-	fGoalVelX = velx;
-	fGoalVelY = vely;
-
-	ih = (short)nspr->getHeight() >> 3;
-	//collisionHeight = ih;
 	
-	if(velx < 0)
-		xi(640 + iw);
-	else
-		xi(-iw);
-
 	movingObjectType = movingobject_bulletbill;
 	state = 1;
 
-	iPlayerID = playerID;
-	iColorID = game_values.colorids[playerID];
-	iTeamID = LookupTeamID(iPlayerID);
+	fIsSpawned = isspawned;
+
+	if(fIsSpawned)
+	{
+		ih = (short)nspr->getHeight() >> 3;
+
+		iPlayerID = -1;
+		iColorID = 0;
+		iTeamID = -1;
+
+		if(velx < 0.0f)
+		{
+			iHiddenDirection = 1;
+			iHiddenPlane = ix;
+		}
+		else
+		{
+			iHiddenDirection = 3;
+			iHiddenPlane = ix + TILESIZE;
+		}
+	}
+	else
+	{
+		ih = (short)nspr->getHeight() >> 3;
+
+		if(velx < 0.0f)
+			xi(640 + iw);
+		else
+			xi(-iw);
+
+		iPlayerID = playerID;
+		iColorID = game_values.colorids[playerID];
+		iTeamID = LookupTeamID(iPlayerID);
+	}
 
 	iColorOffsetY = 64 * iColorID;
 	SetDirectionOffset();
-
-	pHomingPlayer = NULL;
-	fHoming = homing;
-
-	HomeToNearestPlayer();
 }
 
 void OMO_BulletBill::update()
 {
-	if(pHomingPlayer)
-	{
-		if(fGoalVelX < 0.0f && velx > fGoalVelX)
-			velx -= 0.2f;
-
-		if(fGoalVelX > 0.0f && velx < fGoalVelX)
-			velx += 0.2f;
-
-		if(fGoalVelY < 0.0f && vely > fGoalVelY)
-			vely -= 0.2f;
-
-		if(fGoalVelY > 0.0f && vely < fGoalVelY)
-			vely += 0.2f;
-	}
-
 	xf(fx + velx);
-	yf(fy + vely);
+	//yf(fy + vely);
 
 	animate();
 
@@ -5292,7 +5293,10 @@ void OMO_BulletBill::update()
 
 void OMO_BulletBill::draw()
 {
-	spr->draw(ix, iy, drawframe, iColorOffsetY + iDirectionOffsetY, iw, ih);
+	if(fIsSpawned)
+		spr->draw(ix, iy, drawframe, iColorOffsetY + iDirectionOffsetY, iw, ih, iHiddenDirection, iHiddenPlane);
+	else
+		spr->draw(ix, iy, drawframe, iColorOffsetY + iDirectionOffsetY, iw, ih);
 }
 
 bool OMO_BulletBill::collide(CPlayer * player)
@@ -5404,51 +5408,7 @@ void OMO_BulletBill::collide(IO_MovingObject * object)
 void OMO_BulletBill::Die()
 {
 	dead = true;
-	eyecandyfront.add(new EC_FallingObject(&spr_bulletbilldead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, velx > 0 ? 0 : 32, iColorID * 32, 32, 32));
-}
-
-void OMO_BulletBill::HomeToNearestPlayer()
-{
-	if(!fHoming)
-		return;
-
-	int iDistance = 640000;
-	for(short k = 0; k < list_players_cnt; k++)
-	{
-		if(list_players[k]->teamID == iTeamID)
-			continue;
-
-		if(list_players[k]->isready())
-		{
-			int iXValue = list_players[k]->ix - ix;
-			int iYValue = list_players[k]->iy - iy;
-
-			int playerDistance = iXValue * iXValue + iYValue * iYValue;
-
-			if(playerDistance < iDistance)
-			{
-				iDistance = playerDistance;
-				pHomingPlayer = list_players[k];
-			}
-		}
-	}
-
-	if(pHomingPlayer)
-	{
-		float fSlope = (float)(pHomingPlayer->ix - ix) / (float)(pHomingPlayer->iy - iy);
-		
-		if(pHomingPlayer->ix > ix)
-			fGoalVelX = fMaxVel;
-		else
-			fGoalVelX = -fMaxVel;
-
-		if(pHomingPlayer->iy > iy)
-			fGoalVelY = fMaxVel / fabs(fSlope);
-		else
-			fGoalVelY = -fMaxVel / fabs(fSlope);
-
-		SetDirectionOffset();
-	}
+	eyecandyfront.add(new EC_FallingObject(spr_dead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, velx > 0 ? 0 : 32, iColorID * 32, 32, 32));
 }
 
 void OMO_BulletBill::SetDirectionOffset()
@@ -9341,7 +9301,7 @@ void OMO_OrbitHazard::update()
 
 bool OMO_OrbitHazard::collide(CPlayer * player)
 {
-	if(!player->invincible && !player->spawninvincible && (player->score->score > 0 || game_values.gamemode->goal == -1))
+	if(!player->invincible && !player->spawninvincible)
 	{
 		return player->KillPlayerMapHazard(false, kill_style_environment) != player_kill_nonkill;
 	}
@@ -9353,6 +9313,158 @@ void OMO_OrbitHazard::CalculatePosition()
 {
 	xf(dCenterX + dRadius * cos(dAngle) - (float)iw / 2.0f);
 	yf(dCenterY + dRadius * sin(dAngle) - (float)ih / 2.0f);
+}
+
+
+//------------------------------------------------------------------------------
+// class IO_BulletBillCannon - gets update calls and shoots bullet bills based on timer
+//------------------------------------------------------------------------------
+
+IO_BulletBillCannon::IO_BulletBillCannon(short x, short y, short freq, float vel) :
+	CObject(NULL, x, y)
+{
+	iFreq = freq;
+	dVel = vel;
+
+	SetNewTimer();
+}
+
+void IO_BulletBillCannon::update()
+{
+	if(--iTimer <= 0)
+	{
+		SetNewTimer();
+
+		objectsfront.add(new OMO_BulletBill(&spr_bulletbill, &spr_bulletbilldead, ix, iy, dVel, 0, true));
+		ifsoundonplay(sfx_bulletbillsound);
+	}
+}
+
+void IO_BulletBillCannon::SetNewTimer()
+{
+	iTimer = iFreq + (rand() % iFreq);
+}
+
+
+//------------------------------------------------------------------------------
+// class IO_FlameCannon - shoots a flame
+//------------------------------------------------------------------------------
+
+IO_FlameCannon::IO_FlameCannon(short x, short y, short freq, bool isfacingright) :
+	CObject(NULL, x, y)
+{
+	iFreq = freq;
+	state = 0;
+	SetNewTimer();
+
+	//TODO: Fix collision size to match 96x32
+	//Need to set collisionWidth and collisionHeight set offsets to 0
+	//Make sure it still draws right after these fixes, may need to set
+	//iw and ih as well
+
+	iw = 96;
+	ih = 32;
+
+	collisionHeight = 32;
+	collisionWidth = 96;
+	collisionOffsetX = 0;
+	collisionOffsetY = 0;
+
+	if(isfacingright)
+	{
+		ix += 32;
+		iFlameX = 0;
+	}
+	else
+	{
+		ix -= 96;
+		iFlameX = 96;
+	}
+}
+
+void IO_FlameCannon::update()
+{
+	if(state == 0)  //No flame, waiting
+	{
+		if(--iTimer <= 0)
+		{
+			iTimer = 0;
+			iCycle = 0;
+			iFlameY = 0;
+
+			state = 1;
+		}
+	}
+	else if(state == 1 || state == 3) //Start or end of flame but not deadly yet
+	{
+		if(++iTimer >= 4)
+		{
+			iTimer = 0;
+			
+			iFlameY += 32;
+			if(iFlameY > 32)
+			{
+				iFlameY = 0;
+
+				if(++iCycle >= 4)
+				{
+					iFlameY = 64;
+					iCycle = 0;
+					
+					if(state == 1)
+					{
+						state = 2;
+					}
+					else
+					{
+						state = 0;
+						SetNewTimer();
+					}
+				}
+			}
+		}
+	}
+	else if(state == 2) //Full flame
+	{
+		if(++iTimer >= 4)
+		{
+			iTimer = 0;
+			
+			iFlameY += 32;
+			if(iFlameY > 96)
+			{
+				iFlameY = 64;
+
+				if(++iCycle >= 8)
+				{
+					state = 3;
+					iFlameY = 0;
+					iCycle = 0;
+				}
+			}
+		}
+	}
+}
+
+void IO_FlameCannon::draw()
+{
+	if(state > 0)
+	{
+		spr_hazard_flame.draw(ix, iy, iFlameX, iFlameY, 96, 32);
+	}
+}
+
+bool IO_FlameCannon::collide(CPlayer * player)
+{
+	if(state == 2 && !player->invincible && !player->spawninvincible)
+		return player->KillPlayerMapHazard(false, kill_style_environment) != player_kill_nonkill;
+
+	return false;
+}
+
+void IO_FlameCannon::SetNewTimer()
+{
+	iTimer = iFreq + (rand() % iFreq);
 }
 
 //------------------------------------------------------------------------------
