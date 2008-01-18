@@ -34,6 +34,8 @@
 
 //4) Still reports of disappearing map tiles - caused when rRects is used out of bounds causing w and h to be set to 0 - happened with platform with tile using row 960
 
+//5) FIXME!!  Collision detection between pirhana plants and weapons is not working correctly - test ALL weapons!
+
 #ifdef _XBOX
 	#include <xtl.h>
 #endif
@@ -239,7 +241,9 @@ gfxSprite		spr_kuriboshoe;
 
 gfxSprite		spr_hazard_fireball;
 gfxSprite		spr_hazard_rotodisc;
+gfxSprite		spr_hazard_bulletbill;
 gfxSprite		spr_hazard_flame;
+gfxSprite		spr_hazard_pirhanaplant;
 
 gfxSprite		spr_fireballexplosion;
 gfxSprite		spr_frictionsmoke;
@@ -2290,7 +2294,7 @@ void RunGame()
 								IO_MovingObject * object = (IO_MovingObject*)objectsfront.list[i];
 								MovingObjectType type = object->getMovingObjectType();
 								
-								if(type == movingobject_podobo || type == movingobject_bulletbill || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_sledgehammer || type == movingobject_cheepcheep || type == movingobject_boomerang)
+								if(type == movingobject_podobo || type == movingobject_bulletbill || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_sledgehammer || type == movingobject_cheepcheep || type == movingobject_boomerang || type == movingobject_pirhanaplant)
 								{
 									//bullet bills to explosions && hammers to bullet bills
 									for(j = 0; j < objectsfront.list_end; j++)
@@ -3447,6 +3451,16 @@ void LoadMapObjects()
 			objectsfront.add(new IO_FlameCannon(hazard->ix << 5, hazard->iy << 5, hazard->iparam[0], hazard->iparam[1] == 1));
 		}
 	}
+
+	objectcollisionitems.add(new MO_PirhanaPlant(320, 384, 0, 30, 1));
+	objectcollisionitems.add(new MO_PirhanaPlant(352, 384, 1, 30, 1));
+	objectcollisionitems.add(new MO_PirhanaPlant(384, 384, 2, 30, 1));
+	objectcollisionitems.add(new MO_PirhanaPlant(416, 384, 3, 30, 1));
+
+	objectcollisionitems.add(new MO_PirhanaPlant(320, 352, 0, 30, 0));
+	objectcollisionitems.add(new MO_PirhanaPlant(352, 352, 1, 30, 0));
+	objectcollisionitems.add(new MO_PirhanaPlant(384, 352, 2, 30, 0));
+	objectcollisionitems.add(new MO_PirhanaPlant(416, 352, 3, 30, 0));
 }
 
 bool SwapPlayers(short iUsingPlayerID)

@@ -286,7 +286,9 @@ bool LoadGameGraphics()
 	
 	gfx_loadimage(&spr_hazard_fireball, convertPath("gfx/packs/hazards/fireball.png", graphicspack), true);
 	gfx_loadimage(&spr_hazard_rotodisc, convertPath("gfx/packs/hazards/rotodisc.png", graphicspack), true);
+	gfx_loadimage(&spr_hazard_bulletbill, convertPath("gfx/packs/hazards/bulletbill.png", graphicspack), true);
 	gfx_loadimage(&spr_hazard_flame, convertPath("gfx/packs/hazards/flame.png", graphicspack), true);
+	gfx_loadimage(&spr_hazard_pirhanaplant, convertPath("gfx/packs/hazards/pirhanaplant.png", graphicspack), true);
 
 	gfx_loadimage(&spr_fireballexplosion, convertPath("gfx/packs/eyecandy/fireballexplosion.png", graphicspack), 160, true);
 	gfx_loadimage(&spr_frictionsmoke, convertPath("gfx/packs/eyecandy/frictionsmoke.png", graphicspack), 160, true);

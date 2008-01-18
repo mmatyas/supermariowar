@@ -494,6 +494,7 @@ class CPlayer
 		friend class OMO_AttackZone;
 		friend class OMO_OrbitHazard;
 		friend class IO_FlameCannon;
+		friend class MO_PirhanaPlant;
 
 		friend class MO_CarriedObject;
 

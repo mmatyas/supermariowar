@@ -7328,12 +7328,11 @@ void MO_Goomba::collide(IO_MovingObject * object)
 		
 			if(type == movingobject_shell)
 			{
-				CO_Shell * shell = (CO_Shell*)object;
-				shell->CheckAndDie();
+				((CO_Shell*)object)->CheckAndDie();
 			}
 			else if(type == movingobject_throwblock)
 			{
-				((CO_ThrowBlock*)object)->Die();
+				((CO_ThrowBlock*)object)->CheckAndDie();
 			}
 			else if(type == movingobject_bulletbill)
 			{
@@ -7599,12 +7598,11 @@ void OMO_CheepCheep::collide(IO_MovingObject * object)
 		
 			if(type == movingobject_shell)
 			{
-				CO_Shell * shell = (CO_Shell*)object;
-				shell->CheckAndDie();
+				((CO_Shell*)object)->CheckAndDie();
 			}
 			else if(type == movingobject_throwblock)
 			{
-				((CO_ThrowBlock*)object)->Die();
+				((CO_ThrowBlock*)object)->CheckAndDie();
 			}
 			else if(type == movingobject_bulletbill)
 			{
@@ -8712,8 +8710,7 @@ bool CO_ThrowBlock::KillPlayer(CPlayer * player)
 	if(player->spawninvincible)
 		return false;
 
-	if(fDieOnPlayerCollision)
-		Die();
+	CheckAndDie();
 
 	//Find the player that shot this shell so we can attribute a kill
 	PlayerKilledPlayer(playerID, *player, death_style_jump, kill_style_throwblock, false);
@@ -8822,6 +8819,12 @@ void CO_ThrowBlock::Kick(bool superkick)
 		Die();
 	else
 		ifsoundonplay(sfx_kicksound);
+}
+
+void CO_ThrowBlock::CheckAndDie()
+{
+	if(fDieOnPlayerCollision)
+		Die();
 }
 
 void CO_ThrowBlock::Die()
@@ -9357,11 +9360,6 @@ IO_FlameCannon::IO_FlameCannon(short x, short y, short freq, bool isfacingright)
 	state = 0;
 	SetNewTimer();
 
-	//TODO: Fix collision size to match 96x32
-	//Need to set collisionWidth and collisionHeight set offsets to 0
-	//Make sure it still draws right after these fixes, may need to set
-	//iw and ih as well
-
 	iw = 96;
 	ih = 32;
 
@@ -9465,6 +9463,185 @@ bool IO_FlameCannon::collide(CPlayer * player)
 void IO_FlameCannon::SetNewTimer()
 {
 	iTimer = iFreq + (rand() % iFreq);
+}
+
+
+//------------------------------------------------------------------------------
+// class IO_PirhanaPlant - pirhana plant that appears on a certain frequency
+//------------------------------------------------------------------------------
+
+MO_PirhanaPlant::MO_PirhanaPlant(short x, short y, short type, short freq, short direction) :
+	IO_MovingObject(NULL, x, y, 0, 0)
+{
+	iType = type;
+	iDirection = direction;
+	iFreq = freq;
+
+	//iHiddenPlane = y;
+	//iHiddenDirection = 2 - ((direction / 2) * 2);
+
+	state = 0;
+	SetNewTimer();
+
+	iw = 32;
+
+	if(iType == 0 || iType == 1)
+	{
+		iSrcX = iDirection * 128;
+		iSrcY = iType * 48;
+	}
+	else if(iType == 2 || iType == 3)
+	{
+		iSrcX = iDirection * 64;
+		iSrcY = iType * 48 + (iType == 3 ? 16 : 0);
+	}
+
+	if(iType == 2)
+		ih = 64;
+	else
+		ih = 48;
+
+	collisionHeight = 0;
+	collisionWidth = 32;
+	collisionOffsetX = 0;
+	collisionOffsetY = 0;
+
+	iAnimationTimer = 0;
+	iAnimationX = 0;
+}
+
+void MO_PirhanaPlant::update()
+{
+	if(state == 0)  //waiting to appear
+	{
+		if(--iTimer <= 0)
+		{
+			iTimer = 0;
+			state = 1;
+		}
+	}
+	else if(state == 1) //appearing
+	{
+		collisionHeight += 2;
+
+		if(iDirection == 0)
+			iy -= 2;
+
+		if(collisionHeight >= ih)
+		{
+			state = 2;
+		}
+	}
+	else if(state == 2) //extended
+	{
+		if(++iTimer > 60)
+		{
+			iTimer = 0;
+			state = 3;
+		}
+	}
+	else if(state == 3) //retreating
+	{
+		collisionHeight -= 2;
+		
+		if(iDirection == 0)
+			iy += 2;
+
+		if(collisionHeight <= 0)
+		{
+			state = 0;
+			SetNewTimer();
+		}
+	}
+
+	//Animate if these are animated plants
+	if(iType == 2 || iType == 3)
+	{
+		if(++iAnimationTimer >= 8)
+		{
+			iAnimationTimer = 0;
+
+			iAnimationX += 32;
+			if(iAnimationX > 32)
+				iAnimationX = 0;
+		}
+	}
+}
+
+void MO_PirhanaPlant::draw()
+{
+	if(state > 0)
+	{
+		if(iDirection == 0)
+			spr_hazard_pirhanaplant.draw(ix, iy, iSrcX + iAnimationX, iSrcY, 32, collisionHeight);
+		else
+			spr_hazard_pirhanaplant.draw(ix, iy, iSrcX + iAnimationX, iSrcY + ih - collisionHeight, 32, collisionHeight);
+	}
+}
+
+bool MO_PirhanaPlant::collide(CPlayer * player)
+{
+	if(state == 0)
+		return false;
+
+	if(player->invincible)
+	{
+		KillPlant();
+	}
+	else if(!player->spawninvincible)
+	{
+		return player->KillPlayerMapHazard(false, kill_style_environment) != player_kill_nonkill;
+	}
+
+	return false;
+}
+
+void MO_PirhanaPlant::collide(IO_MovingObject * object)
+{
+	removeifprojectile(object, true, false);
+
+	MovingObjectType type = object->getMovingObjectType();
+
+	if(type == movingobject_fireball || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_sledgehammer || type == movingobject_boomerang || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone)
+	{
+		//Don't kill things with shells that are sitting still
+		if(type == movingobject_shell && ((CO_Shell*)object)->state == 2)
+			return;
+
+		if(type == movingobject_shell)
+		{
+			((CO_Shell*)object)->CheckAndDie();
+		}
+		else if(type == movingobject_throwblock)
+		{
+			((CO_ThrowBlock*) object)->CheckAndDie();
+		}
+		else if(type == movingobject_attackzone)
+		{
+			((OMO_AttackZone*) object)->Die();
+		}
+
+		ifsoundonplay(sfx_kicksound);
+		KillPlant();
+	}
+}
+
+void MO_PirhanaPlant::SetNewTimer()
+{
+	iTimer = iFreq + (rand() % iFreq);
+}
+
+void MO_PirhanaPlant::KillPlant()
+{
+	SetNewTimer();
+	state = 0;
+	
+	if(iDirection == 0)
+		iy += collisionHeight;
+
+	collisionHeight = 0;
+
+	eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix, iy - (iDirection == 0 ? 32 : 0), 3, 4));
 }
 
 //------------------------------------------------------------------------------

@@ -2,7 +2,7 @@
 #define _OBJECT_H
 
 enum ObjectType{object_none = 0, object_block = 1, object_moving = 2, object_overmap = 3, object_area = 4, object_egg = 5, object_frenzycard = 6, object_yoshi = 7, object_explosion = 8, object_race_goal = 9, object_star = 10, object_flag = 11, object_flagbase = 12, object_thwomp = 13, object_kingofthehill_area = 14, object_bowserfire = 15, object_coin = 16, object_collectioncard = 17, object_orbithazard = 18, object_bulletbillcannon = 19, object_flamecannon = 20};
-enum MovingObjectType{movingobject_none = 0, movingobject_powerup = 1, movingobject_fireball = 2, movingobject_goomba = 3, movingobject_bulletbill = 4, movingobject_hammer = 5, movingobject_poisonpowerup = 6, movingobject_shell = 7, movingobject_throwblock = 8, movingobject_egg = 9, movingobject_star = 10, movingobject_flag = 11, movingobject_cheepcheep = 12, movingobject_koopa = 13, movingobject_mysterymushroompowerup = 15, movingobject_boomerang = 16, movingobject_spring = 17, movingobject_sledgehammer = 18, movingobject_sledgebrother = 19, movingobject_spike = 20, movingobject_bomb = 21, movingobject_superfireball = 22, movingobject_podobo = 23, movingobject_kuriboshoe = 24, movingobject_treasurechest = 25, movingobject_attackzone = 26};
+enum MovingObjectType{movingobject_none = 0, movingobject_powerup = 1, movingobject_fireball = 2, movingobject_goomba = 3, movingobject_bulletbill = 4, movingobject_hammer = 5, movingobject_poisonpowerup = 6, movingobject_shell = 7, movingobject_throwblock = 8, movingobject_egg = 9, movingobject_star = 10, movingobject_flag = 11, movingobject_cheepcheep = 12, movingobject_koopa = 13, movingobject_mysterymushroompowerup = 15, movingobject_boomerang = 16, movingobject_spring = 17, movingobject_sledgehammer = 18, movingobject_sledgebrother = 19, movingobject_spike = 20, movingobject_bomb = 21, movingobject_superfireball = 22, movingobject_podobo = 23, movingobject_kuriboshoe = 24, movingobject_treasurechest = 25, movingobject_attackzone = 26, movingobject_pirhanaplant = 27};
 enum BlockType{block_none, block_powerup, block_view, block_breakable, block_note, block_donut, block_flip, block_bounce, block_throw, block_onoff_switch, block_onoff, block_weaponbreakable};
 
 class IO_MovingObject;
@@ -1480,6 +1480,7 @@ class CO_Shell : public MO_CarriedObject
 	friend class MO_Koopa;
 	friend class MO_SledgeBrother;
 	friend class OMO_CheepCheep;
+	friend class MO_PirhanaPlant;
 	
 	friend class B_WeaponBreakableBlock;
 	
@@ -1506,6 +1507,7 @@ class CO_ThrowBlock : public MO_CarriedObject
 		void Kick(bool superkick);
 
 		void collide(IO_MovingObject * object);
+		void CheckAndDie();
 		void Die();
 
 		void SideBounce();
@@ -1686,7 +1688,7 @@ class IO_BulletBillCannon : public CObject
 		void update();
 
 		bool collide(CPlayer *) {return false;}
-		void collide() {}
+		void collide(IO_MovingObject *) {}
 		
 		ObjectType getObjectType(){return object_bulletbillcannon;}
 		
@@ -1710,7 +1712,7 @@ class IO_FlameCannon : public CObject
 		void update();
 
 		bool collide(CPlayer * player);
-		void collide() {}
+		void collide(IO_MovingObject *) {}
 		
 		ObjectType getObjectType(){return object_flamecannon;}
 		
@@ -1722,6 +1724,33 @@ class IO_FlameCannon : public CObject
 		short iFlameX, iFlameY;
 
 };
+
+
+class MO_PirhanaPlant : public IO_MovingObject
+{
+	public:
+		MO_PirhanaPlant(short x, short y, short type, short freq, short direction);
+		~MO_PirhanaPlant() {}
+
+		void draw();
+		void update();
+
+		bool collide(CPlayer * player);
+		void collide(IO_MovingObject *);
+		
+		MovingObjectType getMovingObjectType(){return movingobject_pirhanaplant;}
+		
+	private:
+		void SetNewTimer();
+		void KillPlant();
+
+		short iType, iDirection;
+		short iFreq, iTimer;
+		//short iHiddenPlane, iHiddenDirection;
+		short iSrcX, iSrcY;
+		short iAnimationTimer, iAnimationX;
+};
+
 //object container
 class CObjectContainer
 {
