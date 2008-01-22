@@ -296,10 +296,8 @@ CTilesetManager g_tilesetmanager;
 CEyecandyContainer eyecandyback;
 CEyecandyContainer eyecandyfront;
 
-CObjectContainer objectblocks;
-CObjectContainer objectcollisionitems;
-CObjectContainer objectsfront;
-CObjectContainer objectsplayer;
+CObjectContainer noncolcontainer;
+CObjectContainer objectcontainer[3];
 
 bool g_fLoadMessages = true;
 
@@ -426,9 +424,9 @@ float CapSideVelocity(float vel)
 }
 
 //handles a collision between a powerup and an object
-void collisionhandler_o2o(IO_MovingObject &o1, CObject &o2)
+void collisionhandler_o2o(IO_MovingObject * o1, CObject * o2)
 {
-	o2.collide(&o1);
+	o2->collide(o1);
 }
 
 short CountAliveTeams(short * lastteam)
@@ -1244,9 +1242,9 @@ void reconnectjoysticks()
 // THE GAME LOOP
 //-----------------------------------------------------------------------------
 
-bool coldec_player2player(CPlayer &o1, CPlayer &o2);
-bool coldec_player2obj(CPlayer &o1, CObject &o2);
-bool coldec_obj2obj(CObject &o1, CObject &o2);
+bool coldec_player2player(CPlayer * o1, CPlayer * o2);
+bool coldec_player2obj(CPlayer * o1, CObject * o2);
+bool coldec_obj2obj(CObject * o1, CObject * o2);
 
 void RunGame()
 {
@@ -1728,90 +1726,90 @@ void RunGame()
 					else if(event.key.keysym.sym == SDLK_1)
 					{
 						if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-							objectcollisionitems.add(new PU_SledgeHammerPowerup(&spr_sledgehammerpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, 0, 30, 30, 1, 1));
+							objectcontainer[0].add(new PU_SledgeHammerPowerup(&spr_sledgehammerpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, 0, 30, 30, 1, 1));
 						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-							objectcollisionitems.add(new PU_BobombPowerup(&spr_bobombpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));	
+							objectcontainer[0].add(new PU_BobombPowerup(&spr_bobombpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));	
 						else
-							objectcollisionitems.add(new PU_StarPowerup(&spr_starpowerup, list_players[0]->ix + 32, list_players[0]->iy, 4, true, 2, 30, 30, 1, 1));
+							objectcontainer[0].add(new PU_StarPowerup(&spr_starpowerup, list_players[0]->ix + 32, list_players[0]->iy, 4, true, 2, 30, 30, 1, 1));
 					}
 					else if(event.key.keysym.sym == SDLK_2)
 					{
 						if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-							objectcollisionitems.add(new PU_BombPowerup(&spr_bombpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, 0, 30, 30, 1, 1));
+							objectcontainer[0].add(new PU_BombPowerup(&spr_bombpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, 0, 30, 30, 1, 1));
 						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-							objectcollisionitems.add(new PU_PowPowerup(&spr_powpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 8, true, 8, 30, 30, 1, 1));
+							objectcontainer[0].add(new PU_PowPowerup(&spr_powpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 8, true, 8, 30, 30, 1, 1));
 						else
-							objectcollisionitems.add(new PU_ExtraGuyPowerup(&spr_1uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1, 1));
+							objectcontainer[0].add(new PU_ExtraGuyPowerup(&spr_1uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1, 1));
 					}
 					else if(event.key.keysym.sym == SDLK_3)
 					{
 						if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-							objectcollisionitems.add(new PU_PodoboPowerup(&spr_podobopowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, 0, 30, 30, 1, 1));
+							objectcontainer[0].add(new PU_PodoboPowerup(&spr_podobopowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, 0, 30, 30, 1, 1));
 						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-							objectcollisionitems.add(new PU_BulletBillPowerup(&spr_bulletbillpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));
+							objectcontainer[0].add(new PU_BulletBillPowerup(&spr_bulletbillpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));
 						else
-							objectcollisionitems.add(new PU_ExtraGuyPowerup(&spr_2uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1, 2));
+							objectcontainer[0].add(new PU_ExtraGuyPowerup(&spr_2uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1, 2));
 					}
 					else if(event.key.keysym.sym == SDLK_4)
 					{
 						if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-							objectcollisionitems.add(new PU_Tanooki(list_players[0]->ix + 32, list_players[0]->iy));
+							objectcontainer[0].add(new PU_Tanooki(list_players[0]->ix + 32, list_players[0]->iy));
 						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-							objectsplayer.add(new CO_Shell(0, list_players[0]->ix + 32, list_players[0]->iy, true, true, true, false));
+							objectcontainer[1].add(new CO_Shell(0, list_players[0]->ix + 32, list_players[0]->iy, true, true, true, false));
 						else
-							objectcollisionitems.add(new PU_ExtraGuyPowerup(&spr_3uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1, 3));
+							objectcontainer[0].add(new PU_ExtraGuyPowerup(&spr_3uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1, 3));
 					}
 					else if(event.key.keysym.sym == SDLK_5)
 					{
 						if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-							objectcollisionitems.add(new PU_PWingsPowerup(&spr_pwingspowerup, list_players[0]->ix + 32, list_players[0]->iy));
+							objectcontainer[0].add(new PU_PWingsPowerup(&spr_pwingspowerup, list_players[0]->ix + 32, list_players[0]->iy));
 						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-							objectsplayer.add(new CO_Shell(1, list_players[0]->ix + 32, list_players[0]->iy, false, true, true, false));
+							objectcontainer[1].add(new CO_Shell(1, list_players[0]->ix + 32, list_players[0]->iy, false, true, true, false));
 						else
-							objectcollisionitems.add(new PU_ExtraGuyPowerup(&spr_5uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1, 5));
+							objectcontainer[0].add(new PU_ExtraGuyPowerup(&spr_5uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1, 5));
 					}
 					else if(event.key.keysym.sym == SDLK_6)
 					{
 						if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-							objectsplayer.add(new CO_Shell(2, list_players[0]->ix + 32, list_players[0]->iy, false, false, true, true));
+							objectcontainer[1].add(new CO_Shell(2, list_players[0]->ix + 32, list_players[0]->iy, false, false, true, true));
 						else
-							objectcollisionitems.add(new PU_FirePowerup(&spr_firepowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1));
+							objectcontainer[0].add(new PU_FirePowerup(&spr_firepowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1));
 					}
 					else if(event.key.keysym.sym == SDLK_7)
 					{
 						if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-							objectsplayer.add(new CO_Spring(&spr_spring, list_players[0]->ix + 32, list_players[0]->iy));
+							objectcontainer[1].add(new CO_Spring(&spr_spring, list_players[0]->ix + 32, list_players[0]->iy));
 						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-							objectsplayer.add(new CO_Shell(3, list_players[0]->ix + 32, list_players[0]->iy, false, true, false, false));
+							objectcontainer[1].add(new CO_Shell(3, list_players[0]->ix + 32, list_players[0]->iy, false, true, false, false));
 						else
-							objectcollisionitems.add(new PU_HammerPowerup(&spr_hammerpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1));
+							objectcontainer[0].add(new PU_HammerPowerup(&spr_hammerpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1));
 					}
 					else if(event.key.keysym.sym == SDLK_8)
 					{
 						if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-							objectsplayer.add(new CO_Spike(&spr_spike, list_players[0]->ix + 32, list_players[0]->iy));
+							objectcontainer[1].add(new CO_Spike(&spr_spike, list_players[0]->ix + 32, list_players[0]->iy));
 						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-							objectcollisionitems.add(new PU_ModPowerup(&spr_modpowerup, list_players[0]->ix + 32, list_players[0]->iy, 8, true, 8, 30, 30, 1, 1));
+							objectcontainer[0].add(new PU_ModPowerup(&spr_modpowerup, list_players[0]->ix + 32, list_players[0]->iy, 8, true, 8, 30, 30, 1, 1));
 						else
-							objectcollisionitems.add(new PU_PoisonPowerup(&spr_poisonpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1));
+							objectcontainer[0].add(new PU_PoisonPowerup(&spr_poisonpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1));
 					}
 					else if(event.key.keysym.sym == SDLK_9)
 					{
 						if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-							objectsplayer.add(new CO_KuriboShoe(&spr_kuriboshoe, list_players[0]->ix + 32, list_players[0]->iy));
+							objectcontainer[1].add(new CO_KuriboShoe(&spr_kuriboshoe, list_players[0]->ix + 32, list_players[0]->iy));
 						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-							objectcollisionitems.add(new PU_FeatherPowerup(&spr_featherpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, 0, 30, 30, 1, 1));
+							objectcontainer[0].add(new PU_FeatherPowerup(&spr_featherpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, 0, 30, 30, 1, 1));
 						else
-							objectcollisionitems.add(new PU_ClockPowerup(&spr_clockpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));
+							objectcontainer[0].add(new PU_ClockPowerup(&spr_clockpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));
 					}
 					else if(event.key.keysym.sym == SDLK_0)
 					{
 						if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-							objectcollisionitems.add(new PU_LeafPowerup(&spr_leafpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, 0, 30, 30, 1, 1));
+							objectcontainer[0].add(new PU_LeafPowerup(&spr_leafpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, 0, 30, 30, 1, 1));
 						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-							objectcollisionitems.add(new PU_BoomerangPowerup(&spr_boomerangpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));
+							objectcontainer[0].add(new PU_BoomerangPowerup(&spr_boomerangpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));
 						else
-							objectcollisionitems.add(new PU_MysteryMushroomPowerup(&spr_mysterymushroompowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));
+							objectcontainer[0].add(new PU_MysteryMushroomPowerup(&spr_mysterymushroompowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));
 					}
 					else if(event.key.keysym.sym == SDLK_INSERT)
 					{
@@ -1969,21 +1967,21 @@ void RunGame()
 						}
 					}
 
-					//Kill things touching the ground
-					short k;
-					for(k = 0; k < list_players_cnt; k++)
+					//Kill players touching the ground (or in air for MOd blocks)
+					for(short k = 0; k < list_players_cnt; k++)
 					{
-						if(list_players[k]->globalID == game_values.screenshakeplayerid)
+						CPlayer * player = list_players[k];
+						if(player->globalID == game_values.screenshakeplayerid)
 							continue;
 
-						if(game_values.teamcollision != 2 && game_values.screenshaketeamid == list_players[k]->teamID)
+						if(game_values.teamcollision != 2 && game_values.screenshaketeamid == player->teamID)
 							continue;
 						
-						if(!list_players[k]->invincible && !list_players[k]->spawninvincible && !list_players[k]->fKuriboShoe && list_players[k]->isready())
+						if(!player->invincible && !player->spawninvincible && !player->fKuriboShoe && player->isready())
 						{
-							if(game_values.screenshakekillinair == list_players[k]->inair)
+							if(game_values.screenshakekillinair == player->inair)
 							{
-								PlayerKilledPlayer(game_values.screenshakeplayerid, *list_players[k], death_style_jump, kill_style_pow, false);
+								PlayerKilledPlayer(game_values.screenshakeplayerid, player, death_style_jump, kill_style_pow, false);
 
 								CPlayer * killer = GetPlayerFromGlobalID(game_values.screenshakeplayerid);
 
@@ -1998,16 +1996,18 @@ void RunGame()
 						}
 					}
 					
-					for(k = 0; k < objectcollisionitems.list_end; k++)
-					{
-						if(objectcollisionitems.list[k]->getObjectType() == object_moving)
-						{
-							IO_MovingObject * object = (IO_MovingObject *)objectcollisionitems.list[k];
-							
-							if((object->getMovingObjectType() == movingobject_goomba || object->getMovingObjectType() == movingobject_koopa)
-								&& game_values.screenshakekillinair == object->inair)
-							{
 
+					//Kill goombas and koopas
+					for(short k = 0; k < objectcontainer[0].list_end; k++)
+					{
+						CObject * object = objectcontainer[0].list[k];
+						if(object->getObjectType() == object_moving)
+						{
+							IO_MovingObject * movingobject = (IO_MovingObject *)object;
+							
+							if((movingobject->getMovingObjectType() == movingobject_goomba || movingobject->getMovingObjectType() == movingobject_koopa)
+								&& game_values.screenshakekillinair == movingobject->inair)
+							{
 								CPlayer * killer = GetPlayerFromGlobalID(game_values.screenshakeplayerid);
 
 								if(killer)
@@ -2016,7 +2016,7 @@ void RunGame()
 										killer->score->AdjustScore(1);
 
 									ifsoundonplay(sfx_kicksound);
-									((MO_Goomba*)object)->Die();
+									((MO_Goomba*)movingobject)->Die();
 
 									game_values.screenshakekillscount++;
 									
@@ -2027,23 +2027,25 @@ void RunGame()
 						}
 					}
 
-					for(k = 0; k < objectsplayer.list_end; k++)
+					//Destroy throw blocks and flip shells over
+					for(short k = 0; k < objectcontainer[1].list_end; k++)
 					{
-						if(objectsplayer.list[k]->getObjectType() == object_moving)
+						CObject * object = objectcontainer[1].list[k];
+						if(object->getObjectType() == object_moving)
 						{
-							IO_MovingObject * object = (IO_MovingObject *)objectsplayer.list[k];
+							IO_MovingObject * movingobject = (IO_MovingObject *)object;
 							
-							if(game_values.screenshakekillinair == object->inair)
+							if(game_values.screenshakekillinair == movingobject->inair)
 							{
-								if(object->getMovingObjectType() == movingobject_shell)
+								if(movingobject->getMovingObjectType() == movingobject_shell)
 								{
-									CO_Shell * shell = (CO_Shell*)object;
+									CO_Shell * shell = (CO_Shell*)movingobject;
 									if(!shell->owner || shell->owner->inair == game_values.screenshakekillinair)
 										shell->Flip();
 								}
-								else if(object->getMovingObjectType() == movingobject_throwblock)
+								else if(movingobject->getMovingObjectType() == movingobject_throwblock)
 								{
-									CO_ThrowBlock * throwblock = (CO_ThrowBlock*)object;
+									CO_ThrowBlock * throwblock = (CO_ThrowBlock*)movingobject;
 									if(!throwblock->owner || throwblock->owner->inair == game_values.screenshakekillinair)
 										throwblock->Die();
 								}
@@ -2077,7 +2079,7 @@ void RunGame()
 						{
 							game_values.bulletbillspawntimer[iPlayer] = (short)(rand() % 20 + 25);
 							float speed = ((float)(rand() % 21 + 20)) / 10.0f;
-							objectsfront.add(new OMO_BulletBill(&spr_bulletbill, &spr_bulletbilldead, 0, (short)(rand() % 448), (rand() % 2 ? speed : -speed), iPlayer, false));
+							objectcontainer[2].add(new MO_BulletBill(&spr_bulletbill, &spr_bulletbilldead, 0, (short)(rand() % 448), (rand() % 2 ? speed : -speed), iPlayer, false));
 							ifsoundonplay(sfx_bulletbillsound);
 						}
 					}
@@ -2111,18 +2113,20 @@ void RunGame()
 				//Player to player collisions
 				for(i = 0; i < list_players_cnt; i++)
 				{
-					if(list_players[i]->state > player_dead)
+					CPlayer * player1 = list_players[i];
+					if(player1->state > player_dead)
 					{
 						for(j = i + 1; j < list_players_cnt; j++)
 						{
-							if(list_players[j]->state > player_dead)
+							CPlayer * player2 = list_players[j];
+							if(player2->state > player_dead)
 							{
-								if(coldec_player2player(*(list_players[i]), *(list_players[j])))
+								if(coldec_player2player(player1, player2))
 								{
-									collisionhandler_p2p(*(list_players[i]), *(list_players[j]));
+									collisionhandler_p2p(player1, player2);
 
 									//if player was killed by another player, continue with next player for collision detection
-									if(list_players[i]->state <= player_dead)
+									if(player1->state <= player_dead)
 										break;
 								}
 							}
@@ -2141,414 +2145,433 @@ void RunGame()
 					list_players[i]->move();	//move all objects before doing object-object collision detection in
 												//->think(), so we test against the new position after object-map collision detection
 
-				if(!game_values.swapplayers)
+				//Play sound for skidding players
+				if(game_values.playskidsound)
 				{
-					//Play sound for skidding players
-					if(game_values.playskidsound)
-					{
-						if(!sfx_skid.isplaying())
-							ifsoundonplay(sfx_skid);
-					}
-					else
-					{
-						if(sfx_skid.isplaying())
-							ifsoundonstop(sfx_skid);
-					}
+					if(!sfx_skid.isplaying())
+						ifsoundonplay(sfx_skid);
+				}
+				else
+				{
+					if(sfx_skid.isplaying())
+						ifsoundonstop(sfx_skid);
+				}
 
-					//Play sound for players using PWings
-					if(game_values.playflyingsound)
-					{
-						if(!sfx_flyingsound.isplaying())
-							ifsoundonplay(sfx_flyingsound);
-					}
-					else
-					{
-						if(sfx_flyingsound.isplaying())
-							ifsoundonstop(sfx_flyingsound);
-					}
+				//Play sound for players using PWings
+				if(game_values.playflyingsound)
+				{
+					if(!sfx_flyingsound.isplaying())
+						ifsoundonplay(sfx_flyingsound);
+				}
+				else
+				{
+					if(sfx_flyingsound.isplaying())
+						ifsoundonstop(sfx_flyingsound);
+				}
 
-					objectblocks.update();
-					objectcollisionitems.update();
-					objectsfront.update();
-					objectsplayer.update();
+				noncolcontainer.update();
+				objectcontainer[0].update();
+				objectcontainer[1].update();
+				objectcontainer[2].update();
 
-					for(i = 0; i < list_players_cnt; i++)
+				//Collide player with objects
+				for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++)
+				{
+					CPlayer * player = list_players[iPlayer];
+					if(player->state != player_ready)
+						continue;
+
+					//Collide with objects
+					for(short iLayer = 0; iLayer < 3; iLayer++)
 					{
-						if(list_players[i]->state != player_ready)
-							continue;
-
-						//Collide with collision detected objects
-						for(j = 0; j < objectcollisionitems.list_end; j++)
+						for(short iObject = 0; iObject < objectcontainer[iLayer].list_end; iObject++)
 						{
-							if(!objectcollisionitems.list[j]->GetDead() && objectcollisionitems.list[j]->GetState() >= 1)
+							CObject * object = objectcontainer[iLayer].list[iObject];
+
+							if(!object->GetDead())
 							{
-								if(coldec_player2obj(*(list_players[i]), *(objectcollisionitems.list[j])))
+								if(coldec_player2obj(player, object))
 								{
-									if(collisionhandler_p2o(*(list_players[i]), *(objectcollisionitems.list[j])))
+									if(collisionhandler_p2o(player, object))
 										break;
 								}
 							}
 						}
 
-						if(list_players[i]->state != player_ready)
-							continue;
-
-						if(game_values.swapplayers)
+						//if the object killed the player, then continue with the other players
+						if(player->state != player_ready)
 							break;
 
-						//Collide with player objects
-						for(j = 0; j < objectsplayer.list_end; j++)
-						{
-							if(!objectsplayer.list[j]->GetDead())
-							{
-								if(coldec_player2obj(*(list_players[i]), *(objectsplayer.list[j])))
-								{
-									if(collisionhandler_p2o(*(list_players[i]), *(objectsplayer.list[j])))
-										break;
-								}
-							}
-						}
+						//If player collided with a swap mushroom, the break from colliding with everything else
+						if(game_values.swapplayers)
+							goto SWAPBREAK;
+					}
+				}
 
-						if(list_players[i]->state != player_ready)
+				for(short iLayer1 = 0; iLayer1 < 3; iLayer1++)
+				{
+					for(short iObject1 = 0; iObject1 < objectcontainer[iLayer1].list_end; iObject1++)
+					{
+						CObject * object1 = objectcontainer[iLayer1].list[iObject1];
+
+						if(object1->getObjectType() != object_moving)
 							continue;
 
-						//Collide with front objects
-						for(j = 0; j < objectsfront.list_end; j++)
+						IO_MovingObject * movingobject1 = (IO_MovingObject*)object1;
+
+						for(short iLayer2 = 0; iLayer2 < 3; iLayer2++)
 						{
-							if(!objectsfront.list[j]->GetDead())
+							for(short iObject2 = 0; iObject2 < objectcontainer[iLayer2].list_end; iObject2++)
 							{
-								if(coldec_player2obj(*(list_players[i]), *(objectsfront.list[j])))
+								CObject * object2 = objectcontainer[iLayer2].list[iObject2];
+
+								if(iLayer1 == iLayer2 && iObject1 == iObject2)
+									continue;
+
+								if(object2->GetDead())
+									continue;
+
+								if(coldec_obj2obj(movingobject1, object2))
 								{
-									if(collisionhandler_p2o(*(list_players[i]), *(objectsfront.list[j])))
-										break;
+									collisionhandler_o2o(movingobject1, object2);
 								}
+
+								if(object1->GetDead())
+									goto CONTINUEOBJECT1;
 							}
 						}
+
+						//Labeled break
+						CONTINUEOBJECT1:
+						continue;
 					}
+				}
 
-					if(!game_values.swapplayers)
+
+				/*
+				//moving object to moving object collisions
+				for(i = 0; i < objectcontainer[0].list_end; i++)
+				{
+					if(!objectcontainer[0].list[i]->GetDead() && objectcontainer[0].list[i]->getObjectType() == object_moving)
 					{
-						//moving object to moving object collisions
-						for(i = 0; i < objectcollisionitems.list_end; i++)
+						IO_MovingObject * object = (IO_MovingObject*)objectcontainer[0].list[i];
+
+						//collision items
+						if(object->getMovingObjectType() == movingobject_fireball)
 						{
-							if(!objectcollisionitems.list[i]->GetDead() && objectcollisionitems.list[i]->getObjectType() == object_moving && objectcollisionitems.list[i]->GetState() == 1)
+							for(j = 0; j < objectcontainer[0].list_end; j++)
 							{
-								IO_MovingObject * object = (IO_MovingObject*)objectcollisionitems.list[i];
+								if(i == j)
+									continue;
 
-								//collision items
-								if(object->getMovingObjectType() == movingobject_fireball)
+								if(!objectcontainer[0].list[j]->GetDead())
 								{
-									for(j = 0; j < objectcollisionitems.list_end; j++)
+									if(coldec_obj2obj(objectcontainer[0].list[i], objectcontainer[0].list[j]))
 									{
-										if(i == j)
-											continue;
-
-										if(!objectcollisionitems.list[j]->GetDead() && objectcollisionitems.list[j]->GetState() == 1)
-										{
-											if(coldec_obj2obj(*(objectcollisionitems.list[i]), *(objectcollisionitems.list[j])))
-											{
-												collisionhandler_o2o(*object, *(objectcollisionitems.list[j]));
-											}
-										}
-									}
-
-									//fireball to shell/throwblock
-									for(j = 0; j < objectsplayer.list_end; j++)
-									{
-										if(objectsplayer.list[j]->getObjectType() == object_moving)
-										{
-											MovingObjectType type = ((IO_MovingObject*)objectsplayer.list[j])->getMovingObjectType();
-
-											if((type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone) && !objectsplayer.list[j]->GetDead())
-											{
-												if(coldec_obj2obj(*(objectcollisionitems.list[i]), *(objectsplayer.list[j])))
-												{
-													collisionhandler_o2o(*object, *(objectsplayer.list[j]));
-												}
-											}
-										}
+										collisionhandler_o2o(*object, *(objectcontainer[0].list[j]));
 									}
 								}
+							}
 
-								if(object->getMovingObjectType() == movingobject_goomba || object->getMovingObjectType() == movingobject_koopa || object->getMovingObjectType() == movingobject_sledgebrother || object->getMovingObjectType() == movingobject_fireball)
+							//fireball to shell/throwblock
+							for(j = 0; j < objectcontainer[1].list_end; j++)
+							{
+								if(objectcontainer[1].list[j]->getObjectType() == object_moving)
 								{
-									for(j = 0; j < objectsfront.list_end; j++)
+									MovingObjectType type = ((IO_MovingObject*)objectcontainer[1].list[j])->getMovingObjectType();
+
+									if((type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone) && !objectcontainer[1].list[j]->GetDead())
 									{
-										if(!objectsfront.list[j]->GetDead())
+										if(coldec_obj2obj(objectcontainer[0].list[i], objectcontainer[1].list[j]))
 										{
-											if(coldec_obj2obj(*(objectcollisionitems.list[i]), *(objectsfront.list[j])))
-											{
-												collisionhandler_o2o(*object, *(objectsfront.list[j]));
-											}
+											collisionhandler_o2o(*object, *(objectcontainer[1].list[j]));
 										}
 									}
 								}
 							}
 						}
 
-						//front objects to front and collision items (bullet bills to explosions and hammers to bullet bills and goombas)
-						for(i = 0; i < objectsfront.list_end; i++)
+						if(object->getMovingObjectType() == movingobject_goomba || object->getMovingObjectType() == movingobject_koopa || object->getMovingObjectType() == movingobject_sledgebrother || object->getMovingObjectType() == movingobject_fireball)
 						{
-							if(!objectsfront.list[i]->GetDead() && objectsfront.list[i]->getObjectType() == object_moving)
+							for(j = 0; j < objectcontainer[2].list_end; j++)
 							{
-								IO_MovingObject * object = (IO_MovingObject*)objectsfront.list[i];
-								MovingObjectType type = object->getMovingObjectType();
-								
-								if(type == movingobject_podobo || type == movingobject_bulletbill || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_sledgehammer || type == movingobject_cheepcheep || type == movingobject_boomerang || type == movingobject_pirhanaplant)
+								if(!objectcontainer[2].list[j]->GetDead())
 								{
-									//bullet bills to explosions && hammers to bullet bills
-									for(j = 0; j < objectsfront.list_end; j++)
+									if(coldec_obj2obj(objectcontainer[0].list[i], objectcontainer[2].list[j]))
 									{
-										if(i == j)
-											continue;
-
-										bool fCollideWith = false;
-										if(objectsfront.list[j]->getObjectType() == object_moving)
-										{
-											MovingObjectType type = ((IO_MovingObject*)objectsfront.list[j])->getMovingObjectType();
-										
-											if(type == movingobject_podobo || type == movingobject_bulletbill || type == movingobject_cheepcheep)
-												fCollideWith = true;
-										}
-
-										if((fCollideWith || objectsfront.list[j]->getObjectType() == object_explosion) && !objectsfront.list[j]->GetDead())
-										{
-											if(coldec_obj2obj(*(objectsfront.list[i]), *(objectsfront.list[j])))
-											{
-												collisionhandler_o2o(*object, *(objectsfront.list[j]));
-
-												//If the object was killed by this collision, break out
-												if(objectsfront.list[i]->GetDead())
-													break;
-											}
-										}
-									}
-
-									//hammers to goombas
-									for(j = 0; j < objectcollisionitems.list_end; j++)
-									{
-										bool collidewithobject = false;
-										
-										if(objectcollisionitems.list[j]->getObjectType() == object_moving)
-										{
-											IO_MovingObject * movingobject = (IO_MovingObject*)objectcollisionitems.list[j];
-
-											if(movingobject->getMovingObjectType() == movingobject_goomba || movingobject->getMovingObjectType() == movingobject_koopa || movingobject->getMovingObjectType() == movingobject_sledgebrother)
-												collidewithobject = true;
-										}
-
-										if(collidewithobject && !objectcollisionitems.list[j]->GetDead())
-										{
-											if(coldec_obj2obj(*(objectsfront.list[i]), *(objectcollisionitems.list[j])))
-											{
-												collisionhandler_o2o(*object, *(objectcollisionitems.list[j]));
-											}
-										}
-									}
-
-									if(type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_sledgehammer || type == movingobject_boomerang)
-									{
-										//hammer to shell/throwblock
-										for(j = 0; j < objectsplayer.list_end; j++)
-										{
-											if(objectsplayer.list[j]->getObjectType() == object_moving)
-											{
-												MovingObjectType type = ((IO_MovingObject*)objectsplayer.list[j])->getMovingObjectType();
-
-												if((type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone) && !objectsplayer.list[j]->GetDead())
-												{
-													if(coldec_obj2obj(*(objectsfront.list[i]), *(objectsplayer.list[j])))
-													{
-														collisionhandler_o2o(*object, *(objectsplayer.list[j]));
-													}
-												}
-											}
-										}
+										collisionhandler_o2o(*object, *(objectcontainer[2].list[j]));
 									}
 								}
-							}
-						}
-
-						//player objects to collision items (shells to goombas and shell to shell)
-						//Also flags to flag bases
-						for(i = 0; i < objectsplayer.list_end; i++)
-						{
-							if(!objectsplayer.list[i]->GetDead())
-							{
-								if(objectsplayer.list[i]->getObjectType() == object_moving)
-								{
-									IO_MovingObject * object = (IO_MovingObject*)objectsplayer.list[i];
-
-									if(object->getMovingObjectType() == movingobject_shell || object->getMovingObjectType() == movingobject_throwblock || object->getMovingObjectType() == movingobject_attackzone)
-									{
-										//shell/throwblock to goomba and shell/throwblock to fireball
-										for(j = 0; j < objectcollisionitems.list_end; j++)
-										{
-											if(objectcollisionitems.list[j]->getObjectType() == object_moving)
-											{
-												IO_MovingObject * object2 = (IO_MovingObject*)objectcollisionitems.list[j];
-											
-												if(object2->getMovingObjectType() == movingobject_goomba || object2->getMovingObjectType() == movingobject_koopa || object2->getMovingObjectType() == movingobject_sledgebrother)
-												{
-													if(!objectcollisionitems.list[j]->GetDead())
-													{
-														if(coldec_obj2obj(*(objectsplayer.list[i]), *(objectcollisionitems.list[j])))
-														{
-															collisionhandler_o2o(*object, *(objectcollisionitems.list[j]));
-														}
-													}
-												}
-											}
-										}
-
-										//shell to shell or block to block
-										for(j = 0; j < objectsplayer.list_end; j++)
-										{
-											if(i == j)
-												continue;
-
-											if(objectsplayer.list[j]->getObjectType() == object_moving)
-											{
-												MovingObjectType type = ((IO_MovingObject*)objectsplayer.list[j])->getMovingObjectType();
-
-												if((type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone) && !objectsplayer.list[j]->GetDead())
-												{
-													if(coldec_obj2obj(*(objectsplayer.list[i]), *(objectsplayer.list[j])))
-													{
-														collisionhandler_o2o(*object, *(objectsplayer.list[j]));
-													}
-												}
-											}
-										}
-
-										//shells/throwblocks to explosions
-										for(j = 0; j < objectsfront.list_end; j++)
-										{
-											bool fCollideWith = false;
-											if(objectsfront.list[j]->getObjectType() == object_moving)
-											{
-												MovingObjectType type = ((IO_MovingObject*)objectsfront.list[j])->getMovingObjectType();
-											
-												if(type == movingobject_podobo || type == movingobject_bulletbill || type == movingobject_cheepcheep)
-													fCollideWith = true;
-											}
-
-											if((fCollideWith || objectsfront.list[j]->getObjectType() == object_explosion) && !objectsfront.list[j]->GetDead())
-											{
-												if(coldec_obj2obj(*(objectsplayer.list[i]), *(objectsfront.list[j])))
-												{
-													collisionhandler_o2o(*object, *(objectsfront.list[j]));
-												}
-											}
-										}
-									}
-								}
-								else if(objectsplayer.list[i]->getObjectType() == object_flag)
-								{
-									CO_Flag * flag = (CO_Flag*)objectsplayer.list[i];
-
-									//flag to flag base collisions
-									for(j = 0; j < objectcollisionitems.list_end; j++)
-									{
-										if(objectcollisionitems.list[j]->getObjectType() == object_flagbase)
-										{
-											if(!objectcollisionitems.list[j]->GetDead())
-											{
-												if(coldec_obj2obj(*(objectsplayer.list[i]), *(objectcollisionitems.list[j])))
-												{
-													collisionhandler_o2o(*flag, *(objectcollisionitems.list[j]));
-												}
-											}
-										}
-									}
-								}
-								else if(objectsplayer.list[i]->getObjectType() == object_egg)
-								{
-									CO_Egg * egg = (CO_Egg*)objectsplayer.list[i];
-
-									//thrown egg to yoshi collision
-									for(j = 0; j < objectsplayer.list_end; j++)
-									{
-										if(i == j)
-											continue;
-
-										if(objectsplayer.list[j]->getObjectType() == object_yoshi)
-										{
-											if(!objectsplayer.list[j]->GetDead())
-											{
-												if(coldec_obj2obj(*(objectsplayer.list[i]), *(objectsplayer.list[j])))
-												{
-													collisionhandler_o2o(*egg, *(objectsplayer.list[j]));
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-
-						eyecandyfront.cleandeadobjects();
-						eyecandyback.cleandeadobjects();
-						objectsfront.cleandeadobjects();
-						objectsplayer.cleandeadobjects();
-						objectcollisionitems.cleandeadobjects();
-						objectblocks.cleandeadobjects();
-						CleanDeadPlayers();
-
-						eyecandyfront.update();
-						eyecandyback.update();
-						game_values.gamemode->think();
-
-						if(game_values.slowdownon != -1)
-						{
-							if(!sfx_slowdownmusic.isplaying())
-								ifsoundonplay(sfx_slowdownmusic);
-
-							if(++game_values.slowdowncounter > 580)
-							{
-								game_values.slowdownon = -1;
-								game_values.slowdowncounter = 0;
-							}
-						}
-						else
-						{
-							if(sfx_slowdownmusic.isplaying())
-								ifsoundonstop(sfx_slowdownmusic);
-						}
-
-						g_map.update();
-
-						if(y_shake > 0)
-						{
-							y_shake -= CRUNCHVELOCITY;
-
-							if(y_shake < 0)
-								y_shake = 0;
-						}
-					
-						if(game_values.showscoreboard)
-						{
-							if(game_values.scorepercentmove < 1.0f)
-							{
-								game_values.scorepercentmove += 0.01f;
-								
-								if(game_values.scorepercentmove >= 1.0f)
-									game_values.scorepercentmove = 1.0f;
-							}
-							else
-							{
-								game_values.scorepercentmove = 1.0f;
-							}
-
-							for(i = 0; i < score_cnt; i++)
-							{
-								score[i]->x = (short)((float)(score[i]->destx - score[i]->fromx) * game_values.scorepercentmove) + score[i]->fromx;
-								score[i]->y = (short)((float)(score[i]->desty - score[i]->fromy) * game_values.scorepercentmove) + score[i]->fromy;
 							}
 						}
 					}
 				}
+
+				//front objects to front and collision items (bullet bills to explosions and hammers to bullet bills and goombas)
+				for(i = 0; i < objectcontainer[2].list_end; i++)
+				{
+					if(!objectcontainer[2].list[i]->GetDead() && objectcontainer[2].list[i]->getObjectType() == object_moving)
+					{
+						IO_MovingObject * object = (IO_MovingObject*)objectcontainer[2].list[i];
+						MovingObjectType type = object->getMovingObjectType();
+						
+						if(type == movingobject_podobo || type == movingobject_bulletbill || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_sledgehammer || type == movingobject_cheepcheep || type == movingobject_boomerang || type == movingobject_pirhanaplant)
+						{
+							//bullet bills to explosions && hammers to bullet bills
+							for(j = 0; j < objectcontainer[2].list_end; j++)
+							{
+								if(i == j)
+									continue;
+
+								bool fCollideWith = false;
+								if(objectcontainer[2].list[j]->getObjectType() == object_moving)
+								{
+									MovingObjectType type = ((IO_MovingObject*)objectcontainer[2].list[j])->getMovingObjectType();
+								
+									if(type == movingobject_podobo || type == movingobject_bulletbill || type == movingobject_cheepcheep)
+										fCollideWith = true;
+								}
+
+								if((fCollideWith || objectcontainer[2].list[j]->getObjectType() == object_explosion) && !objectcontainer[2].list[j]->GetDead())
+								{
+									if(coldec_obj2obj(objectcontainer[2].list[i], objectcontainer[2].list[j]))
+									{
+										collisionhandler_o2o(*object, *(objectcontainer[2].list[j]));
+
+										//If the object was killed by this collision, break out
+										if(objectcontainer[2].list[i]->GetDead())
+											break;
+									}
+								}
+							}
+
+							//hammers to goombas
+							for(j = 0; j < objectcontainer[0].list_end; j++)
+							{
+								bool collidewithobject = false;
+								
+								if(objectcontainer[0].list[j]->getObjectType() == object_moving)
+								{
+									IO_MovingObject * movingobject = (IO_MovingObject*)objectcontainer[0].list[j];
+
+									if(movingobject->getMovingObjectType() == movingobject_goomba || movingobject->getMovingObjectType() == movingobject_koopa || movingobject->getMovingObjectType() == movingobject_sledgebrother)
+										collidewithobject = true;
+								}
+
+								if(collidewithobject && !objectcontainer[0].list[j]->GetDead())
+								{
+									if(coldec_obj2obj(objectcontainer[2].list[i], objectcontainer[0].list[j]))
+									{
+										collisionhandler_o2o(*object, *(objectcontainer[0].list[j]));
+									}
+								}
+							}
+
+							if(type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_sledgehammer || type == movingobject_boomerang)
+							{
+								//hammer to shell/throwblock
+								for(j = 0; j < objectcontainer[1].list_end; j++)
+								{
+									if(objectcontainer[1].list[j]->getObjectType() == object_moving)
+									{
+										MovingObjectType type = ((IO_MovingObject*)objectcontainer[1].list[j])->getMovingObjectType();
+
+										if((type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone) && !objectcontainer[1].list[j]->GetDead())
+										{
+											if(coldec_obj2obj(objectcontainer[2].list[i], objectcontainer[1].list[j]))
+											{
+												collisionhandler_o2o(*object, *(objectcontainer[1].list[j]));
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+
+				//player objects to collision items (shells to goombas and shell to shell)
+				//Also flags to flag bases
+				for(i = 0; i < objectcontainer[1].list_end; i++)
+				{
+					if(!objectcontainer[1].list[i]->GetDead())
+					{
+						if(objectcontainer[1].list[i]->getObjectType() == object_moving)
+						{
+							IO_MovingObject * object = (IO_MovingObject*)objectcontainer[1].list[i];
+
+							if(object->getMovingObjectType() == movingobject_shell || object->getMovingObjectType() == movingobject_throwblock || object->getMovingObjectType() == movingobject_attackzone)
+							{
+								//shell/throwblock to goomba and shell/throwblock to fireball
+								for(j = 0; j < objectcontainer[0].list_end; j++)
+								{
+									if(objectcontainer[0].list[j]->getObjectType() == object_moving)
+									{
+										IO_MovingObject * object2 = (IO_MovingObject*)objectcontainer[0].list[j];
+									
+										if(object2->getMovingObjectType() == movingobject_goomba || object2->getMovingObjectType() == movingobject_koopa || object2->getMovingObjectType() == movingobject_sledgebrother)
+										{
+											if(!objectcontainer[0].list[j]->GetDead())
+											{
+												if(coldec_obj2obj(objectcontainer[1].list[i], objectcontainer[0].list[j]))
+												{
+													collisionhandler_o2o(*object, *(objectcontainer[0].list[j]));
+												}
+											}
+										}
+									}
+								}
+
+								//shell to shell or block to block
+								for(j = 0; j < objectcontainer[1].list_end; j++)
+								{
+									if(i == j)
+										continue;
+
+									if(objectcontainer[1].list[j]->getObjectType() == object_moving)
+									{
+										MovingObjectType type = ((IO_MovingObject*)objectcontainer[1].list[j])->getMovingObjectType();
+
+										if((type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone) && !objectcontainer[1].list[j]->GetDead())
+										{
+											if(coldec_obj2obj(objectcontainer[1].list[i], objectcontainer[1].list[j]))
+											{
+												collisionhandler_o2o(*object, *(objectcontainer[1].list[j]));
+											}
+										}
+									}
+								}
+
+								//shells/throwblocks to explosions
+								for(j = 0; j < objectcontainer[2].list_end; j++)
+								{
+									bool fCollideWith = false;
+									if(objectcontainer[2].list[j]->getObjectType() == object_moving)
+									{
+										MovingObjectType type = ((IO_MovingObject*)objectcontainer[2].list[j])->getMovingObjectType();
+									
+										if(type == movingobject_podobo || type == movingobject_bulletbill || type == movingobject_cheepcheep)
+											fCollideWith = true;
+									}
+
+									if((fCollideWith || objectcontainer[2].list[j]->getObjectType() == object_explosion) && !objectcontainer[2].list[j]->GetDead())
+									{
+										if(coldec_obj2obj(objectcontainer[1].list[i], objectcontainer[2].list[j]))
+										{
+											collisionhandler_o2o(*object, *(objectcontainer[2].list[j]));
+										}
+									}
+								}
+							}
+						}
+						else if(objectcontainer[1].list[i]->getObjectType() == object_flag)
+						{
+							CO_Flag * flag = (CO_Flag*)objectcontainer[1].list[i];
+
+							//flag to flag base collisions
+							for(j = 0; j < objectcontainer[0].list_end; j++)
+							{
+								if(objectcontainer[0].list[j]->getObjectType() == object_flagbase)
+								{
+									if(!objectcontainer[0].list[j]->GetDead())
+									{
+										if(coldec_obj2obj(objectcontainer[1].list[i], objectcontainer[0].list[j]))
+										{
+											collisionhandler_o2o(*flag, *(objectcontainer[0].list[j]));
+										}
+									}
+								}
+							}
+						}
+						else if(objectcontainer[1].list[i]->getObjectType() == object_egg)
+						{
+							CO_Egg * egg = (CO_Egg*)objectcontainer[1].list[i];
+
+							//thrown egg to yoshi collision
+							for(j = 0; j < objectcontainer[1].list_end; j++)
+							{
+								if(i == j)
+									continue;
+
+								if(objectcontainer[1].list[j]->getObjectType() == object_yoshi)
+								{
+									if(!objectcontainer[1].list[j]->GetDead())
+									{
+										if(coldec_obj2obj(objectcontainer[1].list[i], objectcontainer[1].list[j]))
+										{
+											collisionhandler_o2o(*egg, *(objectcontainer[1].list[j]));
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				*/
+
+				eyecandyfront.cleandeadobjects();
+				eyecandyback.cleandeadobjects();
+				objectcontainer[2].cleandeadobjects();
+				objectcontainer[1].cleandeadobjects();
+				objectcontainer[0].cleandeadobjects();
+				noncolcontainer.cleandeadobjects();
+				CleanDeadPlayers();
+
+				eyecandyfront.update();
+				eyecandyback.update();
+				game_values.gamemode->think();
+
+				if(game_values.slowdownon != -1)
+				{
+					if(!sfx_slowdownmusic.isplaying())
+						ifsoundonplay(sfx_slowdownmusic);
+
+					if(++game_values.slowdowncounter > 580)
+					{
+						game_values.slowdownon = -1;
+						game_values.slowdowncounter = 0;
+					}
+				}
+				else
+				{
+					if(sfx_slowdownmusic.isplaying())
+						ifsoundonstop(sfx_slowdownmusic);
+				}
+
+				g_map.update();
+
+				if(y_shake > 0)
+				{
+					y_shake -= CRUNCHVELOCITY;
+
+					if(y_shake < 0)
+						y_shake = 0;
+				}
+			
+				if(game_values.showscoreboard)
+				{
+					if(game_values.scorepercentmove < 1.0f)
+					{
+						game_values.scorepercentmove += 0.01f;
+						
+						if(game_values.scorepercentmove >= 1.0f)
+							game_values.scorepercentmove = 1.0f;
+					}
+					else
+					{
+						game_values.scorepercentmove = 1.0f;
+					}
+
+					for(i = 0; i < score_cnt; i++)
+					{
+						score[i]->x = (short)((float)(score[i]->destx - score[i]->fromx) * game_values.scorepercentmove) + score[i]->fromx;
+						score[i]->y = (short)((float)(score[i]->desty - score[i]->fromy) * game_values.scorepercentmove) + score[i]->fromy;
+					}
+				}
 			}
+
+			//Go to this label if a player collects a swap mushroom and we need to break out of two loops
+			SWAPBREAK:
 
 			if(game_values.swapplayers)
 			{
@@ -2645,12 +2668,12 @@ void RunGame()
 			spr_backmap[g_iCurrentDrawIndex].draw(0, 0);
 
 			//draw back eyecandy behind players
-			objectblocks.draw();
+			noncolcontainer.draw();
 			eyecandyback.draw();
 
 			game_values.gamemode->draw_background();
 
-			objectcollisionitems.draw();
+			objectcontainer[0].draw();
 
 			if(!game_values.swapplayers)
 			{
@@ -2658,7 +2681,7 @@ void RunGame()
 					list_players[i]->draw();
 			}
 
-			objectsplayer.draw();
+			objectcontainer[1].draw();
 
 			g_map.drawPlatforms();
 
@@ -2670,7 +2693,7 @@ void RunGame()
 #endif
 			g_map.drawWarpLocks();
 
-			objectsfront.draw();
+			objectcontainer[2].draw();
 			eyecandyfront.draw();
 			game_values.gamemode->draw_foreground();
 		
@@ -3044,10 +3067,13 @@ void CleanUp()
 
 	eyecandyfront.clean();
 	eyecandyback.clean();
-	objectsfront.clean();
-	objectsplayer.clean();
-	objectcollisionitems.clean();
-	objectblocks.clean();
+	
+	noncolcontainer.clean();
+
+	objectcontainer[0].clean();
+	objectcontainer[1].clean();
+	objectcontainer[2].clean();
+		
 	LoadMapObjects();
 	g_map.clearWarpLocks();
 	g_map.resetPlatforms();
@@ -3211,84 +3237,84 @@ void PlayNextMusicTrack()
 	backgroundmusic[0].play(game_values.playnextmusic, false);
 }
 
-bool coldec_player2player(CPlayer &o1, CPlayer &o2)
+bool coldec_player2player(CPlayer * o1, CPlayer * o2)
 {
 	//Special cases to deal with players overlapping the right and left sides of the screen
 
-	if(o1.ix + PW < o2.ix)
+	if(o1->ix + PW < o2->ix)
 	{
-		if (o1.ix + 640 >= o2.ix + PW || o1.ix + PW + 640 < o2.ix || o1.iy > o2.iy + PH || o1.iy + PH < o2.iy) 
+		if (o1->ix + 640 >= o2->ix + PW || o1->ix + PW + 640 < o2->ix || o1->iy > o2->iy + PH || o1->iy + PH < o2->iy) 
 			return false;
 		else 
 			return true;
 	}
-	else if(o2.ix + PW < o1.ix)
+	else if(o2->ix + PW < o1->ix)
 	{
-		if (o1.ix >= o2.ix + PW + 640 || o1.ix + PW < o2.ix + 640 || o1.iy > o2.iy + PH || o1.iy + PH < o2.iy) 
+		if (o1->ix >= o2->ix + PW + 640 || o1->ix + PW < o2->ix + 640 || o1->iy > o2->iy + PH || o1->iy + PH < o2->iy) 
 			return false;
 		else 
 			return true;
 	}
 	else  //Normal case where no overlap
 	{
-		if (o1.ix >= o2.ix + PW || o1.ix + PW < o2.ix || o1.iy > o2.iy + PH || o1.iy + PH < o2.iy) 
+		if (o1->ix >= o2->ix + PW || o1->ix + PW < o2->ix || o1->iy > o2->iy + PH || o1->iy + PH < o2->iy) 
 			return false;
 		else 
 			return true;
 	}
 }
 
-bool coldec_player2obj(CPlayer &o1, CObject &o2)
+bool coldec_player2obj(CPlayer * o1, CObject * o2)
 {
 	//Special cases to deal with players overlapping the right and left sides of the screen
-	if(o1.ix + PW < o2.ix)
+	if(o1->ix + PW < o2->ix)
 	{
-		if (o1.ix + 640 >= o2.ix + o2.collisionWidth || o1.ix + PW + 640 < o2.ix || o1.iy >= o2.iy + o2.collisionHeight || o1.iy + PH < o2.iy) 
+		if (o1->ix + 640 >= o2->ix + o2->collisionWidth || o1->ix + PW + 640 < o2->ix || o1->iy >= o2->iy + o2->collisionHeight || o1->iy + PH < o2->iy) 
 			return false;
 		else 
 			return true;
 	}
-	else if(o2.ix + o2.collisionWidth < o1.ix)
+	else if(o2->ix + o2->collisionWidth < o1->ix)
 	{
-		if (o1.ix >= o2.ix + o2.collisionWidth + 640 || o1.ix + PW < o2.ix + 640 || o1.iy >= o2.iy + o2.collisionHeight || o1.iy + PH < o2.iy) 
+		if (o1->ix >= o2->ix + o2->collisionWidth + 640 || o1->ix + PW < o2->ix + 640 || o1->iy >= o2->iy + o2->collisionHeight || o1->iy + PH < o2->iy) 
 			return false;
 		else 
 			return true;
 	}
 	else //Normal case where no overlap
 	{
-		if (o1.ix >= o2.ix + o2.collisionWidth || o2.ix > o1.ix + PW || o1.iy >= o2.iy + o2.collisionHeight || o2.iy > o1.iy + PH) 
+		if (o1->ix >= o2->ix + o2->collisionWidth || o2->ix > o1->ix + PW || o1->iy >= o2->iy + o2->collisionHeight || o2->iy > o1->iy + PH) 
 			return false;
 		else 
 			return true;
 	}
 }
 
-bool coldec_obj2obj(CObject &o1, CObject &o2)
+bool coldec_obj2obj(CObject * o1, CObject * o2)
 {
 	//Special cases to deal with players overlapping the right and left sides of the screen
-	short o1r = o1.ix + o1.collisionWidth;
-	short o1b = o1.iy + o1.collisionHeight;
-	short o2r = o2.ix + o2.collisionWidth;
-	short o2b = o2.iy + o2.collisionHeight;
+	short o1r = o1->ix + o1->collisionWidth;
+	short o1b = o1->iy + o1->collisionHeight;
+	short o2r = o2->ix + o2->collisionWidth;
+	short o2b = o2->iy + o2->collisionHeight;
 
-	if(o1r < o2.ix)
+	if(o1r < o2->ix)
 	{
-		if (o1.ix + 640 >= o2r || o1r + 640 < o2.ix || o1.iy >= o2b || o1b < o2.iy) 
+		if (o1->ix + 640 >= o2r || o1r + 640 < o2->ix || o1->iy >= o2b || o1b < o2->iy) 
 			return false;
 		else 
 			return true;
 	}
-	else if(o2r < o1.ix)
+	else if(o2r < o1->ix)
 	{
-		if (o1.ix >= o2r + 640 || o1r < o2.ix + 640 || o1.iy >= o2b || o1b < o2.iy)
+		if (o1->ix >= o2r + 640 || o1r < o2->ix + 640 || o1->iy >= o2b || o1b < o2->iy)
 			return false;
 		else 
 			return true;
 	}
 	else
 	{
-		if (o1.ix >= o2r || o2.ix > o1r || o1.iy >= o2b || o2.iy > o1b) 
+		if (o1->ix >= o2r || o2->ix > o1r || o1->iy >= o2b || o2->iy > o1b) 
 			return false;
 		else 
 			return true;
@@ -3307,7 +3333,11 @@ void SetGameModeSettingsFromMenu()
 
 void LoadMapObjects()
 {
-	objectblocks.clean();
+	//Make sure we don't have any objects created before we create them from the map settings
+	noncolcontainer.clean();
+	objectcontainer[0].clean();
+	objectcontainer[1].clean();
+	objectcontainer[2].clean();
 
 	//Clear all the previous switch settings
 	for(short iSwitch = 0; iSwitch < 8; iSwitch++)
@@ -3322,43 +3352,43 @@ void LoadMapObjects()
 			if(iType == 0)
 			{
 				g_map.blockdata[x][y] = new B_BreakableBlock(&spr_breakableblock, x * TILESIZE, y * TILESIZE, 4, 10);
-				objectblocks.add(g_map.blockdata[x][y]);
+				noncolcontainer.add(g_map.blockdata[x][y]);
 			}
 			else if(iType == 1)
 			{
 				g_map.blockdata[x][y] = new B_PowerupBlock(&spr_powerupblock, x * TILESIZE, y * TILESIZE, 4, 10, g_map.objectdata[x][y].fHidden, g_map.objectdata[x][y].iSettings);
-				objectblocks.add(g_map.blockdata[x][y]);
+				noncolcontainer.add(g_map.blockdata[x][y]);
 			}
 			else if(iType == 2)
 			{
 				g_map.blockdata[x][y] = new B_DonutBlock(&spr_donutblock, x * TILESIZE, y * TILESIZE);
-				objectblocks.add(g_map.blockdata[x][y]);
+				noncolcontainer.add(g_map.blockdata[x][y]);
 			}
 			else if(iType == 3)
 			{
 				g_map.blockdata[x][y] = new B_FlipBlock(&spr_flipblock, x * TILESIZE, y * TILESIZE, g_map.objectdata[x][y].fHidden);
-				objectblocks.add(g_map.blockdata[x][y]);
+				noncolcontainer.add(g_map.blockdata[x][y]);
 			}
 			else if(iType == 4)
 			{
 				g_map.blockdata[x][y] = new B_BounceBlock(&spr_bounceblock, x * TILESIZE, y * TILESIZE, g_map.objectdata[x][y].fHidden);
-				objectblocks.add(g_map.blockdata[x][y]);
+				noncolcontainer.add(g_map.blockdata[x][y]);
 			}
 			else if(iType == 5)
 			{
 				g_map.blockdata[x][y] = new B_NoteBlock(&spr_noteblock, x * TILESIZE, y * TILESIZE, 4, 10, 1, g_map.objectdata[x][y].fHidden);
-				objectblocks.add(g_map.blockdata[x][y]);
+				noncolcontainer.add(g_map.blockdata[x][y]);
 			}
 			else if(iType == 6)
 			{
 				g_map.blockdata[x][y] = new B_ThrowBlock(&spr_throwblock, x * TILESIZE, y * TILESIZE, 4, 10, 0);
-				objectblocks.add(g_map.blockdata[x][y]);
+				noncolcontainer.add(g_map.blockdata[x][y]);
 			}
 			else if(iType >= 7 && iType <= 10)
 			{
 				short iSwitchType = iType - 7;
 				g_map.blockdata[x][y] = new B_OnOffSwitchBlock(&spr_switchblocks, x * TILESIZE, y * TILESIZE, iSwitchType, g_map.iSwitches[iSwitchType]);
-				objectblocks.add(g_map.blockdata[x][y]);
+				noncolcontainer.add(g_map.blockdata[x][y]);
 				g_map.switchBlocks[iSwitchType].push_back(g_map.blockdata[x][y]);
 			}
 			else if(iType >= 11 && iType <= 14)
@@ -3366,33 +3396,33 @@ void LoadMapObjects()
 				short iSwitchType = iType - 11;
 
 				g_map.blockdata[x][y] = new B_SwitchBlock(&spr_switchblocks, x * TILESIZE, y * TILESIZE, iSwitchType, g_map.iSwitches[iSwitchType]);
-				objectblocks.add(g_map.blockdata[x][y]);
+				noncolcontainer.add(g_map.blockdata[x][y]);
 				g_map.switchBlocks[iSwitchType + 4].push_back(g_map.blockdata[x][y]);
 			}
 			else if(iType == 15)
 			{
 				g_map.blockdata[x][y] = new B_ViewBlock(&spr_viewblock, x * TILESIZE, y * TILESIZE, g_map.objectdata[x][y].fHidden, g_map.objectdata[x][y].iSettings);
-				objectblocks.add(g_map.blockdata[x][y]);
+				noncolcontainer.add(g_map.blockdata[x][y]);
 			}
 			else if(iType == 16)
 			{
 				g_map.blockdata[x][y] = new B_ThrowBlock(&spr_throwblock, x * TILESIZE, y * TILESIZE, 4, 10, 2);
-				objectblocks.add(g_map.blockdata[x][y]);
+				noncolcontainer.add(g_map.blockdata[x][y]);
 			}
 			else if(iType == 17 || iType == 18)
 			{
 				g_map.blockdata[x][y] = new B_NoteBlock(&spr_noteblock, x * TILESIZE, y * TILESIZE, 4, 10, iType == 17 ? 2 : 0, g_map.objectdata[x][y].fHidden);
-				objectblocks.add(g_map.blockdata[x][y]);
+				noncolcontainer.add(g_map.blockdata[x][y]);
 			}
 			else if(iType == 19)
 			{
 				g_map.blockdata[x][y] = new B_ThrowBlock(&spr_throwblock, x * TILESIZE, y * TILESIZE, 4, 10, 1);
-				objectblocks.add(g_map.blockdata[x][y]);
+				noncolcontainer.add(g_map.blockdata[x][y]);
 			}
 			else if(iType >= 20 && iType <= 29)
 			{
 				g_map.blockdata[x][y] = new B_WeaponBreakableBlock(&spr_weaponbreakableblock, x * TILESIZE, y * TILESIZE, iType - 20);
-				objectblocks.add(g_map.blockdata[x][y]);
+				noncolcontainer.add(g_map.blockdata[x][y]);
 			}
 			else
 			{
@@ -3401,7 +3431,7 @@ void LoadMapObjects()
 		}
 	}
 
-	objectsplayer.clean();
+	objectcontainer[1].clean();
 
 	//Add map objects like springs, shoes and spikes
 	for(short i = 0; i < g_map.iNumMapItems; i++)
@@ -3412,11 +3442,11 @@ void LoadMapObjects()
 		short iy = mapItem->iy * TILESIZE;
 
 		if(iType == 0)
-			objectsplayer.add(new CO_Spring(&spr_spring, ix, iy));
+			objectcontainer[1].add(new CO_Spring(&spr_spring, ix, iy));
 		else if(iType == 1)
-			objectsplayer.add(new CO_Spike(&spr_spike, ix, iy));
+			objectcontainer[1].add(new CO_Spike(&spr_spike, ix, iy));
 		else if(iType == 2)
-			objectsplayer.add(new CO_KuriboShoe(&spr_kuriboshoe, ix, iy));
+			objectcontainer[1].add(new CO_KuriboShoe(&spr_kuriboshoe, ix, iy));
 	}
 
 	//Set all the 1x1 gaps up so players can run across them
@@ -3428,7 +3458,7 @@ void LoadMapObjects()
 		if(hazard->itype == 0)
 		{
 			for(short iFireball = 0; iFireball < hazard->iparam[0]; iFireball++)
-				objectsfront.add(new OMO_OrbitHazard(&spr_hazard_fireball, (hazard->ix << 5) + 16, (hazard->iy << 5) + 16, (float)(iFireball * 24), hazard->dparam[0], hazard->dparam[1], 4, 8, 18, 18, 0, 0, 0, hazard->dparam[0] < 0.0f ? 18 : 0, 18, 18));
+				objectcontainer[2].add(new OMO_OrbitHazard(&spr_hazard_fireball, (hazard->ix << 5) + 16, (hazard->iy << 5) + 16, (float)(iFireball * 24), hazard->dparam[0], hazard->dparam[1], 4, 8, 18, 18, 0, 0, 0, hazard->dparam[0] < 0.0f ? 18 : 0, 18, 18));
 		}
 		else if(hazard->itype == 1)
 		{
@@ -3439,28 +3469,28 @@ void LoadMapObjects()
 				if(dAngle > TWO_PI)
 					dAngle -= TWO_PI;
 
-				objectsfront.add(new OMO_OrbitHazard(&spr_hazard_rotodisc, (hazard->ix << 5) + 16, (hazard->iy << 5) + 16, hazard->dparam[2], hazard->dparam[0], dAngle, 3, 8, 32, 32, 0, 0, 0, 0, 32, 32));
+				objectcontainer[2].add(new OMO_OrbitHazard(&spr_hazard_rotodisc, (hazard->ix << 5) + 16, (hazard->iy << 5) + 16, hazard->dparam[2], hazard->dparam[0], dAngle, 3, 8, 32, 32, 0, 0, 0, 0, 32, 32));
 			}
 		}
 		else if(hazard->itype == 2)
 		{
-			objectblocks.add(new IO_BulletBillCannon(hazard->ix << 5, hazard->iy << 5, hazard->iparam[0], hazard->dparam[0]));
+			noncolcontainer.add(new IO_BulletBillCannon(hazard->ix << 5, hazard->iy << 5, hazard->iparam[0], hazard->dparam[0]));
 		}
 		else if(hazard->itype == 3)
 		{
-			objectsfront.add(new IO_FlameCannon(hazard->ix << 5, hazard->iy << 5, hazard->iparam[0], hazard->iparam[1] == 1));
+			objectcontainer[2].add(new IO_FlameCannon(hazard->ix << 5, hazard->iy << 5, hazard->iparam[0], hazard->iparam[1] == 1));
 		}
 	}
 
-	objectcollisionitems.add(new MO_PirhanaPlant(320, 384, 0, 30, 1));
-	objectcollisionitems.add(new MO_PirhanaPlant(352, 384, 1, 30, 1));
-	objectcollisionitems.add(new MO_PirhanaPlant(384, 384, 2, 30, 1));
-	objectcollisionitems.add(new MO_PirhanaPlant(416, 384, 3, 30, 1));
+	objectcontainer[0].add(new MO_PirhanaPlant(320, 384, 0, 30, 1));
+	objectcontainer[0].add(new MO_PirhanaPlant(352, 384, 1, 30, 1));
+	objectcontainer[0].add(new MO_PirhanaPlant(384, 384, 2, 30, 1));
+	objectcontainer[0].add(new MO_PirhanaPlant(416, 384, 3, 30, 1));
 
-	objectcollisionitems.add(new MO_PirhanaPlant(320, 352, 0, 30, 0));
-	objectcollisionitems.add(new MO_PirhanaPlant(352, 352, 1, 30, 0));
-	objectcollisionitems.add(new MO_PirhanaPlant(384, 352, 2, 30, 0));
-	objectcollisionitems.add(new MO_PirhanaPlant(416, 352, 3, 30, 0));
+	objectcontainer[0].add(new MO_PirhanaPlant(320, 352, 0, 30, 0));
+	objectcontainer[0].add(new MO_PirhanaPlant(352, 352, 1, 30, 0));
+	objectcontainer[0].add(new MO_PirhanaPlant(384, 352, 2, 30, 0));
+	objectcontainer[0].add(new MO_PirhanaPlant(416, 352, 3, 30, 0));
 }
 
 bool SwapPlayers(short iUsingPlayerID)
@@ -3548,7 +3578,7 @@ bool SwapPlayers(short iUsingPlayerID)
 	}
 
 	//Clean the dead mystery mushroom
-	objectcollisionitems.cleandeadobjects();	
+	objectcontainer[0].cleandeadobjects();	
 
 	return true;
 }

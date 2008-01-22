@@ -176,7 +176,7 @@ class CPlayer
 		void makeinvincible();
 		void makefrozen(short iTime);
 		void turnslowdownon();
-		bool isstomping(CPlayer &o);
+		bool isstomping(CPlayer * o);
 		void explodeawards();
 		void addswirlingawards();
 		void addrocketawards();
@@ -387,18 +387,18 @@ class CPlayer
 		short iSuicideCreditPlayerID;
 		short iSuicideCreditTimer;
 
-		friend bool coldec_player2player(CPlayer &o1, CPlayer &o2);
-		friend void collisionhandler_p2p(CPlayer &o1, CPlayer &o2);
-		friend void _collisionhandler_p2p_pushback(CPlayer &o1, CPlayer &o2);
+		friend bool coldec_player2player(CPlayer * o1, CPlayer * o2);
+		friend void collisionhandler_p2p(CPlayer * o1, CPlayer * o2);
+		friend void _collisionhandler_p2p_pushback(CPlayer * o1, CPlayer * o2);
 
-		friend void TransferTag(CPlayer &o1, CPlayer &o2);
-		friend void BounceAssistPlayer(CPlayer &o1, CPlayer &o2);
+		friend void TransferTag(CPlayer * o1, CPlayer * o2);
+		friend void BounceAssistPlayer(CPlayer * o1, CPlayer * o2);
 
-		friend bool coldec_player2obj(CPlayer &o1, CObject &o2);
-		friend bool collisionhandler_p2o(CPlayer &o1, CObject &o2);
+		friend bool coldec_player2obj(CPlayer * o1, CObject * o2);
+		friend bool collisionhandler_p2o(CPlayer * o1, CObject * o2);
 
-		friend short PlayerKilledPlayer(short iKiller, CPlayer &killed, short deathstyle, killstyle style, bool fForce);
-		friend short PlayerKilledPlayer(CPlayer &killer, CPlayer &killed, short deathstyle, killstyle style, bool fForce);
+		friend short PlayerKilledPlayer(short iKiller, CPlayer * killed, short deathstyle, killstyle style, bool fForce);
+		friend short PlayerKilledPlayer(CPlayer * killer, CPlayer * killed, short deathstyle, killstyle style, bool fForce);
 
 		friend void AddAwardKill(CPlayer * killer, CPlayer * killed, killstyle style);
 		friend void RemovePlayersButHighestScoring();
@@ -485,13 +485,13 @@ class CPlayer
 
 		friend class OMO_Yoshi;
 		friend class OMO_Thwomp;
-		friend class OMO_Podobo;
+		friend class MO_Podobo;
 		friend class OMO_BowserFire;
 		friend class OMO_Area;
 		friend class OMO_RaceGoal;
-		friend class OMO_Explosion;
-		friend class OMO_SpinAttack;
-		friend class OMO_AttackZone;
+		friend class MO_Explosion;
+		friend class MO_SpinAttack;
+		friend class MO_AttackZone;
 		friend class OMO_OrbitHazard;
 		friend class IO_FlameCannon;
 		friend class MO_PirhanaPlant;
@@ -513,8 +513,8 @@ class CPlayer
 		friend class MO_Goomba;
 		friend class MO_Koopa;
 		friend class MO_SledgeBrother;
-		friend class OMO_CheepCheep;
-		friend class OMO_BulletBill;
+		friend class MO_CheepCheep;
+		friend class MO_BulletBill;
 		friend class OMO_FlagBase;
 
 		friend class MO_BonusHouseChest;
@@ -529,11 +529,11 @@ class CPlayer
 };
 
 
-void collisionhandler_p2p(CPlayer &o1, CPlayer &o2);
-void _collisionhandler_p2p__pushback(CPlayer &o1, CPlayer &o2);
+void collisionhandler_p2p(CPlayer * o1, CPlayer * o2);
+void _collisionhandler_p2p__pushback(CPlayer * o1, CPlayer * o2);
 
-void TransferTag(CPlayer &o1, CPlayer &o2);
-void BounceAssistPlayer(CPlayer &o1, CPlayer &o2);
+void TransferTag(CPlayer * o1, CPlayer * o2);
+void BounceAssistPlayer(CPlayer * o1, CPlayer * o2);
 
 #endif  //_PLAYER_H
 

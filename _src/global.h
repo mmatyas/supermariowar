@@ -280,10 +280,10 @@ extern CScore			*score[4];
 extern short			respawn[4];
 extern short			projectiles[4];
 extern short			score_cnt;
-extern CObjectContainer objectsfront;
-extern CObjectContainer objectsplayer;
-extern CObjectContainer objectcollisionitems;
-extern CObjectContainer objectblocks;
+
+extern CObjectContainer noncolcontainer;
+extern CObjectContainer objectcontainer[3];
+
 extern CEyecandyContainer eyecandyfront;
 extern CEyecandyContainer eyecandyback;
 

@@ -379,7 +379,7 @@ void CPlayer::move()
 				{
 					game_values.screenshaketimer += 10;
 					
-					IO_Block * block = (IO_Block*)objectblocks.getRandomObject();
+					IO_Block * block = (IO_Block*)noncolcontainer.getRandomObject();
 
 					if(block)
 						block->triggerBehavior();
@@ -408,7 +408,7 @@ void CPlayer::move()
 				{
 					game_values.screenshaketimer += 10;
 					
-					IO_Block * block = (IO_Block*)objectblocks.getRandomObject();
+					IO_Block * block = (IO_Block*)noncolcontainer.getRandomObject();
 
 					if(block)
 						block->triggerBehavior();
@@ -494,11 +494,11 @@ void CPlayer::move()
 					ifsoundonplay(sfx_transform); 
 					game_values.redthrowblocks = true;
 
-					for(short iBlock = 0; iBlock < objectblocks.list_end; iBlock++)
+					for(short iBlock = 0; iBlock < noncolcontainer.list_end; iBlock++)
 					{
-						if(((IO_Block*)objectblocks.list[iBlock])->getBlockType() == block_throw)
+						if(((IO_Block*)noncolcontainer.list[iBlock])->getBlockType() == block_throw)
 						{
-							((B_ThrowBlock*)objectblocks.list[iBlock])->SetType(true);
+							((B_ThrowBlock*)noncolcontainer.list[iBlock])->SetType(true);
 						}
 					}
 				}
@@ -525,9 +525,9 @@ void CPlayer::move()
 					ifsoundonplay(sfx_transform); 
 					game_values.viewblocks = true;
 
-					for(short iBlock = 0; iBlock < objectblocks.list_end; iBlock++)
+					for(short iBlock = 0; iBlock < noncolcontainer.list_end; iBlock++)
 					{
-						IO_Block * block = (IO_Block*)objectblocks.list[iBlock];
+						IO_Block * block = (IO_Block*)noncolcontainer.list[iBlock];
 						if(block->getBlockType() == block_powerup)
 						{
 							block->dead = true;
@@ -540,7 +540,7 @@ void CPlayer::move()
 							}
 
 							g_map.blockdata[block->col][block->row] = viewBlock;
-							objectblocks.add(viewBlock);
+							noncolcontainer.add(viewBlock);
 						}
 					}
 				}
@@ -561,7 +561,7 @@ void CPlayer::move()
 			if (secret_spring_index == 9)
 			{
 				ifsoundonplay(sfx_transform); 
-				objectsplayer.add(new CO_Spring(&spr_spring));
+				objectcontainer[1].add(new CO_Spring(&spr_spring));
 			}
 		}
 
@@ -577,7 +577,7 @@ void CPlayer::move()
 			if (secret_spike_index == 6)
 			{
 				ifsoundonplay(sfx_transform); 
-				objectsplayer.add(new CO_Spike(&spr_spike));
+				objectcontainer[1].add(new CO_Spike(&spr_spike));
 			}
 		}
 		*/
@@ -614,7 +614,7 @@ void CPlayer::move()
 			fSuperStomp = false;
 			iSuperStompTimer = 0;
 			
-			objectsplayer.add(new CO_KuriboShoe(&spr_kuriboshoe, ix - PWOFFSET, iy - PHOFFSET - 2));
+			objectcontainer[1].add(new CO_KuriboShoe(&spr_kuriboshoe, ix - PWOFFSET, iy - PHOFFSET - 2));
 			eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
 		}
 	}
@@ -716,8 +716,8 @@ void CPlayer::move()
 		ifsoundonplay(sfx_bobombsound);
 		fSuperStomp = false;
 
-		objectsplayer.add(new OMO_AttackZone(globalID, teamID, ix - 32, iy, 32, PH, 8, kill_style_kuriboshoe, false));
-		objectsplayer.add(new OMO_AttackZone(globalID, teamID, ix + PW, iy, 32, PH, 8, kill_style_kuriboshoe, false));
+		objectcontainer[1].add(new MO_AttackZone(globalID, teamID, ix - 32, iy, 32, PH, 8, kill_style_kuriboshoe, false));
+		objectcontainer[1].add(new MO_AttackZone(globalID, teamID, ix + PW, iy, 32, PH, 8, kill_style_kuriboshoe, false));
 	}
 
 	if(hammertimer > 0)
@@ -967,28 +967,28 @@ void CPlayer::move()
 				case 12:
 				{
 					CO_Shell * shell = new CO_Shell(0, 0, 0, true, true, true, false); 
-					objectsplayer.add(shell);
+					objectcontainer[1].add(shell);
 					shell->UsedAsStoredPowerup(this);
 					break;
 				}
 				case 13:
 				{
 					CO_Shell * shell = new CO_Shell(1, 0, 0, false, true, true, false);
-					objectsplayer.add(shell);
+					objectcontainer[1].add(shell);
 					shell->UsedAsStoredPowerup(this);
 					break;
 				}
 				case 14:
 				{
 					CO_Shell * shell = new CO_Shell(2, 0, 0, false, false, true, true); 
-					objectsplayer.add(shell);
+					objectcontainer[1].add(shell);
 					shell->UsedAsStoredPowerup(this);
 					break;
 				}
 				case 15:
 				{
 					CO_Shell * shell = new CO_Shell(3, 0, 0, false, true, false, false); 
-					objectsplayer.add(shell);
+					objectcontainer[1].add(shell);
 					shell->UsedAsStoredPowerup(this);
 					break;
 				}
@@ -1037,7 +1037,7 @@ void CPlayer::move()
 					short numPodobos = rand() % 6 + 10;
 					for(short iPodobo = 0; iPodobo < numPodobos; iPodobo++)
 					{
-						objectsfront.add(new OMO_Podobo(&spr_podobo, (short)(rand() % 608), -(float(rand() % 9) / 2.0f) - 9.0f, globalID, teamID, colorID));
+						objectcontainer[2].add(new MO_Podobo(&spr_podobo, (short)(rand() % 608), -(float(rand() % 9) / 2.0f) - 9.0f, globalID, teamID, colorID));
 					}
 					ifsoundonplay(sfx_thunder);
 					break;
@@ -1359,7 +1359,7 @@ void CPlayer::move()
 					if(bobomb) //If we're a bob-omb, explode
 					{
 						bobomb = false;
-						objectsfront.add(new OMO_Explosion(&spr_explosion, ix + HALFPW - 96, iy + HALFPH - 64, 2, 4, globalID, teamID, kill_style_bobomb));
+						objectcontainer[2].add(new MO_Explosion(&spr_explosion, ix + HALFPW - 96, iy + HALFPH - 64, 2, 4, globalID, teamID, kill_style_bobomb));
 						ifsoundonplay(sfx_bobombsound);
 					}
 					else
@@ -1370,17 +1370,17 @@ void CPlayer::move()
 							{
 								if(shoot_left_fireball)
 								{
-									objectsfront.add(new MO_SuperFireball(&spr_superfireball, ix + HALFPW - 30, iy + HALFPH - 16, 4, -6.0f, 0.0f, 4, globalID, teamID, colorID));
+									objectcontainer[2].add(new MO_SuperFireball(&spr_superfireball, ix + HALFPW - 30, iy + HALFPH - 16, 4, -6.0f, 0.0f, 4, globalID, teamID, colorID));
 									ifsoundonplay(sfx_spit); 
 								}
 								else if(shoot_right_fireball)
 								{
-									objectsfront.add(new MO_SuperFireball(&spr_superfireball, ix + HALFPW - 2, iy + HALFPH - 16, 4, 6.0f, 0.0f, 4, globalID, teamID, colorID));
+									objectcontainer[2].add(new MO_SuperFireball(&spr_superfireball, ix + HALFPW - 2, iy + HALFPH - 16, 4, 6.0f, 0.0f, 4, globalID, teamID, colorID));
 									ifsoundonplay(sfx_spit); 
 								}
 								else
 								{
-									objectcollisionitems.add(new MO_Fireball(&spr_fireball, ix + 6, iy, 4, IsPlayerFacingRight(), 5, globalID, teamID, colorID));
+									objectcontainer[0].add(new MO_Fireball(&spr_fireball, ix + 6, iy, 4, IsPlayerFacingRight(), 5, globalID, teamID, colorID));
 									ifsoundonplay(sfx_fireball);
 								}
 
@@ -1400,17 +1400,17 @@ void CPlayer::move()
 								{
 									shoot_left_super_hammer = false;
 									shoot_right_super_hammer = false;
-									objectsfront.add(new MO_Hammer(&spr_hammer, ix + 6, iy, 6, (IsPlayerFacingRight() ? 5.0f : -5.0f), -1.0f, 5, globalID, teamID, colorID, true));
-									objectsfront.add(new MO_Hammer(&spr_hammer, ix + 6, iy, 6, (IsPlayerFacingRight() ? 5.0f : -5.0f), 0.0f, 5, globalID, teamID, colorID, true));
-									objectsfront.add(new MO_Hammer(&spr_hammer, ix + 6, iy, 6, (IsPlayerFacingRight() ? 5.0f : -5.0f), 1.0f, 5, globalID, teamID, colorID, true));
+									objectcontainer[2].add(new MO_Hammer(&spr_hammer, ix + 6, iy, 6, (IsPlayerFacingRight() ? 5.0f : -5.0f), -1.0f, 5, globalID, teamID, colorID, true));
+									objectcontainer[2].add(new MO_Hammer(&spr_hammer, ix + 6, iy, 6, (IsPlayerFacingRight() ? 5.0f : -5.0f), 0.0f, 5, globalID, teamID, colorID, true));
+									objectcontainer[2].add(new MO_Hammer(&spr_hammer, ix + 6, iy, 6, (IsPlayerFacingRight() ? 5.0f : -5.0f), 1.0f, 5, globalID, teamID, colorID, true));
 									projectiles[globalID] += 3;
 								}
 								else
 								{
 									if(IsPlayerFacingRight())
-										objectsfront.add(new MO_Hammer(&spr_hammer, ix + 8, iy, 6, velx + 2.0f, -HAMMERTHROW, 5, globalID, teamID, colorID, false));
+										objectcontainer[2].add(new MO_Hammer(&spr_hammer, ix + 8, iy, 6, velx + 2.0f, -HAMMERTHROW, 5, globalID, teamID, colorID, false));
 									else
-										objectsfront.add(new MO_Hammer(&spr_hammer, ix - 14, iy, 6, velx - 2.0f, -HAMMERTHROW, 5, globalID, teamID, colorID, false));
+										objectcontainer[2].add(new MO_Hammer(&spr_hammer, ix - 14, iy, 6, velx - 2.0f, -HAMMERTHROW, 5, globalID, teamID, colorID, false));
 
 									projectiles[globalID]++;
 								}
@@ -1438,7 +1438,7 @@ void CPlayer::move()
 						{
 							if(game_values.boomeranglimit == 0 || projectilelimit > 0)
 							{
-								objectsfront.add(new MO_Boomerang(&spr_boomerang, ix, iy + HALFPH - 16, 4, IsPlayerFacingRight(), 5, globalID, teamID, colorID, shoot_super_boomerang));
+								objectcontainer[2].add(new MO_Boomerang(&spr_boomerang, ix, iy + HALFPH - 16, 4, IsPlayerFacingRight(), 5, globalID, teamID, colorID, shoot_super_boomerang));
 								projectiles[globalID]++;
 
 								if(shoot_super_boomerang)
@@ -1457,9 +1457,9 @@ void CPlayer::move()
 							if(game_values.hammerlimit == 0 || projectilelimit > 0)
 							{
 								if(IsPlayerFacingRight())
-									objectsfront.add(new MO_SledgeHammer(&spr_sledgehammer, ix + 8, iy, 8, velx + 2.0f, -HAMMERTHROW, 5, globalID, teamID, colorID, shoot_super_sledge_hammer));
+									objectcontainer[2].add(new MO_SledgeHammer(&spr_sledgehammer, ix + 8, iy, 8, velx + 2.0f, -HAMMERTHROW, 5, globalID, teamID, colorID, shoot_super_sledge_hammer));
 								else
-									objectsfront.add(new MO_SledgeHammer(&spr_sledgehammer, ix - 18, iy, 8, velx - 2.0f, -HAMMERTHROW, 5, globalID, teamID, colorID, shoot_super_sledge_hammer));
+									objectcontainer[2].add(new MO_SledgeHammer(&spr_sledgehammer, ix - 18, iy, 8, velx - 2.0f, -HAMMERTHROW, 5, globalID, teamID, colorID, shoot_super_sledge_hammer));
 
 								shoot_super_sledge_hammer = false;
 
@@ -1484,7 +1484,7 @@ void CPlayer::move()
 								bomb->MoveToOwner();
 							}
 
-							objectsfront.add(bomb);
+							objectcontainer[2].add(bomb);
 							projectiles[globalID]++;
 							
 							ifsoundonplay(sfx_fireball);
@@ -2074,7 +2074,7 @@ void CPlayer::die(short deathStyle, bool fTeamRemoved)
 		CO_KuriboShoe * shoe = new CO_KuriboShoe(&spr_kuriboshoe, ix - PWOFFSET, iy - PHOFFSET);
 		shoe->collision_detection_checksides();
 
-		objectsplayer.add(shoe);
+		objectcontainer[1].add(shoe);
 	}
 
 	if(!fTeamRemoved)
@@ -2315,16 +2315,16 @@ bool CPlayer::bouncejump()
 
 
 
-bool CPlayer::isstomping(CPlayer &o)
+bool CPlayer::isstomping(CPlayer * o)
 {
-	//printf("ID: %d  Stomp old: %d <= %d  new: %d >= %d  vely: %.2f\n", globalID, oldy + PH, o.oldy, iy + PH, o.iy, vely);
+	//printf("ID: %d  Stomp old: %d <= %d  new: %d >= %d  vely: %.2f\n", globalID, oldy + PH, o->oldy, iy + PH, o->iy, vely);
 
-	if(fOldY + PH <= o.fOldY && iy + PH >= o.iy)
+	if(fOldY + PH <= o->fOldY && iy + PH >= o->iy)
 	{
 		//don't reposition if player is warping when he kills the other player
 		if(state == player_ready)
 		{
-			yi(o.iy - PH);		//set new position to top of other player
+			yi(o->iy - PH);		//set new position to top of other player
 			collision_detection_checktop();
 			platform = NULL;
 		}
@@ -2349,13 +2349,13 @@ bool CPlayer::isstomping(CPlayer &o)
 			else if(extrajumps > 0)
 				style = kill_style_feather;
 
-			PlayerKilledPlayer(*this, o, death_style_squish, style, false);
+			PlayerKilledPlayer(this, o, death_style_squish, style, false);
 		}
 		else
 		{
-			TransferTag(o, *this);
+			TransferTag(o, this);
 
-			iSuicideCreditPlayerID = o.globalID;
+			iSuicideCreditPlayerID = o->globalID;
 			iSuicideCreditTimer = 20;
 		}
 
@@ -2455,22 +2455,22 @@ void CPlayer::AddKillsInRowInAirAward()
 	}
 }
 
-short PlayerKilledPlayer(short iKiller, CPlayer &killed, short deathstyle, killstyle style, bool fForce)
+short PlayerKilledPlayer(short iKiller, CPlayer * killed, short deathstyle, killstyle style, bool fForce)
 {
 	CPlayer * killer = GetPlayerFromGlobalID(iKiller);
 
-	if(killer && killer->globalID != killed.globalID)
+	if(killer && killer->globalID != killed->globalID)
 	{
-		return PlayerKilledPlayer(*killer, killed, deathstyle, style, fForce);
+		return PlayerKilledPlayer(killer, killed, deathstyle, style, fForce);
 	}
 	else
 	{
-		killed.DeathAwards();
+		killed->DeathAwards();
 		
-		short iKillType = game_values.gamemode->playerkilledself(killed, style);
+		short iKillType = game_values.gamemode->playerkilledself(*killed, style);
 
 		if(player_kill_normal == iKillType || (fForce && player_kill_nonkill == iKillType))
-			killed.die(death_style_jump, false);
+			killed->die(death_style_jump, false);
 
 		if(player_kill_nonkill != iKillType)
 			ifsoundonplay(sfx_deathsound);
@@ -2479,34 +2479,34 @@ short PlayerKilledPlayer(short iKiller, CPlayer &killed, short deathstyle, kills
 	}
 }
 
-short PlayerKilledPlayer(CPlayer &killer, CPlayer &killed, short deathstyle, killstyle style, bool fForce)
+short PlayerKilledPlayer(CPlayer * killer, CPlayer * killed, short deathstyle, killstyle style, bool fForce)
 {
 	//If this player is already dead, then don't kill him again
-	if(killed.state != player_ready)
+	if(killed->state != player_ready)
 		return player_kill_none;
 	
 	bool fSoundPlayed = false;
-	if(game_values.gamemode->chicken == &killer && style != kill_style_pow)
+	if(game_values.gamemode->chicken == killer && style != kill_style_pow)
 	{
 		ifsoundonplay(sfx_chicken);
 		fSoundPlayed = true;
 	}
 
-	if(killer.teamID != killed.teamID)
-		AddAwardKill(&killer, &killed, style);
+	if(killer->teamID != killed->teamID)
+		AddAwardKill(killer, killed, style);
 
 	if(game_values.awardstyle != award_style_none)
-		killed.DeathAwards();
+		killed->DeathAwards();
 	
 	//now kill the player (don't call this function earlier because we need the old position, etc.	
-	short iKillType = game_values.gamemode->playerkilledplayer(killer, killed, style);
+	short iKillType = game_values.gamemode->playerkilledplayer(*killer, *killed, style);
 	
 	if(player_kill_nonkill != iKillType || fForce)
 	{
-		if(killed.bobomb)
+		if(killed->bobomb)
 		{
-			killed.diedas = 2;
-			killer.SetPowerup(0);
+			killed->diedas = 2;
+			killer->SetPowerup(0);
 		}
 
 		if(deathstyle == death_style_jump)
@@ -2518,7 +2518,7 @@ short PlayerKilledPlayer(CPlayer &killer, CPlayer &killed, short deathstyle, kil
 	}
 
 	if(player_kill_normal == iKillType || (fForce && player_kill_nonkill == iKillType))
-		killed.die(deathstyle, false);
+		killed->die(deathstyle, false);
 
 	return iKillType;
 }
@@ -2632,25 +2632,25 @@ void AddAwardKill(CPlayer * killer, CPlayer * killed, killstyle style)
 //and it belongs to the context p2p collision detection + response (CPlayer->isstomping, collisionhandler, ...)
 
 //handles a collision between two players (is being called if o1, o2 collide)
-void collisionhandler_p2p(CPlayer &o1, CPlayer &o2)
+void collisionhandler_p2p(CPlayer * o1, CPlayer * o2)
 {
 	//If teams tag each other
-	if(o1.teamID == o2.teamID)
+	if(o1->teamID == o2->teamID)
 	{
 		if(game_values.gamemode->gamemode == game_mode_jail && game_values.gamemodesettings.jail.tagfree)
 		{
-			if(o1.jailtimer > 0)
+			if(o1->jailtimer > 0)
 			{
-				eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, o1.ix + HALFPW - 16, o1.iy + HALFPH - 16, 3, 8));
+				eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, o1->ix + HALFPW - 16, o1->iy + HALFPH - 16, 3, 8));
 				ifsoundonplay(sfx_transform);
-				o1.jailtimer = 0;
+				o1->jailtimer = 0;
 			}
 
-			if(o2.jailtimer > 0)
+			if(o2->jailtimer > 0)
 			{
-				eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, o2.ix + HALFPW - 16, o2.iy + HALFPH - 16, 3, 8));
+				eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, o2->ix + HALFPW - 16, o2->iy + HALFPH - 16, 3, 8));
 				ifsoundonplay(sfx_transform);
-				o2.jailtimer = 0;
+				o2->jailtimer = 0;
 			}
 		}
 
@@ -2668,18 +2668,18 @@ void collisionhandler_p2p(CPlayer &o1, CPlayer &o2)
 			BounceAssistPlayer(o2, o1);
 
 			//Allow players on team to swap stored items
-			if(o1.playerKeys->game_powerup.fPressed || o2.playerKeys->game_powerup.fPressed)
+			if(o1->playerKeys->game_powerup.fPressed || o2->playerKeys->game_powerup.fPressed)
 			{
-				short iTempPowerup = game_values.gamepowerups[o1.globalID];
-				game_values.gamepowerups[o1.globalID] = game_values.gamepowerups[o2.globalID];
-				game_values.gamepowerups[o2.globalID] = iTempPowerup;
+				short iTempPowerup = game_values.gamepowerups[o1->globalID];
+				game_values.gamepowerups[o1->globalID] = game_values.gamepowerups[o2->globalID];
+				game_values.gamepowerups[o2->globalID] = iTempPowerup;
 
 				ifsoundonplay(sfx_storepowerup);
 
-				o1.playerKeys->game_powerup.fPressed = false;
-				o1.playerKeys->game_powerup.fDown = false;
-				o2.playerKeys->game_powerup.fPressed = false;
-				o2.playerKeys->game_powerup.fDown = false;
+				o1->playerKeys->game_powerup.fPressed = false;
+				o1->playerKeys->game_powerup.fDown = false;
+				o2->playerKeys->game_powerup.fPressed = false;
+				o2->playerKeys->game_powerup.fDown = false;
 			}
 
 			return;
@@ -2687,20 +2687,20 @@ void collisionhandler_p2p(CPlayer &o1, CPlayer &o2)
 	}
 
 	//--- 1. Is player frozen? ---
-	if(o1.frozen && o2.frozen)
+	if(o1->frozen && o2->frozen)
 	{
 		PlayerKilledPlayer(o1, o2, death_style_shatter, kill_style_frozen, true);
 		PlayerKilledPlayer(o2, o1, death_style_shatter, kill_style_frozen, true);
 		return;
 	}
 
-	if(o1.frozen)
+	if(o1->frozen)
 	{
 		PlayerKilledPlayer(o2, o1, death_style_shatter, kill_style_frozen, true);
 		return;
 	}
 
-	if(o2.frozen)
+	if(o2->frozen)
 	{
 		PlayerKilledPlayer(o1, o2, death_style_shatter, kill_style_frozen, true);
 		return;
@@ -2708,49 +2708,49 @@ void collisionhandler_p2p(CPlayer &o1, CPlayer &o2)
 	}
 
 	//--- 2. is player invincible? ---
-	if(o1.invincible && !o2.invincible && !o2.spawninvincible)
+	if(o1->invincible && !o2->invincible && !o2->spawninvincible)
 	{
 		PlayerKilledPlayer(o1, o2, death_style_jump, kill_style_star, false);
 		return;
 	}
 	
-	if(!o1.invincible && !o1.spawninvincible && o2.invincible)
+	if(!o1->invincible && !o1->spawninvincible && o2->invincible)
 	{
 		PlayerKilledPlayer(o2, o1, death_style_jump, kill_style_star, false);
 		return;
 	}
 	
 	//If neither can touch each other, then return
-	if((o1.invincible && o2.invincible) || (o1.spawninvincible && o2.spawninvincible) ||
-		(o1.iswarping() && o2.iswarping()))
+	if((o1->invincible && o2->invincible) || (o1->spawninvincible && o2->spawninvincible) ||
+		(o1->iswarping() && o2->iswarping()))
 		return;
 
 	//--- 3. stomping other player? ---
-	if(!o2.spawninvincible && !o2.invincible && o1.isstomping(o2))
+	if(!o2->spawninvincible && !o2->invincible && o1->isstomping(o2))
 		return;
-	if(!o1.spawninvincible && !o1.invincible && o2.isstomping(o1))
+	if(!o1->spawninvincible && !o1->invincible && o2->isstomping(o1))
 		return;
 	
 	//If either is shielded return because there is no pushback collision detection
-	if((o1.spawninvincible && (game_values.gamemode->tagged != &o1 || !game_values.gamemodesettings.tag.tagontouch)) || 
-		(o2.spawninvincible && (game_values.gamemode->tagged != &o2 || !game_values.gamemodesettings.tag.tagontouch)))
+	if((o1->spawninvincible && (game_values.gamemode->tagged != o1 || !game_values.gamemodesettings.tag.tagontouch)) || 
+		(o2->spawninvincible && (game_values.gamemode->tagged != o2 || !game_values.gamemodesettings.tag.tagontouch)))
 		return;
 
 	//--- 4. push back (horizontal) ---
-	if(o1.ix < o2.ix)				//o1 is left -> o1 pushback left, o2 pushback right
+	if(o1->ix < o2->ix)				//o1 is left -> o1 pushback left, o2 pushback right
 		_collisionhandler_p2p_pushback(o1, o2);
 	else
 		_collisionhandler_p2p_pushback(o2, o1);
 }
 
 //handles a collision between a player and an object
-bool collisionhandler_p2o(CPlayer &o1, CObject &o2)
+bool collisionhandler_p2o(CPlayer * o1, CObject * o2)
 {
-	return o2.collide(&o1);
+	return o2->collide(o1);
 }
 
 //calculates the new positions for both players when they are pushing each other
-void _collisionhandler_p2p_pushback(CPlayer &o1, CPlayer &o2)
+void _collisionhandler_p2p_pushback(CPlayer * o1, CPlayer * o2)
 {
 	//o1 is left to o2
 	//  |o1||o2|
@@ -2761,56 +2761,56 @@ void _collisionhandler_p2p_pushback(CPlayer &o1, CPlayer &o2)
 		TransferTag(o1, o2);
 
 	bool overlapcollision = false;
-	if(o1.ix + PW < 320 && o2.ix > 320)
+	if(o1->ix + PW < 320 && o2->ix > 320)
 		overlapcollision = true;
 
-	if((o1.velx == 0 && o2.iswarping() && o2.velx != 0) || o1.iswarping())
+	if((o1->velx == 0 && o2->iswarping() && o2->velx != 0) || o1->iswarping())
 	{
 		if(overlapcollision)
 		{//o2 reposition to the right side of o1, o1 stays
-			o2.xi(o1.ix - PW + 639);
-			o2.collision_detection_checkleft();
+			o2->xi(o1->ix - PW + 639);
+			o2->collision_detection_checkleft();
 		}
 		else
 		{
-			o2.xi(o1.ix + PW + 1);
-			o2.collision_detection_checkright();
+			o2->xi(o1->ix + PW + 1);
+			o2->collision_detection_checkright();
 		}
 	}
-	else if((o2.velx == 0 && o1.iswarping() && o1.velx != 0) || o2.iswarping())
+	else if((o2->velx == 0 && o1->iswarping() && o1->velx != 0) || o2->iswarping())
 	{
 		if(overlapcollision)
 		{//o1 reposition to the left side of o2, o2 stays
-			o1.xi(o2.ix + PW - 639);	
-			o1.collision_detection_checkright();
+			o1->xi(o2->ix + PW - 639);	
+			o1->collision_detection_checkright();
 		}
 		else
 		{
-			o1.xi(o2.ix - PW - 1);	
-			o1.collision_detection_checkleft();
+			o1->xi(o2->ix - PW - 1);	
+			o1->collision_detection_checkleft();
 		}
 	}
-	else if(!o1.iswarping() && !o2.iswarping())
+	else if(!o1->iswarping() && !o2->iswarping())
 	{	//both objects moving - calculate middle and set both objects
 		
 		if(overlapcollision)
 		{
-			short middle = o2.ix - 640 + ((o1.ix + PW) - o2.ix - 640) / 2;		//no ABS needed (o1.x < o2.x -> o1.x+w > o2.x !)
-			o1.xi(middle + 1);	//o1 is left
-			o2.xi(middle - PW + 639);		//o2 is right
+			short middle = o2->ix - 640 + ((o1->ix + PW) - o2->ix - 640) / 2;		//no ABS needed (o1->x < o2->x -> o1->x+w > o2->x !)
+			o1->xi(middle + 1);	//o1 is left
+			o2->xi(middle - PW + 639);		//o2 is right
 
-			o1.collision_detection_checkright();
-			o2.collision_detection_checkleft();
+			o1->collision_detection_checkright();
+			o2->collision_detection_checkleft();
 		}
 		else
 		{
-			short middle = o2.ix + ((o1.ix + PW) - o2.ix) / 2;		//no ABS needed (o1.x < o2.x -> o1.x+w > o2.x !)
-			//printf("hlf:%f, o1x:%f, o2x:%f\n", hlf, o1.x, o2.x);
-			o1.xi(middle - PW - 1);	//o1 is left
-			o2.xi(middle + 1);		//o2 is right
+			short middle = o2->ix + ((o1->ix + PW) - o2->ix) / 2;		//no ABS needed (o1->x < o2->x -> o1->x+w > o2->x !)
+			//printf("hlf:%f, o1x:%f, o2x:%f\n", hlf, o1->x, o2->x);
+			o1->xi(middle - PW - 1);	//o1 is left
+			o2->xi(middle + 1);		//o2 is right
 
-			o1.collision_detection_checkleft();
-			o2.collision_detection_checkright();
+			o1->collision_detection_checkleft();
+			o2->collision_detection_checkright();
 		}
 	}
 
@@ -2820,12 +2820,12 @@ void _collisionhandler_p2p_pushback(CPlayer &o1, CPlayer &o2)
 	float dPlayer1Pushback = 1.5f;
 	float dPlayer2Pushback = 1.5f;
 
-	if(o1.fKuriboShoe && !o2.fKuriboShoe)
+	if(o1->fKuriboShoe && !o2->fKuriboShoe)
 	{
 		dPlayer1Pushback = 0.5f;
 		dPlayer2Pushback = 2.5f;
 	}
-	else if(!o1.fKuriboShoe && o2.fKuriboShoe)
+	else if(!o1->fKuriboShoe && o2->fKuriboShoe)
 	{
 		dPlayer1Pushback = 2.5f;
 		dPlayer2Pushback = 0.5f;
@@ -2833,66 +2833,66 @@ void _collisionhandler_p2p_pushback(CPlayer &o1, CPlayer &o2)
 
 	if(overlapcollision)
 	{
-		absv1 = ( o1.velx < 0 ? o1.velx : -1.0f ) * dPlayer2Pushback;	//o1 is on the left side (only positive velx counts)
-		absv2 = ( o2.velx > 0 ? o2.velx : 1.0f ) * dPlayer1Pushback;	//o2 right (only negative velx counts)
+		absv1 = ( o1->velx < 0 ? o1->velx : -1.0f ) * dPlayer2Pushback;	//o1 is on the left side (only positive velx counts)
+		absv2 = ( o2->velx > 0 ? o2->velx : 1.0f ) * dPlayer1Pushback;	//o2 right (only negative velx counts)
 	}
 	else
 	{
-		absv1 = ( o1.velx > 0 ? o1.velx : 1.0f ) * dPlayer2Pushback;	//o1 is on the left side (only positive velx counts)
-		absv2 = ( o2.velx < 0 ? o2.velx : -1.0f ) * dPlayer1Pushback;	//o2 right (only negative velx counts)
+		absv1 = ( o1->velx > 0 ? o1->velx : 1.0f ) * dPlayer2Pushback;	//o1 is on the left side (only positive velx counts)
+		absv2 = ( o2->velx < 0 ? o2->velx : -1.0f ) * dPlayer1Pushback;	//o2 right (only negative velx counts)
 	}
 
-	if(o1.state == player_ready)
+	if(o1->state == player_ready)
 	{
-		o1.velx = CapSideVelocity(absv2);
-		o1.iSuicideCreditPlayerID = o2.globalID;
-		o1.iSuicideCreditTimer = 62;
+		o1->velx = CapSideVelocity(absv2);
+		o1->iSuicideCreditPlayerID = o2->globalID;
+		o1->iSuicideCreditTimer = 62;
 	}
 	
-	if(o2.state == player_ready)
+	if(o2->state == player_ready)
 	{
-		o2.velx = CapSideVelocity(absv1);
-		o2.iSuicideCreditPlayerID = o1.globalID;
-		o2.iSuicideCreditTimer = 62;
+		o2->velx = CapSideVelocity(absv1);
+		o2->iSuicideCreditPlayerID = o1->globalID;
+		o2->iSuicideCreditTimer = 62;
 	}
 }
 
-void TransferTag(CPlayer &o1, CPlayer &o2)
+void TransferTag(CPlayer * o1, CPlayer * o2)
 {
 	if(game_values.gamemode->gamemode != game_mode_tag)
 		return;
 
-	if(game_values.gamemode->tagged == &o1 && o1.isready() && o2.isready() && !o2.spawninvincible)
+	if(game_values.gamemode->tagged == o1 && o1->isready() && o2->isready() && !o2->spawninvincible)
 	{
-		game_values.gamemode->tagged = &o2;
-		o1.spawninvincible = true;
-		o1.spawninvincibletimer = 60;
+		game_values.gamemode->tagged = o2;
+		o1->spawninvincible = true;
+		o1->spawninvincibletimer = 60;
 		eyecandyfront.add(new EC_GravText(&game_font_large, game_values.gamemode->tagged->ix + HALFPW, game_values.gamemode->tagged->iy + PH, "Tagged!", -VELJUMP*1.5));
 		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, game_values.gamemode->tagged->ix + HALFPW - 16, game_values.gamemode->tagged->iy + HALFPH - 16, 3, 8));
 		ifsoundonplay(sfx_transform);
 	}
-	else if(game_values.gamemode->tagged == &o2 && o1.isready() && o2.isready() && !o1.spawninvincible)
+	else if(game_values.gamemode->tagged == o2 && o1->isready() && o2->isready() && !o1->spawninvincible)
 	{
-		game_values.gamemode->tagged = &o1;
-		o2.spawninvincible = true;
-		o2.spawninvincibletimer = 60;
+		game_values.gamemode->tagged = o1;
+		o2->spawninvincible = true;
+		o2->spawninvincibletimer = 60;
 		eyecandyfront.add(new EC_GravText(&game_font_large, game_values.gamemode->tagged->ix + HALFPW, game_values.gamemode->tagged->iy + PH, "Tagged!", -VELJUMP*1.5));
 		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, game_values.gamemode->tagged->ix + HALFPW - 16, game_values.gamemode->tagged->iy + HALFPH - 16, 3, 8));
 		ifsoundonplay(sfx_transform);
 	}
 }
 
-void BounceAssistPlayer(CPlayer &o1, CPlayer &o2)
+void BounceAssistPlayer(CPlayer * o1, CPlayer * o2)
 {
-	if(o1.state == player_ready && o1.fOldY + PH <= o2.fOldY && o1.iy + PH >= o2.iy && o1.playerKeys->game_jump.fDown)
+	if(o1->state == player_ready && o1->fOldY + PH <= o2->fOldY && o1->iy + PH >= o2->iy && o1->playerKeys->game_jump.fDown)
 	{
-		o1.yi(o2.iy - PH);		//set new position to top of other player
-		o1.collision_detection_checktop();
-		o1.platform = NULL;
-		o1.vely = -VELSUPERJUMP;
+		o1->yi(o2->iy - PH);		//set new position to top of other player
+		o1->collision_detection_checktop();
+		o1->platform = NULL;
+		o1->vely = -VELSUPERJUMP;
 		
-		o1.fSuperStomp = false;
-		o1.iSuperStompTimer = 0;
+		o1->fSuperStomp = false;
+		o1->iSuperStompTimer = 0;
 
 		ifsoundonplay(sfx_superspring);
 	}
@@ -3065,7 +3065,7 @@ void CPlayer::SpinCape()
 
 	SpinPlayer();
 
-	objectsplayer.add(new OMO_SpinAttack(globalID, teamID,  kill_style_feather, IsPlayerFacingRight(), 24));
+	objectcontainer[1].add(new MO_SpinAttack(globalID, teamID,  kill_style_feather, IsPlayerFacingRight(), 24));
 }
 
 void CPlayer::DrawCape()
@@ -3162,7 +3162,7 @@ void CPlayer::SpinTail()
 
 	SpinPlayer();
 
-	objectsplayer.add(new OMO_SpinAttack(globalID, teamID, kill_style_leaf, IsPlayerFacingRight(), 13));
+	objectcontainer[1].add(new MO_SpinAttack(globalID, teamID, kill_style_leaf, IsPlayerFacingRight(), 13));
 }
 
 void CPlayer::DrawTail()
@@ -3899,7 +3899,7 @@ short CPlayer::KillPlayerMapHazard(bool fForce, killstyle style)
 {
 	if(iSuicideCreditPlayerID >= 0)
 	{
-		return PlayerKilledPlayer(iSuicideCreditPlayerID, *this, death_style_jump, style, fForce);
+		return PlayerKilledPlayer(iSuicideCreditPlayerID, this, death_style_jump, style, fForce);
 	}
 	else
 	{

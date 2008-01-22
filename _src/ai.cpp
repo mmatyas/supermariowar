@@ -713,15 +713,15 @@ void CPlayerAI::GetNearestObjects()
 	bool fInvincible = pPlayer->invincible || pPlayer->spawninvincible;
 	short iTeamID = pPlayer->teamID;
 
-	for(short i = 0; i < objectsplayer.list_end; i++)
+	for(short i = 0; i < objectcontainer[1].list_end; i++)
 	{
-		ObjectType type = objectsplayer.list[i]->getObjectType();
+		ObjectType type = objectcontainer[1].list[i]->getObjectType();
 
 		switch (type)
 		{
 			case object_moving:
 			{
-				IO_MovingObject * movingobject = (IO_MovingObject*)objectsplayer.list[i];
+				IO_MovingObject * movingobject = (IO_MovingObject*)objectcontainer[1].list[i];
 				MovingObjectType movingtype = movingobject->getMovingObjectType();
 				
 				if(movingobject_shell == movingtype)
@@ -736,7 +736,7 @@ void CPlayerAI::GetNearestObjects()
 						if(fInvincible)
 							continue;
 	
-						DistanceToObject(objectsplayer.list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
+						DistanceToObject(objectcontainer[1].list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
 					}
 					else if(carriedItem)
 					{
@@ -744,7 +744,7 @@ void CPlayerAI::GetNearestObjects()
 					}
 					else
 					{
-						DistanceToObject(objectsplayer.list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
+						DistanceToObject(objectcontainer[1].list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
 					}
 				}
 				else if(movingobject_throwblock == movingtype)
@@ -755,19 +755,19 @@ void CPlayerAI::GetNearestObjects()
 					if(fInvincible)
 						continue;
 	
-					DistanceToObject(objectsplayer.list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
+					DistanceToObject(objectcontainer[1].list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
 				}
 				break;
 			}
 			case object_frenzycard:
 			{
-				DistanceToObject(objectsplayer.list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
+				DistanceToObject(objectcontainer[1].list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
 				break;
 			}
 
 			case object_flag:
 			{
-				CO_Flag * flag = (CO_Flag*)objectsplayer.list[i];
+				CO_Flag * flag = (CO_Flag*)objectcontainer[1].list[i];
 				
 				if(flag->GetInBase() && flag->GetTeamID() == iTeamID)
 					continue;
@@ -775,7 +775,7 @@ void CPlayerAI::GetNearestObjects()
 				if(carriedItem && carriedItem->getObjectType() == object_flag)
 					continue;
 
-				DistanceToObject(objectsplayer.list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);			
+				DistanceToObject(objectcontainer[1].list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);			
 				break;
 			}
 
@@ -784,7 +784,7 @@ void CPlayerAI::GetNearestObjects()
 				if(!carriedItem || carriedItem->getObjectType() != object_egg)
 					continue;
 
-				DistanceToObject(objectsplayer.list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
+				DistanceToObject(objectcontainer[1].list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
 				break;
 			}
 
@@ -793,13 +793,13 @@ void CPlayerAI::GetNearestObjects()
 				if(carriedItem && carriedItem->getObjectType() == object_egg)
 					continue;
 
-				DistanceToObject(objectsplayer.list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
+				DistanceToObject(objectcontainer[1].list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
 				break;
 			}
 
 			case object_coin:
 			{
-				DistanceToObject(objectsplayer.list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
+				DistanceToObject(objectcontainer[1].list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
 				break;
 			}
 
@@ -810,11 +810,11 @@ void CPlayerAI::GetNearestObjects()
 
 				if(game_values.gamemodesettings.star.shine || game_values.gamemode->star == pPlayer)
 				{
-					DistanceToObject(objectsplayer.list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
+					DistanceToObject(objectcontainer[1].list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
 				}
 				else
 				{
-					DistanceToObject(objectsplayer.list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
+					DistanceToObject(objectcontainer[1].list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
 				}
 
 				break;
@@ -822,47 +822,47 @@ void CPlayerAI::GetNearestObjects()
 
 			default:
 			{
-				DistanceToObject(objectsplayer.list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
+				DistanceToObject(objectcontainer[1].list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
 				break;
 			}
 		
 		}
 	}
 
-	for(short i = 0; i < objectcollisionitems.list_end; i++)
+	for(short i = 0; i < objectcontainer[0].list_end; i++)
 	{
-		ObjectType type = objectcollisionitems.list[i]->getObjectType();
+		ObjectType type = objectcontainer[0].list[i]->getObjectType();
 
 		switch (type)
 		{
 			case object_moving:
 			{
-				IO_MovingObject * movingobject = (IO_MovingObject*)objectcollisionitems.list[i];
+				IO_MovingObject * movingobject = (IO_MovingObject*)objectcontainer[0].list[i];
 				MovingObjectType movingtype = movingobject->getMovingObjectType();
 				
 				if(movingobject_powerup == movingtype)
 				{
-					DistanceToObject(objectcollisionitems.list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
+					DistanceToObject(objectcontainer[0].list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
 				}
-				else if((movingobject_fireball == movingtype && ((MO_Fireball*)objectcollisionitems.list[i])->teamID != iTeamID)
+				else if((movingobject_fireball == movingtype && ((MO_Fireball*)objectcontainer[0].list[i])->teamID != iTeamID)
 					|| movingobject_poisonpowerup == movingtype)
 				{
 					if(fInvincible)
 						continue;
 
-					DistanceToObject(objectcollisionitems.list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
+					DistanceToObject(objectcontainer[0].list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
 				}
 				else if((movingobject_goomba == movingtype || movingobject_koopa == movingtype) && movingobject->GetState() == 1)
 				{
-					DistanceToObject(objectcollisionitems.list[i], &nearestObjects.stomp, &nearestObjects.stompdistance, &nearestObjects.stompwrap);
+					DistanceToObject(objectcontainer[0].list[i], &nearestObjects.stomp, &nearestObjects.stompdistance, &nearestObjects.stompwrap);
 				}
 				else if(movingobject_sledgebrother == movingtype)
 				{
-					DistanceToObject(objectcollisionitems.list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
+					DistanceToObject(objectcontainer[0].list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
 				}
 				else if(movingobject_treasurechest == movingtype)
 				{
-					DistanceToObject(objectcollisionitems.list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
+					DistanceToObject(objectcontainer[0].list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
 				}
 				else
 				{
@@ -873,113 +873,120 @@ void CPlayerAI::GetNearestObjects()
 
 			case object_area:
 			{
-				if(((OMO_Area*)objectcollisionitems.list[i])->getColorID() == pPlayer->colorID)
+				if(((OMO_Area*)objectcontainer[0].list[i])->getColorID() == pPlayer->colorID)
 					continue;
 			
-				DistanceToObject(objectcollisionitems.list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
+				DistanceToObject(objectcontainer[0].list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
 				break;
 			}
 
 			case object_kingofthehill_area:
 			{
-				DistanceToObjectCenter(objectcollisionitems.list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
+				DistanceToObjectCenter(objectcontainer[0].list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
 				break;
 			}
 
 			case object_flagbase:
 			{
-				OMO_FlagBase * flagbase = (OMO_FlagBase*)objectcollisionitems.list[i];
+				OMO_FlagBase * flagbase = (OMO_FlagBase*)objectcontainer[0].list[i];
 				
 				if(!carriedItem || carriedItem->getObjectType() != object_flag || flagbase->GetTeamID() != iTeamID)
 					continue;
 
-				DistanceToObject(objectcollisionitems.list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
+				DistanceToObject(objectcontainer[0].list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
 				break;
 			}
 
 			default:
 			{
-				DistanceToObject(objectcollisionitems.list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
+				DistanceToObject(objectcontainer[0].list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
 				break;
 			}
 		}
 	}
 
-	for(short i = 0; i < objectsfront.list_end; i++)
+	for(short i = 0; i < objectcontainer[2].list_end; i++)
 	{
-		ObjectType type = objectsfront.list[i]->getObjectType();
+		ObjectType type = objectcontainer[2].list[i]->getObjectType();
 
 		switch (type)
 		{
 			case object_moving:
 			{
-				IO_MovingObject * movingobject = (IO_MovingObject*)objectsfront.list[i];
+				IO_MovingObject * movingobject = (IO_MovingObject*)objectcontainer[2].list[i];
 				MovingObjectType movingtype = movingobject->getMovingObjectType();
 				
 				if(movingobject_cheepcheep == movingtype)
 				{
-					DistanceToObject(objectsfront.list[i], &nearestObjects.stomp, &nearestObjects.stompdistance, &nearestObjects.stompwrap);
+					DistanceToObject(objectcontainer[2].list[i], &nearestObjects.stomp, &nearestObjects.stompdistance, &nearestObjects.stompwrap);
 				}
 				else if(movingobject_bulletbill == movingtype)
 				{
 					if(fInvincible)
 						continue;
 
-					DistanceToObject(objectsfront.list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
+					DistanceToObject(objectcontainer[2].list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
 				}
-				else if(movingobject_superfireball == movingtype && ((MO_SuperFireball*)objectsfront.list[i])->teamID != iTeamID)
+				else if(movingobject_superfireball == movingtype && ((MO_SuperFireball*)objectcontainer[2].list[i])->teamID != iTeamID)
 				{
 					if(fInvincible)
 						continue;
 
-					DistanceToObject(objectsfront.list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
+					DistanceToObject(objectcontainer[2].list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
 				}
-				else if(movingobject_hammer == movingtype && ((MO_Hammer*)objectsfront.list[i])->teamID != iTeamID)
+				else if(movingobject_hammer == movingtype && ((MO_Hammer*)objectcontainer[2].list[i])->teamID != iTeamID)
 				{
 					if(fInvincible)
 						continue;
 
-					DistanceToObject(objectsfront.list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
+					DistanceToObject(objectcontainer[2].list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
 				}
-				else if(movingobject_sledgehammer == movingtype && ((MO_SledgeHammer*)objectsfront.list[i])->teamID != iTeamID)
+				else if(movingobject_sledgehammer == movingtype && ((MO_SledgeHammer*)objectcontainer[2].list[i])->teamID != iTeamID)
 				{
 					if(fInvincible)
 						continue;
 
-					DistanceToObject(objectsfront.list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
+					DistanceToObject(objectcontainer[2].list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
 				}
-				else if(movingobject_boomerang == movingtype && ((MO_Boomerang*)objectsfront.list[i])->teamID != iTeamID)
+				else if(movingobject_boomerang == movingtype && ((MO_Boomerang*)objectcontainer[2].list[i])->teamID != iTeamID)
 				{
 					if(fInvincible)
 						continue;
 
-					DistanceToObject(objectsfront.list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
+					DistanceToObject(objectcontainer[2].list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
 				}
-				else if(movingobject_bomb == movingtype && ((CO_Bomb*)objectsfront.list[i])->teamID != iTeamID)
+				else if(movingobject_bomb == movingtype && ((CO_Bomb*)objectcontainer[2].list[i])->teamID != iTeamID)
 				{
 					if(fInvincible)
 						continue;
 
-					DistanceToObject(objectsfront.list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
+					DistanceToObject(objectcontainer[2].list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
 				}
-				else if(movingobject_podobo == movingtype && ((OMO_Podobo*)objectsfront.list[i])->iTeamID != iTeamID)
+				else if(movingobject_podobo == movingtype && ((MO_Podobo*)objectcontainer[2].list[i])->iTeamID != iTeamID)
 				{
 					if(fInvincible)
 						continue;
 
-					DistanceToObject(objectsfront.list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
+					DistanceToObject(objectcontainer[2].list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
+				}
+				else if(movingobject_explosion == movingtype && ((MO_Explosion*)objectcontainer[2].list[i])->teamID != iTeamID)
+				{
+					if(fInvincible)
+						continue;
+
+					DistanceToObjectCenter(objectcontainer[2].list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
+					break;
 				}
 
 				break;
 			}
-			case object_explosion:
 			case object_thwomp:
 			case object_bowserfire:
 			{
 				if(fInvincible)
 					continue;
 
-				DistanceToObjectCenter(objectsfront.list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
+				DistanceToObjectCenter(objectcontainer[2].list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
 				break;
 			}
 			case object_race_goal:
@@ -987,19 +994,19 @@ void CPlayerAI::GetNearestObjects()
 				if(game_values.gamemode->gamemode != game_mode_race)
 					continue;
 
-				OMO_RaceGoal * racegoal = (OMO_RaceGoal*)objectsfront.list[i];
+				OMO_RaceGoal * racegoal = (OMO_RaceGoal*)objectcontainer[2].list[i];
 
 				if(racegoal->getGoalID() != ((CGM_Race*)game_values.gamemode)->getNextGoal(iTeamID))
 					continue;
 			
-				DistanceToObject(objectsfront.list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
+				DistanceToObject(objectcontainer[2].list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
 				break;
 			}
 			
 
 			default:
 			{
-				DistanceToObject(objectsfront.list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
+				DistanceToObject(objectcontainer[2].list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
 				break;
 			}
 		}

@@ -91,7 +91,7 @@ void SetupScoreBoard(bool fOrderMatters)
 			if(tourStop->wsbBonuses[iBonus].iWinnerPlace == 0)
 			{
 				short iBonusType = tourStop->wsbBonuses[iBonus].iBonus;
-				objectcollisionitems.add(new PU_TreasureChestBonus(&spr_bonuschest, 1, 0, 30, 30, 1, 1, iBonusType));
+				objectcontainer[0].add(new PU_TreasureChestBonus(&spr_bonuschest, 1, 0, 30, 30, 1, 1, iBonusType));
 				game_values.noexittimer = 0;
 				game_values.noexit = false;
 			}
@@ -1056,7 +1056,7 @@ void CGM_Coins::init()
 		game_values.gamemodesettings.coins.quantity = 1;
 
 	for(short iCoin = 0; iCoin < game_values.gamemodesettings.coins.quantity; iCoin++)
-		objectsplayer.add(new MO_Coin(&spr_coin, 0.0f, 0.0f, 0, 0, 2, 0, 0));
+		objectcontainer[1].add(new MO_Coin(&spr_coin, 0.0f, 0.0f, 0, 0, 2, 0, 0));
 }
 
 
@@ -1155,7 +1155,7 @@ void CGM_Eggs::init()
 			if(iEgg > 9)
 				break;
 
-			objectsplayer.add(new CO_Egg(&spr_egg, iEggs));
+			objectcontainer[1].add(new CO_Egg(&spr_egg, iEggs));
 		}
 	}
 
@@ -1166,7 +1166,7 @@ void CGM_Eggs::init()
 			if(iYoshi > 9)
 				break;
 
-			objectsplayer.add(new OMO_Yoshi(&spr_yoshi, iYoshis));
+			objectcontainer[1].add(new OMO_Yoshi(&spr_yoshi, iYoshis));
 		}
 	}	
 }
@@ -1287,7 +1287,7 @@ void CGM_Frenzy::think()
 			if(5 < iPowerupQuantity)
 				iPowerupQuantity = list_players_cnt + iPowerupQuantity - 7;
 
-			if(objectsplayer.countTypes(object_frenzycard) < iPowerupQuantity)
+			if(objectcontainer[1].countTypes(object_frenzycard) < iPowerupQuantity)
 			{
 				//Randomly choose a powerup from the weighted list
 				int iRandPowerup = rand() % iItemWeightCount + 1;
@@ -1297,7 +1297,7 @@ void CGM_Frenzy::think()
 				while(iWeightCount < iRandPowerup)
 					iWeightCount += game_values.gamemodesettings.frenzy.powerupweight[++iSelectedPowerup];
 
-				objectsplayer.add(new MO_FrenzyCard(&spr_frenzycards, iSelectedPowerup));
+				objectcontainer[1].add(new MO_FrenzyCard(&spr_frenzycards, iSelectedPowerup));
 			}
 		}
 	}
@@ -1387,12 +1387,12 @@ void CGM_Survival::think()
 
 			if(0 == iSelectedEnemy)
 			{
-				objectsfront.add(new OMO_Thwomp(&spr_thwomp, (short)(rand() % 591), (float)game_values.gamemodesettings.survival.speed / 2.0f + (float)(rand()%20)/10.0f));
+				objectcontainer[2].add(new OMO_Thwomp(&spr_thwomp, (short)(rand() % 591), (float)game_values.gamemodesettings.survival.speed / 2.0f + (float)(rand()%20)/10.0f));
 				timer = (short)(rand() % 21 - 10 + rate);
 			}
 			else if(1 == iSelectedEnemy)
 			{
-				objectsfront.add(new OMO_Podobo(&spr_podobo, (short)(rand() % 608), -(float(rand() % 9) / 2.0f) - 8.0f, -1, -1, -1));
+				objectcontainer[2].add(new MO_Podobo(&spr_podobo, (short)(rand() % 608), -(float(rand() % 9) / 2.0f) - 8.0f, -1, -1, -1));
 				timer = (short)(rand() % 21 - 10 + rate - 20);
 			}
 			else
@@ -1404,7 +1404,7 @@ void CGM_Survival::think()
 				if(dVel < 0)
 					x = 694;
 
-				objectsfront.add(new OMO_BowserFire(&spr_bowserfire, x, (short)(rand() % 448), dVel, 0.0f, -1, -1, -1));
+				objectcontainer[2].add(new OMO_BowserFire(&spr_bowserfire, x, (short)(rand() % 448), dVel, 0.0f, -1, -1, -1));
 				timer = (short)(rand() % 21 - 10 + rate);
 			}
 		}
@@ -1439,7 +1439,7 @@ void CGM_Domination::init()
 		iNumAreas = list_players_cnt + iNumAreas - 12;
 
 	for(short k = 0; k < iNumAreas; k++)
-		objectcollisionitems.add(new OMO_Area(&spr_areas, iNumAreas));
+		objectcontainer[0].add(new OMO_Area(&spr_areas, iNumAreas));
 }
 
 void CGM_Domination::think()
@@ -1475,7 +1475,7 @@ void CGM_Domination::think()
 short CGM_Domination::playerkilledplayer(CPlayer &player, CPlayer &other, killstyle style)
 {
 	//Update areas the dead player owned
-	objectcollisionitems.adjustPlayerAreas(&player, &other);
+	objectcontainer[0].adjustPlayerAreas(&player, &other);
 	
 	return player_kill_normal;
 }
@@ -1485,7 +1485,7 @@ short CGM_Domination::playerkilledself(CPlayer &player, killstyle style)
 	CGameMode::playerkilledself(player, style);
 
 	//Update areas the dead player owned
-	objectcollisionitems.adjustPlayerAreas(NULL, &player);
+	objectcontainer[0].adjustPlayerAreas(NULL, &player);
 
 	return player_kill_normal;
 }
@@ -1952,13 +1952,13 @@ void CGM_Stomp::think()
 				iWeightCount += game_values.gamemodesettings.stomp.enemyweight[++iSelectedEnemy];
 
 			if(0 == iSelectedEnemy)
-				objectcollisionitems.add(new MO_Goomba(&spr_goomba, 2, 8, rand() % 2 == 0, 30, 20, 1, 11));
+				objectcontainer[0].add(new MO_Goomba(&spr_goomba, 2, 8, rand() % 2 == 0, 30, 20, 1, 11));
 			else if(1 == iSelectedEnemy)
-				objectcollisionitems.add(new MO_Koopa(&spr_koopa, 2, 8, rand() % 2 == 0, 30, 28, 1, 25, false));
+				objectcontainer[0].add(new MO_Koopa(&spr_koopa, 2, 8, rand() % 2 == 0, 30, 28, 1, 25, false));
 			else if(2 == iSelectedEnemy)
-				objectsfront.add(new OMO_CheepCheep(&spr_cheepcheep));
+				objectcontainer[2].add(new MO_CheepCheep(&spr_cheepcheep));
 			else
-				objectcollisionitems.add(new MO_Koopa(&spr_redkoopa, 2, 8, rand() % 2 == 0, 30, 28, 1, 25, true));
+				objectcontainer[0].add(new MO_Koopa(&spr_redkoopa, 2, 8, rand() % 2 == 0, 30, 28, 1, 25, true));
 		}
 	}
 }
@@ -2039,7 +2039,7 @@ void CGM_Race::init()
 		game_values.gamemodesettings.race.penalty = penalty = 0;
 
 	for(short iRaceGoal = 0; iRaceGoal < quantity; iRaceGoal++)
-		objectsfront.add(new OMO_RaceGoal(&spr_racegoal, iRaceGoal));
+		objectcontainer[2].add(new OMO_RaceGoal(&spr_racegoal, iRaceGoal));
 
 	for(short iPlayer = 0; iPlayer < 4; iPlayer++)
 		nextGoal[iPlayer] = 0;
@@ -2098,7 +2098,7 @@ void CGM_Race::setNextGoal(short teamID)
 	if(++nextGoal[teamID] >= quantity)
 	{
 		nextGoal[teamID] = 0;
-		objectsfront.removePlayerRaceGoals(teamID, -1);
+		objectcontainer[2].removePlayerRaceGoals(teamID, -1);
 		
 		if(!gameover)
 		{
@@ -2130,7 +2130,7 @@ void CGM_Race::setNextGoal(short teamID)
 //Player loses control of his areas
 void CGM_Race::PenalizeRaceGoals(CPlayer &player)
 {
-	objectsfront.removePlayerRaceGoals(player.teamID, nextGoal[player.teamID] - 1);
+	objectcontainer[2].removePlayerRaceGoals(player.teamID, nextGoal[player.teamID] - 1);
 
 	if(2 == penalty)
 		nextGoal[player.teamID] = 0;
@@ -2167,7 +2167,7 @@ void CGM_Star::init()
 	star = GetHighestScorePlayer(!fReverseScoring && !game_values.gamemodesettings.star.shine);
 									
 	starItem = new CO_Star(&spr_star);
-	objectsplayer.add(starItem);
+	objectcontainer[1].add(starItem);
 
 	for(short iScore = 0; iScore < score_cnt; iScore++)
 	{
@@ -2359,8 +2359,8 @@ void CGM_CaptureTheFlag::init()
 			short iColorID = list_players[iPlayer]->colorID;
 			OMO_FlagBase * base = new OMO_FlagBase(&spr_flagbases, iTeamID, iColorID);
 			CO_Flag * flag = new CO_Flag(&spr_flags, base, iTeamID, iColorID);
-			objectcollisionitems.add(base);
-			objectsplayer.add(flag);
+			objectcontainer[0].add(base);
+			objectcontainer[1].add(flag);
 		}
 	}
 }
@@ -2450,7 +2450,7 @@ CGM_KingOfTheHill::CGM_KingOfTheHill() : CGM_Domination()
 void CGM_KingOfTheHill::init()
 {
 	CGameMode::init();
-	objectsfront.add(new OMO_KingOfTheHillZone(&spr_kingofthehillarea));
+	objectcontainer[2].add(new OMO_KingOfTheHillZone(&spr_kingofthehillarea));
 }
 
 short CGM_KingOfTheHill::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
@@ -2536,7 +2536,7 @@ short CGM_Greed::ReleaseCoins(CPlayer &player, killstyle style)
 		float velx = vel * cos(angle);
 		float vely = vel * sin(angle);
 		
-		objectsplayer.add(new MO_Coin(&spr_coin, velx, vely, ix, iy, player.colorID, 1, 30));
+		objectcontainer[1].add(new MO_Coin(&spr_coin, velx, vely, ix, iy, player.colorID, 1, 30));
 	}
 
 	//Play warning sound if game is almost over
@@ -2701,9 +2701,9 @@ void CGM_Collection::think()
 		if(5 < iPowerupQuantity)
 			iPowerupQuantity = list_players_cnt + iPowerupQuantity - 7;
 
-		if(objectsplayer.countTypes(object_collectioncard) < iPowerupQuantity)
+		if(objectcontainer[1].countTypes(object_collectioncard) < iPowerupQuantity)
 		{
-			objectsplayer.add(new MO_CollectionCard(&spr_collectcards, 0, rand() % 3, 0, 0.0f, 0.0f, 0, 0));
+			objectcontainer[1].add(new MO_CollectionCard(&spr_collectcards, 0, rand() % 3, 0, 0.0f, 0.0f, 0, 0));
 		}
 	}
 
@@ -2775,7 +2775,7 @@ void CGM_Collection::ReleaseCard(CPlayer &player)
 
 		player.score->subscore[1] &= iCardMaskInverted;
 
-		objectsplayer.add(new MO_CollectionCard(&spr_collectcards, 1, iValue, 30, velx, vely, ix, iy));
+		objectcontainer[1].add(new MO_CollectionCard(&spr_collectcards, 1, iValue, 30, velx, vely, ix, iy));
 	}
 }
 
@@ -2825,7 +2825,7 @@ void CGM_Boss::init()
 	for(short iScore = 0; iScore < score_cnt; iScore++)
 		score[iScore]->SetScore(5);
 
-	objectcollisionitems.add(new MO_SledgeBrother(&spr_sledgebrothers, (iBossType == 0 ? 256 : (iBossType == 1 ? 256 : 320)), iBossType));
+	objectcontainer[0].add(new MO_SledgeBrother(&spr_sledgebrothers, (iBossType == 0 ? 256 : (iBossType == 1 ? 256 : 320)), iBossType));
 }
 
 
@@ -2857,7 +2857,7 @@ void CGM_Boss::think()
 			//Randomly spawn koopas
 			if(--enemytimer <= 0)
 			{
-				objectcollisionitems.add(new MO_Koopa(&spr_koopa, 2, 8, rand() % 2 == 0, 30, 28, 1, 25, false));
+				objectcontainer[0].add(new MO_Koopa(&spr_koopa, 2, 8, rand() % 2 == 0, 30, 28, 1, 25, false));
 				enemytimer = (short)(rand() % 120) + 120;  //Spawn koopas slowly
 			}
 		}
@@ -2869,7 +2869,7 @@ void CGM_Boss::think()
 		{
 			if(--enemytimer <= 0)
 			{
-				objectsfront.add(new OMO_Podobo(&spr_podobo, (short)(rand() % 608), -(float(rand() % 9) / 2.0f) - 9.0f, -1, -1, -1));
+				objectcontainer[2].add(new MO_Podobo(&spr_podobo, (short)(rand() % 608), -(float(rand() % 9) / 2.0f) - 9.0f, -1, -1, -1));
 				enemytimer = (short)(rand() % 80 + 60);
 			}
 
@@ -2877,9 +2877,9 @@ void CGM_Boss::think()
 			{
 				poweruptimer = (short)(rand() % 80 + 60);
 
-				if(objectsplayer.countTypes(object_frenzycard) < list_players_cnt)
+				if(objectcontainer[1].countTypes(object_frenzycard) < list_players_cnt)
 				{
-					objectsplayer.add(new MO_FrenzyCard(&spr_frenzycards, 0));
+					objectcontainer[1].add(new MO_FrenzyCard(&spr_frenzycards, 0));
 				}
 			}
 		}
@@ -3003,11 +3003,11 @@ bool CGM_Boss::SetWinner(CPlayer * player)
 	game_values.noexit = true;
 	
 	if(iBossType == 0)
-		objectcollisionitems.add(new PU_SledgeHammerPowerup(&spr_sledgehammerpowerup, 304, -32, 1, 0, 30, 30, 1, 1));
+		objectcontainer[0].add(new PU_SledgeHammerPowerup(&spr_sledgehammerpowerup, 304, -32, 1, 0, 30, 30, 1, 1));
 	else if(iBossType == 1)
-		objectcollisionitems.add(new PU_BombPowerup(&spr_bombpowerup, 304, -32, 1, 0, 30, 30, 1, 1));
+		objectcontainer[0].add(new PU_BombPowerup(&spr_bombpowerup, 304, -32, 1, 0, 30, 30, 1, 1));
 	else if(iBossType == 2)
-		objectcollisionitems.add(new PU_PodoboPowerup(&spr_podobopowerup, 304, -32, 1, 0, 30, 30, 1, 1));
+		objectcontainer[0].add(new PU_PodoboPowerup(&spr_podobopowerup, 304, -32, 1, 0, 30, 30, 1, 1));
 
 	return true;
 }
@@ -3076,7 +3076,7 @@ void CGM_Bonus::init()
 	//float dx = 288.0f - (dSpacing * (float)(iNumBonuses - 1) / 2.0f) ;
 	for(short iChest = 0; iChest < iNumBonuses; iChest++)
 	{
-		objectcollisionitems.add(new MO_BonusHouseChest(&spr_worldbonushouse, (short)dx, 384, tsTourStop->wsbBonuses[iChestOrder[iChest]].iBonus));
+		objectcontainer[0].add(new MO_BonusHouseChest(&spr_worldbonushouse, (short)dx, 384, tsTourStop->wsbBonuses[iChestOrder[iChest]].iBonus));
 		dx += dSpacing + 64.0f;
 	}
 }
