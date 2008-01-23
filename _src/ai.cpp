@@ -566,10 +566,10 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 		if(object->getMovingObjectType() == movingobject_bomb)
 		{
 			CO_Bomb * bomb = (CO_Bomb*)object;
-			if(bomb->teamID != pPlayer->teamID)
+			if(bomb->iTeamID != pPlayer->teamID)
 				playerKeys->game_turbo.fDown = false;
 		}
-		else if(object->getMovingObjectType() == movingobject_spring || object->getMovingObjectType() == movingobject_spike)
+		else if(object->getMovingObjectType() == movingobject_carried)
 		{
 			playerKeys->game_turbo.fDown = false;
 		}
@@ -844,7 +844,7 @@ void CPlayerAI::GetNearestObjects()
 				{
 					DistanceToObject(objectcontainer[0].list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
 				}
-				else if((movingobject_fireball == movingtype && ((MO_Fireball*)objectcontainer[0].list[i])->teamID != iTeamID)
+				else if((movingobject_fireball == movingtype && ((MO_Fireball*)objectcontainer[0].list[i])->iTeamID != iTeamID)
 					|| movingobject_poisonpowerup == movingtype)
 				{
 					if(fInvincible)
@@ -927,35 +927,35 @@ void CPlayerAI::GetNearestObjects()
 
 					DistanceToObject(objectcontainer[2].list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
 				}
-				else if(movingobject_superfireball == movingtype && ((MO_SuperFireball*)objectcontainer[2].list[i])->teamID != iTeamID)
+				else if(movingobject_superfireball == movingtype && ((MO_SuperFireball*)objectcontainer[2].list[i])->iTeamID != iTeamID)
 				{
 					if(fInvincible)
 						continue;
 
 					DistanceToObject(objectcontainer[2].list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
 				}
-				else if(movingobject_hammer == movingtype && ((MO_Hammer*)objectcontainer[2].list[i])->teamID != iTeamID)
+				else if(movingobject_hammer == movingtype && ((MO_Hammer*)objectcontainer[2].list[i])->iTeamID != iTeamID)
 				{
 					if(fInvincible)
 						continue;
 
 					DistanceToObject(objectcontainer[2].list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
 				}
-				else if(movingobject_sledgehammer == movingtype && ((MO_SledgeHammer*)objectcontainer[2].list[i])->teamID != iTeamID)
+				else if(movingobject_sledgehammer == movingtype && ((MO_SledgeHammer*)objectcontainer[2].list[i])->iTeamID != iTeamID)
 				{
 					if(fInvincible)
 						continue;
 
 					DistanceToObject(objectcontainer[2].list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
 				}
-				else if(movingobject_boomerang == movingtype && ((MO_Boomerang*)objectcontainer[2].list[i])->teamID != iTeamID)
+				else if(movingobject_boomerang == movingtype && ((MO_Boomerang*)objectcontainer[2].list[i])->iTeamID != iTeamID)
 				{
 					if(fInvincible)
 						continue;
 
 					DistanceToObject(objectcontainer[2].list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
 				}
-				else if(movingobject_bomb == movingtype && ((CO_Bomb*)objectcontainer[2].list[i])->teamID != iTeamID)
+				else if(movingobject_bomb == movingtype && ((CO_Bomb*)objectcontainer[2].list[i])->iTeamID != iTeamID)
 				{
 					if(fInvincible)
 						continue;
@@ -969,7 +969,7 @@ void CPlayerAI::GetNearestObjects()
 
 					DistanceToObject(objectcontainer[2].list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
 				}
-				else if(movingobject_explosion == movingtype && ((MO_Explosion*)objectcontainer[2].list[i])->teamID != iTeamID)
+				else if(movingobject_explosion == movingtype && ((MO_Explosion*)objectcontainer[2].list[i])->iTeamID != iTeamID)
 				{
 					if(fInvincible)
 						continue;

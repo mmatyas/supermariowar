@@ -2,7 +2,7 @@
 #define _OBJECT_H
 
 enum ObjectType{object_none = 0, object_block = 1, object_moving = 2, object_overmap = 3, object_area = 4, object_egg = 5, object_frenzycard = 6, object_yoshi = 7, object_race_goal = 8, object_star = 9, object_flag = 10, object_flagbase = 11, object_thwomp = 12, object_kingofthehill_area = 13, object_bowserfire = 14, object_coin = 15, object_collectioncard = 16, object_orbithazard = 17, object_bulletbillcannon = 18, object_flamecannon = 19};
-enum MovingObjectType{movingobject_none = 0, movingobject_powerup = 1, movingobject_fireball = 2, movingobject_goomba = 3, movingobject_bulletbill = 4, movingobject_hammer = 5, movingobject_poisonpowerup = 6, movingobject_shell = 7, movingobject_throwblock = 8, movingobject_egg = 9, movingobject_star = 10, movingobject_flag = 11, movingobject_cheepcheep = 12, movingobject_koopa = 13, movingobject_mysterymushroompowerup = 14, movingobject_boomerang = 15, movingobject_spring = 16, movingobject_sledgehammer = 17, movingobject_sledgebrother = 18, movingobject_spike = 19, movingobject_bomb = 20, movingobject_superfireball = 21, movingobject_podobo = 22, movingobject_kuriboshoe = 23, movingobject_treasurechest = 24, movingobject_attackzone = 25, movingobject_pirhanaplant = 26, movingobject_explosion = 27, MOVINGOBJECT_LAST};
+enum MovingObjectType{movingobject_none = 0, movingobject_powerup = 1, movingobject_fireball = 2, movingobject_goomba = 3, movingobject_bulletbill = 4, movingobject_hammer = 5, movingobject_poisonpowerup = 6, movingobject_shell = 7, movingobject_throwblock = 8, movingobject_egg = 9, movingobject_star = 10, movingobject_flag = 11, movingobject_cheepcheep = 12, movingobject_koopa = 13, movingobject_boomerang = 14, movingobject_carried = 15, movingobject_sledgehammer = 16, movingobject_sledgebrother = 17, movingobject_bomb = 18, movingobject_superfireball = 19, movingobject_podobo = 20, movingobject_treasurechest = 21, movingobject_attackzone = 22, movingobject_pirhanaplant = 23, movingobject_explosion = 24, MOVINGOBJECT_LAST};
 enum BlockType{block_none, block_powerup, block_view, block_breakable, block_note, block_donut, block_flip, block_bounce, block_throw, block_onoff_switch, block_onoff, block_weaponbreakable};
 
 class IO_MovingObject;
@@ -455,6 +455,12 @@ class IO_MovingObject : public CObject
 		virtual float BottomBounce() {return bounce;}
 		void KillObjectMapHazard();
 
+		virtual void CheckAndDie() {dead = true;}
+		virtual void Die() {dead = true;}
+
+		short iPlayerID;
+		short iTeamID;
+
 	protected:
 		float fOldX, fOldY;
 		float fPrecalculatedY;
@@ -492,6 +498,11 @@ class IO_MovingObject : public CObject
 	friend class B_OnOffSwitchBlock;
 	friend class B_SwitchBlock;
 	friend class B_WeaponBreakableBlock;
+
+	friend class MO_BulletBill;
+	friend class MO_Goomba;
+	friend class MO_CheepCheep;
+	friend class MO_PirhanaPlant;
 
 	friend class MO_SledgeBrother;
 	friend class MovingPlatform;
@@ -765,8 +776,6 @@ class MO_Fireball : public IO_MovingObject
 		bool collide(CPlayer * player);
 		void draw();
 
-		short playerID;
-		short teamID;
 		short colorOffset;
 
 	private:
@@ -782,9 +791,6 @@ class MO_SuperFireball : public IO_MovingObject
 		void update();
 		bool collide(CPlayer * player);
 		void draw();
-
-		short playerID;
-		short teamID;
 
 	private:
 		short colorOffset;
@@ -802,8 +808,6 @@ class MO_Hammer : public IO_MovingObject
 		bool collide(CPlayer * player);
 		void draw();
 
-		short playerID;
-		short teamID;
 		short colorOffset;
 
 	private:
@@ -822,8 +826,6 @@ class MO_SledgeHammer : public IO_MovingObject
 		void explode();
 		void draw();
 
-		short playerID;
-		short teamID;
 		short colorOffset;
 
 	private:
@@ -841,8 +843,6 @@ class MO_Boomerang : public IO_MovingObject
 		bool collide(CPlayer * player);
 		void draw();
 
-		short playerID;
-		short teamID;
 		short colorOffset;
 
 	private:
@@ -928,9 +928,6 @@ class MO_Podobo : public IO_MovingObject
 		void draw();
 		bool collide(CPlayer * player);
 		void collide(IO_MovingObject * object);
-
-		short iPlayerID;
-		short iTeamID;
 
 	private:
 		
@@ -1132,9 +1129,10 @@ class OMO_Area : public IO_OverMapObject
 		void setOwner(CPlayer * player);
 	
 	private:
-		short playerID;
+		short iPlayerID;
+		short iTeamID;
+
 		short colorID;
-		short teamID;
 		short scoretimer;
 		short frame;
 		short relocatetimer;
@@ -1163,7 +1161,8 @@ class OMO_KingOfTheHillZone : public IO_OverMapObject
 		short playersTouchingCount[4];
 		short totalTouchingPlayers;
 
-		short playerID;
+		short iPlayerID;
+
 		short colorID;
 		short scoretimer;
 		short frame;
@@ -1251,10 +1250,8 @@ class MO_Explosion : public IO_MovingObject
 		bool collide(CPlayer * player);
 		void collide(IO_MovingObject * object);
 		
-		short teamID;
-
 	private:
-		short playerID;
+		
 		short timer;
 		killstyle iStyle;
 };
@@ -1344,9 +1341,7 @@ class MO_BulletBill : public IO_MovingObject
 	private:
 		gfxSprite * spr_dead;
 
-		short iPlayerID;
 		short iColorID;
-		short iTeamID;
 		
 		short iColorOffsetY;
 		short iDirectionOffsetY;
@@ -1454,9 +1449,6 @@ class CO_Shell : public MO_CarriedObject
 
 		short iShellType;
 
-		short playerID;
-		short teamID;
-
 		short iIgnoreBounceTimer;
 		short iDestY;
 
@@ -1517,9 +1509,6 @@ class CO_ThrowBlock : public MO_CarriedObject
 	private:
 		short iType;
 		
-		short playerID;
-		short teamID;
-
 		short iDeathTime;
 		bool fDieOnBounce;
 		bool fDieOnPlayerCollision;
@@ -1601,13 +1590,10 @@ class MO_AttackZone : public IO_MovingObject
 
 		void Die();
 
-		short iPlayerID;
-
 	protected:
 
 		bool fDieOnCollision;
 
-		short iTeamID;
 		short iTimer;
 		killstyle iStyle;
 
@@ -1650,9 +1636,6 @@ class CO_Bomb : public MO_CarriedObject
 		void Kick(bool superkick);
 
 		void Die();
-
-		short playerID;
-		short teamID;
 		
 	protected:
 		

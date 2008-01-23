@@ -401,6 +401,8 @@ char szIPString[32] = "";
 
 extern Uint8 GetScreenBackgroundFade();
 
+extern short g_iCollisionMap[MOVINGOBJECT_LAST][MOVINGOBJECT_LAST];
+
 float CapFallingVelocity(float vel)
 {
 	//if(vel < -MAXVELY)
@@ -424,7 +426,7 @@ float CapSideVelocity(float vel)
 }
 
 //handles a collision between a powerup and an object
-void collisionhandler_o2o(IO_MovingObject * o1, CObject * o2)
+void collisionhandler_o2o(IO_MovingObject * o1, IO_MovingObject * o2)
 {
 	o2->collide(o1);
 }
@@ -2225,15 +2227,23 @@ void RunGame()
 							{
 								CObject * object2 = objectcontainer[iLayer2].list[iObject2];
 
+								if(object2->getObjectType() != object_moving)
+									continue;
+
+								IO_MovingObject * movingobject2 = (IO_MovingObject*)object2;
+
+								if(g_iCollisionMap[movingobject1->getMovingObjectType()][movingobject2->getMovingObjectType()] == 0)
+									continue;
+
 								if(iLayer1 == iLayer2 && iObject1 == iObject2)
 									continue;
 
 								if(object2->GetDead())
 									continue;
 
-								if(coldec_obj2obj(movingobject1, object2))
+								if(coldec_obj2obj(movingobject1, movingobject2))
 								{
-									collisionhandler_o2o(movingobject1, object2);
+									collisionhandler_o2o(movingobject1, movingobject2);
 								}
 
 								if(object1->GetDead())
@@ -3482,6 +3492,7 @@ void LoadMapObjects()
 		}
 	}
 
+	/*
 	objectcontainer[0].add(new MO_PirhanaPlant(320, 384, 0, 30, 1));
 	objectcontainer[0].add(new MO_PirhanaPlant(352, 384, 1, 30, 1));
 	objectcontainer[0].add(new MO_PirhanaPlant(384, 384, 2, 30, 1));
@@ -3491,6 +3502,7 @@ void LoadMapObjects()
 	objectcontainer[0].add(new MO_PirhanaPlant(352, 352, 1, 30, 0));
 	objectcontainer[0].add(new MO_PirhanaPlant(384, 352, 2, 30, 0));
 	objectcontainer[0].add(new MO_PirhanaPlant(416, 352, 3, 30, 0));
+	*/
 }
 
 bool SwapPlayers(short iUsingPlayerID)

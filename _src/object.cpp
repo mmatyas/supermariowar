@@ -15,36 +15,26 @@ extern CPlayer * GetPlayerFromGlobalID(short iGlobalID);
 
 void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead)
 {
-	if((object->movingObjectType == movingobject_fireball || object->movingObjectType == movingobject_superfireball || object->movingObjectType == movingobject_hammer || object->movingObjectType == movingobject_sledgehammer || object->movingObjectType == movingobject_boomerang) && !object->dead)
+	if(object->dead)
+		return;
+
+	MovingObjectType type = object->movingObjectType;
+	if(type == movingobject_fireball || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_sledgehammer || type == movingobject_boomerang)
 	{
-		short iPlayerID = -1;
+		short iPlayerID = object->iPlayerID;
 		bool fDie = true;
 
-		if(object->movingObjectType == movingobject_fireball)
+		if(type == movingobject_hammer && !game_values.hammerpower)
 		{
-			iPlayerID = ((MO_Fireball*)object)->playerID;
+			fDie = false;
 		}
-		else if(object->movingObjectType == movingobject_hammer)
+		else if(type == movingobject_sledgehammer)
 		{
-			iPlayerID = ((MO_Hammer*)object)->playerID;
-
-			if(!game_values.hammerpower)
-				fDie = false;
+			((MO_SledgeHammer*)object)->explode();
 		}
-		else if(object->movingObjectType == movingobject_sledgehammer)
+		else if(type == movingobject_boomerang)
 		{
-			MO_SledgeHammer * hammer = (MO_SledgeHammer*)object;
-			iPlayerID = hammer->playerID;
-			hammer->explode();
-		}
-		else if(object->movingObjectType == movingobject_boomerang)
-		{
-			iPlayerID = ((MO_Boomerang*)object)->playerID;
 			game_values.superboomerang[iPlayerID] = 0;
-		}
-		else if(object->movingObjectType == movingobject_superfireball)
-		{
-			iPlayerID = ((MO_SuperFireball*)object)->playerID;
 		}
 
 		if(fDie || forcedead)
@@ -2148,7 +2138,7 @@ void B_ThrowBlock::GiveBlockToPlayer(CPlayer * player)
 	if(player->AcceptItem(block))
 	{
 		block->owner = player;
-		block->playerID = player->globalID;
+		block->iPlayerID = player->globalID;
 		objectcontainer[1].add(block);
 	}
 	else
@@ -2312,8 +2302,7 @@ bool B_WeaponBreakableBlock::hittop(IO_MovingObject * object)
 
 	if(iType == 0 && type == movingobject_fireball)
 	{
-		MO_Fireball * fireball = (MO_Fireball*)object;
-		triggerBehavior(fireball->playerID, fireball->teamID);
+		triggerBehavior(object->iPlayerID, object->iTeamID);
 		removeifprojectile(object, false, true);
 		return false;
 	}
@@ -2332,8 +2321,7 @@ bool B_WeaponBreakableBlock::hitbottom(IO_MovingObject * object)
 
 	if(iType == 0 && type == movingobject_fireball)
 	{
-		MO_Fireball * fireball = (MO_Fireball*)object;
-		triggerBehavior(fireball->playerID, fireball->teamID);
+		triggerBehavior(object->iPlayerID, object->iTeamID);
 		removeifprojectile(object, false, true);
 		return false;
 	}
@@ -2389,14 +2377,14 @@ bool B_WeaponBreakableBlock::objecthitside(IO_MovingObject * object)
 		if(type == movingobject_shell)
 		{
 			CO_Shell * shell = (CO_Shell*)object;
-			iPlayerID = shell->playerID;
-			iTeamID = shell->teamID;
+			iPlayerID = shell->iPlayerID;
+			iTeamID = shell->iTeamID;
 		}
 		else if(type == movingobject_throwblock)
 		{
 			CO_ThrowBlock * throwblock = (CO_ThrowBlock*)object;
-			iPlayerID = throwblock->playerID;
-			iTeamID = throwblock->teamID;
+			iPlayerID = throwblock->iPlayerID;
+			iTeamID = throwblock->iTeamID;
 		}
 
 		triggerBehavior(iPlayerID, iTeamID);
@@ -2405,7 +2393,7 @@ bool B_WeaponBreakableBlock::objecthitside(IO_MovingObject * object)
 	else if(iType == 0 && type == movingobject_fireball)
 	{
 		MO_Fireball * fireball = (MO_Fireball*)object;
-		triggerBehavior(fireball->playerID, fireball->teamID);
+		triggerBehavior(fireball->iPlayerID, fireball->iTeamID);
 		removeifprojectile(object, false, true);
 		return false;
 	}
@@ -3236,9 +3224,7 @@ void IO_MovingObject::KillObjectMapHazard()
 
 		if(movingObjectType == movingobject_fireball)
 		{
-			short iPlayerID = ((MO_Fireball*)this)->playerID;
-
-			if(projectiles[iPlayerID] > 0)
+			if(iPlayerID > -1 && projectiles[iPlayerID] > 0)
 				projectiles[iPlayerID]--;
 
 			ifsoundonplay(sfx_hit);
@@ -3264,8 +3250,6 @@ void IO_MovingObject::KillObjectMapHazard()
 			}
 			else if(movingObjectType == movingobject_bomb)
 			{
-				short iPlayerID = ((CO_Bomb*)this)->playerID;
-
 				if(iPlayerID > -1 && projectiles[iPlayerID] > 0)
 					projectiles[iPlayerID]--;
 			}
@@ -3474,8 +3458,6 @@ PU_MysteryMushroomPowerup::PU_MysteryMushroomPowerup(gfxSprite *nspr, short x, s
 		velx = 2.0f;
 	else
 		velx = -2.0f;
-
-	movingObjectType = movingobject_mysterymushroompowerup;
 }
 
 bool PU_MysteryMushroomPowerup::collide(CPlayer * player)
@@ -4147,8 +4129,9 @@ MO_Fireball::MO_Fireball(gfxSprite *nspr, short x, short y, short iNumSpr, bool 
 
 	bounce = -FIREBALLBOUNCE;
 
-	playerID = iGlobalID;
-	teamID = iTeamID;
+	iPlayerID = iGlobalID;
+	iTeamID = iTeamID;
+
 	colorOffset = iColorID * 36;
 	movingObjectType = movingobject_fireball;
 	
@@ -4169,7 +4152,7 @@ void MO_Fireball::update()
 
 bool MO_Fireball::collide(CPlayer * player)
 {
-	if(playerID != player->globalID && (game_values.teamcollision == 2|| teamID != player->teamID))
+	if(iPlayerID != player->globalID && (game_values.teamcollision == 2|| iTeamID != player->teamID))
 	{
 		if(!player->spawninvincible)
 		{
@@ -4178,7 +4161,7 @@ bool MO_Fireball::collide(CPlayer * player)
 			if(!player->invincible)
 			{
 				//Find the player that shot this fireball so we can attribute a kill
-				PlayerKilledPlayer(playerID, player, death_style_jump, kill_style_fireball, false);
+				PlayerKilledPlayer(iPlayerID, player, death_style_jump, kill_style_fireball, false);
 				return true;
 			}
 		}
@@ -4200,8 +4183,8 @@ MO_SuperFireball::MO_SuperFireball(gfxSprite *nspr, short x, short y, short iNum
 {
 	ih /= 10;
 
-	playerID = iGlobalID;
-	teamID = iTeamID;
+	iPlayerID = iGlobalID;
+	iTeamID = iTeamID;
 	colorOffset = (iColorID + 1) * 64;
 	directionOffset = velx < 0.0f ? 0 : 32;
 	movingObjectType = movingobject_superfireball;
@@ -4233,7 +4216,7 @@ void MO_SuperFireball::update()
 
 bool MO_SuperFireball::collide(CPlayer * player)
 {
-	if(playerID != player->globalID && (game_values.teamcollision == 2|| teamID != player->teamID))
+	if(iPlayerID != player->globalID && (game_values.teamcollision == 2|| iTeamID != player->teamID))
 	{
 		if(!player->spawninvincible)
 		{
@@ -4242,7 +4225,7 @@ bool MO_SuperFireball::collide(CPlayer * player)
 			if(!player->invincible)
 			{
 				//Find the player that shot this hammer so we can attribute a kill
-				PlayerKilledPlayer(playerID, player, death_style_jump, kill_style_fireball, false);
+				PlayerKilledPlayer(iPlayerID, player, death_style_jump, kill_style_fireball, false);
 				return true;
 			}
 		}
@@ -4265,8 +4248,8 @@ MO_Hammer::MO_Hammer(gfxSprite *nspr, short x, short y, short iNumSpr, float fVe
 {
 	ih = ih >> 2;
 
-	playerID = iGlobalID;
-	teamID = iTeamID;
+	iPlayerID = iGlobalID;
+	iTeamID = iTeamID;
 	colorOffset = iColorID * 28;
 	movingObjectType = movingobject_hammer;
 	
@@ -4328,7 +4311,7 @@ void MO_Hammer::update()
 			B_WeaponBreakableBlock * weaponbreakableblock = (B_WeaponBreakableBlock*)blocks[iBlock];
 			if(weaponbreakableblock->iType == 5)
 			{
-				weaponbreakableblock->triggerBehavior(playerID, teamID);
+				weaponbreakableblock->triggerBehavior(iPlayerID, iTeamID);
 				removeifprojectile(this, false, false);
 				return;
 			}
@@ -4338,7 +4321,7 @@ void MO_Hammer::update()
 
 bool MO_Hammer::collide(CPlayer * player)
 {
-	if(playerID != player->globalID && (game_values.teamcollision == 2|| teamID != player->teamID))
+	if(iPlayerID != player->globalID && (game_values.teamcollision == 2|| iTeamID != player->teamID))
 	{
 		if(!player->spawninvincible)
 		{
@@ -4347,7 +4330,7 @@ bool MO_Hammer::collide(CPlayer * player)
 			if(!player->invincible)
 			{
 				//Find the player that shot this hammer so we can attribute a kill
-				PlayerKilledPlayer(playerID, player, death_style_jump, kill_style_hammer, false);
+				PlayerKilledPlayer(iPlayerID, player, death_style_jump, kill_style_hammer, false);
 				return true;
 			}
 		}
@@ -4369,8 +4352,8 @@ MO_SledgeHammer::MO_SledgeHammer(gfxSprite *nspr, short x, short y, short iNumSp
 {
 	ih = collisionHeight;
 
-	playerID = iGlobalID;
-	teamID = iTeamID;
+	iPlayerID = iGlobalID;
+	iTeamID = iTeamID;
 	colorOffset = (iColorID + 1) * 32;
 	movingObjectType = movingobject_sledgehammer;
 	
@@ -4433,7 +4416,7 @@ void MO_SledgeHammer::update()
 			B_WeaponBreakableBlock * weaponbreakableblock = (B_WeaponBreakableBlock*)blocks[iBlock];
 			if(weaponbreakableblock->iType == 5)
 			{
-				weaponbreakableblock->triggerBehavior(playerID, teamID);
+				weaponbreakableblock->triggerBehavior(iPlayerID, iTeamID);
 				removeifprojectile(this, false, true);
 				return;
 			}
@@ -4444,7 +4427,7 @@ void MO_SledgeHammer::update()
 
 bool MO_SledgeHammer::collide(CPlayer * player)
 {
-	if(playerID != player->globalID && (game_values.teamcollision == 2|| teamID != player->teamID))
+	if(iPlayerID != player->globalID && (game_values.teamcollision == 2|| iTeamID != player->teamID))
 	{
 		if(!player->spawninvincible)
 		{
@@ -4453,7 +4436,7 @@ bool MO_SledgeHammer::collide(CPlayer * player)
 			if(!player->invincible)
 			{
 				//Find the player that shot this hammer so we can attribute a kill
-				PlayerKilledPlayer(playerID, player, death_style_jump, kill_style_sledge, false);
+				PlayerKilledPlayer(iPlayerID, player, death_style_jump, kill_style_sledge, false);
 				return true;
 			}
 		}
@@ -4464,11 +4447,11 @@ bool MO_SledgeHammer::collide(CPlayer * player)
 
 void MO_SledgeHammer::explode()
 {
-	if(playerID > -1 && iy < 480)
+	if(iPlayerID > -1 && iy < 480)
 	{
 		if(fSuper)
 		{
-			objectcontainer[2].add(new MO_Explosion(&spr_explosion, ix + (iw >> 2) - 96, iy + (ih >> 2) - 64, 2, 4, playerID, teamID, kill_style_sledge));
+			objectcontainer[2].add(new MO_Explosion(&spr_explosion, ix + (iw >> 2) - 96, iy + (ih >> 2) - 64, 2, 4, iPlayerID, iTeamID, kill_style_sledge));
 			ifsoundonplay(sfx_bobombsound);
 		}
 		else
@@ -4483,10 +4466,10 @@ void MO_SledgeHammer::explode()
 				float dVel = (float)(rand() % 5) / 2.0f + 3.0f;
 				float dVelX = dVel * cos(dAngle);
 				float dVelY = dVel * sin(dAngle);
-				objectcontainer[2].add(new MO_Hammer(&spr_hammer, iCenterX, iCenterY, 6, dVelX, dVelY, 5, playerID, teamID, iColorID, true));
+				objectcontainer[2].add(new MO_Hammer(&spr_hammer, iCenterX, iCenterY, 6, dVelX, dVelY, 5, iPlayerID, iTeamID, iColorID, true));
 			}
 
-			projectiles[playerID] += 3;
+			projectiles[iPlayerID] += 3;
 
 			ifsoundonplay(sfx_cannon);
 		}
@@ -4510,8 +4493,8 @@ MO_Boomerang::MO_Boomerang(gfxSprite *nspr, short x, short y, short iNumSpr, boo
 	//boomerangs sprites have both right and left sprites in them
 	ih = ih >> 3;
 
-	playerID = iGlobalID;
-	teamID = iTeamID;
+	iPlayerID = iGlobalID;
+	iTeamID = iTeamID;
 	colorOffset = iColorID * 64;
 	movingObjectType = movingobject_boomerang;
 	
@@ -4549,11 +4532,11 @@ void MO_Boomerang::update()
 
 	animate();
 
-	if(game_values.superboomerang[playerID] == 2)
+	if(game_values.superboomerang[iPlayerID] == 2)
 	{
 		removeifprojectile(this, false, true);
 
-		objectcontainer[2].add(new MO_Explosion(&spr_explosion, ix + (iw >> 2) - 96, iy + (ih >> 2) - 64, 2, 4, playerID, teamID, kill_style_boomerang));
+		objectcontainer[2].add(new MO_Explosion(&spr_explosion, ix + (iw >> 2) - 96, iy + (ih >> 2) - 64, 2, 4, iPlayerID, iTeamID, kill_style_boomerang));
 		ifsoundonplay(sfx_bobombsound);
 	}
 
@@ -4567,7 +4550,7 @@ void MO_Boomerang::update()
 			B_WeaponBreakableBlock * weaponbreakableblock = (B_WeaponBreakableBlock*)blocks[iBlock];
 			if(weaponbreakableblock->iType == 4)
 			{
-				weaponbreakableblock->triggerBehavior(playerID, teamID);
+				weaponbreakableblock->triggerBehavior(iPlayerID, iTeamID);
 				forcedead();
 				return;
 			}
@@ -4712,7 +4695,7 @@ void MO_Boomerang::update()
 				fFlipped = true;
 				
 				/*
-				CPlayer * player = GetPlayerFromGlobalID(playerID);
+				CPlayer * player = GetPlayerFromGlobalID(iPlayerID);
 
 				//No wrap boomerang
 				if(player)
@@ -4735,7 +4718,7 @@ void MO_Boomerang::update()
 			yf(fy + vely);
 
 			//Follow the player zelda style
-			CPlayer * player = GetPlayerFromGlobalID(playerID);
+			CPlayer * player = GetPlayerFromGlobalID(iPlayerID);
 			
 			if(player)
 			{
@@ -4809,7 +4792,7 @@ void MO_Boomerang::forcedead()
 		return;
 
 	//Penalize player if they did not catch it
-	CPlayer * player = GetPlayerFromGlobalID(playerID);
+	CPlayer * player = GetPlayerFromGlobalID(iPlayerID);
 
 	if(player)
 	{
@@ -4820,7 +4803,7 @@ void MO_Boomerang::forcedead()
 
 bool MO_Boomerang::collide(CPlayer * player)
 {
-	if(playerID != player->globalID && (game_values.teamcollision == 2|| teamID != player->teamID))
+	if(iPlayerID != player->globalID && (game_values.teamcollision == 2|| iTeamID != player->teamID))
 	{
 		if(!player->spawninvincible)
 		{
@@ -4829,12 +4812,12 @@ bool MO_Boomerang::collide(CPlayer * player)
 			if(!player->invincible)
 			{
 				//Find the player that shot this boomerang so we can attribute a kill
-				PlayerKilledPlayer(playerID, player, death_style_jump, kill_style_boomerang, false);
+				PlayerKilledPlayer(iPlayerID, player, death_style_jump, kill_style_boomerang, false);
 				return true;
 			}
 		}
 	}
-	else if(playerID == player->globalID && fFlipped)
+	else if(iPlayerID == player->globalID && fFlipped)
 	{
 		removeifprojectile(this, false, true);
 	}
@@ -4867,8 +4850,8 @@ CO_Bomb::CO_Bomb(gfxSprite *nspr, short x, short y, float fVelX, float fVelY, sh
 
 	bounce = GRAVITATION;
 
-	playerID = iGlobalID;
-	teamID = iTeamID;
+	iPlayerID = iGlobalID;
+	iTeamID = iTeamID;
 	iColorOffsetY = (iColorID + 1) * 38;
 	
 	movingObjectType = movingobject_bomb;
@@ -4891,10 +4874,10 @@ bool CO_Bomb::collide(CPlayer * player)
 			velx = 0.0f;
 			vely = 0.0f;
 
-			if(playerID == -1)
+			if(iPlayerID == -1)
 			{
-				playerID = owner->globalID;
-				teamID = owner->teamID;
+				iPlayerID = owner->globalID;
+				iTeamID = owner->teamID;
 				iColorOffsetY = (owner->colorID + 1) * 38;
 			}
 		}
@@ -4973,11 +4956,11 @@ void CO_Bomb::Die()
 		owner = NULL;
 	}
 
-	if(playerID > -1 && projectiles[playerID] > 0)
-		projectiles[playerID]--;
+	if(iPlayerID > -1 && projectiles[iPlayerID] > 0)
+		projectiles[iPlayerID]--;
 
 	dead = true;
-	objectcontainer[2].add(new MO_Explosion(&spr_explosion, ix + (iw >> 2) - 96, iy + (ih >> 2) - 64, 2, 4, playerID, teamID, kill_style_bomb));
+	objectcontainer[2].add(new MO_Explosion(&spr_explosion, ix + (iw >> 2) - 96, iy + (ih >> 2) - 64, 2, 4, iPlayerID, iTeamID, kill_style_bomb));
 	ifsoundonplay(sfx_bobombsound);
 }
 
@@ -5254,20 +5237,13 @@ void MO_Podobo::collide(IO_MovingObject * object)
 			return;
 
 		if(type == movingobject_shell)
-		{
 			((CO_Shell*)object)->Die();
-			ifsoundonplay(sfx_kicksound);
-		}
 		else if(type == movingobject_throwblock)
-		{
 			((CO_ThrowBlock*) object)->Die();
-			ifsoundonplay(sfx_kicksound);
-		}
 		else if(type == movingobject_bulletbill)
-		{
 			((MO_BulletBill*) object)->Die();
-			ifsoundonplay(sfx_kicksound);
-		}
+
+		ifsoundonplay(sfx_kicksound);
 	}
 }
 
@@ -5364,7 +5340,7 @@ MO_BulletBill::MO_BulletBill(gfxSprite *nspr, gfxSprite *nsprdead, short x, shor
 			xi(-iw);
 
 		iPlayerID = playerID;
-		iColorID = game_values.colorids[playerID];
+		iColorID = game_values.colorids[iPlayerID];
 		iTeamID = LookupTeamID(iPlayerID);
 	}
 
@@ -5448,52 +5424,42 @@ void MO_BulletBill::collide(IO_MovingObject * object)
 
 	MovingObjectType type = object->getMovingObjectType();
 
-	if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_bulletbill  || type == movingobject_attackzone)
+	if(type == movingobject_bulletbill)
 	{
-		//Don't kill things with shells that are sitting still
-		if(type == movingobject_shell && ((CO_Shell*)object)->state == 2)
-			return;
+		MO_BulletBill * bulletbill = (MO_BulletBill*) object;
 
 		//Same team bullet bills don't kill each other
-		if(type == movingobject_bulletbill && ((MO_BulletBill*) object)->iTeamID == iTeamID)
+		if(bulletbill->iTeamID == iTeamID)
 			return;
 
-		if(type == movingobject_shell)
-		{
-			((CO_Shell*)object)->Die();
-			ifsoundonplay(sfx_kicksound);
-			Die();
-		}
-		else if(type == movingobject_throwblock)
-		{
-			((CO_ThrowBlock*) object)->Die();
-			ifsoundonplay(sfx_kicksound);
-			Die();
-		}
-		else if(type == movingobject_bulletbill)
-		{
-			MO_BulletBill * bulletbill = (MO_BulletBill*) object;
-			bulletbill->dead = true;
-			dead = true;
+		bulletbill->dead = true;
+		dead = true;
 
-			short iOffsetX = 0;
-			if(ix + iw < bulletbill->ix)
-				iOffsetX = 640;
-			else if(bulletbill->ix + bulletbill->iw < ix)
-				iOffsetX = -640;
+		short iOffsetX = 0;
+		if(ix + iw < bulletbill->ix)
+			iOffsetX = 640;
+		else if(bulletbill->ix + bulletbill->iw < ix)
+			iOffsetX = -640;
 
-			short iCenterX = ((ix + iOffsetX - bulletbill->ix) >> 1) + (bulletbill->ix + (bulletbill->iw >> 1));
-			short iCenterY = ((iy - bulletbill->iy) >> 1) + (bulletbill->iy + (bulletbill->ih >> 1));
+		short iCenterX = ((ix + iOffsetX - bulletbill->ix) >> 1) + (bulletbill->ix + (bulletbill->iw >> 1));
+		short iCenterY = ((iy - bulletbill->iy) >> 1) + (bulletbill->iy + (bulletbill->ih >> 1));
 
-			objectcontainer[2].add(new MO_Explosion(&spr_explosion, iCenterX - 96, iCenterY - 64, 2, 4, -1, -1, kill_style_bulletbill));
-			ifsoundonplay(sfx_bobombsound);
-		}
-		else if(type == movingobject_attackzone)
+		objectcontainer[2].add(new MO_Explosion(&spr_explosion, iCenterX - 96, iCenterY - 64, 2, 4, -1, -1, kill_style_bulletbill));
+		ifsoundonplay(sfx_bobombsound);
+	}
+	else if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone || type == movingobject_explosion)
+	{
+		//Don't kill things with shells that are sitting still
+		if(type == movingobject_shell && object->state == 2)
+			return;
+
+		if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone)
 		{
-			((MO_AttackZone*) object)->Die();
-			ifsoundonplay(sfx_kicksound);
-			Die();
+			object->Die();
 		}
+
+		ifsoundonplay(sfx_kicksound);
+		Die();
 	}
 }
 
@@ -6290,9 +6256,10 @@ OMO_Area::OMO_Area(gfxSprite *nspr, short iNumAreas) :
 	collisionWidth = iw;
 
 	objectType = object_area;
-	playerID = -1;
+	iPlayerID = -1;
+	iTeamID = -1;
+
 	colorID = -1;
-	teamID = -1;
 	scoretimer = 0;
 	
 	state = 1;
@@ -6336,12 +6303,12 @@ void OMO_Area::update()
 	if(touchingPlayer)
 		setOwner(touchingPlayer);
 
-	if(playerID != -1 && !game_values.gamemode->gameover)
+	if(iPlayerID != -1 && !game_values.gamemode->gameover)
 	{
 		if(++scoretimer >= (game_values.pointspeed << 1))
 		{
 			scoretimer = 0;
-			list_players[playerID]->score->AdjustScore(1);
+			list_players[iPlayerID]->score->AdjustScore(1);
 		}
 	}
 
@@ -6377,9 +6344,10 @@ void OMO_Area::placeArea()
 
 void OMO_Area::reset()
 {
-	playerID = -1;
+	iPlayerID = -1;
+	iTeamID = -1;
+
 	colorID = -1;
-	teamID = -1;
 	scoretimer = 0;
 	frame = 0;
 }
@@ -6388,9 +6356,9 @@ void OMO_Area::setOwner(CPlayer * player)
 {
 	if(colorID != player->colorID)
 	{
+		iPlayerID = player->localID;
+		iTeamID = player->teamID;
 		colorID = player->colorID;
-		playerID = player->localID;
-		teamID = player->teamID;
 
 		frame = (colorID + 1) * iw;
 		ifsoundonplay(sfx_areatag);
@@ -6455,7 +6423,7 @@ OMO_KingOfTheHillZone::OMO_KingOfTheHillZone(gfxSprite *nspr) :
 	
 	frame = 0;
 	relocatetimer = 0;
-	playerID = -1;
+	iPlayerID = -1;
 	
 	for(short iPlayer = 0; iPlayer < 4; iPlayer++)
 	{
@@ -6519,24 +6487,24 @@ void OMO_KingOfTheHillZone::update()
 	if((iMax << 1) > totalTouchingPlayers) //If the max touching player team is greater than the rest of the touching players
 	{
 		colorID = playersTouching[iMaxTeam]->colorID;
-		playerID = playersTouching[iMaxTeam]->localID;
+		iPlayerID = playersTouching[iMaxTeam]->localID;
 		frame = (colorID + 1) * TILESIZE * 3;
 	}
 	else
 	{
 		colorID = -1;
-		playerID = -1;
+		iPlayerID = -1;
 		frame = 0;
 	}
 
-	if(playerID != -1 && !game_values.gamemode->gameover)
+	if(iPlayerID != -1 && !game_values.gamemode->gameover)
 	{
 		scoretimer += (iMax << 1) - totalTouchingPlayers;  //Speed of point accumulation is proportional to how many players are in zone
 
 		if(scoretimer >= game_values.pointspeed)
 		{
 			scoretimer = 0;
-			list_players[playerID]->score->AdjustScore(1);
+			list_players[iPlayerID]->score->AdjustScore(1);
 		}
 	}
 
@@ -6562,7 +6530,7 @@ void OMO_KingOfTheHillZone::placeArea()
 {
 	relocatetimer = 0;
 	colorID = -1;
-	playerID = -1;
+	iPlayerID = -1;
 	frame = 0;
 
 	short x;
@@ -6652,7 +6620,7 @@ void OMO_KingOfTheHillZone::placeArea()
 
 void OMO_KingOfTheHillZone::reset()
 {
-	playerID = -1;
+	iPlayerID = -1;
 	colorID = -1;
 	scoretimer = 0;
 	frame = 0;
@@ -7077,8 +7045,8 @@ MO_Explosion::MO_Explosion(gfxSprite *nspr, short x, short y, short iNumSpr, sho
 {
 	state = 1;
 
-	playerID = playerid;
-	teamID = iTeamID;
+	iPlayerID = playerid;
+	iTeamID = iTeamID;
 	timer = 0;
 	movingObjectType = movingobject_explosion;
 	iStyle = style;
@@ -7086,10 +7054,10 @@ MO_Explosion::MO_Explosion(gfxSprite *nspr, short x, short y, short iNumSpr, sho
 
 bool MO_Explosion::collide(CPlayer * player)
 {
-	if(player->globalID != playerID && (game_values.teamcollision == 2 || teamID != player->teamID) && !player->invincible && !player->spawninvincible)
+	if(player->globalID != iPlayerID && (game_values.teamcollision == 2 || iTeamID != player->teamID) && !player->invincible && !player->spawninvincible)
 	{
 		//Find the player that made this explosion so we can attribute a kill
-		PlayerKilledPlayer(playerID, player, death_style_jump, iStyle, false);
+		PlayerKilledPlayer(iPlayerID, player, death_style_jump, iStyle, false);
 		return true;
 	}
 
@@ -7123,7 +7091,7 @@ void MO_Explosion::update()
 						B_WeaponBreakableBlock * weaponbreakableblock = (B_WeaponBreakableBlock*)block;
 						if(weaponbreakableblock->iType == 3)
 						{
-							weaponbreakableblock->triggerBehavior(playerID, teamID);
+							weaponbreakableblock->triggerBehavior(iPlayerID, iTeamID);
 						}
 					}
 				
@@ -7159,7 +7127,7 @@ void MO_Explosion::collide(IO_MovingObject * object)
 			&& !game_values.gamemode->gameover)
 		{
 			//Attribute the kill
-			CPlayer * killer = GetPlayerFromGlobalID(playerID);
+			CPlayer * killer = GetPlayerFromGlobalID(iPlayerID);
 
 			if(killer)
 			{
@@ -7206,7 +7174,7 @@ void MO_Explosion::collide(IO_MovingObject * object)
 	}
 	else if(type == movingobject_sledgebrother)
 	{
-		((MO_SledgeBrother*)object)->Damage(playerID);
+		((MO_SledgeBrother*)object)->Damage(iPlayerID);
 	}
 }
 
@@ -7357,58 +7325,16 @@ void MO_Goomba::collide(IO_MovingObject * object)
 
 		MovingObjectType type = object->getMovingObjectType();
 
-		if(type == movingobject_fireball || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_sledgehammer || type == movingobject_boomerang || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_bulletbill || type == movingobject_podobo || type == movingobject_attackzone)
+		if(type == movingobject_fireball || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_sledgehammer || type == movingobject_boomerang || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_bulletbill || type == movingobject_podobo || type == movingobject_attackzone || type == movingobject_explosion)
 		{
 			//Don't kill goombas with non-moving shells
-			if(type == movingobject_shell && ((CO_Shell*)object)->state == 2)
+			if(type == movingobject_shell && object->state == 2)
 				return;
 
 			if(game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover)
 			{
-				short iPlayerID = -1;
-				if(type == movingobject_fireball)
-				{
-					iPlayerID = ((MO_Fireball*)object)->playerID;
-				}
-				else if(type == movingobject_hammer)
-				{
-					iPlayerID = ((MO_Hammer*)object)->playerID;
-				}
-				else if(type == movingobject_sledgehammer)
-				{
-					iPlayerID = ((MO_SledgeHammer*)object)->playerID;
-				}
-				else if(type == movingobject_boomerang)
-				{
-					iPlayerID = ((MO_Boomerang*)object)->playerID;
-				}
-				else if(type == movingobject_shell)
-				{
-					iPlayerID = ((CO_Shell*)object)->playerID;
-				}
-				else if(type == movingobject_throwblock)
-				{
-					iPlayerID = ((CO_ThrowBlock*)object)->playerID;
-				}
-				else if(type == movingobject_bulletbill)
-				{
-					iPlayerID = ((MO_BulletBill*)object)->iPlayerID;
-				}
-				else if(type == movingobject_superfireball)
-				{
-					iPlayerID = ((MO_SuperFireball*)object)->playerID;
-				}
-				else if(type == movingobject_podobo)
-				{
-					iPlayerID = ((MO_Podobo*)object)->iPlayerID;
-				}
-				else if(type == movingobject_attackzone)
-				{
-					iPlayerID = ((MO_AttackZone*)object)->iPlayerID;
-				}
-
 				//Find the player that shot this fireball so we can attribute a kill
-				CPlayer * killer = GetPlayerFromGlobalID(iPlayerID);
+				CPlayer * killer = GetPlayerFromGlobalID(object->iPlayerID);
 
 				if(killer)
 				{
@@ -7423,21 +7349,13 @@ void MO_Goomba::collide(IO_MovingObject * object)
 			ifsoundonplay(sfx_kicksound);
 			Die();
 		
-			if(type == movingobject_shell)
+			if(type == movingobject_shell || type == movingobject_throwblock)
 			{
-				((CO_Shell*)object)->CheckAndDie();
+				object->CheckAndDie();
 			}
-			else if(type == movingobject_throwblock)
+			else if(type == movingobject_bulletbill || type == movingobject_attackzone)
 			{
-				((CO_ThrowBlock*)object)->CheckAndDie();
-			}
-			else if(type == movingobject_bulletbill)
-			{
-				((MO_BulletBill*)object)->Die();
-			}
-			else if(type == movingobject_attackzone)
-			{
-				((MO_AttackZone*)object)->Die();
+				object->Die();
 			}
 		}
 	}
@@ -7627,58 +7545,16 @@ void MO_CheepCheep::collide(IO_MovingObject * object)
 
 		MovingObjectType type = object->getMovingObjectType();
 
-		if(type == movingobject_fireball || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_sledgehammer || type == movingobject_boomerang || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_bulletbill || type == movingobject_podobo || type == movingobject_attackzone)
+		if(type == movingobject_fireball || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_sledgehammer || type == movingobject_boomerang || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_bulletbill || type == movingobject_podobo || type == movingobject_attackzone || type == movingobject_explosion)
 		{
 			//Don't kill goombas with non-moving shells
-			if(type == movingobject_shell && ((CO_Shell*)object)->state == 2)
+			if(type == movingobject_shell && object->state == 2)
 				return;
 
 			if(game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover)
 			{
-				short iPlayerID = -1;
-				if(type == movingobject_fireball)
-				{
-					iPlayerID = ((MO_Fireball*)object)->playerID;
-				}
-				else if(type == movingobject_hammer)
-				{
-					iPlayerID = ((MO_Hammer*)object)->playerID;
-				}
-				else if(type == movingobject_sledgehammer)
-				{
-					iPlayerID = ((MO_SledgeHammer*)object)->playerID;
-				}
-				else if(type == movingobject_boomerang)
-				{
-					iPlayerID = ((MO_Boomerang*)object)->playerID;
-				}
-				else if(type == movingobject_shell)
-				{
-					iPlayerID = ((CO_Shell*)object)->playerID;
-				}
-				else if(type == movingobject_throwblock)
-				{
-					iPlayerID = ((CO_ThrowBlock*)object)->playerID;
-				}
-				else if(type == movingobject_bulletbill)
-				{
-					iPlayerID = ((MO_BulletBill*)object)->iPlayerID;
-				}
-				else if(type == movingobject_superfireball)
-				{
-					iPlayerID = ((MO_SuperFireball*)object)->playerID;
-				}
-				else if(type == movingobject_podobo)
-				{
-					iPlayerID = ((MO_Podobo*)object)->iPlayerID;
-				}
-				else if(type == movingobject_attackzone)
-				{
-					iPlayerID = ((MO_AttackZone*)object)->iPlayerID;
-				}
-
 				//Find the player that shot this projectile so we can attribute a kill
-				CPlayer * killer = GetPlayerFromGlobalID(iPlayerID);
+				CPlayer * killer = GetPlayerFromGlobalID(object->iPlayerID);
 
 				if(killer)
 				{
@@ -7693,21 +7569,13 @@ void MO_CheepCheep::collide(IO_MovingObject * object)
 			ifsoundonplay(sfx_kicksound);
 			Die();
 		
-			if(type == movingobject_shell)
+			if(type == movingobject_shell || type == movingobject_throwblock)
 			{
-				((CO_Shell*)object)->CheckAndDie();
+				object->CheckAndDie();
 			}
-			else if(type == movingobject_throwblock)
+			else if(type == movingobject_bulletbill || type == movingobject_attackzone)
 			{
-				((CO_ThrowBlock*)object)->CheckAndDie();
-			}
-			else if(type == movingobject_bulletbill)
-			{
-				((MO_BulletBill*)object)->Die();
-			}
-			else if(type == movingobject_attackzone)
-			{
-				((MO_AttackZone*)object)->Die();
+				object->Die();
 			}
 		}
 	}
@@ -8120,55 +7988,32 @@ bool MO_SledgeBrother::hit(CPlayer * player)
 
 void MO_SledgeBrother::collide(IO_MovingObject * object)
 {
-	if(!object->GetDead())
+	if(object->GetDead())
+		return;
+
+	MovingObjectType type = object->getMovingObjectType();
+
+	//Ignore hammers and fireballs thrown from sledge brother
+	if(type == movingobject_sledgehammer || type == movingobject_superfireball)
 	{
-		//Ignore hammers thrown from sledge brother
-		if(object->objectType == object_moving)
+		if(object->iPlayerID == -1)
+			return;
+	}
+
+	removeifprojectile(object, false, false);
+
+	if(iType == 0 && (type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone || type == movingobject_explosion))
+	{
+		if(type == movingobject_shell && object->state == 2)
+			return;
+
+		Damage(object->iPlayerID);
+
+		ifsoundonplay(sfx_kicksound);
+	
+		if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone)
 		{
-			if(((IO_MovingObject*)object)->movingObjectType == movingobject_sledgehammer)
-			{
-				if(((MO_SledgeHammer*)object)->playerID == -1)
-					return;
-			}
-
-			if(((IO_MovingObject*)object)->movingObjectType == movingobject_superfireball)
-			{
-				if(((MO_SuperFireball*)object)->playerID == -1)
-					return;
-			}
-		}
-
-		removeifprojectile(object, false, false);
-
-		MovingObjectType type = object->getMovingObjectType();
-
-		if(iType == 0 && (type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone))
-		{
-			if(type == movingobject_shell && ((CO_Shell*)object)->state == 2)
-				return;
-
-			short iPlayerID = -1;
-			if(type == movingobject_shell)
-				iPlayerID = ((CO_Shell*)object)->playerID;
-			else if(type == movingobject_throwblock)
-				iPlayerID = ((CO_ThrowBlock*)object)->playerID;
-
-			Damage(iPlayerID);
-
-			ifsoundonplay(sfx_kicksound);
-		
-			if(type == movingobject_shell)
-			{
-				((CO_Shell*)object)->Die();
-			}
-			else if(type == movingobject_throwblock)
-			{
-				((CO_ThrowBlock*)object)->Die();
-			}
-			else if(type == movingobject_attackzone)
-			{
-				((MO_AttackZone*)object)->Die();
-			}
+			object->Die();
 		}
 	}
 }
@@ -8224,8 +8069,8 @@ CO_Shell::CO_Shell(short type, short x, short y, bool dieOnMovingPlayerCollision
 	objectType = object_moving;
 	movingObjectType = movingobject_shell;
 	
-	playerID = -1;
-	teamID = -1;
+	iPlayerID = -1;
+	iTeamID = -1;
 
 	iIgnoreBounceTimer = 0;
 	iBounceCounter = 0;
@@ -8356,8 +8201,8 @@ bool CO_Shell::HitOther(CPlayer * player)
 			if(player->AcceptItem(this))
 			{
 				owner = player;
-				playerID = owner->globalID;
-				teamID = owner->teamID;
+				iPlayerID = owner->globalID;
+				iTeamID = owner->teamID;
 				state = 3;
 			}
 			else
@@ -8387,15 +8232,15 @@ bool CO_Shell::HitOther(CPlayer * player)
 		else if(ix + iw < 320 && player->ix > 320)
 			flipx = -640;
 
-		if(iNoOwnerKillTime == 0 || player->globalID != playerID || player->ix + HALFPW + flipx >= ix + (iw >> 1) && velx > 0.0f || player->ix + HALFPW + flipx < ix + (iw >> 1) && velx < 0.0f)
+		if(iNoOwnerKillTime == 0 || player->globalID != iPlayerID || player->ix + HALFPW + flipx >= ix + (iw >> 1) && velx > 0.0f || player->ix + HALFPW + flipx < ix + (iw >> 1) && velx < 0.0f)
 			return KillPlayer(player);
 	}
 	else if(state == 3)  //Holding
 	{
 		if(player != owner && (game_values.teamcollision == 2|| player->teamID != owner->teamID))
 		{
-			playerID = owner->globalID;
-			teamID = owner->teamID;
+			iPlayerID = owner->globalID;
+			iTeamID = owner->teamID;
 			return KillPlayer(player);
 		}
 	}
@@ -8431,10 +8276,10 @@ bool CO_Shell::KillPlayer(CPlayer * player)
 	CheckAndDie();
 
 	//Find the player that shot this shell so we can attribute a kill
-	PlayerKilledPlayer(playerID, player, death_style_jump, kill_style_shell, false);
+	PlayerKilledPlayer(iPlayerID, player, death_style_jump, kill_style_shell, false);
 
-	CPlayer * killer = GetPlayerFromGlobalID(playerID);
-	if(killer && playerID != player->globalID)
+	CPlayer * killer = GetPlayerFromGlobalID(iPlayerID);
+	if(killer && iPlayerID != player->globalID)
 	{
 		AddMovingKill(killer);
 	}
@@ -8453,49 +8298,50 @@ void CO_Shell::AddMovingKill(CPlayer * killer)
 
 void CO_Shell::collide(IO_MovingObject * object)
 {
-	if(!object->GetDead())
+	if(object->GetDead())
+		return;
+
+	//Don't allow shells to die if they are warping
+	if(owner && owner->iswarping())
+		return;
+
+	removeifprojectile(object, false, false);
+
+	MovingObjectType type = object->getMovingObjectType();
+
+	if(type == movingobject_shell)
 	{
-		//Don't allow shells to die if they are warping
-		if(owner && owner->iswarping())
-			return;
+		CO_Shell * shell = (CO_Shell*)object;
 
-		removeifprojectile(object, false, false);
+		//Green shells should die on collision, other shells should not,
+		//except if they also hit a non dead on collision shell
 
-		MovingObjectType type = object->getMovingObjectType();
-
-		if(type == movingobject_fireball || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_sledgehammer || type == movingobject_boomerang || type == movingobject_shell || type == movingobject_throwblock)
+		if(shell->fSmoking && !fSmoking)
+			Die();
+		else if(!shell->fSmoking && fSmoking)
+			shell->Die();
+		else
 		{
-			if(type == movingobject_shell)
-			{
-				CO_Shell * shell = (CO_Shell*)object;
-
-				//Green shells should die on collision, other shells should not,
-				//except if they also hit a non dead on collision shell
-
-				if(shell->fSmoking && !fSmoking)
-					Die();
-				else if(!shell->fSmoking && fSmoking)
-					shell->Die();
-				else
-				{
-					if(fDieOnMovingPlayerCollision || state == 2 || (!shell->fDieOnMovingPlayerCollision && shell->state != 2))
-						Die();
-
-					if(shell->fDieOnMovingPlayerCollision || shell->state == 2 || (!fDieOnMovingPlayerCollision && state != 2))
-						shell->Die();
-				}
-			}
-			else if(type == movingobject_throwblock)
-			{
+			if(fDieOnMovingPlayerCollision || state == 2 || (!shell->fDieOnMovingPlayerCollision && shell->state != 2))
 				Die();
-				((CO_ThrowBlock*)object)->Die();
-			}
-			else
-			{
-				if(fDieOnFire)
-					Die();
-			}
+
+			if(shell->fDieOnMovingPlayerCollision || shell->state == 2 || (!fDieOnMovingPlayerCollision && state != 2))
+				shell->Die();
 		}
+	}
+	else if(type == movingobject_throwblock)
+	{
+		Die();
+		((CO_ThrowBlock*)object)->Die();
+	}
+	else if(type == movingobject_explosion)
+	{
+		Die();
+	}
+	else if(type == movingobject_fireball || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_sledgehammer || type == movingobject_boomerang)
+	{
+		if(fDieOnFire)
+			Die();
 	}
 }
 
@@ -8620,8 +8466,8 @@ void CO_Shell::Kick(bool superkick)
 	velx = owner->IsPlayerFacingRight() ? vel : -vel;
 	vely = 0.0f;
 
-	playerID = owner->globalID;
-	teamID = owner->teamID;
+	iPlayerID = owner->globalID;
+	iTeamID = owner->teamID;
 
 	owner = NULL;
 	iNoOwnerKillTime = 30;
@@ -8672,6 +8518,12 @@ void CO_Shell::SideBounce()
 
 void CO_Shell::Flip()
 {
+	if(owner)
+	{
+		Die();
+		return;
+	}
+
 	if(!fFlipped)
 	{
 		fFlipped = true;
@@ -8705,8 +8557,8 @@ CO_ThrowBlock::CO_ThrowBlock(gfxSprite * nspr, short x, short y, short type) :
 	bounce = GRAVITATION;
 	objectType = object_moving;
 	movingObjectType = movingobject_throwblock;
-	playerID = -1;
-	teamID = -1;
+	iPlayerID = -1;
+	iTeamID = -1;
 	
 	fDieOnBounce = type != 2;
 	fDieOnPlayerCollision = type == 0;
@@ -8769,7 +8621,7 @@ bool CO_ThrowBlock::HitOther(CPlayer * player)
 		else if(ix + iw < 320 && player->ix > 320)
 			flipx = -640;
 
-		if(iNoOwnerKillTime == 0 || player->globalID != playerID || player->ix + flipx > ix && velx > 0.0f || player->ix + flipx <= ix && velx < 0.0f)
+		if(iNoOwnerKillTime == 0 || player->globalID != iPlayerID || player->ix + flipx > ix && velx > 0.0f || player->ix + flipx <= ix && velx < 0.0f)
 		{
 			return KillPlayer(player);
 		}
@@ -8778,8 +8630,8 @@ bool CO_ThrowBlock::HitOther(CPlayer * player)
 	{
 		if(player != owner)
 		{
-			playerID = owner->globalID;
-			teamID = owner->teamID;
+			iPlayerID = owner->globalID;
+			iTeamID = owner->teamID;
 			return KillPlayer(player);
 		}
 	}
@@ -8811,26 +8663,26 @@ bool CO_ThrowBlock::KillPlayer(CPlayer * player)
 	CheckAndDie();
 
 	//Find the player that shot this shell so we can attribute a kill
-	PlayerKilledPlayer(playerID, player, death_style_jump, kill_style_throwblock, false);
+	PlayerKilledPlayer(iPlayerID, player, death_style_jump, kill_style_throwblock, false);
 	return true;
 }
 
 void CO_ThrowBlock::collide(IO_MovingObject * object)
 {
-	if(!object->GetDead())
-	{
-		removeifprojectile(object, false, false);
+	if(object->GetDead())
+		return;
 
-		if(object->getMovingObjectType() == movingobject_shell)
-		{
-			Die();
-			((CO_Shell*)object)->Die();
-		}
-		else if(object->getMovingObjectType() == movingobject_throwblock)
-		{
-			Die();
-			((CO_ThrowBlock*)object)->Die();
-		}
+	removeifprojectile(object, false, false);
+
+	MovingObjectType type = object->getMovingObjectType();
+	if(type == movingobject_throwblock)
+	{
+		Die();
+		((CO_ThrowBlock*)object)->Die();
+	}
+	else if(type == movingobject_explosion)
+	{
+		Die();
 	}
 }
 
@@ -8905,8 +8757,8 @@ void CO_ThrowBlock::Kick(bool superkick)
 	velx = owner->IsPlayerFacingRight() ? vel : -vel;
 	vely = 0.0f;
 
-	playerID = owner->globalID;
-	teamID = owner->teamID;
+	iPlayerID = owner->globalID;
+	iTeamID = owner->teamID;
 
 	owner = NULL;
 	iNoOwnerKillTime = 30;
@@ -8969,7 +8821,7 @@ CO_Spring::CO_Spring(gfxSprite *nspr, short ix, short iy) :
 	state = 1;
 	bounce = GRAVITATION;
 	objectType = object_moving;
-	movingObjectType = movingobject_spring;
+	movingObjectType = movingobject_carried;
 }
 
 bool CO_Spring::collide(CPlayer * player)
@@ -9107,7 +8959,7 @@ CO_Spike::CO_Spike(gfxSprite *nspr, short ix, short iy) :
 	iw = 32;
 	ih = 32;
 
-	movingObjectType = movingobject_spike;
+	movingObjectType = movingobject_carried;
 }
 
 void CO_Spike::hittop(CPlayer * player)
@@ -9129,7 +8981,7 @@ CO_KuriboShoe::CO_KuriboShoe(gfxSprite *nspr, short ix, short iy) :
 	collisionOffsetY = 15;
 	collisionHeight = 16;
 
-	movingObjectType = movingobject_kuriboshoe;
+	movingObjectType = movingobject_carried;
 }
 
 void CO_KuriboShoe::hittop(CPlayer * player)
@@ -9209,7 +9061,7 @@ void MO_AttackZone::collide(IO_MovingObject * object)
 	{
 		if(type == movingobject_shell)
 		{
-			((CO_Shell*)object)->Die();
+			object->Die();
 		}
 		else if(type == movingobject_throwblock)
 		{
@@ -9220,7 +9072,7 @@ void MO_AttackZone::collide(IO_MovingObject * object)
 		}
 
 		ifsoundonplay(sfx_kicksound);
-	}
+	}	
 }
 
 void MO_AttackZone::Die()
@@ -9576,6 +9428,8 @@ MO_PirhanaPlant::MO_PirhanaPlant(short x, short y, short type, short freq, short
 	iDirection = direction;
 	iFreq = freq;
 
+	movingObjectType = movingobject_pirhanaplant;
+
 	//iHiddenPlane = y;
 	//iHiddenDirection = 2 - ((direction / 2) * 2);
 
@@ -9704,23 +9558,19 @@ void MO_PirhanaPlant::collide(IO_MovingObject * object)
 
 	MovingObjectType type = object->getMovingObjectType();
 
-	if(type == movingobject_fireball || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_sledgehammer || type == movingobject_boomerang || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone)
+	if(type == movingobject_fireball || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_sledgehammer || type == movingobject_boomerang || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone || type == movingobject_explosion)
 	{
 		//Don't kill things with shells that are sitting still
-		if(type == movingobject_shell && ((CO_Shell*)object)->state == 2)
+		if(type == movingobject_shell && object->state == 2)
 			return;
 
-		if(type == movingobject_shell)
+		if(type == movingobject_shell || type == movingobject_throwblock)
 		{
-			((CO_Shell*)object)->CheckAndDie();
-		}
-		else if(type == movingobject_throwblock)
-		{
-			((CO_ThrowBlock*) object)->CheckAndDie();
+			object->CheckAndDie();
 		}
 		else if(type == movingobject_attackzone)
 		{
-			((MO_AttackZone*) object)->Die();
+			object->Die();
 		}
 
 		ifsoundonplay(sfx_kicksound);
