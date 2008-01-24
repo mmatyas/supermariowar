@@ -111,6 +111,7 @@ gfxSprite		spr_fireball;
 gfxSprite		spr_rotodisc;
 gfxSprite		spr_bulletbill;
 gfxSprite		spr_flame;
+gfxSprite		spr_pirhanaplant;
 
 TileType		set_type = tile_solid;
 int				set_tile_rows = 0;
@@ -359,6 +360,7 @@ int main(int argc, char *argv[])
 	spr_rotodisc.init(convertPath("gfx/packs/Classic/hazards/rotodisc.png"), 255, 0, 255);
 	spr_bulletbill.init(convertPath("gfx/packs/Classic/hazards/bulletbill.png"), 255, 0, 255);
 	spr_flame.init(convertPath("gfx/packs/Classic/hazards/flame.png"), 255, 0, 255);
+	spr_pirhanaplant.init(convertPath("gfx/packs/Classic/hazards/pirhanaplant.png"), 255, 0, 255);
 
 	if( SDL_SetColorKey(s_platform, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(s_platform->format, 255, 0, 255)) < 0)
 	{
@@ -2789,7 +2791,7 @@ int editor_maphazards()
 						{
 							return EDITOR_EDIT;
 						}
-						else if(MAPHAZARD_EDIT_STATE_TYPE == iEditState || MAPHAZARD_EDIT_STATE_LOCATION == iEditState || MAPHAZARD_EDIT_STATE_PROPERTIES == iEditState)
+						else if(MAPHAZARD_EDIT_STATE_LOCATION == iEditState || MAPHAZARD_EDIT_STATE_PROPERTIES == iEditState)
 						{
 							iEditState = MAPHAZARD_EDIT_STATE_SELECT;
 						}
@@ -2842,7 +2844,7 @@ int editor_maphazards()
 						{
 							MapHazard * hazard = &g_map.maphazards[iEditMapHazard];
 
-							if(hazard->itype == 2 || hazard->itype == 3)
+							if(hazard->itype >= 2 && hazard->itype <= 7)
 							{
 								if(g_map.maphazards[iEditMapHazard].iparam[0] > 30)
 									g_map.maphazards[iEditMapHazard].iparam[0] -= 30;
@@ -2855,7 +2857,7 @@ int editor_maphazards()
 						{
 							MapHazard * hazard = &g_map.maphazards[iEditMapHazard];
 
-							if(hazard->itype == 2 || hazard->itype == 3)
+							if(hazard->itype >= 2 && hazard->itype <= 7)
 							{
 								if(g_map.maphazards[iEditMapHazard].iparam[0] < 480)
 									g_map.maphazards[iEditMapHazard].iparam[0] += 30;
@@ -2868,7 +2870,7 @@ int editor_maphazards()
 						{
 							MapHazard * hazard = &g_map.maphazards[iEditMapHazard];
 
-							if(hazard->itype == 3)
+							if(hazard->itype >= 3 && hazard->itype <= 7)
 							{
 								hazard->iparam[1] = 1 - hazard->iparam[1];
 							}
@@ -2919,7 +2921,7 @@ int editor_maphazards()
 						}
 						else if(MAPHAZARD_EDIT_STATE_TYPE == iEditState && !ignoreclick)
 						{
-							for(int iType = 0; iType < 5; iType++)
+							for(int iType = 0; iType < 8; iType++)
 							{
 								if(iClickX >= rTypeButton[iType][1].x && iClickX < rTypeButton[iType][1].x + rTypeButton[iType][1].w &&
 								   iClickY >= rTypeButton[iType][1].y && iClickY < rTypeButton[iType][1].y + rTypeButton[iType][1].h)
@@ -2951,6 +2953,11 @@ int editor_maphazards()
 									else if(iType == 3)
 									{
 										hazard->iparam[0] = 120; //Frequency
+										hazard->iparam[1] = 0; //Direction
+									}
+									else if(iType >= 4 && iType <= 7)
+									{
+										hazard->iparam[0] = 300; //Frequency
 										hazard->iparam[1] = 0; //Direction
 									}
 
@@ -3102,7 +3109,7 @@ int editor_maphazards()
 			{
 				menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "Properties: [esc] Exit, [l] Location, [-/+] Velocity, [[/]] Frequency");
 			}
-			else if(hazard->itype == 3)
+			else if(hazard->itype >= 3 && hazard->itype <= 7)
 			{
 				menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "Properties: [esc] Exit, [l] Location, [[/]] Frequency, [d] direction");
 			}
@@ -3234,7 +3241,8 @@ void DrawMapHazard(MapHazard * hazard)
 	rLocation[1].x = hazard->ix << 5;
 	rLocation[1].y = hazard->iy << 5;
 
-	SDL_BlitSurface(s_platform, &rLocation[0], screen, &rLocation[1]);
+	if(hazard->itype <= 1)
+		SDL_BlitSurface(s_platform, &rLocation[0], screen, &rLocation[1]);
 
 	if(hazard->itype == 0) //fireball string
 	{
@@ -3293,7 +3301,7 @@ void DrawMapHazard(MapHazard * hazard)
 	}
 	else if(hazard->itype == 2) //bullet bill
 	{
-		spr_bulletbill.draw(rLocation[1].x, rLocation[1].y, hazard->dparam[0] < 0.0f ? 0 : 32, 0, 32, 32);
+		spr_bulletbill.draw(rLocation[1].x, rLocation[1].y, 0, hazard->dparam[0] < 0.0f ? 0 : 32, 32, 32);
 
 		short iBulletPathX = rLocation[1].x - 12;
 		if(hazard->dparam[0] > 0.0f)
@@ -3313,7 +3321,11 @@ void DrawMapHazard(MapHazard * hazard)
 	}
 	else if(hazard->itype == 3) //flame cannon
 	{
-		spr_flame.draw(rLocation[1].x + (hazard->iparam[1] == 0 ? -96 : 32), rLocation[1].y, hazard->iparam[1] == 0 ? 96 : 0, 64, 96, 32);
+		spr_flame.draw(rLocation[1].x + (hazard->iparam[1] == 0 ? -64 : 0), rLocation[1].y, hazard->iparam[1] == 0 ? 96 : 0, 64, 96, 32);
+	}
+	else if(hazard->itype >= 4 && hazard->itype <= 7) //pirhana plants
+	{
+		spr_pirhanaplant.draw(rLocation[1].x, rLocation[1].y + (hazard->iparam[1] == 0 ? (hazard->itype == 6 ? -32 : -16) : 0), hazard->iparam[1] == 0 ? 0 : (hazard->itype >= 6 ? 64 : 128), (hazard->itype - 4) * 48 + (hazard->itype == 7 ? 16 : 0), 32, hazard->itype == 6 ? 64 : 48);
 	}
 
 	if(hazard->itype == 0 || hazard->itype == 1 || hazard->itype == 2)
@@ -3337,7 +3349,7 @@ void DrawMapHazard(MapHazard * hazard)
 		//menu_font_small.draw(444, 420, "Clockwise");
 	}
 
-	if(hazard->itype == 2 || hazard->itype == 3) // Draw frequency for bullet bill and flame cannon
+	if(hazard->itype >= 2 && hazard->itype <= 7) // Draw frequency for bullet bill and flame cannon
 	{
 		short iFreqMarkerX = ((hazard->iparam[0] / 30) - 1) * 12 + 196;
 

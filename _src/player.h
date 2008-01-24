@@ -493,6 +493,7 @@ class CPlayer
 		friend class MO_SpinAttack;
 		friend class MO_AttackZone;
 		friend class OMO_OrbitHazard;
+		friend class OMO_StraightPathHazard;
 		friend class IO_FlameCannon;
 		friend class MO_PirhanaPlant;
 

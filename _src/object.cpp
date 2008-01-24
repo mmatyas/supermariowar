@@ -5311,13 +5311,16 @@ MO_BulletBill::MO_BulletBill(gfxSprite *nspr, gfxSprite *nsprdead, short x, shor
 
 	fIsSpawned = isspawned;
 
+	ih = 32;
+	iw = 32;
+
 	if(fIsSpawned)
 	{
-		ih = (short)nspr->getHeight() >> 3;
-
 		iPlayerID = -1;
 		iColorID = 0;
 		iTeamID = -1;
+
+		animationspeed = 0;
 
 		if(velx < 0.0f)
 		{
@@ -5332,8 +5335,6 @@ MO_BulletBill::MO_BulletBill(gfxSprite *nspr, gfxSprite *nsprdead, short x, shor
 	}
 	else
 	{
-		ih = (short)nspr->getHeight() >> 3;
-
 		if(velx < 0.0f)
 			xi(640 + iw);
 		else
@@ -5355,7 +5356,7 @@ void MO_BulletBill::update()
 
 	animate();
 
-	if((velx < 0 && ix < -iw) || (velx > 0 && ix > 640))
+	if((velx < 0.0f && ix < -iw) || (velx > 0.0f && ix > 640))
 		dead = true;
 }
 
@@ -5878,7 +5879,7 @@ void OMO_FlagBase::update()
 
 		angle = atan2(velx, vely);
 	}
-	else if(ix + collisionWidth > 639)
+	else if(ix + collisionWidth >= 640)
 	{
 		velx = -velx;
 		ix = 639 - collisionWidth;
@@ -5895,7 +5896,7 @@ void OMO_FlagBase::update()
 
 		angle = atan2(velx, vely);
 	}
-	else if(iy + collisionHeight > 479)
+	else if(iy + collisionHeight >= 480)
 	{
 		vely = -vely;
 		iy = 479 - collisionHeight;
@@ -6733,7 +6734,7 @@ void OMO_RaceGoal::update()
 
 		angle = atan2(velx, vely);
 	}
-	else if(ix + collisionWidth > 639)
+	else if(ix + collisionWidth >= 640)
 	{
 		velx = -velx;
 		ix = 639 - collisionWidth;
@@ -6750,7 +6751,7 @@ void OMO_RaceGoal::update()
 
 		angle = atan2(velx, vely);
 	}
-	else if(iy + collisionHeight > 479)
+	else if(iy + collisionHeight >= 480)
 	{
 		vely = -vely;
 		iy = 479 - collisionHeight;
@@ -9271,6 +9272,46 @@ void OMO_OrbitHazard::CalculatePosition()
 
 
 //------------------------------------------------------------------------------
+// class OMO Straight Path Hazard - straight path fireball
+//------------------------------------------------------------------------------
+OMO_StraightPathHazard::OMO_StraightPathHazard(gfxSprite *nspr, short x, short y, float angle, float vel, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iAnimationOffsetX, short iAnimationOffsetY, short iAnimationHeight, short iAnimationWidth) :
+	IO_OverMapObject(nspr, x, y, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY, iAnimationOffsetX, iAnimationOffsetY, iAnimationHeight, iAnimationWidth)
+{
+	objectType = object_pathhazard;
+	
+	dVel = vel;
+	dAngle = angle;
+
+	velx = vel * cos(angle);
+	vely = vel * sin(angle);
+}
+
+void OMO_StraightPathHazard::update()
+{
+	IO_OverMapObject::update();
+
+	if(iy + ih < 0 || iy >= 480)
+		dead = true;
+}
+
+bool OMO_StraightPathHazard::collide(CPlayer * player)
+{
+	if(!player->spawninvincible)
+	{
+		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + (iw >> 2) - 16, iy + (ih >> 2) - 16, 3, 8));
+		dead = true;
+
+		if(!player->invincible)
+		{
+			return player->KillPlayerMapHazard(false, kill_style_environment) != player_kill_nonkill;
+		}
+	}
+
+	return false;
+}
+
+
+//------------------------------------------------------------------------------
 // class IO_BulletBillCannon - gets update calls and shoots bullet bills based on timer
 //------------------------------------------------------------------------------
 
@@ -9289,7 +9330,7 @@ void IO_BulletBillCannon::update()
 	{
 		SetNewTimer();
 
-		objectcontainer[2].add(new MO_BulletBill(&spr_bulletbill, &spr_bulletbilldead, ix, iy, dVel, 0, true));
+		objectcontainer[2].add(new MO_BulletBill(&spr_hazard_bulletbill, &spr_hazard_bulletbilldead, ix + (dVel < 0.0f ? 32 : -32), iy, dVel, 0, true));
 		ifsoundonplay(sfx_bulletbillsound);
 	}
 }
@@ -9321,12 +9362,11 @@ IO_FlameCannon::IO_FlameCannon(short x, short y, short freq, bool isfacingright)
 
 	if(isfacingright)
 	{
-		ix += 32;
 		iFlameX = 0;
 	}
 	else
 	{
-		ix -= 96;
+		ix -= 64;
 		iFlameX = 96;
 	}
 }
@@ -9438,6 +9478,9 @@ MO_PirhanaPlant::MO_PirhanaPlant(short x, short y, short type, short freq, short
 
 	iw = 32;
 
+	if(direction == 0)
+		iy += 32;
+
 	if(iType == 0 || iType == 1)
 	{
 		iSrcX = iDirection * 128;
@@ -9461,6 +9504,9 @@ MO_PirhanaPlant::MO_PirhanaPlant(short x, short y, short type, short freq, short
 
 	iAnimationTimer = 0;
 	iAnimationX = 0;
+
+	iActionTimer = rand() % 8;
+	iFacing = 0;
 }
 
 void MO_PirhanaPlant::update()
@@ -9507,8 +9553,51 @@ void MO_PirhanaPlant::update()
 		}
 	}
 
-	//Animate if these are animated plants
-	if(iType == 2 || iType == 3)
+
+	if(iType == 1) //face the plant towards the nearest player
+	{
+		//Don't do this every frame, just once every 8 frames
+		if(state > 0 && ++iActionTimer >= 8)
+		{
+			int distance_to_player = 640000;
+			short iDiffX, iDiffY;
+
+			short iPlantX = ix + 16;
+			short iPlantY = iy + (iDirection == 0 ? 16 : ih - 16);
+
+			for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++)
+			{
+				CPlayer * player = list_players[iPlayer];
+				if(player->state != player_ready)
+					continue;
+
+				//Calculate normal screen distance
+				short tx = iPlantX - player->ix - PW;
+				short ty = iPlantY - player->iy - PH;
+				
+				int distance_player_pow2 = tx*tx + ty*ty;
+
+				if (distance_player_pow2 < distance_to_player)
+				{
+					distance_to_player = distance_player_pow2;
+					iDiffX = tx;
+					iDiffY = ty;
+				}
+			}
+
+			float dAngle = (float)atan2((double)iDiffX, (double)iDiffY);
+			
+			if(dAngle >= 0.0f && dAngle < HALF_PI)
+				iFacing = 0;
+			else if(dAngle >= HALF_PI && dAngle <= PI)
+				iFacing = 32;
+			else if(dAngle >= -HALF_PI && dAngle < 0.0f)
+				iFacing = 64;
+			else if(dAngle >= -PI && dAngle < -HALF_PI)
+				iFacing = 96;
+		}
+	}
+	else if(iType == 2 || iType == 3) //Animate if these are animated plants
 	{
 		if(++iAnimationTimer >= 8)
 		{
@@ -9519,6 +9608,12 @@ void MO_PirhanaPlant::update()
 				iAnimationX = 0;
 		}
 	}
+
+	//Fire a fireball
+	if(iType <= 1 && state == 2 && iTimer == 30)
+	{
+		objectcontainer[1].add(new OMO_StraightPathHazard(&spr_hazard_fireball, ix + 7, iDirection == 0 ? iy + 7 : iy + ih - 23, GetFireballAngle(), 3.0f, 4, 8, 18, 18, 0, 0, 0, iFacing <= 32 ? 18 : 0, 18, 18));
+	}
 }
 
 void MO_PirhanaPlant::draw()
@@ -9526,9 +9621,9 @@ void MO_PirhanaPlant::draw()
 	if(state > 0)
 	{
 		if(iDirection == 0)
-			spr_hazard_pirhanaplant.draw(ix, iy, iSrcX + iAnimationX, iSrcY, 32, collisionHeight);
+			spr_hazard_pirhanaplant.draw(ix, iy, iSrcX + iAnimationX + iFacing, iSrcY, 32, collisionHeight);
 		else
-			spr_hazard_pirhanaplant.draw(ix, iy, iSrcX + iAnimationX, iSrcY + ih - collisionHeight, 32, collisionHeight);
+			spr_hazard_pirhanaplant.draw(ix, iy, iSrcX + iAnimationX + iFacing, iSrcY + ih - collisionHeight, 32, collisionHeight);
 	}
 }
 
@@ -9581,6 +9676,20 @@ void MO_PirhanaPlant::collide(IO_MovingObject * object)
 void MO_PirhanaPlant::SetNewTimer()
 {
 	iTimer = iFreq + (rand() % iFreq);
+
+	//Face the green fireball plant in a random direction
+	if(iType == 0)
+	{
+		//Only point flower towards directions that make sense
+		if((ix >> 5) == 19)
+			iFacing = rand() % 2;
+		else if(ix == 0)
+			iFacing = (rand() % 2) + 2;
+		else
+			iFacing = rand() % 4;
+
+		iFacing <<= 5;
+	}
 }
 
 void MO_PirhanaPlant::KillPlant()
@@ -9594,6 +9703,20 @@ void MO_PirhanaPlant::KillPlant()
 	collisionHeight = 0;
 
 	eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix, iy - (iDirection == 0 ? 32 : 0), 3, 4));
+}
+
+float MO_PirhanaPlant::GetFireballAngle()
+{
+	if(iFacing == 0)
+		return -2.7214f;
+	else if(iFacing == 32)
+		return 2.7214f;
+	else if(iFacing == 64)
+		return -0.4202f;
+	else if(iFacing == 96)
+		return 0.4202f;
+
+	return 0.0f;
 }
 
 //------------------------------------------------------------------------------

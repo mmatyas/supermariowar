@@ -34,7 +34,7 @@
 
 //4) Still reports of disappearing map tiles - caused when rRects is used out of bounds causing w and h to be set to 0 - happened with platform with tile using row 960
 
-//5) FIXME!!  Collision detection between pirhana plants and weapons is not working correctly - test ALL weapons!
+//5) Have green and red pirhana plants shoot fireballs
 
 #ifdef _XBOX
 	#include <xtl.h>
@@ -242,6 +242,7 @@ gfxSprite		spr_kuriboshoe;
 gfxSprite		spr_hazard_fireball;
 gfxSprite		spr_hazard_rotodisc;
 gfxSprite		spr_hazard_bulletbill;
+gfxSprite		spr_hazard_bulletbilldead;
 gfxSprite		spr_hazard_flame;
 gfxSprite		spr_hazard_pirhanaplant;
 
@@ -3468,7 +3469,7 @@ void LoadMapObjects()
 		if(hazard->itype == 0)
 		{
 			for(short iFireball = 0; iFireball < hazard->iparam[0]; iFireball++)
-				objectcontainer[2].add(new OMO_OrbitHazard(&spr_hazard_fireball, (hazard->ix << 5) + 16, (hazard->iy << 5) + 16, (float)(iFireball * 24), hazard->dparam[0], hazard->dparam[1], 4, 8, 18, 18, 0, 0, 0, hazard->dparam[0] < 0.0f ? 18 : 0, 18, 18));
+				objectcontainer[1].add(new OMO_OrbitHazard(&spr_hazard_fireball, (hazard->ix << 5) + 16, (hazard->iy << 5) + 16, (float)(iFireball * 24), hazard->dparam[0], hazard->dparam[1], 4, 8, 18, 18, 0, 0, 0, hazard->dparam[0] < 0.0f ? 18 : 0, 18, 18));
 		}
 		else if(hazard->itype == 1)
 		{
@@ -3479,7 +3480,7 @@ void LoadMapObjects()
 				if(dAngle > TWO_PI)
 					dAngle -= TWO_PI;
 
-				objectcontainer[2].add(new OMO_OrbitHazard(&spr_hazard_rotodisc, (hazard->ix << 5) + 16, (hazard->iy << 5) + 16, hazard->dparam[2], hazard->dparam[0], dAngle, 3, 8, 32, 32, 0, 0, 0, 0, 32, 32));
+				objectcontainer[1].add(new OMO_OrbitHazard(&spr_hazard_rotodisc, (hazard->ix << 5) + 16, (hazard->iy << 5) + 16, hazard->dparam[2], hazard->dparam[0], dAngle, 3, 8, 32, 32, 0, 0, 0, 0, 32, 32));
 			}
 		}
 		else if(hazard->itype == 2)
@@ -3488,21 +3489,13 @@ void LoadMapObjects()
 		}
 		else if(hazard->itype == 3)
 		{
-			objectcontainer[2].add(new IO_FlameCannon(hazard->ix << 5, hazard->iy << 5, hazard->iparam[0], hazard->iparam[1] == 1));
+			objectcontainer[1].add(new IO_FlameCannon(hazard->ix << 5, hazard->iy << 5, hazard->iparam[0], hazard->iparam[1] == 1));
+		}
+		else if(hazard->itype >= 4 && hazard->itype <= 7)
+		{
+			objectcontainer[1].add(new MO_PirhanaPlant(hazard->ix << 5, hazard->iy << 5, hazard->itype - 4, hazard->iparam[0], hazard->iparam[1]));
 		}
 	}
-
-	/*
-	objectcontainer[0].add(new MO_PirhanaPlant(320, 384, 0, 30, 1));
-	objectcontainer[0].add(new MO_PirhanaPlant(352, 384, 1, 30, 1));
-	objectcontainer[0].add(new MO_PirhanaPlant(384, 384, 2, 30, 1));
-	objectcontainer[0].add(new MO_PirhanaPlant(416, 384, 3, 30, 1));
-
-	objectcontainer[0].add(new MO_PirhanaPlant(320, 352, 0, 30, 0));
-	objectcontainer[0].add(new MO_PirhanaPlant(352, 352, 1, 30, 0));
-	objectcontainer[0].add(new MO_PirhanaPlant(384, 352, 2, 30, 0));
-	objectcontainer[0].add(new MO_PirhanaPlant(416, 352, 3, 30, 0));
-	*/
 }
 
 bool SwapPlayers(short iUsingPlayerID)

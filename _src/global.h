@@ -427,6 +427,7 @@ extern gfxSprite		spr_kuriboshoe;
 extern gfxSprite		spr_hazard_fireball;
 extern gfxSprite		spr_hazard_rotodisc;
 extern gfxSprite		spr_hazard_bulletbill;
+extern gfxSprite		spr_hazard_bulletbilldead;
 extern gfxSprite		spr_hazard_flame;
 extern gfxSprite		spr_hazard_pirhanaplant;
 

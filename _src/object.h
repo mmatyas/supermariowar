@@ -1,7 +1,7 @@
 #ifndef _OBJECT_H
 #define _OBJECT_H
 
-enum ObjectType{object_none = 0, object_block = 1, object_moving = 2, object_overmap = 3, object_area = 4, object_egg = 5, object_frenzycard = 6, object_yoshi = 7, object_race_goal = 8, object_star = 9, object_flag = 10, object_flagbase = 11, object_thwomp = 12, object_kingofthehill_area = 13, object_bowserfire = 14, object_coin = 15, object_collectioncard = 16, object_orbithazard = 17, object_bulletbillcannon = 18, object_flamecannon = 19};
+enum ObjectType{object_none = 0, object_block = 1, object_moving = 2, object_overmap = 3, object_area = 4, object_egg = 5, object_frenzycard = 6, object_yoshi = 7, object_race_goal = 8, object_star = 9, object_flag = 10, object_flagbase = 11, object_thwomp = 12, object_kingofthehill_area = 13, object_bowserfire = 14, object_coin = 15, object_collectioncard = 16, object_orbithazard = 17, object_bulletbillcannon = 18, object_flamecannon = 19, object_pathhazard = 20};
 enum MovingObjectType{movingobject_none = 0, movingobject_powerup = 1, movingobject_fireball = 2, movingobject_goomba = 3, movingobject_bulletbill = 4, movingobject_hammer = 5, movingobject_poisonpowerup = 6, movingobject_shell = 7, movingobject_throwblock = 8, movingobject_egg = 9, movingobject_star = 10, movingobject_flag = 11, movingobject_cheepcheep = 12, movingobject_koopa = 13, movingobject_boomerang = 14, movingobject_carried = 15, movingobject_sledgehammer = 16, movingobject_sledgebrother = 17, movingobject_bomb = 18, movingobject_superfireball = 19, movingobject_podobo = 20, movingobject_treasurechest = 21, movingobject_attackzone = 22, movingobject_pirhanaplant = 23, movingobject_explosion = 24, MOVINGOBJECT_LAST};
 enum BlockType{block_none, block_powerup, block_view, block_breakable, block_note, block_donut, block_flip, block_bounce, block_throw, block_onoff_switch, block_onoff, block_weaponbreakable};
 
@@ -1654,13 +1654,27 @@ class OMO_OrbitHazard : public IO_OverMapObject
 		void update();
 
 		bool collide(CPlayer *);
-		void collide(IO_MovingObject *){};
 
 	private:
 		void CalculatePosition();
 
 		float dAngle, dVel, dRadius;
 		float dCenterX, dCenterY;
+};
+
+class OMO_StraightPathHazard : public IO_OverMapObject
+{
+	public:
+		OMO_StraightPathHazard(gfxSprite *nspr, short x, short y, float angle, float vel, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iAnimationOffsetX, short iAnimationOffsetY, short iAnimationHeight, short iAnimationWidth);
+		~OMO_StraightPathHazard() {}
+
+		void update();
+
+		bool collide(CPlayer *);
+
+	private:
+
+		float dAngle, dVel;
 };
 
 class IO_BulletBillCannon : public CObject
@@ -1728,12 +1742,15 @@ class MO_PirhanaPlant : public IO_MovingObject
 	private:
 		void SetNewTimer();
 		void KillPlant();
+		float GetFireballAngle();
 
 		short iType, iDirection;
 		short iFreq, iTimer;
 		//short iHiddenPlane, iHiddenDirection;
 		short iSrcX, iSrcY;
 		short iAnimationTimer, iAnimationX;
+		short iFacing;
+		short iActionTimer;
 };
 
 //object container
