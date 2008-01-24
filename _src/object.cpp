@@ -9612,7 +9612,7 @@ void MO_PirhanaPlant::update()
 	//Fire a fireball
 	if(iType <= 1 && state == 2 && iTimer == 30)
 	{
-		objectcontainer[1].add(new OMO_StraightPathHazard(&spr_hazard_fireball, ix + 7, iDirection == 0 ? iy + 7 : iy + ih - 23, GetFireballAngle(), 3.0f, 4, 8, 18, 18, 0, 0, 0, iFacing <= 32 ? 18 : 0, 18, 18));
+		objectcontainer[0].add(new OMO_StraightPathHazard(&spr_hazard_fireball, ix + 7, iDirection == 0 ? iy + 7 : iy + ih - 23, GetFireballAngle(), 3.0f, 4, 8, 18, 18, 0, 0, 0, iFacing <= 32 ? 18 : 0, 18, 18));
 	}
 }
 

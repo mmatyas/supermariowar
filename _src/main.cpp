@@ -3469,7 +3469,7 @@ void LoadMapObjects()
 		if(hazard->itype == 0)
 		{
 			for(short iFireball = 0; iFireball < hazard->iparam[0]; iFireball++)
-				objectcontainer[1].add(new OMO_OrbitHazard(&spr_hazard_fireball, (hazard->ix << 5) + 16, (hazard->iy << 5) + 16, (float)(iFireball * 24), hazard->dparam[0], hazard->dparam[1], 4, 8, 18, 18, 0, 0, 0, hazard->dparam[0] < 0.0f ? 18 : 0, 18, 18));
+				objectcontainer[1].add(new OMO_OrbitHazard(&spr_hazard_fireball, (hazard->ix << 4) + 16, (hazard->iy << 4) + 16, (float)(iFireball * 24), hazard->dparam[0], hazard->dparam[1], 4, 8, 18, 18, 0, 0, 0, hazard->dparam[0] < 0.0f ? 18 : 0, 18, 18));
 		}
 		else if(hazard->itype == 1)
 		{
@@ -3480,20 +3480,20 @@ void LoadMapObjects()
 				if(dAngle > TWO_PI)
 					dAngle -= TWO_PI;
 
-				objectcontainer[1].add(new OMO_OrbitHazard(&spr_hazard_rotodisc, (hazard->ix << 5) + 16, (hazard->iy << 5) + 16, hazard->dparam[2], hazard->dparam[0], dAngle, 3, 8, 32, 32, 0, 0, 0, 0, 32, 32));
+				objectcontainer[1].add(new OMO_OrbitHazard(&spr_hazard_rotodisc, (hazard->ix << 4) + 16, (hazard->iy << 4) + 16, hazard->dparam[2], hazard->dparam[0], dAngle, 3, 8, 32, 32, 0, 0, 0, 0, 32, 32));
 			}
 		}
 		else if(hazard->itype == 2)
 		{
-			noncolcontainer.add(new IO_BulletBillCannon(hazard->ix << 5, hazard->iy << 5, hazard->iparam[0], hazard->dparam[0]));
+			noncolcontainer.add(new IO_BulletBillCannon(hazard->ix << 4, hazard->iy << 4, hazard->iparam[0], hazard->dparam[0]));
 		}
 		else if(hazard->itype == 3)
 		{
-			objectcontainer[1].add(new IO_FlameCannon(hazard->ix << 5, hazard->iy << 5, hazard->iparam[0], hazard->iparam[1] == 1));
+			objectcontainer[1].add(new IO_FlameCannon(hazard->ix << 4, hazard->iy << 4, hazard->iparam[0], hazard->iparam[1] == 1));
 		}
 		else if(hazard->itype >= 4 && hazard->itype <= 7)
 		{
-			objectcontainer[1].add(new MO_PirhanaPlant(hazard->ix << 5, hazard->iy << 5, hazard->itype - 4, hazard->iparam[0], hazard->iparam[1]));
+			objectcontainer[1].add(new MO_PirhanaPlant(hazard->ix << 4, hazard->iy << 4, hazard->itype - 4, hazard->iparam[0], hazard->iparam[1]));
 		}
 	}
 }

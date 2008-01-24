@@ -2967,8 +2967,9 @@ int editor_maphazards()
 						}
 						else if(MAPHAZARD_EDIT_STATE_LOCATION == iEditState && !ignoreclick)
 						{
-							g_map.maphazards[iEditMapHazard].ix = iClickX / TILESIZE;
-							g_map.maphazards[iEditMapHazard].iy = iClickY / TILESIZE;
+							MapHazard * hazard = &g_map.maphazards[iEditMapHazard];
+							hazard->ix = iClickX / 16;
+							hazard->iy = iClickY / 16;
 						}
 						else if(MAPHAZARD_EDIT_STATE_PROPERTIES == iEditState && !ignoreclick)
 						{
@@ -3014,8 +3015,9 @@ int editor_maphazards()
 					{
 						if(MAPHAZARD_EDIT_STATE_LOCATION == iEditState && !ignoreclick)
 						{
-							g_map.maphazards[iEditMapHazard].ix = iClickX / TILESIZE;
-							g_map.maphazards[iEditMapHazard].iy = iClickY / TILESIZE;
+							MapHazard * hazard = &g_map.maphazards[iEditMapHazard];
+							hazard->ix = iClickX / 16;
+							hazard->iy = iClickY / 16;
 						}
 						else if(MAPHAZARD_EDIT_STATE_PROPERTIES == iEditState)
 						{
@@ -3238,8 +3240,8 @@ void DrawMapHazard(MapHazard * hazard)
 	SDL_Rect rDot[2] = {{150, 362, 12, 12},{0, 0, 12, 12}};
 
 	//Draw center of location
-	rLocation[1].x = hazard->ix << 5;
-	rLocation[1].y = hazard->iy << 5;
+	rLocation[1].x = hazard->ix << 4;
+	rLocation[1].y = hazard->iy << 4;
 
 	if(hazard->itype <= 1)
 		SDL_BlitSurface(s_platform, &rLocation[0], screen, &rLocation[1]);
@@ -3263,8 +3265,8 @@ void DrawMapHazard(MapHazard * hazard)
 		//Draw the fireball string
 		for(short iFireball = 0; iFireball < hazard->iparam[0]; iFireball++)
 		{
-			short x = (hazard->ix << 5) + (short)((float)(iFireball * 24) * cos(hazard->dparam[1])) + 7;
-			short y = (hazard->iy << 5) + (short)((float)(iFireball * 24) * sin(hazard->dparam[1])) + 7;
+			short x = (hazard->ix << 4) + (short)((float)(iFireball * 24) * cos(hazard->dparam[1])) + 7;
+			short y = (hazard->iy << 4) + (short)((float)(iFireball * 24) * sin(hazard->dparam[1])) + 7;
 
 			spr_fireball.draw(x, y, 0, 0, 18, 18);
 		}
@@ -3365,8 +3367,8 @@ void DrawMapHazard(MapHazard * hazard)
 
 void AdjustMapHazardRadius(MapHazard * hazard, short iClickX, short iClickY)
 {
-	short iDiffX = iClickX - ((hazard->ix << 5) + 16);
-	short iDiffY = iClickY - ((hazard->iy << 5) + 16);
+	short iDiffX = iClickX - ((hazard->ix << 4) + 16);
+	short iDiffY = iClickY - ((hazard->iy << 4) + 16);
 
 	float radius = (float)sqrt((double)(iDiffX * iDiffX + iDiffY * iDiffY));
 	float angle = (float)atan2((double)iDiffY, (double)iDiffX);
