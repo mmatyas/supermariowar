@@ -338,7 +338,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 				warpdata[i][j].id = (short)ReadInt(mapfile);
 				
 				for(short iType = 0; iType < NUMSPAWNAREATYPES; iType++)
-					nospawn[iType][i][j] = ReadInt(mapfile) == 0 ? false : true;
+					nospawn[iType][i][j] = ReadBool(mapfile);
 			}
 		}
 
@@ -602,8 +602,12 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 				warpdata[i][j].connection = (short)ReadInt(mapfile);
 				warpdata[i][j].id = (short)ReadInt(mapfile);
 				
-				for(short iType = 0; iType < NUMSPAWNAREATYPES; iType++)
+				for(short iType = 0; iType < 6; iType += 5)
 					nospawn[iType][i][j] = ReadInt(mapfile) == 0 ? false : true;
+
+				//Copy player no spawn areas into team no spawn areas
+				for(short iType = 1; iType < 5; iType++)
+					nospawn[iType][i][j] = nospawn[0][i][j];
 			}
 		}
 
@@ -646,8 +650,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 			numwarpexits = MAXWARPS;
 
 		//Read spawn areas
-
-		for(i = 0; i < NUMSPAWNAREATYPES; i++)
+		for(i = 0; i < 6; i += 5)
 		{
 			totalspawnsize[i] = 0;
 			numspawnareas[i] = (short)ReadInt(mapfile);
@@ -669,6 +672,22 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 				spawnareas[i][m].size = (short)ReadInt(mapfile);
 			
 				totalspawnsize[i] += spawnareas[i][m].size;
+			}
+		}
+
+		//Copy player spawn areas to team specific spawn areas
+		for(short iType = 1; iType < 5; iType++)
+		{
+			totalspawnsize[iType] = totalspawnsize[0];
+			numspawnareas[iType] = numspawnareas[0];
+
+			for(int m = 0; m < numspawnareas[0]; m++)
+			{
+				spawnareas[iType][m].left = spawnareas[0][m].left;
+				spawnareas[iType][m].top = spawnareas[0][m].top;
+				spawnareas[iType][m].width = spawnareas[0][m].width;
+				spawnareas[iType][m].height = spawnareas[0][m].height;
+				spawnareas[iType][m].size = spawnareas[0][m].size;
 			}
 		}
 
@@ -867,7 +886,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 		//Then duplicate it for all the other spawn areas
 		for(short i = 1; i < NUMSPAWNAREATYPES; i++)
 		{
-			totalspawnsize[i] = 0;
+			totalspawnsize[i] = totalspawnsize[0];
 			numspawnareas[i] = numspawnareas[0];
 
 			//Read the only spawn area definition in the file
@@ -884,8 +903,6 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 					spawnareas[i][m].width -= spawnareas[i][m].left;
 					spawnareas[i][m].height -= spawnareas[i][m].top;
 				}
-
-				totalspawnsize[i] += spawnareas[i][m].size;
 			}
 		}
 
@@ -1150,10 +1167,9 @@ void CMap::loadPlatforms(FILE * mapfile, bool fPreview, int version[4], short * 
 		float fEndX = ReadFloat(mapfile);
 		float fEndY = ReadFloat(mapfile);
 		float fVelocity = ReadFloat(mapfile);
-		
-		MovingPlatformPath * path = new MovingPlatformPath(fVelocity, fStartX, fStartY, fEndX, fEndY, false);
 
-		platforms[iPlatform] = new MovingPlatform(tiles, types, iWidth, iHeight, path, true, 0, fPreview);
+		MovingPlatformPath * path = new StraightPath(fVelocity, fStartX, fStartY, fEndX, fEndY, fPreview);
+		platforms[iPlatform] = new MovingPlatform(tiles, types, iWidth, iHeight, path, fPreview);
 	}
 }
 
@@ -1433,12 +1449,12 @@ void CMap::saveMap(const std::string& file)
 				WriteInt(platforms[iPlatform]->iTileType[iCol][iRow].iType, mapfile);
 			}
 		}
-
-		WriteFloat(platforms[iPlatform]->pPath->fStartX, mapfile);
-		WriteFloat(platforms[iPlatform]->pPath->fStartY, mapfile);
-		WriteFloat(platforms[iPlatform]->pPath->fEndX, mapfile);
-		WriteFloat(platforms[iPlatform]->pPath->fEndY, mapfile);
-		WriteFloat(platforms[iPlatform]->pPath->fVelocity, mapfile);
+		
+		WriteFloat(platforms[iPlatform]->pPath->dPathPointX[0], mapfile);
+		WriteFloat(platforms[iPlatform]->pPath->dPathPointY[0], mapfile);
+		WriteFloat(platforms[iPlatform]->pPath->dPathPointX[1], mapfile);
+		WriteFloat(platforms[iPlatform]->pPath->dPathPointY[1], mapfile);
+		WriteFloat(platforms[iPlatform]->pPath->dVelocity, mapfile);
 	}
 
 	//Write map items (carried springs, spikes, kuribo's shoe, etc)
@@ -1498,8 +1514,11 @@ void CMap::saveMap(const std::string& file)
 			WriteInt(warpdata[i][j].id, mapfile);
 			
 			//Write per tile allowed spawn types (player, item, possibly team specific TBD)
-			for(short iType = 0; iType < NUMSPAWNAREATYPES; iType++)
-				WriteInt((int)nospawn[iType][i][j], mapfile);
+			//NUMSPAWNAREATYPES
+			for(short iType = 0; iType < 5; iType++)
+				WriteBool(nospawn[0][i][j], mapfile);
+
+			WriteBool(nospawn[5][i][j], mapfile);
 		}
 	}
 
@@ -1594,12 +1613,17 @@ void CMap::saveMap(const std::string& file)
 		}
 	}
 
-	calculatespawnareas(0, false);
-	
-	if(numspawnareas[0] == 0)
-		calculatespawnareas(0, true);
+	//Calculate player/team spawn zones
+	for(short iType = 0; iType < 5; iType++)
+	{
+		calculatespawnareas(iType, false);
+		
+		if(numspawnareas[iType] == 0)
+			calculatespawnareas(iType, true);
+	}
 
-	calculatespawnareas(1, false);
+	//Calculate item spawn zones
+	calculatespawnareas(5, false);
 
 	//Write spawn areas
 	for(i = 0; i < NUMSPAWNAREATYPES; i++)
@@ -1615,7 +1639,6 @@ void CMap::saveMap(const std::string& file)
 			WriteInt(spawnareas[i][m].size, mapfile);
 		}
 	}
-
 	
 	for(j = 0; j < MAPHEIGHT; j++)
 		for(i = 0; i < MAPWIDTH; i++)
@@ -2179,8 +2202,8 @@ void CMap::drawThumbnailPlatforms(SDL_Surface * targetSurface)
 
 	for(short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++)
 	{
-		short iStartX = ((short)platforms[iPlatform]->pPath->fStartX - platforms[iPlatform]->iHalfWidth) / PREVIEWTILESIZE;
-		short iStartY = ((short)platforms[iPlatform]->pPath->fStartY - platforms[iPlatform]->iHalfHeight) / PREVIEWTILESIZE;
+		short iStartX = ((short)platforms[iPlatform]->pPath->dPathPointX[0] - platforms[iPlatform]->iHalfWidth) / PREVIEWTILESIZE;
+		short iStartY = ((short)platforms[iPlatform]->pPath->dPathPointY[0] - platforms[iPlatform]->iHalfHeight) / PREVIEWTILESIZE;
 
 		for(short iPlatformX = 0; iPlatformX < platforms[iPlatform]->iTileWidth; iPlatformX++)
 		{
@@ -2205,9 +2228,9 @@ void CMap::drawThumbnailPlatforms(SDL_Surface * targetSurface)
 	for(short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++)
 	{
 		MovingPlatformPath * pPath = platforms[iPlatform]->pPath;
-		short iStartX = ((short)pPath->fStartX - platforms[iPlatform]->iHalfWidth) / PREVIEWTILESIZE;
-		short iStartY = ((short)pPath->fStartY - platforms[iPlatform]->iHalfHeight) / PREVIEWTILESIZE;
-		short iEndX = ((short)pPath->fEndX - platforms[iPlatform]->iHalfWidth) / PREVIEWTILESIZE;
+		short iStartX = ((short)pPath->dPathPointX[0] - platforms[iPlatform]->iHalfWidth) / PREVIEWTILESIZE;
+		short iStartY = ((short)pPath->dPathPointY[0] - platforms[iPlatform]->iHalfHeight) / PREVIEWTILESIZE;
+		short iEndX = ((short)pPath->dPathPointX[1] - platforms[iPlatform]->iHalfWidth) / PREVIEWTILESIZE;
 		
 		if(iStartX != iEndX)
 		{
@@ -2226,8 +2249,8 @@ void CMap::drawThumbnailPlatforms(SDL_Surface * targetSurface)
 		}
 		else
 		{
-			short iEndY = ((short)pPath->fEndY - platforms[iPlatform]->iHalfHeight) / PREVIEWTILESIZE;
-
+			short iEndY = ((short)pPath->dPathPointY[1] - platforms[iPlatform]->iHalfHeight) / PREVIEWTILESIZE;
+			
 			short iCenterOffsetX = (platforms[iPlatform]->iWidth - 16) >> 2;
 
 			bool fMoveUp = iStartY < iEndY;

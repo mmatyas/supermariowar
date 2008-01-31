@@ -1248,7 +1248,6 @@ class MO_Explosion : public IO_MovingObject
 
 		void update();
 		bool collide(CPlayer * player);
-		void collide(IO_MovingObject * object);
 		
 	private:
 		

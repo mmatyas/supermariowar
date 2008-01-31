@@ -5,61 +5,336 @@ extern short x_shake;
 extern short y_shake;
 
 //------------------------------------------------------------------------------
-// Moving Platform
+// Moving Platform Path base class
 //------------------------------------------------------------------------------
 
-MovingPlatformPath::MovingPlatformPath(float vel, float startX, float startY, float endX, float endY, bool falling)
+MovingPlatformPath::MovingPlatformPath(float vel, float startX, float startY, float endX, float endY, bool preview)
 {
-	fVelocity = vel;
-	fStartX = startX;
-	fStartY = startY;
-	fEndX = endX;
-	fEndY = endY;
-	fFalling = falling;
+	dVelocity = vel;
+	dVelX = 0.0f;
+	dVelY = 0.0f;
 
-	CalculateAngle();
-}
+	dPathPointX[0] = startX;
+	dPathPointY[0] = startY;
+	dPathPointX[1] = endX;
+	dPathPointY[1] = endY;
 
-MovingPlatformPath::MovingPlatformPath()
-{
-	//Give it some default values for a vertical slow moving platform
-	fVelocity = 1.0f;
-	fStartX = 304.0f;
-	fStartY = 48.0f;
-	fEndX = 304.0f;
-	fEndY = 432.0f;
-	fFalling = false;
-
-	CalculateAngle();
-}
-
-MovingPlatformPath::~MovingPlatformPath()
-{}
-
-void MovingPlatformPath::CalculateAngle()
-{
-	if(fEndX - fStartX == 0)
+	if(preview)
 	{
-		if(fEndY - fStartY > 0)
-			fAngle = HALF_PI;
-		else
-			fAngle = THREE_HALF_PI;
+		dPathPointX[0] /= 2.0f;
+		dPathPointY[0] /= 2.0f;
+		dPathPointX[1] /= 2.0f;
+		dPathPointY[1] /= 2.0f;
+		dVelocity /= 2.0f;
 	}
-	else if(fEndY - fStartY == 0)
+
+	pPlatform = NULL;
+
+	iSteps = 0;
+
+	Reset();
+}
+
+void MovingPlatformPath::Reset()
+{
+	iOnStep[0] = 0;
+	iOnStep[1] = 0;
+
+	dCurrentX = dPathPointX[0];
+	dCurrentY = dPathPointY[0];
+
+	iGoalPoint = 1;
+}
+
+//------------------------------------------------------------------------------
+// Straight Path
+//------------------------------------------------------------------------------
+
+StraightPath::StraightPath(float vel, float startX, float startY, float endX, float endY, bool preview) :
+	MovingPlatformPath(vel, startX, startY, endX, endY, preview)
+{	
+	dWidth = dPathPointX[1] - dPathPointX[0];
+	dHeight = dPathPointY[1] - dPathPointY[0];
+
+	//Lock angle to vertical
+	if(dWidth == 0)
 	{
-		if(fEndX - fStartX > 0)
-			fAngle = 0.0f;
+		if(dHeight > 0)
+			dAngle = HALF_PI;
 		else
-			fAngle = PI;
+			dAngle = THREE_HALF_PI;
+
+		dLength = fabs(dHeight);
+	}
+	else if(dHeight == 0) //Lock angle to horizontal
+	{
+		if(dWidth > 0)
+			dAngle = 0.0f;
+		else
+			dAngle = PI;
+
+		dLength = fabs(dWidth);
 	}
 	else
 	{
-		fAngle = atan2(fEndY - fStartY, fEndX - fStartX);
+		dAngle = atan2(dHeight, dWidth);
+		dLength = sqrt(dHeight * dHeight + dWidth * dWidth);
 	}
+	
+	iSteps = (short)(dLength / dVelocity) + 1;
+
+	SetVelocity();
+}
+
+bool StraightPath::Move(short type)
+{
+	//If the path is a straight line, we don't need to calculate the adjustment each frame!
+	/*
+	if(iGoalPoint == 1)
+	{
+		fVelX = pPath->fVelocity * cos(pPath->fAngle);
+		fVelY = pPath->fVelocity * sin(pPath->fAngle);
+	}
+	else
+	{
+		fVelX = -pPath->fVelocity * cos(pPath->fAngle);
+		fVelY = -pPath->fVelocity * sin(pPath->fAngle);
+	}
+	*/
+
+	dCurrentX += dVelX;
+	dCurrentY += dVelY;
+
+	//See if we're at the end of the path
+	/*
+	if(dVelX < -0.01f)
+	{
+		if(dVelY < -0.01f)
+		{
+			if(dCurrentX <= dPathPointX[iGoalPoint] && dCurrentY <= dPathPointY[iGoalPoint])
+			{
+				dCurrentX = dPathPointX[iGoalPoint];
+				dCurrentY = dPathPointY[iGoalPoint];
+				iGoalPoint = 1 - iGoalPoint;
+				SetVelocity();
+			}
+		}
+		else if(dVelY > 0.01f)
+		{
+			if(dCurrentX <= dPathPointX[iGoalPoint] && dCurrentY >= dPathPointY[iGoalPoint])
+			{
+				dCurrentX = dPathPointX[iGoalPoint];
+				dCurrentY = dPathPointY[iGoalPoint];
+				iGoalPoint = 1 - iGoalPoint;
+				SetVelocity();
+			}
+		}
+		else
+		{
+			if(dCurrentX <= dPathPointX[iGoalPoint])
+			{
+				dCurrentX = dPathPointX[iGoalPoint];
+				dCurrentY = dPathPointY[iGoalPoint];
+				iGoalPoint = 1 - iGoalPoint;
+				SetVelocity();
+			}
+		}
+	}
+	else if(dVelX > 0.01f)
+	{
+		if(dVelY < -0.01f)
+		{
+			if(dCurrentX >= dPathPointX[iGoalPoint] && dCurrentY <= dPathPointY[iGoalPoint])
+			{
+				dCurrentX = dPathPointX[iGoalPoint];
+				dCurrentY = dPathPointY[iGoalPoint];
+				iGoalPoint = 1 - iGoalPoint;
+				SetVelocity();
+			}
+		}
+		else if(dVelY > 0.01f)
+		{
+			if(dCurrentX >= dPathPointX[iGoalPoint] && dCurrentY >= dPathPointY[iGoalPoint])
+			{
+				dCurrentX = dPathPointX[iGoalPoint];
+				dCurrentY = dPathPointY[iGoalPoint];
+				iGoalPoint = 1 - iGoalPoint;
+				SetVelocity();
+			}
+		}
+		else
+		{
+			if(dCurrentX >= dPathPointX[iGoalPoint])
+			{
+				dCurrentX = dPathPointX[iGoalPoint];
+				dCurrentY = dPathPointY[iGoalPoint];
+				iGoalPoint = 1 - iGoalPoint;
+				SetVelocity();
+			}
+		}
+	}
+	else
+	{
+		if(dVelY > 0.01f)
+		{
+			if(dCurrentY >= dPathPointY[iGoalPoint])
+			{
+				dCurrentX = dPathPointX[iGoalPoint];
+				dCurrentY = dPathPointY[iGoalPoint];
+				iGoalPoint = 1 - iGoalPoint;
+				SetVelocity();
+			}
+		}
+		else if(dVelY < -0.01f)
+		{
+			if(dCurrentY <= dPathPointY[iGoalPoint])
+			{
+				dCurrentX = dPathPointX[iGoalPoint];
+				dCurrentY = dPathPointY[iGoalPoint];
+				iGoalPoint = 1 - iGoalPoint;
+				SetVelocity();
+			}
+		}
+		else
+		{
+			//Platform is not moving!
+			printf("Platform is not moving.  This is probably a problem!\n");
+		}
+	}*/
+
+	if(++iOnStep[type] >= iSteps)
+	{
+		iOnStep[type] = 0;
+
+		dCurrentX = dPathPointX[iGoalPoint];
+		dCurrentY = dPathPointY[iGoalPoint];
+
+		iGoalPoint = 1 - iGoalPoint;
+
+		SetVelocity();
+	}
+
+	return false;
+}
+
+void StraightPath::SetVelocity()
+{
+	if(iGoalPoint == 1)
+	{
+		dVelX = dVelocity * cos(dAngle);
+		dVelY = dVelocity * sin(dAngle);
+	}
+	else
+	{
+		dVelX = -dVelocity * cos(dAngle);
+		dVelY = -dVelocity * sin(dAngle);
+	}
+
+	//Fix rounding errors
+	if(dVelX < 0.01f && dVelX > -0.01f)
+		dVelX = 0.0f;
+
+	if(dVelY < 0.01f && dVelY > -0.01f)
+		dVelY = 0.0f;
 }
 
 
-MovingPlatform::MovingPlatform(TilesetTile ** tiledata, MapTile ** tiletypes, short w, short h, MovingPlatformPath * path, bool forwardDirection, short startPathNode, bool fPreview)
+//------------------------------------------------------------------------------
+// Elipse Path
+//------------------------------------------------------------------------------
+/*
+ElipsePath::ElipsePath(float vel, float angle, float radiusx, float radiusy, bool preview) :
+	MovingPlatformPath(vel, 0.0f, 0.0f, 0.0f, 0.0f, preview)
+{	
+	dAngle = angle;
+	dRadiusX = radiusx;
+	dRadiusY = radiusy;
+
+	SetPosition();
+}
+
+bool ElipsePath::Move(short type)
+{
+	dAngle += dVelocity;
+
+	while(dAngle < 0.0f)
+		dAngle += TWO_PI;
+
+	while(dAngle >= TWO_PI)
+		dAngle -= TWO_PI;
+
+	dOldCurrentX = dCurrentX;
+	dOldCurrentY = dCurrentY;
+
+	dCurrentX = dRadiusX * cos(dAngle);
+	dCurrentY = dRadiusY * sin(dAngle);
+
+	dVelX = dCurrentX - dOldCurrentX;
+	dVelY = dCurrentY - dOldCurrentY;
+
+	return false;
+}
+
+void ElipsePath::SetVelocity()
+{
+	if(iGoalPoint == 1)
+	{
+		dVelX = dVelocity * cos(dAngle);
+		dVelY = dVelocity * sin(dAngle);
+	}
+	else
+	{
+		dVelX = -dVelocity * cos(dAngle);
+		dVelY = -dVelocity * sin(dAngle);
+	}
+
+	//Fix rounding errors
+	if(dVelX < 0.01f && dVelX > -0.01f)
+		dVelX = 0.0f;
+
+	if(dVelY < 0.01f && dVelY > -0.01f)
+		dVelY = 0.0f;
+}*/
+
+//------------------------------------------------------------------------------
+// Falling path (for falling donut blocks)
+//------------------------------------------------------------------------------
+
+FallingPath::FallingPath(float startX, float startY) :
+	MovingPlatformPath(0.0f, startX, startY, 0.0f, 0.0f, false)
+{
+
+}
+
+bool FallingPath::Move(short type)
+{
+	dVelY = CapFallingVelocity(dVelY + GRAVITATION);
+	
+	if(pPlatform->fy - pPlatform->iHalfHeight >= 480.0f)
+	{
+		//If a player is standing on this platform, clear him off
+		for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++)
+		{
+			if(list_players[iPlayer]->platform == pPlatform)
+			{
+				list_players[iPlayer]->platform = NULL;
+				list_players[iPlayer]->vely = dVelY;
+			}
+		}
+
+		pPlatform->fDead = true;
+	}
+
+	dCurrentY += dVelY;
+
+	return false;
+}
+
+//------------------------------------------------------------------------------
+// Moving Platform
+//------------------------------------------------------------------------------
+
+MovingPlatform::MovingPlatform(TilesetTile ** tiledata, MapTile ** tiletypes, short w, short h, MovingPlatformPath * path, bool fPreview)
 {
 	fDead = false;
 
@@ -70,12 +345,6 @@ MovingPlatform::MovingPlatform(TilesetTile ** tiledata, MapTile ** tiletypes, sh
 	{
 		iTileSize = PREVIEWTILESIZE;
 		iTileSizeIndex = 1;
-
-		path->fEndX /= 2.0f;
-		path->fEndY /= 2.0f;
-		path->fStartX /= 2.0f;
-		path->fStartY /= 2.0f;
-		path->fVelocity /= 2.0f;
 	}
 
 	iTileData = tiledata;
@@ -90,18 +359,10 @@ MovingPlatform::MovingPlatform(TilesetTile ** tiledata, MapTile ** tiletypes, sh
 	iHalfWidth = iWidth >> 1;
 	iHalfHeight = iHeight >> 1;
 	
-	xf(path->fStartX);
-	yf(path->fStartY);
-
-	fOldX = fx;
-	fOldY = fy;
-
-	fStartDirection = forwardDirection;
-	fForwardDirection = fStartDirection;
-
-	iStartPathNode = startPathNode;
-
 	pPath = path;
+	pPath->SetPlatform(this);
+
+	ResetPath();
 
 	sSurface = SDL_CreateRGBSurface(screen->flags, w * iTileSize, h * iTileSize, screen->format->BitsPerPixel, 0, 0, 0, 0);
 
@@ -141,22 +402,11 @@ MovingPlatform::MovingPlatform(TilesetTile ** tiledata, MapTile ** tiletypes, sh
 	rDstRect.w = w * iTileSize;
 	rDstRect.h = h * iTileSize;
 
-	if(forwardDirection)
-	{
-		fVelX = pPath->fVelocity * cos(pPath->fAngle);
-		fVelY = pPath->fVelocity * sin(pPath->fAngle);
-	}
-	else
-	{
-		fVelX = -pPath->fVelocity * cos(pPath->fAngle);
-		fVelY = -pPath->fVelocity * sin(pPath->fAngle);
-	}
+	fVelX = pPath->dVelX;
+	fVelY = pPath->dVelY;
 
 	fOldVelX = fVelX;
 	fOldVelY = fVelY;
-	
-	fEndPointX = forwardDirection ? path->fEndX : path->fStartX;
-	fEndPointY = forwardDirection ? path->fEndY : path->fStartY;
 }
 
 MovingPlatform::~MovingPlatform()
@@ -179,6 +429,8 @@ void MovingPlatform::draw()
 {
 	rDstRect.x = ix - iHalfWidth + x_shake;
 	rDstRect.y = iy - iHalfHeight + y_shake;
+	rDstRect.w = iWidth;
+	rDstRect.h = iHeight;
 
 	// Blit onto the screen surface
 	if(SDL_BlitSurface(sSurface, &rSrcRect, blitdest, &rDstRect) < 0)
@@ -187,34 +439,34 @@ void MovingPlatform::draw()
 		return;
 	}
 
-	//We won't worry about wrapping the sides of the screen for this release
-	/*
-	//Deal with wrapping both x and y directions
+	//Deal with wrapping over sides of screen
+	bool fBlitSide = false;
 	if(ix - iHalfWidth < 0)
 	{
-		rDstRect.x = ix - iHalfWidth + 640;
-		rDstRect.y = iy - iHalfHeight;
-
-		if(SDL_BlitSurface(sSurface, &rSrcRect, blitdest, &rDstRect) < 0)
-		{
-			fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
-		}
-
-		rDstRect.x = ix - iHalfWidth;
+		rDstRect.x = ix - iHalfWidth + 640 + x_shake;
+		fBlitSide = true;
 	}
 	else if(ix + iHalfWidth >= 640)
 	{
-		rDstRect.x = ix - iHalfWidth - 640;
-		rDstRect.y = iy - iHalfHeight;
+		rDstRect.x = ix - iHalfWidth - 640 + x_shake;
+		fBlitSide = true;
+	}
+		
+	if(fBlitSide)
+	{
+		//rDstRect.y = iy - iHalfHeight + y_shake;
+		rDstRect.w = iWidth;
+		rDstRect.h = iHeight;
 
 		if(SDL_BlitSurface(sSurface, &rSrcRect, blitdest, &rDstRect) < 0)
 		{
 			fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
 		}
 
-		rDstRect.x = ix - iHalfWidth;
+		//rDstRect.x = ix - iHalfWidth;
 	}
 
+	/*
 	if(iy - iHalfHeight < 0)
 	{
 		rDstRect.y = iy - iHalfHeight + 480;
@@ -269,6 +521,7 @@ void MovingPlatform::draw()
 	*/
 }
 
+//Draw path for map preview
 void MovingPlatform::draw(short iOffsetX, short iOffsetY)
 {
 	rDstRect.x = ix - iHalfWidth + x_shake + iOffsetX;
@@ -284,184 +537,39 @@ void MovingPlatform::draw(short iOffsetX, short iOffsetY)
 
 void MovingPlatform::update()
 {
-	//Evaluate where to move platform based on path
-	
-	//if the path is a line, calculate the next position
-	
-	fOldX = fx;
-	fOldY = fy;
-	
-	//If the path is a straight line, we don't need to calculate the adjustment each frame!
-	/*
-	if(fForwardDirection)
-	{
-		fVelX = pPath->fVelocity * cos(pPath->fAngle);
-		fVelY = pPath->fVelocity * sin(pPath->fAngle);
-	}
-	else
-	{
-		fVelX = -pPath->fVelocity * cos(pPath->fAngle);
-		fVelY = -pPath->fVelocity * sin(pPath->fAngle);
-	}
-	*/
+	fOldX = pPath->dCurrentX;
+	fOldY = pPath->dCurrentY;
 
-	fOldVelX = fVelX;
-	fOldVelY = fVelY;
+	fOldVelX = pPath->dVelX;
+	fOldVelY = pPath->dVelY;
 
-	fx += fVelX;
-	fy += fVelY;
-
-	if(pPath->fFalling)
+	//Path will affect new fVelX and fVelY to move the platform to it's next location
+	if(pPath->Move(0))
 	{
-		fVelY = CapFallingVelocity(fVelY + GRAVITATION);
-		
-		if(fy - iHalfHeight > 480.0f)
-		{
-			//If a player is standing on this platform, clear him off
-			for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++)
-			{
-				if(list_players[iPlayer]->platform == this)
-				{
-					list_players[iPlayer]->platform = NULL;
-					list_players[iPlayer]->vely = fVelY;
-				}
-			}
+		//This path is done so move to the next one
 
-			fDead = true;
-		}
-	}
-	else
-	{
-		//See if we're at the end of the path
-		if(fVelX < -0.01f)
-		{
-			if(fVelY < -0.01f)
-			{
-				if(fx <= fEndPointX && fy <= fEndPointY)
-				{
-					xf(fEndPointX);
-					yf(fEndPointY);
-					FlipDirection();
-				}
-			}
-			else if(fVelY > 0.01f)
-			{
-				if(fx <= fEndPointX && fy >= fEndPointY)
-				{
-					xf(fEndPointX);
-					yf(fEndPointY);
-					FlipDirection();
-				}
-			}
-			else
-			{
-				if(fx <= fEndPointX)
-				{
-					xf(fEndPointX);
-					yf(fEndPointY);
-					FlipDirection();
-				}
-			}
-		}
-		else if(fVelX > 0.01f)
-		{
-			if(fVelY < -0.01f)
-			{
-				if(fx >= fEndPointX && fy <= fEndPointY)
-				{
-					xf(fEndPointX);
-					yf(fEndPointY);
-					FlipDirection();
-				}
-			}
-			else if(fVelY > 0.01f)
-			{
-				if(fx >= fEndPointX && fy >= fEndPointY)
-				{
-					xf(fEndPointX);
-					yf(fEndPointY);
-					FlipDirection();
-				}
-			}
-			else
-			{
-				if(fx >= fEndPointX)
-				{
-					xf(fEndPointX);
-					yf(fEndPointY);
-					FlipDirection();
-				}
-			}
-		}
-		else
-		{
-			if(fVelY > 0.01f)
-			{
-				if(fy >= fEndPointY)
-				{
-					xf(fEndPointX);
-					yf(fEndPointY);
-					FlipDirection();
-				}
-			}
-			else if(fVelY < -0.01f)
-			{
-				if(fy <= fEndPointY)
-				{
-					xf(fEndPointX);
-					yf(fEndPointY);
-					FlipDirection();
-				}
-			}
-			else
-			{
-				//Platform is not moving!
-				printf("Platform is not moving.  This is probably a problem!\n");
-			}
-		}
 	}
 
-	ix = (short)fx;
-	iy = (short)fy;
+	fVelX = pPath->dVelX;
+	fVelY = pPath->dVelY;
+
+	xf(pPath->dCurrentX);
+	yf(pPath->dCurrentY);
 }
 
 void MovingPlatform::ResetPath()
 {
-	xf(pPath->fStartX);
-	yf(pPath->fStartY);
+	pPath->Reset();
+
+	xf(pPath->dCurrentX);
+	yf(pPath->dCurrentY);
 
 	fOldX = fx;
 	fOldY = fy;
 
-	fForwardDirection = fStartDirection;
-}
+	//Need to advance spawn platform here if spawn time is greater than 0
+	//Advance it the spawn time amount here
 
-void MovingPlatform::FlipDirection()
-{
-	fForwardDirection = !fForwardDirection;
-
-	fEndPointX = fForwardDirection ? pPath->fEndX : pPath->fStartX;
-	fEndPointY = fForwardDirection ? pPath->fEndY : pPath->fStartY;
-
-	if(fForwardDirection)
-	{
-		fVelX = pPath->fVelocity * cos(pPath->fAngle);
-		fVelY = pPath->fVelocity * sin(pPath->fAngle);
-	}
-	else
-	{
-		fVelX = -pPath->fVelocity * cos(pPath->fAngle);
-		fVelY = -pPath->fVelocity * sin(pPath->fAngle);
-	}
-
-	//Fix rounding errors
-	if(fVelX < 0.01f && fVelX > -0.01f)
-		fVelX = 0.0f;
-
-	if(fVelY < 0.01f && fVelY > -0.01f)
-		fVelY = 0.0f;
-
-	//printf("Platform Flipped Directions: velx: %.5f  vely: %.5f  angle: %.5f\n", fVelX, fVelY, pPath->fAngle);
 }
 
 void MovingPlatform::collide(CPlayer * player)

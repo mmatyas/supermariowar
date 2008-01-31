@@ -34,7 +34,9 @@
 
 //4) Still reports of disappearing map tiles - caused when rRects is used out of bounds causing w and h to be set to 0 - happened with platform with tile using row 960
 
-//5) Have green and red pirhana plants shoot fireballs
+//5) Add shadow rect to platforms that shadow by spawn times so that we can intelligently not spawn into the middle of a platform
+//   Add other path types like looping, circle, and complex (straight with arch connections)
+
 
 #ifdef _XBOX
 	#include <xtl.h>

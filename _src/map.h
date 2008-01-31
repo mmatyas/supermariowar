@@ -320,6 +320,7 @@ class CMap
 		friend void insert_platforms_into_map();
 		friend void loadcurrentmap();
 		friend void loadmap(char * szMapFile);
+		friend void SetNoSpawn(short nospawnmode, short col, short row, bool value);
 		
 		friend class B_BreakableBlock;
 		friend class B_DonutBlock;

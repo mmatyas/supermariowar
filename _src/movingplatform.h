@@ -5,30 +5,94 @@ class CPlayer;
 class IO_MovingObject;
 #include "map.h"
 
+class MovingPlatform;
+
 class MovingPlatformPath
 {
 	public:
-		MovingPlatformPath();
-		MovingPlatformPath(float vel, float startX, float startY, float endX, float endY, bool falling);
-		~MovingPlatformPath();
+		MovingPlatformPath(float vel, float startX, float startY, float endX, float endY, bool preview);
+		virtual ~MovingPlatformPath() {}
 
-		float fVelocity;
-		float fAngle;
+		virtual bool Move(short type) {return false;}
+		virtual void Reset();
 
-		float fStartX, fStartY;
-		float fEndX, fEndY;
-
-		bool fFalling;
+		void SetPlatform(MovingPlatform * platform) {pPlatform = platform;}
 
 	protected:
 
+		MovingPlatform * pPlatform;
+
+		float dVelocity;
+		float dVelX, dVelY;
+
+		float dPathPointX[2], dPathPointY[2];
+
+		float dCurrentX, dCurrentY;
+
+		short iOnStep[2];
+		short iSteps;
+		short iGoalPoint;
+
+	friend class MovingPlatform;
+	friend class CMap;
+	friend void loadcurrentmap();
+	friend void insert_platforms_into_map();
+
+};
+
+class StraightPath : public MovingPlatformPath
+{
+	public:
+		StraightPath(float vel, float startX, float startY, float endX, float endY, bool preview);
+		virtual ~StraightPath() {}
+
+		bool Move(short type);
+
+	private:
 		void CalculateAngle();
+		void SetVelocity();
+		
+		float dWidth, dHeight;
+		float dAngle, dLength;
+
+	friend class MovingPlatform;
+};
+
+/*
+class ElipsePath : public MovingPlatformPath
+{
+	public:
+		ElipsePath(float vel, float dAngle, float dRadiusX, float dRadiusY, bool preview);
+		virtual ~ElipsePath() {}
+
+		bool Move(short type);
+
+	private:
+		
+		float dAngle, dRadiusX, dRadiusY;
+		float dOldCurrentX, dOldCurrentY;
+
+	friend class MovingPlatform;
+};
+*/
+
+class FallingPath : public MovingPlatformPath
+{
+	public:
+		FallingPath(float startX, float startY);
+		virtual ~FallingPath() {}
+
+		bool Move(short type);
+
+	private:
+	
+	friend class MovingPlatform;
 };
 
 class MovingPlatform
 {
 	public:
-		MovingPlatform(TilesetTile ** tiledata, MapTile ** tiletypes, short w, short h, MovingPlatformPath * path, bool forwardDirection, short startPathNode, bool preview);
+		MovingPlatform(TilesetTile ** tiledata, MapTile ** tiletypes, short w, short h, MovingPlatformPath * path, bool preview);
 		~MovingPlatform();
 
 		void draw();
@@ -36,7 +100,6 @@ class MovingPlatform
 		void update();
 
 		void ResetPath();
-		void FlipDirection();
 
 		void collide(CPlayer * player);
 		bool coldec_player(CPlayer * player);
@@ -69,6 +132,9 @@ class MovingPlatform
 		float fOldX, fOldY;
 		float fOldVelX, fOldVelY;
 
+		short iSteps;
+		short iOnStep;
+
 		SDL_Surface	* sSurface;
 
 		SDL_Rect	rSrcRect;
@@ -76,18 +142,18 @@ class MovingPlatform
 
 		bool fForwardDirection;
 		bool fStartDirection;
-		short iStartPathNode;
 
 		MovingPlatformPath * pPath;
 
 		float fVelX, fVelY;
-		float fEndPointX, fEndPointY;
 
 		//Map::findspawnpoint uses this to figure out where not to spawn players
 		short iNoSpawnZoneTop;
 		short iNoSpawnZoneBottom;
 		short iNoSpawnZoneLeft;
 		short iNoSpawnZoneRight;
+
+	friend class FallingPath;
 
 	friend class CPlayer;
 	friend class IO_MovingObject;

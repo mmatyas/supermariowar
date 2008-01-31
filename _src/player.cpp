@@ -2281,7 +2281,7 @@ void CPlayer::FindSpawnPoint()
 	}
 	else
 	{
-		g_map.findspawnpoint(0, &ix, &iy, PW, PH, false);
+		g_map.findspawnpoint(teamID + 1, &ix, &iy, PW, PH, false);
 	}
 
 	fx = (float)ix;
@@ -3376,7 +3376,12 @@ void CPlayer::collision_detection_map()
 		onice = false;
 		
 		//Clear the platform if the player wrapped to the top of the screen
-		platform = NULL;
+		
+		if(platform)
+		{
+			vely = platform->fVelY;
+			platform = NULL;
+		}
 
 		return;
 	}

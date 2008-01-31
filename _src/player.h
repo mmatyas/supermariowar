@@ -520,6 +520,7 @@ class CPlayer
 
 		friend class MO_BonusHouseChest;
 
+		friend class FallingPath;
 		friend class MovingPlatform;
 
 		friend bool SwapPlayers(short iUsingPlayerID);

@@ -1241,8 +1241,8 @@ void B_DonutBlock::triggerBehavior()
 	typedata[0][0].iType = tile_solid;
 	typedata[0][0].iFlags = tile_flag_solid;
 
-	MovingPlatformPath * path = new MovingPlatformPath(0.0f, (float)ix + 16.0f, (float)iy + 16.0f, 0.0f, 0.0f, true); 
-	MovingPlatform * platform = new MovingPlatform(tiledata, typedata, 1, 1, path, true, 0, false);
+	MovingPlatformPath * path = new FallingPath((float)ix + 16.0f, (float)iy + 15.8f); 
+	MovingPlatform * platform = new MovingPlatform(tiledata, typedata, 1, 1, path, false);
 
 	g_map.AddTemporaryPlatform(platform);
 
@@ -7115,69 +7115,6 @@ void MO_Explosion::update()
 		dead = true;
 }
 
-void MO_Explosion::collide(IO_MovingObject * object)
-{
-	MovingObjectType type = object->getMovingObjectType();
-
-	if(type == movingobject_goomba || type == movingobject_koopa || type == movingobject_cheepcheep || type == movingobject_bulletbill || type == movingobject_shell || type == movingobject_throwblock)
-	{
-		object->dead = true;
-		
-		if(game_values.gamemode->gamemode == game_mode_stomp && 
-			(type == movingobject_goomba || type == movingobject_koopa || type == movingobject_cheepcheep)
-			&& !game_values.gamemode->gameover)
-		{
-			//Attribute the kill
-			CPlayer * killer = GetPlayerFromGlobalID(iPlayerID);
-
-			if(killer)
-			{
-				if(type == movingobject_goomba)
-					AddAwardKill(killer, NULL, kill_style_goomba);
-				else if(type == movingobject_koopa)
-					AddAwardKill(killer, NULL, kill_style_koopa);
-				else if(type == movingobject_cheepcheep)
-					AddAwardKill(killer, NULL, kill_style_cheepcheep);
-
-				killer->score->AdjustScore(1);
-			}
-		}
-
-		
-		if(type == movingobject_goomba)
-		{
-			ifsoundonplay(sfx_kicksound);
-			((MO_Goomba*)object)->Die();
-		}
-		else if(type == movingobject_koopa)
-		{
-			ifsoundonplay(sfx_kicksound);
-			((MO_Koopa*)object)->Die();
-		}
-		else if(type == movingobject_cheepcheep)
-		{
-			ifsoundonplay(sfx_kicksound);
-			((MO_CheepCheep*)object)->Die();
-		}
-		else if(type == movingobject_bulletbill)
-		{
-			ifsoundonplay(sfx_kicksound);
-			((MO_BulletBill*)object)->Die();
-		}
-		else if(type == movingobject_shell)
-		{
-			((CO_Shell*)object)->Die();
-		}
-		else if(type == movingobject_throwblock)
-		{
-			((CO_ThrowBlock*)object)->Die();
-		}
-	}
-	else if(type == movingobject_sledgebrother)
-	{
-		((MO_SledgeBrother*)object)->Damage(iPlayerID);
-	}
-}
 
 //------------------------------------------------------------------------------
 // class goomba
@@ -9560,7 +9497,7 @@ void MO_PirhanaPlant::update()
 		if(state > 0 && ++iActionTimer >= 8)
 		{
 			int distance_to_player = 640000;
-			short iDiffX, iDiffY;
+			short iDiffX = 1, iDiffY = 1;
 
 			short iPlantX = ix + 16;
 			short iPlantY = iy + (iDirection == 0 ? 16 : ih - 16);

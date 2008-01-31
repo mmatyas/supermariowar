@@ -1181,5 +1181,5 @@ short g_iCollisionMap[MOVINGOBJECT_LAST][MOVINGOBJECT_LAST] =
 	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_treasurechest = 21
 	{0,0,0,1,1,0,0,0,0,0,0,0,1,1,0,0,0,1,0,0,0,0,0,1,0}, //movingobject_attackzone = 22
 	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_pirhanaplant = 23
-	{0,0,0,1,1,0,0,1,1,0,0,0,1,1,0,0,0,1,0,0,0,0,0,0,0}, //movingobject_explosion = 24
+	{0,0,0,1,1,0,0,1,1,0,0,0,1,1,0,0,0,1,0,0,0,0,0,1,0}, //movingobject_explosion = 24
 };
