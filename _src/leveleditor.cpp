@@ -2280,8 +2280,6 @@ int editor_platforms()
 							iEditPlatform = g_iNumPlatforms;
 							g_iNumPlatforms++;
 							iPlatformEditState = PLATFORM_EDIT_STATE_PATH_TYPE;
-
-							SetPlatformToDefaults(iEditPlatform);
 						}
 					}
 					else if(event.key.keysym.sym == SDLK_t)
@@ -2417,8 +2415,6 @@ int editor_platforms()
 								g_iNumPlatforms++;
 								iPlatformEditState = PLATFORM_EDIT_STATE_PATH_TYPE;
 								ignoreclick = true;
-
-								SetPlatformToDefaults(iEditPlatform);
 							}
 						}
 						else if(PLATFORM_EDIT_STATE_PATH_TYPE == iPlatformEditState)
@@ -2436,41 +2432,8 @@ int editor_platforms()
 										iPlatformEditState = PLATFORM_EDIT_STATE_EDIT;
 										ignoreclick = true;
 
-										/*
-										MapHazard * hazard = &g_map.maphazards[iEditMapHazard];
-										hazard->itype = iType;
-										iEditState = MAPHAZARD_EDIT_STATE_LOCATION;
-										ignoreclick = true;
-
-										//Set some default values for the selected type
-										if(iType == 0)
-										{
-											hazard->iparam[0] = 5; //Number of fireballs in string
-											hazard->dparam[0] = 0.02f; //Angular velocity
-											hazard->dparam[1] = 0.0f; //Start Angle
-										}
-										else if(iType == 1)
-										{
-											hazard->iparam[0] = 2; //Number of fireballs in string
-											hazard->dparam[0] = 0.02f; //Angular velocity
-											hazard->dparam[1] = 0.0f; //Start Angle
-											hazard->dparam[2] = 112.0f; //Radius
-										}
-										else if(iType == 2)
-										{
-											hazard->iparam[0] = 120; //Frequency
-											hazard->dparam[0] = 2.0f; //Velocity
-										}
-										else if(iType == 3)
-										{
-											hazard->iparam[0] = 120; //Frequency
-											hazard->iparam[1] = 0; //Direction
-										}
-										else if(iType >= 4 && iType <= 7)
-										{
-											hazard->iparam[0] = 300; //Frequency
-											hazard->iparam[1] = 0; //Direction
-										}*/
+										g_Platforms[iEditPlatform].iPathType = iType;
+										SetPlatformToDefaults(iEditPlatform);
 
 										break;
 									}

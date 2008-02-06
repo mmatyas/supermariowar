@@ -1162,7 +1162,10 @@ void CMap::loadPlatforms(FILE * mapfile, bool fPreview, int version[4], short * 
 			}
 		}
 	
-		short iPathType = ReadInt(mapfile);
+		short iPathType = 0;
+		
+		if(version[0] > 1 || (version[0] == 1 && version[1] >= 8))
+			iPathType = ReadInt(mapfile);
 
 		MovingPlatformPath * path = NULL;
 		if(iPathType == 0) //segment path

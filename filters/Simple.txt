@@ -5,6 +5,7 @@
 75
 
 #Maps
+Cliff tower
 Mountain waterfall
 Sunny hills
 Wolkje
