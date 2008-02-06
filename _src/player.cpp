@@ -3328,12 +3328,9 @@ void CPlayer::collision_detection_map()
 
 	if(platform)
 	{
-		//if(!onice)
-		//{
-			fPlatformVelX = platform->fVelX;
-			xf(fx + fPlatformVelX);
-			flipsidesifneeded();
-		//}
+		fPlatformVelX = platform->fVelX;
+		xf(fx + fPlatformVelX);
+		flipsidesifneeded();
 		
 		fPlatformVelY = platform->fVelY;
 

@@ -601,6 +601,48 @@ void gfx_setrect(SDL_Rect * rect, SDL_Rect * copyrect)
 	rect->h = copyrect->h;
 }
 
+void gfx_cliprect(SDL_Rect * srcRect, SDL_Rect * dstRect, short x, short y, short w, short h)
+{
+	if(dstRect->x >= x + w || dstRect->x + dstRect->w < x || dstRect->y >= y + h || dstRect->y + dstRect->h < y)
+	{
+		srcRect->w = 0;
+		srcRect->h = 0;
+		return;
+	}
+
+	if(dstRect->x < x)
+	{
+		short iDiffX = x - dstRect->x;
+		srcRect->x += iDiffX;
+		srcRect->w -= iDiffX;
+		dstRect->x = x;
+		//dstRect->w -= iDiffX;
+	}
+
+	if(dstRect->x + dstRect->w >= x + w)
+	{
+		short iDiffX = dstRect->x + dstRect->w - x - w;
+		srcRect->w -= iDiffX;
+		//dstRect->w -= iDiffX;
+	}
+	
+	if(dstRect->y < y)
+	{
+		short iDiffY = y - dstRect->y;
+		srcRect->y += iDiffY;
+		srcRect->h -= iDiffY;
+		dstRect->y = y;
+		//dstRect->h -= iDiffY;
+	}
+
+	if(dstRect->y + dstRect->h >= y + h)
+	{
+		short iDiffY = dstRect->y + dstRect->h - y - h;
+		srcRect->h -= iDiffY;
+		//dstRect->h -= iDiffY;
+	}
+}
+
 bool gfx_loadteamcoloredimage(gfxSprite * gSprites, const std::string& filename, bool fVertical, bool fWrap)
 {
 	return gfx_loadteamcoloredimage(gSprites, filename, 255, 0, 255, 255, fVertical, fWrap);

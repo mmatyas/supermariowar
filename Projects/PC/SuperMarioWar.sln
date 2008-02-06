@@ -1,4 +1,8 @@
 Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SuperMarioWar", "SuperMarioWar.vcproj", "{6A5E367D-CF8E-4B07-BB90-2115716D19D3}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Leveleditor", "Leveleditor.vcproj", "{4B9F6889-63C5-4B88-AF50-5D74B6646C7C}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
@@ -11,10 +15,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Worldeditor", "Worldeditor.
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SuperMarioWar", "SuperMarioWar.vcproj", "{6A5E367D-CF8E-4B07-BB90-2115716D19D3}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		Debug = Debug
@@ -23,6 +23,10 @@ Global
 	GlobalSection(ProjectDependencies) = postSolution
 	EndGlobalSection
 	GlobalSection(ProjectConfiguration) = postSolution
+		{6A5E367D-CF8E-4B07-BB90-2115716D19D3}.Debug.ActiveCfg = Debug|Win32
+		{6A5E367D-CF8E-4B07-BB90-2115716D19D3}.Debug.Build.0 = Debug|Win32
+		{6A5E367D-CF8E-4B07-BB90-2115716D19D3}.Release.ActiveCfg = Release|Win32
+		{6A5E367D-CF8E-4B07-BB90-2115716D19D3}.Release.Build.0 = Release|Win32
 		{4B9F6889-63C5-4B88-AF50-5D74B6646C7C}.Debug.ActiveCfg = Debug|Win32
 		{4B9F6889-63C5-4B88-AF50-5D74B6646C7C}.Debug.Build.0 = Debug|Win32
 		{4B9F6889-63C5-4B88-AF50-5D74B6646C7C}.Release.ActiveCfg = Release|Win32
@@ -35,10 +39,6 @@ Global
 		{4B9F6889-63C5-4B88-AF50-5D74B6646C7C}.Debug.Build.0 = Debug|Win32
 		{4B9F6889-63C5-4B88-AF50-5D74B6646C7C}.Release.ActiveCfg = Release|Win32
 		{4B9F6889-63C5-4B88-AF50-5D74B6646C7C}.Release.Build.0 = Release|Win32
-		{6A5E367D-CF8E-4B07-BB90-2115716D19D3}.Debug.ActiveCfg = Debug|Win32
-		{6A5E367D-CF8E-4B07-BB90-2115716D19D3}.Debug.Build.0 = Debug|Win32
-		{6A5E367D-CF8E-4B07-BB90-2115716D19D3}.Release.ActiveCfg = Release|Win32
-		{6A5E367D-CF8E-4B07-BB90-2115716D19D3}.Release.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

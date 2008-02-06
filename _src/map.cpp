@@ -1162,13 +1162,40 @@ void CMap::loadPlatforms(FILE * mapfile, bool fPreview, int version[4], short * 
 			}
 		}
 	
-		float fStartX = ReadFloat(mapfile);
-		float fStartY = ReadFloat(mapfile);
-		float fEndX = ReadFloat(mapfile);
-		float fEndY = ReadFloat(mapfile);
-		float fVelocity = ReadFloat(mapfile);
+		short iPathType = ReadInt(mapfile);
 
-		MovingPlatformPath * path = new StraightPath(fVelocity, fStartX, fStartY, fEndX, fEndY, fPreview);
+		MovingPlatformPath * path = NULL;
+		if(iPathType == 0) //segment path
+		{
+			float fStartX = ReadFloat(mapfile);
+			float fStartY = ReadFloat(mapfile);
+			float fEndX = ReadFloat(mapfile);
+			float fEndY = ReadFloat(mapfile);
+			float fVelocity = ReadFloat(mapfile);
+
+			path = new StraightPath(fVelocity, fStartX, fStartY, fEndX, fEndY, fPreview);
+		}
+		else if(iPathType == 1) //continuous path
+		{
+			float fStartX = ReadFloat(mapfile);
+			float fStartY = ReadFloat(mapfile);
+			float fAngle = ReadFloat(mapfile);
+			float fVelocity = ReadFloat(mapfile);
+
+			path = new StraightPathContinuous(fVelocity, fStartX, fStartY, fAngle, fPreview);
+		}
+		else if(iPathType == 2) //elliptical path
+		{
+			float fRadiusX = ReadFloat(mapfile);
+			float fRadiusY = ReadFloat(mapfile);
+			float fCenterX = ReadFloat(mapfile);
+			float fCenterY = ReadFloat(mapfile);
+			float fAngle = ReadFloat(mapfile);
+			float fVelocity = ReadFloat(mapfile);
+
+			path = new EllipsePath(fVelocity, fAngle, fRadiusX, fRadiusY, fCenterX, fCenterY, fPreview);
+		}
+
 		platforms[iPlatform] = new MovingPlatform(tiles, types, iWidth, iHeight, path, fPreview);
 	}
 }
@@ -1450,11 +1477,36 @@ void CMap::saveMap(const std::string& file)
 			}
 		}
 		
-		WriteFloat(platforms[iPlatform]->pPath->dPathPointX[0], mapfile);
-		WriteFloat(platforms[iPlatform]->pPath->dPathPointY[0], mapfile);
-		WriteFloat(platforms[iPlatform]->pPath->dPathPointX[1], mapfile);
-		WriteFloat(platforms[iPlatform]->pPath->dPathPointY[1], mapfile);
-		WriteFloat(platforms[iPlatform]->pPath->dVelocity, mapfile);
+		short iPathType = platforms[iPlatform]->pPath->iType;
+		WriteInt(iPathType, mapfile);
+
+		if(iPathType == 0)
+		{
+			StraightPath * path = (StraightPath*)platforms[iPlatform]->pPath;
+			WriteFloat(path->dPathPointX[0], mapfile);
+			WriteFloat(path->dPathPointY[0], mapfile);
+			WriteFloat(path->dPathPointX[1], mapfile);
+			WriteFloat(path->dPathPointY[1], mapfile);
+			WriteFloat(path->dVelocity, mapfile);
+		}
+		else if(iPathType == 1)
+		{
+			StraightPathContinuous * path = (StraightPathContinuous*)platforms[iPlatform]->pPath;
+			WriteFloat(path->dPathPointX[0], mapfile);
+			WriteFloat(path->dPathPointY[0], mapfile);
+			WriteFloat(path->dAngle, mapfile);
+			WriteFloat(path->dVelocity, mapfile);
+		}
+		else if(iPathType == 2) //elliptical path
+		{
+			EllipsePath * path = (EllipsePath*)platforms[iPlatform]->pPath;
+			WriteFloat(path->dRadiusX, mapfile);
+			WriteFloat(path->dRadiusY, mapfile);
+			WriteFloat(path->dPathPointX[0], mapfile);
+			WriteFloat(path->dPathPointY[0], mapfile);
+			WriteFloat(path->dAngle, mapfile);
+			WriteFloat(path->dVelocity, mapfile);
+		}
 	}
 
 	//Write map items (carried springs, spikes, kuribo's shoe, etc)
@@ -2764,6 +2816,7 @@ void CMap::drawPlatforms(short iOffsetX, short iOffsetY)
 
 void CMap::movingPlatformCollision(CPlayer * player)
 {
+	//Collide player with normal moving platforms
 	for(short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++)
 	{
 		platforms[iPlatform]->collide(player);
@@ -2772,6 +2825,7 @@ void CMap::movingPlatformCollision(CPlayer * player)
 			return;
 	}
 
+	//Collide player with temporary platforms (like falling donut blocks)
 	std::list<MovingPlatform*>::iterator iterateAll = tempPlatforms.begin(), lim = tempPlatforms.end();
 	while (iterateAll != lim)
 	{

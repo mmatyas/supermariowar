@@ -68,6 +68,14 @@ class MapPlatform
 		short iStartY;
 		short iEndX;
 		short iEndY;
+		
+		short iPathType;
+
+		float fAngle;
+		float fRadiusX;
+		float fRadiusY;
+		float fCenterX;
+		float fCenterY;
 };
 
 SDL_Surface		*screen;
@@ -194,6 +202,7 @@ short			g_iCurrentDrawIndex = 0;
 
 gfxSprite spr_eyecandy;
 SDL_Surface * s_platform;
+SDL_Surface * s_platformpathbuttons;
 SDL_Surface * s_maphazardbuttons;
 
 int save_as();
@@ -317,6 +326,7 @@ int main(int argc, char *argv[])
 	spr_eyecandy.init(convertPathC("gfx/leveleditor/leveleditor_eyecandy.png"), 255, 0, 255);
 
 	s_platform = IMG_Load(convertPathC("gfx/leveleditor/leveleditor_platform.png"));
+	s_platformpathbuttons = IMG_Load(convertPathC("gfx/leveleditor/leveleditor_pathtype_buttons.png"));
 	s_maphazardbuttons = IMG_Load(convertPathC("gfx/leveleditor/leveleditor_maphazard_buttons.png"));
 
 	spr_warps[0].init(convertPath("gfx/leveleditor/leveleditor_warp.png"), 255, 0, 255);
@@ -366,6 +376,11 @@ int main(int argc, char *argv[])
 	spr_pirhanaplant.init(convertPath("gfx/packs/Classic/hazards/pirhanaplant.png"), 255, 0, 255);
 
 	if( SDL_SetColorKey(s_platform, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(s_platform->format, 255, 0, 255)) < 0)
+	{
+		printf("\n ERROR: Couldn't set ColorKey + RLE: %s\n", SDL_GetError());
+	}
+
+	if( SDL_SetColorKey(s_platformpathbuttons, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(s_platformpathbuttons->format, 255, 0, 255)) < 0)
 	{
 		printf("\n ERROR: Couldn't set ColorKey + RLE: %s\n", SDL_GetError());
 	}
@@ -2198,7 +2213,33 @@ int editor_platforms()
 	rPath[5].w = 32;
 	rPath[5].h = 32;
 
-	enum {PLATFORM_EDIT_STATE_SELECT, PLATFORM_EDIT_STATE_EDIT, PLATFORM_EDIT_STATE_PATH, PLATFORM_EDIT_STATE_TEST, PLATFORM_EDIT_STATE_TILETYPE};
+	SDL_Rect rTypeButton[3][4];
+	for(short iType = 0; iType < 3; iType++)
+	{
+		rTypeButton[iType][0].x = 0;
+		rTypeButton[iType][0].y = 0;
+		rTypeButton[iType][0].w = 192;
+		rTypeButton[iType][0].h = 32;
+
+		rTypeButton[iType][1].x = 320 - (rTypeButton[iType][0].w >> 1);
+		rTypeButton[iType][1].y = 180 + iType * 40;
+		rTypeButton[iType][1].w = 192;
+		rTypeButton[iType][1].h = 32;
+
+		rTypeButton[iType][2].x = 24 * iType;
+		rTypeButton[iType][2].y = 32;
+		rTypeButton[iType][2].w = 24;
+		rTypeButton[iType][2].h = 24;
+
+		rTypeButton[iType][3].x = rTypeButton[iType][1].x + 8;
+		rTypeButton[iType][3].y = rTypeButton[iType][1].y + 4;
+		rTypeButton[iType][3].w = 24;
+		rTypeButton[iType][3].h = 24;
+	}
+
+	char * szPathNames[3] = {"Line Segment", "Continuous", "Ellipse"};
+
+	enum {PLATFORM_EDIT_STATE_SELECT, PLATFORM_EDIT_STATE_PATH_TYPE, PLATFORM_EDIT_STATE_EDIT, PLATFORM_EDIT_STATE_PATH, PLATFORM_EDIT_STATE_TEST, PLATFORM_EDIT_STATE_TILETYPE};
 
 	short iPlatformEditState = PLATFORM_EDIT_STATE_SELECT;
 	short iEditPlatform = 0;
@@ -2223,6 +2264,25 @@ int editor_platforms()
 					if(event.key.keysym.sym == SDLK_s)
 					{
 						savecurrentmap();
+					}
+					else if(event.key.keysym.sym >= SDLK_1 && event.key.keysym.sym <= SDLK_9)
+					{
+						if(PLATFORM_EDIT_STATE_SELECT == iPlatformEditState && event.key.keysym.sym - SDLK_1 < g_iNumPlatforms)
+						{
+							iEditPlatform = event.key.keysym.sym - SDLK_1;
+							iPlatformEditState = PLATFORM_EDIT_STATE_EDIT;
+						}
+					}
+					else if(event.key.keysym.sym == SDLK_n)
+					{
+						if(PLATFORM_EDIT_STATE_SELECT == iPlatformEditState && g_iNumPlatforms < MAX_PLATFORMS)
+						{
+							iEditPlatform = g_iNumPlatforms;
+							g_iNumPlatforms++;
+							iPlatformEditState = PLATFORM_EDIT_STATE_PATH_TYPE;
+
+							SetPlatformToDefaults(iEditPlatform);
+						}
 					}
 					else if(event.key.keysym.sym == SDLK_t)
 					{
@@ -2265,11 +2325,19 @@ int editor_platforms()
 									}
 								}
 
+								g_Platforms[iPlatform].iPathType = g_Platforms[iPlatform + 1].iPathType;
+
 								g_Platforms[iPlatform].iVelocity = g_Platforms[iPlatform + 1].iVelocity;
 								g_Platforms[iPlatform].iStartX = g_Platforms[iPlatform + 1].iStartX;
 								g_Platforms[iPlatform].iStartY = g_Platforms[iPlatform + 1].iStartY;
 								g_Platforms[iPlatform].iEndX = g_Platforms[iPlatform + 1].iEndX;
 								g_Platforms[iPlatform].iEndY = g_Platforms[iPlatform + 1].iEndY;
+
+								g_Platforms[iPlatform].fAngle = g_Platforms[iPlatform + 1].fAngle;
+								g_Platforms[iPlatform].fCenterX = g_Platforms[iPlatform + 1].fCenterX;
+								g_Platforms[iPlatform].fCenterY = g_Platforms[iPlatform + 1].fCenterY;
+								g_Platforms[iPlatform].fRadiusX = g_Platforms[iPlatform + 1].fRadiusX;
+								g_Platforms[iPlatform].fRadiusY = g_Platforms[iPlatform + 1].fRadiusY;
 							}
 							
 							g_iNumPlatforms--;
@@ -2347,10 +2415,66 @@ int editor_platforms()
 								
 								iEditPlatform = g_iNumPlatforms;
 								g_iNumPlatforms++;
-								iPlatformEditState = PLATFORM_EDIT_STATE_EDIT;
+								iPlatformEditState = PLATFORM_EDIT_STATE_PATH_TYPE;
 								ignoreclick = true;
 
 								SetPlatformToDefaults(iEditPlatform);
+							}
+						}
+						else if(PLATFORM_EDIT_STATE_PATH_TYPE == iPlatformEditState)
+						{
+							if(!ignoreclick)
+							{
+								short iClickX = event.button.x;
+								short iClickY = event.button.y;
+
+								for(int iType = 0; iType < 3; iType++)
+								{
+									if(iClickX >= rTypeButton[iType][1].x && iClickX < rTypeButton[iType][1].x + rTypeButton[iType][1].w &&
+									iClickY >= rTypeButton[iType][1].y && iClickY < rTypeButton[iType][1].y + rTypeButton[iType][1].h)
+									{
+										iPlatformEditState = PLATFORM_EDIT_STATE_EDIT;
+										ignoreclick = true;
+
+										/*
+										MapHazard * hazard = &g_map.maphazards[iEditMapHazard];
+										hazard->itype = iType;
+										iEditState = MAPHAZARD_EDIT_STATE_LOCATION;
+										ignoreclick = true;
+
+										//Set some default values for the selected type
+										if(iType == 0)
+										{
+											hazard->iparam[0] = 5; //Number of fireballs in string
+											hazard->dparam[0] = 0.02f; //Angular velocity
+											hazard->dparam[1] = 0.0f; //Start Angle
+										}
+										else if(iType == 1)
+										{
+											hazard->iparam[0] = 2; //Number of fireballs in string
+											hazard->dparam[0] = 0.02f; //Angular velocity
+											hazard->dparam[1] = 0.0f; //Start Angle
+											hazard->dparam[2] = 112.0f; //Radius
+										}
+										else if(iType == 2)
+										{
+											hazard->iparam[0] = 120; //Frequency
+											hazard->dparam[0] = 2.0f; //Velocity
+										}
+										else if(iType == 3)
+										{
+											hazard->iparam[0] = 120; //Frequency
+											hazard->iparam[1] = 0; //Direction
+										}
+										else if(iType >= 4 && iType <= 7)
+										{
+											hazard->iparam[0] = 300; //Frequency
+											hazard->iparam[1] = 0; //Direction
+										}*/
+
+										break;
+									}
+								}
 							}
 						}
 						else if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState)
@@ -2388,6 +2512,7 @@ int editor_platforms()
 						{
 							UpdatePlatformPathStart(iEditPlatform, event.button.x / TILESIZE, event.button.y / TILESIZE, iPlatformWidth, iPlatformHeight);
 						}
+
 						break;
 					}
 					else if(event.button.button == SDL_BUTTON_RIGHT)
@@ -2487,7 +2612,7 @@ int editor_platforms()
 			SDL_BlitSurface(s_platform, &rp, screen, &r);
 			menu_font_small.drawCentered(320, 146, "Platforms");
 
-			menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "Platform Mode: [esc] Exit  [c] Check Paths");
+			menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "Platform Mode: [esc] Exit  [c] Check Paths, [1-8] Select, [n] New");
 			menu_font_small.drawRightJustified(640, 0, maplist.currentFilename());
 
 			for(int iPlatform = 0; iPlatform < g_iNumPlatforms; iPlatform++)
@@ -2497,6 +2622,19 @@ int editor_platforms()
 				SDL_BlitSurface(s_platform, &rNewButton[0], screen, &rNewButton[1]);
 
 		}
+		else if(PLATFORM_EDIT_STATE_PATH_TYPE == iPlatformEditState)
+		{
+			//Draw path options
+			for(short iType = 0; iType < 3; iType++)
+			{
+				SDL_BlitSurface(s_platformpathbuttons, &rTypeButton[iType][0], screen, &rTypeButton[iType][1]);
+				SDL_BlitSurface(s_platformpathbuttons, &rTypeButton[iType][2], screen, &rTypeButton[iType][3]);
+
+				menu_font_large.draw(rTypeButton[iType][1].x + 36, rTypeButton[iType][1].y + 6, szPathNames[iType]);
+			}
+
+			menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "Path Type");
+		}				
 		else if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
 		{
 			menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "Edit Platform: [esc] Exit  [t] Tiles  [l] Types [del] Delete  [p] Path  [+/-] Velocity");
@@ -2512,99 +2650,60 @@ int editor_platforms()
 		}
 		else if(PLATFORM_EDIT_STATE_PATH == iPlatformEditState)
 		{
-			for(short iCol = g_Platforms[iEditPlatform].iStartX; iCol < g_Platforms[iEditPlatform].iStartX + iPlatformWidth; iCol++)
+			if(g_Platforms[iEditPlatform].iPathType == 0)
 			{
-				for(short iRow = g_Platforms[iEditPlatform].iStartY; iRow < g_Platforms[iEditPlatform].iStartY + iPlatformHeight; iRow++)
+				for(short iCol = g_Platforms[iEditPlatform].iStartX; iCol < g_Platforms[iEditPlatform].iStartX + iPlatformWidth; iCol++)
 				{
-					spr_platformstarttile.draw(iCol * TILESIZE, iRow * TILESIZE);
+					for(short iRow = g_Platforms[iEditPlatform].iStartY; iRow < g_Platforms[iEditPlatform].iStartY + iPlatformHeight; iRow++)
+					{
+						spr_platformstarttile.draw(iCol * TILESIZE, iRow * TILESIZE);
+					}
 				}
-			}
 
-			for(short iCol = g_Platforms[iEditPlatform].iEndX; iCol < g_Platforms[iEditPlatform].iEndX + iPlatformWidth; iCol++)
-			{
-				for(short iRow = g_Platforms[iEditPlatform].iEndY; iRow < g_Platforms[iEditPlatform].iEndY + iPlatformHeight; iRow++)
+				for(short iCol = g_Platforms[iEditPlatform].iEndX; iCol < g_Platforms[iEditPlatform].iEndX + iPlatformWidth; iCol++)
 				{
-					spr_platformendtile.draw(iCol * TILESIZE, iRow * TILESIZE);
+					for(short iRow = g_Platforms[iEditPlatform].iEndY; iRow < g_Platforms[iEditPlatform].iEndY + iPlatformHeight; iRow++)
+					{
+						spr_platformendtile.draw(iCol * TILESIZE, iRow * TILESIZE);
+					}
+				}
+
+				//Draw start dot
+				rPath[1].x = g_Platforms[iEditPlatform].iStartX << 5;
+				rPath[1].y = g_Platforms[iEditPlatform].iStartY << 5;
+				SDL_BlitSurface(s_platform, &rPath[0], screen, &rPath[1]);
+				
+				//Draw end dot
+				rPath[3].x = g_Platforms[iEditPlatform].iEndX << 5;
+				rPath[3].y = g_Platforms[iEditPlatform].iEndY << 5;
+				SDL_BlitSurface(s_platform, &rPath[2], screen, &rPath[3]);
+
+				//Draw connecting dots
+				float dDiffX = (float)(rPath[3].x - rPath[1].x);
+				float dDiffY = (float)(rPath[3].y - rPath[1].y);
+
+				short iDistance = (short)sqrt(dDiffX * dDiffX + dDiffY * dDiffY);
+				//float dAngle = atan2(dDiffY, dDiffX);
+
+				short iNumSpots = (iDistance >> 5);
+				float dIncrementX = dDiffX / (float)iNumSpots;
+				float dIncrementY = dDiffY / (float)iNumSpots;
+
+				float dX = rPath[1].x;
+				float dY = rPath[1].y;
+
+				for(short iSpot = 0; iSpot < iNumSpots - 1; iSpot++)
+				{
+					dX += dIncrementX;
+					dY += dIncrementY;
+
+					gfx_setrect(&rPath[5], (short)dX, (short)dY, 32, 32);
+					SDL_BlitSurface(s_platform, &rPath[4], screen, &rPath[5]);
 				}
 			}
 
 			menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "Edit Path: [esc] Exit  [LMB] Set Start Point  [RMB] Set End Point");
 
-			//Draw start dot
-			rPath[1].x = g_Platforms[iEditPlatform].iStartX << 5;
-			rPath[1].y = g_Platforms[iEditPlatform].iStartY << 5;
-			SDL_BlitSurface(s_platform, &rPath[0], screen, &rPath[1]);
-			
-			//Draw end dot
-			rPath[3].x = g_Platforms[iEditPlatform].iEndX << 5;
-			rPath[3].y = g_Platforms[iEditPlatform].iEndY << 5;
-			SDL_BlitSurface(s_platform, &rPath[2], screen, &rPath[3]);
-
-			//Draw connecting dots
-			float dDiffX = (float)(rPath[3].x - rPath[1].x);
-			float dDiffY = (float)(rPath[3].y - rPath[1].y);
-
-			short iDistance = (short)sqrt(dDiffX * dDiffX + dDiffY * dDiffY);
-			//float dAngle = atan2(dDiffY, dDiffX);
-
-			short iNumSpots = (iDistance >> 5);
-			float dIncrementX = dDiffX / (float)iNumSpots;
-			float dIncrementY = dDiffY / (float)iNumSpots;
-
-			float dX = rPath[1].x;
-			float dY = rPath[1].y;
-
-			for(short iSpot = 0; iSpot < iNumSpots - 1; iSpot++)
-			{
-				dX += dIncrementX;
-				dY += dIncrementY;
-
-				gfx_setrect(&rPath[5], (short)dX, (short)dY, 32, 32);
-				SDL_BlitSurface(s_platform, &rPath[4], screen, &rPath[5]);
-			}
-
-			/*
-			if(g_Platforms[iEditPlatform].iStartX != g_Platforms[iEditPlatform].iEndX)
-			{
-				short iSpotLeft = (g_Platforms[iEditPlatform].iStartX < g_Platforms[iEditPlatform].iEndX ? g_Platforms[iEditPlatform].iStartX + 1 : g_Platforms[iEditPlatform].iEndX + 1);
-				short iSpotRight = (g_Platforms[iEditPlatform].iStartX < g_Platforms[iEditPlatform].iEndX ? g_Platforms[iEditPlatform].iEndX - 1 : g_Platforms[iEditPlatform].iStartX - 1);
-
-				for(short iSpot = iSpotLeft; iSpot <= iSpotRight; iSpot++)
-				{
-					rPath[5].x = iSpot * TILESIZE;
-					rPath[5].y = g_Platforms[iEditPlatform].iStartY * TILESIZE;
-					SDL_BlitSurface(s_platform, &rPath[4], screen, &rPath[5]);
-				}
-			}
-			else
-			{
-				short iSpotTop = (g_Platforms[iEditPlatform].iStartY < g_Platforms[iEditPlatform].iEndY ? g_Platforms[iEditPlatform].iStartY + 1 : g_Platforms[iEditPlatform].iEndY + 1);
-				short iSpotBottom = (g_Platforms[iEditPlatform].iStartY < g_Platforms[iEditPlatform].iEndY ? g_Platforms[iEditPlatform].iEndY - 1 : g_Platforms[iEditPlatform].iStartY - 1);
-
-				for(short iSpot = iSpotTop; iSpot <= iSpotBottom; iSpot++)
-				{
-					rPath[5].x = g_Platforms[iEditPlatform].iStartX * TILESIZE;
-					rPath[5].y = iSpot * TILESIZE;
-					SDL_BlitSurface(s_platform, &rPath[4], screen, &rPath[5]);
-				}
-			}
-*/
-			
-			/*
-			SDL_Rect rFillRect[2];
-			rFillRect[0].x = 640 - (iPlatformWidth - 1) * TILESIZE;
-			rFillRect[0].y = 0;
-			rFillRect[0].w = (iPlatformWidth - 1) * TILESIZE;
-			rFillRect[0].h = 480;
-
-			rFillRect[1].x = 0;
-			rFillRect[1].y = 480 - (iPlatformHeight - 1) * TILESIZE;
-			rFillRect[1].w = 640;
-			rFillRect[1].h = (iPlatformHeight - 1) * TILESIZE;
-
-			SDL_FillRect(screen, &rFillRect[0], 0x0);
-			SDL_FillRect(screen, &rFillRect[1], 0x0);
-			*/
 		}
 		else if(PLATFORM_EDIT_STATE_TEST == iPlatformEditState)
 		{
@@ -2638,39 +2737,6 @@ void UpdatePlatformPathStart(short iEditPlatform, short iClickX, short iClickY, 
 			g_Platforms[iEditPlatform].iStartX = iClickX;
 			g_Platforms[iEditPlatform].iStartY = iClickY;
 		}
-
-		/*
-		short iTempStartX = iClickX;
-		short iTempStartY = iClickY;
-		short iTempEndX = g_Platforms[iEditPlatform].iEndX;
-		short iTempEndY = g_Platforms[iEditPlatform].iEndY;
-
-		if(iTempStartX >= 0 && iTempStartX <= MAPWIDTH - iPlatformWidth &&
-			iTempStartY >= 0 && iTempStartY <= MAPHEIGHT - iPlatformHeight)
-		{
-			//If the start isn't in the same row or column, then move the end point so that it is
-			if(iTempStartX != iTempEndX && iTempStartY != iTempEndY)
-			{
-				short iXDiff = abs(iTempStartX - iTempEndX);
-				short iYDiff = abs(iTempStartY - iTempEndY);
-
-				//If the x difference is smaller, move it so it lines up
-				if(iYDiff > iXDiff)
-					iTempEndX = iTempStartX;
-				else
-					iTempEndY = iTempStartY;
-			}
-
-			//If the start and end are the same point, then don't allow this change
-			if(iTempStartX != iTempEndX ||
-				iTempStartY != iTempEndY)
-			{
-				g_Platforms[iEditPlatform].iStartX = iTempStartX;
-				g_Platforms[iEditPlatform].iStartY = iTempStartY;
-				g_Platforms[iEditPlatform].iEndX = iTempEndX;
-				g_Platforms[iEditPlatform].iEndY = iTempEndY;
-			}
-		}*/
 	}
 }
 
@@ -2684,40 +2750,6 @@ void UpdatePlatformPathEnd(short iEditPlatform, short iClickX, short iClickY, sh
 			g_Platforms[iEditPlatform].iEndX = iClickX;
 			g_Platforms[iEditPlatform].iEndY = iClickY;
 		}
-
-		/*
-		short iTempStartX = g_Platforms[iEditPlatform].iStartX;
-		short iTempStartY = g_Platforms[iEditPlatform].iStartY;
-	
-		if(iClickX >= 0 && iClickX <= MAPWIDTH - iPlatformWidth &&
-			iClickY >= 0 && iClickY <= MAPHEIGHT - iPlatformHeight)
-		{
-
-			//If the start isn't in the same row or column, then move the end point so that it is
-			if(iTempStartX != iClickX &&
-				iTempStartY != iClickY)
-			{
-				short iXDiff = abs(iTempStartX - iClickX);
-				short iYDiff = abs(iTempStartY - iClickY);
-
-				//If the x difference is smaller, move it so it lines up
-				if(iYDiff > iXDiff)
-					iTempStartX = iClickX;
-				else
-					iTempStartY = iClickY;
-			}
-
-			//If the start and end are the same point, then don't allow this change
-			if(iTempStartX != iClickX ||
-				iTempStartY != iClickY)
-			{
-				g_Platforms[iEditPlatform].iStartX = iTempStartX;
-				g_Platforms[iEditPlatform].iStartY = iTempStartY;
-				g_Platforms[iEditPlatform].iEndX = iClickX;
-				g_Platforms[iEditPlatform].iEndY = iClickY;
-			}
-		}
-		*/
 	}
 }
 
@@ -3223,83 +3255,6 @@ int editor_maphazards()
 			}
 		}
 		
-		/*
-		else if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
-		{
-			menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "Edit Platform: [esc] Exit  [t] Tiles  [l] Types [del] Delete  [p] Path  [+/-] Velocity");
-			draw_platform(iEditPlatform, PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState);
-
-			rVelocity[3].x = 404 + (g_Platforms[iEditPlatform].iVelocity - 1) * 12;
-
-			SDL_BlitSurface(s_platform, &rVelocity[0], screen, &rVelocity[1]);
-			SDL_BlitSurface(s_platform, &rVelocity[2], screen, &rVelocity[3]);
-
-			menu_font_small.drawRightJustified(413, 10, "Slow");
-			menu_font_small.draw(594, 10, "Fast");
-		}
-		else if(PLATFORM_EDIT_STATE_PATH == iPlatformEditState)
-		{
-			for(short iCol = g_Platforms[iEditPlatform].iStartX; iCol < g_Platforms[iEditPlatform].iStartX + iPlatformWidth; iCol++)
-			{
-				for(short iRow = g_Platforms[iEditPlatform].iStartY; iRow < g_Platforms[iEditPlatform].iStartY + iPlatformHeight; iRow++)
-				{
-					spr_platformstarttile.draw(iCol * TILESIZE, iRow * TILESIZE);
-				}
-			}
-
-			for(short iCol = g_Platforms[iEditPlatform].iEndX; iCol < g_Platforms[iEditPlatform].iEndX + iPlatformWidth; iCol++)
-			{
-				for(short iRow = g_Platforms[iEditPlatform].iEndY; iRow < g_Platforms[iEditPlatform].iEndY + iPlatformHeight; iRow++)
-				{
-					spr_platformendtile.draw(iCol * TILESIZE, iRow * TILESIZE);
-				}
-			}
-
-			menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "Edit Path: [esc] Exit  [LMB] Set Start Point  [RMB] Set End Point");
-
-			rPath[1].x = g_Platforms[iEditPlatform].iStartX * 32;
-			rPath[1].y = g_Platforms[iEditPlatform].iStartY * 32;
-
-			rPath[3].x = g_Platforms[iEditPlatform].iEndX * 32;
-			rPath[3].y = g_Platforms[iEditPlatform].iEndY * 32;
-
-			SDL_BlitSurface(s_platform, &rPath[0], screen, &rPath[1]);
-			SDL_BlitSurface(s_platform, &rPath[2], screen, &rPath[3]);
-
-			if(g_Platforms[iEditPlatform].iStartX != g_Platforms[iEditPlatform].iEndX)
-			{
-				short iSpotLeft = (g_Platforms[iEditPlatform].iStartX < g_Platforms[iEditPlatform].iEndX ? g_Platforms[iEditPlatform].iStartX + 1 : g_Platforms[iEditPlatform].iEndX + 1);
-				short iSpotRight = (g_Platforms[iEditPlatform].iStartX < g_Platforms[iEditPlatform].iEndX ? g_Platforms[iEditPlatform].iEndX - 1 : g_Platforms[iEditPlatform].iStartX - 1);
-
-				for(short iSpot = iSpotLeft; iSpot <= iSpotRight; iSpot++)
-				{
-					rPath[5].x = iSpot * TILESIZE;
-					rPath[5].y = g_Platforms[iEditPlatform].iStartY * TILESIZE;
-					SDL_BlitSurface(s_platform, &rPath[4], screen, &rPath[5]);
-				}
-			}
-			else
-			{
-				short iSpotTop = (g_Platforms[iEditPlatform].iStartY < g_Platforms[iEditPlatform].iEndY ? g_Platforms[iEditPlatform].iStartY + 1 : g_Platforms[iEditPlatform].iEndY + 1);
-				short iSpotBottom = (g_Platforms[iEditPlatform].iStartY < g_Platforms[iEditPlatform].iEndY ? g_Platforms[iEditPlatform].iEndY - 1 : g_Platforms[iEditPlatform].iStartY - 1);
-
-				for(short iSpot = iSpotTop; iSpot <= iSpotBottom; iSpot++)
-				{
-					rPath[5].x = g_Platforms[iEditPlatform].iStartX * TILESIZE;
-					rPath[5].y = iSpot * TILESIZE;
-					SDL_BlitSurface(s_platform, &rPath[4], screen, &rPath[5]);
-				}
-			}
-		}
-		else if(PLATFORM_EDIT_STATE_TEST == iPlatformEditState)
-		{
-			menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "Check Paths: [esc] Exit");
-			
-			g_map.updatePlatforms();
-			g_map.drawPlatforms();
-		}
-		*/
-
 		menu_font_small.drawRightJustified(640, 0, maplist.currentFilename());
 		SDL_Flip(screen);
 
@@ -4992,11 +4947,42 @@ void loadcurrentmap()
 			}
 		}
 
-		g_Platforms[iPlatform].iVelocity = (int)(g_map.platforms[iPlatform]->pPath->dVelocity * 4.0f);
-		g_Platforms[iPlatform].iStartX = (int)(g_map.platforms[iPlatform]->pPath->dPathPointX[0] - g_map.platforms[iPlatform]->iHalfWidth + 1) / TILESIZE;
-		g_Platforms[iPlatform].iStartY = (int)(g_map.platforms[iPlatform]->pPath->dPathPointY[0] - g_map.platforms[iPlatform]->iHalfHeight + 1) / TILESIZE;
-		g_Platforms[iPlatform].iEndX = (int)(g_map.platforms[iPlatform]->pPath->dPathPointX[1] - g_map.platforms[iPlatform]->iHalfWidth + 1) / TILESIZE;
-		g_Platforms[iPlatform].iEndY = (int)(g_map.platforms[iPlatform]->pPath->dPathPointY[1] - g_map.platforms[iPlatform]->iHalfHeight + 1) / TILESIZE;
+		short iPathType = g_map.platforms[iPlatform]->pPath->GetType();
+		g_Platforms[iPlatform].iPathType = iPathType;
+		
+		if(iPathType == 0)
+		{
+			StraightPath * path = (StraightPath*)g_map.platforms[iPlatform]->pPath;
+			g_Platforms[iPlatform].iVelocity = (int)(path->dVelocity * 4.0f);
+			g_Platforms[iPlatform].iStartX = (int)(path->dPathPointX[0] - g_map.platforms[iPlatform]->iHalfWidth + 1) / TILESIZE;
+			g_Platforms[iPlatform].iStartY = (int)(path->dPathPointY[0] - g_map.platforms[iPlatform]->iHalfHeight + 1) / TILESIZE;
+			g_Platforms[iPlatform].iEndX = (int)(path->dPathPointX[1] - g_map.platforms[iPlatform]->iHalfWidth + 1) / TILESIZE;
+			g_Platforms[iPlatform].iEndY = (int)(path->dPathPointY[1] - g_map.platforms[iPlatform]->iHalfHeight + 1) / TILESIZE;
+		}
+		else if(iPathType == 1)
+		{
+			StraightPathContinuous * path = (StraightPathContinuous*)g_map.platforms[iPlatform]->pPath;
+			g_Platforms[iPlatform].iVelocity = (int)(path->dVelocity * 4.0f);
+			g_Platforms[iPlatform].iStartX = (int)(path->dPathPointX[0] - g_map.platforms[iPlatform]->iHalfWidth + 1) / TILESIZE;
+			g_Platforms[iPlatform].iStartY = (int)(path->dPathPointY[0] - g_map.platforms[iPlatform]->iHalfHeight + 1) / TILESIZE;
+			g_Platforms[iPlatform].fAngle = path->dAngle;
+		}
+		else if(iPathType == 2)
+		{
+			EllipsePath * path = (EllipsePath*)g_map.platforms[iPlatform]->pPath;
+
+			//Unconvert the velocity back to an int between 1 and 16 (correct for 0 in the middle)
+			short ivel = (short)(path->dVelocity / 0.0035f) + 8;
+			if(ivel <= 8)
+				ivel++;
+
+			g_Platforms[iPlatform].iVelocity = ivel;
+			g_Platforms[iPlatform].fRadiusX = path->dRadiusX;
+			g_Platforms[iPlatform].fRadiusY = path->dRadiusY;
+			g_Platforms[iPlatform].fCenterX = path->dPathPointX[0];
+			g_Platforms[iPlatform].fCenterY = path->dPathPointY[0];
+			g_Platforms[iPlatform].fAngle = path->dStartAngle;
+		}
 	}
 }
 
@@ -5016,6 +5002,12 @@ void SetPlatformToDefaults(short iPlatform)
 	g_Platforms[iPlatform].iStartY = 0;
 	g_Platforms[iPlatform].iEndX = 1;
 	g_Platforms[iPlatform].iEndY = 0;
+
+	g_Platforms[iPlatform].fAngle = 0.0f;
+	g_Platforms[iPlatform].fCenterX = 320.0f;
+	g_Platforms[iPlatform].fCenterY = 240.0f;
+	g_Platforms[iPlatform].fRadiusX = 128.0f;
+	g_Platforms[iPlatform].fRadiusY = 128.0f;
 }
 
 int savecurrentmap()
@@ -5052,14 +5044,29 @@ void insert_platforms_into_map()
 			}
 		}
 	
-		float fVelocity = (float)g_Platforms[iPlatform].iVelocity * 0.26f;
-
 		float fStartX = (float)(g_Platforms[iPlatform].iStartX * TILESIZE) + (float)(iWidth * TILESIZE) / 2.0f;
 		float fStartY = (float)(g_Platforms[iPlatform].iStartY * TILESIZE) + (float)(iHeight * TILESIZE) / 2.0f;
-		float fEndX = (float)(g_Platforms[iPlatform].iEndX * TILESIZE) + (float)(iWidth * TILESIZE) / 2.0f;
-		float fEndY = (float)(g_Platforms[iPlatform].iEndY * TILESIZE) + (float)(iHeight * TILESIZE) / 2.0f;
 				
-		MovingPlatformPath * path = new StraightPath(fVelocity, fStartX, fStartY, fEndX, fEndY, false);
+		MovingPlatformPath * path = NULL;
+		
+		if(g_Platforms[iPlatform].iPathType == 0)
+		{
+			float fVelocity = (float)g_Platforms[iPlatform].iVelocity * 0.26f;
+			float fEndX = (float)(g_Platforms[iPlatform].iEndX * TILESIZE) + (float)(iWidth * TILESIZE) / 2.0f;
+			float fEndY = (float)(g_Platforms[iPlatform].iEndY * TILESIZE) + (float)(iHeight * TILESIZE) / 2.0f;
+		
+			path = new StraightPath(fVelocity, fStartX, fStartY, fEndX, fEndY, false);
+		}
+		else if(g_Platforms[iPlatform].iPathType == 1)
+		{
+			float fVelocity = (float)g_Platforms[iPlatform].iVelocity * 0.26f;
+			path = new StraightPathContinuous(fVelocity, fStartX, fStartY, g_Platforms[iPlatform].fAngle, false);
+		}
+		else if(g_Platforms[iPlatform].iPathType == 2)
+		{
+			float fVelocity = ((float)g_Platforms[iPlatform].iVelocity - (g_Platforms[iPlatform].iVelocity > 8 ? 8 : 9)) * 0.0035f;
+			path = new EllipsePath(fVelocity, g_Platforms[iPlatform].fAngle, g_Platforms[iPlatform].fRadiusX, g_Platforms[iPlatform].fRadiusY, g_Platforms[iPlatform].fCenterX, g_Platforms[iPlatform].fCenterY, false);
+		}
 
 		g_map.platforms[iPlatform] = new MovingPlatform(tiles, types, iWidth, iHeight, path, false);
 	}
@@ -5496,6 +5503,7 @@ void takescreenshot()
 					else if(tile->iID == TILESETUNKNOWN)
 					{
 						//Draw unknown tile
+						SDL_BlitSurface(spr_unknowntile[0].getSurface(), &g_tilesetmanager.rRects[0][0][0], blitdest, &g_tilesetmanager.rRects[iScreenshotSize][g_Platforms[iPlatform].iStartX + iPlatformX][g_Platforms[iPlatform].iStartY + iPlatformY]);
 					}
 				}
 			}

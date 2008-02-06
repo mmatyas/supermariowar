@@ -37,6 +37,9 @@
 //5) Add shadow rect to platforms that shadow by spawn times so that we can intelligently not spawn into the middle of a platform
 //   Add other path types like looping, circle, and complex (straight with arch connections)
 
+//6) Level editor screenshot will not draw platform correctly anymore
+//   Also reading of platform velocity is not correct for ellipses
+
 
 #ifdef _XBOX
 	#include <xtl.h>

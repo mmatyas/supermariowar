@@ -13,10 +13,12 @@ class MovingPlatformPath
 		MovingPlatformPath(float vel, float startX, float startY, float endX, float endY, bool preview);
 		virtual ~MovingPlatformPath() {}
 
-		virtual bool Move(short type) {return false;}
+		virtual bool Move(short type) = 0; //Never let this class be instanciated
 		virtual void Reset();
 
 		void SetPlatform(MovingPlatform * platform) {pPlatform = platform;}
+
+		short GetType() {return iType;}
 
 	protected:
 
@@ -33,11 +35,12 @@ class MovingPlatformPath
 		short iSteps;
 		short iGoalPoint;
 
+		short iType;
+
 	friend class MovingPlatform;
 	friend class CMap;
 	friend void loadcurrentmap();
 	friend void insert_platforms_into_map();
-
 };
 
 class StraightPath : public MovingPlatformPath
@@ -48,33 +51,55 @@ class StraightPath : public MovingPlatformPath
 
 		bool Move(short type);
 
-	private:
+	protected:
 		void CalculateAngle();
 		void SetVelocity();
 		
-		float dWidth, dHeight;
-		float dAngle, dLength;
+		float dAngle;
 
 	friend class MovingPlatform;
+	friend class CMap;
+	friend void loadcurrentmap();
+	friend void insert_platforms_into_map();
 };
 
-/*
-class ElipsePath : public MovingPlatformPath
+class StraightPathContinuous : public StraightPath
 {
 	public:
-		ElipsePath(float vel, float dAngle, float dRadiusX, float dRadiusY, bool preview);
-		virtual ~ElipsePath() {}
+		StraightPathContinuous(float vel, float startX, float startY, float angle, bool preview);
+		virtual ~StraightPathContinuous() {}
 
 		bool Move(short type);
 
 	private:
-		
-		float dAngle, dRadiusX, dRadiusY;
-		float dOldCurrentX, dOldCurrentY;
+		float dEdgeX, dEdgeY;
 
 	friend class MovingPlatform;
+	friend class CMap;
+	friend void loadcurrentmap();
+	friend void insert_platforms_into_map();
 };
-*/
+
+class EllipsePath : public MovingPlatformPath
+{
+	public:
+		EllipsePath(float vel, float dAngle, float dRadiusX, float dRadiusY, float dCenterX, float dCenterY, bool preview);
+		virtual ~EllipsePath() {}
+
+		bool Move(short type);
+		void SetPosition();
+		void Reset();
+
+	private:
+		
+		float dRadiusX, dRadiusY;
+		float dAngle, dStartAngle;
+
+	friend class MovingPlatform;
+	friend class CMap;
+	friend void loadcurrentmap();
+	friend void insert_platforms_into_map();
+};
 
 class FallingPath : public MovingPlatformPath
 {
@@ -102,12 +127,10 @@ class MovingPlatform
 		void ResetPath();
 
 		void collide(CPlayer * player);
-		bool coldec_player(CPlayer * player);
 
 		void gettiletypes(CPlayer * player, int * lefttile, int * righttile);
 
 		void collide(IO_MovingObject * object);
-		bool coldec_object(IO_MovingObject * object);
 
 		void xf(float xf){fx = xf; ix = (short)fx;}
  		void xi(short xi){ix = xi; fx = (float)ix;}
@@ -118,6 +141,12 @@ class MovingPlatform
 		bool IsInNoSpawnZone(short x, short y, short w, short h);
 
 	protected:
+
+		void check_map_collision_right(CPlayer * player);
+		void check_map_collision_left(CPlayer * player);
+
+		short coldec_player(CPlayer * player);
+		short coldec_object(IO_MovingObject * object);
 
 		TilesetTile ** iTileData;
 		MapTile ** iTileType;
@@ -154,6 +183,7 @@ class MovingPlatform
 		short iNoSpawnZoneRight;
 
 	friend class FallingPath;
+	friend class StraightPathContinuous;
 
 	friend class CPlayer;
 	friend class IO_MovingObject;

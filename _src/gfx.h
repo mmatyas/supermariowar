@@ -35,6 +35,8 @@ bool gfx_loadpalette();
 void gfx_setrect(SDL_Rect * rect, short x, short y, short w, short h);
 void gfx_setrect(SDL_Rect * rect, SDL_Rect * copyrect);
 
+void gfx_cliprect(SDL_Rect * srcRect, SDL_Rect * dstRect, short x, short y, short w, short h);
+
 class gfxSprite
 {
 	public:
