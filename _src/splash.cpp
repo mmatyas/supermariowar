@@ -100,6 +100,10 @@ bool LoadMenuGraphics()
 	gfx_loadimage(&spr_thumbnail_mapitems[0], convertPath("gfx/packs/menu/menu_mapitems_preview.png", graphicspack), false);
 	gfx_loadimage(&spr_thumbnail_mapitems[1], convertPath("gfx/packs/menu/menu_mapitems_thumbnail.png", graphicspack), false);
 
+	gfx_loadimage(&spr_platformstarttile, convertPath("gfx/leveleditor/leveleditor_platformstarttile.png"), 64, true);
+	gfx_loadimage(&spr_platformendtile, convertPath("gfx/leveleditor/leveleditor_selectedtile.png"), 64, true);
+	gfx_loadimage(&spr_platformpath, convertPath("gfx/leveleditor/leveleditor_platform_path.png"), 128, true);
+	
 	gfx_loadimage(&spr_worldbackground[0], convertPath("gfx/packs/world/world_background.png", graphicspack), false);
 	gfx_loadimage(&spr_worldbackground[1], convertPath("gfx/packs/world/preview/world_background.png", graphicspack), false);
 
@@ -284,12 +288,27 @@ bool LoadGameGraphics()
 	gfx_loadimage(&spr_blueblock, convertPath("gfx/packs/projectiles/throwblock.png", graphicspack), true);
 	gfx_loadimage(&spr_bomb, convertPath("gfx/packs/projectiles/bomb.png", graphicspack), true);
 	
-	gfx_loadimage(&spr_hazard_fireball, convertPath("gfx/packs/hazards/fireball.png", graphicspack), true);
-	gfx_loadimage(&spr_hazard_rotodisc, convertPath("gfx/packs/hazards/rotodisc.png", graphicspack), true);
-	gfx_loadimage(&spr_hazard_bulletbill, convertPath("gfx/packs/hazards/bulletbill.png", graphicspack), false);
+	gfx_loadimage(&spr_hazard_fireball[0], convertPath("gfx/packs/hazards/fireball.png", graphicspack), true);
+	gfx_loadimage(&spr_hazard_fireball[1], convertPath("gfx/packs/hazards/fireball_preview.png", graphicspack), true);
+	gfx_loadimage(&spr_hazard_fireball[2], convertPath("gfx/packs/hazards/fireball_thumbnail.png", graphicspack), true);
+
+	gfx_loadimage(&spr_hazard_rotodisc[0], convertPath("gfx/packs/hazards/rotodisc.png", graphicspack), true);
+	gfx_loadimage(&spr_hazard_rotodisc[1], convertPath("gfx/packs/hazards/rotodisc_preview.png", graphicspack), true);
+	gfx_loadimage(&spr_hazard_rotodisc[2], convertPath("gfx/packs/hazards/rotodisc_thumbnail.png", graphicspack), true);
+
+	gfx_loadimage(&spr_hazard_bulletbill[0], convertPath("gfx/packs/hazards/bulletbill.png", graphicspack), false);
+	gfx_loadimage(&spr_hazard_bulletbill[1], convertPath("gfx/packs/hazards/bulletbill_preview.png", graphicspack), false);
+	gfx_loadimage(&spr_hazard_bulletbill[2], convertPath("gfx/packs/hazards/bulletbill_thumbnail.png", graphicspack), false);
+
+	gfx_loadimage(&spr_hazard_flame[0], convertPath("gfx/packs/hazards/flame.png", graphicspack), true);
+	gfx_loadimage(&spr_hazard_flame[1], convertPath("gfx/packs/hazards/flame_preview.png", graphicspack), true);
+	gfx_loadimage(&spr_hazard_flame[2], convertPath("gfx/packs/hazards/flame_thumbnail.png", graphicspack), true);
+
+	gfx_loadimage(&spr_hazard_pirhanaplant[0], convertPath("gfx/packs/hazards/pirhanaplant.png", graphicspack), true);
+	gfx_loadimage(&spr_hazard_pirhanaplant[1], convertPath("gfx/packs/hazards/pirhanaplant_preview.png", graphicspack), true);
+	gfx_loadimage(&spr_hazard_pirhanaplant[2], convertPath("gfx/packs/hazards/pirhanaplant_thumbnail.png", graphicspack), true);
+
 	gfx_loadimage(&spr_hazard_bulletbilldead, convertPath("gfx/packs/hazards/bulletbilldead.png", graphicspack), false);
-	gfx_loadimage(&spr_hazard_flame, convertPath("gfx/packs/hazards/flame.png", graphicspack), true);
-	gfx_loadimage(&spr_hazard_pirhanaplant, convertPath("gfx/packs/hazards/pirhanaplant.png", graphicspack), true);
 
 	gfx_loadimage(&spr_fireballexplosion, convertPath("gfx/packs/eyecandy/fireballexplosion.png", graphicspack), 160, true);
 	gfx_loadimage(&spr_frictionsmoke, convertPath("gfx/packs/eyecandy/frictionsmoke.png", graphicspack), 160, true);

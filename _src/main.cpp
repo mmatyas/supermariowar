@@ -22,7 +22,7 @@
 | start:		24.01.2003									|
 | last changes:	03.26.2007									|
 |															|
-|								© 2003-2007 Florian Hufsky  |
+|								© 2003-2008 Florian Hufsky  |
 |								  florian.hufsky@gmail.com	|
 |                                     mtschaffer@gmail.com  |
 |								  http://smw.72dpiarmy.com	|
@@ -34,12 +34,12 @@
 
 //4) Still reports of disappearing map tiles - caused when rRects is used out of bounds causing w and h to be set to 0 - happened with platform with tile using row 960
 
-//5) Add shadow rect to platforms that shadow by spawn times so that we can intelligently not spawn into the middle of a platform
-//   Add other path types like looping, circle, and complex (straight with arch connections)
+/*
+1) Pause screen should say which mode and how many points needed, in case you didn't notice or forgot after starting the map.
 
-//6) Level editor screenshot will not draw platform correctly anymore
-//   Also reading of platform velocity is not correct for ellipses
-
+2) In addition to getting a victory by number of points, there should be an option to win by have a certain number of points more than everyone else. This will help on maps where extra lives are a bit too abundant, or when one player is crushing the others.
+- Maybe - add "Mercy Rule" to end game as long as the victor has at least 50% of the goal points and he is X% above the other players like 150%, 200%, 250%, 300%, etc...
+/*
 
 #ifdef _XBOX
 	#include <xtl.h>
@@ -47,6 +47,7 @@
 
 #include "global.h"				//all the global stuff
 #include <time.h>
+#include <math.h>
 
 //now it's really time for an "engine" (aka resource manager)
 #ifdef _WIN32
@@ -122,6 +123,9 @@ gfxSprite		spr_menu_boxed_numbers;
 gfxSprite		spr_thumbnail_platformarrows;
 gfxSprite		spr_thumbnail_warps[2];
 gfxSprite		spr_thumbnail_mapitems[2];
+gfxSprite		spr_platformstarttile;
+gfxSprite		spr_platformendtile;
+gfxSprite		spr_platformpath;
 
 gfxSprite		spr_worldbackground[3];
 gfxSprite		spr_worldforeground[3];
@@ -244,12 +248,12 @@ gfxSprite		spr_spike;
 gfxSprite		spr_bomb;
 gfxSprite		spr_kuriboshoe;
 
-gfxSprite		spr_hazard_fireball;
-gfxSprite		spr_hazard_rotodisc;
-gfxSprite		spr_hazard_bulletbill;
+gfxSprite		spr_hazard_fireball[3];
+gfxSprite		spr_hazard_rotodisc[3];
+gfxSprite		spr_hazard_bulletbill[3];
 gfxSprite		spr_hazard_bulletbilldead;
-gfxSprite		spr_hazard_flame;
-gfxSprite		spr_hazard_pirhanaplant;
+gfxSprite		spr_hazard_flame[3];
+gfxSprite		spr_hazard_pirhanaplant[3];
 
 gfxSprite		spr_fireballexplosion;
 gfxSprite		spr_frictionsmoke;
@@ -295,6 +299,9 @@ short			projectiles[4];
 
 extern short controlkeys[2][2][4][NUM_KEYS];
 extern short g_iVersion[];
+
+//Locations for swirl spawn effects
+short g_iSwirlSpawnLocations[4][2][25];
 
 CMap			g_map;
 CTilesetManager g_tilesetmanager;
@@ -603,7 +610,8 @@ void RunGame();
 void CleanUp();
 bool LoadAndSplashScreen();
 void SetGameModeSettingsFromMenu();
-void LoadMapObjects();
+void LoadMapObjects(bool fPreview);
+void LoadMapHazards(bool fPreview);
 void UpdateScoreBoard();
 void PlayNextMusicTrack();
 void EnterBossMode(short type);
@@ -737,6 +745,7 @@ int main(int argc, char *argv[])
 	game_values.outofboundstime		= 5;
 	game_values.warplockstyle		= 1;	// Lock Warp Exit Only
 	game_values.warplocktime		= 186;  // 3 seconds
+	game_values.suicidetime			= 310;	// 5 seconds
 	game_values.cpudifficulty		= 2;
 	game_values.fireballttl			= 310;  // 5 seconds
 	game_values.shellttl			= 496;  // 8 seconds
@@ -1049,6 +1058,7 @@ int main(int argc, char *argv[])
 			fread(&game_values.storedpowerupdelay, sizeof(short), 1, fp);
 			fread(&game_values.warplockstyle, sizeof(short), 1, fp);
 			fread(&game_values.warplocktime, sizeof(short), 1, fp);
+			fread(&game_values.suicidetime, sizeof(short), 1, fp);
 
 			//TODO: Need to test what happens when you unplug some controllers from the xbox
 			//and then start up (device index will probably point to a gamepad that isn't in the list)
@@ -1125,6 +1135,31 @@ int main(int argc, char *argv[])
 		blitdest = screen;
 	}
 #endif
+
+	//Calculate the swirl spawn effect locations
+	float spawnradius = 100.0f;
+	float spawnangle = 0.0f;
+	
+	for(short i = 0; i < 25; i++)
+	{
+		g_iSwirlSpawnLocations[0][0][i] = (short)(spawnradius * cos(spawnangle));
+		g_iSwirlSpawnLocations[0][1][i] = (short)(spawnradius * sin(spawnangle));
+			
+		float angle = spawnangle + HALF_PI;
+		g_iSwirlSpawnLocations[1][0][i] = (short)(spawnradius * cos(angle));
+		g_iSwirlSpawnLocations[1][1][i] = (short)(spawnradius * sin(angle));
+
+		angle = spawnangle + PI;
+		g_iSwirlSpawnLocations[2][0][i] = (short)(spawnradius * cos(angle));
+		g_iSwirlSpawnLocations[2][1][i] = (short)(spawnradius * sin(angle));
+
+		angle = spawnangle + THREE_HALF_PI;
+		g_iSwirlSpawnLocations[3][0][i] = (short)(spawnradius * cos(angle));
+		g_iSwirlSpawnLocations[3][1][i] = (short)(spawnradius * sin(angle));
+
+		spawnradius -= 4.0f;
+		spawnangle += 0.1f;
+	}
 
 	//Load the gfx color palette
 	gfx_loadpalette();
@@ -2263,268 +2298,6 @@ void RunGame()
 					}
 				}
 
-
-				/*
-				//moving object to moving object collisions
-				for(i = 0; i < objectcontainer[0].list_end; i++)
-				{
-					if(!objectcontainer[0].list[i]->GetDead() && objectcontainer[0].list[i]->getObjectType() == object_moving)
-					{
-						IO_MovingObject * object = (IO_MovingObject*)objectcontainer[0].list[i];
-
-						//collision items
-						if(object->getMovingObjectType() == movingobject_fireball)
-						{
-							for(j = 0; j < objectcontainer[0].list_end; j++)
-							{
-								if(i == j)
-									continue;
-
-								if(!objectcontainer[0].list[j]->GetDead())
-								{
-									if(coldec_obj2obj(objectcontainer[0].list[i], objectcontainer[0].list[j]))
-									{
-										collisionhandler_o2o(*object, *(objectcontainer[0].list[j]));
-									}
-								}
-							}
-
-							//fireball to shell/throwblock
-							for(j = 0; j < objectcontainer[1].list_end; j++)
-							{
-								if(objectcontainer[1].list[j]->getObjectType() == object_moving)
-								{
-									MovingObjectType type = ((IO_MovingObject*)objectcontainer[1].list[j])->getMovingObjectType();
-
-									if((type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone) && !objectcontainer[1].list[j]->GetDead())
-									{
-										if(coldec_obj2obj(objectcontainer[0].list[i], objectcontainer[1].list[j]))
-										{
-											collisionhandler_o2o(*object, *(objectcontainer[1].list[j]));
-										}
-									}
-								}
-							}
-						}
-
-						if(object->getMovingObjectType() == movingobject_goomba || object->getMovingObjectType() == movingobject_koopa || object->getMovingObjectType() == movingobject_sledgebrother || object->getMovingObjectType() == movingobject_fireball)
-						{
-							for(j = 0; j < objectcontainer[2].list_end; j++)
-							{
-								if(!objectcontainer[2].list[j]->GetDead())
-								{
-									if(coldec_obj2obj(objectcontainer[0].list[i], objectcontainer[2].list[j]))
-									{
-										collisionhandler_o2o(*object, *(objectcontainer[2].list[j]));
-									}
-								}
-							}
-						}
-					}
-				}
-
-				//front objects to front and collision items (bullet bills to explosions and hammers to bullet bills and goombas)
-				for(i = 0; i < objectcontainer[2].list_end; i++)
-				{
-					if(!objectcontainer[2].list[i]->GetDead() && objectcontainer[2].list[i]->getObjectType() == object_moving)
-					{
-						IO_MovingObject * object = (IO_MovingObject*)objectcontainer[2].list[i];
-						MovingObjectType type = object->getMovingObjectType();
-						
-						if(type == movingobject_podobo || type == movingobject_bulletbill || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_sledgehammer || type == movingobject_cheepcheep || type == movingobject_boomerang || type == movingobject_pirhanaplant)
-						{
-							//bullet bills to explosions && hammers to bullet bills
-							for(j = 0; j < objectcontainer[2].list_end; j++)
-							{
-								if(i == j)
-									continue;
-
-								bool fCollideWith = false;
-								if(objectcontainer[2].list[j]->getObjectType() == object_moving)
-								{
-									MovingObjectType type = ((IO_MovingObject*)objectcontainer[2].list[j])->getMovingObjectType();
-								
-									if(type == movingobject_podobo || type == movingobject_bulletbill || type == movingobject_cheepcheep)
-										fCollideWith = true;
-								}
-
-								if((fCollideWith || objectcontainer[2].list[j]->getObjectType() == object_explosion) && !objectcontainer[2].list[j]->GetDead())
-								{
-									if(coldec_obj2obj(objectcontainer[2].list[i], objectcontainer[2].list[j]))
-									{
-										collisionhandler_o2o(*object, *(objectcontainer[2].list[j]));
-
-										//If the object was killed by this collision, break out
-										if(objectcontainer[2].list[i]->GetDead())
-											break;
-									}
-								}
-							}
-
-							//hammers to goombas
-							for(j = 0; j < objectcontainer[0].list_end; j++)
-							{
-								bool collidewithobject = false;
-								
-								if(objectcontainer[0].list[j]->getObjectType() == object_moving)
-								{
-									IO_MovingObject * movingobject = (IO_MovingObject*)objectcontainer[0].list[j];
-
-									if(movingobject->getMovingObjectType() == movingobject_goomba || movingobject->getMovingObjectType() == movingobject_koopa || movingobject->getMovingObjectType() == movingobject_sledgebrother)
-										collidewithobject = true;
-								}
-
-								if(collidewithobject && !objectcontainer[0].list[j]->GetDead())
-								{
-									if(coldec_obj2obj(objectcontainer[2].list[i], objectcontainer[0].list[j]))
-									{
-										collisionhandler_o2o(*object, *(objectcontainer[0].list[j]));
-									}
-								}
-							}
-
-							if(type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_sledgehammer || type == movingobject_boomerang)
-							{
-								//hammer to shell/throwblock
-								for(j = 0; j < objectcontainer[1].list_end; j++)
-								{
-									if(objectcontainer[1].list[j]->getObjectType() == object_moving)
-									{
-										MovingObjectType type = ((IO_MovingObject*)objectcontainer[1].list[j])->getMovingObjectType();
-
-										if((type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone) && !objectcontainer[1].list[j]->GetDead())
-										{
-											if(coldec_obj2obj(objectcontainer[2].list[i], objectcontainer[1].list[j]))
-											{
-												collisionhandler_o2o(*object, *(objectcontainer[1].list[j]));
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-
-				//player objects to collision items (shells to goombas and shell to shell)
-				//Also flags to flag bases
-				for(i = 0; i < objectcontainer[1].list_end; i++)
-				{
-					if(!objectcontainer[1].list[i]->GetDead())
-					{
-						if(objectcontainer[1].list[i]->getObjectType() == object_moving)
-						{
-							IO_MovingObject * object = (IO_MovingObject*)objectcontainer[1].list[i];
-
-							if(object->getMovingObjectType() == movingobject_shell || object->getMovingObjectType() == movingobject_throwblock || object->getMovingObjectType() == movingobject_attackzone)
-							{
-								//shell/throwblock to goomba and shell/throwblock to fireball
-								for(j = 0; j < objectcontainer[0].list_end; j++)
-								{
-									if(objectcontainer[0].list[j]->getObjectType() == object_moving)
-									{
-										IO_MovingObject * object2 = (IO_MovingObject*)objectcontainer[0].list[j];
-									
-										if(object2->getMovingObjectType() == movingobject_goomba || object2->getMovingObjectType() == movingobject_koopa || object2->getMovingObjectType() == movingobject_sledgebrother)
-										{
-											if(!objectcontainer[0].list[j]->GetDead())
-											{
-												if(coldec_obj2obj(objectcontainer[1].list[i], objectcontainer[0].list[j]))
-												{
-													collisionhandler_o2o(*object, *(objectcontainer[0].list[j]));
-												}
-											}
-										}
-									}
-								}
-
-								//shell to shell or block to block
-								for(j = 0; j < objectcontainer[1].list_end; j++)
-								{
-									if(i == j)
-										continue;
-
-									if(objectcontainer[1].list[j]->getObjectType() == object_moving)
-									{
-										MovingObjectType type = ((IO_MovingObject*)objectcontainer[1].list[j])->getMovingObjectType();
-
-										if((type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone) && !objectcontainer[1].list[j]->GetDead())
-										{
-											if(coldec_obj2obj(objectcontainer[1].list[i], objectcontainer[1].list[j]))
-											{
-												collisionhandler_o2o(*object, *(objectcontainer[1].list[j]));
-											}
-										}
-									}
-								}
-
-								//shells/throwblocks to explosions
-								for(j = 0; j < objectcontainer[2].list_end; j++)
-								{
-									bool fCollideWith = false;
-									if(objectcontainer[2].list[j]->getObjectType() == object_moving)
-									{
-										MovingObjectType type = ((IO_MovingObject*)objectcontainer[2].list[j])->getMovingObjectType();
-									
-										if(type == movingobject_podobo || type == movingobject_bulletbill || type == movingobject_cheepcheep)
-											fCollideWith = true;
-									}
-
-									if((fCollideWith || objectcontainer[2].list[j]->getObjectType() == object_explosion) && !objectcontainer[2].list[j]->GetDead())
-									{
-										if(coldec_obj2obj(objectcontainer[1].list[i], objectcontainer[2].list[j]))
-										{
-											collisionhandler_o2o(*object, *(objectcontainer[2].list[j]));
-										}
-									}
-								}
-							}
-						}
-						else if(objectcontainer[1].list[i]->getObjectType() == object_flag)
-						{
-							CO_Flag * flag = (CO_Flag*)objectcontainer[1].list[i];
-
-							//flag to flag base collisions
-							for(j = 0; j < objectcontainer[0].list_end; j++)
-							{
-								if(objectcontainer[0].list[j]->getObjectType() == object_flagbase)
-								{
-									if(!objectcontainer[0].list[j]->GetDead())
-									{
-										if(coldec_obj2obj(objectcontainer[1].list[i], objectcontainer[0].list[j]))
-										{
-											collisionhandler_o2o(*flag, *(objectcontainer[0].list[j]));
-										}
-									}
-								}
-							}
-						}
-						else if(objectcontainer[1].list[i]->getObjectType() == object_egg)
-						{
-							CO_Egg * egg = (CO_Egg*)objectcontainer[1].list[i];
-
-							//thrown egg to yoshi collision
-							for(j = 0; j < objectcontainer[1].list_end; j++)
-							{
-								if(i == j)
-									continue;
-
-								if(objectcontainer[1].list[j]->getObjectType() == object_yoshi)
-								{
-									if(!objectcontainer[1].list[j]->GetDead())
-									{
-										if(coldec_obj2obj(objectcontainer[1].list[i], objectcontainer[1].list[j]))
-										{
-											collisionhandler_o2o(*egg, *(objectcontainer[1].list[j]));
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-				*/
-
 				eyecandyfront.cleandeadobjects();
 				eyecandyback.cleandeadobjects();
 				objectcontainer[2].cleandeadobjects();
@@ -2628,7 +2401,7 @@ void RunGame()
 					g_map.predrawbackground(spr_background, spr_backmap);
 					g_map.predrawforeground(spr_frontmap);
 					g_map.SetupAnimatedTiles();
-					LoadMapObjects();
+					LoadMapObjects(false);
 					*/
 
 					if(game_values.music)
@@ -3084,13 +2857,13 @@ void CleanUp()
 	eyecandyfront.clean();
 	eyecandyback.clean();
 	
-	noncolcontainer.clean();
+	//noncolcontainer.clean();
 
-	objectcontainer[0].clean();
-	objectcontainer[1].clean();
-	objectcontainer[2].clean();
+	//objectcontainer[0].clean();
+	//objectcontainer[1].clean();
+	//objectcontainer[2].clean();
 		
-	LoadMapObjects();
+	LoadMapObjects(true);
 	g_map.clearWarpLocks();
 	g_map.resetPlatforms();
 	
@@ -3347,13 +3120,9 @@ void SetGameModeSettingsFromMenu()
 		memcpy(&game_values.gamemodesettings, &game_values.gamemodemenusettings, sizeof(GameModeSettings));
 }
 
-void LoadMapObjects()
+void LoadMapObjects(bool fPreview)
 {
-	//Make sure we don't have any objects created before we create them from the map settings
-	noncolcontainer.clean();
-	objectcontainer[0].clean();
-	objectcontainer[1].clean();
-	objectcontainer[2].clean();
+	LoadMapHazards(fPreview);
 
 	//Clear all the previous switch settings
 	for(short iSwitch = 0; iSwitch < 8; iSwitch++)
@@ -3447,8 +3216,6 @@ void LoadMapObjects()
 		}
 	}
 
-	objectcontainer[1].clean();
-
 	//Add map objects like springs, shoes and spikes
 	for(short i = 0; i < g_map.iNumMapItems; i++)
 	{
@@ -3467,14 +3234,24 @@ void LoadMapObjects()
 
 	//Set all the 1x1 gaps up so players can run across them
 	g_map.UpdateAllTileGaps();
+}
 
+void LoadMapHazards(bool fPreview)
+{
+	//Make sure we don't have any objects created before we create them from the map settings
+	noncolcontainer.clean();
+	objectcontainer[0].clean();
+	objectcontainer[1].clean();
+	objectcontainer[2].clean();
+
+	//Create objects for all the map hazards
 	for(short iMapHazard = 0; iMapHazard < g_map.iNumMapHazards; iMapHazard++)
 	{
 		MapHazard * hazard = &g_map.maphazards[iMapHazard];
 		if(hazard->itype == 0)
 		{
 			for(short iFireball = 0; iFireball < hazard->iparam[0]; iFireball++)
-				objectcontainer[1].add(new OMO_OrbitHazard(&spr_hazard_fireball, (hazard->ix << 4) + 16, (hazard->iy << 4) + 16, (float)(iFireball * 24), hazard->dparam[0], hazard->dparam[1], 4, 8, 18, 18, 0, 0, 0, hazard->dparam[0] < 0.0f ? 18 : 0, 18, 18));
+				objectcontainer[1].add(new OMO_OrbitHazard(&spr_hazard_fireball[fPreview ? 1 : 0], (hazard->ix << 4) + 16, (hazard->iy << 4) + 16, (float)(iFireball * 24), hazard->dparam[0], hazard->dparam[1], 4, 8, 18, 18, 0, 0, 0, hazard->dparam[0] < 0.0f ? 18 : 0, 18, 18));
 		}
 		else if(hazard->itype == 1)
 		{
@@ -3485,12 +3262,12 @@ void LoadMapObjects()
 				if(dAngle > TWO_PI)
 					dAngle -= TWO_PI;
 
-				objectcontainer[1].add(new OMO_OrbitHazard(&spr_hazard_rotodisc, (hazard->ix << 4) + 16, (hazard->iy << 4) + 16, hazard->dparam[2], hazard->dparam[0], dAngle, 3, 8, 32, 32, 0, 0, 0, 0, 32, 32));
+				objectcontainer[1].add(new OMO_OrbitHazard(&spr_hazard_rotodisc[fPreview ? 1 : 0], (hazard->ix << 4) + 16, (hazard->iy << 4) + 16, hazard->dparam[2], hazard->dparam[0], dAngle, 3, 8, 32, 32, 0, 0, 0, 0, 32, 32));
 			}
 		}
 		else if(hazard->itype == 2)
 		{
-			noncolcontainer.add(new IO_BulletBillCannon(hazard->ix << 4, hazard->iy << 4, hazard->iparam[0], hazard->dparam[0]));
+			noncolcontainer.add(new IO_BulletBillCannon(hazard->ix << 4, hazard->iy << 4, hazard->iparam[0], hazard->dparam[0], fPreview));
 		}
 		else if(hazard->itype == 3)
 		{
@@ -3498,7 +3275,7 @@ void LoadMapObjects()
 		}
 		else if(hazard->itype >= 4 && hazard->itype <= 7)
 		{
-			objectcontainer[1].add(new MO_PirhanaPlant(hazard->ix << 4, hazard->iy << 4, hazard->itype - 4, hazard->iparam[0], hazard->iparam[1]));
+			objectcontainer[1].add(new MO_PirhanaPlant(hazard->ix << 4, hazard->iy << 4, hazard->itype - 4, hazard->iparam[0], hazard->iparam[1], fPreview));
 		}
 	}
 }

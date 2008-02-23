@@ -14,6 +14,7 @@ extern WorldMap g_worldmap;
 extern short LookupTeamID(short id);
 
 extern void LoadCurrentMapBackground();
+extern void LoadMapHazards(bool fPreview);
 
 UI_Control::UI_Control(short x, short y)
 {
@@ -2372,6 +2373,12 @@ void MI_MapField::Update()
 		}
 	}
 
+	//Update hazards
+	noncolcontainer.update();
+
+	objectcontainer[1].update();
+	objectcontainer[1].cleandeadobjects();
+
 	miModifyImageRight->Update();
 	miModifyImageLeft->Update();
 
@@ -2402,8 +2409,42 @@ void MI_MapField::Draw()
 	menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 24, maplist.currentShortmapname());
 
 	SDL_BlitSurface(surfaceMapBackground, NULL, blitdest, &rectDst);
-	g_map.drawPlatforms(rectDst.x, rectDst.y);
 	
+	//Draw map hazards
+	for(short i = 0; i < objectcontainer[1].list_end; i++)
+	{
+		CObject * object = objectcontainer[1].list[i];
+		ObjectType type = object->getObjectType();
+		
+		if(type == object_orbithazard)
+		{
+			((OMO_OrbitHazard*)object)->draw(rectDst.x, rectDst.y);
+		}
+		else if(type == object_pathhazard)
+		{
+			((OMO_StraightPathHazard*)object)->draw(rectDst.x, rectDst.y);
+		}
+		else if(type == object_flamecannon)
+		{
+			((IO_FlameCannon*)object)->draw(rectDst.x, rectDst.y);
+		}
+		else if(type == object_moving)
+		{
+			IO_MovingObject * movingobject = (IO_MovingObject *) object;
+
+			if(movingobject->getMovingObjectType() == movingobject_bulletbill)
+			{
+				((MO_BulletBill*)movingobject)->draw(rectDst.x, rectDst.y);
+			}
+			else if(movingobject->getMovingObjectType() == movingobject_pirhanaplant)
+			{
+				((MO_PirhanaPlant*)movingobject)->draw(rectDst.x, rectDst.y);
+			}
+		}
+	}
+
+	g_map.drawPlatforms(rectDst.x, rectDst.y);
+
 	if(game_values.toplayer)
 		SDL_BlitSurface(surfaceMapForeground, NULL, blitdest, &rectDst);
 	
@@ -2427,6 +2468,8 @@ void MI_MapField::LoadCurrentMap()
 	SDL_Delay(10);  //Sleeps to help the music from skipping
 	g_map.preDrawPreviewForeground(surfaceMapForeground, false);
 	g_map.preDrawPreviewWarps(surfaceMapForeground, false);
+
+	LoadMapHazards(true);
 }
 
 void MI_MapField::SetMap(const char * szMapName)

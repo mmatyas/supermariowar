@@ -208,8 +208,7 @@ class CMap
 
 		void AddTemporaryPlatform(MovingPlatform * platform);
 
-		void findspawnpoint(short iType, short * x, short * y, short width, short height, bool tilealigned);
-		void CalculatePlatformNoSpawnZones();
+		bool findspawnpoint(short iType, short * x, short * y, short width, short height, bool tilealigned);
 		bool IsInPlatformNoSpawnZone(short x, short y, short width, short height);
 
 		char szBackgroundFile[128];
@@ -287,6 +286,7 @@ class CMap
 		void ClearAnimatedTiles();
 
 		void draw(SDL_Surface *targetsurf, int layer);
+		void drawThumbnailHazards(SDL_Surface * targetSurface);
 		void drawThumbnailPlatforms(SDL_Surface * targetSurface);
 		void drawPreview(SDL_Surface * targetsurf, int layer, bool fThumbnail);
 		void drawPreviewBlocks(SDL_Surface * targetSurface, bool fThumbnail);
@@ -315,12 +315,14 @@ class CMap
 		friend short * GetBlockProperty(short x, short y, short iBlockCol, short iBlockRow, short * iSettingIndex);
 		friend int save_as();
 		friend int load();
-		friend void LoadMapObjects();
+		friend void LoadMapObjects(bool fPreview);
+		friend void LoadMapHazards(bool fPreview);
 		friend void draw_platform(short iPlatform, bool fDrawTileTypes);
 		friend void insert_platforms_into_map();
 		friend void loadcurrentmap();
 		friend void loadmap(char * szMapFile);
 		friend void SetNoSpawn(short nospawnmode, short col, short row, bool value);
+		friend int editor_platforms();
 		
 		friend class B_BreakableBlock;
 		friend class B_DonutBlock;

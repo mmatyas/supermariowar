@@ -1,4 +1,5 @@
 #include "global.h"
+#include <math.h>
 
 #include "gfx.h"
 extern bool g_fLoadMessages;
@@ -1183,3 +1184,340 @@ short g_iCollisionMap[MOVINGOBJECT_LAST][MOVINGOBJECT_LAST] =
 	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_pirhanaplant = 23
 	{0,0,0,1,1,0,0,1,1,0,0,0,1,1,0,0,0,1,0,0,0,0,0,1,0}, //movingobject_explosion = 24
 };
+
+
+short iPlatformPathDotSize[3] = {12, 6, 4};
+short iPlatformPathDotOffset[3] = {0, 12, 18};
+short iScreenshotSize[3][2] = {{640, 480}, {320, 240}, {160, 120}};
+void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short startY, short endX, short endY, float angle, float radiusX, float radiusY, short iSize, short iPlatformWidth, short iPlatformHeight, bool fDrawPlatform, bool fDrawShadow)
+{
+	short iStartX = startX >> iSize;
+	short iStartY = startY >> iSize;
+	short iEndX = endX >> iSize;
+	short iEndY = endY >> iSize;
+
+	float fRadiusX = radiusX / (float)(1 << iSize);
+	float fRadiusY = radiusY / (float)(1 << iSize);
+
+	short iSizeShift = 5 - iSize;
+	int iTileSize = 1 << iSizeShift;
+
+	if(fDrawPlatform)
+	{
+		for(short iPlatformX = 0; iPlatformX < iPlatformWidth; iPlatformX++)
+		{
+			for(short iPlatformY = 0; iPlatformY < iPlatformHeight; iPlatformY++)
+			{
+				TilesetTile * tile = &tiles[iPlatformX][iPlatformY];
+
+				int iDstX = 0;
+				int iDstY = 0;
+
+				if(pathtype == 2)
+				{
+					iDstX = iStartX + (iPlatformX << iSizeShift) + (short)(fRadiusX * cos(angle)) - (iPlatformWidth << (iSizeShift - 1));
+					iDstY = iStartY + (iPlatformY << iSizeShift) + (short)(fRadiusY * sin(angle)) - (iPlatformHeight << (iSizeShift - 1));
+				}
+				else
+				{
+					iDstX = iStartX + (iPlatformX << iSizeShift) - (iPlatformWidth << (iSizeShift - 1));
+					iDstY = iStartY + (iPlatformY << iSizeShift) - (iPlatformHeight << (iSizeShift - 1));
+				}
+
+				SDL_Rect bltrect = {iDstX, iDstY, iTileSize, iTileSize};
+				if(tile->iID >= 0)
+				{
+					SDL_BlitSurface(g_tilesetmanager.GetTileset(tile->iID)->GetSurface(iSize), &g_tilesetmanager.rRects[iSize][tile->iCol][tile->iRow], blitdest, &bltrect);
+				}
+				else if(tile->iID == TILESETUNKNOWN)
+				{
+					//Draw unknown tile
+					SDL_BlitSurface(spr_unknowntile[iSize].getSurface(), &g_tilesetmanager.rRects[iSize][0][0], blitdest, &bltrect);
+				}
+
+				bool fNeedWrap = false;
+				if(iDstX + iTileSize >= iScreenshotSize[iSize][0])
+				{
+					iDstX -= iScreenshotSize[iSize][0];
+					fNeedWrap = true;
+				}
+				else if(iDstX < 0)
+				{
+					iDstX += iScreenshotSize[iSize][0];
+					fNeedWrap = true;
+				}
+
+				if(fNeedWrap)
+				{
+					bltrect.x = iDstX;
+					bltrect.y = iDstY;
+					bltrect.w = iTileSize;
+					bltrect.h = iTileSize;
+
+					if(tile->iID >= 0)
+						SDL_BlitSurface(g_tilesetmanager.GetTileset(tile->iID)->GetSurface(iSize), &g_tilesetmanager.rRects[iSize][tile->iCol][tile->iRow], blitdest, &bltrect);
+					else if(tile->iID == TILESETUNKNOWN)
+						SDL_BlitSurface(spr_unknowntile[iSize].getSurface(), &g_tilesetmanager.rRects[iSize][0][0], blitdest, &bltrect);
+				}
+			}
+		}
+	}
+
+	SDL_Rect rPathSrc = {iPlatformPathDotOffset[iSize], 0, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]}, rPathDst;
+
+	if(pathtype == 0) //line segment
+	{
+		if(fDrawShadow)
+		{
+			for(short iCol = 0; iCol < iPlatformWidth; iCol++)
+			{
+				for(short iRow = 0; iRow < iPlatformHeight; iRow++)
+				{
+					if(tiles[iCol][iRow].iID != -2)
+						spr_platformstarttile.draw(iStartX - (iPlatformWidth << (iSizeShift - 1)) + (iCol << iSizeShift), iStartY - (iPlatformHeight << (iSizeShift - 1)) + (iRow << iSizeShift), 0, 0, iTileSize, iTileSize);
+				}
+			}
+
+			for(short iCol = 0; iCol < iPlatformWidth; iCol++)
+			{
+				for(short iRow = 0; iRow < iPlatformHeight; iRow++)
+				{
+					if(tiles[iCol][iRow].iID != -2)
+						spr_platformendtile.draw(iEndX - (iPlatformWidth << (iSizeShift - 1)) + (iCol << iSizeShift), iEndY - (iPlatformHeight << (iSizeShift - 1)) + (iRow << iSizeShift), 0, 0, iTileSize, iTileSize);
+				}
+			}
+		}
+
+		//Draw connecting dots
+		float dDiffX = (float)(iEndX - iStartX);
+		float dDiffY = (float)(iEndY - iStartY);
+
+		short iDistance = (short)sqrt(dDiffX * dDiffX + dDiffY * dDiffY);
+
+		short iNumSpots = (iDistance >> iSizeShift);
+		float dIncrementX = dDiffX / (float)iNumSpots;
+		float dIncrementY = dDiffY / (float)iNumSpots;
+
+		float dX = (float)(iStartX) - (float)(iPlatformPathDotSize[iSize] >> 1);
+		float dY = (float)(iStartY) - (float)(iPlatformPathDotSize[iSize] >> 1);
+
+		for(short iSpot = 0; iSpot < iNumSpots + 1; iSpot++)
+		{
+			gfx_setrect(&rPathDst, (short)dX, (short)dY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
+			SDL_BlitSurface(spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
+
+			dX += dIncrementX;
+			dY += dIncrementY;
+		}
+	}
+	else if(pathtype == 1) //continuous straight path
+	{
+		if(fDrawShadow)
+		{
+			for(short iCol = 0; iCol < iPlatformWidth; iCol++)
+			{
+				for(short iRow = 0; iRow < iPlatformHeight; iRow++)
+				{
+					if(tiles[iCol][iRow].iID != -2)
+						spr_platformstarttile.draw(iStartX - (iPlatformWidth << (iSizeShift - 1)) + (iCol << iSizeShift), iStartY - (iPlatformHeight << (iSizeShift - 1)) + (iRow << iSizeShift), 0, 0, iTileSize, iTileSize);
+				}
+			}
+		}
+
+		float dIncrementX = (float)iTileSize * cos(angle);
+		float dIncrementY = (float)iTileSize * sin(angle);
+
+		float dX = (float)(iStartX) - (float)(iPlatformPathDotSize[iSize] >> 1);
+		float dY = (float)(iStartY) - (float)(iPlatformPathDotSize[iSize] >> 1);
+
+		for(short iSpot = 0; iSpot < 50; iSpot++)
+		{
+			gfx_setrect(&rPathDst, (short)dX, (short)dY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
+			SDL_BlitSurface(spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
+
+			short iWrapX = (short)dX;
+			short iWrapY = (short)dY;
+			bool fNeedWrap = false;
+			if(dX + iPlatformPathDotSize[iSize] >= iScreenshotSize[iSize][0])
+			{
+				iWrapX = (short)(dX - iScreenshotSize[iSize][0]);
+				fNeedWrap = true;
+			}
+			else if(dX < 0.0f)
+			{
+				iWrapX = (short)(dX + iScreenshotSize[iSize][0]);
+				fNeedWrap = true;
+			}
+
+			if(dY + iPlatformPathDotSize[iSize] >= iScreenshotSize[iSize][1])
+			{
+				iWrapY = (short)(dY - iScreenshotSize[iSize][1]);
+				fNeedWrap = true;
+			}
+			else if(dY < 0.0f)
+			{
+				iWrapY = (short)(dY + iScreenshotSize[iSize][1]);
+				fNeedWrap = true;
+			}
+
+			if(fNeedWrap)
+			{
+				gfx_setrect(&rPathDst, iWrapX, iWrapY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
+				SDL_BlitSurface(spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
+			}
+
+			dX += dIncrementX;
+			dY += dIncrementY;
+		}
+	}
+	else if(pathtype == 2) //ellipse
+	{
+		//Calculate the starting position
+		if(fDrawShadow)
+		{
+			short iEllipseStartX = (short)(fRadiusX * cos(angle)) - (iPlatformWidth << (iSizeShift - 1)) + iStartX;
+			short iEllipseStartY = (short)(fRadiusY * sin(angle)) - (iPlatformHeight << (iSizeShift - 1)) + iStartY;
+
+			for(short iCol = 0; iCol < iPlatformWidth; iCol++)
+			{
+				for(short iRow = 0; iRow < iPlatformHeight; iRow++)
+				{
+					if(tiles[iCol][iRow].iID != -2)
+						spr_platformstarttile.draw(iEllipseStartX + (iCol << iSizeShift), iEllipseStartY + (iRow << iSizeShift), 0, 0, iTileSize, iTileSize);
+				}
+			}
+		}
+
+		float fAngle = angle;
+		for(short iSpot = 0; iSpot < 32; iSpot++)
+		{
+			short iX = (short)(fRadiusX * cos(fAngle)) - (iPlatformPathDotSize[iSize] >> 1) + iStartX;
+			short iY = (short)(fRadiusY * sin(fAngle)) - (iPlatformPathDotSize[iSize] >> 1) + iStartY;
+
+			gfx_setrect(&rPathDst, iX, iY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
+			SDL_BlitSurface(spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
+
+			if(iX + iPlatformPathDotSize[iSize] >= iScreenshotSize[iSize][0])
+			{
+				gfx_setrect(&rPathDst, iX - iScreenshotSize[iSize][0], iY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
+				SDL_BlitSurface(spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
+			}
+			else if(iX < 0)
+			{
+				gfx_setrect(&rPathDst, iX + iScreenshotSize[iSize][0], iY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
+				SDL_BlitSurface(spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
+			}
+
+			fAngle += TWO_PI / 32.0f;
+		}
+	}
+}
+
+
+short iFireballHazardSize[3] = {18, 9, 5};
+
+short iStandardOffset[3] = {0, 32, 48};
+float dBulletBillFrequency[3] = {10.0f, 5.0f, 2.5f};
+
+short iPirhanaPlantOffsetY[4][3] = {{0, 0, 0}, {48, 24, 12}, {96, 48, 24}, {160, 80, 40}};
+void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
+{
+	short iSizeShift = 5 - iSize;
+	short iTileSize = 1 << iSizeShift;
+
+	SDL_Rect rDotSrc = {iPlatformPathDotOffset[iSize] + 22, 0, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]}, rDotDst;
+	SDL_Rect rPathSrc = {iStandardOffset[iSize], 12, iTileSize, iTileSize}, rPathDst;
+
+	gfx_setrect(&rPathDst, hazard->ix << (iSizeShift - 1), hazard->iy << (iSizeShift - 1), iTileSize, iTileSize);
+
+	if(fDrawCenter)
+	{
+		if(hazard->itype <= 1)
+		{
+			SDL_BlitSurface(spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
+		}
+	}
+
+	if(hazard->itype == 0) //fireball string
+	{
+		short iNumDots = 16;
+		float dRadius = (float)((hazard->iparam[0] - 1) * 24) / (float)(1 << iSize) + (iPlatformPathDotSize[iSize] >> 1);
+		float dAngle = hazard->dparam[1];
+		for(short iDot = 0; iDot < iNumDots; iDot++)
+		{
+			rDotDst.x = (short)(dRadius * cos(dAngle)) + rPathDst.x + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1);
+			rDotDst.y = (short)(dRadius * sin(dAngle)) + rPathDst.y + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1);
+			rDotDst.h = rDotDst.w = iPlatformPathDotSize[iSize];
+			
+			spr_platformpath.draw(rDotDst.x, rDotDst.y, rDotSrc.x, rDotSrc.y, rDotDst.w, rDotDst.h);
+			//SDL_BlitSurface(spr_platformpath.getSurface(), &rDotSrc, blitdest, &rDotDst);
+
+			dAngle += TWO_PI / iNumDots;
+		}
+
+		//Draw the fireball string
+		for(short iFireball = 0; iFireball < hazard->iparam[0]; iFireball++)
+		{
+			short x = (hazard->ix << (iSizeShift - 1)) + (short)((float)(iFireball * (24 >> iSize)) * cos(hazard->dparam[1])) + (iTileSize >> 1) - (iFireballHazardSize[iSize] >> 1);
+			short y = (hazard->iy << (iSizeShift - 1)) + (short)((float)(iFireball * (24 >> iSize)) * sin(hazard->dparam[1])) + (iTileSize >> 1) - (iFireballHazardSize[iSize] >> 1);
+
+			spr_hazard_fireball[iSize].draw(x, y, 0, 0, iFireballHazardSize[iSize], iFireballHazardSize[iSize]);
+		}
+	}
+	else if(hazard->itype == 1) //rotodisc
+	{
+		short iNumDots = 16;
+		float dRadius = (hazard->dparam[2] + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1)) / (float)(1 << iSize);
+		float dAngle = hazard->dparam[1];
+		for(short iDot = 0; iDot < iNumDots; iDot++)
+		{
+			rDotDst.x = (short)(dRadius * cos(dAngle)) + rPathDst.x + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1);
+			rDotDst.y = (short)(dRadius * sin(dAngle)) + rPathDst.y + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1);
+			rDotDst.h = rDotDst.w = iPlatformPathDotSize[iSize];
+			
+			spr_platformpath.draw(rDotDst.x, rDotDst.y, rDotSrc.x, rDotSrc.y, rDotDst.w, rDotDst.h);
+			//SDL_BlitSurface(spr_platformpath.getSurface(), &rDotSrc, blitdest, &rDotDst);
+
+			dAngle += TWO_PI / iNumDots;
+		}
+
+		//Draw the rotodiscs
+		float dSector = TWO_PI / hazard->iparam[0];
+		dAngle = hazard->dparam[1];
+		dRadius = hazard->dparam[2] / (float)(1 << iSize);
+		for(short iRotodisc = 0; iRotodisc < hazard->iparam[0]; iRotodisc++)
+		{
+			short x = rPathDst.x + (short)(dRadius * cos(dAngle));
+			short y = rPathDst.y + (short)(dRadius * sin(dAngle));
+
+			spr_hazard_rotodisc[iSize].draw(x, y, 0, 0, iTileSize, iTileSize);
+
+			dAngle += dSector;
+		}
+	}
+	else if(hazard->itype == 2) //bullet bill
+	{
+		spr_hazard_bulletbill[iSize].draw(rPathDst.x, rPathDst.y, 0, hazard->dparam[0] < 0.0f ? 0 : iTileSize, iTileSize, iTileSize);
+
+		short iBulletPathX = rPathDst.x - iPlatformPathDotSize[iSize];
+		if(hazard->dparam[0] > 0.0f)
+			iBulletPathX = rPathDst.x + iTileSize;
+
+		short iBulletPathSpacing = (short)(hazard->dparam[0] * dBulletBillFrequency[iSize]);
+		while(iBulletPathX >= 0 && iBulletPathX < iScreenshotSize[iSize][0])
+		{
+			gfx_setrect(&rDotDst, iBulletPathX, rPathDst.y + ((iTileSize - iPlatformPathDotSize[iSize]) >> 1), iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
+			SDL_BlitSurface(spr_platformpath.getSurface(), &rDotSrc, blitdest, &rDotDst);
+
+			iBulletPathX += hazard->iparam[0] < 0.0f ? -iBulletPathSpacing : iBulletPathSpacing;
+		}
+	}
+	else if(hazard->itype == 3) //flame cannon
+	{
+		spr_hazard_flame[iSize].draw(rPathDst.x + (hazard->iparam[1] == 0 ? -(iTileSize << 1) : 0), rPathDst.y, hazard->iparam[1] == 0 ? iTileSize * 3 : 0, iTileSize << 1, iTileSize * 3, iTileSize);
+	}
+	else if(hazard->itype >= 4 && hazard->itype <= 7) //pirhana plants
+	{
+		spr_hazard_pirhanaplant[iSize].draw(rPathDst.x, rPathDst.y + (hazard->iparam[1] == 0 ? (hazard->itype == 6 ? -iTileSize : -(iTileSize >> 1)) : 0), hazard->iparam[1] == 0 ? 0 : (hazard->itype >= 6 ? iTileSize << 1: iTileSize << 2), iPirhanaPlantOffsetY[hazard->itype - 4][iSize], iTileSize, hazard->itype == 6 ? iTileSize << 1 : iPirhanaPlantOffsetY[1][iSize]);
+	}
+}

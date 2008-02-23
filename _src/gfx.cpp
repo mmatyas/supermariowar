@@ -643,6 +643,121 @@ void gfx_cliprect(SDL_Rect * srcRect, SDL_Rect * dstRect, short x, short y, shor
 	}
 }
 
+bool gfx_adjusthiddenrects(SDL_Rect * srcRect, SDL_Rect * dstRect, short iHiddenDirection, short iHiddenValue)
+{
+	if(iHiddenDirection == 0)
+	{
+		if(dstRect->y <= iHiddenValue)
+		{
+			if(dstRect->y + srcRect->h <= iHiddenValue)
+				return true;
+
+			short iDiff = iHiddenValue - dstRect->y;
+			srcRect->y += iDiff;
+			srcRect->h -= iDiff;
+			dstRect->y = iHiddenValue + y_shake;
+			dstRect->h = srcRect->h;
+		}
+	}
+	else if(iHiddenDirection == 1)
+	{
+		if(dstRect->x + srcRect->w >= iHiddenValue)
+		{
+			if(dstRect->x >= iHiddenValue)
+				return true;
+
+			srcRect->w = iHiddenValue - dstRect->x;
+			dstRect->w = srcRect->w;
+		}
+	}
+	else if(iHiddenDirection == 2)
+	{
+		if(dstRect->y + srcRect->h >= iHiddenValue)
+		{
+			if(dstRect->y >= iHiddenValue)
+				return true;
+
+			srcRect->h = iHiddenValue - dstRect->y;
+			dstRect->h = srcRect->h;
+		}
+	}
+	else if(iHiddenDirection == 3)
+	{
+		if(dstRect->x <= iHiddenValue)
+		{
+			if(dstRect->x + srcRect->w <= iHiddenValue)
+				return true;
+
+			short iDiff = iHiddenValue - dstRect->x;
+			srcRect->x += iDiff;
+			srcRect->w -= iDiff;
+			dstRect->x = iHiddenValue + x_shake;
+			dstRect->w = srcRect->w;
+		}
+	}
+
+	return false;
+}
+
+void gfx_drawpreview(SDL_Surface * surface, short dstX, short dstY, short srcX, short srcY, short iw, short ih, short clipX, short clipY, short clipW, short clipH, bool wrap, short hiddenDirection, short hiddenPlane)
+{
+	//need to set source rect before each blit so it can be clipped correctly
+	SDL_Rect rSrcRect = {srcX, srcY, iw, ih};
+	SDL_Rect rDstRect = {dstX, dstY, iw, ih};
+
+	gfx_cliprect(&rSrcRect, &rDstRect, clipX, clipY, clipW, clipH);
+
+	if(hiddenDirection > -1)
+		gfx_adjusthiddenrects(&rSrcRect, &rDstRect, hiddenDirection, hiddenPlane);
+
+	// Blit onto the screen surface
+	if(SDL_BlitSurface(surface, &rSrcRect, blitdest, &rDstRect) < 0)
+	{
+		fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
+		return;
+	}
+
+	if(wrap)
+	{
+		//Deal with wrapping over sides of screen
+		bool fBlitSide = false;
+		if(dstX < clipX)
+		{
+			rDstRect.x = dstX + 320;
+			fBlitSide = true;
+		}
+		else if(dstX + iw >= clipX + clipW)
+		{
+			rDstRect.x = dstX - 320;
+			fBlitSide = true;
+		}
+			
+		if(fBlitSide)
+		{
+			//need to set source rect before each blit so it can be clipped correctly
+			rSrcRect.x = srcX;
+			rSrcRect.y = srcY;
+			rSrcRect.w = iw;
+			rSrcRect.h = ih;
+
+			rDstRect.y = dstY;
+			rDstRect.w = iw;
+			rDstRect.h = ih;
+
+			gfx_cliprect(&rSrcRect, &rDstRect, clipX, clipY, clipW, clipH);
+
+			if(hiddenDirection > -1)
+				gfx_adjusthiddenrects(&rSrcRect, &rDstRect, hiddenDirection, hiddenPlane);
+
+			if(SDL_BlitSurface(surface, &rSrcRect, blitdest, &rDstRect) < 0)
+			{
+				fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
+				return;
+			}
+		}
+	}
+}
+
 bool gfx_loadteamcoloredimage(gfxSprite * gSprites, const std::string& filename, bool fVertical, bool fWrap)
 {
 	return gfx_loadteamcoloredimage(gSprites, filename, 255, 0, 255, 255, fVertical, fWrap);
@@ -684,6 +799,7 @@ bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, Uint8 alpha, bool 
 gfxSprite::gfxSprite()
 {
 	clearSurface();
+	iWrapSize = 640;
 }
 
 gfxSprite::~gfxSprite()
@@ -862,9 +978,9 @@ bool gfxSprite::draw(short x, short y)
 
 	if(fWrap)
 	{
-		if(x + m_picture->w >= 640)
+		if(x + m_picture->w >= iWrapSize)
 		{
-			m_bltrect.x = x - 640 + x_shake;
+			m_bltrect.x = x - iWrapSize + x_shake;
 			m_bltrect.y = y + y_shake;
 
 			if(SDL_BlitSurface(m_picture, NULL, blitdest, &m_bltrect) < 0)
@@ -875,7 +991,7 @@ bool gfxSprite::draw(short x, short y)
 		}
 		else if(x < 0)
 		{
-			m_bltrect.x = x + 640 + x_shake;
+			m_bltrect.x = x + iWrapSize + x_shake;
 			m_bltrect.y = y + y_shake;
 
 			if(SDL_BlitSurface(m_picture, NULL, blitdest, &m_bltrect) < 0)
@@ -904,7 +1020,7 @@ bool gfxSprite::draw(short x, short y, short srcx, short srcy, short w, short h,
 
 	if(iHiddenDirection > -1)
 	{
-		if(AdjustHiddenRects(x, y, srcx, srcy, w, h, iHiddenDirection, iHiddenValue))
+		if(gfx_adjusthiddenrects(&m_srcrect, &m_bltrect, iHiddenDirection, iHiddenValue))
 			return true;
 	}
 
@@ -917,14 +1033,14 @@ bool gfxSprite::draw(short x, short y, short srcx, short srcy, short w, short h,
 
 	if(fWrap)
 	{
-		if(x + w >= 640)
+		if(x + w >= iWrapSize)
 		{
-			m_bltrect.x = x - 640 + x_shake;
-			m_bltrect.y = y + y_shake;
+			gfx_setrect(&m_srcrect, srcx, srcy, w, h);
+			gfx_setrect(&m_bltrect, x - iWrapSize + x_shake, y + y_shake, w, h);
 
 			if(iHiddenDirection > -1)
 			{
-				if(AdjustHiddenRects(x, y, srcx, srcy, w, h, iHiddenDirection, iHiddenValue))
+				if(gfx_adjusthiddenrects(&m_srcrect, &m_bltrect, iHiddenDirection, iHiddenValue))
 					return true;
 			}
 
@@ -936,12 +1052,12 @@ bool gfxSprite::draw(short x, short y, short srcx, short srcy, short w, short h,
 		}
 		else if(x < 0)
 		{
-			m_bltrect.x = x + 640 + x_shake;
-			m_bltrect.y = y + y_shake;
+			gfx_setrect(&m_srcrect, srcx, srcy, w, h);
+			gfx_setrect(&m_bltrect, x + iWrapSize + x_shake, y + y_shake, w, h);
 
 			if(iHiddenDirection > -1)
 			{
-				if(AdjustHiddenRects(x, y, srcx, srcy, w, h, iHiddenDirection, iHiddenValue))
+				if(gfx_adjusthiddenrects(&m_srcrect, &m_bltrect, iHiddenDirection, iHiddenValue))
 					return true;
 			}
 
@@ -954,60 +1070,6 @@ bool gfxSprite::draw(short x, short y, short srcx, short srcy, short w, short h,
 	}
 
 	return true;
-}
-
-bool gfxSprite::AdjustHiddenRects(short x, short y, short srcx, short srcy, short w, short h, short iHiddenDirection, short iHiddenValue)
-{
-	if(iHiddenDirection == 0)
-	{
-		if(y <= iHiddenValue)
-		{
-			if(y + h <= iHiddenValue)
-				return true;
-
-			m_bltrect.y = iHiddenValue + y_shake;
-			m_bltrect.h = h - iHiddenValue + y;
-			m_srcrect.y = srcy + iHiddenValue - y;
-			m_srcrect.h = m_bltrect.h;
-		}
-	}
-	else if(iHiddenDirection == 1)
-	{
-		if(x + w >= iHiddenValue)
-		{
-			if(x >= iHiddenValue)
-				return true;
-
-			m_bltrect.w = iHiddenValue - x;
-			m_srcrect.w = m_bltrect.w;
-		}
-	}
-	else if(iHiddenDirection == 2)
-	{
-		if(y + h >= iHiddenValue)
-		{
-			if(y >= iHiddenValue)
-				return true;
-
-			m_bltrect.h = iHiddenValue - y;
-			m_srcrect.h = m_bltrect.h;
-		}
-	}
-	else if(iHiddenDirection == 3)
-	{
-		if(x <= iHiddenValue)
-		{
-			if(x + w <= iHiddenValue)
-				return true;
-
-			m_bltrect.x = iHiddenValue + x_shake;
-			m_bltrect.w = w - iHiddenValue + x;
-			m_srcrect.x = srcx + iHiddenValue - x;
-			m_srcrect.w = m_bltrect.w;
-		}
-	}
-
-	return false;
 }
 
 bool gfxSprite::drawStretch(short x, short y, short w, short h, short srcx, short srcy, short srcw, short srch)

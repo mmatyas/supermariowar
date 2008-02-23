@@ -99,6 +99,10 @@ float CapFallingVelocity(float f) {return 0.0f;}
 void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead) {}
 bool LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDirections){return false;}
 
+gfxSprite		spr_platformstarttile;
+gfxSprite		spr_platformendtile;
+gfxSprite		spr_platformpath;
+
 gfxSprite		spr_thumbnail_platformarrows;
 gfxSprite		spr_thumbnail_warps[2];
 gfxSprite		spr_thumbnail_mapitems[2];
@@ -116,6 +120,12 @@ bool			fResumeMusic;
 MapList			maplist;
 CMap			g_map;
 CTilesetManager g_tilesetmanager;
+
+gfxSprite		spr_hazard_fireball[3];
+gfxSprite		spr_hazard_rotodisc[3];
+gfxSprite		spr_hazard_bulletbill[3];
+gfxSprite		spr_hazard_flame[3];
+gfxSprite		spr_hazard_pirhanaplant[3];
 
 void DECLSPEC soundfinished(int channel){}
 void DECLSPEC musicfinished(){}

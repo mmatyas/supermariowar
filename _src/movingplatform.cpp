@@ -13,8 +13,12 @@ enum CollisionStyle {collision_none, collision_normal, collision_overlap_left, c
 MovingPlatformPath::MovingPlatformPath(float vel, float startX, float startY, float endX, float endY, bool preview)
 {
 	dVelocity = vel;
-	dVelX = 0.0f;
-	dVelY = 0.0f;
+	
+	for(short type = 0; type < 2; type++)
+	{
+		dVelX[type] = 0.0f;
+		dVelY[type] = 0.0f;
+	}
 
 	dPathPointX[0] = startX;
 	dPathPointY[0] = startY;
@@ -31,23 +35,22 @@ MovingPlatformPath::MovingPlatformPath(float vel, float startX, float startY, fl
 	}
 
 	pPlatform = NULL;
-
-	iSteps = 0;
-
-	Reset();
 }
 
 void MovingPlatformPath::Reset()
 {
-	iOnStep[0] = 0;
-	iOnStep[1] = 0;
-
-	dCurrentX = dPathPointX[0];
-	dCurrentY = dPathPointY[0];
-
-	iGoalPoint = 1;
+	//advance the spawn test platform
+	if(game_values.spawnstyle == 1)
+	{
+		for(short i = 0; i < 36; i++)
+			Move(1);
+	}
+	else if(game_values.spawnstyle == 2)
+	{
+		for(short i = 0; i < 50; i++)
+			Move(1);
+	}
 }
-
 //------------------------------------------------------------------------------
 // Straight Path
 //------------------------------------------------------------------------------
@@ -88,159 +91,65 @@ StraightPath::StraightPath(float vel, float startX, float startY, float endX, fl
 	
 	iSteps = (short)(dLength / dVelocity) + 1;
 
-	SetVelocity();
+	for(short type = 0; type < 2; type++)
+		SetVelocity(type);
 }
 
 bool StraightPath::Move(short type)
 {
-	//If the path is a straight line, we don't need to calculate the adjustment each frame!
-	/*
-	if(iGoalPoint == 1)
-	{
-		fVelX = pPath->fVelocity * cos(pPath->fAngle);
-		fVelY = pPath->fVelocity * sin(pPath->fAngle);
-	}
-	else
-	{
-		fVelX = -pPath->fVelocity * cos(pPath->fAngle);
-		fVelY = -pPath->fVelocity * sin(pPath->fAngle);
-	}
-	*/
-
-	dCurrentX += dVelX;
-	dCurrentY += dVelY;
-
-	//See if we're at the end of the path
-	/*
-	if(dVelX < -0.01f)
-	{
-		if(dVelY < -0.01f)
-		{
-			if(dCurrentX <= dPathPointX[iGoalPoint] && dCurrentY <= dPathPointY[iGoalPoint])
-			{
-				dCurrentX = dPathPointX[iGoalPoint];
-				dCurrentY = dPathPointY[iGoalPoint];
-				iGoalPoint = 1 - iGoalPoint;
-				SetVelocity();
-			}
-		}
-		else if(dVelY > 0.01f)
-		{
-			if(dCurrentX <= dPathPointX[iGoalPoint] && dCurrentY >= dPathPointY[iGoalPoint])
-			{
-				dCurrentX = dPathPointX[iGoalPoint];
-				dCurrentY = dPathPointY[iGoalPoint];
-				iGoalPoint = 1 - iGoalPoint;
-				SetVelocity();
-			}
-		}
-		else
-		{
-			if(dCurrentX <= dPathPointX[iGoalPoint])
-			{
-				dCurrentX = dPathPointX[iGoalPoint];
-				dCurrentY = dPathPointY[iGoalPoint];
-				iGoalPoint = 1 - iGoalPoint;
-				SetVelocity();
-			}
-		}
-	}
-	else if(dVelX > 0.01f)
-	{
-		if(dVelY < -0.01f)
-		{
-			if(dCurrentX >= dPathPointX[iGoalPoint] && dCurrentY <= dPathPointY[iGoalPoint])
-			{
-				dCurrentX = dPathPointX[iGoalPoint];
-				dCurrentY = dPathPointY[iGoalPoint];
-				iGoalPoint = 1 - iGoalPoint;
-				SetVelocity();
-			}
-		}
-		else if(dVelY > 0.01f)
-		{
-			if(dCurrentX >= dPathPointX[iGoalPoint] && dCurrentY >= dPathPointY[iGoalPoint])
-			{
-				dCurrentX = dPathPointX[iGoalPoint];
-				dCurrentY = dPathPointY[iGoalPoint];
-				iGoalPoint = 1 - iGoalPoint;
-				SetVelocity();
-			}
-		}
-		else
-		{
-			if(dCurrentX >= dPathPointX[iGoalPoint])
-			{
-				dCurrentX = dPathPointX[iGoalPoint];
-				dCurrentY = dPathPointY[iGoalPoint];
-				iGoalPoint = 1 - iGoalPoint;
-				SetVelocity();
-			}
-		}
-	}
-	else
-	{
-		if(dVelY > 0.01f)
-		{
-			if(dCurrentY >= dPathPointY[iGoalPoint])
-			{
-				dCurrentX = dPathPointX[iGoalPoint];
-				dCurrentY = dPathPointY[iGoalPoint];
-				iGoalPoint = 1 - iGoalPoint;
-				SetVelocity();
-			}
-		}
-		else if(dVelY < -0.01f)
-		{
-			if(dCurrentY <= dPathPointY[iGoalPoint])
-			{
-				dCurrentX = dPathPointX[iGoalPoint];
-				dCurrentY = dPathPointY[iGoalPoint];
-				iGoalPoint = 1 - iGoalPoint;
-				SetVelocity();
-			}
-		}
-		else
-		{
-			//Platform is not moving!
-			printf("Platform is not moving.  This is probably a problem!\n");
-		}
-	}*/
+	dCurrentX[type] += dVelX[type];
+	dCurrentY[type] += dVelY[type];
 
 	if(++iOnStep[type] >= iSteps)
 	{
 		iOnStep[type] = 0;
 
-		dCurrentX = dPathPointX[iGoalPoint];
-		dCurrentY = dPathPointY[iGoalPoint];
+		dCurrentX[type] = dPathPointX[iGoalPoint[type]];
+		dCurrentY[type] = dPathPointY[iGoalPoint[type]];
 
-		iGoalPoint = 1 - iGoalPoint;
+		iGoalPoint[type] = 1 - iGoalPoint[type];
 
-		SetVelocity();
+		SetVelocity(type);
 	}
 
 	return false;
 }
 
-void StraightPath::SetVelocity()
+void StraightPath::SetVelocity(short type)
 {
-	if(iGoalPoint == 1)
+	if(iGoalPoint[type] == 1)
 	{
-		dVelX = dVelocity * cos(dAngle);
-		dVelY = dVelocity * sin(dAngle);
+		dVelX[type] = dVelocity * cos(dAngle);
+		dVelY[type] = dVelocity * sin(dAngle);
 	}
 	else
 	{
-		dVelX = -dVelocity * cos(dAngle);
-		dVelY = -dVelocity * sin(dAngle);
+		dVelX[type] = -dVelocity * cos(dAngle);
+		dVelY[type] = -dVelocity * sin(dAngle);
 	}
 
 	//Fix rounding errors
-	if(dVelX < 0.01f && dVelX > -0.01f)
-		dVelX = 0.0f;
+	if(dVelX[type] < 0.01f && dVelX[type] > -0.01f)
+		dVelX[type] = 0.0f;
 
-	if(dVelY < 0.01f && dVelY > -0.01f)
-		dVelY = 0.0f;
+	if(dVelY[type] < 0.01f && dVelY[type] > -0.01f)
+		dVelY[type] = 0.0f;
+}
+
+void StraightPath::Reset()
+{
+	for(short type = 0; type < 2; type++)
+	{
+		iOnStep[type] = 0;
+
+		dCurrentX[type] = dPathPointX[0];
+		dCurrentY[type] = dPathPointY[0];
+
+		iGoalPoint[type] = 1;
+		SetVelocity(type);
+	}
+
+	MovingPlatformPath::Reset();
 }
 
 
@@ -254,7 +163,9 @@ StraightPathContinuous::StraightPathContinuous(float vel, float startX, float st
 	iType = 1;
 
 	dAngle = angle;
-	SetVelocity();
+	
+	for(short type = 0; type < 2; type++)
+		SetVelocity(type);
 
 	dEdgeX = 640.0f;
 	dEdgeY = 480.0f;
@@ -268,23 +179,33 @@ StraightPathContinuous::StraightPathContinuous(float vel, float startX, float st
 
 bool StraightPathContinuous::Move(short type)
 {
-	dCurrentX += dVelX;
-	dCurrentY += dVelY;
+	dCurrentX[type] += dVelX[type];
+	dCurrentY[type] += dVelY[type];
 
-	float dx = dCurrentX - (float)pPlatform->iHalfWidth;
+	float dx = dCurrentX[type] - (float)pPlatform->iHalfWidth;
 	if(dx < 0.0f)
-		dCurrentX += dEdgeX;
+		dCurrentX[type] += dEdgeX;
 	else if(dx >= dEdgeX)
-		dCurrentX -= dEdgeX;
+		dCurrentX[type] -= dEdgeX;
 
-	if(dCurrentY + (float)pPlatform->iHalfHeight < 0.0f)
-		dCurrentY += dEdgeY + (float)pPlatform->iHeight;
-	else if(dCurrentY - (float)pPlatform->iHalfHeight >= dEdgeY)
-		dCurrentY -= dEdgeY + (float)pPlatform->iHeight;
+	if(dCurrentY[type] + (float)pPlatform->iHalfHeight < 0.0f)
+		dCurrentY[type] += dEdgeY + (float)pPlatform->iHeight;
+	else if(dCurrentY[type] - (float)pPlatform->iHalfHeight >= dEdgeY)
+		dCurrentY[type] -= dEdgeY + (float)pPlatform->iHeight;
 
 	return false;
 }
 
+void StraightPathContinuous::Reset()
+{
+	for(short type = 0; type < 2; type++)
+	{
+		dCurrentX[type] = dPathPointX[0];
+		dCurrentY[type] = dPathPointY[0];
+	}
+
+	MovingPlatformPath::Reset();
+}
 
 //------------------------------------------------------------------------------
 // Ellipse Path
@@ -295,7 +216,6 @@ EllipsePath::EllipsePath(float vel, float angle, float radiusx, float radiusy, f
 	iType = 2;
 
 	dStartAngle = angle;
-	dAngle = angle;
 	
 	if(preview)
 	{
@@ -309,45 +229,54 @@ EllipsePath::EllipsePath(float vel, float angle, float radiusx, float radiusy, f
 		dRadiusY = radiusy;
 	}
 
-	SetPosition();
+	for(short type = 0; type < 2; type++)
+	{
+		dAngle[type] = angle;
+		SetPosition(type);
+	}
 }
 
 bool EllipsePath::Move(short type)
 {
-	float dOldCurrentX = dCurrentX;
-	float dOldCurrentY = dCurrentY;
+	float dOldCurrentX = dCurrentX[type];
+	float dOldCurrentY = dCurrentY[type];
 
-	dAngle += dVelocity;
+	dAngle[type] += dVelocity;
 
 	if(dVelocity < 0.0f)
 	{
-		while(dAngle < 0.0f)
-			dAngle += TWO_PI;
+		while(dAngle[type] < 0.0f)
+			dAngle[type] += TWO_PI;
 	}
 	else
 	{
-		while(dAngle >= TWO_PI)
-			dAngle -= TWO_PI;
+		while(dAngle[type] >= TWO_PI)
+			dAngle[type] -= TWO_PI;
 	}
 	
-	SetPosition();
+	SetPosition(type);
 
-	dVelX = dCurrentX - dOldCurrentX;
-	dVelY = dCurrentY - dOldCurrentY;
+	dVelX[type] = dCurrentX[type] - dOldCurrentX;
+	dVelY[type] = dCurrentY[type] - dOldCurrentY;
 
 	return false;
 }
 
-void EllipsePath::SetPosition()
+void EllipsePath::SetPosition(short type)
 {
-	dCurrentX = dRadiusX * cos(dAngle) + dPathPointX[0];
-	dCurrentY = dRadiusY * sin(dAngle) + dPathPointY[0];
+	dCurrentX[type] = dRadiusX * cos(dAngle[type]) + dPathPointX[0];
+	dCurrentY[type] = dRadiusY * sin(dAngle[type]) + dPathPointY[0];
 }
 
 void EllipsePath::Reset()
 {
-	dAngle = dStartAngle;
-	SetPosition();
+	for(short type = 0; type < 2; type++)
+	{
+		dAngle[type] = dStartAngle;
+		SetPosition(type);
+	}
+
+	MovingPlatformPath::Reset();
 }
 
 //------------------------------------------------------------------------------
@@ -360,7 +289,7 @@ FallingPath::FallingPath(float startX, float startY) :
 
 bool FallingPath::Move(short type)
 {
-	dVelY = CapFallingVelocity(dVelY + GRAVITATION);
+	dVelY[type] = CapFallingVelocity(dVelY[type] + GRAVITATION);
 	
 	if(pPlatform->fy - pPlatform->iHalfHeight >= 480.0f)
 	{
@@ -370,16 +299,29 @@ bool FallingPath::Move(short type)
 			if(list_players[iPlayer]->platform == pPlatform)
 			{
 				list_players[iPlayer]->platform = NULL;
-				list_players[iPlayer]->vely = dVelY;
+				list_players[iPlayer]->vely = dVelY[type];
 			}
 		}
 
 		pPlatform->fDead = true;
 	}
 
-	dCurrentY += dVelY;
+	dCurrentY[type] += dVelY[type];
 
 	return false;
+}
+
+void FallingPath::Reset()
+{
+	for(short type = 0; type < 2; type++)
+	{
+		dCurrentX[type] = dPathPointX[0];
+		dCurrentY[type] = dPathPointY[0];
+	}
+
+	//Skip correctly setting the path "shadow" as a perf optimization
+	//This does have the risk of a player spawning inside a falling donut block by accident
+	//MovingPlatformPath::Reset();
 }
 
 //------------------------------------------------------------------------------
@@ -454,8 +396,8 @@ MovingPlatform::MovingPlatform(TilesetTile ** tiledata, MapTile ** tiletypes, sh
 	rDstRect.w = w * iTileSize;
 	rDstRect.h = h * iTileSize;
 
-	fVelX = pPath->dVelX;
-	fVelY = pPath->dVelY;
+	fVelX = pPath->dVelX[0];
+	fVelY = pPath->dVelY[0];
 
 	fOldVelX = fVelX;
 	fOldVelY = fVelY;
@@ -582,92 +524,36 @@ void MovingPlatform::draw()
 //Draw path for map preview
 void MovingPlatform::draw(short iOffsetX, short iOffsetY)
 {
-	//need to set source rect before each blit so it can be clipped correctly
-	rSrcRect.x = 0;
-	rSrcRect.y = 0;
-	rSrcRect.w = iWidth;
-	rSrcRect.h = iHeight;
-
-	short iLeft = ix - iHalfWidth;
-	short iTop = iy - iHalfHeight;
-
-	rDstRect.x = iLeft + iOffsetX;
-	rDstRect.y = iTop + iOffsetY;
-	rDstRect.w = iWidth;
-	rDstRect.h = iHeight;
-
-	gfx_cliprect(&rSrcRect, &rDstRect, iOffsetX, iOffsetY, 320, 240);
-
-	// Blit onto the screen surface
-	if(SDL_BlitSurface(sSurface, &rSrcRect, blitdest, &rDstRect) < 0)
-	{
-		fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
-		return;
-	}
-
-	//Deal with wrapping over sides of screen
-	bool fBlitSide = false;
-	if(iLeft < 0)
-	{
-		rDstRect.x = iLeft + iOffsetX + 320;
-		fBlitSide = true;
-	}
-	else if(ix + iHalfWidth >= 320)
-	{
-		rDstRect.x = iLeft + iOffsetX - 320;
-		fBlitSide = true;
-	}
-		
-	if(fBlitSide)
-	{
-		//need to set source rect before each blit so it can be clipped correctly
-		rSrcRect.x = 0;
-		rSrcRect.y = 0;
-		rSrcRect.w = iWidth;
-		rSrcRect.h = iHeight;
-
-		rDstRect.y = iTop + iOffsetY;
-		rDstRect.w = iWidth;
-		rDstRect.h = iHeight;
-
-		gfx_cliprect(&rSrcRect, &rDstRect, iOffsetX, iOffsetY, 320, 240);
-
-		if(SDL_BlitSurface(sSurface, &rSrcRect, blitdest, &rDstRect) < 0)
-		{
-			fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
-			return;
-		}
-	}
+	gfx_drawpreview(sSurface, ix - iHalfWidth + iOffsetX, iy - iHalfHeight + iOffsetY, 0, 0, iWidth, iHeight, iOffsetX, iOffsetY, 320, 240, true);
 }
 
 void MovingPlatform::update()
 {
-	fOldX = pPath->dCurrentX;
-	fOldY = pPath->dCurrentY;
+	fOldX = pPath->dCurrentX[0];
+	fOldY = pPath->dCurrentY[0];
 
-	fOldVelX = pPath->dVelX;
-	fOldVelY = pPath->dVelY;
+	fOldVelX = pPath->dVelX[0];
+	fOldVelY = pPath->dVelY[0];
 
 	//Path will affect new fVelX and fVelY to move the platform to it's next location
-	if(pPath->Move(0))
-	{
-		//This path is done so move to the next one
+	pPath->Move(0);
+	
+	//Will move the path "shadow" to the next location (for spawn collision detection)
+	pPath->Move(1);
 
-	}
+	fVelX = pPath->dVelX[0];
+	fVelY = pPath->dVelY[0];
 
-	fVelX = pPath->dVelX;
-	fVelY = pPath->dVelY;
-
-	xf(pPath->dCurrentX);
-	yf(pPath->dCurrentY);
+	xf(pPath->dCurrentX[0]);
+	yf(pPath->dCurrentY[0]);
 }
 
 void MovingPlatform::ResetPath()
 {
 	pPath->Reset();
 
-	xf(pPath->dCurrentX);
-	yf(pPath->dCurrentY);
+	xf(pPath->dCurrentX[0]);
+	yf(pPath->dCurrentY[0]);
 
 	fOldX = fx;
 	fOldY = fy;
@@ -748,12 +634,12 @@ void MovingPlatform::collide(CPlayer * player)
 		float fRelativeX;
 
 		//if(player->fx + PW >= 640.0f)
-		if(coldec == collision_overlap_left)
-			fRelativeX = player->fx + PW - fx + iHalfWidth - 640.0f;
-		else if(coldec == collision_overlap_right)
-			fRelativeX = player->fx + PW - fx + iHalfWidth + 640.0f;
-		else
+		if(coldec == collision_normal)
 			fRelativeX = player->fx + PW - fx + iHalfWidth;
+		else if(coldec == collision_overlap_left)
+			fRelativeX = player->fx + PW - fx + iHalfWidth - 640.0f;
+		else
+			fRelativeX = player->fx + PW - fx + iHalfWidth + 640.0f;
 
 		//printf(">>>>Checking Right Side fRelativeX: %.5f  fRelativeY1: %.5f  fRelativeY2: %.5f\n", fRelativeX, fRelativeY1, fRelativeY2);
 
@@ -812,12 +698,12 @@ void MovingPlatform::collide(CPlayer * player)
 		//float fRelativeX = player->fx - fx + iHalfWidth;
 
 		float fRelativeX;
-		if(coldec == collision_overlap_left)
-			fRelativeX = player->fx - fx + iHalfWidth - 640.0f;
-		else if(coldec == collision_overlap_right)
-			fRelativeX = player->fx - fx + iHalfWidth + 640.0f;
-		else
+		if(coldec == collision_normal)
 			fRelativeX = player->fx - fx + iHalfWidth;
+		else if(coldec == collision_overlap_left)
+			fRelativeX = player->fx - fx + iHalfWidth - 640.0f;
+		else
+			fRelativeX = player->fx - fx + iHalfWidth + 640.0f;
 		
 		//printf(">>>>Checking Left Side fRelativeX: %.5f  fRelativeY1: %.5f  fRelativeY2: %.5f\n", fRelativeX, fRelativeY1, fRelativeY2);
 
@@ -875,20 +761,29 @@ void MovingPlatform::collide(CPlayer * player)
 
 	float fRelativeX1, fRelativeX2;
 	
-	if(coldec == collision_overlap_left)
+	//Need to ask for collision detection again because the player might be on the other side of the screen now with wrapping
+	coldec = coldec_player(player);
+	if(coldec == collision_none)
+	{
+		if(player->platform == this)
+			player->platform = NULL;
+
+		return;
+	}
+	else if(coldec == collision_normal)
+	{
+		fRelativeX1 = player->fx - fx + iHalfWidth;
+		fRelativeX2 = player->fx + PW - fx + iHalfWidth;
+	}
+	else if(coldec == collision_overlap_left)
 	{
 		fRelativeX1 = player->fx - fx + iHalfWidth - 640.0f;
 		fRelativeX2 = player->fx + PW - fx + iHalfWidth - 640.0f ;
 	}
-	else if(coldec == collision_overlap_right)
+	else
 	{
 		fRelativeX1 = player->fx - fx + iHalfWidth + 640.0f;
 		fRelativeX2 = player->fx + PW - fx + iHalfWidth + 640.0f;
-	}
-	else
-	{
-		fRelativeX1 = player->fx - fx + iHalfWidth;
-		fRelativeX2 = player->fx + PW - fx + iHalfWidth;
 	}
 
 	if(fColVelY < 0.0f)
@@ -1543,43 +1438,63 @@ short MovingPlatform::coldec_object(IO_MovingObject * object)
 	}
 	else //Normal case where no overlap
 	{
-		//if(object->inair || object->platform == this)
-		//{
-			if (object->fx >= fx + iHalfWidth || fx - iHalfWidth > object->fx + object->collisionWidth || object->fPrecalculatedY >= fy + iHalfHeight || fy - iHalfHeight > object->fPrecalculatedY + object->collisionHeight) 
-				return collision_none;
-			else 
-				return collision_normal;
-		/*
-		}
-		else //special case where object is hit when sitting on a tile
-		{
-			if (object->fx >= fx + iHalfWidth || fx - iHalfWidth > object->fx + object->collisionWidth || object->fy >= fy + iHalfHeight || fy - iHalfHeight > object->fy + object->collisionHeight) 
-				return false;
-			else 
-				return true;
-		}
-		*/
+		if (object->fx >= fx + iHalfWidth || fx - iHalfWidth > object->fx + object->collisionWidth || object->fPrecalculatedY >= fy + iHalfHeight || fy - iHalfHeight > object->fPrecalculatedY + object->collisionHeight) 
+			return collision_none;
+		else 
+			return collision_normal;
 	}
 }
 
-void MovingPlatform::CalculateNoSpawnZone(float dPathTime)
-{
-	float fXArea = fabs(fVelX) * dPathTime + iHalfWidth;
-	float fYArea = fabs(fVelY) * dPathTime + iHalfHeight;
-
-	iNoSpawnZoneLeft = (short)(fx - fXArea);
-	iNoSpawnZoneRight = (short)(fx + fXArea);
-
-	iNoSpawnZoneTop = (short)(fy - fYArea);
-	iNoSpawnZoneBottom = (short)(fy + fYArea);
-}
 
 bool MovingPlatform::IsInNoSpawnZone(short x, short y, short w, short h)
 {
-	if(x + w < iNoSpawnZoneLeft || x >= iNoSpawnZoneRight ||
-		y + h < iNoSpawnZoneTop || y >= iNoSpawnZoneBottom)
+	short iTop = (short)pPath->dCurrentY[1] - iHalfHeight;
+
+	if(y + h < iTop)
 		return false;
 
-	return true;
+	short iBottom = (short)pPath->dCurrentY[1] + iHalfHeight;
+
+	if(y >= iBottom)
+		return false;
+
+	short iLeft = (short)pPath->dCurrentX[1] - iHalfWidth;
+	short iRight = (short)pPath->dCurrentX[1] + iHalfWidth;
+
+	//Deal with screen side overlap
+	if(x + w < iLeft)
+		x += 640;
+	else if(x >= iRight)
+		x -= 640;
+
+	if(x + w < iLeft || x >= iRight)
+		return false;
+	
+	//If we have reached this point, the item is colliding with the bounding rect of the platform
+	//but not necessarily colliding with the platform (example a U shaped platform has an open area in the center)
+	
+	short iRelativeX[2] = {x - iLeft, x + w - iLeft};
+	short iRelativeY[2] = {y - iTop, y + h - iTop};
+	
+	for(short x = 0; x < 2; x++)
+	{
+		for(short y = 0; y < 2; y++)
+		{
+			if(iRelativeX[x] >= 0 && iRelativeX[x] < iWidth && iRelativeY[y] >= 0 && iRelativeY[y] < iHeight)
+			{
+				short tx = iRelativeX[x] / TILESIZE;
+				short ty = iRelativeY[y] / TILESIZE;
+
+				int t = iTileType[tx][ty].iFlags;
+
+				if(t & tile_flag_solid)
+				{
+					return true;
+				}
+			}
+		}
+	}
+
+	return false;
 }
 

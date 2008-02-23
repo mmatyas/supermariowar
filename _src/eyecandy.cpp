@@ -1026,7 +1026,7 @@ short CEyecandyContainer::add(CEyecandy *ec)
 	else
 	{
 		delete ec;	//otherwise memory leak!
-		printf("eyecandy list full!\n");
+		//printf("eyecandy list full!\n");
 	}
 
 	return -1;

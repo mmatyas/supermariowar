@@ -1507,7 +1507,7 @@ void CMap::saveMap(const std::string& file)
 			WriteFloat(path->dRadiusY, mapfile);
 			WriteFloat(path->dPathPointX[0], mapfile);
 			WriteFloat(path->dPathPointY[0], mapfile);
-			WriteFloat(path->dAngle, mapfile);
+			WriteFloat(path->dAngle[0], mapfile);
 			WriteFloat(path->dVelocity, mapfile);
 		}
 	}
@@ -1909,6 +1909,7 @@ void CMap::saveThumbnail(const std::string &sFile, bool fUseClassicPack)
 
 	preDrawPreviewBackground(sThumbnail, true);
 	preDrawPreviewMapItems(sThumbnail, true);
+	drawThumbnailHazards(sThumbnail);
 	drawThumbnailPlatforms(sThumbnail);
 	preDrawPreviewForeground(sThumbnail, true);
 	preDrawPreviewWarps(sThumbnail, true);
@@ -2246,78 +2247,41 @@ void CMap::draw(SDL_Surface *targetSurface, int layer)
 	bltrect.h = 480;
 }
 
+void CMap::drawThumbnailHazards(SDL_Surface * targetSurface)
+{
+	blitdest = targetSurface;
+
+	for(short iHazard = 0; iHazard < iNumMapHazards; iHazard++)
+	{
+		DrawMapHazard(&maphazards[iHazard], 2, false);
+	}
+
+	blitdest = screen;
+}
+
 void CMap::drawThumbnailPlatforms(SDL_Surface * targetSurface)
 {
 	blitdest = targetSurface;
 
-	short iTileSize = 8;
-	//Draw platforms to screenshot
-	SDL_Rect rSrc = {0, 0, iTileSize, iTileSize};
-	SDL_Rect rDst = {0, 0, iTileSize, iTileSize};
-
 	for(short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++)
 	{
-		short iStartX = ((short)platforms[iPlatform]->pPath->dPathPointX[0] - platforms[iPlatform]->iHalfWidth) / PREVIEWTILESIZE;
-		short iStartY = ((short)platforms[iPlatform]->pPath->dPathPointY[0] - platforms[iPlatform]->iHalfHeight) / PREVIEWTILESIZE;
-
-		for(short iPlatformX = 0; iPlatformX < platforms[iPlatform]->iTileWidth; iPlatformX++)
-		{
-			for(short iPlatformY = 0; iPlatformY < platforms[iPlatform]->iTileHeight; iPlatformY++)
-			{
-				TilesetTile * tile = &platforms[iPlatform]->iTileData[iPlatformX][iPlatformY];
-
-				if(tile->iID >= 0)
-				{
-					g_tilesetmanager.Draw(blitdest, tile->iID, 2, tile->iCol, tile->iRow, iStartX + iPlatformX, iStartY + iPlatformY);
-					//SDL_BlitSurface(spr_maptiles[2].getSurface(), &g_tilesetmanager.rRects[2][tile->iCol][tile->iRow], blitdest, &g_tilesetmanager.rRects[2][iStartX + iPlatformX][iStartY + iPlatformY]);
-				}
-				else if(tile->iID == TILESETUNKNOWN)
-				{
-					spr_unknowntile[2].draw(tile->iCol << 3, tile->iRow << 3);
-				}
-			}
-		}
-	}
-
-	//And add platform paths
-	for(short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++)
-	{
-		MovingPlatformPath * pPath = platforms[iPlatform]->pPath;
-		short iStartX = ((short)pPath->dPathPointX[0] - platforms[iPlatform]->iHalfWidth) / PREVIEWTILESIZE;
-		short iStartY = ((short)pPath->dPathPointY[0] - platforms[iPlatform]->iHalfHeight) / PREVIEWTILESIZE;
-		short iEndX = ((short)pPath->dPathPointX[1] - platforms[iPlatform]->iHalfWidth) / PREVIEWTILESIZE;
+		MovingPlatform * platform = platforms[iPlatform];
+		MovingPlatformPath * basepath = platform->pPath;
 		
-		if(iStartX != iEndX)
+		if(basepath->iType == 0)
 		{
-			short iCenterOffsetY = (platforms[iPlatform]->iHeight - 16) >> 2;
-
-			bool fMoveToRight = iStartX < iEndX;
-
-			short iSpotLeft = (fMoveToRight ? iStartX : iEndX) + 1;
-			short iSpotRight = (fMoveToRight ? iEndX : iStartX) - 2 + platforms[iPlatform]->iTileWidth;
-
-			for(short iSpot = iSpotLeft; iSpot <= iSpotRight; iSpot++)
-				spr_thumbnail_platformarrows.draw(iSpot * iTileSize, iStartY * iTileSize + iCenterOffsetY, iTileSize * 5, 0, iTileSize, iTileSize);
-
-			spr_thumbnail_platformarrows.draw((iSpotLeft - 1) * iTileSize, iStartY * iTileSize + iCenterOffsetY, iTileSize * 2, 0, iTileSize, iTileSize);
-			spr_thumbnail_platformarrows.draw((iSpotRight + 1) * iTileSize, iStartY * iTileSize + iCenterOffsetY, iTileSize * 3, 0, iTileSize, iTileSize);
+			StraightPath * path = (StraightPath*) basepath;
+			DrawPlatform(path->iType, platform->iTileData, ((short)path->dPathPointX[0]) << 1, ((short)path->dPathPointY[0]) << 1, ((short)path->dPathPointX[1]) << 1, ((short)path->dPathPointY[1]) << 1, 0.0f, 0.0f, 0.0f, 2, platform->iTileWidth, platform->iTileHeight, true, true);
 		}
-		else
+		else if(basepath->iType == 1)
 		{
-			short iEndY = ((short)pPath->dPathPointY[1] - platforms[iPlatform]->iHalfHeight) / PREVIEWTILESIZE;
-			
-			short iCenterOffsetX = (platforms[iPlatform]->iWidth - 16) >> 2;
-
-			bool fMoveUp = iStartY < iEndY;
-
-			short iSpotTop = (short)(fMoveUp ? iStartY : iEndY) + 1;
-			short iSpotBottom = (short)(fMoveUp ? iEndY : iStartY) - 2 + platforms[iPlatform]->iTileHeight;
-
-			for(short iSpot = iSpotTop; iSpot <= iSpotBottom; iSpot++)
-				spr_thumbnail_platformarrows.draw(iStartX * iTileSize + iCenterOffsetX, iSpot * iTileSize, iTileSize * 4, 0, iTileSize, iTileSize);
-
-			spr_thumbnail_platformarrows.draw(iStartX * iTileSize + iCenterOffsetX, (iSpotTop - 1) * iTileSize, 0, 0, iTileSize, iTileSize);
-			spr_thumbnail_platformarrows.draw(iStartX * iTileSize + iCenterOffsetX, (iSpotBottom + 1) * iTileSize, iTileSize, 0, iTileSize, iTileSize);
+			StraightPathContinuous * path = (StraightPathContinuous*) basepath;
+			DrawPlatform(path->iType, platform->iTileData, ((short)path->dPathPointX[0]) << 1, ((short)path->dPathPointY[0]) << 1, 0, 0, path->dAngle, 0.0f, 0.0f, 2, platform->iTileWidth, platform->iTileHeight, true, true);
+		}
+		else if(basepath->iType == 2)
+		{
+			EllipsePath * path = (EllipsePath*) basepath;
+			DrawPlatform(path->iType, platform->iTileData, ((short)path->dPathPointX[0]) << 1, ((short)path->dPathPointY[0]) << 1, 0, 0, path->dStartAngle, path->dRadiusX * 2, path->dRadiusY * 2, 2, platform->iTileWidth, platform->iTileHeight, true, true);
 		}
 	}
 
@@ -2979,122 +2943,84 @@ void CMap::update()
 		AnimateTiles(iTileAnimationTimer);
 }
 
-void CMap::findspawnpoint(short iType, short * x, short * y, short width, short height, bool tilealigned)
+bool CMap::findspawnpoint(short iType, short * x, short * y, short width, short height, bool tilealigned)
 {
 	if(totalspawnsize[iType] <= 0)
 	{
 		*x = 320;
 		*y = 224;
-		return;
+		return true;
 	}
 
-	//Calculate where the platforms are and create no spawn zones around them
+	int spawnarea = rand() % totalspawnsize[iType];
 
-	float dPathTime = 0.0f;
-	if(game_values.spawnstyle == 1)
-		dPathTime = 36.0f;
-	else if(game_values.spawnstyle == 2)
-		dPathTime = 51.0f;
+	int currentsize = 0;
+	for(int m = 0; m < numspawnareas[iType]; m++)
+	{
+		currentsize += spawnareas[iType][m].size;
 
+		if(spawnarea >= currentsize)
+			continue;
+
+		short areawidth = spawnareas[iType][m].width * TILESIZE + TILESIZE;
+		short areaheight = spawnareas[iType][m].height * TILESIZE + TILESIZE;
+
+		if(width > areawidth || height > areaheight)
+			continue;
+
+		if(tilealigned)
+		{
+			short xoffset = spawnareas[iType][m].width;
+			short yoffset = spawnareas[iType][m].height;
+
+			if(xoffset > 0)
+				xoffset = (short)(rand() % xoffset);
+
+			if(yoffset > 0)
+				yoffset = (short)(rand() % yoffset);
+
+			*x = xoffset * TILESIZE + spawnareas[iType][m].left * TILESIZE + (TILESIZE >> 1) - (width >> 1);
+			*y = yoffset * TILESIZE + spawnareas[iType][m].top * TILESIZE + (TILESIZE >> 1) - (height >> 1);
+		}
+		else
+		{
+			short xoffset = areawidth - width - 2;
+			short yoffset = areaheight - height - 2;
+
+			if(xoffset > 0)
+				xoffset = (short)(rand() % xoffset) + 1;
+
+			if(yoffset > 0)
+				yoffset = (short)(rand() % yoffset) + 1;
+
+			*x = xoffset + spawnareas[iType][m].left * TILESIZE;
+			*y = yoffset + spawnareas[iType][m].top * TILESIZE;
+		}
+
+		break;
+	}
+	//Check to see if we are spawning into a platform
 	for(short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++)
-		platforms[iPlatform]->CalculateNoSpawnZone(dPathTime);
+	{
+		if(platforms[iPlatform]->IsInNoSpawnZone(*x, *y, width, height))
+			return false;
+	}
 
 	std::list<MovingPlatform*>::iterator iterateAll = tempPlatforms.begin(), lim = tempPlatforms.end();
 	while (iterateAll != lim)
 	{
-		(*iterateAll)->CalculateNoSpawnZone(dPathTime);
+		if((*iterateAll)->IsInNoSpawnZone(*x, *y, width, height))
+			return false;
+
 		iterateAll++;
 	}
 
-	bool fDone = false;
-	short iTries = 0;
-	while(iTries++ < MAX_PLAYER_SPAWN_TRIES && !fDone)
-	{
-		int spawnarea = rand() % totalspawnsize[iType];
-
-		int currentsize = 0;
-		for(int m = 0; m < numspawnareas[iType]; m++)
-		{
-			currentsize += spawnareas[iType][m].size;
-
-			if(spawnarea >= currentsize)
-				continue;
-
-			short areawidth = spawnareas[iType][m].width * TILESIZE + TILESIZE;
-			short areaheight = spawnareas[iType][m].height * TILESIZE + TILESIZE;
-
-			if(width > areawidth || height > areaheight)
-				continue;
-
-			if(tilealigned)
-			{
-				short xoffset = spawnareas[iType][m].width;
-				short yoffset = spawnareas[iType][m].height;
-
-				if(xoffset > 0)
-					xoffset = (short)(rand() % xoffset);
-
-				if(yoffset > 0)
-					yoffset = (short)(rand() % yoffset);
-
-				*x = xoffset * TILESIZE + spawnareas[iType][m].left * TILESIZE + (TILESIZE >> 1) - (width >> 1);
-				*y = yoffset * TILESIZE + spawnareas[iType][m].top * TILESIZE + (TILESIZE >> 1) - (height >> 1);
-			}
-			else
-			{
-				short xoffset = areawidth - width - 2;
-				short yoffset = areaheight - height - 2;
-
-				if(xoffset > 0)
-					xoffset = (short)(rand() % xoffset) + 1;
-
-				if(yoffset > 0)
-					yoffset = (short)(rand() % yoffset) + 1;
-
-				*x = xoffset + spawnareas[iType][m].left * TILESIZE;
-				*y = yoffset + spawnareas[iType][m].top * TILESIZE;
-			}
-
-			break;
-		}
-
-		for(short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++)
-		{
-			fDone = !platforms[iPlatform]->IsInNoSpawnZone(*x, *y, width, height);
-			
-			if(!fDone)
-				break;
-		}
-
-		std::list<MovingPlatform*>::iterator iterateAll = tempPlatforms.begin(), lim = tempPlatforms.end();
-		while (iterateAll != lim)
-		{
-			fDone = !(*iterateAll)->IsInNoSpawnZone(*x, *y, width, height);
-
-			if(!fDone)
-				break;
-
-			iterateAll++;
-		}
-	}
+	return true;
 }
 
 void CMap::AddTemporaryPlatform(MovingPlatform * platform)
 {
 	tempPlatforms.push_back(platform);
-}
-
-void CMap::CalculatePlatformNoSpawnZones()
-{
-	for(short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++)
-		platforms[iPlatform]->CalculateNoSpawnZone(0.0f);
-
-	std::list<MovingPlatform*>::iterator iterateAll = tempPlatforms.begin(), lim = tempPlatforms.end();
-	while (iterateAll != lim)
-	{
-		(*iterateAll)->CalculateNoSpawnZone(0.0f);
-		iterateAll++;
-	}
 }
 
 bool CMap::IsInPlatformNoSpawnZone(short x, short y, short width, short height)
@@ -3193,3 +3119,4 @@ void CMap::optimize()
 		}
 	}
 }
+

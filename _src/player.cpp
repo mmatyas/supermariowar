@@ -5,6 +5,7 @@ extern bool SwapPlayers(short iUsingPlayerID);
 extern void EnterBossMode(short bossType);
 extern CPlayer * GetPlayerFromGlobalID(short iGlobalID);
 extern short g_iWinningPlayer;
+extern short g_iSwirlSpawnLocations[4][2][25];
 
 CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamID, short iColorID, gfxSprite * nsprites[PGFX_LAST], CScore *nscore, short * respawn, CPlayerAI * ai)
 {
@@ -774,15 +775,22 @@ void CPlayer::move()
 			if(*respawncounter <= 0)
 			{
 				*respawncounter = 0;
-				state = player_spawning;
 
-				if(game_values.spawnstyle == 0)
+				if(FindSpawnPoint())
 				{
-					eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
-				}
-				else if(game_values.spawnstyle == 1)
-				{
-					eyecandyback.add(new EC_Door(&spr_spawndoor, sprites[spr], ix + HALFPW - 16, iy + HALFPH - 16, 1, iSrcOffsetX, colorID));
+					//Make sure spawn point isn't inside a tile
+					collision_detection_checksides();
+		
+					state = player_spawning;
+
+					if(game_values.spawnstyle == 0)
+					{
+						eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
+					}
+					else if(game_values.spawnstyle == 1)
+					{
+						eyecandyback.add(new EC_Door(&spr_spawndoor, sprites[spr], ix + HALFPW - 16, iy + HALFPH - 16, 1, iSrcOffsetX, colorID));
+					}
 				}
 			}
 
@@ -806,32 +814,19 @@ void CPlayer::move()
 			}
 			else if(game_values.spawnstyle == 2)
 			{
-				spawnradius -= 2.0f;
-				spawnangle += 0.05f;
-
-				if(spawnradius < 0.0f)
-					state = player_ready;
-			
-				if(++spawntimer > 1)
+				if(++spawntimer >= 50)
 				{
-					spawntimer = 0;
+					state = player_ready;
+				}
+				else if(spawntimer % 2)
+				{
+					short swirlindex = spawntimer >> 1;
+					short ixoffset = ix - PWOFFSET;
+					short iyoffset = iy - PHOFFSET;
+					short iColorIdOffset = colorID << 5;
 
-					short ix1 = ix - PWOFFSET + (short)(spawnradius * cos(spawnangle));
-					short iy1 = iy - PHOFFSET + (short)(spawnradius * sin(spawnangle));
-						
-					short ix2 = ix - PWOFFSET + (short)(spawnradius * cos(spawnangle + HALF_PI));
-					short iy2 = iy - PHOFFSET + (short)(spawnradius * sin(spawnangle + HALF_PI));
-
-					short ix3 = ix - PWOFFSET + (short)(spawnradius * cos(spawnangle + PI));
-					short iy3 = iy - PHOFFSET + (short)(spawnradius * sin(spawnangle + PI));
-
-					short ix4 = ix - PWOFFSET + (short)(spawnradius * cos(spawnangle + THREE_HALF_PI));
-					short iy4 = iy - PHOFFSET + (short)(spawnradius * sin(spawnangle + THREE_HALF_PI));
-
-					eyecandyfront.add(new EC_SingleAnimation(&spr_spawnsmoke, ix1, iy1, 4, 4, 0, colorID << 5, 32, 32));
-					eyecandyfront.add(new EC_SingleAnimation(&spr_spawnsmoke, ix2, iy2, 4, 4, 0, colorID << 5, 32, 32));
-					eyecandyfront.add(new EC_SingleAnimation(&spr_spawnsmoke, ix3, iy3, 4, 4, 0, colorID << 5, 32, 32));
-					eyecandyfront.add(new EC_SingleAnimation(&spr_spawnsmoke, ix4, iy4, 4, 4, 0, colorID << 5, 32, 32));
+					for(short iSwirl = 0; iSwirl < 4; iSwirl++)
+						eyecandyfront.add(new EC_SingleAnimation(&spr_spawnsmoke, ixoffset + g_iSwirlSpawnLocations[iSwirl][0][swirlindex], iyoffset + g_iSwirlSpawnLocations[iSwirl][1][swirlindex], 4, 4, 0, iColorIdOffset, 32, 32));
 				}
 			}
 		}
@@ -1700,6 +1695,27 @@ void CPlayer::move()
 			burnupstarttimer = 0;
 		}
 
+		//Kill the player if he is standing still for too long
+		if(velx != 0.0f || vely != GRAVITATION)
+		{
+			suicidetimer = 0;
+			suicidedisplaytimer = 2;
+		}
+
+		if(!invincible && !frozen && game_values.suicidetime > 0 && ++suicidetimer > game_values.suicidetime)
+		{
+			if(++suicidecounttimer > 62)
+			{
+				suicidecounttimer = 0;
+
+				if(--suicidedisplaytimer < 0)
+				{
+					if(player_kill_nonkill != KillPlayerMapHazard(false, kill_style_environment))
+						return;
+				}
+			}
+		}
+
 		//Deal with out of arena timer
 		if(iy < 0)
 		{
@@ -2104,9 +2120,6 @@ void CPlayer::SetupNewPlayer()
 {
 	pScoreboardSprite = sprites;
 
-	FindSpawnPoint();
-	collision_detection_checksides();
-	
 	velx = 0.0f;
 	
 	if(game_values.spawnstyle == 1)
@@ -2214,8 +2227,6 @@ void CPlayer::SetupNewPlayer()
 	frictionslidetimer = 0;
 	bobombsmoketimer = 0;
 
-	spawnangle = (float)(rand()%1000 * 0.00628f);  //random new spawn angle
-	spawnradius = 100.0f;
 	spawntimer = 0;
 	waittimer = 0;
 	*respawncounter = game_values.respawn;
@@ -2251,6 +2262,10 @@ void CPlayer::SetupNewPlayer()
 	fSuperStomp = false;
 	iSuperStompTimer = 0;
 	
+	suicidetimer = 0;
+	suicidecounttimer = 0;
+	suicidedisplaytimer = 2;
+
 	if(game_values.gamemode->getgamemode() == game_mode_survival)
 	{
 		if(game_values.gamemodesettings.survival.shield)
@@ -2272,20 +2287,23 @@ void CPlayer::SetupNewPlayer()
 	throw_star = 0;
 }
 
-void CPlayer::FindSpawnPoint()
+bool CPlayer::FindSpawnPoint()
 {
-	if(game_values.gamemode->gamemode == game_mode_ctf && teamID < g_map.iNumFlagBases)
-	{
-		ix = g_map.flagbaselocations[teamID].x + 16 - HALFPW;
-		iy = g_map.flagbaselocations[teamID].y + 16 - HALFPH;
-	}
-	else
-	{
-		g_map.findspawnpoint(teamID + 1, &ix, &iy, PW, PH, false);
-	}
+	//Spawn the player at his flagbase if it is CTF
+	//if(game_values.gamemode->gamemode == game_mode_ctf && teamID < g_map.iNumFlagBases)
+	//{
+	//	ix = g_map.flagbaselocations[teamID].x + 16 - HALFPW;
+	//	iy = g_map.flagbaselocations[teamID].y + 16 - HALFPH;
+	//}
+	//else
+	//{
+	bool fRet = g_map.findspawnpoint(teamID + 1, &ix, &iy, PW, PH, false);
+	//}
 
 	fx = (float)ix;
 	fy = (float)iy;
+
+	return fRet;
 }
 
 
@@ -2995,6 +3013,9 @@ void CPlayer::draw()
 			spr_jail.draw(ix - PWOFFSET - 6, iy - PHOFFSET - 6, (jailcolor + 1) * 44, 0, 44, 44);
 	}
 
+	if(suicidetimer > game_values.suicidetime)
+		drawsuicidetimer();
+
 	//Draw the Ring awards
 	if(game_values.awardstyle == award_style_halo && killsinrow >= MINAWARDSNEEDED)
 	{
@@ -3275,6 +3296,11 @@ void CPlayer::drawarrows()
 				spr_awardkillsinrow.draw(ix - PWOFFSET + 8, 18, outofarenadisplaytimer << 4, colorID << 4, 16, 16);
 		}
 	}
+}
+
+void CPlayer::drawsuicidetimer()
+{
+	spr_awardkillsinrow.draw(ix - PWOFFSET + 8, iy - PHOFFSET + 8, suicidedisplaytimer << 4, colorID << 4, 16, 16);
 }
 
 void CPlayer::updateswap()

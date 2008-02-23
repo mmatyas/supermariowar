@@ -107,6 +107,7 @@ class CPlayer
 
 		void draw();
 		void drawarrows();
+		void drawsuicidetimer();
 		void updateswap();
 		void drawswap();
 		void move();
@@ -165,7 +166,7 @@ class CPlayer
 		void yf(float yf){fy = yf; iy = (short)fy;};
 		void yi(short yi){iy = yi; fy = (float)iy;};
 		
-		void FindSpawnPoint();
+		bool FindSpawnPoint();
 		void collision_detection_map();
 		bool collision_detection_checktop();
 		bool collision_detection_checkleft();
@@ -332,6 +333,10 @@ class CPlayer
 
 		short outofarenatimer;
 		short outofarenadisplaytimer;
+
+		short suicidetimer;
+		short suicidecounttimer;
+		short suicidedisplaytimer;
 
 		short powerup;
 		short projectilelimit;

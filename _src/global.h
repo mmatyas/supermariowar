@@ -128,8 +128,6 @@ struct STextAward
 #define MAXSPAWNAREAS   128
 #define MAXDRAWAREAS   128
 
-#define MAX_PLAYER_SPAWN_TRIES 16
-
 #define	MAX_BONUS_CHESTS	5
 #define MAX_WORLD_BONUSES_AWARDED 3
 
@@ -424,12 +422,12 @@ extern gfxSprite		spr_spike;
 extern gfxSprite		spr_bomb;
 extern gfxSprite		spr_kuriboshoe;
 
-extern gfxSprite		spr_hazard_fireball;
-extern gfxSprite		spr_hazard_rotodisc;
-extern gfxSprite		spr_hazard_bulletbill;
+extern gfxSprite		spr_hazard_fireball[3];
+extern gfxSprite		spr_hazard_rotodisc[3];
+extern gfxSprite		spr_hazard_bulletbill[3];
 extern gfxSprite		spr_hazard_bulletbilldead;
-extern gfxSprite		spr_hazard_flame;
-extern gfxSprite		spr_hazard_pirhanaplant;
+extern gfxSprite		spr_hazard_flame[3];
+extern gfxSprite		spr_hazard_pirhanaplant[3];
 
 extern gfxSprite		spr_fireballexplosion;
 extern gfxSprite		spr_frictionsmoke;
@@ -536,6 +534,9 @@ extern gfxSprite		spr_menu_boxed_numbers;
 extern gfxSprite		spr_thumbnail_platformarrows;
 extern gfxSprite		spr_thumbnail_warps[2];
 extern gfxSprite		spr_thumbnail_mapitems[2];
+extern gfxSprite		spr_platformstarttile;
+extern gfxSprite		spr_platformendtile;
+extern gfxSprite		spr_platformpath;
 
 extern gfxSprite		spr_worldbackground[3];
 extern gfxSprite		spr_worldforeground[3];
@@ -580,6 +581,9 @@ extern short g_iCurrentDrawIndex;
 
 void _load_drawmsg(const std::string& f);
 void _load_waitforkey();
+
+void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short startY, short endX, short endY, float angle, float radiusX, float radiusY, short iSize, short iPlatformWidth, short iPlatformHeight, bool fDrawPlatform, bool fDrawShadow);
+void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter);
 
 //----------------- game options all parts of the game need -----------
 enum gs{GS_MENU, GS_START_GAME, GS_START_WORLD, GS_END_GAME, GS_GAME, GS_QUIT};
@@ -955,6 +959,8 @@ struct gv
 
 	float		gamewindx;
 	float		gamewindy;
+
+	short		suicidetime;
 };
 
 extern gv game_values;

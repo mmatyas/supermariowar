@@ -12,10 +12,10 @@
 | gfx is a mini graphics library containing						|
 |  + initialisation of SDL										|
 |  + a class for simple Sprites									|
-|  + a class for fonts								|
+|  + a class for fonts											|
 |																|
 | have a lot of fun!											|
-|					© 2003 Florian Hufsky <fhufsky@phorus.at>	|
+|		  © 2003-2008 Florian Hufsky <florian.hufsky@gmail.com>	|
 +--------------------------------------------------------------*/
 
 #ifndef __GFX_H__
@@ -36,6 +36,8 @@ void gfx_setrect(SDL_Rect * rect, short x, short y, short w, short h);
 void gfx_setrect(SDL_Rect * rect, SDL_Rect * copyrect);
 
 void gfx_cliprect(SDL_Rect * srcRect, SDL_Rect * dstRect, short x, short y, short w, short h);
+bool gfx_adjusthiddenrects(SDL_Rect * srcRect, SDL_Rect * dstRect, short iHiddenDirection, short iHiddenValue);
+void gfx_drawpreview(SDL_Surface * surface, short dstX, short dstY, short srcX, short srcY, short iw, short ih, short clipX, short clipY, short clipW, short clipH, bool wrap, short hiddenDirection = -1, short hiddenPlane = -1);
 
 class gfxSprite
 {
@@ -72,7 +74,7 @@ class gfxSprite
 		void freeSurface();
 
 		void SetWrap(bool wrap) {fWrap = wrap;}
-		bool AdjustHiddenRects(short x, short y, short srcx, short srcy, short w, short h, short iHiddenDirection, short iHiddenValue);
+		void SetWrap(bool wrap, short wrapsize) {fWrap = wrap; iWrapSize = wrapsize;}
 
 	private:
 		SDL_Surface *m_picture;
@@ -84,6 +86,7 @@ class gfxSprite
 		short iHiddenValue;
 
 		bool fWrap;
+		short iWrapSize;
 };
 
 

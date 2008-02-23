@@ -15,12 +15,12 @@ class CObject
 		CObject(gfxSprite *nspr, short x, short y);
 		virtual ~CObject(){};
 
-		virtual void draw(){printf("CObject::draw() - NO!\n");};
-		virtual void update(){printf("CObject::update() - NO!\n");};
-		virtual bool collide(CPlayer *){printf("CObject::collide() - NO!\n"); return false;};
-		virtual void collide(IO_MovingObject *){printf("CObject::collide() - NO!\n");};
+		virtual void draw(){};
+		virtual void update() = 0;
+		virtual bool collide(CPlayer *){return false;}
+		virtual void collide(IO_MovingObject *){}
 		
-		virtual ObjectType getObjectType(){printf("CObject::getObjectType() - NO!\n"); return object_none;};
+		virtual ObjectType getObjectType(){return objectType;}
 		
 		void xf(float xf){fx = xf; ix = (short)fx;};
  		void xi(short xi){ix = xi; fx = (float)ix;};
@@ -44,6 +44,8 @@ class CObject
 		//virtual void readNetworkUpdate(short size, char * pData);
 
 	protected:
+		ObjectType objectType;
+
 		short iw, ih;
 		float fx, fy;
 		float velx, vely;
@@ -75,8 +77,7 @@ class IO_Block : public CObject
 		virtual bool collide(CPlayer * player, short direction, bool useBehavior);
 		virtual bool collide(IO_MovingObject * object, short direction);
 		
-		ObjectType getObjectType(){return object_block;}
-		virtual BlockType getBlockType(){printf("CObject::getBlockType() - NO!\n"); return block_none;}
+		virtual BlockType getBlockType() = 0;
 
 		virtual bool isTransparent() {return false;}
 		virtual bool isHidden() {return hidden;}
@@ -444,7 +445,6 @@ class IO_MovingObject : public CObject
 		virtual bool collide(CPlayer * player);
 		
 		void collide(IO_MovingObject *){}
-		ObjectType getObjectType(){return objectType;}
 		MovingObjectType getMovingObjectType() {return movingObjectType;}
 		void applyfriction();
 		void collision_detection_map();
@@ -479,7 +479,6 @@ class IO_MovingObject : public CObject
 		bool inair;
 		bool onice;
 
-		ObjectType objectType;
 		MovingObjectType movingObjectType;
 
 		//Pointer to the platform the object is riding
@@ -520,7 +519,6 @@ class MO_Powerup : public IO_MovingObject
 		virtual void draw();
 		virtual void update();
 		virtual bool collide(CPlayer * player);
-		MovingObjectType getMovingObjectType() {return movingObjectType;}
 
 	protected:
 		float desty;
@@ -885,14 +883,14 @@ class IO_OverMapObject : public CObject
 		virtual ~IO_OverMapObject(){};
 
 		virtual void draw();
+		virtual void draw(short iOffsetX, short iOffsetY);
 		virtual void update();
 		virtual void animate();
 
 		virtual bool collide(CPlayer *){return false;}
 		virtual void collide(IO_MovingObject *){}
 
-		ObjectType getObjectType(){return objectType;}
-		MovingObjectType getMovingObjectType() {return movingObjectType;}
+		//MovingObjectType getMovingObjectType() {return movingObjectType;}
 		
 	protected:
 
@@ -904,8 +902,7 @@ class IO_OverMapObject : public CObject
 		short animationOffsetX, animationOffsetY;
 		short animationspeed;
 
-		ObjectType objectType;
-		MovingObjectType movingObjectType;
+		//MovingObjectType movingObjectType;
 };
 
 class OMO_Thwomp : public IO_OverMapObject
@@ -1060,6 +1057,8 @@ class OMO_FlagBase : public IO_OverMapObject
 		short anglechangetimer;
 		float speed;
 		CO_Flag * homeflag;
+
+		short timer;
 
 	friend class CO_Flag;
 	friend class CPlayer;
@@ -1328,6 +1327,7 @@ class MO_BulletBill : public IO_MovingObject
 
 		void update();
 		void draw();
+		void draw(short iOffsetX, short iOffsetY);
 		bool collide(CPlayer * player);
 		void collide(IO_MovingObject * object);
 
@@ -1679,7 +1679,7 @@ class OMO_StraightPathHazard : public IO_OverMapObject
 class IO_BulletBillCannon : public CObject
 {
 	public:
-		IO_BulletBillCannon(short x, short y, short freq, float vel);
+		IO_BulletBillCannon(short x, short y, short freq, float vel, bool preview);
 		~IO_BulletBillCannon() {}
 
 		void draw() {}
@@ -1688,15 +1688,12 @@ class IO_BulletBillCannon : public CObject
 		bool collide(CPlayer *) {return false;}
 		void collide(IO_MovingObject *) {}
 		
-		ObjectType getObjectType(){return object_bulletbillcannon;}
-		
-
 	private:
 		void SetNewTimer();
 
 		short iFreq, iTimer;
 		float dVel;
-
+		bool fPreview;
 };
 
 
@@ -1707,14 +1704,12 @@ class IO_FlameCannon : public CObject
 		~IO_FlameCannon() {}
 
 		void draw();
+		void draw(short iOffsetX, short iOffsetY);
 		void update();
 
 		bool collide(CPlayer * player);
 		void collide(IO_MovingObject *) {}
-		
-		ObjectType getObjectType(){return object_flamecannon;}
-		
-
+				
 	private:
 		void SetNewTimer();
 
@@ -1727,16 +1722,15 @@ class IO_FlameCannon : public CObject
 class MO_PirhanaPlant : public IO_MovingObject
 {
 	public:
-		MO_PirhanaPlant(short x, short y, short type, short freq, short direction);
+		MO_PirhanaPlant(short x, short y, short type, short freq, short direction, bool preview);
 		~MO_PirhanaPlant() {}
 
 		void draw();
+		void draw(short iOffsetX, short iOffsetY);
 		void update();
 
 		bool collide(CPlayer * player);
 		void collide(IO_MovingObject *);
-		
-		MovingObjectType getMovingObjectType(){return movingobject_pirhanaplant;}
 		
 	private:
 		void SetNewTimer();
@@ -1750,6 +1744,8 @@ class MO_PirhanaPlant : public IO_MovingObject
 		short iAnimationTimer, iAnimationX;
 		short iFacing;
 		short iActionTimer;
+
+		bool fPreview;
 };
 
 //object container

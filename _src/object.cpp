@@ -150,6 +150,8 @@ void CObject::GetCollisionBlocks(IO_Block * blocks[4])
 IO_Block::IO_Block(gfxSprite *nspr, short x, short y) :
 	CObject(nspr, x, y)
 {
+	objectType = object_block;
+
 	iBumpPlayerID = -1;
 	iBumpTeamID = -1;
 
@@ -5023,7 +5025,7 @@ void MO_Coin::update()
 				sparkledrawframe = 0;
 		}
 
-		if(++timer > 1500)
+		if(++timer > 1000)
 			placeCoin();
 	}
 	else
@@ -5074,7 +5076,7 @@ IO_OverMapObject::IO_OverMapObject(gfxSprite *nspr, short x, short y, short iNum
 	CObject(nspr, x, y)
 {
 	objectType = object_overmap;
-	movingObjectType = movingobject_none;
+	//movingObjectType = movingobject_none;
 
 	iNumSprites = iNumSpr;
 
@@ -5126,6 +5128,10 @@ void IO_OverMapObject::draw()
 	spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, animationOffsetY, iw, ih);
 }
 
+void IO_OverMapObject::draw(short iOffsetX, short iOffsetY)
+{
+	gfx_drawpreview(spr->getSurface(), ((ix - collisionOffsetX) >> 1) + iOffsetX, ((iy - collisionOffsetY) >> 1) + iOffsetY, drawframe >> 1, animationOffsetY >> 1, iw >> 1, ih >> 1, iOffsetX, iOffsetY, 320, 240, true);
+}
 
 void IO_OverMapObject::update()
 {
@@ -5366,6 +5372,15 @@ void MO_BulletBill::draw()
 		spr->draw(ix, iy, drawframe, iColorOffsetY + iDirectionOffsetY, iw, ih, iHiddenDirection, iHiddenPlane);
 	else
 		spr->draw(ix, iy, drawframe, iColorOffsetY + iDirectionOffsetY, iw, ih);
+}
+
+//For preview drawing
+void MO_BulletBill::draw(short iOffsetX, short iOffsetY)
+{
+	if(fIsSpawned)
+		gfx_drawpreview(spr->getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, drawframe >> 1, (iColorOffsetY + iDirectionOffsetY) >> 1, iw >> 1, ih >> 1, iOffsetX, iOffsetY, 320, 240, false, iHiddenDirection, (iHiddenPlane >> 1) + iOffsetX);
+	else
+		gfx_drawpreview(spr->getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, drawframe >> 1, (iColorOffsetY + iDirectionOffsetY) >> 1, iw >> 1, ih >> 1, iOffsetX, iOffsetY, 320, 240, false);
 }
 
 bool MO_BulletBill::collide(CPlayer * player)
@@ -5834,6 +5849,8 @@ OMO_FlagBase::OMO_FlagBase(gfxSprite *nspr, short iTeamID, short iColorID) :
 	placeFlagBase(true);
 
 	speed = (float)game_values.gamemodesettings.flag.speed / 4.0f;
+
+	timer = 0;
 }
 
 bool OMO_FlagBase::collide(CPlayer * player)
@@ -5904,10 +5921,14 @@ void OMO_FlagBase::update()
 
 		angle = atan2(velx, vely);
 	}
+
+	if(game_values.gamemodesettings.flag.speed == 0 && timer++ > 1000)
+		placeFlagBase(false);
 }
 
 void OMO_FlagBase::placeFlagBase(bool fInit)
 {
+	timer = 0;
 	short x = 0, y = 0;
 
 	if(fInit && teamID < g_map.iNumFlagBases)
@@ -5967,6 +5988,7 @@ void OMO_FlagBase::scoreFlag(CO_Flag * flag, CPlayer * player)
 
 		if(game_values.gamemodesettings.flag.pointmove)
 		{
+			//Set the values way outside the map so it will place the base correctly
 			ix = 1280;
 			iy = 960;
 			placeFlagBase(false);
@@ -6536,8 +6558,6 @@ void OMO_KingOfTheHillZone::placeArea()
 
 	short x;
 	short y;
-
-	g_map.CalculatePlatformNoSpawnZones();
 
 	for(short iLoop = 0; iLoop < 64; iLoop++)
 	{
@@ -9229,6 +9249,12 @@ void OMO_StraightPathHazard::update()
 
 	if(iy + ih < 0 || iy >= 480)
 		dead = true;
+
+	//Wrap hazard if it is off the edge of the screen
+	if(ix < 0)
+		ix += 640;
+	else if(ix + iw >= 640)
+		ix -= 640;
 }
 
 bool OMO_StraightPathHazard::collide(CPlayer * player)
@@ -9252,11 +9278,14 @@ bool OMO_StraightPathHazard::collide(CPlayer * player)
 // class IO_BulletBillCannon - gets update calls and shoots bullet bills based on timer
 //------------------------------------------------------------------------------
 
-IO_BulletBillCannon::IO_BulletBillCannon(short x, short y, short freq, float vel) :
+IO_BulletBillCannon::IO_BulletBillCannon(short x, short y, short freq, float vel, bool preview) :
 	CObject(NULL, x, y)
 {
 	iFreq = freq;
 	dVel = vel;
+	fPreview = preview;
+
+	objectType = object_bulletbillcannon;
 
 	SetNewTimer();
 }
@@ -9267,7 +9296,7 @@ void IO_BulletBillCannon::update()
 	{
 		SetNewTimer();
 
-		objectcontainer[2].add(new MO_BulletBill(&spr_hazard_bulletbill, &spr_hazard_bulletbilldead, ix + (dVel < 0.0f ? 32 : -32), iy, dVel, 0, true));
+		objectcontainer[1].add(new MO_BulletBill(&spr_hazard_bulletbill[fPreview ? 1 : 0], &spr_hazard_bulletbilldead, ix + (dVel < 0.0f ? 32 : -32), iy, dVel, 0, true));
 		ifsoundonplay(sfx_bulletbillsound);
 	}
 }
@@ -9288,6 +9317,8 @@ IO_FlameCannon::IO_FlameCannon(short x, short y, short freq, bool isfacingright)
 	iFreq = freq;
 	state = 0;
 	SetNewTimer();
+
+	objectType = object_flamecannon;
 
 	iw = 96;
 	ih = 32;
@@ -9376,7 +9407,16 @@ void IO_FlameCannon::draw()
 {
 	if(state > 0)
 	{
-		spr_hazard_flame.draw(ix, iy, iFlameX, iFlameY, 96, 32);
+		spr_hazard_flame[0].draw(ix, iy, iFlameX, iFlameY, 96, 32);
+	}
+}
+
+//For preview
+void IO_FlameCannon::draw(short iOffsetX, short iOffsetY)
+{
+	if(state > 0)
+	{
+		gfx_drawpreview(spr_hazard_flame[1].getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, iFlameX >> 1, iFlameY >> 1, 48, 16, iOffsetX, iOffsetY, 320, 240, true);
 	}
 }
 
@@ -9398,12 +9438,14 @@ void IO_FlameCannon::SetNewTimer()
 // class IO_PirhanaPlant - pirhana plant that appears on a certain frequency
 //------------------------------------------------------------------------------
 
-MO_PirhanaPlant::MO_PirhanaPlant(short x, short y, short type, short freq, short direction) :
+MO_PirhanaPlant::MO_PirhanaPlant(short x, short y, short type, short freq, short direction, bool preview) :
 	IO_MovingObject(NULL, x, y, 0, 0)
 {
 	iType = type;
 	iDirection = direction;
 	iFreq = freq;
+
+	fPreview = preview;
 
 	movingObjectType = movingobject_pirhanaplant;
 
@@ -9549,7 +9591,7 @@ void MO_PirhanaPlant::update()
 	//Fire a fireball
 	if(iType <= 1 && state == 2 && iTimer == 30)
 	{
-		objectcontainer[0].add(new OMO_StraightPathHazard(&spr_hazard_fireball, ix + 7, iDirection == 0 ? iy + 7 : iy + ih - 23, GetFireballAngle(), 3.0f, 4, 8, 18, 18, 0, 0, 0, iFacing <= 32 ? 18 : 0, 18, 18));
+		objectcontainer[1].add(new OMO_StraightPathHazard(&spr_hazard_fireball[fPreview ? 1 : 0], ix + 7, iDirection == 0 ? iy + 7 : iy + ih - 23, GetFireballAngle(), 3.0f, 4, 8, 18, 18, 0, 0, 0, iFacing <= 32 ? 18 : 0, 18, 18));
 	}
 }
 
@@ -9558,9 +9600,21 @@ void MO_PirhanaPlant::draw()
 	if(state > 0)
 	{
 		if(iDirection == 0)
-			spr_hazard_pirhanaplant.draw(ix, iy, iSrcX + iAnimationX + iFacing, iSrcY, 32, collisionHeight);
+			spr_hazard_pirhanaplant[0].draw(ix, iy, iSrcX + iAnimationX + iFacing, iSrcY, 32, collisionHeight);
 		else
-			spr_hazard_pirhanaplant.draw(ix, iy, iSrcX + iAnimationX + iFacing, iSrcY + ih - collisionHeight, 32, collisionHeight);
+			spr_hazard_pirhanaplant[0].draw(ix, iy, iSrcX + iAnimationX + iFacing, iSrcY + ih - collisionHeight, 32, collisionHeight);
+	}
+}
+
+//For preview drawing
+void MO_PirhanaPlant::draw(short iOffsetX, short iOffsetY)
+{
+	if(state > 0)
+	{
+		if(iDirection == 0)
+			gfx_drawpreview(spr_hazard_pirhanaplant[1].getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, (iSrcX + iAnimationX + iFacing) >> 1, iSrcY >> 1, 16, collisionHeight >> 1, iOffsetX, iOffsetY, 320, 240, true);
+		else
+			gfx_drawpreview(spr_hazard_pirhanaplant[1].getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, (iSrcX + iAnimationX + iFacing) >> 1, (iSrcY + ih - collisionHeight) >> 1, 16, collisionHeight >> 1, iOffsetX, iOffsetY, 320, 240, true);
 	}
 }
 

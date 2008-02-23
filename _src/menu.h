@@ -123,6 +123,7 @@ class Menu
 		MI_SelectField * miRespawnField;
 		MI_SelectField * miShieldField;
 		MI_SelectField * miBoundsTimeField;
+		MI_SelectField * miSuicideTimeField;
 		MI_SelectField * miWarpLockStyleField;
 		MI_SelectField * miWarpLockTimeField;
 		MI_SelectField * miBotsField;

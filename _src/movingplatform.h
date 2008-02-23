@@ -25,15 +25,11 @@ class MovingPlatformPath
 		MovingPlatform * pPlatform;
 
 		float dVelocity;
-		float dVelX, dVelY;
+		float dVelX[2], dVelY[2];
 
 		float dPathPointX[2], dPathPointY[2];
 
-		float dCurrentX, dCurrentY;
-
-		short iOnStep[2];
-		short iSteps;
-		short iGoalPoint;
+		float dCurrentX[2], dCurrentY[2];
 
 		short iType;
 
@@ -50,11 +46,15 @@ class StraightPath : public MovingPlatformPath
 		virtual ~StraightPath() {}
 
 		bool Move(short type);
+		void Reset();
 
 	protected:
-		void CalculateAngle();
-		void SetVelocity();
+		void SetVelocity(short type);
 		
+		short iOnStep[2];
+		short iSteps;
+		short iGoalPoint[2];
+
 		float dAngle;
 
 	friend class MovingPlatform;
@@ -70,6 +70,7 @@ class StraightPathContinuous : public StraightPath
 		virtual ~StraightPathContinuous() {}
 
 		bool Move(short type);
+		void Reset();
 
 	private:
 		float dEdgeX, dEdgeY;
@@ -87,13 +88,13 @@ class EllipsePath : public MovingPlatformPath
 		virtual ~EllipsePath() {}
 
 		bool Move(short type);
-		void SetPosition();
+		void SetPosition(short type);
 		void Reset();
 
 	private:
 		
 		float dRadiusX, dRadiusY;
-		float dAngle, dStartAngle;
+		float dAngle[2], dStartAngle;
 
 	friend class MovingPlatform;
 	friend class CMap;
@@ -108,6 +109,7 @@ class FallingPath : public MovingPlatformPath
 		virtual ~FallingPath() {}
 
 		bool Move(short type);
+		void Reset();
 
 	private:
 	
@@ -137,7 +139,6 @@ class MovingPlatform
 		void yf(float yf){fy = yf; iy = (short)fy;}
 		void yi(short yi){iy = yi; fy = (float)iy;}
 
-		void CalculateNoSpawnZone(float dPathTime);
 		bool IsInNoSpawnZone(short x, short y, short w, short h);
 
 	protected:
@@ -176,12 +177,6 @@ class MovingPlatform
 
 		float fVelX, fVelY;
 
-		//Map::findspawnpoint uses this to figure out where not to spawn players
-		short iNoSpawnZoneTop;
-		short iNoSpawnZoneBottom;
-		short iNoSpawnZoneLeft;
-		short iNoSpawnZoneRight;
-
 	friend class FallingPath;
 	friend class StraightPathContinuous;
 
@@ -191,6 +186,7 @@ class MovingPlatform
 	friend void loadcurrentmap();
 	friend void takescreenshot();
 	friend void loadmap(char * szMapFile);
+	friend int editor_platforms();
 
 };
 
