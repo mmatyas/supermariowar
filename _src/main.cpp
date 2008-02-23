@@ -39,7 +39,7 @@
 
 2) In addition to getting a victory by number of points, there should be an option to win by have a certain number of points more than everyone else. This will help on maps where extra lives are a bit too abundant, or when one player is crushing the others.
 - Maybe - add "Mercy Rule" to end game as long as the victor has at least 50% of the goal points and he is X% above the other players like 150%, 200%, 250%, 300%, etc...
-/*
+*/
 
 #ifdef _XBOX
 	#include <xtl.h>
