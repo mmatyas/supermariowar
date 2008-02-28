@@ -323,11 +323,15 @@ short CGM_Frag::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle
 	if(gameover)
 		return player_kill_normal;
 
-	//Penalize killing your team mates
-	if(inflictor.teamID == other.teamID)
-		inflictor.score->AdjustScore(-1);
-	else
-		inflictor.score->AdjustScore(1);
+	//Don't score if "sumo" style scoring is turned on
+	if(game_values.gamemode->gamemode != game_mode_frag || game_values.gamemodesettings.frag.scoring == 0 || style == kill_style_push)
+	{
+		//Penalize killing your team mates
+		if(inflictor.teamID == other.teamID)
+			inflictor.score->AdjustScore(-1);
+		else
+			inflictor.score->AdjustScore(1);
+	}
 
 	short iRet = CheckWinner(inflictor);
 
@@ -470,11 +474,22 @@ short CGM_TimeLimit::playerkilledplayer(CPlayer &inflictor, CPlayer &other, kill
 {
 	if(!gameover)
 	{
-		//Penalize killing your team mates
-		if(inflictor.teamID == other.teamID)
-			inflictor.score->AdjustScore(-1);
-		else
-			inflictor.score->AdjustScore(1);
+		if(game_values.gamemode->gamemode != game_mode_timelimit || game_values.gamemodesettings.time.scoring == 0 || style == kill_style_push)
+		{
+			//Penalize killing your team mates
+			if(inflictor.teamID == other.teamID)
+				inflictor.score->AdjustScore(-1);
+			else
+				inflictor.score->AdjustScore(1);
+		}
+
+		if(game_values.gamemode->gamemode == game_mode_timelimit && game_values.gamemodesettings.time.style == 1)
+		{
+			other.spawninvincible = true;
+			other.spawninvincibletimer = 60;
+
+			return player_kill_nonkill;
+		}
 	}
 
 	return player_kill_normal;
@@ -614,7 +629,7 @@ short CGM_Classic::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killst
 				return player_kill_removed;
 			}
 		}
-
+		
 		if(game_values.gamemode->gamemode == game_mode_classic && game_values.gamemodesettings.classic.style == 1)
 		{
 			other.spawninvincible = true;

@@ -108,8 +108,8 @@ void CMap::clearMap()
 			warpdata[i][j].direction = -1;
 			warpdata[i][j].connection = -1;
 
-			nospawn[0][i][j] = false;
-			nospawn[1][i][j] = false;
+			for(short iSpawn = 0; iSpawn < NUMSPAWNAREATYPES; iSpawn++)
+				nospawn[iSpawn][i][j] = false;
 		}
 	}
 
@@ -1541,17 +1541,6 @@ void CMap::saveMap(const std::string& file)
 	//Write eyecandy ID
 	WriteInt(eyecandyID, mapfile);
 
-	/*
-	//This code runs though the backgrounds and assigns them the default music category
-	for(short iBackground = 0; iBackground < 26; iBackground++)
-	{
-		if(!strcmp(g_szBackgroundConversion[iBackground], szBackgroundFile))
-		{
-			musicCategoryID = g_iMusicCategoryConversion[iBackground];
-		}
-	}
-	*/
-
 	//Write music category
 	WriteInt(musicCategoryID, mapfile);
 
@@ -1568,12 +1557,9 @@ void CMap::saveMap(const std::string& file)
 			WriteInt(warpdata[i][j].connection, mapfile);
 			WriteInt(warpdata[i][j].id, mapfile);
 			
-			//Write per tile allowed spawn types (player, item, possibly team specific TBD)
-			//NUMSPAWNAREATYPES
-			for(short iType = 0; iType < 5; iType++)
-				WriteBool(nospawn[0][i][j], mapfile);
-
-			WriteBool(nospawn[5][i][j], mapfile);
+			//Write per tile allowed spawn types (player, team specific (1-4), item)
+			for(short iType = 0; iType < NUMSPAWNAREATYPES; iType++)
+				WriteBool(nospawn[iType][i][j], mapfile);
 		}
 	}
 
@@ -1962,7 +1948,7 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks)
 			}
 
 			//If this is a player spawn area, have extra restrictions like don't spawn over spikes etc.
-			if(0 == iType)
+			if(0 <= iType && 4 >= iType)
 			{
 				//If there is a death tile directly above
 				if(!fUsed)
@@ -1983,7 +1969,11 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks)
 					for(m = j; m < MAPHEIGHT; m++)
 					{
 						TileType type = mapdatatop[i][m].iType;
+						int flags = mapdatatop[i][m].iFlags;
 						short block = objectdata[i][m].iType;
+
+						if(m == j && (flags & tile_flag_solid_on_top))
+							continue;
 
 						if(type == tile_death_on_top || type == tile_death)
 						{
@@ -2000,7 +1990,8 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks)
 						}
 						else
 						{
-							if((type != tile_nonsolid && type != tile_gap) || (block != -1 && block != 0 && block != 2 && block != 6 && block < 11))
+							//Ignore the blocks that might not be there anymore (destroyed, turned off, etc)
+							if((type != tile_nonsolid && type != tile_gap) || (block != -1 && block != 0 && block != 2 && block != 6 && (block < 11 || block > 14) && block != 16 && block < 19))
 							{
 								break;
 							}
@@ -2030,15 +2021,15 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks)
 							}
 							else
 							{
-								if((type != tile_nonsolid && type != tile_gap) || (block != -1 && block != 0 && block != 2))
+								if((type != tile_nonsolid && type != tile_gap) || (block != -1 && block != 0 && block != 2 && block != 6 && (block < 11 || block > 14) && block != 16 && block < 19))
 								{
 									break;
 								}
 							}
 						}
 
-						if(m == j)
-							fUsed = true;
+						//if(m == j)
+							//fUsed = true;
 					}
 				}
 			}
@@ -2531,12 +2522,12 @@ void CMap::predrawbackground(gfxSprite &background, gfxSprite &mapspr)
 		draw(mapspr.getSurface(), 3);
 	}
 
-	//Draws the spawn areas
 	/*
+	//Draws the spawn areas
 	SDL_Rect dest;
 	dest.w = 32;
 	dest.h = 32;
-	short iType = 0;
+	short iType = 1;
 	
 	for(int m = 0; m < numspawnareas[iType]; m++)  //use [1] for item spawn areas
 	{
@@ -2546,7 +2537,8 @@ void CMap::predrawbackground(gfxSprite &background, gfxSprite &mapspr)
 		dest.w = (spawnareas[iType][m].width) * TILESIZE + TILESIZE;
 		dest.h = (spawnareas[iType][m].height) * TILESIZE + TILESIZE;
 
-		int color = 0x00 << 24 | rand() % 256 << 16 | rand() % 256 << 8 | rand() % 256;
+		//int color = 0x00 << 24 | rand() % 256 << 16 | rand() % 256 << 8 | rand() % 256;
+		int color = 0x128 << 24 | 0x255 << 8;
 
 		SDL_FillRect(mapspr.getSurface(), &dest, color);		//fill empty area with black
 	}
@@ -2560,20 +2552,6 @@ void CMap::predrawforeground(gfxSprite &foregroundspr)
 
 	draw(foregroundspr.getSurface(), 2);
 	draw(foregroundspr.getSurface(), 3);
-
-	/*
-	for(int k = 0; k < numdrawareas; k++)
-	{
-		SDL_Rect rect;
-		rect.x = drawareas[k].x;
-		rect.y = drawareas[k].y;
-		rect.w = drawareas[k].w;
-		rect.h = drawareas[k].h;
-		int color = 0x00 << 24 | rand() % 256 << 16 | rand() % 256 << 8 | rand() % 256;
-
-		SDL_FillRect(foregroundspr.getSurface(), &rect, color);
-	}
-	*/
 }
 
 void CMap::SetupAnimatedTiles()
@@ -3006,6 +2984,7 @@ bool CMap::findspawnpoint(short iType, short * x, short * y, short width, short 
 			return false;
 	}
 
+	//Check to see if we are spawning into a temporary (falling) platform
 	std::list<MovingPlatform*>::iterator iterateAll = tempPlatforms.begin(), lim = tempPlatforms.end();
 	while (iterateAll != lim)
 	{

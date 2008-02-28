@@ -5554,10 +5554,10 @@ void CO_Egg::update()
 	if(owner)
 	{
 		MoveToOwner();
-		timer = 0;
+		relocatetimer = 0;
 		owner_throw = owner;
 	}
-	else if(++timer > 1500)
+	else if(++relocatetimer > 1500)
 	{
 		placeEgg();
 		owner_throw = NULL;
@@ -5583,6 +5583,13 @@ void CO_Egg::update()
 		if(sparkledrawframe >= 480)
 			sparkledrawframe = 0;
 	}
+
+	//Explode
+	if(explosiontimer > 0 && --explosiontimer == 0)
+	{
+		objectcontainer[2].add(new MO_Explosion(&spr_explosion, ix + (iw >> 1) - 96, iy + (ih >> 1) - 64, 2, 4, -1, -1, kill_style_bomb));
+		placeEgg();
+	}
 }
 
 void CO_Egg::draw()
@@ -5601,6 +5608,15 @@ void CO_Egg::draw()
 		else
 			spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, color << 5, iw, ih);
 	}
+
+	//Display explosion timer
+	if(explosiontimer > 0 && explosiontimer < 310)
+	{
+		if(owner && owner->iswarping())
+			spr_eggnumbers.draw(ix - collisionOffsetX, iy - collisionOffsetY, (explosiontimer / 62) << 5, 0, 32, 32, (short)owner->state % 4, owner->GetWarpPlane());
+		else
+			spr_eggnumbers.draw(ix - collisionOffsetX, iy - collisionOffsetY, (explosiontimer / 62) << 5, 0, 32, 32);
+	}
 }
 
 void CO_Egg::MoveToOwner()
@@ -5614,7 +5630,8 @@ void CO_Egg::MoveToOwner()
 
 void CO_Egg::placeEgg()
 {
-	timer = 0;
+	relocatetimer = 0;
+	explosiontimer = game_values.gamemodesettings.egg.explode;
 
 	short tries = 0;
 	short x = 0, y = 0;

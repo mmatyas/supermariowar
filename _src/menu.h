@@ -345,6 +345,7 @@ class Menu
 
 		//Frag
 		MI_SelectField * miFragModeStyleField;
+		MI_SelectField * miFragModeScoringField;
 		MI_Button * miFragModeBackButton;
 		
 		MI_Image * miFragModeLeftHeaderBar;
@@ -352,6 +353,8 @@ class Menu
 		MI_Text * miFragModeHeaderText;
 
 		//Time Limit
+		MI_SelectField * miTimeLimitModeStyleField;
+		MI_SelectField * miTimeLimitModeScoringField;
 		MI_SliderField * miTimeLimitModePercentExtraTime;
 		MI_Button * miTimeLimitModeBackButton;
 		
@@ -381,6 +384,7 @@ class Menu
 		//Yoshi's Eggs
 		MI_PowerupSlider * miEggModeEggQuantityField[4];
 		MI_PowerupSlider * miEggModeYoshiQuantityField[4];
+		MI_SelectField * miEggModeExplosionTimeField;
 		MI_Button * miEggModeBackButton;
 
 		MI_Image * miEggModeLeftHeaderBar;

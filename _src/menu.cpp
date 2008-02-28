@@ -1375,11 +1375,17 @@ void Menu::CreateMenu()
 	// Frag Mode Settings
 	//***********************
 
-	miFragModeStyleField = new MI_SelectField(&spr_selectfield, 120, 220, "On Kill", 400, 180);
+	miFragModeStyleField = new MI_SelectField(&spr_selectfield, 120, 200, "On Kill", 400, 180);
 	miFragModeStyleField->Add("Respawn", 0, "", false, false);
 	miFragModeStyleField->Add("Shield", 1, "", false, false);
 	miFragModeStyleField->SetData(&game_values.gamemodemenusettings.frag.style, NULL, NULL);
 	miFragModeStyleField->SetKey(game_values.gamemodemenusettings.frag.style);
+
+	miFragModeScoringField = new MI_SelectField(&spr_selectfield, 120, 240, "Scoring", 400, 180);
+	miFragModeScoringField->Add("All Kills", 0, "", false, false);
+	miFragModeScoringField->Add("Push Kills Only", 1, "", false, false);
+	miFragModeScoringField->SetData(&game_values.gamemodemenusettings.frag.scoring, NULL, NULL);
+	miFragModeScoringField->SetKey(game_values.gamemodemenusettings.frag.scoring);
 
 	miFragModeBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
 	miFragModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
@@ -1388,8 +1394,9 @@ void Menu::CreateMenu()
 	miFragModeRightHeaderBar = new MI_Image(&menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
 	miFragModeHeaderText = new MI_Text("Frag Mode Menu", 320, 5, 0, 2, 1);
 
-	mModeSettingsMenu[1].AddControl(miFragModeStyleField, miFragModeBackButton, miFragModeBackButton, NULL, miFragModeBackButton);
-	mModeSettingsMenu[1].AddControl(miFragModeBackButton, miFragModeStyleField, miFragModeStyleField, miFragModeStyleField, NULL);
+	mModeSettingsMenu[1].AddControl(miFragModeStyleField, miFragModeBackButton, miFragModeScoringField, NULL, miFragModeBackButton);
+	mModeSettingsMenu[1].AddControl(miFragModeScoringField, miFragModeStyleField, miFragModeBackButton, NULL, miFragModeBackButton);
+	mModeSettingsMenu[1].AddControl(miFragModeBackButton, miFragModeScoringField, miFragModeStyleField, miFragModeScoringField, NULL);
 	
 	mModeSettingsMenu[1].AddNonControl(miFragModeLeftHeaderBar);
 	mModeSettingsMenu[1].AddNonControl(miFragModeRightHeaderBar);
@@ -1403,7 +1410,19 @@ void Menu::CreateMenu()
 	// Time Limit Mode Settings
 	//***********************
 
-	miTimeLimitModePercentExtraTime = new MI_SliderField(&spr_selectfield, &menu_slider_bar, 120, 220, "Extra Time", 400, 150, 384);
+	miTimeLimitModeStyleField = new MI_SelectField(&spr_selectfield, 120, 180, "On Kill", 400, 150);
+	miTimeLimitModeStyleField->Add("Respawn", 0, "", false, false);
+	miTimeLimitModeStyleField->Add("Shield", 1, "", false, false);
+	miTimeLimitModeStyleField->SetData(&game_values.gamemodemenusettings.time.style, NULL, NULL);
+	miTimeLimitModeStyleField->SetKey(game_values.gamemodemenusettings.time.style);
+
+	miTimeLimitModeScoringField = new MI_SelectField(&spr_selectfield, 120, 220, "Scoring", 400, 150);
+	miTimeLimitModeScoringField->Add("All Kills", 0, "", false, false);
+	miTimeLimitModeScoringField->Add("Push Kills Only", 1, "", false, false);
+	miTimeLimitModeScoringField->SetData(&game_values.gamemodemenusettings.time.scoring, NULL, NULL);
+	miTimeLimitModeScoringField->SetKey(game_values.gamemodemenusettings.time.scoring);
+
+	miTimeLimitModePercentExtraTime = new MI_SliderField(&spr_selectfield, &menu_slider_bar, 120, 260, "Extra Time", 400, 150, 384);
 	miTimeLimitModePercentExtraTime->Add("0", 0, "", false, false);
 	miTimeLimitModePercentExtraTime->Add("5", 5, "", false, false);
 	miTimeLimitModePercentExtraTime->Add("10", 10, "", false, false);
@@ -1434,16 +1453,18 @@ void Menu::CreateMenu()
 
 	miTimeLimitModeLeftHeaderBar = new MI_Image(&menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
 	miTimeLimitModeRightHeaderBar = new MI_Image(&menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-	miTimeLimitModeHeaderText = new MI_Text("Jail Mode Menu", 320, 5, 0, 2, 1);
+	miTimeLimitModeHeaderText = new MI_Text("Time Mode Menu", 320, 5, 0, 2, 1);
 
-	mModeSettingsMenu[2].AddControl(miTimeLimitModePercentExtraTime, miTimeLimitModeBackButton, miTimeLimitModeBackButton, NULL, miTimeLimitModeBackButton);
-	mModeSettingsMenu[2].AddControl(miTimeLimitModeBackButton, miTimeLimitModePercentExtraTime, miTimeLimitModePercentExtraTime, miTimeLimitModePercentExtraTime, NULL);
+	mModeSettingsMenu[2].AddControl(miTimeLimitModeStyleField, miTimeLimitModeBackButton, miTimeLimitModeScoringField, NULL, miTimeLimitModeBackButton);
+	mModeSettingsMenu[2].AddControl(miTimeLimitModeScoringField, miTimeLimitModeStyleField, miTimeLimitModePercentExtraTime, NULL, miTimeLimitModeBackButton);
+	mModeSettingsMenu[2].AddControl(miTimeLimitModePercentExtraTime, miTimeLimitModeScoringField, miTimeLimitModeBackButton, NULL, miTimeLimitModeBackButton);
+	mModeSettingsMenu[2].AddControl(miTimeLimitModeBackButton, miTimeLimitModePercentExtraTime, miTimeLimitModeStyleField, miTimeLimitModePercentExtraTime, NULL);
 	
 	mModeSettingsMenu[2].AddNonControl(miTimeLimitModeLeftHeaderBar);
 	mModeSettingsMenu[2].AddNonControl(miTimeLimitModeRightHeaderBar);
 	mModeSettingsMenu[2].AddNonControl(miTimeLimitModeHeaderText);
 	
-	mModeSettingsMenu[2].SetHeadControl(miTimeLimitModePercentExtraTime);
+	mModeSettingsMenu[2].SetHeadControl(miTimeLimitModeStyleField);
 	mModeSettingsMenu[2].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
 
@@ -1546,7 +1567,7 @@ void Menu::CreateMenu()
 
 	for(short iEggField = 0; iEggField < 4; iEggField++)
 	{
-		miEggModeEggQuantityField[iEggField] = new MI_PowerupSlider(&spr_selectfield, &menu_slider_bar, &menu_egg, 170, 80 + 40 * iEggField, 300, iEggField);
+		miEggModeEggQuantityField[iEggField] = new MI_PowerupSlider(&spr_selectfield, &menu_slider_bar, &menu_egg, 170, 60 + 40 * iEggField, 300, iEggField);
 		miEggModeEggQuantityField[iEggField]->Add("0", 0, "", false, false);
 		miEggModeEggQuantityField[iEggField]->Add("1", 1, "", false, false);
 		miEggModeEggQuantityField[iEggField]->Add("2", 2, "", false, false);
@@ -1559,7 +1580,7 @@ void Menu::CreateMenu()
 
 	for(short iYoshiField = 0; iYoshiField < 4; iYoshiField++)
 	{
-		miEggModeYoshiQuantityField[iYoshiField] = new MI_PowerupSlider(&spr_selectfield, &menu_slider_bar, &menu_egg, 170, 240 + 40 * iYoshiField, 300, iYoshiField + 4);
+		miEggModeYoshiQuantityField[iYoshiField] = new MI_PowerupSlider(&spr_selectfield, &menu_slider_bar, &menu_egg, 170, 220 + 40 * iYoshiField, 300, iYoshiField + 4);
 		miEggModeYoshiQuantityField[iYoshiField]->Add("0", 0, "", false, false);
 		miEggModeYoshiQuantityField[iYoshiField]->Add("1", 1, "", false, false);
 		miEggModeYoshiQuantityField[iYoshiField]->Add("2", 2, "", false, false);
@@ -1569,6 +1590,17 @@ void Menu::CreateMenu()
 		miEggModeYoshiQuantityField[iYoshiField]->SetKey(game_values.gamemodemenusettings.egg.yoshis[iYoshiField]);
 		miEggModeYoshiQuantityField[iYoshiField]->SetNoWrap(true);
 	}
+
+	miEggModeExplosionTimeField = new MI_SelectField(&spr_selectfield, 120, 380, "Explosion Timer", 400, 180);
+	miEggModeExplosionTimeField->Add("Off", 0, "", false, false);
+	miEggModeExplosionTimeField->Add("3 Seconds", 186, "", false, false);
+	miEggModeExplosionTimeField->Add("5 Seconds", 310, "", false, false);
+	miEggModeExplosionTimeField->Add("8 Seconds", 496, "", false, false);
+	miEggModeExplosionTimeField->Add("10 Seconds", 620, "", false, false);
+	miEggModeExplosionTimeField->Add("15 Seconds", 930, "", false, false);
+	miEggModeExplosionTimeField->Add("20 Seconds", 1240, "", false, false);
+	miEggModeExplosionTimeField->SetData(&game_values.gamemodemenusettings.egg.explode, NULL, NULL);
+	miEggModeExplosionTimeField->SetKey(game_values.gamemodemenusettings.egg.explode);
 
 	miEggModeBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
 	miEggModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
@@ -1585,9 +1617,11 @@ void Menu::CreateMenu()
 	mModeSettingsMenu[6].AddControl(miEggModeYoshiQuantityField[0], miEggModeEggQuantityField[3], miEggModeYoshiQuantityField[1], NULL, miEggModeBackButton);
 	mModeSettingsMenu[6].AddControl(miEggModeYoshiQuantityField[1], miEggModeYoshiQuantityField[0], miEggModeYoshiQuantityField[2], NULL, miEggModeBackButton);
 	mModeSettingsMenu[6].AddControl(miEggModeYoshiQuantityField[2], miEggModeYoshiQuantityField[1], miEggModeYoshiQuantityField[3], NULL, miEggModeBackButton);
-	mModeSettingsMenu[6].AddControl(miEggModeYoshiQuantityField[3], miEggModeYoshiQuantityField[2], miEggModeBackButton, NULL, miEggModeBackButton);
+	mModeSettingsMenu[6].AddControl(miEggModeYoshiQuantityField[3], miEggModeYoshiQuantityField[2], miEggModeExplosionTimeField, NULL, miEggModeBackButton);
 
-	mModeSettingsMenu[6].AddControl(miEggModeBackButton, miEggModeYoshiQuantityField[3], miEggModeEggQuantityField[0], miEggModeYoshiQuantityField[3], NULL);
+	mModeSettingsMenu[6].AddControl(miEggModeExplosionTimeField, miEggModeYoshiQuantityField[3], miEggModeBackButton, NULL, miEggModeBackButton);
+
+	mModeSettingsMenu[6].AddControl(miEggModeBackButton, miEggModeExplosionTimeField, miEggModeEggQuantityField[0], miEggModeExplosionTimeField, NULL);
 	
 	mModeSettingsMenu[6].AddNonControl(miEggModeLeftHeaderBar);
 	mModeSettingsMenu[6].AddNonControl(miEggModeRightHeaderBar);

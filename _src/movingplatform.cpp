@@ -903,7 +903,7 @@ void MovingPlatform::collide(CPlayer * player)
 				
 				return;
 			}
-			else if(fSolidTileUnderPlayer && (((t1 & tile_flag_death_on_top) == 0 && (t2 & tile_flag_death_on_top) == 0) ||  
+			else if(fSolidTileUnderPlayer && (!(t1 & tile_flag_death_on_top) || !(t2 & tile_flag_death_on_top) ||  
 				player->invincible || player->spawninvincible || player->fKuriboShoe))
 			{	//on ground
 

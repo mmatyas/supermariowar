@@ -35,11 +35,27 @@
 //4) Still reports of disappearing map tiles - caused when rRects is used out of bounds causing w and h to be set to 0 - happened with platform with tile using row 960
 
 /*
-1) Pause screen should say which mode and how many points needed, in case you didn't notice or forgot after starting the map.
-
 2) In addition to getting a victory by number of points, there should be an option to win by have a certain number of points more than everyone else. This will help on maps where extra lives are a bit too abundant, or when one player is crushing the others.
 - Maybe - add "Mercy Rule" to end game as long as the victor has at least 50% of the goal points and he is X% above the other players like 150%, 200%, 250%, 300%, etc...
+
+1) Center flag game for CTF
+2) Chicken fly/glide option
+3) Exploding eggs for yoshi's eggs mode -> when eggs spawn, they could have a timer and when it reaches 5 seconds, display how much time is left
+
+1) New ice wand powerup: Throwable shattering ice ball (maybe remotely triggered like the exploding boomerang) that shatters into crystals
+3) New SuperUp powerup to allow special behavior for hammer, fireball, boomerang, shells/blueblocks.  What key combo to use to activate special behavior?
+7) Settable disappear time for hidden blocks
+8) New empty hidden block
+9) Settable TTL for BTBs, GRBs and RTBs
+10) Bug! When you kill 2 players/bots rapidly one after another with the star and you have the announcer on, the invincibilty music stops.
+13) Other mode specific items - key for jail mode, berry for yoshi's egg mode, coin for coin/greed mode, coin bag greed mode
+15) Menu options for limits on new powerups bombs, leaf, tanooki, sledge, pwings, etc.
+17) Finish removing old AFE codes from game
+19) On/Off switch controlled moving platforms?  See if this is feasible.
 */
+
+//BUG!! When explosion timer for egg is displayed, game crashes!
+
 
 #ifdef _XBOX
 	#include <xtl.h>
@@ -206,6 +222,7 @@ gfxSprite		spr_superstomp;
 
 gfxSprite		spr_coin;
 gfxSprite		spr_egg;
+gfxSprite		spr_eggnumbers;
 gfxSprite		spr_star;
 gfxSprite		spr_frenzycards;
 gfxSprite		spr_collectcards;
@@ -871,8 +888,11 @@ int main(int argc, char *argv[])
 
 	//Frag
 	game_values.gamemodemenusettings.frag.style = 0;		//Respawn on death
+	game_values.gamemodemenusettings.frag.scoring = 0;		//All kills will score
 
 	//Time Limit
+	game_values.gamemodemenusettings.time.style = 0;		//Respawn on death
+	game_values.gamemodemenusettings.time.scoring = 0;		//All kills will score
 	game_values.gamemodemenusettings.time.percentextratime = 10;	//10% chance of a heart spawning
 
 	//Jail
@@ -900,6 +920,7 @@ int main(int argc, char *argv[])
 	game_values.gamemodemenusettings.egg.yoshis[1] = 0;
 	game_values.gamemodemenusettings.egg.yoshis[2] = 0;
 	game_values.gamemodemenusettings.egg.yoshis[3] = 0;
+	game_values.gamemodemenusettings.egg.explode = 0;  //Exploding eggs is turned off by default
 
 	//Capture The Flag
 	game_values.gamemodemenusettings.flag.speed = 0;  //Bases don't move by default
@@ -2743,7 +2764,16 @@ void RunGame()
 			if(game_values.pausegame)
 			{
 				spr_dialog.draw(224, 176);
-				menu_font_large.drawCentered(320, 240 - (menu_font_large.getHeight() >> 1), "Pause");
+				menu_font_large.drawCentered(320, 200, "Pause");
+
+				menu_font_large.drawCentered(320, 240, game_values.gamemode->GetModeName());
+
+				char szGoal[256];
+				strcpy(szGoal, game_values.gamemode->GetGoalName());
+				strcat(szGoal, ": ");
+				sprintf(szGoal + strlen(szGoal), "%d", game_values.gamemode->goal);
+				
+				menu_font_large.drawCentered(320, 264, szGoal);
 			}
 
 			if(game_values.exitinggame)

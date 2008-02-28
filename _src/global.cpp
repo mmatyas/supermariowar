@@ -498,10 +498,13 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 			{
 				ts->fUseSettings = true;
 				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.frag.style, NULL, game_values.gamemodemenusettings.frag.style, false);
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.frag.scoring, NULL, game_values.gamemodemenusettings.frag.scoring, false);
 			}
 			else if(ts->iMode == 2) //time
 			{
 				ts->fUseSettings = true;
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.time.style, NULL, game_values.gamemodemenusettings.time.style, false);
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.time.scoring, NULL, game_values.gamemodemenusettings.time.scoring, false);
 				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.time.percentextratime, NULL, game_values.gamemodemenusettings.time.percentextratime, false);
 			}
 			else if(ts->iMode == 3) //jail
@@ -537,6 +540,8 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 
 				for(int iYoshi = 0; iYoshi < 4; iYoshi++)
 					ts->iNumUsedSettings += ReadTourStopSetting(&(ts->gmsSettings.egg.yoshis[iYoshi]), NULL, game_values.gamemodemenusettings.egg.yoshis[iYoshi], false);
+
+				ts->iNumUsedSettings += ReadTourStopSetting(&(ts->gmsSettings.egg.explode), NULL, game_values.gamemodemenusettings.egg.explode, false);
 			}
 			else if(ts->iMode == 7) //capture the flag
 			{
@@ -783,10 +788,28 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
 					sprintf(szTemp, ",%d", ts->gmsSettings.frag.style);
 					strcat(buffer, szTemp);
 				}
+
+				if(ts->iNumUsedSettings > 1)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.frag.scoring);
+					strcat(buffer, szTemp);
+				}
 			}
 			else if(ts->iMode == 2) //time
 			{
 				if(ts->iNumUsedSettings > 0)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.time.style);
+					strcat(buffer, szTemp);
+				}
+				
+				if(ts->iNumUsedSettings > 1)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.time.scoring);
+					strcat(buffer, szTemp);
+				}
+
+				if(ts->iNumUsedSettings > 2)
 				{
 					sprintf(szTemp, ",%d", ts->gmsSettings.time.percentextratime);
 					strcat(buffer, szTemp);
@@ -861,6 +884,12 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
 						sprintf(szTemp, ",%d", ts->gmsSettings.egg.yoshis[iYoshi]);
 						strcat(buffer, szTemp);
 					}
+				}
+
+				if(ts->iNumUsedSettings > 8)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.egg.explode);
+					strcat(buffer, szTemp);
 				}
 			}
 			else if(ts->iMode == 7) //capture the flag

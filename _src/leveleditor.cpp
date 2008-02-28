@@ -1468,7 +1468,7 @@ int editor_edit()
 			{
 				for(int j = 0; j < MAPWIDTH; j++)
 				{
-					if(g_map.nospawn[1][j][k])
+					if(g_map.nospawn[5][j][k])
 						spr_noitemspawntile.draw(j * TILESIZE, k  * TILESIZE);
 				}
 			}

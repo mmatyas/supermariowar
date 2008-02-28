@@ -379,6 +379,7 @@ extern gfxSprite		spr_tail;
 extern gfxSprite		spr_wings;
 
 extern gfxSprite		spr_egg;
+extern gfxSprite		spr_eggnumbers;
 extern gfxSprite		spr_star;
 extern gfxSprite		spr_flags;
 extern gfxSprite		spr_frenzycards;
@@ -604,10 +605,13 @@ struct ClassicGameModeSettings
 struct FragGameModeSettings
 {
 	short style;			//on kill, either respawn the player or shield them and let them keep playing
+	short scoring;			//When to credit a score, all kills or push kills only (sumo mode)
 };
 
 struct TimeGameModeSettings
 {
+	short style;			//on kill, either respawn the player or shield them and let them keep playing
+	short scoring;			//When to credit a score, all kills or push kills only (sumo mode)
 	short percentextratime; //percent chance a stopwatch with extra game time will spawn
 };
 
@@ -634,6 +638,7 @@ struct EggGameModeSettings
 {
 	short eggs[4];			//Number of eggs of each color in game
 	short yoshis[4];		//Nunber of yoshis of each color in game
+	short explode;			//Time until eggs explode
 };
 
 struct FlagGameModeSettings

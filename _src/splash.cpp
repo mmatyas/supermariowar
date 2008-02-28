@@ -248,6 +248,7 @@ bool LoadGameGraphics()
 	gfx_loadimage(&spr_superstomp, convertPath("gfx/packs/eyecandy/supersmash.png", graphicspack), true);
 
 	gfx_loadimage(&spr_egg, convertPath("gfx/packs/modeobjects/egg.png", graphicspack), true);
+	gfx_loadimage(&spr_eggnumbers, convertPath("gfx/packs/modeobjects/eggnumbers.png", graphicspack), true);
 	gfx_loadimage(&spr_star, convertPath("gfx/packs/modeobjects/star.png", graphicspack), true);
 	gfx_loadimage(&spr_flags, convertPath("gfx/packs/modeobjects/flags.png", graphicspack), true);
 	gfx_loadimage(&spr_frenzycards, convertPath("gfx/packs/modeobjects/frenzycards.png", graphicspack), true);

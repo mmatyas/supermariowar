@@ -3861,7 +3861,7 @@ void CPlayer::collision_detection_map()
 			return;
 		}
 		
-		if(fSolidTileUnderPlayer && (((lefttile & tile_flag_death_on_top) == 0 && (righttile & tile_flag_death_on_top) == 0) ||
+		if(fSolidTileUnderPlayer && (!(lefttile & tile_flag_death_on_top) || !(righttile & tile_flag_death_on_top) ||
 			invincible || spawninvincible || fKuriboShoe))
 		{	//on ground
 
@@ -3927,7 +3927,7 @@ short CPlayer::KillPlayerMapHazard(bool fForce, killstyle style)
 {
 	if(iSuicideCreditPlayerID >= 0)
 	{
-		return PlayerKilledPlayer(iSuicideCreditPlayerID, this, death_style_jump, style, fForce);
+		return PlayerKilledPlayer(iSuicideCreditPlayerID, this, death_style_jump, kill_style_push, fForce);
 	}
 	else
 	{

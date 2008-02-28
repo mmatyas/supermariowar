@@ -990,7 +990,8 @@ class CO_Egg : public MO_CarriedObject
 		void Kick(bool superkick);
 
 	private:
-		short timer;
+		short relocatetimer, explosiontimer;
+
 		CPlayer * owner_throw;
 		short owner_throw_timer;
 		
