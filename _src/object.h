@@ -72,7 +72,8 @@ class IO_Block : public CObject
 
 		virtual void draw();
 		virtual void update();
-		
+		virtual void reset();
+
 		//Returns true if we should continue to check for collisions in this direction
 		virtual bool collide(CPlayer * player, short direction, bool useBehavior);
 		virtual bool collide(IO_MovingObject * object, short direction);
@@ -103,7 +104,8 @@ class IO_Block : public CObject
 		float fposx, fposy;  //position to return to (for note and bumpable blocks)
 		short iposx, iposy; //position of the block (doesn't move)
 
-		bool hidden, oldhidden;
+		bool hidden, oldhidden, ishiddentype;
+		short iHiddenTimer;
 
 		short col, row;
 
@@ -120,6 +122,7 @@ class B_PowerupBlock : public IO_Block
 
 		void draw();
 		void update();
+		void reset();
 
 		bool collide(CPlayer * player, short direction, bool useBehavior);
 		bool collide(IO_MovingObject * object, short direction);
@@ -212,6 +215,7 @@ class B_NoteBlock : public IO_Block
 
 		void draw();
 		void update();
+		void reset();
 
 		bool collide(CPlayer * player, short direction, bool useBehavior);
 		bool collide(IO_MovingObject * object, short direction);
@@ -264,6 +268,8 @@ class B_FlipBlock : public IO_Block
 
 		void draw();
 		void update();
+		void reset();
+
 		bool collide(CPlayer * player, short direction, bool useBehavior);
 		bool collide(IO_MovingObject * object, short direction);
 
@@ -301,6 +307,7 @@ class B_BounceBlock : public IO_Block
 
 		void update();
 		void draw();
+		void reset();
 
 		bool collide(CPlayer * player, short direction, bool useBehavior);
 		bool collide(IO_MovingObject * object, short direction);
@@ -1092,6 +1099,7 @@ class CO_Flag : public MO_CarriedObject
 		bool fInBase;
 		CPlayer * owner_throw;
 		short owner_throw_timer;
+		bool centerflag;
 
 	friend class CPlayer;
 	friend class CGM_CTF;

@@ -2373,10 +2373,20 @@ void CGM_CaptureTheFlag::init()
 
 			short iColorID = list_players[iPlayer]->colorID;
 			OMO_FlagBase * base = new OMO_FlagBase(&spr_flagbases, iTeamID, iColorID);
-			CO_Flag * flag = new CO_Flag(&spr_flags, base, iTeamID, iColorID);
 			objectcontainer[0].add(base);
-			objectcontainer[1].add(flag);
+
+			if(!game_values.gamemodesettings.flag.centerflag)
+			{
+				CO_Flag * flag = new CO_Flag(&spr_flags, base, iTeamID, iColorID);
+				objectcontainer[1].add(flag);
+			}
 		}
+	}
+
+	if(game_values.gamemodesettings.flag.centerflag)
+	{
+		CO_Flag * centerflag = new CO_Flag(&spr_flags, NULL, -1, -1);
+		objectcontainer[1].add(centerflag);
 	}
 }
 

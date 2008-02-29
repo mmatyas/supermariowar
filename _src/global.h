@@ -223,7 +223,7 @@ struct STextAward
 void GetNameFromFileName(char * szName, const char * szFileName);
 std::string stripCreatorAndDotMap(const std::string &filename);
 
-#define NUM_AUTO_FILTERS 8
+#define NUM_AUTO_FILTERS 11
 
 #define WORLD_FOREGROUND_STAGE_OFFSET 200
 #define WORLD_WINNING_TEAM_SPRITE_OFFSET 600
@@ -648,6 +648,7 @@ struct FlagGameModeSettings
 	bool pointmove;			//Move base after point
 	short autoreturn;		//Time to automatically return flag to base
 	bool homescore;			//Need your flag at home base to score
+	bool centerflag;		//Have a single flag that all teams fight to return to their base
 };
 
 struct ChickenGameModeSettings
@@ -877,6 +878,7 @@ struct gv
 	short		respawn;
 	short		itemrespawntime;
 	short		outofboundstime;
+	short		hiddenblockrespawn;
 
 	short		warplockstyle;
 	short		warplocktime;

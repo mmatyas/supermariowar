@@ -165,6 +165,7 @@ class Menu
 		MI_SelectField * miSwapStyleField;
 		MI_SelectField * miBonusWheelField;
 		MI_SelectField * miKeepPowerupField;
+		MI_SelectField * miHiddenBlockRespawnField;
 		MI_StoredPowerupResetButton * miStoredPowerupResetButton;
 		MI_Button * miPowerupSettingsMenuBackButton;
 
@@ -397,6 +398,7 @@ class Menu
 		MI_SelectField * miFlagModePointMoveField;
 		MI_SelectField * miFlagModeAutoReturnField;
 		MI_SelectField * miFlagModeHomeScoreField;
+		MI_SelectField * miFlagModeCenterFlagField;
 		MI_Button * miFlagModeBackButton;
 		
 		MI_Image * miFlagModeLeftHeaderBar;

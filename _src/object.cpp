@@ -164,7 +164,8 @@ IO_Block::IO_Block(gfxSprite *nspr, short x, short y) :
 	col = x / TILESIZE;
 	row = y / TILESIZE;
 
-	oldhidden = hidden = false;
+	oldhidden = hidden = ishiddentype = false;
+	iHiddenTimer = 0;
 }
 
 
@@ -175,7 +176,24 @@ void IO_Block::draw()
 
 
 void IO_Block::update()
-{}
+{
+	if(ishiddentype && !hidden)
+	{
+		if(game_values.hiddenblockrespawn > 0 && ++iHiddenTimer > game_values.hiddenblockrespawn)
+		{
+			iHiddenTimer = 0;
+			oldhidden = hidden = true;
+			reset();
+
+			g_map.UpdateTileGap(col, row);
+		}
+	}
+}
+
+void IO_Block::reset()
+{
+	state = 0;
+}
 
 bool IO_Block::collide(CPlayer * player, short direction, bool useBehavior)
 {
@@ -351,7 +369,7 @@ B_PowerupBlock::B_PowerupBlock(gfxSprite *nspr1, short x, short y, short iNumSpr
 	animationWidth = (short)spr->getWidth();
 	drawFrame = 0;
 
-	oldhidden = hidden = fHidden;
+	oldhidden = hidden = ishiddentype = fHidden;
 
 	if(piSettings[0] == -1 || game_values.overridepowerupsettings == 1) //Game Only
 	{
@@ -404,6 +422,8 @@ void B_PowerupBlock::draw()
 
 void B_PowerupBlock::update()
 {
+	IO_Block::update();
+
 	if(state > 0)
 	{
 		yf(fy + vely);
@@ -493,10 +513,9 @@ void B_PowerupBlock::update()
 		}
 		else if(state == 3)
 		{
-			if(++timer >= game_values.itemrespawntime)
+			if(game_values.itemrespawntime > 0 && ++timer >= game_values.itemrespawntime)
 			{
-				timer = 0;
-				state = 0;
+				reset();
 			}
 		}
 	}
@@ -511,6 +530,12 @@ void B_PowerupBlock::update()
 			drawFrame = 0;
 		}
 	}
+}
+
+void B_PowerupBlock::reset()
+{
+	timer = 0;
+	state = 0;
 }
 
 bool B_PowerupBlock::collide(CPlayer * player, short direction, bool useBehavior)
@@ -571,6 +596,7 @@ bool B_PowerupBlock::hitbottom(CPlayer * player, bool useBehavior)
 		player->yf((float)(iposy + ih) + 0.2f);
 
 		hidden = false;
+		g_map.UpdateTileGap(col, row);
 
 		if(state == 0)
 		{
@@ -972,7 +998,7 @@ B_NoteBlock::B_NoteBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short
 	drawFrame = 0;
 	animationWidth = (short)spr->getWidth();
 
-	oldhidden = hidden = fHidden;
+	oldhidden = hidden = ishiddentype = fHidden;
 
 	iType = type;
 	iTypeOffsetY = iType * TILESIZE;
@@ -988,6 +1014,8 @@ void B_NoteBlock::draw()
 
 void B_NoteBlock::update()
 {
+	IO_Block::update();
+
 	if(state > 0)
 	{
 		xf(fx + velx);
@@ -1000,24 +1028,19 @@ void B_NoteBlock::update()
 		}
 		else if(state == 2 && fabsf(fposx - fx) < VELNOTEBLOCKBOUNCE)
 		{
-			velx = 0.0f;
-			state = 0;
-			xf(fposx);
-			yf(fposy);
+			reset();
 		}
 		else if(state == 3 && fabsf(fposy - fy) > 10.0f)
 		{
 			vely = -vely;
 			state = 4;
-			oldhidden = false;
 			iBumpPlayerID = -1;
+
+			oldhidden = false;
 		}
 		else if(state == 4 && fabsf(fposy - fy) < VELNOTEBLOCKBOUNCE)
 		{
-			vely = 0.0f;
-			state = 0;
-			xf(fposx);
-			yf(fposy);
+			reset();
 		}
 	}
 
@@ -1031,6 +1054,15 @@ void B_NoteBlock::update()
 			drawFrame = 0;
 		}
 	}
+}
+
+void B_NoteBlock::reset()
+{
+	velx = 0.0f;
+	vely = 0.0f;
+	state = 0;
+	xf(fposx);
+	yf(fposy);
 }
 
 bool B_NoteBlock::collide(CPlayer * player, short direction, bool useBehavior)
@@ -1092,6 +1124,7 @@ bool B_NoteBlock::hitbottom(CPlayer * player, bool useBehavior)
 		}
 
 		hidden = false;
+		g_map.UpdateTileGap(col, row);
 	}
 
 	return false;
@@ -1275,7 +1308,7 @@ B_FlipBlock::B_FlipBlock(gfxSprite *nspr, short x, short y, bool fHidden) :
 	iw = (short)spr->getWidth() >> 2;
 	collisionWidth = iw;
 
-	oldhidden = hidden = fHidden;
+	oldhidden = hidden = ishiddentype = fHidden;
 
 	counter = 0;
 	frame = 0;
@@ -1294,6 +1327,8 @@ void B_FlipBlock::draw()
 
 void B_FlipBlock::update()
 {
+	IO_Block::update();
+
 	if(state == 1)
 	{
 		if(++counter >= 10)
@@ -1311,11 +1346,7 @@ void B_FlipBlock::update()
 
 		if(++timer >= 240)
 		{
-			frame = 0;
-			counter = 0;
-			timer = 0;
-			state = 0;
-
+			reset();
 			g_map.UpdateTileGap(col, row);
 		}
 	}
@@ -1329,6 +1360,14 @@ void B_FlipBlock::update()
 		g_map.blockdata[col][row] = NULL;
 		g_map.UpdateTileGap(col, row);
 	}
+}
+
+void B_FlipBlock::reset()
+{
+	frame = 0;
+	counter = 0;
+	timer = 0;
+	state = 0;
 }
 
 bool B_FlipBlock::collide(CPlayer * player, short direction, bool useBehavior)
@@ -1395,6 +1434,7 @@ bool B_FlipBlock::hitbottom(CPlayer * player, bool useBehavior)
 		iBumpTeamID = player->teamID;
 
 		hidden = false;
+		g_map.UpdateTileGap(col, row);
 
 		triggerBehavior();
 		return false;
@@ -1886,7 +1926,7 @@ void B_SwitchBlock::FlipState()
 B_BounceBlock::B_BounceBlock(gfxSprite *nspr1, short x, short y, bool fHidden) :
 	IO_Block(nspr1, x, y)
 {
-	oldhidden = hidden = fHidden;
+	oldhidden = hidden = ishiddentype = fHidden;
 }
 
 void B_BounceBlock::draw()
@@ -1899,6 +1939,8 @@ void B_BounceBlock::draw()
 
 void B_BounceBlock::update()
 {
+	IO_Block::update();
+
 	if(state > 0)
 	{
 		yf(fy + vely);
@@ -1913,11 +1955,16 @@ void B_BounceBlock::update()
 		}
 		else if(state == 2 && fabsf(fposy - fy) < VELBLOCKBOUNCE)
 		{
-			vely = 0.0f;
-			state = 0;
-			yf(fposy);
+			reset();
 		}
 	}
+}
+
+void B_BounceBlock::reset()
+{
+	vely = 0.0f;
+	state = 0;
+	yf(fposy);
 }
 
 bool B_BounceBlock::collide(CPlayer * player, short direction, bool useBehavior)
@@ -1973,6 +2020,7 @@ bool B_BounceBlock::hitbottom(CPlayer * player, bool useBehavior)
 		triggerBehavior();
 
 		hidden = false;
+		g_map.UpdateTileGap(col, row);
 	}
 
 	return false;
@@ -5995,7 +6043,7 @@ void OMO_FlagBase::scoreFlag(CO_Flag * flag, CPlayer * player)
 		flag->placeFlag();
 		ifsoundonplay(sfx_areatag);
 	}
-	else if(!game_values.gamemodesettings.flag.homescore || homeflag != NULL)
+	else if(!game_values.gamemodesettings.flag.homescore || homeflag != NULL || game_values.gamemodesettings.flag.centerflag)
 	{
 		flag->placeFlag();
 		if(!game_values.gamemode->gameover)
@@ -6017,7 +6065,7 @@ void OMO_FlagBase::scoreFlag(CO_Flag * flag, CPlayer * player)
 // class flag (for Capture the Flag mode)
 //------------------------------------------------------------------------------
 CO_Flag::CO_Flag(gfxSprite *nspr, OMO_FlagBase * base, short iTeamID, short iColorID) :
-	MO_CarriedObject(nspr, 0, 0, 4, 8, 30, 30, 1, 1, 0, iColorID * 64, 32, 32)
+	MO_CarriedObject(nspr, 0, 0, 4, 8, 30, 30, 1, 1, 0, iColorID << 6, 32, 32)
 {
 	state = 1;
 	bounce = GRAVITATION;
@@ -6028,6 +6076,8 @@ CO_Flag::CO_Flag(gfxSprite *nspr, OMO_FlagBase * base, short iTeamID, short iCol
 	fLastFlagDirection = false;
 	owner_throw = NULL;
 	owner_throw_timer = 0;
+
+	centerflag = teamID == -1;
 	
 	placeFlag();
 }
@@ -6045,7 +6095,9 @@ bool CO_Flag::collide(CPlayer * player)
 		{
 			owner = player;
 			owner_throw = player;
-			flagbase->setFlag(NULL);
+			
+			if(flagbase)
+				flagbase->setFlag(NULL);
 		}
 	}
 	
@@ -6063,8 +6115,12 @@ void CO_Flag::update()
 	}
 	else if(fInBase)
 	{
-		xf(flagbase->fx);
-		yf(flagbase->fy);
+		if(flagbase)
+		{
+			xf(flagbase->fx);
+			yf(flagbase->fy);
+		}
+
 		owner_throw = NULL;
 	}
 	else if(game_values.gamemodesettings.flag.autoreturn > 0 && ++timer > game_values.gamemodesettings.flag.autoreturn)
@@ -6097,6 +6153,9 @@ void CO_Flag::draw()
 {
 	if(owner)
 	{
+		if(centerflag)
+			animationOffsetY = owner->colorID << 6;
+
 		if(owner->iswarping())
 			spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, animationOffsetY + (fLastFlagDirection ? 32 : 0), iw, ih, (short)owner->state % 4, owner->GetWarpPlane());
 		else
@@ -6104,6 +6163,13 @@ void CO_Flag::draw()
 	}
 	else
 	{
+		if(centerflag)
+		{
+			animationOffsetY += 64;
+			if(animationOffsetY > 192)
+				animationOffsetY = 0;
+		}
+
 		spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, animationOffsetY + (fLastFlagDirection ? 32 : 0), iw, ih);
 	}
 }
@@ -6120,7 +6186,16 @@ void CO_Flag::MoveToOwner()
 
 void CO_Flag::placeFlag()
 {
-	if(flagbase)
+	if(centerflag)
+	{
+		Drop();
+		fInBase = false;
+		g_map.findspawnpoint(1, &ix, &iy, collisionWidth, collisionHeight, false);
+		fx = (float)ix;
+		fy = (float)iy;
+		fLastFlagDirection = false;
+	}
+	else if(flagbase)
 	{
 		Drop();
 		fInBase = true;

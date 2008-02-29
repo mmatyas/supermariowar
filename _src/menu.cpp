@@ -121,6 +121,7 @@ void Menu::WriteGameOptions()
 
 		fwrite(&game_values.spawninvincibility, sizeof(short), 1, fp);
 		fwrite(&game_values.itemrespawntime, sizeof(short), 1, fp);
+		fwrite(&game_values.hiddenblockrespawn, sizeof(short), 1, fp);
 		fwrite(&game_values.fireballttl, sizeof(short), 1, fp);
 		fwrite(&game_values.fireballlimit, sizeof(short), 1, fp);
 		fwrite(&game_values.hammerdelay, sizeof(short), 1, fp);
@@ -456,8 +457,8 @@ void Menu::CreateMenu()
 	miTeamKillsField->SetKey(game_values.teamcollision);
 
 	miTeamColorsField = new MI_SelectField(&spr_selectfield, 70, 240, "Colors", 500, 220);
-	miTeamColorsField->Add("Off", 0, "", false, false);
-	miTeamColorsField->Add("On", 1, "", true, false);
+	miTeamColorsField->Add("Individual", 0, "", false, false);
+	miTeamColorsField->Add("Team", 1, "", true, false);
 	miTeamColorsField->SetData(NULL, NULL, &game_values.teamcolors);
 	miTeamColorsField->SetKey(game_values.teamcolors ? 1 : 0);
 	miTeamColorsField->SetAutoAdvance(true);
@@ -944,7 +945,7 @@ void Menu::CreateMenu()
 	miBoomerangText = new MI_Text("Boomerang", 10, 290, 0, 2, 0);
 	miHammerText = new MI_Text("Hammer", 325, 50, 0, 2, 0);
 	miShellText = new MI_Text("Shell", 325, 250, 0, 2, 0);
-	miBlueBlockText = new MI_Text("Blue Block", 325, 330, 0, 2, 0);
+	miBlueBlockText = new MI_Text("Throwable Blocks", 325, 330, 0, 2, 0);
 
 	mProjectilesOptionsMenu.AddControl(miFireballLifeField, miProjectilesOptionsMenuBackButton, miFireballLimitField, NULL, miHammerLifeField);
 	mProjectilesOptionsMenu.AddControl(miFireballLimitField, miFireballLifeField, miFeatherJumpsField, NULL, miHammerDelayField);
@@ -1634,7 +1635,7 @@ void Menu::CreateMenu()
 	// Flag Mode Settings
 	//***********************
 
-	miFlagModeSpeedField = new MI_SliderField(&spr_selectfield, &menu_slider_bar, 120, 140, "Speed", 400, 180, 380);
+	miFlagModeSpeedField = new MI_SliderField(&spr_selectfield, &menu_slider_bar, 120, 120, "Speed", 400, 180, 380);
 	miFlagModeSpeedField->Add("0", 0, "", false, false);
 	miFlagModeSpeedField->Add("1", 1, "", false, false);
 	miFlagModeSpeedField->Add("2", 2, "", false, false);
@@ -1648,21 +1649,21 @@ void Menu::CreateMenu()
 	miFlagModeSpeedField->SetKey(game_values.gamemodemenusettings.flag.speed);
 	miFlagModeSpeedField->SetNoWrap(true);
 
-	miFlagModeTouchReturnField = new MI_SelectField(&spr_selectfield, 120, 180, "Touch Return", 400, 180);
+	miFlagModeTouchReturnField = new MI_SelectField(&spr_selectfield, 120, 160, "Touch Return", 400, 180);
 	miFlagModeTouchReturnField->Add("Off", 0, "", false, false);
 	miFlagModeTouchReturnField->Add("On", 1, "", true, false);
 	miFlagModeTouchReturnField->SetData(NULL, NULL, &game_values.gamemodemenusettings.flag.touchreturn);
 	miFlagModeTouchReturnField->SetKey(game_values.gamemodemenusettings.flag.touchreturn ? 1 : 0);
 	miFlagModeTouchReturnField->SetAutoAdvance(true);
 
-	miFlagModePointMoveField = new MI_SelectField(&spr_selectfield, 120, 220, "Point Move", 400, 180);
+	miFlagModePointMoveField = new MI_SelectField(&spr_selectfield, 120, 200, "Point Move", 400, 180);
 	miFlagModePointMoveField->Add("Off", 0, "", false, false);
 	miFlagModePointMoveField->Add("On", 1, "", true, false);
 	miFlagModePointMoveField->SetData(NULL, NULL, &game_values.gamemodemenusettings.flag.pointmove);
 	miFlagModePointMoveField->SetKey(game_values.gamemodemenusettings.flag.pointmove ? 1 : 0);
 	miFlagModePointMoveField->SetAutoAdvance(true);
 
-	miFlagModeAutoReturnField = new MI_SelectField(&spr_selectfield, 120, 260, "Auto Return", 400, 180);
+	miFlagModeAutoReturnField = new MI_SelectField(&spr_selectfield, 120, 240, "Auto Return", 400, 180);
 	miFlagModeAutoReturnField->Add("None", 0, "", false, false);
 	miFlagModeAutoReturnField->Add("5 Seconds", 310, "", false, false);
 	miFlagModeAutoReturnField->Add("10 Seconds", 620, "", false, false);
@@ -1679,12 +1680,19 @@ void Menu::CreateMenu()
 	miFlagModeAutoReturnField->SetData(&game_values.gamemodemenusettings.flag.autoreturn, NULL, NULL);
 	miFlagModeAutoReturnField->SetKey(game_values.gamemodemenusettings.flag.autoreturn);
 
-	miFlagModeHomeScoreField = new MI_SelectField(&spr_selectfield, 120, 300, "Need Home", 400, 180);
+	miFlagModeHomeScoreField = new MI_SelectField(&spr_selectfield, 120, 280, "Need Home", 400, 180);
 	miFlagModeHomeScoreField->Add("Off", 0, "", false, false);
 	miFlagModeHomeScoreField->Add("On", 1, "", true, false);
 	miFlagModeHomeScoreField->SetData(NULL, NULL, &game_values.gamemodemenusettings.flag.homescore);
 	miFlagModeHomeScoreField->SetKey(game_values.gamemodemenusettings.flag.homescore ? 1 : 0);
 	miFlagModeHomeScoreField->SetAutoAdvance(true);
+
+	miFlagModeCenterFlagField = new MI_SelectField(&spr_selectfield, 120, 320, "Center Flag", 400, 180);
+	miFlagModeCenterFlagField->Add("Off", 0, "", false, false);
+	miFlagModeCenterFlagField->Add("On", 1, "", true, false);
+	miFlagModeCenterFlagField->SetData(NULL, NULL, &game_values.gamemodemenusettings.flag.centerflag);
+	miFlagModeCenterFlagField->SetKey(game_values.gamemodemenusettings.flag.centerflag ? 1 : 0);
+	miFlagModeCenterFlagField->SetAutoAdvance(true);
 	
 	miFlagModeBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
 	miFlagModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
@@ -1697,9 +1705,10 @@ void Menu::CreateMenu()
 	mModeSettingsMenu[7].AddControl(miFlagModeTouchReturnField, miFlagModeSpeedField, miFlagModePointMoveField, NULL, miFlagModeBackButton);
 	mModeSettingsMenu[7].AddControl(miFlagModePointMoveField, miFlagModeTouchReturnField, miFlagModeAutoReturnField, NULL, miFlagModeBackButton);
 	mModeSettingsMenu[7].AddControl(miFlagModeAutoReturnField, miFlagModePointMoveField, miFlagModeHomeScoreField, NULL, miFlagModeBackButton);
-	mModeSettingsMenu[7].AddControl(miFlagModeHomeScoreField, miFlagModeAutoReturnField, miFlagModeBackButton, NULL, miFlagModeBackButton);
+	mModeSettingsMenu[7].AddControl(miFlagModeHomeScoreField, miFlagModeAutoReturnField, miFlagModeCenterFlagField, NULL, miFlagModeBackButton);
+	mModeSettingsMenu[7].AddControl(miFlagModeCenterFlagField, miFlagModeHomeScoreField, miFlagModeBackButton, NULL, miFlagModeBackButton);
 	
-	mModeSettingsMenu[7].AddControl(miFlagModeBackButton, miFlagModeHomeScoreField, miFlagModeSpeedField, miFlagModeHomeScoreField, NULL);
+	mModeSettingsMenu[7].AddControl(miFlagModeBackButton, miFlagModeCenterFlagField, miFlagModeSpeedField, miFlagModeCenterFlagField, NULL);
 	
 	mModeSettingsMenu[7].AddNonControl(miFlagModeLeftHeaderBar);
 	mModeSettingsMenu[7].AddNonControl(miFlagModeRightHeaderBar);
@@ -2564,7 +2573,7 @@ void Menu::CreateMenu()
 	// Powerup Settings Menu
 	//***********************
 	
-	miStoredPowerupDelayField = new MI_SelectField(&spr_selectfield, 70, 120, "Item Use Speed", 500, 220);
+	miStoredPowerupDelayField = new MI_SelectField(&spr_selectfield, 70, 100, "Item Use Speed", 500, 220);
 	miStoredPowerupDelayField->Add("Very Slow", 2, "", false, false);
 	miStoredPowerupDelayField->Add("Slow", 3, "", false, false);
 	miStoredPowerupDelayField->Add("Moderate", 4, "", false, false);
@@ -2573,7 +2582,8 @@ void Menu::CreateMenu()
 	miStoredPowerupDelayField->SetData(&game_values.storedpowerupdelay, NULL, NULL);
 	miStoredPowerupDelayField->SetKey(game_values.storedpowerupdelay);
 
-	miItemRespawnField = new MI_SelectField(&spr_selectfield, 70, 160, "Item Spawn", 500, 220);
+	miItemRespawnField = new MI_SelectField(&spr_selectfield, 70, 140, "Item Spawn", 500, 220);
+	miItemRespawnField->Add("Off", 0, "", false, false);
 	miItemRespawnField->Add("5 Seconds", 310, "", false, false);
 	miItemRespawnField->Add("10 Seconds", 620, "", false, false);
 	miItemRespawnField->Add("15 Seconds", 930, "", false, false);
@@ -2589,28 +2599,45 @@ void Menu::CreateMenu()
 	miItemRespawnField->SetData(&game_values.itemrespawntime, NULL, NULL);
 	miItemRespawnField->SetKey(game_values.itemrespawntime);
 
-	miSwapStyleField = new MI_SelectField(&spr_selectfield, 70, 200, "Swap Style", 500, 220);
+	miHiddenBlockRespawnField = new MI_SelectField(&spr_selectfield, 70, 180, "Hidden Block Hide", 500, 220);
+	miHiddenBlockRespawnField->Add("Off", 0, "", false, false);
+	miHiddenBlockRespawnField->Add("5 Seconds", 310, "", false, false);
+	miHiddenBlockRespawnField->Add("10 Seconds", 620, "", false, false);
+	miHiddenBlockRespawnField->Add("15 Seconds", 930, "", false, false);
+	miHiddenBlockRespawnField->Add("20 Seconds", 1240, "", false, false);
+	miHiddenBlockRespawnField->Add("25 Seconds", 1550, "", false, false);
+	miHiddenBlockRespawnField->Add("30 Seconds", 1860, "", false, false);
+	miHiddenBlockRespawnField->Add("35 Seconds", 2170, "", false, false);
+	miHiddenBlockRespawnField->Add("40 Seconds", 2480, "", false, false);
+	miHiddenBlockRespawnField->Add("45 Seconds", 2790, "", false, false);
+	miHiddenBlockRespawnField->Add("50 Seconds", 3100, "", false, false);
+	miHiddenBlockRespawnField->Add("55 Seconds", 3410, "", false, false);
+	miHiddenBlockRespawnField->Add("60 Seconds", 3720, "", false, false);
+	miHiddenBlockRespawnField->SetData(&game_values.hiddenblockrespawn, NULL, NULL);
+	miHiddenBlockRespawnField->SetKey(game_values.hiddenblockrespawn);
+
+	miSwapStyleField = new MI_SelectField(&spr_selectfield, 70, 220, "Swap Style", 500, 220);
 	miSwapStyleField->Add("Walk", 0, "", false, false);
 	miSwapStyleField->Add("Blink", 1, "", false, false);
 	miSwapStyleField->Add("Instant", 2, "", false, false);
 	miSwapStyleField->SetData(&game_values.swapstyle, NULL, NULL);
 	miSwapStyleField->SetKey(game_values.swapstyle);
 
-	miBonusWheelField = new MI_SelectField(&spr_selectfield, 70, 240, "Bonus Wheel", 500, 220);
+	miBonusWheelField = new MI_SelectField(&spr_selectfield, 70, 260, "Bonus Wheel", 500, 220);
 	miBonusWheelField->Add("Off", 0, "", false, false);
 	miBonusWheelField->Add("Tournament Win", 1, "", false, false);
 	miBonusWheelField->Add("Every Game", 2, "", false, false);
 	miBonusWheelField->SetData(&game_values.bonuswheel, NULL, NULL);
 	miBonusWheelField->SetKey(game_values.bonuswheel);
 
-	miKeepPowerupField = new MI_SelectField(&spr_selectfield, 70, 280, "Bonus Item", 500, 220);
+	miKeepPowerupField = new MI_SelectField(&spr_selectfield, 70, 300, "Bonus Item", 500, 220);
 	miKeepPowerupField->Add("Until Next Spin", 0, "", false, false);
 	miKeepPowerupField->Add("Keep Always", 1, "", true, false);
 	miKeepPowerupField->SetData(NULL, NULL, &game_values.keeppowerup);
 	miKeepPowerupField->SetKey(game_values.keeppowerup ? 1 : 0);
 	miKeepPowerupField->SetAutoAdvance(true);
 
-	miStoredPowerupResetButton = new MI_StoredPowerupResetButton(&spr_selectfield, 70, 320, "Reset Stored Items", 500, 0);
+	miStoredPowerupResetButton = new MI_StoredPowerupResetButton(&spr_selectfield, 70, 340, "Reset Stored Items", 500, 0);
 	miStoredPowerupResetButton->SetCode(MENU_CODE_RESET_STORED_POWERUPS);
 
 	miPowerupSettingsMenuBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
@@ -2621,8 +2648,9 @@ void Menu::CreateMenu()
 	miPowerupSettingsMenuHeaderText = new MI_Text("Item Settings Menu", 320, 5, 0, 2, 1);
 
 	mPowerupSettingsMenu.AddControl(miStoredPowerupDelayField, miPowerupSettingsMenuBackButton, miItemRespawnField, NULL, miPowerupSettingsMenuBackButton);
-	mPowerupSettingsMenu.AddControl(miItemRespawnField, miStoredPowerupDelayField, miSwapStyleField, NULL, miPowerupSettingsMenuBackButton);
-	mPowerupSettingsMenu.AddControl(miSwapStyleField, miItemRespawnField, miBonusWheelField, NULL, miPowerupSettingsMenuBackButton);
+	mPowerupSettingsMenu.AddControl(miItemRespawnField, miStoredPowerupDelayField, miHiddenBlockRespawnField, NULL, miPowerupSettingsMenuBackButton);
+	mPowerupSettingsMenu.AddControl(miHiddenBlockRespawnField, miItemRespawnField, miSwapStyleField, NULL, miPowerupSettingsMenuBackButton);
+	mPowerupSettingsMenu.AddControl(miSwapStyleField, miHiddenBlockRespawnField, miBonusWheelField, NULL, miPowerupSettingsMenuBackButton);
 	mPowerupSettingsMenu.AddControl(miBonusWheelField, miSwapStyleField, miKeepPowerupField, NULL, miPowerupSettingsMenuBackButton);
 	mPowerupSettingsMenu.AddControl(miKeepPowerupField, miBonusWheelField, miStoredPowerupResetButton, NULL, miPowerupSettingsMenuBackButton);
 	mPowerupSettingsMenu.AddControl(miStoredPowerupResetButton, miKeepPowerupField, miPowerupSettingsMenuBackButton, NULL, miPowerupSettingsMenuBackButton);

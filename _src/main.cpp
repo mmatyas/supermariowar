@@ -40,7 +40,7 @@
 
 1) Center flag game for CTF
 2) Chicken fly/glide option
-3) Exploding eggs for yoshi's eggs mode -> when eggs spawn, they could have a timer and when it reaches 5 seconds, display how much time is left
+3) Fix countdown timer gfx -> Exploding eggs for yoshi's eggs mode -> when eggs spawn, they could have a timer and when it reaches 5 seconds, display how much time is left
 
 1) New ice wand powerup: Throwable shattering ice ball (maybe remotely triggered like the exploding boomerang) that shatters into crystals
 3) New SuperUp powerup to allow special behavior for hammer, fireball, boomerang, shells/blueblocks.  What key combo to use to activate special behavior?
@@ -54,8 +54,12 @@
 19) On/Off switch controlled moving platforms?  See if this is feasible.
 */
 
-//BUG!! When explosion timer for egg is displayed, game crashes!
-
+/*
+Checkin:
+1) Added feature to allow hidden blocks to rehide after a specified time
+2) Fixed bug where running over 1x1 tile gaps wasn't working correctly with hidden blocks
+3) Added 3 new map filters for item destroyable blocks, hidden blocks, and map hazards
+*/
 
 #ifdef _XBOX
 	#include <xtl.h>
@@ -759,6 +763,7 @@ int main(int argc, char *argv[])
 	game_values.soundvolume			= 128;
 	game_values.respawn				= 2;
 	game_values.itemrespawntime		= 1860;  //default item respawn is 30 seconds (30 * 62 fps)
+	game_values.hiddenblockrespawn	= 1860;  //default item respawn is 30 seconds
 	game_values.outofboundstime		= 5;
 	game_values.warplockstyle		= 1;	// Lock Warp Exit Only
 	game_values.warplocktime		= 186;  // 3 seconds
@@ -928,6 +933,7 @@ int main(int argc, char *argv[])
 	game_values.gamemodemenusettings.flag.pointmove = true;  //Move base after point
 	game_values.gamemodemenusettings.flag.autoreturn = 1240;  //Return flag automatically after 20 seconds
 	game_values.gamemodemenusettings.flag.homescore = false;  //Don't require flag to be home to score
+	game_values.gamemodemenusettings.flag.centerflag = false; //Do normal CTF, not center flag style
 
 	//Chicken
 	game_values.gamemodemenusettings.chicken.usetarget = true;  //default to displaying a target around the chicken
@@ -1061,6 +1067,7 @@ int main(int argc, char *argv[])
 			
 			fread(&game_values.spawninvincibility, sizeof(short), 1, fp);
 			fread(&game_values.itemrespawntime, sizeof(short), 1, fp);
+			fread(&game_values.hiddenblockrespawn, sizeof(short), 1, fp);
 			fread(&game_values.fireballttl, sizeof(short), 1, fp);
 			fread(&game_values.fireballlimit, sizeof(short), 1, fp);
 			fread(&game_values.hammerdelay, sizeof(short), 1, fp);

@@ -200,6 +200,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 	if(version[0] == 1 && version[1] == 8)
 	{
 		//Read summary information here
+		
 		int iAutoFilterValues[NUM_AUTO_FILTERS + 1];
 		ReadIntChunk(iAutoFilterValues, NUM_AUTO_FILTERS + 1, mapfile);
 
@@ -462,14 +463,17 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 		//Read summary information here
 		if((version[2] == 0 && version[3] > 1) || version[2] >= 1)
 		{
-			int iAutoFilterValues[NUM_AUTO_FILTERS + 1];
-			ReadIntChunk(iAutoFilterValues, NUM_AUTO_FILTERS + 1, mapfile);
+			int iAutoFilterValues[9];
+			ReadIntChunk(iAutoFilterValues, 9, mapfile);
 
-			for(short iFilter = 0; iFilter < NUM_AUTO_FILTERS; iFilter++)
+			for(short iFilter = 0; iFilter < 8; iFilter++)
 				fAutoFilter[iFilter] = iAutoFilterValues[iFilter] > 0;
 
+			for(short iFilter = 8; iFilter < NUM_AUTO_FILTERS; iFilter++)
+				fAutoFilter[iFilter] = false;
+
 			//Read density and don't do anything with it at the moment
-			//int iDensity = ReadInt(mapfile);
+			//int iDensity = iAutoFilterValues[8];
 		}
 		else
 		{
@@ -1084,13 +1088,13 @@ void CMap::SetTileGap(short i, short j)
 	IO_Block * centerBlock = blockdata[i][j];
 	IO_Block * rightBlock = blockdata[iRightTile][j];
 
-	bool fLeftSolid = (leftTile != tile_flag_nonsolid && leftTile != tile_flag_gap) || (leftBlock && !leftBlock->isTransparent());
-	bool fCenterSolid = centerTile != tile_flag_nonsolid || (centerBlock && !centerBlock->isTransparent());
-	bool fRightSolid = (rightTile != tile_flag_nonsolid && rightTile != tile_flag_gap) || (rightBlock && !rightBlock->isTransparent());
+	bool fLeftSolid = (leftTile != tile_flag_nonsolid && leftTile != tile_flag_gap) || (leftBlock && !leftBlock->isTransparent() && !leftBlock->isHidden());
+	bool fCenterSolid = centerTile != tile_flag_nonsolid || (centerBlock && !centerBlock->isTransparent() && !centerBlock->isHidden());
+	bool fRightSolid = (rightTile != tile_flag_nonsolid && rightTile != tile_flag_gap) || (rightBlock && !rightBlock->isTransparent() && !rightBlock->isHidden());
 
-	bool fTopLeftSolid = (topLeftTile & tile_flag_solid) || (topLeftBlock && !topLeftBlock->isTransparent());
-	bool fTopCenterSolid = (topCenterTile & tile_flag_solid) || (topCenterBlock && !topCenterBlock->isTransparent());
-	bool fTopRightSolid = (topRightTile & tile_flag_solid) || (topRightBlock && !topRightBlock->isTransparent());
+	bool fTopLeftSolid = (topLeftTile & tile_flag_solid) || (topLeftBlock && !topLeftBlock->isTransparent() && !topLeftBlock->isHidden());
+	bool fTopCenterSolid = (topCenterTile & tile_flag_solid) || (topCenterBlock && !topCenterBlock->isTransparent() && !topCenterBlock->isHidden());
+	bool fTopRightSolid = (topRightTile & tile_flag_solid) || (topRightBlock && !topRightBlock->isTransparent() && !topRightBlock->isHidden());
 
 	if(fLeftSolid && !fCenterSolid && fRightSolid && !fTopLeftSolid && !fTopCenterSolid && !fTopRightSolid)
 	{
@@ -1243,7 +1247,9 @@ void CMap::saveMap(const std::string& file)
 	int iOnOffBlockCount = 0;
 	int iThrowBlockCount = 0;
 	int iBreakableBlockCount = 0;
-
+	int iItemDestroyableBlockCount = 0;
+	int iHiddenBlockCount = 0;
+	
 	for(short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++)
 	{
 		for(short iCol = 0; iCol < platforms[iPlatform]->iTileWidth; iCol++)
@@ -1311,30 +1317,40 @@ void CMap::saveMap(const std::string& file)
 				numWarpExits++;
 			}
 
+			short iBlockType = objectdata[i][j].iType;
+			int iFlags = mapdatatop[i][j].iFlags;
+
 			//Calculate auto map filters
-			if(mapdatatop[i][j].iFlags & tile_flag_has_death)
+			if(iFlags & tile_flag_has_death)
 				iHazardCount++;
 
 			if(warpdata[i][j].connection != -1)
 				iWarpCount++;
 
-			if(mapdatatop[i][j].iFlags & tile_flag_ice)
+			if(iFlags & tile_flag_ice)
 				iIceCount++;
 
-			if(objectdata[i][j].iType == 1 || objectdata[i][j].iType == 15) //Powerup/View Block
+			if(iBlockType == 1 || iBlockType == 15) //Powerup/View Block
 				iPowerupBlockCount++;
 
-			if(objectdata[i][j].iType == 0) //Breakable Block
+			if(iBlockType == 0) //Breakable Block
 				iBreakableBlockCount++;
 			
-			if(objectdata[i][j].iType == 6 || objectdata[i][j].iType == 16) //Blue/Red Throw Block
+			if(iBlockType == 6 || iBlockType == 16) //Blue/Red Throw Block
 				iThrowBlockCount++;
 
-			if(objectdata[i][j].iType >= 11 && objectdata[i][j].iType <= 14) //On/Off Block
+			if(iBlockType >= 11 && iBlockType <= 14) //On/Off Block
 				iOnOffBlockCount++;
 
-			if(mapdatatop[i][j].iFlags & tile_flag_solid)
+			if(iFlags & tile_flag_solid)
 				iDensity++;
+
+			if((iBlockType == 1 || iBlockType == 3 || iBlockType == 4 || iBlockType == 5 || iBlockType == 15 || iBlockType == 17 || iBlockType == 18) && objectdata[i][j].fHidden) //Hidden blocks
+				iHiddenBlockCount++;
+
+			if(iBlockType >= 20 && iBlockType <= 29) //Item Destroyable Blocks
+				iItemDestroyableBlockCount++;
+
 		}
 	}
 
@@ -1347,6 +1363,9 @@ void CMap::saveMap(const std::string& file)
 	WriteInt(iThrowBlockCount, mapfile);
 	WriteInt(iOnOffBlockCount, mapfile);
 	WriteInt(iPlatformCount, mapfile);
+	WriteInt(g_map.iNumMapHazards, mapfile);
+	WriteInt(iItemDestroyableBlockCount, mapfile);
+	WriteInt(iHiddenBlockCount, mapfile);
 	WriteInt(iDensity, mapfile);
 
 	//Write tileset names and indexes for translation at load time

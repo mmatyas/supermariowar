@@ -302,8 +302,8 @@ short g_iDefaultMusicCategory[MAXMUSICCATEGORY] = {0, 0, 0, 0, 0, 1, 2, 3, 0, 0,
 
 char * g_szWorldMusicCategoryNames[MAXWORLDMUSICCATEGORY] = {"Grass", "Desert", "Water", "Giant", "Sky", "Ice", "Pipe", "Dark", "Space"};
 
-char * g_szAutoFilterNames[NUM_AUTO_FILTERS] = {"Hazards", "Warps", "Ice", "Item Boxes", "Breakable Blocks", "Throwable Blocks", "On/Off Blocks", "Platforms"};
-short g_iAutoFilterIcons[NUM_AUTO_FILTERS] = {37, 29, 33, 1, 0, 6, 40, 73};
+char * g_szAutoFilterNames[NUM_AUTO_FILTERS] = {"Death Tiles", "Warps", "Ice", "Item Boxes", "Breakable Blocks", "Throwable Blocks", "On/Off Blocks", "Platforms", "Hazards", "Item Destroyable Blocks", "Hidden Blocks"};
+short g_iAutoFilterIcons[NUM_AUTO_FILTERS] = {37, 29, 33, 1, 0, 6, 40, 73, 19, 87, 17};
 
 short g_iPowerupToIcon[8] = {80, 176, 272, 304, 336, 368, 384, 400};
 
@@ -552,6 +552,7 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 				ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.flag.pointmove, 0, game_values.gamemodemenusettings.flag.pointmove);
 				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.flag.autoreturn, NULL, game_values.gamemodemenusettings.flag.autoreturn, false);
 				ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.flag.homescore, 0, game_values.gamemodemenusettings.flag.homescore);
+				ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.flag.centerflag, 0, game_values.gamemodemenusettings.flag.centerflag);
 			}
 			else if(ts->iMode == 8) //chicken
 			{
@@ -921,6 +922,12 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
 				if(ts->iNumUsedSettings > 4)
 				{
 					sprintf(szTemp, ",%d", ts->gmsSettings.flag.homescore);
+					strcat(buffer, szTemp);
+				}
+
+				if(ts->iNumUsedSettings > 5)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.flag.centerflag);
 					strcat(buffer, szTemp);
 				}
 			}
