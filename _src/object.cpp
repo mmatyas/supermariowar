@@ -451,6 +451,10 @@ void B_PowerupBlock::update()
 			{
 				objectcontainer[0].add(new PU_ExtraTimePowerup(&spr_extratimepowerup, ix + 1, iy - 1));				
 			}
+			else if(game_values.gamemode->gamemode == game_mode_jail && rand() % 100 < game_values.gamemodesettings.jail.percentkey)
+			{
+				objectcontainer[0].add(new PU_JailKeyPowerup(&spr_jailkeypowerup, ix + 1, iy - 1));
+			}
 			else
 			{
 				short iSelectedPowerup = SelectPowerup();
@@ -3374,7 +3378,7 @@ bool PU_Tanooki :: collide (CPlayer *player)
 	if(player->tanooki)
 	{
 		ifsoundonplay(sfx_storepowerup);
-		game_values.gamepowerups[player->globalID] = 20;
+		game_values.gamepowerups[player->getGlobalID()] = 20;
 	}
     else
     {
@@ -3427,7 +3431,7 @@ bool PU_StarPowerup::collide(CPlayer * player)
 		else
 		{
 			ifsoundonplay(sfx_storepowerup);
-			game_values.gamepowerups[player->globalID] = 6;
+			game_values.gamepowerups[player->getGlobalID()] = 6;
 		}
 	}
 
@@ -3625,7 +3629,7 @@ bool PU_PodoboPowerup::collide(CPlayer * player)
 	{
 		dead = true;
 		ifsoundonplay(sfx_storepowerup);
-		game_values.gamepowerups[player->globalID] = 22;
+		game_values.gamepowerups[player->getGlobalID()] = 22;
 	}
 
 	return false;
@@ -3884,7 +3888,7 @@ bool PU_ClockPowerup::collide(CPlayer * player)
 
 		dead = true;
 		ifsoundonplay(sfx_storepowerup);
-		game_values.gamepowerups[player->globalID] = 7;
+		game_values.gamepowerups[player->getGlobalID()] = 7;
 	}
 
 	return false;
@@ -3925,7 +3929,7 @@ bool PU_PowPowerup::collide(CPlayer * player)
 	{
 		dead = true;
 		ifsoundonplay(sfx_storepowerup);
-		game_values.gamepowerups[player->globalID] = 9;
+		game_values.gamepowerups[player->getGlobalID()] = 9;
 	}
 
 	return false;
@@ -3946,7 +3950,7 @@ bool PU_ModPowerup::collide(CPlayer * player)
 	{
 		dead = true;
 		ifsoundonplay(sfx_storepowerup);
-		game_values.gamepowerups[player->globalID] = 16;
+		game_values.gamepowerups[player->getGlobalID()] = 16;
 	}
 
 	return false;
@@ -3967,7 +3971,7 @@ bool PU_BulletBillPowerup::collide(CPlayer * player)
 	{
 		dead = true;
 		ifsoundonplay(sfx_storepowerup);
-		game_values.gamepowerups[player->globalID] = 10;
+		game_values.gamepowerups[player->getGlobalID()] = 10;
 	}
 
 	return false;
@@ -4158,6 +4162,28 @@ bool PU_ExtraTimePowerup::collide(CPlayer * player)
 		}
 
 		dead = true;
+	}
+
+	return false;
+}
+
+
+//------------------------------------------------------------------------------
+// class special jail key powerup for jail mode
+//------------------------------------------------------------------------------
+PU_JailKeyPowerup::PU_JailKeyPowerup(gfxSprite *nspr, short x, short y) :
+	MO_Powerup(nspr, x, y, 1, 0, 30, 30, 1, 1)
+{
+	velx = 0.0f;
+}
+
+bool PU_JailKeyPowerup::collide(CPlayer * player)
+{
+	if(state > 0)
+	{
+		dead = true;
+		ifsoundonplay(sfx_storepowerup);
+		game_values.gamepowerups[player->getGlobalID()] = 26;
 	}
 
 	return false;
@@ -5565,7 +5591,7 @@ MO_CarriedObject::~MO_CarriedObject()
 // class egg (for egg mode)
 //------------------------------------------------------------------------------
 CO_Egg::CO_Egg(gfxSprite *nspr, short iColor) :
-	MO_CarriedObject(nspr, 0, 0, 2, 8, 30, 30, 1, 1, 0, iColor << 5, 32, 32)
+	MO_CarriedObject(nspr, 0, 0, 2, 16, 30, 30, 1, 1, 0, iColor << 5, 32, 32)
 {
 	state = 1;
 	bounce = GRAVITATION;
@@ -5579,6 +5605,13 @@ CO_Egg::CO_Egg(gfxSprite *nspr, short iColor) :
 	sparkledrawframe = 0;
 	
 	color = iColor;
+
+	egganimationrates[0] = 2;
+	egganimationrates[1] = 4;
+	egganimationrates[2] = 6;
+	egganimationrates[3] = 8;
+	egganimationrates[4] = 12;
+	egganimationrates[5] = 16;
 
 	placeEgg();
 }
@@ -5621,7 +5654,10 @@ void CO_Egg::update()
 		applyfriction();
 
 		//Collision detect map
-		IO_MovingObject::update();
+		fOldX = fx;
+		fOldY = fy;
+
+		collision_detection_map();
 	}
 
 	if(++sparkleanimationtimer >= 4)
@@ -5633,37 +5669,43 @@ void CO_Egg::update()
 	}
 
 	//Explode
-	if(explosiontimer > 0 && --explosiontimer == 0)
+	if(game_values.gamemodesettings.egg.explode > 0)
 	{
-		objectcontainer[2].add(new MO_Explosion(&spr_explosion, ix + (iw >> 1) - 96, iy + (ih >> 1) - 64, 2, 4, -1, -1, kill_style_bomb));
-		placeEgg();
+		if(--explosiondrawtimer <= 0)
+		{
+			explosiondrawtimer = 62;
+			if(--explosiondrawframe < 0)
+			{
+				objectcontainer[2].add(new MO_Explosion(&spr_explosion, ix + (iw >> 1) - 96, iy + (ih >> 1) - 64, 2, 4, -1, -1, kill_style_bomb));
+				placeEgg();
+			}
+			else
+			{
+				if(explosiondrawframe < 5)
+					animationspeed = egganimationrates[explosiondrawframe];
+				else
+					animationspeed = egganimationrates[5];
+			}
+		}
 	}
+	
+	animate();
 }
 
 void CO_Egg::draw()
 {
-	if(owner)
-	{
-		if(owner->iswarping())
-			spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 64, color << 5, iw, ih, (short)owner->state % 4, owner->GetWarpPlane());
-		else
-			spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 64, color << 5, iw, ih);
-	}
+	if(owner && owner->iswarping())
+		spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, color << 5, iw, ih, (short)owner->state % 4, owner->GetWarpPlane());
 	else
-	{
-		if(velx != 0.0f)
-			spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 64, color << 5, iw, ih);  //keep the egg still while it's moving
-		else
-			spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, color << 5, iw, ih);
-	}
+		spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, color << 5, iw, ih);
 
 	//Display explosion timer
-	if(explosiontimer > 0 && explosiontimer < 310)
+	if(game_values.gamemodesettings.egg.explode > 0 && explosiondrawframe < 5)
 	{
 		if(owner && owner->iswarping())
-			spr_eggnumbers.draw(ix - collisionOffsetX, iy - collisionOffsetY, (explosiontimer / 62) << 5, 0, 32, 32, (short)owner->state % 4, owner->GetWarpPlane());
+			spr_eggnumbers.draw(ix - collisionOffsetX, iy - collisionOffsetY, explosiondrawframe << 5, color << 5, 32, 32, (short)owner->state % 4, owner->GetWarpPlane());
 		else
-			spr_eggnumbers.draw(ix - collisionOffsetX, iy - collisionOffsetY, (explosiontimer / 62) << 5, 0, 32, 32);
+			spr_eggnumbers.draw(ix - collisionOffsetX, iy - collisionOffsetY, explosiondrawframe << 5, color << 5, 32, 32);
 	}
 }
 
@@ -5679,7 +5721,13 @@ void CO_Egg::MoveToOwner()
 void CO_Egg::placeEgg()
 {
 	relocatetimer = 0;
-	explosiontimer = game_values.gamemodesettings.egg.explode;
+	explosiondrawframe = game_values.gamemodesettings.egg.explode - 1;
+	explosiondrawtimer = 62;
+	
+	if(explosiondrawframe < 5)
+		animationspeed = egganimationrates[explosiondrawframe];
+	else
+		animationspeed = egganimationrates[5];
 
 	short tries = 0;
 	short x = 0, y = 0;
@@ -6023,11 +6071,10 @@ void OMO_FlagBase::collide(IO_MovingObject * object)
 	if(object->getMovingObjectType() == movingobject_flag)
 	{
 		CO_Flag * flag = (CO_Flag*)object;
+		CPlayer * player = flag->owner_throw;
 
-		if(flag->owner_throw)
+		if(player)
 		{
-			CPlayer * player = flag->owner_throw;
-
 			if(teamID == player->teamID)
 			{
 				scoreFlag(flag, player);

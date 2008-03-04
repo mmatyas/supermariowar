@@ -1473,14 +1473,14 @@ void Menu::CreateMenu()
 	// Jail Mode Settings
 	//***********************
 
-	miJailModeStyleField = new MI_SelectField(&spr_selectfield, 120, 180, "Style", 400, 180);
+	miJailModeStyleField = new MI_SelectField(&spr_selectfield, 120, 160, "Style", 400, 180);
 	miJailModeStyleField->Add("Classic", 0, "", false, false);
 	miJailModeStyleField->Add("Owned", 1, "", true, false);
 	miJailModeStyleField->Add("Free For All", 2, "", true, false);
 	miJailModeStyleField->SetData(&game_values.gamemodemenusettings.jail.style, NULL, NULL);
 	miJailModeStyleField->SetKey(game_values.gamemodemenusettings.jail.style);
 
-	miJailModeTimeFreeField = new MI_SelectField(&spr_selectfield, 120, 220, "Free Timer", 400, 180);
+	miJailModeTimeFreeField = new MI_SelectField(&spr_selectfield, 120, 200, "Free Timer", 400, 180);
 	miJailModeTimeFreeField->Add("None", 1, "", false, false);
 	miJailModeTimeFreeField->Add("5 Seconds", 310, "", false, false);
 	miJailModeTimeFreeField->Add("10 Seconds", 620, "", false, false);
@@ -1497,12 +1497,38 @@ void Menu::CreateMenu()
 	miJailModeTimeFreeField->SetData(&game_values.gamemodemenusettings.jail.timetofree, NULL, NULL);
 	miJailModeTimeFreeField->SetKey(game_values.gamemodemenusettings.jail.timetofree);
 
-	miJailModeTagFreeField = new MI_SelectField(&spr_selectfield, 120, 260, "Tag Free", 400, 180);
+	miJailModeTagFreeField = new MI_SelectField(&spr_selectfield, 120, 240, "Tag Free", 400, 180);
 	miJailModeTagFreeField->Add("Off", 0, "", false, false);
 	miJailModeTagFreeField->Add("On", 1, "", true, false);
 	miJailModeTagFreeField->SetData(NULL, NULL, &game_values.gamemodemenusettings.jail.tagfree);
 	miJailModeTagFreeField->SetKey(game_values.gamemodemenusettings.jail.tagfree ? 1 : 0);
 	miJailModeTagFreeField->SetAutoAdvance(true);
+
+	miJailModeJailKeyField = new MI_SliderField(&spr_selectfield, &menu_slider_bar, 120, 280, "Jail Key", 400, 150, 384);
+	miJailModeJailKeyField->Add("0", 0, "", false, false);
+	miJailModeJailKeyField->Add("5", 5, "", false, false);
+	miJailModeJailKeyField->Add("10", 10, "", false, false);
+	miJailModeJailKeyField->Add("15", 15, "", false, false);
+	miJailModeJailKeyField->Add("20", 20, "", false, false);
+	miJailModeJailKeyField->Add("25", 25, "", false, false);
+	miJailModeJailKeyField->Add("30", 30, "", false, false);
+	miJailModeJailKeyField->Add("35", 35, "", false, false);
+	miJailModeJailKeyField->Add("40", 40, "", false, false);
+	miJailModeJailKeyField->Add("45", 45, "", false, false);
+	miJailModeJailKeyField->Add("50", 50, "", false, false);
+	miJailModeJailKeyField->Add("55", 55, "", false, false);
+	miJailModeJailKeyField->Add("60", 60, "", false, false);
+	miJailModeJailKeyField->Add("65", 65, "", false, false);
+	miJailModeJailKeyField->Add("70", 70, "", false, false);
+	miJailModeJailKeyField->Add("75", 75, "", false, false);
+	miJailModeJailKeyField->Add("80", 80, "", false, false);
+	miJailModeJailKeyField->Add("85", 85, "", false, false);
+	miJailModeJailKeyField->Add("90", 90, "", false, false);
+	miJailModeJailKeyField->Add("95", 95, "", false, false);
+	miJailModeJailKeyField->Add("100", 100, "", false, false);
+	miJailModeJailKeyField->SetData(&game_values.gamemodemenusettings.jail.percentkey, NULL, NULL);
+	miJailModeJailKeyField->SetKey(game_values.gamemodemenusettings.jail.percentkey);
+	miJailModeJailKeyField->SetNoWrap(true);
 
 	miJailModeBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
 	miJailModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
@@ -1513,8 +1539,9 @@ void Menu::CreateMenu()
 
 	mModeSettingsMenu[3].AddControl(miJailModeStyleField, miJailModeBackButton, miJailModeTimeFreeField, NULL, miJailModeBackButton);
 	mModeSettingsMenu[3].AddControl(miJailModeTimeFreeField, miJailModeStyleField, miJailModeTagFreeField, NULL, miJailModeBackButton);
-	mModeSettingsMenu[3].AddControl(miJailModeTagFreeField, miJailModeTimeFreeField, miJailModeBackButton, NULL, miJailModeBackButton);
-	mModeSettingsMenu[3].AddControl(miJailModeBackButton, miJailModeTagFreeField, miJailModeStyleField, miJailModeTagFreeField, NULL);
+	mModeSettingsMenu[3].AddControl(miJailModeTagFreeField, miJailModeTimeFreeField, miJailModeJailKeyField, NULL, miJailModeBackButton);
+	mModeSettingsMenu[3].AddControl(miJailModeJailKeyField, miJailModeTagFreeField, miJailModeBackButton, NULL, miJailModeBackButton);
+	mModeSettingsMenu[3].AddControl(miJailModeBackButton, miJailModeJailKeyField, miJailModeStyleField, miJailModeJailKeyField, NULL);
 	
 	mModeSettingsMenu[3].AddNonControl(miJailModeLeftHeaderBar);
 	mModeSettingsMenu[3].AddNonControl(miJailModeRightHeaderBar);
@@ -1594,12 +1621,12 @@ void Menu::CreateMenu()
 
 	miEggModeExplosionTimeField = new MI_SelectField(&spr_selectfield, 120, 380, "Explosion Timer", 400, 180);
 	miEggModeExplosionTimeField->Add("Off", 0, "", false, false);
-	miEggModeExplosionTimeField->Add("3 Seconds", 186, "", false, false);
-	miEggModeExplosionTimeField->Add("5 Seconds", 310, "", false, false);
-	miEggModeExplosionTimeField->Add("8 Seconds", 496, "", false, false);
-	miEggModeExplosionTimeField->Add("10 Seconds", 620, "", false, false);
-	miEggModeExplosionTimeField->Add("15 Seconds", 930, "", false, false);
-	miEggModeExplosionTimeField->Add("20 Seconds", 1240, "", false, false);
+	miEggModeExplosionTimeField->Add("3 Seconds", 3, "", false, false);
+	miEggModeExplosionTimeField->Add("5 Seconds", 5, "", false, false);
+	miEggModeExplosionTimeField->Add("8 Seconds", 8, "", false, false);
+	miEggModeExplosionTimeField->Add("10 Seconds", 10, "", false, false);
+	miEggModeExplosionTimeField->Add("15 Seconds", 15, "", false, false);
+	miEggModeExplosionTimeField->Add("20 Seconds", 20, "", false, false);
 	miEggModeExplosionTimeField->SetData(&game_values.gamemodemenusettings.egg.explode, NULL, NULL);
 	miEggModeExplosionTimeField->SetKey(game_values.gamemodemenusettings.egg.explode);
 
@@ -1723,12 +1750,19 @@ void Menu::CreateMenu()
 	// Chicken Mode Settings
 	//***********************
 
-	miChickenModeShowTargetField = new MI_SelectField(&spr_selectfield, 120, 220, "Show Target", 400, 180);
+	miChickenModeShowTargetField = new MI_SelectField(&spr_selectfield, 120, 200, "Show Target", 400, 180);
 	miChickenModeShowTargetField->Add("Off", 0, "", false, false);
 	miChickenModeShowTargetField->Add("On", 1, "", true, false);
 	miChickenModeShowTargetField->SetData(NULL, NULL, &game_values.gamemodemenusettings.chicken.usetarget);
 	miChickenModeShowTargetField->SetKey(game_values.gamemodemenusettings.chicken.usetarget ? 1 : 0);
 	miChickenModeShowTargetField->SetAutoAdvance(true);
+
+	miChickenModeGlideField= new MI_SelectField(&spr_selectfield, 120, 240, "Chicken Glide", 400, 180);
+	miChickenModeGlideField->Add("Off", 0, "", false, false);
+	miChickenModeGlideField->Add("On", 1, "", true, false);
+	miChickenModeGlideField->SetData(NULL, NULL, &game_values.gamemodemenusettings.chicken.glide);
+	miChickenModeGlideField->SetKey(game_values.gamemodemenusettings.chicken.glide ? 1 : 0);
+	miChickenModeGlideField->SetAutoAdvance(true);
 
 	miChickenModeBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
 	miChickenModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
@@ -1738,8 +1772,9 @@ void Menu::CreateMenu()
 	miChickenModeHeaderText = new MI_Text("Chicken Mode Menu", 320, 5, 0, 2, 1);
 
 
-	mModeSettingsMenu[8].AddControl(miChickenModeShowTargetField, miChickenModeBackButton, miChickenModeBackButton, NULL, miChickenModeBackButton);
-	mModeSettingsMenu[8].AddControl(miChickenModeBackButton, miChickenModeShowTargetField, miChickenModeShowTargetField, miChickenModeShowTargetField, NULL);
+	mModeSettingsMenu[8].AddControl(miChickenModeShowTargetField, miChickenModeBackButton, miChickenModeGlideField, NULL, miChickenModeBackButton);
+	mModeSettingsMenu[8].AddControl(miChickenModeGlideField, miChickenModeShowTargetField, miChickenModeBackButton, NULL, miChickenModeBackButton);
+	mModeSettingsMenu[8].AddControl(miChickenModeBackButton, miChickenModeGlideField, miChickenModeShowTargetField, miChickenModeGlideField, NULL);
 	
 	mModeSettingsMenu[8].AddNonControl(miChickenModeLeftHeaderBar);
 	mModeSettingsMenu[8].AddNonControl(miChickenModeRightHeaderBar);

@@ -364,6 +364,7 @@ extern gfxSprite		spr_bombpowerup;
 extern gfxSprite		spr_pwingspowerup;
 extern gfxSprite		spr_extraheartpowerup;
 extern gfxSprite		spr_extratimepowerup;
+extern gfxSprite		spr_jailkeypowerup;
 
 extern gfxSprite		spr_shade[3];
 extern gfxSprite		spr_scorehearts;
@@ -620,6 +621,7 @@ struct JailGameModeSettings
 	short style;			//Style of play: classic, owned, free for all
 	bool tagfree;			//Free jailed player by tagging on same team
 	short timetofree;		//Time it takes for a jailed player to be freed
+	short percentkey;		//percent chance a jail key will spawn
 };
 
 struct CoinGameModeSettings
@@ -654,6 +656,7 @@ struct FlagGameModeSettings
 struct ChickenGameModeSettings
 {
 	bool usetarget;			//Display target around chicken
+	bool glide;				//Allow chicken to glide through the air (chicken gets perm leaf powerup)
 };
 
 struct TagGameModeSettings

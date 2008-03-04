@@ -367,6 +367,7 @@ class Menu
 		MI_SelectField * miJailModeStyleField;
 		MI_SelectField * miJailModeTagFreeField;
 		MI_SelectField * miJailModeTimeFreeField;
+		MI_SelectField * miJailModeJailKeyField;
 		MI_Button * miJailModeBackButton;
 
 		MI_Image * miJailModeLeftHeaderBar;
@@ -407,6 +408,7 @@ class Menu
 
 		//Chicken
 		MI_SelectField * miChickenModeShowTargetField;
+		MI_SelectField * miChickenModeGlideField;
 		MI_Button * miChickenModeBackButton;
 		
 		MI_Image * miChickenModeLeftHeaderBar;

@@ -771,6 +771,15 @@ class PU_ExtraTimePowerup : public MO_Powerup
 		bool collide(CPlayer * player);
 };
 
+class PU_JailKeyPowerup : public MO_Powerup
+{
+	public:
+		PU_JailKeyPowerup(gfxSprite *nspr, short x, short y);
+		~PU_JailKeyPowerup(){};
+
+		bool collide(CPlayer * player);
+};
+
 class MO_Fireball : public IO_MovingObject
 {
 	public:
@@ -997,7 +1006,8 @@ class CO_Egg : public MO_CarriedObject
 		void Kick(bool superkick);
 
 	private:
-		short relocatetimer, explosiontimer;
+		short relocatetimer;
+		short explosiondrawframe, explosiondrawtimer;
 
 		CPlayer * owner_throw;
 		short owner_throw_timer;
@@ -1006,6 +1016,8 @@ class CO_Egg : public MO_CarriedObject
 		short sparkledrawframe;
 	
 		short color;
+
+		short egganimationrates[6];
 
 	friend class CPlayer;
 	friend class OMO_Yoshi;

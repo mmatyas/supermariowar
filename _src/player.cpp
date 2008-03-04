@@ -35,6 +35,7 @@ CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamI
 	carriedItem = NULL;
 	ownerPlayerID = -1;
 	ownerColorOffsetX = 0;
+	
 	jail = -1;
 	jailcolor = 0;
 	jailtimer = 0;
@@ -1055,6 +1056,18 @@ void CPlayer::move()
 					SetPowerup(8);
 					break;
 				}
+				case 26:  //jail key
+				{
+					powerup = -1;
+					
+					jailtimer = 0;
+					jail = -1;
+
+					eyecandyfront.add(new EC_SingleAnimation(&spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
+					ifsoundonplay(sfx_transform);
+				
+					break;
+				}
 			}
 				
 			powerupused = -1;
@@ -1279,18 +1292,7 @@ void CPlayer::move()
 								DecreaseProjectileLimit();
 						}
 					}
-					else if(powerup == 7 && !fKuriboShoe && iSpinState == 0)
-					{
-						if(game_values.leaflimit == 0 || projectilelimit > 0)
-						{
-							ShakeTail();
-							lockjump = true;
-						}
-
-						if(game_values.featherlimit > 0)
-							DecreaseProjectileLimit();
-					}
-					else if(powerup == 8 && !fKuriboShoe && !flying && extrajumps == 0)
+					else if(powerup == 8 && !fKuriboShoe && !flying && extrajumps == 0)  //Start pwings flight
 					{
 						flying = true;
 						game_values.playflyingsound = true;
@@ -1299,6 +1301,18 @@ void CPlayer::move()
 						extrajumps++;
 
 						if(game_values.pwingslimit > 0)
+							DecreaseProjectileLimit();
+					}
+					//This must come last or gliding chickens can't use powerups before this statement
+					else if((powerup == 7 || (powerup != 3 && game_values.gamemode->chicken == this && game_values.gamemodesettings.chicken.glide)) && !fKuriboShoe && iSpinState == 0)
+					{
+						if(game_values.leaflimit == 0 || projectilelimit > 0 || (game_values.gamemode->chicken == this && game_values.gamemodesettings.chicken.glide))
+						{
+							ShakeTail();
+							lockjump = true;
+						}
+
+						if(powerup == 7 && game_values.leaflimit > 0)
 							DecreaseProjectileLimit();
 					}
 				}
@@ -1415,9 +1429,8 @@ void CPlayer::move()
 							}
 
 							if(game_values.hammerlimit > 0)
-							{
 								DecreaseProjectileLimit();
-							}
+
 						}
 						else if(powerup == 3 && iSpinState == 0 && !fKuriboShoe)
 						{
@@ -1443,9 +1456,8 @@ void CPlayer::move()
 							}
 
 							if(game_values.boomeranglimit > 0)
-							{
 								DecreaseProjectileLimit();
-							}
+
 						}
 						else if(powerup == 5 && projectiles[globalID] < 1 && hammertimer == 0)
 						{
@@ -1465,9 +1477,8 @@ void CPlayer::move()
 							}
 
 							if(game_values.hammerlimit > 0)
-							{
 								DecreaseProjectileLimit();
-							}
+
 						}
 						else if(powerup == 6 && projectiles[globalID] < 1)
 						{
@@ -2114,6 +2125,9 @@ void CPlayer::SetKuriboShoe()
 		carriedItem->Drop();
 		carriedItem = NULL;
 	}
+
+	//Clear out powerup states that the player might be in the middle of
+	ClearPowerupStates();
 }
 
 void CPlayer::SetupNewPlayer()
@@ -2167,18 +2181,8 @@ void CPlayer::SetupNewPlayer()
 	holdlefttolerance = 0;
 	holdright = 0;
 	holdrighttolerance = 0;
-	flying = false;
-	flyingtimer = 0;
 	
-	iTailTimer = 0;
-	iTailState = 0;
-	iTailFrame = 0;
-
-	iSpinTimer = 0;
-	iSpinState = 0;
-
-	iWingsTimer = 0;
-	iWingsFrame = 0;
+	ClearPowerupStates();
 
 	ryu_fireball_index_left = 0;
 	ryu_fireball_index_right = 0;
@@ -2967,10 +2971,11 @@ void CPlayer::draw()
 	{
 		if(powerup == 3) 
 			DrawCape();
-		else if(powerup == 7)
-			DrawTail();
 		else if(powerup == 8)
 			DrawWings();
+		//This has to come last otherwise chickens with glide option won't be able to use cape or wings
+		else if(powerup == 7 || (powerup != 3 && game_values.gamemode->chicken == this && game_values.gamemodesettings.chicken.glide))
+			DrawTail();
 	}
 
 	short iPlayerKuriboOffsetY = 0;
@@ -3215,47 +3220,52 @@ void CPlayer::DrawTail()
 		}
 	}
 
-	if(iTailState == 0)
+	//Draw tail will be called by the chicken if he is allowed to glide
+	//but we don't want to draw the actual tail for the chicken
+	if(powerup == 7)
 	{
-		if(++iTailTimer >= 4)
+		if(iTailState == 0)
 		{
-			iTailTimer = 0;
+			if(++iTailTimer >= 4)
+			{
+				iTailTimer = 0;
 
-			if(!inair && velx != 0.0f)
-			{
-				iTailFrame += 22;
-				if(iTailFrame > 66)
+				if(!inair && velx != 0.0f)
+				{
+					iTailFrame += 22;
+					if(iTailFrame > 66)
+						iTailFrame = 22;
+				}
+				else if(!inair)
+				{
 					iTailFrame = 22;
-			}
-			else if(!inair)
-			{
-				iTailFrame = 22;
-			}
-			else if(inair)
-			{
-				if(vely <= 0.0f)
-					iTailFrame = 66;
-				else
-					iTailFrame = 110;
+				}
+				else if(inair)
+				{
+					if(vely <= 0.0f)
+						iTailFrame = 66;
+					else
+						iTailFrame = 110;
+				}
 			}
 		}
-	}
 
-	bool fPlayerFacingRight = true;
-	if(iTailState == 2)
-	{
-		if((iSpinState >= 2 && iSpinState <= 4) || iSpinState == 7 || iSpinState == 11)
-			fPlayerFacingRight = false;
-	}
-	else
-	{
-		fPlayerFacingRight = IsPlayerFacingRight();
-	}
+		bool fPlayerFacingRight = true;
+		if(iTailState == 2)
+		{
+			if((iSpinState >= 2 && iSpinState <= 4) || iSpinState == 7 || iSpinState == 11)
+				fPlayerFacingRight = false;
+		}
+		else
+		{
+			fPlayerFacingRight = IsPlayerFacingRight();
+		}
 
-	if(iswarping())
-		spr_tail.draw(ix + (fPlayerFacingRight ? - 18 : 18), iy + 6, iTailFrame, (fPlayerFacingRight ? 0 : 26) + iOffsetY, 22, 26, (short)state %4, warpplane);
-	else
-		spr_tail.draw(ix + (fPlayerFacingRight ? - 18 : 18), iy + 6, iTailFrame, (fPlayerFacingRight ? 0 : 26) + iOffsetY, 22, 26);
+		if(iswarping())
+			spr_tail.draw(ix + (fPlayerFacingRight ? - 18 : 18), iy + 6, iTailFrame, (fPlayerFacingRight ? 0 : 26) + iOffsetY, 22, 26, (short)state %4, warpplane);
+		else
+			spr_tail.draw(ix + (fPlayerFacingRight ? - 18 : 18), iy + 6, iTailFrame, (fPlayerFacingRight ? 0 : 26) + iOffsetY, 22, 26);
+	}
 }
 
 void CPlayer::DrawWings()
@@ -4500,15 +4510,18 @@ void CPlayer::SetPowerup(short iPowerup)
 	{
 		ifsoundonplay(sfx_collectfeather);
 		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
+		ClearPowerupStates();
 	}
 	else if(iPowerup == 7 || iPowerup == 8)
 	{
 		ifsoundonplay(sfx_collectpowerup);
 		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
+		ClearPowerupStates();
 	}
 	else
 	{
 		ifsoundonplay(sfx_collectpowerup);
+		ClearPowerupStates();
 	}
 
     if(iPowerup == 0)
@@ -4587,12 +4600,30 @@ void CPlayer::SetPowerup(short iPowerup)
 		{
 			if(game_values.pwingslimit > 0)
 				projectilelimit = game_values.pwingslimit;
+
+			flying = false;
 		}
 	}
 
 	//Minor fix for becoming caped to draw animation correctly
 	if(iPowerup == 3)
 		iCapeTimer = 4;
+}
+
+void CPlayer::ClearPowerupStates()
+{
+	iTailTimer = 0;
+	iTailState = 0;
+	iTailFrame = 0;
+
+	iSpinTimer = 0;
+	iSpinState = 0;
+
+	iWingsTimer = 0;
+	iWingsFrame = 0;
+
+	flying = false;
+	flyingtimer = 0;
 }
 
 void CPlayer::DecreaseProjectileLimit()

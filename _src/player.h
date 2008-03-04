@@ -161,6 +161,8 @@ class CPlayer
 
 		void DrawWings();
 
+		void ClearPowerupStates();
+
 		void xf(float xf){fx = xf; ix = (short)fx;};
  		void xi(short xi){ix = xi; fx = (float)ix;};
 		void yf(float yf){fy = yf; iy = (short)fy;};
@@ -463,20 +465,20 @@ class CPlayer
 
 		friend class PU_ExtraGuyPowerup;
 		friend class PU_StarPowerup;
-		friend class PU_FirePowerup;
-		friend class PU_HammerPowerup;
-		friend class PU_SledgeHammerPowerup;
-		friend class PU_PodoboPowerup;
+		//friend class PU_FirePowerup;
+		//friend class PU_HammerPowerup;
+		//friend class PU_SledgeHammerPowerup;
+		//friend class PU_PodoboPowerup;
 		friend class PU_PoisonPowerup;
-		friend class PU_ClockPowerup;
-		friend class PU_BobombPowerup;
-		friend class PU_PowPowerup;
-		friend class PU_ModPowerup;
-		friend class PU_BulletBillPowerup;
-		friend class PU_FeatherPowerup;
+		//friend class PU_ClockPowerup;
+		//friend class PU_BobombPowerup;
+		//friend class PU_PowPowerup;
+		//friend class PU_ModPowerup;
+		//friend class PU_BulletBillPowerup;
+		//friend class PU_FeatherPowerup;
 		friend class PU_MysteryMushroomPowerup;
         friend class PU_Tanooki;
-		friend class PU_BombPowerup;
+		//friend class PU_BombPowerup;
 		friend class PU_ExtraHeartPowerup;
 		friend class MysteryMushroomTempPlayer;
 		friend class PU_TreasureChestBonus;

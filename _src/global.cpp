@@ -514,6 +514,7 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.jail.style, NULL, game_values.gamemodemenusettings.jail.style, false);
 				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.jail.timetofree, NULL, game_values.gamemodemenusettings.jail.timetofree, false);
 				ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.jail.tagfree, 0, game_values.gamemodemenusettings.jail.tagfree);
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.jail.percentkey, NULL, game_values.gamemodemenusettings.jail.percentkey, false);
 			}
 			else if(ts->iMode == 4) //coins
 			{
@@ -559,6 +560,7 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 				ts->fUseSettings = true;
 				
 				ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.chicken.usetarget, 0, game_values.gamemodemenusettings.chicken.usetarget);
+				ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.chicken.glide, 0, game_values.gamemodemenusettings.chicken.glide);
 			}
 			else if(ts->iMode == 9) //tag
 			{
@@ -835,6 +837,12 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
 					sprintf(szTemp, ",%d", ts->gmsSettings.jail.tagfree);
 					strcat(buffer, szTemp);
 				}
+
+				if(ts->iNumUsedSettings > 3)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.jail.percentkey);
+					strcat(buffer, szTemp);
+				}
 			}
 			else if(ts->iMode == 4) //coins
 			{
@@ -936,6 +944,12 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
 				if(ts->iNumUsedSettings > 0)
 				{
 					sprintf(szTemp, ",%d", ts->gmsSettings.chicken.usetarget);
+					strcat(buffer, szTemp);
+				}
+
+				if(ts->iNumUsedSettings > 1)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.chicken.glide);
 					strcat(buffer, szTemp);
 				}
 			}

@@ -38,27 +38,29 @@
 2) In addition to getting a victory by number of points, there should be an option to win by have a certain number of points more than everyone else. This will help on maps where extra lives are a bit too abundant, or when one player is crushing the others.
 - Maybe - add "Mercy Rule" to end game as long as the victor has at least 50% of the goal points and he is X% above the other players like 150%, 200%, 250%, 300%, etc...
 
-1) Center flag game for CTF
-2) Chicken fly/glide option
-3) Fix countdown timer gfx -> Exploding eggs for yoshi's eggs mode -> when eggs spawn, they could have a timer and when it reaches 5 seconds, display how much time is left
+//BUG!! Throwing flags into flag bases and probably eggs to yoshi doens't work anymore because there is no collision detection between those items
 
 1) New ice wand powerup: Throwable shattering ice ball (maybe remotely triggered like the exploding boomerang) that shatters into crystals
 3) New SuperUp powerup to allow special behavior for hammer, fireball, boomerang, shells/blueblocks.  What key combo to use to activate special behavior?
-7) Settable disappear time for hidden blocks
 8) New empty hidden block
-9) Settable TTL for BTBs, GRBs and RTBs
 10) Bug! When you kill 2 players/bots rapidly one after another with the star and you have the announcer on, the invincibilty music stops.
 13) Other mode specific items - key for jail mode, berry for yoshi's egg mode, coin for coin/greed mode, coin bag greed mode
 15) Menu options for limits on new powerups bombs, leaf, tanooki, sledge, pwings, etc.
+9) Settable TTL for GRBs and RTBs
 17) Finish removing old AFE codes from game
-19) On/Off switch controlled moving platforms?  See if this is feasible.
 */
+
+//BUG!! When players are in the middle of using pwings/tail/cape and they jump into a kuribo's shoe, the state of their powerup doesn't get cleared!
+//TEST!! When chicken, get various powerups and use them along side the glide ability
+//TEST!! New Jail Key
+//BUG!! Need to get gfx for jail key
 
 /*
 Checkin:
-1) Added feature to allow hidden blocks to rehide after a specified time
-2) Fixed bug where running over 1x1 tile gaps wasn't working correctly with hidden blocks
-3) Added 3 new map filters for item destroyable blocks, hidden blocks, and map hazards
+1) Fixed gfx for exploding eggs for yoshi's eggs mode and now use an better animated egg from sgraff
+2) Updated spawn egg gfx to use an animation
+3) Added glide option to chicken in chicken mode (unlimited leaf powerup for player that is the chicken)
+4) Added new jail key item to jail mode
 */
 
 #ifdef _XBOX
@@ -205,6 +207,7 @@ gfxSprite		spr_pwingspowerup;
 gfxSprite       spr_tanooki, spr_statue;
 gfxSprite		spr_extraheartpowerup;
 gfxSprite		spr_extratimepowerup;
+gfxSprite		spr_jailkeypowerup;
 
 gfxSprite		spr_shade[3];
 gfxSprite		spr_scorehearts;
@@ -315,6 +318,8 @@ short			scorepowerupoffsets[3][3] = {{37, 0, 0},
 											{71, 89, 0},
 											{105, 123, 141}};
 short			respawn[4] = {0, 0, 0, 0};
+short			respawnanimationtimer[4] = {0, 0, 0, 0};
+short			respawnanimationframe[4] = {0, 0, 0, 0};
 
 short			projectiles[4];
 
@@ -904,6 +909,7 @@ int main(int argc, char *argv[])
 	game_values.gamemodemenusettings.jail.style = 1;			//defaults to color jail play
 	game_values.gamemodemenusettings.jail.tagfree = true;		//players on same team can free player by touching
 	game_values.gamemodemenusettings.jail.timetofree = 1240;   //20 seconds of jail
+	game_values.gamemodemenusettings.jail.percentkey = 30;		//30% chance of a key spawning
 
 	//Coins
 	game_values.gamemodemenusettings.coins.penalty = false;		//no penalty for getting stomped
@@ -917,12 +923,12 @@ int main(int argc, char *argv[])
 	game_values.gamemodemenusettings.stomp.enemyweight[3] = 1;
 
 	//Eggs
-	game_values.gamemodemenusettings.egg.eggs[0] = 1;
-	game_values.gamemodemenusettings.egg.eggs[1] = 0;
+	game_values.gamemodemenusettings.egg.eggs[0] = 0;
+	game_values.gamemodemenusettings.egg.eggs[1] = 1;
 	game_values.gamemodemenusettings.egg.eggs[2] = 0;
 	game_values.gamemodemenusettings.egg.eggs[3] = 0;
-	game_values.gamemodemenusettings.egg.yoshis[0] = 1;
-	game_values.gamemodemenusettings.egg.yoshis[1] = 0;
+	game_values.gamemodemenusettings.egg.yoshis[0] = 0;
+	game_values.gamemodemenusettings.egg.yoshis[1] = 1;
 	game_values.gamemodemenusettings.egg.yoshis[2] = 0;
 	game_values.gamemodemenusettings.egg.yoshis[3] = 0;
 	game_values.gamemodemenusettings.egg.explode = 0;  //Exploding eggs is turned off by default
@@ -937,6 +943,7 @@ int main(int argc, char *argv[])
 
 	//Chicken
 	game_values.gamemodemenusettings.chicken.usetarget = true;  //default to displaying a target around the chicken
+	game_values.gamemodemenusettings.chicken.glide = false;		//don't give the chicken the ability to glide
 
 	//Tag
 	game_values.gamemodemenusettings.tag.tagontouch = true;  //default to transfer tag on touching other players
@@ -2569,10 +2576,22 @@ void RunGame()
 					{
 						short globalID = game_values.teamids[i][k];
 
-						//If player is respawning, draw the egg
+						//If player is respawning, draw an animated egg counter
 						if(respawn[globalID] > 0 && !game_values.gamemode->gameover)
 						{
-							spr_spawneggs.draw(score[i]->x + scoreoffsets[k], score[i]->y + 2, ((respawn[globalID] - 1) >> 1) * 32, game_values.colorids[globalID] * 32, 32, 32);
+							if(++respawnanimationtimer[globalID] > 8)
+							{
+								respawnanimationtimer[globalID] = 0;
+								respawnanimationframe[globalID] += 32;
+
+								if(respawnanimationframe[globalID] > 32)
+									respawnanimationframe[globalID] = 0;
+							}
+
+							short scorex = score[i]->x + scoreoffsets[k];
+							short scorey = score[i]->y + 2;
+							spr_egg.draw(scorex, scorey, respawnanimationframe[globalID], game_values.colorids[globalID] << 5, 32, 32);
+							spr_eggnumbers.draw(scorex, scorey, ((respawn[globalID] - 1) >> 1) << 5, game_values.colorids[globalID] << 5, 32, 32);
 						}
 						else  //otherwise draw the player's skin in the scoreboard
 						{
