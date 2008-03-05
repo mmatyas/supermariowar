@@ -239,7 +239,7 @@ bool MapList::startswith(std::string match)
 		if(iMatchLen > iMapNameLen)
 			continue;
 
-		for(short iIndex = 0; iIndex < iMapNameLen; iIndex++)
+		for(short iIndex = 0; iIndex < iMatchLen && iIndex < iMapNameLen; iIndex++)
 		{
 			if(tolower(szMapName[iIndex]) == tolower(match[iIndex]))
 				continue;

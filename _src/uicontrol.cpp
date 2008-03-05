@@ -2233,6 +2233,37 @@ MenuCodeEnum MI_MapField::Modify(bool modify)
 
 MenuCodeEnum MI_MapField::SendInput(CPlayerInput * playerInput)
 {
+	short iPressedKey = playerInput->iPressedKey;
+
+	if(iPressedKey > 0)
+	{
+		if((iPressedKey >= SDLK_a && iPressedKey <= SDLK_z) ||
+			(iPressedKey >= SDLK_0 && iPressedKey <= SDLK_9) ||
+			iPressedKey == SDLK_MINUS || iPressedKey == SDLK_EQUALS)
+		{
+			short iOldIndex = maplist.GetCurrent()->second->iIndex;
+			
+			//maplist.startswith((char)playerInput->iPressedKey);
+
+			sSearchString += (char)iPressedKey;
+			iSearchStringTimer = 10;
+
+			if(!maplist.startswith(sSearchString.c_str()))
+			{
+				sSearchString = "";
+				iSearchStringTimer = 0;
+			}
+			
+			if(iOldIndex != maplist.GetCurrent()->second->iIndex)
+			{
+				LoadCurrentMap();
+				return MENU_CODE_MAP_CHANGED;
+			}
+			
+			return MENU_CODE_NONE;
+		}
+	}
+
 	/*
 	if(playerInput->iPressedKey > 0)
 	{
@@ -2336,37 +2367,6 @@ MenuCodeEnum MI_MapField::SendInput(CPlayerInput * playerInput)
 			fModifying = false;
 
 			return MENU_CODE_UNSELECT_ITEM;
-		}
-	}
-
-	short iPressedKey = playerInput->iPressedKey;
-
-	if(iPressedKey > 0)
-	{
-		if((iPressedKey >= SDLK_a && iPressedKey <= SDLK_z) ||
-			(iPressedKey >= SDLK_0 && iPressedKey <= SDLK_9))
-		{
-			short iOldIndex = maplist.GetCurrent()->second->iIndex;
-			
-			
-			//maplist.startswith((char)playerInput->iPressedKey);
-
-			sSearchString += (char)iPressedKey;
-			iSearchStringTimer = 20;
-
-			if(!maplist.startswith(sSearchString.c_str()))
-			{
-				sSearchString = "";
-				iSearchStringTimer = 0;
-			}
-			
-			if(iOldIndex != maplist.GetCurrent()->second->iIndex)
-			{
-				LoadCurrentMap();
-				return MENU_CODE_MAP_CHANGED;
-			}
-			
-			return MENU_CODE_NONE;
 		}
 	}
 
@@ -2480,7 +2480,7 @@ void MI_MapField::Draw()
 	miModifyImageLeft->Draw();
 	miModifyImageRight->Draw();
 
-	menu_font_large.drawCentered(320, 240, sSearchString.c_str());
+	//menu_font_large.draw(rectDst.x, rectDst.y, sSearchString.c_str());
 }
 
 void MI_MapField::LoadCurrentMap()

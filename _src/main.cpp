@@ -49,15 +49,6 @@
 
 /*
 Checkin:
-1) Fixed bugs with jail gfx
-2) Updated rotodisc gfx to include all the animation frames
-3) Updated  menu to include limit fields for leaf, pwings, bomb, tanooki and wand (not yet developed)
-4) Moved weapon limits options to a seperate menu from the projectile settings menu
-5) Removed all of the special moves from AFE
-6) Removed super kick for shells and blocks but added a small amount of velocity depending on how fast the player is moving
-7) Added both a left and right direction for the goomba enemy
-8) Fixed invincibility music so it doesn't pause when you pause or start to exit the game
-9) Added ability to search map field for more than just a single character by typing multiple chars
 */
 
 #ifdef _XBOX
