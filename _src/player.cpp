@@ -53,8 +53,6 @@ CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamI
 
 	iSuicideCreditPlayerID = -1;
 	iSuicideCreditTimer = 0;
-
-	konamiIndex = 0;
 }
 
 CPlayer::~CPlayer()
@@ -79,9 +77,9 @@ void CPlayer::move()
 		(playerKeys->game_turbo.fPressed?16:0) |
 		(playerKeys->game_powerup.fPressed?32:0);
 
+	/*
 	if(game_values.secrets)
 	{
-		/*
 		for(short bossType = 0; bossType < 3; bossType++)
 		{
 			if(game_values.bosspeeking == bossType)
@@ -107,9 +105,8 @@ void CPlayer::move()
 			{
 				boss_index[bossType] = 0;
 			}
-		}*/
+		}
 
-		/*
 		if (konamiIndex < 11)
 		{
 			static const int konami_code[11] = {1,1,2,2,4,8,4,8,48,48,48};
@@ -125,157 +122,13 @@ void CPlayer::move()
 				ifsoundonplay(sfx_transform); 
 				g_tanookiFlag++; 
 			}
-		}*/
+		}
 
 		//Super kick shells and BTBs
 		if(keymask & 2)
 			superKickIndex++;
 		else if(keymask & ~2)
 			superKickIndex = 0;
-
-		if (powerup == 2)
-		{
-			static const int super_hammer_throw_code_left[4] = {8, 8, 4, 16};
-		    
-			if (keymask & super_hammer_throw_code_left[super_hammer_throw_left_index]) 
-				super_hammer_throw_left_index++;
-			else if (keymask & ~super_hammer_throw_code_left[super_hammer_throw_left_index])
-				super_hammer_throw_left_index = 0;
-		    
-			if (super_hammer_throw_left_index >= 4)
-			{
-				super_hammer_throw_left_index = 0;
-				shoot_left_super_hammer = true;
-			}
-
-			static const int super_hammer_throw_code_right[4] = {4, 4, 8, 16};
-		        
-			if (keymask & super_hammer_throw_code_right[super_hammer_throw_right_index]) 
-				super_hammer_throw_right_index++;
-			else if (keymask & ~super_hammer_throw_code_right[super_hammer_throw_right_index])
-				super_hammer_throw_right_index = 0;
-		    
-			if (super_hammer_throw_right_index >= 4)
-			{
-				super_hammer_throw_right_index = 0;
-				shoot_right_super_hammer = true;
-			}
-		}
-		else
-		{
-			super_hammer_throw_left_index = 0;
-			super_hammer_throw_right_index = 0;
-
-			shoot_left_super_hammer = false;
-			shoot_right_super_hammer = false;
-		}
-
-		if (powerup == 5)
-		{
-			static const int super_sledge_hammer_throw_code[3] = {2, 2, 16};
-		    
-			if (keymask & super_sledge_hammer_throw_code[super_sledge_hammer_throw_index]) 
-				super_sledge_hammer_throw_index++;
-			else if (keymask & ~super_sledge_hammer_throw_code[super_sledge_hammer_throw_index])
-				super_sledge_hammer_throw_index = 0;
-		    
-			if (super_sledge_hammer_throw_index >= 3)
-			{
-				super_sledge_hammer_throw_index = 0;
-				shoot_super_sledge_hammer = true;
-			}
-		}
-		else
-		{
-			super_sledge_hammer_throw_index = 0;
-			shoot_super_sledge_hammer = false;
-		}
-
-		if (powerup == 4)
-		{
-			if(playerKeys->game_left.fDown)
-			{
-				holdleft++;
-				holdlefttolerance = 0;
-			}
-			else if(holdleft >= 60 && holdlefttolerance < 15)
-			{
-				holdlefttolerance++;
-			}
-			else
-			{
-				holdleft = 0;
-				holdlefttolerance = 0;
-				super_boomerang_throw_index_right = 0;
-			}
-
-			if(playerKeys->game_right.fDown)
-			{
-				holdright++;
-				holdrighttolerance = 0;
-			}
-			else if(holdright >= 60 && holdrighttolerance < 15)
-			{
-				holdrighttolerance++;
-			}
-			else
-			{
-				holdright = 0;
-				holdrighttolerance = 0;
-				super_boomerang_throw_index_left = 0;
-			}
-
-			if(holdleft >= 60)
-			{
-				static const int super_boomerang_throw_code_right[2] = {8, 16};
-		    
-				if (keymask & super_boomerang_throw_code_right[super_boomerang_throw_index_right]) 
-					super_boomerang_throw_index_right++;
-				else if (keymask & ~super_boomerang_throw_code_right[super_boomerang_throw_index_right])
-					super_boomerang_throw_index_right = 0;
-				
-				if (super_boomerang_throw_index_right >= 2)
-				{
-					super_boomerang_throw_index_right = 0;
-					shoot_super_boomerang = true;
-				}
-			}
-
-			if(holdright >= 60)
-			{
-				static const int super_boomerang_throw_code_left[2] = {4, 16};
-		    
-				if (keymask & super_boomerang_throw_code_left[super_boomerang_throw_index_left]) 
-					super_boomerang_throw_index_left++;
-				else if (keymask & ~super_boomerang_throw_code_left[super_boomerang_throw_index_left])
-					super_boomerang_throw_index_left = 0;
-				
-				if (super_boomerang_throw_index_left >= 2)
-				{
-					super_boomerang_throw_index_left = 0;
-					shoot_super_boomerang = true;
-				}
-			}
-		}
-		else
-		{
-			holdleft = 0;
-			holdlefttolerance = 0;
-			
-			holdright = 0;
-			holdrighttolerance = 0;
-
-			super_boomerang_throw_index_left = 0;
-			super_boomerang_throw_index_right = 0;
-
-			shoot_super_boomerang = false;
-		}
-
-		if(game_values.superboomerang[globalID] == 1)
-		{
-			if(keymask & 16)
-				game_values.superboomerang[globalID] = 2;
-		}
 
 		int keymaskdown =
 			(playerKeys->game_jump.fDown?1:0) |
@@ -284,48 +137,6 @@ void CPlayer::move()
 			(playerKeys->game_right.fDown?8:0) |
 			(playerKeys->game_turbo.fDown?16:0) |
 			(playerKeys->game_powerup.fDown?32:0);
-
-		//Shoot super fireball
-		if(powerup == 1)
-		{
-			static const int ryu_fireball_code_left[4] = {2,6,4,20};
-
-			if (keymaskdown == ryu_fireball_code_left[ryu_fireball_index_left])
-				ryu_fireball_index_left++;
-			else if(ryu_fireball_index_left > 0 && keymaskdown == ryu_fireball_code_left[ryu_fireball_index_left - 1])
-			{}
-			else
-				ryu_fireball_index_left = 0;
-		    
-			if (ryu_fireball_index_left >= 4)
-			{
-				ryu_fireball_index_left = 0;
-				shoot_left_fireball = true;
-			}
-
-			static const int ryu_fireball_code_right[4] = {2,10,8,24};
-
-			if (keymaskdown == ryu_fireball_code_right[ryu_fireball_index_right])
-				ryu_fireball_index_right++;
-			else if(ryu_fireball_index_right > 0 && keymaskdown == ryu_fireball_code_right[ryu_fireball_index_right - 1])
-			{}
-			else
-				ryu_fireball_index_right = 0;
-		    
-			if (ryu_fireball_index_right >= 4)
-			{
-				ryu_fireball_index_right = 0;
-				shoot_right_fireball = true;
-			}
-		}
-		else
-		{
-			shoot_left_fireball = false;
-			shoot_right_fireball = false;
-
-			ryu_fireball_index_left = 0;
-			ryu_fireball_index_right = 0;
-		}
 
 		//Invincible Dash
 		if(invincible)
@@ -364,6 +175,8 @@ void CPlayer::move()
 			dashLeft = false;
 			dashRight = false;
 		}
+
+		//Keep this code -> good for items that destroy blocks on the map
 
 		//Active Super POW destroys and triggers blocks
 		if(super_pow && (game_values.screenshaketimer > 0 || powerupused == 9))
@@ -458,8 +271,6 @@ void CPlayer::move()
 				super_mod = true;
 			}
 		}
-
-		/*
 		if(game_values.gamemode->gamemode == game_mode_stomp && !game_values.redkoopas)
 		{
 			if (redKoopaIndex < 7)
@@ -477,9 +288,8 @@ void CPlayer::move()
 					game_values.redkoopas = true; 
 				}
 			}
-		}*/
+		}
 
-		/*
 		if(!game_values.redthrowblocks)
 		{
 			if (redThrowBlockIndex < 8)
@@ -506,9 +316,8 @@ void CPlayer::move()
 				}
 			}
 		}
-		*/
 
-		/*
+
 		//Keep this code for later reference:
 		//It is good code to swap out blocks on the fly
 		if(!game_values.viewblocks)
@@ -548,9 +357,7 @@ void CPlayer::move()
 				}
 			}
 		}
-		*/
 
-		/*
 		if (secret_spring_index < 9)
 		{
 			static const int secret_spring_code[9] = {2,1,2,1,2,1,2,2,16};
@@ -582,8 +389,7 @@ void CPlayer::move()
 				objectcontainer[1].add(new CO_Spike(&spr_spike));
 			}
 		}
-		*/
-	}
+	}*/
 
 	//Free player from the kuribo shoe
 	if (fKuriboShoe && state == player_ready)
@@ -1060,11 +866,18 @@ void CPlayer::move()
 				{
 					powerup = -1;
 					
-					jailtimer = 0;
-					jail = -1;
+					if(jailtimer > 0)
+					{
+						jailtimer = 0;
+						jail = -1;
 
-					eyecandyfront.add(new EC_SingleAnimation(&spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
-					ifsoundonplay(sfx_transform);
+						eyecandyfront.add(new EC_SingleAnimation(&spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
+						ifsoundonplay(sfx_transform);
+					}
+					else
+					{
+						ifsoundonplay(sfx_hit);
+					}
 				
 					break;
 				}
@@ -1103,6 +916,8 @@ void CPlayer::move()
 		{
 			frozentimer = 0;
 			frozen = false;
+
+			eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
 		}
 	}
 
@@ -1377,52 +1192,25 @@ void CPlayer::move()
 						{
 							if(game_values.fireballlimit == 0 || projectilelimit > 0)
 							{
-								if(shoot_left_fireball)
-								{
-									objectcontainer[2].add(new MO_SuperFireball(&spr_superfireball, ix + HALFPW - 30, iy + HALFPH - 16, 4, -6.0f, 0.0f, 4, globalID, teamID, colorID));
-									ifsoundonplay(sfx_spit); 
-								}
-								else if(shoot_right_fireball)
-								{
-									objectcontainer[2].add(new MO_SuperFireball(&spr_superfireball, ix + HALFPW - 2, iy + HALFPH - 16, 4, 6.0f, 0.0f, 4, globalID, teamID, colorID));
-									ifsoundonplay(sfx_spit); 
-								}
-								else
-								{
-									objectcontainer[0].add(new MO_Fireball(&spr_fireball, ix + 6, iy, 4, IsPlayerFacingRight(), 5, globalID, teamID, colorID));
-									ifsoundonplay(sfx_fireball);
-								}
+								objectcontainer[0].add(new MO_Fireball(&spr_fireball, ix + 6, iy, 4, IsPlayerFacingRight(), 5, globalID, teamID, colorID));
+								ifsoundonplay(sfx_fireball);
 
 								projectiles[globalID]++;
 							}
 
 							if(game_values.fireballlimit > 0)
-							{
 								DecreaseProjectileLimit();
-							}
 						}
 						else if(powerup == 2 && projectiles[globalID] < 2 && hammertimer == 0)
 						{
 							if(game_values.hammerlimit == 0 || projectilelimit > 0)
 							{
-								if(shoot_left_super_hammer || shoot_right_super_hammer)
-								{
-									shoot_left_super_hammer = false;
-									shoot_right_super_hammer = false;
-									objectcontainer[2].add(new MO_Hammer(&spr_hammer, ix + 6, iy, 6, (IsPlayerFacingRight() ? 5.0f : -5.0f), -1.0f, 5, globalID, teamID, colorID, true));
-									objectcontainer[2].add(new MO_Hammer(&spr_hammer, ix + 6, iy, 6, (IsPlayerFacingRight() ? 5.0f : -5.0f), 0.0f, 5, globalID, teamID, colorID, true));
-									objectcontainer[2].add(new MO_Hammer(&spr_hammer, ix + 6, iy, 6, (IsPlayerFacingRight() ? 5.0f : -5.0f), 1.0f, 5, globalID, teamID, colorID, true));
-									projectiles[globalID] += 3;
-								}
+								if(IsPlayerFacingRight())
+									objectcontainer[2].add(new MO_Hammer(&spr_hammer, ix + 8, iy, 6, velx + 2.0f, -HAMMERTHROW, 5, globalID, teamID, colorID, false));
 								else
-								{
-									if(IsPlayerFacingRight())
-										objectcontainer[2].add(new MO_Hammer(&spr_hammer, ix + 8, iy, 6, velx + 2.0f, -HAMMERTHROW, 5, globalID, teamID, colorID, false));
-									else
-										objectcontainer[2].add(new MO_Hammer(&spr_hammer, ix - 14, iy, 6, velx - 2.0f, -HAMMERTHROW, 5, globalID, teamID, colorID, false));
+									objectcontainer[2].add(new MO_Hammer(&spr_hammer, ix - 14, iy, 6, velx - 2.0f, -HAMMERTHROW, 5, globalID, teamID, colorID, false));
 
-									projectiles[globalID]++;
-								}
+								projectiles[globalID]++;
 								
 								hammertimer = game_values.hammerdelay;
 								ifsoundonplay(sfx_fireball);
@@ -1446,13 +1234,8 @@ void CPlayer::move()
 						{
 							if(game_values.boomeranglimit == 0 || projectilelimit > 0)
 							{
-								objectcontainer[2].add(new MO_Boomerang(&spr_boomerang, ix, iy + HALFPH - 16, 4, IsPlayerFacingRight(), 5, globalID, teamID, colorID, shoot_super_boomerang));
+								objectcontainer[2].add(new MO_Boomerang(&spr_boomerang, ix, iy + HALFPH - 16, 4, IsPlayerFacingRight(), 5, globalID, teamID, colorID));
 								projectiles[globalID]++;
-
-								if(shoot_super_boomerang)
-									game_values.superboomerang[globalID] = 1;
-
-								shoot_super_boomerang = false;
 							}
 
 							if(game_values.boomeranglimit > 0)
@@ -1461,22 +1244,19 @@ void CPlayer::move()
 						}
 						else if(powerup == 5 && projectiles[globalID] < 1 && hammertimer == 0)
 						{
-							if(game_values.hammerlimit == 0 || projectilelimit > 0)
+							if(game_values.wandlimit == 0 || projectilelimit > 0)
 							{
 								if(IsPlayerFacingRight())
-									objectcontainer[2].add(new MO_SledgeHammer(&spr_sledgehammer, ix + 8, iy, 8, velx + 2.0f, -HAMMERTHROW, 5, globalID, teamID, colorID, shoot_super_sledge_hammer));
+									objectcontainer[2].add(new MO_IceBlast(&spr_iceblast, ix + HALFPW - 2, iy + HALFPH - 16, 5.0f, globalID, teamID, colorID));
 								else
-									objectcontainer[2].add(new MO_SledgeHammer(&spr_sledgehammer, ix - 18, iy, 8, velx - 2.0f, -HAMMERTHROW, 5, globalID, teamID, colorID, shoot_super_sledge_hammer));
+									objectcontainer[2].add(new MO_IceBlast(&spr_iceblast, ix + HALFPW - 30, iy + HALFPH - 16, -5.0f, globalID, teamID, colorID));
 
-								shoot_super_sledge_hammer = false;
-
-								hammertimer = game_values.hammerdelay;
 								projectiles[globalID]++;
 								
-								ifsoundonplay(sfx_fireball);
+								ifsoundonplay(sfx_transform);
 							}
 
-							if(game_values.hammerlimit > 0)
+							if(game_values.wandlimit > 0)
 								DecreaseProjectileLimit();
 
 						}
@@ -1528,7 +1308,7 @@ void CPlayer::move()
 						if(carriedItem->getMovingObjectType() == movingobject_shell || carriedItem->getMovingObjectType() == movingobject_throwblock)
 							carriedItem->MoveToOwner();
 
-						carriedItem->Kick(superKickIndex > 1);
+						carriedItem->Kick();
 					}
 
 					carriedItem = NULL;
@@ -1555,15 +1335,10 @@ void CPlayer::move()
 			}
 		}
 
-		shoot_left_fireball = false;
-		shoot_right_fireball = false;
-
 		if(lrn == 1)
 		{
 			if(onice)
 				velx += VELMOVINGADDICE;
-			else if(dashRight)
-				velx += VELDASHADD;
 			else
 				velx += VELMOVINGADD;		//move right
 
@@ -1572,8 +1347,6 @@ void CPlayer::move()
 			{
 				if((game_values.slowdownon != -1 && game_values.slowdownon != teamID) || jailtimer > 0)
 					maxVel = VELSLOWMOVING;
-				else if(dashRight)
-					maxVel = VELDASHMOVING;
 				else if(playerKeys->game_turbo.fDown)
 					maxVel = VELTURBOMOVING + (game_values.gamemode->tagged == this ? TAGGEDBOOST : 0.0f);
 				else
@@ -1600,8 +1373,6 @@ void CPlayer::move()
 		{
 			if(onice)
 				velx -= VELMOVINGADDICE;
-			else if(dashLeft)
-				velx -= VELDASHADD;
 			else
 				velx -= VELMOVINGADD;		//move left
 
@@ -1610,8 +1381,6 @@ void CPlayer::move()
 			{
 				if((game_values.slowdownon != -1 && game_values.slowdownon != teamID) || jailtimer > 0)
 					maxVel = -VELSLOWMOVING;
-				else if(dashLeft)
-					maxVel = -VELDASHMOVING;
 				else if(playerKeys->game_turbo.fDown)
 					maxVel = -VELTURBOMOVING - (game_values.gamemode->tagged == this ? TAGGEDBOOST : 0.0f);
 				else
@@ -2158,12 +1927,6 @@ void CPlayer::SetupNewPlayer()
     statue_lock = false;
     statue_timer = 0;
 
-	//Only reset the tanooki index if it hasn't been triggered yet
-	if(konamiIndex != 11)
-		konamiIndex = 0;
-
-	superKickIndex = 0;
-
 	invincible = false;
 	invincibletimer = 0;
 
@@ -2177,51 +1940,9 @@ void CPlayer::SetupNewPlayer()
 	killsinrowinair = 0;
 	awardangle = 0.0f;
 	extrajumps = 0;
-	holdleft = 0;
-	holdlefttolerance = 0;
-	holdright = 0;
-	holdrighttolerance = 0;
 	
 	ClearPowerupStates();
-
-	ryu_fireball_index_left = 0;
-	ryu_fireball_index_right = 0;
-	shoot_left_fireball = false;
-	shoot_right_fireball = false;
-
-	super_hammer_throw_left_index = 0;
-	super_hammer_throw_right_index = 0;
-	shoot_left_super_hammer = false;
-	shoot_right_super_hammer = false;
-
-	super_sledge_hammer_throw_index = 0;
-	shoot_super_sledge_hammer = false;
-
-	super_boomerang_throw_index_left = 0;
-	super_boomerang_throw_index_right = 0;
-	shoot_super_boomerang = false;
-
-	super_pow_index = 0;
-	super_pow = false;
-	super_pow_timer = 0;
-
-	super_mod_index = 0;
-	super_mod = false;
-	super_mod_timer = 0;
-
-	dashLeftIndex = 0;
-	dashRightIndex = 0;
-	dashLeft = false;
-	dashRight = false;
-	dashSparkleAnimationTimer = 0;
-
-	redKoopaIndex = 0;
-	redThrowBlockIndex = 0;
-	viewBlockIndex = 0;
 	
-	for(short bossType = 0; bossType < 3; bossType++)
-		boss_index[bossType] = 0;
-
 	iCapeTimer = 0;
 	iCapeFrameX = 0;
 	iCapeFrameY = 0;
@@ -3066,19 +2787,6 @@ void CPlayer::draw()
 				spr_storedpowerupsmall.draw(powerupX, powerupY, powerupused * 16, 0, 16, 16, (short)state %4, warpplane);
 			else
 				spr_storedpowerupsmall.draw(powerupX, powerupY, powerupused * 16, 0, 16, 16);
-		}
-	}
-
-
-	//game_font_large.drawf(ix, iy, "%d", super_boomerang_throw_index_left);
-	//game_font_large.drawf(ix, iy + 24, "%d", holdright);
-
-	if((dashLeft && velx < -VELDASHMOVING + 1) || (dashRight && velx > VELDASHMOVING - 1))
-	{
-		if(++dashSparkleAnimationTimer > 2)
-		{
-			dashSparkleAnimationTimer = 0;
-			eyecandyfront.add(new EC_SingleAnimation(&spr_coinsparkle, ix + HALFPW - 16, iy + HALFPH - 16, 7, 4));
 		}
 	}
 }
@@ -4431,8 +4139,13 @@ void CPlayer::makeinvincible()
 
 void CPlayer::makefrozen(short iTime)
 {
-	frozen = true;
-	frozentimer = iTime;
+	if(!frozen)
+	{
+		frozen = true;
+		frozentimer = iTime;
+
+		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
+	}
 }
 
 void CPlayer::turnslowdownon()

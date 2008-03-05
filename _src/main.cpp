@@ -35,32 +35,29 @@
 //4) Still reports of disappearing map tiles - caused when rRects is used out of bounds causing w and h to be set to 0 - happened with platform with tile using row 960
 
 /*
-2) In addition to getting a victory by number of points, there should be an option to win by have a certain number of points more than everyone else. This will help on maps where extra lives are a bit too abundant, or when one player is crushing the others.
-- Maybe - add "Mercy Rule" to end game as long as the victor has at least 50% of the goal points and he is X% above the other players like 150%, 200%, 250%, 300%, etc...
-
 //BUG!! Throwing flags into flag bases and probably eggs to yoshi doens't work anymore because there is no collision detection between those items
+//      I was never a big fan of this feature, we'll see if anyone complains
 
-1) New ice wand powerup: Throwable shattering ice ball (maybe remotely triggered like the exploding boomerang) that shatters into crystals
-3) New SuperUp powerup to allow special behavior for hammer, fireball, boomerang, shells/blueblocks.  What key combo to use to activate special behavior?
-8) New empty hidden block
+1) New ice wand powerup: Need new gfx from sgraff
 10) Bug! When you kill 2 players/bots rapidly one after another with the star and you have the announcer on, the invincibilty music stops.
-13) Other mode specific items - key for jail mode, berry for yoshi's egg mode, coin for coin/greed mode, coin bag greed mode
-15) Menu options for limits on new powerups bombs, leaf, tanooki, sledge, pwings, etc.
-9) Settable TTL for GRBs and RTBs
-17) Finish removing old AFE codes from game
-*/
 
-//BUG!! When players are in the middle of using pwings/tail/cape and they jump into a kuribo's shoe, the state of their powerup doesn't get cleared!
-//TEST!! When chicken, get various powerups and use them along side the glide ability
-//TEST!! New Jail Key
-//BUG!! Need to get gfx for jail key
+[ ] Other mode specific items - berry for yoshi's egg mode, coin for coin/greed mode, coin bag greed mode
+[ ] Add new hammer bros/paratroopa/paragoomba/etc. enemies to stomp
+[ ] Input bug: if the menu select key is mapped to a letter, but then you select a map and press that letter to select the map, it won't select, but jump to the maps that begin with that letter!
+
+*/
 
 /*
 Checkin:
-1) Fixed gfx for exploding eggs for yoshi's eggs mode and now use an better animated egg from sgraff
-2) Updated spawn egg gfx to use an animation
-3) Added glide option to chicken in chicken mode (unlimited leaf powerup for player that is the chicken)
-4) Added new jail key item to jail mode
+1) Fixed bugs with jail gfx
+2) Updated rotodisc gfx to include all the animation frames
+3) Updated  menu to include limit fields for leaf, pwings, bomb, tanooki and wand (not yet developed)
+4) Moved weapon limits options to a seperate menu from the projectile settings menu
+5) Removed all of the special moves from AFE
+6) Removed super kick for shells and blocks but added a small amount of velocity depending on how fast the player is moving
+7) Added both a left and right direction for the goomba enemy
+8) Fixed invincibility music so it doesn't pause when you pause or start to exit the game
+9) Added ability to search map field for more than just a single character by typing multiple chars
 */
 
 #ifdef _XBOX
@@ -190,7 +187,7 @@ gfxSprite		spr_3uppowerup;
 gfxSprite		spr_5uppowerup;
 gfxSprite		spr_firepowerup;
 gfxSprite		spr_hammerpowerup;
-gfxSprite		spr_sledgehammerpowerup;
+gfxSprite		spr_icewandpowerup;
 gfxSprite		spr_podobopowerup;
 gfxSprite		spr_poisonpowerup;
 gfxSprite		spr_mysterymushroompowerup;
@@ -251,8 +248,8 @@ gfxSprite		spr_goomba;
 gfxSprite		spr_goombadead;
 gfxSprite		spr_goombadeadflying;
 gfxSprite		spr_koopa;
-gfxSprite		spr_sledgebrothers;
-gfxSprite		spr_sledgebrothersdead;
+//gfxSprite		spr_sledgebrothers;
+//gfxSprite		spr_sledgebrothersdead;
 gfxSprite		spr_redkoopa;
 gfxSprite		spr_cheepcheep;
 gfxSprite		spr_cheepcheepdead;
@@ -260,9 +257,9 @@ gfxSprite		spr_bulletbill;
 gfxSprite		spr_bulletbilldead;
 
 gfxSprite		spr_fireball;
-gfxSprite		spr_superfireball;
+//gfxSprite		spr_superfireball;
 gfxSprite		spr_hammer;
-gfxSprite		spr_sledgehammer;
+gfxSprite		spr_iceblast;
 gfxSprite		spr_boomerang;
 gfxSprite		spr_shell;
 gfxSprite		spr_shelldead;
@@ -640,7 +637,7 @@ void LoadMapObjects(bool fPreview);
 void LoadMapHazards(bool fPreview);
 void UpdateScoreBoard();
 void PlayNextMusicTrack();
-void EnterBossMode(short type);
+//void EnterBossMode(short type);
 bool IsExitAllowed();
 bool IsPauseAllowed();
 
@@ -789,6 +786,9 @@ int main(int argc, char *argv[])
 	game_values.featherlimit		= 0;	//Unlimited
 	game_values.leaflimit			= 0;	//Unlimited
 	game_values.pwingslimit			= 0;	//Unlimited
+	game_values.tanookilimit		= 0;	//Unlimited
+	game_values.bombslimit			= 0;	//Unlimited
+	game_values.wandlimit			= 0;	//Unlimited
 	game_values.storedpowerupdelay	= 4;
 	game_values.bonuswheel			= 1;
 	game_values.keeppowerup			= false;
@@ -796,7 +796,6 @@ int main(int argc, char *argv[])
 	game_values.playnextmusic		= false;
 	game_values.pointspeed			= 20;
 	game_values.swapstyle			= 1;	//Blink then swap
-	game_values.secrets				= true; //enable secrets by default
 	game_values.worldpointsbonus	= -1; //no world multiplier until player uses item to boost it
 	game_values.singleplayermode	= -1;
 	game_values.worldskipscoreboard = false;
@@ -836,7 +835,6 @@ int main(int argc, char *argv[])
 		game_values.skinids[iPlayer] = 0;
 		game_values.colorids[iPlayer] = iPlayer;
 		game_values.randomskin[iPlayer] = false;
-		game_values.superboomerang[iPlayer] = 0;
 
 		projectiles[iPlayer] = 0;
 		respawn[iPlayer] = 0;
@@ -1069,7 +1067,6 @@ int main(int argc, char *argv[])
 			game_values.playnextmusic = ((short)abyte[23] > 0 ? true : false);
 			game_values.pointspeed = (short)abyte[24];
 			game_values.swapstyle = (short)abyte[25];
-			game_values.secrets = ((short)abyte[27] > 0 ? true : false);
 			game_values.overridepowerupsettings = (short)abyte[28];
 			
 			fread(&game_values.spawninvincibility, sizeof(short), 1, fp);
@@ -1088,8 +1085,13 @@ int main(int argc, char *argv[])
 			fread(&game_values.featherlimit, sizeof(short), 1, fp);
 			fread(&game_values.leaflimit, sizeof(short), 1, fp);
 			fread(&game_values.pwingslimit, sizeof(short), 1, fp);
+			fread(&game_values.tanookilimit, sizeof(short), 1, fp);
+			fread(&game_values.bombslimit, sizeof(short), 1, fp);
+			fread(&game_values.wandlimit, sizeof(short), 1, fp);
 			fread(&game_values.shellttl, sizeof(short), 1, fp);
 			fread(&game_values.blueblockttl, sizeof(short), 1, fp);
+			fread(&game_values.redblockttl, sizeof(short), 1, fp);
+			fread(&game_values.grayblockttl, sizeof(short), 1, fp);
 			fread(&game_values.storedpowerupdelay, sizeof(short), 1, fp);
 			fread(&game_values.warplockstyle, sizeof(short), 1, fp);
 			fread(&game_values.warplocktime, sizeof(short), 1, fp);
@@ -1804,7 +1806,7 @@ void RunGame()
 					else if(event.key.keysym.sym == SDLK_1)
 					{
 						if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-							objectcontainer[0].add(new PU_SledgeHammerPowerup(&spr_sledgehammerpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, 0, 30, 30, 1, 1));
+							objectcontainer[0].add(new PU_IceWandPowerup(&spr_icewandpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, 0, 30, 30, 1, 1));
 						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
 							objectcontainer[0].add(new PU_BobombPowerup(&spr_bobombpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));	
 						else
@@ -1948,8 +1950,8 @@ void RunGame()
 							menu_shade.draw(0, 0);
 						}
 
-						ifsoundonpause(sfx_invinciblemusic);
-						ifsoundonpause(sfx_slowdownmusic);
+						//ifsoundonpause(sfx_invinciblemusic);
+						//ifsoundonpause(sfx_slowdownmusic);
 						ifsoundonplay(sfx_pause);
 					}
 				}
@@ -1977,8 +1979,8 @@ void RunGame()
 							menu_shade.setalpha(GetScreenBackgroundFade());
 							menu_shade.draw(0, 0);
 							game_values.exitinggame = true;
-							ifsoundonpause(sfx_invinciblemusic);
-							ifsoundonpause(sfx_slowdownmusic);
+							//ifsoundonpause(sfx_invinciblemusic);
+							//ifsoundonpause(sfx_slowdownmusic);
 
 							//Reset the keys each time we switch from menu to game and back
 							game_values.playerInput.ResetKeys();
@@ -2007,8 +2009,8 @@ void RunGame()
 						else
 						{
 							game_values.exitinggame = false;
-							ifsoundonpause(sfx_invinciblemusic);
-							ifsoundonpause(sfx_slowdownmusic);
+							//ifsoundonpause(sfx_invinciblemusic);
+							//ifsoundonpause(sfx_slowdownmusic);
 
 							//Reset the keys each time we switch from menu to game and back
 							game_values.playerInput.ResetKeys();
@@ -2345,21 +2347,10 @@ void RunGame()
 				eyecandyback.update();
 				game_values.gamemode->think();
 
-				if(game_values.slowdownon != -1)
+				if(game_values.slowdownon != -1 && ++game_values.slowdowncounter > 580)
 				{
-					if(!sfx_slowdownmusic.isplaying())
-						ifsoundonplay(sfx_slowdownmusic);
-
-					if(++game_values.slowdowncounter > 580)
-					{
-						game_values.slowdownon = -1;
-						game_values.slowdowncounter = 0;
-					}
-				}
-				else
-				{
-					if(sfx_slowdownmusic.isplaying())
-						ifsoundonstop(sfx_slowdownmusic);
+					game_values.slowdownon = -1;
+					game_values.slowdowncounter = 0;
 				}
 
 				g_map.update();
@@ -2456,29 +2447,6 @@ void RunGame()
 
 					return;
 				}
-			}
-
-			if(game_values.playinvinciblesound)
-			{
-				if(!sfx_invinciblemusic.isplaying() && !sfx_timewarning.isplaying() && !backgroundmusic[0].isplaying())
-					ifsoundonplay(sfx_invinciblemusic);
-			}
-			else
-			{
-				if(sfx_invinciblemusic.isplaying())
-					ifsoundonstop(sfx_invinciblemusic);
-			}
-
-			//If no background music is playing, then play some
-			if(!backgroundmusic[0].isplaying() && !sfx_invinciblemusic.isplaying() && !sfx_timewarning.isplaying() && !game_values.gamemode->gameover)
-			{
-				if(game_values.playnextmusic)
-				{
-					musiclist.SetNextMusic(g_map.musicCategoryID, maplist.currentShortmapname(), g_map.szBackgroundFile);
-					backgroundmusic[0].load(musiclist.GetCurrentMusic());
-				}
-
-				backgroundmusic[0].play(game_values.playnextmusic, false);
 			}
 
 			//--------------- draw everything ----------------------
@@ -2813,6 +2781,41 @@ void RunGame()
 				menu_font_large.draw(275 - (menu_font_large.getWidth("Yes") >> 1),  269 - (menu_font_large.getHeight() >> 1), "Yes");
 				menu_font_large.draw(365 - (menu_font_large.getWidth("No") >> 1),  269 - (menu_font_large.getHeight() >> 1), "No");
 			}
+		}
+
+		//Make sure music and sound effects keep playing
+		if(game_values.slowdownon != -1)
+		{
+			if(!sfx_slowdownmusic.isplaying())
+				ifsoundonplay(sfx_slowdownmusic);
+		}
+		else
+		{
+			if(sfx_slowdownmusic.isplaying())
+				ifsoundonstop(sfx_slowdownmusic);
+		}
+
+		if(game_values.playinvinciblesound)
+		{
+			if(!sfx_invinciblemusic.isplaying() && !sfx_timewarning.isplaying() && !backgroundmusic[0].isplaying())
+				ifsoundonplay(sfx_invinciblemusic);
+		}
+		else
+		{
+			if(sfx_invinciblemusic.isplaying())
+				ifsoundonstop(sfx_invinciblemusic);
+		}
+
+		//If no background music is playing, then play some
+		if(!backgroundmusic[0].isplaying() && !sfx_invinciblemusic.isplaying() && !sfx_timewarning.isplaying() && !game_values.gamemode->gameover)
+		{
+			if(game_values.playnextmusic)
+			{
+				musiclist.SetNextMusic(g_map.musicCategoryID, maplist.currentShortmapname(), g_map.szBackgroundFile);
+				backgroundmusic[0].load(musiclist.GetCurrentMusic());
+			}
+
+			backgroundmusic[0].play(game_values.playnextmusic, false);
 		}
 
 		ticks = SDL_GetTicks() - framestart;
@@ -3318,7 +3321,7 @@ void LoadMapHazards(bool fPreview)
 				if(dAngle > TWO_PI)
 					dAngle -= TWO_PI;
 
-				objectcontainer[1].add(new OMO_OrbitHazard(&spr_hazard_rotodisc[fPreview ? 1 : 0], (hazard->ix << 4) + 16, (hazard->iy << 4) + 16, hazard->dparam[2], hazard->dparam[0], dAngle, 3, 8, 32, 32, 0, 0, 0, 0, 32, 32));
+				objectcontainer[1].add(new OMO_OrbitHazard(&spr_hazard_rotodisc[fPreview ? 1 : 0], (hazard->ix << 4) + 16, (hazard->iy << 4) + 16, hazard->dparam[2], hazard->dparam[0], dAngle, 21, 8, 32, 32, 0, 0, 0, 0, 32, 32));
 			}
 		}
 		else if(hazard->itype == 2)
@@ -3426,6 +3429,7 @@ bool SwapPlayers(short iUsingPlayerID)
 	return true;
 }
 
+/*
 void EnterBossMode(short type)
 {
 	if(game_values.gamestate == GS_GAME && game_values.gamemode->gamemode != game_mode_boss)
@@ -3442,7 +3446,7 @@ void EnterBossMode(short type)
 
 		game_values.gamestate = GS_START_GAME;
 	}
-}
+}*/
 
 bool IsExitAllowed()
 {

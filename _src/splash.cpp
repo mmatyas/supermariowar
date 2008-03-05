@@ -207,7 +207,7 @@ bool LoadGameGraphics()
 	gfx_loadimage(&spr_5uppowerup, convertPath("gfx/packs/powerups/5uppowerup.png", graphicspack), true);
 	gfx_loadimage(&spr_firepowerup, convertPath("gfx/packs/powerups/fireflower.png", graphicspack), true);
 	gfx_loadimage(&spr_hammerpowerup, convertPath("gfx/packs/powerups/hammerpowerup.png", graphicspack), true);
-	gfx_loadimage(&spr_sledgehammerpowerup, convertPath("gfx/packs/powerups/sledgehammerpowerup.png", graphicspack), true);
+	gfx_loadimage(&spr_icewandpowerup, convertPath("gfx/packs/powerups/icewandpowerup.png", graphicspack), true);
 	gfx_loadimage(&spr_podobopowerup, convertPath("gfx/packs/powerups/podobopowerup.png", graphicspack), true);
 	gfx_loadimage(&spr_poisonpowerup, convertPath("gfx/packs/powerups/poisonpowerup.png", graphicspack), true);
 	gfx_loadimage(&spr_mysterymushroompowerup, convertPath("gfx/packs/powerups/mysterymushroom.png", graphicspack), true);
@@ -267,8 +267,8 @@ bool LoadGameGraphics()
 	gfx_loadimage(&spr_goombadead, convertPath("gfx/packs/eyecandy/goombadead.png", graphicspack), true);
 	gfx_loadimage(&spr_goombadeadflying, convertPath("gfx/packs/eyecandy/goombadeadflying.png", graphicspack), true);
 	gfx_loadimage(&spr_koopa, convertPath("gfx/packs/modeobjects/koopa.png", graphicspack), true);
-	gfx_loadimage(&spr_sledgebrothers, convertPath("gfx/packs/modeobjects/sledgebrothers.png", graphicspack), true);
-	gfx_loadimage(&spr_sledgebrothersdead, convertPath("gfx/packs/eyecandy/sledgebrothersdead.png", graphicspack), true);
+	//gfx_loadimage(&spr_sledgebrothers, convertPath("gfx/packs/modeobjects/sledgebrothers.png", graphicspack), true);
+	//gfx_loadimage(&spr_sledgebrothersdead, convertPath("gfx/packs/eyecandy/sledgebrothersdead.png", graphicspack), true);
 	gfx_loadimage(&spr_redkoopa, convertPath("gfx/packs/modeobjects/redkoopa.png", graphicspack), true);
 	gfx_loadimage(&spr_cheepcheep, convertPath("gfx/packs/modeobjects/cheepcheep.png", graphicspack), true);
 	gfx_loadimage(&spr_cheepcheepdead, convertPath("gfx/packs/eyecandy/cheepcheepdead.png", graphicspack), true);
@@ -281,9 +281,9 @@ bool LoadGameGraphics()
 	gfx_loadimage(&spr_teleportstar, convertPath("gfx/packs/eyecandy/teleportstar.png", graphicspack), false);
 	
 	gfx_loadimage(&spr_fireball, convertPath("gfx/packs/projectiles/fireball.png", graphicspack), true);
-	gfx_loadimage(&spr_superfireball, convertPath("gfx/packs/projectiles/superfire.png", graphicspack), true);
+	//gfx_loadimage(&spr_superfireball, convertPath("gfx/packs/projectiles/superfire.png", graphicspack), true);
 	gfx_loadimage(&spr_hammer, convertPath("gfx/packs/projectiles/hammer.png", graphicspack), true);
-	gfx_loadimage(&spr_sledgehammer, convertPath("gfx/packs/projectiles/sledgehammer.png", graphicspack), true);
+	gfx_loadimage(&spr_iceblast, convertPath("gfx/packs/projectiles/wandblast.png", graphicspack), false);
 	gfx_loadimage(&spr_boomerang, convertPath("gfx/packs/projectiles/boomerang.png", graphicspack), true);
 	gfx_loadimage(&spr_shell, convertPath("gfx/packs/projectiles/shell.png", graphicspack), true);
 	gfx_loadimage(&spr_shelldead, convertPath("gfx/packs/eyecandy/shelldead.png", graphicspack), true);

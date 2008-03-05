@@ -614,6 +614,9 @@ class MI_MapField : public UI_Control
 		short iSlideListOutGoal;
 
 		bool fDisable;
+
+		std::string sSearchString;
+		short iSearchStringTimer;
 };
 
 class MI_WorldPreviewDisplay : public UI_Control

@@ -19,22 +19,19 @@ void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead
 		return;
 
 	MovingObjectType type = object->movingObjectType;
-	if(type == movingobject_fireball || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_sledgehammer || type == movingobject_boomerang)
+	if(type == movingobject_fireball || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_boomerang || type == movingobject_iceblast)
 	{
 		short iPlayerID = object->iPlayerID;
 		bool fDie = true;
+		bool fDisplayExplosion = true;
 
 		if(type == movingobject_hammer && !game_values.hammerpower)
 		{
 			fDie = false;
 		}
-		else if(type == movingobject_sledgehammer)
+		else if(type == movingobject_iceblast)
 		{
-			((MO_SledgeHammer*)object)->explode();
-		}
-		else if(type == movingobject_boomerang)
-		{
-			game_values.superboomerang[iPlayerID] = 0;
+			fDisplayExplosion = false;
 		}
 
 		if(fDie || forcedead)
@@ -43,7 +40,9 @@ void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead
 				projectiles[iPlayerID]--;
 
 			object->dead = true;
-			eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, object->ix + (object->iw >> 1) - 16, object->iy + (object->ih >> 1) - 16, 3, 4));
+
+			if(fDisplayExplosion)
+				eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, object->ix + (object->iw >> 1) - 16, object->iy + (object->ih >> 1) - 16, 3, 4));
 		}
 		
 		if(playsound)
@@ -502,7 +501,7 @@ void B_PowerupBlock::update()
 				else if(20 == iSelectedPowerup) 
 					objectcontainer[0].add(new PU_Tanooki(ix + 1, iy - 1));
 				else if(21 == iSelectedPowerup) 
-					objectcontainer[0].add(new PU_SledgeHammerPowerup(&spr_sledgehammerpowerup, ix + 1, iy - 1, 1, 0, 30, 30, 1, 1));
+					objectcontainer[0].add(new PU_IceWandPowerup(&spr_icewandpowerup, ix + 1, iy - 1, 1, 0, 30, 30, 1, 1));
 				else if(22 == iSelectedPowerup) 
 					objectcontainer[0].add(new PU_PodoboPowerup(&spr_podobopowerup, ix + 1, iy - 1, 1, 0, 30, 30, 1, 1));
 				else if(23 == iSelectedPowerup) 
@@ -3573,7 +3572,7 @@ bool PU_HammerPowerup::collide(CPlayer * player)
 //------------------------------------------------------------------------------
 // class sledge hammer powerup
 //------------------------------------------------------------------------------
-PU_SledgeHammerPowerup::PU_SledgeHammerPowerup(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY) :
+PU_IceWandPowerup::PU_IceWandPowerup(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY) :
 	MO_Powerup(nspr, x, y, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
 {
 	velx = 0.0f;
@@ -3582,7 +3581,7 @@ PU_SledgeHammerPowerup::PU_SledgeHammerPowerup(gfxSprite *nspr, short x, short y
 	sparkledrawframe = 0;
 }
 
-void PU_SledgeHammerPowerup::update()
+void PU_IceWandPowerup::update()
 {
 	MO_Powerup::update();
 
@@ -3595,7 +3594,7 @@ void PU_SledgeHammerPowerup::update()
 	}
 }
 
-void PU_SledgeHammerPowerup::draw()
+void PU_IceWandPowerup::draw()
 {
 	MO_Powerup::draw();
 
@@ -3604,8 +3603,9 @@ void PU_SledgeHammerPowerup::draw()
 		spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, 0, 32, 32);
 }
 
-bool PU_SledgeHammerPowerup::collide(CPlayer * player)
+bool PU_IceWandPowerup::collide(CPlayer * player)
 {
+	if(state > 0)
 	{
 		player->SetPowerup(5);
 		dead = true;
@@ -4423,22 +4423,18 @@ void MO_Hammer::draw()
 //------------------------------------------------------------------------------
 // class sledge hammer
 //------------------------------------------------------------------------------
-MO_SledgeHammer::MO_SledgeHammer(gfxSprite *nspr, short x, short y, short iNumSpr, float fVelyX, float fVelyY, short aniSpeed, short iGlobalID, short iTeamID, short iColorID, bool superHammer) :
-	IO_MovingObject(nspr, x, y, iNumSpr, aniSpeed, (short)nspr->getWidth() / iNumSpr, (short)nspr->getHeight() / 5, 0, 0)
+MO_IceBlast::MO_IceBlast(gfxSprite *nspr, short x, short y, float fVelyX, short iGlobalID, short iTeamID, short iColorID) :
+	IO_MovingObject(nspr, x, y, 4, 8, 32, 32, 0, 0, 0, iColorID << 5, 32, 32)
 {
-	ih = collisionHeight;
-
 	iPlayerID = iGlobalID;
 	iTeamID = iTeamID;
-	colorOffset = (iColorID + 1) * 32;
-	movingObjectType = movingobject_sledgehammer;
+
+	movingObjectType = movingobject_iceblast;
 	
 	state = 1;
 	
 	velx = fVelyX;
-	vely = fVelyY;
-
-	fSuper = superHammer;
+	vely = 0.0f;
 
 	if(velx > 0.0f)
 		drawframe = 0;
@@ -4446,7 +4442,7 @@ MO_SledgeHammer::MO_SledgeHammer(gfxSprite *nspr, short x, short y, short iNumSp
 		drawframe = animationWidth - iw;
 }
 
-void MO_SledgeHammer::update()
+void MO_IceBlast::update()
 {
 	if(++animationtimer == animationspeed)
 	{
@@ -4467,105 +4463,30 @@ void MO_SledgeHammer::update()
 	}
 
 	xf(fx + velx);
-	yf(fy + vely);
 	
-	vely += GRAVITATION;
-
-	if(ix < 0)
-		xi(ix + 640);
-	else if(ix > 639)
-		xi(ix - 640);
-	
-	if(iy >= 480)
-	{
+	if(ix >= 640 || ix + iw < 0)
 		removeifprojectile(this, false, true);
-		return;
-	}
-
-	//Detection collision with hammer breakable blocks
-	IO_Block * blocks[4];
-	GetCollisionBlocks(blocks);
-	for(short iBlock = 0; iBlock < 4; iBlock++)
-	{
-		if(blocks[iBlock] && blocks[iBlock]->getBlockType() == block_weaponbreakable)
-		{
-			B_WeaponBreakableBlock * weaponbreakableblock = (B_WeaponBreakableBlock*)blocks[iBlock];
-			if(weaponbreakableblock->iType == 5)
-			{
-				weaponbreakableblock->triggerBehavior(iPlayerID, iTeamID);
-				removeifprojectile(this, false, true);
-				return;
-			}
-		}
-	}
-
 }
 
-bool MO_SledgeHammer::collide(CPlayer * player)
+bool MO_IceBlast::collide(CPlayer * player)
 {
-	if(iPlayerID != player->globalID && (game_values.teamcollision == 2|| iTeamID != player->teamID))
+	if(iPlayerID != player->globalID && (game_values.teamcollision == 2 || iTeamID != player->teamID))
 	{
-		if(!player->spawninvincible)
+		if(!player->spawninvincible && !player->invincible)
 		{
-			removeifprojectile(this, false, false);
-			
-			if(!player->invincible)
-			{
-				//Find the player that shot this hammer so we can attribute a kill
-				PlayerKilledPlayer(iPlayerID, player, death_style_jump, kill_style_sledge, false);
-				return true;
-			}
+			player->makefrozen(300);
 		}
 	}
 
 	return false;
 }
 
-void MO_SledgeHammer::explode()
-{
-	if(iPlayerID > -1 && iy < 480)
-	{
-		if(fSuper)
-		{
-			objectcontainer[2].add(new MO_Explosion(&spr_explosion, ix + (iw >> 2) - 96, iy + (ih >> 2) - 64, 2, 4, iPlayerID, iTeamID, kill_style_sledge));
-			ifsoundonplay(sfx_bobombsound);
-		}
-		else
-		{
-			short iCenterX = ix + (iw >> 1) - 14;
-			short iCenterY = iy + (ih >> 1) - 14;
-			short iColorID = colorOffset / 32 - 1;
-
-			for(short iHammer = 0; iHammer < 3; iHammer++)
-			{
-				float dAngle = (float)(rand() % 628) / 100.0f;
-				float dVel = (float)(rand() % 5) / 2.0f + 3.0f;
-				float dVelX = dVel * cos(dAngle);
-				float dVelY = dVel * sin(dAngle);
-				objectcontainer[2].add(new MO_Hammer(&spr_hammer, iCenterX, iCenterY, 6, dVelX, dVelY, 5, iPlayerID, iTeamID, iColorID, true));
-			}
-
-			projectiles[iPlayerID] += 3;
-
-			ifsoundonplay(sfx_cannon);
-		}
-	}
-}
-
-void MO_SledgeHammer::draw()
-{
-	spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, colorOffset, iw, ih);
-}
-
 //------------------------------------------------------------------------------
 // class boomerang
 //------------------------------------------------------------------------------
-MO_Boomerang::MO_Boomerang(gfxSprite *nspr, short x, short y, short iNumSpr, bool moveToRight, short aniSpeed, short iGlobalID, short iTeamID, short iColorID, bool superBoomerang) :
+MO_Boomerang::MO_Boomerang(gfxSprite *nspr, short x, short y, short iNumSpr, bool moveToRight, short aniSpeed, short iGlobalID, short iTeamID, short iColorID) :
 	IO_MovingObject(nspr, x, y, iNumSpr, aniSpeed, (short)nspr->getWidth() / iNumSpr, (short)nspr->getHeight() >> 3, 0, 0)
 {
-	fSuperBoomerang = superBoomerang;
-	smoketimer = 0;
-
 	//boomerangs sprites have both right and left sprites in them
 	ih = ih >> 3;
 
@@ -4607,14 +4528,6 @@ void MO_Boomerang::update()
 		ifsoundonplay(sfx_boomerang);
 
 	animate();
-
-	if(game_values.superboomerang[iPlayerID] == 2)
-	{
-		removeifprojectile(this, false, true);
-
-		objectcontainer[2].add(new MO_Explosion(&spr_explosion, ix + (iw >> 2) - 96, iy + (ih >> 2) - 64, 2, 4, iPlayerID, iTeamID, kill_style_boomerang));
-		ifsoundonplay(sfx_bobombsound);
-	}
 
 	//Detection collision with boomerang breakable blocks
 	IO_Block * blocks[4];
@@ -4904,15 +4817,6 @@ bool MO_Boomerang::collide(CPlayer * player)
 void MO_Boomerang::draw()
 {
 	spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, colorOffset + (fMoveToRight ? 0 : 32), iw, ih);
-
-	if(fSuperBoomerang)
-	{
-		if(++smoketimer > 2)
-		{
-			smoketimer = 0;
-			eyecandyfront.add(new EC_SingleAnimation(&spr_bobombsmoke, ix - collisionOffsetX + (iw >> 1) - 8, iy - collisionOffsetY + (ih >> 1) - 8, 4, 4));
-		}
-	}
 }
 
 //------------------------------------------------------------------------------
@@ -5015,7 +4919,7 @@ void CO_Bomb::Drop()
 	collision_detection_checksides();
 }
 
-void CO_Bomb::Kick(bool superkick)
+void CO_Bomb::Kick()
 {
 	velx = owner->velx + (owner->IsPlayerFacingRight() ? 2.0f : -2.0f);
 	vely = -4.0f;
@@ -5764,7 +5668,7 @@ void CO_Egg::Drop()
 	owner_throw_timer = 62;
 }
 
-void CO_Egg::Kick(bool superkick)
+void CO_Egg::Kick()
 {
 	velx = owner->velx + (owner->IsPlayerFacingRight() ? 2.0f : -2.0f);
 	vely = -4.0f;
@@ -5818,7 +5722,7 @@ bool CO_Star::collide(CPlayer * player)
 		if(owner == oldstar)
 		{
 			oldstar->throw_star = 30;
-			Kick(false);
+			Kick();
 		}
 	}
 
@@ -5922,7 +5826,7 @@ void CO_Star::Drop()
 	collision_detection_checksides();
 }
 
-void CO_Star::Kick(bool superkick)
+void CO_Star::Kick()
 {
 	if(owner)
 	{
@@ -6270,7 +6174,7 @@ void CO_Flag::Drop()
 	owner_throw_timer = 62;
 }
 
-void CO_Flag::Kick(bool superkick)
+void CO_Flag::Kick()
 {
 	velx = owner->velx + (owner->IsPlayerFacingRight() ? 2.0f : -2.0f);
 	vely = -4.0f;
@@ -7274,19 +7178,18 @@ void MO_Explosion::update()
 		dead = true;
 }
 
-
 //------------------------------------------------------------------------------
-// class goomba
+// class walking enemy (base class for goomba and koopa)
 //------------------------------------------------------------------------------
-MO_Goomba::MO_Goomba(gfxSprite *nspr, short iNumSpr, short aniSpeed, bool moveToRight, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY) :
-	IO_MovingObject(nspr, 0, 0, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
+MO_WalkingEnemy::MO_WalkingEnemy(gfxSprite *nspr, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iAnimationOffsetX, short iAnimationOffsetY, short iAnimationHeight, short iAnimationWidth, bool moveToRight) :
+	IO_MovingObject(nspr, 0, 0, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY, iAnimationOffsetX, iAnimationOffsetY, iAnimationHeight, iAnimationWidth)
 {
 	if(moveToRight)
 		velx = 1.0f;
 	else
 		velx = -1.0f;
 
-	movingObjectType = movingobject_goomba;
+	movingObjectType = movingobject_none;
 	bounce = GRAVITATION;
 	
 	spawnradius = 100.0f;
@@ -7294,14 +7197,13 @@ MO_Goomba::MO_Goomba(gfxSprite *nspr, short iNumSpr, short aniSpeed, bool moveTo
 	inair = true;
 
 	iSpawnIconOffset = 64;
-	killStyle = kill_style_goomba;
 
 	burnuptimer = 0;
 
 	place();
 }
 
-void MO_Goomba::draw()
+void MO_WalkingEnemy::draw()
 {
 	if(state == 0)
 	{
@@ -7325,7 +7227,7 @@ void MO_Goomba::draw()
 	}
 }
 
-void MO_Goomba::update()
+void MO_WalkingEnemy::update()
 {
 	if(state == 0)
 	{
@@ -7358,7 +7260,7 @@ void MO_Goomba::update()
 }
 	
 
-bool MO_Goomba::collide(CPlayer * player)
+bool MO_WalkingEnemy::collide(CPlayer * player)
 {
 	if(state == 0)
 		return false;
@@ -7384,26 +7286,7 @@ bool MO_Goomba::collide(CPlayer * player)
 	return false;
 }
 
-bool MO_Goomba::hittop(CPlayer * player)
-{
-	player->yi(iy - PH - 1);
-	player->bouncejump();
-	player->collision_detection_checktop();
-	player->platform = NULL;
-	dead = true;
-
-	AddAwardKill(player, NULL, killStyle);
-
-	if(game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover)
-		player->score->AdjustScore(1);
-
-	ifsoundonplay(sfx_mip);
-	eyecandyback.add(new EC_Corpse(&spr_goombadead, (float)(ix - collisionOffsetX), (float)(iy + collisionHeight - 32), 0));
-
-	return false;
-}
-
-bool MO_Goomba::hitother(CPlayer * player)
+bool MO_WalkingEnemy::hitother(CPlayer * player)
 {
 	if(player->spawninvincible)
 		return false;
@@ -7411,7 +7294,7 @@ bool MO_Goomba::hitother(CPlayer * player)
 	return player->KillPlayerMapHazard(false, kill_style_environment) != player_kill_nonkill;
 }
 
-void MO_Goomba::collide(IO_MovingObject * object)
+void MO_WalkingEnemy::collide(IO_MovingObject * object)
 {
 	if(state == 0)
 		return;
@@ -7422,7 +7305,7 @@ void MO_Goomba::collide(IO_MovingObject * object)
 
 		MovingObjectType type = object->getMovingObjectType();
 
-		if(type == movingobject_fireball || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_sledgehammer || type == movingobject_boomerang || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_bulletbill || type == movingobject_podobo || type == movingobject_attackzone || type == movingobject_explosion)
+		if(type == movingobject_fireball || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_boomerang || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_bulletbill || type == movingobject_podobo || type == movingobject_attackzone || type == movingobject_explosion)
 		{
 			//Don't kill goombas with non-moving shells
 			if(type == movingobject_shell && object->state == 2)
@@ -7459,12 +7342,53 @@ void MO_Goomba::collide(IO_MovingObject * object)
 }
 
 
-void MO_Goomba::place()
+void MO_WalkingEnemy::place()
 {
 	g_map.findspawnpoint(1, &ix, &iy, collisionWidth, collisionHeight, false);
 	fx = (float)ix;
 	fy = (float)iy;
 }
+
+//------------------------------------------------------------------------------
+// class goomba
+//------------------------------------------------------------------------------
+MO_Goomba::MO_Goomba(gfxSprite *nspr, bool moveToRight) :
+	MO_WalkingEnemy(nspr, 2, 8, 30, 20, 1, 11, 0, moveToRight ? 0 : 32, 32, 32, moveToRight)
+{
+	movingObjectType = movingobject_goomba;
+	iSpawnIconOffset = 64;
+	killStyle = kill_style_goomba;
+}
+
+void MO_Goomba::update()
+{
+	if(velx < 0.0f)
+		animationOffsetY = 32;
+	else
+		animationOffsetY = 0;
+
+	MO_WalkingEnemy::update();
+}
+	
+bool MO_Goomba::hittop(CPlayer * player)
+{
+	player->yi(iy - PH - 1);
+	player->bouncejump();
+	player->collision_detection_checktop();
+	player->platform = NULL;
+	dead = true;
+
+	AddAwardKill(player, NULL, killStyle);
+
+	if(game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover)
+		player->score->AdjustScore(1);
+
+	ifsoundonplay(sfx_mip);
+	eyecandyback.add(new EC_Corpse(&spr_goombadead, (float)(ix - collisionOffsetX), (float)(iy + collisionHeight - 32), 0));
+
+	return false;
+}
+
 
 void MO_Goomba::Die()
 {
@@ -7477,14 +7401,13 @@ void MO_Goomba::Die()
 //------------------------------------------------------------------------------
 // class koopa
 //------------------------------------------------------------------------------
-MO_Koopa::MO_Koopa(gfxSprite *nspr, short iNumSpr, short aniSpeed, bool moveToRight, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, bool red) :
-	MO_Goomba(nspr, iNumSpr, aniSpeed, moveToRight, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
+MO_Koopa::MO_Koopa(gfxSprite *nspr, bool moveToRight, bool red) :
+	MO_WalkingEnemy(nspr, 2, 8, 30, 28, 1, 25, 0, moveToRight ? 0 : 54, 54, 32, moveToRight)
 {
 	fRed = red;
 	movingObjectType = movingobject_koopa;
 	iSpawnIconOffset = fRed ? 144 : 112;
 	killStyle = kill_style_koopa;
-	ih = 54;
 }
 
 void MO_Koopa::update()
@@ -7494,7 +7417,7 @@ void MO_Koopa::update()
 	else
 		animationOffsetY = 0;
 
-	MO_Goomba::update();
+	MO_WalkingEnemy::update();
 }
 
 bool MO_Koopa::hittop(CPlayer * player)
@@ -7642,7 +7565,7 @@ void MO_CheepCheep::collide(IO_MovingObject * object)
 
 		MovingObjectType type = object->getMovingObjectType();
 
-		if(type == movingobject_fireball || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_sledgehammer || type == movingobject_boomerang || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_bulletbill || type == movingobject_podobo || type == movingobject_attackzone || type == movingobject_explosion)
+		if(type == movingobject_fireball || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_boomerang || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_bulletbill || type == movingobject_podobo || type == movingobject_attackzone || type == movingobject_explosion)
 		{
 			//Don't kill goombas with non-moving shells
 			if(type == movingobject_shell && object->state == 2)
@@ -7684,8 +7607,9 @@ void MO_CheepCheep::Die()
 	eyecandyfront.add(new EC_FallingObject(&spr_cheepcheepdead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, 0, iColorOffsetY, 32, 32));
 }
 
+/*
 //------------------------------------------------------------------------------
-// class goomba
+// class sledge brother
 //------------------------------------------------------------------------------
 MO_SledgeBrother::MO_SledgeBrother(gfxSprite *nspr, short platformY, short type) :
 	IO_MovingObject(nspr, 0, 0, 8, 0, 32, 56, 8, 8)
@@ -7783,17 +7707,15 @@ void MO_SledgeBrother::update()
 					objectcontainer[2].add(new OMO_Thwomp(&spr_thwomp, (short)(rand() % 591), 2.0f + (float)(rand()%20)/10.0f));
 				}
 
-				/*
-				short numBombs = rand() % 5 + 6;
+				//short numBombs = rand() % 5 + 6;
 
-				for(short iBomb = 0; iBomb < numBombs; iBomb++)
-				{
-					short iRandomX = rand() % 612;
-					short iRandomY = rand() % 442;
-					eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, iRandomX - 2, iRandomY + 3, 3, 8));
-					objectcontainer[2].add(new CO_Bomb(&spr_bomb, iRandomX, iRandomY, 0.0f, 0.0f, 4, -1, -1, -1, rand() % 30 + 30));
-				}
-				*/
+				//for(short iBomb = 0; iBomb < numBombs; iBomb++)
+				//{
+				//	short iRandomX = rand() % 612;
+				//	short iRandomY = rand() % 442;
+				//	eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, iRandomX - 2, iRandomY + 3, 3, 8));
+				//	objectcontainer[2].add(new CO_Bomb(&spr_bomb, iRandomX, iRandomY, 0.0f, 0.0f, 4, -1, -1, -1, rand() % 30 + 30));
+				//}
 			}
 			else if(iType == 2)
 			{
@@ -8147,7 +8069,7 @@ void MO_SledgeBrother::Damage(short playerID)
 		}
 	}
 }
-
+*/
 
 //------------------------------------------------------------------------------
 // class shell projectile
@@ -8251,7 +8173,7 @@ bool CO_Shell::HitTop(CPlayer * player)
 	else if(state == 2) //Sitting
 	{
 		owner = player;
-		Kick(false);
+		Kick();
 		fSmoking = false;
 		if(player->ix + HALFPW < ix + (iw >> 1))
 			velx = 5.0f;
@@ -8276,7 +8198,7 @@ bool CO_Shell::HitTop(CPlayer * player)
 			if(owner)
 				owner->carriedItem = NULL;
 
-			Kick(false);
+			Kick();
 			fSmoking = false;
 
 			player->yi(iy - PH - 1);
@@ -8312,7 +8234,7 @@ bool CO_Shell::HitOther(CPlayer * player)
 					flipx = -640;
 
 				owner = player;
-				Kick(false);
+				Kick();
 				if(player->ix + HALFPW + flipx < ix + (iw >> 1))
 					velx = 5.0f;
 				else
@@ -8353,7 +8275,7 @@ void CO_Shell::UsedAsStoredPowerup(CPlayer * player)
 	if(player->AcceptItem(this))
 		state = 3;
 	else
-		Kick(false);
+		Kick();
 }
 
 void CO_Shell::MoveToOwner()
@@ -8435,7 +8357,7 @@ void CO_Shell::collide(IO_MovingObject * object)
 	{
 		Die();
 	}
-	else if(type == movingobject_fireball || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_sledgehammer || type == movingobject_boomerang)
+	else if(type == movingobject_fireball || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_boomerang)
 	{
 		if(fDieOnFire)
 			Die();
@@ -8550,17 +8472,38 @@ void CO_Shell::Drop()
 	}
 }
 
-void CO_Shell::Kick(bool superkick)
+void CO_Shell::Kick()
 {
-	float vel = 5.0f;
+	/*
 	if(superkick)
 	{
 		vel = 10.0f;
 		fSmoking = true;
 		ifsoundonplay(sfx_cannon);
 	}
+	*/
 
-	velx = owner->IsPlayerFacingRight() ? vel : -vel;
+	float fVel, fPlayerBonusVel = owner->velx / 2.0f;
+	if(owner->IsPlayerFacingRight())
+	{
+		fVel = 5.0f;
+		if(fPlayerBonusVel > 0.0f)
+			fVel += fPlayerBonusVel;
+
+		//if(fVel >= 7.5f)
+		//	fSmoking = true;
+	}
+	else
+	{
+		fVel = -5.0f;
+		if(fPlayerBonusVel < 0.0f)
+			fVel += fPlayerBonusVel;
+
+		//if(fVel <= -7.5f)
+		//	fSmoking = true;
+	}
+
+	velx = fVel;
 	vely = 0.0f;
 
 	iPlayerID = owner->globalID;
@@ -8694,7 +8637,7 @@ bool CO_ThrowBlock::HitTop(CPlayer * player)
 				if(owner)
 					owner->carriedItem = NULL;
 
-				Kick(false);
+				Kick();
 
 				player->yi(iy - PH - 1);
 				player->bouncejump();
@@ -8836,22 +8779,43 @@ void CO_ThrowBlock::draw()
 
 void CO_ThrowBlock::Drop()
 {
-	Kick(false);
+	Kick();
 }
 
-void CO_ThrowBlock::Kick(bool superkick)
+void CO_ThrowBlock::Kick()
 {
-	float vel = 6.5f;
+	/*
 	if(superkick)
 	{
 		vel = 12.0f;
 		fSmoking = true;
 		ifsoundonplay(sfx_cannon);
 	}
+	*/
 
 	iDeathTime = 0;
 
-	velx = owner->IsPlayerFacingRight() ? vel : -vel;
+	float fVel, fPlayerBonusVel = owner->velx / 2.0f;
+	if(owner->IsPlayerFacingRight())
+	{
+		fVel = 6.5f;
+		if(fPlayerBonusVel > 0.0f)
+			fVel += fPlayerBonusVel;
+
+		//if(fVel >= 9.0f)
+		//	fSmoking = true;
+	}
+	else
+	{
+		fVel = -6.5f;
+		if(fPlayerBonusVel < 0.0f)
+			fVel += fPlayerBonusVel;
+
+		//if(fVel <= -9.0f)
+		//	fSmoking = true;
+	}
+
+	velx = fVel;
 	vely = 0.0f;
 
 	iPlayerID = owner->globalID;
@@ -9038,7 +9002,7 @@ void CO_Spring::Drop()
 	collision_detection_checksides();
 }
 
-void CO_Spring::Kick(bool superkick)
+void CO_Spring::Kick()
 {
 	velx = owner->velx + (owner->IsPlayerFacingRight() ? 2.0f : -2.0f);
 	vely = -4.0f;
@@ -9783,7 +9747,7 @@ void MO_PirhanaPlant::collide(IO_MovingObject * object)
 
 	MovingObjectType type = object->getMovingObjectType();
 
-	if(type == movingobject_fireball || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_sledgehammer || type == movingobject_boomerang || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone || type == movingobject_explosion)
+	if(type == movingobject_fireball || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_boomerang || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone || type == movingobject_explosion)
 	{
 		//Don't kill things with shells that are sitting still
 		if(type == movingobject_shell && object->state == 2)

@@ -2,7 +2,7 @@
 #define _OBJECT_H
 
 enum ObjectType{object_none = 0, object_block = 1, object_moving = 2, object_overmap = 3, object_area = 4, object_egg = 5, object_frenzycard = 6, object_yoshi = 7, object_race_goal = 8, object_star = 9, object_flag = 10, object_flagbase = 11, object_thwomp = 12, object_kingofthehill_area = 13, object_bowserfire = 14, object_coin = 15, object_collectioncard = 16, object_orbithazard = 17, object_bulletbillcannon = 18, object_flamecannon = 19, object_pathhazard = 20};
-enum MovingObjectType{movingobject_none = 0, movingobject_powerup = 1, movingobject_fireball = 2, movingobject_goomba = 3, movingobject_bulletbill = 4, movingobject_hammer = 5, movingobject_poisonpowerup = 6, movingobject_shell = 7, movingobject_throwblock = 8, movingobject_egg = 9, movingobject_star = 10, movingobject_flag = 11, movingobject_cheepcheep = 12, movingobject_koopa = 13, movingobject_boomerang = 14, movingobject_carried = 15, movingobject_sledgehammer = 16, movingobject_sledgebrother = 17, movingobject_bomb = 18, movingobject_superfireball = 19, movingobject_podobo = 20, movingobject_treasurechest = 21, movingobject_attackzone = 22, movingobject_pirhanaplant = 23, movingobject_explosion = 24, MOVINGOBJECT_LAST};
+enum MovingObjectType{movingobject_none = 0, movingobject_powerup = 1, movingobject_fireball = 2, movingobject_goomba = 3, movingobject_bulletbill = 4, movingobject_hammer = 5, movingobject_poisonpowerup = 6, movingobject_shell = 7, movingobject_throwblock = 8, movingobject_egg = 9, movingobject_star = 10, movingobject_flag = 11, movingobject_cheepcheep = 12, movingobject_koopa = 13, movingobject_boomerang = 14, movingobject_carried = 15, movingobject_iceblast = 16, movingobject_bomb = 17, movingobject_superfireball = 18, movingobject_podobo = 19, movingobject_treasurechest = 20, movingobject_attackzone = 21, movingobject_pirhanaplant = 22, movingobject_explosion = 23, MOVINGOBJECT_LAST};
 enum BlockType{block_none, block_powerup, block_view, block_breakable, block_note, block_donut, block_flip, block_bounce, block_throw, block_onoff_switch, block_onoff, block_weaponbreakable};
 
 class IO_MovingObject;
@@ -433,7 +433,6 @@ class B_WeaponBreakableBlock : public IO_Block
 		short iDrawOffsetX;
 
 	friend class MO_Hammer;
-	friend class MO_SledgeHammer;
 	friend class MO_Boomerang;
 	friend class MO_Explosion;
 };
@@ -506,11 +505,12 @@ class IO_MovingObject : public CObject
 	friend class B_WeaponBreakableBlock;
 
 	friend class MO_BulletBill;
+	friend class MO_WalkingEnemy;
 	friend class MO_Goomba;
 	friend class MO_CheepCheep;
 	friend class MO_PirhanaPlant;
 
-	friend class MO_SledgeBrother;
+	//friend class MO_SledgeBrother;
 	friend class MovingPlatform;
 
 	friend void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead);
@@ -604,11 +604,11 @@ class PU_HammerPowerup : public MO_Powerup
 		bool collide(CPlayer * player);
 };
 
-class PU_SledgeHammerPowerup : public MO_Powerup
+class PU_IceWandPowerup : public MO_Powerup
 {
 	public:
-		PU_SledgeHammerPowerup(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY);
-		~PU_SledgeHammerPowerup(){};
+		PU_IceWandPowerup(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY);
+		~PU_IceWandPowerup(){};
 
 		void update();
 		void draw();
@@ -829,28 +829,22 @@ class MO_Hammer : public IO_MovingObject
 		bool fSuper;
 };
 
-class MO_SledgeHammer : public IO_MovingObject
+class MO_IceBlast : public IO_MovingObject
 {
 	public:
-		MO_SledgeHammer(gfxSprite *nspr, short x, short y, short iNumSpr, float fVelyX, float fVelyY, short aniSpeed, short iGlobalID, short iTeamID, short iColorID, bool superHammer);
-		~MO_SledgeHammer(){};
+		MO_IceBlast(gfxSprite *nspr, short x, short y, float fVelyX, short iGlobalID, short iTeamID, short iColorID);
+		~MO_IceBlast(){};
 
 		void update();
 		bool collide(CPlayer * player);
-		void explode();
-		void draw();
 
 		short colorOffset;
-
-	private:
-		short ttl;
-		bool fSuper;
 };
 
 class MO_Boomerang : public IO_MovingObject
 {
 	public:
-		MO_Boomerang(gfxSprite *nspr, short x, short y, short iNumSpr, bool moveToRight, short aniSpeed, short iGlobalID, short iTeamID, short iColorID, bool superBoomerang);
+		MO_Boomerang(gfxSprite *nspr, short x, short y, short iNumSpr, bool moveToRight, short aniSpeed, short iGlobalID, short iTeamID, short iColorID);
 		~MO_Boomerang(){};
 
 		void update();
@@ -867,9 +861,6 @@ class MO_Boomerang : public IO_MovingObject
 		short iStateTimer;
 
 		short iStyle;
-
-		bool fSuperBoomerang;
-		short smoketimer;
 };
 
 class MO_Coin : public IO_MovingObject
@@ -978,7 +969,7 @@ class MO_CarriedObject : public IO_MovingObject
 		virtual void MoveToOwner(){}
 
 		virtual void Drop() {}
-		virtual void Kick(bool superkick) {}
+		virtual void Kick() {}
 
 	protected:
 
@@ -1003,7 +994,7 @@ class CO_Egg : public MO_CarriedObject
 
 		void placeEgg();
 		void Drop();
-		void Kick(bool superkick);
+		void Kick();
 
 	private:
 		short relocatetimer;
@@ -1038,7 +1029,7 @@ class CO_Star : public MO_CarriedObject
 
 		void placeStar();
 		void Drop();
-		void Kick(bool superkick);
+		void Kick();
 
 	private:
 		short timer;
@@ -1098,7 +1089,7 @@ class CO_Flag : public MO_CarriedObject
 
 		void placeFlag();
 		void Drop();
-		void Kick(bool superkick);
+		void Kick();
 
 		bool GetInBase() {return fInBase;}
 		short GetTeamID() {return teamID;}
@@ -1275,22 +1266,22 @@ class MO_Explosion : public IO_MovingObject
 		killstyle iStyle;
 };
 
-class MO_Goomba : public IO_MovingObject
+class MO_WalkingEnemy : public IO_MovingObject
 {
 	public:
-		MO_Goomba(gfxSprite *nspr, short iNumSpr, short aniSpeed, bool moveToRight, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY);
-		virtual ~MO_Goomba(){};
+		MO_WalkingEnemy(gfxSprite *nspr, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iAnimationOffsetX, short iAnimationOffsetY, short iAnimationHeight, short iAnimationWidth, bool moveToRight);
+		virtual ~MO_WalkingEnemy(){};
 
-		void draw();
+		virtual void draw();
 		virtual void update();
-		bool collide(CPlayer * player);
-		void collide(IO_MovingObject * object);
-		void place();
+		virtual bool collide(CPlayer * player);
+		virtual void collide(IO_MovingObject * object);
+		virtual void place();
 
-		virtual bool hittop(CPlayer * player);
-		bool hitother(CPlayer * player);
+		virtual bool hittop(CPlayer * player) = 0;
+		virtual bool hitother(CPlayer * player);
 
-		virtual void Die();
+		virtual void Die() {};
 
 	protected:
 		float spawnradius;
@@ -1302,10 +1293,21 @@ class MO_Goomba : public IO_MovingObject
 		short burnuptimer;
 };
 
-class MO_Koopa : public MO_Goomba
+class MO_Goomba : public MO_WalkingEnemy
 {
 	public:
-		MO_Koopa(gfxSprite *nspr, short iNumSpr, short aniSpeed, bool moveToRight, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, bool red);
+		MO_Goomba(gfxSprite *nspr, bool moveToRight);
+		virtual ~MO_Goomba(){};
+
+		void update();
+		bool hittop(CPlayer * player);
+		void Die();
+};
+
+class MO_Koopa : public MO_WalkingEnemy
+{
+	public:
+		MO_Koopa(gfxSprite *nspr, bool moveToRight, bool red);
 		~MO_Koopa(){};
 
 		void update();
@@ -1313,8 +1315,6 @@ class MO_Koopa : public MO_Goomba
 		void Die();
 
 	private:
-		float spawnradius;
-		float spawnangle;
 
 		bool fRed;
 };
@@ -1370,11 +1370,10 @@ class MO_BulletBill : public IO_MovingObject
 		short iHiddenDirection;
 		short iHiddenPlane;
 
-	friend class MO_Goomba;
-	friend class MO_CheepCheep;
 	friend class MO_Podobo;
 };
 
+/*
 class MO_SledgeBrother : public IO_MovingObject
 {
 	public:
@@ -1431,6 +1430,7 @@ class MO_SledgeBrother : public IO_MovingObject
 		short iPlatformY;
 		short need_attack;
 };
+*/
 
 class CO_Shell : public MO_CarriedObject
 {
@@ -1451,7 +1451,7 @@ class CO_Shell : public MO_CarriedObject
 
 		bool KillPlayer(CPlayer * player);
 		void Drop();
-		void Kick(bool superkick);
+		void Kick();
 
 		void collide(IO_MovingObject * object);
 		void CheckAndDie();
@@ -1492,7 +1492,7 @@ class CO_Shell : public MO_CarriedObject
 	friend class MO_BulletBill;
 	friend class MO_Goomba;
 	friend class MO_Koopa;
-	friend class MO_SledgeBrother;
+	//friend class MO_SledgeBrother;
 	friend class MO_CheepCheep;
 	friend class MO_PirhanaPlant;
 	
@@ -1518,7 +1518,7 @@ class CO_ThrowBlock : public MO_CarriedObject
 
 		bool KillPlayer(CPlayer * player);
 		void Drop();
-		void Kick(bool superkick);
+		void Kick();
 
 		void collide(IO_MovingObject * object);
 		void CheckAndDie();
@@ -1539,7 +1539,7 @@ class CO_ThrowBlock : public MO_CarriedObject
 	friend class MO_Explosion;
 	friend class MO_BulletBill;
 	friend class MO_Goomba;
-	friend class MO_SledgeBrother;
+	//friend class MO_SledgeBrother;
 	friend class MO_CheepCheep;
 	friend class MO_SpinAttack;
 	friend class MO_AttackZone;
@@ -1564,7 +1564,7 @@ class CO_Spring : public MO_CarriedObject
 
 		void place();
 		void Drop();
-		void Kick(bool superkick);
+		void Kick();
 
 	protected:
 
@@ -1653,7 +1653,7 @@ class CO_Bomb : public MO_CarriedObject
 
 		void place();
 		void Drop();
-		void Kick(bool superkick);
+		void Kick();
 
 		void Die();
 		

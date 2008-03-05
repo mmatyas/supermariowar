@@ -856,10 +856,11 @@ void CPlayerAI::GetNearestObjects()
 				{
 					DistanceToObject(objectcontainer[0].list[i], &nearestObjects.stomp, &nearestObjects.stompdistance, &nearestObjects.stompwrap);
 				}
+				/*
 				else if(movingobject_sledgebrother == movingtype)
 				{
 					DistanceToObject(objectcontainer[0].list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
-				}
+				}*/
 				else if(movingobject_treasurechest == movingtype)
 				{
 					DistanceToObject(objectcontainer[0].list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
@@ -941,7 +942,7 @@ void CPlayerAI::GetNearestObjects()
 
 					DistanceToObject(objectcontainer[2].list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
 				}
-				else if(movingobject_sledgehammer == movingtype && ((MO_SledgeHammer*)objectcontainer[2].list[i])->iTeamID != iTeamID)
+				else if(movingobject_iceblast == movingtype && ((MO_IceBlast*)objectcontainer[2].list[i])->iTeamID != iTeamID)
 				{
 					if(fInvincible)
 						continue;

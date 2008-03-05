@@ -780,34 +780,31 @@ Thinking about 1.8...
 [X] Save platform tile types like the map tile types are saved so that tileset.tls isn't read by the game at all.  Need to add a way to specify the platform tile types in the level editor and update the map files to include this information.
 [X] Side spikes tile type
 [X] ice-solid-on-top tile type
-[ ] Map hazards -> bullet bills, canons, flame throwers, rotating fire shafts, rotodiscs, pirhana plants, nippers?
+[X] Map hazards -> bullet bills, canons, flame throwers, rotating fire shafts, rotodiscs, pirhana plants, nippers?
 [X] Special animated tiles like water, lava
 [X] Add mode options to tours -> If the tours are expanded in the future, they should allow you to set goals according to the number of players. I've found when making tours, certain goals on 2 player are fine, but add 2 other players and you're in for a long match, and vice versa. So, if you could manually set the goals depending on the number of players, it would allow you to great balanced tours for any number of players...
 [X] Jail mode updated to jail free for all where players only are released after a certain period of time or stomp another player or tag a team mate.  No bonuses for jailing all other players.
-[ ] Cash Dash mode added
+[X] Greed mode added
 [X] Owned option to jail players instead of normal colored orb
 [ ] The invincibility music dosen't need to stop, when you pause.
 [ ] Goomba sprites should flip when changing direction. GFX packs which use Goombas that change sprites while changing directions can make them look like they're walking backwards.
 [ ] Ability to throw objects upwards like flags, stars, shells, blue blocks, eggs, ect.
 [ ] Input bug: if the menu select key is mapped to a letter, but then you select a map and press that letter to select the map, it won't select, but jump to the maps that begin with that letter!
 [X] New powerup weight menu to support arbitrary number of powerups
-[ ] Solid on top ice tile type
-[ ] New bonus wheel (something like pick 6 or 8 powerups and have a user controlled stopping point of the spinning, more like bomberman)
+[X] Solid on top ice tile type
+[X] New bonus wheel (something like pick 6 or 8 powerups and have a user controlled stopping point of the spinning, more like bomberman)
 [X] Fix bug where when beating a vehicle on a closed bridge, the bridge will open and trap the player in that spot.  Even hourglass powerups don't work when trapped (intentionally, because you're on a bridge! :))
-[ ] New ice wand powerup: Throwable shattering ice ball (maybe remotely triggered like the exploding boomerang) that shatters into crystals
-[ ] Support new mode customized HUDs
-[ ] New greed mode
-[ ] Match 3 cards mode (cards can be bumped out and stolen by other players)
-[ ] Health mode - different attacks do different damage
+[X] New ice wand powerup: Throwable shattering ice ball (maybe remotely triggered like the exploding boomerang) that shatters into crystals
+[X] Support new mode customized HUDs
+[X] Match 3 cards mode (cards can be bumped out and stolen by other players)
+[X] Health mode - different attacks do different damage
 [X] Hidden blocks that popup when hit from below
-[ ] Object destroyable blocks like fire, hammer, bomb, boomerang - done, need gfx
+[X] Object destroyable blocks like fire, hammer, bomb, boomerang - done, need gfx
 [X] Powerup weights should be controlled by level creator with a global override in game
-[ ] New SuperUp powerup to allow special behavior for hammer, fireball, boomerang, shells/blueblocks.  What key combo to use to activate special behavior?
 [X] The game will crash if you go to a map with a view block with no powerups on.
 [X] If the bonus wheel is set to every turn, and you win a world, the tournament win song will play, but it will skip the results screen. 
-[ ] Mode chosen start locations like flag bases, race goals, etc. set in level editor
+[X] Mode chosen start locations like flag bases, race goals, etc. set in level editor
 [X] Jail mode updates: 1. "Owned Jail": Because players get out of Jail when (#players – (#players in jail)=1), in 2P there is no Jail, in 3P only one person can be in jail at a time and 4P only two people can be in jail at once. As soon as the last free player is jailed, the player who jailed him gets a bonus and everyone is freed.  To make it more difficult to get out of jail and to reward the player who does more work to jail all other players, I suggest that the jails be color coded (like owned). And when someone does in fact jail everyone, they get a heftier bonus than for just being the last one to jail the group.  In 2P, the other player is jailed with a colored jail but no bonus points are awarded for this.  They stay jailed for x seconds and are released.  2. "Free for all Jail" : This takes away the whole idea of bonuses for jail. When you are jailed, you remain so until a) you stomp on another player (this includes stomping on other jailed players) or b) you are able to run out the timer for your  jail. The reward and strategy for someone who is not in jail is to try to keep others in jail by stomping/killing them consecutive times to prevent them from being freed. Basically, the idea being that keeping someone in jail is reward enough and you don't need an extra bonus for jailing the group. So, even in 2P, you would have a jail. 
-[?] mpinger_cliff.map has strange behavior where it doesn't display all the map tiles, then flipping between maps sometimes brings some of the the tiles back.  Trying to paint the solid green SOT tile doesn't work. 
 [X] New retro colored jail gfx. 
 [X] New Eyecandy! 
 [X] Trying to insert stages for the bonus world, I've found out it appears to have a stage limit of 20. What's with that?
@@ -815,10 +812,9 @@ Thinking about 1.8...
 [X] I'm coming up with a whole slew of world bugs now! Locked doors do not work properly if set next to a stage. 
 [X] Urgh...why are vehicles invisible after you reload a map? Makes creating vehicle boundaries much harder then it should be... 
 [ ] I also have two sound bugs: The P Wing sound and the toad house music in world mode do not loop properly. 
-[?] Also castle tiles from SMB1 tileset are not being loaded/displayed properly in preview or level editor.  
-[ ] Settable disappear time for hidden blocks
+[X] Settable disappear time for hidden blocks
 [ ] New empty hidden block
-[ ] Settable TTL for BTBs and RTBs
+[X] Settable TTL for BTBs and RTBs
 [X] GTBs that multikill but do not bounce
 [X] Finish fish types for fish eyecandy
  

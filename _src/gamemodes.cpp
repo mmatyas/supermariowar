@@ -1967,13 +1967,13 @@ void CGM_Stomp::think()
 				iWeightCount += game_values.gamemodesettings.stomp.enemyweight[++iSelectedEnemy];
 
 			if(0 == iSelectedEnemy)
-				objectcontainer[0].add(new MO_Goomba(&spr_goomba, 2, 8, rand() % 2 == 0, 30, 20, 1, 11));
+				objectcontainer[0].add(new MO_Goomba(&spr_goomba, rand() % 2 == 0));
 			else if(1 == iSelectedEnemy)
-				objectcontainer[0].add(new MO_Koopa(&spr_koopa, 2, 8, rand() % 2 == 0, 30, 28, 1, 25, false));
+				objectcontainer[0].add(new MO_Koopa(&spr_koopa, rand() % 2 == 0, false));
 			else if(2 == iSelectedEnemy)
 				objectcontainer[2].add(new MO_CheepCheep(&spr_cheepcheep));
 			else
-				objectcontainer[0].add(new MO_Koopa(&spr_redkoopa, 2, 8, rand() % 2 == 0, 30, 28, 1, 25, true));
+				objectcontainer[0].add(new MO_Koopa(&spr_redkoopa, rand() % 2 == 0, true));
 		}
 	}
 }
@@ -2834,6 +2834,7 @@ void CGM_Collection::playerextraguy(CPlayer &player, short iType)
 
 //Boss Mode
 //Person to score fatal hit to boss wins!
+/*
 CGM_Boss::CGM_Boss() : CGameMode() 
 {
 	gamemode = game_mode_boss;
@@ -3041,7 +3042,7 @@ void CGM_Boss::SetBossType(short bosstype)
 {
 	iBossType = bosstype;
 }
-
+*/
 
 
 //Bonus Mode (not really a game mode, but involves using the map so we need a mode to play)

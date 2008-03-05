@@ -44,6 +44,8 @@ MapListNode::MapListNode(std::string fullName)
 	
 	fReadFromCache = false;
 
+	iShortNameLength = strlen(stripCreatorAndDotMap(fullName).c_str());
+
 	fValid = true;
 }
 
@@ -216,6 +218,41 @@ bool MapList::startswith(char letter)
 
 		if(currentShortmapname()[0] == letter)
 			return true;
+	}
+	while(current != oldCurrent);
+
+	return false;
+}
+
+bool MapList::startswith(std::string match)
+{
+	int iMatchLen = strlen(match.c_str());
+
+	std::map<std::string, MapListNode*>::iterator oldCurrent = current;
+	do
+	{
+		next(true);	//sets us to the beginning if we hit the end -> loop through the maps
+
+		const char * szMapName = currentShortmapname();
+		const int iMapNameLen = currentShortMapNameLen();
+	
+		if(iMatchLen > iMapNameLen)
+			continue;
+
+		for(short iIndex = 0; iIndex < iMapNameLen; iIndex++)
+		{
+			if(tolower(szMapName[iIndex]) == tolower(match[iIndex]))
+				continue;
+			
+			goto TRYNEXTMAP;
+		}
+
+		//gets here if we matched
+		return true;
+
+		//Label that we break to if we don't match (it'd be nice if we had labeled continues in c++)
+		TRYNEXTMAP:
+		continue;
 	}
 	while(current != oldCurrent);
 

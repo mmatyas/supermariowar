@@ -12,6 +12,8 @@ class MapListNode
 		short iIndex;
 		short iFilteredIndex;
 
+		int iShortNameLength;
+
 		bool fReadFromCache;
 
 		bool fValid;
@@ -28,9 +30,11 @@ class MapList
         bool find(const char * name);
 		bool findexact(const char * name);
         bool startswith(char letter);
+		bool startswith(std::string match);
 
-		const char* currentFilename(){return (*current).second->filename.c_str();};
-        const char* currentShortmapname(){return (*current).first.c_str();};
+		const char* currentFilename(){return (*current).second->filename.c_str();}
+        const char* currentShortmapname(){return (*current).first.c_str();}
+		const int currentShortMapNameLen(){return (*current).second->iShortNameLength;}
         
 		void prev(bool fUseFilters);
         void next(bool fUseFilters);

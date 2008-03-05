@@ -498,6 +498,7 @@ class CGM_Collection : public CGameMode
 };
 
 
+/*
 //Special mode where players try to kill a boss
 class CGM_Boss : public CGameMode
 {
@@ -524,7 +525,7 @@ class CGM_Boss : public CGameMode
 		short enemytimer, poweruptimer;
 		short iBossType;
 };
-
+*/
 
 //Similar to coin mode but you have to smash the most goombas/cheeps/koopas
 class CGM_Bonus : public CGameMode

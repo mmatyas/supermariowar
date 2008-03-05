@@ -2208,6 +2208,9 @@ MI_MapField::MI_MapField(gfxSprite * nspr, short x, short y, char * name, short 
 		iSlideListOut = 0;
 		iSlideListOutGoal = iSlideListOut;
 	}
+
+	sSearchString = "";
+	iSearchStringTimer = 0;
 }
 
 MI_MapField::~MI_MapField()
@@ -2230,23 +2233,9 @@ MenuCodeEnum MI_MapField::Modify(bool modify)
 
 MenuCodeEnum MI_MapField::SendInput(CPlayerInput * playerInput)
 {
+	/*
 	if(playerInput->iPressedKey > 0)
 	{
-		if((playerInput->iPressedKey >= SDLK_a && playerInput->iPressedKey <= SDLK_z) ||
-			(playerInput->iPressedKey >= SDLK_0 && playerInput->iPressedKey <= SDLK_9))
-		{
-			short iOldIndex = maplist.GetCurrent()->second->iIndex;
-			maplist.startswith((char)playerInput->iPressedKey);
-			
-			if(iOldIndex != maplist.GetCurrent()->second->iIndex)
-			{
-				LoadCurrentMap();
-				return MENU_CODE_MAP_CHANGED;
-			}
-			
-			return MENU_CODE_NONE;
-		}
-		/*
 		else if(playerInput->iPressedKey == SDLK_PAGEUP)
 		{
 			short iOldIndex = maplist.GetCurrent()->second->iIndex;
@@ -2273,8 +2262,8 @@ MenuCodeEnum MI_MapField::SendInput(CPlayerInput * playerInput)
 
 			return MENU_CODE_NONE;
 		}
-		*/
 	}
+	*/
 
 	for(int iPlayer = 0; iPlayer < 4; iPlayer++)
 	{
@@ -2350,11 +2339,51 @@ MenuCodeEnum MI_MapField::SendInput(CPlayerInput * playerInput)
 		}
 	}
 
+	short iPressedKey = playerInput->iPressedKey;
+
+	if(iPressedKey > 0)
+	{
+		if((iPressedKey >= SDLK_a && iPressedKey <= SDLK_z) ||
+			(iPressedKey >= SDLK_0 && iPressedKey <= SDLK_9))
+		{
+			short iOldIndex = maplist.GetCurrent()->second->iIndex;
+			
+			
+			//maplist.startswith((char)playerInput->iPressedKey);
+
+			sSearchString += (char)iPressedKey;
+			iSearchStringTimer = 20;
+
+			if(!maplist.startswith(sSearchString.c_str()))
+			{
+				sSearchString = "";
+				iSearchStringTimer = 0;
+			}
+			
+			if(iOldIndex != maplist.GetCurrent()->second->iIndex)
+			{
+				LoadCurrentMap();
+				return MENU_CODE_MAP_CHANGED;
+			}
+			
+			return MENU_CODE_NONE;
+		}
+	}
+
 	return MENU_CODE_NONE;
 }
 
 void MI_MapField::Update()
 {
+	//Empty out the search string after a certain time
+	if(iSearchStringTimer > 0)
+	{
+		if(--iSearchStringTimer == 0)
+		{
+			sSearchString = "";
+		}
+	}
+
 	if(iSlideListOut != iSlideListOutGoal)
 	{
 		if(iSlideListOutGoal > iSlideListOut)
@@ -2450,6 +2479,8 @@ void MI_MapField::Draw()
 	
 	miModifyImageLeft->Draw();
 	miModifyImageRight->Draw();
+
+	menu_font_large.drawCentered(320, 240, sSearchString.c_str());
 }
 
 void MI_MapField::LoadCurrentMap()

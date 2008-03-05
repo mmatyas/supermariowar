@@ -101,6 +101,7 @@ class Menu
 		MI_Button * miTeamOptionsMenuButton;
 		MI_Button * miPowerupOptionsMenuButton;
 		MI_Button * miProjectilesOptionsMenuButton;
+		MI_Button * miProjectilesLimitsMenuButton;
 		MI_Button * miPowerupSettingsMenuButton;
 		MI_Button * miGraphicsOptionsMenuButton;
 		MI_Button * miSoundOptionsMenuButton;
@@ -129,7 +130,6 @@ class Menu
 		MI_SelectField * miBotsField;
 		MI_SelectField * miFrameLimiterField;
 		MI_SelectField * miPointSpeedField;
-		MI_SelectField * miSecretsField;
 		MI_Button * miGameplayOptionsMenuBackButton;
 
 		MI_Image * miGameplayOptionsMenuLeftHeaderBar;
@@ -179,22 +179,38 @@ class Menu
 		MI_Button * miPowerupSelectionDialogYesButton;
 		MI_Button * miPowerupSelectionDialogNoButton;
 
+		//Weapons & Projectiles Options Menu
+		UI_Menu mProjectilesLimitsMenu;
+		MI_SelectField * miFireballLimitField;
+		MI_SelectField * miHammerLimitField;
+		MI_SelectField * miBoomerangLimitField;
+		MI_SelectField * miFeatherLimitField;
+		MI_SelectField * miLeafLimitField;
+		MI_SelectField * miPwingsLimitField;
+		MI_SelectField * miTanookiLimitField;
+		MI_SelectField * miBombLimitField;
+		MI_SelectField * miWandLimitField;
+
+		MI_Button * miProjectilesLimitsMenuBackButton;
+
+		MI_Image * miProjectilesLimitsMenuLeftHeaderBar;
+		MI_Image * miProjectilesLimitsMenuRightHeaderBar;
+		MI_Text * miProjectilesLimitsMenuHeaderText;
 
 		//Weapons & Projectiles Options Menu
 		UI_Menu mProjectilesOptionsMenu;
+
 		MI_SelectField * miFireballLifeField;
-		MI_SelectField * miFireballLimitField;
 		MI_SelectField * miHammerLifeField;
 		MI_SelectField * miHammerDelayField;
 		MI_SelectField * miHammerOneKillField;
-		MI_SelectField * miHammerLimitField;
 		MI_SelectField * miShellLifeField;
 		MI_SelectField * miBlueBlockLifeField;
+		MI_SelectField * miGrayBlockLifeField;
+		MI_SelectField * miRedBlockLifeField;
 		MI_SelectField * miBoomerangStyleField;
 		MI_SelectField * miBoomerangLifeField;
-		MI_SelectField * miBoomerangLimitField;
 		MI_SelectField * miFeatherJumpsField;
-		MI_SelectField * miFeatherLimitField;
 		MI_Button * miProjectilesOptionsMenuBackButton;
 
 		MI_Text * miFireballText;

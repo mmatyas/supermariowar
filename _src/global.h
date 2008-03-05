@@ -74,11 +74,9 @@ struct STextAward
 
 #define VELMOVING		4.0f		//velocity (speed) for moving left, right
 #define VELSLOWMOVING	2.2f		//velocity when slow down powerup is in effect
-#define VELDASHMOVING   10.0f		//velocity of invincible dashing
 #define	VELMOVING_CHICKEN 2.9f		//speed of the chicken in the gamemode capturethechicken
 #define VELMOVINGADD	0.5f
 #define VELMOVINGADDICE VELMOVINGADD / 4
-#define VELDASHADD      1.0f
 #define VELTURBOMOVING	5.5f
 #define VELJUMP			9.0f		//velocity for jumping
 #define VELSLOWJUMP		7.0f		//velocity for jumping when slow down powerup is in effect
@@ -348,7 +346,7 @@ extern gfxSprite		spr_3uppowerup;
 extern gfxSprite		spr_5uppowerup;
 extern gfxSprite		spr_firepowerup;
 extern gfxSprite		spr_hammerpowerup;
-extern gfxSprite		spr_sledgehammerpowerup;
+extern gfxSprite		spr_icewandpowerup;
 extern gfxSprite		spr_podobopowerup;
 extern gfxSprite		spr_poisonpowerup;
 extern gfxSprite		spr_mysterymushroompowerup;
@@ -403,8 +401,8 @@ extern gfxSprite		spr_goomba;
 extern gfxSprite		spr_goombadead;
 extern gfxSprite		spr_goombadeadflying;
 extern gfxSprite		spr_koopa;
-extern gfxSprite		spr_sledgebrothers;
-extern gfxSprite		spr_sledgebrothersdead;
+//extern gfxSprite		spr_sledgebrothers;
+//extern gfxSprite		spr_sledgebrothersdead;
 extern gfxSprite		spr_redkoopa;
 extern gfxSprite		spr_cheepcheep;
 extern gfxSprite		spr_cheepcheepdead;
@@ -412,9 +410,9 @@ extern gfxSprite		spr_bulletbill;
 extern gfxSprite		spr_bulletbilldead;
 
 extern gfxSprite		spr_fireball;
-extern gfxSprite		spr_superfireball;
+//extern gfxSprite		spr_superfireball;
 extern gfxSprite		spr_hammer;
-extern gfxSprite		spr_sledgehammer;
+extern gfxSprite		spr_iceblast;
 extern gfxSprite		spr_boomerang;
 extern gfxSprite		spr_shell;
 extern gfxSprite		spr_shelldead;
@@ -841,8 +839,6 @@ struct gv
 	short		slowdownon;
 	short		slowdowncounter;
 
-	short		superboomerang[4];
-
 	short		storedpowerups[4];
 	short		gamepowerups[4];
 	short		powerupweights[NUM_POWERUPS];
@@ -922,8 +918,14 @@ struct gv
 	short		leaflimit;
 	short		pwingslimit;
 
+	short		tanookilimit;
+	short		bombslimit;
+	short		wandlimit;
+
 	short		shellttl;
 	short		blueblockttl;
+	short		redblockttl;
+	short		grayblockttl;
 
 	bool		playskidsound;
 	bool		playinvinciblesound;
@@ -956,7 +958,6 @@ struct gv
 
 	short		pointspeed;
 
-	bool		secrets;
 	bool		noexit;
 	short		noexittimer;
 	short		forceexittimer;

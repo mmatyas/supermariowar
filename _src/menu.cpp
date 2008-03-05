@@ -115,7 +115,6 @@ void Menu::WriteGameOptions()
 		abyte[24] = (unsigned char) game_values.pointspeed;
 		abyte[25] = (unsigned char) game_values.swapstyle;
 		abyte[26] = (unsigned char) gamegraphicspacklist.GetCurrentIndex();
-		abyte[27] = (unsigned char) game_values.secrets;
 		abyte[28] = (unsigned char) game_values.overridepowerupsettings;
 		fwrite(abyte, sizeof(unsigned char), 29, fp); 
 
@@ -135,8 +134,13 @@ void Menu::WriteGameOptions()
 		fwrite(&game_values.featherlimit, sizeof(short), 1, fp);
 		fwrite(&game_values.leaflimit, sizeof(short), 1, fp);
 		fwrite(&game_values.pwingslimit, sizeof(short), 1, fp);
+		fwrite(&game_values.tanookilimit, sizeof(short), 1, fp);
+		fwrite(&game_values.bombslimit, sizeof(short), 1, fp);
+		fwrite(&game_values.wandlimit, sizeof(short), 1, fp);
 		fwrite(&game_values.shellttl, sizeof(short), 1, fp);
 		fwrite(&game_values.blueblockttl, sizeof(short), 1, fp);
+		fwrite(&game_values.redblockttl, sizeof(short), 1, fp);
+		fwrite(&game_values.grayblockttl, sizeof(short), 1, fp);
 		fwrite(&game_values.storedpowerupdelay, sizeof(short), 1, fp);
 		fwrite(&game_values.warplockstyle, sizeof(short), 1, fp);
 		fwrite(&game_values.warplocktime, sizeof(short), 1, fp);
@@ -273,30 +277,33 @@ void Menu::CreateMenu()
 	// Options Menu
 	//***********************
 
-	miGameplayOptionsMenuButton = new MI_Button(&spr_selectfield, 120, 80, "Gameplay", 400, 1);
+	miGameplayOptionsMenuButton = new MI_Button(&spr_selectfield, 120, 60, "Gameplay", 400, 1);
 	miGameplayOptionsMenuButton->SetCode(MENU_CODE_TO_GAMEPLAY_OPTIONS_MENU);
 	
-	miTeamOptionsMenuButton = new MI_Button(&spr_selectfield, 120, 120, "Team", 400, 1);
+	miTeamOptionsMenuButton = new MI_Button(&spr_selectfield, 120, 100, "Team", 400, 1);
 	miTeamOptionsMenuButton->SetCode(MENU_CODE_TO_TEAM_OPTIONS_MENU);
 
-	miPowerupOptionsMenuButton = new MI_Button(&spr_selectfield, 120, 160, "Item Selection", 400, 1);
+	miPowerupOptionsMenuButton = new MI_Button(&spr_selectfield, 120, 140, "Item Selection", 400, 1);
 	miPowerupOptionsMenuButton->SetCode(MENU_CODE_TO_POWERUP_SELECTION_MENU);
 
-	miPowerupSettingsMenuButton = new MI_Button(&spr_selectfield, 120, 200, "Item Settings", 400, 1);
+	miPowerupSettingsMenuButton = new MI_Button(&spr_selectfield, 120, 180, "Item Settings", 400, 1);
 	miPowerupSettingsMenuButton->SetCode(MENU_CODE_TO_POWERUP_SETTINGS_MENU);
 
-	miProjectilesOptionsMenuButton = new MI_Button(&spr_selectfield, 120, 240, "Weapons & Projectiles", 400, 1);
+	miProjectilesOptionsMenuButton = new MI_Button(&spr_selectfield, 120, 220, "Weapons & Projectiles", 400, 1);
 	miProjectilesOptionsMenuButton->SetCode(MENU_CODE_TO_PROJECTILES_OPTIONS_MENU);
 
-	miGraphicsOptionsMenuButton = new MI_Button(&spr_selectfield, 120, 280, "Graphics", 400, 1);
+	miProjectilesLimitsMenuButton = new MI_Button(&spr_selectfield, 120, 260, "Weapon Use Limits", 400, 1);
+	miProjectilesLimitsMenuButton->SetCode(MENU_CODE_TO_PROJECTILES_LIMITS_MENU);
+
+	miGraphicsOptionsMenuButton = new MI_Button(&spr_selectfield, 120, 300, "Graphics", 400, 1);
 	miGraphicsOptionsMenuButton->SetCode(MENU_CODE_TO_GRAPHICS_OPTIONS_MENU);
 	
-	miSoundOptionsMenuButton = new MI_Button((game_values.soundcapable ? &spr_selectfield : &spr_selectfielddisabled), 120, 320, "Music & Sound", 400, 1);
+	miSoundOptionsMenuButton = new MI_Button((game_values.soundcapable ? &spr_selectfield : &spr_selectfielddisabled), 120, 340, "Music & Sound", 400, 1);
 	
 	if(game_values.soundcapable)
 		miSoundOptionsMenuButton->SetCode(MENU_CODE_TO_SOUND_OPTIONS_MENU);
 
-	miGenerateMapThumbsButton = new MI_Button(&spr_selectfield, 120, 360, "Refresh Maps", 400, 1);
+	miGenerateMapThumbsButton = new MI_Button(&spr_selectfield, 120, 380, "Refresh Maps", 400, 1);
 	miGenerateMapThumbsButton->SetCode(MENU_CODE_SAVE_ALL_MAP_THUMBNAILS);
 
 	miOptionsMenuBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
@@ -325,8 +332,9 @@ void Menu::CreateMenu()
 	mOptionsMenu.AddControl(miTeamOptionsMenuButton, miGameplayOptionsMenuButton, miPowerupOptionsMenuButton, NULL, miOptionsMenuBackButton);
 	mOptionsMenu.AddControl(miPowerupOptionsMenuButton, miTeamOptionsMenuButton, miPowerupSettingsMenuButton, NULL, miOptionsMenuBackButton);
 	mOptionsMenu.AddControl(miPowerupSettingsMenuButton, miPowerupOptionsMenuButton, miProjectilesOptionsMenuButton, NULL, miOptionsMenuBackButton);
-	mOptionsMenu.AddControl(miProjectilesOptionsMenuButton, miPowerupSettingsMenuButton, miGraphicsOptionsMenuButton, NULL, miOptionsMenuBackButton);
-	mOptionsMenu.AddControl(miGraphicsOptionsMenuButton, miProjectilesOptionsMenuButton, miSoundOptionsMenuButton, NULL, miOptionsMenuBackButton);
+	mOptionsMenu.AddControl(miProjectilesOptionsMenuButton, miPowerupSettingsMenuButton, miProjectilesLimitsMenuButton, NULL, miOptionsMenuBackButton);
+	mOptionsMenu.AddControl(miProjectilesLimitsMenuButton, miProjectilesOptionsMenuButton, miGraphicsOptionsMenuButton, NULL, miOptionsMenuBackButton);
+	mOptionsMenu.AddControl(miGraphicsOptionsMenuButton, miProjectilesLimitsMenuButton, miSoundOptionsMenuButton, NULL, miOptionsMenuBackButton);
 	mOptionsMenu.AddControl(miSoundOptionsMenuButton, miGraphicsOptionsMenuButton, miGenerateMapThumbsButton, NULL, miOptionsMenuBackButton);
 	mOptionsMenu.AddControl(miGenerateMapThumbsButton, miSoundOptionsMenuButton, miOptionsMenuBackButton, NULL, miOptionsMenuBackButton);
 
@@ -485,7 +493,7 @@ void Menu::CreateMenu()
 	// Gameplay Options
 	//***********************
 
-	miRespawnField = new MI_SelectField(&spr_selectfield, 70, 40, "Respawn Time", 500, 220);
+	miRespawnField = new MI_SelectField(&spr_selectfield, 70, 60, "Respawn Time", 500, 220);
 	miRespawnField->Add("Instant", 0, "", false, false);
 	miRespawnField->Add("0.5 Seconds", 1, "", false, false);
 	miRespawnField->Add("1.0 Seconds", 2, "", false, false);
@@ -510,7 +518,7 @@ void Menu::CreateMenu()
 	miRespawnField->SetData(&game_values.respawn, NULL, NULL);
 	miRespawnField->SetKey(game_values.respawn);
 
-	miShieldField = new MI_SelectField(&spr_selectfield, 70, 80, "Shield Time", 500, 220);
+	miShieldField = new MI_SelectField(&spr_selectfield, 70, 100, "Shield Time", 500, 220);
 	miShieldField->Add("None", 0, "", false, false);
 	miShieldField->Add("0.5 Seconds", 31, "", false, false);
 	miShieldField->Add("1.0 Seconds", 62, "", false, false);
@@ -525,7 +533,7 @@ void Menu::CreateMenu()
 	miShieldField->SetData(&game_values.spawninvincibility, NULL, NULL);
 	miShieldField->SetKey(game_values.spawninvincibility);
 
-	miBoundsTimeField = new MI_SelectField(&spr_selectfield, 70, 120, "Bounds Time", 500, 220);
+	miBoundsTimeField = new MI_SelectField(&spr_selectfield, 70, 140, "Bounds Time", 500, 220);
 	miBoundsTimeField->Add("Infinite", 0, "", false, false);
 	miBoundsTimeField->Add("1 Second", 1, "", false, false);
 	miBoundsTimeField->Add("2 Seconds", 2, "", false, false);
@@ -540,7 +548,7 @@ void Menu::CreateMenu()
 	miBoundsTimeField->SetData(&game_values.outofboundstime, NULL, NULL);
 	miBoundsTimeField->SetKey(game_values.outofboundstime);
 
-	miSuicideTimeField = new MI_SelectField(&spr_selectfield, 70, 160, "Suicide Time", 500, 220);
+	miSuicideTimeField = new MI_SelectField(&spr_selectfield, 70, 180, "Suicide Time", 500, 220);
 	miSuicideTimeField->Add("Off", 0, "", false, false);
 	miSuicideTimeField->Add("3 Seconds", 186, "", false, false);
 	miSuicideTimeField->Add("5 Seconds", 310, "", false, false);
@@ -551,7 +559,7 @@ void Menu::CreateMenu()
 	miSuicideTimeField->SetData(&game_values.suicidetime, NULL, NULL);
 	miSuicideTimeField->SetKey(game_values.suicidetime);
 
-	miWarpLockStyleField = new MI_SelectField(&spr_selectfield, 70, 200, "Warp Lock Style", 500, 220);
+	miWarpLockStyleField = new MI_SelectField(&spr_selectfield, 70, 220, "Warp Lock Style", 500, 220);
 	miWarpLockStyleField->Add("Entrance Only", 0, "", false, false);
 	miWarpLockStyleField->Add("Exit Only", 1, "", false, false);
 	miWarpLockStyleField->Add("Entrance and Exit", 2, "", false, false);
@@ -560,7 +568,7 @@ void Menu::CreateMenu()
 	miWarpLockStyleField->SetData(&game_values.warplockstyle, NULL, NULL);
 	miWarpLockStyleField->SetKey(game_values.warplockstyle);
 
-	miWarpLockTimeField = new MI_SelectField(&spr_selectfield, 70, 240, "Warp Lock Time", 500, 220);
+	miWarpLockTimeField = new MI_SelectField(&spr_selectfield, 70, 260, "Warp Lock Time", 500, 220);
 	miWarpLockTimeField->Add("Off", 0, "", false, false);
 	miWarpLockTimeField->Add("1 Second", 62, "", false, false);
 	miWarpLockTimeField->Add("2 Seconds", 124, "", false, false);
@@ -575,7 +583,7 @@ void Menu::CreateMenu()
 	miWarpLockTimeField->SetData(&game_values.warplocktime, NULL, NULL);
 	miWarpLockTimeField->SetKey(game_values.warplocktime);
 
-	miBotsField = new MI_SelectField(&spr_selectfield, 70, 280, "Bot Difficulty", 500, 220);
+	miBotsField = new MI_SelectField(&spr_selectfield, 70, 300, "Bot Difficulty", 500, 220);
 	miBotsField->Add("Very Easy", 0, "", false, false);
 	miBotsField->Add("Easy", 1, "", false, false);
 	miBotsField->Add("Moderate", 2, "", false, false);
@@ -584,7 +592,7 @@ void Menu::CreateMenu()
 	miBotsField->SetData(&game_values.cpudifficulty, NULL, NULL);
 	miBotsField->SetKey(game_values.cpudifficulty);
 
-	miFrameLimiterField = new MI_SelectField(&spr_selectfield, 70, 320, "Frame Limit", 500, 220);
+	miFrameLimiterField = new MI_SelectField(&spr_selectfield, 70, 340, "Frame Limit", 500, 220);
 	miFrameLimiterField->Add("10 FPS", 100, "", false, false);
 	miFrameLimiterField->Add("15 FPS", 67, "", false, false);
 	miFrameLimiterField->Add("20 FPS", 50, "", false, false);
@@ -614,7 +622,7 @@ void Menu::CreateMenu()
 	miFrameLimiterField->SetData(&game_values.framelimiter, NULL, NULL);
 	miFrameLimiterField->SetKey(game_values.framelimiter);
 
-	miPointSpeedField = new MI_SelectField(&spr_selectfield, 70, 360, "Point Speed", 500, 220);
+	miPointSpeedField = new MI_SelectField(&spr_selectfield, 70, 380, "Point Speed", 500, 220);
 	miPointSpeedField->Add("Very Slow", 60, "", false, false);
 	miPointSpeedField->Add("Slow", 40, "", false, false);
 	miPointSpeedField->Add("Moderate", 20, "", false, false);
@@ -623,13 +631,6 @@ void Menu::CreateMenu()
 	miPointSpeedField->SetData(&game_values.pointspeed, NULL, NULL);
 	miPointSpeedField->SetKey(game_values.pointspeed);
 	
-	miSecretsField = new MI_SelectField(&spr_selectfield, 70, 400, "Special Moves", 500, 220);
-	miSecretsField->Add("Off", 0, "", false, false);
-	miSecretsField->Add("On", 1, "", true, false);
-	miSecretsField->SetData(NULL, NULL, &game_values.secrets);
-	miSecretsField->SetKey(game_values.secrets ? 1 : 0);
-	miSecretsField->SetAutoAdvance(true);
-
 	miGameplayOptionsMenuBackButton = new MI_Button(&spr_selectfield, 544, 440, "Back", 80, 1);
 	miGameplayOptionsMenuBackButton->SetCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 
@@ -645,10 +646,9 @@ void Menu::CreateMenu()
 	mGameplayOptionsMenu.AddControl(miWarpLockTimeField, miWarpLockStyleField, miBotsField, NULL, miGameplayOptionsMenuBackButton);
 	mGameplayOptionsMenu.AddControl(miBotsField, miWarpLockTimeField, miFrameLimiterField, NULL, miGameplayOptionsMenuBackButton);
 	mGameplayOptionsMenu.AddControl(miFrameLimiterField, miBotsField, miPointSpeedField, NULL, miGameplayOptionsMenuBackButton);
-	mGameplayOptionsMenu.AddControl(miPointSpeedField, miFrameLimiterField, miSecretsField, NULL, miGameplayOptionsMenuBackButton);
-	mGameplayOptionsMenu.AddControl(miSecretsField, miPointSpeedField, miGameplayOptionsMenuBackButton, NULL, miGameplayOptionsMenuBackButton);
+	mGameplayOptionsMenu.AddControl(miPointSpeedField, miFrameLimiterField, miGameplayOptionsMenuBackButton, NULL, miGameplayOptionsMenuBackButton);
 	
-	mGameplayOptionsMenu.AddControl(miGameplayOptionsMenuBackButton, miSecretsField, miRespawnField, miSecretsField, NULL);
+	mGameplayOptionsMenu.AddControl(miGameplayOptionsMenuBackButton, miPointSpeedField, miRespawnField, miPointSpeedField, NULL);
 
 	mGameplayOptionsMenu.AddNonControl(miGameplayOptionsMenuLeftHeaderBar);
 	mGameplayOptionsMenu.AddNonControl(miGameplayOptionsMenuRightHeaderBar);
@@ -746,26 +746,11 @@ void Menu::CreateMenu()
 	mSoundOptionsMenu.SetHeadControl(miSoundVolumeField);
 	mSoundOptionsMenu.SetCancelCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 
-
 	//***********************
-	// Projectile Options
+	// Projectile Limits
 	//***********************
 
-	miFireballLifeField = new MI_SelectField(&spr_selectfield, 10, 80, "Life", 305, 105);
-	miFireballLifeField->Add("1 Second", 62, "", false, false);
-	miFireballLifeField->Add("2 Seconds", 124, "", false, false);
-	miFireballLifeField->Add("3 Seconds", 186, "", false, false);
-	miFireballLifeField->Add("4 Seconds", 248, "", false, false);
-	miFireballLifeField->Add("5 Seconds", 310, "", false, false);
-	miFireballLifeField->Add("6 Seconds", 372, "", false, false);
-	miFireballLifeField->Add("7 Seconds", 434, "", false, false);
-	miFireballLifeField->Add("8 Seconds", 496, "", false, false);
-	miFireballLifeField->Add("9 Seconds", 558, "", false, false);
-	miFireballLifeField->Add("10 Seconds", 620, "", false, false);
-	miFireballLifeField->SetData(&game_values.fireballttl, NULL, NULL);
-	miFireballLifeField->SetKey(game_values.fireballttl);
-
-	miFireballLimitField = new MI_SelectField(&spr_selectfield, 10, 120, "Limit", 305, 105);
+	miFireballLimitField = new MI_SelectField(&spr_selectfield, 70, 60, "Fireball Limit", 500, 220);
 	miFireballLimitField->Add("Unlimited", 0, "", false, false);
 	miFireballLimitField->Add("2", 2, "", false, false);
 	miFireballLimitField->Add("5", 5, "", false, false);
@@ -781,105 +766,7 @@ void Menu::CreateMenu()
 	miFireballLimitField->SetData(&game_values.fireballlimit, NULL, NULL);
 	miFireballLimitField->SetKey(game_values.fireballlimit);
 
-	miFeatherJumpsField = new MI_SelectField(&spr_selectfield, 10, 200, "Jumps", 305, 105);
-	miFeatherJumpsField->Add("1", 1, "", false, false);
-	miFeatherJumpsField->Add("2", 2, "", false, false);
-	miFeatherJumpsField->Add("3", 3, "", false, false);
-	miFeatherJumpsField->Add("4", 4, "", false, false);
-	miFeatherJumpsField->Add("5", 5, "", false, false);
-	miFeatherJumpsField->SetData(&game_values.featherjumps, NULL, NULL);
-	miFeatherJumpsField->SetKey(game_values.featherjumps);
-
-	miFeatherLimitField = new MI_SelectField(&spr_selectfield, 10, 240, "Limit", 305, 105);
-	miFeatherLimitField->Add("Unlimited", 0, "", false, false);
-	miFeatherLimitField->Add("2", 2, "", false, false);
-	miFeatherLimitField->Add("5", 5, "", false, false);
-	miFeatherLimitField->Add("8", 8, "", false, false);
-	miFeatherLimitField->Add("10", 10, "", false, false);
-	miFeatherLimitField->Add("12", 12, "", false, false);
-	miFeatherLimitField->Add("15", 15, "", false, false);
-	miFeatherLimitField->Add("20", 20, "", false, false);
-	miFeatherLimitField->Add("25", 25, "", false, false);
-	miFeatherLimitField->Add("30", 30, "", false, false);
-	miFeatherLimitField->Add("40", 40, "", false, false);
-	miFeatherLimitField->Add("50", 50, "", false, false);
-	miFeatherLimitField->SetData(&game_values.featherlimit, NULL, NULL);
-	miFeatherLimitField->SetKey(game_values.featherlimit);
-
-	miBoomerangStyleField = new MI_SelectField(&spr_selectfield, 10, 320, "Style", 305, 105);
-	miBoomerangStyleField->Add("Flat", 0, "", false, false);
-	miBoomerangStyleField->Add("SMB3", 1, "", false, false);
-	miBoomerangStyleField->Add("Zelda", 2, "", false, false);
-	miBoomerangStyleField->Add("Random", 3, "", false, false);
-	miBoomerangStyleField->SetData(&game_values.boomerangstyle, NULL, NULL);
-	miBoomerangStyleField->SetKey(game_values.boomerangstyle);
-
-	miBoomerangLifeField = new MI_SelectField(&spr_selectfield, 10, 360, "Life", 305, 105);
-	miBoomerangLifeField->Add("1 Second", 62, "", false, false);
-	miBoomerangLifeField->Add("2 Seconds", 124, "", false, false);
-	miBoomerangLifeField->Add("3 Seconds", 186, "", false, false);
-	miBoomerangLifeField->Add("4 Seconds", 248, "", false, false);
-	miBoomerangLifeField->Add("5 Seconds", 310, "", false, false);
-	miBoomerangLifeField->Add("6 Seconds", 372, "", false, false);
-	miBoomerangLifeField->Add("7 Seconds", 434, "", false, false);
-	miBoomerangLifeField->Add("8 Seconds", 496, "", false, false);
-	miBoomerangLifeField->Add("9 Seconds", 558, "", false, false);
-	miBoomerangLifeField->Add("10 Seconds", 620, "", false, false);
-	miBoomerangLifeField->SetData(&game_values.boomeranglife, NULL, NULL);
-	miBoomerangLifeField->SetKey(game_values.boomeranglife);
-
-	miBoomerangLimitField = new MI_SelectField(&spr_selectfield, 10, 400, "Limit", 305, 105);
-	miBoomerangLimitField->Add("Unlimited", 0, "", false, false);
-	miBoomerangLimitField->Add("2", 2, "", false, false);
-	miBoomerangLimitField->Add("5", 5, "", false, false);
-	miBoomerangLimitField->Add("8", 8, "", false, false);
-	miBoomerangLimitField->Add("10", 10, "", false, false);
-	miBoomerangLimitField->Add("12", 12, "", false, false);
-	miBoomerangLimitField->Add("15", 15, "", false, false);
-	miBoomerangLimitField->Add("20", 20, "", false, false);
-	miBoomerangLimitField->Add("25", 25, "", false, false);
-	miBoomerangLimitField->Add("30", 30, "", false, false);
-	miBoomerangLimitField->Add("40", 40, "", false, false);
-	miBoomerangLimitField->Add("50", 50, "", false, false);
-	miBoomerangLimitField->SetData(&game_values.boomeranglimit, NULL, NULL);
-	miBoomerangLimitField->SetKey(game_values.boomeranglimit);
-
-	miHammerLifeField = new MI_SelectField(&spr_selectfield, 325, 80, "Life", 305, 105);
-	miHammerLifeField->Add("No Limit", 310, "", false, false);
-	miHammerLifeField->Add("0.5 Seconds", 31, "", false, false);
-	miHammerLifeField->Add("0.6 Seconds", 37, "", false, false);
-	miHammerLifeField->Add("0.7 Seconds", 43, "", false, false);
-	miHammerLifeField->Add("0.8 Seconds", 49, "", false, false);
-	miHammerLifeField->Add("0.9 Seconds", 55, "", false, false);
-	miHammerLifeField->Add("1.0 Seconds", 62, "", false, false);
-	miHammerLifeField->Add("1.1 Seconds", 68, "", false, false);
-	miHammerLifeField->Add("1.2 Seconds", 74, "", false, false);
-	miHammerLifeField->SetData(&game_values.hammerttl, NULL, NULL);
-	miHammerLifeField->SetKey(game_values.hammerttl);
-
-	miHammerDelayField = new MI_SelectField(&spr_selectfield, 325, 120, "Delay", 305, 105);
-	miHammerDelayField->Add("None", 0, "", false, false);
-	miHammerDelayField->Add("0.1 Seconds", 6, "", false, false);
-	miHammerDelayField->Add("0.2 Seconds", 12, "", false, false);
-	miHammerDelayField->Add("0.3 Seconds", 19, "", false, false);
-	miHammerDelayField->Add("0.4 Seconds", 25, "", false, false);
-	miHammerDelayField->Add("0.5 Seconds", 31, "", false, false);
-	miHammerDelayField->Add("0.6 Seconds", 37, "", false, false);
-	miHammerDelayField->Add("0.7 Seconds", 43, "", false, false);
-	miHammerDelayField->Add("0.8 Seconds", 49, "", false, false);
-	miHammerDelayField->Add("0.9 Seconds", 55, "", false, false);
-	miHammerDelayField->Add("1.0 Seconds", 62, "", false, false);
-	miHammerDelayField->SetData(&game_values.hammerdelay, NULL, NULL);
-	miHammerDelayField->SetKey(game_values.hammerdelay);
-
-	miHammerOneKillField = new MI_SelectField(&spr_selectfield, 325, 160, "Power", 305, 105);
-	miHammerOneKillField->Add("One Kill", 0, "", true, false);
-	miHammerOneKillField->Add("Multiple Kills", 1, "", false, false);
-	miHammerOneKillField->SetData(NULL, NULL, &game_values.hammerpower);
-	miHammerOneKillField->SetKey(game_values.hammerpower ? 0 : 1);
-	miHammerOneKillField->SetAutoAdvance(true);
-
-	miHammerLimitField = new MI_SelectField(&spr_selectfield, 325, 200, "Limit", 305, 105);
+	miHammerLimitField = new MI_SelectField(&spr_selectfield, 70, 100, "Hammer Limit", 500, 220);
 	miHammerLimitField->Add("Unlimited", 0, "", false, false);
 	miHammerLimitField->Add("2", 2, "", false, false);
 	miHammerLimitField->Add("5", 5, "", false, false);
@@ -895,7 +782,230 @@ void Menu::CreateMenu()
 	miHammerLimitField->SetData(&game_values.hammerlimit, NULL, NULL);
 	miHammerLimitField->SetKey(game_values.hammerlimit);
 
-	miShellLifeField = new MI_SelectField(&spr_selectfield, 325, 280, "Life", 305, 105);
+	miBoomerangLimitField = new MI_SelectField(&spr_selectfield, 70, 140, "Boomerang Limit", 500, 220);
+	miBoomerangLimitField->Add("Unlimited", 0, "", false, false);
+	miBoomerangLimitField->Add("2", 2, "", false, false);
+	miBoomerangLimitField->Add("5", 5, "", false, false);
+	miBoomerangLimitField->Add("8", 8, "", false, false);
+	miBoomerangLimitField->Add("10", 10, "", false, false);
+	miBoomerangLimitField->Add("12", 12, "", false, false);
+	miBoomerangLimitField->Add("15", 15, "", false, false);
+	miBoomerangLimitField->Add("20", 20, "", false, false);
+	miBoomerangLimitField->Add("25", 25, "", false, false);
+	miBoomerangLimitField->Add("30", 30, "", false, false);
+	miBoomerangLimitField->Add("40", 40, "", false, false);
+	miBoomerangLimitField->Add("50", 50, "", false, false);
+	miBoomerangLimitField->SetData(&game_values.boomeranglimit, NULL, NULL);
+	miBoomerangLimitField->SetKey(game_values.boomeranglimit);
+
+	miFeatherLimitField = new MI_SelectField(&spr_selectfield, 70, 180, "Feather Limit", 500, 220);
+	miFeatherLimitField->Add("Unlimited", 0, "", false, false);
+	miFeatherLimitField->Add("2", 2, "", false, false);
+	miFeatherLimitField->Add("5", 5, "", false, false);
+	miFeatherLimitField->Add("8", 8, "", false, false);
+	miFeatherLimitField->Add("10", 10, "", false, false);
+	miFeatherLimitField->Add("12", 12, "", false, false);
+	miFeatherLimitField->Add("15", 15, "", false, false);
+	miFeatherLimitField->Add("20", 20, "", false, false);
+	miFeatherLimitField->Add("25", 25, "", false, false);
+	miFeatherLimitField->Add("30", 30, "", false, false);
+	miFeatherLimitField->Add("40", 40, "", false, false);
+	miFeatherLimitField->Add("50", 50, "", false, false);
+	miFeatherLimitField->SetData(&game_values.featherlimit, NULL, NULL);
+	miFeatherLimitField->SetKey(game_values.featherlimit);
+
+	miLeafLimitField = new MI_SelectField(&spr_selectfield, 70, 220, "Leaf Limit", 500, 220);
+	miLeafLimitField->Add("Unlimited", 0, "", false, false);
+	miLeafLimitField->Add("2", 2, "", false, false);
+	miLeafLimitField->Add("5", 5, "", false, false);
+	miLeafLimitField->Add("8", 8, "", false, false);
+	miLeafLimitField->Add("10", 10, "", false, false);
+	miLeafLimitField->Add("12", 12, "", false, false);
+	miLeafLimitField->Add("15", 15, "", false, false);
+	miLeafLimitField->Add("20", 20, "", false, false);
+	miLeafLimitField->Add("25", 25, "", false, false);
+	miLeafLimitField->Add("30", 30, "", false, false);
+	miLeafLimitField->Add("40", 40, "", false, false);
+	miLeafLimitField->Add("50", 50, "", false, false);
+	miLeafLimitField->SetData(&game_values.leaflimit, NULL, NULL);
+	miLeafLimitField->SetKey(game_values.leaflimit);
+
+	miPwingsLimitField = new MI_SelectField(&spr_selectfield, 70, 260, "P-Wings Limit", 500, 220);
+	miPwingsLimitField->Add("Unlimited", 0, "", false, false);
+	miPwingsLimitField->Add("2", 2, "", false, false);
+	miPwingsLimitField->Add("5", 5, "", false, false);
+	miPwingsLimitField->Add("8", 8, "", false, false);
+	miPwingsLimitField->Add("10", 10, "", false, false);
+	miPwingsLimitField->Add("12", 12, "", false, false);
+	miPwingsLimitField->Add("15", 15, "", false, false);
+	miPwingsLimitField->Add("20", 20, "", false, false);
+	miPwingsLimitField->Add("25", 25, "", false, false);
+	miPwingsLimitField->Add("30", 30, "", false, false);
+	miPwingsLimitField->Add("40", 40, "", false, false);
+	miPwingsLimitField->Add("50", 50, "", false, false);
+	miPwingsLimitField->SetData(&game_values.pwingslimit, NULL, NULL);
+	miPwingsLimitField->SetKey(game_values.pwingslimit);
+
+	miTanookiLimitField = new MI_SelectField(&spr_selectfield, 70, 300, "Tanooki Limit", 500, 220);
+	miTanookiLimitField ->Add("Unlimited", 0, "", false, false);
+	miTanookiLimitField ->Add("2", 2, "", false, false);
+	miTanookiLimitField ->Add("5", 5, "", false, false);
+	miTanookiLimitField ->Add("8", 8, "", false, false);
+	miTanookiLimitField ->Add("10", 10, "", false, false);
+	miTanookiLimitField ->Add("12", 12, "", false, false);
+	miTanookiLimitField ->Add("15", 15, "", false, false);
+	miTanookiLimitField ->Add("20", 20, "", false, false);
+	miTanookiLimitField ->Add("25", 25, "", false, false);
+	miTanookiLimitField ->Add("30", 30, "", false, false);
+	miTanookiLimitField ->Add("40", 40, "", false, false);
+	miTanookiLimitField ->Add("50", 50, "", false, false);
+	miTanookiLimitField ->SetData(&game_values.tanookilimit, NULL, NULL);
+	miTanookiLimitField ->SetKey(game_values.tanookilimit);
+
+	miBombLimitField = new MI_SelectField(&spr_selectfield, 70, 340, "Bomb Limit", 500, 220);
+	miBombLimitField ->Add("Unlimited", 0, "", false, false);
+	miBombLimitField ->Add("2", 2, "", false, false);
+	miBombLimitField ->Add("5", 5, "", false, false);
+	miBombLimitField ->Add("8", 8, "", false, false);
+	miBombLimitField ->Add("10", 10, "", false, false);
+	miBombLimitField ->Add("12", 12, "", false, false);
+	miBombLimitField ->Add("15", 15, "", false, false);
+	miBombLimitField ->Add("20", 20, "", false, false);
+	miBombLimitField ->Add("25", 25, "", false, false);
+	miBombLimitField ->Add("30", 30, "", false, false);
+	miBombLimitField ->Add("40", 40, "", false, false);
+	miBombLimitField ->Add("50", 50, "", false, false);
+	miBombLimitField ->SetData(&game_values.bombslimit, NULL, NULL);
+	miBombLimitField ->SetKey(game_values.bombslimit);
+
+	miWandLimitField = new MI_SelectField(&spr_selectfield, 70, 380, "Wand Limit", 500, 220);
+	miWandLimitField ->Add("Unlimited", 0, "", false, false);
+	miWandLimitField ->Add("2", 2, "", false, false);
+	miWandLimitField ->Add("5", 5, "", false, false);
+	miWandLimitField ->Add("8", 8, "", false, false);
+	miWandLimitField ->Add("10", 10, "", false, false);
+	miWandLimitField ->Add("12", 12, "", false, false);
+	miWandLimitField ->Add("15", 15, "", false, false);
+	miWandLimitField ->Add("20", 20, "", false, false);
+	miWandLimitField ->Add("25", 25, "", false, false);
+	miWandLimitField ->Add("30", 30, "", false, false);
+	miWandLimitField ->Add("40", 40, "", false, false);
+	miWandLimitField ->Add("50", 50, "", false, false);
+	miWandLimitField ->SetData(&game_values.wandlimit, NULL, NULL);
+	miWandLimitField ->SetKey(game_values.wandlimit);
+
+	miProjectilesLimitsMenuBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
+	miProjectilesLimitsMenuBackButton->SetCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
+
+	miProjectilesLimitsMenuLeftHeaderBar = new MI_Image(&menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
+	miProjectilesLimitsMenuRightHeaderBar = new MI_Image(&menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
+	miProjectilesLimitsMenuHeaderText = new MI_Text("Weapon Use Limits Menu", 320, 5, 0, 2, 1);
+
+	mProjectilesLimitsMenu.AddControl(miFireballLimitField, miProjectilesLimitsMenuBackButton, miHammerLimitField, NULL, miProjectilesLimitsMenuBackButton);
+	mProjectilesLimitsMenu.AddControl(miHammerLimitField, miFireballLimitField, miBoomerangLimitField, NULL, miProjectilesLimitsMenuBackButton);
+	mProjectilesLimitsMenu.AddControl(miBoomerangLimitField, miHammerLimitField, miFeatherLimitField, NULL, miProjectilesLimitsMenuBackButton);
+	mProjectilesLimitsMenu.AddControl(miFeatherLimitField, miBoomerangLimitField, miLeafLimitField, NULL, miProjectilesLimitsMenuBackButton);
+	mProjectilesLimitsMenu.AddControl(miLeafLimitField, miFeatherLimitField, miPwingsLimitField, NULL, miProjectilesLimitsMenuBackButton);
+	mProjectilesLimitsMenu.AddControl(miPwingsLimitField, miLeafLimitField, miTanookiLimitField, NULL, miProjectilesLimitsMenuBackButton);
+	mProjectilesLimitsMenu.AddControl(miTanookiLimitField, miPwingsLimitField, miBombLimitField, NULL, miProjectilesLimitsMenuBackButton);
+	mProjectilesLimitsMenu.AddControl(miBombLimitField, miTanookiLimitField, miWandLimitField, NULL, miProjectilesLimitsMenuBackButton);
+	mProjectilesLimitsMenu.AddControl(miWandLimitField, miBombLimitField, miProjectilesLimitsMenuBackButton, NULL, miProjectilesLimitsMenuBackButton);
+	
+	mProjectilesLimitsMenu.AddControl(miProjectilesLimitsMenuBackButton, miWandLimitField, miFireballLimitField, miWandLimitField, NULL);
+
+	mProjectilesLimitsMenu.AddNonControl(miProjectilesLimitsMenuLeftHeaderBar);
+	mProjectilesLimitsMenu.AddNonControl(miProjectilesLimitsMenuRightHeaderBar);
+	mProjectilesLimitsMenu.AddNonControl(miProjectilesLimitsMenuHeaderText);
+
+	mProjectilesLimitsMenu.SetHeadControl(miFireballLimitField);
+	mProjectilesLimitsMenu.SetCancelCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
+
+
+	//***********************
+	// Projectile Options
+	//***********************
+
+	miFireballLifeField = new MI_SelectField(&spr_selectfield, 10, 80, "Life", 305, 120);
+	miFireballLifeField->Add("1 Second", 62, "", false, false);
+	miFireballLifeField->Add("2 Seconds", 124, "", false, false);
+	miFireballLifeField->Add("3 Seconds", 186, "", false, false);
+	miFireballLifeField->Add("4 Seconds", 248, "", false, false);
+	miFireballLifeField->Add("5 Seconds", 310, "", false, false);
+	miFireballLifeField->Add("6 Seconds", 372, "", false, false);
+	miFireballLifeField->Add("7 Seconds", 434, "", false, false);
+	miFireballLifeField->Add("8 Seconds", 496, "", false, false);
+	miFireballLifeField->Add("9 Seconds", 558, "", false, false);
+	miFireballLifeField->Add("10 Seconds", 620, "", false, false);
+	miFireballLifeField->SetData(&game_values.fireballttl, NULL, NULL);
+	miFireballLifeField->SetKey(game_values.fireballttl);
+
+	miFeatherJumpsField = new MI_SelectField(&spr_selectfield, 10, 160, "Jumps", 305, 120);
+	miFeatherJumpsField->Add("1", 1, "", false, false);
+	miFeatherJumpsField->Add("2", 2, "", false, false);
+	miFeatherJumpsField->Add("3", 3, "", false, false);
+	miFeatherJumpsField->Add("4", 4, "", false, false);
+	miFeatherJumpsField->Add("5", 5, "", false, false);
+	miFeatherJumpsField->SetData(&game_values.featherjumps, NULL, NULL);
+	miFeatherJumpsField->SetKey(game_values.featherjumps);
+
+	miBoomerangStyleField = new MI_SelectField(&spr_selectfield, 10, 240, "Style", 305, 120);
+	miBoomerangStyleField->Add("Flat", 0, "", false, false);
+	miBoomerangStyleField->Add("SMB3", 1, "", false, false);
+	miBoomerangStyleField->Add("Zelda", 2, "", false, false);
+	miBoomerangStyleField->Add("Random", 3, "", false, false);
+	miBoomerangStyleField->SetData(&game_values.boomerangstyle, NULL, NULL);
+	miBoomerangStyleField->SetKey(game_values.boomerangstyle);
+
+	miBoomerangLifeField = new MI_SelectField(&spr_selectfield, 10, 280, "Life", 305, 120);
+	miBoomerangLifeField->Add("1 Second", 62, "", false, false);
+	miBoomerangLifeField->Add("2 Seconds", 124, "", false, false);
+	miBoomerangLifeField->Add("3 Seconds", 186, "", false, false);
+	miBoomerangLifeField->Add("4 Seconds", 248, "", false, false);
+	miBoomerangLifeField->Add("5 Seconds", 310, "", false, false);
+	miBoomerangLifeField->Add("6 Seconds", 372, "", false, false);
+	miBoomerangLifeField->Add("7 Seconds", 434, "", false, false);
+	miBoomerangLifeField->Add("8 Seconds", 496, "", false, false);
+	miBoomerangLifeField->Add("9 Seconds", 558, "", false, false);
+	miBoomerangLifeField->Add("10 Seconds", 620, "", false, false);
+	miBoomerangLifeField->SetData(&game_values.boomeranglife, NULL, NULL);
+	miBoomerangLifeField->SetKey(game_values.boomeranglife);
+
+	miHammerLifeField = new MI_SelectField(&spr_selectfield, 325, 80, "Life", 305, 120);
+	miHammerLifeField->Add("No Limit", 310, "", false, false);
+	miHammerLifeField->Add("0.5 Seconds", 31, "", false, false);
+	miHammerLifeField->Add("0.6 Seconds", 37, "", false, false);
+	miHammerLifeField->Add("0.7 Seconds", 43, "", false, false);
+	miHammerLifeField->Add("0.8 Seconds", 49, "", false, false);
+	miHammerLifeField->Add("0.9 Seconds", 55, "", false, false);
+	miHammerLifeField->Add("1.0 Seconds", 62, "", false, false);
+	miHammerLifeField->Add("1.1 Seconds", 68, "", false, false);
+	miHammerLifeField->Add("1.2 Seconds", 74, "", false, false);
+	miHammerLifeField->SetData(&game_values.hammerttl, NULL, NULL);
+	miHammerLifeField->SetKey(game_values.hammerttl);
+
+	miHammerDelayField = new MI_SelectField(&spr_selectfield, 325, 120, "Delay", 305, 120);
+	miHammerDelayField->Add("None", 0, "", false, false);
+	miHammerDelayField->Add("0.1 Seconds", 6, "", false, false);
+	miHammerDelayField->Add("0.2 Seconds", 12, "", false, false);
+	miHammerDelayField->Add("0.3 Seconds", 19, "", false, false);
+	miHammerDelayField->Add("0.4 Seconds", 25, "", false, false);
+	miHammerDelayField->Add("0.5 Seconds", 31, "", false, false);
+	miHammerDelayField->Add("0.6 Seconds", 37, "", false, false);
+	miHammerDelayField->Add("0.7 Seconds", 43, "", false, false);
+	miHammerDelayField->Add("0.8 Seconds", 49, "", false, false);
+	miHammerDelayField->Add("0.9 Seconds", 55, "", false, false);
+	miHammerDelayField->Add("1.0 Seconds", 62, "", false, false);
+	miHammerDelayField->SetData(&game_values.hammerdelay, NULL, NULL);
+	miHammerDelayField->SetKey(game_values.hammerdelay);
+
+	miHammerOneKillField = new MI_SelectField(&spr_selectfield, 325, 160, "Power", 305, 120);
+	miHammerOneKillField->Add("One Kill", 0, "", true, false);
+	miHammerOneKillField->Add("Multiple Kills", 1, "", false, false);
+	miHammerOneKillField->SetData(NULL, NULL, &game_values.hammerpower);
+	miHammerOneKillField->SetKey(game_values.hammerpower ? 0 : 1);
+	miHammerOneKillField->SetAutoAdvance(true);
+
+	miShellLifeField = new MI_SelectField(&spr_selectfield, 10, 360, "Life", 305, 120);
 	miShellLifeField->Add("Unlimited", 0, "", false, false);
 	miShellLifeField->Add("1 Second", 62, "", false, false);
 	miShellLifeField->Add("2 Seconds", 124, "", false, false);
@@ -914,7 +1024,7 @@ void Menu::CreateMenu()
 	miShellLifeField->SetData(&game_values.shellttl, NULL, NULL);
 	miShellLifeField->SetKey(game_values.shellttl);
 
-	miBlueBlockLifeField = new MI_SelectField(&spr_selectfield, 325, 360, "Life", 305, 105);
+	miBlueBlockLifeField = new MI_SelectField(&spr_selectfield, 325, 240, "Blue Life", 305, 120);
 	miBlueBlockLifeField->Add("Unlimited", 0, "", false, false);
 	miBlueBlockLifeField->Add("1 Second", 62, "", false, false);
 	miBlueBlockLifeField->Add("2 Seconds", 124, "", false, false);
@@ -933,6 +1043,44 @@ void Menu::CreateMenu()
 	miBlueBlockLifeField->SetData(&game_values.blueblockttl, NULL, NULL);
 	miBlueBlockLifeField->SetKey(game_values.blueblockttl);
 
+	miGrayBlockLifeField = new MI_SelectField(&spr_selectfield, 325, 280, "Gray Life", 305, 120);
+	miGrayBlockLifeField->Add("Unlimited", 0, "", false, false);
+	miGrayBlockLifeField->Add("1 Second", 62, "", false, false);
+	miGrayBlockLifeField->Add("2 Seconds", 124, "", false, false);
+	miGrayBlockLifeField->Add("3 Seconds", 186, "", false, false);
+	miGrayBlockLifeField->Add("4 Seconds", 248, "", false, false);
+	miGrayBlockLifeField->Add("5 Seconds", 310, "", false, false);
+	miGrayBlockLifeField->Add("6 Seconds", 372, "", false, false);
+	miGrayBlockLifeField->Add("7 Seconds", 434, "", false, false);
+	miGrayBlockLifeField->Add("8 Seconds", 496, "", false, false);
+	miGrayBlockLifeField->Add("9 Seconds", 558, "", false, false);
+	miGrayBlockLifeField->Add("10 Seconds", 620, "", false, false);
+	miGrayBlockLifeField->Add("15 Seconds", 930, "", false, false);
+	miGrayBlockLifeField->Add("20 Seconds", 1240, "", false, false);
+	miGrayBlockLifeField->Add("25 Seconds", 1550, "", false, false);
+	miGrayBlockLifeField->Add("30 Seconds", 1860, "", false, false);
+	miGrayBlockLifeField->SetData(&game_values.grayblockttl, NULL, NULL);
+	miGrayBlockLifeField->SetKey(game_values.grayblockttl);
+
+	miRedBlockLifeField = new MI_SelectField(&spr_selectfield, 325, 320, "Red Life", 305, 120);
+	miRedBlockLifeField->Add("Unlimited", 0, "", false, false);
+	miRedBlockLifeField->Add("1 Second", 62, "", false, false);
+	miRedBlockLifeField->Add("2 Seconds", 124, "", false, false);
+	miRedBlockLifeField->Add("3 Seconds", 186, "", false, false);
+	miRedBlockLifeField->Add("4 Seconds", 248, "", false, false);
+	miRedBlockLifeField->Add("5 Seconds", 310, "", false, false);
+	miRedBlockLifeField->Add("6 Seconds", 372, "", false, false);
+	miRedBlockLifeField->Add("7 Seconds", 434, "", false, false);
+	miRedBlockLifeField->Add("8 Seconds", 496, "", false, false);
+	miRedBlockLifeField->Add("9 Seconds", 558, "", false, false);
+	miRedBlockLifeField->Add("10 Seconds", 620, "", false, false);
+	miRedBlockLifeField->Add("15 Seconds", 930, "", false, false);
+	miRedBlockLifeField->Add("20 Seconds", 1240, "", false, false);
+	miRedBlockLifeField->Add("25 Seconds", 1550, "", false, false);
+	miRedBlockLifeField->Add("30 Seconds", 1860, "", false, false);
+	miRedBlockLifeField->SetData(&game_values.redblockttl, NULL, NULL);
+	miRedBlockLifeField->SetKey(game_values.redblockttl);
+
 	miProjectilesOptionsMenuBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
 	miProjectilesOptionsMenuBackButton->SetCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 
@@ -941,31 +1089,30 @@ void Menu::CreateMenu()
 	miProjectilesOptionsMenuHeaderText = new MI_Text("Projectile & Weapon Options Menu", 320, 5, 0, 2, 1);
 
 	miFireballText = new MI_Text("Fireball", 10, 50, 0, 2, 0);
-	miFeatherText = new MI_Text("Feather", 10, 170, 0, 2, 0);
-	miBoomerangText = new MI_Text("Boomerang", 10, 290, 0, 2, 0);
+	miFeatherText = new MI_Text("Feather", 10, 130, 0, 2, 0);
+	miBoomerangText = new MI_Text("Boomerang", 10, 210, 0, 2, 0);
 	miHammerText = new MI_Text("Hammer", 325, 50, 0, 2, 0);
-	miShellText = new MI_Text("Shell", 325, 250, 0, 2, 0);
-	miBlueBlockText = new MI_Text("Throwable Blocks", 325, 330, 0, 2, 0);
+	miShellText = new MI_Text("Shell", 10, 330, 0, 2, 0);
+	miBlueBlockText = new MI_Text("Throwable Blocks", 325, 210, 0, 2, 0);
 
-	mProjectilesOptionsMenu.AddControl(miFireballLifeField, miProjectilesOptionsMenuBackButton, miFireballLimitField, NULL, miHammerLifeField);
-	mProjectilesOptionsMenu.AddControl(miFireballLimitField, miFireballLifeField, miFeatherJumpsField, NULL, miHammerDelayField);
+	mProjectilesOptionsMenu.AddControl(miFireballLifeField, miProjectilesOptionsMenuBackButton, miFeatherJumpsField, NULL, miHammerLifeField);
 	
-	mProjectilesOptionsMenu.AddControl(miFeatherJumpsField, miFireballLimitField, miFeatherLimitField, NULL, miHammerLimitField);
-	mProjectilesOptionsMenu.AddControl(miFeatherLimitField, miFeatherJumpsField, miBoomerangStyleField, NULL, miShellLifeField);
+	mProjectilesOptionsMenu.AddControl(miFeatherJumpsField, miFireballLifeField, miBoomerangStyleField, NULL, miHammerOneKillField);
 	
-	mProjectilesOptionsMenu.AddControl(miBoomerangStyleField, miFeatherLimitField, miBoomerangLifeField, NULL, miBlueBlockLifeField);
-	mProjectilesOptionsMenu.AddControl(miBoomerangLifeField, miBoomerangStyleField, miBoomerangLimitField, NULL, miBlueBlockLifeField);
-	mProjectilesOptionsMenu.AddControl(miBoomerangLimitField, miBoomerangLifeField, miHammerLifeField, NULL, miBlueBlockLifeField);
+	mProjectilesOptionsMenu.AddControl(miBoomerangStyleField, miFeatherJumpsField, miBoomerangLifeField, NULL, miBlueBlockLifeField);
+	mProjectilesOptionsMenu.AddControl(miBoomerangLifeField, miBoomerangStyleField, miShellLifeField, NULL, miGrayBlockLifeField);
 
-	mProjectilesOptionsMenu.AddControl(miHammerLifeField, miBoomerangLimitField, miHammerDelayField, miFireballLifeField, NULL);
-	mProjectilesOptionsMenu.AddControl(miHammerDelayField, miHammerLifeField, miHammerOneKillField, miFireballLimitField, NULL);
-	mProjectilesOptionsMenu.AddControl(miHammerOneKillField, miHammerDelayField, miHammerLimitField, miFireballLimitField, NULL);
-	mProjectilesOptionsMenu.AddControl(miHammerLimitField, miHammerOneKillField, miShellLifeField, miFeatherJumpsField, NULL);
-	
-	mProjectilesOptionsMenu.AddControl(miShellLifeField, miHammerLimitField, miBlueBlockLifeField, miFeatherLimitField, NULL);
-	mProjectilesOptionsMenu.AddControl(miBlueBlockLifeField, miShellLifeField, miProjectilesOptionsMenuBackButton, miBoomerangLifeField, NULL);
+	mProjectilesOptionsMenu.AddControl(miShellLifeField, miBoomerangLifeField, miHammerLifeField, NULL, miRedBlockLifeField);
 
-	mProjectilesOptionsMenu.AddControl(miProjectilesOptionsMenuBackButton, miBlueBlockLifeField, miFireballLifeField, miBlueBlockLifeField, NULL);
+	mProjectilesOptionsMenu.AddControl(miHammerLifeField, miShellLifeField, miHammerDelayField, miFireballLifeField, NULL);
+	mProjectilesOptionsMenu.AddControl(miHammerDelayField, miHammerLifeField, miHammerOneKillField, miFireballLifeField, NULL);
+	mProjectilesOptionsMenu.AddControl(miHammerOneKillField, miHammerDelayField, miBlueBlockLifeField, miFeatherJumpsField, NULL);
+	
+	mProjectilesOptionsMenu.AddControl(miBlueBlockLifeField, miHammerOneKillField, miGrayBlockLifeField, miBoomerangStyleField, NULL);
+	mProjectilesOptionsMenu.AddControl(miGrayBlockLifeField, miBlueBlockLifeField, miRedBlockLifeField, miBoomerangLifeField, NULL);
+	mProjectilesOptionsMenu.AddControl(miRedBlockLifeField, miGrayBlockLifeField, miProjectilesOptionsMenuBackButton, miShellLifeField, NULL);
+
+	mProjectilesOptionsMenu.AddControl(miProjectilesOptionsMenuBackButton, miRedBlockLifeField, miFireballLifeField, miRedBlockLifeField, NULL);
 
 	mProjectilesOptionsMenu.AddNonControl(miFireballText);
 	mProjectilesOptionsMenu.AddNonControl(miFeatherText);
@@ -1473,14 +1620,14 @@ void Menu::CreateMenu()
 	// Jail Mode Settings
 	//***********************
 
-	miJailModeStyleField = new MI_SelectField(&spr_selectfield, 120, 160, "Style", 400, 180);
+	miJailModeStyleField = new MI_SelectField(&spr_selectfield, 120, 160, "Style", 400, 150);
 	miJailModeStyleField->Add("Classic", 0, "", false, false);
 	miJailModeStyleField->Add("Owned", 1, "", true, false);
 	miJailModeStyleField->Add("Free For All", 2, "", true, false);
 	miJailModeStyleField->SetData(&game_values.gamemodemenusettings.jail.style, NULL, NULL);
 	miJailModeStyleField->SetKey(game_values.gamemodemenusettings.jail.style);
 
-	miJailModeTimeFreeField = new MI_SelectField(&spr_selectfield, 120, 200, "Free Timer", 400, 180);
+	miJailModeTimeFreeField = new MI_SelectField(&spr_selectfield, 120, 200, "Free Timer", 400, 150);
 	miJailModeTimeFreeField->Add("None", 1, "", false, false);
 	miJailModeTimeFreeField->Add("5 Seconds", 310, "", false, false);
 	miJailModeTimeFreeField->Add("10 Seconds", 620, "", false, false);
@@ -1497,7 +1644,7 @@ void Menu::CreateMenu()
 	miJailModeTimeFreeField->SetData(&game_values.gamemodemenusettings.jail.timetofree, NULL, NULL);
 	miJailModeTimeFreeField->SetKey(game_values.gamemodemenusettings.jail.timetofree);
 
-	miJailModeTagFreeField = new MI_SelectField(&spr_selectfield, 120, 240, "Tag Free", 400, 180);
+	miJailModeTagFreeField = new MI_SelectField(&spr_selectfield, 120, 240, "Tag Free", 400, 150);
 	miJailModeTagFreeField->Add("Off", 0, "", false, false);
 	miJailModeTagFreeField->Add("On", 1, "", true, false);
 	miJailModeTagFreeField->SetData(NULL, NULL, &game_values.gamemodemenusettings.jail.tagfree);
@@ -3455,6 +3602,11 @@ void Menu::RunMenu()
 			else if (MENU_CODE_TO_PROJECTILES_OPTIONS_MENU == code)
 			{
 				mCurrentMenu = &mProjectilesOptionsMenu;
+				mCurrentMenu->ResetMenu();
+			}
+			else if (MENU_CODE_TO_PROJECTILES_LIMITS_MENU == code)
+			{
+				mCurrentMenu = &mProjectilesLimitsMenu;
 				mCurrentMenu->ResetMenu();
 			}
 			else if (MENU_CODE_TO_MODE_SETTINGS_MENU == code)

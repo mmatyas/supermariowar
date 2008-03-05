@@ -92,7 +92,7 @@ class CScore
 };
 
 
-enum killstyle{kill_style_stomp = 0, kill_style_star = 1, kill_style_fireball = 2, kill_style_bobomb = 3, kill_style_bounce = 4, kill_style_pow = 5, kill_style_goomba = 6, kill_style_bulletbill = 7, kill_style_hammer = 8, kill_style_shell = 9, kill_style_throwblock = 10, kill_style_cheepcheep = 11, kill_style_koopa = 12, kill_style_boomerang = 13, kill_style_feather = 14, kill_style_sledge = 15, kill_style_podobo = 16, kill_style_bomb = 17, kill_style_leaf = 18, kill_style_pwings = 19, kill_style_kuriboshoe = 20, kill_style_frozen = 21, kill_style_poisonmushroom = 22, kill_style_environment = 23, kill_style_push = 24, KILL_STYLE_LAST};
+enum killstyle{kill_style_stomp = 0, kill_style_star = 1, kill_style_fireball = 2, kill_style_bobomb = 3, kill_style_bounce = 4, kill_style_pow = 5, kill_style_goomba = 6, kill_style_bulletbill = 7, kill_style_hammer = 8, kill_style_shell = 9, kill_style_throwblock = 10, kill_style_cheepcheep = 11, kill_style_koopa = 12, kill_style_boomerang = 13, kill_style_feather = 14, kill_style_iceblast = 15, kill_style_podobo = 16, kill_style_bomb = 17, kill_style_leaf = 18, kill_style_pwings = 19, kill_style_kuriboshoe = 20, kill_style_frozen = 21, kill_style_poisonmushroom = 22, kill_style_environment = 23, kill_style_push = 24, KILL_STYLE_LAST};
 enum awardstyle{award_style_none = 0, award_style_fireworks = 1, award_style_swirl = 2, award_style_halo = 3, award_style_souls = 4, award_style_text = 5};
 enum deathstyle{death_style_jump = 0, death_style_squish = 1, death_style_shatter = 2};
 
@@ -198,10 +198,6 @@ class CPlayer
         bool tanooki;
         bool statue_lock;
         int statue_timer;
-        int konamiIndex;
-
-		//super kick
-		short superKickIndex;
 
 		CScore *score;
 		short killsinrow;
@@ -239,13 +235,6 @@ class CPlayer
 		bool lockfire;		//the player is allowed to shoot a fireball
 		short throw_star;
 
-		int holddown;
-		int holddowntolerance;
-		int holdleft;
-		int holdlefttolerance;
-		int holdright;
-		int holdrighttolerance;
-
 		short extrajumps;	//true when player has used a feather jump in air (only allow one feather jump per time in air)
 		bool flying;
 		short flyingtimer;
@@ -259,42 +248,6 @@ class CPlayer
 
 		short iWingsTimer;
 		short iWingsFrame;
-
-		short ryu_fireball_index_left;
-		short ryu_fireball_index_right;
-		bool shoot_left_fireball;
-		bool shoot_right_fireball;
-
-		short super_sledge_hammer_throw_index;
-		bool shoot_super_sledge_hammer;
-
-		short super_hammer_throw_left_index;
-		short super_hammer_throw_right_index;
-		bool shoot_right_super_hammer;
-		bool shoot_left_super_hammer;
-
-		short super_boomerang_throw_index_left;
-		short super_boomerang_throw_index_right;
-		bool shoot_super_boomerang;
-
-		short super_pow_index;
-		bool super_pow;
-		short super_pow_timer;
-
-		short super_mod_index;
-		bool super_mod;
-		short super_mod_timer;
-
-		short dashLeftIndex;
-		short dashRightIndex;
-		bool dashLeft;
-		bool dashRight;
-		short dashSparkleAnimationTimer;
-
-		short redKoopaIndex;
-		short redThrowBlockIndex;
-		short viewBlockIndex;
-		short boss_index[3];
 
 		short superjumptimer;		//this is true when a player is able to do a super jump off a note block
 		short superjumptype;		//type of the note block they hit
@@ -344,6 +297,7 @@ class CPlayer
 		short projectilelimit;
 
 		bool bobomb;
+
 		short iCapeTimer;
 		short iCapeFrameX;
 		short iCapeFrameY;
@@ -508,7 +462,7 @@ class CPlayer
 
 		friend class MO_Fireball;
 		friend class MO_Hammer;
-		friend class MO_SledgeHammer;
+		friend class MO_IceBlast;
 		friend class MO_Boomerang;
 		friend class MO_SuperFireball;
 		friend class CO_Shell;
@@ -518,9 +472,10 @@ class CPlayer
 		friend class CO_Bomb;
 		friend class CO_KuriboShoe;
 
+		friend class MO_WalkingEnemy;
 		friend class MO_Goomba;
 		friend class MO_Koopa;
-		friend class MO_SledgeBrother;
+		//friend class MO_SledgeBrother;
 		friend class MO_CheepCheep;
 		friend class MO_BulletBill;
 		friend class OMO_FlagBase;
