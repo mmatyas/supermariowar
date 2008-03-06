@@ -19,7 +19,7 @@ void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead
 		return;
 
 	MovingObjectType type = object->movingObjectType;
-	if(type == movingobject_fireball || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_boomerang || type == movingobject_iceblast)
+	if(type == movingobject_fireball || type == movingobject_hammer || type == movingobject_boomerang || type == movingobject_iceblast)
 	{
 		short iPlayerID = object->iPlayerID;
 		bool fDie = true;
@@ -314,7 +314,7 @@ bool IO_Block::hitleft(IO_MovingObject * object)
 void IO_Block::BounceMovingObject(IO_MovingObject * object)
 {
 	MovingObjectType type = object->getMovingObjectType();
-	if(type == movingobject_goomba || type == movingobject_koopa)
+	if(type == movingobject_goomba || type == movingobject_koopa || type == movingobject_buzzybeetle)
 	{
 		ifsoundonplay(sfx_kicksound);
 		killstyle style = kill_style_goomba;
@@ -328,6 +328,11 @@ void IO_Block::BounceMovingObject(IO_MovingObject * object)
 		{
 			((MO_Koopa*)object)->Die();
 			style = kill_style_koopa;
+		}
+		else if(type == movingobject_buzzybeetle)
+		{
+			((MO_BuzzyBeetle*)object)->Die();
+			style = kill_style_buzzybeetle;
 		}
 
 		if(!game_values.gamemode->gameover && iBumpPlayerID >= 0)
@@ -4251,6 +4256,7 @@ void MO_Fireball::draw()
 	spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, (velx > 0 ? 0 : 18) + colorOffset, iw, ih);
 }
 
+/*
 //------------------------------------------------------------------------------
 // class super fireball
 //------------------------------------------------------------------------------
@@ -4314,7 +4320,7 @@ void MO_SuperFireball::draw()
 {
 	spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, colorOffset + directionOffset, iw, ih);
 }
-
+*/
 
 //------------------------------------------------------------------------------
 // class hammer
@@ -4424,7 +4430,7 @@ void MO_Hammer::draw()
 // class sledge hammer
 //------------------------------------------------------------------------------
 MO_IceBlast::MO_IceBlast(gfxSprite *nspr, short x, short y, float fVelyX, short iGlobalID, short iTeamID, short iColorID) :
-	IO_MovingObject(nspr, x, y, 4, 8, 32, 32, 0, 0, 0, iColorID << 5, 32, 32)
+	IO_MovingObject(nspr, x, y, 4, 8, 32, 32, 0, 0, 0, (iColorID + 1) << 5, 32, 32)
 {
 	iPlayerID = iGlobalID;
 	iTeamID = iTeamID;
@@ -7181,7 +7187,7 @@ void MO_Explosion::update()
 //------------------------------------------------------------------------------
 // class walking enemy (base class for goomba and koopa)
 //------------------------------------------------------------------------------
-MO_WalkingEnemy::MO_WalkingEnemy(gfxSprite *nspr, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iAnimationOffsetX, short iAnimationOffsetY, short iAnimationHeight, short iAnimationWidth, bool moveToRight) :
+MO_WalkingEnemy::MO_WalkingEnemy(gfxSprite *nspr, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iAnimationOffsetX, short iAnimationOffsetY, short iAnimationHeight, short iAnimationWidth, bool moveToRight, bool killOnWeakWeapon, bool bouncing) :
 	IO_MovingObject(nspr, 0, 0, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY, iAnimationOffsetX, iAnimationOffsetY, iAnimationHeight, iAnimationWidth)
 {
 	if(moveToRight)
@@ -7190,7 +7196,12 @@ MO_WalkingEnemy::MO_WalkingEnemy(gfxSprite *nspr, short iNumSpr, short aniSpeed,
 		velx = -1.0f;
 
 	movingObjectType = movingobject_none;
-	bounce = GRAVITATION;
+
+	fBouncing = bouncing;
+	if(fBouncing)
+		bounce = -VELENEMYBOUNCE;
+	else
+		bounce = GRAVITATION;
 	
 	spawnradius = 100.0f;
 	spawnangle = (float)(rand()%1000 * 0.00628f);
@@ -7199,6 +7210,8 @@ MO_WalkingEnemy::MO_WalkingEnemy(gfxSprite *nspr, short iNumSpr, short aniSpeed,
 	iSpawnIconOffset = 64;
 
 	burnuptimer = 0;
+
+	fKillOnWeakWeapon = killOnWeakWeapon;
 
 	place();
 }
@@ -7305,9 +7318,9 @@ void MO_WalkingEnemy::collide(IO_MovingObject * object)
 
 		MovingObjectType type = object->getMovingObjectType();
 
-		if(type == movingobject_fireball || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_boomerang || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_bulletbill || type == movingobject_podobo || type == movingobject_attackzone || type == movingobject_explosion)
+		if(((type == movingobject_fireball || type == movingobject_hammer || type == movingobject_boomerang) && fKillOnWeakWeapon) || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_bulletbill || type == movingobject_podobo || type == movingobject_attackzone || type == movingobject_explosion)
 		{
-			//Don't kill goombas with non-moving shells
+			//Don't kill enemies with non-moving shells
 			if(type == movingobject_shell && object->state == 2)
 				return;
 
@@ -7352,8 +7365,8 @@ void MO_WalkingEnemy::place()
 //------------------------------------------------------------------------------
 // class goomba
 //------------------------------------------------------------------------------
-MO_Goomba::MO_Goomba(gfxSprite *nspr, bool moveToRight) :
-	MO_WalkingEnemy(nspr, 2, 8, 30, 20, 1, 11, 0, moveToRight ? 0 : 32, 32, 32, moveToRight)
+MO_Goomba::MO_Goomba(gfxSprite *nspr, bool moveToRight, bool fBouncing) :
+	MO_WalkingEnemy(nspr, 2, 8, 30, 20, 1, 11, 0, moveToRight ? 0 : 32, 32, 32, moveToRight, true, fBouncing)
 {
 	movingObjectType = movingobject_goomba;
 	iSpawnIconOffset = 64;
@@ -7376,15 +7389,24 @@ bool MO_Goomba::hittop(CPlayer * player)
 	player->bouncejump();
 	player->collision_detection_checktop();
 	player->platform = NULL;
-	dead = true;
+	
+	if(fBouncing)
+	{
+		fBouncing = false;
+		bounce = GRAVITATION;
+	}
+	else
+	{
+		dead = true;
 
-	AddAwardKill(player, NULL, killStyle);
+		AddAwardKill(player, NULL, killStyle);
 
-	if(game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover)
-		player->score->AdjustScore(1);
+		if(game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover)
+			player->score->AdjustScore(1);
 
-	ifsoundonplay(sfx_mip);
-	eyecandyback.add(new EC_Corpse(&spr_goombadead, (float)(ix - collisionOffsetX), (float)(iy + collisionHeight - 32), 0));
+		ifsoundonplay(sfx_mip);
+		eyecandyback.add(new EC_Corpse(&spr_goombadead, (float)(ix - collisionOffsetX), (float)(iy + collisionHeight - 32), 0));
+	}
 
 	return false;
 }
@@ -7397,12 +7419,11 @@ void MO_Goomba::Die()
 }
 
 
-
 //------------------------------------------------------------------------------
 // class koopa
 //------------------------------------------------------------------------------
-MO_Koopa::MO_Koopa(gfxSprite *nspr, bool moveToRight, bool red) :
-	MO_WalkingEnemy(nspr, 2, 8, 30, 28, 1, 25, 0, moveToRight ? 0 : 54, 54, 32, moveToRight)
+MO_Koopa::MO_Koopa(gfxSprite *nspr, bool moveToRight, bool red, bool fBouncing) :
+	MO_WalkingEnemy(nspr, 2, 8, 30, 28, 1, 25, 0, moveToRight ? 0 : 54, 54, 32, moveToRight, true, fBouncing)
 {
 	fRed = red;
 	movingObjectType = movingobject_koopa;
@@ -7422,13 +7443,82 @@ void MO_Koopa::update()
 
 bool MO_Koopa::hittop(CPlayer * player)
 {
-	player->yi(iy - PH - 14);
+	player->yi(iy - PH - 1);
+	player->bouncejump();
+	player->collision_detection_checktop();
+	player->platform = NULL;
+	
+	if(fBouncing)
+	{
+		fBouncing = false;
+		bounce = GRAVITATION;
+	}
+	else
+	{
+		dead = true;
+
+		AddAwardKill(player, NULL, kill_style_koopa);
+
+		if(game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover)
+			player->score->AdjustScore(1);
+
+		ifsoundonplay(sfx_mip);
+
+		//Give the shell a state 2 so it is already spawned but sitting
+		CO_Shell * shell;
+		
+		if(fRed)
+			shell = new CO_Shell(1, ix - 1, iy + 8, false, true, true, false);
+		else
+			shell = new CO_Shell(0, ix - 1, iy + 8, true, true, true, false);
+		
+		shell->state = 2;
+		shell->yi(iy + 8);
+
+		objectcontainer[1].add(shell);
+	}
+
+	return false;
+}
+
+void MO_Koopa::Die()
+{
+	dead = true;
+	eyecandyfront.add(new EC_FallingObject(&spr_shelldead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, fRed ? 32 : 0, 0, 32, 32));
+}
+
+
+
+//------------------------------------------------------------------------------
+// class buzzy beetle
+//------------------------------------------------------------------------------
+MO_BuzzyBeetle::MO_BuzzyBeetle(gfxSprite *nspr, bool moveToRight) :
+	MO_WalkingEnemy(nspr, 2, 8, 30, 28, 1, 3, 0, moveToRight ? 0 : 32, 32, 32, moveToRight, false, false)
+{
+	movingObjectType = movingobject_buzzybeetle;
+	iSpawnIconOffset = 160;
+	killStyle = kill_style_buzzybeetle;
+}
+
+void MO_BuzzyBeetle::update()
+{
+	if(velx < 0.0f)
+		animationOffsetY = 32;
+	else
+		animationOffsetY = 0;
+
+	MO_WalkingEnemy::update();
+}
+
+bool MO_BuzzyBeetle::hittop(CPlayer * player)
+{
+	player->yi(iy - PH - 1);
 	player->bouncejump();
 	player->collision_detection_checktop();
 	player->platform = NULL;
 	dead = true;
 
-	AddAwardKill(player, NULL, kill_style_koopa);
+	AddAwardKill(player, NULL, kill_style_buzzybeetle);
 
 	if(game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover)
 		player->score->AdjustScore(1);
@@ -7436,13 +7526,7 @@ bool MO_Koopa::hittop(CPlayer * player)
 	ifsoundonplay(sfx_mip);
 
 	//Give the shell a state 2 so it is already spawned but sitting
-	CO_Shell * shell;
-	
-	if(fRed)
-		shell = new CO_Shell(1, ix - 1, iy + 8, false, true, true, false);
-	else
-		shell = new CO_Shell(0, ix - 1, iy + 8, true, true, true, false);
-	
+	CO_Shell * shell = new CO_Shell(3, ix - 1, iy + 8, false, true, false, false);
 	shell->state = 2;
 	shell->yi(iy + 8);
 
@@ -7451,10 +7535,10 @@ bool MO_Koopa::hittop(CPlayer * player)
 	return false;
 }
 
-void MO_Koopa::Die()
+void MO_BuzzyBeetle::Die()
 {
 	dead = true;
-	eyecandyfront.add(new EC_FallingObject(&spr_shelldead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, fRed ? 32 : 0, 0, 32, 32));
+	eyecandyfront.add(new EC_FallingObject(&spr_shelldead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, 96, 0, 32, 32));
 }
 
 
@@ -7565,7 +7649,7 @@ void MO_CheepCheep::collide(IO_MovingObject * object)
 
 		MovingObjectType type = object->getMovingObjectType();
 
-		if(type == movingobject_fireball || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_boomerang || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_bulletbill || type == movingobject_podobo || type == movingobject_attackzone || type == movingobject_explosion)
+		if(type == movingobject_fireball || type == movingobject_hammer || type == movingobject_boomerang || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_bulletbill || type == movingobject_podobo || type == movingobject_attackzone || type == movingobject_explosion)
 		{
 			//Don't kill goombas with non-moving shells
 			if(type == movingobject_shell && object->state == 2)
@@ -8357,7 +8441,7 @@ void CO_Shell::collide(IO_MovingObject * object)
 	{
 		Die();
 	}
-	else if(type == movingobject_fireball || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_boomerang)
+	else if(type == movingobject_fireball || type == movingobject_hammer || type == movingobject_boomerang)
 	{
 		if(fDieOnFire)
 			Die();
@@ -9453,6 +9537,7 @@ void IO_FlameCannon::update()
 			iFlameY = 0;
 
 			state = 1;
+			ifsoundonplay(sfx_flamecannon);
 		}
 	}
 	else if(state == 1 || state == 3) //Start or end of flame but not deadly yet
@@ -9747,7 +9832,7 @@ void MO_PirhanaPlant::collide(IO_MovingObject * object)
 
 	MovingObjectType type = object->getMovingObjectType();
 
-	if(type == movingobject_fireball || type == movingobject_superfireball || type == movingobject_hammer || type == movingobject_boomerang || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone || type == movingobject_explosion)
+	if(type == movingobject_fireball || type == movingobject_hammer || type == movingobject_boomerang || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone || type == movingobject_explosion)
 	{
 		//Don't kill things with shells that are sitting still
 		if(type == movingobject_shell && object->state == 2)

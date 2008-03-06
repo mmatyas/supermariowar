@@ -38,13 +38,12 @@
 //BUG!! Throwing flags into flag bases and probably eggs to yoshi doens't work anymore because there is no collision detection between those items
 //      I was never a big fan of this feature, we'll see if anyone complains
 
-1) New ice wand powerup: Need new gfx from sgraff
 10) Bug! When you kill 2 players/bots rapidly one after another with the star and you have the announcer on, the invincibilty music stops.
 
 [ ] Other mode specific items - berry for yoshi's egg mode, coin for coin/greed mode, coin bag greed mode
-[ ] Add new hammer bros/paratroopa/paragoomba/etc. enemies to stomp
-[ ] Input bug: if the menu select key is mapped to a letter, but then you select a map and press that letter to select the map, it won't select, but jump to the maps that begin with that letter!
-
+[ ] Add new hammer bros/spiny/buzzy beetle/paratroopa/paragoomba/etc. enemies to stomp
+[ ] See if it is possible to export an animated gif screenshot
+[ ] Add configuration to ice wand for how long a player is frozen
 */
 
 /*
@@ -239,6 +238,7 @@ gfxSprite		spr_goomba;
 gfxSprite		spr_goombadead;
 gfxSprite		spr_goombadeadflying;
 gfxSprite		spr_koopa;
+gfxSprite		spr_buzzybeetle;
 //gfxSprite		spr_sledgebrothers;
 //gfxSprite		spr_sledgebrothersdead;
 gfxSprite		spr_redkoopa;
@@ -391,6 +391,7 @@ sfxSound sfx_stun;
 sfxSound sfx_inventory;
 sfxSound sfx_worldmove;
 sfxSound sfx_treasurechest;
+sfxSound sfx_flamecannon;
 
 sfxMusic backgroundmusic[6];
 

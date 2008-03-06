@@ -267,6 +267,7 @@ bool LoadGameGraphics()
 	gfx_loadimage(&spr_goombadead, convertPath("gfx/packs/eyecandy/goombadead.png", graphicspack), true);
 	gfx_loadimage(&spr_goombadeadflying, convertPath("gfx/packs/eyecandy/goombadeadflying.png", graphicspack), true);
 	gfx_loadimage(&spr_koopa, convertPath("gfx/packs/modeobjects/koopa.png", graphicspack), true);
+	gfx_loadimage(&spr_buzzybeetle, convertPath("gfx/packs/modeobjects/buzzybeetle.png", graphicspack), true);
 	//gfx_loadimage(&spr_sledgebrothers, convertPath("gfx/packs/modeobjects/sledgebrothers.png", graphicspack), true);
 	//gfx_loadimage(&spr_sledgebrothersdead, convertPath("gfx/packs/eyecandy/sledgebrothersdead.png", graphicspack), true);
 	gfx_loadimage(&spr_redkoopa, convertPath("gfx/packs/modeobjects/redkoopa.png", graphicspack), true);
@@ -406,6 +407,7 @@ bool LoadGameSounds()
 	sfx_inventory.init(convertPath("sfx/packs/inventory.wav", soundpack));
 	sfx_worldmove.init(convertPath("sfx/packs/mapmove.wav", soundpack));
 	sfx_treasurechest.init(convertPath("sfx/packs/treasurechest.wav", soundpack));
+	sfx_flamecannon.init(convertPath("sfx/packs/flamecannon.wav", soundpack));
 
 	game_values.soundcapable = true;
 	return true;

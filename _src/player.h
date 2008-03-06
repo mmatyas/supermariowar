@@ -92,7 +92,7 @@ class CScore
 };
 
 
-enum killstyle{kill_style_stomp = 0, kill_style_star = 1, kill_style_fireball = 2, kill_style_bobomb = 3, kill_style_bounce = 4, kill_style_pow = 5, kill_style_goomba = 6, kill_style_bulletbill = 7, kill_style_hammer = 8, kill_style_shell = 9, kill_style_throwblock = 10, kill_style_cheepcheep = 11, kill_style_koopa = 12, kill_style_boomerang = 13, kill_style_feather = 14, kill_style_iceblast = 15, kill_style_podobo = 16, kill_style_bomb = 17, kill_style_leaf = 18, kill_style_pwings = 19, kill_style_kuriboshoe = 20, kill_style_frozen = 21, kill_style_poisonmushroom = 22, kill_style_environment = 23, kill_style_push = 24, KILL_STYLE_LAST};
+enum killstyle{kill_style_stomp = 0, kill_style_star = 1, kill_style_fireball = 2, kill_style_bobomb = 3, kill_style_bounce = 4, kill_style_pow = 5, kill_style_goomba = 6, kill_style_bulletbill = 7, kill_style_hammer = 8, kill_style_shell = 9, kill_style_throwblock = 10, kill_style_cheepcheep = 11, kill_style_koopa = 12, kill_style_boomerang = 13, kill_style_feather = 14, kill_style_iceblast = 15, kill_style_podobo = 16, kill_style_bomb = 17, kill_style_leaf = 18, kill_style_pwings = 19, kill_style_kuriboshoe = 20, kill_style_frozen = 21, kill_style_poisonmushroom = 22, kill_style_environment = 23, kill_style_push = 24, kill_style_buzzybeetle = 25, KILL_STYLE_LAST};
 enum awardstyle{award_style_none = 0, award_style_fireworks = 1, award_style_swirl = 2, award_style_halo = 3, award_style_souls = 4, award_style_text = 5};
 enum deathstyle{death_style_jump = 0, death_style_squish = 1, death_style_shatter = 2};
 
@@ -475,6 +475,7 @@ class CPlayer
 		friend class MO_WalkingEnemy;
 		friend class MO_Goomba;
 		friend class MO_Koopa;
+		friend class MO_BuzzyBeetle;
 		//friend class MO_SledgeBrother;
 		friend class MO_CheepCheep;
 		friend class MO_BulletBill;

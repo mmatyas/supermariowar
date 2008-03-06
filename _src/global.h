@@ -100,6 +100,7 @@ struct STextAward
 #define VELSUPERSTOMP	10.0f
 #define VELTAILSHAKE	1.0f
 #define VELKURIBOBOUNCE	3.0f
+#define VELENEMYBOUNCE  7.0f
 
 #define	GRAVITATION		0.40f		
 
@@ -335,6 +336,7 @@ extern sfxSound			sfx_stun;
 extern sfxSound			sfx_inventory;
 extern sfxSound			sfx_worldmove;
 extern sfxSound			sfx_treasurechest;
+extern sfxSound			sfx_flamecannon;
 
 extern sfxMusic			backgroundmusic[6];
 
@@ -401,6 +403,7 @@ extern gfxSprite		spr_goomba;
 extern gfxSprite		spr_goombadead;
 extern gfxSprite		spr_goombadeadflying;
 extern gfxSprite		spr_koopa;
+extern gfxSprite		spr_buzzybeetle;
 //extern gfxSprite		spr_sledgebrothers;
 //extern gfxSprite		spr_sledgebrothersdead;
 extern gfxSprite		spr_redkoopa;

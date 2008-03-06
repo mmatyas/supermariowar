@@ -1966,14 +1966,21 @@ void CGM_Stomp::think()
 			while(iWeightCount < iRandEnemy)
 				iWeightCount += game_values.gamemodesettings.stomp.enemyweight[++iSelectedEnemy];
 
+			/*
 			if(0 == iSelectedEnemy)
-				objectcontainer[0].add(new MO_Goomba(&spr_goomba, rand() % 2 == 0));
+				objectcontainer[0].add(new MO_Goomba(&spr_goomba, rand() % 2 == 0, false));
 			else if(1 == iSelectedEnemy)
-				objectcontainer[0].add(new MO_Koopa(&spr_koopa, rand() % 2 == 0, false));
+				objectcontainer[0].add(new MO_Koopa(&spr_koopa, rand() % 2 == 0, false, false));
 			else if(2 == iSelectedEnemy)
 				objectcontainer[2].add(new MO_CheepCheep(&spr_cheepcheep));
 			else
-				objectcontainer[0].add(new MO_Koopa(&spr_redkoopa, rand() % 2 == 0, true));
+				objectcontainer[0].add(new MO_Koopa(&spr_redkoopa, rand() % 2 == 0, true, false));
+			*/
+
+			objectcontainer[0].add(new MO_Goomba(&spr_goomba, rand() % 2 == 0, true));
+			objectcontainer[0].add(new MO_Koopa(&spr_koopa, rand() % 2 == 0, false, true));
+
+			//objectcontainer[0].add(new MO_BuzzyBeetle(&spr_buzzybeetle, rand() % 2 == 0));
 		}
 	}
 }

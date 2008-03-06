@@ -928,13 +928,6 @@ void CPlayerAI::GetNearestObjects()
 
 					DistanceToObject(objectcontainer[2].list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
 				}
-				else if(movingobject_superfireball == movingtype && ((MO_SuperFireball*)objectcontainer[2].list[i])->iTeamID != iTeamID)
-				{
-					if(fInvincible)
-						continue;
-
-					DistanceToObject(objectcontainer[2].list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
-				}
 				else if(movingobject_hammer == movingtype && ((MO_Hammer*)objectcontainer[2].list[i])->iTeamID != iTeamID)
 				{
 					if(fInvincible)
