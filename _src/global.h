@@ -932,6 +932,8 @@ struct gv
 
 	short		tanookilimit;
 	short		bombslimit;
+	
+	short		wandfreezetime;
 	short		wandlimit;
 
 	short		shellttl;

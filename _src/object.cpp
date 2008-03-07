@@ -4480,7 +4480,7 @@ bool MO_IceBlast::collide(CPlayer * player)
 	{
 		if(!player->spawninvincible && !player->invincible)
 		{
-			player->makefrozen(300);
+			player->makefrozen(game_values.wandfreezetime);
 		}
 	}
 

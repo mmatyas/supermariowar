@@ -179,7 +179,7 @@ class Menu
 		MI_Button * miPowerupSelectionDialogYesButton;
 		MI_Button * miPowerupSelectionDialogNoButton;
 
-		//Weapons & Projectiles Options Menu
+		//Weapons Use Limits Menu
 		UI_Menu mProjectilesLimitsMenu;
 		MI_SelectField * miFireballLimitField;
 		MI_SelectField * miHammerLimitField;
@@ -205,12 +205,15 @@ class Menu
 		MI_SelectField * miHammerDelayField;
 		MI_SelectField * miHammerOneKillField;
 		MI_SelectField * miShellLifeField;
+		MI_SelectField * miWandFreezeTimeField;
+
 		MI_SelectField * miBlueBlockLifeField;
 		MI_SelectField * miGrayBlockLifeField;
 		MI_SelectField * miRedBlockLifeField;
 		MI_SelectField * miBoomerangStyleField;
 		MI_SelectField * miBoomerangLifeField;
 		MI_SelectField * miFeatherJumpsField;
+		
 		MI_Button * miProjectilesOptionsMenuBackButton;
 
 		MI_Text * miFireballText;
@@ -218,6 +221,7 @@ class Menu
 		MI_Text * miBoomerangText;
 		MI_Text * miFeatherText;
 		MI_Text * miShellText;
+		MI_Text * miWandText;
 		MI_Text * miBlueBlockText;
 
 		MI_Image * miProjectilesOptionsMenuLeftHeaderBar;

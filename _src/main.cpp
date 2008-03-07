@@ -785,6 +785,7 @@ int main(int argc, char *argv[])
 	game_values.pwingslimit			= 0;	//Unlimited
 	game_values.tanookilimit		= 0;	//Unlimited
 	game_values.bombslimit			= 0;	//Unlimited
+	game_values.wandfreezetime		= 310;  //5 seconds of freeze time
 	game_values.wandlimit			= 0;	//Unlimited
 	game_values.storedpowerupdelay	= 4;
 	game_values.bonuswheel			= 1;
@@ -1089,6 +1090,7 @@ int main(int argc, char *argv[])
 			fread(&game_values.pwingslimit, sizeof(short), 1, fp);
 			fread(&game_values.tanookilimit, sizeof(short), 1, fp);
 			fread(&game_values.bombslimit, sizeof(short), 1, fp);
+			fread(&game_values.wandfreezetime, sizeof(short), 1, fp);
 			fread(&game_values.wandlimit, sizeof(short), 1, fp);
 			fread(&game_values.shellttl, sizeof(short), 1, fp);
 			fread(&game_values.blueblockttl, sizeof(short), 1, fp);

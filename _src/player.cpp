@@ -2216,7 +2216,12 @@ short PlayerKilledPlayer(short iKiller, CPlayer * killed, short deathstyle, kill
 			killed->die(death_style_jump, false);
 
 		if(player_kill_nonkill != iKillType)
-			ifsoundonplay(sfx_deathsound);
+		{
+			if(style == death_style_shatter)
+				ifsoundonplay(sfx_breakblock);
+			else
+				ifsoundonplay(sfx_deathsound);
+		}
 
 		return iKillType;
 	}
@@ -2257,7 +2262,7 @@ short PlayerKilledPlayer(CPlayer * killer, CPlayer * killed, short deathstyle, k
 		else if(deathstyle == death_style_squish)
 			ifsoundonplay(sfx_mip);
 		else if(deathstyle == death_style_shatter)
-			ifsoundonplay(sfx_deathsound);
+			ifsoundonplay(sfx_breakblock);
 	}
 
 	if(player_kill_normal == iKillType || (fForce && player_kill_nonkill == iKillType))
