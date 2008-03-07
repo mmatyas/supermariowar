@@ -2,7 +2,7 @@
 #define _OBJECT_H
 
 enum ObjectType{object_none = 0, object_block = 1, object_moving = 2, object_overmap = 3, object_area = 4, object_egg = 5, object_frenzycard = 6, object_yoshi = 7, object_race_goal = 8, object_star = 9, object_flag = 10, object_flagbase = 11, object_thwomp = 12, object_kingofthehill_area = 13, object_bowserfire = 14, object_coin = 15, object_collectioncard = 16, object_orbithazard = 17, object_bulletbillcannon = 18, object_flamecannon = 19, object_pathhazard = 20};
-enum MovingObjectType{movingobject_none = 0, movingobject_powerup = 1, movingobject_fireball = 2, movingobject_goomba = 3, movingobject_bulletbill = 4, movingobject_hammer = 5, movingobject_poisonpowerup = 6, movingobject_shell = 7, movingobject_throwblock = 8, movingobject_egg = 9, movingobject_star = 10, movingobject_flag = 11, movingobject_cheepcheep = 12, movingobject_koopa = 13, movingobject_boomerang = 14, movingobject_carried = 15, movingobject_iceblast = 16, movingobject_bomb = 17, movingobject_podobo = 18, movingobject_treasurechest = 19, movingobject_attackzone = 20, movingobject_pirhanaplant = 21, movingobject_explosion = 22, movingobject_buzzybeetle = 23, MOVINGOBJECT_LAST};
+enum MovingObjectType{movingobject_none = 0, movingobject_powerup = 1, movingobject_fireball = 2, movingobject_goomba = 3, movingobject_bulletbill = 4, movingobject_hammer = 5, movingobject_poisonpowerup = 6, movingobject_shell = 7, movingobject_throwblock = 8, movingobject_egg = 9, movingobject_star = 10, movingobject_flag = 11, movingobject_cheepcheep = 12, movingobject_koopa = 13, movingobject_boomerang = 14, movingobject_carried = 15, movingobject_iceblast = 16, movingobject_bomb = 17, movingobject_podobo = 18, movingobject_treasurechest = 19, movingobject_attackzone = 20, movingobject_pirhanaplant = 21, movingobject_explosion = 22, movingobject_buzzybeetle = 23, movingobject_spiny = 24, MOVINGOBJECT_LAST};
 enum BlockType{block_none, block_powerup, block_view, block_breakable, block_note, block_donut, block_flip, block_bounce, block_throw, block_onoff_switch, block_onoff, block_weaponbreakable};
 
 class IO_MovingObject;
@@ -1283,7 +1283,9 @@ class MO_WalkingEnemy : public IO_MovingObject
 		virtual bool hittop(CPlayer * player) = 0;
 		virtual bool hitother(CPlayer * player);
 
-		virtual void Die() {};
+		virtual void Die() {}
+		virtual void DieAndDropShell() { dead = true; DropShell(); }
+		virtual void DropShell() {}
 
 	protected:
 		float spawnradius;
@@ -1306,6 +1308,7 @@ class MO_Goomba : public MO_WalkingEnemy
 		void update();
 		bool hittop(CPlayer * player);
 		void Die();
+		void DieAndDropShell() { Die(); }
 };
 
 class MO_Koopa : public MO_WalkingEnemy
@@ -1317,6 +1320,7 @@ class MO_Koopa : public MO_WalkingEnemy
 		void update();
 		bool hittop(CPlayer * player);
 		void Die();
+		void DropShell();
 
 	private:
 
@@ -1332,6 +1336,19 @@ class MO_BuzzyBeetle : public MO_WalkingEnemy
 		void update();
 		bool hittop(CPlayer * player);
 		void Die();
+		void DropShell();
+};
+
+class MO_Spiny : public MO_WalkingEnemy
+{
+	public:
+		MO_Spiny(gfxSprite *nspr, bool moveToRight);
+		~MO_Spiny(){};
+
+		void update();
+		bool hittop(CPlayer * player);
+		void Die();
+		void DropShell();
 };
 
 class MO_CheepCheep : public IO_MovingObject
@@ -1508,6 +1525,7 @@ class CO_Shell : public MO_CarriedObject
 	friend class MO_Goomba;
 	friend class MO_Koopa;
 	friend class MO_BuzzyBeetle;
+	friend class MO_Spiny;
 	//friend class MO_SledgeBrother;
 	friend class MO_CheepCheep;
 	friend class MO_PirhanaPlant;

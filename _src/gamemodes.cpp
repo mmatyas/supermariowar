@@ -1367,7 +1367,7 @@ void CGM_Survival::init()
 	ratetimer = 0;
 
 	iEnemyWeightCount = 0;
-	for(short iEnemy = 0; iEnemy < 3; iEnemy++)
+	for(short iEnemy = 0; iEnemy < NUMSURVIVALENEMIES; iEnemy++)
 		iEnemyWeightCount += game_values.gamemodesettings.survival.enemyweight[iEnemy];
 
 	if(iEnemyWeightCount == 0)
@@ -1929,7 +1929,7 @@ void CGM_Stomp::init()
 	ResetSpawnTimer();
 
 	iEnemyWeightCount = 0;
-	for(short iEnemy = 0; iEnemy < 4; iEnemy++)
+	for(short iEnemy = 0; iEnemy < NUMSTOMPENEMIES; iEnemy++)
 		iEnemyWeightCount += game_values.gamemodesettings.stomp.enemyweight[iEnemy];
 
 	if(iEnemyWeightCount == 0)
@@ -1966,21 +1966,24 @@ void CGM_Stomp::think()
 			while(iWeightCount < iRandEnemy)
 				iWeightCount += game_values.gamemodesettings.stomp.enemyweight[++iSelectedEnemy];
 
-			/*
 			if(0 == iSelectedEnemy)
 				objectcontainer[0].add(new MO_Goomba(&spr_goomba, rand() % 2 == 0, false));
 			else if(1 == iSelectedEnemy)
 				objectcontainer[0].add(new MO_Koopa(&spr_koopa, rand() % 2 == 0, false, false));
 			else if(2 == iSelectedEnemy)
 				objectcontainer[2].add(new MO_CheepCheep(&spr_cheepcheep));
-			else
+			else if(3 == iSelectedEnemy)
 				objectcontainer[0].add(new MO_Koopa(&spr_redkoopa, rand() % 2 == 0, true, false));
-			*/
-
-			objectcontainer[0].add(new MO_Goomba(&spr_goomba, rand() % 2 == 0, true));
-			objectcontainer[0].add(new MO_Koopa(&spr_koopa, rand() % 2 == 0, false, true));
-
-			//objectcontainer[0].add(new MO_BuzzyBeetle(&spr_buzzybeetle, rand() % 2 == 0));
+			else if(4 == iSelectedEnemy)
+				objectcontainer[0].add(new MO_Spiny(&spr_spiny, rand() % 2 == 0));
+			else if(5 == iSelectedEnemy)
+				objectcontainer[0].add(new MO_BuzzyBeetle(&spr_buzzybeetle, rand() % 2 == 0));
+			else if(6 == iSelectedEnemy)
+				objectcontainer[0].add(new MO_Goomba(&spr_paragoomba, rand() % 2 == 0, true));
+			else if(7 == iSelectedEnemy)
+				objectcontainer[0].add(new MO_Koopa(&spr_parakoopa, rand() % 2 == 0, false, true));
+			else
+				objectcontainer[0].add(new MO_Koopa(&spr_redparakoopa, rand() % 2 == 0, true, true));
 		}
 	}
 }

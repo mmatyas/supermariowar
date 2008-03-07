@@ -127,6 +127,10 @@ struct STextAward
 #define MAXSPAWNAREAS   128
 #define MAXDRAWAREAS   128
 
+#define NUMSTOMPENEMIES 9
+#define NUMSURVIVALENEMIES 3
+#define NUMFRENZYCARDS 12
+
 #define	MAX_BONUS_CHESTS	5
 #define MAX_WORLD_BONUSES_AWARDED 3
 
@@ -337,6 +341,7 @@ extern sfxSound			sfx_inventory;
 extern sfxSound			sfx_worldmove;
 extern sfxSound			sfx_treasurechest;
 extern sfxSound			sfx_flamecannon;
+extern sfxSound			sfx_wand;
 
 extern sfxMusic			backgroundmusic[6];
 
@@ -404,6 +409,10 @@ extern gfxSprite		spr_goombadead;
 extern gfxSprite		spr_goombadeadflying;
 extern gfxSprite		spr_koopa;
 extern gfxSprite		spr_buzzybeetle;
+extern gfxSprite		spr_spiny;
+extern gfxSprite		spr_paragoomba;
+extern gfxSprite		spr_parakoopa;
+extern gfxSprite		spr_redparakoopa;
 //extern gfxSprite		spr_sledgebrothers;
 //extern gfxSprite		spr_sledgebrothersdead;
 extern gfxSprite		spr_redkoopa;
@@ -634,7 +643,7 @@ struct CoinGameModeSettings
 struct StompGameModeSettings
 {
 	short rate;				//How fast they spawn
-	short enemyweight[4];	//What ratio the enemies are chosen
+	short enemyweight[NUMSTOMPENEMIES];	//What ratio the enemies are chosen
 };
 
 struct EggGameModeSettings
@@ -699,12 +708,12 @@ struct FrenzyGameModeSettings
 	short quantity;			//How many powerups spawn
 	short rate;				//How fast they spawn
 	bool storedshells;		//Shells become stored instead of active
-	short powerupweight[12];	//What ratio the powerups are chosen
+	short powerupweight[NUMFRENZYCARDS];	//What ratio the powerups are chosen
 };
 
 struct SurvivalGameModeSettings
 {
-	short enemyweight[3];       //The weighting of thwomps vs. podobos
+	short enemyweight[NUMSURVIVALENEMIES];       //The weighting of thwomps vs. podobos
 	short density;				//Number of thwomps on screen
 	short speed;				//How fast thwomps go
 	bool shield;				//Players are shielded when spawning

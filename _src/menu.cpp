@@ -2238,7 +2238,7 @@ void Menu::CreateMenu()
 	// Stomp Mode Settings
 	//***********************
 
-	miStompModeRateField = new MI_SelectField(&spr_selectfield, 120, 140, "Rate", 400, 180);
+	miStompModeRateField = new MI_SelectField(&spr_selectfield, 120, 40, "Rate", 400, 180);
 	miStompModeRateField->Add("Very Slow", 150, "", false, false);
 	miStompModeRateField->Add("Slow", 120, "", false, false);
 	miStompModeRateField->Add("Moderate", 90, "", false, false);
@@ -2247,9 +2247,9 @@ void Menu::CreateMenu()
 	miStompModeRateField->SetData(&game_values.gamemodemenusettings.stomp.rate, NULL, NULL);
 	miStompModeRateField->SetKey(game_values.gamemodemenusettings.stomp.rate);
 
-	for(short iEnemy = 0; iEnemy < 4; iEnemy++)
+	for(short iEnemy = 0; iEnemy < NUMSTOMPENEMIES; iEnemy++)
 	{
-		miStompModeEnemySlider[iEnemy] = new MI_PowerupSlider(&spr_selectfield, &menu_slider_bar, &menu_stomp, 120, 180 + 40 * iEnemy, 400, iEnemy);
+		miStompModeEnemySlider[iEnemy] = new MI_PowerupSlider(&spr_selectfield, &menu_slider_bar, &menu_stomp, 120, 80 + 40 * iEnemy, 400, iEnemy);
 		miStompModeEnemySlider[iEnemy]->Add("", 0, "", false, false);
 		miStompModeEnemySlider[iEnemy]->Add("", 1, "", false, false);
 		miStompModeEnemySlider[iEnemy]->Add("", 2, "", false, false);
@@ -2279,9 +2279,14 @@ void Menu::CreateMenu()
 	mModeSettingsMenu[5].AddControl(miStompModeEnemySlider[0], miStompModeRateField,      miStompModeEnemySlider[1], NULL, miStompModeBackButton);
 	mModeSettingsMenu[5].AddControl(miStompModeEnemySlider[1], miStompModeEnemySlider[0], miStompModeEnemySlider[2], NULL, miStompModeBackButton);
 	mModeSettingsMenu[5].AddControl(miStompModeEnemySlider[2], miStompModeEnemySlider[1], miStompModeEnemySlider[3], NULL, miStompModeBackButton);
-	mModeSettingsMenu[5].AddControl(miStompModeEnemySlider[3], miStompModeEnemySlider[2], miStompModeBackButton,     NULL, miStompModeBackButton);
+	mModeSettingsMenu[5].AddControl(miStompModeEnemySlider[3], miStompModeEnemySlider[2], miStompModeEnemySlider[4], NULL, miStompModeBackButton);
+	mModeSettingsMenu[5].AddControl(miStompModeEnemySlider[4], miStompModeEnemySlider[3], miStompModeEnemySlider[5], NULL, miStompModeBackButton);
+	mModeSettingsMenu[5].AddControl(miStompModeEnemySlider[5], miStompModeEnemySlider[4], miStompModeEnemySlider[6], NULL, miStompModeBackButton);
+	mModeSettingsMenu[5].AddControl(miStompModeEnemySlider[6], miStompModeEnemySlider[5], miStompModeEnemySlider[7], NULL, miStompModeBackButton);
+	mModeSettingsMenu[5].AddControl(miStompModeEnemySlider[7], miStompModeEnemySlider[6], miStompModeEnemySlider[8], NULL, miStompModeBackButton);
+	mModeSettingsMenu[5].AddControl(miStompModeEnemySlider[8], miStompModeEnemySlider[7], miStompModeBackButton,     NULL, miStompModeBackButton);
 
-	mModeSettingsMenu[5].AddControl(miStompModeBackButton, miStompModeEnemySlider[3], miStompModeRateField, miStompModeEnemySlider[3], NULL);
+	mModeSettingsMenu[5].AddControl(miStompModeBackButton, miStompModeEnemySlider[8], miStompModeRateField, miStompModeEnemySlider[8], NULL);
 	
 	mModeSettingsMenu[5].AddNonControl(miStompModeLeftHeaderBar);
 	mModeSettingsMenu[5].AddNonControl(miStompModeRightHeaderBar);
@@ -2332,7 +2337,7 @@ void Menu::CreateMenu()
 	miFrenzyModeStoredShellsField->SetAutoAdvance(true);
 
 	short iPowerupMap[] = {8, 5, 11, 17, 19, 9, 16, 10, 12, 13, 14, 15};
-	for(short iPowerup = 0; iPowerup < 12; iPowerup++)
+	for(short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++)
 	{
 		miFrenzyModePowerupSlider[iPowerup] = new MI_PowerupSlider(&spr_selectfield, &menu_slider_bar, &spr_storedpoweruplarge, iPowerup < 6 ? 65 : 330, 180 + 40 * iPowerup - (iPowerup < 6 ? 0 : 240), 245, iPowerupMap[iPowerup]);
 		miFrenzyModePowerupSlider[iPowerup]->Add("", 0, "", false, false);
@@ -2391,7 +2396,7 @@ void Menu::CreateMenu()
 	// Survival Mode Settings
 	//***********************
 
-	for(short iEnemy = 0; iEnemy < 3; iEnemy++)
+	for(short iEnemy = 0; iEnemy < NUMSURVIVALENEMIES; iEnemy++)
 	{
 		miSurvivalModeEnemySlider[iEnemy] = new MI_PowerupSlider(&spr_selectfield, &menu_slider_bar, &menu_survival, 120, 120 + 40 * iEnemy, 400, iEnemy);
 		miSurvivalModeEnemySlider[iEnemy]->Add("", 0, "", false, false);

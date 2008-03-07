@@ -485,7 +485,7 @@ class Menu
 
 		//Stomp
 		MI_SelectField * miStompModeRateField;
-		MI_PowerupSlider * miStompModeEnemySlider[4];
+		MI_PowerupSlider * miStompModeEnemySlider[NUMSTOMPENEMIES];
 		MI_Button * miStompModeBackButton;
 		
 		MI_Image * miStompModeLeftHeaderBar;
@@ -496,7 +496,7 @@ class Menu
 		MI_SelectField * miFrenzyModeQuantityField;
 		MI_SelectField * miFrenzyModeRateField;
 		MI_SelectField * miFrenzyModeStoredShellsField;
-		MI_PowerupSlider * miFrenzyModePowerupSlider[12];
+		MI_PowerupSlider * miFrenzyModePowerupSlider[NUMFRENZYCARDS];
 		MI_Button * miFrenzyModeBackButton;
 		
 		MI_Image * miFrenzyModeLeftHeaderBar;
@@ -504,7 +504,7 @@ class Menu
 		MI_Text * miFrenzyModeHeaderText;
 
 		//Survival
-		MI_PowerupSlider * miSurvivalModeEnemySlider[3];
+		MI_PowerupSlider * miSurvivalModeEnemySlider[NUMSURVIVALENEMIES];
 		MI_SelectField * miSurvivalModeDensityField;
 		MI_SelectField * miSurvivalModeSpeedField;
 		MI_SelectField * miSurvivalModeShieldField;

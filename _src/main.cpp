@@ -41,13 +41,13 @@
 10) Bug! When you kill 2 players/bots rapidly one after another with the star and you have the announcer on, the invincibilty music stops.
 
 [ ] Other mode specific items - berry for yoshi's egg mode, coin for coin/greed mode, coin bag greed mode
-[ ] Add new hammer bros/spiny/buzzy beetle/paratroopa/paragoomba/etc. enemies to stomp
 [ ] See if it is possible to export an animated gif screenshot
 [ ] Add configuration to ice wand for how long a player is frozen
 */
 
 /*
 Checkin:
+
 */
 
 #ifdef _XBOX
@@ -239,6 +239,10 @@ gfxSprite		spr_goombadead;
 gfxSprite		spr_goombadeadflying;
 gfxSprite		spr_koopa;
 gfxSprite		spr_buzzybeetle;
+gfxSprite		spr_spiny;
+gfxSprite		spr_paragoomba;
+gfxSprite		spr_parakoopa;
+gfxSprite		spr_redparakoopa;
 //gfxSprite		spr_sledgebrothers;
 //gfxSprite		spr_sledgebrothersdead;
 gfxSprite		spr_redkoopa;
@@ -392,6 +396,7 @@ sfxSound sfx_inventory;
 sfxSound sfx_worldmove;
 sfxSound sfx_treasurechest;
 sfxSound sfx_flamecannon;
+sfxSound sfx_wand;
 
 sfxMusic backgroundmusic[6];
 
@@ -907,10 +912,15 @@ int main(int argc, char *argv[])
 
 	//Stomp
 	game_values.gamemodemenusettings.stomp.rate = 90; //Moderate
-	game_values.gamemodemenusettings.stomp.enemyweight[0] = 1; // turn on goombas, koopa and cheep cheeps by default
-	game_values.gamemodemenusettings.stomp.enemyweight[1] = 1;  
-	game_values.gamemodemenusettings.stomp.enemyweight[2] = 2;
-	game_values.gamemodemenusettings.stomp.enemyweight[3] = 1;
+	game_values.gamemodemenusettings.stomp.enemyweight[0] = 4; // turn on goombas, koopa and cheep cheeps by default
+	game_values.gamemodemenusettings.stomp.enemyweight[1] = 4;  
+	game_values.gamemodemenusettings.stomp.enemyweight[2] = 6;
+	game_values.gamemodemenusettings.stomp.enemyweight[3] = 2;
+	game_values.gamemodemenusettings.stomp.enemyweight[4] = 2;
+	game_values.gamemodemenusettings.stomp.enemyweight[5] = 4;
+	game_values.gamemodemenusettings.stomp.enemyweight[6] = 1;
+	game_values.gamemodemenusettings.stomp.enemyweight[7] = 1;
+	game_values.gamemodemenusettings.stomp.enemyweight[8] = 1;
 
 	//Eggs
 	game_values.gamemodemenusettings.egg.eggs[0] = 0;
@@ -2076,8 +2086,9 @@ void RunGame()
 						if(object->getObjectType() == object_moving)
 						{
 							IO_MovingObject * movingobject = (IO_MovingObject *)object;
+							MovingObjectType type = movingobject->getMovingObjectType();
 							
-							if((movingobject->getMovingObjectType() == movingobject_goomba || movingobject->getMovingObjectType() == movingobject_koopa)
+							if((type == movingobject_goomba || type == movingobject_koopa || type == movingobject_buzzybeetle || type == movingobject_spiny)
 								&& game_values.screenshakekillinair == movingobject->inair)
 							{
 								CPlayer * killer = GetPlayerFromGlobalID(game_values.screenshakeplayerid);
@@ -2088,7 +2099,7 @@ void RunGame()
 										killer->score->AdjustScore(1);
 
 									ifsoundonplay(sfx_kicksound);
-									((MO_Goomba*)movingobject)->Die();
+									((MO_WalkingEnemy*)movingobject)->DieAndDropShell();
 
 									game_values.screenshakekillscount++;
 									
@@ -2125,6 +2136,7 @@ void RunGame()
 						}
 					}
 
+					//Add kills in row for kills from pow and mod
 					if(game_values.screenshakekillscount > 1 && game_values.awardstyle != award_style_none)
 					{
 						game_values.screenshakekillscount = 0;

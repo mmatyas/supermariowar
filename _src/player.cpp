@@ -1253,7 +1253,7 @@ void CPlayer::move()
 
 								projectiles[globalID]++;
 								
-								ifsoundonplay(sfx_transform);
+								ifsoundonplay(sfx_wand);
 							}
 
 							if(game_values.wandlimit > 0)
@@ -1476,7 +1476,7 @@ void CPlayer::move()
 		}
 
 		//Kill the player if he is standing still for too long
-		if(velx != 0.0f || vely != GRAVITATION)
+		if(velx != 0.0f || vely != GRAVITATION || game_values.gamemode->gameover)
 		{
 			suicidetimer = 0;
 			suicidedisplaytimer = 2;

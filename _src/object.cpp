@@ -7207,7 +7207,7 @@ MO_WalkingEnemy::MO_WalkingEnemy(gfxSprite *nspr, short iNumSpr, short aniSpeed,
 	spawnangle = (float)(rand()%1000 * 0.00628f);
 	inair = true;
 
-	iSpawnIconOffset = 64;
+	iSpawnIconOffset = 0;
 
 	burnuptimer = 0;
 
@@ -7371,12 +7371,25 @@ MO_Goomba::MO_Goomba(gfxSprite *nspr, bool moveToRight, bool fBouncing) :
 	movingObjectType = movingobject_goomba;
 	iSpawnIconOffset = 64;
 	killStyle = kill_style_goomba;
+
+	if(fBouncing)
+	{
+		iw = 40;
+		ih = 48;
+
+		fOldY = fy - ih;
+
+		collisionOffsetX = 5;
+		collisionOffsetY = 27;
+
+		animationOffsetY = moveToRight ? 0 : ih;
+	}
 }
 
 void MO_Goomba::update()
 {
 	if(velx < 0.0f)
-		animationOffsetY = 32;
+		animationOffsetY = ih;
 	else
 		animationOffsetY = 0;
 
@@ -7394,6 +7407,18 @@ bool MO_Goomba::hittop(CPlayer * player)
 	{
 		fBouncing = false;
 		bounce = GRAVITATION;
+
+		iw = 32;
+		ih = 32;
+
+		collisionOffsetX = 1;
+		collisionOffsetY = 11;
+
+		animationWidth = 32;
+		drawframe = 0;
+
+		animationOffsetY = velx > 0.0f ? 0 : ih;
+		spr = &spr_goomba;
 	}
 	else
 	{
@@ -7417,7 +7442,6 @@ void MO_Goomba::Die()
 	dead = true;
 	eyecandyfront.add(new EC_FallingObject(&spr_goombadeadflying, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, 0, 0, 0, 0));
 }
-
 
 //------------------------------------------------------------------------------
 // class koopa
@@ -7452,6 +7476,8 @@ bool MO_Koopa::hittop(CPlayer * player)
 	{
 		fBouncing = false;
 		bounce = GRAVITATION;
+
+		spr = fRed ? &spr_redkoopa : &spr_koopa;
 	}
 	else
 	{
@@ -7464,18 +7490,7 @@ bool MO_Koopa::hittop(CPlayer * player)
 
 		ifsoundonplay(sfx_mip);
 
-		//Give the shell a state 2 so it is already spawned but sitting
-		CO_Shell * shell;
-		
-		if(fRed)
-			shell = new CO_Shell(1, ix - 1, iy + 8, false, true, true, false);
-		else
-			shell = new CO_Shell(0, ix - 1, iy + 8, true, true, true, false);
-		
-		shell->state = 2;
-		shell->yi(iy + 8);
-
-		objectcontainer[1].add(shell);
+		DropShell();
 	}
 
 	return false;
@@ -7487,13 +7502,27 @@ void MO_Koopa::Die()
 	eyecandyfront.add(new EC_FallingObject(&spr_shelldead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, fRed ? 32 : 0, 0, 32, 32));
 }
 
+void MO_Koopa::DropShell()
+{
+	//Give the shell a state 2 so it is already spawned but sitting
+	CO_Shell * shell;
+	
+	if(fRed)
+		shell = new CO_Shell(1, ix - 1, iy + 8, false, true, true, false);
+	else
+		shell = new CO_Shell(0, ix - 1, iy + 8, true, true, true, false);
+	
+	shell->state = 2;
+	shell->yi(iy + 8);
 
+	objectcontainer[1].add(shell);
+}
 
 //------------------------------------------------------------------------------
 // class buzzy beetle
 //------------------------------------------------------------------------------
 MO_BuzzyBeetle::MO_BuzzyBeetle(gfxSprite *nspr, bool moveToRight) :
-	MO_WalkingEnemy(nspr, 2, 8, 30, 28, 1, 3, 0, moveToRight ? 0 : 32, 32, 32, moveToRight, false, false)
+	MO_WalkingEnemy(nspr, 2, 8, 30, 20, 1, 11, 0, moveToRight ? 0 : 32, 32, 32, moveToRight, false, false)
 {
 	movingObjectType = movingobject_buzzybeetle;
 	iSpawnIconOffset = 160;
@@ -7525,12 +7554,7 @@ bool MO_BuzzyBeetle::hittop(CPlayer * player)
 
 	ifsoundonplay(sfx_mip);
 
-	//Give the shell a state 2 so it is already spawned but sitting
-	CO_Shell * shell = new CO_Shell(3, ix - 1, iy + 8, false, true, false, false);
-	shell->state = 2;
-	shell->yi(iy + 8);
-
-	objectcontainer[1].add(shell);
+	DropShell();
 	
 	return false;
 }
@@ -7541,6 +7565,67 @@ void MO_BuzzyBeetle::Die()
 	eyecandyfront.add(new EC_FallingObject(&spr_shelldead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, 96, 0, 32, 32));
 }
 
+void MO_BuzzyBeetle::DropShell()
+{
+	//Give the shell a state 2 so it is already spawned but sitting
+	CO_Shell * shell = new CO_Shell(3, ix - 1, iy + 8, false, true, false, false);
+	shell->state = 2;
+	shell->yi(iy + 8);
+
+	objectcontainer[1].add(shell);
+}
+
+//------------------------------------------------------------------------------
+// class spiny
+//------------------------------------------------------------------------------
+MO_Spiny::MO_Spiny(gfxSprite *nspr, bool moveToRight) :
+	MO_WalkingEnemy(nspr, 2, 8, 30, 20, 1, 11, 0, moveToRight ? 0 : 32, 32, 32, moveToRight, true, false)
+{
+	movingObjectType = movingobject_spiny;
+	iSpawnIconOffset = 176;
+	killStyle = kill_style_spiny;
+}
+
+void MO_Spiny::update()
+{
+	if(velx < 0.0f)
+		animationOffsetY = 32;
+	else
+		animationOffsetY = 0;
+
+	MO_WalkingEnemy::update();
+}
+
+bool MO_Spiny::hittop(CPlayer * player)
+{
+	//Kill player here
+	if(player->isready() && !player->spawninvincible && !player->invincible && !player->fKuriboShoe)
+	{
+		player->KillPlayerMapHazard(false, kill_style_environment);
+		return true;
+	}
+	
+	if(player->fKuriboShoe)
+		Die();
+
+	return false;
+}
+
+void MO_Spiny::Die()
+{
+	dead = true;
+	eyecandyfront.add(new EC_FallingObject(&spr_shelldead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, 64, 0, 32, 32));
+}
+
+void MO_Spiny::DropShell()
+{
+	//Give the shell a state 2 so it is already spawned but sitting
+	CO_Shell * shell = new CO_Shell(2, ix - 1, iy + 8, false, true, false, false);
+	shell->state = 2;
+	shell->yi(iy + 8);
+
+	objectcontainer[1].add(shell);
+}
 
 //------------------------------------------------------------------------------
 // class cheep cheep
