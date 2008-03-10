@@ -623,6 +623,12 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.survival.speed, NULL, game_values.gamemodemenusettings.survival.speed, false);
 				ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.survival.shield, 0, game_values.gamemodemenusettings.survival.shield);
 			}
+			else if(ts->iMode == 17) //greed
+			{
+				ts->fUseSettings = true;
+				
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.greed.coinlife, NULL, game_values.gamemodemenusettings.greed.coinlife, false);
+			}
 			else if(ts->iMode == 18) //health
 			{
 				ts->fUseSettings = true;
@@ -1096,6 +1102,14 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
 				if(ts->iNumUsedSettings > 5)
 				{
 					sprintf(szTemp, ",%d", ts->gmsSettings.survival.shield);
+					strcat(buffer, szTemp);
+				}
+			}
+			else if(ts->iMode == 17) //greed
+			{
+				if(ts->iNumUsedSettings > 0)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.greed.coinlife);
 					strcat(buffer, szTemp);
 				}
 			}

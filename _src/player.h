@@ -392,6 +392,7 @@ class CPlayer
 		friend class CGM_Greed;
 		friend class CGM_Health;
 		friend class CGM_Collection;
+		friend class CGM_Pipe_MiniGame;
 
 		friend class CGM_Boss;
 		friend class CGM_Bonus;

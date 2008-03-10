@@ -518,6 +518,14 @@ class Menu
 		MI_Image * miSurvivalModeRightHeaderBar;
 		MI_Text * miSurvivalModeHeaderText;
 
+		//Greed
+		MI_SelectField * miGreedModeCoinLife;
+		MI_Button * miGreedModeBackButton;
+		
+		MI_Image * miGreedModeLeftHeaderBar;
+		MI_Image * miGreedModeRightHeaderBar;
+		MI_Text * miGreedModeHeaderText;
+		
 		//Health
 		MI_SelectField * miHealthModeStartLife;
 		MI_SelectField * miHealthModeMaxLife;

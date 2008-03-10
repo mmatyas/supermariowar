@@ -719,6 +719,11 @@ struct SurvivalGameModeSettings
 	bool shield;				//Players are shielded when spawning
 };
 
+struct GreedGameModeSettings
+{
+	short coinlife;				//How long coins stick around before disappearing
+};
+
 struct HealthGameModeSettings
 {
 	short startlife;			//Number of hearts players start with
@@ -751,6 +756,7 @@ struct GameModeSettings
 	RaceGameModeSettings race;
 	FrenzyGameModeSettings frenzy;
 	SurvivalGameModeSettings survival;
+	GreedGameModeSettings greed;
 	HealthGameModeSettings health;
 	CollectionGameModeSettings collection;
 };

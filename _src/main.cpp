@@ -47,7 +47,11 @@
 
 /*
 Checkin:
-
+1) Updated animation rate for center flag
+2) Added coin disappear time to greed mode
+3) Fixed bug where suicide timer didn't force player to respawn
+4) Refactored a bunch of mode code into CheckWinner to make it better organized
+5) Fixed bug with collection mode for not detecting game winner correctly
 */
 
 #ifdef _XBOX
@@ -400,8 +404,10 @@ sfxSound sfx_wand;
 
 sfxMusic backgroundmusic[6];
 
-CGameMode	*gamemodes[GAMEMODE_LAST];
-CGM_Bonus	*bonushousemode = NULL;
+CGameMode			*gamemodes[GAMEMODE_LAST];
+CGM_Bonus			*bonushousemode = NULL;
+CGM_Pipe_MiniGame	*pipegamemode = NULL;
+
 short		currentgamemode = 0;
 
 short g_iWinningPlayer;
@@ -887,6 +893,7 @@ int main(int argc, char *argv[])
 
 	//Special modes
 	bonushousemode = new CGM_Bonus();
+	pipegamemode = new CGM_Pipe_MiniGame();
 
 	//Setup the default game mode settings
 	//Classic
@@ -995,12 +1002,15 @@ int main(int argc, char *argv[])
 	game_values.gamemodemenusettings.survival.speed = 4;
 	game_values.gamemodemenusettings.survival.shield = true;
 	
+	//Greed
+	game_values.gamemodemenusettings.greed.coinlife = 124;			//Coins disappear after 2 seconds
+	
 	//Health
 	game_values.gamemodemenusettings.health.startlife = 6;			//Start with 3 whole hearts (each increment is a half heart)
 	game_values.gamemodemenusettings.health.maxlife = 10;			//Maximum of 5 hearts
 	game_values.gamemodemenusettings.health.percentextralife = 20;	//20% chance of a heart spawning
 
-	//Health
+	//Card Collection
 	game_values.gamemodemenusettings.collection.quantity = 6;		//#players - 1
 	game_values.gamemodemenusettings.collection.rate = 186;			//3 seconds to spawn
 	game_values.gamemodemenusettings.collection.banktime = 310;		//5 seconds to bank

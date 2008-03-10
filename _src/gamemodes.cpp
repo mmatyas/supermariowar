@@ -172,6 +172,12 @@ void CGameMode::init()  //called once when the game is started
 	}
 };
 
+void CGameMode::think()
+{
+	if(gameover)
+		displayplayertext();
+}
+
 void CGameMode::displayplayertext()
 {
 	if(winningteam > -1)
@@ -310,14 +316,6 @@ CGM_Frag::CGM_Frag() : CGameMode()
 	SetupModeStrings("Frag Limit", "Kills", 5);
 };
 
-
-void CGM_Frag::think()
-{
-	if(gameover)
-		displayplayertext();
-}
-
-
 short CGM_Frag::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
 {
 	if(gameover)
@@ -333,7 +331,7 @@ short CGM_Frag::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle
 			inflictor.score->AdjustScore(1);
 	}
 
-	short iRet = CheckWinner(inflictor);
+	short iRet = CheckWinner(&inflictor);
 
 	if(game_values.gamemode->gamemode == game_mode_frag && game_values.gamemodesettings.frag.style == 1)
 	{
@@ -371,17 +369,17 @@ void CGM_Frag::playerextraguy(CPlayer &player, short iType)
 	if(!gameover)
 	{
 		player.score->AdjustScore(iType);
-		CheckWinner(player);
+		CheckWinner(&player);
 	}
 }
 
-short CGM_Frag::CheckWinner(CPlayer &player)
+short CGM_Frag::CheckWinner(CPlayer * player)
 {
 	if(goal > -1)
 	{
-		if(player.score->score >= goal)
+		if(player->score->score >= goal)
 		{
-			winningteam = player.teamID;
+			winningteam = player->teamID;
 			gameover = true;
 
 			RemovePlayersButTeam(winningteam);
@@ -390,7 +388,7 @@ short CGM_Frag::CheckWinner(CPlayer &player)
 
 			return player_kill_removed;
 		}
-		else if(player.score->score >= goal - 2 && !playedwarningsound)
+		else if(player->score->score >= goal - 2 && !playedwarningsound)
 		{
 			playwarningsound();
 		}
@@ -432,8 +430,7 @@ void CGM_TimeLimit::init()
 
 void CGM_TimeLimit::think()
 {
-	if(gameover)
-		displayplayertext();
+	CGameMode::think();
 
 	if(timeleft > 0 || goal == -1)
 	{
@@ -587,13 +584,6 @@ void CGM_Classic::init()
 }
 
 
-void CGM_Classic::think()
-{
-	if(gameover)
-		displayplayertext();
-}
-
-
 short CGM_Classic::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
 {
 	if(!gameover)
@@ -716,7 +706,7 @@ void CGM_Classic::playerextraguy(CPlayer &player, short iType)
 
 //capture the chicken
 //one player is the chicken
-//if he is stomped the attacker becomes the chicken.
+//if he is killed the attacker becomes the chicken.
 //get points for being the chicken
 CGM_Chicken::CGM_Chicken() : CGameMode()
 {
@@ -752,7 +742,7 @@ void CGM_Chicken::think()
 				}
 			}
 
-			CheckWinner(*chicken);
+			CheckWinner(chicken);
 		}	
 	}
 }
@@ -788,7 +778,7 @@ short CGM_Chicken::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killst
 		if(!gameover)
 		{
 			inflictor.score->AdjustScore(5);
-			return CheckWinner(inflictor);
+			return CheckWinner(&inflictor);
 		}
 	}
 	
@@ -815,19 +805,19 @@ void CGM_Chicken::playerextraguy(CPlayer &player, short iType)
 	if(!gameover)
 	{
 		player.score->AdjustScore(10 * iType);
-		CheckWinner(player);
+		CheckWinner(&player);
 	}
 }
 
-short CGM_Chicken::CheckWinner(CPlayer &player)
+short CGM_Chicken::CheckWinner(CPlayer * player)
 {
 	if(goal == -1)
 		return player_kill_normal;
 
-	if(player.score->score >= goal)
+	if(player->score->score >= goal)
 	{
-		player.score->SetScore(goal);
-		winningteam = player.teamID;
+		player->score->SetScore(goal);
+		winningteam = player->teamID;
 		gameover = true;
 
 		SetupScoreBoard(false);
@@ -835,7 +825,7 @@ short CGM_Chicken::CheckWinner(CPlayer &player)
 		RemovePlayersButTeam(winningteam);
 		return player_kill_removed;
 	}
-	else if(player.score->score >= goal * 0.8 && !playedwarningsound)
+	else if(player->score->score >= goal * 0.8 && !playedwarningsound)
 	{
 		playwarningsound();
 	}
@@ -1075,37 +1065,6 @@ void CGM_Coins::init()
 }
 
 
-void CGM_Coins::think()
-{
-	if(gameover)
-	{
-		displayplayertext();
-	}
-	else
-	{
-		if(goal > -1)
-		{
-			for(short i = 0; i < list_players_cnt; i++)
-			{
-				if(list_players[i]->score->score >= goal)
-				{
-					winningteam = list_players[i]->teamID;
-					gameover = true;
-
-					RemovePlayersButTeam(winningteam);
-					SetupScoreBoard(false);
-					ShowScoreBoard();
-				}
-				else if(list_players[i]->score->score >= goal - 2 && !playedwarningsound)
-				{
-					playwarningsound();
-				}
-			}
-		}
-	}
-}
-
-
 short CGM_Coins::playerkilledplayer(CPlayer &player, CPlayer &other, killstyle style)
 {
 	if(game_values.gamemodesettings.coins.penalty)
@@ -1127,24 +1086,30 @@ void CGM_Coins::playerextraguy(CPlayer &player, short iType)
 	if(!gameover)
 	{
 		player.score->AdjustScore(iType);
+		CheckWinner(&player);
+	}
+}
 
-		if(goal > -1)
+short CGM_Coins::CheckWinner(CPlayer * player)
+{
+	if(goal > -1)
+	{
+		if(player->score->score >= goal)
 		{
-			if(player.score->score >= goal)
-			{
-				winningteam = player.teamID;
-				gameover = true;
+			winningteam = player->teamID;
+			gameover = true;
 
-				RemovePlayersButTeam(winningteam);
-				SetupScoreBoard(false);
-				ShowScoreBoard();
-			}
-			else if(player.score->score >= goal - 2 && !playedwarningsound)
-			{
-				playwarningsound();
-			}
+			RemovePlayersButTeam(winningteam);
+			SetupScoreBoard(false);
+			ShowScoreBoard();
+		}
+		else if(player->score->score >= goal - 2 && !playedwarningsound)
+		{
+			playwarningsound();
 		}
 	}
+
+	return player_kill_normal;
 }
 
 
@@ -1186,38 +1151,6 @@ void CGM_Eggs::init()
 	}	
 }
 
-
-void CGM_Eggs::think()
-{
-	if(gameover)
-	{
-		displayplayertext();
-	}
-	else
-	{
-		if(goal > -1)
-		{
-			for(short i = 0; i < list_players_cnt; i++)
-			{
-				if(list_players[i]->score->score >= goal)
-				{
-					winningteam = list_players[i]->teamID;
-					gameover = true;
-
-					RemovePlayersButTeam(winningteam);
-					SetupScoreBoard(false);
-					ShowScoreBoard();
-				}
-				else if(list_players[i]->score->score >= goal - 2 && !playedwarningsound)
-				{
-					playwarningsound();
-				}
-			}
-		}
-	}
-}
-
-
 short CGM_Eggs::playerkilledplayer(CPlayer &, CPlayer &, killstyle)
 {
 	return player_kill_normal;
@@ -1240,26 +1173,31 @@ void CGM_Eggs::playerextraguy(CPlayer &player, short iType)
 	if(!gameover)
 	{
 		player.score->AdjustScore(iType);
-
-		if(goal > -1)
-		{
-			if(player.score->score >= goal)
-			{
-				winningteam = player.teamID;
-				gameover = true;
-
-				RemovePlayersButTeam(winningteam);
-				SetupScoreBoard(false);
-				ShowScoreBoard();
-			}
-			else if(player.score->score >= goal - 2 && !playedwarningsound)
-			{
-				playwarningsound();
-			}
-		}
+		CheckWinner(&player);
 	}
 }
 
+short CGM_Eggs::CheckWinner(CPlayer * player)
+{
+	if(goal > -1)
+	{
+		if(player->score->score >= goal)
+		{
+			winningteam = player->teamID;
+			gameover = true;
+
+			RemovePlayersButTeam(winningteam);
+			SetupScoreBoard(false);
+			ShowScoreBoard();
+		}
+		else if(player->score->score >= goal - 2 && !playedwarningsound)
+		{
+			playwarningsound();
+		}
+	}
+
+	return player_kill_normal;
+}
 
 //Fireball:
 //Frag limit death match, but powerup cards appear randomly
@@ -1457,36 +1395,6 @@ void CGM_Domination::init()
 		objectcontainer[0].add(new OMO_Area(&spr_areas, iNumAreas));
 }
 
-void CGM_Domination::think()
-{
-	if(gameover)
-	{
-		displayplayertext();
-	}
-	else
-	{
-		if(goal > -1)
-		{
-			for(short i = 0; i < list_players_cnt; i++)
-			{
-				if(list_players[i]->score->score >= goal)
-				{
-					winningteam = list_players[i]->teamID;
-					gameover = true;
-
-					RemovePlayersButTeam(winningteam);
-					SetupScoreBoard(false);
-					ShowScoreBoard();
-				}
-				else if(list_players[i]->score->score >= goal * 0.8 && !playedwarningsound)
-				{
-					playwarningsound();
-				}
-			}
-		}
-	}
-}
-
 short CGM_Domination::playerkilledplayer(CPlayer &player, CPlayer &other, killstyle style)
 {
 	//Update areas the dead player owned
@@ -1510,27 +1418,32 @@ void CGM_Domination::playerextraguy(CPlayer &player, short iType)
 	if(!gameover)
 	{
 		player.score->AdjustScore(10 * iType);
-
-		if(goal > -1)
-		{
-			if(player.score->score >= goal)
-			{
-				player.score->SetScore(goal);
-				winningteam = player.teamID;
-				gameover = true;
-
-				SetupScoreBoard(false);
-				ShowScoreBoard();
-				RemovePlayersButTeam(winningteam);
-			}
-			else if(player.score->score >= goal * 0.8 && !playedwarningsound)
-			{
-				playwarningsound();
-			}
-		}
+		CheckWinner(&player);
 	}
 }
 
+short CGM_Domination::CheckWinner(CPlayer * player)
+{
+	if(goal > -1)
+	{
+		if(player->score->score >= goal)
+		{
+			player->score->SetScore(goal);
+			winningteam = player->teamID;
+			gameover = true;
+
+			SetupScoreBoard(false);
+			ShowScoreBoard();
+			RemovePlayersButTeam(winningteam);
+		}
+		else if(player->score->score >= goal * 0.8 && !playedwarningsound)
+		{
+			playwarningsound();
+		}
+	}
+
+	return player_kill_normal;
+}
 
 //Owned:
 //Players rack up points like domination for each player they have "owned"
@@ -1614,7 +1527,7 @@ short CGM_Owned::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyl
 			other.ownerColorOffsetX = inflictor.colorID * 48;
 		}
 		
-		return CheckWinner(inflictor);
+		return CheckWinner(&inflictor);
 	}
 
 	return player_kill_normal;
@@ -1640,19 +1553,19 @@ void CGM_Owned::playerextraguy(CPlayer &player, short iType)
 	if(!gameover)
 	{
 		player.score->AdjustScore(10 * iType);
-		CheckWinner(player);
+		CheckWinner(&player);
 	}
 }
 
-short CGM_Owned::CheckWinner(CPlayer &player)
+short CGM_Owned::CheckWinner(CPlayer * player)
 {
 	if(goal == -1)
 		return player_kill_normal;
 	
-	if(player.score->score >= goal)
+	if(player->score->score >= goal)
 	{
-		player.score->SetScore(goal);
-		winningteam = player.teamID;
+		player->score->SetScore(goal);
+		winningteam = player->teamID;
 		gameover = true;
 
 		SetupScoreBoard(false);
@@ -1660,7 +1573,7 @@ short CGM_Owned::CheckWinner(CPlayer &player)
 		RemovePlayersButTeam(winningteam);
 		return player_kill_removed;
 	}
-	else if(player.score->score >= goal * 0.8 && !playedwarningsound)
+	else if(player->score->score >= goal * 0.8 && !playedwarningsound)
 	{
 		playwarningsound();
 	}
@@ -1947,7 +1860,7 @@ void CGM_Stomp::think()
 	{
 		for(short i = 0; i < list_players_cnt; i++)
 		{
-			CheckWinner(*list_players[i]);
+			CheckWinner(list_players[i]);
 		}
 	}
 
@@ -2003,7 +1916,7 @@ void CGM_Stomp::playerextraguy(CPlayer &player, short iType)
 	if(!gameover)
 	{
 		player.score->AdjustScore(iType);
-		CheckWinner(player);
+		CheckWinner(&player);
 	}
 }
 
@@ -2012,15 +1925,15 @@ void CGM_Stomp::ResetSpawnTimer()
 	spawntimer = (short)(rand() % game_values.gamemodesettings.stomp.rate) + game_values.gamemodesettings.stomp.rate;
 }
 
-short CGM_Stomp::CheckWinner(CPlayer &player)
+short CGM_Stomp::CheckWinner(CPlayer * player)
 {
 	if(goal == -1)
 		return player_kill_normal;
 
-	if(player.score->score >= goal)
+	if(player->score->score >= goal)
 	{
-		player.score->SetScore(goal);
-		winningteam = player.teamID;
+		player->score->SetScore(goal);
+		winningteam = player->teamID;
 		gameover = true;
 
 		SetupScoreBoard(false);
@@ -2028,7 +1941,7 @@ short CGM_Stomp::CheckWinner(CPlayer &player)
 		RemovePlayersButTeam(winningteam);
 		return player_kill_removed;
 	}
-	else if(player.score->score >= goal - 2 && !playedwarningsound)
+	else if(player->score->score >= goal - 2 && !playedwarningsound)
 	{
 		playwarningsound();
 	}
@@ -2068,12 +1981,6 @@ void CGM_Race::init()
 
 	for(short iPlayer = 0; iPlayer < 4; iPlayer++)
 		nextGoal[iPlayer] = 0;
-}
-
-void CGM_Race::think()
-{
-	if(gameover)
-		displayplayertext();
 }
 
 short CGM_Race::playerkilledplayer(CPlayer &, CPlayer &other, killstyle style)
@@ -2400,37 +2307,6 @@ void CGM_CaptureTheFlag::init()
 	}
 }
 
-
-void CGM_CaptureTheFlag::think()
-{
-	if(gameover)
-	{
-		displayplayertext();
-		return;
-	}
-	
-	if(goal > -1)
-	{
-		for(short i = 0; i < list_players_cnt; i++)
-		{
-			if(list_players[i]->score->score >= goal)
-			{
-				winningteam = list_players[i]->teamID;
-				gameover = true;
-
-				RemovePlayersButTeam(winningteam);
-				SetupScoreBoard(false);
-				ShowScoreBoard();
-			}
-			else if(list_players[i]->score->score >= goal - 2 && !playedwarningsound)
-			{
-				playwarningsound();
-			}
-		}
-	}
-}
-
-
 short CGM_CaptureTheFlag::playerkilledplayer(CPlayer &, CPlayer &, killstyle)
 {
 	return player_kill_normal;
@@ -2454,23 +2330,29 @@ void CGM_CaptureTheFlag::playerextraguy(CPlayer &player, short iType)
 		return;
 	
 	player.score->AdjustScore(iType);
+	CheckWinner(&player);
+}
 
+short CGM_CaptureTheFlag::CheckWinner(CPlayer * player)
+{
 	if(goal > -1)
 	{
-		if(player.score->score >= goal)
+		if(player->score->score >= goal)
 		{
-			winningteam = player.teamID;
+			winningteam = player->teamID;
 			gameover = true;
 
 			RemovePlayersButTeam(winningteam);
 			SetupScoreBoard(false);
 			ShowScoreBoard();
 		}
-		else if(player.score->score >= goal - 2 && !playedwarningsound)
+		else if(player->score->score >= goal - 2 && !playedwarningsound)
 		{
 			playwarningsound();
 		}
 	}
+
+	return player_kill_normal;
 }
 
 //King of the Hill (Control an area for a certain amount of time)
@@ -2497,6 +2379,7 @@ short CGM_KingOfTheHill::playerkilledself(CPlayer &player, killstyle style)
 {
 	return CGameMode::playerkilledself(player, style);
 }
+
 
 //Greed - steal other players coins - if you have 0 coins, you're removed from the game!
 short g_iKillStyleDamage[KILL_STYLE_LAST] = {5,5,3,8,3,5,2,3,3,5,5,2,2,3,5,3,3,8,5,5,8,8,3,3};
@@ -2743,7 +2626,10 @@ void CGM_Collection::think()
 	}
 
 	if(gameover)
+	{
 		displayplayertext();
+		return;
+	}
 
 	//Check if this team has collected 3 cards
 	for(short iScore = 0; iScore < score_cnt; iScore++)
@@ -2768,6 +2654,11 @@ void CGM_Collection::think()
 				score[iScore]->subscore[2] = 0;
 			}
 		}
+	}
+
+	for(short i = 0; i < list_players_cnt; i++)
+	{
+		CheckWinner(list_players[i]);
 	}
 }
 
@@ -2819,25 +2710,38 @@ void CGM_Collection::playerextraguy(CPlayer &player, short iType)
 	if(!gameover)
 	{
 		player.score->AdjustScore(iType);
+		CheckWinner(&player);
+	}
+}
 
-		if(goal > -1)
+short CGM_Collection::CheckWinner(CPlayer * player)
+{
+	if(goal > -1)
+	{
+		if(player->score->score >= goal)
 		{
-			if(player.score->score >= goal)
-			{
-				player.score->SetScore(goal);
-				winningteam = player.teamID;
-				gameover = true;
+			player->score->SetScore(goal);
+			winningteam = player->teamID;
+			gameover = true;
 
-				SetupScoreBoard(false);
-				ShowScoreBoard();
-				RemovePlayersButTeam(winningteam);
-			}
-			else if(player.score->score >= goal * 0.8 && !playedwarningsound)
+			SetupScoreBoard(false);
+			ShowScoreBoard();
+			RemovePlayersButTeam(winningteam);
+
+			for(short iScore = 0; iScore < score_cnt; iScore++)
 			{
-				playwarningsound();
+				score[iScore]->subscore[0] = 0;
+				score[iScore]->subscore[1] = 0;
+				score[iScore]->subscore[2] = 0;
 			}
 		}
+		else if(player->score->score >= goal * 0.8 && !playedwarningsound)
+		{
+			playwarningsound();
+		}
 	}
+
+	return player_kill_normal;
 }
 
 
@@ -3136,4 +3040,79 @@ void CGM_Bonus::draw_background()
 		for(short iTextLine = 0; iTextLine < tsTourStop->iBonusTextLines; iTextLine++)
 			game_font_large.drawChopRight(136, 132 + 24 * iTextLine, 372, tsTourStop->szBonusText[iTextLine]);
 	}
+}
+
+
+//Pipe Bonus Mini Game (used in world mode)
+//Collect randomly appearing coins on map
+//First one to set amount wins
+CGM_Pipe_MiniGame::CGM_Pipe_MiniGame() : CGameMode()
+{
+	goal = 100;
+	gamemode = game_mode_pipe_minigame;
+
+	SetupModeStrings("Pipe Minigame", "", 0);
+};
+
+void CGM_Pipe_MiniGame::init()
+{
+	CGameMode::init();
+}
+
+
+void CGM_Pipe_MiniGame::think()
+{
+	if(gameover)
+	{
+		displayplayertext();
+		return;
+	}
+
+	for(short i = 0; i < list_players_cnt; i++)
+	{
+		CheckWinner(list_players[i]);
+	}
+}
+
+short CGM_Pipe_MiniGame::playerkilledplayer(CPlayer &player, CPlayer &other, killstyle style)
+{
+	other.score->AdjustScore(-1);
+	return player_kill_normal;
+}
+
+short CGM_Pipe_MiniGame::playerkilledself(CPlayer &player, killstyle style)
+{
+	player.score->AdjustScore(-1);
+	return player_kill_normal;
+}
+
+void CGM_Pipe_MiniGame::playerextraguy(CPlayer &player, short iType)
+{
+	if(!gameover)
+	{
+		player.score->AdjustScore(iType);
+		CheckWinner(&player);
+	}
+}
+
+short CGM_Pipe_MiniGame::CheckWinner(CPlayer * player)
+{
+	if(goal > -1)
+	{
+		if(player->score->score >= goal)
+		{
+			winningteam = player->teamID;
+			gameover = true;
+
+			RemovePlayersButTeam(winningteam);
+			SetupScoreBoard(false);
+			ShowScoreBoard();
+		}
+		else if(player->score->score >= goal - 2 && !playedwarningsound)
+		{
+			playwarningsound();
+		}
+	}
+
+	return player_kill_normal;
 }

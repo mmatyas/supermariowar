@@ -1490,7 +1490,7 @@ void CPlayer::move()
 
 				if(--suicidedisplaytimer < 0)
 				{
-					if(player_kill_nonkill != KillPlayerMapHazard(false, kill_style_environment))
+					if(player_kill_nonkill != KillPlayerMapHazard(true, kill_style_environment))
 						return;
 				}
 			}

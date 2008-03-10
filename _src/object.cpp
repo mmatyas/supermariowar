@@ -4981,7 +4981,10 @@ bool MO_Coin::collide(CPlayer * player)
 		return false;
 
 	if(!game_values.gamemode->gameover)
+	{
 		player->score->AdjustScore(1);
+		game_values.gamemode->CheckWinner(player);
+	}
 
 	eyecandyfront.add(new EC_SingleAnimation(&spr_coinsparkle, ix, iy, 7, 4));
 
@@ -5017,7 +5020,7 @@ void MO_Coin::update()
 		applyfriction();
 		IO_MovingObject::update();
 
-		if(--iUncollectableTime < -120)
+		if(--iUncollectableTime < -game_values.gamemodesettings.greed.coinlife)
 		{
 			eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix, iy, 3, 8));
 			dead = true;
@@ -5631,14 +5634,21 @@ void CO_Egg::MoveToOwner()
 void CO_Egg::placeEgg()
 {
 	relocatetimer = 0;
-	explosiondrawframe = game_values.gamemodesettings.egg.explode - 1;
-	explosiondrawtimer = 62;
-	
-	if(explosiondrawframe < 5)
-		animationspeed = egganimationrates[explosiondrawframe];
-	else
-		animationspeed = egganimationrates[5];
+	if(game_values.gamemodesettings.egg.explode > 0)
+	{
+		explosiondrawframe = game_values.gamemodesettings.egg.explode - 1;
+		explosiondrawtimer = 62;
 
+		if(explosiondrawframe < 5)
+			animationspeed = egganimationrates[explosiondrawframe];
+		else
+			animationspeed = egganimationrates[5];
+	}
+	else
+	{
+		animationspeed = egganimationrates[5];
+	}
+	
 	short tries = 0;
 	short x = 0, y = 0;
 	do
@@ -6004,7 +6014,10 @@ void OMO_FlagBase::scoreFlag(CO_Flag * flag, CPlayer * player)
 	{
 		flag->placeFlag();
 		if(!game_values.gamemode->gameover)
+		{
 			player->score->AdjustScore(1);
+			game_values.gamemode->CheckWinner(player);
+		}
 		
 		ifsoundonplay(sfx_racesound);
 
@@ -6104,6 +6117,16 @@ void CO_Flag::update()
 	}
 
 	animate();
+
+	if(centerflag)
+	{
+		if(animationtimer % 2 == 0)
+		{
+			animationOffsetY += 64;
+			if(animationOffsetY > 192)
+				animationOffsetY = 0;
+		}
+	}
 }
 
 void CO_Flag::draw()
@@ -6120,13 +6143,6 @@ void CO_Flag::draw()
 	}
 	else
 	{
-		if(centerflag)
-		{
-			animationOffsetY += 64;
-			if(animationOffsetY > 192)
-				animationOffsetY = 0;
-		}
-
 		spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, animationOffsetY + (fLastFlagDirection ? 32 : 0), iw, ih);
 	}
 }
@@ -6212,7 +6228,10 @@ bool OMO_Yoshi::collide(CPlayer * player)
 		if(egg->color == color)
 		{
 			if(!game_values.gamemode->gameover)
+			{
 				player->score->AdjustScore(1);
+				game_values.gamemode->CheckWinner(player);
+			}
 		
 			placeYoshi();
 
@@ -6308,7 +6327,10 @@ void OMO_Yoshi::collide(IO_MovingObject * object)
 			CPlayer * player = egg->owner_throw;
 
 			if(!game_values.gamemode->gameover)
+			{
 				player->score->AdjustScore(1);
+				game_values.gamemode->CheckWinner(player);
+			}
 
 			placeYoshi();
 			egg->placeEgg();
@@ -6381,6 +6403,7 @@ void OMO_Area::update()
 		{
 			scoretimer = 0;
 			list_players[iPlayerID]->score->AdjustScore(1);
+			game_values.gamemode->CheckWinner(list_players[iPlayerID]);
 		}
 	}
 
@@ -6577,6 +6600,7 @@ void OMO_KingOfTheHillZone::update()
 		{
 			scoretimer = 0;
 			list_players[iPlayerID]->score->AdjustScore(1);
+			game_values.gamemode->CheckWinner(list_players[iPlayerID]);
 		}
 	}
 

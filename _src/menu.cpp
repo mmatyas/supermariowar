@@ -2487,6 +2487,47 @@ void Menu::CreateMenu()
 
 
 	//***********************
+	// Greed Mode Settings
+	//***********************		
+	miGreedModeCoinLife = new MI_SelectField(&spr_selectfield, 120, 220, "Coin Life", 400, 180);
+	miGreedModeCoinLife->Add("1 Second", 62, "", false, false);
+	miGreedModeCoinLife->Add("2 Seconds", 124, "", false, false);
+	miGreedModeCoinLife->Add("3 Seconds", 186, "", false, false);
+	miGreedModeCoinLife->Add("4 Seconds", 248, "", false, false);
+	miGreedModeCoinLife->Add("5 Seconds", 310, "", false, false);
+	miGreedModeCoinLife->Add("6 Seconds", 372, "", false, false);
+	miGreedModeCoinLife->Add("7 Seconds", 434, "", false, false);
+	miGreedModeCoinLife->Add("8 Seconds", 496, "", false, false);
+	miGreedModeCoinLife->Add("9 Seconds", 558, "", false, false);
+	miGreedModeCoinLife->Add("10 Seconds", 620, "", false, false);
+	miGreedModeCoinLife->Add("12 Seconds", 744, "", false, false);
+	miGreedModeCoinLife->Add("15 Seconds", 930, "", false, false);
+	miGreedModeCoinLife->Add("18 Seconds", 1116, "", false, false);
+	miGreedModeCoinLife->Add("20 Seconds", 1240, "", false, false);
+	miGreedModeCoinLife->Add("25 Seconds", 1550, "", false, false);
+	miGreedModeCoinLife->Add("30 Seconds", 1860, "", false, false);
+	miGreedModeCoinLife->SetData(&game_values.gamemodemenusettings.greed.coinlife, NULL, NULL);
+	miGreedModeCoinLife->SetKey(game_values.gamemodemenusettings.greed.coinlife);
+
+	miGreedModeBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
+	miGreedModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
+
+	miGreedModeLeftHeaderBar = new MI_Image(&menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
+	miGreedModeRightHeaderBar = new MI_Image(&menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
+	miGreedModeHeaderText = new MI_Text("Greed Mode Menu", 320, 5, 0, 2, 1);
+
+	mModeSettingsMenu[17].AddControl(miGreedModeCoinLife, miGreedModeBackButton, miGreedModeBackButton, NULL, miGreedModeBackButton);
+	mModeSettingsMenu[17].AddControl(miGreedModeBackButton, miGreedModeCoinLife, miGreedModeCoinLife, miGreedModeCoinLife, NULL);
+	
+	mModeSettingsMenu[17].AddNonControl(miGreedModeLeftHeaderBar);
+	mModeSettingsMenu[17].AddNonControl(miGreedModeRightHeaderBar);
+	mModeSettingsMenu[17].AddNonControl(miGreedModeHeaderText);
+	
+	mModeSettingsMenu[17].SetHeadControl(miGreedModeCoinLife);
+	mModeSettingsMenu[17].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
+
+
+	//***********************
 	// Health Mode Settings
 	//***********************		
 	miHealthModeStartLife = new MI_SelectField(&spr_selectfield, 120, 180, "Start Life", 400, 150);
@@ -3126,7 +3167,7 @@ void Menu::RunMenu()
 		{
 			MenuCodeEnum code = mCurrentMenu->SendInput(&game_values.playerInput);
 
-			bool fShowSettingsButton[GAMEMODE_LAST] = {true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, true, true, false, true, true};
+			bool fShowSettingsButton[GAMEMODE_LAST] = {true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, true, true, true, true, true};
 
 			if(MENU_CODE_EXIT_APPLICATION == code)
 			{
