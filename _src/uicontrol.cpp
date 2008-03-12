@@ -2435,7 +2435,7 @@ void MI_MapField::Draw()
 	rectDst.x = iMapBoxX + 16;
 
 	menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName);
-	menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 24, maplist.currentShortmapname());
+	menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 24, szMapName);
 
 	SDL_BlitSurface(surfaceMapBackground, NULL, blitdest, &rectDst);
 	
@@ -2485,9 +2485,15 @@ void MI_MapField::Draw()
 
 void MI_MapField::LoadCurrentMap()
 {
-	szMapName = maplist.currentShortmapname();
+	strncpy(szMapName, maplist.currentShortmapname(), 255);
+	szMapName[255] = 0;
 
-	g_map.loadMap(maplist.currentFilename(), read_type_preview);
+	LoadMap(maplist.currentFilename());	
+}
+
+void MI_MapField::LoadMap(const char * szMapPath)
+{
+	g_map.loadMap(szMapPath, read_type_preview);
 	SDL_Delay(10);  //Sleeps to help the music from skipping
 	
 	LoadCurrentMapBackground();
@@ -2495,10 +2501,13 @@ void MI_MapField::LoadCurrentMap()
 	SDL_Delay(10);  //Sleeps to help the music from skipping
 
 	g_map.preDrawPreviewBackground(&spr_background, surfaceMapBackground, false);
+	SDL_Delay(10);  //Sleeps to help the music from skipping
 	g_map.preDrawPreviewMapItems(surfaceMapBackground, false);
 	SDL_Delay(10);  //Sleeps to help the music from skipping
 	g_map.preDrawPreviewForeground(surfaceMapForeground, false);
+	SDL_Delay(10);  //Sleeps to help the music from skipping
 	g_map.preDrawPreviewWarps(surfaceMapForeground, false);
+	SDL_Delay(10);  //Sleeps to help the music from skipping
 
 	LoadMapHazards(true);
 }
@@ -2509,6 +2518,13 @@ void MI_MapField::SetMap(const char * szMapName)
 	LoadCurrentMap();
 }
 
+void MI_MapField::SetSpecialMap(const char * mapName, const char * szMapPath)
+{
+	strncpy(szMapName, mapName, 255);
+	szMapName[255] = 0;
+
+	LoadMap(szMapPath);
+}
 
 
 /**************************************
@@ -3115,9 +3131,6 @@ void MI_StoredPowerupResetButton::Draw()
  * MI_TourStop Class
  **************************************/
 
-char * g_szWorldBonusNames[NUM_POWERUPS + 2] = {"None", "Random", "Poison Mushroom", "1up Mushroom", "2up Mushroom", "3up Mushroom", "5up Mushroom",
-												"Fire Flower", "Star", "Clock", "Bob-omb", "POW", "Bullet Bill", "Hammer", "Green Shell",
-												"Red Shell", "Spiked Shell", "Buzzy Shell", "MOd", "Feather", "Mystery Mushroom", "Boomerang"};
 //Call with x = 70 and y == 80
 MI_TourStop::MI_TourStop(short x, short y, bool fWorld) :
 	UI_Control(x, y)
@@ -3251,26 +3264,35 @@ void MI_TourStop::Refresh(short iTourStop)
 	if(tourstop->iStageType == 0)
 	{
 		miModeField->Clear();
-		miModeField->Add(gamemodes[tourstop->iMode]->GetModeName(), tourstop->iMode, "", false, false);
+
+		CGameMode * gamemode = NULL;
+		if(tourstop->iMode == game_mode_pipe_minigame)
+			gamemode = pipegamemode;
+		else
+			gamemode = gamemodes[tourstop->iMode];
+			
+		miModeField->Add(gamemode->GetModeName(), tourstop->iMode, "", false, false);
 
 		miGoalField->Clear();
 		char szTemp[16];
 		sprintf(szTemp, "%d", tourstop->iGoal);
 		miGoalField->Add(szTemp, 0, "", false, false);
-		miGoalField->SetTitle(gamemodes[tourstop->iMode]->GetGoalName());
+		miGoalField->SetTitle(gamemode->GetGoalName());
 
 		miPointsField->Clear();
 		sprintf(szTemp, "%d", tourstop->iPoints);
 		miPointsField->Add(szTemp, 0, "", false, false);
 
-		miMapField->SetMap(tourstop->pszMapFile);
+		if(tourstop->iMode == game_mode_pipe_minigame)
+			miMapField->SetSpecialMap("Pipe Minigame Map", "maps/special/minigamepipe.map");
+		else
+			miMapField->SetMap(tourstop->pszMapFile);
+
 		miTourStopMenuHeaderText->SetText(tourstop->szName);
 
 		if(fIsWorld)
 		{
 			miBonusField->Clear();
-			//miBonusField->Add(g_szWorldBonusNames[tourstop->iBonusType], tourstop->iBonusType, "", false, false);
-
 			miEndStageImage->Show(tourstop->fEndStage);
 
 			for(short iBonus = 0; iBonus < 10; iBonus++)

@@ -43,15 +43,26 @@
 [ ] Other mode specific items - berry for yoshi's egg mode, coin for coin/greed mode, coin bag greed mode
 [ ] See if it is possible to export an animated gif screenshot
 [ ] Add configuration to ice wand for how long a player is frozen
-*/
+
+Pipe Minigame:
+ - coins come out of the pipe at different angles and fall accoring to gravity
+ - there is no map collision on them, they fall though the ground
+ - fireballs also come out periodically (1 in 10?) and will kill the player and cause him to lose a coin or two
+ - There are also a few types of powerups that will come from the pipe
+   - Team colored fireballs that shoot way up from the pipe and rain from the sky - only kills other teams
+   - Team colored coins, coins that come out will randomly be a team color and only that team can collect them.  The collector of this powerup's team gets 2x their teams color coins.
+   - Negative coins - coins that come out will take away a coin instead of giving a coin, this penalty mode lasts 10 seconds
+   - Slow down mode - coins and fireballs will move and fall slower than normal for 15 seconds
+   - Coin fury - coins come out at a much faster rate than normal
+   - Super coin - once and a while a super coin will pop out worth 5 coins (maybe a yoshi coin)
+
+[ ] Secret unlock code to unlock Minigame match type so you can select what minigame you want to play directly (not through world)
+
+   */
 
 /*
 Checkin:
-1) Updated animation rate for center flag
-2) Added coin disappear time to greed mode
-3) Fixed bug where suicide timer didn't force player to respawn
-4) Refactored a bunch of mode code into CheckWinner to make it better organized
-5) Fixed bug with collection mode for not detecting game winner correctly
+1) Started pipe minigame for world mode
 */
 
 #ifdef _XBOX
@@ -1385,7 +1396,11 @@ void RunGame()
 			}
 		}
 
-		game_values.gamepowerups[iPlayer] = game_values.storedpowerups[iPlayer];
+		if(game_values.gamemode->HasStoredPowerups())
+			game_values.gamepowerups[iPlayer] = game_values.storedpowerups[iPlayer];
+		else
+			game_values.gamepowerups[iPlayer];
+
 		game_values.bulletbilltimer[iPlayer] = 0;
 		game_values.bulletbillspawntimer[iPlayer] = 0;
 	}
@@ -2306,7 +2321,8 @@ void RunGame()
 
 				for(short iLayer1 = 0; iLayer1 < 3; iLayer1++)
 				{
-					for(short iObject1 = 0; iObject1 < objectcontainer[iLayer1].list_end; iObject1++)
+					short iContainerEnd1 = objectcontainer[iLayer1].list_end;
+					for(short iObject1 = 0; iObject1 < iContainerEnd1; iObject1++)
 					{
 						CObject * object1 = objectcontainer[iLayer1].list[iObject1];
 
@@ -2315,9 +2331,10 @@ void RunGame()
 
 						IO_MovingObject * movingobject1 = (IO_MovingObject*)object1;
 
-						for(short iLayer2 = 0; iLayer2 < 3; iLayer2++)
+						for(short iLayer2 = iLayer1; iLayer2 < 3; iLayer2++)
 						{
-							for(short iObject2 = 0; iObject2 < objectcontainer[iLayer2].list_end; iObject2++)
+							short iContainerEnd2 = objectcontainer[iLayer2].list_end;
+							for(short iObject2 = (iLayer1 == iLayer2 ? iObject1 + 1 : 0); iObject2 < iContainerEnd2; iObject2++)
 							{
 								CObject * object2 = objectcontainer[iLayer2].list[iObject2];
 
@@ -2326,18 +2343,30 @@ void RunGame()
 
 								IO_MovingObject * movingobject2 = (IO_MovingObject*)object2;
 
-								if(g_iCollisionMap[movingobject1->getMovingObjectType()][movingobject2->getMovingObjectType()] == 0)
-									continue;
+								//if(g_iCollisionMap[movingobject1->getMovingObjectType()][movingobject2->getMovingObjectType()])
+								//	continue;
 
-								if(iLayer1 == iLayer2 && iObject1 == iObject2)
-									continue;
+								//if(iLayer1 == iLayer2 && iObject1 == iObject2)
+								//	continue;
 
 								if(object2->GetDead())
 									continue;
 
-								if(coldec_obj2obj(movingobject1, movingobject2))
+								MovingObjectType iType1 = movingobject1->getMovingObjectType();
+								MovingObjectType iType2 = movingobject2->getMovingObjectType();
+								if(g_iCollisionMap[iType1][iType2])
 								{
-									collisionhandler_o2o(movingobject1, movingobject2);
+									if(coldec_obj2obj(movingobject1, movingobject2))
+									{
+										collisionhandler_o2o(movingobject1, movingobject2);
+									}
+								}
+								else if(g_iCollisionMap[iType2][iType1])
+								{
+									if(coldec_obj2obj(movingobject2, movingobject1))
+									{
+										collisionhandler_o2o(movingobject2, movingobject1);
+									}
 								}
 
 								if(object1->GetDead())

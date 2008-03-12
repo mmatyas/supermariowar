@@ -35,6 +35,8 @@ class CGameMode
 
 		virtual short CheckWinner(CPlayer *) {return player_kill_normal;}
 
+		virtual bool HasStoredPowerups() {return true;}
+
 		void transferbobombifneeded(CPlayer &inflictor, CPlayer &other);
 		void displayplayertext();
 		void playwarningsound();
@@ -541,6 +543,8 @@ class CGM_Bonus : public CGameMode
 		short playerkilledself(CPlayer &player, killstyle style) {return false;}
 		void playerextraguy(CPlayer &player, short iType) {}
 
+		bool HasStoredPowerups() {return false;}
+
 	private:
 
 		TourStop * tsTourStop;
@@ -560,9 +564,14 @@ class CGM_Pipe_MiniGame : public CGameMode
 		void playerextraguy(CPlayer &player, short iType);
 		short CheckWinner(CPlayer * player);
 
+		void SetBonus(short iType, short iTimer, short iTeamID);
+
+		bool HasStoredPowerups() {return false;}
+
 	private:
 
 		short iNextItemTimer;
+		short iBonusTimer, iBonusType, iBonusTeam;
 };
 
 #endif

@@ -590,8 +590,11 @@ class MI_MapField : public UI_Control
 
 		void AdjustIndicators();
 
-		void SetMap(const char * szMapName);
 		void LoadCurrentMap();
+		void LoadMap(const char * szMapPath);
+
+		void SetMap(const char * szMapName);
+		void SetSpecialMap(const char * szMapName, const char * szMapPath);
 
 		const char * GetMapName() {return szMapName;}
 
@@ -604,7 +607,7 @@ class MI_MapField : public UI_Control
 		SDL_Rect rectDst;
 
 		char * szName;
-		const char * szMapName;
+		char szMapName[256];
 		short iWidth, iIndent;
 
 		MI_Image * miModifyImageLeft;

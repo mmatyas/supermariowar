@@ -3759,8 +3759,17 @@ void Menu::RunMenu()
 				else
 				{
 					short iGameMode = game_values.tourstops[game_values.tourstopcurrent]->iMode;
-					gamemodes[iGameMode]->goal = game_values.tourstops[game_values.tourstopcurrent]->iGoal;
-					game_values.gamemode = gamemodes[iGameMode];
+
+					if(iGameMode == game_mode_pipe_minigame)
+					{
+						pipegamemode->goal = 100;
+						game_values.gamemode = pipegamemode;
+					}
+					else
+					{
+						gamemodes[iGameMode]->goal = game_values.tourstops[game_values.tourstopcurrent]->iGoal;
+						game_values.gamemode = gamemodes[iGameMode];
+					}
 				}
 
 				StartGame();
@@ -3949,8 +3958,16 @@ void Menu::RunMenu()
 				}
 				else
 				{
-					g_map.loadMap(maplist.currentFilename(), read_type_full);
-					
+					if(game_values.gamemode->gamemode == game_mode_pipe_minigame)
+					{
+						g_map.loadMap(convertPath("maps/special/minigamepipe.map"), read_type_full);
+						LoadCurrentMapBackground();
+					}
+					else
+					{
+						g_map.loadMap(maplist.currentFilename(), read_type_full);
+					}
+
 					//Allows all players to start the game
 					game_values.singleplayermode = -1;
 
@@ -3960,7 +3977,6 @@ void Menu::RunMenu()
 						backgroundmusic[0].load(musiclist.GetCurrentMusic());
 						backgroundmusic[0].play(game_values.playnextmusic, false);
 					}
-
 				}
 
 				game_values.gamestate = GS_GAME;			

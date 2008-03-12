@@ -3057,6 +3057,11 @@ CGM_Pipe_MiniGame::CGM_Pipe_MiniGame() : CGameMode()
 void CGM_Pipe_MiniGame::init()
 {
 	CGameMode::init();
+
+	iNextItemTimer = 0;
+	iBonusTimer = 0;
+	iBonusType = 0;
+	iBonusTeam = 0;
 }
 
 
@@ -3068,21 +3073,54 @@ void CGM_Pipe_MiniGame::think()
 		return;
 	}
 
-	for(short i = 0; i < list_players_cnt; i++)
+	if(--iNextItemTimer <= 0)
 	{
-		CheckWinner(list_players[i]);
+		if(iBonusType == 0 || iBonusType == 2)
+		{
+			if(iBonusType == 0)
+				iNextItemTimer = rand() % 30 + 30;
+			else
+				iNextItemTimer = rand() % 10 + 10;
+
+			short iRandCoin = rand() % 20;
+			objectcontainer[1].add(new OMO_PipeCoin(&spr_coin, (float)((rand() % 21) - 10) / 2.0f, -((float)(rand() % 13) / 2.0f + 6.0f), 304, 256, -1, iRandCoin < 12 ? 2 : (iRandCoin < 19 ? 0 : 1), 15));
+		}
+		else if(iBonusType == 1)
+		{
+			iNextItemTimer = rand() % 10 + 10;
+
+			short iRandTeam = rand() % (score_cnt + 2);
+			
+			//Give an advantage to the team that got the item
+			if(iRandTeam >= score_cnt)
+				iRandTeam = iBonusTeam;
+
+			short iRandPlayer = game_values.teamids[iRandTeam][rand() % game_values.teamcounts[iRandTeam]];
+
+			objectcontainer[1].add(new OMO_PipeCoin(&spr_coin, (float)((rand() % 21) - 10) / 2.0f, -((float)(rand() % 13) / 2.0f + 6.0f), 304, 256, list_players[iRandPlayer]->teamID, list_players[iRandPlayer]->colorID, 15));
+		}
+		else if(iBonusType == 3)
+		{
+			iNextItemTimer = rand() % 5 + 10;
+			objectcontainer[1].add(new OMO_PipeCoin(&spr_coin, (float)((rand() % 21) - 10) / 2.0f, -((float)(rand() % 13) / 2.0f + 6.0f), 304, 256, -1, 0, 15));
+		}
+	}
+
+	if(iBonusTimer > 0 && --iBonusTimer <= 0)
+	{
+		iBonusType = 0;
 	}
 }
 
 short CGM_Pipe_MiniGame::playerkilledplayer(CPlayer &player, CPlayer &other, killstyle style)
 {
-	other.score->AdjustScore(-1);
+	other.score->AdjustScore(-2);
 	return player_kill_normal;
 }
 
 short CGM_Pipe_MiniGame::playerkilledself(CPlayer &player, killstyle style)
 {
-	player.score->AdjustScore(-1);
+	player.score->AdjustScore(-2);
 	return player_kill_normal;
 }
 
@@ -3101,6 +3139,8 @@ short CGM_Pipe_MiniGame::CheckWinner(CPlayer * player)
 	{
 		if(player->score->score >= goal)
 		{
+			player->score->score = goal;
+
 			winningteam = player->teamID;
 			gameover = true;
 
@@ -3115,4 +3155,11 @@ short CGM_Pipe_MiniGame::CheckWinner(CPlayer * player)
 	}
 
 	return player_kill_normal;
+}
+
+void CGM_Pipe_MiniGame::SetBonus(short iType, short iTimer, short iTeamID)
+{
+	iBonusType = iType;
+	iBonusTimer = iTimer;
+	iBonusTeam = iTeamID;
 }

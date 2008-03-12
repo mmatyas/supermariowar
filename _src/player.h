@@ -458,6 +458,7 @@ class CPlayer
 		friend class OMO_StraightPathHazard;
 		friend class IO_FlameCannon;
 		friend class MO_PirhanaPlant;
+		friend class OMO_PipeCoin;
 
 		friend class MO_CarriedObject;
 

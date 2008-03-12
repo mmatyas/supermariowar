@@ -371,7 +371,7 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 		else
 			ts->iMode = -1;
 
-		if(ts->iMode < 0 || ts->iMode >= GAMEMODE_LAST)
+		if(ts->iMode < 0 || (ts->iMode >= GAMEMODE_LAST && ts->iMode != game_mode_pipe_minigame))
 			ts->iMode = rand() % GAMEMODE_LAST;
 
 		pszTemp = strtok(NULL, ",\n");
@@ -1162,7 +1162,6 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
 					}
 				}
 			}
-
 		}
 	}
 	else if(ts->iStageType == 1) //Bonus House

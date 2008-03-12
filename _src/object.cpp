@@ -10008,6 +10008,110 @@ float MO_PirhanaPlant::GetFireballAngle()
 }
 
 //------------------------------------------------------------------------------
+// class coin (for coin mode)
+//------------------------------------------------------------------------------
+OMO_PipeCoin::OMO_PipeCoin(gfxSprite *nspr, float dvelx, float dvely, short ix, short iy, short teamid, short colorid, short uncollectabletime) :
+	IO_OverMapObject(nspr, ix, iy, 4, 8, 30, 30, 1, 1, 0, colorid << 5, 32, 32)
+{
+	iTeamID = teamid;
+	iColorID = colorid;
+	state = 1;
+	objectType = object_coin;
+
+	sparkleanimationtimer = 0;
+	sparkledrawframe = 0;
+
+	velx = dvelx;
+	vely = dvely;
+
+	iUncollectableTime = uncollectabletime;
+}
+
+bool OMO_PipeCoin::collide(CPlayer * player)
+{
+	if(iUncollectableTime > 0)
+		return false;
+
+	if(!game_values.gamemode->gameover)
+	{
+		if(iTeamID != -1)
+		{
+			if(player->teamID == iTeamID)
+				player->score->AdjustScore(1);
+		}
+		else
+		{
+			if(iColorID == 2)
+				player->score->AdjustScore(1);
+			else if(iColorID == 0)
+				player->score->AdjustScore(-2);
+			else if(iColorID == 1)
+			{
+				player->score->AdjustScore(5);
+
+				pipegamemode->SetBonus(rand() % 3 + 1, 620, player->teamID);
+			}
+		}
+
+		game_values.gamemode->CheckWinner(player);
+	}
+
+	eyecandyfront.add(new EC_SingleAnimation(&spr_coinsparkle, ix, iy, 7, 4));
+
+	ifsoundonplay(sfx_coin);
+	
+	dead = true;
+	return false;
+}
+
+void OMO_PipeCoin::update()
+{
+	xf(fx + velx);
+	yf(fy + vely);
+
+	if(iTeamID == -1)
+		animate();
+
+	if(iy >= 480)
+		dead = true;
+
+	vely += GRAVITATION;
+	
+	if(++sparkleanimationtimer >= 4)
+	{
+		sparkleanimationtimer = 0;
+		sparkledrawframe += 32;
+		if(sparkledrawframe >= 480)
+			sparkledrawframe = 0;
+	}
+
+	if(iUncollectableTime > 0)
+		--iUncollectableTime;
+}
+
+void OMO_PipeCoin::draw()
+{
+	if(iUncollectableTime > 0)
+	{
+		spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, animationOffsetY, iw, ih, 2, 256);
+
+		//Draw sparkles
+		if(iTeamID == -1)
+			spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, 0, 32, 32, 2, 256);
+
+	}
+	else
+	{
+		spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, animationOffsetY, iw, ih);
+
+		//Draw sparkles
+		if(iTeamID == -1)
+			spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, 0, 32, 32);
+	}
+}
+
+
+//------------------------------------------------------------------------------
 // class object_container
 //------------------------------------------------------------------------------
 CObjectContainer::CObjectContainer()

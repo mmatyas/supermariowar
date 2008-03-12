@@ -148,6 +148,7 @@ struct STextAward
 #define MAXWORLDMUSICCATEGORY	9
 #define WORLDMUSICBONUS MAXWORLDMUSICCATEGORY
 #define WORLDMUSICSLEEP MAXWORLDMUSICCATEGORY + 1
+#define WORLDMUSICPIPEMINIGAME MAXWORLDMUSICCATEGORY + 2
 #define MAXCATEGORYTRACKS	64
 
 #define MAXEYECANDY		192
@@ -576,6 +577,7 @@ extern FiltersList filterslist;
 
 extern CGameMode	*gamemodes[GAMEMODE_LAST];
 extern CGM_Bonus	*bonushousemode;
+extern CGM_Pipe_MiniGame	*pipegamemode;
 extern short		currentgamemode;
 
 extern float CapFallingVelocity(float vel);
