@@ -400,6 +400,7 @@ extern gfxSprite		spr_areas;
 extern gfxSprite		spr_kingofthehillarea;
 extern gfxSprite		spr_jail;
 extern gfxSprite		spr_racegoal;
+extern gfxSprite		spr_pipegamebonus;
 extern gfxSprite		spr_chicken;
 
 extern gfxSprite		spr_bonuschest;
@@ -849,6 +850,8 @@ struct gv
 	short		tournamentgames;
 	short		tournamentwinner;
 	
+	short		selectedminigame;
+
 	short		tourindex;
 	short		tourstopcurrent;
 	short		tourstoptotal;
@@ -994,6 +997,8 @@ struct gv
 	float		gamewindy;
 
 	short		suicidetime;
+
+	bool		minigameunlocked;
 };
 
 extern gv game_values;

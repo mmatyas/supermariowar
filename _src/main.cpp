@@ -58,6 +58,8 @@ Pipe Minigame:
 
 [ ] Secret unlock code to unlock Minigame match type so you can select what minigame you want to play directly (not through world)
 
+//BUG!! Doesn't look like the pipe minigame goal set in the world file is working
+
    */
 
 /*
@@ -244,6 +246,7 @@ gfxSprite		spr_areas;
 gfxSprite		spr_kingofthehillarea;
 gfxSprite		spr_jail;
 gfxSprite		spr_racegoal;
+gfxSprite		spr_pipegamebonus;
 gfxSprite		spr_chicken;
 
 gfxSprite		spr_bonuschest;
@@ -756,6 +759,7 @@ int main(int argc, char *argv[])
 	game_values.spawnstyle			= 2;
 	game_values.tournamentgames		= 2;
 	game_values.tournamentwinner	= -1;
+	game_values.selectedminigame	= 0;
 	game_values.matchtype			= MATCH_TYPE_SINGLE_GAME;
 	game_values.tourindex			= 0;
 	game_values.tourstopcurrent		= 0;
@@ -815,6 +819,7 @@ int main(int argc, char *argv[])
 	game_values.singleplayermode	= -1;
 	game_values.worldskipscoreboard = false;
 	game_values.overridepowerupsettings = 0;
+	game_values.minigameunlocked	= false;
 
 	game_values.pfFilters			= new bool[NUM_AUTO_FILTERS + filterslist.GetCount()];
 	game_values.piFilterIcons		= new short[NUM_AUTO_FILTERS + filterslist.GetCount()];
@@ -1068,8 +1073,8 @@ int main(int argc, char *argv[])
 				SDL_XBOX_SetScreenStretch(game_values.screenResizeW, game_values.screenResizeH);
 			#endif
 
-			unsigned char abyte[29];
-			fread(abyte, sizeof(unsigned char), 29, fp);
+			unsigned char abyte[30];
+			fread(abyte, sizeof(unsigned char), 30, fp);
 			game_values.spawnstyle = (short) abyte[0];
 			game_values.awardstyle = (short) abyte[1];
 			game_values.teamcollision = (short)abyte[3];
@@ -1092,6 +1097,7 @@ int main(int argc, char *argv[])
 			game_values.pointspeed = (short)abyte[24];
 			game_values.swapstyle = (short)abyte[25];
 			game_values.overridepowerupsettings = (short)abyte[28];
+			game_values.minigameunlocked = ((short)abyte[29] > 0 ? true : false);
 			
 			fread(&game_values.spawninvincibility, sizeof(short), 1, fp);
 			fread(&game_values.itemrespawntime, sizeof(short), 1, fp);
@@ -1732,7 +1738,7 @@ void RunGame()
 				{
 					endgametimer = (short)(rand() % 200);
 
-					if(game_values.matchtype != MATCH_TYPE_SINGLE_GAME)
+					if(game_values.matchtype != MATCH_TYPE_SINGLE_GAME && game_values.matchtype != MATCH_TYPE_MINIGAME)
 						UpdateScoreBoard();
 
 					CleanUp();

@@ -7625,8 +7625,7 @@ bool MO_Spiny::hittop(CPlayer * player)
 	//Kill player here
 	if(player->isready() && !player->spawninvincible && !player->invincible && !player->fKuriboShoe)
 	{
-		player->KillPlayerMapHazard(false, kill_style_environment);
-		return true;
+		return player->KillPlayerMapHazard(false, kill_style_environment) != player_kill_nonkill;
 	}
 	
 	if(player->fKuriboShoe)
@@ -10008,7 +10007,7 @@ float MO_PirhanaPlant::GetFireballAngle()
 }
 
 //------------------------------------------------------------------------------
-// class coin (for coin mode)
+// class pipe coin (for coin pipe minigame)
 //------------------------------------------------------------------------------
 OMO_PipeCoin::OMO_PipeCoin(gfxSprite *nspr, float dvelx, float dvely, short ix, short iy, short teamid, short colorid, short uncollectabletime) :
 	IO_OverMapObject(nspr, ix, iy, 4, 8, 30, 30, 1, 1, 0, colorid << 5, 32, 32)
@@ -10016,13 +10015,17 @@ OMO_PipeCoin::OMO_PipeCoin(gfxSprite *nspr, float dvelx, float dvely, short ix, 
 	iTeamID = teamid;
 	iColorID = colorid;
 	state = 1;
-	objectType = object_coin;
+	objectType = object_pipe_coin;
 
 	sparkleanimationtimer = 0;
 	sparkledrawframe = 0;
 
 	velx = dvelx;
-	vely = dvely;
+	
+	if(pipegamemode->IsSlowdown())
+		vely = dvely / 2.0f;
+	else
+		vely = dvely;
 
 	iUncollectableTime = uncollectabletime;
 }
@@ -10044,13 +10047,9 @@ bool OMO_PipeCoin::collide(CPlayer * player)
 			if(iColorID == 2)
 				player->score->AdjustScore(1);
 			else if(iColorID == 0)
-				player->score->AdjustScore(-2);
+				player->score->AdjustScore(-1);
 			else if(iColorID == 1)
-			{
 				player->score->AdjustScore(5);
-
-				pipegamemode->SetBonus(rand() % 3 + 1, 620, player->teamID);
-			}
 		}
 
 		game_values.gamemode->CheckWinner(player);
@@ -10075,7 +10074,10 @@ void OMO_PipeCoin::update()
 	if(iy >= 480)
 		dead = true;
 
-	vely += GRAVITATION;
+	if(pipegamemode->IsSlowdown())
+		vely += GRAVITATION / 1.5f;
+	else
+		vely += GRAVITATION;
 	
 	if(++sparkleanimationtimer >= 4)
 	{
@@ -10108,6 +10110,84 @@ void OMO_PipeCoin::draw()
 		if(iTeamID == -1)
 			spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, 0, 32, 32);
 	}
+}
+
+//------------------------------------------------------------------------------
+// class pipe powerup (for coin pipe minigame)
+//------------------------------------------------------------------------------
+OMO_PipeBonus::OMO_PipeBonus(gfxSprite *nspr, float dvelx, float dvely, short ix, short iy, short type, short duration, short uncollectabletime) :
+	IO_OverMapObject(nspr, ix, iy, 4, 8, 30, 30, 1, 1, 0, type << 5, 32, 32)
+{
+	iType = type;
+	iDuration = duration;
+	state = 1;
+	objectType = object_pipe_bonus;
+
+	velx = dvelx;
+
+	if(pipegamemode->IsSlowdown())
+		vely = dvely / 1.5f;
+	else
+		vely = dvely;
+
+	iUncollectableTime = uncollectabletime;
+}
+
+bool OMO_PipeBonus::collide(CPlayer * player)
+{
+	if(iUncollectableTime > 0)
+		return false;
+
+	//fireball
+	if(iType == 5)
+	{
+		if(!player->spawninvincible)
+		{
+			dead = true;
+			eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix - 1, iy - 1, 3, 8));
+
+			if(!player->invincible)
+			{
+				return player->KillPlayerMapHazard(false, kill_style_environment) != player_kill_nonkill;
+			}
+		}
+
+		return false;
+	}
+	else
+	{
+		if(!game_values.gamemode->gameover)
+			pipegamemode->SetBonus(iType + 1, iDuration, player->getTeamID());
+
+		ifsoundonplay(sfx_collectpowerup);
+	}
+
+	dead = true;
+	return false;
+}
+
+void OMO_PipeBonus::update()
+{
+	IO_OverMapObject::update();
+
+	if(iy >= 480)
+		dead = true;
+
+	if(pipegamemode->IsSlowdown())
+		vely += GRAVITATION / 2.0f;
+	else
+		vely += GRAVITATION;
+	
+	if(iUncollectableTime > 0)
+		--iUncollectableTime;
+}
+
+void OMO_PipeBonus::draw()
+{
+	if(iUncollectableTime > 0)
+		spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, animationOffsetY, iw, ih, 2, 256);
+	else
+		spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, animationOffsetY, iw, ih);
 }
 
 

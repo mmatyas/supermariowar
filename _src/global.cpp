@@ -377,19 +377,21 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 		pszTemp = strtok(NULL, ",\n");
 		
 		//This gets the closest game mode to what the tour has
+		ts->iGoal = -1;
 		if(pszTemp)
 		{
 			//If it is commented out, this will allow things like 33 coins, 17 kill goals, etc.
 			//ts->iGoal = gamemodes[ts->iMode]->GetClosestGoal(atoi(pszTemp));
 			ts->iGoal = atoi(pszTemp);
-			
-			//Default to unlimited if an invalid goal was used
-			if(ts->iGoal <= 0)
-				ts->iGoal = gamemodes[ts->iMode]->GetOptions()[rand() % (GAMEMODE_NUM_OPTIONS - 1)].iValue;
 		}
-		else
+		
+		//Default to a random goal if an invalid goal was used
+		if(ts->iGoal <= 0)
 		{
-			ts->iGoal = gamemodes[ts->iMode]->GetOptions()[rand() % (GAMEMODE_NUM_OPTIONS - 1)].iValue;
+			if(ts->iMode < GAMEMODE_LAST)
+				ts->iGoal = gamemodes[ts->iMode]->GetOptions()[rand() % (GAMEMODE_NUM_OPTIONS - 1)].iValue;
+			else
+				ts->iGoal = 50;
 		}
 
 		if(iVersion[0] == 1 && ((iVersion[1] == 7 && iVersion[2] == 0 && iVersion[3] > 1) || iVersion[1] > 7))

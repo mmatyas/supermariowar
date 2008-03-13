@@ -281,6 +281,7 @@ bool LoadGameGraphics()
 	gfx_loadimage(&spr_bulletbilldead, convertPath("gfx/packs/eyecandy/bulletbilldead.png", graphicspack), false);
 	gfx_loadimage(&spr_chicken, convertPath("gfx/packs/modeobjects/chicken.png", graphicspack), 160, true);
 	gfx_loadimage(&spr_racegoal, convertPath("gfx/packs/modeobjects/racegoal.png", graphicspack), false);
+	gfx_loadimage(&spr_pipegamebonus, convertPath("gfx/packs/modeobjects/pipeminigamebonuses.png", graphicspack), true);
 
 	gfx_loadimage(&spr_bonuschest, convertPath("gfx/packs/modeobjects/bonuschest.png", graphicspack), true);
 	gfx_loadimage(&spr_teleportstar, convertPath("gfx/packs/eyecandy/teleportstar.png", graphicspack), false);

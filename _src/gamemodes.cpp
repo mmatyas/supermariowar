@@ -3044,14 +3044,13 @@ void CGM_Bonus::draw_background()
 
 
 //Pipe Bonus Mini Game (used in world mode)
-//Collect randomly appearing coins on map
-//First one to set amount wins
+//Collect coins and powerups that come out of a pipe
 CGM_Pipe_MiniGame::CGM_Pipe_MiniGame() : CGameMode()
 {
-	goal = 100;
+	goal = 50;
 	gamemode = game_mode_pipe_minigame;
 
-	SetupModeStrings("Pipe Minigame", "", 0);
+	SetupModeStrings("Pipe Minigame", "Points", 0);
 };
 
 void CGM_Pipe_MiniGame::init()
@@ -3075,15 +3074,27 @@ void CGM_Pipe_MiniGame::think()
 
 	if(--iNextItemTimer <= 0)
 	{
-		if(iBonusType == 0 || iBonusType == 2)
+		if(iBonusType == 0 || iBonusType == 2 || iBonusType == 4)
 		{
-			if(iBonusType == 0)
-				iNextItemTimer = rand() % 30 + 30;
-			else
+			if(iBonusType == 2)
 				iNextItemTimer = rand() % 10 + 10;
+			else
+				iNextItemTimer = rand() % 30 + 30;
 
-			short iRandCoin = rand() % 20;
-			objectcontainer[1].add(new OMO_PipeCoin(&spr_coin, (float)((rand() % 21) - 10) / 2.0f, -((float)(rand() % 13) / 2.0f + 6.0f), 304, 256, -1, iRandCoin < 12 ? 2 : (iRandCoin < 19 ? 0 : 1), 15));
+			short iRandPowerup = rand() % 50;
+			if(iBonusType == 0 && iRandPowerup < 5) //bonuses
+			{
+				objectcontainer[1].add(new OMO_PipeBonus(&spr_pipegamebonus, (float)((rand() % 21) - 10) / 2.0f, -((float)(rand() % 11) / 2.0f + 7.0f), 304, 256, iRandPowerup, 620, 15));
+			}
+			else if(iRandPowerup < 10) //fireballs
+			{
+				objectcontainer[1].add(new OMO_PipeBonus(&spr_pipegamebonus, (float)((rand() % 21) - 10) / 2.0f, -((float)(rand() % 11) / 2.0f + 7.0f), 304, 256, 5, 0, 15));
+			}
+			else //coins
+			{
+				short iRandCoin = rand() % 20;
+				objectcontainer[1].add(new OMO_PipeCoin(&spr_coin, (float)((rand() % 21) - 10) / 2.0f, -((float)(rand() % 11) / 2.0f + 7.0f), 304, 256, -1, iRandCoin < 16 ? 2 : (iRandCoin < 19 ? 0 : 1), 15));
+			}
 		}
 		else if(iBonusType == 1)
 		{
@@ -3097,18 +3108,19 @@ void CGM_Pipe_MiniGame::think()
 
 			short iRandPlayer = game_values.teamids[iRandTeam][rand() % game_values.teamcounts[iRandTeam]];
 
-			objectcontainer[1].add(new OMO_PipeCoin(&spr_coin, (float)((rand() % 21) - 10) / 2.0f, -((float)(rand() % 13) / 2.0f + 6.0f), 304, 256, list_players[iRandPlayer]->teamID, list_players[iRandPlayer]->colorID, 15));
+			objectcontainer[1].add(new OMO_PipeCoin(&spr_coin, (float)((rand() % 21) - 10) / 2.0f, -((float)(rand() % 11) / 2.0f + 7.0f), 304, 256, list_players[iRandPlayer]->teamID, list_players[iRandPlayer]->colorID, 15));
 		}
 		else if(iBonusType == 3)
 		{
 			iNextItemTimer = rand() % 5 + 10;
-			objectcontainer[1].add(new OMO_PipeCoin(&spr_coin, (float)((rand() % 21) - 10) / 2.0f, -((float)(rand() % 13) / 2.0f + 6.0f), 304, 256, -1, 0, 15));
+			objectcontainer[1].add(new OMO_PipeCoin(&spr_coin, (float)((rand() % 21) - 10) / 2.0f, -((float)(rand() % 11) / 2.0f + 7.0f), 304, 256, -1, 0, 15));
 		}
 	}
 
 	if(iBonusTimer > 0 && --iBonusTimer <= 0)
 	{
 		iBonusType = 0;
+		fSlowdown = false;
 	}
 }
 
@@ -3160,6 +3172,14 @@ short CGM_Pipe_MiniGame::CheckWinner(CPlayer * player)
 void CGM_Pipe_MiniGame::SetBonus(short iType, short iTimer, short iTeamID)
 {
 	iBonusType = iType;
+
+	//This is the random bonus
+	if(iBonusType == 5)
+		iBonusType = rand() % 4 + 1;
+
+	if(iBonusType == 4)
+		fSlowdown = true;
+
 	iBonusTimer = iTimer;
 	iBonusTeam = iTeamID;
 }

@@ -122,6 +122,8 @@ class CPlayer
 		void SetupNewPlayer();
 
 		short getGlobalID() {return globalID;}
+		short getTeamID() {return teamID;}
+		short getColorID() {return colorID;}
 
 		bool bouncejump();
 
@@ -459,6 +461,7 @@ class CPlayer
 		friend class IO_FlameCannon;
 		friend class MO_PirhanaPlant;
 		friend class OMO_PipeCoin;
+		friend class OMO_PipeBonus;
 
 		friend class MO_CarriedObject;
 

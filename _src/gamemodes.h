@@ -565,6 +565,7 @@ class CGM_Pipe_MiniGame : public CGameMode
 		short CheckWinner(CPlayer * player);
 
 		void SetBonus(short iType, short iTimer, short iTeamID);
+		bool IsSlowdown() {return fSlowdown;}
 
 		bool HasStoredPowerups() {return false;}
 
@@ -572,6 +573,8 @@ class CGM_Pipe_MiniGame : public CGameMode
 
 		short iNextItemTimer;
 		short iBonusTimer, iBonusType, iBonusTeam;
+
+		bool fSlowdown;
 };
 
 #endif

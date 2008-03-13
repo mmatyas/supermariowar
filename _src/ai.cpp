@@ -798,6 +798,8 @@ void CPlayerAI::GetNearestObjects()
 			}
 
 			case object_coin:
+			case object_pipe_coin:
+			case object_pipe_bonus:
 			{
 				DistanceToObject(objectcontainer[1].list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
 				break;
