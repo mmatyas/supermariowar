@@ -1405,7 +1405,7 @@ void RunGame()
 		if(game_values.gamemode->HasStoredPowerups())
 			game_values.gamepowerups[iPlayer] = game_values.storedpowerups[iPlayer];
 		else
-			game_values.gamepowerups[iPlayer];
+			game_values.gamepowerups[iPlayer] = -1;
 
 		game_values.bulletbilltimer[iPlayer] = 0;
 		game_values.bulletbillspawntimer[iPlayer] = 0;

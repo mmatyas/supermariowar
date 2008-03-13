@@ -2217,7 +2217,7 @@ short PlayerKilledPlayer(short iKiller, CPlayer * killed, short deathstyle, kill
 
 		if(player_kill_nonkill != iKillType)
 		{
-			if(style == death_style_shatter)
+			if(style == (killstyle)death_style_shatter)
 				ifsoundonplay(sfx_breakblock);
 			else
 				ifsoundonplay(sfx_deathsound);
