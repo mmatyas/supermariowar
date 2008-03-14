@@ -297,6 +297,7 @@ class CPlayer
 
 		short powerup;
 		short projectilelimit;
+		short tanookilimit;
 
 		bool bobomb;
 

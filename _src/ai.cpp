@@ -798,10 +798,41 @@ void CPlayerAI::GetNearestObjects()
 			}
 
 			case object_coin:
-			case object_pipe_coin:
-			case object_pipe_bonus:
 			{
 				DistanceToObject(objectcontainer[1].list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
+				break;
+			}
+
+			case object_pipe_coin:
+			{
+				OMO_PipeCoin * coin = (OMO_PipeCoin*)objectcontainer[1].list[i];
+
+				if(coin->GetColor() != 0)
+				{
+					if(coin->GetTeam() == -1 || coin->GetTeam() == pPlayer->teamID)
+						DistanceToObject(objectcontainer[1].list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
+				}
+				else
+				{
+					DistanceToObject(objectcontainer[1].list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
+				}
+
+				break;
+			}
+
+			case object_pipe_bonus:
+			{
+				OMO_PipeBonus * bonus = (OMO_PipeBonus*)objectcontainer[1].list[i];
+
+				if(bonus->GetType() != 5)
+				{
+					DistanceToObject(objectcontainer[1].list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
+				}
+				else
+				{
+					DistanceToObject(objectcontainer[1].list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
+				}
+				
 				break;
 			}
 

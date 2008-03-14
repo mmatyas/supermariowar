@@ -2931,6 +2931,8 @@ void Menu::CreateMenu()
 
 void Menu::RunMenu()
 {
+	iUnlockMinigameOptionIndex = 0;
+
 	//Reset the keys each time we switch from menu to game and back
 	game_values.playerInput.ResetKeys();
 
@@ -3163,6 +3165,53 @@ void Menu::RunMenu()
 			game_values.playerInput.Update(event, 1);
 		}
 
+		//Watch for the konami code to unlock the minigames match type
+		if(!game_values.minigameunlocked && mCurrentMenu == &mMatchSelectionMenu)
+		{
+			if(!mCurrentMenu->GetCurrentControl()->IsModifying())
+			{
+				int keymask =
+					(game_values.playerInput.outputControls[0].menu_up.fPressed?1:0) |
+					(game_values.playerInput.outputControls[0].menu_down.fPressed?2:0) |
+					(game_values.playerInput.outputControls[0].menu_left.fPressed?4:0) |
+					(game_values.playerInput.outputControls[0].menu_right.fPressed?8:0) |
+					(game_values.playerInput.outputControls[0].menu_random.fPressed?16:0);
+
+				if (iUnlockMinigameOptionIndex < 11)
+				{
+					static const int konami_code[11] = {1,1,2,2,4,8,4,8,16,16,16};
+			        
+					if (keymask & konami_code[iUnlockMinigameOptionIndex]) 
+						iUnlockMinigameOptionIndex++;
+					else if (keymask & ~konami_code[iUnlockMinigameOptionIndex]) 
+					{
+						iUnlockMinigameOptionIndex = 0;
+
+						if (keymask & konami_code[iUnlockMinigameOptionIndex]) 
+							iUnlockMinigameOptionIndex++;
+					}
+			        
+					if (iUnlockMinigameOptionIndex == 11)
+					{
+						ifsoundonplay(sfx_transform); 
+						game_values.minigameunlocked = true;
+
+						miMatchSelectionField->HideItem(MATCH_TYPE_MINIGAME, false);
+						miMatchSelectionField->SetKey(MATCH_TYPE_MINIGAME);
+
+						miTournamentField->Show(false);
+						miTourField->Show(false);
+						miWorldField->Show(false);
+						miMinigameField->Show(true);
+
+						miMatchSelectionDisplayImage->Show(true);
+						miWorldPreviewDisplay->Show(false);
+						miMatchSelectionDisplayImage->SetImage(0, 240 * game_values.matchtype, 320, 240);
+					}
+				}
+			}
+		}
+
 #ifdef _DEBUG
 		if(g_fAutoTest)
 			GetNextScriptOperation();
@@ -3193,6 +3242,7 @@ void Menu::RunMenu()
 			else if(MENU_CODE_BACK_TO_MATCH_SELECTION_MENU == code)
 			{
 				mCurrentMenu = &mMatchSelectionMenu;
+				iUnlockMinigameOptionIndex = 0;
 			}
 			else if(MENU_CODE_TO_MATCH_SELECTION_MENU == code)
 			{
@@ -3200,6 +3250,7 @@ void Menu::RunMenu()
 
 				mCurrentMenu = &mMatchSelectionMenu;
 				mCurrentMenu->ResetMenu();
+				iUnlockMinigameOptionIndex = 0;
 			}
 			else if(MENU_CODE_MATCH_SELECTION_START == code)
 			{
@@ -3217,7 +3268,6 @@ void Menu::RunMenu()
 				miMatchSelectionDisplayImage->Show(game_values.matchtype != MATCH_TYPE_WORLD);
 				miWorldPreviewDisplay->Show(game_values.matchtype == MATCH_TYPE_WORLD);
 				miMatchSelectionDisplayImage->SetImage(0, 240 * game_values.matchtype, 320, 240);
-
 			}
 			else if(MENU_CODE_WORLD_MAP_CHANGED == code)
 			{

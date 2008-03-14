@@ -1813,6 +1813,9 @@ class OMO_PipeCoin: public IO_OverMapObject
 		void draw();
 		bool collide(CPlayer * player);
 
+		short GetColor() {return iColorID;}
+		short GetTeam() {return iTeamID;}
+
 	private:
 		short iTeamID, iColorID;
 
@@ -1831,6 +1834,8 @@ class OMO_PipeBonus: public IO_OverMapObject
 		void update();
 		void draw();
 		bool collide(CPlayer * player);
+
+		short GetType() {return iType;}
 
 	private:
 		short iType, iDuration;

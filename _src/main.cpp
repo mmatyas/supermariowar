@@ -58,13 +58,15 @@ Pipe Minigame:
 
 [ ] Secret unlock code to unlock Minigame match type so you can select what minigame you want to play directly (not through world)
 
-//BUG!! Doesn't look like the pipe minigame goal set in the world file is working
+//TEST!! unlock code works to unlock minigame match type menu
 
    */
 
 /*
 Checkin:
-1) Started pipe minigame for world mode
+1) Added code to unlock pipe minigame match type
+2) Made AI a little smarter about what it collects and what it avoids in pipe minigame
+3) Fixed bugs with leaf and pwings powerup limits (last use was cut short or not working at all)
 */
 
 #ifdef _XBOX
@@ -2816,7 +2818,11 @@ void RunGame()
 				char szGoal[256];
 				strcpy(szGoal, game_values.gamemode->GetGoalName());
 				strcat(szGoal, ": ");
-				sprintf(szGoal + strlen(szGoal), "%d", game_values.gamemode->goal);
+
+				if(game_values.gamemode->goal == -1)
+					sprintf(szGoal + strlen(szGoal), "Unlimited");
+				else
+					sprintf(szGoal + strlen(szGoal), "%d", game_values.gamemode->goal);
 				
 				menu_font_large.drawCentered(320, 264, szGoal);
 			}

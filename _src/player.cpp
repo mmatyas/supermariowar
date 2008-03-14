@@ -493,6 +493,13 @@ void CPlayer::move()
 				ifsoundonplay(sfx_transform);
 
 				statue_lock = false;
+
+				//Decrease the amount of tanooki uses, if feature is turned on
+				if(game_values.tanookilimit > 0 || tanookilimit > 0)
+				{
+					if(--tanookilimit <= 0)
+						tanooki = false;
+				}
 			}
 
 			// Player is a statue
@@ -826,6 +833,10 @@ void CPlayer::move()
 				{
 					ifsoundonplay(sfx_collectpowerup);
 					tanooki = true;
+
+					if(game_values.tanookilimit > 0)
+						tanookilimit = game_values.tanookilimit;
+
 					break;
 				}
 				case 21:  //sledge hammer
@@ -1114,9 +1125,6 @@ void CPlayer::move()
 
 						lockjump = true;
 						extrajumps++;
-
-						if(game_values.pwingslimit > 0)
-							DecreaseProjectileLimit();
 					}
 					//This must come last or gliding chickens can't use powerups before this statement
 					else if((powerup == 7 || (powerup != 3 && game_values.gamemode->chicken == this && game_values.gamemodesettings.chicken.glide)) && !fKuriboShoe && iSpinState == 0)
@@ -1126,9 +1134,6 @@ void CPlayer::move()
 							ShakeTail();
 							lockjump = true;
 						}
-
-						if(powerup == 7 && game_values.leaflimit > 0)
-							DecreaseProjectileLimit();
 					}
 				}
 			}
@@ -1139,8 +1144,14 @@ void CPlayer::move()
 				if(vely < -VELSTOPJUMP)
 					vely = -VELSTOPJUMP;
 
-				flying = false;
-				flyingtimer = 0;
+				if(flying)
+				{
+					flying = false;
+					flyingtimer = 0;
+
+					if(game_values.pwingslimit > 0)
+						DecreaseProjectileLimit();
+				}
 			}
 		
 			if(playerKeys->game_down.fDown)
@@ -1262,18 +1273,24 @@ void CPlayer::move()
 						}
 						else if(powerup == 6 && projectiles[globalID] < 1)
 						{
-							CO_Bomb * bomb = new CO_Bomb(&spr_bomb, ix + HALFPW - 14, iy - 8, IsPlayerFacingRight() ? 3.0f : -3.0f, -3.0f, 4, globalID, teamID, colorID, rand() % 120 + 240);
-							
-							if(AcceptItem(bomb))
+							if(game_values.bombslimit == 0 || projectilelimit > 0)
 							{
-								bomb->owner = this;
-								bomb->MoveToOwner();
+								CO_Bomb * bomb = new CO_Bomb(&spr_bomb, ix + HALFPW - 14, iy - 8, IsPlayerFacingRight() ? 3.0f : -3.0f, -3.0f, 4, globalID, teamID, colorID, rand() % 120 + 240);
+								
+								if(AcceptItem(bomb))
+								{
+									bomb->owner = this;
+									bomb->MoveToOwner();
+								}
+
+								objectcontainer[2].add(bomb);
+								projectiles[globalID]++;
+							
+								ifsoundonplay(sfx_fireball);
 							}
 
-							objectcontainer[2].add(bomb);
-							projectiles[globalID]++;
-							
-							ifsoundonplay(sfx_fireball);
+							if(game_values.bombslimit > 0)
+								DecreaseProjectileLimit();
 						}
 						else if(powerup == 7 && iSpinState == 0 && !fKuriboShoe) //Racoon tail spin
 						{
@@ -1281,9 +1298,6 @@ void CPlayer::move()
 							{
 								SpinTail(); //Cause tail spin
 							}
-
-							if(game_values.leaflimit > 0)
-								DecreaseProjectileLimit();
 						}
 					}
 
@@ -1322,6 +1336,9 @@ void CPlayer::move()
 			{
 				flyingtimer = 0;
 				flying = false;
+
+				if(game_values.pwingslimit > 0)
+					DecreaseProjectileLimit();
 			}
 
 			if(playerKeys->game_down.fDown && vely < 1.0f)
@@ -2915,7 +2932,12 @@ void CPlayer::DrawTail()
 			iTailFrame -= 22;
 
 			if(iTailFrame < 66)
+			{
 				iTailState = 0;
+
+				if(powerup == 7 && game_values.leaflimit > 0)
+					DecreaseProjectileLimit();
+			}
 		}
 	}
 	else if(iTailState == 2)
@@ -2929,6 +2951,9 @@ void CPlayer::DrawTail()
 			{
 				iTailState = 0;
 				iTailFrame = 66;
+
+				if(powerup == 7 && game_values.leaflimit > 0)
+					DecreaseProjectileLimit();
 			}
 		}
 	}
@@ -2978,6 +3003,7 @@ void CPlayer::DrawTail()
 			spr_tail.draw(ix + (fPlayerFacingRight ? - 18 : 18), iy + 6, iTailFrame, (fPlayerFacingRight ? 0 : 26) + iOffsetY, 22, 26, (short)state %4, warpplane);
 		else
 			spr_tail.draw(ix + (fPlayerFacingRight ? - 18 : 18), iy + 6, iTailFrame, (fPlayerFacingRight ? 0 : 26) + iOffsetY, 22, 26);
+		
 	}
 }
 
@@ -4306,8 +4332,13 @@ void CPlayer::SetPowerup(short iPowerup)
 		}
 		else if(powerup == 5)
 		{
-			if(game_values.hammerlimit > 0)
-				projectilelimit = game_values.hammerlimit;
+			if(game_values.wandlimit > 0)
+				projectilelimit = game_values.wandlimit;
+		}
+		else if(powerup == 6)
+		{
+			if(game_values.bombslimit > 0)
+				projectilelimit = game_values.bombslimit;
 		}
 		else if(powerup == 7)
 		{

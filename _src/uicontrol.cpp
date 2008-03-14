@@ -245,6 +245,7 @@ bool MI_SelectField::SetKey(short iID)
 		if((*search)->iValue == iID)
 		{
 			current = search;
+			SetValues();
 			return true;
 		}
 
@@ -268,6 +269,8 @@ bool MI_SelectField::SetIndex(unsigned short index)
 	}
 
 	iIndex = index;
+
+	SetValues();
 
 	return true;
 }

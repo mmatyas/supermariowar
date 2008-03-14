@@ -3388,6 +3388,9 @@ bool PU_Tanooki :: collide (CPlayer *player)
     {
 		ifsoundonplay(sfx_collectpowerup);
         player->tanooki = true;
+
+		if(game_values.tanookilimit > 0)
+			player->tanookilimit = game_values.tanookilimit;
     }
 
     return false;

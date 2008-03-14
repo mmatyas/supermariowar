@@ -3126,13 +3126,13 @@ void CGM_Pipe_MiniGame::think()
 
 short CGM_Pipe_MiniGame::playerkilledplayer(CPlayer &player, CPlayer &other, killstyle style)
 {
-	other.score->AdjustScore(-2);
+	//other.score->AdjustScore(-2);
 	return player_kill_normal;
 }
 
 short CGM_Pipe_MiniGame::playerkilledself(CPlayer &player, killstyle style)
 {
-	player.score->AdjustScore(-2);
+	//player.score->AdjustScore(-2);
 	return player_kill_normal;
 }
 

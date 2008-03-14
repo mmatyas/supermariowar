@@ -21,7 +21,7 @@ class ScriptOperation
 };
 #endif
 
-enum MatchType {MATCH_TYPE_SINGLE_GAME = 0, MATCH_TYPE_TOURNAMENT = 1, MATCH_TYPE_TOUR = 2, MATCH_TYPE_WORLD = 3, MATCH_TYPE_MINIGAME = 4};
+enum MatchType {MATCH_TYPE_SINGLE_GAME = 0, MATCH_TYPE_TOURNAMENT = 1, MATCH_TYPE_TOUR = 2, MATCH_TYPE_WORLD = 4, MATCH_TYPE_MINIGAME = 3};
 enum DisplayError {DISPLAY_ERROR_NONE, DISPLAY_ERROR_READ_TOUR_FILE, DISPLAY_ERROR_READ_WORLD_FILE, DISPLAY_ERROR_MAP_FILTER};
 
 class Menu
@@ -573,6 +573,8 @@ class Menu
 		bool fNeedMenuMusicReset;
 
 		const char * szCurrentMapName;
+
+		short iUnlockMinigameOptionIndex;
 };
 
 #endif //__MENU_H_

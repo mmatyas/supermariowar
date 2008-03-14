@@ -45,6 +45,8 @@ class UI_Control
 
 		void SetMenuParent(UI_Menu * menu) {uiMenu = menu;}
 
+		bool IsModifying() {return fModifying;}
+
 	protected:
 
 		bool fSelected;
