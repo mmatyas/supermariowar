@@ -61,6 +61,7 @@ class WorldMovingObject
 		short iTileSheet;
 	
 	friend class WorldMap;
+	friend void takescreenshot();
 };
 
 class WorldPlayer : public WorldMovingObject
@@ -76,7 +77,6 @@ class WorldPlayer : public WorldMovingObject
 		void Draw(short iWorldOffsetX, short iWorldOffsetY);
 
 	friend class WorldMap;
-
 };
 
 class WorldVehicle : public WorldMovingObject
@@ -138,6 +138,7 @@ class WorldWarp
 	friend void ReadWarpsIntoEditor();
 	friend void WriteWarpsIntoWorld();
 	friend int editor_edit();
+	friend void takescreenshot();
 };
 
 class WorldMap
@@ -190,6 +191,7 @@ class WorldMap
 		short GetVehicleStageScore(short iVehicleIndex);
 		void MoveBridges();
 
+		void IsTouchingDoor(short iCol, short iRow, bool doors[4]);
 		bool IsDoor(short iCol, short iRow);
 		short UseKey(short iKeytype, short iCol, short iRow);
 

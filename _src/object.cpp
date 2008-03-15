@@ -7137,13 +7137,13 @@ void MO_CollectionCard::placeCard()
 //------------------------------------------------------------------------------
 // class explosion (for bob-omb mode)
 //------------------------------------------------------------------------------
-MO_Explosion::MO_Explosion(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short playerid, short iTeamID, killstyle style) :
+MO_Explosion::MO_Explosion(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short playerid, short teamid, killstyle style) :
 	IO_MovingObject(nspr, x, y, iNumSpr, aniSpeed)
 {
 	state = 1;
 
 	iPlayerID = playerid;
-	iTeamID = iTeamID;
+	iTeamID = teamid;
 	timer = 0;
 	movingObjectType = movingobject_explosion;
 	iStyle = style;
@@ -10043,16 +10043,28 @@ bool OMO_PipeCoin::collide(CPlayer * player)
 		if(iTeamID != -1)
 		{
 			if(player->teamID == iTeamID)
+			{
 				player->score->AdjustScore(1);
+				ifsoundonplay(sfx_coin);
+			}
 		}
 		else
 		{
 			if(iColorID == 2)
+			{
 				player->score->AdjustScore(1);
+				ifsoundonplay(sfx_coin);
+			}
 			else if(iColorID == 0)
+			{
 				player->score->AdjustScore(-1);
+				ifsoundonplay(sfx_stun);
+			}
 			else if(iColorID == 1)
+			{
 				player->score->AdjustScore(5);
+				ifsoundonplay(sfx_extraguysound);
+			}
 		}
 
 		game_values.gamemode->CheckWinner(player);
@@ -10060,8 +10072,6 @@ bool OMO_PipeCoin::collide(CPlayer * player)
 
 	eyecandyfront.add(new EC_SingleAnimation(&spr_coinsparkle, ix, iy, 7, 4));
 
-	ifsoundonplay(sfx_coin);
-	
 	dead = true;
 	return false;
 }
@@ -10161,8 +10171,6 @@ bool OMO_PipeBonus::collide(CPlayer * player)
 	{
 		if(!game_values.gamemode->gameover)
 			pipegamemode->SetBonus(iType + 1, iDuration, player->getTeamID());
-
-		ifsoundonplay(sfx_collectpowerup);
 	}
 
 	dead = true;

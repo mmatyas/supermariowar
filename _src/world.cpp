@@ -1575,6 +1575,55 @@ void WorldMap::MoveBridges()
 	}
 }
 
+void WorldMap::IsTouchingDoor(short iCol, short iRow, bool doors[4])
+{
+	WorldMapTile * tile = &tiles[iCol][iRow];
+
+	if(iCol > 0)
+	{
+		if(tile->iCompleted >= -1)
+		{
+			short iType = tiles[iCol - 1][iRow].iType - 2;
+
+			if(iType >= 0 && iType <= 3)
+				doors[iType] = true;
+		}
+	}
+
+	if(iCol < iWidth - 1)
+	{
+		if(tile->iCompleted >= -1)
+		{
+			short iType = tiles[iCol + 1][iRow].iType - 2;
+
+			if(iType >= 0 && iType <= 3)
+				doors[iType] = true;
+		}
+	}
+
+	if(iRow > 0)
+	{
+		if(tile->iCompleted >= -1)
+		{
+			short iType = tiles[iCol][iRow - 1].iType - 2;
+
+			if(iType >= 0 && iType <= 3)
+				doors[iType] = true;
+		}
+	}
+
+	if(iCol < iHeight - 1)
+	{
+		if(tile->iCompleted >= -1)
+		{
+			short iType = tiles[iCol][iRow + 1].iType - 2;
+
+			if(iType >= 0 && iType <= 3)
+				doors[iType] = true;
+		}
+	}
+}
+
 bool WorldMap::IsDoor(short iCol, short iRow)
 {
 	if(iCol >= 0 && iRow >= 0 && iCol < iWidth && iRow < iHeight)

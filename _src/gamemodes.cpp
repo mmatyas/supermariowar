@@ -2495,7 +2495,7 @@ short CGM_Greed::ReleaseCoins(CPlayer &player, killstyle style)
 //mariowar (x lives - counting down)
 CGM_Health::CGM_Health() : CGM_Classic()
 {
-	goal = 10;
+	goal = 5;
 	gamemode = game_mode_health;
 
 	SetupModeStrings("Health", "Lives", 1);
@@ -3038,7 +3038,7 @@ void CGM_Bonus::draw_background()
 		spr_worldbonushouse.draw(128, 128, 0, 64, 384, 128);
 
 		for(short iTextLine = 0; iTextLine < tsTourStop->iBonusTextLines; iTextLine++)
-			game_font_large.drawChopRight(136, 132 + 24 * iTextLine, 372, tsTourStop->szBonusText[iTextLine]);
+			game_font_large.drawChopCentered(320, 132 + 24 * iTextLine, 372, tsTourStop->szBonusText[iTextLine]);
 	}
 }
 
@@ -3182,4 +3182,9 @@ void CGM_Pipe_MiniGame::SetBonus(short iType, short iTimer, short iTeamID)
 
 	iBonusTimer = iTimer;
 	iBonusTeam = iTeamID;
+
+	if(iBonusType == 3)
+		ifsoundonplay(sfx_powerdown);
+	else
+		ifsoundonplay(sfx_collectpowerup);
 }

@@ -194,12 +194,19 @@ void SFont_WriteChopCenter(SDL_Surface *Surface, const SFont_Font* Font, int x, 
 	int iCurrentChar = 0;
 	char szText[256];
 
-	strcpy(szText, text);
+	//array overflow safe
+	strncpy(szText, text, 255);
+	szText[255] = 0;
 
 	for(c = text; *c != '\0'; c++) 
 	{
 		int charoffset = ((int) text[iCurrentChar] - 33) * 2 + 1;
-		int iNextWidth = Font->CharPos[charoffset+1] - Font->CharPos[charoffset];
+		
+		int iNextWidth = 0;
+		if (*c == ' ' || charoffset < 0 || charoffset > Font->MaxPos) 
+			iNextWidth = Font->CharPos[2] - Font->CharPos[1];
+		else
+			iNextWidth = Font->CharPos[charoffset+1] - Font->CharPos[charoffset];
 		
 		if(iCurrentWidth + iNextWidth > w)
 		{

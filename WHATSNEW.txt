@@ -3,6 +3,85 @@
  Whats New?                                                         04.01.2007
 ------------------------------------------------------------------------------
 
+1.8
+
+Added pipe minigame to world
+Added center flag option to capture the flag mode
+Added coin disappear time to greed mode
+Added suicide timer so players that sit still for too long will countdown and die
+Added shatter death to players that are frozen
+Added menu option to configure the amount of time a player is frozen
+Added spiny, buzzy beetle, paragoomba and parakoopas to stomp
+New wand powerup with sgraff wand blast gfx
+New map hazards flame cannon, bullet bills, pirhana plants, fireball strings, and rotodiscs
+Added powerup limit fields for leaf, pwings, bomb, tanooki and wand
+Moved weapon limits options to a seperate menu from the projectile settings menu
+Removed all of the special moves from AFE
+Removed super kick for shells and blocks but added a small amount of velocity depending on how fast the player is moving
+Added both a left and right direction for the goomba enemy gfx
+Fixed invincibility music so it doesn't pause when you pause or start to exit the game
+Added ability to search map field for more than just a single character by typing multiple chars
+Updated egg gfx to use animated gfx
+Added glide option to chicken in chicken mode (unlimited leaf powerup for player that is the chicken)
+Added new jail key item to jail mode
+Added exploding eggs option to Yoshi's eggs mode
+Added hidden blocks option to note blocks, powerup blocks, flip blocks
+Added feature to allow hidden blocks to rehide after a specified time
+Added 3 new map filters for item destroyable blocks, hidden blocks, and map hazards
+Added push only kills option to timed and frag modes (sumo mode)
+Updated flag bases to relocate after a period of time
+Added two new types of platform paths -> continuous path and ellipse path
+Updated straight paths to allow the path to be at any angle, not just vertical and horizontal
+Added team specific spawn areas
+Optimized collision detection loop
+Added new options to yoshi's eggs mode to allow for 4 different colors of yoshis and eggs
+Added warp lock options - enterance only, exit only, both, whole connection, all warps
+Added feature to break/trigger blocks when a player warps into them.  This will help players not get stuck in breakable blocks when they are on the other side of a warp.
+Added a style option to frag and classic mode allowing players to shield instead of respawn after being killed
+Added "Collection" mode that has players collecting cards for points
+Added kill credits for pushing other players into hazards
+Added Health Mode where players have a certain number of hearts and only die when they lose all their hearts
+Added mode specific extra time powerup for time limit and star modes
+Added greed mode where players have a certain number of coins that pop out when they are attacked - last player with coins wins
+Level editor can now specify where flag bases and race goals will start in a map
+Updated bonus wheel - only 10 bonuses are displayed and the player can choose when to stop the spinner
+Added 6 new tile types: Right and Left death tiles, Ice Solid On Top, Ice Death On Bottom, Ice Death On Left and Ice Death On Right
+Added weapon destroyable blocks that can only be destroyed by that weapon - i.e. fireball breakable blocks, hammer breakable blocks, etc.
+Added fish, snow and leaves eyecandy
+Flipped over shells when hit with POW, MOd, spin attack or bounced from below
+Red and Gray throwable blocks (bounce and keep going when they hit a player/enemy)
+New spin move for tail and cape powerups
+New powerups tanooki, podobo (from AFE), ice wand, leaf, pwings, bombs (from AFE)
+Allow powerup weights to be specified in the map and added options to use weights from game, map or an average of both
+New world match type and world editor (prototype) with working screenshots
+ - Stages, paths, bridges, lots of the stuff from SMB3
+ - Item menu system with new types of multiplayer style items like change controls, score multipliers and stage resurection
+ - Moving stages in the form of hammer brothers and tanks
+ - Bonus houses to visit and a pipe minigame to play
+ - Doors/keys and warp pipes
+Added two alternate modes to jail "Owned" and "Free for All".  Named the 1.7 jail mode to "Classic"
+New animated tileset that gives you complete control over animated tiles in multiple layers
+New tail powerup that can spin attack and allow the player to float down slowly
+Added Kuribo's shoe map item (in addition to the spike and spring items from AFE)
+Added super stomp move to kuribo's shoe and tanooki statue
+New "poof" gfx for transforming player into different forms
+New fireworks eyecandy on scoreboard
+Expanded tilesets - allows player to use any number of customized tileset inside the game (ships with SMB1, SMB2, SMB3 and SMWorld)
+New blue and orange note blocks
+Display different poses for different places in tour and world scoreboard
+New Move mode option in level editor allows "replace" and "merge" moves so that the newly placed tiles either take over or are merged with existing data there
+Fixed move mode to move map objects as well
+Added new world music packs section
+Added tile_gap tile type that is automatically detected and allows players to run across 1 tile wide gaps
+Removed dependency on tileset.tls -> this file is now only used for default tile types assigned in the level editor
+Allow platforms to have tile types set independently o fhte tileset.tls
+Added ability to jump off of falling donut blocks
+Added mode settings to tours -> all mode settings are now settable using the tour file and old tour files are still supported (settings default to what they are set in the game mode menu)
+Added view blocks (from AFE), similar to powerup block except you can see what you're going to get when you hit it
+
+
+------------------------------------------------------------------------------
+
 1.7 April Fools Edition
 
  - Animated lava and water tiles

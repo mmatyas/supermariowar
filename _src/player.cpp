@@ -547,6 +547,10 @@ void CPlayer::move()
 			if(iSpinState == 6 || iSpinState == 12)
 			{
 				iSpinState = 0;
+
+				if(powerup == 3 && game_values.featherlimit > 0)
+					DecreaseProjectileLimit();
+
 			}
 		}
 	}
@@ -839,7 +843,7 @@ void CPlayer::move()
 
 					break;
 				}
-				case 21:  //sledge hammer
+				case 21:  //ice wand
 				{
 					powerup = -1;
 					SetPowerup(5);
@@ -1237,9 +1241,6 @@ void CPlayer::move()
 							{
 								SpinCape(); //Cause cape spin
 							}
-
-							if(game_values.featherlimit > 0)
-								DecreaseProjectileLimit();
 						}
 						else if(powerup == 4 && projectiles[globalID] < 1) //only allow one boomerang
 						{
@@ -2234,7 +2235,7 @@ short PlayerKilledPlayer(short iKiller, CPlayer * killed, short deathstyle, kill
 
 		if(player_kill_nonkill != iKillType)
 		{
-			if(style == (killstyle)death_style_shatter)
+			if(deathstyle == death_style_shatter)
 				ifsoundonplay(sfx_breakblock);
 			else
 				ifsoundonplay(sfx_deathsound);

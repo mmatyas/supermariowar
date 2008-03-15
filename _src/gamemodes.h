@@ -539,6 +539,9 @@ class CGM_Bonus : public CGameMode
 		void init();
 		void draw_background();
 
+		//Override so it doesn't display winner text after you choose a powerup
+		void think() {}
+
 		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style) {return false;}
 		short playerkilledself(CPlayer &player, killstyle style) {return false;}
 		void playerextraguy(CPlayer &player, short iType) {}

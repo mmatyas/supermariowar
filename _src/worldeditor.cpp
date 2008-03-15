@@ -962,7 +962,7 @@ int editor_edit()
 				if(warp->iCol1 >= 0)
 				{
 					ix = (warp->iCol1 - draw_offset_col) * TILESIZE + draw_offset_x;
-					short iy = (warp->iRow1 - draw_offset_row) * TILESIZE + draw_offset_y;
+					iy = (warp->iRow1 - draw_offset_row) * TILESIZE + draw_offset_y;
 
 					spr_warps[0].draw(ix, iy, warp->iID << 5, 0, 32, 32);
 				}
@@ -2998,7 +2998,7 @@ int new_world()
 //take screenshots in full and thumbnail sizes
 void takescreenshot()
 {
-	short iTileSizes[3] = {16, 8, 32};
+	short iTileSizes[3] = {32, 16, 8};
 
 	for(short iScreenshotSize = 0; iScreenshotSize < 3; iScreenshotSize++)
 	{
@@ -3008,8 +3008,41 @@ void takescreenshot()
 		short w, h;
 		g_worldmap.GetWorldSize(&w, &h);
 
+		//Draw most of the world to screenshot
 		SDL_Surface * sScreenshot = SDL_CreateRGBSurface(screen->flags, iTileSize * w, iTileSize * h, screen->format->BitsPerPixel, 0, 0, 0, 0);
+		blitdest = sScreenshot;
+
 		g_worldmap.DrawMapToSurface(sScreenshot); 
+
+		//Draw vehicles to screenshot
+		std::vector<WorldVehicle*>::iterator itr = vehiclelist.begin(), lim = vehiclelist.end();
+		int color = SDL_MapRGB(blitdest->format, 0, 0, 128);
+		while(itr != lim)
+		{
+			WorldVehicle * vehicle = *itr;
+
+			short ix = vehicle->iCurrentTileX * iTileSize;
+			short iy = vehicle->iCurrentTileY * iTileSize;
+			
+			spr_worldvehicle[iScreenshotSize].draw(ix, iy, vehicle->iDrawDirection * iTileSize, vehicle->iDrawSprite * iTileSize, iTileSize, iTileSize);
+
+			itr++;
+		}
+
+		//Draw warps to screenshot
+		std::vector<WorldWarp*>::iterator itrWarp = warplist.begin(), limWarp = warplist.end();
+		while(itrWarp != limWarp)
+		{
+			WorldWarp * warp = *itrWarp;
+
+			if(warp->iCol1 >= 0)
+				spr_warps[iScreenshotSize].draw(warp->iCol1 * iTileSize, warp->iRow1 * iTileSize, warp->iID * iTileSize, 0, iTileSize, iTileSize);
+
+			if(warp->iCol2 >= 0)
+				spr_warps[iScreenshotSize].draw(warp->iCol2 * iTileSize, warp->iRow2 * iTileSize, warp->iID * iTileSize, 0, iTileSize, iTileSize);
+
+			itrWarp++;
+		}
 
 		//Save the screenshot with the same name as the map file
 		char szSaveFile[256];
@@ -3032,6 +3065,8 @@ void takescreenshot()
 
 		SDL_FreeSurface(sScreenshot);
 	}
+
+	blitdest = screen;
 }
 
 

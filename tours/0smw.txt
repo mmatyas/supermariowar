@@ -27,17 +27,22 @@
 
 #Mode Options
 #0 - Classic
-#Style - 0 for respawning on kill, 1 for shield and player keeps playing
+#On Kill - 0 for respawning on kill, 1 for shield and player keeps playing
 
 #1 - Frag
-#Style - 0 for respawning on kill, 1 for shield and player keeps playing
+#On Kill - 0 for respawning on kill, 1 for shield and player keeps playing
+#Scoring - 0 for all kills and 1 for push kills only
 
 #2 - Time Limit
+#On Kill - 0 for respawning on kill, 1 for shield and player keeps playing
+#Scoring - 0 for all kills and 1 for push kills only
 #Percent Extra Time - number between 0 and 100 indicating the percent chance extra time will appear from a powerup block
 
 #3 - Jail
+#Style - 0 for Classic, 1 for Owned and 2 for Free For All
 #Free Timer - None = 1, all other numbers greater than 1 are number of frames the jail will last (example: 620 is about 10 seconds)
 #Tag Free - 0 = Off, 1 = On
+#Percent Jail Key - number between 0 and 100 indicating the percent chance that a jail key will appear from a powerup block
 
 #4 - Coins
 #Penalty - 0 = Off, 1 = On
@@ -48,7 +53,12 @@
 #Goomba Weight - any positive number including 0, used in conjunction with the other weights below.  If goomba rate is 2 and koopa and cheep cheep is 1, then there will be a 50% chance the next enemy will be a goomba (2 + 1 + 1 = 4, 2 / 4 = 50%)
 #Koopa Weight - any positive number including 0
 #Cheep Cheep Weight - any positive number including 0
-#Red Koopa Weight - any positive number inclusing 0
+#Red Koopa Weight - any positive number including 0
+#Spiny - any positive number including 0
+#Buzzy Beetle - any positive number including 0
+#Paragoomba - any positive number including 0
+#Parakoopa - any positive number including 0
+#Red Parakoopa - any positive number including 0
 
 #6 - Eggs
 #Green Eggs - number of green eggs to play with
@@ -59,6 +69,7 @@
 #Red Yoshis - number of red yoshis to play with
 #Yellow Yoshis - number of yellow yoshis to play with
 #Blue Yoshis - number of blue yoshis to play with
+#Explosion Timer - number of seconds until eggs explode - 0 for off any positive number is the number of seconds (5 is 5 seconds until explosion)
 
 #7 - CTF
 #Speed - 0 = stationary, any number greater than 0 causes bases to move.  The larger the number, the faster they go.
@@ -66,9 +77,11 @@
 #Point Move - 0 = Off, 1 = On
 #Auto Return - 0 = No auto return, any number greater than 0 is the number of frames before it returns (example: 620 is about 10 seconds)
 #Need Home - 0 = Off, 1 = On
+#Center Flag - 0 = Off, 1 = On
 
 #8 - Chicken
 #Show Target - 0 = Off, 1 = On
+#Chicken Glide - 0 = Off, 1 = On
 
 #9 - Tag
 #Touch Tag - 0 = Off, 1 = On
@@ -121,7 +134,8 @@
 #Speed - any number greater than 0.  The larger the number, the faster they go. (2 is "Very Slow" and 8 is "Very Fast")
 #Shield - 0 = Off, 1 = On
 
-#17 - Greed - None
+#17 - Greed
+#Coin Life - time until coins disappear - number of frames until the bases relocate (example: 620 is about 10 seconds)
 
 #18 - Health
 #Start Life - Number of hearts each team starts with - number between 1 and 10
@@ -136,6 +150,6 @@
 
 #Tour Stops (maximum 10 stops)
 #Map,Mode,Goal,Points,Bonus Wheel,Name,Options(see above)
-subcon,5,30,2,1,1st Stop,60,1,0,0,1
+subcon,5,30,2,1,1st Stop,60,2,0,0,2,0,0,1,0,0
 0smw,16,200,1,0,2nd Stop,1,5,0,8,4,1
 treefort,15,15,1,0,3rd Stop,3,310,0,2,1,1,0,0,1,0,0,1,0,0,0

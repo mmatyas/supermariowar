@@ -68,12 +68,12 @@
 
 #Tile Types
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-0,0,0,0,0,0,0,0,0,0,0,0,0,12,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,11,0
 0,0,6,0,0,0,0,0,0,0,0,0,0,0,0
 0,0,0,0,0,0,0,8,0,0,0,0,0,3,0
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 0,0,0,0,0,0,0,1,0,0,0,0,0,0,0
-0,7,0,0,0,0,0,30,0,0,0,0,0,0,0
+0,7,0,0,0,0,0,0,0,0,0,0,0,0,0
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 0,0,0,0,0,0,0,0,0,11,0,0,0,0,0
@@ -82,55 +82,40 @@
 
 #Vehicle Boundaries
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-0,0,0,0,0,0,0,3,0,0,0,0,0,3,0
-0,2,0,0,0,0,0,2,0,0,0,0,0,0,0
-0,0,0,0,0,0,0,0,0,0,0,0,0,4,0
 0,0,0,0,1,0,0,0,0,0,0,0,0,0,0
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-0,0,0,0,0,0,0,4,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,2,0,0,0,0,0,2,0
+0,1,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,1,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 
 #Stages
 #Stage Type 0,Map,Mode,Goal,Points,Bonus List(Max 10),Name,End World, then mode settings (see sample tour file for details)
 #Stage Type 1,Bonus House Name,Sequential/Random Order,Display Text,Powerup List
-25
-0,0smw,16,20,2,1p20|1w6|2p2,1st Stop,0,2,4,1,25,4,1
-0,Treefort,15,15,1,1p12,2nd Stop,0,3,310,0,2,1,1,0,0,1,0,0,1,0,0,0
+6
+0,0smw,16,200,1,1w6,2nd Stop,0,5,0,8,4,1
+0,Treefort,15,15,1,0,3rd Stop,0,3,310,0,0,1,1,0,0,1,0,0,1,0,0,0
 0,Mountain waterfall,14,200,1,0,mountain waterfall,0
 0,Ambitions of the Abyss,14,100,1,0,Lava Island,1
-0,Blockfort,5,10,1,1p6,Vehicle Stop,0,60,10,5,0,1
-0,0smw,16,20,2,1p20|1w6|2p2,1st Stop,0,2,4,1,25,4,1
-0,Treefort,15,15,1,1p12,2nd Stop,0,3,310,0,2,1,1,0,0,1,0,0,1,0,0,0
-0,Mountain waterfall,14,200,1,0,mountain waterfall,0
-0,Ambitions of the Abyss,14,100,1,0,Lava Island,1
-0,Blockfort,5,10,1,1p6,Vehicle Stop,0,60,10,5,0,1
-0,0smw,16,20,2,1p20|1w6|2p2,1st Stop,0,2,4,1,25,4,1
-0,Treefort,15,15,1,1p12,2nd Stop,0,3,310,0,2,1,1,0,0,1,0,0,1,0,0,0
-0,Mountain waterfall,14,200,1,0,mountain waterfall,0
-0,Ambitions of the Abyss,14,100,1,0,Lava Island,1
-0,Blockfort,5,10,1,1p6,Vehicle Stop,0,60,10,5,0,1
-0,0smw,16,20,2,1p20|1w6|2p2,1st Stop,0,2,4,1,25,4,1
-0,Treefort,15,15,1,1p12,2nd Stop,0,3,310,0,2,1,1,0,0,1,0,0,1,0,0,0
-0,Mountain waterfall,14,200,1,0,mountain waterfall,0
-0,Ambitions of the Abyss,14,100,1,0,Lava Island,1
-0,Blockfort,5,10,1,1p6,Vehicle Stop,0,60,10,5,0,1
-0,0smw,16,20,2,1p20|1w6|2p2,1st Stop,0,2,4,1,25,4,1
-0,Treefort,15,15,1,1p12,2nd Stop,0,3,310,0,2,1,1,0,0,1,0,0,1,0,0,0
-0,Mountain waterfall,14,200,1,0,mountain waterfall,0
-0,Ambitions of the Abyss,14,100,1,0,Lava Island,1
-0,Blockfort,5,10,1,1p6,Vehicle Stop,0,60,10,5,0,1
+0,Blockfort,5,10,1,1p6,Vehicle Stop,0,60,10,5,0,1,0,0,1,0,0
+1,Toad's House,1,|Pick a Powerup To|Help You On Your Way,p3,p2,p13
 
 #Warps
 #location 1 x, y, location 2 x, y
-0
+2
+4,6,13,10
+5,10,9,1
 
 #Vehicles
 #Sprite,Stage Type, Start Column, Start Row, Min Moves, Max Moves, Sprite Paces, Sprite Direction, Boundary
-0
+2
+0,4,4,4,5,8,1,0,1
+2,4,11,5,5,8,1,0,2
 
 #Initial Items
-w6,w6
+w1,w2,w3,w4

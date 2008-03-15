@@ -626,7 +626,7 @@ bool LoadAndSplashScreen()
 			menu_version.draw(570, 10);	//smw logo
 
 			menu_font_large.setalpha((Uint8)alpha);
-			menu_font_large.drawRightJustified(630, 45, "Alpha");
+			menu_font_large.drawRightJustified(630, 45, "Beta 1");
 
 			menu_credits.setalpha((Uint8)alpha);
 			menu_credits.draw(227, 200);

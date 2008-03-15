@@ -3214,6 +3214,9 @@ MenuCodeEnum MI_TourStop::Modify(bool fModify)
 
 void MI_TourStop::Update()
 {
+	if(!fShow)
+		return;
+
 	miStartButton->Update();
 
 	miModeField->Update();
@@ -3997,7 +4000,7 @@ MI_BonusWheel::~MI_BonusWheel()
 
 MenuCodeEnum MI_BonusWheel::Modify(bool fModify)
 {
-	if(!fPressedSelect)
+	if(fModify && !fPressedSelect)
 	{
 		fPressedSelect = true;
 
@@ -4054,7 +4057,7 @@ void MI_BonusWheel::Update()
 	else
 	{
 		if(!fPressedSelect && ++iPressSelectTimer > 620)
-			Modify(false);
+			Modify(true);
 
 		for(int iImage = 0; iImage < NUMBONUSITEMSONWHEEL; iImage++)
 		{
@@ -5810,8 +5813,33 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 					
 					playerKeys = &game_values.playerInput.outputControls[game_values.teamids[iControllingTeam][0]];
 
+					//If there are no AI moves to make
 					if(iNextMove == -1)
-						fNoInterestingMoves = true;
+					{
+						bool fUsedItem = false;
+
+						//See if we are touching a door
+						bool fDoor[4] = {false, false, false, false};
+						g_worldmap.IsTouchingDoor(iPlayerCurrentTileX, iPlayerCurrentTileY, fDoor);
+
+						//See if we can use a key to keep going
+						for(short iPowerup = 0; iPowerup < game_values.worldpowerupcount[iControllingTeam]; iPowerup++)
+						{
+							short iType = game_values.worldpowerups[iControllingTeam][iPowerup];
+
+							if(iType >= NUM_POWERUPS + 5 && iType <= NUM_POWERUPS + 8) //Door Keys
+							{
+								short iKeyType = iType - NUM_POWERUPS - 5;
+								if(fDoor[iKeyType])
+								{
+									fUsedItem = UsePowerup(iControllingTeam, iPowerup, false);
+								}
+							}
+						}
+
+						//if not, flag that there are no moves to make
+						fNoInterestingMoves = !fUsedItem;
+					}
 					if(iNextMove == 0)
 						playerKeys->menu_up.fPressed = true;
 					else if(iNextMove == 1)
@@ -6035,124 +6063,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 				if(game_values.worldpowerupcount[iTeam] > 0)
 				{
 					short iIndex = iItemPage * 8 + iItemCol;
-					short iPowerup = game_values.worldpowerups[iTeam][iIndex];
-
-					bool fUsedItem = false;
-
-					if(iPowerup < NUM_POWERUPS)
-					{
-						for(short iPlayer = 0; iPlayer < game_values.teamcounts[iTeam]; iPlayer++)
-						{
-							game_values.storedpowerups[game_values.teamids[iTeam][iPlayer]] = iPowerup;
-						}
-
-						ifsoundonplay(sfx_collectpowerup);
-						fUsedItem = true;
-					}
-					else if(iPowerup == NUM_POWERUPS) //Music Box (put vehicles to sleep)
-					{
-						iSleepTurns = rand() % 4 + 2;
-						fUsedItem = true;
-						ifsoundonplay(sfx_collectpowerup);
-
-						backgroundmusic[5].load(worldmusiclist.GetMusic(WORLDMUSICSLEEP));
-						backgroundmusic[5].play(false, false);
-					}
-					else if(iPowerup == NUM_POWERUPS + 1) //Cloud (allows player to skip stages)
-					{
-						UseCloud(true);
-						fUsedItem = true;
-					}
-					else if(iPowerup == NUM_POWERUPS + 2) //Player Switch
-					{
-						short iPlayerTeam = LookupTeamID(iPlayer);
-						if(iControllingTeam != iPlayerTeam)
-						{
-							SetControllingTeam(iPlayerTeam);
-							fUsedItem = true;
-							ifsoundonplay(sfx_switchpress);
-							iState = 6;
-							fNoInterestingMoves = false;
-						}
-					}
-					else if(iPowerup == NUM_POWERUPS + 3) //Advance Turn
-					{
-						short iDestX, iDestY;
-						g_worldmap.GetPlayerDestTile(&iDestX, &iDestY);
-						short iSprite = g_worldmap.tiles[iDestX][iDestY].iForegroundSprite;
-
-						if(iSprite < WORLD_BRIDGE_SPRITE_OFFSET || iSprite > WORLD_BRIDGE_SPRITE_OFFSET + 3)
-						{
-							AdvanceTurn();
-							fUsedItem = true;
-							ifsoundonplay(sfx_switchpress);
-						}
-					}
-					else if(iPowerup == NUM_POWERUPS + 4) //Revive stage
-					{
-						short iDestX, iDestY;
-						g_worldmap.GetPlayerDestTile(&iDestX, &iDestY);
-						WorldMapTile * tile = &g_worldmap.tiles[iDestX][iDestY];
-
-						if(tile->iType >= 6 && tile->iCompleted >= 0)
-						{
-							tile->iCompleted = -2;
-							UpdateMapSurface();
-
-							uiMenu->AddEyeCandy(new EC_SingleAnimation(&spr_poof, (iDestX << 5) + iMapOffsetX - 8, (iDestY << 5) + iMapOffsetY - 8, 4, 5));
-
-							fUsedItem = true;
-							ifsoundonplay(sfx_transform);
-						}
-					}
-					else if(iPowerup >= NUM_POWERUPS + 5 && iPowerup <= NUM_POWERUPS + 8) //Door Keys
-					{
-						short iDoorsOpened = g_worldmap.UseKey(iPowerup - NUM_POWERUPS - 5, iPlayerCurrentTileX, iPlayerCurrentTileY);
-
-						if(iDoorsOpened > 0)
-						{
-							UpdateMapSurface();
-							ifsoundonplay(sfx_transform);
-
-							short iPlayerX = (iPlayerCurrentTileX << 5) + iMapOffsetX;
-							short iPlayerY = (iPlayerCurrentTileY << 5) + iMapOffsetY;
-
-							if(iDoorsOpened & 0x1)
-								uiMenu->AddEyeCandy(new EC_SingleAnimation(&spr_fireballexplosion, iPlayerX - TILESIZE, iPlayerY, 3, 8));
-
-							if(iDoorsOpened & 0x2)
-								uiMenu->AddEyeCandy(new EC_SingleAnimation(&spr_fireballexplosion, iPlayerX + TILESIZE, iPlayerY, 3, 8));
-				
-							if(iDoorsOpened & 0x4)
-								uiMenu->AddEyeCandy(new EC_SingleAnimation(&spr_fireballexplosion, iPlayerX, iPlayerY - TILESIZE, 3, 8));
-
-							if(iDoorsOpened & 0x8)
-								uiMenu->AddEyeCandy(new EC_SingleAnimation(&spr_fireballexplosion, iPlayerX, iPlayerY + TILESIZE, 3, 8));
-
-							fUsedItem = true;
-							fNoInterestingMoves = false;
-						}
-					}
-					else if(iPowerup >= NUM_POWERUPS + 9 && iPowerup <= NUM_POWERUPS + 14) //Stage Points Modifiers
-					{
-						game_values.worldpointsbonus = iPowerup - NUM_POWERUPS - 9;
-						fUsedItem = true;
-						ifsoundonplay(sfx_switchpress);
-					}
-
-					if(fUsedItem)
-					{
-						short iNumItems = --game_values.worldpowerupcount[iTeam];
-
-						for(short iItem = iIndex; iItem < iNumItems; iItem++)
-							game_values.worldpowerups[iTeam][iItem] = game_values.worldpowerups[iTeam][iItem + 1];
-
-						iStateTransition = 2;
-					}
-					else
-					{
-						ifsoundonplay(sfx_stun);
-					}
+					UsePowerup(LookupTeamID(iPlayer), iIndex, true);
 				}
 			}
 		}
@@ -6192,6 +6103,132 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 	}
 
 	return MENU_CODE_NONE;
+}
+
+bool MI_World::UsePowerup(short iTeam, short iIndex, bool fPopupIsUp)
+{
+	short iPlayerCurrentTileX, iPlayerCurrentTileY;
+	g_worldmap.GetPlayerCurrentTile(&iPlayerCurrentTileX, &iPlayerCurrentTileY);
+					
+	short iPowerup = game_values.worldpowerups[iTeam][iIndex];
+	bool fUsedItem = false;
+
+	if(iPowerup < NUM_POWERUPS)
+	{
+		for(short iPlayer = 0; iPlayer < game_values.teamcounts[iTeam]; iPlayer++)
+		{
+			game_values.storedpowerups[game_values.teamids[iTeam][iPlayer]] = iPowerup;
+		}
+
+		ifsoundonplay(sfx_collectpowerup);
+		fUsedItem = true;
+	}
+	else if(iPowerup == NUM_POWERUPS) //Music Box (put vehicles to sleep)
+	{
+		iSleepTurns = rand() % 4 + 2;
+		fUsedItem = true;
+		ifsoundonplay(sfx_collectpowerup);
+
+		backgroundmusic[5].load(worldmusiclist.GetMusic(WORLDMUSICSLEEP));
+		backgroundmusic[5].play(false, false);
+	}
+	else if(iPowerup == NUM_POWERUPS + 1) //Cloud (allows player to skip stages)
+	{
+		UseCloud(true);
+		fUsedItem = true;
+	}
+	else if(iPowerup == NUM_POWERUPS + 2) //Player Switch
+	{
+		if(iControllingTeam != iTeam)
+		{
+			SetControllingTeam(iTeam);
+			fUsedItem = true;
+			ifsoundonplay(sfx_switchpress);
+			iState = 6;
+			fNoInterestingMoves = false;
+		}
+	}
+	else if(iPowerup == NUM_POWERUPS + 3) //Advance Turn
+	{
+		short iDestX, iDestY;
+		g_worldmap.GetPlayerDestTile(&iDestX, &iDestY);
+		short iSprite = g_worldmap.tiles[iDestX][iDestY].iForegroundSprite;
+
+		if(iSprite < WORLD_BRIDGE_SPRITE_OFFSET || iSprite > WORLD_BRIDGE_SPRITE_OFFSET + 3)
+		{
+			AdvanceTurn();
+			fUsedItem = true;
+			ifsoundonplay(sfx_switchpress);
+		}
+	}
+	else if(iPowerup == NUM_POWERUPS + 4) //Revive stage
+	{
+		short iDestX, iDestY;
+		g_worldmap.GetPlayerDestTile(&iDestX, &iDestY);
+		WorldMapTile * tile = &g_worldmap.tiles[iDestX][iDestY];
+
+		if(tile->iType >= 6 && tile->iCompleted >= 0)
+		{
+			tile->iCompleted = -2;
+			UpdateMapSurface();
+
+			uiMenu->AddEyeCandy(new EC_SingleAnimation(&spr_poof, (iDestX << 5) + iMapOffsetX - 8, (iDestY << 5) + iMapOffsetY - 8, 4, 5));
+
+			fUsedItem = true;
+			ifsoundonplay(sfx_transform);
+		}
+	}
+	else if(iPowerup >= NUM_POWERUPS + 5 && iPowerup <= NUM_POWERUPS + 8) //Door Keys
+	{
+		short iDoorsOpened = g_worldmap.UseKey(iPowerup - NUM_POWERUPS - 5, iPlayerCurrentTileX, iPlayerCurrentTileY);
+
+		if(iDoorsOpened > 0)
+		{
+			UpdateMapSurface();
+			ifsoundonplay(sfx_transform);
+
+			short iPlayerX = (iPlayerCurrentTileX << 5) + iMapOffsetX;
+			short iPlayerY = (iPlayerCurrentTileY << 5) + iMapOffsetY;
+
+			if(iDoorsOpened & 0x1)
+				uiMenu->AddEyeCandy(new EC_SingleAnimation(&spr_fireballexplosion, iPlayerX - TILESIZE, iPlayerY, 3, 8));
+
+			if(iDoorsOpened & 0x2)
+				uiMenu->AddEyeCandy(new EC_SingleAnimation(&spr_fireballexplosion, iPlayerX + TILESIZE, iPlayerY, 3, 8));
+
+			if(iDoorsOpened & 0x4)
+				uiMenu->AddEyeCandy(new EC_SingleAnimation(&spr_fireballexplosion, iPlayerX, iPlayerY - TILESIZE, 3, 8));
+
+			if(iDoorsOpened & 0x8)
+				uiMenu->AddEyeCandy(new EC_SingleAnimation(&spr_fireballexplosion, iPlayerX, iPlayerY + TILESIZE, 3, 8));
+
+			fUsedItem = true;
+			fNoInterestingMoves = false;
+		}
+	}
+	else if(iPowerup >= NUM_POWERUPS + 9 && iPowerup <= NUM_POWERUPS + 14) //Stage Points Modifiers
+	{
+		game_values.worldpointsbonus = iPowerup - NUM_POWERUPS - 9;
+		fUsedItem = true;
+		ifsoundonplay(sfx_switchpress);
+	}
+
+	if(fUsedItem)
+	{
+		short iNumItems = --game_values.worldpowerupcount[iTeam];
+
+		for(short iItem = iIndex; iItem < iNumItems; iItem++)
+			game_values.worldpowerups[iTeam][iItem] = game_values.worldpowerups[iTeam][iItem + 1];
+
+		if(fPopupIsUp)
+			iStateTransition = 2;
+	}
+	else
+	{
+		ifsoundonplay(sfx_stun);
+	}
+
+	return fUsedItem;
 }
 
 MenuCodeEnum MI_World::InitGame(short iStage, short iPlayer, bool fNeedAiControl)

@@ -1025,6 +1025,8 @@ class MI_World : public UI_Control
 
 		MenuCodeEnum InitGame(short iStage, short iPlayer, bool fNeedAiControl);
 
+		bool UsePowerup(short iTeam, short iIndex, bool fPopupIsUp);
+
 		void SetMapOffset();
 		void RepositionMapImage();
 		void DrawWorldMapToSurface(bool fInit);

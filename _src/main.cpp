@@ -29,44 +29,31 @@
 +----------------------------------------------------------*/
 
 //TODO
-//3) When PlayerKilledPlayer does not kill a player, then it hidden blocks that were hit could result in a player getting trapped in htem
-//   This happens if the player is sitting still when the hidden block is revealed
+//BUG!! When PlayerKilledPlayer does not kill a player, then it hidden blocks that were hit could result in a player getting trapped in htem
+//      This happens if the player is sitting still when the hidden block is revealed
+//      I think we're going to just live with this one - adding collision detection for such an edge case is probably not a good idea
 
-//4) Still reports of disappearing map tiles - caused when rRects is used out of bounds causing w and h to be set to 0 - happened with platform with tile using row 960
+//BUG!! Still reports of disappearing map tiles - caused when rRects is used out of bounds causing w and h to be set to 0 - happened with platform with tile using row 960
+//      I think this was due to using old maps with newer versions of the 1.8 alpha - keep an eye on this, but it might be a non-issue
 
 /*
 //BUG!! Throwing flags into flag bases and probably eggs to yoshi doens't work anymore because there is no collision detection between those items
 //      I was never a big fan of this feature, we'll see if anyone complains
 
-10) Bug! When you kill 2 players/bots rapidly one after another with the star and you have the announcer on, the invincibilty music stops.
+//BUG!! When you kill 2 players/bots rapidly one after another with the star and you have the announcer on, the invincibilty music stops.
 
-[ ] Other mode specific items - berry for yoshi's egg mode, coin for coin/greed mode, coin bag greed mode
-[ ] See if it is possible to export an animated gif screenshot
-[ ] Add configuration to ice wand for how long a player is frozen
+//[ ] Frenzy mode doesn't have update to items - missing wand, podobo, bomb, pwings, leaf, tanooki
+//[ ] Need better end stage marker gfx
+//[ ] Need match type titles on gfx
+//[ ] Need to test memory/slowness on xbox build
+//[ ] Need to update some maps with better platform paths (Reznor map) and some hazards here and there and maybe some map items
+//[ ] World AI needs ability to use stored items -> harder problem than I have time for
+//[ ] Add SMB3's first world as a test world to ship with
 
-Pipe Minigame:
- - coins come out of the pipe at different angles and fall accoring to gravity
- - there is no map collision on them, they fall though the ground
- - fireballs also come out periodically (1 in 10?) and will kill the player and cause him to lose a coin or two
- - There are also a few types of powerups that will come from the pipe
-   - Team colored fireballs that shoot way up from the pipe and rain from the sky - only kills other teams
-   - Team colored coins, coins that come out will randomly be a team color and only that team can collect them.  The collector of this powerup's team gets 2x their teams color coins.
-   - Negative coins - coins that come out will take away a coin instead of giving a coin, this penalty mode lasts 10 seconds
-   - Slow down mode - coins and fireballs will move and fall slower than normal for 15 seconds
-   - Coin fury - coins come out at a much faster rate than normal
-   - Super coin - once and a while a super coin will pop out worth 5 coins (maybe a yoshi coin)
-
-[ ] Secret unlock code to unlock Minigame match type so you can select what minigame you want to play directly (not through world)
-
-//TEST!! unlock code works to unlock minigame match type menu
-
-   */
+*/
 
 /*
 Checkin:
-1) Added code to unlock pipe minigame match type
-2) Made AI a little smarter about what it collects and what it avoids in pipe minigame
-3) Fixed bugs with leaf and pwings powerup limits (last use was cut short or not working at all)
 */
 
 #ifdef _XBOX

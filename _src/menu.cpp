@@ -196,7 +196,7 @@ void Menu::CreateMenu()
 
 	miSMWTitle = new MI_Image(&menu_smw, 320 - ((short)menu_smw.getWidth() >> 1), 30, 0, 0, 372, 140, 1, 1, 0);
 	miSMWVersion = new MI_Image(&menu_version, 570, 10, 0, 0, 58, 32, 1, 1, 0);
-	miSMWVersionText = new MI_Text("Alpha", 630, 45, 0, 2, 2);
+	miSMWVersionText = new MI_Text("Beta 1", 630, 45, 0, 2, 2);
 	
 	miMainStartButton = new MI_Button(&spr_selectfield, 120, 210, "Start", 400, 0);
 	miMainStartButton->SetCode(MENU_CODE_TO_MATCH_SELECTION_MENU);
