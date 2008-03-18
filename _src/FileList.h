@@ -51,7 +51,7 @@ class SimpleFileList
 
 		bool find(const char * name)
 		{
-			char * szLookForName = strlwr(strdup(name));
+			char * szLookForName = _strlwr(_strdup(name));
 			bool fFound = false;
 
 			int oldCurrent = currentIndex;
@@ -59,7 +59,7 @@ class SimpleFileList
 			{
 				next();	//sets us to the beginning if we hit the end -> loop through the maps
 
-				char * szCurrentName = strlwr(strdup(filelist[currentIndex].c_str()));
+				char * szCurrentName = _strlwr(_strdup(filelist[currentIndex].c_str()));
 
 				if(strstr(szCurrentName, szLookForName))	//compare names after
 					fFound = true;

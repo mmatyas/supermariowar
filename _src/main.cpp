@@ -50,6 +50,27 @@
 //[ ] World AI needs ability to use stored items -> harder problem than I have time for
 //[ ] Add SMB3's first world as a test world to ship with
 
+//[ ] On/Off switch [?] and note blocks and possibly other types of on/off blocks
+//[ ] Kill players that are inside [!] or flip blocks when they become solid again
+//[ ] Enemies should die in lava
+//[ ] Allow spawn areas for domination blocks
+//[ ] Water bubbles and rain eyecandy, Splashing feet when running on rain levels - need gfx for all of these
+//[ ] Resume level editor to zzleveleditor map every time so it looks like you've resumed your last work (or try and load the last map you were on)
+//[ ] Make the poison mushroom on bonus wheel do something bad to the player - and always have at least 1 poison mushroom on there
+//[ ] "Random" and "MultiStars" modes for star mode
+//[ ] Podoboo pops out of a [?] if all powerups are turned off
+//[ ] ? card for frenzy card mode to do random powerup
+//[ ] Thunderbolt style spawn
+//[ ] Reverse gravity blue podoboos
+//[ ] Picture Poker mode
+//[ ] Breaking skull blocks (too close to donut block, perhaps)
+//[ ] Reverse [!] blocks that are on when switch is off (allow in level editor by allowing painting of both outlines and [!] blocks)
+//[ ] Quick Match option that selects everything random for you
+//[ ] Option to make the shield a "soft" shield and allow the player to not be able to kill (stomp) when shielded - lots of requests for this
+//[ ] Announcement that a player/team was removed from game - needs more specing but this could be helpful
+//[ ] Countdown before match begins, 3..., 2..., 1... with announcer hooks
+//[ ] Better eyecandy block for 10+ kills like stars - need gfx
+
 */
 
 /*
@@ -3283,7 +3304,8 @@ void LoadMapObjects(bool fPreview)
 			{
 				short iSwitchType = iType - 11;
 
-				g_map.blockdata[x][y] = new B_SwitchBlock(&spr_switchblocks, x * TILESIZE, y * TILESIZE, iSwitchType, g_map.iSwitches[iSwitchType]);
+				//g_map.blockdata[x][y] = new B_SwitchBlock(&spr_switchblocks, x * TILESIZE, y * TILESIZE, iSwitchType, g_map.iSwitches[iSwitchType]);
+				g_map.blockdata[x][y] = new B_SwitchBlock(&spr_switchblocks, x * TILESIZE, y * TILESIZE, iSwitchType, !g_map.objectdata[x][y].iSettings[0]);
 				noncolcontainer.add(g_map.blockdata[x][y]);
 				g_map.switchBlocks[iSwitchType + 4].push_back(g_map.blockdata[x][y]);
 			}

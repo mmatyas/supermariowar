@@ -1307,8 +1307,8 @@ void Menu::CreateMenu()
 	mMatchSelectionMenu.AddNonControl(miMatchSelectionMenuRightHeaderBar);
 	mMatchSelectionMenu.AddNonControl(miMatchSelectionMenuHeaderText);
 
-	mMatchSelectionMenu.AddNonControl(miMatchSelectionDisplayImage);
 	mMatchSelectionMenu.AddNonControl(miWorldPreviewDisplay);
+	mMatchSelectionMenu.AddNonControl(miMatchSelectionDisplayImage);
 
 	mMatchSelectionMenu.AddControl(miMatchSelectionField, miMatchSelectionStartButton, miTournamentField, NULL, NULL);
 	mMatchSelectionMenu.AddControl(miTournamentField, miMatchSelectionField, miTourField, NULL, NULL);
@@ -3265,9 +3265,13 @@ void Menu::RunMenu()
 				miWorldField->Show(game_values.matchtype == MATCH_TYPE_WORLD);
 				miMinigameField->Show(game_values.matchtype == MATCH_TYPE_MINIGAME);
 
-				miMatchSelectionDisplayImage->Show(game_values.matchtype != MATCH_TYPE_WORLD);
+				//miMatchSelectionDisplayImage->Show(game_values.matchtype != MATCH_TYPE_WORLD);
 				miWorldPreviewDisplay->Show(game_values.matchtype == MATCH_TYPE_WORLD);
-				miMatchSelectionDisplayImage->SetImage(0, 240 * game_values.matchtype, 320, 240);
+				
+				if(game_values.matchtype == MATCH_TYPE_WORLD)
+					miMatchSelectionDisplayImage->SetImage(320, 0, 320, 240);
+				else
+					miMatchSelectionDisplayImage->SetImage(0, 240 * game_values.matchtype, 320, 240);
 			}
 			else if(MENU_CODE_WORLD_MAP_CHANGED == code)
 			{

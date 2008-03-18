@@ -150,6 +150,7 @@ int				view_tileset_x = 0;
 int				view_tileset_y = 0;
 
 int				set_block = 0;
+int				set_block_switch_on = 0;
 TileType		set_tiletype = tile_nonsolid;
 int				set_mapitem = 0;
 
@@ -915,7 +916,7 @@ int editor_edit()
 
 						if(CopyFile(szCurrentPath, szNewPath, false))
 						{
-							unlink(szCurrentPath);
+							_unlink(szCurrentPath);
 							maplist.SetValid(false);
 						}
 					}
@@ -985,6 +986,10 @@ int editor_edit()
 							{
 								for(short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++)
 									g_map.objectdata[iClickX][iClickY].iSettings[iSetting] = g_iDefaultPowerupWeights[iSetting];
+							}
+							else if(set_block >= 11 && set_block <= 14)
+							{
+								g_map.objectdata[iClickX][iClickY].iSettings[0] = set_block_switch_on;
 							}
 
 							AdjustMapItems(iClickX, iClickY);
@@ -1193,6 +1198,10 @@ int editor_edit()
 							{
 								for(short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++)
 									g_map.objectdata[iClickX][iClickY].iSettings[iSetting] = g_iDefaultPowerupWeights[iSetting];
+							}
+							else if(set_block >= 11 && set_block <= 14)
+							{
+								g_map.objectdata[iClickX][iClickY].iSettings[0] = set_block_switch_on;
 							}
 
 							AdjustMapItems(iClickX, iClickY);
@@ -1629,46 +1638,53 @@ void drawmap(bool fScreenshot, short iBlockSize)
 
 		SDL_Rect rSrc = {0, 0, iBlockSize, iBlockSize};
 
+		MapBlock * block = NULL;
 		for(int j = 0; j < MAPHEIGHT; j++)
 		{
 			for(int i = 0; i < MAPWIDTH; i++)
 			{
-				int displayblock = -1;
 				if((move_mode == 1 || move_mode == 3) && i - move_offset_x >= 0 && i - move_offset_x < MAPWIDTH &&
 					j - move_offset_y >= 0 && j - move_offset_y < MAPHEIGHT && 
 					selectedtiles[i - move_offset_x][j - move_offset_y])
 				{
-					displayblock = copiedtiles[i - move_offset_x][j - move_offset_y].block.iType;
+					block = &copiedtiles[i - move_offset_x][j - move_offset_y].block;
 				}
 				else
 				{
-					displayblock = g_map.objectdata[i][j].iType;
+					block = &g_map.objectdata[i][j];
 				}
 
-				if(displayblock > -1)
+				int blocktype = block->iType;
+
+				if(blocktype > -1)
 				{
 					//Don't screenshot hidden blocks
 					if(fScreenshot && g_map.objectdata[i][j].fHidden)
 						continue;
 
-					if(displayblock < 7)
+					if(blocktype < 7)
 					{
-						rSrc.x = displayblock * iBlockSize;
+						rSrc.x = blocktype * iBlockSize;
 						rSrc.y = 0;
 					}
-					if(displayblock >= 7 && displayblock <= 14)
+					else if(blocktype >= 7 && blocktype <= 10)//On/Off Blocks
 					{
-						rSrc.x = displayblock * iBlockSize;
-						rSrc.y = iBlockSize * g_map.iSwitches[(displayblock - 7) % 4];
+						rSrc.x = blocktype * iBlockSize;
+						rSrc.y = iBlockSize * g_map.iSwitches[(blocktype - 7) % 4];
 					}
-					else if(displayblock >= 15 && displayblock <= 19)
+					else if(blocktype >= 11 && blocktype <= 14) //Switched Blocks
 					{
-						rSrc.x = (displayblock - 15) * iBlockSize;
+						rSrc.x = blocktype * iBlockSize;
+						rSrc.y = iBlockSize * (1 - block->iSettings[0]);
+					}
+					else if(blocktype >= 15 && blocktype <= 19)
+					{
+						rSrc.x = (blocktype - 15) * iBlockSize;
 						rSrc.y = iBlockSize;
 					}
-					else if(displayblock >= 20 && displayblock <= 29)
+					else if(blocktype >= 20 && blocktype <= 29)
 					{
-						rSrc.x = (displayblock - 20) * iBlockSize;
+						rSrc.x = (blocktype - 20) * iBlockSize;
 						rSrc.y = iBlockSize << 1;
 					}
 					
@@ -3841,12 +3857,13 @@ int editor_blocks()
 							set_block = set_block_x + 7;
 							g_map.iSwitches[set_block_x] = set_block_y - 1;
 						}
-						else if(set_block_y == 3 && set_block_x >= 0 && set_block_x <= 3)
+						else if(set_block_y >= 1 && set_block_y <= 2 && set_block_x >= 4 && set_block_x <= 7)
 						{  //set the selected block to a switch block
 							
-							set_block = set_block_x + 11;
+							set_block = set_block_x + 7;
+							set_block_switch_on = set_block_y == 1;
 						}
-						else if(set_block_y == 4 && set_block_x >= 0 && set_block_x <= 9)
+						else if(set_block_y == 3 && set_block_x >= 0 && set_block_x <= 9)
 						{  //set the selected block to a switch block
 							
 							set_block = set_block_x + 20;
@@ -3878,8 +3895,8 @@ int editor_blocks()
 
 		SDL_BlitSurface(spr_blocks[0].getSurface(), &rOnOffSrc, screen, &rOnOffDst);
 
-		SDL_Rect rOnOffBlockSrc = {352, 0, 128, 32};
-		SDL_Rect rOnOffBlockDst = {0, 96, 128, 32};
+		SDL_Rect rOnOffBlockSrc = {352, 0, 128, 64};
+		SDL_Rect rOnOffBlockDst = {128, 32, 128, 64};
 
 		SDL_BlitSurface(spr_blocks[0].getSurface(), &rOnOffBlockSrc, screen, &rOnOffBlockDst);
 
@@ -3889,7 +3906,7 @@ int editor_blocks()
 		SDL_BlitSurface(spr_blocks[0].getSurface(), &rBlocksRow2Src, screen, &rBlocksRow2Dst);
 
 		SDL_Rect rBlocksRow3Src = {0, 64, 320, 32};
-		SDL_Rect rBlocksRow3Dst = {0, 128, 320, 32};
+		SDL_Rect rBlocksRow3Dst = {0, 96, 320, 32};
 
 		SDL_BlitSurface(spr_blocks[0].getSurface(), &rBlocksRow3Src, screen, &rBlocksRow3Dst);
 

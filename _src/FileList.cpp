@@ -304,31 +304,31 @@ MusicEntry::MusicEntry(const std::string & musicdirectory)
 		//If we found a category header
 		if(szBuffer[0] == '[')
 		{
-			if(!stricmp(szBuffer, "[land]"))
+			if(!_stricmp(szBuffer, "[land]"))
 				iAddToCategory = 0;
-			else if(!stricmp(szBuffer, "[underground]"))
+			else if(!_stricmp(szBuffer, "[underground]"))
 				iAddToCategory = 1;
-			else if(!stricmp(szBuffer, "[underwater]"))
+			else if(!_stricmp(szBuffer, "[underwater]"))
 				iAddToCategory = 2;
-			else if(!stricmp(szBuffer, "[castle]"))
+			else if(!_stricmp(szBuffer, "[castle]"))
 				iAddToCategory = 3;
-			else if(!stricmp(szBuffer, "[platforms]"))
+			else if(!_stricmp(szBuffer, "[platforms]"))
 				iAddToCategory = 4;
-			else if(!stricmp(szBuffer, "[ghost]"))
+			else if(!_stricmp(szBuffer, "[ghost]"))
 				iAddToCategory = 5;
-			else if(!stricmp(szBuffer, "[bonus]"))
+			else if(!_stricmp(szBuffer, "[bonus]"))
 				iAddToCategory = 6;
-			else if(!stricmp(szBuffer, "[battle]"))
+			else if(!_stricmp(szBuffer, "[battle]"))
 				iAddToCategory = 7;
-			else if(!stricmp(szBuffer, "[desert]"))
+			else if(!_stricmp(szBuffer, "[desert]"))
 				iAddToCategory = 8;
-			else if(!stricmp(szBuffer, "[clouds]"))
+			else if(!_stricmp(szBuffer, "[clouds]"))
 				iAddToCategory = 9;
-			else if(!stricmp(szBuffer, "[snow]"))
+			else if(!_stricmp(szBuffer, "[snow]"))
 				iAddToCategory = 10;
-			else if(!stricmp(szBuffer, "[maps]"))
+			else if(!_stricmp(szBuffer, "[maps]"))
 				iAddToCategory = MAXMUSICCATEGORY;
-			else if(!stricmp(szBuffer, "[backgrounds]"))
+			else if(!_stricmp(szBuffer, "[backgrounds]"))
 				iAddToCategory = MAXMUSICCATEGORY + 1;
 
 			continue;
@@ -689,27 +689,27 @@ WorldMusicEntry::WorldMusicEntry(const std::string & musicdirectory)
 		//If we found a category header
 		if(szBuffer[0] == '[')
 		{
-			if(!stricmp(szBuffer, "[grass]"))
+			if(!_stricmp(szBuffer, "[grass]"))
 				iAddToCategory = 0;
-			else if(!stricmp(szBuffer, "[desert]"))
+			else if(!_stricmp(szBuffer, "[desert]"))
 				iAddToCategory = 1;
-			else if(!stricmp(szBuffer, "[water]"))
+			else if(!_stricmp(szBuffer, "[water]"))
 				iAddToCategory = 2;
-			else if(!stricmp(szBuffer, "[desert]"))
+			else if(!_stricmp(szBuffer, "[desert]"))
 				iAddToCategory = 3;
-			else if(!stricmp(szBuffer, "[sky]"))
+			else if(!_stricmp(szBuffer, "[sky]"))
 				iAddToCategory = 4;
-			else if(!stricmp(szBuffer, "[ice]"))
+			else if(!_stricmp(szBuffer, "[ice]"))
 				iAddToCategory = 5;
-			else if(!stricmp(szBuffer, "[pipe]"))
+			else if(!_stricmp(szBuffer, "[pipe]"))
 				iAddToCategory = 6;
-			else if(!stricmp(szBuffer, "[dark]"))
+			else if(!_stricmp(szBuffer, "[dark]"))
 				iAddToCategory = 7;
-			else if(!stricmp(szBuffer, "[space]"))
+			else if(!_stricmp(szBuffer, "[space]"))
 				iAddToCategory = 8;
-			else if(!stricmp(szBuffer, "[bonus]"))
+			else if(!_stricmp(szBuffer, "[bonus]"))
 				iAddToCategory = WORLDMUSICBONUS;
-			else if(!stricmp(szBuffer, "[sleep]"))
+			else if(!_stricmp(szBuffer, "[sleep]"))
 				iAddToCategory = WORLDMUSICSLEEP;
 
 			continue;

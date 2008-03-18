@@ -13,7 +13,7 @@
 
 #include <stdlib.h>	//srand/rand (maybe replace with an own version)
 #include <string.h>
-#include <string>
+//#include <string>
 #include <map>
 #include <vector>
 #include <list>

@@ -343,6 +343,16 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 			}
 		}
 
+		//Read switch block state data
+		int iNumSwitchBlockData = ReadInt(mapfile);
+		for(short iBlock = 0; iBlock < iNumSwitchBlockData; iBlock++)
+		{
+			short iCol = ReadByteAsShort(mapfile);
+			short iRow = ReadByteAsShort(mapfile);
+
+			objectdata[iCol][iRow].iSettings[0] = ReadByteAsShort(mapfile);
+		}
+
 		if(iReadType == read_type_preview)
 		{
 			fclose(mapfile);
@@ -1582,6 +1592,38 @@ void CMap::saveMap(const std::string& file)
 		}
 	}
 
+	//Count blocks that have supplement data (like powerup weights for powerup blocks or state for switched blocks)
+	short iBlockCount = 0;
+	short iSwitchBlockCount = 0;
+	for(j = 0; j < MAPHEIGHT; j++)
+	{
+		for(i = 0; i < MAPWIDTH; i++)
+		{
+			//powerup block
+			if(objectdata[i][j].iType == 1 || objectdata[i][j].iType == 15)
+				iBlockCount++;
+
+			//switched blocks
+			if(objectdata[i][j].iType >= 11 && objectdata[i][j].iType <= 14)
+				iSwitchBlockCount++;
+		}
+	}
+
+	//Write out the switch block state
+	WriteInt(iSwitchBlockCount, mapfile);
+	for(j = 0; j < MAPHEIGHT; j++)
+	{
+		for(i = 0; i < MAPWIDTH; i++)
+		{
+			if(objectdata[i][j].iType >= 11 && objectdata[i][j].iType <= 14)
+			{
+				WriteByteFromShort(i, mapfile);
+				WriteByteFromShort(j, mapfile);
+				WriteByteFromShort(objectdata[i][j].iSettings[0], mapfile);
+			}
+		}
+	}
+
 	//Write number of warp exits
 	WriteInt(numWarpExits, mapfile);
 
@@ -1793,19 +1835,6 @@ void CMap::saveMap(const std::string& file)
 		WriteInt(drawareas[m].y, mapfile);
 		WriteInt(drawareas[m].w, mapfile);
 		WriteInt(drawareas[m].h, mapfile);
-	}
-
-	//Write supplement info for blocks (like powerup weights for powerup blocks)
-	short iBlockCount = 0;
-	for(j = 0; j < MAPHEIGHT; j++)
-	{
-		for(i = 0; i < MAPWIDTH; i++)
-		{
-			if(objectdata[i][j].iType == 1 || objectdata[i][j].iType == 15) //powerup block
-			{
-				iBlockCount++;
-			}
-		}
 	}
 
 	//Write the number of blocks we have supplement info for
@@ -2497,11 +2526,17 @@ void CMap::drawPreviewBlocks(SDL_Surface * targetSurface, bool fThumbnail)
 			rectSrc.y = 0;
 
 			//Draw the turned off switch blocks too
-			if(ts >= 7 && ts <= 14)
+			if(ts >= 7 && ts <= 10)
+			{
 				if(iSwitches[(ts - 7) % 4] == 1)
 					rectSrc.y = iBlockSize;
-
-			if(ts >= 15 && ts <= 19)
+			}
+			else if(ts >= 11 && ts <= 14)
+			{
+				if(objectdata[i][j].iSettings[0] == 0)
+					rectSrc.y = iBlockSize;
+			}
+			else if(ts >= 15 && ts <= 19)
 			{
 				rectSrc.x = iBlockSize * (ts - 15);
 				rectSrc.y = iBlockSize;

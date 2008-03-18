@@ -765,7 +765,7 @@ class MI_TourStop : public UI_Control
 		MI_Button * miStartButton;
 
 		MI_SelectField * miBonusField;
-		MI_Image * miEndStageImage;
+		MI_Image * miEndStageImage[2];
 
 		MI_Image * miBonusIcon[10];
 		MI_Image * miBonusBackground[10];

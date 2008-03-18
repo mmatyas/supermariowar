@@ -142,7 +142,7 @@ void MapList::add(const char * name)
 
 bool MapList::find(const char * name)
 {
-	char * szLookForName = strlwr(strdup(name));
+	char * szLookForName = _strlwr(_strdup(name));
 	bool fFound = false;
 
 	std::map<std::string, MapListNode*>::iterator oldCurrent = current;
@@ -150,7 +150,7 @@ bool MapList::find(const char * name)
 	{
 		next(false);	//sets us to the beginning if we hit the end -> loop through the maps
 
-		char * szCurrentName = strlwr(strdup((*current).second->filename.c_str()));
+		char * szCurrentName = _strlwr(_strdup((*current).second->filename.c_str()));
 
 		if(strstr(szCurrentName, szLookForName))	//compare names after
 			fFound = true;
@@ -168,7 +168,7 @@ bool MapList::findexact(const char * name)
 {
 	char * szLookForName = new char[strlen(name) + 1];
 	strcpy(szLookForName, name);
-	strlwr(szLookForName);
+	_strlwr(szLookForName);
 
 	bool fFound = false;
 
@@ -180,7 +180,7 @@ bool MapList::findexact(const char * name)
 
 		char * szCurrentName = new char[current->first.length() + 1];
 		strcpy(szCurrentName, current->first.c_str());
-		strlwr(szCurrentName);
+		_strlwr(szCurrentName);
 
 		if(!strcmp(szCurrentName, szLookForName))
 			fFound = true;

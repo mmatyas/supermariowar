@@ -5295,7 +5295,7 @@ bool OMO_BowserFire::collide(CPlayer * player)
 // class thwomp (for thwomp mode)
 //------------------------------------------------------------------------------
 MO_BulletBill::MO_BulletBill(gfxSprite *nspr, gfxSprite *nsprdead, short x, short y, float nspeed, short playerID, bool isspawned) :
-	IO_MovingObject(nspr, x, y, 3, 8, 30, 28, 1, 2)
+	IO_MovingObject(nspr, x, y, 4, 8, 30, 28, 1, 2)
 {
 	spr_dead = nsprdead;
 

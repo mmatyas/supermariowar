@@ -3149,8 +3149,11 @@ MI_TourStop::MI_TourStop(short x, short y, bool fWorld) :
 		miBonusField = new MI_SelectField(&spr_selectfielddisabled, 70, 125, "Bonus", 305, 90);
 		miBonusField->Disable(true);
 
-		miEndStageImage = new MI_Image(&spr_worlditemsplace, 240, 440, 0, 20, 160, 32, 1, 1, 0);
-		miEndStageImage->Show(false);
+		miEndStageImage[0] = new MI_Image(&spr_worlditemsplace, 54, 201, 0, 20, 80, 248, 1, 1, 0);
+		miEndStageImage[0]->Show(false);
+
+		miEndStageImage[1] = new MI_Image(&spr_worlditemsplace, 506, 201, 0, 20, 80, 248, 1, 1, 0);
+		miEndStageImage[1]->Show(false);
 
 		for(short iBonus = 0; iBonus < 10; iBonus++)
 		{
@@ -3197,7 +3200,8 @@ MI_TourStop::~MI_TourStop()
 	if(fIsWorld)
 	{
 		delete miBonusField;
-		delete miEndStageImage;
+		delete miEndStageImage[0];
+		delete miEndStageImage[1];
 
 		for(short iBonus = 0; iBonus < 10; iBonus++)
 		{
@@ -3249,7 +3253,8 @@ void MI_TourStop::Draw()
 	if(fIsWorld)
 	{
 		miBonusField->Draw();
-		miEndStageImage->Draw();
+		miEndStageImage[0]->Draw();
+		miEndStageImage[1]->Draw();
 
 		for(short iBonus = 0; iBonus < 10; iBonus++)
 		{
@@ -3299,7 +3304,8 @@ void MI_TourStop::Refresh(short iTourStop)
 		if(fIsWorld)
 		{
 			miBonusField->Clear();
-			miEndStageImage->Show(tourstop->fEndStage);
+			miEndStageImage[0]->Show(tourstop->fEndStage);
+			miEndStageImage[1]->Show(tourstop->fEndStage);
 
 			for(short iBonus = 0; iBonus < 10; iBonus++)
 			{
