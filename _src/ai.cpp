@@ -669,7 +669,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 	* 5. Use stored powerups
 	***************************************************/
 
-	if(iStoredPowerup > -1)
+	if(iStoredPowerup > 0)
 	{
 		//use 1-5up, clock, pow, bulletbill, mod, podobo, right away
 		if(iStoredPowerup == 1  || iStoredPowerup == 2 || iStoredPowerup == 3 || iStoredPowerup == 4 ||
@@ -695,7 +695,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 				if(iPlayer == pPlayer->localID || list_players[iPlayer]->teamID == iTeamID)
 					continue;
 
-				if(game_values.gamepowerups[list_players[iPlayer]->globalID] > -1)
+				if(game_values.gamepowerups[list_players[iPlayer]->globalID] > 0)
 				{
 					playerKeys->game_powerup.fDown = true;
 					break;
@@ -710,7 +710,7 @@ void CPlayerAI::GetNearestObjects()
 	nearestObjects.Reset();
 
 	MO_CarriedObject * carriedItem = pPlayer->carriedItem;
-	bool fInvincible = pPlayer->invincible || pPlayer->spawninvincible;
+	bool fInvincible = pPlayer->invincible || pPlayer->shield;
 	short iTeamID = pPlayer->teamID;
 
 	for(short i = 0; i < objectcontainer[1].list_end; i++)

@@ -145,8 +145,10 @@ class CPlayer
 		bool isdead() {return state == player_dead;}
 
 		void SetKuriboShoe();
-		bool IsInvincibleOnBottom() {return invincible || spawninvincible || fKuriboShoe;}
+		bool IsInvincibleOnBottom() {return invincible || shield || fKuriboShoe;}
 		bool IsSuperStomping() {return fSuperStomp;}
+
+		void SetStoredPowerup(short iPowerup);
 
 	private:
 		void SetSprite();
@@ -270,8 +272,8 @@ class CPlayer
 		bool invincible;
 		short invincibletimer;
 
-		bool spawninvincible;
-		short spawninvincibletimer;
+		short shield;
+		short shieldtimer;
 
 		bool frozen;
 		short frozentimer;

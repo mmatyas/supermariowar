@@ -335,8 +335,8 @@ short CGM_Frag::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle
 
 	if(game_values.gamemode->gamemode == game_mode_frag && game_values.gamemodesettings.frag.style == 1)
 	{
-		other.spawninvincible = true;
-		other.spawninvincibletimer = 60;
+		other.shield = game_values.shieldstyle;
+		other.shieldtimer = 60;
 
 		return player_kill_nonkill;
 	}
@@ -354,8 +354,8 @@ short CGM_Frag::playerkilledself(CPlayer &player, killstyle style)
 
 		if(game_values.gamemode->gamemode == game_mode_frag && game_values.gamemodesettings.frag.style == 1)
 		{
-			player.spawninvincible = true;
-			player.spawninvincibletimer = 60;
+			player.shield = game_values.shieldstyle;
+			player.shieldtimer = 60;
 
 			return player_kill_nonkill;
 		}
@@ -482,8 +482,8 @@ short CGM_TimeLimit::playerkilledplayer(CPlayer &inflictor, CPlayer &other, kill
 
 		if(game_values.gamemode->gamemode == game_mode_timelimit && game_values.gamemodesettings.time.style == 1)
 		{
-			other.spawninvincible = true;
-			other.spawninvincibletimer = 60;
+			other.shield = game_values.shieldstyle;
+			other.shieldtimer = 60;
 
 			return player_kill_nonkill;
 		}
@@ -622,8 +622,8 @@ short CGM_Classic::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killst
 		
 		if(game_values.gamemode->gamemode == game_mode_classic && game_values.gamemodesettings.classic.style == 1)
 		{
-			other.spawninvincible = true;
-			other.spawninvincibletimer = 60;
+			other.shield = game_values.shieldstyle;
+			other.shieldtimer = 60;
 
 			return player_kill_nonkill;
 		}
@@ -682,8 +682,8 @@ short CGM_Classic::playerkilledself(CPlayer &player, killstyle style)
 
 		if(game_values.gamemode->gamemode == game_mode_classic && game_values.gamemodesettings.classic.style == 1)
 		{
-			player.spawninvincible = true;
-			player.spawninvincibletimer = 60;
+			player.shield = game_values.shieldstyle;
+			player.shieldtimer = 60;
 
 			return player_kill_nonkill;
 		}
@@ -932,8 +932,8 @@ short CGM_Tag::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle 
 	if(&inflictor == tagged)
 	{
 		tagged = &other;
-		inflictor.spawninvincible = true;
-		inflictor.spawninvincibletimer = 60;
+		inflictor.shield = game_values.shieldstyle;
+		inflictor.shieldtimer = 60;
 		eyecandyfront.add(new EC_GravText(&game_font_large, other.ix + (HALFPW), other.iy + PH, "Tagged!", -VELJUMP*1.5));
 		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, other.ix + (HALFPW) - 16, other.iy + (HALFPH) - 16, 3, 8));
 		ifsoundonplay(sfx_transform);
@@ -2434,8 +2434,8 @@ short CGM_Greed::ReleaseCoins(CPlayer &player, killstyle style)
 {
 	ifsoundonplay(sfx_cannon);
 
-	player.spawninvincible = true;
-	player.spawninvincibletimer = 60;
+	player.shield = game_values.shieldstyle;
+	player.shieldtimer = 60;
 
 	short iDamage = g_iKillStyleDamage[style];
 
@@ -2536,8 +2536,8 @@ short CGM_Health::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killsty
 	{
 		ifsoundonplay(sfx_powerdown);
 
-		other.spawninvincible = true;
-		other.spawninvincibletimer = 60;
+		other.shield = game_values.shieldstyle;
+		other.shieldtimer = 60;
 	}
 	
 	return player_kill_nonkill;
@@ -2567,8 +2567,8 @@ short CGM_Health::playerkilledself(CPlayer &player, killstyle style)
 	{
 		ifsoundonplay(sfx_powerdown);
 
-		player.spawninvincible = true;
-		player.spawninvincibletimer = 60;
+		player.shield = game_values.shieldstyle;
+		player.shieldtimer = 60;
 	}
 	
 	return player_kill_nonkill;

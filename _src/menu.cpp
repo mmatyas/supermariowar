@@ -119,7 +119,8 @@ void Menu::WriteGameOptions()
 		abyte[29] = (unsigned char) game_values.minigameunlocked;
 		fwrite(abyte, sizeof(unsigned char), 30, fp); 
 
-		fwrite(&game_values.spawninvincibility, sizeof(short), 1, fp);
+		fwrite(&game_values.shieldtime, sizeof(short), 1, fp);
+		fwrite(&game_values.shieldstyle, sizeof(short), 1, fp);
 		fwrite(&game_values.itemrespawntime, sizeof(short), 1, fp);
 		fwrite(&game_values.hiddenblockrespawn, sizeof(short), 1, fp);
 		fwrite(&game_values.fireballttl, sizeof(short), 1, fp);
@@ -495,7 +496,7 @@ void Menu::CreateMenu()
 	// Gameplay Options
 	//***********************
 
-	miRespawnField = new MI_SelectField(&spr_selectfield, 70, 60, "Respawn Time", 500, 220);
+	miRespawnField = new MI_SelectField(&spr_selectfield, 70, 40, "Respawn Time", 500, 220);
 	miRespawnField->Add("Instant", 0, "", false, false);
 	miRespawnField->Add("0.5 Seconds", 1, "", false, false);
 	miRespawnField->Add("1.0 Seconds", 2, "", false, false);
@@ -519,23 +520,30 @@ void Menu::CreateMenu()
 	miRespawnField->Add("10.0 Seconds", 20, "", false, false);
 	miRespawnField->SetData(&game_values.respawn, NULL, NULL);
 	miRespawnField->SetKey(game_values.respawn);
+	
+	miShieldStyleField = new MI_SelectField(&spr_selectfield, 70, 80, "Shield Style", 500, 220);
+	miShieldStyleField->Add("No Shield", 0, "", false, false);
+	miShieldStyleField->Add("Soft", 1, "", false, false);
+	miShieldStyleField->Add("Soft with Stomp", 2, "", false, false);
+	miShieldStyleField->Add("Hard", 3, "", false, false);
+	miShieldStyleField->SetData(&game_values.shieldstyle, NULL, NULL);
+	miShieldStyleField->SetKey(game_values.shieldstyle);
 
-	miShieldField = new MI_SelectField(&spr_selectfield, 70, 100, "Shield Time", 500, 220);
-	miShieldField->Add("None", 0, "", false, false);
-	miShieldField->Add("0.5 Seconds", 31, "", false, false);
-	miShieldField->Add("1.0 Seconds", 62, "", false, false);
-	miShieldField->Add("1.5 Seconds", 93, "", false, false);
-	miShieldField->Add("2.0 Seconds", 124, "", false, false);
-	miShieldField->Add("2.5 Seconds", 155, "", false, false);
-	miShieldField->Add("3.0 Seconds", 186, "", false, false);
-	miShieldField->Add("3.5 Seconds", 217, "", false, false);
-	miShieldField->Add("4.0 Seconds", 248, "", false, false);
-	miShieldField->Add("4.5 Seconds", 279, "", false, false);
-	miShieldField->Add("5.0 Seconds", 310, "", false, false);
-	miShieldField->SetData(&game_values.spawninvincibility, NULL, NULL);
-	miShieldField->SetKey(game_values.spawninvincibility);
+	miShieldTimeField = new MI_SelectField(&spr_selectfield, 70, 120, "Shield Time", 500, 220);
+	miShieldTimeField->Add("0.5 Seconds", 31, "", false, false);
+	miShieldTimeField->Add("1.0 Seconds", 62, "", false, false);
+	miShieldTimeField->Add("1.5 Seconds", 93, "", false, false);
+	miShieldTimeField->Add("2.0 Seconds", 124, "", false, false);
+	miShieldTimeField->Add("2.5 Seconds", 155, "", false, false);
+	miShieldTimeField->Add("3.0 Seconds", 186, "", false, false);
+	miShieldTimeField->Add("3.5 Seconds", 217, "", false, false);
+	miShieldTimeField->Add("4.0 Seconds", 248, "", false, false);
+	miShieldTimeField->Add("4.5 Seconds", 279, "", false, false);
+	miShieldTimeField->Add("5.0 Seconds", 310, "", false, false);
+	miShieldTimeField->SetData(&game_values.shieldtime, NULL, NULL);
+	miShieldTimeField->SetKey(game_values.shieldtime);
 
-	miBoundsTimeField = new MI_SelectField(&spr_selectfield, 70, 140, "Bounds Time", 500, 220);
+	miBoundsTimeField = new MI_SelectField(&spr_selectfield, 70, 160, "Bounds Time", 500, 220);
 	miBoundsTimeField->Add("Infinite", 0, "", false, false);
 	miBoundsTimeField->Add("1 Second", 1, "", false, false);
 	miBoundsTimeField->Add("2 Seconds", 2, "", false, false);
@@ -550,7 +558,7 @@ void Menu::CreateMenu()
 	miBoundsTimeField->SetData(&game_values.outofboundstime, NULL, NULL);
 	miBoundsTimeField->SetKey(game_values.outofboundstime);
 
-	miSuicideTimeField = new MI_SelectField(&spr_selectfield, 70, 180, "Suicide Time", 500, 220);
+	miSuicideTimeField = new MI_SelectField(&spr_selectfield, 70, 200, "Suicide Time", 500, 220);
 	miSuicideTimeField->Add("Off", 0, "", false, false);
 	miSuicideTimeField->Add("3 Seconds", 186, "", false, false);
 	miSuicideTimeField->Add("5 Seconds", 310, "", false, false);
@@ -561,7 +569,7 @@ void Menu::CreateMenu()
 	miSuicideTimeField->SetData(&game_values.suicidetime, NULL, NULL);
 	miSuicideTimeField->SetKey(game_values.suicidetime);
 
-	miWarpLockStyleField = new MI_SelectField(&spr_selectfield, 70, 220, "Warp Lock Style", 500, 220);
+	miWarpLockStyleField = new MI_SelectField(&spr_selectfield, 70, 240, "Warp Lock Style", 500, 220);
 	miWarpLockStyleField->Add("Entrance Only", 0, "", false, false);
 	miWarpLockStyleField->Add("Exit Only", 1, "", false, false);
 	miWarpLockStyleField->Add("Entrance and Exit", 2, "", false, false);
@@ -570,7 +578,7 @@ void Menu::CreateMenu()
 	miWarpLockStyleField->SetData(&game_values.warplockstyle, NULL, NULL);
 	miWarpLockStyleField->SetKey(game_values.warplockstyle);
 
-	miWarpLockTimeField = new MI_SelectField(&spr_selectfield, 70, 260, "Warp Lock Time", 500, 220);
+	miWarpLockTimeField = new MI_SelectField(&spr_selectfield, 70, 280, "Warp Lock Time", 500, 220);
 	miWarpLockTimeField->Add("Off", 0, "", false, false);
 	miWarpLockTimeField->Add("1 Second", 62, "", false, false);
 	miWarpLockTimeField->Add("2 Seconds", 124, "", false, false);
@@ -585,7 +593,7 @@ void Menu::CreateMenu()
 	miWarpLockTimeField->SetData(&game_values.warplocktime, NULL, NULL);
 	miWarpLockTimeField->SetKey(game_values.warplocktime);
 
-	miBotsField = new MI_SelectField(&spr_selectfield, 70, 300, "Bot Difficulty", 500, 220);
+	miBotsField = new MI_SelectField(&spr_selectfield, 70, 320, "Bot Difficulty", 500, 220);
 	miBotsField->Add("Very Easy", 0, "", false, false);
 	miBotsField->Add("Easy", 1, "", false, false);
 	miBotsField->Add("Moderate", 2, "", false, false);
@@ -594,7 +602,7 @@ void Menu::CreateMenu()
 	miBotsField->SetData(&game_values.cpudifficulty, NULL, NULL);
 	miBotsField->SetKey(game_values.cpudifficulty);
 
-	miFrameLimiterField = new MI_SelectField(&spr_selectfield, 70, 340, "Frame Limit", 500, 220);
+	miFrameLimiterField = new MI_SelectField(&spr_selectfield, 70, 360, "Frame Limit", 500, 220);
 	miFrameLimiterField->Add("10 FPS", 100, "", false, false);
 	miFrameLimiterField->Add("15 FPS", 67, "", false, false);
 	miFrameLimiterField->Add("20 FPS", 50, "", false, false);
@@ -624,7 +632,7 @@ void Menu::CreateMenu()
 	miFrameLimiterField->SetData(&game_values.framelimiter, NULL, NULL);
 	miFrameLimiterField->SetKey(game_values.framelimiter);
 
-	miPointSpeedField = new MI_SelectField(&spr_selectfield, 70, 380, "Point Speed", 500, 220);
+	miPointSpeedField = new MI_SelectField(&spr_selectfield, 70, 400, "Point Speed", 500, 220);
 	miPointSpeedField->Add("Very Slow", 60, "", false, false);
 	miPointSpeedField->Add("Slow", 40, "", false, false);
 	miPointSpeedField->Add("Moderate", 20, "", false, false);
@@ -640,9 +648,10 @@ void Menu::CreateMenu()
 	miGameplayOptionsMenuRightHeaderBar = new MI_Image(&menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
 	miGameplayOptionsMenuHeaderText = new MI_Text("Gameplay Options Menu", 320, 5, 0, 2, 1);
 
-	mGameplayOptionsMenu.AddControl(miRespawnField, miGameplayOptionsMenuBackButton, miShieldField, NULL, miGameplayOptionsMenuBackButton);
-	mGameplayOptionsMenu.AddControl(miShieldField, miRespawnField, miBoundsTimeField, NULL, miGameplayOptionsMenuBackButton);
-	mGameplayOptionsMenu.AddControl(miBoundsTimeField, miShieldField, miSuicideTimeField, NULL, miGameplayOptionsMenuBackButton);
+	mGameplayOptionsMenu.AddControl(miRespawnField, miGameplayOptionsMenuBackButton, miShieldStyleField, NULL, miGameplayOptionsMenuBackButton);
+	mGameplayOptionsMenu.AddControl(miShieldStyleField, miRespawnField, miShieldTimeField, NULL, miGameplayOptionsMenuBackButton);
+	mGameplayOptionsMenu.AddControl(miShieldTimeField, miShieldStyleField, miBoundsTimeField, NULL, miGameplayOptionsMenuBackButton);
+	mGameplayOptionsMenu.AddControl(miBoundsTimeField, miShieldTimeField, miSuicideTimeField, NULL, miGameplayOptionsMenuBackButton);
 	mGameplayOptionsMenu.AddControl(miSuicideTimeField, miBoundsTimeField, miWarpLockStyleField, NULL, miGameplayOptionsMenuBackButton);
 	mGameplayOptionsMenu.AddControl(miWarpLockStyleField, miSuicideTimeField, miWarpLockTimeField, NULL, miGameplayOptionsMenuBackButton);
 	mGameplayOptionsMenu.AddControl(miWarpLockTimeField, miWarpLockStyleField, miBotsField, NULL, miGameplayOptionsMenuBackButton);
@@ -2168,7 +2177,7 @@ void Menu::CreateMenu()
 	// King of the Hill Mode Settings
 	//***********************
 
-	miKingOfTheHillModeSizeField = new MI_SelectField(&spr_selectfield, 120, 200, "Size", 400, 180);
+	miKingOfTheHillModeSizeField = new MI_SelectField(&spr_selectfield, 120, 180, "Size", 400, 180);
 	miKingOfTheHillModeSizeField->Add("2 x 2", 2, "", false, false);
 	miKingOfTheHillModeSizeField->Add("3 x 3", 3, "", false, false);
 	miKingOfTheHillModeSizeField->Add("4 x 4", 4, "", false, false);
@@ -2176,7 +2185,7 @@ void Menu::CreateMenu()
 	miKingOfTheHillModeSizeField->SetData(&game_values.gamemodemenusettings.kingofthehill.areasize, NULL, NULL);
 	miKingOfTheHillModeSizeField->SetKey(game_values.gamemodemenusettings.kingofthehill.areasize);
 
-	miKingOfTheHillModeRelocateFrequencyField = new MI_SelectField(&spr_selectfield, 120, 240, "Relocate", 400, 180);
+	miKingOfTheHillModeRelocateFrequencyField = new MI_SelectField(&spr_selectfield, 120, 220, "Relocate", 400, 180);
 	miKingOfTheHillModeRelocateFrequencyField->Add("Never", 0, "", false, false);
 	miKingOfTheHillModeRelocateFrequencyField->Add("5 Seconds", 310, "", false, false);
 	miKingOfTheHillModeRelocateFrequencyField->Add("10 Seconds", 620, "", false, false);
@@ -2192,6 +2201,15 @@ void Menu::CreateMenu()
 	miKingOfTheHillModeRelocateFrequencyField->SetData(&game_values.gamemodemenusettings.kingofthehill.relocationfrequency, NULL, NULL);
 	miKingOfTheHillModeRelocateFrequencyField->SetKey(game_values.gamemodemenusettings.kingofthehill.relocationfrequency);
 
+	miKingOfTheHillModeMultiplierField = new MI_SelectField(&spr_selectfield, 120, 260, "Max Multiplier", 400, 180);
+	miKingOfTheHillModeMultiplierField->Add("None", 1, "", false, false);
+	miKingOfTheHillModeMultiplierField->Add("2", 2, "", false, false);
+	miKingOfTheHillModeMultiplierField->Add("3", 3, "", false, false);
+	miKingOfTheHillModeMultiplierField->Add("4", 4, "", false, false);
+	miKingOfTheHillModeMultiplierField->Add("5", 5, "", false, false);
+	miKingOfTheHillModeMultiplierField->SetData(&game_values.gamemodemenusettings.kingofthehill.maxmultiplier, NULL, NULL);
+	miKingOfTheHillModeMultiplierField->SetKey(game_values.gamemodemenusettings.kingofthehill.maxmultiplier);
+
 	miKingOfTheHillModeBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
 	miKingOfTheHillModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
@@ -2200,9 +2218,10 @@ void Menu::CreateMenu()
 	miKingOfTheHillModeHeaderText = new MI_Text("King of the Hill Mode Menu", 320, 5, 0, 2, 1);
 
 	mModeSettingsMenu[12].AddControl(miKingOfTheHillModeSizeField, miKingOfTheHillModeBackButton, miKingOfTheHillModeRelocateFrequencyField, NULL, miKingOfTheHillModeBackButton);
-	mModeSettingsMenu[12].AddControl(miKingOfTheHillModeRelocateFrequencyField, miKingOfTheHillModeSizeField, miKingOfTheHillModeBackButton, NULL, miKingOfTheHillModeBackButton);
+	mModeSettingsMenu[12].AddControl(miKingOfTheHillModeRelocateFrequencyField, miKingOfTheHillModeSizeField, miKingOfTheHillModeMultiplierField, NULL, miKingOfTheHillModeBackButton);
+	mModeSettingsMenu[12].AddControl(miKingOfTheHillModeMultiplierField, miKingOfTheHillModeRelocateFrequencyField, miKingOfTheHillModeBackButton, NULL, miKingOfTheHillModeBackButton);
 	
-	mModeSettingsMenu[12].AddControl(miKingOfTheHillModeBackButton, miKingOfTheHillModeRelocateFrequencyField, miKingOfTheHillModeSizeField, miKingOfTheHillModeRelocateFrequencyField, NULL);
+	mModeSettingsMenu[12].AddControl(miKingOfTheHillModeBackButton, miKingOfTheHillModeMultiplierField, miKingOfTheHillModeSizeField, miKingOfTheHillModeMultiplierField, NULL);
 	
 	mModeSettingsMenu[12].AddNonControl(miKingOfTheHillModeLeftHeaderBar);
 	mModeSettingsMenu[12].AddNonControl(miKingOfTheHillModeRightHeaderBar);

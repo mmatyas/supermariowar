@@ -697,6 +697,7 @@ struct KingOfTheHillModeSettings
 {
 	short areasize;			//size of the hill area, 2x2, 3x3 etc.
 	short relocationfrequency;  //How often the hill switches spots
+	short maxmultiplier;	//as a player sits in the zone, the score will multiply
 };
 
 struct RaceGameModeSettings
@@ -836,7 +837,8 @@ struct gv
 	short		spawnstyle;
 	short		awardstyle;
 
-	short		spawninvincibility;
+	short		shieldtime;
+	short		shieldstyle;
 
 	bool		pausegame;
 	bool		exitinggame;

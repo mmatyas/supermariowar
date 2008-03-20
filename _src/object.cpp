@@ -163,7 +163,7 @@ IO_Block::IO_Block(gfxSprite *nspr, short x, short y) :
 	col = x / TILESIZE;
 	row = y / TILESIZE;
 
-	oldhidden = hidden = ishiddentype = false;
+	hidden = ishiddentype = false;
 	iHiddenTimer = 0;
 }
 
@@ -181,7 +181,7 @@ void IO_Block::update()
 		if(game_values.hiddenblockrespawn > 0 && ++iHiddenTimer > game_values.hiddenblockrespawn)
 		{
 			iHiddenTimer = 0;
-			oldhidden = hidden = true;
+			hidden = true;
 			reset();
 
 			g_map.UpdateTileGap(col, row);
@@ -356,6 +356,24 @@ void IO_Block::BounceMovingObject(IO_MovingObject * object)
 	}
 }
 
+void IO_Block::KillPlayersInsideBlock()
+{
+	for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++)
+	{
+		CPlayer * player = list_players[iPlayer];
+
+		short iSwapSides = 0;
+		if(player->fOldX >= iposx + TILESIZE)
+			iSwapSides = -640;
+
+		if(player->fOldX + PW + iSwapSides >= iposx && player->fOldX + iSwapSides < iposx + TILESIZE &&
+			player->fOldY + PH >= iposy && player->fOldY < iposy + TILESIZE)
+		{
+			player->KillPlayerMapHazard(true, kill_style_environment);
+		}
+	}
+}
+
 //------------------------------------------------------------------------------
 // class powerup block
 //------------------------------------------------------------------------------
@@ -373,7 +391,7 @@ B_PowerupBlock::B_PowerupBlock(gfxSprite *nspr1, short x, short y, short iNumSpr
 	animationWidth = (short)spr->getWidth();
 	drawFrame = 0;
 
-	oldhidden = hidden = ishiddentype = fHidden;
+	hidden = ishiddentype = fHidden;
 
 	if(piSettings[0] == -1 || game_values.overridepowerupsettings == 1) //Game Only
 	{
@@ -434,8 +452,6 @@ void B_PowerupBlock::update()
 		
 		if(state == 1 && fabsf(fposy - fy) > 10.0f)
 		{
-			oldhidden = false;
-
 			vely = -vely;
 			state = 2;
 			iBumpPlayerID = -1;
@@ -555,11 +571,6 @@ bool B_PowerupBlock::collide(CPlayer * player, short direction, bool useBehavior
 
 		return true;
 	}
-	else if(oldhidden)
-	{
-		PlayerKilledPlayer(iBumpPlayerID, player, death_style_jump, kill_style_bounce, true);
-		return false;
-	}
 
 	return IO_Block::collide(player, direction, useBehavior);
 }
@@ -603,7 +614,12 @@ bool B_PowerupBlock::hitbottom(CPlayer * player, bool useBehavior)
 		player->vely = CapFallingVelocity(-player->vely * BOUNCESTRENGTH);
 		player->yf((float)(iposy + ih) + 0.2f);
 
-		hidden = false;
+		if(hidden)
+		{
+			hidden = false;
+			KillPlayersInsideBlock();
+		}
+
 		g_map.UpdateTileGap(col, row);
 
 		if(state == 0)
@@ -625,14 +641,7 @@ bool B_PowerupBlock::hitbottom(CPlayer * player, bool useBehavior)
 bool B_PowerupBlock::collide(IO_MovingObject * object, short direction)
 {
 	if(hidden)
-	{
 		return true;
-	}
-	else if(oldhidden)
-	{
-		object->KillObjectMapHazard();
-		return false;
-	}
 
 	return IO_Block::collide(object, direction);
 }
@@ -1006,7 +1015,7 @@ B_NoteBlock::B_NoteBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short
 	drawFrame = 0;
 	animationWidth = (short)spr->getWidth();
 
-	oldhidden = hidden = ishiddentype = fHidden;
+	hidden = ishiddentype = fHidden;
 
 	iType = type;
 	iTypeOffsetY = iType * TILESIZE;
@@ -1043,8 +1052,6 @@ void B_NoteBlock::update()
 			vely = -vely;
 			state = 4;
 			iBumpPlayerID = -1;
-
-			oldhidden = false;
 		}
 		else if(state == 4 && fabsf(fposy - fy) < VELNOTEBLOCKBOUNCE)
 		{
@@ -1081,11 +1088,6 @@ bool B_NoteBlock::collide(CPlayer * player, short direction, bool useBehavior)
 			return hitbottom(player, useBehavior);
 
 		return true;
-	}
-	else if(oldhidden)
-	{
-		PlayerKilledPlayer(iBumpPlayerID, player, death_style_jump, kill_style_bounce, true);
-		return false;
 	}
 
 	return IO_Block::collide(player, direction, useBehavior);
@@ -1131,7 +1133,12 @@ bool B_NoteBlock::hitbottom(CPlayer * player, bool useBehavior)
 			ifsoundonplay(sfx_bump);
 		}
 
-		hidden = false;
+		if(hidden)
+		{
+			hidden = false;
+			KillPlayersInsideBlock();
+		}
+
 		g_map.UpdateTileGap(col, row);
 	}
 
@@ -1181,14 +1188,7 @@ bool B_NoteBlock::hitleft(CPlayer * player, bool useBehavior)
 bool B_NoteBlock::collide(IO_MovingObject * object, short direction)
 {
 	if(hidden)
-	{
 		return true;
-	}
-	else if(oldhidden)
-	{
-		object->KillObjectMapHazard();
-		return false;
-	}
 
 	return IO_Block::collide(object, direction);
 }
@@ -1316,7 +1316,7 @@ B_FlipBlock::B_FlipBlock(gfxSprite *nspr, short x, short y, bool fHidden) :
 	iw = (short)spr->getWidth() >> 2;
 	collisionWidth = iw;
 
-	oldhidden = hidden = ishiddentype = fHidden;
+	hidden = ishiddentype = fHidden;
 
 	counter = 0;
 	frame = 0;
@@ -1343,7 +1343,6 @@ void B_FlipBlock::update()
 		{
 			counter = 0;
 			frame += iw;
-			oldhidden = false;
 			iBumpPlayerID = -1;
 
 			if(frame >= animationWidth)
@@ -1356,6 +1355,8 @@ void B_FlipBlock::update()
 		{
 			reset();
 			g_map.UpdateTileGap(col, row);
+
+			KillPlayersInsideBlock();
 		}
 	}
 	else if(state == 2)
@@ -1386,11 +1387,6 @@ bool B_FlipBlock::collide(CPlayer * player, short direction, bool useBehavior)
 			return hitbottom(player, useBehavior);
 
 		return true;
-	}
-	else if(oldhidden)
-	{
-		PlayerKilledPlayer(iBumpPlayerID, player, death_style_jump, kill_style_bounce, true);
-		return false;
 	}
 
 	if((player->fOldY + PH <= iposy || state > 1) && direction == 2)
@@ -1441,7 +1437,12 @@ bool B_FlipBlock::hitbottom(CPlayer * player, bool useBehavior)
 		iBumpPlayerID = player->globalID;
 		iBumpTeamID = player->teamID;
 
-		hidden = false;
+		if(hidden)
+		{
+			hidden = false;
+			KillPlayersInsideBlock();
+		}
+
 		g_map.UpdateTileGap(col, row);
 
 		triggerBehavior();
@@ -1486,14 +1487,7 @@ bool B_FlipBlock::hitleft(CPlayer * player, bool useBehavior)
 bool B_FlipBlock::collide(IO_MovingObject * object, short direction)
 {
 	if(hidden)
-	{
 		return true;
-	}
-	else if(oldhidden)
-	{
-		object->KillObjectMapHazard();
-		return false;
-	}
 
 	return IO_Block::collide(object, direction);
 }
@@ -1610,7 +1604,7 @@ B_OnOffSwitchBlock::B_OnOffSwitchBlock(gfxSprite *nspr, short x, short y, short 
 	iColorID = colorID;
 	iSrcX = colorID * 32;
 
-	state = (iState == 0 ? 0 : 3);
+	state = (iState == 0 ? 3 : 0);
 }
 
 void B_OnOffSwitchBlock::update()
@@ -1810,10 +1804,9 @@ B_SwitchBlock::B_SwitchBlock(gfxSprite *nspr, short x, short y, short colorID, s
 	ih = (short)spr->getHeight() >> 2;
 	collisionHeight = ih;
 
-	state = iState;
+	state = 1 - iState;
 	iSrcX = colorID * 32;
 }
-
 
 void B_SwitchBlock::draw()
 {
@@ -1926,6 +1919,9 @@ void B_SwitchBlock::FlipState()
 {
 	state = 1 - state;
 	g_map.UpdateTileGap(col, row);
+
+	if(state == 0)
+		KillPlayersInsideBlock();
 }
 
 //------------------------------------------------------------------------------
@@ -1934,7 +1930,7 @@ void B_SwitchBlock::FlipState()
 B_BounceBlock::B_BounceBlock(gfxSprite *nspr1, short x, short y, bool fHidden) :
 	IO_Block(nspr1, x, y)
 {
-	oldhidden = hidden = ishiddentype = fHidden;
+	hidden = ishiddentype = fHidden;
 }
 
 void B_BounceBlock::draw()
@@ -1955,8 +1951,6 @@ void B_BounceBlock::update()
 
 		if(state == 1 && fabsf(fposy - fy) > 10.0f)
 		{
-			oldhidden = false;
-
 			iBumpPlayerID = -1;
 			vely = -vely;
 			state = 2;
@@ -1983,11 +1977,6 @@ bool B_BounceBlock::collide(CPlayer * player, short direction, bool useBehavior)
 			return hitbottom(player, useBehavior);
 
 		return true;
-	}
-	else if(oldhidden)
-	{
-		PlayerKilledPlayer(iBumpPlayerID, player, death_style_jump, kill_style_bounce, true);
-		return false;
 	}
 
 	return IO_Block::collide(player, direction, useBehavior);
@@ -2027,7 +2016,12 @@ bool B_BounceBlock::hitbottom(CPlayer * player, bool useBehavior)
 
 		triggerBehavior();
 
-		hidden = false;
+		if(hidden)
+		{
+			hidden = false;
+			KillPlayersInsideBlock();
+		}
+
 		g_map.UpdateTileGap(col, row);
 	}
 
@@ -2037,14 +2031,7 @@ bool B_BounceBlock::hitbottom(CPlayer * player, bool useBehavior)
 bool B_BounceBlock::collide(IO_MovingObject * object, short direction)
 {
 	if(hidden)
-	{
 		return true;
-	}
-	else if(oldhidden)
-	{
-		object->KillObjectMapHazard();
-		return false;
-	}
 
 	return IO_Block::collide(object, direction);
 }
@@ -3375,23 +3362,25 @@ PU_Tanooki::PU_Tanooki(short x, short y)
 {
 }
 
-bool PU_Tanooki :: collide (CPlayer *player)
+bool PU_Tanooki :: collide (CPlayer * player)
 {
-	dead = true;
-
-	if(player->tanooki)
+	if(state > 0)
 	{
-		ifsoundonplay(sfx_storepowerup);
-		game_values.gamepowerups[player->getGlobalID()] = 20;
-	}
-    else
-    {
-		ifsoundonplay(sfx_collectpowerup);
-        player->tanooki = true;
+		dead = true;
 
-		if(game_values.tanookilimit > 0)
-			player->tanookilimit = game_values.tanookilimit;
-    }
+		if(player->tanooki)
+		{
+			player->SetStoredPowerup(20);
+		}
+		else
+		{
+			ifsoundonplay(sfx_collectpowerup);
+			player->tanooki = true;
+
+			if(game_values.tanookilimit > 0)
+				player->tanookilimit = game_values.tanookilimit;
+		}
+	}
 
     return false;
 }
@@ -3437,8 +3426,7 @@ bool PU_StarPowerup::collide(CPlayer * player)
 		}
 		else
 		{
-			ifsoundonplay(sfx_storepowerup);
-			game_values.gamepowerups[player->getGlobalID()] = 6;
+			player->SetStoredPowerup(6);
 		}
 	}
 
@@ -3498,7 +3486,7 @@ bool PU_PoisonPowerup::collide(CPlayer * player)
 			return false;
 		}
 
-		if(player->spawninvincible)
+		if(player->shield > 0)
 			return false;
 
 		dead = true;
@@ -3636,8 +3624,7 @@ bool PU_PodoboPowerup::collide(CPlayer * player)
 	if(state > 0)
 	{
 		dead = true;
-		ifsoundonplay(sfx_storepowerup);
-		game_values.gamepowerups[player->getGlobalID()] = 22;
+		player->SetStoredPowerup(22);
 	}
 
 	return false;
@@ -3895,8 +3882,7 @@ bool PU_ClockPowerup::collide(CPlayer * player)
 		velx = 0.0f;
 
 		dead = true;
-		ifsoundonplay(sfx_storepowerup);
-		game_values.gamepowerups[player->getGlobalID()] = 7;
+		player->SetStoredPowerup(7);
 	}
 
 	return false;
@@ -3936,8 +3922,7 @@ bool PU_PowPowerup::collide(CPlayer * player)
 	if(state > 0)
 	{
 		dead = true;
-		ifsoundonplay(sfx_storepowerup);
-		game_values.gamepowerups[player->getGlobalID()] = 9;
+		player->SetStoredPowerup(9);
 	}
 
 	return false;
@@ -3978,8 +3963,7 @@ bool PU_BulletBillPowerup::collide(CPlayer * player)
 	if(state > 0)
 	{
 		dead = true;
-		ifsoundonplay(sfx_storepowerup);
-		game_values.gamepowerups[player->getGlobalID()] = 10;
+		player->SetStoredPowerup(10);
 	}
 
 	return false;
@@ -4190,8 +4174,7 @@ bool PU_JailKeyPowerup::collide(CPlayer * player)
 	if(state > 0)
 	{
 		dead = true;
-		ifsoundonplay(sfx_storepowerup);
-		game_values.gamepowerups[player->getGlobalID()] = 26;
+		player->SetStoredPowerup(26);
 	}
 
 	return false;
@@ -4238,7 +4221,7 @@ bool MO_Fireball::collide(CPlayer * player)
 {
 	if(iPlayerID != player->globalID && (game_values.teamcollision == 2|| iTeamID != player->teamID))
 	{
-		if(!player->spawninvincible)
+		if(player->shield == 0)
 		{
 			removeifprojectile(this, false, false);
 
@@ -4303,7 +4286,7 @@ bool MO_SuperFireball::collide(CPlayer * player)
 {
 	if(iPlayerID != player->globalID && (game_values.teamcollision == 2|| iTeamID != player->teamID))
 	{
-		if(!player->spawninvincible)
+		if(player->shield == 0)
 		{
 			removeifprojectile(this, false, false);
 
@@ -4408,7 +4391,7 @@ bool MO_Hammer::collide(CPlayer * player)
 {
 	if(iPlayerID != player->globalID && (game_values.teamcollision == 2|| iTeamID != player->teamID))
 	{
-		if(!player->spawninvincible)
+		if(player->shield == 0)
 		{
 			removeifprojectile(this, false, false);
 
@@ -4481,7 +4464,7 @@ bool MO_IceBlast::collide(CPlayer * player)
 {
 	if(iPlayerID != player->globalID && (game_values.teamcollision == 2 || iTeamID != player->teamID))
 	{
-		if(!player->spawninvincible && !player->invincible)
+		if(player->shield == 0 && !player->invincible)
 		{
 			player->makefrozen(game_values.wandfreezetime);
 		}
@@ -4803,7 +4786,7 @@ bool MO_Boomerang::collide(CPlayer * player)
 {
 	if(iPlayerID != player->globalID && (game_values.teamcollision == 2|| iTeamID != player->teamID))
 	{
-		if(!player->spawninvincible)
+		if(player->shield == 0)
 		{
 			removeifprojectile(this, false, false);
 
@@ -5163,7 +5146,7 @@ void OMO_Thwomp::update()
 
 bool OMO_Thwomp::collide(CPlayer * player)
 {
-	if(!player->invincible && !player->spawninvincible && (player->score->score > 0 || game_values.gamemode->goal == -1))
+	if(!player->invincible && player->shield == 0 && (player->score->score > 0 || game_values.gamemode->goal == -1))
 		return player->KillPlayerMapHazard(false, kill_style_environment) != player_kill_nonkill;
 
 	return false;
@@ -5209,7 +5192,7 @@ void MO_Podobo::draw()
 
 bool MO_Podobo::collide(CPlayer * player)
 {
-	if(player->globalID != iPlayerID && (game_values.teamcollision == 2|| iTeamID != player->teamID) && !player->invincible && !player->spawninvincible)
+	if(player->globalID != iPlayerID && (game_values.teamcollision == 2|| iTeamID != player->teamID) && !player->invincible && player->shield == 0)
 	{
 		//Find the player that made this explosion so we can attribute a kill
 		PlayerKilledPlayer(iPlayerID, player, death_style_jump, kill_style_podobo, false);
@@ -5281,7 +5264,7 @@ void OMO_BowserFire::draw()
 
 bool OMO_BowserFire::collide(CPlayer * player)
 {
-	if(player->globalID != iPlayerID && (game_values.teamcollision == 2|| iTeamID != player->teamID) && !player->invincible && !player->spawninvincible)
+	if(player->globalID != iPlayerID && (game_values.teamcollision == 2|| iTeamID != player->teamID) && !player->invincible && player->shield == 0)
 	{
 		//Find the player that made this explosion so we can attribute a kill
 		PlayerKilledPlayer(iPlayerID, player, death_style_jump, kill_style_fireball, false);
@@ -5412,7 +5395,7 @@ bool MO_BulletBill::hittop(CPlayer * player)
 
 bool MO_BulletBill::hitother(CPlayer * player)
 {
-	if(player->spawninvincible || player->globalID == iPlayerID)
+	if(player->shield > 0 || player->globalID == iPlayerID)
 		return false;
 
 	if(game_values.teamcollision != 2 && iTeamID == player->teamID)
@@ -5728,14 +5711,14 @@ bool CO_Star::collide(CPlayer * player)
 		}
 	}
 
-	if(player->spawninvincible || player->invincible || game_values.gamemode->star == player || game_values.gamemode->gameover)
+	if(player->shield > 0 || player->invincible || game_values.gamemode->star == player || game_values.gamemode->gameover)
 		return false;
 
 	if(game_values.gamemode->star)
 	{
 		CPlayer * oldstar = game_values.gamemode->star;
-		oldstar->spawninvincible = true;
-		oldstar->spawninvincibletimer = 60;
+		oldstar->shield = game_values.shieldstyle;
+		oldstar->shieldtimer = 60;
 		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, oldstar->ix + (HALFPW) - 16, oldstar->iy + (HALFPH) - 16, 3, 8));
 
 		if(owner == oldstar)
@@ -5895,6 +5878,7 @@ bool OMO_FlagBase::collide(CPlayer * player)
 	{
 		CO_Flag * flag = (CO_Flag*)player->carriedItem;
 		scoreFlag(flag, player);
+		timer = 0;
 	}
 
 	return false;
@@ -6530,6 +6514,9 @@ OMO_KingOfTheHillZone::OMO_KingOfTheHillZone(gfxSprite *nspr) :
 	}
 
 	totalTouchingPlayers = 0;
+	
+	multiplier = 1;
+	multipliertimer = 0;
 
 	placeArea();
 }
@@ -6563,7 +6550,13 @@ void OMO_KingOfTheHillZone::draw()
 			if(iCol == size - 1)
 				iXPiece = TILESIZE * 2;
 
-			spr->draw(ix + iCol * TILESIZE, iy + iRow * TILESIZE, iXPiece + frame, iYPiece, TILESIZE, TILESIZE);
+			short iColX = ix + (iCol << 5);
+			short iRowX = iy + (iRow << 5);
+						
+			if(multiplier > 1)
+				spr_awardkillsinrow.draw(iColX + 8, iRowX + 8, (multiplier - 1) << 4, colorID << 4, 16, 16);
+
+			spr->draw(iColX, iRowX, iXPiece + frame, iYPiece, TILESIZE, TILESIZE);
 		}
 	}	
 }
@@ -6602,9 +6595,22 @@ void OMO_KingOfTheHillZone::update()
 		if(scoretimer >= game_values.pointspeed)
 		{
 			scoretimer = 0;
-			list_players[iPlayerID]->score->AdjustScore(1);
+			list_players[iPlayerID]->score->AdjustScore(multiplier);
 			game_values.gamemode->CheckWinner(list_players[iPlayerID]);
+
+			if(game_values.gamemodesettings.kingofthehill.maxmultiplier > 1 && ++multipliertimer >= 10)
+			{
+				multipliertimer = 0;
+
+				if(multiplier < game_values.gamemodesettings.kingofthehill.maxmultiplier)
+					multiplier++;
+			}
 		}
+	}
+	else
+	{
+		multiplier = 1;
+		multipliertimer = 0;
 	}
 
 	if(game_values.gamemodesettings.kingofthehill.relocationfrequency > 0)
@@ -6631,6 +6637,9 @@ void OMO_KingOfTheHillZone::placeArea()
 	colorID = -1;
 	iPlayerID = -1;
 	frame = 0;
+
+	multiplier = 1;
+	multipliertimer = 0;
 
 	short x;
 	short y;
@@ -7151,7 +7160,7 @@ MO_Explosion::MO_Explosion(gfxSprite *nspr, short x, short y, short iNumSpr, sho
 
 bool MO_Explosion::collide(CPlayer * player)
 {
-	if(player->globalID != iPlayerID && (game_values.teamcollision == 2 || iTeamID != player->teamID) && !player->invincible && !player->spawninvincible)
+	if(player->globalID != iPlayerID && (game_values.teamcollision == 2 || iTeamID != player->teamID) && !player->invincible && player->shield == 0)
 	{
 		//Find the player that made this explosion so we can attribute a kill
 		PlayerKilledPlayer(iPlayerID, player, death_style_jump, iStyle, false);
@@ -7328,7 +7337,7 @@ bool MO_WalkingEnemy::collide(CPlayer * player)
 
 bool MO_WalkingEnemy::hitother(CPlayer * player)
 {
-	if(player->spawninvincible)
+	if(player->shield > 0)
 		return false;
 
 	return player->KillPlayerMapHazard(false, kill_style_environment) != player_kill_nonkill;
@@ -7626,7 +7635,7 @@ void MO_Spiny::update()
 bool MO_Spiny::hittop(CPlayer * player)
 {
 	//Kill player here
-	if(player->isready() && !player->spawninvincible && !player->invincible && !player->fKuriboShoe)
+	if(player->isready() && player->shield == 0 && !player->invincible && !player->fKuriboShoe)
 	{
 		return player->KillPlayerMapHazard(false, kill_style_environment) != player_kill_nonkill;
 	}
@@ -7746,7 +7755,7 @@ bool MO_CheepCheep::hittop(CPlayer * player)
 
 bool MO_CheepCheep::hitother(CPlayer * player)
 {
-	if(player->spawninvincible)
+	if(player->shield > 0)
 		return false;
 
 	return player->KillPlayerMapHazard(false, kill_style_environment) != player_kill_nonkill;
@@ -8194,7 +8203,7 @@ bool MO_SledgeBrother::collide(CPlayer * player)
 
 bool MO_SledgeBrother::hit(CPlayer * player)
 {
-	if(player->spawninvincible)
+	if(player->shield > 0)
 		return false;
 
 	return player->KillPlayerMapHazard(false, kill_style_environment) != player_kill_nonkill;
@@ -8484,7 +8493,7 @@ void CO_Shell::MoveToOwner()
 
 bool CO_Shell::KillPlayer(CPlayer * player)
 {
-	if(player->spawninvincible || player->invincible)
+	if(player->shield > 0 || player->invincible)
 		return false;
 
 	CheckAndDie();
@@ -8892,7 +8901,7 @@ bool CO_ThrowBlock::KillPlayer(CPlayer * player)
 		return false;
 	}
 
-	if(player->spawninvincible)
+	if(player->shield > 0)
 		return false;
 
 	CheckAndDie();
@@ -9220,7 +9229,7 @@ CO_Spike::CO_Spike(gfxSprite *nspr, short ix, short iy) :
 
 void CO_Spike::hittop(CPlayer * player)
 {
-	if(player->isready() && !player->spawninvincible && !player->invincible && !player->fKuriboShoe)
+	if(player->isready() && player->shield == 0 && !player->invincible && !player->fKuriboShoe)
 		player->KillPlayerMapHazard(false, kill_style_environment);
 }
 
@@ -9273,7 +9282,7 @@ MO_AttackZone::MO_AttackZone(short playerId, short teamId, short x, short y, sho
 
 bool MO_AttackZone::collide(CPlayer * player)
 {
-	if(player->spawninvincible || player->invincible || dead)
+	if(player->shield > 0 || player->invincible || dead)
 		return false;
 
 	if(game_values.teamcollision != 2 && player->teamID == iTeamID)
@@ -9511,7 +9520,7 @@ void OMO_OrbitHazard::update()
 
 bool OMO_OrbitHazard::collide(CPlayer * player)
 {
-	if(!player->invincible && !player->spawninvincible)
+	if(!player->invincible && player->shield == 0)
 	{
 		return player->KillPlayerMapHazard(false, kill_style_environment) != player_kill_nonkill;
 	}
@@ -9557,7 +9566,7 @@ void OMO_StraightPathHazard::update()
 
 bool OMO_StraightPathHazard::collide(CPlayer * player)
 {
-	if(!player->spawninvincible)
+	if(player->shield == 0)
 	{
 		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + (iw >> 2) - 16, iy + (ih >> 2) - 16, 3, 8));
 		dead = true;
@@ -9721,7 +9730,7 @@ void IO_FlameCannon::draw(short iOffsetX, short iOffsetY)
 
 bool IO_FlameCannon::collide(CPlayer * player)
 {
-	if(state == 2 && !player->invincible && !player->spawninvincible)
+	if(state == 2 && !player->invincible && player->shield == 0)
 		return player->KillPlayerMapHazard(false, kill_style_environment) != player_kill_nonkill;
 
 	return false;
@@ -9926,7 +9935,7 @@ bool MO_PirhanaPlant::collide(CPlayer * player)
 	{
 		KillPlant();
 	}
-	else if(!player->spawninvincible)
+	else if(player->shield == 0)
 	{
 		return player->KillPlayerMapHazard(false, kill_style_environment) != player_kill_nonkill;
 	}
@@ -10154,7 +10163,7 @@ bool OMO_PipeBonus::collide(CPlayer * player)
 	//fireball
 	if(iType == 5)
 	{
-		if(!player->spawninvincible)
+		if(player->shield == 0)
 		{
 			dead = true;
 			eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix - 1, iy - 1, 3, 8));

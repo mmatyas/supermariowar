@@ -122,7 +122,8 @@ class Menu
 		//Gameplay Options Menu
 		UI_Menu mGameplayOptionsMenu;
 		MI_SelectField * miRespawnField;
-		MI_SelectField * miShieldField;
+		MI_SelectField * miShieldStyleField;
+		MI_SelectField * miShieldTimeField;
 		MI_SelectField * miBoundsTimeField;
 		MI_SelectField * miSuicideTimeField;
 		MI_SelectField * miWarpLockStyleField;
@@ -472,6 +473,8 @@ class Menu
 		//King of the Hill
 		MI_SelectField * miKingOfTheHillModeSizeField;
 		MI_SelectField * miKingOfTheHillModeRelocateFrequencyField;
+		MI_SelectField * miKingOfTheHillModeMultiplierField;
+
 		MI_Button * miKingOfTheHillModeBackButton;
 		
 		MI_Image * miKingOfTheHillModeLeftHeaderBar;

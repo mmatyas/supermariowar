@@ -95,6 +95,8 @@ class IO_Block : public CObject
 	
 		virtual void triggerBehavior() {}
 
+		void KillPlayersInsideBlock();
+
 	protected:
 		void BounceMovingObject(IO_MovingObject * object);
 
@@ -104,7 +106,7 @@ class IO_Block : public CObject
 		float fposx, fposy;  //position to return to (for note and bumpable blocks)
 		short iposx, iposy; //position of the block (doesn't move)
 
-		bool hidden, oldhidden, ishiddentype;
+		bool hidden, ishiddentype;
 		short iHiddenTimer;
 
 		short col, row;
@@ -1181,6 +1183,9 @@ class OMO_KingOfTheHillZone : public IO_OverMapObject
 		short frame;
 		short relocatetimer;
 		short size;
+		
+		short multiplier;
+		short multipliertimer;
 
 	friend class CObjectContainer;
 };

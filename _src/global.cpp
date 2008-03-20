@@ -594,6 +594,7 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 				
 				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.kingofthehill.areasize, NULL, game_values.gamemodemenusettings.kingofthehill.areasize, false);
 				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.kingofthehill.relocationfrequency, NULL, game_values.gamemodemenusettings.kingofthehill.relocationfrequency, false);
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.kingofthehill.maxmultiplier, NULL, game_values.gamemodemenusettings.kingofthehill.maxmultiplier, false);
 			}
 			else if(ts->iMode == 13) //race
 			{
@@ -1026,6 +1027,12 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
 				if(ts->iNumUsedSettings > 1)
 				{
 					sprintf(szTemp, ",%d", ts->gmsSettings.kingofthehill.relocationfrequency);
+					strcat(buffer, szTemp);
+				}
+
+				if(ts->iNumUsedSettings > 2)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.kingofthehill.maxmultiplier);
 					strcat(buffer, szTemp);
 				}
 			}

@@ -4208,19 +4208,18 @@ void MI_BonusWheel::Reset(bool fTournament)
 		iWinningTeam = game_values.gamemode->winningteam;
 
 	//Randomly display the powerups around the ring
-	bool fPowerupUsed[NUM_POWERUPS - 1];
-	for(short iPowerup = 0; iPowerup < NUM_POWERUPS - 1; iPowerup++)
-		fPowerupUsed[iPowerup] = false;
-
 	short iCountWeight = 0;
 	for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
 		iCountWeight += game_values.powerupweights[iPowerup];
+
+	//Always have at least 1 poison mushroom to try to avoid
+	short iPoisonMushroom = rand() % NUMBONUSITEMSONWHEEL;
 
 	for(short iPowerup = 0; iPowerup < NUMBONUSITEMSONWHEEL; iPowerup++)
 	{
 		int iChoosePowerup = 0;
 
-		if(iCountWeight > 0)
+		if(iCountWeight > 0 && iPoisonMushroom != iPowerup)
 		{
 			int iRandPowerup = rand() % iCountWeight + 1;
 			int iPowerupWeightCount = game_values.powerupweights[iChoosePowerup];

@@ -665,7 +665,7 @@ void MovingPlatform::collide(CPlayer * player)
 					return;
 				}
 				else if(((t1 & tile_flag_death_on_left) || (t2 & tile_flag_death_on_left)) &&
-					!player->invincible && !player->spawninvincible)
+					!player->invincible && player->shield == 0)
 				{
 					if(player_kill_nonkill != player->KillPlayerMapHazard(true, kill_style_environment))
 						return;
@@ -729,7 +729,7 @@ void MovingPlatform::collide(CPlayer * player)
 					return;				
 				}
 				else if(((t1 & tile_flag_death_on_right) || (t2 & tile_flag_death_on_right)) &&
-					!player->invincible && !player->spawninvincible)
+					!player->invincible && player->shield == 0)
 				{
 					if(player_kill_nonkill != player->KillPlayerMapHazard(true, kill_style_environment))
 						return;				
@@ -811,7 +811,7 @@ void MovingPlatform::collide(CPlayer * player)
 				t2 = iTileType[(short)fRelativeX2 / TILESIZE][ty].iFlags;
 		
 			if(((t1 & tile_flag_solid) || (t2 & tile_flag_solid)) && (((t1 & tile_flag_death_on_bottom) == 0 && (t2 & tile_flag_death_on_bottom) == 0) || 
-				player->invincible || player->spawninvincible))
+				player->invincible || player->shield > 0))
 			{
 				if(player->iVerticalPlatformCollision == 2)
 				{
@@ -904,7 +904,7 @@ void MovingPlatform::collide(CPlayer * player)
 				return;
 			}
 			else if(fSolidTileUnderPlayer && (!(t1 & tile_flag_death_on_top) || !(t2 & tile_flag_death_on_top) ||  
-				player->invincible || player->spawninvincible || player->fKuriboShoe))
+				player->invincible || player->shield > 0 || player->fKuriboShoe))
 			{	//on ground
 
 				if(player->iVerticalPlatformCollision == 0)

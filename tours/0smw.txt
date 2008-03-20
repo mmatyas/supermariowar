@@ -101,6 +101,7 @@
 #12 - King of the Hill
 #Size - number greater than 1 (example: 3 for 3x3 base)
 #Relocate - 0 = never, all other numbers greater than 0 are number of frames until the zone moves (example: 620 is about 10 seconds)
+#Max Multiplier - 1 = no multiplier, all numbers 2 through 10 is the maximum multiplier that the player can achieve
 
 #13 - Race
 #Quantity - any number greater than 1

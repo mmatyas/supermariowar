@@ -1620,6 +1620,9 @@ void CMap::saveMap(const std::string& file)
 				WriteByteFromShort(i, mapfile);
 				WriteByteFromShort(j, mapfile);
 				WriteByteFromShort(objectdata[i][j].iSettings[0], mapfile);
+				
+				//TODO: REmove this and comment in the LINE ABOVE
+				//WriteByteFromShort(iSwitches[objectdata[i][j].iType - 11], mapfile);
 			}
 		}
 	}

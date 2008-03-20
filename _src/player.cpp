@@ -459,8 +459,8 @@ void CPlayer::move()
 				iSuperStompTimer = 8;
 				lockfall = true;
 
-				// Become invincible
-				spawninvincible = true;
+				// Become soft shielded (with stomp ability)
+				shield = 2;
 			}
 
             // Prevent you from shooting
@@ -482,7 +482,7 @@ void CPlayer::move()
 				statue_timer = 0;
 
 				// Release invincibility
-				spawninvincible = false;
+				shield = 0;
 
 				// Slight upward velocity to escape spikes / lava
 				if(!inair)
@@ -517,8 +517,8 @@ void CPlayer::move()
 				// Decrement statue timer3
 				statue_timer--;
 
-				// Become invincible
-				spawninvincible = true;
+				// Become soft shielded (with stomp ability)
+				shield = 2;
 
 				statue_lock = true;
 			}
@@ -576,7 +576,7 @@ void CPlayer::move()
 		iSrcOffsetX = game_values.gamemodesettings.star.shine ? 224 : 192;
 	else if(frozen)
 		iSrcOffsetX = 256;
-	else if(spawninvincible)
+	else if(shield > 0)
 		iSrcOffsetX = 128;
 
 	if(state != player_ready)
@@ -988,8 +988,8 @@ void CPlayer::move()
 		}
 
 		//If player is shielded, count down that timer
-		if(spawninvincibletimer > 0)
-			spawninvincible = --spawninvincibletimer > 0;
+		if(shieldtimer > 0 && --shieldtimer == 0)
+			shield = 0;
 
 		short lrn = 0;	//move left-right-no: -1.. left 0 no 1 ... right
 
@@ -1174,7 +1174,7 @@ void CPlayer::move()
 			//POWERUP RELEASE
 			if(playerKeys->game_powerup.fDown && statue_timer == 0 && game_values.gamemode->gamemode != game_mode_bonus)
 			{
-				if(game_values.gamepowerups[globalID] > -1)
+				if(game_values.gamepowerups[globalID] > 0) //Don't allow usage of the poison powerup, it sticks with you
 				{
 					powerupused = game_values.gamepowerups[globalID];
 					game_values.gamepowerups[globalID] = -1;
@@ -1468,7 +1468,7 @@ void CPlayer::move()
 		//Deal with terminal burnup velocity
 		if(vely >= MAXVELY)
 		{
-			if(!invincible && !spawninvincible)
+			if(!invincible && shield == 0)
 			{
 				if(++burnupstarttimer >= 20)
 				{
@@ -1830,12 +1830,12 @@ void CPlayer::chooseWarpExit()
 	}
 
 	//Make player shielded when exiting the warp (if that option is turned on)
-	if(game_values.spawninvincibility > 0)
+	if(game_values.shieldstyle > 0)
 	{
-		if(!spawninvincible || spawninvincibletimer < game_values.spawninvincibility)
+		if(shield == 0 || shieldtimer < game_values.shieldtime)
 		{
-			spawninvincibletimer = game_values.spawninvincibility;
-			spawninvincible = true;
+			shieldtimer = game_values.shieldtime;
+			shield = game_values.shieldstyle;
 		}
 	}
 
@@ -1993,8 +1993,8 @@ void CPlayer::SetupNewPlayer()
 	iHorizontalPlatformCollision = -1;
 	iVerticalPlatformCollision = -1;
 
-	spawninvincible = false;
-	spawninvincibletimer = 0;
+	shield = 0;
+	shieldtimer = 0;
 
 	fKuriboShoe = false;
 	iKuriboShoeAnimationTimer = 0;
@@ -2013,18 +2013,14 @@ void CPlayer::SetupNewPlayer()
 	{
 		if(game_values.gamemodesettings.survival.shield)
 		{
-			if(game_values.spawninvincibility > 0)
-				spawninvincibletimer = game_values.spawninvincibility;
-			else
-				spawninvincibletimer = 60;
-
-			spawninvincible = true;
+			shieldtimer = game_values.shieldtime;
+			shield = game_values.shieldstyle;
 		}
 	}
-	else if(game_values.spawninvincibility > 0)
+	else if(game_values.shieldstyle > 0)
 	{
-		spawninvincibletimer = game_values.spawninvincibility;
-		spawninvincible = true;
+		shieldtimer = game_values.shieldtime;
+		shield = game_values.shieldstyle;
 	}
 
 	throw_star = 0;
@@ -2091,7 +2087,7 @@ bool CPlayer::isstomping(CPlayer * o)
 		}
 		
 		bool fKillPotential = false;
-		if(vely > 1.0f)
+		if(vely > 1.0f && o->shield == 0)
 			fKillPotential = true;
 
 		bouncejump();
@@ -2403,6 +2399,7 @@ void collisionhandler_p2p(CPlayer * o1, CPlayer * o2)
 	//If teams tag each other
 	if(o1->teamID == o2->teamID)
 	{
+		//Free teammates that are jailed
 		if(game_values.gamemode->gamemode == game_mode_jail && game_values.gamemodesettings.jail.tagfree)
 		{
 			if(o1->jailtimer > 0)
@@ -2420,6 +2417,7 @@ void collisionhandler_p2p(CPlayer * o1, CPlayer * o2)
 			}
 		}
 
+		//Transfer tag if assist is on
 		if(game_values.teamcollision == 1 || game_values.gamemodesettings.tag.tagontouch)
 			TransferTag(o1, o2);
 		
@@ -2452,55 +2450,66 @@ void collisionhandler_p2p(CPlayer * o1, CPlayer * o2)
 		}
 	}
 
-	//--- 1. Is player frozen? ---
-	if(o1->frozen && o2->frozen)
+	//Quit checking collision if either player is soft shielded
+	if(o1->shield == 1 || o2->shield == 1)
 	{
-		PlayerKilledPlayer(o1, o2, death_style_shatter, kill_style_frozen, true);
-		PlayerKilledPlayer(o2, o1, death_style_shatter, kill_style_frozen, true);
+		//Do tag transfer if there is one to do
+		if(game_values.gamemodesettings.tag.tagontouch)
+			TransferTag(o1, o2);
+
 		return;
 	}
 
-	if(o1->frozen)
+	//--- 1. kill frozen players ---
+	bool fFrozenDeath = false;
+	if(o1->frozen && o1->shield == 0 && !o1->invincible)
 	{
 		PlayerKilledPlayer(o2, o1, death_style_shatter, kill_style_frozen, true);
-		return;
+		fFrozenDeath = true;
 	}
 
-	if(o2->frozen)
+	if(o2->frozen && o2->shield == 0 && !o2->invincible)
 	{
 		PlayerKilledPlayer(o1, o2, death_style_shatter, kill_style_frozen, true);
-		return;
-	
+		fFrozenDeath = true;
 	}
+
+	if(fFrozenDeath)
+		return;
 
 	//--- 2. is player invincible? ---
-	if(o1->invincible && !o2->invincible && !o2->spawninvincible)
+	if(o1->invincible && o2->shield == 0 && !o2->invincible)
 	{
 		PlayerKilledPlayer(o1, o2, death_style_jump, kill_style_star, false);
 		return;
 	}
 	
-	if(!o1->invincible && !o1->spawninvincible && o2->invincible)
+	if(o2->invincible && o1->shield == 0 && !o1->invincible)
 	{
 		PlayerKilledPlayer(o2, o1, death_style_jump, kill_style_star, false);
 		return;
 	}
 	
-	//If neither can touch each other, then return
-	if((o1->invincible && o2->invincible) || (o1->spawninvincible && o2->spawninvincible) ||
-		(o1->iswarping() && o2->iswarping()))
+	//If both players are warping, ignore collision
+	if(o1->iswarping() && o2->iswarping())
 		return;
 
 	//--- 3. stomping other player? ---
-	if(!o2->spawninvincible && !o2->invincible && o1->isstomping(o2))
+	if((o2->shield == 0 || o2->shield == 3) && !o2->invincible && o1->isstomping(o2))
 		return;
-	if(!o1->spawninvincible && !o1->invincible && o2->isstomping(o1))
+	if((o1->shield == 0 || o1->shield == 3) && !o1->invincible  && o2->isstomping(o1))
 		return;
 	
-	//If either is shielded return because there is no pushback collision detection
-	if((o1->spawninvincible && (game_values.gamemode->tagged != o1 || !game_values.gamemodesettings.tag.tagontouch)) || 
-		(o2->spawninvincible && (game_values.gamemode->tagged != o2 || !game_values.gamemodesettings.tag.tagontouch)))
+
+	//Quit checking collision if either player is soft shielded
+	if(o1->shield == 2 || o2->shield == 2)
+	{
+		//Do tag transfer if there is one to do
+		if(game_values.gamemodesettings.tag.tagontouch)
+			TransferTag(o1, o2);
+
 		return;
+	}
 
 	//--- 4. push back (horizontal) ---
 	if(o1->ix < o2->ix)				//o1 is left -> o1 pushback left, o2 pushback right
@@ -2530,7 +2539,7 @@ void _collisionhandler_p2p_pushback(CPlayer * o1, CPlayer * o2)
 	if(o1->ix + PW < 320 && o2->ix > 320)
 		overlapcollision = true;
 
-	if((o1->velx == 0 && o2->iswarping() && o2->velx != 0) || o1->iswarping())
+	if(/*(o1->velx == 0 && o2->iswarping() && o2->velx != 0) ||*/ o1->iswarping())
 	{
 		if(overlapcollision)
 		{//o2 reposition to the right side of o1, o1 stays
@@ -2542,8 +2551,10 @@ void _collisionhandler_p2p_pushback(CPlayer * o1, CPlayer * o2)
 			o2->xi(o1->ix + PW + 1);
 			o2->collision_detection_checkright();
 		}
+
+		return;
 	}
-	else if((o2->velx == 0 && o1->iswarping() && o1->velx != 0) || o2->iswarping())
+	else if(/*(o2->velx == 0 && o1->iswarping() && o1->velx != 0) ||*/ o2->iswarping())
 	{
 		if(overlapcollision)
 		{//o1 reposition to the left side of o2, o2 stays
@@ -2555,6 +2566,8 @@ void _collisionhandler_p2p_pushback(CPlayer * o1, CPlayer * o2)
 			o1->xi(o2->ix - PW - 1);	
 			o1->collision_detection_checkleft();
 		}
+
+		return;
 	}
 	else if(!o1->iswarping() && !o2->iswarping())
 	{	//both objects moving - calculate middle and set both objects
@@ -2628,20 +2641,20 @@ void TransferTag(CPlayer * o1, CPlayer * o2)
 	if(game_values.gamemode->gamemode != game_mode_tag)
 		return;
 
-	if(game_values.gamemode->tagged == o1 && o1->isready() && o2->isready() && !o2->spawninvincible)
+	if(game_values.gamemode->tagged == o1 && o1->isready() && o2->isready() && o2->shield == 0 && !o2->invincible)
 	{
 		game_values.gamemode->tagged = o2;
-		o1->spawninvincible = true;
-		o1->spawninvincibletimer = 60;
+		o1->shield = game_values.shieldstyle > 0 ? game_values.shieldstyle : 1;
+		o1->shieldtimer = 60;
 		eyecandyfront.add(new EC_GravText(&game_font_large, game_values.gamemode->tagged->ix + HALFPW, game_values.gamemode->tagged->iy + PH, "Tagged!", -VELJUMP*1.5));
 		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, game_values.gamemode->tagged->ix + HALFPW - 16, game_values.gamemode->tagged->iy + HALFPH - 16, 3, 8));
 		ifsoundonplay(sfx_transform);
 	}
-	else if(game_values.gamemode->tagged == o2 && o1->isready() && o2->isready() && !o1->spawninvincible)
+	else if(game_values.gamemode->tagged == o2 && o1->isready() && o2->isready() && o1->shield == 0 && !o1->invincible)
 	{
 		game_values.gamemode->tagged = o1;
-		o2->spawninvincible = true;
-		o2->spawninvincibletimer = 60;
+		o2->shield = game_values.shieldstyle > 0 ? game_values.shieldstyle : 1;
+		o2->shieldtimer = 60;
 		eyecandyfront.add(new EC_GravText(&game_font_large, game_values.gamemode->tagged->ix + HALFPW, game_values.gamemode->tagged->iy + PH, "Tagged!", -VELJUMP*1.5));
 		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, game_values.gamemode->tagged->ix + HALFPW - 16, game_values.gamemode->tagged->iy + HALFPH - 16, 3, 8));
 		ifsoundonplay(sfx_transform);
@@ -3235,7 +3248,7 @@ void CPlayer::collision_detection_map()
 				}
 			}
 			else if(((toptile & tile_flag_death_on_left) || (bottomtile & tile_flag_death_on_left)) &&
-				!invincible && !spawninvincible)
+				!invincible && shield == 0)
 			{
 				if(player_kill_nonkill != KillPlayerMapHazard(true, kill_style_environment))
 					return;
@@ -3316,7 +3329,7 @@ void CPlayer::collision_detection_map()
 				}
 			}
 			else if(((toptile & tile_flag_death_on_right) || (bottomtile & tile_flag_death_on_right)) &&
-				!invincible && !spawninvincible)
+				!invincible && shield == 0)
 			{
 				if(player_kill_nonkill != KillPlayerMapHazard(true, kill_style_environment))
 					return;
@@ -3427,7 +3440,7 @@ void CPlayer::collision_detection_map()
 		//or if the player is invincible and hits death or death on bottom
 		int alignedTileType = g_map.map(alignedBlockX, ty);
 		if((alignedTileType & tile_flag_solid) && ((alignedTileType & tile_flag_death_on_bottom) == 0 ||
-			invincible || spawninvincible))
+			invincible || shield > 0))
 		{
 			yf((float)(ty * TILESIZE + TILESIZE) + 0.2f);
 			fOldY = fy - 1.0f;
@@ -3471,7 +3484,7 @@ void CPlayer::collision_detection_map()
 		//or if the player is invincible and hits death or death on bottom
 		int unalignedTileType = g_map.map(unAlignedBlockX, ty);
 		if((unalignedTileType & tile_flag_solid) && ((unalignedTileType & tile_flag_death_on_bottom) == 0 ||
-			invincible || spawninvincible))
+			invincible || shield > 0))
 		{
 			xf(unAlignedBlockFX);
 			fOldX = fx;
@@ -3612,7 +3625,7 @@ void CPlayer::collision_detection_map()
 		}
 		
 		if(fSolidTileUnderPlayer && (!(lefttile & tile_flag_death_on_top) || !(righttile & tile_flag_death_on_top) ||
-			invincible || spawninvincible || fKuriboShoe))
+			invincible || shield > 0 || fKuriboShoe))
 		{	//on ground
 
 			yf((float)(ty * TILESIZE - PH) - 0.2f);
@@ -4153,8 +4166,8 @@ void CPlayer::makeinvincible()
 	invincibletimer = 0;
 	animationstate = 0;
 	animationtimer = 0;
-	spawninvincible = false;
-	spawninvincibletimer = 0;
+	shield = 0;
+	shieldtimer = 0;
 
 	//Stop the invincible music if a player is already invincible 
 	//(we don't want two invincible music sounds playing at the same time)
@@ -4241,70 +4254,61 @@ bool CPlayer::AcceptItem(MO_CarriedObject * item)
 
 void CPlayer::SetPowerup(short iPowerup)
 {
-	//Play sounds for collecting a powerup
-	if(powerup == iPowerup || (bobomb && iPowerup == 0) || iPowerup > 8)
-	{
-		ifsoundonplay(sfx_storepowerup);
-	}
-	else if(iPowerup == 0)
-	{
-		ifsoundonplay(sfx_transform);
-		eyecandyfront.add(new EC_SingleAnimation(&spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
-	}
-	else if(iPowerup == 3)
-	{
-		ifsoundonplay(sfx_collectfeather);
-		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
-		ClearPowerupStates();
-	}
-	else if(iPowerup == 7 || iPowerup == 8)
-	{
-		ifsoundonplay(sfx_collectpowerup);
-		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
-		ClearPowerupStates();
-	}
-	else
-	{
-		ifsoundonplay(sfx_collectpowerup);
-		ClearPowerupStates();
-	}
-
-    if(iPowerup == 0)
+	if(iPowerup == 0)
 	{
 		if(bobomb)
-			game_values.gamepowerups[globalID] = 8;
-
-		bobomb = true;
+			SetStoredPowerup(8);
+		else
+		{
+			ifsoundonplay(sfx_transform);
+			eyecandyfront.add(new EC_SingleAnimation(&spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
+			bobomb = true;
+		}
 	}
 	else if(iPowerup > 8)
 	{
 		if(iPowerup == 9)
-			game_values.gamepowerups[globalID] = 9;
+			SetStoredPowerup(9);
 		else if(iPowerup == 10)
-			game_values.gamepowerups[globalID] = 16;
+			SetStoredPowerup(16);
 		else if(iPowerup == 11)
-			game_values.gamepowerups[globalID] = 10;
-		else if(iPowerup > 12)
-			game_values.gamepowerups[globalID] = iPowerup; //Storing shells
+			SetStoredPowerup(10);
+		else if(iPowerup > 11)
+			SetStoredPowerup(iPowerup); //Storing shells
 	}
 	else
 	{
+		if(iPowerup == 3 || iPowerup == 7 || iPowerup == 8)
+		{
+			eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
+		}
+		
+		if(powerup != iPowerup)
+		{
+			if(iPowerup == 3)
+				ifsoundonplay(sfx_collectfeather);
+			else
+				ifsoundonplay(sfx_collectpowerup);
+		}
+
+		ClearPowerupStates();
+
 		if(powerup == 1)
-			game_values.gamepowerups[globalID] = 5;
+			SetStoredPowerup(5);
 		else if(powerup == 2)
-			game_values.gamepowerups[globalID] = 11;
+			SetStoredPowerup(11);
 		else if(powerup == 3)
-			game_values.gamepowerups[globalID] = 17;
+			SetStoredPowerup(17);
 		else if(powerup == 4)
-			game_values.gamepowerups[globalID] = 19;
+			SetStoredPowerup(19);
 		else if(powerup == 5)
-			game_values.gamepowerups[globalID] = 21;
+			SetStoredPowerup(21);
 		else if(powerup == 6)
-			game_values.gamepowerups[globalID] = 23;
+			SetStoredPowerup(23);
 		else if(powerup == 7)
-			game_values.gamepowerups[globalID] = 24;
+			SetStoredPowerup(24);
 		else if(powerup == 8)
-			game_values.gamepowerups[globalID] = 25;
+			SetStoredPowerup(25);
 
 		powerup = iPowerup;
 		projectilelimit = 0;
@@ -4358,6 +4362,18 @@ void CPlayer::SetPowerup(short iPowerup)
 	//Minor fix for becoming caped to draw animation correctly
 	if(iPowerup == 3)
 		iCapeTimer = 4;
+}
+
+void CPlayer::SetStoredPowerup(short iPowerup)
+{
+	if(game_values.gamepowerups[globalID] == 0)
+	{
+		ifsoundonplay(sfx_stun);
+		return;
+	}
+
+	game_values.gamepowerups[globalID] = iPowerup;
+	ifsoundonplay(sfx_storepowerup);
 }
 
 void CPlayer::ClearPowerupStates()

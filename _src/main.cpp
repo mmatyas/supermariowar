@@ -29,10 +29,6 @@
 +----------------------------------------------------------*/
 
 //TODO
-//BUG!! When PlayerKilledPlayer does not kill a player, then it hidden blocks that were hit could result in a player getting trapped in htem
-//      This happens if the player is sitting still when the hidden block is revealed
-//      I think we're going to just live with this one - adding collision detection for such an edge case is probably not a good idea
-
 //BUG!! Still reports of disappearing map tiles - caused when rRects is used out of bounds causing w and h to be set to 0 - happened with platform with tile using row 960
 //      I think this was due to using old maps with newer versions of the 1.8 alpha - keep an eye on this, but it might be a non-issue
 
@@ -50,31 +46,39 @@
 //[ ] World AI needs ability to use stored items -> harder problem than I have time for
 //[ ] Add SMB3's first world as a test world to ship with
 
+//[ ] Option to make the shield a "soft" shield and allow the player to not be able to kill (stomp) when shielded - lots of requests for this
+//[ ] Announcement that a player/team was removed from game - needs more specing but this could be helpful
+//[ ] Countdown before match begins, 3..., 2..., 1... with announcer hooks
+//[ ] Better eyecandy block for 10+ kills like stars - need gfx
 //[ ] On/Off switch [?] and note blocks and possibly other types of on/off blocks
-//[ ] Kill players that are inside [!] or flip blocks when they become solid again
 //[ ] Enemies should die in lava
+//[ ] Quick Match option that selects everything random for you
 //[ ] Allow spawn areas for domination blocks
 //[ ] Water bubbles and rain eyecandy, Splashing feet when running on rain levels - need gfx for all of these
 //[ ] Resume level editor to zzleveleditor map every time so it looks like you've resumed your last work (or try and load the last map you were on)
-//[ ] Make the poison mushroom on bonus wheel do something bad to the player - and always have at least 1 poison mushroom on there
 //[ ] "Random" and "MultiStars" modes for star mode
 //[ ] Podoboo pops out of a [?] if all powerups are turned off
 //[ ] ? card for frenzy card mode to do random powerup
 //[ ] Thunderbolt style spawn
 //[ ] Reverse gravity blue podoboos
-//[ ] Picture Poker mode
 //[ ] Breaking skull blocks (too close to donut block, perhaps)
-//[ ] Reverse [!] blocks that are on when switch is off (allow in level editor by allowing painting of both outlines and [!] blocks)
-//[ ] Quick Match option that selects everything random for you
-//[ ] Option to make the shield a "soft" shield and allow the player to not be able to kill (stomp) when shielded - lots of requests for this
-//[ ] Announcement that a player/team was removed from game - needs more specing but this could be helpful
-//[ ] Countdown before match begins, 3..., 2..., 1... with announcer hooks
-//[ ] Better eyecandy block for 10+ kills like stars - need gfx
+
+* Phanto Mode (there is a key and whoever has the key is chased by a Phanto)
+- Hammers or something arc-pathed in Survival
+* Bomb option in Star mode
+* Multiple selectable item switch presets
+- Mariokart-type podium at the end of a tournament/tour/whatever
 
 */
 
 /*
 Checkin:
+1) Fixed case when players are standing still and a flip, switched or hidden block is made visible
+2) Refactored stored powerup code to handle easy storing of powerups
+3) Fixed poison powerup to stick and not allow you to store powerups
+4) Fixed bonus wheel to always have at least 1 poison mushroom on it to try to avoid
+5) Added shield style options: no shield, soft shield, soft with stomp and hard shield
+6) Added multipliers option to King of the Hill mode
 */
 
 #ifdef _XBOX
@@ -788,7 +792,8 @@ int main(int argc, char *argv[])
 	game_values.scoreboardstyle     = 0;
 	game_values.teamcolors          = true;
 	game_values.cputurn				= -1;
-	game_values.spawninvincibility  = 62;
+	game_values.shieldtime			= 62;
+	game_values.shieldstyle			= 2;
 	game_values.musicvolume			= 128;
 	game_values.soundvolume			= 128;
 	game_values.respawn				= 2;
@@ -997,6 +1002,7 @@ int main(int argc, char *argv[])
 	//King Of The Hill
 	game_values.gamemodemenusettings.kingofthehill.areasize = 3;
 	game_values.gamemodemenusettings.kingofthehill.relocationfrequency = 1240;
+	game_values.gamemodemenusettings.kingofthehill.maxmultiplier = 1;	//No multiplier
 
 	//Race
 	game_values.gamemodemenusettings.race.quantity = 4;
@@ -1109,7 +1115,8 @@ int main(int argc, char *argv[])
 			game_values.overridepowerupsettings = (short)abyte[28];
 			game_values.minigameunlocked = ((short)abyte[29] > 0 ? true : false);
 			
-			fread(&game_values.spawninvincibility, sizeof(short), 1, fp);
+			fread(&game_values.shieldtime, sizeof(short), 1, fp);
+			fread(&game_values.shieldstyle, sizeof(short), 1, fp);
 			fread(&game_values.itemrespawntime, sizeof(short), 1, fp);
 			fread(&game_values.hiddenblockrespawn, sizeof(short), 1, fp);
 			fread(&game_values.fireballttl, sizeof(short), 1, fp);
@@ -1848,6 +1855,12 @@ void RunGame()
 						short iplayer = rand() % list_players_cnt;
 						list_players[iplayer]->makefrozen(300);
 					}
+					else if(event.key.keysym.sym == SDLK_c)
+					{
+						short iplayer = rand() % list_players_cnt;
+						list_players[iplayer]->shield = rand() % 3 + 1;
+						list_players[iplayer]->shieldtimer = 620;
+					}
 					else if(event.key.keysym.sym == SDLK_1)
 					{
 						if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
@@ -2102,7 +2115,7 @@ void RunGame()
 						if(game_values.teamcollision != 2 && game_values.screenshaketeamid == player->teamID)
 							continue;
 						
-						if(!player->invincible && !player->spawninvincible && !player->fKuriboShoe && player->isready())
+						if(!player->invincible && player->shield == 0 && !player->fKuriboShoe && player->isready())
 						{
 							if(game_values.screenshakekillinair == player->inair)
 							{
@@ -3305,7 +3318,7 @@ void LoadMapObjects(bool fPreview)
 				short iSwitchType = iType - 11;
 
 				//g_map.blockdata[x][y] = new B_SwitchBlock(&spr_switchblocks, x * TILESIZE, y * TILESIZE, iSwitchType, g_map.iSwitches[iSwitchType]);
-				g_map.blockdata[x][y] = new B_SwitchBlock(&spr_switchblocks, x * TILESIZE, y * TILESIZE, iSwitchType, !g_map.objectdata[x][y].iSettings[0]);
+				g_map.blockdata[x][y] = new B_SwitchBlock(&spr_switchblocks, x * TILESIZE, y * TILESIZE, iSwitchType, g_map.objectdata[x][y].iSettings[0]);
 				noncolcontainer.add(g_map.blockdata[x][y]);
 				g_map.switchBlocks[iSwitchType + 4].push_back(g_map.blockdata[x][y]);
 			}
