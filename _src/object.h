@@ -1,8 +1,8 @@
 #ifndef _OBJECT_H
 #define _OBJECT_H
 
-enum ObjectType{object_none = 0, object_block = 1, object_moving = 2, object_overmap = 3, object_area = 4, object_egg = 5, object_frenzycard = 6, object_yoshi = 7, object_race_goal = 8, object_star = 9, object_flag = 10, object_flagbase = 11, object_thwomp = 12, object_kingofthehill_area = 13, object_bowserfire = 14, object_coin = 15, object_collectioncard = 16, object_orbithazard = 17, object_bulletbillcannon = 18, object_flamecannon = 19, object_pathhazard = 20, object_pipe_coin = 21, object_pipe_bonus = 22};
-enum MovingObjectType{movingobject_none = 0, movingobject_powerup = 1, movingobject_fireball = 2, movingobject_goomba = 3, movingobject_bulletbill = 4, movingobject_hammer = 5, movingobject_poisonpowerup = 6, movingobject_shell = 7, movingobject_throwblock = 8, movingobject_egg = 9, movingobject_star = 10, movingobject_flag = 11, movingobject_cheepcheep = 12, movingobject_koopa = 13, movingobject_boomerang = 14, movingobject_carried = 15, movingobject_iceblast = 16, movingobject_bomb = 17, movingobject_podobo = 18, movingobject_treasurechest = 19, movingobject_attackzone = 20, movingobject_pirhanaplant = 21, movingobject_explosion = 22, movingobject_buzzybeetle = 23, movingobject_spiny = 24, MOVINGOBJECT_LAST};
+enum ObjectType{object_none = 0, object_block = 1, object_moving = 2, object_overmap = 3, object_area = 4, object_egg = 5, object_frenzycard = 6, object_yoshi = 7, object_race_goal = 8, object_star = 9, object_flag = 10, object_flagbase = 11, object_thwomp = 12, object_kingofthehill_area = 13, object_bowserfire = 14, object_coin = 15, object_collectioncard = 16, object_orbithazard = 17, object_bulletbillcannon = 18, object_flamecannon = 19, object_pathhazard = 20, object_pipe_coin = 21, object_pipe_bonus = 22, object_phanto = 23, object_phantokey = 24};
+enum MovingObjectType{movingobject_none = 0, movingobject_powerup = 1, movingobject_fireball = 2, movingobject_goomba = 3, movingobject_bulletbill = 4, movingobject_hammer = 5, movingobject_poisonpowerup = 6, movingobject_shell = 7, movingobject_throwblock = 8, movingobject_egg = 9, movingobject_star = 10, movingobject_flag = 11, movingobject_cheepcheep = 12, movingobject_koopa = 13, movingobject_boomerang = 14, movingobject_carried = 15, movingobject_iceblast = 16, movingobject_bomb = 17, movingobject_podobo = 18, movingobject_treasurechest = 19, movingobject_attackzone = 20, movingobject_pirhanaplant = 21, movingobject_explosion = 22, movingobject_buzzybeetle = 23, movingobject_spiny = 24, movingobject_phantokey = 25, MOVINGOBJECT_LAST};
 enum BlockType{block_none, block_powerup, block_view, block_breakable, block_note, block_donut, block_flip, block_bounce, block_throw, block_onoff_switch, block_onoff, block_weaponbreakable};
 
 class IO_MovingObject;
@@ -967,18 +967,24 @@ class MO_CarriedObject : public IO_MovingObject
 		~MO_CarriedObject();
 
 		virtual void update() {}
-		virtual void draw() {}
+		virtual void draw();
 		virtual bool collide(CPlayer *) {return false;}
 
-		virtual void MoveToOwner(){}
+		virtual void MoveToOwner();
 
-		virtual void Drop() {}
-		virtual void Kick() {}
+		virtual void Drop();
+		virtual void Kick();
 
 	protected:
 
 		CPlayer * owner;
 		bool fSmoking;
+
+		float dKickX, dKickY;
+		short iOwnerLeftOffset, iOwnerRightOffset, iOwnerUpOffset;
+	
+	private:
+		void init();
 
 	friend class B_ThrowBlock;
 	friend class CPlayer;
@@ -994,11 +1000,8 @@ class CO_Egg : public MO_CarriedObject
 		void draw();
 		bool collide(CPlayer * player);
 		
-		void MoveToOwner();
-
 		void placeEgg();
 		void Drop();
-		void Kick();
 
 	private:
 		short relocatetimer;
@@ -1029,11 +1032,7 @@ class CO_Star : public MO_CarriedObject
 		void draw();
 		bool collide(CPlayer * player);
 
-		void MoveToOwner();
-
 		void placeStar();
-		void Drop();
-		void Kick();
 
 	private:
 		short timer;
@@ -1093,7 +1092,6 @@ class CO_Flag : public MO_CarriedObject
 
 		void placeFlag();
 		void Drop();
-		void Kick();
 
 		bool GetInBase() {return fInBase;}
 		short GetTeamID() {return teamID;}
@@ -1484,8 +1482,6 @@ class CO_Shell : public MO_CarriedObject
 
 		void UsedAsStoredPowerup(CPlayer * player);
 
-		void MoveToOwner();
-
 		bool KillPlayer(CPlayer * player);
 		void Drop();
 		void Kick();
@@ -1553,8 +1549,6 @@ class CO_ThrowBlock : public MO_CarriedObject
 		bool HitTop(CPlayer * player);
 		bool HitOther(CPlayer * player);
 
-		void MoveToOwner();
-
 		bool KillPlayer(CPlayer * player);
 		void Drop();
 		void Kick();
@@ -1599,11 +1593,7 @@ class CO_Spring : public MO_CarriedObject
 		void draw();
 		bool collide(CPlayer * player);
 
-		void MoveToOwner();
-
 		void place();
-		void Drop();
-		void Kick();
 
 	protected:
 
@@ -1688,11 +1678,7 @@ class CO_Bomb : public MO_CarriedObject
 		void draw();
 		bool collide(CPlayer * player);
 
-		void MoveToOwner();
-
 		void place();
-		void Drop();
-		void Kick();
 
 		void Die();
 		
@@ -1846,6 +1832,42 @@ class OMO_PipeBonus: public IO_OverMapObject
 		short iType, iDuration;
 		short iUncollectableTime;
 };
+
+//object phanto
+class OMO_Phanto : public IO_OverMapObject
+{
+	public:
+		OMO_Phanto(gfxSprite *nspr, short x, short y, float velx, float vely, short type);
+		~OMO_Phanto(){};
+
+		void update();
+		bool collide(CPlayer * player);
+
+	private:
+		short iType;
+};
+
+class CO_PhantoKey : public MO_CarriedObject
+{
+	public:
+		CO_PhantoKey(gfxSprite *nspr);
+		~CO_PhantoKey(){};
+
+		void update();
+		void draw();
+		bool collide(CPlayer * player);
+		
+		void placeKey();
+
+	private:
+		short relocatetimer;
+
+		short sparkleanimationtimer;
+		short sparkledrawframe;
+		
+	friend class CGM_Chase;
+};
+
 
 
 //object container

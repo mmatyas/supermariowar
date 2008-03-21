@@ -402,6 +402,7 @@ extern gfxSprite		spr_jail;
 extern gfxSprite		spr_racegoal;
 extern gfxSprite		spr_pipegamebonus;
 extern gfxSprite		spr_chicken;
+extern gfxSprite		spr_phanto, spr_phantokey;
 
 extern gfxSprite		spr_bonuschest;
 extern gfxSprite		spr_teleportstar;

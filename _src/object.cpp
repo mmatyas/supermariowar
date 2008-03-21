@@ -4833,6 +4833,10 @@ CO_Bomb::CO_Bomb(gfxSprite *nspr, short x, short y, float fVelX, float fVelY, sh
 
 	velx = fVelX;
 	vely = fVelY;
+
+	iOwnerRightOffset = 14;
+	iOwnerLeftOffset = -16;
+	iOwnerUpOffset = 40;
 }
 
 bool CO_Bomb::collide(CPlayer * player)
@@ -4890,34 +4894,6 @@ void CO_Bomb::draw()
 		spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, iColorOffsetY, iw, ih, (short)owner->state % 4, owner->GetWarpPlane());
 	else
 		spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, iColorOffsetY, iw, ih);
-}
-
-void CO_Bomb::MoveToOwner()
-{
-	if(owner)
-	{
-		xi(owner->ix + (owner->IsPlayerFacingRight() ? 14 : -16));
-		yi(owner->iy + PH - 40 + collisionOffsetY);
-	}
-}
-
-void CO_Bomb::Drop()
-{
-	if(owner)
-		owner->carriedItem = NULL;
-
-	owner = NULL;
-
-	collision_detection_checksides();
-}
-
-void CO_Bomb::Kick()
-{
-	velx = owner->velx + (owner->IsPlayerFacingRight() ? 2.0f : -2.0f);
-	vely = -4.0f;
-	ifsoundonplay(sfx_kicksound);
-
-	Drop();
 }
 
 void CO_Bomb::Die()
@@ -5471,26 +5447,75 @@ void MO_BulletBill::SetDirectionOffset()
 MO_CarriedObject::MO_CarriedObject(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY) :
 	IO_MovingObject(nspr, x, y, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
 {
-	owner = NULL;
-	fSmoking = false;
+	init();
 }
 
 MO_CarriedObject::MO_CarriedObject(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iAnimationOffsetX, short iAnimationOffsetY, short iAnimationHeight, short iAnimationWidth) :
 	IO_MovingObject(nspr, x, y, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY, iAnimationOffsetX, iAnimationOffsetY, iAnimationHeight, iAnimationWidth)
 {
-	owner = NULL;	
-	fSmoking = false;
+	init();
 }
 
 MO_CarriedObject::~MO_CarriedObject()
 {}
 
+void MO_CarriedObject::init()
+{
+	owner = NULL;
+	fSmoking = false;
+	
+	dKickX = 2.0f;
+	dKickY = 4.0f;
+
+	iOwnerRightOffset = HALFPW;
+	iOwnerLeftOffset = HALFPW - 32;
+	iOwnerUpOffset = 32;
+}
+
+void MO_CarriedObject::draw()
+{
+	if(owner && owner->iswarping())
+		spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, animationOffsetY, iw, ih, (short)owner->state % 4, owner->GetWarpPlane());
+	else
+		spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, animationOffsetY, iw, ih);
+}
+
+void MO_CarriedObject::MoveToOwner()
+{
+	if(owner)
+	{
+		xi(owner->ix + (owner->IsPlayerFacingRight() ? iOwnerRightOffset : iOwnerLeftOffset));
+		yi(owner->iy + PH - iOwnerUpOffset + collisionOffsetY);
+	}
+}
+
+void MO_CarriedObject::Drop()
+{
+	if(owner)
+		owner->carriedItem = NULL;
+
+	owner = NULL;
+
+	collision_detection_checksides();
+}
+
+void MO_CarriedObject::Kick()
+{
+	if(owner)
+	{
+		velx = owner->velx + (owner->IsPlayerFacingRight() ? dKickX : -dKickX);
+		vely = -dKickY;
+		ifsoundonplay(sfx_kicksound);
+	}
+
+	Drop();
+}
 
 //------------------------------------------------------------------------------
 // class egg (for egg mode)
 //------------------------------------------------------------------------------
 CO_Egg::CO_Egg(gfxSprite *nspr, short iColor) :
-	MO_CarriedObject(nspr, 0, 0, 2, 16, 30, 30, 1, 1, 0, iColor << 5, 32, 32)
+	MO_CarriedObject(nspr, 0, 0, 2, 16, 28, 30, 2, 1, 0, iColor << 5, 32, 32)
 {
 	state = 1;
 	bounce = GRAVITATION;
@@ -5511,6 +5536,10 @@ CO_Egg::CO_Egg(gfxSprite *nspr, short iColor) :
 	egganimationrates[3] = 8;
 	egganimationrates[4] = 12;
 	egganimationrates[5] = 16;
+
+	iOwnerRightOffset = HALFPW;
+	iOwnerLeftOffset = HALFPW - 28;
+	iOwnerUpOffset = 32;
 
 	placeEgg();
 }
@@ -5593,10 +5622,7 @@ void CO_Egg::update()
 
 void CO_Egg::draw()
 {
-	if(owner && owner->iswarping())
-		spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, color << 5, iw, ih, (short)owner->state % 4, owner->GetWarpPlane());
-	else
-		spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, color << 5, iw, ih);
+	MO_CarriedObject::draw();
 
 	//Display explosion timer
 	if(game_values.gamemodesettings.egg.explode > 0 && explosiondrawframe < 5)
@@ -5605,15 +5631,6 @@ void CO_Egg::draw()
 			spr_eggnumbers.draw(ix - collisionOffsetX, iy - collisionOffsetY, explosiondrawframe << 5, color << 5, 32, 32, (short)owner->state % 4, owner->GetWarpPlane());
 		else
 			spr_eggnumbers.draw(ix - collisionOffsetX, iy - collisionOffsetY, explosiondrawframe << 5, color << 5, 32, 32);
-	}
-}
-
-void CO_Egg::MoveToOwner()
-{
-	if(owner)
-	{
-		xi(owner->ix + (owner->IsPlayerFacingRight() ? HALFPW : HALFPW - 32));
-		yi(owner->iy + PH - 32 + collisionOffsetY);
 	}
 }
 
@@ -5660,23 +5677,8 @@ void CO_Egg::placeEgg()
 
 void CO_Egg::Drop()
 {
-	if(owner)
-		owner->carriedItem = NULL;
-
-	owner = NULL;
-
-	collision_detection_checksides();
-
+	MO_CarriedObject::Drop();
 	owner_throw_timer = 62;
-}
-
-void CO_Egg::Kick()
-{
-	velx = owner->velx + (owner->IsPlayerFacingRight() ? 2.0f : -2.0f);
-	vely = -4.0f;
-	ifsoundonplay(sfx_kicksound);
-
-	Drop();
 }
 
 //------------------------------------------------------------------------------
@@ -5697,7 +5699,14 @@ CO_Star::CO_Star(gfxSprite *nspr) :
 	sparkleanimationtimer = 0;
 	sparkledrawframe = 0;
 
+	dKickX = 3.0f;
+	dKickY = 6.0f;
+
 	placeStar();
+
+	iOwnerRightOffset = 14;
+	iOwnerLeftOffset = -22;
+	iOwnerUpOffset = 32;
 }
 
 bool CO_Star::collide(CPlayer * player)
@@ -5792,15 +5801,6 @@ void CO_Star::draw()
 		spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, game_values.gamemodesettings.star.shine ? 0 : 32, 32, 32);
 }
 
-void CO_Star::MoveToOwner()
-{
-	if(owner)
-	{
-		xi(owner->ix + (owner->IsPlayerFacingRight() ? HALFPW : HALFPW - 32));
-		yi(owner->iy + PH - 32 + collisionOffsetY);
-	}
-}
-
 void CO_Star::placeStar()
 {
 	timer = 0;
@@ -5818,27 +5818,6 @@ void CO_Star::placeStar()
 	Drop();
 }
 
-void CO_Star::Drop()
-{
-	if(owner)
-		owner->carriedItem = NULL;
-
-	owner = NULL;
-
-	collision_detection_checksides();
-}
-
-void CO_Star::Kick()
-{
-	if(owner)
-	{
-		velx = owner->velx + (owner->IsPlayerFacingRight() ? 3.0f : -3.0f);
-		vely = -6.0f;
-		ifsoundonplay(sfx_kicksound);
-	}
-
-	Drop();
-}
 
 //------------------------------------------------------------------------------
 // class flag base (for CTF mode)
@@ -6035,7 +6014,11 @@ CO_Flag::CO_Flag(gfxSprite *nspr, OMO_FlagBase * base, short iTeamID, short iCol
 	owner_throw_timer = 0;
 
 	centerflag = teamID == -1;
-	
+
+	iOwnerRightOffset = HALFPW - 31;
+	iOwnerLeftOffset = HALFPW + 1;
+	iOwnerUpOffset = 38;
+
 	placeFlag();
 }
 
@@ -6136,12 +6119,10 @@ void CO_Flag::draw()
 
 void CO_Flag::MoveToOwner()
 {
+	MO_CarriedObject::MoveToOwner();
+
 	if(owner)
-	{
 		fLastFlagDirection = owner->IsPlayerFacingRight();
-		xi(owner->ix + HALFPW + (fLastFlagDirection ? -32 : 0));
-		yi(owner->iy + PH - 38 + collisionOffsetY);
-	}
 }
 
 void CO_Flag::placeFlag()
@@ -6173,23 +6154,8 @@ void CO_Flag::placeFlag()
 
 void CO_Flag::Drop()
 {
-	if(owner)
-		owner->carriedItem = NULL;
-
-	owner = NULL;
-
-	collision_detection_checksides();
-
+	MO_CarriedObject::Drop();
 	owner_throw_timer = 62;
-}
-
-void CO_Flag::Kick()
-{
-	velx = owner->velx + (owner->IsPlayerFacingRight() ? 2.0f : -2.0f);
-	vely = -4.0f;
-	ifsoundonplay(sfx_kicksound);
-
-	Drop();
 }
 
 //------------------------------------------------------------------------------
@@ -8314,6 +8280,10 @@ CO_Shell::CO_Shell(short type, short x, short y, bool dieOnMovingPlayerCollision
 
 	fFlipped = false;
 	iFlippedOffset = 0;
+
+	iOwnerRightOffset = 14;
+	iOwnerLeftOffset = -22;
+	iOwnerUpOffset = 32;
 }
 
 bool CO_Shell::collide(CPlayer * player)
@@ -8480,15 +8450,6 @@ void CO_Shell::UsedAsStoredPowerup(CPlayer * player)
 		state = 3;
 	else
 		Kick();
-}
-
-void CO_Shell::MoveToOwner()
-{
-	if(owner)
-	{
-		xi(owner->ix + (owner->IsPlayerFacingRight() ? HALFPW: HALFPW - 32));
-		yi(owner->iy + PH - 32 + collisionOffsetY);
-	}
 }
 
 bool CO_Shell::KillPlayer(CPlayer * player)
@@ -8659,13 +8620,13 @@ void CO_Shell::Drop()
 	if(owner)
 	{
 		owner->carriedItem = NULL;
-		xi(owner->ix + (owner->IsPlayerFacingRight() ? PW + 1: -33));
+		xi(owner->ix + (owner->IsPlayerFacingRight() ? PW + 1: -31));
 	}
 
 	if(collision_detection_checksides())
 	{
 		//Move back to where it was before checking sides, then kill it
-		xi(owner->ix + (owner->IsPlayerFacingRight() ? PW + 1: -33));
+		xi(owner->ix + (owner->IsPlayerFacingRight() ? PW + 1: -31));
 		yi(owner->iy + PH - 32 + collisionOffsetY);
 		Die();
 	}
@@ -8812,6 +8773,10 @@ CO_ThrowBlock::CO_ThrowBlock(gfxSprite * nspr, short x, short y, short type) :
 	iDeathTime = 0;
 	iBounceCounter = 0;
 	iNoOwnerKillTime = 0;
+
+	iOwnerRightOffset = 14;
+	iOwnerLeftOffset = -22;
+	iOwnerUpOffset = 32;
 }
 
 bool CO_ThrowBlock::collide(CPlayer * player)
@@ -8882,16 +8847,6 @@ bool CO_ThrowBlock::HitOther(CPlayer * player)
 
 	return false;
 }
-
-void CO_ThrowBlock::MoveToOwner()
-{
-	if(owner)
-	{
-		xi(owner->ix + (owner->IsPlayerFacingRight() ? 14 : -22));
-		yi(owner->iy + PH - 32 + collisionOffsetY);
-	}
-}
-
 
 bool CO_ThrowBlock::KillPlayer(CPlayer * player)
 {
@@ -9087,6 +9042,10 @@ CO_Spring::CO_Spring(gfxSprite *nspr, short ix, short iy) :
 	bounce = GRAVITATION;
 	objectType = object_moving;
 	movingObjectType = movingobject_carried;
+
+	iOwnerRightOffset = 14;
+	iOwnerLeftOffset = -22;
+	iOwnerUpOffset = 32;
 }
 
 bool CO_Spring::collide(CPlayer * player)
@@ -9178,15 +9137,6 @@ void CO_Spring::draw()
 	}
 }
 
-void CO_Spring::MoveToOwner()
-{
-	if(owner)
-	{
-		xi(owner->ix + (owner->IsPlayerFacingRight() ? 14 : -22));
-		yi(owner->iy + PH - 32 + collisionOffsetY);
-	}
-}
-
 void CO_Spring::place()
 {
 	g_map.findspawnpoint(1, &ix, &iy, collisionWidth, collisionHeight, false);
@@ -9196,24 +9146,6 @@ void CO_Spring::place()
 	Drop();
 }
 
-void CO_Spring::Drop()
-{
-	if(owner)
-		owner->carriedItem = NULL;
-
-	owner = NULL;
-
-	collision_detection_checksides();
-}
-
-void CO_Spring::Kick()
-{
-	velx = owner->velx + (owner->IsPlayerFacingRight() ? 2.0f : -2.0f);
-	vely = -4.0f;
-	ifsoundonplay(sfx_kicksound);
-
-	Drop();
-}
 
 //------------------------------------------------------------------------------
 // class spike
@@ -10208,6 +10140,130 @@ void OMO_PipeBonus::draw()
 		spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, animationOffsetY, iw, ih, 2, 256);
 	else
 		spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, animationOffsetY, iw, ih);
+}
+
+//------------------------------------------------------------------------------
+// class Phanto (for phanto mode)
+//------------------------------------------------------------------------------
+OMO_Phanto::OMO_Phanto(gfxSprite *nspr, short x, short y, float dVelX, float dVelY, short type) :
+	IO_OverMapObject(nspr, x, y, 1, 0, 30, 32, 1, 0, type << 5, 0, 32, 32)
+{
+	objectType = object_phanto;
+	velx = dVelX;
+	vely = dVelY;
+
+	iType = type;
+}
+
+void OMO_Phanto::update()
+{
+	xf(fx + velx);
+	yf(fy + vely);
+
+	//Chase player or move off screen if there is no player holding the key
+
+}
+
+bool OMO_Phanto::collide(CPlayer * player)
+{
+	//If the player is holding the key, kill him
+	if(!player->invincible && player->shield == 0)
+	{
+		//Find the player that made this explosion so we can attribute a kill
+		player->KillPlayerMapHazard(false, kill_style_phanto);
+		return true;
+	}
+
+	return false;
+}
+
+
+//------------------------------------------------------------------------------
+// class phanto key (for chase mode)
+//------------------------------------------------------------------------------
+CO_PhantoKey::CO_PhantoKey(gfxSprite *nspr) :
+	MO_CarriedObject(nspr, 0, 0, 1, 0, 30, 30, 1, 1, 0, 0, 32, 32)
+{
+	state = 1;
+	bounce = GRAVITATION;
+	objectType = object_phantokey;
+	movingObjectType = movingobject_phantokey;
+
+	iOwnerRightOffset = 12;
+	iOwnerLeftOffset = -20;
+	iOwnerUpOffset = 32;
+
+	sparkleanimationtimer = 0;
+	sparkledrawframe = 0;
+
+	placeKey();
+}
+
+bool CO_PhantoKey::collide(CPlayer * player)
+{
+	if(owner == NULL)
+	{
+		if(player->AcceptItem(this))
+		{
+			owner = player;
+		}
+	}
+
+	return false;
+}
+
+void CO_PhantoKey::update()
+{
+	if(owner)
+	{
+		MoveToOwner();
+		relocatetimer = 0;
+	}
+	else if(++relocatetimer > 1000)
+	{
+		placeKey();
+	}
+	else
+	{
+		applyfriction();
+
+		//Collision detect map
+		fOldX = fx;
+		fOldY = fy;
+
+		collision_detection_map();
+	}
+
+	if(++sparkleanimationtimer >= 4)
+	{
+		sparkleanimationtimer = 0;
+		sparkledrawframe += 32;
+		if(sparkledrawframe >= 480)
+			sparkledrawframe = 0;
+	}
+}
+
+void CO_PhantoKey::draw()
+{
+	MO_CarriedObject::draw();
+
+	spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, 0, 32, 32);
+}
+
+void CO_PhantoKey::placeKey()
+{
+	relocatetimer = 0;
+	
+	short x = 0, y = 0;
+	g_map.findspawnpoint(1, &x, &y, collisionWidth, collisionHeight, false);
+
+	xi(x);
+	yi(y);
+
+	vely = GRAVITATION;
+	velx = 0.0f;
+
+	Drop();
 }
 
 

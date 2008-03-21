@@ -4,7 +4,7 @@
 #define GAMEMODE_NUM_OPTIONS 21
 
 //Enum for each game mode
-enum GameModeType{game_mode_frag, game_mode_timelimit, game_mode_coins, game_mode_classic, game_mode_chicken, game_mode_tag, game_mode_frenzy, game_mode_survival, game_mode_eggs, game_mode_domination, game_mode_owned, game_mode_jail, game_mode_stomp, game_mode_race, game_mode_star, game_mode_ctf, game_mode_koth, game_mode_greed, game_mode_health, game_mode_collection, GAMEMODE_LAST, game_mode_boss, game_mode_bonus, game_mode_pipe_minigame};
+enum GameModeType{game_mode_frag, game_mode_timelimit, game_mode_coins, game_mode_classic, game_mode_chicken, game_mode_tag, game_mode_frenzy, game_mode_survival, game_mode_eggs, game_mode_domination, game_mode_owned, game_mode_jail, game_mode_stomp, game_mode_race, game_mode_star, game_mode_ctf, game_mode_koth, game_mode_greed, game_mode_health, game_mode_collection, game_mode_chase, GAMEMODE_LAST, game_mode_boss, game_mode_bonus, game_mode_pipe_minigame};
 enum PlayerKillType{player_kill_none, player_kill_normal, player_kill_removed, player_kill_nonkill};
 
 struct SModeOption
@@ -497,6 +497,30 @@ class CGM_Collection : public CGameMode
 
 	private:
 		short timer;
+};
+
+
+//Chase (player is chased by phanto)
+class CGM_Chase : public CGameMode
+{
+	public:
+        CGM_Chase();
+		virtual ~CGM_Chase() {}
+		
+		void init();
+		void think();
+		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
+		short playerkilledself(CPlayer &player, killstyle style);
+		void playerextraguy(CPlayer &player, short iType);
+
+		short CheckWinner(CPlayer * player);
+
+#ifdef _DEBUG
+		void setdebuggoal() {goal = 50;}
+#endif
+
+	private:
+		CO_PhantoKey * key;
 };
 
 

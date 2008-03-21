@@ -73,12 +73,6 @@
 
 /*
 Checkin:
-1) Fixed case when players are standing still and a flip, switched or hidden block is made visible
-2) Refactored stored powerup code to handle easy storing of powerups
-3) Fixed poison powerup to stick and not allow you to store powerups
-4) Fixed bonus wheel to always have at least 1 poison mushroom on it to try to avoid
-5) Added shield style options: no shield, soft shield, soft with stomp and hard shield
-6) Added multipliers option to King of the Hill mode
 */
 
 #ifdef _XBOX
@@ -322,6 +316,7 @@ gfxSprite		spr_awardsoulspawn;
 gfxSprite		spr_awardkillsinrow;
 gfxSprite		spr_flagbases;
 gfxSprite		spr_ownedtags;
+gfxSprite		spr_phanto, spr_phantokey;
 
 gfxSprite		spr_storedpowerupsmall;
 gfxSprite		spr_storedpoweruplarge;
@@ -918,6 +913,7 @@ int main(int argc, char *argv[])
 	gamemodes[17] = new CGM_Greed();
 	gamemodes[18] = new CGM_Health();
 	gamemodes[19] = new CGM_Collection();
+	gamemodes[20] = new CGM_Chase();
 
 	currentgamemode = 0;
 	game_values.gamemode = gamemodes[currentgamemode];

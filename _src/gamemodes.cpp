@@ -721,30 +721,28 @@ void CGM_Chicken::think()
 	if(gameover)
 	{
 		displayplayertext();
+		return;
 	}
-	else
+
+	if(chicken)
 	{
-		if(chicken)
+		if( chicken->velx > VELMOVING_CHICKEN )
+			chicken->velx = VELMOVING_CHICKEN;
+		else if(chicken->velx < -VELMOVING_CHICKEN)
+			chicken->velx = -VELMOVING_CHICKEN;
+
+		static short counter = 0;
+
+		if(chicken->isready() && chicken->statue_timer == 0)
 		{
-			if( chicken->velx > VELMOVING_CHICKEN )
-				chicken->velx = VELMOVING_CHICKEN;
-			else if(chicken->velx < -VELMOVING_CHICKEN)
-				chicken->velx = -VELMOVING_CHICKEN;
-
-			static short counter = 0;
-
-			if(chicken->isready() && chicken->statue_timer == 0)
+			if(++counter >= game_values.pointspeed)
 			{
-				if(++counter >= game_values.pointspeed)
-				{
-					counter = 0;
-					chicken->score->AdjustScore(1);
-				}
+				counter = 0;
+				chicken->score->AdjustScore(1);
+				CheckWinner(chicken);
 			}
-
-			CheckWinner(chicken);
-		}	
-	}
+		}
+	}	
 }
 
 void CGM_Chicken::draw_foreground()
@@ -2745,6 +2743,98 @@ short CGM_Collection::CheckWinner(CPlayer * player)
 }
 
 
+
+//Chase (hold a key for points while phantos chase you)
+CGM_Chase::CGM_Chase() : CGameMode()
+{
+	goal = 200;
+	gamemode = game_mode_chase;
+
+	SetupModeStrings("Phanto", "Points", 50);
+}
+
+void CGM_Chase::init()
+{
+	CGameMode::init();
+
+	//Add a phanto
+	objectcontainer[1].add(new OMO_Phanto(&spr_phanto, 200, 200, 0.0f, 0.0f, 0));
+
+	//Add a key
+	key = new CO_PhantoKey(&spr_phantokey);
+	objectcontainer[1].add(key);
+}
+
+void CGM_Chase::think()
+{
+	if(gameover)
+	{
+		displayplayertext();
+		return;
+	}
+
+	CPlayer * keyholder = key->owner;
+	if(keyholder)
+	{
+		static short counter = 0;
+
+		if(keyholder->isready() && keyholder->statue_timer == 0)
+		{
+			if(++counter >= game_values.pointspeed)
+			{
+				counter = 0;
+				keyholder->score->AdjustScore(1);
+				CheckWinner(keyholder);
+			}
+		}		
+	}
+}
+
+short CGM_Chase::playerkilledplayer(CPlayer &player, CPlayer &other, killstyle style)
+{
+	return player_kill_normal;
+}
+
+short CGM_Chase::playerkilledself(CPlayer &player, killstyle style)
+{
+	CGameMode::playerkilledself(player, style);
+
+	return player_kill_normal;
+}
+
+void CGM_Chase::playerextraguy(CPlayer &player, short iType)
+{
+	if(!gameover)
+	{
+		player.score->AdjustScore(iType);
+		CheckWinner(&player);
+	}
+}
+
+short CGM_Chase::CheckWinner(CPlayer * player)
+{
+	if(goal == -1)
+		return player_kill_normal;
+
+	if(player->score->score >= goal)
+	{
+		player->score->SetScore(goal);
+		winningteam = player->teamID;
+		gameover = true;
+
+		SetupScoreBoard(false);
+		ShowScoreBoard();
+		RemovePlayersButTeam(winningteam);
+		
+		return player_kill_removed;
+	}
+	else if(player->score->score >= goal * 0.8 && !playedwarningsound)
+	{
+		playwarningsound();
+	}
+
+	return player_kill_normal;
+}
 
 //Boss Mode
 //Person to score fatal hit to boss wins!

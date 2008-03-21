@@ -283,6 +283,9 @@ bool LoadGameGraphics()
 	gfx_loadimage(&spr_racegoal, convertPath("gfx/packs/modeobjects/racegoal.png", graphicspack), false);
 	gfx_loadimage(&spr_pipegamebonus, convertPath("gfx/packs/modeobjects/pipeminigamebonuses.png", graphicspack), true);
 
+	gfx_loadimage(&spr_phanto, convertPath("gfx/packs/modeobjects/phanto.png", graphicspack), true);
+	gfx_loadimage(&spr_phantokey, convertPath("gfx/packs/modeobjects/key.png", graphicspack), true);
+
 	gfx_loadimage(&spr_bonuschest, convertPath("gfx/packs/modeobjects/bonuschest.png", graphicspack), true);
 	gfx_loadimage(&spr_teleportstar, convertPath("gfx/packs/eyecandy/teleportstar.png", graphicspack), false);
 	
