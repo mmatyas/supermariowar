@@ -2700,6 +2700,57 @@ void Menu::CreateMenu()
 	mModeSettingsMenu[19].SetHeadControl(miCollectionModeQuantityField);
 	mModeSettingsMenu[19].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
+	//***********************
+	// Chase Mode Settings
+	//***********************
+
+	miChaseModeSpeedField = new MI_SelectField(&spr_selectfield, 120, 160, "Speed", 400, 180);
+	miChaseModeSpeedField->Add("Very Slow", 3, "", false, false);
+	miChaseModeSpeedField->Add("Slow", 4, "", false, false);
+	miChaseModeSpeedField->Add("Moderate", 5, "", false, false);
+	miChaseModeSpeedField->Add("Fast", 6, "", false, false);
+	miChaseModeSpeedField->Add("Very Fast", 7, "", false, false);
+	miChaseModeSpeedField->Add("Extremely Fast", 8, "", false, false);
+	miChaseModeSpeedField->Add("Insanely Fast", 10, "", false, false);
+	miChaseModeSpeedField->SetData(&game_values.gamemodemenusettings.chase.phantospeed, NULL, NULL);
+	miChaseModeSpeedField->SetKey(game_values.gamemodemenusettings.chase.phantospeed);
+
+	for(short iPhanto = 0; iPhanto < 3; iPhanto++)
+	{
+		miChaseModeQuantitySlider[iPhanto] = new MI_PowerupSlider(&spr_selectfield, &menu_slider_bar, &spr_phanto, 120, 200 + 40 * iPhanto, 400, iPhanto);
+		miChaseModeQuantitySlider[iPhanto]->Add("", 0, "", false, false);
+		miChaseModeQuantitySlider[iPhanto]->Add("", 1, "", false, false);
+		miChaseModeQuantitySlider[iPhanto]->Add("", 2, "", false, false);
+		miChaseModeQuantitySlider[iPhanto]->Add("", 3, "", false, false);
+		miChaseModeQuantitySlider[iPhanto]->Add("", 4, "", false, false);
+		miChaseModeQuantitySlider[iPhanto]->Add("", 5, "", false, false);
+		miChaseModeQuantitySlider[iPhanto]->SetNoWrap(true);
+		miChaseModeQuantitySlider[iPhanto]->SetData(&game_values.gamemodemenusettings.chase.phantoquantity[iPhanto], NULL, NULL);
+		miChaseModeQuantitySlider[iPhanto]->SetKey(game_values.gamemodemenusettings.chase.phantoquantity[iPhanto]);
+	}
+
+	miChaseModeBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
+	miChaseModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
+
+	miChaseModeLeftHeaderBar = new MI_Image(&menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
+	miChaseModeRightHeaderBar = new MI_Image(&menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
+	miChaseModeHeaderText = new MI_Text("Chase Mode Menu", 320, 5, 0, 2, 1);
+
+	mModeSettingsMenu[20].AddControl(miChaseModeSpeedField, miChaseModeBackButton, miChaseModeQuantitySlider[0], NULL, miChaseModeBackButton);
+
+	mModeSettingsMenu[20].AddControl(miChaseModeQuantitySlider[0], miChaseModeSpeedField, miChaseModeQuantitySlider[1], NULL, miChaseModeBackButton);
+	mModeSettingsMenu[20].AddControl(miChaseModeQuantitySlider[1], miChaseModeQuantitySlider[0], miChaseModeQuantitySlider[2], NULL, miChaseModeBackButton);
+	mModeSettingsMenu[20].AddControl(miChaseModeQuantitySlider[2], miChaseModeQuantitySlider[1], miChaseModeBackButton, NULL, miChaseModeBackButton);
+
+	mModeSettingsMenu[20].AddControl(miChaseModeBackButton, miChaseModeQuantitySlider[2], miChaseModeSpeedField, miChaseModeQuantitySlider[2], NULL);
+	
+	mModeSettingsMenu[20].AddNonControl(miChaseModeLeftHeaderBar);
+	mModeSettingsMenu[20].AddNonControl(miChaseModeRightHeaderBar);
+	mModeSettingsMenu[20].AddNonControl(miChaseModeHeaderText);
+	
+	mModeSettingsMenu[20].SetHeadControl(miChaseModeSpeedField);
+	mModeSettingsMenu[20].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
+
 
 	//***********************
 	// Team Select Settings
@@ -3244,7 +3295,7 @@ void Menu::RunMenu()
 		{
 			MenuCodeEnum code = mCurrentMenu->SendInput(&game_values.playerInput);
 
-			bool fShowSettingsButton[GAMEMODE_LAST] = {true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, true, true, true, true, true, false};
+			bool fShowSettingsButton[GAMEMODE_LAST] = {true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, true, true, true, true, true, true};
 
 			if(MENU_CODE_EXIT_APPLICATION == code)
 			{

@@ -356,7 +356,7 @@ class Menu
 
 
 		//Game Mode Settings Menu
-		UI_Menu mModeSettingsMenu[20];
+		UI_Menu mModeSettingsMenu[21];
 
 		//Classic
 		MI_SelectField * miClassicModeStyleField;
@@ -549,6 +549,15 @@ class Menu
 		MI_Image * miCollectionModeLeftHeaderBar;
 		MI_Image * miCollectionModeRightHeaderBar;
 		MI_Text * miCollectionModeHeaderText;
+
+		//Phanto Chase
+		MI_SelectField * miChaseModeSpeedField;
+		MI_PowerupSlider * miChaseModeQuantitySlider[3];
+		MI_Button * miChaseModeBackButton;
+		
+		MI_Image * miChaseModeLeftHeaderBar;
+		MI_Image * miChaseModeRightHeaderBar;
+		MI_Text * miChaseModeHeaderText;
 
 
 		//Team Select

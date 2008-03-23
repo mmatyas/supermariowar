@@ -10153,6 +10153,13 @@ OMO_Phanto::OMO_Phanto(gfxSprite *nspr, short x, short y, float dVelX, float dVe
 	vely = dVelY;
 
 	iType = type;
+
+	dMaxSpeedY = (float)game_values.gamemodesettings.chase.phantospeed / 2.0f;
+	dMaxSpeedX = dMaxSpeedY + 1.0f;
+	dSpeedRatio = (float)game_values.gamemodesettings.chase.phantospeed / 6.0f;
+
+	iSpeedTimer = 0;
+	dReactionSpeed = 0.2f;
 }
 
 void OMO_Phanto::update()
@@ -10160,18 +10167,125 @@ void OMO_Phanto::update()
 	xf(fx + velx);
 	yf(fy + vely);
 
-	//Chase player or move off screen if there is no player holding the key
+	if(fx < 0.0f)
+		xf(fx + 640.0f);
+	else if(fx + iw >= 640.0f)
+		xf(fx - 640.0f);
 
+	if(++iSpeedTimer > 62)
+	{
+		iSpeedTimer = 0;
+		dReactionSpeed = (0.05f + (float)(rand() % 20) / 100.0f) * dSpeedRatio;
+	}
+
+	//Chase player or move off screen if there is no player holding the key
+	if(game_values.gamemode->gamemode == game_mode_chase)
+	{
+		CGM_Chase * chasemode = (CGM_Chase*)game_values.gamemode;
+
+		CPlayer * player = chasemode->GetKeyHolder();
+
+		if(!game_values.gamemode->gameover && player) //Chase the player
+		{
+			bool fWrap = false;
+			if(abs(player->ix - ix) > 320)
+				fWrap = true;
+
+			//Chase wrapped around edge of screen
+			if((player->ix < ix && !fWrap) || (player->ix > ix && fWrap)) 
+			{
+				velx -= dReactionSpeed;
+				
+				if(velx < -dMaxSpeedX)
+					velx = -dMaxSpeedX;
+			}
+			else 
+			{
+				velx += dReactionSpeed;
+
+				if(velx > dMaxSpeedX)
+					velx = dMaxSpeedX;
+			}
+
+			if(player->iy < iy)
+			{
+				vely -= dReactionSpeed;
+				
+				if(vely < -dMaxSpeedY)
+					vely = -dMaxSpeedY;
+			}
+			else 
+			{
+				vely += dReactionSpeed;
+
+				if(vely > dMaxSpeedY)
+					vely = dMaxSpeedY;
+			}
+		}
+		else //Wander off screen
+		{
+			if(iy > 240)
+			{
+				vely += dReactionSpeed;
+
+				if(vely > dMaxSpeedY)
+					vely = dMaxSpeedY;
+			}
+			else
+			{
+				vely -= dReactionSpeed;
+				
+				if(vely < -dMaxSpeedY)
+					vely = -dMaxSpeedY;
+			}
+
+			if(iy >= 480 || iy + ih < 0)
+			{
+				vely = 0.0f;
+				velx = 0.0f;
+
+				//Randomly position phanto off screen
+				xi(rand() % 640);
+				yi(rand() % 2 == 0 ? -ih : 480);
+			}
+		}
+	}
 }
 
 bool OMO_Phanto::collide(CPlayer * player)
 {
+	if(iy <= -ih || iy >= 480)
+		return false;
+
 	//If the player is holding the key, kill him
 	if(!player->invincible && player->shield == 0)
 	{
-		//Find the player that made this explosion so we can attribute a kill
-		player->KillPlayerMapHazard(false, kill_style_phanto);
-		return true;
+		if(iType == 2)
+		{
+			player->KillPlayerMapHazard(false, kill_style_phanto);
+			return true;
+		}
+		else
+		{
+			if(game_values.gamemode->gamemode == game_mode_chase)
+			{
+				CGM_Chase * chasemode = (CGM_Chase*)game_values.gamemode;
+				CPlayer * keyholder = chasemode->GetKeyHolder();
+
+				if(keyholder == player)
+				{
+					player->KillPlayerMapHazard(false, kill_style_phanto);
+
+					if(!game_values.gamemode->gameover && iType == 1)
+					{
+						player->score->AdjustScore(-10);
+						ifsoundonplay(sfx_stun);
+					}
+
+					return true;
+				}
+			}
+		}
 	}
 
 	return false;

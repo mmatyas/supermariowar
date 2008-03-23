@@ -3048,6 +3048,9 @@ void CPlayer::DrawWings()
 
 void CPlayer::drawarrows()
 {
+	if(state != player_ready)
+		return;
+
 	if(iy < 0)
 	{
 		if(iy + PH < -1 || (iy + PH <= 0 && vely <= 1))

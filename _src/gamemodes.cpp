@@ -2757,8 +2757,12 @@ void CGM_Chase::init()
 {
 	CGameMode::init();
 
-	//Add a phanto
-	objectcontainer[1].add(new OMO_Phanto(&spr_phanto, 200, 200, 0.0f, 0.0f, 0));
+	//Add phantos based on settings
+	for(short iPhanto = 0; iPhanto < 3; iPhanto++)
+	{
+		for(short iNumPhantos = 0; iNumPhantos < game_values.gamemodesettings.chase.phantoquantity[iPhanto]; iNumPhantos++)
+			objectcontainer[1].add(new OMO_Phanto(&spr_phanto, rand() % 640, rand() % 2 == 0 ? -32 : 480, 0.0f, 0.0f, iPhanto));
+	}
 
 	//Add a key
 	key = new CO_PhantoKey(&spr_phantokey);

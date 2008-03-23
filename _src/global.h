@@ -743,6 +743,12 @@ struct CollectionGameModeSettings
 	short banktime;				//Amount of time needed to bank cards to score
 };
 
+struct ChaseGameModeSettings
+{
+	short phantospeed;			//How fast the phantos move
+	short phantoquantity[3];	//How many phantos there are
+};
+
 struct GameModeSettings
 {
 	ClassicGameModeSettings classic;
@@ -764,6 +770,7 @@ struct GameModeSettings
 	GreedGameModeSettings greed;
 	HealthGameModeSettings health;
 	CollectionGameModeSettings collection;
+	ChaseGameModeSettings chase;
 };
 
 struct WorldStageBonus

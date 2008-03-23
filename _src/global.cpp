@@ -648,15 +648,15 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.collection.rate, NULL, game_values.gamemodemenusettings.collection.rate, false);
 				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.collection.banktime, NULL, game_values.gamemodemenusettings.collection.banktime, false);
 			}
-			/*
 			else if(ts->iMode == 20) //chase (phanto)
 			{
 				ts->fUseSettings = true;
 				
-				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.collection.quantity, NULL, game_values.gamemodemenusettings.collection.quantity, false);
-				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.collection.rate, NULL, game_values.gamemodemenusettings.collection.rate, false);
-				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.collection.banktime, NULL, game_values.gamemodemenusettings.collection.banktime, false);
-			}*/
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.chase.phantospeed, NULL, game_values.gamemodemenusettings.chase.phantospeed, false);
+
+				for(short iPhanto = 0; iPhanto < 3; iPhanto++)
+					ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.chase.phantoquantity[iPhanto], NULL, game_values.gamemodemenusettings.chase.phantoquantity[iPhanto], false);
+			}
 		}
 	}
 	else if(iStageType == 1) //Bonus House
@@ -1169,12 +1169,20 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
 					sprintf(szTemp, ",%d", ts->gmsSettings.collection.banktime);
 					strcat(buffer, szTemp);
 				}
-
-				for(short iPowerup = 0; iPowerup < 12; iPowerup++)
+			}
+			else if(ts->iMode == 20) //phanto chase mode
+			{
+				if(ts->iNumUsedSettings > 0)
 				{
-					if(ts->iNumUsedSettings > iPowerup + 3)
+					sprintf(szTemp, ",%d", ts->gmsSettings.chase.phantospeed);
+					strcat(buffer, szTemp);
+				}
+
+				for(short iPhanto = 0; iPhanto < 3; iPhanto++)
+				{
+					if(ts->iNumUsedSettings > iPhanto + 1)
 					{
-						sprintf(szTemp, ",%d", ts->gmsSettings.frenzy.powerupweight[iPowerup]);
+						sprintf(szTemp, ",%d", ts->gmsSettings.chase.phantoquantity[iPhanto]);
 						strcat(buffer, szTemp);
 					}
 				}

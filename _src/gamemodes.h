@@ -515,6 +515,8 @@ class CGM_Chase : public CGameMode
 
 		short CheckWinner(CPlayer * player);
 
+		CPlayer * GetKeyHolder() {return key->owner;}
+
 #ifdef _DEBUG
 		void setdebuggoal() {goal = 50;}
 #endif

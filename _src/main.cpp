@@ -1043,6 +1043,12 @@ int main(int argc, char *argv[])
 	game_values.gamemodemenusettings.collection.rate = 186;			//3 seconds to spawn
 	game_values.gamemodemenusettings.collection.banktime = 310;		//5 seconds to bank
 	
+	//Phanto Chase
+	game_values.gamemodemenusettings.chase.phantospeed = 6;			//Medium speed
+	game_values.gamemodemenusettings.chase.phantoquantity[0] = 1;
+	game_values.gamemodemenusettings.chase.phantoquantity[1] = 1;
+	game_values.gamemodemenusettings.chase.phantoquantity[2] = 0;
+
 	//Read saved settings from disk
 	FILE *fp;
 

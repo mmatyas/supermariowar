@@ -1845,6 +1845,10 @@ class OMO_Phanto : public IO_OverMapObject
 
 	private:
 		short iType;
+
+		float dMaxSpeedX, dMaxSpeedY;
+		float dReactionSpeed, dSpeedRatio;
+		short iSpeedTimer;
 };
 
 class CO_PhantoKey : public MO_CarriedObject
