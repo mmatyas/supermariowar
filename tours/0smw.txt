@@ -21,6 +21,10 @@
 #14 = Owned
 #15 = Frenzy
 #16 = Survival
+#17 = Greed
+#18 = Health
+#19 = Card Collection
+#20 = Phanto Chase
 
 #Version
 1.8.0.0
@@ -143,10 +147,16 @@
 #Max Life - Number of hearts that a team can collect up to - number between 1 and 10
 #Percent Extra Life - Percent chance a special heart powerup will spawn from a powerup block - number between 0 and 100
 
-#19 - Cards
+#19 - Card Collection
 #Limit - 1 to 5 = that number of cards, 6 on up = #players - 1 cards on up
 #Rate - 0 = instant, any number greater than 0 is the amount of time in frames that is between card spawns (example: 310 is about 5 seconds)
 #Bank Time - 0 = instant, any number greater than 0 is the amount of time in frames that is between card spawns (example: 310 is about 5 seconds)
+
+#20 - Phanto Chase
+#Phanto Speed - Any positive number, the bigger the greater the speed (5 is normal, 2 is very slow and 7 is very fast for example)
+#Yellow Phanto Quantity - Number of yellow phantos from 0 on up
+#Red Phanto Quantity - Number of red phantos from 0 on up
+#Green Phanto Quantity - Number of green phantos from 0 on up
 
 
 #Tour Stops (maximum 10 stops)

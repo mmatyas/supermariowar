@@ -46,8 +46,7 @@
 //[ ] World AI needs ability to use stored items -> harder problem than I have time for
 //[ ] Add SMB3's first world as a test world to ship with
 
-//[ ] Option to make the shield a "soft" shield and allow the player to not be able to kill (stomp) when shielded - lots of requests for this
-//[ ] Announcement that a player/team was removed from game - needs more specing but this could be helpful
+//[ ] Announcement that a player/team was removed from game - needs more specing but this could be helpful - with announcer hook?
 //[ ] Countdown before match begins, 3..., 2..., 1... with announcer hooks
 //[ ] Better eyecandy block for 10+ kills like stars - need gfx
 //[ ] On/Off switch [?] and note blocks and possibly other types of on/off blocks
@@ -63,8 +62,6 @@
 //[ ] Reverse gravity blue podoboos
 //[ ] Breaking skull blocks (too close to donut block, perhaps)
 
-* Phanto Mode (there is a key and whoever has the key is chased by a Phanto)
-- Hammers or something arc-pathed in Survival
 * Bomb option in Star mode
 * Multiple selectable item switch presets
 - Mariokart-type podium at the end of a tournament/tour/whatever
