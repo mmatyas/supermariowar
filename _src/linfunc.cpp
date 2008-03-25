@@ -34,7 +34,7 @@ bool CopyFile(const char *src, const char *dest, bool dontOverwrite)
 }
 #endif
 
-char *strlwr(char *str)
+char *_strlwr(char *str)
 {
     char *p = str;
 
