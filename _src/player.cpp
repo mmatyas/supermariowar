@@ -44,6 +44,9 @@ CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamI
 	
 	powerupused = -1;
 
+	//Do this so we have a valid x,y to say the player is so other items that init with the player will get valid positions
+	FindSpawnPoint();
+
 	respawncounter = respawn;
 	SetupNewPlayer();
 	*respawncounter = 0;
@@ -572,8 +575,8 @@ void CPlayer::move()
 		iSrcOffsetX = animationstate;
 	else if(game_values.gamemode->tagged == this)
 		iSrcOffsetX = 160;
-	else if(game_values.gamemode->star == this)
-		iSrcOffsetX = game_values.gamemodesettings.star.shine ? 224 : 192;
+	else if(game_values.gamemode->gamemode == game_mode_star && ((CGM_Star*)game_values.gamemode)->isplayerstar(this))
+		iSrcOffsetX = ((CGM_Star*)game_values.gamemode)->getcurrentmodetype() ? 224 : 192;
 	else if(frozen)
 		iSrcOffsetX = 256;
 	else if(shield > 0)
@@ -2161,7 +2164,11 @@ void CPlayer::addswirlingawards()
 	for(short k = 0; k < numawards; k++)
 	{
 		float angle = (float)k * addangle + awardangle;
-		eyecandyfront.add(new EC_SwirlingAward(&spr_awardkillsinrow, ix + HALFPW - 8, iy + HALFPH - 8, angle, 30.0f, 0.05f, 60, numawards - 1, colorID, 16, 16));
+		
+		if(numawards == MAXAWARDS)
+			eyecandyfront.add(new EC_SwirlingAward(&spr_awardkillsinrow, ix + HALFPW - 8, iy + HALFPH - 8, angle, 30.0f, 0.05f, 60, 10, colorID, 16, 16, 4, 4));
+		else
+			eyecandyfront.add(new EC_SwirlingAward(&spr_awardkillsinrow, ix + HALFPW - 8, iy + HALFPH - 8, angle, 30.0f, 0.05f, 60, numawards - 1, colorID, 16, 16));
 	}
 }
 
@@ -2182,8 +2189,11 @@ void CPlayer::addrocketawards()
 		float angle = (float)k * addangle + startangle;
 		float awardvelx = 9.0f * cos(angle);
 		float awardvely = 9.0f * sin(angle);
-			
-		eyecandyfront.add(new EC_RocketAward(&spr_awardkillsinrow, ix + HALFPW - 8, iy + HALFPH - 8, awardvelx, awardvely, 80, numawards - 1, colorID, 16, 16));
+		
+		if(numawards == MAXAWARDS)
+			eyecandyfront.add(new EC_RocketAward(&spr_awardkillsinrow, ix + HALFPW - 8, iy + HALFPH - 8, awardvelx, awardvely, 80, 10, colorID, 16, 16, 4, 4));
+		else
+			eyecandyfront.add(new EC_RocketAward(&spr_awardkillsinrow, ix + HALFPW - 8, iy + HALFPH - 8, awardvelx, awardvely, 80, numawards - 1, colorID, 16, 16));
 	}
 }
 
@@ -4268,16 +4278,31 @@ void CPlayer::SetPowerup(short iPowerup)
 			bobomb = true;
 		}
 	}
-	else if(iPowerup > 8)
+	else if(iPowerup == 9)
 	{
-		if(iPowerup == 9)
-			SetStoredPowerup(9);
-		else if(iPowerup == 10)
-			SetStoredPowerup(16);
+		if(tanooki)
+			SetStoredPowerup(20);
+		else
+		{
+			ifsoundonplay(sfx_collectpowerup);
+			tanooki = true;
+
+			if(game_values.tanookilimit > 0)
+				tanookilimit = game_values.tanookilimit;
+		}
+	}
+	else if(iPowerup >= 10)
+	{
+		if(iPowerup == 10)
+			SetStoredPowerup(9);   //POW
 		else if(iPowerup == 11)
-			SetStoredPowerup(10);
-		else if(iPowerup > 11)
-			SetStoredPowerup(iPowerup); //Storing shells
+			SetStoredPowerup(16);  //MOd
+		else if(iPowerup == 12)
+			SetStoredPowerup(10);  //Bullet Bill
+		else if(iPowerup == 13)
+			SetStoredPowerup(22);  //Podobo
+		else if(iPowerup >= 14)
+			SetStoredPowerup(iPowerup - 2); //Storing shells
 	}
 	else
 	{

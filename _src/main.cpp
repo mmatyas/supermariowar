@@ -48,7 +48,6 @@
 
 //[ ] Announcement that a player/team was removed from game - needs more specing but this could be helpful - with announcer hook?
 //[ ] Countdown before match begins, 3..., 2..., 1... with announcer hooks
-//[ ] Better eyecandy block for 10+ kills like stars - need gfx
 //[ ] On/Off switch [?] and note blocks and possibly other types of on/off blocks
 //[ ] Enemies should die in lava
 //[ ] Quick Match option that selects everything random for you
@@ -61,6 +60,8 @@
 //[ ] Thunderbolt style spawn
 //[ ] Reverse gravity blue podoboos
 //[ ] Breaking skull blocks (too close to donut block, perhaps)
+//[ ] When editing the tile types, have a keyboard shortcut that just clears the tile types, allowing you to start from scratch. 
+//[ ] What about re-appear for bricks/blue/flip/etc.? Is this doable with not much effort?
 
 * Bomb option in Star mode
 * Multiple selectable item switch presets

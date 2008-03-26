@@ -123,11 +123,12 @@ void ShowScoreBoard()
 	}
 }
 
-void RemoveTeam(short teamid)
+//Returns true if all but one team is dead
+bool RemoveTeam(short teamid)
 {
 	//If we have already removed this team then return
 	if(score[teamid]->order > -1)
-		return;
+		return game_values.teamdeadcounter == score_cnt - 1;
 
 	//kill all players on the dead team
 	for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++)
@@ -139,6 +140,8 @@ void RemoveTeam(short teamid)
 	}
 
 	score[teamid]->order = game_values.teamdeadcounter++;
+
+	return game_values.teamdeadcounter == score_cnt - 1;
 }
 
 CGameMode::CGameMode()
@@ -159,7 +162,6 @@ void CGameMode::init()  //called once when the game is started
 
 	chicken = NULL; 
 	tagged = NULL;
-	star = NULL;
 	frenzyowner = NULL;
 
 	winningteam = -1; 
@@ -256,6 +258,7 @@ CPlayer * CGameMode::GetHighestScorePlayer(bool fGetHighest)
 	short tiedplayers[4];
 	tiedplayers[0] = 0;
 
+	//Find the first non-dead player and use them for the first player to compare to
 	for(j = 0; j < list_players_cnt; j++)
 	{
 		if(!list_players[j]->isdead())
@@ -266,6 +269,7 @@ CPlayer * CGameMode::GetHighestScorePlayer(bool fGetHighest)
 		}
 	}
 
+	//Loop through all players, comparing scores to find the highest/lowest
 	for(i = j + 1; i < list_players_cnt; i++)
 	{
 		if(!list_players[i]->isdead())
@@ -287,6 +291,43 @@ CPlayer * CGameMode::GetHighestScorePlayer(bool fGetHighest)
 	return list_players[tiedplayers[rand() % count]];
 }
 
+//Returns number of players in list
+short CGameMode::GetScoreRankedPlayerList(CPlayer * players[4], bool fGetHighest)
+{
+	short iNumPlayersInList = 0;
+
+	for(short iIndex = 0; iIndex < list_players_cnt; iIndex++)
+	{
+		if(list_players[iIndex]->isdead())
+			continue;
+			
+		players[iNumPlayersInList++] = list_players[iIndex];
+	}
+
+	//Bubble sort players in to score order
+	bool fNeedSwap = true;
+
+	while(fNeedSwap)
+	{
+		fNeedSwap = false;
+		short iRandom = 0;
+		for(short iIndex = 0; iIndex < iNumPlayersInList - 1; iIndex++)
+		{
+			if((fGetHighest && players[iIndex]->score->score < players[iIndex + 1]->score->score) ||
+				(!fGetHighest && players[iIndex]->score->score > players[iIndex + 1]->score->score) ||
+				(players[iIndex]->score->score == players[iIndex + 1]->score->score && rand() % 2 && iRandom++ < 5))
+			{
+				CPlayer * pTemp = players[iIndex];
+				players[iIndex] = players[iIndex + 1];
+				players[iIndex + 1] = pTemp;
+
+				fNeedSwap = true;
+			}
+		}
+	}
+
+	return iNumPlayersInList;
+}
 
 short CGameMode::GetClosestGoal(short iGoal)
 {
@@ -1211,7 +1252,7 @@ void CGM_Frenzy::init()
 	timer = 0;
 
 	iItemWeightCount = 0;
-	for(short iPowerup = 0; iPowerup < 12; iPowerup++)
+	for(short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++)
 		iItemWeightCount += game_values.gamemodesettings.frenzy.powerupweight[iPowerup];
 
 	if(iItemWeightCount == 0)
@@ -2070,18 +2111,22 @@ void CGM_Race::PenalizeRaceGoals(CPlayer &player)
 }
 
 
-
-//star
+/********************************************
+* star mode
+********************************************/
 CGM_Star::CGM_Star() : CGM_TimeLimit()
 {
 	goal = 5;
 	gamemode = game_mode_star;
 	SetupModeStrings("Star", "Lives", 1);
+	iCurrentModeType = 0;
 };
 
 void CGM_Star::init()
 {
 	CGM_TimeLimit::init();
+
+	fDisplayTimer = true;
 
 	timeleft = game_values.gamemodesettings.star.time;
 	if(timeleft < 1)
@@ -2089,16 +2134,16 @@ void CGM_Star::init()
 
 	SetDigitCounters();
 
-	if(game_values.gamemodesettings.star.shine < 0 || game_values.gamemodesettings.star.shine > 1)
+	if(game_values.gamemodesettings.star.shine < 0 || game_values.gamemodesettings.star.shine > 3)
 		game_values.gamemodesettings.star.shine = 0;
+
+	iCurrentModeType = game_values.gamemodesettings.star.shine;
+	if(iCurrentModeType == 3)
+		iCurrentModeType = rand() % 3;
 
 	fReverseScoring = goal == -1;
 
-	star = GetHighestScorePlayer(!fReverseScoring && !game_values.gamemodesettings.star.shine);
-									
-	starItem = new CO_Star(&spr_star);
-	objectcontainer[1].add(starItem);
-
+	//Set initial scores
 	for(short iScore = 0; iScore < score_cnt; iScore++)
 	{
 		if(fReverseScoring)
@@ -2106,8 +2151,53 @@ void CGM_Star::init()
 		else
 			score[iScore]->SetScore(goal);
 	}
+
+	for(short iStar = 0; iStar < 3; iStar++)
+	{
+		starItem[iStar] = NULL;
+		starPlayer[iStar] = NULL;
+	}
+
+	SetupMode();
 }
 
+void CGM_Star::SetupMode()
+{
+	//Clean up old stars
+	for(short iStar = 0; iStar < 3; iStar++)
+	{
+		if(starItem[iStar])
+		{
+			starItem[iStar]->Drop();
+			starItem[iStar]->dead = true;
+			starItem[iStar] = NULL;
+		}
+
+		starPlayer[iStar] = NULL;
+	}
+
+	//If multi star, add more stars
+	if(iCurrentModeType == 2)
+	{
+		CPlayer * players[4];
+		short iNumPlayers = GetScoreRankedPlayerList(players, fReverseScoring);
+
+		for(short iStar = 0; iStar < iNumPlayers - 1; iStar++)
+		{
+			starPlayer[iStar] = players[iStar];
+
+			starItem[iStar] = new CO_Star(&spr_star, 1, iStar);
+			objectcontainer[1].add(starItem[iStar]);
+		}
+	}
+	else //otherwise, add just a single star
+	{
+		starPlayer[0] = GetHighestScorePlayer(!fReverseScoring && iCurrentModeType == 0);
+									
+		starItem[0] = new CO_Star(&spr_star, iCurrentModeType == 0 ? 0 : 1, 0);
+		objectcontainer[1].add(starItem[0]);
+	}
+}
 
 void CGM_Star::think()
 {
@@ -2117,9 +2207,37 @@ void CGM_Star::think()
 		return;
 	}
 
-	if(!star)
-		star = GetHighestScorePlayer(!fReverseScoring && !game_values.gamemodesettings.star.shine);
+	//Make sure there is a star player(s)
+	if(iCurrentModeType == 2)
+	{
+		for(short iStar = 0; iStar < list_players_cnt - 1; iStar++)
+		{
+			//If we're missing a star player, then reassign them all
+			if(!starPlayer[iStar])
+			{
+				CPlayer * players[4];
+				short iNumPlayers = GetScoreRankedPlayerList(players, fReverseScoring);
 
+				for(short iStar = 0; iStar < iNumPlayers - 1; iStar++)
+				{
+					starPlayer[iStar] = players[iStar];
+					starItem[iStar]->placeStar();
+				}
+
+				break;
+			}
+		}
+	}
+	else
+	{
+		if(!starPlayer[0])
+		{
+			starPlayer[0] = GetHighestScorePlayer(!fReverseScoring && !game_values.gamemodesettings.star.shine);
+			starItem[0]->placeStar();
+		}
+	}
+
+	//Count down the game time
 	if(timeleft > 0)
 	{
 		if(--framesleft_persecond < 1)
@@ -2133,8 +2251,9 @@ void CGM_Star::think()
 		}
 	}
 	
+	//If the game time ran out, somebody needs to die and scores changed
 	if(timeleft == 0)
-	{		//the game ends
+	{		
 		timeleft = game_values.gamemodesettings.star.time;
 		if(timeleft < 1)
 			timeleft = 30;
@@ -2143,67 +2262,123 @@ void CGM_Star::think()
 
 		ifsoundonplay(sfx_thunder);
 
-		if(game_values.gamemodesettings.star.shine)
+		if(iCurrentModeType == 0)
+		{
+			if(score[starPlayer[0]->teamID]->score > 1 || fReverseScoring)
+				starPlayer[0]->KillPlayerMapHazard(true, kill_style_environment);
+
+			if(fReverseScoring)
+			{
+				starPlayer[0]->score->AdjustScore(1);
+			}
+			else
+			{
+				starPlayer[0]->score->AdjustScore(-1);
+				
+				if(starPlayer[0]->score->score <= 0)
+				{
+					fDisplayTimer = !RemoveTeam(starPlayer[0]->teamID);
+					starPlayer[0] = NULL;
+				}
+			}
+
+			starPlayer[0] = GetHighestScorePlayer(!fReverseScoring);
+			starItem[0]->placeStar();
+		}
+		else if(iCurrentModeType == 1)
 		{
 			for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++)
 			{
-				if(star->teamID == list_players[iPlayer]->teamID)
+				if(starPlayer[0]->teamID == list_players[iPlayer]->teamID)
 					continue;
 
 				//Let the cleanup function remove the player on the last kill
-				if(score[list_players[iPlayer]->teamID]->score > 1)
+				if(score[list_players[iPlayer]->teamID]->score > 1 || fReverseScoring)
 					list_players[iPlayer]->KillPlayerMapHazard(true, kill_style_environment);
 			}
-		}
-		else
-		{
-			if(score[star->teamID]->score > 1)
-				star->KillPlayerMapHazard(true, kill_style_environment);
-		}
 
-		if(game_values.gamemodesettings.star.shine)
-		{
 			if(fReverseScoring)
 			{
-				star->score->AdjustScore(1);
+				starPlayer[0]->score->AdjustScore(1);
 			}
 			else
 			{
 				for(short iTeam = 0; iTeam < score_cnt; iTeam++)
 				{
-					if(star->teamID == iTeam)
+					if(starPlayer[0]->teamID == iTeam)
 						continue;
 
 					score[iTeam]->AdjustScore(-1);
 			
 					if(score[iTeam]->score <= 0)
 					{
-						RemoveTeam(iTeam);
+						fDisplayTimer = !RemoveTeam(iTeam);
 					}
 				}
 			}
 
-			star = GetHighestScorePlayer(false);
-			starItem->placeStar();
+			starPlayer[0] = GetHighestScorePlayer(false);
+			starItem[0]->placeStar();
 		}
-		else
+		else if(iCurrentModeType == 2)
 		{
-			if(fReverseScoring)
+			for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++)
 			{
-				star->score->AdjustScore(1);
-			}
-			else
-			{
-				star->score->AdjustScore(-1);
-				
-				if(star->score->score <= 0)
+				bool fFound = false;
+				for(short iStar = 0; iStar < list_players_cnt - 1; iStar++)
 				{
-					RemoveTeam(star->teamID);
-					star = NULL;
+					if(starPlayer[iStar] == list_players[iPlayer])
+					{
+						fFound = true;
+						break;
+					}
 				}
+
+				if(fFound)
+					continue;
+
+				if(score[list_players[iPlayer]->teamID]->score > 1 || fReverseScoring)
+					list_players[iPlayer]->KillPlayerMapHazard(true, kill_style_environment);
+
+				bool fNeedRebalance = true;
+				if(fReverseScoring)
+				{
+					list_players[iPlayer]->score->AdjustScore(1);
+				}
+				else
+				{
+					list_players[iPlayer]->score->AdjustScore(-1);
+					
+					if(list_players[iPlayer]->score->score <= 0)
+					{
+						fDisplayTimer = !RemoveTeam(list_players[iPlayer]->teamID);
+
+						//Don't setup the mode if this is a random game because it will be setup below
+						if(game_values.gamemodesettings.star.shine != 3)
+						{
+							SetupMode();
+							fNeedRebalance = false;
+						}
+					}
+				}
+
+				if(game_values.gamemodesettings.star.shine != 3 && fNeedRebalance)
+				{
+					CPlayer * players[4];
+					short iNumPlayers = GetScoreRankedPlayerList(players, fReverseScoring);
+
+					for(short iStar = 0; iStar < iNumPlayers - 1; iStar++)
+					{
+						starPlayer[iStar] = players[iStar];
+						starItem[iStar]->placeStar();
+					}
+				}
+
+				break;
 			}
 		}
 
+		//Play warning sound if needed
 		if(!fReverseScoring)
 		{
 			if(!playedwarningsound)
@@ -2229,12 +2404,19 @@ void CGM_Star::think()
 				}
 			}
 		}
+	
+		//If random game, then choose a new game type
+		if(game_values.gamemodesettings.star.shine == 3 && fDisplayTimer)
+		{
+			iCurrentModeType = rand() % 3;
+			SetupMode();
+		}
 	}
 }
 
 void CGM_Star::draw_foreground()
 {
-	if(!gameover)
+	if(fDisplayTimer)
 		drawtime();
 }
 
@@ -2260,6 +2442,40 @@ void CGM_Star::playerextraguy(CPlayer &player, short iType)
 	}
 }
 
+bool CGM_Star::isplayerstar(CPlayer * player)
+{
+	for(short iPlayer = 0; iPlayer < list_players_cnt - 1; iPlayer++)
+	{
+		if(starPlayer[iPlayer] == player)
+			return true;
+	}
+
+	return false;
+}
+
+CPlayer * CGM_Star::swapplayer(short id, CPlayer * player)
+{
+	CPlayer * oldstar = NULL;
+	if(starPlayer[id])
+	{
+		oldstar = starPlayer[id];
+		oldstar->shield = game_values.shieldstyle;
+		oldstar->shieldtimer = 60;
+		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, oldstar->ix + (HALFPW) - 16, oldstar->iy + (HALFPH) - 16, 3, 8));
+	}
+
+	starPlayer[id] = player;
+	
+	if(starItem[id]->getType() == 1)
+		eyecandyfront.add(new EC_GravText(&game_font_large, player->ix + HALFPW, player->iy + PH, "Shine Get!", -VELJUMP*1.5));
+	else
+		eyecandyfront.add(new EC_GravText(&game_font_large, player->ix + HALFPW, player->iy + PH, "Ztarred!", -VELJUMP*1.5));
+
+	eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, player->ix + (HALFPW) - 16, player->iy + (HALFPH) - 16, 3, 8));
+	ifsoundonplay(sfx_transform);
+
+	return oldstar;
+}
 
 
 //Capture The Flag mode - each team has a base and a flag

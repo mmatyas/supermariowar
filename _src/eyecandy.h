@@ -228,7 +228,7 @@ class EC_ExplodingAward : public CEyecandy
 class EC_SwirlingAward : public CEyecandy
 {
 	public:
-		EC_SwirlingAward(gfxSprite *nspr, short nx, short ny, float nangle, float nradius, float nvel, short timetolive, short srcX, short srcY, short iw, short ih);
+		EC_SwirlingAward(gfxSprite *nspr, short nx, short ny, float nangle, float nradius, float nvel, short timetolive, short srcX, short srcY, short iw, short ih, short animationRate = 0, short animationFrames = 0);
 		void draw();
 		void update();
 
@@ -239,12 +239,15 @@ class EC_SwirlingAward : public CEyecandy
 		short timer, ttl;
 		short iSrcX, iSrcY;
 		float vel, angle, radius;
+
+		short iAnimationRate, iAnimationFrames;
+		short iAnimationTimer, iAnimationFrame, iAnimationEndFrame;
 };
 
 class EC_RocketAward : public CEyecandy
 {
 	public:
-		EC_RocketAward(gfxSprite *nspr, short nx, short ny, float nvelx, float nvely, short timetolive, short srcX, short srcY, short iw, short ih);
+		EC_RocketAward(gfxSprite *nspr, short nx, short ny, float nvelx, float nvely, short timetolive, short srcX, short srcY, short iw, short ih, short animationRate = 0, short animationFrames = 0);
 		void draw();
 		void update();
 
@@ -255,6 +258,9 @@ class EC_RocketAward : public CEyecandy
 		float velx, vely;
 		short timer, ttl;
 		short iSrcX, iSrcY;
+
+		short iAnimationRate, iAnimationFrames;
+		short iAnimationTimer, iAnimationFrame, iAnimationEndFrame;
 };
 
 class EC_FloatingObject : public CEyecandy

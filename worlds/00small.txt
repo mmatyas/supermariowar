@@ -99,7 +99,7 @@
 #Stage Type 1,Bonus House Name,Sequential/Random Order,Display Text,Powerup List
 6
 0,0smw,16,200,1,1w6,2nd Stop,0,5,0,8,4,1
-0,Treefort,15,15,1,0,3rd Stop,0,3,310,0,0,1,1,0,0,1,0,0,1,0,0,0
+0,Treefort,15,15,1,0,3rd Stop,0,3,310,0,0,1,1,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0
 0,Mountain waterfall,14,200,1,0,mountain waterfall,0
 0,Ambitions of the Abyss,14,100,1,0,Lava Island,1
 0,Blockfort,5,10,1,1p6,Vehicle Stop,0,60,10,5,0,1,0,0,1,0,0

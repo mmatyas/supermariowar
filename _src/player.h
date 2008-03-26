@@ -369,7 +369,7 @@ class CPlayer
 		friend void AddAwardKill(CPlayer * killer, CPlayer * killed, killstyle style);
 		friend void RemovePlayersButHighestScoring();
 		friend void RemovePlayersButTeam(short teamID);
-		friend void RemoveTeam(short teamid);
+		friend bool RemoveTeam(short teamid);
 		friend void CleanDeadPlayers();
 		friend short CountAliveTeams(short * lastteam);
 		friend void RunGame();

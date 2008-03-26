@@ -587,7 +587,7 @@ void EC_ExplodingAward::draw()
 // class EC_SwirlingAward
 //------------------------------------------------------------------------------
 
-EC_SwirlingAward::EC_SwirlingAward(gfxSprite *nspr, short nx, short ny, float nangle, float nradius, float nvel, short timetolive, short srcX, short srcY, short iw, short ih) :
+EC_SwirlingAward::EC_SwirlingAward(gfxSprite *nspr, short nx, short ny, float nangle, float nradius, float nvel, short timetolive, short srcX, short srcY, short iw, short ih, short animationRate, short animationFrames) :
 	CEyecandy()
 {
 	spr = nspr;
@@ -604,6 +604,12 @@ EC_SwirlingAward::EC_SwirlingAward(gfxSprite *nspr, short nx, short ny, float na
 
 	iSrcX = srcX * w;
 	iSrcY = srcY * h;
+
+	iAnimationRate = animationRate;
+	iAnimationFrames = animationFrames;
+	iAnimationTimer = 0;
+	iAnimationFrame = iSrcX;
+	iAnimationEndFrame = iSrcX + iw * iAnimationFrames;
 }
 
 
@@ -620,6 +626,15 @@ void EC_SwirlingAward::update()
 		
 		dead = true;
 	}
+
+	if(iAnimationRate > 0 && ++iAnimationTimer > iAnimationRate)
+	{
+		iAnimationTimer = 0;
+
+		iAnimationFrame += w;
+		if(iAnimationFrame >= iAnimationEndFrame)
+			iAnimationFrame = iSrcX;
+	}
 }
 
 
@@ -628,7 +643,7 @@ void EC_SwirlingAward::draw()
 	short awardx = x + (short)(radius * cos(angle));
 	short awardy = y + (short)(radius * sin(angle));
 		
-	spr->draw(awardx, awardy, iSrcX, iSrcY, w, h);
+	spr->draw(awardx, awardy, iAnimationFrame, iSrcY, w, h);
 }
 
 
@@ -636,7 +651,7 @@ void EC_SwirlingAward::draw()
 // class EC_RocketAward
 //------------------------------------------------------------------------------
 
-EC_RocketAward::EC_RocketAward(gfxSprite *nspr, short nx, short ny, float nvelx, float nvely, short timetolive, short srcX, short srcY, short iw, short ih) :
+EC_RocketAward::EC_RocketAward(gfxSprite *nspr, short nx, short ny, float nvelx, float nvely, short timetolive, short srcX, short srcY, short iw, short ih, short animationRate, short animationFrames) :
 	CEyecandy()
 {
 	spr = nspr;
@@ -653,6 +668,12 @@ EC_RocketAward::EC_RocketAward(gfxSprite *nspr, short nx, short ny, float nvelx,
 
 	iSrcX = srcX * w;
 	iSrcY = srcY * h;
+
+	iAnimationRate = animationRate;
+	iAnimationFrames = animationFrames;
+	iAnimationTimer = 0;
+	iAnimationFrame = iSrcX;
+	iAnimationEndFrame = iSrcX + iw * iAnimationFrames;
 }
 
 
@@ -668,12 +689,21 @@ void EC_RocketAward::update()
 		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, (short)x + (w >> 1) - 16, (short)y + (h >> 1) - 16, 3, 8));
 		dead = true;
 	}
+
+	if(iAnimationRate > 0 && ++iAnimationTimer > iAnimationRate)
+	{
+		iAnimationTimer = 0;
+
+		iAnimationFrame += w;
+		if(iAnimationFrame >= iAnimationEndFrame)
+			iAnimationFrame = iSrcX;
+	}
 }
 
 
 void EC_RocketAward::draw()
 {
-	spr->draw((short)x, (short)y, iSrcX, iSrcY, w, h);
+	spr->draw((short)x, (short)y, iAnimationFrame, iSrcY, w, h);
 }
 
 //------------------------------------------------------------------------------

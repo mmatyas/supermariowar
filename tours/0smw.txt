@@ -92,7 +92,7 @@
 
 #10 - Star
 #Time - any number greater than 0, number of seconds between scores
-#Star Type - 0 = Ztar, 1 = Shine
+#Star Type - 0 = Ztar, 1 = Shine, 2 = Multi Shine, 3 = Random
 #Percent Extra Time - number between 0 and 100 indicating the percent chance extra time will appear from a powerup block
 
 #11 - Domination
@@ -130,6 +130,13 @@
 #Red Shell Powerup Weight - any positive number including 0
 #Spiked Shell Powerup Weight - any positive number including 0
 #Buzzy Shell Powerup Weight - any positive number including 0
+#Ice Wand Powerup Weight - any positive number including 0
+#Podoboo Powerup Weight - any positive number including 0
+#Bomb Powerup Weight - any positive number including 0
+#Tanooki Powerup Weight - any positive number including 0
+#Leaf Powerup Weight - any positive number including 0
+#P-Wings Powerup Weight - any positive number including 0
+#Random Powerup Weight - any positive number including 0
 
 #16 - Survival
 #Thwomp Weight - any positive number including 0, used in conjunction with the other weights below.  If thwomp rate is 2 and podoboo and bowser fire is 1, then there will be a 50% chance the next hazard will be a thwomp (2 + 1 + 1 = 4, 2 / 4 = 50%)
@@ -163,4 +170,4 @@
 #Map,Mode,Goal,Points,Bonus Wheel,Name,Options(see above)
 subcon,5,30,2,1,1st Stop,60,2,0,0,2,0,0,1,0,0
 0smw,16,200,1,0,2nd Stop,1,5,0,8,4,1
-treefort,15,15,1,0,3rd Stop,3,310,0,2,1,1,0,0,1,0,0,1,0,0,0
+treefort,15,15,1,0,3rd Stop,3,310,0,2,1,1,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0

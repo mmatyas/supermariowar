@@ -2026,9 +2026,10 @@ void Menu::CreateMenu()
 	miStarModeShineField = new MI_SelectField(&spr_selectfield, 120, 220, "Star Type", 400, 150);
 	miStarModeShineField->Add("Ztar", 0, "", false, false);
 	miStarModeShineField->Add("Shine", 1, "", false, false);
+	miStarModeShineField->Add("Multi Shine", 2, "", false, false);
+	miStarModeShineField->Add("Random", 3, "", false, false);
 	miStarModeShineField->SetData(&game_values.gamemodemenusettings.star.shine, NULL, NULL);
 	miStarModeShineField->SetKey(game_values.gamemodemenusettings.star.shine);
-	miStarModeShineField->SetAutoAdvance(true);
 
 	miStarModePercentExtraTime = new MI_SliderField(&spr_selectfield, &menu_slider_bar, 120, 260, "Extra Time", 400, 150, 384);
 	miStarModePercentExtraTime->Add("0", 0, "", false, false);
@@ -2387,10 +2388,10 @@ void Menu::CreateMenu()
 	miFrenzyModeStoredShellsField->SetKey(game_values.gamemodemenusettings.frenzy.storedshells ? 1 : 0);
 	miFrenzyModeStoredShellsField->SetAutoAdvance(true);
 
-	short iPowerupMap[] = {8, 5, 11, 17, 19, 9, 16, 10, 12, 13, 14, 15};
+	short iPowerupMap[] = {8, 5, 11, 17, 19, 21, 23, 24, 25, 20, 9, 16, 10, 22, 12, 13, 14, 15, 27};
 	for(short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++)
 	{
-		miFrenzyModePowerupSlider[iPowerup] = new MI_PowerupSlider(&spr_selectfield, &menu_slider_bar, &spr_storedpoweruplarge, iPowerup < 6 ? 65 : 330, 180 + 40 * iPowerup - (iPowerup < 6 ? 0 : 240), 245, iPowerupMap[iPowerup]);
+		miFrenzyModePowerupSlider[iPowerup] = new MI_PowerupSlider(&spr_selectfield, &menu_slider_bar, &spr_storedpoweruplarge, iPowerup < 10 ? 65 : 330, 40 + 40 * iPowerup - (iPowerup < 10 ? 0 : 380), 245, iPowerupMap[iPowerup]);
 		miFrenzyModePowerupSlider[iPowerup]->Add("", 0, "", false, false);
 		miFrenzyModePowerupSlider[iPowerup]->Add("", 1, "", false, false);
 		miFrenzyModePowerupSlider[iPowerup]->Add("", 2, "", false, false);
@@ -2419,21 +2420,28 @@ void Menu::CreateMenu()
 	mModeSettingsMenu[15].AddControl(miFrenzyModeRateField, miFrenzyModeQuantityField, miFrenzyModeStoredShellsField, NULL, miFrenzyModeBackButton);
 	mModeSettingsMenu[15].AddControl(miFrenzyModeStoredShellsField, miFrenzyModeRateField, miFrenzyModePowerupSlider[0], NULL, miFrenzyModeBackButton);
 
-	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[0], miFrenzyModeStoredShellsField, miFrenzyModePowerupSlider[1], NULL, miFrenzyModePowerupSlider[6]);
-	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[1], miFrenzyModePowerupSlider[0], miFrenzyModePowerupSlider[2], NULL, miFrenzyModePowerupSlider[7]);
-	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[2], miFrenzyModePowerupSlider[1], miFrenzyModePowerupSlider[3], NULL, miFrenzyModePowerupSlider[8]);
-	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[3], miFrenzyModePowerupSlider[2], miFrenzyModePowerupSlider[4], NULL, miFrenzyModePowerupSlider[9]);
-	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[4], miFrenzyModePowerupSlider[3], miFrenzyModePowerupSlider[5], NULL, miFrenzyModePowerupSlider[10]);
-	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[5], miFrenzyModePowerupSlider[4], miFrenzyModePowerupSlider[6], NULL, miFrenzyModePowerupSlider[11]);
-	
-	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[6], miFrenzyModePowerupSlider[5], miFrenzyModePowerupSlider[7], miFrenzyModePowerupSlider[0], miFrenzyModeBackButton);
-	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[7], miFrenzyModePowerupSlider[6], miFrenzyModePowerupSlider[8], miFrenzyModePowerupSlider[1], miFrenzyModeBackButton);
-	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[8], miFrenzyModePowerupSlider[7], miFrenzyModePowerupSlider[9], miFrenzyModePowerupSlider[2], miFrenzyModeBackButton);
-	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[9], miFrenzyModePowerupSlider[8], miFrenzyModePowerupSlider[10], miFrenzyModePowerupSlider[3], miFrenzyModeBackButton);
-	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[10], miFrenzyModePowerupSlider[9], miFrenzyModePowerupSlider[11], miFrenzyModePowerupSlider[4], miFrenzyModeBackButton);
-	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[11], miFrenzyModePowerupSlider[10], miFrenzyModeBackButton,       miFrenzyModePowerupSlider[5], miFrenzyModeBackButton);
+	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[0], miFrenzyModeStoredShellsField, miFrenzyModePowerupSlider[1], NULL, miFrenzyModePowerupSlider[10]);
+	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[1], miFrenzyModePowerupSlider[0], miFrenzyModePowerupSlider[2], NULL, miFrenzyModePowerupSlider[11]);
+	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[2], miFrenzyModePowerupSlider[1], miFrenzyModePowerupSlider[3], NULL, miFrenzyModePowerupSlider[12]);
+	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[3], miFrenzyModePowerupSlider[2], miFrenzyModePowerupSlider[4], NULL, miFrenzyModePowerupSlider[13]);
+	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[4], miFrenzyModePowerupSlider[3], miFrenzyModePowerupSlider[5], NULL, miFrenzyModePowerupSlider[14]);
+	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[5], miFrenzyModePowerupSlider[4], miFrenzyModePowerupSlider[6], NULL, miFrenzyModePowerupSlider[15]);
+	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[6], miFrenzyModePowerupSlider[5], miFrenzyModePowerupSlider[7], NULL, miFrenzyModePowerupSlider[16]);
+	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[7], miFrenzyModePowerupSlider[6], miFrenzyModePowerupSlider[8], NULL, miFrenzyModePowerupSlider[17]);
+	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[8], miFrenzyModePowerupSlider[7], miFrenzyModePowerupSlider[9], NULL, miFrenzyModePowerupSlider[18]);
+	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[9], miFrenzyModePowerupSlider[8], miFrenzyModePowerupSlider[10], NULL, miFrenzyModeBackButton);
 
-	mModeSettingsMenu[15].AddControl(miFrenzyModeBackButton, miFrenzyModePowerupSlider[11], miFrenzyModeQuantityField, miFrenzyModePowerupSlider[11], NULL);
+	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[10], miFrenzyModePowerupSlider[9], miFrenzyModePowerupSlider[11], miFrenzyModePowerupSlider[0], miFrenzyModeBackButton);
+	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[11], miFrenzyModePowerupSlider[10], miFrenzyModePowerupSlider[12], miFrenzyModePowerupSlider[1], miFrenzyModeBackButton);
+	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[12], miFrenzyModePowerupSlider[11], miFrenzyModePowerupSlider[13], miFrenzyModePowerupSlider[2], miFrenzyModeBackButton);
+	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[13], miFrenzyModePowerupSlider[12], miFrenzyModePowerupSlider[14], miFrenzyModePowerupSlider[3], miFrenzyModeBackButton);
+	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[14], miFrenzyModePowerupSlider[13], miFrenzyModePowerupSlider[15], miFrenzyModePowerupSlider[4], miFrenzyModeBackButton);
+	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[15], miFrenzyModePowerupSlider[14], miFrenzyModePowerupSlider[16], miFrenzyModePowerupSlider[5], miFrenzyModeBackButton);
+	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[16], miFrenzyModePowerupSlider[15], miFrenzyModePowerupSlider[17], miFrenzyModePowerupSlider[6], miFrenzyModeBackButton);
+	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[17], miFrenzyModePowerupSlider[16], miFrenzyModePowerupSlider[18], miFrenzyModePowerupSlider[7], miFrenzyModeBackButton);
+	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[18], miFrenzyModePowerupSlider[17], miFrenzyModeBackButton,       miFrenzyModePowerupSlider[8], miFrenzyModeBackButton);
+
+	mModeSettingsMenu[15].AddControl(miFrenzyModeBackButton, miFrenzyModePowerupSlider[18], miFrenzyModeQuantityField, miFrenzyModePowerupSlider[18], NULL);
 	
 	mModeSettingsMenu[15].AddNonControl(miFrenzyModeLeftHeaderBar);
 	mModeSettingsMenu[15].AddNonControl(miFrenzyModeRightHeaderBar);

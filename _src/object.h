@@ -1025,7 +1025,7 @@ class CO_Egg : public MO_CarriedObject
 class CO_Star : public MO_CarriedObject
 {
 	public:
-		CO_Star(gfxSprite *nspr);
+		CO_Star(gfxSprite *nspr, short type, short id);
 		~CO_Star(){};
 
 		void update();
@@ -1034,11 +1034,14 @@ class CO_Star : public MO_CarriedObject
 
 		void placeStar();
 
+		short getType() {return iType;}
+
 	private:
 		short timer;
-		short iOffsetY;
+		short iType, iOffsetY;
 		short sparkleanimationtimer;
 		short sparkledrawframe;
+		short iID;
 
 	friend class CPlayer;
 	friend class CGM_Star;

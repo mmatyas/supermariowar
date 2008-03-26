@@ -46,7 +46,6 @@ class CGameMode
 
 		CPlayer *chicken;
 		CPlayer *tagged;
-		CPlayer *star;
 		CPlayer *frenzyowner;
 
 		GameModeType getgamemode(){return gamemode;}
@@ -73,7 +72,8 @@ class CGameMode
 
 		void SetupModeStrings(char * szMode, char * szGoal, short iGoalSpacing);
 
-		CPlayer * GetHighestScorePlayer(bool fGetLowest);
+		CPlayer * GetHighestScorePlayer(bool fGetHighest);
+		short GetScoreRankedPlayerList(CPlayer * players[4], bool fGetHighest);
 
 		bool fReverseScoring;
 };
@@ -390,13 +390,23 @@ class CGM_Star : public CGM_TimeLimit
 		short playerkilledself(CPlayer &player, killstyle style);
 		void playerextraguy(CPlayer &player, short iType);
 
+		bool isplayerstar(CPlayer * player);
+		CPlayer * swapplayer(short id, CPlayer * player);
+		CPlayer * getstarplayer(short id) {return starPlayer[id];}
+
+		short getcurrentmodetype() {return iCurrentModeType;}
+
 #ifdef _DEBUG
 		void setdebuggoal() {goal = 1;}
 #endif
 
 	private:
-		CO_Star * starItem;
+		void SetupMode();
 
+		CO_Star * starItem[3];
+		CPlayer * starPlayer[3];
+		short iCurrentModeType;
+		bool fDisplayTimer;
 };
 
 //Capture The Flag mode - each team has a base and a flag

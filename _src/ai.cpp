@@ -163,8 +163,11 @@ game_values.gamemode->tagged == pPlayer
 11. Player is "it" in chicken mode:
 game_values.gamemode->chicken == pPlayer
 
-12. Player is "it" in star mode:
-game_values.gamemode->star == pPlayer
+12. Player has star in star mode:
+if(game_values.gamemode->gamemode == game_mode_star)
+{
+	bool playerIsStar = ((CGM_Star*)game_values.gamemode)->isplayerstar(pPlayer);
+}
 
 13. If greater than 0, player is jailed in jail mode:
 pPlayer->jailtimer;
@@ -289,10 +292,18 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 			{
 				if(carriedItem->getObjectType() == object_egg)
 					playerKeys->game_turbo.fDown = true;
-				else if((game_values.gamemodesettings.star.shine || game_values.gamemode->star == pPlayer) && carriedItem->getObjectType() == object_star)
-					playerKeys->game_turbo.fDown = true;
 				else if(carriedItem->getObjectType() == object_flag)
 					playerKeys->game_turbo.fDown = true;
+
+				if(game_values.gamemode->gamemode == game_mode_star && carriedItem->getObjectType() == object_star)
+				{
+					CGM_Star * starmode = (CGM_Star*)game_values.gamemode;
+					CO_Star * star = (CO_Star*)carriedItem;
+
+					//If it is a good star or we are already infected with a bad star, then hold the star
+					if(star->getType() == 1 || starmode->isplayerstar(pPlayer))
+						playerKeys->game_turbo.fDown = true;
+				}
 			}
 		}
 
@@ -318,7 +329,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 			{
 				if(carriedItem && carriedItem->getObjectType() == object_star)
 				{
-					if(game_values.gamemodesettings.star.shine)
+					if(((CO_Star*)carriedItem)->getType() == 1)
 						*moveAway = true;
 					else
 					{
@@ -551,11 +562,13 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 
 	//"Star Mode" specific stuff
 	//Drop the star if we're not it
-	if(game_values.gamemode->gamemode == game_mode_star && !game_values.gamemodesettings.star.shine)
+	if(game_values.gamemode->gamemode == game_mode_star)
 	{
-		if(carriedItem && carriedItem->getObjectType() == object_star && game_values.gamemode->star != pPlayer)
+		CGM_Star * starmode = (CGM_Star*)game_values.gamemode;
+
+		if(carriedItem && carriedItem->getObjectType() == object_star && ((CO_Star*)carriedItem)->getType() == 0 && !starmode->isplayerstar(pPlayer))
 			playerKeys->game_turbo.fDown = false;
-		else if(game_values.gamemode->star == pPlayer && pPlayer->throw_star == 0)
+		else if(starmode->isplayerstar(pPlayer) && pPlayer->throw_star == 0)
 			playerKeys->game_turbo.fDown = true;
 	}
 
@@ -841,13 +854,16 @@ void CPlayerAI::GetNearestObjects()
 				if(carriedItem && carriedItem->getObjectType() == object_star)
 					continue;
 
-				if(game_values.gamemodesettings.star.shine || game_values.gamemode->star == pPlayer)
+				CGM_Star * starmode = (CGM_Star*)game_values.gamemode;
+				CO_Star * star = (CO_Star*)objectcontainer[1].list[i];
+				
+				if(star->getType() == 1 || starmode->isplayerstar(pPlayer))
 				{
-					DistanceToObject(objectcontainer[1].list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
+					DistanceToObject(star, &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
 				}
 				else
 				{
-					DistanceToObject(objectcontainer[1].list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
+					DistanceToObject(star, &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
 				}
 
 				break;

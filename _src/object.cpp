@@ -3366,20 +3366,8 @@ bool PU_Tanooki :: collide (CPlayer * player)
 {
 	if(state > 0)
 	{
+		player->SetPowerup(9);
 		dead = true;
-
-		if(player->tanooki)
-		{
-			player->SetStoredPowerup(20);
-		}
-		else
-		{
-			ifsoundonplay(sfx_collectpowerup);
-			player->tanooki = true;
-
-			if(game_values.tanookilimit > 0)
-				player->tanookilimit = game_values.tanookilimit;
-		}
 	}
 
     return false;
@@ -4183,7 +4171,7 @@ bool PU_JailKeyPowerup::collide(CPlayer * player)
 //------------------------------------------------------------------------------
 // class fireball
 //------------------------------------------------------------------------------
-MO_Fireball::MO_Fireball(gfxSprite *nspr, short x, short y, short iNumSpr, bool moveToRight, short aniSpeed, short iGlobalID, short iTeamID, short iColorID) :
+MO_Fireball::MO_Fireball(gfxSprite *nspr, short x, short y, short iNumSpr, bool moveToRight, short aniSpeed, short iGlobalID, short teamID, short iColorID) :
 	IO_MovingObject(nspr, x, y, iNumSpr, aniSpeed, (short)nspr->getWidth() >> 2, (short)nspr->getHeight() >> 3, 0, 0)
 {
 	if(moveToRight)
@@ -4197,7 +4185,7 @@ MO_Fireball::MO_Fireball(gfxSprite *nspr, short x, short y, short iNumSpr, bool 
 	bounce = -FIREBALLBOUNCE;
 
 	iPlayerID = iGlobalID;
-	iTeamID = iTeamID;
+	iTeamID = teamID;
 
 	colorOffset = iColorID * 36;
 	movingObjectType = movingobject_fireball;
@@ -4246,13 +4234,13 @@ void MO_Fireball::draw()
 //------------------------------------------------------------------------------
 // class super fireball
 //------------------------------------------------------------------------------
-MO_SuperFireball::MO_SuperFireball(gfxSprite *nspr, short x, short y, short iNumSpr, float fVelyX, float fVelyY, short aniSpeed, short iGlobalID, short iTeamID, short iColorID) :
+MO_SuperFireball::MO_SuperFireball(gfxSprite *nspr, short x, short y, short iNumSpr, float fVelyX, float fVelyY, short aniSpeed, short iGlobalID, short teamID, short iColorID) :
 	IO_MovingObject(nspr, x, y, iNumSpr, aniSpeed, nspr->getWidth() / iNumSpr, nspr->getHeight() / 10, 0, 0)
 {
 	ih /= 10;
 
 	iPlayerID = iGlobalID;
-	iTeamID = iTeamID;
+	iTeamID = teamID;
 	colorOffset = (iColorID + 1) * 64;
 	directionOffset = velx < 0.0f ? 0 : 32;
 	movingObjectType = movingobject_superfireball;
@@ -4311,13 +4299,13 @@ void MO_SuperFireball::draw()
 //------------------------------------------------------------------------------
 // class hammer
 //------------------------------------------------------------------------------
-MO_Hammer::MO_Hammer(gfxSprite *nspr, short x, short y, short iNumSpr, float fVelyX, float fVelyY, short aniSpeed, short iGlobalID, short iTeamID, short iColorID, bool superHammer) :
+MO_Hammer::MO_Hammer(gfxSprite *nspr, short x, short y, short iNumSpr, float fVelyX, float fVelyY, short aniSpeed, short iGlobalID, short teamID, short iColorID, bool superHammer) :
 	IO_MovingObject(nspr, x, y, iNumSpr, aniSpeed, (short)nspr->getWidth() / iNumSpr, (short)nspr->getHeight() >> 2, 0, 0)
 {
 	ih = ih >> 2;
 
 	iPlayerID = iGlobalID;
-	iTeamID = iTeamID;
+	iTeamID = teamID;
 	colorOffset = iColorID * 28;
 	movingObjectType = movingobject_hammer;
 	
@@ -4415,11 +4403,11 @@ void MO_Hammer::draw()
 //------------------------------------------------------------------------------
 // class sledge hammer
 //------------------------------------------------------------------------------
-MO_IceBlast::MO_IceBlast(gfxSprite *nspr, short x, short y, float fVelyX, short iGlobalID, short iTeamID, short iColorID) :
+MO_IceBlast::MO_IceBlast(gfxSprite *nspr, short x, short y, float fVelyX, short iGlobalID, short teamID, short iColorID) :
 	IO_MovingObject(nspr, x, y, 4, 8, 32, 32, 0, 0, 0, (iColorID + 1) << 5, 32, 32)
 {
 	iPlayerID = iGlobalID;
-	iTeamID = iTeamID;
+	iTeamID = teamID;
 
 	movingObjectType = movingobject_iceblast;
 	
@@ -4476,14 +4464,14 @@ bool MO_IceBlast::collide(CPlayer * player)
 //------------------------------------------------------------------------------
 // class boomerang
 //------------------------------------------------------------------------------
-MO_Boomerang::MO_Boomerang(gfxSprite *nspr, short x, short y, short iNumSpr, bool moveToRight, short aniSpeed, short iGlobalID, short iTeamID, short iColorID) :
+MO_Boomerang::MO_Boomerang(gfxSprite *nspr, short x, short y, short iNumSpr, bool moveToRight, short aniSpeed, short iGlobalID, short teamID, short iColorID) :
 	IO_MovingObject(nspr, x, y, iNumSpr, aniSpeed, (short)nspr->getWidth() / iNumSpr, (short)nspr->getHeight() >> 3, 0, 0)
 {
 	//boomerangs sprites have both right and left sprites in them
 	ih = ih >> 3;
 
 	iPlayerID = iGlobalID;
-	iTeamID = iTeamID;
+	iTeamID = teamID;
 	colorOffset = iColorID * 64;
 	movingObjectType = movingobject_boomerang;
 	
@@ -4814,7 +4802,7 @@ void MO_Boomerang::draw()
 //------------------------------------------------------------------------------
 // class bomb
 //------------------------------------------------------------------------------
-CO_Bomb::CO_Bomb(gfxSprite *nspr, short x, short y, float fVelX, float fVelY, short aniSpeed, short iGlobalID, short iTeamID, short iColorID, short timetolive) :
+CO_Bomb::CO_Bomb(gfxSprite *nspr, short x, short y, float fVelX, float fVelY, short aniSpeed, short iGlobalID, short teamID, short iColorID, short timetolive) :
 	MO_CarriedObject(nspr, x, y, 5, aniSpeed, 24, 24, 4, 13)
 {
 	iw = 28;
@@ -4823,7 +4811,7 @@ CO_Bomb::CO_Bomb(gfxSprite *nspr, short x, short y, float fVelX, float fVelY, sh
 	bounce = GRAVITATION;
 
 	iPlayerID = iGlobalID;
-	iTeamID = iTeamID;
+	iTeamID = teamID;
 	iColorOffsetY = (iColorID + 1) * 38;
 	
 	movingObjectType = movingobject_bomb;
@@ -5684,9 +5672,11 @@ void CO_Egg::Drop()
 //------------------------------------------------------------------------------
 // class star (for star mode)
 //------------------------------------------------------------------------------
-CO_Star::CO_Star(gfxSprite *nspr) :
+CO_Star::CO_Star(gfxSprite *nspr, short type, short id) :
 	MO_CarriedObject(nspr, 0, 0, 8, 8, 30, 30, 1, 1)
 {
+	iID = id;
+
 	state = 1;
 	iw = 32;
 	ih = 32;
@@ -5694,7 +5684,8 @@ CO_Star::CO_Star(gfxSprite *nspr) :
 	objectType = object_star;
 	movingObjectType = movingobject_star;
 	
-	iOffsetY = game_values.gamemodesettings.star.shine ? 32 : 0;
+	iType = type;
+	iOffsetY = type == 1 ? 32 : 0;
 
 	sparkleanimationtimer = 0;
 	sparkledrawframe = 0;
@@ -5711,6 +5702,11 @@ CO_Star::CO_Star(gfxSprite *nspr) :
 
 bool CO_Star::collide(CPlayer * player)
 {
+	if(game_values.gamemode->gamemode != game_mode_star)
+		return false;
+
+	CGM_Star * starmode = (CGM_Star *)game_values.gamemode;
+
 	timer = 0;
 	if(owner == NULL)
 	{
@@ -5720,32 +5716,16 @@ bool CO_Star::collide(CPlayer * player)
 		}
 	}
 
-	if(player->shield > 0 || player->invincible || game_values.gamemode->star == player || game_values.gamemode->gameover)
+	if(player->shield > 0 || player->invincible || starmode->isplayerstar(player) || game_values.gamemode->gameover)
 		return false;
 
-	if(game_values.gamemode->star)
+	CPlayer * oldstar = starmode->swapplayer(iID, player);
+
+	if(owner == oldstar)
 	{
-		CPlayer * oldstar = game_values.gamemode->star;
-		oldstar->shield = game_values.shieldstyle;
-		oldstar->shieldtimer = 60;
-		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, oldstar->ix + (HALFPW) - 16, oldstar->iy + (HALFPH) - 16, 3, 8));
-
-		if(owner == oldstar)
-		{
-			oldstar->throw_star = 30;
-			Kick();
-		}
+		oldstar->throw_star = 30;
+		Kick();
 	}
-
-	game_values.gamemode->star = player;
-	
-	if(game_values.gamemodesettings.star.shine)
-		eyecandyfront.add(new EC_GravText(&game_font_large, player->ix + HALFPW, player->iy + PH, "Shine Get!", -VELJUMP*1.5));
-	else
-		eyecandyfront.add(new EC_GravText(&game_font_large, player->ix + HALFPW, player->iy + PH, "Ztarred!", -VELJUMP*1.5));
-
-	eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, player->ix + (HALFPW) - 16, player->iy + (HALFPH) - 16, 3, 8));
-	ifsoundonplay(sfx_transform);
 
 	return false;
 }
@@ -5796,18 +5776,24 @@ void CO_Star::draw()
 	}
 
 	if(owner && owner->iswarping())
-		spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, game_values.gamemodesettings.star.shine ? 0 : 32, 32, 32, (short)owner->state % 4, owner->GetWarpPlane());
+		spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, iType ? 0 : 32, 32, 32, (short)owner->state % 4, owner->GetWarpPlane());
 	else
-		spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, game_values.gamemodesettings.star.shine ? 0 : 32, 32, 32);
+		spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, iType ? 0 : 32, 32, 32);
 }
 
 void CO_Star::placeStar()
 {
+	if(game_values.gamemode->gamemode != game_mode_star)
+		return;
+
+	CGM_Star * starmode = (CGM_Star*)game_values.gamemode;
+
 	timer = 0;
 
-	if(game_values.gamemode->star)
+	CPlayer * star = starmode->getstarplayer(iID);
+
+	if(star)
 	{
-		CPlayer * star = game_values.gamemode->star;
 		xf(star->fx + HALFPW - 16.0f);
 		yf(star->fy + HALFPH - 17.0f);
 
@@ -6868,6 +6854,9 @@ MO_FrenzyCard::MO_FrenzyCard(gfxSprite *nspr, short iType) :
 	state = 1;
 	objectType = object_frenzycard;
 	type = iType;
+
+	if(type == NUMFRENZYCARDS - 1)
+		type = rand() % (NUMFRENZYCARDS - 1);
 	
 	sparkleanimationtimer = 0;
 	sparkledrawframe = 0;
@@ -6877,12 +6866,8 @@ MO_FrenzyCard::MO_FrenzyCard(gfxSprite *nspr, short iType) :
 
 bool MO_FrenzyCard::collide(CPlayer * player)
 {
-	if(type < 8 || game_values.gamemodesettings.frenzy.storedshells)
+	if(type < 14 || type > 17 || game_values.gamemodesettings.frenzy.storedshells)
 	{
-		//Hack to skip sledge hammer, bombs and leaf for now
-		if(type > 4)
-			type += 4;
-
 		player->SetPowerup(type);
 		game_values.gamemode->frenzyowner = player;
 	}
@@ -6890,28 +6875,28 @@ bool MO_FrenzyCard::collide(CPlayer * player)
 	{
 		switch(type)
 		{
-			case 8:
+			case 14:
 			{
 				CO_Shell * shell = new CO_Shell(0, 0, 0, true, true, true, false); 
 				objectcontainer[1].add(shell);
 				shell->UsedAsStoredPowerup(player);
 				break;
 			}
-			case 9:
+			case 15:
 			{
 				CO_Shell * shell = new CO_Shell(1, 0, 0, false, true, true, false);
 				objectcontainer[1].add(shell);
 				shell->UsedAsStoredPowerup(player);
 				break;
 			}
-			case 10:
+			case 16:
 			{
 				CO_Shell * shell = new CO_Shell(2, 0, 0, false, false, true, true); 
 				objectcontainer[1].add(shell);
 				shell->UsedAsStoredPowerup(player);
 				break;
 			}
-			case 11:
+			case 17:
 			{
 				CO_Shell * shell = new CO_Shell(3, 0, 0, false, true, false, false); 
 				objectcontainer[1].add(shell);
