@@ -824,8 +824,17 @@ int editor_edit()
 
 					if(key == SDLK_DELETE || key == SDLK_BACKSPACE)
 					{
-						clearselectedmaptiles();
-						resetselectedtiles();
+						if(edit_mode == 3)
+						{
+							clearselectedmaptiles();
+							resetselectedtiles();
+						}
+						else if(edit_mode == 6)
+						{
+							for(short iRow = 0; iRow < MAPHEIGHT; iRow++)
+								for(short iCol = 0; iCol < MAPWIDTH; iCol++)
+									g_map.mapdatatop[iCol][iRow].iType = tile_nonsolid;
+						}
 					}
 
 					if(key == SDLK_n)
@@ -1496,6 +1505,7 @@ int editor_edit()
 			}
 
 			menu_font_small.draw(0, 0, "Tile Type Mode");
+			menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "Press [Delete] To Clear All Tile Types");
 		}
 		else if(edit_mode == 7)
 		{
@@ -4600,7 +4610,7 @@ int display_help()
 	menu_shade.draw(0, 0);
 	//menu_font_large.drawCentered(320, 15, "Help");
 	
-	int offsety = 30;
+	int offsety = 10;
 	int offsetx = 20;
 	menu_font_small.draw(offsetx, offsety, "Modes:");
 	offsety += menu_font_small.getHeight() + 2;
@@ -4621,6 +4631,10 @@ int display_help()
 	menu_font_small.draw(offsetx, offsety, "[x] - No Player Spawn Area");
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[z] - No Item Spawn Area");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[h] - Hazard Mode");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[a] - Animated Tile Mode");
 	offsety += menu_font_small.getHeight() + 20;
 
 	menu_font_small.draw(offsetx, offsety, "Layers:");
@@ -4651,7 +4665,7 @@ int display_help()
 	menu_font_small.draw(offsetx, offsety, "[pagedown] - Go To Next Map");
 
 	offsetx = 305;
-	offsety = 30;
+	offsety = 10;
 
 	menu_font_small.draw(offsetx, offsety, "Tile, Warp and Block Modes:");
 	offsety += menu_font_small.getHeight() + 2;
@@ -4697,6 +4711,8 @@ int display_help()
 	menu_font_small.draw(offsetx, offsety, "[e] - Change Floating Eyecandy");
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[ctrl] + [delete] - Clear All");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[insert] - Take Screenshot");
 	offsety += menu_font_small.getHeight() + 2;
 
 

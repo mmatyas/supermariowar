@@ -54,7 +54,6 @@
 //[ ] Allow spawn areas for domination blocks
 //[ ] Water bubbles and rain eyecandy, Splashing feet when running on rain levels - need gfx for all of these
 //[ ] Resume level editor to zzleveleditor map every time so it looks like you've resumed your last work (or try and load the last map you were on)
-//[ ] "Random" and "MultiStars" modes for star mode
 //[ ] Podoboo pops out of a [?] if all powerups are turned off
 //[ ] ? card for frenzy card mode to do random powerup
 //[ ] Thunderbolt style spawn
