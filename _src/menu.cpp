@@ -149,6 +149,9 @@ void Menu::WriteGameOptions()
 		fwrite(&game_values.warplocktime, sizeof(short), 1, fp);
 		fwrite(&game_values.suicidetime, sizeof(short), 1, fp);
 
+		fwrite(&game_values.poweruppreset, sizeof(short), 1, fp);
+		fwrite(&g_iCurrentPowerupPresets, sizeof(short), NUM_POWERUP_PRESETS * NUM_POWERUPS, fp);
+
 		fwrite(game_values.inputConfiguration, sizeof(CInputPlayerControl), 8, fp);
 
 		for(int iPlayer = 0; iPlayer < 4; iPlayer++)
@@ -165,10 +168,6 @@ void Menu::WriteGameOptions()
 			short iGoal = miGoalField[k]->GetShortValue();
 			fwrite(&iGoal, sizeof(short), 1, fp);
 		}
-
-		//Write out powerup weights
-		for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
-			fwrite(&game_values.powerupweights[iPowerup], sizeof(short), 1, fp);
 
 		fwrite(&game_values.gamemodemenusettings, sizeof(GameModeSettings), 1, fp);
 
@@ -199,8 +198,11 @@ void Menu::CreateMenu()
 	miSMWVersion = new MI_Image(&menu_version, 570, 10, 0, 0, 58, 32, 1, 1, 0);
 	miSMWVersionText = new MI_Text("Beta 1", 630, 45, 0, 2, 2);
 	
-	miMainStartButton = new MI_Button(&spr_selectfield, 120, 210, "Start", 400, 0);
+	miMainStartButton = new MI_Button(&spr_selectfield, 120, 210, "Start", 310, 0);
 	miMainStartButton->SetCode(MENU_CODE_TO_MATCH_SELECTION_MENU);
+
+	miQuickGameButton = new MI_Button(&spr_selectfield, 440, 210, "Go!", 80, 0);
+	miQuickGameButton->SetCode(MENU_CODE_QUICK_GAME_START);
 
 	miPlayerSelect = new MI_PlayerSelect(&menu_player_select, 120, 250, "Players", 400, 140);
 	
@@ -213,7 +215,8 @@ void Menu::CreateMenu()
 	miExitButton = new MI_Button(&spr_selectfield, 120, 402, "Exit", 400, 0);
 	miExitButton->SetCode(MENU_CODE_EXIT_APPLICATION);
 
-	mMainMenu.AddControl(miMainStartButton, miExitButton, miPlayerSelect, NULL, NULL);
+	mMainMenu.AddControl(miMainStartButton, miExitButton, miPlayerSelect, NULL, miQuickGameButton);
+	mMainMenu.AddControl(miQuickGameButton, miExitButton, miPlayerSelect, miMainStartButton, NULL);
 	mMainMenu.AddControl(miPlayerSelect, miMainStartButton, miOptionsButton, NULL, NULL);
 	mMainMenu.AddControl(miOptionsButton, miPlayerSelect, miControlsButton, NULL, NULL);
 	mMainMenu.AddControl(miControlsButton, miOptionsButton, miExitButton, NULL, NULL);
@@ -2352,102 +2355,20 @@ void Menu::CreateMenu()
 	// Frenzy Mode Settings
 	//***********************
 
-	miFrenzyModeQuantityField = new MI_SelectField(&spr_selectfield, 120, 60, "Limit", 400, 180);
-	miFrenzyModeQuantityField->Add("Single Powerup", 0, "", false, false);
-	miFrenzyModeQuantityField->Add("1 Powerup", 1, "", false, false);
-	miFrenzyModeQuantityField->Add("2 Powerups", 2, "", false, false);
-	miFrenzyModeQuantityField->Add("3 Powerups", 3, "", false, false);
-	miFrenzyModeQuantityField->Add("4 Powerups", 4, "", false, false);
-	miFrenzyModeQuantityField->Add("5 Powerups", 5, "", false, false);
-	miFrenzyModeQuantityField->Add("# Players - 1", 6, "", false, false);
-	miFrenzyModeQuantityField->Add("# Players", 7, "", false, false);
-	miFrenzyModeQuantityField->Add("# Players + 1", 8, "", false, false);
-	miFrenzyModeQuantityField->Add("# Players + 2", 9, "", false, false);
-	miFrenzyModeQuantityField->Add("# Players + 3", 10, "", false, false);
-	miFrenzyModeQuantityField->SetData(&game_values.gamemodemenusettings.frenzy.quantity, NULL, NULL);
-	miFrenzyModeQuantityField->SetKey(game_values.gamemodemenusettings.frenzy.quantity);
-
-	miFrenzyModeRateField = new MI_SelectField(&spr_selectfield, 120, 100, "Rate", 400, 180);
-	miFrenzyModeRateField->Add("Instant", 0, "", false, false);
-	miFrenzyModeRateField->Add("1 Second", 62, "", false, false);
-	miFrenzyModeRateField->Add("2 Seconds", 124, "", false, false);
-	miFrenzyModeRateField->Add("3 Seconds", 186, "", false, false);
-	miFrenzyModeRateField->Add("5 Seconds", 310, "", false, false);
-	miFrenzyModeRateField->Add("10 Seconds", 620, "", false, false);
-	miFrenzyModeRateField->Add("15 Seconds", 930, "", false, false);
-	miFrenzyModeRateField->Add("20 Seconds", 1240, "", false, false);
-	miFrenzyModeRateField->Add("25 Seconds", 1550, "", false, false);
-	miFrenzyModeRateField->Add("30 Seconds", 1860, "", false, false);
-	miFrenzyModeRateField->SetData(&game_values.gamemodemenusettings.frenzy.rate, NULL, NULL);
-	miFrenzyModeRateField->SetKey(game_values.gamemodemenusettings.frenzy.rate);
-
-	miFrenzyModeStoredShellsField = new MI_SelectField(&spr_selectfield, 120, 140, "Store Shells", 400, 180);
-	miFrenzyModeStoredShellsField->Add("Off", 0, "", false, false);
-	miFrenzyModeStoredShellsField->Add("On", 1, "", true, false);
-	miFrenzyModeStoredShellsField->SetData(NULL, NULL, &game_values.gamemodemenusettings.frenzy.storedshells);
-	miFrenzyModeStoredShellsField->SetKey(game_values.gamemodemenusettings.frenzy.storedshells ? 1 : 0);
-	miFrenzyModeStoredShellsField->SetAutoAdvance(true);
-
-	short iPowerupMap[] = {8, 5, 11, 17, 19, 21, 23, 24, 25, 20, 9, 16, 10, 22, 12, 13, 14, 15, 27};
-	for(short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++)
-	{
-		miFrenzyModePowerupSlider[iPowerup] = new MI_PowerupSlider(&spr_selectfield, &menu_slider_bar, &spr_storedpoweruplarge, iPowerup < 10 ? 65 : 330, 40 + 40 * iPowerup - (iPowerup < 10 ? 0 : 380), 245, iPowerupMap[iPowerup]);
-		miFrenzyModePowerupSlider[iPowerup]->Add("", 0, "", false, false);
-		miFrenzyModePowerupSlider[iPowerup]->Add("", 1, "", false, false);
-		miFrenzyModePowerupSlider[iPowerup]->Add("", 2, "", false, false);
-		miFrenzyModePowerupSlider[iPowerup]->Add("", 3, "", false, false);
-		miFrenzyModePowerupSlider[iPowerup]->Add("", 4, "", false, false);
-		miFrenzyModePowerupSlider[iPowerup]->Add("", 5, "", false, false);
-		miFrenzyModePowerupSlider[iPowerup]->Add("", 6, "", false, false);
-		miFrenzyModePowerupSlider[iPowerup]->Add("", 7, "", false, false);
-		miFrenzyModePowerupSlider[iPowerup]->Add("", 8, "", false, false);
-		miFrenzyModePowerupSlider[iPowerup]->Add("", 9, "", false, false);
-		miFrenzyModePowerupSlider[iPowerup]->Add("", 10, "", false, false);
-		miFrenzyModePowerupSlider[iPowerup]->SetNoWrap(true);
-		miFrenzyModePowerupSlider[iPowerup]->SetData(&game_values.gamemodemenusettings.frenzy.powerupweight[iPowerup], NULL, NULL);
-		miFrenzyModePowerupSlider[iPowerup]->SetKey(game_values.gamemodemenusettings.frenzy.powerupweight[iPowerup]);
-	}
-
-	miFrenzyModeBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
-	miFrenzyModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
+	miFrenzyModeOptions = new MI_FrenzyModeOptions(50, 44, 640, 7);
+	miFrenzyModeOptions->SetAutoModify(true);
 
 	miFrenzyModeLeftHeaderBar = new MI_Image(&menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
 	miFrenzyModeRightHeaderBar = new MI_Image(&menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
 	miFrenzyModeHeaderText = new MI_Text("Frenzy Mode Menu", 320, 5, 0, 2, 1);
 
-
-	mModeSettingsMenu[15].AddControl(miFrenzyModeQuantityField, miFrenzyModeBackButton, miFrenzyModeRateField, NULL, miFrenzyModeBackButton);
-	mModeSettingsMenu[15].AddControl(miFrenzyModeRateField, miFrenzyModeQuantityField, miFrenzyModeStoredShellsField, NULL, miFrenzyModeBackButton);
-	mModeSettingsMenu[15].AddControl(miFrenzyModeStoredShellsField, miFrenzyModeRateField, miFrenzyModePowerupSlider[0], NULL, miFrenzyModeBackButton);
-
-	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[0], miFrenzyModeStoredShellsField, miFrenzyModePowerupSlider[1], NULL, miFrenzyModePowerupSlider[10]);
-	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[1], miFrenzyModePowerupSlider[0], miFrenzyModePowerupSlider[2], NULL, miFrenzyModePowerupSlider[11]);
-	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[2], miFrenzyModePowerupSlider[1], miFrenzyModePowerupSlider[3], NULL, miFrenzyModePowerupSlider[12]);
-	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[3], miFrenzyModePowerupSlider[2], miFrenzyModePowerupSlider[4], NULL, miFrenzyModePowerupSlider[13]);
-	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[4], miFrenzyModePowerupSlider[3], miFrenzyModePowerupSlider[5], NULL, miFrenzyModePowerupSlider[14]);
-	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[5], miFrenzyModePowerupSlider[4], miFrenzyModePowerupSlider[6], NULL, miFrenzyModePowerupSlider[15]);
-	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[6], miFrenzyModePowerupSlider[5], miFrenzyModePowerupSlider[7], NULL, miFrenzyModePowerupSlider[16]);
-	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[7], miFrenzyModePowerupSlider[6], miFrenzyModePowerupSlider[8], NULL, miFrenzyModePowerupSlider[17]);
-	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[8], miFrenzyModePowerupSlider[7], miFrenzyModePowerupSlider[9], NULL, miFrenzyModePowerupSlider[18]);
-	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[9], miFrenzyModePowerupSlider[8], miFrenzyModePowerupSlider[10], NULL, miFrenzyModeBackButton);
-
-	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[10], miFrenzyModePowerupSlider[9], miFrenzyModePowerupSlider[11], miFrenzyModePowerupSlider[0], miFrenzyModeBackButton);
-	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[11], miFrenzyModePowerupSlider[10], miFrenzyModePowerupSlider[12], miFrenzyModePowerupSlider[1], miFrenzyModeBackButton);
-	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[12], miFrenzyModePowerupSlider[11], miFrenzyModePowerupSlider[13], miFrenzyModePowerupSlider[2], miFrenzyModeBackButton);
-	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[13], miFrenzyModePowerupSlider[12], miFrenzyModePowerupSlider[14], miFrenzyModePowerupSlider[3], miFrenzyModeBackButton);
-	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[14], miFrenzyModePowerupSlider[13], miFrenzyModePowerupSlider[15], miFrenzyModePowerupSlider[4], miFrenzyModeBackButton);
-	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[15], miFrenzyModePowerupSlider[14], miFrenzyModePowerupSlider[16], miFrenzyModePowerupSlider[5], miFrenzyModeBackButton);
-	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[16], miFrenzyModePowerupSlider[15], miFrenzyModePowerupSlider[17], miFrenzyModePowerupSlider[6], miFrenzyModeBackButton);
-	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[17], miFrenzyModePowerupSlider[16], miFrenzyModePowerupSlider[18], miFrenzyModePowerupSlider[7], miFrenzyModeBackButton);
-	mModeSettingsMenu[15].AddControl(miFrenzyModePowerupSlider[18], miFrenzyModePowerupSlider[17], miFrenzyModeBackButton,       miFrenzyModePowerupSlider[8], miFrenzyModeBackButton);
-
-	mModeSettingsMenu[15].AddControl(miFrenzyModeBackButton, miFrenzyModePowerupSlider[18], miFrenzyModeQuantityField, miFrenzyModePowerupSlider[18], NULL);
+	mModeSettingsMenu[15].AddControl(miFrenzyModeOptions, NULL, NULL, NULL, NULL);
 	
 	mModeSettingsMenu[15].AddNonControl(miFrenzyModeLeftHeaderBar);
 	mModeSettingsMenu[15].AddNonControl(miFrenzyModeRightHeaderBar);
 	mModeSettingsMenu[15].AddNonControl(miFrenzyModeHeaderText);
 	
-	mModeSettingsMenu[15].SetHeadControl(miFrenzyModeQuantityField);
+	mModeSettingsMenu[15].SetHeadControl(miFrenzyModeOptions);
 	mModeSettingsMenu[15].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
 
@@ -2807,87 +2728,17 @@ void Menu::CreateMenu()
 	mBonusWheelMenu.SetHeadControl(miBonusWheel);
 	mBonusWheelMenu.SetCancelCode(MENU_CODE_BONUS_DONE);
 
+
 	//***********************
 	// Powerup Selection Menu
 	//***********************
 	
-	/*
-	for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
-	{
-		miPowerupSlider[iPowerup] = new MI_PowerupSlider(&spr_selectfield, &menu_slider_bar, &spr_storedpoweruplarge, 50 + (iPowerupDisplayMap[iPowerup] < 10 ? 0 : 295), 44 + 38 * (iPowerupDisplayMap[iPowerup] < 10 ? iPowerupDisplayMap[iPowerup] : iPowerupDisplayMap[iPowerup] - 10), 245, iPowerup);
-		miPowerupSlider[iPowerup]->Add("", 0, "", false, false);
-		miPowerupSlider[iPowerup]->Add("", 1, "", false, false);
-		miPowerupSlider[iPowerup]->Add("", 2, "", false, false);
-		miPowerupSlider[iPowerup]->Add("", 3, "", false, false);
-		miPowerupSlider[iPowerup]->Add("", 4, "", false, false);
-		miPowerupSlider[iPowerup]->Add("", 5, "", false, false);
-		miPowerupSlider[iPowerup]->Add("", 6, "", false, false);
-		miPowerupSlider[iPowerup]->Add("", 7, "", false, false);
-		miPowerupSlider[iPowerup]->Add("", 8, "", false, false);
-		miPowerupSlider[iPowerup]->Add("", 9, "", false, false);
-		miPowerupSlider[iPowerup]->Add("", 10, "", false, false);
-		miPowerupSlider[iPowerup]->SetNoWrap(true);
-		miPowerupSlider[iPowerup]->SetData(&game_values.powerupweights[iPowerup], NULL, NULL);
-		miPowerupSlider[iPowerup]->SetKey(game_values.powerupweights[iPowerup]);
-	}
-
-	miPowerupSelectionBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
-	miPowerupSelectionBackButton->SetCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
-	
-	miPowerupSelectionRestoreDefaultsButton = new MI_Button(&spr_selectfield, 220, 432, "Restore Defaults", 245, 1);
-	miPowerupSelectionRestoreDefaultsButton->SetCode(MENU_CODE_RESTORE_DEFAULT_POWERUP_WEIGHTS);
-	*/
-
-	miPowerupSelection = new MI_PowerupSelection(50, 44, 640, 9);
+	miPowerupSelection = new MI_PowerupSelection(50, 44, 640, 8);
 	miPowerupSelection->SetAutoModify(true);
 
 	miPowerupSelectionLeftHeaderBar = new MI_Image(&menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
 	miPowerupSelectionMenuRightHeaderBar = new MI_Image(&menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
 	miPowerupSelectionMenuHeaderText = new MI_Text("Item Selection Menu", 320, 5, 0, 2, 1);
-
-	//Are You Sure dialog box
-	/*
-	miPowerupSelectionDialogImage = new MI_Image(&spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
-	miPowerupSelectionDialogExitText = new MI_Text("Are You", 320, 195, 0, 2, 1);
-	miPowerupSelectionDialogTournamentText = new MI_Text("Sure?", 320, 220, 0, 2, 1);
-	miPowerupSelectionDialogYesButton = new MI_Button(&spr_selectfield, 235, 250, "Yes", 80, 1);
-	miPowerupSelectionDialogNoButton = new MI_Button(&spr_selectfield, 325, 250, "No", 80, 1);
-	
-	miPowerupSelectionDialogYesButton->SetCode(MENU_CODE_POWERUP_RESET_YES);
-	miPowerupSelectionDialogNoButton->SetCode(MENU_CODE_POWERUP_RESET_NO);
-
-	miPowerupSelectionDialogImage->Show(false);
-	miPowerupSelectionDialogTournamentText->Show(false);
-	miPowerupSelectionDialogExitText->Show(false);
-	miPowerupSelectionDialogYesButton->Show(false);
-	miPowerupSelectionDialogNoButton->Show(false);
-
-	mPowerupSelectionMenu.AddControl(miPowerupSlider[iPowerupPositionMap[0]], miPowerupSelectionBackButton, miPowerupSlider[iPowerupPositionMap[1]], NULL, miPowerupSlider[iPowerupPositionMap[10]]);
-	mPowerupSelectionMenu.AddControl(miPowerupSlider[iPowerupPositionMap[1]], miPowerupSlider[iPowerupPositionMap[0]], miPowerupSlider[iPowerupPositionMap[2]], NULL, miPowerupSlider[iPowerupPositionMap[11]]);
-	mPowerupSelectionMenu.AddControl(miPowerupSlider[iPowerupPositionMap[2]], miPowerupSlider[iPowerupPositionMap[1]], miPowerupSlider[iPowerupPositionMap[3]], NULL, miPowerupSlider[iPowerupPositionMap[12]]);
-	mPowerupSelectionMenu.AddControl(miPowerupSlider[iPowerupPositionMap[3]], miPowerupSlider[iPowerupPositionMap[2]], miPowerupSlider[iPowerupPositionMap[4]], NULL, miPowerupSlider[iPowerupPositionMap[13]]);
-	mPowerupSelectionMenu.AddControl(miPowerupSlider[iPowerupPositionMap[4]], miPowerupSlider[iPowerupPositionMap[3]], miPowerupSlider[iPowerupPositionMap[5]], NULL, miPowerupSlider[iPowerupPositionMap[14]]);
-	mPowerupSelectionMenu.AddControl(miPowerupSlider[iPowerupPositionMap[5]], miPowerupSlider[iPowerupPositionMap[4]], miPowerupSlider[iPowerupPositionMap[6]], NULL, miPowerupSlider[iPowerupPositionMap[15]]);
-	mPowerupSelectionMenu.AddControl(miPowerupSlider[iPowerupPositionMap[6]], miPowerupSlider[iPowerupPositionMap[5]], miPowerupSlider[iPowerupPositionMap[7]], NULL, miPowerupSlider[iPowerupPositionMap[16]]);
-	mPowerupSelectionMenu.AddControl(miPowerupSlider[iPowerupPositionMap[7]], miPowerupSlider[iPowerupPositionMap[6]], miPowerupSlider[iPowerupPositionMap[8]], NULL, miPowerupSlider[iPowerupPositionMap[17]]);
-	mPowerupSelectionMenu.AddControl(miPowerupSlider[iPowerupPositionMap[8]], miPowerupSlider[iPowerupPositionMap[7]], miPowerupSlider[iPowerupPositionMap[9]], NULL, miPowerupSlider[iPowerupPositionMap[18]]);
-	mPowerupSelectionMenu.AddControl(miPowerupSlider[iPowerupPositionMap[9]], miPowerupSlider[iPowerupPositionMap[8]], miPowerupSelectionRestoreDefaultsButton, NULL, miPowerupSlider[iPowerupPositionMap[19]]);
-	
-	mPowerupSelectionMenu.AddControl(miPowerupSlider[iPowerupPositionMap[10]], miPowerupSelectionRestoreDefaultsButton, miPowerupSlider[iPowerupPositionMap[11]], miPowerupSlider[iPowerupPositionMap[0]], NULL);
-	mPowerupSelectionMenu.AddControl(miPowerupSlider[iPowerupPositionMap[11]], miPowerupSlider[iPowerupPositionMap[10]], miPowerupSlider[iPowerupPositionMap[12]], miPowerupSlider[iPowerupPositionMap[1]], NULL);
-	mPowerupSelectionMenu.AddControl(miPowerupSlider[iPowerupPositionMap[12]], miPowerupSlider[iPowerupPositionMap[11]], miPowerupSlider[iPowerupPositionMap[13]], miPowerupSlider[iPowerupPositionMap[2]], NULL);
-	mPowerupSelectionMenu.AddControl(miPowerupSlider[iPowerupPositionMap[13]], miPowerupSlider[iPowerupPositionMap[12]], miPowerupSlider[iPowerupPositionMap[14]], miPowerupSlider[iPowerupPositionMap[3]], NULL);
-	mPowerupSelectionMenu.AddControl(miPowerupSlider[iPowerupPositionMap[14]], miPowerupSlider[iPowerupPositionMap[13]], miPowerupSlider[iPowerupPositionMap[15]], miPowerupSlider[iPowerupPositionMap[4]], NULL);
-	mPowerupSelectionMenu.AddControl(miPowerupSlider[iPowerupPositionMap[15]], miPowerupSlider[iPowerupPositionMap[14]], miPowerupSlider[iPowerupPositionMap[16]], miPowerupSlider[iPowerupPositionMap[5]], NULL);
-	mPowerupSelectionMenu.AddControl(miPowerupSlider[iPowerupPositionMap[16]], miPowerupSlider[iPowerupPositionMap[15]], miPowerupSlider[iPowerupPositionMap[17]], miPowerupSlider[iPowerupPositionMap[6]], NULL);
-	mPowerupSelectionMenu.AddControl(miPowerupSlider[iPowerupPositionMap[17]], miPowerupSlider[iPowerupPositionMap[16]], miPowerupSlider[iPowerupPositionMap[18]], miPowerupSlider[iPowerupPositionMap[7]], NULL);
-	mPowerupSelectionMenu.AddControl(miPowerupSlider[iPowerupPositionMap[18]], miPowerupSlider[iPowerupPositionMap[17]], miPowerupSlider[iPowerupPositionMap[19]], miPowerupSlider[iPowerupPositionMap[8]], NULL);
-	mPowerupSelectionMenu.AddControl(miPowerupSlider[iPowerupPositionMap[19]], miPowerupSlider[iPowerupPositionMap[18]], miPowerupSelectionBackButton, miPowerupSlider[iPowerupPositionMap[9]], NULL);
-	
-	mPowerupSelectionMenu.AddControl(miPowerupSelectionRestoreDefaultsButton, miPowerupSlider[iPowerupPositionMap[9]], miPowerupSlider[iPowerupPositionMap[10]], NULL, miPowerupSelectionBackButton);
-
-	mPowerupSelectionMenu.AddControl(miPowerupSelectionBackButton, miPowerupSlider[iPowerupPositionMap[19]], miPowerupSlider[iPowerupPositionMap[0]], miPowerupSelectionRestoreDefaultsButton, NULL);
-	*/
 
 	mPowerupSelectionMenu.AddControl(miPowerupSelection, NULL, NULL, NULL, NULL);
 
@@ -2895,15 +2746,6 @@ void Menu::CreateMenu()
 	mPowerupSelectionMenu.AddNonControl(miPowerupSelectionMenuRightHeaderBar);
 	mPowerupSelectionMenu.AddNonControl(miPowerupSelectionMenuHeaderText);
 	
-	/*
-	mPowerupSelectionMenu.AddNonControl(miPowerupSelectionDialogImage);
-	mPowerupSelectionMenu.AddNonControl(miPowerupSelectionDialogTournamentText);
-	mPowerupSelectionMenu.AddNonControl(miPowerupSelectionDialogExitText);
-
-	mPowerupSelectionMenu.AddControl(miPowerupSelectionDialogYesButton, NULL, NULL, NULL, miPowerupSelectionDialogNoButton);
-	mPowerupSelectionMenu.AddControl(miPowerupSelectionDialogNoButton, NULL, NULL, miPowerupSelectionDialogYesButton, NULL);
-	*/
-
 	mPowerupSelectionMenu.SetHeadControl(miPowerupSelection);
 	mPowerupSelectionMenu.SetCancelCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 
@@ -3017,14 +2859,20 @@ void Menu::RunMenu()
 	fNeedMenuMusicReset = false;
 
 	if(game_values.gamemode->winningteam > -1 && game_values.tournamentwinner == -1 && 
-		(((game_values.matchtype == MATCH_TYPE_SINGLE_GAME || game_values.matchtype == MATCH_TYPE_MINIGAME || game_values.matchtype == MATCH_TYPE_TOURNAMENT) && game_values.bonuswheel == 2) || (game_values.matchtype == MATCH_TYPE_TOUR && game_values.tourstops[game_values.tourstopcurrent - 1]->iBonusType)))
+		(((game_values.matchtype == MATCH_TYPE_SINGLE_GAME || game_values.matchtype == MATCH_TYPE_QUICK_GAME || game_values.matchtype == MATCH_TYPE_MINIGAME || game_values.matchtype == MATCH_TYPE_TOURNAMENT) && game_values.bonuswheel == 2) || (game_values.matchtype == MATCH_TYPE_TOUR && game_values.tourstops[game_values.tourstopcurrent - 1]->iBonusType)))
 	{
 		miBonusWheel->Reset(false);
 		mCurrentMenu = &mBonusWheelMenu;
 	}
-	else if(game_values.matchtype != MATCH_TYPE_SINGLE_GAME && game_values.matchtype != MATCH_TYPE_MINIGAME)
+	else if(game_values.matchtype != MATCH_TYPE_SINGLE_GAME && game_values.matchtype != MATCH_TYPE_QUICK_GAME && game_values.matchtype != MATCH_TYPE_MINIGAME)
 	{
 		mCurrentMenu = &mTournamentScoreboardMenu;
+	}
+	else if(game_values.matchtype == MATCH_TYPE_QUICK_GAME)
+	{
+		//Reset back to main menu after quick game
+		mCurrentMenu = &mMainMenu;
+		mCurrentMenu->ResetMenu();
 	}
 
 	if(game_values.matchtype == MATCH_TYPE_WORLD)
@@ -3088,14 +2936,14 @@ void Menu::RunMenu()
 
 	//Keep track if we entered the menu loop as part of a tournament, if we exit the tournament
 	//we need to reset the menu music back to normal
-	if(game_values.matchtype != MATCH_TYPE_SINGLE_GAME && game_values.matchtype != MATCH_TYPE_MINIGAME)
+	if(game_values.matchtype != MATCH_TYPE_SINGLE_GAME && game_values.matchtype != MATCH_TYPE_QUICK_GAME && game_values.matchtype != MATCH_TYPE_MINIGAME)
 		fNeedMenuMusicReset = true;
 
 	if(game_values.music)
 	{
 		if(game_values.tournamentwinner < 0)
 		{
-			if(game_values.matchtype == MATCH_TYPE_SINGLE_GAME || game_values.matchtype == MATCH_TYPE_MINIGAME)
+			if(game_values.matchtype == MATCH_TYPE_SINGLE_GAME || game_values.matchtype == MATCH_TYPE_QUICK_GAME || game_values.matchtype == MATCH_TYPE_MINIGAME)
 				backgroundmusic[2].play(false, false);
 			else if(game_values.matchtype == MATCH_TYPE_WORLD)
 				backgroundmusic[5].play(false, false);
@@ -3104,7 +2952,7 @@ void Menu::RunMenu()
 		}
 	}
 
-	if(game_values.matchtype != MATCH_TYPE_WORLD)
+	if(game_values.matchtype != MATCH_TYPE_WORLD && game_values.matchtype != MATCH_TYPE_QUICK_GAME)
 	{
 		if(mCurrentMenu == &mGameSettingsMenu || mCurrentMenu == &mTournamentScoreboardMenu)
 			miMapField->LoadCurrentMap();
@@ -3330,8 +3178,13 @@ void Menu::RunMenu()
 				mCurrentMenu->ResetMenu();
 				iUnlockMinigameOptionIndex = 0;
 			}
-			else if(MENU_CODE_MATCH_SELECTION_START == code)
+			else if(MENU_CODE_MATCH_SELECTION_START == code || MENU_CODE_QUICK_GAME_START == code)
 			{
+				if(MENU_CODE_QUICK_GAME_START == code)
+					game_values.matchtype = MATCH_TYPE_QUICK_GAME;
+				else
+					game_values.matchtype = miMatchSelectionField->GetShortValue();
+
 				miTeamSelect->Reset();
 				mCurrentMenu = &mTeamSelectMenu;
 				mCurrentMenu->ResetMenu();
@@ -3448,6 +3301,18 @@ void Menu::RunMenu()
 					game_values.gamemode = pipegamemode;
 					StartGame();
 				}
+				else if(MATCH_TYPE_QUICK_GAME == game_values.matchtype)
+				{
+					short iRandomMode = rand() % GAMEMODE_LAST;
+					game_values.gamemode = gamemodes[iRandomMode];
+						
+					SModeOption * options = game_values.gamemode->GetOptions();
+					
+					short iRandOption = (rand() % 8) + 2;
+					game_values.gamemode->goal  = options[iRandOption].iValue;
+
+					StartGame();
+				}
 				else
 				{
 
@@ -3532,6 +3397,9 @@ void Menu::RunMenu()
 							game_values.screenfadespeed = 8;
 							game_values.screenfade = 8;
 							game_values.gamestate = GS_START_WORLD;
+
+							//Play enter world sound
+							ifsoundonandreadyplay(sfx_enterstage);
 						}
 
 						//Setup items on next menu
@@ -3762,44 +3630,7 @@ void Menu::RunMenu()
 			{
 				mCurrentMenu = &mPowerupSettingsMenu;
 				mCurrentMenu->ResetMenu();
-			}/*
-			else if (MENU_CODE_RESTORE_DEFAULT_POWERUP_WEIGHTS == code)
-			{
-				miPowerupSelectionDialogImage->Show(true);
-				miPowerupSelectionDialogTournamentText->Show(true);
-				miPowerupSelectionDialogExitText->Show(true);
-				miPowerupSelectionDialogYesButton->Show(true);
-				miPowerupSelectionDialogNoButton->Show(true);
-
-				mPowerupSelectionMenu.RememberCurrent();
-
-				mPowerupSelectionMenu.SetHeadControl(miPowerupSelectionDialogNoButton);
-				mPowerupSelectionMenu.SetCancelCode(MENU_CODE_POWERUP_RESET_NO);
-				mPowerupSelectionMenu.ResetMenu();
 			}
-			else if(MENU_CODE_POWERUP_RESET_YES == code || MENU_CODE_POWERUP_RESET_NO == code)
-			{
-				miPowerupSelectionDialogImage->Show(false);
-				miPowerupSelectionDialogTournamentText->Show(false);
-				miPowerupSelectionDialogExitText->Show(false);
-				miPowerupSelectionDialogYesButton->Show(false);
-				miPowerupSelectionDialogNoButton->Show(false);
-
-				mPowerupSelectionMenu.SetHeadControl(miPowerupSlider[iPowerupPositionMap[0]]);
-				mPowerupSelectionMenu.SetCancelCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
-
-				mPowerupSelectionMenu.RestoreCurrent();
-
-				if(MENU_CODE_POWERUP_RESET_YES == code)
-				{
-					//restore default powerup weights for powerup selection menu
-					for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
-					{
-						miPowerupSlider[iPowerup]->SetKey(g_iDefaultPowerupWeights[iPowerup]);
-						game_values.powerupweights[iPowerup] = g_iDefaultPowerupWeights[iPowerup];
-					}
-				}
-			}*/
 			else if (MENU_CODE_TO_GRAPHICS_OPTIONS_MENU == code)
 			{
 				mCurrentMenu = &mGraphicsOptionsMenu;
@@ -4111,6 +3942,11 @@ void Menu::RunMenu()
 						g_map.loadMap(convertPath("maps/special/minigamepipe.map"), read_type_full);
 						LoadCurrentMapBackground();
 					}
+					else if(game_values.matchtype == MATCH_TYPE_QUICK_GAME)
+					{
+						//Load a random map for the quick game
+						g_map.loadMap(maplist.randomFilename(), read_type_full);
+					}
 					else
 					{
 						g_map.loadMap(maplist.currentFilename(), read_type_full);
@@ -4411,7 +4247,7 @@ void Menu::ResetTournamentBackToMainMenu()
 	mCurrentMenu = &mMainMenu;
 	mCurrentMenu->ResetMenu();
 
-	if(game_values.matchtype != MATCH_TYPE_SINGLE_GAME && game_values.matchtype != MATCH_TYPE_MINIGAME)
+	if(game_values.matchtype != MATCH_TYPE_SINGLE_GAME && game_values.matchtype != MATCH_TYPE_QUICK_GAME && game_values.matchtype != MATCH_TYPE_MINIGAME)
 	{
 		if(fNeedMenuMusicReset)
 		{

@@ -417,6 +417,7 @@ bool LoadGameSounds()
 	sfx_treasurechest.init(convertPath("sfx/packs/treasurechest.wav", soundpack));
 	sfx_flamecannon.init(convertPath("sfx/packs/flamecannon.wav", soundpack));
 	sfx_wand.init(convertPath("sfx/packs/wand.wav", soundpack));
+	sfx_enterstage.init(convertPath("sfx/packs/enter-stage.wav", soundpack));
 
 	game_values.soundcapable = true;
 	return true;

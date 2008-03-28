@@ -21,7 +21,7 @@ class ScriptOperation
 };
 #endif
 
-enum MatchType {MATCH_TYPE_SINGLE_GAME = 0, MATCH_TYPE_TOURNAMENT = 1, MATCH_TYPE_TOUR = 2, MATCH_TYPE_WORLD = 4, MATCH_TYPE_MINIGAME = 3};
+enum MatchType {MATCH_TYPE_SINGLE_GAME = 0, MATCH_TYPE_TOURNAMENT = 1, MATCH_TYPE_TOUR = 2, MATCH_TYPE_WORLD = 4, MATCH_TYPE_MINIGAME = 3, MATCH_TYPE_QUICK_GAME = 5};
 enum DisplayError {DISPLAY_ERROR_NONE, DISPLAY_ERROR_READ_TOUR_FILE, DISPLAY_ERROR_READ_WORLD_FILE, DISPLAY_ERROR_MAP_FILTER};
 
 class Menu
@@ -68,6 +68,8 @@ class Menu
 		MI_Text * miSMWVersionText;
 	
 		MI_Button * miMainStartButton;
+		MI_Button * miQuickGameButton;
+
 		MI_PlayerSelect * miPlayerSelect;
 	
 		MI_Button * miOptionsButton;
@@ -501,11 +503,7 @@ class Menu
 		MI_Text * miStompModeHeaderText;
 
 		//Frenzy
-		MI_SelectField * miFrenzyModeQuantityField;
-		MI_SelectField * miFrenzyModeRateField;
-		MI_SelectField * miFrenzyModeStoredShellsField;
-		MI_PowerupSlider * miFrenzyModePowerupSlider[NUMFRENZYCARDS];
-		MI_Button * miFrenzyModeBackButton;
+		MI_FrenzyModeOptions * miFrenzyModeOptions;
 		
 		MI_Image * miFrenzyModeLeftHeaderBar;
 		MI_Image * miFrenzyModeRightHeaderBar;

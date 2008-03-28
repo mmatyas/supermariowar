@@ -547,7 +547,7 @@ class MI_PowerupSelection : public UI_Control
 	private:
 		
 		void SetupPowerupFields();
-		void EnablePowerupFields();
+		void EnablePowerupFields(bool fEnable);
 
 		short iIndex, iOffset;
 		short iTopStop, iBottomStop;
@@ -557,17 +557,55 @@ class MI_PowerupSelection : public UI_Control
 		UI_Menu * mMenu;
 
 		MI_SelectField * miOverride;
+		MI_SelectField * miPreset;
 
 		MI_PowerupSlider * miPowerupSlider[NUM_POWERUPS];
+
 		MI_Button * miRestoreDefaultsButton;
+		MI_Button * miClearButton;
 
 		MI_Image * miDialogImage;
 		MI_Text * miDialogAreYouText;
 		MI_Text * miDialogSureText;
 		MI_Button * miDialogYesButton;
 		MI_Button * miDialogNoButton;
-	
+
 };
+
+class MI_FrenzyModeOptions : public UI_Control
+{
+	public:
+
+		MI_FrenzyModeOptions(short x, short y, short width, short numlines);
+		virtual ~MI_FrenzyModeOptions();
+
+		MenuCodeEnum Modify(bool modify);
+		MenuCodeEnum SendInput(CPlayerInput * playerInput);
+
+		void Update();
+		void Draw();
+
+		void MoveNext();
+		void MovePrev();
+
+	private:
+		
+		void SetupPowerupFields();
+
+		short iIndex, iOffset;
+		short iTopStop, iBottomStop;
+		short iNumLines;
+		short iWidth;
+
+		UI_Menu * mMenu;
+	
+		MI_SelectField * miQuantityField;
+		MI_SelectField * miRateField;
+		MI_SelectField * miStoredShellsField;
+		MI_PowerupSlider * miPowerupSlider[NUMFRENZYCARDS];
+		MI_Button * miBackButton;
+};
+
 
 class MI_MapField : public UI_Control
 {

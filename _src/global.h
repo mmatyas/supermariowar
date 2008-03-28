@@ -223,6 +223,7 @@ struct STextAward
 #define NUM_WORLD_POWERUPS 15
 #define NUM_WORLD_SCORE_BONUSES 20
 #define NUM_BLOCK_SETTINGS NUM_POWERUPS
+#define NUM_POWERUP_PRESETS 12
 
 void GetNameFromFileName(char * szName, const char * szFileName);
 std::string stripCreatorAndDotMap(const std::string &filename);
@@ -343,6 +344,7 @@ extern sfxSound			sfx_worldmove;
 extern sfxSound			sfx_treasurechest;
 extern sfxSound			sfx_flamecannon;
 extern sfxSound			sfx_wand;
+extern sfxSound			sfx_enterstage;
 
 extern sfxMusic			backgroundmusic[6];
 
@@ -591,7 +593,8 @@ extern char szIPString[32];
 //extern NetServer netServer;
 //extern NetClient netClient;
 
-extern short g_iDefaultPowerupWeights[];
+extern short g_iDefaultPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
+extern short g_iCurrentPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
 
 extern short g_iCurrentDrawIndex;
 
@@ -875,6 +878,7 @@ struct gv
 	short		storedpowerups[4];
 	short		gamepowerups[4];
 	short		powerupweights[NUM_POWERUPS];
+	short		poweruppreset;
 
 	short		worldpowerups[4][32];
 	short		worldpowerupcount[4];
@@ -1007,7 +1011,6 @@ struct gv
 	float		gamewindy;
 
 	short		suicidetime;
-
 	bool		minigameunlocked;
 };
 

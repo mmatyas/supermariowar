@@ -994,7 +994,7 @@ int editor_edit()
 							if(set_block == 1 || set_block == 15)
 							{
 								for(short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++)
-									g_map.objectdata[iClickX][iClickY].iSettings[iSetting] = g_iDefaultPowerupWeights[iSetting];
+									g_map.objectdata[iClickX][iClickY].iSettings[iSetting] = g_iDefaultPowerupPresets[0][iSetting];
 							}
 							else if(set_block >= 11 && set_block <= 14)
 							{
@@ -1206,7 +1206,7 @@ int editor_edit()
 							if(set_block == 1 || set_block == 15)
 							{
 								for(short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++)
-									g_map.objectdata[iClickX][iClickY].iSettings[iSetting] = g_iDefaultPowerupWeights[iSetting];
+									g_map.objectdata[iClickX][iClickY].iSettings[iSetting] = g_iDefaultPowerupPresets[0][iSetting];
 							}
 							else if(set_block >= 11 && set_block <= 14)
 							{
@@ -2020,7 +2020,7 @@ int editor_properties(short iBlockCol, short iBlockRow)
 							else if(event.key.keysym.sym == SDLK_BACKQUOTE)
 								iValue = 0;
 							else if(event.key.keysym.sym == SDLK_d)
-								iValue = g_iDefaultPowerupWeights[iSettingIndex];
+								iValue = g_iDefaultPowerupPresets[0][iSettingIndex];
 
 							//If shift is held, set all powerups to this setting
 							Uint8 * keystate = SDL_GetKeyState(NULL);
@@ -2029,7 +2029,7 @@ int editor_properties(short iBlockCol, short iBlockRow)
 								for(short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++)
 								{
 									if(event.key.keysym.sym == SDLK_d)
-										iValue = g_iDefaultPowerupWeights[iSetting];
+										iValue = g_iDefaultPowerupPresets[0][iSetting];
 
 									g_map.objectdata[iBlockCol][iBlockRow].iSettings[iSetting] = iValue;
 								}
@@ -2058,7 +2058,7 @@ int editor_properties(short iBlockCol, short iBlockRow)
 							if((event.button.button == SDL_BUTTON_RIGHT && (iMouseState & SDL_BUTTON_LMASK)) ||
 								(event.button.button == SDL_BUTTON_LEFT && (iMouseState & SDL_BUTTON_RMASK)))
 							{
-								*piSetting = g_iDefaultPowerupWeights[iSettingIndex];
+								*piSetting = g_iDefaultPowerupPresets[0][iSettingIndex];
 							}
 							else if(event.button.button == SDL_BUTTON_LEFT)
 							{
@@ -2096,7 +2096,7 @@ int editor_properties(short iBlockCol, short iBlockRow)
 								if(g_map.objectdata[iBlockCol][iBlockRow].iSettings[0] >= 0)
 									g_map.objectdata[iBlockCol][iBlockRow].iSettings[0] = -1;
 								else
-									g_map.objectdata[iBlockCol][iBlockRow].iSettings[0] = g_iDefaultPowerupWeights[0];
+									g_map.objectdata[iBlockCol][iBlockRow].iSettings[0] = g_iDefaultPowerupPresets[0][0];
 							}
 						}
 					}

@@ -1254,9 +1254,6 @@ void CGM_Frenzy::init()
 	iItemWeightCount = 0;
 	for(short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++)
 		iItemWeightCount += game_values.gamemodesettings.frenzy.powerupweight[iPowerup];
-
-	if(iItemWeightCount == 0)
-		iItemWeightCount = 1;
 }
 
 
@@ -1281,13 +1278,21 @@ void CGM_Frenzy::think()
 
 			if(objectcontainer[1].countTypes(object_frenzycard) < iPowerupQuantity)
 			{
-				//Randomly choose a powerup from the weighted list
-				int iRandPowerup = rand() % iItemWeightCount + 1;
-				iSelectedPowerup = 0;
-				int iWeightCount = game_values.gamemodesettings.frenzy.powerupweight[iSelectedPowerup];
+				if(iItemWeightCount == 0)
+				{
+					//If all weights are zero, then choose the random powerup
+					iSelectedPowerup = NUMFRENZYCARDS - 1;
+				}
+				else
+				{
+					//Randomly choose a powerup from the weighted list
+					int iRandPowerup = rand() % iItemWeightCount + 1;
+					iSelectedPowerup = 0;
+					int iWeightCount = game_values.gamemodesettings.frenzy.powerupweight[iSelectedPowerup];
 
-				while(iWeightCount < iRandPowerup)
-					iWeightCount += game_values.gamemodesettings.frenzy.powerupweight[++iSelectedPowerup];
+					while(iWeightCount < iRandPowerup)
+						iWeightCount += game_values.gamemodesettings.frenzy.powerupweight[++iSelectedPowerup];
+				}
 
 				objectcontainer[1].add(new MO_FrenzyCard(&spr_frenzycards, iSelectedPowerup));
 			}

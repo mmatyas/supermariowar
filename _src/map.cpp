@@ -545,7 +545,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 				if(objectdata[i][j].iType == 1)
 				{
 					for(short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++)
-						objectdata[i][j].iSettings[iSetting] = g_iDefaultPowerupWeights[iSetting];
+						objectdata[i][j].iSettings[iSetting] = g_iDefaultPowerupPresets[0][iSetting];
 				}
 			}
 		}
@@ -809,7 +809,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 				if(objectdata[i][j].iType == 1)
 				{
 					for(short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++)
-						objectdata[i][j].iSettings[iSetting] = g_iDefaultPowerupWeights[iSetting];
+						objectdata[i][j].iSettings[iSetting] = g_iDefaultPowerupPresets[0][iSetting];
 				}
 
 				warpdata[i][j].direction = (short)ReadInt(mapfile);
@@ -1006,7 +1006,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 				if(objectdata[i][j].iType == 1)
 				{
 					for(short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++)
-						objectdata[i][j].iSettings[iSetting] = g_iDefaultPowerupWeights[iSetting];
+						objectdata[i][j].iSettings[iSetting] = g_iDefaultPowerupPresets[0][iSetting];
 				}
 			}
 		}

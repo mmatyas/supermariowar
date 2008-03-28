@@ -1911,9 +1911,8 @@ void MI_PowerupSlider::Draw()
  **************************************/
 
 //Rearrange display of powerups
-short iPowerupDisplayMap[NUM_POWERUPS] = { 4, 0, 1, 2, 3, 6, 10, 12, 11, 14, 13, 7, 16, 17, 18, 19, 15, 9, 5, 8, 20, 21, 22, 23, 24, 25};
+//short iPowerupDisplayMap[NUM_POWERUPS] = { 4, 0, 1, 2, 3, 6, 10, 12, 11, 14, 13, 7, 16, 17, 18, 19, 15, 9, 5, 8, 20, 21, 22, 23, 24, 25};
 short iPowerupPositionMap[NUM_POWERUPS] = { 1, 2, 3, 4, 0, 18, 5, 11, 19, 17, 6, 8, 7, 10, 9, 16, 12, 13, 14, 15, 20, 21, 22, 23, 24, 25};
-
 MI_PowerupSelection::MI_PowerupSelection(short x, short y, short width, short numlines) :
 	UI_Control(x, y)
 {
@@ -1923,7 +1922,7 @@ MI_PowerupSelection::MI_PowerupSelection(short x, short y, short width, short nu
 	iIndex = 0;
 	iOffset = 0;
 
-	iTopStop = ((iNumLines - 1) >> 1) + 1;
+	iTopStop = ((iNumLines - 1) >> 1) + 2;
 	iBottomStop = (NUM_POWERUPS >> 1) - iNumLines + iTopStop;
 
 	mMenu = new UI_Menu();
@@ -1931,11 +1930,28 @@ MI_PowerupSelection::MI_PowerupSelection(short x, short y, short width, short nu
 	miOverride = new MI_SelectField(&spr_selectfield, 70, iy, "Use Settings From", 500, 250);
 	miOverride->Add("Map Only", 0, "", false, false);
 	miOverride->Add("Game Only", 1, "", false, false);
-	miOverride->Add("Average", 2, "", false, false);
-	miOverride->Add("Weighted", 3, "", false, false);
+	miOverride->Add("Basic Average", 2, "", false, false);
+	miOverride->Add("Weighted Average", 3, "", false, false);
 	miOverride->SetData(&game_values.overridepowerupsettings, NULL, NULL);
 	miOverride->SetKey(game_values.overridepowerupsettings);
 	//miOverride->SetItemChangedCode(MENU_CODE_POWERUP_OVERRIDE_CHANGED);
+
+	miPreset = new MI_SelectField(&spr_selectfield, 70, iy + 40, "Item Set", 500, 250);
+	miPreset->Add("Custom Set 1", 0, "", false, false);
+	miPreset->Add("Custom Set 2", 1, "", false, false);
+	miPreset->Add("Custom Set 3", 2, "", false, false);
+	miPreset->Add("Custom Set 4", 3, "", false, false);
+	miPreset->Add("Custom Set 5", 4, "", false, false);
+	miPreset->Add("Balanced Set", 5, "", false, false);
+	miPreset->Add("Weapons Only", 6, "", false, false);
+	miPreset->Add("Support Items", 7, "", false, false);
+	miPreset->Add("Super Mario Bros 3", 8, "", false, false);
+	miPreset->Add("Bombs and Shakes", 9, "", false, false);
+	miPreset->Add("Fly and Glide", 10, "", false, false);
+	miPreset->Add("Shells", 11, "", false, false);
+	miPreset->SetData(&game_values.poweruppreset, NULL, NULL);
+	miPreset->SetKey(game_values.poweruppreset);
+	miPreset->SetItemChangedCode(MENU_CODE_POWERUP_PRESET_CHANGED);
 
 	for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
 	{
@@ -1954,10 +1970,14 @@ MI_PowerupSelection::MI_PowerupSelection(short x, short y, short width, short nu
 		miPowerupSlider[iPowerup]->SetNoWrap(true);
 		miPowerupSlider[iPowerup]->SetData(&game_values.powerupweights[iPowerup], NULL, NULL);
 		miPowerupSlider[iPowerup]->SetKey(game_values.powerupweights[iPowerup]);
+		miPowerupSlider[iPowerup]->SetItemChangedCode(MENU_CODE_POWERUP_SETTING_CHANGED);
 	}
-	
-	miRestoreDefaultsButton = new MI_Button(&spr_selectfield, 220, 432, "Restore Defaults", 245, 1);
+
+	miRestoreDefaultsButton = new MI_Button(&spr_selectfield, 160, 432, "Defaults", 150, 1);
 	miRestoreDefaultsButton->SetCode(MENU_CODE_RESTORE_DEFAULT_POWERUP_WEIGHTS);
+
+	miClearButton = new MI_Button(&spr_selectfield, 330, 432, "Clear", 150, 1);
+	miClearButton->SetCode(MENU_CODE_CLEAR_POWERUP_WEIGHTS);
 
 	//Are You Sure dialog box
 	miDialogImage = new MI_Image(&spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
@@ -1975,13 +1995,14 @@ MI_PowerupSelection::MI_PowerupSelection(short x, short y, short width, short nu
 	miDialogYesButton->Show(false);
 	miDialogNoButton->Show(false);
 
-	mMenu->AddControl(miOverride, NULL, miPowerupSlider[0], NULL, NULL);
+	mMenu->AddControl(miOverride, NULL, miPreset, NULL, NULL);
+	mMenu->AddControl(miPreset, miOverride, miPowerupSlider[0], NULL, NULL);
 
 	for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
 	{
 		UI_Control * upcontrol = NULL;
 		if(iPowerup == 0)
-			upcontrol = miOverride;
+			upcontrol = miPreset;
 		else
 			upcontrol = miPowerupSlider[iPowerup - 2];
 
@@ -1997,13 +2018,13 @@ MI_PowerupSelection::MI_PowerupSelection(short x, short y, short width, short nu
 		{
 			upcontrol = NULL;
 			if(iPowerup == 1)
-				upcontrol = miOverride;
+				upcontrol = miPreset;
 			else
 				upcontrol = miPowerupSlider[iPowerup - 2];
 
 			UI_Control * downcontrol = NULL;
 			if(iPowerup >= NUM_POWERUPS - 2)
-				downcontrol = miRestoreDefaultsButton;
+				downcontrol = miClearButton;
 			else
 				downcontrol = miPowerupSlider[iPowerup + 2];
 
@@ -2011,13 +2032,14 @@ MI_PowerupSelection::MI_PowerupSelection(short x, short y, short width, short nu
 		}
 	}
 
+	mMenu->AddControl(miRestoreDefaultsButton, miPowerupSlider[NUM_POWERUPS - 2], NULL, NULL, miClearButton);
+	mMenu->AddControl(miClearButton, miPowerupSlider[NUM_POWERUPS - 1], NULL, miRestoreDefaultsButton, NULL);
+
 	//Setup positions and visible powerups
 	SetupPowerupFields();
 
 	//Set enabled based on if we are overriding or not
 	//EnablePowerupFields();
-
-	mMenu->AddControl(miRestoreDefaultsButton, miPowerupSlider[NUM_POWERUPS - 1], NULL, NULL, NULL);
 
 	mMenu->AddNonControl(miDialogImage);
 	mMenu->AddNonControl(miDialogAreYouText);
@@ -2025,6 +2047,7 @@ MI_PowerupSelection::MI_PowerupSelection(short x, short y, short width, short nu
 
 	mMenu->AddControl(miDialogYesButton, NULL, NULL, NULL, miDialogNoButton);
 	mMenu->AddControl(miDialogNoButton, NULL, NULL, miDialogYesButton, NULL);
+
 
 	mMenu->SetHeadControl(miOverride);
 	mMenu->SetCancelCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
@@ -2047,19 +2070,19 @@ void MI_PowerupSelection::SetupPowerupFields()
 		else
 		{
 			slider->Show(true);
-			slider->SetPosition(ix + (iPosition % 2) * 295, iy + 44 + 38 * (iPosition / 2 - iOffset));
+			slider->SetPosition(ix + (iPosition % 2) * 295, iy + 84 + 38 * (iPosition / 2 - iOffset));
 		}
 	}
 }
 
-void MI_PowerupSelection::EnablePowerupFields()
+void MI_PowerupSelection::EnablePowerupFields(bool fEnable)
 {
 	for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
 	{
-		miPowerupSlider[iPowerup]->Disable(game_values.overridepowerupsettings == 0);
+		miPowerupSlider[iPowerup]->Disable(!fEnable);
 	}
 
-	miOverride->SetNeighbor(1, game_values.overridepowerupsettings > 0 ? miPowerupSlider[0] : NULL);
+	miPreset->SetNeighbor(1, fEnable ? miPowerupSlider[0] : NULL);
 }
 
 MenuCodeEnum MI_PowerupSelection::Modify(bool modify)
@@ -2068,6 +2091,8 @@ MenuCodeEnum MI_PowerupSelection::Modify(bool modify)
 	iOffset = 0;
 	iIndex = 0;
 	SetupPowerupFields();
+
+	//EnablePowerupFields(game_values.poweruppreset >= 1 && game_values.poweruppreset <= 3);
 
 	fModifying = modify;
 	return MENU_CODE_MODIFY_ACCEPTED;
@@ -2082,7 +2107,25 @@ MenuCodeEnum MI_PowerupSelection::SendInput(CPlayerInput * playerInput)
 		fModifying = false;
 		return MENU_CODE_UNSELECT_ITEM;
 	}
-	else if (MENU_CODE_RESTORE_DEFAULT_POWERUP_WEIGHTS == ret)
+	else if (MENU_CODE_POWERUP_PRESET_CHANGED == ret)
+	{
+		for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
+		{
+			short iCurrentValue = g_iCurrentPowerupPresets[game_values.poweruppreset][iPowerup];
+			miPowerupSlider[iPowerup]->SetKey(iCurrentValue);
+			game_values.powerupweights[iPowerup] = iCurrentValue;
+		}
+
+		//If it is a custom preset, then allow modification
+		//EnablePowerupFields(game_values.poweruppreset >= 1 && game_values.poweruppreset <= 3);
+	}
+	else if (MENU_CODE_POWERUP_SETTING_CHANGED == ret)
+	{
+		//Update the custom presets
+		for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
+			g_iCurrentPowerupPresets[game_values.poweruppreset][iPowerup] = game_values.powerupweights[iPowerup];
+	}
+	else if (MENU_CODE_RESTORE_DEFAULT_POWERUP_WEIGHTS == ret || MENU_CODE_CLEAR_POWERUP_WEIGHTS == ret)
 	{
 		miDialogImage->Show(true);
 		miDialogAreYouText->Show(true);
@@ -2095,8 +2138,14 @@ MenuCodeEnum MI_PowerupSelection::SendInput(CPlayerInput * playerInput)
 		mMenu->SetHeadControl(miDialogNoButton);
 		mMenu->SetCancelCode(MENU_CODE_POWERUP_RESET_NO);
 		mMenu->ResetMenu();
+
+		if(MENU_CODE_CLEAR_POWERUP_WEIGHTS == ret)
+			miDialogYesButton->SetCode(MENU_CODE_POWERUP_CLEAR_YES);
+		else
+			miDialogYesButton->SetCode(MENU_CODE_POWERUP_RESET_YES);
+
 	}
-	else if(MENU_CODE_POWERUP_RESET_YES == ret || MENU_CODE_POWERUP_RESET_NO == ret)
+	else if(MENU_CODE_POWERUP_RESET_YES == ret || MENU_CODE_POWERUP_RESET_NO == ret || MENU_CODE_POWERUP_CLEAR_YES == ret)
 	{
 		miDialogImage->Show(false);
 		miDialogAreYouText->Show(false);
@@ -2104,7 +2153,7 @@ MenuCodeEnum MI_PowerupSelection::SendInput(CPlayerInput * playerInput)
 		miDialogYesButton->Show(false);
 		miDialogNoButton->Show(false);
 
-		mMenu->SetHeadControl(miPowerupSlider[iPowerupPositionMap[0]]);
+		mMenu->SetHeadControl(miOverride);
 		mMenu->SetCancelCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 
 		mMenu->RestoreCurrent();
@@ -2114,8 +2163,22 @@ MenuCodeEnum MI_PowerupSelection::SendInput(CPlayerInput * playerInput)
 			//restore default powerup weights for powerup selection menu
 			for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
 			{
-				miPowerupSlider[iPowerup]->SetKey(g_iDefaultPowerupWeights[iPowerup]);
-				game_values.powerupweights[iPowerup] = g_iDefaultPowerupWeights[iPowerup];
+				short iDefaultValue = g_iDefaultPowerupPresets[game_values.poweruppreset][iPowerup];
+				miPowerupSlider[iPowerup]->SetKey(iDefaultValue);
+				game_values.powerupweights[iPowerup] = iDefaultValue;
+
+				g_iCurrentPowerupPresets[game_values.poweruppreset][iPowerup] = iDefaultValue;
+			}
+		}
+		else if(MENU_CODE_POWERUP_CLEAR_YES == ret)
+		{
+			//restore default powerup weights for powerup selection menu
+			for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
+			{
+				miPowerupSlider[iPowerup]->SetKey(0);
+				game_values.powerupweights[iPowerup] = 0;
+
+				g_iCurrentPowerupPresets[game_values.poweruppreset][iPowerup] = 0;
 			}
 		}
 	}
@@ -2127,11 +2190,6 @@ MenuCodeEnum MI_PowerupSelection::SendInput(CPlayerInput * playerInput)
 	{
 		MoveNext();
 	}
-	/*
-	else if(MENU_CODE_POWERUP_OVERRIDE_CHANGED == ret)
-	{
-		EnablePowerupFields();
-	}*/
 
 	return ret;
 }
@@ -2170,6 +2228,225 @@ void MI_PowerupSelection::MovePrev()
 		SetupPowerupFields();
 	}
 }
+
+
+
+/**************************************
+ * MI_FrenzyModeOptions Class
+ **************************************/
+
+//Rearrange display of powerups
+short iFrenzyCardPositionMap[NUMFRENZYCARDS] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18};
+
+MI_FrenzyModeOptions::MI_FrenzyModeOptions(short x, short y, short width, short numlines) :
+	UI_Control(x, y)
+{
+	iWidth = width;
+	iNumLines = numlines;
+
+	iIndex = 0;
+	iOffset = 0;
+
+	iTopStop = ((iNumLines - 1) >> 1) + 3;  // Plus 3 for the 3 fields at the top
+	iBottomStop = ((NUMFRENZYCARDS + 1) >> 1) - iNumLines + iTopStop;
+
+	mMenu = new UI_Menu();
+
+	miQuantityField = new MI_SelectField(&spr_selectfield, 120, 40, "Limit", 400, 180);
+	miQuantityField->Add("Single Powerup", 0, "", false, false);
+	miQuantityField->Add("1 Powerup", 1, "", false, false);
+	miQuantityField->Add("2 Powerups", 2, "", false, false);
+	miQuantityField->Add("3 Powerups", 3, "", false, false);
+	miQuantityField->Add("4 Powerups", 4, "", false, false);
+	miQuantityField->Add("5 Powerups", 5, "", false, false);
+	miQuantityField->Add("# Players - 1", 6, "", false, false);
+	miQuantityField->Add("# Players", 7, "", false, false);
+	miQuantityField->Add("# Players + 1", 8, "", false, false);
+	miQuantityField->Add("# Players + 2", 9, "", false, false);
+	miQuantityField->Add("# Players + 3", 10, "", false, false);
+	miQuantityField->SetData(&game_values.gamemodemenusettings.frenzy.quantity, NULL, NULL);
+	miQuantityField->SetKey(game_values.gamemodemenusettings.frenzy.quantity);
+
+	miRateField = new MI_SelectField(&spr_selectfield, 120, 80, "Rate", 400, 180);
+	miRateField->Add("Instant", 0, "", false, false);
+	miRateField->Add("1 Second", 62, "", false, false);
+	miRateField->Add("2 Seconds", 124, "", false, false);
+	miRateField->Add("3 Seconds", 186, "", false, false);
+	miRateField->Add("5 Seconds", 310, "", false, false);
+	miRateField->Add("10 Seconds", 620, "", false, false);
+	miRateField->Add("15 Seconds", 930, "", false, false);
+	miRateField->Add("20 Seconds", 1240, "", false, false);
+	miRateField->Add("25 Seconds", 1550, "", false, false);
+	miRateField->Add("30 Seconds", 1860, "", false, false);
+	miRateField->SetData(&game_values.gamemodemenusettings.frenzy.rate, NULL, NULL);
+	miRateField->SetKey(game_values.gamemodemenusettings.frenzy.rate);
+
+	miStoredShellsField = new MI_SelectField(&spr_selectfield, 120, 120, "Store Shells", 400, 180);
+	miStoredShellsField->Add("Off", 0, "", false, false);
+	miStoredShellsField->Add("On", 1, "", true, false);
+	miStoredShellsField->SetData(NULL, NULL, &game_values.gamemodemenusettings.frenzy.storedshells);
+	miStoredShellsField->SetKey(game_values.gamemodemenusettings.frenzy.storedshells ? 1 : 0);
+	miStoredShellsField->SetAutoAdvance(true);
+
+	short iPowerupMap[] = {8, 5, 11, 17, 19, 21, 23, 24, 25, 20, 9, 16, 10, 22, 12, 13, 14, 15, 27};
+	for(short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++)
+	{
+		miPowerupSlider[iPowerup] = new MI_PowerupSlider(&spr_selectfield, &menu_slider_bar, &spr_storedpoweruplarge, iPowerup < 10 ? 65 : 330, 0, 245, iPowerupMap[iPowerup]);
+		miPowerupSlider[iPowerup]->Add("", 0, "", false, false);
+		miPowerupSlider[iPowerup]->Add("", 1, "", false, false);
+		miPowerupSlider[iPowerup]->Add("", 2, "", false, false);
+		miPowerupSlider[iPowerup]->Add("", 3, "", false, false);
+		miPowerupSlider[iPowerup]->Add("", 4, "", false, false);
+		miPowerupSlider[iPowerup]->Add("", 5, "", false, false);
+		miPowerupSlider[iPowerup]->Add("", 6, "", false, false);
+		miPowerupSlider[iPowerup]->Add("", 7, "", false, false);
+		miPowerupSlider[iPowerup]->Add("", 8, "", false, false);
+		miPowerupSlider[iPowerup]->Add("", 9, "", false, false);
+		miPowerupSlider[iPowerup]->Add("", 10, "", false, false);
+		miPowerupSlider[iPowerup]->SetNoWrap(true);
+		miPowerupSlider[iPowerup]->SetData(&game_values.gamemodemenusettings.frenzy.powerupweight[iPowerup], NULL, NULL);
+		miPowerupSlider[iPowerup]->SetKey(game_values.gamemodemenusettings.frenzy.powerupweight[iPowerup]);
+	}
+
+	miBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
+	miBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
+
+	mMenu->AddControl(miQuantityField, NULL, miRateField, NULL, NULL);
+	mMenu->AddControl(miRateField, miQuantityField, miStoredShellsField, NULL, NULL);
+	mMenu->AddControl(miStoredShellsField, miRateField, miPowerupSlider[0], NULL, NULL);
+
+	for(short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++)
+	{
+		UI_Control * upcontrol = NULL;
+		if(iPowerup == 0)
+			upcontrol = miStoredShellsField;
+		else
+			upcontrol = miPowerupSlider[iPowerup - 2];
+
+		UI_Control * downcontrol = NULL;
+		if(iPowerup >= NUMFRENZYCARDS - 2)
+			downcontrol = miBackButton;
+		else
+			downcontrol = miPowerupSlider[iPowerup + 2];
+
+		mMenu->AddControl(miPowerupSlider[iPowerup], upcontrol, downcontrol, NULL, miPowerupSlider[iPowerup + 1]);
+
+		if(++iPowerup < NUMFRENZYCARDS)
+		{
+			upcontrol = NULL;
+			if(iPowerup == 1)
+				upcontrol = miStoredShellsField;
+			else
+				upcontrol = miPowerupSlider[iPowerup - 2];
+
+			UI_Control * downcontrol = NULL;
+			if(iPowerup >= NUMFRENZYCARDS - 2)
+				downcontrol = miBackButton;
+			else
+				downcontrol = miPowerupSlider[iPowerup + 2];
+
+			mMenu->AddControl(miPowerupSlider[iPowerup], upcontrol, downcontrol, miPowerupSlider[iPowerup - 1], NULL);
+		}
+	}
+
+	//Setup positions and visible powerups
+	SetupPowerupFields();
+
+	mMenu->AddControl(miBackButton, miPowerupSlider[NUMFRENZYCARDS - 1], NULL, NULL, NULL);
+
+	mMenu->SetHeadControl(miQuantityField);
+	mMenu->SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
+}
+
+MI_FrenzyModeOptions::~MI_FrenzyModeOptions()
+{
+	delete mMenu;
+}
+
+void MI_FrenzyModeOptions::SetupPowerupFields()
+{
+	for(short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++)
+	{
+		short iPosition = iFrenzyCardPositionMap[iPowerup];
+		MI_PowerupSlider * slider = miPowerupSlider[iPosition];
+
+		if((iPosition >> 1) < iOffset || (iPosition >> 1) >= iOffset + iNumLines)
+			slider->Show(false);
+		else
+		{
+			slider->Show(true);
+			slider->SetPosition(ix + (iPosition % 2) * 295, iy + 118 + 38 * (iPosition / 2 - iOffset));
+		}
+	}
+}
+
+MenuCodeEnum MI_FrenzyModeOptions::Modify(bool modify)
+{
+	mMenu->ResetMenu();
+	iOffset = 0;
+	iIndex = 0;
+	SetupPowerupFields();
+
+	fModifying = modify;
+	return MENU_CODE_MODIFY_ACCEPTED;
+}
+
+MenuCodeEnum MI_FrenzyModeOptions::SendInput(CPlayerInput * playerInput)
+{
+	MenuCodeEnum ret = mMenu->SendInput(playerInput);
+
+	if(MENU_CODE_CANCEL_INPUT == ret)
+	{
+		fModifying = false;
+		return MENU_CODE_UNSELECT_ITEM;
+	}
+	else if(MENU_CODE_NEIGHBOR_UP == ret)
+	{
+		MovePrev();
+	}
+	else if(MENU_CODE_NEIGHBOR_DOWN == ret)
+	{
+		MoveNext();
+	}
+	
+	return ret;
+}
+
+void MI_FrenzyModeOptions::Update()
+{
+	mMenu->Update();
+}
+
+void MI_FrenzyModeOptions::Draw()
+{
+	if(!fShow)
+		return;
+
+	mMenu->Draw();
+}
+
+void MI_FrenzyModeOptions::MoveNext()
+{
+	iIndex++;
+
+	if(iIndex > iTopStop && iIndex <= iBottomStop)
+	{
+		iOffset++;
+		SetupPowerupFields();
+	}
+}
+
+void MI_FrenzyModeOptions::MovePrev()
+{
+	iIndex--;
+
+	if(iIndex >= iTopStop && iIndex < iBottomStop)
+	{
+		iOffset--;
+		SetupPowerupFields();
+	}
+}
+
 
 
 /**************************************

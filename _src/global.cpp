@@ -94,8 +94,51 @@ short controlkeys[2][2][4][NUM_KEYS] = { { { {SDLK_LEFT, SDLK_RIGHT, SDLK_UP, SD
 char * GameInputNames[NUM_KEYS] = {"Left", "Right", "Jump", "Down", "Turbo", "Use Item", "Pause", "Exit"};
 char * MenuInputNames[NUM_KEYS] = {"Up", "Down", "Left", "Right", "Select", "Cancel", "Random", "Fast Map"};
 
-//Poison, 1up, 2up, 3up, 5up, firepower, star, clock, bobomb, POW, Bullet Bill, hammer, Green Shell, Red Shell, Spiny Shell, Buzzy Shell, MOd, Feather, Tanooki, Sledge, Podobo, Bombs, Leaf, Pwings
-short g_iDefaultPowerupWeights[] = {5, 10, 4, 2, 1, 10, 8, 4, 4, 2, 2, 4, 8, 4, 2, 4, 2, 4, 5, 6, 6, 2, 4, 4, 5, 3};
+//Poison == 0
+//1up == 1
+//2up == 2
+//3up == 3
+//5up == 4
+//firepower == 5
+//star == 6
+//clock == 7
+//bobomb == 8
+//POW == 9
+//Bullet Bill == 10
+//hammer == 11
+//Green Shell == 12
+//Red Shell == 13
+//Spiny Shell == 14
+//Buzzy Shell == 15
+//MOd == 16
+//Feather == 17
+//Mystery == 18
+//Boomerang == 19
+//Tanooki == 20
+//Ice Wand == 21
+//Podobo == 22
+//Bombs == 23
+//Leaf == 24
+//Pwings == 25
+
+short g_iDefaultPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS] = {  
+//   0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25
+	{5,10, 4, 2, 1,10, 8, 4, 4, 2, 2, 4, 8, 4, 2, 4, 2, 4, 5, 6, 6, 3, 4, 4, 5, 3}, //Custom 1
+	{5,10, 4, 2, 1,10, 8, 4, 4, 2, 2, 4, 8, 4, 2, 4, 2, 4, 5, 6, 6, 3, 4, 4, 5, 3}, //Custom 2
+	{5,10, 4, 2, 1,10, 8, 4, 4, 2, 2, 4, 8, 4, 2, 4, 2, 4, 5, 6, 6, 3, 4, 4, 5, 3}, //Custom 3
+	{5,10, 4, 2, 1,10, 8, 4, 4, 2, 2, 4, 8, 4, 2, 4, 2, 4, 5, 6, 6, 3, 4, 4, 5, 3}, //Custom 4
+	{5,10, 4, 2, 1,10, 8, 4, 4, 2, 2, 4, 8, 4, 2, 4, 2, 4, 5, 6, 6, 3, 4, 4, 5, 3}, //Custom 5
+	{5,10, 5, 3, 1,10, 2, 3, 4, 3, 3, 4, 9, 6, 2, 4, 4, 7, 5, 6, 6, 3, 2, 2, 5, 5}, //Balanced
+	{5, 0, 0, 0, 0,10, 0, 0, 0, 0, 0, 7, 9, 6, 3, 4, 0, 0, 0, 4, 0, 2, 0, 2, 0, 0}, //Weapons Only
+	{5,10, 7, 5, 2, 0, 6, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 5, 0, 3, 0, 0, 0, 8, 6}, //Support Items
+	{5, 3, 0, 0, 0, 8, 4, 0, 0, 0, 5, 2,10, 9, 4, 5, 0, 0, 0, 4, 3, 0, 4, 0, 8, 5}, //Super Mario Bros 3
+	{3, 3, 1, 0, 0, 0, 0, 0, 4, 2, 2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 3, 0, 0, 0}, //Booms and Shakes
+	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 2, 0, 0, 0, 8, 3}, //Fly and Glide
+	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 4, 2, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, //Shells
+};
+
+short g_iCurrentPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
+
 
 //Conversion to switch 1.6 tiles into 1.7 tiles
 short g_iTileConversion[] =    {0,1,2,3,4,5,6,7,8,9,

@@ -330,6 +330,18 @@ void MapList::random(bool fUseFilters)
 		next(fUseFilters);
 }
 
+const char* MapList::randomFilename()
+{
+	std::map<std::string, MapListNode*>::iterator random = maps.begin();
+
+	short iRand = rand() % maps.size();
+
+	for(short iMap = 0; iMap < iRand; iMap++)
+		random++;
+
+	return (*random).second->filename.c_str();
+}
+
 
 void MapList::WriteFilters()
 {

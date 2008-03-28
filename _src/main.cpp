@@ -50,16 +50,14 @@
 //[ ] Countdown before match begins, 3..., 2..., 1... with announcer hooks
 //[ ] On/Off switch [?] and note blocks and possibly other types of on/off blocks
 //[ ] Enemies should die in lava
-//[ ] Quick Match option that selects everything random for you
+//[ ] Quick Match option that selects everything random for you -> Have it choose goals that are in the middle, not too short or way to long
 //[ ] Allow spawn areas for domination blocks
 //[ ] Water bubbles and rain eyecandy, Splashing feet when running on rain levels - need gfx for all of these
 //[ ] Resume level editor to zzleveleditor map every time so it looks like you've resumed your last work (or try and load the last map you were on)
 //[ ] Podoboo pops out of a [?] if all powerups are turned off
-//[ ] ? card for frenzy card mode to do random powerup
 //[ ] Thunderbolt style spawn
 //[ ] Reverse gravity blue podoboos
 //[ ] Breaking skull blocks (too close to donut block, perhaps)
-//[ ] When editing the tile types, have a keyboard shortcut that just clears the tile types, allowing you to start from scratch. 
 //[ ] What about re-appear for bricks/blue/flip/etc.? Is this doable with not much effort?
 
 * Bomb option in Star mode
@@ -70,6 +68,7 @@
 
 /*
 Checkin:
+1) Finished new frenzy cards in frenzy mode menu (added scrolling powerup sliders)
 */
 
 #ifdef _XBOX
@@ -421,6 +420,7 @@ sfxSound sfx_worldmove;
 sfxSound sfx_treasurechest;
 sfxSound sfx_flamecannon;
 sfxSound sfx_wand;
+sfxSound sfx_enterstage;
 
 sfxMusic backgroundmusic[6];
 
@@ -827,6 +827,7 @@ int main(int argc, char *argv[])
 	game_values.worldskipscoreboard = false;
 	game_values.overridepowerupsettings = 0;
 	game_values.minigameunlocked	= false;
+	game_values.poweruppreset		= 0;
 
 	game_values.pfFilters			= new bool[NUM_AUTO_FILTERS + filterslist.GetCount()];
 	game_values.piFilterIcons		= new short[NUM_AUTO_FILTERS + filterslist.GetCount()];
@@ -843,8 +844,13 @@ int main(int argc, char *argv[])
 	//game_values.gamehost			= false;
 	
 	//Set the default powerup weights for bonus wheel and [?] boxes
-	for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
-		game_values.powerupweights[iPowerup] = g_iDefaultPowerupWeights[iPowerup];
+	for(short iPreset = 0; iPreset < NUM_POWERUP_PRESETS; iPreset++)
+	{
+		for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
+		{
+			g_iCurrentPowerupPresets[iPreset][iPowerup] = g_iDefaultPowerupPresets[iPreset][iPowerup];
+		}
+	}
 
 	announcerlist.SetCurrent(0);
 	musiclist.SetCurrent(0);
@@ -1144,6 +1150,9 @@ int main(int argc, char *argv[])
 			fread(&game_values.warplocktime, sizeof(short), 1, fp);
 			fread(&game_values.suicidetime, sizeof(short), 1, fp);
 
+			fread(&game_values.poweruppreset, sizeof(short), 1, fp);
+			fread(&g_iCurrentPowerupPresets, sizeof(short), NUM_POWERUP_PRESETS * NUM_POWERUPS, fp);
+
 			//TODO: Need to test what happens when you unplug some controllers from the xbox
 			//and then start up (device index will probably point to a gamepad that isn't in the list)
 			//and this will cause a crash
@@ -1171,9 +1180,6 @@ int main(int argc, char *argv[])
 			
 			for(short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++)
 				fread(&(gamemodes[iGameMode]->goal), sizeof(short), 1, fp);
-
-			for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
-				fread(&game_values.powerupweights[iPowerup], sizeof(short), 1, fp);
 
 			fread(&game_values.gamemodemenusettings, sizeof(GameModeSettings), 1, fp);
 
@@ -1206,6 +1212,12 @@ int main(int argc, char *argv[])
 		}
 
 		fclose(fp);
+	}
+
+	//Assign the powerup weights to the selected preset
+	for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
+	{
+		game_values.powerupweights[iPowerup] = g_iCurrentPowerupPresets[game_values.poweruppreset][iPowerup];
 	}
 
 #ifdef _XBOX
@@ -1754,7 +1766,7 @@ void RunGame()
 				{
 					endgametimer = (short)(rand() % 200);
 
-					if(game_values.matchtype != MATCH_TYPE_SINGLE_GAME && game_values.matchtype != MATCH_TYPE_MINIGAME)
+					if(game_values.matchtype != MATCH_TYPE_SINGLE_GAME && game_values.matchtype != MATCH_TYPE_QUICK_GAME && game_values.matchtype != MATCH_TYPE_MINIGAME)
 						UpdateScoreBoard();
 
 					CleanUp();

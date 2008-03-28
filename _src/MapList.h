@@ -40,6 +40,8 @@ class MapList
         void next(bool fUseFilters);
 		void random(bool fUseFilters);
 
+		const char* randomFilename();
+
 		//Sets/Gets if a map at the current map node is valid and can be loaded
 		void SetValid(bool fValid) {(*current).second->fValid = fValid;}
 		bool GetValid() {return (*current).second->fValid;}
