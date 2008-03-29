@@ -1035,6 +1035,7 @@ class CO_Star : public MO_CarriedObject
 		void placeStar();
 
 		short getType() {return iType;}
+		void setPlayerColor(short iColor) {iOffsetY = 64 + (iColor << 5);}
 
 	private:
 		short timer;

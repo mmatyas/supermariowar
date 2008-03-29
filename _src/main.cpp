@@ -50,7 +50,6 @@
 //[ ] Countdown before match begins, 3..., 2..., 1... with announcer hooks
 //[ ] On/Off switch [?] and note blocks and possibly other types of on/off blocks
 //[ ] Enemies should die in lava
-//[ ] Quick Match option that selects everything random for you -> Have it choose goals that are in the middle, not too short or way to long
 //[ ] Allow spawn areas for domination blocks
 //[ ] Water bubbles and rain eyecandy, Splashing feet when running on rain levels - need gfx for all of these
 //[ ] Resume level editor to zzleveleditor map every time so it looks like you've resumed your last work (or try and load the last map you were on)
@@ -60,15 +59,41 @@
 //[ ] Breaking skull blocks (too close to donut block, perhaps)
 //[ ] What about re-appear for bricks/blue/flip/etc.? Is this doable with not much effort?
 
+//[ ] Need to set what good values are to choose from for random mode options for quick game
+
 * Bomb option in Star mode
-* Multiple selectable item switch presets
 - Mariokart-type podium at the end of a tournament/tour/whatever
+
+TEST!! More quick game testing!
 
 */
 
 /*
 Checkin:
-1) Finished new frenzy cards in frenzy mode menu (added scrolling powerup sliders)
+1) Added colored stars to multi star option of star mode
+2) Started random mode options for quick game
+*/
+
+/*
+Procedure for adding a new game mode:
+1) Add class to gamemodes.cpp and gamemodes.h
+2) Add game mode type to GameModeType enum in gamemodes.h
+3) Add new game mode to gamemodes array in main.cpp
+4) Add game mode options to GameModeSettings in global.h
+5) Add menu fields to support these new options
+6) Update ParseTourStopLine() and WriteTourStopLine() in global.cpp
+7) Update ChooseRandomSettingsForMode() in menu.cpp
+8) Add new mode gfx to gfx\packs\Classic\menu\menu_mode_large.png and menu_mode_small.png
+9) Update fShowSettingsButton[] array in menu.cpp
+
+
+Procedure for adding a new powerup:
+1) Add class to object.cpp and object.h inhieriting from MO_Powerup
+2) Update CPlayer::move() to handle using new stored powerup
+3) Update NUM_POWERUPS in global.h
+4) Update CPlayer::SetPowerup() to use this powerup
+5) Add new gfx to gfx\packs\Classic\powerups\large.png and small.png
+6) Update iPowerupPositionMap[] in uicontrol.cpp
 */
 
 #ifdef _XBOX

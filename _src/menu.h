@@ -33,6 +33,8 @@ class Menu
 		void CreateMenu();
 		void RunMenu();
 
+		void SetRandomGameModeSettings(short iMode);
+
 #ifdef _DEBUG
 
 		void LoadScript(char * szScriptFile);
@@ -391,7 +393,7 @@ class Menu
 		MI_SelectField * miJailModeStyleField;
 		MI_SelectField * miJailModeTagFreeField;
 		MI_SelectField * miJailModeTimeFreeField;
-		MI_SelectField * miJailModeJailKeyField;
+		MI_SliderField * miJailModeJailKeyField;
 		MI_Button * miJailModeBackButton;
 
 		MI_Image * miJailModeLeftHeaderBar;

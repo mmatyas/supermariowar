@@ -5685,6 +5685,7 @@ CO_Star::CO_Star(gfxSprite *nspr, short type, short id) :
 	movingObjectType = movingobject_star;
 	
 	iType = type;
+
 	iOffsetY = type == 1 ? 32 : 0;
 
 	sparkleanimationtimer = 0;

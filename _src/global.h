@@ -223,7 +223,7 @@ struct STextAward
 #define NUM_WORLD_POWERUPS 15
 #define NUM_WORLD_SCORE_BONUSES 20
 #define NUM_BLOCK_SETTINGS NUM_POWERUPS
-#define NUM_POWERUP_PRESETS 12
+#define NUM_POWERUP_PRESETS 17
 
 void GetNameFromFileName(char * szName, const char * szFileName);
 std::string stripCreatorAndDotMap(const std::string &filename);

@@ -1944,11 +1944,16 @@ MI_PowerupSelection::MI_PowerupSelection(short x, short y, short width, short nu
 	miPreset->Add("Custom Set 5", 4, "", false, false);
 	miPreset->Add("Balanced Set", 5, "", false, false);
 	miPreset->Add("Weapons Only", 6, "", false, false);
-	miPreset->Add("Support Items", 7, "", false, false);
-	miPreset->Add("Super Mario Bros 3", 8, "", false, false);
-	miPreset->Add("Bombs and Shakes", 9, "", false, false);
+	miPreset->Add("Koopa Bros Weapons", 7, "", false, false);
+	miPreset->Add("Support Items", 8, "", false, false);
+	miPreset->Add("Booms and Shakes", 9, "", false, false);
 	miPreset->Add("Fly and Glide", 10, "", false, false);
-	miPreset->Add("Shells", 11, "", false, false);
+	miPreset->Add("Shells Only", 11, "", false, false);
+	miPreset->Add("Mushrooms Only", 12, "", false, false);
+	miPreset->Add("Super Mario Bros 1", 13, "", false, false);
+	miPreset->Add("Super Mario Bros 2", 14, "", false, false);
+	miPreset->Add("Super Mario Bros 3", 15, "", false, false);
+	miPreset->Add("Super Mario World", 16, "", false, false);
 	miPreset->SetData(&game_values.poweruppreset, NULL, NULL);
 	miPreset->SetKey(game_values.poweruppreset);
 	miPreset->SetItemChangedCode(MENU_CODE_POWERUP_PRESET_CHANGED);
@@ -2447,7 +2452,15 @@ void MI_FrenzyModeOptions::MovePrev()
 	}
 }
 
+void MI_FrenzyModeOptions::SetRandomGameModeSettings()
+{
+	game_values.gamemodesettings.frenzy.quantity = miQuantityField->GetRandomShortValue();
+	game_values.gamemodesettings.frenzy.rate = miRateField->GetRandomShortValue();
+	game_values.gamemodesettings.frenzy.storedshells = miStoredShellsField->GetRandomBoolValue();
 
+	for(short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++)
+		game_values.gamemodesettings.frenzy.powerupweight[iPowerup] = miPowerupSlider[iPowerup]->GetRandomShortValue();
+}
 
 /**************************************
  * MI_MapField Class

@@ -2192,6 +2192,7 @@ void CGM_Star::SetupMode()
 			starPlayer[iStar] = players[iStar];
 
 			starItem[iStar] = new CO_Star(&spr_star, 1, iStar);
+			starItem[iStar]->setPlayerColor(starPlayer[iStar]->colorID);
 			objectcontainer[1].add(starItem[iStar]);
 		}
 	}
@@ -2226,6 +2227,7 @@ void CGM_Star::think()
 				for(short iStar = 0; iStar < iNumPlayers - 1; iStar++)
 				{
 					starPlayer[iStar] = players[iStar];
+					starItem[iStar]->setPlayerColor(starPlayer[iStar]->colorID);
 					starItem[iStar]->placeStar();
 				}
 
@@ -2375,6 +2377,7 @@ void CGM_Star::think()
 					for(short iStar = 0; iStar < iNumPlayers - 1; iStar++)
 					{
 						starPlayer[iStar] = players[iStar];
+						starItem[iStar]->setPlayerColor(starPlayer[iStar]->colorID);
 						starItem[iStar]->placeStar();
 					}
 				}
@@ -2470,6 +2473,9 @@ CPlayer * CGM_Star::swapplayer(short id, CPlayer * player)
 	}
 
 	starPlayer[id] = player;
+
+	if(iCurrentModeType == 2)
+		starItem[id]->setPlayerColor(starPlayer[id]->colorID);
 	
 	if(starItem[id]->getType() == 1)
 		eyecandyfront.add(new EC_GravText(&game_font_large, player->ix + HALFPW, player->iy + PH, "Shine Get!", -VELJUMP*1.5));
@@ -3031,7 +3037,7 @@ void CGM_Chase::playerextraguy(CPlayer &player, short iType)
 {
 	if(!gameover)
 	{
-		player.score->AdjustScore(iType);
+		player.score->AdjustScore(10 * iType);
 		CheckWinner(&player);
 	}
 }

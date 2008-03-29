@@ -225,6 +225,10 @@ class MI_SelectField : public UI_Control
 		std::string GetStringValue() {return (*current)->sValue;}
 		bool GetBoolValue() {return (*current)->fValue;}
 
+		//Gets a random value, but does not set the control to that value
+		short GetRandomShortValue() {return items[rand() % items.size()]->iValue;}
+		bool GetRandomBoolValue() {return items[rand() % items.size()]->fValue;}
+
 		//sets the currently selected item
 		bool SetKey(short iID);
 		bool SetIndex(unsigned short iPosition);
@@ -587,6 +591,8 @@ class MI_FrenzyModeOptions : public UI_Control
 
 		void MoveNext();
 		void MovePrev();
+
+		void SetRandomGameModeSettings();
 
 	private:
 		
