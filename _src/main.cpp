@@ -71,7 +71,7 @@ TEST!! More quick game testing!
 /*
 Checkin:
 1) Added colored stars to multi star option of star mode
-2) Started random mode options for quick game
+2) Added random mode options for quick game -> Still needs to have good ranges for options, right now it is completely random
 */
 
 /*

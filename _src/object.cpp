@@ -8673,7 +8673,7 @@ void CO_Shell::Kick()
 
 void CO_Shell::CheckAndDie()
 {
-	if((fDieOnMovingPlayerCollision && state == 1) || (fDieOnHoldingPlayerCollision && state == 3))
+	if((fDieOnMovingPlayerCollision && state == 1) || ((fDieOnHoldingPlayerCollision || fFlipped)&& state == 3))
 		Die();
 	else if(!fDieOnHoldingPlayerCollision && state == 3 && (rand() % 5) == 0)
 		Die();

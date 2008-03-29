@@ -224,6 +224,18 @@ MI_SelectField::~MI_SelectField()
 {
 	delete miModifyImageLeft;
 	delete miModifyImageRight;
+
+	goodRandomItems.clear();
+
+	std::vector<SF_ListItem*>::iterator iterateAll = items.begin(), lim = items.end();
+	
+	while (iterateAll != lim)
+	{
+		delete *iterateAll;
+		iterateAll++;
+	}
+
+	items.clear();
 }
 
 void MI_SelectField::SetTitle(char * name)
@@ -275,10 +287,13 @@ bool MI_SelectField::SetIndex(unsigned short index)
 	return true;
 }
 
-void MI_SelectField::Add(std::string name, short ivalue, std::string svalue, bool fvalue, bool fhidden)
+void MI_SelectField::Add(std::string name, short ivalue, std::string svalue, bool fvalue, bool fhidden, bool fGoodRandom)
 {
 	SF_ListItem * item = new SF_ListItem(name, ivalue, svalue, fvalue, fhidden);
 	items.push_back(item);
+
+	if(fGoodRandom)
+		goodRandomItems.push_back(item);
 
 	if(items.size() >= 1)
 	{
@@ -586,6 +601,8 @@ bool MI_SelectField::MoveRandom()
 	SetValues();
 	return true;
 }
+
+
 /**************************************
  * MI_ImageSelectField Class
  **************************************/
@@ -2266,9 +2283,9 @@ MI_FrenzyModeOptions::MI_FrenzyModeOptions(short x, short y, short width, short 
 	miQuantityField->Add("5 Powerups", 5, "", false, false);
 	miQuantityField->Add("# Players - 1", 6, "", false, false);
 	miQuantityField->Add("# Players", 7, "", false, false);
-	miQuantityField->Add("# Players + 1", 8, "", false, false);
-	miQuantityField->Add("# Players + 2", 9, "", false, false);
-	miQuantityField->Add("# Players + 3", 10, "", false, false);
+	miQuantityField->Add("# Players + 1", 8, "", false, false, false);
+	miQuantityField->Add("# Players + 2", 9, "", false, false, false);
+	miQuantityField->Add("# Players + 3", 10, "", false, false, false);
 	miQuantityField->SetData(&game_values.gamemodemenusettings.frenzy.quantity, NULL, NULL);
 	miQuantityField->SetKey(game_values.gamemodemenusettings.frenzy.quantity);
 
@@ -2278,11 +2295,11 @@ MI_FrenzyModeOptions::MI_FrenzyModeOptions(short x, short y, short width, short 
 	miRateField->Add("2 Seconds", 124, "", false, false);
 	miRateField->Add("3 Seconds", 186, "", false, false);
 	miRateField->Add("5 Seconds", 310, "", false, false);
-	miRateField->Add("10 Seconds", 620, "", false, false);
-	miRateField->Add("15 Seconds", 930, "", false, false);
-	miRateField->Add("20 Seconds", 1240, "", false, false);
-	miRateField->Add("25 Seconds", 1550, "", false, false);
-	miRateField->Add("30 Seconds", 1860, "", false, false);
+	miRateField->Add("10 Seconds", 620, "", false, false, false);
+	miRateField->Add("15 Seconds", 930, "", false, false, false);
+	miRateField->Add("20 Seconds", 1240, "", false, false, false);
+	miRateField->Add("25 Seconds", 1550, "", false, false, false);
+	miRateField->Add("30 Seconds", 1860, "", false, false, false);
 	miRateField->SetData(&game_values.gamemodemenusettings.frenzy.rate, NULL, NULL);
 	miRateField->SetKey(game_values.gamemodemenusettings.frenzy.rate);
 

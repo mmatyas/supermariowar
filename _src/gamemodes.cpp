@@ -2005,7 +2005,7 @@ CGM_Race::CGM_Race() : CGameMode()
 	quantity = 3;
 	penalty = 0;
 
-	SetupModeStrings("Race", "Laps", 5);
+	SetupModeStrings("Race", "Laps", 2);
 }
 
 void CGM_Race::init()

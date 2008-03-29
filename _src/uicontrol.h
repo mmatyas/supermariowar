@@ -195,7 +195,7 @@ class SF_ListItem
 			fHidden = fhidden;
 		}
 
-		~SF_ListItem();
+		~SF_ListItem() {}
 
 		std::string sName;  //Display name
 
@@ -226,8 +226,8 @@ class MI_SelectField : public UI_Control
 		bool GetBoolValue() {return (*current)->fValue;}
 
 		//Gets a random value, but does not set the control to that value
-		short GetRandomShortValue() {return items[rand() % items.size()]->iValue;}
-		bool GetRandomBoolValue() {return items[rand() % items.size()]->fValue;}
+		short GetRandomShortValue() {return goodRandomItems[rand() % goodRandomItems.size()]->iValue;}
+		bool GetRandomBoolValue() {return goodRandomItems[rand() % goodRandomItems.size()]->fValue;}
 
 		//sets the currently selected item
 		bool SetKey(short iID);
@@ -240,7 +240,7 @@ class MI_SelectField : public UI_Control
 		MenuCodeEnum Modify(bool modify);
 
 		//Adds an item to the list
-		void Add(std::string name, short ivalue, std::string svalue, bool fvalue, bool fhidden);
+		void Add(std::string name, short ivalue, std::string svalue, bool fvalue, bool fhidden, bool fGoodRandom = true);
 		void Clear() {items.clear();}
 
 		bool HideItem(short iID, bool fhide);
@@ -278,6 +278,9 @@ class MI_SelectField : public UI_Control
 
 		std::vector<SF_ListItem*> items;
 		std::vector<SF_ListItem*>::iterator current;
+
+		std::vector<SF_ListItem*> goodRandomItems;
+
 		short iIndex;
 
 		short iWidth, iIndent;
