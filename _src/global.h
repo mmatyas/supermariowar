@@ -62,7 +62,7 @@ struct STextAward
 //--------------------------
 #define PGFX_LAST		10
 
-#define PANNOUNCER_SOUND_LAST	12
+#define PANNOUNCER_SOUND_LAST	20
 #define PAWARD_LAST		9
 
 #define PH				25		//Player height
@@ -242,6 +242,8 @@ std::string stripCreatorAndDotMap(const std::string &filename);
 
 #define NUM_FRAMES_IN_TILE_ANIMATION 4
 #define NUM_FRAMES_BETWEEN_TILE_ANIMATION 8
+
+#define COUNTDOWN_START_INDEX 4
 
 //------------- data structures / selfmade include files -------------
 #include "input.h"
@@ -566,6 +568,7 @@ extern gfxSprite		spr_worlditempopup;
 extern gfxSprite		spr_worlditemssmall;
 extern gfxSprite		spr_worlditemsplace;
 extern gfxSprite		spr_worldbonushouse;
+extern gfxSprite		spr_announcementicons;
 
 extern MapList maplist;
 extern SkinList skinlist;

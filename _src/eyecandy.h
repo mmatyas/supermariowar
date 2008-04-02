@@ -163,6 +163,30 @@ class EC_GravText : public CEyecandy
 		char *text;
 };
 
+class EC_Announcement : public CEyecandy
+{
+	public:
+		EC_Announcement(gfxFont *nfont, gfxSprite *nsprite, const char *ntext, short icon, short time);
+		~EC_Announcement();
+		void draw();
+		void update();
+
+	private:
+		gfxFont *font;
+		gfxSprite *sprite;
+
+		short ix, iy;
+		char *text;
+
+		short iTime, iTimer;
+		short iIcon;
+
+		short iFontY, iFontOffsetX;
+
+		SDL_Rect rSrcRect[4];
+		SDL_Rect rDstRect[4];
+};
+
 class EC_FallingObject : public EC_Animated
 {
 	public:

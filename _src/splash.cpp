@@ -125,6 +125,8 @@ bool LoadMenuGraphics()
 	gfx_loadimage(&spr_worlditemsplace, convertPath("gfx/packs/world/world_bonusplace.png", graphicspack), false);
 	gfx_loadimage(&spr_worldbonushouse, convertPath("gfx/packs/world/world_bonushouse.png", graphicspack), false);
 
+	gfx_loadimage(&spr_announcementicons, convertPath("gfx/packs/menu/menu_announcement_icons.png", graphicspack), false);
+
 	return true;
 }
 

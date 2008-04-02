@@ -214,6 +214,7 @@ void DECLSPEC soundfinished(int channel){}
 void DECLSPEC musicfinished(){}
 sfxSound * g_PlayingSoundChannels[NUM_SOUND_CHANNELS];
 short			g_iCurrentDrawIndex = 0;
+gfxSprite		menu_dialog;
 ///////
 
 gfxSprite spr_eyecandy;

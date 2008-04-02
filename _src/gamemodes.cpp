@@ -131,17 +131,30 @@ bool RemoveTeam(short teamid)
 		return game_values.teamdeadcounter == score_cnt - 1;
 
 	//kill all players on the dead team
+	short iAnnouncementColor = -1;
 	for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++)
 	{
 		if(list_players[iPlayer]->teamID == teamid)
 		{
+			if(iAnnouncementColor == -1)
+				iAnnouncementColor = game_values.colorids[iPlayer];
+
 			list_players[iPlayer]->state = player_dead;
 		}
 	}
 
 	score[teamid]->order = game_values.teamdeadcounter++;
 
-	return game_values.teamdeadcounter == score_cnt - 1;
+	bool fRet = game_values.teamdeadcounter == score_cnt - 1;
+
+	//Announce that a team was removed
+	if(!fRet)
+	{
+		eyecandyfront.add(new EC_Announcement(&game_font_large, &spr_announcementicons, "Team Removed!", iAnnouncementColor, 90));
+		ifsoundonandreadyplay(sfx_announcer[iAnnouncementColor + 16]);
+	}
+
+	return fRet;
 }
 
 CGameMode::CGameMode()

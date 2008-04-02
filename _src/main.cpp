@@ -38,9 +38,7 @@
 
 //BUG!! When you kill 2 players/bots rapidly one after another with the star and you have the announcer on, the invincibilty music stops.
 
-//[ ] Frenzy mode doesn't have update to items - missing wand, podobo, bomb, pwings, leaf, tanooki
 //[ ] Need better end stage marker gfx
-//[ ] Need match type titles on gfx
 //[ ] Need to test memory/slowness on xbox build
 //[ ] Need to update some maps with better platform paths (Reznor map) and some hazards here and there and maybe some map items
 //[ ] World AI needs ability to use stored items -> harder problem than I have time for
@@ -59,12 +57,10 @@
 //[ ] Breaking skull blocks (too close to donut block, perhaps)
 //[ ] What about re-appear for bricks/blue/flip/etc.? Is this doable with not much effort?
 
-//[ ] Need to set what good values are to choose from for random mode options for quick game
+//[ ] TEST!! Check to see that we use the "enter stage" sound when starting a world match
 
 * Bomb option in Star mode
 - Mariokart-type podium at the end of a tournament/tour/whatever
-
-TEST!! More quick game testing!
 
 */
 
@@ -193,6 +189,8 @@ gfxSprite		spr_worlditempopup;
 gfxSprite		spr_worlditemssmall;
 gfxSprite		spr_worlditemsplace;
 gfxSprite		spr_worldbonushouse;
+
+gfxSprite		spr_announcementicons;
 
 gfxSprite		spr_noteblock;
 gfxSprite		spr_breakableblock;
@@ -1410,12 +1408,21 @@ bool coldec_player2player(CPlayer * o1, CPlayer * o2);
 bool coldec_player2obj(CPlayer * o1, CObject * o2);
 bool coldec_obj2obj(CObject * o1, CObject * o2);
 
+extern SDL_Rect iCountDownNumbers[4][4][2];
+extern short iCountDownTimes[28];
+extern short iCountDownRectSize[28];
+extern short iCountDownRectGroup[28];
+extern short iCountDownAnnounce[28];
+
 void RunGame()
 {
 	unsigned int	framestart, ticks;
 	SDL_Event		event;
 	short			i, j;
 	float			realfps = 0, flipfps = 0;
+
+	short iCountDownState = 28;
+	short iCountDownTimer = iCountDownTimes[0];
 
 	//Reset the keys each time we switch from menu to game and back
 	game_values.playerInput.ResetKeys();
@@ -2014,7 +2021,7 @@ void RunGame()
 			game_values.playerInput.Update(event, (game_values.exitinggame ? 1 : 0));
 		}
 
-		if(game_values.screenfade == 0)
+		if(game_values.screenfade == 0 && iCountDownState <= COUNTDOWN_START_INDEX)
 		{
 			//If the cancel button is pressed
 			if(game_values.forceexittimer > 0)
@@ -2118,383 +2125,416 @@ void RunGame()
 		{
 			if(!game_values.swapplayers && game_values.screenfade == 0)
 			{
-				//Shake screen
-				if(game_values.screenshaketimer > 0)
+				//Count down start timer before each game
+				if(iCountDownState > 0 && --iCountDownTimer <= 0)
 				{
-					game_values.screenshaketimer--;
+					--iCountDownState;
+					iCountDownTimer = iCountDownTimes[28 - iCountDownState];
 
-					static bool shakeleft = false;
-					if(shakeleft)
+					short countDownAnnounce = iCountDownAnnounce[28 - iCountDownState];
+					if(countDownAnnounce >= 0)
+						ifsoundonandreadyplay(sfx_announcer[countDownAnnounce]);
+				}
+
+				//Make updates to background stuff (animate map while countdown is counting)
+				if(iCountDownState > COUNTDOWN_START_INDEX)
+				{
+					//Move platforms
+					g_map.updatePlatforms();
+
+					//Keep updating map hazards
+					noncolcontainer.update();
+					objectcontainer[1].update();
+
+					eyecandyfront.cleandeadobjects();
+					eyecandyback.cleandeadobjects();
+					objectcontainer[0].cleandeadobjects();
+					noncolcontainer.cleandeadobjects();
+					
+					eyecandyfront.update();
+					eyecandyback.update();
+					
+					g_map.update();
+				}
+				else
+				{
+					//Shake screen
+					if(game_values.screenshaketimer > 0)
 					{
-						x_shake -= 2;
-						if(x_shake <= -2)
+						game_values.screenshaketimer--;
+
+						static bool shakeleft = false;
+						if(shakeleft)
 						{
-							shakeleft = false;
+							x_shake -= 2;
+							if(x_shake <= -2)
+							{
+								shakeleft = false;
+							}
+						}
+						else
+						{
+							x_shake += 2;
+							if(x_shake >= 2)
+							{
+								shakeleft = true;
+							}
+						}
+
+						//Kill players touching the ground (or in air for MOd blocks)
+						for(short k = 0; k < list_players_cnt; k++)
+						{
+							CPlayer * player = list_players[k];
+							if(player->globalID == game_values.screenshakeplayerid)
+								continue;
+
+							if(game_values.teamcollision != 2 && game_values.screenshaketeamid == player->teamID)
+								continue;
+							
+							if(!player->invincible && player->shield == 0 && !player->fKuriboShoe && player->isready())
+							{
+								if(game_values.screenshakekillinair == player->inair)
+								{
+									PlayerKilledPlayer(game_values.screenshakeplayerid, player, death_style_jump, kill_style_pow, false);
+
+									CPlayer * killer = GetPlayerFromGlobalID(game_values.screenshakeplayerid);
+
+									if(killer)
+									{
+										game_values.screenshakekillscount++;
+										
+										if(killer->inair)
+											killer->killsinrowinair--;  //Don't want to give both shake and in air award
+									}
+								}
+							}
+						}
+						
+
+						//Kill goombas and koopas
+						for(short k = 0; k < objectcontainer[0].list_end; k++)
+						{
+							CObject * object = objectcontainer[0].list[k];
+							if(object->getObjectType() == object_moving)
+							{
+								IO_MovingObject * movingobject = (IO_MovingObject *)object;
+								MovingObjectType type = movingobject->getMovingObjectType();
+								
+								if((type == movingobject_goomba || type == movingobject_koopa || type == movingobject_buzzybeetle || type == movingobject_spiny)
+									&& game_values.screenshakekillinair == movingobject->inair)
+								{
+									CPlayer * killer = GetPlayerFromGlobalID(game_values.screenshakeplayerid);
+
+									if(killer)
+									{
+										if(!game_values.gamemode->gameover)
+											killer->score->AdjustScore(1);
+
+										ifsoundonplay(sfx_kicksound);
+										((MO_WalkingEnemy*)movingobject)->DieAndDropShell();
+
+										game_values.screenshakekillscount++;
+										
+										if(killer->inair)
+											killer->killsinrowinair--;  //Don't want to give both shake and in air award
+									}
+								}
+							}
+						}
+
+						//Destroy throw blocks and flip shells over
+						for(short k = 0; k < objectcontainer[1].list_end; k++)
+						{
+							CObject * object = objectcontainer[1].list[k];
+							if(object->getObjectType() == object_moving)
+							{
+								IO_MovingObject * movingobject = (IO_MovingObject *)object;
+								
+								if(game_values.screenshakekillinair == movingobject->inair)
+								{
+									if(movingobject->getMovingObjectType() == movingobject_shell)
+									{
+										CO_Shell * shell = (CO_Shell*)movingobject;
+										if(!shell->owner || shell->owner->inair == game_values.screenshakekillinair)
+											shell->Flip();
+									}
+									else if(movingobject->getMovingObjectType() == movingobject_throwblock)
+									{
+										CO_ThrowBlock * throwblock = (CO_ThrowBlock*)movingobject;
+										if(!throwblock->owner || throwblock->owner->inair == game_values.screenshakekillinair)
+											throwblock->Die();
+									}
+								}
+							}
+						}
+
+						//Add kills in row for kills from pow and mod
+						if(game_values.screenshakekillscount > 1 && game_values.awardstyle != award_style_none)
+						{
+							game_values.screenshakekillscount = 0;
+
+							CPlayer * killer = GetPlayerFromGlobalID(game_values.screenshakeplayerid);
+
+							if(killer)
+								killer->AddKillsInRowInAirAward();
 						}
 					}
 					else
 					{
-						x_shake += 2;
-						if(x_shake >= 2)
+						//Make sure we zero out the shake value after it is done
+						x_shake = 0;
+					}
+
+					for(short iPlayer = 0; iPlayer < 4; iPlayer++)
+					{
+						if(game_values.bulletbilltimer[iPlayer] > 0)
 						{
-							shakeleft = true;
+							game_values.bulletbilltimer[iPlayer]--;
+							
+							if(--game_values.bulletbillspawntimer[iPlayer] <= 0)
+							{
+								game_values.bulletbillspawntimer[iPlayer] = (short)(rand() % 20 + 25);
+								float speed = ((float)(rand() % 21 + 20)) / 10.0f;
+								objectcontainer[2].add(new MO_BulletBill(&spr_bulletbill, &spr_bulletbilldead, 0, (short)(rand() % 448), (rand() % 2 ? speed : -speed), iPlayer, false));
+								ifsoundonplay(sfx_bulletbillsound);
+							}
 						}
 					}
 
-					//Kill players touching the ground (or in air for MOd blocks)
-					for(short k = 0; k < list_players_cnt; k++)
+					if(game_values.matchtype == MATCH_TYPE_WORLD && game_values.gamemode->gameover && game_values.forceexittimer <= 0)
 					{
-						CPlayer * player = list_players[k];
-						if(player->globalID == game_values.screenshakeplayerid)
-							continue;
+						if(--game_values.noexittimer <= 0)
+							game_values.noexit = false;
+					}
 
-						if(game_values.teamcollision != 2 && game_values.screenshaketeamid == player->teamID)
-							continue;
-						
-						if(!player->invincible && player->shield == 0 && !player->fKuriboShoe && player->isready())
+					//------------- update objects -----------------------
+
+	#ifdef _DEBUG
+					if(game_values.autokill)
+					{
+						for(short k = 0; k < list_players_cnt; k++)
 						{
-							if(game_values.screenshakekillinair == player->inair)
+							list_players[k]->DeathAwards();
+
+							if(!game_values.gamemode->playerkilledself(*(list_players[k]), kill_style_environment))
+								list_players[k]->die(0, false);
+						}
+					}
+	#endif
+
+					//Advance the cpu's turn (AI only calculates player's actions 1 out of 4 frames)
+					if(++game_values.cputurn > 3)
+						game_values.cputurn = 0;
+
+					//Player to player collisions
+					for(i = 0; i < list_players_cnt; i++)
+					{
+						CPlayer * player1 = list_players[i];
+						if(player1->state > player_dead)
+						{
+							for(j = i + 1; j < list_players_cnt; j++)
 							{
-								PlayerKilledPlayer(game_values.screenshakeplayerid, player, death_style_jump, kill_style_pow, false);
-
-								CPlayer * killer = GetPlayerFromGlobalID(game_values.screenshakeplayerid);
-
-								if(killer)
+								CPlayer * player2 = list_players[j];
+								if(player2->state > player_dead)
 								{
-									game_values.screenshakekillscount++;
-									
-									if(killer->inair)
-										killer->killsinrowinair--;  //Don't want to give both shake and in air award
+									if(coldec_player2player(player1, player2))
+									{
+										collisionhandler_p2p(player1, player2);
+
+										//if player was killed by another player, continue with next player for collision detection
+										if(player1->state <= player_dead)
+											break;
+									}
 								}
 							}
 						}
 					}
 					
+					//Move platforms
+					g_map.updatePlatforms();
 
-					//Kill goombas and koopas
-					for(short k = 0; k < objectcontainer[0].list_end; k++)
+					game_values.playskidsound = false;
+					game_values.playinvinciblesound = false;
+					game_values.playflyingsound = false;
+
+					for(i = 0; i < list_players_cnt; i++)
+						list_players[i]->move();	//move all objects before doing object-object collision detection in
+													//->think(), so we test against the new position after object-map collision detection
+
+					//Play sound for skidding players
+					if(game_values.playskidsound)
 					{
-						CObject * object = objectcontainer[0].list[k];
-						if(object->getObjectType() == object_moving)
-						{
-							IO_MovingObject * movingobject = (IO_MovingObject *)object;
-							MovingObjectType type = movingobject->getMovingObjectType();
-							
-							if((type == movingobject_goomba || type == movingobject_koopa || type == movingobject_buzzybeetle || type == movingobject_spiny)
-								&& game_values.screenshakekillinair == movingobject->inair)
-							{
-								CPlayer * killer = GetPlayerFromGlobalID(game_values.screenshakeplayerid);
-
-								if(killer)
-								{
-									if(!game_values.gamemode->gameover)
-										killer->score->AdjustScore(1);
-
-									ifsoundonplay(sfx_kicksound);
-									((MO_WalkingEnemy*)movingobject)->DieAndDropShell();
-
-									game_values.screenshakekillscount++;
-									
-									if(killer->inair)
-										killer->killsinrowinair--;  //Don't want to give both shake and in air award
-								}
-							}
-						}
-					}
-
-					//Destroy throw blocks and flip shells over
-					for(short k = 0; k < objectcontainer[1].list_end; k++)
-					{
-						CObject * object = objectcontainer[1].list[k];
-						if(object->getObjectType() == object_moving)
-						{
-							IO_MovingObject * movingobject = (IO_MovingObject *)object;
-							
-							if(game_values.screenshakekillinair == movingobject->inair)
-							{
-								if(movingobject->getMovingObjectType() == movingobject_shell)
-								{
-									CO_Shell * shell = (CO_Shell*)movingobject;
-									if(!shell->owner || shell->owner->inair == game_values.screenshakekillinair)
-										shell->Flip();
-								}
-								else if(movingobject->getMovingObjectType() == movingobject_throwblock)
-								{
-									CO_ThrowBlock * throwblock = (CO_ThrowBlock*)movingobject;
-									if(!throwblock->owner || throwblock->owner->inair == game_values.screenshakekillinair)
-										throwblock->Die();
-								}
-							}
-						}
-					}
-
-					//Add kills in row for kills from pow and mod
-					if(game_values.screenshakekillscount > 1 && game_values.awardstyle != award_style_none)
-					{
-						game_values.screenshakekillscount = 0;
-
-						CPlayer * killer = GetPlayerFromGlobalID(game_values.screenshakeplayerid);
-
-						if(killer)
-							killer->AddKillsInRowInAirAward();
-					}
-				}
-				else
-				{
-					//Make sure we zero out the shake value after it is done
-					x_shake = 0;
-				}
-
-				for(short iPlayer = 0; iPlayer < 4; iPlayer++)
-				{
-					if(game_values.bulletbilltimer[iPlayer] > 0)
-					{
-						game_values.bulletbilltimer[iPlayer]--;
-						
-						if(--game_values.bulletbillspawntimer[iPlayer] <= 0)
-						{
-							game_values.bulletbillspawntimer[iPlayer] = (short)(rand() % 20 + 25);
-							float speed = ((float)(rand() % 21 + 20)) / 10.0f;
-							objectcontainer[2].add(new MO_BulletBill(&spr_bulletbill, &spr_bulletbilldead, 0, (short)(rand() % 448), (rand() % 2 ? speed : -speed), iPlayer, false));
-							ifsoundonplay(sfx_bulletbillsound);
-						}
-					}
-				}
-
-				if(game_values.matchtype == MATCH_TYPE_WORLD && game_values.gamemode->gameover && game_values.forceexittimer <= 0)
-				{
-					if(--game_values.noexittimer <= 0)
-						game_values.noexit = false;
-				}
-
-				//------------- update objects -----------------------
-
-#ifdef _DEBUG
-				if(game_values.autokill)
-				{
-					for(short k = 0; k < list_players_cnt; k++)
-					{
-						list_players[k]->DeathAwards();
-
-						if(!game_values.gamemode->playerkilledself(*(list_players[k]), kill_style_environment))
-							list_players[k]->die(0, false);
-					}
-				}
-#endif
-
-				//Advance the cpu's turn (AI only calculates player's actions 1 out of 4 frames)
-				if(++game_values.cputurn > 3)
-					game_values.cputurn = 0;
-
-				//Player to player collisions
-				for(i = 0; i < list_players_cnt; i++)
-				{
-					CPlayer * player1 = list_players[i];
-					if(player1->state > player_dead)
-					{
-						for(j = i + 1; j < list_players_cnt; j++)
-						{
-							CPlayer * player2 = list_players[j];
-							if(player2->state > player_dead)
-							{
-								if(coldec_player2player(player1, player2))
-								{
-									collisionhandler_p2p(player1, player2);
-
-									//if player was killed by another player, continue with next player for collision detection
-									if(player1->state <= player_dead)
-										break;
-								}
-							}
-						}
-					}
-				}
-				
-				//Move platforms
-				g_map.updatePlatforms();
-
-				game_values.playskidsound = false;
-				game_values.playinvinciblesound = false;
-				game_values.playflyingsound = false;
-
-				for(i = 0; i < list_players_cnt; i++)
-					list_players[i]->move();	//move all objects before doing object-object collision detection in
-												//->think(), so we test against the new position after object-map collision detection
-
-				//Play sound for skidding players
-				if(game_values.playskidsound)
-				{
-					if(!sfx_skid.isplaying())
-						ifsoundonplay(sfx_skid);
-				}
-				else
-				{
-					if(sfx_skid.isplaying())
-						ifsoundonstop(sfx_skid);
-				}
-
-				//Play sound for players using PWings
-				if(game_values.playflyingsound)
-				{
-					if(!sfx_flyingsound.isplaying())
-						ifsoundonplay(sfx_flyingsound);
-				}
-				else
-				{
-					if(sfx_flyingsound.isplaying())
-						ifsoundonstop(sfx_flyingsound);
-				}
-
-				noncolcontainer.update();
-				objectcontainer[0].update();
-				objectcontainer[1].update();
-				objectcontainer[2].update();
-
-				//Collide player with objects
-				for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++)
-				{
-					CPlayer * player = list_players[iPlayer];
-					if(player->state != player_ready)
-						continue;
-
-					//Collide with objects
-					for(short iLayer = 0; iLayer < 3; iLayer++)
-					{
-						for(short iObject = 0; iObject < objectcontainer[iLayer].list_end; iObject++)
-						{
-							CObject * object = objectcontainer[iLayer].list[iObject];
-
-							if(!object->GetDead())
-							{
-								if(coldec_player2obj(player, object))
-								{
-									if(collisionhandler_p2o(player, object))
-										break;
-								}
-							}
-						}
-
-						//if the object killed the player, then continue with the other players
-						if(player->state != player_ready)
-							break;
-
-						//If player collided with a swap mushroom, the break from colliding with everything else
-						if(game_values.swapplayers)
-							goto SWAPBREAK;
-					}
-				}
-
-				for(short iLayer1 = 0; iLayer1 < 3; iLayer1++)
-				{
-					short iContainerEnd1 = objectcontainer[iLayer1].list_end;
-					for(short iObject1 = 0; iObject1 < iContainerEnd1; iObject1++)
-					{
-						CObject * object1 = objectcontainer[iLayer1].list[iObject1];
-
-						if(object1->getObjectType() != object_moving)
-							continue;
-
-						IO_MovingObject * movingobject1 = (IO_MovingObject*)object1;
-
-						for(short iLayer2 = iLayer1; iLayer2 < 3; iLayer2++)
-						{
-							short iContainerEnd2 = objectcontainer[iLayer2].list_end;
-							for(short iObject2 = (iLayer1 == iLayer2 ? iObject1 + 1 : 0); iObject2 < iContainerEnd2; iObject2++)
-							{
-								CObject * object2 = objectcontainer[iLayer2].list[iObject2];
-
-								if(object2->getObjectType() != object_moving)
-									continue;
-
-								IO_MovingObject * movingobject2 = (IO_MovingObject*)object2;
-
-								//if(g_iCollisionMap[movingobject1->getMovingObjectType()][movingobject2->getMovingObjectType()])
-								//	continue;
-
-								//if(iLayer1 == iLayer2 && iObject1 == iObject2)
-								//	continue;
-
-								if(object2->GetDead())
-									continue;
-
-								MovingObjectType iType1 = movingobject1->getMovingObjectType();
-								MovingObjectType iType2 = movingobject2->getMovingObjectType();
-								if(g_iCollisionMap[iType1][iType2])
-								{
-									if(coldec_obj2obj(movingobject1, movingobject2))
-									{
-										collisionhandler_o2o(movingobject1, movingobject2);
-									}
-								}
-								else if(g_iCollisionMap[iType2][iType1])
-								{
-									if(coldec_obj2obj(movingobject2, movingobject1))
-									{
-										collisionhandler_o2o(movingobject2, movingobject1);
-									}
-								}
-
-								if(object1->GetDead())
-									goto CONTINUEOBJECT1;
-							}
-						}
-
-						//Labeled break
-						CONTINUEOBJECT1:
-						continue;
-					}
-				}
-
-				eyecandyfront.cleandeadobjects();
-				eyecandyback.cleandeadobjects();
-				objectcontainer[2].cleandeadobjects();
-				objectcontainer[1].cleandeadobjects();
-				objectcontainer[0].cleandeadobjects();
-				noncolcontainer.cleandeadobjects();
-				CleanDeadPlayers();
-
-				eyecandyfront.update();
-				eyecandyback.update();
-				game_values.gamemode->think();
-
-				if(game_values.slowdownon != -1 && ++game_values.slowdowncounter > 580)
-				{
-					game_values.slowdownon = -1;
-					game_values.slowdowncounter = 0;
-				}
-
-				g_map.update();
-
-				if(y_shake > 0)
-				{
-					y_shake -= CRUNCHVELOCITY;
-
-					if(y_shake < 0)
-						y_shake = 0;
-				}
-			
-				if(game_values.showscoreboard)
-				{
-					if(game_values.scorepercentmove < 1.0f)
-					{
-						game_values.scorepercentmove += 0.01f;
-						
-						if(game_values.scorepercentmove >= 1.0f)
-							game_values.scorepercentmove = 1.0f;
+						if(!sfx_skid.isplaying())
+							ifsoundonplay(sfx_skid);
 					}
 					else
 					{
-						game_values.scorepercentmove = 1.0f;
+						if(sfx_skid.isplaying())
+							ifsoundonstop(sfx_skid);
 					}
 
-					for(i = 0; i < score_cnt; i++)
+					//Play sound for players using PWings
+					if(game_values.playflyingsound)
 					{
-						score[i]->x = (short)((float)(score[i]->destx - score[i]->fromx) * game_values.scorepercentmove) + score[i]->fromx;
-						score[i]->y = (short)((float)(score[i]->desty - score[i]->fromy) * game_values.scorepercentmove) + score[i]->fromy;
+						if(!sfx_flyingsound.isplaying())
+							ifsoundonplay(sfx_flyingsound);
+					}
+					else
+					{
+						if(sfx_flyingsound.isplaying())
+							ifsoundonstop(sfx_flyingsound);
+					}
+
+					noncolcontainer.update();
+					objectcontainer[0].update();
+					objectcontainer[1].update();
+					objectcontainer[2].update();
+
+					//Collide player with objects
+					for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++)
+					{
+						CPlayer * player = list_players[iPlayer];
+						if(player->state != player_ready)
+							continue;
+
+						//Collide with objects
+						for(short iLayer = 0; iLayer < 3; iLayer++)
+						{
+							for(short iObject = 0; iObject < objectcontainer[iLayer].list_end; iObject++)
+							{
+								CObject * object = objectcontainer[iLayer].list[iObject];
+
+								if(!object->GetDead())
+								{
+									if(coldec_player2obj(player, object))
+									{
+										if(collisionhandler_p2o(player, object))
+											break;
+									}
+								}
+							}
+
+							//if the object killed the player, then continue with the other players
+							if(player->state != player_ready)
+								break;
+
+							//If player collided with a swap mushroom, the break from colliding with everything else
+							if(game_values.swapplayers)
+								goto SWAPBREAK;
+						}
+					}
+
+					for(short iLayer1 = 0; iLayer1 < 3; iLayer1++)
+					{
+						short iContainerEnd1 = objectcontainer[iLayer1].list_end;
+						for(short iObject1 = 0; iObject1 < iContainerEnd1; iObject1++)
+						{
+							CObject * object1 = objectcontainer[iLayer1].list[iObject1];
+
+							if(object1->getObjectType() != object_moving)
+								continue;
+
+							IO_MovingObject * movingobject1 = (IO_MovingObject*)object1;
+
+							for(short iLayer2 = iLayer1; iLayer2 < 3; iLayer2++)
+							{
+								short iContainerEnd2 = objectcontainer[iLayer2].list_end;
+								for(short iObject2 = (iLayer1 == iLayer2 ? iObject1 + 1 : 0); iObject2 < iContainerEnd2; iObject2++)
+								{
+									CObject * object2 = objectcontainer[iLayer2].list[iObject2];
+
+									if(object2->getObjectType() != object_moving)
+										continue;
+
+									IO_MovingObject * movingobject2 = (IO_MovingObject*)object2;
+
+									//if(g_iCollisionMap[movingobject1->getMovingObjectType()][movingobject2->getMovingObjectType()])
+									//	continue;
+
+									//if(iLayer1 == iLayer2 && iObject1 == iObject2)
+									//	continue;
+
+									if(object2->GetDead())
+										continue;
+
+									MovingObjectType iType1 = movingobject1->getMovingObjectType();
+									MovingObjectType iType2 = movingobject2->getMovingObjectType();
+									if(g_iCollisionMap[iType1][iType2])
+									{
+										if(coldec_obj2obj(movingobject1, movingobject2))
+										{
+											collisionhandler_o2o(movingobject1, movingobject2);
+										}
+									}
+									else if(g_iCollisionMap[iType2][iType1])
+									{
+										if(coldec_obj2obj(movingobject2, movingobject1))
+										{
+											collisionhandler_o2o(movingobject2, movingobject1);
+										}
+									}
+
+									if(object1->GetDead())
+										goto CONTINUEOBJECT1;
+								}
+							}
+
+							//Labeled break
+							CONTINUEOBJECT1:
+							continue;
+						}
+					}
+
+					eyecandyfront.cleandeadobjects();
+					eyecandyback.cleandeadobjects();
+					objectcontainer[2].cleandeadobjects();
+					objectcontainer[1].cleandeadobjects();
+					objectcontainer[0].cleandeadobjects();
+					noncolcontainer.cleandeadobjects();
+					CleanDeadPlayers();
+
+					eyecandyfront.update();
+					eyecandyback.update();
+					game_values.gamemode->think();
+
+					if(game_values.slowdownon != -1 && ++game_values.slowdowncounter > 580)
+					{
+						game_values.slowdownon = -1;
+						game_values.slowdowncounter = 0;
+					}
+
+					g_map.update();
+
+					if(y_shake > 0)
+					{
+						y_shake -= CRUNCHVELOCITY;
+
+						if(y_shake < 0)
+							y_shake = 0;
+					}
+				
+					if(game_values.showscoreboard)
+					{
+						if(game_values.scorepercentmove < 1.0f)
+						{
+							game_values.scorepercentmove += 0.01f;
+							
+							if(game_values.scorepercentmove >= 1.0f)
+								game_values.scorepercentmove = 1.0f;
+						}
+						else
+						{
+							game_values.scorepercentmove = 1.0f;
+						}
+
+						for(i = 0; i < score_cnt; i++)
+						{
+							score[i]->x = (short)((float)(score[i]->destx - score[i]->fromx) * game_values.scorepercentmove) + score[i]->fromx;
+							score[i]->y = (short)((float)(score[i]->desty - score[i]->fromy) * game_values.scorepercentmove) + score[i]->fromy;
+						}
 					}
 				}
 			}
-
 			//Go to this label if a player collects a swap mushroom and we need to break out of two loops
 			SWAPBREAK:
 
@@ -2780,6 +2820,12 @@ void RunGame()
 			for(i = 0; i < list_players_cnt; i++)
 				list_players[i]->drawarrows();
 
+			//Draw countdown start timer
+			if(iCountDownState > 0 && game_values.screenfade == 0)
+			{
+				SDL_Rect * rects = iCountDownNumbers[iCountDownRectGroup[28 - iCountDownState]][iCountDownRectSize[28 - iCountDownState]];
+				spr_menu_boxed_numbers.draw(rects[1].x, rects[1].y, rects[0].x, rects[0].y, rects[0].w, rects[0].h);
+			}
 
 			if(game_values.screenfadespeed != 0)
 			{

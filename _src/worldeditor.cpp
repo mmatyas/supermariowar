@@ -44,8 +44,7 @@ SDL_Surface		*blitdest;
 SDL_Surface		*sMapSurface;
 
 SDL_Rect		rectSrcSurface = {0, 0, 768, 608};
-SDL_Rect		rectDstSurface = {0, 0, 640, 480};
-bool			fNeedBlackBackground = false;
+SDL_Rect		rectDstSurface = {0, 0, 640, 480};bool			fNeedBlackBackground = false;
 short			iWorldWidth, iWorldHeight;
 
 SDL_Event		event;
@@ -138,6 +137,7 @@ CPlayer			*list_players[4];
 short			list_players_cnt = 0;
 bool			g_fLoadMessages = true;
 short			g_iCurrentDrawIndex = 0;
+gfxSprite		menu_dialog;
 ///////
 
 int save_as();

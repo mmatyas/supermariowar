@@ -396,8 +396,9 @@ EC_GravText::EC_GravText(gfxFont *nfont, short nx, short ny, const char *ntext, 
 	y = (float)ny;
 	w = (short)font->getWidth(ntext);
 	
-	text = new char[strlen(ntext)+1];	//someone should test if we got the memory...
+	text = new char[strlen(ntext)+1];
 	
+	//Test if we got the memory
 	if(text)
 		strcpy(text, ntext);
 	else
@@ -433,6 +434,75 @@ EC_GravText::~EC_GravText()
 {
 	delete [] text;
 	text = NULL;
+}
+
+
+//------------------------------------------------------------------------------
+// class EC_Announcement
+//------------------------------------------------------------------------------
+
+EC_Announcement::EC_Announcement(gfxFont *nfont, gfxSprite *nsprite, const char *ntext, short icon, short time) :
+	CEyecandy()
+{
+	font = nfont;
+	sprite = nsprite;
+
+	iy = 200;
+	
+	text = new char[strlen(ntext)+1];
+	
+	//Test if we got the memory
+	if(text)
+		strcpy(text, ntext);
+	else
+		dead = true;
+
+	iIcon = icon;
+	iTime = time;
+	iTimer = 0;
+
+	iFontY = iy + 32 - (font->getHeight() >> 1);
+
+	iFontOffsetX = 16 + (sprite ? 48 : 0);
+
+	short iWidth = 16 + iFontOffsetX + font->getWidth(text);
+	short iHalfWidth = iWidth >> 1;
+
+	ix = 320 - iHalfWidth;
+
+	gfx_setrect(&rDstRect[0], ix, iy, iHalfWidth, 32);
+	gfx_setrect(&rDstRect[1], ix + iHalfWidth, iy, iHalfWidth, 32);
+	gfx_setrect(&rDstRect[2], ix, iy + 32, iHalfWidth, 32);
+	gfx_setrect(&rDstRect[3], ix + iHalfWidth, iy + 32, iHalfWidth, 32);
+
+	gfx_setrect(&rSrcRect[0], 0, 0, iHalfWidth, 32);
+	gfx_setrect(&rSrcRect[1], 512 - iHalfWidth, 0, iHalfWidth, 32);
+	gfx_setrect(&rSrcRect[2], 0, 448, iHalfWidth, 32);
+	gfx_setrect(&rSrcRect[3], 512 - iHalfWidth, 448, iHalfWidth, 32);
+}
+
+
+EC_Announcement::~EC_Announcement()
+{
+	delete [] text;
+	text = NULL;
+}
+
+void EC_Announcement::update()
+{
+	if(++iTimer >= iTime)
+		dead = true;
+}
+
+void EC_Announcement::draw()
+{
+	for(short iRect = 0; iRect < 4; iRect++)
+		menu_dialog.draw(rDstRect[iRect].x, rDstRect[iRect].y, rSrcRect[iRect].x, rSrcRect[iRect].y, rSrcRect[iRect].w, rSrcRect[iRect].h);
+
+	font->draw(ix + iFontOffsetX, iFontY, text);
+
+	if(sprite)
+		sprite->draw(ix + 16, iy + 16, iIcon << 5, 0, 32, 32);
 }
 
 

@@ -4214,11 +4214,11 @@ void Menu::StartGame()
 				}
 			}
 
-			if(!strcmp(szBuffer, "[none]"))
-				announcerIndex++;
-			else
-				sfx_announcer[announcerIndex++].init(convertPath(szBuffer));
+			//If it is not "[none]", then add this announcer sound
+			if(strcmp(szBuffer, "[none]"))
+				sfx_announcer[announcerIndex].init(convertPath(szBuffer));
 
+			announcerIndex++;
 		}
 
 		fclose(announcerfile);
