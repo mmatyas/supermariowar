@@ -441,13 +441,13 @@ EC_GravText::~EC_GravText()
 // class EC_Announcement
 //------------------------------------------------------------------------------
 
-EC_Announcement::EC_Announcement(gfxFont *nfont, gfxSprite *nsprite, const char *ntext, short icon, short time) :
+EC_Announcement::EC_Announcement(gfxFont *nfont, gfxSprite *nsprite, const char *ntext, short icon, short time, short y) :
 	CEyecandy()
 {
 	font = nfont;
 	sprite = nsprite;
 
-	iy = 200;
+	iy = y;
 	
 	text = new char[strlen(ntext)+1];
 	

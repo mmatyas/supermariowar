@@ -148,9 +148,9 @@ bool RemoveTeam(short teamid)
 	bool fRet = game_values.teamdeadcounter == score_cnt - 1;
 
 	//Announce that a team was removed
-	if(!fRet)
+	if(game_values.deadteamnotice && !fRet)
 	{
-		eyecandyfront.add(new EC_Announcement(&game_font_large, &spr_announcementicons, "Team Removed!", iAnnouncementColor, 90));
+		eyecandyfront.add(new EC_Announcement(&game_font_large, &spr_announcementicons, "Team Removed!", iAnnouncementColor, 90, 200));
 		ifsoundonandreadyplay(sfx_announcer[iAnnouncementColor + 16]);
 	}
 

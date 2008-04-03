@@ -166,7 +166,7 @@ class EC_GravText : public CEyecandy
 class EC_Announcement : public CEyecandy
 {
 	public:
-		EC_Announcement(gfxFont *nfont, gfxSprite *nsprite, const char *ntext, short icon, short time);
+		EC_Announcement(gfxFont *nfont, gfxSprite *nsprite, const char *ntext, short icon, short time, short y);
 		~EC_Announcement();
 		void draw();
 		void update();

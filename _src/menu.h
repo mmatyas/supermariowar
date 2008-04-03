@@ -108,6 +108,7 @@ class Menu
 		MI_Button * miProjectilesLimitsMenuButton;
 		MI_Button * miPowerupSettingsMenuButton;
 		MI_Button * miGraphicsOptionsMenuButton;
+		MI_Button * miEyeCandyOptionsMenuButton;
 		MI_Button * miSoundOptionsMenuButton;
 		MI_Button * miGenerateMapThumbsButton;
 		
@@ -133,7 +134,6 @@ class Menu
 		MI_SelectField * miWarpLockStyleField;
 		MI_SelectField * miWarpLockTimeField;
 		MI_SelectField * miBotsField;
-		MI_SelectField * miFrameLimiterField;
 		MI_SelectField * miPointSpeedField;
 		MI_Button * miGameplayOptionsMenuBackButton;
 
@@ -235,13 +235,9 @@ class Menu
 
 		//Graphics Options Menu
 		UI_Menu mGraphicsOptionsMenu;
-		MI_SelectField * miSpawnStyleField;
-		MI_SelectField * miAwardStyleField;
-		MI_SelectField * miScoreStyleField;
-		MI_SelectField * miCrunchField;
 		MI_SelectField * miTopLayerField;
-		MI_SelectField * miWinningCrownField;
-		
+		MI_SelectField * miFrameLimiterField;
+
 #ifdef _XBOX
 		MI_Button * miScreenSettingsButton;
 #else
@@ -255,6 +251,22 @@ class Menu
 		MI_Image * miGraphicsOptionsMenuLeftHeaderBar;
 		MI_Image * miGraphicsOptionsMenuRightHeaderBar;
 		MI_Text * miGraphicsOptionsMenuHeaderText;
+
+		//Eye Candy Options Menu
+		UI_Menu mEyeCandyOptionsMenu;
+		MI_SelectField * miSpawnStyleField;
+		MI_SelectField * miAwardStyleField;
+		MI_SelectField * miScoreStyleField;
+		MI_SelectField * miCrunchField;
+		MI_SelectField * miWinningCrownField;
+		MI_SelectField * miStartCountDownField;
+		MI_SelectField * miDeadTeamNoticeField;
+
+		MI_Button * miEyeCandyOptionsMenuBackButton;
+		
+		MI_Image * miEyeCandyOptionsMenuLeftHeaderBar;
+		MI_Image * miEyeCandyOptionsMenuRightHeaderBar;
+		MI_Text * miEyeCandyOptionsMenuHeaderText;
 
 		//Sound Options Menu
 		UI_Menu mSoundOptionsMenu;

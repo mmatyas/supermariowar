@@ -44,8 +44,7 @@
 //[ ] World AI needs ability to use stored items -> harder problem than I have time for
 //[ ] Add SMB3's first world as a test world to ship with
 
-//[ ] Announcement that a player/team was removed from game - needs more specing but this could be helpful - with announcer hook?
-//[ ] Countdown before match begins, 3..., 2..., 1... with announcer hooks
+//[ ] Countdown before match begins, 3..., 2..., 1... with announcer hooks -> Add real gfx for this!
 //[ ] On/Off switch [?] and note blocks and possibly other types of on/off blocks
 //[ ] Enemies should die in lava
 //[ ] Allow spawn areas for domination blocks
@@ -57,7 +56,8 @@
 //[ ] Breaking skull blocks (too close to donut block, perhaps)
 //[ ] What about re-appear for bricks/blue/flip/etc.? Is this doable with not much effort?
 
-//[ ] TEST!! Check to see that we use the "enter stage" sound when starting a world match
+//[ ] Clean up unused gfx/sfx
+//[ ] Add display of mode/goal at the beginning of a quick game
 
 * Bomb option in Star mode
 - Mariokart-type podium at the end of a tournament/tour/whatever
@@ -842,6 +842,8 @@ int main(int argc, char *argv[])
 	game_values.bonuswheel			= 1;
 	game_values.keeppowerup			= false;
 	game_values.showwinningcrown	= false;
+	game_values.startgamecountdown	= true;
+	game_values.deadteamnotice		= true;
 	game_values.playnextmusic		= false;
 	game_values.pointspeed			= 20;
 	game_values.swapstyle			= 1;	//Blink then swap
@@ -1117,8 +1119,8 @@ int main(int argc, char *argv[])
 				SDL_XBOX_SetScreenStretch(game_values.screenResizeW, game_values.screenResizeH);
 			#endif
 
-			unsigned char abyte[30];
-			fread(abyte, sizeof(unsigned char), 30, fp);
+			unsigned char abyte[32];
+			fread(abyte, sizeof(unsigned char), 32, fp);
 			game_values.spawnstyle = (short) abyte[0];
 			game_values.awardstyle = (short) abyte[1];
 			game_values.teamcollision = (short)abyte[3];
@@ -1142,7 +1144,9 @@ int main(int argc, char *argv[])
 			game_values.swapstyle = (short)abyte[25];
 			game_values.overridepowerupsettings = (short)abyte[28];
 			game_values.minigameunlocked = ((short)abyte[29] > 0 ? true : false);
-			
+			game_values.startgamecountdown = ((short)abyte[30] > 0 ? true : false);
+			game_values.deadteamnotice = ((short)abyte[31] > 0 ? true : false);
+
 			fread(&game_values.shieldtime, sizeof(short), 1, fp);
 			fread(&game_values.shieldstyle, sizeof(short), 1, fp);
 			fread(&game_values.itemrespawntime, sizeof(short), 1, fp);
@@ -1421,8 +1425,11 @@ void RunGame()
 	short			i, j;
 	float			realfps = 0, flipfps = 0;
 
-	short iCountDownState = 28;
+	short iCountDownState = 0;
 	short iCountDownTimer = iCountDownTimes[0];
+
+	if(game_values.startgamecountdown)
+		iCountDownState = 28;
 
 	//Reset the keys each time we switch from menu to game and back
 	game_values.playerInput.ResetKeys();
@@ -2836,6 +2843,14 @@ void RunGame()
 				{
 					game_values.screenfadespeed = 0;
 					game_values.screenfade = 0;
+
+					//If this is a quick game, display the mode and goal
+					if(game_values.matchtype == MATCH_TYPE_QUICK_GAME)
+					{
+						char szMode[128];
+						sprintf(szMode, "%s  %s: %d", game_values.gamemode->GetModeName(), game_values.gamemode->GetGoalName(), game_values.gamemode->goal);
+						eyecandyfront.add(new EC_Announcement(&game_font_large, &menu_mode_large, szMode, game_values.gamemode->gamemode, 130, 90));
+					}
 				}
 				else if(game_values.screenfade >= 255)
 				{

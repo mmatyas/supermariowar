@@ -87,7 +87,7 @@ void Menu::WriteGameOptions()
 		fwrite(&game_values.screenResizeH, sizeof(float), 1, fp);
 #endif
 
-		unsigned char abyte[30];
+		unsigned char abyte[32];
 		abyte[0] = (unsigned char) game_values.spawnstyle;
 		abyte[1] = (unsigned char) game_values.awardstyle;
 		abyte[2] = (unsigned char) announcerlist.GetCurrentIndex();
@@ -117,7 +117,9 @@ void Menu::WriteGameOptions()
 		abyte[26] = (unsigned char) gamegraphicspacklist.GetCurrentIndex();
 		abyte[28] = (unsigned char) game_values.overridepowerupsettings;
 		abyte[29] = (unsigned char) game_values.minigameunlocked;
-		fwrite(abyte, sizeof(unsigned char), 30, fp); 
+		abyte[30] = (unsigned char) game_values.startgamecountdown;
+		abyte[31] = (unsigned char) game_values.deadteamnotice;
+		fwrite(abyte, sizeof(unsigned char), 32, fp); 
 
 		fwrite(&game_values.shieldtime, sizeof(short), 1, fp);
 		fwrite(&game_values.shieldstyle, sizeof(short), 1, fp);
@@ -283,33 +285,36 @@ void Menu::CreateMenu()
 	// Options Menu
 	//***********************
 
-	miGameplayOptionsMenuButton = new MI_Button(&spr_selectfield, 120, 60, "Gameplay", 400, 1);
+	miGameplayOptionsMenuButton = new MI_Button(&spr_selectfield, 120, 40, "Gameplay", 400, 1);
 	miGameplayOptionsMenuButton->SetCode(MENU_CODE_TO_GAMEPLAY_OPTIONS_MENU);
 	
-	miTeamOptionsMenuButton = new MI_Button(&spr_selectfield, 120, 100, "Team", 400, 1);
+	miTeamOptionsMenuButton = new MI_Button(&spr_selectfield, 120, 80, "Team", 400, 1);
 	miTeamOptionsMenuButton->SetCode(MENU_CODE_TO_TEAM_OPTIONS_MENU);
 
-	miPowerupOptionsMenuButton = new MI_Button(&spr_selectfield, 120, 140, "Item Selection", 400, 1);
+	miPowerupOptionsMenuButton = new MI_Button(&spr_selectfield, 120, 120, "Item Selection", 400, 1);
 	miPowerupOptionsMenuButton->SetCode(MENU_CODE_TO_POWERUP_SELECTION_MENU);
 
-	miPowerupSettingsMenuButton = new MI_Button(&spr_selectfield, 120, 180, "Item Settings", 400, 1);
+	miPowerupSettingsMenuButton = new MI_Button(&spr_selectfield, 120, 160, "Item Settings", 400, 1);
 	miPowerupSettingsMenuButton->SetCode(MENU_CODE_TO_POWERUP_SETTINGS_MENU);
 
-	miProjectilesOptionsMenuButton = new MI_Button(&spr_selectfield, 120, 220, "Weapons & Projectiles", 400, 1);
+	miProjectilesOptionsMenuButton = new MI_Button(&spr_selectfield, 120, 200, "Weapons & Projectiles", 400, 1);
 	miProjectilesOptionsMenuButton->SetCode(MENU_CODE_TO_PROJECTILES_OPTIONS_MENU);
 
-	miProjectilesLimitsMenuButton = new MI_Button(&spr_selectfield, 120, 260, "Weapon Use Limits", 400, 1);
+	miProjectilesLimitsMenuButton = new MI_Button(&spr_selectfield, 120, 240, "Weapon Use Limits", 400, 1);
 	miProjectilesLimitsMenuButton->SetCode(MENU_CODE_TO_PROJECTILES_LIMITS_MENU);
 
-	miGraphicsOptionsMenuButton = new MI_Button(&spr_selectfield, 120, 300, "Graphics", 400, 1);
+	miGraphicsOptionsMenuButton = new MI_Button(&spr_selectfield, 120, 280, "Graphics", 400, 1);
 	miGraphicsOptionsMenuButton->SetCode(MENU_CODE_TO_GRAPHICS_OPTIONS_MENU);
+
+	miEyeCandyOptionsMenuButton = new MI_Button(&spr_selectfield, 120, 320, "Eye Candy", 400, 1);
+	miEyeCandyOptionsMenuButton->SetCode(MENU_CODE_TO_EYECANDY_OPTIONS_MENU);
 	
-	miSoundOptionsMenuButton = new MI_Button((game_values.soundcapable ? &spr_selectfield : &spr_selectfielddisabled), 120, 340, "Music & Sound", 400, 1);
+	miSoundOptionsMenuButton = new MI_Button((game_values.soundcapable ? &spr_selectfield : &spr_selectfielddisabled), 120, 360, "Music & Sound", 400, 1);
 	
 	if(game_values.soundcapable)
 		miSoundOptionsMenuButton->SetCode(MENU_CODE_TO_SOUND_OPTIONS_MENU);
 
-	miGenerateMapThumbsButton = new MI_Button(&spr_selectfield, 120, 380, "Refresh Maps", 400, 1);
+	miGenerateMapThumbsButton = new MI_Button(&spr_selectfield, 120, 400, "Refresh Maps", 400, 1);
 	miGenerateMapThumbsButton->SetCode(MENU_CODE_SAVE_ALL_MAP_THUMBNAILS);
 
 	miOptionsMenuBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
@@ -340,8 +345,9 @@ void Menu::CreateMenu()
 	mOptionsMenu.AddControl(miPowerupSettingsMenuButton, miPowerupOptionsMenuButton, miProjectilesOptionsMenuButton, NULL, miOptionsMenuBackButton);
 	mOptionsMenu.AddControl(miProjectilesOptionsMenuButton, miPowerupSettingsMenuButton, miProjectilesLimitsMenuButton, NULL, miOptionsMenuBackButton);
 	mOptionsMenu.AddControl(miProjectilesLimitsMenuButton, miProjectilesOptionsMenuButton, miGraphicsOptionsMenuButton, NULL, miOptionsMenuBackButton);
-	mOptionsMenu.AddControl(miGraphicsOptionsMenuButton, miProjectilesLimitsMenuButton, miSoundOptionsMenuButton, NULL, miOptionsMenuBackButton);
-	mOptionsMenu.AddControl(miSoundOptionsMenuButton, miGraphicsOptionsMenuButton, miGenerateMapThumbsButton, NULL, miOptionsMenuBackButton);
+	mOptionsMenu.AddControl(miGraphicsOptionsMenuButton, miProjectilesLimitsMenuButton, miEyeCandyOptionsMenuButton, NULL, miOptionsMenuBackButton);
+	mOptionsMenu.AddControl(miEyeCandyOptionsMenuButton, miGraphicsOptionsMenuButton, miSoundOptionsMenuButton, NULL, miOptionsMenuBackButton);
+	mOptionsMenu.AddControl(miSoundOptionsMenuButton, miEyeCandyOptionsMenuButton, miGenerateMapThumbsButton, NULL, miOptionsMenuBackButton);
 	mOptionsMenu.AddControl(miGenerateMapThumbsButton, miSoundOptionsMenuButton, miOptionsMenuBackButton, NULL, miOptionsMenuBackButton);
 
 	mOptionsMenu.AddControl(miOptionsMenuBackButton, miGenerateMapThumbsButton, miGameplayOptionsMenuButton, miGenerateMapThumbsButton, NULL);
@@ -365,14 +371,101 @@ void Menu::CreateMenu()
 	// Graphics Options
 	//***********************
 
-	miSpawnStyleField = new MI_SelectField(&spr_selectfield, 70, 60, "Spawn Style", 500, 220);
+	miTopLayerField = new MI_SelectField(&spr_selectfield, 70, 140, "Draw Top Layer", 500, 220);
+	miTopLayerField->Add("Background", 0, "", false, false);
+	miTopLayerField->Add("Foreground", 1, "", true, false);
+	miTopLayerField->SetData(NULL, NULL, &game_values.toplayer);
+	miTopLayerField->SetKey(game_values.toplayer ? 1 : 0);
+	miTopLayerField->SetAutoAdvance(true);
+
+	miFrameLimiterField = new MI_SelectField(&spr_selectfield, 70, 180, "Frame Limit", 500, 220);
+	miFrameLimiterField->Add("10 FPS", 100, "", false, false);
+	miFrameLimiterField->Add("15 FPS", 67, "", false, false);
+	miFrameLimiterField->Add("20 FPS", 50, "", false, false);
+	miFrameLimiterField->Add("25 FPS", 40, "", false, false);
+	miFrameLimiterField->Add("30 FPS", 33, "", false, false);
+	miFrameLimiterField->Add("35 FPS", 28, "", false, false);
+	miFrameLimiterField->Add("40 FPS", 25, "", false, false);
+	miFrameLimiterField->Add("45 FPS", 22, "", false, false);
+	miFrameLimiterField->Add("50 FPS", 20, "", false, false);
+	miFrameLimiterField->Add("55 FPS", 18, "", false, false);
+	miFrameLimiterField->Add("62 FPS (Normal)", 16, "", false, false);
+	miFrameLimiterField->Add("66 FPS", 15, "", false, false);
+	miFrameLimiterField->Add("71 FPS", 14, "", false, false);
+	miFrameLimiterField->Add("77 FPS", 13, "", false, false);
+	miFrameLimiterField->Add("83 FPS", 12, "", false, false);
+	miFrameLimiterField->Add("90 FPS", 11, "", false, false);
+	miFrameLimiterField->Add("100 FPS", 10, "", false, false);
+	miFrameLimiterField->Add("111 FPS", 9, "", false, false);
+	miFrameLimiterField->Add("125 FPS", 8, "", false, false);
+	miFrameLimiterField->Add("142 FPS", 7, "", false, false);
+	miFrameLimiterField->Add("166 FPS", 6, "", false, false);
+	miFrameLimiterField->Add("200 FPS", 5, "", false, false);
+	miFrameLimiterField->Add("250 FPS", 4, "", false, false);
+	miFrameLimiterField->Add("333 FPS", 3, "", false, false);
+	miFrameLimiterField->Add("500 FPS", 2, "", false, false);
+	miFrameLimiterField->Add("No Limit", 0, "", false, false);
+	miFrameLimiterField->SetData(&game_values.framelimiter, NULL, NULL);
+	miFrameLimiterField->SetKey(game_values.framelimiter);
+
+#ifdef _XBOX
+	miScreenSettingsButton = new MI_Button(&spr_selectfield, 70, 220, "Screen Settings", 500, 0);
+	miScreenSettingsButton->SetCode(MENU_CODE_TO_SCREEN_SETTINGS);
+#else
+	miFullscreenField = new MI_SelectField(&spr_selectfield, 70, 220, "Screen Size", 500, 220);
+	miFullscreenField->Add("Windowed", 0, "", false, false);
+	miFullscreenField->Add("Fullscreen", 1, "", true, false);
+	miFullscreenField->SetData(NULL, NULL, &game_values.fullscreen);
+	miFullscreenField->SetKey(game_values.fullscreen ? 1 : 0);
+	miFullscreenField->SetAutoAdvance(true);
+	miFullscreenField->SetItemChangedCode(MENU_CODE_TOGGLE_FULLSCREEN);
+#endif //_XBOX
+
+	miMenuGraphicsPackField = new MI_PacksField(&spr_selectfield, 70, 260, "Menu Graphics", 500, 220, &menugraphicspacklist, MENU_CODE_MENU_GRAPHICS_PACK_CHANGED);
+	miGameGraphicsPackField = new MI_PacksField(&spr_selectfield, 70, 300, "Game Graphics", 500, 220, &gamegraphicspacklist, MENU_CODE_GAME_GRAPHICS_PACK_CHANGED);
+
+	miGraphicsOptionsMenuBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
+	miGraphicsOptionsMenuBackButton->SetCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
+
+	miGraphicsOptionsMenuLeftHeaderBar = new MI_Image(&menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
+	miGraphicsOptionsMenuRightHeaderBar = new MI_Image(&menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
+	miGraphicsOptionsMenuHeaderText = new MI_Text("Graphics Options Menu", 320, 5, 0, 2, 1);
+
+	mGraphicsOptionsMenu.AddControl(miTopLayerField, miGraphicsOptionsMenuBackButton, miFrameLimiterField, NULL, miGraphicsOptionsMenuBackButton);
+
+#ifdef _XBOX
+	mGraphicsOptionsMenu.AddControl(miFrameLimiterField, miTopLayerField, miScreenSettingsButton, NULL, miGraphicsOptionsMenuBackButton);
+	mGraphicsOptionsMenu.AddControl(miScreenSettingsButton, miFrameLimiterField, miMenuGraphicsPackField, NULL, miGraphicsOptionsMenuBackButton);
+	mGraphicsOptionsMenu.AddControl(miMenuGraphicsPackField, miScreenSettingsButton, miGameGraphicsPackField, NULL, miGraphicsOptionsMenuBackButton);
+#else
+	mGraphicsOptionsMenu.AddControl(miFrameLimiterField, miTopLayerField, miFullscreenField, NULL, miGraphicsOptionsMenuBackButton);
+	mGraphicsOptionsMenu.AddControl(miFullscreenField, miFrameLimiterField, miMenuGraphicsPackField, NULL, miGraphicsOptionsMenuBackButton);
+	mGraphicsOptionsMenu.AddControl(miMenuGraphicsPackField, miFullscreenField, miGameGraphicsPackField, NULL, miGraphicsOptionsMenuBackButton);
+#endif
+
+	mGraphicsOptionsMenu.AddControl(miGameGraphicsPackField, miMenuGraphicsPackField, miGraphicsOptionsMenuBackButton, NULL, miGraphicsOptionsMenuBackButton);
+	mGraphicsOptionsMenu.AddControl(miGraphicsOptionsMenuBackButton, miGameGraphicsPackField, miTopLayerField, miGameGraphicsPackField, NULL);
+
+	mGraphicsOptionsMenu.AddNonControl(miGraphicsOptionsMenuLeftHeaderBar);
+	mGraphicsOptionsMenu.AddNonControl(miGraphicsOptionsMenuRightHeaderBar);
+	mGraphicsOptionsMenu.AddNonControl(miGraphicsOptionsMenuHeaderText);
+
+	mGraphicsOptionsMenu.SetHeadControl(miTopLayerField);
+	mGraphicsOptionsMenu.SetCancelCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
+
+
+	//***********************
+	// Eye Candy Options
+	//***********************
+
+	miSpawnStyleField = new MI_SelectField(&spr_selectfield, 70, 100, "Spawn Style", 500, 220);
 	miSpawnStyleField->Add("Instant", 0, "", false, false);
 	miSpawnStyleField->Add("Door", 1, "", false, false);
 	miSpawnStyleField->Add("Swirl", 2, "", false, false);
 	miSpawnStyleField->SetData(&game_values.spawnstyle, NULL, NULL);
 	miSpawnStyleField->SetKey(game_values.spawnstyle);
 
-	miAwardStyleField = new MI_SelectField(&spr_selectfield, 70, 100, "Award Style", 500, 220);
+	miAwardStyleField = new MI_SelectField(&spr_selectfield, 70, 140, "Award Style", 500, 220);
 	miAwardStyleField->Add("None", 0, "", false, false);
 	miAwardStyleField->Add("Fireworks", 1, "", false, false);
 	miAwardStyleField->Add("Spiral", 2, "", false, false);
@@ -382,26 +475,19 @@ void Menu::CreateMenu()
 	miAwardStyleField->SetData(&game_values.awardstyle, NULL, NULL);
 	miAwardStyleField->SetKey(game_values.awardstyle);
 
-	miScoreStyleField = new MI_SelectField(&spr_selectfield, 70, 140, "Score Style", 500, 220);
+	miScoreStyleField = new MI_SelectField(&spr_selectfield, 70, 180, "Score Style", 500, 220);
 	miScoreStyleField->Add("Top", 0, "", false, false);
 	miScoreStyleField->Add("Bottom", 1, "", false, false);
 	miScoreStyleField->Add("Corners", 2, "", false, false);
 	miScoreStyleField->SetData(&game_values.scoreboardstyle, NULL, NULL);
 	miScoreStyleField->SetKey(game_values.scoreboardstyle);
 
-	miCrunchField = new MI_SelectField(&spr_selectfield, 70, 180, "Screen Crunch", 500, 220);
+	miCrunchField = new MI_SelectField(&spr_selectfield, 70, 220, "Screen Crunch", 500, 220);
 	miCrunchField->Add("Off", 0, "", false, false);
 	miCrunchField->Add("On", 1, "", true, false);
 	miCrunchField->SetData(NULL, NULL, &game_values.screencrunch);
 	miCrunchField->SetKey(game_values.screencrunch ? 1 : 0);
 	miCrunchField->SetAutoAdvance(true);
-
-	miTopLayerField = new MI_SelectField(&spr_selectfield, 70, 220, "Draw Top Layer", 500, 220);
-	miTopLayerField->Add("Background", 0, "", false, false);
-	miTopLayerField->Add("Foreground", 1, "", true, false);
-	miTopLayerField->SetData(NULL, NULL, &game_values.toplayer);
-	miTopLayerField->SetKey(game_values.toplayer ? 1 : 0);
-	miTopLayerField->SetAutoAdvance(true);
 
 	miWinningCrownField = new MI_SelectField(&spr_selectfield, 70, 260, "Leader Crown", 500, 220);
 	miWinningCrownField->Add("Off", 0, "", false, false);
@@ -410,53 +496,43 @@ void Menu::CreateMenu()
 	miWinningCrownField->SetKey(game_values.showwinningcrown ? 1 : 0);
 	miWinningCrownField->SetAutoAdvance(true);
 
-#ifdef _XBOX
-	miScreenSettingsButton = new MI_Button(&spr_selectfield, 70, 300, "Screen Settings", 500, 0);
-	miScreenSettingsButton->SetCode(MENU_CODE_TO_SCREEN_SETTINGS);
-#else
-	miFullscreenField = new MI_SelectField(&spr_selectfield, 70, 300, "Screen Size", 500, 220);
-	miFullscreenField->Add("Windowed", 0, "", false, false);
-	miFullscreenField->Add("Fullscreen", 1, "", true, false);
-	miFullscreenField->SetData(NULL, NULL, &game_values.fullscreen);
-	miFullscreenField->SetKey(game_values.fullscreen ? 1 : 0);
-	miFullscreenField->SetAutoAdvance(true);
-	miFullscreenField->SetItemChangedCode(MENU_CODE_TOGGLE_FULLSCREEN);
-#endif //_XBOX
+	miStartCountDownField = new MI_SelectField(&spr_selectfield, 70, 300, "Start Countdown", 500, 220);
+	miStartCountDownField->Add("Off", 0, "", false, false);
+	miStartCountDownField->Add("On", 1, "", true, false);
+	miStartCountDownField->SetData(NULL, NULL, &game_values.startgamecountdown);
+	miStartCountDownField->SetKey(game_values.startgamecountdown ? 1 : 0);
+	miStartCountDownField->SetAutoAdvance(true);
 
-	miMenuGraphicsPackField = new MI_PacksField(&spr_selectfield, 70, 340, "Menu Graphics", 500, 220, &menugraphicspacklist, MENU_CODE_MENU_GRAPHICS_PACK_CHANGED);
-	miGameGraphicsPackField = new MI_PacksField(&spr_selectfield, 70, 380, "Game Graphics", 500, 220, &gamegraphicspacklist, MENU_CODE_GAME_GRAPHICS_PACK_CHANGED);
+	miDeadTeamNoticeField = new MI_SelectField(&spr_selectfield, 70, 340, "Dead Team Notice", 500, 220);
+	miDeadTeamNoticeField->Add("Off", 0, "", false, false);
+	miDeadTeamNoticeField->Add("On", 1, "", true, false);
+	miDeadTeamNoticeField->SetData(NULL, NULL, &game_values.deadteamnotice);
+	miDeadTeamNoticeField->SetKey(game_values.deadteamnotice ? 1 : 0);
+	miDeadTeamNoticeField->SetAutoAdvance(true);
 
-	miGraphicsOptionsMenuBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
-	miGraphicsOptionsMenuBackButton->SetCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
+	miEyeCandyOptionsMenuBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
+	miEyeCandyOptionsMenuBackButton->SetCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 
-	miGraphicsOptionsMenuLeftHeaderBar = new MI_Image(&menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
-	miGraphicsOptionsMenuRightHeaderBar = new MI_Image(&menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-	miGraphicsOptionsMenuHeaderText = new MI_Text("Graphics Options Menu", 320, 5, 0, 2, 1);
+	miEyeCandyOptionsMenuLeftHeaderBar = new MI_Image(&menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
+	miEyeCandyOptionsMenuRightHeaderBar = new MI_Image(&menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
+	miEyeCandyOptionsMenuHeaderText = new MI_Text("Eye Candy Options Menu", 320, 5, 0, 2, 1);
 
-	mGraphicsOptionsMenu.AddControl(miSpawnStyleField, miGraphicsOptionsMenuBackButton, miAwardStyleField, NULL, miGraphicsOptionsMenuBackButton);
-	mGraphicsOptionsMenu.AddControl(miAwardStyleField, miSpawnStyleField, miScoreStyleField, NULL, miGraphicsOptionsMenuBackButton);
-	mGraphicsOptionsMenu.AddControl(miScoreStyleField, miAwardStyleField, miCrunchField, NULL, miGraphicsOptionsMenuBackButton);
-	mGraphicsOptionsMenu.AddControl(miCrunchField, miScoreStyleField, miTopLayerField, NULL, miGraphicsOptionsMenuBackButton);
-	mGraphicsOptionsMenu.AddControl(miTopLayerField, miCrunchField, miWinningCrownField, NULL, miGraphicsOptionsMenuBackButton);
-#ifdef _XBOX
-	mGraphicsOptionsMenu.AddControl(miWinningCrownField, miTopLayerField, miScreenSettingsButton, NULL, miGraphicsOptionsMenuBackButton);
-	mGraphicsOptionsMenu.AddControl(miScreenSettingsButton, miWinningCrownField, miMenuGraphicsPackField, NULL, miGraphicsOptionsMenuBackButton);
-	mGraphicsOptionsMenu.AddControl(miMenuGraphicsPackField, miScreenSettingsButton, miGameGraphicsPackField, NULL, miGraphicsOptionsMenuBackButton);
-#else
-	mGraphicsOptionsMenu.AddControl(miWinningCrownField, miTopLayerField, miFullscreenField, NULL, miGraphicsOptionsMenuBackButton);
-	mGraphicsOptionsMenu.AddControl(miFullscreenField, miWinningCrownField, miMenuGraphicsPackField, NULL, miGraphicsOptionsMenuBackButton);
-	mGraphicsOptionsMenu.AddControl(miMenuGraphicsPackField, miFullscreenField, miGameGraphicsPackField, NULL, miGraphicsOptionsMenuBackButton);
-#endif
+	mEyeCandyOptionsMenu.AddControl(miSpawnStyleField, miEyeCandyOptionsMenuBackButton, miAwardStyleField, NULL, miEyeCandyOptionsMenuBackButton);
+	mEyeCandyOptionsMenu.AddControl(miAwardStyleField, miSpawnStyleField, miScoreStyleField, NULL, miEyeCandyOptionsMenuBackButton);
+	mEyeCandyOptionsMenu.AddControl(miScoreStyleField, miAwardStyleField, miCrunchField, NULL, miEyeCandyOptionsMenuBackButton);
+	mEyeCandyOptionsMenu.AddControl(miCrunchField, miScoreStyleField, miWinningCrownField, NULL, miEyeCandyOptionsMenuBackButton);
+	mEyeCandyOptionsMenu.AddControl(miWinningCrownField, miCrunchField, miStartCountDownField, NULL, miEyeCandyOptionsMenuBackButton);
+	mEyeCandyOptionsMenu.AddControl(miStartCountDownField, miWinningCrownField, miDeadTeamNoticeField, NULL, miEyeCandyOptionsMenuBackButton);
+	mEyeCandyOptionsMenu.AddControl(miDeadTeamNoticeField, miStartCountDownField, miEyeCandyOptionsMenuBackButton, NULL, miEyeCandyOptionsMenuBackButton);
 
-	mGraphicsOptionsMenu.AddControl(miGameGraphicsPackField, miMenuGraphicsPackField, miGraphicsOptionsMenuBackButton, NULL, miGraphicsOptionsMenuBackButton);
-	mGraphicsOptionsMenu.AddControl(miGraphicsOptionsMenuBackButton, miGameGraphicsPackField, miSpawnStyleField, miGameGraphicsPackField, NULL);
+	mEyeCandyOptionsMenu.AddControl(miEyeCandyOptionsMenuBackButton, miDeadTeamNoticeField, miSpawnStyleField, miDeadTeamNoticeField, NULL);
 
-	mGraphicsOptionsMenu.AddNonControl(miGraphicsOptionsMenuLeftHeaderBar);
-	mGraphicsOptionsMenu.AddNonControl(miGraphicsOptionsMenuRightHeaderBar);
-	mGraphicsOptionsMenu.AddNonControl(miGraphicsOptionsMenuHeaderText);
+	mEyeCandyOptionsMenu.AddNonControl(miEyeCandyOptionsMenuLeftHeaderBar);
+	mEyeCandyOptionsMenu.AddNonControl(miEyeCandyOptionsMenuRightHeaderBar);
+	mEyeCandyOptionsMenu.AddNonControl(miEyeCandyOptionsMenuHeaderText);
 
-	mGraphicsOptionsMenu.SetHeadControl(miSpawnStyleField);
-	mGraphicsOptionsMenu.SetCancelCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
+	mEyeCandyOptionsMenu.SetHeadControl(miSpawnStyleField);
+	mEyeCandyOptionsMenu.SetCancelCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 
 
 	//***********************
@@ -499,7 +575,7 @@ void Menu::CreateMenu()
 	// Gameplay Options
 	//***********************
 
-	miRespawnField = new MI_SelectField(&spr_selectfield, 70, 40, "Respawn Time", 500, 220);
+	miRespawnField = new MI_SelectField(&spr_selectfield, 70, 60, "Respawn Time", 500, 220);
 	miRespawnField->Add("Instant", 0, "", false, false);
 	miRespawnField->Add("0.5 Seconds", 1, "", false, false);
 	miRespawnField->Add("1.0 Seconds", 2, "", false, false);
@@ -524,7 +600,7 @@ void Menu::CreateMenu()
 	miRespawnField->SetData(&game_values.respawn, NULL, NULL);
 	miRespawnField->SetKey(game_values.respawn);
 	
-	miShieldStyleField = new MI_SelectField(&spr_selectfield, 70, 80, "Shield Style", 500, 220);
+	miShieldStyleField = new MI_SelectField(&spr_selectfield, 70, 100, "Shield Style", 500, 220);
 	miShieldStyleField->Add("No Shield", 0, "", false, false);
 	miShieldStyleField->Add("Soft", 1, "", false, false);
 	miShieldStyleField->Add("Soft with Stomp", 2, "", false, false);
@@ -532,7 +608,7 @@ void Menu::CreateMenu()
 	miShieldStyleField->SetData(&game_values.shieldstyle, NULL, NULL);
 	miShieldStyleField->SetKey(game_values.shieldstyle);
 
-	miShieldTimeField = new MI_SelectField(&spr_selectfield, 70, 120, "Shield Time", 500, 220);
+	miShieldTimeField = new MI_SelectField(&spr_selectfield, 70, 140, "Shield Time", 500, 220);
 	miShieldTimeField->Add("0.5 Seconds", 31, "", false, false);
 	miShieldTimeField->Add("1.0 Seconds", 62, "", false, false);
 	miShieldTimeField->Add("1.5 Seconds", 93, "", false, false);
@@ -546,7 +622,7 @@ void Menu::CreateMenu()
 	miShieldTimeField->SetData(&game_values.shieldtime, NULL, NULL);
 	miShieldTimeField->SetKey(game_values.shieldtime);
 
-	miBoundsTimeField = new MI_SelectField(&spr_selectfield, 70, 160, "Bounds Time", 500, 220);
+	miBoundsTimeField = new MI_SelectField(&spr_selectfield, 70, 180, "Bounds Time", 500, 220);
 	miBoundsTimeField->Add("Infinite", 0, "", false, false);
 	miBoundsTimeField->Add("1 Second", 1, "", false, false);
 	miBoundsTimeField->Add("2 Seconds", 2, "", false, false);
@@ -561,7 +637,7 @@ void Menu::CreateMenu()
 	miBoundsTimeField->SetData(&game_values.outofboundstime, NULL, NULL);
 	miBoundsTimeField->SetKey(game_values.outofboundstime);
 
-	miSuicideTimeField = new MI_SelectField(&spr_selectfield, 70, 200, "Suicide Time", 500, 220);
+	miSuicideTimeField = new MI_SelectField(&spr_selectfield, 70, 220, "Suicide Time", 500, 220);
 	miSuicideTimeField->Add("Off", 0, "", false, false);
 	miSuicideTimeField->Add("3 Seconds", 186, "", false, false);
 	miSuicideTimeField->Add("5 Seconds", 310, "", false, false);
@@ -572,7 +648,7 @@ void Menu::CreateMenu()
 	miSuicideTimeField->SetData(&game_values.suicidetime, NULL, NULL);
 	miSuicideTimeField->SetKey(game_values.suicidetime);
 
-	miWarpLockStyleField = new MI_SelectField(&spr_selectfield, 70, 240, "Warp Lock Style", 500, 220);
+	miWarpLockStyleField = new MI_SelectField(&spr_selectfield, 70, 260, "Warp Lock Style", 500, 220);
 	miWarpLockStyleField->Add("Entrance Only", 0, "", false, false);
 	miWarpLockStyleField->Add("Exit Only", 1, "", false, false);
 	miWarpLockStyleField->Add("Entrance and Exit", 2, "", false, false);
@@ -581,7 +657,7 @@ void Menu::CreateMenu()
 	miWarpLockStyleField->SetData(&game_values.warplockstyle, NULL, NULL);
 	miWarpLockStyleField->SetKey(game_values.warplockstyle);
 
-	miWarpLockTimeField = new MI_SelectField(&spr_selectfield, 70, 280, "Warp Lock Time", 500, 220);
+	miWarpLockTimeField = new MI_SelectField(&spr_selectfield, 70, 300, "Warp Lock Time", 500, 220);
 	miWarpLockTimeField->Add("Off", 0, "", false, false);
 	miWarpLockTimeField->Add("1 Second", 62, "", false, false);
 	miWarpLockTimeField->Add("2 Seconds", 124, "", false, false);
@@ -596,7 +672,7 @@ void Menu::CreateMenu()
 	miWarpLockTimeField->SetData(&game_values.warplocktime, NULL, NULL);
 	miWarpLockTimeField->SetKey(game_values.warplocktime);
 
-	miBotsField = new MI_SelectField(&spr_selectfield, 70, 320, "Bot Difficulty", 500, 220);
+	miBotsField = new MI_SelectField(&spr_selectfield, 70, 340, "Bot Difficulty", 500, 220);
 	miBotsField->Add("Very Easy", 0, "", false, false);
 	miBotsField->Add("Easy", 1, "", false, false);
 	miBotsField->Add("Moderate", 2, "", false, false);
@@ -605,37 +681,7 @@ void Menu::CreateMenu()
 	miBotsField->SetData(&game_values.cpudifficulty, NULL, NULL);
 	miBotsField->SetKey(game_values.cpudifficulty);
 
-	miFrameLimiterField = new MI_SelectField(&spr_selectfield, 70, 360, "Frame Limit", 500, 220);
-	miFrameLimiterField->Add("10 FPS", 100, "", false, false);
-	miFrameLimiterField->Add("15 FPS", 67, "", false, false);
-	miFrameLimiterField->Add("20 FPS", 50, "", false, false);
-	miFrameLimiterField->Add("25 FPS", 40, "", false, false);
-	miFrameLimiterField->Add("30 FPS", 33, "", false, false);
-	miFrameLimiterField->Add("35 FPS", 28, "", false, false);
-	miFrameLimiterField->Add("40 FPS", 25, "", false, false);
-	miFrameLimiterField->Add("45 FPS", 22, "", false, false);
-	miFrameLimiterField->Add("50 FPS", 20, "", false, false);
-	miFrameLimiterField->Add("55 FPS", 18, "", false, false);
-	miFrameLimiterField->Add("62 FPS (Normal)", 16, "", false, false);
-	miFrameLimiterField->Add("66 FPS", 15, "", false, false);
-	miFrameLimiterField->Add("71 FPS", 14, "", false, false);
-	miFrameLimiterField->Add("77 FPS", 13, "", false, false);
-	miFrameLimiterField->Add("83 FPS", 12, "", false, false);
-	miFrameLimiterField->Add("90 FPS", 11, "", false, false);
-	miFrameLimiterField->Add("100 FPS", 10, "", false, false);
-	miFrameLimiterField->Add("111 FPS", 9, "", false, false);
-	miFrameLimiterField->Add("125 FPS", 8, "", false, false);
-	miFrameLimiterField->Add("142 FPS", 7, "", false, false);
-	miFrameLimiterField->Add("166 FPS", 6, "", false, false);
-	miFrameLimiterField->Add("200 FPS", 5, "", false, false);
-	miFrameLimiterField->Add("250 FPS", 4, "", false, false);
-	miFrameLimiterField->Add("333 FPS", 3, "", false, false);
-	miFrameLimiterField->Add("500 FPS", 2, "", false, false);
-	miFrameLimiterField->Add("No Limit", 0, "", false, false);
-	miFrameLimiterField->SetData(&game_values.framelimiter, NULL, NULL);
-	miFrameLimiterField->SetKey(game_values.framelimiter);
-
-	miPointSpeedField = new MI_SelectField(&spr_selectfield, 70, 400, "Point Speed", 500, 220);
+	miPointSpeedField = new MI_SelectField(&spr_selectfield, 70, 380, "Point Speed", 500, 220);
 	miPointSpeedField->Add("Very Slow", 60, "", false, false);
 	miPointSpeedField->Add("Slow", 40, "", false, false);
 	miPointSpeedField->Add("Moderate", 20, "", false, false);
@@ -658,9 +704,8 @@ void Menu::CreateMenu()
 	mGameplayOptionsMenu.AddControl(miSuicideTimeField, miBoundsTimeField, miWarpLockStyleField, NULL, miGameplayOptionsMenuBackButton);
 	mGameplayOptionsMenu.AddControl(miWarpLockStyleField, miSuicideTimeField, miWarpLockTimeField, NULL, miGameplayOptionsMenuBackButton);
 	mGameplayOptionsMenu.AddControl(miWarpLockTimeField, miWarpLockStyleField, miBotsField, NULL, miGameplayOptionsMenuBackButton);
-	mGameplayOptionsMenu.AddControl(miBotsField, miWarpLockTimeField, miFrameLimiterField, NULL, miGameplayOptionsMenuBackButton);
-	mGameplayOptionsMenu.AddControl(miFrameLimiterField, miBotsField, miPointSpeedField, NULL, miGameplayOptionsMenuBackButton);
-	mGameplayOptionsMenu.AddControl(miPointSpeedField, miFrameLimiterField, miGameplayOptionsMenuBackButton, NULL, miGameplayOptionsMenuBackButton);
+	mGameplayOptionsMenu.AddControl(miBotsField, miWarpLockTimeField, miPointSpeedField, NULL, miGameplayOptionsMenuBackButton);
+	mGameplayOptionsMenu.AddControl(miPointSpeedField, miBotsField, miGameplayOptionsMenuBackButton, NULL, miGameplayOptionsMenuBackButton);
 	
 	mGameplayOptionsMenu.AddControl(miGameplayOptionsMenuBackButton, miPointSpeedField, miRespawnField, miPointSpeedField, NULL);
 
@@ -3635,6 +3680,11 @@ void Menu::RunMenu()
 			else if (MENU_CODE_TO_GRAPHICS_OPTIONS_MENU == code)
 			{
 				mCurrentMenu = &mGraphicsOptionsMenu;
+				mCurrentMenu->ResetMenu();
+			}
+			else if (MENU_CODE_TO_EYECANDY_OPTIONS_MENU == code)
+			{
+				mCurrentMenu = &mEyeCandyOptionsMenu;
 				mCurrentMenu->ResetMenu();
 			}
 			else if (MENU_CODE_TO_SOUND_OPTIONS_MENU == code)

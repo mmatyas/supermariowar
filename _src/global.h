@@ -1015,6 +1015,9 @@ struct gv
 
 	short		suicidetime;
 	bool		minigameunlocked;
+
+	bool		startgamecountdown;
+	bool		deadteamnotice;
 };
 
 extern gv game_values;
