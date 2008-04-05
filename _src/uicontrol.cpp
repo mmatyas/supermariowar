@@ -2905,6 +2905,8 @@ void MI_WorldPreviewDisplay::Update()
 		return;
 
 	bool fNeedMapSurfaceUpdate = false;
+	bool fNeedFullRefresh = false;
+
 	if(++iAnimationTimer > 15)
 	{
 		iAnimationTimer = 0;
@@ -2913,7 +2915,7 @@ void MI_WorldPreviewDisplay::Update()
 		if(iAnimationFrame >= 64)
 			iAnimationFrame = 0;
 
-		fNeedMapSurfaceUpdate = true;		
+		fNeedMapSurfaceUpdate = true;
 	}
 
 	if(iMoveDirection == 0)
@@ -2923,6 +2925,7 @@ void MI_WorldPreviewDisplay::Update()
 			iMapOffsetX = 0;
 
 			fNeedMapSurfaceUpdate = true;
+			fNeedFullRefresh = true;
 
 			if(++iMapDrawOffsetCol >= iScrollCols)
 			{
@@ -2947,6 +2950,7 @@ void MI_WorldPreviewDisplay::Update()
 			iMapOffsetY = 0;
 
 			fNeedMapSurfaceUpdate = true;
+			fNeedFullRefresh = true;
 
 			if(++iMapDrawOffsetRow >= iScrollRows)
 			{
@@ -2970,6 +2974,7 @@ void MI_WorldPreviewDisplay::Update()
 		if(--iMapOffsetX <= 0)
 		{
 			fNeedMapSurfaceUpdate = true;
+			fNeedFullRefresh = true;
 
 			if(--iMapDrawOffsetCol < 0)
 			{
@@ -2998,6 +3003,7 @@ void MI_WorldPreviewDisplay::Update()
 		if(--iMapOffsetY <= 0)
 		{
 			fNeedMapSurfaceUpdate = true;
+			fNeedFullRefresh = true;
 
 			if(--iMapDrawOffsetRow < 0)
 			{
@@ -3023,7 +3029,7 @@ void MI_WorldPreviewDisplay::Update()
 	}
 
 	if(fNeedMapSurfaceUpdate)
-		UpdateMapSurface();
+		UpdateMapSurface(fNeedFullRefresh);
 }
 
 void MI_WorldPreviewDisplay::Draw()
@@ -3052,12 +3058,12 @@ void MI_WorldPreviewDisplay::SetWorld()
 
 	Init();
 
-	UpdateMapSurface();
+	UpdateMapSurface(true);
 }
 
-void MI_WorldPreviewDisplay::UpdateMapSurface()
+void MI_WorldPreviewDisplay::UpdateMapSurface(bool fFullRefresh)
 {
-	g_worldmap.DrawMapToSurface(true, sMapSurface, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame); 
+	g_worldmap.DrawMapToSurface(fFullRefresh, sMapSurface, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame); 
 }
 
 
@@ -5772,7 +5778,7 @@ void MI_World::AdvanceTurn()
 	g_worldmap.MoveBridges();
 
 	//Update the completed stage with team colored tile on the map
-	UpdateMapSurface();
+	UpdateMapSurface(true);
 
 	fNoInterestingMoves = false;
 }
@@ -5796,7 +5802,7 @@ void MI_World::Update()
 			iAnimationFrame = 0;
 
 		//update background map surface
-		UpdateMapSurface();
+		UpdateMapSurface(false);
 	}
 
 	if(fPlayerMoveDone)
@@ -5909,9 +5915,9 @@ void MI_World::Update()
 	}
 }
 
-void MI_World::UpdateMapSurface()
+void MI_World::UpdateMapSurface(bool fFullRefresh)
 {
-	g_worldmap.DrawMapToSurface(true, sMapSurface, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
+	g_worldmap.DrawMapToSurface(fFullRefresh, sMapSurface, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
 }
 
 void MI_World::SetMapOffset()
@@ -5971,7 +5977,7 @@ void MI_World::RepositionMapImage()
 			iMapDrawOffsetRow = g_worldmap.iHeight - 19;
 	}
 
-	UpdateMapSurface();
+	UpdateMapSurface(true);
 }
 
 
@@ -6482,7 +6488,7 @@ bool MI_World::UsePowerup(short iTeam, short iIndex, bool fPopupIsUp)
 		if(tile->iType >= 6 && tile->iCompleted >= 0)
 		{
 			tile->iCompleted = -2;
-			UpdateMapSurface();
+			UpdateMapSurface(true);
 
 			uiMenu->AddEyeCandy(new EC_SingleAnimation(&spr_poof, (iDestX << 5) + iMapOffsetX - 8, (iDestY << 5) + iMapOffsetY - 8, 4, 5));
 
@@ -6496,7 +6502,7 @@ bool MI_World::UsePowerup(short iTeam, short iIndex, bool fPopupIsUp)
 
 		if(iDoorsOpened > 0)
 		{
-			UpdateMapSurface();
+			UpdateMapSurface(true);
 			ifsoundonplay(sfx_transform);
 
 			short iPlayerX = (iPlayerCurrentTileX << 5) + iMapOffsetX;

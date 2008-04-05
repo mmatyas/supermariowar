@@ -69,7 +69,6 @@
 
 /*
 Checkin:
-1) Fixed bug where warp was detected, but there was no warp there so player would freeze stuck on wall and warp sound would repeat over and over
 */
 
 /*
@@ -2914,9 +2913,10 @@ void RunGame()
 			if(game_values.pausegame)
 			{
 				spr_dialog.draw(224, 176);
-				menu_font_large.drawCentered(320, 200, "Pause");
+				menu_font_large.drawCentered(320, 194, "Pause");
 
-				menu_font_large.drawCentered(320, 240, game_values.gamemode->GetModeName());
+				//menu_font_large.drawCentered(320, 240, game_values.gamemode->GetModeName());
+				menu_mode_large.draw(304, 224, game_values.gamemode->gamemode << 5, 0, 32, 32);
 
 				char szGoal[256];
 				strcpy(szGoal, game_values.gamemode->GetGoalName());

@@ -684,14 +684,12 @@ class MI_WorldPreviewDisplay : public UI_Control
 		//Draws every frame
 		void Draw();
 
-		void RefreshWorld();
-		
 		void SetWorld();
 
 	protected:
 		
 		void Init();
-		void UpdateMapSurface();
+		void UpdateMapSurface(bool fFullRefresh);
 
 		SDL_Surface * sMapSurface;
 		SDL_Rect rectDst;
@@ -1076,10 +1074,9 @@ class MI_World : public UI_Control
 
 		void SetMapOffset();
 		void RepositionMapImage();
-		void DrawWorldMapToSurface(bool fInit);
 
 		void AdvanceTurn();
-		void UpdateMapSurface();
+		void UpdateMapSurface(bool fFullRefresh);
 		void UseCloud(bool fUseCloud);
 
 		short iState;
