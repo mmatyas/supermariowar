@@ -3585,8 +3585,8 @@ void CPlayer::collision_detection_map()
 
 		bool fGapSupport = (velx >= VELTURBOMOVING || velx <= -VELTURBOMOVING) && (lefttile == tile_flag_gap || righttile == tile_flag_gap);
 		
-		bool fSolidTileUnderPlayer = lefttile & tile_flag_solid  || righttile & tile_flag_solid;
-
+		bool fSolidTileUnderPlayer = (lefttile & tile_flag_solid)  || (righttile & tile_flag_solid);
+		
 		if((lefttile & tile_flag_solid_on_top || righttile & tile_flag_solid_on_top || fGapSupport) && fOldY + PH <= ty * TILESIZE)
 		{	//on ground
 			//Deal with player down jumping through solid on top tiles
@@ -3637,7 +3637,11 @@ void CPlayer::collision_detection_map()
 			return;
 		}
 		
-		if(fSolidTileUnderPlayer && (!(lefttile & tile_flag_death_on_top) || !(righttile & tile_flag_death_on_top) ||
+		bool fDeathTileUnderPlayer = ((lefttile & tile_flag_death_on_top) && (righttile & tile_flag_death_on_top)) ||
+									 ((lefttile & tile_flag_death_on_top) && !(righttile & tile_flag_solid)) ||
+									 (!(lefttile & tile_flag_solid) && (righttile & tile_flag_death_on_top));
+
+		if(fSolidTileUnderPlayer && (!fDeathTileUnderPlayer ||
 			invincible || shield > 0 || fKuriboShoe))
 		{	//on ground
 
@@ -3666,7 +3670,7 @@ void CPlayer::collision_detection_map()
 				return;
 			}
 		}
-		else if((lefttile & tile_flag_death_on_top) || (righttile & tile_flag_death_on_top))
+		else if(fDeathTileUnderPlayer)
 		{
 			if(player_kill_nonkill != KillPlayerMapHazard(true, kill_style_environment))
 				return;

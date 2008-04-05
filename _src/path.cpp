@@ -181,7 +181,7 @@ const string convertPartialPath(const string & source)
 
 const string getFileFromPath(const string &path)
 {
-	short iPos = path.find_last_of('/');
+	short iPos = path.find_last_of(getDirectorySeperator()[0]);
 
 	if(iPos > 0)
 		return path.substr(iPos + 1);

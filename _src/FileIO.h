@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 
+FILE * OpenFile(const char * filename, const char * options);
 void WriteInt(int out, FILE * outFile);
 int ReadInt(FILE * inFile);
 void ReadIntChunk(int * mem, size_t iQuantity, FILE * inFile);

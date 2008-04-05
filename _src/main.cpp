@@ -38,36 +38,37 @@
 
 //BUG!! When you kill 2 players/bots rapidly one after another with the star and you have the announcer on, the invincibilty music stops.
 
-//[ ] Need better end stage marker gfx
+//BUG!!  World AI needs ability to use stored items -> harder problem than I have time for
+
 //[ ] Need to test memory/slowness on xbox build
 //[ ] Need to update some maps with better platform paths (Reznor map) and some hazards here and there and maybe some map items
-//[ ] World AI needs ability to use stored items -> harder problem than I have time for
 //[ ] Add SMB3's first world as a test world to ship with
 
 //[ ] Countdown before match begins, 3..., 2..., 1... with announcer hooks -> Add real gfx for this!
 //[ ] On/Off switch [?] and note blocks and possibly other types of on/off blocks
-//[ ] Enemies should die in lava
-//[ ] Allow spawn areas for domination blocks
 //[ ] Water bubbles and rain eyecandy, Splashing feet when running on rain levels - need gfx for all of these
-//[ ] Resume level editor to zzleveleditor map every time so it looks like you've resumed your last work (or try and load the last map you were on)
 //[ ] Podoboo pops out of a [?] if all powerups are turned off
 //[ ] Thunderbolt style spawn
 //[ ] Reverse gravity blue podoboos
-//[ ] Breaking skull blocks (too close to donut block, perhaps)
-//[ ] What about re-appear for bricks/blue/flip/etc.? Is this doable with not much effort?
 
 //[ ] Clean up unused gfx/sfx
-//[ ] Add display of mode/goal at the beginning of a quick game
+
+//[ ] Finish implementation of fixes for UpdateTileType -> don't update the tile type if it was overwritten in tile type mode
 
 * Bomb option in Star mode
 - Mariokart-type podium at the end of a tournament/tour/whatever
+
+//XBOX FIX!!!
+//Very slow framerate/chunky in world mode (navigating world)
+//Replace mode name on pause dialog with mode icon
+//All tiles are displaying as red hash (unknown tileset)
 
 */
 
 /*
 Checkin:
-1) Added colored stars to multi star option of star mode
-2) Added random mode options for quick game -> Still needs to have good ranges for options, right now it is completely random
+1) Items/enemies now die when hitting spikes/lava -> some objects do not die like shells
+2) Added feature to load the last map you were working on in level editor
 */
 
 /*
@@ -1078,26 +1079,9 @@ int main(int argc, char *argv[])
 	game_values.gamemodemenusettings.chase.phantoquantity[2] = 0;
 
 	//Read saved settings from disk
-	FILE *fp;
+	FILE * fp = OpenFile("options.bin", "rb");
 
-#ifdef _XBOX
-	fp = fopen("D:\\options.bin", "rb");
-#else
-#ifdef PREFIXPATH
-	char * folder=getenv("HOME");
-#ifdef __MACOSX__
-	std::string optionsbin=std::string(folder)+
-		std::string("/Library/Preferences/smw.options.bin");
-#else
-    std::string optionsbin=std::string(folder)+std::string("/.smw.options.bin");
-#endif
-    fp = fopen(optionsbin.c_str(), "rb");
-#else
-	fp = fopen("options.bin", "rb");
-#endif
-#endif
-
-	if(fp != NULL)
+	if(fp)
 	{
 		short version[4];
 		fread(version, sizeof(short), 4, fp);

@@ -52,23 +52,7 @@ extern TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWo
 
 void Menu::WriteGameOptions()
 {
-	FILE *fp;
-#ifdef _XBOX
-	fp = fopen("D:\\options.bin", "wb");
-#else
-#ifdef PREFIXPATH
-    char * folder=getenv("HOME");
-#ifdef __MACOSX__
-	std::string optionsbin=std::string(folder)+
-		std::string("/Library/Preferences/smw.options.bin");
-#else
-    std::string optionsbin=std::string(folder)+std::string("/.smw.options.bin");
-#endif
-    fp= fopen(optionsbin.c_str(), "wb");
-#else
-	fp = fopen("options.bin", "wb");
-#endif
-#endif
+	FILE * fp = OpenFile("options.bin", "wb");
 
 	if(fp != NULL)
 	{
@@ -1216,7 +1200,7 @@ void Menu::CreateMenu()
 	//***********************
 
 	MI_Button * miScreenResizeButton;
-	miScreenResizeButton = new MI_Button(&spr_selectfield, 120, 160, "Resize Screen", 400, 0);
+	miScreenResizeButton = new MI_Button(&spr_selectfield, 70, 160, "Resize Screen", 500, 0);
 	miScreenResizeButton->SetCode(MENU_CODE_TO_SCREEN_RESIZE);
 
 	miScreenHardwareFilterField = new MI_SelectField(&spr_selectfield, 70, 200, "Screen Filter", 500, 220);

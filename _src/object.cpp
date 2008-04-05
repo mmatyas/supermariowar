@@ -2520,6 +2520,8 @@ IO_MovingObject::IO_MovingObject(gfxSprite *nspr, short x, short y, short iNumSp
 	platform = NULL;
 	iHorizontalPlatformCollision = -1;
 	iVerticalPlatformCollision = -1;
+
+	fObjectDiesOnDeathTiles = true;
 }
 
 
@@ -2927,7 +2929,11 @@ void IO_MovingObject::collision_detection_map()
 			}
 		}
 
-		if((leftTile & tile_flag_solid) || (rightTile & tile_flag_solid))
+		bool fDeathTileUnderObject = fObjectDiesOnDeathTiles && (((leftTile & tile_flag_death_on_top) && (rightTile & tile_flag_death_on_top)) ||
+									 ((leftTile & tile_flag_death_on_top) && !(rightTile & tile_flag_solid)) ||
+									 (!(leftTile & tile_flag_solid) && (rightTile & tile_flag_death_on_top)));
+
+		if(((leftTile & tile_flag_solid) || (rightTile & tile_flag_solid)) && !fDeathTileUnderObject)
 		{	
 			vely = BottomBounce();
 			yf((float)(ty * TILESIZE - collisionHeight) - 0.2f);
@@ -2948,6 +2954,11 @@ void IO_MovingObject::collision_detection_map()
 
 			if(iVerticalPlatformCollision == 0)
 				KillObjectMapHazard();
+		}
+		else if(fDeathTileUnderObject)
+		{
+			KillObjectMapHazard();
+			return;
 		}
 		else
 		{
@@ -3297,6 +3308,11 @@ void IO_MovingObject::KillObjectMapHazard()
 			{
 				if(iPlayerID > -1 && projectiles[iPlayerID] > 0)
 					projectiles[iPlayerID]--;
+			}
+			else if(movingObjectType == movingobject_phantokey)
+			{
+				dead = false;
+				((CO_PhantoKey*)this)->placeKey();
 			}
 		}
 	}
@@ -8270,6 +8286,8 @@ CO_Shell::CO_Shell(short type, short x, short y, bool dieOnMovingPlayerCollision
 	iOwnerRightOffset = 14;
 	iOwnerLeftOffset = -22;
 	iOwnerUpOffset = 32;
+
+	fObjectDiesOnDeathTiles = false;
 }
 
 bool CO_Shell::collide(CPlayer * player)
@@ -9165,6 +9183,8 @@ CO_KuriboShoe::CO_KuriboShoe(gfxSprite *nspr, short ix, short iy) :
 	collisionHeight = 16;
 
 	movingObjectType = movingobject_carried;
+
+	fObjectDiesOnDeathTiles = false;
 }
 
 void CO_KuriboShoe::hittop(CPlayer * player)

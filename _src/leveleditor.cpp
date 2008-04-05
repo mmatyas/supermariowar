@@ -461,7 +461,17 @@ int main(int argc, char *argv[])
 		g_Platforms[iPlatform].iVelocity = 4;
 	}
 
+	FILE * fp = OpenFile("leveleditor.bin", "rt");
+
+	if(fp)
+	{
+		fgets(findstring, FILEBUFSIZE, fp);
+		fclose(fp);
+	}
+
+	maplist.find(findstring);
 	loadcurrentmap();
+	findstring[0] = 0;  //clear out the find string so that pressing "f" will give you the find dialog
 	
 	printf("\n---------------- ready, steady, go! ----------------\n");
 
@@ -561,6 +571,15 @@ int main(int argc, char *argv[])
 	printf("\n---------------- save map ----------------\n");
 
 	save_map(convertPath("maps/ZZleveleditor.map"));
+
+	fp = OpenFile("leveleditor.bin", "wt");
+
+	if(fp)
+	{
+		fprintf(fp, maplist.currentFilename());
+		fclose(fp);
+	}
+
 	//g_map.saveTileSet(convertPath("maps/tileset/tileset.tls"));
 	g_tilesetmanager.SaveTilesets();
 
@@ -568,7 +587,21 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
-void UpdateTileType(short x, short y)
+void UpdateTileType(short x, short y, short layer, TileType type)
+{
+	//If -1 is passed in for layer, then just update the entire tile
+	if(layer == -1)
+	{
+		g_map.mapdatatop[x][y].iType = CalculateTileType(x, y);
+	}
+	else
+	{
+		TileType calculatedType = CalculateTileType(x, y);
+		TileType currentType = g_map.mapdatatop[x][y].iType;		
+	}
+}
+
+TileType CalculateTileType(short x, short y)
 {
 	TileType type = tile_nonsolid;
 	for(short k = MAPLAYERS - 1; k >= 0; k--)
@@ -586,9 +619,8 @@ void UpdateTileType(short x, short y)
 		}
 	}
 
-	g_map.mapdatatop[x][y].iType = type;
+	return type;
 }
-
 
 void AdjustMapItems(short iClickX, short iClickY)
 {
@@ -1018,7 +1050,7 @@ int editor_edit()
 									{
 										SetTilesetTile(&g_map.mapdata[iLocalX][iLocalY][selected_layer], set_tile_tileset, set_tile_start_x + i, set_tile_start_y + j);
 										
-										UpdateTileType(iLocalX, iLocalY);
+										UpdateTileType(iLocalX, iLocalY, -1, tile_nonsolid);
 										AdjustMapItems(iLocalX, iLocalY);
 									}
 								}
@@ -1143,7 +1175,7 @@ int editor_edit()
 						else if(edit_mode == 1 || edit_mode == 8)
 						{
 							g_map.mapdata[iClickX][iClickY][selected_layer].iID = TILESETNONE;
-							UpdateTileType(iClickX, iClickY);
+							UpdateTileType(iClickX, iClickY, -1, tile_nonsolid);
 						}
 						else if(edit_mode == 2)
 						{
@@ -1230,7 +1262,7 @@ int editor_edit()
 									{
 										SetTilesetTile(&g_map.mapdata[iLocalX][iLocalY][selected_layer], set_tile_tileset, set_tile_start_x + i, set_tile_start_y + j);
 
-										UpdateTileType(iLocalX, iLocalY);
+										UpdateTileType(iLocalX, iLocalY, -1, tile_nonsolid);
 										AdjustMapItems(iLocalY, iLocalY);
 									}
 								}
@@ -1286,7 +1318,7 @@ int editor_edit()
 						else if(edit_mode == 1 || edit_mode == 8)
 						{
 							g_map.mapdata[iClickX][iClickY][selected_layer].iID = TILESETNONE;
-							UpdateTileType(iClickX, iClickY);
+							UpdateTileType(iClickX, iClickY, -1, tile_nonsolid);
 						}
 						else if(edit_mode == 2)
 						{
@@ -5312,7 +5344,7 @@ void clearselectedmaptiles()
 					RemoveMapItemAt(j, k);
 				}
 
-				UpdateTileType(j, k);
+				UpdateTileType(j, k, -1, tile_nonsolid);
 			}
 		}
 	}
@@ -5407,7 +5439,7 @@ void pasteselectedtiles(int movex, int movey)
 						if(move_replace)
 							g_map.mapdatatop[iNewX][iNewY].iType = copiedtiles[j][k].tiletype;
 						else
-							UpdateTileType(j, k);
+							UpdateTileType(j, k, -1, tile_nonsolid);
 						
 						for(short iType = 0; iType < NUMSPAWNAREATYPES; iType++)
 							g_map.nospawn[iType][iNewX][iNewY] = copiedtiles[j][k].nospawn[iType];

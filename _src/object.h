@@ -494,6 +494,8 @@ class IO_MovingObject : public CObject
 		short iHorizontalPlatformCollision;
 		short iVerticalPlatformCollision;
 
+		bool fObjectDiesOnDeathTiles;
+
 	friend class IO_Block;
 	friend class B_PowerupBlock;
 	friend class B_BreakableBlock;

@@ -903,7 +903,12 @@ void MovingPlatform::collide(CPlayer * player)
 				
 				return;
 			}
-			else if(fSolidTileUnderPlayer && (!(t1 & tile_flag_death_on_top) || !(t2 & tile_flag_death_on_top) ||  
+			
+			bool fDeathTileUnderPlayer = ((t1 & tile_flag_death_on_top) && (t2 & tile_flag_death_on_top)) ||
+									 ((t1 & tile_flag_death_on_top) && !(t2 & tile_flag_solid)) ||
+									 (!(t1 & tile_flag_solid) && (t2 & tile_flag_death_on_top));
+
+			if(fSolidTileUnderPlayer && (!fDeathTileUnderPlayer ||  
 				player->invincible || player->shield > 0 || player->fKuriboShoe))
 			{	//on ground
 
@@ -939,7 +944,7 @@ void MovingPlatform::collide(CPlayer * player)
 					return;
 				}
 			}
-			else if(t1 & tile_flag_death_on_top || t2 & tile_flag_death_on_top)
+			else if(fDeathTileUnderPlayer)
 			{
 				if(player_kill_nonkill != player->KillPlayerMapHazard(true, kill_style_environment))
 					return;
@@ -1382,7 +1387,12 @@ void MovingPlatform::collide(IO_MovingObject * object)
 
 				return;
 			}
-			else if((t1 & tile_flag_solid) || (t2 & tile_flag_solid))
+			
+			bool fDeathTileUnderObject = object->fObjectDiesOnDeathTiles && (((t1 & tile_flag_death_on_top) && (t2 & tile_flag_death_on_top)) ||
+									 ((t1 & tile_flag_death_on_top) && !(t2 & tile_flag_solid)) ||
+									 (!(t1 & tile_flag_solid) && (t2 & tile_flag_death_on_top)));
+			
+			if(((t1 & tile_flag_solid) || (t2 & tile_flag_solid)) && !fDeathTileUnderObject)
 			{	//on ground
 				if(object->iVerticalPlatformCollision == 0)
 				{
@@ -1409,6 +1419,11 @@ void MovingPlatform::collide(IO_MovingObject * object)
 					
 					return;
 				}
+			}
+			else if(fDeathTileUnderObject)
+			{
+				object->KillObjectMapHazard();
+				return;
 			}
 			else
 			{
