@@ -61,14 +61,15 @@
 //XBOX FIX!!!
 //Very slow framerate/chunky in world mode (navigating world)
 //Replace mode name on pause dialog with mode icon
-//All tiles are displaying as red hash (unknown tileset)
+
+//BUG?? Look in CTilesetManager::Init to see if we are loading the non-classic tilesets when we pass in classic!
+//BUG?? Did yellow player holding flag not kill green player when invincible?
 
 */
 
 /*
 Checkin:
-1) Items/enemies now die when hitting spikes/lava -> some objects do not die like shells
-2) Added feature to load the last map you were working on in level editor
+1) Fixed bug where warp was detected, but there was no warp there so player would freeze stuck on wall and warp sound would repeat over and over
 */
 
 /*

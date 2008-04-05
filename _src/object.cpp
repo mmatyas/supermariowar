@@ -9685,7 +9685,7 @@ void IO_FlameCannon::SetNewTimer()
 //------------------------------------------------------------------------------
 
 MO_PirhanaPlant::MO_PirhanaPlant(short x, short y, short type, short freq, short direction, bool preview) :
-	IO_MovingObject(NULL, x, y, 0, 0)
+	IO_MovingObject(NULL, x, y, 1, 0)
 {
 	iType = type;
 	iDirection = direction;

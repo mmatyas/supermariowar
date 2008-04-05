@@ -2989,7 +2989,6 @@ void Menu::RunMenu()
 
 	float realfps = 0, flipfps = 0;
 	unsigned int framestart, ticks;
-	int delay;
 
 	while (true)
 	{
@@ -4038,6 +4037,42 @@ void Menu::RunMenu()
 			menu_font_large.drawCentered(320, 430, "Please Wait...");
 		}
 
+		ticks = SDL_GetTicks() - framestart;
+		if(ticks == 0)
+			ticks = 1;
+
+		if(game_values.showfps) 
+			menu_font_large.drawf(0, 480 - menu_font_large.getHeight(), "Actual:%.1f/%.1f, Flip:%.1f, Potential:%.1f", realfps, 1000.0f / (float)WAITTIME, flipfps, 1000.0f / (float)ticks);
+
+#ifdef _DEBUG
+	if(g_fAutoTest)
+		menu_font_small.drawRightJustified(635, 5, "Auto");
+
+	if(g_fRecordTest)
+		menu_font_small.drawRightJustified(635, 5, "Recording...");
+#endif
+ 
+		//double buffering -> flip buffers
+		SDL_Flip(screen);
+
+		flipfps = 1000.0f / (float)ticks;
+
+		
+		//Sleep for time just under what we need
+		short delay = (short)(game_values.framelimiter - SDL_GetTicks() + framestart - 2);
+
+		if(delay > 0)
+		{
+			if(delay > game_values.framelimiter)
+				delay = game_values.framelimiter;
+			
+			SDL_Delay(delay);
+		}
+
+		//Fine tune wait here
+		while(SDL_GetTicks() - framestart < (unsigned short)game_values.framelimiter)
+			SDL_Delay(0);   //keep framerate constant at 1000/game_values.framelimiter fps
+
 		//Debug code to slow framerate down to 1 fps to see exact movement
 #ifdef _DEBUG
 		if(game_values.frameadvance)
@@ -4059,32 +4094,7 @@ void Menu::RunMenu()
 
 		ticks = SDL_GetTicks() - framestart;
 		if(ticks == 0)
-			ticks = 1;
-
-		if(game_values.showfps) 
-			menu_font_large.drawf(0, 480 - menu_font_large.getHeight(), "Actual:%.1f/%.1f, Flip:%.1f, Potential:%.1f", realfps, 1000.0f / (float)WAITTIME, flipfps, 1000.0f / (float)ticks);
-
-#ifdef _DEBUG
-	if(g_fAutoTest)
-		menu_font_small.drawRightJustified(635, 5, "Auto");
-
-	if(g_fRecordTest)
-		menu_font_small.drawRightJustified(635, 5, "Recording...");
-#endif
- 
-		//double buffering -> flip buffers
-		SDL_Flip(screen);
-
-		flipfps = 1000.0f / (float)ticks;
-
-		//we don't need much accuracy here, so we can stick to SDL_Delay
-		delay = WAITTIME - (SDL_GetTicks() - framestart);
-		if(delay < 0)
-			delay = 0;
-		else if(delay > WAITTIME)
-			delay = WAITTIME;
-		
-		SDL_Delay(delay);
+			ticks = game_values.framelimiter;
 
 		realfps = 1000.0f / (float)ticks;
 

@@ -3115,7 +3115,7 @@ bool CMap::checkforwarp(short iData1, short iData2, short iData3, short iDirecti
 		warp2 = &warpdata[iData1][iData3];
 	}
 
-	return warp1->id == warp2->id && warp1->direction == iDirection &&
+	return warp1->direction == warp2->direction && warp1->id == warp2->id && warp1->direction == iDirection &&
 		!warplocked[warp1->connection] && warpexits[warp1->id].locktimer <= 0;
 }
 
