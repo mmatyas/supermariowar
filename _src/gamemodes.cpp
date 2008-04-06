@@ -3001,7 +3001,7 @@ void CGM_Chase::init()
 	for(short iPhanto = 0; iPhanto < 3; iPhanto++)
 	{
 		for(short iNumPhantos = 0; iNumPhantos < game_values.gamemodesettings.chase.phantoquantity[iPhanto]; iNumPhantos++)
-			objectcontainer[1].add(new OMO_Phanto(&spr_phanto, rand() % 640, rand() % 2 == 0 ? -32 : 480, 0.0f, 0.0f, iPhanto));
+			objectcontainer[1].add(new OMO_Phanto(&spr_phanto, rand() % 640, rand() % 2 == 0 ? -32 - CRUNCHMAX : 480, 0.0f, 0.0f, iPhanto));
 	}
 
 	//Add a key

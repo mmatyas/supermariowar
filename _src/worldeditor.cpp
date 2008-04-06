@@ -1761,7 +1761,7 @@ void AutoSetTile(short iCol, short iRow)
 
 void updateworldsurface()
 {
-	g_worldmap.DrawMapToSurface(true, sMapSurface, draw_offset_col, draw_offset_row, 0);
+	g_worldmap.DrawMapToSurface(-1, true, sMapSurface, draw_offset_col, draw_offset_row, 0);
 }
 
 void drawmap(bool fScreenshot, short iBlockSize)

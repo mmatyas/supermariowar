@@ -3063,7 +3063,7 @@ void MI_WorldPreviewDisplay::SetWorld()
 
 void MI_WorldPreviewDisplay::UpdateMapSurface(bool fFullRefresh)
 {
-	g_worldmap.DrawMapToSurface(fFullRefresh, sMapSurface, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame); 
+	g_worldmap.DrawMapToSurface(-1, fFullRefresh, sMapSurface, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame); 
 }
 
 
@@ -5659,8 +5659,12 @@ MI_World::MI_World() :
 	iControllingTeam = 0;
 	iReturnDirection = 0;
 
-	sMapSurface = SDL_CreateRGBSurface(screen->flags, 768, 608, screen->format->BitsPerPixel, 0, 0, 0, 0);
+	sMapSurface[0] = SDL_CreateRGBSurface(screen->flags, 768, 608, screen->format->BitsPerPixel, 0, 0, 0, 0);
+	sMapSurface[1] = SDL_CreateRGBSurface(screen->flags, 768, 608, screen->format->BitsPerPixel, 0, 0, 0, 0);
 	
+	iCurrentSurfaceIndex = 0;
+	iCycleIndex = 0;
+
 	rectSrcSurface.x = 0;
 	rectSrcSurface.y = 0;
 	rectSrcSurface.w = 768;
@@ -5674,18 +5678,32 @@ MI_World::MI_World() :
 
 MI_World::~MI_World()
 {
-	SDL_FreeSurface(sMapSurface);
+	if(sMapSurface[0])
+	{
+		SDL_FreeSurface(sMapSurface[0]);
+		sMapSurface[0] = NULL;
+	}
+	
+	if(sMapSurface[1])
+	{
+		SDL_FreeSurface(sMapSurface[1]);
+		sMapSurface[1] = NULL;
+	}
 }
 
 void MI_World::Init()
 {
-	iAnimationTimer = 0;
+	iCycleIndex = 0;
 	iAnimationFrame = 0;
+	iDrawFullRefresh = 0;
 	
 	g_worldmap.InitPlayer();
 
 	iMapDrawOffsetCol = 0;
 	iMapDrawOffsetRow = 0;
+
+	iNextMapDrawOffsetCol = 0;
+	iNextMapDrawOffsetRow = 0;
 
 	iMessageTimer = 0;
 
@@ -5698,6 +5716,9 @@ void MI_World::Init()
 
 	SetMapOffset();
 	RepositionMapImage();
+
+	g_worldmap.DrawMapToSurface(-1, true, sMapSurface[0], iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
+	g_worldmap.DrawMapToSurface(-1, true, sMapSurface[1], iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
 
 	dTeleportStarRadius = 300.0f;
 	dTeleportStarAngle = 0.0f;
@@ -5756,6 +5777,9 @@ void MI_World::SetCurrentStageToCompleted(short iWinningTeam)
 		//tile->fAnimated = false; //Update with team completed sprite
 		tile->iCompleted = game_values.colorids[game_values.teamids[iWinningTeam][0]];
 
+		g_worldmap.UpdateTile(sMapSurface[0], iPlayerCurrentTileX - iMapDrawOffsetCol, iPlayerCurrentTileY - iMapDrawOffsetRow, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
+		g_worldmap.UpdateTile(sMapSurface[1], iPlayerCurrentTileX - iMapDrawOffsetCol, iPlayerCurrentTileY - iMapDrawOffsetRow, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
+		
 		game_values.tournament_scores[iWinningTeam].total += game_values.tourstops[tile->iType - 6]->iPoints * iBonusMult + iBonusAdd;
 	}
 
@@ -5777,8 +5801,8 @@ void MI_World::AdvanceTurn()
 
 	g_worldmap.MoveBridges();
 
-	//Update the completed stage with team colored tile on the map
-	UpdateMapSurface(true);
+	//Update the map with the flipped bridges
+	//TODO:: Need to update just bridge tiles across both surfaces
 
 	fNoInterestingMoves = false;
 }
@@ -5793,16 +5817,22 @@ void MI_World::Update()
 
 	short iPlayerState = g_worldmap.GetPlayerState();
 
-	if(++iAnimationTimer > 15)
+	UpdateMapSurface(iCycleIndex);
+
+	if(++iCycleIndex > 15)
 	{
-		iAnimationTimer = 0;
+		iCurrentSurfaceIndex = 1 - iCurrentSurfaceIndex;
+
+		if(iDrawFullRefresh == 1)
+			iDrawFullRefresh = 2;
+		else
+			iDrawFullRefresh = 0;
+
+		iCycleIndex = 0;
 		iAnimationFrame += TILESIZE;
 
 		if(iAnimationFrame >= 128)
 			iAnimationFrame = 0;
-
-		//update background map surface
-		UpdateMapSurface(false);
 	}
 
 	if(fPlayerMoveDone)
@@ -5898,6 +5928,15 @@ void MI_World::Update()
 			SetMapOffset();
 			RepositionMapImage();
 
+			//These 3 lines allow us to only refresh the entire map to one surface and sets it up so that the 
+			//other surface will update with the normal flow
+			iCurrentSurfaceIndex = 0;
+			iCycleIndex = 0;
+			iDrawFullRefresh = 2; //Draw one full refresh to next surface
+
+			g_worldmap.DrawMapToSurface(-1, true, sMapSurface[0], iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
+			//g_worldmap.DrawMapToSurface(-1, true, sMapSurface[1], iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
+
 			iState = 5;
 			iScreenfade = 255;
 			iScreenfadeRate = -8;
@@ -5915,9 +5954,9 @@ void MI_World::Update()
 	}
 }
 
-void MI_World::UpdateMapSurface(bool fFullRefresh)
+void MI_World::UpdateMapSurface(short iCycleIndex)
 {
-	g_worldmap.DrawMapToSurface(fFullRefresh, sMapSurface, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
+	g_worldmap.DrawMapToSurface(iCycleIndex, iDrawFullRefresh > 0, sMapSurface[1 - iCurrentSurfaceIndex], iNextMapDrawOffsetCol, iNextMapDrawOffsetRow, iAnimationFrame);
 }
 
 void MI_World::SetMapOffset()
@@ -5977,7 +6016,13 @@ void MI_World::RepositionMapImage()
 			iMapDrawOffsetRow = g_worldmap.iHeight - 19;
 	}
 
-	UpdateMapSurface(true);
+	iNextMapDrawOffsetCol = iMapDrawOffsetCol;
+	iNextMapDrawOffsetRow = iMapDrawOffsetRow;
+
+	//TODO:: Don't draw so much on this refresh (entire image can be moved over and just a single
+	//       row or column can be drawn
+	//if(iOldOffsetCol != iMapDrawOffsetCol || iOldOffsetRow != iMapDrawOffsetRow)
+	//	UpdateMapSurface(true);
 }
 
 
@@ -6002,10 +6047,10 @@ void MI_World::Draw()
 	else
 		rectSrcSurface.h = g_worldmap.iHeight * TILESIZE;
 
-	rectDstSurface.x = iMapOffsetX + iMapDrawOffsetCol * TILESIZE;
-	rectDstSurface.y = iMapOffsetY + iMapDrawOffsetRow * TILESIZE;
+	rectDstSurface.x = iMapOffsetX + (iMapDrawOffsetCol << 5);
+	rectDstSurface.y = iMapOffsetY + (iMapDrawOffsetRow << 5);
 	
-	SDL_BlitSurface(sMapSurface, &rectSrcSurface, blitdest, &rectDstSurface);
+	SDL_BlitSurface(sMapSurface[iCurrentSurfaceIndex], &rectSrcSurface, blitdest, &rectDstSurface);
 
 	g_worldmap.Draw(iMapOffsetX, iMapOffsetY, iState != -2 && iState < 4 && !fUsingCloud, iSleepTurns > 0);
 
@@ -6214,9 +6259,14 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 							UseCloud(false);
 
 						g_worldmap.MovePlayer(0);
+						iPlayerState = g_worldmap.GetPlayerState();
+
 						iReturnDirection = 1;
 
 						ifsoundonplay(sfx_worldmove);
+
+						//Start draw cycle over
+						RestartDrawCycleIfNeeded();
 					}
 					else
 					{
@@ -6232,7 +6282,12 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 							UseCloud(false);
 
 						g_worldmap.MovePlayer(1);
+						iPlayerState = g_worldmap.GetPlayerState();
+
 						iReturnDirection = 0;
+
+						//Start draw cycle over
+						RestartDrawCycleIfNeeded();
 
 						ifsoundonplay(sfx_worldmove);
 					}
@@ -6250,7 +6305,12 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 							UseCloud(false);
 
 						g_worldmap.MovePlayer(2);
+						iPlayerState = g_worldmap.GetPlayerState();
+
 						iReturnDirection = 3;
+
+						//Start draw cycle over
+						RestartDrawCycleIfNeeded();
 
 						ifsoundonplay(sfx_worldmove);
 					}
@@ -6269,7 +6329,12 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 							UseCloud(false);
 
 						g_worldmap.MovePlayer(3);
+						iPlayerState = g_worldmap.GetPlayerState();
+
 						iReturnDirection = 2;
+
+						//Start draw cycle over
+						RestartDrawCycleIfNeeded();
 
 						ifsoundonplay(sfx_worldmove);
 					}
@@ -6400,7 +6465,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 			if ((game_values.playercontrol[iPlayer] == 1 || fNoInterestingMoves) && (playerKeys->menu_random.fPressed ||
 				(iPlayer != 0 && playerInput->inputControls[iPlayer]->iDevice == DEVICE_KEYBOARD && playerKeys->menu_cancel.fPressed)))
 			{
-				if(iState == -1)
+				if(iState == -1 && iPlayerState == 0)
 				{
 					iState = game_values.colorids[iPlayer];
 					iTeam = LookupTeamID(iPlayer);
@@ -6421,6 +6486,40 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 	}
 
 	return MENU_CODE_NONE;
+}
+
+void MI_World::RestartDrawCycleIfNeeded()
+{
+	iNextMapDrawOffsetCol = iMapDrawOffsetCol;
+	iNextMapDrawOffsetRow = iMapDrawOffsetRow;
+
+	short iPlayerDestTileX, iPlayerDestTileY;
+	g_worldmap.GetPlayerDestTile(&iPlayerDestTileX, &iPlayerDestTileY);
+	
+	if(g_worldmap.iWidth > 24)
+	{
+		iNextMapDrawOffsetCol = iPlayerDestTileX - 11;
+		if(iNextMapDrawOffsetCol < 0)
+			iNextMapDrawOffsetCol = 0;
+		else if(iNextMapDrawOffsetCol > g_worldmap.iWidth - 24)
+			iNextMapDrawOffsetCol = g_worldmap.iWidth - 24;
+	}
+
+	if(g_worldmap.iHeight > 19)
+	{
+		iNextMapDrawOffsetRow = iPlayerDestTileY - 9;
+		if(iNextMapDrawOffsetRow < 0)
+			iNextMapDrawOffsetRow = 0;
+		else if(iNextMapDrawOffsetRow > g_worldmap.iHeight - 19)
+			iNextMapDrawOffsetRow = g_worldmap.iHeight - 19;
+	}
+
+	//Reset the draw cycle if the map offset col/row is going to move
+	if(iMapDrawOffsetCol != iNextMapDrawOffsetCol || iMapDrawOffsetRow != iNextMapDrawOffsetRow)
+	{
+		iCycleIndex = 0;
+		iDrawFullRefresh = 1;
+	}
 }
 
 bool MI_World::UsePowerup(short iTeam, short iIndex, bool fPopupIsUp)
@@ -6464,6 +6563,11 @@ bool MI_World::UsePowerup(short iTeam, short iIndex, bool fPopupIsUp)
 			ifsoundonplay(sfx_switchpress);
 			iState = 6;
 			fNoInterestingMoves = false;
+
+			//Since we set the state to 6 to do the warping star effect, we must
+			//Set the inventory back to off manually
+			iItemPopupDrawY = 0;
+			iStateTransition = 0;
 		}
 	}
 	else if(iPowerup == NUM_POWERUPS + 3) //Advance Turn
@@ -6488,7 +6592,9 @@ bool MI_World::UsePowerup(short iTeam, short iIndex, bool fPopupIsUp)
 		if(tile->iType >= 6 && tile->iCompleted >= 0)
 		{
 			tile->iCompleted = -2;
-			UpdateMapSurface(true);
+
+			g_worldmap.UpdateTile(sMapSurface[0], iDestX - iMapDrawOffsetCol, iDestY - iMapDrawOffsetRow, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
+			g_worldmap.UpdateTile(sMapSurface[1], iDestX - iMapDrawOffsetCol, iDestY - iMapDrawOffsetRow, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
 
 			uiMenu->AddEyeCandy(new EC_SingleAnimation(&spr_poof, (iDestX << 5) + iMapOffsetX - 8, (iDestY << 5) + iMapOffsetY - 8, 4, 5));
 
@@ -6502,23 +6608,42 @@ bool MI_World::UsePowerup(short iTeam, short iIndex, bool fPopupIsUp)
 
 		if(iDoorsOpened > 0)
 		{
-			UpdateMapSurface(true);
 			ifsoundonplay(sfx_transform);
 
 			short iPlayerX = (iPlayerCurrentTileX << 5) + iMapOffsetX;
 			short iPlayerY = (iPlayerCurrentTileY << 5) + iMapOffsetY;
 
 			if(iDoorsOpened & 0x1)
+			{
 				uiMenu->AddEyeCandy(new EC_SingleAnimation(&spr_fireballexplosion, iPlayerX - TILESIZE, iPlayerY, 3, 8));
 
+				g_worldmap.UpdateTile(sMapSurface[0], iPlayerCurrentTileX - iMapDrawOffsetCol - 1, iPlayerCurrentTileY - iMapDrawOffsetRow, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
+				g_worldmap.UpdateTile(sMapSurface[1], iPlayerCurrentTileX - iMapDrawOffsetCol - 1, iPlayerCurrentTileY - iMapDrawOffsetRow, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
+			}
+
 			if(iDoorsOpened & 0x2)
+			{
 				uiMenu->AddEyeCandy(new EC_SingleAnimation(&spr_fireballexplosion, iPlayerX + TILESIZE, iPlayerY, 3, 8));
 
+				g_worldmap.UpdateTile(sMapSurface[0], iPlayerCurrentTileX - iMapDrawOffsetCol + 1, iPlayerCurrentTileY - iMapDrawOffsetRow, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
+				g_worldmap.UpdateTile(sMapSurface[1], iPlayerCurrentTileX - iMapDrawOffsetCol + 1, iPlayerCurrentTileY - iMapDrawOffsetRow, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
+			}
+
 			if(iDoorsOpened & 0x4)
+			{
 				uiMenu->AddEyeCandy(new EC_SingleAnimation(&spr_fireballexplosion, iPlayerX, iPlayerY - TILESIZE, 3, 8));
 
+				g_worldmap.UpdateTile(sMapSurface[0], iPlayerCurrentTileX - iMapDrawOffsetCol, iPlayerCurrentTileY - iMapDrawOffsetRow - 1, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
+				g_worldmap.UpdateTile(sMapSurface[1], iPlayerCurrentTileX - iMapDrawOffsetCol, iPlayerCurrentTileY - iMapDrawOffsetRow - 1, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
+			}
+
 			if(iDoorsOpened & 0x8)
+			{
 				uiMenu->AddEyeCandy(new EC_SingleAnimation(&spr_fireballexplosion, iPlayerX, iPlayerY + TILESIZE, 3, 8));
+
+				g_worldmap.UpdateTile(sMapSurface[0], iPlayerCurrentTileX - iMapDrawOffsetCol, iPlayerCurrentTileY - iMapDrawOffsetRow + 1, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
+				g_worldmap.UpdateTile(sMapSurface[1], iPlayerCurrentTileX - iMapDrawOffsetCol, iPlayerCurrentTileY - iMapDrawOffsetRow + 1, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
+			}
 
 			fUsedItem = true;
 			fNoInterestingMoves = false;

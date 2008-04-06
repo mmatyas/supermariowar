@@ -1070,13 +1070,14 @@ class MI_World : public UI_Control
 
 		MenuCodeEnum InitGame(short iStage, short iPlayer, bool fNeedAiControl);
 
+		void RestartDrawCycleIfNeeded();
 		bool UsePowerup(short iTeam, short iIndex, bool fPopupIsUp);
 
 		void SetMapOffset();
 		void RepositionMapImage();
 
 		void AdvanceTurn();
-		void UpdateMapSurface(bool fFullRefresh);
+		void UpdateMapSurface(short iCycleIndex);
 		void UseCloud(bool fUseCloud);
 
 		short iState;
@@ -1087,11 +1088,14 @@ class MI_World : public UI_Control
 		short iItemCol;
 		short iItemPage;
 
-		SDL_Surface * sMapSurface;
+		SDL_Surface * sMapSurface[2];
 		SDL_Rect rectSrcSurface;
 		SDL_Rect rectDstSurface;
 
-		short iAnimationTimer;
+		short iCurrentSurfaceIndex;
+		short iCycleIndex;
+		short iDrawFullRefresh;
+
 		short iAnimationFrame;
 
 		short iMapOffsetX;
@@ -1099,6 +1103,9 @@ class MI_World : public UI_Control
 
 		short iMapDrawOffsetCol;
 		short iMapDrawOffsetRow;
+
+		short iNextMapDrawOffsetCol;
+		short iNextMapDrawOffsetRow;
 			
 		short iControllingTeam;
 		short iReturnDirection;

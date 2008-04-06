@@ -3287,32 +3287,40 @@ void IO_MovingObject::KillObjectMapHazard()
 		}
 		else
 		{
-			ifsoundonplay(sfx_transform);
-
 			if(movingObjectType == movingobject_egg)
 			{
 				dead = false;
 				((CO_Egg*)this)->placeEgg();
+				ifsoundonplay(sfx_transform);
 			}
 			else if(movingObjectType == movingobject_star)
 			{
 				dead = false;
 				((CO_Star*)this)->placeStar();
+				ifsoundonplay(sfx_transform);
 			}
 			else if(movingObjectType == movingobject_flag)
 			{
 				dead = false;
 				((CO_Flag*)this)->placeFlag();
+				ifsoundonplay(sfx_transform);
 			}
 			else if(movingObjectType == movingobject_bomb)
 			{
 				if(iPlayerID > -1 && projectiles[iPlayerID] > 0)
 					projectiles[iPlayerID]--;
+
+				ifsoundonplay(sfx_hit);
 			}
 			else if(movingObjectType == movingobject_phantokey)
 			{
 				dead = false;
 				((CO_PhantoKey*)this)->placeKey();
+				ifsoundonplay(sfx_transform);
+			}
+			else
+			{
+				ifsoundonplay(sfx_hit);
 			}
 		}
 	}
@@ -10245,14 +10253,14 @@ void OMO_Phanto::update()
 					vely = -dMaxSpeedY;
 			}
 
-			if(iy >= 480 || iy + ih < 0)
+			if(iy >= 480 || iy + ih < -CRUNCHMAX)
 			{
 				vely = 0.0f;
 				velx = 0.0f;
 
 				//Randomly position phanto off screen
 				xi(rand() % 640);
-				yi(rand() % 2 == 0 ? -ih : 480);
+				yi(rand() % 2 == 0 ? -ih - CRUNCHMAX: 480);
 			}
 		}
 	}
