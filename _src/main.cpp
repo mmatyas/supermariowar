@@ -58,22 +58,9 @@
 * Bomb option in Star mode
 - Mariokart-type podium at the end of a tournament/tour/whatever
 
-//XBOX FIX!!!
-//Very slow framerate/chunky in world mode (navigating world) -> Reason for this is map draw updates
-//    Possible fix is to predict when an update will be needed and draw it to a second flip surface evenly for 16 frames
-//    This is how we do animated tiles in the map and it seems to work well
-//    We know as soon as a player pushes right, it will take 16 frames to reach the next square, we also know that animation
-//    updates every 16 frames (these updates will probably not be in sync).  We might have to go to a 8 frame draw cycle
-//    where the animation refreshes itself every 8 frames, the second set which might be at a different offset to account
-//    for the player moving.
-
-//Replace mode name on pause dialog with mode icon
-
 //BUG?? Look in CTilesetManager::Init to see if we are loading the non-classic tilesets when we pass in classic!
 //BUG?? Did yellow player holding flag not kill green player when invincible?
 
-//Race goals are frozen during begin game countdown
-//Objects that die in spikes makes teleport sound
 
 */
 

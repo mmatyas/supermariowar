@@ -195,7 +195,7 @@ class WorldMap
 
 		void IsTouchingDoor(short iCol, short iRow, bool doors[4]);
 		bool IsDoor(short iCol, short iRow);
-		short UseKey(short iKeytype, short iCol, short iRow);
+		short UseKey(short iKeytype, short iCol, short iRow, bool fCloud);
 
 		short GetVehicleBoundary(short iCol, short iRow);
 

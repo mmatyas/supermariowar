@@ -6604,7 +6604,7 @@ bool MI_World::UsePowerup(short iTeam, short iIndex, bool fPopupIsUp)
 	}
 	else if(iPowerup >= NUM_POWERUPS + 5 && iPowerup <= NUM_POWERUPS + 8) //Door Keys
 	{
-		short iDoorsOpened = g_worldmap.UseKey(iPowerup - NUM_POWERUPS - 5, iPlayerCurrentTileX, iPlayerCurrentTileY);
+		short iDoorsOpened = g_worldmap.UseKey(iPowerup - NUM_POWERUPS - 5, iPlayerCurrentTileX, iPlayerCurrentTileY, fUsingCloud);
 
 		if(iDoorsOpened > 0)
 		{
