@@ -587,20 +587,6 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
-void UpdateTileType(short x, short y, short layer, TileType type)
-{
-	//If -1 is passed in for layer, then just update the entire tile
-	if(layer == -1)
-	{
-		g_map.mapdatatop[x][y].iType = CalculateTileType(x, y);
-	}
-	else
-	{
-		TileType calculatedType = CalculateTileType(x, y);
-		TileType currentType = g_map.mapdatatop[x][y].iType;		
-	}
-}
-
 TileType CalculateTileType(short x, short y)
 {
 	TileType type = tile_nonsolid;
@@ -620,6 +606,20 @@ TileType CalculateTileType(short x, short y)
 	}
 
 	return type;
+}
+
+void UpdateTileType(short x, short y, short layer, TileType type)
+{
+	//If -1 is passed in for layer, then just update the entire tile
+	if(layer == -1)
+	{
+		g_map.mapdatatop[x][y].iType = CalculateTileType(x, y);
+	}
+	else
+	{
+		TileType calculatedType = CalculateTileType(x, y);
+		TileType currentType = g_map.mapdatatop[x][y].iType;		
+	}
 }
 
 void AdjustMapItems(short iClickX, short iClickY)
