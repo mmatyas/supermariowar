@@ -3340,6 +3340,8 @@ void Menu::RunMenu()
 					short iRandOption = (rand() % 6) + 1;
 					game_values.gamemode->goal  = options[iRandOption].iValue;
 
+					game_values.tournamentwinner = -1;
+
 					StartGame();
 				}
 				else
