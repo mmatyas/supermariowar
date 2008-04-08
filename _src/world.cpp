@@ -1,5 +1,7 @@
 #include "global.h"
 
+#include "savepng.h"
+
 extern void ResetTourStops();
 extern TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld);
 extern void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld);
@@ -391,6 +393,7 @@ WorldMap::~WorldMap()
 bool WorldMap::Load(short tilesize)
 {
 	Cleanup();
+	ResetDrawCycle();
 
 	iTileSize = tilesize;
 
@@ -467,6 +470,13 @@ bool WorldMap::Load(short tilesize)
 
 			for(short iCol = 0; iCol < iWidth; iCol++)
 				tiles[iCol] = new WorldMapTile[iHeight];
+
+			short iDrawSurfaceTiles = iWidth * iHeight;
+
+			if(iDrawSurfaceTiles > 456)
+				iDrawSurfaceTiles = 456; //19 * 24 = 456 max tiles in world surface
+
+			iTilesPerCycle = iDrawSurfaceTiles / 16;
 		}
 		else if(iReadType == 4) //background sprites
 		{
@@ -500,7 +510,7 @@ bool WorldMap::Load(short tilesize)
 
 				WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
 				tile->iBackgroundSprite = atoi(psz);
-				tile->fAnimated = tile->iBackgroundSprite != 1;
+				tile->fAnimated = (tile->iBackgroundSprite % WORLD_BACKGROUND_SPRITE_SET_SIZE) != 1;
 				
 				tile->iID = iMapTileReadRow * iWidth + iMapTileReadCol;
 				tile->iCol = iMapTileReadCol;
@@ -530,9 +540,9 @@ bool WorldMap::Load(short tilesize)
 				short iForegroundSprite = tile->iForegroundSprite;
 
 				//Animated parts of paths
-				if(!tile->fAnimated && iForegroundSprite >= 0 && iForegroundSprite <= 80)
+				if(!tile->fAnimated && iForegroundSprite >= 0 && iForegroundSprite <= 8 * WORLD_PATH_SPRITE_SET_SIZE)
 				{
-					short iForeground = iForegroundSprite % 10;
+					short iForeground = iForegroundSprite % WORLD_PATH_SPRITE_SET_SIZE;
 					tile->fAnimated = iForeground >= 3 && iForeground <= 10;
 				}
 
@@ -542,7 +552,7 @@ bool WorldMap::Load(short tilesize)
 
 				//Animated foreground tiles
 				if(!tile->fAnimated)
-					tile->fAnimated = iForegroundSprite >= WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_SPRITE_OFFSET + 29;
+					tile->fAnimated = iForegroundSprite >= WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET + 29;
 				
 				psz = strtok(NULL, ",\n");
 			}
@@ -1234,19 +1244,38 @@ void WorldMap::DrawMapToSurface(SDL_Surface * surface)
 	}		
 }
 
+void WorldMap::ResetDrawCycle()
+{
+	iLastDrawRow = 0;
+	iLastDrawCol = 0;
+}
+
 void WorldMap::DrawMapToSurface(short iCycleIndex, bool fFullRefresh, SDL_Surface * surface, short iMapDrawOffsetCol, short iMapDrawOffsetRow, short iAnimationFrame)
 {
-	short iCounter = 0;
-	for(short iRow = 0; iRow < 19 && iRow + iMapDrawOffsetRow < iHeight; iRow++)
-	{
-		for(short iCol = 0; iCol < 24 && iCol + iMapDrawOffsetCol < iWidth; iCol++)
-		{
-			if(iCycleIndex < 0 || iCounter % 16 == iCycleIndex)
-				DrawTileToSurface(surface, iCol, iRow, iMapDrawOffsetCol, iMapDrawOffsetRow, fFullRefresh, iAnimationFrame);
+	short iRowEnd = 19 + iMapDrawOffsetRow < iHeight ? 19 : iHeight - iMapDrawOffsetRow;
+	short iColEnd = 24 + iMapDrawOffsetCol < iWidth ? 24 : iWidth - iMapDrawOffsetCol;
 
-			iCounter++;
+	short iCounter = 0, iRow, iCol;
+	for(iRow = iLastDrawRow; iRow < iRowEnd; iRow++)
+	{
+		for(iCol = iLastDrawCol; iCol < iColEnd; iCol++)
+		{
+			DrawTileToSurface(surface, iCol, iRow, iMapDrawOffsetCol, iMapDrawOffsetRow, fFullRefresh, iAnimationFrame);
+
+			if(iCycleIndex >= 0 && iCycleIndex != 15 && ++iCounter > iTilesPerCycle)
+				goto STOPDRAWING;
 		}
-	}		
+
+		iLastDrawCol = 0;
+	}
+
+	iLastDrawRow = 0;
+
+	return;
+
+	STOPDRAWING:
+	iLastDrawRow = iRow;
+	iLastDrawCol = iCol;
 }
 
 void WorldMap::DrawTileToSurface(SDL_Surface * surface, short iCol, short iRow, short iMapDrawOffsetCol, short iMapDrawOffsetRow, bool fFullRefresh, short iAnimationFrame)

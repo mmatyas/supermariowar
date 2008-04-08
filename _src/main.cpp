@@ -61,6 +61,8 @@
 //BUG?? Look in CTilesetManager::Init to see if we are loading the non-classic tilesets when we pass in classic!
 //BUG?? Did yellow player holding flag not kill green player when invincible?
 
+//Fix all world tiles painting in the same cycle
+//Fix world animated foreground tiles
 
 */
 

@@ -163,6 +163,7 @@ class WorldMap
 		
 		void UpdateTile(SDL_Surface * surface, short iCol, short iRow, short iMapDrawOffsetCol, short iMapDrawOffsetRow, short iAnimationFrame);
 
+		void ResetDrawCycle();
 		void DrawMapToSurface(SDL_Surface * surface);
 		void DrawMapToSurface(short iCycleIndex, bool fFullRefresh, SDL_Surface * surface, short iMapDrawOffsetCol, short iMapDrawOffsetRow, short iAnimationFrame);
 
@@ -233,6 +234,11 @@ class WorldMap
 		short iTileSize;
 		short iTileSizeShift;
 		short iTileSheet;
+
+		short iLastDrawRow;
+		short iLastDrawCol;
+
+		short iTilesPerCycle;
 
 	friend class MI_World;
 	friend class MI_WorldPreviewDisplay;

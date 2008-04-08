@@ -1063,6 +1063,8 @@ class MI_World : public UI_Control
 
 		void Init();
 		void SetControllingTeam(short iPlayerID);
+		void DisplayTeamControlAnnouncement();
+
 		void SetCurrentStageToCompleted(short iWinningTeam);
 		void ClearCloud() {fUsingCloud = false;}
 
@@ -1108,6 +1110,7 @@ class MI_World : public UI_Control
 		short iNextMapDrawOffsetRow;
 			
 		short iControllingTeam;
+		short iControllingPlayerId;
 		short iReturnDirection;
 
 		short iMessageTimer;

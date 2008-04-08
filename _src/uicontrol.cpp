@@ -5694,6 +5694,8 @@ MI_World::~MI_World()
 void MI_World::Init()
 {
 	iCycleIndex = 0;
+	g_worldmap.ResetDrawCycle();
+
 	iAnimationFrame = 0;
 	iDrawFullRefresh = 0;
 	
@@ -5738,16 +5740,20 @@ void MI_World::Init()
 void MI_World::SetControllingTeam(short iWinningTeam)
 {
 	iControllingTeam = iWinningTeam;
-	g_worldmap.SetPlayerSprite(game_values.teamids[iControllingTeam][rand() % game_values.teamcounts[iControllingTeam]]);
+	iControllingPlayerId = game_values.teamids[iControllingTeam][rand() % game_values.teamcounts[iControllingTeam]];
+	g_worldmap.SetPlayerSprite(iControllingPlayerId);
 
-	iMessageTimer = 120;
+	fNoInterestingMoves = false;
+}
 
+void MI_World::DisplayTeamControlAnnouncement()
+{
 	if(game_values.teamcounts[iControllingTeam] <= 1)
 		sprintf(szMessage, "Player %d Is In Control", game_values.teamids[iControllingTeam][0] + 1);
 	else
 		sprintf(szMessage, "Team %d Is In Control", iControllingTeam + 1);
 
-	fNoInterestingMoves = false;
+	uiMenu->AddEyeCandy(new EC_Announcement(&menu_font_large, &spr_announcementicons, szMessage, game_values.colorids[iControllingPlayerId], 120, 100));
 }
 
 void MI_World::SetCurrentStageToCompleted(short iWinningTeam)
@@ -5932,6 +5938,8 @@ void MI_World::Update()
 			//other surface will update with the normal flow
 			iCurrentSurfaceIndex = 0;
 			iCycleIndex = 0;
+			g_worldmap.ResetDrawCycle();
+
 			iDrawFullRefresh = 2; //Draw one full refresh to next surface
 
 			g_worldmap.DrawMapToSurface(-1, true, sMapSurface[0], iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
@@ -6518,6 +6526,7 @@ void MI_World::RestartDrawCycleIfNeeded()
 	if(iMapDrawOffsetCol != iNextMapDrawOffsetCol || iMapDrawOffsetRow != iNextMapDrawOffsetRow)
 	{
 		iCycleIndex = 0;
+		g_worldmap.ResetDrawCycle();
 		iDrawFullRefresh = 1;
 	}
 }
@@ -6559,6 +6568,8 @@ bool MI_World::UsePowerup(short iTeam, short iIndex, bool fPopupIsUp)
 		if(iControllingTeam != iTeam)
 		{
 			SetControllingTeam(iTeam);
+			DisplayTeamControlAnnouncement();
+
 			fUsedItem = true;
 			ifsoundonplay(sfx_switchpress);
 			iState = 6;

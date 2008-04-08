@@ -2917,7 +2917,7 @@ void Menu::RunMenu()
 			mWorldMenu.SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
 
 			mWorldMenu.RestoreCurrent();
-			
+
 			//Clear out the stored powerups after a game that had a winner
 			if(!game_values.worldskipscoreboard)
 			{
@@ -3451,6 +3451,7 @@ void Menu::RunMenu()
 			}
 			else if(MENU_CODE_BACK_TO_GAME_SETUP_MENU == code)
 			{
+				bool fNeedTeamAnnouncement = false;
 				if(game_values.matchtype == MATCH_TYPE_WORLD)
 				{
 					if(game_values.tournamentwinner == -2 || (game_values.tournamentwinner >= 0 && game_values.bonuswheel == 0))
@@ -3466,6 +3467,8 @@ void Menu::RunMenu()
 					{
 						mCurrentMenu = &mWorldMenu;
 						miWorldStop->Refresh(game_values.tourstopcurrent);
+
+						fNeedTeamAnnouncement = true;
 					}
 				}
 				else
@@ -3496,6 +3499,9 @@ void Menu::RunMenu()
 				}
 
 				mCurrentMenu->ResetMenu();
+
+				if(fNeedTeamAnnouncement)
+					miWorld->DisplayTeamControlAnnouncement();
 			}
 			else if(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS == code)
 			{
@@ -4026,6 +4032,8 @@ void Menu::RunMenu()
 				backgroundmusic[5].load(worldmusiclist.GetMusic(g_worldmap.GetMusicCategory()));
 				backgroundmusic[5].play(false, false);
 				fNeedMenuMusicReset = true;
+
+				miWorld->DisplayTeamControlAnnouncement();
 
 				game_values.gamestate = GS_MENU;
 			}

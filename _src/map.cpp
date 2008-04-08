@@ -1154,9 +1154,18 @@ void CMap::loadPlatforms(FILE * mapfile, bool fPreview, int version[4], short * 
 					tile->iCol = ReadByteAsShort(mapfile);
 					tile->iRow = ReadByteAsShort(mapfile);
 
-					TileType type = (TileType)ReadInt(mapfile);
-					types[iCol][iRow].iType = type;
-					types[iCol][iRow].iFlags = g_iTileTypeConversion[type];
+					TileType iType = (TileType)ReadInt(mapfile);
+
+					if(iType >= 0 && iType <= 12)
+					{
+						types[iCol][iRow].iType = iType;
+						types[iCol][iRow].iFlags = g_iTileTypeConversion[iType];
+					}
+					else
+					{
+						types[iCol][iRow].iType = tile_nonsolid;
+						types[iCol][iRow].iFlags = tile_flag_nonsolid;
+					}
 				}
 				else
 				{

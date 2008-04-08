@@ -137,7 +137,7 @@ bool RemoveTeam(short teamid)
 		if(list_players[iPlayer]->teamID == teamid)
 		{
 			if(iAnnouncementColor == -1)
-				iAnnouncementColor = game_values.colorids[iPlayer];
+				iAnnouncementColor = list_players[iPlayer]->colorID;
 
 			list_players[iPlayer]->state = player_dead;
 		}
