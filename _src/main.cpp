@@ -61,8 +61,7 @@
 //BUG?? Look in CTilesetManager::Init to see if we are loading the non-classic tilesets when we pass in classic!
 //BUG?? Did yellow player holding flag not kill green player when invincible?
 
-//Fix all world tiles painting in the same cycle
-//Fix world animated foreground tiles
+[ ] Place any tile, like inside dirt part of the cave tiles from SMW. Place a 3x3 sized box. (easier to see the change) Then, make the tiles not be solid, for backgrounds or something. If you place any non-solid tile (as said by the icon near the tile in the selector) on top of once-solid tile (as said by the missin icon) the once-solid tile reverts to solid again. It's a very annoying thing.
 
 */
 

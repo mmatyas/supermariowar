@@ -4476,7 +4476,7 @@ int editor_animation()
 			short iCol = event.button.x / TILESIZE;
 			short iRow = event.button.y / TILESIZE;
 
-			bool fInValidTile = (iRow >= 0 && iRow <= 1 && iCol >= 0 && iCol < 13) || (iRow == 2 && iCol >= 0 && iCol < 12);
+			bool fInValidTile = (iRow >= 0 && iRow <= 2 && iCol >= 0 && iCol < 13);
 
 			switch(event.type)
 			{
