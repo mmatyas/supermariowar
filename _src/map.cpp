@@ -588,6 +588,18 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 			{
 				iSwitches[iSwitch] = (short)ReadInt(mapfile);
 			}
+
+			//Set all the on/off blocks correctly
+			for(j = 0; j < MAPHEIGHT; j++)
+			{
+				for(i = 0; i < MAPWIDTH; i++)
+				{
+					if(objectdata[i][j].iType >= 11 && objectdata[i][j].iType <= 14)
+					{
+						objectdata[i][j].iSettings[0] = iSwitches[objectdata[i][j].iType - 11];
+					}
+				}
+			}
 		}
 
 		if((version[2] == 0 && version[3] > 1) || version[2] >= 1)
@@ -736,6 +748,18 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 			for(short iSwitch = 0; iSwitch < 4; iSwitch++)
 			{
 				iSwitches[iSwitch] = (short)ReadInt(mapfile);
+			}
+
+			//Set all the on/off blocks correctly
+			for(j = 0; j < MAPHEIGHT; j++)
+			{
+				for(i = 0; i < MAPWIDTH; i++)
+				{
+					if(objectdata[i][j].iType >= 11 && objectdata[i][j].iType <= 14)
+					{
+						objectdata[i][j].iSettings[0] = iSwitches[objectdata[i][j].iType - 11];
+					}
+				}
 			}
 		}
 	}
@@ -943,6 +967,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 
 		for(short iSwitch = 0; iSwitch < 4; iSwitch++)
 			iSwitches[iSwitch] = 0;
+
 	}
 	else //If the version is unrecognized (1.5 maps didn't have version numbers)
 	{

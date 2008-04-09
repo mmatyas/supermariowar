@@ -71,12 +71,13 @@
 [ ] Make the SMB3 world work -> Need to recreate maps using new 1.8 map editor
 [ ] Special directory for world maps?  Don't want to polute the map list with world only maps
 
+[ ] On/off switches are backwards on the preview for 1.7 maps
+
 */
 
 /*
 Checkin:
-1) Adjusted world surface drawing so that we only attemp to blit the visible 640x480 screen, not the entire world surface
-2) Fixed item spawn bug where they were using team 1's spawn (old index 1) and should be using item spawn (new index 5)
+1) Fixed bug with 1.7 maps that have on/off blocks will be randomly on/off and should have been set to what the switch was
 */
 
 /*
