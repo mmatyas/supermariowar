@@ -63,10 +63,20 @@
 
 [ ] Place any tile, like inside dirt part of the cave tiles from SMW. Place a 3x3 sized box. (easier to see the change) Then, make the tiles not be solid, for backgrounds or something. If you place any non-solid tile (as said by the icon near the tile in the selector) on top of once-solid tile (as said by the missin icon) the once-solid tile reverts to solid again. It's a very annoying thing.
 
+[ ] Tile placement in world editor for large maps is _very_ slow, especially painting a string of tiles
+
+[ ] Old 1.7 maps have funny platform behavior, try this with platformproblem.map
+
+[ ] Run with old 1.7 maps and make sure all of them load correctly
+[ ] Make the SMB3 world work -> Need to recreate maps using new 1.8 map editor
+[ ] Special directory for world maps?  Don't want to polute the map list with world only maps
+
 */
 
 /*
 Checkin:
+1) Adjusted world surface drawing so that we only attemp to blit the visible 640x480 screen, not the entire world surface
+2) Fixed item spawn bug where they were using team 1's spawn (old index 1) and should be using item spawn (new index 5)
 */
 
 /*

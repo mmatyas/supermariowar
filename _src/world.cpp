@@ -1295,13 +1295,17 @@ void WorldMap::DrawTileToSurface(SDL_Surface * surface, short iCol, short iRow, 
 
 	iBackgroundSprite %= WORLD_BACKGROUND_SPRITE_SET_SIZE;
 
-	//if(iBackgroundSprite == 0 || (iBackgroundSprite >= 2 && iBackgroundSprite <= 27) || (iBackgroundSprite >= 45 && iBackgroundSprite <= 48))
-	if(iBackgroundSprite == 0 || (iBackgroundSprite >= 2 && iBackgroundSprite <= 48))
+	//The solid background tile is not animated, but all the rest are
+	if(iBackgroundSprite == 1)
+	{
+		SDL_Rect rSrc = {iTileSize + iBackgroundStyleOffset, iTileSize, iTileSize, iTileSize};
+		SDL_BlitSurface(spr_worldbackground[iTileSheet].getSurface(), &rSrc, surface, &r);
+	}
+	else
 	{
 		SDL_Rect rSrc = {iAnimationFrame + (iBackgroundWater << (2 + iTileSizeShift)), 0, iTileSize, iTileSize};
 		SDL_BlitSurface(spr_worldbackground[iTileSheet].getSurface(), &rSrc, surface, &r);
 
-		//if((iBackgroundSprite >= 2 && iBackgroundSprite <= 27) || (iBackgroundSprite >= 45 && iBackgroundSprite <= 48))
 		if((iBackgroundSprite >= 2 && iBackgroundSprite <= 48))
 		{
 			if(iBackgroundSprite >= 45)
@@ -1325,16 +1329,6 @@ void WorldMap::DrawTileToSurface(SDL_Surface * surface, short iCol, short iRow, 
 				SDL_BlitSurface(spr_worldbackground[iTileSheet].getSurface(), &rSrc, surface, &r);
 			}
 		}
-	}
-	else if(iBackgroundSprite == 1)
-	{
-		SDL_Rect rSrc = {iTileSize + iBackgroundStyleOffset, iTileSize, iTileSize, iTileSize};
-		SDL_BlitSurface(spr_worldbackground[iTileSheet].getSurface(), &rSrc, surface, &r);
-	}
-	else if(iBackgroundSprite == 28 || iBackgroundSprite == 29)
-	{
-		SDL_Rect rSrc = {iTileSize + iBackgroundStyleOffset, (iBackgroundSprite - 14) << iTileSizeShift, iTileSize, iTileSize};
-		SDL_BlitSurface(spr_worldbackground[iTileSheet].getSurface(), &rSrc, surface, &r);
 	}
 
 	if(tile->iCompleted >= 0)

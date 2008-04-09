@@ -3677,7 +3677,7 @@ PU_TreasureChestBonus::PU_TreasureChestBonus(gfxSprite *nspr, short iNumSpr, sho
 	state = 2;
 	bonusitem = iBonusItem;
 	
-	g_map.findspawnpoint(1, &ix, &iy, collisionWidth, collisionHeight, false);
+	g_map.findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false);
 	fx = (float)ix;
 	fy = (float)iy;
 
@@ -5022,7 +5022,7 @@ void MO_Coin::placeCoin()
 		if(++tries > 32)
 			break;
 
-		g_map.findspawnpoint(1, &x, &y, collisionWidth, collisionHeight, false);
+		g_map.findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false);
 	}
 	while(objectcontainer[1].getClosestObject(x, y, object_coin) <= 150.0f);
 
@@ -5671,7 +5671,7 @@ void CO_Egg::placeEgg()
 		if(++tries > 32)
 			break;
 
-		g_map.findspawnpoint(1, &x, &y, collisionWidth, collisionHeight, false);
+		g_map.findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false);
 	}
 	while(objectcontainer[1].getClosestObject(x, y, object_yoshi) < 250.0f);
 
@@ -5954,7 +5954,7 @@ void OMO_FlagBase::placeFlagBase(bool fInit)
 			if(++tries > 32)
 				break;
 
-			g_map.findspawnpoint(1, &x, &y, collisionWidth, collisionHeight, true);
+			g_map.findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, true);
 		}
 		while(objectcontainer[0].getClosestObject(x, y, object_flagbase) <= 200.0f);
 	}
@@ -6142,7 +6142,7 @@ void CO_Flag::placeFlag()
 	{
 		Drop();
 		fInBase = false;
-		g_map.findspawnpoint(1, &ix, &iy, collisionWidth, collisionHeight, false);
+		g_map.findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false);
 		fx = (float)ix;
 		fy = (float)iy;
 		fLastFlagDirection = false;
@@ -6393,7 +6393,7 @@ void OMO_Area::placeArea()
 		if(++tries > 32)
 			break;
 
-		g_map.findspawnpoint(1, &x, &y, collisionWidth, collisionHeight, true);
+		g_map.findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, true);
 	}
 	while(objectcontainer[0].getClosestObject(x, y, object_area) <= (200.0f - ((numareas - 3) * 25.0f)));
 
@@ -6970,7 +6970,7 @@ void MO_FrenzyCard::placeCard()
 		if(++tries > 32)
 			break;
 
-		g_map.findspawnpoint(1, &x, &y, collisionWidth, collisionHeight, false);
+		g_map.findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false);
 	}
 	while(objectcontainer[1].getClosestObject(x, y, object_frenzycard) <= 150.0f);
 
@@ -7111,7 +7111,7 @@ void MO_CollectionCard::placeCard()
 		if(++tries > 32)
 			break;
 
-		g_map.findspawnpoint(1, &x, &y, collisionWidth, collisionHeight, false);
+		g_map.findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false);
 	}
 	while(objectcontainer[1].getClosestObject(x, y, object_collectioncard) <= 150.0f);
 
@@ -7369,7 +7369,7 @@ void MO_WalkingEnemy::collide(IO_MovingObject * object)
 
 void MO_WalkingEnemy::place()
 {
-	g_map.findspawnpoint(1, &ix, &iy, collisionWidth, collisionHeight, false);
+	g_map.findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false);
 	fx = (float)ix;
 	fy = (float)iy;
 }
@@ -9151,7 +9151,7 @@ void CO_Spring::draw()
 
 void CO_Spring::place()
 {
-	g_map.findspawnpoint(1, &ix, &iy, collisionWidth, collisionHeight, false);
+	g_map.findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false);
 	fx = (float)ix;
 	fy = (float)iy;
 
@@ -10383,7 +10383,7 @@ void CO_PhantoKey::placeKey()
 	relocatetimer = 0;
 	
 	short x = 0, y = 0;
-	g_map.findspawnpoint(1, &x, &y, collisionWidth, collisionHeight, false);
+	g_map.findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false);
 
 	xi(x);
 	yi(y);

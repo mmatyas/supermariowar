@@ -1109,12 +1109,13 @@ class MI_World : public UI_Control
 		short iNextMapDrawOffsetCol;
 		short iNextMapDrawOffsetRow;
 			
+		short iDrawWidth, iDrawHeight;
+		short iSrcOffsetX, iSrcOffsetY;
+		short iDstOffsetX, iDstOffsetY;
+
 		short iControllingTeam;
 		short iControllingPlayerId;
 		short iReturnDirection;
-
-		short iMessageTimer;
-		char szMessage[128];
 
 		bool fForceStageStart;
 		short iVehicleId;

@@ -531,8 +531,8 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 					else
 					{
 						tile->iID = iClassicTilesetID;
-						tile->iCol = iTileID % 32;
-						tile->iRow = iTileID / 32;
+						tile->iCol = iTileID % TILESETWIDTH;
+						tile->iRow = iTileID / TILESETWIDTH;
 					}
 				}
 
@@ -1170,15 +1170,25 @@ void CMap::loadPlatforms(FILE * mapfile, bool fPreview, int version[4], short * 
 				else
 				{
 					short iTile = ReadInt(mapfile);
-					tile->iID = g_tilesetmanager.GetClassicTilesetIndex();
-					tile->iCol = iTile % TILESETWIDTH;
-					tile->iRow = iTile / TILESETWIDTH;
+					TileType type;
 
-					TileType type = g_tilesetmanager.GetClassicTileset()->GetTileType(tile->iCol, tile->iRow);
+					if(iTile == TILESETSIZE)
+					{
+						tile->iID = TILESETNONE;
+						tile->iCol = 0;
+						tile->iRow = 0;
 
-					//if(type < 0 || type > 12)
-					//	type = tile_nonsolid;
+						type = tile_nonsolid;
+					}
+					else
+					{
+						tile->iID = g_tilesetmanager.GetClassicTilesetIndex();
+						tile->iCol = iTile % TILESETWIDTH;
+						tile->iRow = iTile / TILESETWIDTH;
 
+						type = g_tilesetmanager.GetClassicTileset()->GetTileType(tile->iCol, tile->iRow);
+					}
+	
 					types[iCol][iRow].iType = type;
 					types[iCol][iRow].iFlags = g_iTileTypeConversion[type];
 				}

@@ -5707,8 +5707,6 @@ void MI_World::Init()
 	iNextMapDrawOffsetCol = 0;
 	iNextMapDrawOffsetRow = 0;
 
-	iMessageTimer = 0;
-
 	iState = -2;
 	iTeam = -1;
 	iStateTransition = 0;
@@ -5735,6 +5733,20 @@ void MI_World::Init()
 
 	iPressSelectTimer = 0;
 	pressSelectKeys = NULL;
+
+	iDrawWidth = g_worldmap.iWidth < 20 ? g_worldmap.iWidth << 5 : 640;
+	iDrawHeight = g_worldmap.iHeight < 15 ? g_worldmap.iHeight << 5 : 480;
+
+	iSrcOffsetX = 0;
+	iSrcOffsetY = 0;
+	iDstOffsetX = 0;
+	iDstOffsetY = 0;
+
+	if(g_worldmap.iWidth < 20)
+		iDstOffsetX = (20 - g_worldmap.iWidth) << 4;
+
+	if(g_worldmap.iHeight < 15)
+		iDstOffsetY = (15 - g_worldmap.iHeight) << 4;
 }
 
 void MI_World::SetControllingTeam(short iWinningTeam)
@@ -5748,6 +5760,7 @@ void MI_World::SetControllingTeam(short iWinningTeam)
 
 void MI_World::DisplayTeamControlAnnouncement()
 {
+	char szMessage[128];
 	if(game_values.teamcounts[iControllingTeam] <= 1)
 		sprintf(szMessage, "Player %d Is In Control", game_values.teamids[iControllingTeam][0] + 1);
 	else
@@ -6026,11 +6039,6 @@ void MI_World::RepositionMapImage()
 
 	iNextMapDrawOffsetCol = iMapDrawOffsetCol;
 	iNextMapDrawOffsetRow = iMapDrawOffsetRow;
-
-	//TODO:: Don't draw so much on this refresh (entire image can be moved over and just a single
-	//       row or column can be drawn
-	//if(iOldOffsetCol != iMapDrawOffsetCol || iOldOffsetRow != iMapDrawOffsetRow)
-	//	UpdateMapSurface(true);
 }
 
 
@@ -6041,35 +6049,22 @@ void MI_World::Draw()
 
 	short iPlayerX, iPlayerY;
 	g_worldmap.GetPlayerPosition(&iPlayerX, &iPlayerY);
-
-	rectSrcSurface.x = 0;
-	rectSrcSurface.y = 0;
 	
-	if(g_worldmap.iWidth > 24)
-		rectSrcSurface.w = 768;
-	else
-		rectSrcSurface.w = g_worldmap.iWidth * TILESIZE;
+	if(g_worldmap.iWidth > 20)
+		iSrcOffsetX = -iMapOffsetX - (iMapDrawOffsetCol << 5);
 
-	if(g_worldmap.iHeight > 19)
-		rectSrcSurface.h = 608;
-	else
-		rectSrcSurface.h = g_worldmap.iHeight * TILESIZE;
+	if(g_worldmap.iHeight > 15)
+		iSrcOffsetY = -iMapOffsetY - (iMapDrawOffsetRow << 5);
 
-	rectDstSurface.x = iMapOffsetX + (iMapDrawOffsetCol << 5);
-	rectDstSurface.y = iMapOffsetY + (iMapDrawOffsetRow << 5);
-	
+	gfx_setrect(&rectSrcSurface, iSrcOffsetX, iSrcOffsetY, iDrawWidth, iDrawHeight);
+	gfx_setrect(&rectDstSurface, iDstOffsetX, iDstOffsetY, iDrawWidth, iDrawHeight);
+
 	SDL_BlitSurface(sMapSurface[iCurrentSurfaceIndex], &rectSrcSurface, blitdest, &rectDstSurface);
 
 	g_worldmap.Draw(iMapOffsetX, iMapOffsetY, iState != -2 && iState < 4 && !fUsingCloud, iSleepTurns > 0);
 
 	if(fUsingCloud && iState != -2 && iState < 4)
 		spr_worlditems.draw(iPlayerX + iMapOffsetX, iPlayerY + iMapOffsetY, 32, 0, 32, 32);
-
-	if(iMessageTimer > 0)
-	{
-		iMessageTimer--;
-		menu_font_large.drawCentered(320, 64, szMessage);
-	}
 
 	//If a points modifier is in place, display it
 	if(game_values.worldpointsbonus >= 0)
