@@ -2822,9 +2822,9 @@ void MI_MapField::LoadMap(const char * szMapPath)
 	LoadMapHazards(true);
 }
 
-void MI_MapField::SetMap(const char * szMapName)
+void MI_MapField::SetMap(const char * szMapName, bool fWorld)
 {
-	maplist.findexact(szMapName);
+	maplist.findexact(szMapName, fWorld);
 	LoadCurrentMap();
 }
 
@@ -3610,7 +3610,7 @@ void MI_TourStop::Refresh(short iTourStop)
 		if(tourstop->iMode == game_mode_pipe_minigame)
 			miMapField->SetSpecialMap("Pipe Minigame Map", "maps/special/minigamepipe.map");
 		else
-			miMapField->SetMap(tourstop->pszMapFile);
+			miMapField->SetMap(tourstop->pszMapFile, true);
 
 		miTourStopMenuHeaderText->SetText(tourstop->szName);
 

@@ -196,7 +196,6 @@ void IO_MovingObject::flipsidesifneeded() {}
 void IO_MovingObject::KillObjectMapHazard() {}
 float CapFallingVelocity(float f) {return 0.0f;}
 void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead) {}
-gfxSprite		spr_thumbnail_platformarrows;
 gfxSprite		spr_thumbnail_warps[2];
 gfxSprite		spr_thumbnail_mapitems[2];
 gfxSprite		spr_awardsouls, spr_fireballexplosion;
@@ -608,18 +607,14 @@ TileType CalculateTileType(short x, short y)
 	return type;
 }
 
-void UpdateTileType(short x, short y, short layer, TileType type)
+void UpdateTileType(short x, short y)
 {
-	//If -1 is passed in for layer, then just update the entire tile
-	if(layer == -1)
-	{
-		g_map.mapdatatop[x][y].iType = CalculateTileType(x, y);
-	}
-	else
-	{
-		TileType calculatedType = CalculateTileType(x, y);
-		TileType currentType = g_map.mapdatatop[x][y].iType;		
-	}
+	g_map.mapdatatop[x][y].iType = CalculateTileType(x, y);
+}
+
+bool TileTypeIsModified(short x, short y)
+{
+	return g_map.mapdatatop[x][y].iType != CalculateTileType(x, y);
 }
 
 void AdjustMapItems(short iClickX, short iClickY)
@@ -1048,9 +1043,12 @@ int editor_edit()
 
 									if(iLocalX >= 0 && iLocalX < MAPWIDTH && iLocalY >= 0 && iLocalY < MAPHEIGHT)
 									{
+										bool fNeedUpdate = !TileTypeIsModified(iLocalX, iLocalY);
 										SetTilesetTile(&g_map.mapdata[iLocalX][iLocalY][selected_layer], set_tile_tileset, set_tile_start_x + i, set_tile_start_y + j);
 										
-										UpdateTileType(iLocalX, iLocalY, -1, tile_nonsolid);
+										if(fNeedUpdate)
+											UpdateTileType(iLocalX, iLocalY);
+
 										AdjustMapItems(iLocalX, iLocalY);
 									}
 								}
@@ -1174,8 +1172,11 @@ int editor_edit()
 							g_map.objectdata[iClickX][iClickY].iType = -1;
 						else if(edit_mode == 1 || edit_mode == 8)
 						{
+							bool fNeedUpdate = !TileTypeIsModified(iClickX, iClickY);
 							g_map.mapdata[iClickX][iClickY][selected_layer].iID = TILESETNONE;
-							UpdateTileType(iClickX, iClickY, -1, tile_nonsolid);
+							
+							if(fNeedUpdate)
+								UpdateTileType(iClickX, iClickY);
 						}
 						else if(edit_mode == 2)
 						{
@@ -1260,9 +1261,13 @@ int editor_edit()
 
 									if(iLocalX >= 0 && iLocalX < MAPWIDTH && iLocalY >= 0 && iLocalY < MAPHEIGHT)
 									{
+										bool fNeedUpdate = !TileTypeIsModified(iLocalX, iLocalY);
+
 										SetTilesetTile(&g_map.mapdata[iLocalX][iLocalY][selected_layer], set_tile_tileset, set_tile_start_x + i, set_tile_start_y + j);
 
-										UpdateTileType(iLocalX, iLocalY, -1, tile_nonsolid);
+										if(fNeedUpdate)
+											UpdateTileType(iLocalX, iLocalY);
+
 										AdjustMapItems(iLocalY, iLocalY);
 									}
 								}
@@ -1317,8 +1322,11 @@ int editor_edit()
 							g_map.objectdata[iClickX][iClickY].iType = -1;
 						else if(edit_mode == 1 || edit_mode == 8)
 						{
+							bool fNeedUpdate = !TileTypeIsModified(iClickX, iClickY);
 							g_map.mapdata[iClickX][iClickY][selected_layer].iID = TILESETNONE;
-							UpdateTileType(iClickX, iClickY, -1, tile_nonsolid);
+							
+							if(fNeedUpdate)
+								UpdateTileType(iClickX, iClickY);
 						}
 						else if(edit_mode == 2)
 						{
@@ -1713,7 +1721,7 @@ void drawmap(bool fScreenshot, short iBlockSize)
 					else if(blocktype >= 7 && blocktype <= 10)//On/Off Blocks
 					{
 						rSrc.x = blocktype * iBlockSize;
-						rSrc.y = iBlockSize * g_map.iSwitches[(blocktype - 7) % 4];
+						rSrc.y = iBlockSize * (1 - g_map.iSwitches[(blocktype - 7) % 4]);
 					}
 					else if(blocktype >= 11 && blocktype <= 14) //Switched Blocks
 					{
@@ -5344,7 +5352,7 @@ void clearselectedmaptiles()
 					RemoveMapItemAt(j, k);
 				}
 
-				UpdateTileType(j, k, -1, tile_nonsolid);
+				UpdateTileType(j, k);
 			}
 		}
 	}
@@ -5439,7 +5447,7 @@ void pasteselectedtiles(int movex, int movey)
 						if(move_replace)
 							g_map.mapdatatop[iNewX][iNewY].iType = copiedtiles[j][k].tiletype;
 						else
-							UpdateTileType(j, k, -1, tile_nonsolid);
+							UpdateTileType(j, k);
 						
 						for(short iType = 0; iType < NUMSPAWNAREATYPES; iType++)
 							g_map.nospawn[iType][iNewX][iNewY] = copiedtiles[j][k].nospawn[iType];

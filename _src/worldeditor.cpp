@@ -102,7 +102,6 @@ gfxSprite		spr_platformstarttile;
 gfxSprite		spr_platformendtile;
 gfxSprite		spr_platformpath;
 
-gfxSprite		spr_thumbnail_platformarrows;
 gfxSprite		spr_thumbnail_warps[2];
 gfxSprite		spr_thumbnail_mapitems[2];
 gfxSprite		spr_awardsouls, spr_fireballexplosion;
@@ -148,14 +147,17 @@ int display_help();
 
 void drawmap(bool fScreenshot, short iBlockSize);
 
-void UpdateForeground(short iCol, short iRow);
+bool UpdateForeground(short iCol, short iRow);
 void UpdatePath(short iCol, short iRow);
 void AutoSetPath(short iCol, short iRow);
-void UpdateCoastline(short iCol, short iRow);
-void AutoSetTile(short iCol, short iRow);
+bool UpdateCoastline(short iCol, short iRow);
+bool AutoSetTile(short iCol, short iRow);
 void UpdatePathSprite(short iCol, short iRow);
 void AutoSetPathSprite(short iCol, short iRow);
 short AdjustForeground(short iSprite, short iCol, short iRow);
+
+void GetForegroundTileValues(short iCol, short iRow, short iOldTiles[9]);
+bool ForegroundTileValuesChanged(short iCol, short iRow, short iOldTiles[9]);
 
 void ReadVehiclesIntoEditor();
 void WriteVehiclesIntoWorld();
@@ -562,13 +564,20 @@ int editor_edit()
 							{
 								if(g_worldmap.tiles[iCol][iRow].iBackgroundSprite != set_tile || fAutoPaint)
 								{
-									g_worldmap.tiles[iCol][iRow].iBackgroundSprite = set_tile;
-									UpdateForeground(iCol, iRow);
+									bool fNeedUpdate = false;
+									if(g_worldmap.tiles[iCol][iRow].iBackgroundSprite != set_tile)
+									{
+										g_worldmap.tiles[iCol][iRow].iBackgroundSprite = set_tile;
+										fNeedUpdate = true;
+									}
+
+									fNeedUpdate |= UpdateForeground(iCol, iRow);
 
 									if((set_tile % WORLD_BACKGROUND_SPRITE_SET_SIZE) < 2 && fAutoPaint)
-										UpdateCoastline(iCol, iRow);								
+										fNeedUpdate |= UpdateCoastline(iCol, iRow);								
 
-									updateworldsurface();
+									if(fNeedUpdate)
+										updateworldsurface();
 								}
 							}
 							else if(edit_mode == 1) //selected foreground
@@ -593,28 +602,51 @@ int editor_edit()
 							{
 								if(set_tile <= 1)
 								{
-									g_worldmap.tiles[iCol][iRow].iType = 1;
-									g_worldmap.tiles[iCol][iRow].iForegroundSprite = set_tile + WORLD_START_SPRITE_OFFSET;
+									if(g_worldmap.tiles[iCol][iRow].iForegroundSprite != set_tile + WORLD_START_SPRITE_OFFSET)
+									{
+										g_worldmap.tiles[iCol][iRow].iType = 1;
+										g_worldmap.tiles[iCol][iRow].iForegroundSprite = set_tile + WORLD_START_SPRITE_OFFSET;
+										updateworldsurface();
+									}
+								}
+								else if(set_tile <= 5)
+								{
+									if(g_worldmap.tiles[iCol][iRow].iType != set_tile)
+									{
+										g_worldmap.tiles[iCol][iRow].iType = set_tile;
+										updateworldsurface();
+									}
 								}
 								else
 								{
 									g_worldmap.tiles[iCol][iRow].iType = set_tile;
 								}
-
-								updateworldsurface();
 							}
 							else if(edit_mode == 4) //selected foreground
 							{
 								short iAdjustedTile = AdjustForeground(set_tile, iCol, iRow);
-								if(g_worldmap.tiles[iCol][iRow].iForegroundSprite != iAdjustedTile || fAutoPaint)
+								bool fNeedUpdate = false;
+	
+								if(!fAutoPaint && g_worldmap.tiles[iCol][iRow].iForegroundSprite != iAdjustedTile)
 								{
 									g_worldmap.tiles[iCol][iRow].iForegroundSprite = iAdjustedTile;
-
-									if(fAutoPaint)
-										UpdatePathSprite(iCol, iRow);
-
-									updateworldsurface();
+									fNeedUpdate = true;
 								}
+
+								//Detect if there was a change so we can repaint the screen
+								if(fAutoPaint)
+								{
+									short iOldTiles[9];
+									GetForegroundTileValues(iCol, iRow, iOldTiles);
+									g_worldmap.tiles[iCol][iRow].iForegroundSprite = iAdjustedTile;
+									UpdatePathSprite(iCol, iRow);
+
+									if(ForegroundTileValuesChanged(iCol, iRow, iOldTiles))
+										fNeedUpdate = true;
+								}
+
+								if(fNeedUpdate)
+									updateworldsurface();
 							}
 							else if(edit_mode == 5) //selected vehicle
 							{
@@ -643,13 +675,21 @@ int editor_edit()
 							{
 								if(g_worldmap.tiles[iCol][iRow].iBackgroundSprite != 0 || fAutoPaint)
 								{
-									g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 0;
-									UpdateForeground(iCol, iRow);
+									bool fNeedUpdate = false;
+
+									if(g_worldmap.tiles[iCol][iRow].iBackgroundSprite != 0)
+									{
+										g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 0;
+										fNeedUpdate = true;
+									}
+
+									fNeedUpdate |= UpdateForeground(iCol, iRow);
 
 									if(fAutoPaint)
-										UpdateCoastline(iCol, iRow);
+										fNeedUpdate |= UpdateCoastline(iCol, iRow);
 									
-									updateworldsurface();
+									if(fNeedUpdate)
+										updateworldsurface();
 								}
 							}
 							else if(edit_mode == 1)
@@ -670,22 +710,46 @@ int editor_edit()
 							else if(edit_mode == 3) //selected start/door/stage
 							{
 								if(g_worldmap.tiles[iCol][iRow].iType == 1)
+								{
 									g_worldmap.tiles[iCol][iRow].iForegroundSprite = 0;
-
+									updateworldsurface();
+								}
+								else if(set_tile <= 5)
+								{
+									if(g_worldmap.tiles[iCol][iRow].iType != 0)
+									{
+										g_worldmap.tiles[iCol][iRow].iType = 0;
+										updateworldsurface();
+									}
+								}
+								
 								g_worldmap.tiles[iCol][iRow].iType = 0;
-								updateworldsurface();
 							}
 							else if(edit_mode == 4)
 							{
-								if(g_worldmap.tiles[iCol][iRow].iForegroundSprite != 0 || fAutoPaint)
+								short iAdjustedTile = AdjustForeground(set_tile, iCol, iRow);
+								bool fNeedUpdate = false;
+	
+								if(!fAutoPaint && g_worldmap.tiles[iCol][iRow].iForegroundSprite != 0)
 								{
 									g_worldmap.tiles[iCol][iRow].iForegroundSprite = 0;
-
-									if(fAutoPaint)
-										UpdatePathSprite(iCol, iRow);								
-
-									updateworldsurface();
+									fNeedUpdate = true;
 								}
+
+								//Detect if there was a change so we can repaint the screen
+								if(fAutoPaint)
+								{
+									short iOldTiles[9];
+									GetForegroundTileValues(iCol, iRow, iOldTiles);
+									g_worldmap.tiles[iCol][iRow].iForegroundSprite = 0;
+									UpdatePathSprite(iCol, iRow);
+
+									if(ForegroundTileValuesChanged(iCol, iRow, iOldTiles))
+										fNeedUpdate = true;
+								}
+
+								if(fNeedUpdate)
+									updateworldsurface();
 							}
 							else if(edit_mode == 5)
 							{
@@ -728,13 +792,20 @@ int editor_edit()
 							{
 								if(g_worldmap.tiles[iCol][iRow].iBackgroundSprite != set_tile || fAutoPaint)
 								{
-									g_worldmap.tiles[iCol][iRow].iBackgroundSprite = set_tile;
-									UpdateForeground(iCol, iRow);
+									bool fNeedUpdate = false;
+									if(g_worldmap.tiles[iCol][iRow].iBackgroundSprite != set_tile)
+									{
+										g_worldmap.tiles[iCol][iRow].iBackgroundSprite = set_tile;
+										fNeedUpdate = true;
+									}
+
+									fNeedUpdate |= UpdateForeground(iCol, iRow);
 
 									if((set_tile % WORLD_BACKGROUND_SPRITE_SET_SIZE) < 2 && fAutoPaint)
-										UpdateCoastline(iCol, iRow);								
+										fNeedUpdate |= UpdateCoastline(iCol, iRow);								
 
-									updateworldsurface();
+									if(fNeedUpdate)
+										updateworldsurface();
 								}
 							}
 							else if(edit_mode == 1)
@@ -756,28 +827,51 @@ int editor_edit()
 							{
 								if(set_tile <= 1)
 								{
-									g_worldmap.tiles[iCol][iRow].iType = 1;
-									g_worldmap.tiles[iCol][iRow].iForegroundSprite = set_tile + WORLD_START_SPRITE_OFFSET;
+									if(g_worldmap.tiles[iCol][iRow].iForegroundSprite != set_tile + WORLD_START_SPRITE_OFFSET)
+									{
+										g_worldmap.tiles[iCol][iRow].iType = 1;
+										g_worldmap.tiles[iCol][iRow].iForegroundSprite = set_tile + WORLD_START_SPRITE_OFFSET;
+										updateworldsurface();
+									}
+								}
+								else if(set_tile <= 5)
+								{
+									if(g_worldmap.tiles[iCol][iRow].iType != set_tile)
+									{
+										g_worldmap.tiles[iCol][iRow].iType = set_tile;
+										updateworldsurface();
+									}
 								}
 								else
 								{
 									g_worldmap.tiles[iCol][iRow].iType = set_tile;
 								}
-
-								updateworldsurface();
 							}
 							else if(edit_mode == 4)
 							{
 								short iAdjustedTile = AdjustForeground(set_tile, iCol, iRow);
-								if(g_worldmap.tiles[iCol][iRow].iForegroundSprite != iAdjustedTile || fAutoPaint)
+								bool fNeedUpdate = false;
+	
+								if(!fAutoPaint && g_worldmap.tiles[iCol][iRow].iForegroundSprite != iAdjustedTile)
 								{
 									g_worldmap.tiles[iCol][iRow].iForegroundSprite = iAdjustedTile;
-
-									if(fAutoPaint)
-										UpdatePathSprite(iCol, iRow);								
-
-									updateworldsurface();
+									fNeedUpdate = true;
 								}
+
+								//Detect if there was a change so we can repaint the screen
+								if(fAutoPaint)
+								{
+									short iOldTiles[9];
+									GetForegroundTileValues(iCol, iRow, iOldTiles);
+									g_worldmap.tiles[iCol][iRow].iForegroundSprite = iAdjustedTile;
+									UpdatePathSprite(iCol, iRow);
+
+									if(ForegroundTileValuesChanged(iCol, iRow, iOldTiles))
+										fNeedUpdate = true;
+								}
+
+								if(fNeedUpdate)
+									updateworldsurface();
 							}
 							else if(edit_mode == 5)
 							{
@@ -802,13 +896,20 @@ int editor_edit()
 							{
 								if(g_worldmap.tiles[iCol][iRow].iBackgroundSprite != 0 || fAutoPaint)
 								{
-									g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 0;
-									UpdateForeground(iCol, iRow);
+									bool fNeedUpdate = false;
+									if(g_worldmap.tiles[iCol][iRow].iBackgroundSprite != 0)
+									{
+										g_worldmap.tiles[iCol][iRow].iBackgroundSprite = 0;
+										fNeedUpdate = true;
+									}
+
+									fNeedUpdate |= UpdateForeground(iCol, iRow);
 
 									if(fAutoPaint)
-										UpdateCoastline(iCol, iRow);
+										fNeedUpdate |= UpdateCoastline(iCol, iRow);
 
-									updateworldsurface();
+									if(fNeedUpdate)
+										updateworldsurface();
 								}
 							}
 							else if(edit_mode == 1)
@@ -829,22 +930,46 @@ int editor_edit()
 							else if(edit_mode == 3)
 							{
 								if(g_worldmap.tiles[iCol][iRow].iType == 1)
+								{
 									g_worldmap.tiles[iCol][iRow].iForegroundSprite = 0;
+									updateworldsurface();
+								}
+								else if(set_tile <= 5)
+								{
+									if(g_worldmap.tiles[iCol][iRow].iType != 0)
+									{
+										g_worldmap.tiles[iCol][iRow].iType = 0;
+										updateworldsurface();
+									}
+								}
 
 								g_worldmap.tiles[iCol][iRow].iType = 0;
-								updateworldsurface();
 							}
 							else if(edit_mode == 4)
 							{
-								if(g_worldmap.tiles[iCol][iRow].iForegroundSprite != 0 || fAutoPaint)
+								short iAdjustedTile = AdjustForeground(set_tile, iCol, iRow);
+								bool fNeedUpdate = false;
+	
+								if(!fAutoPaint && g_worldmap.tiles[iCol][iRow].iForegroundSprite != 0)
 								{
 									g_worldmap.tiles[iCol][iRow].iForegroundSprite = 0;
-
-									if(fAutoPaint)
-										UpdatePathSprite(iCol, iRow);								
-
-									updateworldsurface();
+									fNeedUpdate = true;
 								}
+
+								//Detect if there was a change so we can repaint the screen
+								if(fAutoPaint)
+								{
+									short iOldTiles[9];
+									GetForegroundTileValues(iCol, iRow, iOldTiles);
+									g_worldmap.tiles[iCol][iRow].iForegroundSprite = 0;
+									UpdatePathSprite(iCol, iRow);
+
+									if(ForegroundTileValuesChanged(iCol, iRow, iOldTiles))
+										fNeedUpdate = true;
+								}
+
+								if(fNeedUpdate)
+									updateworldsurface();
 							}
 							else if(edit_mode == 5) //vehicles
 							{
@@ -1062,6 +1187,42 @@ int editor_edit()
 	}
 
 	return EDITOR_QUIT;
+}
+
+void GetForegroundTileValues(short iCol, short iRow, short iOldTiles[9])
+{
+	short iIndex = 0;
+	for(short iAutoRow = iRow - 1; iAutoRow <= iRow + 1; iAutoRow++)
+	{
+		for(short iAutoCol = iCol - 1; iAutoCol <= iCol + 1; iAutoCol++)
+		{
+			if(iAutoRow >= 0 && iAutoRow < iWorldHeight && iAutoCol >= 0 && iAutoCol < iWorldWidth)
+			{
+				iOldTiles[iIndex++] = g_worldmap.tiles[iAutoCol][iAutoRow].iForegroundSprite;
+			}
+		}
+	}
+
+	for(short i = iIndex; i < 9; i++)
+		iOldTiles[i] = 0;
+}
+
+bool ForegroundTileValuesChanged(short iCol, short iRow, short iOldTiles[9])
+{
+	short iIndex = 0;
+	for(short iAutoRow = iRow - 1; iAutoRow <= iRow + 1; iAutoRow++)
+	{
+		for(short iAutoCol = iCol - 1; iAutoCol <= iCol + 1; iAutoCol++)
+		{
+			if(iAutoRow >= 0 && iAutoRow < iWorldHeight && iAutoCol >= 0 && iAutoCol < iWorldWidth)
+			{
+				if(g_worldmap.tiles[iAutoCol][iAutoRow].iForegroundSprite != iOldTiles[iIndex++])
+					return true;
+			}
+		}
+	}
+
+	return false;
 }
 
 void ReadVehiclesIntoEditor()
@@ -1502,12 +1663,20 @@ void AutoSetPath(short iCol, short iRow)
 	g_worldmap.tiles[iCol][iRow].iConnectionType = iPathType;
 }
 
-void UpdateForeground(short iCol, short iRow)
+bool UpdateForeground(short iCol, short iRow)
 {
-	g_worldmap.tiles[iCol][iRow].iForegroundSprite = AdjustForeground(g_worldmap.tiles[iCol][iRow].iForegroundSprite, iCol, iRow);
+	short iNewForeground = AdjustForeground(g_worldmap.tiles[iCol][iRow].iForegroundSprite, iCol, iRow);
+
+	if(g_worldmap.tiles[iCol][iRow].iForegroundSprite != iNewForeground)
+	{
+		g_worldmap.tiles[iCol][iRow].iForegroundSprite = iNewForeground;
+		return true;
+	}
+
+	return false;
 }
 
-void UpdateCoastline(short iCol, short iRow)
+bool UpdateCoastline(short iCol, short iRow)
 {
 	short iStartCol = iCol == 0 ? 0 : iCol - 1;
 	short iEndCol = iCol == iWorldWidth - 1 ? iWorldWidth - 1 : iCol + 1;
@@ -1515,21 +1684,24 @@ void UpdateCoastline(short iCol, short iRow)
 	short iStartRow = iRow == 0 ? 0 : iRow - 1;
 	short iEndRow = iRow == iWorldHeight - 1 ? iWorldHeight - 1 : iRow + 1;
 
+	bool fRet = false;
 	for(short iAutoRow = iStartRow; iAutoRow <= iEndRow; iAutoRow++)
 	{
 		for(short iAutoCol = iStartCol; iAutoCol <= iEndCol; iAutoCol++)
 		{
-			AutoSetTile(iAutoCol, iAutoRow);
-			UpdateForeground(iAutoCol, iAutoRow);
+			fRet |= AutoSetTile(iAutoCol, iAutoRow);
+			fRet |= UpdateForeground(iAutoCol, iAutoRow);
 		}
 	}	
+
+	return fRet;
 }
 
-void AutoSetTile(short iCol, short iRow)
+bool AutoSetTile(short iCol, short iRow)
 {
 	//Don't need to do anything if this tile is solid
 	if(g_worldmap.tiles[iCol][iRow].iBackgroundSprite % WORLD_BACKGROUND_SPRITE_SET_SIZE == 1)
-		return;
+		return false;
 
 	bool iTile[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 	short iNeighborIndex = 0;
@@ -1569,194 +1741,203 @@ void AutoSetTile(short iCol, short iRow)
 		}
 	}
 
+	short iNewTile = 0;
 	if(iTile[0] && !iTile[1] && iTile[2] && !iTile[3] && !iTile[4] && iTile[5] && !iTile[6] && iTile[7])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 44;
+		iNewTile = iTileStyleOffset + 44;
 	}
 	else if(iTile[0] && !iTile[1] && !iTile[3] && iTile[4] && iTile[5] && !iTile[6])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 30;
+		iNewTile = iTileStyleOffset + 30;
 	}
 	else if(!iTile[1] && iTile[2] && iTile[3] && !iTile[4] && !iTile[6] && iTile[7])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 31;
+		iNewTile = iTileStyleOffset + 31;
 	}
 	else if(iTile[1] && !iTile[3] && !iTile[4] && iTile[5] && !iTile[6] && iTile[7])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 32;
+		iNewTile = iTileStyleOffset + 32;
 	}
 	else if(iTile[0] && !iTile[1] && iTile[2] && !iTile[3] && !iTile[4] && iTile[6])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 33;
+		iNewTile = iTileStyleOffset + 33;
 	}
 	else if(!iTile[1] && iTile[2] && iTile[3] && !iTile[4] && iTile[6])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 34;
+		iNewTile = iTileStyleOffset + 34;
 	}
 	else if(iTile[0] && !iTile[1] && !iTile[3] && iTile[4] && iTile[6])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 35;
+		iNewTile = iTileStyleOffset + 35;
 	}
 	else if(iTile[1] && !iTile[3] && iTile[4] && iTile[5] && !iTile[6])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 36;
+		iNewTile = iTileStyleOffset + 36;
 	}
 	else if(iTile[1] && iTile[3] && !iTile[4] && !iTile[6] && iTile[7])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 37;
+		iNewTile = iTileStyleOffset + 37;
 	}
 	else if(iTile[0] && !iTile[1] && iTile[2] && !iTile[4] && iTile[7])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 45;
+		iNewTile = iTileStyleOffset + 45;
 	}
 	else if(iTile[2] && !iTile[4] && iTile[5] && !iTile[6] && iTile[7])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 46;
+		iNewTile = iTileStyleOffset + 46;
 	}
 	else if(iTile[0] && !iTile[3] && iTile[5] && !iTile[6] && iTile[7])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 47;
+		iNewTile = iTileStyleOffset + 47;
 	}
 	else if(iTile[0] && !iTile[1] && iTile[2] && !iTile[3] && iTile[5])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 48;
+		iNewTile = iTileStyleOffset + 48;
 	}
 	else if(iTile[1] && iTile[3] && iTile[4] && iTile[6])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 28;
+		iNewTile = iTileStyleOffset + 28;
 	}
 	else if(iTile[1] && !iTile[3] && iTile[4] && iTile[6])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 38;
+		iNewTile = iTileStyleOffset + 38;
 	}
 	else if(iTile[1] && iTile[3] && !iTile[4] && iTile[6])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 39;
+		iNewTile = iTileStyleOffset + 39;
 	}
 	else if(iTile[1] && iTile[3] && iTile[4] && !iTile[6])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 40;
+		iNewTile = iTileStyleOffset + 40;
 	}
 	else if(!iTile[1] && iTile[3] && iTile[4] && iTile[6])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 41;
+		iNewTile = iTileStyleOffset + 41;
 	}
 	else if(!iTile[1] && iTile[3] && iTile[4] && !iTile[6])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 42;
+		iNewTile = iTileStyleOffset + 42;
 	}
 	else if(iTile[1] && !iTile[3] && !iTile[4] && iTile[6])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 43;
+		iNewTile = iTileStyleOffset + 43;
 	}
 	else if(iTile[0] && !iTile[1] && iTile[4])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 16;
+		iNewTile = iTileStyleOffset + 16;
 	}
 	else if(iTile[4] && iTile[5] && !iTile[6])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 17;
+		iNewTile = iTileStyleOffset + 17;
 	}
 	else if(iTile[3] && !iTile[6] && iTile[7])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 18;
+		iNewTile = iTileStyleOffset + 18;
 	}
 	else if(!iTile[1] && iTile[2] && iTile[3])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 19;
+		iNewTile = iTileStyleOffset + 19;
 	}
 	else if(iTile[1] && !iTile[4] && iTile[7])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 20;
+		iNewTile = iTileStyleOffset + 20;
 	}
 	else if(iTile[2] && !iTile[4] && iTile[6])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 21;
+		iNewTile = iTileStyleOffset + 21;
 	}
 	else if(iTile[0] && !iTile[3] && iTile[6])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 22;
+		iNewTile = iTileStyleOffset + 22;
 	}
 	else if(iTile[1] && !iTile[3] && iTile[5])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 23;
+		iNewTile = iTileStyleOffset + 23;
 	}
 	else if(iTile[0] && !iTile[1] && iTile[2])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 6;
+		iNewTile = iTileStyleOffset + 6;
 	}
 	else if(iTile[5] && !iTile[6] && iTile[7])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 7;
+		iNewTile = iTileStyleOffset + 7;
 	}
 	else if(iTile[0] && !iTile[3] && iTile[5])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 8;
+		iNewTile = iTileStyleOffset + 8;
 	}
 	else if(iTile[2] && !iTile[4] && iTile[7])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 9;
+		iNewTile = iTileStyleOffset + 9;
 	}
 	else if(iTile[1] && iTile[4])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 24;
+		iNewTile = iTileStyleOffset + 24;
 	}
 	else if(iTile[4] && iTile[6])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 25;
+		iNewTile = iTileStyleOffset + 25;
 	}
 	else if(iTile[3] && iTile[6])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 26;
+		iNewTile = iTileStyleOffset + 26;
 	}
 	else if(iTile[1] && iTile[3])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 27;
+		iNewTile = iTileStyleOffset + 27;
 	}
 	else if(iTile[2] && iTile[5])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 10;
+		iNewTile = iTileStyleOffset + 10;
 	}
 	else if(iTile[0] && iTile[7])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 11;
+		iNewTile = iTileStyleOffset + 11;
 	}
 	else if(iTile[1])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 12;
+		iNewTile = iTileStyleOffset + 12;
 	}
 	else if(iTile[6])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 13;
+		iNewTile = iTileStyleOffset + 13;
 	}
 	else if(iTile[3])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 14;
+		iNewTile = iTileStyleOffset + 14;
 	}
 	else if(iTile[4])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 15;
+		iNewTile = iTileStyleOffset + 15;
 	}
 	else if(iTile[2])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 2;
+		iNewTile = iTileStyleOffset + 2;
 	}
 	else if(iTile[0])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 3;
+		iNewTile = iTileStyleOffset + 3;
 	}
 	else if(iTile[5])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 4;
+		iNewTile = iTileStyleOffset + 4;
 	}
 	else if(iTile[7])
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 5;
+		iNewTile = iTileStyleOffset + 5;
 	}
 	else
 	{
-		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iTileStyleOffset + 0;
+		iNewTile = iTileStyleOffset + 0;
 	}
+
+	if(g_worldmap.tiles[iCol][iRow].iBackgroundSprite != iNewTile)
+	{
+		g_worldmap.tiles[iCol][iRow].iBackgroundSprite = iNewTile;
+		return true;
+	}
+
+	return false;
 }
 
 void updateworldsurface()
@@ -1997,10 +2178,12 @@ int editor_type()
 						short iButtonX = event.button.x / TILESIZE;
 						short iButtonY = event.button.y / TILESIZE;
 
+						//Start and doors
 						if(iButtonX >= 0 && iButtonX <= 5 && iButtonY == 0)
 						{
 							set_tile = iButtonX;
 						}
+						//Stages
 						else if(iButtonX >= 0 && iButtonX < g_worldmap.iNumStages - ((iButtonY - 1) * 20) && iButtonY >= 1 && iButtonY <= (g_worldmap.iNumStages - 1) / 20 + 1)
 						{
 							set_tile = iButtonX + (iButtonY - 1) * 20 + 6;

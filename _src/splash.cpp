@@ -88,22 +88,30 @@ bool LoadMenuGraphics()
 	gfx_loadimage(&spr_tournament_powerup_splash, convertPath("gfx/packs/menu/tournament_powerup_splash.png", graphicspack), false);
 	gfx_loadimage(&spr_player_select_background, convertPath("gfx/packs/menu/player_select_background.png", graphicspack), false);
 	gfx_loadimage(&spr_player_select_ready, convertPath("gfx/packs/menu/player_select_ready.png", graphicspack), false);
-	gfx_loadimage(&spr_ipfield, convertPath("gfx/packs/menu/menu_ipfield.png", graphicspack), false);
+	//gfx_loadimage(&spr_ipfield, convertPath("gfx/packs/menu/menu_ipfield.png", graphicspack), false);
 	gfx_loadimage(&spr_selectfield, convertPath("gfx/packs/menu/menu_selectfield.png", graphicspack), false);
 	gfx_loadimage(&spr_selectfielddisabled, convertPath("gfx/packs/menu/menu_selectfield_disabled.png", graphicspack), false);
 	gfx_loadimage(&spr_map_filter_icons, convertPath("gfx/packs/menu/menu_map_flags.png", graphicspack), false);
 	gfx_loadimage(&spr_tour_markers, convertPath("gfx/packs/menu/tour_markers.png", graphicspack), false); 
 	gfx_loadimage(&spr_menu_boxed_numbers, convertPath("gfx/packs/menu/menu_boxed_numbers.png", graphicspack), false);
-	gfx_loadimage(&spr_thumbnail_platformarrows, convertPath("gfx/packs/menu/menu_platform_arrows.png", graphicspack), 128, false);
 	gfx_loadimage(&spr_thumbnail_warps[0], convertPath("gfx/packs/menu/menu_warp_preview.png", graphicspack), false);
 	gfx_loadimage(&spr_thumbnail_warps[1], convertPath("gfx/packs/menu/menu_warp_thumbnail.png", graphicspack), false);
 	gfx_loadimage(&spr_thumbnail_mapitems[0], convertPath("gfx/packs/menu/menu_mapitems_preview.png", graphicspack), false);
 	gfx_loadimage(&spr_thumbnail_mapitems[1], convertPath("gfx/packs/menu/menu_mapitems_thumbnail.png", graphicspack), false);
 
+	gfx_loadimage(&spr_announcementicons, convertPath("gfx/packs/menu/menu_announcement_icons.png", graphicspack), false);
+
 	gfx_loadimage(&spr_platformstarttile, convertPath("gfx/leveleditor/leveleditor_platformstarttile.png"), 64, true);
 	gfx_loadimage(&spr_platformendtile, convertPath("gfx/leveleditor/leveleditor_selectedtile.png"), 64, true);
 	gfx_loadimage(&spr_platformpath, convertPath("gfx/leveleditor/leveleditor_platform_path.png"), 128, true);
 	
+	return true;
+}
+
+bool LoadWorldGraphics()
+{
+	const char * graphicspack = worldgraphicspacklist.current_name();
+
 	gfx_loadimage(&spr_worldbackground[0], convertPath("gfx/packs/world/world_background.png", graphicspack), false);
 	gfx_loadimage(&spr_worldbackground[1], convertPath("gfx/packs/world/preview/world_background.png", graphicspack), false);
 
@@ -124,8 +132,6 @@ bool LoadMenuGraphics()
 	gfx_loadimage(&spr_worlditemssmall, convertPath("gfx/packs/world/world_powerupssmall.png", graphicspack), false);
 	gfx_loadimage(&spr_worlditemsplace, convertPath("gfx/packs/world/world_bonusplace.png", graphicspack), false);
 	gfx_loadimage(&spr_worldbonushouse, convertPath("gfx/packs/world/world_bonushouse.png", graphicspack), false);
-
-	gfx_loadimage(&spr_announcementicons, convertPath("gfx/packs/menu/menu_announcement_icons.png", graphicspack), false);
 
 	return true;
 }
@@ -162,7 +168,6 @@ bool LoadGameGraphics()
 	gfx_loadimage(&spr_clouds, convertPath("gfx/packs/eyecandy/cloud.png", graphicspack), 255, true);
 	gfx_loadimage(&spr_ghosts, convertPath("gfx/packs/eyecandy/ghost.png", graphicspack), 128, true);
 	gfx_loadimage(&spr_fish, convertPath("gfx/packs/eyecandy/fish.png", graphicspack), 128, true);
-
 	gfx_loadimage(&spr_leaves, convertPath("gfx/packs/eyecandy/leaves.png", graphicspack), true);
 	gfx_loadimage(&spr_snow, convertPath("gfx/packs/eyecandy/snow.png", graphicspack), true);
 
@@ -412,7 +417,6 @@ bool LoadGameSounds()
 	sfx_powerdown.init(convertPath("sfx/packs/powerdown.wav", soundpack));
 	sfx_switchpress.init(convertPath("sfx/packs/switchpress.wav", soundpack));
 	sfx_superspring.init(convertPath("sfx/packs/superspring.wav", soundpack));
-	sfx_gameover.init(convertPath("sfx/packs/gameover.wav", soundpack));
 	sfx_stun.init(convertPath("sfx/packs/stun.wav", soundpack));
 	sfx_inventory.init(convertPath("sfx/packs/inventory.wav", soundpack));
 	sfx_worldmove.init(convertPath("sfx/packs/mapmove.wav", soundpack));
@@ -689,6 +693,7 @@ bool LoadAndSplashScreen()
 			}
 
 			LoadMenuGraphics();
+			LoadWorldGraphics();
 			LoadGameGraphics();
 
 			gfx_loadimagenocolorkey(&spr_backmap[0], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist.current_name()));

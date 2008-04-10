@@ -2703,9 +2703,9 @@ void CPlayer::draw()
             return;
 
 		if(iswarping())
-			spr_statue.draw(ix - PWOFFSET, iy - 31, 0, 0, 32, 58, (short)state % 4, warpplane);
+			spr_statue.draw(ix - PWOFFSET, iy - 31, colorID << 5, 0, 32, 58, (short)state % 4, warpplane);
 		else
-			spr_statue.draw(ix - PWOFFSET, iy - 31);
+			spr_statue.draw(ix - PWOFFSET, iy - 31, colorID << 5, 0, 32, 58);
 
         return;
     }

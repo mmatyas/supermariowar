@@ -413,7 +413,7 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 		maplist.SaveCurrent();
 
 		//If that map is not found
-		if(!maplist.findexact(pszTemp))
+		if(!maplist.findexact(pszTemp, true))
 			maplist.random(false);
 		
 		ts->pszMapFile = maplist.currentShortmapname();
@@ -1592,8 +1592,6 @@ void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
 			rDotDst.h = rDotDst.w = iPlatformPathDotSize[iSize];
 			
 			spr_platformpath.draw(rDotDst.x, rDotDst.y, rDotSrc.x, rDotSrc.y, rDotDst.w, rDotDst.h);
-			//SDL_BlitSurface(spr_platformpath.getSurface(), &rDotSrc, blitdest, &rDotDst);
-
 			dAngle += TWO_PI / iNumDots;
 		}
 
@@ -1618,8 +1616,6 @@ void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
 			rDotDst.h = rDotDst.w = iPlatformPathDotSize[iSize];
 			
 			spr_platformpath.draw(rDotDst.x, rDotDst.y, rDotSrc.x, rDotSrc.y, rDotDst.w, rDotDst.h);
-			//SDL_BlitSurface(spr_platformpath.getSurface(), &rDotSrc, blitdest, &rDotDst);
-
 			dAngle += TWO_PI / iNumDots;
 		}
 

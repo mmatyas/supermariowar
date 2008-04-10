@@ -245,6 +245,7 @@ class Menu
 #endif //_XBOX
 
 		MI_PacksField * miMenuGraphicsPackField;
+		MI_PacksField * miWorldGraphicsPackField;
 		MI_PacksField * miGameGraphicsPackField;
 		MI_Button * miGraphicsOptionsMenuBackButton;
 

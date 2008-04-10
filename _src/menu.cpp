@@ -31,6 +31,7 @@ extern void SetGameModeSettingsFromMenu();
 extern void LoadMapObjects(bool fPreview);
 extern bool LoadStartGraphics();
 extern bool LoadMenuGraphics();
+extern bool LoadWorldGraphics();
 extern bool LoadGameGraphics();
 extern bool LoadGameSounds();
 extern bool LoadFullSkin(gfxSprite ** sprites, short skinID, short colorID);
@@ -71,7 +72,7 @@ void Menu::WriteGameOptions()
 		fwrite(&game_values.screenResizeH, sizeof(float), 1, fp);
 #endif
 
-		unsigned char abyte[32];
+		unsigned char abyte[33];
 		abyte[0] = (unsigned char) game_values.spawnstyle;
 		abyte[1] = (unsigned char) game_values.awardstyle;
 		abyte[2] = (unsigned char) announcerlist.GetCurrentIndex();
@@ -103,7 +104,8 @@ void Menu::WriteGameOptions()
 		abyte[29] = (unsigned char) game_values.minigameunlocked;
 		abyte[30] = (unsigned char) game_values.startgamecountdown;
 		abyte[31] = (unsigned char) game_values.deadteamnotice;
-		fwrite(abyte, sizeof(unsigned char), 32, fp); 
+		abyte[32] = (unsigned char) worldgraphicspacklist.GetCurrentIndex();
+		fwrite(abyte, sizeof(unsigned char), 33, fp); 
 
 		fwrite(&game_values.shieldtime, sizeof(short), 1, fp);
 		fwrite(&game_values.shieldstyle, sizeof(short), 1, fp);
@@ -355,14 +357,14 @@ void Menu::CreateMenu()
 	// Graphics Options
 	//***********************
 
-	miTopLayerField = new MI_SelectField(&spr_selectfield, 70, 140, "Draw Top Layer", 500, 220);
+	miTopLayerField = new MI_SelectField(&spr_selectfield, 70, 120, "Draw Top Layer", 500, 220);
 	miTopLayerField->Add("Background", 0, "", false, false);
 	miTopLayerField->Add("Foreground", 1, "", true, false);
 	miTopLayerField->SetData(NULL, NULL, &game_values.toplayer);
 	miTopLayerField->SetKey(game_values.toplayer ? 1 : 0);
 	miTopLayerField->SetAutoAdvance(true);
 
-	miFrameLimiterField = new MI_SelectField(&spr_selectfield, 70, 180, "Frame Limit", 500, 220);
+	miFrameLimiterField = new MI_SelectField(&spr_selectfield, 70, 160, "Frame Limit", 500, 220);
 	miFrameLimiterField->Add("10 FPS", 100, "", false, false);
 	miFrameLimiterField->Add("15 FPS", 67, "", false, false);
 	miFrameLimiterField->Add("20 FPS", 50, "", false, false);
@@ -393,10 +395,10 @@ void Menu::CreateMenu()
 	miFrameLimiterField->SetKey(game_values.framelimiter);
 
 #ifdef _XBOX
-	miScreenSettingsButton = new MI_Button(&spr_selectfield, 70, 220, "Screen Settings", 500, 0);
+	miScreenSettingsButton = new MI_Button(&spr_selectfield, 70, 200, "Screen Settings", 500, 0);
 	miScreenSettingsButton->SetCode(MENU_CODE_TO_SCREEN_SETTINGS);
 #else
-	miFullscreenField = new MI_SelectField(&spr_selectfield, 70, 220, "Screen Size", 500, 220);
+	miFullscreenField = new MI_SelectField(&spr_selectfield, 70, 200, "Screen Size", 500, 220);
 	miFullscreenField->Add("Windowed", 0, "", false, false);
 	miFullscreenField->Add("Fullscreen", 1, "", true, false);
 	miFullscreenField->SetData(NULL, NULL, &game_values.fullscreen);
@@ -405,8 +407,9 @@ void Menu::CreateMenu()
 	miFullscreenField->SetItemChangedCode(MENU_CODE_TOGGLE_FULLSCREEN);
 #endif //_XBOX
 
-	miMenuGraphicsPackField = new MI_PacksField(&spr_selectfield, 70, 260, "Menu Graphics", 500, 220, &menugraphicspacklist, MENU_CODE_MENU_GRAPHICS_PACK_CHANGED);
-	miGameGraphicsPackField = new MI_PacksField(&spr_selectfield, 70, 300, "Game Graphics", 500, 220, &gamegraphicspacklist, MENU_CODE_GAME_GRAPHICS_PACK_CHANGED);
+	miMenuGraphicsPackField = new MI_PacksField(&spr_selectfield, 70, 240, "Menu Graphics", 500, 220, &menugraphicspacklist, MENU_CODE_MENU_GRAPHICS_PACK_CHANGED);
+	miWorldGraphicsPackField = new MI_PacksField(&spr_selectfield, 70, 280, "World Graphics", 500, 220, &worldgraphicspacklist, MENU_CODE_WORLD_GRAPHICS_PACK_CHANGED);
+	miGameGraphicsPackField = new MI_PacksField(&spr_selectfield, 70, 320, "Game Graphics", 500, 220, &gamegraphicspacklist, MENU_CODE_GAME_GRAPHICS_PACK_CHANGED);
 
 	miGraphicsOptionsMenuBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
 	miGraphicsOptionsMenuBackButton->SetCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
@@ -420,14 +423,15 @@ void Menu::CreateMenu()
 #ifdef _XBOX
 	mGraphicsOptionsMenu.AddControl(miFrameLimiterField, miTopLayerField, miScreenSettingsButton, NULL, miGraphicsOptionsMenuBackButton);
 	mGraphicsOptionsMenu.AddControl(miScreenSettingsButton, miFrameLimiterField, miMenuGraphicsPackField, NULL, miGraphicsOptionsMenuBackButton);
-	mGraphicsOptionsMenu.AddControl(miMenuGraphicsPackField, miScreenSettingsButton, miGameGraphicsPackField, NULL, miGraphicsOptionsMenuBackButton);
+	mGraphicsOptionsMenu.AddControl(miMenuGraphicsPackField, miScreenSettingsButton, miWorldGraphicsPackField, NULL, miGraphicsOptionsMenuBackButton);
 #else
 	mGraphicsOptionsMenu.AddControl(miFrameLimiterField, miTopLayerField, miFullscreenField, NULL, miGraphicsOptionsMenuBackButton);
 	mGraphicsOptionsMenu.AddControl(miFullscreenField, miFrameLimiterField, miMenuGraphicsPackField, NULL, miGraphicsOptionsMenuBackButton);
-	mGraphicsOptionsMenu.AddControl(miMenuGraphicsPackField, miFullscreenField, miGameGraphicsPackField, NULL, miGraphicsOptionsMenuBackButton);
+	mGraphicsOptionsMenu.AddControl(miMenuGraphicsPackField, miFullscreenField, miWorldGraphicsPackField, NULL, miGraphicsOptionsMenuBackButton);
 #endif
 
-	mGraphicsOptionsMenu.AddControl(miGameGraphicsPackField, miMenuGraphicsPackField, miGraphicsOptionsMenuBackButton, NULL, miGraphicsOptionsMenuBackButton);
+	mGraphicsOptionsMenu.AddControl(miWorldGraphicsPackField, miMenuGraphicsPackField, miGameGraphicsPackField, NULL, miGraphicsOptionsMenuBackButton);
+	mGraphicsOptionsMenu.AddControl(miGameGraphicsPackField, miWorldGraphicsPackField, miGraphicsOptionsMenuBackButton, NULL, miGraphicsOptionsMenuBackButton);
 	mGraphicsOptionsMenu.AddControl(miGraphicsOptionsMenuBackButton, miGameGraphicsPackField, miTopLayerField, miGameGraphicsPackField, NULL);
 
 	mGraphicsOptionsMenu.AddNonControl(miGraphicsOptionsMenuLeftHeaderBar);
@@ -3403,7 +3407,7 @@ void Menu::RunMenu()
 
 						if(MATCH_TYPE_SINGLE_GAME == game_values.matchtype || MATCH_TYPE_TOURNAMENT == game_values.matchtype)
 						{
-							maplist.findexact(szCurrentMapName);
+							maplist.findexact(szCurrentMapName, false);
 							miMapField->LoadCurrentMap();
 
 							game_values.gamemode = gamemodes[miModeField->GetShortValue()];
@@ -3724,6 +3728,10 @@ void Menu::RunMenu()
 				menu_shade.setalpha(GetScreenBackgroundFade());
 				menu_shade.draw(0, 0);
 				blitdest = screen;
+			}
+			else if (MENU_CODE_WORLD_GRAPHICS_PACK_CHANGED == code)
+			{
+				LoadWorldGraphics();
 			}
 			else if (MENU_CODE_GAME_GRAPHICS_PACK_CHANGED == code)
 			{

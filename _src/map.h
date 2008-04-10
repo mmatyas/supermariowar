@@ -300,7 +300,9 @@ class CMap
 		friend void pasteselectedtiles(int movex, int movey);
 
 		friend TileType CalculateTileType(short x, short y);
-		friend void UpdateTileType(short x, short y, short layer, TileType type);
+		friend void UpdateTileType(short x, short y);
+		friend bool TileTypeIsModified(short x, short y);
+
 		friend void AdjustMapItems(short iClickX, short iClickY);
 		friend void RemoveMapItemAt(short x, short y);	
 

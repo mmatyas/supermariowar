@@ -77,10 +77,10 @@ MapList::MapList()
 		maps[stripCreatorAndDotMap(curname)] = node;
 	}
 
-	DirectoryListing specialMapDir(convertPath("maps/special/"), ".map");
-	while(specialMapDir(curname))
+	DirectoryListing specialDebugMapDir(convertPath("maps/special/"), ".map");
+	while(specialDebugMapDir(curname))
 	{
-		MapListNode * node = new MapListNode(specialMapDir.fullName(curname));
+		MapListNode * node = new MapListNode(specialDebugMapDir.fullName(curname));
 		maps[stripCreatorAndDotMap(curname)] = node;
 	}
 #endif
@@ -103,15 +103,26 @@ MapList::MapList()
 
 	current = maps.begin();
 	savedcurrent = current;
+	outercurrent = current;
 
 	iFilteredMapCount = maps.size();
 
 	mlnFilteredMaps = new std::map<std::string, MapListNode*>::iterator[maps.size()];
 	mlnMaps = new std::map<std::string, MapListNode*>::iterator[maps.size()];
+
+	//Load in the "world only" maps
+	DirectoryListing worldMapDir(convertPath("maps/worldtour/"), ".map");
+
+	while(worldMapDir(curname))
+	{
+		MapListNode * node = new MapListNode(worldMapDir.fullName(curname));
+		worldmaps[stripCreatorAndDotMap(curname)] = node;
+	}
 }
 
 MapList::~MapList()
 {
+	//Delete all map list nodes
 	std::map<std::string, MapListNode*>::iterator iterateAll = maps.begin(), lim = maps.end();
 	
 	while (iterateAll != lim)
@@ -121,6 +132,18 @@ MapList::~MapList()
 	}
 
 	maps.clear();
+
+	//Delete all world map list nodes
+	iterateAll = worldmaps.begin();
+	lim = worldmaps.end();
+	
+	while (iterateAll != lim)
+	{
+		delete (iterateAll->second);
+		iterateAll++;
+	}
+
+	worldmaps.clear();
 
 	delete [] mlnFilteredMaps;
 	delete [] mlnMaps;
@@ -133,8 +156,9 @@ void MapList::add(const char * name)
 	for(std::map<std::string, MapListNode*>::iterator i = maps.begin(); i != maps.end(); ++i)
 	{
 		if((*i).second->filename == fullName)
-				return;
+			return;
 	}
+
 	//not found - insert new map
 	MapListNode * node = new MapListNode(fullName);
 	maps[stripCreatorAndDotMap(name)] = node;
@@ -164,7 +188,7 @@ bool MapList::find(const char * name)
 	return fFound;
 }
 
-bool MapList::findexact(const char * name)
+bool MapList::findexact(const char * name, bool fWorld)
 {
 	char * szLookForName = new char[strlen(name) + 1];
 	strcpy(szLookForName, name);
@@ -172,8 +196,36 @@ bool MapList::findexact(const char * name)
 
 	bool fFound = false;
 
+	//If we're looking for a world, then search the world maps first
+	//if the world map isn't found, then search the regular map list
+	if(fWorld)
+	{
+		std::map<std::string, MapListNode*>::iterator iterateAll = worldmaps.begin(), lim = worldmaps.end();
+		
+		while(iterateAll != lim && !fFound)
+		{
+			char * szCurrentName = new char[iterateAll->first.length() + 1];
+			strcpy(szCurrentName, iterateAll->first.c_str());
+			_strlwr(szCurrentName);
+
+			if(!strcmp(szCurrentName, szLookForName))
+			{
+				fFound = true;
+				outercurrent = iterateAll;
+			}
+
+			delete[] szCurrentName;
+
+			iterateAll++;
+		}
+
+		if(fFound)
+			return true;
+	}
+
 	std::map<std::string, MapListNode*>::iterator oldCurrent = current;
 
+	fFound = false;
 	do
 	{
 		next(false);	//sets us to the beginning if we hit the end -> loop through the maps
@@ -204,7 +256,7 @@ bool MapList::FindFilteredMap()
 	return true;
 }
 
-//Update to allow key combos like "hy" to do "hyrule castle"
+//Searches for a map that starts with this single character
 bool MapList::startswith(char letter)
 {
 	//Captialize the letter becuase all maps have first letter in caps
@@ -224,6 +276,7 @@ bool MapList::startswith(char letter)
 	return false;
 }
 
+//Searches for maps that start with this entire string
 bool MapList::startswith(std::string match)
 {
 	int iMatchLen = strlen(match.c_str());
@@ -280,6 +333,8 @@ void MapList::prev(bool fUseFilters)
 			current = --maps.end();	//continue from end
 		else
 			--current;
+
+		outercurrent = current;
 	}
 
 	return;
@@ -306,6 +361,8 @@ void MapList::next(bool fUseFilters)
 			current = maps.begin();	//continue from start
 		else
 			++current;
+
+		outercurrent = current;
 	}
 
 	return;
@@ -482,7 +539,7 @@ void MapList::ReadFilters()
 				char * pszMap = strtok(buffer, "\r\n");
 
 				//If that map is found
-				if(findexact(pszMap))
+				if(findexact(pszMap, false))
 					(*current).second->pfFilters[iFilter + NUM_AUTO_FILTERS] = true;
 			}
 		}
@@ -492,6 +549,7 @@ void MapList::ReadFilters()
 
 	//Reset the current back to the beginning after setting up the filters for each map
 	current = maps.begin();
+	outercurrent = current;
 }
 
 //Forces all the maps to reload the auto filters from the live map files (flush the cache)

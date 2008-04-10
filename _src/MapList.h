@@ -28,13 +28,13 @@ class MapList
 
         void add(const char * name);
         bool find(const char * name);
-		bool findexact(const char * name);
+		bool findexact(const char * name, bool fWorld);
         bool startswith(char letter);
 		bool startswith(std::string match);
 
-		const char* currentFilename(){return (*current).second->filename.c_str();}
-        const char* currentShortmapname(){return (*current).first.c_str();}
-		const int currentShortMapNameLen(){return (*current).second->iShortNameLength;}
+		const char* currentFilename(){return (*outercurrent).second->filename.c_str();}
+        const char* currentShortmapname(){return (*outercurrent).first.c_str();}
+		const int currentShortMapNameLen(){return (*outercurrent).second->iShortNameLength;}
         
 		void prev(bool fUseFilters);
         void next(bool fUseFilters);
@@ -74,8 +74,12 @@ class MapList
     private:
 
         std::map<std::string, MapListNode*> maps;
+		std::map<std::string, MapListNode*> worldmaps;
+
         std::map<std::string, MapListNode*>::iterator current;
 		std::map<std::string, MapListNode*>::iterator savedcurrent;
+
+		std::map<std::string, MapListNode*>::iterator outercurrent;
 
 		short iFilteredMapCount;
 

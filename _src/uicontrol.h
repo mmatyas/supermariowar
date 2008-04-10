@@ -642,7 +642,7 @@ class MI_MapField : public UI_Control
 		void LoadCurrentMap();
 		void LoadMap(const char * szMapPath);
 
-		void SetMap(const char * szMapName);
+		void SetMap(const char * szMapName, bool fWorld);
 		void SetSpecialMap(const char * szMapName, const char * szMapPath);
 
 		const char * GetMapName() {return szMapName;}

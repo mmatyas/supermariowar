@@ -586,7 +586,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 			//Read on/off switches
 			for(short iSwitch = 0; iSwitch < 4; iSwitch++)
 			{
-				iSwitches[iSwitch] = (short)ReadInt(mapfile);
+				iSwitches[iSwitch] = 1 - (short)ReadInt(mapfile);
 			}
 
 			//Set all the on/off blocks correctly
@@ -597,6 +597,26 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 					if(objectdata[i][j].iType >= 11 && objectdata[i][j].iType <= 14)
 					{
 						objectdata[i][j].iSettings[0] = iSwitches[objectdata[i][j].iType - 11];
+					}
+				}
+			}
+		}
+		else if(iReadType == read_type_preview)  //if it is a preview, for older maps, set the on/off blocks to on by default
+		{
+			//Read on/off switches
+			for(short iSwitch = 0; iSwitch < 4; iSwitch++)
+			{
+				iSwitches[iSwitch] = 1;
+			}
+
+			//Set all the on/off blocks correctly
+			for(j = 0; j < MAPHEIGHT; j++)
+			{
+				for(i = 0; i < MAPWIDTH; i++)
+				{
+					if(objectdata[i][j].iType >= 11 && objectdata[i][j].iType <= 14)
+					{
+						objectdata[i][j].iSettings[0] = 1;
 					}
 				}
 			}
@@ -747,7 +767,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 		{
 			for(short iSwitch = 0; iSwitch < 4; iSwitch++)
 			{
-				iSwitches[iSwitch] = (short)ReadInt(mapfile);
+				iSwitches[iSwitch] = 1 - (short)ReadInt(mapfile);
 			}
 
 			//Set all the on/off blocks correctly
@@ -2575,7 +2595,7 @@ void CMap::drawPreviewBlocks(SDL_Surface * targetSurface, bool fThumbnail)
 			//Draw the turned off switch blocks too
 			if(ts >= 7 && ts <= 10)
 			{
-				if(iSwitches[(ts - 7) % 4] == 1)
+				if(iSwitches[(ts - 7) % 4] == 0)
 					rectSrc.y = iBlockSize;
 			}
 			else if(ts >= 11 && ts <= 14)

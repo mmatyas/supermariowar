@@ -51,33 +51,35 @@
 //[ ] Thunderbolt style spawn
 //[ ] Reverse gravity blue podoboos
 
-//[ ] Clean up unused gfx/sfx
-
-//[ ] Finish implementation of fixes for UpdateTileType -> don't update the tile type if it was overwritten in tile type mode
-
 * Bomb option in Star mode
 - Mariokart-type podium at the end of a tournament/tour/whatever
 
 //BUG?? Look in CTilesetManager::Init to see if we are loading the non-classic tilesets when we pass in classic!
-//BUG?? Did yellow player holding flag not kill green player when invincible?
 
-[ ] Place any tile, like inside dirt part of the cave tiles from SMW. Place a 3x3 sized box. (easier to see the change) Then, make the tiles not be solid, for backgrounds or something. If you place any non-solid tile (as said by the icon near the tile in the selector) on top of once-solid tile (as said by the missin icon) the once-solid tile reverts to solid again. It's a very annoying thing.
-
-[ ] Tile placement in world editor for large maps is _very_ slow, especially painting a string of tiles
-
-[ ] Old 1.7 maps have funny platform behavior, try this with platformproblem.map
-
-[ ] Run with old 1.7 maps and make sure all of them load correctly
 [ ] Make the SMB3 world work -> Need to recreate maps using new 1.8 map editor
 [ ] Special directory for world maps?  Don't want to polute the map list with world only maps
 
-[ ] On/off switches are backwards on the preview for 1.7 maps
+[ ] Speed up world drawing by looking at DrawMapToSurface() method to make it blazing fast
+[ ] Profile code using DevPartner
+
+[ ] Clean up unused gfx/sfx -> see below
+[ ] CVS REMOVE:
+	gameover.wav
+	gfx/packs/menu/menu_platform_arrows.png
+	leveleditor_platform_arrows.png
+	leveleditor_platform_arrows_preview.png
+	leveleditor_platform_arrows_thumbnail.png
+	sledgebrothersdead.png
+	menu_ipfield.png
+	superfire.png
+
+[ ] CVS ADD:
+	leveleditor_platform_path.png
 
 */
 
 /*
 Checkin:
-1) Fixed bug with 1.7 maps that have on/off blocks will be randomly on/off and should have been set to what the switch was
 */
 
 /*
@@ -175,13 +177,12 @@ gfxSprite		spr_tournament_background;
 gfxSprite		spr_tournament_powerup_splash;
 gfxSprite		spr_player_select_background;
 gfxSprite		spr_player_select_ready;
-gfxSprite		spr_ipfield;
+//gfxSprite		spr_ipfield;
 gfxSprite		spr_selectfield;
 gfxSprite		spr_selectfielddisabled;
 gfxSprite		spr_map_filter_icons;
 gfxSprite		spr_tour_markers;
 gfxSprite		spr_menu_boxed_numbers;
-gfxSprite		spr_thumbnail_platformarrows;
 gfxSprite		spr_thumbnail_warps[2];
 gfxSprite		spr_thumbnail_mapitems[2];
 gfxSprite		spr_platformstarttile;
@@ -446,7 +447,6 @@ sfxSound sfx_starwarning;
 sfxSound sfx_powerdown;
 sfxSound sfx_switchpress;
 sfxSound sfx_superspring;
-sfxSound sfx_gameover;
 sfxSound sfx_stun;
 sfxSound sfx_inventory;
 sfxSound sfx_worldmove;
@@ -477,6 +477,7 @@ AnnouncerList announcerlist;
 MusicList musiclist;
 WorldMusicList worldmusiclist;
 GraphicsList menugraphicspacklist;
+GraphicsList worldgraphicspacklist;
 GraphicsList gamegraphicspacklist;
 SoundsList soundpacklist;
 TourList tourlist;
@@ -891,6 +892,7 @@ int main(int argc, char *argv[])
 	musiclist.SetCurrent(0);
 	worldmusiclist.SetCurrent(0);
 	menugraphicspacklist.SetCurrent(0);
+	worldgraphicspacklist.SetCurrent(0);
 	gamegraphicspacklist.SetCurrent(0);
 	soundpacklist.SetCurrent(0);
 
@@ -1112,8 +1114,8 @@ int main(int argc, char *argv[])
 				SDL_XBOX_SetScreenStretch(game_values.screenResizeW, game_values.screenResizeH);
 			#endif
 
-			unsigned char abyte[32];
-			fread(abyte, sizeof(unsigned char), 32, fp);
+			unsigned char abyte[33];
+			fread(abyte, sizeof(unsigned char), 33, fp);
 			game_values.spawnstyle = (short) abyte[0];
 			game_values.awardstyle = (short) abyte[1];
 			game_values.teamcollision = (short)abyte[3];
@@ -1220,6 +1222,7 @@ int main(int argc, char *argv[])
 			musiclist.SetCurrent((short) abyte[13]);
 			worldmusiclist.SetCurrent((short) abyte[14]);
 			menugraphicspacklist.SetCurrent((short) abyte[17]);
+			worldgraphicspacklist.SetCurrent((short) abyte[32]);
 			gamegraphicspacklist.SetCurrent((short) abyte[26]);
 			soundpacklist.SetCurrent((short) abyte[18]);
 

@@ -246,11 +246,14 @@ class WorldMap
 
 	friend int editor_edit();
 	friend int editor_type();
-	friend void AutoSetTile(short iCol, short iRow);
+	friend bool AutoSetTile(short iCol, short iRow);
 	friend void AutoSetPath(short iCol, short iRow);
 	friend void AutoSetPathSprite(short iCol, short iRow);
 	friend short AdjustForeground(short iSprite, short iCol, short iRow);
-	friend void UpdateForeground(short iCol, short iRow);
+	friend bool UpdateForeground(short iCol, short iRow);
+
+	friend void GetForegroundTileValues(short iCol, short iRow, short iOldTiles[9]);
+	friend bool ForegroundTileValuesChanged(short iCol, short iRow, short iOldTiles[9]);
 
 	friend void ReadVehiclesIntoEditor();
 	friend void WriteVehiclesIntoWorld();
