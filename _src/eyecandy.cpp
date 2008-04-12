@@ -213,21 +213,6 @@ void EC_Leaf::update()
 		NextLeaf();
 	}
 
-	if(velx > 0.0f && ix >= 640)
-	{
-		dx = -16.0f;
-		dy = (float)(rand() % 480);
-
-		NextLeaf();
-	}
-	else if(velx < 0.0f && ix < -16)
-	{
-		dx = 640.0f;
-		dy = (float)(rand() % 480);
-
-		NextLeaf();
-	}
-
 	ix = (short)dx;
 	iy = (short)dy;
 }
@@ -286,21 +271,93 @@ void EC_Snow::update()
 		dx = (float)(rand() % 640);
 	}
 
-	if(velx > 0.0f && ix >= 640)
-	{
-		dx = -16.0f;
-		dy = (float)(rand() % 480);
-	}
-	else if(velx < 0.0f && ix < -16)
-	{
-		dx = 640.0f;
-		dy = (float)(rand() % 480);
-	}
+	ix = (short)dx;
+	iy = (short)dy;
+}
+
+
+//------------------------------------------------------------------------------
+// class rain
+//------------------------------------------------------------------------------
+EC_Rain::EC_Rain(gfxSprite *nspr, float nx, float ny) :
+	EC_StillImage(nspr, (short)nx, (short)ny, 0, 16, 10, 10)
+{
+	NextRainDrop();
+	dx = nx;
+	dy = ny;
+}
+
+void EC_Rain::update()
+{
+	dx += velx;
+	dy += vely;
+
+	//If rain is off left edge, wrap it
+	if(dx < 0.0f)
+		dx += 640.0f;
+
+	//If rain is off bottom edge, change the rain gfx and start it from the top
+	if(iy >= 480)
+		NextRainDrop();
 
 	ix = (short)dx;
 	iy = (short)dy;
 }
 
+void EC_Rain::NextRainDrop()
+{
+	velx = -5.0f + (float)(rand() % 5) / 4.0f;
+	vely = 4.0f + (float)(rand() % 5) / 4.0f;
+
+	dy = -16.0f;
+	dx = (float)(rand() % 640);
+
+	iSrcX = (rand() % 8) * 10;
+}
+
+
+//------------------------------------------------------------------------------
+// class bubble
+//------------------------------------------------------------------------------
+EC_Bubble::EC_Bubble(gfxSprite *nspr, float nx, float ny) :
+	EC_OscillatingAnimation(nspr, (short)nx, (short)ny, 0, 0, 16, 8, 4, 4)
+{
+	NextBubble();
+	dx = nx;
+	dy = ny;
+}
+
+void EC_Bubble::update()
+{
+	animate();
+
+	dx += velx;
+	dy += vely;
+
+	//If bubble is off the edges, wrap it
+	if(dx < 0.0f)
+		dx += 640.0f;
+	else if(dx + iAnimationW >= 640.0f)
+		dx -= 640.0f;
+
+	//If bubble is off top edge, move it back to the bottom to start again
+	if(iy + iAnimationH < 0)
+		NextBubble();
+
+	ix = (short)dx;
+	iy = (short)dy;
+}
+
+void EC_Bubble::NextBubble()
+{
+	velx = -1.0f + (float)(rand() % 9) / 4.0f;
+	vely = -4.0f + (float)(rand() % 9) / 4.0f;
+
+	dy = 480.0f;
+	dx = (float)(rand() % 640);
+
+	iAnimationFrame = (rand() % 4) << 4;
+}
 
 //------------------------------------------------------------------------------
 // class corpse

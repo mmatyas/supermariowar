@@ -773,9 +773,9 @@ bool gfx_loadimagenocolorkey(gfxSprite * gSprite, const std::string& f)
 	return gSprite->init(f);
 }
 
-bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, bool fWrap)
+bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, bool fWrap, bool fUseAccel)
 {
-	bool fRet = gSprite->init(f, 255, 0, 255);
+	bool fRet = gSprite->init(f, 255, 0, 255, fUseAccel);
 
 	if(fRet)
 		gSprite->SetWrap(fWrap);
@@ -783,9 +783,9 @@ bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, bool fWrap)
 	return fRet;
 }
 
-bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, Uint8 alpha, bool fWrap)
+bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, Uint8 alpha, bool fWrap, bool fUseAccel)
 {
-	bool fRet = gSprite->init(f, 255, 0, 255, alpha);
+	bool fRet = gSprite->init(f, 255, 0, 255, alpha, fUseAccel);
 
 	if(fRet)
 		gSprite->SetWrap(fWrap);
@@ -823,7 +823,7 @@ void gfxSprite::clearSurface()
 	fWrap = false;
 }
 
-bool gfxSprite::init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b)
+bool gfxSprite::init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b, bool fUseAccel)
 {
     cout << "loading sprite " << filename << "...";
 
@@ -842,7 +842,7 @@ bool gfxSprite::init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b)
         return false;
     }
 
-	if( SDL_SetColorKey(m_picture, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(m_picture->format, r, g, b)) < 0)
+	if( SDL_SetColorKey(m_picture, SDL_SRCCOLORKEY | (fUseAccel ? SDL_RLEACCEL : 0), SDL_MapRGB(m_picture->format, r, g, b)) < 0)
 	{
         cout << endl << " ERROR: Couldn't set ColorKey + RLE for "
              << filename << ": " << SDL_GetError() << endl;
@@ -868,7 +868,7 @@ bool gfxSprite::init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b)
 	return true;
 }
 
-bool gfxSprite::init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+bool gfxSprite::init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b, Uint8 a, bool fUseAccel)
 {
     cout << "Loading sprite " << filename << " ...";
 
@@ -888,14 +888,14 @@ bool gfxSprite::init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b, Uin
         return false;
     }
 
-	if( SDL_SetColorKey(m_picture, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(m_picture->format, r, g, b)) < 0)
+	if( SDL_SetColorKey(m_picture, SDL_SRCCOLORKEY | (fUseAccel ? SDL_RLEACCEL : 0), SDL_MapRGB(m_picture->format, r, g, b)) < 0)
 	{
         cout << endl << " ERROR: Couldn't set ColorKey + RLE for "
              << filename << ": " << SDL_GetError() << endl;
 		return false;
 	}
 
-	if( (SDL_SetAlpha(m_picture, SDL_SRCALPHA | SDL_RLEACCEL, a)) < 0)
+	if( (SDL_SetAlpha(m_picture, SDL_SRCALPHA | (fUseAccel ? SDL_RLEACCEL : 0), a)) < 0)
 	{
         cout << endl << " ERROR: Couldn't set per-surface alpha on "
              << filename << ": " << SDL_GetError() << endl;

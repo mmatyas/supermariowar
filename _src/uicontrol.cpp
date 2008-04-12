@@ -5661,7 +5661,7 @@ MI_World::MI_World() :
 
 	sMapSurface[0] = SDL_CreateRGBSurface(screen->flags, 768, 608, screen->format->BitsPerPixel, 0, 0, 0, 0);
 	sMapSurface[1] = SDL_CreateRGBSurface(screen->flags, 768, 608, screen->format->BitsPerPixel, 0, 0, 0, 0);
-	
+
 	iCurrentSurfaceIndex = 0;
 	iCycleIndex = 0;
 

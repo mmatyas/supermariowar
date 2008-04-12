@@ -336,28 +336,28 @@ int main(int argc, char *argv[])
 	printf("\n---------------- loading graphics ----------------\n");
 
 	spr_tiletypes.init(convertPath("gfx/leveleditor/leveleditor_tile_types.png"));
-	spr_transparenttiles.init(convertPath("gfx/leveleditor/leveleditor_transparent_tiles.png"), 255, 0, 255, 160);
+	spr_transparenttiles.init(convertPath("gfx/leveleditor/leveleditor_transparent_tiles.png"), 255, 0, 255, 160, true);
 	
-	spr_backgroundlevel.init(convertPath("gfx/leveleditor/leveleditor_background_levels.png"), 255, 0, 255);
-	spr_tilesetlevel.init(convertPath("gfx/leveleditor/leveleditor_tileset_levels.png"), 255, 0, 255);
+	spr_backgroundlevel.init(convertPath("gfx/leveleditor/leveleditor_background_levels.png"), 255, 0, 255, true);
+	spr_tilesetlevel.init(convertPath("gfx/leveleditor/leveleditor_tileset_levels.png"), 255, 0, 255, true);
 	
-	spr_eyecandy.init(convertPathC("gfx/leveleditor/leveleditor_eyecandy.png"), 255, 0, 255);
+	spr_eyecandy.init(convertPathC("gfx/leveleditor/leveleditor_eyecandy.png"), 255, 0, 255, true);
 
 	s_platform = IMG_Load(convertPathC("gfx/leveleditor/leveleditor_platform.png"));
 	s_platformpathbuttons = IMG_Load(convertPathC("gfx/leveleditor/leveleditor_pathtype_buttons.png"));
 	s_maphazardbuttons = IMG_Load(convertPathC("gfx/leveleditor/leveleditor_maphazard_buttons.png"));
 
-	spr_warps[0].init(convertPath("gfx/leveleditor/leveleditor_warp.png"), 255, 0, 255);
-	spr_warps[1].init(convertPath("gfx/leveleditor/leveleditor_warp_preview.png"), 255, 0, 255);
-	spr_warps[2].init(convertPath("gfx/leveleditor/leveleditor_warp_thumbnail.png"), 255, 0, 255);
+	spr_warps[0].init(convertPath("gfx/leveleditor/leveleditor_warp.png"), 255, 0, 255, true);
+	spr_warps[1].init(convertPath("gfx/leveleditor/leveleditor_warp_preview.png"), 255, 0, 255, true);
+	spr_warps[2].init(convertPath("gfx/leveleditor/leveleditor_warp_thumbnail.png"), 255, 0, 255, true);
 
-	spr_platformpath.init(convertPath("gfx/leveleditor/leveleditor_platform_path.png"), 255, 0, 255, 128);
+	spr_platformpath.init(convertPath("gfx/leveleditor/leveleditor_platform_path.png"), 255, 0, 255, 128, true);
 
-	spr_selectedtile.init(convertPath("gfx/leveleditor/leveleditor_selectedtile.png"), 0, 0, 0, 128);
-	spr_nospawntile.init(convertPath("gfx/leveleditor/leveleditor_nospawntile.png"), 0, 0, 0, 128);
-	spr_noitemspawntile.init(convertPath("gfx/leveleditor/leveleditor_noitemspawntile.png"), 0, 0, 0, 128);
-	spr_platformstarttile.init(convertPath("gfx/leveleditor/leveleditor_platformstarttile.png"), 0, 0, 0, 64);
-	spr_platformendtile.init(convertPath("gfx/leveleditor/leveleditor_selectedtile.png"), 0, 0, 0, 64);
+	spr_selectedtile.init(convertPath("gfx/leveleditor/leveleditor_selectedtile.png"), 0, 0, 0, 128, true);
+	spr_nospawntile.init(convertPath("gfx/leveleditor/leveleditor_nospawntile.png"), 0, 0, 0, 128, true);
+	spr_noitemspawntile.init(convertPath("gfx/leveleditor/leveleditor_noitemspawntile.png"), 0, 0, 0, 128, true);
+	spr_platformstarttile.init(convertPath("gfx/leveleditor/leveleditor_platformstarttile.png"), 0, 0, 0, 64, true);
+	spr_platformendtile.init(convertPath("gfx/leveleditor/leveleditor_selectedtile.png"), 0, 0, 0, 64, true);
 	spr_platformstarttile.SetWrap(true);
 	spr_platformendtile.SetWrap(true);
 
@@ -365,8 +365,8 @@ int main(int argc, char *argv[])
 	spr_mapitems[1].init(convertPath("gfx/leveleditor/leveleditor_mapitems_preview.png"), 255, 0, 255);
 	spr_mapitems[2].init(convertPath("gfx/leveleditor/leveleditor_mapitems_thumbnail.png"), 255, 0, 255);
 
-	spr_dialog.init(convertPath("gfx/leveleditor/leveleditor_dialog.png"), 255, 0, 255, 255);
-	menu_shade.init(convertPath("gfx/leveleditor/leveleditor_shade.png"), 255, 0, 255, 128);
+	spr_dialog.init(convertPath("gfx/leveleditor/leveleditor_dialog.png"), 255, 0, 255, 255, true);
+	menu_shade.init(convertPath("gfx/leveleditor/leveleditor_shade.png"), 255, 0, 255, 128, true);
 
 	spr_tileanimation[0].init(convertPath("gfx/packs/Classic/tilesets/tile_animation.png"), 255, 0, 255);
 	spr_tileanimation[1].init(convertPath("gfx/packs/Classic/tilesets/tile_animation_preview.png"), 255, 0, 255);
@@ -381,7 +381,7 @@ int main(int argc, char *argv[])
 	spr_unknowntile[2].init(convertPath("gfx/packs/Classic/tilesets/unknown_tile_thumbnail.png"), 255, 0, 255);
 
 	spr_powerups.init(convertPath("gfx/packs/Classic/powerups/large.png"), 255, 0, 255);
-	spr_powerupselector.init(convertPath("gfx/leveleditor/leveleditor_powerup_selector.png"), 255, 0, 255, 128);
+	spr_powerupselector.init(convertPath("gfx/leveleditor/leveleditor_powerup_selector.png"), 255, 0, 255, 128, true);
 	spr_hidden_marker.init(convertPath("gfx/leveleditor/leveleditor_hidden_marker.png"), 255, 0, 255);
 
 	spr_flagbases.init(convertPath("gfx/packs/Classic/modeobjects/flagbases.png"), 255, 0, 255);
@@ -1903,7 +1903,8 @@ int editor_warp()
 	return EDITOR_QUIT;
 }
 
-char * szEyecandyNames[5] = {"Clouds", "Ghosts", "Leaves", "Snow", "Fish"};
+#define NUM_EYECANDY 7
+char * szEyecandyNames[NUM_EYECANDY] = {"Clouds", "Ghosts", "Leaves", "Snow", "Fish", "Rain", "Bubbles"};
 int editor_eyecandy()
 {
 	bool done = false;
@@ -1935,10 +1936,10 @@ int editor_eyecandy()
 				{
 					if(event.button.button == SDL_BUTTON_LEFT)
 					{
-						for(int k = 0; k < 5; k++)
+						for(int k = 0; k < NUM_EYECANDY; k++)
 						{
 							if(event.button.x >= 275 && event.button.x < 365 &&
-								event.button.y >= k * 80 + 60 && event.button.y < k * 80 + 112)
+								event.button.y >= k * 65 + 20 && event.button.y < k * 65 + 72)
 							{
 								short mask = 1 << k;
 								if(g_map.eyecandyID & mask)
@@ -1964,10 +1965,10 @@ int editor_eyecandy()
 		int iMouseX, iMouseY;
 		SDL_GetMouseState(&iMouseX, &iMouseY);
 
-		for(int k = 0; k < 5; k++)
+		for(int k = 0; k < NUM_EYECANDY; k++)
 		{
 			short ix = 275;
-			short iy = k * 80 + 60;
+			short iy = k * 65 + 20;
 
 			if(iMouseX >= ix && iMouseX < ix + 90 && iMouseY >= iy && iMouseY < iy + 52)
 				spr_powerupselector.draw(ix, iy, 0, 0, 90, 52);
@@ -1980,7 +1981,7 @@ int editor_eyecandy()
 			if(g_map.eyecandyID & mask)
 				spr_hidden_marker.draw(ix + 57, iy + 16);
 
-			menu_font_small.drawCentered(320, iy - menu_font_small.getHeight(), szEyecandyNames[k]);
+			menu_font_small.drawCentered(320, iy - menu_font_small.getHeight() + 7, szEyecandyNames[k]);
 		}
 
 		menu_font_small.draw(0,480-menu_font_small.getHeight(), "eyecandy mode: [e] edit mode, [LMB] choose eyecandy");

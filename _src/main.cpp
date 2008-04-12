@@ -54,27 +54,14 @@
 * Bomb option in Star mode
 - Mariokart-type podium at the end of a tournament/tour/whatever
 
-//BUG?? Look in CTilesetManager::Init to see if we are loading the non-classic tilesets when we pass in classic!
-
 [ ] Make the SMB3 world work -> Need to recreate maps using new 1.8 map editor
 [ ] Special directory for world maps?  Don't want to polute the map list with world only maps
 
 [ ] Speed up world drawing by looking at DrawMapToSurface() method to make it blazing fast
 [ ] Profile code using DevPartner
+[ ] Maybe it has a paging problem because the source gfx are too big + the 2 dest surfaces -> split static and animated foreground tiles to separate textures?
 
-[ ] Clean up unused gfx/sfx -> see below
-[ ] CVS REMOVE:
-	gameover.wav
-	gfx/packs/menu/menu_platform_arrows.png
-	leveleditor_platform_arrows.png
-	leveleditor_platform_arrows_preview.png
-	leveleditor_platform_arrows_thumbnail.png
-	sledgebrothersdead.png
-	menu_ipfield.png
-	superfire.png
-
-[ ] CVS ADD:
-	leveleditor_platform_path.png
+[ ] Look in CTilesetManager::Init to see if we are loading the non-classic tilesets when we pass in classic!
 
 */
 
@@ -145,6 +132,8 @@ gfxSprite		spr_ghosts;
 gfxSprite		spr_fish;
 gfxSprite		spr_leaves;
 gfxSprite		spr_snow;
+gfxSprite		spr_rain;
+
 gfxSprite		spr_background;
 gfxSprite		spr_backmap[2];
 gfxSprite		spr_frontmap[2];
@@ -1626,6 +1615,20 @@ void RunGame()
 		}
 	}
 	
+	//Rain
+	if(g_map.eyecandyID & 32)
+	{
+		for(i = 0; i < 30; i++)
+			eyecandyfront.add(new EC_Rain(&spr_rain, (float)(rand() % 640), (float)(rand() % 480)));
+	}
+
+	//Bubbles
+	if(g_map.eyecandyID & 64)
+	{
+		for(i = 0; i < 15; i++)
+			eyecandyfront.add(new EC_Bubble(&spr_rain, (float)(rand() % 640), (float)(rand() % 480)));
+	}
+
 	short iScoreTextOffset[4];
 	for(short iTeam = 0; iTeam < score_cnt; iTeam++)
 	{
@@ -2146,6 +2149,11 @@ void RunGame()
 					g_map.updatePlatforms();
 
 					//Keep updating map hazards
+					objectcontainer[0].cleandeadobjects();
+					objectcontainer[1].cleandeadobjects();
+					objectcontainer[2].cleandeadobjects();
+					noncolcontainer.cleandeadobjects();
+					
 					noncolcontainer.update();
 					objectcontainer[0].update();
 					objectcontainer[1].update();
@@ -2153,8 +2161,6 @@ void RunGame()
 
 					eyecandyfront.cleandeadobjects();
 					eyecandyback.cleandeadobjects();
-					objectcontainer[0].cleandeadobjects();
-					noncolcontainer.cleandeadobjects();
 					
 					eyecandyfront.update();
 					eyecandyback.update();

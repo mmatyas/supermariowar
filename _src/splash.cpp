@@ -101,9 +101,9 @@ bool LoadMenuGraphics()
 
 	gfx_loadimage(&spr_announcementicons, convertPath("gfx/packs/menu/menu_announcement_icons.png", graphicspack), false);
 
-	gfx_loadimage(&spr_platformstarttile, convertPath("gfx/leveleditor/leveleditor_platformstarttile.png"), 64, true);
-	gfx_loadimage(&spr_platformendtile, convertPath("gfx/leveleditor/leveleditor_selectedtile.png"), 64, true);
-	gfx_loadimage(&spr_platformpath, convertPath("gfx/leveleditor/leveleditor_platform_path.png"), 128, true);
+	gfx_loadimage(&spr_platformstarttile, convertPath("gfx/leveleditor/leveleditor_platformstarttile.png"), 64, true, true);
+	gfx_loadimage(&spr_platformendtile, convertPath("gfx/leveleditor/leveleditor_selectedtile.png"), 64, true, true);
+	gfx_loadimage(&spr_platformpath, convertPath("gfx/leveleditor/leveleditor_platform_path.png"), 128, true, true);
 	
 	return true;
 }
@@ -112,17 +112,17 @@ bool LoadWorldGraphics()
 {
 	const char * graphicspack = worldgraphicspacklist.current_name();
 
-	gfx_loadimage(&spr_worldbackground[0], convertPath("gfx/packs/world/world_background.png", graphicspack), false);
-	gfx_loadimage(&spr_worldbackground[1], convertPath("gfx/packs/world/preview/world_background.png", graphicspack), false);
+	gfx_loadimage(&spr_worldbackground[0], convertPath("gfx/packs/world/world_background.png", graphicspack), false, false);
+	gfx_loadimage(&spr_worldbackground[1], convertPath("gfx/packs/world/preview/world_background.png", graphicspack), false, false);
 
-	gfx_loadimage(&spr_worldforeground[0], convertPath("gfx/packs/world/world_foreground.png", graphicspack), false);
-	gfx_loadimage(&spr_worldforeground[1], convertPath("gfx/packs/world/preview/world_foreground.png", graphicspack), false);
+	gfx_loadimage(&spr_worldforeground[0], convertPath("gfx/packs/world/world_foreground.png", graphicspack), false, false);
+	gfx_loadimage(&spr_worldforeground[1], convertPath("gfx/packs/world/preview/world_foreground.png", graphicspack), false, false);
 
-	gfx_loadimage(&spr_worldforegroundspecial[0], convertPath("gfx/packs/world/world_foreground_special.png", graphicspack), false);
-	gfx_loadimage(&spr_worldforegroundspecial[1], convertPath("gfx/packs/world/preview/world_foreground_special.png", graphicspack), false);
+	gfx_loadimage(&spr_worldforegroundspecial[0], convertPath("gfx/packs/world/world_foreground_special.png", graphicspack), false, false);
+	gfx_loadimage(&spr_worldforegroundspecial[1], convertPath("gfx/packs/world/preview/world_foreground_special.png", graphicspack), false, false);
 
-	gfx_loadimage(&spr_worldpaths[0], convertPath("gfx/packs/world/world_paths.png", graphicspack), false);
-	gfx_loadimage(&spr_worldpaths[1], convertPath("gfx/packs/world/preview/world_paths.png", graphicspack), false);
+	gfx_loadimage(&spr_worldpaths[0], convertPath("gfx/packs/world/world_paths.png", graphicspack), false, false);
+	gfx_loadimage(&spr_worldpaths[1], convertPath("gfx/packs/world/preview/world_paths.png", graphicspack), false, false);
 
 	gfx_loadimage(&spr_worldvehicle[0], convertPath("gfx/packs/world/world_vehicles.png", graphicspack), false);
 	gfx_loadimage(&spr_worldvehicle[1], convertPath("gfx/packs/world/preview/world_vehicles.png", graphicspack), false);
@@ -165,11 +165,12 @@ bool LoadGameGraphics()
 	gfx_loadimage(&menu_stomp, convertPath("gfx/packs/modeobjects/menu_stomp.png", graphicspack), false);
 	gfx_loadimage(&menu_egg, convertPath("gfx/packs/modeobjects/menu_egg.png", graphicspack), false);
 
-	gfx_loadimage(&spr_clouds, convertPath("gfx/packs/eyecandy/cloud.png", graphicspack), 255, true);
-	gfx_loadimage(&spr_ghosts, convertPath("gfx/packs/eyecandy/ghost.png", graphicspack), 128, true);
-	gfx_loadimage(&spr_fish, convertPath("gfx/packs/eyecandy/fish.png", graphicspack), 128, true);
+	gfx_loadimage(&spr_clouds, convertPath("gfx/packs/eyecandy/cloud.png", graphicspack), 255, true, true);
+	gfx_loadimage(&spr_ghosts, convertPath("gfx/packs/eyecandy/ghost.png", graphicspack), 128, true, true);
+	gfx_loadimage(&spr_fish, convertPath("gfx/packs/eyecandy/fish.png", graphicspack), 128, true, true);
 	gfx_loadimage(&spr_leaves, convertPath("gfx/packs/eyecandy/leaves.png", graphicspack), true);
 	gfx_loadimage(&spr_snow, convertPath("gfx/packs/eyecandy/snow.png", graphicspack), true);
+	gfx_loadimage(&spr_rain, convertPath("gfx/packs/eyecandy/rain.png", graphicspack), true);
 
 	gfx_loadimage(&spr_noteblock, convertPath("gfx/packs/blocks/noteblock.png", graphicspack), false);
 	gfx_loadimage(&spr_breakableblock, convertPath("gfx/packs/blocks/breakableblock.png", graphicspack), false);
@@ -233,13 +234,13 @@ bool LoadGameGraphics()
 	gfx_loadimage(&spr_extratimepowerup, convertPath("gfx/packs/powerups/extratimepowerup.png", graphicspack), true);
 	gfx_loadimage(&spr_jailkeypowerup, convertPath("gfx/packs/powerups/jailkeypowerup.png", graphicspack), true);
 
-	gfx_loadimage(&spr_shade[0], convertPath("gfx/packs/eyecandy/shade1.png", graphicspack), 64, false);
-	gfx_loadimage(&spr_shade[1], convertPath("gfx/packs/eyecandy/shade2.png", graphicspack), 64, false);
-	gfx_loadimage(&spr_shade[2], convertPath("gfx/packs/eyecandy/shade3.png", graphicspack), 64, false);
+	gfx_loadimage(&spr_shade[0], convertPath("gfx/packs/eyecandy/shade1.png", graphicspack), 64, false, true);
+	gfx_loadimage(&spr_shade[1], convertPath("gfx/packs/eyecandy/shade2.png", graphicspack), 64, false, true);
+	gfx_loadimage(&spr_shade[2], convertPath("gfx/packs/eyecandy/shade3.png", graphicspack), 64, false, true);
 	gfx_loadimage(&spr_scorehearts, convertPath("gfx/packs/menu/score_hearts.png", graphicspack), false);
 	gfx_loadimage(&spr_scorecards, convertPath("gfx/packs/menu/score_cards.png", graphicspack), false);
 	
-	gfx_loadimage(&spr_timershade, convertPath("gfx/packs/eyecandy/timershade.png", graphicspack), 64, false);
+	gfx_loadimage(&spr_timershade, convertPath("gfx/packs/eyecandy/timershade.png", graphicspack), 64, false, true);
 	gfx_loadimage(&spr_spawneggs, convertPath("gfx/packs/eyecandy/spawneggs.png", graphicspack), false);
 	gfx_loadimage(&spr_scoretext, convertPath("gfx/packs/fonts/score.png", graphicspack), false);
 	gfx_loadimage(&spr_racetext, convertPath("gfx/packs/fonts/race.png", graphicspack), false);
@@ -268,8 +269,8 @@ bool LoadGameGraphics()
 	gfx_loadimage(&spr_podobo, convertPath("gfx/packs/modeobjects/podobo.png", graphicspack), false);
 	gfx_loadimage(&spr_bowserfire, convertPath("gfx/packs/modeobjects/bowserfire.png", graphicspack), false);
 	gfx_loadimage(&spr_areas, convertPath("gfx/packs/modeobjects/areas.png", graphicspack), false);
-	gfx_loadimage(&spr_kingofthehillarea, convertPath("gfx/packs/modeobjects/kingofthehill.png", graphicspack), 128, false);
-	gfx_loadimage(&spr_jail, convertPath("gfx/packs/modeobjects/jail.png", graphicspack), 160, true);
+	gfx_loadimage(&spr_kingofthehillarea, convertPath("gfx/packs/modeobjects/kingofthehill.png", graphicspack), 128, false, true);
+	gfx_loadimage(&spr_jail, convertPath("gfx/packs/modeobjects/jail.png", graphicspack), 160, true, true);
 	gfx_loadimage(&spr_goomba, convertPath("gfx/packs/modeobjects/goomba.png", graphicspack), true);
 	gfx_loadimage(&spr_goombadead, convertPath("gfx/packs/eyecandy/goombadead.png", graphicspack), true);
 	gfx_loadimage(&spr_goombadeadflying, convertPath("gfx/packs/eyecandy/goombadeadflying.png", graphicspack), true);
@@ -286,7 +287,7 @@ bool LoadGameGraphics()
 	gfx_loadimage(&spr_cheepcheepdead, convertPath("gfx/packs/eyecandy/cheepcheepdead.png", graphicspack), true);
 	gfx_loadimage(&spr_bulletbill, convertPath("gfx/packs/projectiles/bulletbill.png", graphicspack), false);
 	gfx_loadimage(&spr_bulletbilldead, convertPath("gfx/packs/eyecandy/bulletbilldead.png", graphicspack), false);
-	gfx_loadimage(&spr_chicken, convertPath("gfx/packs/modeobjects/chicken.png", graphicspack), 160, true);
+	gfx_loadimage(&spr_chicken, convertPath("gfx/packs/modeobjects/chicken.png", graphicspack), 160, true, true);
 	gfx_loadimage(&spr_racegoal, convertPath("gfx/packs/modeobjects/racegoal.png", graphicspack), false);
 	gfx_loadimage(&spr_pipegamebonus, convertPath("gfx/packs/modeobjects/pipeminigamebonuses.png", graphicspack), true);
 
@@ -328,21 +329,21 @@ bool LoadGameGraphics()
 
 	gfx_loadimage(&spr_hazard_bulletbilldead, convertPath("gfx/packs/hazards/bulletbilldead.png", graphicspack), false);
 
-	gfx_loadimage(&spr_fireballexplosion, convertPath("gfx/packs/eyecandy/fireballexplosion.png", graphicspack), 160, true);
-	gfx_loadimage(&spr_frictionsmoke, convertPath("gfx/packs/eyecandy/frictionsmoke.png", graphicspack), 160, true);
-	gfx_loadimage(&spr_bobombsmoke, convertPath("gfx/packs/eyecandy/bobombsmoke.png", graphicspack), 160, true);
+	gfx_loadimage(&spr_fireballexplosion, convertPath("gfx/packs/eyecandy/fireballexplosion.png", graphicspack), 160, true, true);
+	gfx_loadimage(&spr_frictionsmoke, convertPath("gfx/packs/eyecandy/frictionsmoke.png", graphicspack), 160, true, true);
+	gfx_loadimage(&spr_bobombsmoke, convertPath("gfx/packs/eyecandy/bobombsmoke.png", graphicspack), 160, true, true);
 	gfx_loadimage(&spr_explosion, convertPath("gfx/packs/eyecandy/explosion.png", graphicspack), true);
-	gfx_loadimage(&spr_burnup, convertPath("gfx/packs/eyecandy/burnup.png", graphicspack), 192, true);
+	gfx_loadimage(&spr_burnup, convertPath("gfx/packs/eyecandy/burnup.png", graphicspack), 192, true, true);
 	gfx_loadimage(&spr_fireworks, convertPath("gfx/packs/eyecandy/fireworks.png", graphicspack), true);
 	gfx_loadimage(&spr_poof, convertPath("gfx/packs/eyecandy/poof.png", graphicspack), true);
 
-	gfx_loadimage(&spr_spawnsmoke, convertPath("gfx/packs/eyecandy/spawnsmoke.png", graphicspack), 128, true);
+	gfx_loadimage(&spr_spawnsmoke, convertPath("gfx/packs/eyecandy/spawnsmoke.png", graphicspack), 128, true, true);
 	gfx_loadimage(&spr_spawndoor, convertPath("gfx/packs/eyecandy/spawndoor.png", graphicspack), true);
 
 	gfx_loadimage(&spr_bonus, convertPath("gfx/packs/eyecandy/bonus.png", graphicspack), true);
 	gfx_loadimage(&spr_extralife, convertPath("gfx/packs/eyecandy/extralife.png", graphicspack), true);
 
-	gfx_loadimage(&spr_award, convertPath("gfx/packs/awards/killsinrow.png", graphicspack), 128, true);
+	gfx_loadimage(&spr_award, convertPath("gfx/packs/awards/killsinrow.png", graphicspack), 128, true, true);
 	gfx_loadimage(&spr_awardsolid, convertPath("gfx/packs/awards/killsinrow.png", graphicspack), true);
 	gfx_loadimage(&spr_awardsouls, convertPath("gfx/packs/awards/souls.png", graphicspack), true);
 	gfx_loadimage(&spr_awardsoulspawn, convertPath("gfx/packs/awards/soulspawn.png", graphicspack), true);
@@ -350,8 +351,8 @@ bool LoadGameGraphics()
 	gfx_loadimage(&spr_awardkillsinrow, convertPath("gfx/packs/awards/killsinrownumbers.png", graphicspack), true);
 	
 	//gfx_loadteamcoloredimage(&spr_flagbases, convertPath("gfx/packs/modeobjects/flagbases.png", graphicspack), 255, 0, 255, 160, false, false);
-	gfx_loadimage(&spr_flagbases, convertPath("gfx/packs/modeobjects/flagbases.png", graphicspack), 160, true);
-	gfx_loadimage(&spr_ownedtags, convertPath("gfx/packs/modeobjects/ownedtags.png", graphicspack), 160, true);
+	gfx_loadimage(&spr_flagbases, convertPath("gfx/packs/modeobjects/flagbases.png", graphicspack), 160, true, true);
+	gfx_loadimage(&spr_ownedtags, convertPath("gfx/packs/modeobjects/ownedtags.png", graphicspack), 160, true, true);
 
 	gfx_loadimage(&spr_storedpowerupsmall, convertPath("gfx/packs/powerups/small.png", graphicspack), true);
 	gfx_loadimage(&spr_storedpoweruplarge, convertPath("gfx/packs/powerups/large.png", graphicspack), false);

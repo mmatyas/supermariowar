@@ -1388,6 +1388,12 @@ void CPlayer::move()
 				}
 				else if(velx < 0.0f)
 					game_values.playskidsound = true;
+
+				if(g_map.eyecandyID & 32 && ++rainsteptimer > 7 && velx > VELMOVINGADD)
+				{
+					rainsteptimer = 0;
+					eyecandyfront.add(new EC_SingleAnimation(&spr_frictionsmoke, ix, iy + PH - 14, 5, 3, 0, 16, 16, 16));
+				}
 			}
 		}
 		else if(lrn == -1)
@@ -1422,6 +1428,12 @@ void CPlayer::move()
 				}
 				else if(velx > 0.0f)
 					game_values.playskidsound = true;
+
+				if(g_map.eyecandyID & 32 && ++rainsteptimer > 7 && velx < -VELMOVINGADD)
+				{
+					rainsteptimer = 0;
+					eyecandyfront.add(new EC_SingleAnimation(&spr_frictionsmoke, ix, iy + PH - 14, 5, 3, 0, 16, 16, 16));
+				}
 			}
 		}
 		else
@@ -1581,6 +1593,7 @@ void CPlayer::SetSprite()
 		else if(inair)
 		{
 			frictionslidetimer = 0;
+			rainsteptimer = 0;
 
 			if(IsPlayerFacingRight())
 				spr = PGFX_JUMPING_R;
@@ -1598,7 +1611,7 @@ void CPlayer::SetSprite()
 					if(++frictionslidetimer > 3)
 					{
 						frictionslidetimer = 0;
-						eyecandyfront.add(new EC_SingleAnimation(&spr_frictionsmoke, ix, iy + PH - 12, 4, 4));
+						eyecandyfront.add(new EC_SingleAnimation(&spr_frictionsmoke, ix, iy + PH - 12, 4, 4, 0, 0, 16, 16));
 					}
 				}
 				else
@@ -1634,7 +1647,7 @@ void CPlayer::SetSprite()
 					if(++frictionslidetimer > 3)
 					{
 						frictionslidetimer = 0;
-						eyecandyfront.add(new EC_SingleAnimation(&spr_frictionsmoke, ix + PW - 16, iy + PH - 12, 4, 4));
+						eyecandyfront.add(new EC_SingleAnimation(&spr_frictionsmoke, ix + PW - 16, iy + PH - 12, 4, 4, 0, 0, 16, 16));
 					}
 				}
 				else
@@ -1972,6 +1985,7 @@ void CPlayer::SetupNewPlayer()
 
 	frictionslidetimer = 0;
 	bobombsmoketimer = 0;
+	rainsteptimer = 0;
 
 	spawntimer = 0;
 	waittimer = 0;

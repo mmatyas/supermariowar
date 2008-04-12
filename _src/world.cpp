@@ -476,7 +476,7 @@ bool WorldMap::Load(short tilesize)
 			if(iDrawSurfaceTiles > 456)
 				iDrawSurfaceTiles = 456; //19 * 24 = 456 max tiles in world surface
 
-			iTilesPerCycle = iDrawSurfaceTiles / 16;
+			iTilesPerCycle = iDrawSurfaceTiles / 8;
 		}
 		else if(iReadType == 4) //background sprites
 		{
@@ -1239,7 +1239,7 @@ void WorldMap::DrawMapToSurface(SDL_Surface * surface)
 	{
 		for(short iCol = 0; iCol < iWidth; iCol++)
 		{
-			DrawTileToSurface(surface, iCol, iRow, 0, 0, true, 0);
+			DrawTileToSurface(surface, iCol, iRow, 0, 0, true, 0, 0);
 		}
 	}		
 }
@@ -1256,13 +1256,14 @@ void WorldMap::DrawMapToSurface(short iCycleIndex, bool fFullRefresh, SDL_Surfac
 	short iColEnd = 24 + iMapDrawOffsetCol < iWidth ? 24 : iWidth - iMapDrawOffsetCol;
 
 	short iCounter = 0, iRow, iCol;
+	short iLayer = iCycleIndex == -1 ? 0 : iCycleIndex < 8 ? 1 : 2;
 	for(iRow = iLastDrawRow; iRow < iRowEnd; iRow++)
 	{
 		for(iCol = iLastDrawCol; iCol < iColEnd; iCol++)
 		{
-			DrawTileToSurface(surface, iCol, iRow, iMapDrawOffsetCol, iMapDrawOffsetRow, fFullRefresh, iAnimationFrame);
+			DrawTileToSurface(surface, iCol, iRow, iMapDrawOffsetCol, iMapDrawOffsetRow, fFullRefresh, iAnimationFrame, iLayer);
 
-			if(iCycleIndex >= 0 && iCycleIndex != 15 && ++iCounter > iTilesPerCycle)
+			if(iCycleIndex >= 0 && iCycleIndex != 7 && iCycleIndex != 15 && ++iCounter > iTilesPerCycle)
 				goto STOPDRAWING;
 		}
 
@@ -1278,7 +1279,7 @@ void WorldMap::DrawMapToSurface(short iCycleIndex, bool fFullRefresh, SDL_Surfac
 	iLastDrawCol = iCol;
 }
 
-void WorldMap::DrawTileToSurface(SDL_Surface * surface, short iCol, short iRow, short iMapDrawOffsetCol, short iMapDrawOffsetRow, bool fFullRefresh, short iAnimationFrame)
+void WorldMap::DrawTileToSurface(SDL_Surface * surface, short iCol, short iRow, short iMapDrawOffsetCol, short iMapDrawOffsetRow, bool fFullRefresh, short iAnimationFrame, short iLayer)
 {
 	WorldMapTile * tile = &tiles[iCol + iMapDrawOffsetCol][iRow + iMapDrawOffsetRow];
 
@@ -1296,115 +1297,121 @@ void WorldMap::DrawTileToSurface(SDL_Surface * surface, short iCol, short iRow, 
 	iBackgroundSprite %= WORLD_BACKGROUND_SPRITE_SET_SIZE;
 
 	//The solid background tile is not animated, but all the rest are
-	if(iBackgroundSprite == 1)
+	if(iLayer != 2)
 	{
-		SDL_Rect rSrc = {iTileSize + iBackgroundStyleOffset, iTileSize, iTileSize, iTileSize};
-		SDL_BlitSurface(spr_worldbackground[iTileSheet].getSurface(), &rSrc, surface, &r);
-	}
-	else
-	{
-		SDL_Rect rSrc = {iAnimationFrame + (iBackgroundWater << (2 + iTileSizeShift)), 0, iTileSize, iTileSize};
-		SDL_BlitSurface(spr_worldbackground[iTileSheet].getSurface(), &rSrc, surface, &r);
+		if(iBackgroundSprite == 1)
+		{
+			SDL_Rect rSrc = {iTileSize + iBackgroundStyleOffset, iTileSize, iTileSize, iTileSize};
+			SDL_BlitSurface(spr_worldbackground[iTileSheet].getSurface(), &rSrc, surface, &r);
+		}
+		else
+		{
+			SDL_Rect rSrc = {iAnimationFrame + (iBackgroundWater << (2 + iTileSizeShift)), 0, iTileSize, iTileSize};
+			SDL_BlitSurface(spr_worldbackground[iTileSheet].getSurface(), &rSrc, surface, &r);
 
-		if((iBackgroundSprite >= 2 && iBackgroundSprite <= 48))
-		{
-			if(iBackgroundSprite >= 45)
+			if((iBackgroundSprite >= 2 && iBackgroundSprite <= 48))
 			{
-				SDL_Rect rSrc = {(3 << iTileSizeShift) + iBackgroundStyleOffset, (iBackgroundSprite - 44) << iTileSizeShift, iTileSize, iTileSize};
-				SDL_BlitSurface(spr_worldbackground[iTileSheet].getSurface(), &rSrc, surface, &r);
+				if(iBackgroundSprite >= 45)
+				{
+					SDL_Rect rSrc = {(3 << iTileSizeShift) + iBackgroundStyleOffset, (iBackgroundSprite - 44) << iTileSizeShift, iTileSize, iTileSize};
+					SDL_BlitSurface(spr_worldbackground[iTileSheet].getSurface(), &rSrc, surface, &r);
+				}
+				else if(iBackgroundSprite >= 30)
+				{
+					SDL_Rect rSrc = {(2 << iTileSizeShift) + iBackgroundStyleOffset, (iBackgroundSprite - 29) << iTileSizeShift, iTileSize, iTileSize};
+					SDL_BlitSurface(spr_worldbackground[iTileSheet].getSurface(), &rSrc, surface, &r);
+				}
+				else if(iBackgroundSprite >= 16)
+				{
+					SDL_Rect rSrc = {iTileSize + iBackgroundStyleOffset, (iBackgroundSprite - 14) << iTileSizeShift, iTileSize, iTileSize};
+					SDL_BlitSurface(spr_worldbackground[iTileSheet].getSurface(), &rSrc, surface, &r);
+				}
+				else
+				{
+					SDL_Rect rSrc = {iBackgroundStyleOffset, iBackgroundSprite << iTileSizeShift, iTileSize, iTileSize};
+					SDL_BlitSurface(spr_worldbackground[iTileSheet].getSurface(), &rSrc, surface, &r);
+				}
 			}
-			else if(iBackgroundSprite >= 30)
-			{
-				SDL_Rect rSrc = {(2 << iTileSizeShift) + iBackgroundStyleOffset, (iBackgroundSprite - 29) << iTileSizeShift, iTileSize, iTileSize};
-				SDL_BlitSurface(spr_worldbackground[iTileSheet].getSurface(), &rSrc, surface, &r);
-			}
-			else if(iBackgroundSprite >= 16)
-			{
-				SDL_Rect rSrc = {iTileSize + iBackgroundStyleOffset, (iBackgroundSprite - 14) << iTileSizeShift, iTileSize, iTileSize};
-				SDL_BlitSurface(spr_worldbackground[iTileSheet].getSurface(), &rSrc, surface, &r);
-			}
-			else
-			{
-				SDL_Rect rSrc = {iBackgroundStyleOffset, iBackgroundSprite << iTileSizeShift, iTileSize, iTileSize};
-				SDL_BlitSurface(spr_worldbackground[iTileSheet].getSurface(), &rSrc, surface, &r);
-			}
-		}
-	}
-
-	if(tile->iCompleted >= 0)
-	{
-		SDL_Rect rSrc = {(tile->iCompleted + 10) << iTileSizeShift, 5 << iTileSizeShift, iTileSize, iTileSize};
-		SDL_BlitSurface(spr_worldforegroundspecial[iTileSheet].getSurface(), &rSrc, surface, &r);
-	}
-	else
-	{
-		if(iForegroundSprite >= 0 && iForegroundSprite < WORLD_FOREGROUND_STAGE_OFFSET)
-		{
-			short iPathStyle = iForegroundSprite / WORLD_PATH_SPRITE_SET_SIZE;
-			short iPathOffsetX = (iPathStyle % 4) * (5 << iTileSizeShift);
-			short iPathOffsetY = (iPathStyle >> 2) * (10 << iTileSizeShift);
-			iForegroundSprite %= WORLD_PATH_SPRITE_SET_SIZE;
-			
-			if(iForegroundSprite == 1 || iForegroundSprite == 2)  //Non-animated straight paths
-			{
-				SDL_Rect rSrc = {iPathOffsetX, ((iForegroundSprite - 1) << iTileSizeShift) + iPathOffsetY, iTileSize, iTileSize};
-				SDL_BlitSurface(spr_worldpaths[iTileSheet].getSurface(), &rSrc, surface, &r);
-			}
-			else if(iForegroundSprite >= 3 && iForegroundSprite <= 10) //Animated paths with "coins" in them
-			{
-				SDL_Rect rSrc = {iPathOffsetX + iAnimationFrame, ((iForegroundSprite - 1) << iTileSizeShift) + iPathOffsetY, iTileSize, iTileSize};
-				SDL_BlitSurface(spr_worldpaths[iTileSheet].getSurface(), &rSrc, surface, &r);
-			}
-			else if(iForegroundSprite >= 11 && iForegroundSprite <= 18) //Non-animated straight paths over water
-			{
-				short iSpriteX = (((iForegroundSprite - 11) / 2) + 1) << iTileSizeShift;
-				short iSpriteY = ((iForegroundSprite - 11) % 2) << iTileSizeShift;
-
-				SDL_Rect rSrc = {iPathOffsetX + iSpriteX, iSpriteY + iPathOffsetY, iTileSize, iTileSize};
-				SDL_BlitSurface(spr_worldpaths[iTileSheet].getSurface(), &rSrc, surface, &r);
-			}
-		}
-		else if(iForegroundSprite >= WORLD_FOREGROUND_STAGE_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_STAGE_OFFSET + 399)
-		{
-			short iTileColor = (iForegroundSprite - WORLD_FOREGROUND_STAGE_OFFSET) / 100;
-			SDL_Rect rSrc = {(10 << iTileSizeShift) + iAnimationFrame, iTileColor << iTileSizeShift, iTileSize, iTileSize};
-			SDL_BlitSurface(spr_worldforegroundspecial[iTileSheet].getSurface(), &rSrc, surface, &r);
-
-			short iTileNumber = (iForegroundSprite - WORLD_FOREGROUND_STAGE_OFFSET) % 100;
-			rSrc.x = (iTileNumber % 10) << iTileSizeShift;
-			rSrc.y = (iTileNumber / 10) << iTileSizeShift;
-			SDL_BlitSurface(spr_worldforegroundspecial[iTileSheet].getSurface(), &rSrc, surface, &r);
-		}
-		else if(iForegroundSprite >= WORLD_BRIDGE_SPRITE_OFFSET && iForegroundSprite <= WORLD_BRIDGE_SPRITE_OFFSET + 3)
-		{
-			SDL_Rect rSrc = {(iForegroundSprite - WORLD_BRIDGE_SPRITE_OFFSET + 10) << iTileSizeShift, 7 << iTileSizeShift, iTileSize, iTileSize};
-			SDL_BlitSurface(spr_worldforegroundspecial[iTileSheet].getSurface(), &rSrc, surface, &r);
-		}
-		else if(iForegroundSprite >= WORLD_START_SPRITE_OFFSET && iForegroundSprite <= WORLD_START_SPRITE_OFFSET + 1)
-		{
-			SDL_Rect rSrc = {(iForegroundSprite - WORLD_START_SPRITE_OFFSET + 10) << iTileSizeShift, 4 << iTileSizeShift, iTileSize, iTileSize};
-			SDL_BlitSurface(spr_worldforegroundspecial[iTileSheet].getSurface(), &rSrc, surface, &r);
-		}
-		else if(iForegroundSprite >= WORLD_FOREGROUND_SPRITE_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_SPRITE_OFFSET + 179)
-		{
-			short iSprite = iForegroundSprite - WORLD_FOREGROUND_SPRITE_OFFSET;
-			SDL_Rect rSrc = {(iSprite % 12) << iTileSizeShift, (iSprite / 12) << iTileSizeShift, iTileSize, iTileSize};
-			SDL_BlitSurface(spr_worldforeground[iTileSheet].getSurface(), &rSrc, surface, &r);
-		}
-		else if(iForegroundSprite >= WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET + 29)
-		{
-			short iSprite = iForegroundSprite - WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET;
-			SDL_Rect rSrc = {(iSprite >= 15 ? (16 << iTileSizeShift) : (12 << iTileSizeShift)) + iAnimationFrame, (iSprite % 15) << iTileSizeShift, iTileSize, iTileSize};
-			SDL_BlitSurface(spr_worldforeground[iTileSheet].getSurface(), &rSrc, surface, &r);
 		}
 	}
 
-	//Draw doors
-	short iType = tile->iType;
-	if(iType >= 2 && iType <= 5)
+	if(iLayer != 1)
 	{
-		SDL_Rect rSrc = {(iType + 8) << iTileSizeShift, 6 << iTileSizeShift, iTileSize, iTileSize};
-		SDL_BlitSurface(spr_worldforegroundspecial[iTileSheet].getSurface(), &rSrc, surface, &r);
+		if(tile->iCompleted >= 0)
+		{
+			SDL_Rect rSrc = {(tile->iCompleted + 10) << iTileSizeShift, 5 << iTileSizeShift, iTileSize, iTileSize};
+			SDL_BlitSurface(spr_worldforegroundspecial[iTileSheet].getSurface(), &rSrc, surface, &r);
+		}
+		else
+		{
+			if(iForegroundSprite >= 0 && iForegroundSprite < WORLD_FOREGROUND_STAGE_OFFSET)
+			{
+				short iPathStyle = iForegroundSprite / WORLD_PATH_SPRITE_SET_SIZE;
+				short iPathOffsetX = (iPathStyle % 4) * (5 << iTileSizeShift);
+				short iPathOffsetY = (iPathStyle >> 2) * (10 << iTileSizeShift);
+				iForegroundSprite %= WORLD_PATH_SPRITE_SET_SIZE;
+				
+				if(iForegroundSprite == 1 || iForegroundSprite == 2)  //Non-animated straight paths
+				{
+					SDL_Rect rSrc = {iPathOffsetX, ((iForegroundSprite - 1) << iTileSizeShift) + iPathOffsetY, iTileSize, iTileSize};
+					SDL_BlitSurface(spr_worldpaths[iTileSheet].getSurface(), &rSrc, surface, &r);
+				}
+				else if(iForegroundSprite >= 3 && iForegroundSprite <= 10) //Animated paths with "coins" in them
+				{
+					SDL_Rect rSrc = {iPathOffsetX + iAnimationFrame, ((iForegroundSprite - 1) << iTileSizeShift) + iPathOffsetY, iTileSize, iTileSize};
+					SDL_BlitSurface(spr_worldpaths[iTileSheet].getSurface(), &rSrc, surface, &r);
+				}
+				else if(iForegroundSprite >= 11 && iForegroundSprite <= 18) //Non-animated straight paths over water
+				{
+					short iSpriteX = (((iForegroundSprite - 11) / 2) + 1) << iTileSizeShift;
+					short iSpriteY = ((iForegroundSprite - 11) % 2) << iTileSizeShift;
+
+					SDL_Rect rSrc = {iPathOffsetX + iSpriteX, iSpriteY + iPathOffsetY, iTileSize, iTileSize};
+					SDL_BlitSurface(spr_worldpaths[iTileSheet].getSurface(), &rSrc, surface, &r);
+				}
+			}
+			else if(iForegroundSprite >= WORLD_FOREGROUND_STAGE_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_STAGE_OFFSET + 399)
+			{
+				short iTileColor = (iForegroundSprite - WORLD_FOREGROUND_STAGE_OFFSET) / 100;
+				SDL_Rect rSrc = {(10 << iTileSizeShift) + iAnimationFrame, iTileColor << iTileSizeShift, iTileSize, iTileSize};
+				SDL_BlitSurface(spr_worldforegroundspecial[iTileSheet].getSurface(), &rSrc, surface, &r);
+
+				short iTileNumber = (iForegroundSprite - WORLD_FOREGROUND_STAGE_OFFSET) % 100;
+				rSrc.x = (iTileNumber % 10) << iTileSizeShift;
+				rSrc.y = (iTileNumber / 10) << iTileSizeShift;
+				SDL_BlitSurface(spr_worldforegroundspecial[iTileSheet].getSurface(), &rSrc, surface, &r);
+			}
+			else if(iForegroundSprite >= WORLD_BRIDGE_SPRITE_OFFSET && iForegroundSprite <= WORLD_BRIDGE_SPRITE_OFFSET + 3)
+			{
+				SDL_Rect rSrc = {(iForegroundSprite - WORLD_BRIDGE_SPRITE_OFFSET + 10) << iTileSizeShift, 7 << iTileSizeShift, iTileSize, iTileSize};
+				SDL_BlitSurface(spr_worldforegroundspecial[iTileSheet].getSurface(), &rSrc, surface, &r);
+			}
+			else if(iForegroundSprite >= WORLD_START_SPRITE_OFFSET && iForegroundSprite <= WORLD_START_SPRITE_OFFSET + 1)
+			{
+				SDL_Rect rSrc = {(iForegroundSprite - WORLD_START_SPRITE_OFFSET + 10) << iTileSizeShift, 4 << iTileSizeShift, iTileSize, iTileSize};
+				SDL_BlitSurface(spr_worldforegroundspecial[iTileSheet].getSurface(), &rSrc, surface, &r);
+			}
+			else if(iForegroundSprite >= WORLD_FOREGROUND_SPRITE_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_SPRITE_OFFSET + 179)
+			{
+				short iSprite = iForegroundSprite - WORLD_FOREGROUND_SPRITE_OFFSET;
+				SDL_Rect rSrc = {(iSprite % 12) << iTileSizeShift, (iSprite / 12) << iTileSizeShift, iTileSize, iTileSize};
+				SDL_BlitSurface(spr_worldforeground[iTileSheet].getSurface(), &rSrc, surface, &r);
+			}
+			else if(iForegroundSprite >= WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET + 29)
+			{
+				short iSprite = iForegroundSprite - WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET;
+				SDL_Rect rSrc = {(iSprite >= 15 ? (16 << iTileSizeShift) : (12 << iTileSizeShift)) + iAnimationFrame, (iSprite % 15) << iTileSizeShift, iTileSize, iTileSize};
+				SDL_BlitSurface(spr_worldforeground[iTileSheet].getSurface(), &rSrc, surface, &r);
+			}
+		}
+
+		//Draw doors
+		short iType = tile->iType;
+		if(iType >= 2 && iType <= 5)
+		{
+			SDL_Rect rSrc = {(iType + 8) << iTileSizeShift, 6 << iTileSizeShift, iTileSize, iTileSize};
+			SDL_BlitSurface(spr_worldforegroundspecial[iTileSheet].getSurface(), &rSrc, surface, &r);
+		}
 	}
 }
 

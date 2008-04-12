@@ -47,8 +47,8 @@ class gfxSprite
 
 		void clearSurface();
 
-		bool init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b); //color keyed
-		bool init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b, Uint8 a);	//color keyed + alpha
+		bool init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b, bool fUseAccel = true); //color keyed
+		bool init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b, Uint8 a, bool fUseAccel = true);	//color keyed + alpha
 		bool init(const std::string& filename);							//non color keyed
 		bool initskin(const std::string& filename, Uint8 r, Uint8 g, Uint8 b, short colorscheme, bool expand);
 
@@ -126,8 +126,8 @@ bool gfx_loadteamcoloredimage(gfxSprite * gSprites, const std::string& filename,
 bool gfx_loadteamcoloredimage(gfxSprite * gSprites, const std::string& filename, Uint8 a, bool fVertical, bool fWrap);
 
 bool gfx_loadimagenocolorkey(gfxSprite * gSprite, const std::string& f);
-bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, bool fWrap);
-bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, Uint8 alpha, bool fWrap);
+bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, bool fWrap, bool fUseAccel = true);
+bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, Uint8 alpha, bool fWrap, bool fUseAccel = true);
 
 #endif //__GFX_H__
 

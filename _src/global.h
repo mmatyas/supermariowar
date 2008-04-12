@@ -516,6 +516,8 @@ extern gfxSprite		spr_ghosts;
 extern gfxSprite		spr_fish;
 extern gfxSprite		spr_leaves;
 extern gfxSprite		spr_snow;
+extern gfxSprite		spr_rain;
+
 extern gfxSprite		spr_background;
 extern gfxSprite		spr_backmap[2];
 extern gfxSprite		spr_frontmap[2];

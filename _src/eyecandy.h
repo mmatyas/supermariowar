@@ -146,6 +146,35 @@ class EC_Snow : public EC_StillImage
 		float velx, vely;
 };
 
+class EC_Rain : public EC_StillImage
+{
+	public:
+		EC_Rain(gfxSprite *nspr, float nx, float ny);
+		~EC_Rain() {}
+
+		void update();
+
+	private:
+		void NextRainDrop();
+
+		float dx, dy;
+		float velx, vely;
+};
+
+class EC_Bubble : public EC_OscillatingAnimation
+{
+	public:
+		EC_Bubble(gfxSprite *nspr, float nx, float ny);
+		~EC_Bubble() {}
+
+		void update();
+
+	private:
+		void NextBubble();
+
+		float dx, dy;
+		float velx, vely;
+};
 
 class EC_GravText : public CEyecandy
 {

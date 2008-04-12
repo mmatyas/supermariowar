@@ -211,7 +211,7 @@ class WorldMap
 		void Cleanup();
 		void SetTileConnections(short iCol, short iRow);
 
-		void DrawTileToSurface(SDL_Surface * surface, short iCol, short iRow, short iMapDrawOffsetCol, short iMapDrawOffsetRow, bool fFullRefresh, short iAnimationFrame);
+		void DrawTileToSurface(SDL_Surface * surface, short iCol, short iRow, short iMapDrawOffsetCol, short iMapDrawOffsetRow, bool fFullRefresh, short iAnimationFrame, short iLayer = 0);
 
 		short iWidth;
 		short iHeight;

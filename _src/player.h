@@ -259,6 +259,7 @@ class CPlayer
 		
 		short frictionslidetimer;  //this controls how much friction smoke is generated when sliding
 		short bobombsmoketimer;   //timer for the bobomb smoke animation
+		short rainsteptimer;
 
 		CPlayerAI * pPlayerAI;
 
