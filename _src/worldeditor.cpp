@@ -241,19 +241,19 @@ int main(int argc, char *argv[])
 
 	printf("\n---------------- load world ----------------\n");
 
-	spr_worldbackground[0].init(convertPath("gfx/packs/Classic/world/world_background.png"), 255, 0, 255);
+	spr_worldbackground[0].init(convertPath("gfx/packs/Classic/world/world_background.png"), 255, 0, 255, false);
 	spr_worldbackground[1].init(convertPath("gfx/packs/Classic/world/preview/world_background.png"), 255, 0, 255);
 	spr_worldbackground[2].init(convertPath("gfx/packs/Classic/world/thumbnail/world_background.png"), 255, 0, 255);
 
-	spr_worldforeground[0].init(convertPath("gfx/packs/Classic/world/world_foreground.png"), 255, 0, 255);
+	spr_worldforeground[0].init(convertPath("gfx/packs/Classic/world/world_foreground.png"), 255, 0, 255, false);
 	spr_worldforeground[1].init(convertPath("gfx/packs/Classic/world/preview/world_foreground.png"), 255, 0, 255);
 	spr_worldforeground[2].init(convertPath("gfx/packs/Classic/world/thumbnail/world_foreground.png"), 255, 0, 255);
 
-	spr_worldforegroundspecial[0].init(convertPath("gfx/packs/Classic/world/world_foreground_special.png"), 255, 0, 255);
+	spr_worldforegroundspecial[0].init(convertPath("gfx/packs/Classic/world/world_foreground_special.png"), 255, 0, 255, false);
 	spr_worldforegroundspecial[1].init(convertPath("gfx/packs/Classic/world/preview/world_foreground_special.png"), 255, 0, 255);
 	spr_worldforegroundspecial[2].init(convertPath("gfx/packs/Classic/world/thumbnail/world_foreground_special.png"), 255, 0, 255);
 
-	spr_worldpaths[0].init(convertPath("gfx/packs/Classic/world/world_paths.png"), 255, 0, 255);
+	spr_worldpaths[0].init(convertPath("gfx/packs/Classic/world/world_paths.png"), 255, 0, 255, false);
 	spr_worldpaths[1].init(convertPath("gfx/packs/Classic/world/preview/world_paths.png"), 255, 0, 255);
 	spr_worldpaths[2].init(convertPath("gfx/packs/Classic/world/thumbnail/world_paths.png"), 255, 0, 255);
 
