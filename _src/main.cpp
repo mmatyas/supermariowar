@@ -40,7 +40,6 @@
 
 //BUG!!  World AI needs ability to use stored items -> harder problem than I have time for
 
-//[ ] Need to test memory/slowness on xbox build
 //[ ] Need to update some maps with better platform paths (Reznor map) and some hazards here and there and maybe some map items
 //[ ] Add SMB3's first world as a test world to ship with
 
@@ -55,13 +54,10 @@
 - Mariokart-type podium at the end of a tournament/tour/whatever
 
 [ ] Make the SMB3 world work -> Need to recreate maps using new 1.8 map editor
-[ ] Special directory for world maps?  Don't want to polute the map list with world only maps
-
-[ ] Speed up world drawing by looking at DrawMapToSurface() method to make it blazing fast
-[ ] Profile code using DevPartner
-[ ] Maybe it has a paging problem because the source gfx are too big + the 2 dest surfaces -> split static and animated foreground tiles to separate textures?
 
 [ ] Look in CTilesetManager::Init to see if we are loading the non-classic tilesets when we pass in classic!
+
+[ ] Unlimited -> 5 goal once you exit out, the game doesn't know if you're going to go into a tournament next where unlimited is invalid. I'll see if I can fix it so it only resets if you actually enter a tournament.
 
 */
 

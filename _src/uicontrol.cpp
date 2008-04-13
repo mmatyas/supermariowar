@@ -6252,7 +6252,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 				short iTemp; //Just a temp value so we can call the GetVehicleInPlayerTile method
 				bool fVehicleInTile = g_worldmap.GetVehicleInPlayerTile(&iTemp) >= 0;
 
-				if(playerKeys->menu_up.fPressed)
+				if(playerKeys->menu_up.fPressed || playerKeys->menu_up.fDown)
 				{
 					//Make sure there is a path connection and that there is no stage or vehicle blocking the way
 					if((tile->fConnection[0] || tile->iConnectionType == 14) && !g_worldmap.IsDoor(iPlayerCurrentTileX, iPlayerCurrentTileY - 1) &&
@@ -6273,10 +6273,11 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 					}
 					else
 					{
-						ifsoundonplay(sfx_hit);
+						if(playerKeys->menu_up.fPressed)
+							ifsoundonplay(sfx_hit);
 					}
 				}
-				else if(playerKeys->menu_down.fPressed)
+				else if(playerKeys->menu_down.fPressed || playerKeys->menu_down.fDown)
 				{
 					if((tile->fConnection[1] || tile->iConnectionType == 14) && !g_worldmap.IsDoor(iPlayerCurrentTileX, iPlayerCurrentTileY + 1) &&
 						(((tile->iCompleted >= -1 || (tile->iType >= 6 && game_values.tourstops[tile->iType - 6]->iStageType == 1)) && (!fVehicleInTile || iSleepTurns > 0)) || iReturnDirection == 1 || fUsingCloud))
@@ -6296,10 +6297,11 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 					}
 					else
 					{
-						ifsoundonplay(sfx_hit);
+						if(playerKeys->menu_down.fPressed)
+							ifsoundonplay(sfx_hit);
 					}
 				}
-				else if(playerKeys->menu_left.fPressed)
+				else if(playerKeys->menu_left.fPressed || playerKeys->menu_left.fDown)
 				{
 					if((tile->fConnection[2] || tile->iConnectionType == 12) && !g_worldmap.IsDoor(iPlayerCurrentTileX - 1, iPlayerCurrentTileY) &&
 						(((tile->iCompleted >= -1 || (tile->iType >= 6 && game_values.tourstops[tile->iType - 6]->iStageType == 1)) && (!fVehicleInTile || iSleepTurns > 0)) || iReturnDirection == 2 || fUsingCloud))
@@ -6320,10 +6322,12 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 					else
 					{
 						g_worldmap.FacePlayer(1);
-						ifsoundonplay(sfx_hit);
+
+						if(playerKeys->menu_left.fPressed)
+							ifsoundonplay(sfx_hit);
 					}
 				}
-				else if(playerKeys->menu_right.fPressed)
+				else if(playerKeys->menu_right.fPressed || playerKeys->menu_right.fDown)
 				{
 					if((tile->fConnection[3] || tile->iConnectionType == 12) && !g_worldmap.IsDoor(iPlayerCurrentTileX + 1, iPlayerCurrentTileY) &&
 						(((tile->iCompleted >= -1 || (tile->iType >= 6 && game_values.tourstops[tile->iType - 6]->iStageType == 1)) && (!fVehicleInTile || iSleepTurns > 0)) || iReturnDirection == 3 || fUsingCloud))
@@ -6344,7 +6348,9 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 					else
 					{
 						g_worldmap.FacePlayer(0);
-						ifsoundonplay(sfx_hit);
+						
+						if(playerKeys->menu_right.fPressed)
+							ifsoundonplay(sfx_hit);
 					}
 				}
 				else if(playerInput->outputControls[iPlayer].menu_select.fPressed)
