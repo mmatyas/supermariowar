@@ -2054,32 +2054,27 @@ int editor_properties(short iBlockCol, short iBlockRow)
 						short iSettingIndex;
 						short * piSetting = GetBlockProperty(iMouseX, iMouseY, iBlockCol, iBlockRow, &iSettingIndex);
 
-						if(piSetting)
+						//If shift is held, set all powerups to this setting
+						short iValue = event.key.keysym.sym - SDLK_0;
+
+						if(event.key.keysym.sym == SDLK_0)
+							iValue = 10;
+						else if(event.key.keysym.sym == SDLK_BACKQUOTE)
+							iValue = 0;
+						else if(event.key.keysym.sym == SDLK_d)
+							iValue = g_iDefaultPowerupPresets[0][iSettingIndex];
+
+						Uint8 * keystate = SDL_GetKeyState(NULL);
+						if (keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT]) 
 						{
-							short iValue = event.key.keysym.sym - SDLK_0;
-							if(event.key.keysym.sym == SDLK_0)
-								iValue = 10;
-							else if(event.key.keysym.sym == SDLK_BACKQUOTE)
-								iValue = 0;
-							else if(event.key.keysym.sym == SDLK_d)
-								iValue = g_iDefaultPowerupPresets[0][iSettingIndex];
-
-							//If shift is held, set all powerups to this setting
-							Uint8 * keystate = SDL_GetKeyState(NULL);
-							if (keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT]) 
+							for(short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++)
 							{
-								for(short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++)
-								{
-									if(event.key.keysym.sym == SDLK_d)
-										iValue = g_iDefaultPowerupPresets[0][iSetting];
-
-									g_map.objectdata[iBlockCol][iBlockRow].iSettings[iSetting] = iValue;
-								}
+								g_map.objectdata[iBlockCol][iBlockRow].iSettings[iSetting] = iValue;
 							}
-							else
-							{
-								*piSetting = iValue;
-							}
+						}
+						else if(piSetting)
+						{
+							*piSetting = iValue;
 						}
 					}
 				}

@@ -3990,7 +3990,6 @@ void Menu::RunMenu()
 					if(game_values.gamemode->gamemode == game_mode_pipe_minigame)
 					{
 						g_map.loadMap(convertPath("maps/special/minigamepipe.map"), read_type_full);
-						LoadCurrentMapBackground();
 					}
 					else if(game_values.matchtype == MATCH_TYPE_QUICK_GAME)
 					{
@@ -4001,6 +4000,8 @@ void Menu::RunMenu()
 					{
 						g_map.loadMap(maplist.currentFilename(), read_type_full);
 					}
+
+					LoadCurrentMapBackground();
 
 					//Allows all players to start the game
 					game_values.singleplayermode = -1;

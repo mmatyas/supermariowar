@@ -94,6 +94,7 @@ bool LoadMenuGraphics()
 	gfx_loadimage(&spr_map_filter_icons, convertPath("gfx/packs/menu/menu_map_flags.png", graphicspack), false);
 	gfx_loadimage(&spr_tour_markers, convertPath("gfx/packs/menu/tour_markers.png", graphicspack), false); 
 	gfx_loadimage(&spr_menu_boxed_numbers, convertPath("gfx/packs/menu/menu_boxed_numbers.png", graphicspack), false);
+	gfx_loadimage(&spr_countdown_numbers, convertPath("gfx/packs/menu/game_countdown_numbers.png", graphicspack), false);
 	gfx_loadimage(&spr_thumbnail_warps[0], convertPath("gfx/packs/menu/menu_warp_preview.png", graphicspack), false);
 	gfx_loadimage(&spr_thumbnail_warps[1], convertPath("gfx/packs/menu/menu_warp_thumbnail.png", graphicspack), false);
 	gfx_loadimage(&spr_thumbnail_mapitems[0], convertPath("gfx/packs/menu/menu_mapitems_preview.png", graphicspack), false);

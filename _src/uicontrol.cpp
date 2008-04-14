@@ -307,13 +307,13 @@ bool MI_SelectField::HideItem(short iID, bool fhide)
 	if(items.empty())
 		return false;
 
-	std::vector<SF_ListItem*>::iterator search = items.begin();
+	std::vector<SF_ListItem*>::iterator search = items.begin(), lim = items.end();
 
-	while(search != items.end())
+	while(search != lim)
 	{
 		if((*search)->iValue == iID)
 		{
-			if(current == search)
+			if(current == search && fhide)
 			{
 				if(!MoveNext())
 					MovePrev();

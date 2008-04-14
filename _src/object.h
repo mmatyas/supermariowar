@@ -931,7 +931,7 @@ class OMO_Thwomp : public IO_OverMapObject
 class MO_Podobo : public IO_MovingObject
 {
 	public:
-		MO_Podobo(gfxSprite *nspr, short x, float nspeed, short playerid, short teamid, short colorid);
+		MO_Podobo(gfxSprite *nspr, short x, short y, float nspeed, short playerid, short teamid, short colorid, bool isSpawned);
 		~MO_Podobo(){};
 
 		void update();
@@ -943,6 +943,8 @@ class MO_Podobo : public IO_MovingObject
 		
 		short iColorOffsetY;
 
+		bool fIsSpawned;
+		short iHiddenPlane;
 };
 
 class OMO_BowserFire : public IO_OverMapObject

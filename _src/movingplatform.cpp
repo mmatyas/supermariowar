@@ -165,7 +165,10 @@ StraightPathContinuous::StraightPathContinuous(float vel, float startX, float st
 	dAngle = angle;
 	
 	for(short type = 0; type < 2; type++)
+	{
+		iGoalPoint[type] = 1;
 		SetVelocity(type);
+	}
 
 	dEdgeX = 640.0f;
 	dEdgeY = 480.0f;

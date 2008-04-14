@@ -169,5 +169,5 @@
 #Tour Stops (maximum 10 stops)
 #Map,Mode,Goal,Points,Bonus Wheel,Name,Options(see above)
 subcon,5,30,2,1,1st Stop,60,2,0,0,2,0,0,1,0,0
-0smw,16,200,1,0,2nd Stop,1,5,0,8,4,1
+0smw,16,20,1,0,2nd Stop,1,5,0,8,4,1
 treefort,15,15,1,0,3rd Stop,3,310,0,2,1,1,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0

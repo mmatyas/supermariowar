@@ -1402,7 +1402,7 @@ void CGM_Survival::think()
 			}
 			else if(1 == iSelectedEnemy)
 			{
-				objectcontainer[2].add(new MO_Podobo(&spr_podobo, (short)(rand() % 608), -(float(rand() % 9) / 2.0f) - 8.0f, -1, -1, -1));
+				objectcontainer[2].add(new MO_Podobo(&spr_podobo, (short)(rand() % 608), 480, -(float(rand() % 9) / 2.0f) - 8.0f, -1, -1, -1, false));
 				timer = (short)(rand() % 21 - 10 + rate - 20);
 			}
 			else

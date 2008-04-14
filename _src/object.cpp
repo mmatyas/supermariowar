@@ -479,58 +479,146 @@ void B_PowerupBlock::update()
 			{
 				short iSelectedPowerup = SelectPowerup();
 
-				if(0 == iSelectedPowerup)
-					objectcontainer[0].add(new PU_PoisonPowerup(&spr_poisonpowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1));
-				else if(1 == iSelectedPowerup)
-					objectcontainer[0].add(new PU_ExtraGuyPowerup(&spr_1uppowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1, 1));
-				else if(2 == iSelectedPowerup)
-					objectcontainer[0].add(new PU_ExtraGuyPowerup(&spr_2uppowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1, 2));
-				else if(3 == iSelectedPowerup)
-					objectcontainer[0].add(new PU_ExtraGuyPowerup(&spr_3uppowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1, 3));
-				else if(4 == iSelectedPowerup)
-					objectcontainer[0].add(new PU_ExtraGuyPowerup(&spr_5uppowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1, 5));
-				else if(5 == iSelectedPowerup)
-					objectcontainer[0].add(new PU_FirePowerup(&spr_firepowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1));
-				else if(6 == iSelectedPowerup)
-					objectcontainer[0].add(new PU_StarPowerup(&spr_starpowerup, ix + 1, iy - 1, 4, side, 2, 30, 30, 1, 1));
-				else if(7 == iSelectedPowerup)
-					objectcontainer[0].add(new PU_ClockPowerup(&spr_clockpowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1));
-				else if(8 == iSelectedPowerup)
-					objectcontainer[0].add(new PU_BobombPowerup(&spr_bobombpowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1));
-				else if(9 == iSelectedPowerup)
-					objectcontainer[0].add(new PU_PowPowerup(&spr_powpowerup, ix + 1, iy - 1, 8, side, 8, 30, 30, 1, 1));
-				else if(10 == iSelectedPowerup)
-					objectcontainer[0].add(new PU_BulletBillPowerup(&spr_bulletbillpowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1));
-				else if(11 == iSelectedPowerup)
-					objectcontainer[0].add(new PU_HammerPowerup(&spr_hammerpowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1));
-				else if(12 == iSelectedPowerup)
-					objectcontainer[1].add(new CO_Shell(0, ix + 1, iy - 1, true, true, true, false));
-				else if(13 == iSelectedPowerup)
-					objectcontainer[1].add(new CO_Shell(1, ix + 1, iy - 1, false, true, true, false));
-				else if(14 == iSelectedPowerup)
-					objectcontainer[1].add(new CO_Shell(2, ix + 1, iy - 1, false, false, true, true));
-				else if(15 == iSelectedPowerup)
-					objectcontainer[1].add(new CO_Shell(3, ix + 1, iy - 1, false, true, false, false));
-				else if(16 == iSelectedPowerup)
-					objectcontainer[0].add(new PU_ModPowerup(&spr_modpowerup, ix + 1, iy - 1, 8, side, 8, 30, 30, 1, 1));
-				else if(17 == iSelectedPowerup)
-					objectcontainer[0].add(new PU_FeatherPowerup(&spr_featherpowerup, ix + 1, iy - 1, 1, 0, 30, 30, 1, 1));
-				else if(18 == iSelectedPowerup)
-					objectcontainer[0].add(new PU_MysteryMushroomPowerup(&spr_mysterymushroompowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1));
-				else if(19 == iSelectedPowerup)
-					objectcontainer[0].add(new PU_BoomerangPowerup(&spr_boomerangpowerup, ix + 1, iy - 1, 1, side, 0, 30, 26, 1, 5));
-				else if(20 == iSelectedPowerup) 
-					objectcontainer[0].add(new PU_Tanooki(ix + 1, iy - 1));
-				else if(21 == iSelectedPowerup) 
-					objectcontainer[0].add(new PU_IceWandPowerup(&spr_icewandpowerup, ix + 1, iy - 1, 1, 0, 30, 30, 1, 1));
-				else if(22 == iSelectedPowerup) 
-					objectcontainer[0].add(new PU_PodoboPowerup(&spr_podobopowerup, ix + 1, iy - 1, 1, 0, 30, 30, 1, 1));
-				else if(23 == iSelectedPowerup) 
-					objectcontainer[0].add(new PU_BombPowerup(&spr_bombpowerup, ix + 1, iy - 1, 1, 0, 30, 30, 1, 1));
-				else if(24 == iSelectedPowerup)
-					objectcontainer[0].add(new PU_LeafPowerup(&spr_leafpowerup, ix + 1, iy - 1, 1, 0, 30, 30, 1, 1));
-				else if(25 == iSelectedPowerup) 
-					objectcontainer[0].add(new PU_PWingsPowerup(&spr_pwingspowerup, ix + 1, iy - 1));
+				switch(iSelectedPowerup)
+				{
+					case 0:
+					{
+						objectcontainer[0].add(new PU_PoisonPowerup(&spr_poisonpowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1));
+						break;
+					}
+					case 1:
+					{
+						objectcontainer[0].add(new PU_ExtraGuyPowerup(&spr_1uppowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1, 1));
+						break;
+					}
+					case 2:
+					{
+						objectcontainer[0].add(new PU_ExtraGuyPowerup(&spr_2uppowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1, 2));
+						break;
+					}
+					case 3:
+					{
+						objectcontainer[0].add(new PU_ExtraGuyPowerup(&spr_3uppowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1, 3));
+						break;
+					}
+					case 4:
+					{
+						objectcontainer[0].add(new PU_ExtraGuyPowerup(&spr_5uppowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1, 5));
+						break;
+					}
+					case 5:
+					{
+						objectcontainer[0].add(new PU_FirePowerup(&spr_firepowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1));
+						break;
+					}
+					case 6:
+					{
+						objectcontainer[0].add(new PU_StarPowerup(&spr_starpowerup, ix + 1, iy - 1, 4, side, 2, 30, 30, 1, 1));
+						break;
+					}
+					case 7:
+					{
+						objectcontainer[0].add(new PU_ClockPowerup(&spr_clockpowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1));
+						break;
+					}
+					case 8:
+					{
+						objectcontainer[0].add(new PU_BobombPowerup(&spr_bobombpowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1));
+						break;
+					}
+					case 9:
+					{
+						objectcontainer[0].add(new PU_PowPowerup(&spr_powpowerup, ix + 1, iy - 1, 8, side, 8, 30, 30, 1, 1));
+						break;
+					}
+					case 10:
+					{
+						objectcontainer[0].add(new PU_BulletBillPowerup(&spr_bulletbillpowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1));
+						break;
+					}
+					case 11:
+					{
+						objectcontainer[0].add(new PU_HammerPowerup(&spr_hammerpowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1));
+						break;
+					}
+					case 12:
+					{
+						objectcontainer[1].add(new CO_Shell(0, ix + 1, iy - 1, true, true, true, false));
+						break;
+					}
+					case 13:
+					{
+						objectcontainer[1].add(new CO_Shell(1, ix + 1, iy - 1, false, true, true, false));
+						break;
+					}
+					case 14:
+					{
+						objectcontainer[1].add(new CO_Shell(2, ix + 1, iy - 1, false, false, true, true));
+						break;
+					}
+					case 15:
+					{
+						objectcontainer[1].add(new CO_Shell(3, ix + 1, iy - 1, false, true, false, false));
+						break;
+					}
+					case 16:
+					{
+						objectcontainer[0].add(new PU_ModPowerup(&spr_modpowerup, ix + 1, iy - 1, 8, side, 8, 30, 30, 1, 1));
+						break;
+					}
+					case 17:
+					{
+						objectcontainer[0].add(new PU_FeatherPowerup(&spr_featherpowerup, ix + 1, iy - 1, 1, 0, 30, 30, 1, 1));
+						break;
+					}
+					case 18:
+					{
+						objectcontainer[0].add(new PU_MysteryMushroomPowerup(&spr_mysterymushroompowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1));
+						break;
+					}
+					case 19:
+					{
+						objectcontainer[0].add(new PU_BoomerangPowerup(&spr_boomerangpowerup, ix + 1, iy - 1, 1, side, 0, 30, 26, 1, 5));
+						break;
+					}
+					case 20:
+					{
+						objectcontainer[0].add(new PU_Tanooki(ix + 1, iy - 1));
+						break;
+					}
+					case 21:
+					{
+						objectcontainer[0].add(new PU_IceWandPowerup(&spr_icewandpowerup, ix + 1, iy - 1, 1, 0, 30, 30, 1, 1));
+						break;
+					}
+					case 22:
+					{
+						objectcontainer[0].add(new PU_PodoboPowerup(&spr_podobopowerup, ix + 1, iy - 1, 1, 0, 30, 30, 1, 1));
+						break;
+					}
+					case 23:
+					{
+						objectcontainer[0].add(new PU_BombPowerup(&spr_bombpowerup, ix + 1, iy - 1, 1, 0, 30, 30, 1, 1));
+						break;
+					}
+					case 24:
+					{
+						objectcontainer[0].add(new PU_LeafPowerup(&spr_leafpowerup, ix + 1, iy - 1, 1, 0, 30, 30, 1, 1));
+						break;
+					}
+					case 25:
+					{
+						objectcontainer[0].add(new PU_PWingsPowerup(&spr_pwingspowerup, ix + 1, iy - 1));
+						break;
+					}
+					default:
+					{
+						//If no powerups were selected for this block, then fire out a podobo
+						objectcontainer[2].add(new MO_Podobo(&spr_podobo, ix + 2, iy, -(float(rand() % 5) / 2.0f) - 6.0f, -1, -1, -1, true));
+						break;
+					}
+
+				}
 			}
 
 			ifsoundonplay(sfx_sprout);
@@ -5144,9 +5232,12 @@ bool OMO_Thwomp::collide(CPlayer * player)
 //------------------------------------------------------------------------------
 // class podobo (for survival mode)
 //------------------------------------------------------------------------------
-MO_Podobo::MO_Podobo(gfxSprite *nspr, short x, float dVelY, short playerid, short teamid, short colorid) :
-	IO_MovingObject(nspr, x, 480, 4, 6)
+MO_Podobo::MO_Podobo(gfxSprite *nspr, short x, short y, float dVelY, short playerid, short teamid, short colorid, bool isSpawned) :
+	IO_MovingObject(nspr, x, y, 4, 6)
 {
+	fIsSpawned = isSpawned;
+	iHiddenPlane = y;
+
 	objectType = object_moving;
 	movingObjectType = movingobject_podobo;
 	vely = dVelY;
@@ -5175,7 +5266,10 @@ void MO_Podobo::update()
 
 void MO_Podobo::draw()
 {
-	spr->draw(ix, iy, drawframe, iColorOffsetY + (vely > 0.0f ? 32 : 0), iw, ih);
+	if(fIsSpawned && vely < 0.0f)
+		spr->draw(ix, iy, drawframe, iColorOffsetY + (vely > 0.0f ? 32 : 0), iw, ih, 2, iHiddenPlane);
+	else
+		spr->draw(ix, iy, drawframe, iColorOffsetY + (vely > 0.0f ? 32 : 0), iw, ih);
 }
 
 bool MO_Podobo::collide(CPlayer * player)

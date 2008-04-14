@@ -41,23 +41,18 @@
 //BUG!!  World AI needs ability to use stored items -> harder problem than I have time for
 
 //[ ] Need to update some maps with better platform paths (Reznor map) and some hazards here and there and maybe some map items
-//[ ] Add SMB3's first world as a test world to ship with
 
-//[ ] Countdown before match begins, 3..., 2..., 1... with announcer hooks -> Add real gfx for this!
 //[ ] On/Off switch [?] and note blocks and possibly other types of on/off blocks
-//[ ] Water bubbles and rain eyecandy, Splashing feet when running on rain levels - need gfx for all of these
-//[ ] Podoboo pops out of a [?] if all powerups are turned off
 //[ ] Thunderbolt style spawn
 //[ ] Reverse gravity blue podoboos
 
 * Bomb option in Star mode
 - Mariokart-type podium at the end of a tournament/tour/whatever
 
+[ ] Add SMB3's first world as a test world to ship with
 [ ] Make the SMB3 world work -> Need to recreate maps using new 1.8 map editor
 
-[ ] Look in CTilesetManager::Init to see if we are loading the non-classic tilesets when we pass in classic!
-
-[ ] Unlimited -> 5 goal once you exit out, the game doesn't know if you're going to go into a tournament next where unlimited is invalid. I'll see if I can fix it so it only resets if you actually enter a tournament.
+[ ] Fix bug that continuous path platforms move the opposite direction as indicated
 
 */
 
@@ -168,6 +163,7 @@ gfxSprite		spr_selectfielddisabled;
 gfxSprite		spr_map_filter_icons;
 gfxSprite		spr_tour_markers;
 gfxSprite		spr_menu_boxed_numbers;
+gfxSprite		spr_countdown_numbers;
 gfxSprite		spr_thumbnail_warps[2];
 gfxSprite		spr_thumbnail_mapitems[2];
 gfxSprite		spr_platformstarttile;
@@ -2831,7 +2827,7 @@ void RunGame()
 			if(iCountDownState > 0 && game_values.screenfade == 0)
 			{
 				SDL_Rect * rects = iCountDownNumbers[iCountDownRectGroup[28 - iCountDownState]][iCountDownRectSize[28 - iCountDownState]];
-				spr_menu_boxed_numbers.draw(rects[1].x, rects[1].y, rects[0].x, rects[0].y, rects[0].w, rects[0].h);
+				spr_countdown_numbers.draw(rects[1].x, rects[1].y, rects[0].x, rects[0].y, rects[0].w, rects[0].h);
 			}
 
 			if(game_values.screenfadespeed != 0)

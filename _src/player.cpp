@@ -857,7 +857,7 @@ void CPlayer::move()
 					short numPodobos = rand() % 6 + 10;
 					for(short iPodobo = 0; iPodobo < numPodobos; iPodobo++)
 					{
-						objectcontainer[2].add(new MO_Podobo(&spr_podobo, (short)(rand() % 608), -(float(rand() % 9) / 2.0f) - 9.0f, globalID, teamID, colorID));
+						objectcontainer[2].add(new MO_Podobo(&spr_podobo, (short)(rand() % 608), 480, -(float(rand() % 9) / 2.0f) - 9.0f, globalID, teamID, colorID, false));
 					}
 					ifsoundonplay(sfx_thunder);
 					break;

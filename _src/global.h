@@ -551,6 +551,7 @@ extern gfxSprite		spr_selectfielddisabled;
 extern gfxSprite		spr_map_filter_icons;
 extern gfxSprite		spr_tour_markers;
 extern gfxSprite		spr_menu_boxed_numbers;
+extern gfxSprite		spr_countdown_numbers;
 extern gfxSprite		spr_thumbnail_warps[2];
 extern gfxSprite		spr_thumbnail_mapitems[2];
 extern gfxSprite		spr_platformstarttile;
