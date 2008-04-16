@@ -1594,7 +1594,7 @@ class CO_ThrowBlock : public MO_CarriedObject
 class CO_Spring : public MO_CarriedObject
 {
 	public:
-		CO_Spring(gfxSprite *nspr, short ix, short iy);
+		CO_Spring(gfxSprite *nspr, short ix, short iy, bool fsuper);
 		~CO_Spring(){};
 
 		void update();
@@ -1607,6 +1607,9 @@ class CO_Spring : public MO_CarriedObject
 
 		virtual void hittop(CPlayer * player);
 		void hitother(CPlayer * player);
+
+		bool fSuper;
+		short iOffsetY;
 
 	friend class CPlayer;
 };

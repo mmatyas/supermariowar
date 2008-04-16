@@ -203,6 +203,12 @@ ai = new CYourAIClass();
 
 and the computer players will now be controlled by your AI.
 
+Issues With The Current AI
+--------------------------
+1. Bots don't use the tanooki powerup.
+2. If a bot is holding something(Not a ztar/shine/egg) in ztar, or yoshi's egg mode, they can't pick up the ztar/shine/egg.
+3. Bots can't pick up throwable blocks that they are standing on.
+
 */
 
 

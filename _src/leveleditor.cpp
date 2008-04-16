@@ -4003,7 +4003,7 @@ int editor_mapitems()
 						short set_item_y = event.button.y / TILESIZE;
 
 						//Set the selected block to one of the interaction blocks
-						if(set_item_y == 0 && set_item_x >= 0 && set_item_x <= 2)
+						if(set_item_y == 0 && set_item_x >= 0 && set_item_x <= 3)
 							set_mapitem = set_item_x;
 
 						edit_mode = 7;
@@ -4022,7 +4022,7 @@ int editor_mapitems()
 		drawmap(false, TILESIZE);
 		menu_shade.draw(0, 0);
 		
-		spr_mapitems[0].draw(0, 0, 0, 0, 96, 32);
+		spr_mapitems[0].draw(0, 0, 0, 0, 128, 32);
 
 		menu_font_small.drawRightJustified(640, 0, maplist.currentFilename());
 		menu_font_small.drawRightJustified(0, 480 - menu_font_small.getHeight(), "Map Items");

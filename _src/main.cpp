@@ -52,8 +52,6 @@
 [ ] Add SMB3's first world as a test world to ship with
 [ ] Make the SMB3 world work -> Need to recreate maps using new 1.8 map editor
 
-[ ] Fix bug that continuous path platforms move the opposite direction as indicated
-
 */
 
 /*
@@ -1949,7 +1947,9 @@ void RunGame()
 					}
 					else if(event.key.keysym.sym == SDLK_6)
 					{
-						if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
+						if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
+							objectcontainer[1].add(new CO_Spring(&spr_spring, list_players[0]->ix + 32, list_players[0]->iy, true));
+						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
 							objectcontainer[1].add(new CO_Shell(2, list_players[0]->ix + 32, list_players[0]->iy, false, false, true, true));
 						else
 							objectcontainer[0].add(new PU_FirePowerup(&spr_firepowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1));
@@ -1957,7 +1957,7 @@ void RunGame()
 					else if(event.key.keysym.sym == SDLK_7)
 					{
 						if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-							objectcontainer[1].add(new CO_Spring(&spr_spring, list_players[0]->ix + 32, list_players[0]->iy));
+							objectcontainer[1].add(new CO_Spring(&spr_spring, list_players[0]->ix + 32, list_players[0]->iy, false));
 						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
 							objectcontainer[1].add(new CO_Shell(3, list_players[0]->ix + 32, list_players[0]->iy, false, true, false, false));
 						else
@@ -3457,11 +3457,13 @@ void LoadMapObjects(bool fPreview)
 		short iy = mapItem->iy * TILESIZE;
 
 		if(iType == 0)
-			objectcontainer[1].add(new CO_Spring(&spr_spring, ix, iy));
+			objectcontainer[1].add(new CO_Spring(&spr_spring, ix, iy, false));
 		else if(iType == 1)
 			objectcontainer[1].add(new CO_Spike(&spr_spike, ix, iy));
 		else if(iType == 2)
 			objectcontainer[1].add(new CO_KuriboShoe(&spr_kuriboshoe, ix, iy));
+		if(iType == 3)
+			objectcontainer[1].add(new CO_Spring(&spr_spring, ix, iy, true));
 	}
 
 	//Set all the 1x1 gaps up so players can run across them

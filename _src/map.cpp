@@ -1424,7 +1424,6 @@ void CMap::saveMap(const std::string& file)
 
 			if(iBlockType >= 20 && iBlockType <= 29) //Item Destroyable Blocks
 				iItemDestroyableBlockCount++;
-
 		}
 	}
 
@@ -1437,9 +1436,10 @@ void CMap::saveMap(const std::string& file)
 	WriteInt(iThrowBlockCount, mapfile);
 	WriteInt(iOnOffBlockCount, mapfile);
 	WriteInt(iPlatformCount, mapfile);
-	WriteInt(g_map.iNumMapHazards, mapfile);
+	WriteInt(iNumMapHazards, mapfile);
 	WriteInt(iItemDestroyableBlockCount, mapfile);
 	WriteInt(iHiddenBlockCount, mapfile);
+	WriteInt(iNumMapItems, mapfile);
 	WriteInt(iDensity, mapfile);
 
 	//Write tileset names and indexes for translation at load time

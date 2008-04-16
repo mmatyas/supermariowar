@@ -9141,9 +9141,12 @@ void CO_ThrowBlock::SideBounce()
 //------------------------------------------------------------------------------
 // class spring
 //------------------------------------------------------------------------------
-CO_Spring::CO_Spring(gfxSprite *nspr, short ix, short iy) :
+CO_Spring::CO_Spring(gfxSprite *nspr, short ix, short iy, bool fsuper) :
 	MO_CarriedObject(nspr, ix, iy, 4, 4, 30, 30, 1, 1)
 {
+	fSuper = fsuper;
+	iOffsetY = fSuper ? 32 : 0;
+
 	state = 1;
 	bounce = GRAVITATION;
 	objectType = object_moving;
@@ -9181,7 +9184,7 @@ void CO_Spring::hittop(CPlayer * player)
 	player->extrajumps = 0;
 
 	player->superjumptimer = 4;
-	player->superjumptype = 1;
+	player->superjumptype = fSuper ? 2 : 1;
 	player->vely = -VELNOTEBLOCKREPEL;
 	
 	ifsoundonplay(sfx_bump);
@@ -9233,13 +9236,13 @@ void CO_Spring::draw()
 	if(owner)
 	{
 		if(owner->iswarping())
-			spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, 0, iw, ih, (short)owner->state % 4, owner->GetWarpPlane());
+			spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, iOffsetY, 32, 32, (short)owner->state % 4, owner->GetWarpPlane());
 		else
-			spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, 0, iw, ih);
+			spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, iOffsetY, 32, 32);
 	}
 	else
 	{
-		spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, 0, iw, ih);
+		spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, iOffsetY, 32, 32);
 	}
 }
 
@@ -9257,7 +9260,7 @@ void CO_Spring::place()
 // class spike
 //------------------------------------------------------------------------------
 CO_Spike::CO_Spike(gfxSprite *nspr, short ix, short iy) :
-	CO_Spring(nspr, ix, iy)
+	CO_Spring(nspr, ix, iy, false)
 {
 	iw = 32;
 	ih = 32;
@@ -9276,7 +9279,7 @@ void CO_Spike::hittop(CPlayer * player)
 // class kuribo's shoe
 //------------------------------------------------------------------------------
 CO_KuriboShoe::CO_KuriboShoe(gfxSprite *nspr, short ix, short iy) :
-	CO_Spring(nspr, ix, iy + 15)
+	CO_Spring(nspr, ix, iy + 15, false)
 {
 	iw = 32;
 	ih = 32;

@@ -228,7 +228,7 @@ struct STextAward
 void GetNameFromFileName(char * szName, const char * szFileName);
 std::string stripCreatorAndDotMap(const std::string &filename);
 
-#define NUM_AUTO_FILTERS 11
+#define NUM_AUTO_FILTERS 12
 
 #define WORLD_FOREGROUND_STAGE_OFFSET 200
 #define WORLD_WINNING_TEAM_SPRITE_OFFSET 600
