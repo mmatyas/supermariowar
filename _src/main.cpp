@@ -40,8 +40,6 @@
 
 //BUG!!  World AI needs ability to use stored items -> harder problem than I have time for
 
-//[ ] Need to update some maps with better platform paths (Reznor map) and some hazards here and there and maybe some map items
-
 //[ ] On/Off switch [?] and note blocks and possibly other types of on/off blocks
 //[ ] Thunderbolt style spawn
 //[ ] Reverse gravity blue podoboos
@@ -51,6 +49,69 @@
 
 [ ] Add SMB3's first world as a test world to ship with
 [ ] Make the SMB3 world work -> Need to recreate maps using new 1.8 map editor
+
+SHIP BETA
+[ ] Get some good maps using 1.8 features
+[ ] Get some good worlds
+[ ] Prune old maps
+[ ] Improve tilesets?
+[ ] Get SMB3's world working
+
+Feature Requests
+[ ] In Multi Star, the text still says Shine Get, and the players with stars still turn gold. The text could be "Star Get" per the Japanese version of Galaxy or it could be something else; also, since the stars are color-coded, I don't think the gold tone is needed.
+
+[ ] In Yoshi's Eggs, could we have it so the options menu has two columns, one for eggs and one for Yoshis? Oh, and an option to have the egg timer pause while the egg is being held would be nice.
+
+[ ] In Greed Mode, it would be nice to have an option for how many coins fly out (Regular, Double, or Triple). Also, an option to make it impossible to pick up your own coins. Also also, have it so that if a player hits 0 coins but still has coins of their color in play, make it so they don't die until their coins disappear.
+
+[ ] In Health Mode, there should be some sound played when you grab a heart. Perhaps the sound you hear when you get a mushroom in SMB2? (It should also pause the music when you get one, if we do that.) Also, how do the extra life shrooms work in this mode? Do they just recover X points of health?
+
+[ ] In Card Mode, what does Bank Time do? Also, what are the different colors of Phantos in Phanto mode for?
+
+[ ] In Frenzy Mode it would be nice to have some presets like with the regular item switch.
+
+[ ] In the Item Switch screen, and on the Frenzy Card select screen, it would be nice to have some sort of arrowhead pointing to indicate that there are more items available by scrolling the list up or down.
+
+[ ] Ooh, here's another thing I just thought of. What about options for who gets to pick the next stage in Tournament mode?
+Any - All players have control.
+Winner - The winner of one stage picks the next. First stage is the same as All.
+Loser - The loser of one stage picks the next. First stage is the same as All.
+Game Winner - Whoever is leading picks the next stage. In case of a tie, whoever placed highest in the last stage gets control. First stage is the same as All.
+Game Loser - Whoever is in last place picks the next stage. In case of a tie, whoever placed lowest in the last stage gets control. First stage is the same as All.
+Random - One person is picked at random to decide the next stage.
+Random Loser - One person who didn't win the last stage is picked at random to decide the next stage. First stage is regular Random.
+Cycle - P1 picks the first stage, P2 picks the second, and so on. 
+
+[ ] I also think we should fix the explosions. The bob-omb explosion should resemble the SMB3 bob-omb explosion and the bomb powerup should break bricks when exploded.
+
+
+BUGS:
+[X] The Super Mario World item set has the feather set at 0.
+[X] Sometimes when you stomp a Paratroopa or Paragoomba, you kill them in a single stomp instead of two.
+[X] Para enemies don't have the stomp noise then you rid them of their wings. 
+[X] Jumping on top of a shell in just the right angle cause you to kick the shell while still falling into it in the same direction as it's kicked, causing you to kill yourself.
+[X] If a player is killed by an on/off block turning on and the switch turns on and off against while the player is still dead, the player that died, "dies again" and their respawn timer is reset. This can be abused to keep a dead player, well, dead.
+[X] Yoshi Egg explosions do not emit any sound. (Either that or too many exploded at once and killed the explosion sound)
+[X] ESC does not exit out of the Hazard select menu in the level editor like advertised.
+[X] Can't delete a hazard until exited out of the hazard screen and reselected it.
+[X] bots won't react to firebars, in fact they're jumping into this large one, then again it covers the whole screen and slowly rotates so that might be an issue but
+
+[ ] Tossing into base to score seems to no longer work for Capture the Flag and Yoshi Eggs.
+[ ] I found a bug in the leveleditor.  In animated tile mode, i klicked on a tile and the square appeared on another one, but i still selected the tile i klicked on. -> no repro
+[ ] got spawned into solid tiles two times so far  It's happened to me a few times as well, and pretty much directly into a solid tile that is perfectly fine and ..well yeah, solid, even from the original tiletype it had in the tileset.
+[ ] There was a slight error in the frenzy cards graphic. I just corrected it and am about to upload it to the repository. If you don't get it, I can email it to you. To check to see if you have the "fixed" one, look at a P-Wing card in-game - the correct graphic doesn't have the top and bottom edges of the card "cut" incorrectly.
+[ ] If you have a raccoon tail and then you grab a key, you lose the tail but you float every time you fall.
+[ ] 1ups in greed mode should give you more coins: 5, 10, 15, 30 is a great ladder for 1, 2, 3 and 5 ups respectively.
+[ ] Kuribo's Shoe will outright kill a spiny, it's supposed to turn them into a spiny shell.
+[ ] When in Chicken mode, when Chicken Glide is set to On, and you have a feather or a P-Wing, you can't glide after double-jumping/flying. Is this intentional?
+[ ] If you place a locked door over a start place (I only did this with red) and you delete the door, you can't delete the start place.
+[ ] When it's player 2's turn on the world and player 2 is a bot, you have to control Player 2.
+[ ] The suicide time thing doesn't work when you are bouncing on a note block, or spring, but not pressing any buttons.
+[ ] I've found a really fatal bug. I cannot get these maps to convert...they will crash the level editor upon trying to load them and causes SMW to completely explode when it tries to load the map list. I have no clue what the problem is, could you check into this for me Two?
+	http://srpgp.supersanctuary.net/smw/pot ... eezing.map
+	http://srpgp.supersanctuary.net/smw/Rox ... 0block.map
+	http://srpgp.supersanctuary.net/smw/ssf ... 20home.map
+
 
 */
 

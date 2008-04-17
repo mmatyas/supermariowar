@@ -3054,7 +3054,7 @@ int editor_maphazards()
 					}
 					else if(event.key.keysym.sym == SDLK_DELETE)
 					{
-						if(MAPHAZARD_EDIT_STATE_PROPERTIES == iEditState)
+						if(MAPHAZARD_EDIT_STATE_PROPERTIES == iEditState || MAPHAZARD_EDIT_STATE_LOCATION == iEditState)
 						{
 							//Copy platforms into empty spot
 							for(short iMapHazard = iEditMapHazard; iMapHazard < g_map.iNumMapHazards - 1; iMapHazard++)
@@ -3372,7 +3372,7 @@ int editor_maphazards()
 				menu_font_large.draw(rTypeButton[iType][1].x + 36, rTypeButton[iType][1].y + 6, szHazardNames[iType]);
 			}
 
-			menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "Choose Type: [esc] Exit");
+			menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "Choose Hazard Type");
 		}
 		else if(MAPHAZARD_EDIT_STATE_LOCATION == iEditState)
 		{

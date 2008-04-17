@@ -94,32 +94,35 @@ short controlkeys[2][2][4][NUM_KEYS] = { { { {SDLK_LEFT, SDLK_RIGHT, SDLK_UP, SD
 char * GameInputNames[NUM_KEYS] = {"Left", "Right", "Jump", "Down", "Turbo", "Use Item", "Pause", "Exit"};
 char * MenuInputNames[NUM_KEYS] = {"Up", "Down", "Left", "Right", "Select", "Cancel", "Random", "Fast Map"};
 
-//Poison == 0
-//1up == 1
-//2up == 2
-//3up == 3
-//5up == 4
-//firepower == 5
-//star == 6
-//clock == 7
-//bobomb == 8
-//POW == 9
-//Bullet Bill == 10
-//hammer == 11
-//Green Shell == 12
-//Red Shell == 13
-//Spiny Shell == 14
-//Buzzy Shell == 15
-//MOd == 16
-//Feather == 17
-//Mystery == 18
-//Boomerang == 19
-//Tanooki == 20
-//Ice Wand == 21
-//Podobo == 22
-//Bombs == 23
-//Leaf == 24
-//Pwings == 25
+/*
+0 == poison mushroom
+1 == 1up
+2 == 2up
+3 == 3up
+4 == 5up
+5 == flower
+6 == star
+7 == clock
+8 == bobomb
+9 == pow
+10 == bulletbill
+11 == hammer
+12 == green shell
+13 == red shell
+14 == spike shell
+15 == buzzy shell
+16 == mod
+17 == feather
+18 == mystery mushroom
+19 == boomerang
+20 == tanooki
+21 == ice wand
+22 == podoboo
+23 == bombs
+24 == leaf
+25 == pwings
+*/
+
 
 short g_iDefaultPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS] = {  
 //   0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25
@@ -139,7 +142,7 @@ short g_iDefaultPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS] = {
 	{3, 5, 0, 0, 0, 5, 2, 0, 0, 0, 3, 0, 6, 4, 1, 3, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0}, //Super Mario Bros 1
 	{0, 5, 0, 0, 0, 0, 2, 4, 3, 2, 0, 0, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0}, //Super Mario Bros 2
 	{0, 3, 0, 0, 0, 8, 4, 0, 0, 0, 5, 2,10, 9, 4, 5, 0, 0, 0, 4, 3, 0, 4, 0, 8, 5}, //Super Mario Bros 3
-	{0,10, 0, 0, 0,10, 6, 0, 0, 0, 2, 0, 8, 4, 2, 4, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0}, //Super Mario World
+	{0,10, 0, 0, 0,10, 6, 0, 0, 0, 2, 0, 8, 4, 2, 4, 0, 4, 0, 0, 0, 0, 5, 0, 0, 0}, //Super Mario World
 };
 
 //Koopa Bros Weapons

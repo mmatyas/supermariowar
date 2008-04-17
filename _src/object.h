@@ -1773,6 +1773,7 @@ class IO_FlameCannon : public CObject
 		short iFreq, iTimer, iCycle;
 		short iFlameX, iFlameY;
 
+	friend class CPlayerAI;
 };
 
 
@@ -1803,6 +1804,8 @@ class MO_PirhanaPlant : public IO_MovingObject
 		short iActionTimer;
 
 		bool fPreview;
+
+	friend class CPlayerAI;
 };
 
 class OMO_PipeCoin: public IO_OverMapObject

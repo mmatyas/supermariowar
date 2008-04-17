@@ -1929,7 +1929,54 @@ void MI_PowerupSlider::Draw()
 
 //Rearrange display of powerups
 //short iPowerupDisplayMap[NUM_POWERUPS] = { 4, 0, 1, 2, 3, 6, 10, 12, 11, 14, 13, 7, 16, 17, 18, 19, 15, 9, 5, 8, 20, 21, 22, 23, 24, 25};
-short iPowerupPositionMap[NUM_POWERUPS] = { 1, 2, 3, 4, 0, 18, 5, 11, 19, 17, 6, 8, 7, 10, 9, 16, 12, 13, 14, 15, 20, 21, 22, 23, 24, 25};
+//                                          0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 
+short iPowerupPositionMap[NUM_POWERUPS] = { 1, 0, 2, 6, 3, 8, 4,20,18, 7, 5,10,11,22,19, 9,23,16,21,12,17,13,24,15,25,14};
+
+/*
+0 == poison mushroom
+1 == 1up
+2 == 2up
+3 == 3up
+4 == 5up
+5 == flower
+6 == star
+7 == clock
+8 == bobomb
+9 == pow
+10 == bulletbill
+11 == hammer
+12 == green shell
+13 == red shell
+14 == spike shell
+15 == buzzy shell
+16 == mod
+17 == feather
+18 == mystery mushroom
+19 == boomerang
+20 == tanooki
+21 == ice wand
+22 == podoboo
+23 == bombs
+24 == leaf
+25 == pwings
+*/
+				
+/*
+0 1UP     Poison
+2 2UP     Star
+4 3UP     Bob-Omb
+6 5UP     Tanooki
+8 Mystery Clock
+10 Flower  B.Bill
+12 Hammer  P'Boo
+14 B'Rang  POW
+16 Bomb    MOd
+18 Wand    G.Shell
+20 Feather R.Shell
+22 Leaf    B.Shell
+24 P-Wing  S.Shell
+*/
+
 MI_PowerupSelection::MI_PowerupSelection(short x, short y, short width, short numlines) :
 	UI_Control(x, y)
 {
@@ -1977,7 +2024,7 @@ MI_PowerupSelection::MI_PowerupSelection(short x, short y, short width, short nu
 
 	for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
 	{
-		miPowerupSlider[iPowerup] = new MI_PowerupSlider(&spr_selectfield, &menu_slider_bar, &spr_storedpoweruplarge, 0, 0, 245, iPowerup);
+		miPowerupSlider[iPowerup] = new MI_PowerupSlider(&spr_selectfield, &menu_slider_bar, &spr_storedpoweruplarge, 0, 0, 245, iPowerupPositionMap[iPowerup]);
 		miPowerupSlider[iPowerup]->Add("", 0, "", false, false);
 		miPowerupSlider[iPowerup]->Add("", 1, "", false, false);
 		miPowerupSlider[iPowerup]->Add("", 2, "", false, false);
@@ -1990,8 +2037,8 @@ MI_PowerupSelection::MI_PowerupSelection(short x, short y, short width, short nu
 		miPowerupSlider[iPowerup]->Add("", 9, "", false, false);
 		miPowerupSlider[iPowerup]->Add("", 10, "", false, false);
 		miPowerupSlider[iPowerup]->SetNoWrap(true);
-		miPowerupSlider[iPowerup]->SetData(&game_values.powerupweights[iPowerup], NULL, NULL);
-		miPowerupSlider[iPowerup]->SetKey(game_values.powerupweights[iPowerup]);
+		miPowerupSlider[iPowerup]->SetData(&game_values.powerupweights[iPowerupPositionMap[iPowerup]], NULL, NULL);
+		miPowerupSlider[iPowerup]->SetKey(game_values.powerupweights[iPowerupPositionMap[iPowerup]]);
 		miPowerupSlider[iPowerup]->SetItemChangedCode(MENU_CODE_POWERUP_SETTING_CHANGED);
 	}
 
@@ -2133,9 +2180,9 @@ MenuCodeEnum MI_PowerupSelection::SendInput(CPlayerInput * playerInput)
 	{
 		for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
 		{
-			short iCurrentValue = g_iCurrentPowerupPresets[game_values.poweruppreset][iPowerup];
+			short iCurrentValue = g_iCurrentPowerupPresets[game_values.poweruppreset][iPowerupPositionMap[iPowerup]];
 			miPowerupSlider[iPowerup]->SetKey(iCurrentValue);
-			game_values.powerupweights[iPowerup] = iCurrentValue;
+			game_values.powerupweights[iPowerupPositionMap[iPowerup]] = iCurrentValue;
 		}
 
 		//If it is a custom preset, then allow modification
@@ -2145,7 +2192,7 @@ MenuCodeEnum MI_PowerupSelection::SendInput(CPlayerInput * playerInput)
 	{
 		//Update the custom presets
 		for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
-			g_iCurrentPowerupPresets[game_values.poweruppreset][iPowerup] = game_values.powerupweights[iPowerup];
+			g_iCurrentPowerupPresets[game_values.poweruppreset][iPowerupPositionMap[iPowerup]] = game_values.powerupweights[iPowerupPositionMap[iPowerup]];
 	}
 	else if (MENU_CODE_RESTORE_DEFAULT_POWERUP_WEIGHTS == ret || MENU_CODE_CLEAR_POWERUP_WEIGHTS == ret)
 	{
@@ -2185,11 +2232,11 @@ MenuCodeEnum MI_PowerupSelection::SendInput(CPlayerInput * playerInput)
 			//restore default powerup weights for powerup selection menu
 			for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
 			{
-				short iDefaultValue = g_iDefaultPowerupPresets[game_values.poweruppreset][iPowerup];
+				short iDefaultValue = g_iDefaultPowerupPresets[game_values.poweruppreset][iPowerupPositionMap[iPowerup]];
 				miPowerupSlider[iPowerup]->SetKey(iDefaultValue);
-				game_values.powerupweights[iPowerup] = iDefaultValue;
+				game_values.powerupweights[iPowerupPositionMap[iPowerup]] = iDefaultValue;
 
-				g_iCurrentPowerupPresets[game_values.poweruppreset][iPowerup] = iDefaultValue;
+				g_iCurrentPowerupPresets[game_values.poweruppreset][iPowerupPositionMap[iPowerup]] = iDefaultValue;
 			}
 		}
 		else if(MENU_CODE_POWERUP_CLEAR_YES == ret)
@@ -2218,7 +2265,7 @@ MenuCodeEnum MI_PowerupSelection::SendInput(CPlayerInput * playerInput)
 
 void MI_PowerupSelection::Update()
 {
-	mMenu->Update();
+	mMenu->Update();\
 }
 
 void MI_PowerupSelection::Draw()

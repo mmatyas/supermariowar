@@ -776,6 +776,13 @@ void CPlayerAI::GetNearestObjects()
 	
 					DistanceToObject(objectcontainer[1].list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
 				}
+				else if(movingobject_pirhanaplant == movingtype)
+				{
+					MO_PirhanaPlant * plant = (MO_PirhanaPlant*)objectcontainer[1].list[i];
+					if(plant->state > 0)
+						DistanceToObjectCenter(plant, &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);				
+				}
+
 				break;
 			}
 			case object_frenzycard:
@@ -871,6 +878,23 @@ void CPlayerAI::GetNearestObjects()
 				{
 					DistanceToObject(star, &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
 				}
+
+				break;
+			}
+
+			case object_pathhazard:
+			case object_orbithazard:
+			{
+				DistanceToObject(objectcontainer[1].list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
+				break;
+			}
+
+			case object_flamecannon:
+			{
+				IO_FlameCannon * cannon = (IO_FlameCannon *)objectcontainer[1].list[i];
+
+				if(cannon->state > 0)
+					DistanceToObject(cannon, &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
 
 				break;
 			}

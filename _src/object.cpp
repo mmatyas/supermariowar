@@ -362,6 +362,9 @@ void IO_Block::KillPlayersInsideBlock()
 	{
 		CPlayer * player = list_players[iPlayer];
 
+		if(!player->isready())
+			continue;
+
 		short iSwapSides = 0;
 		if(player->fOldX >= iposx + TILESIZE)
 			iSwapSides = -640;
@@ -5712,6 +5715,8 @@ void CO_Egg::update()
 			{
 				objectcontainer[2].add(new MO_Explosion(&spr_explosion, ix + (iw >> 1) - 96, iy + (ih >> 1) - 64, 2, 4, -1, -1, kill_style_bomb));
 				placeEgg();
+
+				ifsoundonplay(sfx_bobombsound);
 			}
 			else
 			{
@@ -7514,13 +7519,16 @@ bool MO_Goomba::hittop(CPlayer * player)
 		fBouncing = false;
 		bounce = GRAVITATION;
 
+		if(vely < GRAVITATION)
+			vely = GRAVITATION;
+
 		iw = 32;
 		ih = 32;
 
 		collisionOffsetX = 1;
 		collisionOffsetY = 11;
 
-		animationWidth = 32;
+		animationWidth = 64;
 		drawframe = 0;
 
 		animationOffsetY = velx > 0.0f ? 0 : ih;
@@ -7535,9 +7543,10 @@ bool MO_Goomba::hittop(CPlayer * player)
 		if(game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover)
 			player->score->AdjustScore(1);
 
-		ifsoundonplay(sfx_mip);
 		eyecandyback.add(new EC_Corpse(&spr_goombadead, (float)(ix - collisionOffsetX), (float)(iy + collisionHeight - 32), 0));
 	}
+
+	ifsoundonplay(sfx_mip);
 
 	return false;
 }
@@ -7583,6 +7592,9 @@ bool MO_Koopa::hittop(CPlayer * player)
 		fBouncing = false;
 		bounce = GRAVITATION;
 
+		if(vely < GRAVITATION)
+			vely = GRAVITATION;
+
 		spr = fRed ? &spr_redkoopa : &spr_koopa;
 	}
 	else
@@ -7594,10 +7606,10 @@ bool MO_Koopa::hittop(CPlayer * player)
 		if(game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover)
 			player->score->AdjustScore(1);
 
-		ifsoundonplay(sfx_mip);
-
 		DropShell();
 	}
+
+	ifsoundonplay(sfx_mip);
 
 	return false;
 }
@@ -8936,7 +8948,7 @@ bool CO_ThrowBlock::HitOther(CPlayer * player)
 		else if(ix + iw < 320 && player->ix > 320)
 			flipx = -640;
 
-		if(iNoOwnerKillTime == 0 || player->globalID != iPlayerID || player->ix + flipx > ix && velx > 0.0f || player->ix + flipx <= ix && velx < 0.0f)
+		if(iNoOwnerKillTime == 0 || player->globalID != iPlayerID || (player->ix + flipx > ix + (iw >> 1) && velx > 0.0f) || (player->ix + flipx <= ix - (iw >> 1) && velx < 0.0f))
 		{
 			return KillPlayer(player);
 		}
