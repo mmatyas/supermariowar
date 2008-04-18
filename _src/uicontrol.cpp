@@ -5907,7 +5907,7 @@ void MI_World::Update()
 	if(iSleepTurns <= 0 && !fUsingCloud && (fPlayerVehicleCollision || fPlayerMoveDone))
 	{
 		short iStage = g_worldmap.GetVehicleInPlayerTile(&iVehicleId);
-		if(iStage >= 0)
+		if(iStage >= 0 && iStage < g_worldmap.iNumStages)
 		{
 			game_values.tourstopcurrent = iStage;
 			fForceStageStart = true;
@@ -6405,7 +6405,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 					//Lookup current tile and see if it is a type of tile you can interact with
 					//If there is a vehicle on this tile, then load it's stage
 					short iStage = g_worldmap.GetVehicleInPlayerTile(&iVehicleId);
-					if(iStage >= 0)
+					if(iStage >= 0 && iStage < g_worldmap.iNumStages)
 					{
 						return InitGame(iStage, iPlayer, fNeedAiControl);
 					}
@@ -6423,7 +6423,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 					WorldMapTile * tile = &g_worldmap.tiles[iPlayerCurrentTileX][iPlayerCurrentTileY];
 
 					short iType = tile->iType - 6;
-					if(iType >= 0 && tile->iCompleted == -2)
+					if(iType >= 0 && iType < g_worldmap.iNumStages && tile->iCompleted == -2)
 					{
 						return InitGame(iType, iPlayer, fNeedAiControl);
 					}

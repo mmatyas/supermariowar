@@ -600,6 +600,7 @@ int editor_edit()
 							}
 							else if(edit_mode == 3) //selected type
 							{
+								//start tiles
 								if(set_tile <= 1)
 								{
 									if(g_worldmap.tiles[iCol][iRow].iForegroundSprite != set_tile + WORLD_START_SPRITE_OFFSET)
@@ -609,16 +610,27 @@ int editor_edit()
 										updateworldsurface();
 									}
 								}
-								else if(set_tile <= 5)
+								else if(set_tile <= 5) //doors
 								{
 									if(g_worldmap.tiles[iCol][iRow].iType != set_tile)
 									{
+										//if the door was placed on a start tile
+										if(g_worldmap.tiles[iCol][iRow].iType == 1)
+											g_worldmap.tiles[iCol][iRow].iForegroundSprite = 0;
+
 										g_worldmap.tiles[iCol][iRow].iType = set_tile;
 										updateworldsurface();
 									}
 								}
-								else
+								else //stages
 								{
+									//if the door was placed on a start tile
+									if(g_worldmap.tiles[iCol][iRow].iType == 1)
+									{
+										g_worldmap.tiles[iCol][iRow].iForegroundSprite = 0;
+										updateworldsurface();
+									}
+
 									g_worldmap.tiles[iCol][iRow].iType = set_tile;
 								}
 							}
@@ -714,13 +726,10 @@ int editor_edit()
 									g_worldmap.tiles[iCol][iRow].iForegroundSprite = 0;
 									updateworldsurface();
 								}
-								else if(set_tile <= 5)
+								else if(g_worldmap.tiles[iCol][iRow].iType <= 5)
 								{
-									if(g_worldmap.tiles[iCol][iRow].iType != 0)
-									{
-										g_worldmap.tiles[iCol][iRow].iType = 0;
-										updateworldsurface();
-									}
+									g_worldmap.tiles[iCol][iRow].iType = 0;
+									updateworldsurface();
 								}
 								
 								g_worldmap.tiles[iCol][iRow].iType = 0;
@@ -838,12 +847,23 @@ int editor_edit()
 								{
 									if(g_worldmap.tiles[iCol][iRow].iType != set_tile)
 									{
+										//if the door was placed on a start tile
+										if(g_worldmap.tiles[iCol][iRow].iType == 1)
+											g_worldmap.tiles[iCol][iRow].iForegroundSprite = 0;
+
 										g_worldmap.tiles[iCol][iRow].iType = set_tile;
 										updateworldsurface();
 									}
 								}
 								else
 								{
+									//if the door was placed on a start tile
+									if(g_worldmap.tiles[iCol][iRow].iType == 1)
+									{
+										g_worldmap.tiles[iCol][iRow].iForegroundSprite = 0;
+										updateworldsurface();
+									}
+
 									g_worldmap.tiles[iCol][iRow].iType = set_tile;
 								}
 							}
@@ -934,13 +954,10 @@ int editor_edit()
 									g_worldmap.tiles[iCol][iRow].iForegroundSprite = 0;
 									updateworldsurface();
 								}
-								else if(set_tile <= 5)
+								else if(g_worldmap.tiles[iCol][iRow].iType <= 5)
 								{
-									if(g_worldmap.tiles[iCol][iRow].iType != 0)
-									{
-										g_worldmap.tiles[iCol][iRow].iType = 0;
-										updateworldsurface();
-									}
+									g_worldmap.tiles[iCol][iRow].iType = 0;
+									updateworldsurface();
 								}
 
 								g_worldmap.tiles[iCol][iRow].iType = 0;

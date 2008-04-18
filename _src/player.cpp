@@ -882,8 +882,6 @@ void CPlayer::move()
 				}
 				case 26:  //jail key
 				{
-					powerup = -1;
-					
 					if(jailtimer > 0)
 					{
 						jailtimer = 0;
@@ -1094,11 +1092,13 @@ void CPlayer::move()
 						if(superjumptype == 2)
 						{
 							vely = -VELSUPERJUMP;
+							inair = true;
 							ifsoundonplay(sfx_superspring);
 						}
 						else if(superjumptype == 1)
 						{
 							vely = -VELTURBOJUMP;
+							inair = true;
 							ifsoundonplay(sfx_springjump);
 						}
 
@@ -1134,9 +1134,9 @@ void CPlayer::move()
 						extrajumps++;
 					}
 					//This must come last or gliding chickens can't use powerups before this statement
-					else if((powerup == 7 || (powerup != 3 && game_values.gamemode->chicken == this && game_values.gamemodesettings.chicken.glide)) && !fKuriboShoe && iSpinState == 0)
+					else if((powerup == 7 || (powerup == -1 && game_values.gamemode->chicken == this && game_values.gamemodesettings.chicken.glide)) && !fKuriboShoe && iSpinState == 0)
 					{
-						if(game_values.leaflimit == 0 || projectilelimit > 0 || (game_values.gamemode->chicken == this && game_values.gamemodesettings.chicken.glide))
+						if(game_values.leaflimit == 0 || projectilelimit > 0 || (game_values.gamemode->chicken == this && game_values.gamemodesettings.chicken.glide && powerup == -1))
 						{
 							ShakeTail();
 							lockjump = true;
@@ -1381,10 +1381,17 @@ void CPlayer::move()
 			{
 				if(fKuriboShoe)
 				{
+					//This will make the shoe sticky
 					//velx = 0.0f;
-					Jump(lrn, 1.0f, true);
-					superjumptype = 3;
-					superjumptimer = 16;
+
+					//only allow the player to jump in the air from kuribo's shoe if we aren't bouncing on a note block
+					if(superjumptimer <= 0)
+					{
+						Jump(lrn, 1.0f, true);
+					
+						superjumptype = 3;
+						superjumptimer = 16;
+					}
 				}
 				else if(velx < 0.0f)
 					game_values.playskidsound = true;
@@ -1421,10 +1428,17 @@ void CPlayer::move()
 			{
 				if(fKuriboShoe)
 				{
+					//This will make the shoe sticky
 					//velx = 0.0f;
-					Jump(lrn, 1.0f, true);
-					superjumptype = 3;
-					superjumptimer = 16;
+					
+					//only allow the player to jump in the air from kuribo's shoe if we aren't bouncing on a note block
+					if(superjumptimer <= 0)
+					{
+						Jump(lrn, 1.0f, true);
+
+						superjumptype = 3;
+						superjumptimer = 16;
+					}
 				}
 				else if(velx > 0.0f)
 					game_values.playskidsound = true;
@@ -1509,7 +1523,7 @@ void CPlayer::move()
 		}
 
 		//Kill the player if he is standing still for too long
-		if(velx != 0.0f || vely != GRAVITATION || game_values.gamemode->gameover)
+		if(velx != 0.0f || vely != GRAVITATION || game_values.gamemode->gameover || game_values.singleplayermode >= 0)
 		{
 			suicidetimer = 0;
 			suicidedisplaytimer = 2;
@@ -2755,7 +2769,7 @@ void CPlayer::draw()
 		else if(powerup == 8)
 			DrawWings();
 		//This has to come last otherwise chickens with glide option won't be able to use cape or wings
-		else if(powerup == 7 || (powerup != 3 && game_values.gamemode->chicken == this && game_values.gamemodesettings.chicken.glide))
+		else if(powerup == 7 || (powerup == -1 && game_values.gamemode->chicken == this && game_values.gamemodesettings.chicken.glide))
 			DrawTail();
 	}
 

@@ -84,6 +84,28 @@ Cycle - P1 picks the first stage, P2 picks the second, and so on.
 
 [ ] I also think we should fix the explosions. The bob-omb explosion should resemble the SMB3 bob-omb explosion and the bomb powerup should break bricks when exploded.
 
+[ ] Greed Mode's Unlimited option needs to be done differently. The way it stands now, eventually every coin will disappear and it won't be greed mode unlimited anymore, which ruins the whole point of...unlimited.  Maybe you could have all the counters set to zero and have them reflect how many coins players have lost? Like Classic's Unlimited.
+[ ] Since we have all these team-colored coins for Greed mode, could we have an option for higher-point coins in Coin mode? Red could be 2, Green 3, and Blue 5.
+
+[ ] vertical rising flame hazard would be nice =D, 2 votes for this
+[ ] and perhaps a new button placeing for the frequenzy of certain hazards, because [/] arn'tfindable on a German keaboard for example. (the german keyboard adapts the amerikan one, i tested every butten but none of them applies to the american [/])
+
+[ ] I have a question. If the clear boxes in SMWorld is hit, does it turn into a normal block? Or does it become an empty clear box? In SMW it turns into a normal block and that looked funny to me. If it does not in World, I request that it should be corrected.
+
+[ ] Be able to have sideways Piranha Plants / Venus Fire Traps like in some of the levels in SMB3. 
+
+[ ] Universal Music exceptions folder. Instead of copying your favorite music exceptions from song pack to song pack whenever you change, there'd be a document that lists the worlds and levels that have specified music. Of course, there could still be pack-specific ones. :3
+
+[ ] World Music exception option. Like how you can set specific songs for specific maps, but instead for specific worlds. (Like if someone always wanted the SMW Overworld theme on a certain world but not change the music pack, for example.)
+
+[ ] Bullet Bill shooters and piranha plants should not be active while a player is sitting on or next to it.
+
+[ ] Would it be too much trouble to have an option for setting whether an individual platform is below all, between, or above all? Right now it's always between (in front of players/L0/L1, below L2/L3). I could make some pretty neat effects if I could make some platforms go below/above all layers... 
+[ ] Sometime in the unknown future I would like to see more types of bricks and [?] boxes. It is a tad weird when you are making a SMB1 themed map with SMB3 bricks or [?] boxes.
+
+[ ] Also, maybe some more animated tiles? It's kinda weird to see animated grass sitting right next to a Muncher Plant that just stares with its mouth open and kills you. Not everything, though, maybe just things that would look weird without animation (like Munchers, propellers, wheels, etc.).  And maybe for some of the other waterfalls (like maybe one of the lighter ones) and lava (upside-down lava and such).
+
+[ ] Make a different colored/styled kuribo's shoe that is "sticky" in that it doesn't bounce around and you have to jump everywhere to make it move
 
 BUGS:
 [X] The Super Mario World item set has the feather set at 0.
@@ -98,19 +120,28 @@ BUGS:
 
 [ ] Tossing into base to score seems to no longer work for Capture the Flag and Yoshi Eggs.
 [ ] I found a bug in the leveleditor.  In animated tile mode, i klicked on a tile and the square appeared on another one, but i still selected the tile i klicked on. -> no repro
+
 [ ] got spawned into solid tiles two times so far  It's happened to me a few times as well, and pretty much directly into a solid tile that is perfectly fine and ..well yeah, solid, even from the original tiletype it had in the tileset.
-[ ] There was a slight error in the frenzy cards graphic. I just corrected it and am about to upload it to the repository. If you don't get it, I can email it to you. To check to see if you have the "fixed" one, look at a P-Wing card in-game - the correct graphic doesn't have the top and bottom edges of the card "cut" incorrectly.
-[ ] If you have a raccoon tail and then you grab a key, you lose the tail but you float every time you fall.
-[ ] 1ups in greed mode should give you more coins: 5, 10, 15, 30 is a great ladder for 1, 2, 3 and 5 ups respectively.
-[ ] Kuribo's Shoe will outright kill a spiny, it's supposed to turn them into a spiny shell.
-[ ] When in Chicken mode, when Chicken Glide is set to On, and you have a feather or a P-Wing, you can't glide after double-jumping/flying. Is this intentional?
-[ ] If you place a locked door over a start place (I only did this with red) and you delete the door, you can't delete the start place.
-[ ] When it's player 2's turn on the world and player 2 is a bot, you have to control Player 2.
+[X] If you have a raccoon tail and then you grab a key, you lose the tail but you float every time you fall.
+[X] 1ups in greed mode should give you more coins: 5, 10, 15, 30 is a great ladder for 1, 2, 3 and 5 ups respectively.
+[X] If you place a locked door over a start place (I only did this with red) and you delete the door, you can't delete the start place.
 [ ] The suicide time thing doesn't work when you are bouncing on a note block, or spring, but not pressing any buttons.
-[ ] I've found a really fatal bug. I cannot get these maps to convert...they will crash the level editor upon trying to load them and causes SMW to completely explode when it tries to load the map list. I have no clue what the problem is, could you check into this for me Two?
-	http://srpgp.supersanctuary.net/smw/pot ... eezing.map
-	http://srpgp.supersanctuary.net/smw/Rox ... 0block.map
-	http://srpgp.supersanctuary.net/smw/ssf ... 20home.map
+[ ] I've found a really fatal bug. I cannot get these maps to convert...they will crash the level editor upon trying to load them and causes SMW to completely explode when it tries to load the map list. I have no clue what the problem is, could you check into this for me Two?  See crashingmap1, 2 and 3.
+[ ] Players spawning in tiles: spawninsidetile.map
+
+[X] Here's a bug - squished corpses don't fall down through invisible blocks.
+[ ] if a player is holding a shell while frozen, the shell is still held in place.  *edit: even when you let go of run, the shell is held there.  i still don't know if this is intended or not. should probably kill the shell though. :x 
+[X] Kuribo's Shoe + Red Note block don't seem to work very well when you try to jump onto it and fly off diagonally. It makes the sound but you don't get very far in most cases.
+[X] For whatever reason, hitting End crashes the editor for me. 
+[X] Also, the Help menu says nothing on how to activate the block properties thing.
+[ ] "Stage Type" sounds a bit misleading for configuring vehicles to go to stages
+[ ] Also, another thing with the suicide thing, you still die if you are standing still and repeatedly firing projectiles.
+[X] Also, if you stand still for too long in a bonus house, the suicide timer will activate, but since you can't die, it'll just repeatedly play the death sound until you move.
+[X] Most items disappear when hitting a tile that's has the tile type death. (ie lava) But shells don't.
+[X] Also, I noticed the springs fall a little bit when the game starts. That is not really a bug, but I think it should be fixed. 
+[X] I have no idea how, but he managed to spawn not once but twice holding one of the stage items in White Sky. The item simply vanished and appeared in his arms as he poofed out of the spawn smoke.
+[ ] Oh yeah, and running into a vehicle when there are no stages set crashes the game.
+[X] Chicken glide with pwings can allow player to permanately glide downwards
 
 
 */

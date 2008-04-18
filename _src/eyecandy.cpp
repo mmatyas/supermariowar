@@ -414,7 +414,7 @@ void EC_Corpse::update()
 			IO_Block * rightblock = g_map.block(tx2, ty);
 
 			if((g_map.map(tx, ty) & 0x13) > 0 || (g_map.map(tx2, ty) & 0x13) > 0 ||
-				(leftblock && !leftblock->isTransparent()) || (rightblock && !rightblock->isTransparent()))
+				(leftblock && !leftblock->isTransparent() && !leftblock->isHidden()) || (rightblock && !rightblock->isTransparent() && !rightblock->isHidden()))
 			{	//on ground
 				dy = (float) (ty * TILESIZE - 32);
 				vely = 0.0f;

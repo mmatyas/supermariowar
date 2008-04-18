@@ -2665,7 +2665,7 @@ short CGM_Greed::playerkilledself(CPlayer &player, killstyle style)
 void CGM_Greed::playerextraguy(CPlayer &player, short iType)
 {
 	if(!gameover)
-        player.score->AdjustScore(iType);
+        player.score->AdjustScore(iType * 5);
 }
 
 short CGM_Greed::ReleaseCoins(CPlayer &player, killstyle style)

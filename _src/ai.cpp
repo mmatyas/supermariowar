@@ -221,13 +221,16 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 	playerKeys->game_right.fDown = false;
 
 	//A percentage of the time the cpu will do nothing based on the difficulty level
-	if(rand() % 100 > iDecisionPercentage[game_values.cpudifficulty])
+	if(rand() % 100 > iDecisionPercentage[game_values.cpudifficulty] && pPlayer->isready())
 		return;
 
 	playerKeys->game_jump.fDown = false;
 	playerKeys->game_down.fDown = false;
 	playerKeys->game_turbo.fDown = false;
 	playerKeys->game_powerup.fDown = false;
+
+	if(pPlayer->isdead() || pPlayer->isspawning())
+		return;
 
 	/***************************************************
 	* 1. Figure out what objects are nearest to us
@@ -1213,6 +1216,9 @@ void CSimpleAI::Think(COutputControl * playerKeys)
 	playerKeys->game_down.fDown = false;
 	playerKeys->game_turbo.fDown = false;
 	playerKeys->game_powerup.fDown = false;
+
+	if(pPlayer->isdead() || pPlayer->isspawning())
+		return;
 
 	//Hold down jump until player starts moving down again, then release jump button
 	if(pPlayer->inair)

@@ -8400,8 +8400,6 @@ CO_Shell::CO_Shell(short type, short x, short y, bool dieOnMovingPlayerCollision
 	iOwnerRightOffset = 14;
 	iOwnerLeftOffset = -22;
 	iOwnerUpOffset = 32;
-
-	fObjectDiesOnDeathTiles = false;
 }
 
 bool CO_Shell::collide(CPlayer * player)
@@ -9154,7 +9152,7 @@ void CO_ThrowBlock::SideBounce()
 // class spring
 //------------------------------------------------------------------------------
 CO_Spring::CO_Spring(gfxSprite *nspr, short ix, short iy, bool fsuper) :
-	MO_CarriedObject(nspr, ix, iy, 4, 4, 30, 30, 1, 1)
+	MO_CarriedObject(nspr, ix, iy, 4, 4, 30, 31, 1, 0)
 {
 	fSuper = fsuper;
 	iOffsetY = fSuper ? 32 : 0;

@@ -959,8 +959,8 @@ int editor_edit()
 					}
 #endif
 
-					if(key == SDLK_END)
-						g_map.optimize();
+					//if(key == SDLK_END)
+						//g_map.optimize();
 
 					if(key == SDLK_m)
 					{
@@ -4672,6 +4672,8 @@ int display_help()
 	menu_font_small.draw(offsetx, offsety, "[h] - Hazard Mode");
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[a] - Animated Tile Mode");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[k] - Block Properties");
 	offsety += menu_font_small.getHeight() + 20;
 
 	menu_font_small.draw(offsetx, offsety, "Layers:");
@@ -4684,6 +4686,25 @@ int display_help()
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[end] - Optimize Layers");
 	offsety += menu_font_small.getHeight() + 20;
+
+	menu_font_small.draw(offsetx, offsety, "Miscellaneous:");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[b] - Background Thumbnails");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[g] - Change Backgrounds");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[r] - Change Music Category");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[e] - Change Floating Eyecandy");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[ctrl] + [delete] - Clear All");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[insert] - Take Screenshot");
+	offsety += menu_font_small.getHeight() + 2;
+
+
+	offsetx = 305;
+	offsety = 10;
 
 	menu_font_small.draw(offsetx, offsety, "File:");
 	offsety += menu_font_small.getHeight() + 2;
@@ -4700,9 +4721,6 @@ int display_help()
 	menu_font_small.draw(offsetx, offsety, "[pageup] - Go To Previous Map");
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[pagedown] - Go To Next Map");
-
-	offsetx = 305;
-	offsety = 10;
 
 	menu_font_small.draw(offsetx, offsety, "Tile, Warp and Block Modes:");
 	offsety += menu_font_small.getHeight() + 2;
@@ -4736,22 +4754,6 @@ int display_help()
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[delete] - Delete");
 	offsety += menu_font_small.getHeight() + 20;
-
-	menu_font_small.draw(offsetx, offsety, "Miscellaneous:");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[b] - Background Thumbnails");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[g] - Change Backgrounds");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[r] - Change Music Category");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[e] - Change Floating Eyecandy");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[ctrl] + [delete] - Clear All");
-	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[insert] - Take Screenshot");
-	offsety += menu_font_small.getHeight() + 2;
-
 
 	SDL_Flip(screen);
 
