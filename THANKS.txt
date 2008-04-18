@@ -1,6 +1,6 @@
 
 ------------------------------------------------------------------------------
- THANKS TO                                                         21.07.2006
+ THANKS TO (NEEDS TO BE UPDATED)                                    21.07.2006
 ------------------------------------------------------------------------------
 
 First of all we want to thank everyone who gave us feedback - this game 
@@ -26,14 +26,13 @@ Jared		    for contributing tons of ideas, managing user suggestions,
 dolorous            for maintaining the build for Linux systems and periodic
                     code review (catching lots of bugs)
 
-Steven Graff        for putting in lots of work to create the awesome brand-
-                    new default graphics which we're including in this release
+Steven Graff        for putting in lots of custom graphics work and offering
+                    loads of great suggestions for the game
 
 Link901             for being a terrific moderator on the 72dpiarmy forums and
                     for his work on the New Super Mario War gfx pack
 
-npodges             for creating and moderating the official content site 
-                    www.smwstuff.com, maintaining the quality of uploads,
+npodges             for creating the official content site www.smwstuff.com
                     and registering #supermariowar on freenode for us
 
 Some Mac Guy        for maintaining the Macintosh builds of the game
