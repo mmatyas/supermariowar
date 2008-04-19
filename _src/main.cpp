@@ -171,6 +171,19 @@ BOMB UPDATES
 [ ] I can't tell if this is a bug or not but the key power-up for Jail pops up in other modes. All I remember was Greed, Phanto, and Classic.   but possibly others
 [ ] Shells and mushrooms cannot do an about face when they hit the solid side of a moving platform, and just completely stop moving. example: continuous platform moves left, shell comes moving right, hits solid platform, doesn't move. It takes a stop and start from a player to get it moving again.
 
+[ ] The shells, when flipped in SMB3 by tail, block from underneath or whatever, goes roughly twice the height the shells in SMW do when flipped the same way. Maybe increase their Y velocity when flipped?
+[ ] Make src animation support using 1024x1024 surface for animated tiles, and use the new animation tile gfx
+
+[ ] Make the extra time clock give you a percentage of the starting time back instead of a constant 30 -> 30 is too much for some start times and not enough for others
+
+[ ] Level Editor bug: When you first use the animated tile mode and select animated tiles, the red tint tiles get when selecting multiple tiles appears at first, but this feature eventually disappears. Not sure what causes it to go away yet.
+[ ] Not really a bug, but something that'll be annoying later on as users might complain of this: The tail/ cape attack sounds like it's in a cave on all maps
+
+[ ] This was a pretty tricky bug to catch: The world editor will snip off the third mode option of Star mode in the world's text file, which is supposed to stand for the percentage of the extra time item appearing. 
+
+[ ] I found a really quirky bug. If you do a timed match and get extra time after the match has ended (on the winner screen while the player can still move around) then the time goes back up without any other noticable changes...when it runs out, the winner theme plays again.
+[ ] Oh, and cape/tail swiping should only make flip blocks start flipping, not break them altogether.
+
 */
 
 /*
