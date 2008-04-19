@@ -28,21 +28,20 @@
 |								  http://smw.72dpiarmy.com	|
 +----------------------------------------------------------*/
 
-//TODO
-//BUG!! Still reports of disappearing map tiles - caused when rRects is used out of bounds causing w and h to be set to 0 - happened with platform with tile using row 960
-//      I think this was due to using old maps with newer versions of the 1.8 alpha - keep an eye on this, but it might be a non-issue
 
 /*
-//BUG!! Throwing flags into flag bases and probably eggs to yoshi doens't work anymore because there is no collision detection between those items
-//      I was never a big fan of this feature, we'll see if anyone complains
+TODO
 
-//BUG!! When you kill 2 players/bots rapidly one after another with the star and you have the announcer on, the invincibilty music stops.
+BUG!! Still reports of disappearing map tiles - caused when rRects is used out of bounds causing w and h to be set to 0 - happened with platform with tile using row 960
+      I think this was due to using old maps with newer versions of the 1.8 alpha - keep an eye on this, but it might be a non-issue
 
-//BUG!!  World AI needs ability to use stored items -> harder problem than I have time for
+BUG!! When you kill 2 players/bots rapidly one after another with the star and you have the announcer on, the invincibilty music stops.
 
-//[ ] On/Off switch [?] and note blocks and possibly other types of on/off blocks
-//[ ] Thunderbolt style spawn
-//[ ] Reverse gravity blue podoboos
+BUG!!  World AI needs ability to use stored items -> harder problem than I have time for
+
+[ ] On/Off switch [?] and note blocks and possibly other types of on/off blocks
+[ ] Thunderbolt style spawn
+[ ] Reverse gravity blue podoboos
 
 * Bomb option in Star mode
 - Mariokart-type podium at the end of a tournament/tour/whatever
@@ -107,6 +106,8 @@ Cycle - P1 picks the first stage, P2 picks the second, and so on.
 
 [ ] Make a different colored/styled kuribo's shoe that is "sticky" in that it doesn't bounce around and you have to jump everywhere to make it move
 
+[ ] It'd be nice if the fortresses can get rid of a locked door like in SMB3.  Like you put down a fortress on your world and with the world editor, link the fortress and the locked door together so that if you beat the fortress, the locked door vanishes.
+
 BUGS:
 [X] The Super Mario World item set has the feather set at 0.
 [X] Sometimes when you stomp a Paratroopa or Paragoomba, you kill them in a single stomp instead of two.
@@ -118,31 +119,57 @@ BUGS:
 [X] Can't delete a hazard until exited out of the hazard screen and reselected it.
 [X] bots won't react to firebars, in fact they're jumping into this large one, then again it covers the whole screen and slowly rotates so that might be an issue but
 
-[ ] Tossing into base to score seems to no longer work for Capture the Flag and Yoshi Eggs.
-[ ] I found a bug in the leveleditor.  In animated tile mode, i klicked on a tile and the square appeared on another one, but i still selected the tile i klicked on. -> no repro
-
-[ ] got spawned into solid tiles two times so far  It's happened to me a few times as well, and pretty much directly into a solid tile that is perfectly fine and ..well yeah, solid, even from the original tiletype it had in the tileset.
 [X] If you have a raccoon tail and then you grab a key, you lose the tail but you float every time you fall.
 [X] 1ups in greed mode should give you more coins: 5, 10, 15, 30 is a great ladder for 1, 2, 3 and 5 ups respectively.
 [X] If you place a locked door over a start place (I only did this with red) and you delete the door, you can't delete the start place.
-[ ] The suicide time thing doesn't work when you are bouncing on a note block, or spring, but not pressing any buttons.
-[ ] I've found a really fatal bug. I cannot get these maps to convert...they will crash the level editor upon trying to load them and causes SMW to completely explode when it tries to load the map list. I have no clue what the problem is, could you check into this for me Two?  See crashingmap1, 2 and 3.
-[ ] Players spawning in tiles: spawninsidetile.map
-
 [X] Here's a bug - squished corpses don't fall down through invisible blocks.
-[ ] if a player is holding a shell while frozen, the shell is still held in place.  *edit: even when you let go of run, the shell is held there.  i still don't know if this is intended or not. should probably kill the shell though. :x 
 [X] Kuribo's Shoe + Red Note block don't seem to work very well when you try to jump onto it and fly off diagonally. It makes the sound but you don't get very far in most cases.
 [X] For whatever reason, hitting End crashes the editor for me. 
 [X] Also, the Help menu says nothing on how to activate the block properties thing.
-[ ] "Stage Type" sounds a bit misleading for configuring vehicles to go to stages
-[ ] Also, another thing with the suicide thing, you still die if you are standing still and repeatedly firing projectiles.
 [X] Also, if you stand still for too long in a bonus house, the suicide timer will activate, but since you can't die, it'll just repeatedly play the death sound until you move.
 [X] Most items disappear when hitting a tile that's has the tile type death. (ie lava) But shells don't.
 [X] Also, I noticed the springs fall a little bit when the game starts. That is not really a bug, but I think it should be fixed. 
 [X] I have no idea how, but he managed to spawn not once but twice holding one of the stage items in White Sky. The item simply vanished and appeared in his arms as he poofed out of the spawn smoke.
-[ ] Oh yeah, and running into a vehicle when there are no stages set crashes the game.
+[X] Oh yeah, and running into a vehicle when there are no stages set crashes the game.
 [X] Chicken glide with pwings can allow player to permanately glide downwards
 
+[X] Tossing into base to score seems to no longer work for Capture the Flag and Yoshi Eggs.
+[X] got spawned into solid tiles two times so far  It's happened to me a few times as well, and pretty much directly into a solid tile that is perfectly fine and ..well yeah, solid, even from the original tiletype it had in the tileset.
+[X] Increased normal coin rate on pipe game slightly
+[X] kuribo shoe and Tanuki statue need the ability to kill piranha plants
+[X] If the four corners setting for the players stats is on, the bottom two cannot see their cards in card mode. Sorry if that was mentioned already.
+[X] Also, some since the background becomes solid black, it becomes impossible to see the little black railings in SMB3. The only way I could tell which was which was by referencing the white ones below it. I don't know how that could be fixed unless instead of pure black the background was made some very very dark shade of grey.\
+[X] Level Editor Hazard Configuration - The clockwise and counterclockwise velocity settings may need to be labelled to avoid any confusion.
+[X] Ice Wand - When using it from the left-most side of the map, the projectile doesn't show up.
+
+[ ] "Stage Type" sounds a bit misleading for configuring vehicles to go to stages
+[ ] Also, another thing with the suicide thing, you still die if you are standing still and repeatedly firing projectiles.
+[ ] The suicide time thing doesn't work when you are bouncing on a note block, or spring, but not pressing any buttons.
+
+[ ] if a player is holding a shell while frozen, the shell is still held in place.  *edit: even when you let go of run, the shell is held there.  i still don't know if this is intended or not. should probably kill the shell though. :x 
+
+[ ] I found a bug in the leveleditor.  In animated tile mode, i klicked on a tile and the square appeared on another one, but i still selected the tile i klicked on. -> no repro
+
+BOMB UPDATES
+1) Shorten the time a bit.
+2) Allow two on-screen at once.
+3) Add a 1.5 second delay between pulling out one bomb and another.
+4) If you try to pull out a third bomb, the first one explodes. (This is what the delay is for. Having it any shorter would allow you to sort of "chain" explosions pretty much all over.)
+5) Make the Rock Blocks from SMB2 destroyable with bombs, if Two52 doesn't mind having another interactive block. But in the games, explosions don't damage regular bricks or flip blocks, so I don't think they should here.
+
+[ ] Oh and maybe you could move the button that opens the world mode item selection (the pop up on the bottom) from the space bar to something like maybe the Stored Item Use button? Using a gamepad on a world without the ability to open that up is really annoying.
+[ ] This isn't really a bug per se, but there are some flaws with the various tilesets. I know there are several repeated tiles in the SMB2 and SMB3 sets, such as two pairs of bullet bill blasters in SMB3 and what looks to be two identical layers of the tree from SMB2. If those are taken out, it would give at least a little bit of room to add stuff / organize.
+
+[ ] Stomp - The podobo powerup has no effect on Spinies or Buzzy Beetles. Also, I thought that flipping active Koopas, Spinies, and Buzzy Beetles would render them upside down shells, not kill them.
+[ ] Awards - When acquiring an Ice Wand kill in a string of multikills, the graphic used is the blue fire instead of the wand.
+[ ] By the way, this led me to an idea of how to re-implement the superfire if anyone wants it back. We could use a fire wand that shoots them, and on impact, the player is engulfed in flame and disappears in a poof of smoke.
+[ ] Not really a bug, but more of a minor suggestion. Stomping enemies with the Kuribo's Shoe should instantly kill them, using the deadflying graphic, and they should all have that little bit of bounce you get from stomping Koopas and Goombas... that, and stomping the Spiny kills it, but you go right through it, making no sound.
+[ ] Not sure if you're planning something for them or not, but the spawneggs seem to be replaced by the egg and eggnumber graphics, so they're unused like the Sledge Bros... I miss those guys.
+[ ] Also, I've only had one instance so far where the game has actually crashed. When playing on a test map I made, it sometimes crashes... the map had the 3 types of throwing blocks, 2 types of weapon breakable blocks, 6 item blocks with 3 separate configurations, and 3 rotodiscs. Maybe I'm overloading it or something. I was only throwing hammers, after all.
+
+[ ] Anyways I have a small bug... well I'm not sure if it's a bug, but on worlds with 2 draw-bridges and only one small path connected between them, and when you have the hourglass power-up in your reserves, you'll obviously be stuck if you activate it when you're in between them, so is there anyway you could make it so the hourglass is idiot-proof and doesn't allow you to use it when it figures out you'll be stuck if you activate it?
+[ ] I can't tell if this is a bug or not but the key power-up for Jail pops up in other modes. All I remember was Greed, Phanto, and Classic.   but possibly others
+[ ] Shells and mushrooms cannot do an about face when they hit the solid side of a moving platform, and just completely stop moving. example: continuous platform moves left, shell comes moving right, hits solid platform, doesn't move. It takes a stop and start from a player to get it moving again.
 
 */
 
@@ -1588,12 +1615,20 @@ void RunGame()
 			for(short k = 0; k < i; k++)
 				score[i]->x += 76 + game_values.teamcounts[k] * 34;
 
-			score[i]->y = 5 + (game_values.scoreboardstyle == 1 ? 429 : 0);
+			short iScoreOffsetY = 0;
+			if(game_values.gamemode->gamemode == game_mode_health || game_values.gamemode->gamemode == game_mode_collection)
+				iScoreOffsetY = 18;
+
+			score[i]->y = 5 + (game_values.scoreboardstyle == 1 ? 429 - iScoreOffsetY : 0);
 		}
 		else
 		{
+			short iScoreOffsetY = 0;
+			if(game_values.gamemode->gamemode == game_mode_health || game_values.gamemode->gamemode == game_mode_collection)
+				iScoreOffsetY = 18;
+
 			score[i]->x = 5 + (574 - (34 * game_values.teamcounts[i])) * (i % 2);
-			score[i]->y = 5 + 429 * (i > 1 ? 1 : 0);
+			score[i]->y = 5 + (429 - iScoreOffsetY) * (i > 1 ? 1 : 0);
 		}
 
 		score[i]->fromx = score[i]->x;

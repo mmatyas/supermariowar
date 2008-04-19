@@ -1,8 +1,8 @@
 #ifndef _OBJECT_H
 #define _OBJECT_H
 
-enum ObjectType{object_none = 0, object_block = 1, object_moving = 2, object_overmap = 3, object_area = 4, object_egg = 5, object_frenzycard = 6, object_yoshi = 7, object_race_goal = 8, object_star = 9, object_flag = 10, object_flagbase = 11, object_thwomp = 12, object_kingofthehill_area = 13, object_bowserfire = 14, object_coin = 15, object_collectioncard = 16, object_orbithazard = 17, object_bulletbillcannon = 18, object_flamecannon = 19, object_pathhazard = 20, object_pipe_coin = 21, object_pipe_bonus = 22, object_phanto = 23, object_phantokey = 24};
-enum MovingObjectType{movingobject_none = 0, movingobject_powerup = 1, movingobject_fireball = 2, movingobject_goomba = 3, movingobject_bulletbill = 4, movingobject_hammer = 5, movingobject_poisonpowerup = 6, movingobject_shell = 7, movingobject_throwblock = 8, movingobject_egg = 9, movingobject_star = 10, movingobject_flag = 11, movingobject_cheepcheep = 12, movingobject_koopa = 13, movingobject_boomerang = 14, movingobject_carried = 15, movingobject_iceblast = 16, movingobject_bomb = 17, movingobject_podobo = 18, movingobject_treasurechest = 19, movingobject_attackzone = 20, movingobject_pirhanaplant = 21, movingobject_explosion = 22, movingobject_buzzybeetle = 23, movingobject_spiny = 24, movingobject_phantokey = 25, MOVINGOBJECT_LAST};
+enum ObjectType{object_none = 0, object_block = 1, object_moving = 2, object_overmap = 3, object_area = 4, object_frenzycard = 5, object_race_goal = 6, object_star = 7, object_thwomp = 8, object_kingofthehill_area = 9, object_bowserfire = 10, object_coin = 11, object_collectioncard = 12, object_orbithazard = 13, object_bulletbillcannon = 14, object_flamecannon = 15, object_pathhazard = 16, object_pipe_coin = 17, object_pipe_bonus = 18, object_phanto = 19, object_phantokey = 20};
+enum MovingObjectType{movingobject_none = 0, movingobject_powerup = 1, movingobject_fireball = 2, movingobject_goomba = 3, movingobject_bulletbill = 4, movingobject_hammer = 5, movingobject_poisonpowerup = 6, movingobject_shell = 7, movingobject_throwblock = 8, movingobject_egg = 9, movingobject_star = 10, movingobject_flag = 11, movingobject_cheepcheep = 12, movingobject_koopa = 13, movingobject_boomerang = 14, movingobject_carried = 15, movingobject_iceblast = 16, movingobject_bomb = 17, movingobject_podobo = 18, movingobject_treasurechest = 19, movingobject_attackzone = 20, movingobject_pirhanaplant = 21, movingobject_explosion = 22, movingobject_buzzybeetle = 23, movingobject_spiny = 24, movingobject_phantokey = 25, movingobject_flagbase = 26, movingobject_yoshi = 27, MOVINGOBJECT_LAST};
 enum BlockType{block_none, block_powerup, block_view, block_breakable, block_note, block_donut, block_flip, block_bounce, block_throw, block_onoff_switch, block_onoff, block_weaponbreakable};
 
 class IO_MovingObject;
@@ -1022,7 +1022,7 @@ class CO_Egg : public MO_CarriedObject
 		short egganimationrates[6];
 
 	friend class CPlayer;
-	friend class OMO_Yoshi;
+	friend class MO_Yoshi;
 	friend class CGM_Eggs;
 };
 
@@ -1052,14 +1052,14 @@ class CO_Star : public MO_CarriedObject
 	friend class CGM_Star;
 };
 
-//Declaring class for use in OMO_FlagBase (some compilers complain if this isn't here)
+//Declaring class for use in MO_FlagBase (some compilers complain if this isn't here)
 class CO_Flag;
 
-class OMO_FlagBase : public IO_OverMapObject
+class MO_FlagBase : public IO_MovingObject
 {
 	public:
-		OMO_FlagBase(gfxSprite *nspr, short iTeamID, short iColorID);
-		~OMO_FlagBase(){};
+		MO_FlagBase(gfxSprite *nspr, short iTeamID, short iColorID);
+		~MO_FlagBase(){};
 
 		void draw();
 		void update();
@@ -1089,7 +1089,7 @@ class OMO_FlagBase : public IO_OverMapObject
 class CO_Flag : public MO_CarriedObject
 {
 	public:
-		CO_Flag(gfxSprite *nspr, OMO_FlagBase * base, short iTeamID, short iColorID);
+		CO_Flag(gfxSprite *nspr, MO_FlagBase * base, short iTeamID, short iColorID);
 		~CO_Flag(){};
 
 		void update();
@@ -1106,7 +1106,7 @@ class CO_Flag : public MO_CarriedObject
 
 	private:
 		short timer;
-		OMO_FlagBase * flagbase;
+		MO_FlagBase * flagbase;
 		short teamID;
 		bool fLastFlagDirection;
 		bool fInBase;
@@ -1116,14 +1116,14 @@ class CO_Flag : public MO_CarriedObject
 
 	friend class CPlayer;
 	friend class CGM_CTF;
-	friend class OMO_FlagBase;
+	friend class MO_FlagBase;
 };
 
-class OMO_Yoshi : public IO_OverMapObject
+class MO_Yoshi : public IO_MovingObject
 {
 	public:
-		OMO_Yoshi(gfxSprite *nspr, short iColor);
-		~OMO_Yoshi(){};
+		MO_Yoshi(gfxSprite *nspr, short iColor);
+		~MO_Yoshi(){};
 
 		void update();
 		bool collide(CPlayer * player);
@@ -1916,6 +1916,7 @@ class CObjectContainer
 		void cleandeadobjects();
 
 		float getClosestObject(short x, short y, short objectType);
+		float getClosestMovingObject(short x, short y, short movingObjectType);
 		short countTypes(ObjectType type);
 		void adjustPlayerAreas(CPlayer * player, CPlayer * other);
 		void removePlayerRaceGoals(short id, short iGoal);

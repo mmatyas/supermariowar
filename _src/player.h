@@ -452,7 +452,7 @@ class CPlayer
 		friend class MO_Coin;
 		friend class MO_CollectionCard;
 
-		friend class OMO_Yoshi;
+		friend class MO_Yoshi;
 		friend class OMO_Thwomp;
 		friend class MO_Podobo;
 		friend class OMO_BowserFire;
@@ -491,7 +491,7 @@ class CPlayer
 		//friend class MO_SledgeBrother;
 		friend class MO_CheepCheep;
 		friend class MO_BulletBill;
-		friend class OMO_FlagBase;
+		friend class MO_FlagBase;
 
 		friend class MO_BonusHouseChest;
 

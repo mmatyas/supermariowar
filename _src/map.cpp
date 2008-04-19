@@ -1330,16 +1330,28 @@ void CMap::saveMap(const std::string& file)
 		{
 			for(short iRow = 0; iRow < platforms[iPlatform]->iTileHeight; iRow++)	
 			{
+				//Set the tile type flags for each tile
+				int iType = platforms[iPlatform]->iTileType[iCol][iRow].iType;
+				if(iType >= 0 && iType <= 12)
+				{
+					platforms[iPlatform]->iTileType[iCol][iRow].iFlags = g_iTileTypeConversion[iType];
+				}
+				else
+				{
+					platforms[iPlatform]->iTileType[iCol][iRow].iType = tile_nonsolid;
+					platforms[iPlatform]->iTileType[iCol][iRow].iFlags = tile_flag_nonsolid;
+				}
+
 				TilesetTile * tile = &platforms[iPlatform]->iTileData[iCol][iRow];
-				int type = platforms[iPlatform]->iTileType[iCol][iRow].iFlags;
+				int iFlags = platforms[iPlatform]->iTileType[iCol][iRow].iFlags;
 
 				if(tile->iID != TILESETNONE)
 					iPlatformCount++;
 
-				if(type & tile_flag_has_death)
+				if(iFlags & tile_flag_has_death)
 					iHazardCount++;
 
-				if(type & tile_flag_ice)
+				if(iFlags & tile_flag_ice)
 					iIceCount++;
 			}
 		}
@@ -1351,6 +1363,18 @@ void CMap::saveMap(const std::string& file)
 	{
 		for(i = 0; i < MAPWIDTH; i++)
 		{
+			//Set the tile type flags for each tile
+			int iType = mapdatatop[i][j].iType;
+			if(iType >= 0 && iType <= 12)
+			{
+				mapdatatop[i][j].iFlags = g_iTileTypeConversion[iType];
+			}
+			else
+			{
+				mapdatatop[i][j].iType = tile_nonsolid;
+				mapdatatop[i][j].iFlags = tile_flag_nonsolid;
+			}
+
 			//Calculate what warp tiles belong together (any warps that have the same connection that are 
 			//next to each other are merged into a single warp)
 			//If there are too many warps, then remove any warp encountered that is over that limit
@@ -2648,7 +2672,7 @@ void CMap::predrawbackground(gfxSprite &background, gfxSprite &mapspr)
 	SDL_Rect dest;
 	dest.w = 32;
 	dest.h = 32;
-	short iType = 1;
+	short iType = 2;
 	
 	for(int m = 0; m < numspawnareas[iType]; m++)  //use [1] for item spawn areas
 	{

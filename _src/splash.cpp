@@ -281,8 +281,6 @@ bool LoadGameGraphics()
 	gfx_loadimage(&spr_paragoomba, convertPath("gfx/packs/modeobjects/paragoomba.png", graphicspack), true);
 	gfx_loadimage(&spr_parakoopa, convertPath("gfx/packs/modeobjects/parakoopa.png", graphicspack), true);
 	gfx_loadimage(&spr_redparakoopa, convertPath("gfx/packs/modeobjects/redparakoopa.png", graphicspack), true);
-	//gfx_loadimage(&spr_sledgebrothers, convertPath("gfx/packs/modeobjects/sledgebrothers.png", graphicspack), true);
-	//gfx_loadimage(&spr_sledgebrothersdead, convertPath("gfx/packs/eyecandy/sledgebrothersdead.png", graphicspack), true);
 	gfx_loadimage(&spr_redkoopa, convertPath("gfx/packs/modeobjects/redkoopa.png", graphicspack), true);
 	gfx_loadimage(&spr_cheepcheep, convertPath("gfx/packs/modeobjects/cheepcheep.png", graphicspack), true);
 	gfx_loadimage(&spr_cheepcheepdead, convertPath("gfx/packs/eyecandy/cheepcheepdead.png", graphicspack), true);

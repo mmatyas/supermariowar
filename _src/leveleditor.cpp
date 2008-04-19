@@ -2063,12 +2063,15 @@ int editor_properties(short iBlockCol, short iBlockRow)
 							iValue = 0;
 						else if(event.key.keysym.sym == SDLK_d)
 							iValue = g_iDefaultPowerupPresets[0][iSettingIndex];
-
+						
 						Uint8 * keystate = SDL_GetKeyState(NULL);
 						if (keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT]) 
 						{
 							for(short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++)
 							{
+								if(event.key.keysym.sym == SDLK_d)
+									iValue = g_iDefaultPowerupPresets[0][iSetting];
+
 								g_map.objectdata[iBlockCol][iBlockRow].iSettings[iSetting] = iValue;
 							}
 						}
@@ -2184,7 +2187,7 @@ int editor_properties(short iBlockCol, short iBlockRow)
 			iHiddenCheckboxY = 365;
 
 			menu_font_small.draw(0,480-menu_font_small.getHeight() * 3, "Block Property Mode");
-			menu_font_small.draw(0,480-menu_font_small.getHeight() * 2, "[0-9] Set Value [LMB] Increase [RMB] Decrease [D] Default");
+			menu_font_small.draw(0,480-menu_font_small.getHeight() * 2, "[~, 0-9] Set Value [LMB] Increase [RMB] Decrease [D] Default");
 			menu_font_small.draw(0,480-menu_font_small.getHeight(), "[Shift] + [0-9 or D] Set All To Value");
 		}
 		else if(iBlockType == 4 || iBlockType == 5 || iBlockType == 17 || iBlockType == 18 || iBlockType == 3)
@@ -3127,7 +3130,7 @@ int editor_maphazards()
 							}
 						}
 					}
-					else if(event.key.keysym.sym == SDLK_LEFTBRACKET)
+					else if(event.key.keysym.sym == SDLK_COMMA || event.key.keysym.sym == SDLK_LEFTBRACKET)
 					{
 						if(MAPHAZARD_EDIT_STATE_PROPERTIES == iEditState)
 						{
@@ -3140,7 +3143,7 @@ int editor_maphazards()
 							}
 						}
 					}
-					else if(event.key.keysym.sym == SDLK_RIGHTBRACKET)
+					else if(event.key.keysym.sym == SDLK_PERIOD || event.key.keysym.sym == SDLK_RIGHTBRACKET)
 					{
 						if(MAPHAZARD_EDIT_STATE_PROPERTIES == iEditState)
 						{
@@ -3163,6 +3166,10 @@ int editor_maphazards()
 							{
 								hazard->iparam[1] = 1 - hazard->iparam[1];
 							}
+							else if(hazard->itype == 2)
+							{
+								g_map.maphazards[iEditMapHazard].dparam[0] = -g_map.maphazards[iEditMapHazard].dparam[0];
+							}					
 						}
 					}
 					else if(event.key.keysym.sym == SDLK_n)
@@ -3400,11 +3407,13 @@ int editor_maphazards()
 			}
 			else if(hazard->itype == 2)
 			{
-				menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "Properties: [esc] Exit, [l] Location, [-/+] Velocity, [[/]] Frequency");
+				menu_font_small.draw(0, 480 - (menu_font_small.getHeight() << 1), "Properties: [esc] Exit, [l] Location, [d] Direction");
+				menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "[-/+] Velocity, [[/]] or [</>] Frequency");
 			}
 			else if(hazard->itype >= 3 && hazard->itype <= 7)
 			{
-				menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "Properties: [esc] Exit, [l] Location, [[/]] Frequency, [d] direction");
+				menu_font_small.draw(0, 480 - (menu_font_small.getHeight() << 1), "Properties: [esc] Exit, [l] Location");
+				menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "[[/]] or [</>] Frequency, [d] direction");
 			}
 			else
 			{
@@ -3465,10 +3474,16 @@ void DrawMapHazardControls(MapHazard * hazard)
 		SDL_Rect rMarker[2] = {{244,400,8,18},{iVelMarkerX,418,8,18}};
 		SDL_BlitSurface(s_platform, &rMarker[0], screen, &rMarker[1]);
 	
-		menu_font_small.drawRightJustified(190, 420, "Velocity");
-
-		//menu_font_small.drawRightJustified(196, 420, "Counter Clockwise");
-		//menu_font_small.draw(444, 420, "Clockwise");
+		if(hazard->itype == 2)
+		{
+			menu_font_small.drawRightJustified(190, 420, "Left");
+			menu_font_small.draw(450, 420, "Right");
+		}
+		else
+		{
+			menu_font_small.drawRightJustified(190, 420, "Counter Clockwise");
+			menu_font_small.draw(450, 420, "Clockwise");
+		}
 	}
 
 	if(hazard->itype >= 2 && hazard->itype <= 7) // Draw frequency for bullet bill and flame cannon
@@ -3481,7 +3496,8 @@ void DrawMapHazardControls(MapHazard * hazard)
 		SDL_Rect rMarker[2] = {{244,400,8,18},{iFreqMarkerX,388,8,18}};
 		SDL_BlitSurface(s_platform, &rMarker[0], screen, &rMarker[1]);
 
-		menu_font_small.drawRightJustified(190, 390, "Frequency");
+		menu_font_small.drawRightJustified(190, 390, "More Frequent");
+		menu_font_small.draw(388, 390, "Less Frequent");
 	}
 }
 
@@ -3789,7 +3805,7 @@ int editor_tiles()
 		//drawmap(false, TILESIZE);
 		//menu_shade.draw(0, 0);
 
-		SDL_FillRect(screen, NULL, 0x0);
+		SDL_FillRect(screen, NULL, 0xFF888888);
 
 		SDL_Rect rectSrc;
 		rectSrc.x = view_tileset_x << 5;

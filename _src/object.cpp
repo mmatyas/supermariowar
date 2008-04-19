@@ -4532,9 +4532,19 @@ MO_IceBlast::MO_IceBlast(gfxSprite *nspr, short x, short y, float fVelyX, short 
 	vely = 0.0f;
 
 	if(velx > 0.0f)
+	{
 		drawframe = 0;
+
+		if(ix >= 624)
+			xi(ix - 640);
+	}
 	else
+	{
 		drawframe = animationWidth - iw;
+		
+		if(ix + iw < 16)
+			xi(ix + 640);
+	}
 }
 
 void MO_IceBlast::update()
@@ -5628,7 +5638,7 @@ CO_Egg::CO_Egg(gfxSprite *nspr, short iColor) :
 {
 	state = 1;
 	bounce = GRAVITATION;
-	objectType = object_egg;
+	objectType = object_moving;
 	movingObjectType = movingobject_egg;
 
 	owner_throw = NULL;
@@ -5772,7 +5782,7 @@ void CO_Egg::placeEgg()
 
 		g_map.findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false);
 	}
-	while(objectcontainer[1].getClosestObject(x, y, object_yoshi) < 250.0f);
+	while(objectcontainer[1].getClosestMovingObject(x, y, movingobject_yoshi) < 250.0f);
 
 	xi(x);
 	yi(y);
@@ -5932,8 +5942,8 @@ void CO_Star::placeStar()
 //------------------------------------------------------------------------------
 // class flag base (for CTF mode)
 //------------------------------------------------------------------------------
-OMO_FlagBase::OMO_FlagBase(gfxSprite *nspr, short iTeamID, short iColorID) :
-	IO_OverMapObject(nspr, 1280, 960, 5, 0)  //use 1280 and 960 so when placing base, it doesn't interfere (look in getClosestObject())
+MO_FlagBase::MO_FlagBase(gfxSprite *nspr, short iTeamID, short iColorID) :
+	IO_MovingObject(nspr, 1280, 960, 5, 0)  //use 1280 and 960 so when placing base, it doesn't interfere (look in getClosestObject())
 {
 	state = 1;
 	iw = 32;
@@ -5941,7 +5951,8 @@ OMO_FlagBase::OMO_FlagBase(gfxSprite *nspr, short iTeamID, short iColorID) :
 	collisionWidth = 32;
 	collisionHeight = 32;
 
-	objectType = object_flagbase;
+	objectType = object_moving;
+	movingObjectType = movingobject_flagbase;
 	teamID = iTeamID;
 	iGraphicOffsetX = iColorID * 48;
 	
@@ -5961,9 +5972,9 @@ OMO_FlagBase::OMO_FlagBase(gfxSprite *nspr, short iTeamID, short iColorID) :
 	timer = 0;
 }
 
-bool OMO_FlagBase::collide(CPlayer * player)
+bool MO_FlagBase::collide(CPlayer * player)
 {
-	if(teamID == player->teamID && player->carriedItem && player->carriedItem->getObjectType() == object_flag)
+	if(teamID == player->teamID && player->carriedItem && player->carriedItem->getMovingObjectType() == movingobject_flag)
 	{
 		CO_Flag * flag = (CO_Flag*)player->carriedItem;
 		scoreFlag(flag, player);
@@ -5973,13 +5984,13 @@ bool OMO_FlagBase::collide(CPlayer * player)
 	return false;
 }
 
-void OMO_FlagBase::draw()
+void MO_FlagBase::draw()
 {
 	spr->draw(ix - 8, iy - 8, iGraphicOffsetX, 0, 48, 48);
 }
 
 
-void OMO_FlagBase::update()
+void MO_FlagBase::update()
 {
 	if(--anglechangetimer <= 0)
 	{
@@ -5992,10 +6003,8 @@ void OMO_FlagBase::update()
 	velx = speed * sin(angle);
 	vely = speed * cos(angle);
 	
-	IO_OverMapObject::update();
-
-	ix = (short)fx;
-	iy = (short)fy;
+	xf(fx + velx);
+	yf(fy + vely);
 
 	if(ix < 0)
 	{
@@ -6035,7 +6044,7 @@ void OMO_FlagBase::update()
 		placeFlagBase(false);
 }
 
-void OMO_FlagBase::placeFlagBase(bool fInit)
+void MO_FlagBase::placeFlagBase(bool fInit)
 {
 	timer = 0;
 	short x = 0, y = 0;
@@ -6055,14 +6064,14 @@ void OMO_FlagBase::placeFlagBase(bool fInit)
 
 			g_map.findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, true);
 		}
-		while(objectcontainer[0].getClosestObject(x, y, object_flagbase) <= 200.0f);
+		while(objectcontainer[0].getClosestMovingObject(x, y, movingobject_flagbase) <= 200.0f);
 	}
 
 	xi(x);
 	yi(y);
 }
 
-void OMO_FlagBase::collide(IO_MovingObject * object)
+void MO_FlagBase::collide(IO_MovingObject * object)
 {
 	if(object->getMovingObjectType() == movingobject_flag)
 	{
@@ -6079,7 +6088,7 @@ void OMO_FlagBase::collide(IO_MovingObject * object)
 	}
 }
 
-void OMO_FlagBase::scoreFlag(CO_Flag * flag, CPlayer * player)
+void MO_FlagBase::scoreFlag(CO_Flag * flag, CPlayer * player)
 {
 	if(flag->teamID == teamID)
 	{
@@ -6110,12 +6119,12 @@ void OMO_FlagBase::scoreFlag(CO_Flag * flag, CPlayer * player)
 //------------------------------------------------------------------------------
 // class flag (for Capture the Flag mode)
 //------------------------------------------------------------------------------
-CO_Flag::CO_Flag(gfxSprite *nspr, OMO_FlagBase * base, short iTeamID, short iColorID) :
+CO_Flag::CO_Flag(gfxSprite *nspr, MO_FlagBase * base, short iTeamID, short iColorID) :
 	MO_CarriedObject(nspr, 0, 0, 4, 8, 30, 30, 1, 1, 0, iColorID << 6, 32, 32)
 {
 	state = 1;
 	bounce = GRAVITATION;
-	objectType = object_flag;
+	objectType = object_moving;
 	movingObjectType = movingobject_flag;
 	flagbase = base;
 	teamID = iTeamID;
@@ -6244,6 +6253,8 @@ void CO_Flag::placeFlag()
 		g_map.findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false);
 		fx = (float)ix;
 		fy = (float)iy;
+		velx = 0.0f;
+		vely = 0.0f;
 		fLastFlagDirection = false;
 	}
 	else if(flagbase)
@@ -6271,10 +6282,11 @@ void CO_Flag::Drop()
 //------------------------------------------------------------------------------
 // class yoshi (for egg mode)
 //------------------------------------------------------------------------------
-OMO_Yoshi::OMO_Yoshi(gfxSprite *nspr, short iColor) :
-	IO_OverMapObject(nspr, 0, 0, 2, 8, 52, 56, 0, 0, 0, iColor * 56, 56, 52)
+MO_Yoshi::MO_Yoshi(gfxSprite *nspr, short iColor) :
+	IO_MovingObject(nspr, 0, 0, 2, 8, 52, 56, 0, 0, 0, iColor * 56, 56, 52)
 {
-	objectType = object_yoshi;
+	objectType = object_moving;
+	movingObjectType = movingobject_yoshi;
 	state = 1;
 
 	color = iColor;
@@ -6282,9 +6294,9 @@ OMO_Yoshi::OMO_Yoshi(gfxSprite *nspr, short iColor) :
 	placeYoshi();
 }
 
-bool OMO_Yoshi::collide(CPlayer * player)
+bool MO_Yoshi::collide(CPlayer * player)
 {
-	if(player->carriedItem && player->carriedItem->getObjectType() == object_egg)
+	if(player->carriedItem && player->carriedItem->getMovingObjectType() == movingobject_egg)
 	{
 		CO_Egg * egg = (CO_Egg*)player->carriedItem;
 
@@ -6308,7 +6320,7 @@ bool OMO_Yoshi::collide(CPlayer * player)
 	return false;
 }
 
-void OMO_Yoshi::update()
+void MO_Yoshi::update()
 {
 	animate();
 
@@ -6316,7 +6328,7 @@ void OMO_Yoshi::update()
 		placeYoshi();
 }
 
-void OMO_Yoshi::placeYoshi()
+void MO_Yoshi::placeYoshi()
 {
 	timer = 0;
 
@@ -6379,7 +6391,7 @@ void OMO_Yoshi::placeYoshi()
 	iy = 240;
 }
 
-void OMO_Yoshi::collide(IO_MovingObject * object)
+void MO_Yoshi::collide(IO_MovingObject * object)
 {
 	if(object->getMovingObjectType() == movingobject_egg)
 	{
@@ -9851,6 +9863,10 @@ MO_PirhanaPlant::MO_PirhanaPlant(short x, short y, short type, short freq, short
 
 void MO_PirhanaPlant::update()
 {
+	//Needed for collisions with player and kuribo's shoe to know
+	//if the plant hit the player from the top or not
+	fOldY = (float)iy;
+
 	if(state == 0)  //waiting to appear
 	{
 		if(--iTimer <= 0)
@@ -9984,7 +10000,9 @@ bool MO_PirhanaPlant::collide(CPlayer * player)
 	if(state == 0)
 		return false;
 
-	if(player->invincible)
+	bool fHitPlayerTop = fOldY + collisionHeight <= player->fOldY && iy + collisionHeight >= player->iy;
+
+	if(player->invincible || player->statue_timer || (player->fKuriboShoe && !fHitPlayerTop))
 	{
 		KillPlant();
 	}
@@ -10563,23 +10581,44 @@ bool CObjectContainer::isBlockAt(short x, short y)
 
 float CObjectContainer::getClosestObject(short ix, short iy, short objectType)
 {
-	float dist = 800.0f;  //Longest distance from corner to corner
+	int dist = 640000;  //Longest distance from corner to corner squared
 
 	for(short i = 0; i < list_end; i++)
 	{
-		if(list[i]->getObjectType() == objectType)
-		{
-			short x = list[i]->ix - ix;
-			short y = list[i]->iy - iy;
+		if(list[i]->getObjectType() != objectType)
+			continue;
 
-			float calcdist = (float)sqrt((double)(x * x + y * y));
+		short x = list[i]->ix - ix;
+		short y = list[i]->iy - iy;
 
-			if(calcdist < dist)
-				dist = calcdist;
-		}
+		int calcdist = x * x + y * y;
+
+		if(calcdist < dist)
+			dist = calcdist;
 	}
 
-	return dist;
+	return (float)sqrt((double)dist);
+}
+
+float CObjectContainer::getClosestMovingObject(short ix, short iy, short movingObjectType)
+{
+	int dist = 640000;  //Longest distance from corner to corner squared
+
+	for(short i = 0; i < list_end; i++)
+	{
+		if(list[i]->getObjectType() != object_moving || ((IO_MovingObject*)list[i])->getMovingObjectType() != movingObjectType)
+			continue;
+
+		short x = list[i]->ix - ix;
+		short y = list[i]->iy - iy;
+
+		int calcdist = x * x + y * y;
+
+		if(calcdist < dist)
+			dist = calcdist;
+	}
+
+	return (float)sqrt((double)dist);
 }
 
 short CObjectContainer::countTypes(ObjectType type)

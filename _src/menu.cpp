@@ -463,7 +463,7 @@ void Menu::CreateMenu()
 	miAwardStyleField->SetData(&game_values.awardstyle, NULL, NULL);
 	miAwardStyleField->SetKey(game_values.awardstyle);
 
-	miScoreStyleField = new MI_SelectField(&spr_selectfield, 70, 180, "Score Style", 500, 220);
+	miScoreStyleField = new MI_SelectField(&spr_selectfield, 70, 180, "Score Location", 500, 220);
 	miScoreStyleField->Add("Top", 0, "", false, false);
 	miScoreStyleField->Add("Bottom", 1, "", false, false);
 	miScoreStyleField->Add("Corners", 2, "", false, false);

@@ -338,7 +338,7 @@ class CMap
 		friend class MapList;
 		friend class CPlayer;
 
-		friend class OMO_FlagBase;
+		friend class MO_FlagBase;
 		friend class OMO_RaceGoal;
 };
 

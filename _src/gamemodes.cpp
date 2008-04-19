@@ -1198,7 +1198,7 @@ void CGM_Eggs::init()
 			if(iYoshi > 9)
 				break;
 
-			objectcontainer[1].add(new OMO_Yoshi(&spr_yoshi, iYoshis));
+			objectcontainer[1].add(new MO_Yoshi(&spr_yoshi, iYoshis));
 		}
 	}	
 }
@@ -1212,7 +1212,7 @@ short CGM_Eggs::playerkilledself(CPlayer &player, killstyle style)
 {
 	CGameMode::playerkilledself(player, style);
 
-	if(player.carriedItem && player.carriedItem->getObjectType() == object_egg)
+	if(player.carriedItem && player.carriedItem->getMovingObjectType() == movingobject_egg)
 	{
 		((CO_Egg*)player.carriedItem)->placeEgg();
 	}
@@ -2527,7 +2527,7 @@ void CGM_CaptureTheFlag::init()
 			fTeamUsed[iTeamID] = true;
 
 			short iColorID = list_players[iPlayer]->colorID;
-			OMO_FlagBase * base = new OMO_FlagBase(&spr_flagbases, iTeamID, iColorID);
+			MO_FlagBase * base = new MO_FlagBase(&spr_flagbases, iTeamID, iColorID);
 			objectcontainer[0].add(base);
 
 			if(!game_values.gamemodesettings.flag.centerflag)
@@ -2554,7 +2554,7 @@ short CGM_CaptureTheFlag::playerkilledself(CPlayer &player, killstyle style)
 {
 	CGameMode::playerkilledself(player, style);
 
-	if(player.carriedItem && player.carriedItem->getObjectType() == object_flag)
+	if(player.carriedItem && player.carriedItem->getMovingObjectType() == movingobject_flag)
 	{
 		((CO_Flag*)player.carriedItem)->placeFlag();
 	}
@@ -3413,7 +3413,7 @@ void CGM_Pipe_MiniGame::think()
 			if(iBonusType == 2)
 				iNextItemTimer = rand() % 10 + 10;
 			else
-				iNextItemTimer = rand() % 30 + 30;
+				iNextItemTimer = rand() % 20 + 25;
 
 			short iRandPowerup = rand() % 50;
 			if(iBonusType == 0 && iRandPowerup < 5) //bonuses
