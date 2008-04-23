@@ -2502,13 +2502,13 @@ void collisionhandler_p2p(CPlayer * o1, CPlayer * o2)
 	bool fFrozenDeath = false;
 	if(o1->frozen && o1->shield == 0 && !o1->invincible)
 	{
-		PlayerKilledPlayer(o2, o1, death_style_shatter, kill_style_frozen, true);
+		PlayerKilledPlayer(o2, o1, death_style_shatter, kill_style_iceblast, true);
 		fFrozenDeath = true;
 	}
 
 	if(o2->frozen && o2->shield == 0 && !o2->invincible)
 	{
-		PlayerKilledPlayer(o1, o2, death_style_shatter, kill_style_frozen, true);
+		PlayerKilledPlayer(o1, o2, death_style_shatter, kill_style_iceblast, true);
 		fFrozenDeath = true;
 	}
 

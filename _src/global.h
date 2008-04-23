@@ -380,7 +380,6 @@ extern gfxSprite		spr_scorehearts;
 extern gfxSprite		spr_scorecards;
 
 extern gfxSprite		spr_timershade;
-extern gfxSprite		spr_spawneggs;
 extern gfxSprite		spr_scoretext;
 extern gfxSprite		spr_racetext;
 extern gfxSprite		spr_crown;

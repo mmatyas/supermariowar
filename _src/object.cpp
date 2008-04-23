@@ -314,11 +314,16 @@ bool IO_Block::hitleft(IO_MovingObject * object)
 void IO_Block::BounceMovingObject(IO_MovingObject * object)
 {
 	MovingObjectType type = object->getMovingObjectType();
-	if(type == movingobject_goomba || type == movingobject_koopa || type == movingobject_buzzybeetle)
+	if(type == movingobject_goomba || type == movingobject_koopa || type == movingobject_buzzybeetle || type == movingobject_spiny)
 	{
 		ifsoundonplay(sfx_kicksound);
 		killstyle style = kill_style_goomba;
 		
+		MO_WalkingEnemy * enemy = (MO_WalkingEnemy *)object;
+		style = enemy->getKillStyle();
+		enemy->DieAndDropShell();
+
+		/*
 		if(type == movingobject_goomba)
 		{
 			((MO_Goomba*)object)->Die();
@@ -334,6 +339,11 @@ void IO_Block::BounceMovingObject(IO_MovingObject * object)
 			((MO_BuzzyBeetle*)object)->Die();
 			style = kill_style_buzzybeetle;
 		}
+		else if(type == movingobject_spiny)
+		{
+			((MO_Spiny*)object)->Die();
+			style = kill_style_buzzybeetle;
+		}*/
 
 		if(!game_values.gamemode->gameover && iBumpPlayerID >= 0)
 		{
@@ -469,12 +479,12 @@ void B_PowerupBlock::update()
 			{
 				objectcontainer[0].add(new PU_ExtraHeartPowerup(&spr_extraheartpowerup, ix + 1, iy - 1));
 			}
-			else if((game_values.gamemode->gamemode == game_mode_timelimit && rand() % 100 < game_values.gamemodesettings.time.percentextratime) ||
-				(game_values.gamemode->gamemode == game_mode_star && rand() % 100 < game_values.gamemodesettings.star.percentextratime))
+			else if((game_values.gamemode->gamemode == game_mode_timelimit || game_values.gamemode->gamemode == game_mode_star) && 
+				rand() % 100 < game_values.gamemodesettings.time.percentextratime)
 			{
 				objectcontainer[0].add(new PU_ExtraTimePowerup(&spr_extratimepowerup, ix + 1, iy - 1));				
 			}
-			else if(game_values.gamemode->gamemode == game_mode_jail && rand() % 100 < game_values.gamemodesettings.jail.percentkey)
+			else if(game_values.gamemode->gamemode == game_mode_jail && (rand() % 100) < game_values.gamemodesettings.jail.percentkey)
 			{
 				objectcontainer[0].add(new PU_JailKeyPowerup(&spr_jailkeypowerup, ix + 1, iy - 1));
 			}
@@ -1617,7 +1627,7 @@ bool B_FlipBlock::hitright(IO_MovingObject * object)
 			object->velx = -object->velx;
 
 		MovingObjectType type = object->getMovingObjectType();
-		if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone)
+		if(type == movingobject_shell || type == movingobject_throwblock)
 		{
 			if(type == movingobject_shell)
 			{
@@ -1627,6 +1637,22 @@ bool B_FlipBlock::hitright(IO_MovingObject * object)
 
 			state = 2;
 			explode();
+		}
+		else if(type == movingobject_attackzone)
+		{
+			iBumpPlayerID = object->iPlayerID;
+			iBumpTeamID = object->iTeamID;
+
+			if(hidden)
+			{
+				hidden = false;
+				KillPlayersInsideBlock();
+			}
+
+			g_map.UpdateTileGap(col, row);
+
+			triggerBehavior();
+			return false;
 		}
 	}
 
@@ -1644,7 +1670,7 @@ bool B_FlipBlock::hitleft(IO_MovingObject * object)
 			object->velx = -object->velx;
 
 		MovingObjectType type = object->getMovingObjectType();
-		if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone)
+		if(type == movingobject_shell || type == movingobject_throwblock)
 		{
 			if(type == movingobject_shell)
 			{
@@ -1654,6 +1680,22 @@ bool B_FlipBlock::hitleft(IO_MovingObject * object)
 
 			state = 2;
 			explode();
+		}
+		else if(type == movingobject_attackzone)
+		{
+			iBumpPlayerID = object->iPlayerID;
+			iBumpTeamID = object->iTeamID;
+
+			if(hidden)
+			{
+				hidden = false;
+				KillPlayersInsideBlock();
+			}
+
+			g_map.UpdateTileGap(col, row);
+
+			triggerBehavior();
+			return false;
 		}
 	}
 
@@ -3775,6 +3817,8 @@ PU_TreasureChestBonus::PU_TreasureChestBonus(gfxSprite *nspr, short iNumSpr, sho
 	drawbonusitemx = 0;
 	drawbonusitemy = 0;
 	drawbonusitemtimer = 0;
+
+	fObjectDiesOnDeathTiles = false;
 }
 
 void PU_TreasureChestBonus::update()
@@ -4231,6 +4275,8 @@ bool PU_ExtraHeartPowerup::collide(CPlayer * player)
 				player->score->subscore[0]++;
 		}
 
+		ifsoundonplay(sfx_collectpowerup);
+
 		dead = true;
 	}
 
@@ -4253,7 +4299,7 @@ bool PU_ExtraTimePowerup::collide(CPlayer * player)
 		if(game_values.gamemode->gamemode == game_mode_timelimit || game_values.gamemode->gamemode == game_mode_star)
 		{
 			CGM_TimeLimit * timelimitmode = (CGM_TimeLimit*)game_values.gamemode;
-			timelimitmode->addtime(30);
+			timelimitmode->addtime(timelimitmode->goal / 5);
 		}
 
 		dead = true;
@@ -7698,9 +7744,9 @@ void MO_BuzzyBeetle::Die()
 void MO_BuzzyBeetle::DropShell()
 {
 	//Give the shell a state 2 so it is already spawned but sitting
-	CO_Shell * shell = new CO_Shell(3, ix - 1, iy + 8, false, true, false, false);
+	CO_Shell * shell = new CO_Shell(3, ix - 1, iy, false, true, false, false);
 	shell->state = 2;
-	shell->yi(iy + 8);
+	shell->yi(iy);
 
 	objectcontainer[1].add(shell);
 }
@@ -7730,13 +7776,27 @@ bool MO_Spiny::hittop(CPlayer * player)
 {
 	//Kill player here
 	if(player->isready() && player->shield == 0 && !player->invincible && !player->fKuriboShoe)
-	{
 		return player->KillPlayerMapHazard(false, kill_style_environment) != player_kill_nonkill;
-	}
-	
-	if(player->fKuriboShoe)
-		Die();
 
+	if(player->fKuriboShoe)
+	{
+		player->yi(iy - PH - 1);
+		player->bouncejump();
+		player->collision_detection_checktop();
+		player->platform = NULL;
+		
+		dead = true;
+
+		AddAwardKill(player, NULL, kill_style_spiny);
+
+		if(game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover)
+			player->score->AdjustScore(1);
+
+		DropShell();
+
+		ifsoundonplay(sfx_mip);
+	}
+		
 	return false;
 }
 
@@ -7749,9 +7809,9 @@ void MO_Spiny::Die()
 void MO_Spiny::DropShell()
 {
 	//Give the shell a state 2 so it is already spawned but sitting
-	CO_Shell * shell = new CO_Shell(2, ix - 1, iy + 8, false, true, false, false);
+	CO_Shell * shell = new CO_Shell(2, ix - 1, iy, false, true, false, false);
 	shell->state = 2;
-	shell->yi(iy + 8);
+	shell->yi(iy);
 
 	objectcontainer[1].add(shell);
 }

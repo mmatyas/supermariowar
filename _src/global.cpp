@@ -1049,6 +1049,12 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
 					sprintf(szTemp, ",%d", ts->gmsSettings.star.shine);
 					strcat(buffer, szTemp);
 				}
+
+				if(ts->iNumUsedSettings > 2)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.star.percentextratime);
+					strcat(buffer, szTemp);
+				}
 			}
 			else if(ts->iMode == 11) //domination
 			{
@@ -1321,7 +1327,7 @@ short g_iCollisionMap[MOVINGOBJECT_LAST][MOVINGOBJECT_LAST] =
 	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_carried = 15
 	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_iceblast = 16
 	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_bomb = 17
-	{0,0,0,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_podobo = 18
+	{0,0,0,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1,1,0,0,0}, //movingobject_podobo = 18
 	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_treasurechest = 19
 	{0,0,0,1,1,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,1,0,1,1,0,0,0}, //movingobject_attackzone = 20
 	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_pirhanaplant = 21

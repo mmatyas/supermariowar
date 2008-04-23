@@ -609,8 +609,11 @@ void CGM_TimeLimit::SetDigitCounters()
 
 void CGM_TimeLimit::addtime(short iTime)
 {
-	timeleft += iTime;
-	SetDigitCounters();
+	if(!gameover)
+	{
+		timeleft += iTime;
+		SetDigitCounters();
+	}
 }
 
 //mariowar (x lives - counting down)
@@ -2755,7 +2758,7 @@ short CGM_Health::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killsty
 	if(gameover)
 		return player_kill_normal;
 
-	if(style == kill_style_bobomb || style == kill_style_bomb)
+	if(style == kill_style_bobomb || style == kill_style_bomb || style == kill_style_iceblast)
 		other.score->subscore[0] -= 2;
 	else
 		other.score->subscore[0]--;
@@ -2786,7 +2789,7 @@ short CGM_Health::playerkilledself(CPlayer &player, killstyle style)
 	if(gameover)
 		return player_kill_normal;
 
-	if(style == kill_style_bobomb || style == kill_style_bomb)
+	if(style == kill_style_bobomb || style == kill_style_bomb || style == kill_style_environment)
 		player.score->subscore[0] -= 2;
 	else
 		player.score->subscore[0]--;

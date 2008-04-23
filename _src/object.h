@@ -1298,6 +1298,8 @@ class MO_WalkingEnemy : public IO_MovingObject
 		virtual void DieAndDropShell() { dead = true; DropShell(); }
 		virtual void DropShell() {}
 
+		killstyle getKillStyle() {return killStyle;}
+
 	protected:
 		float spawnradius;
 		float spawnangle;

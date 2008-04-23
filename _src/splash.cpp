@@ -242,7 +242,6 @@ bool LoadGameGraphics()
 	gfx_loadimage(&spr_scorecards, convertPath("gfx/packs/menu/score_cards.png", graphicspack), false);
 	
 	gfx_loadimage(&spr_timershade, convertPath("gfx/packs/eyecandy/timershade.png", graphicspack), 64, false, true);
-	gfx_loadimage(&spr_spawneggs, convertPath("gfx/packs/eyecandy/spawneggs.png", graphicspack), false);
 	gfx_loadimage(&spr_scoretext, convertPath("gfx/packs/fonts/score.png", graphicspack), false);
 	gfx_loadimage(&spr_racetext, convertPath("gfx/packs/fonts/race.png", graphicspack), false);
 
