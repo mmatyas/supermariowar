@@ -136,39 +136,6 @@ Cycle - P1 picks the first stage, P2 picks the second, and so on.
 [ ] There should be an option for Greed mode where you can disable the option of getting your coins back. It's a bit of a pain in the neck when the opponent grabs all his coins back.
 
 BUGS:
-[X] The Super Mario World item set has the feather set at 0.
-[X] Sometimes when you stomp a Paratroopa or Paragoomba, you kill them in a single stomp instead of two.
-[X] Para enemies don't have the stomp noise then you rid them of their wings. 
-[X] Jumping on top of a shell in just the right angle cause you to kick the shell while still falling into it in the same direction as it's kicked, causing you to kill yourself.
-[X] If a player is killed by an on/off block turning on and the switch turns on and off against while the player is still dead, the player that died, "dies again" and their respawn timer is reset. This can be abused to keep a dead player, well, dead.
-[X] Yoshi Egg explosions do not emit any sound. (Either that or too many exploded at once and killed the explosion sound)
-[X] ESC does not exit out of the Hazard select menu in the level editor like advertised.
-[X] Can't delete a hazard until exited out of the hazard screen and reselected it.
-[X] bots won't react to firebars, in fact they're jumping into this large one, then again it covers the whole screen and slowly rotates so that might be an issue but
-
-[X] If you have a raccoon tail and then you grab a key, you lose the tail but you float every time you fall.
-[X] 1ups in greed mode should give you more coins: 5, 10, 15, 30 is a great ladder for 1, 2, 3 and 5 ups respectively.
-[X] If you place a locked door over a start place (I only did this with red) and you delete the door, you can't delete the start place.
-[X] Here's a bug - squished corpses don't fall down through invisible blocks.
-[X] Kuribo's Shoe + Red Note block don't seem to work very well when you try to jump onto it and fly off diagonally. It makes the sound but you don't get very far in most cases.
-[X] For whatever reason, hitting End crashes the editor for me. 
-[X] Also, the Help menu says nothing on how to activate the block properties thing.
-[X] Also, if you stand still for too long in a bonus house, the suicide timer will activate, but since you can't die, it'll just repeatedly play the death sound until you move.
-[X] Most items disappear when hitting a tile that's has the tile type death. (ie lava) But shells don't.
-[X] Also, I noticed the springs fall a little bit when the game starts. That is not really a bug, but I think it should be fixed. 
-[X] I have no idea how, but he managed to spawn not once but twice holding one of the stage items in White Sky. The item simply vanished and appeared in his arms as he poofed out of the spawn smoke.
-[X] Oh yeah, and running into a vehicle when there are no stages set crashes the game.
-[X] Chicken glide with pwings can allow player to permanately glide downwards
-
-[X] Tossing into base to score seems to no longer work for Capture the Flag and Yoshi Eggs.
-[X] got spawned into solid tiles two times so far  It's happened to me a few times as well, and pretty much directly into a solid tile that is perfectly fine and ..well yeah, solid, even from the original tiletype it had in the tileset.
-[X] Increased normal coin rate on pipe game slightly
-[X] kuribo shoe and Tanuki statue need the ability to kill piranha plants
-[X] If the four corners setting for the players stats is on, the bottom two cannot see their cards in card mode. Sorry if that was mentioned already.
-[X] Also, some since the background becomes solid black, it becomes impossible to see the little black railings in SMB3. The only way I could tell which was which was by referencing the white ones below it. I don't know how that could be fixed unless instead of pure black the background was made some very very dark shade of grey.\
-[X] Level Editor Hazard Configuration - The clockwise and counterclockwise velocity settings may need to be labelled to avoid any confusion.
-[X] Ice Wand - When using it from the left-most side of the map, the projectile doesn't show up.
-
 [X] Stomp - The podobo powerup has no effect on Spinies or Buzzy Beetles. 
 [X] I thought that flipping active Koopas, Spinies, and Buzzy Beetles would render them upside down shells, not kill them.
 [X] Awards - When acquiring an Ice Wand kill in a string of multikills, the graphic used is the blue fire instead of the wand.
@@ -189,14 +156,6 @@ BUGS:
 
 [ ] if a player is holding a shell while frozen, the shell is still held in place.  *edit: even when you let go of run, the shell is held there.  i still don't know if this is intended or not. should probably kill the shell though. :x 
 
-[ ] I found a bug in the leveleditor.  In animated tile mode, i klicked on a tile and the square appeared on another one, but i still selected the tile i klicked on. -> no repro
-1. open the leveleditor,
-2. press "a"
-3. select a tile or more tiles at once there
-4. those tiles won't be highlighted red/get inclosed into a red square that shows you that you have selected those tiles.
-5. the square appears one tile above and one tile to the right from the spot you clicked at.
-
-
 
 BOMB UPDATES
 1) Shorten the time a bit.
@@ -208,71 +167,95 @@ BOMB UPDATES
 [ ] Oh and maybe you could move the button that opens the world mode item selection (the pop up on the bottom) from the space bar to something like maybe the Stored Item Use button? Using a gamepad on a world without the ability to open that up is really annoying.
 [ ] This isn't really a bug per se, but there are some flaws with the various tilesets. I know there are several repeated tiles in the SMB2 and SMB3 sets, such as two pairs of bullet bill blasters in SMB3 and what looks to be two identical layers of the tree from SMB2. If those are taken out, it would give at least a little bit of room to add stuff / organize.
 
-[ ] Also, I've only had one instance so far where the game has actually crashed. When playing on a test map I made, it sometimes crashes... the map had the 3 types of throwing blocks, 2 types of weapon breakable blocks, 6 item blocks with 3 separate configurations, and 3 rotodiscs. Maybe I'm overloading it or something. I was only throwing hammers, after all.
-	-> Hmmm, sounds like there is a hammer problem in the corner of the map
-[ ] I can't tell if this is a bug or not but the key power-up for Jail pops up in other modes. All I remember was Greed, Phanto, and Classic.   but possibly others -> adjusted parens but I don't think this was possible before from other modes without the game type being wrong
-    -> no repro
-[ ] Shells and mushrooms cannot do an about face when they hit the solid side of a moving platform, and just completely stop moving. example: continuous platform moves left, shell comes moving right, hits solid platform, doesn't move. It takes a stop and start from a player to get it moving again.
-    -> no repro, post map where this is happening
+[X] In animated tile mode, sometimes clicking on the animated tiles causes the red selector to appear in the wrong place or not show up at all
+[X] Also, I've only had one instance so far where the game has actually crashed. Problem fixed with GetCollisionBlocks()
 
 [ ] Make src animation support using 1024x1024 surface for animated tiles, and use the new animation tile gfx
 
-[ ] Level Editor bug: When you first use the animated tile mode and select animated tiles, the red tint tiles get when selecting multiple tiles appears at first, but this feature eventually disappears. Not sure what causes it to go away yet.
-
-[ ] In frenzy mode if all card weights are set to 0, one ? card appears and that's it fo the game
-    -> no repro - check your mode settings
+[X] Level Editor bug: When you first use the animated tile mode and select animated tiles, the red tint tiles get when selecting multiple tiles appears at first, but this feature eventually disappears. Not sure what causes it to go away yet.
 
 [ ] Yet another, though it might be impossible to fix: Clear blocks do not give you the displayed powerup when you hit them in certain modes that have mode specific items like Health and Jail and the block gives you that instead.
 
-[ ] Found a new bug, when you use the tanuki suit power in mid-air with nothing blocking your way you will constantly loop and there is no way to deactivate the power so you fall forever until something gets in your way.
+[x] Found a new bug, when you use the tanuki suit power in mid-air with nothing blocking your way you will constantly loop and there is no way to deactivate the power so you fall forever until something gets in your way.
 
-[ ] After deleting a tile in the leveleditor, the tiletype of it remains on the spot the tile has been before.
+[X] the super stomp kills arial or dropping down enemies one tile above you. I noticed that when an enemie tried to squish me while i did the super stomp with the kuribo shoe. the enemie just died one tile above me. -> somewhat intended, made the attack zone a little smaller
 
-[ ] the super stomp kills arial or dropping down enemies one tile above you. I noticed that when an enemie tried to squish me while i did the super stomp with the kuribo shoe. the enemie just died one tile above me.
-
-[ ] It appears that computers don't know that the key would be considered instant use when they are jailed.
-
-[ ] World keys are rendered useless when two doors are adjacent to the spot in which you are standing.
+[X] It appears that computers don't know that the key would be considered instant use when they are jailed.
 
 [ ] SMW just crashed on me while playing a world map on capture the flag mode. I'm not sure how it happened, but the almost finished chime started just as I grabbed a flag. I'll need to look into it.
 
-[ ] Killing a piranha plant doesn't make the usual death sound.
+[X] Killing a piranha plant doesn't make the usual death sound.
 
 [ ] In tag mode, when you use a POW or MOd and kill multiple players at once, the tag always transfers to the first player "on the board", that is, it will go to P1 if he got hit, otherwise P2, and so on.  Perhaps we could have it so that instead of killing all players sequentially, the POW/MOD kills them in a random order, so as to avoid this little bias?
 
 [ ] That platform (or, to be more exact, the whole stage) is moving left.  My character is partially in the vertical wooden block.
 
-[ ] Anyway, in the world editor, the Auto Draw feature for the path tool works fine in empty spaces, but it has the annoying tendancy to try to connect to every little object it gets near. This is probably because forts and castles are in the same category as dancing hills and rocks. I had to manually make each and every path in the SMB3 worlds I created simply because the Auto Draw kept trying to link my path to every little hill and tree it passed.
+[X] Anyway, in the world editor, the Auto Draw feature for the path tool works fine in empty spaces, but it has the annoying tendancy to try to connect to every little object it gets near. This is probably because forts and castles are in the same category as dancing hills and rocks. I had to manually make each and every path in the SMB3 worlds I created simply because the Auto Draw kept trying to link my path to every little hill and tree it passed.
 
-[ ] Also, what does "Use Game" mean for the Item Block properties? If it means "use the game's item settings instead", shouldn't it be the default for each item block? Otherwise, all item blocks unless specified will use the same item settings regardless of what the user chooses.
+[ ] Also, what does "Use Game" mean for the Item Block properties? If it means "use the game's item settings instead", shouldn't it be the default for each item block? Otherwise, all item blocks unless specified will use the same item settings regardless of what the user chooses. -> if the user is changing the settings, then they should also change it to use those settings
 
-[ ] Clicking, and dragging map objects (spring, spike) in the editor doesn't work.
-[ ] When the bonus wheel is set to every game, and you play a single match, it takes you to the main menu after the wheel spins, instead of the level/mode select menu.
-[ ] In the editor, you can't make on switches off, or off switches on.
-[ ] Bots should stop the bonus wheel at random.
-[ ] If you throw hammers onto the bottom right corner of certain maps, the game will crash.
+[X] The reward treasure chest spawned over a pit of boiling lava and vaporised. Considering the chest was supposed to hold a key, I panicked a bit until I saw that the victory screen gave me the key regardless. Still, the treasure chest should be made to spawn only in player-safe areas.
 
-[ ] World Editor's help screen gives no mention of using Insert to take screens. I only knew it worked because of the screens folder.
+[X] When the bonus wheel is set to every game, and you play a single match, it takes you to the main menu after the wheel spins, instead of the level/mode select menu.
+[X] Bots should stop the bonus wheel at random.
+[X] If you throw hammers onto the bottom right corner of certain maps, the game will crash.
+
+[X] World Editor's help screen gives no mention of using Insert to take screens. I only knew it worked because of the screens folder.
 [ ] The "thumbnail" sized tiles for the world editor have purple parts in all the foreground objects, including the level markers.
-[ ] The "Giant" music category seems broken.
-[ ] The quicksand tile animation for the overworld is backwards. The sand should be moving inwards, not outwards.
-[ ] The reward treasure chest spawned over a pit of boiling lava and vaporised. Considering the chest was supposed to hold a key, I panicked a bit until I saw that the victory screen gave me the key regardless. Still, the treasure chest should be made to spawn only in player-safe areas.
+[X] The "Giant" music category seems broken.
+[X] The quicksand tile animation for the overworld is backwards. The sand should be moving inwards, not outwards.
 
-[ ] Also, could you change the name of "Peardian_Frozen Frenzy" to "Peardian_Frozen Frenzy (MP5)"? I renamed it recently and want to keep things consistant.
+[X] Also, could you change the name of "Peardian_Frozen Frenzy" to "Peardian_Frozen Frenzy (MP5)"? I renamed it recently and want to keep things consistant.
 
-[ ] If you are a chicken in chicken mode, then you become a statue, the score doesn't show you as a chicken.
-[ ] Para-goombas and para-koopas don't give you any points in stomp mode.
-[ ] The file part of the help text in the level editor has some overlapping text.
+[X] If you are a chicken in chicken mode, then you become a statue, the score doesn't show you as a chicken.
+[X] The file part of the help text in the level editor has some overlapping text.
 
-[ ] stomping a piranha plant with a kuribo shoe doesn't make any sound.
+[X] stomping a piranha plant with a kuribo shoe doesn't make any sound.
 
 [ ] Bots still dont like levels that is nothing but one single gigantic moving platform it seems, as they'll just constantly run left as if always in danger. The spawning algorithm is the same way, always spawning players just in middle of the screen. -> maybe if everything is a falling area, then just allow spawning everywhere
+    -> The bot fall detection algorithm doesn't take into account moving platforms - it is computationally intensive to do this, the best solution for now is to make a row of solid tiles at the bottom of the map
 
 [ ] Maps that have Kuribo's shoe in them with the game types set to CTF or Eggs kinda makes it all moot point because you can't carry anything in the shoe and that's the whole point of the game...
-    Make items flagged with CarribleByKuribosShoe() so the shoe can carry only flags and eggs
+    Make items flagged with CarribleByKuribosShoe() so the shoe can carry only flags and eggs and display the item where the player should be in the shoe
 
 [ ] Bots also like to think that every egg in egg mode has a matching Yoshi even when it actually doesn't. They will bring wrong coloured eggs to Yoshis if the coloured egg they're holding has no Yoshi to begin with.
+	The solution here is to add a GameInit() method to the AI and allow it to do some computations on the map/mode before the game starts
+	Then the bot can detect that we are playing eggs mode and scan the objects lists looking for yoshis.  It can keep a list of good yoshis and know only which eggs to grab.
 
+[X] If you are flying with a leaf(Rapidly pressing jump), then activate the tanooki's stomp, you will float down slowly.
+
+[X] If you do a tanooki stomp into a kuribo shoe, the shoe will dissapear until the statue disapears.
+[ ] If you get off the kuribo shoe while touching a wall, the shoe will embed itself into the wall.
+[ ] If you become a statue in the air, and have a feather, you can use its extra jump while a statue.
+[ ] If you break a frozen player, and he is the last to die before the game says you win, the broken pieces won't appear.
+
+[ ] You can't tag anyone when you're in the shoe.
+
+[ ] I'm not sure if this can be fixed but if you become frozen, the bottom part of the shoe freeze, not the character. -> maybe don't display the character when frozen in a shoe?
+
+[ ] Frozen players that wiggle can free themselves a little sooner
+
+WAITING RESPONSE
+[ ] I can't tell if this is a bug or not but the key power-up for Jail pops up in other modes. All I remember was Greed, Phanto, and Classic.   but possibly others -> adjusted parens but I don't think this was possible before from other modes without the game type being wrong
+    -> no repro
+[ ] Shells and mushrooms cannot do an about face when they hit the solid side of a moving platform, and just completely stop moving. example: continuous platform moves left, shell comes moving right, hits solid platform, doesn't move. It takes a stop and start from a player to get it moving again.
+    -> no repro, post map where this is happening
+[ ] After deleting a tile in the leveleditor, the tiletype of it remains on the spot the tile has been before.
+	-> This is probably intended - there is a feature to not remove tile types if you customized them in that tile
+	-> Post your exact repro case and I'll look to see if it is actually a bug
+[ ] Clicking, and dragging map objects (spring, spike) in the editor doesn't work.
+    -> no repro
+[ ] In frenzy mode if all card weights are set to 0, one ? card appears and that's it fo the game
+    -> no repro - check your mode settings
+
+
+ASK
+[ ] World keys are rendered useless when two doors are adjacent to the spot in which you are standing.
+    -> Not sure what you mean
+[ ] Also, what does "Use Game" mean for the Item Block properties? If it means "use the game's item settings instead", shouldn't it be the default for each item block? Otherwise, all item blocks unless specified will use the same item settings regardless of what the user chooses. 
+    -> if the user is changing the settings, then they should also change it to use those settings
+[ ] Para-goombas and para-koopas don't give you any points in stomp mode.
+    -> They only award a point when you fully kill them.  Do you think they should be worth 2 points (1 for knocking off their wings and 1 for killing them)?
 
 */
 
@@ -1665,6 +1648,7 @@ void RunGame()
 			}
 		}
 
+		//If the gamemode allows stored powerups, then assign the game stored slot to the powerup this player has
 		if(game_values.gamemode->HasStoredPowerups())
 			game_values.gamepowerups[iPlayer] = game_values.storedpowerups[iPlayer];
 		else

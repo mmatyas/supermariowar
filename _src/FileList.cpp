@@ -695,7 +695,7 @@ WorldMusicEntry::WorldMusicEntry(const std::string & musicdirectory)
 				iAddToCategory = 1;
 			else if(!_stricmp(szBuffer, "[water]"))
 				iAddToCategory = 2;
-			else if(!_stricmp(szBuffer, "[desert]"))
+			else if(!_stricmp(szBuffer, "[giant]"))
 				iAddToCategory = 3;
 			else if(!_stricmp(szBuffer, "[sky]"))
 				iAddToCategory = 4;

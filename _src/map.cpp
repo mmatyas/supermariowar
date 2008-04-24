@@ -3070,8 +3070,8 @@ bool CMap::findspawnpoint(short iType, short * x, short * y, short width, short 
 {
 	if(totalspawnsize[iType] <= 0)
 	{
-		*x = 320;
-		*y = 224;
+		*x = rand() % 640;
+		*y = rand() % 416;
 		return true;
 	}
 

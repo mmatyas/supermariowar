@@ -145,16 +145,14 @@ bool RemoveTeam(short teamid)
 
 	score[teamid]->order = game_values.teamdeadcounter++;
 
-	bool fRet = game_values.teamdeadcounter == score_cnt - 1;
-
 	//Announce that a team was removed
-	if(game_values.deadteamnotice && !fRet)
+	if(game_values.deadteamnotice && game_values.teamdeadcounter < score_cnt - 1)
 	{
 		eyecandyfront.add(new EC_Announcement(&game_font_large, &spr_announcementicons, "Team Removed!", iAnnouncementColor, 90, 200));
 		ifsoundonandreadyplay(sfx_announcer[iAnnouncementColor + 16]);
 	}
 
-	return fRet;
+	return game_values.teamdeadcounter == score_cnt - 1;
 }
 
 CGameMode::CGameMode()

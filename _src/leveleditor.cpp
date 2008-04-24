@@ -3804,7 +3804,6 @@ int editor_tiles()
 		
 		//drawmap(false, TILESIZE);
 		//menu_shade.draw(0, 0);
-
 		SDL_FillRect(screen, NULL, 0xFF888888);
 
 		SDL_Rect rectSrc;
@@ -4496,7 +4495,7 @@ int editor_animation()
 			short iCol = event.button.x / TILESIZE;
 			short iRow = event.button.y / TILESIZE;
 
-			bool fInValidTile = (iRow >= 0 && iRow <= 2 && iCol >= 0 && iCol < 13);
+			bool fInValidTile = (iRow >= 0 && iRow <= 2 && iCol >= 0 && iCol <= 12);
 
 			switch(event.type)
 			{
@@ -4582,8 +4581,9 @@ int editor_animation()
 			}
 		}
 
-		drawmap(false, TILESIZE);
-		menu_shade.draw(0, 0);
+		//drawmap(false, TILESIZE);
+		//menu_shade.draw(0, 0);
+		SDL_FillRect(screen, NULL, 0xFF888888);
 
 		for(short iTile = 0; iTile < 64; iTile++)
 		{
@@ -4601,7 +4601,7 @@ int editor_animation()
 			{
 				for(short j = set_tile_start_y; j <= set_tile_end_y; j++)
 				{
-					spr_selectedtile.draw((i - view_tileset_x) << 5, (j - view_tileset_y) << 5);
+					spr_selectedtile.draw(i << 5, j << 5);
 				}
 			}
 		}
@@ -4737,6 +4737,7 @@ int display_help()
 	menu_font_small.draw(offsetx, offsety, "[pageup] - Go To Previous Map");
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[pagedown] - Go To Next Map");
+	offsety += menu_font_small.getHeight() + 20;
 
 	menu_font_small.draw(offsetx, offsety, "Tile, Warp and Block Modes:");
 	offsety += menu_font_small.getHeight() + 2;

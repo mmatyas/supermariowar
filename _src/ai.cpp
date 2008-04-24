@@ -744,6 +744,11 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 				}
 			}
 		}
+		else if(iStoredPowerup == 26) //jail key
+		{
+			if(pPlayer->jailtimer > 0)
+				playerKeys->game_powerup.fDown = true;
+		}
 	}
 }
 

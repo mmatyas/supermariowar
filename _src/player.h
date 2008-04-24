@@ -287,6 +287,7 @@ class CPlayer
 
 		bool fSuperStomp;
 		short iSuperStompTimer;
+		short iSuperStompExitTimer;
 
 		short burnuptimer;
 		short burnupstarttimer;

@@ -930,6 +930,8 @@ class MI_BonusWheel : public UI_Control
 
 		short iNumPlayers;
 		short iWinningTeam;
+
+		bool fCpuControlled;
 };
 
 #ifdef _XBOX

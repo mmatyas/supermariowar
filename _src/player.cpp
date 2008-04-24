@@ -424,8 +424,11 @@ void CPlayer::move()
 			fKuriboShoe = false;
 			fSuperStomp = false;
 			iSuperStompTimer = 0;
+			iSuperStompExitTimer = 0;
 			
-			objectcontainer[1].add(new CO_KuriboShoe(&spr_kuriboshoe, ix - PWOFFSET, iy - PHOFFSET - 2));
+			CO_KuriboShoe * shoe = new CO_KuriboShoe(&spr_kuriboshoe, ix - PWOFFSET, iy - PHOFFSET - 2);
+			shoe->collision_detection_checksides();
+			objectcontainer[1].add(shoe);
 			eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
 		}
 	}
@@ -440,7 +443,8 @@ void CPlayer::move()
         }
 
         // Become the tanooki
-        else if (playerKeys->game_turbo.fPressed && playerKeys->game_down.fDown && !statue_lock && !lockfire && powerupused == -1 && !fKuriboShoe)
+        else if (playerKeys->game_turbo.fPressed && playerKeys->game_down.fDown && !statue_lock && !lockfire && powerupused == -1 
+			&& !fKuriboShoe && iTailState == 0)
         {
             // set the amount of time you get to remain in statue form
             statue_timer = 123;
@@ -534,8 +538,8 @@ void CPlayer::move()
 		ifsoundonplay(sfx_bobombsound);
 		fSuperStomp = false;
 
-		objectcontainer[1].add(new MO_AttackZone(globalID, teamID, ix - 32, iy, 32, PH, 8, kill_style_kuriboshoe, false));
-		objectcontainer[1].add(new MO_AttackZone(globalID, teamID, ix + PW, iy, 32, PH, 8, kill_style_kuriboshoe, false));
+		objectcontainer[1].add(new MO_AttackZone(globalID, teamID, ix - 32, iy + 10, 32, 15, 8, kill_style_kuriboshoe, false));
+		objectcontainer[1].add(new MO_AttackZone(globalID, teamID, ix + PW, iy + 10, 32, 15, 8, kill_style_kuriboshoe, false));
 	}
 
 	if(hammertimer > 0)
@@ -970,6 +974,7 @@ void CPlayer::move()
 			if(--iSuperStompTimer <= 0)
 			{
 				fSuperStomp = true;
+				iSuperStompExitTimer = 40;
 				vely = VELSUPERSTOMP;
 
 				lockfall = true;
@@ -979,6 +984,11 @@ void CPlayer::move()
 				velx = 0.0f;
 				vely = 0.0f;
 			}
+		}
+
+		if(fSuperStomp && --iSuperStompExitTimer <= 0)
+		{
+			fSuperStomp = false;
 		}
 
 		//If player is shaking tail, slow decent
@@ -2035,6 +2045,7 @@ void CPlayer::SetupNewPlayer()
 
 	fSuperStomp = false;
 	iSuperStompTimer = 0;
+	iSuperStompExitTimer = 0;
 	
 	suicidetimer = 0;
 	suicidecounttimer = 0;
@@ -2124,6 +2135,7 @@ bool CPlayer::isstomping(CPlayer * o)
 		bouncejump();
 		fSuperStomp = false;
 		iSuperStompTimer = 0;
+		iSuperStompExitTimer = 0;
 
 		if(fKillPotential)
 		{
@@ -2710,6 +2722,7 @@ void BounceAssistPlayer(CPlayer * o1, CPlayer * o2)
 		
 		o1->fSuperStomp = false;
 		o1->iSuperStompTimer = 0;
+		o1->iSuperStompExitTimer = 0;
 
 		ifsoundonplay(sfx_superspring);
 	}
@@ -2726,10 +2739,17 @@ void CPlayer::draw()
 
 	if (statue_timer)
     {
-        if (isready() && (statue_timer < 50) && (statue_timer /3 %2))
-                /*|| statue_timer > 110*/   //Looks better with immediate transformation
+		//Make sure the scoreboard still accurately represents the player
+		if(bobomb)
+			pScoreboardSprite = spr_bobomb[colorID];
+		else if(game_values.gamemode->chicken == this)
+			pScoreboardSprite = spr_chocobo[colorID];
+		
+		//Blink the statue if the time is almost up
+        if (isready() && (statue_timer < 50) && (statue_timer / 3 % 2))
             return;
 
+		//Draw the statue
 		if(iswarping())
 			spr_statue.draw(ix - PWOFFSET, iy - 31, colorID << 5, 0, 32, 58, (short)state % 4, warpplane);
 		else

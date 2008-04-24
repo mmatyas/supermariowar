@@ -3656,9 +3656,19 @@ void Menu::RunMenu()
 					{
 						if((game_values.matchtype == MATCH_TYPE_TOUR || game_values.matchtype == MATCH_TYPE_TOURNAMENT) && game_values.tournamentwinner == -1 &&
 							((game_values.matchtype != MATCH_TYPE_TOUR && game_values.bonuswheel == 2) || (game_values.matchtype == MATCH_TYPE_TOUR && game_values.tourstops[game_values.tourstopcurrent - 1]->iBonusType)))
+						{
 							mCurrentMenu = &mTournamentScoreboardMenu;
+						}
+						else if(game_values.matchtype == MATCH_TYPE_SINGLE_GAME)
+						{
+							mCurrentMenu = &mGameSettingsMenu;
+							mCurrentMenu->ResetMenu();
+							miMapField->LoadCurrentMap();
+						}
 						else
+						{
 							ResetTournamentBackToMainMenu();
+						}
 					}
 				}
 			}

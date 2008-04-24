@@ -121,7 +121,7 @@ void CObject::GetCollisionBlocks(IO_Block * blocks[4])
 	blocks[0] = NULL;
 	blocks[1] = NULL;
 
-	if(iy >= 0)
+	if(iy >= 0 && iy < 480)
 	{
 		short yt = iy / TILESIZE;
 
@@ -132,7 +132,7 @@ void CObject::GetCollisionBlocks(IO_Block * blocks[4])
 	blocks[2] = NULL;
 	blocks[3] = NULL;
 
-	if(iy + ih >= 0)
+	if(iy + ih >= 0 && iy + ih < 480)
 	{
 		short yb = (iy + ih) / TILESIZE;
 
@@ -9376,7 +9376,7 @@ CO_KuriboShoe::CO_KuriboShoe(gfxSprite *nspr, short ix, short iy) :
 
 void CO_KuriboShoe::hittop(CPlayer * player)
 {
-	if(!player->fKuriboShoe)
+	if(!player->fKuriboShoe && player->statue_timer == 0)
 	{
 		dead = true;
 		player->SetKuriboShoe();
@@ -10098,7 +10098,6 @@ void MO_PirhanaPlant::collide(IO_MovingObject * object)
 			object->Die();
 		}
 
-		ifsoundonplay(sfx_kicksound);
 		KillPlant();
 	}
 }
@@ -10132,6 +10131,7 @@ void MO_PirhanaPlant::KillPlant()
 
 	collisionHeight = 0;
 
+	ifsoundonplay(sfx_kicksound);
 	eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix, iy - (iDirection == 0 ? 32 : 0), 3, 4));
 }
 

@@ -4328,6 +4328,7 @@ MI_BonusWheel::MI_BonusWheel(short x, short y) :
 	UI_Control(x, y)
 {
 	miPlayerImages = NULL;
+	fCpuControlled = false;
 
 	for(short iImage = 0; iImage < NUMBONUSITEMSONWHEEL; iImage++)
 	{
@@ -4422,7 +4423,7 @@ void MI_BonusWheel::Update()
 	}
 	else
 	{
-		if(!fPressedSelect && ++iPressSelectTimer > 620)
+		if(!fPressedSelect && (fCpuControlled || ++iPressSelectTimer > 620))
 			Modify(true);
 
 		for(int iImage = 0; iImage < NUMBONUSITEMSONWHEEL; iImage++)
@@ -4635,218 +4636,15 @@ void MI_BonusWheel::Reset(bool fTournament)
 		else
 			break;
 	}
-}
 
-//Call with x = 144 and y == 64
-//The spr_player full set of sprites needs to be created via loadfullskin() to use this class
-/*
-MI_BonusWheel::MI_BonusWheel(gfxSprite * spr_background, gfxSprite * spr_icons, short x, short y) :
-	UI_Control(x, y)
-{
-	spr = spr_background;
-	miPlayerImages = NULL;
-
-	miBonusImages = new MI_Image * [NUM_POWERUPS - 1];
-
-	for(short iImage = 0; iImage < NUM_POWERUPS - 1; iImage++)
-		miBonusImages[iImage] = new MI_Image(spr_icons, 0, 0, (iImage + 1) * 32, 0, 32, 32, 1, 1, 0);
-
-	miContinueButton = new MI_Button(&menu_plain_field, ix + 76, iy + 390, "Continue", 200, 1);
-	miContinueButton->Show(false);
-	miContinueButton->SetCode(MENU_CODE_BONUS_DONE);
-
-	//Reset(true);
-}
-
-MI_BonusWheel::~MI_BonusWheel()
-{
-	if(miBonusImages)
+	//Figure out if only cpus are on the winning team, if so, the wheel will be stopped early
+	fCpuControlled = true;
+	for(short iPlayer = 0; iPlayer < game_values.teamcounts[iWinningTeam]; iPlayer++)
 	{
-		for(int iImage = 0; iImage < NUM_POWERUPS - 1; iImage++)
-			delete miBonusImages[iImage];
-		
-		delete [] miBonusImages;
-	}
-
-	if(miPlayerImages)
-	{
-		for(int iPlayer = 0; iPlayer < iNumPlayers; iPlayer++)
-			delete miPlayerImages[iPlayer];
-		
-		delete [] miPlayerImages;
+		if(game_values.playercontrol[game_values.teamids[iWinningTeam][iPlayer]] == 1)
+			fCpuControlled = false;
 	}
 }
-
-MenuCodeEnum MI_BonusWheel::Modify(bool fModify)
-{
-	if(fPowerupSelectionDone)
-		return miContinueButton->Modify(fModify);
-
-	return MENU_CODE_NONE;
-}
-
-void MI_BonusWheel::Update()
-{
-	for(int iImage = 0; iImage < NUM_POWERUPS - 1; iImage++)
-	{
-		miBonusImages[iImage]->Update();
-	}
-
-	for(int iPlayer = 0; iPlayer < iNumPlayers; iPlayer++)
-	{
-		miPlayerImages[iPlayer]->Update();
-	}
-
-	miContinueButton->Update();
-
-	if(++iSelectorAnimationCounter > 8)
-	{
-		iSelectorAnimationCounter = 0;
-		
-		if(++iSelectorAnimation > 1)
-			iSelectorAnimation = 0;
-	}
-
-	dSelectionSpeed -= 0.0005f;
-
-	if(dSelectionSpeed <= 0.0f)
-	{
-		dSelectionSpeed = 0.0f;
-		
-		if(!fPowerupSelectionDone)
-		{
-			fPowerupSelectionDone = true;
-			miContinueButton->Show(true);
-			miContinueButton->Select(true);
-
-			//Reset all player's stored item
-			if(!game_values.keeppowerup)
-			{
-				for(short iPlayer = 0; iPlayer < 4; iPlayer++)
-					game_values.storedpowerups[iPlayer] = -1;
-			}
-
-			//Give the newly won stored item to the winning players
-			for(short iPlayer = 0; iPlayer < game_values.teamcounts[iWinningTeam]; iPlayer++)
-				game_values.storedpowerups[game_values.teamids[iWinningTeam][iPlayer]] = iSelectedPowerup;
-
-			ifsoundonplay(sfx_collectpowerup);
-		}
-	}
-
-	dSelectionAngle += dSelectionSpeed;
-}
-		
-void MI_BonusWheel::Draw()
-{
-	if(!fShow)
-		return;
-
-	spr->draw(ix, iy);
-
-	short iSelectorX = ix + 144 + (short)(130.0f * cos(dSelectionAngle));
-	short iSelectorY = iy + 192 + (short)(120.0f * sin(dSelectionAngle));
-
-	spr_powerupselector.draw(iSelectorX, iSelectorY, iSelectorAnimation * 64, 0, 64, 64);
-
-	for(int iImage = 0; iImage < NUM_POWERUPS - 1; iImage++)
-	{
-		miBonusImages[iImage]->Draw();
-	}
-
-	for(int iPlayer = 0; iPlayer < iNumPlayers; iPlayer++)
-	{
-		miPlayerImages[iPlayer]->Draw();
-	}
-
-	miContinueButton->Draw();
-}
-
-void MI_BonusWheel::Reset(bool fTournament)
-{
-	if(fTournament)
-		iWinningTeam = game_values.tournamentwinner;
-	else
-		iWinningTeam = game_values.gamemode->winningteam;
-
-	//Randomly display the powerups around the ring
-	bool fPowerupUsed[NUM_POWERUPS - 1];
-	for(short iPowerup = 0; iPowerup < NUM_POWERUPS - 1; iPowerup++)
-		fPowerupUsed[iPowerup] = false;
-
-	for(short iPowerup = 0; iPowerup < NUM_POWERUPS - 1; iPowerup++)
-	{
-		short iChoosePowerup = (short)(rand() % (NUM_POWERUPS - 1));
-
-		while(fPowerupUsed[iChoosePowerup])
-		{
-			if(++iChoosePowerup >= NUM_POWERUPS - 1)
-				iChoosePowerup = 0;
-		}
-
-		fPowerupUsed[iChoosePowerup] = true;
-
-		iPowerupOrder[iChoosePowerup] = iPowerup;
-
-		float dAngle = (float)iPowerup * TWO_PI / (float)(NUM_POWERUPS - 1);
-		short iPowerupX = ix + 160 + (short)(130.0f * cos(dAngle));
-		short iPowerupY = iy + 210 + (short)(120.0f * sin(dAngle));
-
-		miBonusImages[iChoosePowerup]->SetPosition(iPowerupX, iPowerupY);
-	}
-	
-	//Delete the old winner images
-	if(miPlayerImages)
-	{
-		for(short iPlayer = 0; iPlayer < iNumPlayers; iPlayer++)
-			delete miPlayerImages[iPlayer];
-
-		delete [] miPlayerImages;
-	}
-
-	iNumPlayers = game_values.teamcounts[iWinningTeam];
-
-	miPlayerImages = new MI_Image * [iNumPlayers];
-
-	short iPlayerX = ix + 160 - ((iNumPlayers - 1) * 17);
-	for(short iPlayer = 0; iPlayer < iNumPlayers; iPlayer++)
-	{
-		miPlayerImages[iPlayer] = new MI_Image(spr_player[game_values.teamids[iWinningTeam][iPlayer]][PGFX_JUMPING_R], iPlayerX, iy + 210, 0, 0, 32, 32, 1, 1, 0);
-		iPlayerX += 34;
-	}
-
-	short iCountWeight = 0;
-	for(short iPowerup = 1; iPowerup < NUM_POWERUPS; iPowerup++)
-		iCountWeight += game_values.powerupweights[iPowerup];
-
-	if(iCountWeight == 0)
-		iCountWeight = 1;
-
-	int iRandPowerup = rand() % iCountWeight + 1;
-	iSelectedPowerup = 1;
-	int iPowerupWeightCount = game_values.powerupweights[iSelectedPowerup];
-
-	while(iPowerupWeightCount < iRandPowerup)
-		iPowerupWeightCount += game_values.powerupweights[++iSelectedPowerup];
-
-	fPowerupSelectionDone = false;
-
-	iSelectorAnimation = 0;
-	iSelectorAnimationCounter = 0;
-	dSelectionSpeed = 0.0f;
-	dSelectionAngle = (float)(iPowerupOrder[iSelectedPowerup - 1]) * TWO_PI / (float)(NUM_POWERUPS - 1);
-	
-	//wind back the selection angle
-	int iRandomWindBack = rand() % 50 + 250;
-	for(int iWindback = 0; iWindback < iRandomWindBack; iWindback++)
-	{
-		dSelectionAngle -= dSelectionSpeed;
-		dSelectionSpeed += 0.0005f;
-	}
-
-	miContinueButton->Show(false);
-}
-*/
 
 /**************************************
  * MI_ScreenResize Class

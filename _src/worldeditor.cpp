@@ -634,7 +634,7 @@ int editor_edit()
 									g_worldmap.tiles[iCol][iRow].iType = set_tile;
 								}
 							}
-							else if(edit_mode == 4) //selected foreground
+							else if(edit_mode == 4) //selected path sprite
 							{
 								short iAdjustedTile = AdjustForeground(set_tile, iCol, iRow);
 								bool fNeedUpdate = false;
@@ -1530,10 +1530,12 @@ void AutoSetPathSprite(short iCol, short iRow)
 					
 					if((iForegroundSprite >= WORLD_BRIDGE_SPRITE_OFFSET && iForegroundSprite <= WORLD_BRIDGE_SPRITE_OFFSET + 3) || 
 						(iForegroundSprite >= WORLD_FOREGROUND_STAGE_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_STAGE_OFFSET + 399) ||
-						(iForegroundSprite >= WORLD_FOREGROUND_SPRITE_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_SPRITE_OFFSET + 179) ||
-						(iForegroundSprite >= WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET + 29) ||
+						/*(iForegroundSprite >= WORLD_FOREGROUND_SPRITE_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_SPRITE_OFFSET + 179) ||*/
+						/*(iForegroundSprite >= WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET && iForegroundSprite <= WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET + 29) ||*/
 						(iForegroundSprite >= WORLD_START_SPRITE_OFFSET && iForegroundSprite <= WORLD_START_SPRITE_OFFSET + 1))
+					{
 						iPath += 1 << iNeighborIndex;
+					}
 					else if(iForegroundSprite >= 0 && iForegroundSprite < WORLD_FOREGROUND_STAGE_OFFSET)
 					{
 						short iPathSprite = iForegroundSprite % WORLD_PATH_SPRITE_SET_SIZE;
@@ -2870,6 +2872,8 @@ int display_help()
 	menu_font_small.draw(offsetx, offsety, "[a] - Automatic Path/Land");
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[ctrl] + [delete] - Clear All");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[insert] - Screenshot");
 	offsety += menu_font_small.getHeight() + 2;
 
 	SDL_Flip(screen);
