@@ -9,7 +9,7 @@ http://forum.72dpiarmy.com
 
 [controls will go here]
 
-***Game Modes*** [need to finish from Jail onward]
+***Game Modes***
 
 Classic
 
@@ -148,7 +148,7 @@ When set to anything else, eggs will explode if they are left on the screen for 
 
 ---
 
-capture The Flag
+Capture The Flag
 
 In this mode, each player has a base with a flag stuck to it.  The goal is to snatch the flags from the other players' bases and bring them back to yours.  If you toss or carry the flag to your base, you get a point.  Dying has no effect on your score.  And don't forget to return your own flag to your base if you recover it!
 
@@ -478,5 +478,7 @@ These determine how many of each kind of Phanto will appear when someone grabs t
 [tour help will go here]
 
 [world editor will go here]
+
+[shameless final website plug will go here]
 
 [note to self: check to see if anything else needs to be covered]
