@@ -583,12 +583,19 @@ void CPlayer::move()
 	}
 
 	iSrcOffsetX = 0;
+		
+	if(game_values.gamemode->gamemode == game_mode_star)
+	{
+		CGM_Star * starmode = (CGM_Star*) game_values.gamemode;
+		short starmodetype = starmode->getcurrentmodetype();
+		if(starmodetype != 2 && starmode->isplayerstar(this))
+			iSrcOffsetX = starmodetype ? 224 : 192;
+	}
+	
 	if(invincible)
 		iSrcOffsetX = animationstate;
 	else if(game_values.gamemode->tagged == this)
 		iSrcOffsetX = 160;
-	else if(game_values.gamemode->gamemode == game_mode_star && ((CGM_Star*)game_values.gamemode)->isplayerstar(this))
-		iSrcOffsetX = ((CGM_Star*)game_values.gamemode)->getcurrentmodetype() ? 224 : 192;
 	else if(frozen)
 		iSrcOffsetX = 256;
 	else if(shield > 0)

@@ -57,15 +57,13 @@ SHIP BETA
 [ ] Get SMB3's world working
 
 Feature Requests
-[ ] In Multi Star, the text still says Shine Get, and the players with stars still turn gold. The text could be "Star Get" per the Japanese version of Galaxy or it could be something else; also, since the stars are color-coded, I don't think the gold tone is needed.
+[X] In Multi Star, the text still says Shine Get, and the players with stars still turn gold. The text could be "Star Get" per the Japanese version of Galaxy or it could be something else; also, since the stars are color-coded, I don't think the gold tone is needed.
 
 [ ] In Yoshi's Eggs, could we have it so the options menu has two columns, one for eggs and one for Yoshis? Oh, and an option to have the egg timer pause while the egg is being held would be nice.
 
 [ ] In Greed Mode, it would be nice to have an option for how many coins fly out (Regular, Double, or Triple). Also, an option to make it impossible to pick up your own coins. Also also, have it so that if a player hits 0 coins but still has coins of their color in play, make it so they don't die until their coins disappear.
 
-[ ] In Health Mode, there should be some sound played when you grab a heart. Perhaps the sound you hear when you get a mushroom in SMB2? (It should also pause the music when you get one, if we do that.) Also, how do the extra life shrooms work in this mode? Do they just recover X points of health?
-
-[ ] In Card Mode, what does Bank Time do? Also, what are the different colors of Phantos in Phanto mode for?
+[X] In Health Mode, there should be some sound played when you grab a heart. Perhaps the sound you hear when you get a mushroom in SMB2? (It should also pause the music when you get one, if we do that.) Also, how do the extra life shrooms work in this mode? Do they just recover X points of health?
 
 [ ] In Frenzy Mode it would be nice to have some presets like with the regular item switch.
 
@@ -83,11 +81,11 @@ Cycle - P1 picks the first stage, P2 picks the second, and so on.
 
 [ ] I also think we should fix the explosions. The bob-omb explosion should resemble the SMB3 bob-omb explosion and the bomb powerup should break bricks when exploded.
 
-[ ] Greed Mode's Unlimited option needs to be done differently. The way it stands now, eventually every coin will disappear and it won't be greed mode unlimited anymore, which ruins the whole point of...unlimited.  Maybe you could have all the counters set to zero and have them reflect how many coins players have lost? Like Classic's Unlimited.
+[X] Greed Mode's Unlimited option needs to be done differently. The way it stands now, eventually every coin will disappear and it won't be greed mode unlimited anymore, which ruins the whole point of...unlimited.  Maybe you could have all the counters set to zero and have them reflect how many coins players have lost? Like Classic's Unlimited.
 [ ] Since we have all these team-colored coins for Greed mode, could we have an option for higher-point coins in Coin mode? Red could be 2, Green 3, and Blue 5.
 
 [ ] vertical rising flame hazard would be nice =D, 2 votes for this
-[ ] and perhaps a new button placeing for the frequenzy of certain hazards, because [/] arn'tfindable on a German keaboard for example. (the german keyboard adapts the amerikan one, i tested every butten but none of them applies to the american [/])
+[X] and perhaps a new button placeing for the frequenzy of certain hazards, because [/] arn'tfindable on a German keaboard for example. (the german keyboard adapts the amerikan one, i tested every butten but none of them applies to the american [/])
 
 [ ] I have a question. If the clear boxes in SMWorld is hit, does it turn into a normal block? Or does it become an empty clear box? In SMW it turns into a normal block and that looked funny to me. If it does not in World, I request that it should be corrected.
 
@@ -281,6 +279,7 @@ Procedure for adding a new powerup:
 4) Update CPlayer::SetPowerup() to use this powerup
 5) Add new gfx to gfx\packs\Classic\powerups\large.png and small.png
 6) Update iPowerupPositionMap[] in uicontrol.cpp
+7) Add to kill style array potentially for greed mode
 */
 
 #ifdef _XBOX

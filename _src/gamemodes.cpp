@@ -2481,7 +2481,7 @@ CPlayer * CGM_Star::swapplayer(short id, CPlayer * player)
 	if(starPlayer[id])
 	{
 		oldstar = starPlayer[id];
-		oldstar->shield = game_values.shieldstyle;
+		oldstar->shield = game_values.shieldstyle == 0 ? 1 : game_values.shieldstyle;
 		oldstar->shieldtimer = 60;
 		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, oldstar->ix + (HALFPW) - 16, oldstar->iy + (HALFPH) - 16, 3, 8));
 	}
@@ -2492,7 +2492,7 @@ CPlayer * CGM_Star::swapplayer(short id, CPlayer * player)
 		starItem[id]->setPlayerColor(starPlayer[id]->colorID);
 	
 	if(starItem[id]->getType() == 1)
-		eyecandyfront.add(new EC_GravText(&game_font_large, player->ix + HALFPW, player->iy + PH, "Shine Get!", -VELJUMP*1.5));
+		eyecandyfront.add(new EC_GravText(&game_font_large, player->ix + HALFPW, player->iy + PH, iCurrentModeType == 2 ? "Star Get!" : "Shine Get!", -VELJUMP*1.5));
 	else
 		eyecandyfront.add(new EC_GravText(&game_font_large, player->ix + HALFPW, player->iy + PH, "Ztarred!", -VELJUMP*1.5));
 
@@ -2619,9 +2619,37 @@ short CGM_KingOfTheHill::playerkilledself(CPlayer &player, killstyle style)
 	return CGameMode::playerkilledself(player, style);
 }
 
-
+/*
+kill_style_stomp = 0, 
+kill_style_star = 1, 
+kill_style_fireball = 2, 
+kill_style_bobomb = 3, 
+kill_style_bounce = 4, 
+kill_style_pow = 5, 
+kill_style_goomba = 6, 
+kill_style_bulletbill = 7, 
+kill_style_hammer = 8, 
+kill_style_shell = 9, 
+kill_style_throwblock = 10, 
+kill_style_cheepcheep = 11, 
+kill_style_koopa = 12, 
+kill_style_boomerang = 13, 
+kill_style_feather = 14, 
+kill_style_iceblast = 15, 
+kill_style_podobo = 16, 
+kill_style_bomb = 17, 
+kill_style_leaf = 18, 
+kill_style_pwings = 19, 
+kill_style_kuriboshoe = 20, 
+kill_style_poisonmushroom = 21, 
+kill_style_environment = 22, 
+kill_style_push = 23, 
+kill_style_buzzybeetle = 24, 
+kill_style_spiny = 25, 
+kill_style_phanto = 26
+*/
 //Greed - steal other players coins - if you have 0 coins, you're removed from the game!
-short g_iKillStyleDamage[KILL_STYLE_LAST] = {5,5,3,8,3,5,2,3,3,5,5,2,2,3,5,3,3,8,5,5,8,8,3,3};
+short g_iKillStyleDamage[KILL_STYLE_LAST] = {5,5,3,8,3,5,2,3,3,5, 5,2,2,3,5,8,3,8,5,5, 8,5,3,3,2,2,2};
 
 CGM_Greed::CGM_Greed() : CGM_Classic()
 {
@@ -2635,9 +2663,7 @@ void CGM_Greed::init()
 {
 	CGameMode::init();
 
-	short iGoal = goal;
-	if(goal == -1)
-		iGoal = 50;
+	short iGoal = goal == -1 ? 0 : goal;
 
 	for(short iScore = 0; iScore < score_cnt; iScore++)
 	{
@@ -2673,15 +2699,18 @@ short CGM_Greed::ReleaseCoins(CPlayer &player, killstyle style)
 {
 	ifsoundonplay(sfx_cannon);
 
-	player.shield = game_values.shieldstyle;
+	player.shield = game_values.shieldstyle == 0 ? 1 : game_values.shieldstyle;
 	player.shieldtimer = 60;
 
 	short iDamage = g_iKillStyleDamage[style];
 
-	if(player.score->score < iDamage)
-		iDamage = player.score->score;
-
-	player.score->AdjustScore(-iDamage);
+	if(goal != -1)
+	{
+		if(player.score->score < iDamage)
+			iDamage = player.score->score;
+	
+		player.score->AdjustScore(-iDamage);
+	}
 
 	short ix = player.ix + HALFPW - 16;
 	short iy = player.iy + HALFPH - 16;
@@ -2697,7 +2726,7 @@ short CGM_Greed::ReleaseCoins(CPlayer &player, killstyle style)
 	}
 
 	//Play warning sound if game is almost over
-	if(!playedwarningsound)
+	if(goal != -1 && !playedwarningsound)
 	{
 		bool playwarning = false;
 		for(short j = 0; j < score_cnt; j++)
