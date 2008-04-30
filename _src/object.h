@@ -1630,12 +1630,14 @@ class CO_Spike : public CO_Spring
 class CO_KuriboShoe : public CO_Spring
 {
 	public:
-		CO_KuriboShoe(gfxSprite *nspr, short ix, short iy);
+		CO_KuriboShoe(gfxSprite *nspr, short ix, short iy, bool fSticky);
 		~CO_KuriboShoe(){};
 
 	private:
 
 		void hittop(CPlayer * player);
+
+		bool fSticky;
 };
 
 class MO_AttackZone : public IO_MovingObject

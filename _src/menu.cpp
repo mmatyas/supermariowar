@@ -4062,8 +4062,12 @@ void Menu::RunMenu()
 
 		if(fGenerateMapThumbs)
 		{
-			menu_font_large.drawCentered(320, 405, "Refreshing Map Thumbnails");
-			menu_font_large.drawCentered(320, 430, "Please Wait...");
+			menu_dialog.draw(160, 176, 0, 0, 160, 64);
+			menu_dialog.draw(320, 176, 352, 0, 160, 64);
+			menu_dialog.draw(160, 240, 0, 416, 160, 64);
+			menu_dialog.draw(320, 240, 352, 416, 160, 64);
+			menu_font_large.drawCentered(320, 215, "Refreshing Map Thumbnails");
+			menu_font_large.drawCentered(320, 245, "Please Wait...");
 		}
 
 		ticks = SDL_GetTicks() - framestart;

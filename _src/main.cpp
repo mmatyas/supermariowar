@@ -104,8 +104,6 @@ Cycle - P1 picks the first stage, P2 picks the second, and so on.
 
 [ ] Also, maybe some more animated tiles? It's kinda weird to see animated grass sitting right next to a Muncher Plant that just stares with its mouth open and kills you. Not everything, though, maybe just things that would look weird without animation (like Munchers, propellers, wheels, etc.).  And maybe for some of the other waterfalls (like maybe one of the lighter ones) and lava (upside-down lava and such).
 
-[ ] Make a different colored/styled kuribo's shoe that is "sticky" in that it doesn't bounce around and you have to jump everywhere to make it move
-
 [ ] It'd be nice if the fortresses can get rid of a locked door like in SMB3.  Like you put down a fortress on your world and with the world editor, link the fortress and the locked door together so that if you beat the fortress, the locked door vanishes.
 
 [ ] By the way, this led me to an idea of how to re-implement the superfire if anyone wants it back. We could use a fire wand that shoots them, and on impact, the player is engulfed in flame and disappears in a poof of smoke.
@@ -135,6 +133,14 @@ Cycle - P1 picks the first stage, P2 picks the second, and so on.
 
 [ ] There should be an option for Greed mode where you can disable the option of getting your coins back. It's a bit of a pain in the neck when the opponent grabs all his coins back.
 
+BOMB UPDATES
+1) Shorten the time a bit.
+2) Allow two on-screen at once.
+3) Add a 1.5 second delay between pulling out one bomb and another.
+4) If you try to pull out a third bomb, the first one explodes. (This is what the delay is for. Having it any shorter would allow you to sort of "chain" explosions pretty much all over.)
+5) Make the Rock Blocks from SMB2 destroyable with bombs, if Two52 doesn't mind having another interactive block. But in the games, explosions don't damage regular bricks or flip blocks, so I don't think they should here.
+
+
 BUGS:
 [X] Stomp - The podobo powerup has no effect on Spinies or Buzzy Beetles. 
 [X] I thought that flipping active Koopas, Spinies, and Buzzy Beetles would render them upside down shells, not kill them.
@@ -150,70 +156,52 @@ BUGS:
 [X] Another bug: Spikes only deduct a single health point in health mode but force a respawn like you've died anyhow. Should they just shield you like normal hits or deduct a whole life altogether? (Speaking of which, death tiles and the ice wand probably have the same bug...)
 [X] The rope/ring attachment tile still needs to be fixed
 
-[ ] "Stage Type" sounds a bit misleading for configuring vehicles to go to stages
-[ ] Also, another thing with the suicide thing, you still die if you are standing still and repeatedly firing projectiles.
-[ ] The suicide time thing doesn't work when you are bouncing on a note block, or spring, but not pressing any buttons.
-
-[ ] if a player is holding a shell while frozen, the shell is still held in place.  *edit: even when you let go of run, the shell is held there.  i still don't know if this is intended or not. should probably kill the shell though. :x 
-
-
-BOMB UPDATES
-1) Shorten the time a bit.
-2) Allow two on-screen at once.
-3) Add a 1.5 second delay between pulling out one bomb and another.
-4) If you try to pull out a third bomb, the first one explodes. (This is what the delay is for. Having it any shorter would allow you to sort of "chain" explosions pretty much all over.)
-5) Make the Rock Blocks from SMB2 destroyable with bombs, if Two52 doesn't mind having another interactive block. But in the games, explosions don't damage regular bricks or flip blocks, so I don't think they should here.
-
-[ ] Oh and maybe you could move the button that opens the world mode item selection (the pop up on the bottom) from the space bar to something like maybe the Stored Item Use button? Using a gamepad on a world without the ability to open that up is really annoying.
-[ ] This isn't really a bug per se, but there are some flaws with the various tilesets. I know there are several repeated tiles in the SMB2 and SMB3 sets, such as two pairs of bullet bill blasters in SMB3 and what looks to be two identical layers of the tree from SMB2. If those are taken out, it would give at least a little bit of room to add stuff / organize.
-
 [X] In animated tile mode, sometimes clicking on the animated tiles causes the red selector to appear in the wrong place or not show up at all
 [X] Also, I've only had one instance so far where the game has actually crashed. Problem fixed with GetCollisionBlocks()
-
-[ ] Make src animation support using 1024x1024 surface for animated tiles, and use the new animation tile gfx
-
 [X] Level Editor bug: When you first use the animated tile mode and select animated tiles, the red tint tiles get when selecting multiple tiles appears at first, but this feature eventually disappears. Not sure what causes it to go away yet.
-
-[ ] Yet another, though it might be impossible to fix: Clear blocks do not give you the displayed powerup when you hit them in certain modes that have mode specific items like Health and Jail and the block gives you that instead.
-
 [x] Found a new bug, when you use the tanuki suit power in mid-air with nothing blocking your way you will constantly loop and there is no way to deactivate the power so you fall forever until something gets in your way.
-
 [X] the super stomp kills arial or dropping down enemies one tile above you. I noticed that when an enemie tried to squish me while i did the super stomp with the kuribo shoe. the enemie just died one tile above me. -> somewhat intended, made the attack zone a little smaller
-
 [X] It appears that computers don't know that the key would be considered instant use when they are jailed.
-
-[ ] SMW just crashed on me while playing a world map on capture the flag mode. I'm not sure how it happened, but the almost finished chime started just as I grabbed a flag. I'll need to look into it.
-
 [X] Killing a piranha plant doesn't make the usual death sound.
-
-[ ] In tag mode, when you use a POW or MOd and kill multiple players at once, the tag always transfers to the first player "on the board", that is, it will go to P1 if he got hit, otherwise P2, and so on.  Perhaps we could have it so that instead of killing all players sequentially, the POW/MOD kills them in a random order, so as to avoid this little bias?
-
-[ ] That platform (or, to be more exact, the whole stage) is moving left.  My character is partially in the vertical wooden block.
-
 [X] Anyway, in the world editor, the Auto Draw feature for the path tool works fine in empty spaces, but it has the annoying tendancy to try to connect to every little object it gets near. This is probably because forts and castles are in the same category as dancing hills and rocks. I had to manually make each and every path in the SMB3 worlds I created simply because the Auto Draw kept trying to link my path to every little hill and tree it passed.
-
-[ ] Also, what does "Use Game" mean for the Item Block properties? If it means "use the game's item settings instead", shouldn't it be the default for each item block? Otherwise, all item blocks unless specified will use the same item settings regardless of what the user chooses. -> if the user is changing the settings, then they should also change it to use those settings
-
 [X] The reward treasure chest spawned over a pit of boiling lava and vaporised. Considering the chest was supposed to hold a key, I panicked a bit until I saw that the victory screen gave me the key regardless. Still, the treasure chest should be made to spawn only in player-safe areas.
-
 [X] When the bonus wheel is set to every game, and you play a single match, it takes you to the main menu after the wheel spins, instead of the level/mode select menu.
 [X] Bots should stop the bonus wheel at random.
 [X] If you throw hammers onto the bottom right corner of certain maps, the game will crash.
-
 [X] World Editor's help screen gives no mention of using Insert to take screens. I only knew it worked because of the screens folder.
-[ ] The "thumbnail" sized tiles for the world editor have purple parts in all the foreground objects, including the level markers.
 [X] The "Giant" music category seems broken.
 [X] The quicksand tile animation for the overworld is backwards. The sand should be moving inwards, not outwards.
-
 [X] Also, could you change the name of "Peardian_Frozen Frenzy" to "Peardian_Frozen Frenzy (MP5)"? I renamed it recently and want to keep things consistant.
-
 [X] If you are a chicken in chicken mode, then you become a statue, the score doesn't show you as a chicken.
 [X] The file part of the help text in the level editor has some overlapping text.
-
 [X] stomping a piranha plant with a kuribo shoe doesn't make any sound.
+[X] If you are flying with a leaf(Rapidly pressing jump), then activate the tanooki's stomp, you will float down slowly.
+[X] If you do a tanooki stomp into a kuribo shoe, the shoe will dissapear until the statue disapears.
+[X] If you get off the kuribo shoe while touching a wall, the shoe will embed itself into the wall.
 
-[ ] Bots still dont like levels that is nothing but one single gigantic moving platform it seems, as they'll just constantly run left as if always in danger. The spawning algorithm is the same way, always spawning players just in middle of the screen. -> maybe if everything is a falling area, then just allow spawning everywhere
-    -> The bot fall detection algorithm doesn't take into account moving platforms - it is computationally intensive to do this, the best solution for now is to make a row of solid tiles at the bottom of the map
+[X] With the suicide timer, you still die if you are standing still and repeatedly firing projectiles.
+[X] The suicide time thing doesn't work when you are bouncing on a note block, or spring, but not pressing any buttons.
+[X] Make src animation support using 1024x1024 surface for animated tiles, and use the new animation tile gfx    
+[X] If you break a frozen player, and he is the last to die before the game says you win, the broken pieces won't appear.
+[X] I'm not sure if this can be fixed but if you become frozen, the bottom part of the shoe freeze, not the character. -> maybe don't display the character when frozen in a shoe?
+[X] Frozen players that wiggle can free themselves a little sooner
+[X] Clicking, and dragging map objects (spring, spike) in the editor doesn't work. - I meant that when you click and drag map objects, it only creates one, while if you do the same with tiles, it creates more then one. - Try copying tile
+[X] When you are refreshing map thumbnails, the "Refreshing Map Thumbnails" text overlaps the Refresh Maps button.
+[X] Map thumbnails are messed up. When you pick a map through thumbnails, it takes you back to the map you had before.
+[X] If you become a statue while flying with a p-wing, the flying sound will continue to play.
+[X] Added an extra score point for stomping Para-goombas and para-koopas 
+[X] Make a different colored/styled kuribo's shoe that is "sticky" in that it doesn't bounce around and you have to jump everywhere to make it move
+
+[ ] "Stage Type" sounds a bit misleading for configuring vehicles to go to stages
+
+[ ] if a player is holding a shell while frozen, the shell is still held in place.  *edit: even when you let go of run, the shell is held there.  i still don't know if this is intended or not. should probably kill the shell though. :x 
+
+[ ] There are several repeated tiles in the SMB2 and SMB3 tilesets, such as two pairs of bullet bill blasters in SMB3 and what looks to be two identical layers of the tree from SMB2. If those are taken out, it would give at least a little bit of room to add stuff / organize.
+[ ] The "thumbnail" sized tiles for the world editor have purple parts in all the foreground objects, including the level markers.
+
+[ ] Yet another, though it might be impossible to fix: Clear blocks do not give you the displayed powerup when you hit them in certain modes that have mode specific items like Health and Jail and the block gives you that instead.
+
+[ ] In tag mode, when you use a POW or MOd and kill multiple players at once, the tag always transfers to the first player "on the board", that is, it will go to P1 if he got hit, otherwise P2, and so on.  Perhaps we could have it so that instead of killing all players sequentially, the POW/MOD kills them in a random order, so as to avoid this little bias?
 
 [ ] Maps that have Kuribo's shoe in them with the game types set to CTF or Eggs kinda makes it all moot point because you can't carry anything in the shoe and that's the whole point of the game...
     Make items flagged with CarribleByKuribosShoe() so the shoe can carry only flags and eggs and display the item where the player should be in the shoe
@@ -222,40 +210,50 @@ BOMB UPDATES
 	The solution here is to add a GameInit() method to the AI and allow it to do some computations on the map/mode before the game starts
 	Then the bot can detect that we are playing eggs mode and scan the objects lists looking for yoshis.  It can keep a list of good yoshis and know only which eggs to grab.
 
-[X] If you are flying with a leaf(Rapidly pressing jump), then activate the tanooki's stomp, you will float down slowly.
-
-[X] If you do a tanooki stomp into a kuribo shoe, the shoe will dissapear until the statue disapears.
-[ ] If you get off the kuribo shoe while touching a wall, the shoe will embed itself into the wall.
-[ ] If you become a statue in the air, and have a feather, you can use its extra jump while a statue.
-[ ] If you break a frozen player, and he is the last to die before the game says you win, the broken pieces won't appear.
+[ ] Shells and mushrooms cannot do an about face when they hit the solid side of a moving platform, and just completely stop moving. example: continuous platform moves left, shell comes moving right, hits solid platform, doesn't move. It takes a stop and start from a player to get it moving again.
+    -> test on test/00000000stuckshell.map
+	-> or test/00000000movingstage.map
+	-> This is caused because a shell/mushroom is touching both the left and right side of a platform at the same time
+	-> Fixed part of this, but players and objects that are pushing against the side of the platform as it moves across the screen edge will lack good collision detection and cause the player to "bounce" against the side of the platform
+	-> Bouncing effect happens all the time when platofrm is moving right and player left... crap!
 
 [ ] You can't tag anyone when you're in the shoe.
+    -> Can't reproduce this, please post exact steps or wait for next build
+	1. Become tagged
+	2. Get in a shoe
+	3. Try to touch someone in the shoe while you're tagged.
 
-[ ] I'm not sure if this can be fixed but if you become frozen, the bottom part of the shoe freeze, not the character. -> maybe don't display the character when frozen in a shoe?
+[ ] I wanted to stomp a bot,which stood on a continious upmoving, solid-on top platform, which was set on the highes velocity. Instead of stomping the bot, my character kind of "froze" in the jumping frame and hovered exactly over the bot's head. After the upmoving platform transported me out of the screen, i did not fall down, but i could move left and right. after i have left the area of the upmoving platform, i finally fell down.
 
-[ ] Frozen players that wiggle can free themselves a little sooner
+[ ] Pow-blocks do not kill piranha plants
 
 WAITING RESPONSE
 [ ] I can't tell if this is a bug or not but the key power-up for Jail pops up in other modes. All I remember was Greed, Phanto, and Classic.   but possibly others -> adjusted parens but I don't think this was possible before from other modes without the game type being wrong
     -> no repro
-[ ] Shells and mushrooms cannot do an about face when they hit the solid side of a moving platform, and just completely stop moving. example: continuous platform moves left, shell comes moving right, hits solid platform, doesn't move. It takes a stop and start from a player to get it moving again.
-    -> no repro, post map where this is happening
 [ ] After deleting a tile in the leveleditor, the tiletype of it remains on the spot the tile has been before.
 	-> This is probably intended - there is a feature to not remove tile types if you customized them in that tile
 	-> Post your exact repro case and I'll look to see if it is actually a bug
-[ ] Clicking, and dragging map objects (spring, spike) in the editor doesn't work.
-    -> no repro
 [ ] In frenzy mode if all card weights are set to 0, one ? card appears and that's it fo the game
     -> no repro - check your mode settings
 
-
-ASK
 [ ] World keys are rendered useless when two doors are adjacent to the spot in which you are standing.
     -> Not sure what you mean
 [ ] Also, what does "Use Game" mean for the Item Block properties? If it means "use the game's item settings instead", shouldn't it be the default for each item block? Otherwise, all item blocks unless specified will use the same item settings regardless of what the user chooses. 
     -> if the user is changing the settings, then they should also change it to use those settings
-[ ] Para-goombas and para-koopas don't give you any points in stomp mode.
-    -> They only award a point when you fully kill them.  Do you think they should be worth 2 points (1 for knocking off their wings and 1 for killing them)?
+[ ] Bots still dont like levels that is nothing but one single gigantic moving platform it seems, as they'll just constantly run left as if always in danger. The spawning algorithm is the same way, always spawning players just in middle of the screen. -> maybe if everything is a falling area, then just allow spawning everywhere
+    -> The bot fall detection algorithm doesn't take into account moving platforms - it is computationally intensive to do this, the best solution for now is to make a row of solid tiles at the bottom of the map
+[ ] Oh and maybe you could move the button that opens the world mode item selection (the pop up on the bottom) from the space bar to something like maybe the Stored Item Use button? Using a gamepad on a world without the ability to open that up is really annoying.
+    -> For game controllers, it is mapped to the "Random" button for menus.  The world is technically a menu, not a game so it uses menu buttons.  See if that works for you.
+[ ] SMW just crashed on me while playing a world map on capture the flag mode. I'm not sure how it happened, but the almost finished chime started just as I grabbed a flag. I'll need to look into it.
+    -> Hope the projectile fix on the bottom row fixed this.  Keep an eye out for crashes in the next build.
+[ ] That platform (or, to be more exact, the whole stage) is moving left.  My character is partially in the vertical wooden block.
+    -> Please post map.
+[ ] Also, what does "Use Game" mean for the Item Block properties? If it means "use the game's item settings instead", shouldn't it be the default for each item block? Otherwise, all item blocks unless specified will use the same item settings regardless of what the user chooses. 
+    -> if the user is changing the settings, then they should also change it to use those settings
+[ ] If you become a statue in the air, and have a feather, you can use its extra jump while a statue.
+    -> I can't reproduce this, it may have been fixed with another bug fix
+
+ASK
 
 */
 
@@ -2188,7 +2186,7 @@ void RunGame()
 					else if(event.key.keysym.sym == SDLK_9)
 					{
 						if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-							objectcontainer[1].add(new CO_KuriboShoe(&spr_kuriboshoe, list_players[0]->ix + 32, list_players[0]->iy));
+							objectcontainer[1].add(new CO_KuriboShoe(&spr_kuriboshoe, list_players[0]->ix + 32, list_players[0]->iy, true));
 						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
 							objectcontainer[0].add(new PU_FeatherPowerup(&spr_featherpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, 0, 30, 30, 1, 1));
 						else
@@ -2407,7 +2405,7 @@ void RunGame()
 							if(game_values.teamcollision != 2 && game_values.screenshaketeamid == player->teamID)
 								continue;
 							
-							if(!player->invincible && player->shield == 0 && !player->fKuriboShoe && player->isready())
+							if(!player->invincible && player->shield == 0 && player->iKuriboShoe == 0 && player->isready())
 							{
 								if(game_values.screenshakekillinair == player->inair)
 								{
@@ -3674,9 +3672,11 @@ void LoadMapObjects(bool fPreview)
 		else if(iType == 1)
 			objectcontainer[1].add(new CO_Spike(&spr_spike, ix, iy));
 		else if(iType == 2)
-			objectcontainer[1].add(new CO_KuriboShoe(&spr_kuriboshoe, ix, iy));
-		if(iType == 3)
+			objectcontainer[1].add(new CO_KuriboShoe(&spr_kuriboshoe, ix, iy, false));
+		else if(iType == 3)
 			objectcontainer[1].add(new CO_Spring(&spr_spring, ix, iy, true));
+		else if(iType == 4)
+			objectcontainer[1].add(new CO_KuriboShoe(&spr_kuriboshoe, ix, iy, true));
 	}
 
 	//Set all the 1x1 gaps up so players can run across them

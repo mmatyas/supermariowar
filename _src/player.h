@@ -130,7 +130,7 @@ class CPlayer
 		short GetWarpPlane() {return warpplane;}
 		bool IsPlayerFacingRight();
 		
-		bool IsAcceptingItem() {return fAcceptingItem && statue_timer == 0 && !fKuriboShoe;}
+		bool IsAcceptingItem() {return fAcceptingItem && statue_timer == 0 && iKuriboShoe == 0;}
 		bool PressedAcceptItemKey() {return fPressedAcceptItem;}
 		bool AcceptItem(MO_CarriedObject * item);
 
@@ -144,13 +144,15 @@ class CPlayer
 		bool iswarping() {return state > player_ready;}
 		bool isdead() {return state == player_dead;}
 
-		void SetKuriboShoe();
-		bool IsInvincibleOnBottom() {return invincible || shield || fKuriboShoe;}
+		void SetKuriboShoe(short iType);
+		bool IsInvincibleOnBottom() {return invincible || shield || iKuriboShoe;}
 		bool IsSuperStomping() {return fSuperStomp;}
 
 		void SetStoredPowerup(short iPowerup);
 
 	private:
+
+		void ResetSuicideTime();
 		void SetSprite();
 		void Jump(short iMove, float jumpModifier, bool fKuriboBounce);
 		
@@ -279,7 +281,7 @@ class CPlayer
 		bool frozen;
 		short frozentimer;
 
-		bool fKuriboShoe;
+		short iKuriboShoe;
 		short iKuriboShoeAnimationTimer;
 		short iKuriboShoeAnimationFrame;
 		short iKuriboShoeExitTimer;

@@ -149,6 +149,8 @@ bool			set_tile_drag = false;
 int				view_tileset_x = 0;
 int				view_tileset_y = 0;
 
+int				view_animated_tileset_x = 0;
+
 int				set_block = 0;
 int				set_block_switch_on = 0;
 TileType		set_tiletype = tile_nonsolid;
@@ -4018,14 +4020,16 @@ int editor_mapitems()
 						short set_item_y = event.button.y / TILESIZE;
 
 						//Set the selected block to one of the interaction blocks
-						if(set_item_y == 0 && set_item_x >= 0 && set_item_x <= 3)
+						if(set_item_y == 0 && set_item_x >= 0 && set_item_x <= 4)
+						{
 							set_mapitem = set_item_x;
 
-						edit_mode = 7;
+							edit_mode = 7;
 
-						//The user must release the mouse button before trying to add a tile
-						ignoreclick = true;
-						return EDITOR_EDIT;
+							//The user must release the mouse button before trying to add a tile
+							ignoreclick = true;
+							return EDITOR_EDIT;
+						}
 					}
 				break;
 
@@ -4037,7 +4041,7 @@ int editor_mapitems()
 		drawmap(false, TILESIZE);
 		menu_shade.draw(0, 0);
 		
-		spr_mapitems[0].draw(0, 0, 0, 0, 128, 32);
+		spr_mapitems[0].draw(0, 0, 0, 0, 160, 32);
 
 		menu_font_small.drawRightJustified(640, 0, maplist.currentFilename());
 		menu_font_small.drawRightJustified(0, 480 - menu_font_small.getHeight(), "Map Items");
@@ -4485,6 +4489,9 @@ int editor_animation()
 	
 	set_tile_drag = false;
 
+	short view_tileset_repeat_direction = -1;
+	short view_tileset_repeat_timer = 0;
+
 	while (!done)
 	{
 		int framestart = SDL_GetTicks();
@@ -4492,10 +4499,10 @@ int editor_animation()
 		//handle messages
 		while(SDL_PollEvent(&event))
 		{
-			short iCol = event.button.x / TILESIZE;
+			short iCol = event.button.x / TILESIZE + view_animated_tileset_x;
 			short iRow = event.button.y / TILESIZE;
 
-			bool fInValidTile = (iRow >= 0 && iRow <= 2 && iCol >= 0 && iCol <= 12);
+			bool fInValidTile = iRow >= 0 && iRow <= 7;
 
 			switch(event.type)
 			{
@@ -4507,14 +4514,46 @@ int editor_animation()
 
 				case SDL_KEYDOWN:
 				{
-					if(!set_tile_drag)
+					if(event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_a)
 					{
-						edit_mode = 8;
-						return EDITOR_EDIT;
+						if(!set_tile_drag)
+						{
+							edit_mode = 8;
+							return EDITOR_EDIT;
+						}
+					}
+					else if(event.key.keysym.sym == SDLK_LEFT)
+					{
+						if(view_animated_tileset_x > 0)
+						{
+							view_animated_tileset_x--;
+							view_tileset_repeat_direction = 2;
+							view_tileset_repeat_timer = 30;
+						}
+					}
+					else if(event.key.keysym.sym == SDLK_RIGHT)
+					{
+						if(view_animated_tileset_x < 12)
+						{
+							view_animated_tileset_x++;
+							view_tileset_repeat_direction = 3;
+							view_tileset_repeat_timer = 30;
+						}
+					}
+								
+					break;
+				}				
+
+				case SDL_KEYUP:
+				{
+					if(event.key.keysym.sym == SDLK_LEFT || event.key.keysym.sym == SDLK_RIGHT)
+					{
+						view_tileset_repeat_direction = -1;
+						view_tileset_repeat_timer = 0;
 					}
 					
 					break;
-				}				
+				}
 
 				case SDL_MOUSEBUTTONDOWN:
 				{
@@ -4581,23 +4620,44 @@ int editor_animation()
 			}
 		}
 
+		//Allow auto-scrolling of tilesets when the arrow keys are held down
+		if(view_tileset_repeat_direction >= 0 && view_tileset_repeat_timer > 0)
+		{
+			if(--view_tileset_repeat_timer <= 0)
+			{
+				view_tileset_repeat_timer = 5;
+
+				if(view_tileset_repeat_direction == 2 && view_animated_tileset_x > 0)
+				{
+					view_animated_tileset_x--;
+				}
+				else if(view_tileset_repeat_direction == 3 && view_animated_tileset_x < 12)
+				{
+					view_animated_tileset_x++;
+				}
+			}
+		}
+
 		//drawmap(false, TILESIZE);
 		//menu_shade.draw(0, 0);
 		SDL_FillRect(screen, NULL, 0xFF888888);
 
-		for(short iTile = 0; iTile < 64; iTile++)
+		for(short iCol = view_animated_tileset_x; iCol < view_animated_tileset_x + 20; iCol++)
 		{
-			short iDestX = (iTile % 16) << 5;
-			short iDestY = (iTile / 16) << 5;
-			short iSrcX = (iTile / 16) << 7;
-			short iSrcY = (iTile % 16) << 5;
+			for(short iRow = 0; iRow < 8; iRow++)
+			{	
+				short iDestX = (iCol - view_animated_tileset_x) << 5;
+				short iDestY = iRow << 5;
+				short iSrcX = iRow << 7;
+				short iSrcY = iCol << 5;
 
-			spr_tileanimation[0].draw(iDestX, iDestY, iSrcX, iSrcY, TILESIZE, TILESIZE);
+				spr_tileanimation[0].draw(iDestX, iDestY, iSrcX, iSrcY, TILESIZE, TILESIZE);
+			}
 		}
 
 		if(set_tile_drag)
 		{
-			for(short i = set_tile_start_x; i <= set_tile_end_x; i++)
+			for(short i = set_tile_start_x - view_animated_tileset_x; i <= set_tile_end_x - view_animated_tileset_x; i++)
 			{
 				for(short j = set_tile_start_y; j <= set_tile_end_y; j++)
 				{
@@ -5467,13 +5527,13 @@ void pasteselectedtiles(int movex, int movey)
 						for(short iType = 0; iType < NUMSPAWNAREATYPES; iType++)
 							g_map.nospawn[iType][iNewX][iNewY] = copiedtiles[j][k].nospawn[iType];
 
-						if(move_replace)
-							RemoveMapItemAt(j, k);
+						//if(move_replace)
+						//	RemoveMapItemAt(j, k);
 
 						if(g_map.iNumMapItems < MAXMAPITEMS && copiedtiles[j][k].item >= 0)
 						{
-							if(!move_replace)
-								RemoveMapItemAt(j, k);
+						//	if(!move_replace)
+						//		RemoveMapItemAt(j, k);
 
 							MapItem * mapitem = &g_map.mapitems[g_map.iNumMapItems];
 							mapitem->itype = copiedtiles[j][k].item;

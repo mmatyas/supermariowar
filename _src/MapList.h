@@ -50,7 +50,7 @@ class MapList
 		int GetCount() {return maps.size();}
 		
 		std::map<std::string, MapListNode*>::iterator GetCurrent() {return current;}
-		void SetCurrent(std::map<std::string, MapListNode*>::iterator itr) {current = itr;}
+		void SetCurrent(std::map<std::string, MapListNode*>::iterator itr) {outercurrent = current = itr;}
 
 		void WriteFilters();
 		void ReadFilters();

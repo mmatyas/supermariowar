@@ -80,6 +80,10 @@ void CPlayer::move()
 		(playerKeys->game_turbo.fPressed?16:0) |
 		(playerKeys->game_powerup.fPressed?32:0);
 
+	//If any key was pressed, reset the suicide timer
+	if(keymask)
+		ResetSuicideTime();
+
 	/*
 	if(game_values.secrets)
 	{
@@ -395,7 +399,7 @@ void CPlayer::move()
 	}*/
 
 	//Free player from the kuribo shoe
-	if (fKuriboShoe && state == player_ready)
+	if (iKuriboShoe > 0 && state == player_ready)
 	{
 		static const int iExitKuriboShoeCode[4] = {4, 8, 4, 8};
 
@@ -418,18 +422,19 @@ void CPlayer::move()
 	    
 		if (iKuriboShoeExitIndex == 4 && iKuriboShoeExitTimer < 32)
 		{
+			CO_KuriboShoe * shoe = new CO_KuriboShoe(&spr_kuriboshoe, ix - PWOFFSET, iy - PHOFFSET - 2, iKuriboShoe == 2);
+			shoe->collision_detection_checksides();
+			objectcontainer[1].add(shoe);
+			eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
+
 			iKuriboShoeExitIndex = 0;
 			iKuriboShoeExitTimer = 0;
 			ifsoundonplay(sfx_transform); 
-			fKuriboShoe = false;
+			iKuriboShoe = 0;
 			fSuperStomp = false;
 			iSuperStompTimer = 0;
 			iSuperStompExitTimer = 0;
 			
-			CO_KuriboShoe * shoe = new CO_KuriboShoe(&spr_kuriboshoe, ix - PWOFFSET, iy - PHOFFSET - 2);
-			shoe->collision_detection_checksides();
-			objectcontainer[1].add(shoe);
-			eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
 		}
 	}
 
@@ -444,7 +449,7 @@ void CPlayer::move()
 
         // Become the tanooki
         else if (playerKeys->game_turbo.fPressed && playerKeys->game_down.fDown && !statue_lock && !lockfire && powerupused == -1 
-			&& !fKuriboShoe && iTailState == 0)
+			&& iKuriboShoe == 0 && iTailState == 0)
         {
             // set the amount of time you get to remain in statue form
             statue_timer = 123;
@@ -478,6 +483,9 @@ void CPlayer::move()
 
             // Prevent you from becoming the statue twice before touching the ground
             statue_lock = true;
+
+			//If we were flying or spinning when we became the statue, clear those states
+			ClearPowerupStates();
         }
 
 		if(!fSuperStomp && iSuperStompTimer <= 0)
@@ -932,6 +940,10 @@ void CPlayer::move()
 
 	if(frozen)
 	{
+		bool facingRight = IsPlayerFacingRight();
+		if((~(spr & 0x1) && (keymask & 4)) || ((spr & 0x1) && (keymask & 8)))
+			frozentimer -= 5;
+
 		if(--frozentimer <= 0)
 		{
 			frozentimer = 0;
@@ -941,7 +953,7 @@ void CPlayer::move()
 		}
 	}
 
-	if(fKuriboShoe)
+	if(iKuriboShoe > 0)
 	{
 		if(++iKuriboShoeAnimationTimer > 7)
 		{
@@ -957,7 +969,7 @@ void CPlayer::move()
 	if(state == player_ready)
 	{
 		//Super stomp
-		if(fKuriboShoe && inair && !fSuperStomp && ((playerKeys->game_down.fPressed && playerDevice == DEVICE_KEYBOARD) || 
+		if(iKuriboShoe > 0 && inair && !fSuperStomp && ((playerKeys->game_down.fPressed && playerDevice == DEVICE_KEYBOARD) || 
 			(playerKeys->game_jump.fPressed && playerKeys->game_down.fDown)))
 		{
 			if((superjumptype != 3 || superjumptimer <= 0) &&
@@ -1115,7 +1127,7 @@ void CPlayer::move()
 						superjumptimer = 0;
 						lockjump = true;
 					}
-					else if(powerup == 3 && !fKuriboShoe)
+					else if(powerup == 3 && iKuriboShoe == 0)
 					{
 						if(extrajumps < game_values.featherjumps)
 						{
@@ -1135,7 +1147,7 @@ void CPlayer::move()
 								DecreaseProjectileLimit();
 						}
 					}
-					else if(powerup == 8 && !fKuriboShoe && !flying && extrajumps == 0)  //Start pwings flight
+					else if(powerup == 8 && iKuriboShoe == 0 && !flying && extrajumps == 0)  //Start pwings flight
 					{
 						flying = true;
 						game_values.playflyingsound = true;
@@ -1144,7 +1156,7 @@ void CPlayer::move()
 						extrajumps++;
 					}
 					//This must come last or gliding chickens can't use powerups before this statement
-					else if((powerup == 7 || (powerup == -1 && game_values.gamemode->chicken == this && game_values.gamemodesettings.chicken.glide)) && !fKuriboShoe && iSpinState == 0)
+					else if((powerup == 7 || (powerup == -1 && game_values.gamemode->chicken == this && game_values.gamemodesettings.chicken.glide)) && iKuriboShoe == 0 && iSpinState == 0)
 					{
 						if(game_values.leaflimit == 0 || projectilelimit > 0 || (game_values.gamemode->chicken == this && game_values.gamemodesettings.chicken.glide && powerup == -1))
 						{
@@ -1248,7 +1260,7 @@ void CPlayer::move()
 								DecreaseProjectileLimit();
 
 						}
-						else if(powerup == 3 && iSpinState == 0 && !fKuriboShoe)
+						else if(powerup == 3 && iSpinState == 0 && iKuriboShoe == 0)
 						{
 							if(game_values.featherlimit == 0 || projectilelimit > 0)
 							{
@@ -1306,7 +1318,7 @@ void CPlayer::move()
 							if(game_values.bombslimit > 0)
 								DecreaseProjectileLimit();
 						}
-						else if(powerup == 7 && iSpinState == 0 && !fKuriboShoe) //Racoon tail spin
+						else if(powerup == 7 && iSpinState == 0 && iKuriboShoe == 0) //Racoon tail spin
 						{
 							if(game_values.leaflimit == 0 || projectilelimit > 0)
 							{
@@ -1389,18 +1401,23 @@ void CPlayer::move()
 
 			if(!inair)
 			{
-				if(fKuriboShoe)
+				if(iKuriboShoe > 0)
 				{
-					//This will make the shoe sticky
-					//velx = 0.0f;
-
-					//only allow the player to jump in the air from kuribo's shoe if we aren't bouncing on a note block
-					if(superjumptimer <= 0)
+					//This makes the shoe stick to the ground (for sticky shoes)
+					if(iKuriboShoe == 2)
 					{
-						Jump(lrn, 1.0f, true);
-					
-						superjumptype = 3;
-						superjumptimer = 16;
+						velx = 0.0f;
+					}
+					else
+					{
+						//only allow the player to jump in the air from kuribo's shoe if we aren't bouncing on a note block
+						if(superjumptimer <= 0)
+						{
+							Jump(lrn, 1.0f, true);
+						
+							superjumptype = 3;
+							superjumptimer = 16;
+						}
 					}
 				}
 				else if(velx < 0.0f)
@@ -1436,18 +1453,23 @@ void CPlayer::move()
 
 			if(!inair)
 			{
-				if(fKuriboShoe)
+				if(iKuriboShoe > 0)
 				{
 					//This will make the shoe sticky
-					//velx = 0.0f;
-					
-					//only allow the player to jump in the air from kuribo's shoe if we aren't bouncing on a note block
-					if(superjumptimer <= 0)
+					if(iKuriboShoe == 2)
 					{
-						Jump(lrn, 1.0f, true);
+						velx = 0.0f;
+					}
+					else
+					{
+						//only allow the player to jump in the air from kuribo's shoe if we aren't bouncing on a note block
+						if(superjumptimer <= 0)
+						{
+							Jump(lrn, 1.0f, true);
 
-						superjumptype = 3;
-						superjumptimer = 16;
+							superjumptype = 3;
+							superjumptimer = 16;
+						}
 					}
 				}
 				else if(velx > 0.0f)
@@ -1489,10 +1511,8 @@ void CPlayer::move()
 			}
 
 			//Stop ground velocity when wearing the shoe
-			//if(!inair && fKuriboShoe)
-			//{
-				//velx = 0.0f;
-			//}
+			if(!inair && iKuriboShoe == 2)
+				velx = 0.0f;
 		}
 		
 		fOldX = fx;
@@ -1533,11 +1553,8 @@ void CPlayer::move()
 		}
 
 		//Kill the player if he is standing still for too long
-		if(velx != 0.0f || vely != GRAVITATION || game_values.gamemode->gameover || game_values.singleplayermode >= 0)
-		{
-			suicidetimer = 0;
-			suicidedisplaytimer = 2;
-		}
+		if(game_values.gamemode->gameover || game_values.singleplayermode >= 0)
+			ResetSuicideTime();
 
 		if(!invincible && !frozen && game_values.suicidetime > 0 && ++suicidetimer > game_values.suicidetime)
 		{
@@ -1585,6 +1602,13 @@ void CPlayer::move()
 	}
 
 	SetSprite();
+}
+
+void CPlayer::ResetSuicideTime()
+{
+	suicidetimer = 0;
+	suicidecounttimer = 0;
+	suicidedisplaytimer = 2;
 }
 
 void CPlayer::SetSprite()
@@ -1900,37 +1924,46 @@ void CPlayer::die(short deathStyle, bool fTeamRemoved)
 
 	gfxSprite * corpseSprite = sprites[iDeathSprite];
 
+	//If the player was a bobomb or chicken, make sure their death sprite matches
 	if(diedas == 1 || game_values.gamemode->chicken == this)
 		corpseSprite = spr_chocobo[colorID][iDeathSprite];
 	else if(diedas == 2 || bobomb)
 		corpseSprite = spr_bobomb[colorID][iDeathSprite];
 	
-	if(deathStyle == death_style_jump)
-		eyecandyfront.add(new EC_FallingObject(corpseSprite, ix + HALFPW - 16, iy + PH - 32, 0.0f, -VELTURBOJUMP, 1, 0, iSrcOffsetX, 0, 32, 32));
-	else if(deathStyle == death_style_squish)
-		eyecandyback.add(new EC_Corpse(corpseSprite, (float)(ix - PWOFFSET), (float)(iy+PH-32), iSrcOffsetX));
-	else if(deathStyle == death_style_shatter)
+	//Add eyecandy for the dead player
+	if(deathStyle == death_style_shatter || frozen)
 	{
 		eyecandyfront.add(new EC_FallingObject(&spr_brokeniceblock, ix + HALFPW - 16, iy + HALFPH - 16, -1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
 		eyecandyfront.add(new EC_FallingObject(&spr_brokeniceblock, ix + HALFPW, iy + HALFPH - 16, 1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
 		eyecandyfront.add(new EC_FallingObject(&spr_brokeniceblock, ix + HALFPW - 16, iy + HALFPH, -1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
 		eyecandyfront.add(new EC_FallingObject(&spr_brokeniceblock, ix + HALFPW, iy + HALFPH, 1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
 	}
+	else if(deathStyle == death_style_jump)
+	{
+		eyecandyfront.add(new EC_FallingObject(corpseSprite, ix + HALFPW - 16, iy + PH - 32, 0.0f, -VELTURBOJUMP, 1, 0, iSrcOffsetX, 0, 32, 32));
+	}
+	else if(deathStyle == death_style_squish)
+	{
+		eyecandyback.add(new EC_Corpse(corpseSprite, (float)(ix - PWOFFSET), (float)(iy+PH-32), iSrcOffsetX));
+	}
 
+	//Drop any item the dead player was carrying
 	if(carriedItem)
 	{
 		carriedItem->Drop();
 		carriedItem = NULL;
 	}
 
-	if(fKuriboShoe)
+	//Drop a shoe item if the player died in one
+	if(iKuriboShoe > 0)
 	{
-		CO_KuriboShoe * shoe = new CO_KuriboShoe(&spr_kuriboshoe, ix - PWOFFSET, iy - PHOFFSET);
+		CO_KuriboShoe * shoe = new CO_KuriboShoe(&spr_kuriboshoe, ix - PWOFFSET, iy - PHOFFSET, iKuriboShoe == 2);
 		shoe->collision_detection_checksides();
 
 		objectcontainer[1].add(shoe);
 	}
 
+	//If the game mode didn't say to remove the team from the game, then respawn the player
 	if(!fTeamRemoved)
 	{
 		if(game_values.screencrunch)
@@ -1943,9 +1976,9 @@ void CPlayer::die(short deathStyle, bool fTeamRemoved)
 	}
 }
 
-void CPlayer::SetKuriboShoe()
+void CPlayer::SetKuriboShoe(short iType)
 {
-	fKuriboShoe = true;
+	iKuriboShoe = iType;
 
 	if(carriedItem)
 	{
@@ -2037,7 +2070,7 @@ void CPlayer::SetupNewPlayer()
 	shield = 0;
 	shieldtimer = 0;
 
-	fKuriboShoe = false;
+	iKuriboShoe = 0;
 	iKuriboShoeAnimationTimer = 0;
 	iKuriboShoeAnimationFrame = 0;
 	iKuriboShoeExitTimer = 0;
@@ -2142,7 +2175,7 @@ bool CPlayer::isstomping(CPlayer * o)
 			killstyle style = kill_style_stomp;
 			if(flying)
 				style = kill_style_pwings;
-			else if(fKuriboShoe)
+			else if(iKuriboShoe > 0)
 				style = kill_style_kuriboshoe;
 			else if(iTailState > 0)
 				style = kill_style_leaf;
@@ -2649,12 +2682,12 @@ void _collisionhandler_p2p_pushback(CPlayer * o1, CPlayer * o2)
 	float dPlayer1Pushback = 1.5f;
 	float dPlayer2Pushback = 1.5f;
 
-	if(o1->fKuriboShoe && !o2->fKuriboShoe)
+	if(o1->iKuriboShoe > 0 && o2->iKuriboShoe == 0)
 	{
 		dPlayer1Pushback = 0.5f;
 		dPlayer2Pushback = 2.5f;
 	}
-	else if(!o1->fKuriboShoe && o2->fKuriboShoe)
+	else if(o1->iKuriboShoe == 0 && o2->iKuriboShoe > 0)
 	{
 		dPlayer1Pushback = 2.5f;
 		dPlayer2Pushback = 0.5f;
@@ -2782,7 +2815,7 @@ void CPlayer::draw()
 	}
 
 	//Don't allow cape, tail, wings to be used with shoe
-	if(!fKuriboShoe)
+	if(iKuriboShoe == 0)
 	{
 		if(powerup == 3) 
 			DrawCape();
@@ -2794,25 +2827,29 @@ void CPlayer::draw()
 	}
 
 	short iPlayerKuriboOffsetY = 0;
-	if(fKuriboShoe)
+	if(iKuriboShoe > 0)
 		iPlayerKuriboOffsetY = 16;
 
-	if(state > player_ready) //warping
-		pScoreboardSprite[spr]->draw(ix - PWOFFSET, iy - PHOFFSET - iPlayerKuriboOffsetY, iSrcOffsetX, 0, 32, 32, (short)state % 4, warpplane);
-	else
-		pScoreboardSprite[spr]->draw(ix - PWOFFSET, iy - PHOFFSET - iPlayerKuriboOffsetY, iSrcOffsetX, 0, 32, 32);
-
-	if(fKuriboShoe)
+	//Don't draw the player if he is frozen in a shoe
+	if(!frozen || iKuriboShoe == 0)
 	{
 		if(state > player_ready) //warping
-			spr_kuriboshoe.draw(ix - PWOFFSET, iy - PHOFFSET, iKuriboShoeAnimationFrame, (spr & 0x1) == 0 ? 0 : 32, 32, 32, (short)state % 4, warpplane);
+			pScoreboardSprite[spr]->draw(ix - PWOFFSET, iy - PHOFFSET - iPlayerKuriboOffsetY, iSrcOffsetX, 0, 32, 32, (short)state % 4, warpplane);
 		else
-			spr_kuriboshoe.draw(ix - PWOFFSET, iy - PHOFFSET, iKuriboShoeAnimationFrame, (spr & 0x1) == 0 ? 0 : 32, 32, 32);
+			pScoreboardSprite[spr]->draw(ix - PWOFFSET, iy - PHOFFSET - iPlayerKuriboOffsetY, iSrcOffsetX, 0, 32, 32);
+	}
+
+	if(iKuriboShoe > 0)
+	{
+		if(state > player_ready) //warping
+			spr_kuriboshoe.draw(ix - PWOFFSET, iy - PHOFFSET, iKuriboShoeAnimationFrame + (iKuriboShoe == 2 ? 64 : 0), (spr & 0x1) == 0 ? 0 : 32, 32, 32, (short)state % 4, warpplane);
+		else
+			spr_kuriboshoe.draw(ix - PWOFFSET, iy - PHOFFSET, iKuriboShoeAnimationFrame + (iKuriboShoe == 2 ? 64 : 0), (spr & 0x1) == 0 ? 0 : 32, 32, 32);
 	}
 
 	//Draw the crown on the player
 	if(game_values.showwinningcrown && g_iWinningPlayer == teamID)
-		spr_crown.draw(ix + HALFPW - (IsPlayerFacingRight() ? 4 : 10), iy - 10 - (fKuriboShoe ? 16 : 0));
+		spr_crown.draw(ix + HALFPW - (IsPlayerFacingRight() ? 4 : 10), iy - 10 - (iKuriboShoe > 0 ? 16 : 0));
 
 	if(state < player_ready)
 		return;
@@ -3690,7 +3727,7 @@ void CPlayer::collision_detection_map()
 									 (!(lefttile & tile_flag_solid) && (righttile & tile_flag_death_on_top));
 
 		if(fSolidTileUnderPlayer && (!fDeathTileUnderPlayer ||
-			invincible || shield > 0 || fKuriboShoe))
+			invincible || shield > 0 || iKuriboShoe > 0))
 		{	//on ground
 
 			yf((float)(ty * TILESIZE - PH) - 0.2f);
@@ -4305,7 +4342,7 @@ bool CPlayer::IsPlayerFacingRight()
 
 bool CPlayer::AcceptItem(MO_CarriedObject * item)
 {
-	if(fAcceptingItem && statue_timer == 0 && !fKuriboShoe)
+	if(fAcceptingItem && statue_timer == 0 && iKuriboShoe == 0)
 	{
 		carriedItem = item;
 		item->owner = this;

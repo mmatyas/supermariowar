@@ -7571,7 +7571,10 @@ bool MO_Goomba::hittop(CPlayer * player)
 	player->bouncejump();
 	player->collision_detection_checktop();
 	player->platform = NULL;
-	
+
+	if(game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover)
+		player->score->AdjustScore(1);
+
 	if(fBouncing)
 	{
 		fBouncing = false;
@@ -7597,9 +7600,6 @@ bool MO_Goomba::hittop(CPlayer * player)
 		dead = true;
 
 		AddAwardKill(player, NULL, killStyle);
-
-		if(game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover)
-			player->score->AdjustScore(1);
 
 		eyecandyback.add(new EC_Corpse(&spr_goombadead, (float)(ix - collisionOffsetX), (float)(iy + collisionHeight - 32), 0));
 	}
@@ -7645,6 +7645,9 @@ bool MO_Koopa::hittop(CPlayer * player)
 	player->collision_detection_checktop();
 	player->platform = NULL;
 	
+	if(game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover)
+		player->score->AdjustScore(1);
+
 	if(fBouncing)
 	{
 		fBouncing = false;
@@ -7660,9 +7663,6 @@ bool MO_Koopa::hittop(CPlayer * player)
 		dead = true;
 
 		AddAwardKill(player, NULL, kill_style_koopa);
-
-		if(game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover)
-			player->score->AdjustScore(1);
 
 		DropShell();
 	}
@@ -7775,10 +7775,10 @@ void MO_Spiny::update()
 bool MO_Spiny::hittop(CPlayer * player)
 {
 	//Kill player here
-	if(player->isready() && player->shield == 0 && !player->invincible && !player->fKuriboShoe)
+	if(player->isready() && player->shield == 0 && !player->invincible && player->iKuriboShoe == 0)
 		return player->KillPlayerMapHazard(false, kill_style_environment) != player_kill_nonkill;
 
-	if(player->fKuriboShoe)
+	if(player->iKuriboShoe > 0)
 	{
 		player->yi(iy - PH - 1);
 		player->bouncejump();
@@ -8521,7 +8521,7 @@ bool CO_Shell::collide(CPlayer * player)
 
 bool CO_Shell::HitTop(CPlayer * player)
 {
-	if(player->invincible || player->fKuriboShoe)
+	if(player->invincible || player->iKuriboShoe > 0)
 	{
 		Die();
 		fSmoking = false;
@@ -9318,13 +9318,13 @@ void CO_Spring::draw()
 	if(owner)
 	{
 		if(owner->iswarping())
-			spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, iOffsetY, 32, 32, (short)owner->state % 4, owner->GetWarpPlane());
+			spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, animationOffsetX, iOffsetY, 32, 32, (short)owner->state % 4, owner->GetWarpPlane());
 		else
-			spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, iOffsetY, 32, 32);
+			spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, animationOffsetX, iOffsetY, 32, 32);
 	}
 	else
 	{
-		spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, iOffsetY, 32, 32);
+		spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, animationOffsetX + drawframe, iOffsetY, 32, 32);
 	}
 }
 
@@ -9352,7 +9352,7 @@ CO_Spike::CO_Spike(gfxSprite *nspr, short ix, short iy) :
 
 void CO_Spike::hittop(CPlayer * player)
 {
-	if(player->isready() && player->shield == 0 && !player->invincible && !player->fKuriboShoe)
+	if(player->isready() && player->shield == 0 && !player->invincible && player->iKuriboShoe == 0)
 		player->KillPlayerMapHazard(false, kill_style_environment);
 }
 
@@ -9360,7 +9360,7 @@ void CO_Spike::hittop(CPlayer * player)
 //------------------------------------------------------------------------------
 // class kuribo's shoe
 //------------------------------------------------------------------------------
-CO_KuriboShoe::CO_KuriboShoe(gfxSprite *nspr, short ix, short iy) :
+CO_KuriboShoe::CO_KuriboShoe(gfxSprite *nspr, short ix, short iy, bool sticky) :
 	CO_Spring(nspr, ix, iy + 15, false)
 {
 	iw = 32;
@@ -9369,17 +9369,20 @@ CO_KuriboShoe::CO_KuriboShoe(gfxSprite *nspr, short ix, short iy) :
 	collisionOffsetY = 15;
 	collisionHeight = 16;
 
+	animationOffsetX = sticky ? 64 : 0;
+
 	movingObjectType = movingobject_carried;
 
 	fObjectDiesOnDeathTiles = false;
+	fSticky = sticky;
 }
 
 void CO_KuriboShoe::hittop(CPlayer * player)
 {
-	if(!player->fKuriboShoe && player->statue_timer == 0)
+	if(player->iKuriboShoe == 0 && player->statue_timer == 0)
 	{
 		dead = true;
-		player->SetKuriboShoe();
+		player->SetKuriboShoe(fSticky ? 2 : 1);
 		ifsoundonplay(sfx_transform);
 		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, player->ix + HALFPW - 16, player->iy + HALFPH - 16, 3, 8));
 	}
@@ -10062,7 +10065,7 @@ bool MO_PirhanaPlant::collide(CPlayer * player)
 
 	bool fHitPlayerTop = fOldY + collisionHeight <= player->fOldY && iy + collisionHeight >= player->iy;
 
-	if(player->invincible || player->statue_timer || (player->fKuriboShoe && !fHitPlayerTop))
+	if(player->invincible || player->statue_timer || (player->iKuriboShoe > 0 && !fHitPlayerTop))
 	{
 		KillPlant();
 	}

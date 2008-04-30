@@ -912,7 +912,7 @@ void MovingPlatform::collide(CPlayer * player)
 									 (!(t1 & tile_flag_solid) && (t2 & tile_flag_death_on_top));
 
 			if(fSolidTileUnderPlayer && (!fDeathTileUnderPlayer ||  
-				player->invincible || player->shield > 0 || player->fKuriboShoe))
+				player->invincible || player->shield > 0 || player->iKuriboShoe > 0))
 			{	//on ground
 
 				if(player->iVerticalPlatformCollision == 0)
@@ -1035,7 +1035,7 @@ void MovingPlatform::check_map_collision_left(CPlayer * player)
 	}
 }
 
-//TODO:: Need to fix this so we report back if we had to overlap the edges to make the collision
+//Reports back if we had to overlap the edges to make the collision
 short MovingPlatform::coldec_player(CPlayer * player)
 {
 	//Special cases to deal with players overlapping the right and left sides of the screen
@@ -1094,6 +1094,8 @@ void MovingPlatform::gettiletypes(CPlayer * player, int * lefttile, int * rightt
 
 void MovingPlatform::collide(IO_MovingObject * object)
 {
+	float fColVelX = object->velx - fOldVelX;
+
 	short coldec = coldec_object(object);
 	if(coldec == collision_none)
 	{
@@ -1106,7 +1108,6 @@ void MovingPlatform::collide(IO_MovingObject * object)
 	if(fDead)
 		return;
 
-	float fColVelX = object->velx - fOldVelX;
 	float fColVelY = object->vely - fOldVelY;
 
 	if(object->platform)
@@ -1287,22 +1288,31 @@ void MovingPlatform::collide(IO_MovingObject * object)
 	}
 
 	float fRelativeX1, fRelativeX2;
-	if(coldec == collision_overlap_left)
+
+	coldec = coldec_object(object);
+	if(coldec == collision_none)
 	{
-		fRelativeX1 = object->fx - fx + iHalfWidth - 640.0f;
-		fRelativeX2 = object->fx + object->collisionWidth - fx + iHalfWidth - 640.0f;
+		if(object->platform == this)
+			object->platform = NULL;
+
+		return;
 	}
-	else if(coldec == collision_overlap_right)
-	{
-		fRelativeX1 = object->fx - fx + iHalfWidth + 640.0f;
-		fRelativeX2 = object->fx + object->collisionWidth - fx + iHalfWidth + 640.0f;
-	}
-	else
+	else if(coldec == collision_normal)
 	{
 		fRelativeX1 = object->fx - fx + iHalfWidth;
 		fRelativeX2 = object->fx + object->collisionWidth - fx + iHalfWidth;
 	}
-
+	else if(coldec == collision_overlap_left)
+	{
+		fRelativeX1 = object->fx - fx + iHalfWidth - 640.0f;
+		fRelativeX2 = object->fx + object->collisionWidth - fx + iHalfWidth - 640.0f;
+	}
+	else
+	{
+		fRelativeX1 = object->fx - fx + iHalfWidth + 640.0f;
+		fRelativeX2 = object->fx + object->collisionWidth - fx + iHalfWidth + 640.0f;
+	}
+	
 	if(fColVelY < 0.0f)
 	{
 		float fRelativeY;
