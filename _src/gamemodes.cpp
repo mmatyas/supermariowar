@@ -1181,6 +1181,10 @@ void CGM_Eggs::init()
 {
 	CGameMode::init();
 
+	//Verify that at least 1 matching yoshi and egg exist
+	bool fEgg[4] = {false, false, false, false};
+	bool fAtLeastOneMatch = false;
+
 	for(short iEggs = 0; iEggs < 4; iEggs++)
 	{
 		for(short iEgg = 0; iEgg < game_values.gamemodesettings.egg.eggs[iEggs]; iEgg++)
@@ -1188,6 +1192,7 @@ void CGM_Eggs::init()
 			if(iEgg > 9)
 				break;
 
+			fEgg[iEggs] = true;
 			objectcontainer[1].add(new CO_Egg(&spr_egg, iEggs));
 		}
 	}
@@ -1199,9 +1204,18 @@ void CGM_Eggs::init()
 			if(iYoshi > 9)
 				break;
 
+			if(fEgg[iYoshis])
+				fAtLeastOneMatch = true;
+
 			objectcontainer[1].add(new MO_Yoshi(&spr_yoshi, iYoshis));
 		}
-	}	
+	}
+
+	if(!fAtLeastOneMatch)
+	{
+		objectcontainer[1].add(new CO_Egg(&spr_egg, 1));
+		objectcontainer[1].add(new MO_Yoshi(&spr_yoshi, 1));
+	}
 }
 
 short CGM_Eggs::playerkilledplayer(CPlayer &, CPlayer &, killstyle)
@@ -1903,8 +1917,8 @@ void CGM_Stomp::init()
 	for(short iEnemy = 0; iEnemy < NUMSTOMPENEMIES; iEnemy++)
 		iEnemyWeightCount += game_values.gamemodesettings.stomp.enemyweight[iEnemy];
 
-	if(iEnemyWeightCount == 0)
-		iEnemyWeightCount = 1;
+	//if(iEnemyWeightCount == 0)
+	//	iEnemyWeightCount = 1;
 }
 
 
@@ -1929,14 +1943,21 @@ void CGM_Stomp::think()
 		{
 			ResetSpawnTimer();
 
-			//Randomly choose an enemy from the weighted list
-			int iRandEnemy = rand() % iEnemyWeightCount + 1;
-			iSelectedEnemy = 0;
-			int iWeightCount = game_values.gamemodesettings.stomp.enemyweight[iSelectedEnemy];
+			//If all weights were zero, then randomly choose an enemy
+			if(iEnemyWeightCount == 0)
+			{
+				iSelectedEnemy = rand() % 9;
+			}
+			else //Otherwise randomly choose an enemy from the weighted list
+			{
+				int iRandEnemy = rand() % iEnemyWeightCount + 1;
+				iSelectedEnemy = 0;
+				int iWeightCount = game_values.gamemodesettings.stomp.enemyweight[iSelectedEnemy];
 
-			while(iWeightCount < iRandEnemy)
-				iWeightCount += game_values.gamemodesettings.stomp.enemyweight[++iSelectedEnemy];
-
+				while(iWeightCount < iRandEnemy)
+					iWeightCount += game_values.gamemodesettings.stomp.enemyweight[++iSelectedEnemy];
+			}
+			
 			if(0 == iSelectedEnemy)
 				objectcontainer[0].add(new MO_Goomba(&spr_goomba, rand() % 2 == 0, false));
 			else if(1 == iSelectedEnemy)

@@ -88,13 +88,12 @@ Cycle - P1 picks the first stage, P2 picks the second, and so on.
 
 [ ] As for the Card Collection Mode, I think a card life option similar to the coin life option in Greed Mode would be a nice addition.
 
-[ ] Also, I found something strange about the Yoshi's Eggs Mode. Not sure if it's a bug or not, but when you set all the egg and Yoshi values to 0, you basically have a pointless match. Could we set it so that doing this results in a random setup of eggs and Yoshis? 
-[ ] Also, when you do this in Stomp Mode, you get just Red Parakoopas. The Frenzy Mode's reaction works just fine, since it spawns just the ? cards.
+[X] Also, I found something strange about the Yoshi's Eggs Mode. Not sure if it's a bug or not, but when you set all the egg and Yoshi values to 0, you basically have a pointless match. Could we set it so that doing this results in a random setup of eggs and Yoshis? 
+[X] Also, when you do this in Stomp Mode, you get just Red Parakoopas. The Frenzy Mode's reaction works just fine, since it spawns just the ? cards.
 
-[ ] In Stomp Mode, the Spinies don't flip over when you bump them from below. They just do the hop thing from SMB1.
-[ ] This last one's not really a bug, but I'm putting it here in case. The Goomba's Shoe doesn't protect from lava in SMB3. Actually, this leads to a small suggestion. We could probably use alternate death tiletypes. Along with the one we have now, we could throw in one that also kills through the Goomba's Shoe and another that doesn't destroy items. That way, map makers could have a choice in how their lava behaves, and we could have hazard tiles like Jelectros and Nipper floors that behave correctly.
+[ ] The Kuribo's Shoe doesn't protect from lava in SMB3. Actually, this leads to a small suggestion. We could probably use alternate death tiletypes. Along with the one we have now, we could throw in one that also kills through the Goomba's Shoe and another that doesn't destroy items. That way, map makers could have a choice in how their lava behaves, and we could have hazard tiles like Jelectros and Nipper floors that behave correctly.
 
-[ ] Wait, got another one. Flipping shelled enemies with a cape or tail shouldn't kill them instantly, it should render them upside-down shells.
+[ ] Flipping shelled enemies with a cape or tail shouldn't kill them instantly, it should render them upside-down shells.
 [ ] Also, bumping winged enemies from below doesn't do anything, where it should kill Paragoombas and flip over Parakoopas.
 [ ] Oh, and Buzzy Beetles could be killed in SMB3 with hammers... should we match that in SMW?
 
