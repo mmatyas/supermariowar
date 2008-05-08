@@ -553,6 +553,8 @@ class MI_PowerupSelection : public UI_Control
 
 	private:
 		
+		void AdjustDisplayArrows();
+
 		void SetupPowerupFields();
 		void EnablePowerupFields(bool fEnable);
 
@@ -577,6 +579,8 @@ class MI_PowerupSelection : public UI_Control
 		MI_Button * miDialogYesButton;
 		MI_Button * miDialogNoButton;
 
+		MI_Image * miUpArrow;
+		MI_Image * miDownArrow;
 };
 
 class MI_FrenzyModeOptions : public UI_Control
@@ -600,6 +604,7 @@ class MI_FrenzyModeOptions : public UI_Control
 	private:
 		
 		void SetupPowerupFields();
+		void AdjustDisplayArrows();
 
 		short iIndex, iOffset;
 		short iTopStop, iBottomStop;
@@ -613,6 +618,9 @@ class MI_FrenzyModeOptions : public UI_Control
 		MI_SelectField * miStoredShellsField;
 		MI_PowerupSlider * miPowerupSlider[NUMFRENZYCARDS];
 		MI_Button * miBackButton;
+
+		MI_Image * miUpArrow;
+		MI_Image * miDownArrow;
 };
 
 
@@ -697,6 +705,7 @@ class MI_WorldPreviewDisplay : public UI_Control
 		short iCols, iRows;
 
 		short iMapOffsetX, iMapOffsetY;
+		short iMapGlobalOffsetX, iMapGlobalOffsetY;
 		short iMapDrawOffsetCol, iMapDrawOffsetRow;
 
 		short iMoveDirection;

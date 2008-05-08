@@ -8,9 +8,12 @@ extern void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld);
 extern WorldMap g_worldmap;
 extern bool LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDirections);
 
+extern std::string stripPathAndExtension(const std::string &path);
+
 extern short g_iVersion[];
 using std::queue;
 using std::map;
+
 
 /**********************************
 * WorldMovingObject
@@ -200,7 +203,7 @@ void WorldVehicle::Init(short iCol, short iRow, short iAction, short iSprite, sh
 	if(iDrawSprite >= 0 && iDrawSprite <= 8)
 	{
 		iRectOffsetX = 0;
-		iRectOffsetY = iDrawSprite * TILESIZE;
+		iRectOffsetY = iDrawSprite * tilesize;
 	}
 
 	for(short iRect = 0; iRect < 5; iRect++)
@@ -413,7 +416,9 @@ bool WorldMap::Load(short tilesize)
 		iTileSheet = 2;
 	}
 
-	FILE * file = fopen(worldlist.GetIndex(game_values.worldindex), "r");
+	const char * szPath = worldlist.GetIndex(game_values.worldindex);
+	FILE * file = fopen(szPath, "r");
+	worldName = stripPathAndExtension(szPath);
 
 	if(!file)
 		return false;
@@ -927,7 +932,7 @@ bool WorldMap::Save(const char * szPath)
 	}
 	fprintf(file, "\n");
 
-	fprintf(file, "#Sprite Backgroud Layer\n");
+	fprintf(file, "#Sprite Background Layer\n");
 
 	for(short iMapTileReadRow = 0; iMapTileReadRow < iHeight; iMapTileReadRow++)
 	{
@@ -944,7 +949,7 @@ bool WorldMap::Save(const char * szPath)
 	}
 	fprintf(file, "\n");
 
-	fprintf(file, "#Sprite Foregroud Layer\n");
+	fprintf(file, "#Sprite Foreground Layer\n");
 
 	for(short iMapTileReadRow = 0; iMapTileReadRow < iHeight; iMapTileReadRow++)
 	{

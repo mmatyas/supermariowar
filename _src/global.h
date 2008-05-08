@@ -148,7 +148,7 @@ struct STextAward
 #define MAXWORLDMUSICCATEGORY	9
 #define WORLDMUSICBONUS MAXWORLDMUSICCATEGORY
 #define WORLDMUSICSLEEP MAXWORLDMUSICCATEGORY + 1
-#define WORLDMUSICPIPEMINIGAME MAXWORLDMUSICCATEGORY + 2
+#define WORLDMUSICWORLDS MAXWORLDMUSICCATEGORY + 2
 #define MAXCATEGORYTRACKS	64
 
 #define MAXEYECANDY		192
@@ -531,6 +531,7 @@ extern gfxSprite		menu_player_select;
 extern gfxSprite		menu_map_filter;
 extern gfxSprite		menu_match_select;
 extern gfxSprite		menu_dialog;
+extern gfxSprite		menu_verticalarrows;
 
 extern gfxSprite		menu_stomp;
 extern gfxSprite		menu_survival;
@@ -734,6 +735,8 @@ struct SurvivalGameModeSettings
 struct GreedGameModeSettings
 {
 	short coinlife;				//How long coins stick around before disappearing
+	bool owncoins;
+	short multiplier;
 };
 
 struct HealthGameModeSettings

@@ -537,6 +537,8 @@ class Menu
 
 		//Greed
 		MI_SelectField * miGreedModeCoinLife;
+		MI_SelectField * miGreedModeOwnCoins;
+		MI_SelectField * miGreedModeMultiplier;
 		MI_Button * miGreedModeBackButton;
 		
 		MI_Image * miGreedModeLeftHeaderBar;

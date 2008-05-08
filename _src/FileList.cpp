@@ -282,6 +282,22 @@ MusicEntry::MusicEntry(const std::string & musicdirectory)
 	}
 
 	int iNumFile = 0;
+
+	//Run through the global overrides and add them to the map overrides of this music entry
+	//if there are any overrides then for each override
+	/*
+	{
+		if(mapoverride.find(pszName) == mapoverride.end())
+			mapoverride[pszName] = new MusicOverride();
+	  
+		songFileNames.push_back(sPath);
+
+		fUsesMapOverrides = true;
+		mapoverride[pszName]->songs.push_back(iNumFile);
+		iNumFile++;
+	}
+	*/
+
 	int iAddToCategory = -1;
 	char szBuffer[256];
 	while(fgets(szBuffer, 256, in))
@@ -598,9 +614,9 @@ WorldMusicList::~WorldMusicList()
 	entries.clear();
 }
 
-string WorldMusicList::GetMusic(int musicID)
+string WorldMusicList::GetMusic(int musicID, const char * szWorldName)
 {
-	return entries[currentIndex]->GetMusic(musicID);
+	return entries[currentIndex]->GetMusic(musicID, szWorldName);
 }
 
 string WorldMusicList::GetCurrentMusic()
@@ -630,7 +646,7 @@ void WorldMusicList::prev()
 WorldMusicEntry::WorldMusicEntry(const std::string & musicdirectory)
 {
 	fError = false;
-	iCurrentMusic = 0;
+	fUsesWorldOverrides = false;
 
 	int i, k;
 
@@ -711,6 +727,8 @@ WorldMusicEntry::WorldMusicEntry(const std::string & musicdirectory)
 				iAddToCategory = WORLDMUSICBONUS;
 			else if(!_stricmp(szBuffer, "[sleep]"))
 				iAddToCategory = WORLDMUSICSLEEP;
+			else if(!_stricmp(szBuffer, "[worlds]"))
+				iAddToCategory = WORLDMUSICWORLDS;
 
 			continue;
 		}
@@ -722,6 +740,27 @@ WorldMusicEntry::WorldMusicEntry(const std::string & musicdirectory)
 			if(File_Exists(sPath.c_str()))
 				songFileNames[iAddToCategory] = sPath;
 		}
+		else if(iAddToCategory == WORLDMUSICWORLDS)
+		{
+			char * pszName = strtok(szBuffer, ",\n");
+			
+			if(!pszName)
+				continue;
+
+			char * pszMusic = strtok(NULL, ",\n");
+			
+			if(!pszMusic)
+				continue;
+
+			std::string sPath = musicdirectory + getDirectorySeperator() + convertPartialPath(std::string(pszMusic));
+
+			if(!File_Exists(sPath.c_str()))
+				continue;
+
+			fUsesWorldOverrides = true;
+			worldoverride[pszName] = sPath;
+				
+		}
 	}
 
 	fclose(in);
@@ -729,8 +768,14 @@ WorldMusicEntry::WorldMusicEntry(const std::string & musicdirectory)
 
 
 
-string WorldMusicEntry::GetMusic(unsigned int musicID)
+string WorldMusicEntry::GetMusic(unsigned int musicID, const char * szWorldName)
 {
+	//First check if there is specific map music
+	if(fUsesWorldOverrides && worldoverride.find(szWorldName) != worldoverride.end())
+	{
+		return worldoverride[szWorldName];
+	}
+
     if (musicID < 0 || musicID > WORLDMUSICSLEEP)
         return songFileNames[0];
 

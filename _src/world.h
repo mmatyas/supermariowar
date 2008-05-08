@@ -206,6 +206,8 @@ class WorldMap
 
 		short GetMusicCategory() {return iMusicCategory;}
 
+		const char * GetWorldName() {return worldName.c_str();}
+
 	private:
 
 		void Cleanup();
@@ -239,6 +241,8 @@ class WorldMap
 		short iLastDrawCol;
 
 		short iTilesPerCycle;
+
+		std::string worldName;
 
 	friend class MI_World;
 	friend class MI_WorldPreviewDisplay;

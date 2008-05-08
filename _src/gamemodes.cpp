@@ -1114,7 +1114,7 @@ void CGM_Coins::init()
 		game_values.gamemodesettings.coins.quantity = 1;
 
 	for(short iCoin = 0; iCoin < game_values.gamemodesettings.coins.quantity; iCoin++)
-		objectcontainer[1].add(new MO_Coin(&spr_coin, 0.0f, 0.0f, 0, 0, 2, 0, 0));
+		objectcontainer[1].add(new MO_Coin(&spr_coin, 0.0f, 0.0f, 0, 0, 0, 2, 0, 0));
 }
 
 
@@ -2702,7 +2702,7 @@ short CGM_Greed::ReleaseCoins(CPlayer &player, killstyle style)
 	player.shield = game_values.shieldstyle == 0 ? 1 : game_values.shieldstyle;
 	player.shieldtimer = 60;
 
-	short iDamage = g_iKillStyleDamage[style];
+	short iDamage = g_iKillStyleDamage[style] * game_values.gamemodesettings.greed.multiplier / 2;
 
 	if(goal != -1)
 	{
@@ -2722,7 +2722,7 @@ short CGM_Greed::ReleaseCoins(CPlayer &player, killstyle style)
 		float velx = vel * cos(angle);
 		float vely = vel * sin(angle);
 		
-		objectcontainer[1].add(new MO_Coin(&spr_coin, velx, vely, ix, iy, player.colorID, 1, 30));
+		objectcontainer[1].add(new MO_Coin(&spr_coin, velx, vely, ix, iy, player.colorID, player.teamID, 1, 30));
 	}
 
 	//Play warning sound if game is almost over

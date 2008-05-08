@@ -2479,7 +2479,7 @@ void Menu::CreateMenu()
 	//***********************
 	// Greed Mode Settings
 	//***********************		
-	miGreedModeCoinLife = new MI_SelectField(&spr_selectfield, 120, 220, "Coin Life", 400, 180);
+	miGreedModeCoinLife = new MI_SelectField(&spr_selectfield, 120, 180, "Coin Life", 400, 180);
 	miGreedModeCoinLife->Add("1 Second", 62, "", false, false, false);
 	miGreedModeCoinLife->Add("2 Seconds", 124, "", false, false, false);
 	miGreedModeCoinLife->Add("3 Seconds", 186, "", false, false);
@@ -2499,6 +2499,23 @@ void Menu::CreateMenu()
 	miGreedModeCoinLife->SetData(&game_values.gamemodemenusettings.greed.coinlife, NULL, NULL);
 	miGreedModeCoinLife->SetKey(game_values.gamemodemenusettings.greed.coinlife);
 
+	miGreedModeOwnCoins = new MI_SelectField(&spr_selectfield, 120, 220, "Own Coins", 400, 180);
+	miGreedModeOwnCoins->Add("Yes", 1, "", true, false);
+	miGreedModeOwnCoins->Add("No", 0, "", false, false);
+	miGreedModeOwnCoins->SetData(NULL, NULL, &game_values.gamemodemenusettings.greed.owncoins);
+	miGreedModeOwnCoins->SetKey(game_values.gamemodemenusettings.greed.owncoins);
+	miGreedModeOwnCoins->SetAutoAdvance(true);
+
+	miGreedModeMultiplier = new MI_SelectField(&spr_selectfield, 120, 260, "Multipler", 400, 180);
+	miGreedModeMultiplier->Add("0.5", 1, "", false, false, false);
+	miGreedModeMultiplier->Add("1", 2, "", false, false, false);
+	miGreedModeMultiplier->Add("1.5", 3, "", false, false, false);
+	miGreedModeMultiplier->Add("2", 4, "", false, false, false);
+	miGreedModeMultiplier->Add("2.5", 5, "", false, false, false);
+	miGreedModeMultiplier->Add("3", 6, "", false, false, false);
+	miGreedModeMultiplier->SetData(&game_values.gamemodemenusettings.greed.multiplier, NULL, NULL);
+	miGreedModeMultiplier->SetKey(game_values.gamemodemenusettings.greed.multiplier);
+
 	miGreedModeBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
 	miGreedModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
@@ -2506,8 +2523,11 @@ void Menu::CreateMenu()
 	miGreedModeRightHeaderBar = new MI_Image(&menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
 	miGreedModeHeaderText = new MI_Text("Greed Mode Menu", 320, 5, 0, 2, 1);
 
-	mModeSettingsMenu[17].AddControl(miGreedModeCoinLife, miGreedModeBackButton, miGreedModeBackButton, NULL, miGreedModeBackButton);
-	mModeSettingsMenu[17].AddControl(miGreedModeBackButton, miGreedModeCoinLife, miGreedModeCoinLife, miGreedModeCoinLife, NULL);
+	mModeSettingsMenu[17].AddControl(miGreedModeCoinLife, miGreedModeBackButton, miGreedModeOwnCoins, NULL, miGreedModeBackButton);
+	mModeSettingsMenu[17].AddControl(miGreedModeOwnCoins, miGreedModeCoinLife, miGreedModeMultiplier, NULL, miGreedModeBackButton);
+	mModeSettingsMenu[17].AddControl(miGreedModeMultiplier, miGreedModeOwnCoins, miGreedModeBackButton, NULL, miGreedModeBackButton);
+
+	mModeSettingsMenu[17].AddControl(miGreedModeBackButton, miGreedModeMultiplier, miGreedModeCoinLife, miGreedModeMultiplier, NULL);
 	
 	mModeSettingsMenu[17].AddNonControl(miGreedModeLeftHeaderBar);
 	mModeSettingsMenu[17].AddNonControl(miGreedModeRightHeaderBar);
@@ -3991,7 +4011,7 @@ void Menu::RunMenu()
 
 					if(game_values.music)
 					{
-						backgroundmusic[0].load(worldmusiclist.GetMusic(WORLDMUSICBONUS));
+						backgroundmusic[0].load(worldmusiclist.GetMusic(WORLDMUSICBONUS, ""));
 						backgroundmusic[0].play(false, false);
 					}
 				}
@@ -4050,7 +4070,7 @@ void Menu::RunMenu()
 				mCurrentMenu->ResetMenu();
 
 				backgroundmusic[2].stop();
-				backgroundmusic[5].load(worldmusiclist.GetMusic(g_worldmap.GetMusicCategory()));
+				backgroundmusic[5].load(worldmusiclist.GetMusic(g_worldmap.GetMusicCategory(), g_worldmap.GetWorldName()));
 				backgroundmusic[5].play(false, false);
 				fNeedMenuMusicReset = true;
 

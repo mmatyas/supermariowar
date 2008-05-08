@@ -872,7 +872,7 @@ class MO_Boomerang : public IO_MovingObject
 class MO_Coin : public IO_MovingObject
 {
 	public:
-		MO_Coin(gfxSprite *nspr, float velx, float vely, short ix, short iy, short color, short type, short uncollectabletime);
+		MO_Coin(gfxSprite *nspr, float velx, float vely, short ix, short iy, short color, short team, short type, short uncollectabletime);
 		~MO_Coin(){};
 
 		void update();
@@ -886,6 +886,7 @@ class MO_Coin : public IO_MovingObject
 		short sparkledrawframe;
 
 		short iType;
+		short iTeam;
 		short iUncollectableTime;
 };
 
@@ -1761,7 +1762,7 @@ class IO_BulletBillCannon : public CObject
 class IO_FlameCannon : public CObject
 {
 	public:
-		IO_FlameCannon(short x, short y, short freq, bool isfacingright);
+		IO_FlameCannon(short x, short y, short freq, short direction);
 		~IO_FlameCannon() {}
 
 		void draw();
@@ -1775,7 +1776,9 @@ class IO_FlameCannon : public CObject
 		void SetNewTimer();
 
 		short iFreq, iTimer, iCycle;
-		short iFlameX, iFlameY;
+		short iFrame;
+
+		short iDirection;
 
 	friend class CPlayerAI;
 };
@@ -1802,9 +1805,9 @@ class MO_PirhanaPlant : public IO_MovingObject
 		short iType, iDirection;
 		short iFreq, iTimer;
 		//short iHiddenPlane, iHiddenDirection;
-		short iSrcX, iSrcY;
-		short iAnimationTimer, iAnimationX;
-		short iFacing;
+		//short iSrcX, iSrcY;
+		short iAnimationTimer;
+		short iFrame;
 		short iActionTimer;
 
 		bool fPreview;

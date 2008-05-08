@@ -5074,7 +5074,7 @@ void CO_Bomb::Die()
 //------------------------------------------------------------------------------
 // class coin (for coin mode)
 //------------------------------------------------------------------------------
-MO_Coin::MO_Coin(gfxSprite *nspr, float dvelx, float dvely, short ix, short iy, short color, short type, short uncollectabletime) :
+MO_Coin::MO_Coin(gfxSprite *nspr, float dvelx, float dvely, short ix, short iy, short color, short team, short type, short uncollectabletime) :
 	IO_MovingObject(nspr, ix, iy, 4, 8, 30, 30, 1, 1, 0, color << 5, 32, 32)
 {
 	state = 1;
@@ -5085,6 +5085,7 @@ MO_Coin::MO_Coin(gfxSprite *nspr, float dvelx, float dvely, short ix, short iy, 
 	sparkledrawframe = 0;
 
 	iType = type;
+	iTeam = team;
 
 	iUncollectableTime = uncollectabletime;
 	velx = dvelx;
@@ -5098,7 +5099,7 @@ MO_Coin::MO_Coin(gfxSprite *nspr, float dvelx, float dvely, short ix, short iy, 
 
 bool MO_Coin::collide(CPlayer * player)
 {
-	if(iType == 1 && iUncollectableTime > 0)
+	if(iType == 1 && (iUncollectableTime > 0 || (!game_values.gamemodesettings.greed.owncoins && iTeam == player->getTeamID())))
 		return false;
 
 	if(!game_values.gamemode->gameover)
@@ -9745,8 +9746,8 @@ void IO_BulletBillCannon::SetNewTimer()
 //------------------------------------------------------------------------------
 // class IO_FlameCannon - shoots a flame
 //------------------------------------------------------------------------------
-
-IO_FlameCannon::IO_FlameCannon(short x, short y, short freq, bool isfacingright) :
+extern SDL_Rect g_rFlameRects[4][4];
+IO_FlameCannon::IO_FlameCannon(short x, short y, short freq, short direction) :
 	CObject(NULL, x, y)
 {
 	iFreq = freq;
@@ -9755,22 +9756,25 @@ IO_FlameCannon::IO_FlameCannon(short x, short y, short freq, bool isfacingright)
 
 	objectType = object_flamecannon;
 
-	iw = 96;
-	ih = 32;
+	iw = g_rFlameRects[direction][0].w;
+	ih = g_rFlameRects[direction][0].h;
 
-	collisionHeight = 32;
-	collisionWidth = 96;
+	collisionHeight = ih;
+	collisionWidth = iw;
 	collisionOffsetX = 0;
 	collisionOffsetY = 0;
 
-	if(isfacingright)
-	{
-		iFlameX = 0;
-	}
-	else
+	iDirection = direction;
+
+	iFrame = 0;
+
+	if(iDirection == 1)
 	{
 		ix -= 64;
-		iFlameX = 96;
+	}
+	else if(iDirection == 2)
+	{
+		iy -= 64;
 	}
 }
 
@@ -9782,7 +9786,7 @@ void IO_FlameCannon::update()
 		{
 			iTimer = 0;
 			iCycle = 0;
-			iFlameY = 0;
+			iFrame = 0;
 
 			state = 1;
 			ifsoundonplay(sfx_flamecannon);
@@ -9794,14 +9798,13 @@ void IO_FlameCannon::update()
 		{
 			iTimer = 0;
 			
-			iFlameY += 32;
-			if(iFlameY > 32)
+			if(++iFrame > 1)
 			{
-				iFlameY = 0;
+				iFrame = 0;
 
 				if(++iCycle >= 4)
 				{
-					iFlameY = 64;
+					iFrame = 2;
 					iCycle = 0;
 					
 					if(state == 1)
@@ -9823,15 +9826,14 @@ void IO_FlameCannon::update()
 		{
 			iTimer = 0;
 			
-			iFlameY += 32;
-			if(iFlameY > 96)
+			if(++iFrame > 3)
 			{
-				iFlameY = 64;
+				iFrame = 2;
 
 				if(++iCycle >= 8)
 				{
 					state = 3;
-					iFlameY = 0;
+					iFrame = 0;
 					iCycle = 0;
 				}
 			}
@@ -9843,7 +9845,8 @@ void IO_FlameCannon::draw()
 {
 	if(state > 0)
 	{
-		spr_hazard_flame[0].draw(ix, iy, iFlameX, iFlameY, 96, 32);
+		SDL_Rect * rect = &g_rFlameRects[iDirection][iFrame];
+		spr_hazard_flame[0].draw(ix, iy, rect->x, rect->y, rect->w, rect->h);
 	}
 }
 
@@ -9852,7 +9855,8 @@ void IO_FlameCannon::draw(short iOffsetX, short iOffsetY)
 {
 	if(state > 0)
 	{
-		gfx_drawpreview(spr_hazard_flame[1].getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, iFlameX >> 1, iFlameY >> 1, 48, 16, iOffsetX, iOffsetY, 320, 240, true);
+		SDL_Rect * rect = &g_rFlameRects[iDirection][iFrame];
+		gfx_drawpreview(spr_hazard_flame[1].getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, rect->x >> 1, rect->y >> 1, rect->w >> 1, rect->h >> 1, iOffsetX, iOffsetY, 320, 240, true);
 	}
 }
 
@@ -9873,6 +9877,7 @@ void IO_FlameCannon::SetNewTimer()
 //------------------------------------------------------------------------------
 // class IO_PirhanaPlant - pirhana plant that appears on a certain frequency
 //------------------------------------------------------------------------------
+extern SDL_Rect g_rPirhanaRects[4][4][4];
 
 MO_PirhanaPlant::MO_PirhanaPlant(short x, short y, short type, short freq, short direction, bool preview) :
 	IO_MovingObject(NULL, x, y, 1, 0)
@@ -9891,11 +9896,17 @@ MO_PirhanaPlant::MO_PirhanaPlant(short x, short y, short type, short freq, short
 	state = 0;
 	SetNewTimer();
 
-	iw = 32;
+	if(iDirection <= 1)
+		iw = 32;
+	else
+		ih = 32;
 
 	if(direction == 0)
 		iy += 32;
+	else if(direction == 2)
+		ix += 32;
 
+	/*
 	if(iType == 0 || iType == 1)
 	{
 		iSrcX = iDirection * 128;
@@ -9906,22 +9917,42 @@ MO_PirhanaPlant::MO_PirhanaPlant(short x, short y, short type, short freq, short
 		iSrcX = iDirection * 64;
 		iSrcY = iType * 48 + (iType == 3 ? 16 : 0);
 	}
+	*/
 
-	if(iType == 2)
-		ih = 64;
+	if(iDirection <= 1)
+	{
+		if(iType == 2)
+			ih = 64;
+		else
+			ih = 48;
+	}
 	else
-		ih = 48;
+	{
+		if(iType == 2)
+			iw = 64;
+		else
+			iw = 48;
+	}
 
-	collisionHeight = 0;
-	collisionWidth = 32;
+	if(iDirection <= 1)
+	{
+		collisionHeight = 0;
+		collisionWidth = 32;
+	}
+	else
+	{
+		collisionHeight = 32;
+		collisionWidth = 0;
+	}
+
 	collisionOffsetX = 0;
 	collisionOffsetY = 0;
 
 	iAnimationTimer = 0;
-	iAnimationX = 0;
+	//iAnimationX = 0;
 
 	iActionTimer = rand() % 8;
-	iFacing = 0;
+	iFrame = 0;
 }
 
 void MO_PirhanaPlant::update()
@@ -9940,15 +9971,18 @@ void MO_PirhanaPlant::update()
 	}
 	else if(state == 1) //appearing
 	{
-		collisionHeight += 2;
+		if(iDirection <= 1)
+			collisionHeight += 2;
+		else
+			collisionWidth += 2;
 
 		if(iDirection == 0)
 			iy -= 2;
+		else if(iDirection == 2)
+			ix -= 2;
 
-		if(collisionHeight >= ih)
-		{
+		if((iDirection <= 1 && collisionHeight >= ih) || (iDirection >= 2 && collisionWidth >= iw))
 			state = 2;
-		}
 	}
 	else if(state == 2) //extended
 	{
@@ -9960,12 +9994,17 @@ void MO_PirhanaPlant::update()
 	}
 	else if(state == 3) //retreating
 	{
-		collisionHeight -= 2;
+		if(iDirection <= 1)
+			collisionHeight -= 2;
+		else
+			collisionWidth -= 2;
 		
 		if(iDirection == 0)
 			iy += 2;
+		else if(iDirection == 2)
+			ix += 2;
 
-		if(collisionHeight <= 0)
+		if((iDirection <= 1 && collisionHeight <= 0) || (iDirection >= 2 && collisionWidth <= 0))
 		{
 			state = 0;
 			SetNewTimer();
@@ -10007,13 +10046,13 @@ void MO_PirhanaPlant::update()
 			float dAngle = (float)atan2((double)iDiffX, (double)iDiffY);
 			
 			if(dAngle >= 0.0f && dAngle < HALF_PI)
-				iFacing = 0;
+				iFrame = 0;
 			else if(dAngle >= HALF_PI && dAngle <= PI)
-				iFacing = 32;
+				iFrame = iDirection <= 1 ? 1 : 2;
 			else if(dAngle >= -HALF_PI && dAngle < 0.0f)
-				iFacing = 64;
+				iFrame = iDirection <= 1 ? 2 : 1;
 			else if(dAngle >= -PI && dAngle < -HALF_PI)
-				iFacing = 96;
+				iFrame = 3;
 		}
 	}
 	else if(iType == 2 || iType == 3) //Animate if these are animated plants
@@ -10022,16 +10061,15 @@ void MO_PirhanaPlant::update()
 		{
 			iAnimationTimer = 0;
 
-			iAnimationX += 32;
-			if(iAnimationX > 32)
-				iAnimationX = 0;
+			if(++iFrame > 1)
+				iFrame = 0;
 		}
 	}
 
 	//Fire a fireball
 	if(iType <= 1 && state == 2 && iTimer == 30)
 	{
-		objectcontainer[1].add(new OMO_StraightPathHazard(&spr_hazard_fireball[fPreview ? 1 : 0], ix + 7, iDirection == 0 ? iy + 7 : iy + ih - 23, GetFireballAngle(), 3.0f, 4, 8, 18, 18, 0, 0, 0, iFacing <= 32 ? 18 : 0, 18, 18));
+		objectcontainer[1].add(new OMO_StraightPathHazard(&spr_hazard_fireball[fPreview ? 1 : 0], iDirection != 3 ? ix + 7 : ix + iw - 23, iDirection != 1 ? iy + 7 : iy + ih - 23, GetFireballAngle(), 3.0f, 4, 8, 18, 18, 0, 0, 0, iFrame <= 1 ? 18 : 0, 18, 18));
 	}
 }
 
@@ -10039,10 +10077,15 @@ void MO_PirhanaPlant::draw()
 {
 	if(state > 0)
 	{
+		SDL_Rect * rect = &g_rPirhanaRects[iType][iDirection][iFrame];
 		if(iDirection == 0)
-			spr_hazard_pirhanaplant[0].draw(ix, iy, iSrcX + iAnimationX + iFacing, iSrcY, 32, collisionHeight);
+			spr_hazard_pirhanaplant[0].draw(ix, iy, rect->x, rect->y, 32, collisionHeight);
+		else if(iDirection == 1)
+			spr_hazard_pirhanaplant[0].draw(ix, iy, rect->x, rect->y + ih - collisionHeight, 32, collisionHeight);
+		else if(iDirection == 2)
+			spr_hazard_pirhanaplant[0].draw(ix, iy, rect->x, rect->y, collisionWidth, 32);
 		else
-			spr_hazard_pirhanaplant[0].draw(ix, iy, iSrcX + iAnimationX + iFacing, iSrcY + ih - collisionHeight, 32, collisionHeight);
+			spr_hazard_pirhanaplant[0].draw(ix, iy, rect->x + iw - collisionWidth, rect->y, collisionWidth, 32);
 	}
 }
 
@@ -10051,10 +10094,15 @@ void MO_PirhanaPlant::draw(short iOffsetX, short iOffsetY)
 {
 	if(state > 0)
 	{
+		SDL_Rect * rect = &g_rPirhanaRects[iType][iDirection][iFrame];
 		if(iDirection == 0)
-			gfx_drawpreview(spr_hazard_pirhanaplant[1].getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, (iSrcX + iAnimationX + iFacing) >> 1, iSrcY >> 1, 16, collisionHeight >> 1, iOffsetX, iOffsetY, 320, 240, true);
+			gfx_drawpreview(spr_hazard_pirhanaplant[1].getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, rect->x >> 1, rect->y >> 1, 16, collisionHeight >> 1, iOffsetX, iOffsetY, 320, 240, true);
+		else if(iDirection == 1)
+			gfx_drawpreview(spr_hazard_pirhanaplant[1].getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, rect->x >> 1, (rect->y + ih - collisionHeight) >> 1, 16, collisionHeight >> 1, iOffsetX, iOffsetY, 320, 240, true);
+		else if(iDirection == 2)
+			gfx_drawpreview(spr_hazard_pirhanaplant[1].getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, rect->x >> 1, rect->y >> 1, collisionWidth >> 1, 16, iOffsetX, iOffsetY, 320, 240, true);
 		else
-			gfx_drawpreview(spr_hazard_pirhanaplant[1].getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, (iSrcX + iAnimationX + iFacing) >> 1, (iSrcY + ih - collisionHeight) >> 1, 16, collisionHeight >> 1, iOffsetX, iOffsetY, 320, 240, true);
+			gfx_drawpreview(spr_hazard_pirhanaplant[1].getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, (rect->x + iw - collisionWidth) >> 1, rect->y >> 1, collisionWidth >> 1, 16, iOffsetX, iOffsetY, 320, 240, true);
 	}
 }
 
@@ -10114,13 +10162,11 @@ void MO_PirhanaPlant::SetNewTimer()
 	{
 		//Only point flower towards directions that make sense
 		if((ix >> 5) == 19)
-			iFacing = rand() % 2;
+			iFrame = rand() % 2;
 		else if(ix == 0)
-			iFacing = (rand() % 2) + 2;
+			iFrame = (rand() % 2) + 2;
 		else
-			iFacing = rand() % 4;
-
-		iFacing <<= 5;
+			iFrame = rand() % 4;
 	}
 }
 
@@ -10140,14 +10186,29 @@ void MO_PirhanaPlant::KillPlant()
 
 float MO_PirhanaPlant::GetFireballAngle()
 {
-	if(iFacing == 0)
-		return -2.7214f;
-	else if(iFacing == 32)
-		return 2.7214f;
-	else if(iFacing == 64)
-		return -0.4202f;
-	else if(iFacing == 96)
-		return 0.4202f;
+	if(iDirection <= 1)
+	{
+		if(iFrame == 0)
+			return -2.7214f;
+		else if(iFrame == 1)
+			return 2.7214f;
+		else if(iFrame == 2)
+			return -0.4202f;
+		else if(iFrame == 3)
+			return 0.4202f;
+	}
+	else
+	{
+
+		if(iFrame == 0)
+			return -1.9910f;
+		else if(iFrame == 1)
+			return -1.1506f;
+		else if(iFrame == 2)
+			return 1.9910f;
+		else if(iFrame == 3)
+			return 1.1506f;
+	}
 
 	return 0.0f;
 }

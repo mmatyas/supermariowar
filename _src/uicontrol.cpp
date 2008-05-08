@@ -2067,6 +2067,10 @@ MI_PowerupSelection::MI_PowerupSelection(short x, short y, short width, short nu
 	mMenu->AddControl(miOverride, NULL, miPreset, NULL, NULL);
 	mMenu->AddControl(miPreset, miOverride, miPowerupSlider[0], NULL, NULL);
 
+	miUpArrow = new MI_Image(&menu_verticalarrows, 310, 128, 20, 0, 20, 20, 1, 4, 8);
+	miDownArrow = new MI_Image(&menu_verticalarrows, 310, 406, 0, 0, 20, 20, 1, 4, 8);
+	miUpArrow->Show(false);
+
 	for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
 	{
 		UI_Control * upcontrol = NULL;
@@ -2117,6 +2121,8 @@ MI_PowerupSelection::MI_PowerupSelection(short x, short y, short width, short nu
 	mMenu->AddControl(miDialogYesButton, NULL, NULL, NULL, miDialogNoButton);
 	mMenu->AddControl(miDialogNoButton, NULL, NULL, miDialogYesButton, NULL);
 
+	mMenu->AddNonControl(miUpArrow);
+	mMenu->AddNonControl(miDownArrow);
 
 	mMenu->SetHeadControl(miOverride);
 	mMenu->SetCancelCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
@@ -2265,7 +2271,7 @@ MenuCodeEnum MI_PowerupSelection::SendInput(CPlayerInput * playerInput)
 
 void MI_PowerupSelection::Update()
 {
-	mMenu->Update();\
+	mMenu->Update();
 }
 
 void MI_PowerupSelection::Draw()
@@ -2285,6 +2291,8 @@ void MI_PowerupSelection::MoveNext()
 		iOffset++;
 		SetupPowerupFields();
 	}
+
+	AdjustDisplayArrows();
 }
 
 void MI_PowerupSelection::MovePrev()
@@ -2296,8 +2304,22 @@ void MI_PowerupSelection::MovePrev()
 		iOffset--;
 		SetupPowerupFields();
 	}
+
+	AdjustDisplayArrows();
 }
 
+void MI_PowerupSelection::AdjustDisplayArrows()
+{
+	if(iIndex > iTopStop)
+		miUpArrow->Show(true);
+	else
+		miUpArrow->Show(false);
+
+	if(iIndex < iBottomStop)
+		miDownArrow->Show(true);
+	else
+		miDownArrow->Show(false);
+}
 
 
 /**************************************
@@ -2380,6 +2402,10 @@ MI_FrenzyModeOptions::MI_FrenzyModeOptions(short x, short y, short width, short 
 	miBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
 	miBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
+	miUpArrow = new MI_Image(&menu_verticalarrows, 310, 162, 20, 0, 20, 20, 1, 4, 8);
+	miDownArrow = new MI_Image(&menu_verticalarrows, 310, 402, 0, 0, 20, 20, 1, 4, 8);
+	miUpArrow->Show(false);
+
 	mMenu->AddControl(miQuantityField, NULL, miRateField, NULL, NULL);
 	mMenu->AddControl(miRateField, miQuantityField, miStoredShellsField, NULL, NULL);
 	mMenu->AddControl(miStoredShellsField, miRateField, miPowerupSlider[0], NULL, NULL);
@@ -2420,6 +2446,9 @@ MI_FrenzyModeOptions::MI_FrenzyModeOptions(short x, short y, short width, short 
 
 	//Setup positions and visible powerups
 	SetupPowerupFields();
+
+	mMenu->AddNonControl(miUpArrow);
+	mMenu->AddNonControl(miDownArrow);
 
 	mMenu->AddControl(miBackButton, miPowerupSlider[NUMFRENZYCARDS - 1], NULL, NULL, NULL);
 
@@ -2503,6 +2532,8 @@ void MI_FrenzyModeOptions::MoveNext()
 		iOffset++;
 		SetupPowerupFields();
 	}
+
+	AdjustDisplayArrows();
 }
 
 void MI_FrenzyModeOptions::MovePrev()
@@ -2514,6 +2545,8 @@ void MI_FrenzyModeOptions::MovePrev()
 		iOffset--;
 		SetupPowerupFields();
 	}
+
+	AdjustDisplayArrows();
 }
 
 void MI_FrenzyModeOptions::SetRandomGameModeSettings()
@@ -2524,6 +2557,19 @@ void MI_FrenzyModeOptions::SetRandomGameModeSettings()
 
 	for(short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++)
 		game_values.gamemodesettings.frenzy.powerupweight[iPowerup] = miPowerupSlider[iPowerup]->GetRandomShortValue();
+}
+
+void MI_FrenzyModeOptions::AdjustDisplayArrows()
+{
+	if(iIndex > iTopStop)
+		miUpArrow->Show(true);
+	else
+		miUpArrow->Show(false);
+
+	if(iIndex < iBottomStop)
+		miDownArrow->Show(true);
+	else
+		miDownArrow->Show(false);
 }
 
 /**************************************
@@ -2915,6 +2961,9 @@ void MI_WorldPreviewDisplay::Init()
 {
 	iMapOffsetX = 0;
 	iMapOffsetY = 0;
+
+	iMapGlobalOffsetX = 0;
+	iMapGlobalOffsetY = 0;
 	
 	iMapDrawOffsetCol = 0;
 	iMapDrawOffsetRow = 0;
@@ -2967,6 +3016,7 @@ void MI_WorldPreviewDisplay::Update()
 
 	if(iMoveDirection == 0)
 	{
+		--iMapGlobalOffsetX;
 		if(++iMapOffsetX >= PREVIEWTILESIZE)
 		{
 			iMapOffsetX = 0;
@@ -2986,12 +3036,14 @@ void MI_WorldPreviewDisplay::Update()
 					iMoveDirection = 2;
 					iMapOffsetX = PREVIEWTILESIZE;
 					--iMapDrawOffsetCol;
+					iMapGlobalOffsetX += PREVIEWTILESIZE;
 				}
 			}
 		}
 	}
 	else if(iMoveDirection == 1)
 	{
+		--iMapGlobalOffsetY;
 		if(++iMapOffsetY >= PREVIEWTILESIZE)
 		{
 			iMapOffsetY = 0;
@@ -3006,18 +3058,21 @@ void MI_WorldPreviewDisplay::Update()
 					iMoveDirection = 2;
 					iMapOffsetX = PREVIEWTILESIZE;
 					--iMapDrawOffsetCol;
+					iMapGlobalOffsetX += PREVIEWTILESIZE;
 				}
 				else
 				{
 					iMoveDirection = 3;
 					iMapOffsetY = PREVIEWTILESIZE;
 					--iMapDrawOffsetRow;
+					iMapGlobalOffsetY += PREVIEWTILESIZE;
 				}
 			}
 		}
 	}
-	else if(iMoveDirection == 2)
+	else if(iMoveDirection == 2)  //scroll left
 	{
+		++iMapGlobalOffsetX;
 		if(--iMapOffsetX <= 0)
 		{
 			fNeedMapSurfaceUpdate = true;
@@ -3032,11 +3087,14 @@ void MI_WorldPreviewDisplay::Update()
 					iMoveDirection = 3;
 					iMapOffsetY = PREVIEWTILESIZE;
 					--iMapDrawOffsetRow;
+					iMapGlobalOffsetY += PREVIEWTILESIZE;
+					iMapGlobalOffsetX -= PREVIEWTILESIZE;
 				}
 				else
 				{
 					iMoveDirection = 0;
 					iMapOffsetX = 0;
+					iMapGlobalOffsetX -= PREVIEWTILESIZE;
 				}
 			}
 			else
@@ -3045,8 +3103,9 @@ void MI_WorldPreviewDisplay::Update()
 			}
 		}
 	}
-	else if(iMoveDirection == 3)
+	else if(iMoveDirection == 3) //scroll up
 	{
+		++iMapGlobalOffsetY;
 		if(--iMapOffsetY <= 0)
 		{
 			fNeedMapSurfaceUpdate = true;
@@ -3061,11 +3120,13 @@ void MI_WorldPreviewDisplay::Update()
 				{
 					iMoveDirection = 0;
 					iMapOffsetX = 0;
+					iMapGlobalOffsetY -= PREVIEWTILESIZE;
 				}
 				else
 				{
 					iMoveDirection = 1;
 					iMapOffsetY = 0;
+					iMapGlobalOffsetY -= PREVIEWTILESIZE;
 				}
 			}
 			else
@@ -3088,9 +3149,6 @@ void MI_WorldPreviewDisplay::Draw()
 	rectSrcSurface.y = iMapOffsetY;
 	
 	SDL_BlitSurface(sMapSurface, &rectSrcSurface, blitdest, &rectDstSurface);
-
-	//TODO: Need a way to not draw vehicles that are not in preview
-	//g_worldmap.Draw(ix + iMapOffsetX, iy + iMapOffsetY, false, false);
 }
 
 void MI_WorldPreviewDisplay::SetWorld()
@@ -3110,7 +3168,12 @@ void MI_WorldPreviewDisplay::SetWorld()
 
 void MI_WorldPreviewDisplay::UpdateMapSurface(bool fFullRefresh)
 {
-	g_worldmap.DrawMapToSurface(-1, fFullRefresh, sMapSurface, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame); 
+	g_worldmap.DrawMapToSurface(-1, fFullRefresh, sMapSurface, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
+
+	SDL_Surface * olddest = blitdest;
+	blitdest = sMapSurface;
+	g_worldmap.Draw(iMapGlobalOffsetX, iMapGlobalOffsetY, false, false);
+	blitdest = olddest;
 }
 
 
@@ -5656,7 +5719,7 @@ void MI_World::AdvanceTurn()
 	{
 		if(--iSleepTurns <= 0)
 		{
-			backgroundmusic[5].load(worldmusiclist.GetMusic(g_worldmap.GetMusicCategory()));
+			backgroundmusic[5].load(worldmusiclist.GetMusic(g_worldmap.GetMusicCategory(), g_worldmap.GetWorldName()));
 			backgroundmusic[5].play(false, false);
 		}
 	}
@@ -6401,7 +6464,7 @@ bool MI_World::UsePowerup(short iTeam, short iIndex, bool fPopupIsUp)
 		fUsedItem = true;
 		ifsoundonplay(sfx_collectpowerup);
 
-		backgroundmusic[5].load(worldmusiclist.GetMusic(WORLDMUSICSLEEP));
+		backgroundmusic[5].load(worldmusiclist.GetMusic(WORLDMUSICSLEEP, ""));
 		backgroundmusic[5].play(false, false);
 	}
 	else if(iPowerup == NUM_POWERUPS + 1) //Cloud (allows player to skip stages)

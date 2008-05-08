@@ -58,16 +58,19 @@ SHIP BETA
 
 Feature Requests
 [X] In Multi Star, the text still says Shine Get, and the players with stars still turn gold. The text could be "Star Get" per the Japanese version of Galaxy or it could be something else; also, since the stars are color-coded, I don't think the gold tone is needed.
-
-[ ] In Yoshi's Eggs, could we have it so the options menu has two columns, one for eggs and one for Yoshis? Oh, and an option to have the egg timer pause while the egg is being held would be nice.
-
-[ ] In Greed Mode, it would be nice to have an option for how many coins fly out (Regular, Double, or Triple). Also, an option to make it impossible to pick up your own coins. Also also, have it so that if a player hits 0 coins but still has coins of their color in play, make it so they don't die until their coins disappear.
-
+[X] In Greed Mode, it would be nice to have an option for how many coins fly out (Regular, Double, or Triple). 
+[X] Also, an option to make it impossible to pick up your own coins. 
 [X] In Health Mode, there should be some sound played when you grab a heart. Perhaps the sound you hear when you get a mushroom in SMB2? (It should also pause the music when you get one, if we do that.) Also, how do the extra life shrooms work in this mode? Do they just recover X points of health?
+[X] Greed Mode's Unlimited option needs to be done differently. The way it stands now, eventually every coin will disappear and it won't be greed mode unlimited anymore, which ruins the whole point of...unlimited.  Maybe you could have all the counters set to zero and have them reflect how many coins players have lost? Like Classic's Unlimited.
+[X] New key for placeing for the frequenzy of certain hazards, because [/] arn'tfindable on a German keaboard for example. (the german keyboard adapts the amerikan one, i tested every butten but none of them applies to the american [/])
+[X] In the level editor, when you are looking at the tilesets, the background should be partially transparent like when you look at the animated tiles.
+[X] In the Item Switch screen, and on the Frenzy Card select screen, it would be nice to have some sort of arrowhead pointing to indicate that there are more items available by scrolling the list up or down.
 
-[ ] In Frenzy Mode it would be nice to have some presets like with the regular item switch.
+[X] Vertical rising flame hazard
+[X] Sideways Piranha Plants
+[X] Vehicles should be shown on world previews.
+[X] World Music exception option. Like how you can set specific songs for specific maps, but instead for specific worlds. 
 
-[ ] In the Item Switch screen, and on the Frenzy Card select screen, it would be nice to have some sort of arrowhead pointing to indicate that there are more items available by scrolling the list up or down.
 
 [ ] Ooh, here's another thing I just thought of. What about options for who gets to pick the next stage in Tournament mode?
 Any - All players have control.
@@ -79,25 +82,38 @@ Random - One person is picked at random to decide the next stage.
 Random Loser - One person who didn't win the last stage is picked at random to decide the next stage. First stage is regular Random.
 Cycle - P1 picks the first stage, P2 picks the second, and so on. 
 
+[ ] Universal Music exceptions folder. Instead of copying your favorite music exceptions from song pack to song pack whenever you change, there'd be a document that lists the worlds and levels that have specified music. Of course, there could still be pack-specific ones. :3
+
+[ ] Would it be too much trouble to have an option for setting whether an individual platform is below all, between, or above all? Right now it's always between (in front of players/L0/L1, below L2/L3). I could make some pretty neat effects if I could make some platforms go below/above all layers... 
+
+[ ] As for the Card Collection Mode, I think a card life option similar to the coin life option in Greed Mode would be a nice addition.
+
+[ ] Also, I found something strange about the Yoshi's Eggs Mode. Not sure if it's a bug or not, but when you set all the egg and Yoshi values to 0, you basically have a pointless match. Could we set it so that doing this results in a random setup of eggs and Yoshis? 
+[ ] Also, when you do this in Stomp Mode, you get just Red Parakoopas. The Frenzy Mode's reaction works just fine, since it spawns just the ? cards.
+
+[ ] In Stomp Mode, the Spinies don't flip over when you bump them from below. They just do the hop thing from SMB1.
+[ ] This last one's not really a bug, but I'm putting it here in case. The Goomba's Shoe doesn't protect from lava in SMB3. Actually, this leads to a small suggestion. We could probably use alternate death tiletypes. Along with the one we have now, we could throw in one that also kills through the Goomba's Shoe and another that doesn't destroy items. That way, map makers could have a choice in how their lava behaves, and we could have hazard tiles like Jelectros and Nipper floors that behave correctly.
+
+[ ] Wait, got another one. Flipping shelled enemies with a cape or tail shouldn't kill them instantly, it should render them upside-down shells.
+[ ] Also, bumping winged enemies from below doesn't do anything, where it should kill Paragoombas and flip over Parakoopas.
+[ ] Oh, and Buzzy Beetles could be killed in SMB3 with hammers... should we match that in SMW?
+
+
+
+[ ] In Yoshi's Eggs, could we have it so the options menu has two columns, one for eggs and one for Yoshis? Oh, and an option to have the egg timer pause while the egg is being held would be nice.
+
+[ ] Also also, have it so that if a player hits 0 coins but still has coins of their color in play, make it so they don't die until their coins disappear.
+
+[ ] In Frenzy Mode it would be nice to have some presets like with the regular item switch.
+
 [ ] I also think we should fix the explosions. The bob-omb explosion should resemble the SMB3 bob-omb explosion and the bomb powerup should break bricks when exploded.
 
-[X] Greed Mode's Unlimited option needs to be done differently. The way it stands now, eventually every coin will disappear and it won't be greed mode unlimited anymore, which ruins the whole point of...unlimited.  Maybe you could have all the counters set to zero and have them reflect how many coins players have lost? Like Classic's Unlimited.
 [ ] Since we have all these team-colored coins for Greed mode, could we have an option for higher-point coins in Coin mode? Red could be 2, Green 3, and Blue 5.
-
-[ ] vertical rising flame hazard would be nice =D, 2 votes for this
-[X] and perhaps a new button placeing for the frequenzy of certain hazards, because [/] arn'tfindable on a German keaboard for example. (the german keyboard adapts the amerikan one, i tested every butten but none of them applies to the american [/])
 
 [ ] I have a question. If the clear boxes in SMWorld is hit, does it turn into a normal block? Or does it become an empty clear box? In SMW it turns into a normal block and that looked funny to me. If it does not in World, I request that it should be corrected.
 
-[ ] Be able to have sideways Piranha Plants / Venus Fire Traps like in some of the levels in SMB3. 
-
-[ ] Universal Music exceptions folder. Instead of copying your favorite music exceptions from song pack to song pack whenever you change, there'd be a document that lists the worlds and levels that have specified music. Of course, there could still be pack-specific ones. :3
-
-[ ] World Music exception option. Like how you can set specific songs for specific maps, but instead for specific worlds. (Like if someone always wanted the SMW Overworld theme on a certain world but not change the music pack, for example.)
-
 [ ] Bullet Bill shooters and piranha plants should not be active while a player is sitting on or next to it.
 
-[ ] Would it be too much trouble to have an option for setting whether an individual platform is below all, between, or above all? Right now it's always between (in front of players/L0/L1, below L2/L3). I could make some pretty neat effects if I could make some platforms go below/above all layers... 
 [ ] Sometime in the unknown future I would like to see more types of bricks and [?] boxes. It is a tad weird when you are making a SMB1 themed map with SMB3 bricks or [?] boxes.
 
 [ ] Also, maybe some more animated tiles? It's kinda weird to see animated grass sitting right next to a Muncher Plant that just stares with its mouth open and kills you. Not everything, though, maybe just things that would look weird without animation (like Munchers, propellers, wheels, etc.).  And maybe for some of the other waterfalls (like maybe one of the lighter ones) and lava (upside-down lava and such).
@@ -112,11 +128,8 @@ Cycle - P1 picks the first stage, P2 picks the second, and so on.
 
 [ ] In King of the Hill mode, it's extremely, extremely rare that I ever see the multiplier unless I'm playing in a map where the computers are dumb and won't move. Maybe make it a mode option to be able to change the amount of time it takes to increase the multiplier?
 
-[ ] Vehicles should be shown on world previews.
-
 [ ] In level previews, eyecandy should show, and animated tiles and interactive blocks should animate.
-[ ] A sound should play when you collect a heart powerup.
-[ ] In the level editor, when you are looking at the tilesets, the background should be partially transparent like when you look at the animated tiles.
+
 [ ] Option to turn off items, and stomp enemies being killed by spikes.
 [ ] A scrolling effect like the one in the SMW 1.6 options menu could be used for the powerup selection menu.
 [ ] Options to choose how many fireballs, hammers, boomerangs, etc can be on screen at once.
@@ -129,7 +142,6 @@ Cycle - P1 picks the first stage, P2 picks the second, and so on.
 [ ] The shells, when flipped in SMB3 by tail, block from underneath or whatever, goes roughly twice the height the shells in SMW do when flipped the same way. Maybe increase their Y velocity when flipped?
 [ ] Not really a bug, but something that'll be annoying later on as users might complain of this: The tail/ cape attack sounds like it's in a cave on all maps
 
-[ ] There should be an option for Greed mode where you can disable the option of getting your coins back. It's a bit of a pain in the neck when the opponent grabs all his coins back.
 
 BOMB UPDATES
 1) Shorten the time a bit.
@@ -344,6 +356,7 @@ gfxSprite		menu_map_filter;
 gfxSprite		menu_match_select;
 gfxSprite		menu_dialog;
 gfxSprite		menu_slider_bar;
+gfxSprite		menu_verticalarrows;
 
 gfxSprite		menu_stomp;
 gfxSprite		menu_survival;
@@ -1252,6 +1265,8 @@ int main(int argc, char *argv[])
 	
 	//Greed
 	game_values.gamemodemenusettings.greed.coinlife = 124;			//Coins disappear after 2 seconds
+	game_values.gamemodemenusettings.greed.owncoins = true;			//Can collect own coins
+	game_values.gamemodemenusettings.greed.multiplier = 2;			//Single multiplier
 	
 	//Health
 	game_values.gamemodemenusettings.health.startlife = 6;			//Start with 3 whole hearts (each increment is a half heart)
@@ -3717,7 +3732,7 @@ void LoadMapHazards(bool fPreview)
 		}
 		else if(hazard->itype == 3)
 		{
-			objectcontainer[1].add(new IO_FlameCannon(hazard->ix << 4, hazard->iy << 4, hazard->iparam[0], hazard->iparam[1] == 1));
+			objectcontainer[1].add(new IO_FlameCannon(hazard->ix << 4, hazard->iy << 4, hazard->iparam[0], hazard->iparam[1]));
 		}
 		else if(hazard->itype >= 4 && hazard->itype <= 7)
 		{

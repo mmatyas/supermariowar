@@ -3166,7 +3166,8 @@ int editor_maphazards()
 
 							if(hazard->itype >= 3 && hazard->itype <= 7)
 							{
-								hazard->iparam[1] = 1 - hazard->iparam[1];
+								if(++hazard->iparam[1] > 3)
+									hazard->iparam[1] = 0;
 							}
 							else if(hazard->itype == 2)
 							{

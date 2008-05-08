@@ -304,7 +304,7 @@ std::string stripCreatorAndDotMap(const std::string &filename)
 		firstUnderscore++;						//we don't want the _
 
 	std::string withoutPrefix = filename.substr(firstUnderscore);	//substring without bla_ and .map (length-4)
-	withoutPrefix = withoutPrefix.substr(0, withoutPrefix.length()-4);		//i have no idea why this doesn't work if i do it like this: (leaves .map if the map starts with an underscore)
+	withoutPrefix = withoutPrefix.substr(0, withoutPrefix.length() - 4);		//i have no idea why this doesn't work if i do it like this: (leaves .map if the map starts with an underscore)
 	//																return filename.substr(firstUnderscore, filename.length()-4);
 
 	//Capitalize the first letter so the hash table sorting works correctly
@@ -312,6 +312,28 @@ std::string stripCreatorAndDotMap(const std::string &filename)
 		withoutPrefix[0] -= 32;
 
 	return withoutPrefix;
+}
+
+std::string stripPathAndExtension(const std::string &path)
+{
+	unsigned int chopHere = path.find("_");	//find first _
+	if(chopHere == std::string::npos)	//if not found, then find the beginning of the filename
+	{
+		chopHere = path.find_last_of(getDirectorySeperator());	//find last /
+		if(chopHere == std::string::npos)	//if not found start with first character
+			chopHere = 0;
+		else
+			chopHere++;						//we don't want the /
+	}
+	else
+	{
+		chopHere++;						//we don't want the _
+	}
+
+	std::string withoutPath = path.substr(chopHere);	//substring without bla_ and .map (length-4)
+	withoutPath = withoutPath.substr(0, withoutPath.length() - 4);
+
+	return withoutPath;
 }
 
 short iScoreboardPlayerOffsetsX[3][3] = {{40, 0, 0}, {19, 59, 0}, {6, 40, 74}};
@@ -689,6 +711,8 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 				ts->fUseSettings = true;
 				
 				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.greed.coinlife, NULL, game_values.gamemodemenusettings.greed.coinlife, false);
+				ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.greed.owncoins, 0, game_values.gamemodemenusettings.greed.owncoins);
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.greed.multiplier, NULL, game_values.gamemodemenusettings.greed.multiplier, false);
 			}
 			else if(ts->iMode == 18) //health
 			{
@@ -1193,6 +1217,18 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
 					sprintf(szTemp, ",%d", ts->gmsSettings.greed.coinlife);
 					strcat(buffer, szTemp);
 				}
+
+				if(ts->iNumUsedSettings > 1)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.greed.owncoins);
+					strcat(buffer, szTemp);
+				}
+
+				if(ts->iNumUsedSettings > 2)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.greed.multiplier);
+					strcat(buffer, szTemp);
+				}
 			}
 			else if(ts->iMode == 18) //health
 			{
@@ -1566,6 +1602,33 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
 	}
 }
 
+//[Direction][Frame]
+SDL_Rect g_rFlameRects[4][4] = { { {0, 0, 96, 32}, {0, 32, 96, 32}, {0, 64, 96, 32}, {0, 96, 96, 32} },
+	  						     { {96, 0, 96, 32}, {96, 32, 96, 32}, {96, 64, 96, 32}, {96, 96, 96, 32} },
+							     { {0, 128, 32, 96}, {32, 128, 32, 96}, {64, 128, 32, 96}, {96, 128, 32, 96} }, 
+							     { {128, 128, 32, 96}, {160, 128, 32, 96}, {192, 128, 32, 96}, {224, 128, 32, 96} } };
+
+//[Type][Direction][Frame]
+SDL_Rect g_rPirhanaRects[4][4][4] = { { { {0, 0, 32, 48}, {32, 0, 32, 48}, {64, 0, 32, 48}, {96, 0, 32, 48} },
+	  							 	    { {128, 0, 32, 48}, {160, 0, 32, 48}, {192, 0, 32, 48}, {224, 0, 32, 48} },
+									    { {304, 0, 48, 32}, {304, 32, 48, 32}, {304, 64, 48, 32}, {304, 96, 48, 32} }, 
+									    { {304, 128, 48, 32}, {304, 160, 48, 32}, {304, 192, 48, 32}, {304, 224, 48, 32} } },
+
+									  { { {0, 48, 32, 48}, {32, 48, 32, 48}, {64, 48, 32, 48}, {96, 48, 32, 48} },
+								 	    { {128, 48, 32, 48}, {160, 48, 32, 48}, {192, 48, 32, 48}, {224, 48, 32, 48} },
+									    { {256, 0, 48, 32}, {256, 32, 48, 32}, {256, 64, 48, 32}, {256, 96, 48, 32} }, 
+									    { {256, 128, 48, 32}, {256, 160, 48, 32}, {256, 192, 48, 32}, {256, 224, 48, 32} } },
+
+									  { { {0, 96, 32, 64}, {32, 96, 32, 64}, {0, 0, 0, 0}, {0, 0, 0, 0} },
+								 	    { {64, 96, 32, 64}, {96, 96, 32, 64}, {0, 0, 0, 0}, {0, 0, 0, 0} },
+									    { {192, 128, 64, 32}, {192, 160, 64, 32}, {0, 0, 0, 0}, {0, 0, 0, 0} }, 
+									    { {192, 192, 64, 32}, {192, 224, 64, 32}, {0, 0, 0, 0}, {0, 0, 0, 0} } },
+
+									  { { {0, 160, 32, 48}, {32, 160, 32, 48}, {0, 0, 0, 0}, {0, 0, 0, 0} },
+								 	    { {64, 160, 32, 48}, {96, 160, 32, 48}, {0, 0, 0, 0}, {0, 0, 0, 0} },
+									    { {144, 128, 48, 32}, {144, 160, 48, 32}, {0, 0, 0, 0}, {0, 0, 0, 0} }, 
+									    { {144, 192, 48, 32}, {144, 224, 48, 32}, {0, 0, 0, 0}, {0, 0, 0, 0} } } };
+
 
 short iFireballHazardSize[3] = {18, 9, 5};
 
@@ -1663,11 +1726,44 @@ void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
 	}
 	else if(hazard->itype == 3) //flame cannon
 	{
-		spr_hazard_flame[iSize].draw(rPathDst.x + (hazard->iparam[1] == 0 ? -(iTileSize << 1) : 0), rPathDst.y, hazard->iparam[1] == 0 ? iTileSize * 3 : 0, iTileSize << 1, iTileSize * 3, iTileSize);
+		SDL_Rect * rect = &g_rFlameRects[hazard->iparam[1]][2];
+
+		short iOffsetX = 0;
+		short iOffsetY = 0;
+
+		if(hazard->iparam[1] == 1)
+		{
+			iOffsetX = -(iTileSize << 1);
+		}
+		else if(hazard->iparam[1] == 2)
+		{
+			iOffsetY = -(iTileSize << 1);
+		}
+
+		spr_hazard_flame[iSize].draw(rPathDst.x + iOffsetX, rPathDst.y + iOffsetY, rect->x, rect->y, rect->w, rect->h);
 	}
 	else if(hazard->itype >= 4 && hazard->itype <= 7) //pirhana plants
 	{
-		spr_hazard_pirhanaplant[iSize].draw(rPathDst.x, rPathDst.y + (hazard->iparam[1] == 0 ? (hazard->itype == 6 ? -iTileSize : -(iTileSize >> 1)) : 0), hazard->iparam[1] == 0 ? 0 : (hazard->itype >= 6 ? iTileSize << 1: iTileSize << 2), iPirhanaPlantOffsetY[hazard->itype - 4][iSize], iTileSize, hazard->itype == 6 ? iTileSize << 1 : iPirhanaPlantOffsetY[1][iSize]);
+		SDL_Rect * rect = &g_rPirhanaRects[hazard->itype - 4][hazard->iparam[1]][0];
+		short iOffsetX = 0;
+		short iOffsetY = 0;
+
+		if(hazard->iparam[1] == 0)
+		{
+			if(hazard->itype == 6)
+				iOffsetY = -iTileSize;
+			else
+				iOffsetY = -(iTileSize >> 1);
+		}
+		else if(hazard->iparam[1] == 2)
+		{
+			if(hazard->itype == 6)
+				iOffsetX = -iTileSize;
+			else
+				iOffsetX = -(iTileSize >> 1);
+		}
+
+		spr_hazard_pirhanaplant[iSize].draw(rPathDst.x + iOffsetX, rPathDst.y + iOffsetY, rect->x, rect->y, rect->w, rect->h);
 	}
 }
 
@@ -1695,3 +1791,4 @@ short iCountDownTimes[28] = {3, 3, 3, 15, 3, 3, 3, 3, 3, 3, 15, 3, 3, 3, 3, 3, 3
 short iCountDownRectSize[28] = {3, 2, 1, 0, 1, 2, 3, 3, 2, 1, 0, 1, 2, 3, 3, 2, 1, 0, 1, 2, 3, 3, 2, 1, 0, 1, 2, 3};
 short iCountDownRectGroup[28] = {0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3};
 short iCountDownAnnounce[28] = {-1, -1, -1, 12, -1, -1, -1, -1, -1, -1, 13, -1, -1, -1, -1, -1, -1, 14, -1, -1, -1, -1, -1, -1, 15, -1, -1, -1};
+

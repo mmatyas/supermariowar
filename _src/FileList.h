@@ -219,13 +219,16 @@ class WorldMusicEntry
         WorldMusicEntry(const std::string & musicdirectory);
 		~WorldMusicEntry() {}
 
-        std::string GetMusic(unsigned int musicID);
+		std::string GetMusic(unsigned int musicID, const char * szWorldName);
 
         std::string songFileNames[MAXWORLDMUSICCATEGORY + 2];
         std::string name;
-		unsigned short iCurrentMusic;
+
+		std::map<std::string, std::string> worldoverride;
 
         bool fError;
+
+		bool fUsesWorldOverrides;
 };
 
 class WorldMusicList
@@ -234,7 +237,7 @@ class WorldMusicList
 		WorldMusicList();
 		~WorldMusicList();
 
-		std::string GetMusic(int musicID);
+		std::string GetMusic(int musicID, const char * szWorldName);
 		std::string GetCurrentMusic();
 
 		int GetCurrentIndex(){return currentIndex;}

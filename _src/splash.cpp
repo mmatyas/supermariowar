@@ -79,6 +79,8 @@ bool LoadMenuGraphics()
 	gfx_loadimage(&menu_map_filter, convertPath("gfx/packs/menu/menu_map_filter.png", graphicspack), false);
 	gfx_loadimage(&menu_match_select, convertPath("gfx/packs/menu/menu_match_select.png", graphicspack), false);
 
+	gfx_loadimage(&menu_verticalarrows, convertPath("gfx/packs/menu/menu_vertical_arrows.png", graphicspack), false);
+
 	gfx_loadimage(&menu_mode_small, convertPath("gfx/packs/menu/menu_mode_small.png", graphicspack), false);
 	gfx_loadimage(&menu_mode_large, convertPath("gfx/packs/menu/menu_mode_large.png", graphicspack), false);
 
@@ -105,7 +107,7 @@ bool LoadMenuGraphics()
 	gfx_loadimage(&spr_platformstarttile, convertPath("gfx/leveleditor/leveleditor_platformstarttile.png"), 64, true, true);
 	gfx_loadimage(&spr_platformendtile, convertPath("gfx/leveleditor/leveleditor_selectedtile.png"), 64, true, true);
 	gfx_loadimage(&spr_platformpath, convertPath("gfx/leveleditor/leveleditor_platform_path.png"), 128, true, true);
-	
+
 	return true;
 }
 
