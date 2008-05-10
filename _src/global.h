@@ -499,6 +499,7 @@ extern gfxSprite		spr_weaponbreakableblock;
 extern gfxSprite		spr_brokenyellowblock;
 extern gfxSprite		spr_brokenflipblock;
 extern gfxSprite		spr_brokenblueblock;
+extern gfxSprite		spr_brokengrayblock;
 
 extern gfxSprite		spr_brokeniceblock;
 extern gfxSprite		spr_iceblock;
@@ -751,6 +752,7 @@ struct CollectionGameModeSettings
 	short quantity;				//How many cards spawn
 	short rate;					//How fast they spawn
 	short banktime;				//Amount of time needed to bank cards to score
+	short cardlife;				//How long cards live after they are released from players
 };
 
 struct ChaseGameModeSettings
@@ -1025,6 +1027,21 @@ struct gv
 };
 
 extern gv game_values;
+
+struct MapMusicOverride
+{
+	std::string mapname;
+	std::vector<std::string> songs;
+};
+
+struct WorldMusicOverride
+{
+	std::string worldname;
+	std::string song;
+};
+
+extern std::vector<MapMusicOverride*> mapmusicoverrides;
+extern std::vector<WorldMusicOverride*> worldmusicoverrides;
 
 #endif
 

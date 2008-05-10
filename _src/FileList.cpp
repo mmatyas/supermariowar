@@ -232,7 +232,15 @@ void MusicList::prev()
 	else
 		currentIndex--;
 }
-		
+
+void MusicList::UpdateEntriesWithOverrides()
+{
+	for(unsigned short i = 0; i < entries.size(); i++)
+	{
+		entries[i]->UpdateWithOverrides();
+	}
+}
+
 
 ///////////// MusicEntry ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 MusicEntry::MusicEntry(const std::string & musicdirectory)
@@ -579,7 +587,28 @@ string MusicEntry::GetNextMusic(int iMusicCategory, const char * szMapName, cons
 	return songFileNames[4];
 }
 
+void MusicEntry::UpdateWithOverrides()
+{
+	short iNumFile = songFileNames.size();
 
+	if(mapmusicoverrides.size() > 0)
+		fUsesMapOverrides = true;
+
+	for(unsigned short i = 0; i < mapmusicoverrides.size(); i++)
+	{
+		MapMusicOverride * override = mapmusicoverrides[i];
+
+		if(mapoverride.find(override->mapname) == mapoverride.end())
+			mapoverride[override->mapname] = new MusicOverride();	
+
+		for(unsigned short j = 0; j < override->songs.size(); j++)
+		{
+			songFileNames.push_back(override->songs[j]);
+			mapoverride[override->mapname]->songs.push_back(iNumFile);
+			iNumFile++;
+		}
+	}
+}
 
 ///////////// MusicList ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 WorldMusicList::WorldMusicList()
@@ -639,6 +668,14 @@ void WorldMusicList::prev()
 		currentIndex = entries.size()-1;
 	else
 		currentIndex--;
+}
+
+void WorldMusicList::UpdateEntriesWithOverrides()
+{
+	for(unsigned short i = 0; i < entries.size(); i++)
+	{
+		entries[i]->UpdateWithOverrides();
+	}
 }
 		
 
@@ -781,3 +818,17 @@ string WorldMusicEntry::GetMusic(unsigned int musicID, const char * szWorldName)
 
     return songFileNames[musicID];
 }
+
+void WorldMusicEntry::UpdateWithOverrides()
+{
+	if(worldmusicoverrides.size() > 0)
+		fUsesWorldOverrides = true;
+
+	for(unsigned short i = 0; i < worldmusicoverrides.size(); i++)
+	{
+		WorldMusicOverride * override = worldmusicoverrides[i];
+		worldoverride[override->worldname] = override->song;	
+	}
+}
+
+

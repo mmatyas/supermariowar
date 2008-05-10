@@ -2620,7 +2620,7 @@ void Menu::CreateMenu()
 	// Card Collection Mode Settings
 	//***********************
 
-	miCollectionModeQuantityField = new MI_SelectField(&spr_selectfield, 120, 180, "Limit", 400, 180);
+	miCollectionModeQuantityField = new MI_SelectField(&spr_selectfield, 120, 160, "Limit", 400, 180);
 	miCollectionModeQuantityField->Add("1 Card", 1, "", false, false);
 	miCollectionModeQuantityField->Add("2 Cards", 2, "", false, false);
 	miCollectionModeQuantityField->Add("3 Cards", 3, "", false, false);
@@ -2634,7 +2634,7 @@ void Menu::CreateMenu()
 	miCollectionModeQuantityField->SetData(&game_values.gamemodemenusettings.collection.quantity, NULL, NULL);
 	miCollectionModeQuantityField->SetKey(game_values.gamemodemenusettings.collection.quantity);
 
-	miCollectionModeRateField = new MI_SelectField(&spr_selectfield, 120, 220, "Rate", 400, 180);
+	miCollectionModeRateField = new MI_SelectField(&spr_selectfield, 120, 200, "Rate", 400, 180);
 	miCollectionModeRateField->Add("Instant", 0, "", false, false);
 	miCollectionModeRateField->Add("1 Second", 62, "", false, false);
 	miCollectionModeRateField->Add("2 Seconds", 124, "", false, false);
@@ -2648,7 +2648,7 @@ void Menu::CreateMenu()
 	miCollectionModeRateField->SetData(&game_values.gamemodemenusettings.collection.rate, NULL, NULL);
 	miCollectionModeRateField->SetKey(game_values.gamemodemenusettings.collection.rate);
 
-	miCollectionModeBankTimeField = new MI_SelectField(&spr_selectfield, 120, 260, "Bank Time", 400, 180);
+	miCollectionModeBankTimeField = new MI_SelectField(&spr_selectfield, 120, 240, "Bank Time", 400, 180);
 	miCollectionModeBankTimeField->Add("Instant", 0, "", false, false, false);
 	miCollectionModeBankTimeField->Add("1 Second", 62, "", false, false, false);
 	miCollectionModeBankTimeField->Add("2 Seconds", 124, "", false, false);
@@ -2663,6 +2663,26 @@ void Menu::CreateMenu()
 	miCollectionModeBankTimeField->SetData(&game_values.gamemodemenusettings.collection.banktime, NULL, NULL);
 	miCollectionModeBankTimeField->SetKey(game_values.gamemodemenusettings.collection.banktime);
 
+	miCollectionModeCardLifeField = new MI_SelectField(&spr_selectfield, 120, 280, "Card Life", 400, 180);
+	miCollectionModeCardLifeField->Add("1 Second", 62, "", false, false, false);
+	miCollectionModeCardLifeField->Add("2 Seconds", 124, "", false, false, false);
+	miCollectionModeCardLifeField->Add("3 Seconds", 186, "", false, false);
+	miCollectionModeCardLifeField->Add("4 Seconds", 248, "", false, false);
+	miCollectionModeCardLifeField->Add("5 Seconds", 310, "", false, false);
+	miCollectionModeCardLifeField->Add("6 Seconds", 372, "", false, false);
+	miCollectionModeCardLifeField->Add("7 Seconds", 434, "", false, false);
+	miCollectionModeCardLifeField->Add("8 Seconds", 496, "", false, false);
+	miCollectionModeCardLifeField->Add("9 Seconds", 558, "", false, false);
+	miCollectionModeCardLifeField->Add("10 Seconds", 620, "", false, false);
+	miCollectionModeCardLifeField->Add("12 Seconds", 744, "", false, false);
+	miCollectionModeCardLifeField->Add("15 Seconds", 930, "", false, false);
+	miCollectionModeCardLifeField->Add("18 Seconds", 1116, "", false, false);
+	miCollectionModeCardLifeField->Add("20 Seconds", 1240, "", false, false);
+	miCollectionModeCardLifeField->Add("25 Seconds", 1550, "", false, false);
+	miCollectionModeCardLifeField->Add("30 Seconds", 1860, "", false, false);
+	miCollectionModeCardLifeField->SetData(&game_values.gamemodemenusettings.collection.cardlife, NULL, NULL);
+	miCollectionModeCardLifeField->SetKey(game_values.gamemodemenusettings.collection.cardlife);
+
 	miCollectionModeBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
 	miCollectionModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
@@ -2672,8 +2692,9 @@ void Menu::CreateMenu()
 
 	mModeSettingsMenu[19].AddControl(miCollectionModeQuantityField, miCollectionModeBackButton, miCollectionModeRateField, NULL, miCollectionModeBackButton);
 	mModeSettingsMenu[19].AddControl(miCollectionModeRateField, miCollectionModeQuantityField, miCollectionModeBankTimeField, NULL, miCollectionModeBackButton);
-	mModeSettingsMenu[19].AddControl(miCollectionModeBankTimeField, miCollectionModeRateField, miCollectionModeBackButton, NULL, miCollectionModeBackButton);
-	mModeSettingsMenu[19].AddControl(miCollectionModeBackButton, miCollectionModeBankTimeField, miCollectionModeQuantityField, miCollectionModeBankTimeField, NULL);
+	mModeSettingsMenu[19].AddControl(miCollectionModeBankTimeField, miCollectionModeRateField, miCollectionModeCardLifeField, NULL, miCollectionModeBackButton);
+	mModeSettingsMenu[19].AddControl(miCollectionModeCardLifeField, miCollectionModeBankTimeField, miCollectionModeBackButton, NULL, miCollectionModeBackButton);
+	mModeSettingsMenu[19].AddControl(miCollectionModeBackButton, miCollectionModeCardLifeField, miCollectionModeQuantityField, miCollectionModeCardLifeField, NULL);
 	
 	mModeSettingsMenu[19].AddNonControl(miCollectionModeLeftHeaderBar);
 	mModeSettingsMenu[19].AddNonControl(miCollectionModeRightHeaderBar);
@@ -4477,6 +4498,7 @@ void Menu::SetRandomGameModeSettings(short iMode)
 		game_values.gamemodesettings.collection.quantity = miCollectionModeQuantityField->GetRandomShortValue();
 		game_values.gamemodesettings.collection.rate = miCollectionModeRateField->GetRandomShortValue();
 		game_values.gamemodesettings.collection.banktime = miCollectionModeBankTimeField->GetRandomShortValue();
+		game_values.gamemodesettings.collection.cardlife = miCollectionModeCardLifeField->GetRandomShortValue();
 	}
 	else if(iMode == game_mode_chase) //chase (phanto)
 	{

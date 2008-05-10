@@ -161,6 +161,8 @@ class MusicEntry
         MusicEntry(const std::string & musicdirectory);
 		~MusicEntry() {}
 
+		void UpdateWithOverrides();
+
         std::string GetMusic(unsigned int musicID);
         std::string GetRandomMusic(int iCategoryID, const char * szMapName, const char * szBackground);
 		std::string GetNextMusic(int iCategoryID, const char * szMapName, const char * szBackground);
@@ -206,6 +208,7 @@ class MusicList
         void prev();
         void random(){currentIndex = rand()%entries.size();};
 
+		void UpdateEntriesWithOverrides();
 
     private:
         std::string CurrentMusic;
@@ -218,6 +221,8 @@ class WorldMusicEntry
     public:
         WorldMusicEntry(const std::string & musicdirectory);
 		~WorldMusicEntry() {}
+
+		void UpdateWithOverrides();
 
 		std::string GetMusic(unsigned int musicID, const char * szWorldName);
 
@@ -255,6 +260,8 @@ class WorldMusicList
 		void random() {currentIndex = rand()%entries.size();}
 
 		int GetCount() {return entries.size();}
+
+		void UpdateEntriesWithOverrides();
 
     private:
         std::string CurrentMusic;

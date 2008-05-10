@@ -317,33 +317,10 @@ void IO_Block::BounceMovingObject(IO_MovingObject * object)
 	if(type == movingobject_goomba || type == movingobject_koopa || type == movingobject_buzzybeetle || type == movingobject_spiny)
 	{
 		ifsoundonplay(sfx_kicksound);
-		killstyle style = kill_style_goomba;
 		
 		MO_WalkingEnemy * enemy = (MO_WalkingEnemy *)object;
-		style = enemy->getKillStyle();
+		killstyle style = enemy->getKillStyle();
 		enemy->DieAndDropShell();
-
-		/*
-		if(type == movingobject_goomba)
-		{
-			((MO_Goomba*)object)->Die();
-			style = kill_style_goomba;
-		}
-		else if(type == movingobject_koopa)
-		{
-			((MO_Koopa*)object)->Die();
-			style = kill_style_koopa;
-		}
-		else if(type == movingobject_buzzybeetle)
-		{
-			((MO_BuzzyBeetle*)object)->Die();
-			style = kill_style_buzzybeetle;
-		}
-		else if(type == movingobject_spiny)
-		{
-			((MO_Spiny*)object)->Die();
-			style = kill_style_buzzybeetle;
-		}*/
 
 		if(!game_values.gamemode->gameover && iBumpPlayerID >= 0)
 		{
@@ -2531,10 +2508,10 @@ void B_WeaponBreakableBlock::triggerBehavior(short iPlayerID, short iTeamID)
 {
 	if(state == 0)
 	{
-		eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix, iy, -2.2f, -10.0f, 4, 2, 0, 16, 16, 16));
-		eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix + 16, iy, 2.2f, -10.0f, 4, 2, 0, 16, 16, 16));
-		eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix, iy + 16, -2.2f, -5.5f, 4, 2, 0, 16, 16, 16));
-		eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix + 16, iy + 16, 2.2f, -5.5f, 4, 2, 0, 16, 16, 16));
+		eyecandyfront.add(new EC_FallingObject(&spr_brokengrayblock, ix, iy, -2.2f, -10.0f, 4, 2, 0, 0, 16, 16));
+		eyecandyfront.add(new EC_FallingObject(&spr_brokengrayblock, ix + 16, iy, 2.2f, -10.0f, 4, 2, 0, 0, 16, 16));
+		eyecandyfront.add(new EC_FallingObject(&spr_brokengrayblock, ix, iy + 16, -2.2f, -5.5f, 4, 2, 0, 0, 16, 16));
+		eyecandyfront.add(new EC_FallingObject(&spr_brokengrayblock, ix + 16, iy + 16, 2.2f, -5.5f, 4, 2, 0, 0, 16, 16));
 
 		state = 1;
 		ifsoundonplay(sfx_breakblock);
@@ -7242,7 +7219,7 @@ void MO_CollectionCard::update()
 		applyfriction();
 		IO_MovingObject::update();
 
-		if(--uncollectabletime < -300)
+		if(--uncollectabletime < -game_values.gamemodesettings.collection.cardlife)
 		{
 			eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix, iy, 3, 8));
 			dead = true;
@@ -7510,8 +7487,12 @@ void MO_WalkingEnemy::collide(IO_MovingObject * object)
 			}
 
 			ifsoundonplay(sfx_kicksound);
-			Die();
-		
+			
+			if(type == movingobject_attackzone)
+				DieAndDropShell();
+			else
+				Die();
+
 			if(type == movingobject_shell || type == movingobject_throwblock)
 			{
 				object->CheckAndDie();
@@ -7519,7 +7500,7 @@ void MO_WalkingEnemy::collide(IO_MovingObject * object)
 			else if(type == movingobject_bulletbill || type == movingobject_attackzone)
 			{
 				object->Die();
-			}
+			}			
 		}
 	}
 }
@@ -7691,6 +7672,7 @@ void MO_Koopa::DropShell()
 	
 	shell->state = 2;
 	shell->yi(iy + 8);
+	shell->vely = -VELJUMP / 2.0;
 
 	objectcontainer[1].add(shell);
 }
@@ -7748,6 +7730,7 @@ void MO_BuzzyBeetle::DropShell()
 	CO_Shell * shell = new CO_Shell(3, ix - 1, iy, false, true, false, false);
 	shell->state = 2;
 	shell->yi(iy);
+	shell->vely = -VELJUMP / 2.0;
 
 	objectcontainer[1].add(shell);
 }
@@ -7813,6 +7796,7 @@ void MO_Spiny::DropShell()
 	CO_Shell * shell = new CO_Shell(2, ix - 1, iy, false, true, false, false);
 	shell->state = 2;
 	shell->yi(iy);
+	shell->vely = -VELJUMP / 2.0;
 
 	objectcontainer[1].add(shell);
 }

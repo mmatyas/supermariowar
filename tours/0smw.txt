@@ -148,6 +148,8 @@
 
 #17 - Greed
 #Coin Life - time until coins disappear - number of frames until the bases relocate (example: 620 is about 10 seconds)
+#Own Coins - 0 = player cannot collect his own coins, 1 = he can
+#Multiplier = how many coins are released from players, 1 = 0.5x normal, 2 = normal amount, 4 = 2x, 6 = 3x, ect.
 
 #18 - Health
 #Start Life - Number of hearts each team starts with - number between 1 and 10
@@ -158,6 +160,7 @@
 #Limit - 1 to 5 = that number of cards, 6 on up = #players - 1 cards on up
 #Rate - 0 = instant, any number greater than 0 is the amount of time in frames that is between card spawns (example: 310 is about 5 seconds)
 #Bank Time - 0 = instant, any number greater than 0 is the amount of time in frames that is between card spawns (example: 310 is about 5 seconds)
+#Card Life - 0 = no cards released, any number greater than 0 is the amount of time in frames that a card lives for (example: 310 is about 5 seconds)
 
 #20 - Phanto Chase
 #Phanto Speed - Any positive number, the bigger the greater the speed (5 is normal, 2 is very slow and 7 is very fast for example)

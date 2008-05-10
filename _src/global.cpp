@@ -729,6 +729,7 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.collection.quantity, NULL, game_values.gamemodemenusettings.collection.quantity, false);
 				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.collection.rate, NULL, game_values.gamemodemenusettings.collection.rate, false);
 				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.collection.banktime, NULL, game_values.gamemodemenusettings.collection.banktime, false);
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.collection.cardlife, NULL, game_values.gamemodemenusettings.collection.cardlife, false);
 			}
 			else if(ts->iMode == 20) //chase (phanto)
 			{
@@ -1267,6 +1268,12 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
 				if(ts->iNumUsedSettings > 2)
 				{
 					sprintf(szTemp, ",%d", ts->gmsSettings.collection.banktime);
+					strcat(buffer, szTemp);
+				}
+
+				if(ts->iNumUsedSettings > 3)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.collection.cardlife);
 					strcat(buffer, szTemp);
 				}
 			}

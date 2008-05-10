@@ -137,6 +137,9 @@ short			list_players_cnt = 0;
 bool			g_fLoadMessages = true;
 short			g_iCurrentDrawIndex = 0;
 gfxSprite		menu_dialog;
+
+std::vector<MapMusicOverride*> mapmusicoverrides;
+std::vector<WorldMusicOverride*> worldmusicoverrides;
 ///////
 
 int save_as();

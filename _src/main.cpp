@@ -70,7 +70,13 @@ Feature Requests
 [X] Sideways Piranha Plants
 [X] Vehicles should be shown on world previews.
 [X] World Music exception option. Like how you can set specific songs for specific maps, but instead for specific worlds. 
+[X] In Yoshi's Eggs Mode when you set all the egg and Yoshi values to 0, you basically have a pointless match. -> Now we make sure we at least have a matching pair of yoshi and egg.
+[X] In stomp mode, if all settings are set to 0, you just get red koopas.  Fixed so it is random if all are 0.
 
+[X] Universal Music exceptions folder. Instead of copying your favorite music exceptions from song pack to song pack whenever you change, there'd be a document that lists the worlds and levels that have specified music.
+[X] As for the Card Collection Mode, I think a card life option similar to the coin life option in Greed Mode would be a nice addition.
+[X] Flipping shelled enemies with a cape or tail shouldn't kill them instantly, it should render them upside-down shells.
+[X] Weapon breakable blocks need to use their own broken chunks
 
 [ ] Ooh, here's another thing I just thought of. What about options for who gets to pick the next stage in Tournament mode?
 Any - All players have control.
@@ -82,22 +88,14 @@ Random - One person is picked at random to decide the next stage.
 Random Loser - One person who didn't win the last stage is picked at random to decide the next stage. First stage is regular Random.
 Cycle - P1 picks the first stage, P2 picks the second, and so on. 
 
-[ ] Universal Music exceptions folder. Instead of copying your favorite music exceptions from song pack to song pack whenever you change, there'd be a document that lists the worlds and levels that have specified music. Of course, there could still be pack-specific ones. :3
-
 [ ] Would it be too much trouble to have an option for setting whether an individual platform is below all, between, or above all? Right now it's always between (in front of players/L0/L1, below L2/L3). I could make some pretty neat effects if I could make some platforms go below/above all layers... 
+[ ] Better music, better mushroom gfx and better thunder.wav
+[ ] Player needs bounce when killing hazards with shoe or tanooki?
+[ ] Roulette wheel should be stopped by any key pressed by the player
 
-[ ] As for the Card Collection Mode, I think a card life option similar to the coin life option in Greed Mode would be a nice addition.
 
-[X] Also, I found something strange about the Yoshi's Eggs Mode. Not sure if it's a bug or not, but when you set all the egg and Yoshi values to 0, you basically have a pointless match. Could we set it so that doing this results in a random setup of eggs and Yoshis? 
-[X] Also, when you do this in Stomp Mode, you get just Red Parakoopas. The Frenzy Mode's reaction works just fine, since it spawns just the ? cards.
 
 [ ] The Kuribo's Shoe doesn't protect from lava in SMB3. Actually, this leads to a small suggestion. We could probably use alternate death tiletypes. Along with the one we have now, we could throw in one that also kills through the Goomba's Shoe and another that doesn't destroy items. That way, map makers could have a choice in how their lava behaves, and we could have hazard tiles like Jelectros and Nipper floors that behave correctly.
-
-[ ] Flipping shelled enemies with a cape or tail shouldn't kill them instantly, it should render them upside-down shells.
-[ ] Also, bumping winged enemies from below doesn't do anything, where it should kill Paragoombas and flip over Parakoopas.
-[ ] Oh, and Buzzy Beetles could be killed in SMB3 with hammers... should we match that in SMW?
-
-
 
 [ ] In Yoshi's Eggs, could we have it so the options menu has two columns, one for eggs and one for Yoshis? Oh, and an option to have the egg timer pause while the egg is being held would be nice.
 
@@ -410,6 +408,7 @@ gfxSprite		spr_weaponbreakableblock;
 gfxSprite		spr_brokenyellowblock;
 gfxSprite		spr_brokenflipblock;
 gfxSprite		spr_brokenblueblock;
+gfxSprite		spr_brokengrayblock;
 
 gfxSprite		spr_brokeniceblock;
 gfxSprite		spr_iceblock;
@@ -676,6 +675,9 @@ TourList tourlist;
 WorldList worldlist;
 WorldMap g_worldmap;
 
+std::vector<MapMusicOverride*> mapmusicoverrides;
+std::vector<WorldMusicOverride*> worldmusicoverrides;
+
 //Network stuff
 int g_iNextNetworkID = 0;
 int g_iNextMessageID = 0;
@@ -890,6 +892,9 @@ void PlayNextMusicTrack();
 bool IsExitAllowed();
 bool IsPauseAllowed();
 
+//Adds music overrides to the music lists
+void UpdateMusicWithOverrides();
+
 Menu g_Menu;
 gv game_values;
 //MenuContext menu_context;
@@ -1079,6 +1084,8 @@ int main(int argc, char *argv[])
 			g_iCurrentPowerupPresets[iPreset][iPowerup] = g_iDefaultPowerupPresets[iPreset][iPowerup];
 		}
 	}
+
+	UpdateMusicWithOverrides();
 
 	announcerlist.SetCurrent(0);
 	musiclist.SetCurrent(0);
@@ -1276,6 +1283,7 @@ int main(int argc, char *argv[])
 	game_values.gamemodemenusettings.collection.quantity = 6;		//#players - 1
 	game_values.gamemodemenusettings.collection.rate = 186;			//3 seconds to spawn
 	game_values.gamemodemenusettings.collection.banktime = 310;		//5 seconds to bank
+	game_values.gamemodemenusettings.collection.cardlife = 310;		//5 seconds to live
 	
 	//Phanto Chase
 	game_values.gamemodemenusettings.chase.phantospeed = 6;			//Medium speed
@@ -3867,4 +3875,105 @@ bool IsPauseAllowed()
 {
 	return !game_values.noexit;
 }
+
+void UpdateMusicWithOverrides()
+{
+	FILE * file = fopen(convertPath("music/Overrides.txt").c_str(), "r");
+
+	if(!file)
+		return;
+
+	short iAddToCategory = 0;
+	char szBuffer[256];
+	while(fgets(szBuffer, 1024, file))
+	{
+		//Ignore comment lines
+		if(szBuffer[0] == '#' || szBuffer[0] == '\n' || szBuffer[0] == '\r' || szBuffer[0] == ' ' || szBuffer[0] == '\t')
+			continue;
+
+		//Chop off line ending
+		int stringLength = strlen(szBuffer);
+		for(short k = 0; k < stringLength; k++)
+		{
+			if(szBuffer[k] == '\r' || szBuffer[k] == '\n')
+			{
+				szBuffer[k] = '\0';
+				break;
+			}
+		}
+
+		//If we found a category header
+		if(szBuffer[0] == '[')
+		{
+			if(!_stricmp(szBuffer, "[maps]"))
+				iAddToCategory = 1;
+			else if(!_stricmp(szBuffer, "[worlds]"))
+				iAddToCategory = 2;
+
+			continue;
+		}
+		
+		//If we're not in a category, ignore this line
+		if(iAddToCategory == 0)
+			continue;
+
+		char * pszName = strtok(szBuffer, ",\n");
+				
+		if(!pszName)
+			continue;
+
+		if(iAddToCategory == 1)
+		{
+			MapMusicOverride * override = new MapMusicOverride();
+
+			override->mapname = pszName;
+			
+			char * pszMusic = strtok(NULL, ",\n");
+			while(pszMusic)
+			{
+				std::string sPath = convertPath(pszMusic);
+
+				if(File_Exists(sPath.c_str()))
+				{
+					override->songs.push_back(sPath);
+				}
+
+				pszMusic = strtok(NULL, ",\n");
+			}
+
+			//Don't add overrides that have no songs
+			if(override->songs.size() == 0)
+			{
+				delete override;
+				continue;
+			}
+
+			mapmusicoverrides.push_back(override);
+		}
+		else if(iAddToCategory == 2)
+		{
+			WorldMusicOverride * override = new WorldMusicOverride();
+
+			override->worldname = pszName;
+			
+			char * pszMusic = strtok(NULL, ",\n");
+			if(pszMusic)
+			{
+				std::string sPath = convertPath(pszMusic);
+
+				if(File_Exists(sPath.c_str()))
+				{
+					override->song = sPath;
+					worldmusicoverrides.push_back(override);
+				}
+			}		
+		}
+	}
+
+	musiclist.UpdateEntriesWithOverrides();
+	worldmusiclist.UpdateEntriesWithOverrides();
+
+	fclose(file);
+}
+
 

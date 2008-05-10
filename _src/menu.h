@@ -559,6 +559,7 @@ class Menu
 		MI_SelectField * miCollectionModeQuantityField;
 		MI_SelectField * miCollectionModeRateField;
 		MI_SelectField * miCollectionModeBankTimeField;
+		MI_SelectField * miCollectionModeCardLifeField;
 		MI_Button * miCollectionModeBackButton;
 		
 		MI_Image * miCollectionModeLeftHeaderBar;

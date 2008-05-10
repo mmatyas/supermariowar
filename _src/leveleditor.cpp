@@ -216,6 +216,9 @@ void DECLSPEC musicfinished(){}
 sfxSound * g_PlayingSoundChannels[NUM_SOUND_CHANNELS];
 short			g_iCurrentDrawIndex = 0;
 gfxSprite		menu_dialog;
+
+std::vector<MapMusicOverride*> mapmusicoverrides;
+std::vector<WorldMusicOverride*> worldmusicoverrides;
 ///////
 
 gfxSprite spr_eyecandy;

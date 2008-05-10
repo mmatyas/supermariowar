@@ -33,9 +33,11 @@ bool File_Exists (const std::string fileName)
 /* Call this when your application launches */
 void Initialize_Paths()
 {
-	if(SMW_Root_Data_Dir[0] != 0){ 
+	if(SMW_Root_Data_Dir[0] != 0)
+	{ 
 		return; 
 	}
+
 #ifdef APPBUNDLE
     UInt8 temp[PATH_MAX];
     CFBundleRef mainBundle;
@@ -93,19 +95,18 @@ const string convertPath(const string& source)
 
     if (!are_paths_initialized) 
 	{
+		#ifdef PREFIXPATH
+			strcpy(SMW_Root_Data_Dir, PREFIXPATH);
+		#endif
 
-	#ifdef PREFIXPATH
-        strcpy(SMW_Root_Data_Dir, PREFIXPATH);
-	#endif
+		#ifdef __MACOSX__
+			Initialize_Paths();
+		#endif
 
-	#ifdef __MACOSX__
-        Initialize_Paths();
-	#endif
-
-	#ifndef _WIN32
-        strcat(SMW_Root_Data_Dir, "/");
-	#endif
-    
+		#ifndef _WIN32
+			strcat(SMW_Root_Data_Dir, "/");
+		#endif
+	    
 		are_paths_initialized = true;
     }
 
