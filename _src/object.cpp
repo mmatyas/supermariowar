@@ -1363,7 +1363,7 @@ void B_DonutBlock::triggerBehavior()
 	typedata[0][0].iFlags = tile_flag_solid;
 
 	MovingPlatformPath * path = new FallingPath((float)ix + 16.0f, (float)iy + 15.8f); 
-	MovingPlatform * platform = new MovingPlatform(tiledata, typedata, 1, 1, path, false);
+	MovingPlatform * platform = new MovingPlatform(tiledata, typedata, 1, 1, 2, path, false);
 
 	g_map.AddTemporaryPlatform(platform);
 
@@ -9585,17 +9585,20 @@ void MO_SpinAttack::collide(IO_MovingObject * object)
 		if(type == movingobject_shell)
 		{
 			((CO_Shell*)object)->Flip();
+			ifsoundonplay(sfx_kicksound);
+			Die();
 		}
 		else if(type == movingobject_throwblock)
 		{
 			CO_ThrowBlock * block = (CO_ThrowBlock*) object;
 
 			if(!block->owner || block->owner->globalID != iPlayerID)
+			{
 				block->Die();
+				ifsoundonplay(sfx_kicksound);
+				Die();
+			}
 		}
-
-		ifsoundonplay(sfx_kicksound);
-		Die();
 	}	
 }
 

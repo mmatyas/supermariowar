@@ -331,7 +331,7 @@ void FallingPath::Reset()
 // Moving Platform
 //------------------------------------------------------------------------------
 
-MovingPlatform::MovingPlatform(TilesetTile ** tiledata, MapTile ** tiletypes, short w, short h, MovingPlatformPath * path, bool fPreview)
+MovingPlatform::MovingPlatform(TilesetTile ** tiledata, MapTile ** tiletypes, short w, short h, short drawlayer, MovingPlatformPath * path, bool fPreview)
 {
 	fDead = false;
 
@@ -349,6 +349,8 @@ MovingPlatform::MovingPlatform(TilesetTile ** tiledata, MapTile ** tiletypes, sh
 
 	iTileWidth = w;
 	iTileHeight = h;
+
+	iDrawLayer = drawlayer;
 
 	iWidth = w * iTileSize;
 	iHeight = h * iTileSize;

@@ -92,6 +92,8 @@ Cycle - P1 picks the first stage, P2 picks the second, and so on.
 [ ] Better music, better mushroom gfx and better thunder.wav
 [ ] Player needs bounce when killing hazards with shoe or tanooki?
 [ ] Roulette wheel should be stopped by any key pressed by the player
+[X] If you have a cape, and you pick up a blue block(While spinning), the kick sound plays.
+[ ] bombs appear in front of layer 2 tiles(havn't tested layer 3 ones yet)
 
 
 
@@ -138,7 +140,7 @@ Cycle - P1 picks the first stage, P2 picks the second, and so on.
 [ ] Anyways I have a small bug... well I'm not sure if it's a bug, but on worlds with 2 draw-bridges and only one small path connected between them, and when you have the hourglass power-up in your reserves, you'll obviously be stuck if you activate it when you're in between them, so is there anyway you could make it so the hourglass is idiot-proof and doesn't allow you to use it when it figures out you'll be stuck if you activate it?
 [ ] The shells, when flipped in SMB3 by tail, block from underneath or whatever, goes roughly twice the height the shells in SMW do when flipped the same way. Maybe increase their Y velocity when flipped?
 [ ] Not really a bug, but something that'll be annoying later on as users might complain of this: The tail/ cape attack sounds like it's in a cave on all maps
-
+[ ] Anyways, we need the ability to have Donut Blocks fall at certain times. Blue ones are fast, brown ones or normal, and grey ones are slow. Plus ability for donut blocks to come back after they are destroyed and customizable time for it to be triggered.
 
 BOMB UPDATES
 1) Shorten the time a bit.
@@ -2845,12 +2847,16 @@ void RunGame()
 			spr_backmap[g_iCurrentDrawIndex].draw(0, 0);
 
 			//draw back eyecandy behind players
+			g_map.drawPlatforms(0);
+
 			noncolcontainer.draw();
 			eyecandyback.draw();
 
 			game_values.gamemode->draw_background();
 
 			objectcontainer[0].draw();
+
+			g_map.drawPlatforms(1);
 
 			if(!game_values.swapplayers)
 			{
@@ -2860,7 +2866,7 @@ void RunGame()
 
 			objectcontainer[1].draw();
 
-			g_map.drawPlatforms();
+			g_map.drawPlatforms(2);
 
 #ifdef _XBOX
 			g_map.drawfrontlayer();
@@ -2870,10 +2876,14 @@ void RunGame()
 #endif
 			g_map.drawWarpLocks();
 
+			g_map.drawPlatforms(3);
+
 			objectcontainer[2].draw();
 			eyecandyfront.draw();
 			game_values.gamemode->draw_foreground();
 		
+			g_map.drawPlatforms(4);
+
 			g_iWinningPlayer = -1;
 			short mostkills = 0;
 			

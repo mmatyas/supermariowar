@@ -4,7 +4,7 @@
 #include "gfx.h"
 extern bool g_fLoadMessages;
 
-short g_iVersion[] = {1, 8, 0, 0};
+short g_iVersion[] = {1, 8, 0, 1};
 
 //We're using these strings intead of the ugly ones returned by SDL_GetKeyName()
 char * Keynames[340] = {"Unknown", "", "", "", "", "", "", "", "Backspace", "Tab", 

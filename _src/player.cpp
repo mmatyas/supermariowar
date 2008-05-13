@@ -1316,7 +1316,7 @@ void CPlayer::move()
 									bomb->MoveToOwner();
 								}
 
-								objectcontainer[2].add(bomb);
+								objectcontainer[1].add(bomb);
 								projectiles[globalID]++;
 							
 								ifsoundonplay(sfx_fireball);

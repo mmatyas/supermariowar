@@ -123,6 +123,9 @@ void CMap::clearMap()
 
 void CMap::clearPlatforms()
 {
+	for(short iLayer = 0; iLayer < 5; iLayer++)
+		platformdrawlayer[iLayer].clear();
+	
 	if(platforms)
 	{
 		for(short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++)
@@ -132,9 +135,9 @@ void CMap::clearPlatforms()
 
 		delete [] platforms;
 		platforms = NULL;
-	
-		iNumPlatforms = 0;
 	}
+
+	iNumPlatforms = 0;
 
 	std::list<MovingPlatform*>::iterator iter = tempPlatforms.begin(), lim = tempPlatforms.end();
 	
@@ -1240,6 +1243,10 @@ void CMap::loadPlatforms(FILE * mapfile, bool fPreview, int version[4], short * 
 			}
 		}
 	
+		short iDrawLayer = 2;
+		if(version[0] > 1 || (version[0] == 1 && (version[1] > 8 || (version[1] == 8 && version[3] >= 1))))
+			iDrawLayer = ReadInt(mapfile);
+
 		short iPathType = 0;
 		
 		if(version[0] > 1 || (version[0] == 1 && version[1] >= 8))
@@ -1277,7 +1284,9 @@ void CMap::loadPlatforms(FILE * mapfile, bool fPreview, int version[4], short * 
 			path = new EllipsePath(fVelocity, fAngle, fRadiusX, fRadiusY, fCenterX, fCenterY, fPreview);
 		}
 
-		platforms[iPlatform] = new MovingPlatform(tiles, types, iWidth, iHeight, path, fPreview);
+		MovingPlatform * platform = new MovingPlatform(tiles, types, iWidth, iHeight, iDrawLayer, path, fPreview);
+		platforms[iPlatform] = platform;
+		platformdrawlayer[iDrawLayer].push_back(platform);
 	}
 }
 
@@ -1596,6 +1605,8 @@ void CMap::saveMap(const std::string& file)
 				WriteInt(platforms[iPlatform]->iTileType[iCol][iRow].iType, mapfile);
 			}
 		}
+
+		WriteInt(platforms[iPlatform]->iDrawLayer, mapfile);
 		
 		short iPathType = platforms[iPlatform]->pPath->iType;
 		WriteInt(iPathType, mapfile);
@@ -2033,6 +2044,7 @@ void CMap::saveThumbnail(const std::string &sFile, bool fUseClassicPack)
 	SDL_FreeSurface(sBackground);
 
 	preDrawPreviewBackground(sThumbnail, true);
+	preDrawPreviewBlocks(sThumbnail, true);
 	preDrawPreviewMapItems(sThumbnail, true);
 	drawThumbnailHazards(sThumbnail);
 	drawThumbnailPlatforms(sThumbnail);
@@ -2487,7 +2499,7 @@ void CMap::preDrawPreviewBackground(SDL_Surface * targetSurface, bool fThumbnail
 		SDL_Delay(10);
 	}
 
-	drawPreviewBlocks(targetSurface, fThumbnail);
+	//drawPreviewBlocks(targetSurface, fThumbnail);
 }
 
 void CMap::preDrawPreviewBackground(gfxSprite * spr_background, SDL_Surface * targetSurface, bool fThumbnail)
@@ -2523,6 +2535,19 @@ void CMap::preDrawPreviewBackground(gfxSprite * spr_background, SDL_Surface * ta
 	
 	preDrawPreviewBackground(targetSurface, fThumbnail);
 }
+
+void CMap::preDrawPreviewBlocks(SDL_Surface * targetSurface, bool fThumbnail)
+{
+	if(!fThumbnail)
+	{
+		SDL_FillRect(targetSurface, NULL, SDL_MapRGB(targetSurface->format, 255, 0, 255));
+		SDL_SetColorKey(targetSurface, SDL_SRCCOLORKEY, SDL_MapRGB(targetSurface->format, 255, 0, 255));
+		SDL_Delay(10);
+	}
+
+	drawPreviewBlocks(targetSurface, fThumbnail);
+}
+
 
 void CMap::preDrawPreviewForeground(SDL_Surface * targetSurface, bool fThumbnail)
 {
@@ -2881,26 +2906,35 @@ void CMap::updatePlatforms()
 	}*/
 }
 
-void CMap::drawPlatforms()
+void CMap::drawPlatforms(short iLayer)
 {
-	for(short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++)
+	std::list<MovingPlatform*>::iterator iterate = platformdrawlayer[iLayer].begin(), lim = platformdrawlayer[iLayer].end();
+
+	while (iterate != lim)
 	{
-		platforms[iPlatform]->draw();
+		(*iterate)->draw();
+		iterate++;
 	}
 
-	std::list<MovingPlatform*>::iterator iterateAll = tempPlatforms.begin(), lim = tempPlatforms.end();
-	while (iterateAll != lim)
+	if(iLayer == 2)
 	{
-		(*iterateAll)->draw();
-		iterateAll++;
+		std::list<MovingPlatform*>::iterator iterateTemps = tempPlatforms.begin(), limTemps = tempPlatforms.end();
+		while (iterateTemps != limTemps)
+		{
+			(*iterateTemps)->draw();
+			iterateTemps++;
+		}
 	}
 }
 
-void CMap::drawPlatforms(short iOffsetX, short iOffsetY)
+void CMap::drawPlatforms(short iOffsetX, short iOffsetY, short iLayer)
 {
-	for(short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++)
+	std::list<MovingPlatform*>::iterator iterate = platformdrawlayer[iLayer].begin(), lim = platformdrawlayer[iLayer].end();
+
+	while (iterate != lim)
 	{
-		platforms[iPlatform]->draw(iOffsetX, iOffsetY);
+		(*iterate)->draw(iOffsetX, iOffsetY);
+		iterate++;
 	}
 }
 
@@ -3140,6 +3174,12 @@ bool CMap::findspawnpoint(short iType, short * x, short * y, short width, short 
 	}
 
 	return true;
+}
+
+void CMap::AddPermanentPlatform(MovingPlatform * platform)
+{
+	platforms[iNumPlatforms++] = platform;
+	platformdrawlayer[platform->iDrawLayer].push_back(platform);
 }
 
 void CMap::AddTemporaryPlatform(MovingPlatform * platform)

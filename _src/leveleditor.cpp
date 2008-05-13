@@ -91,6 +91,8 @@ class MapPlatform
 		float fAngle;
 		float fRadiusX;
 		float fRadiusY;
+
+		short iDrawLayer;
 };
 
 SDL_Surface		*screen;
@@ -129,6 +131,7 @@ gfxSprite		spr_powerupselector;
 gfxSprite		spr_hidden_marker;
 
 gfxSprite		spr_flagbases, spr_racegoals;	
+gfxSprite		spr_number_icons;
 
 gfxSprite		spr_hazard_fireball[3];
 gfxSprite		spr_hazard_rotodisc[3];
@@ -236,7 +239,7 @@ int display_help();
 	void convertAll();
 #endif
 
-void drawmap(bool fScreenshot, short iBlockSize);
+void drawmap(bool fScreenshot, short iBlockSize, bool fWithPlatforms = false);
 void draw_platform(short iPlatform, bool fDrawTileTypes);
 void SetPlatformToDefaults(short iPlatform);
 
@@ -412,6 +415,8 @@ int main(int argc, char *argv[])
 	spr_hazard_pirhanaplant[1].init(convertPath("gfx/packs/Classic/hazards/pirhanaplant_preview.png"), 255, 0, 255);
 	spr_hazard_pirhanaplant[2].init(convertPath("gfx/packs/Classic/hazards/pirhanaplant_thumbnail.png"), 255, 0, 255);
 
+	spr_number_icons.init(convertPath("gfx/packs/Classic/awards/killsinrownumbers.png"), 255, 0, 255);
+
 	for(short i = 0; i < 3; i++)
 	{
 		spr_hazard_fireball[i].SetWrap(true, 640 >> i);
@@ -463,6 +468,7 @@ int main(int argc, char *argv[])
 		}
 
 		g_Platforms[iPlatform].iVelocity = 4;
+		g_Platforms[iPlatform].iDrawLayer = 2;  //Default to drawing in the middle layer
 	}
 
 	FILE * fp = OpenFile("leveleditor.bin", "rt");
@@ -1643,7 +1649,7 @@ void drawlayer(int layer, bool fUseCopied, short iBlockSize)
 	}
 }
 
-void drawmap(bool fScreenshot, short iBlockSize)
+void drawmap(bool fScreenshot, short iBlockSize, bool fWithPlatforms)
 {
 	if(iBlockSize != TILESIZE)
 	{
@@ -1669,6 +1675,9 @@ void drawmap(bool fScreenshot, short iBlockSize)
 	{
 		spr_background.draw(0,0);
 	}
+
+	if(fWithPlatforms)
+		g_map.drawPlatforms(0);
 
 	if((view_only_layer && selected_layer == 0) || !view_only_layer)
 		drawlayer(0, false, iBlockSize);
@@ -1750,6 +1759,9 @@ void drawmap(bool fScreenshot, short iBlockSize)
 		}
 	}
 	
+	if(fWithPlatforms)
+		g_map.drawPlatforms(1);
+
 	if(!view_only_layer || fScreenshot)
 	{
 		for(short j = 0; j < g_map.iNumMapItems; j++)
@@ -1778,6 +1790,9 @@ void drawmap(bool fScreenshot, short iBlockSize)
 		}
 	}
 
+	if(fWithPlatforms)
+		g_map.drawPlatforms(2);
+
 	if((view_only_layer && selected_layer == 2) || !view_only_layer)
 		drawlayer(2, false, iBlockSize);
 
@@ -1795,6 +1810,9 @@ void drawmap(bool fScreenshot, short iBlockSize)
 		if((view_only_layer && copiedlayer == 3) || !view_only_layer)
 			drawlayer(3, true, iBlockSize);
 	}
+
+	if(fWithPlatforms)
+		g_map.drawPlatforms(3);
 
 	if((viewwarps && !view_only_layer) || fScreenshot)
 	{
@@ -1824,6 +1842,9 @@ void drawmap(bool fScreenshot, short iBlockSize)
 			}
 		}
 	}
+
+	if(fWithPlatforms)
+		g_map.drawPlatforms(4);
 
 	/*
 	for(int k = 0; k < g_map.numwarpexits; k++)
@@ -2352,6 +2373,14 @@ int editor_platforms()
 							iPlatformEditState = PLATFORM_EDIT_STATE_TILETYPE;
 						}
 					}
+					else if(event.key.keysym.sym == SDLK_y) //Change the draw layer
+					{
+						if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
+						{
+							if(++g_Platforms[iEditPlatform].iDrawLayer > 4)
+								g_Platforms[iEditPlatform].iDrawLayer = 0;
+						}
+					}
 					else if(event.key.keysym.sym == SDLK_c)
 					{
 						if(PLATFORM_EDIT_STATE_SELECT == iPlatformEditState)
@@ -2388,6 +2417,8 @@ int editor_platforms()
 								g_Platforms[iPlatform].fAngle = g_Platforms[iPlatform + 1].fAngle;
 								g_Platforms[iPlatform].fRadiusX = g_Platforms[iPlatform + 1].fRadiusX;
 								g_Platforms[iPlatform].fRadiusY = g_Platforms[iPlatform + 1].fRadiusY;
+
+								g_Platforms[iPlatform].iDrawLayer = g_Platforms[iPlatform + 1].iDrawLayer;
 							}
 							
 							g_iNumPlatforms--;
@@ -2677,11 +2708,11 @@ int editor_platforms()
 			}
 		}
 
-		//Draw platform editing
-		drawmap(false, TILESIZE);
-
 		if(PLATFORM_EDIT_STATE_TEST != iPlatformEditState)
+		{
+			drawmap(false, TILESIZE);
 			menu_shade.draw(0, 0);
+		}
 
 		if(PLATFORM_EDIT_STATE_SELECT == iPlatformEditState)
 		{
@@ -2719,7 +2750,9 @@ int editor_platforms()
 		}				
 		else if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
 		{
-			menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "Edit Platform: [esc] Exit  [t] Tiles  [l] Types [del] Delete  [p] Path  [+/-] Velocity");
+			menu_font_small.draw(0, 480 - menu_font_small.getHeight() * 3, "Edit Platform");
+			menu_font_small.draw(0, 480 - menu_font_small.getHeight() * 2, "[esc] Exit  [t] Tiles  [l] Types [del] Delete  [p] Path");
+			menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "[+/-] Velocity  [y] Draw Layer");
 			draw_platform(iEditPlatform, PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState);
 
 			if(g_Platforms[iEditPlatform].iPathType == 2)
@@ -2748,6 +2781,9 @@ int editor_platforms()
 				menu_font_small.drawRightJustified(234, 10, "Slow");
 				menu_font_small.draw(406, 10, "Fast");
 			}
+
+			spr_number_icons.draw(619, 5, g_Platforms[iEditPlatform].iDrawLayer << 4, 48, 16, 16);
+
 		}
 		else if(PLATFORM_EDIT_STATE_PATH == iPlatformEditState)
 		{
@@ -2756,7 +2792,8 @@ int editor_platforms()
 				MapPlatform * platform = &g_Platforms[iEditPlatform];
 				DrawPlatform(platform->iPathType, g_map.platforms[iEditPlatform]->iTileData, platform->iStartX, platform->iStartY, platform->iEndX, platform->iEndY, platform->fAngle, platform->fRadiusX, platform->fRadiusY, 0, iPlatformWidth, iPlatformHeight, false, true);
 
-				menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "Edit Path: [esc] Exit  [LMB] Set Start Point  [RMB] Set End Point [t] Change Path Type");
+				menu_font_small.draw(0, 480 - (menu_font_small.getHeight() << 1), "Edit Path");
+				menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "[esc] Exit  [LMB] Set Start Point  [RMB] Set End Point [t] Change Path Type");
 			}
 			else if (g_Platforms[iEditPlatform].iPathType == 1) //continuous path
 			{
@@ -2779,10 +2816,13 @@ int editor_platforms()
 		}
 		else if(PLATFORM_EDIT_STATE_TEST == iPlatformEditState)
 		{
+			g_map.updatePlatforms();
+			
+			//Platforms are drawn inside drawmap(...)
+			drawmap(false, TILESIZE, true);
+
 			menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "Check Paths: [esc] Exit");
 			
-			g_map.updatePlatforms();
-			g_map.drawPlatforms();
 		}
 
 		SDL_Flip(screen);
@@ -5112,6 +5152,9 @@ void loadcurrentmap()
 			}
 		}
 
+		short iDrawLayer = g_map.platforms[iPlatform]->iDrawLayer; 
+		g_Platforms[iPlatform].iDrawLayer = iDrawLayer;
+
 		short iPathType = g_map.platforms[iPlatform]->pPath->GetType();
 		g_Platforms[iPlatform].iPathType = iPathType;
 		
@@ -5166,6 +5209,8 @@ void SetPlatformToDefaults(short iPlatform)
 	g_Platforms[iPlatform].fAngle = 0.0f;
 	g_Platforms[iPlatform].fRadiusX = 128.0f;
 	g_Platforms[iPlatform].fRadiusY = 128.0f;
+
+	g_Platforms[iPlatform].iDrawLayer = 2;
 }
 
 int savecurrentmap()
@@ -5179,7 +5224,7 @@ void insert_platforms_into_map()
 	//First take the created platforms and move them into the actual map
 	g_map.clearPlatforms();
 
-	g_map.iNumPlatforms = g_iNumPlatforms;
+	//g_map.iNumPlatforms = g_iNumPlatforms;
 	g_map.platforms = new MovingPlatform*[g_iNumPlatforms];
 
 	for(short iPlatform = 0; iPlatform < g_iNumPlatforms; iPlatform++)
@@ -5201,6 +5246,8 @@ void insert_platforms_into_map()
 				types[iCol][iRow].iType = g_Platforms[iPlatform].types[iCol + iLeft][iRow + iTop];
 			}
 		}
+
+		short iDrawLayer = g_Platforms[iPlatform].iDrawLayer;
 	
 		float fStartX = (float)(g_Platforms[iPlatform].iStartX);
 		float fStartY = (float)(g_Platforms[iPlatform].iStartY);
@@ -5226,7 +5273,7 @@ void insert_platforms_into_map()
 			path = new EllipsePath(fVelocity, g_Platforms[iPlatform].fAngle, g_Platforms[iPlatform].fRadiusX, g_Platforms[iPlatform].fRadiusY, fStartX, fStartY, false);
 		}
 
-		g_map.platforms[iPlatform] = new MovingPlatform(tiles, types, iWidth, iHeight, path, false);
+		g_map.AddPermanentPlatform(new MovingPlatform(tiles, types, iWidth, iHeight, iDrawLayer, path, false));
 	}
 }
 

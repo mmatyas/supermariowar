@@ -151,6 +151,7 @@ class CMap
 		
 		void preDrawPreviewBackground(SDL_Surface * targetSurface, bool fThumbnail);
 		void preDrawPreviewBackground(gfxSprite * spr_background, SDL_Surface * targetSurface, bool fThumbnail);
+		void preDrawPreviewBlocks(SDL_Surface * targetSurface, bool fThumbnail);
 		void preDrawPreviewForeground(SDL_Surface * targetSurface, bool fThumbnail);
 		void preDrawPreviewWarps(SDL_Surface * targetSurface, bool fThumbnail);
 		void preDrawPreviewMapItems(SDL_Surface * targetSurface, bool fThumbnail);
@@ -189,8 +190,8 @@ class CMap
 		}
 
 		void updatePlatforms();
-		void drawPlatforms();
-		void drawPlatforms(short iOffsetX, short iOffsetY);
+		void drawPlatforms(short iLayer);
+		void drawPlatforms(short iOffsetX, short iOffsetY, short iLayer);
 		void resetPlatforms();
 
 		void movingPlatformCollision(CPlayer * player);
@@ -206,8 +207,9 @@ class CMap
 
 		void update();
 
+		void AddPermanentPlatform(MovingPlatform * platform);
 		void AddTemporaryPlatform(MovingPlatform * platform);
-
+		
 		bool findspawnpoint(short iType, short * x, short * y, short width, short height, bool tilealigned);
 		bool IsInPlatformNoSpawnZone(short x, short y, short width, short height);
 
@@ -282,6 +284,8 @@ class CMap
 		short iAnimatedTileCount;
 		short iAnimatedVectorIndices[NUM_FRAMES_BETWEEN_TILE_ANIMATION + 1];
 
+		std::list<MovingPlatform*> platformdrawlayer[5];
+
 		void AnimateTiles(short iFrame);
 		void ClearAnimatedTiles();
 
@@ -291,7 +295,7 @@ class CMap
 		void drawPreview(SDL_Surface * targetsurf, int layer, bool fThumbnail);
 		void drawPreviewBlocks(SDL_Surface * targetSurface, bool fThumbnail);
 
-		friend void drawmap(bool fScreenshot, short iBlockSize);
+		friend void drawmap(bool fScreenshot, short iBlockSize, bool fWithPlatforms);
 		friend void drawlayer(int layer, bool fUseCopied, short iBlocksize);
 		friend void takescreenshot();
 
@@ -336,6 +340,7 @@ class CMap
 
 		friend class MovingPlatform;
 		friend class MapList;
+		friend class MI_MapField;
 		friend class CPlayer;
 
 		friend class MO_FlagBase;

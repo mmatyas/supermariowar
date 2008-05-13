@@ -119,7 +119,7 @@ class FallingPath : public MovingPlatformPath
 class MovingPlatform
 {
 	public:
-		MovingPlatform(TilesetTile ** tiledata, MapTile ** tiletypes, short w, short h, MovingPlatformPath * path, bool preview);
+		MovingPlatform(TilesetTile ** tiledata, MapTile ** tiletypes, short w, short h, short drawlayer, MovingPlatformPath * path, bool preview);
 		~MovingPlatform();
 
 		void draw();
@@ -172,6 +172,8 @@ class MovingPlatform
 
 		bool fForwardDirection;
 		bool fStartDirection;
+
+		short iDrawLayer;
 
 		MovingPlatformPath * pPath;
 

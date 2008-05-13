@@ -660,6 +660,7 @@ class MI_MapField : public UI_Control
 		gfxSprite * spr;
 		
 		SDL_Surface * surfaceMapBackground;
+		SDL_Surface * surfaceMapBlockLayer;
 		SDL_Surface * surfaceMapForeground;
 		SDL_Rect rectDst;
 

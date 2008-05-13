@@ -2593,6 +2593,7 @@ MI_MapField::MI_MapField(gfxSprite * nspr, short x, short y, char * name, short 
 	miModifyImageRight->Show(false);
 
 	surfaceMapBackground = SDL_CreateRGBSurface(0, 320, 240, 16, 0, 0, 0, 0);
+	surfaceMapBlockLayer = SDL_CreateRGBSurface(0, 320, 240, 16, 0, 0, 0, 0);
 	surfaceMapForeground = SDL_CreateRGBSurface(0, 320, 240, 16, 0, 0, 0, 0);
 	LoadCurrentMap();
 	
@@ -2841,7 +2842,13 @@ void MI_MapField::Draw()
 	menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 24, szMapName);
 
 	SDL_BlitSurface(surfaceMapBackground, NULL, blitdest, &rectDst);
-	
+
+	g_map.drawPlatforms(rectDst.x, rectDst.y, 0);
+
+	SDL_BlitSurface(surfaceMapBlockLayer, NULL, blitdest, &rectDst);
+
+	g_map.drawPlatforms(rectDst.x, rectDst.y, 1);
+
 	//Draw map hazards
 	for(short i = 0; i < objectcontainer[1].list_end; i++)
 	{
@@ -2875,11 +2882,14 @@ void MI_MapField::Draw()
 		}
 	}
 
-	g_map.drawPlatforms(rectDst.x, rectDst.y);
+	g_map.drawPlatforms(rectDst.x, rectDst.y, 2);
 
 	if(game_values.toplayer)
 		SDL_BlitSurface(surfaceMapForeground, NULL, blitdest, &rectDst);
 	
+	g_map.drawPlatforms(rectDst.x, rectDst.y, 3);
+	g_map.drawPlatforms(rectDst.x, rectDst.y, 4);
+
 	miModifyImageLeft->Draw();
 	miModifyImageRight->Draw();
 
@@ -2904,6 +2914,8 @@ void MI_MapField::LoadMap(const char * szMapPath)
 	SDL_Delay(10);  //Sleeps to help the music from skipping
 
 	g_map.preDrawPreviewBackground(&spr_background, surfaceMapBackground, false);
+	SDL_Delay(10);  //Sleeps to help the music from skipping
+	g_map.preDrawPreviewBlocks(surfaceMapBlockLayer, false);
 	SDL_Delay(10);  //Sleeps to help the music from skipping
 	g_map.preDrawPreviewMapItems(surfaceMapBackground, false);
 	SDL_Delay(10);  //Sleeps to help the music from skipping
