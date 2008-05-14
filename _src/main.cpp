@@ -78,6 +78,10 @@ Feature Requests
 [X] Flipping shelled enemies with a cape or tail shouldn't kill them instantly, it should render them upside-down shells.
 [X] Weapon breakable blocks need to use their own broken chunks
 
+[X] If you have a cape, and you pick up a blue block(While spinning), the kick sound plays.
+[X] bombs appear in front of layer 2 tiles(havn't tested layer 3 ones yet)
+[X] Updated platforms to be able to be drawn in 1 of 5 platform layers
+
 [ ] Ooh, here's another thing I just thought of. What about options for who gets to pick the next stage in Tournament mode?
 Any - All players have control.
 Winner - The winner of one stage picks the next. First stage is the same as All.
@@ -88,14 +92,24 @@ Random - One person is picked at random to decide the next stage.
 Random Loser - One person who didn't win the last stage is picked at random to decide the next stage. First stage is regular Random.
 Cycle - P1 picks the first stage, P2 picks the second, and so on. 
 
-[ ] Would it be too much trouble to have an option for setting whether an individual platform is below all, between, or above all? Right now it's always between (in front of players/L0/L1, below L2/L3). I could make some pretty neat effects if I could make some platforms go below/above all layers... 
-[ ] Better music, better mushroom gfx and better thunder.wav
+Need to handle mode setting menus, filters and thumbs menus for only one team control
+
+[X] Better music, better mushroom gfx and better thunder.wav
+[ ] Pow-blocks do not kill piranha plants
+
+[ ] Another death tile type the strong death tile (lava) as opposed to the weak death tile (spikes).  Everything dies on the strong death tile, where as only players die on the weak tiles (and go shielded on those types of modes as opposed to respawn for strong)
+
+[ ] BOMB UPDATES
+1) Shorten the time a bit.
+2) Allow two on-screen at once.
+3) Add a 1.5 second delay between pulling out one bomb and another.
+4) If you try to pull out a third bomb, the first one explodes. (This is what the delay is for. Having it any shorter would allow you to sort of "chain" explosions pretty much all over.)
+5) Make the Rock Blocks from SMB2 destroyable with bombs, if Two52 doesn't mind having another interactive block. But in the games, explosions don't damage regular bricks or flip blocks, so I don't think they should here.
+
+
 [ ] Player needs bounce when killing hazards with shoe or tanooki?
+
 [ ] Roulette wheel should be stopped by any key pressed by the player
-[X] If you have a cape, and you pick up a blue block(While spinning), the kick sound plays.
-[ ] bombs appear in front of layer 2 tiles(havn't tested layer 3 ones yet)
-
-
 
 [ ] The Kuribo's Shoe doesn't protect from lava in SMB3. Actually, this leads to a small suggestion. We could probably use alternate death tiletypes. Along with the one we have now, we could throw in one that also kills through the Goomba's Shoe and another that doesn't destroy items. That way, map makers could have a choice in how their lava behaves, and we could have hazard tiles like Jelectros and Nipper floors that behave correctly.
 
@@ -141,13 +155,6 @@ Cycle - P1 picks the first stage, P2 picks the second, and so on.
 [ ] The shells, when flipped in SMB3 by tail, block from underneath or whatever, goes roughly twice the height the shells in SMW do when flipped the same way. Maybe increase their Y velocity when flipped?
 [ ] Not really a bug, but something that'll be annoying later on as users might complain of this: The tail/ cape attack sounds like it's in a cave on all maps
 [ ] Anyways, we need the ability to have Donut Blocks fall at certain times. Blue ones are fast, brown ones or normal, and grey ones are slow. Plus ability for donut blocks to come back after they are destroyed and customizable time for it to be triggered.
-
-BOMB UPDATES
-1) Shorten the time a bit.
-2) Allow two on-screen at once.
-3) Add a 1.5 second delay between pulling out one bomb and another.
-4) If you try to pull out a third bomb, the first one explodes. (This is what the delay is for. Having it any shorter would allow you to sort of "chain" explosions pretty much all over.)
-5) Make the Rock Blocks from SMB2 destroyable with bombs, if Two52 doesn't mind having another interactive block. But in the games, explosions don't damage regular bricks or flip blocks, so I don't think they should here.
 
 
 BUGS:
@@ -234,7 +241,6 @@ BUGS:
 
 [ ] I wanted to stomp a bot,which stood on a continious upmoving, solid-on top platform, which was set on the highes velocity. Instead of stomping the bot, my character kind of "froze" in the jumping frame and hovered exactly over the bot's head. After the upmoving platform transported me out of the screen, i did not fall down, but i could move left and right. after i have left the area of the upmoving platform, i finally fell down.
 
-[ ] Pow-blocks do not kill piranha plants
 
 WAITING RESPONSE
 [ ] I can't tell if this is a bug or not but the key power-up for Jail pops up in other modes. All I remember was Greed, Phanto, and Classic.   but possibly others -> adjusted parens but I don't think this was possible before from other modes without the game type being wrong

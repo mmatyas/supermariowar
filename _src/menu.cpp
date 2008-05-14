@@ -3003,6 +3003,9 @@ void Menu::RunMenu()
 		miTournamentScoreboard->StopSwirl();
 		if(game_values.gamemode->winningteam > -1)
 			miTournamentScoreboard->RefreshTournamentScores(game_values.gamemode->winningteam);
+
+		//Set the next controlling team
+		game_values.tournamentcontrolteam = game_values.gamemode->winningteam;
 	}
 
 	//Reset game mode back to the current game mode in case we came from boss mode
@@ -3258,6 +3261,10 @@ void Menu::RunMenu()
 				else
 					game_values.matchtype = miMatchSelectionField->GetShortValue();
 
+				//The first game of the tournament is always controlled by all players
+				if(game_values.matchtype == MATCH_TYPE_TOURNAMENT)
+					game_values.tournamentcontrolteam = -1;
+
 				miTeamSelect->Reset();
 				mCurrentMenu = &mTeamSelectMenu;
 				mCurrentMenu->ResetMenu();
@@ -3460,6 +3467,9 @@ void Menu::RunMenu()
 
 							miModeSettingsButton->Show(fShowSettingsButton[miModeField->GetShortValue()]);
 							
+							if(MATCH_TYPE_TOURNAMENT == game_values.matchtype)
+								mGameSettingsMenu.SetControllingTeam(game_values.tournamentcontrolteam);
+
 							mCurrentMenu = &mGameSettingsMenu;
 							mCurrentMenu->ResetMenu();
 						}
@@ -3539,13 +3549,31 @@ void Menu::RunMenu()
 					else  //Next Tour/Tourament Game
 					{
 						if(game_values.matchtype == MATCH_TYPE_TOUR)
+						{
 							mCurrentMenu = &mTourStopMenu;
+						}
 						else
+						{
 							mCurrentMenu = &mGameSettingsMenu;
+						}
 					}
 				}
 
 				mCurrentMenu->ResetMenu();
+
+				if(MATCH_TYPE_TOURNAMENT == game_values.matchtype && game_values.tournamentwinner == -1)
+				{
+					mCurrentMenu->SetControllingTeam(game_values.tournamentcontrolteam);
+
+					//Display the team that is in control of selecting the next game
+					char szMessage[128];
+					if(game_values.teamcounts[game_values.tournamentcontrolteam] <= 1)
+						sprintf(szMessage, "Player %d Is In Control", game_values.teamids[game_values.tournamentcontrolteam][0] + 1);
+					else
+						sprintf(szMessage, "Team %d Is In Control", game_values.tournamentcontrolteam + 1);
+
+					mCurrentMenu->AddEyeCandy(new EC_Announcement(&menu_font_large, &spr_announcementicons, szMessage, game_values.colorids[game_values.teamids[game_values.tournamentcontrolteam][0]], 120, 100));
+				}
 
 				if(fNeedTeamAnnouncement)
 					miWorld->DisplayTeamControlAnnouncement();

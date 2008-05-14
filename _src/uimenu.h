@@ -124,6 +124,8 @@ class UI_Menu
 
 		UI_Control * GetCurrentControl() {return current;}
 
+		void SetControllingTeam(short teamid) {iControllingTeam = teamid;}
+
 	protected:
 
 		MenuCodeEnum MoveNextControl(MenuCodeEnum iDirection);
@@ -139,6 +141,8 @@ class UI_Menu
 		UI_Control * headControl;
 
 		CEyecandyContainer eyeCandy;
+
+		short iControllingTeam;
 };
 
 #endif //__UIMENU_H_

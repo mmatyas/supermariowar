@@ -1,11 +1,15 @@
 #include "global.h"
 
+extern short LookupTeamID(short id);
+
 UI_Menu::UI_Menu()
 {
 	cancelCode = MENU_CODE_NONE;
 	fModifyingItem = false;
 	headControl = NULL;
 	current = NULL;
+	
+	iControllingTeam = -1;
 }
 
 UI_Menu::~UI_Menu()
@@ -108,9 +112,17 @@ MenuCodeEnum UI_Menu::SendInput(CPlayerInput * playerInput)
 
 	for(short iPlayer = 0; iPlayer < 4; iPlayer++)
 	{
-		//Only let player 1 on the keyboard control the menu
-		if(iPlayer != 0 && game_values.playerInput.inputControls[iPlayer]->iDevice == DEVICE_KEYBOARD)
+		//Only allow the controlling team to control the menu (if there is one)
+		if(iControllingTeam != -1)
+		{
+			if(iControllingTeam != LookupTeamID(iPlayer))
+				continue;
+		}
+		//Only let player 1 on the keyboard control the menu unless there is another controlling team
+		else if(iPlayer != 0 && game_values.playerInput.inputControls[iPlayer]->iDevice == DEVICE_KEYBOARD)
+		{
 			continue;
+		}
 
 		if(playerInput->outputControls[iPlayer].menu_up.fPressed)
 		{

@@ -871,6 +871,8 @@ struct gv
 
 	short		tournamentgames;
 	short		tournamentwinner;
+
+	short		tournamentcontrolteam;
 	
 	short		selectedminigame;
 
