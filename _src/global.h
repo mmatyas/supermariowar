@@ -867,12 +867,14 @@ struct gv
 	bool		showscoreboard;
 	float		scorepercentmove;
 
-	short		matchtype;
+	short		matchtype;	//The currently selected match type: quick game, single, tournament, tour, world, minigame
 
-	short		tournamentgames;
-	short		tournamentwinner;
+	short		tournamentgames;	//How many games that are played in this tournament
+	short		tournamentwinner;     //-2 for a tied tournament (for tours), -1 for no winner yet, 0 or greater for the team that has won the tournament
 
-	short		tournamentcontrolteam;
+	short		tournamentcontrolteam;   //The team ID that currently has control
+	short		tournamentcontrolstyle;  //ID for the player selected control style
+	short		tournamentnextcontrol;  //For round robin control style
 	
 	short		selectedminigame;
 

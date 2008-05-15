@@ -51,6 +51,8 @@ extern void LoadCurrentMapBackground();
 
 extern TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld);
 
+extern CScore *score[4];
+
 void Menu::WriteGameOptions()
 {
 	FILE * fp = OpenFile("options.bin", "wb");
@@ -72,7 +74,7 @@ void Menu::WriteGameOptions()
 		fwrite(&game_values.screenResizeH, sizeof(float), 1, fp);
 #endif
 
-		unsigned char abyte[33];
+		unsigned char abyte[34];
 		abyte[0] = (unsigned char) game_values.spawnstyle;
 		abyte[1] = (unsigned char) game_values.awardstyle;
 		abyte[2] = (unsigned char) announcerlist.GetCurrentIndex();
@@ -105,7 +107,8 @@ void Menu::WriteGameOptions()
 		abyte[30] = (unsigned char) game_values.startgamecountdown;
 		abyte[31] = (unsigned char) game_values.deadteamnotice;
 		abyte[32] = (unsigned char) worldgraphicspacklist.GetCurrentIndex();
-		fwrite(abyte, sizeof(unsigned char), 33, fp); 
+		abyte[33] = (unsigned char) game_values.tournamentcontrolstyle;
+		fwrite(abyte, sizeof(unsigned char), 34, fp); 
 
 		fwrite(&game_values.shieldtime, sizeof(short), 1, fp);
 		fwrite(&game_values.shieldstyle, sizeof(short), 1, fp);
@@ -527,19 +530,31 @@ void Menu::CreateMenu()
 	// Team Options
 	//***********************
 	
-	miTeamKillsField = new MI_SelectField(&spr_selectfield, 70, 200, "Player Collision", 500, 220);
+	miTeamKillsField = new MI_SelectField(&spr_selectfield, 70, 180, "Player Collision", 500, 220);
 	miTeamKillsField->Add("Off", 0, "", false, false);
 	miTeamKillsField->Add("Assist", 1, "", false, false);
 	miTeamKillsField->Add("On", 2, "", false, false);
 	miTeamKillsField->SetData(&game_values.teamcollision, NULL, NULL);
 	miTeamKillsField->SetKey(game_values.teamcollision);
 
-	miTeamColorsField = new MI_SelectField(&spr_selectfield, 70, 240, "Colors", 500, 220);
+	miTeamColorsField = new MI_SelectField(&spr_selectfield, 70, 220, "Colors", 500, 220);
 	miTeamColorsField->Add("Individual", 0, "", false, false);
 	miTeamColorsField->Add("Team", 1, "", true, false);
 	miTeamColorsField->SetData(NULL, NULL, &game_values.teamcolors);
 	miTeamColorsField->SetKey(game_values.teamcolors ? 1 : 0);
 	miTeamColorsField->SetAutoAdvance(true);
+
+	miTournamentControlField = new MI_SelectField(&spr_selectfield, 70, 260, "Tournament Control", 500, 220);
+	miTournamentControlField->Add("All", 0, "", false, false);
+	miTournamentControlField->Add("Game Winner", 1, "", false, false);
+	miTournamentControlField->Add("Game Loser", 2, "", false, false);
+	miTournamentControlField->Add("Leading Teams", 3, "", false, false);
+	miTournamentControlField->Add("Trailing Teams", 4, "", false, false);
+	miTournamentControlField->Add("Random", 5, "", false, false);
+	miTournamentControlField->Add("Random Loser", 6, "", false, false);
+	miTournamentControlField->Add("Round Robin", 7, "", false, false);
+	miTournamentControlField->SetData(&game_values.tournamentcontrolstyle, NULL, NULL);
+	miTournamentControlField->SetKey(game_values.tournamentcontrolstyle);
 
 	miTeamOptionsMenuBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
 	miTeamOptionsMenuBackButton->SetCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
@@ -549,8 +564,9 @@ void Menu::CreateMenu()
 	miTeamOptionsMenuHeaderText = new MI_Text("Team Options Menu", 320, 5, 0, 2, 1);
 
 	mTeamOptionsMenu.AddControl(miTeamKillsField, miTeamOptionsMenuBackButton, miTeamColorsField, NULL, miTeamOptionsMenuBackButton);
-	mTeamOptionsMenu.AddControl(miTeamColorsField, miTeamKillsField, miTeamOptionsMenuBackButton, NULL, miTeamOptionsMenuBackButton);
-	mTeamOptionsMenu.AddControl(miTeamOptionsMenuBackButton, miTeamColorsField, miTeamKillsField, miTeamColorsField, NULL);
+	mTeamOptionsMenu.AddControl(miTeamColorsField, miTeamKillsField, miTournamentControlField, NULL, miTeamOptionsMenuBackButton);
+	mTeamOptionsMenu.AddControl(miTournamentControlField, miTeamColorsField, miTeamOptionsMenuBackButton, NULL, miTeamOptionsMenuBackButton);
+	mTeamOptionsMenu.AddControl(miTeamOptionsMenuBackButton, miTournamentControlField, miTeamKillsField, miTournamentControlField, NULL);
 
 	mTeamOptionsMenu.AddNonControl(miTeamOptionsMenuLeftHeaderBar);
 	mTeamOptionsMenu.AddNonControl(miTeamOptionsMenuRightHeaderBar);
@@ -3002,10 +3018,138 @@ void Menu::RunMenu()
 	{
 		miTournamentScoreboard->StopSwirl();
 		if(game_values.gamemode->winningteam > -1)
+		{
 			miTournamentScoreboard->RefreshTournamentScores(game_values.gamemode->winningteam);
 
-		//Set the next controlling team
-		game_values.tournamentcontrolteam = game_values.gamemode->winningteam;
+			//Set the next controlling team
+			switch(game_values.tournamentcontrolstyle)
+			{
+				case 1: //Winning Team
+				{
+					game_values.tournamentcontrolteam = game_values.gamemode->winningteam;
+					break;
+				}
+
+				case 2: //Losing Team
+				{
+					short iNumInPlace = 0;
+					short iInPlace[4];
+					short iLowestPlace = 0;
+					for(short iScore = 0; iScore < score_cnt; iScore++)
+					{
+						if(score[iScore]->place == iLowestPlace)
+						{
+							iInPlace[iNumInPlace++] = iScore;
+						}
+						else if(score[iScore]->place > iLowestPlace)
+						{
+							iNumInPlace = 1;
+							iInPlace[0] = iScore;
+							iLowestPlace = score[iScore]->place;
+						}
+					}
+
+					game_values.tournamentcontrolteam = iInPlace[rand() % iNumInPlace];
+					break;
+				}
+
+				case 3: //Tournament Ahead Teams
+				{
+					short iNumInPlace = 0;
+					short iInPlace[4];
+					short iMostWins = 0;
+					for(short iTeam = 0; iTeam < score_cnt; iTeam++)
+					{
+						if(game_values.tournament_scores[iTeam].wins == iMostWins)
+						{
+							iInPlace[iNumInPlace++] = iTeam;
+						}
+						else if(game_values.tournament_scores[iTeam].wins > iMostWins)
+						{
+							iNumInPlace = 1;
+							iInPlace[0] = iTeam;
+							iMostWins = game_values.tournament_scores[iTeam].wins;
+						}
+					}
+
+					game_values.tournamentcontrolteam = iInPlace[rand() % iNumInPlace];
+					break;
+				}
+
+				case 4: //Tournament Behind Teams
+				{
+					short iNumInPlace = 0;
+					short iInPlace[4];
+					short iLeastWins = 20; //Most possible wins are 10
+
+					for(short iTeam = 0; iTeam < score_cnt; iTeam++)
+					{
+						if(game_values.tournament_scores[iTeam].wins == iLeastWins)
+						{
+							iInPlace[iNumInPlace++] = iTeam;
+						}
+						else if(game_values.tournament_scores[iTeam].wins < iLeastWins)
+						{
+							iNumInPlace = 1;
+							iInPlace[0] = iTeam;
+							iLeastWins = game_values.tournament_scores[iTeam].wins;
+						}
+					}
+
+					game_values.tournamentcontrolteam = iInPlace[rand() % iNumInPlace];
+					break;
+				}
+
+				case 5: //Random
+				{
+					game_values.tournamentcontrolteam = rand() % score_cnt;
+					break;
+				}
+
+				case 6: //Random Losing Team
+				{
+					short iNumInPlace = 0;
+					short iInPlace[4];
+					short iWinner = 0;
+
+					for(short iTeam = 0; iTeam < score_cnt; iTeam++)
+					{
+						if(score[iTeam]->place == 0)
+						{
+							iWinner = iTeam;
+							break;
+						}
+					}
+
+					for(short iTeam = 0; iTeam < score_cnt; iTeam++)
+					{
+						if(iTeam == iWinner)
+							continue;
+
+						iInPlace[iNumInPlace++] = iTeam;
+					}
+
+					game_values.tournamentcontrolteam = iInPlace[rand() % iNumInPlace];
+					break;
+				}
+
+				case 7: //Round Robin
+				{
+					game_values.tournamentcontrolteam = game_values.tournamentnextcontrol;
+
+					if(++game_values.tournamentnextcontrol >= score_cnt)
+						game_values.tournamentnextcontrol = 0;
+
+					break;
+				}
+
+				default:
+				{
+					game_values.tournamentcontrolteam = -1;
+					break;
+				}
+			}
+		}
 	}
 
 	//Reset game mode back to the current game mode in case we came from boss mode
@@ -3261,13 +3405,26 @@ void Menu::RunMenu()
 				else
 					game_values.matchtype = miMatchSelectionField->GetShortValue();
 
-				//The first game of the tournament is always controlled by all players
-				if(game_values.matchtype == MATCH_TYPE_TOURNAMENT)
-					game_values.tournamentcontrolteam = -1;
-
 				miTeamSelect->Reset();
 				mCurrentMenu = &mTeamSelectMenu;
 				mCurrentMenu->ResetMenu();
+
+				if(game_values.matchtype == MATCH_TYPE_TOURNAMENT)
+				{
+					if(game_values.tournamentcontrolstyle == 5 || game_values.tournamentcontrolstyle == 6) //Random
+						game_values.tournamentcontrolteam = rand() % score_cnt;
+					else if(game_values.tournamentcontrolstyle == 7) //Round robin
+						game_values.tournamentcontrolteam = 0;
+					else //The first game of the tournament is controlled by all players
+						game_values.tournamentcontrolteam = -1;
+	
+					game_values.tournamentnextcontrol = 1;  //if round robin is selected, choose the next team next					
+				}
+				else
+				{
+					game_values.tournamentcontrolteam = -1;
+					SetControllingTeamForSettingsMenu(false);
+				}
 			}
 			else if(MENU_CODE_MATCH_SELECTION_MATCH_CHANGED == code)
 			{
@@ -3462,16 +3619,17 @@ void Menu::RunMenu()
 							
 							for(short iMode = 0; iMode < GAMEMODE_LAST; iMode++)
 							{
-								gamemodes[iMode]->goal = miGoalField[iMode]->GetShortValue();	
+								gamemodes[iMode]->goal = miGoalField[iMode]->GetShortValue();
 							}
 
 							miModeSettingsButton->Show(fShowSettingsButton[miModeField->GetShortValue()]);
 							
-							if(MATCH_TYPE_TOURNAMENT == game_values.matchtype)
-								mGameSettingsMenu.SetControllingTeam(game_values.tournamentcontrolteam);
-
 							mCurrentMenu = &mGameSettingsMenu;
 							mCurrentMenu->ResetMenu();
+
+							//If it is a tournament, then set the controlling team 
+							if(MATCH_TYPE_TOURNAMENT == game_values.matchtype)
+								SetControllingTeamForSettingsMenu(true);
 						}
 						else if(MATCH_TYPE_TOUR == game_values.matchtype)
 						{
@@ -3561,19 +3719,9 @@ void Menu::RunMenu()
 
 				mCurrentMenu->ResetMenu();
 
+				//Set the controlling team for tournament mode
 				if(MATCH_TYPE_TOURNAMENT == game_values.matchtype && game_values.tournamentwinner == -1)
-				{
-					mCurrentMenu->SetControllingTeam(game_values.tournamentcontrolteam);
-
-					//Display the team that is in control of selecting the next game
-					char szMessage[128];
-					if(game_values.teamcounts[game_values.tournamentcontrolteam] <= 1)
-						sprintf(szMessage, "Player %d Is In Control", game_values.teamids[game_values.tournamentcontrolteam][0] + 1);
-					else
-						sprintf(szMessage, "Team %d Is In Control", game_values.tournamentcontrolteam + 1);
-
-					mCurrentMenu->AddEyeCandy(new EC_Announcement(&menu_font_large, &spr_announcementicons, szMessage, game_values.colorids[game_values.teamids[game_values.tournamentcontrolteam][0]], 120, 100));
-				}
+					SetControllingTeamForSettingsMenu(true);
 
 				if(fNeedTeamAnnouncement)
 					miWorld->DisplayTeamControlAnnouncement();
@@ -4384,6 +4532,34 @@ void Menu::StartGame()
 
 	game_values.screenfade = 8;
 	game_values.screenfadespeed = 8;
+}
+
+void Menu::SetControllingTeamForSettingsMenu(bool fDisplayMessage)
+{
+	mGameSettingsMenu.SetControllingTeam(game_values.tournamentcontrolteam);
+
+	for(short iMode = 0; iMode < GAMEMODE_LAST; iMode++)
+		mModeSettingsMenu[iMode].SetControllingTeam(game_values.tournamentcontrolteam);
+
+	miMapFilterScroll->SetControllingTeam(game_values.tournamentcontrolteam);
+	miMapBrowser->SetControllingTeam(game_values.tournamentcontrolteam);
+
+	if(fDisplayMessage)
+		DisplayControllingTeamMessage();
+}
+
+void Menu::DisplayControllingTeamMessage()
+{
+	//Display the team that is in control of selecting the next game
+	char szMessage[128];
+	if(game_values.tournamentcontrolteam < 0)
+		sprintf(szMessage, "All Teams Are In Control");
+	else if(game_values.teamcounts[game_values.tournamentcontrolteam] <= 1)
+		sprintf(szMessage, "Player %d Is In Control", game_values.teamids[game_values.tournamentcontrolteam][0] + 1);
+	else
+		sprintf(szMessage, "Team %d Is In Control", game_values.tournamentcontrolteam + 1);
+
+	mCurrentMenu->AddEyeCandy(new EC_Announcement(&menu_font_large, &spr_announcementicons, szMessage, game_values.colorids[game_values.teamids[game_values.tournamentcontrolteam][0]], 120, 100));
 }
 
 void Menu::Exit()

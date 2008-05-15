@@ -60,6 +60,9 @@ class Menu
 		void WriteGameOptions();
 		void ResetTournamentBackToMainMenu();
 	
+		void SetControllingTeamForSettingsMenu(bool fDisplayMessage);
+		void DisplayControllingTeamMessage();
+		
 		UI_Menu * mCurrentMenu;
 		
 		//Main Menu
@@ -145,6 +148,7 @@ class Menu
 		UI_Menu mTeamOptionsMenu;
 		MI_SelectField * miTeamKillsField;
 		MI_SelectField * miTeamColorsField;
+		MI_SelectField * miTournamentControlField;
 		MI_Button * miTeamOptionsMenuBackButton;
 
 		MI_Image * miTeamOptionsMenuLeftHeaderBar;

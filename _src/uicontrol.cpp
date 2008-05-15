@@ -30,6 +30,8 @@ UI_Control::UI_Control(short x, short y)
 		neighborControls[iNeighbor] = NULL;
 
 	uiMenu = NULL;
+
+	iControllingTeam = -1;
 }
 
 /**************************************
@@ -5131,6 +5133,13 @@ MenuCodeEnum MI_MapFilterScroll::SendInput(CPlayerInput * playerInput)
 {
 	for(int iPlayer = 0; iPlayer < 4; iPlayer++)
 	{
+		//Only allow the controlling team to control the menu (if there is one)
+		if(iControllingTeam != -1)
+		{
+			if(iControllingTeam != LookupTeamID(iPlayer))
+				continue;
+		}
+
 		if(playerInput->outputControls[iPlayer].menu_down.fPressed)
 		{
 			MoveNext();
@@ -5383,6 +5392,13 @@ MenuCodeEnum MI_MapBrowser::SendInput(CPlayerInput * playerInput)
 {
 	for(int iPlayer = 0; iPlayer < 4; iPlayer++)
 	{
+		//Only allow the controlling team to control the menu (if there is one)
+		if(iControllingTeam != -1)
+		{
+			if(iControllingTeam != LookupTeamID(iPlayer))
+				continue;
+		}
+
 		if(playerInput->outputControls[iPlayer].menu_down.fPressed)
 		{
 			short iSkipRows = 1;

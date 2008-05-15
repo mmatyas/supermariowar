@@ -25,6 +25,7 @@
 #18 = Health
 #19 = Card Collection
 #20 = Phanto Chase
+#24 = Pipe Minigame
 
 #Version
 1.8.0.0
@@ -123,19 +124,19 @@
 #Hammer Powerup Weight - any positive number including 0
 #Feather Powerup Weight - any positive number including 0
 #Boomerang Powerup Weight - any positive number including 0
+#Ice Wand Powerup Weight - any positive number including 0
+#Bomb Powerup Weight - any positive number including 0
+#Leaf Powerup Weight - any positive number including 0
+#P-Wings Powerup Weight - any positive number including 0
+#Tanooki Powerup Weight - any positive number including 0
 #POW Powerup Weight - any positive number including 0
 #MOd Powerup Weight - any positive number including 0
 #Bullet Bill Powerup Weight - any positive number including 0
+#Podoboo Powerup Weight - any positive number including 0
 #Green Shell Powerup Weight - any positive number including 0
 #Red Shell Powerup Weight - any positive number including 0
 #Spiked Shell Powerup Weight - any positive number including 0
 #Buzzy Shell Powerup Weight - any positive number including 0
-#Ice Wand Powerup Weight - any positive number including 0
-#Podoboo Powerup Weight - any positive number including 0
-#Bomb Powerup Weight - any positive number including 0
-#Tanooki Powerup Weight - any positive number including 0
-#Leaf Powerup Weight - any positive number including 0
-#P-Wings Powerup Weight - any positive number including 0
 #Random Powerup Weight - any positive number including 0
 
 #16 - Survival
@@ -168,6 +169,8 @@
 #Red Phanto Quantity - Number of red phantos from 0 on up
 #Green Phanto Quantity - Number of green phantos from 0 on up
 
+#24 - Pipe Minigame
+No Options
 
 #Tour Stops (maximum 10 stops)
 #Map,Mode,Goal,Points,Bonus Wheel,Name,Options(see above)

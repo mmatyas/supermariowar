@@ -47,6 +47,8 @@ class UI_Control
 
 		bool IsModifying() {return fModifying;}
 
+		void SetControllingTeam(short teamid) {iControllingTeam = teamid;}
+
 	protected:
 
 		bool fSelected;
@@ -60,6 +62,8 @@ class UI_Control
 		bool fShow;
 
 		UI_Menu * uiMenu;
+
+		short iControllingTeam;
 };
 
 /*********************************************************

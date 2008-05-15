@@ -82,6 +82,8 @@ Feature Requests
 [X] bombs appear in front of layer 2 tiles(havn't tested layer 3 ones yet)
 [X] Updated platforms to be able to be drawn in 1 of 5 platform layers
 
+[X] Better music, better mushroom gfx and better thunder.wav
+
 [ ] Ooh, here's another thing I just thought of. What about options for who gets to pick the next stage in Tournament mode?
 Any - All players have control.
 Winner - The winner of one stage picks the next. First stage is the same as All.
@@ -92,12 +94,15 @@ Random - One person is picked at random to decide the next stage.
 Random Loser - One person who didn't win the last stage is picked at random to decide the next stage. First stage is regular Random.
 Cycle - P1 picks the first stage, P2 picks the second, and so on. 
 
-Need to handle mode setting menus, filters and thumbs menus for only one team control
+- Need to handle mode setting menus, filters and thumbs menus for only one team control
+- Need to deal with AI when only bots on the team that controls the menu
+- Test all control cases with teams/bots keyboard/controllers menu/sub menus/bonus wheel/scoreboard and ties for winner/loser tournament ties etc.
+- Need a flag and message for when all teams have control and display this message on the first view of the selection menu
 
-[X] Better music, better mushroom gfx and better thunder.wav
 [ ] Pow-blocks do not kill piranha plants
 
 [ ] Another death tile type the strong death tile (lava) as opposed to the weak death tile (spikes).  Everything dies on the strong death tile, where as only players die on the weak tiles (and go shielded on those types of modes as opposed to respawn for strong)
+[ ] Wand should go for a set distance, not to the edge of the screen
 
 [ ] BOMB UPDATES
 1) Shorten the time a bit.
@@ -1069,6 +1074,7 @@ int main(int argc, char *argv[])
 	game_values.overridepowerupsettings = 0;
 	game_values.minigameunlocked	= false;
 	game_values.poweruppreset		= 0;
+	game_values.tournamentcontrolstyle = 0;
 
 	game_values.pfFilters			= new bool[NUM_AUTO_FILTERS + filterslist.GetCount()];
 	game_values.piFilterIcons		= new short[NUM_AUTO_FILTERS + filterslist.GetCount()];
@@ -1324,8 +1330,8 @@ int main(int argc, char *argv[])
 				SDL_XBOX_SetScreenStretch(game_values.screenResizeW, game_values.screenResizeH);
 			#endif
 
-			unsigned char abyte[33];
-			fread(abyte, sizeof(unsigned char), 33, fp);
+			unsigned char abyte[34];
+			fread(abyte, sizeof(unsigned char), 34, fp);
 			game_values.spawnstyle = (short) abyte[0];
 			game_values.awardstyle = (short) abyte[1];
 			game_values.teamcollision = (short)abyte[3];
@@ -1351,6 +1357,7 @@ int main(int argc, char *argv[])
 			game_values.minigameunlocked = ((short)abyte[29] > 0 ? true : false);
 			game_values.startgamecountdown = ((short)abyte[30] > 0 ? true : false);
 			game_values.deadteamnotice = ((short)abyte[31] > 0 ? true : false);
+			game_values.tournamentcontrolstyle = (short)abyte[33];
 
 			fread(&game_values.shieldtime, sizeof(short), 1, fp);
 			fread(&game_values.shieldstyle, sizeof(short), 1, fp);
