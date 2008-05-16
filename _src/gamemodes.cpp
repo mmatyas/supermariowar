@@ -1114,7 +1114,7 @@ void CGM_Coins::init()
 		game_values.gamemodesettings.coins.quantity = 1;
 
 	for(short iCoin = 0; iCoin < game_values.gamemodesettings.coins.quantity; iCoin++)
-		objectcontainer[1].add(new MO_Coin(&spr_coin, 0.0f, 0.0f, 0, 0, 0, 2, 0, 0));
+		objectcontainer[1].add(new MO_Coin(&spr_coin, 0.0f, 0.0f, 0, 0, 2, 0, 0, 0));
 }
 
 

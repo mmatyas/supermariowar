@@ -129,6 +129,16 @@ TileType CTileset::IncrementTileType(short iTileCol, short iTileRow)
 	else if(tiletypes[iTile] == tile_ice_death_on_left)
 		tiletypes[iTile] = tile_ice_death_on_right;
 	else if(tiletypes[iTile] == tile_ice_death_on_right)
+		tiletypes[iTile] = tile_super_death;
+	else if(tiletypes[iTile] == tile_super_death)
+		tiletypes[iTile] = tile_super_death_top;
+	else if(tiletypes[iTile] == tile_super_death_top)
+		tiletypes[iTile] = tile_super_death_bottom;
+	else if(tiletypes[iTile] == tile_super_death_bottom)
+		tiletypes[iTile] = tile_super_death_left;
+	else if(tiletypes[iTile] == tile_super_death_left)
+		tiletypes[iTile] = tile_super_death_right;
+	else if(tiletypes[iTile] == tile_super_death_right)
 		tiletypes[iTile] = tile_nonsolid;
 
 	return tiletypes[iTile];

@@ -60,8 +60,8 @@ class Menu
 		void WriteGameOptions();
 		void ResetTournamentBackToMainMenu();
 	
-		void SetControllingTeamForSettingsMenu(bool fDisplayMessage);
-		void DisplayControllingTeamMessage();
+		void SetControllingTeamForSettingsMenu(short iControlTeam, bool fDisplayMessage);
+		void DisplayControllingTeamMessage(short iControlTeam);
 		
 		UI_Menu * mCurrentMenu;
 		
@@ -607,6 +607,9 @@ class Menu
 		const char * szCurrentMapName;
 
 		short iUnlockMinigameOptionIndex;
+
+		short iTournamentAIStep;
+		short iTournamentAITimer;
 };
 
 #endif //__MENU_H_

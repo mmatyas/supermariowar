@@ -584,22 +584,29 @@ void CPlayer::move()
 
 	iSrcOffsetX = 0;
 		
+	bool fColorChosen = false;
 	if(game_values.gamemode->gamemode == game_mode_star)
 	{
 		CGM_Star * starmode = (CGM_Star*) game_values.gamemode;
 		short starmodetype = starmode->getcurrentmodetype();
 		if(starmodetype != 2 && starmode->isplayerstar(this))
+		{
 			iSrcOffsetX = starmodetype ? 224 : 192;
+			fColorChosen = true;
+		}
 	}
 	
-	if(invincible)
-		iSrcOffsetX = animationstate;
-	else if(game_values.gamemode->tagged == this)
-		iSrcOffsetX = 160;
-	else if(frozen)
-		iSrcOffsetX = 256;
-	else if(shield > 0)
-		iSrcOffsetX = 128;
+	if(!fColorChosen)
+	{
+		if(invincible)
+			iSrcOffsetX = animationstate;
+		else if(game_values.gamemode->tagged == this)
+			iSrcOffsetX = 160;
+		else if(frozen)
+			iSrcOffsetX = 256;
+		else if(shield > 0)
+			iSrcOffsetX = 128;
+	}
 
 	if(state != player_ready)
 	{
@@ -1027,7 +1034,12 @@ void CPlayer::move()
 		{
 			//Calculate movement every 4th frame (speed up optimization)
 			if(game_values.cputurn == globalID)
+			{
 				cpu_think();
+
+				if(playerKeys->game_jump.fDown|| playerKeys->game_left.fDown || playerKeys->game_right.fDown)
+					ResetSuicideTime();
+			}
 		}
 
 		//Used for bouncing off of note blocks
@@ -1286,7 +1298,7 @@ void CPlayer::move()
 								DecreaseProjectileLimit();
 
 						}
-						else if(powerup == 5 && projectiles[globalID] < 1 && hammertimer == 0)
+						else if(powerup == 5 && projectiles[globalID] < 1)
 						{
 							if(game_values.wandlimit == 0 || projectilelimit > 0)
 							{
@@ -1304,11 +1316,11 @@ void CPlayer::move()
 								DecreaseProjectileLimit();
 
 						}
-						else if(powerup == 6 && projectiles[globalID] < 1)
+						else if(powerup == 6 && projectiles[globalID] < 2 && hammertimer == 0)
 						{
 							if(game_values.bombslimit == 0 || projectilelimit > 0)
 							{
-								CO_Bomb * bomb = new CO_Bomb(&spr_bomb, ix + HALFPW - 14, iy - 8, IsPlayerFacingRight() ? 3.0f : -3.0f, -3.0f, 4, globalID, teamID, colorID, rand() % 120 + 240);
+								CO_Bomb * bomb = new CO_Bomb(&spr_bomb, ix + HALFPW - 14, iy - 8, IsPlayerFacingRight() ? 3.0f : -3.0f, -3.0f, 4, globalID, teamID, colorID, rand() % 120 + 120);
 								
 								if(AcceptItem(bomb))
 								{
@@ -1319,6 +1331,8 @@ void CPlayer::move()
 								objectcontainer[1].add(bomb);
 								projectiles[globalID]++;
 							
+								hammertimer = 90;
+
 								ifsoundonplay(sfx_fireball);
 							}
 
@@ -3311,6 +3325,14 @@ void CPlayer::collision_detection_map()
 			int toptile = g_map.map(tx, ty);
 			int bottomtile = g_map.map(tx, ty2);
 
+			bool fDeathTileToLeft = ((toptile & tile_flag_death_on_left) && (bottomtile & tile_flag_death_on_left)) ||
+									 ((toptile & tile_flag_death_on_left) && !(bottomtile & tile_flag_solid)) ||
+									 (!(toptile & tile_flag_solid) && (bottomtile & tile_flag_death_on_left));
+
+			bool fSuperDeathTileToLeft = ((toptile & tile_flag_super_death_left) && (bottomtile & tile_flag_super_death_left)) ||
+									    ((toptile & tile_flag_super_death_left) && !(bottomtile & tile_flag_solid)) ||
+									    (!(toptile & tile_flag_solid) && (bottomtile & tile_flag_super_death_left));
+
 			//first check to see if player hit a warp
 			if(playerKeys->game_right.fDown && !frozen && g_map.checkforwarp(tx, ty, ty2, 3))
 			{
@@ -3352,10 +3374,9 @@ void CPlayer::collision_detection_map()
 					flipsidesifneeded();
 				}
 			}
-			else if(((toptile & tile_flag_death_on_left) || (bottomtile & tile_flag_death_on_left)) &&
-				!invincible && shield == 0)
+			else if(fSuperDeathTileToLeft || (fDeathTileToLeft && !invincible && shield == 0))
 			{
-				if(player_kill_nonkill != KillPlayerMapHazard(true, kill_style_environment))
+				if(player_kill_nonkill != KillPlayerMapHazard(fSuperDeathTileToLeft, kill_style_environment))
 					return;
 			}
 			//collision on the right side.
@@ -3391,6 +3412,14 @@ void CPlayer::collision_detection_map()
 
 			int toptile = g_map.map(tx, ty);
 			int bottomtile = g_map.map(tx, ty2);
+
+			bool fDeathTileToRight = ((toptile & tile_flag_death_on_right) && (bottomtile & tile_flag_death_on_right)) ||
+									 ((toptile & tile_flag_death_on_right) && !(bottomtile & tile_flag_solid)) ||
+									 (!(toptile & tile_flag_solid) && (bottomtile & tile_flag_death_on_right));
+
+			bool fSuperDeathTileToRight = ((toptile & tile_flag_super_death_right) && (bottomtile & tile_flag_super_death_right)) ||
+									    ((toptile & tile_flag_super_death_right) && !(bottomtile & tile_flag_solid)) ||
+									    (!(toptile & tile_flag_solid) && (bottomtile & tile_flag_super_death_right));
 
 			//first check to see if player hit a warp
 			if(playerKeys->game_left.fDown && !frozen && g_map.checkforwarp(tx, ty, ty2, 1))
@@ -3433,10 +3462,9 @@ void CPlayer::collision_detection_map()
 					flipsidesifneeded();
 				}
 			}
-			else if(((toptile & tile_flag_death_on_right) || (bottomtile & tile_flag_death_on_right)) &&
-				!invincible && shield == 0)
+			else if(fSuperDeathTileToRight || (fDeathTileToRight && !invincible && shield == 0))
 			{
-				if(player_kill_nonkill != KillPlayerMapHazard(true, kill_style_environment))
+				if(player_kill_nonkill != KillPlayerMapHazard(fSuperDeathTileToRight, kill_style_environment))
 					return;
 			}
 			else if((toptile & tile_flag_solid) || (bottomtile & tile_flag_solid)) // collide with solid, ice, death and all sides death
@@ -3543,9 +3571,15 @@ void CPlayer::collision_detection_map()
 
 		//Player hit a solid, ice or death on top
 		//or if the player is invincible and hits death or death on bottom
+
+		//There is a known issue where where if a death on bottom tile and a super death on bottom tile
+		//are next to each other and the player hits from below and aligns with the super death on bottom
+		//the player will then shift over and fully hit the super death on bottom and die even if shielded
+		//or invincible.
+
 		int alignedTileType = g_map.map(alignedBlockX, ty);
-		if((alignedTileType & tile_flag_solid) && ((alignedTileType & tile_flag_death_on_bottom) == 0 ||
-			invincible || shield > 0))
+		if((alignedTileType & tile_flag_solid) && !(alignedTileType & tile_flag_super_death_bottom) &&
+			(!(alignedTileType & tile_flag_death_on_bottom) || invincible || shield > 0))
 		{
 			yf((float)(ty * TILESIZE + TILESIZE) + 0.2f);
 			fOldY = fy - 1.0f;
@@ -3584,12 +3618,12 @@ void CPlayer::collision_detection_map()
 				return;
 			}
 		}
-		
+
 		//Player squeezed around the block, ice or death on top
 		//or if the player is invincible and hits death or death on bottom
 		int unalignedTileType = g_map.map(unAlignedBlockX, ty);
-		if((unalignedTileType & tile_flag_solid) && ((unalignedTileType & tile_flag_death_on_bottom) == 0 ||
-			invincible || shield > 0))
+		if((unalignedTileType & tile_flag_solid) && !(unalignedTileType & tile_flag_super_death_bottom) && 
+			(!(unalignedTileType & tile_flag_death_on_bottom) || invincible || shield > 0))
 		{
 			xf(unAlignedBlockFX);
 			fOldX = fx;
@@ -3599,7 +3633,11 @@ void CPlayer::collision_detection_map()
 		}
 		else if((alignedTileType & tile_flag_death_on_bottom) || (unalignedTileType & tile_flag_death_on_bottom))
 		{
-			if(player_kill_nonkill != KillPlayerMapHazard(true, kill_style_environment))
+			bool fRespawnPlayer = ((alignedTileType & tile_flag_super_death_bottom) && (unalignedTileType & tile_flag_super_death_bottom)) ||
+								  ((alignedTileType & tile_flag_super_death_bottom) &&  !(unalignedTileType & tile_flag_solid)) ||
+								  ((alignedTileType & tile_flag_solid) && !(unalignedTileType & tile_flag_super_death_bottom));
+
+			if(player_kill_nonkill != KillPlayerMapHazard(fRespawnPlayer, kill_style_environment))
 				return;
 		}
 		else
@@ -3733,8 +3771,12 @@ void CPlayer::collision_detection_map()
 									 ((lefttile & tile_flag_death_on_top) && !(righttile & tile_flag_solid)) ||
 									 (!(lefttile & tile_flag_solid) && (righttile & tile_flag_death_on_top));
 
-		if(fSolidTileUnderPlayer && (!fDeathTileUnderPlayer ||
-			invincible || shield > 0 || iKuriboShoe > 0))
+		bool fSuperDeathTileUnderPlayer = ((lefttile & tile_flag_super_death_top) && (righttile & tile_flag_super_death_top)) ||
+									      ((lefttile & tile_flag_super_death_top) && !(righttile & tile_flag_solid)) ||
+									      (!(lefttile & tile_flag_solid) && (righttile & tile_flag_super_death_top));
+
+		if(fSolidTileUnderPlayer && !fSuperDeathTileUnderPlayer && 
+			(!fDeathTileUnderPlayer || invincible || shield > 0 || iKuriboShoe > 0) )
 		{	//on ground
 
 			yf((float)(ty * TILESIZE - PH) - 0.2f);
@@ -3762,9 +3804,9 @@ void CPlayer::collision_detection_map()
 				return;
 			}
 		}
-		else if(fDeathTileUnderPlayer)
+		else if(fDeathTileUnderPlayer || fSuperDeathTileUnderPlayer)
 		{
-			if(player_kill_nonkill != KillPlayerMapHazard(true, kill_style_environment))
+			if(player_kill_nonkill != KillPlayerMapHazard(fSuperDeathTileUnderPlayer, kill_style_environment))
 				return;
 		}
 		else

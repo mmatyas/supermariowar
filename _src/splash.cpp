@@ -301,7 +301,7 @@ bool LoadGameGraphics()
 	gfx_loadimage(&spr_fireball, convertPath("gfx/packs/projectiles/fireball.png", graphicspack), true);
 	//gfx_loadimage(&spr_superfireball, convertPath("gfx/packs/projectiles/superfire.png", graphicspack), true);
 	gfx_loadimage(&spr_hammer, convertPath("gfx/packs/projectiles/hammer.png", graphicspack), true);
-	gfx_loadimage(&spr_iceblast, convertPath("gfx/packs/projectiles/wandblast.png", graphicspack), false);
+	gfx_loadimage(&spr_iceblast, convertPath("gfx/packs/projectiles/wandblast.png", graphicspack), true);
 	gfx_loadimage(&spr_boomerang, convertPath("gfx/packs/projectiles/boomerang.png", graphicspack), true);
 	gfx_loadimage(&spr_shell, convertPath("gfx/packs/projectiles/shell.png", graphicspack), true);
 	gfx_loadimage(&spr_shelldead, convertPath("gfx/packs/eyecandy/shelldead.png", graphicspack), true);

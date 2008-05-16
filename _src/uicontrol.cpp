@@ -2744,16 +2744,7 @@ MenuCodeEnum MI_MapField::SendInput(CPlayerInput * playerInput)
 
 		if(playerInput->outputControls[iPlayer].menu_random.fPressed)
 		{
-			short iOldIndex = maplist.GetCurrent()->second->iIndex;
-			maplist.random(true);
-			
-			if(iOldIndex != maplist.GetCurrent()->second->iIndex)
-			{
-				LoadCurrentMap();
-				return MENU_CODE_MAP_CHANGED;
-			}
-
-			return MENU_CODE_NONE;
+			return ChooseRandomMap();
 		}
 
 		if(playerInput->outputControls[iPlayer].menu_select.fPressed)
@@ -2774,6 +2765,20 @@ MenuCodeEnum MI_MapField::SendInput(CPlayerInput * playerInput)
 
 			return MENU_CODE_UNSELECT_ITEM;
 		}
+	}
+
+	return MENU_CODE_NONE;
+}
+
+MenuCodeEnum MI_MapField::ChooseRandomMap()
+{
+	short iOldIndex = maplist.GetCurrent()->second->iIndex;
+	maplist.random(true);
+
+	if(iOldIndex != maplist.GetCurrent()->second->iIndex)
+	{
+		LoadCurrentMap();
+		return MENU_CODE_MAP_CHANGED;
 	}
 
 	return MENU_CODE_NONE;
@@ -5136,7 +5141,7 @@ MenuCodeEnum MI_MapFilterScroll::SendInput(CPlayerInput * playerInput)
 		//Only allow the controlling team to control the menu (if there is one)
 		if(iControllingTeam != -1)
 		{
-			if(iControllingTeam != LookupTeamID(iPlayer))
+			if(iControllingTeam != LookupTeamID(iPlayer) || game_values.playercontrol[iPlayer] != 1)
 				continue;
 		}
 
@@ -5395,7 +5400,7 @@ MenuCodeEnum MI_MapBrowser::SendInput(CPlayerInput * playerInput)
 		//Only allow the controlling team to control the menu (if there is one)
 		if(iControllingTeam != -1)
 		{
-			if(iControllingTeam != LookupTeamID(iPlayer))
+			if(iControllingTeam != LookupTeamID(iPlayer) || game_values.playercontrol[iPlayer] != 1)
 				continue;
 		}
 

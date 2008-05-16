@@ -494,7 +494,7 @@ class IO_MovingObject : public CObject
 		short iHorizontalPlatformCollision;
 		short iVerticalPlatformCollision;
 
-		bool fObjectDiesOnDeathTiles;
+		bool fObjectDiesOnSuperDeathTiles;
 
 	friend class IO_Block;
 	friend class B_PowerupBlock;
@@ -844,7 +844,9 @@ class MO_IceBlast : public IO_MovingObject
 		void update();
 		bool collide(CPlayer * player);
 
+	private:
 		short colorOffset;
+		short ttl;
 };
 
 class MO_Boomerang : public IO_MovingObject
@@ -1797,9 +1799,11 @@ class MO_PirhanaPlant : public IO_MovingObject
 		bool collide(CPlayer * player);
 		void collide(IO_MovingObject *);
 		
+		void KillPlant();
+
 	private:
 		void SetNewTimer();
-		void KillPlant();
+		
 		float GetFireballAngle();
 
 		short iType, iDirection;

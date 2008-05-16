@@ -4345,7 +4345,7 @@ int editor_tiletype()
 						short iCol = event.button.x / TILESIZE;
 						short iRow = event.button.y / TILESIZE;
 
-						if(iCol <= 11 && iRow == 0)
+						if(iCol <= 16 && iRow == 0)
 						{
 							set_tiletype = (TileType)(iCol + 1);
 

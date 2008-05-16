@@ -115,8 +115,9 @@ MenuCodeEnum UI_Menu::SendInput(CPlayerInput * playerInput)
 		//Only allow the controlling team to control the menu (if there is one)
 		if(iControllingTeam != -1)
 		{
-			if(iControllingTeam != LookupTeamID(iPlayer))
-				continue;
+			//Pay attention to other player's exit button pushes so we can exit when AI is controlling
+			if(game_values.playercontrol[iPlayer] != 1 || (iControllingTeam != LookupTeamID(iPlayer) && (!fAllowExitButton || !playerInput->outputControls[iPlayer].menu_cancel.fPressed)))
+				continue;			
 		}
 		//Only let player 1 on the keyboard control the menu unless there is another controlling team
 		else if(iPlayer != 0 && game_values.playerInput.inputControls[iPlayer]->iDevice == DEVICE_KEYBOARD)

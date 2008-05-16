@@ -104,6 +104,7 @@ class UI_Menu
 
 		void AddControl(UI_Control * control, UI_Control * up, UI_Control * down, UI_Control * left, UI_Control * right);
 		void AddNonControl(UI_Control * control);
+		UI_Control * GetHeadControl() {return headControl;}
 		void SetHeadControl(UI_Control * control);
 		void ResetMenu();
 
@@ -125,6 +126,7 @@ class UI_Menu
 		UI_Control * GetCurrentControl() {return current;}
 
 		void SetControllingTeam(short teamid) {iControllingTeam = teamid;}
+		void SetAllowExit(bool allowExit) {fAllowExitButton = allowExit;}
 
 	protected:
 
@@ -143,6 +145,7 @@ class UI_Menu
 		CEyecandyContainer eyeCandy;
 
 		short iControllingTeam;
+		bool fAllowExitButton;
 };
 
 #endif //__UIMENU_H_

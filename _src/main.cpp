@@ -55,61 +55,20 @@ SHIP BETA
 [ ] Prune old maps
 [ ] Improve tilesets?
 [ ] Get SMB3's world working
+[ ] Test controllers on xbox where different tournament control settings are used
+	- Test all control cases with teams/bots keyboard/controllers menu/sub menus/bonus wheel/scoreboard and ties for winner/loser tournament ties etc.
+[ ] Go through all maps and replace lava tile types with super death
 
 Feature Requests
-[X] In Multi Star, the text still says Shine Get, and the players with stars still turn gold. The text could be "Star Get" per the Japanese version of Galaxy or it could be something else; also, since the stars are color-coded, I don't think the gold tone is needed.
-[X] In Greed Mode, it would be nice to have an option for how many coins fly out (Regular, Double, or Triple). 
-[X] Also, an option to make it impossible to pick up your own coins. 
-[X] In Health Mode, there should be some sound played when you grab a heart. Perhaps the sound you hear when you get a mushroom in SMB2? (It should also pause the music when you get one, if we do that.) Also, how do the extra life shrooms work in this mode? Do they just recover X points of health?
-[X] Greed Mode's Unlimited option needs to be done differently. The way it stands now, eventually every coin will disappear and it won't be greed mode unlimited anymore, which ruins the whole point of...unlimited.  Maybe you could have all the counters set to zero and have them reflect how many coins players have lost? Like Classic's Unlimited.
-[X] New key for placeing for the frequenzy of certain hazards, because [/] arn'tfindable on a German keaboard for example. (the german keyboard adapts the amerikan one, i tested every butten but none of them applies to the american [/])
-[X] In the level editor, when you are looking at the tilesets, the background should be partially transparent like when you look at the animated tiles.
-[X] In the Item Switch screen, and on the Frenzy Card select screen, it would be nice to have some sort of arrowhead pointing to indicate that there are more items available by scrolling the list up or down.
 
-[X] Vertical rising flame hazard
-[X] Sideways Piranha Plants
-[X] Vehicles should be shown on world previews.
-[X] World Music exception option. Like how you can set specific songs for specific maps, but instead for specific worlds. 
-[X] In Yoshi's Eggs Mode when you set all the egg and Yoshi values to 0, you basically have a pointless match. -> Now we make sure we at least have a matching pair of yoshi and egg.
-[X] In stomp mode, if all settings are set to 0, you just get red koopas.  Fixed so it is random if all are 0.
+[X] Options for who gets to pick the next stage in Tournament mode
+[X] Fixed bug where red coins were being used in coin mode
+[X] Fixed bug where AI was dying from suicide timer even though they were moving
+[X] Pow-blocks now kill piranha plants and mod blocks kill bullet bills hazards
+[X] Wand should go for a set distance, not to the edge of the screen
+[X] Another death tile type the strong death tile (lava) as opposed to the weak death tile (spikes).  Everything dies on the strong death tile, where as only players die on the weak tiles (and go shielded on those types of modes as opposed to respawn for strong)
+[X] Bomb updates - Shortened the alive time a bit, allow two on-screen at once from a player, and added a 1.5 second delay between pulling out one bomb and another.
 
-[X] Universal Music exceptions folder. Instead of copying your favorite music exceptions from song pack to song pack whenever you change, there'd be a document that lists the worlds and levels that have specified music.
-[X] As for the Card Collection Mode, I think a card life option similar to the coin life option in Greed Mode would be a nice addition.
-[X] Flipping shelled enemies with a cape or tail shouldn't kill them instantly, it should render them upside-down shells.
-[X] Weapon breakable blocks need to use their own broken chunks
-
-[X] If you have a cape, and you pick up a blue block(While spinning), the kick sound plays.
-[X] bombs appear in front of layer 2 tiles(havn't tested layer 3 ones yet)
-[X] Updated platforms to be able to be drawn in 1 of 5 platform layers
-
-[X] Better music, better mushroom gfx and better thunder.wav
-
-[ ] Ooh, here's another thing I just thought of. What about options for who gets to pick the next stage in Tournament mode?
-Any - All players have control.
-Winner - The winner of one stage picks the next. First stage is the same as All.
-Loser - The loser of one stage picks the next. First stage is the same as All.
-Game Winner - Whoever is leading picks the next stage. In case of a tie, whoever placed highest in the last stage gets control. First stage is the same as All.
-Game Loser - Whoever is in last place picks the next stage. In case of a tie, whoever placed lowest in the last stage gets control. First stage is the same as All.
-Random - One person is picked at random to decide the next stage.
-Random Loser - One person who didn't win the last stage is picked at random to decide the next stage. First stage is regular Random.
-Cycle - P1 picks the first stage, P2 picks the second, and so on. 
-
-- Need to handle mode setting menus, filters and thumbs menus for only one team control
-- Need to deal with AI when only bots on the team that controls the menu
-- Test all control cases with teams/bots keyboard/controllers menu/sub menus/bonus wheel/scoreboard and ties for winner/loser tournament ties etc.
-- Need a flag and message for when all teams have control and display this message on the first view of the selection menu
-
-[ ] Pow-blocks do not kill piranha plants
-
-[ ] Another death tile type the strong death tile (lava) as opposed to the weak death tile (spikes).  Everything dies on the strong death tile, where as only players die on the weak tiles (and go shielded on those types of modes as opposed to respawn for strong)
-[ ] Wand should go for a set distance, not to the edge of the screen
-
-[ ] BOMB UPDATES
-1) Shorten the time a bit.
-2) Allow two on-screen at once.
-3) Add a 1.5 second delay between pulling out one bomb and another.
-4) If you try to pull out a third bomb, the first one explodes. (This is what the delay is for. Having it any shorter would allow you to sort of "chain" explosions pretty much all over.)
-5) Make the Rock Blocks from SMB2 destroyable with bombs, if Two52 doesn't mind having another interactive block. But in the games, explosions don't damage regular bricks or flip blocks, so I don't think they should here.
 
 
 [ ] Player needs bounce when killing hazards with shoe or tanooki?
@@ -2513,6 +2472,16 @@ void RunGame()
 										CO_ThrowBlock * throwblock = (CO_ThrowBlock*)movingobject;
 										if(!throwblock->owner || throwblock->owner->inair == game_values.screenshakekillinair)
 											throwblock->Die();
+									}
+									else if(movingobject->getMovingObjectType() == movingobject_pirhanaplant)
+									{
+										MO_PirhanaPlant * plant = (MO_PirhanaPlant*)movingobject;
+										plant->KillPlant();
+									}
+									else if(movingobject->getMovingObjectType() == movingobject_bulletbill)
+									{
+										MO_BulletBill * bulletbill = (MO_BulletBill*)movingobject;
+										bulletbill->Die();
 									}
 								}
 							}

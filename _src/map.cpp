@@ -26,7 +26,7 @@ extern short g_iVersion[];
 extern char * g_szBackgroundConversion[26];
 extern short g_iMusicCategoryConversion[26];
 
-short g_iTileTypeConversion[13] = {0, 1, 2, 5, 121, 9, 17, 33, 65, 6, 21, 37, 69};
+short g_iTileTypeConversion[18] = {0, 1, 2, 5, 121, 9, 17, 33, 65, 6, 21, 37, 69, 3961, 265, 529, 1057, 2113};
 
 CMap::CMap()
 {
@@ -329,7 +329,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 				TileType iType = (TileType)ReadInt(mapfile);
 				mapdatatop[i][j].iType = iType;
 
-				if(iType >= 0 && iType <= 12)
+				if(iType >= 0 && iType <= 17)
 					mapdatatop[i][j].iFlags = g_iTileTypeConversion[iType];
 				else
 				{
@@ -1204,7 +1204,7 @@ void CMap::loadPlatforms(FILE * mapfile, bool fPreview, int version[4], short * 
 
 					TileType iType = (TileType)ReadInt(mapfile);
 
-					if(iType >= 0 && iType <= 12)
+					if(iType >= 0 && iType <= 17)
 					{
 						types[iCol][iRow].iType = iType;
 						types[iCol][iRow].iFlags = g_iTileTypeConversion[iType];
@@ -1341,7 +1341,7 @@ void CMap::saveMap(const std::string& file)
 			{
 				//Set the tile type flags for each tile
 				int iType = platforms[iPlatform]->iTileType[iCol][iRow].iType;
-				if(iType >= 0 && iType <= 12)
+				if(iType >= 0 && iType <= 17)
 				{
 					platforms[iPlatform]->iTileType[iCol][iRow].iFlags = g_iTileTypeConversion[iType];
 				}
@@ -1374,7 +1374,7 @@ void CMap::saveMap(const std::string& file)
 		{
 			//Set the tile type flags for each tile
 			int iType = mapdatatop[i][j].iType;
-			if(iType >= 0 && iType <= 12)
+			if(iType >= 0 && iType <= 17)
 			{
 				mapdatatop[i][j].iFlags = g_iTileTypeConversion[iType];
 			}
@@ -2126,7 +2126,7 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks)
 						if(m == j && (flags & tile_flag_solid_on_top))
 							continue;
 
-						if(type == tile_death_on_top || type == tile_death)
+						if(type == tile_death_on_top || type == tile_death || type == tile_super_death_top || type == tile_super_death)
 						{
 							fUsed = true;
 							break;
@@ -2157,7 +2157,7 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks)
 							TileType type = mapdatatop[i][m].iType;
 							short block = objectdata[i][m].iType;
 
-							if(type == tile_death_on_top || type == tile_death)
+							if(type == tile_death_on_top || type == tile_death || type == tile_super_death_top || type == tile_super_death)
 							{
 								fUsed = true;
 								break;
@@ -2697,9 +2697,9 @@ void CMap::predrawbackground(gfxSprite &background, gfxSprite &mapspr)
 	SDL_Rect dest;
 	dest.w = 32;
 	dest.h = 32;
-	short iType = 2;
+	short iType = 5; //use [5] for item spawn areas
 	
-	for(int m = 0; m < numspawnareas[iType]; m++)  //use [1] for item spawn areas
+	for(int m = 0; m < numspawnareas[iType]; m++)  
 	{
 		dest.x = spawnareas[iType][m].left * TILESIZE;
 		dest.y = spawnareas[iType][m].top * TILESIZE;

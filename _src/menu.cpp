@@ -2943,6 +2943,11 @@ void Menu::RunMenu()
 {
 	iUnlockMinigameOptionIndex = 0;
 
+	iTournamentAIStep = 0;
+	iTournamentAITimer = 0;
+
+	bool fShowSettingsButton[GAMEMODE_LAST] = {true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, true, true, true, true, true, true};
+
 	//Reset the keys each time we switch from menu to game and back
 	game_values.playerInput.ResetKeys();
 
@@ -3311,6 +3316,60 @@ void Menu::RunMenu()
 			game_values.playerInput.Update(event, 1);
 		}
 
+		//If AI is controlling the tournament menu, select the options
+		if(game_values.matchtype == MATCH_TYPE_TOURNAMENT && iTournamentAITimer > 0 && mCurrentMenu == &mGameSettingsMenu && mCurrentMenu->GetHeadControl() == miSettingsStartButton)
+		{
+			if(--iTournamentAITimer == 0)
+			{
+				iTournamentAIStep++;
+
+				if(iTournamentAIStep == 1)
+				{
+					miMapField->ChooseRandomMap();
+
+					iTournamentAITimer = 60;
+				}
+				else if(iTournamentAIStep == 2)
+				{
+					currentgamemode = rand() % GAMEMODE_LAST;
+					game_values.gamemode = gamemodes[currentgamemode];
+
+					miModeField->SetKey(currentgamemode);
+
+					//Unhide/hide the settings button
+					game_values.gamemode = gamemodes[miModeField->GetShortValue()];
+					miModeSettingsButton->Show(fShowSettingsButton[miModeField->GetShortValue()]);
+
+					//Show the approprate goal field
+					for(short iMode = 0; iMode < GAMEMODE_LAST; iMode++)
+					{
+						miGoalField[iMode]->Show(miModeField->GetShortValue() == iMode);
+					}
+
+					iTournamentAITimer = 60;
+				}
+				else if(iTournamentAIStep == 3)
+				{
+					SModeOption * options = game_values.gamemode->GetOptions();
+					
+					//Choose a goal from the lower values for a quicker game
+					short iRandOption = (rand() % 6) + 1;
+					game_values.gamemode->goal  = options[iRandOption].iValue;
+
+					miGoalField[currentgamemode]->SetKey(gamemodes[currentgamemode]->goal);
+
+					SetRandomGameModeSettings(game_values.gamemode->gamemode);
+					
+					iTournamentAITimer = 60;
+				}
+				else if(iTournamentAIStep == 4)
+				{
+					iTournamentAIStep = 0;
+					StartGame();
+				}
+			}
+		}
+
 		//Watch for the konami code to unlock the minigames match type
 		if(!game_values.minigameunlocked && mCurrentMenu == &mMatchSelectionMenu)
 		{
@@ -3371,8 +3430,6 @@ void Menu::RunMenu()
 		{
 			MenuCodeEnum code = mCurrentMenu->SendInput(&game_values.playerInput);
 
-			bool fShowSettingsButton[GAMEMODE_LAST] = {true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, true, true, true, true, true, true};
-
 			if(MENU_CODE_EXIT_APPLICATION == code)
 			{
 				Exit();
@@ -3423,7 +3480,7 @@ void Menu::RunMenu()
 				else
 				{
 					game_values.tournamentcontrolteam = -1;
-					SetControllingTeamForSettingsMenu(false);
+					SetControllingTeamForSettingsMenu(game_values.tournamentcontrolteam, false);
 				}
 			}
 			else if(MENU_CODE_MATCH_SELECTION_MATCH_CHANGED == code)
@@ -3629,7 +3686,7 @@ void Menu::RunMenu()
 
 							//If it is a tournament, then set the controlling team 
 							if(MATCH_TYPE_TOURNAMENT == game_values.matchtype)
-								SetControllingTeamForSettingsMenu(true);
+								SetControllingTeamForSettingsMenu(game_values.tournamentcontrolteam, true);
 						}
 						else if(MATCH_TYPE_TOUR == game_values.matchtype)
 						{
@@ -3721,7 +3778,7 @@ void Menu::RunMenu()
 
 				//Set the controlling team for tournament mode
 				if(MATCH_TYPE_TOURNAMENT == game_values.matchtype && game_values.tournamentwinner == -1)
-					SetControllingTeamForSettingsMenu(true);
+					SetControllingTeamForSettingsMenu(game_values.tournamentcontrolteam, true);
 
 				if(fNeedTeamAnnouncement)
 					miWorld->DisplayTeamControlAnnouncement();
@@ -3781,6 +3838,9 @@ void Menu::RunMenu()
 					mGameSettingsMenu.SetHeadControl(miGameSettingsExitDialogNoButton);
 					mGameSettingsMenu.SetCancelCode(MENU_CODE_NONE);
 					mGameSettingsMenu.ResetMenu();
+
+					if(iTournamentAITimer > 0)
+						SetControllingTeamForSettingsMenu(-1, false);
 				}
 				else
 				{
@@ -3824,6 +3884,8 @@ void Menu::RunMenu()
 
 				if(MENU_CODE_EXIT_TOURNAMENT_YES == code)
 					ResetTournamentBackToMainMenu();
+				else
+					SetControllingTeamForSettingsMenu(game_values.tournamentcontrolteam, false);
 			}
 			else if(MENU_CODE_EXIT_TOUR_YES == code || MENU_CODE_EXIT_TOUR_NO == code)
 			{
@@ -4534,32 +4596,56 @@ void Menu::StartGame()
 	game_values.screenfadespeed = 8;
 }
 
-void Menu::SetControllingTeamForSettingsMenu(bool fDisplayMessage)
+void Menu::SetControllingTeamForSettingsMenu(short iControlTeam, bool fDisplayMessage)
 {
-	mGameSettingsMenu.SetControllingTeam(game_values.tournamentcontrolteam);
+	mGameSettingsMenu.SetControllingTeam(iControlTeam);
 
 	for(short iMode = 0; iMode < GAMEMODE_LAST; iMode++)
-		mModeSettingsMenu[iMode].SetControllingTeam(game_values.tournamentcontrolteam);
+		mModeSettingsMenu[iMode].SetControllingTeam(iControlTeam);
 
-	miMapFilterScroll->SetControllingTeam(game_values.tournamentcontrolteam);
-	miMapBrowser->SetControllingTeam(game_values.tournamentcontrolteam);
+	miMapFilterScroll->SetControllingTeam(iControlTeam);
+	miMapBrowser->SetControllingTeam(iControlTeam);
 
 	if(fDisplayMessage)
-		DisplayControllingTeamMessage();
+		DisplayControllingTeamMessage(iControlTeam);
+
+	//Scan controlling team members and if they are only bots, then let the cpu control the selection
+	iTournamentAITimer = 0;
+	iTournamentAIStep = 0;
+	mGameSettingsMenu.SetAllowExit(false);
+
+	if(iControlTeam >= 0)
+	{
+		bool fNeedAI = true;
+		for(short iPlayer = 0; iPlayer < game_values.teamcounts[iControlTeam]; iPlayer++)
+		{
+			if(game_values.playercontrol[game_values.teamids[iControlTeam][iPlayer]] == 1)
+			{
+				fNeedAI = false;
+				break;
+			}
+		}
+
+		if(fNeedAI)
+		{
+			iTournamentAITimer = 60;
+			mGameSettingsMenu.SetAllowExit(true);
+		}
+	}
 }
 
-void Menu::DisplayControllingTeamMessage()
+void Menu::DisplayControllingTeamMessage(short iControlTeam)
 {
 	//Display the team that is in control of selecting the next game
 	char szMessage[128];
-	if(game_values.tournamentcontrolteam < 0)
+	if(iControlTeam < 0)
 		sprintf(szMessage, "All Teams Are In Control");
-	else if(game_values.teamcounts[game_values.tournamentcontrolteam] <= 1)
-		sprintf(szMessage, "Player %d Is In Control", game_values.teamids[game_values.tournamentcontrolteam][0] + 1);
+	else if(game_values.teamcounts[iControlTeam] <= 1)
+		sprintf(szMessage, "Player %d Is In Control", game_values.teamids[iControlTeam][0] + 1);
 	else
-		sprintf(szMessage, "Team %d Is In Control", game_values.tournamentcontrolteam + 1);
+		sprintf(szMessage, "Team %d Is In Control", iControlTeam + 1);
 
-	mCurrentMenu->AddEyeCandy(new EC_Announcement(&menu_font_large, &spr_announcementicons, szMessage, game_values.colorids[game_values.teamids[game_values.tournamentcontrolteam][0]], 120, 100));
+	mCurrentMenu->AddEyeCandy(new EC_Announcement(&menu_font_large, &spr_announcementicons, szMessage, iControlTeam < 0 ? 4 : game_values.colorids[game_values.teamids[iControlTeam][0]], 120, 100));
 }
 
 void Menu::Exit()

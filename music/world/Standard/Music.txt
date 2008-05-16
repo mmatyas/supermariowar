@@ -7,7 +7,7 @@
 #Special music
 #Bonus plays in bonus houses
 [Bonus]
-bonus.ogg
+bonushouse.ogg
 
 #Sleep plays when a music box world item is used
 [Sleep]

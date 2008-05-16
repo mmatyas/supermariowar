@@ -659,6 +659,8 @@ class MI_MapField : public UI_Control
 
 		const char * GetMapName() {return szMapName;}
 
+		MenuCodeEnum ChooseRandomMap();
+
 	protected:
 
 		gfxSprite * spr;

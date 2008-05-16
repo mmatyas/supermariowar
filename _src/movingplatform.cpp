@@ -663,16 +663,23 @@ void MovingPlatform::collide(CPlayer * player)
 
 			if((t1 & tile_flag_solid) || (t2 & tile_flag_solid))
 			{
+				bool fDeathTileToLeft = ((t1 & tile_flag_death_on_left) && (t2 & tile_flag_death_on_left)) ||
+									 ((t1 & tile_flag_death_on_left) && !(t2 & tile_flag_solid)) ||
+									 (!(t1 & tile_flag_solid) && (t2 & tile_flag_death_on_left));
+
+				bool fSuperDeathTileToLeft = ((t1 & tile_flag_super_death_left) && (t2 & tile_flag_super_death_left)) ||
+									      ((t1 & tile_flag_super_death_left) && !(t2 & tile_flag_solid)) ||
+									      (!(t1 & tile_flag_solid) && (t2 & tile_flag_super_death_left));
+
 				if(player->iHorizontalPlatformCollision == 3)
 				{
 					player->KillPlayerMapHazard(true, kill_style_environment);
 					//printf("Platform Right Side Killed Player\n");
 					return;
 				}
-				else if(((t1 & tile_flag_death_on_left) || (t2 & tile_flag_death_on_left)) &&
-					!player->invincible && player->shield == 0)
+				else if(fSuperDeathTileToLeft || (fDeathTileToLeft && !player->invincible && player->shield == 0))
 				{
-					if(player_kill_nonkill != player->KillPlayerMapHazard(true, kill_style_environment))
+					if(player_kill_nonkill != player->KillPlayerMapHazard(fSuperDeathTileToLeft, kill_style_environment))
 						return;
 				}
 				else
@@ -727,16 +734,23 @@ void MovingPlatform::collide(CPlayer * player)
 
 			if((t1 & tile_flag_solid) || (t2 & tile_flag_solid))
 			{
+				bool fDeathTileToRight = ((t1 & tile_flag_death_on_right) && (t2 & tile_flag_death_on_right)) ||
+									 ((t1 & tile_flag_death_on_right) && !(t2 & tile_flag_solid)) ||
+									 (!(t1 & tile_flag_solid) && (t2 & tile_flag_death_on_right));
+
+				bool fSuperDeathTileToRight = ((t1 & tile_flag_super_death_right) && (t2 & tile_flag_super_death_right)) ||
+									      ((t1 & tile_flag_super_death_right) && !(t2 & tile_flag_solid)) ||
+									      (!(t1 & tile_flag_solid) && (t2 & tile_flag_super_death_right));
+
 				if(player->iHorizontalPlatformCollision == 1)
 				{
 					player->KillPlayerMapHazard(true, kill_style_environment);
 					//printf("Platform Left Side Killed Player\n");
 					return;				
 				}
-				else if(((t1 & tile_flag_death_on_right) || (t2 & tile_flag_death_on_right)) &&
-					!player->invincible && player->shield == 0)
+				else if(fSuperDeathTileToRight || (fDeathTileToRight && !player->invincible && player->shield == 0))
 				{
-					if(player_kill_nonkill != player->KillPlayerMapHazard(true, kill_style_environment))
+					if(player_kill_nonkill != player->KillPlayerMapHazard(fSuperDeathTileToRight, kill_style_environment))
 						return;				
 				}
 				else
@@ -814,9 +828,19 @@ void MovingPlatform::collide(CPlayer * player)
 
 			if(fRelativeX2 >= 0.0f && fRelativeX2 < iWidth)
 				t2 = iTileType[(short)fRelativeX2 / TILESIZE][ty].iFlags;
-		
-			if(((t1 & tile_flag_solid) || (t2 & tile_flag_solid)) && (((t1 & tile_flag_death_on_bottom) == 0 && (t2 & tile_flag_death_on_bottom) == 0) || 
-				player->invincible || player->shield > 0))
+
+			bool fSolidTileOverPlayer = (t1 & tile_flag_solid) || (t1 & tile_flag_solid);
+
+			bool fDeathTileOverPlayer = ((t1 & tile_flag_death_on_bottom) && (t2 & tile_flag_death_on_bottom)) ||
+									 ((t1 & tile_flag_death_on_bottom) && !(t2 & tile_flag_solid)) ||
+									 (!(t1 & tile_flag_solid) && (t2 & tile_flag_death_on_bottom));
+
+			bool fSuperDeathTileOverPlayer = ((t1 & tile_flag_super_death_bottom) && (t2 & tile_flag_super_death_bottom)) ||
+									      ((t1 & tile_flag_super_death_bottom) && !(t2 & tile_flag_solid)) ||
+									      (!(t1 & tile_flag_solid) && (t2 & tile_flag_super_death_bottom));
+
+			if(fSolidTileOverPlayer && !fSuperDeathTileOverPlayer && 
+				(!fDeathTileOverPlayer || player->invincible || player->shield > 0))
 			{
 				if(player->iVerticalPlatformCollision == 2)
 				{
@@ -913,8 +937,12 @@ void MovingPlatform::collide(CPlayer * player)
 									 ((t1 & tile_flag_death_on_top) && !(t2 & tile_flag_solid)) ||
 									 (!(t1 & tile_flag_solid) && (t2 & tile_flag_death_on_top));
 
-			if(fSolidTileUnderPlayer && (!fDeathTileUnderPlayer ||  
-				player->invincible || player->shield > 0 || player->iKuriboShoe > 0))
+			bool fSuperDeathTileUnderPlayer = ((t1 & tile_flag_super_death_top) && (t2 & tile_flag_super_death_top)) ||
+									 ((t1 & tile_flag_super_death_top) && !(t2 & tile_flag_solid)) ||
+									 (!(t1 & tile_flag_solid) && (t2 & tile_flag_super_death_top));
+
+			if(fSolidTileUnderPlayer && !fSuperDeathTileUnderPlayer && 
+				(!fDeathTileUnderPlayer || player->invincible || player->shield > 0 || player->iKuriboShoe > 0))
 			{	//on ground
 
 				if(player->iVerticalPlatformCollision == 0)
@@ -949,9 +977,9 @@ void MovingPlatform::collide(CPlayer * player)
 					return;
 				}
 			}
-			else if(fDeathTileUnderPlayer)
+			else if(fDeathTileUnderPlayer || fSuperDeathTileUnderPlayer)
 			{
-				if(player_kill_nonkill != player->KillPlayerMapHazard(true, kill_style_environment))
+				if(player_kill_nonkill != player->KillPlayerMapHazard(fSuperDeathTileUnderPlayer, kill_style_environment))
 					return;
 			}
 			else
@@ -1403,11 +1431,11 @@ void MovingPlatform::collide(IO_MovingObject * object)
 				return;
 			}
 			
-			bool fDeathTileUnderObject = object->fObjectDiesOnDeathTiles && (((t1 & tile_flag_death_on_top) && (t2 & tile_flag_death_on_top)) ||
-									 ((t1 & tile_flag_death_on_top) && !(t2 & tile_flag_solid)) ||
-									 (!(t1 & tile_flag_solid) && (t2 & tile_flag_death_on_top)));
+			bool fSuperDeathTileUnderObject = object->fObjectDiesOnSuperDeathTiles && (((t1 & tile_flag_super_death_top) && (t2 & tile_flag_super_death_top)) ||
+									 ((t1 & tile_flag_super_death_top) && !(t2 & tile_flag_solid)) ||
+									 (!(t1 & tile_flag_solid) && (t2 & tile_flag_super_death_top)));
 			
-			if(((t1 & tile_flag_solid) || (t2 & tile_flag_solid)) && !fDeathTileUnderObject)
+			if(((t1 & tile_flag_solid) || (t2 & tile_flag_solid)) && !fSuperDeathTileUnderObject)
 			{	//on ground
 				if(object->iVerticalPlatformCollision == 0)
 				{
@@ -1435,7 +1463,7 @@ void MovingPlatform::collide(IO_MovingObject * object)
 					return;
 				}
 			}
-			else if(fDeathTileUnderObject)
+			else if(fSuperDeathTileUnderObject)
 			{
 				object->KillObjectMapHazard();
 				return;

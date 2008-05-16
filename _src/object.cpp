@@ -23,15 +23,10 @@ void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead
 	{
 		short iPlayerID = object->iPlayerID;
 		bool fDie = true;
-		bool fDisplayExplosion = true;
 
 		if(type == movingobject_hammer && !game_values.hammerpower)
 		{
 			fDie = false;
-		}
-		else if(type == movingobject_iceblast)
-		{
-			fDisplayExplosion = false;
 		}
 
 		if(fDie || forcedead)
@@ -40,9 +35,7 @@ void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead
 				projectiles[iPlayerID]--;
 
 			object->dead = true;
-
-			if(fDisplayExplosion)
-				eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, object->ix + (object->iw >> 1) - 16, object->iy + (object->ih >> 1) - 16, 3, 4));
+			eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, object->ix + (object->iw >> 1) - 16, object->iy + (object->ih >> 1) - 16, 3, 4));
 		}
 		
 		if(playsound)
@@ -2631,7 +2624,7 @@ IO_MovingObject::IO_MovingObject(gfxSprite *nspr, short x, short y, short iNumSp
 	iHorizontalPlatformCollision = -1;
 	iVerticalPlatformCollision = -1;
 
-	fObjectDiesOnDeathTiles = true;
+	fObjectDiesOnSuperDeathTiles = true;
 }
 
 
@@ -3039,11 +3032,11 @@ void IO_MovingObject::collision_detection_map()
 			}
 		}
 
-		bool fDeathTileUnderObject = fObjectDiesOnDeathTiles && (((leftTile & tile_flag_death_on_top) && (rightTile & tile_flag_death_on_top)) ||
-									 ((leftTile & tile_flag_death_on_top) && !(rightTile & tile_flag_solid)) ||
-									 (!(leftTile & tile_flag_solid) && (rightTile & tile_flag_death_on_top)));
+		bool fSuperDeathTileUnderObject = fObjectDiesOnSuperDeathTiles && (((leftTile & tile_flag_super_death_top) && (rightTile & tile_flag_super_death_top)) ||
+									 ((leftTile & tile_flag_super_death_top) && !(rightTile & tile_flag_solid)) ||
+									 (!(leftTile & tile_flag_solid) && (rightTile & tile_flag_super_death_top)));
 
-		if(((leftTile & tile_flag_solid) || (rightTile & tile_flag_solid)) && !fDeathTileUnderObject)
+		if(((leftTile & tile_flag_solid) || (rightTile & tile_flag_solid)) && !fSuperDeathTileUnderObject)
 		{	
 			vely = BottomBounce();
 			yf((float)(ty * TILESIZE - collisionHeight) - 0.2f);
@@ -3065,7 +3058,7 @@ void IO_MovingObject::collision_detection_map()
 			if(iVerticalPlatformCollision == 0)
 				KillObjectMapHazard();
 		}
-		else if(fDeathTileUnderObject)
+		else if(fSuperDeathTileUnderObject)
 		{
 			KillObjectMapHazard();
 			return;
@@ -3795,7 +3788,7 @@ PU_TreasureChestBonus::PU_TreasureChestBonus(gfxSprite *nspr, short iNumSpr, sho
 	drawbonusitemy = 0;
 	drawbonusitemtimer = 0;
 
-	fObjectDiesOnDeathTiles = false;
+	fObjectDiesOnSuperDeathTiles = false;
 }
 
 void PU_TreasureChestBonus::update()
@@ -4555,19 +4548,11 @@ MO_IceBlast::MO_IceBlast(gfxSprite *nspr, short x, short y, float fVelyX, short 
 	vely = 0.0f;
 
 	if(velx > 0.0f)
-	{
 		drawframe = 0;
-
-		if(ix >= 624)
-			xi(ix - 640);
-	}
 	else
-	{
 		drawframe = animationWidth - iw;
-		
-		if(ix + iw < 16)
-			xi(ix + 640);
-	}
+
+	ttl = 120;
 }
 
 void MO_IceBlast::update()
@@ -4592,8 +4577,10 @@ void MO_IceBlast::update()
 
 	xf(fx + velx);
 	
-	if(ix >= 640 || ix + iw < 0)
+	if(--ttl <= 0)
+	{
 		removeifprojectile(this, false, true);
+	}
 }
 
 bool MO_IceBlast::collide(CPlayer * player)
@@ -5411,6 +5398,8 @@ MO_BulletBill::MO_BulletBill(gfxSprite *nspr, gfxSprite *nsprdead, short x, shor
 
 	ih = 32;
 	iw = 32;
+
+	inair = true;
 
 	if(fIsSpawned)
 	{
@@ -9358,7 +9347,6 @@ CO_KuriboShoe::CO_KuriboShoe(gfxSprite *nspr, short ix, short iy, bool sticky) :
 
 	movingObjectType = movingobject_carried;
 
-	fObjectDiesOnDeathTiles = false;
 	fSticky = sticky;
 }
 
@@ -10159,6 +10147,9 @@ void MO_PirhanaPlant::SetNewTimer()
 
 void MO_PirhanaPlant::KillPlant()
 {
+	if(state == 0)
+		return;
+
 	SetNewTimer();
 	state = 0;
 	
