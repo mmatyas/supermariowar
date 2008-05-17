@@ -9,7 +9,7 @@ class SimpleFileList
     public:
 		SimpleFileList() {};
         SimpleFileList(const std::string &path, const std::string &extension);
-        virtual ~SimpleFileList(){;};
+        virtual ~SimpleFileList();
         const char * GetIndex(unsigned int index);
         int GetCount() {return filelist.size();}
 

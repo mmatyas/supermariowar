@@ -43,6 +43,11 @@ SimpleFileList::SimpleFileList(const std::string &path, const std::string &exten
 	}
 }
 
+SimpleFileList::~SimpleFileList()
+{
+	filelist.clear();
+}
+
 
 void SimpleFileList::next()
 {

@@ -1298,8 +1298,8 @@ class MO_WalkingEnemy : public IO_MovingObject
 		virtual bool hitother(CPlayer * player);
 
 		virtual void Die() {}
-		virtual void DieAndDropShell() { dead = true; DropShell(); }
-		virtual void DropShell() {}
+		virtual void DieAndDropShell(bool fBounce) { dead = true; DropShell(fBounce); }
+		virtual void DropShell(bool fBounce) {}
 
 		killstyle getKillStyle() {return killStyle;}
 
@@ -1324,7 +1324,7 @@ class MO_Goomba : public MO_WalkingEnemy
 		void update();
 		bool hittop(CPlayer * player);
 		void Die();
-		void DieAndDropShell() { Die(); }
+		void DieAndDropShell(bool fBounce) { Die(); }
 };
 
 class MO_Koopa : public MO_WalkingEnemy
@@ -1336,7 +1336,7 @@ class MO_Koopa : public MO_WalkingEnemy
 		void update();
 		bool hittop(CPlayer * player);
 		void Die();
-		void DropShell();
+		void DropShell(bool fBounce);
 
 	private:
 
@@ -1352,7 +1352,7 @@ class MO_BuzzyBeetle : public MO_WalkingEnemy
 		void update();
 		bool hittop(CPlayer * player);
 		void Die();
-		void DropShell();
+		void DropShell(bool fBounce);
 };
 
 class MO_Spiny : public MO_WalkingEnemy
@@ -1364,7 +1364,7 @@ class MO_Spiny : public MO_WalkingEnemy
 		void update();
 		bool hittop(CPlayer * player);
 		void Die();
-		void DropShell();
+		void DropShell(bool fBounce);
 };
 
 class MO_CheepCheep : public IO_MovingObject

@@ -46,30 +46,23 @@ BUG!!  World AI needs ability to use stored items -> harder problem than I have 
 * Bomb option in Star mode
 - Mariokart-type podium at the end of a tournament/tour/whatever
 
-[ ] Add SMB3's first world as a test world to ship with
-[ ] Make the SMB3 world work -> Need to recreate maps using new 1.8 map editor
 
 SHIP BETA
-[ ] Get some good maps using 1.8 features
-[ ] Get some good worlds
-[ ] Prune old maps
+[X] Get some good maps using 1.8 features
+[X] Get some good worlds
+[X] Prune old maps
 [ ] Improve tilesets?
-[ ] Get SMB3's world working
+[X] Get SMB3's world working
 [ ] Test controllers on xbox where different tournament control settings are used
 	- Test all control cases with teams/bots keyboard/controllers menu/sub menus/bonus wheel/scoreboard and ties for winner/loser tournament ties etc.
-[ ] Go through all maps and replace lava tile types with super death
+[X] Go through all maps and replace lava tile types with super death
+[X] Add more special directory handling for world maps so that each world can have it's own map directory
+[X] Change "worldtour" maps directory to just "tour" or "tourmaps"
+[X] move 00small.txt and 0smw.txt to world test directory
+[X] Test new shell bounce (doesn't bounce for hopping, but does for tail hitting, bottom bouncing and pow/mod)
+
 
 Feature Requests
-
-[X] Options for who gets to pick the next stage in Tournament mode
-[X] Fixed bug where red coins were being used in coin mode
-[X] Fixed bug where AI was dying from suicide timer even though they were moving
-[X] Pow-blocks now kill piranha plants and mod blocks kill bullet bills hazards
-[X] Wand should go for a set distance, not to the edge of the screen
-[X] Another death tile type the strong death tile (lava) as opposed to the weak death tile (spikes).  Everything dies on the strong death tile, where as only players die on the weak tiles (and go shielded on those types of modes as opposed to respawn for strong)
-[X] Bomb updates - Shortened the alive time a bit, allow two on-screen at once from a player, and added a 1.5 second delay between pulling out one bomb and another.
-
-
 
 [ ] Player needs bounce when killing hazards with shoe or tanooki?
 
@@ -2440,7 +2433,7 @@ void RunGame()
 											killer->score->AdjustScore(1);
 
 										ifsoundonplay(sfx_kicksound);
-										((MO_WalkingEnemy*)movingobject)->DieAndDropShell();
+										((MO_WalkingEnemy*)movingobject)->DieAndDropShell(true);
 
 										game_values.screenshakekillscount++;
 										

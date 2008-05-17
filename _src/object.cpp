@@ -313,7 +313,7 @@ void IO_Block::BounceMovingObject(IO_MovingObject * object)
 		
 		MO_WalkingEnemy * enemy = (MO_WalkingEnemy *)object;
 		killstyle style = enemy->getKillStyle();
-		enemy->DieAndDropShell();
+		enemy->DieAndDropShell(true);
 
 		if(!game_values.gamemode->gameover && iBumpPlayerID >= 0)
 		{
@@ -7478,7 +7478,7 @@ void MO_WalkingEnemy::collide(IO_MovingObject * object)
 			ifsoundonplay(sfx_kicksound);
 			
 			if(type == movingobject_attackzone)
-				DieAndDropShell();
+				DieAndDropShell(true);
 			else
 				Die();
 
@@ -7635,7 +7635,7 @@ bool MO_Koopa::hittop(CPlayer * player)
 
 		AddAwardKill(player, NULL, kill_style_koopa);
 
-		DropShell();
+		DropShell(false);
 	}
 
 	ifsoundonplay(sfx_mip);
@@ -7649,7 +7649,7 @@ void MO_Koopa::Die()
 	eyecandyfront.add(new EC_FallingObject(&spr_shelldead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, fRed ? 32 : 0, 0, 32, 32));
 }
 
-void MO_Koopa::DropShell()
+void MO_Koopa::DropShell(bool fBounce)
 {
 	//Give the shell a state 2 so it is already spawned but sitting
 	CO_Shell * shell;
@@ -7661,7 +7661,9 @@ void MO_Koopa::DropShell()
 	
 	shell->state = 2;
 	shell->yi(iy + 8);
-	shell->vely = -VELJUMP / 2.0;
+
+	if(fBounce)
+		shell->vely = -VELJUMP / 2.0;
 
 	objectcontainer[1].add(shell);
 }
@@ -7702,7 +7704,7 @@ bool MO_BuzzyBeetle::hittop(CPlayer * player)
 
 	ifsoundonplay(sfx_mip);
 
-	DropShell();
+	DropShell(false);
 	
 	return false;
 }
@@ -7713,13 +7715,15 @@ void MO_BuzzyBeetle::Die()
 	eyecandyfront.add(new EC_FallingObject(&spr_shelldead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, 96, 0, 32, 32));
 }
 
-void MO_BuzzyBeetle::DropShell()
+void MO_BuzzyBeetle::DropShell(bool fBounce)
 {
 	//Give the shell a state 2 so it is already spawned but sitting
 	CO_Shell * shell = new CO_Shell(3, ix - 1, iy, false, true, false, false);
 	shell->state = 2;
 	shell->yi(iy);
-	shell->vely = -VELJUMP / 2.0;
+
+	if(fBounce)
+		shell->vely = -VELJUMP / 2.0;
 
 	objectcontainer[1].add(shell);
 }
@@ -7765,7 +7769,7 @@ bool MO_Spiny::hittop(CPlayer * player)
 		if(game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover)
 			player->score->AdjustScore(1);
 
-		DropShell();
+		DropShell(false);
 
 		ifsoundonplay(sfx_mip);
 	}
@@ -7779,13 +7783,15 @@ void MO_Spiny::Die()
 	eyecandyfront.add(new EC_FallingObject(&spr_shelldead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, 64, 0, 32, 32));
 }
 
-void MO_Spiny::DropShell()
+void MO_Spiny::DropShell(bool fBounce)
 {
 	//Give the shell a state 2 so it is already spawned but sitting
 	CO_Shell * shell = new CO_Shell(2, ix - 1, iy, false, true, false, false);
 	shell->state = 2;
 	shell->yi(iy);
-	shell->vely = -VELJUMP / 2.0;
+	
+	if(fBounce)
+		shell->vely = -VELJUMP / 2.0;
 
 	objectcontainer[1].add(shell);
 }

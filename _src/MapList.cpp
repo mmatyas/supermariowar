@@ -110,13 +110,32 @@ MapList::MapList()
 	mlnFilteredMaps = new std::map<std::string, MapListNode*>::iterator[maps.size()];
 	mlnMaps = new std::map<std::string, MapListNode*>::iterator[maps.size()];
 
-	//Load in the "world only" maps
-	DirectoryListing worldMapDir(convertPath("maps/worldtour/"), ".map");
+	//Load in the "tour only" maps directory
+	DirectoryListing tourMapDir(convertPath("maps/tour/"), ".map");
 
-	while(worldMapDir(curname))
+	while(tourMapDir(curname))
 	{
-		MapListNode * node = new MapListNode(worldMapDir.fullName(curname));
+		MapListNode * node = new MapListNode(tourMapDir.fullName(curname));
 		worldmaps[stripCreatorAndDotMap(curname)] = node;
+	}
+
+	//Read all world map directories and load them into the world/tour only list
+	SimpleDirectoryList worldmapdirs(convertPath("worlds/"));
+
+	short iDirCount = worldmapdirs.GetCount();
+	for(short iDir = 0; iDir < iDirCount; iDir++)
+	{
+		const char * szName = worldmapdirs.current_name();
+		
+		DirectoryListing worldMapDir(convertPath(std::string(szName) + std::string("/")), ".map");
+
+		while(worldMapDir(curname))
+		{
+			MapListNode * node = new MapListNode(worldMapDir.fullName(curname));
+			worldmaps[stripCreatorAndDotMap(curname)] = node;
+		}
+		
+		worldmapdirs.next();
 	}
 }
 
