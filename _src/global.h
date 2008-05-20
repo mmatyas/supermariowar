@@ -225,7 +225,7 @@ struct STextAward
 #define NUM_BLOCK_SETTINGS NUM_POWERUPS
 #define NUM_POWERUP_PRESETS 17
 
-void GetNameFromFileName(char * szName, const char * szFileName);
+void GetNameFromFileName(char * szName, const char * szFileName, bool fStripAuthor = false);
 std::string stripCreatorAndDotMap(const std::string &filename);
 
 #define NUM_AUTO_FILTERS 12
@@ -289,8 +289,7 @@ extern short			score_cnt;
 extern CObjectContainer noncolcontainer;
 extern CObjectContainer objectcontainer[3];
 
-extern CEyecandyContainer eyecandyfront;
-extern CEyecandyContainer eyecandyback;
+extern CEyecandyContainer eyecandy[3];
 
 extern STextAward		awards[PAWARD_LAST];
 extern sfxSound			sfx_announcer[PANNOUNCER_SOUND_LAST];

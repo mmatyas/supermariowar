@@ -79,7 +79,7 @@ bool WorldMovingObject::Update()
 	if(iState == 1)
 	{
 		iy -= 2;
-		if(iy <= iDestTileY * iTileSize)
+		if(iy < iDestTileY * iTileSize)
 		{
 			iy = iDestTileY * iTileSize;
 			iState = 0;
@@ -91,7 +91,7 @@ bool WorldMovingObject::Update()
 	else if(iState == 2) //down
 	{
 		iy += 2;
-		if(iy >= iDestTileY * iTileSize)
+		if(iy > iDestTileY * iTileSize)
 		{
 			iy = iDestTileY * iTileSize;
 			iState = 0;
@@ -103,7 +103,7 @@ bool WorldMovingObject::Update()
 	else if(iState == 3) //left
 	{
 		ix -= 2;
-		if(ix <= iDestTileX * iTileSize)
+		if(ix < iDestTileX * iTileSize)
 		{
 			ix = iDestTileX * iTileSize;
 			iState = 0;
@@ -115,7 +115,7 @@ bool WorldMovingObject::Update()
 	else if(iState == 4) //right
 	{
 		ix += 2;
-		if(ix >= iDestTileX * iTileSize)
+		if(ix > iDestTileX * iTileSize)
 		{
 			ix = iDestTileX * iTileSize;
 			iState = 0;
@@ -1718,7 +1718,7 @@ short WorldMap::UseKey(short iKeyType, short iCol, short iRow, bool fCloud)
 		}
 	}
 
-	if(iCol < iHeight - 1)
+	if(iRow < iHeight - 1)
 	{
 		if((tile->iCompleted >= -1 || fCloud) && tiles[iCol][iRow + 1].iType - 2 == iKeyType)
 		{

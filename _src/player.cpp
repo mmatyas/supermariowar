@@ -425,7 +425,7 @@ void CPlayer::move()
 			CO_KuriboShoe * shoe = new CO_KuriboShoe(&spr_kuriboshoe, ix - PWOFFSET, iy - PHOFFSET - 2, iKuriboShoe == 2);
 			shoe->collision_detection_checksides();
 			objectcontainer[1].add(shoe);
-			eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
+			eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
 
 			iKuriboShoeExitIndex = 0;
 			iKuriboShoeExitTimer = 0;
@@ -455,7 +455,7 @@ void CPlayer::move()
             statue_timer = 123;
 
             // perform tansformation effects
-			eyecandyfront.add(new EC_SingleAnimation(&spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
+			eyecandy[2].add(new EC_SingleAnimation(&spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
             ifsoundonplay(sfx_transform);
 
             // Neutralize lateral velocity
@@ -504,7 +504,7 @@ void CPlayer::move()
 					vely = -8.0;
 
 				// perform transformation effects
-				eyecandyfront.add(new EC_SingleAnimation(&spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
+				eyecandy[2].add(new EC_SingleAnimation(&spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
 				ifsoundonplay(sfx_transform);
 
 				statue_lock = false;
@@ -513,7 +513,11 @@ void CPlayer::move()
 				if(game_values.tanookilimit > 0 || tanookilimit > 0)
 				{
 					if(--tanookilimit <= 0)
+					{
 						tanooki = false;
+						tanookilimit = 0;
+						ifsoundonplay(sfx_powerdown);
+					}
 				}
 			}
 
@@ -542,7 +546,7 @@ void CPlayer::move()
 
 	if(fSuperStomp && !inair)
 	{
-		eyecandyfront.add(new EC_SuperStompExplosion(&spr_superstomp, ix + HALFPW, iy + PH, 4));
+		eyecandy[2].add(new EC_SuperStompExplosion(&spr_superstomp, ix + HALFPW, iy + PH, 4));
 		ifsoundonplay(sfx_bobombsound);
 		fSuperStomp = false;
 
@@ -632,11 +636,11 @@ void CPlayer::move()
 
 					if(game_values.spawnstyle == 0)
 					{
-						eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
+						eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
 					}
 					else if(game_values.spawnstyle == 1)
 					{
-						eyecandyback.add(new EC_Door(&spr_spawndoor, sprites[spr], ix + HALFPW - 16, iy + HALFPH - 16, 1, iSrcOffsetX, colorID));
+						eyecandy[0].add(new EC_Door(&spr_spawndoor, sprites[spr], ix + HALFPW - 16, iy + HALFPH - 16, 1, iSrcOffsetX, colorID));
 					}
 				}
 			}
@@ -673,7 +677,7 @@ void CPlayer::move()
 					short iColorIdOffset = colorID << 5;
 
 					for(short iSwirl = 0; iSwirl < 4; iSwirl++)
-						eyecandyfront.add(new EC_SingleAnimation(&spr_spawnsmoke, ixoffset + g_iSwirlSpawnLocations[iSwirl][0][swirlindex], iyoffset + g_iSwirlSpawnLocations[iSwirl][1][swirlindex], 4, 4, 0, iColorIdOffset, 32, 32));
+						eyecandy[2].add(new EC_SingleAnimation(&spr_spawnsmoke, ixoffset + g_iSwirlSpawnLocations[iSwirl][0][swirlindex], iyoffset + g_iSwirlSpawnLocations[iSwirl][1][swirlindex], 4, 4, 0, iColorIdOffset, 32, 32));
 				}
 			}
 		}
@@ -845,10 +849,8 @@ void CPlayer::move()
 				}
 				case 17:
 				{
-					eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
-					ifsoundonplay(sfx_collectfeather);
-					powerup = 3;
-					iCapeTimer = 4;
+					powerup = -1;
+					SetPowerup(3);
 					break;
 				}
 				case 18:
@@ -913,7 +915,7 @@ void CPlayer::move()
 						jailtimer = 0;
 						jail = -1;
 
-						eyecandyfront.add(new EC_SingleAnimation(&spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
+						eyecandy[2].add(new EC_SingleAnimation(&spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
 						ifsoundonplay(sfx_transform);
 					}
 					else
@@ -963,7 +965,7 @@ void CPlayer::move()
 			frozentimer = 0;
 			frozen = false;
 
-			eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
+			eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
 		}
 	}
 
@@ -1061,7 +1063,7 @@ void CPlayer::move()
 			//jump pressed?
 			if(playerKeys->game_jump.fDown)
 			{
-				if(!lockjump)
+				if(!lockjump && !statue_timer && !fSuperStomp)
 				{
 					if(!inair && superjumptimer == 0)
 					{	//only if on the ground and the jump key was released somewhen after it was pressed the last time
@@ -1444,10 +1446,10 @@ void CPlayer::move()
 				else if(velx < 0.0f)
 					game_values.playskidsound = true;
 
-				if(g_map.eyecandyID & 32 && ++rainsteptimer > 7 && velx > VELMOVINGADD)
+				if((g_map.eyecandy[0] & 32 || g_map.eyecandy[1] & 32 || g_map.eyecandy[2] & 32) && ++rainsteptimer > 7 && velx > VELMOVINGADD)
 				{
 					rainsteptimer = 0;
-					eyecandyfront.add(new EC_SingleAnimation(&spr_frictionsmoke, ix, iy + PH - 14, 5, 3, 0, 16, 16, 16));
+					eyecandy[1].add(new EC_SingleAnimation(&spr_frictionsmoke, ix, iy + PH - 14, 5, 3, 0, 16, 16, 16));
 				}
 			}
 		}
@@ -1496,10 +1498,10 @@ void CPlayer::move()
 				else if(velx > 0.0f)
 					game_values.playskidsound = true;
 
-				if(g_map.eyecandyID & 32 && ++rainsteptimer > 7 && velx < -VELMOVINGADD)
+				if((g_map.eyecandy[0] & 32 || g_map.eyecandy[1] & 32 || g_map.eyecandy[2] & 32) && ++rainsteptimer > 7 && velx < -VELMOVINGADD)
 				{
 					rainsteptimer = 0;
-					eyecandyfront.add(new EC_SingleAnimation(&spr_frictionsmoke, ix, iy + PH - 14, 5, 3, 0, 16, 16, 16));
+					eyecandy[1].add(new EC_SingleAnimation(&spr_frictionsmoke, ix, iy + PH - 14, 5, 3, 0, 16, 16, 16));
 				}
 			}
 		}
@@ -1562,7 +1564,7 @@ void CPlayer::move()
 					}
 					else
 					{
-						eyecandyback.add(new EC_SingleAnimation(&spr_burnup, ix + HALFPW - 16, iy + HALFPH - 16, 5, 4));
+						eyecandy[0].add(new EC_SingleAnimation(&spr_burnup, ix + HALFPW - 16, iy + HALFPH - 16, 5, 4));
 					}
 				}
 			}
@@ -1616,7 +1618,7 @@ void CPlayer::move()
 			{
 				jailtimer = 0;
 				jail = -1;
-				eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
+				eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
 				ifsoundonplay(sfx_transform);
 			}
 		}
@@ -1680,7 +1682,7 @@ void CPlayer::SetSprite()
 					if(++frictionslidetimer > 3)
 					{
 						frictionslidetimer = 0;
-						eyecandyfront.add(new EC_SingleAnimation(&spr_frictionsmoke, ix, iy + PH - 12, 4, 4, 0, 0, 16, 16));
+						eyecandy[1].add(new EC_SingleAnimation(&spr_frictionsmoke, ix, iy + PH - 12, 4, 4, 0, 0, 16, 16));
 					}
 				}
 				else
@@ -1716,7 +1718,7 @@ void CPlayer::SetSprite()
 					if(++frictionslidetimer > 3)
 					{
 						frictionslidetimer = 0;
-						eyecandyfront.add(new EC_SingleAnimation(&spr_frictionsmoke, ix + PW - 16, iy + PH - 12, 4, 4, 0, 0, 16, 16));
+						eyecandy[1].add(new EC_SingleAnimation(&spr_frictionsmoke, ix + PW - 16, iy + PH - 12, 4, 4, 0, 0, 16, 16));
 					}
 				}
 				else
@@ -1954,18 +1956,18 @@ void CPlayer::die(short deathStyle, bool fTeamRemoved)
 	//Add eyecandy for the dead player
 	if(deathStyle == death_style_shatter || frozen)
 	{
-		eyecandyfront.add(new EC_FallingObject(&spr_brokeniceblock, ix + HALFPW - 16, iy + HALFPH - 16, -1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
-		eyecandyfront.add(new EC_FallingObject(&spr_brokeniceblock, ix + HALFPW, iy + HALFPH - 16, 1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
-		eyecandyfront.add(new EC_FallingObject(&spr_brokeniceblock, ix + HALFPW - 16, iy + HALFPH, -1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
-		eyecandyfront.add(new EC_FallingObject(&spr_brokeniceblock, ix + HALFPW, iy + HALFPH, 1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
+		eyecandy[2].add(new EC_FallingObject(&spr_brokeniceblock, ix + HALFPW - 16, iy + HALFPH - 16, -1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
+		eyecandy[2].add(new EC_FallingObject(&spr_brokeniceblock, ix + HALFPW, iy + HALFPH - 16, 1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
+		eyecandy[2].add(new EC_FallingObject(&spr_brokeniceblock, ix + HALFPW - 16, iy + HALFPH, -1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
+		eyecandy[2].add(new EC_FallingObject(&spr_brokeniceblock, ix + HALFPW, iy + HALFPH, 1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
 	}
 	else if(deathStyle == death_style_jump)
 	{
-		eyecandyfront.add(new EC_FallingObject(corpseSprite, ix + HALFPW - 16, iy + PH - 32, 0.0f, -VELTURBOJUMP, 1, 0, iSrcOffsetX, 0, 32, 32));
+		eyecandy[2].add(new EC_FallingObject(corpseSprite, ix + HALFPW - 16, iy + PH - 32, 0.0f, -VELTURBOJUMP, 1, 0, iSrcOffsetX, 0, 32, 32));
 	}
 	else if(deathStyle == death_style_squish)
 	{
-		eyecandyback.add(new EC_Corpse(corpseSprite, (float)(ix - PWOFFSET), (float)(iy+PH-32), iSrcOffsetX));
+		eyecandy[1].add(new EC_Corpse(corpseSprite, (float)(ix - PWOFFSET), (float)(iy+PH-32), iSrcOffsetX));
 	}
 
 	//Drop any item the dead player was carrying
@@ -2146,7 +2148,7 @@ void CPlayer::spawnText(char * szText)
 {
 	if(++spawntext >= 20)
 	{
-		eyecandyfront.add(new EC_GravText(&game_font_large, ix + HALFPW, iy, szText, -VELJUMP));
+		eyecandy[2].add(new EC_GravText(&game_font_large, ix + HALFPW, iy, szText, -VELJUMP));
 		spawntext = 0;	//spawn text every 20 frames
 	}
 }
@@ -2241,7 +2243,7 @@ void CPlayer::explodeawards()
 		float awardvelx = 7.0f * cosangle;
 		float awardvely = 7.0f * sinangle;
 			
-		eyecandyfront.add(new EC_ExplodingAward(&spr_awardsolid, awardx, awardy, awardvelx, awardvely, 30, awards[k]));
+		eyecandy[2].add(new EC_ExplodingAward(&spr_awardsolid, awardx, awardy, awardvelx, awardvely, 30, awards[k]));
 	}
 }
 
@@ -2260,9 +2262,9 @@ void CPlayer::addswirlingawards()
 		float angle = (float)k * addangle + awardangle;
 		
 		if(numawards == MAXAWARDS)
-			eyecandyfront.add(new EC_SwirlingAward(&spr_awardkillsinrow, ix + HALFPW - 8, iy + HALFPH - 8, angle, 30.0f, 0.05f, 60, 10, colorID, 16, 16, 4, 4));
+			eyecandy[2].add(new EC_SwirlingAward(&spr_awardkillsinrow, ix + HALFPW - 8, iy + HALFPH - 8, angle, 30.0f, 0.05f, 60, 10, colorID, 16, 16, 4, 4));
 		else
-			eyecandyfront.add(new EC_SwirlingAward(&spr_awardkillsinrow, ix + HALFPW - 8, iy + HALFPH - 8, angle, 30.0f, 0.05f, 60, numawards - 1, colorID, 16, 16));
+			eyecandy[2].add(new EC_SwirlingAward(&spr_awardkillsinrow, ix + HALFPW - 8, iy + HALFPH - 8, angle, 30.0f, 0.05f, 60, numawards - 1, colorID, 16, 16));
 	}
 }
 
@@ -2285,9 +2287,9 @@ void CPlayer::addrocketawards()
 		float awardvely = 9.0f * sin(angle);
 		
 		if(numawards == MAXAWARDS)
-			eyecandyfront.add(new EC_RocketAward(&spr_awardkillsinrow, ix + HALFPW - 8, iy + HALFPH - 8, awardvelx, awardvely, 80, 10, colorID, 16, 16, 4, 4));
+			eyecandy[2].add(new EC_RocketAward(&spr_awardkillsinrow, ix + HALFPW - 8, iy + HALFPH - 8, awardvelx, awardvely, 80, 10, colorID, 16, 16, 4, 4));
 		else
-			eyecandyfront.add(new EC_RocketAward(&spr_awardkillsinrow, ix + HALFPW - 8, iy + HALFPH - 8, awardvelx, awardvely, 80, numawards - 1, colorID, 16, 16));
+			eyecandy[2].add(new EC_RocketAward(&spr_awardkillsinrow, ix + HALFPW - 8, iy + HALFPH - 8, awardvelx, awardvely, 80, numawards - 1, colorID, 16, 16));
 	}
 }
 
@@ -2296,7 +2298,7 @@ void CPlayer::DeathAwards()
 	if(game_values.awardstyle == award_style_halo)
 		explodeawards();
 	else if(game_values.awardstyle == award_style_souls && killsinrow >= MINAWARDSNEEDED)
-		eyecandyfront.add(new EC_SoulsAward(&spr_awardsouls, &spr_awardsoulspawn, ix + HALFPW, iy + HALFPH, 60, 9.0f, killsinrow, awards));
+		eyecandy[2].add(new EC_SoulsAward(&spr_awardsouls, &spr_awardsoulspawn, ix + HALFPW, iy + HALFPH, 60, 9.0f, killsinrow, awards));
 
 	killsinrow = 0;
 	killsinrowinair = 0;
@@ -2311,7 +2313,7 @@ void CPlayer::AddKillsInRowInAirAward()
 		float awardvelx = vel * cos(angle);
 		float awardvely = vel * sin(angle);
 		
-		eyecandyfront.add(new EC_FallingObject(&spr_bonus, ix + HALFPW - 8, iy + HALFPH - 8, awardvelx, awardvely, 4, 2, 0, colorID * 16, 16, 16));
+		eyecandy[2].add(new EC_FallingObject(&spr_bonus, ix + HALFPW - 8, iy + HALFPH - 8, awardvelx, awardvely, 4, 2, 0, colorID * 16, 16, 16));
 		angle -= (float)PI / 14;
 	}
 }
@@ -2400,7 +2402,7 @@ void AddAwardKill(CPlayer * killer, CPlayer * killed, killstyle style)
 		{
 			if(!game_values.gamemode->gameover && game_values.bosspeeking == -1)
 			{
-				eyecandyfront.add(new EC_BossPeeker(&spr_sledgebrothers, rand()%90 + 90, 2));
+				eyecandy[2].add(new EC_BossPeeker(&spr_sledgebrothers, rand()%90 + 90, 2));
 				
 				backgroundmusic[0].stop();
 				ifsoundonstop(sfx_invinciblemusic);
@@ -2478,7 +2480,7 @@ void AddAwardKill(CPlayer * killer, CPlayer * killed, killstyle style)
 				sprintf(text, "%d - %s", killer->killsinrow, awards[awardIndex].name);
 
 				//now add the eyecandy
-				eyecandyfront.add(new EC_GravText(awards[awardIndex].font, killer->ix + HALFPW, killer->iy+PH, text, -VELJUMP));
+				eyecandy[2].add(new EC_GravText(awards[awardIndex].font, killer->ix + HALFPW, killer->iy+PH, text, -VELJUMP));
 			}
 
 			//if we stopped the other players run show another award
@@ -2488,7 +2490,7 @@ void AddAwardKill(CPlayer * killer, CPlayer * killed, killstyle style)
 				char text[128];
 				sprintf(text, "%s Stopped!",  awards[a].name);
 
-				eyecandyfront.add(new EC_GravText(awards[a].font, killed->ix + HALFPW, killed->iy+PH, text, -VELJUMP*1.3f));
+				eyecandy[2].add(new EC_GravText(awards[a].font, killed->ix + HALFPW, killed->iy+PH, text, -VELJUMP*1.3f));
 			}
 		}
 	}
@@ -2508,14 +2510,14 @@ void collisionhandler_p2p(CPlayer * o1, CPlayer * o2)
 		{
 			if(o1->jailtimer > 0)
 			{
-				eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, o1->ix + HALFPW - 16, o1->iy + HALFPH - 16, 3, 8));
+				eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, o1->ix + HALFPW - 16, o1->iy + HALFPH - 16, 3, 8));
 				ifsoundonplay(sfx_transform);
 				o1->jailtimer = 0;
 			}
 
 			if(o2->jailtimer > 0)
 			{
-				eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, o2->ix + HALFPW - 16, o2->iy + HALFPH - 16, 3, 8));
+				eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, o2->ix + HALFPW - 16, o2->iy + HALFPH - 16, 3, 8));
 				ifsoundonplay(sfx_transform);
 				o2->jailtimer = 0;
 			}
@@ -2750,8 +2752,8 @@ void TransferTag(CPlayer * o1, CPlayer * o2)
 		game_values.gamemode->tagged = o2;
 		o1->shield = game_values.shieldstyle > 0 ? game_values.shieldstyle : 1;
 		o1->shieldtimer = 60;
-		eyecandyfront.add(new EC_GravText(&game_font_large, game_values.gamemode->tagged->ix + HALFPW, game_values.gamemode->tagged->iy + PH, "Tagged!", -VELJUMP*1.5));
-		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, game_values.gamemode->tagged->ix + HALFPW - 16, game_values.gamemode->tagged->iy + HALFPH - 16, 3, 8));
+		eyecandy[2].add(new EC_GravText(&game_font_large, game_values.gamemode->tagged->ix + HALFPW, game_values.gamemode->tagged->iy + PH, "Tagged!", -VELJUMP*1.5));
+		eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, game_values.gamemode->tagged->ix + HALFPW - 16, game_values.gamemode->tagged->iy + HALFPH - 16, 3, 8));
 		ifsoundonplay(sfx_transform);
 	}
 	else if(game_values.gamemode->tagged == o2 && o1->isready() && o2->isready() && o1->shield == 0 && !o1->invincible)
@@ -2759,8 +2761,8 @@ void TransferTag(CPlayer * o1, CPlayer * o2)
 		game_values.gamemode->tagged = o1;
 		o2->shield = game_values.shieldstyle > 0 ? game_values.shieldstyle : 1;
 		o2->shieldtimer = 60;
-		eyecandyfront.add(new EC_GravText(&game_font_large, game_values.gamemode->tagged->ix + HALFPW, game_values.gamemode->tagged->iy + PH, "Tagged!", -VELJUMP*1.5));
-		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, game_values.gamemode->tagged->ix + HALFPW - 16, game_values.gamemode->tagged->iy + HALFPH - 16, 3, 8));
+		eyecandy[2].add(new EC_GravText(&game_font_large, game_values.gamemode->tagged->ix + HALFPW, game_values.gamemode->tagged->iy + PH, "Tagged!", -VELJUMP*1.5));
+		eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, game_values.gamemode->tagged->ix + HALFPW - 16, game_values.gamemode->tagged->iy + HALFPH - 16, 3, 8));
 		ifsoundonplay(sfx_transform);
 	}
 }
@@ -2819,7 +2821,7 @@ void CPlayer::draw()
 		if(++bobombsmoketimer > 2 && (velx != 0.0f || vely != GRAVITATION) && state == player_ready)
 		{
 			bobombsmoketimer = 0;
-			eyecandyfront.add(new EC_SingleAnimation(&spr_bobombsmoke, ix + HALFPH - 8, iy - PHOFFSET - 8, 4, 4));
+			eyecandy[2].add(new EC_SingleAnimation(&spr_bobombsmoke, ix + HALFPH - 8, iy - PHOFFSET - 8, 4, 4));
 		}
 	}
 	else if(game_values.gamemode->chicken == this) //draw him as chicken
@@ -4340,7 +4342,7 @@ void CPlayer::makefrozen(short iTime)
 		frozen = true;
 		frozentimer = iTime;
 
-		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
+		eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
 	}
 }
 
@@ -4412,7 +4414,7 @@ void CPlayer::SetPowerup(short iPowerup)
 		else
 		{
 			ifsoundonplay(sfx_transform);
-			eyecandyfront.add(new EC_SingleAnimation(&spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
+			eyecandy[2].add(new EC_SingleAnimation(&spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
 			bobomb = true;
 		}
 	}
@@ -4446,7 +4448,7 @@ void CPlayer::SetPowerup(short iPowerup)
 	{
 		if(iPowerup == 3 || iPowerup == 7 || iPowerup == 8)
 		{
-			eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
+			eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
 		}
 		
 		if(powerup != iPowerup)
@@ -4520,8 +4522,6 @@ void CPlayer::SetPowerup(short iPowerup)
 		{
 			if(game_values.pwingslimit > 0)
 				projectilelimit = game_values.pwingslimit;
-
-			flying = false;
 		}
 	}
 

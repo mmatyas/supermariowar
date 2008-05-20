@@ -723,6 +723,8 @@ class MI_WorldPreviewDisplay : public UI_Control
 		short iScrollCols, iScrollRows;
 
 		SDL_Rect rectSrcSurface, rectDstSurface;
+
+		short iScrollSpeed, iScrollSpeedTimer;
 };
 
 class MI_AnnouncerField : public UI_Control

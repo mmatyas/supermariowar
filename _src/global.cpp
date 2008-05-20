@@ -4,7 +4,7 @@
 #include "gfx.h"
 extern bool g_fLoadMessages;
 
-short g_iVersion[] = {1, 8, 0, 1};
+short g_iVersion[] = {1, 8, 0, 2};
 
 //We're using these strings intead of the ugly ones returned by SDL_GetKeyName()
 char * Keynames[340] = {"Unknown", "", "", "", "", "", "", "", "Backspace", "Tab", 
@@ -274,7 +274,7 @@ void _load_waitforkey()
 	}
 }
 
-void GetNameFromFileName(char * szName, const char * szFileName)
+void GetNameFromFileName(char * szName, const char * szFileName, bool fStripAuthor)
 {
 #ifdef _XBOX
 	const char * p = strrchr(szFileName,'\\');
@@ -288,7 +288,14 @@ void GetNameFromFileName(char * szName, const char * szFileName)
 		p++;
 
 	strcpy(szName, p);
-	
+
+	if(fStripAuthor)
+	{
+		char * pUnderscore = strchr(szName, '_');
+		if(pUnderscore)
+			strcpy(szName, ++pUnderscore);
+	}
+
 	char * pLastPeriod = strrchr(szName, '.');
 
 	if(pLastPeriod)
@@ -1747,7 +1754,7 @@ void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
 			iOffsetY = -(iTileSize << 1);
 		}
 
-		spr_hazard_flame[iSize].draw(rPathDst.x + iOffsetX, rPathDst.y + iOffsetY, rect->x, rect->y, rect->w, rect->h);
+		spr_hazard_flame[iSize].draw(rPathDst.x + iOffsetX, rPathDst.y + iOffsetY, rect->x >> iSize, rect->y >> iSize, rect->w >> iSize, rect->h >> iSize);
 	}
 	else if(hazard->itype >= 4 && hazard->itype <= 7) //pirhana plants
 	{
@@ -1770,7 +1777,7 @@ void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
 				iOffsetX = -(iTileSize >> 1);
 		}
 
-		spr_hazard_pirhanaplant[iSize].draw(rPathDst.x + iOffsetX, rPathDst.y + iOffsetY, rect->x, rect->y, rect->w, rect->h);
+		spr_hazard_pirhanaplant[iSize].draw(rPathDst.x + iOffsetX, rPathDst.y + iOffsetY, rect->x >> iSize, rect->y >> iSize, rect->w >> iSize, rect->h >> iSize);
 	}
 }
 
@@ -1798,4 +1805,44 @@ short iCountDownTimes[28] = {3, 3, 3, 15, 3, 3, 3, 3, 3, 3, 15, 3, 3, 3, 3, 3, 3
 short iCountDownRectSize[28] = {3, 2, 1, 0, 1, 2, 3, 3, 2, 1, 0, 1, 2, 3, 3, 2, 1, 0, 1, 2, 3, 3, 2, 1, 0, 1, 2, 3};
 short iCountDownRectGroup[28] = {0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3};
 short iCountDownAnnounce[28] = {-1, -1, -1, 12, -1, -1, -1, -1, -1, -1, 13, -1, -1, -1, -1, -1, -1, 14, -1, -1, -1, -1, -1, -1, 15, -1, -1, -1};
+
+TileType GetIncrementedTileType(TileType type)
+{
+	if(type == tile_nonsolid)
+		return tile_solid;
+	else if(type == tile_solid)
+		return tile_solid_on_top;
+	else if(type == tile_solid_on_top)
+		return tile_ice;
+	else if(type == tile_ice)
+		return tile_death;
+	else if(type == tile_death)
+		return tile_death_on_top;
+	else if(type == tile_death_on_top)
+		return tile_death_on_bottom;
+	else if(type == tile_death_on_bottom)
+		return tile_death_on_left;
+	else if(type == tile_death_on_left)
+		return tile_death_on_right;
+	else if(type == tile_death_on_right)
+		return tile_ice_on_top;
+	else if(type == tile_ice_on_top)
+		return tile_ice_death_on_bottom;
+	else if(type == tile_ice_death_on_bottom)
+		return tile_ice_death_on_left;
+	else if(type == tile_ice_death_on_left)
+		return tile_ice_death_on_right;
+	else if(type == tile_ice_death_on_right)
+		return tile_super_death;
+	else if(type == tile_super_death)
+		return tile_super_death_top;
+	else if(type == tile_super_death_top)
+		return tile_super_death_bottom;
+	else if(type == tile_super_death_bottom)
+		return tile_super_death_left;
+	else if(type == tile_super_death_left)
+		return tile_super_death_right;
+	else if(type == tile_super_death_right)
+		return tile_nonsolid;
+}
 

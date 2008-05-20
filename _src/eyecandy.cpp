@@ -700,7 +700,7 @@ void EC_ExplodingAward::update()
 	if(++timer > ttl)
 	{
 		dead = true;
-		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, (short)x + (w >> 1) - 16, (short)y + (h >> 1) - 16, 3, 8));
+		eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, (short)x + (w >> 1) - 16, (short)y + (h >> 1) - 16, 3, 8));
 	}
 }
 
@@ -749,7 +749,7 @@ void EC_SwirlingAward::update()
 	{
 		short awardx = x + (short)(radius * cos(angle)) + (w >> 1) - 16;
 		short awardy = y + (short)(radius * sin(angle)) + (h >> 1) - 16;
-		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, awardx, awardy, 3, 8));
+		eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, awardx, awardy, 3, 8));
 		
 		dead = true;
 	}
@@ -813,7 +813,7 @@ void EC_RocketAward::update()
 
 	if(++timer > ttl)
 	{
-		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, (short)x + (w >> 1) - 16, (short)y + (h >> 1) - 16, 3, 8));
+		eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, (short)x + (w >> 1) - 16, (short)y + (h >> 1) - 16, 3, 8));
 		dead = true;
 	}
 
@@ -862,7 +862,7 @@ void EC_FloatingObject::update()
 
 	if(++timer > ttl)
 	{
-		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, (short)x + (w >> 1) - 16, (short)y + (h >> 1) - 16, 3, 8));
+		eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, (short)x + (w >> 1) - 16, (short)y + (h >> 1) - 16, 3, 8));
 		dead = true;
 	}
 }
@@ -931,7 +931,7 @@ void EC_SoulsAward::update()
 		float velx = speed * cos(angle);
 		float vely = speed * sin(angle);
 
-		eyecandyfront.add(new EC_RocketAward(&spr_awardsouls, x - 8, y - 8, velx, vely, ttl, id[count], 0, 16, 16));
+		eyecandy[2].add(new EC_RocketAward(&spr_awardsouls, x - 8, y - 8, velx, vely, ttl, id[count], 0, 16, 16));
 		
 		if(++count >= numSouls)
 		{

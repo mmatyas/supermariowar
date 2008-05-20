@@ -113,7 +113,10 @@ void CMap::clearMap()
 		}
 	}
 
-	eyecandyID = 0;
+	eyecandy[0] = 0;
+	eyecandy[1] = 0;
+	eyecandy[2] = 0;
+
 	iNumMapItems = 0;
 	iNumMapHazards = 0;
 
@@ -317,8 +320,15 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 				maphazards[iMapHazard].dparam[iParam] = ReadFloat(mapfile);
 		}
 
+		//For all layers if the map format supports it
+		if(version[2] >= 1 || (version[2] == 0 && version[3] >= 2))
+		{
+			eyecandy[0] = (short)ReadInt(mapfile);
+			eyecandy[1] = (short)ReadInt(mapfile);
+		}
+
 		//Read in eyecandy to use
-		eyecandyID = (short)ReadInt(mapfile);
+		eyecandy[2] = (short)ReadInt(mapfile);
 
 		musicCategoryID = ReadInt(mapfile);
 
@@ -632,7 +642,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 		}
 
 		//Read in eyecandy to use
-		eyecandyID = (short)ReadInt(mapfile);
+		eyecandy[2] = (short)ReadInt(mapfile);
 
 		if((version[2] == 0 && version[3] > 0) || version[2] >= 1)
 			musicCategoryID = ReadInt(mapfile);
@@ -880,7 +890,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 		strcpy(szBackgroundFile, g_szBackgroundConversion[backgroundID]);
 
 		//Read in eyecandy to use
-		eyecandyID = (short)ReadInt(mapfile);
+		eyecandy[2] = (short)ReadInt(mapfile);
 		
 		maxConnection = 0;
 
@@ -1065,7 +1075,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 		strcpy(szBackgroundFile, g_szBackgroundConversion[backgroundID]);
 		
 		//All 1.5 maps will use cloud eyecandy
-		eyecandyID = 1;
+		eyecandy[2] = 1;
 
 		for(short iSwitch = 0; iSwitch < 4; iSwitch++)
 			iSwitches[iSwitch] = 0;
@@ -1666,8 +1676,10 @@ void CMap::saveMap(const std::string& file)
 			WriteFloat(maphazards[iMapHazard].dparam[iParam], mapfile);
 	}
 
-	//Write eyecandy ID
-	WriteInt(eyecandyID, mapfile);
+	//Write eyecandy for all eyecandy layers
+	WriteInt(eyecandy[0], mapfile);
+	WriteInt(eyecandy[1], mapfile);
+	WriteInt(eyecandy[2], mapfile);
 
 	//Write music category
 	WriteInt(musicCategoryID, mapfile);

@@ -25,7 +25,7 @@ extern bool gfx_createfullskin(gfxSprite ** gSprites, const std::string& filenam
 bool LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDirections);
 bool LoadFullSkin(gfxSprite ** sprites, const std::string&  filename, short colorID);
 
-extern CEyecandyContainer eyecandyfront;
+extern CEyecandyContainer eyecandy[3];
 extern Uint8 GetScreenBackgroundFade();
 
 //-----------------------------------------------------------------------------
@@ -569,7 +569,7 @@ bool LoadAndSplashScreen()
 					blitdest = screen;
 
 					g_fLoadMessages = false;
-					eyecandyfront.clean();
+					eyecandy[2].clean();
 
 					game_values.playerInput.ResetKeys();
 
@@ -653,15 +653,15 @@ bool LoadAndSplashScreen()
 		{
 			_load_drawmsg("Press Any Key To Continue");
 
-			eyecandyfront.cleandeadobjects();
-			eyecandyfront.update();
-			eyecandyfront.draw();
+			eyecandy[2].cleandeadobjects();
+			eyecandy[2].update();
+			eyecandy[2].draw();
 
 			static int timer = 60;
 			static int index = 0;
 			if(++timer >= 60)
 			{
-				eyecandyfront.add(new EC_GravText(&menu_font_large, 320, 480, contributors[contributorOrder[index]], -8.2f));
+				eyecandy[2].add(new EC_GravText(&menu_font_large, 320, 480, contributors[contributorOrder[index]], -8.2f));
 				timer = 0;
 
 				if(++index >= NUM_CONTRIBUTORS)

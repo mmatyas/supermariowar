@@ -148,7 +148,7 @@ bool RemoveTeam(short teamid)
 	//Announce that a team was removed
 	if(game_values.deadteamnotice && game_values.teamdeadcounter < score_cnt - 1)
 	{
-		eyecandyfront.add(new EC_Announcement(&game_font_large, &spr_announcementicons, "Team Removed!", iAnnouncementColor, 90, 200));
+		eyecandy[2].add(new EC_Announcement(&game_font_large, &spr_announcementicons, "Team Removed!", iAnnouncementColor, 90, 200));
 		ifsoundonandreadyplay(sfx_announcer[iAnnouncementColor + 16]);
 	}
 
@@ -818,9 +818,9 @@ short CGM_Chicken::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killst
 	if(!chicken || &other == chicken)
 	{
 		chicken = &inflictor;
-		eyecandyfront.add(new EC_GravText(&game_font_large, inflictor.ix + HALFPW, inflictor.iy + PH, "Chicken!", -VELJUMP*1.5));
-		//eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, inflictor.ix + (HALFPW) - 16, inflictor.iy + (HALFPH) - 16, 3, 8));
-		eyecandyfront.add(new EC_SingleAnimation(&spr_poof, inflictor.ix + HALFPW - 24, inflictor.iy + HALFPH - 24, 4, 5));
+		eyecandy[2].add(new EC_GravText(&game_font_large, inflictor.ix + HALFPW, inflictor.iy + PH, "Chicken!", -VELJUMP*1.5));
+		//eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, inflictor.ix + (HALFPW) - 16, inflictor.iy + (HALFPH) - 16, 3, 8));
+		eyecandy[2].add(new EC_SingleAnimation(&spr_poof, inflictor.ix + HALFPW - 24, inflictor.iy + HALFPH - 24, 4, 5));
 		ifsoundonplay(sfx_transform);
 
 		if(&other == chicken)
@@ -987,8 +987,8 @@ short CGM_Tag::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle 
 		tagged = &other;
 		inflictor.shield = game_values.shieldstyle;
 		inflictor.shieldtimer = 60;
-		eyecandyfront.add(new EC_GravText(&game_font_large, other.ix + (HALFPW), other.iy + PH, "Tagged!", -VELJUMP*1.5));
-		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, other.ix + (HALFPW) - 16, other.iy + (HALFPH) - 16, 3, 8));
+		eyecandy[2].add(new EC_GravText(&game_font_large, other.ix + (HALFPW), other.iy + PH, "Tagged!", -VELJUMP*1.5));
+		eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, other.ix + (HALFPW) - 16, other.iy + (HALFPH) - 16, 3, 8));
 		ifsoundonplay(sfx_transform);
 	}
 
@@ -1679,7 +1679,7 @@ short CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle
 
 			if(inflictor.jailtimer > 0)
 			{
-				eyecandyfront.add(new EC_SingleAnimation(&spr_poof, inflictor.ix + HALFPW - 24, inflictor.iy + HALFPH - 24, 4, 5));
+				eyecandy[2].add(new EC_SingleAnimation(&spr_poof, inflictor.ix + HALFPW - 24, inflictor.iy + HALFPH - 24, 4, 5));
 				ifsoundonplay(sfx_transform);
 				inflictor.jailtimer = 0;
 				inflictor.jail = -1;
@@ -1739,7 +1739,7 @@ short CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle
 						//If they weren't just the one killed and they were jailed, give them a transform cloud
 						if(list_players[i] != &other && list_players[i]->jailtimer > 0)
 						{
-							eyecandyfront.add(new EC_SingleAnimation(&spr_poof, list_players[i]->ix + HALFPW - 24, list_players[i]->iy + HALFPH - 24, 4, 5));
+							eyecandy[2].add(new EC_SingleAnimation(&spr_poof, list_players[i]->ix + HALFPW - 24, list_players[i]->iy + HALFPH - 24, 4, 5));
 							ifsoundonplay(sfx_transform);
 						}
 
@@ -1834,7 +1834,7 @@ short CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle
 							//If they weren't just the one killed and they were jailed, give them a transform cloud
 							if(list_players[i] != &other && list_players[i]->jailtimer > 0)
 							{
-								eyecandyfront.add(new EC_SingleAnimation(&spr_poof, list_players[i]->ix + HALFPW - 24, list_players[i]->iy + HALFPH - 24, 4, 5));
+								eyecandy[2].add(new EC_SingleAnimation(&spr_poof, list_players[i]->ix + HALFPW - 24, list_players[i]->iy + HALFPH - 24, 4, 5));
 								ifsoundonplay(sfx_transform);
 							}
 
@@ -2504,7 +2504,7 @@ CPlayer * CGM_Star::swapplayer(short id, CPlayer * player)
 		oldstar = starPlayer[id];
 		oldstar->shield = game_values.shieldstyle == 0 ? 1 : game_values.shieldstyle;
 		oldstar->shieldtimer = 60;
-		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, oldstar->ix + (HALFPW) - 16, oldstar->iy + (HALFPH) - 16, 3, 8));
+		eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, oldstar->ix + (HALFPW) - 16, oldstar->iy + (HALFPH) - 16, 3, 8));
 	}
 
 	starPlayer[id] = player;
@@ -2513,11 +2513,11 @@ CPlayer * CGM_Star::swapplayer(short id, CPlayer * player)
 		starItem[id]->setPlayerColor(starPlayer[id]->colorID);
 	
 	if(starItem[id]->getType() == 1)
-		eyecandyfront.add(new EC_GravText(&game_font_large, player->ix + HALFPW, player->iy + PH, iCurrentModeType == 2 ? "Star Get!" : "Shine Get!", -VELJUMP*1.5));
+		eyecandy[2].add(new EC_GravText(&game_font_large, player->ix + HALFPW, player->iy + PH, iCurrentModeType == 2 ? "Star Get!" : "Shine Get!", -VELJUMP*1.5));
 	else
-		eyecandyfront.add(new EC_GravText(&game_font_large, player->ix + HALFPW, player->iy + PH, "Ztarred!", -VELJUMP*1.5));
+		eyecandy[2].add(new EC_GravText(&game_font_large, player->ix + HALFPW, player->iy + PH, "Ztarred!", -VELJUMP*1.5));
 
-	eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, player->ix + (HALFPW) - 16, player->iy + (HALFPH) - 16, 3, 8));
+	eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, player->ix + (HALFPW) - 16, player->iy + (HALFPH) - 16, 3, 8));
 	ifsoundonplay(sfx_transform);
 
 	return oldstar;
@@ -2640,6 +2640,14 @@ short CGM_KingOfTheHill::playerkilledself(CPlayer &player, killstyle style)
 	return CGameMode::playerkilledself(player, style);
 }
 
+void CGM_KingOfTheHill::playerextraguy(CPlayer &player, short iType)
+{
+	if(!gameover)
+	{
+		player.score->AdjustScore(5 * iType);
+		CheckWinner(&player);
+	}
+}
 /*
 kill_style_stomp = 0, 
 kill_style_star = 1, 
@@ -3101,7 +3109,7 @@ void CGM_Chase::playerextraguy(CPlayer &player, short iType)
 {
 	if(!gameover)
 	{
-		player.score->AdjustScore(10 * iType);
+		player.score->AdjustScore(5 * iType);
 		CheckWinner(&player);
 	}
 }

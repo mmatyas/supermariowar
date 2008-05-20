@@ -3012,6 +3012,13 @@ void MI_WorldPreviewDisplay::Init()
 
 	if(g_worldmap.iHeight < 15)
 		rectDstSurface.y += (15 - g_worldmap.iHeight) * 8;
+	
+	short iNumScrollTiles = (g_worldmap.iWidth > 20 ? g_worldmap.iWidth - 20 : 0) + (g_worldmap.iHeight > 15 ? g_worldmap.iHeight - 15 : 0);
+
+	iScrollSpeed = 0;
+	iScrollSpeedTimer = 0;
+	if(iNumScrollTiles < 9)
+		iScrollSpeed = (12 - iNumScrollTiles) >> 2;
 }
 
 void MI_WorldPreviewDisplay::Update()
@@ -3033,124 +3040,129 @@ void MI_WorldPreviewDisplay::Update()
 		fNeedMapSurfaceUpdate = true;
 	}
 
-	if(iMoveDirection == 0)
+	if(++iScrollSpeedTimer > iScrollSpeed)
 	{
-		--iMapGlobalOffsetX;
-		if(++iMapOffsetX >= PREVIEWTILESIZE)
+		iScrollSpeedTimer = 0;
+
+		if(iMoveDirection == 0)
 		{
-			iMapOffsetX = 0;
-
-			fNeedMapSurfaceUpdate = true;
-			fNeedFullRefresh = true;
-
-			if(++iMapDrawOffsetCol >= iScrollCols)
+			--iMapGlobalOffsetX;
+			if(++iMapOffsetX >= PREVIEWTILESIZE)
 			{
-				if(iScrollRows > 0)
+				iMapOffsetX = 0;
+
+				fNeedMapSurfaceUpdate = true;
+				fNeedFullRefresh = true;
+
+				if(++iMapDrawOffsetCol >= iScrollCols)
 				{
-					iMoveDirection = 1;
-					iMapOffsetY = 0;
+					if(iScrollRows > 0)
+					{
+						iMoveDirection = 1;
+						iMapOffsetY = 0;
+					}
+					else
+					{
+						iMoveDirection = 2;
+						iMapOffsetX = PREVIEWTILESIZE;
+						--iMapDrawOffsetCol;
+						iMapGlobalOffsetX += PREVIEWTILESIZE;
+					}
+				}
+			}
+		}
+		else if(iMoveDirection == 1)
+		{
+			--iMapGlobalOffsetY;
+			if(++iMapOffsetY >= PREVIEWTILESIZE)
+			{
+				iMapOffsetY = 0;
+
+				fNeedMapSurfaceUpdate = true;
+				fNeedFullRefresh = true;
+
+				if(++iMapDrawOffsetRow >= iScrollRows)
+				{
+					if(iScrollCols > 0)
+					{
+						iMoveDirection = 2;
+						iMapOffsetX = PREVIEWTILESIZE;
+						--iMapDrawOffsetCol;
+						iMapGlobalOffsetX += PREVIEWTILESIZE;
+					}
+					else
+					{
+						iMoveDirection = 3;
+						iMapOffsetY = PREVIEWTILESIZE;
+						--iMapDrawOffsetRow;
+						iMapGlobalOffsetY += PREVIEWTILESIZE;
+					}
+				}
+			}
+		}
+		else if(iMoveDirection == 2)  //scroll left
+		{
+			++iMapGlobalOffsetX;
+			if(--iMapOffsetX <= 0)
+			{
+				fNeedMapSurfaceUpdate = true;
+				fNeedFullRefresh = true;
+
+				if(--iMapDrawOffsetCol < 0)
+				{
+					iMapDrawOffsetCol = 0;
+
+					if(iScrollRows > 0)
+					{
+						iMoveDirection = 3;
+						iMapOffsetY = PREVIEWTILESIZE;
+						--iMapDrawOffsetRow;
+						iMapGlobalOffsetY += PREVIEWTILESIZE;
+						iMapGlobalOffsetX -= PREVIEWTILESIZE;
+					}
+					else
+					{
+						iMoveDirection = 0;
+						iMapOffsetX = 0;
+						iMapGlobalOffsetX -= PREVIEWTILESIZE;
+					}
 				}
 				else
 				{
-					iMoveDirection = 2;
 					iMapOffsetX = PREVIEWTILESIZE;
-					--iMapDrawOffsetCol;
-					iMapGlobalOffsetX += PREVIEWTILESIZE;
 				}
 			}
 		}
-	}
-	else if(iMoveDirection == 1)
-	{
-		--iMapGlobalOffsetY;
-		if(++iMapOffsetY >= PREVIEWTILESIZE)
+		else if(iMoveDirection == 3) //scroll up
 		{
-			iMapOffsetY = 0;
-
-			fNeedMapSurfaceUpdate = true;
-			fNeedFullRefresh = true;
-
-			if(++iMapDrawOffsetRow >= iScrollRows)
+			++iMapGlobalOffsetY;
+			if(--iMapOffsetY <= 0)
 			{
-				if(iScrollCols > 0)
+				fNeedMapSurfaceUpdate = true;
+				fNeedFullRefresh = true;
+
+				if(--iMapDrawOffsetRow < 0)
 				{
-					iMoveDirection = 2;
-					iMapOffsetX = PREVIEWTILESIZE;
-					--iMapDrawOffsetCol;
-					iMapGlobalOffsetX += PREVIEWTILESIZE;
+					iMapDrawOffsetRow = 0;
+					iMoveDirection = iScrollCols > 0 ? 0 : 1;
+
+					if(iScrollCols > 0)
+					{
+						iMoveDirection = 0;
+						iMapOffsetX = 0;
+						iMapGlobalOffsetY -= PREVIEWTILESIZE;
+					}
+					else
+					{
+						iMoveDirection = 1;
+						iMapOffsetY = 0;
+						iMapGlobalOffsetY -= PREVIEWTILESIZE;
+					}
 				}
 				else
 				{
-					iMoveDirection = 3;
 					iMapOffsetY = PREVIEWTILESIZE;
-					--iMapDrawOffsetRow;
-					iMapGlobalOffsetY += PREVIEWTILESIZE;
 				}
-			}
-		}
-	}
-	else if(iMoveDirection == 2)  //scroll left
-	{
-		++iMapGlobalOffsetX;
-		if(--iMapOffsetX <= 0)
-		{
-			fNeedMapSurfaceUpdate = true;
-			fNeedFullRefresh = true;
-
-			if(--iMapDrawOffsetCol < 0)
-			{
-				iMapDrawOffsetCol = 0;
-
-				if(iScrollRows > 0)
-				{
-					iMoveDirection = 3;
-					iMapOffsetY = PREVIEWTILESIZE;
-					--iMapDrawOffsetRow;
-					iMapGlobalOffsetY += PREVIEWTILESIZE;
-					iMapGlobalOffsetX -= PREVIEWTILESIZE;
-				}
-				else
-				{
-					iMoveDirection = 0;
-					iMapOffsetX = 0;
-					iMapGlobalOffsetX -= PREVIEWTILESIZE;
-				}
-			}
-			else
-			{
-				iMapOffsetX = PREVIEWTILESIZE;
-			}
-		}
-	}
-	else if(iMoveDirection == 3) //scroll up
-	{
-		++iMapGlobalOffsetY;
-		if(--iMapOffsetY <= 0)
-		{
-			fNeedMapSurfaceUpdate = true;
-			fNeedFullRefresh = true;
-
-			if(--iMapDrawOffsetRow < 0)
-			{
-				iMapDrawOffsetRow = 0;
-				iMoveDirection = iScrollCols > 0 ? 0 : 1;
-
-				if(iScrollCols > 0)
-				{
-					iMoveDirection = 0;
-					iMapOffsetX = 0;
-					iMapGlobalOffsetY -= PREVIEWTILESIZE;
-				}
-				else
-				{
-					iMoveDirection = 1;
-					iMapOffsetY = 0;
-					iMapGlobalOffsetY -= PREVIEWTILESIZE;
-				}
-			}
-			else
-			{
-				iMapOffsetY = PREVIEWTILESIZE;
 			}
 		}
 	}
@@ -5779,7 +5791,7 @@ void MI_World::Update()
 
 	UpdateMapSurface(iCycleIndex);
 
-	if(++iCycleIndex > 15)
+	if(++iCycleIndex > 16)
 	{
 		iCurrentSurfaceIndex = 1 - iCurrentSurfaceIndex;
 
@@ -6502,8 +6514,11 @@ bool MI_World::UsePowerup(short iTeam, short iIndex, bool fPopupIsUp)
 	}
 	else if(iPowerup == NUM_POWERUPS + 1) //Cloud (allows player to skip stages)
 	{
-		UseCloud(true);
-		fUsedItem = true;
+		if(!fUsingCloud)
+		{
+			UseCloud(true);
+			fUsedItem = true;
+		}
 	}
 	else if(iPowerup == NUM_POWERUPS + 2) //Player Switch
 	{

@@ -35,7 +35,7 @@ void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead
 				projectiles[iPlayerID]--;
 
 			object->dead = true;
-			eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, object->ix + (object->iw >> 1) - 16, object->iy + (object->ih >> 1) - 16, 3, 4));
+			eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, object->ix + (object->iw >> 1) - 16, object->iy + (object->ih >> 1) - 16, 3, 4));
 		}
 		
 		if(playsound)
@@ -1062,10 +1062,10 @@ void B_BreakableBlock::triggerBehavior()
 {
 	if(state == 0)
 	{
-		eyecandyfront.add(new EC_FallingObject(&spr_brokenyellowblock, ix, iy, -2.2f, -10.0f, 4, 2, 0, 0, 16, 16));
-		eyecandyfront.add(new EC_FallingObject(&spr_brokenyellowblock, ix + 16, iy, 2.2f, -10.0f, 4, 2, 0, 0, 16, 16));
-		eyecandyfront.add(new EC_FallingObject(&spr_brokenyellowblock, ix, iy + 16, -2.2f, -5.5f, 4, 2, 0, 0, 16, 16));
-		eyecandyfront.add(new EC_FallingObject(&spr_brokenyellowblock, ix + 16, iy + 16, 2.2f, -5.5f, 4, 2, 0, 0, 16, 16));
+		eyecandy[2].add(new EC_FallingObject(&spr_brokenyellowblock, ix, iy, -2.2f, -10.0f, 4, 2, 0, 0, 16, 16));
+		eyecandy[2].add(new EC_FallingObject(&spr_brokenyellowblock, ix + 16, iy, 2.2f, -10.0f, 4, 2, 0, 0, 16, 16));
+		eyecandy[2].add(new EC_FallingObject(&spr_brokenyellowblock, ix, iy + 16, -2.2f, -5.5f, 4, 2, 0, 0, 16, 16));
+		eyecandy[2].add(new EC_FallingObject(&spr_brokenyellowblock, ix + 16, iy + 16, 2.2f, -5.5f, 4, 2, 0, 0, 16, 16));
 
 		state = 1;
 		ifsoundonplay(sfx_breakblock);
@@ -1342,7 +1342,7 @@ bool B_DonutBlock::hittop(CPlayer * player, bool useBehavior)
 
 void B_DonutBlock::triggerBehavior()
 {
-	//eyecandyfront.add(new EC_FallingObject(&spr_donutblock, ix, iy, 0.0f, 0, 0, 0, 0));
+	//eyecandy[2].add(new EC_FallingObject(&spr_donutblock, ix, iy, 0.0f, 0, 0, 0, 0));
 	
 	TilesetTile ** tiledata = new TilesetTile*[1];
 	tiledata[0] = new TilesetTile[1];
@@ -1685,10 +1685,10 @@ void B_FlipBlock::triggerBehavior()
 
 void B_FlipBlock::explode()
 {
-	eyecandyfront.add(new EC_FallingObject(&spr_brokenflipblock, ix, iy, -2.2f, -10.0f, 4, 2, 0, 0, 16, 16));
-	eyecandyfront.add(new EC_FallingObject(&spr_brokenflipblock, ix + 16, iy, 2.2f, -10.0f, 4, 2, 0, 0, 16, 16));
-	eyecandyfront.add(new EC_FallingObject(&spr_brokenflipblock, ix, iy + 16, -2.2f, -5.5f, 4, 2, 0, 0, 16, 16));
-	eyecandyfront.add(new EC_FallingObject(&spr_brokenflipblock, ix + 16, iy + 16, 2.2f, -5.5f, 4, 2, 0, 0, 16, 16));
+	eyecandy[2].add(new EC_FallingObject(&spr_brokenflipblock, ix, iy, -2.2f, -10.0f, 4, 2, 0, 0, 16, 16));
+	eyecandy[2].add(new EC_FallingObject(&spr_brokenflipblock, ix + 16, iy, 2.2f, -10.0f, 4, 2, 0, 0, 16, 16));
+	eyecandy[2].add(new EC_FallingObject(&spr_brokenflipblock, ix, iy + 16, -2.2f, -5.5f, 4, 2, 0, 0, 16, 16));
+	eyecandy[2].add(new EC_FallingObject(&spr_brokenflipblock, ix + 16, iy + 16, 2.2f, -5.5f, 4, 2, 0, 0, 16, 16));
 	
 	ifsoundonplay(sfx_breakblock);
 }
@@ -2299,10 +2299,10 @@ void B_ThrowBlock::triggerBehavior()
 	g_map.blockdata[col][row] = NULL;
 	g_map.UpdateTileGap(col, row);
 
-	eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix, iy, -1.5f, -7.0f, 6, 2, 0, iType << 4, 16, 16));
-	eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix + 16, iy, 1.5f, -7.0f, 6, 2, 0, iType << 4, 16, 16));
-	eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix, iy + 16, -1.5f, -4.0f, 6, 2, 0, iType << 4, 16, 16));
-	eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix + 16, iy + 16, 1.5f, -4.0f, 6, 2, 0, iType << 4, 16, 16));
+	eyecandy[2].add(new EC_FallingObject(&spr_brokenblueblock, ix, iy, -1.5f, -7.0f, 6, 2, 0, iType << 4, 16, 16));
+	eyecandy[2].add(new EC_FallingObject(&spr_brokenblueblock, ix + 16, iy, 1.5f, -7.0f, 6, 2, 0, iType << 4, 16, 16));
+	eyecandy[2].add(new EC_FallingObject(&spr_brokenblueblock, ix, iy + 16, -1.5f, -4.0f, 6, 2, 0, iType << 4, 16, 16));
+	eyecandy[2].add(new EC_FallingObject(&spr_brokenblueblock, ix + 16, iy + 16, 1.5f, -4.0f, 6, 2, 0, iType << 4, 16, 16));
 	
 	ifsoundonplay(sfx_breakblock);
 }
@@ -2501,10 +2501,10 @@ void B_WeaponBreakableBlock::triggerBehavior(short iPlayerID, short iTeamID)
 {
 	if(state == 0)
 	{
-		eyecandyfront.add(new EC_FallingObject(&spr_brokengrayblock, ix, iy, -2.2f, -10.0f, 4, 2, 0, 0, 16, 16));
-		eyecandyfront.add(new EC_FallingObject(&spr_brokengrayblock, ix + 16, iy, 2.2f, -10.0f, 4, 2, 0, 0, 16, 16));
-		eyecandyfront.add(new EC_FallingObject(&spr_brokengrayblock, ix, iy + 16, -2.2f, -5.5f, 4, 2, 0, 0, 16, 16));
-		eyecandyfront.add(new EC_FallingObject(&spr_brokengrayblock, ix + 16, iy + 16, 2.2f, -5.5f, 4, 2, 0, 0, 16, 16));
+		eyecandy[2].add(new EC_FallingObject(&spr_brokengrayblock, ix, iy, -2.2f, -10.0f, 4, 2, 0, 0, 16, 16));
+		eyecandy[2].add(new EC_FallingObject(&spr_brokengrayblock, ix + 16, iy, 2.2f, -10.0f, 4, 2, 0, 0, 16, 16));
+		eyecandy[2].add(new EC_FallingObject(&spr_brokengrayblock, ix, iy + 16, -2.2f, -5.5f, 4, 2, 0, 0, 16, 16));
+		eyecandy[2].add(new EC_FallingObject(&spr_brokengrayblock, ix + 16, iy + 16, 2.2f, -5.5f, 4, 2, 0, 0, 16, 16));
 
 		state = 1;
 		ifsoundonplay(sfx_breakblock);
@@ -3122,7 +3122,6 @@ bool IO_MovingObject::collision_detection_checksides()
 				}
 			}
 		}
-
 	}
 
 	if(iy + collisionHeight >= 0.0f)
@@ -3356,6 +3355,8 @@ bool IO_MovingObject::collision_detection_checksides()
 			break;
 	}
 
+	//TODO:: Check moving platforms to see if the object is inside a solid tile here!
+
 	return true;
 }
 
@@ -3379,7 +3380,7 @@ void IO_MovingObject::KillObjectMapHazard()
 	if(!dead)
 	{
 		dead = true;
-		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + (iw >> 1) - 16, iy + (ih >> 1) - 16, 3, 4));
+		eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix + (iw >> 1) - 16, iy + (ih >> 1) - 16, 3, 4));
 
 		if(movingObjectType == movingobject_fireball)
 		{
@@ -3569,7 +3570,7 @@ bool PU_ExtraGuyPowerup::collide(CPlayer * player)
 		game_values.gamemode->playerextraguy(*player, iType);
 		ifsoundonplay(sfx_extraguysound);
 
-		eyecandyfront.add(new EC_FloatingObject(&spr_extralife, player->ix + HALFPW - 19, player->iy - 16, 0.0f, -1.5f, 62, player->colorID * 38, (iType == 5 ? 3 : iType - 1) * 16, 38, 16));
+		eyecandy[2].add(new EC_FloatingObject(&spr_extralife, player->ix + HALFPW - 19, player->iy - 16, 0.0f, -1.5f, 62, player->colorID * 38, (iType == 5 ? 3 : iType - 1) * 16, 38, 16));
 		
 		dead = true;
 	}
@@ -3632,7 +3633,7 @@ bool PU_MysteryMushroomPowerup::collide(CPlayer * player)
 
 		if(!SwapPlayers(player->localID))
 		{
-			eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, player->ix + (HALFPW) - 16, player->iy + (HALFPH) - 16, 3, 8));
+			eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, player->ix + (HALFPW) - 16, player->iy + (HALFPH) - 16, 3, 8));
 			ifsoundonplay(sfx_spit);
 		}
 	}
@@ -3813,7 +3814,7 @@ void PU_TreasureChestBonus::update()
 	}
 	else if (state == 4)
 	{
-		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix, drawbonusitemy, 3, 8));
+		eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix, drawbonusitemy, 3, 8));
 		dead = true;
 	}
 }
@@ -3852,7 +3853,7 @@ bool PU_TreasureChestBonus::collide(CPlayer * player)
 		drawbonusitemy = iy;
 		drawbonusitemtimer = 60;
 
-		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix, iy, 3, 8));
+		eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix, iy, 3, 8));
 
 		game_values.noexit = false;
 	}
@@ -3910,7 +3911,7 @@ void MO_BonusHouseChest::update()
 
 		if(--drawbonusitemtimer <= 0)
 		{
-			eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + 16, drawbonusitemy, 3, 8));
+			eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix + 16, drawbonusitemy, 3, 8));
 			state = 3;
 		}
 	}
@@ -5072,7 +5073,7 @@ bool MO_Coin::collide(CPlayer * player)
 		game_values.gamemode->CheckWinner(player);
 	}
 
-	eyecandyfront.add(new EC_SingleAnimation(&spr_coinsparkle, ix, iy, 7, 4));
+	eyecandy[2].add(new EC_SingleAnimation(&spr_coinsparkle, ix, iy, 7, 4));
 
 	ifsoundonplay(sfx_coin);
 	
@@ -5108,7 +5109,7 @@ void MO_Coin::update()
 
 		if(--iUncollectableTime < -game_values.gamemodesettings.greed.coinlife)
 		{
-			eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix, iy, 3, 8));
+			eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix, iy, 3, 8));
 			dead = true;
 		}
 	}
@@ -5563,7 +5564,7 @@ void MO_BulletBill::collide(IO_MovingObject * object)
 void MO_BulletBill::Die()
 {
 	dead = true;
-	eyecandyfront.add(new EC_FallingObject(spr_dead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, velx > 0 ? 0 : 32, iColorID * 32, 32, 32));
+	eyecandy[2].add(new EC_FallingObject(spr_dead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, velx > 0 ? 0 : 32, iColorID * 32, 32, 32));
 }
 
 void MO_BulletBill::SetDirectionOffset()
@@ -6571,7 +6572,7 @@ void OMO_Area::setOwner(CPlayer * player)
 			{
 				if(!game_values.gamemode->gameover && game_values.bosspeeking == -1)
 				{
-					eyecandyfront.add(new EC_BossPeeker(&spr_sledgebrothers, rand()%90 + 90, 1));
+					eyecandy[2].add(new EC_BossPeeker(&spr_sledgebrothers, rand()%90 + 90, 1));
 					
 					backgroundmusic[0].stop();
 					ifsoundonstop(sfx_invinciblemusic);
@@ -7185,7 +7186,7 @@ void MO_CollectionCard::update()
 		if(++timer > 200)
 		{
 			dead = true;
-			eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix, iy, 3, 8));
+			eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix, iy, 3, 8));
 		}
 	}
 
@@ -7210,7 +7211,7 @@ void MO_CollectionCard::update()
 
 		if(--uncollectabletime < -game_values.gamemodesettings.collection.cardlife)
 		{
-			eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix, iy, 3, 8));
+			eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix, iy, 3, 8));
 			dead = true;
 		}
 	}
@@ -7399,7 +7400,7 @@ void MO_WalkingEnemy::update()
 			if(burnuptimer > 80)
 				KillObjectMapHazard();
 			else
-				eyecandyback.add(new EC_SingleAnimation(&spr_burnup, ix + (collisionWidth >> 1) - 16, iy + (collisionHeight >> 1) - 16, 5, 4));
+				eyecandy[0].add(new EC_SingleAnimation(&spr_burnup, ix + (collisionWidth >> 1) - 16, iy + (collisionHeight >> 1) - 16, 5, 4));
 		}
 	}
 	else
@@ -7572,7 +7573,7 @@ bool MO_Goomba::hittop(CPlayer * player)
 
 		AddAwardKill(player, NULL, killStyle);
 
-		eyecandyback.add(new EC_Corpse(&spr_goombadead, (float)(ix - collisionOffsetX), (float)(iy + collisionHeight - 32), 0));
+		eyecandy[0].add(new EC_Corpse(&spr_goombadead, (float)(ix - collisionOffsetX), (float)(iy + collisionHeight - 32), 0));
 	}
 
 	ifsoundonplay(sfx_mip);
@@ -7584,7 +7585,7 @@ bool MO_Goomba::hittop(CPlayer * player)
 void MO_Goomba::Die()
 {
 	dead = true;
-	eyecandyfront.add(new EC_FallingObject(&spr_goombadeadflying, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, 0, 0, 0, 0));
+	eyecandy[2].add(new EC_FallingObject(&spr_goombadeadflying, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, 0, 0, 0, 0));
 }
 
 //------------------------------------------------------------------------------
@@ -7646,7 +7647,7 @@ bool MO_Koopa::hittop(CPlayer * player)
 void MO_Koopa::Die()
 {
 	dead = true;
-	eyecandyfront.add(new EC_FallingObject(&spr_shelldead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, fRed ? 32 : 0, 0, 32, 32));
+	eyecandy[2].add(new EC_FallingObject(&spr_shelldead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, fRed ? 32 : 0, 0, 32, 32));
 }
 
 void MO_Koopa::DropShell(bool fBounce)
@@ -7712,7 +7713,7 @@ bool MO_BuzzyBeetle::hittop(CPlayer * player)
 void MO_BuzzyBeetle::Die()
 {
 	dead = true;
-	eyecandyfront.add(new EC_FallingObject(&spr_shelldead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, 96, 0, 32, 32));
+	eyecandy[2].add(new EC_FallingObject(&spr_shelldead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, 96, 0, 32, 32));
 }
 
 void MO_BuzzyBeetle::DropShell(bool fBounce)
@@ -7780,7 +7781,7 @@ bool MO_Spiny::hittop(CPlayer * player)
 void MO_Spiny::Die()
 {
 	dead = true;
-	eyecandyfront.add(new EC_FallingObject(&spr_shelldead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, 64, 0, 32, 32));
+	eyecandy[2].add(new EC_FallingObject(&spr_shelldead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, 64, 0, 32, 32));
 }
 
 void MO_Spiny::DropShell(bool fBounce)
@@ -7942,7 +7943,7 @@ void MO_CheepCheep::collide(IO_MovingObject * object)
 void MO_CheepCheep::Die()
 {
 	dead = true;
-	eyecandyfront.add(new EC_FallingObject(&spr_cheepcheepdead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, 0, iColorOffsetY, 32, 32));
+	eyecandy[2].add(new EC_FallingObject(&spr_cheepcheepdead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, 0, iColorOffsetY, 32, 32));
 }
 
 /*
@@ -8051,7 +8052,7 @@ void MO_SledgeBrother::update()
 				//{
 				//	short iRandomX = rand() % 612;
 				//	short iRandomY = rand() % 442;
-				//	eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, iRandomX - 2, iRandomY + 3, 3, 8));
+				//	eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, iRandomX - 2, iRandomY + 3, 3, 8));
 				//	objectcontainer[2].add(new CO_Bomb(&spr_bomb, iRandomX, iRandomY, 0.0f, 0.0f, 4, -1, -1, -1, rand() % 30 + 30));
 				//}
 			}
@@ -8378,7 +8379,7 @@ void MO_SledgeBrother::collide(IO_MovingObject * object)
 void MO_SledgeBrother::Die()
 {
 	dead = true;
-	eyecandyfront.add(new EC_FallingObject(&spr_sledgebrothersdead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, 0, iType * 64, iw, ih));
+	eyecandy[2].add(new EC_FallingObject(&spr_sledgebrothersdead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, 0, iType * 64, iw, ih));
 }
 
 void MO_SledgeBrother::Damage(short playerID)
@@ -8706,7 +8707,7 @@ void CO_Shell::update()
 	{
 		if(game_values.shellttl > 0 && ++iDeathTime >= game_values.shellttl)
 		{
-			eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix, iy, 3, 8));
+			eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix, iy, 3, 8));
 			dead = true;
 			ifsoundonplay(sfx_kicksound);
 
@@ -8779,7 +8780,7 @@ void CO_Shell::draw()
 
 	if(fSmoking)
 	{
-		eyecandyback.add(new EC_SingleAnimation(&spr_burnup, ix - collisionOffsetX + (iw >> 1) - 16, iy - collisionOffsetY + (ih >> 1) - 16, 5, 3));
+		eyecandy[0].add(new EC_SingleAnimation(&spr_burnup, ix - collisionOffsetX + (iw >> 1) - 16, iy - collisionOffsetY + (ih >> 1) - 16, 5, 3));
 	}
 }
 
@@ -8863,7 +8864,7 @@ void CO_Shell::CheckAndDie()
 
 void CO_Shell::Die()
 {
-	eyecandyfront.add(new EC_FallingObject(&spr_shelldead, ix, iy, -velx / 4.0f, -VELJUMP / 2.0f, 1, 0, iShellType * 32, 0, 32, 32));
+	eyecandy[2].add(new EC_FallingObject(&spr_shelldead, ix, iy, -velx / 4.0f, -VELJUMP / 2.0f, 1, 0, iShellType * 32, 0, 32, 32));
 	dead = true;
 	ifsoundonplay(sfx_kicksound);
 	iKillCounter = 0;
@@ -8881,7 +8882,7 @@ void CO_Shell::SideBounce()
 	{
 		if(iBounceCounter == 0)
 		{
-			eyecandyfront.add(new EC_SingleAnimation(&spr_shellbounce, ix + (velx > 0 ? 0 : collisionWidth) - 21, iy + (collisionHeight >> 1) - 20, 4, 4));
+			eyecandy[2].add(new EC_SingleAnimation(&spr_shellbounce, ix + (velx > 0 ? 0 : collisionWidth) - 21, iy + (collisionHeight >> 1) - 20, 4, 4));
 			ifsoundonplay(sfx_bump);
 
 			iBounceCounter = 7; //Allow bounce stars to show on each bounce on a 2x wide pit
@@ -9060,7 +9061,7 @@ void CO_ThrowBlock::update()
 
 	if(game_values.blueblockttl > 0 && ++iDeathTime >= game_values.blueblockttl)
 	{
-		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix, iy, 3, 8));
+		eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix, iy, 3, 8));
 		dead = true;
 
 		if(owner)
@@ -9100,7 +9101,7 @@ void CO_ThrowBlock::draw()
 
 	if(fSmoking)
 	{
-		eyecandyback.add(new EC_SingleAnimation(&spr_burnup, ix - collisionOffsetX + (iw >> 1) - 16, iy - collisionOffsetY + (ih >> 1) - 16, 5, 3));
+		eyecandy[0].add(new EC_SingleAnimation(&spr_burnup, ix - collisionOffsetX + (iw >> 1) - 16, iy - collisionOffsetY + (ih >> 1) - 16, 5, 3));
 	}
 }
 
@@ -9167,10 +9168,10 @@ void CO_ThrowBlock::CheckAndDie()
 
 void CO_ThrowBlock::Die()
 {
-	eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix, iy, -1.5f, -7.0f, 6, 2, 0, iType << 4, 16, 16));
-	eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix + 16, iy, 1.5f, -7.0f, 6, 2, 0, iType << 4, 16, 16));
-	eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix, iy + 16, -1.5f, -4.0f, 6, 2, 0, iType << 4, 16, 16));
-	eyecandyfront.add(new EC_FallingObject(&spr_brokenblueblock, ix + 16, iy + 16, 1.5f, -4.0f, 6, 2, 0, iType << 4, 16, 16));
+	eyecandy[2].add(new EC_FallingObject(&spr_brokenblueblock, ix, iy, -1.5f, -7.0f, 6, 2, 0, iType << 4, 16, 16));
+	eyecandy[2].add(new EC_FallingObject(&spr_brokenblueblock, ix + 16, iy, 1.5f, -7.0f, 6, 2, 0, iType << 4, 16, 16));
+	eyecandy[2].add(new EC_FallingObject(&spr_brokenblueblock, ix, iy + 16, -1.5f, -4.0f, 6, 2, 0, iType << 4, 16, 16));
+	eyecandy[2].add(new EC_FallingObject(&spr_brokenblueblock, ix + 16, iy + 16, 1.5f, -4.0f, 6, 2, 0, iType << 4, 16, 16));
 	
 	dead = true;
 	ifsoundonplay(sfx_breakblock);
@@ -9192,7 +9193,7 @@ void CO_ThrowBlock::SideBounce()
 	{
 		if(iBounceCounter == 0)
 		{
-			eyecandyfront.add(new EC_SingleAnimation(&spr_shellbounce, ix + (velx > 0 ? 0 : collisionWidth) - 21, iy + (collisionHeight >> 1) - 20, 4, 4));
+			eyecandy[2].add(new EC_SingleAnimation(&spr_shellbounce, ix + (velx > 0 ? 0 : collisionWidth) - 21, iy + (collisionHeight >> 1) - 20, 4, 4));
 			ifsoundonplay(sfx_bump);
 
 			iBounceCounter = 7; //Allow bounce stars to show on each bounce on a 2x wide pit
@@ -9363,7 +9364,7 @@ void CO_KuriboShoe::hittop(CPlayer * player)
 		dead = true;
 		player->SetKuriboShoe(fSticky ? 2 : 1);
 		ifsoundonplay(sfx_transform);
-		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, player->ix + HALFPW - 16, player->iy + HALFPH - 16, 3, 8));
+		eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, player->ix + HALFPW - 16, player->iy + HALFPH - 16, 3, 8));
 	}
 }
 
@@ -9678,7 +9679,7 @@ bool OMO_StraightPathHazard::collide(CPlayer * player)
 {
 	if(player->shield == 0)
 	{
-		eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix + (iw >> 2) - 16, iy + (ih >> 2) - 16, 3, 8));
+		eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix + (iw >> 2) - 16, iy + (ih >> 2) - 16, 3, 8));
 		dead = true;
 
 		if(!player->invincible)
@@ -10165,7 +10166,7 @@ void MO_PirhanaPlant::KillPlant()
 	collisionHeight = 0;
 
 	ifsoundonplay(sfx_kicksound);
-	eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix, iy - (iDirection == 0 ? 32 : 0), 3, 4));
+	eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix, iy - (iDirection == 0 ? 32 : 0), 3, 4));
 }
 
 float MO_PirhanaPlant::GetFireballAngle()
@@ -10258,7 +10259,7 @@ bool OMO_PipeCoin::collide(CPlayer * player)
 		game_values.gamemode->CheckWinner(player);
 	}
 
-	eyecandyfront.add(new EC_SingleAnimation(&spr_coinsparkle, ix, iy, 7, 4));
+	eyecandy[2].add(new EC_SingleAnimation(&spr_coinsparkle, ix, iy, 7, 4));
 
 	dead = true;
 	return false;
@@ -10345,7 +10346,7 @@ bool OMO_PipeBonus::collide(CPlayer * player)
 		if(player->shield == 0)
 		{
 			dead = true;
-			eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, ix - 1, iy - 1, 3, 8));
+			eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix - 1, iy - 1, 3, 8));
 
 			if(!player->invincible)
 			{

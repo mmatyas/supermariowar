@@ -1331,7 +1331,7 @@ void Menu::CreateMenu()
 	miTourField = new MI_SelectField(&spr_selectfield, 130, 380, "Tour", 380, 100);
 	for(short iTour = 0; iTour < tourlist.GetCount(); iTour++)
 	{
-		GetNameFromFileName(szTemp, tourlist.GetIndex(iTour));
+		GetNameFromFileName(szTemp, tourlist.GetIndex(iTour), true);
 		//strcat(szTemp, " Tour");
 		miTourField->Add(szTemp, iTour, "", true, false);
 	}
@@ -1342,7 +1342,7 @@ void Menu::CreateMenu()
 	miWorldField = new MI_SelectField(&spr_selectfield, 130, 380, "World", 380, 100);
 	for(short iWorld = 0; iWorld < worldlist.GetCount(); iWorld++)
 	{
-		GetNameFromFileName(szTemp, worldlist.GetIndex(iWorld));
+		GetNameFromFileName(szTemp, worldlist.GetIndex(iWorld), true);
 		miWorldField->Add(szTemp, iWorld, "", true, false);
 	}
 	miWorldField->SetData(&game_values.worldindex, NULL, NULL);
@@ -1442,7 +1442,7 @@ void Menu::CreateMenu()
 	//Add user defined filters
 	for(short iFilter = 0; iFilter < filterslist.GetCount(); iFilter++)
 	{
-		GetNameFromFileName(szTemp, filterslist.GetIndex(iFilter));
+		GetNameFromFileName(szTemp, filterslist.GetIndex(iFilter), true);
 		miMapFilterScroll->Add(szTemp, game_values.piFilterIcons[NUM_AUTO_FILTERS + iFilter]);
 	}
 	

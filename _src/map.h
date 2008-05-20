@@ -220,7 +220,7 @@ class CMap
 
 		char szBackgroundFile[128];
 		short backgroundID;
-		short eyecandyID;
+		short eyecandy[3];
 		short musicCategoryID;
 		
 		short iNumMapItems;

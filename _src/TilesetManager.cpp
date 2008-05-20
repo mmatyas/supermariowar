@@ -3,6 +3,7 @@
 /*********************************
 *  CTileset
 *********************************/
+extern TileType GetIncrementedTileType(TileType type);
 
 CTileset::CTileset(const char * szpath)
 {
@@ -104,42 +105,7 @@ void CTileset::SetTileType(short iTileCol, short iTileRow, TileType type)
 TileType CTileset::IncrementTileType(short iTileCol, short iTileRow)
 {
 	short iTile = iTileCol + iTileRow * iWidth;
-	if(tiletypes[iTile] == tile_nonsolid)
-		tiletypes[iTile] = tile_solid;
-	else if(tiletypes[iTile] == tile_solid)
-		tiletypes[iTile] = tile_solid_on_top;
-	else if(tiletypes[iTile] == tile_solid_on_top)
-		tiletypes[iTile] = tile_ice;
-	else if(tiletypes[iTile] == tile_ice)
-		tiletypes[iTile] = tile_death;
-	else if(tiletypes[iTile] == tile_death)
-		tiletypes[iTile] = tile_death_on_top;
-	else if(tiletypes[iTile] == tile_death_on_top)
-		tiletypes[iTile] = tile_death_on_bottom;
-	else if(tiletypes[iTile] == tile_death_on_bottom)
-		tiletypes[iTile] = tile_death_on_left;
-	else if(tiletypes[iTile] == tile_death_on_left)
-		tiletypes[iTile] = tile_death_on_right;
-	else if(tiletypes[iTile] == tile_death_on_right)
-		tiletypes[iTile] = tile_ice_on_top;
-	else if(tiletypes[iTile] == tile_ice_on_top)
-		tiletypes[iTile] = tile_ice_death_on_bottom;
-	else if(tiletypes[iTile] == tile_ice_death_on_bottom)
-		tiletypes[iTile] = tile_ice_death_on_left;
-	else if(tiletypes[iTile] == tile_ice_death_on_left)
-		tiletypes[iTile] = tile_ice_death_on_right;
-	else if(tiletypes[iTile] == tile_ice_death_on_right)
-		tiletypes[iTile] = tile_super_death;
-	else if(tiletypes[iTile] == tile_super_death)
-		tiletypes[iTile] = tile_super_death_top;
-	else if(tiletypes[iTile] == tile_super_death_top)
-		tiletypes[iTile] = tile_super_death_bottom;
-	else if(tiletypes[iTile] == tile_super_death_bottom)
-		tiletypes[iTile] = tile_super_death_left;
-	else if(tiletypes[iTile] == tile_super_death_left)
-		tiletypes[iTile] = tile_super_death_right;
-	else if(tiletypes[iTile] == tile_super_death_right)
-		tiletypes[iTile] = tile_nonsolid;
+	tiletypes[iTile] = GetIncrementedTileType(tiletypes[iTile]);
 
 	return tiletypes[iTile];
 }

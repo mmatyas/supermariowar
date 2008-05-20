@@ -18,32 +18,32 @@ sleep.ogg
 grassland.ogg
 
 [Desert]
-grassland.ogg
+desert.ogg
 
 [Water]
-grassland.ogg
+water.ogg
 
 [Giant]
-grassland.ogg
+giant.ogg
 
 [Sky]
-grassland.ogg
+sky.ogg
 
 [Ice]
-grassland.ogg
+ice.ogg
 
 [Pipe]
-grassland.ogg
+pipe.ogg
 
 [Dark]
-grassland.ogg
+bowser.ogg
 
 [Space]
-grassland.ogg
+space.ogg
 
 #The section below is for selecting music for a specific world
 #The format is "WorldName,MusicFile".  Only one music file can be
 #specified for any given map.  The map name should be only the actual
 #name and no extension.  Capitalization should match the map exactly.
 [Worlds]
-0smw,grassland.ogg
+SMB3,grassland.ogg

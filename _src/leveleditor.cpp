@@ -95,6 +95,12 @@ class MapPlatform
 		short iDrawLayer;
 };
 
+extern TileType GetIncrementedTileType(TileType type);
+
+TileType * animatedtiletypes;
+bool ReadAnimatedTileTypeFile(const char * szFile);
+bool WriteAnimatedTileTypeFile(const char * szFile);
+
 SDL_Surface		*screen;
 SDL_Surface		*blitdest;
 SDL_Event		event;
@@ -206,7 +212,7 @@ gfxSprite		spr_thumbnail_mapitems[2];
 gfxSprite		spr_awardsouls, spr_fireballexplosion;
 
 gfxSprite		spr_backmap[2];
-CEyecandyContainer eyecandyfront;
+CEyecandyContainer eyecandy[3];
 CGameMode		*gamemodes[GAMEMODE_LAST];
 CPlayer			*list_players[4];
 short			list_players_cnt = 0;
@@ -471,6 +477,8 @@ int main(int argc, char *argv[])
 		g_Platforms[iPlatform].iDrawLayer = 2;  //Default to drawing in the middle layer
 	}
 
+	ReadAnimatedTileTypeFile(convertPath("gfx/packs/Classic/tilesets/tile_animation_tileset.tls").c_str());
+
 	FILE * fp = OpenFile("leveleditor.bin", "rt");
 
 	if(fp)
@@ -590,7 +598,7 @@ int main(int argc, char *argv[])
 		fclose(fp);
 	}
 
-	//g_map.saveTileSet(convertPath("maps/tileset/tileset.tls"));
+	WriteAnimatedTileTypeFile(convertPath("gfx/packs/Classic/tilesets/tile_animation_tileset.tls").c_str());
 	g_tilesetmanager.SaveTilesets();
 
 	printf("\n---------------- shutdown ----------------\n");
@@ -607,6 +615,8 @@ TileType CalculateTileType(short x, short y)
 		TileType iTileType = tile_nonsolid;
 		if(tile->iID >= 0)
 			iTileType = g_tilesetmanager.GetTileset(tile->iID)->GetTileType(tile->iCol, tile->iRow);
+		else if(tile->iID == TILESETANIMATED)
+			iTileType = animatedtiletypes[tile->iRow + (tile->iCol << 5)];
 
 		if(iTileType != tile_nonsolid)
 		{
@@ -1170,8 +1180,12 @@ int editor_edit()
 									short iLocalY = iClickY + j;
 
 									if(iLocalX >= 0 && iLocalX < MAPWIDTH && iLocalY >= 0 && iLocalY < MAPHEIGHT)
-									{										
+									{		
+										bool fNeedUpdate = !TileTypeIsModified(iLocalX, iLocalY);
 										SetTilesetTile(&g_map.mapdata[iLocalX][iLocalY][selected_layer], TILESETANIMATED, set_tile_start_y + j, set_tile_start_x + i);
+										
+										if(fNeedUpdate)
+											UpdateTileType(iLocalX, iLocalY);
 									}
 								}
 							}
@@ -1321,7 +1335,11 @@ int editor_edit()
 
 									if(iLocalX >= 0 && iLocalX < MAPWIDTH && iLocalY >= 0 && iLocalY < MAPHEIGHT)
 									{
+										bool fNeedUpdate = !TileTypeIsModified(iLocalX, iLocalY);
 										SetTilesetTile(&g_map.mapdata[iLocalX][iLocalY][selected_layer], TILESETANIMATED, set_tile_start_y + j, set_tile_start_x + i);
+										
+										if(fNeedUpdate)
+											UpdateTileType(iLocalX, iLocalY);
 									}
 								}
 							}							
@@ -1676,9 +1694,6 @@ void drawmap(bool fScreenshot, short iBlockSize, bool fWithPlatforms)
 		spr_background.draw(0,0);
 	}
 
-	if(fWithPlatforms)
-		g_map.drawPlatforms(0);
-
 	if((view_only_layer && selected_layer == 0) || !view_only_layer)
 		drawlayer(0, false, iBlockSize);
 
@@ -1696,6 +1711,9 @@ void drawmap(bool fScreenshot, short iBlockSize, bool fWithPlatforms)
 		if((view_only_layer && copiedlayer == 1) || !view_only_layer)
 			drawlayer(1, true, iBlockSize);
 	}
+
+	if(fWithPlatforms)
+		g_map.drawPlatforms(0);
 
 	if((viewblocks && !view_only_layer) || fScreenshot)
 	{
@@ -1962,17 +1980,23 @@ int editor_eyecandy()
 				{
 					if(event.button.button == SDL_BUTTON_LEFT)
 					{
-						for(int k = 0; k < NUM_EYECANDY; k++)
+						short ix = 165;
+						for(short iLayer = 0; iLayer < 3; iLayer++)
 						{
-							if(event.button.x >= 275 && event.button.x < 365 &&
-								event.button.y >= k * 65 + 20 && event.button.y < k * 65 + 72)
+							for(short k = 0; k < NUM_EYECANDY; k++)
 							{
-								short mask = 1 << k;
-								if(g_map.eyecandyID & mask)
-									g_map.eyecandyID &= ~mask;
-								else
-									g_map.eyecandyID |= mask;
+								if(event.button.x >= ix && event.button.x < ix + 90 &&
+									event.button.y >= k * 65 + 20 && event.button.y < k * 65 + 72)
+								{
+									short mask = 1 << k;
+									if(g_map.eyecandy[iLayer] & mask)
+										g_map.eyecandy[iLayer] &= ~mask;
+									else
+										g_map.eyecandy[iLayer] |= mask;
+								}
 							}
+
+							ix += 110;
 						}
 					}
 				
@@ -1991,23 +2015,28 @@ int editor_eyecandy()
 		int iMouseX, iMouseY;
 		SDL_GetMouseState(&iMouseX, &iMouseY);
 
-		for(int k = 0; k < NUM_EYECANDY; k++)
+		short ix = 165;
+		for(short iLayer = 0; iLayer < 3; iLayer++)
 		{
-			short ix = 275;
-			short iy = k * 65 + 20;
+			for(short k = 0; k < NUM_EYECANDY; k++)
+			{
+				short iy = k * 65 + 20;
 
-			if(iMouseX >= ix && iMouseX < ix + 90 && iMouseY >= iy && iMouseY < iy + 52)
-				spr_powerupselector.draw(ix, iy, 0, 0, 90, 52);
-			else
-				spr_powerupselector.draw(ix, iy, 0, 52, 90, 52);
+				if(iMouseX >= ix && iMouseX < ix + 90 && iMouseY >= iy && iMouseY < iy + 52)
+					spr_powerupselector.draw(ix, iy, 0, 0, 90, 52);
+				else
+					spr_powerupselector.draw(ix, iy, 0, 52, 90, 52);
 
-			spr_eyecandy.draw(ix + 10, iy + 10, k << 5, 0, 32, 32);
+				spr_eyecandy.draw(ix + 10, iy + 10, k << 5, 0, 32, 32);
 
-			short mask = 1 << k;
-			if(g_map.eyecandyID & mask)
-				spr_hidden_marker.draw(ix + 57, iy + 16);
+				short mask = 1 << k;
+				if(g_map.eyecandy[iLayer] & mask)
+					spr_hidden_marker.draw(ix + 57, iy + 16);
 
-			menu_font_small.drawCentered(320, iy - menu_font_small.getHeight() + 7, szEyecandyNames[k]);
+				menu_font_small.drawCentered(320, iy - menu_font_small.getHeight() + 7, szEyecandyNames[k]);
+			}
+
+			ix += 110;
 		}
 
 		menu_font_small.draw(0,480-menu_font_small.getHeight(), "eyecandy mode: [e] edit mode, [LMB] choose eyecandy");
@@ -3963,7 +3992,7 @@ int editor_blocks()
 						{  //set the selected block to an on/off switch block
 							
 							set_block = set_block_x + 7;
-							g_map.iSwitches[set_block_x] = set_block_y - 1;
+							g_map.iSwitches[set_block_x] = 2 - set_block_y;
 						}
 						else if(set_block_y >= 1 && set_block_y <= 2 && set_block_x >= 4 && set_block_x <= 7)
 						{  //set the selected block to a switch block
@@ -3972,7 +4001,7 @@ int editor_blocks()
 							set_block_switch_on = set_block_y == 1;
 						}
 						else if(set_block_y == 3 && set_block_x >= 0 && set_block_x <= 9)
-						{  //set the selected block to a switch block
+						{  //set the selected block to a weapon breakable block
 							
 							set_block = set_block_x + 20;
 						}
@@ -4613,6 +4642,11 @@ int editor_animation()
 							set_tile_drag = true;
 						}
 					}
+					else if(event.button.button == SDL_BUTTON_RIGHT)
+					{
+						TileType * type = &animatedtiletypes[iCol + (iRow << 5)];
+						set_type = *type = GetIncrementedTileType(*type);
+					}
 				
 					break;
 				}
@@ -4653,6 +4687,10 @@ int editor_animation()
 							
 							if(iRow > set_tile_end_y)
 								set_tile_end_y = iRow;
+						}
+						else if(event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT))
+						{
+							animatedtiletypes[iCol + (iRow << 5)] = set_type;
 						}
 					}
 					
@@ -4696,6 +4734,10 @@ int editor_animation()
 				short iSrcY = iCol << 5;
 
 				spr_tileanimation[0].draw(iDestX, iDestY, iSrcX, iSrcY, TILESIZE, TILESIZE);
+
+				TileType t = animatedtiletypes[iCol + (iRow << 5)];
+				if(t != tile_nonsolid)
+					spr_tiletypes.draw(iDestX, iDestY, (t-1) << 3, 0, 8, 8);
 			}
 		}
 
@@ -4711,6 +4753,8 @@ int editor_animation()
 		}
 
 		menu_font_small.drawRightJustified(640, 0, maplist.currentFilename());
+
+		menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "Use Arrow Keys To Scroll");
 				
 		SDL_Flip(screen);
 
@@ -5695,4 +5739,59 @@ void takescreenshot()
 	screen = old_screen;
 	blitdest = screen;
 }
+
+bool ReadAnimatedTileTypeFile(const char * szFile)
+{
+	//Detect if the tiletype file already exists, if not create it
+	if(File_Exists(szFile))
+	{
+		FILE * tsf = fopen(szFile, "rb");
+		if(tsf == NULL)
+		{
+			printf("ERROR: couldn't open tileset file: %s\n", szFile);
+			return false;
+		}
+		
+		animatedtiletypes = new TileType[256];
+
+		for(short i = 0; i < 256; i++)
+		{
+			animatedtiletypes[i] = (TileType)ReadInt(tsf);
+		}
+
+		fclose(tsf);
+	}
+	else
+	{
+		animatedtiletypes = new TileType[256];
+
+		for(short i = 0; i < 256; i++)
+		{
+			animatedtiletypes[i] = tile_nonsolid;
+		}
+	}
+
+	return true;
+}
+
+
+bool WriteAnimatedTileTypeFile(const char * szFile)
+{
+	FILE * tsf = fopen(szFile, "wb");
+	if(tsf == NULL)
+	{
+		printf("ERROR: couldn't open tileset file to save tile types: %s\n", szFile);
+		return false;
+	}
+	
+	for(short i = 0; i < 256; i++)
+	{
+		WriteInt(animatedtiletypes[i], tsf);
+	}
+
+	fclose(tsf);
+	return true;
+}
+
+
 

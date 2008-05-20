@@ -42,9 +42,8 @@ BUG!!  World AI needs ability to use stored items -> harder problem than I have 
 [ ] On/Off switch [?] and note blocks and possibly other types of on/off blocks
 [ ] Thunderbolt style spawn
 [ ] Reverse gravity blue podoboos
-
-* Bomb option in Star mode
-- Mariokart-type podium at the end of a tournament/tour/whatever
+[ ] Bomb option in Star mode
+[ ] Mariokart-type podium at the end of a tournament/tour/whatever
 
 
 SHIP BETA
@@ -62,7 +61,42 @@ SHIP BETA
 [X] Test new shell bounce (doesn't bounce for hopping, but does for tail hitting, bottom bouncing and pow/mod)
 
 
+[ ] Treasure chests from winning a stage that rewards an item in world mode can be spawned in areas where they fall forever, and can never be opened. (Though this is aesthetic)
+
+[ ] Flame hazards in maps that crossed over from the pre-beta to beta are reversed and move over a few tiles.
+[ ] Weird sound problems with the world music.
+
+[X] Make the world preview scroll as fast as there are number of tiles needed to scroll (i.e. smaller maps will scroll slower than larger maps) Have it cap at a slowest rate or fastest rate.
+[X] Ability to say whether eyecandy appears behind everything or in front of everything
+[X] The switch bug is still there.(The one where if you click the on switch in the level editor, and place it down, you place the off switch.)
+[X] Worlds should have the names removed like maps.(Two52_World should become World.)
+[X] The propeller animation tiles don't line up with the sideways screw tiles from the airship tileset, which is rather important.
+[X] Animated tiles don't set tile types.
+[X] Platform layer 1 goes behind layer 0 tiles in the editor, but in front of them in game
+[X] Fixed default tiletype of the super mario world lava tiles
+[X] Key won't open a door when a different color door is also touching the player
+[X] On world map when moving left it displays a little black bar then updates screen
+[X] Adding 20 pirhana plants to the top of a map causes the preview screenshot to not look so good.  Maybe it is any screenshot using pirhana plants?
+[X] If you do a statue stomp, and you press the jump button just as you land, you will jump.
+[X] If you become a statue while flying with a p-wing, the flying sound will continue to play. Actually, you can fly with the P Wing as a statue, too... it's kinda funny to see, honestly.
+[X] When you do a statue stomp with a cape or leaf, and press jump before you land, you will continue to fall slowly with the leaf, or will do an extra jump with the cape.
+[X] The Weapon Use Limit for the Feather and Leaf are apparently messed up a bit. When you use a stored Feather or Leaf, it disappears on the first use, and you can't spin with it either.
+[X] Also, running out the limit on the Tanooki powerup doesn't make the powerdown sound.
+[X] 1ups in KotH are too powerful -> halved score awarded
+
+[ ] CVS Add new 1.8 readme and docs images
+[ ] CVS Add new world music
+
+[ ] AI should stop collecting cards if their bank is full (unless maybe they see a better card)
+[ ] Carried objects can be dropped inside moving platforms solid tiles
+
 Feature Requests
+
+[ ] Shells still don't disappear on death tiles -> I think this is user error and not a bug
+
+[ ] The water splatter when rain eyecandy is in effect (awesome) appears over all layers and should appear in the same layer as the player - need middle eyecandy layer
+
+[ ] Author filter type where you can choose a single author and it will only show you the maps from that author.  At startup, it would scan all maps and extra the author (everything before the underscore) then create a list of possible authors to filter on.
 
 [ ] Player needs bounce when killing hazards with shoe or tanooki?
 
@@ -104,11 +138,10 @@ Feature Requests
 [ ] A scrolling effect like the one in the SMW 1.6 options menu could be used for the powerup selection menu.
 [ ] Options to choose how many fireballs, hammers, boomerangs, etc can be on screen at once.
 [ ] Options to choose how long clocks and stars last.
-[ ] The projectile thrown by the ice wand should last only for a certain amount of time instead of stopping at the sides of the screen.
 [ ] Option to choose how long the p-wing lets you fly.
 [ ] The level editor should use the newer menu graphics.
 
-[ ] Anyways I have a small bug... well I'm not sure if it's a bug, but on worlds with 2 draw-bridges and only one small path connected between them, and when you have the hourglass power-up in your reserves, you'll obviously be stuck if you activate it when you're in between them, so is there anyway you could make it so the hourglass is idiot-proof and doesn't allow you to use it when it figures out you'll be stuck if you activate it?
+[ ] Worlds with 2 draw-bridges and only one small path connected between them, and when you have the hourglass power-up in your reserves, you'll obviously be stuck if you activate it when you're in between them, so is there anyway you could make it so the hourglass is idiot-proof and doesn't allow you to use it when it figures out you'll be stuck if you activate it?
 [ ] The shells, when flipped in SMB3 by tail, block from underneath or whatever, goes roughly twice the height the shells in SMW do when flipped the same way. Maybe increase their Y velocity when flipped?
 [ ] Not really a bug, but something that'll be annoying later on as users might complain of this: The tail/ cape attack sounds like it's in a cave on all maps
 [ ] Anyways, we need the ability to have Donut Blocks fall at certain times. Blue ones are fast, brown ones or normal, and grey ones are slow. Plus ability for donut blocks to come back after they are destroyed and customizable time for it to be triggered.
@@ -537,8 +570,7 @@ short g_iSwirlSpawnLocations[4][2][25];
 CMap			g_map;
 CTilesetManager g_tilesetmanager;
 
-CEyecandyContainer eyecandyback;
-CEyecandyContainer eyecandyfront;
+CEyecandyContainer eyecandy[3];
 
 CObjectContainer noncolcontainer;
 CObjectContainer objectcontainer[3];
@@ -936,7 +968,7 @@ int main(int argc, char *argv[])
 #ifdef _DEBUG	
 	game_values.fullscreen			= false;
 #else	
-	game_values.fullscreen			= true;
+	game_values.fullscreen			= false;
 #endif
 
 	game_values.screenResizeX		= 20.0f;
@@ -1709,113 +1741,116 @@ void RunGame()
 		score[i]->order = -1;
 	}
 
-	//Clouds
-	if(g_map.eyecandyID & 1)
+	for(short iEyeCandyLayer = 0; iEyeCandyLayer < 3; iEyeCandyLayer++)
 	{
-		for(i = 0; i < 4; i++)
+		//Clouds
+		if(g_map.eyecandy[iEyeCandyLayer] & 1)
 		{
-			float velx;			//speed of cloud, small clouds are slower than big ones
-			short srcy, w, h;
-
-			if(rand() % 2)
+			for(i = 0; i < 4; i++)
 			{
-				velx = (short)(rand() % 51 - 25) / 10.0f;	//big clouds: -3 - +3 pixel/frame
-				srcy = 0;
-				w = 60;
-				h = 28;
-			}
-			else
-			{
-				velx = (short)(rand() % 41 - 20) / 10.0f;	//small clouds: -2 - +2 pixel/frame
-				srcy = 28;
-				w = 28;
-				h = 12;
-			}
-			
-			velx = velx < 0.5f && velx > -0.5f ? 1 : velx;	//no static clouds please
+				float velx;			//speed of cloud, small clouds are slower than big ones
+				short srcy, w, h;
 
-			//add cloud to eyecandy array
-			eyecandyfront.add(new EC_Cloud(&spr_clouds, (float)(rand()%640), (float)(rand()%100), velx, 0, srcy, w, h));
-		}
-	}
-	
-	//Ghosts
-	if(g_map.eyecandyID & 2)
-	{
-		for(i = 0; i < 12; i++)
-		{
-			short iGhostSrcY = (short)(rand() % 3) << 5;	//ghost type
-			float velx = (short)(rand() % 51 - 25) / 10.0f;	//big clouds: -3 - +3 pixel/frame
-			
-			velx = velx < 0.5f && velx > -0.5f ? (rand() % 1 ? 1.0f : -1.0f) : velx;	//no static clouds please
-
-			//add cloud to eyecandy array
-			eyecandyfront.add(new EC_Ghost(&spr_ghosts, (float)(rand() % 640), (float)(rand() % 100), velx, 8, 2, velx < 0.0f ? 64 : 0, iGhostSrcY, 32, 32));
-		}
-	}
-
-	//Leaves
-	if(g_map.eyecandyID & 4)
-	{
-		for(i = 0; i < 20; i++)
-			eyecandyfront.add(new EC_Leaf(&spr_leaves, (float)(rand() % 640), (float)(rand() % 480)));
-	}
-
-	//Snow
-	if(g_map.eyecandyID & 8)
-	{
-		for(i = 0; i < 20; i++)
-			eyecandyfront.add(new EC_Snow(&spr_snow, (float)(rand() % 640), (float)(rand() % 480)));
-	}
-
-	//Fish
-	short iFishWeights[] = {20, 20, 15, 10, 10, 5, 10, 10};
-	short iFishSettings[][4] = { {0, 0, 64, 44}, {0, 44, 64, 44}, {0, 44, 48, 44}, {32, 32, 16, 12}, {32, 44, 16, 12}, {32, 16, 16, 28}, {32, 0, 32, 28}, {32, 44, 32, 28}}; 
-	if(g_map.eyecandyID & 16)
-	{
-		for(i = 0; i < 10; i++)
-		{
-			float velx = (short)(rand() % 41 - 20) / 10.0f;
-			velx = velx < 0.5f && velx > -0.5f ? 1.0f : velx; //Keep fish from moving too slowly
-
-			short srcx, srcy, w, h;
-
-			short iRandomFish = rand() % 100;
-			
-			short iFishWeightCount = 0;
-			for(short iFish = 0; iFish < 8; iFish++)
-			{
-				iFishWeightCount += iFishWeights[iFish];
-
-				if(iRandomFish < iFishWeightCount)
+				if(rand() % 2)
 				{
-					srcx = iFishSettings[iFish][0];
-					srcy = iFishSettings[iFish][1];
-					w = iFishSettings[iFish][2];
-					h = iFishSettings[iFish][3];
-					break;
+					velx = (short)(rand() % 51 - 25) / 10.0f;	//big clouds: -3 - +3 pixel/frame
+					srcy = 0;
+					w = 60;
+					h = 28;
 				}
+				else
+				{
+					velx = (short)(rand() % 41 - 20) / 10.0f;	//small clouds: -2 - +2 pixel/frame
+					srcy = 28;
+					w = 28;
+					h = 12;
+				}
+				
+				velx = velx < 0.5f && velx > -0.5f ? 1 : velx;	//no static clouds please
+
+				//add cloud to eyecandy array
+				eyecandy[iEyeCandyLayer].add(new EC_Cloud(&spr_clouds, (float)(rand()%640), (float)(rand()%100), velx, 0, srcy, w, h));
 			}
-
-			//add cloud to eyecandy array
-			short iPossibleY = (480 - h) / 10;
-			float dDestY = (float)(rand() % iPossibleY + iPossibleY * i);
-			eyecandyfront.add(new EC_Cloud(&spr_fish, (float)(rand()%640), dDestY, velx, srcx + (velx > 0.0f ? 64 : 0), srcy, w, h));
 		}
-	}
-	
-	//Rain
-	if(g_map.eyecandyID & 32)
-	{
-		for(i = 0; i < 30; i++)
-			eyecandyfront.add(new EC_Rain(&spr_rain, (float)(rand() % 640), (float)(rand() % 480)));
-	}
+		
+		//Ghosts
+		if(g_map.eyecandy[iEyeCandyLayer] & 2)
+		{
+			for(i = 0; i < 12; i++)
+			{
+				short iGhostSrcY = (short)(rand() % 3) << 5;	//ghost type
+				float velx = (short)(rand() % 51 - 25) / 10.0f;	//big clouds: -3 - +3 pixel/frame
+				
+				velx = velx < 0.5f && velx > -0.5f ? (rand() % 1 ? 1.0f : -1.0f) : velx;	//no static clouds please
 
-	//Bubbles
-	if(g_map.eyecandyID & 64)
-	{
-		for(i = 0; i < 15; i++)
-			eyecandyfront.add(new EC_Bubble(&spr_rain, (float)(rand() % 640), (float)(rand() % 480)));
+				//add cloud to eyecandy array
+				eyecandy[iEyeCandyLayer].add(new EC_Ghost(&spr_ghosts, (float)(rand() % 640), (float)(rand() % 100), velx, 8, 2, velx < 0.0f ? 64 : 0, iGhostSrcY, 32, 32));
+			}
+		}
+
+		//Leaves
+		if(g_map.eyecandy[iEyeCandyLayer] & 4)
+		{
+			for(i = 0; i < 20; i++)
+				eyecandy[iEyeCandyLayer].add(new EC_Leaf(&spr_leaves, (float)(rand() % 640), (float)(rand() % 480)));
+		}
+
+		//Snow
+		if(g_map.eyecandy[iEyeCandyLayer] & 8)
+		{
+			for(i = 0; i < 20; i++)
+				eyecandy[iEyeCandyLayer].add(new EC_Snow(&spr_snow, (float)(rand() % 640), (float)(rand() % 480)));
+		}
+
+		//Fish
+		short iFishWeights[] = {20, 20, 15, 10, 10, 5, 10, 10};
+		short iFishSettings[][4] = { {0, 0, 64, 44}, {0, 44, 64, 44}, {0, 44, 48, 44}, {32, 32, 16, 12}, {32, 44, 16, 12}, {32, 16, 16, 28}, {32, 0, 32, 28}, {32, 44, 32, 28}}; 
+		if(g_map.eyecandy[iEyeCandyLayer] & 16)
+		{
+			for(i = 0; i < 10; i++)
+			{
+				float velx = (short)(rand() % 41 - 20) / 10.0f;
+				velx = velx < 0.5f && velx > -0.5f ? 1.0f : velx; //Keep fish from moving too slowly
+
+				short srcx, srcy, w, h;
+
+				short iRandomFish = rand() % 100;
+				
+				short iFishWeightCount = 0;
+				for(short iFish = 0; iFish < 8; iFish++)
+				{
+					iFishWeightCount += iFishWeights[iFish];
+
+					if(iRandomFish < iFishWeightCount)
+					{
+						srcx = iFishSettings[iFish][0];
+						srcy = iFishSettings[iFish][1];
+						w = iFishSettings[iFish][2];
+						h = iFishSettings[iFish][3];
+						break;
+					}
+				}
+
+				//add cloud to eyecandy array
+				short iPossibleY = (480 - h) / 10;
+				float dDestY = (float)(rand() % iPossibleY + iPossibleY * i);
+				eyecandy[iEyeCandyLayer].add(new EC_Cloud(&spr_fish, (float)(rand()%640), dDestY, velx, srcx + (velx > 0.0f ? 64 : 0), srcy, w, h));
+			}
+		}
+		
+		//Rain
+		if(g_map.eyecandy[iEyeCandyLayer] & 32)
+		{
+			for(i = 0; i < 30; i++)
+				eyecandy[iEyeCandyLayer].add(new EC_Rain(&spr_rain, (float)(rand() % 640), (float)(rand() % 480)));
+		}
+
+		//Bubbles
+		if(g_map.eyecandy[iEyeCandyLayer] & 64)
+		{
+			for(i = 0; i < 15; i++)
+				eyecandy[iEyeCandyLayer].add(new EC_Bubble(&spr_rain, (float)(rand() % 640), (float)(rand() % 480)));
+		}
 	}
 
 	short iScoreTextOffset[4];
@@ -2350,11 +2385,13 @@ void RunGame()
 					objectcontainer[1].update();
 					objectcontainer[2].update();
 
-					eyecandyfront.cleandeadobjects();
-					eyecandyback.cleandeadobjects();
-					
-					eyecandyfront.update();
-					eyecandyback.update();
+					eyecandy[0].cleandeadobjects();
+					eyecandy[1].cleandeadobjects();
+					eyecandy[2].cleandeadobjects();
+
+					eyecandy[0].update();
+					eyecandy[1].update();
+					eyecandy[2].update();
 					
 					g_map.update();
 				}
@@ -2697,16 +2734,21 @@ void RunGame()
 						}
 					}
 
-					eyecandyfront.cleandeadobjects();
-					eyecandyback.cleandeadobjects();
+					eyecandy[0].cleandeadobjects();
+					eyecandy[1].cleandeadobjects();
+					eyecandy[2].cleandeadobjects();
+
 					objectcontainer[2].cleandeadobjects();
 					objectcontainer[1].cleandeadobjects();
 					objectcontainer[0].cleandeadobjects();
 					noncolcontainer.cleandeadobjects();
+					
 					CleanDeadPlayers();
 
-					eyecandyfront.update();
-					eyecandyback.update();
+					eyecandy[0].update();
+					eyecandy[1].update();
+					eyecandy[2].update();
+
 					game_values.gamemode->think();
 
 					if(game_values.slowdownon != -1 && ++game_values.slowdowncounter > 580)
@@ -2824,9 +2866,9 @@ void RunGame()
 			//draw back eyecandy behind players
 			g_map.drawPlatforms(0);
 
+			eyecandy[0].draw();
 			noncolcontainer.draw();
-			eyecandyback.draw();
-
+			
 			game_values.gamemode->draw_background();
 
 			objectcontainer[0].draw();
@@ -2838,6 +2880,8 @@ void RunGame()
 				for(i = 0; i < list_players_cnt; i++)
 					list_players[i]->draw();
 			}
+
+			eyecandy[1].draw();
 
 			objectcontainer[1].draw();
 
@@ -2854,7 +2898,7 @@ void RunGame()
 			g_map.drawPlatforms(3);
 
 			objectcontainer[2].draw();
-			eyecandyfront.draw();
+			eyecandy[2].draw();
 			game_values.gamemode->draw_foreground();
 		
 			g_map.drawPlatforms(4);
@@ -3062,7 +3106,7 @@ void RunGame()
 					{
 						char szMode[128];
 						sprintf(szMode, "%s  %s: %d", game_values.gamemode->GetModeName(), game_values.gamemode->GetGoalName(), game_values.gamemode->goal);
-						eyecandyfront.add(new EC_Announcement(&game_font_large, &menu_mode_large, szMode, game_values.gamemode->gamemode, 130, 90));
+						eyecandy[2].add(new EC_Announcement(&game_font_large, &menu_mode_large, szMode, game_values.gamemode->gamemode, 130, 90));
 					}
 				}
 				else if(game_values.screenfade >= 255)
@@ -3132,7 +3176,7 @@ void RunGame()
 					if(game_values.swapstyle == 1)
 					{
 						for(i = 0; i < list_players_cnt; i++)
-							eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, list_players[i]->ix + (HALFPW) - 16, list_players[i]->iy + (HALFPH) - 16, 3, 8));
+							eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, list_players[i]->ix + (HALFPW) - 16, list_players[i]->iy + (HALFPH) - 16, 3, 8));
 					}
 				}
 			}
@@ -3302,8 +3346,9 @@ void CleanUp()
 	}
 	list_players_cnt = 0;
 
-	eyecandyfront.clean();
-	eyecandyback.clean();
+	eyecandy[0].clean();
+	eyecandy[1].clean();
+	eyecandy[2].clean();
 	
 	//noncolcontainer.clean();
 
@@ -3805,7 +3850,7 @@ bool SwapPlayers(short iUsingPlayerID)
 		spots[iPlayer].GetPlayer(list_players[iPlayer], &game_values.gamepowerups[list_players[iPlayer]->getGlobalID()]);
 		
 		if(game_values.swapstyle != 1)
-			eyecandyfront.add(new EC_SingleAnimation(&spr_fireballexplosion, (short)list_players[iPlayer]->fNewSwapX + (HALFPW) - 16, (short)list_players[iPlayer]->fNewSwapY + (HALFPH) - 16, 3, 8));
+			eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, (short)list_players[iPlayer]->fNewSwapX + (HALFPW) - 16, (short)list_players[iPlayer]->fNewSwapY + (HALFPH) - 16, 3, 8));
 
 		if(game_values.swapstyle == 2)
 		{

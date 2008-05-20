@@ -440,6 +440,7 @@ class CGM_KingOfTheHill : public CGM_Domination
 		void init();
 		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
 		short playerkilledself(CPlayer &player, killstyle style);
+		void playerextraguy(CPlayer &player, short iType);
 
 #ifdef _DEBUG
 		void setdebuggoal() {goal = 100;}

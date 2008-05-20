@@ -391,6 +391,7 @@ class CPlayer
 		friend class CGM_Survival;
 		friend class CGM_Eggs;
 		friend class CGM_Domination;
+		friend class CGM_KingOfTheHill;
 		friend class OMO_KingOfTheHillZone;
 		friend class CGM_Race;
 		friend class CGM_Frenzy;
