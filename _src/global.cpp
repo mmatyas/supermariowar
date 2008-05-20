@@ -1844,5 +1844,7 @@ TileType GetIncrementedTileType(TileType type)
 		return tile_super_death_right;
 	else if(type == tile_super_death_right)
 		return tile_nonsolid;
+
+	return tile_nonsolid;
 }
 
