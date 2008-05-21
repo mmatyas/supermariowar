@@ -201,6 +201,7 @@ class CMap
 
 		void movingPlatformCollision(CPlayer * player);
 		void movingPlatformCollision(IO_MovingObject * object);
+		bool movingPlatformCheckSides(IO_MovingObject * object);
 
 		bool isconnectionlocked(int connection) {return warplocked[connection];}
 		void lockconnection(int connection);

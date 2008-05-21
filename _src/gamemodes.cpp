@@ -387,6 +387,8 @@ short CGM_Frag::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle
 
 	if(game_values.gamemode->gamemode == game_mode_frag && game_values.gamemodesettings.frag.style == 1)
 	{
+		ifsoundonplay(sfx_powerdown);
+
 		other.shield = game_values.shieldstyle;
 		other.shieldtimer = 60;
 
@@ -406,6 +408,8 @@ short CGM_Frag::playerkilledself(CPlayer &player, killstyle style)
 
 		if(game_values.gamemode->gamemode == game_mode_frag && game_values.gamemodesettings.frag.style == 1)
 		{
+			ifsoundonplay(sfx_powerdown);
+
 			player.shield = game_values.shieldstyle;
 			player.shieldtimer = 60;
 
@@ -534,6 +538,8 @@ short CGM_TimeLimit::playerkilledplayer(CPlayer &inflictor, CPlayer &other, kill
 
 		if(game_values.gamemode->gamemode == game_mode_timelimit && game_values.gamemodesettings.time.style == 1)
 		{
+			ifsoundonplay(sfx_powerdown);
+
 			other.shield = game_values.shieldstyle;
 			other.shieldtimer = 60;
 
@@ -677,6 +683,8 @@ short CGM_Classic::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killst
 		
 		if(game_values.gamemode->gamemode == game_mode_classic && game_values.gamemodesettings.classic.style == 1)
 		{
+			ifsoundonplay(sfx_powerdown);
+
 			other.shield = game_values.shieldstyle;
 			other.shieldtimer = 60;
 
@@ -737,6 +745,8 @@ short CGM_Classic::playerkilledself(CPlayer &player, killstyle style)
 
 		if(game_values.gamemode->gamemode == game_mode_classic && game_values.gamemodesettings.classic.style == 1)
 		{
+			ifsoundonplay(sfx_powerdown);
+
 			player.shield = game_values.shieldstyle;
 			player.shieldtimer = 60;
 

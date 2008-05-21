@@ -2989,6 +2989,24 @@ void CMap::movingPlatformCollision(IO_MovingObject * object)
 	}
 }
 
+bool CMap::movingPlatformCheckSides(IO_MovingObject * object)
+{
+	bool fRet = false;
+	for(short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++)
+	{
+		fRet |= platforms[iPlatform]->collision_detection_check_sides(object);
+	}
+
+	std::list<MovingPlatform*>::iterator iterateAll = tempPlatforms.begin(), lim = tempPlatforms.end();
+	while (iterateAll != lim)
+	{
+		fRet |= (*iterateAll)->collision_detection_check_sides(object);		
+		iterateAll++;
+	}
+
+	return fRet;
+}
+
 void CMap::resetPlatforms()
 {
 	for(short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++)

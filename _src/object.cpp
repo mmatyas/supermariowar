@@ -3150,6 +3150,7 @@ bool IO_MovingObject::collision_detection_checksides()
 		}
 	}
 
+	bool fRet = true;
 	//Then determine which way is the best way to move this object out of the solid map areas
 	switch(iCase)
 	{
@@ -3157,7 +3158,7 @@ bool IO_MovingObject::collision_detection_checksides()
 		//[ ][ ]
 		//[ ][ ]
 		case 0:
-			return false;
+			fRet = false;
 			break;
 		
 		//[X][ ]
@@ -3352,12 +3353,20 @@ bool IO_MovingObject::collision_detection_checksides()
 		}
 
 		default:
+		{
+			fRet = false;
 			break;
+		}
 	}
 
-	//TODO:: Check moving platforms to see if the object is inside a solid tile here!
+	//Updated object to have correct precalculatedY since it wasn't getting collision detection updates
+	//while it was being held by the player
+	fPrecalculatedY = fy;
 
-	return true;
+	//Check moving platforms and make sure this object is not inside one
+	fRet |= g_map.movingPlatformCheckSides(this);
+
+	return fRet;
 }
 
 void IO_MovingObject::flipsidesifneeded()

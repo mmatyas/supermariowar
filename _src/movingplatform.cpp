@@ -1065,6 +1065,294 @@ void MovingPlatform::check_map_collision_left(CPlayer * player)
 	}
 }
 
+bool MovingPlatform::collision_detection_check_sides(IO_MovingObject * object)
+{
+	short coldec = coldec_object(object);
+	if(coldec == collision_none)
+		return false;
+	
+	if(fDead)
+		return false;
+
+	//Figure out where the corners of this object are touching
+	Uint8 iCase = 0;
+
+	//Check the left side
+	float fRelativeXLeft = object->fx - fx + iHalfWidth;
+	if(coldec == collision_overlap_left)
+		fRelativeXLeft -= 640.0f;
+	else if(coldec == collision_overlap_right)
+		fRelativeXLeft += 640.0f;
+
+	//Check the right side
+	float fRelativeXRight = fRelativeXLeft + object->collisionWidth;
+
+	//Top and Bottom
+	float fRelativeYTop = object->fy - fy + iHalfHeight;
+	float fRelativeYBottom = fRelativeYTop + object->collisionHeight;
+
+	short txLeft = -1;
+	short txRight = -1;
+
+	if(fRelativeXLeft >= 0.0f && fRelativeXLeft < iWidth)
+		txLeft = (short)fRelativeXLeft / TILESIZE;
+
+	if(fRelativeXRight >= 0.0f && fRelativeXRight < iWidth)
+		txRight = (short)fRelativeXRight / TILESIZE;
+
+	short tyTop = -1;
+	short tyBottom = -1;
+
+	if(fRelativeYTop >= 0.0f && fRelativeYTop < iHeight)
+		tyTop = (short)fRelativeYTop / TILESIZE;
+
+	if(fRelativeYBottom >= 0.0f && fRelativeYBottom < iHeight)
+		tyBottom = (short)fRelativeYBottom / TILESIZE;
+
+	if(txLeft >= 0)
+	{
+		int t1 = tile_flag_nonsolid;
+		int t2 = tile_flag_nonsolid;
+
+		if(tyTop >= 0)
+			t1 = iTileType[txLeft][tyTop].iFlags;
+
+		if(tyBottom >= 0)
+			t2 = iTileType[txLeft][tyBottom].iFlags;
+
+		if(t1 & tile_flag_solid)
+			iCase |= 0x01;
+			
+		if(t2 & tile_flag_solid)
+			iCase |= 0x04;
+	}
+
+	if(txRight >= 0)
+	{
+		int t1 = tile_flag_nonsolid;
+		int t2 = tile_flag_nonsolid;
+
+		if(tyTop >= 0)
+			t1 = iTileType[txRight][tyTop].iFlags;
+
+		if(tyBottom >= 0)
+			t2 = iTileType[txRight][tyBottom].iFlags;
+
+		if(t1 & tile_flag_solid)
+			iCase |= 0x02;
+			
+		if(t2 & tile_flag_solid)
+			iCase |= 0x08;
+	}
+
+	//Then determine which way is the best way to move this object out of the solid areas
+	switch(iCase)
+	{
+		//Do nothing
+		//[ ][ ]
+		//[ ][ ]
+		case 0:
+			return false;
+			break;
+		
+		//[X][ ]
+		//[ ][ ]
+		case 1:
+		{
+			if(object->ix + (object->collisionWidth >> 1) > txLeft * TILESIZE + TILESIZE)
+			{
+				object->xf((float)(txLeft * TILESIZE + TILESIZE) + 0.2f + fx - iHalfWidth);
+				object->flipsidesifneeded();
+			}
+			else
+			{
+				object->yf((float)(tyTop * TILESIZE + TILESIZE) + 0.2f + fy - iHalfHeight);
+			}
+
+			break;
+		}
+
+		//[ ][X]
+		//[ ][ ]
+		case 2:
+		{
+			if(object->ix + (object->collisionWidth >> 1) < txRight * TILESIZE)
+			{
+				object->xf((float)(txRight * TILESIZE - object->collisionWidth) - 0.2f + fx - iHalfWidth);
+				object->flipsidesifneeded();
+			}
+			else
+			{
+				object->yf((float)(tyTop * TILESIZE + TILESIZE) + 0.2f + fy - iHalfHeight);
+			}
+
+			break;
+		}
+
+		//[X][X]
+		//[ ][ ]
+		case 3:
+		{
+			object->yf((float)(tyTop * TILESIZE + TILESIZE) + 0.2f + fy - iHalfHeight);
+			break;
+		}
+
+		//[ ][ ]
+		//[X][ ]
+		case 4:
+		{
+			if(object->ix + (object->collisionWidth >> 1) > txLeft * TILESIZE + TILESIZE)
+			{
+				object->xf((float)(txLeft * TILESIZE + TILESIZE) + 0.2f + fx - iHalfWidth);
+				object->flipsidesifneeded();
+			}
+			else
+			{
+				object->yf((float)(tyBottom * TILESIZE - object->collisionHeight) - 0.2f + fy - iHalfHeight);
+			}
+
+			break;
+		}
+
+		//[X][ ]
+		//[X][ ]
+		case 5:
+		{
+			object->xf((float)(txLeft * TILESIZE + TILESIZE) + 0.2f + fx - iHalfWidth);
+			object->flipsidesifneeded();
+			break;
+		}
+
+		//[ ][X]
+		//[X][ ]
+		case 6:
+		{
+			if(object->ix + (object->collisionWidth >> 1) > txLeft * TILESIZE + TILESIZE)
+			{
+				object->yf((float)(tyTop * TILESIZE + TILESIZE) + 0.2f + fy - iHalfHeight);
+				object->xf((float)(txLeft * TILESIZE + TILESIZE) + 0.2f + fx - iHalfWidth);
+				object->flipsidesifneeded();
+			}
+			else
+			{
+				object->yf((float)(tyBottom * TILESIZE - object->collisionHeight) - 0.2f + fy - iHalfHeight);
+				object->xf((float)(txRight * TILESIZE - object->collisionWidth) - 0.2f + fx - iHalfWidth);
+				object->flipsidesifneeded();
+			}
+
+			break;
+		}
+
+		//[X][X]
+		//[X][ ]
+		case 7:
+		{
+			object->yf((float)(tyTop * TILESIZE + TILESIZE) + 0.2f + fy - iHalfHeight);
+			object->xf((float)(txLeft * TILESIZE + TILESIZE) + 0.2f + fx - iHalfWidth);
+			object->flipsidesifneeded();
+			break;
+		}
+
+		//[ ][ ]
+		//[ ][X]
+		case 8:
+		{
+			if(object->ix + (object->collisionWidth >> 1) < txRight * TILESIZE)
+			{
+				object->xf((float)(txRight * TILESIZE - object->collisionWidth) - 0.2f + fx - iHalfWidth);
+				object->flipsidesifneeded();
+			}
+			else
+			{
+				object->yf((float)(tyBottom * TILESIZE - object->collisionHeight) - 0.2f + fy - iHalfHeight);
+			}
+
+			break;
+		}
+
+		//[X][ ]
+		//[ ][X]
+		case 9:
+		{
+			if(object->ix + (object->collisionWidth >> 1) > txLeft * TILESIZE + TILESIZE)
+			{
+				object->yf((float)(tyBottom * TILESIZE - object->collisionHeight) - 0.2f + fy - iHalfHeight);
+				object->xf((float)(txLeft * TILESIZE + TILESIZE) + 0.2f + fx - iHalfWidth);
+				object->flipsidesifneeded();
+			}
+			else
+			{
+				object->yf((float)(tyTop * TILESIZE + TILESIZE) + 0.2f + fy - iHalfHeight);
+				object->xf((float)(txRight * TILESIZE - object->collisionWidth) - 0.2f + fx - iHalfWidth);
+				object->flipsidesifneeded();
+			}
+
+			break;
+		}
+
+		//[ ][X]
+		//[ ][X]
+		case 10:
+		{
+			object->xf((float)(txRight * TILESIZE - object->collisionWidth) - 0.2f + fx - iHalfWidth);
+			object->flipsidesifneeded();
+			break;
+		}
+
+		//[X][X]
+		//[ ][X]
+		case 11:
+		{
+			object->yf((float)(tyTop * TILESIZE + TILESIZE) + 0.2f + fy - iHalfHeight);
+			object->xf((float)(txRight * TILESIZE - object->collisionWidth) - 0.2f + fx - iHalfWidth);
+			object->flipsidesifneeded();
+			break;
+		}
+
+		//[ ][ ]
+		//[X][X]
+		case 12:
+		{
+			object->yf((float)(tyBottom * TILESIZE - object->collisionHeight) - 0.2f + fy - iHalfHeight);
+			break;
+		}
+
+		//[X][ ]
+		//[X][X]
+		case 13:
+		{
+			object->yf((float)(tyBottom * TILESIZE - object->collisionHeight) - 0.2f + fy - iHalfHeight);
+			object->xf((float)(txLeft * TILESIZE + TILESIZE) + 0.2f + fx - iHalfWidth);
+			object->flipsidesifneeded();
+			break;
+		}
+
+		//[ ][X]
+		//[X][X]
+		case 14:
+		{
+			object->yf((float)(tyBottom * TILESIZE - object->collisionHeight) - 0.2f + fy - iHalfHeight);
+			object->xf((float)(txRight * TILESIZE - object->collisionWidth) - 0.2f + fx - iHalfWidth);
+			object->flipsidesifneeded();
+			break;
+		}
+
+		//If object is completely inside a block, default to moving it down
+		//[X][X]
+		//[X][X]
+		case 15:
+		{
+			object->yf((float)(tyBottom * TILESIZE + TILESIZE) + 0.2f + fy - iHalfHeight);
+			break;
+		}
+
+		default:
+			break;
+	}
+
+	return true;
+}
+
 //Reports back if we had to overlap the edges to make the collision
 short MovingPlatform::coldec_player(CPlayer * player)
 {
@@ -1165,12 +1453,12 @@ void MovingPlatform::collide(IO_MovingObject * object)
 	if(object->platform != this)
 	{
 		fRelativeY1 = object->fy - fOldY + iHalfHeight;
-		fRelativeY2 = object->fy + object->collisionHeight - fOldY + iHalfHeight;
+		fRelativeY2 = fRelativeY1 + object->collisionHeight;
 	}
 	else
 	{
 		fRelativeY1 = object->fy - fy + iHalfHeight;
-		fRelativeY2 = object->fy + object->collisionHeight - fy + iHalfHeight;
+		fRelativeY2 = fRelativeY1 + object->collisionHeight;
 	}
 	
 	if(fColVelX > 0.01f || object->iHorizontalPlatformCollision == 3)

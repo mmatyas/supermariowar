@@ -149,6 +149,8 @@ class MovingPlatform
 		short coldec_player(CPlayer * player);
 		short coldec_object(IO_MovingObject * object);
 
+		bool collision_detection_check_sides(IO_MovingObject * object);
+
 		TilesetTile ** iTileData;
 		MapTile ** iTileType;
 		short ix, iy;

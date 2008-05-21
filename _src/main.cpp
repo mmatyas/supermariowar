@@ -84,11 +84,11 @@ SHIP BETA
 [X] Also, running out the limit on the Tanooki powerup doesn't make the powerdown sound.
 [X] 1ups in KotH are too powerful -> halved score awarded
 
-[ ] CVS Add new 1.8 readme and docs images
-[ ] CVS Add new world music
-
 [ ] AI should stop collecting cards if their bank is full (unless maybe they see a better card)
-[ ] Carried objects can be dropped inside moving platforms solid tiles
+[ ] Carried objects can be dropped inside moving platforms solid tiles - kicked seems to work fine, but dropping just sticks the map object straight into the solid tile
+
+[ ] An idea for another tile type. Basically, instant-death, but not solid. So, touching it would kill you like lava, but fireballs, shells, etc. could pass through unharmed. The tile type image in the editor could be a purple version of the skull one. 
+[X] Need to play powerdown sound on frag/timed/classic when shield death is on
 
 Feature Requests
 
