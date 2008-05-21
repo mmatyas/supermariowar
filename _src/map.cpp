@@ -173,6 +173,10 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 	
 	ClearAnimatedTiles();
 
+	eyecandy[0] = 0;
+	eyecandy[1] = 0;
+	eyecandy[2] = 0;
+
 	FILE * mapfile;
 	short i, j, k;
 
@@ -247,10 +251,15 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 		}
 
 		short * translationid = new short[iMaxTilesetID + 1];
+		short * tilesetwidths = new short[iMaxTilesetID + 1];
+		short * tilesetheights = new short[iMaxTilesetID + 1];
 
 		for(short iTileset = 0; iTileset < iNumTilesets; iTileset++)
 		{
-			translationid[translation[iTileset].iID] = g_tilesetmanager.GetIndexFromName(translation[iTileset].szName);
+			short iID = translation[iTileset].iID;
+			translationid[iID] = g_tilesetmanager.GetIndexFromName(translation[iTileset].szName);
+			tilesetwidths[iID] = g_tilesetmanager.GetTileset(translationid[iID])->GetWidth();
+			tilesetheights[iID] = g_tilesetmanager.GetTileset(translationid[iID])->GetHeight();
 		}
 
 		delete [] translation;
@@ -262,17 +271,23 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 			{
 				for(k = 0; k < MAPLAYERS; k++)
 				{
-					//mapdata[i][j][k] = (short)ReadInt(mapfile);
-
 					TilesetTile * tile = &mapdata[i][j][k];
 					tile->iID = ReadByteAsShort(mapfile);
-
-					//Convert tileset ids into the current game's tileset's ids
-					if(tile->iID >= 0)
-						tile->iID = translationid[tile->iID];
-
 					tile->iCol = ReadByteAsShort(mapfile);
 					tile->iRow = ReadByteAsShort(mapfile);
+
+					if(tile->iID >= 0)
+					{
+						//Make sure the column and row we read in is within the bounds of the tileset
+						if(tile->iCol < 0 || tile->iCol >= tilesetwidths[tile->iID])
+							tile->iCol = 0;
+
+						if(tile->iRow < 0 || tile->iRow >= tilesetheights[tile->iID])
+							tile->iRow = 0;
+
+						//Convert tileset ids into the current game's tileset's ids
+						tile->iID = translationid[tile->iID];
+					}
 				}
 
 				objectdata[i][j].iType = ReadByteAsShort(mapfile);
@@ -289,10 +304,12 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 			iSwitches[iSwitch] = (short)ReadInt(mapfile);
 		}
 
-		loadPlatforms(mapfile, iReadType == read_type_preview, version, translationid);
+		loadPlatforms(mapfile, iReadType == read_type_preview, version, translationid, tilesetwidths, tilesetheights);
 
 		//All tiles have been loaded so the translation is no longer needed
 		delete [] translationid;
+		delete [] tilesetwidths;
+		delete [] tilesetheights;
 
 		//Load map items (like carryable spikes and springs)
 		iNumMapItems = ReadInt(mapfile);
@@ -637,8 +654,8 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 
 		if((version[2] == 0 && version[3] > 1) || version[2] >= 1)
 		{
-			short translationid[1] = {g_tilesetmanager.GetIndexFromName("Classic")};
-			loadPlatforms(mapfile, iReadType == read_type_preview, version, translationid);
+			//short translationid[1] = {g_tilesetmanager.GetIndexFromName("Classic")};
+			loadPlatforms(mapfile, iReadType == read_type_preview, version);
 		}
 
 		//Read in eyecandy to use
@@ -772,8 +789,8 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 
 		if(version[2] == 0 && version[3] < 2)
 		{
-			short translationid[1] = {g_tilesetmanager.GetIndexFromName("Classic")};
-			loadPlatforms(mapfile, iReadType == read_type_preview, version, translationid);
+			//short translationid[1] = {g_tilesetmanager.GetIndexFromName("Classic")};
+			loadPlatforms(mapfile, iReadType == read_type_preview, version);
 		}
 
 		if(version[2] == 0 && version[3] == 0)
@@ -1176,7 +1193,7 @@ void CMap::SetTileGap(short i, short j)
 	}
 }
 
-void CMap::loadPlatforms(FILE * mapfile, bool fPreview, int version[4], short * translationid)
+void CMap::loadPlatforms(FILE * mapfile, bool fPreview, int version[4], short * translationid, short * tilesetwidths, short * tilesetheights)
 {
 	clearPlatforms();
 
@@ -1204,13 +1221,22 @@ void CMap::loadPlatforms(FILE * mapfile, bool fPreview, int version[4], short * 
 				if(version[0] > 1 || (version[0] == 1 && version[1] >= 8))
 				{
 					tile->iID = ReadByteAsShort(mapfile);
-
-					//Convert tileset ids into the current game's tileset's ids
-					if(tile->iID >= 0)
-						tile->iID = translationid[tile->iID];
-
 					tile->iCol = ReadByteAsShort(mapfile);
 					tile->iRow = ReadByteAsShort(mapfile);
+
+					if(tile->iID >= 0)
+					{
+						//Make sure the column and row we read in is within the bounds of the tileset
+						if(tile->iCol < 0 || (tilesetwidths && tile->iCol >= tilesetwidths[tile->iID]))
+							tile->iCol = 0;
+
+						if(tile->iRow < 0 || (tilesetheights && tile->iRow >= tilesetheights[tile->iID]))
+							tile->iRow = 0;
+
+						//Convert tileset ids into the current game's tileset's ids
+						if(translationid)
+							tile->iID = translationid[tile->iID];
+					}
 
 					TileType iType = (TileType)ReadInt(mapfile);
 

@@ -5930,7 +5930,8 @@ void MI_World::Update()
 
 void MI_World::UpdateMapSurface(short iCycleIndex)
 {
-	g_worldmap.DrawMapToSurface(iCycleIndex, iDrawFullRefresh > 0, sMapSurface[1 - iCurrentSurfaceIndex], iNextMapDrawOffsetCol, iNextMapDrawOffsetRow, iAnimationFrame);
+	if(iCycleIndex >= 0 && iCycleIndex <= 15)
+		g_worldmap.DrawMapToSurface(iCycleIndex, iDrawFullRefresh > 0, sMapSurface[1 - iCurrentSurfaceIndex], iNextMapDrawOffsetCol, iNextMapDrawOffsetRow, iAnimationFrame);
 }
 
 void MI_World::SetMapOffset()

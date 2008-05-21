@@ -84,11 +84,19 @@ SHIP BETA
 [X] Also, running out the limit on the Tanooki powerup doesn't make the powerdown sound.
 [X] 1ups in KotH are too powerful -> halved score awarded
 
+[X] Carried objects can be dropped inside moving platforms solid tiles - kicked seems to work fine, but dropping just sticks the map object straight into the solid tile
+[X] Need to play powerdown sound on frag/timed/classic when shield death is on
+
+[X] When a shell kills a player frozen from the wand(Or a block, cape spin, and maybe a lot of other things.), the break sound doesn't play.
+[X] Top two rows of screensized worlds not animating
+[X] Missing blocks bug back - updated checks in the map loader to make sure tile row/cols are inside the tileset sizes
+
+
 [ ] AI should stop collecting cards if their bank is full (unless maybe they see a better card)
-[ ] Carried objects can be dropped inside moving platforms solid tiles - kicked seems to work fine, but dropping just sticks the map object straight into the solid tile
 
 [ ] An idea for another tile type. Basically, instant-death, but not solid. So, touching it would kill you like lava, but fireballs, shells, etc. could pass through unharmed. The tile type image in the editor could be a purple version of the skull one. 
-[X] Need to play powerdown sound on frag/timed/classic when shield death is on
+
+[ ] When you made items play the bump sound, you forgot to change the flags in capture the flag mode.
 
 Feature Requests
 
@@ -1048,6 +1056,7 @@ int main(int argc, char *argv[])
 	game_values.keeppowerup			= false;
 	game_values.showwinningcrown	= false;
 	game_values.startgamecountdown	= true;
+	game_values.startmodedisplay	= true;
 	game_values.deadteamnotice		= true;
 	game_values.playnextmusic		= false;
 	game_values.pointspeed			= 20;
@@ -1314,8 +1323,8 @@ int main(int argc, char *argv[])
 				SDL_XBOX_SetScreenStretch(game_values.screenResizeW, game_values.screenResizeH);
 			#endif
 
-			unsigned char abyte[34];
-			fread(abyte, sizeof(unsigned char), 34, fp);
+			unsigned char abyte[35];
+			fread(abyte, sizeof(unsigned char), 35, fp);
 			game_values.spawnstyle = (short) abyte[0];
 			game_values.awardstyle = (short) abyte[1];
 			game_values.teamcollision = (short)abyte[3];
@@ -1342,6 +1351,7 @@ int main(int argc, char *argv[])
 			game_values.startgamecountdown = ((short)abyte[30] > 0 ? true : false);
 			game_values.deadteamnotice = ((short)abyte[31] > 0 ? true : false);
 			game_values.tournamentcontrolstyle = (short)abyte[33];
+			game_values.startmodedisplay = ((short)abyte[34] > 0 ? true : false);
 
 			fread(&game_values.shieldtime, sizeof(short), 1, fp);
 			fread(&game_values.shieldstyle, sizeof(short), 1, fp);
@@ -3101,11 +3111,16 @@ void RunGame()
 					game_values.screenfadespeed = 0;
 					game_values.screenfade = 0;
 
-					//If this is a quick game, display the mode and goal
-					if(game_values.matchtype == MATCH_TYPE_QUICK_GAME)
+					//display the mode and goal at the start of the game
+					//if(game_values.matchtype == MATCH_TYPE_QUICK_GAME)
+					if(game_values.startmodedisplay)
 					{
 						char szMode[128];
-						sprintf(szMode, "%s  %s: %d", game_values.gamemode->GetModeName(), game_values.gamemode->GetGoalName(), game_values.gamemode->goal);
+						if(game_values.gamemode->goal < 0)
+							sprintf(szMode, "%s  %s: X", game_values.gamemode->GetModeName(), game_values.gamemode->GetGoalName(), game_values.gamemode->goal);
+						else
+							sprintf(szMode, "%s  %s: %d", game_values.gamemode->GetModeName(), game_values.gamemode->GetGoalName(), game_values.gamemode->goal);
+
 						eyecandy[2].add(new EC_Announcement(&game_font_large, &menu_mode_large, szMode, game_values.gamemode->gamemode, 130, 90));
 					}
 				}

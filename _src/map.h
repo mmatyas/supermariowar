@@ -143,7 +143,7 @@ class CMap
 		void UpdateAllTileGaps();
 		void UpdateTileGap(short i, short j);
 
-		void loadPlatforms(FILE * mapfile, bool fPreview, int version[4], short * translationid);
+		void loadPlatforms(FILE * mapfile, bool fPreview, int version[4], short * translationid = NULL, short * tilesetwidths = NULL, short * tilesetheights = NULL);
 
 		//void convertMap();
 

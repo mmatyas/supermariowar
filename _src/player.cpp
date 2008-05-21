@@ -2360,6 +2360,9 @@ short PlayerKilledPlayer(CPlayer * killer, CPlayer * killed, short deathstyle, k
 		fSoundPlayed = true;
 	}
 
+	if(killed->frozen)
+		deathstyle = death_style_shatter;
+
 	if(killer->teamID != killed->teamID)
 		AddAwardKill(killer, killed, style);
 

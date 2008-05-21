@@ -265,6 +265,7 @@ class Menu
 		MI_SelectField * miCrunchField;
 		MI_SelectField * miWinningCrownField;
 		MI_SelectField * miStartCountDownField;
+		MI_SelectField * miStartModeDisplayField;
 		MI_SelectField * miDeadTeamNoticeField;
 
 		MI_Button * miEyeCandyOptionsMenuBackButton;

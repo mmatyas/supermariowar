@@ -1026,6 +1026,7 @@ struct gv
 	bool		minigameunlocked;
 
 	bool		startgamecountdown;
+	bool		startmodedisplay;
 	bool		deadteamnotice;
 };
 
