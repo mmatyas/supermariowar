@@ -62,7 +62,6 @@ SHIP BETA
 
 
 [ ] Treasure chests from winning a stage that rewards an item in world mode can be spawned in areas where they fall forever, and can never be opened. (Though this is aesthetic)
-
 [ ] Flame hazards in maps that crossed over from the pre-beta to beta are reversed and move over a few tiles.
 [ ] Weird sound problems with the world music.
 
@@ -90,7 +89,8 @@ SHIP BETA
 [X] When a shell kills a player frozen from the wand(Or a block, cape spin, and maybe a lot of other things.), the break sound doesn't play.
 [X] Top two rows of screensized worlds not animating
 [X] Missing blocks bug back - updated checks in the map loader to make sure tile row/cols are inside the tileset sizes
-
+[X] Added mode announcement option to all match types (nice to remind all players what mode was chosen)
+[X] Added mode gfx for pipe minigame
 
 [ ] AI should stop collecting cards if their bank is full (unless maybe they see a better card)
 
@@ -1786,7 +1786,7 @@ void RunGame()
 		//Ghosts
 		if(g_map.eyecandy[iEyeCandyLayer] & 2)
 		{
-			for(i = 0; i < 12; i++)
+			for(i = 0; i < 8; i++)
 			{
 				short iGhostSrcY = (short)(rand() % 3) << 5;	//ghost type
 				float velx = (short)(rand() % 51 - 25) / 10.0f;	//big clouds: -3 - +3 pixel/frame
@@ -1801,14 +1801,14 @@ void RunGame()
 		//Leaves
 		if(g_map.eyecandy[iEyeCandyLayer] & 4)
 		{
-			for(i = 0; i < 20; i++)
+			for(i = 0; i < 15; i++)
 				eyecandy[iEyeCandyLayer].add(new EC_Leaf(&spr_leaves, (float)(rand() % 640), (float)(rand() % 480)));
 		}
 
 		//Snow
 		if(g_map.eyecandy[iEyeCandyLayer] & 8)
 		{
-			for(i = 0; i < 20; i++)
+			for(i = 0; i < 15; i++)
 				eyecandy[iEyeCandyLayer].add(new EC_Snow(&spr_snow, (float)(rand() % 640), (float)(rand() % 480)));
 		}
 
@@ -1817,7 +1817,7 @@ void RunGame()
 		short iFishSettings[][4] = { {0, 0, 64, 44}, {0, 44, 64, 44}, {0, 44, 48, 44}, {32, 32, 16, 12}, {32, 44, 16, 12}, {32, 16, 16, 28}, {32, 0, 32, 28}, {32, 44, 32, 28}}; 
 		if(g_map.eyecandy[iEyeCandyLayer] & 16)
 		{
-			for(i = 0; i < 10; i++)
+			for(i = 0; i < 8; i++)
 			{
 				float velx = (short)(rand() % 41 - 20) / 10.0f;
 				velx = velx < 0.5f && velx > -0.5f ? 1.0f : velx; //Keep fish from moving too slowly
@@ -1851,14 +1851,14 @@ void RunGame()
 		//Rain
 		if(g_map.eyecandy[iEyeCandyLayer] & 32)
 		{
-			for(i = 0; i < 30; i++)
+			for(i = 0; i < 20; i++)
 				eyecandy[iEyeCandyLayer].add(new EC_Rain(&spr_rain, (float)(rand() % 640), (float)(rand() % 480)));
 		}
 
 		//Bubbles
 		if(g_map.eyecandy[iEyeCandyLayer] & 64)
 		{
-			for(i = 0; i < 15; i++)
+			for(i = 0; i < 10; i++)
 				eyecandy[iEyeCandyLayer].add(new EC_Bubble(&spr_rain, (float)(rand() % 640), (float)(rand() % 480)));
 		}
 	}
@@ -3113,7 +3113,7 @@ void RunGame()
 
 					//display the mode and goal at the start of the game
 					//if(game_values.matchtype == MATCH_TYPE_QUICK_GAME)
-					if(game_values.startmodedisplay)
+					if(game_values.startmodedisplay && game_values.singleplayermode == -1)
 					{
 						char szMode[128];
 						if(game_values.gamemode->goal < 0)

@@ -745,7 +745,7 @@ bool B_PowerupBlock::hitright(IO_MovingObject * object)
 		object->velx = -object->velx;
 
 	MovingObjectType type = object->getMovingObjectType();
-	if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_egg || type == movingobject_attackzone /*|| type == movingobject_star*/)
+	if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone)
 	{
 		if(type == movingobject_shell)
 		{
@@ -779,7 +779,7 @@ bool B_PowerupBlock::hitleft(IO_MovingObject * object)
 		object->velx = -object->velx;
 
 	MovingObjectType type = object->getMovingObjectType();
-	if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_egg || type == movingobject_attackzone /*|| type == movingobject_star*/)
+	if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone)
 	{
 		if(type == movingobject_shell)
 		{
@@ -1027,7 +1027,7 @@ bool B_BreakableBlock::hitright(IO_MovingObject * object)
 			object->velx = -object->velx;
 
 		MovingObjectType type = object->getMovingObjectType();
-		if((type == movingobject_shell && object->state == 1) || type == movingobject_throwblock || type == movingobject_attackzone /*|| type == movingobject_egg || type == movingobject_star*/)
+		if((type == movingobject_shell && object->state == 1) || type == movingobject_throwblock || type == movingobject_attackzone)
 		{
 			triggerBehavior();
 			return true;
@@ -1048,7 +1048,7 @@ bool B_BreakableBlock::hitleft(IO_MovingObject * object)
 			object->velx = -object->velx;
 
 		MovingObjectType type = object->getMovingObjectType();
-		if((type == movingobject_shell && object->state == 1) || type == movingobject_throwblock || type == movingobject_attackzone /*|| type == movingobject_egg || type == movingobject_star*/)
+		if((type == movingobject_shell && object->state == 1) || type == movingobject_throwblock || type == movingobject_attackzone)
 		{
 			triggerBehavior();	
 			return true;
@@ -1808,7 +1808,7 @@ bool B_OnOffSwitchBlock::hitright(IO_MovingObject * object)
 		object->velx = -object->velx;
 
 	MovingObjectType type = object->getMovingObjectType();
-	if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_egg  || type == movingobject_attackzone/*|| type == movingobject_star*/)
+	if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone)
 	{
 		if(type == movingobject_shell)
 		{
@@ -1842,7 +1842,7 @@ bool B_OnOffSwitchBlock::hitleft(IO_MovingObject * object)
 		object->velx = -object->velx;
 
 	MovingObjectType type = object->getMovingObjectType();
-	if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_egg  || type == movingobject_attackzone/*|| type == movingobject_star*/)
+	if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone)
 	{
 		if(type == movingobject_shell)
 		{
@@ -5873,7 +5873,7 @@ bool CO_Star::collide(CPlayer * player)
 		}
 	}
 
-	if(player->shield > 0 || player->invincible || starmode->isplayerstar(player) || game_values.gamemode->gameover)
+	if((iType == 0 && player->invincible) || player->shield > 0 || starmode->isplayerstar(player) || game_values.gamemode->gameover)
 		return false;
 
 	CPlayer * oldstar = starmode->swapplayer(iID, player);

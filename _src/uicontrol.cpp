@@ -5755,7 +5755,9 @@ void MI_World::SetCurrentStageToCompleted(short iWinningTeam)
 		game_values.tournament_scores[iWinningTeam].total += game_values.tourstops[tile->iType - 6]->iPoints * iBonusMult + iBonusAdd;
 	}
 
-	AdvanceTurn();
+	//Only advance the turn if the players played a real game, no bonus houses
+	if(game_values.singleplayermode == -1)
+		AdvanceTurn();
 }
 
 void MI_World::AdvanceTurn()

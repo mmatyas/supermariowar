@@ -587,24 +587,30 @@ void CPlayer::move()
 	}
 
 	iSrcOffsetX = 0;
-		
+	
 	bool fColorChosen = false;
-	if(game_values.gamemode->gamemode == game_mode_star)
+	if(invincible)
 	{
-		CGM_Star * starmode = (CGM_Star*) game_values.gamemode;
-		short starmodetype = starmode->getcurrentmodetype();
-		if(starmodetype != 2 && starmode->isplayerstar(this))
+		iSrcOffsetX = animationstate;
+		fColorChosen = true;
+	}
+	else
+	{
+		if(game_values.gamemode->gamemode == game_mode_star)
 		{
-			iSrcOffsetX = starmodetype ? 224 : 192;
-			fColorChosen = true;
+			CGM_Star * starmode = (CGM_Star*) game_values.gamemode;
+			short starmodetype = starmode->getcurrentmodetype();
+			if(starmodetype != 2 && starmode->isplayerstar(this))
+			{
+				iSrcOffsetX = starmodetype ? 224 : 192;
+				fColorChosen = true;
+			}
 		}
 	}
 	
 	if(!fColorChosen)
 	{
-		if(invincible)
-			iSrcOffsetX = animationstate;
-		else if(game_values.gamemode->tagged == this)
+		if(game_values.gamemode->tagged == this)
 			iSrcOffsetX = 160;
 		else if(frozen)
 			iSrcOffsetX = 256;

@@ -2589,6 +2589,7 @@ short CGM_CaptureTheFlag::playerkilledself(CPlayer &player, killstyle style)
 	if(player.carriedItem && player.carriedItem->getMovingObjectType() == movingobject_flag)
 	{
 		((CO_Flag*)player.carriedItem)->placeFlag();
+		ifsoundonplay(sfx_transform);
 	}
 
 	return player_kill_normal;

@@ -1949,6 +1949,7 @@ int editor_warp()
 
 #define NUM_EYECANDY 7
 char * szEyecandyNames[NUM_EYECANDY] = {"Clouds", "Ghosts", "Leaves", "Snow", "Fish", "Rain", "Bubbles"};
+char * szLayerNames[3] = {"Back Layer", "Mid Layer", "Top Layer"};
 int editor_eyecandy()
 {
 	bool done = false;
@@ -2033,14 +2034,21 @@ int editor_eyecandy()
 				if(g_map.eyecandy[iLayer] & mask)
 					spr_hidden_marker.draw(ix + 57, iy + 16);
 
-				menu_font_small.drawCentered(320, iy - menu_font_small.getHeight() + 7, szEyecandyNames[k]);
+				//menu_font_small.drawCentered(320, iy - menu_font_small.getHeight() + 7, szEyecandyNames[k]);
 			}
 
+			menu_font_small.drawCentered(ix + 45, 10, szLayerNames[iLayer]);
 			ix += 110;
 		}
 
-		menu_font_small.draw(0,480-menu_font_small.getHeight(), "eyecandy mode: [e] edit mode, [LMB] choose eyecandy");
-		menu_font_small.drawRightJustified(640, 0, maplist.currentFilename());
+		for(short k = 0; k < NUM_EYECANDY; k++)
+		{
+			//menu_font_small.drawRightJustified(160, k * 65 + 40, szEyecandyNames[k]);
+			menu_font_small.drawCentered(320, k * 65 + 62, szEyecandyNames[k]);
+		}
+
+		menu_font_small.draw(0,480-menu_font_small.getHeight(), "Eyecandy: [e] Exit, [LMB] Choose Eyecandy");
+		//menu_font_small.drawRightJustified(640, 0, maplist.currentFilename());
 
 		SDL_Flip(screen);
 
