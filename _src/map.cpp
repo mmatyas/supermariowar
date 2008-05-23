@@ -1,3 +1,7 @@
+#if defined(__MACOSX__)
+#include <sys/stat.h>
+#endif
+
 #include "global.h"
 #include <iostream>
 using std::cout;
@@ -2013,6 +2017,10 @@ void CMap::saveMap(const std::string& file)
 
 	fclose(mapfile);
 
+#if defined(__MACOSX__)
+	chmod(file.c_str(), S_IRWXU | S_IRWXG | S_IROTH);
+#endif
+	
     cout << "done" << endl;
 
 /*

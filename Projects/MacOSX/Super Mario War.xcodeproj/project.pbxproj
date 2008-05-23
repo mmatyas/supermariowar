@@ -110,7 +110,7 @@
 		305281D30CFBBFA0004DFFAA /* FileIO.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FileIO.h; path = ../../_src/FileIO.h; sourceTree = SOURCE_ROOT; };
 		305281D60CFBC039004DFFAA /* TilesetManager.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = TilesetManager.cpp; path = ../../_src/TilesetManager.cpp; sourceTree = SOURCE_ROOT; };
 		305281D70CFBC039004DFFAA /* TilesetManager.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = TilesetManager.h; path = ../../_src/TilesetManager.h; sourceTree = SOURCE_ROOT; };
-		30DDC6D60D061EDF00F363D5 /* SMW World Editor.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = "SMW World Editor.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		30DDC6D60D061EDF00F363D5 /* SMW World Editor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SMW World Editor.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		30DDC6D80D061EDF00F363D5 /* SMW World Editor-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "SMW World Editor-Info.plist"; sourceTree = "<group>"; };
 		30DDC6EA0D061FF200F363D5 /* worldedit.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = worldedit.icns; path = ../../macosx/worldedit.icns; sourceTree = SOURCE_ROOT; };
 		30F8EA1E0B2EA473001B86D3 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
@@ -166,12 +166,12 @@
 		30F8EA7A0B2EA62E001B86D3 /* SDLMain.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = SDLMain.h; path = ../../macosx/SDLMain.h; sourceTree = SOURCE_ROOT; };
 		30F8EA7B0B2EA62E001B86D3 /* SDLMain.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = SDLMain.m; path = ../../macosx/SDLMain.m; sourceTree = SOURCE_ROOT; };
 		30F8EA7D0B2EA640001B86D3 /* smw.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = smw.icns; path = ../../macosx/smw.icns; sourceTree = SOURCE_ROOT; };
-		30F8EAEB0B2EADF8001B86D3 /* SMW Level Editor.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = "SMW Level Editor.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		30F8EAEB0B2EADF8001B86D3 /* SMW Level Editor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SMW Level Editor.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		30F8EAED0B2EADF8001B86D3 /* SMW Level Editor-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "SMW Level Editor-Info.plist"; sourceTree = "<group>"; };
 		30F8EAFB0B2EAF0E001B86D3 /* leveledit.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = leveledit.icns; path = ../../macosx/leveledit.icns; sourceTree = SOURCE_ROOT; };
 		32CA4F630368D1EE00C91783 /* Super Mario War_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Super Mario War_Prefix.pch"; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		8D1107320486CEB800E47090 /* Super Mario War.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = "Super Mario War.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D1107320486CEB800E47090 /* Super Mario War.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Super Mario War.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */

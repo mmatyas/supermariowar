@@ -5124,6 +5124,10 @@ void Menu::SaveScript(char * szScriptFile)
 		}
 
 		fclose(fp);
+		
+#if defined(__MACOSX__)
+		chmod(file.c_str(), S_IRWXU | S_IRWXG | S_IROTH);
+#endif
 	}
 }
 

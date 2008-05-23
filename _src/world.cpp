@@ -2,6 +2,10 @@
 
 #include "savepng.h"
 
+#if defined(__MACOSX__)
+#include <sys/stat.h>
+#endif
+
 extern void ResetTourStops();
 extern TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld);
 extern void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld);
@@ -1084,6 +1088,10 @@ bool WorldMap::Save(const char * szPath)
 	fprintf(file, "\n");
 
 	fclose(file);
+	
+#if defined(__MACOSX__)
+	chmod(szPath, S_IRWXU | S_IRWXG | S_IROTH);
+#endif
 
 	return true;
 }

@@ -1,3 +1,7 @@
+#if defined(__MACOSX__)
+#include <sys/stat.h>
+#endif
+
 #include "global.h"
 
 /*********************************
@@ -132,6 +136,10 @@ void CTileset::SaveTileset()
 	}
 
 	fclose(tsf);
+	
+#if defined(__MACOSX__)
+	chmod(szTilesetPath, S_IRWXU | S_IRWXG | S_IROTH);
+#endif
 }
 
 /*********************************

@@ -12,6 +12,10 @@
     #include <dirent.h>
 #endif
 
+#if defined(__MACOSX__)
+#include <sys/stat.h>
+#endif
+
 #include "global.h"
 #include "dirlist.h"
 #include <ctype.h>
@@ -452,6 +456,10 @@ void MapList::WriteFilters()
 			}
 
 			fclose(fp);
+			
+#if defined(__MACOSX__)
+			chmod(filterslist.GetIndex(iFilter), S_IRWXU | S_IRWXG | S_IROTH);
+#endif
 		}
 	}
 }
@@ -607,6 +615,10 @@ void MapList::WriteMapSummaryCache()
 	}
 
 	fclose(fp);
+	
+#if defined(__MACOSX__)
+	chmod(convertPath("maps/cache/mapsummary.txt").c_str(), S_IRWXU | S_IRWXG | S_IROTH);
+#endif
 }
 
 //Applies the currently selected filters to the entire map set
