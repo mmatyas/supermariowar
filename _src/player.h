@@ -116,7 +116,7 @@ class CPlayer
 
 		void die(short deathStyle, bool fTeamRemoved);
 
-		void spawnText(char * szText);
+		void spawnText(const char * szText);
 		void DeathAwards();
 		void AddKillsInRowInAirAward();
 		void SetupNewPlayer();

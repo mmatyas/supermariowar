@@ -238,7 +238,7 @@ SDL_Surface * s_maphazardbuttons;
 int save_as();
 int find();
 int clearMap();
-bool dialog(char * title, char * instructions, char * input, int inputsize);
+bool dialog(const char * title, const char * instructions, char * input, int inputsize);
 int display_help();
 
 #ifdef _DEBUG
@@ -1948,8 +1948,8 @@ int editor_warp()
 }
 
 #define NUM_EYECANDY 7
-char * szEyecandyNames[NUM_EYECANDY] = {"Clouds", "Ghosts", "Leaves", "Snow", "Fish", "Rain", "Bubbles"};
-char * szLayerNames[3] = {"Back Layer", "Mid Layer", "Top Layer"};
+const char * szEyecandyNames[NUM_EYECANDY] = {"Clouds", "Ghosts", "Leaves", "Snow", "Fish", "Rain", "Bubbles"};
+const char * szLayerNames[3] = {"Back Layer", "Mid Layer", "Top Layer"};
 int editor_eyecandy()
 {
 	bool done = false;
@@ -2345,7 +2345,7 @@ int editor_platforms()
 		rTypeButton[iType][3].h = 24;
 	}
 
-	char * szPathNames[3] = {"Line Segment", "Continuous", "Ellipse"};
+	const char * szPathNames[3] = {"Line Segment", "Continuous", "Ellipse"};
 
 	enum {PLATFORM_EDIT_STATE_SELECT, PLATFORM_EDIT_STATE_PATH_TYPE, PLATFORM_EDIT_STATE_CHANGE_PATH_TYPE, PLATFORM_EDIT_STATE_EDIT, PLATFORM_EDIT_STATE_PATH, PLATFORM_EDIT_STATE_TEST, PLATFORM_EDIT_STATE_TILETYPE};
 
@@ -3082,7 +3082,7 @@ int editor_maphazards()
 		rIconRects[iMapHazard][1].h = 32;
 	}
 
-	char * szHazardNames[8] = {"Fireballs", "Rotodisc", "Bullet Bill", "Flame Thrower", "Green Pirhana", "Red Pirhana", "Tall Pirhana", "Short Pirhana"};
+	const char * szHazardNames[8] = {"Fireballs", "Rotodisc", "Bullet Bill", "Flame Thrower", "Green Pirhana", "Red Pirhana", "Tall Pirhana", "Short Pirhana"};
 
 	while (!done)
 	{
@@ -3368,9 +3368,6 @@ int editor_maphazards()
 					}
 					else if(event.button.button == SDL_BUTTON_RIGHT)
 					{
-						short iClickX = event.button.x;
-						short iClickY = event.button.y;
-
 						if(MAPHAZARD_EDIT_STATE_PROPERTIES == iEditState)
 						{
 							short iType = g_map.maphazards[iEditMapHazard].itype;
@@ -4980,7 +4977,7 @@ int save_as()
 	return 0;
 }
 
-bool dialog(char * title, char * instructions, char * input, int inputsize)
+bool dialog(const char * title, const char * instructions, char * input, int inputsize)
 {	
 	unsigned int currentChar = 0;
 

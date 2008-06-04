@@ -1199,7 +1199,7 @@ void gfxFont::drawRightJustified(int x, int y, const char *s, ...)
 };
 
 
-void gfxFont::drawf(int x, int y, char *s, ...)
+void gfxFont::drawf(int x, int y, const char *s, ...)
 {
 	char buffer[256];
 

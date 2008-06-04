@@ -448,7 +448,7 @@ bool LoadAndSplashScreen()
 	int state = 0;
 	int timer = 120;
 
-	char * contributors[] = {
+	const char * contributors[] = {
 	"no_shorty", "redfalcon", "no_human", "dschingis", "funvill",
 	"matsche", "aeroflare", "Tymoe", "David Olofson", "scoti",
 	"affeOHNEwaffe", "mademan", "mario piuk", "yvoo", "DNightmare", 

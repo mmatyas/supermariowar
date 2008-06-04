@@ -98,7 +98,7 @@ class gfxFont
 
 		bool init(const std::string& filename);
 		void draw(int x, int y, const std::string& s);
-		void drawf(int x, int y, char *s, ...);
+		void drawf(int x, int y, const char *s, ...);
 
 		void drawCentered(int x, int y, const char *text);
 		void drawChopCentered(int x, int y, int width, const char *text);

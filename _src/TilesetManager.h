@@ -47,7 +47,7 @@ class CTilesetManager : public SimpleDirectoryList
         virtual ~CTilesetManager();
 		void Init(const char * szGfxPack);
 
-		short GetIndexFromName(char * szName);
+		short GetIndexFromName(const char * szName);
 
 		void Draw(SDL_Surface * dstSurface, short iTilesetID, short iTileSize, short iSrcTileCol, short iSrcTileRow, short iDstTileCol, short iDstTileRow);
 

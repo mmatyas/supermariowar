@@ -214,7 +214,7 @@ void CGameMode::playwarningsound()
 	ifsoundonplay(sfx_timewarning);
 }
 
-void CGameMode::SetupModeStrings(char * szMode, char * szGoal, short iGoalSpacing)
+void CGameMode::SetupModeStrings(const char * szMode, const char * szGoal, short iGoalSpacing)
 {
 	strcpy(szModeName, szMode);
 	strcpy(szGoalName, szGoal);

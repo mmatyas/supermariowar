@@ -244,7 +244,7 @@ void CTilesetManager::Init(const char * szGfxPack)
 	}
 }
 
-short CTilesetManager::GetIndexFromName(char * szName)
+short CTilesetManager::GetIndexFromName(const char * szName)
 {
 	short iLength = tilesetlist.size();
 

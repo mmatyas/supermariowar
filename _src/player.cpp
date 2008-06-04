@@ -962,7 +962,6 @@ void CPlayer::move()
 
 	if(frozen)
 	{
-		bool facingRight = IsPlayerFacingRight();
 		if((~(spr & 0x1) && (keymask & 4)) || ((spr & 0x1) && (keymask & 8)))
 			frozentimer -= 5;
 
@@ -2150,7 +2149,7 @@ bool CPlayer::FindSpawnPoint()
 }
 
 
-void CPlayer::spawnText(char * szText)
+void CPlayer::spawnText(const char * szText)
 {
 	if(++spawntext >= 20)
 	{

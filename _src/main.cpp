@@ -1528,6 +1528,8 @@ int main(int argc, char *argv[])
 				g_Menu.RunMenu();
 			break;
 
+            case GS_START_WORLD:
+            case GS_END_GAME:
             case GS_QUIT: // added because of warning on not handling all of enum
             break;
 		}
@@ -3117,7 +3119,7 @@ void RunGame()
 					{
 						char szMode[128];
 						if(game_values.gamemode->goal < 0)
-							sprintf(szMode, "%s  %s: X", game_values.gamemode->GetModeName(), game_values.gamemode->GetGoalName(), game_values.gamemode->goal);
+							sprintf(szMode, "%s  %s: X", game_values.gamemode->GetModeName(), game_values.gamemode->GetGoalName());
 						else
 							sprintf(szMode, "%s  %s: %d", game_values.gamemode->GetModeName(), game_values.gamemode->GetGoalName(), game_values.gamemode->goal);
 

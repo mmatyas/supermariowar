@@ -192,7 +192,7 @@ void MI_IPField::Draw()
  * MI_SelectField Class
  **************************************/
 
-MI_SelectField::MI_SelectField(gfxSprite * nspr, short x, short y, char * name, short width, short indent) :
+MI_SelectField::MI_SelectField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent) :
 	UI_Control(x, y)
 {
 	spr = nspr;
@@ -609,7 +609,7 @@ bool MI_SelectField::MoveRandom()
  * MI_ImageSelectField Class
  **************************************/
 
-MI_ImageSelectField::MI_ImageSelectField(gfxSprite * nspr, gfxSprite * nspr_image, short x, short y, char * name, short width, short indent, short imageHeight, short imageWidth) :
+MI_ImageSelectField::MI_ImageSelectField(gfxSprite * nspr, gfxSprite * nspr_image, short x, short y, const char * name, short width, short indent, short imageHeight, short imageWidth) :
 	MI_SelectField(nspr, x, y, name, width, indent)
 {
 	spr_image = nspr_image;
@@ -647,11 +647,11 @@ void MI_ImageSelectField::Draw()
  * MI_InputControlField Class
  **************************************/
 
-MI_InputControlField::MI_InputControlField(gfxSprite * nspr, short x, short y, char * name, short width, short indent) :
+MI_InputControlField::MI_InputControlField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent) :
 	UI_Control(x, y)
 {
 	spr = nspr;
-	szName = name;
+	strcpy(szName,  name);
 	iWidth = width;
 	iIndent = indent;
 	fSelected = false;
@@ -1658,13 +1658,13 @@ short MI_TeamSelect::GetTeam(short iPlayerID)
 /**************************************
  * MI_PlayerSelect Class
  **************************************/
-MI_PlayerSelect::MI_PlayerSelect(gfxSprite * nspr, short x, short y, char * name, short width, short indent) :
+MI_PlayerSelect::MI_PlayerSelect(gfxSprite * nspr, short x, short y, const char * name, short width, short indent) :
 	UI_Control(x, y)
 {
 	spr = nspr;
 	iSelectedPlayer = 0;
 
-	szName = name;
+	strcpy(szName, name);
 	iWidth = width;
 	iIndent = indent;
 
@@ -1795,7 +1795,7 @@ void MI_PlayerSelect::Draw()
  * MI_SliderField Class
  **************************************/
 
-MI_SliderField::MI_SliderField(gfxSprite * nspr, gfxSprite * nsprSlider, short x, short y, char * name, short width, short indent1, short indent2) :
+MI_SliderField::MI_SliderField(gfxSprite * nspr, gfxSprite * nsprSlider, short x, short y, const char * name, short width, short indent1, short indent2) :
 	MI_SelectField(nspr, x, y, name, width, indent1)
 {
 	iIndent2 = indent2;
@@ -2578,13 +2578,13 @@ void MI_FrenzyModeOptions::AdjustDisplayArrows()
  * MI_MapField Class
  **************************************/
 
-MI_MapField::MI_MapField(gfxSprite * nspr, short x, short y, char * name, short width, short indent, bool showtags) :
+MI_MapField::MI_MapField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent, bool showtags) :
 	UI_Control(x, y)
 {
 	fDisable = false;
 
 	spr = nspr;
-	szName = name;
+	strcpy(szName, name);
 	iWidth = width;
 	iIndent = indent;
 
@@ -3212,11 +3212,11 @@ void MI_WorldPreviewDisplay::UpdateMapSurface(bool fFullRefresh)
  * MI_AnnouncerField Class
  **************************************/
 
-MI_AnnouncerField::MI_AnnouncerField(gfxSprite * nspr, short x, short y, char * name, short width, short indent, SimpleFileList * pList) :
+MI_AnnouncerField::MI_AnnouncerField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent, SimpleFileList * pList) :
 	UI_Control(x, y)
 {
 	spr = nspr;
-	szName = name;
+	strcpy(szName, name);
 	iWidth = width;
 	iIndent = indent;
 
@@ -3317,7 +3317,7 @@ void MI_AnnouncerField::Draw()
  * MI_PacksField Class
  **************************************/
 
-MI_PacksField::MI_PacksField(gfxSprite * nspr, short x, short y, char * name, short width, short indent, SimpleFileList * pList, MenuCodeEnum code) :
+MI_PacksField::MI_PacksField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent, SimpleFileList * pList, MenuCodeEnum code) :
 	MI_AnnouncerField(nspr, x, y, name, width, indent, pList)
 {
 	itemChangedCode = code;
@@ -3357,11 +3357,11 @@ MenuCodeEnum MI_PacksField::SendInput(CPlayerInput * playerInput)
  * MI_PlayListField Class
  **************************************/
 
-MI_PlaylistField::MI_PlaylistField(gfxSprite * nspr, short x, short y, char * name, short width, short indent) :
+MI_PlaylistField::MI_PlaylistField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent) :
 	UI_Control(x, y)
 {
 	spr = nspr;
-	szName = name;
+	strcpy(szName, name);
 	iWidth = width;
 	iIndent = indent;
 
@@ -3468,11 +3468,11 @@ void MI_PlaylistField::Draw()
  * MI_Button Class
  **************************************/
 
-MI_Button::MI_Button(gfxSprite * nspr, short x, short y, char * name, short width, short justified) :
+MI_Button::MI_Button(gfxSprite * nspr, short x, short y, const char * name, short width, short justified) :
 	UI_Control(x, y)
 {
 	spr = nspr;
-	szName = name;
+	strcpy(szName, name);
 	iWidth = width;
 	iTextJustified = justified;
 	fSelected = false;
@@ -3532,9 +3532,9 @@ void MI_Button::Draw()
 	}
 }
 
-void MI_Button::SetName(char * name)
+void MI_Button::SetName(const char * name)
 {
-	szName = name; 
+	strcpy(szName, name);
 	iTextW = (short)menu_font_large.getWidth(name);
 }
 
@@ -3551,11 +3551,11 @@ void MI_Button::SetImage(gfxSprite * nsprImage, short x, short y, short w, short
  * MI_StoredPowerupResetButton Class
  **************************************/
 
-MI_StoredPowerupResetButton::MI_StoredPowerupResetButton(gfxSprite * nspr, short x, short y, char * name, short width, short justified) :
+MI_StoredPowerupResetButton::MI_StoredPowerupResetButton(gfxSprite * nspr, short x, short y, const char * name, short width, short justified) :
 	MI_Button(nspr, x, y, name, width, justified)
 {
 	spr = nspr;
-	szName = name;
+	strcpy(szName, name);
 	iWidth = width;
 	iTextJustified = justified;
 	fSelected = false;
@@ -4178,8 +4178,6 @@ void MI_TournamentScoreboard::RefreshWorldScores(short gameWinner)
 	for(short iTeam = 0; iTeam < iNumTeams; iTeam++)
 	{
 		short iTeamY = GetYFromPlace(game_values.tournament_scores[iTeam].wins);
-
-		float dSpacing = GetIconSpacing();
 
 		miTeamImages[iTeam]->SetPosition(ix - 40, iTeamY);
 		worldPointsBackground[iTeam]->SetPosition(ix + 476, iTeamY);
@@ -4997,7 +4995,7 @@ void MI_Image::Draw()
  * MI_Text Class
  **************************************/
 
-MI_Text::MI_Text(char * text, short x, short y, short w, short size, short justified) :
+MI_Text::MI_Text(const char * text, short x, short y, short w, short size, short justified) :
 	UI_Control(x, y)
 {
 	szText = new char[strlen(text) + 1];
@@ -5015,7 +5013,7 @@ MI_Text::MI_Text(char * text, short x, short y, short w, short size, short justi
 MI_Text::~MI_Text()
 {}
 
-void MI_Text::SetText(char * text)
+void MI_Text::SetText(const char * text)
 {
 	delete [] szText;
 	szText = new char[strlen(text) + 1];

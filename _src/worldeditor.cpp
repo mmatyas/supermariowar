@@ -37,7 +37,7 @@
 
 enum {EDITOR_EDIT, EDITOR_WATER, EDITOR_BACKGROUND, EDITOR_FOREGROUND, EDITOR_PATHSPRITE, EDITOR_VEHICLES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_WORLD, NEW_WORLD, SAVE, EDITOR_WARP, DISPLAY_HELP, EDITOR_PATH, EDITOR_TYPE, EDITOR_BOUNDARY};
 
-char * szEditModes[9] = {"Background Mode", "Foreground Mode", "Path Sprite Mode", "Stage Mode", "Path Mode", "Vehicle Mode", "Warp Mode", "Stage/Door Mode", "Boundary Mode"};
+const char * szEditModes[9] = {"Background Mode", "Foreground Mode", "Path Sprite Mode", "Stage Mode", "Path Mode", "Vehicle Mode", "Warp Mode", "Stage/Door Mode", "Boundary Mode"};
 
 SDL_Surface		*screen;
 SDL_Surface		*blitdest;
@@ -145,7 +145,7 @@ std::vector<WorldMusicOverride*> worldmusicoverrides;
 int save_as();
 int find();
 int clear_world();
-bool dialog(char * title, char * instructions, char * input, int inputsize);
+bool dialog(const char * title, const char * instructions, char * input, int inputsize);
 int display_help();
 
 void drawmap(bool fScreenshot, short iBlockSize);
@@ -739,7 +739,6 @@ int editor_edit()
 							}
 							else if(edit_mode == 4)
 							{
-								short iAdjustedTile = AdjustForeground(set_tile, iCol, iRow);
 								bool fNeedUpdate = false;
 	
 								if(!fAutoPaint && g_worldmap.tiles[iCol][iRow].iForegroundSprite != 0)
@@ -967,7 +966,6 @@ int editor_edit()
 							}
 							else if(edit_mode == 4)
 							{
-								short iAdjustedTile = AdjustForeground(set_tile, iCol, iRow);
 								bool fNeedUpdate = false;
 	
 								if(!fAutoPaint && g_worldmap.tiles[iCol][iRow].iForegroundSprite != 0)
@@ -1513,7 +1511,6 @@ void AutoSetPathSprite(short iCol, short iRow)
 
 	short iForegroundSprite = g_worldmap.tiles[iCol][iRow].iForegroundSprite;
 	short iForegroundStyle = iForegroundSprite / WORLD_PATH_SPRITE_SET_SIZE;
-	short iPathSprite = iForegroundSprite % WORLD_PATH_SPRITE_SET_SIZE;
 
 	if(iForegroundSprite == 0 || iForegroundSprite >= WORLD_FOREGROUND_STAGE_OFFSET)
 		return;
@@ -2932,7 +2929,7 @@ int save_as()
 	return 0;
 }
 
-bool dialog(char * title, char * instructions, char * input, int inputsize)
+bool dialog(const char * title, const char * instructions, char * input, int inputsize)
 {	
 	unsigned int currentChar = 0;
 
@@ -3223,7 +3220,6 @@ void takescreenshot()
 
 		//Draw vehicles to screenshot
 		std::vector<WorldVehicle*>::iterator itr = vehiclelist.begin(), lim = vehiclelist.end();
-		int color = SDL_MapRGB(blitdest->format, 0, 0, 128);
 		while(itr != lim)
 		{
 			WorldVehicle * vehicle = *itr;

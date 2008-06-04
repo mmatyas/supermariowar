@@ -29,10 +29,10 @@
 
 struct STextAward
 {
-	char			*name;
+	const char		*name;
 	gfxFont			*font;
 	
-	STextAward(char *nname, gfxFont *nfont) {name = nname; font = nfont;}
+	STextAward(const char *nname, gfxFont *nfont) {name = nname; font = nfont;}
 };
 
 //------------- global definitions -------------
