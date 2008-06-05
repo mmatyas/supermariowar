@@ -37,7 +37,7 @@ class Menu
 
 #ifdef _DEBUG
 
-		void LoadScript(char * szScriptFile);
+		void LoadScript(const char * szScriptFile);
 		void ResetScript();
 		void GetNextScriptOperation();
 
@@ -47,7 +47,7 @@ class Menu
 		bool fScriptRunPreGameOptions;
 
 		void StartRecordScript();
-		void SaveScript(char * szScriptFile);
+		void SaveScript(const char * szScriptFile);
 		void SetNextScriptOperation();
 		void AddEmtpyLineToScript();
 #endif

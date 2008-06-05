@@ -4812,7 +4812,7 @@ void Menu::SetRandomGameModeSettings(short iMode)
 //Debugging code for writing and playing test scripts
 #ifdef _DEBUG
 
-void Menu::LoadScript(char * szScriptFile)
+void Menu::LoadScript(const char * szScriptFile)
 {
 	operations.clear();
 
@@ -5091,7 +5091,7 @@ void Menu::StartRecordScript()
 	operations.clear();
 }
 
-void Menu::SaveScript(char * szScriptFile)
+void Menu::SaveScript(const char * szScriptFile)
 {
 	FILE * fp = fopen(szScriptFile, "w");
 

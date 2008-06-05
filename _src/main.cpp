@@ -1824,7 +1824,7 @@ void RunGame()
 				float velx = (short)(rand() % 41 - 20) / 10.0f;
 				velx = velx < 0.5f && velx > -0.5f ? 1.0f : velx; //Keep fish from moving too slowly
 
-				short srcx, srcy, w, h;
+				short srcx = iFishSettings[0][0], srcy = iFishSettings[0][1], w = iFishSettings[0][2], h = iFishSettings[0][3];
 
 				short iRandomFish = rand() % 100;
 				
