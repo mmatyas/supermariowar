@@ -196,7 +196,10 @@ MI_SelectField::MI_SelectField(gfxSprite * nspr, short x, short y, const char * 
 	UI_Control(x, y)
 {
 	spr = nspr;
+
+	szName = new char[strlen(name) + 1];
 	strcpy(szName, name);
+
 	iWidth = width;
 	iIndent = indent;
 
@@ -242,6 +245,8 @@ MI_SelectField::~MI_SelectField()
 
 void MI_SelectField::SetTitle(char * name)
 {
+	delete [] szName;
+	szName = new char[strlen(name) + 1];
 	strcpy(szName, name);
 }
 
@@ -651,7 +656,10 @@ MI_InputControlField::MI_InputControlField(gfxSprite * nspr, short x, short y, c
 	UI_Control(x, y)
 {
 	spr = nspr;
-	strcpy(szName,  name);
+
+	szName = new char[strlen(name) + 1];
+	strcpy(szName, name);
+
 	iWidth = width;
 	iIndent = indent;
 	fSelected = false;
@@ -1664,7 +1672,9 @@ MI_PlayerSelect::MI_PlayerSelect(gfxSprite * nspr, short x, short y, const char 
 	spr = nspr;
 	iSelectedPlayer = 0;
 
+	szName = new char[strlen(name) + 1];
 	strcpy(szName, name);
+
 	iWidth = width;
 	iIndent = indent;
 
@@ -2584,7 +2594,10 @@ MI_MapField::MI_MapField(gfxSprite * nspr, short x, short y, const char * name, 
 	fDisable = false;
 
 	spr = nspr;
+
+	szName = new char[strlen(name) + 1];
 	strcpy(szName, name);
+
 	iWidth = width;
 	iIndent = indent;
 
@@ -3216,7 +3229,10 @@ MI_AnnouncerField::MI_AnnouncerField(gfxSprite * nspr, short x, short y, const c
 	UI_Control(x, y)
 {
 	spr = nspr;
+
+	szName = new char[strlen(name) + 1];
 	strcpy(szName, name);
+
 	iWidth = width;
 	iIndent = indent;
 
@@ -3361,7 +3377,10 @@ MI_PlaylistField::MI_PlaylistField(gfxSprite * nspr, short x, short y, const cha
 	UI_Control(x, y)
 {
 	spr = nspr;
+
+	szName = new char[strlen(name) + 1];
 	strcpy(szName, name);
+
 	iWidth = width;
 	iIndent = indent;
 
@@ -3472,7 +3491,10 @@ MI_Button::MI_Button(gfxSprite * nspr, short x, short y, const char * name, shor
 	UI_Control(x, y)
 {
 	spr = nspr;
+
+	szName = new char[strlen(name) + 1];
 	strcpy(szName, name);
+
 	iWidth = width;
 	iTextJustified = justified;
 	fSelected = false;
@@ -3534,7 +3556,10 @@ void MI_Button::Draw()
 
 void MI_Button::SetName(const char * name)
 {
+	delete [] szName;
+	szName = new char[strlen(name) + 1];
 	strcpy(szName, name);
+
 	iTextW = (short)menu_font_large.getWidth(name);
 }
 
@@ -3555,7 +3580,10 @@ MI_StoredPowerupResetButton::MI_StoredPowerupResetButton(gfxSprite * nspr, short
 	MI_Button(nspr, x, y, name, width, justified)
 {
 	spr = nspr;
+
+	szName = new char[strlen(name) + 1];
 	strcpy(szName, name);
+
 	iWidth = width;
 	iTextJustified = justified;
 	fSelected = false;
@@ -5017,7 +5045,7 @@ void MI_Text::SetText(const char * text)
 {
 	delete [] szText;
 	szText = new char[strlen(text) + 1];
-	strcpy(szText, text);	
+	strcpy(szText, text);
 }
 
 void MI_Text::Draw()
