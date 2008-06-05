@@ -119,7 +119,7 @@ class MI_Text : public UI_Control
 		void Draw();
 
 	private:
-		char * szText;
+		char szText[64];
 		short iw;
 		short iJustified;
 		gfxFont * font;
@@ -338,7 +338,7 @@ class MI_InputControlField : public UI_Control
 	private:
 
 		gfxSprite * spr;
-		char * szName;
+		char szName[64];
 
 		short iWidth, iIndent;
 
@@ -368,7 +368,7 @@ class MI_Button : public UI_Control
 	protected:
 
 		gfxSprite * spr;
-		char * szName;
+		char szName[64];
 
 		short iWidth, iIndent;
 		short iTextJustified;
@@ -492,7 +492,7 @@ class MI_PlayerSelect : public UI_Control
 
 		gfxSprite * spr;
 
-		char * szName;
+		char szName[64];
 		short iWidth, iIndent;
 
 		short iSelectedPlayer;
@@ -670,7 +670,7 @@ class MI_MapField : public UI_Control
 		SDL_Surface * surfaceMapForeground;
 		SDL_Rect rectDst;
 
-		char * szName;
+		char szName[64];
 		char szMapName[256];
 		short iWidth, iIndent;
 
@@ -752,7 +752,7 @@ class MI_AnnouncerField : public UI_Control
 
 		gfxSprite * spr;
 		
-		char * szName;
+		char szName[64];
 		short iWidth, iIndent;
 		
 		char szFieldName[256];
@@ -799,7 +799,7 @@ class MI_PlaylistField : public UI_Control
 
 		gfxSprite * spr;
 		
-		char * szName;
+		char szName[64];
 		short iWidth, iIndent;
 		
 		MI_Image * miModifyImageLeft;
