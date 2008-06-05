@@ -1333,11 +1333,6 @@ void ResetTourStops()
 {
 	game_values.tourstopcurrent = 0;
 	game_values.tourstoptotal = 0;
-	
-	for(short iTourStop = 0; iTourStop < (short)game_values.tourstops.size(); iTourStop++)
-	{
-		delete game_values.tourstops[iTourStop];
-	}
 
 	game_values.tourstops.clear();
 }
