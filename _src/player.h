@@ -290,6 +290,7 @@ class CPlayer
 		bool fSuperStomp;
 		short iSuperStompTimer;
 		short iSuperStompExitTimer;
+		bool superstomp_lock;
 
 		short burnuptimer;
 		short burnupstarttimer;

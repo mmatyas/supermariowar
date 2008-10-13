@@ -262,8 +262,17 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 		{
 			short iID = translation[iTileset].iID;
 			translationid[iID] = g_tilesetmanager.GetIndexFromName(translation[iTileset].szName);
-			tilesetwidths[iID] = g_tilesetmanager.GetTileset(translationid[iID])->GetWidth();
-			tilesetheights[iID] = g_tilesetmanager.GetTileset(translationid[iID])->GetHeight();
+
+			if(translationid[iID] == TILESETUNKNOWN)
+			{
+				tilesetwidths[iID] = 1;
+				tilesetheights[iID] = 1;
+			}
+			else
+			{
+				tilesetwidths[iID] = g_tilesetmanager.GetTileset(translationid[iID])->GetWidth();
+				tilesetheights[iID] = g_tilesetmanager.GetTileset(translationid[iID])->GetHeight();
+			}
 		}
 
 		delete [] translation;
@@ -2105,6 +2114,7 @@ void CMap::saveThumbnail(const std::string &sFile, bool fUseClassicPack)
 	SDL_SaveBMP(sThumbnail, sFile.c_str());
 #endif
 
+	SDL_FreeSurface(sThumbnail);
 }
 
 void CMap::calculatespawnareas(short iType, bool fUseTempBlocks)

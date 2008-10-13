@@ -264,13 +264,11 @@ MusicEntry::MusicEntry(const std::string & musicdirectory)
 		numsongsforcategory[k] = 0;
 
 	char musiclistname[FILEBUFSIZE];
-#ifdef _XBOX
-	sprintf(musiclistname, szDir + 9);
-#else
-    char * p = strrchr(szDir, '/');
+
+	char cDirSeperator = getDirectorySeperator().c_str()[0];
+    char * p = strrchr(szDir, cDirSeperator);
     if (!p) p=szDir; else p++;
     strcpy(musiclistname, p);
-#endif
 
 	for(i = (int)strlen(musiclistname); i >= 0; i--)
 	{
@@ -695,13 +693,11 @@ WorldMusicEntry::WorldMusicEntry(const std::string & musicdirectory)
 	char * szDir = (char*)(musicdirectory.c_str());
 	
 	char musiclistname[FILEBUFSIZE];
-#ifdef _XBOX
-	sprintf(musiclistname, szDir + 9);
-#else
-    char * p = strrchr(szDir, '/');
+
+	char cDirSeperator = getDirectorySeperator().c_str()[0];
+	char * p = strrchr(szDir, cDirSeperator);
     if (!p) p=szDir; else p++;
     strcpy(musiclistname, p);
-#endif
 
 	for(i = (int)strlen(musiclistname); i >= 0; i--)
 	{

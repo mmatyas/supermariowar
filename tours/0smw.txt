@@ -66,12 +66,12 @@
 #Red Parakoopa - any positive number including 0
 
 #6 - Eggs
-#Green Eggs - number of green eggs to play with
 #Red Eggs - number of red eggs to play with
+#Green Eggs - number of green eggs to play with
 #Yellow Eggs - number of yellow eggs to play with
 #Blue Eggs - number of blue eggs to play with
-#Green Yoshis - number of green yoshis to play with
 #Red Yoshis - number of red yoshis to play with
+#Green Yoshis - number of green yoshis to play with
 #Yellow Yoshis - number of yellow yoshis to play with
 #Blue Yoshis - number of blue yoshis to play with
 #Explosion Timer - number of seconds until eggs explode - 0 for off any positive number is the number of seconds (5 is 5 seconds until explosion)
@@ -170,7 +170,7 @@
 #Green Phanto Quantity - Number of green phantos from 0 on up
 
 #24 - Pipe Minigame
-No Options
+#No Options
 
 #Tour Stops (maximum 10 stops)
 #Map,Mode,Goal,Points,Bonus Wheel,Name,Options(see above)

@@ -935,6 +935,38 @@ int editor_edit()
 						while(!maplist.GetValid());
 
 						loadcurrentmap();
+
+						//Look for a certain tile in maps for testing
+						/*
+						bool fKeepgoing = true;
+						while(fKeepgoing)
+						{
+							do
+							{
+								maplist.next(false);
+							}
+							while(!maplist.GetValid());
+
+							loadcurrentmap();
+
+							for(short i = 0; i < MAPWIDTH; i++)
+							{
+								for(short j = 0; j < MAPHEIGHT; j++)
+								{
+									for(short k = 0; k < MAPLAYERS; k++)
+									{
+										TilesetTile tile = g_map.mapdata[i][j][k];
+										
+										///if(tile.iID == 3 && tile.iRow == 28 && (tile.iCol == 3 || tile.iCol == 4))
+										if(tile.iID == 0 && tile.iRow == 0 && (tile.iCol == 0 || tile.iCol == 1))
+										{
+											fKeepgoing = false;
+										}
+									}
+								}
+							}
+						}
+						*/
 					}
 
 					if(key == SDLK_y)
@@ -1584,8 +1616,10 @@ int editor_edit()
 
 		menu_font_small.drawRightJustified(640, 0, maplist.currentFilename());
 
-		if(--g_musiccategorydisplaytimer > 0)
+		if(g_musiccategorydisplaytimer > 0)
 		{
+			--g_musiccategorydisplaytimer;
+
 			spr_dialog.draw(224, 176);
 			menu_font_small.drawCentered(320, 195, "Music Category");
 			menu_font_large.drawCentered(320, 220, g_szMusicCategoryNames[g_map.musicCategoryID]);

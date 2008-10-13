@@ -468,7 +468,7 @@ bool LoadAndSplashScreen()
 	"Pikawil", "Marioman64", "Peardian", "Bob Ippolito", "Viper Snake", "neavea",
 	"Mr.Bob-omb", "milua", "bobmanperson", "DrTek", "somestrangeflea", "nes6502",
 	"XPort", "Naphistim", "Chaos", "NiGHTS", "Kutter", "Maximilian",
-	"Felix the Ghost"};
+	"Felix the Ghost", "Water Kirby"};
 
 #define NUM_CONTRIBUTORS ((int)(sizeof(contributors)/sizeof(char*)))
 

@@ -80,8 +80,16 @@ void CPlayer::move()
 		(playerKeys->game_turbo.fPressed?16:0) |
 		(playerKeys->game_powerup.fPressed?32:0);
 
+	int keymaskdown = 
+		(playerKeys->game_jump.fDown?1:0) |
+		(playerKeys->game_down.fDown?2:0) |
+		(playerKeys->game_left.fDown?4:0) |
+		(playerKeys->game_right.fDown?8:0) |
+		(playerKeys->game_turbo.fDown?16:0) |
+		(playerKeys->game_powerup.fDown?32:0);
+
 	//If any key was pressed, reset the suicide timer
-	if(keymask)
+	if(keymask || (keymaskdown && (velx < -1.0f || velx > 1.0f)))
 		ResetSuicideTime();
 
 	/*
@@ -431,10 +439,11 @@ void CPlayer::move()
 			iKuriboShoeExitTimer = 0;
 			ifsoundonplay(sfx_transform); 
 			iKuriboShoe = 0;
+			
 			fSuperStomp = false;
 			iSuperStompTimer = 0;
 			iSuperStompExitTimer = 0;
-			
+			superstomp_lock = false;
 		}
 	}
 
@@ -466,13 +475,16 @@ void CPlayer::move()
 				velx = -tv;
 
 			// Cause statue to super stomp to ground
-			if(inair && !fSuperStomp && iSuperStompTimer <= 0)
+			if(inair && !fSuperStomp && iSuperStompTimer <= 0 && !superstomp_lock)
 			{
 				iSuperStompTimer = 8;
 				lockfall = true;
 
 				// Become soft shielded (with stomp ability)
 				shield = 2;
+
+				// Stop player from super stomping twice before touching the ground
+				superstomp_lock = true;
 			}
 
             // Prevent you from shooting
@@ -506,8 +518,6 @@ void CPlayer::move()
 				// perform transformation effects
 				eyecandy[2].add(new EC_SingleAnimation(&spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
 				ifsoundonplay(sfx_transform);
-
-				statue_lock = false;
 
 				//Decrease the amount of tanooki uses, if feature is turned on
 				if(game_values.tanookilimit > 0 || tanookilimit > 0)
@@ -544,14 +554,26 @@ void CPlayer::move()
 		}
     }
 
-	if(fSuperStomp && !inair)
+	if(!inair)
 	{
-		eyecandy[2].add(new EC_SuperStompExplosion(&spr_superstomp, ix + HALFPW, iy + PH, 4));
-		ifsoundonplay(sfx_bobombsound);
-		fSuperStomp = false;
+		//If the player is touching the ground, then free the lock on super stomping
+		superstomp_lock = false;
 
-		objectcontainer[1].add(new MO_AttackZone(globalID, teamID, ix - 32, iy + 10, 32, 15, 8, kill_style_kuriboshoe, false));
-		objectcontainer[1].add(new MO_AttackZone(globalID, teamID, ix + PW, iy + 10, 32, 15, 8, kill_style_kuriboshoe, false));
+		//If they are touching the ground and they are not the statue, allow them to become the statue again
+		if(statue_timer <= 0)
+			statue_lock = false;
+
+		//If they were super stomping and they are not in the air anymore (i.e. on the ground), then create the
+		//super stomp attack zone, play the sound and show the stomp gfx
+		if(fSuperStomp)
+		{
+			eyecandy[2].add(new EC_SuperStompExplosion(&spr_superstomp, ix + HALFPW, iy + PH, 4));
+			ifsoundonplay(sfx_bobombsound);
+			fSuperStomp = false;
+
+			objectcontainer[1].add(new MO_AttackZone(globalID, teamID, ix - 32, iy + 10, 32, 15, 8, kill_style_kuriboshoe, false));
+			objectcontainer[1].add(new MO_AttackZone(globalID, teamID, ix + PW, iy + 10, 32, 15, 8, kill_style_kuriboshoe, false));
+		}
 	}
 
 	if(hammertimer > 0)
@@ -990,14 +1012,16 @@ void CPlayer::move()
 	if(state == player_ready)
 	{
 		//Super stomp
-		if(iKuriboShoe > 0 && inair && !fSuperStomp && ((playerKeys->game_down.fPressed && playerDevice == DEVICE_KEYBOARD) || 
+		if(iKuriboShoe > 0 && inair && !fSuperStomp && !superstomp_lock && ((playerKeys->game_down.fPressed && playerDevice == DEVICE_KEYBOARD) || 
 			(playerKeys->game_jump.fPressed && playerKeys->game_down.fDown)))
 		{
 			if((superjumptype != 3 || superjumptimer <= 0) &&
-				(inair && !fSuperStomp && iSuperStompTimer <= 0))
+				inair && !fSuperStomp && !superstomp_lock && iSuperStompTimer <= 0)
 			{
 				iSuperStompTimer = 8;
 				lockfall = true;
+
+				superstomp_lock = true;
 			}
 		}
 
@@ -2107,6 +2131,7 @@ void CPlayer::SetupNewPlayer()
 	fSuperStomp = false;
 	iSuperStompTimer = 0;
 	iSuperStompExitTimer = 0;
+	superstomp_lock = false;
 	
 	suicidetimer = 0;
 	suicidecounttimer = 0;
@@ -2197,6 +2222,7 @@ bool CPlayer::isstomping(CPlayer * o)
 		fSuperStomp = false;
 		iSuperStompTimer = 0;
 		iSuperStompExitTimer = 0;
+		superstomp_lock = false;
 
 		if(fKillPotential)
 		{
@@ -2787,6 +2813,7 @@ void BounceAssistPlayer(CPlayer * o1, CPlayer * o2)
 		o1->fSuperStomp = false;
 		o1->iSuperStompTimer = 0;
 		o1->iSuperStompExitTimer = 0;
+		o1->superstomp_lock = false;
 
 		ifsoundonplay(sfx_superspring);
 	}

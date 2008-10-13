@@ -260,6 +260,8 @@ void WorldVehicle::SetNextDest()
 	if(iNumMoves <= -10)
 		return;
 
+	//Check to see what directions are available to move
+	//Can't move through doors or vehicle boundaries
 	short iConnections[4];
 	short iNumConnections = 0;
 	for(short iDirection = 0; iDirection < 4; iDirection++)
@@ -1740,7 +1742,12 @@ short WorldMap::UseKey(short iKeyType, short iCol, short iRow, bool fCloud)
 
 short WorldMap::GetVehicleBoundary(short iCol, short iRow)
 {
-	return tiles[iCol][iRow].iVehicleBoundary;
+	if(iCol >= 0 && iRow >= 0 && iCol < iWidth && iRow < iHeight)
+	{
+		return tiles[iCol][iRow].iVehicleBoundary;
+	}
+
+	return 0;
 }
 
 //Implements breadth first search to find a stage or vehicle of interest

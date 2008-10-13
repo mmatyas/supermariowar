@@ -4256,7 +4256,6 @@ bool PU_ExtraHeartPowerup::collide(CPlayer * player)
 		}
 
 		ifsoundonplay(sfx_collectpowerup);
-
 		dead = true;
 	}
 
@@ -4282,6 +4281,7 @@ bool PU_ExtraTimePowerup::collide(CPlayer * player)
 			timelimitmode->addtime(timelimitmode->goal / 5);
 		}
 
+		ifsoundonplay(sfx_collectpowerup);
 		dead = true;
 	}
 
@@ -5688,7 +5688,7 @@ CO_Egg::CO_Egg(gfxSprite *nspr, short iColor) :
 
 bool CO_Egg::collide(CPlayer * player)
 {
-	if(owner == NULL)
+	if(owner == NULL && player->isready())
 	{
 		if(player->AcceptItem(this))
 		{
@@ -5865,7 +5865,7 @@ bool CO_Star::collide(CPlayer * player)
 	CGM_Star * starmode = (CGM_Star *)game_values.gamemode;
 
 	timer = 0;
-	if(owner == NULL)
+	if(owner == NULL && player->isready())
 	{
 		if(player->throw_star == 0 && player->AcceptItem(this))
 		{
@@ -6166,7 +6166,7 @@ CO_Flag::CO_Flag(gfxSprite *nspr, MO_FlagBase * base, short iTeamID, short iColo
 
 bool CO_Flag::collide(CPlayer * player)
 {
-	if(owner == NULL && (!fInBase || teamID != player->teamID))
+	if(owner == NULL && player->isready() && (!fInBase || teamID != player->teamID))
 	{
 		if(game_values.gamemodesettings.flag.touchreturn && teamID == player->teamID)
 		{
@@ -6467,7 +6467,7 @@ OMO_Area::OMO_Area(gfxSprite *nspr, short iNumAreas) :
 
 bool OMO_Area::collide(CPlayer * player)
 {
-	if(player->statue_timer == 0)
+	if(player->statue_timer == 0 && !player->isdead())
 	{
 		totalTouchingPlayers++;
 
@@ -8567,7 +8567,7 @@ bool CO_Shell::HitOther(CPlayer * player)
 {
 	if(state == 2) //Sitting
 	{
-		if(owner == NULL)
+		if(owner == NULL && player->isready())
 		{
 			if(player->AcceptItem(this))
 			{
@@ -9264,9 +9264,12 @@ void CO_Spring::hittop(CPlayer * player)
 
 void CO_Spring::hitother(CPlayer * player)
 {
-	if(player->AcceptItem(this))
+	if(owner == NULL && player->isready())
 	{
-		owner = player;
+		if(player->AcceptItem(this))
+		{
+			owner = player;
+		}
 	}
 }
 
@@ -10572,7 +10575,7 @@ CO_PhantoKey::CO_PhantoKey(gfxSprite *nspr) :
 
 bool CO_PhantoKey::collide(CPlayer * player)
 {
-	if(owner == NULL)
+	if(owner == NULL && player->isready())
 	{
 		if(player->AcceptItem(this))
 		{

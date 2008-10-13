@@ -3429,7 +3429,7 @@ void CGM_Bonus::init()
 void CGM_Bonus::draw_background()
 {
 	//Draw Toad
-	spr_worldbonushouse.draw(544, 266, list_players[0]->ix > 544 ? 224 : 192, 10, 32, 54);
+	spr_worldbonushouse.draw(544, 256, list_players[0]->ix > 544 ? 224 : 192, 0, 32, 64);
 
 	//Draw Bonus House Title
 	menu_plain_field.draw(0, 0, 0, 0, 320, 32);
@@ -3486,6 +3486,7 @@ void CGM_Pipe_MiniGame::think()
 				iNextItemTimer = rand() % 20 + 25;
 
 			short iRandPowerup = rand() % 50;
+			iRandPowerup = 0;
 			if(iBonusType == 0 && iRandPowerup < 5) //bonuses
 			{
 				objectcontainer[1].add(new OMO_PipeBonus(&spr_pipegamebonus, (float)((rand() % 21) - 10) / 2.0f, -((float)(rand() % 11) / 2.0f + 7.0f), 304, 256, iRandPowerup, 620, 15));
@@ -3512,7 +3513,7 @@ void CGM_Pipe_MiniGame::think()
 
 			short iRandPlayer = game_values.teamids[iRandTeam][rand() % game_values.teamcounts[iRandTeam]];
 
-			objectcontainer[1].add(new OMO_PipeCoin(&spr_coin, (float)((rand() % 21) - 10) / 2.0f, -((float)(rand() % 11) / 2.0f + 7.0f), 304, 256, list_players[iRandPlayer]->teamID, list_players[iRandPlayer]->colorID, 15));
+			objectcontainer[1].add(new OMO_PipeCoin(&spr_coin, (float)((rand() % 21) - 10) / 2.0f, -((float)(rand() % 11) / 2.0f + 7.0f), 304, 256, iRandTeam, game_values.colorids[iRandPlayer], 15));
 		}
 		else if(iBonusType == 3)
 		{

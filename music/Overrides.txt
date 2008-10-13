@@ -9,4 +9,4 @@
 #0smw,music/game/Standard/smb3level1.ogg,music/game/Standard/M2_Level1.ogg
 
 [worlds]
-#0smw,music/game/Standard/grassland.ogg
+#0smw,music/world/Standard/grassland.ogg
