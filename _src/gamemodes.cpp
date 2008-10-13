@@ -2106,7 +2106,7 @@ void CGM_Race::playerextraguy(CPlayer &player, short iType)
 			SetupScoreBoard(false);
 			ShowScoreBoard();
 		}
-		else if(player.score->score >= goal - 2 && !playedwarningsound)
+		else if(player.score->score >= goal - 1 && !playedwarningsound)
 		{
 			playwarningsound();
 		}
@@ -2140,7 +2140,7 @@ void CGM_Race::setNextGoal(short teamID)
 				ShowScoreBoard();
 
 			}
-			else if(score[teamID]->score >= goal - 2 && !playedwarningsound)
+			else if(score[teamID]->score >= goal - 1 && !playedwarningsound)
 			{
 				playwarningsound();
 			}

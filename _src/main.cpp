@@ -20,7 +20,7 @@
 |															|
 |															|
 | start:		24.01.2003									|
-| last changes:	03.26.2007									|
+| last changes:	10.11.2008									|
 |															|
 |								© 2003-2008 Florian Hufsky  |
 |								  florian.hufsky@gmail.com	|
@@ -120,7 +120,7 @@ Beta 1 Public Release Bugs
 [X] Update Readme with Links updates on desktop
 [X] Game crashes when you create a map with a tileset, then remove that tileset from your game and start up
 [X] Revert back to the classic skin palette from 1.7 AFE
-[  ] Add in tileset expansion
+[X] Add in tileset expansion
 [X] Crashing world bug with !!!skyworld (on desktop) - when bots are playing, it crashes when they beat a world (some times it's the first, sometimes second or third they beat)
 [X] Apparently when you grab an item at the same time you die, it makes you spawn with that item in your hand. -> test with 1 frame advance on and pick up and item and press z in same frame, I tested this out and if you hold a shoe and jump on top of the spike, you spawn with the shoe on. The green and red spring however does the same thing like the spike does, spawning with the player in their hands. This only happens when it is the movable spike. It doesn't happen when it's the regular tile spikes.  Edit: But after you spawn with the shoe on and you do the "left/right" thing to get out of the shoe and your still holding it then you jump on a spike again, it is perfectly normal and doesn't spawn with you
     -> repro case was when two spikes were overlapped and the player came in at an angle to die by hitting the spike, yet picking it up at the same time
@@ -160,8 +160,8 @@ Beta 1 Public Release Bugs
 [X] Default ttls on menu for gray and red throw blocks are unlimted
 [ ] Refreshing the map thumbnails hangs half way through on xbox (after icecap map)
     -> Fixed memory leak in thumbnail creation, retest on xbox
-[ ] Remove Fire Temple map on Felix-The-Ghosts request
-[ ] Take out monster truck skin requested by Felix
+[X] Remove Fire Temple map on Felix-The-Ghosts request
+[X] Take out monster truck skin requested by Felix
 [X] Add Water Kirby to thanks list
 [ ] Not really a bug, but in some gfx subdirectories of the 1.8 beta zip file you got hidden "Thumbs.db" files included.
 [X] Extra Time powerups don't make any sound when grabbed.
@@ -187,7 +187,6 @@ Beta 1 Public Release Bugs
 [ ] It still says "2007" on that first splash screen that comes up.
 [ ] If a platform is non moving, but it's speed is greater than minimum, then standing on it causes undesired sprite animation.
 [ ] Player getting caught in a moving platform here: LKA_Turbulence.map
-[ ] 0smw's tour lacks a # in one of the lines under mode 24 ("No options"), causing the first stage of the tour to be completely random.
 [ ] Use smb3_extended1up.wav (on desktop) for 5up sound
 [ ] Add all maps into a single list for saving and loading for the level editor so you can access any map currently in smw
 [ ] Don't know if it's already been said, but for some reason, no matter what I set the Glide setting to for Chicken mode in a Single Game, the Chicken can NEVER glide. I don't know if I'm doing anything wrong or what, but... It just won't work. Oddly enough, I believe I've seen it work in Tours/Worlds. O_o I know it works SOMEWHERE in the game...just not in the Single Game.
@@ -198,7 +197,6 @@ Beta 1 Public Release Bugs
 [ ] Items and objects aren't destroyed when trapped in switch (on/off) blocks.
 [ ] Well, I decided to create a map with all animations in the background, to represent the sea. Trouble is, I acidentaly set all the animated parts to zero, and when I tried to put the blue parts underneth it went over the animations and over saved them. so i just put the blue parts  over the top of most of the animated tiles and eventually the tile just fell.  From this I also noticed that there is a limit to the amount of animations allowed on a map-is this a bug? -> Hitting the limit of animation blocks?
 [ ] Items get overlapped by platforms, no matter what layer they are.
-[ ] Ah-HA! I figured out exactly what the bug with Vehicles is. If you put a vehicle at the very edge of the World, it will crash the game EVERY time if it has a Boundary setting greater than 0. I have no idea why it's doing this, but it is. Set it to 0, nothing bad happens. Set it greater, it apparently allows it to move to invalid positions. D: This is my assumption, though I'm POSITIVE it is doing this. ...Fix please?
 [ ] P-wing glitch: Get a p-wing, activate it, then hold down and right. You drop and move right with the wings still going. You don't move if you hold left.
 [ ] Uhh, not sure whether or not this is a glitch, but I hit the top of an item brick and I got a podoboo. No, not the item; a real, flashing orange podoboo jumped up from the block, killed me, and dropped off the bottom of the screen 0.o  Also, if a map doesn't work sometimes, such as crashes, it will work just fine if you play it under the "zzworldeditor" world 0.o
 [ ] also usually the game does a good job not spawning you inside a platform(killing you) but I lined the bottom of a map with death tiles and it started spawning inside the platform.  edit: also stomp mode has problems with spawning them inside platforms(specifically continuous), only they don't die and still animate-it looks weird.  I guess you have to take into account how much time is spent in the swirly spawn animation-an area can be empty initially, but occupied by the time the animation is done
