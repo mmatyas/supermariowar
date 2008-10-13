@@ -20,7 +20,7 @@ using std::cout;
 using std::endl;
 using std::string;
 
-extern char * g_szMusicCategoryNames[MAXMUSICCATEGORY];
+extern const char * g_szMusicCategoryNames[MAXMUSICCATEGORY];
 extern short g_iDefaultMusicCategory[MAXMUSICCATEGORY];
 
 ///////////// SimpleFileList ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -119,8 +119,8 @@ SHIP BETA
 Beta 1 Public Release Bugs
 [X] Update Readme with Links updates on desktop
 [X] Game crashes when you create a map with a tileset, then remove that tileset from your game and start up
-[ ] Revert back to the classic skin palette from 1.7 AFE
-[ ] Add in tileset expansion
+[X] Revert back to the classic skin palette from 1.7 AFE
+[  ] Add in tileset expansion
 [X] Crashing world bug with !!!skyworld (on desktop) - when bots are playing, it crashes when they beat a world (some times it's the first, sometimes second or third they beat)
 [X] Apparently when you grab an item at the same time you die, it makes you spawn with that item in your hand. -> test with 1 frame advance on and pick up and item and press z in same frame, I tested this out and if you hold a shoe and jump on top of the spike, you spawn with the shoe on. The green and red spring however does the same thing like the spike does, spawning with the player in their hands. This only happens when it is the movable spike. It doesn't happen when it's the regular tile spikes.  Edit: But after you spawn with the shoe on and you do the "left/right" thing to get out of the shoe and your still holding it then you jump on a spike again, it is perfectly normal and doesn't spawn with you
     -> repro case was when two spikes were overlapped and the player came in at an angle to die by hitting the spike, yet picking it up at the same time

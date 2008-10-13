@@ -1,11 +1,11 @@
 #include "global.h"
 #include <math.h>
 
-extern char * Keynames[340];
-extern char * Joynames[30];
+extern const char * Keynames[340];
+extern const char * Joynames[30];
 
-extern char * GameInputNames[NUM_KEYS];
-extern char * MenuInputNames[NUM_KEYS];
+extern const char * GameInputNames[NUM_KEYS];
+extern const char * MenuInputNames[NUM_KEYS];
 
 extern bool LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDirections);
 

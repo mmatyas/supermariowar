@@ -41,7 +41,7 @@ extern void UpdateScoreBoard();
 extern Uint8 GetScreenBackgroundFade();
 extern short LookupTeamID(short id);
 
-extern char * g_szAutoFilterNames[NUM_AUTO_FILTERS];
+extern const char * g_szAutoFilterNames[NUM_AUTO_FILTERS];
 extern short g_iAutoFilterIcons[NUM_AUTO_FILTERS];
 
 extern void ResetTourStops();

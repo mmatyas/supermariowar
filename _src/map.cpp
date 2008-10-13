@@ -27,7 +27,7 @@ using std::endl;
 extern gfxSprite spr_frontmap[2];
 extern short g_iTileConversion[];
 extern short g_iVersion[];
-extern char * g_szBackgroundConversion[26];
+extern const char * g_szBackgroundConversion[26];
 extern short g_iMusicCategoryConversion[26];
 
 short g_iTileTypeConversion[18] = {0, 1, 2, 5, 121, 9, 17, 33, 65, 6, 21, 37, 69, 3961, 265, 529, 1057, 2113};

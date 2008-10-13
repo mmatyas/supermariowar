@@ -197,7 +197,7 @@ bool ignoreclick = false;
 
 char findstring[FILEBUFSIZE] = "";
 
-extern char * g_szWorldMusicCategoryNames[MAXWORLDMUSICCATEGORY];
+extern const char * g_szWorldMusicCategoryNames[MAXWORLDMUSICCATEGORY];
 short g_musiccategorydisplaytimer = 0;
 
 //Vehicle stuff
