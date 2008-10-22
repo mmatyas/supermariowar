@@ -431,17 +431,17 @@ int main(int argc, char *argv[])
 		spr_hazard_pirhanaplant[i].SetWrap(true, 640 >> i);
 	}
 
-	if( SDL_SetColorKey(s_platform, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(s_platform->format, 255, 0, 255)) < 0)
+	if( SDL_SetColorKey(s_platform, SDL_SRCCOLORKEY, SDL_MapRGB(s_platform->format, 255, 0, 255)) < 0)
 	{
 		printf("\n ERROR: Couldn't set ColorKey + RLE: %s\n", SDL_GetError());
 	}
 
-	if( SDL_SetColorKey(s_platformpathbuttons, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(s_platformpathbuttons->format, 255, 0, 255)) < 0)
+	if( SDL_SetColorKey(s_platformpathbuttons, SDL_SRCCOLORKEY, SDL_MapRGB(s_platformpathbuttons->format, 255, 0, 255)) < 0)
 	{
 		printf("\n ERROR: Couldn't set ColorKey + RLE: %s\n", SDL_GetError());
 	}
 
-	if( SDL_SetColorKey(s_maphazardbuttons, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(s_maphazardbuttons->format, 255, 0, 255)) < 0)
+	if( SDL_SetColorKey(s_maphazardbuttons, SDL_SRCCOLORKEY, SDL_MapRGB(s_maphazardbuttons->format, 255, 0, 255)) < 0)
 	{
 		printf("\n ERROR: Couldn't set ColorKey + RLE: %s\n", SDL_GetError());
 	}
@@ -2381,7 +2381,7 @@ int editor_platforms()
 
 	const char * szPathNames[3] = {"Line Segment", "Continuous", "Ellipse"};
 
-	enum {PLATFORM_EDIT_STATE_SELECT, PLATFORM_EDIT_STATE_PATH_TYPE, PLATFORM_EDIT_STATE_CHANGE_PATH_TYPE, PLATFORM_EDIT_STATE_EDIT, PLATFORM_EDIT_STATE_PATH, PLATFORM_EDIT_STATE_TEST, PLATFORM_EDIT_STATE_TILETYPE};
+	enum {PLATFORM_EDIT_STATE_SELECT, PLATFORM_EDIT_STATE_PATH_TYPE, PLATFORM_EDIT_STATE_CHANGE_PATH_TYPE, PLATFORM_EDIT_STATE_EDIT, PLATFORM_EDIT_STATE_PATH, PLATFORM_EDIT_STATE_TEST, PLATFORM_EDIT_STATE_TILETYPE, PLATFORM_EDIT_STATE_ANIMATED};
 
 	short iPlatformEditState = PLATFORM_EDIT_STATE_SELECT;
 	short iEditPlatform = 0;
@@ -2414,6 +2414,20 @@ int editor_platforms()
 							iEditPlatform = event.key.keysym.sym - SDLK_1;
 							iPlatformEditState = PLATFORM_EDIT_STATE_EDIT;
 						}
+						else if((PLATFORM_EDIT_STATE_PATH_TYPE == iPlatformEditState || PLATFORM_EDIT_STATE_CHANGE_PATH_TYPE == iPlatformEditState) && event.key.keysym.sym >= SDLK_1 && event.key.keysym.sym <= SDLK_3)
+						{
+							g_Platforms[iEditPlatform].iPathType = event.key.keysym.sym - SDLK_1;
+
+							if(PLATFORM_EDIT_STATE_PATH_TYPE == iPlatformEditState)
+							{
+								iPlatformEditState = PLATFORM_EDIT_STATE_EDIT;
+								SetPlatformToDefaults(iEditPlatform);
+							}
+							else
+							{
+								iPlatformEditState = PLATFORM_EDIT_STATE_PATH;
+							}
+						}
 					}
 					else if(event.key.keysym.sym == SDLK_n)
 					{
@@ -2426,7 +2440,7 @@ int editor_platforms()
 					}
 					else if(event.key.keysym.sym == SDLK_t)
 					{
-						if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
+						if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
 						{
 							editor_tiles();
 							iPlatformEditState = PLATFORM_EDIT_STATE_EDIT;
@@ -2436,9 +2450,17 @@ int editor_platforms()
 							iPlatformEditState = PLATFORM_EDIT_STATE_CHANGE_PATH_TYPE;
 						}
 					}
+					else if(event.key.keysym.sym == SDLK_a)
+					{
+						if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
+						{
+							editor_animation();
+							iPlatformEditState = PLATFORM_EDIT_STATE_ANIMATED;
+						}
+					}
 					else if(event.key.keysym.sym == SDLK_l)
 					{
-						if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
+						if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
 						{
 							editor_tiletype();
 							iPlatformEditState = PLATFORM_EDIT_STATE_TILETYPE;
@@ -2446,7 +2468,7 @@ int editor_platforms()
 					}
 					else if(event.key.keysym.sym == SDLK_y) //Change the draw layer
 					{
-						if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
+						if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
 						{
 							if(++g_Platforms[iEditPlatform].iDrawLayer > 4)
 								g_Platforms[iEditPlatform].iDrawLayer = 0;
@@ -2463,7 +2485,7 @@ int editor_platforms()
 					}
 					else if(event.key.keysym.sym == SDLK_DELETE)
 					{
-						if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
+						if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
 						{
 							//Copy platforms into empty spot
 							for(short iPlatform = iEditPlatform; iPlatform < g_iNumPlatforms - 1; iPlatform++)
@@ -2502,7 +2524,7 @@ int editor_platforms()
 						{
 							return EDITOR_EDIT;
 						}
-						else if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState)
+						else if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState)
 						{
 							iPlatformEditState = PLATFORM_EDIT_STATE_SELECT;
 						}
@@ -2517,7 +2539,7 @@ int editor_platforms()
 					}
 					else if(event.key.keysym.sym == SDLK_KP_MINUS || event.key.keysym.sym == SDLK_MINUS)
 					{
-						if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
+						if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
 						{
 							if(g_Platforms[iEditPlatform].iPathType == 2)
 							{
@@ -2536,7 +2558,7 @@ int editor_platforms()
 					}
 					else if(event.key.keysym.sym == SDLK_KP_PLUS || event.key.keysym.sym == SDLK_EQUALS)
 					{
-						if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
+						if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
 						{
 							if(g_Platforms[iEditPlatform].iPathType == 2)
 							{
@@ -2555,7 +2577,7 @@ int editor_platforms()
 					}
 					else if(event.key.keysym.sym == SDLK_p)
 					{
-						if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
+						if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
 						{
 							iPlatformEditState = PLATFORM_EDIT_STATE_PATH;
 							CalculatePlatformDims(iEditPlatform, &iPlatformLeft, &iPlatformTop, &iPlatformWidth, &iPlatformHeight);
@@ -2646,6 +2668,27 @@ int editor_platforms()
 								}
 							}
 						}
+						else if(PLATFORM_EDIT_STATE_ANIMATED) //animated tiles
+						{
+							if(!ignoreclick)
+							{
+								short ix = event.button.x / TILESIZE;
+								short iy = event.button.y / TILESIZE;
+
+								for(short i = 0; i < set_tile_cols; i++)
+								{
+									for(short j = 0; j < set_tile_rows; j++)
+									{
+										if(ix + i >= 0 && ix + i < MAPWIDTH && iy + j >= 0 && iy + j < MAPHEIGHT)
+										{
+											TilesetTile * tile = &g_Platforms[iEditPlatform].tiles[ix + i][iy + j];
+											SetTilesetTile(tile, TILESETANIMATED, set_tile_start_y + j, set_tile_start_x + i);
+											g_Platforms[iEditPlatform].types[ix + i][iy + j] = animatedtiletypes[tile->iRow + (tile->iCol << 5)];
+										}
+									}
+								}
+							}
+						}
 						else if(PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
 						{
 							if(!ignoreclick)
@@ -2676,7 +2719,7 @@ int editor_platforms()
 						short ix = event.button.x / TILESIZE;
 						short iy = event.button.y / TILESIZE;
 
-						if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState)
+						if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState)
 						{
 							ClearTilesetTile(&g_Platforms[iEditPlatform].tiles[ix][iy]);
 							g_Platforms[iEditPlatform].types[ix][iy] = tile_nonsolid;
@@ -2704,7 +2747,7 @@ int editor_platforms()
 					short ix = event.button.x / TILESIZE;
 					short iy = event.button.y / TILESIZE;
 
-					if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState)
+					if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState)
 					{
 						if(event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT) && !ignoreclick)
 						{
@@ -2715,8 +2758,17 @@ int editor_platforms()
 									if(ix + i >= 0 && ix + i < MAPWIDTH && iy + j >= 0 && iy + j < MAPHEIGHT)
 									{
 										TilesetTile * tile = &g_Platforms[iEditPlatform].tiles[ix + i][iy + j];
-										SetTilesetTile(tile, set_tile_tileset, set_tile_start_x + i, set_tile_start_y + j);
-										g_Platforms[iEditPlatform].types[ix + i][iy + j] = g_tilesetmanager.GetTileset(tile->iID)->GetTileType(tile->iCol, tile->iRow);
+										
+										if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState)
+										{
+											SetTilesetTile(tile, set_tile_tileset, set_tile_start_x + i, set_tile_start_y + j);
+											g_Platforms[iEditPlatform].types[ix + i][iy + j] = g_tilesetmanager.GetTileset(tile->iID)->GetTileType(tile->iCol, tile->iRow);
+										}
+										else
+										{
+											SetTilesetTile(tile, TILESETANIMATED, set_tile_start_y + j, set_tile_start_x + i);
+											g_Platforms[iEditPlatform].types[ix + i][iy + j] = animatedtiletypes[tile->iRow + (tile->iCol << 5)];
+										}
 									}
 								}
 							}
@@ -2819,10 +2871,10 @@ int editor_platforms()
 
 			menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "Path Type");
 		}				
-		else if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
+		else if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
 		{
 			menu_font_small.draw(0, 480 - menu_font_small.getHeight() * 3, "Edit Platform");
-			menu_font_small.draw(0, 480 - menu_font_small.getHeight() * 2, "[esc] Exit  [t] Tiles  [l] Types [del] Delete  [p] Path");
+			menu_font_small.draw(0, 480 - menu_font_small.getHeight() * 2, "[esc] Exit  [t] Tiles  [a] Animation [l] Types [del] Delete  [p] Path");
 			menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "[+/-] Velocity  [y] Draw Layer");
 			draw_platform(iEditPlatform, PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState);
 
@@ -3030,6 +3082,10 @@ void draw_platform(short iPlatform, bool fDrawTileTypes)
 			{
 				g_tilesetmanager.Draw(screen, tile->iID, 0, tile->iCol, tile->iRow, iCol, iRow);
 				//SDL_BlitSurface(g_tilesetmanager.GetTileset(tile->iID)->GetSurface(0), &g_tilesetmanager.rRects[0][tile->iCol][tile->iRow], screen, &bltrect);
+			}
+			else if(tile->iID == TILESETANIMATED)
+			{
+				SDL_BlitSurface(spr_tileanimation[0].getSurface(), &g_tilesetmanager.rRects[0][tile->iCol << 2][tile->iRow], screen, &g_tilesetmanager.rRects[0][iCol][iRow]);
 			}
 			else if(tile->iID == TILESETUNKNOWN)
 			{

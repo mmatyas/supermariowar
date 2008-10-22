@@ -73,6 +73,7 @@ class gfxSprite
 
 		void freeSurface();
 
+		bool GetWrap() {return fWrap;}
 		void SetWrap(bool wrap) {fWrap = wrap;}
 		void SetWrap(bool wrap, short wrapsize) {fWrap = wrap; iWrapSize = wrapsize;}
 

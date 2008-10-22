@@ -3269,6 +3269,7 @@ void takescreenshot()
 		SDL_FreeSurface(sScreenshot);
 	}
 
+	g_worldmap.Load(iTileSizes[0]);
 	blitdest = screen;
 }
 

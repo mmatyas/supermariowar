@@ -69,10 +69,10 @@ M2_Level1.ogg
 #capitalized.  For example, if the name of the map is "two52_cave.map",
 #please use "Cave" as the map name below
 [Maps]
-0smw,smb3level1.ogg,M2_Level1.ogg
+#0smw,smb3level1.ogg,M2_Level1.ogg
 
 [Backgrounds]
-Land_Classic.png,smb3level1.ogg,M2_Level1.ogg
+#Land_Classic.png,smb3level1.ogg,M2_Level1.ogg
 
 
 #Mapping of how the old backgrounds map to the new music categories by

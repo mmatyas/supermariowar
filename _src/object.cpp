@@ -336,8 +336,9 @@ void IO_Block::BounceMovingObject(IO_MovingObject * object)
 	}
 }
 
-void IO_Block::KillPlayersInsideBlock()
+void IO_Block::KillPlayersAndObjectsInsideBlock()
 {
+	//Loop through players
 	for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++)
 	{
 		CPlayer * player = list_players[iPlayer];
@@ -352,7 +353,37 @@ void IO_Block::KillPlayersInsideBlock()
 		if(player->fOldX + PW + iSwapSides >= iposx && player->fOldX + iSwapSides < iposx + TILESIZE &&
 			player->fOldY + PH >= iposy && player->fOldY < iposy + TILESIZE)
 		{
+			//player->iSuicideCreditPlayerID = X;
+			//player->iSuicideCreditTimer = 1;
 			player->KillPlayerMapHazard(true, kill_style_environment);
+		}
+	}
+
+	//Loop through objects
+	for(short iLayer = 0; iLayer < 3; iLayer++)
+	{
+		short iContainerEnd = objectcontainer[iLayer].list_end;
+		for(short iObject = 0; iObject < iContainerEnd; iObject++)
+		{
+			CObject * object = objectcontainer[iLayer].list[iObject];
+
+			if(object->getObjectType() != object_moving)
+				continue;
+
+			IO_MovingObject * movingobject = (IO_MovingObject*)object;
+
+			if(!movingobject->CollidesWithMap())
+				continue;
+
+			short iSwapSides = 0;
+			if(movingobject->fOldX >= iposx + TILESIZE)
+				iSwapSides = -640;
+
+			if(movingobject->fOldX + PW + iSwapSides >= iposx && movingobject->fOldX + iSwapSides < iposx + TILESIZE &&
+				movingobject->fOldY + PH >= iposy && movingobject->fOldY < iposy + TILESIZE)
+			{
+				movingobject->KillObjectMapHazard();
+			}
 		}
 	}
 }
@@ -688,7 +719,7 @@ bool B_PowerupBlock::hitbottom(CPlayer * player, bool useBehavior)
 		if(hidden)
 		{
 			hidden = false;
-			KillPlayersInsideBlock();
+			KillPlayersAndObjectsInsideBlock();
 		}
 
 		g_map.UpdateTileGap(col, row);
@@ -1207,7 +1238,7 @@ bool B_NoteBlock::hitbottom(CPlayer * player, bool useBehavior)
 		if(hidden)
 		{
 			hidden = false;
-			KillPlayersInsideBlock();
+			KillPlayersAndObjectsInsideBlock();
 		}
 
 		g_map.UpdateTileGap(col, row);
@@ -1427,7 +1458,7 @@ void B_FlipBlock::update()
 			reset();
 			g_map.UpdateTileGap(col, row);
 
-			KillPlayersInsideBlock();
+			KillPlayersAndObjectsInsideBlock();
 		}
 	}
 	else if(state == 2)
@@ -1511,7 +1542,7 @@ bool B_FlipBlock::hitbottom(CPlayer * player, bool useBehavior)
 		if(hidden)
 		{
 			hidden = false;
-			KillPlayersInsideBlock();
+			KillPlayersAndObjectsInsideBlock();
 		}
 
 		g_map.UpdateTileGap(col, row);
@@ -1616,7 +1647,7 @@ bool B_FlipBlock::hitright(IO_MovingObject * object)
 			if(hidden)
 			{
 				hidden = false;
-				KillPlayersInsideBlock();
+				KillPlayersAndObjectsInsideBlock();
 			}
 
 			g_map.UpdateTileGap(col, row);
@@ -1659,7 +1690,7 @@ bool B_FlipBlock::hitleft(IO_MovingObject * object)
 			if(hidden)
 			{
 				hidden = false;
-				KillPlayersInsideBlock();
+				KillPlayersAndObjectsInsideBlock();
 			}
 
 			g_map.UpdateTileGap(col, row);
@@ -2024,7 +2055,7 @@ void B_SwitchBlock::FlipState()
 	g_map.UpdateTileGap(col, row);
 
 	if(state == 0)
-		KillPlayersInsideBlock();
+		KillPlayersAndObjectsInsideBlock();
 }
 
 //------------------------------------------------------------------------------
@@ -2122,7 +2153,7 @@ bool B_BounceBlock::hitbottom(CPlayer * player, bool useBehavior)
 		if(hidden)
 		{
 			hidden = false;
-			KillPlayersInsideBlock();
+			KillPlayersAndObjectsInsideBlock();
 		}
 
 		g_map.UpdateTileGap(col, row);
@@ -2625,6 +2656,7 @@ IO_MovingObject::IO_MovingObject(gfxSprite *nspr, short x, short y, short iNumSp
 	iVerticalPlatformCollision = -1;
 
 	fObjectDiesOnSuperDeathTiles = true;
+	fObjectCollidesWithMap = true;
 }
 
 
@@ -3384,6 +3416,8 @@ void IO_MovingObject::flipsidesifneeded()
 	}
 }
 
+//This method probably needs to be rewritten so that it just calls into the object being killed
+//And let it handle not dying and placing itself somewhere else if necessary
 void IO_MovingObject::KillObjectMapHazard()
 {
 	if(!dead)
@@ -3398,43 +3432,40 @@ void IO_MovingObject::KillObjectMapHazard()
 
 			ifsoundonplay(sfx_hit);
 		}
+		else if(movingObjectType == movingobject_egg)
+		{
+			dead = false;
+			((CO_Egg*)this)->placeEgg();
+			ifsoundonplay(sfx_transform);
+		}
+		else if(movingObjectType == movingobject_star)
+		{
+			dead = false;
+			((CO_Star*)this)->placeStar();
+			ifsoundonplay(sfx_transform);
+		}
+		else if(movingObjectType == movingobject_flag)
+		{
+			dead = false;
+			((CO_Flag*)this)->placeFlag();
+			ifsoundonplay(sfx_transform);
+		}
+		else if(movingObjectType == movingobject_bomb)
+		{
+			if(iPlayerID > -1 && projectiles[iPlayerID] > 0)
+				projectiles[iPlayerID]--;
+
+			ifsoundonplay(sfx_hit);
+		}
+		else if(movingObjectType == movingobject_phantokey)
+		{
+			dead = false;
+			((CO_PhantoKey*)this)->placeKey();
+			ifsoundonplay(sfx_transform);
+		}
 		else
 		{
-			if(movingObjectType == movingobject_egg)
-			{
-				dead = false;
-				((CO_Egg*)this)->placeEgg();
-				ifsoundonplay(sfx_transform);
-			}
-			else if(movingObjectType == movingobject_star)
-			{
-				dead = false;
-				((CO_Star*)this)->placeStar();
-				ifsoundonplay(sfx_transform);
-			}
-			else if(movingObjectType == movingobject_flag)
-			{
-				dead = false;
-				((CO_Flag*)this)->placeFlag();
-				ifsoundonplay(sfx_transform);
-			}
-			else if(movingObjectType == movingobject_bomb)
-			{
-				if(iPlayerID > -1 && projectiles[iPlayerID] > 0)
-					projectiles[iPlayerID]--;
-
-				ifsoundonplay(sfx_hit);
-			}
-			else if(movingObjectType == movingobject_phantokey)
-			{
-				dead = false;
-				((CO_PhantoKey*)this)->placeKey();
-				ifsoundonplay(sfx_transform);
-			}
-			else
-			{
-				ifsoundonplay(sfx_hit);
-			}
+			ifsoundonplay(sfx_hit);
 		}
 	}
 }
@@ -3909,6 +3940,9 @@ MO_BonusHouseChest::MO_BonusHouseChest(gfxSprite *nspr, short ix, short iy, shor
 	drawbonusitemtimer = 0;
 
 	movingObjectType = movingobject_treasurechest;
+
+	fObjectDiesOnSuperDeathTiles = false;
+	fObjectCollidesWithMap = false;
 }
 
 void MO_BonusHouseChest::update()
@@ -4111,6 +4145,8 @@ PU_FeatherPowerup::PU_FeatherPowerup(gfxSprite *nspr, short x, short y, short iN
 	bounce = GRAVITATION;
 	fFloatDirectionRight = true;
 	dFloatAngle = HALF_PI;
+
+	fObjectCollidesWithMap = false;
 }
 
 void PU_FeatherPowerup::draw()
@@ -4393,6 +4429,8 @@ MO_SuperFireball::MO_SuperFireball(gfxSprite *nspr, short x, short y, short iNum
 	ttl = rand() % 30 + 60;
 	
 	drawframe = 0;
+
+	fObjectCollidesWithMap = false;
 }
 
 void MO_SuperFireball::update()
@@ -4462,6 +4500,8 @@ MO_Hammer::MO_Hammer(gfxSprite *nspr, short x, short y, short iNumSpr, float fVe
 		drawframe = 0;
 	else
 		drawframe = animationWidth - iw;
+
+	fObjectCollidesWithMap = false;
 }
 
 void MO_Hammer::update()
@@ -4563,6 +4603,8 @@ MO_IceBlast::MO_IceBlast(gfxSprite *nspr, short x, short y, float fVelyX, short 
 		drawframe = animationWidth - iw;
 
 	ttl = 120;
+
+	fObjectCollidesWithMap = false;
 }
 
 void MO_IceBlast::update()
@@ -4645,6 +4687,8 @@ MO_Boomerang::MO_Boomerang(gfxSprite *nspr, short x, short y, short iNumSpr, boo
 		iStyle = rand() % 3;
 	else
 		iStyle = game_values.boomerangstyle;
+
+	fObjectCollidesWithMap = false;
 }
 
 void MO_Boomerang::update()
@@ -5052,7 +5096,8 @@ MO_Coin::MO_Coin(gfxSprite *nspr, float dvelx, float dvely, short ix, short iy, 
 	IO_MovingObject(nspr, ix, iy, 4, 8, 30, 30, 1, 1, 0, color << 5, 32, 32)
 {
 	state = 1;
-	objectType = object_coin;
+	objectType = object_moving;
+	movingObjectType = movingobject_coin;
 	bounce = GRAVITATION;
 
 	sparkleanimationtimer = 0;
@@ -5066,9 +5111,14 @@ MO_Coin::MO_Coin(gfxSprite *nspr, float dvelx, float dvely, short ix, short iy, 
 	vely = dvely;
 	
 	if(iType == 0)
+	{
 		placeCoin();
+		fObjectCollidesWithMap = false;
+	}
 	else
+	{
 		collision_detection_checksides();
+	}
 }
 
 bool MO_Coin::collide(CPlayer * player)
@@ -5146,7 +5196,7 @@ void MO_Coin::placeCoin()
 
 		g_map.findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false);
 	}
-	while(objectcontainer[1].getClosestObject(x, y, object_coin) <= 150.0f);
+	while(objectcontainer[1].getClosestMovingObject(x, y, movingobject_coin) <= 150.0f);
 
 	xi(x);
 	yi(y);
@@ -5282,6 +5332,8 @@ MO_Podobo::MO_Podobo(gfxSprite *nspr, short x, short y, float dVelY, short playe
 	iPlayerID = playerid;
 	iTeamID = teamid;
 	iColorOffsetY = (colorid + 1) * 64;
+
+	fObjectCollidesWithMap = false;
 }
 
 void MO_Podobo::update()
@@ -5380,6 +5432,13 @@ void OMO_BowserFire::draw()
 
 bool OMO_BowserFire::collide(CPlayer * player)
 {
+	//if the fire is off the screen, don't wrap it to collide
+	if((ix < 0 && velx < 0.0f && player->ix > ix + iw && player->ix + PW < 640) ||
+		(ix + iw >= 640 && velx > 0.0f && player->ix + PW < ix && player->ix >= 0))
+	{
+		return false;
+	}
+
 	if(player->globalID != iPlayerID && (game_values.teamcollision == 2|| iTeamID != player->teamID) && !player->invincible && player->shield == 0)
 	{
 		//Find the player that made this explosion so we can attribute a kill
@@ -5391,7 +5450,7 @@ bool OMO_BowserFire::collide(CPlayer * player)
 }
 
 //------------------------------------------------------------------------------
-// class thwomp (for thwomp mode)
+// class bulletbill 
 //------------------------------------------------------------------------------
 MO_BulletBill::MO_BulletBill(gfxSprite *nspr, gfxSprite *nsprdead, short x, short y, float nspeed, short playerID, bool isspawned) :
 	IO_MovingObject(nspr, x, y, 4, 8, 30, 28, 1, 2)
@@ -5444,6 +5503,8 @@ MO_BulletBill::MO_BulletBill(gfxSprite *nspr, gfxSprite *nsprdead, short x, shor
 
 	iColorOffsetY = 64 * iColorID;
 	SetDirectionOffset();
+
+	fObjectCollidesWithMap = false;
 }
 
 void MO_BulletBill::update()
@@ -5476,6 +5537,16 @@ void MO_BulletBill::draw(short iOffsetX, short iOffsetY)
 
 bool MO_BulletBill::collide(CPlayer * player)
 {
+	if(dead)
+		return false;
+
+	//if the bullet bill is off the screen, don't wrap it to collide
+	if((ix < 0 && velx < 0.0f && player->ix > ix + iw && player->ix + PW < 640) ||
+		(ix + iw >= 640 && velx > 0.0f && player->ix + PW < ix && player->ix >= 0))
+	{
+		return false;
+	}
+	
 	if(player->invincible)
 	{
 		AddAwardKill(player, NULL, kill_style_bulletbill);
@@ -5837,7 +5908,7 @@ CO_Star::CO_Star(gfxSprite *nspr, short type, short id) :
 	iw = 32;
 	ih = 32;
 	bounce = GRAVITATION;
-	objectType = object_star;
+	objectType = object_moving;
 	movingObjectType = movingobject_star;
 	
 	iType = type;
@@ -5993,6 +6064,8 @@ MO_FlagBase::MO_FlagBase(gfxSprite *nspr, short iTeamID, short iColorID) :
 	speed = (float)game_values.gamemodesettings.flag.speed / 4.0f;
 
 	timer = 0;
+
+	fObjectCollidesWithMap = false;
 }
 
 bool MO_FlagBase::collide(CPlayer * player)
@@ -6315,6 +6388,8 @@ MO_Yoshi::MO_Yoshi(gfxSprite *nspr, short iColor) :
 	color = iColor;
 
 	placeYoshi();
+
+	fObjectCollidesWithMap = false;
 }
 
 bool MO_Yoshi::collide(CPlayer * player)
@@ -7021,6 +7096,8 @@ MO_FrenzyCard::MO_FrenzyCard(gfxSprite *nspr, short iType) :
 	sparkledrawframe = 0;
 
 	placeCard();
+
+	fObjectCollidesWithMap = false;
 }
 
 bool MO_FrenzyCard::collide(CPlayer * player)
@@ -7119,7 +7196,8 @@ MO_CollectionCard::MO_CollectionCard(gfxSprite *nspr, short iType, short iValue,
 	IO_MovingObject(nspr, ix, iy, 6, 8, -1, -1, -1, -1, 0, 0, 32, 32)
 {
 	state = 1;
-	objectType = object_collectioncard;
+	objectType = object_moving;
+	movingObjectType = movingobject_collectioncard;
 	bounce = GRAVITATION;
 	
 	sparkleanimationtimer = 0;
@@ -7135,6 +7213,7 @@ MO_CollectionCard::MO_CollectionCard(gfxSprite *nspr, short iType, short iValue,
 	if(iType == 0)
 	{
 		placeCard();
+		fObjectCollidesWithMap = false;
 	}
 	else
 	{
@@ -7148,6 +7227,8 @@ bool MO_CollectionCard::collide(CPlayer * player)
 	//If it is not collectable, return
 	if((type == 1 && uncollectabletime > 0) || state != 1)
 		return false;
+
+	ifsoundonplay(sfx_areatag);
 
 	//Add this card to the team's score
 	if(player->score->subscore[0] < 3)
@@ -7247,7 +7328,7 @@ void MO_CollectionCard::placeCard()
 
 		g_map.findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false);
 	}
-	while(objectcontainer[1].getClosestObject(x, y, object_collectioncard) <= 150.0f);
+	while(objectcontainer[1].getClosestMovingObject(x, y, movingobject_collectioncard) <= 150.0f);
 
 	xi(x);
 	yi(y);
@@ -7266,6 +7347,8 @@ MO_Explosion::MO_Explosion(gfxSprite *nspr, short x, short y, short iNumSpr, sho
 	timer = 0;
 	movingObjectType = movingobject_explosion;
 	iStyle = style;
+
+	fObjectCollidesWithMap = false;
 }
 
 bool MO_Explosion::collide(CPlayer * player)
@@ -7829,6 +7912,8 @@ MO_CheepCheep::MO_CheepCheep(gfxSprite *nspr) :
 	
 	if(velx > 0.0f)
 		iColorOffsetY += 32;
+
+	fObjectCollidesWithMap = false;
 }
 
 void MO_CheepCheep::update()
@@ -9398,6 +9483,8 @@ MO_AttackZone::MO_AttackZone(short playerId, short teamId, short x, short y, sho
 	fDieOnCollision = dieoncollision;
 
 	state = 1;
+
+	fObjectCollidesWithMap = false;
 }
 
 bool MO_AttackZone::collide(CPlayer * player)
@@ -9947,6 +10034,8 @@ MO_PirhanaPlant::MO_PirhanaPlant(short x, short y, short type, short freq, short
 
 	iActionTimer = rand() % 8;
 	iFrame = 0;
+
+	fObjectCollidesWithMap = false;
 }
 
 void MO_PirhanaPlant::update()
@@ -10749,6 +10838,21 @@ short CObjectContainer::countTypes(ObjectType type)
 	for(short i = 0; i < list_end; i++)
 	{
 		if(list[i]->getObjectType() == type)
+		{
+			count++;
+		}
+	}
+
+	return count;
+}
+
+short CObjectContainer::countMovingTypes(MovingObjectType type)
+{
+	short count = 0;
+
+	for(short i = 0; i < list_end; i++)
+	{
+		if(list[i]->getObjectType() == object_moving && ((IO_MovingObject*)list[i])->getMovingObjectType() == type)
 		{
 			count++;
 		}

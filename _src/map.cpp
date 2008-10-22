@@ -1187,7 +1187,12 @@ void CMap::SetTileGap(short i, short j)
 	IO_Block * rightBlock = blockdata[iRightTile][j];
 
 	bool fLeftSolid = (leftTile != tile_flag_nonsolid && leftTile != tile_flag_gap) || (leftBlock && !leftBlock->isTransparent() && !leftBlock->isHidden());
-	bool fCenterSolid = centerTile != tile_flag_nonsolid || (centerBlock && !centerBlock->isTransparent() && !centerBlock->isHidden());
+
+	//The following line used to be:
+	//bool fCenterSolid = centerTile != tile_flag_nonsolid || (centerBlock && !centerBlock->isTransparent() && !centerBlock->isHidden());
+	//And I don't remember why I specifically did it that way.  It was causing a bug so I changed it back to this:
+	bool fCenterSolid = (centerTile != tile_flag_nonsolid && centerTile != tile_flag_gap) || (centerBlock && !centerBlock->isTransparent() && !centerBlock->isHidden());
+
 	bool fRightSolid = (rightTile != tile_flag_nonsolid && rightTile != tile_flag_gap) || (rightBlock && !rightBlock->isTransparent() && !rightBlock->isHidden());
 
 	bool fTopLeftSolid = (topLeftTile & tile_flag_solid) || (topLeftBlock && !topLeftBlock->isTransparent() && !topLeftBlock->isHidden());
@@ -2319,14 +2324,12 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks)
 
 void CMap::AnimateTiles(short iFrame)
 {
-	//For each animated tile
+	//If the end index for this frame is the same as the next frame, that means there are 0
+	//animated tiles to paint this frame so we should skip it
 	if(iAnimatedVectorIndices[iFrame] == iAnimatedVectorIndices[iFrame + 1])
 		return;
 
-	//FIXME:: There is an issue here where there is excessive memory page faults when you put a
-	//non animated tile on layer 0 (or layer 2) and then an animated tile on layer 1 (or 3)
-	//This causes the working set to contain the static tileset + the backmap surface that is swapped
-	//every 8 frames, needing to be loaded back into the working set.  This causes serious slowdown.
+	//For each animated tile we are painting this frame, paint it to the map tiles or a platform
 	for(short iTile = iAnimatedVectorIndices[iFrame]; iTile < iAnimatedVectorIndices[iFrame + 1]; iTile++)
 	{
 		AnimatedTile * tile = animatedtiles[iTile];
@@ -2340,6 +2343,11 @@ void CMap::AnimateTiles(short iFrame)
 		if(tile->fForegroundAnimated)
 		{
 			SDL_BlitSurface(animatedTilesSurface, &(tile->rAnimationSrc[1][iTileAnimationFrame]), animatedFrontmapSurface, rDst);
+		}
+
+		if(tile->sPlatformSurface)
+		{
+			SDL_BlitSurface(animatedTilesSurface, &(tile->rAnimationSrc[0][iTileAnimationFrame]), tile->sPlatformSurface, rDst);
 		}
 	}
 }
@@ -2395,6 +2403,7 @@ void CMap::draw(SDL_Surface *targetSurface, int layer)
 					
 					animatedtile->fBackgroundAnimated = false;
 					animatedtile->fForegroundAnimated = false;
+					animatedtile->sPlatformSurface = NULL;
 
 					for(short iLayer = 0; iLayer < 4; iLayer++)
 					{
@@ -2443,6 +2452,58 @@ void CMap::draw(SDL_Surface *targetSurface, int layer)
 	bltrect.y = 0;
 	bltrect.w = 640;
 	bltrect.h = 480;
+}
+
+void CMap::addPlatformAnimatedTiles()
+{
+	for(short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++)
+	{
+		MovingPlatform * platform = platforms[iPlatform];
+
+		short iHeight = platform->iTileHeight;
+		short iWidth = platform->iTileWidth;
+		TilesetTile ** tiles = platform->iTileData;
+
+		short iDestX = 0;
+		short iDestY = 0;
+		
+		for(short iRow = 0; iRow < iHeight; iRow++)
+		{
+			for(short iCol = 0; iCol < iWidth; iCol++)
+			{
+				if(tiles[iCol][iRow].iID == TILESETANIMATED)
+				{
+					AnimatedTile * animatedtile = new AnimatedTile();
+					animatedtile->id = -1;  //we don't want this ID to collide with an animated map tile
+					
+					animatedtile->fBackgroundAnimated = false;
+					animatedtile->fForegroundAnimated = false;
+					animatedtile->sPlatformSurface = platform->sSurface;
+
+					TilesetTile * tile = &tiles[iCol][iRow];
+					TilesetTile * toTile = &animatedtile->layers[0];
+
+					toTile->iID = tile->iID;
+					toTile->iCol = tile->iCol;
+					toTile->iRow = tile->iRow;
+
+					for(short iRect = 0; iRect < 4; iRect++)
+					{
+						gfx_setrect(&(animatedtile->rSrc[0][iRect]), (iRect + (tile->iCol << 2)) * TILESIZE, tile->iRow * TILESIZE, TILESIZE, TILESIZE);
+					}
+
+					gfx_setrect(&(animatedtile->rDest), iDestX, iDestY, TILESIZE, TILESIZE);
+					animatedtiles.push_back(animatedtile);
+				
+				}
+
+				iDestX += TILESIZE;
+			}
+
+			iDestY += TILESIZE;
+			iDestX = 0;
+		}
+	}
 }
 
 void CMap::drawThumbnailHazards(SDL_Surface * targetSurface)
@@ -2748,6 +2809,9 @@ void CMap::predrawbackground(gfxSprite &background, gfxSprite &mapspr)
 		draw(mapspr.getSurface(), 3);
 	}
 
+	//Add animated tile objects for each animated tile in a platform (to be used later for drawing)
+	addPlatformAnimatedTiles();
+
 	/*
 	//Draws the spawn areas
 	SDL_Rect dest;
@@ -2809,8 +2873,10 @@ void CMap::SetupAnimatedTiles()
 
 		std::vector<AnimatedTile*>::iterator iter = animatedtiles.begin(), lim = animatedtiles.end();
 		
+		bool fSrcSurfaceFull = false;
+
 		SDL_Rect rDst = {0, 0, 32, 32};
-		while (iter != lim)
+		while (iter != lim && !fSrcSurfaceFull)
 		{
 			AnimatedTile * tile = *iter;
 			SDL_Rect * rSrc = &(tile->rDest);
@@ -2848,11 +2914,18 @@ void CMap::SetupAnimatedTiles()
 						if(rDst.y >= 1024)
 						{
 							tile->fForegroundAnimated = false;
-							++iter;
+							fSrcSurfaceFull = true;
 							break;
 						}
 					}
 				}
+			}
+
+			//If we have run out of room on the animatedTilesSurface surface, then stop reading animated tiles
+			if(fSrcSurfaceFull)
+			{
+				iter++;
+				break;
 			}
 
 			if(tile->fForegroundAnimated)
@@ -2887,7 +2960,46 @@ void CMap::SetupAnimatedTiles()
 						rDst.y += 32;
 						if(rDst.y >= 1024)
 						{
-							++iter;
+							fSrcSurfaceFull = true;
+							break;
+						}
+					}
+				}
+			}
+
+			//If we have run out of room on the animatedTilesSurface surface, then stop reading animated tiles
+			if(fSrcSurfaceFull)
+			{
+				iter++;
+				break;
+			}
+			
+			if(tile->sPlatformSurface)
+			{
+				for(short iTileAnimationFrame = 0; iTileAnimationFrame < 4; iTileAnimationFrame++)
+				{
+					gfx_setrect(&tile->rAnimationSrc[0][iTileAnimationFrame], &rDst);
+
+					SDL_FillRect(animatedTilesSurface, &rDst, iTransparentColor);
+
+					TilesetTile * tilesetTile = &tile->layers[0];
+					if(tilesetTile->iID == TILESETANIMATED)
+					{
+						SDL_BlitSurface(animatedTileSrcSurface, &(tile->rSrc[0][iTileAnimationFrame]), animatedTilesSurface, &rDst);
+					}
+					else
+					{
+						cout << endl << " ERROR: A nonanimated platform tile was added to the animated tile list" << endl;
+					}
+
+					rDst.x += 32;
+					if(rDst.x >= 1024)
+					{
+						rDst.x = 0;
+						rDst.y += 32;
+						if(rDst.y >= 1024)
+						{
+							fSrcSurfaceFull = true;
 							break;
 						}
 					}
@@ -2904,19 +3016,25 @@ void CMap::SetupAnimatedTiles()
 
 			tile->fBackgroundAnimated = false;
 			tile->fForegroundAnimated = false;
+			tile->sPlatformSurface = NULL;
 
 			++iter;
 		}
 
+		//Figure out how many animated tiles we will be painting a frame (evenly distribute the painting as much as possible)
 		for(short iAnimatedFrame = 0; iAnimatedFrame <= NUM_FRAMES_BETWEEN_TILE_ANIMATION; iAnimatedFrame++)
 			iAnimatedVectorIndices[iAnimatedFrame] = (iAnimatedFrame * iAnimatedTileCount) / NUM_FRAMES_BETWEEN_TILE_ANIMATION;
 	
+		//Draw all animated tiles to the front buffer
 		for(short iFrame = 0; iFrame < NUM_FRAMES_BETWEEN_TILE_ANIMATION; iFrame++)
 			AnimateTiles(iFrame);
 
+		//Setup the back buffer to draw animated tiles to each frame
+		//This is flipped every NUM_FRAMES_BETWEEN_TILE_ANIMATION to be the displayed surface
 		animatedFrontmapSurface = spr_frontmap[1 - g_iCurrentDrawIndex].getSurface();
 		animatedBackmapSurface = spr_backmap[1 - g_iCurrentDrawIndex].getSurface();
 
+		//Draw the first set of animated tiles to the back buffer
 		AnimateTiles(0);
 	}
 }
@@ -3161,6 +3279,7 @@ void CMap::update()
 	{
 		iTileAnimationTimer = 0;
 
+		//Flip front and back buffers
 		animatedFrontmapSurface = spr_frontmap[g_iCurrentDrawIndex].getSurface();
 		animatedBackmapSurface = spr_backmap[g_iCurrentDrawIndex].getSurface();
 
@@ -3170,6 +3289,7 @@ void CMap::update()
 			iTileAnimationFrame = 0;
 	}
 
+	//If there is at least 1 animated tile, then draw its animation
 	if(iAnimatedTileCount > 0)
 		AnimateTiles(iTileAnimationTimer);
 }

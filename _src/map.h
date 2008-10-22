@@ -110,6 +110,7 @@ struct AnimatedTile
 	SDL_Rect rDest;
 	bool fBackgroundAnimated;
 	bool fForegroundAnimated;
+	SDL_Surface * sPlatformSurface;
 };
 
 struct MapTile
@@ -300,6 +301,8 @@ class CMap
 		void drawThumbnailPlatforms(SDL_Surface * targetSurface);
 		void drawPreview(SDL_Surface * targetsurf, int layer, bool fThumbnail);
 		void drawPreviewBlocks(SDL_Surface * targetSurface, bool fThumbnail);
+
+		void addPlatformAnimatedTiles();
 
 		friend void drawmap(bool fScreenshot, short iBlockSize, bool fWithPlatforms);
 		friend void drawlayer(int layer, bool fUseCopied, short iBlocksize);

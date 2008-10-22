@@ -1410,23 +1410,27 @@ void CPlayer::move()
 
 		if(flying)
 		{
-			if(++flyingtimer > 200)
+			//If they player was frozen while flying, cause them to stop flying
+			//or if they have been flying for a while, stop them flying
+			if(frozen || ++flyingtimer > 200)
 			{
 				flyingtimer = 0;
 				flying = false;
-
+				
 				if(game_values.pwingslimit > 0)
 					DecreaseProjectileLimit();
 			}
-
-			if(playerKeys->game_down.fDown && vely < 1.0f)
+			else //otherwise allow them to rise and swoop while flying
 			{
-				vely += 1.0f;
-			}
-			else if(!playerKeys->game_down.fDown && vely > -1.0f)
-			{
-				vely -= 1.5f;
-				inair = true;
+				if(playerKeys->game_down.fDown && vely < 1.0f)
+				{
+					vely += 1.0f;
+				}
+				else if(!playerKeys->game_down.fDown && vely > -1.0f)
+				{
+					vely -= 1.5f;
+					inair = true;
+				}
 			}
 		}
 

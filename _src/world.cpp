@@ -1087,6 +1087,10 @@ bool WorldMap::Save(const char * szPath)
 
 		fprintf(file, "%c%d", cBonusType, iBonus);
 	}
+
+	if(iNumInitialBonuses == 0)
+		fprintf(file, "0");
+
 	fprintf(file, "\n");
 
 	fclose(file);

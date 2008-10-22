@@ -117,23 +117,10 @@ SHIP BETA
 
 
 Beta 1 Public Release Bugs
-[X] Update Readme with Links updates on desktop
-[X] Game crashes when you create a map with a tileset, then remove that tileset from your game and start up
-[X] Revert back to the classic skin palette from 1.7 AFE
-[X] Add in tileset expansion
-[X] Crashing world bug with !!!skyworld (on desktop) - when bots are playing, it crashes when they beat a world (some times it's the first, sometimes second or third they beat)
-[X] Apparently when you grab an item at the same time you die, it makes you spawn with that item in your hand. -> test with 1 frame advance on and pick up and item and press z in same frame, I tested this out and if you hold a shoe and jump on top of the spike, you spawn with the shoe on. The green and red spring however does the same thing like the spike does, spawning with the player in their hands. This only happens when it is the movable spike. It doesn't happen when it's the regular tile spikes.  Edit: But after you spawn with the shoe on and you do the "left/right" thing to get out of the shoe and your still holding it then you jump on a spike again, it is perfectly normal and doesn't spawn with you
-    -> repro case was when two spikes were overlapped and the player came in at an angle to die by hitting the spike, yet picking it up at the same time
-[X] Make toad in toad house use full 64 pixel tall sprites for gfx pack creators - right now it cuts off at toads actual height
 [ ] In the above picture, when I get killed on the spike but get the domination square below it, the square stays my color, even if I set it so that all my blocks go away when I die. All of my other ones turn neutral normally when I die like that. 
     -> made fix for this but need to test
-[X] When vehicle goes next to right edge on map, it crashes world -> Vehicle Edge Crash.txt ->  Also, I found another oddity- In my old temporary fix (using boundaries to prevent vehicles from moving to the edge), the Tank (Vehicle 3) went right onto a set Boundary. After that, the game crashed. I STILL believe it's trying to move to an invalid spot... Perhaps it's a bug with that boundary? Or the vehicle itself? I honestly have no clue.
-[X] I was playing Peardian's Island World map, and on one of the bonus pipe minigame stage on the island the game crashed. (Trying to be specific, not quite sure when in the game it crashed, but I just got the the generic "Supermariowar crashed lol" message from Windows)  Not sure what triggered it, but yeah, thought I'd mention that. -> ^ Turns out that I'm pretty sure it was triggered by that colourful star object (as seen in pipeminigamebonuses.png, very top). I've lost quite a bit of fun due to this, seeing as how this occured to me in two worlds so far, ..and rather large ones too fdsgs
-	-> made a fix, but couldn't repro in the first place so I don't know if it is really fixed
 [ ] Level editor crash when adding a new line segment platform, drawing only some solid on top tiles, then adjusting it's start and stop.  See video: http://www.youtube.com/watch?v=vXpnv8qpVDg
 	-> No repro
-[X] Can you keep ground pounding when continuously falling after the ground pound wears off -> fixed
-[X] Fatal tileset error:  For some reason, when you don't have a tileset, any map using said tileset will make the game crash. -> fixed
 [ ] Can run through walls that have 1 tile wide gaps : -> no repro, need map where this happened
 	  X
 	P X  -> run across 1 tile gap into and through wall
@@ -146,32 +133,16 @@ Beta 1 Public Release Bugs
 [ ] P-Wings, not sure if there's a bug, but I collected a lot of other items, and I couldn't get rid of the P-Wings. 
 	I kept activating the items I collected but I still had the P-Wings and didn't switch. 
 	The activation worked though, as the animation played and the activated items disappeared.
-[X] During respawn I sometimes was killed during invincible or sometimes even before I could do anything. I'm not sure what the cause was, it may have been an on/off switch block which was switched to "on" by the other player.
-	-> Intended gameplay
-[X] Tanooki Suit disables burnup death making it really cheap when you use it constantly while falling forever, as you're pretty much unstoppable. -> fixed
-[X] Somehow the water transitiony tiles in the SMB3 tileset were made slightly darker than their original colors. It shouldn't be too much trouble to recolor them to their correct color from their corresponding water tile.
 [ ] the preview of certain maps in the selection screen randomly drops certain tiles out and replaces them with a blank spot.
-[X] some bullet bill cannons got replaced by strange pixel-water tiles, like in GG_Submerged
 [ ] On/Off switches placed just beside a column of switch blocks: -> intended gameplay
 	When you jump into the on/off switch and are some pixels into the switch block column you'll die. 
 	It's really annoying since you often don't have the time to aim exactly.
 [ ] Game and world music packs on the menu have "game\" and "world\" in front of them (on xbox but see if same on PC)
     -> Fix in place, check on xbox
-[X] Default ttls on menu for gray and red throw blocks are unlimted
 [ ] Refreshing the map thumbnails hangs half way through on xbox (after icecap map)
     -> Fixed memory leak in thumbnail creation, retest on xbox
-[X] Remove Fire Temple map on Felix-The-Ghosts request
-[X] Take out monster truck skin requested by Felix
-[X] Add Water Kirby to thanks list
 [ ] Not really a bug, but in some gfx subdirectories of the 1.8 beta zip file you got hidden "Thumbs.db" files included.
-[X] Extra Time powerups don't make any sound when grabbed.
 [ ] Shelled enemies need to be flipped upside down when bumped from above instead of just acting like they were stomped.
-[X] Using a Jail Key makes the quiet fireball hitting sound... maybe it should be something louder. -> uses fireball sound when not opening a jail, but uses a transform sound when it does
-[X] The older announcers I used to use(unreal, the count, killer instinct, etc.) start out the level at like 
-	4-5 killing combo, I'll have to edit the text files to test, but weird anyways.
-    -> User complained that even updating the file caused it still to play the 4 kills in row after "Let's go": 
-	I decided to randomly create some sounds as announcers using the 1.8 text setting and every time it 
-	plays the 4 kills in the row everytime the match starts.
 [ ] This may have already been mentioned, but I was playing a timed match against three bots, 
 	and one of them had star invincibility at the time the clock ran out. The other two bots dropped off the stage 
 	instantly as the victory fanfare played, but this bot remained along with my character. In fact, after his star 
@@ -179,44 +150,56 @@ Beta 1 Public Release Bugs
 	-> No repro, but was it a tie game?  If so, the bot would have remained with you.
 [ ] While in a purple Kiriboe's Shoe, bots won't come after you. 
 [ ] Bots cannot use the Tanooki Suit.
-[ ] Also for the running over 1x1 gaps feature, it sometimes fails when running across a gap to a [?] block, 
-	but only sometimes; experiment with gaps and [?] blocks.
 [ ] In the Retro graphics pack, there are certain graphics that need updated, mainly the tournament board layout, and some other menu stuff, if I recall correctly.
     -> I meant that some of the stuff isn't set up like it needs to be. For example, the tournament board's layout is missing an entire section that was added in, making the World mode and Tour mode scoreboards fail to appear correctly, or at all for that matter.
 	-> yeah there wasnt that board thingy that shows the scores, all it shows is the scores and thats all. also in the editor, some times I cant make any blocks at all.
-[ ] It still says "2007" on that first splash screen that comes up.
-[ ] If a platform is non moving, but it's speed is greater than minimum, then standing on it causes undesired sprite animation.
-[ ] Player getting caught in a moving platform here: LKA_Turbulence.map
+
 [ ] Use smb3_extended1up.wav (on desktop) for 5up sound
-[ ] Add all maps into a single list for saving and loading for the level editor so you can access any map currently in smw
+[ ] Add all maps into a single list for saving and loading for the level editor so you can access any map currently in smw including special world only maps
 [ ] Don't know if it's already been said, but for some reason, no matter what I set the Glide setting to for Chicken mode in a Single Game, the Chicken can NEVER glide. I don't know if I'm doing anything wrong or what, but... It just won't work. Oddly enough, I believe I've seen it work in Tours/Worlds. O_o I know it works SOMEWHERE in the game...just not in the Single Game.
-[ ] The hazard kiling aura continues after leaving the map. I was playing Moby Dick and I spawned on the ship after the bullit bill fired and left the map, and as soon as the bullit bill would hit me if it continued, I died. This happened about 4 times! 
-	-> probably the bullet bill collision is wrapping to the other side and hitting him, lets see if this can be fixed
-	-> This also happens with bowser fires, and also when a bowser fire/bullet bill is entering the screen; it seems that the whole collision box wraps around to the other side and takes effect as soon as the sprite is loaded, and doesn't get deactivated until the sprite is completely off the screen.
-	-> Really annoying, as it causes a lot of "what hit me?" deaths. -_-
+
 [ ] Items and objects aren't destroyed when trapped in switch (on/off) blocks.
-[ ] Well, I decided to create a map with all animations in the background, to represent the sea. Trouble is, I acidentaly set all the animated parts to zero, and when I tried to put the blue parts underneth it went over the animations and over saved them. so i just put the blue parts  over the top of most of the animated tiles and eventually the tile just fell.  From this I also noticed that there is a limit to the amount of animations allowed on a map-is this a bug? -> Hitting the limit of animation blocks?
+	-> Fixed, but needs testing
+	-> Carried objects, held shells, over map objects, throw blocks, fireballs, players in area when switched
+	-> use 000000bleck2 map
+	-> holding an item like a spring in the air when killed by the on/off block, the item doesn't die if it is inside the block
+[ ] Killing players/enemies does not score player points when killed by turning an on/off block on
+[ ] Well, I decided to create a map with all animations in the background, to represent the sea. 
+	Trouble is, I acidentaly set all the animated parts to zero, and when I tried to put the blue parts underneth 
+	it went over the animations and over saved them. so i just put the blue parts  over the top of most of the 
+	animated tiles and eventually the tile just fell.  From this I also noticed that there is a limit to the 
+	amount of animations allowed on a map-is this a bug? -> Hitting the limit of animation blocks?
 [ ] Items get overlapped by platforms, no matter what layer they are.
+	-> No repro, verified powerup items appear over layer 1
 [ ] P-wing glitch: Get a p-wing, activate it, then hold down and right. You drop and move right with the wings still going. You don't move if you hold left.
-[ ] Uhh, not sure whether or not this is a glitch, but I hit the top of an item brick and I got a podoboo. No, not the item; a real, flashing orange podoboo jumped up from the block, killed me, and dropped off the bottom of the screen 0.o  Also, if a map doesn't work sometimes, such as crashes, it will work just fine if you play it under the "zzworldeditor" world 0.o
+    -> Intended gameplay
 [ ] also usually the game does a good job not spawning you inside a platform(killing you) but I lined the bottom of a map with death tiles and it started spawning inside the platform.  edit: also stomp mode has problems with spawning them inside platforms(specifically continuous), only they don't die and still animate-it looks weird.  I guess you have to take into account how much time is spent in the swirly spawn animation-an area can be empty initially, but occupied by the time the animation is done
 [ ] for the animated tiles, i tried to set it to solid for the waterfall tiles (as in the default tile type?), yet in game it does not work.
-[ ] Also, for whatever reason, said pipe minigame plays whatever music was last played. I don't know if this has anything to do with me using universal overrides on all the levels in the world containing the minigame. -> And an update on the pipe minigame bug, it only happens after playing on a level that has been affected by a musical override.
-[ ] I used to insert to take a screen of this world, but when I went to go scroll through it again, the tiny version appeared in the corner and started scrolling instead. Also, the tiny objects still have their purplish edges which still need to be fixed.
-[ ] Oh yeah, and the upside-down SMB3 lava is animated incorrectly. It should match that of the normal lava.
-[ ] New animated tiles: Ani tiles.zip
-[ ] If you pause the game while you're flying with the P-Wing, you can still hear the flying sound for a while. -> stop sound like skid/clock
-[ ] Also, though this is really kind of a silly thing, putting a warp on a level space causes the player to warp and activate the level at the same time. Would it be possible to have it so the warp doesn't go through until the level is beaten? Like an auto-warp for beating the level.
+	-> No repro, setting default tile types for animated tiles works fine -> though, it doesn't affect maps that have already been created before the change (maybe some confusion here)
 [ ] Player spawn zones are ignored in SpawnZonesIgnored.map on desktop
+	-> No repro, spawn zones work fine on this map
+	-> It is actually a no spawn zone feature.  Spawn zones are still calculated by making sure a player has something hard to land on, not death tiles
+	-> We probably need to do a little better job when no hard areas are defined to choose a good place
 [ ] Falling donut blocks turn into castle pieces in SMWarld mod (on desktop) -> ask Mr Mister it is his mod
-[ ] Rename eeliot_Not so cave to eeliottheking_not so cave
-[ ] Idea: Make the "someone's about to win" jingle happen on the last lap instead of two laps before the win. That would make it more in line with the Mario Kart esc. feel of the mode (that's what I'm guessing the mode is based off of).
-[ ] The Bob-Omb's standing and turning pose are med-res. Look near the wind-up key.
-[ ] The World Editor has a habit of deleting the "#Initial Items" line if you change the line from the initial entry ("p1"). I know 4matsy mentioned this in my "OMG HALP!" thread. x: -> reports are that if you have no initial items, it should be "0", but the world editor will not put the "0" there when it saves.
+	-> The donut block from the standard tileset needs to be a "falling donut block" tile
 [ ] play world mode with the random skins, the change every time you enter a level; they suddenly change on the world map.  For random skins it should unrandomize them after the world starts. -> They should switch every time you start a game.
+	-> It looks a little weird, but it is acceptable and not worth the work to fix it (changing to a random skin happens deep inside the gamestart() code)
 [ ] Update the Tanooki statues to be proportionally sized to players
-[ ] if youre gliding with a pwing and get frozen, you can still fly up.
-[ ] If you use a announcer with a 4 kills in row sound, this sound is played at the begin of every match, without any reason.
+[ ] Animated tiles in platforms
+
+[X] Also for the running over 1x1 gaps feature, it sometimes fails when running across a gap to a [?] block
+[X] Player getting caught in a moving platform here: LKA_Turbulence.map
+[X] The hazard kiling aura continues after leaving the map. I was playing Moby Dick and I spawned on the ship after the bullit bill fired and left the map, and as soon as the bullit bill would hit me if it continued, I died. This happened about 4 times! 
+[X] Added animated tiles to platforms
+[X] Collection card does not make noise when you collect it
+[X] Also, for whatever reason, said pipe minigame plays whatever music was last played. I don't know if this has anything to do with me using universal overrides on all the levels in the world containing the minigame. -> And an update on the pipe minigame bug, it only happens after playing on a level that has been affected by a musical override.
+[X] I used to insert to take a screen of this world, but when I went to go scroll through it again, the tiny version appeared in the corner and started scrolling instead. Also, the tiny objects still have their purplish edges which still need to be fixed.
+[X] Oh yeah, and the upside-down SMB3 lava is animated incorrectly. It should match that of the normal lava.
+[X] If you pause the game while you're flying with the P-Wing, you can still hear the flying sound for a while. -> stop sound like skid/clock
+[X] Putting a warp on a level space causes the player to warp and activate the level at the same time. 
+[X] The Bob-Omb's standing and turning pose are med-res. Look near the wind-up key.
+[X] The World Editor has a habit of deleting the "#Initial Items" line if you change the line from the initial entry ("p1"). I know 4matsy mentioned this in my "OMG HALP!" thread. x: -> reports are that if you have no initial items, it should be "0", but the world editor will not put the "0" there when it saves.
+[X] if youre gliding with a pwing and get frozen, you can still fly up.
 
 Beta 1 Public Release Feature Requests
 [ ] Maybe the three waterfalls on the Classic tileset could animate differently
@@ -234,7 +217,6 @@ Beta 1 Public Release Feature Requests
 [ ] Save map with Shift + s in level AND world editor and display on screen that the map was saved
 [ ] Though the universal Overrides thing has Map-specific and World-specific overrides, it lacks Background-specific overrides.
 [ ] Volume control for individual tunes in music packs. Just changing a number in the text file would be a lot less trouble than having to edit the music files themselves.
-[ ] Animated tiles in platforms
 [ ] It'd be nice to have a way to adjust world size in the world editor. It'd suck to find out you made the world a block or two too small, and end up having to redo it all on a new map.
 [ ] Bombs setting off other bombs (chain reaction) and bombs destroying breakable blocks
 [ ] Escape in level editor will ask you if you want to close before doing it
@@ -2456,6 +2438,10 @@ void RunGame()
 						{
 							menu_shade.setalpha(GetScreenBackgroundFade());
 							menu_shade.draw(0, 0);
+
+							//Stop the pwings sound if it is on
+							if(sfx_flyingsound.isplaying())
+								ifsoundonstop(sfx_flyingsound);
 						}
 
 						//ifsoundonpause(sfx_invinciblemusic);
@@ -3709,27 +3695,17 @@ void PlayNextMusicTrack()
 bool coldec_player2player(CPlayer * o1, CPlayer * o2)
 {
 	//Special cases to deal with players overlapping the right and left sides of the screen
-
 	if(o1->ix + PW < o2->ix)
 	{
-		if (o1->ix + 640 >= o2->ix + PW || o1->ix + PW + 640 < o2->ix || o1->iy > o2->iy + PH || o1->iy + PH < o2->iy) 
-			return false;
-		else 
-			return true;
+		return o1->ix + 640 < o2->ix + PW && o1->ix + PW + 640 >= o2->ix && o1->iy <= o2->iy + PH && o1->iy + PH >= o2->iy;
 	}
 	else if(o2->ix + PW < o1->ix)
 	{
-		if (o1->ix >= o2->ix + PW + 640 || o1->ix + PW < o2->ix + 640 || o1->iy > o2->iy + PH || o1->iy + PH < o2->iy) 
-			return false;
-		else 
-			return true;
+		return o1->ix < o2->ix + PW + 640 && o1->ix + PW >= o2->ix + 640 && o1->iy <= o2->iy + PH && o1->iy + PH >= o2->iy;
 	}
 	else  //Normal case where no overlap
 	{
-		if (o1->ix >= o2->ix + PW || o1->ix + PW < o2->ix || o1->iy > o2->iy + PH || o1->iy + PH < o2->iy) 
-			return false;
-		else 
-			return true;
+		return o1->ix < o2->ix + PW && o1->ix + PW >= o2->ix && o1->iy <= o2->iy + PH && o1->iy + PH >= o2->iy;
 	}
 }
 
@@ -3738,24 +3714,15 @@ bool coldec_player2obj(CPlayer * o1, CObject * o2)
 	//Special cases to deal with players overlapping the right and left sides of the screen
 	if(o1->ix + PW < o2->ix)
 	{
-		if (o1->ix + 640 >= o2->ix + o2->collisionWidth || o1->ix + PW + 640 < o2->ix || o1->iy >= o2->iy + o2->collisionHeight || o1->iy + PH < o2->iy) 
-			return false;
-		else 
-			return true;
+		return o1->ix + 640 < o2->ix + o2->collisionWidth && o1->ix + PW + 640 >= o2->ix && o1->iy < o2->iy + o2->collisionHeight && o1->iy + PH >= o2->iy;
 	}
 	else if(o2->ix + o2->collisionWidth < o1->ix)
 	{
-		if (o1->ix >= o2->ix + o2->collisionWidth + 640 || o1->ix + PW < o2->ix + 640 || o1->iy >= o2->iy + o2->collisionHeight || o1->iy + PH < o2->iy) 
-			return false;
-		else 
-			return true;
+		return o1->ix < o2->ix + o2->collisionWidth + 640 && o1->ix + PW >= o2->ix + 640 && o1->iy < o2->iy + o2->collisionHeight && o1->iy + PH >= o2->iy; 
 	}
 	else //Normal case where no overlap
 	{
-		if (o1->ix >= o2->ix + o2->collisionWidth || o2->ix > o1->ix + PW || o1->iy >= o2->iy + o2->collisionHeight || o2->iy > o1->iy + PH) 
-			return false;
-		else 
-			return true;
+		return o1->ix < o2->ix + o2->collisionWidth && o1->ix + PW >= o2->ix && o1->iy < o2->iy + o2->collisionHeight && o2->iy <= o1->iy + PH;
 	}
 }
 
@@ -3769,24 +3736,15 @@ bool coldec_obj2obj(CObject * o1, CObject * o2)
 
 	if(o1r < o2->ix)
 	{
-		if (o1->ix + 640 >= o2r || o1r + 640 < o2->ix || o1->iy >= o2b || o1b < o2->iy) 
-			return false;
-		else 
-			return true;
+		return o1->ix + 640 < o2r && o1r + 640 >= o2->ix && o1->iy < o2b && o1b >= o2->iy;
 	}
 	else if(o2r < o1->ix)
 	{
-		if (o1->ix >= o2r + 640 || o1r < o2->ix + 640 || o1->iy >= o2b || o1b < o2->iy)
-			return false;
-		else 
-			return true;
+		return o1->ix < o2r + 640 && o1r >= o2->ix + 640 && o1->iy < o2b && o1b >= o2->iy;
 	}
 	else
 	{
-		if (o1->ix >= o2r || o2->ix > o1r || o1->iy >= o2b || o2->iy > o1b) 
-			return false;
-		else 
-			return true;
+		return o1->ix < o2r && o1r >= o2->ix && o1->iy < o2b && o1b >= o2->iy;
 	}
 }
 

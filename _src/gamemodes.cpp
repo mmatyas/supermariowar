@@ -2927,7 +2927,7 @@ void CGM_Collection::think()
 		if(5 < iPowerupQuantity)
 			iPowerupQuantity = list_players_cnt + iPowerupQuantity - 7;
 
-		if(objectcontainer[1].countTypes(object_collectioncard) < iPowerupQuantity)
+		if(objectcontainer[1].countMovingTypes(movingobject_collectioncard) < iPowerupQuantity)
 		{
 			objectcontainer[1].add(new MO_CollectionCard(&spr_collectcards, 0, rand() % 3, 0, 0.0f, 0.0f, 0, 0));
 		}
@@ -3486,7 +3486,6 @@ void CGM_Pipe_MiniGame::think()
 				iNextItemTimer = rand() % 20 + 25;
 
 			short iRandPowerup = rand() % 50;
-			iRandPowerup = 0;
 			if(iBonusType == 0 && iRandPowerup < 5) //bonuses
 			{
 				objectcontainer[1].add(new OMO_PipeBonus(&spr_pipegamebonus, (float)((rand() % 21) - 10) / 2.0f, -((float)(rand() % 11) / 2.0f + 7.0f), 304, 256, iRandPowerup, 620, 15));

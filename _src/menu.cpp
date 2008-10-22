@@ -53,6 +53,8 @@ extern TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWo
 
 extern CScore *score[4];
 
+extern std::string stripPathAndExtension(const std::string &path);
+
 void Menu::WriteGameOptions()
 {
 	FILE * fp = OpenFile("options.bin", "wb");
@@ -188,7 +190,7 @@ void Menu::CreateMenu()
 
 	miSMWTitle = new MI_Image(&menu_smw, 320 - ((short)menu_smw.getWidth() >> 1), 30, 0, 0, 372, 140, 1, 1, 0);
 	miSMWVersion = new MI_Image(&menu_version, 570, 10, 0, 0, 58, 32, 1, 1, 0);
-	miSMWVersionText = new MI_Text("Beta 1", 630, 45, 0, 2, 2);
+	miSMWVersionText = new MI_Text("Beta 2", 630, 45, 0, 2, 2);
 	
 	miMainStartButton = new MI_Button(&spr_selectfield, 120, 210, "Start", 310, 0);
 	miMainStartButton->SetCode(MENU_CODE_TO_MATCH_SELECTION_MENU);
@@ -4285,18 +4287,23 @@ void Menu::RunMenu()
 				}
 				else
 				{
+					std::string sShortMapName = "";
 					if(game_values.gamemode->gamemode == game_mode_pipe_minigame)
 					{
 						g_map.loadMap(convertPath("maps/special/minigamepipe.map"), read_type_full);
+						sShortMapName = "minigamepipe";
 					}
 					else if(game_values.matchtype == MATCH_TYPE_QUICK_GAME)
 					{
 						//Load a random map for the quick game
-						g_map.loadMap(maplist.randomFilename(), read_type_full);
+						const char * szMapName = maplist.randomFilename();
+						g_map.loadMap(szMapName, read_type_full);
+						sShortMapName = stripPathAndExtension(szMapName);
 					}
 					else
 					{
 						g_map.loadMap(maplist.currentFilename(), read_type_full);
+						sShortMapName = maplist.currentShortmapname();
 					}
 
 					LoadCurrentMapBackground();
@@ -4306,7 +4313,7 @@ void Menu::RunMenu()
 
 					if(game_values.music)
 					{
-						musiclist.SetRandomMusic(g_map.musicCategoryID, maplist.currentShortmapname(), g_map.szBackgroundFile);
+						musiclist.SetRandomMusic(g_map.musicCategoryID, sShortMapName.c_str(), g_map.szBackgroundFile);
 						backgroundmusic[0].load(musiclist.GetCurrentMusic());
 						backgroundmusic[0].play(game_values.playnextmusic, false);
 					}

@@ -365,11 +365,13 @@ MovingPlatform::MovingPlatform(TilesetTile ** tiledata, MapTile ** tiletypes, sh
 
 	sSurface = SDL_CreateRGBSurface(screen->flags, w * iTileSize, h * iTileSize, screen->format->BitsPerPixel, 0, 0, 0, 0);
 
-	if( SDL_SetColorKey(sSurface, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(sSurface->format, 255, 0, 255)) < 0)
+	if( SDL_SetColorKey(sSurface, SDL_SRCCOLORKEY, SDL_MapRGB(sSurface->format, 255, 0, 255)) < 0)
 		printf("\n ERROR: Couldn't set ColorKey for moving platform: %s\n", SDL_GetError());
 
 	SDL_FillRect(sSurface, NULL, SDL_MapRGB(sSurface->format, 255, 0, 255));
 
+	//Run through all tiles in the platform, detect unknown and blank tiles,
+	//and draw all static tiles to the platform surface
 	for(short iCol = 0; iCol < iTileWidth; iCol++)
 	{
 		for(short iRow = 0; iRow < iTileHeight; iRow++)
@@ -383,6 +385,10 @@ MovingPlatform::MovingPlatform(TilesetTile ** tiledata, MapTile ** tiletypes, sh
 			{
 				g_tilesetmanager.Draw(sSurface, tile->iID, iTileSizeIndex, tile->iCol, tile->iRow, iCol, iRow);
 				//SDL_BlitSurface(g_tilesetmanager.GetTileset(tile->iID)->getsur, &g_tilesetmanager.rRects[iTileSizeIndex][tile->iCol][tile->iRow], sSurface, &rDstRect);
+			}
+			else if(tile->iID == TILESETANIMATED)
+			{
+				SDL_BlitSurface(spr_tileanimation[iTileSizeIndex].getSurface(), &g_tilesetmanager.rRects[iTileSizeIndex][tile->iCol << 2][tile->iRow], sSurface, &g_tilesetmanager.rRects[iTileSizeIndex][iCol][iRow]);
 			}
 			else if(tile->iID == TILESETUNKNOWN)
 			{
@@ -829,7 +835,7 @@ void MovingPlatform::collide(CPlayer * player)
 			if(fRelativeX2 >= 0.0f && fRelativeX2 < iWidth)
 				t2 = iTileType[(short)fRelativeX2 / TILESIZE][ty].iFlags;
 
-			bool fSolidTileOverPlayer = (t1 & tile_flag_solid) || (t1 & tile_flag_solid);
+			bool fSolidTileOverPlayer = (t1 & tile_flag_solid) || (t2 & tile_flag_solid);
 
 			bool fDeathTileOverPlayer = ((t1 & tile_flag_death_on_bottom) && (t2 & tile_flag_death_on_bottom)) ||
 									 ((t1 & tile_flag_death_on_bottom) && !(t2 & tile_flag_solid)) ||

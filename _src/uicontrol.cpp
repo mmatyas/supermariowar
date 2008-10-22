@@ -6345,15 +6345,6 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 						return InitGame(iStage, iPlayer, fNeedAiControl);
 					}
 
-					if(g_worldmap.GetWarpInPlayerTile(&iWarpCol, &iWarpRow))
-					{
-						iState = 4;
-						iScreenfade = 0;
-						iScreenfadeRate = 8;
-
-						ifsoundonplay(sfx_pipe);
-					}
-
 					//if it is a stage, then load the stage
 					WorldMapTile * tile = &g_worldmap.tiles[iPlayerCurrentTileX][iPlayerCurrentTileY];
 
@@ -6361,6 +6352,15 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 					if(iType >= 0 && iType < g_worldmap.iNumStages && tile->iCompleted == -2)
 					{
 						return InitGame(iType, iPlayer, fNeedAiControl);
+					}
+
+					if(g_worldmap.GetWarpInPlayerTile(&iWarpCol, &iWarpRow))
+					{
+						iState = 4;
+						iScreenfade = 0;
+						iScreenfadeRate = 8;
+
+						ifsoundonplay(sfx_pipe);
 					}
 				}
 			}
