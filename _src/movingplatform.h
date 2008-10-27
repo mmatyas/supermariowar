@@ -167,7 +167,7 @@ class MovingPlatform
 		short iSteps;
 		short iOnStep;
 
-		SDL_Surface	* sSurface;
+		SDL_Surface	* sSurface[2];
 
 		SDL_Rect	rSrcRect;
 		SDL_Rect    rDstRect;

@@ -2345,9 +2345,9 @@ void CMap::AnimateTiles(short iFrame)
 			SDL_BlitSurface(animatedTilesSurface, &(tile->rAnimationSrc[1][iTileAnimationFrame]), animatedFrontmapSurface, rDst);
 		}
 
-		if(tile->sPlatformSurface)
+		if(tile->pPlatform)
 		{
-			SDL_BlitSurface(animatedTilesSurface, &(tile->rAnimationSrc[0][iTileAnimationFrame]), tile->sPlatformSurface, rDst);
+			SDL_BlitSurface(animatedTilesSurface, &(tile->rAnimationSrc[0][iTileAnimationFrame]), tile->pPlatform->sSurface[g_iCurrentDrawIndex], rDst);
 		}
 	}
 }
@@ -2403,7 +2403,7 @@ void CMap::draw(SDL_Surface *targetSurface, int layer)
 					
 					animatedtile->fBackgroundAnimated = false;
 					animatedtile->fForegroundAnimated = false;
-					animatedtile->sPlatformSurface = NULL;
+					animatedtile->pPlatform = NULL;
 
 					for(short iLayer = 0; iLayer < 4; iLayer++)
 					{
@@ -2478,7 +2478,7 @@ void CMap::addPlatformAnimatedTiles()
 					
 					animatedtile->fBackgroundAnimated = false;
 					animatedtile->fForegroundAnimated = false;
-					animatedtile->sPlatformSurface = platform->sSurface;
+					animatedtile->pPlatform = platform;
 
 					TilesetTile * tile = &tiles[iCol][iRow];
 					TilesetTile * toTile = &animatedtile->layers[0];
@@ -2974,7 +2974,7 @@ void CMap::SetupAnimatedTiles()
 				break;
 			}
 			
-			if(tile->sPlatformSurface)
+			if(tile->pPlatform)
 			{
 				for(short iTileAnimationFrame = 0; iTileAnimationFrame < 4; iTileAnimationFrame++)
 				{
@@ -3016,7 +3016,7 @@ void CMap::SetupAnimatedTiles()
 
 			tile->fBackgroundAnimated = false;
 			tile->fForegroundAnimated = false;
-			tile->sPlatformSurface = NULL;
+			tile->pPlatform = NULL;
 
 			++iter;
 		}

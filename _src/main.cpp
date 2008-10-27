@@ -46,77 +46,26 @@ BUG!!  World AI needs ability to use stored items -> harder problem than I have 
 [ ] Mariokart-type podium at the end of a tournament/tour/whatever
 
 
-SHIP BETA
-[X] Get some good maps using 1.8 features
-[X] Get some good worlds
-[X] Prune old maps
-[ ] Improve tilesets?
-[X] Get SMB3's world working
+STUFF TO WATCH OUT FOR IN BETA2
+- animated tiles in platforms
+- collision detection and behavior of coins, ztar, collection cards
+
+
 [ ] Test controllers on xbox where different tournament control settings are used
 	- Test all control cases with teams/bots keyboard/controllers menu/sub menus/bonus wheel/scoreboard and ties for winner/loser tournament ties etc.
-[X] Go through all maps and replace lava tile types with super death
-[X] Add more special directory handling for world maps so that each world can have it's own map directory
-[X] Change "worldtour" maps directory to just "tour" or "tourmaps"
-[X] move 00small.txt and 0smw.txt to world test directory
-[X] Test new shell bounce (doesn't bounce for hopping, but does for tail hitting, bottom bouncing and pow/mod)
-
-
 [ ] Treasure chests from winning a stage that rewards an item in world mode can be spawned in areas where they fall forever, and can never be opened. (Though this is aesthetic)
 [ ] Flame hazards in maps that crossed over from the pre-beta to beta are reversed and move over a few tiles.
-[ ] Weird sound problems with the world music.
-
-[X] Make the world preview scroll as fast as there are number of tiles needed to scroll (i.e. smaller maps will scroll slower than larger maps) Have it cap at a slowest rate or fastest rate.
-[X] Ability to say whether eyecandy appears behind everything or in front of everything
-[X] The switch bug is still there.(The one where if you click the on switch in the level editor, and place it down, you place the off switch.)
-[X] Worlds should have the names removed like maps.(Two52_World should become World.)
-[X] The propeller animation tiles don't line up with the sideways screw tiles from the airship tileset, which is rather important.
-[X] Animated tiles don't set tile types.
-[X] Platform layer 1 goes behind layer 0 tiles in the editor, but in front of them in game
-[X] Fixed default tiletype of the super mario world lava tiles
-[X] Key won't open a door when a different color door is also touching the player
-[X] On world map when moving left it displays a little black bar then updates screen
-[X] Adding 20 pirhana plants to the top of a map causes the preview screenshot to not look so good.  Maybe it is any screenshot using pirhana plants?
-[X] If you do a statue stomp, and you press the jump button just as you land, you will jump.
-[X] If you become a statue while flying with a p-wing, the flying sound will continue to play. Actually, you can fly with the P Wing as a statue, too... it's kinda funny to see, honestly.
-[X] When you do a statue stomp with a cape or leaf, and press jump before you land, you will continue to fall slowly with the leaf, or will do an extra jump with the cape.
-[X] The Weapon Use Limit for the Feather and Leaf are apparently messed up a bit. When you use a stored Feather or Leaf, it disappears on the first use, and you can't spin with it either.
-[X] Also, running out the limit on the Tanooki powerup doesn't make the powerdown sound.
-[X] 1ups in KotH are too powerful -> halved score awarded
-
-[X] Carried objects can be dropped inside moving platforms solid tiles - kicked seems to work fine, but dropping just sticks the map object straight into the solid tile
-[X] Need to play powerdown sound on frag/timed/classic when shield death is on
-
-[X] When a shell kills a player frozen from the wand(Or a block, cape spin, and maybe a lot of other things.), the break sound doesn't play.
-[X] Top two rows of screensized worlds not animating
-[X] Missing blocks bug back - updated checks in the map loader to make sure tile row/cols are inside the tileset sizes
-[X] Added mode announcement option to all match types (nice to remind all players what mode was chosen)
-[X] Added mode gfx for pipe minigame
-
-[X] The world turn does not advance after visiting a bonus house
-[X] Updated Mr Mister's maps
-[X] Fixed star transfer when players were invincible
-[X] Fixed egg thrown into powerup blocks triggering them
-[X] When you made items play the bump sound, you forgot to change the flags in capture the flag mode.
-
-[ ] AI should stop collecting cards if their bank is full (unless maybe they see a better card)
-
-[ ] An idea for another tile type. Basically, instant-death, but not solid. So, touching it would kill you like lava, but fireballs, shells, etc. could pass through unharmed. The tile type image in the editor could be a purple version of the skull one. 
-
-[X] Make toad in toad house use full 64 pixel tall sprites for gfx pack creators
-[X] When vehicle goes next to right edge on map, it crashes world
-[X] Multicolored powerup in pipeminigame can cause crash
-[X] Can you keep ground pounding when continuously falling after the ground pound wears off
-[X] Fatal tileset error:  For some reason, when you don't have a tileset, any map using said tileset will make the game crash.
-[X] Tanooki Suit disables burnup death making it really cheap when you use it constantly while falling forever, as you're pretty much unstoppable.
-[X] Somehow the water transitiony tiles in the SMB3 tileset were made slightly darker than their original colors. 
-[X] Fix GG_Submerged map to use bulletbill tiles instead of new water transition tiles
-[X] Default ttls on menu for gray and red throw blocks are unlimted
-[X] Add Water Kirby to thanks list
-[X] Extra Time powerups don't make any sound when grabbed.
-[X] The older announcers I used to use(unreal, the count, killer instinct, etc.) start out the level at like 
 
 
 Beta 1 Public Release Bugs
+[ ] In the Retro graphics pack, there are certain graphics that need updated, mainly the tournament board layout, and some other menu stuff, if I recall correctly.
+    -> I meant that some of the stuff isn't set up like it needs to be. For example, the tournament board's layout is missing an entire section that was added in, making the World mode and Tour mode scoreboards fail to appear correctly, or at all for that matter.
+	-> yeah there wasnt that board thingy that shows the scores, all it shows is the scores and thats all. also in the editor, some times I cant make any blocks at all.
+
+[ ] Setting P1's menu controls select and cancel to any letter keys will make it to where you cannot change the playable map, as the map search funtion takes presidence(sp?) over menu controls.
+[ ] Weird sound problems with the world music.
+	-> no repro
+[ ] AI should stop collecting cards if their bank is full (unless maybe they see a better card)
 [ ] In the above picture, when I get killed on the spike but get the domination square below it, the square stays my color, even if I set it so that all my blocks go away when I die. All of my other ones turn neutral normally when I die like that. 
     -> made fix for this but need to test
 [ ] Level editor crash when adding a new line segment platform, drawing only some solid on top tiles, then adjusting it's start and stop.  See video: http://www.youtube.com/watch?v=vXpnv8qpVDg
@@ -150,12 +99,7 @@ Beta 1 Public Release Bugs
 	-> No repro, but was it a tie game?  If so, the bot would have remained with you.
 [ ] While in a purple Kiriboe's Shoe, bots won't come after you. 
 [ ] Bots cannot use the Tanooki Suit.
-[ ] In the Retro graphics pack, there are certain graphics that need updated, mainly the tournament board layout, and some other menu stuff, if I recall correctly.
-    -> I meant that some of the stuff isn't set up like it needs to be. For example, the tournament board's layout is missing an entire section that was added in, making the World mode and Tour mode scoreboards fail to appear correctly, or at all for that matter.
-	-> yeah there wasnt that board thingy that shows the scores, all it shows is the scores and thats all. also in the editor, some times I cant make any blocks at all.
 
-[ ] Use smb3_extended1up.wav (on desktop) for 5up sound
-[ ] Add all maps into a single list for saving and loading for the level editor so you can access any map currently in smw including special world only maps
 [ ] Don't know if it's already been said, but for some reason, no matter what I set the Glide setting to for Chicken mode in a Single Game, the Chicken can NEVER glide. I don't know if I'm doing anything wrong or what, but... It just won't work. Oddly enough, I believe I've seen it work in Tours/Worlds. O_o I know it works SOMEWHERE in the game...just not in the Single Game.
 
 [ ] Items and objects aren't destroyed when trapped in switch (on/off) blocks.
@@ -163,6 +107,7 @@ Beta 1 Public Release Bugs
 	-> Carried objects, held shells, over map objects, throw blocks, fireballs, players in area when switched
 	-> use 000000bleck2 map
 	-> holding an item like a spring in the air when killed by the on/off block, the item doesn't die if it is inside the block
+
 [ ] Killing players/enemies does not score player points when killed by turning an on/off block on
 [ ] Well, I decided to create a map with all animations in the background, to represent the sea. 
 	Trouble is, I acidentaly set all the animated parts to zero, and when I tried to put the blue parts underneth 
@@ -171,8 +116,6 @@ Beta 1 Public Release Bugs
 	amount of animations allowed on a map-is this a bug? -> Hitting the limit of animation blocks?
 [ ] Items get overlapped by platforms, no matter what layer they are.
 	-> No repro, verified powerup items appear over layer 1
-[ ] P-wing glitch: Get a p-wing, activate it, then hold down and right. You drop and move right with the wings still going. You don't move if you hold left.
-    -> Intended gameplay
 [ ] also usually the game does a good job not spawning you inside a platform(killing you) but I lined the bottom of a map with death tiles and it started spawning inside the platform.  edit: also stomp mode has problems with spawning them inside platforms(specifically continuous), only they don't die and still animate-it looks weird.  I guess you have to take into account how much time is spent in the swirly spawn animation-an area can be empty initially, but occupied by the time the animation is done
 [ ] for the animated tiles, i tried to set it to solid for the waterfall tiles (as in the default tile type?), yet in game it does not work.
 	-> No repro, setting default tile types for animated tiles works fine -> though, it doesn't affect maps that have already been created before the change (maybe some confusion here)
@@ -186,6 +129,29 @@ Beta 1 Public Release Bugs
 	-> It looks a little weird, but it is acceptable and not worth the work to fix it (changing to a random skin happens deep inside the gamestart() code)
 [ ] Update the Tanooki statues to be proportionally sized to players
 [ ] Animated tiles in platforms
+	-> Still need to double buffer drawing to platforms
+[ ] Write release script that cleans up smw directory automatically so we don't forget to remove things like .svn or thumbs.db
+		all .svn directories everywhere
+		all thumbs.db files everywhere
+		leveleditor.bin
+		options.bin
+		*.exp
+		*.lib
+		Makefile
+		configure
+		DOES_WORK
+		smw_icon.res
+		zzz_test dir
+		_src dir
+		debian dir
+		macosx dir
+		Projects dir
+		Scripts dir
+		maps/ZZleveleditor.map
+		maps/test
+		maps/moved
+		everything in maps/cache (except mapsummary.txt)
+		everything in maps/screenshots (except readme.txt)
 
 [X] Also for the running over 1x1 gaps feature, it sometimes fails when running across a gap to a [?] block
 [X] Player getting caught in a moving platform here: LKA_Turbulence.map
@@ -202,6 +168,7 @@ Beta 1 Public Release Bugs
 [X] if youre gliding with a pwing and get frozen, you can still fly up.
 
 Beta 1 Public Release Feature Requests
+[ ] Use smb3_extended1up.wav (on desktop) for 5up sound
 [ ] Maybe the three waterfalls on the Classic tileset could animate differently
 [ ] Is there any way you could re-add that functionality to the game (maybe with a toggle to turn the secrets on or off) before the final release? You don't have to bring all of them back, but I really miss the super fireball, triple hammer, kaboomerang, extended POW and MOD blocks, super shell kick, and homing Bullet Bills.
 [ ] I think there should be a way to agree on a draw in world mode and thus skip a level. In one world there was a capture-the-flag level where you could only score with the flag in your own base, without touch return and a high auto-return time. We only were two players (human) and ended up carrying each others flag all the time and couldn't score. To bring back your own flag you had to drop the enemy flag, so stomping didn't help either. It's a bit unfair if one player has to intentionally lose just so the game can go on  (Unfair in the sense of world score, probably same for tournament I guess) Maybe just add an option for "draw" or "skip level" to the exit menu?
@@ -237,6 +204,7 @@ Beta 1 Public Release Feature Requests
 [ ] Hazard deaths only option in the classic mode
 [ ] Death Blocks that items/etc. go through, but players don't.
 [ ] Switch that turns off and on certain movements of some hazards[like Fire-Bars, Roto-disks, and Piranha-plants]
+[ ] An idea for another tile type. Basically, instant-death, but not solid. So, touching it would kill you like lava, but fireballs, shells, etc. could pass through unharmed. The tile type image in the editor could be a purple version of the skull one. 
 
 Feature Requests
 
@@ -296,56 +264,6 @@ Feature Requests
 
 
 BUGS:
-[X] Stomp - The podobo powerup has no effect on Spinies or Buzzy Beetles. 
-[X] I thought that flipping active Koopas, Spinies, and Buzzy Beetles would render them upside down shells, not kill them.
-[X] Awards - When acquiring an Ice Wand kill in a string of multikills, the graphic used is the blue fire instead of the wand.
-[X] Not really a bug, but more of a minor suggestion. Stomping enemies with the Kuribo's Shoe should instantly kill them, using the deadflying graphic, and they should all have that little bit of bounce you get from stomping Koopas and Goombas... that, and stomping the Spiny kills it, but you go right through it, making no sound.
-[X] Fixed buzzy and spiny shells that come from enemies would fall through solid-on-top blocks after stomping them
-[X] Not sure if you're planning something for them or not, but the spawneggs seem to be replaced by the egg and eggnumber graphics, so they're unused
-[X] Make the extra time clock give you a percentage of the starting time back instead of a constant 30 -> 30 is too much for some start times and not enough for others
-[X] This was a pretty tricky bug to catch: The world editor will snip off the third mode option of Star mode in the world's text file, which is supposed to stand for the percentage of the extra time item appearing. 
-[X] I found a really quirky bug. If you do a timed match and get extra time after the match has ended (on the winner screen while the player can still move around) then the time goes back up without any other noticable changes...when it runs out, the winner theme plays again.
-[X] Oh, and cape/tail swiping should only make flip blocks start flipping, not break them altogether.
-[X] A sound should play when you collect a heart powerup.
-[X] Another bug: Spikes only deduct a single health point in health mode but force a respawn like you've died anyhow. Should they just shield you like normal hits or deduct a whole life altogether? (Speaking of which, death tiles and the ice wand probably have the same bug...)
-[X] The rope/ring attachment tile still needs to be fixed
-
-[X] In animated tile mode, sometimes clicking on the animated tiles causes the red selector to appear in the wrong place or not show up at all
-[X] Also, I've only had one instance so far where the game has actually crashed. Problem fixed with GetCollisionBlocks()
-[X] Level Editor bug: When you first use the animated tile mode and select animated tiles, the red tint tiles get when selecting multiple tiles appears at first, but this feature eventually disappears. Not sure what causes it to go away yet.
-[x] Found a new bug, when you use the tanuki suit power in mid-air with nothing blocking your way you will constantly loop and there is no way to deactivate the power so you fall forever until something gets in your way.
-[X] the super stomp kills arial or dropping down enemies one tile above you. I noticed that when an enemie tried to squish me while i did the super stomp with the kuribo shoe. the enemie just died one tile above me. -> somewhat intended, made the attack zone a little smaller
-[X] It appears that computers don't know that the key would be considered instant use when they are jailed.
-[X] Killing a piranha plant doesn't make the usual death sound.
-[X] Anyway, in the world editor, the Auto Draw feature for the path tool works fine in empty spaces, but it has the annoying tendancy to try to connect to every little object it gets near. This is probably because forts and castles are in the same category as dancing hills and rocks. I had to manually make each and every path in the SMB3 worlds I created simply because the Auto Draw kept trying to link my path to every little hill and tree it passed.
-[X] The reward treasure chest spawned over a pit of boiling lava and vaporised. Considering the chest was supposed to hold a key, I panicked a bit until I saw that the victory screen gave me the key regardless. Still, the treasure chest should be made to spawn only in player-safe areas.
-[X] When the bonus wheel is set to every game, and you play a single match, it takes you to the main menu after the wheel spins, instead of the level/mode select menu.
-[X] Bots should stop the bonus wheel at random.
-[X] If you throw hammers onto the bottom right corner of certain maps, the game will crash.
-[X] World Editor's help screen gives no mention of using Insert to take screens. I only knew it worked because of the screens folder.
-[X] The "Giant" music category seems broken.
-[X] The quicksand tile animation for the overworld is backwards. The sand should be moving inwards, not outwards.
-[X] Also, could you change the name of "Peardian_Frozen Frenzy" to "Peardian_Frozen Frenzy (MP5)"? I renamed it recently and want to keep things consistant.
-[X] If you are a chicken in chicken mode, then you become a statue, the score doesn't show you as a chicken.
-[X] The file part of the help text in the level editor has some overlapping text.
-[X] stomping a piranha plant with a kuribo shoe doesn't make any sound.
-[X] If you are flying with a leaf(Rapidly pressing jump), then activate the tanooki's stomp, you will float down slowly.
-[X] If you do a tanooki stomp into a kuribo shoe, the shoe will dissapear until the statue disapears.
-[X] If you get off the kuribo shoe while touching a wall, the shoe will embed itself into the wall.
-
-[X] With the suicide timer, you still die if you are standing still and repeatedly firing projectiles.
-[X] The suicide time thing doesn't work when you are bouncing on a note block, or spring, but not pressing any buttons.
-[X] Make src animation support using 1024x1024 surface for animated tiles, and use the new animation tile gfx    
-[X] If you break a frozen player, and he is the last to die before the game says you win, the broken pieces won't appear.
-[X] I'm not sure if this can be fixed but if you become frozen, the bottom part of the shoe freeze, not the character. -> maybe don't display the character when frozen in a shoe?
-[X] Frozen players that wiggle can free themselves a little sooner
-[X] Clicking, and dragging map objects (spring, spike) in the editor doesn't work. - I meant that when you click and drag map objects, it only creates one, while if you do the same with tiles, it creates more then one. - Try copying tile
-[X] When you are refreshing map thumbnails, the "Refreshing Map Thumbnails" text overlaps the Refresh Maps button.
-[X] Map thumbnails are messed up. When you pick a map through thumbnails, it takes you back to the map you had before.
-[X] If you become a statue while flying with a p-wing, the flying sound will continue to play.
-[X] Added an extra score point for stomping Para-goombas and para-koopas 
-[X] Make a different colored/styled kuribo's shoe that is "sticky" in that it doesn't bounce around and you have to jump everywhere to make it move
-
 [ ] "Stage Type" sounds a bit misleading for configuring vehicles to go to stages
 
 [ ] if a player is holding a shell while frozen, the shell is still held in place.  *edit: even when you let go of run, the shell is held there.  i still don't know if this is intended or not. should probably kill the shell though. :x 
@@ -388,7 +306,6 @@ WAITING RESPONSE
 	-> Post your exact repro case and I'll look to see if it is actually a bug
 [ ] In frenzy mode if all card weights are set to 0, one ? card appears and that's it fo the game
     -> no repro - check your mode settings
-
 [ ] World keys are rendered useless when two doors are adjacent to the spot in which you are standing.
     -> Not sure what you mean
 [ ] Also, what does "Use Game" mean for the Item Block properties? If it means "use the game's item settings instead", shouldn't it be the default for each item block? Otherwise, all item blocks unless specified will use the same item settings regardless of what the user chooses. 

@@ -172,6 +172,31 @@ MapList::~MapList()
 	delete [] mlnMaps;
 }
 
+//Called by level editor to load world maps into the map list
+void MapList::addWorldMaps()
+{
+	SimpleDirectoryList worldmapdirs(convertPath("worlds/"));
+
+	short iDirCount = worldmapdirs.GetCount();
+	for(short iDir = 0; iDir < iDirCount; iDir++)
+	{
+		const char * szName = worldmapdirs.current_name();
+		
+		DirectoryListing worldMapDir(convertPath(std::string(szName) + std::string("/")), ".map");
+
+		DirectoryListing specialDebugMapDir(convertPath("maps/special/"), ".map");
+		
+		std::string curname;
+		while(worldMapDir(curname))
+		{
+			MapListNode * node = new MapListNode(worldMapDir.fullName(curname));
+			maps[stripCreatorAndDotMap(curname)] = node;
+		}
+		
+		worldmapdirs.next();
+	}
+}
+
 void MapList::add(const char * name)
 {
 	std::string fullName = convertPath("maps/") + name;

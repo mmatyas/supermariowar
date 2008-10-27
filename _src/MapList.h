@@ -26,6 +26,9 @@ class MapList
         MapList();
         ~MapList();
 
+		//Adds maps in all world map directories to the map list so they can be edited in the map editor
+		void addWorldMaps();
+
         void add(const char * name);
         bool find(const char * name);
 		bool findexact(const char * name, bool fWorld);

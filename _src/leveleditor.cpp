@@ -344,6 +344,9 @@ int main(int argc, char *argv[])
 	gfx_init(640,480, false);
 	blitdest = screen;
 	g_tilesetmanager.Init(convertPath("gfx/Classic/tilesets").c_str());
+	
+	//Add all of the maps that are world only so we can edit them
+	maplist.addWorldMaps();
 
 	SDL_WM_SetCaption(MAPTITLESTRING, "leveleditor.ico");
 
@@ -2916,7 +2919,7 @@ int editor_platforms()
 				DrawPlatform(platform->iPathType, g_map.platforms[iEditPlatform]->iTileData, platform->iStartX, platform->iStartY, platform->iEndX, platform->iEndY, platform->fAngle, platform->fRadiusX, platform->fRadiusY, 0, iPlatformWidth, iPlatformHeight, false, true);
 
 				menu_font_small.draw(0, 480 - (menu_font_small.getHeight() << 1), "Edit Path");
-				menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "[esc] Exit  [LMB] Set Start Point  [RMB] Set End Point [t] Change Path Type");
+				menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "[esc] Exit  [LMB] Set Start Point  [RMB] Set End Point [t] Path Type");
 			}
 			else if (g_Platforms[iEditPlatform].iPathType == 1) //continuous path
 			{
@@ -2924,7 +2927,7 @@ int editor_platforms()
 				DrawPlatform(platform->iPathType, g_map.platforms[iEditPlatform]->iTileData, platform->iStartX, platform->iStartY, platform->iEndX, platform->iEndY, platform->fAngle, platform->fRadiusX, platform->fRadiusY, 0, iPlatformWidth, iPlatformHeight, false, true);
 
 				menu_font_small.draw(0, 480 - (menu_font_small.getHeight() << 1), "Edit Path: [esc] Exit  [LMB] Set Start Point  [RMB] Set Angle");
-				menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "[SHIFT + LMB] Location Snap [SHIFT + RMB] Angle Snap [t] Change Path Type");
+				menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "[SHIFT + LMB] Location Snap [SHIFT + RMB] Angle Snap [t] Path Type");
 			}
 			else if (g_Platforms[iEditPlatform].iPathType == 2) //ellipse path
 			{
@@ -2934,7 +2937,7 @@ int editor_platforms()
 				menu_font_small.draw(0, 480 - menu_font_small.getHeight() * 4, "Edit Path: [esc] Exit  [LMB] Set Center [SHIFT + LMB] Center Snap");
 				menu_font_small.draw(0, 480 - menu_font_small.getHeight() * 3, "[X + LMB] Set X Radius [SHIFT + X + LMB] X Radius Snap");
 				menu_font_small.draw(0, 480 - menu_font_small.getHeight() * 2, "[Z + LMB] Set Y Radius [SHIFT + Z + LMB] Y Radius Snap");
-				menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "[C + LMB] Set Circular Radius [SHIFT + C + LMB] Circular Radius Snap [t] Change Path Type");
+				menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "[C + LMB] Set Circular Radius [SHIFT + C + LMB] Circular Radius Snap [t] Path Type");
 			}
 		}
 		else if(PLATFORM_EDIT_STATE_TEST == iPlatformEditState)

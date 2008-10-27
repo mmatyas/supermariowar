@@ -110,7 +110,7 @@ struct AnimatedTile
 	SDL_Rect rDest;
 	bool fBackgroundAnimated;
 	bool fForegroundAnimated;
-	SDL_Surface * sPlatformSurface;
+	MovingPlatform * pPlatform;
 };
 
 struct MapTile

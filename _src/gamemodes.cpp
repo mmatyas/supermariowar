@@ -1130,6 +1130,9 @@ void CGM_Coins::init()
 
 short CGM_Coins::playerkilledplayer(CPlayer &player, CPlayer &other, killstyle style)
 {
+	if(gameover)
+		return player_kill_normal;
+
 	if(game_values.gamemodesettings.coins.penalty)
 		other.score->AdjustScore(-1);
 
@@ -1138,6 +1141,9 @@ short CGM_Coins::playerkilledplayer(CPlayer &player, CPlayer &other, killstyle s
 
 short CGM_Coins::playerkilledself(CPlayer &player, killstyle style)
 {
+	if(gameover)
+		return player_kill_normal;
+
 	if(game_values.gamemodesettings.coins.penalty)
 		player.score->AdjustScore(-1);
 

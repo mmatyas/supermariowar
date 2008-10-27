@@ -363,36 +363,41 @@ MovingPlatform::MovingPlatform(TilesetTile ** tiledata, MapTile ** tiletypes, sh
 
 	ResetPath();
 
-	sSurface = SDL_CreateRGBSurface(screen->flags, w * iTileSize, h * iTileSize, screen->format->BitsPerPixel, 0, 0, 0, 0);
+	for(short iSurface = 0; iSurface < 2; iSurface++)
+	{
+		sSurface[iSurface] = SDL_CreateRGBSurface(screen->flags, w * iTileSize, h * iTileSize, screen->format->BitsPerPixel, 0, 0, 0, 0);
+	
+		if( SDL_SetColorKey(sSurface[iSurface], SDL_SRCCOLORKEY, SDL_MapRGB(sSurface[iSurface]->format, 255, 0, 255)) < 0)
+			printf("\n ERROR: Couldn't set ColorKey for moving platform: %s\n", SDL_GetError());
 
-	if( SDL_SetColorKey(sSurface, SDL_SRCCOLORKEY, SDL_MapRGB(sSurface->format, 255, 0, 255)) < 0)
-		printf("\n ERROR: Couldn't set ColorKey for moving platform: %s\n", SDL_GetError());
-
-	SDL_FillRect(sSurface, NULL, SDL_MapRGB(sSurface->format, 255, 0, 255));
+		SDL_FillRect(sSurface[iSurface], NULL, SDL_MapRGB(sSurface[iSurface]->format, 255, 0, 255));
+	}
 
 	//Run through all tiles in the platform, detect unknown and blank tiles,
 	//and draw all static tiles to the platform surface
-	for(short iCol = 0; iCol < iTileWidth; iCol++)
+	for(short iSurface = 0; iSurface < 2; iSurface++)
 	{
-		for(short iRow = 0; iRow < iTileHeight; iRow++)
+		for(short iCol = 0; iCol < iTileWidth; iCol++)
 		{
-			TilesetTile * tile = &iTileData[iCol][iRow];
+			for(short iRow = 0; iRow < iTileHeight; iRow++)
+			{
+				TilesetTile * tile = &iTileData[iCol][iRow];
 
-			if(tile->iID == TILESETNONE)
-				continue;
+				if(tile->iID == TILESETNONE)
+					continue;
 
-			if(tile->iID >= 0)
-			{
-				g_tilesetmanager.Draw(sSurface, tile->iID, iTileSizeIndex, tile->iCol, tile->iRow, iCol, iRow);
-				//SDL_BlitSurface(g_tilesetmanager.GetTileset(tile->iID)->getsur, &g_tilesetmanager.rRects[iTileSizeIndex][tile->iCol][tile->iRow], sSurface, &rDstRect);
-			}
-			else if(tile->iID == TILESETANIMATED)
-			{
-				SDL_BlitSurface(spr_tileanimation[iTileSizeIndex].getSurface(), &g_tilesetmanager.rRects[iTileSizeIndex][tile->iCol << 2][tile->iRow], sSurface, &g_tilesetmanager.rRects[iTileSizeIndex][iCol][iRow]);
-			}
-			else if(tile->iID == TILESETUNKNOWN)
-			{
-				SDL_BlitSurface(spr_unknowntile[iTileSizeIndex].getSurface(), &g_tilesetmanager.rRects[iTileSizeIndex][0][0], sSurface, &g_tilesetmanager.rRects[iTileSizeIndex][iCol][iRow]);				
+				if(tile->iID >= 0)
+				{
+					g_tilesetmanager.Draw(sSurface[iSurface], tile->iID, iTileSizeIndex, tile->iCol, tile->iRow, iCol, iRow);
+				}
+				else if(tile->iID == TILESETANIMATED)
+				{
+					SDL_BlitSurface(spr_tileanimation[iTileSizeIndex].getSurface(), &g_tilesetmanager.rRects[iTileSizeIndex][tile->iCol << 2][tile->iRow], sSurface[iSurface], &g_tilesetmanager.rRects[iTileSizeIndex][iCol][iRow]);
+				}
+				else if(tile->iID == TILESETUNKNOWN)
+				{
+					SDL_BlitSurface(spr_unknowntile[iTileSizeIndex].getSurface(), &g_tilesetmanager.rRects[iTileSizeIndex][0][0], sSurface[iSurface], &g_tilesetmanager.rRects[iTileSizeIndex][iCol][iRow]);
+				}
 			}
 		}
 	}
@@ -427,7 +432,8 @@ MovingPlatform::~MovingPlatform()
 
 	delete pPath;
 
-	SDL_FreeSurface(sSurface);
+	SDL_FreeSurface(sSurface[0]);
+	SDL_FreeSurface(sSurface[1]);
 }
 
 void MovingPlatform::draw()
@@ -438,7 +444,7 @@ void MovingPlatform::draw()
 	rDstRect.h = iHeight;
 
 	// Blit onto the screen surface
-	if(SDL_BlitSurface(sSurface, &rSrcRect, blitdest, &rDstRect) < 0)
+	if(SDL_BlitSurface(sSurface[1 - g_iCurrentDrawIndex], &rSrcRect, blitdest, &rDstRect) < 0)
 	{
 		fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
 		return;
@@ -463,7 +469,7 @@ void MovingPlatform::draw()
 		rDstRect.w = iWidth;
 		rDstRect.h = iHeight;
 
-		if(SDL_BlitSurface(sSurface, &rSrcRect, blitdest, &rDstRect) < 0)
+		if(SDL_BlitSurface(sSurface[1 - g_iCurrentDrawIndex], &rSrcRect, blitdest, &rDstRect) < 0)
 		{
 			fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
 		}
@@ -477,7 +483,7 @@ void MovingPlatform::draw()
 		rDstRect.y = iy - iHalfHeight + 480;
 		rDstRect.x = ix - iHalfWidth;
 
-		if(SDL_BlitSurface(sSurface, &rSrcRect, blitdest, &rDstRect) < 0)
+		if(SDL_BlitSurface(sSurface[1 - g_iCurrentDrawIndex], &rSrcRect, blitdest, &rDstRect) < 0)
 		{
 			fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
 		}
@@ -489,7 +495,7 @@ void MovingPlatform::draw()
 		rDstRect.y = iy - iHalfHeight - 480;
 		rDstRect.x = ix - iHalfWidth;
 
-		if(SDL_BlitSurface(sSurface, &rSrcRect, blitdest, &rDstRect) < 0)
+		if(SDL_BlitSurface(sSurface[1 - g_iCurrentDrawIndex], &rSrcRect, blitdest, &rDstRect) < 0)
 		{
 			fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
 		}
@@ -502,7 +508,7 @@ void MovingPlatform::draw()
 		rDstRect.x = ix - iHalfWidth + 640;
 		rDstRect.y = iy - iHalfHeight + 480;
 
-		if(SDL_BlitSurface(sSurface, &rSrcRect, blitdest, &rDstRect) < 0)
+		if(SDL_BlitSurface(sSurface[1 - g_iCurrentDrawIndex], &rSrcRect, blitdest, &rDstRect) < 0)
 		{
 			fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
 		}
@@ -515,7 +521,7 @@ void MovingPlatform::draw()
 		rDstRect.x = ix - iHalfWidth - 640;
 		rDstRect.y = iy - iHalfHeight - 480;
 
-		if(SDL_BlitSurface(sSurface, &rSrcRect, blitdest, &rDstRect) < 0)
+		if(SDL_BlitSurface(sSurface[1 - g_iCurrentDrawIndex], &rSrcRect, blitdest, &rDstRect) < 0)
 		{
 			fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
 		}
@@ -535,7 +541,7 @@ void MovingPlatform::draw()
 //Draw path for map preview
 void MovingPlatform::draw(short iOffsetX, short iOffsetY)
 {
-	gfx_drawpreview(sSurface, ix - iHalfWidth + iOffsetX, iy - iHalfHeight + iOffsetY, 0, 0, iWidth, iHeight, iOffsetX, iOffsetY, 320, 240, true);
+	gfx_drawpreview(sSurface[0], ix - iHalfWidth + iOffsetX, iy - iHalfHeight + iOffsetY, 0, 0, iWidth, iHeight, iOffsetX, iOffsetY, 320, 240, true);
 }
 
 void MovingPlatform::update()

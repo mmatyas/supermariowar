@@ -187,7 +187,7 @@ void CTilesetManager::Init(const char * szGfxPack)
 		lim = tilesetlist.end();
 	}
 
-	//Add in tilesets from the new gfxpack (if it isn't "Classic")
+	//Add in tilesets from the new gfxpack (if the gfxpack isn't "Classic")
 	if(strcmp(getFileFromPath(szGfxPack).c_str(), "Classic"))
 	{
 		std::string s = convertPath("gfx/packs/tilesets", szGfxPack) + getDirectorySeperator();
@@ -199,6 +199,7 @@ void CTilesetManager::Init(const char * szGfxPack)
 			CTileset * tileset = new CTileset(dirlist.current_name());
 			tilesetlist.push_back(tileset);
 
+			//If the tileset is "classic" then keep it's index for common operations
 			if(!strcmp(tileset->GetName(), "Classic"))
 			{
 				tClassicTileset = tileset;

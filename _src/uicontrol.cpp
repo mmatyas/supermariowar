@@ -2654,35 +2654,6 @@ MenuCodeEnum MI_MapField::SendInput(CPlayerInput * playerInput)
 {
 	short iPressedKey = playerInput->iPressedKey;
 
-	if(iPressedKey > 0)
-	{
-		if((iPressedKey >= SDLK_a && iPressedKey <= SDLK_z) ||
-			(iPressedKey >= SDLK_0 && iPressedKey <= SDLK_9) ||
-			iPressedKey == SDLK_MINUS || iPressedKey == SDLK_EQUALS)
-		{
-			short iOldIndex = maplist.GetCurrent()->second->iIndex;
-			
-			//maplist.startswith((char)playerInput->iPressedKey);
-
-			sSearchString += (char)iPressedKey;
-			iSearchStringTimer = 10;
-
-			if(!maplist.startswith(sSearchString.c_str()))
-			{
-				sSearchString = "";
-				iSearchStringTimer = 0;
-			}
-			
-			if(iOldIndex != maplist.GetCurrent()->second->iIndex)
-			{
-				LoadCurrentMap();
-				return MENU_CODE_MAP_CHANGED;
-			}
-			
-			return MENU_CODE_NONE;
-		}
-	}
-
 	/*
 	if(playerInput->iPressedKey > 0)
 	{
@@ -2777,6 +2748,35 @@ MenuCodeEnum MI_MapField::SendInput(CPlayerInput * playerInput)
 			fModifying = false;
 
 			return MENU_CODE_UNSELECT_ITEM;
+		}
+
+		if(iPlayer == 0 && iPressedKey > 0)
+		{
+			if((iPressedKey >= SDLK_a && iPressedKey <= SDLK_z) ||
+				(iPressedKey >= SDLK_0 && iPressedKey <= SDLK_9) ||
+				iPressedKey == SDLK_MINUS || iPressedKey == SDLK_EQUALS)
+			{
+				short iOldIndex = maplist.GetCurrent()->second->iIndex;
+				
+				//maplist.startswith((char)playerInput->iPressedKey);
+
+				sSearchString += (char)iPressedKey;
+				iSearchStringTimer = 10;
+
+				if(!maplist.startswith(sSearchString.c_str()))
+				{
+					sSearchString = "";
+					iSearchStringTimer = 0;
+				}
+				
+				if(iOldIndex != maplist.GetCurrent()->second->iIndex)
+				{
+					LoadCurrentMap();
+					return MENU_CODE_MAP_CHANGED;
+				}
+				
+				return MENU_CODE_NONE;
+			}
 		}
 	}
 

@@ -3374,6 +3374,9 @@ void CPlayer::collision_detection_map()
 									    ((toptile & tile_flag_super_death_left) && !(bottomtile & tile_flag_solid)) ||
 									    (!(toptile & tile_flag_solid) && (bottomtile & tile_flag_super_death_left));
 
+			bool fTopBlockSolid = topblock && !topblock->isTransparent() && !topblock->isHidden();
+			bool fBottomBlockSolid = bottomblock && !bottomblock->isTransparent() && !bottomblock->isHidden();
+
 			//first check to see if player hit a warp
 			if(playerKeys->game_right.fDown && !frozen && g_map.checkforwarp(tx, ty, ty2, 3))
 			{
@@ -3388,12 +3391,11 @@ void CPlayer::collision_detection_map()
 
 				return;
 			}
-			else if((topblock && !topblock->isTransparent()) || 
-				(bottomblock && !bottomblock->isTransparent()))
+			else if(fTopBlockSolid || fBottomBlockSolid)
 			{
-				if(topblock && !topblock->isTransparent()) //collide with top block
+				if(fTopBlockSolid) //collide with top block
 				{	
-					if(iHorizontalPlatformCollision == 3 && !topblock->isHidden())
+					if(iHorizontalPlatformCollision == 3)
 					{
 						KillPlayerMapHazard(true, kill_style_environment);
 						return;
@@ -3403,9 +3405,9 @@ void CPlayer::collision_detection_map()
 					flipsidesifneeded();
 				}
 				
-				if(bottomblock && !bottomblock->isTransparent()) //then bottom
+				if(fBottomBlockSolid) //then bottom
 				{	
-					if(iHorizontalPlatformCollision == 3 && !bottomblock->isHidden())
+					if(iHorizontalPlatformCollision == 3)
 					{
 						KillPlayerMapHazard(true, kill_style_environment);
 						return;
@@ -3462,6 +3464,9 @@ void CPlayer::collision_detection_map()
 									    ((toptile & tile_flag_super_death_right) && !(bottomtile & tile_flag_solid)) ||
 									    (!(toptile & tile_flag_solid) && (bottomtile & tile_flag_super_death_right));
 
+			bool fTopBlockSolid = topblock && !topblock->isTransparent() && !topblock->isHidden();
+			bool fBottomBlockSolid = bottomblock && !bottomblock->isTransparent() && !bottomblock->isHidden();
+
 			//first check to see if player hit a warp
 			if(playerKeys->game_left.fDown && !frozen && g_map.checkforwarp(tx, ty, ty2, 1))
 			{
@@ -3476,12 +3481,11 @@ void CPlayer::collision_detection_map()
 
 				return;
 			}
-			else if((topblock && !topblock->isTransparent()) || 
-				(bottomblock && !bottomblock->isTransparent()))
+			else if(fTopBlockSolid || fBottomBlockSolid)
 			{
-				if(topblock && !topblock->isTransparent()) //collide with top block
+				if(fTopBlockSolid) //collide with top block
 				{	
-					if(iHorizontalPlatformCollision == 1 && !topblock->isHidden())
+					if(iHorizontalPlatformCollision == 1)
 					{
 						KillPlayerMapHazard(true, kill_style_environment);
 						return;
@@ -3491,9 +3495,9 @@ void CPlayer::collision_detection_map()
 					flipsidesifneeded();
 				}
 				
-				if(bottomblock && !bottomblock->isTransparent()) //then bottom
+				if(fBottomBlockSolid) //then bottom
 				{	
-					if(iHorizontalPlatformCollision == 1 && !bottomblock->isHidden())
+					if(iHorizontalPlatformCollision == 1)
 					{
 						KillPlayerMapHazard(true, kill_style_environment);
 						return;
@@ -3717,11 +3721,13 @@ void CPlayer::collision_detection_map()
 		IO_Block * leftblock = g_map.block(txl, ty);
 		IO_Block * rightblock = g_map.block(txr, ty);
 
-		if((leftblock && !leftblock->isTransparent()) || 
-			(rightblock && !rightblock->isTransparent()))
+		bool fLeftBlockSolid = leftblock && !leftblock->isTransparent() && !leftblock->isHidden();
+		bool fRightBlockSolid = rightblock && !rightblock->isTransparent() && !rightblock->isHidden();
+
+		if(fLeftBlockSolid || fRightBlockSolid)
 		{
 			bool collisionresult = true;
-			if(leftblock && !leftblock->isTransparent()) //collide with left block
+			if(fLeftBlockSolid) //collide with left block
 			{	
 				collisionresult &= leftblock->collide(this, 2, alignedBlockX == txl || rightblock == NULL || rightblock->isTransparent() || rightblock->isHidden());
 				
@@ -3730,7 +3736,7 @@ void CPlayer::collision_detection_map()
 					return;
 			}
 			
-			if(rightblock && !rightblock->isTransparent()) //then right
+			if(fRightBlockSolid) //then right
 			{	
 				collisionresult &= rightblock->collide(this, 2, alignedBlockX == txr || leftblock == NULL || leftblock->isTransparent() || leftblock->isHidden());
 

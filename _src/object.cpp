@@ -1377,7 +1377,7 @@ void B_DonutBlock::triggerBehavior()
 	
 	TilesetTile ** tiledata = new TilesetTile*[1];
 	tiledata[0] = new TilesetTile[1];
-	tiledata[0][0].iID = 0;
+	tiledata[0][0].iID = g_tilesetmanager.GetClassicTilesetIndex();
 	tiledata[0][0].iCol = 29;
 	tiledata[0][0].iRow = 15;
 
