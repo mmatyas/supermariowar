@@ -460,7 +460,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 			//Drop current item if we're going after another carried item
 			if(carriedItem)
 			{
-				if(goal->getObjectType() == object_moving && ((IO_MovingObject*)goal)->getObjectType() == movingobject_star && (carriedItem->getObjectType() != object_moving || ((IO_MovingObject*)carriedItem)->getMovingObjectType() != movingobject_star))
+				if(goal->getObjectType() == object_moving && ((IO_MovingObject*)goal)->getMovingObjectType() == movingobject_star && (carriedItem->getObjectType() != object_moving || ((IO_MovingObject*)carriedItem)->getMovingObjectType() != movingobject_star))
 				{
 					playerKeys->game_turbo.fDown = false;
 				}
