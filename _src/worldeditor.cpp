@@ -35,7 +35,7 @@
 
 #define MAPTITLESTRING "SMW 1.8 World Editor"
 
-enum {EDITOR_EDIT, EDITOR_WATER, EDITOR_BACKGROUND, EDITOR_FOREGROUND, EDITOR_PATHSPRITE, EDITOR_VEHICLES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_WORLD, NEW_WORLD, SAVE, EDITOR_WARP, DISPLAY_HELP, EDITOR_PATH, EDITOR_TYPE, EDITOR_BOUNDARY};
+enum {EDITOR_EDIT, EDITOR_WATER, EDITOR_BACKGROUND, EDITOR_FOREGROUND, EDITOR_PATHSPRITE, EDITOR_VEHICLES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_WORLD, NEW_WORLD, RESIZE_WORLD, SAVE, EDITOR_WARP, DISPLAY_HELP, EDITOR_PATH, EDITOR_TYPE, EDITOR_BOUNDARY};
 
 const char * szEditModes[9] = {"Background Mode", "Foreground Mode", "Path Sprite Mode", "Stage Mode", "Path Mode", "Vehicle Mode", "Warp Mode", "Stage/Door Mode", "Boundary Mode"};
 
@@ -91,9 +91,9 @@ short			x_shake = 0;
 short			y_shake = 0;
 gv				game_values;
 void CPlayer::flipsidesifneeded() {}
-short CPlayer::KillPlayerMapHazard(bool fForce, killstyle style) {return 0;}
+short CPlayer::KillPlayerMapHazard(bool fForce, killstyle style, bool fKillCarriedItem) {return 0;}
 void IO_MovingObject::flipsidesifneeded() {}
-void IO_MovingObject::KillObjectMapHazard() {}
+void IO_MovingObject::KillObjectMapHazard(short playerID) {}
 float CapFallingVelocity(float f) {return 0.0f;}
 void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead) {}
 bool LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDirections){return false;}
@@ -178,6 +178,7 @@ void loadcurrentworld();
 int savecurrentworld();
 int findcurrentstring();
 int new_world();
+int resize_world();
 
 int editor_edit();
 int editor_warp();
@@ -199,6 +200,11 @@ char findstring[FILEBUFSIZE] = "";
 
 extern const char * g_szWorldMusicCategoryNames[MAXWORLDMUSICCATEGORY];
 short g_musiccategorydisplaytimer = 0;
+
+short g_messagedisplaytimer = 0;
+std::string g_szMessageTitle = "";
+std::string g_szMessageLine[3];
+void DrawMessage();
 
 //Vehicle stuff
 std::vector<WorldVehicle*> vehiclelist;
@@ -341,6 +347,10 @@ int main(int argc, char *argv[])
 				state = new_world();
 			break;
 
+			case RESIZE_WORLD:
+				state = resize_world();
+			break;
+
 			case SAVE:
 				state = savecurrentworld();
 			break;
@@ -445,7 +455,7 @@ int editor_edit()
 						g_musiccategorydisplaytimer = 90;
 					}
 					
-					if(event.key.keysym.sym == SDLK_s )
+					if(event.key.keysym.sym == SDLK_s)
 					{
 						if(keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT])
 							return SAVE_AS;
@@ -453,7 +463,7 @@ int editor_edit()
 						return SAVE;
 					}
 
-					if(event.key.keysym.sym == SDLK_f )
+					if(event.key.keysym.sym == SDLK_f)
 					{
 						if(keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT] || findstring[0] == '\0')
 							return FIND;
@@ -468,6 +478,9 @@ int editor_edit()
 
 					if(event.key.keysym.sym == SDLK_n)
 						return NEW_WORLD;
+
+					if(event.key.keysym.sym == SDLK_k)
+						return RESIZE_WORLD;
 										
 					if(event.key.keysym.sym == SDLK_h || event.key.keysym.sym == SDLK_F1)
 						return DISPLAY_HELP;
@@ -1185,7 +1198,7 @@ int editor_edit()
 
 		if(--g_musiccategorydisplaytimer > 0)
 		{
-			spr_dialog.draw(224, 176);
+			spr_dialog.draw(224, 176, 0, 0, 192, 128);
 			menu_font_small.drawCentered(320, 195, "Music Category");
 			menu_font_large.drawCentered(320, 220, g_szWorldMusicCategoryNames[g_worldmap.iMusicCategory]);
 
@@ -1193,6 +1206,7 @@ int editor_edit()
 			menu_font_small.drawCentered(320, 270, "To Change");
 		}
 		
+		DrawMessage();
 		SDL_Flip(screen);
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
@@ -1205,6 +1219,20 @@ int editor_edit()
 	}
 
 	return EDITOR_QUIT;
+}
+
+void DrawMessage()
+{
+	if(g_messagedisplaytimer > 0)
+	{
+		--g_messagedisplaytimer;
+
+		spr_dialog.draw(224, 176, 0, 0, 192, 128);
+		menu_font_large.drawCentered(320, 195, g_szMessageTitle.c_str());
+		menu_font_large.drawCentered(320, 220, g_szMessageLine[0].c_str());
+		menu_font_large.drawCentered(320, 240, g_szMessageLine[1].c_str());
+		menu_font_large.drawCentered(320, 260, g_szMessageLine[2].c_str());
+	}
 }
 
 void GetForegroundTileValues(short iCol, short iRow, short iOldTiles[9])
@@ -2064,6 +2092,7 @@ int editor_warp()
 
 		menu_font_small.drawRightJustified(640, 0, worldlist.current_name());
 
+		DrawMessage();
 		SDL_Flip(screen);
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
@@ -2143,6 +2172,7 @@ int editor_boundary()
 		
 		menu_font_small.drawRightJustified(640, 0, worldlist.current_name());
 
+		DrawMessage();
 		SDL_Flip(screen);
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
@@ -2247,6 +2277,7 @@ int editor_type()
 		
 		menu_font_small.drawRightJustified(640, 0, worldlist.current_name());
 
+		DrawMessage();
 		SDL_Flip(screen);
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
@@ -2319,6 +2350,7 @@ int editor_water()
 		for(short iWater = 0; iWater < 3; iWater++)
 			spr_worldbackground[0].draw(iWater << 5, 0, 512 + (iWater << 7), 0, 32, 32);
 		
+		DrawMessage();
 		SDL_Flip(screen);
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
@@ -2424,6 +2456,7 @@ int editor_background()
 
 		spr_worldbackground[0].draw(0, 0, iPage * 640, 32, 640, 480);
 
+		DrawMessage();
 		SDL_Flip(screen);
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
@@ -2550,6 +2583,7 @@ int editor_foreground()
 			spr_worldforeground[0].draw(416, 0, 512, 0, 32, 480);
 		}
 
+		DrawMessage();
 		SDL_Flip(screen);
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
@@ -2622,6 +2656,7 @@ int editor_pathsprite()
 			spr_worldpaths[0].draw(iPath << 5, 0, (iPath % 4) * 160, (iPath / 4) * 320, 32, 192);
 		}
 
+		DrawMessage();
 		SDL_Flip(screen);
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
@@ -2700,6 +2735,7 @@ int editor_vehicles()
 
 		menu_font_small.drawRightJustified(640, 0, worldlist.current_name());
 				
+		DrawMessage();
 		SDL_Flip(screen);
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
@@ -2773,6 +2809,7 @@ int editor_path()
 		SDL_FillRect(screen, NULL, 0x0);
 		spr_path.draw(0, 0, 0, 0, 480, 32);
 
+		DrawMessage();
 		SDL_Flip(screen);
 
 		int delay = WAITTIME - (SDL_GetTicks() - framestart);
@@ -2935,7 +2972,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 
 	drawmap(false, TILESIZE);
 	menu_shade.draw(0, 0);
-	spr_dialog.draw(224, 176);
+	spr_dialog.draw(224, 176, 0, 0, 192, 128);
 	menu_font_large.drawCentered(320, 200, title);
 	menu_font_small.draw(240, 235, instructions);
 	menu_font_small.drawRightJustified(640, 0, worldlist.current_name());
@@ -2972,7 +3009,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 							
 							drawmap(false, TILESIZE);
 							menu_shade.draw(0, 0);
-							spr_dialog.draw(224, 176);
+							spr_dialog.draw(224, 176, 0, 0, 192, 128);
 							menu_font_large.drawCentered(320, 200, title);
 							menu_font_small.draw(240, 235, instructions);
 							menu_font_small.draw(240, 255, input);
@@ -3028,7 +3065,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 
 							drawmap(false, TILESIZE);
 							menu_shade.draw(0, 0);
-							spr_dialog.draw(224, 176);
+							spr_dialog.draw(224, 176, 0, 0, 192, 128);
 							menu_font_large.drawCentered(320, 200, title);
 							menu_font_small.draw(240, 235, instructions);
 							menu_font_small.draw(240, 255, input);
@@ -3130,6 +3167,12 @@ void loadcurrentworld()
 
 int savecurrentworld()
 {
+	g_messagedisplaytimer = 60;
+	g_szMessageTitle = "Saved";
+	g_szMessageLine[0] = "Your world has";
+	g_szMessageLine[1] = "been saved.";
+	g_szMessageLine[2] = "";
+
 	WriteVehiclesIntoWorld();
 	WriteWarpsIntoWorld();
 	g_worldmap.Save();
@@ -3198,6 +3241,51 @@ int new_world()
 	return 0;
 }
 
+
+int resize_world()
+{
+	char szWidth[5], szHeight[5];
+
+	if(dialog("Resize World", "Width:", szWidth, 4) && 
+		dialog("Resize World", "Height:", szHeight, 4))
+	{
+		short iWidth = atoi(szWidth);
+		short iHeight = atoi(szHeight);
+
+		if(iWidth < 1)
+			iWidth = 1;
+
+		if(iHeight < 1)
+			iHeight = 1;
+
+		std::vector<WorldVehicle*>::iterator itrVehicle = vehiclelist.begin(), limVehicle = vehiclelist.end();
+		while(itrVehicle != limVehicle)
+		{
+			if((*itrVehicle)->iCurrentTileX >= iWidth || (*itrVehicle)->iCurrentTileY >= iHeight)
+				RemoveVehicleFromTile((*itrVehicle)->iCurrentTileX, (*itrVehicle)->iCurrentTileY);
+
+			itrVehicle++;
+		}
+
+		std::vector<WorldWarp*>::iterator itrWarp = warplist.begin(), limWarp = warplist.end();
+		while(itrWarp != limWarp)
+		{
+			delete (*itrWarp);
+				
+			itrWarp = warplist.erase(itrWarp);
+			limWarp = warplist.end();
+
+			itrWarp++;
+		}
+
+		g_worldmap.Resize(iWidth, iHeight);
+
+		savecurrentworld();
+		loadcurrentworld();
+	}
+
+	return 0;
+}
 
 //take screenshots in full and thumbnail sizes
 void takescreenshot()

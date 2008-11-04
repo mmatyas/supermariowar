@@ -411,6 +411,21 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 			{				//or if player is high
 				playerKeys->game_jump.fDown = true;
 				playerKeys->game_down.fDown = true;
+
+				if(!pPlayer->superstomp_lock)
+				{
+					//If the player is tanooki, then try to super stomp on them
+					if(pPlayer->tanooki)
+					{
+						playerKeys->game_turbo.fPressed = true;
+						pPlayer->lockfire = false;
+					}
+					else if(pPlayer->iKuriboShoe > 0)  //else if the player has the shoe then stomp
+					{
+						playerKeys->game_down.fPressed = true;
+						playerKeys->game_jump.fPressed = true;
+					}
+				}
 			}
 			else if(iy - player->iy > 70)  //If the player is significatly below us, then jump
 			{
@@ -580,6 +595,21 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 			{
 				playerKeys->game_jump.fDown = true;
 				playerKeys->game_down.fDown = true;
+
+				if(!pPlayer->superstomp_lock)
+				{
+					//If the player is tanooki, then try to super stomp on them
+					if(pPlayer->tanooki)
+					{
+						playerKeys->game_turbo.fPressed = true;
+						pPlayer->lockfire = false;
+					}
+					else if(pPlayer->iKuriboShoe > 0)  //else if the player has the shoe then stomp
+					{
+						playerKeys->game_down.fPressed = true;
+						playerKeys->game_jump.fPressed = true;
+					}
+				}
 			}
 			else
 			{
@@ -783,7 +813,7 @@ void CPlayerAI::GetNearestObjects()
 						if(fInvincible)
 							continue;
 	
-						DistanceToObject(objectcontainer[1].list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
+						DistanceToObject(movingobject, &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
 					}
 					else if(carriedItem)
 					{
@@ -791,7 +821,7 @@ void CPlayerAI::GetNearestObjects()
 					}
 					else
 					{
-						DistanceToObject(objectcontainer[1].list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
+						DistanceToObject(movingobject, &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
 					}
 				}
 				else if(movingobject_throwblock == movingtype)
@@ -802,7 +832,7 @@ void CPlayerAI::GetNearestObjects()
 					if(fInvincible)
 						continue;
 	
-					DistanceToObject(objectcontainer[1].list[i], &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
+					DistanceToObject(movingobject, &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
 				}
 				else if(movingobject_pirhanaplant == movingtype)
 				{
@@ -817,28 +847,35 @@ void CPlayerAI::GetNearestObjects()
 					if(flag->GetInBase() && flag->GetTeamID() == iTeamID)
 						continue;
 
-					if(carriedItem && carriedItem->getObjectType() == object_moving && ((IO_MovingObject*)carriedItem)->getMovingObjectType() == movingobject_flag)
+					if(carriedItem && carriedItem->getMovingObjectType() == movingobject_flag)
 						continue;
 
-					DistanceToObject(objectcontainer[1].list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);			
+					DistanceToObject(movingobject, &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);			
 				}
 				else if(movingobject_yoshi == movingtype)
 				{
-					if(!carriedItem || carriedItem->getObjectType() != object_moving || ((IO_MovingObject*)carriedItem)->getMovingObjectType() != movingobject_egg)
+					MO_Yoshi * yoshi = (MO_Yoshi*)movingobject;
+
+					if(!carriedItem || carriedItem->getMovingObjectType() != movingobject_egg)
 						continue;
 
-					DistanceToObject(objectcontainer[1].list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
+					CO_Egg * egg = (CO_Egg*)carriedItem;
+					
+					if(yoshi->getColor() != egg->getColor())
+						continue;
+
+					DistanceToObject(movingobject, &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
 				}
 				else if(movingobject_egg == movingtype)
 				{
-					if(carriedItem && carriedItem->getObjectType() == object_moving && ((IO_MovingObject*)carriedItem)->getMovingObjectType() == movingobject_egg)
+					if(carriedItem && carriedItem->getMovingObjectType() == movingobject_egg)
 						continue;
 
-					DistanceToObject(objectcontainer[1].list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
+					DistanceToObject(movingobject, &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
 				}
 				else if(movingobject_star == movingtype)
 				{
-					if(carriedItem && carriedItem->getObjectType() == object_moving && ((IO_MovingObject*)carriedItem)->getMovingObjectType() == movingobject_star)
+					if(carriedItem && carriedItem->getMovingObjectType() == movingobject_star)
 						continue;
 
 					CGM_Star * starmode = (CGM_Star*)game_values.gamemode;
@@ -855,7 +892,65 @@ void CPlayerAI::GetNearestObjects()
 				}
 				else if(movingobject_coin == movingtype)
 				{
-					DistanceToObject(objectcontainer[1].list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
+					DistanceToObject(movingobject, &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
+				}
+				else if(movingobject_collectioncard == movingtype)
+				{
+					int iNumHeldCards = pPlayer->score->subscore[0];
+					int iHeldCards = pPlayer->score->subscore[1];
+
+					if(iNumHeldCards == 3)
+					{
+						int iThreeHeldCards = iHeldCards && 63;
+
+						//If bot is holding all of the same type of card, then ignore all other cards
+						if(iThreeHeldCards == 42 || iThreeHeldCards == 21 || iThreeHeldCards == 0)
+						{
+							DistanceToObject(movingobject, &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
+							break;
+						}
+
+						int iTwoHeldCards = iHeldCards && 15;
+						if(iTwoHeldCards == 10 || iTwoHeldCards == 5 || iTwoHeldCards == 0)
+						{
+							DistanceToObject(movingobject, &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);				
+							break;
+						}
+					}
+					else
+					{
+						MO_CollectionCard * card = (MO_CollectionCard*)movingobject;
+
+						if(iNumHeldCards == 2)
+						{
+							int iTwoHeldCards = iHeldCards && 15;
+						
+							if(iTwoHeldCards == 10 || iTwoHeldCards == 5 || iTwoHeldCards == 0)
+							{
+								int iCardValue = card->getValue();
+								if(card->getType() == 1 && ((iTwoHeldCards == 10 && iCardValue != 2) || (iTwoHeldCards == 5 && iCardValue != 1) || (iTwoHeldCards == 0 && iCardValue != 0)))
+								{
+									DistanceToObject(movingobject, &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
+									break;
+								}
+							}
+						}
+						else if(iNumHeldCards == 1)
+						{
+							int iHeldCard = iHeldCards && 3;
+							int iCardValue = card->getValue();
+							if(card->getType() == 1 || iHeldCard != iCardValue)
+							{
+								DistanceToObject(movingobject, &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
+								break;
+							}
+						}
+					}
+
+					if(iNumHeldCards == 3)
+						DistanceToObject(movingobject, &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
+					else
+						DistanceToObject(movingobject, &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);				
 				}
 
 				break;
@@ -965,7 +1060,7 @@ void CPlayerAI::GetNearestObjects()
 				{
 					MO_FlagBase * flagbase = (MO_FlagBase*)objectcontainer[0].list[i];
 					
-					if(!carriedItem || carriedItem->getObjectType() != object_moving || ((IO_MovingObject*)carriedItem)->getMovingObjectType() != movingobject_flag || flagbase->GetTeamID() != iTeamID)
+					if(!carriedItem || carriedItem->getMovingObjectType() != movingobject_flag || flagbase->GetTeamID() != iTeamID)
 						continue;
 
 					DistanceToObject(objectcontainer[0].list[i], &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);

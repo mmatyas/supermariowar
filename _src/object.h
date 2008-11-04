@@ -97,7 +97,7 @@ class IO_Block : public CObject
 	
 		virtual void triggerBehavior() {}
 
-		void KillPlayersAndObjectsInsideBlock();
+		void KillPlayersAndObjectsInsideBlock(short playerID);
 
 	protected:
 		void BounceMovingObject(IO_MovingObject * object);
@@ -372,7 +372,7 @@ class B_OnOffSwitchBlock : public IO_Block
 
 		void FlipState() {state = (state < 3 ? state + 3 : state - 3);}
 
-		void triggerBehavior();
+		void triggerBehavior(short playerID);
 
 	private:
 		short iColorID;
@@ -401,7 +401,7 @@ class B_SwitchBlock : public IO_Block
 		bool hitright(IO_MovingObject * object);
 		bool hitleft(IO_MovingObject * object);
 
-		void FlipState();
+		void FlipState(short playerID);
 
 	private:
 		short iSrcX;
@@ -463,7 +463,7 @@ class IO_MovingObject : public CObject
 
 		virtual void SideBounce() {}
 		virtual float BottomBounce() {return bounce;}
-		void KillObjectMapHazard();
+		void KillObjectMapHazard(short playerID = -1);
 
 		virtual void CheckAndDie() {dead = true;}
 		virtual void Die() {dead = true;}
@@ -1015,6 +1015,8 @@ class CO_Egg : public MO_CarriedObject
 		void placeEgg();
 		void Drop();
 
+		short getColor() {return color;}
+
 	private:
 		short relocatetimer;
 		short explosiondrawframe, explosiondrawtimer;
@@ -1137,6 +1139,7 @@ class MO_Yoshi : public IO_MovingObject
 		bool collide(CPlayer * player);
 		void collide(IO_MovingObject * object);
 		void placeYoshi();
+		short getColor() {return color;}
 
 	private:
 		short timer;
@@ -1261,6 +1264,9 @@ class MO_CollectionCard : public IO_MovingObject
 		bool collide(CPlayer * player);
 		void placeCard();
 
+		short getType() {return type;}
+		short getValue() {return value;}
+
 	private:
 		short timer;
 		short type;
@@ -1303,8 +1309,8 @@ class MO_WalkingEnemy : public IO_MovingObject
 		virtual bool hitother(CPlayer * player);
 
 		virtual void Die() {}
-		virtual void DieAndDropShell(bool fBounce) { dead = true; DropShell(fBounce); }
-		virtual void DropShell(bool fBounce) {}
+		virtual void DieAndDropShell(bool fBounce, bool fFlip) { dead = true; DropShell(fBounce, fFlip); }
+		virtual void DropShell(bool fBounce, bool fFlip) {}
 
 		killstyle getKillStyle() {return killStyle;}
 
@@ -1329,7 +1335,7 @@ class MO_Goomba : public MO_WalkingEnemy
 		void update();
 		bool hittop(CPlayer * player);
 		void Die();
-		void DieAndDropShell(bool fBounce) { Die(); }
+		void DieAndDropShell(bool fBounce, bool fFlip) { Die(); }
 };
 
 class MO_Koopa : public MO_WalkingEnemy
@@ -1341,7 +1347,7 @@ class MO_Koopa : public MO_WalkingEnemy
 		void update();
 		bool hittop(CPlayer * player);
 		void Die();
-		void DropShell(bool fBounce);
+		void DropShell(bool fBounce, bool fFlip);
 
 	private:
 
@@ -1357,7 +1363,7 @@ class MO_BuzzyBeetle : public MO_WalkingEnemy
 		void update();
 		bool hittop(CPlayer * player);
 		void Die();
-		void DropShell(bool fBounce);
+		void DropShell(bool fBounce, bool fFlip);
 };
 
 class MO_Spiny : public MO_WalkingEnemy
@@ -1369,7 +1375,7 @@ class MO_Spiny : public MO_WalkingEnemy
 		void update();
 		bool hittop(CPlayer * player);
 		void Die();
-		void DropShell(bool fBounce);
+		void DropShell(bool fBounce, bool fFlip);
 };
 
 class MO_CheepCheep : public IO_MovingObject
@@ -1921,7 +1927,7 @@ class CObjectContainer
 
 		void draw()
 		{
-			for(short i = 0; i < list_end; i++)
+			for(short i = list_end - 1; i >= 0; i--)
 				list[i]->draw();
 		};
 

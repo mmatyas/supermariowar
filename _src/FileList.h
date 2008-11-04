@@ -8,7 +8,7 @@ class SimpleFileList
 {
     public:
 		SimpleFileList() {};
-        SimpleFileList(const std::string &path, const std::string &extension);
+        SimpleFileList(const std::string &path, const std::string &extension, bool fAlphabetize = false);
         virtual ~SimpleFileList();
         const char * GetIndex(unsigned int index);
         int GetCount() {return filelist.size();}
@@ -134,7 +134,7 @@ class TourList : public SimpleFileList
 class WorldList : public SimpleFileList
 {
     public:
-        WorldList() : SimpleFileList(convertPath("worlds/"), ".txt"){;};
+        WorldList() : SimpleFileList(convertPath("worlds/"), ".txt", true){;};
 };
 
 class BackgroundList : public SimpleFileList

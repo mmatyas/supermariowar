@@ -23,8 +23,10 @@ using std::string;
 extern const char * g_szMusicCategoryNames[MAXMUSICCATEGORY];
 extern short g_iDefaultMusicCategory[MAXMUSICCATEGORY];
 
+extern std::string stripPathAndExtension(const std::string &path);
+
 ///////////// SimpleFileList ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-SimpleFileList::SimpleFileList(const std::string &path, const std::string &extension)
+SimpleFileList::SimpleFileList(const std::string &path, const std::string &extension, bool fAlphabetize)
 {
 	DirectoryListing d(path, extension);
 	std::string curname;
@@ -40,6 +42,43 @@ SimpleFileList::SimpleFileList(const std::string &path, const std::string &exten
 		//printf("ERROR: Empty directory!\n");
 		//exit(0);
 		currentIndex = -1;
+	}
+
+	//Alphabetize the list, ignoring author
+	if(fAlphabetize)
+	{
+		short iSize = filelist.size();
+		std::string * names = new std::string[iSize];
+
+		//Get only the names of the files, no author information
+		for(short i = 0; i < iSize; i++)
+		{
+			names[i] = stripPathAndExtension(filelist[i]);
+			std::transform(names[i].begin(), names[i].end(), names[i].begin(), tolower);
+		}
+
+		//Now bubblesort them
+		bool fDone = false;
+		while(!fDone)
+		{
+			fDone = true;
+			for(short i = 0; i < iSize - 1; i++)
+			{
+				if(names[i].compare(names[i + 1]) > 0)
+				{
+					fDone = false;
+					std::string tempName = names[i];
+					names[i] = names[i + 1];
+					names[i + 1] = tempName;
+
+					std::string tempFullName = filelist[i];
+					filelist[i] = filelist[i + 1];
+					filelist[i + 1] = tempFullName;
+				}
+			}
+		}
+
+		delete [] names;
 	}
 }
 

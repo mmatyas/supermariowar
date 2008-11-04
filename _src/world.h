@@ -118,6 +118,7 @@ class WorldVehicle : public WorldMovingObject
 	friend void ReadVehiclesIntoEditor();
 	friend void WriteVehiclesIntoWorld();
 	friend int editor_edit();
+	friend int resize_world();
 };
 
 class WorldWarp

@@ -114,7 +114,7 @@ class CPlayer
 		void mapcollisions();
 		void cpu_think();
 
-		void die(short deathStyle, bool fTeamRemoved);
+		void die(short deathStyle, bool fTeamRemoved, bool fKillCarriedItem);
 
 		void spawnText(const char * szText);
 		void DeathAwards();
@@ -190,7 +190,7 @@ class CPlayer
 		void addswirlingawards();
 		void addrocketawards();
 
-		short KillPlayerMapHazard(bool fForce, killstyle);
+		short KillPlayerMapHazard(bool fForce, killstyle ks, bool fKillCarriedItem);
 		
         void enterwarp(Warp * warp);
 		void chooseWarpExit();
@@ -368,8 +368,8 @@ class CPlayer
 		friend bool coldec_player2obj(CPlayer * o1, CObject * o2);
 		friend bool collisionhandler_p2o(CPlayer * o1, CObject * o2);
 
-		friend short PlayerKilledPlayer(short iKiller, CPlayer * killed, short deathstyle, killstyle style, bool fForce);
-		friend short PlayerKilledPlayer(CPlayer * killer, CPlayer * killed, short deathstyle, killstyle style, bool fForce);
+		friend short PlayerKilledPlayer(short iKiller, CPlayer * killed, short deathstyle, killstyle style, bool fForce, bool fKillCarriedItem);
+		friend short PlayerKilledPlayer(CPlayer * killer, CPlayer * killed, short deathstyle, killstyle style, bool fForce, bool fKillCarriedItem);
 
 		friend void AddAwardKill(CPlayer * killer, CPlayer * killed, killstyle style);
 		friend void RemovePlayersButHighestScoring();
@@ -456,6 +456,8 @@ class CPlayer
 		
 		friend class MO_Coin;
 		friend class MO_CollectionCard;
+
+		friend class IO_MovingObject;
 
 		friend class MO_Yoshi;
 		friend class OMO_Thwomp;

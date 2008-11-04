@@ -2881,6 +2881,8 @@ void CMap::SetupAnimatedTiles()
 			AnimatedTile * tile = *iter;
 			SDL_Rect * rSrc = &(tile->rDest);
 
+			//If the background layer has an animated tile, then create the set of 4 images that will be
+			//drawn to this tile during the gameplay (gfx optimization by only drawing from animatedTilesSurface)
 			if(tile->fBackgroundAnimated)
 			{
 				for(short iTileAnimationFrame = 0; iTileAnimationFrame < 4; iTileAnimationFrame++)

@@ -1160,16 +1160,18 @@ void WorldMap::Resize(short w, short h)
 {
 	//Copy tiles from old map
 	WorldMapTile ** tempTiles = NULL;
+	short iOldWidth = iWidth;
+	short iOldHeight = iHeight;
 
 	if(tiles)
 	{
-		WorldMapTile ** tempTiles = new WorldMapTile*[iWidth];
+		tempTiles = new WorldMapTile*[w];
 
-		for(short iCol = 0; iCol < iWidth; iCol++)
+		for(short iCol = 0; iCol < w && iCol < iOldWidth; iCol++)
 		{
-			tempTiles[iCol] = new WorldMapTile[iHeight];
+			tempTiles[iCol] = new WorldMapTile[h];
 			
-			for(short iRow = 0; iRow < iHeight; iRow++)
+			for(short iRow = 0; iRow < h && iRow < iOldHeight; iRow++)
 			{
 				tempTiles[iCol][iRow].iBackgroundSprite = tiles[iCol][iRow].iBackgroundSprite;
 				tempTiles[iCol][iRow].iBackgroundWater = tiles[iCol][iRow].iBackgroundWater;
@@ -1181,14 +1183,14 @@ void WorldMap::Resize(short w, short h)
 	}
 
 	//Create new map
-	New(iWidth, iHeight);
+	New(w, h);
 
 	//Copy into new map
 	if(tempTiles)
 	{
-		for(short iCol = 0; iCol < w && iCol < iWidth; iCol++)
+		for(short iCol = 0; iCol < w && iCol < iOldWidth; iCol++)
 		{
-			for(short iRow = 0; iRow < h && iRow < iHeight; iRow++)
+			for(short iRow = 0; iRow < h && iRow < iOldHeight; iRow++)
 			{
 				tiles[iCol][iRow].iBackgroundSprite = tempTiles[iCol][iRow].iBackgroundSprite;
 				tiles[iCol][iRow].iBackgroundWater = tempTiles[iCol][iRow].iBackgroundWater;
@@ -1196,9 +1198,10 @@ void WorldMap::Resize(short w, short h)
 				tiles[iCol][iRow].iConnectionType = tempTiles[iCol][iRow].iConnectionType;
 				tiles[iCol][iRow].iType = tempTiles[iCol][iRow].iType;
 			}
-
-			delete [] tempTiles[iCol];
 		}
+
+		for(short iCol = 0; iCol < w; iCol++)
+			delete [] tempTiles[iCol];
 
 		delete [] tempTiles;
 	}

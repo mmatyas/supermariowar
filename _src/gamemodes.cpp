@@ -2323,7 +2323,7 @@ void CGM_Star::think()
 		if(iCurrentModeType == 0)
 		{
 			if(score[starPlayer[0]->teamID]->score > 1 || fReverseScoring)
-				starPlayer[0]->KillPlayerMapHazard(true, kill_style_environment);
+				starPlayer[0]->KillPlayerMapHazard(true, kill_style_environment, false);
 
 			if(fReverseScoring)
 			{
@@ -2352,7 +2352,7 @@ void CGM_Star::think()
 
 				//Let the cleanup function remove the player on the last kill
 				if(score[list_players[iPlayer]->teamID]->score > 1 || fReverseScoring)
-					list_players[iPlayer]->KillPlayerMapHazard(true, kill_style_environment);
+					list_players[iPlayer]->KillPlayerMapHazard(true, kill_style_environment, false);
 			}
 
 			if(fReverseScoring)
@@ -2396,7 +2396,7 @@ void CGM_Star::think()
 					continue;
 
 				if(score[list_players[iPlayer]->teamID]->score > 1 || fReverseScoring)
-					list_players[iPlayer]->KillPlayerMapHazard(true, kill_style_environment);
+					list_players[iPlayer]->KillPlayerMapHazard(true, kill_style_environment, false);
 
 				bool fNeedRebalance = true;
 				if(fReverseScoring)

@@ -274,6 +274,7 @@ void _load_waitforkey()
 	}
 }
 
+//Takes a path to a file and gives you back the file name (with or without author) as a char *
 void GetNameFromFileName(char * szName, const char * szFileName, bool fStripAuthor)
 {
 #ifdef _XBOX
@@ -302,6 +303,8 @@ void GetNameFromFileName(char * szName, const char * szFileName, bool fStripAuth
 		*pLastPeriod = 0;
 }
 
+//Takes a file name and gives you back just the name of the file with no author or file extention
+//and the first letter of the name will come back capitalized
 std::string stripCreatorAndDotMap(const std::string &filename)
 {
 	unsigned int firstUnderscore = filename.find("_");	//find first _
@@ -321,13 +324,14 @@ std::string stripCreatorAndDotMap(const std::string &filename)
 	return withoutPrefix;
 }
 
+//Takes a path to a file and gives you back just the name of the file with no author or file extention
 std::string stripPathAndExtension(const std::string &path)
 {
 	unsigned int chopHere = path.find("_");	//find first _
 	if(chopHere == std::string::npos)	//if not found, then find the beginning of the filename
 	{
 		chopHere = path.find_last_of(getDirectorySeperator());	//find last /
-		if(chopHere == std::string::npos)	//if not found start with first character
+		if(chopHere == std::string::npos)	//if not found, start with first character
 			chopHere = 0;
 		else
 			chopHere++;						//we don't want the /
@@ -337,8 +341,8 @@ std::string stripPathAndExtension(const std::string &path)
 		chopHere++;						//we don't want the _
 	}
 
-	std::string withoutPath = path.substr(chopHere);	//substring without bla_ and .map (length-4)
-	withoutPath = withoutPath.substr(0, withoutPath.length() - 4);
+	std::string withoutPath = path.substr(chopHere);	//substring without bla_
+	withoutPath = withoutPath.substr(0, withoutPath.length() - 4); //and without extension like .map (length-4)
 
 	return withoutPath;
 }

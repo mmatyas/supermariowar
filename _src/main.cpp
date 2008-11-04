@@ -50,24 +50,52 @@ STUFF TO WATCH OUT FOR IN BETA2
 - animated tiles in platforms
 - collision detection and behavior of coins, ztar, collection cards
 
-
-[ ] Test controllers on xbox where different tournament control settings are used
-	- Test all control cases with teams/bots keyboard/controllers menu/sub menus/bonus wheel/scoreboard and ties for winner/loser tournament ties etc.
-[ ] Treasure chests from winning a stage that rewards an item in world mode can be spawned in areas where they fall forever, and can never be opened. (Though this is aesthetic)
-[ ] Flame hazards in maps that crossed over from the pre-beta to beta are reversed and move over a few tiles.
+Fixed
+[X] Setting P1's menu controls select and cancel to any letter keys will make it to where you cannot change the playable map, as the map search funtion takes presidence(sp?) over menu controls.
+[X] Shelled enemies need to be flipped upside down when bumped from above instead of just acting like they were stomped.
+[X] In the colored yoshi egg mode the AI doesn't match egg color with yoshi color and keeps running to the wrong yoshi
+[X] Items and objects aren't destroyed when trapped in switch (on/off) blocks.
+[X] Write release script that cleans up smw directory automatically so we don't forget to remove things like .svn or thumbs.db
+[X] Draw order of objects reversed so that the player collides first with the item drawn on top
+[X] AI smartly collects cards in collection mode -> stops at 3 cards, attempts to match cards that it can see
+[X] Allowed bots to use super stomp move at the right time (kuribo's shoe and tanooki stomp)
+[X] Bouncing off of stomp enemies with tanooki doesn't free player from being tanooki like stomping on players does
+[X] Killing players/enemies does not score player points when killed by turning an on/off block on
+[X] Fixed dealing with corrupt tiles (row/col out of bounds) in level editor.  This was causing the mysterious falling tile bug.
+[X] Fixed bug where the worlds are in alphabetized by the creator's name, not the world's name.
+[X] Save map with Shift + s in level AND world editor and display on screen that the map was saved
+[X] It'd be nice to have a way to adjust world size in the world editor. It'd suck to find out you made the world a block or two too small, and end up having to redo it all on a new map.
 
 
 Beta 1 Public Release Bugs
+
 [ ] In the Retro graphics pack, there are certain graphics that need updated, mainly the tournament board layout, and some other menu stuff, if I recall correctly.
     -> I meant that some of the stuff isn't set up like it needs to be. For example, the tournament board's layout is missing an entire section that was added in, making the World mode and Tour mode scoreboards fail to appear correctly, or at all for that matter.
 	-> yeah there wasnt that board thingy that shows the scores, all it shows is the scores and thats all. also in the editor, some times I cant make any blocks at all.
 
-[ ] Setting P1's menu controls select and cancel to any letter keys will make it to where you cannot change the playable map, as the map search funtion takes presidence(sp?) over menu controls.
-[ ] Weird sound problems with the world music.
-	-> no repro
-[ ] AI should stop collecting cards if their bank is full (unless maybe they see a better card)
+[ ] Treasure chests from winning a stage that rewards an item in world mode can be spawned in areas where they fall forever, and can never be opened. (Though this is aesthetic)
+
+[ ] also usually the game does a good job not spawning you inside a platform(killing you) but I lined the bottom of a 
+	map with death tiles and it started spawning inside the platform.  edit: also stomp mode has problems with spawning 
+	them inside platforms(specifically continuous), only they don't die and still animate-it looks weird.  I guess you 
+	have to take into account how much time is spent in the swirly spawn animation-an area can be empty initially, but 
+	occupied by the time the animation is done
+
+
+Need To Test
 [ ] In the above picture, when I get killed on the spike but get the domination square below it, the square stays my color, even if I set it so that all my blocks go away when I die. All of my other ones turn neutral normally when I die like that. 
     -> made fix for this but need to test
+[ ] Test controllers on xbox where different tournament control settings are used
+	- Test all control cases with teams/bots keyboard/controllers menu/sub menus/bonus wheel/scoreboard and ties for winner/loser tournament ties etc.
+[ ] Game and world music packs on the menu have "game\" and "world\" in front of them (on xbox but see if same on PC)
+    -> Fix in place, check on xbox
+[ ] Refreshing the map thumbnails hangs half way through on xbox (after icecap map)
+    -> Fixed memory leak in thumbnail creation, retest on xbox
+
+
+Can't Reproduce Bug
+[ ] Weird sound problems with the world music.
+	-> no repro
 [ ] Level editor crash when adding a new line segment platform, drawing only some solid on top tiles, then adjusting it's start and stop.  See video: http://www.youtube.com/watch?v=vXpnv8qpVDg
 	-> No repro
 [ ] Can run through walls that have 1 tile wide gaps : -> no repro, need map where this happened
@@ -75,48 +103,18 @@ Beta 1 Public Release Bugs
 	P X  -> run across 1 tile gap into and through wall
 	XG
 	X
-[ ] In the colored yoshi egg mode the AI doesn't match egg color with yoshi color and keeps running to the wrong yoshi
-[ ] colission doesn't always work with the brown "bounce blocks" when you have a cape or leaf; 
-	when jumping and rotating you sometimes glide through them from below 
-	(not sure if it also happened with leaf, but it did happen with cape)
 [ ] P-Wings, not sure if there's a bug, but I collected a lot of other items, and I couldn't get rid of the P-Wings. 
 	I kept activating the items I collected but I still had the P-Wings and didn't switch. 
 	The activation worked though, as the animation played and the activated items disappeared.
-[ ] the preview of certain maps in the selection screen randomly drops certain tiles out and replaces them with a blank spot.
-[ ] On/Off switches placed just beside a column of switch blocks: -> intended gameplay
-	When you jump into the on/off switch and are some pixels into the switch block column you'll die. 
-	It's really annoying since you often don't have the time to aim exactly.
-[ ] Game and world music packs on the menu have "game\" and "world\" in front of them (on xbox but see if same on PC)
-    -> Fix in place, check on xbox
-[ ] Refreshing the map thumbnails hangs half way through on xbox (after icecap map)
-    -> Fixed memory leak in thumbnail creation, retest on xbox
-[ ] Not really a bug, but in some gfx subdirectories of the 1.8 beta zip file you got hidden "Thumbs.db" files included.
-[ ] Shelled enemies need to be flipped upside down when bumped from above instead of just acting like they were stomped.
 [ ] This may have already been mentioned, but I was playing a timed match against three bots, 
 	and one of them had star invincibility at the time the clock ran out. The other two bots dropped off the stage 
 	instantly as the victory fanfare played, but this bot remained along with my character. In fact, after his star 
 	ran out, I killed him -- and he respawned just as my character would. Very odd.
 	-> No repro, but was it a tie game?  If so, the bot would have remained with you.
-[ ] While in a purple Kiriboe's Shoe, bots won't come after you. 
-[ ] Bots cannot use the Tanooki Suit.
-
-[ ] Don't know if it's already been said, but for some reason, no matter what I set the Glide setting to for Chicken mode in a Single Game, the Chicken can NEVER glide. I don't know if I'm doing anything wrong or what, but... It just won't work. Oddly enough, I believe I've seen it work in Tours/Worlds. O_o I know it works SOMEWHERE in the game...just not in the Single Game.
-
-[ ] Items and objects aren't destroyed when trapped in switch (on/off) blocks.
-	-> Fixed, but needs testing
-	-> Carried objects, held shells, over map objects, throw blocks, fireballs, players in area when switched
-	-> use 000000bleck2 map
-	-> holding an item like a spring in the air when killed by the on/off block, the item doesn't die if it is inside the block
-
-[ ] Killing players/enemies does not score player points when killed by turning an on/off block on
-[ ] Well, I decided to create a map with all animations in the background, to represent the sea. 
-	Trouble is, I acidentaly set all the animated parts to zero, and when I tried to put the blue parts underneth 
-	it went over the animations and over saved them. so i just put the blue parts  over the top of most of the 
-	animated tiles and eventually the tile just fell.  From this I also noticed that there is a limit to the 
-	amount of animations allowed on a map-is this a bug? -> Hitting the limit of animation blocks?
+[ ] No matter what I set the Glide setting to for Chicken mode in a Single Game, the Chicken can NEVER glide. I don't know if I'm doing anything wrong or what, but... It just won't work. Oddly enough, I believe I've seen it work in Tours/Worlds. O_o I know it works SOMEWHERE in the game...just not in the Single Game.
+    -> No repro
 [ ] Items get overlapped by platforms, no matter what layer they are.
 	-> No repro, verified powerup items appear over layer 1
-[ ] also usually the game does a good job not spawning you inside a platform(killing you) but I lined the bottom of a map with death tiles and it started spawning inside the platform.  edit: also stomp mode has problems with spawning them inside platforms(specifically continuous), only they don't die and still animate-it looks weird.  I guess you have to take into account how much time is spent in the swirly spawn animation-an area can be empty initially, but occupied by the time the animation is done
 [ ] for the animated tiles, i tried to set it to solid for the waterfall tiles (as in the default tile type?), yet in game it does not work.
 	-> No repro, setting default tile types for animated tiles works fine -> though, it doesn't affect maps that have already been created before the change (maybe some confusion here)
 [ ] Player spawn zones are ignored in SpawnZonesIgnored.map on desktop
@@ -125,49 +123,23 @@ Beta 1 Public Release Bugs
 	-> We probably need to do a little better job when no hard areas are defined to choose a good place
 [ ] Falling donut blocks turn into castle pieces in SMWarld mod (on desktop) -> ask Mr Mister it is his mod
 	-> The donut block from the standard tileset needs to be a "falling donut block" tile
+[ ] colission doesn't always work with the brown "bounce blocks" when you have a cape or leaf; 
+	when jumping and rotating you sometimes glide through them from below 
+	(not sure if it also happened with leaf, but it did happen with cape)
+	-> no repro
+
+
+No Fix
 [ ] play world mode with the random skins, the change every time you enter a level; they suddenly change on the world map.  For random skins it should unrandomize them after the world starts. -> They should switch every time you start a game.
 	-> It looks a little weird, but it is acceptable and not worth the work to fix it (changing to a random skin happens deep inside the gamestart() code)
-[ ] Update the Tanooki statues to be proportionally sized to players
-[ ] Animated tiles in platforms
-	-> Still need to double buffer drawing to platforms
-[ ] Write release script that cleans up smw directory automatically so we don't forget to remove things like .svn or thumbs.db
-		all .svn directories everywhere
-		all thumbs.db files everywhere
-		leveleditor.bin
-		options.bin
-		*.exp
-		*.lib
-		Makefile
-		configure
-		DOES_WORK
-		smw_icon.res
-		zzz_test dir
-		_src dir
-		debian dir
-		macosx dir
-		Projects dir
-		Scripts dir
-		maps/ZZleveleditor.map
-		maps/test
-		maps/moved
-		everything in maps/cache (except mapsummary.txt)
-		everything in maps/screenshots (except readme.txt)
+[ ] On/Off switches placed just beside a column of switch blocks: -> intended gameplay
+	When you jump into the on/off switch and are some pixels into the switch block column you'll die. 
+	It's really annoying since you often don't have the time to aim exactly.
 
-[X] Also for the running over 1x1 gaps feature, it sometimes fails when running across a gap to a [?] block
-[X] Player getting caught in a moving platform here: LKA_Turbulence.map
-[X] The hazard kiling aura continues after leaving the map. I was playing Moby Dick and I spawned on the ship after the bullit bill fired and left the map, and as soon as the bullit bill would hit me if it continued, I died. This happened about 4 times! 
-[X] Added animated tiles to platforms
-[X] Collection card does not make noise when you collect it
-[X] Also, for whatever reason, said pipe minigame plays whatever music was last played. I don't know if this has anything to do with me using universal overrides on all the levels in the world containing the minigame. -> And an update on the pipe minigame bug, it only happens after playing on a level that has been affected by a musical override.
-[X] I used to insert to take a screen of this world, but when I went to go scroll through it again, the tiny version appeared in the corner and started scrolling instead. Also, the tiny objects still have their purplish edges which still need to be fixed.
-[X] Oh yeah, and the upside-down SMB3 lava is animated incorrectly. It should match that of the normal lava.
-[X] If you pause the game while you're flying with the P-Wing, you can still hear the flying sound for a while. -> stop sound like skid/clock
-[X] Putting a warp on a level space causes the player to warp and activate the level at the same time. 
-[X] The Bob-Omb's standing and turning pose are med-res. Look near the wind-up key.
-[X] The World Editor has a habit of deleting the "#Initial Items" line if you change the line from the initial entry ("p1"). I know 4matsy mentioned this in my "OMG HALP!" thread. x: -> reports are that if you have no initial items, it should be "0", but the world editor will not put the "0" there when it saves.
-[X] if youre gliding with a pwing and get frozen, you can still fly up.
 
 Beta 1 Public Release Feature Requests
+[ ] Shy Guy Tag
+[ ] Update the Tanooki statues to be proportionally sized to players
 [ ] Use smb3_extended1up.wav (on desktop) for 5up sound
 [ ] Maybe the three waterfalls on the Classic tileset could animate differently
 [ ] Is there any way you could re-add that functionality to the game (maybe with a toggle to turn the secrets on or off) before the final release? You don't have to bring all of them back, but I really miss the super fireball, triple hammer, kaboomerang, extended POW and MOD blocks, super shell kick, and homing Bullet Bills.
@@ -175,19 +147,13 @@ Beta 1 Public Release Feature Requests
 [ ] it'd be a nice idea to add some weapon options for the Bomb powerup. Maybe a bomb limit that ranges from 1 to 5, and a fuse limit ranging from 3 to 10 seconds.
 [ ] Intro music attached to normal looped tracks
 [ ] A way to put levels/bonus stages in worlds WITHOUT editing the .txt file.
-[ ] When you made items play the bump sound when they get destroyed, you forgot to change the flags in capture the flag mode so they also play that sound.
-[ ] The worlds are in alphabetized by the creator's name, not the world's name.
-[ ] What happened to the 0smw world?
 [ ] Also, as P1 on the Bonus Island World against 3 CPUs, I was unable to use items in the World screen.
 [ ] I used the power-up to take off a CPU's win so I could redo the level and after the CPU won again, it just stands on that level and doesn't move...
 [ ] Ability to reorder the drawing order of platforms within the same layer - not too hard to do, just a platform swap in the platforms away
-[ ] Save map with Shift + s in level AND world editor and display on screen that the map was saved
 [ ] Though the universal Overrides thing has Map-specific and World-specific overrides, it lacks Background-specific overrides.
 [ ] Volume control for individual tunes in music packs. Just changing a number in the text file would be a lot less trouble than having to edit the music files themselves.
-[ ] It'd be nice to have a way to adjust world size in the world editor. It'd suck to find out you made the world a block or two too small, and end up having to redo it all on a new map.
 [ ] Bombs setting off other bombs (chain reaction) and bombs destroying breakable blocks
 [ ] Escape in level editor will ask you if you want to close before doing it
-[ ] Award points to players that kill others using an on/off block
 [ ] Enemy specific spawn zones (as part of the mode objects locations in level editor)
 [ ] Be able to define a size of area in which the suicide timer runs (like, say, if you're in the same 3x3-tile area for long enough, you get killed). Right now, the game only checks to see if you haven't moved; this causes the bots to not get timed out unless you set the suicide timer to something really short, since they still jump occasionally.
 [ ] Item idea: in a world, if you have a stored item left over at the end of a level, it goes into your inventory. (It would only count stored items you had at the moment the level ended...that way, you can't just run around after the game and hit item blocks until you get a certain item.
@@ -217,8 +183,6 @@ Feature Requests
 [ ] Player needs bounce when killing hazards with shoe or tanooki?
 
 [ ] Roulette wheel should be stopped by any key pressed by the player
-
-[ ] The Kuribo's Shoe doesn't protect from lava in SMB3. Actually, this leads to a small suggestion. We could probably use alternate death tiletypes. Along with the one we have now, we could throw in one that also kills through the Goomba's Shoe and another that doesn't destroy items. That way, map makers could have a choice in how their lava behaves, and we could have hazard tiles like Jelectros and Nipper floors that behave correctly.
 
 [ ] In Yoshi's Eggs, could we have it so the options menu has two columns, one for eggs and one for Yoshis? Oh, and an option to have the egg timer pause while the egg is being held would be nice.
 
@@ -823,7 +787,7 @@ void CleanDeadPlayers()
 			fCheckForGameOver = true;
 
 			if(respawn[list_players[i]->globalID] <= 0)
-				list_players[i]->die(0, true);
+				list_players[i]->die(0, true, false);
 
 			//Set this to zero so we don't display a spawn egg when player is removed from game
 			respawn[list_players[i]->globalID] = 0;
@@ -2194,7 +2158,7 @@ void RunGame()
 							list_players[k]->DeathAwards();
 
 							if(game_values.gamemode->playerkilledself(*(list_players[k]), kill_style_environment) == player_kill_normal)
-								list_players[k]->die(0, false);
+								list_players[k]->die(0, false, false);
 						}
 					}
 					else if(event.key.keysym.sym == SDLK_x)
@@ -2519,7 +2483,7 @@ void RunGame()
 							{
 								if(game_values.screenshakekillinair == player->inair)
 								{
-									PlayerKilledPlayer(game_values.screenshakeplayerid, player, death_style_jump, kill_style_pow, false);
+									PlayerKilledPlayer(game_values.screenshakeplayerid, player, death_style_jump, kill_style_pow, false, false);
 
 									CPlayer * killer = GetPlayerFromGlobalID(game_values.screenshakeplayerid);
 
@@ -2555,7 +2519,7 @@ void RunGame()
 											killer->score->AdjustScore(1);
 
 										ifsoundonplay(sfx_kicksound);
-										((MO_WalkingEnemy*)movingobject)->DieAndDropShell(true);
+										((MO_WalkingEnemy*)movingobject)->DieAndDropShell(true, true);
 
 										game_values.screenshakekillscount++;
 										
@@ -2651,7 +2615,7 @@ void RunGame()
 							list_players[k]->DeathAwards();
 
 							if(!game_values.gamemode->playerkilledself(*(list_players[k]), kill_style_environment))
-								list_players[k]->die(0, false);
+								list_players[k]->die(0, false, false);
 						}
 					}
 	#endif
