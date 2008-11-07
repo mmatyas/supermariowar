@@ -130,7 +130,8 @@ class MovingPlatform
 
 		void collide(CPlayer * player);
 
-		void gettiletypes(CPlayer * player, int * lefttile, int * righttile);
+		void GetTileTypesFromPlayer(CPlayer * player, int * lefttile, int * righttile);
+		int GetTileTypeFromCoord(short x, short y);
 
 		void collide(IO_MovingObject * object);
 

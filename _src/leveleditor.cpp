@@ -776,6 +776,12 @@ int editor_edit()
 
 							fExiting = false;
 						}
+#ifdef _DEBUG
+						else if(event.key.keysym.sym == SDLK_ESCAPE)
+						{
+							return EDITOR_QUIT;
+						}
+#endif
 					}
 				}
 			}
@@ -1545,10 +1551,10 @@ int editor_edit()
 			spr_dialog.draw(224, 176, 0, 0, 192, 128);
 			menu_font_large.drawCentered(320, 195, "Exit");
 			menu_font_large.drawCentered(320, 220, "Are You Sure?");
-			menu_font_large.drawCentered(274, 254, "Yes");
+			menu_font_large.drawCentered(282, 254, "Yes");
 			menu_font_large.drawCentered(356, 254, "No");
 
-			spr_dialog.draw(fSelectedYes ? 240 : 326, 250, 192, 0, 64, 32);
+			spr_dialog.draw(fSelectedYes ? 250 : 326, 250, 192, 0, 64, 32);
 		}
 		else
 		{

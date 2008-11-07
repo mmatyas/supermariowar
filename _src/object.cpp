@@ -5746,7 +5746,6 @@ CO_Egg::CO_Egg(gfxSprite *nspr, short iColor) :
 {
 	state = 1;
 	bounce = GRAVITATION;
-	objectType = object_moving;
 	movingObjectType = movingobject_egg;
 
 	owner_throw = NULL;
@@ -5922,7 +5921,6 @@ CO_Star::CO_Star(gfxSprite *nspr, short type, short id) :
 	iw = 32;
 	ih = 32;
 	bounce = GRAVITATION;
-	objectType = object_moving;
 	movingObjectType = movingobject_star;
 	
 	iType = type;
@@ -6234,7 +6232,6 @@ CO_Flag::CO_Flag(gfxSprite *nspr, MO_FlagBase * base, short iTeamID, short iColo
 {
 	state = 1;
 	bounce = GRAVITATION;
-	objectType = object_moving;
 	movingObjectType = movingobject_flag;
 	flagbase = base;
 	teamID = iTeamID;
@@ -8543,7 +8540,6 @@ CO_Shell::CO_Shell(short type, short x, short y, bool dieOnMovingPlayerCollision
 	state = 0;
 
 	bounce = GRAVITATION;
-	objectType = object_moving;
 	movingObjectType = movingobject_shell;
 	
 	iPlayerID = -1;
@@ -9048,7 +9044,6 @@ CO_ThrowBlock::CO_ThrowBlock(gfxSprite * nspr, short x, short y, short type) :
 	state = 2;
 	ih = 32;
 	bounce = GRAVITATION;
-	objectType = object_moving;
 	movingObjectType = movingobject_throwblock;
 	iPlayerID = -1;
 	iTeamID = -1;
@@ -9331,7 +9326,6 @@ CO_Spring::CO_Spring(gfxSprite *nspr, short ix, short iy, bool fsuper) :
 
 	state = 1;
 	bounce = GRAVITATION;
-	objectType = object_moving;
 	movingObjectType = movingobject_carried;
 
 	iOwnerRightOffset = 14;
@@ -10674,7 +10668,6 @@ CO_PhantoKey::CO_PhantoKey(gfxSprite *nspr) :
 {
 	state = 1;
 	bounce = GRAVITATION;
-	objectType = object_phantokey;
 	movingObjectType = movingobject_phantokey;
 
 	iOwnerRightOffset = 12;

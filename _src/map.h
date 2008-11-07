@@ -235,7 +235,7 @@ class CMap
 	private:
 
 		void SetTileGap(short i, short j);
-		void calculatespawnareas(short iType, bool fUseTempBlocks);
+		void calculatespawnareas(short iType, bool fUseTempBlocks, bool fIgnoreDeath);
 
 		TilesetTile	mapdata[MAPWIDTH][MAPHEIGHT][MAPLAYERS];
 		MapTile		mapdatatop[MAPWIDTH][MAPHEIGHT];
@@ -303,6 +303,8 @@ class CMap
 		void drawPreviewBlocks(SDL_Surface * targetSurface, bool fThumbnail);
 
 		void addPlatformAnimatedTiles();
+
+		friend class CPlayerAI;
 
 		friend void drawmap(bool fScreenshot, short iBlockSize, bool fWithPlatforms);
 		friend void drawlayer(int layer, bool fUseCopied, short iBlocksize);

@@ -64,6 +64,12 @@ CPlayer::~CPlayer()
 		delete pPlayerAI;
 }
 
+void CPlayer::Init()
+{
+	if(pPlayerAI)
+		pPlayerAI->Init();
+}
+
 void CPlayer::move()
 {
 	//Call the AI if cpu controlled
@@ -1135,7 +1141,7 @@ void CPlayer::move()
 							if(!fFellThrough && platform)
 							{
 								fPrecalculatedY += platform->fOldVelY;
-								platform->gettiletypes(this, &lefttile, &righttile);
+								platform->GetTileTypesFromPlayer(this, &lefttile, &righttile);
 
 								if(((lefttile & tile_flag_solid_on_top) && (righttile & tile_flag_solid_on_top || righttile == tile_flag_nonsolid || righttile == tile_flag_gap)) ||
 								((righttile & tile_flag_solid_on_top) && (lefttile & tile_flag_solid_on_top || lefttile == tile_flag_nonsolid || lefttile == tile_flag_gap)))

@@ -50,11 +50,20 @@ class NearestObjects
 		bool threatwrap;
 };
 
+struct AttentionObject
+{
+	int iID;	  //Global ID of this object
+	short iType;  //Ignore it, high priority, etc.
+	short iTimer;  //When it the attention expires, 0 for never
+};
+
 class CPlayerAI
 {
 	public:
-		CPlayerAI() {}
-		virtual ~CPlayerAI() {}
+		CPlayerAI();
+		virtual ~CPlayerAI();
+
+		virtual void Init();
 
 		void SetPlayer(CPlayer * player) {pPlayer = player;}
 
@@ -71,6 +80,9 @@ class CPlayerAI
 	private:
 		short iFallDanger;
 		NearestObjects nearestObjects;
+
+		std::map<int, AttentionObject*> attentionObjects;
+		AttentionObject currentAttentionObject;
 };
 
 

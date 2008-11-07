@@ -30,6 +30,7 @@ extern short g_iVersion[];
 extern const char * g_szBackgroundConversion[26];
 extern short g_iMusicCategoryConversion[26];
 
+//Converts the tile type into the flags that this tile carries (solid + ice + death, etc)
 short g_iTileTypeConversion[18] = {0, 1, 2, 5, 121, 9, 17, 33, 65, 6, 21, 37, 69, 3961, 265, 529, 1057, 2113};
 
 CMap::CMap()
@@ -458,6 +459,18 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 				spawnareas[i][m].size = (short)ReadInt(mapfile);
 			
 				totalspawnsize[i] += spawnareas[i][m].size;
+			}
+
+			//If no spawn areas were identified, then create one big spawn area
+			if(totalspawnsize[i] == 0)
+			{
+				numspawnareas[i] = 1;
+				spawnareas[i][0].left = 0;
+				spawnareas[i][0].width = 20;
+				spawnareas[i][0].top = 1;
+				spawnareas[i][0].height = 12;
+				spawnareas[i][0].size = 220;
+				totalspawnsize[i] = 220;
 			}
 		}
 
@@ -1874,16 +1887,18 @@ void CMap::saveMap(const std::string& file)
 	}
 
 	//Calculate player/team spawn zones
-	for(short iType = 0; iType < 5; iType++)
+	for(short iType = 0; iType <= 5; iType++)
 	{
-		calculatespawnareas(iType, false);
+		calculatespawnareas(iType, false, false);
 		
+		//Ok try to find somewhere to spawn using areas that may or may not be there
 		if(numspawnareas[iType] == 0)
-			calculatespawnareas(iType, true);
-	}
+			calculatespawnareas(iType, true, false);
 
-	//Calculate item spawn zones
-	calculatespawnareas(5, false);
+		//Ok, try to find somewhere to spawn that might be over a death tile
+		if(numspawnareas[iType] == 0)
+			calculatespawnareas(iType, true, true);
+	}
 
 	//Write spawn areas
 	for(i = 0; i < NUMSPAWNAREATYPES; i++)
@@ -2122,7 +2137,7 @@ void CMap::saveThumbnail(const std::string &sFile, bool fUseClassicPack)
 	SDL_FreeSurface(sThumbnail);
 }
 
-void CMap::calculatespawnareas(short iType, bool fUseTempBlocks)
+void CMap::calculatespawnareas(short iType, bool fUseTempBlocks, bool fIgnoreDeath)
 {
 	bool usedtile[MAPWIDTH][MAPHEIGHT];
 	short i, j;
@@ -2175,7 +2190,7 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks)
 				}
 
 				//If there is a death tile anywhere below this tile
-				if(!fUsed)
+				if(!fUsed && !fIgnoreDeath)
 				{
 					int m;
 					for(m = j; m < MAPHEIGHT; m++)
@@ -2817,7 +2832,7 @@ void CMap::predrawbackground(gfxSprite &background, gfxSprite &mapspr)
 	SDL_Rect dest;
 	dest.w = 32;
 	dest.h = 32;
-	short iType = 5; //use [5] for item spawn areas
+	short iType = 1; //use [5] for item spawn areas
 	
 	for(int m = 0; m < numspawnareas[iType]; m++)  
 	{
@@ -3065,21 +3080,6 @@ void CMap::updatePlatforms()
 			++iter;
 		}
 	}
-
-	/*
-	while (iter != lim)
-	{
-		if((*iterateAll)->fDead)
-		{
-			iterateAll = tempPlatforms.erase(iterateAll);
-			--iterateAll;
-		}
-		else
-		{
-			(*iterateAll)->update();
-			++iterateAll;
-		}
-	}*/
 }
 
 void CMap::drawPlatforms(short iLayer)

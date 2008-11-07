@@ -1395,7 +1395,7 @@ short MovingPlatform::coldec_player(CPlayer * player)
 	}
 }
 
-void MovingPlatform::gettiletypes(CPlayer * player, int * lefttile, int * righttile)
+void MovingPlatform::GetTileTypesFromPlayer(CPlayer * player, int * lefttile, int * righttile)
 {
 	*lefttile = tile_flag_nonsolid;
 	*righttile = tile_flag_nonsolid;
@@ -1420,6 +1420,28 @@ void MovingPlatform::gettiletypes(CPlayer * player, int * lefttile, int * rightt
 
 	if(fRelativeX2 >= 0.0f && fRelativeX2 < iWidth)
 		*righttile = iTileType[(short)fRelativeX2 / TILESIZE][ty].iFlags;
+}
+
+int MovingPlatform::GetTileTypeFromCoord(short x, short y)
+{
+	int tile = tile_flag_nonsolid;
+
+	float fRelativeY = y - fy + iHalfHeight;
+
+	if(fRelativeY < 0.0f || fRelativeY >= iHeight)
+		return tile_flag_nonsolid;
+
+	if(x >= 640)
+		x -= 640;
+	else if(x < 0)
+		x += 640;
+
+	float fRelativeX = x - fx + iHalfWidth;
+
+	if(fRelativeX < 0.0f || fRelativeX >= iWidth)
+		return tile_flag_nonsolid;
+		
+	return iTileType[(short)fRelativeX / TILESIZE][(short)fRelativeY / TILESIZE].iFlags;
 }
 
 void MovingPlatform::collide(IO_MovingObject * object)

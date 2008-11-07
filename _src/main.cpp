@@ -51,20 +51,9 @@ STUFF TO WATCH OUT FOR IN BETA2
 - collision detection and behavior of coins, ztar, collection cards
 
 Fixed
-[X] Setting P1's menu controls select and cancel to any letter keys will make it to where you cannot change the playable map, as the map search funtion takes presidence(sp?) over menu controls.
-[X] Shelled enemies need to be flipped upside down when bumped from above instead of just acting like they were stomped.
-[X] In the colored yoshi egg mode the AI doesn't match egg color with yoshi color and keeps running to the wrong yoshi
-[X] Items and objects aren't destroyed when trapped in switch (on/off) blocks.
-[X] Write release script that cleans up smw directory automatically so we don't forget to remove things like .svn or thumbs.db
-[X] Draw order of objects reversed so that the player collides first with the item drawn on top
-[X] AI smartly collects cards in collection mode -> stops at 3 cards, attempts to match cards that it can see
-[X] Allowed bots to use super stomp move at the right time (kuribo's shoe and tanooki stomp)
-[X] Bouncing off of stomp enemies with tanooki doesn't free player from being tanooki like stomping on players does
-[X] Killing players/enemies does not score player points when killed by turning an on/off block on
-[X] Fixed dealing with corrupt tiles (row/col out of bounds) in level editor.  This was causing the mysterious falling tile bug.
-[X] Fixed bug where the worlds are in alphabetized by the creator's name, not the world's name.
-[X] Save map with Shift + s in level AND world editor and display on screen that the map was saved
-[X] It'd be nice to have a way to adjust world size in the world editor. It'd suck to find out you made the world a block or two too small, and end up having to redo it all on a new map.
+[X] Added "Are You Sure" message when exiting world editor
+[X] AI to deal with having platforms under their feet so they don't think they should run to one side to avoid death tiles below
+[X] AI to deal with phanto and throwing key when it is close.    
 
 
 Beta 1 Public Release Bugs
@@ -81,6 +70,14 @@ Beta 1 Public Release Bugs
 	have to take into account how much time is spent in the swirly spawn animation-an area can be empty initially, but 
 	occupied by the time the animation is done
 
+[ ] Ignore yoshi's eggs that don't have a matching yoshi
+
+[ ] Test new AI that deals with getting rid of held objects that are not goal objects like flags
+    Holding/throwing stars in star mode
+	Holding shells/throwblocks/springs etc -> changes made here to not pay attention to held objects
+	Holding phanto key
+
+[ ] Alt + Enter makes game fullscreen/windowed but doesn't change menu option to reflect change
 
 Need To Test
 [ ] In the above picture, when I get killed on the spike but get the domination square below it, the square stays my color, even if I set it so that all my blocks go away when I die. All of my other ones turn neutral normally when I die like that. 
@@ -1902,6 +1899,12 @@ void RunGame()
 	float dNextWind = (float)((rand() % 41) - 20) / 4.0f;
 	game_values.gamewindx = (float)((rand() % 41) - 20) / 4.0f;
 
+	//Initialize players after game init has finished
+	for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++)
+		list_players[iPlayer]->Init();
+	
+
+	//This is the main game loop
 	while (true)
 	{
 		framestart = SDL_GetTicks();

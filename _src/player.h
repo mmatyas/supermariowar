@@ -105,6 +105,8 @@ class CPlayer
 		CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamID, short iTeamColorID, gfxSprite * nsprites[PGFX_LAST], CScore *nscore, short * respawn, CPlayerAI * ai);
 		~CPlayer();
 
+		void Init();
+
 		void draw();
 		void drawarrows();
 		void drawsuicidetimer();
