@@ -346,10 +346,14 @@ class CPlayer
 		//ID of the player that owns this player for Owned mode
 		short ownerPlayerID;
 		short ownerColorOffsetX;
+
 		//If greater than 0, the player is jailed and moves slowly for Jail mode
 		short jail;
 		short jailcolor;
 		short jailtimer;
+
+		//if true, the player is a shyguy in shyguy mode
+		bool shyguy;
 
 		bool fallthrough;
 
@@ -390,6 +394,7 @@ class CPlayer
 		friend class CGM_Classic;
 		friend class CGM_Chicken;
 		friend class CGM_Tag;
+		friend class CGM_ShyGuyTag;
 		friend class CGM_Coins;
 		friend class CGM_Survival;
 		friend class CGM_Eggs;

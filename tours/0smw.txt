@@ -25,7 +25,8 @@
 #18 = Health
 #19 = Card Collection
 #20 = Phanto Chase
-#24 = Pipe Minigame
+#21 = Shyguy Tag
+#1000 = Pipe Minigame
 
 #Version
 1.8.0.0
@@ -169,7 +170,11 @@
 #Red Phanto Quantity - Number of red phantos from 0 on up
 #Green Phanto Quantity - Number of green phantos from 0 on up
 
-#24 - Pipe Minigame
+#21 - Shyguy Tag
+#Suicide Tag - 0 = Off, 1 = On
+#Stomp Tag - 0 = Off, 1 = On
+
+#1000 - Pipe Minigame
 #No Options
 
 #Tour Stops (maximum 10 stops)

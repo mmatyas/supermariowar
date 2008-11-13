@@ -233,7 +233,52 @@ CPlayerAI::~CPlayerAI()
 //Setup AI so that it can ignore or pay attention to some objects
 void CPlayerAI::Init()
 {
-	//TODO: Scan yoshi's egg mode objects to make sure that we ignore eggs with out matching yoshis
+	//Scan yoshi's egg mode objects to make sure that we ignore eggs with out matching yoshis
+	if(game_values.gamemode->gamemode == game_mode_eggs)
+	{
+		bool fYoshi[4] = {false, false, false, false};
+		//Scan Yoshis to see which ones are present
+		for(short i = 0; i < objectcontainer[1].list_end; i++)
+		{
+			CObject * object = objectcontainer[1].list[i];
+
+			if(object_moving == object->getObjectType())
+			{
+				IO_MovingObject * movingobject = (IO_MovingObject*)object;
+
+				if(movingobject_yoshi == movingobject->getMovingObjectType())
+				{
+					MO_Yoshi * yoshi = (MO_Yoshi*)movingobject;
+					fYoshi[yoshi->getColor()] = true;
+				}
+			}
+		}
+
+		//Now scan eggs and ignore any egg that doesn't have a yoshi
+		for(short i = 0; i < objectcontainer[1].list_end; i++)
+		{
+			CObject * object = objectcontainer[1].list[i];
+
+			if(object_moving == object->getObjectType())
+			{
+				IO_MovingObject * movingobject = (IO_MovingObject*)object;
+
+				if(movingobject_egg == movingobject->getMovingObjectType())
+				{
+					CO_Egg * egg = (CO_Egg*)movingobject;
+					if(!fYoshi[egg->getColor()])
+					{
+						AttentionObject * ao = new AttentionObject();
+						ao->iID = egg->iNetworkID;
+						ao->iType = 1;     //Ignore this object
+						ao->iTimer = 0;		//Ignore it forever
+
+						attentionObjects[ao->iID] = ao;
+					}
+				}
+			}
+		}
+	}
 }
 
 void CPlayerAI::Think(COutputControl * playerKeys)
@@ -714,6 +759,11 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 				}
 			}
 		}
+		//If we are holding something that we are ignoring, drop it
+		else if(attentionObjects.find(carriedItem->iNetworkID) != attentionObjects.end())
+		{
+			playerKeys->game_turbo.fDown = false;
+		}
 
 		//Drop live bombs if they are not yours
 		if(carriedobjecttype == movingobject_bomb)
@@ -912,7 +962,7 @@ void CPlayerAI::GetNearestObjects()
 
 		if(attentionObjects.find(object->iNetworkID) != lim)
 		{
-			DistanceToObject(object, &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
+			//DistanceToObject(object, &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
 			continue;
 		}
 
@@ -1158,7 +1208,7 @@ void CPlayerAI::GetNearestObjects()
 
 		if(attentionObjects.find(object->iNetworkID) != lim)
 		{
-			DistanceToObject(object, &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
+			//DistanceToObject(object, &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
 			continue;
 		}
 
@@ -1244,7 +1294,7 @@ void CPlayerAI::GetNearestObjects()
 
 		if(attentionObjects.find(object->iNetworkID) != lim)
 		{
-			DistanceToObject(object, &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
+			//DistanceToObject(object, &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
 			continue;
 		}
 

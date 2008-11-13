@@ -205,6 +205,9 @@ void CGameMode::displayplayertext()
 
 void CGameMode::playwarningsound()
 {
+	if(playedwarningsound)
+		return;
+
 	playedwarningsound = true;
 	ifsoundonstop(sfx_invinciblemusic);
 
@@ -1104,6 +1107,169 @@ void CGM_Tag::playerextraguy(CPlayer &player, short iType)
 	}
 }
 
+
+//shyguy tag mode
+//First player killed becomes the shyguy
+//He can then tag other players to also become shy guys
+//Players that are not shy guys will be slowly scoring points
+//When all players become shyguys, then the mode is reset with no shyguys
+CGM_ShyGuyTag::CGM_ShyGuyTag() : CGameMode()
+{
+	goal = 200;
+	gamemode = game_mode_shyguytag;
+
+	SetupModeStrings("Shyguy Tag", "Points", 50);
+
+	shyguyclearcounter = 0;
+	scorecounter = 0;
+}
+
+void CGM_ShyGuyTag::init()
+{
+	CGameMode::init();
+	fReverseScoring = goal == -1;
+
+	for(short iScore = 0; iScore < score_cnt; iScore++)
+	{
+		score[iScore]->SetScore(0);
+	}
+}
+
+void CGM_ShyGuyTag::think()
+{
+	if(gameover)
+	{
+		displayplayertext();
+		return;
+	}
+
+	//See how many players are shy guys
+	short shyguycount = 0;
+	for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++)
+	{
+		if(list_players[iPlayer]->shyguy)
+			shyguycount++;
+	}
+
+	//If we are not waiting to clear, check if we need to start waiting
+	if(shyguyclearcounter == 0)
+	{
+		if(shyguycount == list_players_cnt)
+		{
+			shyguyclearcounter = 1;
+			ifsoundonplay(sfx_starwarning);
+		}
+	}
+	else if(++shyguyclearcounter == 62) //Clear the shy guys
+	{
+		ifsoundonplay(sfx_racesound);
+
+		shyguyclearcounter = 0;
+
+		for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++)
+		{
+			list_players[iPlayer]->shyguy = false;
+		}
+	}
+
+	//Award points to non shyguys
+	if(shyguycount > 0)
+	{
+		if(++scorecounter >= game_values.pointspeed)
+		{
+			bool playwarning = false;
+			scorecounter = 0;
+
+			bool fAlreadyScored[4] = {false, false, false, false};
+			for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++)
+			{
+				if(!list_players[iPlayer]->shyguy)
+				{
+					short iTeam = list_players[iPlayer]->getTeamID();
+					if(!fAlreadyScored[iTeam])
+					{
+						fAlreadyScored[iTeam] = true;
+						list_players[iPlayer]->score->AdjustScore(shyguycount);
+
+						CheckWinner(list_players[iPlayer]);
+					}
+				}
+			}
+		}
+	}
+}
+
+short CGM_ShyGuyTag::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
+{
+	if(!other.shyguy)
+	{
+		SetShyGuy(other.getTeamID());
+		ifsoundonplay(sfx_transform);
+	}
+
+	return player_kill_normal;
+}
+
+short CGM_ShyGuyTag::playerkilledself(CPlayer &player, killstyle style)
+{
+	CGameMode::playerkilledself(player, style);
+
+	if(gameover && game_values.gamemodesettings.shyguytag.tagonsuicide)
+	{
+		SetShyGuy(player.getTeamID());
+		return player_kill_normal;
+	}
+	
+	return player_kill_normal;
+}
+
+void CGM_ShyGuyTag::playerextraguy(CPlayer &player, short iType)
+{
+	if(!gameover)
+	{
+		player.score->AdjustScore(10 * iType);
+		CheckWinner(&player);
+	}
+}
+
+void CGM_ShyGuyTag::SetShyGuy(short iTeam)
+{
+	for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++)
+	{
+		if(list_players[iPlayer]->getTeamID() == iTeam)
+		{
+			CPlayer * player = list_players[iPlayer];
+			player->shyguy = true;
+			eyecandy[2].add(new EC_GravText(&game_font_large, player->ix + (HALFPW), player->iy + PH, "Shyguy!", -VELJUMP*1.5));
+			eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, player->ix + (HALFPW) - 16, player->iy + (HALFPH) - 16, 3, 8));
+		}
+	}
+
+	ifsoundonplay(sfx_transform);
+}
+
+short CGM_ShyGuyTag::CheckWinner(CPlayer * player)
+{
+	if(gameover)
+		return player_kill_normal;
+
+	if(player->score->score >= goal)
+	{
+		SetupScoreBoard(false);
+		ShowScoreBoard();
+
+		RemovePlayersButHighestScoring();
+		gameover = true;
+
+		CountAliveTeams(&winningteam);
+	}
+	else if(!playedwarningsound && goal != -1 && player->score->score >= goal * 0.8)
+	{
+		playwarningsound();
+	}
+
+	return player_kill_normal;
+}
 
 //Coin mode:
 //Collect randomly appearing coins on map

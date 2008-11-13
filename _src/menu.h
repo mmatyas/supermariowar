@@ -331,7 +331,7 @@ class Menu
 		UI_Menu mGameSettingsMenu;
 
 		MI_ImageSelectField * miModeField;
-		MI_SelectField * miGoalField[21];
+		MI_SelectField * miGoalField[22];
 		MI_Button * miModeSettingsButton;
 		MI_MapField * miMapField;
 		MI_Button * miSettingsStartButton;
@@ -378,7 +378,7 @@ class Menu
 
 
 		//Game Mode Settings Menu
-		UI_Menu mModeSettingsMenu[21];
+		UI_Menu mModeSettingsMenu[22];
 
 		//Classic
 		MI_SelectField * miClassicModeStyleField;
@@ -580,6 +580,15 @@ class Menu
 		MI_Image * miChaseModeRightHeaderBar;
 		MI_Text * miChaseModeHeaderText;
 
+		//Shyguy Tag
+		MI_SelectField * miShyGuyTagModeTagOnSuicideField;
+		MI_SelectField * miShyGuyTagModeTagOnStompField;
+		MI_Button * miShyGuyTagModeBackButton;
+		
+		MI_Image * miShyGuyTagModeLeftHeaderBar;
+		MI_Image * miShyGuyTagModeRightHeaderBar;
+		MI_Text * miShyGuyTagModeHeaderText;
+
 
 		//Team Select
 		UI_Menu mTeamSelectMenu;
@@ -611,6 +620,8 @@ class Menu
 
 		short iTournamentAIStep;
 		short iTournamentAITimer;
+
+		friend void RunGame();
 };
 
 #endif //__MENU_H_

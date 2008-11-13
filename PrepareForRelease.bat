@@ -21,7 +21,7 @@ rd /s /q maps\moved
 
 del /f /q worlds\ZZworldeditor.txt
 
-del /f /q /s thumbs.db
+del /f /q /s /a:H thumbs.db
 
 del /f /q maps\cache\*.png
 del /f /q maps\screenshots\*.png

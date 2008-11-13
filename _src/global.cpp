@@ -4,7 +4,11 @@
 #include "gfx.h"
 extern bool g_fLoadMessages;
 
-short g_iVersion[] = {1, 8, 0, 2};
+//1.8.0.0 == Release to staff
+//1.8.0.1 == Second release to staff
+//1.8.0.2 == beta1
+//1.8.0.3 == beta2
+short g_iVersion[] = {1, 8, 0, 3};
 
 //We're using these strings intead of the ugly ones returned by SDL_GetKeyName()
 const char * Keynames[340] = {"Unknown", "", "", "", "", "", "", "", "Backspace", "Tab", 
@@ -462,6 +466,14 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 		else
 			ts->iMode = -1;
 
+		//The pipe minigame was using the value 24 from version 1.8.0.0 to 1.8.0.2
+		//It was later switched to 1000 to accomodate new modes easily
+		if(iVersion[0] == 1 && iVersion[1] == 8 && iVersion[2] == 0 && iVersion[3] <= 2)
+		{
+			if(ts->iMode == 24)
+				ts->iMode = game_mode_pipe_minigame;
+		}
+
 		if(ts->iMode < 0 || (ts->iMode >= GAMEMODE_LAST && ts->iMode != game_mode_pipe_minigame))
 			ts->iMode = rand() % GAMEMODE_LAST;
 
@@ -750,6 +762,13 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 
 				for(short iPhanto = 0; iPhanto < 3; iPhanto++)
 					ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.chase.phantoquantity[iPhanto], NULL, game_values.gamemodemenusettings.chase.phantoquantity[iPhanto], false);
+			}
+			else if(ts->iMode == 21) //shyguy tag
+			{
+				ts->fUseSettings = true;
+				
+				ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.shyguytag.tagonsuicide, 0, game_values.gamemodemenusettings.shyguytag.tagonsuicide);
+				ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.shyguytag.tagonstomp, 0, game_values.gamemodemenusettings.shyguytag.tagonstomp);
 			}
 		}
 	}
@@ -1303,6 +1322,20 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
 						sprintf(szTemp, ",%d", ts->gmsSettings.chase.phantoquantity[iPhanto]);
 						strcat(buffer, szTemp);
 					}
+				}
+			}
+			else if(ts->iMode == 21) //shyguy tag
+			{
+				if(ts->iNumUsedSettings > 0)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.shyguytag.tagonsuicide);
+					strcat(buffer, szTemp);
+				}
+
+				if(ts->iNumUsedSettings > 1)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.shyguytag.tagonstomp);
+					strcat(buffer, szTemp);
 				}
 			}
 		}

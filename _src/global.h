@@ -760,6 +760,12 @@ struct ChaseGameModeSettings
 	short phantoquantity[3];	//How many phantos there are
 };
 
+struct ShyGuyTagGameModeSettings
+{
+	bool tagonsuicide;			//If players become shyguys if they kill themselves
+	bool tagonstomp;			//If players become shyguys if they are stomped
+};
+
 struct GameModeSettings
 {
 	ClassicGameModeSettings classic;
@@ -782,6 +788,7 @@ struct GameModeSettings
 	HealthGameModeSettings health;
 	CollectionGameModeSettings collection;
 	ChaseGameModeSettings chase;
+	ShyGuyTagGameModeSettings shyguytag;
 };
 
 struct WorldStageBonus

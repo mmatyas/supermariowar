@@ -2783,6 +2783,43 @@ void Menu::CreateMenu()
 
 
 	//***********************
+	// Shyguy Tag Mode Settings
+	//***********************
+
+	miShyGuyTagModeTagOnSuicideField = new MI_SelectField(&spr_selectfield, 120, 200, "Suicide Tag", 400, 180);
+	miShyGuyTagModeTagOnSuicideField->Add("Off", 0, "", false, false);
+	miShyGuyTagModeTagOnSuicideField->Add("On", 1, "", true, false);
+	miShyGuyTagModeTagOnSuicideField->SetData(NULL, NULL, &game_values.gamemodemenusettings.shyguytag.tagonsuicide);
+	miShyGuyTagModeTagOnSuicideField->SetKey(game_values.gamemodemenusettings.shyguytag.tagonsuicide ? 1 : 0);
+	miShyGuyTagModeTagOnSuicideField->SetAutoAdvance(true);
+
+	miShyGuyTagModeTagOnStompField = new MI_SelectField(&spr_selectfield, 120, 240, "Stomp Tag", 400, 180);
+	miShyGuyTagModeTagOnStompField->Add("Off", 0, "", false, false);
+	miShyGuyTagModeTagOnStompField->Add("On", 1, "", true, false);
+	miShyGuyTagModeTagOnStompField->SetData(NULL, NULL, &game_values.gamemodemenusettings.shyguytag.tagonstomp);
+	miShyGuyTagModeTagOnStompField->SetKey(game_values.gamemodemenusettings.shyguytag.tagonstomp ? 1 : 0);
+	miShyGuyTagModeTagOnStompField->SetAutoAdvance(true);
+
+	miShyGuyTagModeBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
+	miShyGuyTagModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
+
+	miShyGuyTagModeLeftHeaderBar = new MI_Image(&menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
+	miShyGuyTagModeRightHeaderBar = new MI_Image(&menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
+	miShyGuyTagModeHeaderText = new MI_Text("Tag Mode Menu", 320, 5, 0, 2, 1);
+
+	mModeSettingsMenu[21].AddControl(miShyGuyTagModeTagOnSuicideField, miShyGuyTagModeBackButton, miShyGuyTagModeTagOnStompField, NULL, miShyGuyTagModeBackButton);
+	mModeSettingsMenu[21].AddControl(miShyGuyTagModeTagOnStompField, miShyGuyTagModeTagOnSuicideField, miShyGuyTagModeBackButton, NULL, miShyGuyTagModeBackButton);
+	mModeSettingsMenu[21].AddControl(miShyGuyTagModeBackButton, miShyGuyTagModeTagOnStompField, miShyGuyTagModeTagOnSuicideField, miShyGuyTagModeTagOnStompField, NULL);
+	
+	mModeSettingsMenu[21].AddNonControl(miShyGuyTagModeLeftHeaderBar);
+	mModeSettingsMenu[21].AddNonControl(miShyGuyTagModeRightHeaderBar);
+	mModeSettingsMenu[21].AddNonControl(miShyGuyTagModeHeaderText);
+	
+	mModeSettingsMenu[21].SetHeadControl(miShyGuyTagModeTagOnSuicideField);
+	mModeSettingsMenu[21].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
+
+
+	//***********************
 	// Team Select Settings
 	//***********************
 	
@@ -2957,7 +2994,7 @@ void Menu::RunMenu()
 	iTournamentAIStep = 0;
 	iTournamentAITimer = 0;
 
-	bool fShowSettingsButton[GAMEMODE_LAST] = {true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, true, true, true, true, true, true};
+	bool fShowSettingsButton[GAMEMODE_LAST] = {true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, true, true, true, true, true, true, true};
 
 	//Reset the keys each time we switch from menu to game and back
 	game_values.playerInput.ResetKeys();
@@ -3277,6 +3314,9 @@ void Menu::RunMenu()
 							game_values.fullscreen = !game_values.fullscreen;
 							gfx_setresolution(640, 480, game_values.fullscreen);
 							blitdest = screen;
+
+							miFullscreenField->SetKey(game_values.fullscreen ? 1 : 0);
+
 							continue;
 						}
 					}
@@ -4445,7 +4485,7 @@ void Menu::RunMenu()
 				char * pszThumbnail = szThumbnail + strlen(szThumbnail);
 				GetNameFromFileName(pszThumbnail, (*itr).second->filename.c_str());
 
-#ifdef PNG_SAVE_FORMAT				
+#ifdef PNG_SAVE_FORMAT
 				strcat(szThumbnail, ".png");
 #else
 				strcat(szThumbnail, ".bmp");
@@ -4812,6 +4852,11 @@ void Menu::SetRandomGameModeSettings(short iMode)
 		
 		for(short iPhanto = 0; iPhanto < 3; iPhanto++)
 			game_values.gamemodesettings.chase.phantoquantity[iPhanto] = miChaseModeQuantitySlider[iPhanto]->GetRandomShortValue();
+	}
+	else if(iMode == game_mode_shyguytag) //shyguy tag
+	{
+		game_values.gamemodesettings.shyguytag.tagonsuicide = miShyGuyTagModeTagOnSuicideField->GetRandomBoolValue();
+		game_values.gamemodesettings.shyguytag.tagonstomp = miShyGuyTagModeTagOnStompField->GetRandomBoolValue();
 	}
 }
 

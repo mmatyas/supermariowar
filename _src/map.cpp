@@ -292,6 +292,9 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 
 					if(tile->iID >= 0)
 					{
+						if(tile->iID > iMaxTilesetID)
+							tile->iID = 0;
+
 						//Make sure the column and row we read in is within the bounds of the tileset
 						if(tile->iCol < 0 || tile->iCol >= tilesetwidths[tile->iID])
 							tile->iCol = 0;
@@ -318,7 +321,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 			iSwitches[iSwitch] = (short)ReadInt(mapfile);
 		}
 
-		loadPlatforms(mapfile, iReadType == read_type_preview, version, translationid, tilesetwidths, tilesetheights);
+		loadPlatforms(mapfile, iReadType == read_type_preview, version, translationid, tilesetwidths, tilesetheights, iMaxTilesetID);
 
 		//All tiles have been loaded so the translation is no longer needed
 		delete [] translationid;
@@ -1224,7 +1227,7 @@ void CMap::SetTileGap(short i, short j)
 	}
 }
 
-void CMap::loadPlatforms(FILE * mapfile, bool fPreview, int version[4], short * translationid, short * tilesetwidths, short * tilesetheights)
+void CMap::loadPlatforms(FILE * mapfile, bool fPreview, int version[4], short * translationid, short * tilesetwidths, short * tilesetheights, short iMaxTilesetID)
 {
 	clearPlatforms();
 
@@ -1257,6 +1260,9 @@ void CMap::loadPlatforms(FILE * mapfile, bool fPreview, int version[4], short * 
 
 					if(tile->iID >= 0)
 					{
+						if(iMaxTilesetID != -1 && tile->iID > iMaxTilesetID)
+							tile->iID = 0;
+
 						//Make sure the column and row we read in is within the bounds of the tileset
 						if(tile->iCol < 0 || (tilesetwidths && tile->iCol >= tilesetwidths[tile->iID]))
 							tile->iCol = 0;

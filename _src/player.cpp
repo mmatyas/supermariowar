@@ -40,6 +40,8 @@ CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamI
 	jailcolor = 0;
 	jailtimer = 0;
 
+	shyguy = false;
+
 	spawntext = 20;  //set it to 20 so there is an immediate text spawned upon winning
 	
 	powerupused = -1;

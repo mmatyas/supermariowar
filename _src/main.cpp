@@ -54,13 +54,12 @@ Fixed
 [X] Added "Are You Sure" message when exiting world editor
 [X] AI to deal with having platforms under their feet so they don't think they should run to one side to avoid death tiles below
 [X] AI to deal with phanto and throwing key when it is close.    
-
+[X] Alt + Enter makes game fullscreen/windowed but doesn't change menu option to reflect change
+[X] In the Retro graphics pack, there are certain graphics that need updated, mainly the tournament scoreboard layout
+[X] Ignore yoshi's eggs that don't have a matching yoshi
+[X] Started Shyguy tag mode
 
 Beta 1 Public Release Bugs
-
-[ ] In the Retro graphics pack, there are certain graphics that need updated, mainly the tournament board layout, and some other menu stuff, if I recall correctly.
-    -> I meant that some of the stuff isn't set up like it needs to be. For example, the tournament board's layout is missing an entire section that was added in, making the World mode and Tour mode scoreboards fail to appear correctly, or at all for that matter.
-	-> yeah there wasnt that board thingy that shows the scores, all it shows is the scores and thats all. also in the editor, some times I cant make any blocks at all.
 
 [ ] Treasure chests from winning a stage that rewards an item in world mode can be spawned in areas where they fall forever, and can never be opened. (Though this is aesthetic)
 
@@ -70,14 +69,21 @@ Beta 1 Public Release Bugs
 	have to take into account how much time is spent in the swirly spawn animation-an area can be empty initially, but 
 	occupied by the time the animation is done
 
-[ ] Ignore yoshi's eggs that don't have a matching yoshi
-
 [ ] Test new AI that deals with getting rid of held objects that are not goal objects like flags
     Holding/throwing stars in star mode
 	Holding shells/throwblocks/springs etc -> changes made here to not pay attention to held objects
 	Holding phanto key
 
-[ ] Alt + Enter makes game fullscreen/windowed but doesn't change menu option to reflect change
+[ ] Refreshing the map thumbnails hangs half way through on xbox (after icecap map)
+    -> Fixed memory leak in thumbnail creation, retest on xbox
+	-> Still Hangs :(
+	-> Fixed bug where some maps crashed when loaded
+
+[ ] Fix PrepareForRelease script to delete hidden thumbs.db  use /a:H option and test it!
+	-> Need to test it
+
+[ ] Pipe minigame icon doesn't show up before game (because it is now ID 1000)
+
 
 Need To Test
 [ ] In the above picture, when I get killed on the spike but get the domination square below it, the square stays my color, even if I set it so that all my blocks go away when I die. All of my other ones turn neutral normally when I die like that. 
@@ -86,8 +92,6 @@ Need To Test
 	- Test all control cases with teams/bots keyboard/controllers menu/sub menus/bonus wheel/scoreboard and ties for winner/loser tournament ties etc.
 [ ] Game and world music packs on the menu have "game\" and "world\" in front of them (on xbox but see if same on PC)
     -> Fix in place, check on xbox
-[ ] Refreshing the map thumbnails hangs half way through on xbox (after icecap map)
-    -> Fixed memory leak in thumbnail creation, retest on xbox
 
 
 Can't Reproduce Bug
@@ -289,20 +293,20 @@ ASK
 */
 
 /*
-Checkin:
-*/
-
-/*
 Procedure for adding a new game mode:
 1) Add class to gamemodes.cpp and gamemodes.h
 2) Add game mode type to GameModeType enum in gamemodes.h
 3) Add new game mode to gamemodes array in main.cpp
-4) Add game mode options to GameModeSettings in global.h
-5) Add menu fields to support these new options
-6) Update ParseTourStopLine() and WriteTourStopLine() in global.cpp
-7) Update ChooseRandomSettingsForMode() in menu.cpp
-8) Add new mode gfx to gfx\packs\Classic\menu\menu_mode_large.png and menu_mode_small.png
-9) Update fShowSettingsButton[] array in menu.cpp
+4) Update MI_SelectField * miGoalField[22]; line in menu.h to match the new number of modes
+5) Update UI_Menu mModeSettingsMenu[22]; line in meny.h to accomodate a new settings menu
+6) Add game mode options to GameModeSettings in global.h
+7) Set default settings for settings in main.cpp
+8) Add menu fields to support these new options
+9) Update ParseTourStopLine() and WriteTourStopLine() in global.cpp
+10) Update SetRandomGameModeSettings() in menu.cpp
+11) Add new mode gfx to gfx\packs\Classic\menu\menu_mode_large.png and menu_mode_small.png
+12) Update fShowSettingsButton[] array in menu.cpp
+13) Remove old options.bin (new settings will now be read from it)
 
 
 Procedure for adding a new powerup:
@@ -1180,6 +1184,7 @@ int main(int argc, char *argv[])
 	gamemodes[18] = new CGM_Health();
 	gamemodes[19] = new CGM_Collection();
 	gamemodes[20] = new CGM_Chase();
+	gamemodes[21] = new CGM_ShyGuyTag();
 
 	currentgamemode = 0;
 	game_values.gamemode = gamemodes[currentgamemode];
@@ -1317,6 +1322,10 @@ int main(int argc, char *argv[])
 	game_values.gamemodemenusettings.chase.phantoquantity[0] = 1;
 	game_values.gamemodemenusettings.chase.phantoquantity[1] = 1;
 	game_values.gamemodemenusettings.chase.phantoquantity[2] = 0;
+
+	//Shyguy Tag
+	game_values.gamemodemenusettings.shyguytag.tagonsuicide = false; 
+	game_values.gamemodemenusettings.shyguytag.tagonstomp = true;
 
 	//Read saved settings from disk
 	FILE * fp = OpenFile("options.bin", "rb");
@@ -2126,6 +2135,8 @@ void RunGame()
 							game_values.fullscreen = !game_values.fullscreen;
 							gfx_setresolution(640, 480, game_values.fullscreen);
 							blitdest = screen;
+
+							g_Menu.miFullscreenField->SetKey(game_values.fullscreen ? 1 : 0);
 							
 							//Continue with input -> don't feed this event to the input
 							//otherwise it will pause the game when switching to full/windowed screen
