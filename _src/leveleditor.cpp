@@ -66,6 +66,8 @@ class MapPlatform
 
 			for(short i = 0; i < MAPWIDTH; i++)
 				tiles[i] = new TilesetTile[MAPHEIGHT];
+
+			preview = NULL;
 		}
 
 		~MapPlatform()
@@ -74,12 +76,47 @@ class MapPlatform
 				delete [] tiles[i];
 
 			delete [] tiles;
+
+			if(preview)
+				SDL_FreeSurface(preview);
 		}
 
+		void UpdatePreview()
+		{
+			if(!preview)
+			{
+				preview = SDL_CreateRGBSurface(screen->flags, 160, 120, screen->format->BitsPerPixel, 0, 0, 0, 0);
+				SDL_SetColorKey(preview, SDL_SRCCOLORKEY, SDL_MapRGB(preview->format, 255, 0, 255));
+			}
+
+			SDL_FillRect(preview, NULL, SDL_MapRGB(preview->format, 255, 0, 255));
+
+			for(short iPlatformX = 0; iPlatformX < MAPWIDTH; iPlatformX++)
+			{
+				for(short iPlatformY = 0; iPlatformY < MAPHEIGHT; iPlatformY++)
+				{
+					TilesetTile * tile = &tiles[iPlatformX][iPlatformY];
+
+					SDL_Rect bltrect = {iPlatformX << 3, iPlatformY << 3, THUMBTILESIZE, THUMBTILESIZE};
+					if(tile->iID >= 0)
+					{
+						SDL_BlitSurface(g_tilesetmanager.GetTileset(tile->iID)->GetSurface(2), &g_tilesetmanager.rRects[2][tile->iCol][tile->iRow], preview, &bltrect);
+					}
+					else if(tile->iID == TILESETANIMATED)
+					{
+						SDL_BlitSurface(spr_tileanimation[2].getSurface(), &g_tilesetmanager.rRects[2][tile->iCol << 2][tile->iRow], preview, &bltrect);
+					}
+					else if(tile->iID == TILESETUNKNOWN)
+					{
+						//Draw unknown tile
+						SDL_BlitSurface(spr_unknowntile[2].getSurface(), &g_tilesetmanager.rRects[2][0][0], preview, &bltrect);
+					}
+				}				
+			}
+		}
 
 		TilesetTile ** tiles;
 		TileType types[MAPWIDTH][MAPHEIGHT];
-		SDL_Rect rIcon[2];
 		short iVelocity;
 		short iStartX;
 		short iStartY;
@@ -93,6 +130,9 @@ class MapPlatform
 		float fRadiusY;
 
 		short iDrawLayer;
+
+		SDL_Rect rIcon[2];
+		SDL_Surface * preview;
 };
 
 extern TileType GetIncrementedTileType(TileType type);
@@ -273,6 +313,7 @@ int editor_animation();
 int editor_properties(short iBlockCol, short iBlockRow);
 int editor_modeitems();
 
+void DisplayPlatformPreview(short iPlatformId, short iMouseX, short iMouseY);
 void SwitchPlatforms(short iPlatformId1, short iPlatformId2);
 void CopyPlatform(MapPlatform * toPlatform, MapPlatform * fromPlatform);
 
@@ -1757,9 +1798,6 @@ void drawlayer(int layer, bool fUseCopied, short iBlockSize)
 	{
 		for(short j = 0; j < MAPHEIGHT; j++)
 		{
-			if(i == 9 && j == 6)
-				int hello = 3;
-
 			TilesetTile * tile = NULL;
 			if((move_mode == 1 || move_mode == 3) && i - move_offset_x >= 0 && i - move_offset_x < MAPWIDTH &&
 				j - move_offset_y >= 0 && j - move_offset_y < MAPHEIGHT && 
@@ -2492,11 +2530,13 @@ int editor_platforms()
 	short iPlatformSwitchState = 0, iPlatformSwitchIndex = 0;
 	short iEditPlatform = 0;
 	short iPlatformTop, iPlatformLeft, iPlatformWidth, iPlatformHeight;
-								
+		
+	short iPlatformPreview = -1;
+
 	while (!done)
 	{
 		int framestart = SDL_GetTicks();
-
+	
 		//handle messages
 		while(SDL_PollEvent(&event))
 		{
@@ -2540,6 +2580,8 @@ int editor_platforms()
 							{
 								SwitchPlatforms(iPlatformSwitchIndex, event.key.keysym.sym - SDLK_1);
 
+								iPlatformPreview = -1;
+								
 								iPlatformSwitchState = 0;
 								iPlatformEditState = PLATFORM_EDIT_STATE_SELECT;								
 							}
@@ -2563,6 +2605,7 @@ int editor_platforms()
 					{
 						if(PLATFORM_EDIT_STATE_SELECT == iPlatformEditState)
 						{
+							iPlatformPreview = -1;
 							iPlatformEditState = PLATFORM_EDIT_STATE_MOVE;
 							iPlatformSwitchState = 0;
 						}
@@ -2653,17 +2696,15 @@ int editor_platforms()
 						{
 							return EDITOR_EDIT;
 						}
-						else if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState || PLATFORM_EDIT_STATE_MOVE == iPlatformEditState)
+						else if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState || PLATFORM_EDIT_STATE_MOVE == iPlatformEditState || PLATFORM_EDIT_STATE_TEST == iPlatformEditState)
 						{
+							iPlatformPreview = -1;
+							g_Platforms[iEditPlatform].UpdatePreview();
 							iPlatformEditState = PLATFORM_EDIT_STATE_SELECT;
 						}
 						else if(PLATFORM_EDIT_STATE_PATH == iPlatformEditState || PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState)
 						{
 							iPlatformEditState = PLATFORM_EDIT_STATE_EDIT;
-						}
-						else if(PLATFORM_EDIT_STATE_TEST == iPlatformEditState)
-						{
-							iPlatformEditState = PLATFORM_EDIT_STATE_SELECT;
 						}
 					}
 					else if(event.key.keysym.sym == SDLK_KP_MINUS || event.key.keysym.sym == SDLK_MINUS)
@@ -2739,6 +2780,8 @@ int editor_platforms()
 										if(iPlatformSwitchState == 1)
 										{
 											SwitchPlatforms(iPlatformSwitchIndex, iPlatform);
+
+											iPlatformPreview = -1;
 
 											iPlatformSwitchState = 0;
 											iPlatformEditState = PLATFORM_EDIT_STATE_SELECT;								
@@ -2960,6 +3003,20 @@ int editor_platforms()
 							}
 						}
 					}
+					//Display platform preview
+					else if(PLATFORM_EDIT_STATE_SELECT == iPlatformEditState || PLATFORM_EDIT_STATE_MOVE == iPlatformEditState)
+					{
+						iPlatformPreview = -1;
+						for(int iPlatform = 0; iPlatform < g_iNumPlatforms; iPlatform++)
+						{
+							if(event.button.x >= g_Platforms[iPlatform].rIcon[1].x && event.button.x < g_Platforms[iPlatform].rIcon[1].x + g_Platforms[iPlatform].rIcon[1].w &&
+								event.button.y >= g_Platforms[iPlatform].rIcon[1].y && event.button.y < g_Platforms[iPlatform].rIcon[1].y + g_Platforms[iPlatform].rIcon[1].h)
+							{
+								iPlatformPreview = iPlatform;
+							}
+						}
+					}
+						
 
 					break;
 				}
@@ -3008,12 +3065,19 @@ int editor_platforms()
 			{
 				if(iPlatformSwitchState == 0)
 				{
-					menu_font_small.drawCentered(320, 300, "Select First Platform To Switch");
+					menu_font_small.drawCentered(320, 280, "Select First");
+					menu_font_small.drawCentered(320, 300, "Platform To Switch");
 				}
-				else 
+				else
 				{
-					menu_font_small.drawCentered(320, 300, "Select Second Platform To Switch");
+					menu_font_small.drawCentered(320, 280, "Select Second");
+					menu_font_small.drawCentered(320, 300, "Platform To Switch");
 				}								
+			}
+
+			if(iPlatformPreview >= 0)
+			{
+				DisplayPlatformPreview(iPlatformPreview, event.button.x, event.button.y);
 			}
 		}
 		else if(PLATFORM_EDIT_STATE_PATH_TYPE == iPlatformEditState || PLATFORM_EDIT_STATE_CHANGE_PATH_TYPE == iPlatformEditState)
@@ -3103,7 +3167,6 @@ int editor_platforms()
 			drawmap(false, TILESIZE, true);
 
 			menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "Check Paths: [esc] Exit");
-			
 		}
 
 		DrawMessage();
@@ -3121,33 +3184,43 @@ int editor_platforms()
 	return EDITOR_QUIT;
 }
 
+void DisplayPlatformPreview(short iPlatformId, short iMouseX, short iMouseY)
+{
+	SDL_Rect srcRect = {0, 0, 160, 120};
+	SDL_Rect dstRect = {iMouseX, iMouseY, 160, 120};
+	SDL_BlitSurface(g_Platforms[iPlatformId].preview, &srcRect, screen, &dstRect);
+}
+
 void SwitchPlatforms(short iPlatformId1, short iPlatformId2)
 {
 	MapPlatform tempPlatform;
 	CopyPlatform(&tempPlatform, &g_Platforms[iPlatformId1]);
 	CopyPlatform(&g_Platforms[iPlatformId1], &g_Platforms[iPlatformId2]);
-	CopyPlatform(&g_Platforms[iPlatformId2], &tempPlatform);
+	CopyPlatform(&g_Platforms[iPlatformId2], &tempPlatform);	
+
+	g_Platforms[iPlatformId1].UpdatePreview();
+	g_Platforms[iPlatformId2].UpdatePreview();
 }
 
 void CopyPlatform(MapPlatform * toPlatform, MapPlatform * fromPlatform)
 {
-	toPlatform->fAngle = fromPlatform->fAngle ;
-	toPlatform->fRadiusX = toPlatform->fRadiusX;
-	toPlatform->fRadiusY = toPlatform->fRadiusY;
-	toPlatform->iDrawLayer = toPlatform->iDrawLayer;
-	toPlatform->iEndX = toPlatform->iEndX;
-	toPlatform->iEndY = toPlatform->iEndY;
-	toPlatform->iPathType = toPlatform->iPathType;
-	toPlatform->iStartX = toPlatform->iStartX;
-	toPlatform->iStartY = toPlatform->iStartY;
-	toPlatform->iVelocity = toPlatform->iVelocity;
-	
+	toPlatform->fAngle = fromPlatform->fAngle;
+	toPlatform->fRadiusX = fromPlatform->fRadiusX;
+	toPlatform->fRadiusY = fromPlatform->fRadiusY;
+	toPlatform->iDrawLayer = fromPlatform->iDrawLayer;
+	toPlatform->iEndX = fromPlatform->iEndX;
+	toPlatform->iEndY = fromPlatform->iEndY;
+	toPlatform->iPathType = fromPlatform->iPathType;
+	toPlatform->iStartX = fromPlatform->iStartX;
+	toPlatform->iStartY = fromPlatform->iStartY;
+	toPlatform->iVelocity = fromPlatform->iVelocity;
+
 	for(short iRow = 0; iRow < MAPHEIGHT; iRow++)
 	{
 		for(short iCol = 0; iCol < MAPWIDTH; iCol++)
 		{
 			CopyTilesetTile(&toPlatform->tiles[iCol][iRow], &fromPlatform->tiles[iCol][iRow]);
-			toPlatform->types[iCol][iRow] = toPlatform->types[iCol][iRow];
+			toPlatform->types[iCol][iRow] = fromPlatform->types[iCol][iRow];
 		}
 	}
 }
@@ -5533,6 +5606,8 @@ void loadcurrentmap()
 			g_Platforms[iPlatform].iStartY = (int)(path->dPathPointY[0]);
 			g_Platforms[iPlatform].fAngle = path->dStartAngle;
 		}
+
+		g_Platforms[iPlatform].UpdatePreview();
 	}
 }
 

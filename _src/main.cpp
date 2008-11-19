@@ -51,11 +51,8 @@ STUFF TO WATCH OUT FOR IN BETA2
 - collision detection and behavior of coins, ztar, collection cards
 
 Fixed
-[X] Can push players through walls when pushing several players in a row (to increase speed using the 1.5 multiplier),
-[X] Finished shyguy tag -> shyguys are somewhat invincible, shyguys can't use powerups
-[X] Pipe minigame icon doesn't show up before game (because it is now ID 1000)
-[X] Fix PrepareForRelease script to delete hidden thumbs.db
-[X] Started implementation of platform switcher feature in level editor
+[X] Added feature to level editor to allow switching platforms around
+[X] Added feature to level editor to show preview of platform when the icon is moused over
 
 Beta 1 Public Release Bugs
 
@@ -79,9 +76,7 @@ Beta 1 Public Release Bugs
 
 [ ] Fix Bug with switching platforms positions
 
-[ ] SVN Add 3 FTG skins
-[ ] SVN add shyguy mode skin
-
+[ ] Alt + enter on level editor or world editor should full screen
 
 
 Need To Test
