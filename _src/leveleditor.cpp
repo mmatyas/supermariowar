@@ -273,6 +273,9 @@ int editor_animation();
 int editor_properties(short iBlockCol, short iBlockRow);
 int editor_modeitems();
 
+void SwitchPlatforms(short iPlatformId1, short iPlatformId2);
+void CopyPlatform(MapPlatform * toPlatform, MapPlatform * fromPlatform);
+
 void UpdatePlatformPathStart(short iEditPlatform, short iClickX, short iClickY, bool fSnapToTile);
 void UpdatePlatformPathEnd(short iEditPlatform, short iClickX, short iClickY, bool fSnapToTile);
 void UpdatePlatformPathAngle(short iEditPlatform, short iClickX, short iClickY, bool fSnapToAngle);
@@ -2483,9 +2486,10 @@ int editor_platforms()
 
 	const char * szPathNames[3] = {"Line Segment", "Continuous", "Ellipse"};
 
-	enum {PLATFORM_EDIT_STATE_SELECT, PLATFORM_EDIT_STATE_PATH_TYPE, PLATFORM_EDIT_STATE_CHANGE_PATH_TYPE, PLATFORM_EDIT_STATE_EDIT, PLATFORM_EDIT_STATE_PATH, PLATFORM_EDIT_STATE_TEST, PLATFORM_EDIT_STATE_TILETYPE, PLATFORM_EDIT_STATE_ANIMATED};
+	enum {PLATFORM_EDIT_STATE_SELECT, PLATFORM_EDIT_STATE_PATH_TYPE, PLATFORM_EDIT_STATE_CHANGE_PATH_TYPE, PLATFORM_EDIT_STATE_EDIT, PLATFORM_EDIT_STATE_PATH, PLATFORM_EDIT_STATE_TEST, PLATFORM_EDIT_STATE_TILETYPE, PLATFORM_EDIT_STATE_ANIMATED, PLATFORM_EDIT_STATE_MOVE};
 
 	short iPlatformEditState = PLATFORM_EDIT_STATE_SELECT;
+	short iPlatformSwitchState = 0, iPlatformSwitchIndex = 0;
 	short iEditPlatform = 0;
 	short iPlatformTop, iPlatformLeft, iPlatformWidth, iPlatformHeight;
 								
@@ -2530,6 +2534,21 @@ int editor_platforms()
 								iPlatformEditState = PLATFORM_EDIT_STATE_PATH;
 							}
 						}
+						else if(PLATFORM_EDIT_STATE_MOVE == iPlatformEditState && event.key.keysym.sym - SDLK_1 < g_iNumPlatforms)
+						{
+							if(iPlatformSwitchState == 1)
+							{
+								SwitchPlatforms(iPlatformSwitchIndex, event.key.keysym.sym - SDLK_1);
+
+								iPlatformSwitchState = 0;
+								iPlatformEditState = PLATFORM_EDIT_STATE_SELECT;								
+							}
+							else
+							{
+								iPlatformSwitchState = 1;
+								iPlatformSwitchIndex = event.key.keysym.sym - SDLK_1;
+							}
+						}
 					}
 					else if(event.key.keysym.sym == SDLK_n)
 					{
@@ -2538,6 +2557,14 @@ int editor_platforms()
 							iEditPlatform = g_iNumPlatforms;
 							g_iNumPlatforms++;
 							iPlatformEditState = PLATFORM_EDIT_STATE_PATH_TYPE;
+						}
+					}
+					else if(event.key.keysym.sym == SDLK_m)
+					{
+						if(PLATFORM_EDIT_STATE_SELECT == iPlatformEditState)
+						{
+							iPlatformEditState = PLATFORM_EDIT_STATE_MOVE;
+							iPlatformSwitchState = 0;
 						}
 					}
 					else if(event.key.keysym.sym == SDLK_t)
@@ -2626,7 +2653,7 @@ int editor_platforms()
 						{
 							return EDITOR_EDIT;
 						}
-						else if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState)
+						else if(PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState || PLATFORM_EDIT_STATE_MOVE == iPlatformEditState)
 						{
 							iPlatformEditState = PLATFORM_EDIT_STATE_SELECT;
 						}
@@ -2693,7 +2720,7 @@ int editor_platforms()
 				{
 					if(event.button.button == SDL_BUTTON_LEFT && !ignoreclick)
 					{
-						if(PLATFORM_EDIT_STATE_SELECT == iPlatformEditState)
+						if(PLATFORM_EDIT_STATE_SELECT == iPlatformEditState || PLATFORM_EDIT_STATE_MOVE == iPlatformEditState)
 						{
 							//check clicks on existing platforms
 							for(int iPlatform = 0; iPlatform < g_iNumPlatforms; iPlatform++)
@@ -2701,14 +2728,32 @@ int editor_platforms()
 								if(event.button.x >= g_Platforms[iPlatform].rIcon[1].x && event.button.x < g_Platforms[iPlatform].rIcon[1].x + g_Platforms[iPlatform].rIcon[1].w &&
 								   event.button.y >= g_Platforms[iPlatform].rIcon[1].y && event.button.y < g_Platforms[iPlatform].rIcon[1].y + g_Platforms[iPlatform].rIcon[1].h)
 								{
-									iEditPlatform = iPlatform;
-									iPlatformEditState = PLATFORM_EDIT_STATE_EDIT;
-									ignoreclick = true;
+									if(PLATFORM_EDIT_STATE_SELECT == iPlatformEditState)
+									{
+										iEditPlatform = iPlatform;
+										iPlatformEditState = PLATFORM_EDIT_STATE_EDIT;
+										ignoreclick = true;
+									}
+									else if(PLATFORM_EDIT_STATE_MOVE == iPlatformEditState)
+									{
+										if(iPlatformSwitchState == 1)
+										{
+											SwitchPlatforms(iPlatformSwitchIndex, iPlatform);
+
+											iPlatformSwitchState = 0;
+											iPlatformEditState = PLATFORM_EDIT_STATE_SELECT;								
+										}
+										else
+										{
+											iPlatformSwitchState = 1;
+											iPlatformSwitchIndex = iPlatform;
+										}
+									}
 								}
 							}
 
-							if(g_iNumPlatforms < MAX_PLATFORMS && event.button.x >= rNewButton[1].x && event.button.x < rNewButton[1].x + rNewButton[1].w &&
-							   event.button.y >= rNewButton[1].y && event.button.y < rNewButton[1].y + rNewButton[1].h)
+							if(PLATFORM_EDIT_STATE_SELECT == iPlatformEditState && g_iNumPlatforms < MAX_PLATFORMS && event.button.x >= rNewButton[1].x && 
+								event.button.x < rNewButton[1].x + rNewButton[1].w && event.button.y >= rNewButton[1].y && event.button.y < rNewButton[1].y + rNewButton[1].h)
 							{
 								//Create a new platform then edit it
 								
@@ -2939,7 +2984,7 @@ int editor_platforms()
 			menu_shade.draw(0, 0);
 		}
 
-		if(PLATFORM_EDIT_STATE_SELECT == iPlatformEditState)
+		if(PLATFORM_EDIT_STATE_SELECT == iPlatformEditState || PLATFORM_EDIT_STATE_MOVE == iPlatformEditState)
 		{
 			SDL_Rect rp;
 			rp.x = 0;
@@ -2956,9 +3001,20 @@ int editor_platforms()
 			for(int iPlatform = 0; iPlatform < g_iNumPlatforms; iPlatform++)
 				SDL_BlitSurface(s_platform, &g_Platforms[iPlatform].rIcon[0], screen, &g_Platforms[iPlatform].rIcon[1]);
 
-			if(g_iNumPlatforms < MAX_PLATFORMS)
+			if(g_iNumPlatforms < MAX_PLATFORMS && PLATFORM_EDIT_STATE_SELECT == iPlatformEditState)
 				SDL_BlitSurface(s_platform, &rNewButton[0], screen, &rNewButton[1]);
 
+			if(PLATFORM_EDIT_STATE_MOVE == iPlatformEditState)
+			{
+				if(iPlatformSwitchState == 0)
+				{
+					menu_font_small.drawCentered(320, 300, "Select First Platform To Switch");
+				}
+				else 
+				{
+					menu_font_small.drawCentered(320, 300, "Select Second Platform To Switch");
+				}								
+			}
 		}
 		else if(PLATFORM_EDIT_STATE_PATH_TYPE == iPlatformEditState || PLATFORM_EDIT_STATE_CHANGE_PATH_TYPE == iPlatformEditState)
 		{
@@ -3063,6 +3119,37 @@ int editor_platforms()
 	}
 
 	return EDITOR_QUIT;
+}
+
+void SwitchPlatforms(short iPlatformId1, short iPlatformId2)
+{
+	MapPlatform tempPlatform;
+	CopyPlatform(&tempPlatform, &g_Platforms[iPlatformId1]);
+	CopyPlatform(&g_Platforms[iPlatformId1], &g_Platforms[iPlatformId2]);
+	CopyPlatform(&g_Platforms[iPlatformId2], &tempPlatform);
+}
+
+void CopyPlatform(MapPlatform * toPlatform, MapPlatform * fromPlatform)
+{
+	toPlatform->fAngle = fromPlatform->fAngle ;
+	toPlatform->fRadiusX = toPlatform->fRadiusX;
+	toPlatform->fRadiusY = toPlatform->fRadiusY;
+	toPlatform->iDrawLayer = toPlatform->iDrawLayer;
+	toPlatform->iEndX = toPlatform->iEndX;
+	toPlatform->iEndY = toPlatform->iEndY;
+	toPlatform->iPathType = toPlatform->iPathType;
+	toPlatform->iStartX = toPlatform->iStartX;
+	toPlatform->iStartY = toPlatform->iStartY;
+	toPlatform->iVelocity = toPlatform->iVelocity;
+	
+	for(short iRow = 0; iRow < MAPHEIGHT; iRow++)
+	{
+		for(short iCol = 0; iCol < MAPWIDTH; iCol++)
+		{
+			CopyTilesetTile(&toPlatform->tiles[iCol][iRow], &fromPlatform->tiles[iCol][iRow]);
+			toPlatform->types[iCol][iRow] = toPlatform->types[iCol][iRow];
+		}
+	}
 }
 
 void UpdatePlatformPathStart(short iEditPlatform, short iClickX, short iClickY, bool fSnapToTile)

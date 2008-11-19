@@ -105,6 +105,7 @@ struct STextAward
 #define	GRAVITATION		0.40f		
 
 #define MAXVELY			20.0f
+#define MAXSIDEVELY		10.0f
 
 #define CRUNCHVELOCITY	2
 #define CRUNCHAMOUNT	16
@@ -508,6 +509,7 @@ extern gfxSprite		spr_blocks[3];
 extern gfxSprite		spr_unknowntile[3];
 
 extern gfxSprite		** spr_player[4];
+extern gfxSprite		** spr_shyguy[4];
 extern gfxSprite		** spr_chocobo[4];
 extern gfxSprite		** spr_bobomb[4];
 extern gfxSprite		spr_clouds;
@@ -763,7 +765,8 @@ struct ChaseGameModeSettings
 struct ShyGuyTagGameModeSettings
 {
 	bool tagonsuicide;			//If players become shyguys if they kill themselves
-	bool tagonstomp;			//If players become shyguys if they are stomped
+	short tagtransfer;			//If players become shyguys if they are stomped
+	short freetime;				//How long all players will stay shyguys before the game is reset
 };
 
 struct GameModeSettings

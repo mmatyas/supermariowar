@@ -81,6 +81,7 @@ void SetupScoreBoard(bool fOrderMatters)
 		draw[max] = true;	//this is the next biggest score - it doesn't belong to the remaining scores from now on
 	}
 
+	//Add the treasure chests to the map in world mode if there were any awards for winning this match
 	if(game_values.matchtype == MATCH_TYPE_WORLD && game_values.gamemode->winningteam > -1 && game_values.gamemode->gamemode != game_mode_bonus)
 	{
 		TourStop * tourStop = game_values.tourstops[game_values.tourstopcurrent];
@@ -1133,6 +1134,11 @@ void CGM_ShyGuyTag::init()
 	{
 		score[iScore]->SetScore(0);
 	}
+
+	for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++)
+	{
+		list_players[iPlayer]->ownerColorOffsetX = list_players[iPlayer]->getColorID() * 48;
+	}
 }
 
 void CGM_ShyGuyTag::think()
@@ -1144,12 +1150,7 @@ void CGM_ShyGuyTag::think()
 	}
 
 	//See how many players are shy guys
-	short shyguycount = 0;
-	for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++)
-	{
-		if(list_players[iPlayer]->shyguy)
-			shyguycount++;
-	}
+	short shyguycount = CountShyGuys();
 
 	//If we are not waiting to clear, check if we need to start waiting
 	if(shyguyclearcounter == 0)
@@ -1160,7 +1161,7 @@ void CGM_ShyGuyTag::think()
 			ifsoundonplay(sfx_starwarning);
 		}
 	}
-	else if(++shyguyclearcounter == 62) //Clear the shy guys
+	else if(++shyguyclearcounter >= game_values.gamemodesettings.shyguytag.freetime) //Clear the shy guys
 	{
 		ifsoundonplay(sfx_racesound);
 
@@ -1168,7 +1169,9 @@ void CGM_ShyGuyTag::think()
 
 		for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++)
 		{
-			list_players[iPlayer]->shyguy = false;
+			CPlayer * player = list_players[iPlayer];
+			player->shyguy = false;
+			eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, player->ix + (HALFPW) - 16, player->iy + (HALFPH) - 16, 3, 8));
 		}
 	}
 
@@ -1180,6 +1183,7 @@ void CGM_ShyGuyTag::think()
 			bool playwarning = false;
 			scorecounter = 0;
 
+			CPlayer * pCheckWinner = NULL;
 			bool fAlreadyScored[4] = {false, false, false, false};
 			for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++)
 			{
@@ -1191,20 +1195,25 @@ void CGM_ShyGuyTag::think()
 						fAlreadyScored[iTeam] = true;
 						list_players[iPlayer]->score->AdjustScore(shyguycount);
 
-						CheckWinner(list_players[iPlayer]);
+						pCheckWinner = list_players[iPlayer];
 					}
 				}
 			}
+
+			if(pCheckWinner)
+				CheckWinner(pCheckWinner);
 		}
 	}
 }
 
 short CGM_ShyGuyTag::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
 {
-	if(!other.shyguy)
+	if(!gameover && !other.shyguy)
 	{
-		SetShyGuy(other.getTeamID());
-		ifsoundonplay(sfx_transform);
+		if(CountShyGuys() == 0 || game_values.gamemodesettings.shyguytag.tagtransfer != 0)
+		{
+			SetShyGuy(other.getTeamID());
+		}
 	}
 
 	return player_kill_normal;
@@ -1214,10 +1223,9 @@ short CGM_ShyGuyTag::playerkilledself(CPlayer &player, killstyle style)
 {
 	CGameMode::playerkilledself(player, style);
 
-	if(gameover && game_values.gamemodesettings.shyguytag.tagonsuicide)
+	if(!gameover && game_values.gamemodesettings.shyguytag.tagonsuicide)
 	{
 		SetShyGuy(player.getTeamID());
-		return player_kill_normal;
 	}
 	
 	return player_kill_normal;
@@ -1242,6 +1250,9 @@ void CGM_ShyGuyTag::SetShyGuy(short iTeam)
 			player->shyguy = true;
 			eyecandy[2].add(new EC_GravText(&game_font_large, player->ix + (HALFPW), player->iy + PH, "Shyguy!", -VELJUMP*1.5));
 			eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, player->ix + (HALFPW) - 16, player->iy + (HALFPH) - 16, 3, 8));
+
+			player->StripPowerups();
+			player->ClearPowerupStates();
 		}
 	}
 
@@ -1269,6 +1280,18 @@ short CGM_ShyGuyTag::CheckWinner(CPlayer * player)
 	}
 
 	return player_kill_normal;
+}
+
+short CGM_ShyGuyTag::CountShyGuys()
+{
+	short shyguycount = 0;
+	for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++)
+	{
+		if(list_players[iPlayer]->shyguy)
+			shyguycount++;
+	}
+
+	return shyguycount;
 }
 
 //Coin mode:

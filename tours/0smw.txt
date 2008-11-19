@@ -172,7 +172,8 @@
 
 #21 - Shyguy Tag
 #Suicide Tag - 0 = Off, 1 = On
-#Stomp Tag - 0 = Off, 1 = On
+#Tag Transfer - 0 = Touch Only, 1 = Kills Only, 2 = Touch and Kills
+#Free Time - 0 = instant, any number greater than 0 is the amount of time in frames (example: 310 is about 5 seconds)
 
 #1000 - Pipe Minigame
 #No Options

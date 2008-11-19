@@ -689,7 +689,7 @@ void MovingPlatform::collide(CPlayer * player)
 					//printf("Platform Right Side Killed Player\n");
 					return;
 				}
-				else if(fSuperDeathTileToLeft || (fDeathTileToLeft && !player->invincible && player->shield == 0))
+				else if(fSuperDeathTileToLeft || (fDeathTileToLeft && !player->invincible && player->shield == 0 && !player->shyguy))
 				{
 					if(player_kill_nonkill != player->KillPlayerMapHazard(fSuperDeathTileToLeft, kill_style_environment, false))
 						return;
@@ -760,7 +760,7 @@ void MovingPlatform::collide(CPlayer * player)
 					//printf("Platform Left Side Killed Player\n");
 					return;				
 				}
-				else if(fSuperDeathTileToRight || (fDeathTileToRight && !player->invincible && player->shield == 0))
+				else if(fSuperDeathTileToRight || (fDeathTileToRight && !player->invincible && player->shield == 0 && !player->shyguy))
 				{
 					if(player_kill_nonkill != player->KillPlayerMapHazard(fSuperDeathTileToRight, kill_style_environment, false))
 						return;				
@@ -852,7 +852,7 @@ void MovingPlatform::collide(CPlayer * player)
 									      (!(t1 & tile_flag_solid) && (t2 & tile_flag_super_death_bottom));
 
 			if(fSolidTileOverPlayer && !fSuperDeathTileOverPlayer && 
-				(!fDeathTileOverPlayer || player->invincible || player->shield > 0))
+				(!fDeathTileOverPlayer || player->invincible || player->shield > 0 || player->shyguy))
 			{
 				if(player->iVerticalPlatformCollision == 2)
 				{
@@ -954,7 +954,7 @@ void MovingPlatform::collide(CPlayer * player)
 									 (!(t1 & tile_flag_solid) && (t2 & tile_flag_super_death_top));
 
 			if(fSolidTileUnderPlayer && !fSuperDeathTileUnderPlayer && 
-				(!fDeathTileUnderPlayer || player->invincible || player->shield > 0 || player->iKuriboShoe > 0))
+				(!fDeathTileUnderPlayer || player->invincible || player->shield > 0 || player->iKuriboShoe > 0 || player->shyguy))
 			{	//on ground
 
 				if(player->iVerticalPlatformCollision == 0)

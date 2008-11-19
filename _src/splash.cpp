@@ -160,6 +160,7 @@ bool LoadGameGraphics()
 	for(short k = 0; k < 4; k++)
 	{
 		//LoadMenuSkin(k, game_values.skinids[k], game_values.colorids[k], false);
+		LoadFullSkin(spr_shyguy[k], convertPath("gfx/packs/modeskins/shyguy.bmp", graphicspack), k);
 		LoadFullSkin(spr_chocobo[k], convertPath("gfx/packs/modeskins/chicken.bmp", graphicspack), k);
 		LoadFullSkin(spr_bobomb[k], convertPath("gfx/packs/modeskins/bobomb.bmp", graphicspack), k);
 	}
@@ -679,16 +680,19 @@ bool LoadAndSplashScreen()
 			for(k = 0; k < 4; k++)
 			{
 				spr_player[k] = new gfxSprite * [PGFX_LAST];
+				spr_shyguy[k] = new gfxSprite * [PGFX_LAST];
 				spr_chocobo[k] = new gfxSprite * [PGFX_LAST];
 				spr_bobomb[k] = new gfxSprite * [PGFX_LAST];
 
 				for(j = 0; j < PGFX_LAST; j++)
 				{
 					spr_player[k][j] = new gfxSprite();
+					spr_shyguy[k][j] = new gfxSprite();
 					spr_chocobo[k][j] = new gfxSprite();
 					spr_bobomb[k][j] = new gfxSprite();
 
 					spr_player[k][j]->SetWrap(true);
+					spr_shyguy[k][j]->SetWrap(true);
 					spr_chocobo[k][j]->SetWrap(true);
 					spr_bobomb[k][j]->SetWrap(true);
 				}

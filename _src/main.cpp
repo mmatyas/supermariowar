@@ -51,13 +51,11 @@ STUFF TO WATCH OUT FOR IN BETA2
 - collision detection and behavior of coins, ztar, collection cards
 
 Fixed
-[X] Added "Are You Sure" message when exiting world editor
-[X] AI to deal with having platforms under their feet so they don't think they should run to one side to avoid death tiles below
-[X] AI to deal with phanto and throwing key when it is close.    
-[X] Alt + Enter makes game fullscreen/windowed but doesn't change menu option to reflect change
-[X] In the Retro graphics pack, there are certain graphics that need updated, mainly the tournament scoreboard layout
-[X] Ignore yoshi's eggs that don't have a matching yoshi
-[X] Started Shyguy tag mode
+[X] Can push players through walls when pushing several players in a row (to increase speed using the 1.5 multiplier),
+[X] Finished shyguy tag -> shyguys are somewhat invincible, shyguys can't use powerups
+[X] Pipe minigame icon doesn't show up before game (because it is now ID 1000)
+[X] Fix PrepareForRelease script to delete hidden thumbs.db
+[X] Started implementation of platform switcher feature in level editor
 
 Beta 1 Public Release Bugs
 
@@ -79,10 +77,11 @@ Beta 1 Public Release Bugs
 	-> Still Hangs :(
 	-> Fixed bug where some maps crashed when loaded
 
-[ ] Fix PrepareForRelease script to delete hidden thumbs.db  use /a:H option and test it!
-	-> Need to test it
+[ ] Fix Bug with switching platforms positions
 
-[ ] Pipe minigame icon doesn't show up before game (because it is now ID 1000)
+[ ] SVN Add 3 FTG skins
+[ ] SVN add shyguy mode skin
+
 
 
 Need To Test
@@ -90,8 +89,6 @@ Need To Test
     -> made fix for this but need to test
 [ ] Test controllers on xbox where different tournament control settings are used
 	- Test all control cases with teams/bots keyboard/controllers menu/sub menus/bonus wheel/scoreboard and ties for winner/loser tournament ties etc.
-[ ] Game and world music packs on the menu have "game\" and "world\" in front of them (on xbox but see if same on PC)
-    -> Fix in place, check on xbox
 
 
 Can't Reproduce Bug
@@ -128,6 +125,8 @@ Can't Reproduce Bug
 	when jumping and rotating you sometimes glide through them from below 
 	(not sure if it also happened with leaf, but it did happen with cape)
 	-> no repro
+[ ] I used the power-up to take off a CPU's win so I could redo the level and after the CPU won again, it just stands on that level and doesn't move...
+
 
 
 No Fix
@@ -139,7 +138,6 @@ No Fix
 
 
 Beta 1 Public Release Feature Requests
-[ ] Shy Guy Tag
 [ ] Update the Tanooki statues to be proportionally sized to players
 [ ] Use smb3_extended1up.wav (on desktop) for 5up sound
 [ ] Maybe the three waterfalls on the Classic tileset could animate differently
@@ -149,7 +147,7 @@ Beta 1 Public Release Feature Requests
 [ ] Intro music attached to normal looped tracks
 [ ] A way to put levels/bonus stages in worlds WITHOUT editing the .txt file.
 [ ] Also, as P1 on the Bonus Island World against 3 CPUs, I was unable to use items in the World screen.
-[ ] I used the power-up to take off a CPU's win so I could redo the level and after the CPU won again, it just stands on that level and doesn't move...
+
 [ ] Ability to reorder the drawing order of platforms within the same layer - not too hard to do, just a platform swap in the platforms away
 [ ] Though the universal Overrides thing has Map-specific and World-specific overrides, it lacks Background-specific overrides.
 [ ] Volume control for individual tunes in music packs. Just changing a number in the text file would be a lot less trouble than having to edit the music files themselves.
@@ -307,7 +305,8 @@ Procedure for adding a new game mode:
 11) Add new mode gfx to gfx\packs\Classic\menu\menu_mode_large.png and menu_mode_small.png
 12) Update fShowSettingsButton[] array in menu.cpp
 13) Remove old options.bin (new settings will now be read from it)
-
+14) Change line 3186 in main.cpp: if(iMode == game_mode_pipe_minigame)
+15) Change line 3274 in main.cpp: if(iMode == game_mode_pipe_minigame)
 
 Procedure for adding a new powerup:
 1) Add class to object.cpp and object.h inhieriting from MO_Powerup
@@ -353,6 +352,7 @@ short			y_shake = 0;
 
 //------ sprites (maybe this should be done in a resource manger) ------
 gfxSprite		** spr_player[4];	//all player sprites (see global.h)
+gfxSprite		** spr_shyguy[4];
 gfxSprite		** spr_chocobo[4];
 gfxSprite		** spr_bobomb[4];
 gfxSprite		spr_clouds;
@@ -730,11 +730,11 @@ float CapFallingVelocity(float vel)
 
 float CapSideVelocity(float vel)
 {
-	if(vel < -MAXVELY)
-		return -MAXVELY;
+	if(vel < -MAXSIDEVELY)
+		return -MAXSIDEVELY;
 	
-	if(vel > MAXVELY)
-		return MAXVELY;
+	if(vel > MAXSIDEVELY)
+		return MAXSIDEVELY;
 	
 	return vel;
 }
@@ -1052,7 +1052,11 @@ int main(int argc, char *argv[])
 	game_values.outofboundstime		= 5;
 	game_values.warplockstyle		= 1;	// Lock Warp Exit Only
 	game_values.warplocktime		= 186;  // 3 seconds
+#ifdef _DEBUG
+	game_values.suicidetime			= 0;	// Turn off suicide kills for debug
+#else
 	game_values.suicidetime			= 310;	// 5 seconds
+#endif
 	game_values.cpudifficulty		= 2;
 	game_values.fireballttl			= 310;  // 5 seconds
 	game_values.shellttl			= 496;  // 8 seconds
@@ -1325,7 +1329,8 @@ int main(int argc, char *argv[])
 
 	//Shyguy Tag
 	game_values.gamemodemenusettings.shyguytag.tagonsuicide = false; 
-	game_values.gamemodemenusettings.shyguytag.tagonstomp = true;
+	game_values.gamemodemenusettings.shyguytag.tagtransfer = 0;
+	game_values.gamemodemenusettings.shyguytag.freetime = 310;
 
 	//Read saved settings from disk
 	FILE * fp = OpenFile("options.bin", "rb");
@@ -1589,11 +1594,13 @@ int main(int argc, char *argv[])
 		for(short j = 0; j < PGFX_LAST; j++)
 		{
 			delete spr_player[k][j];
+			delete spr_shyguy[k][j];
 			delete spr_chocobo[k][j];
 			delete spr_bobomb[k][j];
 		}
 
 		delete [] spr_player[k];
+		delete [] spr_shyguy[k];
 		delete [] spr_chocobo[k];
 		delete [] spr_bobomb[k];
 		
@@ -3174,7 +3181,11 @@ void RunGame()
 						else
 							sprintf(szMode, "%s  %s: %d", game_values.gamemode->GetModeName(), game_values.gamemode->GetGoalName(), game_values.gamemode->goal);
 
-						eyecandy[2].add(new EC_Announcement(&game_font_large, &menu_mode_large, szMode, game_values.gamemode->gamemode, 130, 90));
+						short iMode = game_values.gamemode->gamemode;
+						if(iMode == game_mode_pipe_minigame)
+							iMode = 25;
+
+						eyecandy[2].add(new EC_Announcement(&game_font_large, &menu_mode_large, szMode, iMode, 130, 90));
 					}
 				}
 				else if(game_values.screenfade >= 255)
@@ -3257,7 +3268,10 @@ void RunGame()
 				menu_font_large.drawCentered(320, 194, "Pause");
 
 				//menu_font_large.drawCentered(320, 240, game_values.gamemode->GetModeName());
-				menu_mode_large.draw(304, 224, game_values.gamemode->gamemode << 5, 0, 32, 32);
+				short iMode = game_values.gamemode->gamemode;
+				if(iMode == game_mode_pipe_minigame)
+					iMode = 25;
+				menu_mode_large.draw(304, 224, iMode << 5, 0, 32, 32);
 
 				char szGoal[256];
 				strcpy(szGoal, game_values.gamemode->GetGoalName());

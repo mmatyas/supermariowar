@@ -208,6 +208,7 @@ class CGM_ShyGuyTag : public CGameMode
 
 		void SetShyGuy(short iTeam);
 		short CheckWinner(CPlayer * player);
+		short CountShyGuys();
 
 #ifdef _DEBUG
 		void setdebuggoal() {goal = 100;}

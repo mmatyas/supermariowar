@@ -583,6 +583,7 @@ class Menu
 		//Shyguy Tag
 		MI_SelectField * miShyGuyTagModeTagOnSuicideField;
 		MI_SelectField * miShyGuyTagModeTagOnStompField;
+		MI_SelectField * miShyGuyTagModeFreeTimeField;
 		MI_Button * miShyGuyTagModeBackButton;
 		
 		MI_Image * miShyGuyTagModeLeftHeaderBar;

@@ -1261,7 +1261,7 @@ void CPlayer::move()
 			//POWERUP RELEASE
 			if(playerKeys->game_powerup.fDown && statue_timer == 0 && game_values.gamemode->gamemode != game_mode_bonus)
 			{
-				if(game_values.gamepowerups[globalID] > 0) //Don't allow usage of the poison powerup, it sticks with you
+				if(game_values.gamepowerups[globalID] > 0 && !shyguy) //Don't allow usage of the poison powerup, it sticks with you and don't allow shyguys to use powerups
 				{
 					powerupused = game_values.gamepowerups[globalID];
 					game_values.gamepowerups[globalID] = -1;
@@ -1997,6 +1997,8 @@ void CPlayer::die(short deathStyle, bool fTeamRemoved, bool fKillCarriedItem)
 		corpseSprite = spr_chocobo[colorID][iDeathSprite];
 	else if(diedas == 2 || bobomb)
 		corpseSprite = spr_bobomb[colorID][iDeathSprite];
+	else if(diedas == 3 || shyguy)
+		corpseSprite = spr_shyguy[colorID][iDeathSprite];
 	
 	//Add eyecandy for the dead player
 	if(deathStyle == death_style_shatter || frozen)
@@ -2081,17 +2083,8 @@ void CPlayer::SetupNewPlayer()
 	lockjump = true;
 	superjumptimer = 0;
 	superjumptype = 0;
-	powerup	= -1;
 	projectilelimit = 0;
-	bobomb = false;
 	hammertimer = 0;
-
-	tanooki = false;
-    statue_lock = false;
-    statue_timer = 0;
-
-	invincible = false;
-	invincibletimer = 0;
 
 	frozen = false;
 	frozentimer = 0;
@@ -2104,6 +2097,7 @@ void CPlayer::SetupNewPlayer()
 	awardangle = 0.0f;
 	extrajumps = 0;
 	
+	StripPowerups();
 	ClearPowerupStates();
 	
 	iCapeTimer = 0;
@@ -2132,8 +2126,6 @@ void CPlayer::SetupNewPlayer()
 	outofarenadisplaytimer = game_values.outofboundstime - 1;
 
 	warpcounter = 0;
-
-	powerupused = -1;
 
 	platform = NULL;
 	iHorizontalPlatformCollision = -1;
@@ -2172,6 +2164,21 @@ void CPlayer::SetupNewPlayer()
 	}
 
 	throw_star = 0;
+}
+
+void CPlayer::StripPowerups()
+{
+	bobomb = false;
+	powerup	= -1;
+	
+	tanooki = false;
+    statue_lock = false;
+    statue_timer = 0;
+
+	invincible = false;
+	invincibletimer = 0;
+
+	powerupused = -1;
 }
 
 bool CPlayer::FindSpawnPoint()
@@ -2261,7 +2268,11 @@ bool CPlayer::isstomping(CPlayer * o)
 		}
 		else
 		{
-			TransferTag(o, this);
+			if(game_values.gamemode->gamemode == game_mode_tag)
+				TransferTag(o, this);
+
+			if(game_values.gamemode->gamemode == game_mode_shyguytag)
+				TransferShyGuy(o, this);
 
 			iSuicideCreditPlayerID = o->globalID;
 			iSuicideCreditTimer = 20;
@@ -2579,7 +2590,7 @@ void collisionhandler_p2p(CPlayer * o1, CPlayer * o2)
 		}
 
 		//Transfer tag if assist is on
-		if(game_values.teamcollision == 1 || game_values.gamemodesettings.tag.tagontouch)
+		if(game_values.gamemode->gamemode == game_mode_tag && game_values.teamcollision == 1 || game_values.gamemodesettings.tag.tagontouch)
 			TransferTag(o1, o2);
 		
 		//Don't collision detect players on same team if friendly fire is turned off
@@ -2615,8 +2626,11 @@ void collisionhandler_p2p(CPlayer * o1, CPlayer * o2)
 	if(o1->shield == 1 || o2->shield == 1)
 	{
 		//Do tag transfer if there is one to do
-		if(game_values.gamemodesettings.tag.tagontouch)
+		if(game_values.gamemode->gamemode == game_mode_tag && game_values.gamemodesettings.tag.tagontouch)
 			TransferTag(o1, o2);
+
+		if(game_values.gamemode->gamemode == game_mode_shyguytag && game_values.gamemodesettings.shyguytag.tagtransfer != 1)
+			TransferShyGuy(o1, o2);
 
 		return;
 	}
@@ -2662,12 +2676,15 @@ void collisionhandler_p2p(CPlayer * o1, CPlayer * o2)
 		return;
 	
 
-	//Quit checking collision if either player is soft shielded
+	//Quit checking collision if either player is hard shielded
 	if(o1->shield == 2 || o2->shield == 2)
 	{
 		//Do tag transfer if there is one to do
-		if(game_values.gamemodesettings.tag.tagontouch)
+		if(game_values.gamemode->gamemode == game_mode_tag && game_values.gamemodesettings.tag.tagontouch)
 			TransferTag(o1, o2);
+
+		if(game_values.gamemode->gamemode == game_mode_shyguytag && game_values.gamemodesettings.shyguytag.tagtransfer != 1)
+			TransferShyGuy(o1, o2);
 
 		return;
 	}
@@ -2693,8 +2710,11 @@ void _collisionhandler_p2p_pushback(CPlayer * o1, CPlayer * o2)
 	//-----------
 
 	//Transfer tag on touching other players
-	if(game_values.gamemodesettings.tag.tagontouch)
+	if(game_values.gamemode->gamemode == game_mode_tag && game_values.gamemodesettings.tag.tagontouch)
 		TransferTag(o1, o2);
+
+	if(game_values.gamemode->gamemode == game_mode_shyguytag && game_values.gamemodesettings.shyguytag.tagtransfer != 1)
+		TransferShyGuy(o1, o2);
 
 	bool overlapcollision = false;
 	if(o1->ix + PW < 320 && o2->ix > 320)
@@ -2802,7 +2822,10 @@ void TransferTag(CPlayer * o1, CPlayer * o2)
 	if(game_values.gamemode->gamemode != game_mode_tag)
 		return;
 
-	if(game_values.gamemode->tagged == o1 && o1->isready() && o2->isready() && o2->shield == 0 && !o2->invincible)
+	if(!o1->isready() || !o2->isready())
+		return;
+
+	if(game_values.gamemode->tagged == o1 && o2->shield == 0 && !o2->invincible)
 	{
 		game_values.gamemode->tagged = o2;
 		o1->shield = game_values.shieldstyle > 0 ? game_values.shieldstyle : 1;
@@ -2811,7 +2834,7 @@ void TransferTag(CPlayer * o1, CPlayer * o2)
 		eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, game_values.gamemode->tagged->ix + HALFPW - 16, game_values.gamemode->tagged->iy + HALFPH - 16, 3, 8));
 		ifsoundonplay(sfx_transform);
 	}
-	else if(game_values.gamemode->tagged == o2 && o1->isready() && o2->isready() && o1->shield == 0 && !o1->invincible)
+	else if(game_values.gamemode->tagged == o2 && o1->shield == 0 && !o1->invincible)
 	{
 		game_values.gamemode->tagged = o1;
 		o2->shield = game_values.shieldstyle > 0 ? game_values.shieldstyle : 1;
@@ -2819,6 +2842,27 @@ void TransferTag(CPlayer * o1, CPlayer * o2)
 		eyecandy[2].add(new EC_GravText(&game_font_large, game_values.gamemode->tagged->ix + HALFPW, game_values.gamemode->tagged->iy + PH, "Tagged!", -VELJUMP*1.5));
 		eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, game_values.gamemode->tagged->ix + HALFPW - 16, game_values.gamemode->tagged->iy + HALFPH - 16, 3, 8));
 		ifsoundonplay(sfx_transform);
+	}
+}
+
+void TransferShyGuy(CPlayer * o1, CPlayer * o2)
+{
+	//Don't shyguy tag if this isn't shyguy tag mode or if tag transfers is set to kills only
+	if(game_values.gamemode->gamemode != game_mode_shyguytag || game_values.gamemodesettings.shyguytag.tagtransfer == 1)
+		return;
+
+	if(!o1->isready() || !o2->isready())
+		return;
+
+	CGM_ShyGuyTag * sgt = (CGM_ShyGuyTag*)game_values.gamemode;
+
+	if(o1->shyguy && !o2->shyguy && o2->shield == 0 && !o2->invincible)
+	{
+		sgt->SetShyGuy(o2->getTeamID());
+	}
+	else if(o2->shyguy && !o1->shyguy && o1->shield == 0 && !o1->invincible)
+	{
+		sgt->SetShyGuy(o1->getTeamID());
 	}
 }
 
@@ -2856,6 +2900,8 @@ void CPlayer::draw()
 			pScoreboardSprite = spr_bobomb[colorID];
 		else if(game_values.gamemode->chicken == this)
 			pScoreboardSprite = spr_chocobo[colorID];
+		else if(shyguy)
+			pScoreboardSprite = spr_shyguy[colorID];
 		
 		//Blink the statue if the time is almost up
         if (isready() && (statue_timer < 50) && (statue_timer / 3 % 2))
@@ -2883,6 +2929,11 @@ void CPlayer::draw()
 	else if(game_values.gamemode->chicken == this) //draw him as chicken
 	{
 		pScoreboardSprite = spr_chocobo[colorID];
+	}
+	else if(shyguy) //draw him as chicken
+	{
+		pScoreboardSprite = spr_shyguy[colorID];
+		spr_ownedtags.draw(ix - PWOFFSET - 8, iy - PHOFFSET - 8, ownerColorOffsetX, 0, 48, 48);
 	}
 
 	if(ownerPlayerID > -1)
@@ -3434,7 +3485,7 @@ void CPlayer::collision_detection_map()
 					flipsidesifneeded();
 				}
 			}
-			else if(fSuperDeathTileToLeft || (fDeathTileToLeft && !invincible && shield == 0))
+			else if(fSuperDeathTileToLeft || (fDeathTileToLeft && !invincible && shield == 0 && !shyguy))
 			{
 				if(player_kill_nonkill != KillPlayerMapHazard(fSuperDeathTileToLeft, kill_style_environment, false))
 					return;
@@ -3524,7 +3575,7 @@ void CPlayer::collision_detection_map()
 					flipsidesifneeded();
 				}
 			}
-			else if(fSuperDeathTileToRight || (fDeathTileToRight && !invincible && shield == 0))
+			else if(fSuperDeathTileToRight || (fDeathTileToRight && !invincible && shield == 0 && !shyguy))
 			{
 				if(player_kill_nonkill != KillPlayerMapHazard(fSuperDeathTileToRight, kill_style_environment, false))
 					return;
@@ -3641,7 +3692,7 @@ void CPlayer::collision_detection_map()
 
 		int alignedTileType = g_map.map(alignedBlockX, ty);
 		if((alignedTileType & tile_flag_solid) && !(alignedTileType & tile_flag_super_death_bottom) &&
-			(!(alignedTileType & tile_flag_death_on_bottom) || invincible || shield > 0))
+			(!(alignedTileType & tile_flag_death_on_bottom) || invincible || shield > 0 || shyguy))
 		{
 			yf((float)(ty * TILESIZE + TILESIZE) + 0.2f);
 			fOldY = fy - 1.0f;
@@ -3685,7 +3736,7 @@ void CPlayer::collision_detection_map()
 		//or if the player is invincible and hits death or death on bottom
 		int unalignedTileType = g_map.map(unAlignedBlockX, ty);
 		if((unalignedTileType & tile_flag_solid) && !(unalignedTileType & tile_flag_super_death_bottom) && 
-			(!(unalignedTileType & tile_flag_death_on_bottom) || invincible || shield > 0))
+			(!(unalignedTileType & tile_flag_death_on_bottom) || invincible || shield > 0 || shyguy))
 		{
 			xf(unAlignedBlockFX);
 			fOldX = fx;
@@ -3840,7 +3891,7 @@ void CPlayer::collision_detection_map()
 									      (!(lefttile & tile_flag_solid) && (righttile & tile_flag_super_death_top));
 
 		if(fSolidTileUnderPlayer && !fSuperDeathTileUnderPlayer && 
-			(!fDeathTileUnderPlayer || invincible || shield > 0 || iKuriboShoe > 0) )
+			(!fDeathTileUnderPlayer || invincible || shield > 0 || iKuriboShoe > 0 || shyguy) )
 		{	//on ground
 
 			yf((float)(ty * TILESIZE - PH) - 0.2f);
@@ -4469,6 +4520,12 @@ bool CPlayer::AcceptItem(MO_CarriedObject * item)
 
 void CPlayer::SetPowerup(short iPowerup)
 {
+	if(shyguy)
+	{
+		ifsoundonplay(sfx_stun);
+		return;
+	}
+
 	if(iPowerup == 0)
 	{
 		if(bobomb)

@@ -3590,7 +3590,7 @@ bool PU_StarPowerup::collide(CPlayer * player)
 	{
 		dead = true;
 
-		if(!player->invincible)
+		if(!player->invincible && !player->shyguy)
 		{
 			player->makeinvincible();
 		}
@@ -3650,7 +3650,7 @@ bool PU_PoisonPowerup::collide(CPlayer * player)
 {
 	if(state > 0)
 	{
-		if(player->invincible)
+		if(player->invincible || player->shyguy)
 		{
 			dead = true;
 			return false;
@@ -4054,10 +4054,8 @@ bool PU_ClockPowerup::collide(CPlayer * player)
 {
 	if(state > 0)
 	{
-		velx = 0.0f;
-
-		dead = true;
 		player->SetStoredPowerup(7);
+		dead = true;
 	}
 
 	return false;
@@ -4117,8 +4115,7 @@ bool PU_ModPowerup::collide(CPlayer * player)
 	if(state > 0)
 	{
 		dead = true;
-		ifsoundonplay(sfx_storepowerup);
-		game_values.gamepowerups[player->getGlobalID()] = 16;
+		player->SetStoredPowerup(16);
 	}
 
 	return false;
@@ -4404,7 +4401,7 @@ bool MO_Fireball::collide(CPlayer * player)
 		{
 			removeifprojectile(this, false, false);
 
-			if(!player->invincible)
+			if(!player->invincible && !player->shyguy)
 			{
 				//Find the player that shot this fireball so we can attribute a kill
 				PlayerKilledPlayer(iPlayerID, player, death_style_jump, kill_style_fireball, false, false);
@@ -4471,7 +4468,7 @@ bool MO_SuperFireball::collide(CPlayer * player)
 		{
 			removeifprojectile(this, false, false);
 
-			if(!player->invincible)
+			if(!player->invincible && !player->shyguy)
 			{
 				//Find the player that shot this hammer so we can attribute a kill
 				PlayerKilledPlayer(iPlayerID, player, death_style_jump, kill_style_fireball, false, false);
@@ -4578,7 +4575,7 @@ bool MO_Hammer::collide(CPlayer * player)
 		{
 			removeifprojectile(this, false, false);
 
-			if(!player->invincible)
+			if(!player->invincible && !player->shyguy)
 			{
 				//Find the player that shot this hammer so we can attribute a kill
 				PlayerKilledPlayer(iPlayerID, player, death_style_jump, kill_style_hammer, false, false);
@@ -4653,7 +4650,7 @@ bool MO_IceBlast::collide(CPlayer * player)
 {
 	if(iPlayerID != player->globalID && (game_values.teamcollision == 2 || iTeamID != player->teamID))
 	{
-		if(player->shield == 0 && !player->invincible)
+		if(player->shield == 0 && !player->invincible && !player->shyguy)
 		{
 			player->makefrozen(game_values.wandfreezetime);
 		}
@@ -4981,7 +4978,7 @@ bool MO_Boomerang::collide(CPlayer * player)
 		{
 			removeifprojectile(this, false, false);
 
-			if(!player->invincible)
+			if(!player->invincible && !player->shyguy)
 			{
 				//Find the player that shot this boomerang so we can attribute a kill
 				PlayerKilledPlayer(iPlayerID, player, death_style_jump, kill_style_boomerang, false, false);
@@ -5374,7 +5371,7 @@ void MO_Podobo::draw()
 
 bool MO_Podobo::collide(CPlayer * player)
 {
-	if(player->globalID != iPlayerID && (game_values.teamcollision == 2|| iTeamID != player->teamID) && !player->invincible && player->shield == 0)
+	if(player->globalID != iPlayerID && (game_values.teamcollision == 2|| iTeamID != player->teamID) && !player->invincible && player->shield == 0 && !player->shyguy)
 	{
 		//Find the player that made this explosion so we can attribute a kill
 		PlayerKilledPlayer(iPlayerID, player, death_style_jump, kill_style_podobo, false, false);
@@ -5561,7 +5558,7 @@ bool MO_BulletBill::collide(CPlayer * player)
 		return false;
 	}
 	
-	if(player->invincible)
+	if(player->invincible || player->shyguy)
 	{
 		AddAwardKill(player, NULL, kill_style_bulletbill);
 		ifsoundonplay(sfx_kicksound);
@@ -7366,7 +7363,7 @@ MO_Explosion::MO_Explosion(gfxSprite *nspr, short x, short y, short iNumSpr, sho
 
 bool MO_Explosion::collide(CPlayer * player)
 {
-	if(player->globalID != iPlayerID && (game_values.teamcollision == 2 || iTeamID != player->teamID) && !player->invincible && player->shield == 0)
+	if(player->globalID != iPlayerID && (game_values.teamcollision == 2 || iTeamID != player->teamID) && !player->invincible && player->shield == 0 && !player->shyguy)
 	{
 		//Find the player that made this explosion so we can attribute a kill
 		PlayerKilledPlayer(iPlayerID, player, death_style_jump, iStyle, false, false);
@@ -8572,14 +8569,14 @@ CO_Shell::CO_Shell(short type, short x, short y, bool dieOnMovingPlayerCollision
 
 bool CO_Shell::collide(CPlayer * player)
 {
-	if(player->invincible)
+	if(player->invincible || player->shyguy)
 	{
-		if(state == 0 || state == 2)
+		if(state == 0 || state == 2) //If sitting or spawning then just die
 		{
 			Die();
 			return false;
 		}
-		else if(state == 3)
+		else if(state == 3)  //if held, but not by us then die
 		{
 			if(owner != player)
 			{
@@ -8587,7 +8584,7 @@ bool CO_Shell::collide(CPlayer * player)
 				return false;
 			}
 		}
-		else if(state == 1)
+		else if(state == 1) //If moving, see if it is actually hitting us before we kill it
 		{
 			short flipx = 0;
 
@@ -8617,7 +8614,7 @@ bool CO_Shell::collide(CPlayer * player)
 
 bool CO_Shell::HitTop(CPlayer * player)
 {
-	if(player->invincible || player->iKuriboShoe > 0)
+	if(player->invincible || player->iKuriboShoe > 0 || player->shyguy)
 	{
 		Die();
 		fSmoking = false;
@@ -8738,7 +8735,7 @@ void CO_Shell::UsedAsStoredPowerup(CPlayer * player)
 
 bool CO_Shell::KillPlayer(CPlayer * player)
 {
-	if(player->shield > 0 || player->invincible)
+	if(player->shield > 0 || player->invincible || player->shyguy)
 		return false;
 
 	CheckAndDie();
@@ -9072,7 +9069,7 @@ bool CO_ThrowBlock::collide(CPlayer * player)
 
 bool CO_ThrowBlock::HitTop(CPlayer * player)
 {
-	if(player->invincible)
+	if(player->invincible || player->shyguy)
 	{
 		Die();
 	}
@@ -9133,7 +9130,7 @@ bool CO_ThrowBlock::HitOther(CPlayer * player)
 
 bool CO_ThrowBlock::KillPlayer(CPlayer * player)
 {
-	if(player->invincible)
+	if(player->invincible || player->shyguy)
 	{
 		Die();
 		return false;
@@ -9449,7 +9446,7 @@ CO_Spike::CO_Spike(gfxSprite *nspr, short ix, short iy) :
 
 void CO_Spike::hittop(CPlayer * player)
 {
-	if(player->isready() && player->shield == 0 && !player->invincible && player->iKuriboShoe == 0)
+	if(player->isready() && player->shield == 0 && !player->invincible && player->iKuriboShoe == 0 && !player->shyguy)
 		player->KillPlayerMapHazard(false, kill_style_environment, false);
 }
 
@@ -9508,7 +9505,7 @@ MO_AttackZone::MO_AttackZone(short playerId, short teamId, short x, short y, sho
 
 bool MO_AttackZone::collide(CPlayer * player)
 {
-	if(player->shield > 0 || player->invincible || dead)
+	if(player->shield > 0 || player->invincible || player->shyguy || dead)
 		return false;
 
 	if(game_values.teamcollision != 2 && player->teamID == iTeamID)
@@ -9749,7 +9746,7 @@ void OMO_OrbitHazard::update()
 
 bool OMO_OrbitHazard::collide(CPlayer * player)
 {
-	if(!player->invincible && player->shield == 0)
+	if(!player->invincible && player->shield == 0 && !player->shyguy)
 	{
 		return player->KillPlayerMapHazard(false, kill_style_environment, false) != player_kill_nonkill;
 	}
@@ -9800,7 +9797,7 @@ bool OMO_StraightPathHazard::collide(CPlayer * player)
 		eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix + (iw >> 2) - 16, iy + (ih >> 2) - 16, 3, 8));
 		dead = true;
 
-		if(!player->invincible)
+		if(!player->invincible && !player->shyguy)
 		{
 			return player->KillPlayerMapHazard(false, kill_style_environment, false) != player_kill_nonkill;
 		}
@@ -9962,7 +9959,7 @@ void IO_FlameCannon::draw(short iOffsetX, short iOffsetY)
 
 bool IO_FlameCannon::collide(CPlayer * player)
 {
-	if(state == 2 && !player->invincible && player->shield == 0)
+	if(state == 2 && !player->invincible && player->shield == 0 && !player->shyguy)
 		return player->KillPlayerMapHazard(false, kill_style_environment, false) != player_kill_nonkill;
 
 	return false;
@@ -10219,7 +10216,7 @@ bool MO_PirhanaPlant::collide(CPlayer * player)
 	{
 		KillPlant();
 	}
-	else if(player->shield == 0)
+	else if(player->shield == 0 && !player->shyguy)
 	{
 		return player->KillPlayerMapHazard(false, kill_style_environment, false) != player_kill_nonkill;
 	}

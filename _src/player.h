@@ -151,6 +151,7 @@ class CPlayer
 		bool IsSuperStomping() {return fSuperStomp;}
 
 		void SetStoredPowerup(short iPowerup);
+		void StripPowerups();
 
 	private:
 
@@ -369,6 +370,7 @@ class CPlayer
 		friend void _collisionhandler_p2p_pushback(CPlayer * o1, CPlayer * o2);
 
 		friend void TransferTag(CPlayer * o1, CPlayer * o2);
+		friend void TransferShyGuy(CPlayer * o1, CPlayer * o2);
 		friend void BounceAssistPlayer(CPlayer * o1, CPlayer * o2);
 
 		friend bool coldec_player2obj(CPlayer * o1, CObject * o2);
@@ -524,6 +526,7 @@ void collisionhandler_p2p(CPlayer * o1, CPlayer * o2);
 void _collisionhandler_p2p__pushback(CPlayer * o1, CPlayer * o2);
 
 void TransferTag(CPlayer * o1, CPlayer * o2);
+void TransferShyGuy(CPlayer * o1, CPlayer * o2);
 void BounceAssistPlayer(CPlayer * o1, CPlayer * o2);
 
 #endif  //_PLAYER_H

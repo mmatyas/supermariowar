@@ -768,7 +768,8 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 				ts->fUseSettings = true;
 				
 				ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.shyguytag.tagonsuicide, 0, game_values.gamemodemenusettings.shyguytag.tagonsuicide);
-				ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.shyguytag.tagonstomp, 0, game_values.gamemodemenusettings.shyguytag.tagonstomp);
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.shyguytag.tagtransfer, NULL, game_values.gamemodemenusettings.shyguytag.tagtransfer, false);
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.shyguytag.freetime, NULL, game_values.gamemodemenusettings.shyguytag.freetime, false);
 			}
 		}
 	}
@@ -1334,7 +1335,13 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
 
 				if(ts->iNumUsedSettings > 1)
 				{
-					sprintf(szTemp, ",%d", ts->gmsSettings.shyguytag.tagonstomp);
+					sprintf(szTemp, ",%d", ts->gmsSettings.shyguytag.tagtransfer);
+					strcat(buffer, szTemp);
+				}
+
+				if(ts->iNumUsedSettings > 2)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.shyguytag.freetime);
 					strcat(buffer, szTemp);
 				}
 			}
