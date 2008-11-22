@@ -3710,11 +3710,21 @@ void Menu::RunMenu()
 						{
 							miTournamentScoreboard->CreateScoreboard(score_cnt, 0, &spr_tour_markers);
 
-							for(short iPlayer = 0; iPlayer < 4; iPlayer++)
-								game_values.storedpowerups[iPlayer] = -1;
-							
 							g_worldmap.SetInitialPowerups();
 
+							//If a player had a stored powerup from another game, add it to their inventory
+							for(short iPlayer = 0; iPlayer < 4; iPlayer++)
+							{
+								if(game_values.storedpowerups[iPlayer] != -1)
+								{
+									short iTeamId = LookupTeamID(iPlayer);
+									if(game_values.worldpowerupcount[iTeamId] < 32)
+										game_values.worldpowerups[iTeamId][game_values.worldpowerupcount[iTeamId]++] = game_values.storedpowerups[iPlayer];
+			
+									game_values.storedpowerups[iPlayer] = -1;	
+								}
+							}
+							
 							miWorld->Init();
 							miWorld->SetControllingTeam(rand() % score_cnt);
 						}
@@ -3983,6 +3993,10 @@ void Menu::RunMenu()
 
 				if(MENU_CODE_EXIT_WORLD_YES == code)
 				{
+					//Clear out any stored items a player might have
+					for(short iPlayer = 0; iPlayer < 4; iPlayer++)
+						game_values.storedpowerups[iPlayer] = -1;
+
 					ResetTournamentBackToMainMenu();
 					miWorldStop->Show(false);
 				}

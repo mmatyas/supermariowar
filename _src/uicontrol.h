@@ -1093,7 +1093,7 @@ class MI_World : public UI_Control
 		MenuCodeEnum InitGame(short iStage, short iPlayer, bool fNeedAiControl);
 
 		void RestartDrawCycleIfNeeded();
-		bool UsePowerup(short iTeam, short iIndex, bool fPopupIsUp);
+		bool UsePowerup(short iPlayer, short iTeam, short iIndex, bool fPopupIsUp);
 
 		void SetMapOffset();
 		void RepositionMapImage();
@@ -1103,12 +1103,15 @@ class MI_World : public UI_Control
 		void UseCloud(bool fUseCloud);
 
 		short iState;
-		short iTeam;
-		short iStateTransition;
-		short iItemPopupDrawY;
+		bool  fItemPopup;
+		short iStateTransition[4];
+		short iItemPopupDrawY[4];
+		short iPopupOffsets[4];
+		short iNumPopups;
+		short iStoredItemPopupDrawY;
 
-		short iItemCol;
-		short iItemPage;
+		short iItemCol[4];
+		short iItemPage[4];
 
 		SDL_Surface * sMapSurface[2];
 		SDL_Rect rectSrcSurface;

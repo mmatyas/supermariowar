@@ -51,8 +51,12 @@ STUFF TO WATCH OUT FOR IN BETA2
 - collision detection and behavior of coins, ztar, collection cards
 
 Fixed
-[X] Added feature to level editor to allow switching platforms around
-[X] Added feature to level editor to show preview of platform when the icon is moused over
+[X] Alt + enter on level editor or world editor should full screen + remember setting
+[X] Save last viewed world + coordinates in world editor
+[X] When using world inventory item powerups, only give the powerup to the player that used it, not the entire team
+[X] If players have stored powerups in world mode (i.e. they selected an item and are waiting to play the next game) and the world is exited, then that stored item will be kept
+[X] Added display for stored powerups on world inventory menu
+[X] Started multi inventory select in world mode
 
 Beta 1 Public Release Bugs
 
@@ -74,9 +78,16 @@ Beta 1 Public Release Bugs
 	-> Still Hangs :(
 	-> Fixed bug where some maps crashed when loaded
 
-[ ] Fix Bug with switching platforms positions
 
-[ ] Alt + enter on level editor or world editor should full screen
+[ ] Item idea: in a world, if you have a stored item left over at the end of a level, it goes into your inventory. (It would only count stored items you had at the moment the level ended...that way, you can't just run around after the game and hit item blocks until you get a certain item.
+    -> Need to test to make sure this works
+[ ] If you have a powerup awarded by the bonus wheel when you start a world, it should be added to your inventory
+    -> Need to test to make sure it works
+
+[ ] Death Blocks that items/etc. go through, but players don't.
+[ ] An idea for another tile type. Basically, instant-death, but not solid. So, touching it would kill you like lava, but fireballs, shells, etc. could pass through unharmed. The tile type image in the editor could be a purple version of the skull one. 
+
+[ ] Hazard deaths only option in the classic mode
 
 
 Need To Test
@@ -142,18 +153,19 @@ Beta 1 Public Release Feature Requests
 [ ] Intro music attached to normal looped tracks
 [ ] A way to put levels/bonus stages in worlds WITHOUT editing the .txt file.
 [ ] Also, as P1 on the Bonus Island World against 3 CPUs, I was unable to use items in the World screen.
-
-[ ] Ability to reorder the drawing order of platforms within the same layer - not too hard to do, just a platform swap in the platforms away
 [ ] Though the universal Overrides thing has Map-specific and World-specific overrides, it lacks Background-specific overrides.
 [ ] Volume control for individual tunes in music packs. Just changing a number in the text file would be a lot less trouble than having to edit the music files themselves.
 [ ] Bombs setting off other bombs (chain reaction) and bombs destroying breakable blocks
-[ ] Escape in level editor will ask you if you want to close before doing it
 [ ] Enemy specific spawn zones (as part of the mode objects locations in level editor)
 [ ] Be able to define a size of area in which the suicide timer runs (like, say, if you're in the same 3x3-tile area for long enough, you get killed). Right now, the game only checks to see if you haven't moved; this causes the bots to not get timed out unless you set the suicide timer to something really short, since they still jump occasionally.
-[ ] Item idea: in a world, if you have a stored item left over at the end of a level, it goes into your inventory. (It would only count stored items you had at the moment the level ended...that way, you can't just run around after the game and hit item blocks until you get a certain item.
-[ ] If you have a powerup awarded by the bonus wheel when you start a world, it should be added to your inventory
+
 [ ] I hate that being trapped by ! block or even flip block kills you. That really sux and I request deleting it
-[ ] How difficult would it be to add another mode which would be basically identical to Greed mode, but with a couple of tweaks? Basically it would act like Coin mode from Smash Bros. It could be called "Cash Clash" or something. 1) Players start with no coins, but still lose coins when hit. 2) There is a global timer like in Time Limit mode. The primary parameter of the mode is how long the game lasts, like in Time Limit. At the end of the match, whoever has the most coins wins. 3) (Maybe) One extra game option - if you want, have it so whoever has the fewest coins at the end wins.
+[ ] How difficult would it be to add another mode which would be basically identical to Greed mode, but with a couple of 
+    tweaks? Basically it would act like Coin mode from Smash Bros. It could be called "Cash Clash" or something. 
+	1) Players start with no coins, but still lose coins when hit. 
+	2) There is a global timer like in Time Limit mode. The primary parameter of the mode is how long the game lasts, 
+	like in Time Limit. At the end of the match, whoever has the most coins wins. 
+	3) (Maybe) One extra game option - if you want, have it so whoever has the fewest coins at the end wins.
 [ ] donut blocks that respawn.
 [ ] ember eyecandy: works like bubbles but with different graphics and ash eyecandy: works like snow but with different graphics
 [ ] A Button in the Map items that activates and deactivates certain Platforms. 
@@ -161,10 +173,8 @@ Beta 1 Public Release Feature Requests
 [ ] i don't know if someone mentioned this already but it would be cool if you can kick items and shells upward like in SMW
 [ ] Also, why not an item that makes you partially transparent for awhile? Kind of like the cloaking device thing from Super Smash. -> maybe an item that turns on a hard shield for a while
 [ ] Make it easier to assign tile types in level editor by pressing keys or have a little menu pop up
-[ ] Hazard deaths only option in the classic mode
-[ ] Death Blocks that items/etc. go through, but players don't.
 [ ] Switch that turns off and on certain movements of some hazards[like Fire-Bars, Roto-disks, and Piranha-plants]
-[ ] An idea for another tile type. Basically, instant-death, but not solid. So, touching it would kill you like lava, but fireballs, shells, etc. could pass through unharmed. The tile type image in the editor could be a purple version of the skull one. 
+
 
 Feature Requests
 
@@ -3454,6 +3464,7 @@ void UpdateScoreBoard()
 		if(game_values.gamemode->winningteam < 0)
 			return;
 
+		//If this was the last stage, signal that the world is over
 		if(game_values.tourstops[game_values.tourstopcurrent]->fEndStage)
 		{
 			game_values.tournamentwinner = 1;
@@ -3464,6 +3475,7 @@ void UpdateScoreBoard()
 		for(short iScore = 0; iScore < score_cnt; iScore++)
 			game_values.tournament_scores[iScore].wins = 0;
 
+		//Assign the order that players will show up on the scoreboard (ordered by score)
 		for(short iMyScore = 0; iMyScore < score_cnt; iMyScore++)
 		{
 			for(short iTheirScore = 0; iTheirScore < score_cnt; iTheirScore++)
@@ -3489,6 +3501,17 @@ void UpdateScoreBoard()
 					else
 						game_values.worldpowerups[iScore][31] = tourStop->wsbBonuses[iBonus].iBonus;	
 				}
+			}
+		}
+
+		//Add powerups to player's world item inventory that they held at the end of the game
+		for(short iPlayer = 0; iPlayer < 4; iPlayer++)
+		{
+			if(game_values.gamepowerups[iPlayer] != -1)
+			{
+				short iTeamId = LookupTeamID(iPlayer);
+				if(game_values.worldpowerupcount[iTeamId] < 32)
+					game_values.worldpowerups[iTeamId][game_values.worldpowerupcount[iTeamId]++] = game_values.gamepowerups[iPlayer];
 			}
 		}
 	}

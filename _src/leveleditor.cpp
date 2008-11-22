@@ -377,6 +377,8 @@ void AdjustMapHazardRadius(MapHazard * hazard, short iClickX, short iClickY);
 
 void SetNoSpawn(short nospawnmode, short col, short row, bool value);
 
+bool g_fFullScreen = false;
+
 //main main main
 int main(int argc, char *argv[])
 {
@@ -390,7 +392,16 @@ int main(int argc, char *argv[])
 	printf("-------------------------------------------------------------------------------\n");
 	printf("\n---------------- startup ----------------\n");
 
-	gfx_init(640,480, false);
+	FILE * fp = OpenFile("leveleditor.bin", "rt");
+
+	if(fp)
+	{
+		fread(&g_fFullScreen, sizeof(bool), 1, fp);
+		fgets(findstring, FILEBUFSIZE, fp);
+		fclose(fp);
+	}
+
+	gfx_init(640,480, g_fFullScreen);
 	blitdest = screen;
 	g_tilesetmanager.Init(convertPath("gfx/Classic/tilesets").c_str());
 	
@@ -531,14 +542,6 @@ int main(int argc, char *argv[])
 
 	ReadAnimatedTileTypeFile(convertPath("gfx/packs/Classic/tilesets/tile_animation_tileset.tls").c_str());
 
-	FILE * fp = OpenFile("leveleditor.bin", "rt");
-
-	if(fp)
-	{
-		fgets(findstring, FILEBUFSIZE, fp);
-		fclose(fp);
-	}
-
 	maplist.find(findstring);
 	loadcurrentmap();
 	findstring[0] = 0;  //clear out the find string so that pressing "f" will give you the find dialog
@@ -646,6 +649,7 @@ int main(int argc, char *argv[])
 
 	if(fp)
 	{
+		fwrite(&g_fFullScreen, sizeof(bool), 1, fp);
 		fprintf(fp, maplist.currentFilename());
 		fclose(fp);
 	}
@@ -859,6 +863,16 @@ int editor_edit()
 							{
 								fSelectedYes = false;
 								fExiting = true;
+							}
+						}
+
+						if(event.key.keysym.mod & (KMOD_LALT | KMOD_RALT))
+						{
+							if(event.key.keysym.sym == SDLK_RETURN)
+							{
+								g_fFullScreen = !g_fFullScreen;
+								gfx_setresolution(640, 480, g_fFullScreen);
+								blitdest = screen;
 							}
 						}
 						
@@ -5294,7 +5308,9 @@ int display_help()
 	menu_font_small.draw(offsetx, offsety, "[+/-] - Change Speed");
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[delete] - Delete");
-	offsety += menu_font_small.getHeight() + 20;
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[alt] + [enter] - Full Screen/Window");
+	
 
 	SDL_Flip(screen);
 

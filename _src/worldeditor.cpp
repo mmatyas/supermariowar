@@ -212,6 +212,8 @@ std::vector<WorldVehicle*> vehiclelist;
 //Warp stuff
 std::vector<WorldWarp*> warplist;
 
+bool g_fFullScreen = false;
+
 //main main main
 int main(int argc, char *argv[])
 {
@@ -225,7 +227,19 @@ int main(int argc, char *argv[])
 	printf("-------------------------------------------------------------------------------\n");
 	printf("\n---------------- startup ----------------\n");
 
-	gfx_init(640,480, false);
+	FILE * fp = OpenFile("worldeditor.bin", "rt");
+
+	int saved_col = 0, saved_row = 0;
+	if(fp)
+	{
+		fread(&saved_col, sizeof(int), 1, fp);
+		fread(&saved_row, sizeof(int), 1, fp);
+		fread(&g_fFullScreen, sizeof(bool), 1, fp);
+		fgets(findstring, FILEBUFSIZE, fp);
+		fclose(fp);
+	}
+
+	gfx_init(640,480, g_fFullScreen);
 	blitdest = screen;
 	g_tilesetmanager.Init(convertPath("gfx/Classic/tilesets").c_str());
 
@@ -272,9 +286,17 @@ int main(int argc, char *argv[])
 	
 	sMapSurface = SDL_CreateRGBSurface(screen->flags, 768, 608, screen->format->BitsPerPixel, 0, 0, 0, 0);
 
-	game_values.worldindex = 0;
+	worldlist.find(findstring);
+	game_values.worldindex = worldlist.GetCurrentIndex();
 	loadcurrentworld();
 	
+	if(saved_row >= 0 && saved_row <= iWorldHeight - 15 && saved_col >= 0 && saved_col <= iWorldWidth - 20)
+	{
+		draw_offset_row = saved_row;
+		draw_offset_col = saved_col;
+		updateworldsurface();
+	}
+
 	printf("\n---------------- ready, steady, go! ----------------\n");
 
 	printf("entering world editor loop...\n");
@@ -369,6 +391,17 @@ int main(int argc, char *argv[])
 	WriteWarpsIntoWorld();
 	g_worldmap.Save(convertPath("worlds/ZZworldeditor.txt").c_str());
 
+	fp = OpenFile("worldeditor.bin", "wt");
+
+	if(fp)
+	{
+		fwrite(&draw_offset_col, sizeof(int), 1, fp);
+		fwrite(&draw_offset_row, sizeof(int), 1, fp);
+		fwrite(&g_fFullScreen, sizeof(bool), 1, fp);
+		fprintf(fp, worldlist.current_name());
+		fclose(fp);
+	}
+
 	printf("\n---------------- shutdown ----------------\n");
 	return 0;
 }
@@ -457,6 +490,16 @@ int editor_edit()
 							{
 								fSelectedYes = false;
 								fExiting = true;
+							}
+						}
+
+						if(event.key.keysym.mod & (KMOD_LALT | KMOD_RALT))
+						{
+							if(event.key.keysym.sym == SDLK_RETURN)
+							{
+								g_fFullScreen = !g_fFullScreen;
+								gfx_setresolution(640, 480, g_fFullScreen);
+								blitdest = screen;
 							}
 						}
 
@@ -2895,7 +2938,7 @@ int display_help()
 	menu_font_large.drawCentered(320, 15, "Help");
 	
 	int offsety = 55;
-	int offsetx = 50;
+	int offsetx = 30;
 	menu_font_small.draw(offsetx, offsety, "Modes:");
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[1] - Water Mode");
@@ -2974,6 +3017,8 @@ int display_help()
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[insert] - Screenshot");
 	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[alt] + [enter] - Full Screen/Window");
+	
 
 	SDL_Flip(screen);
 

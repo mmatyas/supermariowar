@@ -4651,7 +4651,8 @@ void CPlayer::SetPowerup(short iPowerup)
 
 void CPlayer::SetStoredPowerup(short iPowerup)
 {
-	if(game_values.gamepowerups[globalID] == 0)
+	//If the player as the poison mushroom or the game is over, don't store the powerup
+	if(game_values.gamepowerups[globalID] == 0 || game_values.gamemode->gameover)
 	{
 		ifsoundonplay(sfx_stun);
 		return;
