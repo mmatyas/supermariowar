@@ -1107,8 +1107,12 @@ class MI_World : public UI_Control
 		short iStateTransition[4];
 		short iItemPopupDrawY[4];
 		short iPopupOffsets[4];
+		short iPopupOffsetsCurrent[4];
+		short iPopupOrder[4];
 		short iNumPopups;
 		short iStoredItemPopupDrawY;
+
+		bool iPopupFlag[4];
 
 		short iItemCol[4];
 		short iItemPage[4];

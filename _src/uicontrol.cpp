@@ -5694,6 +5694,7 @@ void MI_World::Init()
 	{
 		iStateTransition[iTeam] = 0;
 		iItemPopupDrawY[iTeam] = 0;
+		iPopupFlag[iTeam] = false;
 	}
 	
 	iNumPopups = 0;
@@ -5806,7 +5807,9 @@ void MI_World::AdvanceTurn()
 		}
 	}
 	else
+	{
 		g_worldmap.MoveVehicles();
+	}
 
 	g_worldmap.MoveBridges();
 
@@ -5904,17 +5907,12 @@ void MI_World::Update()
 	
 	if(iNumPopups > 0)
 	{
-		fItemPopup = false;
-
 		for(short iTeam = 0; iTeam < 4; iTeam++)
 		{
-			if(iStateTransition[iTeam] != 0)
-				fItemPopup = true;
-
+			//Do inventory popup open effect
 			if(iStateTransition[iTeam] == 1)
 			{
 				iItemPopupDrawY[iTeam] += 4;
-				iStoredItemPopupDrawY += 8;
 
 				if(iItemPopupDrawY[iTeam] >= 32)
 				{
@@ -5922,23 +5920,60 @@ void MI_World::Update()
 					iStateTransition[iTeam] = 3;
 				}
 			}
-			else if(iStateTransition[iTeam] == 2)
+			else if(iStateTransition[iTeam] == 2) // Do close effect
 			{
 				iItemPopupDrawY[iTeam] -= 4;
-				iStoredItemPopupDrawY -= 8;
 
 				if(iItemPopupDrawY[iTeam] <= 0)
 				{
 					iItemPopupDrawY[iTeam] = 0;
 					iStateTransition[iTeam] = 0;
 
-					//Need to remove item popup here
-					//iPopupOffsets[iTeam] = iNumPopups++ << 6;
+					//Shift down popup menus if one was removed that was below
+					bool fStartShift = false;
+					for(short iMoveTeam = 0; iMoveTeam < iNumPopups - 1; iMoveTeam++)
+					{
+						if(iPopupOrder[iMoveTeam] == iTeam)
+						{
+							fStartShift = true;
+						}
+
+						if(fStartShift)
+						{
+							iPopupOrder[iMoveTeam] = iPopupOrder[iMoveTeam + 1];
+							iPopupOffsets[iPopupOrder[iMoveTeam]] = iMoveTeam << 6;
+						}
+					}
+
 					iNumPopups--;
 				}
 			}
 		}
+
+		for(short iTeam = 0; iTeam < 4; iTeam++)
+		{
+			//Transition the inventory popup to it's new location if it needs to move
+			if(iPopupOffsetsCurrent[iTeam] > iPopupOffsets[iTeam])
+			{
+				iPopupOffsetsCurrent[iTeam] -= 4;
+				if(iPopupOffsetsCurrent[iTeam] < iPopupOffsets[iTeam])
+					iPopupOffsetsCurrent[iTeam] = iPopupOffsets[iTeam];
+			}
+		}
 	}
+
+	bool iShowStoredItems = false;
+	for(short iTeam = 0; iTeam < 4; iTeam++)
+	{
+		if(iShowStoredItems = iStateTransition[iTeam] == 1 || iStateTransition[iTeam] == 3)
+			break;
+	}
+
+	if(iShowStoredItems && iStoredItemPopupDrawY < 16)
+		iStoredItemPopupDrawY += 8;
+	else if(!iShowStoredItems && iStoredItemPopupDrawY > -48)
+		iStoredItemPopupDrawY -= 8;
+
 	
 	if(iState == 4 || iState == 5)
 	{
@@ -6119,24 +6154,24 @@ void MI_World::Draw()
 			if(iStateTransition[iTeam] != 0)
 			{
 				short iColorId = game_values.colorids[game_values.teamids[iTeam][0]];
-				spr_worlditempopup.draw(0, 448 - iItemPopupDrawY[iTeam] - iTeam * 64, 0, iColorId * 64 + 32 - iItemPopupDrawY[iTeam], 320, iItemPopupDrawY[iTeam] << 1);
-				spr_worlditempopup.draw(320, 448 - iItemPopupDrawY[iTeam] - iTeam * 64, 192, iColorId * 64 + 32 - iItemPopupDrawY[iTeam], 320, iItemPopupDrawY[iTeam] << 1);
+				spr_worlditempopup.draw(0, 448 - iItemPopupDrawY[iTeam] - iPopupOffsetsCurrent[iTeam], 0, iColorId * 64 + 32 - iItemPopupDrawY[iTeam], 320, iItemPopupDrawY[iTeam] << 1);
+				spr_worlditempopup.draw(320, 448 - iItemPopupDrawY[iTeam] - iPopupOffsetsCurrent[iTeam], 192, iColorId * 64 + 32 - iItemPopupDrawY[iTeam], 320, iItemPopupDrawY[iTeam] << 1);
 
 				if(iStateTransition[iTeam] == 3)
 				{
 					short iNumPowerups = game_values.worldpowerupcount[iTeam];
 					
 					if(iNumPowerups > 0)
-						spr_worlditempopup.draw(iItemCol[iTeam] * 52 + 114, 424 - iTeam * 64, iColorId * 48, 256, 48, 48);
+						spr_worlditempopup.draw(iItemCol[iTeam] * 52 + 114, 424 - iPopupOffsetsCurrent[iTeam], iColorId * 48, 256, 48, 48);
 
 					short iStartItem = iItemPage[iTeam] << 3;
 					for(short iItem = iStartItem; iItem < iStartItem + 8 && iItem < iNumPowerups; iItem++)
 					{
 						short iPowerup = game_values.worldpowerups[iTeam][iItem];
 						if(iPowerup >= NUM_POWERUPS)
-							spr_worlditems.draw((iItem - iItemPage[iTeam] * 8) * 52 + 122, 432 - iTeam * 64, (iPowerup - NUM_POWERUPS) << 5, 0, 32, 32);
+							spr_worlditems.draw((iItem - iItemPage[iTeam] * 8) * 52 + 122, 432 - iPopupOffsetsCurrent[iTeam], (iPowerup - NUM_POWERUPS) << 5, 0, 32, 32);
 						else
-							spr_storedpoweruplarge.draw((iItem - iItemPage[iTeam] * 8) * 52 + 122, 432 - iTeam * 64, iPowerup << 5, 0, 32, 32);
+							spr_storedpoweruplarge.draw((iItem - iItemPage[iTeam] * 8) * 52 + 122, 432 - iPopupOffsetsCurrent[iTeam], iPowerup << 5, 0, 32, 32);
 					}
 				}
 			}
@@ -6168,6 +6203,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 			iNumPopups = 0;
 			iStateTransition[iTeam] = 0;
 			iItemPopupDrawY[iTeam] = 0;
+			iPopupFlag[iTeam] = false;
 		}
 
 		fForceStageStart = false;
@@ -6286,7 +6322,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 
 		short iTeamId = LookupTeamID(iPlayer);
 
-		if(iState == -1 && iNumPopups == 0)
+		if(iState == -1 && iNumPopups == 0 && iPopupFlag[0] == false && iPopupFlag[1] == false && iPopupFlag[2] == false && iPopupFlag[3] == false)
 		{
 			if(iControllingTeam == LookupTeamID(iPlayer) && iPlayerState == 0 && game_values.playercontrol[iPlayer] > 0) //if this player is player or cpu
 			{
@@ -6503,7 +6539,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 			}
 		}
 
-		if(iStateTransition[iTeamId] == 0 || iStateTransition[iTeamId] == 3)
+		if(iState == -1 && (iStateTransition[iTeamId] == 0 || iStateTransition[iTeamId] == 3))
 		{
 			if(playerKeys->menu_cancel.fPressed)
 			{
@@ -6514,15 +6550,19 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 				}
 			}
 			
-			if ((game_values.playercontrol[iPlayer] == 1 || fNoInterestingMoves) && (playerKeys->menu_random.fPressed ||
+			if ((game_values.playercontrol[iPlayer] == 1 || fNoInterestingMoves) && (iPopupFlag[iTeamId] || playerKeys->menu_random.fPressed ||
 				(iPlayer != 0 && playerInput->inputControls[iPlayer]->iDevice == DEVICE_KEYBOARD && playerKeys->menu_cancel.fPressed)))
 			{
+				iPopupFlag[iTeamId] = true;
+
 				if(iPlayerState == 0 && iStateTransition[iTeamId] == 0)
 				{
-					//TODO: Need to add the popup to the offsets
-					//iPopupOffsets[iTeamId] = iNumPopups++ << 6;
+					iPopupFlag[iTeamId] = false;
 
-					iNumPopups++;
+					iPopupOrder[iNumPopups] = iTeamId;
+					iPopupOffsets[iTeamId] = iNumPopups++ << 6;
+					iPopupOffsetsCurrent[iTeamId] = iPopupOffsets[iTeamId];
+					
 					iStateTransition[iTeamId] = 1;
 
 					iItemPage[iTeamId] = 0;
@@ -6532,6 +6572,8 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 				}
 				else if (iStateTransition[iTeamId] == 3)
 				{
+					iPopupFlag[iTeamId] = false;
+
 					iStateTransition[iTeamId] = 2;
 					ifsoundonplay(sfx_inventory);
 				}
@@ -6609,7 +6651,7 @@ bool MI_World::UsePowerup(short iPlayer, short iTeam, short iIndex, bool fPopupI
 	}
 	else if(iPowerup == NUM_POWERUPS + 1) //Cloud (allows player to skip stages)
 	{
-		if(!fUsingCloud)
+		if(!fUsingCloud && iState == -1)
 		{
 			UseCloud(true);
 			fUsedItem = true;
@@ -6617,7 +6659,7 @@ bool MI_World::UsePowerup(short iPlayer, short iTeam, short iIndex, bool fPopupI
 	}
 	else if(iPowerup == NUM_POWERUPS + 2) //Player Switch
 	{
-		if(iControllingTeam != iTeam)
+		if(iControllingTeam != iTeam && iState == -1)
 		{
 			SetControllingTeam(iTeam);
 			DisplayTeamControlAnnouncement();
@@ -6628,7 +6670,7 @@ bool MI_World::UsePowerup(short iPlayer, short iTeam, short iIndex, bool fPopupI
 			fNoInterestingMoves = false;
 		}
 	}
-	else if(iPowerup == NUM_POWERUPS + 3) //Advance Turn
+	else if(iPowerup == NUM_POWERUPS + 3 && iState == -1) //Advance Turn
 	{
 		short iDestX, iDestY;
 		g_worldmap.GetPlayerDestTile(&iDestX, &iDestY);
@@ -6641,7 +6683,7 @@ bool MI_World::UsePowerup(short iPlayer, short iTeam, short iIndex, bool fPopupI
 			ifsoundonplay(sfx_switchpress);
 		}
 	}
-	else if(iPowerup == NUM_POWERUPS + 4) //Revive stage
+	else if(iPowerup == NUM_POWERUPS + 4 && iState == -1) //Revive stage
 	{
 		short iDestX, iDestY;
 		g_worldmap.GetPlayerDestTile(&iDestX, &iDestY);
@@ -6660,7 +6702,7 @@ bool MI_World::UsePowerup(short iPlayer, short iTeam, short iIndex, bool fPopupI
 			ifsoundonplay(sfx_transform);
 		}
 	}
-	else if(iPowerup >= NUM_POWERUPS + 5 && iPowerup <= NUM_POWERUPS + 8) //Door Keys
+	else if(iPowerup >= NUM_POWERUPS + 5 && iPowerup <= NUM_POWERUPS + 8 && iState == -1) //Door Keys
 	{
 		short iDoorsOpened = g_worldmap.UseKey(iPowerup - NUM_POWERUPS - 5, iPlayerCurrentTileX, iPlayerCurrentTileY, fUsingCloud);
 
@@ -6741,6 +6783,10 @@ MenuCodeEnum MI_World::InitGame(short iStage, short iPlayer, bool fNeedAiControl
 
 	if(fBonusHouse)
 		game_values.singleplayermode = iPlayer;
+
+	//If player was trying to get to his inventory menu, cancel that because a game is about to start
+	for(short iTeam = 0; iTeam < 4; iTeam++)
+		iPopupFlag[iTeam] = false;
 
 	if(fNeedAiControl || fBonusHouse)
 		return MENU_CODE_TOUR_STOP_CONTINUE_FORCED;

@@ -51,12 +51,8 @@ STUFF TO WATCH OUT FOR IN BETA2
 - collision detection and behavior of coins, ztar, collection cards
 
 Fixed
-[X] Alt + enter on level editor or world editor should full screen + remember setting
-[X] Save last viewed world + coordinates in world editor
-[X] When using world inventory item powerups, only give the powerup to the player that used it, not the entire team
-[X] If players have stored powerups in world mode (i.e. they selected an item and are waiting to play the next game) and the world is exited, then that stored item will be kept
-[X] Added display for stored powerups on world inventory menu
-[X] Started multi inventory select in world mode
+[X] Finished multi select inventory menu in world mode -> added smooth transitions
+
 
 Beta 1 Public Release Bugs
 
@@ -83,6 +79,8 @@ Beta 1 Public Release Bugs
     -> Need to test to make sure this works
 [ ] If you have a powerup awarded by the bonus wheel when you start a world, it should be added to your inventory
     -> Need to test to make sure it works
+
+[ ] Finish world mode multi inventory select then TEST IT with all powerups and team configurations
 
 [ ] Death Blocks that items/etc. go through, but players don't.
 [ ] An idea for another tile type. Basically, instant-death, but not solid. So, touching it would kill you like lava, but fireballs, shells, etc. could pass through unharmed. The tile type image in the editor could be a purple version of the skull one. 
