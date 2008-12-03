@@ -598,6 +598,7 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 			{
 				ts->fUseSettings = true;
 				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.classic.style, NULL, game_values.gamemodemenusettings.classic.style, false);
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.classic.scoring, NULL, game_values.gamemodemenusettings.classic.scoring, false);
 			}
 			else if(ts->iMode == 1) //frag
 			{
@@ -912,6 +913,12 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
 				if(ts->iNumUsedSettings > 0)
 				{
 					sprintf(szTemp, ",%d", ts->gmsSettings.classic.style);
+					strcat(buffer, szTemp);
+				}
+
+				if(ts->iNumUsedSettings > 1)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.classic.scoring);
 					strcat(buffer, szTemp);
 				}
 			}

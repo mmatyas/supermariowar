@@ -1599,11 +1599,17 @@ void Menu::CreateMenu()
 	// Classic Mode Settings
 	//***********************
 
-	miClassicModeStyleField = new MI_SelectField(&spr_selectfield, 120, 220, "On Kill", 400, 180);
+	miClassicModeStyleField = new MI_SelectField(&spr_selectfield, 120, 200, "On Kill", 400, 180);
 	miClassicModeStyleField->Add("Respawn", 0, "", false, false);
 	miClassicModeStyleField->Add("Shield", 1, "", false, false);
 	miClassicModeStyleField->SetData(&game_values.gamemodemenusettings.classic.style, NULL, NULL);
 	miClassicModeStyleField->SetKey(game_values.gamemodemenusettings.classic.style);
+
+	miClassicModeScoringField = new MI_SelectField(&spr_selectfield, 120, 240, "Scoring", 400, 180);
+	miClassicModeScoringField->Add("All Kills", 0, "", false, false);
+	miClassicModeScoringField->Add("Push Kills Only", 1, "", false, false);
+	miClassicModeScoringField->SetData(&game_values.gamemodemenusettings.classic.scoring, NULL, NULL);
+	miClassicModeScoringField->SetKey(game_values.gamemodemenusettings.classic.scoring);
 
 	miClassicModeBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
 	miClassicModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
@@ -1612,8 +1618,9 @@ void Menu::CreateMenu()
 	miClassicModeRightHeaderBar = new MI_Image(&menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
 	miClassicModeHeaderText = new MI_Text("Classic Mode Menu", 320, 5, 0, 2, 1);
 
-	mModeSettingsMenu[0].AddControl(miClassicModeStyleField, miClassicModeBackButton, miClassicModeBackButton, NULL, miClassicModeBackButton);
-	mModeSettingsMenu[0].AddControl(miClassicModeBackButton, miClassicModeStyleField, miClassicModeStyleField, miClassicModeStyleField, NULL);
+	mModeSettingsMenu[0].AddControl(miClassicModeStyleField, miClassicModeBackButton, miClassicModeScoringField, NULL, miClassicModeBackButton);
+	mModeSettingsMenu[0].AddControl(miClassicModeScoringField, miClassicModeStyleField, miClassicModeBackButton, NULL, miClassicModeBackButton);
+	mModeSettingsMenu[0].AddControl(miClassicModeBackButton, miClassicModeScoringField, miClassicModeStyleField, miClassicModeScoringField, NULL);
 	
 	mModeSettingsMenu[0].AddNonControl(miClassicModeLeftHeaderBar);
 	mModeSettingsMenu[0].AddNonControl(miClassicModeRightHeaderBar);
@@ -4761,6 +4768,7 @@ void Menu::SetRandomGameModeSettings(short iMode)
 	if(iMode == game_mode_classic) //classic
 	{
 		game_values.gamemodesettings.classic.style = miClassicModeStyleField->GetRandomShortValue();
+		game_values.gamemodesettings.classic.scoring = miClassicModeScoringField->GetRandomShortValue();
 	}
 	else if(iMode == game_mode_frag) //frag
 	{

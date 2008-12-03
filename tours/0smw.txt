@@ -34,6 +34,7 @@
 #Mode Options
 #0 - Classic
 #On Kill - 0 for respawning on kill, 1 for shield and player keeps playing
+#Scoring - 0 for all kills and 1 for push kills only
 
 #1 - Frag
 #On Kill - 0 for respawning on kill, 1 for shield and player keeps playing

@@ -1469,6 +1469,7 @@ void CPlayer::move()
 
 			if(!inair)
 			{
+				//Make player hop or stick to ground in Kuribo's shoe
 				if(iKuriboShoe > 0)
 				{
 					//This makes the shoe stick to the ground (for sticky shoes)
@@ -1521,6 +1522,7 @@ void CPlayer::move()
 
 			if(!inair)
 			{
+				//Make player hop or stick to ground in Kuribo's shoe
 				if(iKuriboShoe > 0)
 				{
 					//This will make the shoe sticky
@@ -1578,7 +1580,7 @@ void CPlayer::move()
 					velx = 0.0f;
 			}
 
-			//Stop ground velocity when wearing the shoe
+			//Stop ground velocity when wearing the sticky shoe
 			if(!inair && iKuriboShoe == 2)
 				velx = 0.0f;
 		}
@@ -2054,7 +2056,7 @@ void CPlayer::SetKuriboShoe(short iType)
 {
 	iKuriboShoe = iType;
 
-	if(carriedItem)
+	if(carriedItem && !carriedItem->IsCarriedByKuriboShoe())
 	{
 		carriedItem->Drop();
 		carriedItem = NULL;
@@ -2956,6 +2958,7 @@ void CPlayer::draw()
 			DrawTail();
 	}
 
+	//Draw the player sprite above the shoe
 	short iPlayerKuriboOffsetY = 0;
 	if(iKuriboShoe > 0)
 		iPlayerKuriboOffsetY = 16;
@@ -2969,6 +2972,7 @@ void CPlayer::draw()
 			pScoreboardSprite[spr]->draw(ix - PWOFFSET, iy - PHOFFSET - iPlayerKuriboOffsetY, iSrcOffsetX, 0, 32, 32);
 	}
 
+	//Draw Kuribo's Shoe
 	if(iKuriboShoe > 0)
 	{
 		if(state > player_ready) //warping
@@ -4506,7 +4510,7 @@ bool CPlayer::IsPlayerFacingRight()
 
 bool CPlayer::AcceptItem(MO_CarriedObject * item)
 {
-	if(fAcceptingItem && statue_timer == 0 && iKuriboShoe == 0)
+	if(fAcceptingItem && statue_timer == 0 && (iKuriboShoe == 0 || item->IsCarriedByKuriboShoe()))
 	{
 		carriedItem = item;
 		item->owner = this;

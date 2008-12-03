@@ -625,6 +625,7 @@ struct ts
 struct ClassicGameModeSettings
 {
 	short style;			//on kill, either respawn the player or shield them and let them keep playing
+	short scoring;			//When to credit a score, all kills or push kills only (sumo mode)
 };
 
 struct FragGameModeSettings

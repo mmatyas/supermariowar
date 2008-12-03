@@ -382,6 +382,7 @@ class Menu
 
 		//Classic
 		MI_SelectField * miClassicModeStyleField;
+		MI_SelectField * miClassicModeScoringField;
 		MI_Button * miClassicModeBackButton;
 		
 		MI_Image * miClassicModeLeftHeaderBar;

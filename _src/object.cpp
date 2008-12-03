@@ -5694,6 +5694,8 @@ void MO_CarriedObject::init()
 	iOwnerRightOffset = HALFPW;
 	iOwnerLeftOffset = HALFPW - 32;
 	iOwnerUpOffset = 32;
+
+	fCarriedByKuriboShoe = false;
 }
 
 void MO_CarriedObject::draw()
@@ -5763,6 +5765,8 @@ CO_Egg::CO_Egg(gfxSprite *nspr, short iColor) :
 	iOwnerRightOffset = HALFPW;
 	iOwnerLeftOffset = HALFPW - 28;
 	iOwnerUpOffset = 32;
+
+	fCarriedByKuriboShoe = true;
 
 	placeEgg();
 }
@@ -5929,6 +5933,8 @@ CO_Star::CO_Star(gfxSprite *nspr, short type, short id) :
 
 	dKickX = 3.0f;
 	dKickY = 6.0f;
+
+	fCarriedByKuriboShoe = true;
 
 	placeStar();
 
@@ -6241,6 +6247,8 @@ CO_Flag::CO_Flag(gfxSprite *nspr, MO_FlagBase * base, short iTeamID, short iColo
 	iOwnerRightOffset = HALFPW - 31;
 	iOwnerLeftOffset = HALFPW + 1;
 	iOwnerUpOffset = 38;
+
+	fCarriedByKuriboShoe = true;
 
 	placeFlag();
 }
@@ -10673,6 +10681,8 @@ CO_PhantoKey::CO_PhantoKey(gfxSprite *nspr) :
 
 	sparkleanimationtimer = 0;
 	sparkledrawframe = 0;
+
+	fCarriedByKuriboShoe = true;
 
 	placeKey();
 }

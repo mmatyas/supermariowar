@@ -987,7 +987,11 @@ class MO_CarriedObject : public IO_MovingObject
 		virtual void Drop();
 		virtual void Kick();
 
+		bool IsCarriedByKuriboShoe() { return fCarriedByKuriboShoe; }
+
 	protected:
+
+		bool fCarriedByKuriboShoe;
 
 		CPlayer * owner;
 		bool fSmoking;

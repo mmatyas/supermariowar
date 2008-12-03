@@ -6109,7 +6109,9 @@ void MI_World::Draw()
 
 	//If a points modifier is in place, display it
 	if(game_values.worldpointsbonus >= 0)
-		spr_worlditems.draw(603, 443, (game_values.worldpointsbonus + 9) << 5, 0, 32, 32);
+	{
+		spr_worlditems.draw(603, 5, (game_values.worldpointsbonus + 9) << 5, 0, 32, 32);
+	}
 	
 	//Draw the teleport/warp stars effect
 	if(iState == -2 || iState >= 4)

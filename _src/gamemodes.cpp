@@ -651,7 +651,11 @@ void CGM_Classic::init()
 
 short CGM_Classic::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
 {
-	if(!gameover)
+	if(gameover)
+		return player_kill_normal;
+
+	//If we are playing classic "sumo" mode, then only score hazard kills
+	if(game_values.gamemode->gamemode != game_mode_classic || game_values.gamemodesettings.classic.scoring == 0 || style == kill_style_push)
 	{
 		if(fReverseScoring)
 		{
@@ -684,16 +688,16 @@ short CGM_Classic::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killst
 				return player_kill_removed;
 			}
 		}
-		
-		if(game_values.gamemode->gamemode == game_mode_classic && game_values.gamemodesettings.classic.style == 1)
-		{
-			ifsoundonplay(sfx_powerdown);
+	}
 
-			other.shield = game_values.shieldstyle;
-			other.shieldtimer = 60;
+	if(game_values.gamemode->gamemode == game_mode_classic && game_values.gamemodesettings.classic.style == 1)
+	{
+		ifsoundonplay(sfx_powerdown);
 
-			return player_kill_nonkill;
-		}
+		other.shield = game_values.shieldstyle;
+		other.shieldtimer = 60;
+
+		return player_kill_nonkill;
 	}
 
 	return player_kill_normal;
@@ -1208,12 +1212,12 @@ void CGM_ShyGuyTag::think()
 
 short CGM_ShyGuyTag::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
 {
-	if(!gameover && !other.shyguy)
+	if(gameover || other.shyguy)
+		return player_kill_normal;
+
+	if(CountShyGuys() == 0 || game_values.gamemodesettings.shyguytag.tagtransfer != 0)
 	{
-		if(CountShyGuys() == 0 || game_values.gamemodesettings.shyguytag.tagtransfer != 0)
-		{
-			SetShyGuy(other.getTeamID());
-		}
+		SetShyGuy(other.getTeamID());
 	}
 
 	return player_kill_normal;

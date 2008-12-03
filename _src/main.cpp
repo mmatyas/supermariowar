@@ -20,7 +20,7 @@
 |															|
 |															|
 | start:		24.01.2003									|
-| last changes:	10.11.2008									|
+| last changes:	12.02.2008									|
 |															|
 |								© 2003-2008 Florian Hufsky  |
 |								  florian.hufsky@gmail.com	|
@@ -52,6 +52,9 @@ STUFF TO WATCH OUT FOR IN BETA2
 
 Fixed
 [X] Finished multi select inventory menu in world mode -> added smooth transitions
+[X] Hazard deaths only option in the classic mode
+[X] Allow critical mode items like flags, yoshi's egg, ect to be carried by players in Kuribo's shoe
+[X] Randomize the transfer of tag/shyguy when a POW or MOd is used instead of always giving it to the first player in the players array
 
 
 Beta 1 Public Release Bugs
@@ -74,18 +77,16 @@ Beta 1 Public Release Bugs
 	-> Still Hangs :(
 	-> Fixed bug where some maps crashed when loaded
 
-
 [ ] Item idea: in a world, if you have a stored item left over at the end of a level, it goes into your inventory. (It would only count stored items you had at the moment the level ended...that way, you can't just run around after the game and hit item blocks until you get a certain item.
     -> Need to test to make sure this works
 [ ] If you have a powerup awarded by the bonus wheel when you start a world, it should be added to your inventory
     -> Need to test to make sure it works
 
-[ ] Finish world mode multi inventory select then TEST IT with all powerups and team configurations
-
 [ ] Death Blocks that items/etc. go through, but players don't.
 [ ] An idea for another tile type. Basically, instant-death, but not solid. So, touching it would kill you like lava, but fireballs, shells, etc. could pass through unharmed. The tile type image in the editor could be a purple version of the skull one. 
 
-[ ] Hazard deaths only option in the classic mode
+[ ] The "thumbnail" sized tiles for the world editor have purple parts in all the foreground objects, including the level markers.
+
 
 
 Need To Test
@@ -235,6 +236,7 @@ BUGS:
 [ ] if a player is holding a shell while frozen, the shell is still held in place.  *edit: even when you let go of run, the shell is held there.  i still don't know if this is intended or not. should probably kill the shell though. :x 
 
 [ ] There are several repeated tiles in the SMB2 and SMB3 tilesets, such as two pairs of bullet bill blasters in SMB3 and what looks to be two identical layers of the tree from SMB2. If those are taken out, it would give at least a little bit of room to add stuff / organize.
+
 [ ] The "thumbnail" sized tiles for the world editor have purple parts in all the foreground objects, including the level markers.
 
 [ ] Yet another, though it might be impossible to fix: Clear blocks do not give you the displayed powerup when you hit them in certain modes that have mode specific items like Health and Jail and the block gives you that instead.
@@ -243,10 +245,6 @@ BUGS:
 
 [ ] Maps that have Kuribo's shoe in them with the game types set to CTF or Eggs kinda makes it all moot point because you can't carry anything in the shoe and that's the whole point of the game...
     Make items flagged with CarribleByKuribosShoe() so the shoe can carry only flags and eggs and display the item where the player should be in the shoe
-
-[ ] Bots also like to think that every egg in egg mode has a matching Yoshi even when it actually doesn't. They will bring wrong coloured eggs to Yoshis if the coloured egg they're holding has no Yoshi to begin with.
-	The solution here is to add a GameInit() method to the AI and allow it to do some computations on the map/mode before the game starts
-	Then the bot can detect that we are playing eggs mode and scan the objects lists looking for yoshis.  It can keep a list of good yoshis and know only which eggs to grab.
 
 [ ] Shells and mushrooms cannot do an about face when they hit the solid side of a moving platform, and just completely stop moving. example: continuous platform moves left, shell comes moving right, hits solid platform, doesn't move. It takes a stop and start from a player to get it moving again.
     -> test on test/00000000stuckshell.map
@@ -289,20 +287,18 @@ WAITING RESPONSE
 [ ] If you become a statue in the air, and have a feather, you can use its extra jump while a statue.
     -> I can't reproduce this, it may have been fixed with another bug fix
 
-ASK
-
 */
 
 /*
 Procedure for adding a new game mode:
 1) Add class to gamemodes.cpp and gamemodes.h
 2) Add game mode type to GameModeType enum in gamemodes.h
-3) Add new game mode to gamemodes array in main.cpp
+3) Add new game mode to gamemodes array in main.cpp (gamemodes[X] line 1187)
 4) Update MI_SelectField * miGoalField[22]; line in menu.h to match the new number of modes
 5) Update UI_Menu mModeSettingsMenu[22]; line in meny.h to accomodate a new settings menu
 6) Add game mode options to GameModeSettings in global.h
 7) Set default settings for settings in main.cpp
-8) Add menu fields to support these new options
+8) Add menu fields to support these new options in menu.cpp and menu.h
 9) Update ParseTourStopLine() and WriteTourStopLine() in global.cpp
 10) Update SetRandomGameModeSettings() in menu.cpp
 11) Add new mode gfx to gfx\packs\Classic\menu\menu_mode_large.png and menu_mode_small.png
@@ -310,6 +306,17 @@ Procedure for adding a new game mode:
 13) Remove old options.bin (new settings will now be read from it)
 14) Change line 3186 in main.cpp: if(iMode == game_mode_pipe_minigame)
 15) Change line 3274 in main.cpp: if(iMode == game_mode_pipe_minigame)
+16) Update tours/0smw.txt to have documentation of mode and options
+
+Procedure for adding a new game mode option:
+1) Add game mode options to GameModeSettings in global.h
+2) Set default settings for settings in main.cpp
+3) Add menu fields to support these new options in menu.cpp and menu.h
+4) Update ParseTourStopLine() and WriteTourStopLine() in global.cpp
+5) Update SetRandomGameModeSettings() in menu.cpp
+6) Remove old options.bin (new settings will now be read from it)
+7) Update tours/0smw.txt to have documentation of new mode option
+
 
 Procedure for adding a new powerup:
 1) Add class to object.cpp and object.h inhieriting from MO_Powerup
@@ -1203,6 +1210,7 @@ int main(int argc, char *argv[])
 	//Setup the default game mode settings
 	//Classic
 	game_values.gamemodemenusettings.classic.style = 0;		//Respawn on death
+	game_values.gamemodemenusettings.classic.scoring = 0;	//All kills will score
 
 	//Frag
 	game_values.gamemodemenusettings.frag.style = 0;		//Respawn on death
@@ -2494,23 +2502,30 @@ void RunGame()
 						}
 
 						//Kill players touching the ground (or in air for MOd blocks)
+						short iNumKillPlayers = 0;
+						CPlayer * pKillPlayers[3];
+
+						CPlayer * killer = GetPlayerFromGlobalID(game_values.screenshakeplayerid);
+
 						for(short k = 0; k < list_players_cnt; k++)
 						{
 							CPlayer * player = list_players[k];
+
+							//Don't kill the player that triggered the POW/MOd
 							if(player->globalID == game_values.screenshakeplayerid)
 								continue;
 
+							//Don't kill players on his team either (if friendly fire is off)
 							if(game_values.teamcollision != 2 && game_values.screenshaketeamid == player->teamID)
 								continue;
 							
+							//Kill other players
 							if(!player->invincible && player->shield == 0 && player->iKuriboShoe == 0 && player->isready())
 							{
 								if(game_values.screenshakekillinair == player->inair)
 								{
-									PlayerKilledPlayer(game_values.screenshakeplayerid, player, death_style_jump, kill_style_pow, false, false);
-
-									CPlayer * killer = GetPlayerFromGlobalID(game_values.screenshakeplayerid);
-
+									pKillPlayers[iNumKillPlayers++] = player;
+									
 									if(killer)
 									{
 										game_values.screenshakekillscount++;
@@ -2522,6 +2537,18 @@ void RunGame()
 							}
 						}
 						
+						//Randomize the order in which the players are killed (so that game modes where order matters is fair)
+						if(iNumKillPlayers > 0)
+						{
+							short iRandPlayer = rand() % iNumKillPlayers;
+							for(short iPlayer = 0; iPlayer < iNumKillPlayers; iPlayer++)
+							{
+								PlayerKilledPlayer(game_values.screenshakeplayerid, pKillPlayers[iRandPlayer], death_style_jump, kill_style_pow, false, false);
+
+								if(++iRandPlayer >= iNumKillPlayers)
+									iRandPlayer = 0;
+							}
+						}
 
 						//Kill goombas and koopas
 						for(short k = 0; k < objectcontainer[0].list_end; k++)
@@ -3274,6 +3301,7 @@ void RunGame()
 				short iMode = game_values.gamemode->gamemode;
 				if(iMode == game_mode_pipe_minigame)
 					iMode = 25;
+
 				menu_mode_large.draw(304, 224, iMode << 5, 0, 32, 32);
 
 				char szGoal[256];
