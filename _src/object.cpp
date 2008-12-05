@@ -6103,52 +6103,55 @@ void MO_FlagBase::draw()
 
 void MO_FlagBase::update()
 {
-	if(--anglechangetimer <= 0)
+	if(game_values.gamemodesettings.flag.speed > 0)
 	{
-		anglechange = (float)((rand()%101 - 50) * 0.0002f);
-		anglechangetimer = (short)(rand() % 50 + 100);
-	}
-	
-	angle += anglechange;
+		if(--anglechangetimer <= 0)
+		{
+			anglechange = (float)((rand()%101 - 50) * 0.0002f);
+			anglechangetimer = (short)(rand() % 50 + 100);
+		}
+		
+		angle += anglechange;
 
-	velx = speed * sin(angle);
-	vely = speed * cos(angle);
-	
-	xf(fx + velx);
-	yf(fy + vely);
+		velx = speed * sin(angle);
+		vely = speed * cos(angle);
+		
+		xf(fx + velx);
+		yf(fy + vely);
 
-	if(ix < 0)
-	{
-		velx = -velx;
-		ix = 0;
-		fx = (float)ix;
+		if(ix < 0)
+		{
+			velx = -velx;
+			ix = 0;
+			fx = (float)ix;
 
-		angle = atan2(velx, vely);
-	}
-	else if(ix + collisionWidth >= 640)
-	{
-		velx = -velx;
-		ix = 639 - collisionWidth;
-		fx = (float)ix;
+			angle = atan2(velx, vely);
+		}
+		else if(ix + collisionWidth >= 640)
+		{
+			velx = -velx;
+			ix = 639 - collisionWidth;
+			fx = (float)ix;
 
-		angle = atan2(velx, vely);
-	}
-	
-	if(iy < 0)
-	{
-		vely = -vely;
-		iy = 0;
-		fy = (float)iy;
+			angle = atan2(velx, vely);
+		}
+		
+		if(iy < 0)
+		{
+			vely = -vely;
+			iy = 0;
+			fy = (float)iy;
 
-		angle = atan2(velx, vely);
-	}
-	else if(iy + collisionHeight >= 480)
-	{
-		vely = -vely;
-		iy = 479 - collisionHeight;
-		fy = (float)iy;
+			angle = atan2(velx, vely);
+		}
+		else if(iy + collisionHeight >= 480)
+		{
+			vely = -vely;
+			iy = 479 - collisionHeight;
+			fy = (float)iy;
 
-		angle = atan2(velx, vely);
+			angle = atan2(velx, vely);
+		}
 	}
 
 	if(game_values.gamemodesettings.flag.speed == 0 && timer++ > 1000)
@@ -6800,7 +6803,7 @@ void OMO_KingOfTheHillZone::update()
 			list_players[iPlayerID]->score->AdjustScore(multiplier);
 			game_values.gamemode->CheckWinner(list_players[iPlayerID]);
 
-			if(game_values.gamemodesettings.kingofthehill.maxmultiplier > 1 && ++multipliertimer >= 10)
+			if(game_values.gamemodesettings.kingofthehill.maxmultiplier > 1 && ++multipliertimer >= 5)
 			{
 				multipliertimer = 0;
 

@@ -79,7 +79,7 @@
 #Explosion Timer - number of seconds until eggs explode - 0 for off any positive number is the number of seconds (5 is 5 seconds until explosion)
 
 #7 - CTF
-#Speed - 0 = stationary, any number greater than 0 causes bases to move.  The larger the number, the faster they go.
+#Speed - 0 = stationary, -1 = stationary and no reposition, any number greater than 0 causes bases to move.  The larger the number, the faster they go.
 #Touch Return - 0 = Off, 1 = On
 #Point Move - 0 = Off, 1 = On
 #Auto Return - 0 = No auto return, any number greater than 0 is the number of frames before it returns (example: 620 is about 10 seconds)
@@ -181,6 +181,6 @@
 
 #Tour Stops (maximum 10 stops)
 #Map,Mode,Goal,Points,Bonus Wheel,Name,Options(see above)
-subcon,5,30,2,1,1st Stop,60,2,0,0,2,0,0,1,0,0
+subcon,7,10,2,1,1st Stop,5,1,0,0,0,0
 0smw,16,20,1,0,2nd Stop,1,5,0,8,4,1
 treefort,15,15,1,0,3rd Stop,3,310,0,2,1,1,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0

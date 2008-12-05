@@ -679,9 +679,9 @@ void MovingPlatform::collide(CPlayer * player)
 									 ((t1 & tile_flag_death_on_left) && !(t2 & tile_flag_solid)) ||
 									 (!(t1 & tile_flag_solid) && (t2 & tile_flag_death_on_left));
 
-				bool fSuperDeathTileToLeft = ((t1 & tile_flag_super_death_left) && (t2 & tile_flag_super_death_left)) ||
-									      ((t1 & tile_flag_super_death_left) && !(t2 & tile_flag_solid)) ||
-									      (!(t1 & tile_flag_solid) && (t2 & tile_flag_super_death_left));
+				bool fSuperDeathTileToLeft = ((t1 & tile_flag_super_or_player_death_left) && (t2 & tile_flag_super_or_player_death_left)) ||
+									      ((t1 & tile_flag_super_or_player_death_left) && !(t2 & tile_flag_solid)) ||
+									      (!(t1 & tile_flag_solid) && (t2 & tile_flag_super_or_player_death_left));
 
 				if(player->iHorizontalPlatformCollision == 3)
 				{
@@ -750,9 +750,9 @@ void MovingPlatform::collide(CPlayer * player)
 									 ((t1 & tile_flag_death_on_right) && !(t2 & tile_flag_solid)) ||
 									 (!(t1 & tile_flag_solid) && (t2 & tile_flag_death_on_right));
 
-				bool fSuperDeathTileToRight = ((t1 & tile_flag_super_death_right) && (t2 & tile_flag_super_death_right)) ||
-									      ((t1 & tile_flag_super_death_right) && !(t2 & tile_flag_solid)) ||
-									      (!(t1 & tile_flag_solid) && (t2 & tile_flag_super_death_right));
+				bool fSuperDeathTileToRight = ((t1 & tile_flag_super_or_player_death_right) && (t2 & tile_flag_super_or_player_death_right)) ||
+									      ((t1 & tile_flag_super_or_player_death_right) && !(t2 & tile_flag_solid)) ||
+									      (!(t1 & tile_flag_solid) && (t2 & tile_flag_super_or_player_death_right));
 
 				if(player->iHorizontalPlatformCollision == 1)
 				{
@@ -847,9 +847,9 @@ void MovingPlatform::collide(CPlayer * player)
 									 ((t1 & tile_flag_death_on_bottom) && !(t2 & tile_flag_solid)) ||
 									 (!(t1 & tile_flag_solid) && (t2 & tile_flag_death_on_bottom));
 
-			bool fSuperDeathTileOverPlayer = ((t1 & tile_flag_super_death_bottom) && (t2 & tile_flag_super_death_bottom)) ||
-									      ((t1 & tile_flag_super_death_bottom) && !(t2 & tile_flag_solid)) ||
-									      (!(t1 & tile_flag_solid) && (t2 & tile_flag_super_death_bottom));
+			bool fSuperDeathTileOverPlayer = ((t1 & tile_flag_super_or_player_death_bottom) && (t2 & tile_flag_super_or_player_death_bottom)) ||
+									      ((t1 & tile_flag_super_or_player_death_bottom) && !(t2 & tile_flag_solid)) ||
+									      (!(t1 & tile_flag_solid) && (t2 & tile_flag_super_or_player_death_bottom));
 
 			if(fSolidTileOverPlayer && !fSuperDeathTileOverPlayer && 
 				(!fDeathTileOverPlayer || player->invincible || player->shield > 0 || player->shyguy))
@@ -878,7 +878,7 @@ void MovingPlatform::collide(CPlayer * player)
 
 				return;
 			}
-			else if((t1 & tile_flag_death_on_bottom) || (t2 & tile_flag_death_on_bottom))
+			else if((t1 & tile_flag_player_or_death_on_bottom) || (t2 & tile_flag_player_or_death_on_bottom))
 			{
 				if(player_kill_nonkill != player->KillPlayerMapHazard(true, kill_style_environment, false))
 					return;
@@ -949,9 +949,9 @@ void MovingPlatform::collide(CPlayer * player)
 									 ((t1 & tile_flag_death_on_top) && !(t2 & tile_flag_solid)) ||
 									 (!(t1 & tile_flag_solid) && (t2 & tile_flag_death_on_top));
 
-			bool fSuperDeathTileUnderPlayer = ((t1 & tile_flag_super_death_top) && (t2 & tile_flag_super_death_top)) ||
-									 ((t1 & tile_flag_super_death_top) && !(t2 & tile_flag_solid)) ||
-									 (!(t1 & tile_flag_solid) && (t2 & tile_flag_super_death_top));
+			bool fSuperDeathTileUnderPlayer = ((t1 & tile_flag_super_or_player_death_top) && (t2 & tile_flag_super_or_player_death_top)) ||
+									 ((t1 & tile_flag_super_or_player_death_top) && !(t2 & tile_flag_solid)) ||
+									 (!(t1 & tile_flag_solid) && (t2 & tile_flag_super_or_player_death_top));
 
 			if(fSolidTileUnderPlayer && !fSuperDeathTileUnderPlayer && 
 				(!fDeathTileUnderPlayer || player->invincible || player->shield > 0 || player->iKuriboShoe > 0 || player->shyguy))

@@ -35,7 +35,7 @@
 
 #define MAPTITLESTRING "SMW 1.8 World Editor"
 
-enum {EDITOR_EDIT, EDITOR_WATER, EDITOR_BACKGROUND, EDITOR_FOREGROUND, EDITOR_PATHSPRITE, EDITOR_VEHICLES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_WORLD, NEW_WORLD, RESIZE_WORLD, SAVE, EDITOR_WARP, DISPLAY_HELP, EDITOR_PATH, EDITOR_TYPE, EDITOR_BOUNDARY};
+enum {EDITOR_EDIT, EDITOR_WATER, EDITOR_BACKGROUND, EDITOR_FOREGROUND, EDITOR_PATHSPRITE, EDITOR_VEHICLES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_WORLD, NEW_WORLD, RESIZE_WORLD, SAVE, EDITOR_WARP, DISPLAY_HELP, EDITOR_PATH, EDITOR_TYPE, EDITOR_BOUNDARY, EDITOR_START_ITEMS};
 
 const char * szEditModes[9] = {"Background Mode", "Foreground Mode", "Path Sprite Mode", "Stage Mode", "Path Mode", "Vehicle Mode", "Warp Mode", "Stage/Door Mode", "Boundary Mode"};
 
@@ -66,6 +66,10 @@ gfxSprite		spr_worldforeground[3];
 gfxSprite		spr_worldforegroundspecial[3];
 gfxSprite		spr_worldpaths[3];
 gfxSprite		spr_worldvehicle[3];
+
+gfxSprite		spr_powerupitems;
+gfxSprite		spr_worlditems;
+gfxSprite		spr_worldpopup;
 
 int				set_tile = 0;
 bool			fAutoPaint = true;
@@ -190,6 +194,7 @@ int editor_vehicles();
 int	editor_path();
 int editor_pathsprite();
 int editor_type();
+int editor_start_items();
 
 void updateworldsurface();
 void takescreenshot();
@@ -283,6 +288,10 @@ int main(int argc, char *argv[])
 	spr_worldvehicle[0].init(convertPath("gfx/packs/Classic/world/world_vehicles.png"), 255, 0, 255);
 	spr_worldvehicle[1].init(convertPath("gfx/packs/Classic/world/preview/world_vehicles.png"), 255, 0, 255);
 	spr_worldvehicle[2].init(convertPath("gfx/packs/Classic/world/thumbnail/world_vehicles.png"), 255, 0, 255);
+
+	spr_powerupitems.init(convertPath("gfx/packs/Classic/powerups/large.png"), 255, 0, 255);
+	spr_worlditems.init(convertPath("gfx/packs/Classic/world/world_powerups.png"), 255, 0, 255);
+	spr_worldpopup.init(convertPath("gfx/packs/Classic/world/world_item_popup.png"), 255, 0, 255);
 	
 	sMapSurface = SDL_CreateRGBSurface(screen->flags, 768, 608, screen->format->BitsPerPixel, 0, 0, 0, 0);
 
@@ -335,6 +344,10 @@ int main(int argc, char *argv[])
 
 			case EDITOR_WARP:
 				state = editor_warp();
+			break;
+
+			case EDITOR_START_ITEMS:
+				state = editor_start_items();
 			break;
 
 			case EDITOR_BOUNDARY:
@@ -529,6 +542,9 @@ int editor_edit()
 
 						if(event.key.keysym.sym == SDLK_w)
 							return EDITOR_WARP;
+
+						if(event.key.keysym.sym == SDLK_i)
+							return EDITOR_START_ITEMS;
 
 						if(event.key.keysym.sym == SDLK_b)
 							return EDITOR_BOUNDARY;
@@ -2212,6 +2228,155 @@ int editor_warp()
 	return EDITOR_QUIT;
 }
 
+int editor_start_items()
+{
+	bool done = false;
+	
+	SDL_Rect rItemDst[NUM_POWERUPS + NUM_WORLD_POWERUPS];
+
+	SDL_Rect rPickedItemDst[32];
+
+	short iColCount = 0;
+	short iRowCount = 0;
+	for(short iItem = 0; iItem < NUM_POWERUPS + NUM_WORLD_POWERUPS; iItem++)
+	{
+		rItemDst[iItem].x = 16 + iColCount * 48;
+		rItemDst[iItem].y = 16 + iRowCount * 48;
+		rItemDst[iItem].w = 32;
+		rItemDst[iItem].h = 32;
+		
+		if(++iColCount > 12)
+		{
+			iColCount = 0;
+			iRowCount++;
+		}
+	}
+
+	short iPickedItem = 0;
+	for(short iPickedItemY = 0; iPickedItemY < 4; iPickedItemY++)
+	{
+		for(short iPickedItemX = 0; iPickedItemX < 8; iPickedItemX++)
+		{
+			rPickedItemDst[iPickedItem].x = 122 + iPickedItemX * 52;  
+			rPickedItemDst[iPickedItem].y = 240 + iPickedItemY * 64;
+			rPickedItemDst[iPickedItem].w = 32;
+			rPickedItemDst[iPickedItem].h = 32;
+
+			iPickedItem++;
+		}
+	}
+
+	while (!done)
+	{
+		int framestart = SDL_GetTicks();
+
+		//handle messages
+		while(SDL_PollEvent(&event))
+		{
+			switch(event.type)
+			{
+				case SDL_QUIT:
+				{
+					done = true;
+					break;
+				}
+
+				case SDL_KEYDOWN:
+				{
+					return EDITOR_EDIT;
+				}
+			
+				case SDL_MOUSEBUTTONDOWN:
+				{
+					short iButtonX = event.button.x;
+					short iButtonY = event.button.y;
+
+					if(event.button.button == SDL_BUTTON_LEFT)
+					{
+						if(g_worldmap.iNumInitialBonuses < 32)
+						{
+							for(short iItem = 0; iItem < NUM_POWERUPS + NUM_WORLD_POWERUPS; iItem++)
+							{
+								if(iButtonX >= rItemDst[iItem].x && iButtonX < rItemDst[iItem].w + rItemDst[iItem].x &&
+									iButtonY >= rItemDst[iItem].y && iButtonY < rItemDst[iItem].h + rItemDst[iItem].y)
+								{
+									g_worldmap.iInitialBonuses[g_worldmap.iNumInitialBonuses++] = iItem;
+									break;
+								}
+							}
+						}
+
+						for(short iRemoveItem = 0; iRemoveItem < g_worldmap.iNumInitialBonuses; iRemoveItem++)
+						{
+							if(iButtonX >= rPickedItemDst[iRemoveItem].x && iButtonX < rPickedItemDst[iRemoveItem].w + rPickedItemDst[iRemoveItem].x &&
+								iButtonY >= rPickedItemDst[iRemoveItem].y && iButtonY < rPickedItemDst[iRemoveItem].h + rPickedItemDst[iRemoveItem].y)
+							{
+								for(short iAdjust = iRemoveItem; iAdjust < g_worldmap.iNumInitialBonuses - 1; iAdjust++)
+								{
+									g_worldmap.iInitialBonuses[iAdjust] = g_worldmap.iInitialBonuses[iAdjust + 1];
+								}
+
+								g_worldmap.iNumInitialBonuses--;
+
+								break;
+							}
+						}
+					}
+				
+					break;
+				}
+
+				default:
+					break;
+			}
+		}
+
+		
+		drawmap(false, TILESIZE);
+		menu_shade.draw(0, 0);
+
+		for(short iItem = 0; iItem < NUM_POWERUPS; iItem++)
+		{
+			spr_powerupitems.draw(rItemDst[iItem].x, rItemDst[iItem].y, iItem << 5, 0, 32, 32);
+		}
+
+		for(short iWorldItem = 0; iWorldItem < NUM_WORLD_POWERUPS; iWorldItem++)
+		{
+			spr_worlditems.draw(rItemDst[iWorldItem + NUM_POWERUPS].x, rItemDst[iWorldItem + NUM_POWERUPS].y, iWorldItem << 5, 0, 32, 32);
+		}
+
+		for(short iPopup = 0; iPopup < 4; iPopup++)
+		{
+			spr_worldpopup.draw(0, 416 - (iPopup << 6), 0, 0, 320, 64);
+			spr_worldpopup.draw(320, 416 - (iPopup << 6), 192, 0, 320, 64);
+		}
+
+		for(short iPickedItem = 0; iPickedItem < g_worldmap.iNumInitialBonuses; iPickedItem++)
+		{
+			short iPowerup = g_worldmap.iInitialBonuses[iPickedItem];
+			if(iPowerup >= NUM_POWERUPS)
+				spr_worlditems.draw(rPickedItemDst[iPickedItem].x, rPickedItemDst[iPickedItem].y, (iPowerup - NUM_POWERUPS) << 5, 0, 32, 32);
+			else
+				spr_powerupitems.draw(rPickedItemDst[iPickedItem].x, rPickedItemDst[iPickedItem].y, iPowerup << 5, 0, 32, 32);
+		}
+
+		menu_font_small.drawRightJustified(640, 0, worldlist.current_name());
+
+		DrawMessage();
+		SDL_Flip(screen);
+
+		int delay = WAITTIME - (SDL_GetTicks() - framestart);
+		if(delay < 0)
+			delay = 0;
+		else if(delay > WAITTIME)
+			delay = WAITTIME;
+		
+		SDL_Delay(delay);
+	}
+
+	return EDITOR_QUIT;
+}
+
 int editor_boundary()
 {
 	bool done = false;
@@ -2958,6 +3123,8 @@ int display_help()
 	menu_font_small.draw(offsetx, offsety, "[t] - Stages and Doors");
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[b] - Vehicle Boundaries");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[i] - Initial Powerups");
 	offsety += menu_font_small.getHeight() + 20;
 
 	menu_font_small.draw(offsetx, offsety, "File:");

@@ -51,10 +51,10 @@ STUFF TO WATCH OUT FOR IN BETA2
 - collision detection and behavior of coins, ztar, collection cards
 
 Fixed
-[X] Finished multi select inventory menu in world mode -> added smooth transitions
-[X] Hazard deaths only option in the classic mode
-[X] Allow critical mode items like flags, yoshi's egg, ect to be carried by players in Kuribo's shoe
-[X] Randomize the transfer of tag/shyguy when a POW or MOd is used instead of always giving it to the first player in the players array
+[X] Added player only death tile type
+[X] Decreased time required to get multiplier in KOTH by half
+[X] Allow -1 as CTF mode base relocate setting in tour/world so flag base stays stationary for the duration of the match
+[X] Added start items selection for world editor using 'i' key
 
 
 Beta 1 Public Release Bugs
@@ -68,25 +68,15 @@ Beta 1 Public Release Bugs
 	occupied by the time the animation is done
 
 [ ] Test new AI that deals with getting rid of held objects that are not goal objects like flags
-    Holding/throwing stars in star mode
-	Holding shells/throwblocks/springs etc -> changes made here to not pay attention to held objects
-	Holding phanto key
+    Increased the ignore time on throwing the phanto key need to test then feature is complete
 
 [ ] Refreshing the map thumbnails hangs half way through on xbox (after icecap map)
     -> Fixed memory leak in thumbnail creation, retest on xbox
 	-> Still Hangs :(
 	-> Fixed bug where some maps crashed when loaded
 
-[ ] Item idea: in a world, if you have a stored item left over at the end of a level, it goes into your inventory. (It would only count stored items you had at the moment the level ended...that way, you can't just run around after the game and hit item blocks until you get a certain item.
-    -> Need to test to make sure this works
-[ ] If you have a powerup awarded by the bonus wheel when you start a world, it should be added to your inventory
-    -> Need to test to make sure it works
-
-[ ] Death Blocks that items/etc. go through, but players don't.
-[ ] An idea for another tile type. Basically, instant-death, but not solid. So, touching it would kill you like lava, but fireballs, shells, etc. could pass through unharmed. The tile type image in the editor could be a purple version of the skull one. 
-
 [ ] The "thumbnail" sized tiles for the world editor have purple parts in all the foreground objects, including the level markers.
-
+    -> Write script to make these using 0x808080 gray background
 
 
 Need To Test
@@ -177,57 +167,64 @@ Beta 1 Public Release Feature Requests
 
 Feature Requests
 
-[ ] Shells still don't disappear on death tiles -> I think this is user error and not a bug
-
-[ ] The water splatter when rain eyecandy is in effect (awesome) appears over all layers and should appear in the same layer as the player - need middle eyecandy layer
-
-[ ] Author filter type where you can choose a single author and it will only show you the maps from that author.  At startup, it would scan all maps and extra the author (everything before the underscore) then create a list of possible authors to filter on.
+[ ] Author filter type where you can choose a single author and it will only show you the maps from that author.  
+	At startup, it would scan all maps and extra the author (everything before the underscore) then create a list of 
+	possible authors to filter on.
 
 [ ] Player needs bounce when killing hazards with shoe or tanooki?
 
 [ ] Roulette wheel should be stopped by any key pressed by the player
 
-[ ] In Yoshi's Eggs, could we have it so the options menu has two columns, one for eggs and one for Yoshis? Oh, and an option to have the egg timer pause while the egg is being held would be nice.
+[ ] In Yoshi's Eggs, could we have it so the options menu has two columns, one for eggs and one for Yoshis? 
+	Oh, and an option to have the egg timer pause while the egg is being held would be nice.
 
-[ ] Also also, have it so that if a player hits 0 coins but still has coins of their color in play, make it so they don't die until their coins disappear.
+[ ] Have it so that if a player hits 0 coins but still has coins of their color in play, make it so they don't die 
+	until their coins disappear.
 
 [ ] In Frenzy Mode it would be nice to have some presets like with the regular item switch.
 
-[ ] I also think we should fix the explosions. The bob-omb explosion should resemble the SMB3 bob-omb explosion and the bomb powerup should break bricks when exploded.
+[ ] I also think we should fix the explosions. The bob-omb explosion should resemble the SMB3 bob-omb explosion 
+	and the bomb powerup should break bricks when exploded.
 
-[ ] Since we have all these team-colored coins for Greed mode, could we have an option for higher-point coins in Coin mode? Red could be 2, Green 3, and Blue 5.
+[ ] Since we have all these team-colored coins for Greed mode, could we have an option for higher-point coins in Coin mode? 
+	Red could be 2, Green 3, and Blue 5.
 
-[ ] I have a question. If the clear boxes in SMWorld is hit, does it turn into a normal block? Or does it become an empty clear box? In SMW it turns into a normal block and that looked funny to me. If it does not in World, I request that it should be corrected.
+[ ] I have a question. If the clear boxes in SMWorld is hit, does it turn into a normal block? Or does it become an empty 
+	clear box? In SMW it turns into a normal block and that looked funny to me. If it does not in World, I request that it 
+	should be corrected.
 
 [ ] Bullet Bill shooters and piranha plants should not be active while a player is sitting on or next to it.
 
-[ ] Sometime in the unknown future I would like to see more types of bricks and [?] boxes. It is a tad weird when you are making a SMB1 themed map with SMB3 bricks or [?] boxes.
+[ ] Sometime in the unknown future I would like to see more types of bricks and [?] boxes. It is a tad weird when you 
+	are making a SMB1 themed map with SMB3 bricks or [?] boxes.
 
-[ ] Also, maybe some more animated tiles? It's kinda weird to see animated grass sitting right next to a Muncher Plant that just stares with its mouth open and kills you. Not everything, though, maybe just things that would look weird without animation (like Munchers, propellers, wheels, etc.).  And maybe for some of the other waterfalls (like maybe one of the lighter ones) and lava (upside-down lava and such).
+[ ] It'd be nice if the fortresses can get rid of a locked door like in SMB3.  Like you put down a fortress on your 
+	world and with the world editor, link the fortress and the locked door together so that if you beat the fortress, 
+	the locked door vanishes.
 
-[ ] It'd be nice if the fortresses can get rid of a locked door like in SMB3.  Like you put down a fortress on your world and with the world editor, link the fortress and the locked door together so that if you beat the fortress, the locked door vanishes.
+[ ] By the way, this led me to an idea of how to re-implement the superfire if anyone wants it back. We could use a fire 
+	wand that shoots them, and on impact, the player is engulfed in flame and disappears in a poof of smoke.
 
-[ ] By the way, this led me to an idea of how to re-implement the superfire if anyone wants it back. We could use a fire wand that shoots them, and on impact, the player is engulfed in flame and disappears in a poof of smoke.
-
-[ ] Castle collapse tiles for world mode: instead of turning into the colored T tile, you can set an option for stages clearing into an overworld foreground sprite. (The ones with the castles and such on them, since that image contains collapsed castles too) You could have it under the stages section with a number denoting what sprite to change into, 0 for the T colored tile.
-
-[ ] Also, CTF really needs a relocate bases variable that can be changed by the player/world/tour maker as a mode option. It's really annoying that they move when you don't want them to. Especially when all the bases happen to just relocate on top of each other and the first person to touch the combined bases instantly wins because one point for every frame they're touching it x_x
-
-[ ] In King of the Hill mode, it's extremely, extremely rare that I ever see the multiplier unless I'm playing in a map where the computers are dumb and won't move. Maybe make it a mode option to be able to change the amount of time it takes to increase the multiplier?
+[ ] Castle collapse tiles for world mode: instead of turning into the colored T tile, you can set an option for stages 
+	clearing into an overworld foreground sprite. (The ones with the castles and such on them, since that image contains 
+	collapsed castles too) You could have it under the stages section with a number denoting what sprite to change into, 
+	0 for the T colored tile.
 
 [ ] In level previews, eyecandy should show, and animated tiles and interactive blocks should animate.
 
-[ ] Option to turn off items, and stomp enemies being killed by spikes.
-[ ] A scrolling effect like the one in the SMW 1.6 options menu could be used for the powerup selection menu.
 [ ] Options to choose how many fireballs, hammers, boomerangs, etc can be on screen at once.
+
 [ ] Options to choose how long clocks and stars last.
+
 [ ] Option to choose how long the p-wing lets you fly.
+
 [ ] The level editor should use the newer menu graphics.
 
 [ ] Worlds with 2 draw-bridges and only one small path connected between them, and when you have the hourglass power-up in your reserves, you'll obviously be stuck if you activate it when you're in between them, so is there anyway you could make it so the hourglass is idiot-proof and doesn't allow you to use it when it figures out you'll be stuck if you activate it?
-[ ] The shells, when flipped in SMB3 by tail, block from underneath or whatever, goes roughly twice the height the shells in SMW do when flipped the same way. Maybe increase their Y velocity when flipped?
-[ ] Not really a bug, but something that'll be annoying later on as users might complain of this: The tail/ cape attack sounds like it's in a cave on all maps
-[ ] Anyways, we need the ability to have Donut Blocks fall at certain times. Blue ones are fast, brown ones or normal, and grey ones are slow. Plus ability for donut blocks to come back after they are destroyed and customizable time for it to be triggered.
+
+[ ] The tail/ cape attack sounds like it's in a cave on all maps
+
+[ ] We need the ability to have Donut Blocks fall at certain times. Blue ones are fast, brown ones or normal, and grey ones are slow. Plus ability for donut blocks to come back after they are destroyed and customizable time for it to be triggered.
 
 
 BUGS:
@@ -240,11 +237,6 @@ BUGS:
 [ ] The "thumbnail" sized tiles for the world editor have purple parts in all the foreground objects, including the level markers.
 
 [ ] Yet another, though it might be impossible to fix: Clear blocks do not give you the displayed powerup when you hit them in certain modes that have mode specific items like Health and Jail and the block gives you that instead.
-
-[ ] In tag mode, when you use a POW or MOd and kill multiple players at once, the tag always transfers to the first player "on the board", that is, it will go to P1 if he got hit, otherwise P2, and so on.  Perhaps we could have it so that instead of killing all players sequentially, the POW/MOD kills them in a random order, so as to avoid this little bias?
-
-[ ] Maps that have Kuribo's shoe in them with the game types set to CTF or Eggs kinda makes it all moot point because you can't carry anything in the shoe and that's the whole point of the game...
-    Make items flagged with CarribleByKuribosShoe() so the shoe can carry only flags and eggs and display the item where the player should be in the shoe
 
 [ ] Shells and mushrooms cannot do an about face when they hit the solid side of a moving platform, and just completely stop moving. example: continuous platform moves left, shell comes moving right, hits solid platform, doesn't move. It takes a stop and start from a player to get it moving again.
     -> test on test/00000000stuckshell.map

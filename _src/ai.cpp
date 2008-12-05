@@ -747,14 +747,14 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 				{
 					AttentionObject * ao = attentionObjects[carriedItem->iNetworkID];
 					ao->iType = 1;
-					ao->iTimer = iDecisionPercentage[game_values.cpudifficulty] / 10;
+					ao->iTimer = iDecisionPercentage[game_values.cpudifficulty] / 3;
 				}
 				else
 				{
 					AttentionObject * ao = new AttentionObject();
 					ao->iID = carriedItem->iNetworkID;
 					ao->iType = 1;
-					ao->iTimer = iDecisionPercentage[game_values.cpudifficulty] / 10;
+					ao->iTimer = iDecisionPercentage[game_values.cpudifficulty] / 3;
 					attentionObjects[ao->iID] = ao;
 				}
 			}

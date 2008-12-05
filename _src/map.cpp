@@ -31,7 +31,7 @@ extern const char * g_szBackgroundConversion[26];
 extern short g_iMusicCategoryConversion[26];
 
 //Converts the tile type into the flags that this tile carries (solid + ice + death, etc)
-short g_iTileTypeConversion[18] = {0, 1, 2, 5, 121, 9, 17, 33, 65, 6, 21, 37, 69, 3961, 265, 529, 1057, 2113};
+short g_iTileTypeConversion[NUMTILETYPES] = {0, 1, 2, 5, 121, 9, 17, 33, 65, 6, 21, 37, 69, 3961, 265, 529, 1057, 2113, 4096};
 
 CMap::CMap()
 {
@@ -371,10 +371,12 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 			for(i = 0; i < MAPWIDTH; i++)
 			{
 				TileType iType = (TileType)ReadInt(mapfile);
-				mapdatatop[i][j].iType = iType;
-
-				if(iType >= 0 && iType <= 17)
+				
+				if(iType >= 0 && iType < NUMTILETYPES)
+				{
+					mapdatatop[i][j].iType = iType;
 					mapdatatop[i][j].iFlags = g_iTileTypeConversion[iType];
+				}
 				else
 				{
 					mapdatatop[i][j].iType = tile_nonsolid;
@@ -691,17 +693,30 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 		eyecandy[2] = (short)ReadInt(mapfile);
 
 		if((version[2] == 0 && version[3] > 0) || version[2] >= 1)
+		{
 			musicCategoryID = ReadInt(mapfile);
+		}
 		else
+		{
 			musicCategoryID = g_iMusicCategoryConversion[backgroundID];
+		}
 
 		for(j = 0; j < MAPHEIGHT; j++)
 		{
 			for(i = 0; i < MAPWIDTH; i++)
 			{
 				TileType iType = (TileType)ReadInt(mapfile);
-				mapdatatop[i][j].iType = iType;
-				mapdatatop[i][j].iFlags = g_iTileTypeConversion[iType];
+
+				if(iType >= 0 && iType < NUMTILETYPES)
+				{
+					mapdatatop[i][j].iType = iType;
+					mapdatatop[i][j].iFlags = g_iTileTypeConversion[iType];
+				}
+				else
+				{
+					mapdatatop[i][j].iType = tile_nonsolid;
+					mapdatatop[i][j].iFlags = tile_flag_nonsolid;
+				}
 
 				warpdata[i][j].direction = (short)ReadInt(mapfile);
 				warpdata[i][j].connection = (short)ReadInt(mapfile);
@@ -897,8 +912,17 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 					TileType type = g_tilesetmanager.GetClassicTileset()->GetTileType(tile->iCol, tile->iRow);
 					if(type != tile_nonsolid)
 					{
-						mapdatatop[i][j].iType = type;
-						mapdatatop[i][j].iFlags = g_iTileTypeConversion[type];
+						if(type >= 0 && type < NUMTILETYPES)
+						{
+							mapdatatop[i][j].iType = type;
+							mapdatatop[i][j].iFlags = g_iTileTypeConversion[type];
+						}
+						else
+						{
+							mapdatatop[i][j].iType = tile_nonsolid;
+							mapdatatop[i][j].iFlags = tile_flag_nonsolid;
+						}
+
 						break;
 					}
 				}
@@ -1087,9 +1111,18 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 				tile->iRow = iTileID / 32;
 
 				TileType iType = g_tilesetmanager.GetClassicTileset()->GetTileType(tile->iCol, tile->iRow);
-				mapdatatop[i][j].iType = iType;
-				mapdatatop[i][j].iFlags = g_iTileTypeConversion[iType];
 
+				if(iType >= 0 && iType < NUMTILETYPES)
+				{
+					mapdatatop[i][j].iType = iType;
+					mapdatatop[i][j].iFlags = g_iTileTypeConversion[iType];
+				}
+				else
+				{
+					mapdatatop[i][j].iType = tile_nonsolid;
+					mapdatatop[i][j].iFlags = tile_flag_nonsolid;
+				}
+				
 				mapdata[i][j][0].iID = TILESETNONE;
 				mapdata[i][j][2].iID = TILESETNONE;
 				mapdata[i][j][3].iID = TILESETNONE;
@@ -1277,7 +1310,7 @@ void CMap::loadPlatforms(FILE * mapfile, bool fPreview, int version[4], short * 
 
 					TileType iType = (TileType)ReadInt(mapfile);
 
-					if(iType >= 0 && iType <= 17)
+					if(iType >= 0 && iType < NUMTILETYPES)
 					{
 						types[iCol][iRow].iType = iType;
 						types[iCol][iRow].iFlags = g_iTileTypeConversion[iType];
@@ -1310,8 +1343,16 @@ void CMap::loadPlatforms(FILE * mapfile, bool fPreview, int version[4], short * 
 						type = g_tilesetmanager.GetClassicTileset()->GetTileType(tile->iCol, tile->iRow);
 					}
 	
-					types[iCol][iRow].iType = type;
-					types[iCol][iRow].iFlags = g_iTileTypeConversion[type];
+					if(type >= 0 && type < NUMTILETYPES)
+					{
+						types[iCol][iRow].iType = type;
+						types[iCol][iRow].iFlags = g_iTileTypeConversion[type];
+					}
+					else
+					{
+						mapdatatop[iCol][iRow].iType = tile_nonsolid;
+						mapdatatop[iCol][iRow].iFlags = tile_flag_nonsolid;
+					}
 				}
 			}
 		}
@@ -1414,7 +1455,7 @@ void CMap::saveMap(const std::string& file)
 			{
 				//Set the tile type flags for each tile
 				int iType = platforms[iPlatform]->iTileType[iCol][iRow].iType;
-				if(iType >= 0 && iType <= 17)
+				if(iType >= 0 && iType < NUMTILETYPES)
 				{
 					platforms[iPlatform]->iTileType[iCol][iRow].iFlags = g_iTileTypeConversion[iType];
 				}
@@ -1447,7 +1488,7 @@ void CMap::saveMap(const std::string& file)
 		{
 			//Set the tile type flags for each tile
 			int iType = mapdatatop[i][j].iType;
-			if(iType >= 0 && iType <= 17)
+			if(iType >= 0 && iType < NUMTILETYPES)
 			{
 				mapdatatop[i][j].iFlags = g_iTileTypeConversion[iType];
 			}
@@ -2208,7 +2249,7 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks, bool fIgnoreDea
 						if(m == j && (flags & tile_flag_solid_on_top))
 							continue;
 
-						if(type == tile_death_on_top || type == tile_death || type == tile_super_death_top || type == tile_super_death)
+						if(type == tile_death_on_top || type == tile_death || type == tile_super_death_top || type == tile_super_death || type == tile_player_death)
 						{
 							fUsed = true;
 							break;
@@ -2239,7 +2280,7 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks, bool fIgnoreDea
 							TileType type = mapdatatop[i][m].iType;
 							short block = objectdata[i][m].iType;
 
-							if(type == tile_death_on_top || type == tile_death || type == tile_super_death_top || type == tile_super_death)
+							if(type == tile_death_on_top || type == tile_death || type == tile_super_death_top || type == tile_super_death || type == tile_player_death)
 							{
 								fUsed = true;
 								break;

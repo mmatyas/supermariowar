@@ -1492,7 +1492,8 @@ void CPlayer::move()
 				else if(velx < 0.0f)
 					game_values.playskidsound = true;
 
-				if((g_map.eyecandy[0] & 32 || g_map.eyecandy[1] & 32 || g_map.eyecandy[2] & 32) && ++rainsteptimer > 7 && velx > VELMOVINGADD)
+				//If rain candy is tyrned on
+				if((g_map.eyecandy[0] & 32 || g_map.eyecandy[1] & 32 || g_map.eyecandy[2] & 32) && velx > VELMOVINGADD && ++rainsteptimer > 7)
 				{
 					rainsteptimer = 0;
 					eyecandy[1].add(new EC_SingleAnimation(&spr_frictionsmoke, ix, iy + PH - 14, 5, 3, 0, 16, 16, 16));
@@ -1545,7 +1546,7 @@ void CPlayer::move()
 				else if(velx > 0.0f)
 					game_values.playskidsound = true;
 
-				if((g_map.eyecandy[0] & 32 || g_map.eyecandy[1] & 32 || g_map.eyecandy[2] & 32) && ++rainsteptimer > 7 && velx < -VELMOVINGADD)
+				if((g_map.eyecandy[0] & 32 || g_map.eyecandy[1] & 32 || g_map.eyecandy[2] & 32) && velx < -VELMOVINGADD && ++rainsteptimer > 7)
 				{
 					rainsteptimer = 0;
 					eyecandy[1].add(new EC_SingleAnimation(&spr_frictionsmoke, ix, iy + PH - 14, 5, 3, 0, 16, 16, 16));
@@ -3442,9 +3443,9 @@ void CPlayer::collision_detection_map()
 									 ((toptile & tile_flag_death_on_left) && !(bottomtile & tile_flag_solid)) ||
 									 (!(toptile & tile_flag_solid) && (bottomtile & tile_flag_death_on_left));
 
-			bool fSuperDeathTileToLeft = ((toptile & tile_flag_super_death_left) && (bottomtile & tile_flag_super_death_left)) ||
-									    ((toptile & tile_flag_super_death_left) && !(bottomtile & tile_flag_solid)) ||
-									    (!(toptile & tile_flag_solid) && (bottomtile & tile_flag_super_death_left));
+			bool fSuperDeathTileToLeft = ((toptile & tile_flag_super_or_player_death_left) && (bottomtile & tile_flag_super_or_player_death_left)) ||
+									    ((toptile & tile_flag_super_or_player_death_left) && !(bottomtile & tile_flag_solid)) ||
+									    (!(toptile & tile_flag_solid) && (bottomtile & tile_flag_super_or_player_death_left));
 
 			bool fTopBlockSolid = topblock && !topblock->isTransparent() && !topblock->isHidden();
 			bool fBottomBlockSolid = bottomblock && !bottomblock->isTransparent() && !bottomblock->isHidden();
@@ -3532,9 +3533,9 @@ void CPlayer::collision_detection_map()
 									 ((toptile & tile_flag_death_on_right) && !(bottomtile & tile_flag_solid)) ||
 									 (!(toptile & tile_flag_solid) && (bottomtile & tile_flag_death_on_right));
 
-			bool fSuperDeathTileToRight = ((toptile & tile_flag_super_death_right) && (bottomtile & tile_flag_super_death_right)) ||
-									    ((toptile & tile_flag_super_death_right) && !(bottomtile & tile_flag_solid)) ||
-									    (!(toptile & tile_flag_solid) && (bottomtile & tile_flag_super_death_right));
+			bool fSuperDeathTileToRight = ((toptile & tile_flag_super_or_player_death_right) && (bottomtile & tile_flag_super_or_player_death_right)) ||
+									    ((toptile & tile_flag_super_or_player_death_right) && !(bottomtile & tile_flag_solid)) ||
+									    (!(toptile & tile_flag_solid) && (bottomtile & tile_flag_super_or_player_death_right));
 
 			bool fTopBlockSolid = topblock && !topblock->isTransparent() && !topblock->isHidden();
 			bool fBottomBlockSolid = bottomblock && !bottomblock->isTransparent() && !bottomblock->isHidden();
@@ -3695,7 +3696,7 @@ void CPlayer::collision_detection_map()
 		//or invincible.
 
 		int alignedTileType = g_map.map(alignedBlockX, ty);
-		if((alignedTileType & tile_flag_solid) && !(alignedTileType & tile_flag_super_death_bottom) &&
+		if((alignedTileType & tile_flag_solid) && !(alignedTileType & tile_flag_super_or_player_death_bottom) &&
 			(!(alignedTileType & tile_flag_death_on_bottom) || invincible || shield > 0 || shyguy))
 		{
 			yf((float)(ty * TILESIZE + TILESIZE) + 0.2f);
@@ -3739,7 +3740,7 @@ void CPlayer::collision_detection_map()
 		//Player squeezed around the block, ice or death on top
 		//or if the player is invincible and hits death or death on bottom
 		int unalignedTileType = g_map.map(unAlignedBlockX, ty);
-		if((unalignedTileType & tile_flag_solid) && !(unalignedTileType & tile_flag_super_death_bottom) && 
+		if((unalignedTileType & tile_flag_solid) && !(unalignedTileType & tile_flag_super_or_player_death_bottom) && 
 			(!(unalignedTileType & tile_flag_death_on_bottom) || invincible || shield > 0 || shyguy))
 		{
 			xf(unAlignedBlockFX);
@@ -3748,11 +3749,11 @@ void CPlayer::collision_detection_map()
 			yf(fPrecalculatedY);
 			vely += GRAVITATION;
 		}
-		else if((alignedTileType & tile_flag_death_on_bottom) || (unalignedTileType & tile_flag_death_on_bottom))
+		else if((alignedTileType & tile_flag_player_or_death_on_bottom) || (unalignedTileType & tile_flag_player_or_death_on_bottom))
 		{
-			bool fRespawnPlayer = ((alignedTileType & tile_flag_super_death_bottom) && (unalignedTileType & tile_flag_super_death_bottom)) ||
-								  ((alignedTileType & tile_flag_super_death_bottom) &&  !(unalignedTileType & tile_flag_solid)) ||
-								  ((alignedTileType & tile_flag_solid) && !(unalignedTileType & tile_flag_super_death_bottom));
+			bool fRespawnPlayer = ((alignedTileType & tile_flag_super_or_player_death_bottom) && (unalignedTileType & tile_flag_super_or_player_death_bottom)) ||
+								  ((alignedTileType & tile_flag_super_or_player_death_bottom) &&  !(unalignedTileType & tile_flag_solid)) ||
+								  ((alignedTileType & tile_flag_solid) && !(unalignedTileType & tile_flag_super_or_player_death_bottom));
 
 			if(player_kill_nonkill != KillPlayerMapHazard(fRespawnPlayer, kill_style_environment, false))
 				return;
@@ -3890,9 +3891,9 @@ void CPlayer::collision_detection_map()
 									 ((lefttile & tile_flag_death_on_top) && !(righttile & tile_flag_solid)) ||
 									 (!(lefttile & tile_flag_solid) && (righttile & tile_flag_death_on_top));
 
-		bool fSuperDeathTileUnderPlayer = ((lefttile & tile_flag_super_death_top) && (righttile & tile_flag_super_death_top)) ||
-									      ((lefttile & tile_flag_super_death_top) && !(righttile & tile_flag_solid)) ||
-									      (!(lefttile & tile_flag_solid) && (righttile & tile_flag_super_death_top));
+		bool fSuperDeathTileUnderPlayer = ((lefttile & tile_flag_super_or_player_death_top) && (righttile & tile_flag_super_or_player_death_top)) ||
+									      ((lefttile & tile_flag_super_or_player_death_top) && !(righttile & tile_flag_solid)) ||
+									      (!(lefttile & tile_flag_solid) && (righttile & tile_flag_super_or_player_death_top));
 
 		if(fSolidTileUnderPlayer && !fSuperDeathTileUnderPlayer && 
 			(!fDeathTileUnderPlayer || invincible || shield > 0 || iKuriboShoe > 0 || shyguy) )

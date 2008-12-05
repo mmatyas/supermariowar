@@ -264,6 +264,8 @@ class WorldMap
 	friend void WriteVehiclesIntoWorld();
 	friend void ReadWarpsIntoEditor();
 	friend void WriteWarpsIntoWorld();
+
+	friend int editor_start_items();
 };
 
 #endif //__WORLD_H_
