@@ -35,9 +35,9 @@
 
 #define MAPTITLESTRING "SMW 1.8 World Editor"
 
-enum {EDITOR_EDIT, EDITOR_WATER, EDITOR_BACKGROUND, EDITOR_FOREGROUND, EDITOR_PATHSPRITE, EDITOR_VEHICLES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_WORLD, NEW_WORLD, RESIZE_WORLD, SAVE, EDITOR_WARP, DISPLAY_HELP, EDITOR_PATH, EDITOR_TYPE, EDITOR_BOUNDARY, EDITOR_START_ITEMS};
+enum {EDITOR_EDIT, EDITOR_WATER, EDITOR_BACKGROUND, EDITOR_FOREGROUND, EDITOR_PATHSPRITE, EDITOR_VEHICLES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_WORLD, NEW_WORLD, RESIZE_WORLD, SAVE, EDITOR_WARP, DISPLAY_HELP, EDITOR_PATH, EDITOR_TYPE, EDITOR_BOUNDARY, EDITOR_START_ITEMS, EDITOR_STAGE};
 
-const char * szEditModes[9] = {"Background Mode", "Foreground Mode", "Path Sprite Mode", "Stage Mode", "Path Mode", "Vehicle Mode", "Warp Mode", "Stage/Door Mode", "Boundary Mode"};
+const char * szEditModes[10] = {"Background Mode", "Foreground Mode", "Path Sprite Mode", "Stage Mode", "Path Mode", "Vehicle Mode", "Warp Mode", "Start/Door Mode", "Boundary Mode", "Stage Mode"};
 
 SDL_Surface		*screen;
 SDL_Surface		*blitdest;
@@ -67,9 +67,21 @@ gfxSprite		spr_worldforegroundspecial[3];
 gfxSprite		spr_worldpaths[3];
 gfxSprite		spr_worldvehicle[3];
 
-gfxSprite		spr_powerupitems;
 gfxSprite		spr_worlditems;
 gfxSprite		spr_worldpopup;
+
+//Mode Options Menu Gfx
+gfxSprite		menu_egg;
+gfxSprite		menu_plain_field;
+gfxSprite		menu_slider_bar;
+gfxSprite		menu_stomp;
+gfxSprite		menu_survival;
+gfxSprite		spr_phanto;
+gfxSprite		spr_selectfield;
+gfxSprite		menu_verticalarrows;
+gfxSprite		spr_storedpoweruplarge;
+gfxSprite		menu_mode_small;
+gfxSprite		menu_mode_large;
 
 int				set_tile = 0;
 bool			fAutoPaint = true;
@@ -144,6 +156,9 @@ gfxSprite		menu_dialog;
 
 std::vector<MapMusicOverride*> mapmusicoverrides;
 std::vector<WorldMusicOverride*> worldmusicoverrides;
+
+short LookupTeamID(short id) {return 0;}
+gfxSprite		spr_scoretext;
 ///////
 
 int save_as();
@@ -194,6 +209,7 @@ int editor_vehicles();
 int	editor_path();
 int editor_pathsprite();
 int editor_type();
+int editor_stage();
 int editor_start_items();
 
 void updateworldsurface();
@@ -218,6 +234,10 @@ std::vector<WorldVehicle*> vehiclelist;
 std::vector<WorldWarp*> warplist;
 
 bool g_fFullScreen = false;
+
+//Stage Mode Menu
+UI_Menu mStageSettingsMenu;
+MI_ImageSelectField * miModeField = NULL;
 
 //main main main
 int main(int argc, char *argv[])
@@ -289,10 +309,23 @@ int main(int argc, char *argv[])
 	spr_worldvehicle[1].init(convertPath("gfx/packs/Classic/world/preview/world_vehicles.png"), 255, 0, 255);
 	spr_worldvehicle[2].init(convertPath("gfx/packs/Classic/world/thumbnail/world_vehicles.png"), 255, 0, 255);
 
-	spr_powerupitems.init(convertPath("gfx/packs/Classic/powerups/large.png"), 255, 0, 255);
 	spr_worlditems.init(convertPath("gfx/packs/Classic/world/world_powerups.png"), 255, 0, 255);
 	spr_worldpopup.init(convertPath("gfx/packs/Classic/world/world_item_popup.png"), 255, 0, 255);
-	
+
+	//Mode Options Menu Gfx
+	menu_egg.init(convertPath("gfx/packs/Classic/modeobjects/menu_egg.png"), 255, 0, 255);
+	menu_stomp.init(convertPath("gfx/packs/Classic/modeobjects/menu_stomp.png"), 255, 0, 255);
+	menu_survival.init(convertPath("gfx/packs/Classic/modeobjects/menu_survival.png"), 255, 0, 255);
+	spr_phanto.init(convertPath("gfx/packs/Classic/modeobjects/phanto.png"), 255, 0, 255);
+	menu_plain_field.init(convertPath("gfx/packs/Classic/menu/menu_plain_field.png"), 255, 0, 255);
+	menu_slider_bar.init(convertPath("gfx/packs/Classic/menu/menu_slider_bar.png"), 255, 0, 255);
+	spr_selectfield.init(convertPath("gfx/packs/Classic/menu/menu_selectfield.png"), 255, 0, 255);
+	menu_verticalarrows.init(convertPath("gfx/packs/Classic/menu/menu_vertical_arrows.png"), 255, 0, 255);
+	spr_storedpoweruplarge.init(convertPath("gfx/packs/Classic/powerups/large.png"), 255, 0, 255);
+
+	menu_mode_large.init(convertPath("gfx/packs/Classic/menu/menu_mode_small.png"), 255, 0, 255);
+	menu_mode_large.init(convertPath("gfx/packs/Classic/menu/menu_mode_large.png"), 255, 0, 255);
+
 	sMapSurface = SDL_CreateRGBSurface(screen->flags, 768, 608, screen->format->BitsPerPixel, 0, 0, 0, 0);
 
 	worldlist.find(findstring);
@@ -305,6 +338,38 @@ int main(int argc, char *argv[])
 		draw_offset_col = saved_col;
 		updateworldsurface();
 	}
+
+	//Setup The Mode Menu
+	miModeField = new MI_ImageSelectField(&spr_selectfield, &menu_mode_small, 70, 85, "Mode", 500, 120, 16, 16);
+
+	miModeField->Add("Classic", 0, "", false, false);
+	miModeField->Add("Frag", 1, "", false, false);
+	miModeField->Add("Time Limit", 2, "", false, false);
+	miModeField->Add("Jail", 3, "", false, false);
+	miModeField->Add("Coin Collection", 4, "", false, false);
+	miModeField->Add("Stomp", 5, "", false, false);
+	miModeField->Add("Yoshi's Eggs", 6, "", false, false);
+	miModeField->Add("Capture The Flag", 7, "", false, false);
+	miModeField->Add("Chicken", 8, "", false, false);
+	miModeField->Add("Tag", 9, "", false, false);
+	miModeField->Add("Star", 10, "", false, false);
+	miModeField->Add("Domination", 11, "", false, false);
+	miModeField->Add("King of the Hill", 12, "", false, false);
+	miModeField->Add("Race", 13, "", false, false);
+	miModeField->Add("Owned", 14, "", false, false);
+	miModeField->Add("Frenzy", 15, "", false, false);
+	miModeField->Add("Survival", 16, "", false, false);
+	miModeField->Add("Greed", 17, "", false, false);
+	miModeField->Add("Health", 18, "", false, false);
+	miModeField->Add("Card Collection", 19, "", false, false);
+	miModeField->Add("Phanto Chase", 20, "", false, false);
+	miModeField->Add("Shy Guy Tag", 21, "", false, false);
+	
+	//miModeField->SetData(game_values.tourstops[0]->iMode, NULL, NULL);
+	//miModeField->SetKey(0);
+	miModeField->SetItemChangedCode(MENU_CODE_MODE_CHANGED);
+
+	mStageSettingsMenu.AddControl(miModeField, NULL, NULL, NULL, NULL);
 
 	printf("\n---------------- ready, steady, go! ----------------\n");
 
@@ -356,6 +421,10 @@ int main(int argc, char *argv[])
 
 			case EDITOR_TYPE:
 				state = editor_type();
+			break;
+
+			case EDITOR_STAGE:
+				state = editor_stage();
 			break;
 
 			case EDITOR_QUIT:
@@ -533,6 +602,9 @@ int editor_edit()
 
 						if(event.key.keysym.sym == SDLK_t)
 							return EDITOR_TYPE;
+
+						if(event.key.keysym.sym == SDLK_e)
+							return EDITOR_STAGE;
 
 						if(event.key.keysym.sym == SDLK_p)
 							return EDITOR_PATH;
@@ -743,17 +815,6 @@ int editor_edit()
 											updateworldsurface();
 										}
 									}
-									else //stages
-									{
-										//if the door was placed on a start tile
-										if(g_worldmap.tiles[iCol][iRow].iType == 1)
-										{
-											g_worldmap.tiles[iCol][iRow].iForegroundSprite = 0;
-											updateworldsurface();
-										}
-
-										g_worldmap.tiles[iCol][iRow].iType = set_tile;
-									}
 								}
 								else if(edit_mode == 4) //selected path sprite
 								{
@@ -801,6 +862,17 @@ int editor_edit()
 								{
 									g_worldmap.tiles[iCol][iRow].iVehicleBoundary = set_tile;
 								}
+								else if(edit_mode == 9)
+								{
+									//if the stage was placed on a start tile
+									if(g_worldmap.tiles[iCol][iRow].iType == 1)
+									{
+										g_worldmap.tiles[iCol][iRow].iForegroundSprite = 0;
+										updateworldsurface();
+									}
+
+									g_worldmap.tiles[iCol][iRow].iType = set_tile;
+								}
 							}
 							else if(event.button.button == SDL_BUTTON_RIGHT)
 							{
@@ -840,7 +912,7 @@ int editor_edit()
 									if(fAutoPaint)
 										UpdatePath(iCol, iRow);
 								}
-								else if(edit_mode == 3) //selected start/door/stage
+								else if(edit_mode == 3) //selected start/door
 								{
 									if(g_worldmap.tiles[iCol][iRow].iType == 1)
 									{
@@ -899,6 +971,10 @@ int editor_edit()
 								else if(edit_mode == 8) //boundary
 								{
 									g_worldmap.tiles[iCol][iRow].iVehicleBoundary = 0;
+								}
+								else if(edit_mode == 9) //stage
+								{
+									g_worldmap.tiles[iCol][iRow].iType = 0;
 								}
 							}
 						}
@@ -975,17 +1051,6 @@ int editor_edit()
 											updateworldsurface();
 										}
 									}
-									else
-									{
-										//if the door was placed on a start tile
-										if(g_worldmap.tiles[iCol][iRow].iType == 1)
-										{
-											g_worldmap.tiles[iCol][iRow].iForegroundSprite = 0;
-											updateworldsurface();
-										}
-
-										g_worldmap.tiles[iCol][iRow].iType = set_tile;
-									}
 								}
 								else if(edit_mode == 4)
 								{
@@ -1028,6 +1093,17 @@ int editor_edit()
 										g_worldmap.tiles[iCol][iRow].iBackgroundWater = set_tile;							
 										updateworldsurface();
 									}
+								}
+								else if(edit_mode == 9) //stage
+								{
+									//if the stage was placed on a start tile
+									if(g_worldmap.tiles[iCol][iRow].iType == 1)
+									{
+										g_worldmap.tiles[iCol][iRow].iForegroundSprite = 0;
+										updateworldsurface();
+									}
+
+									g_worldmap.tiles[iCol][iRow].iType = set_tile;
 								}
 							}
 							else if(event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT))
@@ -1123,6 +1199,10 @@ int editor_edit()
 										updateworldsurface();
 									}
 								}
+								else if(edit_mode == 9) //stage
+								{
+									g_worldmap.tiles[iCol][iRow].iType = 0;
+								}
 							}
 						}
 					
@@ -1204,27 +1284,6 @@ int editor_edit()
 					}
 				}
 			}
-			else if(edit_mode == 3) //draw stages
-			{
-				int color = SDL_MapRGB(blitdest->format, 0, 0, 255);
-				for(short iRow = draw_offset_row; iRow < draw_offset_row + 15 && iRow < iWorldHeight; iRow++)
-				{
-					for(short iCol = draw_offset_col; iCol <= draw_offset_col + 20 && iCol < iWorldWidth; iCol++)
-					{
-						short iType = g_worldmap.tiles[iCol][iRow].iType - 6;
-
-						if(iType >= 0)
-						{
-							short ix = (iCol - draw_offset_col) * TILESIZE + draw_offset_x;
-							short iy = (iRow - draw_offset_row) * TILESIZE + draw_offset_y;
-							SDL_Rect r = {ix, iy, 32, 32};
-							SDL_FillRect(blitdest, &r, color);
-
-							spr_worldforegroundspecial[0].draw(ix, iy, (iType % 10) << 5, (iType / 10) << 5, 32, 32);
-						}
-					}
-				}
-			}
 			else if(edit_mode == 6) //draw warps
 			{
 				std::vector<WorldWarp*>::iterator itr = warplist.begin(), lim = warplist.end();
@@ -1270,6 +1329,27 @@ int editor_edit()
 							SDL_FillRect(blitdest, &r, color);
 
 							spr_worldforegroundspecial[0].draw(ix, iy, (iBoundary % 10) << 5, (iBoundary / 10) << 5, 32, 32);
+						}
+					}
+				}
+			}
+			else if(edit_mode == 9) //draw stages
+			{
+				int color = SDL_MapRGB(blitdest->format, 0, 0, 255);
+				for(short iRow = draw_offset_row; iRow < draw_offset_row + 15 && iRow < iWorldHeight; iRow++)
+				{
+					for(short iCol = draw_offset_col; iCol <= draw_offset_col + 20 && iCol < iWorldWidth; iCol++)
+					{
+						short iType = g_worldmap.tiles[iCol][iRow].iType - 6;
+
+						if(iType >= 0)
+						{
+							short ix = (iCol - draw_offset_col) * TILESIZE + draw_offset_x;
+							short iy = (iRow - draw_offset_row) * TILESIZE + draw_offset_y;
+							SDL_Rect r = {ix, iy, 32, 32};
+							SDL_FillRect(blitdest, &r, color);
+
+							spr_worldforegroundspecial[0].draw(ix, iy, (iType % 10) << 5, (iType / 10) << 5, 32, 32);
 						}
 					}
 				}
@@ -2337,7 +2417,7 @@ int editor_start_items()
 
 		for(short iItem = 0; iItem < NUM_POWERUPS; iItem++)
 		{
-			spr_powerupitems.draw(rItemDst[iItem].x, rItemDst[iItem].y, iItem << 5, 0, 32, 32);
+			spr_storedpoweruplarge.draw(rItemDst[iItem].x, rItemDst[iItem].y, iItem << 5, 0, 32, 32);
 		}
 
 		for(short iWorldItem = 0; iWorldItem < NUM_WORLD_POWERUPS; iWorldItem++)
@@ -2357,7 +2437,7 @@ int editor_start_items()
 			if(iPowerup >= NUM_POWERUPS)
 				spr_worlditems.draw(rPickedItemDst[iPickedItem].x, rPickedItemDst[iPickedItem].y, (iPowerup - NUM_POWERUPS) << 5, 0, 32, 32);
 			else
-				spr_powerupitems.draw(rPickedItemDst[iPickedItem].x, rPickedItemDst[iPickedItem].y, iPowerup << 5, 0, 32, 32);
+				spr_storedpoweruplarge.draw(rPickedItemDst[iPickedItem].x, rPickedItemDst[iPickedItem].y, iPowerup << 5, 0, 32, 32);
 		}
 
 		menu_font_small.drawRightJustified(640, 0, worldlist.current_name());
@@ -2484,7 +2564,7 @@ int editor_type()
 
 				case SDL_KEYDOWN:
 				{
-					edit_mode = 3;  //change to edit mode using stages/doors/start
+					edit_mode = 3;  //change to edit mode using doors/start
 					return EDITOR_EDIT;
 				
 					break;
@@ -2502,12 +2582,7 @@ int editor_type()
 						{
 							set_tile = iButtonX;
 						}
-						//Stages
-						else if(iButtonX >= 0 && iButtonX < g_worldmap.iNumStages - ((iButtonY - 1) * 20) && iButtonY >= 1 && iButtonY <= (g_worldmap.iNumStages - 1) / 20 + 1)
-						{
-							set_tile = iButtonX + (iButtonY - 1) * 20 + 6;
-						}
-
+			
 						edit_mode = 3;  //change to edit mode using warps
 						
 						//The user must release the mouse button before trying to add a tile
@@ -2530,18 +2605,6 @@ int editor_type()
 
 		spr_worldforegroundspecial[0].draw(0, 0, 320, 128, 64, 32);
 		spr_worldforegroundspecial[0].draw(64, 0, 320, 192, 128, 32);
-
-		int color = SDL_MapRGB(blitdest->format, 0, 0, 255);
-		for(short iStage = 0; iStage < g_worldmap.iNumStages; iStage++)
-		{
-			short ix = (iStage % 20) << 5;
-			short iy = ((iStage / 20) << 5) + 32;
-
-			SDL_Rect r = {ix, iy, 32, 32};
-			SDL_FillRect(blitdest, &r, color);
-
-			spr_worldforegroundspecial[0].draw(ix, iy, (iStage % 10) << 5, (iStage / 10) << 5, 32, 32);
-		}
 
 		spr_worldforegroundspecial[0].draw(64, 0, 448, 64, 128, 32);
 		
@@ -3094,6 +3157,133 @@ int editor_path()
 	return EDITOR_QUIT;
 }
 
+void DisplayModeDetails(short iModeId, short iMouseX, short iMouseY)
+{
+	menu_mode_large.draw(iMouseX, iMouseY, iModeId << 5, 0, 32, 32);
+}
+
+int editor_stage()
+{
+	bool done = false;
+	int iModeDisplay = -1;
+	int iEditStage = 0;
+	
+	while (!done)
+	{
+		int framestart = SDL_GetTicks();
+
+		//handle messages
+		while(SDL_PollEvent(&event))
+		{
+			switch(event.type)
+			{
+				case SDL_QUIT:
+				{
+					done = true;
+					break;
+				}
+
+				case SDL_KEYDOWN:
+				{
+					edit_mode = 9;  //change to edit mode using stages
+					return EDITOR_EDIT;
+				
+					break;
+				}
+
+				case SDL_MOUSEBUTTONDOWN:
+				{
+					short iButtonX = event.button.x / TILESIZE;
+					short iButtonY = event.button.y / TILESIZE;
+
+					if(event.button.button == SDL_BUTTON_LEFT)
+					{
+						//Stages
+						if(iButtonX >= 0 && iButtonX < g_worldmap.iNumStages - (iButtonY * 20) && iButtonY >= 0 && iButtonY <= (g_worldmap.iNumStages - 1) / 20)
+						{
+							set_tile = iButtonX + (iButtonY * 20) + 6;
+
+							edit_mode = 9;  //change to edit mode using warps
+						
+							//The user must release the mouse button before trying to add a tile
+							ignoreclick = true;
+							
+							return EDITOR_EDIT;
+						}
+						//New stage button
+						else if(iButtonX >= 200 && iButtonX < 300 && iButtonY >= 20 && iButtonY < 30)
+						{
+							
+						}
+					}
+					else if(event.button.button == SDL_BUTTON_RIGHT)
+					{
+						iEditStage = iButtonX + (iButtonY * 20);
+
+
+					}
+			
+					break;
+				}
+
+				case SDL_MOUSEMOTION:
+				{
+					iModeDisplay = -1;
+
+					short iMouseX = event.button.x / TILESIZE;
+					short iMouseY = event.button.y / TILESIZE;
+					
+					if(iMouseX >= 0 && iMouseX < g_worldmap.iNumStages - (iMouseY * 20) && iMouseY >= 0 && iMouseY <= (g_worldmap.iNumStages - 1) / 20)
+					{
+						iModeDisplay = game_values.tourstops[iMouseX + (iMouseY * 20)]->iMode;
+					}
+				}
+
+				default:
+					break;
+			}
+		}
+
+		
+		drawmap(false, TILESIZE);
+		menu_shade.draw(0, 0);
+
+		int color = SDL_MapRGB(blitdest->format, 0, 0, 255);
+		for(short iStage = 0; iStage < g_worldmap.iNumStages; iStage++)
+		{
+			short ix = (iStage % 20) << 5;
+			short iy = ((iStage / 20) << 5);
+
+			SDL_Rect r = {ix, iy, 32, 32};
+			SDL_FillRect(blitdest, &r, color);
+
+			spr_worldforegroundspecial[0].draw(ix, iy, (iStage % 10) << 5, (iStage / 10) << 5, 32, 32);
+		}
+		
+		menu_font_small.drawRightJustified(640, 0, worldlist.current_name());
+
+		if(iModeDisplay >= 0)
+		{
+			DisplayModeDetails(iModeDisplay, event.button.x, event.button.y);
+		}
+
+		DrawMessage();
+		SDL_Flip(screen);
+
+		int delay = WAITTIME - (SDL_GetTicks() - framestart);
+		if(delay < 0)
+			delay = 0;
+		else if(delay > WAITTIME)
+			delay = WAITTIME;
+		
+		SDL_Delay(delay);
+	}
+
+	return EDITOR_QUIT;
+}
+
+
+
 int display_help()
 {
 	//unsigned int currentChar = 0;
@@ -3125,6 +3315,8 @@ int display_help()
 	menu_font_small.draw(offsetx, offsety, "[b] - Vehicle Boundaries");
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[i] - Initial Powerups");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[e] - Edit Stages");
 	offsety += menu_font_small.getHeight() + 20;
 
 	menu_font_small.draw(offsetx, offsety, "File:");

@@ -251,6 +251,9 @@ class WorldMap
 
 	friend int editor_edit();
 	friend int editor_type();
+	friend int editor_stage();
+	friend int editor_start_items();
+
 	friend bool AutoSetTile(short iCol, short iRow);
 	friend void AutoSetPath(short iCol, short iRow);
 	friend void AutoSetPathSprite(short iCol, short iRow);
@@ -264,8 +267,6 @@ class WorldMap
 	friend void WriteVehiclesIntoWorld();
 	friend void ReadWarpsIntoEditor();
 	friend void WriteWarpsIntoWorld();
-
-	friend int editor_start_items();
 };
 
 #endif //__WORLD_H_

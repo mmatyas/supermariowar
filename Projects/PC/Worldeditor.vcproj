@@ -184,6 +184,12 @@
 				RelativePath="..\..\_src\MapList.h">
 			</File>
 			<File
+				RelativePath="..\..\_src\modeoptionsmenu.cpp">
+			</File>
+			<File
+				RelativePath="..\..\_src\modeoptionsmenu.h">
+			</File>
+			<File
 				RelativePath="..\..\_src\movingplatform.cpp">
 			</File>
 			<File
@@ -206,6 +212,18 @@
 			</File>
 			<File
 				RelativePath="..\..\_src\TilesetManager.h">
+			</File>
+			<File
+				RelativePath="..\..\_src\uicontrol.cpp">
+			</File>
+			<File
+				RelativePath="..\..\_src\uicontrol.h">
+			</File>
+			<File
+				RelativePath="..\..\_src\uimenu.cpp">
+			</File>
+			<File
+				RelativePath="..\..\_src\uimenu.h">
 			</File>
 			<File
 				RelativePath="..\..\_src\world.cpp">

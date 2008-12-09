@@ -300,6 +300,12 @@
 				RelativePath="..\..\_src\menu.h">
 			</File>
 			<File
+				RelativePath="..\..\_src\modeoptionsmenu.cpp">
+			</File>
+			<File
+				RelativePath="..\..\_src\modeoptionsmenu.h">
+			</File>
+			<File
 				RelativePath="..\..\_src\movingplatform.cpp">
 			</File>
 			<File
@@ -358,6 +364,12 @@
 			</File>
 			<File
 				RelativePath="..\..\_src\uicontrol.h">
+			</File>
+			<File
+				RelativePath="..\..\_src\uicustomcontrol.cpp">
+			</File>
+			<File
+				RelativePath="..\..\_src\uicustomcontrol.h">
 			</File>
 			<File
 				RelativePath="..\..\_src\uimenu.cpp">

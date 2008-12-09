@@ -735,10 +735,10 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 		MovingObjectType carriedobjecttype = carriedItem->getMovingObjectType();
 
 		//"Phanto Mode" specific stuff
-		if(game_values.gamemode->gamemode == game_mode_chase && carriedobjecttype == movingobject_phantokey)
+		if(game_values.gamemode->gamemode == game_mode_chase)
 		{
-			//Drop the key if a phanto is really close
-			if(nearestObjects.threat && nearestObjects.threat->getObjectType() == object_phanto && nearestObjects.threatdistance < 2025)
+			//Ignore the key if a phanto is really close
+			if(nearestObjects.threat && nearestObjects.threat->getObjectType() == object_phanto && nearestObjects.threatdistance < 4096)
 			{
 				playerKeys->game_turbo.fDown = false;
 

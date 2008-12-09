@@ -51,10 +51,6 @@ STUFF TO WATCH OUT FOR IN BETA2
 - collision detection and behavior of coins, ztar, collection cards
 
 Fixed
-[X] Added player only death tile type
-[X] Decreased time required to get multiplier in KOTH by half
-[X] Allow -1 as CTF mode base relocate setting in tour/world so flag base stays stationary for the duration of the match
-[X] Added start items selection for world editor using 'i' key
 
 
 Beta 1 Public Release Bugs
@@ -287,7 +283,7 @@ Procedure for adding a new game mode:
 2) Add game mode type to GameModeType enum in gamemodes.h
 3) Add new game mode to gamemodes array in main.cpp (gamemodes[X] line 1187)
 4) Update MI_SelectField * miGoalField[22]; line in menu.h to match the new number of modes
-5) Update UI_Menu mModeSettingsMenu[22]; line in meny.h to accomodate a new settings menu
+5) Update UI_Menu mModeSettingsMenu[22]; line in modeoptionsmenu.h to accomodate a new settings menu
 6) Add game mode options to GameModeSettings in global.h
 7) Set default settings for settings in main.cpp
 8) Add menu fields to support these new options in menu.cpp and menu.h
@@ -299,6 +295,7 @@ Procedure for adding a new game mode:
 14) Change line 3186 in main.cpp: if(iMode == game_mode_pipe_minigame)
 15) Change line 3274 in main.cpp: if(iMode == game_mode_pipe_minigame)
 16) Update tours/0smw.txt to have documentation of mode and options
+17) Update worldeditor.cpp: miModeField = new MI_ImageSelectField to add new game mode
 
 Procedure for adding a new game mode option:
 1) Add game mode options to GameModeSettings in global.h
