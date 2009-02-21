@@ -1774,8 +1774,6 @@ void Menu::RunMenu()
 	iTournamentAIStep = 0;
 	iTournamentAITimer = 0;
 
-	bool fShowSettingsButton[GAMEMODE_LAST] = {true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, true, true, true, true, true, true, true};
-
 	//Reset the keys each time we switch from menu to game and back
 	game_values.playerInput.ResetKeys();
 
@@ -2169,7 +2167,7 @@ void Menu::RunMenu()
 
 					//Unhide/hide the settings button
 					game_values.gamemode = gamemodes[miModeField->GetShortValue()];
-					miModeSettingsButton->Show(fShowSettingsButton[miModeField->GetShortValue()]);
+					miModeSettingsButton->Show(miModeField->GetShortValue() != game_mode_owned);
 
 					//Show the approprate goal field
 					for(short iMode = 0; iMode < GAMEMODE_LAST; iMode++)
@@ -2520,7 +2518,7 @@ void Menu::RunMenu()
 								gamemodes[iMode]->goal = miGoalField[iMode]->GetShortValue();
 							}
 
-							miModeSettingsButton->Show(fShowSettingsButton[miModeField->GetShortValue()]);
+							miModeSettingsButton->Show(miModeField->GetShortValue() != game_mode_owned);
 							
 							mCurrentMenu = &mGameSettingsMenu;
 							mCurrentMenu->ResetMenu();
@@ -2631,7 +2629,7 @@ void Menu::RunMenu()
 			else if(MENU_CODE_MODE_CHANGED == code)
 			{
 				game_values.gamemode = gamemodes[miModeField->GetShortValue()];
-				miModeSettingsButton->Show(fShowSettingsButton[miModeField->GetShortValue()]);
+				miModeSettingsButton->Show(miModeField->GetShortValue() != game_mode_owned);
 
 				for(short iMode = 0; iMode < GAMEMODE_LAST; iMode++)
 				{

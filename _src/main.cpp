@@ -22,7 +22,7 @@
 | start:		24.01.2003									|
 | last changes:	12.02.2008									|
 |															|
-|								© 2003-2008 Florian Hufsky  |
+|								© 2003-2009 Florian Hufsky  |
 |								  florian.hufsky@gmail.com	|
 |                                     mtschaffer@gmail.com  |
 |								  http://smw.72dpiarmy.com	|
@@ -63,9 +63,6 @@ Beta 1 Public Release Bugs
 	have to take into account how much time is spent in the swirly spawn animation-an area can be empty initially, but 
 	occupied by the time the animation is done
 
-[ ] Test new AI that deals with getting rid of held objects that are not goal objects like flags
-    Increased the ignore time on throwing the phanto key need to test then feature is complete
-
 [ ] Refreshing the map thumbnails hangs half way through on xbox (after icecap map)
     -> Fixed memory leak in thumbnail creation, retest on xbox
 	-> Still Hangs :(
@@ -73,6 +70,17 @@ Beta 1 Public Release Bugs
 
 [ ] The "thumbnail" sized tiles for the world editor have purple parts in all the foreground objects, including the level markers.
     -> Write script to make these using 0x808080 gray background
+
+Considering Features
+
+[ ] FIXME::Crash when switching between stages and changing modes (crash at exit) need to debug in world editor
+
+[ ] Add 3 types of boss battles back in as possible tour stops/world stages (and add to secret minigame menu)
+
+[ ] Add box game where players race around the map opening boxes to try to get all the coins
+	Fireballs, hazards etc would impede progress
+	Players could steal coins
+	No powerups
 
 
 Need To Test
@@ -284,18 +292,21 @@ Procedure for adding a new game mode:
 3) Add new game mode to gamemodes array in main.cpp (gamemodes[X] line 1187)
 4) Update MI_SelectField * miGoalField[22]; line in menu.h to match the new number of modes
 5) Update UI_Menu mModeSettingsMenu[22]; line in modeoptionsmenu.h to accomodate a new settings menu
-6) Add game mode options to GameModeSettings in global.h
-7) Set default settings for settings in main.cpp
-8) Add menu fields to support these new options in menu.cpp and menu.h
-9) Update ParseTourStopLine() and WriteTourStopLine() in global.cpp
-10) Update SetRandomGameModeSettings() in menu.cpp
-11) Add new mode gfx to gfx\packs\Classic\menu\menu_mode_large.png and menu_mode_small.png
-12) Update fShowSettingsButton[] array in menu.cpp
-13) Remove old options.bin (new settings will now be read from it)
-14) Change line 3186 in main.cpp: if(iMode == game_mode_pipe_minigame)
-15) Change line 3274 in main.cpp: if(iMode == game_mode_pipe_minigame)
-16) Update tours/0smw.txt to have documentation of mode and options
-17) Update worldeditor.cpp: miModeField = new MI_ImageSelectField to add new game mode
+6) Update modeoptionsmenu.cpp: ModeOptionsMenu::Refresh()
+7) Add game mode options to GameModeSettings in global.h
+8) Set default settings for settings in main.cpp
+9) Add menu fields to support these new options in menu.cpp and menu.h
+10) Update ParseTourStopLine() and WriteTourStopLine() in global.cpp
+11) Update SetRandomGameModeSettings() in menu.cpp
+12) Add new mode gfx to gfx\packs\Classic\menu\menu_mode_large.png and menu_mode_small.png
+13) Update fShowSettingsButton[] array in menu.cpp
+14) Remove old options.bin (new settings will now be read from it)
+15) Change line 3186 in main.cpp: if(iMode == game_mode_pipe_minigame)
+16) Change line 3274 in main.cpp: if(iMode == game_mode_pipe_minigame)
+17) Update tours/0smw.txt to have documentation of mode and options
+18) Update worldeditor.cpp: miModeField = new MI_ImageSelectField to add new game mode
+19) Update worldeditor.cpp: g_iNumGameModeSettings[]
+
 
 Procedure for adding a new game mode option:
 1) Add game mode options to GameModeSettings in global.h
@@ -305,6 +316,8 @@ Procedure for adding a new game mode option:
 5) Update SetRandomGameModeSettings() in menu.cpp
 6) Remove old options.bin (new settings will now be read from it)
 7) Update tours/0smw.txt to have documentation of new mode option
+8) Update worldeditor.cpp: miModeField = new MI_ImageSelectField to add new game mode
+9) Update worldeditor.cpp: g_iNumGameModeSettings[]
 
 
 Procedure for adding a new powerup:
@@ -715,6 +728,8 @@ char szIPString[32] = "";
 extern Uint8 GetScreenBackgroundFade();
 
 extern short g_iCollisionMap[MOVINGOBJECT_LAST][MOVINGOBJECT_LAST];
+
+extern void SetupDefaultGameModeSettings();
 
 float CapFallingVelocity(float vel)
 {
@@ -1196,142 +1211,8 @@ int main(int argc, char *argv[])
 	bonushousemode = new CGM_Bonus();
 	pipegamemode = new CGM_Pipe_MiniGame();
 
-	//Setup the default game mode settings
-	//Classic
-	game_values.gamemodemenusettings.classic.style = 0;		//Respawn on death
-	game_values.gamemodemenusettings.classic.scoring = 0;	//All kills will score
-
-	//Frag
-	game_values.gamemodemenusettings.frag.style = 0;		//Respawn on death
-	game_values.gamemodemenusettings.frag.scoring = 0;		//All kills will score
-
-	//Time Limit
-	game_values.gamemodemenusettings.time.style = 0;		//Respawn on death
-	game_values.gamemodemenusettings.time.scoring = 0;		//All kills will score
-	game_values.gamemodemenusettings.time.percentextratime = 10;	//10% chance of a heart spawning
-
-	//Jail
-	game_values.gamemodemenusettings.jail.style = 1;			//defaults to color jail play
-	game_values.gamemodemenusettings.jail.tagfree = true;		//players on same team can free player by touching
-	game_values.gamemodemenusettings.jail.timetofree = 1240;   //20 seconds of jail
-	game_values.gamemodemenusettings.jail.percentkey = 30;		//30% chance of a key spawning
-
-	//Coins
-	game_values.gamemodemenusettings.coins.penalty = false;		//no penalty for getting stomped
-	game_values.gamemodemenusettings.coins.quantity = 1;		//only 1 coin on screen
-
-	//Stomp
-	game_values.gamemodemenusettings.stomp.rate = 90; //Moderate
-	game_values.gamemodemenusettings.stomp.enemyweight[0] = 4; // turn on goombas, koopa and cheep cheeps by default
-	game_values.gamemodemenusettings.stomp.enemyweight[1] = 4;  
-	game_values.gamemodemenusettings.stomp.enemyweight[2] = 6;
-	game_values.gamemodemenusettings.stomp.enemyweight[3] = 2;
-	game_values.gamemodemenusettings.stomp.enemyweight[4] = 2;
-	game_values.gamemodemenusettings.stomp.enemyweight[5] = 4;
-	game_values.gamemodemenusettings.stomp.enemyweight[6] = 1;
-	game_values.gamemodemenusettings.stomp.enemyweight[7] = 1;
-	game_values.gamemodemenusettings.stomp.enemyweight[8] = 1;
-
-	//Eggs
-	game_values.gamemodemenusettings.egg.eggs[0] = 0;
-	game_values.gamemodemenusettings.egg.eggs[1] = 1;
-	game_values.gamemodemenusettings.egg.eggs[2] = 0;
-	game_values.gamemodemenusettings.egg.eggs[3] = 0;
-	game_values.gamemodemenusettings.egg.yoshis[0] = 0;
-	game_values.gamemodemenusettings.egg.yoshis[1] = 1;
-	game_values.gamemodemenusettings.egg.yoshis[2] = 0;
-	game_values.gamemodemenusettings.egg.yoshis[3] = 0;
-	game_values.gamemodemenusettings.egg.explode = 0;  //Exploding eggs is turned off by default
-
-	//Capture The Flag
-	game_values.gamemodemenusettings.flag.speed = 0;  //Bases don't move by default
-	game_values.gamemodemenusettings.flag.touchreturn = false;  //Don't return by touching
-	game_values.gamemodemenusettings.flag.pointmove = true;  //Move base after point
-	game_values.gamemodemenusettings.flag.autoreturn = 1240;  //Return flag automatically after 20 seconds
-	game_values.gamemodemenusettings.flag.homescore = false;  //Don't require flag to be home to score
-	game_values.gamemodemenusettings.flag.centerflag = false; //Do normal CTF, not center flag style
-
-	//Chicken
-	game_values.gamemodemenusettings.chicken.usetarget = true;  //default to displaying a target around the chicken
-	game_values.gamemodemenusettings.chicken.glide = false;		//don't give the chicken the ability to glide
-
-	//Tag
-	game_values.gamemodemenusettings.tag.tagontouch = true;  //default to transfer tag on touching other players
-
-	//Star
-	game_values.gamemodemenusettings.star.time = 30;				//default to 30 seconds
-	game_values.gamemodemenusettings.star.shine = 0;				//default to hot potato (ztar)
-	game_values.gamemodemenusettings.star.percentextratime = 10;	//10 percent chance of an extra time poweurp spawning
-
-	//Domination
-	game_values.gamemodemenusettings.domination.loseondeath = true;
-	game_values.gamemodemenusettings.domination.stealondeath = false;
-	game_values.gamemodemenusettings.domination.relocateondeath = false;
-	game_values.gamemodemenusettings.domination.quantity = 13; //# Players + 1 = 13
-	game_values.gamemodemenusettings.domination.relocationfrequency = 1240;  //Relocate after 20 seconds = 1240
+	SetupDefaultGameModeSettings();
 	
-	//King Of The Hill
-	game_values.gamemodemenusettings.kingofthehill.areasize = 3;
-	game_values.gamemodemenusettings.kingofthehill.relocationfrequency = 1240;
-	game_values.gamemodemenusettings.kingofthehill.maxmultiplier = 1;	//No multiplier
-
-	//Race
-	game_values.gamemodemenusettings.race.quantity = 4;
-	game_values.gamemodemenusettings.race.speed = 4;
-	game_values.gamemodemenusettings.race.penalty = 2;  //0 == none, 1 = 1 base, 2 = all bases lost on death
-		
-	//Frenzy
-	game_values.gamemodemenusettings.frenzy.quantity = 6; //#players - 1
-	game_values.gamemodemenusettings.frenzy.rate = 186; //3 seconds
-	game_values.gamemodemenusettings.frenzy.storedshells = true; //Shells are stored by default
-	game_values.gamemodemenusettings.frenzy.powerupweight[0] = 0;
-	game_values.gamemodemenusettings.frenzy.powerupweight[1] = 1;  // turn on flowers and hammers by default
-	game_values.gamemodemenusettings.frenzy.powerupweight[2] = 1;
-	game_values.gamemodemenusettings.frenzy.powerupweight[3] = 0;
-	game_values.gamemodemenusettings.frenzy.powerupweight[4] = 0;
-	game_values.gamemodemenusettings.frenzy.powerupweight[5] = 0;
-	game_values.gamemodemenusettings.frenzy.powerupweight[6] = 0;
-	game_values.gamemodemenusettings.frenzy.powerupweight[7] = 0;
-	game_values.gamemodemenusettings.frenzy.powerupweight[8] = 0;
-	game_values.gamemodemenusettings.frenzy.powerupweight[9] = 0;
-	game_values.gamemodemenusettings.frenzy.powerupweight[10] = 0;
-	game_values.gamemodemenusettings.frenzy.powerupweight[11] = 0;
-
-	//Survival
-	game_values.gamemodemenusettings.survival.enemyweight[0] = 1;
-	game_values.gamemodemenusettings.survival.enemyweight[1] = 0;
-	game_values.gamemodemenusettings.survival.enemyweight[2] = 0;
-	game_values.gamemodemenusettings.survival.density = 20;
-	game_values.gamemodemenusettings.survival.speed = 4;
-	game_values.gamemodemenusettings.survival.shield = true;
-	
-	//Greed
-	game_values.gamemodemenusettings.greed.coinlife = 124;			//Coins disappear after 2 seconds
-	game_values.gamemodemenusettings.greed.owncoins = true;			//Can collect own coins
-	game_values.gamemodemenusettings.greed.multiplier = 2;			//Single multiplier
-	
-	//Health
-	game_values.gamemodemenusettings.health.startlife = 6;			//Start with 3 whole hearts (each increment is a half heart)
-	game_values.gamemodemenusettings.health.maxlife = 10;			//Maximum of 5 hearts
-	game_values.gamemodemenusettings.health.percentextralife = 20;	//20% chance of a heart spawning
-
-	//Card Collection
-	game_values.gamemodemenusettings.collection.quantity = 6;		//#players - 1
-	game_values.gamemodemenusettings.collection.rate = 186;			//3 seconds to spawn
-	game_values.gamemodemenusettings.collection.banktime = 310;		//5 seconds to bank
-	game_values.gamemodemenusettings.collection.cardlife = 310;		//5 seconds to live
-	
-	//Phanto Chase
-	game_values.gamemodemenusettings.chase.phantospeed = 6;			//Medium speed
-	game_values.gamemodemenusettings.chase.phantoquantity[0] = 1;
-	game_values.gamemodemenusettings.chase.phantoquantity[1] = 1;
-	game_values.gamemodemenusettings.chase.phantoquantity[2] = 0;
-
-	//Shyguy Tag
-	game_values.gamemodemenusettings.shyguytag.tagonsuicide = false; 
-	game_values.gamemodemenusettings.shyguytag.tagtransfer = 0;
-	game_values.gamemodemenusettings.shyguytag.freetime = 310;
-
 	//Read saved settings from disk
 	FILE * fp = OpenFile("options.bin", "rb");
 

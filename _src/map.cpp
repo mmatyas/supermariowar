@@ -1361,10 +1361,14 @@ void CMap::loadPlatforms(FILE * mapfile, bool fPreview, int version[4], short * 
 		if(version[0] > 1 || (version[0] == 1 && (version[1] > 8 || (version[1] == 8 && version[3] >= 1))))
 			iDrawLayer = ReadInt(mapfile);
 
+		//printf("Layer: %d\n", iDrawLayer);
+
 		short iPathType = 0;
 		
 		if(version[0] > 1 || (version[0] == 1 && version[1] >= 8))
 			iPathType = ReadInt(mapfile);
+
+		//printf("PathType: %d\n", iPathType);
 
 		MovingPlatformPath * path = NULL;
 		if(iPathType == 0) //segment path
@@ -1376,6 +1380,9 @@ void CMap::loadPlatforms(FILE * mapfile, bool fPreview, int version[4], short * 
 			float fVelocity = ReadFloat(mapfile);
 
 			path = new StraightPath(fVelocity, fStartX, fStartY, fEndX, fEndY, fPreview);
+
+			//printf("Read segment path\n");
+			//printf("StartX: %.2f StartY:%.2f EndX:%.2f EndY:%.2f Velocity:%.2f\n", fStartX, fStartY, fEndX, fEndY, fVelocity);
 		}
 		else if(iPathType == 1) //continuous path
 		{
@@ -1385,6 +1392,9 @@ void CMap::loadPlatforms(FILE * mapfile, bool fPreview, int version[4], short * 
 			float fVelocity = ReadFloat(mapfile);
 
 			path = new StraightPathContinuous(fVelocity, fStartX, fStartY, fAngle, fPreview);
+
+			//printf("Read continuous path\n");
+			//printf("StartX: %.2f StartY:%.2f Angle:%.2f Velocity:%.2f\n", fStartX, fStartY, fAngle, fVelocity);
 		}
 		else if(iPathType == 2) //elliptical path
 		{
@@ -1396,6 +1406,9 @@ void CMap::loadPlatforms(FILE * mapfile, bool fPreview, int version[4], short * 
 			float fVelocity = ReadFloat(mapfile);
 
 			path = new EllipsePath(fVelocity, fAngle, fRadiusX, fRadiusY, fCenterX, fCenterY, fPreview);
+
+			//printf("Read elliptical path\n");
+			//printf("CenterX: %.2f CenterY:%.2f Angle:%.2f RadiusX: %.2f RadiusY: %.2f Velocity:%.2f\n", fCenterX, fCenterY, fAngle, fRadiusX, fRadiusY, fVelocity);
 		}
 
 		MovingPlatform * platform = new MovingPlatform(tiles, types, iWidth, iHeight, iDrawLayer, path, fPreview);

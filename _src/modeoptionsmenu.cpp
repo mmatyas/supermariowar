@@ -1412,3 +1412,10 @@ void ModeOptionsMenu::HealthModeMaxLifeChanged()
 	}
 }
 
+void ModeOptionsMenu::Refresh()
+{
+	for(short iMode = 0; iMode < 22; iMode++)
+	{
+		mModeSettingsMenu[iMode].Refresh();
+	}
+}

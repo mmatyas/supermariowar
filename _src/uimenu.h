@@ -7,6 +7,7 @@ enum MenuCodeEnum {
 	MENU_CODE_NEIGHBOR_LEFT = 2,
 	MENU_CODE_NEIGHBOR_RIGHT = 3,
 	MENU_CODE_NONE, 
+	MENU_CODE_CLICKED,
 	MENU_CODE_UNSELECT_ITEM, 
 	MENU_CODE_INPUT_TYPE_CHANGED, 
 	MENU_CODE_INPUT_DEVICE_CHANGED, 
@@ -89,7 +90,11 @@ enum MenuCodeEnum {
 	MENU_CODE_HEALTH_MODE_MAX_LIFE_CHANGED,
 	MENU_CODE_POWERUP_PRESET_CHANGED,
 	MENU_CODE_POWERUP_SETTING_CHANGED,
-	MENU_CODE_QUICK_GAME_START
+	MENU_CODE_QUICK_GAME_START,
+	MENU_CODE_TO_BONUS_PICKER_MENU,
+	MENU_CODE_DELETE_STAGE_BUTTON,
+	MENU_CODE_DELETE_STAGE_YES,
+	MENU_CODE_DELETE_STAGE_NO
 };
 
 #include "uicontrol.h"
@@ -127,6 +132,11 @@ class UI_Menu
 
 		void SetControllingTeam(short teamid) {iControllingTeam = teamid;}
 		void SetAllowExit(bool allowExit) {fAllowExitButton = allowExit;}
+
+		MenuCodeEnum MouseClick(short iMouseX, short iMouseY);
+		bool IsModifying() {return fModifyingItem;}
+
+		void Refresh();
 
 	protected:
 

@@ -89,6 +89,28 @@ MapList::MapList()
 	}
 #endif
 
+//If this is for the world editor, load all the world maps into the map viewer UI control
+#ifdef _WORLDEDITOR
+	SimpleDirectoryList worldeditormapdirs(convertPath("worlds/"));
+
+	short iEditorDirCount = worldeditormapdirs.GetCount();
+	for(short iDir = 0; iDir < iEditorDirCount; iDir++)
+	{
+		const char * szName = worldeditormapdirs.current_name();
+		
+		DirectoryListing worldMapDir(convertPath(std::string(szName) + std::string("/")), ".map");
+
+		while(worldMapDir(curname))
+		{
+			MapListNode * node = new MapListNode(worldMapDir.fullName(curname));
+			maps[stripCreatorAndDotMap(curname)] = node;
+		}
+		
+		worldeditormapdirs.next();
+	}
+#endif
+
+
 	//TODO: add proper test via size
 	if(maps.empty())
 	{	

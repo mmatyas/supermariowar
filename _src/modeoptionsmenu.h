@@ -17,6 +17,8 @@ class ModeOptionsMenu
 		void HealthModeStartLifeChanged();
 		void HealthModeMaxLifeChanged();
 
+		void Refresh();
+
 	private:
 		
 		//Game Mode Settings Menu

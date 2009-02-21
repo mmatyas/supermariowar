@@ -1,11 +1,15 @@
 #include "global.h"
 #include <math.h>
 
+extern void LoadCurrentMapBackground();
+
 UI_Control::UI_Control(short x, short y)
 {
 	fSelected = false;
 	fModifying = false;
 	fAutoModify = false;
+	fDisable = false;
+
 	ix = x;
 	iy = y;
 
@@ -172,6 +176,18 @@ void MI_IPField::Draw()
 	}
 }
 
+MenuCodeEnum MI_IPField::MouseClick(short iMouseX, short iMouseY)
+{
+	if(fDisable)
+		return MENU_CODE_NONE;
+
+	if(iMouseX >= ix && iMouseX < ix + 278 && iMouseY >= iy && iMouseY < iy + 51)
+	{
+		return MENU_CODE_CLICKED;
+	}
+
+	return MENU_CODE_NONE;
+}
 
 /**************************************
  * MI_SelectField Class
@@ -193,7 +209,6 @@ MI_SelectField::MI_SelectField(gfxSprite * nspr, short x, short y, const char * 
 
 	fAutoAdvance = false;
 	fNoWrap = false;
-	fDisable = false;
 
 	iValue = NULL;
 	sValue = NULL;
@@ -212,6 +227,8 @@ MI_SelectField::MI_SelectField(gfxSprite * nspr, short x, short y, const char * 
 
 MI_SelectField::~MI_SelectField()
 {
+	delete [] szName;
+
 	delete miModifyImageLeft;
 	delete miModifyImageRight;
 
@@ -594,6 +611,49 @@ bool MI_SelectField::MoveRandom()
 	return true;
 }
 
+MenuCodeEnum MI_SelectField::MouseClick(short iMouseX, short iMouseY)
+{
+	if(fDisable)
+		return MENU_CODE_NONE;
+
+	//If we are modifying this control, see if we clicked on a next/prev button
+	if(fModifying)
+	{
+		short x, y, w, h;
+		miModifyImageLeft->GetPositionAndSize(&x, &y, &w, &h);
+
+		if(iMouseX >= x && iMouseX < x + w &&
+			iMouseY >= y && iMouseY < y + h)
+		{
+			if(MovePrev())
+				return mcItemChangedCode;
+		}
+		
+		miModifyImageRight->GetPositionAndSize(&x, &y, &w, &h);
+		
+		if(iMouseX >= x && iMouseX < x + w &&
+			iMouseY >= y && iMouseY < y + h)
+		{
+			if(MoveNext())
+				return mcItemChangedCode;
+		}
+	}
+	
+	//Otherwise just check to see if we clicked on the whole control
+	if(iMouseX >= ix && iMouseX < ix + iWidth && iMouseY >= iy && iMouseY < iy + 32)
+		return MENU_CODE_CLICKED;
+	
+	//Otherwise this control wasn't clicked at all
+	return MENU_CODE_NONE;
+}
+
+void MI_SelectField::Refresh()
+{
+	if(iValue)
+		SetKey(*iValue);
+	else if(fValue)
+		SetKey(*fValue ? 1 : 0);
+}
 
 /**************************************
  * MI_ImageSelectField Class
@@ -697,7 +757,6 @@ void MI_SliderField::Draw()
 
 MenuCodeEnum MI_SliderField::SendInput(CPlayerInput * playerInput)
 {
-
 	for(int iPlayer = 0; iPlayer < 4; iPlayer++)
 	{
 		if(playerInput->outputControls[iPlayer].menu_scrollfast.fPressed)
@@ -767,7 +826,6 @@ void MI_PowerupSlider::Draw()
 	if(current != --items.end() || !fNoWrap)
 		miModifyImageRight->Draw();
 }
-
 
 /**************************************
  * MI_FrenzyModeOptions Class
@@ -871,7 +929,13 @@ MI_FrenzyModeOptions::MI_FrenzyModeOptions(short x, short y, short width, short 
 		else
 			downcontrol = miPowerupSlider[iPowerup + 2];
 
-		mMenu->AddControl(miPowerupSlider[iPowerup], upcontrol, downcontrol, NULL, miPowerupSlider[iPowerup + 1]);
+		UI_Control * rightcontrol = NULL;
+		if(iPowerup + 1 < NUMFRENZYCARDS)
+			rightcontrol = miPowerupSlider[iPowerup + 1];
+		else
+			rightcontrol = miBackButton;
+
+		mMenu->AddControl(miPowerupSlider[iPowerup], upcontrol, downcontrol, NULL, rightcontrol);
 
 		if(++iPowerup < NUMFRENZYCARDS)
 		{
@@ -897,7 +961,7 @@ MI_FrenzyModeOptions::MI_FrenzyModeOptions(short x, short y, short width, short 
 	mMenu->AddNonControl(miUpArrow);
 	mMenu->AddNonControl(miDownArrow);
 
-	mMenu->AddControl(miBackButton, miPowerupSlider[NUMFRENZYCARDS - 1], NULL, NULL, NULL);
+	mMenu->AddControl(miBackButton, miPowerupSlider[NUMFRENZYCARDS - 1], NULL, miPowerupSlider[NUMFRENZYCARDS - 1], NULL);
 
 	mMenu->SetHeadControl(miQuantityField);
 	mMenu->SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
@@ -931,6 +995,7 @@ MenuCodeEnum MI_FrenzyModeOptions::Modify(bool modify)
 	iOffset = 0;
 	iIndex = 0;
 	SetupPowerupFields();
+	AdjustDisplayArrows();
 
 	fModifying = modify;
 	return MENU_CODE_MODIFY_ACCEPTED;
@@ -938,7 +1003,11 @@ MenuCodeEnum MI_FrenzyModeOptions::Modify(bool modify)
 
 MenuCodeEnum MI_FrenzyModeOptions::SendInput(CPlayerInput * playerInput)
 {
+	UI_Control * prevControl = mMenu->GetCurrentControl();
+
 	MenuCodeEnum ret = mMenu->SendInput(playerInput);
+
+	UI_Control * nextControl = mMenu->GetCurrentControl();
 
 	if(MENU_CODE_CANCEL_INPUT == ret)
 	{
@@ -947,11 +1016,13 @@ MenuCodeEnum MI_FrenzyModeOptions::SendInput(CPlayerInput * playerInput)
 	}
 	else if(MENU_CODE_NEIGHBOR_UP == ret)
 	{
-		MovePrev();
+		if(prevControl != miBackButton)
+			MovePrev();
 	}
 	else if(MENU_CODE_NEIGHBOR_DOWN == ret)
 	{
-		MoveNext();
+		if(nextControl != miBackButton || prevControl == miPowerupSlider[NUMFRENZYCARDS - 2])
+			MoveNext();
 	}
 	
 	return ret;
@@ -1019,6 +1090,51 @@ void MI_FrenzyModeOptions::AdjustDisplayArrows()
 		miDownArrow->Show(false);
 }
 
+MenuCodeEnum MI_FrenzyModeOptions::MouseClick(short iMouseX, short iMouseY)
+{
+	if(fDisable)
+		return MENU_CODE_NONE;
+
+	//Loop through all controls to see if one was clicked on
+	MenuCodeEnum ret = mMenu->MouseClick(iMouseX, iMouseY);
+
+	if(ret == MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS)
+		return ret;
+
+	for(short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++)
+	{
+		MI_PowerupSlider * slider = miPowerupSlider[iPowerup];
+
+		if(slider == mMenu->GetCurrentControl())
+		{
+			iIndex = (iPowerup >> 1) + 3;
+			
+			if(iIndex <= iTopStop)
+				iOffset = 0;
+			else if(iIndex >= iBottomStop)
+				iOffset = iBottomStop - iTopStop;
+			else
+				iOffset = iIndex - iTopStop;
+
+			SetupPowerupFields();
+			AdjustDisplayArrows();	
+
+			return ret;
+		}
+	}
+
+	iOffset = 0;
+	iIndex = 0;
+	SetupPowerupFields();
+	AdjustDisplayArrows();	
+	
+	return ret;
+}
+
+void MI_FrenzyModeOptions::Refresh()
+{
+	mMenu->Refresh();
+}
 
 /**************************************
  * MI_Button Class
@@ -1051,6 +1167,9 @@ MI_Button::MI_Button(gfxSprite * nspr, short x, short y, const char * name, shor
 
 MenuCodeEnum MI_Button::Modify(bool)
 {
+	if(fDisable)
+		return MENU_CODE_UNSELECT_ITEM;
+
 	return menuCode;
 }
 
@@ -1109,6 +1228,18 @@ void MI_Button::SetImage(gfxSprite * nsprImage, short x, short y, short w, short
 	iImageH = h;
 }
 
+MenuCodeEnum MI_Button::MouseClick(short iMouseX, short iMouseY)
+{
+	if(fDisable)
+		return MENU_CODE_NONE;
+
+	if(iMouseX >= ix && iMouseX < ix + iWidth && iMouseY >= iy && iMouseY < iy + 32)
+	{
+		return menuCode;
+	}
+
+	return MENU_CODE_NONE;
+}
 
 /**************************************
  * MI_Image Class
@@ -1140,6 +1271,11 @@ MI_Image::MI_Image(gfxSprite * nspr, short x, short y, short srcx, short srcy, s
 	dSwirlAngle = 0.0f;
 	dSwirlRadiusSpeed = 0.0f;
 	dSwirlAngleSpeed = 0.0f;
+
+	fBlink = false;
+	iBlinkInterval = 0;
+	iBlinkCounter = 0;
+	fBlinkShow = true;
 }
 
 MI_Image::~MI_Image()
@@ -1203,11 +1339,20 @@ void MI_Image::Update()
 			dSwirlAngle += dSwirlAngleSpeed;
 		}
 	}
+
+	if(fBlink)
+	{
+		if(++iBlinkCounter > iBlinkInterval)
+		{
+			fBlinkShow = !fBlinkShow;
+			iBlinkCounter = 0;
+		}
+	}
 }
 
 void MI_Image::Draw()
 {
-	if(!fShow)
+	if(!fShow || (fBlink && !fBlinkShow))
 		return;
 
 	short iXOffset = 0;
@@ -1334,5 +1479,782 @@ void MI_ScoreText::SetScore(short iScore)
 		iDigitMiddleDstX = ix - 8;
 		iDigitRightDstX = ix + 8;
 	}
+}
+
+
+/**************************************
+ * MI_TextField Class
+ **************************************/
+
+MI_TextField::MI_TextField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent) :
+	UI_Control(x, y)
+{
+	spr = nspr;
+
+	szName = new char[strlen(name) + 1];
+	strcpy(szName, name);
+
+	iWidth = width;
+	iIndent = indent;
+
+	mcItemChangedCode = MENU_CODE_NONE;
+	mcControlSelectedCode = MENU_CODE_NONE;
+
+	szValue = NULL;
+
+	miModifyCursor = new MI_Image(nspr, ix + indent, iy + 4, 0, 166, 6, 24, 4, 1, 8);
+	miModifyCursor->SetBlink(true, 20);
+	miModifyCursor->Show(false);
+
+	iAdjustmentY = width > 256 ? 0 : 128;
+
+	iMaxChars = 0;
+	iNumChars = 0;
+	iCursorIndex = 0;
+
+	szTempValue = NULL;
+
+	iStringWidth = 0;
+	iAllowedWidth = iWidth - iIndent - 24;
+}
+
+MI_TextField::~MI_TextField()
+{
+	delete miModifyCursor;
+	delete [] szName;
+	delete [] szTempValue;
+}
+
+void MI_TextField::SetTitle(char * name)
+{
+	delete [] szName;
+	szName = new char[strlen(name) + 1];
+	strcpy(szName, name);
+}
+
+MenuCodeEnum MI_TextField::Modify(bool modify)
+{
+	if(fDisable)
+		return MENU_CODE_UNSELECT_ITEM;
+
+	if(MENU_CODE_NONE != mcControlSelectedCode)
+		return mcControlSelectedCode;
+
+	miModifyCursor->Show(modify);
+	fModifying = modify;
+	return MENU_CODE_MODIFY_ACCEPTED;
+}
+
+short number_key_map[10] = {41, 33, 64, 35, 36, 37, 94, 38, 42, 40};
+
+MenuCodeEnum MI_TextField::SendInput(CPlayerInput * playerInput)
+{
+	Uint8 * keystate = SDL_GetKeyState(NULL);
+
+	for(int iPlayer = 0; iPlayer < 4; iPlayer++)
+	{
+		if(playerInput->outputControls[iPlayer].menu_select.fPressed || playerInput->outputControls[iPlayer].menu_cancel.fPressed)
+		{
+			miModifyCursor->Show(false);
+
+			fModifying = false;
+
+			return MENU_CODE_UNSELECT_ITEM;
+		}
+	}
+
+	if(!szValue || iNumChars >= iMaxChars)
+		return MENU_CODE_NONE;
+
+	//Watch for characters typed in including delete and backspace
+	short key = playerInput->iPressedKey;
+	if((key >= SDLK_a && key <= SDLK_z) || key == SDLK_SPACE || (key >= SDLK_0 && key <= SDLK_9) || key == SDLK_EQUALS ||
+		key == SDLK_MINUS || key == SDLK_BACKQUOTE || (key >= SDLK_LEFTBRACKET && key <= SDLK_RIGHTBRACKET) ||
+		key == SDLK_SEMICOLON || key == SDLK_QUOTE || key == SDLK_COMMA || key == SDLK_PERIOD || key == SDLK_SLASH)
+	{
+		if(iNumChars < iMaxChars - 1)
+		{
+			//Take care of holding shift to shift the pressed key to another character
+			if(keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT])
+			{
+				if(key >= SDLK_a && key <= SDLK_z)
+				{
+					key -= 32;
+				}
+				else if(key >= SDLK_0 && key <= SDLK_9)
+				{
+					key = number_key_map[key - 48];
+				}
+				else if(key == SDLK_MINUS)
+				{
+					key = SDLK_UNDERSCORE;
+				}
+				else if(key == SDLK_EQUALS)
+				{
+					key = SDLK_PLUS;
+				}
+				else if(key == SDLK_BACKQUOTE)
+				{
+					key = 126;	
+				}
+				else if(key >= SDLK_LEFTBRACKET && key <= SDLK_RIGHTBRACKET)
+				{
+					key += 32;
+				}
+				else if(key == SDLK_SEMICOLON)
+				{
+					key = SDLK_COLON;
+				}
+				else if(key == SDLK_QUOTE)
+				{
+					key = SDLK_QUOTEDBL;
+				}
+				else if(key == SDLK_COMMA)
+				{
+					key = SDLK_LESS;
+				}
+				else if(key == SDLK_PERIOD)
+				{
+					key = SDLK_GREATER;
+				}
+				else if(key == SDLK_SLASH)
+				{
+					key = SDLK_QUESTION;
+				}
+			}
+
+			//Check to see if this is an allowed character for this field
+			bool fAllowed = true;
+			for(short iIndex = 0; iIndex < 32 && szDisallowedChars[iIndex] != 0; iIndex++)
+			{
+				if(szDisallowedChars[iIndex] == key)
+				{
+					fAllowed = false;
+					break;
+				}
+			}
+
+			//If it is an allowed character, then add it to the field
+			if(fAllowed)
+			{
+				iNumChars++;
+
+				for(short iCopy = iNumChars - 1; iCopy >= iCursorIndex; iCopy--)
+				{
+					szValue[iCopy + 1] = szValue[iCopy];
+				}
+				
+				szValue[iCursorIndex++] = (char)key;
+
+				UpdateCursor();
+				return mcItemChangedCode;
+			}
+		}
+	}
+	else if(key == SDLK_BACKSPACE)
+	{
+		if(iCursorIndex > 0)
+		{
+			iCursorIndex--;
+			iNumChars--;
+			for(short iCopy = iCursorIndex; iCopy < iNumChars; iCopy++)
+			{
+				szValue[iCopy] = szValue[iCopy + 1];
+			}
+			szValue[iNumChars] = 0;
+
+			UpdateCursor();
+			return mcItemChangedCode;
+		}
+	}
+	else if(key == SDLK_DELETE)
+	{
+		if(iCursorIndex < iNumChars)
+		{
+			for(short iCopy = iCursorIndex; iCopy < iNumChars; iCopy++)
+			{
+				szValue[iCopy] = szValue[iCopy + 1];
+			}
+
+			szValue[--iNumChars] = 0;
+
+			UpdateCursor();
+			return mcItemChangedCode;
+		}
+	}
+	else if(key == SDLK_LEFT)
+	{
+		if(iCursorIndex > 0)
+		{
+			iCursorIndex--;
+			UpdateCursor();
+		}
+	}
+	else if(key == SDLK_RIGHT)
+	{
+		if(iCursorIndex < iNumChars)
+		{
+			iCursorIndex++;
+			UpdateCursor();
+		}
+	}
+
+	return MENU_CODE_NONE;
+}
+
+
+void MI_TextField::Update()
+{
+	miModifyCursor->Update();
+}
+
+void MI_TextField::Draw()
+{
+	if(!fShow)
+		return;
+
+	spr->draw(ix, iy, 0, (fSelected ? 32 : 0) + iAdjustmentY, iIndent - 16, 32);
+	spr->draw(ix + iIndent - 16, iy, 0, (fSelected ? 96 : 64), 32, 32);
+	spr->draw(ix + iIndent + 16, iy, 528 - iWidth + iIndent, (fSelected ? 32 : 0) + iAdjustmentY, iWidth - iIndent - 16, 32);
+
+	menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName);
+
+	if(szValue)
+	{
+		if(iStringWidth <= iAllowedWidth || !fModifying)
+		{
+			menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iAllowedWidth, szValue);
+		}
+		else
+		{
+			menu_font_large.drawChopLeft(ix + iWidth - 16, iy + 5, iAllowedWidth, szTempValue);
+		}
+	}
+
+	miModifyCursor->Draw();
+}
+
+void MI_TextField::SetData(char * data, short maxchars)
+{
+	iMaxChars = maxchars;
+	szValue = data;
+	iCursorIndex = strlen(szValue);
+	iNumChars = iCursorIndex;
+
+	if(szTempValue)
+		delete [] szTempValue;
+
+	szTempValue = new char[iMaxChars];
+
+	UpdateCursor();
+}
+
+MenuCodeEnum MI_TextField::MouseClick(short iMouseX, short iMouseY)
+{
+	if(!szValue || fDisable)
+		return MENU_CODE_NONE;
+
+	//If we are modifying this control, see if we clicked on a next/prev button
+	if(fModifying)
+	{
+		//Move cursor to index in string where clicked
+		short iPixelCount = 0;
+		char szChar[2];
+		szChar[1] = 0;
+		for(short iChar = 0; iChar < iNumChars; iChar++)
+		{
+			szChar[0] = szValue[iChar];
+			iPixelCount += menu_font_large.getWidth(szChar);
+
+			if(iPixelCount >= iMouseX - (ix + iIndent + 8))
+			{
+				iCursorIndex = iChar;
+				UpdateCursor();
+				return MENU_CODE_NONE;
+			}
+		}
+	}
+	
+	//Otherwise just check to see if we clicked on the whole control
+	if(iMouseX >= ix && iMouseX < ix + iWidth && iMouseY >= iy && iMouseY < iy + 32)
+	{
+		iCursorIndex = strlen(szValue);
+		UpdateCursor();
+		return MENU_CODE_CLICKED;
+	}
+	
+	//Otherwise this control wasn't clicked at all
+	return MENU_CODE_NONE;
+}
+
+void MI_TextField::Refresh()
+{
+	//Look at destination string and update control based on that value
+	if(!szValue)
+		return;
+
+	SetData(szValue, iMaxChars);
+}
+
+void MI_TextField::UpdateCursor()
+{
+	if(!szValue)
+		return;
+
+	strncpy(szTempValue, szValue, iCursorIndex);
+	szTempValue[iCursorIndex] = 0;
+
+	iStringWidth = menu_font_large.getWidth(szTempValue);
+	if(iStringWidth <= iAllowedWidth)
+	{
+		miModifyCursor->SetPosition(ix + iIndent + 10 + iStringWidth, iy + 4);
+	}
+	else
+	{
+		miModifyCursor->SetPosition(ix + iIndent + 10 + iAllowedWidth, iy + 4);
+	}
+}
+
+void MI_TextField::SetDisallowedChars(const char * chars)
+{
+	strncpy(szDisallowedChars, chars, 31);
+	szDisallowedChars[31] = 0;
+}
+
+
+
+/**************************************
+ * MI_MapField Class
+ **************************************/
+
+MI_MapField::MI_MapField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent, bool showtags) :
+	UI_Control(x, y)
+{
+	spr = nspr;
+
+	szName = new char[strlen(name) + 1];
+	strcpy(szName, name);
+
+	iWidth = width;
+	iIndent = indent;
+
+	miModifyImageLeft = new MI_Image(nspr, ix + indent - 26, iy + 4, 32, 64, 26, 24, 4, 1, 8);
+	miModifyImageLeft->Show(false);
+
+	miModifyImageRight = new MI_Image(nspr, ix + iWidth - 16, iy + 4, 32, 88, 26, 24, 4, 1, 8);
+	miModifyImageRight->Show(false);
+
+	surfaceMapBackground = SDL_CreateRGBSurface(0, 320, 240, 16, 0, 0, 0, 0);
+	surfaceMapBlockLayer = SDL_CreateRGBSurface(0, 320, 240, 16, 0, 0, 0, 0);
+	surfaceMapForeground = SDL_CreateRGBSurface(0, 320, 240, 16, 0, 0, 0, 0);
+	LoadCurrentMap();
+	
+	rectDst.x = x + 16;
+	rectDst.y = y + 44;
+	rectDst.w = 320;
+	rectDst.h = 240;
+
+	if(showtags)
+	{
+		iSlideListOut = (iWidth - 352) >> 1;
+		iSlideListOutGoal = iSlideListOut;
+	}
+	else
+	{
+		iSlideListOut = 0;
+		iSlideListOutGoal = iSlideListOut;
+	}
+
+	sSearchString = "";
+	iSearchStringTimer = 0;
+}
+
+MI_MapField::~MI_MapField()
+{
+	delete miModifyImageLeft;
+	delete miModifyImageRight;
+}
+
+MenuCodeEnum MI_MapField::Modify(bool modify)
+{
+	if(fDisable)
+		return MENU_CODE_UNSELECT_ITEM;
+
+	miModifyImageLeft->Show(modify);
+	miModifyImageRight->Show(modify);
+
+	fModifying = modify;
+	return MENU_CODE_MODIFY_ACCEPTED;
+}
+
+MenuCodeEnum MI_MapField::SendInput(CPlayerInput * playerInput)
+{
+	short iPressedKey = playerInput->iPressedKey;
+
+	/*
+	if(playerInput->iPressedKey > 0)
+	{
+		else if(playerInput->iPressedKey == SDLK_PAGEUP)
+		{
+			short iOldIndex = maplist.GetCurrent()->second->iIndex;
+			maplist.prev(true);
+			
+			if(iOldIndex != maplist.GetCurrent()->second->iIndex)
+			{
+				LoadCurrentMap();
+				return MENU_CODE_MAP_CHANGED;
+			}
+
+			return MENU_CODE_NONE;
+		}
+		else if(playerInput->iPressedKey == SDLK_PAGEDOWN)
+		{
+			short iOldIndex = maplist.GetCurrent()->second->iIndex;
+			maplist.next(true);
+
+			if(iOldIndex != maplist.GetCurrent()->second->iIndex)
+			{
+				LoadCurrentMap();
+				return MENU_CODE_MAP_CHANGED;
+			}
+
+			return MENU_CODE_NONE;
+		}
+	}
+	*/
+
+	for(int iPlayer = 0; iPlayer < 4; iPlayer++)
+	{
+		if(playerInput->outputControls[iPlayer].menu_right.fPressed || playerInput->outputControls[iPlayer].menu_down.fPressed)
+		{
+			if(MoveNext(playerInput->outputControls[iPlayer].menu_scrollfast.fDown))
+				return MENU_CODE_MAP_CHANGED;
+
+			return MENU_CODE_NONE;
+		}
+		
+		if(playerInput->outputControls[iPlayer].menu_left.fPressed || playerInput->outputControls[iPlayer].menu_up.fPressed)
+		{
+			if(MovePrev(playerInput->outputControls[iPlayer].menu_scrollfast.fDown))
+				return MENU_CODE_MAP_CHANGED;
+
+			return MENU_CODE_NONE;
+		}
+
+		if(playerInput->outputControls[iPlayer].menu_random.fPressed)
+		{
+			return ChooseRandomMap();
+		}
+
+		if(playerInput->outputControls[iPlayer].menu_select.fPressed)
+		{
+			miModifyImageLeft->Show(false);
+			miModifyImageRight->Show(false);
+			
+			fModifying = false;
+			return MENU_CODE_UNSELECT_ITEM;
+		}
+
+		if(playerInput->outputControls[iPlayer].menu_cancel.fPressed)
+		{
+			miModifyImageLeft->Show(false);
+			miModifyImageRight->Show(false);
+			
+			fModifying = false;
+
+			return MENU_CODE_UNSELECT_ITEM;
+		}
+
+		if(iPlayer == 0 && iPressedKey > 0)
+		{
+			if((iPressedKey >= SDLK_a && iPressedKey <= SDLK_z) ||
+				(iPressedKey >= SDLK_0 && iPressedKey <= SDLK_9) ||
+				iPressedKey == SDLK_MINUS || iPressedKey == SDLK_EQUALS)
+			{
+				short iOldIndex = maplist.GetCurrent()->second->iIndex;
+				
+				//maplist.startswith((char)playerInput->iPressedKey);
+
+				sSearchString += (char)iPressedKey;
+				iSearchStringTimer = 10;
+
+				if(!maplist.startswith(sSearchString.c_str()))
+				{
+					sSearchString = "";
+					iSearchStringTimer = 0;
+				}
+				
+				if(iOldIndex != maplist.GetCurrent()->second->iIndex)
+				{
+					LoadCurrentMap();
+					return MENU_CODE_MAP_CHANGED;
+				}
+				
+				return MENU_CODE_NONE;
+			}
+		}
+	}
+
+	return MENU_CODE_NONE;
+}
+
+MenuCodeEnum MI_MapField::ChooseRandomMap()
+{
+	short iOldIndex = maplist.GetCurrent()->second->iIndex;
+	maplist.random(true);
+
+	if(iOldIndex != maplist.GetCurrent()->second->iIndex)
+	{
+		LoadCurrentMap();
+		return MENU_CODE_MAP_CHANGED;
+	}
+
+	return MENU_CODE_NONE;
+}
+
+void MI_MapField::Update()
+{
+	//Empty out the search string after a certain time
+	if(iSearchStringTimer > 0)
+	{
+		if(--iSearchStringTimer == 0)
+		{
+			sSearchString = "";
+		}
+	}
+
+	if(iSlideListOut != iSlideListOutGoal)
+	{
+		if(iSlideListOutGoal > iSlideListOut)
+		{
+			iSlideListOut += 4;
+
+			if(iSlideListOut > iSlideListOutGoal)
+				iSlideListOut = iSlideListOutGoal;
+		}
+		else if(iSlideListOutGoal < iSlideListOut)
+		{
+			iSlideListOut -= 4;
+
+			if(iSlideListOut < iSlideListOutGoal)
+				iSlideListOut = iSlideListOutGoal;
+		}
+	}
+
+	//Update hazards
+#ifndef _WORLDEDITOR
+	noncolcontainer.update();
+
+	objectcontainer[1].update();
+	objectcontainer[1].cleandeadobjects();
+#endif //_WORLDEDITOR
+
+	miModifyImageRight->Update();
+	miModifyImageLeft->Update();
+
+	g_map.updatePlatforms();
+}
+
+void MI_MapField::Draw()
+{
+	if(!fShow)
+		return;
+
+	//Draw the select field background
+	spr->draw(ix, iy, 0, (fSelected ? 32 : 0), iIndent - 16, 32);
+	spr->draw(ix + iIndent - 16, iy, 0, (fSelected ? 96 : 64), 32, 32);
+	spr->draw(ix + iIndent + 16, iy, 528 - iWidth + iIndent, (fSelected ? 32 : 0), iWidth - iIndent - 16, 32);
+
+	short iMapBoxX = ix + (iWidth >> 1) - 176 - iSlideListOut;
+
+	//Draw the background for the map preview
+	menu_dialog.draw(iMapBoxX, iy + 30, 0, 0, 336, 254);
+	menu_dialog.draw(iMapBoxX + 336, iy + 30, 496, 0, 16, 254);
+	menu_dialog.draw(iMapBoxX, iy + 284, 0, 464, 336, 16);
+	menu_dialog.draw(iMapBoxX + 336, iy + 284, 496, 464, 16, 16);
+
+	rectDst.x = iMapBoxX + 16;
+
+	menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName);
+	menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 24, szMapName);
+
+	SDL_BlitSurface(surfaceMapBackground, NULL, blitdest, &rectDst);
+
+	g_map.drawPlatforms(rectDst.x, rectDst.y, 0);
+
+	SDL_BlitSurface(surfaceMapBlockLayer, NULL, blitdest, &rectDst);
+
+	g_map.drawPlatforms(rectDst.x, rectDst.y, 1);
+
+#ifndef _WORLDEDITOR
+	//Draw map hazards
+	for(short i = 0; i < objectcontainer[1].list_end; i++)
+	{
+		CObject * object = objectcontainer[1].list[i];
+		ObjectType type = object->getObjectType();
+		
+		if(type == object_orbithazard)
+		{
+			((OMO_OrbitHazard*)object)->draw(rectDst.x, rectDst.y);
+		}
+		else if(type == object_pathhazard)
+		{
+			((OMO_StraightPathHazard*)object)->draw(rectDst.x, rectDst.y);
+		}
+		else if(type == object_flamecannon)
+		{
+			((IO_FlameCannon*)object)->draw(rectDst.x, rectDst.y);
+		}
+		else if(type == object_moving)
+		{
+			IO_MovingObject * movingobject = (IO_MovingObject *) object;
+
+			if(movingobject->getMovingObjectType() == movingobject_bulletbill)
+			{
+				((MO_BulletBill*)movingobject)->draw(rectDst.x, rectDst.y);
+			}
+			else if(movingobject->getMovingObjectType() == movingobject_pirhanaplant)
+			{
+				((MO_PirhanaPlant*)movingobject)->draw(rectDst.x, rectDst.y);
+			}
+		}
+	}
+#endif  //_WORLDEDITOR
+
+	g_map.drawPlatforms(rectDst.x, rectDst.y, 2);
+
+	if(game_values.toplayer)
+		SDL_BlitSurface(surfaceMapForeground, NULL, blitdest, &rectDst);
+	
+	g_map.drawPlatforms(rectDst.x, rectDst.y, 3);
+	g_map.drawPlatforms(rectDst.x, rectDst.y, 4);
+
+	miModifyImageLeft->Draw();
+	miModifyImageRight->Draw();
+
+	//menu_font_large.draw(rectDst.x, rectDst.y, sSearchString.c_str());
+}
+
+void MI_MapField::LoadCurrentMap()
+{
+	strncpy(szMapName, maplist.currentShortmapname(), 255);
+	szMapName[255] = 0;
+
+	LoadMap(maplist.currentFilename());	
+}
+
+void MI_MapField::LoadMap(const char * szMapPath)
+{
+	g_map.loadMap(szMapPath, read_type_preview);
+	SDL_Delay(10);  //Sleeps to help the music from skipping
+	
+	LoadCurrentMapBackground();
+
+	SDL_Delay(10);  //Sleeps to help the music from skipping
+
+	g_map.preDrawPreviewBackground(&spr_background, surfaceMapBackground, false);
+	SDL_Delay(10);  //Sleeps to help the music from skipping
+	g_map.preDrawPreviewBlocks(surfaceMapBlockLayer, false);
+	SDL_Delay(10);  //Sleeps to help the music from skipping
+	g_map.preDrawPreviewMapItems(surfaceMapBackground, false);
+	SDL_Delay(10);  //Sleeps to help the music from skipping
+	g_map.preDrawPreviewForeground(surfaceMapForeground, false);
+	SDL_Delay(10);  //Sleeps to help the music from skipping
+	g_map.preDrawPreviewWarps(surfaceMapForeground, false);
+	SDL_Delay(10);  //Sleeps to help the music from skipping
+
+#ifndef _WORLDEDITOR
+	LoadMapHazards(true);
+#endif //_WORLDEDITOR
+
+}
+
+void MI_MapField::SetMap(const char * szMapName, bool fWorld)
+{
+	maplist.findexact(szMapName, fWorld);
+	LoadCurrentMap();
+}
+
+void MI_MapField::SetSpecialMap(const char * mapName, const char * szMapPath)
+{
+	strncpy(szMapName, mapName, 255);
+	szMapName[255] = 0;
+
+	LoadMap(szMapPath);
+}
+
+MenuCodeEnum MI_MapField::MouseClick(short iMouseX, short iMouseY)
+{
+	if(fDisable)
+		return MENU_CODE_NONE;
+
+	//If we are modifying this control, see if we clicked on a next/prev button
+	if(fModifying)
+	{
+		short x, y, w, h;
+		miModifyImageLeft->GetPositionAndSize(&x, &y, &w, &h);
+
+		if(iMouseX >= x && iMouseX < x + w &&
+			iMouseY >= y && iMouseY < y + h)
+		{
+			if(MovePrev(false))
+				return MENU_CODE_MAP_CHANGED;
+		}
+		
+		miModifyImageRight->GetPositionAndSize(&x, &y, &w, &h);
+		
+		if(iMouseX >= x && iMouseX < x + w &&
+			iMouseY >= y && iMouseY < y + h)
+		{
+			if(MoveNext(false))
+				return MENU_CODE_MAP_CHANGED;
+		}
+	}
+	
+	//Otherwise just check to see if we clicked on the whole control
+	if(iMouseX >= ix && iMouseX < ix + iWidth && iMouseY >= iy && iMouseY < iy + 32)
+		return MENU_CODE_CLICKED;
+	
+	//Otherwise this control wasn't clicked at all
+	return MENU_CODE_NONE;
+
+}
+
+bool MI_MapField::MovePrev(bool fScrollFast)
+{
+	int numadvance = 1;
+	if(fScrollFast)
+		numadvance = 10;
+
+	short iOldIndex = maplist.GetCurrent()->second->iIndex;
+	for(int k = 0; k < numadvance; k++)
+		maplist.prev(true);
+
+	if(iOldIndex != maplist.GetCurrent()->second->iIndex)
+	{
+		LoadCurrentMap();
+		return true;
+	}
+
+	return false;
+}
+
+bool MI_MapField::MoveNext(bool fScrollFast)
+{
+	int numadvance = 1;
+	if(fScrollFast)
+		numadvance = 10;
+
+	short iOldIndex = maplist.GetCurrent()->second->iIndex;
+	for(int k = 0; k < numadvance; k++)
+		maplist.next(true);
+
+	if(iOldIndex != maplist.GetCurrent()->second->iIndex)
+	{
+		LoadCurrentMap();
+		return true;
+	}
+
+	return false;
 }
 

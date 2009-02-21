@@ -447,6 +447,12 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 
 	ts->iStageType = iStageType;
 	
+	ts->szBonusText[0][0] = 0;
+	ts->szBonusText[1][0] = 0;
+	ts->szBonusText[2][0] = 0;
+	ts->szBonusText[3][0] = 0;
+	ts->szBonusText[4][0] = 0;
+
 	if(iStageType == 0)
 	{
 		//Using the maplist to cheat and find a map for us
@@ -593,6 +599,9 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 				else
 					ts->fEndStage = false;
 			}
+
+			//Copy in default values first
+			memcpy(&ts->gmsSettings, &game_values.gamemodemenusettings, sizeof(GameModeSettings));
 
 			if(ts->iMode == 0) //classic
 			{
@@ -1902,5 +1911,144 @@ TileType GetIncrementedTileType(TileType type)
 		return tile_nonsolid;
 
 	return tile_nonsolid;
+}
+
+void SetupDefaultGameModeSettings()
+{
+	//Setup the default game mode settings
+	//Classic
+	game_values.gamemodemenusettings.classic.style = 0;		//Respawn on death
+	game_values.gamemodemenusettings.classic.scoring = 0;	//All kills will score
+
+	//Frag
+	game_values.gamemodemenusettings.frag.style = 0;		//Respawn on death
+	game_values.gamemodemenusettings.frag.scoring = 0;		//All kills will score
+
+	//Time Limit
+	game_values.gamemodemenusettings.time.style = 0;		//Respawn on death
+	game_values.gamemodemenusettings.time.scoring = 0;		//All kills will score
+	game_values.gamemodemenusettings.time.percentextratime = 10;	//10% chance of a heart spawning
+
+	//Jail
+	game_values.gamemodemenusettings.jail.style = 1;			//defaults to color jail play
+	game_values.gamemodemenusettings.jail.tagfree = true;		//players on same team can free player by touching
+	game_values.gamemodemenusettings.jail.timetofree = 1240;   //20 seconds of jail
+	game_values.gamemodemenusettings.jail.percentkey = 30;		//30% chance of a key spawning
+
+	//Coins
+	game_values.gamemodemenusettings.coins.penalty = false;		//no penalty for getting stomped
+	game_values.gamemodemenusettings.coins.quantity = 1;		//only 1 coin on screen
+
+	//Stomp
+	game_values.gamemodemenusettings.stomp.rate = 90; //Moderate
+	game_values.gamemodemenusettings.stomp.enemyweight[0] = 4; // turn on goombas, koopa and cheep cheeps by default
+	game_values.gamemodemenusettings.stomp.enemyweight[1] = 4;  
+	game_values.gamemodemenusettings.stomp.enemyweight[2] = 6;
+	game_values.gamemodemenusettings.stomp.enemyweight[3] = 2;
+	game_values.gamemodemenusettings.stomp.enemyweight[4] = 2;
+	game_values.gamemodemenusettings.stomp.enemyweight[5] = 4;
+	game_values.gamemodemenusettings.stomp.enemyweight[6] = 1;
+	game_values.gamemodemenusettings.stomp.enemyweight[7] = 1;
+	game_values.gamemodemenusettings.stomp.enemyweight[8] = 1;
+
+	//Eggs
+	game_values.gamemodemenusettings.egg.eggs[0] = 0;
+	game_values.gamemodemenusettings.egg.eggs[1] = 1;
+	game_values.gamemodemenusettings.egg.eggs[2] = 0;
+	game_values.gamemodemenusettings.egg.eggs[3] = 0;
+	game_values.gamemodemenusettings.egg.yoshis[0] = 0;
+	game_values.gamemodemenusettings.egg.yoshis[1] = 1;
+	game_values.gamemodemenusettings.egg.yoshis[2] = 0;
+	game_values.gamemodemenusettings.egg.yoshis[3] = 0;
+	game_values.gamemodemenusettings.egg.explode = 0;  //Exploding eggs is turned off by default
+
+	//Capture The Flag
+	game_values.gamemodemenusettings.flag.speed = 0;  //Bases don't move by default
+	game_values.gamemodemenusettings.flag.touchreturn = false;  //Don't return by touching
+	game_values.gamemodemenusettings.flag.pointmove = true;  //Move base after point
+	game_values.gamemodemenusettings.flag.autoreturn = 1240;  //Return flag automatically after 20 seconds
+	game_values.gamemodemenusettings.flag.homescore = false;  //Don't require flag to be home to score
+	game_values.gamemodemenusettings.flag.centerflag = false; //Do normal CTF, not center flag style
+
+	//Chicken
+	game_values.gamemodemenusettings.chicken.usetarget = true;  //default to displaying a target around the chicken
+	game_values.gamemodemenusettings.chicken.glide = false;		//don't give the chicken the ability to glide
+
+	//Tag
+	game_values.gamemodemenusettings.tag.tagontouch = true;  //default to transfer tag on touching other players
+
+	//Star
+	game_values.gamemodemenusettings.star.time = 30;				//default to 30 seconds
+	game_values.gamemodemenusettings.star.shine = 0;				//default to hot potato (ztar)
+	game_values.gamemodemenusettings.star.percentextratime = 10;	//10 percent chance of an extra time poweurp spawning
+
+	//Domination
+	game_values.gamemodemenusettings.domination.loseondeath = true;
+	game_values.gamemodemenusettings.domination.stealondeath = false;
+	game_values.gamemodemenusettings.domination.relocateondeath = false;
+	game_values.gamemodemenusettings.domination.quantity = 13; //# Players + 1 = 13
+	game_values.gamemodemenusettings.domination.relocationfrequency = 1240;  //Relocate after 20 seconds = 1240
+	
+	//King Of The Hill
+	game_values.gamemodemenusettings.kingofthehill.areasize = 3;
+	game_values.gamemodemenusettings.kingofthehill.relocationfrequency = 1240;
+	game_values.gamemodemenusettings.kingofthehill.maxmultiplier = 1;	//No multiplier
+
+	//Race
+	game_values.gamemodemenusettings.race.quantity = 4;
+	game_values.gamemodemenusettings.race.speed = 4;
+	game_values.gamemodemenusettings.race.penalty = 2;  //0 == none, 1 = 1 base, 2 = all bases lost on death
+		
+	//Frenzy
+	game_values.gamemodemenusettings.frenzy.quantity = 6; //#players - 1
+	game_values.gamemodemenusettings.frenzy.rate = 186; //3 seconds
+	game_values.gamemodemenusettings.frenzy.storedshells = true; //Shells are stored by default
+	game_values.gamemodemenusettings.frenzy.powerupweight[0] = 0;
+	game_values.gamemodemenusettings.frenzy.powerupweight[1] = 1;  // turn on flowers and hammers by default
+	game_values.gamemodemenusettings.frenzy.powerupweight[2] = 1;
+	game_values.gamemodemenusettings.frenzy.powerupweight[3] = 0;
+	game_values.gamemodemenusettings.frenzy.powerupweight[4] = 0;
+	game_values.gamemodemenusettings.frenzy.powerupweight[5] = 0;
+	game_values.gamemodemenusettings.frenzy.powerupweight[6] = 0;
+	game_values.gamemodemenusettings.frenzy.powerupweight[7] = 0;
+	game_values.gamemodemenusettings.frenzy.powerupweight[8] = 0;
+	game_values.gamemodemenusettings.frenzy.powerupweight[9] = 0;
+	game_values.gamemodemenusettings.frenzy.powerupweight[10] = 0;
+	game_values.gamemodemenusettings.frenzy.powerupweight[11] = 0;
+
+	//Survival
+	game_values.gamemodemenusettings.survival.enemyweight[0] = 1;
+	game_values.gamemodemenusettings.survival.enemyweight[1] = 0;
+	game_values.gamemodemenusettings.survival.enemyweight[2] = 0;
+	game_values.gamemodemenusettings.survival.density = 20;
+	game_values.gamemodemenusettings.survival.speed = 4;
+	game_values.gamemodemenusettings.survival.shield = true;
+	
+	//Greed
+	game_values.gamemodemenusettings.greed.coinlife = 124;			//Coins disappear after 2 seconds
+	game_values.gamemodemenusettings.greed.owncoins = true;			//Can collect own coins
+	game_values.gamemodemenusettings.greed.multiplier = 2;			//Single multiplier
+	
+	//Health
+	game_values.gamemodemenusettings.health.startlife = 6;			//Start with 3 whole hearts (each increment is a half heart)
+	game_values.gamemodemenusettings.health.maxlife = 10;			//Maximum of 5 hearts
+	game_values.gamemodemenusettings.health.percentextralife = 20;	//20% chance of a heart spawning
+
+	//Card Collection
+	game_values.gamemodemenusettings.collection.quantity = 6;		//#players - 1
+	game_values.gamemodemenusettings.collection.rate = 186;			//3 seconds to spawn
+	game_values.gamemodemenusettings.collection.banktime = 310;		//5 seconds to bank
+	game_values.gamemodemenusettings.collection.cardlife = 310;		//5 seconds to live
+	
+	//Phanto Chase
+	game_values.gamemodemenusettings.chase.phantospeed = 6;			//Medium speed
+	game_values.gamemodemenusettings.chase.phantoquantity[0] = 1;
+	game_values.gamemodemenusettings.chase.phantoquantity[1] = 1;
+	game_values.gamemodemenusettings.chase.phantoquantity[2] = 0;
+
+	//Shyguy Tag
+	game_values.gamemodemenusettings.shyguytag.tagonsuicide = false; 
+	game_values.gamemodemenusettings.shyguytag.tagtransfer = 0;
+	game_values.gamemodemenusettings.shyguytag.freetime = 310;
 }
 

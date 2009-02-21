@@ -253,6 +253,7 @@ class WorldMap
 	friend int editor_type();
 	friend int editor_stage();
 	friend int editor_start_items();
+	friend void NewStage(short * iEditStage);
 
 	friend bool AutoSetTile(short iCol, short iRow);
 	friend void AutoSetPath(short iCol, short iRow);

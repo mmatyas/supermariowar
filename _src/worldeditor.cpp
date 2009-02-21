@@ -4,10 +4,10 @@
 |															|
 | this sourcecode is released under the GPLv2.				|
 |															|
-| start:		3.8.2007									|
-| last changes:	3.8.2007									|
+| start:		1.1.2008									|
+| last changes:	1.10.2009									|
 |															|
-|	© 2003-2007 Florian Hufsky <florian.hufsky@gmail.com>	|
+|	© 2003-2009 Florian Hufsky <florian.hufsky@gmail.com>	|
 +----------------------------------------------------------*/
 
 #define _SMW_EDITOR
@@ -152,7 +152,6 @@ CPlayer			*list_players[4];
 short			list_players_cnt = 0;
 bool			g_fLoadMessages = true;
 short			g_iCurrentDrawIndex = 0;
-gfxSprite		menu_dialog;
 
 std::vector<MapMusicOverride*> mapmusicoverrides;
 std::vector<WorldMusicOverride*> worldmusicoverrides;
@@ -225,7 +224,11 @@ short g_musiccategorydisplaytimer = 0;
 short g_messagedisplaytimer = 0;
 std::string g_szMessageTitle = "";
 std::string g_szMessageLine[3];
+void SetDisplayMessage(short iTime, char * szTitle, char * szLine1, char * szLine2, char * szLine3);
 void DrawMessage();
+
+//Menu keys to use for menus
+extern short controlkeys[2][2][4][NUM_KEYS];
 
 //Vehicle stuff
 std::vector<WorldVehicle*> vehiclelist;
@@ -236,8 +239,80 @@ std::vector<WorldWarp*> warplist;
 bool g_fFullScreen = false;
 
 //Stage Mode Menu
+UI_Menu * mCurrentMenu;
 UI_Menu mStageSettingsMenu;
-MI_ImageSelectField * miModeField = NULL;
+UI_Menu mBonusItemPicker;
+
+MI_ImageSelectField * miModeField;
+MI_SelectField * miGoalField[GAMEMODE_LAST];
+MI_Button * miModeSettingsButton;
+MI_Button * miBonusItemsButton;
+MI_SelectField * miSpecialGoalField[1];
+
+MI_SelectField * miFinalStageField;
+MI_SelectField * miPointsField;
+
+MI_TextField * miNameField;
+MI_SelectField * miBonusType;
+MI_TextField * miBonusTextField[5];
+
+MI_MapField * miMapField;
+
+MI_Button * miDeleteStageButton;
+
+MI_Image * miDeleteStageDialogImage;
+MI_Text * miDeleteStageDialogAreYouText;
+MI_Text * miDeleteStageDialogSureText;
+MI_Button * miDeleteStageDialogYesButton;
+MI_Button * miDeleteStageDialogNoButton;
+
+
+ModeOptionsMenu modeOptionsMenu;
+
+gfxSprite menu_dialog;
+
+//Sets up default mode options
+extern void SetupDefaultGameModeSettings();
+
+struct StageModeOption
+{
+	char szName[64];
+	short iValue;
+};
+
+struct StageMode
+{
+	char szName[128];
+	char szGoal[64];
+
+	short iDefaultGoal;
+
+	StageModeOption options[GAMEMODE_NUM_OPTIONS - 1];
+};
+
+StageMode stagemodes[GAMEMODE_LAST];
+
+void SetStageMode(short iIndex, const char * szModeName, const char * szGoalName, short iIncrement, short iDefault)
+{
+	if(iIndex < 0 || iIndex >= GAMEMODE_LAST)
+		return;
+
+	StageMode * sm = &stagemodes[iIndex];
+
+	strncpy(sm->szName, szModeName, 128);
+	sm->szName[127] = 0;
+
+	strncpy(sm->szGoal, szGoalName, 64);
+	sm->szGoal[63] = 0;
+
+	sm->iDefaultGoal = iDefault;
+
+	for(short iModeOption = 0; iModeOption < GAMEMODE_NUM_OPTIONS - 1; iModeOption++)
+	{
+		sm->options[iModeOption].iValue = (iModeOption + 1) * iIncrement;
+		sprintf(sm->options[iModeOption].szName, "%d", sm->options[iModeOption].iValue);
+	}
+}
 
 //main main main
 int main(int argc, char *argv[])
@@ -312,6 +387,8 @@ int main(int argc, char *argv[])
 	spr_worlditems.init(convertPath("gfx/packs/Classic/world/world_powerups.png"), 255, 0, 255);
 	spr_worldpopup.init(convertPath("gfx/packs/Classic/world/world_item_popup.png"), 255, 0, 255);
 
+	menu_dialog.init(convertPath("gfx/packs/Classic/menu/menu_dialog.png"), 255, 0, 255);
+
 	//Mode Options Menu Gfx
 	menu_egg.init(convertPath("gfx/packs/Classic/modeobjects/menu_egg.png"), 255, 0, 255);
 	menu_stomp.init(convertPath("gfx/packs/Classic/modeobjects/menu_stomp.png"), 255, 0, 255);
@@ -323,10 +400,12 @@ int main(int argc, char *argv[])
 	menu_verticalarrows.init(convertPath("gfx/packs/Classic/menu/menu_vertical_arrows.png"), 255, 0, 255);
 	spr_storedpoweruplarge.init(convertPath("gfx/packs/Classic/powerups/large.png"), 255, 0, 255);
 
-	menu_mode_large.init(convertPath("gfx/packs/Classic/menu/menu_mode_small.png"), 255, 0, 255);
+	menu_mode_small.init(convertPath("gfx/packs/Classic/menu/menu_mode_small.png"), 255, 0, 255);
 	menu_mode_large.init(convertPath("gfx/packs/Classic/menu/menu_mode_large.png"), 255, 0, 255);
 
 	sMapSurface = SDL_CreateRGBSurface(screen->flags, 768, 608, screen->format->BitsPerPixel, 0, 0, 0, 0);
+
+	SetupDefaultGameModeSettings();
 
 	worldlist.find(findstring);
 	game_values.worldindex = worldlist.GetCurrentIndex();
@@ -339,37 +418,224 @@ int main(int argc, char *argv[])
 		updateworldsurface();
 	}
 
-	//Setup The Mode Menu
-	miModeField = new MI_ImageSelectField(&spr_selectfield, &menu_mode_small, 70, 85, "Mode", 500, 120, 16, 16);
+	//Setup input for menus
+	game_values.inputConfiguration[0][0].iDevice = DEVICE_KEYBOARD;
+	for(short iInputState = 0; iInputState < 2; iInputState++)  //for game/menu
+	{
+		for(short iKey = 0; iKey < NUM_KEYS; iKey++)
+		{
+			game_values.inputConfiguration[0][0].inputGameControls[iInputState].keys[iKey] = controlkeys[0][iInputState][0][iKey];
+		}
+	}
 
-	miModeField->Add("Classic", 0, "", false, false);
-	miModeField->Add("Frag", 1, "", false, false);
-	miModeField->Add("Time Limit", 2, "", false, false);
-	miModeField->Add("Jail", 3, "", false, false);
-	miModeField->Add("Coin Collection", 4, "", false, false);
-	miModeField->Add("Stomp", 5, "", false, false);
-	miModeField->Add("Yoshi's Eggs", 6, "", false, false);
-	miModeField->Add("Capture The Flag", 7, "", false, false);
-	miModeField->Add("Chicken", 8, "", false, false);
-	miModeField->Add("Tag", 9, "", false, false);
-	miModeField->Add("Star", 10, "", false, false);
-	miModeField->Add("Domination", 11, "", false, false);
-	miModeField->Add("King of the Hill", 12, "", false, false);
-	miModeField->Add("Race", 13, "", false, false);
-	miModeField->Add("Owned", 14, "", false, false);
-	miModeField->Add("Frenzy", 15, "", false, false);
-	miModeField->Add("Survival", 16, "", false, false);
-	miModeField->Add("Greed", 17, "", false, false);
-	miModeField->Add("Health", 18, "", false, false);
-	miModeField->Add("Card Collection", 19, "", false, false);
-	miModeField->Add("Phanto Chase", 20, "", false, false);
-	miModeField->Add("Shy Guy Tag", 21, "", false, false);
-	
+	game_values.playerInput.inputControls[0] = &game_values.inputConfiguration[0][0];
+
+	SetStageMode(0, "Classic", "Lives", 5, 10);
+	SetStageMode(1, "Frag", "Kills", 5, 20);
+	SetStageMode(2, "Time Limit", "Time", 30, 60);
+	SetStageMode(3, "Jail", "Kills", 5, 20);
+	SetStageMode(4, "Coin Collection", "Coins", 5, 20);
+	SetStageMode(5, "Stomp", "Kills", 10, 10);
+	SetStageMode(6, "Yoshi's Eggs", "Eggs", 5, 20);
+	SetStageMode(7, "Capture The Flag", "Points", 5, 20);
+	SetStageMode(8, "Chicken", "Points", 50, 200);
+	SetStageMode(9, "Tag", "Points", 50, 200);
+	SetStageMode(10, "Star", "Lives", 1, 5);
+	SetStageMode(11, "Domination", "Points", 50, 200);
+	SetStageMode(12, "King of the Hill", "Points", 50, 200);
+	SetStageMode(13, "Race", "Laps", 2, 10);
+	SetStageMode(14, "Owned", "Points", 50, 200);
+	SetStageMode(15, "Frenzy", "Kills", 5, 20);
+	SetStageMode(16, "Survival", "Lives", 5, 10);
+	SetStageMode(17, "Greed", "Coins", 10, 40);
+	SetStageMode(18, "Health", "Lives", 1, 5);
+	SetStageMode(19, "Card Collection", "Points", 10, 30);
+	SetStageMode(20, "Phanto Chase", "Points", 50, 200);
+	SetStageMode(21, "Shy Guy Tag", "Points", 50, 200);
+
+	//Setup The Mode Menu
+	mCurrentMenu = &mStageSettingsMenu;
+
+	//Name
+	miNameField = new MI_TextField(&spr_selectfield, 70, 20, "Name", 500, 120);
+	miNameField->SetDisallowedChars(",");
+
+	miModeField = new MI_ImageSelectField(&spr_selectfield, &menu_mode_small, 70, 60, "Mode", 500, 120, 16, 16);
 	//miModeField->SetData(game_values.tourstops[0]->iMode, NULL, NULL);
 	//miModeField->SetKey(0);
 	miModeField->SetItemChangedCode(MENU_CODE_MODE_CHANGED);
 
-	mStageSettingsMenu.AddControl(miModeField, NULL, NULL, NULL, NULL);
+	for(short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++)
+	{
+		miModeField->Add(stagemodes[iGameMode].szName, iGameMode, "", false, false);
+
+		miGoalField[iGameMode] = new MI_SelectField(&spr_selectfield, 70, 100, stagemodes[iGameMode].szGoal, 352, 120);
+		miGoalField[iGameMode]->Show(iGameMode == 0);
+
+		for(short iGameModeOption = 0; iGameModeOption < GAMEMODE_NUM_OPTIONS - 1; iGameModeOption++)
+		{
+			StageModeOption * option = &stagemodes[iGameMode].options[iGameModeOption];
+			miGoalField[iGameMode]->Add(option->szName, option->iValue, "", false, false);
+		}
+
+		//miGoalField[iGameMode]->SetData(&gamemodes[iGameMode]->goal, NULL, NULL);
+		//miGoalField[iGameMode]->SetKey(gamemodes[iGameMode]->goal);
+	}
+
+	miModeField->Add("Bonus House", 24, "", false, false);
+	miModeField->Add("Pipe Minigame", 25, "", false, false);
+
+	//Create goal field for pipe game
+	miSpecialGoalField[0] = new MI_SelectField(&spr_selectfield, 70, 100, "Points", 352, 120);
+	miSpecialGoalField[0]->Show(false);
+
+	for(short iGameModeOption = 0; iGameModeOption < GAMEMODE_NUM_OPTIONS - 1; iGameModeOption++)
+	{
+		short iValue = 10 + iGameModeOption * 10;
+		char szName[16];
+		sprintf(szName, "%d", iValue);
+		miSpecialGoalField[0]->Add(szName, iValue, "", false, false);
+	}
+
+	//Mode Settings Button
+	miModeSettingsButton = new MI_Button(&spr_selectfield, 430, 100, "Settings", 140, 0);
+	miModeSettingsButton->SetCode(MENU_CODE_TO_MODE_SETTINGS_MENU);
+
+	//Points Field
+	miPointsField = new MI_SelectField(&spr_selectfield, 70, 140, "Points", 240, 120);
+	miPointsField->Add("0", 0, "", false, false);
+	miPointsField->Add("1", 1, "", false, false);
+	miPointsField->Add("2", 2, "", false, false);
+	miPointsField->Add("3", 3, "", false, false);
+	miPointsField->Add("4", 4, "", false, false);
+	miPointsField->Add("5", 5, "", false, false);
+	miPointsField->Add("6", 6, "", false, false);
+	miPointsField->Add("7", 7, "", false, false);
+	miPointsField->Add("8", 8, "", false, false);
+	miPointsField->Add("9", 9, "", false, false);
+	miPointsField->Add("10", 10, "", false, false);
+	miPointsField->Add("11", 11, "", false, false);
+	miPointsField->Add("12", 12, "", false, false);
+	miPointsField->Add("13", 13, "", false, false);
+	miPointsField->Add("14", 14, "", false, false);
+	miPointsField->Add("15", 15, "", false, false);
+	miPointsField->Add("16", 16, "", false, false);
+	miPointsField->Add("17", 17, "", false, false);
+	miPointsField->Add("18", 18, "", false, false);
+	miPointsField->Add("19", 19, "", false, false);
+	miPointsField->Add("20", 20, "", false, false);
+	
+	//Final Stage Field
+	miFinalStageField = new MI_SelectField(&spr_selectfield, 320, 140, "End Stage", 240, 120);
+	miFinalStageField->Add("No", 0, "", false, false);
+	miFinalStageField->Add("Yes", 1, "", true, false);
+	miFinalStageField->SetAutoAdvance(true);
+
+	//Map Select Field
+	miMapField = new MI_MapField(&spr_selectfield, 70, 180, "Map", 500, 120, true);
+
+	//Bonus Item Picker Menu Button
+	miBonusItemsButton= new MI_Button(&spr_selectfield, 430, 220, "Bonuses", 140, 0);
+	miBonusItemsButton->SetCode(MENU_CODE_TO_BONUS_PICKER_MENU);
+
+	//Bonus Type
+	miBonusType = new MI_SelectField(&spr_selectfield, 70, 100, "Type", 500, 120);
+	miBonusType->Add("Fixed", 0, "", false, false);
+	miBonusType->Add("Random", 1, "", true, false);
+	miBonusType->SetAutoAdvance(true);
+
+	//Bonus House Text * 5
+	miBonusTextField[0] = new MI_TextField(&spr_selectfield, 70, 140, "Text", 500, 120);
+	miBonusTextField[1] = new MI_TextField(&spr_selectfield, 70, 180, "Text", 500, 120);
+	miBonusTextField[2] = new MI_TextField(&spr_selectfield, 70, 220, "Text", 500, 120);
+	miBonusTextField[3] = new MI_TextField(&spr_selectfield, 70, 260, "Text", 500, 120);
+	miBonusTextField[4] = new MI_TextField(&spr_selectfield, 70, 300, "Text", 500, 120);
+
+	miBonusTextField[0]->SetDisallowedChars(",|");
+	miBonusTextField[1]->SetDisallowedChars(",|");
+	miBonusTextField[2]->SetDisallowedChars(",|");
+	miBonusTextField[3]->SetDisallowedChars(",|");
+	miBonusTextField[4]->SetDisallowedChars(",|");
+
+	//Delete Stage Button
+	miDeleteStageButton = new MI_Button(&spr_selectfield, 430, 440, "Delete", 140, 0);
+	miDeleteStageButton->SetCode(MENU_CODE_DELETE_STAGE_BUTTON);
+
+	//Are You Sure Dialog for Delete Stage
+	miDeleteStageDialogImage = new MI_Image(&spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
+	miDeleteStageDialogAreYouText = new MI_Text("Are You", 320, 195, 0, 2, 1);
+	miDeleteStageDialogSureText = new MI_Text("Sure?", 320, 220, 0, 2, 1);
+	miDeleteStageDialogYesButton = new MI_Button(&spr_selectfield, 235, 250, "Yes", 80, 1);
+	miDeleteStageDialogNoButton = new MI_Button(&spr_selectfield, 325, 250, "No", 80, 1);
+	
+	miDeleteStageDialogYesButton->SetCode(MENU_CODE_DELETE_STAGE_YES);
+	miDeleteStageDialogNoButton->SetCode(MENU_CODE_DELETE_STAGE_NO);
+
+	miDeleteStageDialogImage->Show(false);
+	miDeleteStageDialogAreYouText->Show(false);
+	miDeleteStageDialogSureText->Show(false);
+	miDeleteStageDialogYesButton->Show(false);
+	miDeleteStageDialogNoButton->Show(false);
+
+	//Add Name Field
+	mStageSettingsMenu.AddControl(miNameField, miDeleteStageButton, miModeField, NULL, NULL);
+
+	//Add Mode Field
+	mStageSettingsMenu.AddControl(miModeField, miNameField, miGoalField[0], NULL, NULL);
+
+	//Add Mode Goal Fields
+	mStageSettingsMenu.AddControl(miGoalField[0], miModeField, miGoalField[1], NULL, miModeSettingsButton);
+	
+	for(short iGoalField = 1; iGoalField < GAMEMODE_LAST - 1; iGoalField++)
+		mStageSettingsMenu.AddControl(miGoalField[iGoalField], miGoalField[iGoalField - 1], miGoalField[iGoalField + 1], miGoalField[iGoalField - 1], miModeSettingsButton);
+
+	mStageSettingsMenu.AddControl(miGoalField[GAMEMODE_LAST - 1], miGoalField[GAMEMODE_LAST - 2], miSpecialGoalField[0], miGoalField[GAMEMODE_LAST - 2], miModeSettingsButton);
+	
+	mStageSettingsMenu.AddControl(miSpecialGoalField[0], miGoalField[GAMEMODE_LAST - 1], miPointsField, miGoalField[GAMEMODE_LAST - 1], miModeSettingsButton);
+
+	//Add Mode Settings Button
+	mStageSettingsMenu.AddControl(miModeSettingsButton, miModeField, miBonusType, miSpecialGoalField[0], NULL);
+
+	//Add Points Field
+	mStageSettingsMenu.AddControl(miPointsField, miSpecialGoalField[0], miMapField, NULL, miFinalStageField);
+
+	//Add Final Stage Field
+	mStageSettingsMenu.AddControl(miFinalStageField, miGoalField[GAMEMODE_LAST - 1], miMapField, miPointsField, NULL);
+
+	//Add Map Field
+	mStageSettingsMenu.AddControl(miMapField, miFinalStageField, miBonusType, NULL, miBonusItemsButton);
+
+	//Add Bonus House Fields
+	mStageSettingsMenu.AddControl(miBonusType, miMapField, miBonusTextField[0], NULL, NULL);
+	mStageSettingsMenu.AddControl(miBonusTextField[0], miBonusType, miBonusTextField[1], NULL, NULL);
+	mStageSettingsMenu.AddControl(miBonusTextField[1], miBonusTextField[0], miBonusTextField[2], NULL, NULL);
+	mStageSettingsMenu.AddControl(miBonusTextField[2], miBonusTextField[1], miBonusTextField[3], NULL, NULL);
+	mStageSettingsMenu.AddControl(miBonusTextField[3], miBonusTextField[2], miBonusTextField[4], NULL, NULL);
+	mStageSettingsMenu.AddControl(miBonusTextField[4], miBonusTextField[3], miBonusItemsButton, NULL, NULL);
+
+	//Add Bonus Button
+	mStageSettingsMenu.AddControl(miBonusItemsButton, miBonusTextField[4], miDeleteStageButton, miMapField, NULL);
+
+	//Add Delete Stage Button
+	mStageSettingsMenu.AddControl(miDeleteStageButton, miBonusItemsButton, miNameField, miMapField, NULL);
+
+	//Add Are You Sure Dialog
+	mStageSettingsMenu.AddNonControl(miDeleteStageDialogImage);
+	mStageSettingsMenu.AddNonControl(miDeleteStageDialogAreYouText);
+	mStageSettingsMenu.AddNonControl(miDeleteStageDialogSureText);
+
+	mStageSettingsMenu.AddControl(miDeleteStageDialogYesButton, NULL, NULL, NULL, miDeleteStageDialogNoButton);
+	mStageSettingsMenu.AddControl(miDeleteStageDialogNoButton, NULL, NULL, miDeleteStageDialogYesButton, NULL);
+
+	mStageSettingsMenu.SetHeadControl(miNameField);
+	mStageSettingsMenu.SetCancelCode(MENU_CODE_EXIT_APPLICATION);
+	
+	mBonusItemPicker.SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
+
+
+	modeOptionsMenu.CreateMenu();
+
+	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 
 	printf("\n---------------- ready, steady, go! ----------------\n");
 
@@ -483,7 +749,7 @@ int main(int argc, char *argv[])
 		fprintf(fp, worldlist.current_name());
 		fclose(fp);
 	}
-
+	
 	printf("\n---------------- shutdown ----------------\n");
 	return 0;
 }
@@ -3162,15 +3428,333 @@ void DisplayModeDetails(short iModeId, short iMouseX, short iMouseY)
 	menu_mode_large.draw(iMouseX, iMouseY, iModeId << 5, 0, 32, 32);
 }
 
+int g_iNumGameModeSettings[GAMEMODE_LAST] = {2,2,3,4,2,10,9,6,2,1,3,5,3,3,0,22,6,3,3,4,4,3};
+
+SDL_Rect rItemDst[NUM_WORLD_ITEMS];
+
+void SetBonusString(char * szString, short iPlace, short iItem, short iStageType)
+{
+	char cType = 'p';
+
+	if(iItem >= NUM_POWERUPS + NUM_WORLD_POWERUPS)
+	{
+		cType = 's';
+		iItem -= NUM_POWERUPS + NUM_WORLD_POWERUPS;
+	}
+	else if(iItem >= NUM_POWERUPS)
+	{
+		cType = 'w';
+		iItem -= NUM_POWERUPS;
+	}
+
+	if(iStageType == 0)
+	{
+		sprintf(szString, "%d%c%d", iPlace, cType, iItem);
+	}
+	else
+	{
+		sprintf(szString, "%c%d", cType, iItem);
+	}
+}
+
+void TestAndSetBonusItem(TourStop * ts, short iPlace, short iButtonX, short iButtonY)
+{
+	short iMaxBonusesAllowed = 10;
+
+	if(ts->iStageType == 1)
+		iMaxBonusesAllowed = MAX_BONUS_CHESTS;
+
+	if(ts->iNumBonuses < iMaxBonusesAllowed)
+	{
+		short iNumSelectableItems = NUM_WORLD_ITEMS;
+		if(ts->iStageType == 0)
+			iNumSelectableItems = NUM_POWERUPS + NUM_WORLD_POWERUPS;
+
+		for(short iItem = 0; iItem < iNumSelectableItems; iItem++)
+		{
+			if(iButtonX >= rItemDst[iItem].x && iButtonX < rItemDst[iItem].w + rItemDst[iItem].x &&
+				iButtonY >= rItemDst[iItem].y && iButtonY < rItemDst[iItem].h + rItemDst[iItem].y)
+			{
+				//If this is a normal stage, then alert the player that they need to select the place for this item
+				if(ts->iStageType == 0 && iPlace == 0)
+				{
+					SetDisplayMessage(120, "Use Number Keys", "Hover over item", "use keys 1 to 4", "to select bonus");
+					return;
+				}
+
+				//Set the bonus item for the place selected
+				ts->wsbBonuses[ts->iNumBonuses].iBonus = iItem;
+				ts->wsbBonuses[ts->iNumBonuses].iWinnerPlace = iPlace - 1;
+
+				SetBonusString(ts->wsbBonuses[ts->iNumBonuses].szBonusString, iPlace, iItem, ts->iStageType);
+
+				ts->iNumBonuses++;
+
+				break;
+			}
+		}
+	}
+}
+
+static short iLastStageType = 0;
+
+void AdjustBonuses(TourStop * ts)
+{
+	//No need to do anything if we were a stage and we're still a stage
+	//(or a house and still a house)
+	if(ts->iStageType == iLastStageType)
+		return;
+
+	if(ts->iStageType == 0)
+	{
+		//Remove any score bonuses
+		for(short iBonus = 0; iBonus < ts->iNumBonuses; iBonus++)
+		{
+			if(ts->wsbBonuses[iBonus].iBonus >= NUM_POWERUPS + NUM_WORLD_POWERUPS)
+			{
+				ts->iNumBonuses--;
+				for(short iRemoveBonus = iBonus; iRemoveBonus < ts->iNumBonuses; iRemoveBonus++)
+				{
+					ts->wsbBonuses[iRemoveBonus].iBonus = ts->wsbBonuses[iRemoveBonus + 1].iBonus;
+					ts->wsbBonuses[iRemoveBonus].iWinnerPlace = ts->wsbBonuses[iRemoveBonus + 1].iWinnerPlace;
+					strcpy(ts->wsbBonuses[iRemoveBonus].szBonusString, ts->wsbBonuses[iRemoveBonus + 1].szBonusString);
+				}
+			}
+		}
+
+		//Add places to bonuses
+		for(short iBonus = 0; iBonus < ts->iNumBonuses; iBonus++)
+		{
+			if(ts->wsbBonuses[iBonus].iWinnerPlace < 0 || ts->wsbBonuses[iBonus].iWinnerPlace > 3)
+				ts->wsbBonuses[iBonus].iWinnerPlace = 0;
+
+			SetBonusString(ts->wsbBonuses[iBonus].szBonusString, ts->wsbBonuses[iBonus].iWinnerPlace + 1, ts->wsbBonuses[iBonus].iBonus, ts->iStageType);
+		}
+	}
+	else if(ts->iStageType == 1)
+	{
+		//Cap the number of 
+		if(ts->iNumBonuses > MAX_BONUS_CHESTS)
+			ts->iNumBonuses = MAX_BONUS_CHESTS;
+
+		for(short iBonus = 0; iBonus < ts->iNumBonuses; iBonus++)
+		{
+			SetBonusString(ts->wsbBonuses[iBonus].szBonusString, 0, ts->wsbBonuses[iBonus].iBonus, ts->iStageType);
+		}
+	}
+
+	iLastStageType = ts->iStageType;
+}
+
+void EditStage(short iEditStage)
+{
+	memcpy(&game_values.gamemodemenusettings, &game_values.tourstops[iEditStage]->gmsSettings, sizeof(GameModeSettings));
+
+	//Set fields to write data to the selected stage
+	TourStop * ts = game_values.tourstops[iEditStage];
+
+	miModeField->SetData(&ts->iMode, NULL, NULL);
+	miNameField->SetData(ts->szName, 128);
+
+	miPointsField->SetData(&ts->iPoints, NULL, NULL);
+	miFinalStageField->SetData(NULL, NULL, &ts->fEndStage);
+
+	if(!ts->pszMapFile)
+		ts->pszMapFile = maplist.currentShortmapname();
+
+	miMapField->SetMap(ts->pszMapFile, false);
+
+	miBonusType->SetData(&ts->iBonusType, NULL, NULL);
+	miBonusTextField[0]->SetData(ts->szBonusText[0], 128);
+	miBonusTextField[1]->SetData(ts->szBonusText[1], 128);
+	miBonusTextField[2]->SetData(ts->szBonusText[2], 128);
+	miBonusTextField[3]->SetData(ts->szBonusText[3], 128);
+	miBonusTextField[4]->SetData(ts->szBonusText[4], 128);
+
+	ts->iBonusTextLines = 5;
+
+	short iMode = game_values.tourstops[iEditStage]->iMode;
+	short iStageType = game_values.tourstops[iEditStage]->iStageType;
+
+	//Show fields applicable for this mode
+	miPointsField->Show(iStageType == 0);
+	miFinalStageField->Show(iStageType == 0);
+	miMapField->Show(iStageType == 0 && iMode != 1000);
+
+	miBonusType->Show(iStageType == 1);
+	miBonusTextField[0]->Show(iStageType == 1);
+	miBonusTextField[1]->Show(iStageType == 1);
+	miBonusTextField[2]->Show(iStageType == 1);
+	miBonusTextField[3]->Show(iStageType == 1);
+	miBonusTextField[4]->Show(iStageType == 1);
+
+	miSpecialGoalField[0]->Show(iMode == 1000);
+
+	miBonusItemsButton->SetPosition(430, iStageType == 0 ? (iMode == 1000 ? 180 : 220) : 340);
+
+	if(iStageType == 0 && iMode >= 0 && iMode < GAMEMODE_LAST)
+	{
+		miModeField->SetKey(iMode);
+
+		miModeSettingsButton->Show(iMode != game_mode_owned);
+
+		for(short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++)
+		{
+			miGoalField[iGameMode]->Show(iMode == iGameMode);
+		}
+
+		miGoalField[iMode]->SetData(&game_values.tourstops[iEditStage]->iGoal, NULL, NULL);
+		miGoalField[iMode]->SetKey(game_values.tourstops[iEditStage]->iGoal);
+		miPointsField->SetKey(game_values.tourstops[iEditStage]->iPoints);
+		miFinalStageField->SetKey(game_values.tourstops[iEditStage]->fEndStage ? 1 : 0);
+	}
+	else
+	{
+		miModeSettingsButton->Show(false);
+
+		for(short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++)
+		{
+			miGoalField[iGameMode]->Show(false);
+		}
+
+		if(iStageType == 1) //Bonus House
+		{
+			miModeField->SetKey(24);
+		}
+		else if(iMode == 1000) //Pipe Game
+		{
+			miModeField->SetKey(25);
+			miPointsField->SetKey(game_values.tourstops[iEditStage]->iPoints);
+			miFinalStageField->SetKey(game_values.tourstops[iEditStage]->fEndStage ? 1 : 0);
+
+			//Have to set this back again since the SetKey() above will set it to 25
+			game_values.tourstops[iEditStage]->iMode = 1000;
+		}
+	}
+}
+
+void EnableStageMenu(bool fEnable)
+{
+	miNameField->Disable(!fEnable);
+	miModeField->Disable(!fEnable);
+
+	for(short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++)
+		miGoalField[iGameMode]->Disable(!fEnable);
+
+	miSpecialGoalField[0]->Disable(!fEnable);
+
+	//complete deleting stages using this button
+	//	and add Disable() to the button class (it isn't part of the base menu object class??)
+
+	//1) Scan stage use grid and remove any of the stage that is being deleted and shift
+	 //  every other number greater down by 1
+    //2) Remove stage from stage list
+	//3) Move menu back to stage select screen
+
+	miModeSettingsButton->Disable(!fEnable);
+
+	miPointsField->Disable(!fEnable);
+	miFinalStageField->Disable(!fEnable);
+	miMapField->Disable(!fEnable);
+	miBonusItemsButton->Disable(!fEnable);
+	miBonusType->Disable(!fEnable);
+	miBonusTextField[0]->Disable(!fEnable);
+	miBonusTextField[1]->Disable(!fEnable);
+	miBonusTextField[2]->Disable(!fEnable);
+	miBonusTextField[3]->Disable(!fEnable);
+	miBonusTextField[4]->Disable(!fEnable);
+	miDeleteStageButton->Disable(!fEnable);
+}
+
+void NewStage(short * iEditStage)
+{
+	TourStop * ts = new TourStop();
+	ts->fUseSettings = false;
+	ts->iNumUsedSettings = 0;
+
+	ts->iStageType = 0;
+
+	ts->szBonusText[0][0] = 0;
+	ts->szBonusText[1][0] = 0;
+	ts->szBonusText[2][0] = 0;
+	ts->szBonusText[3][0] = 0;
+	ts->szBonusText[4][0] = 0;
+
+	ts->pszMapFile = maplist.currentShortmapname();
+	ts->iMode = 0;
+
+	ts->iGoal = 10;
+	ts->iPoints = 1;
+
+	ts->iBonusType = 0;
+	ts->iNumBonuses = 0;
+
+	sprintf(ts->szName, "Tour Stop %d", game_values.tourstoptotal + 1);
+
+	ts->fEndStage = false;
+	
+	//Copy in default values first
+	memcpy(&ts->gmsSettings, &game_values.gamemodemenusettings, sizeof(GameModeSettings));
+
+	game_values.tourstops.push_back(ts);
+	game_values.tourstoptotal++;
+	g_worldmap.iNumStages++;
+
+	*iEditStage = game_values.tourstoptotal - 1;
+	EditStage(*iEditStage);
+}
+
 int editor_stage()
 {
 	bool done = false;
-	int iModeDisplay = -1;
-	int iEditStage = 0;
-	
+	short iModeDisplay = -1;
+	short iEditStage = -1;	
+
+	SDL_Rect rStageBonusDst[10];
+	SDL_Rect rHouseBonusDst[MAX_BONUS_CHESTS];
+
+	short iColCount = 0;
+	short iRowCount = 0;
+	for(short iItem = 0; iItem < NUM_WORLD_ITEMS; iItem++)
+	{
+		rItemDst[iItem].x = 16 + iColCount * 48;
+		rItemDst[iItem].y = 16 + iRowCount * 48;
+		rItemDst[iItem].w = 32;
+		rItemDst[iItem].h = 32;
+		
+		if(++iColCount > 12)
+		{
+			iColCount = 0;
+			iRowCount++;
+		}
+	}
+
+	for(short iStageBonus = 0; iStageBonus < 10; iStageBonus++)
+	{
+		rStageBonusDst[iStageBonus].x = 35 + iStageBonus * 58;  
+		rStageBonusDst[iStageBonus].y = 360;
+		rStageBonusDst[iStageBonus].w = 32;
+		rStageBonusDst[iStageBonus].h = 32;
+	}
+
+	short iStartItemX = (640 - (MAX_BONUS_CHESTS * 58 - 10)) >> 1;
+
+	for(short iHouseBonus = 0; iHouseBonus < MAX_BONUS_CHESTS; iHouseBonus++)
+	{
+		rHouseBonusDst[iHouseBonus].x = iStartItemX + iHouseBonus * 58;  
+		rHouseBonusDst[iHouseBonus].y = 360;
+		rHouseBonusDst[iHouseBonus].w = 32;
+		rHouseBonusDst[iHouseBonus].h = 32;
+	}
+
 	while (!done)
 	{
 		int framestart = SDL_GetTicks();
+
+		//Reset the keys that were down the last frame
+		game_values.playerInput.ClearPressedKeys(1);
+
+		MenuCodeEnum code = MENU_CODE_NONE;
 
 		//handle messages
 		while(SDL_PollEvent(&event))
@@ -3185,42 +3769,131 @@ int editor_stage()
 
 				case SDL_KEYDOWN:
 				{
-					edit_mode = 9;  //change to edit mode using stages
-					return EDITOR_EDIT;
+					TourStop * ts = game_values.tourstops[iEditStage];
+
+					if(!mCurrentMenu->IsModifying() && event.key.keysym.sym == SDLK_s)
+					{
+						savecurrentworld();
+					}
+					else if(mCurrentMenu == &mStageSettingsMenu && event.key.keysym.sym == SDLK_n)
+					{
+						NewStage(&iEditStage);
+					}
+					else if(event.key.keysym.sym == SDLK_ESCAPE && iEditStage == -1)
+					{
+						edit_mode = 9;  //change to edit mode using stages
+						return EDITOR_EDIT;
+					}
+					else if(event.key.keysym.sym >= SDLK_1 && event.key.keysym.sym <= SDLK_4 && mCurrentMenu == &mBonusItemPicker && ts->iStageType == 0)
+					{
+						short iPlace = event.key.keysym.sym - SDLK_1 + 1;
+
+						int iMouseX, iMouseY;
+						SDL_GetMouseState(&iMouseX, &iMouseY);
 				
+						TestAndSetBonusItem(ts, iPlace, iMouseX, iMouseY);
+					}
+					else if((event.key.keysym.sym == SDLK_PAGEUP && iEditStage > 0) || 
+						(event.key.keysym.sym == SDLK_PAGEDOWN && iEditStage < g_worldmap.iNumStages - 1))
+					{
+						if(iEditStage != -1 && mCurrentMenu == &mStageSettingsMenu)
+						{
+							if(event.key.keysym.sym == SDLK_PAGEUP)
+								iEditStage--;
+							else if(event.key.keysym.sym == SDLK_PAGEDOWN)
+								iEditStage++;
+
+							EditStage(iEditStage);
+							mCurrentMenu->ResetMenu();
+
+							code = MENU_CODE_MODE_CHANGED;
+
+							modeOptionsMenu.Refresh();
+						}
+					}
+
 					break;
 				}
 
 				case SDL_MOUSEBUTTONDOWN:
 				{
-					short iButtonX = event.button.x / TILESIZE;
-					short iButtonY = event.button.y / TILESIZE;
+					short iTileX = event.button.x / TILESIZE;
+					short iTileY = event.button.y / TILESIZE;
+					short iButtonX = event.button.x;
+					short iButtonY = event.button.y;
 
 					if(event.button.button == SDL_BUTTON_LEFT)
 					{
 						//Stages
-						if(iButtonX >= 0 && iButtonX < g_worldmap.iNumStages - (iButtonY * 20) && iButtonY >= 0 && iButtonY <= (g_worldmap.iNumStages - 1) / 20)
+						if(iEditStage == -1)
 						{
-							set_tile = iButtonX + (iButtonY * 20) + 6;
+							if(iTileX >= 0 && iTileX < g_worldmap.iNumStages - (iTileY * 20) && iTileY >= 0 && iTileY <= (g_worldmap.iNumStages - 1) / 20)
+							{
+								set_tile = iTileX + (iTileY * 20) + 6;
 
-							edit_mode = 9;  //change to edit mode using warps
-						
-							//The user must release the mouse button before trying to add a tile
-							ignoreclick = true;
+								edit_mode = 9;  //change to edit mode using warps
 							
-							return EDITOR_EDIT;
+								//The user must release the mouse button before trying to add a tile
+								ignoreclick = true;
+								
+								return EDITOR_EDIT;
+							}
+							//New stage button
+							else if(iButtonX >= 256 && iButtonX < 384 && iButtonY >= 420 && iButtonY < 452)
+							{
+								NewStage(&iEditStage);
+							}
 						}
-						//New stage button
-						else if(iButtonX >= 200 && iButtonX < 300 && iButtonY >= 20 && iButtonY < 30)
+						else if(mCurrentMenu == &mBonusItemPicker)
 						{
+							TourStop * ts = game_values.tourstops[iEditStage];
+
+							//See if we clicked an item and add it if we did
+							TestAndSetBonusItem(ts, 0, iButtonX, iButtonY);
 							
+							//See if we clicked an already added item and remove it
+							for(short iRemoveItem = 0; iRemoveItem < ts->iNumBonuses; iRemoveItem++)
+							{
+								SDL_Rect * rects = rStageBonusDst;
+
+								if(ts->iStageType == 1)
+									rects = rHouseBonusDst;
+
+								if(iButtonX >= rects[iRemoveItem].x && iButtonX < rects[iRemoveItem].w + rects[iRemoveItem].x &&
+									iButtonY >= rects[iRemoveItem].y && iButtonY < rects[iRemoveItem].h + rects[iRemoveItem].y)
+								{
+									for(short iAdjust = iRemoveItem; iAdjust < ts->iNumBonuses - 1; iAdjust++)
+									{
+										ts->wsbBonuses[iAdjust].iBonus = ts->wsbBonuses[iAdjust + 1].iBonus;
+										ts->wsbBonuses[iAdjust].iWinnerPlace = ts->wsbBonuses[iAdjust + 1].iWinnerPlace;
+										strcpy(ts->wsbBonuses[iAdjust].szBonusString, ts->wsbBonuses[iAdjust + 1].szBonusString);
+									}
+
+									ts->iNumBonuses--;
+
+									break;
+								}
+							}
+						}
+						else
+						{
+							code = mCurrentMenu->MouseClick(iButtonX, iButtonY);
 						}
 					}
 					else if(event.button.button == SDL_BUTTON_RIGHT)
 					{
-						iEditStage = iButtonX + (iButtonY * 20);
+						if(iEditStage == -1)
+						{
+							if(iTileX >= 0 && iTileX < g_worldmap.iNumStages - (iTileY * 20) && iTileY >= 0 && iTileY <= (g_worldmap.iNumStages - 1) / 20)
+							{
+								iEditStage = iTileX + (iTileY * 20);
+								EditStage(iEditStage);
 
+								code = MENU_CODE_MODE_CHANGED;
 
+								modeOptionsMenu.Refresh();
+							}
+						}
 					}
 			
 					break;
@@ -3230,43 +3903,343 @@ int editor_stage()
 				{
 					iModeDisplay = -1;
 
-					short iMouseX = event.button.x / TILESIZE;
-					short iMouseY = event.button.y / TILESIZE;
-					
-					if(iMouseX >= 0 && iMouseX < g_worldmap.iNumStages - (iMouseY * 20) && iMouseY >= 0 && iMouseY <= (g_worldmap.iNumStages - 1) / 20)
+					if(iEditStage == -1)
 					{
-						iModeDisplay = game_values.tourstops[iMouseX + (iMouseY * 20)]->iMode;
+						if(event.button.x >= 0 && event.button.y >= 0)
+						{
+							short iMouseX = event.button.x / TILESIZE;
+							short iMouseY = event.button.y / TILESIZE;
+							
+							if(iMouseX >= 0 && iMouseX < g_worldmap.iNumStages - (iMouseY * 20) && iMouseY >= 0 && iMouseY <= (g_worldmap.iNumStages - 1) / 20)
+							{
+								TourStop * ts = game_values.tourstops[iMouseX + (iMouseY * 20)];
+
+								if(ts->iStageType == 1)
+								{
+									iModeDisplay = 24;
+								}
+								else
+								{
+									iModeDisplay = (ts->iMode == 1000 ? 25 : ts->iMode);
+								}
+							}
+						}
 					}
 				}
 
 				default:
 					break;
 			}
+
+			game_values.playerInput.Update(event, 1);
 		}
 
-		
+		if(iEditStage >= 0)
+		{
+			if(MENU_CODE_NONE == code)
+			{
+				code = mCurrentMenu->SendInput(&game_values.playerInput);
+			}
+			
+			if(MENU_CODE_EXIT_APPLICATION == code)
+			{
+				//Set the number of game mode settings to the maximum so we write them all out
+				game_values.tourstops[iEditStage]->iNumUsedSettings = g_iNumGameModeSettings[game_values.tourstops[iEditStage]->iMode];
+
+				//Copy the working values back into the structure that will be saved
+				memcpy(&game_values.tourstops[iEditStage]->gmsSettings, &game_values.gamemodemenusettings, sizeof(GameModeSettings));
+				
+				if(game_values.tourstops[iEditStage]->iMode == 25)
+					game_values.tourstops[iEditStage]->iMode = 1000;
+
+				//We are no longer working on a specific stage
+				iEditStage = -1;
+			}
+			else if(MENU_CODE_MODE_CHANGED == code)
+			{
+				short iMode = miModeField->GetShortValue();
+
+				miPointsField->Show(iMode != 24);
+				miFinalStageField->Show(iMode != 24);
+
+				miMapField->Show(iMode < 24);
+
+				miBonusType->Show(iMode == 24);
+				miBonusTextField[0]->Show(iMode == 24);
+				miBonusTextField[1]->Show(iMode == 24);
+				miBonusTextField[2]->Show(iMode == 24);
+				miBonusTextField[3]->Show(iMode == 24);
+				miBonusTextField[4]->Show(iMode == 24);
+
+				miSpecialGoalField[0]->Show(iMode == 25);
+
+				miBonusItemsButton->SetPosition(430, iMode != 24 ? (iMode == 25 ? 180 : 220) : 340);
+
+				if(iMode >= 0 && iMode < GAMEMODE_LAST)
+				{
+					//game_values.gamemode = gamemodes[miModeField->GetShortValue()];
+					miModeSettingsButton->Show(iMode != game_mode_owned);
+
+					for(short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++)
+					{
+						miGoalField[iGameMode]->Show(iMode == iGameMode);
+					}
+
+					miGoalField[iMode]->SetData(&game_values.tourstops[iEditStage]->iGoal, NULL, NULL);
+					miGoalField[iMode]->SetValues();
+					
+					game_values.tourstops[iEditStage]->iStageType = 0;
+				}
+				else
+				{
+					miModeSettingsButton->Show(false);
+					for(short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++)
+						miGoalField[iGameMode]->Show(false);
+
+					if(iMode == 24)
+					{
+						game_values.tourstops[iEditStage]->iStageType = 1;
+						game_values.tourstops[iEditStage]->iBonusTextLines = 5;
+					}
+					else if(iMode == 25)
+					{
+						game_values.tourstops[iEditStage]->iStageType = 0;
+					}
+				}
+
+				//Removes bonuses if we went from a stage to a bonus house
+				//(and there were more than the max bonuses for a house)
+				AdjustBonuses(game_values.tourstops[iEditStage]);
+
+			}
+			else if (MENU_CODE_TO_MODE_SETTINGS_MENU == code)
+			{
+				for(short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++)
+				{
+					if(miGoalField[iGameMode]->IsVisible())
+					{
+						mCurrentMenu = modeOptionsMenu.GetOptionsMenu(iGameMode);
+						mCurrentMenu->ResetMenu();
+						break;
+					}
+				}
+			}
+			else if(MENU_CODE_HEALTH_MODE_START_LIFE_CHANGED == code)
+			{
+				modeOptionsMenu.HealthModeStartLifeChanged();
+			}
+			else if(MENU_CODE_HEALTH_MODE_MAX_LIFE_CHANGED == code)
+			{
+				modeOptionsMenu.HealthModeMaxLifeChanged();
+			}
+			else if(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS == code)
+			{
+				mCurrentMenu = &mStageSettingsMenu;
+				mCurrentMenu->ResetMenu();
+			}
+			else if(MENU_CODE_MAP_CHANGED == code)
+			{
+				game_values.tourstops[iEditStage]->pszMapFile = maplist.currentShortmapname();
+			}
+			else if(MENU_CODE_TO_BONUS_PICKER_MENU == code)
+			{
+				mCurrentMenu = &mBonusItemPicker;
+				mCurrentMenu->ResetMenu();
+			}
+			else if(MENU_CODE_DELETE_STAGE_BUTTON == code)
+			{
+				miDeleteStageDialogImage->Show(true);
+				miDeleteStageDialogAreYouText->Show(true);
+				miDeleteStageDialogSureText->Show(true);
+				miDeleteStageDialogYesButton->Show(true);
+				miDeleteStageDialogNoButton->Show(true);
+
+				EnableStageMenu(false);
+
+				mStageSettingsMenu.RememberCurrent();
+
+				mStageSettingsMenu.SetHeadControl(miDeleteStageDialogNoButton);
+				mStageSettingsMenu.SetCancelCode(MENU_CODE_DELETE_STAGE_NO);
+				mStageSettingsMenu.ResetMenu();
+			}
+			else if(MENU_CODE_DELETE_STAGE_YES == code || MENU_CODE_DELETE_STAGE_NO == code)
+			{
+				miDeleteStageDialogImage->Show(false);
+				miDeleteStageDialogAreYouText->Show(false);
+				miDeleteStageDialogSureText->Show(false);
+				miDeleteStageDialogYesButton->Show(false);
+				miDeleteStageDialogNoButton->Show(false);
+
+				mStageSettingsMenu.SetHeadControl(miNameField);
+				mStageSettingsMenu.SetCancelCode(MENU_CODE_EXIT_APPLICATION);
+				mStageSettingsMenu.RestoreCurrent();
+
+				//Yes was selected to delete this stage
+				if(MENU_CODE_DELETE_STAGE_YES == code)
+				{
+					//Scan the grid of stages and remove any references to this stage
+					//and decrement stage numbers greater than this stage
+					for(short iRow = 0; iRow < iWorldHeight; iRow++)
+					{
+						for(short iCol = 0; iCol < iWorldWidth; iCol++)
+						{
+							if(g_worldmap.tiles[iCol][iRow].iType == iEditStage + 6)
+							{
+								g_worldmap.tiles[iCol][iRow].iType = 0;
+							}
+							else if(g_worldmap.tiles[iCol][iRow].iType > iEditStage + 6)
+							{
+								g_worldmap.tiles[iCol][iRow].iType--;
+							}
+						}
+					}
+					
+					std::vector<TourStop*>::iterator iter = game_values.tourstops.begin(), lim = game_values.tourstops.end();
+	
+					short iIndex = 0;
+					while (iter != lim)
+					{
+						if(iIndex == iEditStage)
+						{
+							delete (*iter);
+							
+							game_values.tourstops.erase(iter);
+							game_values.tourstoptotal--;
+							g_worldmap.iNumStages--;
+
+							break;
+						}
+						
+						++iter;
+						++iIndex;
+					}
+
+					iEditStage = -1;
+					mCurrentMenu = &mStageSettingsMenu;
+					mCurrentMenu->ResetMenu();
+				}
+
+				EnableStageMenu(true);
+			}
+		}
+
 		drawmap(false, TILESIZE);
 		menu_shade.draw(0, 0);
 
 		int color = SDL_MapRGB(blitdest->format, 0, 0, 255);
-		for(short iStage = 0; iStage < g_worldmap.iNumStages; iStage++)
+
+		if(iEditStage == -1)
 		{
-			short ix = (iStage % 20) << 5;
-			short iy = ((iStage / 20) << 5);
+			for(short iStage = 0; iStage < g_worldmap.iNumStages; iStage++)
+			{
+				short ix = (iStage % 20) << 5;
+				short iy = ((iStage / 20) << 5);
 
-			SDL_Rect r = {ix, iy, 32, 32};
-			SDL_FillRect(blitdest, &r, color);
+				SDL_Rect r = {ix, iy, 32, 32};
+				SDL_FillRect(blitdest, &r, color);
 
-			spr_worldforegroundspecial[0].draw(ix, iy, (iStage % 10) << 5, (iStage / 10) << 5, 32, 32);
+				spr_worldforegroundspecial[0].draw(ix, iy, (iStage % 10) << 5, (iStage / 10) << 5, 32, 32);
+			}
+
+			if(iModeDisplay >= 0)
+			{
+				int iMouseX, iMouseY;
+				SDL_GetMouseState(&iMouseX, &iMouseY);
+							
+				DisplayModeDetails(iModeDisplay, iMouseX, iMouseY);
+			}
+
+			//Display New button
+			spr_selectfield.draw(256, 420, 0, 0, 64, 32);
+			spr_selectfield.draw(320, 420, 448, 0, 64, 32);
+
+			menu_font_large.drawCentered(320, 425, "New Stage");
+
+			menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "[LMB] Select Stage, [RMB] Edit Stage, [n] New Stage");
 		}
-		
+		else
+		{
+			mCurrentMenu->Update();
+			mCurrentMenu->Draw();
+
+			if(mCurrentMenu != &mBonusItemPicker)
+			{
+				short ix = 20;
+				short iy = 20;
+
+				SDL_Rect r = {ix, iy, 32, 32};
+				SDL_FillRect(blitdest, &r, color);
+
+				spr_worldforegroundspecial[0].draw(ix, iy, (iEditStage % 10) << 5, (iEditStage / 10) << 5, 32, 32);
+			}
+		}
+
+		if(mCurrentMenu == &mBonusItemPicker)
+		{
+			TourStop * ts = game_values.tourstops[iEditStage];
+
+			//Game powerups
+			for(short iItem = 0; iItem < NUM_POWERUPS; iItem++)
+			{
+				spr_storedpoweruplarge.draw(rItemDst[iItem].x, rItemDst[iItem].y, iItem << 5, 0, 32, 32);
+			}
+
+			//World Powerups
+			for(short iWorldItem = 0; iWorldItem < NUM_WORLD_POWERUPS; iWorldItem++)
+			{
+				spr_worlditems.draw(rItemDst[iWorldItem + NUM_POWERUPS].x, rItemDst[iWorldItem + NUM_POWERUPS].y, iWorldItem << 5, 0, 32, 32);
+			}
+
+			//Score Bonuses
+			if(ts->iStageType == 1)
+			{
+				for(short iScoreBonus = 0; iScoreBonus < NUM_WORLD_SCORE_BONUSES; iScoreBonus++)
+				{
+					spr_worlditems.draw(rItemDst[iScoreBonus + NUM_POWERUPS + NUM_WORLD_POWERUPS].x, rItemDst[iScoreBonus + NUM_POWERUPS + NUM_WORLD_POWERUPS].y, iScoreBonus < 10 ? iScoreBonus << 5 : (iScoreBonus - 10) << 5, iScoreBonus < 10 ? 32 : 64, 32, 32);
+				}
+			}
+
+			//Draw background container
+			spr_worldpopup.draw(0, 344, 0, 0, 320, 64);
+			spr_worldpopup.draw(320, 344, 192, 0, 320, 64);
+
+			SDL_Rect * rects = rStageBonusDst;
+
+			if(ts->iStageType == 1)
+				rects = rHouseBonusDst;
+
+			for(short iPickedItem = 0; iPickedItem < ts->iNumBonuses; iPickedItem++)
+			{
+				short iBonus = ts->wsbBonuses[iPickedItem].iBonus;
+				short iPlace = ts->wsbBonuses[iPickedItem].iWinnerPlace;
+
+				//Draw place behind bonus
+				if(ts->iStageType == 0)
+					spr_worldpopup.draw(rects[iPickedItem].x - 8, rects[iPickedItem].y - 8, iPlace * 48, 256, 48, 48);
+
+				if(iBonus >= NUM_POWERUPS + NUM_WORLD_POWERUPS)
+				{
+					short iBonusIndex = iBonus - NUM_POWERUPS - NUM_WORLD_POWERUPS;
+					spr_worlditems.draw(rects[iPickedItem].x, rects[iPickedItem].y, iBonusIndex < 10 ? iBonusIndex << 5 : (iBonusIndex - 10) << 5, iBonusIndex < 10 ? 32 : 64, 32, 32);
+				}
+				else if(iBonus >= NUM_POWERUPS)
+				{
+					spr_worlditems.draw(rects[iPickedItem].x, rects[iPickedItem].y, (iBonus - NUM_POWERUPS) << 5, 0, 32, 32);
+				}
+				else
+				{
+					spr_storedpoweruplarge.draw(rects[iPickedItem].x, rects[iPickedItem].y, iBonus << 5, 0, 32, 32);
+				}
+			}
+
+			if(ts->iStageType == 0)
+				menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "[1-4] Select Items, [LMB] Remove Items");
+			else
+				menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "[LMB] Select Items, [LMB] Remove Items");
+		}
+
 		menu_font_small.drawRightJustified(640, 0, worldlist.current_name());
-
-		if(iModeDisplay >= 0)
-		{
-			DisplayModeDetails(iModeDisplay, event.button.x, event.button.y);
-		}
-
+		
 		DrawMessage();
 		SDL_Flip(screen);
 
@@ -3633,16 +4606,21 @@ void loadcurrentworld()
 
 int savecurrentworld()
 {
-	g_messagedisplaytimer = 60;
-	g_szMessageTitle = "Saved";
-	g_szMessageLine[0] = "Your world has";
-	g_szMessageLine[1] = "been saved.";
-	g_szMessageLine[2] = "";
+	SetDisplayMessage(60, "Saved", "Your world has", "been saved.", "");
 
 	WriteVehiclesIntoWorld();
 	WriteWarpsIntoWorld();
 	g_worldmap.Save();
 	return 0;
+}
+
+void SetDisplayMessage(short iTime, char * szTitle, char * szLine1, char * szLine2, char * szLine3)
+{
+	g_messagedisplaytimer = iTime;
+	g_szMessageTitle = szTitle;
+	g_szMessageLine[0] = szLine1;
+	g_szMessageLine[1] = szLine2;
+	g_szMessageLine[2] = szLine3;
 }
 
 int findcurrentstring()

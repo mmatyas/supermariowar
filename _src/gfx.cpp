@@ -1167,6 +1167,14 @@ void gfxFont::drawChopRight(int x, int y, int width, const char *s)
 	SFont_WriteChopRight(blitdest, m_font, x, y, width, s);
 }
 
+void gfxFont::drawChopLeft(int x, int y, int width, const char *s)
+{
+	//if(y + getHeight() < 0)
+	//	return;
+		
+	SFont_WriteChopLeft(blitdest, m_font, x, y, width, s);
+}
+
 void gfxFont::drawCentered(int x, int y, const char *text)
 {
 	//if(y + getHeight() < 0)

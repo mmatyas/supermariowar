@@ -221,11 +221,13 @@ void SFont_WriteChopCenter(SDL_Surface *Surface, const SFont_Font* Font, int x, 
 	SFont_WriteCenter(Surface, Font, x, y, szText);
 }
 
+//Right Aligned
 void SFont_WriteRight(SDL_Surface *Surface, const SFont_Font *Font, int x, int y, const char *text)
 {
     SFont_Write(Surface, Font, x - SFont_TextWidth(Font, text), y, text);
 }
 
+//Left aligned with fixed width
 void SFont_WriteChopRight(SDL_Surface *Surface, const SFont_Font *Font,
 		 int x, int y, int w, const char *text)
 {
@@ -233,6 +235,8 @@ void SFont_WriteChopRight(SDL_Surface *Surface, const SFont_Font *Font,
     int charoffset;
     SDL_Rect srcrect, dstrect;
 	int startx = x;
+	int width = 0;
+	int charsize = sizeof(char);
 
     if(text == NULL)
 		return;
@@ -241,7 +245,7 @@ void SFont_WriteChopRight(SDL_Surface *Surface, const SFont_Font *Font,
     srcrect.y = 1;
     srcrect.h = dstrect.h = (Uint16)Font->Surface->h - 1;
 
-	for(c = text; *c != '\0' && x <= Surface->w ; c++) 
+	for(c = text; *c != '\0' && x <= Surface->w ; c += charsize)
 	{
 		charoffset = ((int) (*c - 33)) * 2 + 1;
 		// skip spaces and nonprintable characters
@@ -255,7 +259,9 @@ void SFont_WriteChopRight(SDL_Surface *Surface, const SFont_Font *Font,
 			(((Font->CharPos[charoffset+2] + Font->CharPos[charoffset+1]) >> 1) -
 			((Font->CharPos[charoffset] + Font->CharPos[charoffset-1]) >> 1));
 		
-		if(x - startx + srcrect.w > w)
+		width = Font->CharPos[charoffset+1] - Font->CharPos[charoffset];
+
+		if(x - startx + width > w)
 			break;
 
 		srcrect.x = (Sint16)(Font->CharPos[charoffset] + Font->CharPos[charoffset-1]) >> 1;
@@ -269,7 +275,65 @@ void SFont_WriteChopRight(SDL_Surface *Surface, const SFont_Font *Font,
 
 		SDL_BlitSurface(Font->Surface, &srcrect, Surface, &dstrect); 
 
-		x += Font->CharPos[charoffset+1] - Font->CharPos[charoffset];
+		x += width;
+    }
+}
+
+//Right aligned with fixed width
+void SFont_WriteChopLeft(SDL_Surface *Surface, const SFont_Font *Font,
+		 int x, int y, int w, const char *text)
+{
+    const char* c;
+    int charoffset;
+    SDL_Rect srcrect, dstrect;
+	int charsize = sizeof(char);
+	int width = 0;
+	short iPrintedWidth = 0;
+	int startx = x;
+
+    if(text == NULL)
+		return;
+
+    // these values won't change in the loop
+    srcrect.y = 1;
+    srcrect.h = dstrect.h = (Uint16)Font->Surface->h - 1;
+
+	for(c = text + (strlen(text) - 1) * charsize; c >= text && x >= startx - w ; c -= charsize) 
+	{
+		charoffset = ((int) (*c - 33)) * 2 + 1;
+		// skip spaces and nonprintable characters
+		if (*c == ' ' || charoffset < 0 || charoffset > Font->MaxPos) 
+		{
+			width = Font->CharPos[2] - Font->CharPos[1];
+			x -= width;
+
+			iPrintedWidth += width;
+			continue;
+		}
+
+		srcrect.w = dstrect.w = (Sint16)
+			(((Font->CharPos[charoffset+2] + Font->CharPos[charoffset+1]) >> 1) -
+			((Font->CharPos[charoffset] + Font->CharPos[charoffset-1]) >> 1));
+		
+		width = Font->CharPos[charoffset+1] - Font->CharPos[charoffset];
+
+		iPrintedWidth += width;
+
+		if(iPrintedWidth > w)
+			break;
+
+		x -= width;
+
+		srcrect.x = (Sint16)(Font->CharPos[charoffset] + Font->CharPos[charoffset-1]) >> 1;
+		dstrect.x = (short) (x - (float)((Font->CharPos[charoffset]
+					- Font->CharPos[charoffset-1]) >> 1)) + x_shake;
+
+		dstrect.y = (Sint16)(y + y_shake);
+
+		//x -= (width - srcrect.w);
+
+		SDL_BlitSurface(Font->Surface, &srcrect, Surface, &dstrect); 
+		
     }
 }
 

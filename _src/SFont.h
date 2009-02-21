@@ -80,6 +80,7 @@ void SFont_WriteChopCenter(SDL_Surface *Surface, const SFont_Font* Font, int x, 
 void SFont_WriteRight(SDL_Surface *Surface, const SFont_Font *Font, int x, int y, const char *text);
 
 void SFont_WriteChopRight(SDL_Surface *Surface, const SFont_Font *Font, int x, int y, int w, const char *text);
+void SFont_WriteChopLeft(SDL_Surface *Surface, const SFont_Font *Font, int x, int y, int w, const char *text);
 
 #ifdef __cplusplus
 }

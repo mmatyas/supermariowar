@@ -132,9 +132,12 @@ void CPlayerInput::Update(SDL_Event event, short iGameState)
 		}
 		else
 		{
+			if(!inputControls[iPlayer])
+				continue;
+
 			inputControl = &inputControls[iPlayer]->inputGameControls[iGameState];
 			outputControl = &outputControls[iPlayer];
-			iDeviceID = inputControls[iPlayerID]->iDevice;
+			iDeviceID = inputControls[iPlayer]->iDevice;
 		}
 		
 		if(iDeviceID == DEVICE_KEYBOARD)

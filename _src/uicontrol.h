@@ -46,11 +46,18 @@ class UI_Control
 
 		void SetControllingTeam(short teamid) {iControllingTeam = teamid;}
 
+		virtual MenuCodeEnum MouseClick(short iMouseX, short iMouseY) {return MENU_CODE_NONE;}
+
+		virtual void Refresh() {}
+
+		virtual void Disable(bool disable) {fDisable = disable;}
+
 	protected:
 
 		bool fSelected;
 		bool fModifying;
 		bool fAutoModify;
+		bool fDisable;
 
 		short ix, iy;
 
@@ -83,8 +90,11 @@ class MI_Image : public UI_Control
 		void SetPulse(bool pulse) {fPulse = pulse;}
 		void SetSwirl(bool swirl, float radius, float angle, float radiusSpeed, float angleSpeed) {fSwirl = swirl; dSwirlRadius = radius; dSwirlAngle = angle; dSwirlRadiusSpeed = radiusSpeed; dSwirlAngleSpeed = angleSpeed;}
 		void StopSwirl() {SetSwirl(false, 0.0f, 0.0f, 0.0f, 0.0f);}
+		void SetBlink(bool blink, short interval) {fBlink = blink; iBlinkInterval = interval;}
 
 		bool IsSwirling() {return fSwirl;}
+
+		void GetPositionAndSize(short * x, short * y, short * w, short * h) {*x = ix; *y = iy; *w = iw; *h = ih;}
 
 	private:
 		gfxSprite * spr;
@@ -104,6 +114,11 @@ class MI_Image : public UI_Control
 		float dSwirlAngle;
 		float dSwirlRadiusSpeed;
 		float dSwirlAngleSpeed;
+
+		bool fBlink;
+		short iBlinkInterval;
+		short iBlinkCounter;
+		bool fBlinkShow;
 };
 
 class MI_Text : public UI_Control
@@ -156,6 +171,8 @@ class MI_IPField : public UI_Control
 		MenuCodeEnum SendInput(CPlayerInput * playerInput);
 		MenuCodeEnum Modify(bool modify);
 		
+		MenuCodeEnum MouseClick(short iMouseX, short iMouseY);
+
 	private:
 
 		void AssignHostAddress();
@@ -219,7 +236,6 @@ class MI_SelectField : public UI_Control
 		//When this control is selected, advance the value one instead of modifying the control
 		void SetAutoAdvance(bool advance) {fAutoAdvance = advance;}
 		void SetNoWrap(bool nowrap) {fNoWrap = nowrap;}
-		void Disable(bool disable) {fDisable = disable;}
 
 		//Gets the values of the currently selected item
 		short GetShortValue() {return (*current)->iValue;}
@@ -263,9 +279,14 @@ class MI_SelectField : public UI_Control
 		//Set where the data of this control is written to (some member of game_values probably)
 		void SetData(short * ivalue, std::string * svalue, bool * fvalue) {iValue = ivalue; sValue = svalue; fValue = fvalue;}
 		
-	protected:
+		MenuCodeEnum MouseClick(short iMouseX, short iMouseY);
+
+		void Refresh();
 
 		void SetValues();
+
+	protected:
+		
 		bool MoveNext();
 		bool MovePrev();
 		bool MoveRandom();
@@ -294,7 +315,6 @@ class MI_SelectField : public UI_Control
 
 		bool fAutoAdvance;
 		bool fNoWrap;
-		bool fDisable;
 
 		short iAdjustmentY;
 };
@@ -329,6 +349,8 @@ class MI_Button : public UI_Control
 		void SetName(const char * name);
 		void SetCode(MenuCodeEnum code) {menuCode = code;}
 		void SetImage(gfxSprite * nsprImage, short x, short y, short w, short h);
+
+		MenuCodeEnum MouseClick(short iMouseX, short iMouseY);
 
 	protected:
 
@@ -409,6 +431,10 @@ class MI_FrenzyModeOptions : public UI_Control
 
 		void SetRandomGameModeSettings();
 
+		MenuCodeEnum MouseClick(short iMouseX, short iMouseY);
+
+		void Refresh();
+
 	private:
 		
 		void SetupPowerupFields();
@@ -429,6 +455,132 @@ class MI_FrenzyModeOptions : public UI_Control
 
 		MI_Image * miUpArrow;
 		MI_Image * miDownArrow;
+};
+
+class MI_TextField : public UI_Control
+{
+	public:
+
+		MI_TextField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent);
+		virtual ~MI_TextField();
+
+		void SetTitle(char * name);
+
+		//Gets the values of the currently selected item
+		char * GetValue() {return szValue;}
+
+		//Called when user selects this control to change it's value
+		MenuCodeEnum Modify(bool modify);
+
+		void Clear() {szValue[0] = 0; iCursorIndex = 0; iNumChars = 1;}
+
+		//Updates animations or other events every frame
+		void Update();
+
+		//Draws every frame
+		virtual void Draw();
+
+		//Sends player input to control on every frame
+		virtual MenuCodeEnum SendInput(CPlayerInput * playerInput);
+
+		//When the item is changed, this code will be returned from SendInput()
+		void SetItemChangedCode(MenuCodeEnum code) {mcItemChangedCode = code;}
+		void SetControlSelectedCode(MenuCodeEnum code) {mcControlSelectedCode = code;}
+
+		//Set where the data of this control is written to (some member of game_values probably)
+		void SetData(char * value, short maxchars);
+		
+		MenuCodeEnum MouseClick(short iMouseX, short iMouseY);
+
+		void Refresh();
+
+		void SetDisallowedChars(const char * chars);
+
+	protected:
+
+		void UpdateCursor();
+
+		short iCursorIndex;
+		short iNumChars, iMaxChars;
+
+		gfxSprite * spr;
+		char * szName;
+
+		char * szValue;
+
+		short iWidth, iIndent;
+
+		MI_Image * miModifyCursor;
+		
+		MenuCodeEnum mcItemChangedCode;
+		MenuCodeEnum mcControlSelectedCode;
+
+		short iAdjustmentY;
+		char * szTempValue;
+
+		short iStringWidth, iAllowedWidth;
+
+		char szDisallowedChars[32];
+};
+
+
+class MI_MapField : public UI_Control
+{
+	public:
+
+		MI_MapField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent, bool showtags);
+		virtual ~MI_MapField();
+
+		//Called when user selects this control to change it's value
+		MenuCodeEnum Modify(bool modify);
+
+		//Updates animations or other events every frame
+		void Update();
+
+		//Draws every frame
+		void Draw();
+
+		//Sends player input to control on every frame
+		MenuCodeEnum SendInput(CPlayerInput * playerInput);
+
+		void AdjustIndicators();
+
+		void LoadCurrentMap();
+		void LoadMap(const char * szMapPath);
+
+		void SetMap(const char * szMapName, bool fWorld);
+		void SetSpecialMap(const char * szMapName, const char * szMapPath);
+
+		const char * GetMapName() {return szMapName;}
+
+		MenuCodeEnum ChooseRandomMap();
+
+		MenuCodeEnum MouseClick(short iMouseX, short iMouseY);
+
+		bool MovePrev(bool fScrollFast);
+		bool MoveNext(bool fScrollFast);
+
+	protected:
+
+		gfxSprite * spr;
+		
+		SDL_Surface * surfaceMapBackground;
+		SDL_Surface * surfaceMapBlockLayer;
+		SDL_Surface * surfaceMapForeground;
+		SDL_Rect rectDst;
+
+		char * szName;
+		char szMapName[256];
+		short iWidth, iIndent;
+
+		MI_Image * miModifyImageLeft;
+		MI_Image * miModifyImageRight;
+
+		short iSlideListOut;
+		short iSlideListOutGoal;
+
+		std::string sSearchString;
+		short iSearchStringTimer;
 };
 
 #endif //__UICONTROL_H_

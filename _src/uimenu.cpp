@@ -120,7 +120,7 @@ MenuCodeEnum UI_Menu::SendInput(CPlayerInput * playerInput)
 				continue;			
 		}
 		//Only let player 1 on the keyboard control the menu unless there is another controlling team
-		else if(iPlayer != 0 && game_values.playerInput.inputControls[iPlayer]->iDevice == DEVICE_KEYBOARD)
+		else if(iPlayer != 0 && game_values.playerInput.inputControls[iPlayer] && game_values.playerInput.inputControls[iPlayer]->iDevice == DEVICE_KEYBOARD)
 		{
 			continue;
 		}
@@ -214,3 +214,75 @@ void UI_Menu::RestoreCurrent()
 	eyeCandy.clean();
 }
 
+MenuCodeEnum UI_Menu::MouseClick(short iMouseX, short iMouseY)
+{
+	//Loop through all controls to see if one was clicked on
+	std::list<UI_Control*>::iterator itr = controls.begin(), lim = controls.end();
+	UI_Control * pFound = NULL;
+	MenuCodeEnum code = MENU_CODE_NONE;
+	while(itr != lim)
+	{
+		if((*itr)->IsVisible())
+		{
+			code = (*itr)->MouseClick(iMouseX, iMouseY);
+
+			if(code != MENU_CODE_NONE)
+			{
+				pFound = *itr;
+				break;
+			}
+		}
+
+		itr++;
+	}
+
+	if(pFound)
+	{
+		//If we clicked the same control we have selected
+		if(pFound != current)
+		{
+			if(fModifyingItem)
+			{
+				current->Modify(false);
+				fModifyingItem = false;
+			}
+
+			current->Select(false);
+			current = pFound;
+			fModifyingItem = current->Select(true);
+
+			if(!fModifyingItem)
+			{
+				fModifyingItem = current->Modify(true) == MENU_CODE_MODIFY_ACCEPTED;
+			}
+		}
+		else
+		{
+			if(!fModifyingItem)
+			{
+				fModifyingItem = current->Modify(true) == MENU_CODE_MODIFY_ACCEPTED;
+			}
+		}
+	}
+	else
+	{
+		//If nothing was clicked, then stop modifying the current control
+		if(fModifyingItem)
+		{
+			current->Modify(false);
+			fModifyingItem = false;
+		}
+	}
+
+	return code;
+}
+
+void UI_Menu::Refresh()
+{
+	std::list<UI_Control*>::iterator itr = controls.begin(), lim = controls.end();
+	while(itr != lim)
+	{
+		(*itr)->Refresh();
+		itr++;
+	}	
+}

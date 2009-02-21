@@ -203,63 +203,6 @@ class MI_PowerupSelection : public UI_Control
 		MI_Image * miDownArrow;
 };
 
-class MI_MapField : public UI_Control
-{
-	public:
-
-		MI_MapField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent, bool showtags);
-		virtual ~MI_MapField();
-
-		//Called when user selects this control to change it's value
-		MenuCodeEnum Modify(bool modify);
-
-		//Updates animations or other events every frame
-		void Update();
-
-		//Draws every frame
-		void Draw();
-
-		void Disable(bool disable) {fDisable = disable;}
-
-		//Sends player input to control on every frame
-		MenuCodeEnum SendInput(CPlayerInput * playerInput);
-
-		void AdjustIndicators();
-
-		void LoadCurrentMap();
-		void LoadMap(const char * szMapPath);
-
-		void SetMap(const char * szMapName, bool fWorld);
-		void SetSpecialMap(const char * szMapName, const char * szMapPath);
-
-		const char * GetMapName() {return szMapName;}
-
-		MenuCodeEnum ChooseRandomMap();
-
-	protected:
-
-		gfxSprite * spr;
-		
-		SDL_Surface * surfaceMapBackground;
-		SDL_Surface * surfaceMapBlockLayer;
-		SDL_Surface * surfaceMapForeground;
-		SDL_Rect rectDst;
-
-		char * szName;
-		char szMapName[256];
-		short iWidth, iIndent;
-
-		MI_Image * miModifyImageLeft;
-		MI_Image * miModifyImageRight;
-
-		short iSlideListOut;
-		short iSlideListOutGoal;
-
-		bool fDisable;
-
-		std::string sSearchString;
-		short iSearchStringTimer;
-};
 
 class MI_WorldPreviewDisplay : public UI_Control
 {

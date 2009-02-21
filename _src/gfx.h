@@ -105,6 +105,7 @@ class gfxFont
 		void drawChopCentered(int x, int y, int width, const char *text);
 		void drawRightJustified(int x, int y, const char *s, ...);
 		void drawChopRight(int x, int y, int width, const char *s);
+		void drawChopLeft(int x, int y, int width, const char *s);
 
 		void setalpha(Uint8 alpha);
 
