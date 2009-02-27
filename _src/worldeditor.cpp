@@ -414,9 +414,9 @@ int main(int argc, char *argv[])
 	menu_stomp.init(convertPath("gfx/packs/Classic/modeobjects/menu_stomp.png"), 255, 0, 255);
 	menu_survival.init(convertPath("gfx/packs/Classic/modeobjects/menu_survival.png"), 255, 0, 255);
 	spr_phanto.init(convertPath("gfx/packs/Classic/modeobjects/phanto.png"), 255, 0, 255);
-	menu_plain_field.init(convertPath("gfx/packs/Classic/menu/menu_plain_field.png"), 255, 0, 255);
+	menu_plain_field.init(convertPath("gfx/leveleditor/menu_plain_field.png"), 255, 0, 255);
 	menu_slider_bar.init(convertPath("gfx/packs/Classic/menu/menu_slider_bar.png"), 255, 0, 255);
-	spr_selectfield.init(convertPath("gfx/packs/Classic/menu/menu_selectfield.png"), 255, 0, 255);
+	spr_selectfield.init(convertPath("gfx/leveleditor/menu_selectfield.png"), 255, 0, 255);
 	menu_verticalarrows.init(convertPath("gfx/packs/Classic/menu/menu_vertical_arrows.png"), 255, 0, 255);
 	spr_storedpoweruplarge.init(convertPath("gfx/packs/Classic/powerups/large.png"), 255, 0, 255);
 
@@ -524,7 +524,7 @@ int main(int argc, char *argv[])
 	miModeSettingsButton->SetCode(MENU_CODE_TO_MODE_SETTINGS_MENU);
 
 	//Points Field
-	miPointsField = new MI_SelectField(&spr_selectfield, 70, 140, "Points", 240, 120);
+	miPointsField = new MI_SelectField(&spr_selectfield, 70, 140, "Points", 245, 120);
 	for(short iPoints = 0; iPoints <= 20; iPoints++)
 	{
 		char szPoints[8];
@@ -533,7 +533,7 @@ int main(int argc, char *argv[])
 	}
 
 	//Final Stage Field
-	miFinalStageField = new MI_SelectField(&spr_selectfield, 320, 140, "End Stage", 240, 120);
+	miFinalStageField = new MI_SelectField(&spr_selectfield, 325, 140, "End Stage", 245, 120);
 	miFinalStageField->Add("No", 0, "", false, false);
 	miFinalStageField->Add("Yes", 1, "", true, false);
 	miFinalStageField->SetAutoAdvance(true);
