@@ -201,9 +201,10 @@ class SF_ListItem
 			sValue = "";
 			fValue = false;
 			fHidden = false;
+			iIconOverride = -1;
 		}
 
-		SF_ListItem(std::string sname, short ivalue, std::string svalue, bool fvalue, bool fhidden)
+		SF_ListItem(std::string sname, short ivalue, std::string svalue, bool fvalue, bool fhidden, short iiconoverride)
 		{
 			sName = sname;
 
@@ -211,6 +212,7 @@ class SF_ListItem
 			sValue = svalue;
 			fValue = fvalue;
 			fHidden = fhidden;
+			iIconOverride = iiconoverride;
 		}
 
 		~SF_ListItem() {}
@@ -222,6 +224,8 @@ class SF_ListItem
 		bool fValue;  //bool data for toggle controls
 
 		bool fHidden;
+
+		short iIconOverride;
 };
 
 class MI_SelectField : public UI_Control
@@ -257,7 +261,7 @@ class MI_SelectField : public UI_Control
 		MenuCodeEnum Modify(bool modify);
 
 		//Adds an item to the list
-		void Add(std::string name, short ivalue, std::string svalue, bool fvalue, bool fhidden, bool fGoodRandom = true);
+		void Add(std::string name, short ivalue, std::string svalue, bool fvalue, bool fhidden, bool fGoodRandom = true, short iIconOverride = -1);
 		void Clear() {items.clear();}
 
 		bool HideItem(short iID, bool fhide);
@@ -284,6 +288,8 @@ class MI_SelectField : public UI_Control
 		void Refresh();
 
 		void SetValues();
+
+		void AllowFastScroll(bool fastscroll) {fFastScroll = fastscroll;}
 
 	protected:
 		
@@ -317,6 +323,8 @@ class MI_SelectField : public UI_Control
 		bool fNoWrap;
 
 		short iAdjustmentY;
+
+		bool fFastScroll;
 };
 
 class MI_ImageSelectField : public MI_SelectField

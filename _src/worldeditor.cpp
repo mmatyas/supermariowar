@@ -10,6 +10,10 @@
 |	© 2003-2009 Florian Hufsky <florian.hufsky@gmail.com>	|
 +----------------------------------------------------------*/
 
+//TODO:
+//1) Update field button gfx to look like buttons
+//2) Decrement stages for vehicles when a stage is deleted
+
 #define _SMW_EDITOR
 #include "global.h"
 
@@ -83,6 +87,8 @@ gfxSprite		spr_storedpoweruplarge;
 gfxSprite		menu_mode_small;
 gfxSprite		menu_mode_large;
 
+gfxSprite		spr_vehicleicons;
+
 int				set_tile = 0;
 bool			fAutoPaint = true;
 
@@ -97,6 +103,9 @@ int				state;
 bool			selectedtiles[MAPWIDTH][MAPHEIGHT];
 bool			moveselectedtiles[MAPWIDTH][MAPHEIGHT];
 WorldMapTile	copiedtiles[MAPWIDTH][MAPHEIGHT];
+
+//Vehicle structure that holds the current vehicle "stamp"
+WorldVehicle g_wvVehicleStamp;
 
 //// Global stuff that the map editor doesn't need, but has references to
 GraphicsList menugraphicspacklist;
@@ -266,6 +275,17 @@ MI_Text * miDeleteStageDialogSureText;
 MI_Button * miDeleteStageDialogYesButton;
 MI_Button * miDeleteStageDialogNoButton;
 
+//Vehicle Creation Menu
+UI_Menu mVehicleMenu;
+MI_ImageSelectField * miVehicleSpriteField;
+MI_ImageSelectField * miVehicleStageField;
+MI_SelectField * miVehicleMinMovesField;
+MI_SelectField * miVehicleMaxMovesField;
+MI_SelectField * miVehiclePacesField;
+MI_SelectField * miVehicleDirectionField;
+MI_SelectField * miVehicleBoundaryField;
+MI_Button * miVehicleCreateButton;
+MI_Text * miTitleText;
 
 ModeOptionsMenu modeOptionsMenu;
 
@@ -403,6 +423,8 @@ int main(int argc, char *argv[])
 	menu_mode_small.init(convertPath("gfx/packs/Classic/menu/menu_mode_small.png"), 255, 0, 255);
 	menu_mode_large.init(convertPath("gfx/packs/Classic/menu/menu_mode_large.png"), 255, 0, 255);
 
+	spr_vehicleicons.init(convertPath("gfx/leveleditor/vehicle_icons.png"), 255, 0, 255);
+
 	sMapSurface = SDL_CreateRGBSurface(screen->flags, 768, 608, screen->format->BitsPerPixel, 0, 0, 0, 0);
 
 	SetupDefaultGameModeSettings();
@@ -503,28 +525,13 @@ int main(int argc, char *argv[])
 
 	//Points Field
 	miPointsField = new MI_SelectField(&spr_selectfield, 70, 140, "Points", 240, 120);
-	miPointsField->Add("0", 0, "", false, false);
-	miPointsField->Add("1", 1, "", false, false);
-	miPointsField->Add("2", 2, "", false, false);
-	miPointsField->Add("3", 3, "", false, false);
-	miPointsField->Add("4", 4, "", false, false);
-	miPointsField->Add("5", 5, "", false, false);
-	miPointsField->Add("6", 6, "", false, false);
-	miPointsField->Add("7", 7, "", false, false);
-	miPointsField->Add("8", 8, "", false, false);
-	miPointsField->Add("9", 9, "", false, false);
-	miPointsField->Add("10", 10, "", false, false);
-	miPointsField->Add("11", 11, "", false, false);
-	miPointsField->Add("12", 12, "", false, false);
-	miPointsField->Add("13", 13, "", false, false);
-	miPointsField->Add("14", 14, "", false, false);
-	miPointsField->Add("15", 15, "", false, false);
-	miPointsField->Add("16", 16, "", false, false);
-	miPointsField->Add("17", 17, "", false, false);
-	miPointsField->Add("18", 18, "", false, false);
-	miPointsField->Add("19", 19, "", false, false);
-	miPointsField->Add("20", 20, "", false, false);
-	
+	for(short iPoints = 0; iPoints <= 20; iPoints++)
+	{
+		char szPoints[8];
+		sprintf(szPoints, "%d", iPoints);
+		miPointsField->Add(szPoints, iPoints, "", false, false);
+	}
+
 	//Final Stage Field
 	miFinalStageField = new MI_SelectField(&spr_selectfield, 320, 140, "End Stage", 240, 120);
 	miFinalStageField->Add("No", 0, "", false, false);
@@ -632,8 +639,112 @@ int main(int argc, char *argv[])
 	
 	mBonusItemPicker.SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
-
 	modeOptionsMenu.CreateMenu();
+
+	g_wvVehicleStamp.iDrawSprite = 0;
+	g_wvVehicleStamp.iActionId = 0;
+	g_wvVehicleStamp.iCurrentTileX = 0;
+	g_wvVehicleStamp.iCurrentTileY = 0;
+	g_wvVehicleStamp.iMinMoves = 5;
+	g_wvVehicleStamp.iMaxMoves = 8;
+	g_wvVehicleStamp.fSpritePaces = true;
+	g_wvVehicleStamp.iDrawDirection = 0;
+	g_wvVehicleStamp.iBoundary = 0;
+	
+	//Create Vehicle Menu
+	miVehicleSpriteField = new MI_ImageSelectField(&spr_selectfield, &spr_vehicleicons, 70, 80, "Sprite", 500, 150, 16, 16);
+	miVehicleSpriteField->Add("Hammer Brother", 0, "", false, false);
+	miVehicleSpriteField->Add("Boomerang Brother", 1, "", false, false);
+	miVehicleSpriteField->Add("Fire Brother", 2, "", false, false);
+	miVehicleSpriteField->Add("Tank 1", 3, "", false, false);
+	miVehicleSpriteField->Add("Boat 1", 4, "", false, false);
+	miVehicleSpriteField->Add("Boat 2", 5, "", false, false);
+	miVehicleSpriteField->Add("Airship 1", 6, "", false, false);
+	miVehicleSpriteField->Add("Airship 2", 7, "", false, false);
+	miVehicleSpriteField->Add("Tank 2", 8, "", false, false);
+	miVehicleSpriteField->SetData(&g_wvVehicleStamp.iDrawSprite, NULL, NULL);
+	miVehicleSpriteField->SetKey(g_wvVehicleStamp.iDrawSprite);
+
+	miVehicleStageField = new MI_ImageSelectField(&spr_selectfield, &menu_mode_small, 70, 120, "Stage", 500, 150, 16, 16);
+	miVehicleStageField->SetData(&g_wvVehicleStamp.iActionId, NULL, NULL);
+
+	miVehicleMinMovesField = new MI_SelectField(&spr_selectfield, 70, 160, "Min Moves", 500, 150);
+	
+	for(short iMinMoves = 0; iMinMoves <= 100; iMinMoves++)
+	{
+		char szMinMoves[8];
+		sprintf(szMinMoves, "%d", iMinMoves);
+		miVehicleMinMovesField->Add(szMinMoves, iMinMoves, "", false, false);
+	}
+
+	miVehicleMinMovesField->SetData(&g_wvVehicleStamp.iMinMoves, NULL, NULL);
+	miVehicleMinMovesField->SetKey(g_wvVehicleStamp.iMinMoves);
+	miVehicleMinMovesField->SetItemChangedCode(MENU_CODE_VEHICLE_MIN_MOVES_CHANGED);
+	miVehicleMinMovesField->SetNoWrap(true);
+	miVehicleMinMovesField->AllowFastScroll(true);
+
+	miVehicleMaxMovesField = new MI_SelectField(&spr_selectfield, 70, 200, "Max Moves", 500, 150);
+
+	for(short iMaxMoves = 0; iMaxMoves <= 100; iMaxMoves++)
+	{
+		char szMaxMoves[8];
+		sprintf(szMaxMoves, "%d", iMaxMoves);
+		miVehicleMaxMovesField->Add(szMaxMoves, iMaxMoves, "", false, false);
+	}
+
+	miVehicleMaxMovesField->SetData(&g_wvVehicleStamp.iMaxMoves, NULL, NULL);
+	miVehicleMaxMovesField->SetKey(g_wvVehicleStamp.iMaxMoves);
+	miVehicleMaxMovesField->SetItemChangedCode(MENU_CODE_VEHICLE_MAX_MOVES_CHANGED);
+	miVehicleMaxMovesField->SetNoWrap(true);
+	miVehicleMaxMovesField->AllowFastScroll(true);
+	
+	miVehiclePacesField = new MI_SelectField(&spr_selectfield, 70, 240, "Paces", 500, 150);
+	miVehiclePacesField->Add("No", 0, "", false, false);
+	miVehiclePacesField->Add("Yes", 1, "", true, false);
+	miVehiclePacesField->SetData(NULL, NULL, &g_wvVehicleStamp.fSpritePaces);
+	miVehiclePacesField->SetKey(g_wvVehicleStamp.fSpritePaces ? 1 : 0);
+	miVehiclePacesField->SetAutoAdvance(true);
+
+	miVehicleDirectionField = new MI_SelectField(&spr_selectfield, 70, 280, "Direction", 500, 150);
+	miVehicleDirectionField->Add("Left", 0, "", false, false);
+	miVehicleDirectionField->Add("Right", 1, "", true, false);
+	miVehiclePacesField->SetData(&g_wvVehicleStamp.iDrawDirection, NULL, NULL);
+	miVehiclePacesField->SetKey(g_wvVehicleStamp.iDrawDirection);
+	miVehicleDirectionField->SetAutoAdvance(true);
+
+	miVehicleBoundaryField = new MI_SelectField(&spr_selectfield, 70, 320, "Boundary", 500, 150);
+	miVehicleBoundaryField->Add("No Boundary", 0, "", false, false);
+
+	for(short iBoundary = 1; iBoundary <= 100; iBoundary++)
+	{
+		char szBoundary[8];
+		sprintf(szBoundary, "%d", iBoundary);
+		miVehicleBoundaryField->Add(szBoundary, iBoundary, "", false, false);
+	}
+
+	miVehicleBoundaryField->SetData(&g_wvVehicleStamp.iBoundary, NULL, NULL);
+	miVehicleBoundaryField->SetKey(g_wvVehicleStamp.iBoundary);
+	miVehicleBoundaryField->AllowFastScroll(true);
+
+	miVehicleCreateButton = new MI_Button(&spr_selectfield, 430, 360, "OK", 140, 1);
+	miVehicleCreateButton->SetCode(MENU_CODE_CREATE_VEHICLE);
+
+	miTitleText = new MI_Text("Clicking on the map will add the vehicle configured below", 320, 50, 640, 2, 1);
+
+	mVehicleMenu.AddNonControl(miTitleText);
+
+	mVehicleMenu.AddControl(miVehicleSpriteField, miVehicleCreateButton, miVehicleStageField, NULL, NULL);
+	mVehicleMenu.AddControl(miVehicleStageField, miVehicleSpriteField, miVehicleMinMovesField, NULL, NULL);
+	mVehicleMenu.AddControl(miVehicleMinMovesField, miVehicleStageField, miVehicleMaxMovesField, NULL, NULL);
+	mVehicleMenu.AddControl(miVehicleMaxMovesField, miVehicleMinMovesField, miVehiclePacesField, NULL, NULL);
+	mVehicleMenu.AddControl(miVehiclePacesField, miVehicleMaxMovesField, miVehicleDirectionField, NULL, NULL);
+	mVehicleMenu.AddControl(miVehicleDirectionField, miVehiclePacesField, miVehicleBoundaryField, NULL, NULL);
+	mVehicleMenu.AddControl(miVehicleBoundaryField, miVehicleDirectionField, miVehicleCreateButton, NULL, NULL);
+	mVehicleMenu.AddControl(miVehicleCreateButton, miVehicleBoundaryField, miVehicleSpriteField, NULL, NULL);
+
+	mVehicleMenu.SetHeadControl(miVehicleSpriteField);
+	mVehicleMenu.SetCancelCode(MENU_CODE_EXIT_APPLICATION);
+
 
 	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 
@@ -877,6 +988,45 @@ int editor_edit()
 
 						if(event.key.keysym.sym == SDLK_v)
 							return EDITOR_VEHICLES;
+
+						if(edit_mode == 5 && event.key.keysym.sym == SDLK_c)
+						{
+							int iMouseX, iMouseY;
+							SDL_GetMouseState(&iMouseX, &iMouseY);
+				
+							short iButtonX = iMouseX - draw_offset_x;
+							short iButtonY = iMouseY - draw_offset_y;
+							short iCol = iButtonX / TILESIZE + draw_offset_col;
+							short iRow = iButtonY / TILESIZE + draw_offset_row;
+
+							std::vector<WorldVehicle*>::iterator itr = vehiclelist.begin(), lim = vehiclelist.end();
+							while(itr != lim)
+							{
+								WorldVehicle * vehicle = *itr;
+								if(vehicle->iCurrentTileX == iCol && vehicle->iCurrentTileY == iRow)
+								{
+									g_wvVehicleStamp.iDrawSprite = vehicle->iDrawSprite;
+									g_wvVehicleStamp.iActionId = vehicle->iActionId;
+									g_wvVehicleStamp.iMinMoves = vehicle->iMinMoves;
+									g_wvVehicleStamp.iMaxMoves = vehicle->iMaxMoves;
+									g_wvVehicleStamp.fSpritePaces = vehicle->fSpritePaces;
+									g_wvVehicleStamp.iDrawDirection = vehicle->iDrawDirection;
+									g_wvVehicleStamp.iBoundary = vehicle->iBoundary;
+
+									miVehicleSpriteField->SetKey(g_wvVehicleStamp.iDrawSprite);
+									miVehicleStageField->SetKey(g_wvVehicleStamp.iActionId);
+									miVehicleMinMovesField->SetKey(g_wvVehicleStamp.iMinMoves);
+									miVehicleMaxMovesField->SetKey(g_wvVehicleStamp.iMaxMoves);
+									miVehiclePacesField->SetKey(g_wvVehicleStamp.fSpritePaces ? 1 : 0);
+									miVehicleDirectionField->SetKey(g_wvVehicleStamp.iDrawDirection);
+									miVehicleBoundaryField->SetKey(g_wvVehicleStamp.iBoundary);
+
+									return EDITOR_VEHICLES;
+								}
+
+								itr++;
+							}
+						}
 
 						if(event.key.keysym.sym == SDLK_w)
 							return EDITOR_WARP;
@@ -1632,15 +1782,15 @@ int editor_edit()
 					short ix = (vehicle->iCurrentTileX  - draw_offset_col) * TILESIZE + draw_offset_x;
 					short iy = (vehicle->iCurrentTileY - draw_offset_row) * TILESIZE + draw_offset_y;
 
-					if(edit_mode == 8)
-					{
-						SDL_Rect r = {ix, iy, 32, 32};
-						SDL_FillRect(blitdest, &r, color);
-					}
-					
+					SDL_Rect r = {ix, iy, 32, 32};
+					SDL_FillRect(blitdest, &r, color);
+				
 					spr_worldvehicle[0].draw(ix, iy, vehicle->iDrawDirection << 5, vehicle->iDrawSprite << 5, 32, 32);
 
-					itr++;
+					if(edit_mode == 5)
+					{
+						spr_worldforegroundspecial[0].draw(ix, iy, (vehicle->iActionId % 10) << 5, (vehicle->iActionId / 10) << 5, 32, 32);
+					}
 
 					if(edit_mode == 8)
 					{
@@ -1650,6 +1800,8 @@ int editor_edit()
 						else
 							spr_worldforegroundspecial[0].draw(ix, iy, (iBoundary % 10) << 5, (iBoundary / 10) << 5, 32, 32);
 					}
+
+					itr++;
 				}
 			}
 
@@ -1818,13 +1970,13 @@ void AddVehicleToTile(short iCol, short iRow, short iType)
 		vehiclelist.push_back(newvehicle);
 	}
 
-	newvehicle->iDrawSprite = iType;
-	newvehicle->iActionId = 0;
-	newvehicle->iMinMoves = 5;
-	newvehicle->iMaxMoves = 8;
-	newvehicle->fSpritePaces = true;
-	newvehicle->iDrawDirection = 0;
-	newvehicle->iBoundary = 0;
+	newvehicle->iDrawSprite = g_wvVehicleStamp.iDrawSprite;
+	newvehicle->iActionId = g_wvVehicleStamp.iActionId;
+	newvehicle->iMinMoves = g_wvVehicleStamp.iMinMoves;
+	newvehicle->iMaxMoves = g_wvVehicleStamp.iMaxMoves;
+	newvehicle->fSpritePaces = g_wvVehicleStamp.fSpritePaces;
+	newvehicle->iDrawDirection = g_wvVehicleStamp.iDrawDirection;
+	newvehicle->iBoundary = g_wvVehicleStamp.iBoundary;
 }
 
 void RemoveVehicleFromTile(short iCol, short iRow)
@@ -3270,13 +3422,35 @@ int editor_pathsprite()
 	return EDITOR_QUIT;
 }
 
+//Display stages over vehicles
+//allow setting of stages on vehicles
+
 int editor_vehicles()
 {
+	mCurrentMenu = &mVehicleMenu;
+	mCurrentMenu->ResetMenu();
+
 	bool done = false;
-	
+
+	miVehicleStageField->Clear();
+
+	for(short iStage = 0; iStage < g_worldmap.iNumStages; iStage++)
+	{
+		TourStop * ts = game_values.tourstops[iStage];
+		char szStageName[256];
+		sprintf(szStageName, "(%d) %s", iStage + 1, ts->szName);
+		miVehicleStageField->Add(szStageName, iStage, "", false, false, true, ts->iStageType == 1 ? 24 : (ts->iMode == 1000 ? 25 : ts->iMode));
+	}
+
+	miVehicleStageField->SetKey(g_wvVehicleStamp.iActionId);
+
 	while (!done)
 	{
 		int framestart = SDL_GetTicks();
+
+		game_values.playerInput.ClearPressedKeys(1);
+
+		MenuCodeEnum code = MENU_CODE_NONE;
 
 		//handle messages
 		while(SDL_PollEvent(&event))
@@ -3285,35 +3459,34 @@ int editor_vehicles()
 			{
 				case SDL_QUIT:
 				{
-					done = true;
-					break;
+					edit_mode = 5;
+					game_values.playerInput.ResetKeys();
+					return EDITOR_EDIT;
 				}
 
 				case SDL_KEYDOWN:
 				{
-					edit_mode = 5;
-					return EDITOR_EDIT;
+					if(event.key.keysym.sym == SDLK_v)
+					{
+						if(!mCurrentMenu->IsModifying())
+						{
+							edit_mode = 5;
+							game_values.playerInput.ResetKeys();
+							return EDITOR_EDIT;				
+						}
+					}
+
+					break;
 				}
-				
+
 				case SDL_MOUSEBUTTONDOWN:
 				{
+					short iButtonX = event.button.x;
+					short iButtonY = event.button.y;
+
 					if(event.button.button == SDL_BUTTON_LEFT)
 					{
-						short set_item_x = event.button.x / TILESIZE;
-						short set_item_y = event.button.y / TILESIZE;
-
-						//Set the selected block to one of the interaction blocks
-						if(set_item_x >= 0 && set_item_x <= 8 && set_item_y == 0)
-						{
-							set_tile = set_item_x;
-
-							edit_mode = 5;
-
-							//The user must release the mouse button before trying to add a tile
-							ignoreclick = true;
-							
-							return EDITOR_EDIT;
-						}
+						code = mCurrentMenu->MouseClick(iButtonX, iButtonY);
 					}
 				
 					break;
@@ -3322,15 +3495,50 @@ int editor_vehicles()
 				default:
 					break;
 			}
+
+			game_values.playerInput.Update(event, 1);
 		}
+
+		if(MENU_CODE_NONE == code)
+		{
+			code = mCurrentMenu->SendInput(&game_values.playerInput);
+		}
+		
+		if(MENU_CODE_EXIT_APPLICATION == code)
+		{
+			edit_mode = 5;
+			game_values.playerInput.ResetKeys();
+			return EDITOR_EDIT;
+		}
+		else if(MENU_CODE_VEHICLE_MIN_MOVES_CHANGED == code)
+		{
+			short iMaxMoves = miVehicleMaxMovesField->GetShortValue();
+			if(miVehicleMinMovesField->GetShortValue() > iMaxMoves)
+			{
+				miVehicleMinMovesField->SetKey(iMaxMoves);
+			}
+		}
+		else if(MENU_CODE_VEHICLE_MAX_MOVES_CHANGED == code)
+		{
+			short iMinMoves = miVehicleMinMovesField->GetShortValue();
+			if(miVehicleMaxMovesField->GetShortValue() < iMinMoves)
+			{
+				miVehicleMaxMovesField->SetKey(iMinMoves);
+			}
+		}
+		else if(MENU_CODE_CREATE_VEHICLE == code)
+		{
+			edit_mode = 5;
+			game_values.playerInput.ResetKeys();
+			return EDITOR_EDIT;
+		}
+
 
 		drawmap(false, TILESIZE);
 		menu_shade.draw(0, 0);
 		
-		for(short iVehicle = 0; iVehicle < 9; iVehicle++)
-		{
-			spr_worldvehicle[0].draw(iVehicle << 5, 0, 0, iVehicle << 5, 32, 32);
-		}
+		mCurrentMenu->Update();
+		mCurrentMenu->Draw();
 
 		menu_font_small.drawRightJustified(640, 0, worldlist.current_name());
 				
@@ -3607,6 +3815,9 @@ void EditStage(short iEditStage)
 		miGoalField[iMode]->SetKey(game_values.tourstops[iEditStage]->iGoal);
 		miPointsField->SetKey(game_values.tourstops[iEditStage]->iPoints);
 		miFinalStageField->SetKey(game_values.tourstops[iEditStage]->fEndStage ? 1 : 0);
+
+		game_values.tourstops[iEditStage]->fUseSettings = true;
+		game_values.tourstops[iEditStage]->iNumUsedSettings = g_iNumGameModeSettings[iMode];
 	}
 	else
 	{
@@ -3643,14 +3854,6 @@ void EnableStageMenu(bool fEnable)
 
 	miSpecialGoalField[0]->Disable(!fEnable);
 
-	//complete deleting stages using this button
-	//	and add Disable() to the button class (it isn't part of the base menu object class??)
-
-	//1) Scan stage use grid and remove any of the stage that is being deleted and shift
-	 //  every other number greater down by 1
-    //2) Remove stage from stage list
-	//3) Move menu back to stage select screen
-
 	miModeSettingsButton->Disable(!fEnable);
 
 	miPointsField->Disable(!fEnable);
@@ -3669,8 +3872,6 @@ void EnableStageMenu(bool fEnable)
 void NewStage(short * iEditStage)
 {
 	TourStop * ts = new TourStop();
-	ts->fUseSettings = false;
-	ts->iNumUsedSettings = 0;
 
 	ts->iStageType = 0;
 
@@ -3682,6 +3883,9 @@ void NewStage(short * iEditStage)
 
 	ts->pszMapFile = maplist.currentShortmapname();
 	ts->iMode = 0;
+
+	ts->fUseSettings = true;
+	ts->iNumUsedSettings = g_iNumGameModeSettings[0];
 
 	ts->iGoal = 10;
 	ts->iPoints = 1;
@@ -3706,6 +3910,9 @@ void NewStage(short * iEditStage)
 
 int editor_stage()
 {
+	mCurrentMenu = &mStageSettingsMenu;
+	mCurrentMenu->ResetMenu();
+
 	bool done = false;
 	short iModeDisplay = -1;
 	short iEditStage = -1;	
@@ -3771,11 +3978,11 @@ int editor_stage()
 				{
 					TourStop * ts = game_values.tourstops[iEditStage];
 
-					if(!mCurrentMenu->IsModifying() && event.key.keysym.sym == SDLK_s)
-					{
-						savecurrentworld();
-					}
-					else if(mCurrentMenu == &mStageSettingsMenu && event.key.keysym.sym == SDLK_n)
+					//Do not allow saving world by pressing 's' key
+					//World data structures are not in the correct state to be saved
+					//until exiting the stage editor menu in (MENU_CODE_EXIT_APPLICATION == code) below
+
+					if(mCurrentMenu == &mStageSettingsMenu && event.key.keysym.sym == SDLK_n)
 					{
 						NewStage(&iEditStage);
 					}
@@ -3944,6 +4151,7 @@ int editor_stage()
 			if(MENU_CODE_EXIT_APPLICATION == code)
 			{
 				//Set the number of game mode settings to the maximum so we write them all out
+				game_values.tourstops[iEditStage]->fUseSettings = true;
 				game_values.tourstops[iEditStage]->iNumUsedSettings = g_iNumGameModeSettings[game_values.tourstops[iEditStage]->iMode];
 
 				//Copy the working values back into the structure that will be saved
@@ -3989,6 +4197,9 @@ int editor_stage()
 					miGoalField[iMode]->SetValues();
 					
 					game_values.tourstops[iEditStage]->iStageType = 0;
+
+					game_values.tourstops[iEditStage]->fUseSettings = true;
+					game_values.tourstops[iEditStage]->iNumUsedSettings = g_iNumGameModeSettings[iMode];
 				}
 				else
 				{
@@ -4094,23 +4305,41 @@ int editor_stage()
 						}
 					}
 					
-					std::vector<TourStop*>::iterator iter = game_values.tourstops.begin(), lim = game_values.tourstops.end();
+					//Scan vehicles and remove references to deleted stage
+					std::vector<WorldVehicle*>::iterator itrVehicle = vehiclelist.begin(), limVehicle = vehiclelist.end();
+					while(itrVehicle != limVehicle)
+					{
+						WorldVehicle * vehicle = *itrVehicle;
+						if(vehicle->iActionId == iEditStage)
+						{
+							RemoveVehicleFromTile(vehicle->iCurrentTileX, vehicle->iCurrentTileY);
+						}
+						else if(vehicle->iActionId > iEditStage)
+						{
+							vehicle->iActionId--;
+						}
+
+						itrVehicle++;
+					}
+
+					//Remove stage from tourstops vector
+					std::vector<TourStop*>::iterator itr = game_values.tourstops.begin(), lim = game_values.tourstops.end();
 	
 					short iIndex = 0;
-					while (iter != lim)
+					while (itr != lim)
 					{
 						if(iIndex == iEditStage)
 						{
-							delete (*iter);
+							delete (*itr);
 							
-							game_values.tourstops.erase(iter);
+							game_values.tourstops.erase(itr);
 							game_values.tourstoptotal--;
 							g_worldmap.iNumStages--;
 
 							break;
 						}
 						
-						++iter;
+						++itr;
 						++iIndex;
 					}
 
@@ -4283,6 +4512,8 @@ int display_help()
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[v] - Vehicle");
 	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "    [c] - Copy Vehicle");
+	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[t] - Stages and Doors");
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[b] - Vehicle Boundaries");
@@ -4345,13 +4576,14 @@ int display_help()
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[a] - Automatic Path/Land");
 	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[k] - Resize World");
+	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[ctrl] + [delete] - Clear All");
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[insert] - Screenshot");
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[alt] + [enter] - Full Screen/Window");
 	
-
 	SDL_Flip(screen);
 
     while (true)

@@ -223,6 +223,8 @@ MI_SelectField::MI_SelectField(gfxSprite * nspr, short x, short y, const char * 
 	miModifyImageRight->Show(false);
 
 	iAdjustmentY = width > 256 ? 0 : 128;
+
+	fFastScroll = false;
 }
 
 MI_SelectField::~MI_SelectField()
@@ -296,9 +298,9 @@ bool MI_SelectField::SetIndex(unsigned short index)
 	return true;
 }
 
-void MI_SelectField::Add(std::string name, short ivalue, std::string svalue, bool fvalue, bool fhidden, bool fGoodRandom)
+void MI_SelectField::Add(std::string name, short ivalue, std::string svalue, bool fvalue, bool fhidden, bool fGoodRandom, short iIconOverride)
 {
-	SF_ListItem * item = new SF_ListItem(name, ivalue, svalue, fvalue, fhidden);
+	SF_ListItem * item = new SF_ListItem(name, ivalue, svalue, fvalue, fhidden, iIconOverride);
 	items.push_back(item);
 
 	if(fGoodRandom)
@@ -392,15 +394,29 @@ MenuCodeEnum MI_SelectField::SendInput(CPlayerInput * playerInput)
 {
 	for(int iPlayer = 0; iPlayer < 4; iPlayer++)
 	{
+		short iNumMoves = 1;
+		if(fFastScroll && playerInput->outputControls[iPlayer].menu_scrollfast.fDown)
+			iNumMoves = 10;
+
 		if(playerInput->outputControls[iPlayer].menu_right.fPressed || playerInput->outputControls[iPlayer].menu_down.fPressed)
 		{
-			if(MoveNext())
+			bool fMoved = false;
+
+			for(short iMove = 0; iMove < iNumMoves; iMove++)
+				fMoved |= MoveNext();
+
+			if(fMoved)
 				return mcItemChangedCode;
 		}
 		
 		if(playerInput->outputControls[iPlayer].menu_left.fPressed || playerInput->outputControls[iPlayer].menu_up.fPressed)
 		{
-			if(MovePrev())
+			bool fMoved = false;
+
+			for(short iMove = 0; iMove < iNumMoves; iMove++)
+				fMoved |= MovePrev();
+
+			if(fMoved)
 				return mcItemChangedCode;
 		}
 
@@ -626,7 +642,12 @@ MenuCodeEnum MI_SelectField::MouseClick(short iMouseX, short iMouseY)
 			iMouseY >= y && iMouseY < y + h)
 		{
 			if(MovePrev())
+			{
+				if(mcItemChangedCode == MENU_CODE_NONE)
+					return MENU_CODE_CLICKED;
+
 				return mcItemChangedCode;
+			}
 		}
 		
 		miModifyImageRight->GetPositionAndSize(&x, &y, &w, &h);
@@ -635,7 +656,12 @@ MenuCodeEnum MI_SelectField::MouseClick(short iMouseX, short iMouseY)
 			iMouseY >= y && iMouseY < y + h)
 		{
 			if(MoveNext())
+			{
+				if(mcItemChangedCode == MENU_CODE_NONE)
+					return MENU_CODE_CLICKED;
+
 				return mcItemChangedCode;
+			}
 		}
 	}
 	
@@ -687,7 +713,7 @@ void MI_ImageSelectField::Draw()
 		menu_font_large.drawChopRight(ix + iIndent + iImageWidth + 10, iy + 5, iWidth - iIndent - 24, (*current)->sName.c_str());
 	}
 
-	spr_image->draw(ix + iIndent + 8, iy + 16 - (iImageHeight >> 1), (*current)->iValue * iImageWidth, 0, iImageWidth, iImageHeight);
+	spr_image->draw(ix + iIndent + 8, iy + 16 - (iImageHeight >> 1), ((*current)->iIconOverride >= 0 ? (*current)->iIconOverride : (*current)->iValue) * iImageWidth, 0, iImageWidth, iImageHeight);
 
 	miModifyImageRight->Draw();
 	miModifyImageLeft->Draw();

@@ -117,8 +117,12 @@ class WorldVehicle : public WorldMovingObject
 	friend void RemoveVehicleFromTile(short iCol, short iRow);
 	friend void ReadVehiclesIntoEditor();
 	friend void WriteVehiclesIntoWorld();
+	
+	friend int editor_stage();
 	friend int editor_edit();
 	friend int resize_world();
+	friend int editor_vehicles();
+	friend int main(int argc, char *argv[]);
 };
 
 class WorldWarp
@@ -253,6 +257,7 @@ class WorldMap
 	friend int editor_type();
 	friend int editor_stage();
 	friend int editor_start_items();
+	friend int editor_vehicles();
 	friend void NewStage(short * iEditStage);
 
 	friend bool AutoSetTile(short iCol, short iRow);
