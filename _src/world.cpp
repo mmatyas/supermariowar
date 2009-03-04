@@ -989,7 +989,7 @@ bool WorldMap::Save(const char * szPath)
 	}
 	fprintf(file, "\n");
 
-	fprintf(file, "#Tile Types\n");
+	fprintf(file, "#Tile Types (Stages, Doors, Start Tiles)\n");
 
 	for(short iMapTileReadRow = 0; iMapTileReadRow < iHeight; iMapTileReadRow++)
 	{
@@ -1025,7 +1025,7 @@ bool WorldMap::Save(const char * szPath)
 
 	fprintf(file, "#Stages\n");
 	fprintf(file, "#Stage Type 0,Map,Mode,Goal,Points,Bonus List(Max 10),Name,End World, then mode settings (see sample tour file for details)\n");
-	fprintf(file, "#Stage Type 1,Bonus House Name,Sequential/Random Order,Display Text,Powerup List\n");
+	fprintf(file, "#Stage Type 1,Bonus House Name,Sequential/Random Order,Display Text,Powerup List(Max 5)\n");
 
 	fprintf(file, "%d\n", game_values.tourstoptotal);
 
@@ -1440,6 +1440,8 @@ void WorldMap::DrawTileToSurface(SDL_Surface * surface, short iCol, short iRow, 
 void WorldMap::Cleanup()
 {
 	ResetTourStops();
+	iNumStages = 0;
+	iNumInitialBonuses = 0;
 
 	if(tiles)
 	{

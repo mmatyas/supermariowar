@@ -11,8 +11,13 @@
 +----------------------------------------------------------*/
 
 //TODO:
-//1) Update field button gfx to look like buttons
-//2) Decrement stages for vehicles when a stage is deleted
+//1) Continue testing by creating a fully functional new world
+
+//Checkin
+//1) Fixed crashing bug when no stages were defined with stage and vehicle editor
+//2) Fixed problem when saving map with a bonus house with no powerups defined
+//3) Fixed bug where keys were not being cleared out when exiting vehicle editor
+//4) Added fast scroll feature as an option for select fields
 
 #define _SMW_EDITOR
 #include "global.h"
@@ -39,7 +44,7 @@
 
 #define MAPTITLESTRING "SMW 1.8 World Editor"
 
-enum {EDITOR_EDIT, EDITOR_WATER, EDITOR_BACKGROUND, EDITOR_FOREGROUND, EDITOR_PATHSPRITE, EDITOR_VEHICLES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_WORLD, NEW_WORLD, RESIZE_WORLD, SAVE, EDITOR_WARP, DISPLAY_HELP, EDITOR_PATH, EDITOR_TYPE, EDITOR_BOUNDARY, EDITOR_START_ITEMS, EDITOR_STAGE};
+enum {EDITOR_EDIT, EDITOR_WATER, EDITOR_BACKGROUND, EDITOR_STAGEFOREGROUND, EDITOR_STRUCTUREFOREGROUND, EDITOR_BRIDGES, EDITOR_PATHSPRITE, EDITOR_VEHICLES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_WORLD, NEW_WORLD, RESIZE_WORLD, SAVE, EDITOR_WARP, DISPLAY_HELP, EDITOR_PATH, EDITOR_TYPE, EDITOR_BOUNDARY, EDITOR_START_ITEMS, EDITOR_STAGE};
 
 const char * szEditModes[10] = {"Background Mode", "Foreground Mode", "Path Sprite Mode", "Stage Mode", "Path Mode", "Vehicle Mode", "Warp Mode", "Start/Door Mode", "Boundary Mode", "Stage Mode"};
 
@@ -212,7 +217,9 @@ int editor_warp();
 int editor_boundary();
 int editor_water();
 int	editor_background();
-int editor_foreground();
+int editor_stageforeground();
+int editor_structureforeground();
+int editor_bridges();
 int editor_vehicles();
 int	editor_path();
 int editor_pathsprite();
@@ -768,8 +775,16 @@ int main(int argc, char *argv[])
 				state = editor_background();
 			break;
 
-			case EDITOR_FOREGROUND:
-				state = editor_foreground();
+			case EDITOR_STAGEFOREGROUND:
+				state = editor_stageforeground();
+			break;
+
+			case EDITOR_STRUCTUREFOREGROUND:
+				state = editor_structureforeground();
+			break;
+
+			case EDITOR_BRIDGES:
+				state = editor_bridges();
 			break;
 
 			case EDITOR_VEHICLES:
@@ -972,10 +987,16 @@ int editor_edit()
 							return EDITOR_BACKGROUND;
 
 						if(event.key.keysym.sym == SDLK_3)
-							return EDITOR_FOREGROUND;
+							return EDITOR_STAGEFOREGROUND;
 
 						if(event.key.keysym.sym == SDLK_4)
 							return EDITOR_PATHSPRITE;
+
+						if(event.key.keysym.sym == SDLK_5)
+							return EDITOR_STRUCTUREFOREGROUND;
+
+						if(event.key.keysym.sym == SDLK_6)
+							return EDITOR_BRIDGES;
 
 						if(event.key.keysym.sym == SDLK_t)
 							return EDITOR_TYPE;
@@ -2789,7 +2810,7 @@ int editor_start_items()
 					short iButtonX = event.button.x;
 					short iButtonY = event.button.y;
 
-					if(event.button.button == SDL_BUTTON_LEFT)
+					if(event.button.button == SDL_BUTTON_LEFT || event.button.button == SDL_BUTTON_RIGHT)
 					{
 						if(g_worldmap.iNumInitialBonuses < 32)
 						{
@@ -3222,7 +3243,7 @@ int editor_background()
 	return EDITOR_QUIT;
 }
 
-int editor_foreground()
+int editor_stageforeground()
 {
 	bool done = false;
 	short iForegroundScreen = 0;
@@ -3246,7 +3267,7 @@ int editor_foreground()
 				{	
 					SDLKey key = event.key.keysym.sym;
 
-					if(key >= SDLK_1 && key <= SDLK_6)
+					if(key >= SDLK_1 && key <= SDLK_4)
 					{
 						iForegroundScreen = key - SDLK_1;
 					}
@@ -3266,40 +3287,17 @@ int editor_foreground()
 						short iButtonX = event.button.x / TILESIZE;
 						short iButtonY = event.button.y / TILESIZE;
 
-						if(iForegroundScreen < 4)
+						if(iButtonX >= 0 && iButtonX < 10)
 						{
-							if(iButtonX >= 0 && iButtonX < 10)
+							if(iButtonY >= 0 && iButtonY < 10)
 							{
-								if(iButtonY >= 0 && iButtonY < 10)
-									set_tile = WORLD_FOREGROUND_STAGE_OFFSET + iButtonY * 10 + iButtonX + iForegroundScreen * 100;
-							}
-						}
-						else if(iForegroundScreen == 4)
-						{
-							if(iButtonX >= 0 && iButtonX < 4)
-							{
-								if(iButtonY >= 0 && iButtonY < 1)
-									set_tile = WORLD_BRIDGE_SPRITE_OFFSET + iButtonX;
-							}
-						}
-						else if(iForegroundScreen == 5)
-						{
-							if(iButtonY >= 0 && iButtonY < 15)
-							{
-								if(iButtonX >= 0 && iButtonX < 12)
-								{
-									set_tile = WORLD_FOREGROUND_SPRITE_OFFSET + iButtonX + iButtonY * 12;
-								}
-								else if(iButtonX >= 12 && iButtonX < 14)
-								{
-									set_tile = WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET + iButtonY + (iButtonX - 12) * 15;
-								}
-							}
-						}
+								set_tile = WORLD_FOREGROUND_STAGE_OFFSET + iButtonY * 10 + iButtonX + iForegroundScreen * 100;
 
-						ignoreclick = true;
-						edit_mode = 1;
-						return EDITOR_EDIT;
+								ignoreclick = true;
+								edit_mode = 1;
+								return EDITOR_EDIT;
+							}
+						}
 					}
 					
 					break;
@@ -3312,27 +3310,172 @@ int editor_foreground()
 
 		SDL_FillRect(screen, NULL, 0x0);
 
-		if(iForegroundScreen < 4)
+		for(short iRow = 0; iRow < 10; iRow++)
 		{
-			for(short iRow = 0; iRow < 10; iRow++)
+			for(short iCol = 0; iCol < 10; iCol++)
 			{
-				for(short iCol = 0; iCol < 10; iCol++)
-				{
-					spr_worldforegroundspecial[0].draw(iCol << 5, iRow << 5, 384, iForegroundScreen << 5, 32, 32);
-				}
+				spr_worldforegroundspecial[0].draw(iCol << 5, iRow << 5, 384, iForegroundScreen << 5, 32, 32);
 			}
+		}
 
-			spr_worldforegroundspecial[0].draw(0, 0, 0, 0, 320, 320);
-		}
-		else if(iForegroundScreen == 4)
+		spr_worldforegroundspecial[0].draw(0, 0, 0, 0, 320, 320);
+
+		DrawMessage();
+		SDL_Flip(screen);
+
+		int delay = WAITTIME - (SDL_GetTicks() - framestart);
+		if(delay < 0)
+			delay = 0;
+		else if(delay > WAITTIME)
+			delay = WAITTIME;
+		
+		SDL_Delay(delay);
+	}
+
+	return EDITOR_QUIT;
+}
+
+int editor_bridges()
+{
+	bool done = false;
+	
+	while (!done)
+	{
+		int framestart = SDL_GetTicks();
+
+		//handle messages
+		while(SDL_PollEvent(&event))
 		{
-			spr_worldforegroundspecial[0].draw(0, 0, 320, 224, 128, 32);
+			switch(event.type)
+			{
+				case SDL_QUIT:
+				{
+					done = true;
+					break;
+				}
+
+				case SDL_KEYDOWN:
+				{	
+					edit_mode = 1;
+					return EDITOR_EDIT;
+
+					break;
+				}
+
+				case SDL_MOUSEBUTTONDOWN:
+				{
+					if(event.button.button == SDL_BUTTON_LEFT)
+					{
+						short iButtonX = event.button.x / TILESIZE;
+						short iButtonY = event.button.y / TILESIZE;
+
+						if(iButtonX >= 0 && iButtonX < 4)
+						{
+							if(iButtonY >= 0 && iButtonY < 1)
+							{
+								set_tile = WORLD_BRIDGE_SPRITE_OFFSET + iButtonX;
+
+								ignoreclick = true;
+								edit_mode = 1;
+								return EDITOR_EDIT;
+							}
+						}
+					}
+					
+					break;
+				}
+
+				default:
+					break;
+			}
 		}
-		else if(iForegroundScreen == 5)
+
+		SDL_FillRect(screen, NULL, 0x0);
+
+		spr_worldforegroundspecial[0].draw(0, 0, 320, 224, 128, 32);
+		
+		DrawMessage();
+		SDL_Flip(screen);
+
+		int delay = WAITTIME - (SDL_GetTicks() - framestart);
+		if(delay < 0)
+			delay = 0;
+		else if(delay > WAITTIME)
+			delay = WAITTIME;
+		
+		SDL_Delay(delay);
+	}
+
+	return EDITOR_QUIT;
+}
+
+int editor_structureforeground()
+{
+	bool done = false;
+	
+	while (!done)
+	{
+		int framestart = SDL_GetTicks();
+
+		//handle messages
+		while(SDL_PollEvent(&event))
 		{
-			spr_worldforeground[0].draw(0, 0, 0, 0, 416, 480);
-			spr_worldforeground[0].draw(416, 0, 512, 0, 32, 480);
+			switch(event.type)
+			{
+				case SDL_QUIT:
+				{
+					done = true;
+					break;
+				}
+
+				case SDL_KEYDOWN:
+				{	
+					edit_mode = 1;
+					return EDITOR_EDIT;
+
+					break;
+				}
+
+				case SDL_MOUSEBUTTONDOWN:
+				{
+					if(event.button.button == SDL_BUTTON_LEFT)
+					{
+						short iButtonX = event.button.x / TILESIZE;
+						short iButtonY = event.button.y / TILESIZE;
+
+						if(iButtonY >= 0 && iButtonY < 15)
+						{
+							if(iButtonX >= 0 && iButtonX < 12)
+							{
+								set_tile = WORLD_FOREGROUND_SPRITE_OFFSET + iButtonX + iButtonY * 12;
+
+								ignoreclick = true;
+								edit_mode = 1;
+								return EDITOR_EDIT;
+							}
+							else if(iButtonX >= 12 && iButtonX < 14)
+							{
+								set_tile = WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET + iButtonY + (iButtonX - 12) * 15;
+
+								ignoreclick = true;
+								edit_mode = 1;
+								return EDITOR_EDIT;
+							}
+						}
+					}
+					
+					break;
+				}
+
+				default:
+					break;
+			}
 		}
+
+		SDL_FillRect(screen, NULL, 0x0);
+
+		spr_worldforeground[0].draw(0, 0, 0, 0, 416, 480);
+		spr_worldforeground[0].draw(416, 0, 512, 0, 32, 480);
 
 		DrawMessage();
 		SDL_Flip(screen);
@@ -3427,6 +3570,12 @@ int editor_pathsprite()
 
 int editor_vehicles()
 {
+	if(g_worldmap.iNumStages <= 0)
+	{
+		SetDisplayMessage(120, "No Stages", "You need to create", "stages before you", "can create vehicles");
+		return EDITOR_EDIT;
+	}
+
 	mCurrentMenu = &mVehicleMenu;
 	mCurrentMenu->ResetMenu();
 
@@ -3976,29 +4125,35 @@ int editor_stage()
 
 				case SDL_KEYDOWN:
 				{
-					TourStop * ts = game_values.tourstops[iEditStage];
-
 					//Do not allow saving world by pressing 's' key
 					//World data structures are not in the correct state to be saved
 					//until exiting the stage editor menu in (MENU_CODE_EXIT_APPLICATION == code) below
 
-					if(mCurrentMenu == &mStageSettingsMenu && event.key.keysym.sym == SDLK_n)
+					if(iEditStage == -1 && event.key.keysym.sym == SDLK_n)
 					{
 						NewStage(&iEditStage);
 					}
 					else if(event.key.keysym.sym == SDLK_ESCAPE && iEditStage == -1)
 					{
-						edit_mode = 9;  //change to edit mode using stages
+						if(g_worldmap.iNumStages == 0 || set_tile < 6 || set_tile >= g_worldmap.iNumStages + 6)
+							edit_mode = 1;
+						else 
+							edit_mode = 9;  //change to edit mode using stages
+
 						return EDITOR_EDIT;
 					}
-					else if(event.key.keysym.sym >= SDLK_1 && event.key.keysym.sym <= SDLK_4 && mCurrentMenu == &mBonusItemPicker && ts->iStageType == 0)
+					else if(mCurrentMenu == &mBonusItemPicker && event.key.keysym.sym >= SDLK_1 && event.key.keysym.sym <= SDLK_4)
 					{
-						short iPlace = event.key.keysym.sym - SDLK_1 + 1;
+						TourStop * ts = game_values.tourstops[iEditStage];
+						if(ts->iStageType == 0)
+						{
+							short iPlace = event.key.keysym.sym - SDLK_1 + 1;
 
-						int iMouseX, iMouseY;
-						SDL_GetMouseState(&iMouseX, &iMouseY);
-				
-						TestAndSetBonusItem(ts, iPlace, iMouseX, iMouseY);
+							int iMouseX, iMouseY;
+							SDL_GetMouseState(&iMouseX, &iMouseY);
+					
+							TestAndSetBonusItem(ts, iPlace, iMouseX, iMouseY);
+						}
 					}
 					else if((event.key.keysym.sym == SDLK_PAGEUP && iEditStage > 0) || 
 						(event.key.keysym.sym == SDLK_PAGEDOWN && iEditStage < g_worldmap.iNumStages - 1))
@@ -4512,9 +4667,9 @@ int display_help()
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[v] - Vehicle");
 	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "    [c] - Copy Vehicle");
+	menu_font_small.draw(offsetx, offsety, "      [c] - Copy Vehicle");
 	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[t] - Stages and Doors");
+	menu_font_small.draw(offsetx, offsety, "[t] - Start and Doors");
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[b] - Vehicle Boundaries");
 	offsety += menu_font_small.getHeight() + 2;

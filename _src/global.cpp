@@ -1379,10 +1379,17 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
 			strcat(buffer, ts->szBonusText[iText]);
 		}
 
-		for(short iBonus = 0; iBonus < ts->iNumBonuses; iBonus++)
+		if(ts->iNumBonuses == 0)
 		{
-			strcat(buffer, ",");
-			strcat(buffer, ts->wsbBonuses[iBonus].szBonusString);
+			strcat(buffer, ",p0");
+		}
+		else
+		{
+			for(short iBonus = 0; iBonus < ts->iNumBonuses; iBonus++)
+			{
+				strcat(buffer, ",");
+				strcat(buffer, ts->wsbBonuses[iBonus].szBonusString);
+			}
 		}
 	}
 
