@@ -12,10 +12,9 @@
 
 //TODO:
 //1) Continue testing by creating a fully functional new world
-//2) Animated tank treads not showing on tanx map preview
 //3) When saving new world, it didn't save the name correct (or at all)
-//4) Add stage preview window when mousing over stage or vehicles
-//5) Need to add the rest of the stage preview data such as points, bonus items for each place, etc.
+//5) Warp arrows not showing up in map field
+//6) Several map thumbnails in main game are just blue corner blocks in thumbnail browser
 
 //Checkin
 
@@ -53,7 +52,8 @@ SDL_Surface		*blitdest;
 SDL_Surface		*sMapSurface;
 
 SDL_Rect		rectSrcSurface = {0, 0, 768, 608};
-SDL_Rect		rectDstSurface = {0, 0, 640, 480};bool			fNeedBlackBackground = false;
+SDL_Rect		rectDstSurface = {0, 0, 640, 480};
+bool			fNeedBlackBackground = false;
 short			iWorldWidth, iWorldHeight;
 
 SDL_Event		event;
@@ -120,6 +120,11 @@ gfxSprite		spr_platformstarttile;
 gfxSprite		spr_platformendtile;
 gfxSprite		spr_platformpath;
 
+gfxSprite		spr_thumbnail_warps[2];
+gfxSprite		spr_thumbnail_mapitems[2];
+gfxSprite		spr_tileanimation[3];
+gfxSprite		spr_blocks[3];
+gfxSprite		spr_unknowntile[3];
 
 //// Global stuff that the map editor doesn't need, but has references to
 GraphicsList menugraphicspacklist;
@@ -137,12 +142,7 @@ float CapFallingVelocity(float f) {return 0.0f;}
 void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead) {}
 bool LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDirections){return false;}
 
-gfxSprite		spr_thumbnail_warps[2];
-gfxSprite		spr_thumbnail_mapitems[2];
 gfxSprite		spr_awardsouls, spr_fireballexplosion;
-gfxSprite		spr_tileanimation[3];
-gfxSprite		spr_blocks[3];
-gfxSprite		spr_unknowntile[3];
 gfxSprite		spr_backmap[2];
 gfxSprite		spr_background;
 sfxSound		sfx_boomerang;
@@ -305,6 +305,9 @@ ModeOptionsMenu modeOptionsMenu;
 
 gfxSprite menu_dialog;
 
+SDL_Surface * sMapThumbnail = NULL;
+short iOldStageId = -1;
+
 //Sets up default mode options
 extern void SetupDefaultGameModeSettings();
 
@@ -450,6 +453,21 @@ int main(int argc, char *argv[])
 	menu_mode_large.init(convertPath("gfx/packs/Classic/menu/menu_mode_large.png"), 255, 0, 255);
 
 	spr_vehicleicons.init(convertPath("gfx/leveleditor/vehicle_icons.png"), 255, 0, 255);
+
+	spr_thumbnail_warps[0].init(convertPath("gfx/packs/Classic/menu/menu_warp_preview.png"), 255, 0, 255);
+	spr_thumbnail_warps[1].init(convertPath("gfx/packs/Classic/menu/menu_warp_thumbnail.png"), 255, 0, 255);
+	
+	spr_thumbnail_mapitems[0].init(convertPath("gfx/packs/Classic/menu/menu_mapitems_preview.png"), 255, 0, 255);
+	spr_thumbnail_mapitems[1].init(convertPath("gfx/packs/Classic/menu/menu_mapitems_thumbnail.png"), 255, 0, 255);
+
+	spr_tileanimation[1].init(convertPath("gfx/packs/Classic/tilesets/tile_animation_preview.png"), 255, 0, 255);
+	spr_tileanimation[2].init(convertPath("gfx/packs/Classic/tilesets/tile_animation_thumbnail.png"), 255, 0, 255);
+
+	spr_blocks[1].init(convertPath("gfx/packs/Classic/tilesets/blocks_preview.png"), 255, 0, 255);
+	spr_blocks[2].init(convertPath("gfx/packs/Classic/tilesets/blocks_thumbnail.png"), 255, 0, 255);
+
+	spr_unknowntile[1].init(convertPath("gfx/packs/Classic/tilesets/unknown_tile_preview.png"), 255, 0, 255);
+	spr_unknowntile[2].init(convertPath("gfx/packs/Classic/tilesets/unknown_tile_thumbnail.png"), 255, 0, 255);
 
 	sMapSurface = SDL_CreateRGBSurface(screen->flags, 768, 608, screen->format->BitsPerPixel, 0, 0, 0, 0);
 
@@ -1181,6 +1199,8 @@ int editor_edit()
 							worldlist.prev();
 
 							loadcurrentworld();
+
+							iOldStageId = -1;
 						}
 
 						if(event.key.keysym.sym == SDLK_PAGEDOWN)
@@ -1191,6 +1211,8 @@ int editor_edit()
 							worldlist.next();
 
 							loadcurrentworld();
+
+							iOldStageId = -1;
 						}
 
 						break;
@@ -3832,9 +3854,6 @@ int editor_path()
 
 void DisplayStageDetails(short iStageId, short iMouseX, short iMouseY)
 {
-	static SDL_Surface * sMapThumbnail = NULL;
-	static short iOldStageId = -1;
-
 	TourStop * ts = game_values.tourstops[iStageId];
 
 	//If we're pointing to a new stage or no stage at all
@@ -3904,7 +3923,14 @@ void DisplayStageDetails(short iStageId, short iMouseX, short iMouseY)
 	}
 	else if(iMode == 25)
 	{
-	
+		//Make sure we're displaying it on the screen
+		if(iMouseY > 374)
+			iMouseY = 374;
+
+		spr_largedialog.draw(iMouseX, iMouseY, 0, 0, 116, 53);
+		spr_largedialog.draw(iMouseX + 116, iMouseY, 140, 0, 116, 53);
+		spr_largedialog.draw(iMouseX, iMouseY + 53, 0, 171, 116, 53);
+		spr_largedialog.draw(iMouseX + 116, iMouseY + 53, 140, 171, 116, 53);
 	}
 
 	menu_mode_large.draw(iMouseX + 16, iMouseY + 16, iMode << 5, 0, 32, 32);
@@ -3925,7 +3951,7 @@ void DisplayStageDetails(short iStageId, short iMouseX, short iMouseY)
 		menu_font_small.drawChopRight(iMouseX + 16, iMouseY + iOffsetY + 16, 100, szPrint);
 
 		sprintf(szPrint, "End: %s", ts->fEndStage ? "Yes" : "No");
-		menu_font_small.drawChopRight(iMouseX + 116, iMouseY + iOffsetY + 16, 80, szPrint);
+		menu_font_small.drawChopRight(iMouseX + 126, iMouseY + iOffsetY + 16, 80, szPrint);
 
 		for(short iBonus = 0; iBonus < ts->iNumBonuses; iBonus++)
 		{
@@ -3941,6 +3967,40 @@ void DisplayStageDetails(short iStageId, short iMouseX, short iMouseY)
 	{
 		sprintf(szPrint, "Sort: %s", ts->iBonusType == 0 ? "Fixed" : "Random");
 		menu_font_small.drawChopRight(iMouseX + 52, iMouseY + 34, 164, szPrint);
+
+		for(short iBonus = 0; iBonus < ts->iNumBonuses; iBonus++)
+		{
+			short iBonusIcon = ts->wsbBonuses[iBonus].iBonus;
+			gfxSprite * spr_icon = NULL;
+			short iSrcX = 0, iSrcY = 0;
+
+			if(iBonusIcon < NUM_POWERUPS)
+			{
+				spr_icon = &spr_storedpowerupsmall;
+				iSrcX = iBonusIcon << 4;
+				iSrcY = 0;
+			}
+			else if(iBonusIcon < NUM_POWERUPS + NUM_WORLD_POWERUPS)
+			{
+				spr_icon = &spr_worlditemssmall;
+				iSrcX = (iBonusIcon - NUM_POWERUPS) << 4;
+				iSrcY = 0;
+			}
+			else if(iBonusIcon < NUM_POWERUPS + NUM_WORLD_POWERUPS + 10)
+			{
+				spr_icon = &spr_worlditemssmall;
+				iSrcX = (iBonusIcon - NUM_POWERUPS - NUM_WORLD_POWERUPS) << 4;
+				iSrcY = 16;
+			}
+			else
+			{
+				spr_icon = &spr_worlditemssmall;
+				iSrcX = (iBonusIcon - NUM_POWERUPS - NUM_WORLD_POWERUPS - 10) << 4;
+				iSrcY = 32;
+			}
+
+			spr_icon->draw(iMouseX + iBonus * 20 + 18, iMouseY + 52, iSrcX, iSrcY, 16, 16);
+		}
 	}
 
 	if(sMapThumbnail)
@@ -4300,7 +4360,7 @@ int editor_stage()
 					{
 						NewStage(&iEditStage);
 					}
-					else if(event.key.keysym.sym == SDLK_ESCAPE && iEditStage == -1)
+					else if((event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_e) && iEditStage == -1)
 					{
 						if(g_worldmap.iNumStages == 0)
 						{
