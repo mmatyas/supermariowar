@@ -141,6 +141,8 @@ class CMap
 
 		void loadMap(const std::string& file, ReadType iReadType);
 		void saveMap(const std::string& file);
+
+		SDL_Surface * createThumbnailSurface(bool fUseClassicPack);
 		void saveThumbnail(const std::string &file, bool fUseClassicPack);
 
 		void UpdateAllTileGaps();

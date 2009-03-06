@@ -2129,8 +2129,7 @@ void CMap::saveMap(const std::string& file)
 */
 }
 
-//Save thumbnail image
-void CMap::saveThumbnail(const std::string &sFile, bool fUseClassicPack)
+SDL_Surface * CMap::createThumbnailSurface(bool fUseClassicPack)
 {
 	SDL_Surface * sThumbnail = SDL_CreateRGBSurface(screen->flags, 160, 120, 16, 0, 0, 0, 0);
 
@@ -2162,7 +2161,7 @@ void CMap::saveThumbnail(const std::string &sFile, bool fUseClassicPack)
 	if(!sBackground)
 	{
 		printf("ERROR: Couldn't convert thumbnail background to diplay pixel format: %s\n", SDL_GetError());
-		return;
+		return NULL;
 	}
 
 	SDL_FreeSurface(temp);
@@ -2173,7 +2172,7 @@ void CMap::saveThumbnail(const std::string &sFile, bool fUseClassicPack)
 	if(SDL_SoftStretch(sBackground, &srcRectBackground, sThumbnail, &dstRectBackground) < 0)
 	{
 		fprintf(stderr, "SDL_SoftStretch error: %s\n", SDL_GetError());
-		return;
+		return NULL;
 	}
 
 	SDL_FreeSurface(sBackground);
@@ -2185,6 +2184,17 @@ void CMap::saveThumbnail(const std::string &sFile, bool fUseClassicPack)
 	drawThumbnailPlatforms(sThumbnail);
 	preDrawPreviewForeground(sThumbnail, true);
 	preDrawPreviewWarps(sThumbnail, true);
+
+	return sThumbnail;
+}
+
+//Save thumbnail image
+void CMap::saveThumbnail(const std::string &sFile, bool fUseClassicPack)
+{
+	SDL_Surface * sThumbnail = createThumbnailSurface(fUseClassicPack);
+
+	if(!sThumbnail)
+		return;
 
 	//Save the screenshot with the same name as the map file
 

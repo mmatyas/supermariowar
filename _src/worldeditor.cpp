@@ -12,12 +12,12 @@
 
 //TODO:
 //1) Continue testing by creating a fully functional new world
+//2) Animated tank treads not showing on tanx map preview
+//3) When saving new world, it didn't save the name correct (or at all)
+//4) Add stage preview window when mousing over stage or vehicles
+//5) Need to add the rest of the stage preview data such as points, bonus items for each place, etc.
 
 //Checkin
-//1) Fixed crashing bug when no stages were defined with stage and vehicle editor
-//2) Fixed problem when saving map with a bonus house with no powerups defined
-//3) Fixed bug where keys were not being cleared out when exiting vehicle editor
-//4) Added fast scroll feature as an option for select fields
 
 #define _SMW_EDITOR
 #include "global.h"
@@ -63,9 +63,9 @@ gfxFont			menu_font_large;
 
 gfxSprite		spr_tilesetworld;
 gfxSprite		spr_selectedtile;
-gfxSprite		spr_worldstarttile;
 gfxSprite		spr_dialog;
 gfxSprite		menu_shade;
+gfxSprite		spr_largedialog;
 
 gfxSprite		spr_warps[3];
 gfxSprite		spr_path;
@@ -76,8 +76,12 @@ gfxSprite		spr_worldforegroundspecial[3];
 gfxSprite		spr_worldpaths[3];
 gfxSprite		spr_worldvehicle[3];
 
+gfxSprite		spr_storedpowerupsmall;
 gfxSprite		spr_worlditems;
 gfxSprite		spr_worldpopup;
+
+gfxSprite		spr_worlditemssmall;
+gfxSprite		spr_worlditemsplace;
 
 //Mode Options Menu Gfx
 gfxSprite		menu_egg;
@@ -112,6 +116,11 @@ WorldMapTile	copiedtiles[MAPWIDTH][MAPHEIGHT];
 //Vehicle structure that holds the current vehicle "stamp"
 WorldVehicle g_wvVehicleStamp;
 
+gfxSprite		spr_platformstarttile;
+gfxSprite		spr_platformendtile;
+gfxSprite		spr_platformpath;
+
+
 //// Global stuff that the map editor doesn't need, but has references to
 GraphicsList menugraphicspacklist;
 GraphicsList gamegraphicspacklist;
@@ -127,10 +136,6 @@ void IO_MovingObject::KillObjectMapHazard(short playerID) {}
 float CapFallingVelocity(float f) {return 0.0f;}
 void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead) {}
 bool LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDirections){return false;}
-
-gfxSprite		spr_platformstarttile;
-gfxSprite		spr_platformendtile;
-gfxSprite		spr_platformpath;
 
 gfxSprite		spr_thumbnail_warps[2];
 gfxSprite		spr_thumbnail_mapitems[2];
@@ -226,6 +231,8 @@ int editor_pathsprite();
 int editor_type();
 int editor_stage();
 int editor_start_items();
+
+void DisplayStageDetails(short iStageId, short iMouseX, short iMouseY);
 
 void updateworldsurface();
 void takescreenshot();
@@ -381,13 +388,21 @@ int main(int argc, char *argv[])
 	spr_path.init(convertPath("gfx/leveleditor/leveleditor_world_path.png"), 255, 0, 255);
 
 	spr_selectedtile.init(convertPath("gfx/leveleditor/leveleditor_selectedtile.png"), 0, 0, 0, 128, true);
-	spr_worldstarttile.init(convertPath("gfx/leveleditor/leveleditor_platformstarttile.png"), 0, 0, 0, 64, true);
-
+	
 	spr_dialog.init(convertPath("gfx/leveleditor/leveleditor_dialog.png"), 255, 0, 255, 255, true);
 	menu_shade.init(convertPath("gfx/leveleditor/leveleditor_shade.png"), 255, 0, 255, 128, true);
+	spr_largedialog.init(convertPath("gfx/leveleditor/leveleditor_platform.png"), 255, 0, 255, 255, true);
 
 	menu_font_small.init(convertPath("gfx/packs/Classic/fonts/font_small.png"));
 	menu_font_large.init(convertPath("gfx/packs/Classic/fonts/font_large.png"));
+
+	spr_platformpath.init(convertPath("gfx/leveleditor/leveleditor_platform_path.png"), 255, 0, 255, 128, true);
+
+	spr_platformstarttile.init(convertPath("gfx/leveleditor/leveleditor_platformstarttile.png"), 0, 0, 0, 64, true);
+	spr_platformendtile.init(convertPath("gfx/leveleditor/leveleditor_selectedtile.png"), 0, 0, 0, 64, true);
+	spr_platformstarttile.SetWrap(true);
+	spr_platformendtile.SetWrap(true);
+
 
 	printf("\n---------------- load world ----------------\n");
 
@@ -413,6 +428,10 @@ int main(int argc, char *argv[])
 
 	spr_worlditems.init(convertPath("gfx/packs/Classic/world/world_powerups.png"), 255, 0, 255);
 	spr_worldpopup.init(convertPath("gfx/packs/Classic/world/world_item_popup.png"), 255, 0, 255);
+
+	spr_storedpowerupsmall.init(convertPath("gfx/packs/Classic/powerups/small.png"), 255, 0, 255);
+	spr_worlditemssmall.init(convertPath("gfx/packs/Classic/world/world_powerupssmall.png"), 255, 0, 255);
+	spr_worlditemsplace.init(convertPath("gfx/packs/Classic/world/world_bonusplace.png"), 255, 0, 255);
 
 	menu_dialog.init(convertPath("gfx/packs/Classic/menu/menu_dialog.png"), 255, 0, 255);
 
@@ -892,6 +911,8 @@ int editor_edit()
 	bool fExiting = false;
 	bool fSelectedYes = false;
 
+	short iStageDisplay = -1;
+
 	while (!done)
 	{
 		int framestart = SDL_GetTicks();
@@ -1108,6 +1129,8 @@ int editor_edit()
 
 								view_repeat_direction = 0;
 								view_repeat_timer = 30;
+
+								iStageDisplay = -1;
 							}
 						}
 						else if(event.key.keysym.sym == SDLK_DOWN)
@@ -1119,6 +1142,8 @@ int editor_edit()
 
 								view_repeat_direction = 1;
 								view_repeat_timer = 30;
+								
+								iStageDisplay = -1;
 							}
 						}
 						else if(event.key.keysym.sym == SDLK_LEFT)
@@ -1130,6 +1155,8 @@ int editor_edit()
 
 								view_repeat_direction = 2;
 								view_repeat_timer = 30;
+
+								iStageDisplay = -1;
 							}
 						}
 						else if(event.key.keysym.sym == SDLK_RIGHT)
@@ -1141,6 +1168,8 @@ int editor_edit()
 
 								view_repeat_direction = 3;
 								view_repeat_timer = 30;
+
+								iStageDisplay = -1;
 							}
 						}
 
@@ -1392,6 +1421,7 @@ int editor_edit()
 								else if(edit_mode == 5)
 								{
 									RemoveVehicleFromTile(iCol, iRow);
+									iStageDisplay = -1;
 								}
 								else if(edit_mode == 6)
 								{
@@ -1412,6 +1442,7 @@ int editor_edit()
 								else if(edit_mode == 9) //stage
 								{
 									g_worldmap.tiles[iCol][iRow].iType = 0;
+									iStageDisplay = -1;
 								}
 							}
 						}
@@ -1623,6 +1654,7 @@ int editor_edit()
 								else if(edit_mode == 5) //vehicles
 								{
 									RemoveVehicleFromTile(iCol, iRow);
+									iStageDisplay = -1;
 								}
 								else if(edit_mode == 6) //Warps
 								{
@@ -1639,10 +1671,40 @@ int editor_edit()
 								else if(edit_mode == 9) //stage
 								{
 									g_worldmap.tiles[iCol][iRow].iType = 0;
+									iStageDisplay = -1;
 								}
 							}
 						}
 					
+						//Scan to see if we are mousing over a stage
+						if(edit_mode == 5)
+						{
+							iStageDisplay = -1;
+
+							std::vector<WorldVehicle*>::iterator itr = vehiclelist.begin(), lim = vehiclelist.end();
+							while(itr != lim)
+							{
+								WorldVehicle * vehicle = *itr;
+								if(vehicle->iCurrentTileX == iCol && vehicle->iCurrentTileY == iRow)
+								{
+									iStageDisplay = vehicle->iActionId;
+									break;
+								}
+
+								itr++;
+							}
+						}
+						else if(edit_mode == 9)
+						{
+							iStageDisplay = -1;
+
+							short iType = g_worldmap.tiles[iCol][iRow].iType - 6;
+							if(iType >= 0)
+							{
+								iStageDisplay = iType;
+							}
+						}
+
 						break;
 					}
 
@@ -1790,6 +1852,14 @@ int editor_edit()
 						}
 					}
 				}
+
+				if(iStageDisplay >= 0)
+				{
+					int iMouseX, iMouseY;
+					SDL_GetMouseState(&iMouseX, &iMouseY);
+				
+					DisplayStageDetails(iStageDisplay, iMouseX, iMouseY);
+				}
 			}
 
 			if(edit_mode == 5 || edit_mode == 8) //draw vehicles
@@ -1823,6 +1893,17 @@ int editor_edit()
 					}
 
 					itr++;
+				}
+
+				if(edit_mode == 5)
+				{
+					if(iStageDisplay >= 0)
+					{
+						int iMouseX, iMouseY;
+						SDL_GetMouseState(&iMouseX, &iMouseY);
+					
+						DisplayStageDetails(iStageDisplay, iMouseX, iMouseY);
+					}
 				}
 			}
 
@@ -2638,37 +2719,6 @@ void drawmap(bool fScreenshot, short iBlockSize)
 		SDL_FillRect(screen, NULL, 0x0);
 
 	SDL_BlitSurface(sMapSurface, &rectSrcSurface, blitdest, &rectDstSurface);
-
-	//g_worldmap.Draw(draw_offset_col, draw_offset_row);
-
-	//Draw warp arrows
-	/*
-	for(int j = 0; j < MAPHEIGHT; j++)
-	{
-		for(int i = 0; i < MAPWIDTH; i++)
-		{
-			Warp * warp = NULL;
-			if((move_mode == 1 || move_mode == 3) && i - move_offset_x >= 0 && i - move_offset_x < MAPWIDTH &&
-				j - move_offset_y >= 0 && j - move_offset_y < MAPHEIGHT && 
-				selectedtiles[i - move_offset_x][j - move_offset_y])
-			{
-				warp = &copiedtiles[i - move_offset_x][j - move_offset_y].warp;
-			}
-			else
-			{
-				warp = &g_map.warpdata[i][j];
-			}
-			
-			if(warp->connection != -1)
-			{
-				SDL_Rect rSrc = {warp->connection * iBlockSize, warp->direction * iBlockSize, iBlockSize, iBlockSize};
-				SDL_Rect rDst = {i * iBlockSize, j * iBlockSize, iBlockSize, iBlockSize};
-
-				SDL_BlitSurface(spr_warps[iBlockSize == TILESIZE ? 0 : iBlockSize == PREVIEWTILESIZE ? 1 : 2].getSurface(), &rSrc, screen, &rDst);
-			}
-		}
-	}
-	*/
 }
 
 int editor_warp()
@@ -3678,10 +3728,10 @@ int editor_vehicles()
 		else if(MENU_CODE_CREATE_VEHICLE == code)
 		{
 			edit_mode = 5;
+			ignoreclick = true;
 			game_values.playerInput.ResetKeys();
 			return EDITOR_EDIT;
 		}
-
 
 		drawmap(false, TILESIZE);
 		menu_shade.draw(0, 0);
@@ -3780,9 +3830,126 @@ int editor_path()
 	return EDITOR_QUIT;
 }
 
-void DisplayModeDetails(short iModeId, short iMouseX, short iMouseY)
+void DisplayStageDetails(short iStageId, short iMouseX, short iMouseY)
 {
-	menu_mode_large.draw(iMouseX, iMouseY, iModeId << 5, 0, 32, 32);
+	static SDL_Surface * sMapThumbnail = NULL;
+	static short iOldStageId = -1;
+
+	TourStop * ts = game_values.tourstops[iStageId];
+
+	//If we're pointing to a new stage or no stage at all
+	if(iStageId != iOldStageId)
+	{
+		if(ts->iStageType == 1 || ts->iMode == 1000)
+		{
+			if(sMapThumbnail)
+			{
+				SDL_FreeSurface(sMapThumbnail);
+				sMapThumbnail = NULL;
+			}
+		}
+		else
+		{
+			const char * pszMapName = ts->pszMapFile;
+
+			if(pszMapName)
+			{
+				if(maplist.findexact(pszMapName, false))
+				{
+					if(sMapThumbnail)
+					{
+						SDL_FreeSurface(sMapThumbnail);
+						sMapThumbnail = NULL;
+					}
+
+					g_map.loadMap(maplist.currentFilename(), read_type_preview);
+					sMapThumbnail = g_map.createThumbnailSurface(true);
+				}
+			}
+		}
+	}
+
+	iOldStageId = iStageId;
+
+	short iMode = ts->iMode;
+	if(ts->iStageType == 1)
+		iMode = 24;
+	else if(ts->iMode == 1000)
+		iMode = 25;
+
+	//Make sure we're displaying it on the screen
+	if(iMouseX > 408)
+		iMouseX = 408;
+
+	if(iMode < GAMEMODE_LAST)
+	{
+		if(iMouseY > 248)
+			iMouseY = 248;
+
+		spr_largedialog.draw(iMouseX, iMouseY, 0, 0, 116, 116);
+		spr_largedialog.draw(iMouseX + 116, iMouseY, 140, 0, 116, 116);
+		spr_largedialog.draw(iMouseX, iMouseY + 116, 0, 108, 116, 116);
+		spr_largedialog.draw(iMouseX + 116, iMouseY + 116, 140, 108, 116, 116);
+	}
+	else if(iMode == 24)
+	{
+		//Make sure we're displaying it on the screen
+		if(iMouseY > 392)
+			iMouseY = 392;
+
+		spr_largedialog.draw(iMouseX, iMouseY, 0, 0, 116, 44);
+		spr_largedialog.draw(iMouseX + 116, iMouseY, 140, 0, 116, 44);
+		spr_largedialog.draw(iMouseX, iMouseY + 44, 0, 180, 116, 44);
+		spr_largedialog.draw(iMouseX + 116, iMouseY + 44, 140, 180, 116, 44);
+	}
+	else if(iMode == 25)
+	{
+	
+	}
+
+	menu_mode_large.draw(iMouseX + 16, iMouseY + 16, iMode << 5, 0, 32, 32);
+
+	menu_font_small.drawChopRight(iMouseX + 52, iMouseY + 16, 164, ts->szName);
+
+	char szPrint[128];
+	if(iMode != 24)
+	{
+		sprintf(szPrint, "Goal: %d", ts->iGoal);
+		menu_font_small.drawChopRight(iMouseX + 52, iMouseY + 34, 164, szPrint);
+
+		short iOffsetY = 160;
+		if(iMode >= 25)
+			iOffsetY = 36;
+
+		sprintf(szPrint, "Points: %d", ts->iPoints);
+		menu_font_small.drawChopRight(iMouseX + 16, iMouseY + iOffsetY + 16, 100, szPrint);
+
+		sprintf(szPrint, "End: %s", ts->fEndStage ? "Yes" : "No");
+		menu_font_small.drawChopRight(iMouseX + 116, iMouseY + iOffsetY + 16, 80, szPrint);
+
+		for(short iBonus = 0; iBonus < ts->iNumBonuses; iBonus++)
+		{
+			WorldStageBonus * wsb = &ts->wsbBonuses[iBonus];
+			spr_worlditemsplace.draw(iMouseX + iBonus * 20 + 16, iMouseY + iOffsetY + 34, wsb->iWinnerPlace * 20, 0, 20, 20);
+
+			short iBonusIcon = wsb->iBonus;
+			gfxSprite * spr_icon = iBonusIcon < NUM_POWERUPS ? &spr_storedpowerupsmall : &spr_worlditemssmall;
+			spr_icon->draw(iMouseX + iBonus * 20 + 18, iMouseY + iOffsetY + 36, (iBonusIcon < NUM_POWERUPS ? iBonusIcon : iBonusIcon - NUM_POWERUPS) << 4, 0, 16, 16);
+		}
+	}
+	else
+	{
+		sprintf(szPrint, "Sort: %s", ts->iBonusType == 0 ? "Fixed" : "Random");
+		menu_font_small.drawChopRight(iMouseX + 52, iMouseY + 34, 164, szPrint);
+	}
+
+	if(sMapThumbnail)
+	{
+		SDL_Rect rSrc = {0, 0, 160, 120};
+		SDL_Rect rDst = {iMouseX + 16, iMouseY + 52, 160, 120};
+
+		SDL_BlitSurface(sMapThumbnail, &rSrc, blitdest, &rDst);
+	}
 }
 
 int g_iNumGameModeSettings[GAMEMODE_LAST] = {2,2,3,4,2,10,9,6,2,1,3,5,3,3,0,22,6,3,3,4,4,3};
@@ -4063,8 +4230,8 @@ int editor_stage()
 	mCurrentMenu->ResetMenu();
 
 	bool done = false;
-	short iModeDisplay = -1;
-	short iEditStage = -1;	
+	short iStageDisplay = -1;
+	short iEditStage = -1;
 
 	SDL_Rect rStageBonusDst[10];
 	SDL_Rect rHouseBonusDst[MAX_BONUS_CHESTS];
@@ -4135,10 +4302,19 @@ int editor_stage()
 					}
 					else if(event.key.keysym.sym == SDLK_ESCAPE && iEditStage == -1)
 					{
-						if(g_worldmap.iNumStages == 0 || set_tile < 6 || set_tile >= g_worldmap.iNumStages + 6)
+						if(g_worldmap.iNumStages == 0)
+						{
 							edit_mode = 1;
-						else 
+						}
+						else if(set_tile < 6 || set_tile >= g_worldmap.iNumStages + 6)
+						{
+							set_tile = 6;
+							edit_mode = 9;
+						}
+						else
+						{
 							edit_mode = 9;  //change to edit mode using stages
+						}
 
 						return EDITOR_EDIT;
 					}
@@ -4263,7 +4439,7 @@ int editor_stage()
 
 				case SDL_MOUSEMOTION:
 				{
-					iModeDisplay = -1;
+					iStageDisplay = -1;
 
 					if(iEditStage == -1)
 					{
@@ -4274,16 +4450,7 @@ int editor_stage()
 							
 							if(iMouseX >= 0 && iMouseX < g_worldmap.iNumStages - (iMouseY * 20) && iMouseY >= 0 && iMouseY <= (g_worldmap.iNumStages - 1) / 20)
 							{
-								TourStop * ts = game_values.tourstops[iMouseX + (iMouseY * 20)];
-
-								if(ts->iStageType == 1)
-								{
-									iModeDisplay = 24;
-								}
-								else
-								{
-									iModeDisplay = (ts->iMode == 1000 ? 25 : ts->iMode);
-								}
+								iStageDisplay = iMouseX + (iMouseY * 20);
 							}
 						}
 					}
@@ -4525,12 +4692,12 @@ int editor_stage()
 				spr_worldforegroundspecial[0].draw(ix, iy, (iStage % 10) << 5, (iStage / 10) << 5, 32, 32);
 			}
 
-			if(iModeDisplay >= 0)
+			if(iStageDisplay >= 0)
 			{
 				int iMouseX, iMouseY;
 				SDL_GetMouseState(&iMouseX, &iMouseY);
 							
-				DisplayModeDetails(iModeDisplay, iMouseX, iMouseY);
+				DisplayStageDetails(iStageDisplay, iMouseX, iMouseY);
 			}
 
 			//Display New button

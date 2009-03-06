@@ -883,7 +883,7 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
 
 		if(fIsWorld)
 		{
-			if(ts->iNumBonuses == 0)
+			if(ts->iNumBonuses <= 0)
 			{
 				strcat(buffer, "0");
 			}

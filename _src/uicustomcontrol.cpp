@@ -3914,6 +3914,9 @@ void MI_MapBrowser::LoadPage(short page, bool fUseFilters)
 			SDL_Delay(10);
 		}
 		
+		if(mapSurfaces[iMap])
+			SDL_FreeSurface(mapSurfaces[iMap]);
+
 		mapSurfaces[iMap] = IMG_Load(sConvertedPath.c_str());
 
 		mapListNodes[iMap] = (*itr).second;
