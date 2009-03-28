@@ -51,9 +51,18 @@ STUFF TO WATCH OUT FOR IN BETA2
 - collision detection and behavior of coins, ztar, collection cards
 
 Fixed
-
+[X] Removed Push Only Kills as good game mode options for quick game
+[X] Fixed bug where quick greed mode games didn't choose a good multiplier
+[X] Fixed horizontal pirhana plants not resetting width/height correctly when killed
+[X] No pirhana plants (hazards) in previews in main game
+[X] Added boss mode back in as a minigame
 
 Beta 1 Public Release Bugs
+[ ] world editor does not compile correctly because it has different preprocessors than the other objects
+    when compiling it uses the same compiled objects compiled by other projects causing bad behavior
+
+[ ] Need to finish up difficulty settings for bosses
+[ ] Boss sledge hammers not colliding with koopas/shells
 
 [ ] Treasure chests from winning a stage that rewards an item in world mode can be spawned in areas where they fall forever, and can never be opened. (Though this is aesthetic)
 
@@ -297,7 +306,7 @@ Procedure for adding a new game mode:
 8) Set default settings for settings in main.cpp
 9) Add menu fields to support these new options in menu.cpp and menu.h
 10) Update ParseTourStopLine() and WriteTourStopLine() in global.cpp
-11) Update SetRandomGameModeSettings() in menu.cpp
+11) Update SetRandomGameModeSettings() in modeoptionsmenu.cpp
 12) Add new mode gfx to gfx\packs\Classic\menu\menu_mode_large.png and menu_mode_small.png
 13) Update fShowSettingsButton[] array in menu.cpp
 14) Remove old options.bin (new settings will now be read from it)
@@ -530,8 +539,8 @@ gfxSprite		spr_spiny;
 gfxSprite		spr_paragoomba;
 gfxSprite		spr_parakoopa;
 gfxSprite		spr_redparakoopa;
-//gfxSprite		spr_sledgebrothers;
-//gfxSprite		spr_sledgebrothersdead;
+gfxSprite		spr_sledgebrothers;
+gfxSprite		spr_sledgebrothersdead;
 gfxSprite		spr_redkoopa;
 gfxSprite		spr_cheepcheep;
 gfxSprite		spr_cheepcheepdead;
@@ -539,7 +548,6 @@ gfxSprite		spr_bulletbill;
 gfxSprite		spr_bulletbilldead;
 
 gfxSprite		spr_fireball;
-//gfxSprite		spr_superfireball;
 gfxSprite		spr_hammer;
 gfxSprite		spr_iceblast;
 gfxSprite		spr_boomerang;
@@ -550,6 +558,9 @@ gfxSprite		spr_spring;
 gfxSprite		spr_spike;
 gfxSprite		spr_bomb;
 gfxSprite		spr_kuriboshoe;
+
+gfxSprite		spr_sledgehammer;
+gfxSprite		spr_superfireball;
 
 gfxSprite		spr_hazard_fireball[3];
 gfxSprite		spr_hazard_rotodisc[3];
@@ -684,12 +695,14 @@ sfxSound sfx_treasurechest;
 sfxSound sfx_flamecannon;
 sfxSound sfx_wand;
 sfxSound sfx_enterstage;
+sfxSound sfx_gameover;
 
 sfxMusic backgroundmusic[6];
 
 CGameMode			*gamemodes[GAMEMODE_LAST];
 CGM_Bonus			*bonushousemode = NULL;
 CGM_Pipe_MiniGame	*pipegamemode = NULL;
+CGM_Boss_MiniGame	*bossgamemode = NULL;
 
 short		currentgamemode = 0;
 
@@ -699,6 +712,8 @@ extern short g_iPowerupToIcon[6];
 
 extern void SetupScoreBoard(bool fOrderMatters);
 extern void ShowScoreBoard();
+
+extern void LoadCurrentMapBackground();
 
 FiltersList filterslist;  //Filters list must be initiallized before maps list because it is used in maplist constructor
 MapList maplist;
@@ -826,10 +841,10 @@ void CleanDeadPlayers()
 		}
 	}
 
-	if(fCheckForGameOver)
+	if(fCheckForGameOver && game_values.gamemode->gamemode != game_mode_bonus && game_values.gamemode->gamemode != game_mode_boss_minigame)
 	{
 		short lastteam = -1;
-		if(!game_values.gamemode->gameover && CountAliveTeams(&lastteam) <= 1 && game_values.gamemode->gamemode != game_mode_bonus)
+		if(!game_values.gamemode->gameover && CountAliveTeams(&lastteam) <= 1)
 		{
 			game_values.gamemode->gameover = true;
 			game_values.gamemode->winningteam = lastteam;
@@ -926,10 +941,9 @@ void CleanUp();
 bool LoadAndSplashScreen();
 void SetGameModeSettingsFromMenu();
 void LoadMapObjects(bool fPreview);
-void LoadMapHazards(bool fPreview);
+extern void LoadMapHazards(bool fPreview);
 void UpdateScoreBoard();
 void PlayNextMusicTrack();
-//void EnterBossMode(short type);
 bool IsExitAllowed();
 bool IsPauseAllowed();
 
@@ -948,6 +962,26 @@ short joystickcount = 0;
 bool g_fAutoTest = false;
 bool g_fRecordTest = false;
 #endif
+
+/*
+void EnterBossMode(short type)
+{
+	if(game_values.gamestate == GS_GAME && game_values.gamemode->gamemode != game_mode_boss_minigame)
+	{
+		bossgamemode->SetBossType(type);
+
+		game_values.screenfade = 2;
+		game_values.screenfadespeed = 2;
+
+		backgroundmusic[0].stop();
+		ifsoundonstop(sfx_invinciblemusic);
+		ifsoundonstop(sfx_timewarning);
+		ifsoundonstop(sfx_slowdownmusic);
+
+		game_values.gamestate = GS_START_GAME;
+	}
+}*/
+
 
 // ------ MAIN ------
 int main(int argc, char *argv[])
@@ -1210,6 +1244,7 @@ int main(int argc, char *argv[])
 	//Special modes
 	bonushousemode = new CGM_Bonus();
 	pipegamemode = new CGM_Pipe_MiniGame();
+	bossgamemode = new CGM_Boss_MiniGame();
 
 	SetupDefaultGameModeSettings();
 	
@@ -2779,7 +2814,9 @@ void RunGame()
 					game_values.gamestate = GS_GAME;
 					
 					/*
+					/////////////BOSS
 					game_values.gamemode = bossgamemode;  //boss type has already been set at this point
+					bossgamemode->SetBossType(0);
 
 					if(bossgamemode->GetBossType() == 0)
 						g_map.loadMap(convertPath("maps/special/dungeon.map"), read_type_full);
@@ -2788,20 +2825,17 @@ void RunGame()
 					else if(bossgamemode->GetBossType() == 2)
 						g_map.loadMap(convertPath("maps/special/volcano.map"), read_type_full);
 
-					char filename[128];
-					sprintf(filename, "gfx/packs/backgrounds/%s", g_map.szBackgroundFile);
-					std::string path = convertPath(filename, gamegraphicspacklist.current_name());
+					LoadCurrentMapBackground();
 
-					//if the background file doesn't exist, use the classic background
-					if(!File_Exists(path))
-						path = convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist.current_name());
+					g_map.predrawbackground(spr_background, spr_backmap[0]);
+					g_map.predrawforeground(spr_frontmap[0]);
+					
+					g_map.predrawbackground(spr_background, spr_backmap[1]);
+					g_map.predrawforeground(spr_frontmap[1]);
 
-					gfx_loadimagenocolorkey(spr_background, path, false);
-
-					g_map.predrawbackground(spr_background, spr_backmap);
-					g_map.predrawforeground(spr_frontmap);
 					g_map.SetupAnimatedTiles();
 					LoadMapObjects(false);
+					///////////////////
 					*/
 
 					if(game_values.music)
@@ -3084,6 +3118,8 @@ void RunGame()
 						short iMode = game_values.gamemode->gamemode;
 						if(iMode == game_mode_pipe_minigame)
 							iMode = 25;
+						else if(iMode == game_mode_boss_minigame)
+							iMode = 26;
 
 						eyecandy[2].add(new EC_Announcement(&game_font_large, &menu_mode_large, szMode, iMode, 130, 90));
 					}
@@ -3171,6 +3207,8 @@ void RunGame()
 				short iMode = game_values.gamemode->gamemode;
 				if(iMode == game_mode_pipe_minigame)
 					iMode = 25;
+				else if(iMode == game_mode_boss_minigame)
+					iMode = 26;
 
 				menu_mode_large.draw(304, 224, iMode << 5, 0, 32, 32);
 
@@ -3574,8 +3612,8 @@ bool coldec_obj2obj(CObject * o1, CObject * o2)
 void SetGameModeSettingsFromMenu()
 {
 	//If this is a tour stop and the tour has settings in it, use those.  Otherwise use the menu settings.
-	if((game_values.matchtype == MATCH_TYPE_TOUR && game_values.tourstops[game_values.tourstopcurrent]->fUseSettings) || 
-		game_values.matchtype == MATCH_TYPE_WORLD)
+	if(game_values.tourstops[game_values.tourstopcurrent]->fUseSettings && 
+		(game_values.matchtype == MATCH_TYPE_TOUR || game_values.matchtype == MATCH_TYPE_WORLD))
 		memcpy(&game_values.gamemodesettings, &game_values.tourstops[game_values.tourstopcurrent]->gmsSettings, sizeof(GameModeSettings));
 	else
 		memcpy(&game_values.gamemodesettings, &game_values.gamemodemenusettings, sizeof(GameModeSettings));
@@ -3702,50 +3740,6 @@ void LoadMapObjects(bool fPreview)
 	g_map.UpdateAllTileGaps();
 }
 
-void LoadMapHazards(bool fPreview)
-{
-	//Make sure we don't have any objects created before we create them from the map settings
-	noncolcontainer.clean();
-	objectcontainer[0].clean();
-	objectcontainer[1].clean();
-	objectcontainer[2].clean();
-
-	//Create objects for all the map hazards
-	for(short iMapHazard = 0; iMapHazard < g_map.iNumMapHazards; iMapHazard++)
-	{
-		MapHazard * hazard = &g_map.maphazards[iMapHazard];
-		if(hazard->itype == 0)
-		{
-			for(short iFireball = 0; iFireball < hazard->iparam[0]; iFireball++)
-				objectcontainer[1].add(new OMO_OrbitHazard(&spr_hazard_fireball[fPreview ? 1 : 0], (hazard->ix << 4) + 16, (hazard->iy << 4) + 16, (float)(iFireball * 24), hazard->dparam[0], hazard->dparam[1], 4, 8, 18, 18, 0, 0, 0, hazard->dparam[0] < 0.0f ? 18 : 0, 18, 18));
-		}
-		else if(hazard->itype == 1)
-		{
-			float dSector = TWO_PI / hazard->iparam[0];
-			for(short iRotoDisc = 0; iRotoDisc < hazard->iparam[0]; iRotoDisc++)
-			{
-				float dAngle = hazard->dparam[1] + iRotoDisc * dSector;
-				if(dAngle > TWO_PI)
-					dAngle -= TWO_PI;
-
-				objectcontainer[1].add(new OMO_OrbitHazard(&spr_hazard_rotodisc[fPreview ? 1 : 0], (hazard->ix << 4) + 16, (hazard->iy << 4) + 16, hazard->dparam[2], hazard->dparam[0], dAngle, 21, 8, 32, 32, 0, 0, 0, 0, 32, 32));
-			}
-		}
-		else if(hazard->itype == 2)
-		{
-			noncolcontainer.add(new IO_BulletBillCannon(hazard->ix << 4, hazard->iy << 4, hazard->iparam[0], hazard->dparam[0], fPreview));
-		}
-		else if(hazard->itype == 3)
-		{
-			objectcontainer[1].add(new IO_FlameCannon(hazard->ix << 4, hazard->iy << 4, hazard->iparam[0], hazard->iparam[1]));
-		}
-		else if(hazard->itype >= 4 && hazard->itype <= 7)
-		{
-			objectcontainer[1].add(new MO_PirhanaPlant(hazard->ix << 4, hazard->iy << 4, hazard->itype - 4, hazard->iparam[0], hazard->iparam[1], fPreview));
-		}
-	}
-}
-
 bool SwapPlayers(short iUsingPlayerID)
 {
 	//Count available players to switch with
@@ -3835,25 +3829,6 @@ bool SwapPlayers(short iUsingPlayerID)
 
 	return true;
 }
-
-/*
-void EnterBossMode(short type)
-{
-	if(game_values.gamestate == GS_GAME && game_values.gamemode->gamemode != game_mode_boss)
-	{
-		//bossgamemode->SetBossType(type);
-
-		game_values.screenfade = 2;
-		game_values.screenfadespeed = 2;
-
-		backgroundmusic[0].stop();
-		ifsoundonstop(sfx_invinciblemusic);
-		ifsoundonstop(sfx_timewarning);
-		ifsoundonstop(sfx_slowdownmusic);
-
-		game_values.gamestate = GS_START_GAME;
-	}
-}*/
 
 bool IsExitAllowed()
 {

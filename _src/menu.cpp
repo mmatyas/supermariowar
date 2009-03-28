@@ -1366,6 +1366,9 @@ void Menu::CreateMenu()
 
 	miMinigameField = new MI_SelectField(&spr_selectfield, 130, 380, "Game", 380, 100);
 	miMinigameField->Add("Pipe Coin Game", 0, "", false, false);
+	miMinigameField->Add("Hammer Boss Game", 1, "", false, false);
+	miMinigameField->Add("Bomb Boss Game", 2, "", false, false);
+	miMinigameField->Add("Fire Boss Game", 3, "", false, false);
 	miMinigameField->SetData(&game_values.selectedminigame, NULL, NULL);
 	miMinigameField->SetKey(game_values.selectedminigame);
 	miMinigameField->Show(false);
@@ -2420,8 +2423,22 @@ void Menu::RunMenu()
 
 				if(MATCH_TYPE_MINIGAME == game_values.matchtype)
 				{
-					pipegamemode->goal = 50;
-					game_values.gamemode = pipegamemode;
+					short iMiniGameType = miMinigameField->GetShortValue();
+					
+					if(iMiniGameType == 0)
+					{
+						pipegamemode->goal = 50;
+						game_values.gamemode = pipegamemode;
+					}
+					else if(iMiniGameType >= 1 && iMiniGameType <= 3)
+					{
+						game_values.gamemodemenusettings.boss.bosstype = iMiniGameType - 1;
+						game_values.gamemodemenusettings.boss.difficulty = 2;
+
+						bossgamemode->goal = 5;
+						game_values.gamemode = bossgamemode;
+					}
+
 					StartGame();
 				}
 				else if(MATCH_TYPE_QUICK_GAME == game_values.matchtype)
@@ -2927,6 +2944,8 @@ void Menu::RunMenu()
 
 					if(iGameMode == game_mode_pipe_minigame)
 						game_values.gamemode = pipegamemode;
+					else if(iGameMode == game_mode_boss_minigame)
+						game_values.gamemode = bossgamemode;
 					else
 						game_values.gamemode = gamemodes[iGameMode];
 
@@ -3098,6 +3117,11 @@ void Menu::RunMenu()
 		{
 			if(GS_START_GAME == game_values.gamestate)
 			{
+				if(game_values.matchtype == MATCH_TYPE_QUICK_GAME)
+					modeOptionsMenu.SetRandomGameModeSettings(game_values.gamemode->gamemode);
+				else
+					SetGameModeSettingsFromMenu();
+
 				if(game_values.matchtype == MATCH_TYPE_WORLD && game_values.tourstops[game_values.tourstopcurrent]->iStageType == 1)
 				{
 					g_map.loadMap(convertPath("maps/special/bonushouse.map"), read_type_full);
@@ -3116,6 +3140,19 @@ void Menu::RunMenu()
 					{
 						g_map.loadMap(convertPath("maps/special/minigamepipe.map"), read_type_full);
 						sShortMapName = "minigamepipe";
+					}
+					else if(game_values.gamemode->gamemode == game_mode_boss_minigame)
+					{
+						short iBossType = game_values.gamemodesettings.boss.bosstype;
+						bossgamemode->SetBossType(iBossType);
+						if(iBossType == 0)
+							g_map.loadMap(convertPath("maps/special/dungeon.map"), read_type_full);
+						else if(iBossType == 1)
+							g_map.loadMap(convertPath("maps/special/hills.map"), read_type_full);
+						else if(iBossType == 2)
+							g_map.loadMap(convertPath("maps/special/volcano.map"), read_type_full);
+						
+						sShortMapName = "minigameboss";
 					}
 					else if(game_values.matchtype == MATCH_TYPE_QUICK_GAME)
 					{
@@ -3144,11 +3181,6 @@ void Menu::RunMenu()
 				}
 
 				game_values.gamestate = GS_GAME;			
-
-				if(game_values.matchtype == MATCH_TYPE_QUICK_GAME)
-					modeOptionsMenu.SetRandomGameModeSettings(game_values.gamemode->gamemode);
-				else
-					SetGameModeSettingsFromMenu();
 
 				g_map.predrawbackground(spr_background, spr_backmap[0]);
 				g_map.predrawforeground(spr_frontmap[0]);

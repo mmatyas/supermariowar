@@ -17,7 +17,7 @@ void ModeOptionsMenu::CreateMenu()
 
 	miClassicModeScoringField = new MI_SelectField(&spr_selectfield, 120, 240, "Scoring", 400, 180);
 	miClassicModeScoringField->Add("All Kills", 0, "", false, false);
-	miClassicModeScoringField->Add("Push Kills Only", 1, "", false, false);
+	miClassicModeScoringField->Add("Push Kills Only", 1, "", false, false, false);
 	miClassicModeScoringField->SetData(&game_values.gamemodemenusettings.classic.scoring, NULL, NULL);
 	miClassicModeScoringField->SetKey(game_values.gamemodemenusettings.classic.scoring);
 
@@ -52,7 +52,7 @@ void ModeOptionsMenu::CreateMenu()
 
 	miFragModeScoringField = new MI_SelectField(&spr_selectfield, 120, 240, "Scoring", 400, 180);
 	miFragModeScoringField->Add("All Kills", 0, "", false, false);
-	miFragModeScoringField->Add("Push Kills Only", 1, "", false, false);
+	miFragModeScoringField->Add("Push Kills Only", 1, "", false, false, false);
 	miFragModeScoringField->SetData(&game_values.gamemodemenusettings.frag.scoring, NULL, NULL);
 	miFragModeScoringField->SetKey(game_values.gamemodemenusettings.frag.scoring);
 
@@ -87,7 +87,7 @@ void ModeOptionsMenu::CreateMenu()
 
 	miTimeLimitModeScoringField = new MI_SelectField(&spr_selectfield, 120, 220, "Scoring", 400, 150);
 	miTimeLimitModeScoringField->Add("All Kills", 0, "", false, false);
-	miTimeLimitModeScoringField->Add("Push Kills Only", 1, "", false, false);
+	miTimeLimitModeScoringField->Add("Push Kills Only", 1, "", false, false, false);
 	miTimeLimitModeScoringField->SetData(&game_values.gamemodemenusettings.time.scoring, NULL, NULL);
 	miTimeLimitModeScoringField->SetKey(game_values.gamemodemenusettings.time.scoring);
 
@@ -952,9 +952,9 @@ void ModeOptionsMenu::CreateMenu()
 
 	miGreedModeMultiplier = new MI_SelectField(&spr_selectfield, 120, 260, "Multipler", 400, 180);
 	miGreedModeMultiplier->Add("0.5", 1, "", false, false, false);
-	miGreedModeMultiplier->Add("1", 2, "", false, false, false);
-	miGreedModeMultiplier->Add("1.5", 3, "", false, false, false);
-	miGreedModeMultiplier->Add("2", 4, "", false, false, false);
+	miGreedModeMultiplier->Add("1", 2, "", false, false);
+	miGreedModeMultiplier->Add("1.5", 3, "", false, false);
+	miGreedModeMultiplier->Add("2", 4, "", false, false);
 	miGreedModeMultiplier->Add("2.5", 5, "", false, false, false);
 	miGreedModeMultiplier->Add("3", 6, "", false, false, false);
 	miGreedModeMultiplier->SetData(&game_values.gamemodemenusettings.greed.multiplier, NULL, NULL);
@@ -1365,6 +1365,8 @@ void ModeOptionsMenu::SetRandomGameModeSettings(short iMode)
 	else if(iMode == game_mode_greed) //greed
 	{
 		game_values.gamemodesettings.greed.coinlife = miGreedModeCoinLife->GetRandomShortValue();
+		game_values.gamemodesettings.greed.owncoins = miGreedModeOwnCoins->GetRandomBoolValue();
+		game_values.gamemodesettings.greed.multiplier = miGreedModeMultiplier->GetRandomShortValue();
 	}
 	else if(iMode == game_mode_health) //health
 	{
@@ -1414,7 +1416,7 @@ void ModeOptionsMenu::HealthModeMaxLifeChanged()
 
 void ModeOptionsMenu::Refresh()
 {
-	for(short iMode = 0; iMode < 22; iMode++)
+	for(short iMode = 0; iMode < GAMEMODE_LAST; iMode++)
 	{
 		mModeSettingsMenu[iMode].Refresh();
 	}

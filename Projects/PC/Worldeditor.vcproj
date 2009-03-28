@@ -22,7 +22,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;PNG_SAVE_FORMAT;_WORLDEDITOR"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;PNG_SAVE_FORMAT;WORLDEDITOR"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="2"
@@ -82,7 +82,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;PNG_SAVE_FORMAT;_WORLDEDITOR"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;PNG_SAVE_FORMAT;WORLDEDITOR"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="TRUE"
@@ -194,6 +194,18 @@
 			</File>
 			<File
 				RelativePath="..\..\_src\movingplatform.h">
+			</File>
+			<File
+				RelativePath="..\..\_src\object.cpp">
+			</File>
+			<File
+				RelativePath="..\..\_src\object.h">
+			</File>
+			<File
+				RelativePath="..\..\_src\objecthazard.cpp">
+			</File>
+			<File
+				RelativePath="..\..\_src\objecthazard.h">
 			</File>
 			<File
 				RelativePath="..\..\_src\path.cpp">

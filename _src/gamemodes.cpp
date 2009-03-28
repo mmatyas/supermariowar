@@ -3349,30 +3349,35 @@ short CGM_Chase::CheckWinner(CPlayer * player)
 	return player_kill_normal;
 }
 
+CPlayer * CGM_Chase::GetKeyHolder()
+{
+	return key->owner;
+}
+
+
 //Boss Mode
 //Person to score fatal hit to boss wins!
-/*
-CGM_Boss::CGM_Boss() : CGameMode() 
+CGM_Boss_MiniGame::CGM_Boss_MiniGame() : CGameMode() 
 {
-	gamemode = game_mode_boss;
+	gamemode = game_mode_boss_minigame;
 	SetupModeStrings("Boss", "Lives", 5);
 	iBossType = 0;
 }
 
-void CGM_Boss::init()
+void CGM_Boss_MiniGame::init()
 {
 	CGameMode::init();
 	enemytimer = (short)(rand() % 120) + 120;
 	poweruptimer = 120;
 
 	for(short iScore = 0; iScore < score_cnt; iScore++)
-		score[iScore]->SetScore(5);
+		score[iScore]->SetScore(goal);
 
 	objectcontainer[0].add(new MO_SledgeBrother(&spr_sledgebrothers, (iBossType == 0 ? 256 : (iBossType == 1 ? 256 : 320)), iBossType));
 }
 
 
-void CGM_Boss::think()
+void CGM_Boss_MiniGame::think()
 {
 	if(!gameover && list_players_cnt == 0)
 	{
@@ -3400,7 +3405,7 @@ void CGM_Boss::think()
 			//Randomly spawn koopas
 			if(--enemytimer <= 0)
 			{
-				objectcontainer[0].add(new MO_Koopa(&spr_koopa, 2, 8, rand() % 2 == 0, 30, 28, 1, 25, false));
+				objectcontainer[0].add(new MO_Koopa(&spr_koopa, rand() % 2 == 0, false, false));
 				enemytimer = (short)(rand() % 120) + 120;  //Spawn koopas slowly
 			}
 		}
@@ -3412,7 +3417,7 @@ void CGM_Boss::think()
 		{
 			if(--enemytimer <= 0)
 			{
-				objectcontainer[2].add(new MO_Podobo(&spr_podobo, (short)(rand() % 608), -(float(rand() % 9) / 2.0f) - 9.0f, -1, -1, -1));
+				objectcontainer[2].add(new MO_Podobo(&spr_podobo, (short)(rand() % 608), 480, -(float(rand() % 9) / 2.0f) - 9.0f, -1, -1, -1, false));
 				enemytimer = (short)(rand() % 80 + 60);
 			}
 
@@ -3429,21 +3434,11 @@ void CGM_Boss::think()
 	}
 }
 
-void CGM_Boss::draw_foreground()
+void CGM_Boss_MiniGame::draw_foreground()
 {
 	if(gameover)
 	{
-		if(winningteam > -1)
-		{
-			game_font_large.drawCentered(320, 96, "Congratulations!");
-			if(iBossType == 0)
-				game_font_large.drawCentered(320, 118, "The Powerful Sledge Hammer Is Yours");
-			else if(iBossType == 1)
-				game_font_large.drawCentered(320, 118, "The Super Bomb Is Yours");
-			else if(iBossType == 2)
-				game_font_large.drawCentered(320, 118, "The Golden Podobo Is Yours");
-		}
-		else
+		if(winningteam == -1)
 		{
 			game_font_large.drawCentered(320, 96, "You Failed To Defeat");
 			
@@ -3457,7 +3452,7 @@ void CGM_Boss::draw_foreground()
 	}
 }
 
-short CGM_Boss::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
+short CGM_Boss_MiniGame::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
 {
 	if(!gameover)
 	{
@@ -3483,7 +3478,7 @@ short CGM_Boss::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle
 	return player_kill_normal;
 }
 
-short CGM_Boss::playerkilledself(CPlayer &player, killstyle style)
+short CGM_Boss_MiniGame::playerkilledself(CPlayer &player, killstyle style)
 {
 	CGameMode::playerkilledself(player, style);
 
@@ -3511,13 +3506,13 @@ short CGM_Boss::playerkilledself(CPlayer &player, killstyle style)
 	return player_kill_normal;
 }
 
-void CGM_Boss::playerextraguy(CPlayer &player, short iType)
+void CGM_Boss_MiniGame::playerextraguy(CPlayer &player, short iType)
 {
 	if(!gameover)
 		player.score->AdjustScore(iType);
 }
 
-bool CGM_Boss::SetWinner(CPlayer * player)
+bool CGM_Boss_MiniGame::SetWinner(CPlayer * player)
 {
 	winningteam = player->teamID;
 	gameover = true;
@@ -3543,23 +3538,25 @@ bool CGM_Boss::SetWinner(CPlayer * player)
 		backgroundmusic[1].play(true, false);
 	}
 
-	game_values.noexit = true;
-	
+	//game_values.noexit = true;
+
+	/*
 	if(iBossType == 0)
 		objectcontainer[0].add(new PU_SledgeHammerPowerup(&spr_sledgehammerpowerup, 304, -32, 1, 0, 30, 30, 1, 1));
 	else if(iBossType == 1)
 		objectcontainer[0].add(new PU_BombPowerup(&spr_bombpowerup, 304, -32, 1, 0, 30, 30, 1, 1));
 	else if(iBossType == 2)
 		objectcontainer[0].add(new PU_PodoboPowerup(&spr_podobopowerup, 304, -32, 1, 0, 30, 30, 1, 1));
+	*/
 
 	return true;
 }
 
-void CGM_Boss::SetBossType(short bosstype)
+void CGM_Boss_MiniGame::SetBossType(short bosstype)
 {
 	iBossType = bosstype;
 }
-*/
+
 
 
 //Bonus Mode (not really a game mode, but involves using the map so we need a mode to play)

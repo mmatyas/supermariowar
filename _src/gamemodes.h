@@ -4,7 +4,7 @@
 #define GAMEMODE_NUM_OPTIONS 21
 
 //Enum for each game mode
-enum GameModeType{game_mode_classic, game_mode_frag, game_mode_timelimit, game_mode_jail, game_mode_coins, game_mode_stomp, game_mode_eggs, game_mode_ctf, game_mode_chicken, game_mode_tag, game_mode_star, game_mode_domination, game_mode_koth, game_mode_race, game_mode_owned, game_mode_frenzy, game_mode_survival, game_mode_greed, game_mode_health, game_mode_collection, game_mode_chase, game_mode_shyguytag, GAMEMODE_LAST, game_mode_boss = 998, game_mode_bonus = 999, game_mode_pipe_minigame = 1000};
+enum GameModeType{game_mode_classic, game_mode_frag, game_mode_timelimit, game_mode_jail, game_mode_coins, game_mode_stomp, game_mode_eggs, game_mode_ctf, game_mode_chicken, game_mode_tag, game_mode_star, game_mode_domination, game_mode_koth, game_mode_race, game_mode_owned, game_mode_frenzy, game_mode_survival, game_mode_greed, game_mode_health, game_mode_collection, game_mode_chase, game_mode_shyguytag, GAMEMODE_LAST, game_mode_bonus = 999, game_mode_pipe_minigame = 1000, game_mode_boss_minigame = 1001};
 enum PlayerKillType{player_kill_none, player_kill_normal, player_kill_removed, player_kill_nonkill};
 
 struct SModeOption
@@ -14,6 +14,7 @@ struct SModeOption
 };
 
 struct TourStop;
+class CO_PhantoKey;
 
 //gamemode base class
 class CGameMode
@@ -552,7 +553,7 @@ class CGM_Chase : public CGameMode
 
 		short CheckWinner(CPlayer * player);
 
-		CPlayer * GetKeyHolder() {return key->owner;}
+		CPlayer * GetKeyHolder();
 
 #ifdef _DEBUG
 		void setdebuggoal() {goal = 50;}
@@ -563,13 +564,12 @@ class CGM_Chase : public CGameMode
 };
 
 
-/*
 //Special mode where players try to kill a boss
-class CGM_Boss : public CGameMode
+class CGM_Boss_MiniGame : public CGameMode
 {
 	public:
-        CGM_Boss();
-		virtual ~CGM_Boss() {}
+        CGM_Boss_MiniGame();
+		virtual ~CGM_Boss_MiniGame() {}
 		
 		void init();
 		void think();
@@ -585,12 +585,14 @@ class CGM_Boss : public CGameMode
 		void SetBossType(short bosstype);
 		short GetBossType() {return iBossType;}
 
+		bool HasStoredPowerups() {return false;}
+
 	private:
 		
 		short enemytimer, poweruptimer;
 		short iBossType;
 };
-*/
+
 
 //Special mode where players can collect a bonus item
 class CGM_Bonus : public CGameMode

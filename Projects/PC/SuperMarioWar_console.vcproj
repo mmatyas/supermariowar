@@ -318,6 +318,18 @@
 				RelativePath="..\..\_src\object.h">
 			</File>
 			<File
+				RelativePath="..\..\_src\objectgame.cpp">
+			</File>
+			<File
+				RelativePath="..\..\_src\objectgame.h">
+			</File>
+			<File
+				RelativePath="..\..\_src\objecthazard.cpp">
+			</File>
+			<File
+				RelativePath="..\..\_src\objecthazard.h">
+			</File>
+			<File
 				RelativePath="..\..\_src\path.cpp">
 			</File>
 			<File

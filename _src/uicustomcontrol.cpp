@@ -2281,6 +2281,8 @@ void MI_TourStop::Refresh(short iTourStop)
 		CGameMode * gamemode = NULL;
 		if(tourstop->iMode == game_mode_pipe_minigame)
 			gamemode = pipegamemode;
+		else if(tourstop->iMode == game_mode_boss_minigame)
+			gamemode = bossgamemode;
 		else
 			gamemode = gamemodes[tourstop->iMode];
 			
@@ -2297,9 +2299,23 @@ void MI_TourStop::Refresh(short iTourStop)
 		miPointsField->Add(szTemp, 0, "", false, false);
 
 		if(tourstop->iMode == game_mode_pipe_minigame)
-			miMapField->SetSpecialMap("Pipe Minigame Map", "maps/special/minigamepipe.map");
+		{
+			miMapField->SetSpecialMap("Pipe Minigame", "maps/special/minigamepipe.map");
+		}
+		else if(tourstop->iMode == game_mode_boss_minigame)
+		{
+			short iBossType = tourstop->gmsSettings.boss.bosstype;
+			if(iBossType == 0)
+				miMapField->SetSpecialMap("Hammer Boss Minigame", "maps/special/dungeon.map");
+			else if(iBossType == 1)
+				miMapField->SetSpecialMap("Bomb Boss Minigame", "maps/special/hills.map");
+			else if(iBossType == 2)
+				miMapField->SetSpecialMap("Fire Boss Minigame", "maps/special/volcano.map");
+		}
 		else
+		{
 			miMapField->SetMap(tourstop->pszMapFile, true);
+		}
 
 		miTourStopMenuHeaderText->SetText(tourstop->szName);
 

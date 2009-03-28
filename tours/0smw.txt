@@ -27,6 +27,7 @@
 #20 = Phanto Chase
 #21 = Shyguy Tag
 #1000 = Pipe Minigame
+#1001 = Boss Minigame
 
 #Version
 1.8.0.0
@@ -177,6 +178,9 @@
 #Free Time - 0 = instant, any number greater than 0 is the amount of time in frames (example: 310 is about 5 seconds)
 
 #1000 - Pipe Minigame
+#No Options
+
+#1001 - Boss Minigame
 #No Options
 
 #Tour Stops (maximum 10 stops)

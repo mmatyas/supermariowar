@@ -90,7 +90,7 @@ MapList::MapList()
 #endif
 
 //If this is for the world editor, load all the world maps into the map viewer UI control
-#ifdef _WORLDEDITOR
+#ifdef WORLDEDITOR
 	SimpleDirectoryList worldeditormapdirs(convertPath("worlds/"));
 
 	short iEditorDirCount = worldeditormapdirs.GetCount();
@@ -108,7 +108,7 @@ MapList::MapList()
 		
 		worldeditormapdirs.next();
 	}
-#endif
+#endif //WORLDEDITOR
 
 
 	//TODO: add proper test via size

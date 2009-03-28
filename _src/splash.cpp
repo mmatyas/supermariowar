@@ -287,6 +287,10 @@ bool LoadGameGraphics()
 	gfx_loadimage(&spr_redkoopa, convertPath("gfx/packs/modeobjects/redkoopa.png", graphicspack), true);
 	gfx_loadimage(&spr_cheepcheep, convertPath("gfx/packs/modeobjects/cheepcheep.png", graphicspack), true);
 	gfx_loadimage(&spr_cheepcheepdead, convertPath("gfx/packs/eyecandy/cheepcheepdead.png", graphicspack), true);
+	
+	gfx_loadimage(&spr_sledgebrothers, convertPath("gfx/packs/modeobjects/sledgebrothers.png", graphicspack), true);
+	gfx_loadimage(&spr_sledgebrothersdead, convertPath("gfx/packs/eyecandy/sledgebrothersdead.png", graphicspack), true);
+	
 	gfx_loadimage(&spr_bulletbill, convertPath("gfx/packs/projectiles/bulletbill.png", graphicspack), false);
 	gfx_loadimage(&spr_bulletbilldead, convertPath("gfx/packs/eyecandy/bulletbilldead.png", graphicspack), false);
 	gfx_loadimage(&spr_chicken, convertPath("gfx/packs/modeobjects/chicken.png", graphicspack), 160, true, true);
@@ -300,7 +304,6 @@ bool LoadGameGraphics()
 	gfx_loadimage(&spr_teleportstar, convertPath("gfx/packs/eyecandy/teleportstar.png", graphicspack), false);
 	
 	gfx_loadimage(&spr_fireball, convertPath("gfx/packs/projectiles/fireball.png", graphicspack), true);
-	//gfx_loadimage(&spr_superfireball, convertPath("gfx/packs/projectiles/superfire.png", graphicspack), true);
 	gfx_loadimage(&spr_hammer, convertPath("gfx/packs/projectiles/hammer.png", graphicspack), true);
 	gfx_loadimage(&spr_iceblast, convertPath("gfx/packs/projectiles/wandblast.png", graphicspack), true);
 	gfx_loadimage(&spr_boomerang, convertPath("gfx/packs/projectiles/boomerang.png", graphicspack), true);
@@ -308,7 +311,10 @@ bool LoadGameGraphics()
 	gfx_loadimage(&spr_shelldead, convertPath("gfx/packs/eyecandy/shelldead.png", graphicspack), true);
 	gfx_loadimage(&spr_blueblock, convertPath("gfx/packs/projectiles/throwblock.png", graphicspack), true);
 	gfx_loadimage(&spr_bomb, convertPath("gfx/packs/projectiles/bomb.png", graphicspack), true);
-	
+
+	gfx_loadimage(&spr_superfireball, convertPath("gfx/packs/modeobjects/superfire.png", graphicspack), true);
+	gfx_loadimage(&spr_sledgehammer, convertPath("gfx/packs/modeobjects/sledgehammer.png", graphicspack), true);
+
 	gfx_loadimage(&spr_hazard_fireball[0], convertPath("gfx/packs/hazards/fireball.png", graphicspack), true);
 	gfx_loadimage(&spr_hazard_fireball[1], convertPath("gfx/packs/hazards/fireball_preview.png", graphicspack), true);
 	gfx_loadimage(&spr_hazard_fireball[2], convertPath("gfx/packs/hazards/fireball_thumbnail.png", graphicspack), true);
@@ -427,6 +433,7 @@ bool LoadGameSounds()
 	sfx_flamecannon.init(convertPath("sfx/packs/flamecannon.wav", soundpack));
 	sfx_wand.init(convertPath("sfx/packs/wand.wav", soundpack));
 	sfx_enterstage.init(convertPath("sfx/packs/enter-stage.wav", soundpack));
+	sfx_gameover.init(convertPath("sfx/packs/gameover.wav", soundpack));
 
 	game_values.soundcapable = true;
 	return true;

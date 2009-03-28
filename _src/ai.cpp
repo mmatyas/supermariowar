@@ -1240,11 +1240,10 @@ void CPlayerAI::GetNearestObjects()
 				{
 					DistanceToObject(movingobject, &nearestObjects.stomp, &nearestObjects.stompdistance, &nearestObjects.stompwrap);
 				}
-				/*
 				else if(movingobject_sledgebrother == movingtype)
 				{
 					DistanceToObject(movingobject, &nearestObjects.threat, &nearestObjects.threatdistance, &nearestObjects.threatwrap);
-				}*/
+				}
 				else if(movingobject_treasurechest == movingtype)
 				{
 					DistanceToObject(movingobject, &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);

@@ -413,11 +413,10 @@ class CPlayer
 		friend class CGM_Health;
 		friend class CGM_Collection;
 		friend class CGM_Chase;
-		friend class CGM_Pipe_MiniGame;
 
-		friend class CGM_Boss;
 		friend class CGM_Bonus;
-		
+		friend class CGM_Pipe_MiniGame;
+		friend class CGM_Boss_MiniGame;
 		
 		friend class MI_InputDevice;
 		friend class MI_InputLeft;
@@ -499,12 +498,15 @@ class CPlayer
 		friend class CO_Bomb;
 		friend class CO_KuriboShoe;
 
+		friend class MO_SuperFireball;
+		friend class MO_SledgeHammer;
+		
 		friend class MO_WalkingEnemy;
 		friend class MO_Goomba;
 		friend class MO_Koopa;
 		friend class MO_BuzzyBeetle;
 		friend class MO_Spiny;
-		//friend class MO_SledgeBrother;
+		friend class MO_SledgeBrother;
 		friend class MO_CheepCheep;
 		friend class MO_BulletBill;
 		friend class MO_FlagBase;

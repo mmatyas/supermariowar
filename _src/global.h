@@ -261,6 +261,8 @@ std::string stripCreatorAndDotMap(const std::string &filename);
 #include "map.h"
 #include "player.h"
 #include "object.h"
+#include "objectgame.h"
+#include "objecthazard.h"
 //#include "HashTable.h"
 #include "eyecandy.h"
 #include "gamemodes.h"
@@ -349,6 +351,7 @@ extern sfxSound			sfx_treasurechest;
 extern sfxSound			sfx_flamecannon;
 extern sfxSound			sfx_wand;
 extern sfxSound			sfx_enterstage;
+extern sfxSound			sfx_gameover;
 
 extern sfxMusic			backgroundmusic[6];
 
@@ -421,8 +424,8 @@ extern gfxSprite		spr_spiny;
 extern gfxSprite		spr_paragoomba;
 extern gfxSprite		spr_parakoopa;
 extern gfxSprite		spr_redparakoopa;
-//extern gfxSprite		spr_sledgebrothers;
-//extern gfxSprite		spr_sledgebrothersdead;
+extern gfxSprite		spr_sledgebrothers;
+extern gfxSprite		spr_sledgebrothersdead;
 extern gfxSprite		spr_redkoopa;
 extern gfxSprite		spr_cheepcheep;
 extern gfxSprite		spr_cheepcheepdead;
@@ -430,7 +433,7 @@ extern gfxSprite		spr_bulletbill;
 extern gfxSprite		spr_bulletbilldead;
 
 extern gfxSprite		spr_fireball;
-//extern gfxSprite		spr_superfireball;
+extern gfxSprite		spr_superfireball;
 extern gfxSprite		spr_hammer;
 extern gfxSprite		spr_iceblast;
 extern gfxSprite		spr_boomerang;
@@ -441,6 +444,9 @@ extern gfxSprite		spr_spring;
 extern gfxSprite		spr_spike;
 extern gfxSprite		spr_bomb;
 extern gfxSprite		spr_kuriboshoe;
+
+extern gfxSprite		spr_sledgehammer;
+extern gfxSprite		spr_superfireball;
 
 extern gfxSprite		spr_hazard_fireball[3];
 extern gfxSprite		spr_hazard_rotodisc[3];
@@ -589,10 +595,11 @@ extern TourList tourlist;
 extern WorldList worldlist;
 extern FiltersList filterslist;
 
-extern CGameMode	*gamemodes[GAMEMODE_LAST];
-extern CGM_Bonus	*bonushousemode;
-extern CGM_Pipe_MiniGame	*pipegamemode;
-extern short		currentgamemode;
+extern CGameMode * gamemodes[GAMEMODE_LAST];
+extern CGM_Bonus * bonushousemode;
+extern CGM_Pipe_MiniGame * pipegamemode;
+extern CGM_Boss_MiniGame * bossgamemode;
+extern short currentgamemode;
 
 extern float CapFallingVelocity(float vel);
 extern float CapSideVelocity(float vel);
@@ -773,6 +780,12 @@ struct ShyGuyTagGameModeSettings
 	short freetime;				//How long all players will stay shyguys before the game is reset
 };
 
+struct BossGameModeSettings
+{
+	short bosstype;				//What type of boss battle it is
+	short difficulty;			//How hard the boss is to defeat
+};
+
 struct GameModeSettings
 {
 	ClassicGameModeSettings classic;
@@ -796,6 +809,7 @@ struct GameModeSettings
 	CollectionGameModeSettings collection;
 	ChaseGameModeSettings chase;
 	ShyGuyTagGameModeSettings shyguytag;
+	BossGameModeSettings boss;
 };
 
 struct WorldStageBonus

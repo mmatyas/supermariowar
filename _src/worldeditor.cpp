@@ -13,8 +13,6 @@
 //TODO:
 //1) Continue testing by creating a fully functional new world
 //3) When saving new world, it didn't save the name correct (or at all)
-//5) Warp arrows not showing up in map field
-//6) Several map thumbnails in main game are just blue corner blocks in thumbnail browser
 
 //Checkin
 
@@ -134,10 +132,27 @@ gfxSprite		spr_warplock;
 short			x_shake = 0;
 short			y_shake = 0;
 gv				game_values;
+
 void CPlayer::flipsidesifneeded() {}
 short CPlayer::KillPlayerMapHazard(bool fForce, killstyle style, bool fKillCarriedItem) {return 0;}
-void IO_MovingObject::flipsidesifneeded() {}
-void IO_MovingObject::KillObjectMapHazard(short playerID) {}
+bool CPlayer::collision_detection_checktop() {return false;}
+bool CPlayer::bouncejump() {return false;}
+
+void B_WeaponBreakableBlock::triggerBehavior(short iPlayerID, short iTeamID) {}
+
+void CO_Egg::placeEgg() {}
+void CO_Flag::placeFlag() {}
+void CO_PhantoKey::placeKey() {}
+void CO_Star::placeStar() {}
+void OMO_Area::placeArea() {}
+void OMO_Area::reset() {}
+void OMO_Area::setOwner(CPlayer * player) {}
+
+short PlayerKilledPlayer(short id, CPlayer * killed, short deathstyle, killstyle style, bool fForce, bool fKillCarriedItem) {return 0;}
+void AddAwardKill(CPlayer * killer, CPlayer * killed, killstyle style) {}
+
+CPlayer * GetPlayerFromGlobalID(short id) {return NULL;}
+
 float CapFallingVelocity(float f) {return 0.0f;}
 void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead) {}
 bool LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDirections){return false;}
@@ -145,7 +160,18 @@ bool LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDir
 gfxSprite		spr_awardsouls, spr_fireballexplosion;
 gfxSprite		spr_backmap[2];
 gfxSprite		spr_background;
+gfxSprite		spr_explosion;
+gfxSprite		spr_hazard_bulletbilldead;
+
 sfxSound		sfx_boomerang;
+sfxSound		sfx_bobombsound;
+sfxSound		sfx_bulletbillsound;
+sfxSound		sfx_flamecannon;
+sfxSound		sfx_hit;
+sfxSound		sfx_kicksound;
+sfxSound		sfx_mip;
+sfxSound		sfx_transform;
+
 SkinList		skinlist;
 gfxSprite		**spr_player[4];
 CGameMode		*gamemodes[GAMEMODE_LAST];
@@ -177,7 +203,13 @@ std::vector<WorldMusicOverride*> worldmusicoverrides;
 
 short LookupTeamID(short id) {return 0;}
 gfxSprite		spr_scoretext;
+
+int g_iNextNetworkID = 0;
+short projectiles[4];
 ///////
+
+CObjectContainer noncolcontainer;
+CObjectContainer objectcontainer[3];
 
 int save_as();
 int find();
@@ -232,7 +264,7 @@ int editor_type();
 int editor_stage();
 int editor_start_items();
 
-void DisplayStageDetails(short iStageId, short iMouseX, short iMouseY);
+void DisplayStageDetails(bool fForce, short iStageId, short iMouseX, short iMouseY);
 
 void updateworldsurface();
 void takescreenshot();
@@ -310,6 +342,7 @@ short iOldStageId = -1;
 
 //Sets up default mode options
 extern void SetupDefaultGameModeSettings();
+extern void LoadMapHazards(bool fPreview);
 
 struct StageModeOption
 {
@@ -354,6 +387,9 @@ void SetStageMode(short iIndex, const char * szModeName, const char * szGoalName
 //main main main
 int main(int argc, char *argv[])
 {
+	game_values.sound = false;
+	game_values.music = false;
+
     /* This must occur before any data files are loaded */
     Initialize_Paths();
 
@@ -381,6 +417,8 @@ int main(int argc, char *argv[])
 	g_tilesetmanager.Init(convertPath("gfx/Classic/tilesets").c_str());
 
 	SDL_WM_SetCaption(MAPTITLESTRING, "worldeditor.ico");
+
+	game_values.toplayer = true;
 
 	printf("\n---------------- loading graphics ----------------\n");
 		
@@ -468,6 +506,22 @@ int main(int argc, char *argv[])
 
 	spr_unknowntile[1].init(convertPath("gfx/packs/Classic/tilesets/unknown_tile_preview.png"), 255, 0, 255);
 	spr_unknowntile[2].init(convertPath("gfx/packs/Classic/tilesets/unknown_tile_thumbnail.png"), 255, 0, 255);
+
+	spr_hazard_fireball[1].init(convertPath("gfx/packs/Classic/hazards/fireball_preview.png"), 255, 0, 255);
+	spr_hazard_fireball[2].init(convertPath("gfx/packs/Classic/hazards/fireball_thumbnail.png"), 255, 0, 255);
+
+	spr_hazard_rotodisc[1].init(convertPath("gfx/packs/Classic/hazards/rotodisc_preview.png"), 255, 0, 255);
+	spr_hazard_rotodisc[2].init(convertPath("gfx/packs/Classic/hazards/rotodisc_thumbnail.png"), 255, 0, 255);
+
+	spr_hazard_bulletbill[1].init(convertPath("gfx/packs/Classic/hazards/bulletbill_preview.png"), 255, 0, 255);
+	spr_hazard_bulletbill[2].init(convertPath("gfx/packs/Classic/hazards/bulletbill_thumbnail.png"), 255, 0, 255);
+
+	spr_hazard_flame[1].init(convertPath("gfx/packs/Classic/hazards/flame_preview.png"), 255, 0, 255);
+	spr_hazard_flame[2].init(convertPath("gfx/packs/Classic/hazards/flame_thumbnail.png"), 255, 0, 255);
+
+	spr_hazard_pirhanaplant[1].init(convertPath("gfx/packs/Classic/hazards/pirhanaplant_preview.png"), 255, 0, 255);
+	spr_hazard_pirhanaplant[2].init(convertPath("gfx/packs/Classic/hazards/pirhanaplant_thumbnail.png"), 255, 0, 255);
+
 
 	sMapSurface = SDL_CreateRGBSurface(screen->flags, 768, 608, screen->format->BitsPerPixel, 0, 0, 0, 0);
 
@@ -1880,7 +1934,7 @@ int editor_edit()
 					int iMouseX, iMouseY;
 					SDL_GetMouseState(&iMouseX, &iMouseY);
 				
-					DisplayStageDetails(iStageDisplay, iMouseX, iMouseY);
+					DisplayStageDetails(false, iStageDisplay, iMouseX, iMouseY);
 				}
 			}
 
@@ -1924,7 +1978,7 @@ int editor_edit()
 						int iMouseX, iMouseY;
 						SDL_GetMouseState(&iMouseX, &iMouseY);
 					
-						DisplayStageDetails(iStageDisplay, iMouseX, iMouseY);
+						DisplayStageDetails(false, iStageDisplay, iMouseX, iMouseY);
 					}
 				}
 			}
@@ -3852,12 +3906,12 @@ int editor_path()
 	return EDITOR_QUIT;
 }
 
-void DisplayStageDetails(short iStageId, short iMouseX, short iMouseY)
+void DisplayStageDetails(bool fForce, short iStageId, short iMouseX, short iMouseY)
 {
 	TourStop * ts = game_values.tourstops[iStageId];
 
 	//If we're pointing to a new stage or no stage at all
-	if(iStageId != iOldStageId)
+	if(iStageId != iOldStageId || fForce)
 	{
 		if(ts->iStageType == 1 || ts->iMode == 1000)
 		{
@@ -4291,6 +4345,7 @@ int editor_stage()
 
 	bool done = false;
 	short iStageDisplay = -1;
+	bool fForceStageDisplay = false;
 	short iEditStage = -1;
 
 	SDL_Rect rStageBonusDst[10];
@@ -4633,6 +4688,7 @@ int editor_stage()
 			else if(MENU_CODE_MAP_CHANGED == code)
 			{
 				game_values.tourstops[iEditStage]->pszMapFile = maplist.currentShortmapname();
+				fForceStageDisplay = true;
 			}
 			else if(MENU_CODE_TO_BONUS_PICKER_MENU == code)
 			{
@@ -4757,7 +4813,8 @@ int editor_stage()
 				int iMouseX, iMouseY;
 				SDL_GetMouseState(&iMouseX, &iMouseY);
 							
-				DisplayStageDetails(iStageDisplay, iMouseX, iMouseY);
+				DisplayStageDetails(fForceStageDisplay, iStageDisplay, iMouseX, iMouseY);
+				fForceStageDisplay = false;
 			}
 
 			//Display New button

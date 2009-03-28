@@ -2068,12 +2068,10 @@ void MI_MapField::Update()
 	}
 
 	//Update hazards
-#ifndef _WORLDEDITOR
 	noncolcontainer.update();
 
 	objectcontainer[1].update();
 	objectcontainer[1].cleandeadobjects();
-#endif //_WORLDEDITOR
 
 	miModifyImageRight->Update();
 	miModifyImageLeft->Update();
@@ -2112,7 +2110,6 @@ void MI_MapField::Draw()
 
 	g_map.drawPlatforms(rectDst.x, rectDst.y, 1);
 
-#ifndef _WORLDEDITOR
 	//Draw map hazards
 	for(short i = 0; i < objectcontainer[1].list_end; i++)
 	{
@@ -2145,7 +2142,6 @@ void MI_MapField::Draw()
 			}
 		}
 	}
-#endif  //_WORLDEDITOR
 
 	g_map.drawPlatforms(rectDst.x, rectDst.y, 2);
 
@@ -2186,12 +2182,10 @@ void MI_MapField::LoadMap(const char * szMapPath)
 	SDL_Delay(10);  //Sleeps to help the music from skipping
 	g_map.preDrawPreviewForeground(surfaceMapForeground, false);
 	SDL_Delay(10);  //Sleeps to help the music from skipping
-	g_map.preDrawPreviewWarps(surfaceMapForeground, false);
+	g_map.preDrawPreviewWarps(game_values.toplayer ? surfaceMapForeground : surfaceMapBackground, false);
 	SDL_Delay(10);  //Sleeps to help the music from skipping
 
-#ifndef _WORLDEDITOR
 	LoadMapHazards(true);
-#endif //_WORLDEDITOR
 
 }
 
