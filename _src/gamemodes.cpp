@@ -3415,7 +3415,8 @@ void CGM_Boss_MiniGame::think()
 		}
 		else if(iBossType == 2)
 		{
-			if(--enemytimer <= 0)
+			//Only create podobos if the difficulty is moderate or greater
+			if(--enemytimer <= 0 && game_values.gamemodesettings.boss.difficulty >= 2)
 			{
 				objectcontainer[2].add(new MO_Podobo(&spr_podobo, (short)(rand() % 608), 480, -(float(rand() % 9) / 2.0f) - 9.0f, -1, -1, -1, false));
 				enemytimer = (short)(rand() % 80 + 60);

@@ -181,7 +181,9 @@
 #No Options
 
 #1001 - Boss Minigame
-#No Options
+#Boss Type - 0 = Hammer, 1 = Bomb, 2 = Fire
+#Difficulty - 0 = Very Easy, 1 = Easy, 2 = Moderate, 3 = Hard, 4 = Very Hard
+#Hit Points - Any number greater than 0. This is the number of hits required to kill the boss.
 
 #Tour Stops (maximum 10 stops)
 #Map,Mode,Goal,Points,Bonus Wheel,Name,Options(see above)

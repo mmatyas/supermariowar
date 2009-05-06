@@ -829,6 +829,8 @@ class MO_CarriedObject : public IO_MovingObject
 		virtual void Drop();
 		virtual void Kick();
 
+		bool HasOwner() {return owner != NULL;}
+
 		bool IsCarriedByKuriboShoe() { return fCarriedByKuriboShoe; }
 
 	protected:
@@ -1246,15 +1248,19 @@ class MO_SledgeBrother : public IO_MovingObject
 		void Die();
 		void Damage(short playerID);
 
+		short debugActionType;
+
 	protected:
 		
+		void SetLastAction(short type);
+
 		short iType;
 
 		short iActionState;
 		short iDestLocationX[5];
 
 		void randomaction();
-		void move(bool moveright);
+		void move();
 		void throwprojectile();
 		void taunt();
 		void turn();
@@ -1284,7 +1290,10 @@ class MO_SledgeBrother : public IO_MovingObject
 		short iDestX;
 		
 		short iPlatformY;
-		short need_attack;
+		short need_action[6];
+
+		short last_action;
+		short last_action_count;
 };
 
 

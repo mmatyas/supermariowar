@@ -28,9 +28,42 @@
 |								  http://smw.72dpiarmy.com	|
 +----------------------------------------------------------*/
 
+/*
+To Remove Debug Sledge Bros Stuff
+1) Remove debug stuff from void Menu::WriteGameOptions()
+2) Remove all references to these in main.cpp:
+extern short g_iSledgeBrotherActions[3][5][5];
+extern short g_iSledgeBrotherNeedAction[3][5][6];
+extern short g_iSledgeBrotherMaxAction[3][5][5];
+extern short g_iSledgeBrotherWaitTime[3][5][2];
+3) Remove debug code from sledgebrother object in objectgame.cpp
+4) Remove all keys (sdlk_p, sdlk_r, sdlk_e, etc) from main
+5) Remove bracket and +/- keys
+6) Remove debugActionType in sledgebrother object
+7) Remove opening sledge.bin file line 1431 main.cpp
+8) Remove opening sledge.bin line 300 menu.cpp
+9) Remove line 2424: game_values.minigameunlocked in menu.cpp
+10) Remove line 6900: debugActionType in objectgame.cpp
+11) Remove line 1635: fDebugShowBossSettings in main.cpp
+12) Change line 2592: bossgamemode->goal = 999; in menu.cpp
+13) Remove line 1730 in main.cpp debug statements
+*/
 
 /*
 TODO
+BUG!! Shy Guy Tag is pretty fun, but there's a small bug to it. On Unlimited, whoever scores the first point wins the match. Also, we might want to look into a different skin for the Shy Guy, since it's in the regular skins too. I can see that causing some serious confusion. Maybe we could switch it out with SGraff's or something.
+
+[ ] There's less pause between actions when moving up a difficulty past moderate but when the boss starts moving, he moves so ungodly slow that the battle becomes very trivial; It was usually enough time for me to hunt a koopa shell and easily pass it into the boss in the hammer brother challenge, even on very hard. I think the challenges above moderate would definitely earn their names if the brothers could be sped up in their movement functions so that there isn't such a noticably huge gap between actions compared to when the brother is doing something else.
+
+[ ] AI seems to have a rough time being a shy guy...the invincibility from environmental hazards causes them to get stuck standing on some because it's telling them to avoid it regardless of the invincibility. It'd also be nice if the sound cue played every second of the free time remaining once everyone was a shy guy, to better let the players know when it would be ending.
+
+BUG!! It crashes if you press enter when you're attaching bonus items to a level, though. Not sure why.
+
+BUG!! Well, I haven't played with it much but when I press Escape at the end of a boss fight (after a win), the game crashes.
+
+BUG!! I've noticed a glitch where after taunting, sometimes the boss might walk but use the attacking animation instead which kinda looks weird.
+
+
 
 BUG!! Still reports of disappearing map tiles - caused when rRects is used out of bounds causing w and h to be set to 0 - happened with platform with tile using row 960
       I think this was due to using old maps with newer versions of the 1.8 alpha - keep an eye on this, but it might be a non-issue
@@ -58,11 +91,20 @@ Fixed
 [X] Added boss mode back in as a minigame
 
 Beta 1 Public Release Bugs
+[ ] Need to put restrictions on what values can be selected for wait time and others to avoid crash
+
 [ ] world editor does not compile correctly because it has different preprocessors than the other objects
     when compiling it uses the same compiled objects compiled by other projects causing bad behavior
 
 [ ] Need to finish up difficulty settings for bosses
 [ ] Boss sledge hammers not colliding with koopas/shells
+
+[ ] Maybe a tanooki suit should appear next to the weapon powerup on the HUD when a player has it.
+[ ] I checked on that bug Open. It's when you go into a pipe while flying and hold up.  It's not so much a bug as it is a quirk in the physics. When you hold up as you exit a pipe, your player jumps, which makes it seem like you're flying upward faster. You're actually just jumping and resuming the flight you started before you entered the pipe at the other end.
+
+[ ] If you get hit in any way while you're Ztarred (or whatever you call it) and the timer runs out while you're in your death pose (and you didn't respawn yet), another you comes out in dying. (So let's say you were 0SMW, 0SMW dies by a shell while Ztarred and the timer runs ou before he respawns, you see 2 0SMWs dying instead of one)
+    - Yeah, it does that. Try playing a game with instant respawn and no shields and use a pow or a mod block. It usually scores multiple kills on the same opponent, resulting in multiple death sprites of the same player on screen.
+    - Edit: Wait, my mistake, that was the Super Pow and Mods from 1.7's AFE that let you do that. But in checking on that, I found that you can do it in 1.8 with the Golden Podobo powerup, and even with regular projectile weapons if you're fast and they spawn close to you. 
 
 [ ] Treasure chests from winning a stage that rewards an item in world mode can be spawned in areas where they fall forever, and can never be opened. (Though this is aesthetic)
 
@@ -963,6 +1005,12 @@ bool g_fAutoTest = false;
 bool g_fRecordTest = false;
 #endif
 
+#ifdef _DEBUG
+extern short g_iSledgeBrotherActions[3][5][5];
+extern short g_iSledgeBrotherNeedAction[3][5][6];
+extern short g_iSledgeBrotherMaxAction[3][5][5];
+extern short g_iSledgeBrotherWaitTime[3][5][2];
+#endif
 /*
 void EnterBossMode(short type)
 {
@@ -1398,6 +1446,21 @@ int main(int argc, char *argv[])
 		fclose(fp);
 	}
 
+////////////////DEBUG Remove when done //////////////////////////
+	//Read saved settings from disk
+	fp = OpenFile("sledge.bin", "rb");
+
+	if(fp)
+	{
+		fread(g_iSledgeBrotherActions, sizeof(short), 3 * 5 * 5, fp);
+		fread(g_iSledgeBrotherNeedAction, sizeof(short), 3 * 5 * 6, fp);
+		fread(g_iSledgeBrotherMaxAction, sizeof(short), 3 * 5 * 5, fp);
+		fread(g_iSledgeBrotherWaitTime, sizeof(short), 3 * 5 * 2, fp);
+
+		fclose(fp);
+	}
+////////////////DEBUG Remove when done //////////////////////////
+	
 	//Assign the powerup weights to the selected preset
 	for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
 	{
@@ -1579,6 +1642,17 @@ extern short iCountDownRectSize[28];
 extern short iCountDownRectGroup[28];
 extern short iCountDownAnnounce[28];
 
+#ifdef _DEBUG
+short iSledgeBrotherSetting = 0;
+short iSledgeBrotherAttribute = 0;
+#endif
+
+///////////////////////DEBUG!  REMOVE THIS WHEN DONE/////////////////////////////
+#ifdef _DEBUG
+	bool fDebugShowBossSettings = true;
+#endif
+///////////////////////DEBUG!  REMOVE THIS WHEN DONE/////////////////////////////
+
 void RunGame()
 {
 	unsigned int	framestart, ticks;
@@ -1666,6 +1740,13 @@ void RunGame()
 	game_values.forceexittimer = 0;
 	game_values.gamewindx = 0.0f;
 	game_values.gamewindy = 0.0f;
+
+///////////////////////DEBUG!  REMOVE THIS WHEN DONE/////////////////////////////
+#ifdef _DEBUG
+	if(game_values.gamemode->gamemode == game_mode_boss_minigame)
+		game_values.scoreboardstyle = 1;
+#endif
+///////////////////////DEBUG!  REMOVE THIS WHEN DONE/////////////////////////////
 
 	//Initialize game mode
 	game_values.gamemode->init();
@@ -2080,6 +2161,258 @@ void RunGame()
 						PlayNextMusicTrack();
 					}
 #ifdef _DEBUG
+					else if(event.key.keysym.sym == SDLK_MINUS)
+					{
+						if(game_values.gamemodesettings.boss.difficulty > 0)
+							game_values.gamemodesettings.boss.difficulty--;
+					}
+					else if(event.key.keysym.sym == SDLK_EQUALS)
+					{
+						if(game_values.gamemodesettings.boss.difficulty < 4)
+							game_values.gamemodesettings.boss.difficulty++;
+					}
+					else if(event.key.keysym.sym == SDLK_v)
+					{
+						fDebugShowBossSettings = !fDebugShowBossSettings;
+					}
+					else if(event.key.keysym.sym == SDLK_b)
+					{
+						if(game_values.gamemode->gamemode == game_mode_boss_minigame)
+						{
+							++iSledgeBrotherSetting;
+
+							if(iSledgeBrotherAttribute == 0)
+							{
+								if(iSledgeBrotherSetting > 4)
+									iSledgeBrotherSetting = 0;
+							}
+							else if(iSledgeBrotherAttribute == 1)
+							{
+								if(iSledgeBrotherSetting > 5)
+									iSledgeBrotherSetting = 0;
+							}
+							else if(iSledgeBrotherAttribute == 2)
+							{
+								if(iSledgeBrotherSetting > 4)
+									iSledgeBrotherSetting = 0;
+							}
+							else if(iSledgeBrotherAttribute == 3)
+							{
+								if(iSledgeBrotherSetting > 1)
+									iSledgeBrotherSetting = 0;
+							}
+						}
+					}
+					else if(event.key.keysym.sym == SDLK_n)
+					{
+						if(game_values.gamemode->gamemode == game_mode_boss_minigame)
+						{
+							if(++iSledgeBrotherAttribute > 3)
+								iSledgeBrotherAttribute = 0;
+
+							if(iSledgeBrotherAttribute == 0)
+							{
+								if(iSledgeBrotherSetting > 4)
+									iSledgeBrotherSetting = 0;
+							}
+							else if(iSledgeBrotherAttribute == 1)
+							{
+								if(iSledgeBrotherSetting > 5)
+									iSledgeBrotherSetting = 0;
+							}
+							else if(iSledgeBrotherAttribute == 2)
+							{
+								if(iSledgeBrotherSetting > 4)
+									iSledgeBrotherSetting = 0;
+							}
+							else if(iSledgeBrotherAttribute == 3)
+							{
+								if(iSledgeBrotherSetting > 1)
+									iSledgeBrotherSetting = 0;
+							}
+						}
+					}
+					else if(event.key.keysym.sym == SDLK_COMMA)
+					{
+						if(game_values.gamemode->gamemode == game_mode_boss_minigame)
+						{
+							CGM_Boss_MiniGame * bossgame = (CGM_Boss_MiniGame*)game_values.gamemode;
+							short iSledgeBrotherType = bossgame->GetBossType();
+							short iSledgeBrotherDifficulty = game_values.gamemodesettings.boss.difficulty;
+
+							if(iSledgeBrotherAttribute == 0)
+							{
+								if(g_iSledgeBrotherActions[iSledgeBrotherType][iSledgeBrotherDifficulty][iSledgeBrotherSetting] > 0 && 
+									(iSledgeBrotherSetting == 0 || g_iSledgeBrotherActions[iSledgeBrotherType][iSledgeBrotherDifficulty][iSledgeBrotherSetting] > g_iSledgeBrotherActions[iSledgeBrotherType][iSledgeBrotherDifficulty][iSledgeBrotherSetting - 1]))
+									g_iSledgeBrotherActions[iSledgeBrotherType][iSledgeBrotherDifficulty][iSledgeBrotherSetting]--;
+							}
+							else if(iSledgeBrotherAttribute == 1)
+							{
+								if(g_iSledgeBrotherNeedAction[iSledgeBrotherType][iSledgeBrotherDifficulty][iSledgeBrotherSetting] > 0)
+									g_iSledgeBrotherNeedAction[iSledgeBrotherType][iSledgeBrotherDifficulty][iSledgeBrotherSetting]--;
+							}
+							else if(iSledgeBrotherAttribute == 2)
+							{
+								if(g_iSledgeBrotherMaxAction[iSledgeBrotherType][iSledgeBrotherDifficulty][iSledgeBrotherSetting] > 0)
+									g_iSledgeBrotherMaxAction[iSledgeBrotherType][iSledgeBrotherDifficulty][iSledgeBrotherSetting]--;
+							}
+							else if(iSledgeBrotherAttribute == 3)
+							{
+								if(g_iSledgeBrotherWaitTime[iSledgeBrotherType][iSledgeBrotherDifficulty][iSledgeBrotherSetting] > 0)
+									g_iSledgeBrotherWaitTime[iSledgeBrotherType][iSledgeBrotherDifficulty][iSledgeBrotherSetting] -= 5;
+							}
+						}
+					}
+					else if(event.key.keysym.sym == SDLK_PERIOD)
+					{
+						if(game_values.gamemode->gamemode == game_mode_boss_minigame)
+						{
+							CGM_Boss_MiniGame * bossgame = (CGM_Boss_MiniGame*)game_values.gamemode;
+							short iSledgeBrotherType = bossgame->GetBossType();
+							short iSledgeBrotherDifficulty = game_values.gamemodesettings.boss.difficulty;
+
+							if(iSledgeBrotherAttribute == 0)
+							{
+								if(g_iSledgeBrotherActions[iSledgeBrotherType][iSledgeBrotherDifficulty][iSledgeBrotherSetting] < 100 &&
+									(iSledgeBrotherSetting == 4 || g_iSledgeBrotherActions[iSledgeBrotherType][iSledgeBrotherDifficulty][iSledgeBrotherSetting] < g_iSledgeBrotherActions[iSledgeBrotherType][iSledgeBrotherDifficulty][iSledgeBrotherSetting + 1]))
+									g_iSledgeBrotherActions[iSledgeBrotherType][iSledgeBrotherDifficulty][iSledgeBrotherSetting]++;
+							}
+							else if(iSledgeBrotherAttribute == 1)
+							{
+								g_iSledgeBrotherNeedAction[iSledgeBrotherType][iSledgeBrotherDifficulty][iSledgeBrotherSetting]++;
+							}
+							else if(iSledgeBrotherAttribute == 2)
+							{
+								g_iSledgeBrotherMaxAction[iSledgeBrotherType][iSledgeBrotherDifficulty][iSledgeBrotherSetting]++;
+							}
+							else if(iSledgeBrotherAttribute == 3)
+							{
+								g_iSledgeBrotherWaitTime[iSledgeBrotherType][iSledgeBrotherDifficulty][iSledgeBrotherSetting] += 5;
+							}
+						}
+					}
+					else if(event.key.keysym.sym == SDLK_p)
+					{
+						FILE * fout = fopen("sledge_brother_settings.txt", "a+");
+						if(fout)
+						{
+							fprintf(fout, "short g_iSledgeBrotherActions[3][5][5] = {\n");
+
+							for(short iType = 0; iType < 3; iType++)
+							{
+								fprintf(fout, "\t{");
+								for(short iDiff = 0; iDiff < 5; iDiff++)
+								{
+									if(iDiff != 0)
+										fprintf(fout, ",");
+
+									fprintf(fout, "{");
+									for(short iSetting = 0; iSetting < 5; iSetting++)
+									{
+										if(iSetting != 0)
+											fprintf(fout, ",");
+
+										fprintf(fout, "%d", g_iSledgeBrotherActions[iType][iDiff][iSetting]);
+									}
+									fprintf(fout, "}");
+								}
+								if(iType == 2)
+									fprintf(fout, "}};\n\n");
+								else
+									fprintf(fout, "},\n");
+							}
+
+							fprintf(fout, "short g_iSledgeBrotherNeedAction[3][5][6] = {\n");
+
+							for(short iType = 0; iType < 3; iType++)
+							{
+								fprintf(fout, "\t{");
+								for(short iDiff = 0; iDiff < 5; iDiff++)
+								{
+									if(iDiff != 0)
+										fprintf(fout, ",");
+
+									fprintf(fout, "{");
+									for(short iSetting = 0; iSetting < 6; iSetting++)
+									{
+										if(iSetting != 0)
+											fprintf(fout, ",");
+
+										fprintf(fout, "%d", g_iSledgeBrotherNeedAction[iType][iDiff][iSetting]);
+									}
+									fprintf(fout, "}");
+								}
+								if(iType == 2)
+									fprintf(fout, "}};\n\n");
+								else
+									fprintf(fout, "},\n");
+							}
+
+							fprintf(fout, "short g_iSledgeBrotherMaxAction[3][5][5] = {\n");
+
+							for(short iType = 0; iType < 3; iType++)
+							{
+								fprintf(fout, "\t{");
+								for(short iDiff = 0; iDiff < 5; iDiff++)
+								{
+									if(iDiff != 0)
+										fprintf(fout, ",");
+
+									fprintf(fout, "{");
+									for(short iSetting = 0; iSetting < 5; iSetting++)
+									{
+										if(iSetting != 0)
+											fprintf(fout, ",");
+
+										fprintf(fout, "%d", g_iSledgeBrotherMaxAction[iType][iDiff][iSetting]);
+									}
+									fprintf(fout, "}");
+								}
+								if(iType == 2)
+									fprintf(fout, "}};\n\n");
+								else
+									fprintf(fout, "},\n");
+							}
+
+							fprintf(fout, "short g_iSledgeBrotherWaitTime[3][5][2] = {\n");
+
+							for(short iType = 0; iType < 3; iType++)
+							{
+								fprintf(fout, "\t{");
+								for(short iDiff = 0; iDiff < 5; iDiff++)
+								{
+									if(iDiff != 0)
+										fprintf(fout, ",");
+
+									fprintf(fout, "{");
+									for(short iSetting = 0; iSetting < 2; iSetting++)
+									{
+										if(iSetting != 0)
+											fprintf(fout, ",");
+
+										fprintf(fout, "%d", g_iSledgeBrotherWaitTime[iType][iDiff][iSetting]);
+									}
+									fprintf(fout, "}");
+								}
+								if(iType == 2)
+									fprintf(fout, "}};\n");
+								else
+									fprintf(fout, "},\n");
+							}
+
+							fprintf(fout, "\n\n");
+							fclose(fout);
+						}
+					}
+					else if(event.key.keysym.sym == SDLK_LEFTBRACKET)
+					{
+						game_values.framelimiter++;
+					}
+					else if(event.key.keysym.sym == SDLK_RIGHTBRACKET)
+					{
+						if(game_values.framelimiter > 0)
+							game_values.framelimiter--;
+					}
 					else if(event.key.keysym.sym == SDLK_F2)
 					{
 						game_values.frameadvance = !game_values.frameadvance;
@@ -2875,6 +3208,14 @@ void RunGame()
 			
 			game_values.gamemode->draw_background();
 
+#ifdef _DEBUG
+			if(game_values.gamemode->gamemode == game_mode_boss_minigame && fDebugShowBossSettings)
+			{
+				SDL_Rect rFill = {0, 0, 640, 80};
+				SDL_FillRect(screen, &rFill, 0x0);
+			}
+#endif
+
 			objectcontainer[0].draw();
 
 			g_map.drawPlatforms(1);
@@ -2906,6 +3247,81 @@ void RunGame()
 			game_values.gamemode->draw_foreground();
 		
 			g_map.drawPlatforms(4);
+
+#ifdef _DEBUG
+			if(game_values.gamemode->gamemode == game_mode_boss_minigame && fDebugShowBossSettings)
+			{
+				short iDisplayY = 0;
+
+				CGM_Boss_MiniGame * bossgame = (CGM_Boss_MiniGame*)game_values.gamemode;
+
+				short iSledgeBrotherType = bossgame->GetBossType();
+				short iSledgeBrotherDifficulty = game_values.gamemodesettings.boss.difficulty;
+
+				
+				char szText[256];
+				char * szTypeNames[3] = {"Hammer Brother", "Bomb Brother", "Fire Brother"};
+				char * szDifficultyNames[5] = {"Very Easy", "Easy", "Moderate", "Hard", "Very Hard"};
+				sprintf(szText, "Type: %s  Difficulty Level: %s", szTypeNames[iSledgeBrotherType], szDifficultyNames[iSledgeBrotherDifficulty]);
+				game_font_large.draw(5, iDisplayY, szText);
+				
+				char * szSettingNames[4] = {"Action Probability", "Force Action", "Maximum Action In A Row", "Wait Time"};
+				sprintf(szText, "Setting: %s", szSettingNames[iSledgeBrotherAttribute]);
+				game_font_large.draw(5, iDisplayY + 20, szText);
+
+				if(iSledgeBrotherAttribute == 0)
+				{
+					sprintf(szText, "Stomp: %d", g_iSledgeBrotherActions[iSledgeBrotherType][iSledgeBrotherDifficulty][0]);
+					if(iSledgeBrotherSetting == 0) game_font_large.draw(5, iDisplayY + 40, szText); else game_font_small.draw(5, iDisplayY + 48, szText);
+					sprintf(szText, "Throw: %d", g_iSledgeBrotherActions[iSledgeBrotherType][iSledgeBrotherDifficulty][1] - g_iSledgeBrotherActions[iSledgeBrotherType][iSledgeBrotherDifficulty][0]);
+					if(iSledgeBrotherSetting == 1) game_font_large.draw(110, iDisplayY + 40, szText); else game_font_small.draw(110, iDisplayY + 48, szText);
+					sprintf(szText, "Turn: %d", g_iSledgeBrotherActions[iSledgeBrotherType][iSledgeBrotherDifficulty][2] - g_iSledgeBrotherActions[iSledgeBrotherType][iSledgeBrotherDifficulty][1]);
+					if(iSledgeBrotherSetting == 2) game_font_large.draw(220, iDisplayY + 40, szText); else game_font_small.draw(220, iDisplayY + 48, szText);
+					sprintf(szText, "Wait: %d", g_iSledgeBrotherActions[iSledgeBrotherType][iSledgeBrotherDifficulty][3] - g_iSledgeBrotherActions[iSledgeBrotherType][iSledgeBrotherDifficulty][2]);
+					if(iSledgeBrotherSetting == 3) game_font_large.draw(330, iDisplayY + 40, szText); else game_font_small.draw(330, iDisplayY + 48, szText);
+					sprintf(szText, "Taunt: %d", g_iSledgeBrotherActions[iSledgeBrotherType][iSledgeBrotherDifficulty][4] - g_iSledgeBrotherActions[iSledgeBrotherType][iSledgeBrotherDifficulty][3]);
+					if(iSledgeBrotherSetting == 4) game_font_large.draw(440, iDisplayY + 40, szText); else game_font_small.draw(440, iDisplayY + 48, szText);
+					sprintf(szText, "Move: %d", 100 - g_iSledgeBrotherActions[iSledgeBrotherType][iSledgeBrotherDifficulty][4]);
+					game_font_small.draw(550, iDisplayY + 48, szText);
+				}
+				else if(iSledgeBrotherAttribute == 1)
+				{
+					sprintf(szText, "Stomp: %d", g_iSledgeBrotherNeedAction[iSledgeBrotherType][iSledgeBrotherDifficulty][0]);
+					if(iSledgeBrotherSetting == 0) game_font_large.draw(5, iDisplayY + 40, szText); else game_font_small.draw(5, iDisplayY + 48, szText);
+					sprintf(szText, "Throw: %d", g_iSledgeBrotherNeedAction[iSledgeBrotherType][iSledgeBrotherDifficulty][1]);
+					if(iSledgeBrotherSetting == 1) game_font_large.draw(110, iDisplayY + 40, szText); else game_font_small.draw(110, iDisplayY + 48, szText);
+					sprintf(szText, "Turn: %d", g_iSledgeBrotherNeedAction[iSledgeBrotherType][iSledgeBrotherDifficulty][2]);
+					if(iSledgeBrotherSetting == 2) game_font_large.draw(220, iDisplayY + 40, szText); else game_font_small.draw(220, iDisplayY + 48, szText);
+					sprintf(szText, "Wait: %d", g_iSledgeBrotherNeedAction[iSledgeBrotherType][iSledgeBrotherDifficulty][3]);
+					if(iSledgeBrotherSetting == 3) game_font_large.draw(330, iDisplayY + 40, szText); else game_font_small.draw(330, iDisplayY + 48, szText);
+					sprintf(szText, "Taunt: %d", g_iSledgeBrotherNeedAction[iSledgeBrotherType][iSledgeBrotherDifficulty][4]);
+					if(iSledgeBrotherSetting == 4) game_font_large.draw(440, iDisplayY + 40, szText); else game_font_small.draw(440, iDisplayY + 48, szText);
+					sprintf(szText, "Move: %d", g_iSledgeBrotherNeedAction[iSledgeBrotherType][iSledgeBrotherDifficulty][5]);
+					if(iSledgeBrotherSetting == 5) game_font_large.draw(550, iDisplayY + 40, szText); else game_font_small.draw(550, iDisplayY + 48, szText);
+				}
+				else if(iSledgeBrotherAttribute == 2)
+				{
+					sprintf(szText, "Stomp: %d", g_iSledgeBrotherMaxAction[iSledgeBrotherType][iSledgeBrotherDifficulty][0]);
+					if(iSledgeBrotherSetting == 0) game_font_large.draw(5, iDisplayY + 40, szText); else game_font_small.draw(5, iDisplayY + 48, szText);
+					sprintf(szText, "Throw: %d", g_iSledgeBrotherMaxAction[iSledgeBrotherType][iSledgeBrotherDifficulty][1]);
+					if(iSledgeBrotherSetting == 1) game_font_large.draw(110, iDisplayY + 40, szText); else game_font_small.draw(110, iDisplayY + 48, szText);
+					sprintf(szText, "Turn: %d", g_iSledgeBrotherMaxAction[iSledgeBrotherType][iSledgeBrotherDifficulty][2]);
+					if(iSledgeBrotherSetting == 2) game_font_large.draw(220, iDisplayY + 40, szText); else game_font_small.draw(220, iDisplayY + 48, szText);
+					sprintf(szText, "Wait: %d", g_iSledgeBrotherMaxAction[iSledgeBrotherType][iSledgeBrotherDifficulty][3]);
+					if(iSledgeBrotherSetting == 3) game_font_large.draw(330, iDisplayY + 40, szText); else game_font_small.draw(330, iDisplayY + 48, szText);
+					sprintf(szText, "Taunt: %d", g_iSledgeBrotherMaxAction[iSledgeBrotherType][iSledgeBrotherDifficulty][4]);
+					if(iSledgeBrotherSetting == 4) game_font_large.draw(440, iDisplayY + 40, szText); else game_font_small.draw(440, iDisplayY + 48, szText);
+					game_font_small.draw(550, iDisplayY + 48, "Move: X");
+				}
+				else if(iSledgeBrotherAttribute == 3)
+				{
+					sprintf(szText, "Min: %d", g_iSledgeBrotherWaitTime[iSledgeBrotherType][iSledgeBrotherDifficulty][0]);
+					if(iSledgeBrotherSetting == 0) game_font_large.draw(5, iDisplayY + 40, szText); else game_font_small.draw(5, iDisplayY + 48, szText);
+					sprintf(szText, "Max: %d", g_iSledgeBrotherWaitTime[iSledgeBrotherType][iSledgeBrotherDifficulty][1]);
+					if(iSledgeBrotherSetting == 1) game_font_large.draw(120, iDisplayY + 40, szText); else game_font_small.draw(120, iDisplayY + 48, szText);
+				}
+			}
+#endif
 
 			g_iWinningPlayer = -1;
 			short mostkills = 0;

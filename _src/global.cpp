@@ -787,6 +787,7 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 				
 				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.boss.bosstype, NULL, game_values.gamemodemenusettings.boss.bosstype, false);
 				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.boss.difficulty, NULL, game_values.gamemodemenusettings.boss.difficulty, false);
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.boss.hitpoints, NULL, game_values.gamemodemenusettings.boss.hitpoints, false);
 			}
 		}
 	}
@@ -1379,6 +1380,12 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
 				if(ts->iNumUsedSettings > 1)
 				{
 					sprintf(szTemp, ",%d", ts->gmsSettings.boss.difficulty);
+					strcat(buffer, szTemp);
+				}
+
+				if(ts->iNumUsedSettings > 2)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.boss.hitpoints);
 					strcat(buffer, szTemp);
 				}
 			}
@@ -2085,5 +2092,6 @@ void SetupDefaultGameModeSettings()
 	//Boss Minigame
 	game_values.gamemodemenusettings.boss.bosstype = 0;			//Default to hammer boss
 	game_values.gamemodemenusettings.boss.difficulty = 2;		//Medium difficulty
+	game_values.gamemodemenusettings.boss.hitpoints = 5;		//5 hits to kill
 }
 

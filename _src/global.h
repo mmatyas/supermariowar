@@ -784,6 +784,7 @@ struct BossGameModeSettings
 {
 	short bosstype;				//What type of boss battle it is
 	short difficulty;			//How hard the boss is to defeat
+	short hitpoints;			//How much life the boss has
 };
 
 struct GameModeSettings

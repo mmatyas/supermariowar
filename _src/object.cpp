@@ -1247,6 +1247,40 @@ void CObjectContainer::removePlayerRaceGoals(short id, short iGoal)
 	}
 }
 
+void CObjectContainer::pushBombs(short x, short y)
+{
+	for(short i = 0; i < list_end; i++)
+	{
+		if(list[i]->getObjectType() != object_moving)
+			continue;
+
+		IO_MovingObject * mo = (IO_MovingObject*)list[i];
+
+		if(mo->getMovingObjectType() != movingobject_bomb)
+			continue;
+
+		CO_Bomb * bomb = (CO_Bomb*)list[i];
+
+		if(bomb->HasOwner())
+			continue;
+
+		int bombx = bomb->ix + (bomb->iw >> 1) - x;
+		int bomby = bomb->iy + (bomb->ih >> 1) - y;
+
+		int dist = bombx * bombx + bomby * bomby;
+
+		if(dist < 10000)
+		{
+			if(bombx > 0)
+				bomb->velx += ((float)(rand() % 30) / 10.0f + 4.0f);
+			else
+				bomb->velx -= ((float)(rand() % 30) / 10.0f + 4.0f);
+
+			bomb->vely -= (float)(rand() % 30) / 10.0f + 6.0f;
+		}
+	}
+}
+
 void CObjectContainer::cleandeadobjects()
 {
 	for(short i = 0; i < list_end; i++)

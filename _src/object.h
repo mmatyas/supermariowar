@@ -208,6 +208,7 @@ class CObjectContainer
 		short countMovingTypes(MovingObjectType type);
 		void adjustPlayerAreas(CPlayer * player, CPlayer * other);
 		void removePlayerRaceGoals(short id, short iGoal);
+		void pushBombs(short x, short y);
 
 		CObject * getRandomObject();
 

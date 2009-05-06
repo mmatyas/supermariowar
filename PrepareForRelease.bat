@@ -2,6 +2,7 @@
 del /f /q *.bin
 del /f /q *.exp
 del /f /q *.lib
+del /f /q *.suo
 del /f /q Makefile
 del /f /q configure
 del /f /q DOES_WORK
