@@ -57,124 +57,6 @@ extern std::string stripPathAndExtension(const std::string &path);
 
 void Menu::WriteGameOptions()
 {
-	#ifdef _DEBUG
-extern short g_iSledgeBrotherActions[3][5][5];
-extern short g_iSledgeBrotherNeedAction[3][5][6];
-extern short g_iSledgeBrotherMaxAction[3][5][5];
-extern short g_iSledgeBrotherWaitTime[3][5][2];
-#endif
-
-	FILE * fout = fopen("sledge_brother_settings.txt", "a+");
-						if(fout)
-						{
-							fprintf(fout, "short g_iSledgeBrotherActions[3][5][5] = {\n");
-
-							for(short iType = 0; iType < 3; iType++)
-							{
-								fprintf(fout, "\t{");
-								for(short iDiff = 0; iDiff < 5; iDiff++)
-								{
-									if(iDiff != 0)
-										fprintf(fout, ",");
-
-									fprintf(fout, "{");
-									for(short iSetting = 0; iSetting < 5; iSetting++)
-									{
-										if(iSetting != 0)
-											fprintf(fout, ",");
-
-										fprintf(fout, "%d", g_iSledgeBrotherActions[iType][iDiff][iSetting]);
-									}
-									fprintf(fout, "}");
-								}
-								if(iType == 2)
-									fprintf(fout, "}};\n\n");
-								else
-									fprintf(fout, "},\n");
-							}
-
-							fprintf(fout, "short g_iSledgeBrotherNeedAction[3][5][6] = {\n");
-
-							for(short iType = 0; iType < 3; iType++)
-							{
-								fprintf(fout, "\t{");
-								for(short iDiff = 0; iDiff < 5; iDiff++)
-								{
-									if(iDiff != 0)
-										fprintf(fout, ",");
-
-									fprintf(fout, "{");
-									for(short iSetting = 0; iSetting < 6; iSetting++)
-									{
-										if(iSetting != 0)
-											fprintf(fout, ",");
-
-										fprintf(fout, "%d", g_iSledgeBrotherNeedAction[iType][iDiff][iSetting]);
-									}
-									fprintf(fout, "}");
-								}
-								if(iType == 2)
-									fprintf(fout, "}};\n\n");
-								else
-									fprintf(fout, "},\n");
-							}
-
-							fprintf(fout, "short g_iSledgeBrotherMaxAction[3][5][5] = {\n");
-
-							for(short iType = 0; iType < 3; iType++)
-							{
-								fprintf(fout, "\t{");
-								for(short iDiff = 0; iDiff < 5; iDiff++)
-								{
-									if(iDiff != 0)
-										fprintf(fout, ",");
-
-									fprintf(fout, "{");
-									for(short iSetting = 0; iSetting < 5; iSetting++)
-									{
-										if(iSetting != 0)
-											fprintf(fout, ",");
-
-										fprintf(fout, "%d", g_iSledgeBrotherMaxAction[iType][iDiff][iSetting]);
-									}
-									fprintf(fout, "}");
-								}
-								if(iType == 2)
-									fprintf(fout, "}};\n\n");
-								else
-									fprintf(fout, "},\n");
-							}
-
-							fprintf(fout, "short g_iSledgeBrotherWaitTime[3][5][2] = {\n");
-
-							for(short iType = 0; iType < 3; iType++)
-							{
-								fprintf(fout, "\t{");
-								for(short iDiff = 0; iDiff < 5; iDiff++)
-								{
-									if(iDiff != 0)
-										fprintf(fout, ",");
-
-									fprintf(fout, "{");
-									for(short iSetting = 0; iSetting < 2; iSetting++)
-									{
-										if(iSetting != 0)
-											fprintf(fout, ",");
-
-										fprintf(fout, "%d", g_iSledgeBrotherWaitTime[iType][iDiff][iSetting]);
-									}
-									fprintf(fout, "}");
-								}
-								if(iType == 2)
-									fprintf(fout, "}};\n");
-								else
-									fprintf(fout, "},\n");
-							}
-
-							fprintf(fout, "\n\n");
-							fclose(fout);
-						}
-
 	FILE * fp = OpenFile("options.bin", "wb");
 
 	if(fp != NULL)
@@ -291,21 +173,6 @@ extern short g_iSledgeBrotherWaitTime[3][5][2];
 
 		fclose(fp);
 	}
-
-	////////////////DEBUG Remove when done //////////////////////////
-	//Write saved settings to disk
-	fp = OpenFile("sledge.bin", "wb");
-
-	if(fp)
-	{
-		fwrite(g_iSledgeBrotherActions, sizeof(short), 3 * 5 * 5, fp);
-		fwrite(g_iSledgeBrotherNeedAction, sizeof(short), 3 * 5 * 6, fp);
-		fwrite(g_iSledgeBrotherMaxAction, sizeof(short), 3 * 5 * 5, fp);
-		fwrite(g_iSledgeBrotherWaitTime, sizeof(short), 3 * 5 * 2, fp);
-
-		fclose(fp);
-	}
-////////////////DEBUG Remove when done //////////////////////////
 
 	maplist.WriteFilters();
 	maplist.WriteMapSummaryCache();
@@ -2419,26 +2286,6 @@ void Menu::RunMenu()
 				mCurrentMenu = &mMatchSelectionMenu;
 				mCurrentMenu->ResetMenu();
 				iUnlockMinigameOptionIndex = 0;
-
-///////////////////// DEBUG -> Remove when done
-#ifdef _DEBUG
-		game_values.minigameunlocked = true;
-
-		miMatchSelectionField->HideItem(MATCH_TYPE_MINIGAME, false);
-		miMatchSelectionField->SetKey(MATCH_TYPE_MINIGAME);
-
-		miTournamentField->Show(false);
-		miTourField->Show(false);
-		miWorldField->Show(false);
-		miMinigameField->Show(true);
-		miMinigameField->SetIndex(1);
-
-		miMatchSelectionDisplayImage->Show(true);
-		miWorldPreviewDisplay->Show(false);
-		miMatchSelectionDisplayImage->SetImage(0, 240 * game_values.matchtype, 320, 240);
-#endif
-////////////////////// END DEBUG!
-
 			}
 			else if(MENU_CODE_MATCH_SELECTION_START == code || MENU_CODE_QUICK_GAME_START == code)
 			{
@@ -2589,8 +2436,7 @@ void Menu::RunMenu()
 						game_values.gamemodemenusettings.boss.difficulty = 2;
 						game_values.gamemodemenusettings.boss.hitpoints = 5;
 
-						//bossgamemode->goal = 5;
-						bossgamemode->goal = 999;
+						bossgamemode->goal = 5;
 						game_values.gamemode = bossgamemode;
 					}
 

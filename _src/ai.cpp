@@ -488,11 +488,11 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 					}
 				}
 			}
-			else if(game_values.gamemode->tagged == player || player->invincible || game_values.gamemode->chicken == pPlayer)
+			else if(game_values.gamemode->tagged == player || player->invincible || player->shyguy || game_values.gamemode->chicken == pPlayer)
 			{
 				*moveAway = true;
 			}
-			else if(pPlayer->invincible || pPlayer->bobomb || game_values.gamemode->tagged == pPlayer)
+			else if(pPlayer->invincible || pPlayer->shyguy  || pPlayer->bobomb || game_values.gamemode->tagged == pPlayer)
 			{
 				*moveToward = true;
 			}
@@ -672,7 +672,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 				moveAway = &playerKeys->game_left.fDown;
 			}
 
-			if(stomp->iy > iy + PH || pPlayer->invincible || 
+			if(stomp->iy > iy + PH || pPlayer->shyguy || pPlayer->invincible || 
 				(carriedItem && (carriedItem->getMovingObjectType() == movingobject_shell || carriedItem->getMovingObjectType() == movingobject_throwblock)))
 			{	//if true stomp target is lower or at the same level, run toward
 				*moveToward = true;
@@ -951,7 +951,7 @@ void CPlayerAI::GetNearestObjects()
 	nearestObjects.Reset();
 
 	MO_CarriedObject * carriedItem = pPlayer->carriedItem;
-	bool fInvincible = pPlayer->invincible || pPlayer->shield;
+	bool fInvincible = pPlayer->invincible || pPlayer->shield || pPlayer->shyguy;
 	short iTeamID = pPlayer->teamID;
 
 	std::map<int, AttentionObject*>::iterator lim = attentionObjects.end();

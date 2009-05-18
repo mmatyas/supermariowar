@@ -147,18 +147,23 @@ MenuCodeEnum UI_Menu::SendInput(CPlayerInput * playerInput)
 
 		if(playerInput->outputControls[iPlayer].menu_select.fPressed)
 		{
-			MenuCodeEnum ret = current->Modify(true);
+			MenuCodeEnum ret = MENU_CODE_NONE;
 			
-			if(MENU_CODE_MODIFY_ACCEPTED == ret)
+			if(current)
 			{
-				fModifyingItem = true;
-				return MENU_CODE_NONE;
-			}
+				ret = current->Modify(true);
 			
-			if(MENU_CODE_UNSELECT_ITEM == ret)
-			{
-				fModifyingItem = false;
-				return MENU_CODE_NONE;
+				if(MENU_CODE_MODIFY_ACCEPTED == ret)
+				{
+					fModifyingItem = true;
+					return MENU_CODE_NONE;
+				}
+				
+				if(MENU_CODE_UNSELECT_ITEM == ret)
+				{
+					fModifyingItem = false;
+					return MENU_CODE_NONE;
+				}
 			}
 			
 			return ret;
@@ -175,6 +180,9 @@ MenuCodeEnum UI_Menu::SendInput(CPlayerInput * playerInput)
 
 MenuCodeEnum UI_Menu::MoveNextControl(MenuCodeEnum iDirection)
 {
+	if(!current)
+		return MENU_CODE_NONE;
+
 	UI_Control * neighbor = current->GetNeighbor(iDirection);
 
 	while(neighbor && !neighbor->IsVisible())

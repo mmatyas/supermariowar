@@ -1248,8 +1248,6 @@ class MO_SledgeBrother : public IO_MovingObject
 		void Die();
 		void Damage(short playerID);
 
-		short debugActionType;
-
 	protected:
 		
 		void SetLastAction(short type);

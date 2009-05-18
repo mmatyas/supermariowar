@@ -1882,6 +1882,8 @@ void CPlayer::chooseWarpExit()
 	fOldY = fy;
 
 	lockjump = false;
+	ClearPowerupStates();
+
 	if(exit->direction == 0)
 	{
 		state = player_exiting_warp_up;
@@ -1991,33 +1993,38 @@ void CPlayer::cpu_think()
 
 void CPlayer::die(short deathStyle, bool fTeamRemoved, bool fKillCarriedItem)
 {
-	short iDeathSprite = deathStyle == death_style_jump ? PGFX_DEADFLYING : PGFX_DEAD;
+	//Only show the death gfx if the player is alive when he died
+	//If he is spawning or already dead, then don't show anything
+	if(state >= player_ready)
+	{
+		short iDeathSprite = deathStyle == death_style_jump ? PGFX_DEADFLYING : PGFX_DEAD;
 
-	gfxSprite * corpseSprite = sprites[iDeathSprite];
+		gfxSprite * corpseSprite = sprites[iDeathSprite];
 
-	//If the player was a bobomb or chicken, make sure their death sprite matches
-	if(diedas == 1 || game_values.gamemode->chicken == this)
-		corpseSprite = spr_chocobo[colorID][iDeathSprite];
-	else if(diedas == 2 || bobomb)
-		corpseSprite = spr_bobomb[colorID][iDeathSprite];
-	else if(diedas == 3 || shyguy)
-		corpseSprite = spr_shyguy[colorID][iDeathSprite];
-	
-	//Add eyecandy for the dead player
-	if(deathStyle == death_style_shatter || frozen)
-	{
-		eyecandy[2].add(new EC_FallingObject(&spr_brokeniceblock, ix + HALFPW - 16, iy + HALFPH - 16, -1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
-		eyecandy[2].add(new EC_FallingObject(&spr_brokeniceblock, ix + HALFPW, iy + HALFPH - 16, 1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
-		eyecandy[2].add(new EC_FallingObject(&spr_brokeniceblock, ix + HALFPW - 16, iy + HALFPH, -1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
-		eyecandy[2].add(new EC_FallingObject(&spr_brokeniceblock, ix + HALFPW, iy + HALFPH, 1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
-	}
-	else if(deathStyle == death_style_jump)
-	{
-		eyecandy[2].add(new EC_FallingObject(corpseSprite, ix + HALFPW - 16, iy + PH - 32, 0.0f, -VELTURBOJUMP, 1, 0, iSrcOffsetX, 0, 32, 32));
-	}
-	else if(deathStyle == death_style_squish)
-	{
-		eyecandy[1].add(new EC_Corpse(corpseSprite, (float)(ix - PWOFFSET), (float)(iy+PH-32), iSrcOffsetX));
+		//If the player was a bobomb or chicken, make sure their death sprite matches
+		if(diedas == 1 || game_values.gamemode->chicken == this)
+			corpseSprite = spr_chocobo[colorID][iDeathSprite];
+		else if(diedas == 2 || bobomb)
+			corpseSprite = spr_bobomb[colorID][iDeathSprite];
+		else if(diedas == 3 || shyguy)
+			corpseSprite = spr_shyguy[colorID][iDeathSprite];
+		
+		//Add eyecandy for the dead player
+		if(deathStyle == death_style_shatter || frozen)
+		{
+			eyecandy[2].add(new EC_FallingObject(&spr_brokeniceblock, ix + HALFPW - 16, iy + HALFPH - 16, -1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
+			eyecandy[2].add(new EC_FallingObject(&spr_brokeniceblock, ix + HALFPW, iy + HALFPH - 16, 1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
+			eyecandy[2].add(new EC_FallingObject(&spr_brokeniceblock, ix + HALFPW - 16, iy + HALFPH, -1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
+			eyecandy[2].add(new EC_FallingObject(&spr_brokeniceblock, ix + HALFPW, iy + HALFPH, 1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
+		}
+		else if(deathStyle == death_style_jump)
+		{
+			eyecandy[2].add(new EC_FallingObject(corpseSprite, ix + HALFPW - 16, iy + PH - 32, 0.0f, -VELTURBOJUMP, 1, 0, iSrcOffsetX, 0, 32, 32));
+		}
+		else if(deathStyle == death_style_squish)
+		{
+			eyecandy[1].add(new EC_Corpse(corpseSprite, (float)(ix - PWOFFSET), (float)(iy+PH-32), iSrcOffsetX));
+		}
 	}
 
 	//Drop any item the dead player was carrying

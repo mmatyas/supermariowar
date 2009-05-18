@@ -6875,8 +6875,6 @@ MO_SledgeBrother::MO_SledgeBrother(gfxSprite *nspr, short platformY, short type)
 
 	last_action = -1;
 	last_action_count = 0;
-
-	debugActionType = -1;
 }
 
 extern short iSledgeBrotherAttribute;
@@ -6889,41 +6887,6 @@ void MO_SledgeBrother::draw()
 		for(short iHeart = 0; iHeart < hit_points; iHeart++)
 			spr_scorehearts.draw(ix - collisionOffsetX + iHeart * 8, iy - collisionOffsetY - 18, 0, 0, 16, 16);
 	}
-
-	///////////////////////DEBUG - Remove when done! ///////////////////////////
-	if(fDebugShowBossSettings)
-	{
-		if(debugActionType >= 0 && (iSledgeBrotherAttribute == 0 || iSledgeBrotherAttribute == 1))
-		{
-			int color = (debugActionType > 5 ? SDL_MapRGB(screen->format, 0, 255, 0) : SDL_MapRGB(screen->format, 255, 0, 0));
-			short type = debugActionType % 6;
-
-			SDL_Rect r = {type * 110, 40, 100, 25};
-			SDL_FillRect(screen, &r, color);
-
-			if(iSledgeBrotherAttribute == 1)
-			{
-				char szNum[16];
-				for(short iAction = 0; iAction < 6; iAction++)
-				{
-					game_font_small.draw(5, 65, "Force:");
-
-					sprintf(szNum, "%d", need_action[iAction]);
-					game_font_small.draw(iAction * 110 + 70, 65, szNum);
-				}
-			}
-		}
-
-		if(iSledgeBrotherAttribute == 2)
-		{
-			game_font_small.draw(5, 65, "In Row:");
-
-			char szNum[16];
-			sprintf(szNum, "%d", last_action_count);
-			game_font_small.draw(last_action * 110 + 70, 65, szNum);
-		}
-	}
-	///////////////////////DEBUG - Remove when done! ///////////////////////////
 }
 
 void MO_SledgeBrother::update()
@@ -7009,28 +6972,30 @@ void MO_SledgeBrother::update()
 		//move towards destination
 		if(ix < iDestX)
 		{
-			ix++;
+			ix += game_values.gamemodesettings.boss.difficulty >= 3 ? 2 : 1;
 
 			if(ix >= iDestX)
 			{
 				ix = iDestX;
 				iActionState = 0;
 				leg_offset_x = 0;
+				leg_movement_timer = 0;
 			}
 		}
 		else if(ix > iDestX)
 		{
-			ix--;
+			ix -= game_values.gamemodesettings.boss.difficulty >= 3 ? 2 : 1;
 
 			if(ix <= iDestX)
 			{
 				ix = iDestX;
 				iActionState = 0;
 				leg_offset_x = 0;
+				leg_movement_timer = 0;
 			}
 		}
 
-		if(++leg_movement_timer == 8)
+		if(iActionState != 0 && ++leg_movement_timer == 8)
 		{
 			leg_movement_timer = 0;
 			
@@ -7042,31 +7007,36 @@ void MO_SledgeBrother::update()
 	}
 	else if(iActionState == 5)
 	{
+		//If we are done taunting, reset arm/legs back to normal state
 		if(--taunt_timer <= 0)
 		{
 			iActionState = 0;
 			arm_offset_x = 0;
 			leg_offset_x = 0;
-		}
-
-		if(++arm_movement_timer == 8)
-		{
 			arm_movement_timer = 0;
-			
-			if(arm_offset_x == 0)
-				arm_offset_x = 96;
-			else
-				arm_offset_x = 0;
-		}
-
-		if(++leg_movement_timer == 6)
-		{
 			leg_movement_timer = 0;
-			
-			if(leg_offset_x == 0)
-				leg_offset_x = 48;
-			else
-				leg_offset_x = 0;
+		}
+		else  //otherwise move them around
+		{
+			if(++arm_movement_timer == 8)
+			{
+				arm_movement_timer = 0;
+				
+				if(arm_offset_x == 0)
+					arm_offset_x = 96;
+				else
+					arm_offset_x = 0;
+			}
+
+			if(++leg_movement_timer == 6)
+			{
+				leg_movement_timer = 0;
+				
+				if(leg_offset_x == 0)
+					leg_offset_x = 48;
+				else
+					leg_offset_x = 0;
+			}
 		}
 	}
 
@@ -7098,71 +7068,35 @@ void MO_SledgeBrother::randomaction()
 
 	//Force an action if it has been too long since the last action of that type
 	if(need_action[0] > g_iSledgeBrotherNeedAction[iType][game_values.gamemodesettings.boss.difficulty][0])
-	{
 		jump();
-		debugActionType = 0;
-	}
 	else if(need_action[1] > g_iSledgeBrotherNeedAction[iType][game_values.gamemodesettings.boss.difficulty][1])
-	{
 		throwprojectile();
-		debugActionType = 1;
-	}
 	else if(need_action[2] > g_iSledgeBrotherNeedAction[iType][game_values.gamemodesettings.boss.difficulty][2])
-	{
 		turn();
-		debugActionType = 2;
-	}
 	else if(need_action[3] > g_iSledgeBrotherNeedAction[iType][game_values.gamemodesettings.boss.difficulty][3])
-	{
 		wait(g_iSledgeBrotherWaitTime[iType][game_values.gamemodesettings.boss.difficulty][0], g_iSledgeBrotherWaitTime[iType][game_values.gamemodesettings.boss.difficulty][1]);
-		debugActionType = 3;
-	}
 	else if(need_action[4] > g_iSledgeBrotherNeedAction[iType][game_values.gamemodesettings.boss.difficulty][4])
-	{
 		taunt();
-		debugActionType = 4;
-	}
 	else if(need_action[5] > g_iSledgeBrotherNeedAction[iType][game_values.gamemodesettings.boss.difficulty][5])
-	{
 		move();
-		debugActionType = 5;
-	}
 	//then do action based on probability
 	else if((last_action != 0 || last_action_count < g_iSledgeBrotherMaxAction[iType][game_values.gamemodesettings.boss.difficulty][0]) && 
 		randaction < g_iSledgeBrotherActions[iType][game_values.gamemodesettings.boss.difficulty][0])
-	{
 		jump();
-		debugActionType = 6;
-	}
 	else if((last_action != 1 || last_action_count < g_iSledgeBrotherMaxAction[iType][game_values.gamemodesettings.boss.difficulty][1]) && 
 		randaction < g_iSledgeBrotherActions[iType][game_values.gamemodesettings.boss.difficulty][1])
-	{
 		throwprojectile();
-		debugActionType = 7;
-	}
 	else if((last_action != 2 || last_action_count < g_iSledgeBrotherMaxAction[iType][game_values.gamemodesettings.boss.difficulty][2]) && 
 		randaction < g_iSledgeBrotherActions[iType][game_values.gamemodesettings.boss.difficulty][2])
-	{
 		turn();
-		debugActionType = 8;
-	}
 	else if((last_action != 2 || last_action_count < g_iSledgeBrotherMaxAction[iType][game_values.gamemodesettings.boss.difficulty][3]) && 
 		randaction < g_iSledgeBrotherActions[iType][game_values.gamemodesettings.boss.difficulty][3])
-	{
 		wait(g_iSledgeBrotherWaitTime[iType][game_values.gamemodesettings.boss.difficulty][0], g_iSledgeBrotherWaitTime[iType][game_values.gamemodesettings.boss.difficulty][1]);
-		debugActionType = 9;
-	}
 	else if((last_action != 2 || last_action_count < g_iSledgeBrotherMaxAction[iType][game_values.gamemodesettings.boss.difficulty][4]) && 
 		randaction < g_iSledgeBrotherActions[iType][game_values.gamemodesettings.boss.difficulty][4])
-	{
 		taunt();
-		debugActionType = 10;
-	}
 	else
-	{
 		move();
-		debugActionType = 11;
-	}
 
 	for(short iAction = 0; iAction < 6; iAction++)
 		need_action[iAction]++;

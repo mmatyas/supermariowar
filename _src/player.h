@@ -417,6 +417,7 @@ class CPlayer
 		friend class CGM_Bonus;
 		friend class CGM_Pipe_MiniGame;
 		friend class CGM_Boss_MiniGame;
+		friend class CGM_Boxes_MiniGame;
 		
 		friend class MI_InputDevice;
 		friend class MI_InputLeft;

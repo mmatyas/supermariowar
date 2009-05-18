@@ -1204,7 +1204,7 @@ void CGM_ShyGuyTag::think()
 				}
 			}
 
-			if(pCheckWinner)
+			if(pCheckWinner && !fReverseScoring)
 				CheckWinner(pCheckWinner);
 		}
 	}
@@ -3789,3 +3789,85 @@ void CGM_Pipe_MiniGame::SetBonus(short iType, short iTimer, short iTeamID)
 	else
 		ifsoundonplay(sfx_collectpowerup);
 }
+
+/*
+TODO
+1) Create new box object that breaks on contact and either gives a coin/bonus/penalty
+2) Create levels approprate for distributing boxes onto
+3) Add level hazards like thwomps, podobos, fireballs
+4) Add hurry up that kicks in after 3 minutes of play that adds more coins or lowers bar to win
+*/
+
+//Boxes Bonus Mini Game (used in world mode)
+//Try to collect all coins from boxes and players
+CGM_Boxes_MiniGame::CGM_Boxes_MiniGame() : CGameMode()
+{
+	goal = 1;
+	gamemode = game_mode_boxes_minigame;
+
+	SetupModeStrings("Boxes Minigame", "Points", 0);
+};
+
+void CGM_Boxes_MiniGame::init()
+{
+	CGameMode::init();
+
+}
+
+
+void CGM_Boxes_MiniGame::think()
+{
+	if(gameover)
+	{
+		displayplayertext();
+		return;
+	}
+
+	
+}
+
+short CGM_Boxes_MiniGame::playerkilledplayer(CPlayer &player, CPlayer &other, killstyle style)
+{
+	//other.score->AdjustScore(-2);
+	return player_kill_normal;
+}
+
+short CGM_Boxes_MiniGame::playerkilledself(CPlayer &player, killstyle style)
+{
+	//player.score->AdjustScore(-2);
+	return player_kill_normal;
+}
+
+void CGM_Boxes_MiniGame::playerextraguy(CPlayer &player, short iType)
+{
+	if(!gameover)
+	{
+		player.score->AdjustScore(iType);
+		CheckWinner(&player);
+	}
+}
+
+short CGM_Boxes_MiniGame::CheckWinner(CPlayer * player)
+{
+	if(goal > -1)
+	{
+		if(player->score->score >= goal)
+		{
+			player->score->score = goal;
+
+			winningteam = player->teamID;
+			gameover = true;
+
+			RemovePlayersButTeam(winningteam);
+			SetupScoreBoard(false);
+			ShowScoreBoard();
+		}
+		else if(player->score->score >= goal - 2 && !playedwarningsound)
+		{
+			playwarningsound();
+		}
+	}
+
+	return player_kill_normal;
+}
+
