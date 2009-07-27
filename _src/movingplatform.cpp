@@ -334,6 +334,7 @@ void FallingPath::Reset()
 MovingPlatform::MovingPlatform(TilesetTile ** tiledata, MapTile ** tiletypes, short w, short h, short drawlayer, MovingPlatformPath * path, bool fPreview)
 {
 	fDead = false;
+	iPlayerId = -1;
 
 	short iTileSize = TILESIZE;
 	short iTileSizeIndex = 0;
@@ -685,13 +686,13 @@ void MovingPlatform::collide(CPlayer * player)
 
 				if(player->iHorizontalPlatformCollision == 3)
 				{
-					player->KillPlayerMapHazard(true, kill_style_environment, true);
+					player->KillPlayerMapHazard(true, kill_style_environment, true, iPlayerId);
 					//printf("Platform Right Side Killed Player\n");
 					return;
 				}
 				else if(fSuperDeathTileToLeft || (fDeathTileToLeft && !player->invincible && player->shield == 0 && !player->shyguy))
 				{
-					if(player_kill_nonkill != player->KillPlayerMapHazard(fSuperDeathTileToLeft, kill_style_environment, false))
+					if(player_kill_nonkill != player->KillPlayerMapHazard(fSuperDeathTileToLeft, kill_style_environment, false, iPlayerId))
 						return;
 				}
 				else
@@ -708,6 +709,7 @@ void MovingPlatform::collide(CPlayer * player)
 						player->fOldX = fx - 10.0f;  //Need to push out the old enough to collide correctly with flip blocks
 					
 					player->iHorizontalPlatformCollision = 1;
+					player->iPlatformCollisionPlayerId = iPlayerId;
 
 					if(player->velx > 0.0f)
 						player->velx = 0.0f;
@@ -756,13 +758,13 @@ void MovingPlatform::collide(CPlayer * player)
 
 				if(player->iHorizontalPlatformCollision == 1)
 				{
-					player->KillPlayerMapHazard(true, kill_style_environment, true);
+					player->KillPlayerMapHazard(true, kill_style_environment, true, iPlayerId);
 					//printf("Platform Left Side Killed Player\n");
 					return;				
 				}
 				else if(fSuperDeathTileToRight || (fDeathTileToRight && !player->invincible && player->shield == 0 && !player->shyguy))
 				{
-					if(player_kill_nonkill != player->KillPlayerMapHazard(fSuperDeathTileToRight, kill_style_environment, false))
+					if(player_kill_nonkill != player->KillPlayerMapHazard(fSuperDeathTileToRight, kill_style_environment, false, iPlayerId))
 						return;				
 				}
 				else
@@ -780,6 +782,7 @@ void MovingPlatform::collide(CPlayer * player)
 						player->fOldX = fx - 10.0f;  //Need to push out the old enough to collide correctly with flip blocks
 					
 					player->iHorizontalPlatformCollision = 3;
+					player->iPlatformCollisionPlayerId = iPlayerId;
 
 					if(player->velx < 0.0f)
 						player->velx = 0.0f;
@@ -856,7 +859,7 @@ void MovingPlatform::collide(CPlayer * player)
 			{
 				if(player->iVerticalPlatformCollision == 2)
 				{
-					player->KillPlayerMapHazard(true, kill_style_environment, true);
+					player->KillPlayerMapHazard(true, kill_style_environment, true, iPlayerId);
 					//printf("Platform Bottom Killed Player\n");
 					return;
 				}
@@ -872,6 +875,7 @@ void MovingPlatform::collide(CPlayer * player)
 						player->vely = CapFallingVelocity(-player->vely * BOUNCESTRENGTH + fVelY);
 
 					player->iVerticalPlatformCollision = 0;
+					player->iPlatformCollisionPlayerId = iPlayerId;
 
 					//printf("Hit Platform Bottom\n");
 				}
@@ -880,7 +884,7 @@ void MovingPlatform::collide(CPlayer * player)
 			}
 			else if((t1 & tile_flag_player_or_death_on_bottom) || (t2 & tile_flag_player_or_death_on_bottom))
 			{
-				if(player_kill_nonkill != player->KillPlayerMapHazard(true, kill_style_environment, false))
+				if(player_kill_nonkill != player->KillPlayerMapHazard(true, kill_style_environment, false, iPlayerId))
 					return;
 			}
 		}
@@ -920,7 +924,7 @@ void MovingPlatform::collide(CPlayer * player)
 				{
 					if(player->iVerticalPlatformCollision == 0)
 					{
-						player->KillPlayerMapHazard(true, kill_style_environment, true);
+						player->KillPlayerMapHazard(true, kill_style_environment, true, iPlayerId);
 						//printf("Solid On Top Platform Killed Player\n");
 						return;
 					}
@@ -928,6 +932,7 @@ void MovingPlatform::collide(CPlayer * player)
 					{
 						player->platform = this;
 						player->iVerticalPlatformCollision = 2;
+						player->iPlatformCollisionPlayerId = iPlayerId;
 
 						player->fPrecalculatedY = ty * TILESIZE - PH - 0.2f + fy - iHalfHeight;
 						player->vely = GRAVITATION;
@@ -959,7 +964,7 @@ void MovingPlatform::collide(CPlayer * player)
 
 				if(player->iVerticalPlatformCollision == 0)
 				{
-					player->KillPlayerMapHazard(true, kill_style_environment, true);
+					player->KillPlayerMapHazard(true, kill_style_environment, true, iPlayerId);
 					//printf("Platform Top Killed Player\n");
 					return;
 				}
@@ -967,6 +972,7 @@ void MovingPlatform::collide(CPlayer * player)
 				{
 					player->platform = this;
 					player->iVerticalPlatformCollision = 2;
+					player->iPlatformCollisionPlayerId = iPlayerId;
 
 					player->fPrecalculatedY = ty * TILESIZE - PH - 0.2f + fy - iHalfHeight;
 					player->fOldY = player->fPrecalculatedY - fVelY;
@@ -991,7 +997,7 @@ void MovingPlatform::collide(CPlayer * player)
 			}
 			else if(fDeathTileUnderPlayer || fSuperDeathTileUnderPlayer)
 			{
-				if(player_kill_nonkill != player->KillPlayerMapHazard(fSuperDeathTileUnderPlayer, kill_style_environment, false))
+				if(player_kill_nonkill != player->KillPlayerMapHazard(fSuperDeathTileUnderPlayer, kill_style_environment, false, iPlayerId))
 					return;
 			}
 			else
@@ -1564,7 +1570,7 @@ void MovingPlatform::collide(IO_MovingObject * object)
 
 					removeifprojectile(object, true, true);
 
-					object->SideBounce();
+					object->SideBounce(true);
 				}
 			}
 		}
@@ -1633,7 +1639,7 @@ void MovingPlatform::collide(IO_MovingObject * object)
 
 					removeifprojectile(object, true, true);
 
-					object->SideBounce();
+					object->SideBounce(false);
 				}
 			}
 		}

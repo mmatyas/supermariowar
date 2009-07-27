@@ -105,7 +105,7 @@ void ShowScoreBoard()
 	game_values.showscoreboard = true;
 
 	short iScoreboardElementHeight = 45;
-	if(game_values.gamemode->gamemode == game_mode_health || game_values.gamemode->gamemode == game_mode_collection)
+	if(game_values.gamemode->gamemode == game_mode_health || game_values.gamemode->gamemode == game_mode_collection || game_values.gamemode->gamemode == game_mode_boxes_minigame)
 		iScoreboardElementHeight = 63;
 
 	for(short i = 0; i < score_cnt; i++)
@@ -155,6 +155,116 @@ bool RemoveTeam(short teamid)
 
 	return game_values.teamdeadcounter == score_cnt - 1;
 }
+
+
+GameTimerDisplay::GameTimerDisplay()
+{
+	iFramesPerSecond = 1000 / WAITTIME;
+}
+
+void GameTimerDisplay::Init(short iTime, bool fCountDown)
+{
+	timeleft = iTime;
+	countdown = fCountDown;
+	
+	SetDigitCounters();
+	framesleft_persecond = iFramesPerSecond;
+
+	if(game_values.scoreboardstyle == 0)
+		iScoreOffsetX = 5;
+	else
+		iScoreOffsetX = 291;
+
+	SetDigitCounters();
+	framesleft_persecond = iFramesPerSecond;
+}
+
+short GameTimerDisplay::RunClock()
+{
+	if(timeleft > 0 || !countdown)
+	{
+		if(--framesleft_persecond < 1)
+		{
+			framesleft_persecond = iFramesPerSecond;
+
+			if(countdown)
+			{
+				--timeleft;
+			}
+			else
+			{
+				++timeleft;
+			}
+
+			SetDigitCounters();
+
+			return timeleft;
+		}
+	}
+
+	return -1;
+}
+
+
+void GameTimerDisplay::Draw()
+{
+	spr_timershade.draw(iScoreOffsetX, 5);
+	spr_scoretext.draw(iDigitRightDstX, 13, iDigitRightSrcX, 0, 16, 16);
+	
+	if(iDigitLeftSrcX > 0)
+	{
+		spr_scoretext.draw(iDigitMiddleDstX, 13, iDigitMiddleSrcX, 0, 16, 16);
+		spr_scoretext.draw(iDigitLeftDstX, 13, iDigitLeftSrcX, 0, 16, 16);
+	}
+	else if(iDigitMiddleSrcX > 0)
+	{
+		spr_scoretext.draw(iDigitMiddleDstX, 13, iDigitMiddleSrcX, 0, 16, 16);
+	}
+}
+
+void GameTimerDisplay::SetDigitCounters()
+{
+	short iDigits = timeleft;
+	while(iDigits > 999)
+		iDigits -= 1000;
+		
+	iDigitLeftSrcX = iDigits / 100 * 16;
+	iDigitMiddleSrcX = iDigits % 100 / 10 * 16;
+	iDigitRightSrcX = iDigits % 10 * 16;
+
+	if(iDigitLeftSrcX == 0)
+	{
+		if(iDigitMiddleSrcX == 0)
+		{
+			iDigitRightDstX = iScoreOffsetX + 21;
+		}
+		else
+		{
+			iDigitMiddleDstX = iScoreOffsetX + 12;
+			iDigitRightDstX = iScoreOffsetX + 30;
+		}
+	}
+	else
+	{
+		iDigitLeftDstX = iScoreOffsetX + 3;
+		iDigitMiddleDstX = iScoreOffsetX + 21;
+		iDigitRightDstX = iScoreOffsetX + 39;
+	}
+}
+
+void GameTimerDisplay::SetTime(short iTime)
+{
+	timeleft = iTime;
+	SetDigitCounters();
+}
+
+void GameTimerDisplay::AddTime(short iTime)
+{
+	timeleft += iTime;
+	SetDigitCounters();
+}
+
+
 
 CGameMode::CGameMode()
 {
@@ -439,6 +549,7 @@ short CGM_Frag::CheckWinner(CPlayer * player)
 	{
 		if(player->score->score >= goal)
 		{
+			player->score->SetScore(goal);
 			winningteam = player->teamID;
 			gameover = true;
 
@@ -465,8 +576,6 @@ CGM_TimeLimit::CGM_TimeLimit() : CGameMode()
 	gamemode = game_mode_timelimit;
 
 	SetupModeStrings("Time Limit", "Time", 30);
-
-	iFramesPerSecond = 1000 / WAITTIME;
 };
 
 void CGM_TimeLimit::init()
@@ -474,55 +583,34 @@ void CGM_TimeLimit::init()
 	CGameMode::init();
 
 	if(goal == -1)
-		timeleft = 0;
+		gameClock.Init(0, false);
 	else
-		timeleft = goal;
-
-	if(game_values.scoreboardstyle == 0)
-		iScoreOffsetX = 5;
-	else
-		iScoreOffsetX = 291;
-
-	SetDigitCounters();
-	framesleft_persecond = iFramesPerSecond;
+		gameClock.Init(goal, true);
 }
 
 
 void CGM_TimeLimit::think()
 {
 	CGameMode::think();
+	short iTime = gameClock.RunClock();
 
-	if(timeleft > 0 || goal == -1)
+	if(goal > 0)
 	{
-		if(--framesleft_persecond < 1)
+		if(iTime == 20 && !playedwarningsound)
 		{
-			framesleft_persecond = iFramesPerSecond;
-
-			if(goal == -1)
-			{
-				timeleft++;
-			}
-			else
-			{
-				if(--timeleft == 20 && !playedwarningsound)
-				{
-					playwarningsound();
-				}
-			}
-
-			SetDigitCounters();
+			playwarningsound();
 		}
-	}
-	else if(timeleft == 0 && goal > 0)
-	{		//the game ends
-		SetupScoreBoard(false);
-		ShowScoreBoard();
-		timeleft--;
 
-		RemovePlayersButHighestScoring();
-		gameover = true;
+		if(iTime == 0)
+		{		//the game ends
+			SetupScoreBoard(false);
+			ShowScoreBoard();
 
-		CountAliveTeams(&winningteam);
+			RemovePlayersButHighestScoring();
+			gameover = true;
+
+			CountAliveTeams(&winningteam);
+		}
 	}
 }
 
@@ -566,52 +654,9 @@ short CGM_TimeLimit::playerkilledself(CPlayer &player, killstyle style)
 
 void CGM_TimeLimit::draw_foreground()
 {
-	drawtime();
-}
-
-void CGM_TimeLimit::drawtime()
-{
-	spr_timershade.draw(iScoreOffsetX, 5);
-	spr_scoretext.draw(iDigitRightDstX, 13, iDigitRightSrcX, 0, 16, 16);
-	
-	if(iDigitLeftSrcX > 0)
+	if(!gameover)
 	{
-		spr_scoretext.draw(iDigitMiddleDstX, 13, iDigitMiddleSrcX, 0, 16, 16);
-		spr_scoretext.draw(iDigitLeftDstX, 13, iDigitLeftSrcX, 0, 16, 16);
-	}
-	else if(iDigitMiddleSrcX > 0)
-	{
-		spr_scoretext.draw(iDigitMiddleDstX, 13, iDigitMiddleSrcX, 0, 16, 16);
-	}
-}
-
-void CGM_TimeLimit::SetDigitCounters()
-{
-	short iDigits = timeleft;
-	while(iDigits > 999)
-		iDigits -= 1000;
-		
-	iDigitLeftSrcX = iDigits / 100 * 16;
-	iDigitMiddleSrcX = iDigits % 100 / 10 * 16;
-	iDigitRightSrcX = iDigits % 10 * 16;
-
-	if(iDigitLeftSrcX == 0)
-	{
-		if(iDigitMiddleSrcX == 0)
-		{
-			iDigitRightDstX = iScoreOffsetX + 21;
-		}
-		else
-		{
-			iDigitMiddleDstX = iScoreOffsetX + 12;
-			iDigitRightDstX = iScoreOffsetX + 30;
-		}
-	}
-	else
-	{
-		iDigitLeftDstX = iScoreOffsetX + 3;
-		iDigitMiddleDstX = iScoreOffsetX + 21;
-		iDigitRightDstX = iScoreOffsetX + 39;
+		gameClock.Draw();
 	}
 }
 
@@ -619,8 +664,7 @@ void CGM_TimeLimit::addtime(short iTime)
 {
 	if(!gameover)
 	{
-		timeleft += iTime;
-		SetDigitCounters();
+		gameClock.AddTime(iTime);
 	}
 }
 
@@ -1124,8 +1168,6 @@ CGM_ShyGuyTag::CGM_ShyGuyTag() : CGameMode()
 	gamemode = game_mode_shyguytag;
 
 	SetupModeStrings("Shyguy Tag", "Points", 50);
-
-	shyguyclearcounter = 0;
 	scorecounter = 0;
 }
 
@@ -1133,6 +1175,9 @@ void CGM_ShyGuyTag::init()
 {
 	CGameMode::init();
 	fReverseScoring = goal == -1;
+
+	fRunClock = false;
+	gameClock.Init(0, true);
 
 	for(short iScore = 0; iScore < score_cnt; iScore++)
 	{
@@ -1157,25 +1202,34 @@ void CGM_ShyGuyTag::think()
 	short shyguycount = CountShyGuys();
 
 	//If we are not waiting to clear, check if we need to start waiting
-	if(shyguyclearcounter == 0)
+	if(!fRunClock)
 	{
 		if(shyguycount == list_players_cnt)
 		{
-			shyguyclearcounter = 1;
-			ifsoundonplay(sfx_starwarning);
+			if(game_values.gamemodesettings.shyguytag.freetime > 0)
+			{
+				fRunClock = true;
+				gameClock.SetTime(game_values.gamemodesettings.shyguytag.freetime);
+				ifsoundonplay(sfx_starwarning);
+			}
+			else
+			{
+				FreeShyGuys();
+			}
 		}
 	}
-	else if(++shyguyclearcounter >= game_values.gamemodesettings.shyguytag.freetime) //Clear the shy guys
+	else 
 	{
-		ifsoundonplay(sfx_racesound);
+		short iTime = gameClock.RunClock();
 
-		shyguyclearcounter = 0;
-
-		for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++)
+		if(iTime == 0) //Clear the shy guys
 		{
-			CPlayer * player = list_players[iPlayer];
-			player->shyguy = false;
-			eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, player->ix + (HALFPW) - 16, player->iy + (HALFPH) - 16, 3, 8));
+			fRunClock = false;
+			FreeShyGuys();
+		}
+		else if(iTime > 0)
+		{
+			ifsoundonplay(sfx_starwarning);
 		}
 	}
 
@@ -1207,6 +1261,15 @@ void CGM_ShyGuyTag::think()
 			if(pCheckWinner && !fReverseScoring)
 				CheckWinner(pCheckWinner);
 		}
+	}
+}
+
+//Draw count down timer here
+void CGM_ShyGuyTag::draw_foreground()
+{
+	if(fRunClock)
+	{
+		gameClock.Draw();
 	}
 }
 
@@ -1263,6 +1326,18 @@ void CGM_ShyGuyTag::SetShyGuy(short iTeam)
 	ifsoundonplay(sfx_transform);
 }
 
+void CGM_ShyGuyTag::FreeShyGuys()
+{
+	ifsoundonplay(sfx_thunder);
+
+	for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++)
+	{
+		CPlayer * player = list_players[iPlayer];
+		player->shyguy = false;
+		eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, player->ix + (HALFPW) - 16, player->iy + (HALFPH) - 16, 3, 8));
+	}
+}
+
 short CGM_ShyGuyTag::CheckWinner(CPlayer * player)
 {
 	if(gameover)
@@ -1270,6 +1345,7 @@ short CGM_ShyGuyTag::CheckWinner(CPlayer * player)
 
 	if(player->score->score >= goal)
 	{
+		player->score->SetScore(goal);
 		SetupScoreBoard(false);
 		ShowScoreBoard();
 
@@ -1317,7 +1393,7 @@ void CGM_Coins::init()
 		game_values.gamemodesettings.coins.quantity = 1;
 
 	for(short iCoin = 0; iCoin < game_values.gamemodesettings.coins.quantity; iCoin++)
-		objectcontainer[1].add(new MO_Coin(&spr_coin, 0.0f, 0.0f, 0, 0, 2, 0, 0, 0));
+		objectcontainer[1].add(new MO_Coin(&spr_coin, 0.0f, 0.0f, 0, 0, 2, 0, 0, 0, true));
 }
 
 
@@ -1347,17 +1423,18 @@ void CGM_Coins::playerextraguy(CPlayer &player, short iType)
 {
 	if(!gameover)
 	{
-		player.score->AdjustScore(iType);
+		player.score->AdjustScore(iType << 1);
 		CheckWinner(&player);
 	}
 }
 
 short CGM_Coins::CheckWinner(CPlayer * player)
 {
-	if(goal > -1)
+	if(!gameover && goal > -1)
 	{
 		if(player->score->score >= goal)
 		{
+			player->score->SetScore(goal);
 			winningteam = player->teamID;
 			gameover = true;
 
@@ -1365,7 +1442,7 @@ short CGM_Coins::CheckWinner(CPlayer * player)
 			SetupScoreBoard(false);
 			ShowScoreBoard();
 		}
-		else if(player->score->score >= goal - 2 && !playedwarningsound)
+		else if(player->score->score >= goal - 5 && !playedwarningsound)
 		{
 			playwarningsound();
 		}
@@ -1459,6 +1536,8 @@ short CGM_Eggs::CheckWinner(CPlayer * player)
 	{
 		if(player->score->score >= goal)
 		{
+			player->score->SetScore(goal);
+
 			winningteam = player->teamID;
 			gameover = true;
 
@@ -2377,11 +2456,7 @@ void CGM_Star::init()
 
 	fDisplayTimer = true;
 
-	timeleft = game_values.gamemodesettings.star.time;
-	if(timeleft < 1)
-		timeleft = 30;
-
-	SetDigitCounters();
+	gameClock.Init(game_values.gamemodesettings.star.time < 1 ? 30 : game_values.gamemodesettings.star.time, true);
 
 	if(game_values.gamemodesettings.star.shine < 0 || game_values.gamemodesettings.star.shine > 3)
 		game_values.gamemodesettings.star.shine = 0;
@@ -2489,28 +2564,16 @@ void CGM_Star::think()
 	}
 
 	//Count down the game time
-	if(timeleft > 0)
+	short iTime = gameClock.RunClock();
+	if(iTime <= 5 && iTime > 0)
 	{
-		if(--framesleft_persecond < 1)
-		{
-			timeleft--;
-			framesleft_persecond = iFramesPerSecond;
-			SetDigitCounters();
-
-			if(timeleft <= 5 && timeleft > 0)
-				ifsoundonplay(sfx_starwarning);
-		}
+		ifsoundonplay(sfx_starwarning);
 	}
 	
 	//If the game time ran out, somebody needs to die and scores changed
-	if(timeleft == 0)
+	if(iTime == 0)
 	{		
-		timeleft = game_values.gamemodesettings.star.time;
-		if(timeleft < 1)
-			timeleft = 30;
-
-		SetDigitCounters();
-
+		gameClock.SetTime(game_values.gamemodesettings.star.time < 1 ? 30 : game_values.gamemodesettings.star.time);
 		ifsoundonplay(sfx_thunder);
 
 		if(iCurrentModeType == 0)
@@ -2669,7 +2732,9 @@ void CGM_Star::think()
 void CGM_Star::draw_foreground()
 {
 	if(fDisplayTimer)
-		drawtime();
+	{
+		gameClock.Draw();
+	}
 }
 
 
@@ -2687,10 +2752,14 @@ void CGM_Star::playerextraguy(CPlayer &player, short iType)
 {
 	if(!gameover)
 	{
-		if(fReverseScoring)
-			player.score->AdjustScore(-1 - (iType == 5 ? 1 : 0));
+		if(iType == 5)
+		{
+			player.score->AdjustScore(fReverseScoring ? -1 : 1);
+		}
 		else
-			player.score->AdjustScore(1 + (iType == 5 ? 1 : 0));
+		{
+			gameClock.AddTime(iType * 10);
+		}
 	}
 }
 
@@ -2809,6 +2878,7 @@ short CGM_CaptureTheFlag::CheckWinner(CPlayer * player)
 	{
 		if(player->score->score >= goal)
 		{
+			player->score->SetScore(goal);
 			winningteam = player->teamID;
 			gameover = true;
 
@@ -2961,7 +3031,7 @@ short CGM_Greed::ReleaseCoins(CPlayer &player, killstyle style)
 		float velx = vel * cos(angle);
 		float vely = vel * sin(angle);
 		
-		objectcontainer[1].add(new MO_Coin(&spr_coin, velx, vely, ix, iy, player.colorID, player.teamID, 1, 30));
+		objectcontainer[1].add(new MO_Coin(&spr_coin, velx, vely, ix, iy, player.colorID, player.teamID, 1, 30, false));
 	}
 
 	//Play warning sound if game is almost over
@@ -3128,7 +3198,14 @@ void CGM_Collection::think()
 
 		if(objectcontainer[1].countMovingTypes(movingobject_collectioncard) < iPowerupQuantity)
 		{
-			objectcontainer[1].add(new MO_CollectionCard(&spr_collectcards, 0, rand() % 3, 0, 0.0f, 0.0f, 0, 0));
+			short iRandom = rand() % 5;
+			short iRandomCard = 0;
+			if(iRandom == 4)
+				iRandomCard = 2;
+			else if(iRandom >= 2)
+				iRandomCard = 1;
+
+			objectcontainer[1].add(new MO_CollectionCard(&spr_collectcards, 0, iRandomCard, 0, 0.0f, 0.0f, 0, 0));
 		}
 	}
 
@@ -3189,16 +3266,16 @@ short CGM_Collection::playerkilledself(CPlayer &player, killstyle style)
 
 void CGM_Collection::ReleaseCard(CPlayer &player)
 {
-	short ix = player.ix + HALFPW - 16;
-	short iy = player.iy + HALFPH - 16;
-
-	float vel = 7.0f + (float)(rand() % 9) / 2.0f;
-	float angle = -(float)(rand() % 314) / 100.0f;
-	float velx = vel * cos(angle);
-	float vely = vel * sin(angle);
-	
 	if(player.score->subscore[0] > 0)
 	{
+		short ix = player.ix + HALFPW - 16;
+		short iy = player.iy + HALFPH - 16;
+
+		float vel = 7.0f + (float)(rand() % 9) / 2.0f;
+		float angle = -(float)(rand() % 314) / 100.0f;
+		float velx = vel * cos(angle);
+		float vely = vel * sin(angle);
+
 		player.score->subscore[0]--;
 
 		short iCardMask = 3 << (player.score->subscore[0] << 1);
@@ -3752,7 +3829,7 @@ short CGM_Pipe_MiniGame::CheckWinner(CPlayer * player)
 	{
 		if(player->score->score >= goal)
 		{
-			player->score->score = goal;
+			player->score->SetScore(goal);
 
 			winningteam = player->teamID;
 			gameover = true;
@@ -3761,7 +3838,7 @@ short CGM_Pipe_MiniGame::CheckWinner(CPlayer * player)
 			SetupScoreBoard(false);
 			ShowScoreBoard();
 		}
-		else if(player->score->score >= goal - 2 && !playedwarningsound)
+		else if(player->score->score >= goal - 5 && !playedwarningsound)
 		{
 			playwarningsound();
 		}
@@ -3802,16 +3879,21 @@ TODO
 //Try to collect all coins from boxes and players
 CGM_Boxes_MiniGame::CGM_Boxes_MiniGame() : CGameMode()
 {
-	goal = 1;
+	goal = 10;
 	gamemode = game_mode_boxes_minigame;
 
-	SetupModeStrings("Boxes Minigame", "Points", 0);
+	SetupModeStrings("Boxes Minigame", "Lives", 5);
 };
 
 void CGM_Boxes_MiniGame::init()
 {
 	CGameMode::init();
 
+	for(short iScore = 0; iScore < score_cnt; iScore++)
+	{
+		score[iScore]->SetScore(goal);
+		score[iScore]->subscore[0] = 0;
+	}
 }
 
 
@@ -3822,52 +3904,141 @@ void CGM_Boxes_MiniGame::think()
 		displayplayertext();
 		return;
 	}
+}
 
+short CGM_Boxes_MiniGame::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
+{
+	if(gameover)
+		return player_kill_normal;
+
+	ReleaseCoin(other);
 	
-}
+	other.score->AdjustScore(-1);
 
-short CGM_Boxes_MiniGame::playerkilledplayer(CPlayer &player, CPlayer &other, killstyle style)
-{
-	//other.score->AdjustScore(-2);
-	return player_kill_normal;
-}
-
-short CGM_Boxes_MiniGame::playerkilledself(CPlayer &player, killstyle style)
-{
-	//player.score->AdjustScore(-2);
-	return player_kill_normal;
-}
-
-void CGM_Boxes_MiniGame::playerextraguy(CPlayer &player, short iType)
-{
-	if(!gameover)
+	if(!playedwarningsound)
 	{
-		player.score->AdjustScore(iType);
-		CheckWinner(&player);
-	}
-}
-
-short CGM_Boxes_MiniGame::CheckWinner(CPlayer * player)
-{
-	if(goal > -1)
-	{
-		if(player->score->score >= goal)
+		short countscore = 0;
+		for(short k = 0; k < score_cnt; k++)
 		{
-			player->score->score = goal;
+			if(inflictor.score == score[k])
+				continue;
 
-			winningteam = player->teamID;
-			gameover = true;
-
-			RemovePlayersButTeam(winningteam);
-			SetupScoreBoard(false);
-			ShowScoreBoard();
+			countscore += score[k]->score;
 		}
-		else if(player->score->score >= goal - 2 && !playedwarningsound)
+
+		if(countscore <= 2)
 		{
 			playwarningsound();
 		}
 	}
 
+	if(other.score->score <= 0)
+	{
+		ReleaseAllCoinsFromTeam(other);
+		RemoveTeam(other.teamID);
+		return player_kill_removed;
+	}
+
 	return player_kill_normal;
 }
 
+short CGM_Boxes_MiniGame::playerkilledself(CPlayer &player, killstyle style)
+{
+	if(gameover)
+		return player_kill_normal;
+
+	ReleaseCoin(player);
+	
+	player.score->AdjustScore(-1);
+
+	if(!playedwarningsound)
+	{
+		short countscore = 0;
+		bool playwarning = false;
+		for(short j = 0; j < score_cnt; j++)
+		{
+			for(short k = 0; k < score_cnt; k++)
+			{
+				if(j == k)
+					continue;
+
+				countscore += score[k]->score;
+			}
+
+			if(countscore <= 2)
+			{
+				playwarning = true;
+				break;
+			}
+
+			countscore = 0;
+		}
+
+		if(playwarning)
+			playwarningsound();
+	}
+
+	if(player.score->score <= 0)
+	{
+		ReleaseAllCoinsFromTeam(player);
+		RemoveTeam(player.teamID);
+		return player_kill_removed;
+	}
+
+	return player_kill_normal;
+}
+
+void CGM_Boxes_MiniGame::playerextraguy(CPlayer &player, short iType)
+{
+	if(gameover)
+		return;
+
+	player.score->AdjustScore(iType);
+}
+
+short CGM_Boxes_MiniGame::CheckWinner(CPlayer * player)
+{
+	if(player->score->subscore[0] >= 5)
+	{
+		player->score->subscore[0] = 5;
+
+		winningteam = player->teamID;
+		gameover = true;
+
+		RemovePlayersButTeam(winningteam);
+		SetupScoreBoard(false);
+		ShowScoreBoard();
+	}
+	else if(player->score->subscore[0] >= 4 && !playedwarningsound)
+	{
+		playwarningsound();
+	}
+
+	return player_kill_normal;
+}
+
+void CGM_Boxes_MiniGame::ReleaseCoin(CPlayer &player)
+{
+	if(player.score->subscore[0] > 0)
+	{
+		player.score->subscore[0]--;
+
+		short ix = player.ix + HALFPW - 16;
+		short iy = player.iy + HALFPH - 16;
+
+		float vel = 7.0f + (float)(rand() % 9) / 2.0f;
+		float angle = -(float)(rand() % 314) / 100.0f;
+		float velx = vel * cos(angle);
+		float vely = vel * sin(angle);
+		
+		ifsoundonplay(sfx_coin);
+
+		objectcontainer[1].add(new MO_Coin(&spr_coin, velx, vely, ix, iy, 2, -1, 2, 30, false));
+	}
+}
+
+void CGM_Boxes_MiniGame::ReleaseAllCoinsFromTeam(CPlayer &player)
+{
+	while(player.score->subscore[0] > 0)
+		ReleaseCoin(player);
+}

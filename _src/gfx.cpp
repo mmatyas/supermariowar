@@ -793,6 +793,16 @@ bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, Uint8 alpha, bool 
 	return fRet;
 }
 
+bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, Uint8 r, Uint8 g, Uint8 b, bool fWrap, bool fUseAccel)
+{
+	bool fRet = gSprite->init(f, r, g, b, fUseAccel);
+
+	if(fRet)
+		gSprite->SetWrap(fWrap);
+
+	return fRet;
+}
+
 
 //gfxSprite
 

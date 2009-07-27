@@ -223,14 +223,14 @@ void ModeOptionsMenu::CreateMenu()
 	// Coins Mode Settings
 	//***********************
 
-	miCoinModePenaltyField = new MI_SelectField(&spr_selectfield, 120, 200, "Penalty", 400, 180);
+	miCoinModePenaltyField = new MI_SelectField(&spr_selectfield, 120, 180, "Penalty", 400, 150);
 	miCoinModePenaltyField->Add("Off", 0, "", false, false);
 	miCoinModePenaltyField->Add("On", 1, "", true, false);
 	miCoinModePenaltyField->SetData(NULL, NULL, &game_values.gamemodemenusettings.coins.penalty);
 	miCoinModePenaltyField->SetKey(game_values.gamemodemenusettings.coins.penalty ? 1 : 0);
 	miCoinModePenaltyField->SetAutoAdvance(true);
 
-	miCoinModeQuantityField = new MI_SelectField(&spr_selectfield, 120, 240, "Quantity", 400, 180);
+	miCoinModeQuantityField = new MI_SelectField(&spr_selectfield, 120, 220, "Quantity", 400, 150);
 	miCoinModeQuantityField->Add("1", 1, "", false, false);
 	miCoinModeQuantityField->Add("2", 2, "", false, false);
 	miCoinModeQuantityField->Add("3", 3, "", false, false);
@@ -238,6 +238,32 @@ void ModeOptionsMenu::CreateMenu()
 	miCoinModeQuantityField->Add("5", 5, "", false, false);
 	miCoinModeQuantityField->SetData(&game_values.gamemodemenusettings.coins.quantity, NULL, NULL);
 	miCoinModeQuantityField->SetKey(game_values.gamemodemenusettings.coins.quantity);
+
+	miCoinModePercentExtraCoin = new MI_SliderField(&spr_selectfield, &menu_slider_bar, 120, 260, "Extra Coins", 400, 150, 384);
+	miCoinModePercentExtraCoin->Add("0", 0, "", false, false, false);
+	miCoinModePercentExtraCoin->Add("5", 5, "", false, false, false);
+	miCoinModePercentExtraCoin->Add("10", 10, "", false, false);
+	miCoinModePercentExtraCoin->Add("15", 15, "", false, false);
+	miCoinModePercentExtraCoin->Add("20", 20, "", false, false);
+	miCoinModePercentExtraCoin->Add("25", 25, "", false, false);
+	miCoinModePercentExtraCoin->Add("30", 30, "", false, false);
+	miCoinModePercentExtraCoin->Add("35", 35, "", false, false);
+	miCoinModePercentExtraCoin->Add("40", 40, "", false, false);
+	miCoinModePercentExtraCoin->Add("45", 45, "", false, false);
+	miCoinModePercentExtraCoin->Add("50", 50, "", false, false);
+	miCoinModePercentExtraCoin->Add("55", 55, "", false, false, false);
+	miCoinModePercentExtraCoin->Add("60", 60, "", false, false, false);
+	miCoinModePercentExtraCoin->Add("65", 65, "", false, false, false);
+	miCoinModePercentExtraCoin->Add("70", 70, "", false, false, false);
+	miCoinModePercentExtraCoin->Add("75", 75, "", false, false, false);
+	miCoinModePercentExtraCoin->Add("80", 80, "", false, false, false);
+	miCoinModePercentExtraCoin->Add("85", 85, "", false, false, false);
+	miCoinModePercentExtraCoin->Add("90", 90, "", false, false, false);
+	miCoinModePercentExtraCoin->Add("95", 95, "", false, false, false);
+	miCoinModePercentExtraCoin->Add("100", 100, "", false, false, false);
+	miCoinModePercentExtraCoin->SetData(&game_values.gamemodemenusettings.coins.percentextracoin, NULL, NULL);
+	miCoinModePercentExtraCoin->SetKey(game_values.gamemodemenusettings.coins.percentextracoin);
+	miCoinModePercentExtraCoin->SetNoWrap(true);
 
 	miCoinModeBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
 	miCoinModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
@@ -247,8 +273,9 @@ void ModeOptionsMenu::CreateMenu()
 	miCoinModeHeaderText = new MI_Text("Coin Collection Mode Menu", 320, 5, 0, 2, 1);
 
 	mModeSettingsMenu[4].AddControl(miCoinModePenaltyField, miCoinModeBackButton, miCoinModeQuantityField, NULL, miCoinModeBackButton);
-	mModeSettingsMenu[4].AddControl(miCoinModeQuantityField, miCoinModePenaltyField, miCoinModeBackButton, NULL, miCoinModeBackButton);
-	mModeSettingsMenu[4].AddControl(miCoinModeBackButton, miCoinModeQuantityField, miCoinModePenaltyField, miCoinModeQuantityField, NULL);
+	mModeSettingsMenu[4].AddControl(miCoinModeQuantityField, miCoinModePenaltyField, miCoinModePercentExtraCoin, NULL, miCoinModeBackButton);
+	mModeSettingsMenu[4].AddControl(miCoinModePercentExtraCoin, miCoinModeQuantityField, miCoinModeBackButton, NULL, miCoinModeBackButton);
+	mModeSettingsMenu[4].AddControl(miCoinModeBackButton, miCoinModePercentExtraCoin, miCoinModePenaltyField, miCoinModePercentExtraCoin, NULL);
 	
 	mModeSettingsMenu[4].AddNonControl(miCoinModeLeftHeaderBar);
 	mModeSettingsMenu[4].AddNonControl(miCoinModeRightHeaderBar);
@@ -923,7 +950,7 @@ void ModeOptionsMenu::CreateMenu()
 	//***********************
 	// Greed Mode Settings
 	//***********************		
-	miGreedModeCoinLife = new MI_SelectField(&spr_selectfield, 120, 180, "Coin Life", 400, 180);
+	miGreedModeCoinLife = new MI_SelectField(&spr_selectfield, 120, 160, "Coin Life", 400, 150);
 	miGreedModeCoinLife->Add("1 Second", 62, "", false, false, false);
 	miGreedModeCoinLife->Add("2 Seconds", 124, "", false, false, false);
 	miGreedModeCoinLife->Add("3 Seconds", 186, "", false, false);
@@ -943,14 +970,14 @@ void ModeOptionsMenu::CreateMenu()
 	miGreedModeCoinLife->SetData(&game_values.gamemodemenusettings.greed.coinlife, NULL, NULL);
 	miGreedModeCoinLife->SetKey(game_values.gamemodemenusettings.greed.coinlife);
 
-	miGreedModeOwnCoins = new MI_SelectField(&spr_selectfield, 120, 220, "Own Coins", 400, 180);
+	miGreedModeOwnCoins = new MI_SelectField(&spr_selectfield, 120, 200, "Own Coins", 400, 150);
 	miGreedModeOwnCoins->Add("Yes", 1, "", true, false);
 	miGreedModeOwnCoins->Add("No", 0, "", false, false);
 	miGreedModeOwnCoins->SetData(NULL, NULL, &game_values.gamemodemenusettings.greed.owncoins);
 	miGreedModeOwnCoins->SetKey(game_values.gamemodemenusettings.greed.owncoins);
 	miGreedModeOwnCoins->SetAutoAdvance(true);
 
-	miGreedModeMultiplier = new MI_SelectField(&spr_selectfield, 120, 260, "Multipler", 400, 180);
+	miGreedModeMultiplier = new MI_SelectField(&spr_selectfield, 120, 240, "Multipler", 400, 150);
 	miGreedModeMultiplier->Add("0.5", 1, "", false, false, false);
 	miGreedModeMultiplier->Add("1", 2, "", false, false);
 	miGreedModeMultiplier->Add("1.5", 3, "", false, false);
@@ -959,6 +986,32 @@ void ModeOptionsMenu::CreateMenu()
 	miGreedModeMultiplier->Add("3", 6, "", false, false, false);
 	miGreedModeMultiplier->SetData(&game_values.gamemodemenusettings.greed.multiplier, NULL, NULL);
 	miGreedModeMultiplier->SetKey(game_values.gamemodemenusettings.greed.multiplier);
+
+	miGreedModePercentExtraCoin = new MI_SliderField(&spr_selectfield, &menu_slider_bar, 120, 280, "Extra Coins", 400, 150, 384);
+	miGreedModePercentExtraCoin->Add("0", 0, "", false, false, false);
+	miGreedModePercentExtraCoin->Add("5", 5, "", false, false, false);
+	miGreedModePercentExtraCoin->Add("10", 10, "", false, false);
+	miGreedModePercentExtraCoin->Add("15", 15, "", false, false);
+	miGreedModePercentExtraCoin->Add("20", 20, "", false, false);
+	miGreedModePercentExtraCoin->Add("25", 25, "", false, false);
+	miGreedModePercentExtraCoin->Add("30", 30, "", false, false);
+	miGreedModePercentExtraCoin->Add("35", 35, "", false, false);
+	miGreedModePercentExtraCoin->Add("40", 40, "", false, false);
+	miGreedModePercentExtraCoin->Add("45", 45, "", false, false);
+	miGreedModePercentExtraCoin->Add("50", 50, "", false, false);
+	miGreedModePercentExtraCoin->Add("55", 55, "", false, false, false);
+	miGreedModePercentExtraCoin->Add("60", 60, "", false, false, false);
+	miGreedModePercentExtraCoin->Add("65", 65, "", false, false, false);
+	miGreedModePercentExtraCoin->Add("70", 70, "", false, false, false);
+	miGreedModePercentExtraCoin->Add("75", 75, "", false, false, false);
+	miGreedModePercentExtraCoin->Add("80", 80, "", false, false, false);
+	miGreedModePercentExtraCoin->Add("85", 85, "", false, false, false);
+	miGreedModePercentExtraCoin->Add("90", 90, "", false, false, false);
+	miGreedModePercentExtraCoin->Add("95", 95, "", false, false, false);
+	miGreedModePercentExtraCoin->Add("100", 100, "", false, false, false);
+	miGreedModePercentExtraCoin->SetData(&game_values.gamemodemenusettings.greed.percentextracoin, NULL, NULL);
+	miGreedModePercentExtraCoin->SetKey(game_values.gamemodemenusettings.greed.percentextracoin);
+	miGreedModePercentExtraCoin->SetNoWrap(true);
 
 	miGreedModeBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
 	miGreedModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
@@ -969,9 +1022,10 @@ void ModeOptionsMenu::CreateMenu()
 
 	mModeSettingsMenu[17].AddControl(miGreedModeCoinLife, miGreedModeBackButton, miGreedModeOwnCoins, NULL, miGreedModeBackButton);
 	mModeSettingsMenu[17].AddControl(miGreedModeOwnCoins, miGreedModeCoinLife, miGreedModeMultiplier, NULL, miGreedModeBackButton);
-	mModeSettingsMenu[17].AddControl(miGreedModeMultiplier, miGreedModeOwnCoins, miGreedModeBackButton, NULL, miGreedModeBackButton);
+	mModeSettingsMenu[17].AddControl(miGreedModeMultiplier, miGreedModeOwnCoins, miGreedModePercentExtraCoin, NULL, miGreedModeBackButton);
+	mModeSettingsMenu[17].AddControl(miGreedModePercentExtraCoin, miGreedModeMultiplier, miGreedModeBackButton, NULL, miGreedModeBackButton);
 
-	mModeSettingsMenu[17].AddControl(miGreedModeBackButton, miGreedModeMultiplier, miGreedModeCoinLife, miGreedModeMultiplier, NULL);
+	mModeSettingsMenu[17].AddControl(miGreedModeBackButton, miGreedModePercentExtraCoin, miGreedModeCoinLife, miGreedModePercentExtraCoin, NULL);
 	
 	mModeSettingsMenu[17].AddNonControl(miGreedModeLeftHeaderBar);
 	mModeSettingsMenu[17].AddNonControl(miGreedModeRightHeaderBar);
@@ -1219,16 +1273,16 @@ void ModeOptionsMenu::CreateMenu()
 
 	miShyGuyTagModeFreeTimeField = new MI_SelectField(&spr_selectfield, 120, 260, "Free Time", 400, 180);
 	miShyGuyTagModeFreeTimeField->Add("Instant", 0, "", false, false);
-	miShyGuyTagModeFreeTimeField->Add("1 Second", 62, "", false, false);
-	miShyGuyTagModeFreeTimeField->Add("2 Seconds", 124, "", false, false);
-	miShyGuyTagModeFreeTimeField->Add("3 Seconds", 186, "", false, false);
-	miShyGuyTagModeFreeTimeField->Add("4 Seconds", 248, "", false, false);
-	miShyGuyTagModeFreeTimeField->Add("5 Seconds", 310, "", false, false);
-	miShyGuyTagModeFreeTimeField->Add("6 Seconds", 372, "", false, false);
-	miShyGuyTagModeFreeTimeField->Add("7 Seconds", 434, "", false, false);
-	miShyGuyTagModeFreeTimeField->Add("8 Seconds", 496, "", false, false);
-	miShyGuyTagModeFreeTimeField->Add("9 Seconds", 558, "", false, false);
-	miShyGuyTagModeFreeTimeField->Add("10 Seconds", 620, "", false, false);
+	miShyGuyTagModeFreeTimeField->Add("1 Second", 1, "", false, false);
+	miShyGuyTagModeFreeTimeField->Add("2 Seconds", 2, "", false, false);
+	miShyGuyTagModeFreeTimeField->Add("3 Seconds", 3, "", false, false);
+	miShyGuyTagModeFreeTimeField->Add("4 Seconds", 4, "", false, false);
+	miShyGuyTagModeFreeTimeField->Add("5 Seconds", 5, "", false, false);
+	miShyGuyTagModeFreeTimeField->Add("6 Seconds", 6, "", false, false);
+	miShyGuyTagModeFreeTimeField->Add("7 Seconds", 7, "", false, false);
+	miShyGuyTagModeFreeTimeField->Add("8 Seconds", 8, "", false, false);
+	miShyGuyTagModeFreeTimeField->Add("9 Seconds", 9, "", false, false);
+	miShyGuyTagModeFreeTimeField->Add("10 Seconds", 10, "", false, false);
 	miShyGuyTagModeFreeTimeField->SetData(&game_values.gamemodemenusettings.shyguytag.freetime, NULL, NULL);
 	miShyGuyTagModeFreeTimeField->SetKey(game_values.gamemodemenusettings.shyguytag.freetime);
 
@@ -1250,6 +1304,70 @@ void ModeOptionsMenu::CreateMenu()
 	
 	mModeSettingsMenu[21].SetHeadControl(miShyGuyTagModeTagOnSuicideField);
 	mModeSettingsMenu[21].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
+
+
+	//***********************
+	// Shyguy Tag Mode Settings
+	//***********************
+
+	miBossModeTypeField = new MI_SelectField(&spr_selectfield, 120, 180, "Type", 400, 180);
+	miBossModeTypeField->Add("Hammer", 0, "", false, false);
+	miBossModeTypeField->Add("Bomb", 1, "", false, false);
+	miBossModeTypeField->Add("Fire", 2, "", false, false);
+	miBossModeTypeField->SetData(&game_values.gamemodemenusettings.boss.bosstype, NULL, NULL);
+	miBossModeTypeField->SetKey(game_values.gamemodemenusettings.boss.bosstype);
+
+	miBossModeDifficultyField = new MI_SelectField(&spr_selectfield, 120, 220, "Difficulty", 400, 180);
+	miBossModeDifficultyField->Add("Very Easy", 0, "", false, false, false);
+	miBossModeDifficultyField->Add("Easy", 1, "", false, false);
+	miBossModeDifficultyField->Add("Moderate", 2, "", false, false);
+	miBossModeDifficultyField->Add("Hard", 3, "", false, false);
+	miBossModeDifficultyField->Add("Very Hard", 4, "", false, false, false);
+	miBossModeDifficultyField->SetData(&game_values.gamemodemenusettings.boss.difficulty, NULL, NULL);
+	miBossModeDifficultyField->SetKey(game_values.gamemodemenusettings.boss.difficulty);
+
+	miBossModeHitPointsField = new MI_SelectField(&spr_selectfield, 120, 260, "Health", 400, 180);
+	miBossModeHitPointsField->Add("1", 1, "", false, false, false);
+	miBossModeHitPointsField->Add("2", 2, "", false, false, false);
+	miBossModeHitPointsField->Add("3", 3, "", false, false);
+	miBossModeHitPointsField->Add("4", 4, "", false, false);
+	miBossModeHitPointsField->Add("5", 5, "", false, false);
+	miBossModeHitPointsField->Add("6", 6, "", false, false);
+	miBossModeHitPointsField->Add("7", 7, "", false, false);
+	miBossModeHitPointsField->Add("8", 8, "", false, false);
+	miBossModeHitPointsField->Add("9", 9, "", false, false, false);
+	miBossModeHitPointsField->Add("10", 10, "", false, false, false);
+	miBossModeHitPointsField->Add("11", 11, "", false, false, false);
+	miBossModeHitPointsField->Add("12", 12, "", false, false, false);
+	miBossModeHitPointsField->Add("13", 13, "", false, false, false);
+	miBossModeHitPointsField->Add("14", 14, "", false, false, false);
+	miBossModeHitPointsField->Add("15", 15, "", false, false, false);
+	miBossModeHitPointsField->Add("16", 16, "", false, false, false);
+	miBossModeHitPointsField->Add("17", 17, "", false, false, false);
+	miBossModeHitPointsField->Add("18", 18, "", false, false, false);
+	miBossModeHitPointsField->Add("19", 19, "", false, false, false);
+	miBossModeHitPointsField->Add("20", 20, "", false, false, false);
+	miBossModeHitPointsField->SetData(&game_values.gamemodemenusettings.boss.hitpoints, NULL, NULL);
+	miBossModeHitPointsField->SetKey(game_values.gamemodemenusettings.boss.hitpoints);
+
+	miBossModeBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
+	miBossModeBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
+
+	miBossModeLeftHeaderBar = new MI_Image(&menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
+	miBossModeRightHeaderBar = new MI_Image(&menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
+	miBossModeHeaderText = new MI_Text("Boss Minigame Menu", 320, 5, 0, 2, 1);
+
+	mBossSettingsMenu.AddControl(miBossModeTypeField, miBossModeBackButton, miBossModeDifficultyField, NULL, miBossModeBackButton);
+	mBossSettingsMenu.AddControl(miBossModeDifficultyField, miBossModeTypeField, miBossModeHitPointsField, NULL, miBossModeBackButton);
+	mBossSettingsMenu.AddControl(miBossModeHitPointsField, miBossModeDifficultyField, miBossModeBackButton, NULL, miBossModeBackButton);
+	mBossSettingsMenu.AddControl(miBossModeBackButton, miBossModeHitPointsField, miBossModeTypeField, miBossModeHitPointsField, NULL);
+	
+	mBossSettingsMenu.AddNonControl(miBossModeLeftHeaderBar);
+	mBossSettingsMenu.AddNonControl(miBossModeRightHeaderBar);
+	mBossSettingsMenu.AddNonControl(miBossModeHeaderText);
+	
+	mBossSettingsMenu.SetHeadControl(miBossModeTypeField);
+	mBossSettingsMenu.SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 }
 
 void ModeOptionsMenu::SetControllingTeam(short iControlTeam)
@@ -1287,6 +1405,7 @@ void ModeOptionsMenu::SetRandomGameModeSettings(short iMode)
 	{
 		game_values.gamemodesettings.coins.penalty = miCoinModePenaltyField->GetRandomBoolValue();
 		game_values.gamemodesettings.coins.quantity = miCoinModeQuantityField->GetRandomShortValue();
+		game_values.gamemodesettings.coins.percentextracoin = miCoinModePercentExtraCoin->GetRandomShortValue();
 	}
 	else if(iMode == game_mode_stomp) //stomp
 	{
@@ -1367,6 +1486,7 @@ void ModeOptionsMenu::SetRandomGameModeSettings(short iMode)
 		game_values.gamemodesettings.greed.coinlife = miGreedModeCoinLife->GetRandomShortValue();
 		game_values.gamemodesettings.greed.owncoins = miGreedModeOwnCoins->GetRandomBoolValue();
 		game_values.gamemodesettings.greed.multiplier = miGreedModeMultiplier->GetRandomShortValue();
+		game_values.gamemodesettings.greed.percentextracoin = miGreedModePercentExtraCoin->GetRandomShortValue();
 	}
 	else if(iMode == game_mode_health) //health
 	{
@@ -1394,6 +1514,12 @@ void ModeOptionsMenu::SetRandomGameModeSettings(short iMode)
 		game_values.gamemodesettings.shyguytag.tagtransfer = miShyGuyTagModeTagOnStompField->GetRandomShortValue();
 		game_values.gamemodesettings.shyguytag.freetime = miShyGuyTagModeTagOnStompField->GetRandomShortValue();
 	}
+	else if(iMode == game_mode_boss_minigame) //boss
+	{
+		game_values.gamemodesettings.boss.bosstype = miBossModeTypeField->GetRandomShortValue();
+		game_values.gamemodesettings.boss.difficulty = miBossModeDifficultyField->GetRandomShortValue();
+		game_values.gamemodesettings.boss.hitpoints = miBossModeHitPointsField->GetRandomShortValue();
+	}
 }
 
 void ModeOptionsMenu::HealthModeStartLifeChanged()
@@ -1420,4 +1546,6 @@ void ModeOptionsMenu::Refresh()
 	{
 		mModeSettingsMenu[iMode].Refresh();
 	}
+
+	mBossSettingsMenu.Refresh();
 }

@@ -556,7 +556,7 @@ class MI_MapField : public UI_Control
 		void LoadCurrentMap();
 		void LoadMap(const char * szMapPath);
 
-		void SetMap(const char * szMapName, bool fWorld);
+		bool SetMap(const char * szMapName, bool fWorld);
 		void SetSpecialMap(const char * szMapName, const char * szMapPath);
 
 		const char * GetMapName() {return szMapName;}
@@ -568,7 +568,11 @@ class MI_MapField : public UI_Control
 		bool MovePrev(bool fScrollFast);
 		bool MoveNext(bool fScrollFast);
 
+		void SetDimensions(short iWidth, short iIndent);
+
 	protected:
+
+		bool Move(bool fNext, bool fScrollFast);
 
 		gfxSprite * spr;
 		
@@ -589,6 +593,8 @@ class MI_MapField : public UI_Control
 
 		std::string sSearchString;
 		short iSearchStringTimer;
+
+		bool fShowtags;
 };
 
 #endif //__UICONTROL_H_

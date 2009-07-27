@@ -772,7 +772,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 			if(bomb->iTeamID != pPlayer->teamID)
 				playerKeys->game_turbo.fDown = false;
 		}
-		else if(carriedobjecttype == movingobject_carried)  //Drop springs,spikes,shoes
+		else if(carriedobjecttype == movingobject_carried || carriedobjecttype == movingobject_throwbox)  //Drop springs,spikes,shoes
 		{
 			playerKeys->game_turbo.fDown = false;
 		}
@@ -998,7 +998,7 @@ void CPlayerAI::GetNearestObjects()
 						DistanceToObject(movingobject, &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
 					}
 				}
-				else if(movingobject_throwblock == movingtype)
+				else if(movingobject_throwblock == movingtype || (movingobject_throwbox == movingtype && ((CO_ThrowBox*)movingobject)->HasKillVelocity()))
 				{
 					if(fInvincible)
 						continue;
@@ -1040,6 +1040,13 @@ void CPlayerAI::GetNearestObjects()
 				else if(movingobject_egg == movingtype)
 				{
 					if(carriedItem && carriedItem->getMovingObjectType() == movingobject_egg)
+						continue;
+
+					DistanceToObject(movingobject, &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);
+				}
+				else if(movingobject_throwbox == movingtype)
+				{
+					if(carriedItem)
 						continue;
 
 					DistanceToObject(movingobject, &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);

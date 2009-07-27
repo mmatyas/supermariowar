@@ -191,7 +191,7 @@ class B_DonutBlock : public IO_Block
 
 		bool hittop(CPlayer * player, bool useBehavior);
 
-		void triggerBehavior();
+		void triggerBehavior(short iPlayerId);
 
 	private:
 		short counter;
@@ -387,6 +387,7 @@ class MO_Powerup : public IO_MovingObject
 		virtual void draw();
 		virtual void update();
 		virtual bool collide(CPlayer * player);
+		virtual void nospawn(short y);
 
 	protected:
 		float desty;
@@ -489,6 +490,23 @@ class PU_PodoboPowerup : public MO_Powerup
 		bool collide(CPlayer * player);
 };
 
+class PU_SecretPowerup : public MO_Powerup
+{
+	public:
+		PU_SecretPowerup(gfxSprite * nspr, short x, short y, short type);
+		~PU_SecretPowerup(){};
+
+		void update();
+		void draw();
+		bool collide(CPlayer * player);
+		void place();
+	
+	private:
+		short sparkleanimationtimer;
+		short sparkledrawframe;
+		short itemtype;
+};
+
 class PU_TreasureChestBonus : public MO_Powerup
 {
 	public:
@@ -589,6 +607,8 @@ class PU_FeatherPowerup : public IO_MovingObject
 		void draw();
 		virtual bool collide(CPlayer * player);
 
+		void nospawn(short y);
+
 	private:
 		bool fFloatDirectionRight;
 		float dFloatAngle;
@@ -630,6 +650,24 @@ class PU_ExtraTimePowerup : public MO_Powerup
 		~PU_ExtraTimePowerup(){};
 
 		bool collide(CPlayer * player);
+};
+
+class PU_CoinPowerup : public MO_Powerup
+{
+	public:
+		PU_CoinPowerup(gfxSprite *nspr, short x, short y, short color, short value);
+		~PU_CoinPowerup(){};
+
+		void update();
+		void draw();
+		bool collide(CPlayer * player);
+
+	protected:
+		short iColorOffsetY;
+		short iValue;
+
+		short sparkleanimationtimer;
+		short sparkledrawframe;
 };
 
 class PU_JailKeyPowerup : public MO_Powerup
@@ -719,6 +757,7 @@ class MO_IceBlast : public IO_MovingObject
 
 		void update();
 		bool collide(CPlayer * player);
+		void draw();
 
 	private:
 		short colorOffset;
@@ -750,7 +789,7 @@ class MO_Boomerang : public IO_MovingObject
 class MO_Coin : public IO_MovingObject
 {
 	public:
-		MO_Coin(gfxSprite *nspr, float velx, float vely, short ix, short iy, short color, short team, short type, short uncollectabletime);
+		MO_Coin(gfxSprite *nspr, float velx, float vely, short ix, short iy, short color, short team, short type, short uncollectabletime, bool placecoin);
 		~MO_Coin(){};
 
 		void update();
@@ -1141,8 +1180,9 @@ class MO_WalkingEnemy : public IO_MovingObject
 		virtual bool hittop(CPlayer * player) = 0;
 		virtual bool hitother(CPlayer * player);
 
+		virtual void ShatterDie();
 		virtual void Die() {}
-		virtual void DieAndDropShell(bool fBounce, bool fFlip) { dead = true; DropShell(fBounce, fFlip); }
+		virtual void DieAndDropShell(bool fBounce, bool fFlip) { if(frozen){ShatterDie();return;} dead = true; DropShell(fBounce, fFlip); }
 		virtual void DropShell(bool fBounce, bool fFlip) {}
 
 		killstyle getKillStyle() {return killStyle;}
@@ -1157,6 +1197,11 @@ class MO_WalkingEnemy : public IO_MovingObject
 		short burnuptimer;
 		bool fKillOnWeakWeapon;
 		bool fBouncing;
+
+		bool frozen;
+		short frozentimer;
+		float frozenvelocity;
+		short frozenanimationspeed;
 };
 
 class MO_Goomba : public MO_WalkingEnemy
@@ -1165,6 +1210,7 @@ class MO_Goomba : public MO_WalkingEnemy
 		MO_Goomba(gfxSprite *nspr, bool moveToRight, bool fBouncing);
 		virtual ~MO_Goomba(){};
 
+		void draw();
 		void update();
 		bool hittop(CPlayer * player);
 		void Die();
@@ -1177,6 +1223,7 @@ class MO_Koopa : public MO_WalkingEnemy
 		MO_Koopa(gfxSprite *nspr, bool moveToRight, bool red, bool fBouncing);
 		~MO_Koopa(){};
 
+		void draw();
 		void update();
 		bool hittop(CPlayer * player);
 		void Die();
@@ -1227,9 +1274,11 @@ class MO_CheepCheep : public IO_MovingObject
 		bool hitother(CPlayer * player);
 
 		void Die();
+		void ShatterDie();
 
 	private:
 		short iColorOffsetY;
+		bool frozen;
 };
 
 class MO_SledgeBrother : public IO_MovingObject
@@ -1317,13 +1366,16 @@ class CO_Shell : public MO_CarriedObject
 		void collide(IO_MovingObject * object);
 		void CheckAndDie();
 		void Die();
+		void ShatterDie();
 
-		void SideBounce();
+		void SideBounce(bool fRightSide);
 		void AddMovingKill(CPlayer * killer);
 
 		bool IsThreat() {return state == 1 || state == 3;}
 
 		void Flip();
+
+		void nospawn(short y, bool fBounce);
 
 	private:
 		void Stop();
@@ -1348,6 +1400,11 @@ class CO_Shell : public MO_CarriedObject
 		bool fFlipped;
 		short iFlippedOffset;
 
+		bool frozen;
+		short frozentimer;
+		float frozenvelocity;
+		short frozenanimationspeed;
+
 	friend class CPlayer;
 	friend class MO_Explosion;
 	friend class MO_BulletBill;
@@ -1359,6 +1416,9 @@ class CO_Shell : public MO_CarriedObject
 	friend class MO_CheepCheep;
 	friend class MO_PirhanaPlant;
 	
+	friend class MO_AttackZone;
+	friend class MO_SpinAttack;
+
 	friend class B_WeaponBreakableBlock;
 	
 	friend void RunGame();
@@ -1384,10 +1444,13 @@ class CO_ThrowBlock : public MO_CarriedObject
 		void collide(IO_MovingObject * object);
 		void CheckAndDie();
 		void Die();
+		void ShatterDie();
 
-		void SideBounce();
+		void SideBounce(bool fRightSide);
 
 	private:
+		void DieHelper();
+
 		short iType;
 		
 		short iDeathTime;
@@ -1395,6 +1458,11 @@ class CO_ThrowBlock : public MO_CarriedObject
 		bool fDieOnPlayerCollision;
 		short iBounceCounter;
 		short iNoOwnerKillTime;
+
+		bool frozen;
+		short frozentimer;
+		float frozenvelocity;
+		short frozenanimationspeed;
 
 	friend class CPlayer;
 	friend class MO_Explosion;
@@ -1405,7 +1473,57 @@ class CO_ThrowBlock : public MO_CarriedObject
 	friend class MO_SpinAttack;
 	friend class MO_AttackZone;
 
+	friend class CO_Shell;
+
 	friend class B_ThrowBlock;
+	friend class B_WeaponBreakableBlock;
+
+	friend void RunGame();
+};
+
+class CO_ThrowBox : public MO_CarriedObject
+{
+	public:
+		CO_ThrowBox(gfxSprite * nspr, short x, short y, short item);
+		~CO_ThrowBox(){};
+
+		void update();
+		void draw();
+		bool collide(CPlayer * player);
+
+		bool KillPlayer(CPlayer * player);
+		
+		void Drop();
+		void Kick();
+
+		void collide(IO_MovingObject * object);
+		void Die();
+		void ShatterDie();
+
+		void SideBounce(bool fRightSide);
+		float BottomBounce();
+
+		bool HasKillVelocity();
+
+	private:
+		void DieHelper();
+
+		short iItem;
+		
+		bool frozen;
+		short frozentimer;
+		short frozenanimationspeed;
+
+	friend class CPlayer;
+	friend class MO_Explosion;
+	friend class MO_BulletBill;
+	friend class MO_Goomba;
+	friend class MO_CheepCheep;
+	friend class MO_SpinAttack;
+	friend class MO_AttackZone;
+
+	friend class CO_ThrowBlock;
+	friend class CO_Shell;
 	friend class B_WeaponBreakableBlock;
 
 	friend void RunGame();

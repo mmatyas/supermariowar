@@ -23,7 +23,7 @@ class MapListNode
 class MapList
 {
     public:
-        MapList();
+        MapList(bool fWorldEditor);
         ~MapList();
 
 		//Adds maps in all world map directories to the map list so they can be edited in the map editor
@@ -74,6 +74,8 @@ class MapList
 		void ReloadMapAutoFilters();
 		void WriteMapSummaryCache();
 
+		const char * GetUnknownMapName();
+
     private:
 
         std::map<std::string, MapListNode*> maps;
@@ -88,4 +90,6 @@ class MapList
 
 		std::map<std::string, MapListNode*>::iterator * mlnFilteredMaps;
 		std::map<std::string, MapListNode*>::iterator * mlnMaps;
+
+		char szUnknownMapString[2];
 };

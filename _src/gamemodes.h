@@ -16,6 +16,36 @@ struct SModeOption
 struct TourStop;
 class CO_PhantoKey;
 
+class GameTimerDisplay
+{
+	public:
+		GameTimerDisplay();
+		~GameTimerDisplay() {}
+
+		void Init(short iTime, bool fCountDown);
+		short RunClock();
+		void Draw();
+		void SetTime(short iTime);
+		void AddTime(short iTime);
+
+	protected:
+		void SetDigitCounters();
+
+		short timeleft;
+		bool countdown;
+
+		short framesleft_persecond;
+		short iDigitLeftSrcX;
+		short iDigitMiddleSrcX;
+		short iDigitRightSrcX;
+		short iDigitLeftDstX;
+		short iDigitMiddleDstX;
+		short iDigitRightDstX;
+		short iScoreOffsetX;
+
+		short iFramesPerSecond;
+};
+
 //gamemode base class
 class CGameMode
 {
@@ -122,19 +152,8 @@ class CGM_TimeLimit : public CGameMode
 #endif
 
 	protected:
-		void SetDigitCounters();
+		GameTimerDisplay gameClock;
 
-		short timeleft;
-		short framesleft_persecond;
-		short iDigitLeftSrcX;
-		short iDigitMiddleSrcX;
-		short iDigitRightSrcX;
-		short iDigitLeftDstX;
-		short iDigitMiddleDstX;
-		short iDigitRightDstX;
-		short iScoreOffsetX;
-
-		short iFramesPerSecond;
 };
 
 
@@ -203,22 +222,26 @@ class CGM_ShyGuyTag : public CGameMode
 		
 		void init();
 		void think();
+		void draw_foreground();
 		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
 		short playerkilledself(CPlayer &player, killstyle style);
 		void playerextraguy(CPlayer &player, short iType);
 
 		void SetShyGuy(short iTeam);
-		short CheckWinner(CPlayer * player);
-		short CountShyGuys();
 
 #ifdef _DEBUG
 		void setdebuggoal() {goal = 100;}
 #endif
 
 	private:
-		short shyguyclearcounter;
-		short scorecounter;
 
+		short CheckWinner(CPlayer * player);
+		short CountShyGuys();
+		void FreeShyGuys();
+
+		GameTimerDisplay gameClock;
+		bool fRunClock;
+		short scorecounter;
 };
 
 class CGM_Coins : public CGameMode
@@ -670,6 +693,8 @@ class CGM_Boxes_MiniGame : public CGameMode
 
 	private:
 		
+		void ReleaseCoin(CPlayer &player);
+		void ReleaseAllCoinsFromTeam(CPlayer &player);
 };
 
 #endif

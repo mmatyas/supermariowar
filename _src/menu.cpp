@@ -25,7 +25,7 @@ extern bool	g_fAutoTest;
 extern bool g_fRecordTest;
 #endif
 
-extern short g_iVersion[];
+extern int g_iVersion[];
 
 extern void SetGameModeSettingsFromMenu();
 extern void LoadMapObjects(bool fPreview);
@@ -49,7 +49,7 @@ extern WorldMap g_worldmap;
 
 extern void LoadCurrentMapBackground();
 
-extern TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld);
+extern TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld);
 
 extern CScore *score[4];
 
@@ -1369,6 +1369,7 @@ void Menu::CreateMenu()
 	miMinigameField->Add("Hammer Boss Game", 1, "", false, false);
 	miMinigameField->Add("Bomb Boss Game", 2, "", false, false);
 	miMinigameField->Add("Fire Boss Game", 3, "", false, false);
+	miMinigameField->Add("Boxes Game", 4, "", false, false);
 	miMinigameField->SetData(&game_values.selectedminigame, NULL, NULL);
 	miMinigameField->SetKey(game_values.selectedminigame);
 	miMinigameField->Show(false);
@@ -1816,8 +1817,12 @@ void Menu::RunMenu()
 			//Clear out the stored powerups after a game that had a winner
 			if(!game_values.worldskipscoreboard)
 			{
-				for(short iPlayer = 0; iPlayer < 4; iPlayer++)
-					game_values.storedpowerups[iPlayer] = -1;
+				//Only clear out the stored powerup if we were allowed to use it in the game
+				if(game_values.gamemode->HasStoredPowerups())
+				{
+					for(short iPlayer = 0; iPlayer < 4; iPlayer++)
+						game_values.storedpowerups[iPlayer] = -1;
+				}
 			}
 		}
 		/*else if(game_values.tournamentwinner > -1) //World is completed
@@ -2298,18 +2303,7 @@ void Menu::RunMenu()
 				mCurrentMenu = &mTeamSelectMenu;
 				mCurrentMenu->ResetMenu();
 
-				if(game_values.matchtype == MATCH_TYPE_TOURNAMENT)
-				{
-					if(game_values.tournamentcontrolstyle == 5 || game_values.tournamentcontrolstyle == 6) //Random
-						game_values.tournamentcontrolteam = rand() % score_cnt;
-					else if(game_values.tournamentcontrolstyle == 7) //Round robin
-						game_values.tournamentcontrolteam = 0;
-					else //The first game of the tournament is controlled by all players
-						game_values.tournamentcontrolteam = -1;
-	
-					game_values.tournamentnextcontrol = 1;  //if round robin is selected, choose the next team next					
-				}
-				else
+				if(game_values.matchtype != MATCH_TYPE_TOURNAMENT)
 				{
 					game_values.tournamentcontrolteam = -1;
 					SetControllingTeamForSettingsMenu(game_values.tournamentcontrolteam, false);
@@ -2425,12 +2419,12 @@ void Menu::RunMenu()
 				{
 					short iMiniGameType = miMinigameField->GetShortValue();
 					
-					if(iMiniGameType == 0)
+					if(iMiniGameType == 0) //Pipe minigame
 					{
 						pipegamemode->goal = 50;
 						game_values.gamemode = pipegamemode;
 					}
-					else if(iMiniGameType >= 1 && iMiniGameType <= 3)
+					else if(iMiniGameType >= 1 && iMiniGameType <= 3)  //3 types of boss minigames
 					{
 						game_values.gamemodemenusettings.boss.bosstype = iMiniGameType - 1;
 						game_values.gamemodemenusettings.boss.difficulty = 2;
@@ -2438,6 +2432,11 @@ void Menu::RunMenu()
 
 						bossgamemode->goal = 5;
 						game_values.gamemode = bossgamemode;
+					}
+					else if(iMiniGameType == 4) //boxes minigame
+					{
+						boxesgamemode->goal = 10;
+						game_values.gamemode = boxesgamemode;
 					}
 
 					StartGame();
@@ -2476,6 +2475,16 @@ void Menu::RunMenu()
 					}
 					else if(game_values.matchtype == MATCH_TYPE_TOURNAMENT)
 					{
+						//Set who is controlling the tournament menu
+						if(game_values.tournamentcontrolstyle == 5 || game_values.tournamentcontrolstyle == 6) //Random
+							game_values.tournamentcontrolteam = rand() % score_cnt;
+						else if(game_values.tournamentcontrolstyle == 7) //Round robin
+							game_values.tournamentcontrolteam = 0;
+						else //The first game of the tournament is controlled by all players
+							game_values.tournamentcontrolteam = -1;
+		
+						game_values.tournamentnextcontrol = 1;  //if round robin is selected, choose the next team next					
+						
 						miTournamentScoreboard->CreateScoreboard(score_cnt, game_values.tournamentgames, &menu_mode_large);
 					}
 					else if(game_values.matchtype == MATCH_TYPE_WORLD)
@@ -2947,6 +2956,8 @@ void Menu::RunMenu()
 						game_values.gamemode = pipegamemode;
 					else if(iGameMode == game_mode_boss_minigame)
 						game_values.gamemode = bossgamemode;
+					else if(iGameMode == game_mode_boxes_minigame)
+						game_values.gamemode = boxesgamemode;
 					else
 						game_values.gamemode = gamemodes[iGameMode];
 
@@ -3125,7 +3136,7 @@ void Menu::RunMenu()
 
 				if(game_values.matchtype == MATCH_TYPE_WORLD && game_values.tourstops[game_values.tourstopcurrent]->iStageType == 1)
 				{
-					g_map.loadMap(convertPath("maps/special/bonushouse.map"), read_type_full);
+					g_map.loadMap(convertPath("maps/special/two52_special_bonushouse.map"), read_type_full);
 					LoadCurrentMapBackground();
 
 					if(game_values.music)
@@ -3137,23 +3148,56 @@ void Menu::RunMenu()
 				else
 				{
 					std::string sShortMapName = "";
+
+					bool fMiniGameMapFound = false;
+
+					if(game_values.matchtype == MATCH_TYPE_WORLD)
+					{
+						if(game_values.gamemode->gamemode == game_mode_pipe_minigame || 
+							game_values.gamemode->gamemode == game_mode_boss_minigame ||
+							game_values.gamemode->gamemode == game_mode_boxes_minigame)
+						{
+							fMiniGameMapFound = maplist.findexact(game_values.tourstops[game_values.tourstopcurrent]->pszMapFile, true);
+
+							if(fMiniGameMapFound)
+							{
+								g_map.loadMap(maplist.currentFilename(), read_type_full);
+								sShortMapName = maplist.currentShortmapname();
+							}
+						}
+					}
+
 					if(game_values.gamemode->gamemode == game_mode_pipe_minigame)
 					{
-						g_map.loadMap(convertPath("maps/special/minigamepipe.map"), read_type_full);
-						sShortMapName = "minigamepipe";
+						if(!fMiniGameMapFound)
+						{
+							g_map.loadMap(convertPath("maps/special/two52_special_pipe_minigame.map"), read_type_full);
+							sShortMapName = "minigamepipe";
+						}
 					}
 					else if(game_values.gamemode->gamemode == game_mode_boss_minigame)
 					{
-						short iBossType = game_values.gamemodesettings.boss.bosstype;
-						bossgamemode->SetBossType(iBossType);
-						if(iBossType == 0)
-							g_map.loadMap(convertPath("maps/special/dungeon.map"), read_type_full);
-						else if(iBossType == 1)
-							g_map.loadMap(convertPath("maps/special/hills.map"), read_type_full);
-						else if(iBossType == 2)
-							g_map.loadMap(convertPath("maps/special/volcano.map"), read_type_full);
-						
-						sShortMapName = "minigameboss";
+						if(!fMiniGameMapFound)
+						{
+							short iBossType = game_values.gamemodesettings.boss.bosstype;
+							bossgamemode->SetBossType(iBossType);
+							if(iBossType == 0)
+								g_map.loadMap(convertPath("maps/special/two52_special_hammerboss_minigame.map"), read_type_full);
+							else if(iBossType == 1)
+								g_map.loadMap(convertPath("maps/special/two52_special_bombboss_minigame.map"), read_type_full);
+							else if(iBossType == 2)
+								g_map.loadMap(convertPath("maps/special/two52_special_fireboss_minigame.map"), read_type_full);
+							
+							sShortMapName = "minigameboss";
+						}
+					}
+					else if(game_values.gamemode->gamemode == game_mode_boxes_minigame)
+					{
+						if(!fMiniGameMapFound)
+						{
+							g_map.loadMap(convertPath("maps/special/two52_special_boxes_minigame.map"), read_type_full);
+							sShortMapName = "minigameboxes";
+						}
 					}
 					else if(game_values.matchtype == MATCH_TYPE_QUICK_GAME)
 					{
@@ -3330,7 +3374,7 @@ bool Menu::ReadTourFile()
 
 	char buffer[256];
 	bool fReadVersion = false;
-	short iVersion[4] = {0, 0, 0, 0};
+	int iVersion[4] = {0, 0, 0, 0};
 	while(fgets(buffer, 256, fp) && game_values.tourstoptotal < 10)
 	{
 		if(buffer[0] == '#' || buffer[0] == '\n' || buffer[0] == ' ' || buffer[0] == '\t')

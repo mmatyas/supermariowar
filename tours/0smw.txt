@@ -28,6 +28,7 @@
 #21 = Shyguy Tag
 #1000 = Pipe Minigame
 #1001 = Boss Minigame
+#1002 = Boxes Minigame
 
 #Version
 1.8.0.0
@@ -55,6 +56,7 @@
 #4 - Coins
 #Penalty - 0 = Off, 1 = On
 #Quantity - any number greater than 0
+#Extra Coins - number between 0 and 100 indicating the percent chance extra time will appear from a powerup block
 
 #5 - Stomp
 #Rate - Relates to the number of frames between spawns. The smaller the number, the faster the spawning (example: 30 is "Very fast" and 120 is "Slow")
@@ -154,6 +156,7 @@
 #Coin Life - time until coins disappear - number of frames until the bases relocate (example: 620 is about 10 seconds)
 #Own Coins - 0 = player cannot collect his own coins, 1 = he can
 #Multiplier = how many coins are released from players, 1 = 0.5x normal, 2 = normal amount, 4 = 2x, 6 = 3x, ect.
+#Extra Coins - number between 0 and 100 indicating the percent chance extra time will appear from a powerup block
 
 #18 - Health
 #Start Life - Number of hearts each team starts with - number between 1 and 10
@@ -184,6 +187,10 @@
 #Boss Type - 0 = Hammer, 1 = Bomb, 2 = Fire
 #Difficulty - 0 = Very Easy, 1 = Easy, 2 = Moderate, 3 = Hard, 4 = Very Hard
 #Hit Points - Any number greater than 0. This is the number of hits required to kill the boss.
+
+#1002 - Boxes Minigame
+#No Options
+
 
 #Tour Stops (maximum 10 stops)
 #Map,Mode,Goal,Points,Bonus Wheel,Name,Options(see above)

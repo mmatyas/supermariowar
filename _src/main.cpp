@@ -31,6 +31,7 @@
 /*
 TODO
 
+
 BUG!! Still reports of disappearing map tiles - caused when rRects is used out of bounds causing w and h to be set to 0 - happened with platform with tile using row 960
       I think this was due to using old maps with newer versions of the 1.8 alpha - keep an eye on this, but it might be a non-issue
 
@@ -50,29 +51,9 @@ STUFF TO WATCH OUT FOR IN BETA2
 - collision detection and behavior of coins, ztar, collection cards
 
 Fixed
-[X] Removed Push Only Kills as good game mode options for quick game
-[X] Fixed bug where quick greed mode games didn't choose a good multiplier
-[X] Fixed horizontal pirhana plants not resetting width/height correctly when killed
-[X] No pirhana plants (hazards) in previews in main game
-[X] Added boss mode back in as a minigame
-[X] Added boss mode difficulty settings
-[X] On Unlimited Shyguy mode, whoever scores the first point wins the match.
-[X] There's less pause between actions when moving up a difficulty past moderate but when the boss starts moving, he moves so ungodly slow that the battle becomes very trivial; It was usually enough time for me to hunt a koopa shell and easily pass it into the boss in the hammer brother challenge, even on very hard. I think the challenges above moderate would definitely earn their names if the brothers could be sped up in their movement functions so that there isn't such a noticably huge gap between actions compared to when the brother is doing something else.
-[X] AI seems to have a rough time being a shy guy...the invincibility from environmental hazards causes them to get stuck standing on some because it's telling them to avoid it regardless of the invincibility. It'd also be nice if the sound cue played every second of the free time remaining once everyone was a shy guy, to better let the players know when it would be ending.
-[X] It crashes if you press enter when you're attaching bonus items to a level, though. Not sure why.
-[X] Well, I haven't played with it much but when I press Escape at the end of a boss fight (after a win), the game crashes. -> Bug with array size around same area, need to re-test
-[X] I've noticed a glitch where after taunting, sometimes the boss might walk but use the attacking animation instead which kinda looks weird.
-[X] When exiting a warp pipe, the powerup states are now cleared.  This means that flying/spinning/stomping players will not be using that power when exiting.
-[X] Tanooki suit should appear next to the weapon powerup on the HUD when a player has it.
-[X] If you get hit in any way while you're Ztarred and the timer runs out while you're waiting to spawn, you'll see another death sprite
 
 
 Beta 1 Public Release Bugs
-[ ] world editor does not compile correctly because it has different preprocessors than the other objects
-    when compiling it uses the same compiled objects compiled by other projects causing bad behavior
-
-[ ] Look at dying in pipes -> shoes and items are dropped in the middle of warping and could cause a problem
-
 [ ] Treasure chests from winning a stage that rewards an item in world mode can be spawned in areas where they fall forever, and can never be opened. (Though this is aesthetic)
 
 [ ] also usually the game does a good job not spawning you inside a platform(killing you) but I lined the bottom of a 
@@ -90,15 +71,13 @@ Beta 1 Public Release Bugs
     -> Write script to make these using 0x808080 gray background
 
 Considering Features
+[ ] Figure out what triggers secret 3 and 4
 
-[ ] FIXME::Crash when switching between stages and changing modes (crash at exit) need to debug in world editor
+[ ] Build in release mode and make sure we can still use special maps in world editor
 
-[ ] Add 3 types of boss battles back in as possible tour stops/world stages (and add to secret minigame menu)
+[ ] Bug on 00test6 map on left side when you let go of a held item or if you get hit in greed mode, items go through wall on left side
 
-[ ] Add box game where players race around the map opening boxes to try to get all the coins
-	Fireballs, hazards etc would impede progress
-	Players could steal coins
-	No powerups
+[ ] Get boss settings from forum and integrate them in
 
 
 Need To Test
@@ -322,16 +301,16 @@ Procedure for adding a new game mode:
 15) Change line 3186 in main.cpp: if(iMode == game_mode_pipe_minigame)
 16) Change line 3274 in main.cpp: if(iMode == game_mode_pipe_minigame)
 17) Update tours/0smw.txt to have documentation of mode and options
-18) Update worldeditor.cpp: miModeField = new MI_ImageSelectField to add new game mode
-19) Update worldeditor.cpp: g_iNumGameModeSettings[]
+18) Update worldeditor.cpp: "miModeField = new MI_ImageSelectField" to add new game mode
+19) Update worldeditor.cpp: "g_iNumGameModeSettings[]"
 
 
 Procedure for adding a new game mode option:
 1) Add game mode options to GameModeSettings in global.h
-2) Set default settings for settings in main.cpp
-3) Add menu fields to support these new options in menu.cpp and menu.h
+2) Add to SetupDefaultGameModeSettings() in global.cpp
+3) Add menu fields to support these new options in modeoptionsmenu.cpp and modeoptionsmenu.h
 4) Update ParseTourStopLine() and WriteTourStopLine() in global.cpp
-5) Update SetRandomGameModeSettings() in menu.cpp
+5) Update SetRandomGameModeSettings() in modeoptionsmenu.cpp
 6) Remove old options.bin (new settings will now be read from it)
 7) Update tours/0smw.txt to have documentation of new mode option
 8) Update worldeditor.cpp: miModeField = new MI_ImageSelectField to add new game mode
@@ -380,6 +359,12 @@ short			g_iCurrentDrawIndex = 0;
 short			x_shake = 0;
 short			y_shake = 0;
 
+//Vars that keep track of spinning the screen
+float spinangle = 0.0f;
+float spinspeed = 0.0f;
+short spindirection = 1;
+short spintimer = 0;
+
 //------ sprites (maybe this should be done in a resource manger) ------
 gfxSprite		** spr_player[4];	//all player sprites (see global.h)
 gfxSprite		** spr_shyguy[4];
@@ -395,6 +380,7 @@ gfxSprite		spr_rain;
 gfxSprite		spr_background;
 gfxSprite		spr_backmap[2];
 gfxSprite		spr_frontmap[2];
+gfxSprite		spr_overlay;
 gfxSprite		menu_backdrop;
 
 gfxFont			menu_font_small;
@@ -501,9 +487,15 @@ gfxSprite		spr_extraheartpowerup;
 gfxSprite		spr_extratimepowerup;
 gfxSprite		spr_jailkeypowerup;
 
+gfxSprite		spr_secret1;
+gfxSprite		spr_secret2;
+gfxSprite		spr_secret3;
+gfxSprite		spr_secret4;
+
 gfxSprite		spr_shade[3];
 gfxSprite		spr_scorehearts;
 gfxSprite		spr_scorecards;
+gfxSprite		spr_scorecoins;
 
 gfxSprite		spr_timershade;
 gfxSprite		spr_scoretext;
@@ -567,6 +559,7 @@ gfxSprite		spr_spring;
 gfxSprite		spr_spike;
 gfxSprite		spr_bomb;
 gfxSprite		spr_kuriboshoe;
+gfxSprite		spr_throwbox;
 
 gfxSprite		spr_sledgehammer;
 gfxSprite		spr_superfireball;
@@ -606,6 +599,10 @@ gfxSprite		spr_powerupselector;
 gfxSprite		spr_scoreboard;
 gfxSprite		spr_abovearrows;
 
+gfxSprite		spr_windmeter;
+gfxSprite		spr_overlayhole;
+
+
 //------ game relevant stuff ------
 CPlayer			*list_players[4];
 short			list_players_cnt = 0;
@@ -624,7 +621,7 @@ short			respawnanimationframe[4] = {0, 0, 0, 0};
 short			projectiles[4];
 
 extern short controlkeys[2][2][4][NUM_KEYS];
-extern short g_iVersion[];
+extern int g_iVersion[];
 
 //Locations for swirl spawn effects
 short g_iSwirlSpawnLocations[4][2][25];
@@ -705,6 +702,7 @@ sfxSound sfx_flamecannon;
 sfxSound sfx_wand;
 sfxSound sfx_enterstage;
 sfxSound sfx_gameover;
+sfxSound sfx_pickup;
 
 sfxMusic backgroundmusic[6];
 
@@ -712,6 +710,7 @@ CGameMode			*gamemodes[GAMEMODE_LAST];
 CGM_Bonus			*bonushousemode = NULL;
 CGM_Pipe_MiniGame	*pipegamemode = NULL;
 CGM_Boss_MiniGame	*bossgamemode = NULL;
+CGM_Boxes_MiniGame	*boxesgamemode = NULL;
 
 short		currentgamemode = 0;
 
@@ -725,7 +724,7 @@ extern void ShowScoreBoard();
 extern void LoadCurrentMapBackground();
 
 FiltersList filterslist;  //Filters list must be initiallized before maps list because it is used in maplist constructor
-MapList maplist;
+MapList maplist(false);
 SkinList skinlist;
 AnnouncerList announcerlist;
 MusicList musiclist;
@@ -945,6 +944,18 @@ void DECLSPEC musicfinished()
 	}
 }
 
+short GetModeIconIndexFromMode(short iMode)
+{
+	if(iMode == game_mode_pipe_minigame)
+		iMode = 25;
+	else if(iMode == game_mode_boss_minigame)
+		iMode = 26;
+	else if(iMode == game_mode_boxes_minigame)
+		iMode = 27;
+
+	return iMode;
+}
+
 void RunGame();
 void CleanUp();
 bool LoadAndSplashScreen();
@@ -991,6 +1002,56 @@ void EnterBossMode(short type)
 	}
 }*/
 
+//Move the screen in a small circle
+void SpinScreen()
+{
+	if(spindirection == 0 || spindirection == 2)
+	{
+		if(++spintimer >= 300)
+		{
+			spindirection++;
+			spintimer = 0;
+		}
+	}
+	else if(spindirection == 1)
+	{
+		spinspeed += 0.0008f;
+
+		if(spinspeed >= 0.05f)
+		{
+			spinspeed = 0.05f;
+			spindirection++;
+		}
+	}
+	else
+	{
+		spinspeed -= 0.0008f;
+
+		if(spinspeed <= -0.05f)
+		{
+			spinspeed = -0.05f;
+			spindirection = 0;
+		}
+	}
+
+	spinangle += spinspeed;
+
+	if(spinangle >= TWO_PI)
+	{
+		spinangle -= TWO_PI;
+	}
+	else if(spinangle < 0.0f)
+	{
+		spinangle += TWO_PI;
+	}
+
+	float shakey = spinspeed * 640.0f * sin(spinangle);
+	if(shakey < 0.0f)
+		shakey -= 1.0f;
+
+	x_shake = (short)(spinspeed * 640.0f * cos(spinangle));
+	y_shake = (short)(shakey);
+}
 
 // ------ MAIN ------
 int main(int argc, char *argv[])
@@ -1254,6 +1315,7 @@ int main(int argc, char *argv[])
 	bonushousemode = new CGM_Bonus();
 	pipegamemode = new CGM_Pipe_MiniGame();
 	bossgamemode = new CGM_Boss_MiniGame();
+	boxesgamemode = new CGM_Boxes_MiniGame();
 
 	SetupDefaultGameModeSettings();
 	
@@ -1609,6 +1671,29 @@ void RunGame()
 		iCountDownTimer = iCountDownTimes[0];
 	}
 
+	//Reset the screen spin variables
+	spinangle = 0.0f;
+	spinspeed = 0.0f;
+	spindirection = 1;
+	spintimer = 0;
+
+	//Reset Secret Counters
+	for(short iPlayer = 0; iPlayer < 4; iPlayer++)
+		game_values.unlocksecret1part1[iPlayer] = false;
+
+	game_values.unlocksecret1part2 = 0;
+	game_values.unlocksecret2part1 = false;
+	game_values.unlocksecret2part2 = 0;
+	game_values.unlocksecret3part1 = false;
+	game_values.unlocksecret3part2 = 0;
+	game_values.unlocksecret4part1 = false;
+	game_values.unlocksecret4part2 = 0;
+	game_values.unlocksecretunlocked[0] = false;
+	game_values.unlocksecretunlocked[1] = false;
+	game_values.unlocksecretunlocked[2] = false;
+	game_values.unlocksecretunlocked[3] = false;
+
+
 	//Reset the keys each time we switch from menu to game and back
 	game_values.playerInput.ResetKeys();
 
@@ -1651,7 +1736,9 @@ void RunGame()
 		if(game_values.gamemode->HasStoredPowerups())
 			game_values.gamepowerups[iPlayer] = game_values.storedpowerups[iPlayer];
 		else
+		{
 			game_values.gamepowerups[iPlayer] = -1;
+		}
 
 		game_values.bulletbilltimer[iPlayer] = 0;
 		game_values.bulletbillspawntimer[iPlayer] = 0;
@@ -1680,6 +1767,11 @@ void RunGame()
 	game_values.forceexittimer = 0;
 	game_values.gamewindx = 0.0f;
 	game_values.gamewindy = 0.0f;
+	
+	game_values.windaffectsplayers = false;
+	game_values.spinscreen = false;
+	game_values.reversewalk = false;
+	game_values.spotlights = true;
 
 	//Initialize game mode
 	game_values.gamemode->init();
@@ -1780,7 +1872,7 @@ void RunGame()
 		if(g_map.eyecandy[iEyeCandyLayer] & 8)
 		{
 			for(i = 0; i < 15; i++)
-				eyecandy[iEyeCandyLayer].add(new EC_Snow(&spr_snow, (float)(rand() % 640), (float)(rand() % 480)));
+				eyecandy[iEyeCandyLayer].add(new EC_Snow(&spr_snow, (float)(rand() % 640), (float)(rand() % 480), 0));
 		}
 
 		//Fish
@@ -1833,7 +1925,7 @@ void RunGame()
 				eyecandy[iEyeCandyLayer].add(new EC_Bubble(&spr_rain, (float)(rand() % 640), (float)(rand() % 480)));
 		}
 	}
-
+	
 	short iScoreTextOffset[4];
 	for(short iTeam = 0; iTeam < score_cnt; iTeam++)
 	{
@@ -1849,13 +1941,13 @@ void RunGame()
 	for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++)
 		list_players[iPlayer]->Init();
 	
-
+	
 	//This is the main game loop
 	while (true)
 	{
 		framestart = SDL_GetTicks();
 
-		if(iWindTimer == 0)
+		if(iWindTimer <= 0)
 		{
 			//Then trigger next wind event
 			if(game_values.gamewindx < dNextWind)
@@ -1865,7 +1957,7 @@ void RunGame()
 				if(game_values.gamewindx >= dNextWind)
 					iWindTimer = (rand() % 60) + 30;
 			}
-			if(game_values.gamewindx > dNextWind)
+			else if(game_values.gamewindx >= dNextWind)
 			{
 				game_values.gamewindx -= 0.02f;
 
@@ -2189,7 +2281,7 @@ void RunGame()
 					else if(event.key.keysym.sym == SDLK_7)
 					{
 						if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-							objectcontainer[1].add(new CO_Spring(&spr_spring, list_players[0]->ix + 32, list_players[0]->iy, false));
+							objectcontainer[1].add(new CO_ThrowBox(&spr_throwbox, list_players[0]->ix + 32, list_players[0]->iy, (rand() % NUM_POWERUPS + 3) - 3));
 						else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
 							objectcontainer[1].add(new CO_Shell(3, list_players[0]->ix + 32, list_players[0]->iy, false, true, false, false));
 						else
@@ -2407,6 +2499,7 @@ void RunGame()
 				else
 				{
 					//Shake screen
+
 					if(game_values.screenshaketimer > 0)
 					{
 						game_values.screenshaketimer--;
@@ -2522,14 +2615,20 @@ void RunGame()
 									if(movingobject->getMovingObjectType() == movingobject_shell)
 									{
 										CO_Shell * shell = (CO_Shell*)movingobject;
-										if(!shell->owner || shell->owner->inair == game_values.screenshakekillinair)
-											shell->Flip();
+										if(shell->frozen || !shell->owner || shell->owner->inair == game_values.screenshakekillinair)
+											shell->Flip();  //also breaks shells if frozen
 									}
 									else if(movingobject->getMovingObjectType() == movingobject_throwblock)
 									{
 										CO_ThrowBlock * throwblock = (CO_ThrowBlock*)movingobject;
-										if(!throwblock->owner || throwblock->owner->inair == game_values.screenshakekillinair)
+										if(throwblock->frozen || !throwblock->owner || throwblock->owner->inair == game_values.screenshakekillinair)
 											throwblock->Die();
+									}
+									else if(movingobject->getMovingObjectType() == movingobject_throwbox)
+									{
+										CO_ThrowBox * throwbox = (CO_ThrowBox*)movingobject;
+										if(throwbox->frozen)
+											throwbox->Die();
 									}
 									else if(movingobject->getMovingObjectType() == movingobject_pirhanaplant)
 									{
@@ -2562,6 +2661,11 @@ void RunGame()
 						x_shake = 0;
 					}
 
+					if(game_values.spinscreen)
+					{
+						SpinScreen();
+					}
+					
 					for(short iPlayer = 0; iPlayer < 4; iPlayer++)
 					{
 						if(game_values.bulletbilltimer[iPlayer] > 0)
@@ -2762,6 +2866,11 @@ void RunGame()
 						}
 					}
 
+					//Commit all player actions at this point (after we have collided with any objects
+					//that the player might have picked up)
+					for(i = 0; i < list_players_cnt; i++)
+						list_players[i]->CommitAction();
+
 					eyecandy[0].cleandeadobjects();
 					eyecandy[1].cleandeadobjects();
 					eyecandy[2].cleandeadobjects();
@@ -2787,7 +2896,7 @@ void RunGame()
 
 					g_map.update();
 
-					if(y_shake > 0)
+					if(y_shake > 0 && !game_values.spinscreen)
 					{
 						y_shake -= CRUNCHVELOCITY;
 
@@ -2837,7 +2946,8 @@ void RunGame()
 					game_values.gamestate = GS_GAME;
 					
 					/*
-					/////////////BOSS
+					//This code will help stop a game midway and load a new map and mode
+					//It was used for the secret boss mode in 1.7 AFE
 					game_values.gamemode = bossgamemode;  //boss type has already been set at this point
 					bossgamemode->SetBossType(0);
 
@@ -2882,11 +2992,8 @@ void RunGame()
 
 			//--------------- draw everything ----------------------
 
-			if(y_shake > 0)
-			{
-				SDL_Rect rect = {0, 0, 640, y_shake};
-				SDL_FillRect(screen, &rect, 0x0);		//fill empty area with black
-			}
+			//Clear the overlay surface again with black
+			SDL_FillRect(spr_overlay.getSurface(), NULL, 0x0);
 
 			spr_backmap[g_iCurrentDrawIndex].draw(0, 0);
 
@@ -2929,6 +3036,10 @@ void RunGame()
 			game_values.gamemode->draw_foreground();
 		
 			g_map.drawPlatforms(4);
+
+			//Draw the overlay
+			spr_overlay.draw(0, 0);
+
 
 			g_iWinningPlayer = -1;
 			short mostkills = 0;
@@ -2976,7 +3087,7 @@ void RunGame()
 				//in game scoreboards
 				for(i = 0; i < score_cnt; i++)
 				{
-					if(game_values.gamemode->gamemode == game_mode_health || game_values.gamemode->gamemode == game_mode_collection)
+					if(game_values.gamemode->gamemode == game_mode_health || game_values.gamemode->gamemode == game_mode_collection || game_values.gamemode->gamemode == game_mode_boxes_minigame)
 						spr_shade[game_values.teamcounts[i] - 1].draw(score[i]->x, score[i]->y);
 					else
 						spr_shade[game_values.teamcounts[i] - 1].draw(score[i]->x, score[i]->y, 0, 0, 256, 41);
@@ -3103,6 +3214,23 @@ void RunGame()
 							}
 						}
 					}
+					else if(game_values.gamemode->gamemode == game_mode_boxes_minigame) //Draw coins for boxes minigame
+					{
+						//Flash collected cards if 3 have been collected
+						short iNumCoins = score[i]->subscore[0];
+						short iCoinX = score[i]->x + scorepowerupoffsets[game_values.teamcounts[i] - 1][0] - 32;
+						
+						short iCoin = 0;
+						for(; iCoin < iNumCoins; iCoin++)
+						{
+							spr_scorecoins.draw(iCoinX + iCoin * 16, score[i]->y + 43, 0, 0, 16, 16);
+						}
+
+						for(short iEmptyCoin = iCoin; iEmptyCoin < 5; iEmptyCoin++)
+						{
+							spr_scorecoins.draw(iCoinX + iEmptyCoin * 16, score[i]->y + 43, 16, 0, 16, 16);
+						}
+					}
 					
 					short iScoreX = score[i]->x + iScoreTextOffset[i];
 					short iScoreY = score[i]->y + 4;
@@ -3111,6 +3239,13 @@ void RunGame()
 					spr_scoretext.draw(iScoreX + 18, iScoreY, score[i]->iDigitMiddle, (score[i]->iDigitLeft == 0 && score[i]->iDigitMiddle == 0 ? 16 : 0), 16, 16);
 					spr_scoretext.draw(iScoreX + 36, iScoreY, score[i]->iDigitRight, 0, 16, 16);
 				}
+			}
+
+			if(game_values.windaffectsplayers)
+			{
+				short iDisplayWindMeterY = game_values.scoreboardstyle == 1 ? 8 : 440;
+				spr_windmeter.draw(210, iDisplayWindMeterY, 0, 0, 220, 32);
+				spr_windmeter.draw((short)(game_values.gamewindx * 20.0f) + 320, iDisplayWindMeterY + 6, 220, 0, 12, 20);
 			}
 
 			//draw arrows for being above the top of the screen
@@ -3144,11 +3279,7 @@ void RunGame()
 						else
 							sprintf(szMode, "%s  %s: %d", game_values.gamemode->GetModeName(), game_values.gamemode->GetGoalName(), game_values.gamemode->goal);
 
-						short iMode = game_values.gamemode->gamemode;
-						if(iMode == game_mode_pipe_minigame)
-							iMode = 25;
-						else if(iMode == game_mode_boss_minigame)
-							iMode = 26;
+						short iMode = GetModeIconIndexFromMode(game_values.gamemode->gamemode);
 
 						eyecandy[2].add(new EC_Announcement(&game_font_large, &menu_mode_large, szMode, iMode, 130, 90));
 					}
@@ -3224,6 +3355,29 @@ void RunGame()
 					}
 				}
 			}
+
+			//Draw black "behind" the game if we are shaking/moving the screen
+			if(y_shake > 0)
+			{
+				SDL_Rect rect = {0, 0, 640, y_shake};
+				SDL_FillRect(screen, &rect, 0x0);		//fill empty area with black
+			}
+			else if(y_shake < 0)
+			{
+				SDL_Rect rect = {0, 480 + y_shake, 640, 480};
+				SDL_FillRect(screen, &rect, 0x0);		//fill empty area with black
+			}
+
+			if(x_shake > 0)
+			{
+				SDL_Rect rect = {0, 0, x_shake, 480};
+				SDL_FillRect(screen, &rect, 0x0);		//fill empty area with black
+			}
+			else if(x_shake < 0)
+			{
+				SDL_Rect rect = {640 + x_shake, 0, 640, 480};
+				SDL_FillRect(screen, &rect, 0x0);		//fill empty area with black
+			}
 		}
 		else
 		{
@@ -3233,11 +3387,7 @@ void RunGame()
 				menu_font_large.drawCentered(320, 194, "Pause");
 
 				//menu_font_large.drawCentered(320, 240, game_values.gamemode->GetModeName());
-				short iMode = game_values.gamemode->gamemode;
-				if(iMode == game_mode_pipe_minigame)
-					iMode = 25;
-				else if(iMode == game_mode_boss_minigame)
-					iMode = 26;
+				short iMode = GetModeIconIndexFromMode(game_values.gamemode->gamemode);
 
 				menu_mode_large.draw(304, 224, iMode << 5, 0, 32, 32);
 
@@ -3745,7 +3895,51 @@ void LoadMapObjects(bool fPreview)
 		}
 	}
 
+	//Scan for throw box objects and add items to them if approprate
+	//Add special coins to them for the boxes minigame
+	short iCountWeight = 0;
+	for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
+		iCountWeight += game_values.powerupweights[iPowerup];
+
+	short iThrowBoxCount = 0;
+	bool * fBoxHasCoin = NULL;
+
+	if(game_values.gamemode->gamemode == game_mode_boxes_minigame)
+	{
+		for(short iItem = 0; iItem < g_map.iNumMapItems; iItem++)
+		{
+			if(g_map.mapitems[iItem].itype == 5)
+				iThrowBoxCount++;
+		}
+
+		fBoxHasCoin = new bool[iThrowBoxCount];
+		for(short iItem = 0; iItem < iThrowBoxCount; iItem++)
+			fBoxHasCoin[iItem] = false;
+
+		//Randomly choose boxes to put 5 coins in
+		for(short iItem = 0; iItem < 5 && iItem < iThrowBoxCount; iItem++)
+		{
+			short iBoxIndex = rand() % iThrowBoxCount;
+			
+			while(fBoxHasCoin[iBoxIndex])
+			{
+				if(++iBoxIndex >= iThrowBoxCount)
+					iBoxIndex = 0;
+			}
+
+			fBoxHasCoin[iBoxIndex] = true;
+		}
+
+		//If map has less than 5 boxes, then insert coins into map in random locations
+		short iExtraCoinsNeeded = 5 - iThrowBoxCount;
+		for(short iExtraCoin = 0; iExtraCoin < iExtraCoinsNeeded; iExtraCoin++)
+		{
+			objectcontainer[1].add(new MO_Coin(&spr_coin, 0.0f, 0.0f, 0, 0, 2, -1, 2, 0, true));
+		}
+	}
+
 	//Add map objects like springs, shoes and spikes
+	short iAddThrowBoxIndex = 0;
 	for(short i = 0; i < g_map.iNumMapItems; i++)
 	{
 		MapItem * mapItem = &g_map.mapitems[i];
@@ -3763,6 +3957,55 @@ void LoadMapObjects(bool fPreview)
 			objectcontainer[1].add(new CO_Spring(&spr_spring, ix, iy, true));
 		else if(iType == 4)
 			objectcontainer[1].add(new CO_KuriboShoe(&spr_kuriboshoe, ix, iy, true));
+		else if(iType == 5)
+		{
+			short iItem = NO_POWERUP;
+			if(!fPreview)
+			{
+				if(game_values.gamemode->gamemode == game_mode_boxes_minigame)
+				{
+					if(fBoxHasCoin[iAddThrowBoxIndex])
+						iItem = MINIGAME_COIN;
+				}
+				else if(game_values.gamemode->gamemode == game_mode_health && rand() % 100 < game_values.gamemodesettings.health.percentextralife)
+				{
+					iItem = HEALTH_POWERUP;
+				}
+				else if((game_values.gamemode->gamemode == game_mode_timelimit && rand() % 100 < game_values.gamemodesettings.time.percentextratime) || 
+					(game_values.gamemode->gamemode == game_mode_star && rand() % 100 < game_values.gamemodesettings.star.percentextratime))
+				{
+					iItem = TIME_POWERUP;
+				}
+				else if((game_values.gamemode->gamemode == game_mode_coins && rand() % 100 < game_values.gamemodesettings.coins.percentextracoin) || 
+					(game_values.gamemode->gamemode == game_mode_greed && rand() % 100 < game_values.gamemodesettings.greed.percentextracoin))
+				{
+					iItem = COIN_POWERUP;
+				}
+				else if(game_values.gamemode->gamemode == game_mode_jail && (rand() % 100) < game_values.gamemodesettings.jail.percentkey)
+				{
+					iItem = JAIL_KEY_POWERUP;
+				}
+				else if(iCountWeight > 0 && (rand() % 100) < 40)
+				{
+					int iRandPowerup = rand() % iCountWeight + 1;
+					iItem = 0;
+
+					int iPowerupWeightCount = game_values.powerupweights[iItem];
+
+					while(iPowerupWeightCount < iRandPowerup)
+						iPowerupWeightCount += game_values.powerupweights[++iItem];
+				}
+			}
+
+			objectcontainer[1].add(new CO_ThrowBox(&spr_throwbox, ix, iy, iItem));
+			iAddThrowBoxIndex++;
+		}
+	}
+
+	if(fBoxHasCoin)
+	{
+		delete [] fBoxHasCoin;
+		fBoxHasCoin = NULL;
 	}
 
 	//Set all the 1x1 gaps up so players can run across them

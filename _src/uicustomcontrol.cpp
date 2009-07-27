@@ -2279,14 +2279,29 @@ void MI_TourStop::Refresh(short iTourStop)
 		miModeField->Clear();
 
 		CGameMode * gamemode = NULL;
+		short tourstopicon = 0;
 		if(tourstop->iMode == game_mode_pipe_minigame)
+		{
 			gamemode = pipegamemode;
+			tourstopicon = 25;
+		}
 		else if(tourstop->iMode == game_mode_boss_minigame)
+		{
 			gamemode = bossgamemode;
+			tourstopicon = 26;
+		}
+		else if(tourstop->iMode == game_mode_boxes_minigame)
+		{
+			gamemode = boxesgamemode;
+			tourstopicon = 27;
+		}
 		else
+		{
 			gamemode = gamemodes[tourstop->iMode];
+			tourstopicon = tourstop->iMode;
+		}
 			
-		miModeField->Add(gamemode->GetModeName(), tourstop->iMode, "", false, false);
+		miModeField->Add(gamemode->GetModeName(), tourstopicon, "", false, false);
 
 		miGoalField->Clear();
 		char szTemp[16];
@@ -2300,17 +2315,32 @@ void MI_TourStop::Refresh(short iTourStop)
 
 		if(tourstop->iMode == game_mode_pipe_minigame)
 		{
-			miMapField->SetSpecialMap("Pipe Minigame", "maps/special/minigamepipe.map");
+			bool fFound = miMapField->SetMap(tourstop->pszMapFile, true);
+			
+			if(!fFound)
+				miMapField->SetSpecialMap("Pipe Minigame", "maps/special/two52_special_pipe_minigame.map");
 		}
 		else if(tourstop->iMode == game_mode_boss_minigame)
 		{
-			short iBossType = tourstop->gmsSettings.boss.bosstype;
-			if(iBossType == 0)
-				miMapField->SetSpecialMap("Hammer Boss Minigame", "maps/special/dungeon.map");
-			else if(iBossType == 1)
-				miMapField->SetSpecialMap("Bomb Boss Minigame", "maps/special/hills.map");
-			else if(iBossType == 2)
-				miMapField->SetSpecialMap("Fire Boss Minigame", "maps/special/volcano.map");
+			bool fFound = miMapField->SetMap(tourstop->pszMapFile, true);
+			
+			if(!fFound)
+			{
+				short iBossType = tourstop->gmsSettings.boss.bosstype;
+				if(iBossType == 0)
+					miMapField->SetSpecialMap("Hammer Boss Minigame", "maps/special/two52_special_hammerboss_minigame.map");
+				else if(iBossType == 1)
+					miMapField->SetSpecialMap("Bomb Boss Minigame", "maps/special/two52_special_bombboss_minigame.map");
+				else if(iBossType == 2)
+					miMapField->SetSpecialMap("Fire Boss Minigame", "maps/special/two52_special_fireboss_minigame.map");
+			}
+		}
+		else if(tourstop->iMode == game_mode_boxes_minigame)
+		{
+			bool fFound = miMapField->SetMap(tourstop->pszMapFile, true);
+			
+			if(!fFound)
+				miMapField->SetSpecialMap("Boxes Minigame", "maps/special/two52_special_boxes_minigame.map");
 		}
 		else
 		{
@@ -4944,11 +4974,13 @@ bool MI_World::UsePowerup(short iPlayer, short iTeam, short iIndex, bool fPopupI
 	if(iPowerup < NUM_POWERUPS)
 	{
 		/*
+		//Comment this in to give the powerup to all members of the team
 		for(short iPlayer = 0; iPlayer < game_values.teamcounts[iTeam]; iPlayer++)
 		{
 			game_values.storedpowerups[game_values.teamids[iTeam][iPlayer]] = iPowerup;
 		}*/
 
+		//Give the powerup only to the player that selected it
 		game_values.storedpowerups[iPlayer] = iPowerup;
 
 		ifsoundonplay(sfx_collectpowerup);

@@ -242,7 +242,7 @@ short			x_shake = 0;
 short			y_shake = 0;
 gv				game_values;
 void CPlayer::flipsidesifneeded() {}
-short CPlayer::KillPlayerMapHazard(bool fForce, killstyle style, bool fKillCarriedItem) {return 0;}
+short CPlayer::KillPlayerMapHazard(bool fForce, killstyle style, bool fKillCarriedItem, short iPlayerId) {return 0;}
 void IO_MovingObject::flipsidesifneeded() {}
 void IO_MovingObject::KillObjectMapHazard(short playerID) {}
 float CapFallingVelocity(float f) {return 0.0f;}
@@ -268,6 +268,12 @@ gfxSprite		menu_dialog;
 
 std::vector<MapMusicOverride*> mapmusicoverrides;
 std::vector<WorldMusicOverride*> worldmusicoverrides;
+
+gfxSprite		spr_poof;
+sfxSound		sfx_transform;
+gfxSprite		spr_overlay, spr_overlayhole;
+
+IO_MovingObject * createpowerup(short iType, short ix, short iy, bool side, bool spawn) {return NULL;}
 ///////
 
 gfxSprite spr_eyecandy;
@@ -289,7 +295,7 @@ void drawmap(bool fScreenshot, short iBlockSize, bool fWithPlatforms = false);
 void draw_platform(short iPlatform, bool fDrawTileTypes);
 void SetPlatformToDefaults(short iPlatform);
 
-MapList maplist;
+MapList maplist(false);
 void loadcurrentmap();
 int savecurrentmap();
 int findcurrentstring();
@@ -4478,7 +4484,7 @@ int editor_mapitems()
 						short set_item_y = event.button.y / TILESIZE;
 
 						//Set the selected block to one of the interaction blocks
-						if(set_item_y == 0 && set_item_x >= 0 && set_item_x <= 4)
+						if(set_item_y == 0 && set_item_x >= 0 && set_item_x <= 5)
 						{
 							set_mapitem = set_item_x;
 
@@ -4499,7 +4505,7 @@ int editor_mapitems()
 		drawmap(false, TILESIZE);
 		menu_shade.draw(0, 0);
 		
-		spr_mapitems[0].draw(0, 0, 0, 0, 160, 32);
+		spr_mapitems[0].draw(0, 0, 0, 0, 192, 32);
 
 		menu_font_small.drawRightJustified(640, 0, maplist.currentFilename());
 		menu_font_small.drawRightJustified(0, 480 - menu_font_small.getHeight(), "Map Items");

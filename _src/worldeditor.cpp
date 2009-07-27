@@ -134,7 +134,7 @@ short			y_shake = 0;
 gv				game_values;
 
 void CPlayer::flipsidesifneeded() {}
-short CPlayer::KillPlayerMapHazard(bool fForce, killstyle style, bool fKillCarriedItem) {return 0;}
+short CPlayer::KillPlayerMapHazard(bool fForce, killstyle style, bool fKillCarriedItem, short iPlayerId) {return 0;}
 bool CPlayer::collision_detection_checktop() {return false;}
 bool CPlayer::bouncejump() {return false;}
 
@@ -144,9 +144,12 @@ void CO_Egg::placeEgg() {}
 void CO_Flag::placeFlag() {}
 void CO_PhantoKey::placeKey() {}
 void CO_Star::placeStar() {}
+void MO_Coin::placeCoin() {}
 void OMO_Area::placeArea() {}
 void OMO_Area::reset() {}
 void OMO_Area::setOwner(CPlayer * player) {}
+
+bool CO_ThrowBox::HasKillVelocity() {return false;}
 
 short PlayerKilledPlayer(short id, CPlayer * killed, short deathstyle, killstyle style, bool fForce, bool fKillCarriedItem) {return 0;}
 void AddAwardKill(CPlayer * killer, CPlayer * killed, killstyle style) {}
@@ -176,7 +179,7 @@ SkinList		skinlist;
 gfxSprite		**spr_player[4];
 CGameMode		*gamemodes[GAMEMODE_LAST];
 bool			fResumeMusic;
-MapList			maplist;
+MapList			maplist(true);
 CMap			g_map;
 CTilesetManager g_tilesetmanager;
 
@@ -185,6 +188,7 @@ gfxSprite		spr_hazard_rotodisc[3];
 gfxSprite		spr_hazard_bulletbill[3];
 gfxSprite		spr_hazard_flame[3];
 gfxSprite		spr_hazard_pirhanaplant[3];
+gfxSprite		spr_overlay, spr_overlayhole;
 
 void DECLSPEC soundfinished(int channel){}
 void DECLSPEC musicfinished(){}
@@ -203,9 +207,13 @@ std::vector<WorldMusicOverride*> worldmusicoverrides;
 
 short LookupTeamID(short id) {return 0;}
 gfxSprite		spr_scoretext;
+gfxSprite		spr_poof;
 
 int g_iNextNetworkID = 0;
 short projectiles[4];
+
+IO_MovingObject * createpowerup(short iType, short ix, short iy, bool side, bool spawn) {return NULL;}
+void CScore::AdjustScore(short iValue) {}
 ///////
 
 CObjectContainer noncolcontainer;
@@ -302,7 +310,7 @@ MI_ImageSelectField * miModeField;
 MI_SelectField * miGoalField[GAMEMODE_LAST];
 MI_Button * miModeSettingsButton;
 MI_Button * miBonusItemsButton;
-MI_SelectField * miSpecialGoalField[1];
+MI_SelectField * miSpecialGoalField[3];
 
 MI_SelectField * miFinalStageField;
 MI_SelectField * miPointsField;
@@ -604,6 +612,8 @@ int main(int argc, char *argv[])
 
 	miModeField->Add("Bonus House", 24, "", false, false);
 	miModeField->Add("Pipe Minigame", 25, "", false, false);
+	miModeField->Add("Boss Minigame", 26, "", false, false);
+	miModeField->Add("Boxes Minigame", 27, "", false, false);
 
 	//Create goal field for pipe game
 	miSpecialGoalField[0] = new MI_SelectField(&spr_selectfield, 70, 100, "Points", 352, 120);
@@ -615,6 +625,28 @@ int main(int argc, char *argv[])
 		char szName[16];
 		sprintf(szName, "%d", iValue);
 		miSpecialGoalField[0]->Add(szName, iValue, "", false, false);
+	}
+
+	//Create goal field for boss game
+	miSpecialGoalField[1] = new MI_SelectField(&spr_selectfield, 70, 100, "Lives", 352, 120);
+	miSpecialGoalField[1]->Show(false);
+
+	for(short iGameLives = 1; iGameLives <= 30; iGameLives++)
+	{
+		char szName[16];
+		sprintf(szName, "%d", iGameLives);
+		miSpecialGoalField[1]->Add(szName, iGameLives, "", false, false);
+	}
+
+	//Create goal field for boxes game
+	miSpecialGoalField[2] = new MI_SelectField(&spr_selectfield, 70, 100, "Lives", 352, 120);
+	miSpecialGoalField[2]->Show(false);
+
+	for(short iGameLives = 1; iGameLives <= 30; iGameLives++)
+	{
+		char szName[16];
+		sprintf(szName, "%d", iGameLives);
+		miSpecialGoalField[2]->Add(szName, iGameLives, "", false, false);
 	}
 
 	//Mode Settings Button
@@ -696,16 +728,18 @@ int main(int argc, char *argv[])
 
 	mStageSettingsMenu.AddControl(miGoalField[GAMEMODE_LAST - 1], miGoalField[GAMEMODE_LAST - 2], miSpecialGoalField[0], miGoalField[GAMEMODE_LAST - 2], miModeSettingsButton);
 	
-	mStageSettingsMenu.AddControl(miSpecialGoalField[0], miGoalField[GAMEMODE_LAST - 1], miPointsField, miGoalField[GAMEMODE_LAST - 1], miModeSettingsButton);
+	mStageSettingsMenu.AddControl(miSpecialGoalField[0], miGoalField[GAMEMODE_LAST - 1], miSpecialGoalField[1], miGoalField[GAMEMODE_LAST - 1], miSpecialGoalField[1]);
+	mStageSettingsMenu.AddControl(miSpecialGoalField[1], miSpecialGoalField[0], miSpecialGoalField[2], miSpecialGoalField[0], miSpecialGoalField[2]);
+	mStageSettingsMenu.AddControl(miSpecialGoalField[2], miSpecialGoalField[1], miPointsField, miSpecialGoalField[1], miModeSettingsButton);
 
 	//Add Mode Settings Button
-	mStageSettingsMenu.AddControl(miModeSettingsButton, miModeField, miBonusType, miSpecialGoalField[0], NULL);
+	mStageSettingsMenu.AddControl(miModeSettingsButton, miModeField, miFinalStageField, miSpecialGoalField[2], NULL);
 
 	//Add Points Field
-	mStageSettingsMenu.AddControl(miPointsField, miSpecialGoalField[0], miMapField, NULL, miFinalStageField);
+	mStageSettingsMenu.AddControl(miPointsField, miSpecialGoalField[2], miMapField, NULL, miFinalStageField);
 
 	//Add Final Stage Field
-	mStageSettingsMenu.AddControl(miFinalStageField, miGoalField[GAMEMODE_LAST - 1], miMapField, miPointsField, NULL);
+	mStageSettingsMenu.AddControl(miFinalStageField, miSpecialGoalField[2], miMapField, miPointsField, NULL);
 
 	//Add Map Field
 	mStageSettingsMenu.AddControl(miMapField, miFinalStageField, miBonusType, NULL, miBonusItemsButton);
@@ -3913,7 +3947,7 @@ void DisplayStageDetails(bool fForce, short iStageId, short iMouseX, short iMous
 	//If we're pointing to a new stage or no stage at all
 	if(iStageId != iOldStageId || fForce)
 	{
-		if(ts->iStageType == 1 || ts->iMode == 1000)
+		if(ts->iStageType == 1)
 		{
 			if(sMapThumbnail)
 			{
@@ -3927,16 +3961,20 @@ void DisplayStageDetails(bool fForce, short iStageId, short iMouseX, short iMous
 
 			if(pszMapName)
 			{
+				if(sMapThumbnail)
+				{
+					SDL_FreeSurface(sMapThumbnail);
+					sMapThumbnail = NULL;
+				}
+
 				if(maplist.findexact(pszMapName, false))
 				{
-					if(sMapThumbnail)
-					{
-						SDL_FreeSurface(sMapThumbnail);
-						sMapThumbnail = NULL;
-					}
-
 					g_map.loadMap(maplist.currentFilename(), read_type_preview);
 					sMapThumbnail = g_map.createThumbnailSurface(true);
+				}
+				else  //otherwise show a unknown map icon
+				{
+					sMapThumbnail = IMG_Load(convertPath("gfx/leveleditor/leveleditor_mapnotfound.png").c_str());
 				}
 			}
 		}
@@ -3947,14 +3985,14 @@ void DisplayStageDetails(bool fForce, short iStageId, short iMouseX, short iMous
 	short iMode = ts->iMode;
 	if(ts->iStageType == 1)
 		iMode = 24;
-	else if(ts->iMode == 1000)
-		iMode = 25;
+	else if(ts->iMode >= 1000)
+		iMode = ts->iMode - 975;  //Convert mode id from map file to internal id for special stage modes
 
 	//Make sure we're displaying it on the screen
 	if(iMouseX > 408)
 		iMouseX = 408;
 
-	if(iMode < GAMEMODE_LAST)
+	if(iMode < GAMEMODE_LAST || (iMode >= 25 && iMode <= 27))
 	{
 		if(iMouseY > 248)
 			iMouseY = 248;
@@ -3975,17 +4013,6 @@ void DisplayStageDetails(bool fForce, short iStageId, short iMouseX, short iMous
 		spr_largedialog.draw(iMouseX, iMouseY + 44, 0, 180, 116, 44);
 		spr_largedialog.draw(iMouseX + 116, iMouseY + 44, 140, 180, 116, 44);
 	}
-	else if(iMode == 25)
-	{
-		//Make sure we're displaying it on the screen
-		if(iMouseY > 374)
-			iMouseY = 374;
-
-		spr_largedialog.draw(iMouseX, iMouseY, 0, 0, 116, 53);
-		spr_largedialog.draw(iMouseX + 116, iMouseY, 140, 0, 116, 53);
-		spr_largedialog.draw(iMouseX, iMouseY + 53, 0, 171, 116, 53);
-		spr_largedialog.draw(iMouseX + 116, iMouseY + 53, 140, 171, 116, 53);
-	}
 
 	menu_mode_large.draw(iMouseX + 16, iMouseY + 16, iMode << 5, 0, 32, 32);
 
@@ -3997,24 +4024,28 @@ void DisplayStageDetails(bool fForce, short iStageId, short iMouseX, short iMous
 		sprintf(szPrint, "Goal: %d", ts->iGoal);
 		menu_font_small.drawChopRight(iMouseX + 52, iMouseY + 34, 164, szPrint);
 
-		short iOffsetY = 160;
-		if(iMode >= 25)
-			iOffsetY = 36;
-
 		sprintf(szPrint, "Points: %d", ts->iPoints);
-		menu_font_small.drawChopRight(iMouseX + 16, iMouseY + iOffsetY + 16, 100, szPrint);
+		menu_font_small.drawChopRight(iMouseX + 16, iMouseY + 176, 100, szPrint);
 
 		sprintf(szPrint, "End: %s", ts->fEndStage ? "Yes" : "No");
-		menu_font_small.drawChopRight(iMouseX + 126, iMouseY + iOffsetY + 16, 80, szPrint);
+		menu_font_small.drawChopRight(iMouseX + 126, iMouseY + 176, 80, szPrint);
 
 		for(short iBonus = 0; iBonus < ts->iNumBonuses; iBonus++)
 		{
 			WorldStageBonus * wsb = &ts->wsbBonuses[iBonus];
-			spr_worlditemsplace.draw(iMouseX + iBonus * 20 + 16, iMouseY + iOffsetY + 34, wsb->iWinnerPlace * 20, 0, 20, 20);
+			spr_worlditemsplace.draw(iMouseX + iBonus * 20 + 16, iMouseY + 194, wsb->iWinnerPlace * 20, 0, 20, 20);
 
 			short iBonusIcon = wsb->iBonus;
 			gfxSprite * spr_icon = iBonusIcon < NUM_POWERUPS ? &spr_storedpowerupsmall : &spr_worlditemssmall;
-			spr_icon->draw(iMouseX + iBonus * 20 + 18, iMouseY + iOffsetY + 36, (iBonusIcon < NUM_POWERUPS ? iBonusIcon : iBonusIcon - NUM_POWERUPS) << 4, 0, 16, 16);
+			spr_icon->draw(iMouseX + iBonus * 20 + 18, iMouseY + 196, (iBonusIcon < NUM_POWERUPS ? iBonusIcon : iBonusIcon - NUM_POWERUPS) << 4, 0, 16, 16);
+		}
+
+		if(sMapThumbnail)
+		{
+			SDL_Rect rSrc = {0, 0, 160, 120};
+			SDL_Rect rDst = {iMouseX + 16, iMouseY + 52, 160, 120};
+
+			SDL_BlitSurface(sMapThumbnail, &rSrc, blitdest, &rDst);
 		}
 	}
 	else
@@ -4056,17 +4087,9 @@ void DisplayStageDetails(bool fForce, short iStageId, short iMouseX, short iMous
 			spr_icon->draw(iMouseX + iBonus * 20 + 18, iMouseY + 52, iSrcX, iSrcY, 16, 16);
 		}
 	}
-
-	if(sMapThumbnail)
-	{
-		SDL_Rect rSrc = {0, 0, 160, 120};
-		SDL_Rect rDst = {iMouseX + 16, iMouseY + 52, 160, 120};
-
-		SDL_BlitSurface(sMapThumbnail, &rSrc, blitdest, &rDst);
-	}
 }
 
-int g_iNumGameModeSettings[GAMEMODE_LAST] = {2,2,3,4,2,10,9,6,2,1,3,5,3,3,0,22,6,3,3,4,4,3};
+int g_iNumGameModeSettings[GAMEMODE_LAST] = {2,2,3,4,3,10,9,6,2,1,3,5,3,3,0,22,6,4,3,4,4,3};
 
 SDL_Rect rItemDst[NUM_WORLD_ITEMS];
 
@@ -4184,6 +4207,19 @@ void AdjustBonuses(TourStop * ts)
 	iLastStageType = ts->iStageType;
 }
 
+void SaveStage(short iEditStage)
+{
+	//Set the number of game mode settings to the maximum so we write them all out
+	game_values.tourstops[iEditStage]->fUseSettings = true;
+	game_values.tourstops[iEditStage]->iNumUsedSettings = g_iNumGameModeSettings[game_values.tourstops[iEditStage]->iMode];
+
+	//Copy the working values back into the structure that will be saved
+	memcpy(&game_values.tourstops[iEditStage]->gmsSettings, &game_values.gamemodemenusettings, sizeof(GameModeSettings));
+	
+	if(game_values.tourstops[iEditStage]->iMode == 25)
+		game_values.tourstops[iEditStage]->iMode = 1000;
+}
+
 void EditStage(short iEditStage)
 {
 	memcpy(&game_values.gamemodemenusettings, &game_values.tourstops[iEditStage]->gmsSettings, sizeof(GameModeSettings));
@@ -4214,6 +4250,9 @@ void EditStage(short iEditStage)
 	short iMode = game_values.tourstops[iEditStage]->iMode;
 	short iStageType = game_values.tourstops[iEditStage]->iStageType;
 
+	if(iMode == 25)
+		iMode = 1000;
+
 	//Show fields applicable for this mode
 	miPointsField->Show(iStageType == 0);
 	miFinalStageField->Show(iStageType == 0);
@@ -4227,8 +4266,10 @@ void EditStage(short iEditStage)
 	miBonusTextField[4]->Show(iStageType == 1);
 
 	miSpecialGoalField[0]->Show(iMode == 1000);
+	miSpecialGoalField[1]->Show(iMode == 1001);
+	miSpecialGoalField[2]->Show(iMode == 1002);
 
-	miBonusItemsButton->SetPosition(430, iStageType == 0 ? (iMode == 1000 ? 180 : 220) : 340);
+	miBonusItemsButton->SetPosition(430, iStageType == 0 ? 220 : 340);
 
 	if(iStageType == 0 && iMode >= 0 && iMode < GAMEMODE_LAST)
 	{
@@ -4251,7 +4292,8 @@ void EditStage(short iEditStage)
 	}
 	else
 	{
-		miModeSettingsButton->Show(false);
+		//Show the settings button for boss mode
+		miModeSettingsButton->Show(iMode == 1001);
 
 		for(short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++)
 		{
@@ -4262,14 +4304,14 @@ void EditStage(short iEditStage)
 		{
 			miModeField->SetKey(24);
 		}
-		else if(iMode == 1000) //Pipe Game
+		else if(iMode >= 1000 && iMode <= 1002) //Pipe, Boss and Boxes Game
 		{
-			miModeField->SetKey(25);
+			miModeField->SetKey(iMode - 975);
 			miPointsField->SetKey(game_values.tourstops[iEditStage]->iPoints);
 			miFinalStageField->SetKey(game_values.tourstops[iEditStage]->fEndStage ? 1 : 0);
 
 			//Have to set this back again since the SetKey() above will set it to 25
-			game_values.tourstops[iEditStage]->iMode = 1000;
+			game_values.tourstops[iEditStage]->iMode = iMode;
 		}
 	}
 }
@@ -4283,6 +4325,8 @@ void EnableStageMenu(bool fEnable)
 		miGoalField[iGameMode]->Disable(!fEnable);
 
 	miSpecialGoalField[0]->Disable(!fEnable);
+	miSpecialGoalField[1]->Disable(!fEnable);
+	miSpecialGoalField[2]->Disable(!fEnable);
 
 	miModeSettingsButton->Disable(!fEnable);
 
@@ -4451,6 +4495,8 @@ int editor_stage()
 					{
 						if(iEditStage != -1 && mCurrentMenu == &mStageSettingsMenu)
 						{
+							SaveStage(iEditStage);
+
 							if(event.key.keysym.sym == SDLK_PAGEUP)
 								iEditStage--;
 							else if(event.key.keysym.sym == SDLK_PAGEDOWN)
@@ -4587,15 +4633,8 @@ int editor_stage()
 			
 			if(MENU_CODE_EXIT_APPLICATION == code)
 			{
-				//Set the number of game mode settings to the maximum so we write them all out
-				game_values.tourstops[iEditStage]->fUseSettings = true;
-				game_values.tourstops[iEditStage]->iNumUsedSettings = g_iNumGameModeSettings[game_values.tourstops[iEditStage]->iMode];
-
-				//Copy the working values back into the structure that will be saved
-				memcpy(&game_values.tourstops[iEditStage]->gmsSettings, &game_values.gamemodemenusettings, sizeof(GameModeSettings));
-				
-				if(game_values.tourstops[iEditStage]->iMode == 25)
-					game_values.tourstops[iEditStage]->iMode = 1000;
+				//Save the current stage
+				SaveStage(iEditStage);
 
 				//We are no longer working on a specific stage
 				iEditStage = -1;
@@ -4607,7 +4646,7 @@ int editor_stage()
 				miPointsField->Show(iMode != 24);
 				miFinalStageField->Show(iMode != 24);
 
-				miMapField->Show(iMode < 24);
+				miMapField->Show(iMode != 24);
 
 				miBonusType->Show(iMode == 24);
 				miBonusTextField[0]->Show(iMode == 24);
@@ -4617,12 +4656,13 @@ int editor_stage()
 				miBonusTextField[4]->Show(iMode == 24);
 
 				miSpecialGoalField[0]->Show(iMode == 25);
+				miSpecialGoalField[1]->Show(iMode == 26);
+				miSpecialGoalField[2]->Show(iMode == 27);
 
-				miBonusItemsButton->SetPosition(430, iMode != 24 ? (iMode == 25 ? 180 : 220) : 340);
+				miBonusItemsButton->SetPosition(430, iMode != 24 ? 220 : 340);
 
 				if(iMode >= 0 && iMode < GAMEMODE_LAST)
 				{
-					//game_values.gamemode = gamemodes[miModeField->GetShortValue()];
 					miModeSettingsButton->Show(iMode != game_mode_owned);
 
 					for(short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++)
@@ -4640,7 +4680,9 @@ int editor_stage()
 				}
 				else
 				{
-					miModeSettingsButton->Show(false);
+					//Show the settings button for boss mode
+					miModeSettingsButton->Show(iMode == 26);
+
 					for(short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++)
 						miGoalField[iGameMode]->Show(false);
 
@@ -4649,7 +4691,7 @@ int editor_stage()
 						game_values.tourstops[iEditStage]->iStageType = 1;
 						game_values.tourstops[iEditStage]->iBonusTextLines = 5;
 					}
-					else if(iMode == 25)
+					else if(iMode >= 25 && iMode <= 27)
 					{
 						game_values.tourstops[iEditStage]->iStageType = 0;
 					}
@@ -4662,13 +4704,25 @@ int editor_stage()
 			}
 			else if (MENU_CODE_TO_MODE_SETTINGS_MENU == code)
 			{
+				bool fModeFound = false;
 				for(short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++)
 				{
 					if(miGoalField[iGameMode]->IsVisible())
 					{
 						mCurrentMenu = modeOptionsMenu.GetOptionsMenu(iGameMode);
 						mCurrentMenu->ResetMenu();
+						fModeFound = true;
 						break;
+					}
+				}
+
+				//Look to see if this is the boss mode and go to boss settings
+				if(!fModeFound)
+				{
+					if(miSpecialGoalField[1]->IsVisible())
+					{
+						mCurrentMenu = modeOptionsMenu.GetBossOptionsMenu();
+						mCurrentMenu->ResetMenu();
 					}
 				}
 			}

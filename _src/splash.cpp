@@ -190,6 +190,7 @@ bool LoadGameGraphics()
 	gfx_loadimage(&spr_spring, convertPath("gfx/packs/powerups/spring.png", graphicspack), true);
 	gfx_loadimage(&spr_spike, convertPath("gfx/packs/powerups/spike.png", graphicspack), true);
 	gfx_loadimage(&spr_kuriboshoe, convertPath("gfx/packs/powerups/kuriboshoe.png", graphicspack), true);
+	gfx_loadimage(&spr_throwbox, convertPath("gfx/packs/powerups/throwbox.png", graphicspack), true);
 
 	gfx_loadimage(&spr_tileanimation[0], convertPath("gfx/packs/tilesets/tile_animation.png", graphicspack), false);
 	gfx_loadimage(&spr_tileanimation[1], convertPath("gfx/packs/tilesets/tile_animation_preview.png", graphicspack), false);
@@ -239,11 +240,17 @@ bool LoadGameGraphics()
 	gfx_loadimage(&spr_extratimepowerup, convertPath("gfx/packs/powerups/extratimepowerup.png", graphicspack), true);
 	gfx_loadimage(&spr_jailkeypowerup, convertPath("gfx/packs/powerups/jailkeypowerup.png", graphicspack), true);
 
+	gfx_loadimage(&spr_secret1, convertPath("gfx/packs/powerups/secret1.png", graphicspack), true);
+	gfx_loadimage(&spr_secret2, convertPath("gfx/packs/powerups/secret2.png", graphicspack), true);
+	gfx_loadimage(&spr_secret3, convertPath("gfx/packs/powerups/secret3.png", graphicspack), true);
+	gfx_loadimage(&spr_secret4, convertPath("gfx/packs/powerups/secret4.png", graphicspack), true);
+
 	gfx_loadimage(&spr_shade[0], convertPath("gfx/packs/eyecandy/shade1.png", graphicspack), 64, false, true);
 	gfx_loadimage(&spr_shade[1], convertPath("gfx/packs/eyecandy/shade2.png", graphicspack), 64, false, true);
 	gfx_loadimage(&spr_shade[2], convertPath("gfx/packs/eyecandy/shade3.png", graphicspack), 64, false, true);
 	gfx_loadimage(&spr_scorehearts, convertPath("gfx/packs/menu/score_hearts.png", graphicspack), false);
 	gfx_loadimage(&spr_scorecards, convertPath("gfx/packs/menu/score_cards.png", graphicspack), false);
+	gfx_loadimage(&spr_scorecoins, convertPath("gfx/packs/menu/score_coins.png", graphicspack), false);
 	
 	gfx_loadimage(&spr_timershade, convertPath("gfx/packs/eyecandy/timershade.png", graphicspack), 64, false, true);
 	gfx_loadimage(&spr_scoretext, convertPath("gfx/packs/fonts/score.png", graphicspack), false);
@@ -351,6 +358,9 @@ bool LoadGameGraphics()
 	gfx_loadimage(&spr_bonus, convertPath("gfx/packs/eyecandy/bonus.png", graphicspack), true);
 	gfx_loadimage(&spr_extralife, convertPath("gfx/packs/eyecandy/extralife.png", graphicspack), true);
 
+	gfx_loadimage(&spr_windmeter, convertPath("gfx/packs/eyecandy/wind_meter.png", graphicspack), 192, true, true);
+	gfx_loadimage(&spr_overlayhole, convertPath("gfx/packs/eyecandy/overlayholes.png", graphicspack), 0, 255, 0, true, true);
+
 	gfx_loadimage(&spr_award, convertPath("gfx/packs/awards/killsinrow.png", graphicspack), 128, true, true);
 	gfx_loadimage(&spr_awardsolid, convertPath("gfx/packs/awards/killsinrow.png", graphicspack), true);
 	gfx_loadimage(&spr_awardsouls, convertPath("gfx/packs/awards/souls.png", graphicspack), true);
@@ -434,6 +444,7 @@ bool LoadGameSounds()
 	sfx_wand.init(convertPath("sfx/packs/wand.wav", soundpack));
 	sfx_enterstage.init(convertPath("sfx/packs/enter-stage.wav", soundpack));
 	sfx_gameover.init(convertPath("sfx/packs/gameover.wav", soundpack));
+	sfx_pickup.init(convertPath("sfx/packs/pickup.wav", soundpack));
 
 	game_values.soundcapable = true;
 	return true;
@@ -713,6 +724,8 @@ bool LoadAndSplashScreen()
 			gfx_loadimagenocolorkey(&spr_backmap[1], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist.current_name()));
 			gfx_loadimagenocolorkey(&spr_frontmap[0], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist.current_name()));
 			gfx_loadimagenocolorkey(&spr_frontmap[1], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist.current_name()));
+
+			gfx_loadimage(&spr_overlay, convertPath("gfx/packs/menu/menu_shade.png", gamegraphicspacklist.current_name()), false, false);
 
 			LoadGameSounds();
 

@@ -323,13 +323,17 @@ void MO_BulletBill::collide(IO_MovingObject * object)
 		objectcontainer[2].add(new MO_Explosion(&spr_explosion, iCenterX - 96, iCenterY - 64, 2, 4, -1, -1, kill_style_bulletbill));
 		ifsoundonplay(sfx_bobombsound);
 	}
-	else if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone || type == movingobject_explosion)
+	else if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_throwbox || type == movingobject_attackzone || type == movingobject_explosion)
 	{
 		//Don't kill things with shells that are sitting still
 		if(type == movingobject_shell && object->state == 2)
 			return;
 
-		if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone)
+		//Don't kill things with boxesx that aren't moving fast enough
+		if(type == movingobject_throwbox && !((CO_ThrowBox*)object)->HasKillVelocity())
+			return;
+
+		if(type != movingobject_explosion)
 		{
 			object->Die();
 		}
@@ -860,17 +864,21 @@ void MO_PirhanaPlant::collide(IO_MovingObject * object)
 
 	MovingObjectType type = object->getMovingObjectType();
 
-	if(type == movingobject_fireball || type == movingobject_hammer || type == movingobject_boomerang || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone || type == movingobject_explosion)
+	if(type == movingobject_fireball || type == movingobject_hammer || type == movingobject_boomerang || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_throwbox || type == movingobject_attackzone || type == movingobject_explosion)
 	{
 		//Don't kill things with shells that are sitting still
 		if(type == movingobject_shell && object->state == 2)
+			return;
+
+		//Don't kill things with boxesx that aren't moving fast enough
+		if(type == movingobject_throwbox && !((CO_ThrowBox*)object)->HasKillVelocity())
 			return;
 
 		if(type == movingobject_shell || type == movingobject_throwblock)
 		{
 			object->CheckAndDie();
 		}
-		else if(type == movingobject_attackzone)
+		else if(type == movingobject_attackzone || type == movingobject_throwbox)
 		{
 			object->Die();
 		}

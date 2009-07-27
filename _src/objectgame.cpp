@@ -11,6 +11,8 @@ extern bool SwapPlayers(short iUsingPlayerID);
 extern short scorepowerupoffsets[3][3];
 
 extern CPlayer * GetPlayerFromGlobalID(short iGlobalID);
+extern void CheckSecret(short id);
+extern void AddSpotlight(short ix, short iy, short iSize);
 
 void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead)
 {
@@ -42,6 +44,256 @@ void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead
 	}
 }
 
+IO_MovingObject * createpowerup(short iType, short ix, short iy, bool side, bool spawn)
+{
+	MO_Powerup * powerup = NULL;
+	CO_Shell * shell = NULL;
+	PU_FeatherPowerup * feather = NULL;
+	MO_Coin * coin = NULL;
+
+	short iSpawnX = ix + 1;
+	short iSpawnY = iy - 1;
+
+	switch(iType)
+	{
+		case HEALTH_POWERUP:
+		{
+			powerup = new PU_ExtraHeartPowerup(&spr_extraheartpowerup, iSpawnX, iSpawnY);
+			break;
+		}
+		case TIME_POWERUP:
+		{
+			powerup = new PU_ExtraTimePowerup(&spr_extratimepowerup, iSpawnX, iSpawnY);
+			break;
+		}
+		case JAIL_KEY_POWERUP:
+		{
+			powerup = new PU_JailKeyPowerup(&spr_jailkeypowerup, iSpawnX, iSpawnY);
+			break;
+		}
+		case COIN_POWERUP:
+		{
+			short iRandCoin = rand() % 9;
+			short iCoin = 2;
+
+			if(iRandCoin == 8)
+				iCoin = 3;
+			else if(iRandCoin >= 6)
+				iCoin = 1;
+			else if(iRandCoin >= 3)
+				iCoin = 0;
+
+			static short iCoinValue[4] = {3, 5, 2, 10};
+			static short iGreedValue[4] = {10, 15, 5, 20};
+
+			powerup = new PU_CoinPowerup(&spr_coin, iSpawnX, iSpawnY, iCoin, game_values.gamemode->gamemode == game_mode_greed ? iGreedValue[iCoin] : iCoinValue[iCoin]);
+			break;
+		}
+		case MINIGAME_COIN:
+		{
+			coin = new MO_Coin(&spr_coin, 0.0f, -VELJUMP / 2.0, iSpawnX, iSpawnY, 2, -1, 2, 0, false);
+			break;
+		}
+		case SECRET1_POWERUP:
+		{
+			powerup = new PU_SecretPowerup(&spr_secret1, iSpawnX, iSpawnY, 0);
+			break;
+		}
+		case SECRET2_POWERUP:
+		{
+			powerup = new PU_SecretPowerup(&spr_secret2, iSpawnX, iSpawnY, 1);
+			break;
+		}
+		case SECRET3_POWERUP:
+		{
+			powerup = new PU_SecretPowerup(&spr_secret3, iSpawnX, iSpawnY, 2);
+			break;
+		}
+		case SECRET4_POWERUP:
+		{
+			powerup = new PU_SecretPowerup(&spr_secret4, iSpawnX, iSpawnY, 3);
+			break;
+		}
+		case 0:
+		{
+			powerup = new PU_PoisonPowerup(&spr_poisonpowerup, iSpawnX, iSpawnY, 1, side, 0, 30, 30, 1, 1);
+			break;
+		}
+		case 1:
+		{
+			powerup = new PU_ExtraGuyPowerup(&spr_1uppowerup, iSpawnX, iSpawnY, 1, side, 0, 30, 30, 1, 1, 1);
+			break;
+		}
+		case 2:
+		{
+			powerup = new PU_ExtraGuyPowerup(&spr_2uppowerup, iSpawnX, iSpawnY, 1, side, 0, 30, 30, 1, 1, 2);
+			break;
+		}
+		case 3:
+		{
+			powerup = new PU_ExtraGuyPowerup(&spr_3uppowerup, iSpawnX, iSpawnY, 1, side, 0, 30, 30, 1, 1, 3);
+			break;
+		}
+		case 4:
+		{
+			powerup = new PU_ExtraGuyPowerup(&spr_5uppowerup, iSpawnX, iSpawnY, 1, side, 0, 30, 30, 1, 1, 5);
+			break;
+		}
+		case 5:
+		{
+			powerup = new PU_FirePowerup(&spr_firepowerup, iSpawnX, iSpawnY, 1, side, 0, 30, 30, 1, 1);
+			break;
+		}
+		case 6:
+		{
+			powerup = new PU_StarPowerup(&spr_starpowerup, iSpawnX, iSpawnY, 4, side, 2, 30, 30, 1, 1);
+			break;
+		}
+		case 7:
+		{
+			powerup = new PU_ClockPowerup(&spr_clockpowerup, iSpawnX, iSpawnY, 1, side, 0, 30, 30, 1, 1);
+			break;
+		}
+		case 8:
+		{
+			powerup = new PU_BobombPowerup(&spr_bobombpowerup, iSpawnX, iSpawnY, 1, side, 0, 30, 30, 1, 1);
+			break;
+		}
+		case 9:
+		{
+			powerup = new PU_PowPowerup(&spr_powpowerup, iSpawnX, iSpawnY, 8, side, 8, 30, 30, 1, 1);
+			break;
+		}
+		case 10:
+		{
+			powerup = new PU_BulletBillPowerup(&spr_bulletbillpowerup, iSpawnX, iSpawnY, 1, side, 0, 30, 30, 1, 1);
+			break;
+		}
+		case 11:
+		{
+			powerup = new PU_HammerPowerup(&spr_hammerpowerup, iSpawnX, iSpawnY, 1, side, 0, 30, 30, 1, 1);
+			break;
+		}
+		case 12:
+		{
+			shell = new CO_Shell(0, iSpawnX, iSpawnY, true, true, true, false);
+			break;
+		}
+		case 13:
+		{
+			shell = new CO_Shell(1, iSpawnX, iSpawnY, false, true, true, false);
+			break;
+		}
+		case 14:
+		{
+			shell = new CO_Shell(2, iSpawnX, iSpawnY, false, false, true, true);
+			break;
+		}
+		case 15:
+		{
+			shell = new CO_Shell(3, iSpawnX, iSpawnY, false, true, false, false);
+			break;
+		}
+		case 16:
+		{
+			powerup = new PU_ModPowerup(&spr_modpowerup, iSpawnX, iSpawnY, 8, side, 8, 30, 30, 1, 1);
+			break;
+		}
+		case 17:
+		{
+			feather = new PU_FeatherPowerup(&spr_featherpowerup, iSpawnX, iSpawnY, 1, 0, 30, 30, 1, 1);
+			break;
+		}
+		case 18:
+		{
+			powerup = new PU_MysteryMushroomPowerup(&spr_mysterymushroompowerup, iSpawnX, iSpawnY, 1, side, 0, 30, 30, 1, 1);
+			break;
+		}
+		case 19:
+		{
+			powerup = new PU_BoomerangPowerup(&spr_boomerangpowerup, iSpawnX, iSpawnY, 1, side, 0, 30, 26, 1, 5);
+			break;
+		}
+		case 20:
+		{
+			powerup = new PU_Tanooki(iSpawnX, iSpawnY);
+			break;
+		}
+		case 21:
+		{
+			powerup = new PU_IceWandPowerup(&spr_icewandpowerup, iSpawnX, iSpawnY, 1, 0, 30, 30, 1, 1);
+			break;
+		}
+		case 22:
+		{
+			powerup = new PU_PodoboPowerup(&spr_podobopowerup, iSpawnX, iSpawnY, 1, 0, 30, 30, 1, 1);
+			break;
+		}
+		case 23:
+		{
+			powerup = new PU_BombPowerup(&spr_bombpowerup, iSpawnX, iSpawnY, 1, 0, 30, 30, 1, 1);
+			break;
+		}
+		case 24:
+		{
+			feather = new PU_LeafPowerup(&spr_leafpowerup, iSpawnX, iSpawnY, 1, 0, 30, 30, 1, 1);
+			break;
+		}
+		case 25:
+		{
+			powerup = new PU_PWingsPowerup(&spr_pwingspowerup, iSpawnX, iSpawnY);
+			break;
+		}
+	}
+
+	if(coin)
+	{
+		ifsoundonplay(sfx_coin);
+		objectcontainer[1].add(coin);
+		return coin;
+	}
+	else if(powerup)
+	{
+		objectcontainer[0].add(powerup);
+
+		if(!spawn)
+		{
+			powerup->nospawn(iy);
+			powerup->collision_detection_checksides();
+		}
+
+		return powerup;
+	}
+	else if(shell)
+	{
+		objectcontainer[1].add(shell);
+
+		if(!spawn)
+		{
+			shell->nospawn(iy, true);
+			shell->collision_detection_checksides();
+		}
+
+		return shell;
+	}
+	else if(feather)
+	{
+		objectcontainer[0].add(feather);
+
+		if(!spawn)
+			feather->nospawn(iy);
+
+		return feather;
+	}
+	else //If no powerups were selected for this block, then fire out a podobo
+	{
+		IO_MovingObject * podobo = new MO_Podobo(&spr_podobo, ix + 2, iy, -(float(rand() % 5) / 2.0f) - 6.0f, -1, -1, -1, true);
+		objectcontainer[2].add(podobo);
+		return podobo;
+	}
+
+	return NULL;
+}
 
 //------------------------------------------------------------------------------
 // class Block base class
@@ -221,6 +473,7 @@ void IO_Block::BounceMovingObject(IO_MovingObject * object)
 		
 		MO_WalkingEnemy * enemy = (MO_WalkingEnemy *)object;
 		killstyle style = enemy->getKillStyle();
+		
 		enemy->DieAndDropShell(true, true);
 
 		if(!game_values.gamemode->gameover && iBumpPlayerID >= 0)
@@ -236,7 +489,18 @@ void IO_Block::BounceMovingObject(IO_MovingObject * object)
 	}
 	else if(type == movingobject_shell)
 	{
-		((CO_Shell*)object)->Flip();
+		CO_Shell * shell = (CO_Shell*)object;
+		shell->Flip();
+	}
+	else if(type == movingobject_throwblock)
+	{
+		CO_ThrowBlock * block = (CO_ThrowBlock*)object;
+		block->Die();
+	}
+	else if(type == movingobject_throwbox)
+	{
+		CO_ThrowBox * box = (CO_ThrowBox*)object;
+		box->Die();
 	}
 	else
 	{
@@ -386,161 +650,25 @@ void B_PowerupBlock::update()
 
 			if(game_values.gamemode->gamemode == game_mode_health && rand() % 100 < game_values.gamemodesettings.health.percentextralife)
 			{
-				objectcontainer[0].add(new PU_ExtraHeartPowerup(&spr_extraheartpowerup, ix + 1, iy - 1));
+				createpowerup(HEALTH_POWERUP, ix, iy, side, true);
 			}
-			else if((game_values.gamemode->gamemode == game_mode_timelimit || game_values.gamemode->gamemode == game_mode_star) && 
-				rand() % 100 < game_values.gamemodesettings.time.percentextratime)
+			else if((game_values.gamemode->gamemode == game_mode_timelimit && rand() % 100 < game_values.gamemodesettings.time.percentextratime) || 
+					(game_values.gamemode->gamemode == game_mode_star && rand() % 100 < game_values.gamemodesettings.star.percentextratime))
 			{
-				objectcontainer[0].add(new PU_ExtraTimePowerup(&spr_extratimepowerup, ix + 1, iy - 1));				
+				createpowerup(TIME_POWERUP, ix, iy, side, true);
+			}
+			else if((game_values.gamemode->gamemode == game_mode_coins && rand() % 100 < game_values.gamemodesettings.coins.percentextracoin) || 
+					(game_values.gamemode->gamemode == game_mode_greed && rand() % 100 < game_values.gamemodesettings.greed.percentextracoin))
+			{
+				createpowerup(COIN_POWERUP, ix, iy, side, true);
 			}
 			else if(game_values.gamemode->gamemode == game_mode_jail && (rand() % 100) < game_values.gamemodesettings.jail.percentkey)
 			{
-				objectcontainer[0].add(new PU_JailKeyPowerup(&spr_jailkeypowerup, ix + 1, iy - 1));
+				createpowerup(JAIL_KEY_POWERUP, ix, iy, side, true);
 			}
 			else
 			{
-				short iSelectedPowerup = SelectPowerup();
-
-				switch(iSelectedPowerup)
-				{
-					case 0:
-					{
-						objectcontainer[0].add(new PU_PoisonPowerup(&spr_poisonpowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1));
-						break;
-					}
-					case 1:
-					{
-						objectcontainer[0].add(new PU_ExtraGuyPowerup(&spr_1uppowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1, 1));
-						break;
-					}
-					case 2:
-					{
-						objectcontainer[0].add(new PU_ExtraGuyPowerup(&spr_2uppowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1, 2));
-						break;
-					}
-					case 3:
-					{
-						objectcontainer[0].add(new PU_ExtraGuyPowerup(&spr_3uppowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1, 3));
-						break;
-					}
-					case 4:
-					{
-						objectcontainer[0].add(new PU_ExtraGuyPowerup(&spr_5uppowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1, 5));
-						break;
-					}
-					case 5:
-					{
-						objectcontainer[0].add(new PU_FirePowerup(&spr_firepowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1));
-						break;
-					}
-					case 6:
-					{
-						objectcontainer[0].add(new PU_StarPowerup(&spr_starpowerup, ix + 1, iy - 1, 4, side, 2, 30, 30, 1, 1));
-						break;
-					}
-					case 7:
-					{
-						objectcontainer[0].add(new PU_ClockPowerup(&spr_clockpowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1));
-						break;
-					}
-					case 8:
-					{
-						objectcontainer[0].add(new PU_BobombPowerup(&spr_bobombpowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1));
-						break;
-					}
-					case 9:
-					{
-						objectcontainer[0].add(new PU_PowPowerup(&spr_powpowerup, ix + 1, iy - 1, 8, side, 8, 30, 30, 1, 1));
-						break;
-					}
-					case 10:
-					{
-						objectcontainer[0].add(new PU_BulletBillPowerup(&spr_bulletbillpowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1));
-						break;
-					}
-					case 11:
-					{
-						objectcontainer[0].add(new PU_HammerPowerup(&spr_hammerpowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1));
-						break;
-					}
-					case 12:
-					{
-						objectcontainer[1].add(new CO_Shell(0, ix + 1, iy - 1, true, true, true, false));
-						break;
-					}
-					case 13:
-					{
-						objectcontainer[1].add(new CO_Shell(1, ix + 1, iy - 1, false, true, true, false));
-						break;
-					}
-					case 14:
-					{
-						objectcontainer[1].add(new CO_Shell(2, ix + 1, iy - 1, false, false, true, true));
-						break;
-					}
-					case 15:
-					{
-						objectcontainer[1].add(new CO_Shell(3, ix + 1, iy - 1, false, true, false, false));
-						break;
-					}
-					case 16:
-					{
-						objectcontainer[0].add(new PU_ModPowerup(&spr_modpowerup, ix + 1, iy - 1, 8, side, 8, 30, 30, 1, 1));
-						break;
-					}
-					case 17:
-					{
-						objectcontainer[0].add(new PU_FeatherPowerup(&spr_featherpowerup, ix + 1, iy - 1, 1, 0, 30, 30, 1, 1));
-						break;
-					}
-					case 18:
-					{
-						objectcontainer[0].add(new PU_MysteryMushroomPowerup(&spr_mysterymushroompowerup, ix + 1, iy - 1, 1, side, 0, 30, 30, 1, 1));
-						break;
-					}
-					case 19:
-					{
-						objectcontainer[0].add(new PU_BoomerangPowerup(&spr_boomerangpowerup, ix + 1, iy - 1, 1, side, 0, 30, 26, 1, 5));
-						break;
-					}
-					case 20:
-					{
-						objectcontainer[0].add(new PU_Tanooki(ix + 1, iy - 1));
-						break;
-					}
-					case 21:
-					{
-						objectcontainer[0].add(new PU_IceWandPowerup(&spr_icewandpowerup, ix + 1, iy - 1, 1, 0, 30, 30, 1, 1));
-						break;
-					}
-					case 22:
-					{
-						objectcontainer[0].add(new PU_PodoboPowerup(&spr_podobopowerup, ix + 1, iy - 1, 1, 0, 30, 30, 1, 1));
-						break;
-					}
-					case 23:
-					{
-						objectcontainer[0].add(new PU_BombPowerup(&spr_bombpowerup, ix + 1, iy - 1, 1, 0, 30, 30, 1, 1));
-						break;
-					}
-					case 24:
-					{
-						objectcontainer[0].add(new PU_LeafPowerup(&spr_leafpowerup, ix + 1, iy - 1, 1, 0, 30, 30, 1, 1));
-						break;
-					}
-					case 25:
-					{
-						objectcontainer[0].add(new PU_PWingsPowerup(&spr_pwingspowerup, ix + 1, iy - 1));
-						break;
-					}
-					default:
-					{
-						//If no powerups were selected for this block, then fire out a podobo
-						objectcontainer[2].add(new MO_Podobo(&spr_podobo, ix + 2, iy, -(float(rand() % 5) / 2.0f) - 6.0f, -1, -1, -1, true));
-						break;
-					}
-
-				}
+				createpowerup(SelectPowerup(), ix, iy, side, true);
 			}
 
 			ifsoundonplay(sfx_sprout);
@@ -661,7 +789,22 @@ bool B_PowerupBlock::hittop(IO_MovingObject * object)
 	object->yf((float)(iposy - object->collisionHeight) - 0.2f);
 	object->fOldY = object->fy;
 	
-	if(state == 1 && object->bounce == GRAVITATION)
+	MovingObjectType type = object->getMovingObjectType();
+	if(type == movingobject_throwbox && ((CO_ThrowBox*)object)->HasKillVelocity())
+	{
+		if(state == 0)
+		{
+			ifsoundonplay(sfx_bump);
+
+			iBumpPlayerID = -1;
+			vely = -VELBLOCKBOUNCE;
+			state = 1;
+			side = false;
+		}
+
+		object->vely = object->BottomBounce();
+	}
+	else if(state == 1 && object->bounce == GRAVITATION)
 	{
 		BounceMovingObject(object);
 		return false;
@@ -684,13 +827,17 @@ bool B_PowerupBlock::hitright(IO_MovingObject * object)
 		object->velx = -object->velx;
 
 	MovingObjectType type = object->getMovingObjectType();
-	if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone)
+	if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_throwbox || type == movingobject_attackzone)
 	{
 		if(type == movingobject_shell)
 		{
 			if(object->state != 1)
 				return false;
 		}
+
+		//If the box isn't moving fast enough, then don't do anything
+		if(type == movingobject_throwbox && !((CO_ThrowBox*)object)->HasKillVelocity())
+			return false;
 
 		if(state == 0)
 		{
@@ -718,13 +865,17 @@ bool B_PowerupBlock::hitleft(IO_MovingObject * object)
 		object->velx = -object->velx;
 
 	MovingObjectType type = object->getMovingObjectType();
-	if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone)
+	if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_throwbox || type == movingobject_attackzone)
 	{
 		if(type == movingobject_shell)
 		{
 			if(object->state != 1)
 				return false;
 		}
+
+		//If the box isn't moving fast enough, then don't do anything
+		if(type == movingobject_throwbox && !((CO_ThrowBox*)object)->HasKillVelocity())
+			return false;
 
 		if(state == 0)
 		{
@@ -942,6 +1093,17 @@ bool B_BreakableBlock::hittop(IO_MovingObject * object)
 	object->yf((float)(iposy - object->collisionHeight) - 0.2f);
 	object->fOldY = object->fy;
 	
+	if(state == 0)
+	{
+		MovingObjectType type = object->getMovingObjectType();
+		if(type == movingobject_throwbox && ((CO_ThrowBox*)object)->HasKillVelocity())
+		{
+			triggerBehavior();
+			object->vely = object->BottomBounce();
+			return true;
+		}
+	}
+
 	if((state == 1  || state == 2) && object->bounce == GRAVITATION)
 	{
 		BounceMovingObject(object);
@@ -966,7 +1128,7 @@ bool B_BreakableBlock::hitright(IO_MovingObject * object)
 			object->velx = -object->velx;
 
 		MovingObjectType type = object->getMovingObjectType();
-		if((type == movingobject_shell && object->state == 1) || type == movingobject_throwblock || type == movingobject_attackzone)
+		if((type == movingobject_shell && object->state == 1) || type == movingobject_throwblock || (type == movingobject_throwbox && ((CO_ThrowBox*)object)->HasKillVelocity()) || type == movingobject_attackzone)
 		{
 			triggerBehavior();
 			return true;
@@ -987,7 +1149,7 @@ bool B_BreakableBlock::hitleft(IO_MovingObject * object)
 			object->velx = -object->velx;
 
 		MovingObjectType type = object->getMovingObjectType();
-		if((type == movingobject_shell && object->state == 1) || type == movingobject_throwblock || type == movingobject_attackzone)
+		if((type == movingobject_shell && object->state == 1) || type == movingobject_throwblock || (type == movingobject_throwbox && ((CO_ThrowBox*)object)->HasKillVelocity()) || type == movingobject_attackzone)
 		{
 			triggerBehavior();	
 			return true;
@@ -1009,6 +1171,9 @@ void B_BreakableBlock::triggerBehavior()
 		state = 1;
 		ifsoundonplay(sfx_breakblock);
 	}
+
+	game_values.unlocksecret1part2++;
+	CheckSecret(0);
 }
 
 //------------------------------------------------------------------------------
@@ -1262,7 +1427,7 @@ void B_DonutBlock::update()
 
 		if(++counter > 50)
 		{
-			triggerBehavior();
+			triggerBehavior(state - 1);
 		}
 	}
 
@@ -1274,12 +1439,12 @@ bool B_DonutBlock::hittop(CPlayer * player, bool useBehavior)
 	IO_Block::hittop(player, useBehavior);
 
 	if(useBehavior)
-		state = 1;
+		state = player->globalID + 1;
 	
 	return false;
 }
 
-void B_DonutBlock::triggerBehavior()
+void B_DonutBlock::triggerBehavior(short iPlayerId)
 {
 	//eyecandy[2].add(new EC_FallingObject(&spr_donutblock, ix, iy, 0.0f, 0, 0, 0, 0));
 	
@@ -1296,6 +1461,7 @@ void B_DonutBlock::triggerBehavior()
 
 	MovingPlatformPath * path = new FallingPath((float)ix + 16.0f, (float)iy + 15.8f); 
 	MovingPlatform * platform = new MovingPlatform(tiledata, typedata, 1, 1, 2, path, false);
+	platform->SetPlayerId(iPlayerId);
 
 	g_map.AddTemporaryPlatform(platform);
 
@@ -1536,12 +1702,17 @@ bool B_FlipBlock::hitright(IO_MovingObject * object)
 			object->velx = -object->velx;
 
 		MovingObjectType type = object->getMovingObjectType();
-		if(type == movingobject_shell || type == movingobject_throwblock)
+		if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_throwbox)
 		{
 			if(type == movingobject_shell)
 			{
 				if(object->state != 1)
 					return false;
+			}
+
+			if(type == movingobject_throwbox && !((CO_ThrowBox*)object)->HasKillVelocity())
+			{
+				return false;
 			}
 
 			state = 2;
@@ -1579,12 +1750,17 @@ bool B_FlipBlock::hitleft(IO_MovingObject * object)
 			object->velx = -object->velx;
 
 		MovingObjectType type = object->getMovingObjectType();
-		if(type == movingobject_shell || type == movingobject_throwblock)
+		if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_throwbox)
 		{
 			if(type == movingobject_shell)
 			{
 				if(object->state != 1)
 					return false;
+			}
+
+			if(type == movingobject_throwbox && !((CO_ThrowBox*)object)->HasKillVelocity())
+			{
+				return false;
 			}
 
 			state = 2;
@@ -1723,8 +1899,21 @@ bool B_OnOffSwitchBlock::hittop(IO_MovingObject * object)
 {
 	object->yf((float)(iposy - object->collisionHeight) - 0.2f);
 	object->fOldY = object->fy;
-	
-	if((state == 1 || state == 4) && object->bounce == GRAVITATION)
+
+	MovingObjectType type = object->getMovingObjectType();
+	if(type == movingobject_throwbox && ((CO_ThrowBox*)object)->HasKillVelocity())
+	{
+		if(state == 0 || state == 3)
+		{
+			iBumpPlayerID = -1;
+			triggerBehavior(((IO_MovingObject*)object)->iPlayerID);
+		}
+
+		object->vely = object->BottomBounce();
+
+		return true;
+	}
+	else if((state == 1 || state == 4) && object->bounce == GRAVITATION)
 	{
 		BounceMovingObject(object);
 		return false;
@@ -1747,12 +1936,17 @@ bool B_OnOffSwitchBlock::hitright(IO_MovingObject * object)
 		object->velx = -object->velx;
 
 	MovingObjectType type = object->getMovingObjectType();
-	if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone)
+	if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_throwbox || type == movingobject_attackzone)
 	{
 		if(type == movingobject_shell)
 		{
 			if(object->state != 1)
 				return false;
+		}
+
+		if(type == movingobject_throwbox && !((CO_ThrowBox*)object)->HasKillVelocity())
+		{
+			return false;
 		}
 
 		if(state == 0 || state == 3)
@@ -1781,12 +1975,17 @@ bool B_OnOffSwitchBlock::hitleft(IO_MovingObject * object)
 		object->velx = -object->velx;
 
 	MovingObjectType type = object->getMovingObjectType();
-	if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone)
+	if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_throwbox || type == movingobject_attackzone)
 	{
 		if(type == movingobject_shell)
 		{
 			if(object->state != 1)
 				return false;
+		}
+
+		if(type == movingobject_throwbox && !((CO_ThrowBox*)object)->HasKillVelocity())
+		{
+			return false;
 		}
 
 		if(state == 0 || state == 3)
@@ -2217,19 +2416,21 @@ bool B_ThrowBlock::hitleft(CPlayer * player, bool useBehavior)
 
 void B_ThrowBlock::GiveBlockToPlayer(CPlayer * player)
 {
-	dead = true;
-	g_map.blockdata[col][row] = NULL;
-	g_map.UpdateTileGap(col, row);
-
 	CO_ThrowBlock * block = new CO_ThrowBlock(&spr_blueblock, ix, iy, iType);
 	if(player->AcceptItem(block))
 	{
+		dead = true;
+		g_map.blockdata[col][row] = NULL;
+		g_map.UpdateTileGap(col, row);
+
 		block->owner = player;
 		block->iPlayerID = player->globalID;
 		objectcontainer[1].add(block);
 	}
 	else
+	{
 		delete block;
+	}
 }
 
 void B_ThrowBlock::triggerBehavior()
@@ -2457,7 +2658,7 @@ bool B_WeaponBreakableBlock::objecthitside(IO_MovingObject * object)
 {
 	MovingObjectType type = object->getMovingObjectType();
 	
-	if(iType == 2 && ((type == movingobject_shell && object->state == 1) || type == movingobject_throwblock))
+	if(iType == 2 && ((type == movingobject_shell && object->state == 1) || type == movingobject_throwblock || (type == movingobject_throwbox && !((CO_ThrowBox*)object)->HasKillVelocity())))
 	{
 		short iPlayerID = -1;
 		short iTeamID = -1;
@@ -2472,6 +2673,12 @@ bool B_WeaponBreakableBlock::objecthitside(IO_MovingObject * object)
 			CO_ThrowBlock * throwblock = (CO_ThrowBlock*)object;
 			iPlayerID = throwblock->iPlayerID;
 			iTeamID = throwblock->iTeamID;
+		}
+		else if(type == movingobject_throwbox)
+		{
+			CO_ThrowBox * throwbox = (CO_ThrowBox*)object;
+			iPlayerID = throwbox->iPlayerID;
+			iTeamID = throwbox->iTeamID;
 		}
 
 		triggerBehavior(iPlayerID, iTeamID);
@@ -2508,7 +2715,6 @@ MO_Powerup::MO_Powerup(gfxSprite *nspr, short x, short y, short iNumSpr, short a
 {
 	desty = fy - collisionHeight;
 	movingObjectType = movingobject_powerup;
-	bounce = GRAVITATION;
 }
 
 void MO_Powerup::draw()
@@ -2529,6 +2735,7 @@ void MO_Powerup::update()
 
 		if(fy <= desty)
 		{
+			fy = desty;
 			state = 1;
 			vely = 1.0f;
 		}
@@ -2550,6 +2757,13 @@ bool MO_Powerup::collide(CPlayer *)
 		dead = true;
 
 	return false;
+}
+
+void MO_Powerup::nospawn(short y)
+{
+	state = 1;
+	yi(y);
+	vely = -VELJUMP / 2.0;
 }
 
 //------------------------------------------------------------------------------
@@ -2578,7 +2792,7 @@ PU_PWingsPowerup::PU_PWingsPowerup(gfxSprite * nspr, short x, short y)
     : MO_Powerup(nspr, x, y, 1, 0, 30, 30, 1, 1)
 {}
 
-bool PU_PWingsPowerup :: collide (CPlayer *player)
+bool PU_PWingsPowerup::collide (CPlayer *player)
 {
 	player->SetPowerup(8);
 	dead = true;
@@ -2752,7 +2966,7 @@ bool PU_HammerPowerup::collide(CPlayer * player)
 }	
 
 //------------------------------------------------------------------------------
-// class sledge hammer powerup
+// class ice wand powerup
 //------------------------------------------------------------------------------
 PU_IceWandPowerup::PU_IceWandPowerup(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY) :
 	MO_Powerup(nspr, x, y, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY)
@@ -2835,6 +3049,73 @@ bool PU_BombPowerup::collide(CPlayer * player)
 
 	return false;
 }
+
+//------------------------------------------------------------------------------
+// secret powerup
+//------------------------------------------------------------------------------
+PU_SecretPowerup::PU_SecretPowerup(gfxSprite * nspr, short x, short y, short type)
+    : MO_Powerup(nspr, x, y, 4, 8, 30, 30, 1, 1)
+{
+	itemtype = type;
+	place();
+}
+
+void PU_SecretPowerup::update()
+{
+	MO_Powerup::update();
+
+	if(++sparkleanimationtimer >= 4)
+	{
+		sparkleanimationtimer = 0;
+		sparkledrawframe += 32;
+		if(sparkledrawframe >= 480)
+			sparkledrawframe = 0;
+	}
+}
+
+void PU_SecretPowerup::draw()
+{
+	MO_Powerup::draw();
+
+	//Draw sparkles
+	spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, 0, 32, 32);
+}
+
+bool PU_SecretPowerup::collide (CPlayer *player)
+{
+	if(itemtype == 0)
+	{
+		game_values.windaffectsplayers = true;
+		
+		for(short i = 0; i < 15; i++)
+			eyecandy[2].add(new EC_Snow(&spr_snow, (float)(rand() % 640), (float)(rand() % 480), rand() % 4 + 1));
+	}
+	else if(itemtype == 1)
+	{
+		game_values.spinscreen = true;
+	}
+	else if(itemtype == 2)
+	{
+		game_values.reversewalk = true;
+	}
+	else if(itemtype == 3)
+	{
+		game_values.spotlights = true;
+	}
+
+	ifsoundonplay(sfx_pickup);
+
+	dead = true;
+	return false;
+}
+
+void PU_SecretPowerup::place()
+{
+	g_map.findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false);
+	fx = (float)ix;
+	fy = (float)iy;
+}
+
 
 //------------------------------------------------------------------------------
 // class treasure chest powerup
@@ -3169,7 +3450,6 @@ PU_FeatherPowerup::PU_FeatherPowerup(gfxSprite *nspr, short x, short y, short iN
 	iw = (short)nspr->getWidth() >> 1;
 
 	velx = 0.0f;
-	bounce = GRAVITATION;
 	fFloatDirectionRight = true;
 	dFloatAngle = HALF_PI;
 
@@ -3255,6 +3535,13 @@ bool PU_FeatherPowerup::collide(CPlayer * player)
 	}
 
 	return false;
+}
+
+void PU_FeatherPowerup::nospawn(short y)
+{
+	state = 1;
+	desty = y;
+	yi(y + TILESIZE - collisionHeight);
 }
 
 //------------------------------------------------------------------------------
@@ -3353,6 +3640,70 @@ bool PU_ExtraTimePowerup::collide(CPlayer * player)
 
 
 //------------------------------------------------------------------------------
+// class special extra coin powerup for coin or greed mode
+//------------------------------------------------------------------------------
+PU_CoinPowerup::PU_CoinPowerup(gfxSprite *nspr, short x, short y, short color, short value) :
+	MO_Powerup(nspr, x, y, 4, 8, 30, 30, 1, 1)
+{
+	velx = 0.0f;
+	iColorOffsetY = color << 5;
+	iValue = value;
+
+	sparkleanimationtimer = 0;
+	sparkledrawframe = 0;
+}
+
+void PU_CoinPowerup::update()
+{
+	MO_Powerup::update();
+
+	if(++sparkleanimationtimer >= 4)
+	{
+		sparkleanimationtimer = 0;
+		sparkledrawframe += 32;
+		if(sparkledrawframe >= 480)
+			sparkledrawframe = 0;
+	}
+}
+
+void PU_CoinPowerup::draw()
+{
+	if(state == 0)
+	{
+		short iHeight = (short)(32 - fy + desty);
+		spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, iColorOffsetY, 32, iHeight);
+		spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, 0, 32, iHeight);
+	}
+	else
+	{
+		spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, iColorOffsetY, 32, 32);
+		spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, 0, 32, 32);
+	}
+}
+
+bool PU_CoinPowerup::collide(CPlayer * player)
+{
+	if(state > 0)
+	{
+		if(game_values.gamemode->gamemode == game_mode_coins || game_values.gamemode->gamemode == game_mode_greed)
+		{
+			if(!game_values.gamemode->gameover)
+			{
+				player->score->AdjustScore(iValue);
+				game_values.gamemode->CheckWinner(player);
+			}
+		}
+
+		ifsoundonplay(sfx_coin);
+		dead = true;
+	}
+
+	return false;
+}
+
+
+
+//------------------------------------------------------------------------------
 // class special jail key powerup for jail mode
 //------------------------------------------------------------------------------
 PU_JailKeyPowerup::PU_JailKeyPowerup(gfxSprite *nspr, short x, short y) :
@@ -3432,6 +3783,8 @@ bool MO_Fireball::collide(CPlayer * player)
 void MO_Fireball::draw()
 {
 	spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, (velx > 0 ? 0 : 18) + colorOffset, iw, ih);
+
+	AddSpotlight(ix + (iw >> 1), iy + (ih >> 1), 1);
 }
 
 
@@ -3602,6 +3955,8 @@ bool MO_Hammer::collide(CPlayer * player)
 void MO_Hammer::draw()
 {
 	spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, colorOffset, iw, ih);
+
+	AddSpotlight(ix + (iw >> 1), iy + (ih >> 1), 1);
 }
 
 
@@ -3775,10 +4130,17 @@ bool MO_IceBlast::collide(CPlayer * player)
 		if(player->shield == 0 && !player->invincible && !player->shyguy)
 		{
 			player->makefrozen(game_values.wandfreezetime);
+			removeifprojectile(this, false, true);
 		}
 	}
 
 	return false;
+}
+
+void MO_IceBlast::draw()
+{
+	IO_MovingObject::draw();
+	AddSpotlight(ix + (iw >> 1), iy + (ih >> 1), 1);
 }
 
 //------------------------------------------------------------------------------
@@ -4119,6 +4481,8 @@ bool MO_Boomerang::collide(CPlayer * player)
 void MO_Boomerang::draw()
 {
 	spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, colorOffset + (fMoveToRight ? 0 : 32), iw, ih);
+
+	AddSpotlight(ix + (iw >> 1), iy + (ih >> 1), 1);
 }
 
 //------------------------------------------------------------------------------
@@ -4129,8 +4493,6 @@ CO_Bomb::CO_Bomb(gfxSprite *nspr, short x, short y, float fVelX, float fVelY, sh
 {
 	iw = 28;
 	ih = 38;
-
-	bounce = GRAVITATION;
 
 	iPlayerID = iGlobalID;
 	iTeamID = teamID;
@@ -4225,13 +4587,12 @@ void CO_Bomb::Die()
 //------------------------------------------------------------------------------
 // class coin (for coin mode)
 //------------------------------------------------------------------------------
-MO_Coin::MO_Coin(gfxSprite *nspr, float dvelx, float dvely, short ix, short iy, short color, short team, short type, short uncollectabletime) :
+MO_Coin::MO_Coin(gfxSprite *nspr, float dvelx, float dvely, short ix, short iy, short color, short team, short type, short uncollectabletime, bool placecoin) :
 	IO_MovingObject(nspr, ix, iy, 4, 8, 30, 30, 1, 1, 0, color << 5, 32, 32)
 {
 	state = 1;
 	objectType = object_moving;
 	movingObjectType = movingobject_coin;
-	bounce = GRAVITATION;
 
 	sparkleanimationtimer = 0;
 	sparkledrawframe = 0;
@@ -4242,10 +4603,15 @@ MO_Coin::MO_Coin(gfxSprite *nspr, float dvelx, float dvely, short ix, short iy, 
 	iUncollectableTime = uncollectabletime;
 	velx = dvelx;
 	vely = dvely;
-	
-	if(iType == 0)
+
+	timer = 0;
+	if(placecoin)
 	{
 		placeCoin();
+	}
+
+	if(iType == 0)
+	{
 		fObjectCollidesWithMap = false;
 	}
 	else
@@ -4256,12 +4622,16 @@ MO_Coin::MO_Coin(gfxSprite *nspr, float dvelx, float dvely, short ix, short iy, 
 
 bool MO_Coin::collide(CPlayer * player)
 {
-	if(iType == 1 && (iUncollectableTime > 0 || (!game_values.gamemodesettings.greed.owncoins && iTeam == player->getTeamID())))
+	if(iUncollectableTime > 0 || (iType == 1 && (!game_values.gamemodesettings.greed.owncoins && iTeam == player->getTeamID())))
 		return false;
 
 	if(!game_values.gamemode->gameover)
 	{
-		player->score->AdjustScore(1);
+		if(iType == 2)
+			player->score->subscore[0]++;
+		else
+			player->score->AdjustScore(1);
+
 		game_values.gamemode->CheckWinner(player);
 	}
 
@@ -4279,7 +4649,7 @@ bool MO_Coin::collide(CPlayer * player)
 
 void MO_Coin::update()
 {
-	if(iType == 0)
+	if(iType != 1)
 	{
 		animate();
 
@@ -4294,12 +4664,15 @@ void MO_Coin::update()
 		if(++timer > 1000)
 			placeCoin();
 	}
-	else
+
+	if(iType != 0)
 	{
 		applyfriction();
 		IO_MovingObject::update();
 
-		if(--iUncollectableTime < -game_values.gamemodesettings.greed.coinlife)
+		iUncollectableTime--;
+
+		if(iType == 1 && iUncollectableTime < -game_values.gamemodesettings.greed.coinlife)
 		{
 			eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix, iy, 3, 8));
 			dead = true;
@@ -4312,7 +4685,7 @@ void MO_Coin::draw()
 	IO_MovingObject::draw();
 
 	//Draw sparkles
-	if(iType == 0)
+	if(iType != 1)
 		spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, 0, 32, 32);
 }
 
@@ -4580,7 +4953,6 @@ CO_Egg::CO_Egg(gfxSprite *nspr, short iColor) :
 	MO_CarriedObject(nspr, 0, 0, 2, 16, 28, 30, 2, 1, 0, iColor << 5, 32, 32)
 {
 	state = 1;
-	bounce = GRAVITATION;
 	movingObjectType = movingobject_egg;
 
 	owner_throw = NULL;
@@ -4757,7 +5129,6 @@ CO_Star::CO_Star(gfxSprite *nspr, short type, short id) :
 	state = 1;
 	iw = 32;
 	ih = 32;
-	bounce = GRAVITATION;
 	movingObjectType = movingobject_star;
 	
 	iType = type;
@@ -5073,7 +5444,6 @@ CO_Flag::CO_Flag(gfxSprite *nspr, MO_FlagBase * base, short iTeamID, short iColo
 	MO_CarriedObject(nspr, 0, 0, 4, 8, 30, 30, 1, 1, 0, iColorID << 6, 32, 32)
 {
 	state = 1;
-	bounce = GRAVITATION;
 	movingObjectType = movingobject_flag;
 	flagbase = base;
 	teamID = iTeamID;
@@ -6019,7 +6389,6 @@ MO_CollectionCard::MO_CollectionCard(gfxSprite *nspr, short iType, short iValue,
 	state = 1;
 	objectType = object_moving;
 	movingObjectType = movingobject_collectioncard;
-	bounce = GRAVITATION;
 	
 	sparkleanimationtimer = 0;
 	sparkledrawframe = 0;
@@ -6187,6 +6556,11 @@ MO_WalkingEnemy::MO_WalkingEnemy(gfxSprite *nspr, short iNumSpr, short aniSpeed,
 
 	fKillOnWeakWeapon = killOnWeakWeapon;
 
+	frozen = false;
+	frozentimer = 0;
+	frozenvelocity = velx;
+	frozenanimationspeed = aniSpeed;
+
 	place();
 }
 
@@ -6211,11 +6585,33 @@ void MO_WalkingEnemy::draw()
 	else
 	{
 		IO_MovingObject::draw();
+
+		if(frozen)
+		{
+			spr_iceblock.draw(ix - collisionOffsetX + iw - 32, iy - collisionOffsetY + ih - 32, 0, 0, 32, 32);
+		}
 	}
 }
 
 void MO_WalkingEnemy::update()
 {
+	if(frozen)
+	{
+		if(--frozentimer <= 0)
+		{
+			frozentimer = 0;
+			frozen = false;
+			
+			velx = frozenvelocity;
+			animationspeed = frozenanimationspeed;
+
+			if(fBouncing)
+				bounce = -VELENEMYBOUNCE;
+		
+			eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix - collisionOffsetX + iw - 32, iy - collisionOffsetY + ih - 32, 3, 8));
+		}
+	}
+
 	if(state == 0)
 	{
 		spawnradius -= 2.0f;
@@ -6252,15 +6648,22 @@ bool MO_WalkingEnemy::collide(CPlayer * player)
 	if(state == 0)
 		return false;
 
-	if(player->invincible)
+	if(player->invincible || frozen)
 	{
 		AddAwardKill(player, NULL, killStyle);
 
 		if(game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover)
 			player->score->AdjustScore(1);
 
-		ifsoundonplay(sfx_kicksound);
-		Die();
+		if(frozen)
+		{
+			ShatterDie();
+		}
+		else
+		{
+			ifsoundonplay(sfx_kicksound);
+			Die();
+		}
 	}
 	else
 	{
@@ -6292,10 +6695,14 @@ void MO_WalkingEnemy::collide(IO_MovingObject * object)
 
 		MovingObjectType type = object->getMovingObjectType();
 
-		if(((type == movingobject_fireball || type == movingobject_hammer || type == movingobject_boomerang) && fKillOnWeakWeapon) || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_bulletbill || type == movingobject_podobo || type == movingobject_attackzone || type == movingobject_explosion || type == movingobject_sledgehammer)
+		if(((type == movingobject_fireball || type == movingobject_hammer || type == movingobject_boomerang) && (fKillOnWeakWeapon || frozen)) || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_throwbox || type == movingobject_bulletbill || type == movingobject_podobo || type == movingobject_attackzone || type == movingobject_explosion || type == movingobject_sledgehammer)
 		{
 			//Don't kill enemies with non-moving shells
 			if(type == movingobject_shell && object->state == 2)
+				return;
+
+			//Don't kill enemies with slow or non-moving boxes
+			if(type == movingobject_throwbox && !((CO_ThrowBox*)object)->HasKillVelocity())
 				return;
 
 			if(game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover)
@@ -6313,21 +6720,41 @@ void MO_WalkingEnemy::collide(IO_MovingObject * object)
 				}
 			}
 
-			ifsoundonplay(sfx_kicksound);
-			
-			if(type == movingobject_attackzone)
-				DieAndDropShell(true, false);
+			if(frozen)
+			{
+				ShatterDie();
+			}
 			else
-				Die();
+			{
+				ifsoundonplay(sfx_kicksound);
+				
+				if(type == movingobject_attackzone)
+					DieAndDropShell(true, false);
+				else
+					Die();
+			}
 
 			if(type == movingobject_shell || type == movingobject_throwblock)
 			{
 				object->CheckAndDie();
 			}
-			else if(type == movingobject_bulletbill || type == movingobject_attackzone)
+			else if(type == movingobject_bulletbill || type == movingobject_attackzone || type == movingobject_throwbox)
 			{
 				object->Die();
 			}			
+		}
+		else if(type == movingobject_iceblast)
+		{
+			frozenvelocity = velx;
+			velx = 0.0f;
+			animationspeed = 0;
+			
+			bounce = GRAVITATION;
+
+			frozen = true;
+			frozentimer = 300;
+			
+			eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix - collisionOffsetX + iw - 32, iy - collisionOffsetY + ih - 32, 3, 8));
 		}
 	}
 }
@@ -6339,6 +6766,21 @@ void MO_WalkingEnemy::place()
 	fx = (float)ix;
 	fy = (float)iy;
 }
+
+void MO_WalkingEnemy::ShatterDie()
+{
+	ifsoundonplay(sfx_breakblock);
+	dead = true;
+
+	short iBrokenIceX = ix - collisionOffsetX + iw - 32, iBrokenIceY = iy - collisionOffsetY + ih - 32;
+	eyecandy[2].add(new EC_FallingObject(&spr_brokeniceblock, iBrokenIceX, iBrokenIceY, -1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
+	eyecandy[2].add(new EC_FallingObject(&spr_brokeniceblock, iBrokenIceX + 16, iBrokenIceY, 1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
+	eyecandy[2].add(new EC_FallingObject(&spr_brokeniceblock, iBrokenIceX, iBrokenIceY + 16, -1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
+	eyecandy[2].add(new EC_FallingObject(&spr_brokeniceblock, iBrokenIceX + 16, iBrokenIceY + 16, 1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
+
+	game_values.unlocksecret2part2++;
+}
+
 
 //------------------------------------------------------------------------------
 // class goomba
@@ -6361,6 +6803,20 @@ MO_Goomba::MO_Goomba(gfxSprite *nspr, bool moveToRight, bool fBouncing) :
 		collisionOffsetY = 27;
 
 		animationOffsetY = moveToRight ? 0 : ih;
+	}
+}
+
+void MO_Goomba::draw()
+{
+	//if frozen, just draw shell, not entire koopa
+	if(frozen)
+	{
+		spr_goomba.draw(ix - collisionOffsetX + iw - 32, iy - collisionOffsetY + ih - 32, 0, 0, 32, 32);	
+		spr_iceblock.draw(ix - collisionOffsetX + iw - 32, iy - collisionOffsetY + ih - 32, 0, 0, 32, 32);	
+	}
+	else
+	{
+		MO_WalkingEnemy::draw();
 	}
 }
 
@@ -6421,6 +6877,12 @@ bool MO_Goomba::hittop(CPlayer * player)
 
 void MO_Goomba::Die()
 {
+	if(frozen)
+	{
+		ShatterDie();
+		return;
+	}
+
 	dead = true;
 	eyecandy[2].add(new EC_FallingObject(&spr_goombadeadflying, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, 0, 0, 0, 0));
 }
@@ -6435,6 +6897,20 @@ MO_Koopa::MO_Koopa(gfxSprite *nspr, bool moveToRight, bool red, bool fBouncing) 
 	movingObjectType = movingobject_koopa;
 	iSpawnIconOffset = fRed ? 144 : 112;
 	killStyle = kill_style_koopa;
+}
+
+void MO_Koopa::draw()
+{
+	//if frozen, just draw shell, not entire koopa
+	if(frozen)
+	{
+		spr_shell.draw(ix - collisionOffsetX + iw - 32, iy - collisionOffsetY + ih - 32, 0, fRed ? 32 : 0, 32, 32);	
+		spr_iceblock.draw(ix - collisionOffsetX + iw - 32, iy - collisionOffsetY + ih - 32, 0, 0, 32, 32);	
+	}
+	else
+	{
+		MO_WalkingEnemy::draw();
+	}
 }
 
 void MO_Koopa::update()
@@ -6483,6 +6959,12 @@ bool MO_Koopa::hittop(CPlayer * player)
 
 void MO_Koopa::Die()
 {
+	if(frozen)
+	{
+		ShatterDie();
+		return;
+	}
+
 	dead = true;
 	eyecandy[2].add(new EC_FallingObject(&spr_shelldead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, fRed ? 32 : 0, 0, 32, 32));
 }
@@ -6497,11 +6979,7 @@ void MO_Koopa::DropShell(bool fBounce, bool fFlip)
 	else
 		shell = new CO_Shell(0, ix - 1, iy + 8, true, true, true, false);
 	
-	shell->state = 2;
-	shell->yi(iy + 8);
-
-	if(fBounce)
-		shell->vely = -VELJUMP / 2.0;
+	shell->nospawn(iy + 8, fBounce);
 
 	if(fFlip)
 		shell->Flip();
@@ -6552,6 +7030,12 @@ bool MO_BuzzyBeetle::hittop(CPlayer * player)
 
 void MO_BuzzyBeetle::Die()
 {
+	if(frozen)
+	{
+		ShatterDie();
+		return;
+	}
+
 	dead = true;
 	eyecandy[2].add(new EC_FallingObject(&spr_shelldead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, 96, 0, 32, 32));
 }
@@ -6560,12 +7044,8 @@ void MO_BuzzyBeetle::DropShell(bool fBounce, bool fFlip)
 {
 	//Give the shell a state 2 so it is already spawned but sitting
 	CO_Shell * shell = new CO_Shell(3, ix - 1, iy, false, true, false, false);
-	shell->state = 2;
-	shell->yi(iy);
-
-	if(fBounce)
-		shell->vely = -VELJUMP / 2.0;
-
+	shell->nospawn(iy, fBounce);
+	
 	if(fFlip)
 		shell->Flip();
 
@@ -6623,6 +7103,12 @@ bool MO_Spiny::hittop(CPlayer * player)
 
 void MO_Spiny::Die()
 {
+	if(frozen)
+	{
+		ShatterDie();
+		return;
+	}
+
 	dead = true;
 	eyecandy[2].add(new EC_FallingObject(&spr_shelldead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, 64, 0, 32, 32));
 }
@@ -6631,11 +7117,7 @@ void MO_Spiny::DropShell(bool fBounce, bool fFlip)
 {
 	//Give the shell a state 2 so it is already spawned but sitting
 	CO_Shell * shell = new CO_Shell(2, ix - 1, iy, false, true, false, false);
-	shell->state = 2;
-	shell->yi(iy);
-	
-	if(fBounce)
-		shell->vely = -VELJUMP / 2.0;
+	shell->nospawn(iy, fBounce);
 
 	if(fFlip)
 		shell->Flip();
@@ -6668,6 +7150,7 @@ MO_CheepCheep::MO_CheepCheep(gfxSprite *nspr) :
 		iColorOffsetY += 32;
 
 	fObjectCollidesWithMap = false;
+	frozen = false;
 }
 
 void MO_CheepCheep::update()
@@ -6691,19 +7174,31 @@ void MO_CheepCheep::update()
 void MO_CheepCheep::draw()
 {
 	spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, iColorOffsetY, iw, ih);
+
+	if(frozen)
+	{
+		spr_iceblock.draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, 0, 32, 32);
+	}
 }
 
 bool MO_CheepCheep::collide(CPlayer * player)
 {
-	if(player->invincible)
+	if(player->invincible || frozen)
 	{
 		AddAwardKill(player, NULL, kill_style_cheepcheep);
-		ifsoundonplay(sfx_kicksound);
 
 		if(game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover)
 			player->score->AdjustScore(1);
 		
-		Die();
+		if(frozen)
+		{
+			ShatterDie();
+		}
+		else
+		{
+			ifsoundonplay(sfx_kicksound);
+			Die();
+		}
 	}
 	else
 	{
@@ -6752,10 +7247,13 @@ void MO_CheepCheep::collide(IO_MovingObject * object)
 
 		MovingObjectType type = object->getMovingObjectType();
 
-		if(type == movingobject_fireball || type == movingobject_hammer || type == movingobject_boomerang || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_bulletbill || type == movingobject_podobo || type == movingobject_attackzone || type == movingobject_explosion || type == movingobject_sledgehammer)
+		if(type == movingobject_fireball || type == movingobject_hammer || type == movingobject_boomerang || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_throwbox || type == movingobject_bulletbill || type == movingobject_podobo || type == movingobject_attackzone || type == movingobject_explosion || type == movingobject_sledgehammer)
 		{
 			//Don't kill goombas with non-moving shells
 			if(type == movingobject_shell && object->state == 2)
+				return;
+
+			if(type == movingobject_throwbox && !((CO_ThrowBox*)object)->HasKillVelocity())
 				return;
 
 			if(game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover)
@@ -6773,27 +7271,60 @@ void MO_CheepCheep::collide(IO_MovingObject * object)
 				}
 			}
 
-			ifsoundonplay(sfx_kicksound);
-			Die();
+			if(frozen)
+			{
+				ShatterDie();
+			}
+			else
+			{
+				ifsoundonplay(sfx_kicksound);
+				Die();
+			}
 		
 			if(type == movingobject_shell || type == movingobject_throwblock)
 			{
 				object->CheckAndDie();
 			}
-			else if(type == movingobject_bulletbill || type == movingobject_attackzone)
+			else if(type == movingobject_bulletbill || type == movingobject_attackzone || type == movingobject_throwbox)
 			{
 				object->Die();
 			}
+		}
+		else if(type == movingobject_iceblast)
+		{
+			animationspeed = 0;
+			frozen = true;
+			
+			eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix - collisionOffsetX, iy - collisionOffsetY, 3, 8));
 		}
 	}
 }
 
 void MO_CheepCheep::Die()
 {
+	if(frozen)
+	{
+		ShatterDie();
+		return;
+	}
+
 	dead = true;
 	eyecandy[2].add(new EC_FallingObject(&spr_cheepcheepdead, ix, iy, 0.0f, -VELJUMP / 2.0f, 1, 0, 0, iColorOffsetY, 32, 32));
 }
 
+void MO_CheepCheep::ShatterDie()
+{
+	ifsoundonplay(sfx_breakblock);
+	dead = true;
+
+	short iBrokenIceX = ix - collisionOffsetX, iBrokenIceY = iy - collisionOffsetY;
+	eyecandy[2].add(new EC_FallingObject(&spr_brokeniceblock, iBrokenIceX, iBrokenIceY, -1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
+	eyecandy[2].add(new EC_FallingObject(&spr_brokeniceblock, iBrokenIceX + 16, iBrokenIceY, 1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
+	eyecandy[2].add(new EC_FallingObject(&spr_brokeniceblock, iBrokenIceX, iBrokenIceY + 16, -1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
+	eyecandy[2].add(new EC_FallingObject(&spr_brokeniceblock, iBrokenIceX + 16, iBrokenIceY + 16, 1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
+
+	game_values.unlocksecret2part2++;
+}
 
 ///////////////////////DEBUG!  REMOVE THIS WHEN DONE/////////////////////////////
 #ifdef _DEBUG
@@ -6836,7 +7367,6 @@ MO_SledgeBrother::MO_SledgeBrother(gfxSprite *nspr, short platformY, short type)
 	ih = spr->getHeight() / 3;
 
 	movingObjectType = movingobject_sledgebrother;
-	bounce = GRAVITATION;
 	
 	inair = true;
 	throwing_timer = 0;
@@ -7251,17 +7781,38 @@ void MO_SledgeBrother::collide(IO_MovingObject * object)
 
 	removeifprojectile(object, false, false);
 
-	if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone || type == movingobject_explosion)
+	//These types of attacks damage the boss
+	bool fDamageWeapon = type == movingobject_shell || type == movingobject_throwblock || type == movingobject_throwbox || type == movingobject_explosion;
+
+	//These don't damage him but still collide
+	bool fNoDamageWeapon = type == movingobject_fireball || type == movingobject_bulletbill || type == movingobject_hammer || type == movingobject_boomerang || type == movingobject_attackzone;
+
+	if(fDamageWeapon || fNoDamageWeapon)
 	{
+		//If it is a shell but it is sitting, don't collide
 		if(type == movingobject_shell && object->GetState() == 2)
 			return;
 
-		Damage(object->iPlayerID);
+		//If it is a throw box but is sitting, dont' collide
+		if(type == movingobject_throwbox && !((CO_ThrowBox*)object)->HasKillVelocity())
+			return;
 
-		if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_attackzone)
+		if(fDamageWeapon)
 		{
-			ifsoundonplay(sfx_kicksound);
-			object->Die();
+			Damage(object->iPlayerID);
+
+			if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_throwbox || type == movingobject_attackzone)
+			{
+				ifsoundonplay(sfx_kicksound);
+				object->Die();
+			}
+		}
+		else
+		{
+			ifsoundonplay(sfx_hit);
+			
+			if(type == movingobject_attackzone || type == movingobject_bulletbill)
+				object->Die();
 		}
 	}
 }
@@ -7326,7 +7877,6 @@ CO_Shell::CO_Shell(short type, short x, short y, bool dieOnMovingPlayerCollision
 
 	state = 0;
 
-	bounce = GRAVITATION;
 	movingObjectType = movingobject_shell;
 	
 	iPlayerID = -1;
@@ -7355,38 +7905,51 @@ CO_Shell::CO_Shell(short type, short x, short y, bool dieOnMovingPlayerCollision
 	iOwnerRightOffset = 14;
 	iOwnerLeftOffset = -22;
 	iOwnerUpOffset = 32;
+
+	frozen = false;
+	frozentimer = 0;
+	frozenvelocity = 0.0f;
+	frozenanimationspeed = 4;
 }
 
 bool CO_Shell::collide(CPlayer * player)
 {
-	if(player->invincible || player->shyguy)
+	if(player->invincible || player->shyguy || frozen)
 	{
-		if(state == 0 || state == 2) //If sitting or spawning then just die
+		if(frozen)
 		{
-			Die();
+			ShatterDie();
 			return false;
 		}
-		else if(state == 3)  //if held, but not by us then die
+		else
 		{
-			if(owner != player)
+			if(state == 0 || state == 2) //If sitting or spawning then just die
 			{
 				Die();
 				return false;
 			}
-		}
-		else if(state == 1) //If moving, see if it is actually hitting us before we kill it
-		{
-			short flipx = 0;
-
-			if(player->ix + PW < 320 && ix > 320)
-				flipx = 640;
-			else if(ix + iw < 320 && player->ix > 320)
-				flipx = -640;
-
-			if((player->ix + HALFPW + flipx >= ix + (iw >> 1) && velx > 0.0f) || (player->ix + HALFPW + flipx < ix + (iw >> 1) && velx < 0.0f))
+			else if(state == 3)  //if held, but not by us then die
 			{
-				Die();
-				return false;	
+				if(owner != player)
+				{
+					Die();
+					return false;
+				}
+			}
+			else if(state == 1) //If moving, see if it is actually hitting us before we kill it
+			{
+				short flipx = 0;
+
+				if(player->ix + PW < 320 && ix > 320)
+					flipx = 640;
+				else if(ix + iw < 320 && player->ix > 320)
+					flipx = -640;
+
+				if((player->ix + HALFPW + flipx >= ix + (iw >> 1) && velx > 0.0f) || (player->ix + HALFPW + flipx < ix + (iw >> 1) && velx < 0.0f))
+				{
+					Die();
+					return false;	
+				}
 			}
 		}
 	}
@@ -7501,7 +8064,7 @@ bool CO_Shell::HitOther(CPlayer * player)
 	}
 	else if(state == 3)  //Holding
 	{
-		if(player != owner && (game_values.teamcollision == 2|| player->teamID != owner->teamID))
+		if(player != owner && (game_values.teamcollision == 2 || player->teamID != owner->teamID))
 		{
 			iPlayerID = owner->globalID;
 			iTeamID = owner->teamID;
@@ -7571,10 +8134,19 @@ void CO_Shell::collide(IO_MovingObject * object)
 		//Green shells should die on collision, other shells should not,
 		//except if they also hit a non dead on collision shell
 
-		if(shell->fSmoking && !fSmoking)
+		if(frozen || shell->frozen)
+		{
 			Die();
-		else if(!shell->fSmoking && fSmoking)
 			shell->Die();
+		}
+		if(shell->fSmoking && !fSmoking)
+		{
+			Die();
+		}
+		else if(!shell->fSmoking && fSmoking)
+		{
+			shell->Die();
+		}
 		else
 		{
 			if(fDieOnMovingPlayerCollision || state == 2 || (!shell->fDieOnMovingPlayerCollision && shell->state != 2))
@@ -7586,8 +8158,17 @@ void CO_Shell::collide(IO_MovingObject * object)
 	}
 	else if(type == movingobject_throwblock)
 	{
+		CO_ThrowBlock * block = (CO_ThrowBlock*)object;
+
 		Die();
-		((CO_ThrowBlock*)object)->Die();
+		block->Die();
+	}
+	else if(type == movingobject_throwbox)
+	{
+		CO_ThrowBox * box = (CO_ThrowBox*)object;
+
+		Die();
+		box->Die();
 	}
 	else if(type == movingobject_explosion || type == movingobject_sledgehammer || type == movingobject_superfireball)
 	{
@@ -7598,6 +8179,17 @@ void CO_Shell::collide(IO_MovingObject * object)
 		if(fDieOnFire)
 			Die();
 	}
+	else if(type == movingobject_iceblast)
+	{
+		frozenvelocity = velx;
+		velx = 0.0f;
+		animationspeed = 0;
+
+		frozen = true;
+		frozentimer = 300;
+		
+		eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix - collisionOffsetX, iy - collisionOffsetY, 3, 8));
+	}
 }
 
 void CO_Shell::update()
@@ -7605,26 +8197,42 @@ void CO_Shell::update()
 	if(iNoOwnerKillTime > 0)
 		iNoOwnerKillTime--;
 
-	if(state == 1)
+	if(frozen)
 	{
-		if(game_values.shellttl > 0 && ++iDeathTime >= game_values.shellttl)
+		if(--frozentimer <= 0)
 		{
-			eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix, iy, 3, 8));
-			dead = true;
-			ifsoundonplay(sfx_kicksound);
-
-			if(owner)
-			{
-				owner->carriedItem = NULL;
-				owner = NULL;
-			}
-
-			return;
+			frozentimer = 0;
+			frozen = false;
+			
+			velx = frozenvelocity;
+			animationspeed = frozenanimationspeed;
+		
+			eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix - collisionOffsetX, iy - collisionOffsetY, 3, 8));
 		}
 	}
 	else
 	{
-		iDeathTime = 0;
+		if(state == 1)
+		{
+			if(game_values.shellttl > 0 && ++iDeathTime >= game_values.shellttl)
+			{
+				eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix, iy, 3, 8));
+				dead = true;
+				ifsoundonplay(sfx_kicksound);
+
+				if(owner)
+				{
+					owner->carriedItem = NULL;
+					owner = NULL;
+				}
+
+				return;
+			}
+		}
+		else
+		{
+			iDeathTime = 0;
+		}
 	}
 	
 	//Have the powerup grow out of the powerup block
@@ -7680,7 +8288,11 @@ void CO_Shell::draw()
 			spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, iColorOffsetY + iFlippedOffset, iw, ih);
 	}
 
-	if(fSmoking)
+	if(frozen)
+	{
+		spr_iceblock.draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, 0, 32, 32);
+	}
+	else if(fSmoking)
 	{
 		eyecandy[0].add(new EC_SingleAnimation(&spr_burnup, ix - collisionOffsetX + (iw >> 1) - 16, iy - collisionOffsetY + (ih >> 1) - 16, 5, 3));
 	}
@@ -7766,6 +8378,12 @@ void CO_Shell::CheckAndDie()
 
 void CO_Shell::Die()
 {
+	if(frozen)
+	{
+		ShatterDie();
+		return;
+	}
+
 	eyecandy[2].add(new EC_FallingObject(&spr_shelldead, ix, iy, -velx / 4.0f, -VELJUMP / 2.0f, 1, 0, iShellType * 32, 0, 32, 32));
 	dead = true;
 	ifsoundonplay(sfx_kicksound);
@@ -7778,7 +8396,26 @@ void CO_Shell::Die()
 	}
 }
 
-void CO_Shell::SideBounce()
+void CO_Shell::ShatterDie()
+{
+	dead = true;
+	ifsoundonplay(sfx_breakblock);
+	iKillCounter = 0;
+
+	if(owner)
+	{
+		owner->carriedItem = NULL;
+		owner = NULL;
+	}
+
+	short iBrokenIceX = ix - collisionOffsetX, iBrokenIceY = iy - collisionOffsetY;
+	eyecandy[2].add(new EC_FallingObject(&spr_brokeniceblock, iBrokenIceX, iBrokenIceY, -1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
+	eyecandy[2].add(new EC_FallingObject(&spr_brokeniceblock, iBrokenIceX + 16, iBrokenIceY, 1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
+	eyecandy[2].add(new EC_FallingObject(&spr_brokeniceblock, iBrokenIceX, iBrokenIceY + 16, -1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
+	eyecandy[2].add(new EC_FallingObject(&spr_brokeniceblock, iBrokenIceX + 16, iBrokenIceY + 16, 1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
+}
+
+void CO_Shell::SideBounce(bool fRightSide)
 {
 	if(state == 1)
 	{
@@ -7794,6 +8431,12 @@ void CO_Shell::SideBounce()
 
 void CO_Shell::Flip()
 {
+	if(frozen)
+	{
+		ShatterDie();
+		return;
+	}
+
 	if(owner)
 	{
 		Die();
@@ -7820,6 +8463,15 @@ void CO_Shell::Stop()
 	iKillCounter = 0;
 }
 
+void CO_Shell::nospawn(short y, bool fBounce)
+{
+	state = 2;
+	yi(y);
+	
+	if(fBounce)
+		vely = -VELJUMP / 2.0;
+}
+
 //------------------------------------------------------------------------------
 // class throwable block projectile
 //------------------------------------------------------------------------------
@@ -7830,7 +8482,6 @@ CO_ThrowBlock::CO_ThrowBlock(gfxSprite * nspr, short x, short y, short type) :
 {
 	state = 2;
 	ih = 32;
-	bounce = GRAVITATION;
 	movingObjectType = movingobject_throwblock;
 	iPlayerID = -1;
 	iTeamID = -1;
@@ -7847,10 +8498,21 @@ CO_ThrowBlock::CO_ThrowBlock(gfxSprite * nspr, short x, short y, short type) :
 	iOwnerRightOffset = 14;
 	iOwnerLeftOffset = -22;
 	iOwnerUpOffset = 32;
+
+	frozen = false;
+	frozentimer = 0;
+	frozenvelocity = 0.0f;
+	frozenanimationspeed = 2;
 }
 
 bool CO_ThrowBlock::collide(CPlayer * player)
 {
+	if(frozen)
+	{
+		ShatterDie();
+		return false;
+	}
+
 	if(player->fOldY + PH <= iy && player->iy + PH >= iy)
 		return HitTop(player);
 	else
@@ -7944,14 +8606,35 @@ void CO_ThrowBlock::collide(IO_MovingObject * object)
 	removeifprojectile(object, false, false);
 
 	MovingObjectType type = object->getMovingObjectType();
+
 	if(type == movingobject_throwblock)
 	{
+		CO_ThrowBlock * block = (CO_ThrowBlock*)object;
+
 		Die();
-		((CO_ThrowBlock*)object)->Die();
+		block->Die();
+	}
+	else if(type == movingobject_throwbox)
+	{
+		CO_ThrowBox * box = (CO_ThrowBox*)object;
+		
+		Die();
+		box->Die();
 	}
 	else if(type == movingobject_explosion)
 	{
 		Die();
+	}
+	else if(type == movingobject_iceblast)
+	{
+		frozenvelocity = velx;
+		velx = 0.0f;
+		animationspeed = 0;
+
+		frozen = true;
+		frozentimer = 300;
+		
+		eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix - collisionOffsetX, iy - collisionOffsetY, 3, 8));
 	}
 }
 
@@ -7960,7 +8643,20 @@ void CO_ThrowBlock::update()
 	if(iNoOwnerKillTime > 0)
 		iNoOwnerKillTime--;
 
-	if(game_values.blueblockttl > 0 && ++iDeathTime >= game_values.blueblockttl)
+	if(frozen)
+	{
+		if(--frozentimer <= 0)
+		{
+			frozentimer = 0;
+			frozen = false;
+			
+			velx = frozenvelocity;
+			animationspeed = frozenanimationspeed;
+		
+			eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix - collisionOffsetX, iy - collisionOffsetY, 3, 8));
+		}
+	}
+	else if(game_values.blueblockttl > 0 && ++iDeathTime >= game_values.blueblockttl)
 	{
 		eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix, iy, 3, 8));
 		dead = true;
@@ -8000,7 +8696,11 @@ void CO_ThrowBlock::draw()
 	else
 		spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, iType << 5, iw, ih);
 
-	if(fSmoking)
+	if(frozen)
+	{
+		spr_iceblock.draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, 0, 32, 32);
+	}
+	else if(fSmoking)
 	{
 		eyecandy[0].add(new EC_SingleAnimation(&spr_burnup, ix - collisionOffsetX + (iw >> 1) - 16, iy - collisionOffsetY + (ih >> 1) - 16, 5, 3));
 	}
@@ -8069,11 +8769,40 @@ void CO_ThrowBlock::CheckAndDie()
 
 void CO_ThrowBlock::Die()
 {
+	if(frozen)
+	{
+		ShatterDie();
+		return;
+	}
+
+	if(dead)
+		return;
+
 	eyecandy[2].add(new EC_FallingObject(&spr_brokenblueblock, ix, iy, -1.5f, -7.0f, 6, 2, 0, iType << 4, 16, 16));
 	eyecandy[2].add(new EC_FallingObject(&spr_brokenblueblock, ix + 16, iy, 1.5f, -7.0f, 6, 2, 0, iType << 4, 16, 16));
 	eyecandy[2].add(new EC_FallingObject(&spr_brokenblueblock, ix, iy + 16, -1.5f, -4.0f, 6, 2, 0, iType << 4, 16, 16));
 	eyecandy[2].add(new EC_FallingObject(&spr_brokenblueblock, ix + 16, iy + 16, 1.5f, -4.0f, 6, 2, 0, iType << 4, 16, 16));
-	
+
+	DieHelper();
+}
+
+void CO_ThrowBlock::ShatterDie()
+{
+	if(dead)
+		return;
+
+	eyecandy[2].add(new EC_FallingObject(&spr_brokeniceblock, ix, iy, -1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
+	eyecandy[2].add(new EC_FallingObject(&spr_brokeniceblock, ix + 16, iy, 1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
+	eyecandy[2].add(new EC_FallingObject(&spr_brokeniceblock, ix, iy + 16, -1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
+	eyecandy[2].add(new EC_FallingObject(&spr_brokeniceblock, ix + 16, iy + 16, 1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
+
+	game_values.unlocksecret2part2++;
+
+	DieHelper();
+}
+
+void CO_ThrowBlock::DieHelper()
+{
 	dead = true;
 	ifsoundonplay(sfx_breakblock);
 
@@ -8084,7 +8813,7 @@ void CO_ThrowBlock::Die()
 	}
 }
 
-void CO_ThrowBlock::SideBounce()
+void CO_ThrowBlock::SideBounce(bool fRightSide)
 {
 	if(fDieOnBounce)
 	{
@@ -8103,6 +8832,293 @@ void CO_ThrowBlock::SideBounce()
 }
 
 //------------------------------------------------------------------------------
+// class throwable box - can be used as a shield, thrown at a player, or holds items
+//------------------------------------------------------------------------------
+CO_ThrowBox::CO_ThrowBox(gfxSprite * nspr, short x, short y, short item) :
+	MO_CarriedObject(nspr, x, y, 4, 8, 30, 30, 1, 1)
+{
+	state = 1;
+	ih = 32;
+	iw = 32;
+
+	movingObjectType = movingobject_throwbox;
+
+	iPlayerID = -1;
+	iTeamID = -1;
+	
+	iItem = item;
+
+	iOwnerRightOffset = 14;
+	iOwnerLeftOffset = -22;
+	iOwnerUpOffset = 32;
+
+	frozen = false;
+	frozentimer = 0;
+	frozenanimationspeed = 8;
+}
+
+bool CO_ThrowBox::collide(CPlayer * player)
+{
+	//Kill the player if it is moving
+
+	if(frozen)
+	{
+		ShatterDie();
+		return false;
+	}
+
+	if(HasKillVelocity())
+	{
+		short flipx = 0;
+
+		if(player->ix + PW < 320 && ix > 320)
+			flipx = 640;
+		else if(ix + iw < 320 && player->ix > 320)
+			flipx = -640;
+
+		if(player->globalID != iPlayerID)
+		{
+			return KillPlayer(player);
+		}
+	}
+	/*
+	//Kill player when another player is holding the box
+	else
+	{
+		if(owner && player != owner && (game_values.teamcollision == 2 || player->teamID != owner->teamID))
+		{
+			iPlayerID = owner->globalID;
+			iTeamID = owner->teamID;
+			return KillPlayer(player);
+		}
+	}*/
+
+	//Otherwise allow them to pick this box up
+	if(owner == NULL && player->isready())
+	{
+		if(player->AcceptItem(this))
+		{
+			owner = player;
+		}
+	}
+
+	return false;
+}
+
+
+bool CO_ThrowBox::KillPlayer(CPlayer * player)
+{
+	if(player->invincible || player->shyguy)
+	{
+		Die();
+		return false;
+	}
+
+	if(player->shield > 0)
+		return false;
+
+	Die();
+
+	//Find the player that shot this shell so we can attribute a kill
+	PlayerKilledPlayer(iPlayerID, player, death_style_jump, kill_style_throwblock, false, false);
+	return true;
+}
+
+void CO_ThrowBox::collide(IO_MovingObject * object)
+{
+	if(object->GetDead())
+		return;
+
+	removeifprojectile(object, false, false);
+
+	MovingObjectType type = object->getMovingObjectType();
+
+	if(type == movingobject_throwbox)
+	{
+		CO_ThrowBox * box = (CO_ThrowBox*)object;
+		if(frozen || box->frozen || HasKillVelocity() || box->HasKillVelocity())
+		{
+			Die();
+			box->Die();
+		}
+	}
+	else if(type == movingobject_explosion || type == movingobject_fireball || type == movingobject_hammer || type == movingobject_boomerang || type == movingobject_superfireball || type == movingobject_sledgehammer)
+	{
+		Die();
+	}
+	else if(type == movingobject_iceblast)
+	{
+		velx = 0.0f;
+		animationspeed = 0;
+
+		frozen = true;
+		frozentimer = 300;
+		
+		eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix - collisionOffsetX, iy - collisionOffsetY, 3, 8));
+	}
+}
+
+void CO_ThrowBox::update()
+{	
+	if(frozen)
+	{
+		if(--frozentimer <= 0)
+		{
+			frozentimer = 0;
+			frozen = false;
+			
+			animationspeed = frozenanimationspeed;
+		
+			eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix - collisionOffsetX, iy - collisionOffsetY, 3, 8));
+		}
+	}
+	
+	fOldX = fx;
+	fOldY = fy;
+
+	if(owner)
+	{
+		MoveToOwner();
+		inair = true;
+	}
+	else
+	{
+		applyfriction();
+		collision_detection_map();
+	}
+
+	animate();
+}
+
+void CO_ThrowBox::draw()
+{
+	if(owner && owner->iswarping())
+		spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, 0, iw, ih, (short)owner->state % 4, owner->GetWarpPlane());
+	else
+		spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, 0, iw, ih);
+
+	if(frozen)
+	{
+		spr_iceblock.draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, 0, 32, 32);
+	}
+}
+
+void CO_ThrowBox::Drop()
+{
+	if(owner)
+	{
+		iPlayerID = owner->globalID;
+		iTeamID = owner->teamID;
+	}
+
+	if(collision_detection_checksides())
+		Die();
+	else
+		MO_CarriedObject::Drop();
+}
+
+void CO_ThrowBox::Kick()
+{
+	if(owner)
+	{
+		iPlayerID = owner->globalID;
+		iTeamID = owner->teamID;
+	}
+
+	if(collision_detection_checksides())
+		Die();
+	else
+		MO_CarriedObject::Kick();
+}
+
+void CO_ThrowBox::Die()
+{
+	if(frozen)
+	{
+		ShatterDie();
+		return;
+	}
+
+	if(dead)
+		return;
+
+	eyecandy[2].add(new EC_FallingObject(&spr_brokenyellowblock, ix, iy, -2.2f, -10.0f, 4, 2, 0, 0, 16, 16));
+	eyecandy[2].add(new EC_FallingObject(&spr_brokenyellowblock, ix + 16, iy, 2.2f, -10.0f, 4, 2, 0, 0, 16, 16));
+	eyecandy[2].add(new EC_FallingObject(&spr_brokenyellowblock, ix, iy + 16, -2.2f, -5.5f, 4, 2, 0, 0, 16, 16));
+	eyecandy[2].add(new EC_FallingObject(&spr_brokenyellowblock, ix + 16, iy + 16, 2.2f, -5.5f, 4, 2, 0, 0, 16, 16));
+
+	DieHelper();
+}
+
+void CO_ThrowBox::ShatterDie()
+{
+	if(dead)
+		return;
+
+	eyecandy[2].add(new EC_FallingObject(&spr_brokeniceblock, ix, iy, -1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
+	eyecandy[2].add(new EC_FallingObject(&spr_brokeniceblock, ix + 16, iy, 1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
+	eyecandy[2].add(new EC_FallingObject(&spr_brokeniceblock, ix, iy + 16, -1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
+	eyecandy[2].add(new EC_FallingObject(&spr_brokeniceblock, ix + 16, iy + 16, 1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
+
+	game_values.unlocksecret2part2++;
+
+	DieHelper();
+}
+
+void CO_ThrowBox::DieHelper()
+{
+	dead = true;
+	ifsoundonplay(sfx_breakblock);
+
+	if(owner)
+	{
+		owner->carriedItem = NULL;
+		owner = NULL;
+	}
+
+	//Check to see if we should spawn an item here
+	if(iItem != NO_POWERUP)
+	{
+		createpowerup(iItem, ix, iy, velx < 0.0f, false);
+	}
+}
+
+void CO_ThrowBox::SideBounce(bool fRightSide)
+{
+	if(dead)
+		return;
+
+	if(HasKillVelocity())
+	{
+		if(frozen)
+			ShatterDie();
+		else
+			Die();
+	}
+}
+
+float CO_ThrowBox::BottomBounce()
+{
+	if(dead)
+		return bounce;
+
+	if(HasKillVelocity())
+	{
+		if(frozen)
+			ShatterDie();
+		else
+			Die();
+	}
+	
+	return bounce;
+}
+
+bool CO_ThrowBox::HasKillVelocity()
+{
+	return velx < -0.01f || velx > 0.01f || vely < -0.01f || vely > 2.0f;
+}
+
+//------------------------------------------------------------------------------
 // class spring
 //------------------------------------------------------------------------------
 CO_Spring::CO_Spring(gfxSprite *nspr, short ix, short iy, bool fsuper) :
@@ -8112,7 +9128,6 @@ CO_Spring::CO_Spring(gfxSprite *nspr, short ix, short iy, bool fsuper) :
 	iOffsetY = fSuper ? 32 : 0;
 
 	state = 1;
-	bounce = GRAVITATION;
 	movingObjectType = movingobject_carried;
 
 	iOwnerRightOffset = 14;
@@ -8335,18 +9350,33 @@ void MO_AttackZone::collide(IO_MovingObject * object)
 
 	MovingObjectType type = object->getMovingObjectType();
 
-	if(type == movingobject_shell || type == movingobject_throwblock)
+	if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_throwbox)
 	{
 		if(type == movingobject_shell)
 		{
-			object->Die();
+			CO_Shell * shell = (CO_Shell*)object;
+			if(shell->frozen)
+				shell->ShatterDie();
+			else
+				shell->Die();
 		}
 		else if(type == movingobject_throwblock)
 		{
 			CO_ThrowBlock * block = (CO_ThrowBlock*) object;
 
-			if(!block->owner || block->owner->globalID != iPlayerID)
+			if(block->frozen)
+				block->ShatterDie();
+			else if(!block->owner || block->owner->globalID != iPlayerID)
 				block->Die();
+		}
+		else if(type == movingobject_throwbox)
+		{
+			CO_ThrowBox * box = (CO_ThrowBox*) object;
+
+			if(box->frozen)
+				box->ShatterDie();
+			else if(!box->owner || box->owner->globalID != iPlayerID)
+				box->Die();
 		}
 
 		ifsoundonplay(sfx_kicksound);
@@ -8480,21 +9510,50 @@ void MO_SpinAttack::collide(IO_MovingObject * object)
 
 	MovingObjectType type = object->getMovingObjectType();
 
-	if(type == movingobject_shell || type == movingobject_throwblock)
+	if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_throwbox)
 	{
 		if(type == movingobject_shell)
 		{
-			((CO_Shell*)object)->Flip();
-			ifsoundonplay(sfx_kicksound);
+			CO_Shell * shell = (CO_Shell*)object;
+			
+			if(shell->frozen)
+			{
+				shell->ShatterDie();
+			}
+			else
+			{
+				shell->Flip();
+				ifsoundonplay(sfx_kicksound);
+			}
+			
 			Die();
 		}
 		else if(type == movingobject_throwblock)
 		{
 			CO_ThrowBlock * block = (CO_ThrowBlock*) object;
 
-			if(!block->owner || block->owner->globalID != iPlayerID)
+			if(block->frozen)
+			{
+				block->ShatterDie();
+			}
+			else if(!block->owner || block->owner->globalID != iPlayerID)
 			{
 				block->Die();
+				ifsoundonplay(sfx_kicksound);
+				Die();
+			}
+		}
+		else if(type == movingobject_throwbox)
+		{
+			CO_ThrowBox * box = (CO_ThrowBox*) object;
+
+			if(box->frozen)
+			{
+				box->ShatterDie();
+			}
+			else if(!box->owner || box->owner->globalID != iPlayerID)
+			{
+				box->Die();
 				ifsoundonplay(sfx_kicksound);
 				Die();
 			}
@@ -8852,7 +9911,6 @@ CO_PhantoKey::CO_PhantoKey(gfxSprite *nspr) :
 	MO_CarriedObject(nspr, 0, 0, 1, 0, 30, 30, 1, 1, 0, 0, 32, 32)
 {
 	state = 1;
-	bounce = GRAVITATION;
 	movingObjectType = movingobject_phantokey;
 
 	iOwnerRightOffset = 12;

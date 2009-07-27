@@ -136,7 +136,7 @@ class EC_Leaf : public EC_OscillatingAnimation
 class EC_Snow : public EC_StillImage
 {
 	public:
-		EC_Snow(gfxSprite *nspr, float nx, float ny);
+		EC_Snow(gfxSprite *nspr, float nx, float ny, short type);
 		~EC_Snow() {}
 
 		void update();

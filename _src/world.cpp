@@ -7,14 +7,14 @@
 #endif
 
 extern void ResetTourStops();
-extern TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld);
+extern TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld);
 extern void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld);
 extern WorldMap g_worldmap;
 extern bool LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDirections);
 
 extern std::string stripPathAndExtension(const std::string &path);
 
-extern short g_iVersion[];
+extern int g_iVersion[];
 using std::queue;
 using std::map;
 
@@ -431,7 +431,7 @@ bool WorldMap::Load(short tilesize)
 
 	char buffer[1024];
 	short iReadType = 0;
-	short iVersion[4] = {0, 0, 0, 0};
+	int iVersion[4] = {0, 0, 0, 0};
 	short iMapTileReadRow = 0;
 	short iCurrentStage = 0;
 	short iCurrentWarp = 0;

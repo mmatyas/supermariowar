@@ -142,6 +142,8 @@ class MovingPlatform
 
 		bool IsInNoSpawnZone(short x, short y, short w, short h);
 
+		void SetPlayerId(short playerId) {iPlayerId = playerId;}
+
 	protected:
 
 		void check_map_collision_right(CPlayer * player);
@@ -181,6 +183,8 @@ class MovingPlatform
 		MovingPlatformPath * pPath;
 
 		float fVelX, fVelY;
+
+		short iPlayerId;
 
 	friend class FallingPath;
 	friend class StraightPathContinuous;

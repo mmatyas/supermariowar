@@ -24,7 +24,7 @@ using std::cout;
 using std::endl;
 using std::string;
 
-extern short g_iVersion[];
+extern int g_iVersion[];
 
 char * lowercase(char * name)
 {
@@ -62,8 +62,10 @@ extern const char * g_szMusicCategoryNames[MAXMUSICCATEGORY];
 extern short g_iDefaultMusicCategory[MAXMUSICCATEGORY];
 
 ///////////// MapList ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-MapList::MapList()
+MapList::MapList(bool fWorldEditor)
 {
+	strcpy(szUnknownMapString, "-");
+
 	DirectoryListing d(convertPath("maps/"), ".map");
 	std::string curname;
 
@@ -89,27 +91,37 @@ MapList::MapList()
 	}
 #endif
 
-//If this is for the world editor, load all the world maps into the map viewer UI control
-#ifdef WORLDEDITOR
-	SimpleDirectoryList worldeditormapdirs(convertPath("worlds/"));
-
-	short iEditorDirCount = worldeditormapdirs.GetCount();
-	for(short iDir = 0; iDir < iEditorDirCount; iDir++)
+	//If this is for the world editor, load all the world maps into the map viewer UI control
+	if(fWorldEditor)
 	{
-		const char * szName = worldeditormapdirs.current_name();
-		
-		DirectoryListing worldMapDir(convertPath(std::string(szName) + std::string("/")), ".map");
+		SimpleDirectoryList worldeditormapdirs(convertPath("worlds/"));
 
-		while(worldMapDir(curname))
+		short iEditorDirCount = worldeditormapdirs.GetCount();
+		for(short iDir = 0; iDir < iEditorDirCount; iDir++)
 		{
-			MapListNode * node = new MapListNode(worldMapDir.fullName(curname));
+			const char * szName = worldeditormapdirs.current_name();
+			
+			DirectoryListing worldMapDir(convertPath(std::string(szName) + std::string("/")), ".map");
+
+			while(worldMapDir(curname))
+			{
+				MapListNode * node = new MapListNode(worldMapDir.fullName(curname));
+				maps[stripCreatorAndDotMap(curname)] = node;
+			}
+			
+			worldeditormapdirs.next();
+		}
+
+#ifndef _DEBUG
+		DirectoryListing specialEditorMapDir(convertPath("maps/special/"), ".map");
+		while(specialEditorMapDir(curname))
+		{
+			MapListNode * node = new MapListNode(specialEditorMapDir.fullName(curname));
 			maps[stripCreatorAndDotMap(curname)] = node;
 		}
-		
-		worldeditormapdirs.next();
-	}
-#endif //WORLDEDITOR
+#endif
 
+	}
 
 	//TODO: add proper test via size
 	if(maps.empty())
@@ -162,6 +174,13 @@ MapList::MapList()
 		}
 		
 		worldmapdirs.next();
+	}
+
+	DirectoryListing specialMapDir(convertPath("maps/special/"), ".map");
+	while(specialMapDir(curname))
+	{
+		MapListNode * node = new MapListNode(specialMapDir.fullName(curname));
+		worldmaps[stripCreatorAndDotMap(curname)] = node;
 	}
 }
 
@@ -740,4 +759,9 @@ std::map<std::string, MapListNode*>::iterator MapList::GetIteratorAt(unsigned sh
 
 		return mlnMaps[iIndex];
 	}
+}
+
+const char * MapList::GetUnknownMapName()
+{
+	return szUnknownMapString;
 }

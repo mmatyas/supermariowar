@@ -240,8 +240,8 @@ void EC_Leaf::NextLeaf()
 //------------------------------------------------------------------------------
 // class snow
 //------------------------------------------------------------------------------
-EC_Snow::EC_Snow(gfxSprite *nspr, float nx, float ny) :
-	EC_StillImage(nspr, (short)nx, (short)ny, (rand() % 2) << 4, 0, 16, 16)
+EC_Snow::EC_Snow(gfxSprite *nspr, float nx, float ny, short type) :
+	EC_StillImage(nspr, (short)nx, (short)ny, (rand() % 2) << 4, type << 4, 16, 16)
 {
 	dx = nx;
 	dy = ny;

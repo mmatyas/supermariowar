@@ -162,6 +162,8 @@ IO_MovingObject::IO_MovingObject(gfxSprite *nspr, short x, short y, short iNumSp
 
 	fObjectDiesOnSuperDeathTiles = true;
 	fObjectCollidesWithMap = true;
+
+	bounce = GRAVITATION;
 }
 
 
@@ -328,7 +330,7 @@ void IO_MovingObject::collision_detection_map()
 
 					processOtherBlock = false;
 
-					SideBounce();
+					SideBounce(true);
 				}
 				
 				if(processOtherBlock && fBottomBlockSolid) //then bottom
@@ -343,7 +345,7 @@ void IO_MovingObject::collision_detection_map()
 					flipsidesifneeded();
 					removeifprojectile(this, true, true);
 
-					SideBounce();
+					SideBounce(true);
 				}
 			}
 			else if((g_map.map(tx, ty) & tile_flag_solid) || (g_map.map(tx, ty2) & tile_flag_solid))
@@ -364,7 +366,7 @@ void IO_MovingObject::collision_detection_map()
 				flipsidesifneeded();
 				removeifprojectile(this, true, true);
 
-				SideBounce();
+				SideBounce(true);
 			}
 		}
 		else if(velx + fPlatformVelX < -0.01f || iHorizontalPlatformCollision == 1)
@@ -397,7 +399,7 @@ void IO_MovingObject::collision_detection_map()
 
 					processOtherBlock = false;
 
-					SideBounce();
+					SideBounce(false);
 				}
 				
 				if(processOtherBlock && fBottomBlockSolid) //then bottom
@@ -412,7 +414,7 @@ void IO_MovingObject::collision_detection_map()
 					flipsidesifneeded();
 					removeifprojectile(this, true, true);
 
-					SideBounce();
+					SideBounce(false);
 				}
 			}
 			else if((g_map.map(tx, ty) & tile_flag_solid) || (g_map.map(tx, ty2) & tile_flag_solid))
@@ -432,7 +434,7 @@ void IO_MovingObject::collision_detection_map()
 				flipsidesifneeded();
 				removeifprojectile(this, true, true);
 
-				SideBounce();
+				SideBounce(false);
 			}
 		}
 	}
@@ -620,20 +622,26 @@ bool IO_MovingObject::collision_detection_checksides()
 	//First figure out where the corners of this object are touching
 	Uint8 iCase = 0;
 
-	short txl = -1;
+	short txl = -1, nofliptxl = -1;
 	if(ix < 0)
-		txl = (ix + 640) / TILESIZE;
+	{
+		nofliptxl = (ix - TILESIZE) >> 5;
+		txl = (ix + 640) >> 5;
+	}
 	else
-		txl = ix / TILESIZE;
+	{
+		nofliptxl = ix >> 5;
+		txl = nofliptxl;
+	}
 
-	short txr = -1;
+	short txr = -1, nofliptxr = (ix + collisionWidth) >> 5;
 	if(ix + collisionWidth >= 640)
-		txr = (ix + collisionWidth - 640) / TILESIZE;
+		txr = (ix + collisionWidth - 640) >> 5;
 	else
-		txr = (ix + collisionWidth) / TILESIZE;
+		txr = nofliptxr;
 
-	short ty = iy / TILESIZE;
-	short ty2 = (iy + collisionHeight) / TILESIZE;
+	short ty = iy >> 5;
+	short ty2 = (iy + collisionHeight) >> 5;
 
 	if(iy >= 0)
 	{
@@ -702,9 +710,9 @@ bool IO_MovingObject::collision_detection_checksides()
 		//[ ][ ]
 		case 1:
 		{
-			if(ix + (collisionWidth >> 1) > txl * TILESIZE + TILESIZE)
+			if(ix + (collisionWidth >> 1) > nofliptxl * TILESIZE + TILESIZE)
 			{
-				xf((float)(txl * TILESIZE + TILESIZE) + 0.2f);
+				xf((float)(nofliptxl * TILESIZE + TILESIZE) + 0.2f);
 				flipsidesifneeded();
 			}
 			else
@@ -719,9 +727,9 @@ bool IO_MovingObject::collision_detection_checksides()
 		//[ ][ ]
 		case 2:
 		{
-			if(ix + (collisionWidth >> 1) < txr * TILESIZE)
+			if(ix + (collisionWidth >> 1) < nofliptxr * TILESIZE)
 			{
-				xf((float)(txr * TILESIZE - collisionWidth) - 0.2f);
+				xf((float)(nofliptxr * TILESIZE - collisionWidth) - 0.2f);
 				flipsidesifneeded();
 			}
 			else
@@ -744,9 +752,9 @@ bool IO_MovingObject::collision_detection_checksides()
 		//[X][ ]
 		case 4:
 		{
-			if(ix + (collisionWidth >> 1) > txl * TILESIZE + TILESIZE)
+			if(ix + (collisionWidth >> 1) > nofliptxl * TILESIZE + TILESIZE)
 			{
-				xf((float)(txl * TILESIZE + TILESIZE) + 0.2f);
+				xf((float)(nofliptxl * TILESIZE + TILESIZE) + 0.2f);
 				flipsidesifneeded();
 			}
 			else
@@ -761,7 +769,7 @@ bool IO_MovingObject::collision_detection_checksides()
 		//[X][ ]
 		case 5:
 		{
-			xf((float)(txl * TILESIZE + TILESIZE) + 0.2f);
+			xf((float)(nofliptxl * TILESIZE + TILESIZE) + 0.2f);
 			flipsidesifneeded();
 			break;
 		}
@@ -770,16 +778,16 @@ bool IO_MovingObject::collision_detection_checksides()
 		//[X][ ]
 		case 6:
 		{
-			if(ix + (collisionWidth >> 1) > txl * TILESIZE + TILESIZE)
+			if(ix + (collisionWidth >> 1) > nofliptxl * TILESIZE + TILESIZE)
 			{
 				yf((float)(ty * TILESIZE + TILESIZE) + 0.2f);
-				xf((float)(txl * TILESIZE + TILESIZE) + 0.2f);
+				xf((float)(nofliptxl * TILESIZE + TILESIZE) + 0.2f);
 				flipsidesifneeded();
 			}
 			else
 			{
 				yf((float)(ty2 * TILESIZE - collisionHeight) - 0.2f);
-				xf((float)(txr * TILESIZE - collisionWidth) - 0.2f);
+				xf((float)(nofliptxr * TILESIZE - collisionWidth) - 0.2f);
 				flipsidesifneeded();
 			}
 
@@ -791,7 +799,7 @@ bool IO_MovingObject::collision_detection_checksides()
 		case 7:
 		{
 			yf((float)(ty * TILESIZE + TILESIZE) + 0.2f);
-			xf((float)(txl * TILESIZE + TILESIZE) + 0.2f);
+			xf((float)(nofliptxl * TILESIZE + TILESIZE) + 0.2f);
 			flipsidesifneeded();
 			break;
 		}
@@ -800,9 +808,9 @@ bool IO_MovingObject::collision_detection_checksides()
 		//[ ][X]
 		case 8:
 		{
-			if(ix + (collisionWidth >> 1) < txr * TILESIZE)
+			if(ix + (collisionWidth >> 1) < nofliptxr * TILESIZE)
 			{
-				xf((float)(txr * TILESIZE - collisionWidth) - 0.2f);
+				xf((float)(nofliptxr * TILESIZE - collisionWidth) - 0.2f);
 				flipsidesifneeded();
 			}
 			else
@@ -817,16 +825,16 @@ bool IO_MovingObject::collision_detection_checksides()
 		//[ ][X]
 		case 9:
 		{
-			if(ix + (collisionWidth >> 1) > txl * TILESIZE + TILESIZE)
+			if(ix + (collisionWidth >> 1) > nofliptxl * TILESIZE + TILESIZE)
 			{
 				yf((float)(ty2 * TILESIZE - collisionHeight) - 0.2f);
-				xf((float)(txl * TILESIZE + TILESIZE) + 0.2f);
+				xf((float)(nofliptxl * TILESIZE + TILESIZE) + 0.2f);
 				flipsidesifneeded();
 			}
 			else
 			{
 				yf((float)(ty * TILESIZE + TILESIZE) + 0.2f);
-				xf((float)(txr * TILESIZE - collisionWidth) - 0.2f);
+				xf((float)(nofliptxr * TILESIZE - collisionWidth) - 0.2f);
 				flipsidesifneeded();
 			}
 
@@ -837,7 +845,7 @@ bool IO_MovingObject::collision_detection_checksides()
 		//[ ][X]
 		case 10:
 		{
-			xf((float)(txr * TILESIZE - collisionWidth) - 0.2f);
+			xf((float)(nofliptxr * TILESIZE - collisionWidth) - 0.2f);
 			flipsidesifneeded();
 			break;
 		}
@@ -847,7 +855,7 @@ bool IO_MovingObject::collision_detection_checksides()
 		case 11:
 		{
 			yf((float)(ty * TILESIZE + TILESIZE) + 0.2f);
-			xf((float)(txr * TILESIZE - collisionWidth) - 0.2f);
+			xf((float)(nofliptxr * TILESIZE - collisionWidth) - 0.2f);
 			flipsidesifneeded();
 			break;
 		}
@@ -865,7 +873,7 @@ bool IO_MovingObject::collision_detection_checksides()
 		case 13:
 		{
 			yf((float)(ty2 * TILESIZE - collisionHeight) - 0.2f);
-			xf((float)(txl * TILESIZE + TILESIZE) + 0.2f);
+			xf((float)(nofliptxl * TILESIZE + TILESIZE) + 0.2f);
 			flipsidesifneeded();
 			break;
 		}
@@ -875,7 +883,7 @@ bool IO_MovingObject::collision_detection_checksides()
 		case 14:
 		{
 			yf((float)(ty2 * TILESIZE - collisionHeight) - 0.2f);
-			xf((float)(txr * TILESIZE - collisionWidth) - 0.2f);
+			xf((float)(nofliptxr * TILESIZE - collisionWidth) - 0.2f);
 			flipsidesifneeded();
 			break;
 		}
@@ -927,6 +935,13 @@ void IO_MovingObject::KillObjectMapHazard(short playerID)
 {
 	if(!dead)
 	{
+		//If it is a throw box, trigger it's behavior and return
+		if(movingObjectType == movingobject_throwbox)
+		{
+			((CO_ThrowBox*)this)->Die();
+			return;
+		}
+
 		dead = true;
 		eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix + (iw >> 1) - 16, iy + (ih >> 1) - 16, 3, 4));
 
@@ -966,6 +981,12 @@ void IO_MovingObject::KillObjectMapHazard(short playerID)
 		{
 			dead = false;
 			((CO_PhantoKey*)this)->placeKey();
+			ifsoundonplay(sfx_transform);
+		}
+		else if(game_mode_boxes_minigame == game_values.gamemode->gamemode && movingObjectType == movingobject_coin)
+		{
+			dead = false;
+			((MO_Coin*)this)->placeCoin();
 			ifsoundonplay(sfx_transform);
 		}
 		else if(game_values.gamemode->gamemode == game_mode_stomp && (movingObjectType == movingobject_goomba || movingObjectType == movingobject_koopa || movingObjectType == movingobject_spiny || movingObjectType == movingobject_buzzybeetle || movingObjectType == movingobject_cheepcheep))

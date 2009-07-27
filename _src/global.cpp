@@ -8,7 +8,62 @@ extern bool g_fLoadMessages;
 //1.8.0.1 == Second release to staff
 //1.8.0.2 == beta1
 //1.8.0.3 == beta2
-short g_iVersion[] = {1, 8, 0, 3};
+int g_iVersion[] = {1, 8, 0, 3};
+
+bool VersionIsEqual(int iVersion[], short iMajor, short iMinor, short iMicro, short iBuild)
+{
+	return iVersion[0] == iMajor && iVersion[1] == iMinor && iVersion[2] == iMicro && iVersion[3] == iBuild;
+}
+
+bool VersionIsEqualOrBefore(int iVersion[], short iMajor, short iMinor, short iMicro, short iBuild)
+{
+	if(iVersion[0] < iMajor)
+		return true;
+	
+	if(iVersion[0] == iMajor)
+	{
+		if(iVersion[1] < iMinor)
+			return true;
+		
+		if(iVersion[1] == iMinor)
+		{
+			if(iVersion[2] < iMicro)
+				return true;
+			
+			if(iVersion[2] == iMicro)
+			{
+				return iVersion[3] <= iBuild;
+			}
+		}
+	}
+
+	return false;
+}
+
+bool VersionIsEqualOrAfter(int iVersion[], short iMajor, short iMinor, short iMicro, short iBuild)
+{
+	if(iVersion[0] > iMajor)
+		return true;
+	
+	if(iVersion[0] == iMajor)
+	{
+		if(iVersion[1] > iMinor)
+			return true;
+		
+		if(iVersion[1] == iMinor)
+		{
+			if(iVersion[2] > iMicro)
+				return true;
+			
+			if(iVersion[2] == iMicro)
+			{
+				return iVersion[3] >= iBuild;
+			}
+		}
+	}
+
+	return false;
+}
 
 //We're using these strings intead of the ugly ones returned by SDL_GetKeyName()
 const char * Keynames[340] = {"Unknown", "", "", "", "", "", "", "", "Backspace", "Tab", 
@@ -427,7 +482,7 @@ short ReadTourStopSetting(short * iSetting, bool * fSetting, short iDefault, boo
 	return 0;
 }
 
-TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
+TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld)
 {
 	TourStop * ts = new TourStop();
 	ts->fUseSettings = false;
@@ -455,16 +510,9 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 
 	if(iStageType == 0)
 	{
-		//Using the maplist to cheat and find a map for us
-		maplist.SaveCurrent();
+		char * szMap = new char[strlen(pszTemp) + 1];
+		strcpy(szMap, pszTemp);
 
-		//If that map is not found
-		if(!maplist.findexact(pszTemp, true))
-			maplist.random(false);
-		
-		ts->pszMapFile = maplist.currentShortmapname();
-		maplist.ResumeCurrent();
-		
 		pszTemp = strtok(NULL, ",\n");
 
 		if(pszTemp)
@@ -472,15 +520,54 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 		else
 			ts->iMode = -1;
 
+		//If this is 1.8.0.2 or earlier and we are playing a minigame, use the default map
+		if(VersionIsEqualOrBefore(iVersion, 1, 8, 0, 2) &&
+			(ts->iMode == game_mode_pipe_minigame || ts->iMode == game_mode_boss_minigame || ts->iMode == game_mode_boxes_minigame))
+		{
+			//Get a bogus map name so the mode will know to load the default map
+			ts->pszMapFile = maplist.GetUnknownMapName();
+		}
+		else
+		{
+			//Using the maplist to cheat and find a map for us
+			maplist.SaveCurrent();
+
+			//If that map is not found
+			bool fMapFound = maplist.findexact(szMap, true);
+
+			if(!fMapFound)
+			{
+				if(ts->iMode == game_mode_pipe_minigame || ts->iMode == game_mode_boss_minigame || ts->iMode == game_mode_boxes_minigame)
+				{
+					//Get a bogus map name so the mode will know to load the default map
+					ts->pszMapFile = maplist.GetUnknownMapName();
+				}
+				else
+				{
+					maplist.random(false);
+					ts->pszMapFile = maplist.currentShortmapname();
+				}
+			}
+			else
+			{
+				ts->pszMapFile = maplist.currentShortmapname();
+			}
+				
+			maplist.ResumeCurrent();
+		}
+
+		delete [] szMap;
+
 		//The pipe minigame was using the value 24 from version 1.8.0.0 to 1.8.0.2
 		//It was later switched to 1000 to accomodate new modes easily
-		if(iVersion[0] == 1 && iVersion[1] == 8 && iVersion[2] == 0 && iVersion[3] <= 2)
+		if(VersionIsEqualOrBefore(iVersion, 1, 8, 0, 2))
 		{
 			if(ts->iMode == 24)
 				ts->iMode = game_mode_pipe_minigame;
 		}
 
-		if(ts->iMode < 0 || (ts->iMode >= GAMEMODE_LAST && ts->iMode != game_mode_pipe_minigame && ts->iMode != game_mode_boss_minigame))
+		//If a valid mode was not detected, then just choose a random mode
+		if(ts->iMode < 0 || (ts->iMode >= GAMEMODE_LAST && ts->iMode != game_mode_pipe_minigame && ts->iMode != game_mode_boss_minigame && ts->iMode != game_mode_boxes_minigame))
 			ts->iMode = rand() % GAMEMODE_LAST;
 
 		pszTemp = strtok(NULL, ",\n");
@@ -503,7 +590,7 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 				ts->iGoal = 50;
 		}
 
-		if(iVersion[0] == 1 && ((iVersion[1] == 7 && iVersion[2] == 0 && iVersion[3] > 1) || iVersion[1] > 7))
+		if(VersionIsEqualOrAfter(iVersion, 1, 7, 0, 2))
 		{
 			pszTemp = strtok(NULL, ",\n");
 
@@ -587,7 +674,7 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 			sprintf(ts->szName, "Tour Stop %d", game_values.tourstoptotal + 1);
 		}
 
-		if(iVersion[0] == 1 && iVersion[1] >= 8)
+		if(VersionIsEqualOrAfter(iVersion, 1, 8, 0, 0))
 		{
 			if(fIsWorld)
 			{
@@ -637,6 +724,7 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 
 				ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.coins.penalty, 0, game_values.gamemodemenusettings.coins.penalty);
 				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.coins.quantity, NULL, game_values.gamemodemenusettings.coins.quantity, false);
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.coins.percentextracoin, NULL, game_values.gamemodemenusettings.coins.percentextracoin, false);
 			}
 			else if(ts->iMode == 5) //stomp
 			{
@@ -746,6 +834,7 @@ TourStop * ParseTourStopLine(char * buffer, short iVersion[4], bool fIsWorld)
 				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.greed.coinlife, NULL, game_values.gamemodemenusettings.greed.coinlife, false);
 				ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.greed.owncoins, 0, game_values.gamemodemenusettings.greed.owncoins);
 				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.greed.multiplier, NULL, game_values.gamemodemenusettings.greed.multiplier, false);
+				ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.greed.percentextracoin, NULL, game_values.gamemodemenusettings.greed.percentextracoin, false);
 			}
 			else if(ts->iMode == 18) //health
 			{
@@ -1010,6 +1099,12 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
 				if(ts->iNumUsedSettings > 1)
 				{
 					sprintf(szTemp, ",%d", ts->gmsSettings.coins.quantity);
+					strcat(buffer, szTemp);
+				}
+
+				if(ts->iNumUsedSettings > 2)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.coins.percentextracoin);
 					strcat(buffer, szTemp);
 				}
 			}
@@ -1285,6 +1380,12 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
 					sprintf(szTemp, ",%d", ts->gmsSettings.greed.multiplier);
 					strcat(buffer, szTemp);
 				}
+
+				if(ts->iNumUsedSettings > 3)
+				{
+					sprintf(szTemp, ",%d", ts->gmsSettings.greed.percentextracoin);
+					strcat(buffer, szTemp);
+				}
 			}
 			else if(ts->iMode == 18) //health
 			{
@@ -1448,40 +1549,41 @@ void LoadCurrentMapBackground()
 //TODO  - Review what is colliding with what and remove duplicates (i.e. shell vs. throwblock and throwblock vs. shell should only detect one way)
 short g_iCollisionMap[MOVINGOBJECT_LAST][MOVINGOBJECT_LAST] = 
 {
-//   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_none = 0
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_powerup = 1
-	{0,0,0,1,1,0,0,1,1,0,0,0,1,1,0,0,0,0,0,0,0,1,0,1,1,0,0,0,0,0,0,0,0}, //movingobject_fireball = 2
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_goomba = 3
-	{0,0,0,1,1,0,0,0,0,0,0,0,1,1,0,0,0,0,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0}, //movingobject_bulletbill = 4
-	{0,0,0,1,1,0,0,1,1,0,0,0,1,1,0,0,0,0,0,0,0,1,0,1,1,0,0,0,0,0,0,0,0}, //movingobject_hammer = 5 
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_poisonpowerup = 6
-	{0,0,0,1,1,0,0,1,0,0,0,0,1,1,0,0,0,0,1,0,1,1,0,1,1,0,0,0,0,0,1,0,0}, //movingobject_shell = 7
-	{0,0,0,1,1,0,0,1,1,0,0,0,1,1,0,0,0,0,1,0,1,1,0,1,1,0,0,0,0,0,1,0,0}, //movingobject_throwblock = 8
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0}, //movingobject_egg = 9
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_star = 10
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0}, //movingobject_flag = 11
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_cheepcheep = 12
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_koopa = 13
-	{0,0,0,1,1,0,0,1,1,0,0,0,1,1,0,0,0,0,0,0,0,1,0,1,1,0,0,0,0,0,0,0,0}, //movingobject_boomerang = 14
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_carried = 15
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_iceblast = 16
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_bomb = 17
-	{0,0,0,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0}, //movingobject_podobo = 18
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_treasurechest = 19
-	{0,0,0,1,1,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,1,0,1,1,0,0,0,0,0,0,0,0}, //movingobject_attackzone = 20
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_pirhanaplant = 21
-	{0,0,0,1,1,0,0,1,1,0,0,0,1,1,0,0,0,0,0,0,0,1,0,1,1,0,0,0,0,0,1,0,0}, //movingobject_explosion = 22
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_buzzybeetle = 23
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_spiny = 24
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_phantokey = 25
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_flagbase = 26
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_yoshi = 27
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_coin = 28
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_collectioncard = 29
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_sledgebrother = 30
-	{0,0,0,1,1,0,0,1,1,0,0,0,1,1,0,0,0,0,0,0,0,1,0,1,1,0,0,0,0,0,0,0,0}, //movingobject_sledgehammer = 31
-	{0,0,0,1,1,0,0,1,1,0,0,0,1,1,0,0,0,0,0,0,0,1,0,1,1,0,0,0,0,0,0,0,0}, //movingobject_superfireball = 32
+//   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_none = 0
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_powerup = 1
+	{0,0,0,1,1,0,0,1,1,0,0,0,1,1,0,0,0,0,0,0,0,1,0,1,1,0,0,0,0,0,1,0,0,1}, //movingobject_fireball = 2
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_goomba = 3
+	{0,0,0,1,1,0,0,0,0,0,0,0,1,1,0,0,0,0,1,0,0,0,0,1,1,0,0,0,0,0,1,0,0,0}, //movingobject_bulletbill = 4
+	{0,0,0,1,1,0,0,1,1,0,0,0,1,1,0,0,0,0,0,0,0,1,0,1,1,0,0,0,0,0,1,0,0,1}, //movingobject_hammer = 5 
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_poisonpowerup = 6
+	{0,0,0,1,1,0,0,1,0,0,0,0,1,1,0,0,0,0,1,0,1,1,0,1,1,0,0,0,0,0,1,0,0,0}, //movingobject_shell = 7
+	{0,0,0,1,1,0,0,1,1,0,0,0,1,1,0,0,0,0,1,0,1,1,0,1,1,0,0,0,0,0,1,0,0,0}, //movingobject_throwblock = 8
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0}, //movingobject_egg = 9
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_star = 10
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0}, //movingobject_flag = 11
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_cheepcheep = 12
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_koopa = 13
+	{0,0,0,1,1,0,0,1,1,0,0,0,1,1,0,0,0,0,0,0,0,1,0,1,1,0,0,0,0,0,1,0,0,1}, //movingobject_boomerang = 14
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_carried = 15
+	{0,0,0,1,0,0,0,1,1,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1}, //movingobject_iceblast = 16
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_bomb = 17
+	{0,0,0,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0}, //movingobject_podobo = 18
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_treasurechest = 19
+	{0,0,0,1,1,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,1,0,1,1,0,0,0,0,0,1,0,0,0}, //movingobject_attackzone = 20
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_pirhanaplant = 21
+	{0,0,0,1,1,0,0,1,1,0,0,0,1,1,0,0,0,0,0,0,0,1,0,1,1,0,0,0,0,0,1,0,0,1}, //movingobject_explosion = 22
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_buzzybeetle = 23
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_spiny = 24
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_phantokey = 25
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_flagbase = 26
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_yoshi = 27
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_coin = 28
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_collectioncard = 29
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, //movingobject_sledgebrother = 30
+	{0,0,0,1,1,0,0,1,1,0,0,0,1,1,0,0,0,0,0,0,0,1,0,1,1,0,0,0,0,0,0,0,0,1}, //movingobject_sledgehammer = 31
+	{0,0,0,1,1,0,0,1,1,0,0,0,1,1,0,0,0,0,0,0,0,1,0,1,1,0,0,0,0,0,0,0,0,1}, //movingobject_superfireball = 32
+	{0,0,0,1,1,0,0,1,1,0,0,0,1,1,0,0,0,0,0,0,1,1,0,1,1,0,0,0,0,0,1,0,0,1}, //movingobject_throwbox = 33
 };
 
 short iPlatformPathDotSize[3] = {12, 6, 4};
@@ -1976,6 +2078,7 @@ void SetupDefaultGameModeSettings()
 	//Coins
 	game_values.gamemodemenusettings.coins.penalty = false;		//no penalty for getting stomped
 	game_values.gamemodemenusettings.coins.quantity = 1;		//only 1 coin on screen
+	game_values.gamemodemenusettings.coins.percentextracoin = 10;  //10% chance of an extra coin powerup
 
 	//Stomp
 	game_values.gamemodemenusettings.stomp.rate = 90; //Moderate
@@ -2066,6 +2169,7 @@ void SetupDefaultGameModeSettings()
 	game_values.gamemodemenusettings.greed.coinlife = 124;			//Coins disappear after 2 seconds
 	game_values.gamemodemenusettings.greed.owncoins = true;			//Can collect own coins
 	game_values.gamemodemenusettings.greed.multiplier = 2;			//Single multiplier
+	game_values.gamemodemenusettings.greed.percentextracoin = 10;  //10% chance of an extra coin powerup
 	
 	//Health
 	game_values.gamemodemenusettings.health.startlife = 6;			//Start with 3 whole hearts (each increment is a half heart)
@@ -2087,7 +2191,7 @@ void SetupDefaultGameModeSettings()
 	//Shyguy Tag
 	game_values.gamemodemenusettings.shyguytag.tagonsuicide = false; 
 	game_values.gamemodemenusettings.shyguytag.tagtransfer = 0;
-	game_values.gamemodemenusettings.shyguytag.freetime = 310;
+	game_values.gamemodemenusettings.shyguytag.freetime = 5;
 
 	//Boss Minigame
 	game_values.gamemodemenusettings.boss.bosstype = 0;			//Default to hammer boss
@@ -2095,3 +2199,90 @@ void SetupDefaultGameModeSettings()
 	game_values.gamemodemenusettings.boss.hitpoints = 5;		//5 hits to kill
 }
 
+extern IO_MovingObject * createpowerup(short iType, short ix, short iy, bool side, bool spawn);
+
+void CheckSecret(short id)
+{
+	if(id == 0 && !game_values.unlocksecretunlocked[0])
+	{
+		short iCountTeams = 0;
+		for(short iPlayer = 0; iPlayer < 4; iPlayer++)
+		{
+			if(game_values.unlocksecret1part1[iPlayer])
+				iCountTeams++;
+		}
+
+		if(iCountTeams >= 2 && game_values.unlocksecret1part2 >= 8)
+		{
+			game_values.unlocksecretunlocked[0] = true;
+			ifsoundonplay(sfx_transform);
+			
+			IO_MovingObject * object = createpowerup(SECRET1_POWERUP, rand() % 640, rand() % 480, true, false);
+			
+			if(object)
+				eyecandy[2].add(new EC_SingleAnimation(&spr_poof, object->ix - 8, object->iy - 8, 4, 5));
+		}
+	}
+	else if(!game_values.unlocksecretunlocked[1])
+	{
+		if(game_values.unlocksecret2part1 && game_values.unlocksecret2part2 >= 3)
+		{
+			game_values.unlocksecretunlocked[1] = true;
+			ifsoundonplay(sfx_transform);
+
+			IO_MovingObject * object = createpowerup(SECRET2_POWERUP, rand() % 640, rand() % 480, true, false);
+
+			if(object)
+				eyecandy[2].add(new EC_SingleAnimation(&spr_poof, object->ix - 8, object->iy - 8, 4, 5));
+		}
+	}
+	else if(!game_values.unlocksecretunlocked[2])
+	{
+		if(game_values.unlocksecret3part1 && game_values.unlocksecret3part2 >= 3)
+		{
+			game_values.unlocksecretunlocked[2] = true;
+			ifsoundonplay(sfx_transform);
+
+			IO_MovingObject * object = createpowerup(SECRET3_POWERUP, rand() % 640, rand() % 480, true, false);
+
+			if(object)
+				eyecandy[2].add(new EC_SingleAnimation(&spr_poof, object->ix - 8, object->iy - 8, 4, 5));
+		}
+	}
+	else if(!game_values.unlocksecretunlocked[3])
+	{
+		if(game_values.unlocksecret4part1 && game_values.unlocksecret4part2 >= 3)
+		{
+			game_values.unlocksecretunlocked[3] = true;
+			ifsoundonplay(sfx_transform);
+
+			IO_MovingObject * object = createpowerup(SECRET4_POWERUP, rand() % 640, rand() % 480, true, false);
+
+			if(object)
+				eyecandy[2].add(new EC_SingleAnimation(&spr_poof, object->ix - 8, object->iy - 8, 4, 5));
+		}
+	}
+}
+
+short iSpotlightValues[2][3] = { { 128, 64, 0 }, { 64, 32, 128 } };
+
+void AddSpotlight(short ix, short iy, short iSize)
+{
+	short iWidth = iSpotlightValues[iSize][0];
+	short iHalfWidth = iSpotlightValues[iSize][1];
+
+	SDL_Rect rSrc = {iSpotlightValues[iSize][2], 0, iWidth, iWidth};
+	SDL_Rect rDst = {ix - iHalfWidth, iy - iHalfWidth, iWidth, iWidth};
+	SDL_BlitSurface(spr_overlayhole.getSurface(), &rSrc, spr_overlay.getSurface(), &rDst);
+
+	if(ix - iHalfWidth < 0)
+	{
+		SDL_Rect rDstWrap = {ix - iHalfWidth + 640, iy - iHalfWidth, iWidth, iWidth};
+		SDL_BlitSurface(spr_overlayhole.getSurface(), &rSrc, spr_overlay.getSurface(), &rDstWrap);
+	}
+	else if(ix + iHalfWidth >= 640)
+	{
+		SDL_Rect rDstWrap = {ix - iHalfWidth - 640, iy - iHalfWidth, iWidth, iWidth};
+		SDL_BlitSurface(spr_overlayhole.getSurface(), &rSrc, spr_overlay.getSurface(), &rDstWrap);
+	}
+}

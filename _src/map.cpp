@@ -26,9 +26,13 @@ using std::endl;
 
 extern gfxSprite spr_frontmap[2];
 extern short g_iTileConversion[];
-extern short g_iVersion[];
+extern int g_iVersion[];
 extern const char * g_szBackgroundConversion[26];
 extern short g_iMusicCategoryConversion[26];
+
+extern bool VersionIsEqual(int iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
+extern bool VersionIsEqualOrBefore(int iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
+extern bool VersionIsEqualOrAfter(int iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
 
 //Converts the tile type into the flags that this tile carries (solid + ice + death, etc)
 short g_iTileTypeConversion[NUMTILETYPES] = {0, 1, 2, 5, 121, 9, 17, 33, 65, 6, 21, 37, 69, 3961, 265, 529, 1057, 2113, 4096};
@@ -212,7 +216,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 
 	ReadIntChunk(version, 4, mapfile);
 
-	if(version[0] == 1 && version[1] == 8)
+	if(VersionIsEqualOrAfter(version, 1, 8, 0, 0))
 	{
 		//Read summary information here
 		
@@ -355,7 +359,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 		}
 
 		//For all layers if the map format supports it
-		if(version[2] >= 1 || (version[2] == 0 && version[3] >= 2))
+		if(VersionIsEqualOrAfter(version, 1, 8, 0, 2))
 		{
 			eyecandy[0] = (short)ReadInt(mapfile);
 			eyecandy[1] = (short)ReadInt(mapfile);
@@ -526,13 +530,13 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 			flagbaselocations[j].y = (short)ReadInt(mapfile);
 		}
 	}
-	else if(version[0] == 1 && version[1] == 7)
+	else if(VersionIsEqualOrAfter(version, 1, 7, 0, 0))
 	{
 		iNumMapItems = 0;
 		iNumMapHazards = 0;
 
 		//Read summary information here
-		if((version[2] == 0 && version[3] > 1) || version[2] >= 1)
+		if(VersionIsEqualOrAfter(version, 1, 7, 0, 2))
 		{
 			int iAutoFilterValues[9];
 			ReadIntChunk(iAutoFilterValues, 9, mapfile);
@@ -611,13 +615,13 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 			}
 		}
 
-		if((version[2] == 0 && version[3] > 1) || version[2] >= 1)
+		if(VersionIsEqualOrAfter(version, 1, 7, 0, 2))
 		{
 			//Read in background to use
 			ReadString(szBackgroundFile, 128, mapfile);
 			//printf("Background: %s", szBackgroundFile);
 		}
-		else if(version[2] == 0 && version[3] == 1)
+		else if(VersionIsEqualOrAfter(version, 1, 7, 0, 1))
 		{
 			//Read in background to use
 			ReadString(szBackgroundFile, 128, mapfile);
@@ -642,7 +646,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 			strcpy(szBackgroundFile, g_szBackgroundConversion[backgroundID]);
 		}
 
-		if((version[2] == 0 && version[3] > 0) || version[2] >= 1)
+		if(VersionIsEqualOrAfter(version, 1, 7, 0, 1))
 		{
 			//Read on/off switches
 			for(short iSwitch = 0; iSwitch < 4; iSwitch++)
@@ -683,7 +687,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 			}
 		}
 
-		if((version[2] == 0 && version[3] > 1) || version[2] >= 1)
+		if(VersionIsEqualOrAfter(version, 1, 7, 0, 2))
 		{
 			//short translationid[1] = {g_tilesetmanager.GetIndexFromName("Classic")};
 			loadPlatforms(mapfile, iReadType == read_type_preview, version);
@@ -692,7 +696,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 		//Read in eyecandy to use
 		eyecandy[2] = (short)ReadInt(mapfile);
 
-		if((version[2] == 0 && version[3] > 0) || version[2] >= 1)
+		if(VersionIsEqualOrAfter(version, 1, 7, 0, 1))
 		{
 			musicCategoryID = ReadInt(mapfile);
 		}
@@ -831,13 +835,13 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 			drawareas[m].h = (Uint16)ReadInt(mapfile);
 		}
 
-		if(version[2] == 0 && version[3] < 2)
+		if(VersionIsEqualOrBefore(version, 1, 7, 0, 1))
 		{
 			//short translationid[1] = {g_tilesetmanager.GetIndexFromName("Classic")};
 			loadPlatforms(mapfile, iReadType == read_type_preview, version);
 		}
 
-		if(version[2] == 0 && version[3] == 0)
+		if(VersionIsEqual(version, 1, 7, 0, 0))
 		{
 			for(short iSwitch = 0; iSwitch < 4; iSwitch++)
 			{
@@ -857,7 +861,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 			}
 		}
 	}
-	else if(version[0] == 1 && version[1] == 6)
+	else if(VersionIsEqualOrAfter(version, 1, 6, 0, 0))
 	{
 		iNumMapItems = 0;
 		iNumMapHazards = 0;
@@ -943,7 +947,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 				warpdata[i][j].connection = (short)ReadInt(mapfile);
 				warpdata[i][j].id = (short)ReadInt(mapfile);
 
-				if(version[2] == 1)
+				if(VersionIsEqualOrAfter(version, 1, 6, 1, 0))
 				{
 					nospawn[0][i][j] = ReadInt(mapfile) == 0 ? false : true;
 
@@ -1015,7 +1019,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 			spawnareas[0][m].height = (short)ReadInt(mapfile);
 			spawnareas[0][m].size = (short)ReadInt(mapfile);
 		
-			if(version[2] == 0)
+			if(VersionIsEqualOrBefore(version, 1, 6, 0, 10))
 			{
 				spawnareas[0][m].width -= spawnareas[0][m].left;
 				spawnareas[0][m].height -= spawnareas[0][m].top;
@@ -1039,7 +1043,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 				spawnareas[i][m].height = spawnareas[0][m].height;
 				spawnareas[i][m].size = spawnareas[0][m].size;
 			
-				if(version[2] == 0)
+				if(VersionIsEqualOrBefore(version, 1, 6, 0, 10))
 				{
 					spawnareas[i][m].width -= spawnareas[i][m].left;
 					spawnareas[i][m].height -= spawnareas[i][m].top;
@@ -1047,7 +1051,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 			}
 		}
 
-		if(version[2] == 1)
+		if(VersionIsEqualOrAfter(version, 1, 6, 1, 0))
 		{
 			numdrawareas = (short)ReadInt(mapfile);
 
@@ -1285,7 +1289,7 @@ void CMap::loadPlatforms(FILE * mapfile, bool fPreview, int version[4], short * 
 			{
 				TilesetTile * tile = &tiles[iCol][iRow];
 
-				if(version[0] > 1 || (version[0] == 1 && version[1] >= 8))
+				if(VersionIsEqualOrAfter(version, 1, 8, 0, 0))
 				{
 					tile->iID = ReadByteAsShort(mapfile);
 					tile->iCol = ReadByteAsShort(mapfile);
@@ -1358,14 +1362,14 @@ void CMap::loadPlatforms(FILE * mapfile, bool fPreview, int version[4], short * 
 		}
 	
 		short iDrawLayer = 2;
-		if(version[0] > 1 || (version[0] == 1 && (version[1] > 8 || (version[1] == 8 && version[3] >= 1))))
+		if(VersionIsEqualOrAfter(version, 1, 8, 0, 1))
 			iDrawLayer = ReadInt(mapfile);
 
 		//printf("Layer: %d\n", iDrawLayer);
 
 		short iPathType = 0;
 		
-		if(version[0] > 1 || (version[0] == 1 && version[1] >= 8))
+		if(VersionIsEqualOrAfter(version, 1, 8, 0, 0))
 			iPathType = ReadInt(mapfile);
 
 		//printf("PathType: %d\n", iPathType);

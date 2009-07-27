@@ -229,6 +229,17 @@ struct STextAward
 #define NUM_BLOCK_SETTINGS NUM_POWERUPS
 #define NUM_POWERUP_PRESETS 17
 
+#define HEALTH_POWERUP -1
+#define TIME_POWERUP -2
+#define JAIL_KEY_POWERUP -3
+#define COIN_POWERUP -4
+#define MINIGAME_COIN -5
+#define SECRET1_POWERUP -6
+#define SECRET2_POWERUP -7
+#define SECRET3_POWERUP -8
+#define SECRET4_POWERUP -9
+#define NO_POWERUP -10
+
 void GetNameFromFileName(char * szName, const char * szFileName, bool fStripAuthor = false);
 std::string stripCreatorAndDotMap(const std::string &filename);
 
@@ -352,6 +363,7 @@ extern sfxSound			sfx_flamecannon;
 extern sfxSound			sfx_wand;
 extern sfxSound			sfx_enterstage;
 extern sfxSound			sfx_gameover;
+extern sfxSound			sfx_pickup;
 
 extern sfxMusic			backgroundmusic[6];
 
@@ -381,9 +393,15 @@ extern gfxSprite		spr_extraheartpowerup;
 extern gfxSprite		spr_extratimepowerup;
 extern gfxSprite		spr_jailkeypowerup;
 
+extern gfxSprite		spr_secret1;
+extern gfxSprite		spr_secret2;
+extern gfxSprite		spr_secret3;
+extern gfxSprite		spr_secret4;
+
 extern gfxSprite		spr_shade[3];
 extern gfxSprite		spr_scorehearts;
 extern gfxSprite		spr_scorecards;
+extern gfxSprite		spr_scorecoins;
 
 extern gfxSprite		spr_timershade;
 extern gfxSprite		spr_scoretext;
@@ -444,6 +462,7 @@ extern gfxSprite		spr_spring;
 extern gfxSprite		spr_spike;
 extern gfxSprite		spr_bomb;
 extern gfxSprite		spr_kuriboshoe;
+extern gfxSprite		spr_throwbox;
 
 extern gfxSprite		spr_sledgehammer;
 extern gfxSprite		spr_superfireball;
@@ -486,6 +505,9 @@ extern gfxSprite		spr_powerupselector;
 
 extern gfxSprite		spr_scoreboard;
 extern gfxSprite		spr_abovearrows;
+
+extern gfxSprite		spr_windmeter;
+extern gfxSprite		spr_overlayhole;
 
 #ifndef _SMW_EDITOR
 extern gfxFont			menu_font_small;
@@ -532,6 +554,7 @@ extern gfxSprite		spr_background;
 extern gfxSprite		spr_backmap[2];
 extern gfxSprite		spr_frontmap[2];
 extern gfxSprite		menu_backdrop;
+extern gfxSprite		spr_overlay;
 
 extern gfxSprite		menu_shade;
 extern gfxSprite		menu_smw;
@@ -599,6 +622,7 @@ extern CGameMode * gamemodes[GAMEMODE_LAST];
 extern CGM_Bonus * bonushousemode;
 extern CGM_Pipe_MiniGame * pipegamemode;
 extern CGM_Boss_MiniGame * bossgamemode;
+extern CGM_Boxes_MiniGame * boxesgamemode;
 extern short currentgamemode;
 
 extern float CapFallingVelocity(float vel);
@@ -663,6 +687,7 @@ struct CoinGameModeSettings
 {
 	bool penalty;			//Player loses coin if stomped on
 	short quantity;			//Number of coins to have on screen at one time
+	short percentextracoin; //percent chance a bonus coin will appear
 };
 
 struct StompGameModeSettings
@@ -748,8 +773,9 @@ struct SurvivalGameModeSettings
 struct GreedGameModeSettings
 {
 	short coinlife;				//How long coins stick around before disappearing
-	bool owncoins;
-	short multiplier;
+	bool owncoins;				//You can/can't pick up your own coins
+	short multiplier;			//How many coins are released when players are hit
+	short percentextracoin;		//percent chance a bonus coin will appear
 };
 
 struct HealthGameModeSettings
@@ -1051,12 +1077,27 @@ struct gv
 	float		gamewindx;
 	float		gamewindy;
 
+	bool		windaffectsplayers;
+	bool		spinscreen;
+	bool		reversewalk;
+	bool		spotlights;
+
 	short		suicidetime;
 	bool		minigameunlocked;
 
 	bool		startgamecountdown;
 	bool		startmodedisplay;
 	bool		deadteamnotice;
+
+	bool		unlocksecret1part1[4];
+	short		unlocksecret1part2;
+	bool		unlocksecret2part1;
+	short		unlocksecret2part2;
+	bool		unlocksecret3part1;
+	short		unlocksecret3part2;
+	bool		unlocksecret4part1;
+	short		unlocksecret4part2;
+	bool		unlocksecretunlocked[4];
 };
 
 extern gv game_values;

@@ -13,6 +13,7 @@ class ModeOptionsMenu
 		void SetControllingTeam(short iControlTeam);
 
 		UI_Menu * GetOptionsMenu(short iMode) {return &mModeSettingsMenu[iMode];}
+		UI_Menu * GetBossOptionsMenu() {return &mBossSettingsMenu;}
 
 		void HealthModeStartLifeChanged();
 		void HealthModeMaxLifeChanged();
@@ -23,6 +24,8 @@ class ModeOptionsMenu
 		
 		//Game Mode Settings Menu
 		UI_Menu mModeSettingsMenu[22];
+
+		UI_Menu mBossSettingsMenu;
 
 		//Classic
 		MI_SelectField * miClassicModeStyleField;
@@ -66,6 +69,7 @@ class ModeOptionsMenu
 		//Coins
 		MI_SelectField * miCoinModePenaltyField;
 		MI_SelectField * miCoinModeQuantityField;
+		MI_SelectField * miCoinModePercentExtraCoin;
 		MI_Button * miCoinModeBackButton;
 
 		MI_Image * miCoinModeLeftHeaderBar;
@@ -189,6 +193,7 @@ class ModeOptionsMenu
 		MI_SelectField * miGreedModeCoinLife;
 		MI_SelectField * miGreedModeOwnCoins;
 		MI_SelectField * miGreedModeMultiplier;
+		MI_SelectField * miGreedModePercentExtraCoin;
 		MI_Button * miGreedModeBackButton;
 		
 		MI_Image * miGreedModeLeftHeaderBar;
@@ -235,6 +240,15 @@ class ModeOptionsMenu
 		MI_Image * miShyGuyTagModeRightHeaderBar;
 		MI_Text * miShyGuyTagModeHeaderText;
 
+		//Boss
+		MI_SelectField * miBossModeTypeField;
+		MI_SelectField * miBossModeDifficultyField;
+		MI_SelectField * miBossModeHitPointsField;
+		MI_Button * miBossModeBackButton;
+		
+		MI_Image * miBossModeLeftHeaderBar;
+		MI_Image * miBossModeRightHeaderBar;
+		MI_Text * miBossModeHeaderText;
 };
 
 #endif //__MODEOPTIONSMENU_H_

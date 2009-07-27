@@ -107,7 +107,7 @@
 0,Bowsers Castle,0,10,20,0,Final Stage,1
 0,MrIslandBattle,0,2,5,1p1,Battle!,0
 1,Toad's House,1,|Pick a Powerup To|Help You On Your Way,p1,p5,p11
-0,Bonus Room,24,10,5,1p3,Pipe Minigame!,0
+0,-,1000,10,5,1p3,Pipe Minigame!,0
 
 #Warps
 #location 1 x, y, location 2 x, y

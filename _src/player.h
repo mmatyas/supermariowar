@@ -3,6 +3,7 @@
 
 #include "ai.h"
 enum PlayerState {player_wait, player_spawning, player_dead, player_ready, player_entering_warp_up, player_entering_warp_right, player_entering_warp_down, player_entering_warp_left, player_exiting_warp_down, player_exiting_warp_left, player_exiting_warp_up, player_exiting_warp_right};
+enum PlayerAction {player_action_none, player_action_bobomb, player_action_fireball, player_action_hammer, player_action_boomerang, player_action_iceblast, player_action_bomb, player_action_spincape, player_action_spintail};
 
 class CObject;
 class MO_CarriedObject;
@@ -34,16 +35,8 @@ class CScore
 
 		~CScore() {}
 
-		void AdjustScore(short iValue)
-		{
-			score += iValue;
-
-			if(score < 0)
-				score = 0;
-
-			SetDigitCounters();
-		}
-
+		void AdjustScore(short iValue);
+		
 		void SetScore(short iValue)
 		{
 			score = iValue;
@@ -115,6 +108,8 @@ class CPlayer
 		void move();
 		void mapcollisions();
 		void cpu_think();
+
+		void CommitAction();
 
 		void die(short deathStyle, bool fTeamRemoved, bool fKillCarriedItem);
 
@@ -193,7 +188,7 @@ class CPlayer
 		void addswirlingawards();
 		void addrocketawards();
 
-		short KillPlayerMapHazard(bool fForce, killstyle ks, bool fKillCarriedItem);
+		short KillPlayerMapHazard(bool fForce, killstyle ks, bool fKillCarriedItem, short iPlayerId = -1);
 		
         void enterwarp(Warp * warp);
 		void chooseWarpExit();
@@ -290,6 +285,9 @@ class CPlayer
 		short iKuriboShoeExitTimer;
 		short iKuriboShoeExitIndex;
 
+		short iDumpCollectionCardTimer;
+		short iDumpCollectionCardIndex;
+
 		bool fSuperStomp;
 		short iSuperStompTimer;
 		short iSuperStompExitTimer;
@@ -304,6 +302,8 @@ class CPlayer
 		short suicidetimer;
 		short suicidecounttimer;
 		short suicidedisplaytimer;
+
+		short action;
 
 		short powerup;
 		short projectilelimit;
@@ -343,6 +343,7 @@ class CPlayer
 		MovingPlatform * platform;
 		short iHorizontalPlatformCollision;
 		short iVerticalPlatformCollision;
+		short iPlatformCollisionPlayerId;
 
 		//ID of the player that owns this player for Owned mode
 		short ownerPlayerID;
@@ -441,23 +442,13 @@ class CPlayer
 
 		friend class PU_ExtraGuyPowerup;
 		friend class PU_StarPowerup;
-		//friend class PU_FirePowerup;
-		//friend class PU_HammerPowerup;
-		//friend class PU_SledgeHammerPowerup;
-		//friend class PU_PodoboPowerup;
 		friend class PU_PoisonPowerup;
-		//friend class PU_ClockPowerup;
-		//friend class PU_BobombPowerup;
-		//friend class PU_PowPowerup;
-		//friend class PU_ModPowerup;
-		//friend class PU_BulletBillPowerup;
-		//friend class PU_FeatherPowerup;
 		friend class PU_MysteryMushroomPowerup;
         friend class PU_Tanooki;
-		//friend class PU_BombPowerup;
 		friend class PU_ExtraHeartPowerup;
 		friend class MysteryMushroomTempPlayer;
 		friend class PU_TreasureChestBonus;
+		friend class PU_CoinPowerup;
 
 		friend class CO_Egg;
 		friend class CO_Star;
@@ -498,6 +489,7 @@ class CPlayer
 		friend class CO_Spike;
 		friend class CO_Bomb;
 		friend class CO_KuriboShoe;
+		friend class CO_ThrowBox;
 
 		friend class MO_SuperFireball;
 		friend class MO_SledgeHammer;

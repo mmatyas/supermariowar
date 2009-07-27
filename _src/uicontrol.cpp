@@ -454,15 +454,28 @@ void MI_SelectField::Draw()
 	if(!fShow)
 		return;
 
-	spr->draw(ix, iy, 0, (fSelected ? 32 : 0) + iAdjustmentY, iIndent - 16, 32);
-	spr->draw(ix + iIndent - 16, iy, 0, (fSelected ? 96 : 64), 32, 32);
-	spr->draw(ix + iIndent + 16, iy, 528 - iWidth + iIndent, (fSelected ? 32 : 0) + iAdjustmentY, iWidth - iIndent - 16, 32);
+	if(iIndent == 0)
+	{
+		short iHalfWidth = iWidth >> 1;
+		spr->draw(ix, iy, 0, (fSelected ? 32 : 0) + iAdjustmentY, iHalfWidth, 32);
+		spr->draw(ix + iHalfWidth, iy, 512 - iHalfWidth, (fSelected ? 32 : 0) + iAdjustmentY, iWidth - iHalfWidth, 32);
+	}
+	else
+	{
+		spr->draw(ix, iy, 0, (fSelected ? 32 : 0) + iAdjustmentY, iIndent - 16, 32);
+		spr->draw(ix + iIndent - 16, iy, 0, (fSelected ? 96 : 64), 32, 32);
+		spr->draw(ix + iIndent + 16, iy, 528 - iWidth + iIndent, (fSelected ? 32 : 0) + iAdjustmentY, iWidth - iIndent - 16, 32);
+	}
 
-	menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName);
+	if(iIndent> 0)
+		menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName);
 
 	if(!items.empty())
 	{
-		menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 24, (*current)->sName.c_str());
+		if(iIndent > 0)
+			menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 24, (*current)->sName.c_str());
+		else
+			menu_font_large.drawChopRight(ix + 16, iy + 5, iWidth - 32, (*current)->sName.c_str());
 	}
 
 	if(current != items.begin() || !fNoWrap)
@@ -1864,6 +1877,8 @@ MI_MapField::MI_MapField(gfxSprite * nspr, short x, short y, const char * name, 
 	iWidth = width;
 	iIndent = indent;
 
+	fShowtags = showtags;
+
 	miModifyImageLeft = new MI_Image(nspr, ix + indent - 26, iy + 4, 32, 64, 26, 24, 4, 1, 8);
 	miModifyImageLeft->Show(false);
 
@@ -1880,7 +1895,7 @@ MI_MapField::MI_MapField(gfxSprite * nspr, short x, short y, const char * name, 
 	rectDst.w = 320;
 	rectDst.h = 240;
 
-	if(showtags)
+	if(fShowtags)
 	{
 		iSlideListOut = (iWidth - 352) >> 1;
 		iSlideListOutGoal = iSlideListOut;
@@ -1972,22 +1987,12 @@ MenuCodeEnum MI_MapField::SendInput(CPlayerInput * playerInput)
 			return ChooseRandomMap();
 		}
 
-		if(playerInput->outputControls[iPlayer].menu_select.fPressed)
+		if(playerInput->outputControls[iPlayer].menu_select.fPressed || playerInput->outputControls[iPlayer].menu_cancel.fPressed)
 		{
 			miModifyImageLeft->Show(false);
 			miModifyImageRight->Show(false);
 			
 			fModifying = false;
-			return MENU_CODE_UNSELECT_ITEM;
-		}
-
-		if(playerInput->outputControls[iPlayer].menu_cancel.fPressed)
-		{
-			miModifyImageLeft->Show(false);
-			miModifyImageRight->Show(false);
-			
-			fModifying = false;
-
 			return MENU_CODE_UNSELECT_ITEM;
 		}
 
@@ -2189,10 +2194,12 @@ void MI_MapField::LoadMap(const char * szMapPath)
 
 }
 
-void MI_MapField::SetMap(const char * szMapName, bool fWorld)
+bool MI_MapField::SetMap(const char * szMapName, bool fWorld)
 {
-	maplist.findexact(szMapName, fWorld);
+	bool fFound = maplist.findexact(szMapName, fWorld);
 	LoadCurrentMap();
+
+	return fFound;
 }
 
 void MI_MapField::SetSpecialMap(const char * mapName, const char * szMapPath)
@@ -2242,13 +2249,28 @@ MenuCodeEnum MI_MapField::MouseClick(short iMouseX, short iMouseY)
 
 bool MI_MapField::MovePrev(bool fScrollFast)
 {
+	return Move(false, fScrollFast);
+}
+
+bool MI_MapField::MoveNext(bool fScrollFast)
+{
+	return Move(true, fScrollFast);
+}
+
+bool MI_MapField::Move(bool fNext, bool fScrollFast)
+{
 	int numadvance = 1;
 	if(fScrollFast)
 		numadvance = 10;
 
 	short iOldIndex = maplist.GetCurrent()->second->iIndex;
 	for(int k = 0; k < numadvance; k++)
-		maplist.prev(true);
+	{
+		if(fNext)
+			maplist.next(true);
+		else
+			maplist.prev(true);
+	}
 
 	if(iOldIndex != maplist.GetCurrent()->second->iIndex)
 	{
@@ -2259,22 +2281,18 @@ bool MI_MapField::MovePrev(bool fScrollFast)
 	return false;
 }
 
-bool MI_MapField::MoveNext(bool fScrollFast)
+void MI_MapField::SetDimensions(short width, short indent)
 {
-	int numadvance = 1;
-	if(fScrollFast)
-		numadvance = 10;
+	iWidth = width;
+	iIndent = indent;
 
-	short iOldIndex = maplist.GetCurrent()->second->iIndex;
-	for(int k = 0; k < numadvance; k++)
-		maplist.next(true);
+	miModifyImageLeft->SetPosition(ix + indent - 26, iy + 4);
+	miModifyImageRight->SetPosition(ix + iWidth - 16, iy + 4);
 
-	if(iOldIndex != maplist.GetCurrent()->second->iIndex)
+	if(fShowtags)
 	{
-		LoadCurrentMap();
-		return true;
+		iSlideListOut = (iWidth - 352) >> 1;
+		iSlideListOutGoal = iSlideListOut;
 	}
-
-	return false;
 }
 
