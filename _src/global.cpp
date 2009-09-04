@@ -2223,7 +2223,7 @@ void CheckSecret(short id)
 				eyecandy[2].add(new EC_SingleAnimation(&spr_poof, object->ix - 8, object->iy - 8, 4, 5));
 		}
 	}
-	else if(!game_values.unlocksecretunlocked[1])
+	else if(id == 1 && !game_values.unlocksecretunlocked[1])
 	{
 		if(game_values.unlocksecret2part1 && game_values.unlocksecret2part2 >= 3)
 		{
@@ -2236,53 +2236,32 @@ void CheckSecret(short id)
 				eyecandy[2].add(new EC_SingleAnimation(&spr_poof, object->ix - 8, object->iy - 8, 4, 5));
 		}
 	}
-	else if(!game_values.unlocksecretunlocked[2])
+	else if(id == 2 && !game_values.unlocksecretunlocked[2])
 	{
-		if(game_values.unlocksecret3part1 && game_values.unlocksecret3part2 >= 3)
+		for(short iPlayer = 0; iPlayer < 4; iPlayer++)
 		{
-			game_values.unlocksecretunlocked[2] = true;
-			ifsoundonplay(sfx_transform);
+			//number of songs on thriller + number of released albums (figure it out :))
+			if(game_values.unlocksecret3part1[iPlayer] >= 9 && game_values.unlocksecret3part2[iPlayer] >= 13)
+			{
+				game_values.unlocksecretunlocked[2] = true;
+				ifsoundonplay(sfx_transform);
 
-			IO_MovingObject * object = createpowerup(SECRET3_POWERUP, rand() % 640, rand() % 480, true, false);
+				IO_MovingObject * object = createpowerup(SECRET3_POWERUP, rand() % 640, rand() % 480, true, false);
 
-			if(object)
-				eyecandy[2].add(new EC_SingleAnimation(&spr_poof, object->ix - 8, object->iy - 8, 4, 5));
+				if(object)
+					eyecandy[2].add(new EC_SingleAnimation(&spr_poof, object->ix - 8, object->iy - 8, 4, 5));
+			}
 		}
 	}
-	else if(!game_values.unlocksecretunlocked[3])
+	else if(id == 3 && !game_values.unlocksecretunlocked[3])
 	{
-		if(game_values.unlocksecret4part1 && game_values.unlocksecret4part2 >= 3)
-		{
-			game_values.unlocksecretunlocked[3] = true;
-			ifsoundonplay(sfx_transform);
+		game_values.unlocksecretunlocked[3] = true;
+		ifsoundonplay(sfx_transform);
 
-			IO_MovingObject * object = createpowerup(SECRET4_POWERUP, rand() % 640, rand() % 480, true, false);
+		IO_MovingObject * object = createpowerup(SECRET4_POWERUP, rand() % 640, rand() % 480, true, false);
 
-			if(object)
-				eyecandy[2].add(new EC_SingleAnimation(&spr_poof, object->ix - 8, object->iy - 8, 4, 5));
-		}
+		if(object)
+			eyecandy[2].add(new EC_SingleAnimation(&spr_poof, object->ix - 8, object->iy - 8, 4, 5));
 	}
 }
 
-short iSpotlightValues[2][3] = { { 128, 64, 0 }, { 64, 32, 128 } };
-
-void AddSpotlight(short ix, short iy, short iSize)
-{
-	short iWidth = iSpotlightValues[iSize][0];
-	short iHalfWidth = iSpotlightValues[iSize][1];
-
-	SDL_Rect rSrc = {iSpotlightValues[iSize][2], 0, iWidth, iWidth};
-	SDL_Rect rDst = {ix - iHalfWidth, iy - iHalfWidth, iWidth, iWidth};
-	SDL_BlitSurface(spr_overlayhole.getSurface(), &rSrc, spr_overlay.getSurface(), &rDst);
-
-	if(ix - iHalfWidth < 0)
-	{
-		SDL_Rect rDstWrap = {ix - iHalfWidth + 640, iy - iHalfWidth, iWidth, iWidth};
-		SDL_BlitSurface(spr_overlayhole.getSurface(), &rSrc, spr_overlay.getSurface(), &rDstWrap);
-	}
-	else if(ix + iHalfWidth >= 640)
-	{
-		SDL_Rect rDstWrap = {ix - iHalfWidth - 640, iy - iHalfWidth, iWidth, iWidth};
-		SDL_BlitSurface(spr_overlayhole.getSurface(), &rSrc, spr_overlay.getSurface(), &rDstWrap);
-	}
-}

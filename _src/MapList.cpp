@@ -94,6 +94,15 @@ MapList::MapList(bool fWorldEditor)
 	//If this is for the world editor, load all the world maps into the map viewer UI control
 	if(fWorldEditor)
 	{
+		//Load in the "tour only" maps directory
+		DirectoryListing tourMapDir(convertPath("maps/tour/"), ".map");
+
+		while(tourMapDir(curname))
+		{
+			MapListNode * node = new MapListNode(tourMapDir.fullName(curname));
+			maps[stripCreatorAndDotMap(curname)] = node;
+		}
+
 		SimpleDirectoryList worldeditormapdirs(convertPath("worlds/"));
 
 		short iEditorDirCount = worldeditormapdirs.GetCount();

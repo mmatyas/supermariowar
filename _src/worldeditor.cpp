@@ -300,6 +300,7 @@ std::vector<WorldVehicle*> vehiclelist;
 std::vector<WorldWarp*> warplist;
 
 bool g_fFullScreen = false;
+bool g_fShowStagePreviews = true;
 
 //Stage Mode Menu
 UI_Menu * mCurrentMenu;
@@ -1137,6 +1138,15 @@ int editor_edit()
 						if(event.key.keysym.sym == SDLK_v)
 							return EDITOR_VEHICLES;
 
+						if(event.key.keysym.sym == SDLK_SPACE)
+						{
+							g_fShowStagePreviews = !g_fShowStagePreviews;
+							if(g_fShowStagePreviews)
+								SetDisplayMessage(60, "Stage Previews", "Preview popups", "have been", "enabled.");
+							else
+								SetDisplayMessage(60, "Stage Previews", "Preview popups", "have been", "disabled.");
+						}
+
 						if(edit_mode == 5 && event.key.keysym.sym == SDLK_c)
 						{
 							int iMouseX, iMouseY;
@@ -1564,8 +1574,8 @@ int editor_edit()
 					{
 						short iButtonX = event.button.x - draw_offset_x;
 						short iButtonY = event.button.y - draw_offset_y;
-						short iCol = iButtonX / TILESIZE + draw_offset_col;
-						short iRow = iButtonY / TILESIZE + draw_offset_row;
+						short iCol = (iButtonX >> 5) + draw_offset_col;
+						short iRow = (iButtonY >> 5) + draw_offset_row;
 
 						if(iButtonX >= 0 && iButtonY >= 0 && iButtonX < iWorldWidth * TILESIZE && iButtonY < iWorldHeight * TILESIZE)
 						{
@@ -1807,11 +1817,13 @@ int editor_edit()
 						else if(edit_mode == 9)
 						{
 							iStageDisplay = -1;
-
-							short iType = g_worldmap.tiles[iCol][iRow].iType - 6;
-							if(iType >= 0)
+							if(iCol >= 0 && iRow >= 0 && iCol < iWorldWidth && iRow < iWorldHeight)
 							{
-								iStageDisplay = iType;
+								short iType = g_worldmap.tiles[iCol][iRow].iType - 6;
+								if(iType >= 0)
+								{
+									iStageDisplay = iType;
+								}
 							}
 						}
 
@@ -1963,7 +1975,7 @@ int editor_edit()
 					}
 				}
 
-				if(iStageDisplay >= 0)
+				if(iStageDisplay >= 0 && g_fShowStagePreviews)
 				{
 					int iMouseX, iMouseY;
 					SDL_GetMouseState(&iMouseX, &iMouseY);
@@ -3748,7 +3760,7 @@ int editor_vehicles()
 		TourStop * ts = game_values.tourstops[iStage];
 		char szStageName[256];
 		sprintf(szStageName, "(%d) %s", iStage + 1, ts->szName);
-		miVehicleStageField->Add(szStageName, iStage, "", false, false, true, ts->iStageType == 1 ? 24 : (ts->iMode == 1000 ? 25 : ts->iMode));
+		miVehicleStageField->Add(szStageName, iStage, "", false, false, true, ts->iStageType == 1 ? 24 : (ts->iMode >= 1000 ? ts->iMode - 975 : ts->iMode));
 	}
 
 	miVehicleStageField->SetKey(g_wvVehicleStamp.iActionId);
@@ -4216,8 +4228,8 @@ void SaveStage(short iEditStage)
 	//Copy the working values back into the structure that will be saved
 	memcpy(&game_values.tourstops[iEditStage]->gmsSettings, &game_values.gamemodemenusettings, sizeof(GameModeSettings));
 	
-	if(game_values.tourstops[iEditStage]->iMode == 25)
-		game_values.tourstops[iEditStage]->iMode = 1000;
+	if(game_values.tourstops[iEditStage]->iMode >= 25 && game_values.tourstops[iEditStage]->iMode <= 27)
+		game_values.tourstops[iEditStage]->iMode += 975;
 }
 
 void EditStage(short iEditStage)
@@ -4250,13 +4262,13 @@ void EditStage(short iEditStage)
 	short iMode = game_values.tourstops[iEditStage]->iMode;
 	short iStageType = game_values.tourstops[iEditStage]->iStageType;
 
-	if(iMode == 25)
-		iMode = 1000;
+	if(iMode >= 25 && iMode <= 27)
+		iMode += 975;
 
 	//Show fields applicable for this mode
 	miPointsField->Show(iStageType == 0);
 	miFinalStageField->Show(iStageType == 0);
-	miMapField->Show(iStageType == 0 && iMode != 1000);
+	miMapField->Show(iStageType == 0);
 
 	miBonusType->Show(iStageType == 1);
 	miBonusTextField[0]->Show(iStageType == 1);
@@ -5076,6 +5088,8 @@ int display_help()
 	menu_font_small.draw(offsetx, offsety, "[insert] - Screenshot");
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[alt] + [enter] - Full Screen/Window");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[space] - Toggle Stage Previews");
 	
 	SDL_Flip(screen);
 

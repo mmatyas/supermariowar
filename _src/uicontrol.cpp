@@ -1541,7 +1541,7 @@ MI_TextField::MI_TextField(gfxSprite * nspr, short x, short y, const char * name
 
 	szValue = NULL;
 
-	miModifyCursor = new MI_Image(nspr, ix + indent, iy + 4, 0, 166, 6, 24, 4, 1, 8);
+	miModifyCursor = new MI_Image(nspr, ix + indent, iy + 4, 136, 64, 15, 24, 4, 1, 8);
 	miModifyCursor->SetBlink(true, 20);
 	miModifyCursor->Show(false);
 

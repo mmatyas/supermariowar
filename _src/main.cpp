@@ -51,7 +51,13 @@ STUFF TO WATCH OUT FOR IN BETA2
 - collision detection and behavior of coins, ztar, collection cards
 
 Fixed
-
+[X] Finished secret 3 and 4
+[X] Fixed bug where you could throw items through the wall on the left map edge
+[X] Red Koopas detect platform edges and turn around
+[X] Cleaned up areas that used "*TILESIZE" and replaced them with "<< 5" for performance
+[X] Fixed bug that crashed world editor if the map was smaller than the screen
+[X] Fixed bug in world editor that didn't save worlds correct with boxes or bosses minigames
+[X] Fixed bug when placing maps into the tours folder, they are not found in the world editor
 
 Beta 1 Public Release Bugs
 [ ] Treasure chests from winning a stage that rewards an item in world mode can be spawned in areas where they fall forever, and can never be opened. (Though this is aesthetic)
@@ -71,11 +77,13 @@ Beta 1 Public Release Bugs
     -> Write script to make these using 0x808080 gray background
 
 Considering Features
-[ ] Figure out what triggers secret 3 and 4
+
+[ ] BUG!!! In world mode when you win a boxes game, the ranking at the end of the game is based on lives left, not coins collected.  All players that didn't win should get 2nd place.
+
+[ ] BUG!!! A bug that isn't on the first post is that if you quit a tour in session, the game displays and error message and the program closes. Not sure if this is 100% garunteed.
+    -> No repro, need poster to post which tour and which stop this happened with
 
 [ ] Build in release mode and make sure we can still use special maps in world editor
-
-[ ] Bug on 00test6 map on left side when you let go of a held item or if you get hit in greed mode, items go through wall on left side
 
 [ ] Get boss settings from forum and integrate them in
 
@@ -141,7 +149,6 @@ Beta 1 Public Release Feature Requests
 [ ] I think there should be a way to agree on a draw in world mode and thus skip a level. In one world there was a capture-the-flag level where you could only score with the flag in your own base, without touch return and a high auto-return time. We only were two players (human) and ended up carrying each others flag all the time and couldn't score. To bring back your own flag you had to drop the enemy flag, so stomping didn't help either. It's a bit unfair if one player has to intentionally lose just so the game can go on  (Unfair in the sense of world score, probably same for tournament I guess) Maybe just add an option for "draw" or "skip level" to the exit menu?
 [ ] it'd be a nice idea to add some weapon options for the Bomb powerup. Maybe a bomb limit that ranges from 1 to 5, and a fuse limit ranging from 3 to 10 seconds.
 [ ] Intro music attached to normal looped tracks
-[ ] A way to put levels/bonus stages in worlds WITHOUT editing the .txt file.
 [ ] Also, as P1 on the Bonus Island World against 3 CPUs, I was unable to use items in the World screen.
 [ ] Though the universal Overrides thing has Map-specific and World-specific overrides, it lacks Background-specific overrides.
 [ ] Volume control for individual tunes in music packs. Just changing a number in the text file would be a lot less trouble than having to edit the music files themselves.
@@ -630,6 +637,7 @@ CMap			g_map;
 CTilesetManager g_tilesetmanager;
 
 CEyecandyContainer eyecandy[3];
+SpotlightManager spotlightManager;
 
 CObjectContainer noncolcontainer;
 CObjectContainer objectcontainer[3];
@@ -722,6 +730,8 @@ extern void SetupScoreBoard(bool fOrderMatters);
 extern void ShowScoreBoard();
 
 extern void LoadCurrentMapBackground();
+
+extern bool VersionIsEqual(int iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
 
 FiltersList filterslist;  //Filters list must be initiallized before maps list because it is used in maplist constructor
 MapList maplist(false);
@@ -1324,10 +1334,10 @@ int main(int argc, char *argv[])
 
 	if(fp)
 	{
-		short version[4];
-		fread(version, sizeof(short), 4, fp);
+		int version[4];
+		fread(version, sizeof(int), 4, fp);
 
-		if(version[0] == g_iVersion[0] && version[1] == g_iVersion[1] && version[2] == g_iVersion[2] && version[3] == g_iVersion[3])
+		if(VersionIsEqual(g_iVersion, version[0], version[1], version[2], version[3]))
 		{
 			#ifdef _XBOX
 				fread(&game_values.flickerfilter, sizeof(short), 1, fp);
@@ -1684,10 +1694,14 @@ void RunGame()
 	game_values.unlocksecret1part2 = 0;
 	game_values.unlocksecret2part1 = false;
 	game_values.unlocksecret2part2 = 0;
-	game_values.unlocksecret3part1 = false;
-	game_values.unlocksecret3part2 = 0;
-	game_values.unlocksecret4part1 = false;
-	game_values.unlocksecret4part2 = 0;
+	game_values.unlocksecret3part1[0] = 0;
+	game_values.unlocksecret3part1[1] = 0;
+	game_values.unlocksecret3part1[2] = 0;
+	game_values.unlocksecret3part1[3] = 0;
+	game_values.unlocksecret3part2[0] = 0;
+	game_values.unlocksecret3part2[1] = 0;
+	game_values.unlocksecret3part2[2] = 0;
+	game_values.unlocksecret3part2[3] = 0;
 	game_values.unlocksecretunlocked[0] = false;
 	game_values.unlocksecretunlocked[1] = false;
 	game_values.unlocksecretunlocked[2] = false;
@@ -1771,7 +1785,7 @@ void RunGame()
 	game_values.windaffectsplayers = false;
 	game_values.spinscreen = false;
 	game_values.reversewalk = false;
-	game_values.spotlights = true;
+	game_values.spotlights = false;
 
 	//Initialize game mode
 	game_values.gamemode->init();
@@ -2991,10 +3005,6 @@ void RunGame()
 			}
 
 			//--------------- draw everything ----------------------
-
-			//Clear the overlay surface again with black
-			SDL_FillRect(spr_overlay.getSurface(), NULL, 0x0);
-
 			spr_backmap[g_iCurrentDrawIndex].draw(0, 0);
 
 			//draw back eyecandy behind players
@@ -3037,9 +3047,8 @@ void RunGame()
 		
 			g_map.drawPlatforms(4);
 
-			//Draw the overlay
-			spr_overlay.draw(0, 0);
-
+			if(game_values.spotlights)
+				spotlightManager.DrawSpotlights();
 
 			g_iWinningPlayer = -1;
 			short mostkills = 0;
@@ -3549,12 +3558,13 @@ void CleanUp()
 	eyecandy[0].clean();
 	eyecandy[1].clean();
 	eyecandy[2].clean();
-	
-	//noncolcontainer.clean();
+	spotlightManager.ClearSpotlights();
 
-	//objectcontainer[0].clean();
-	//objectcontainer[1].clean();
-	//objectcontainer[2].clean();
+	noncolcontainer.clean();
+
+	objectcontainer[0].clean();
+	objectcontainer[1].clean();
+	objectcontainer[2].clean();
 		
 	LoadMapObjects(true);
 	g_map.clearWarpLocks();
@@ -3814,43 +3824,43 @@ void LoadMapObjects(bool fPreview)
 			short iType = g_map.objectdata[x][y].iType;
 			if(iType == 0)
 			{
-				g_map.blockdata[x][y] = new B_BreakableBlock(&spr_breakableblock, x * TILESIZE, y * TILESIZE, 4, 10);
+				g_map.blockdata[x][y] = new B_BreakableBlock(&spr_breakableblock, x << 5, y << 5, 4, 10);
 				noncolcontainer.add(g_map.blockdata[x][y]);
 			}
 			else if(iType == 1)
 			{
-				g_map.blockdata[x][y] = new B_PowerupBlock(&spr_powerupblock, x * TILESIZE, y * TILESIZE, 4, 10, g_map.objectdata[x][y].fHidden, g_map.objectdata[x][y].iSettings);
+				g_map.blockdata[x][y] = new B_PowerupBlock(&spr_powerupblock, x << 5, y << 5, 4, 10, g_map.objectdata[x][y].fHidden, g_map.objectdata[x][y].iSettings);
 				noncolcontainer.add(g_map.blockdata[x][y]);
 			}
 			else if(iType == 2)
 			{
-				g_map.blockdata[x][y] = new B_DonutBlock(&spr_donutblock, x * TILESIZE, y * TILESIZE);
+				g_map.blockdata[x][y] = new B_DonutBlock(&spr_donutblock, x << 5, y << 5);
 				noncolcontainer.add(g_map.blockdata[x][y]);
 			}
 			else if(iType == 3)
 			{
-				g_map.blockdata[x][y] = new B_FlipBlock(&spr_flipblock, x * TILESIZE, y * TILESIZE, g_map.objectdata[x][y].fHidden);
+				g_map.blockdata[x][y] = new B_FlipBlock(&spr_flipblock, x << 5, y << 5, g_map.objectdata[x][y].fHidden);
 				noncolcontainer.add(g_map.blockdata[x][y]);
 			}
 			else if(iType == 4)
 			{
-				g_map.blockdata[x][y] = new B_BounceBlock(&spr_bounceblock, x * TILESIZE, y * TILESIZE, g_map.objectdata[x][y].fHidden);
+				g_map.blockdata[x][y] = new B_BounceBlock(&spr_bounceblock, x << 5, y << 5, g_map.objectdata[x][y].fHidden);
 				noncolcontainer.add(g_map.blockdata[x][y]);
 			}
 			else if(iType == 5)
 			{
-				g_map.blockdata[x][y] = new B_NoteBlock(&spr_noteblock, x * TILESIZE, y * TILESIZE, 4, 10, 1, g_map.objectdata[x][y].fHidden);
+				g_map.blockdata[x][y] = new B_NoteBlock(&spr_noteblock, x << 5, y << 5, 4, 10, 1, g_map.objectdata[x][y].fHidden);
 				noncolcontainer.add(g_map.blockdata[x][y]);
 			}
 			else if(iType == 6)
 			{
-				g_map.blockdata[x][y] = new B_ThrowBlock(&spr_throwblock, x * TILESIZE, y * TILESIZE, 4, 10, 0);
+				g_map.blockdata[x][y] = new B_ThrowBlock(&spr_throwblock, x << 5, y << 5, 4, 10, 0);
 				noncolcontainer.add(g_map.blockdata[x][y]);
 			}
 			else if(iType >= 7 && iType <= 10)
 			{
 				short iSwitchType = iType - 7;
-				g_map.blockdata[x][y] = new B_OnOffSwitchBlock(&spr_switchblocks, x * TILESIZE, y * TILESIZE, iSwitchType, g_map.iSwitches[iSwitchType]);
+				g_map.blockdata[x][y] = new B_OnOffSwitchBlock(&spr_switchblocks, x << 5, y << 5, iSwitchType, g_map.iSwitches[iSwitchType]);
 				noncolcontainer.add(g_map.blockdata[x][y]);
 				g_map.switchBlocks[iSwitchType].push_back(g_map.blockdata[x][y]);
 			}
@@ -3858,34 +3868,34 @@ void LoadMapObjects(bool fPreview)
 			{
 				short iSwitchType = iType - 11;
 
-				//g_map.blockdata[x][y] = new B_SwitchBlock(&spr_switchblocks, x * TILESIZE, y * TILESIZE, iSwitchType, g_map.iSwitches[iSwitchType]);
-				g_map.blockdata[x][y] = new B_SwitchBlock(&spr_switchblocks, x * TILESIZE, y * TILESIZE, iSwitchType, g_map.objectdata[x][y].iSettings[0]);
+				//g_map.blockdata[x][y] = new B_SwitchBlock(&spr_switchblocks, x << 5, y << 5, iSwitchType, g_map.iSwitches[iSwitchType]);
+				g_map.blockdata[x][y] = new B_SwitchBlock(&spr_switchblocks, x << 5, y << 5, iSwitchType, g_map.objectdata[x][y].iSettings[0]);
 				noncolcontainer.add(g_map.blockdata[x][y]);
 				g_map.switchBlocks[iSwitchType + 4].push_back(g_map.blockdata[x][y]);
 			}
 			else if(iType == 15)
 			{
-				g_map.blockdata[x][y] = new B_ViewBlock(&spr_viewblock, x * TILESIZE, y * TILESIZE, g_map.objectdata[x][y].fHidden, g_map.objectdata[x][y].iSettings);
+				g_map.blockdata[x][y] = new B_ViewBlock(&spr_viewblock, x << 5, y << 5, g_map.objectdata[x][y].fHidden, g_map.objectdata[x][y].iSettings);
 				noncolcontainer.add(g_map.blockdata[x][y]);
 			}
 			else if(iType == 16)
 			{
-				g_map.blockdata[x][y] = new B_ThrowBlock(&spr_throwblock, x * TILESIZE, y * TILESIZE, 4, 10, 2);
+				g_map.blockdata[x][y] = new B_ThrowBlock(&spr_throwblock, x << 5, y << 5, 4, 10, 2);
 				noncolcontainer.add(g_map.blockdata[x][y]);
 			}
 			else if(iType == 17 || iType == 18)
 			{
-				g_map.blockdata[x][y] = new B_NoteBlock(&spr_noteblock, x * TILESIZE, y * TILESIZE, 4, 10, iType == 17 ? 2 : 0, g_map.objectdata[x][y].fHidden);
+				g_map.blockdata[x][y] = new B_NoteBlock(&spr_noteblock, x << 5, y << 5, 4, 10, iType == 17 ? 2 : 0, g_map.objectdata[x][y].fHidden);
 				noncolcontainer.add(g_map.blockdata[x][y]);
 			}
 			else if(iType == 19)
 			{
-				g_map.blockdata[x][y] = new B_ThrowBlock(&spr_throwblock, x * TILESIZE, y * TILESIZE, 4, 10, 1);
+				g_map.blockdata[x][y] = new B_ThrowBlock(&spr_throwblock, x << 5, y << 5, 4, 10, 1);
 				noncolcontainer.add(g_map.blockdata[x][y]);
 			}
 			else if(iType >= 20 && iType <= 29)
 			{
-				g_map.blockdata[x][y] = new B_WeaponBreakableBlock(&spr_weaponbreakableblock, x * TILESIZE, y * TILESIZE, iType - 20);
+				g_map.blockdata[x][y] = new B_WeaponBreakableBlock(&spr_weaponbreakableblock, x << 5, y << 5, iType - 20);
 				noncolcontainer.add(g_map.blockdata[x][y]);
 			}
 			else
@@ -3944,8 +3954,8 @@ void LoadMapObjects(bool fPreview)
 	{
 		MapItem * mapItem = &g_map.mapitems[i];
 		short iType = mapItem->itype;
-		short ix = mapItem->ix * TILESIZE;
-		short iy = mapItem->iy * TILESIZE;
+		short ix = mapItem->ix << 5;
+		short iy = mapItem->iy << 5;
 
 		if(iType == 0)
 			objectcontainer[1].add(new CO_Spring(&spr_spring, ix, iy, false));

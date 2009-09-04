@@ -35,6 +35,8 @@ struct STextAward
 	STextAward(const char *nname, gfxFont *nfont) {name = nname; font = nfont;}
 };
 
+
+
 //------------- global definitions -------------
 
 
@@ -1093,10 +1095,8 @@ struct gv
 	short		unlocksecret1part2;
 	bool		unlocksecret2part1;
 	short		unlocksecret2part2;
-	bool		unlocksecret3part1;
-	short		unlocksecret3part2;
-	bool		unlocksecret4part1;
-	short		unlocksecret4part2;
+	short		unlocksecret3part1[4];
+	short		unlocksecret3part2[4];
 	bool		unlocksecretunlocked[4];
 };
 

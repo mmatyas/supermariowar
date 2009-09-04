@@ -439,5 +439,44 @@ class CEyecandyContainer
 		void remove(short i);
 };
 
+class Spotlight
+{
+	public:
+		Spotlight(short x, short y, short size);
+		~Spotlight() {}
+
+		void Update();
+		void UpdatePosition(short x, short y);
+		void Draw();
+		
+		bool IsDead() {return iState >= 3;}
+
+	private:
+		short ix, iy;
+		short iEndSize;
+		//short iTransparency;
+		short iState;
+		bool fUpdated;
+
+		short iSizeCounter;
+		short iSize;
+
+		short iHalfWidth;
+		short iWidth;
+		SDL_Rect rSrc;
+};
+
+class SpotlightManager
+{
+	public:
+		Spotlight * AddSpotlight(short ix, short iy, short iSize);
+		void DrawSpotlights();
+		void ClearSpotlights();
+
+	private:
+		std::vector<Spotlight*> spotlightList;
+
+};
+
 #endif
 

@@ -439,6 +439,10 @@ MovingPlatform::~MovingPlatform()
 
 void MovingPlatform::draw()
 {
+	//Comment this back in to see the no spawn area of the platform
+	//SDL_Rect r = {(int)pPath->dCurrentX[1] - iHalfWidth, (int)pPath->dCurrentY[1] - iHalfHeight, iWidth, iHeight};
+	//SDL_FillRect(blitdest, &r, SDL_MapRGB(blitdest->format, 0, 0, 255));
+
 	rDstRect.x = ix - iHalfWidth + x_shake;
 	rDstRect.y = iy - iHalfHeight + y_shake;
 	rDstRect.w = iWidth;
@@ -697,7 +701,7 @@ void MovingPlatform::collide(CPlayer * player)
 				}
 				else
 				{
-					player->xf((float)(tx * TILESIZE - PW) - 0.2f + fx - iHalfWidth);
+					player->xf((float)((tx << 5) - PW) - 0.2f + fx - iHalfWidth);
 					player->flipsidesifneeded();
 					
 					//test to see if we put the object on top of a background tile
@@ -769,7 +773,7 @@ void MovingPlatform::collide(CPlayer * player)
 				}
 				else
 				{
-					player->xf((float)(tx * TILESIZE + TILESIZE) + 0.2f + fx - iHalfWidth);
+					player->xf((float)((tx << 5) + TILESIZE) + 0.2f + fx - iHalfWidth);
 					player->flipsidesifneeded();
 					
 					//test to see if we put the object on top of a background tile
@@ -865,7 +869,7 @@ void MovingPlatform::collide(CPlayer * player)
 				}
 				else
 				{
-					player->fPrecalculatedY = ty * TILESIZE + TILESIZE + 0.2f + fy - iHalfHeight;
+					player->fPrecalculatedY = (ty << 5) + TILESIZE + 0.2f + fy - iHalfHeight;
 					player->fOldY = player->fPrecalculatedY - fVelY - GRAVITATION;
 
 					if(player->vely < 0.0f && fVelY > 0.0f)
@@ -910,12 +914,12 @@ void MovingPlatform::collide(CPlayer * player)
 
 			bool fSolidTileUnderPlayer = (t1 & tile_flag_solid) || (t2 & tile_flag_solid);
 
-			if((t1 & tile_flag_solid_on_top || t2 & tile_flag_solid_on_top) && player->fOldY + PH <= ty * TILESIZE + fOldY - iHalfHeight)
+			if((t1 & tile_flag_solid_on_top || t2 & tile_flag_solid_on_top) && player->fOldY + PH <= (ty << 5) + fOldY - iHalfHeight)
 			{
 				//Deal with player down jumping through solid on top tiles
 				if(player->fallthrough && !fSolidTileUnderPlayer)
 				{
-					player->fPrecalculatedY = ty * TILESIZE - PH + (fVelY > 0.0f ? fVelY : 0.0f) + 0.2f + fy - iHalfHeight;
+					player->fPrecalculatedY = (ty << 5) - PH + (fVelY > 0.0f ? fVelY : 0.0f) + 0.2f + fy - iHalfHeight;
 					player->inair = true;
 					player->platform = NULL;
 					//printf("Fell Through Solid On Top Platform\n");
@@ -934,7 +938,7 @@ void MovingPlatform::collide(CPlayer * player)
 						player->iVerticalPlatformCollision = 2;
 						player->iPlatformCollisionPlayerId = iPlayerId;
 
-						player->fPrecalculatedY = ty * TILESIZE - PH - 0.2f + fy - iHalfHeight;
+						player->fPrecalculatedY = (ty << 5) - PH - 0.2f + fy - iHalfHeight;
 						player->vely = GRAVITATION;
 						player->inair = false;
 						player->killsinrowinair = 0;
@@ -974,7 +978,7 @@ void MovingPlatform::collide(CPlayer * player)
 					player->iVerticalPlatformCollision = 2;
 					player->iPlatformCollisionPlayerId = iPlayerId;
 
-					player->fPrecalculatedY = ty * TILESIZE - PH - 0.2f + fy - iHalfHeight;
+					player->fPrecalculatedY = (ty << 5) - PH - 0.2f + fy - iHalfHeight;
 					player->fOldY = player->fPrecalculatedY - fVelY;
 					
 					player->vely = GRAVITATION;
@@ -1028,7 +1032,7 @@ void MovingPlatform::check_map_collision_right(CPlayer * player)
 	if((topblock && !topblock->isTransparent() && !topblock->isHidden()) || 
 		(g_map.map(iTestBackgroundX, iTestBackgroundY) & tile_flag_solid))
 	{
-		player->xf((float)(iTestBackgroundX * TILESIZE - PW) - 0.2f);
+		player->xf((float)((iTestBackgroundX << 5) - PW) - 0.2f);
 		player->flipsidesifneeded();
 		return;
 	}
@@ -1043,7 +1047,7 @@ void MovingPlatform::check_map_collision_right(CPlayer * player)
 	if((bottomblock && !bottomblock->isTransparent() && !bottomblock->isHidden()) || 
 		(g_map.map(iTestBackgroundX, iTestBackgroundY2) & tile_flag_solid))
 	{
-		player->xf((float)(iTestBackgroundX * TILESIZE - PW) - 0.2f);
+		player->xf((float)((iTestBackgroundX << 5) - PW) - 0.2f);
 		player->flipsidesifneeded();
 		return;
 	}
@@ -1062,7 +1066,7 @@ void MovingPlatform::check_map_collision_left(CPlayer * player)
 	if((topblock && !topblock->isTransparent() && !topblock->isHidden()) || 
 		(g_map.map(iTestBackgroundX, iTestBackgroundY) & tile_flag_solid))
 	{
-		player->xf((float)(iTestBackgroundX * TILESIZE + TILESIZE) + 0.2f);
+		player->xf((float)((iTestBackgroundX << 5) + TILESIZE) + 0.2f);
 		player->flipsidesifneeded();
 		return;
 	}
@@ -1077,7 +1081,7 @@ void MovingPlatform::check_map_collision_left(CPlayer * player)
 	if((bottomblock && !bottomblock->isTransparent() && !bottomblock->isHidden()) || 
 		(g_map.map(iTestBackgroundX, iTestBackgroundY2) & tile_flag_solid))
 	{
-		player->xf((float)(iTestBackgroundX * TILESIZE + TILESIZE) + 0.2f);
+		player->xf((float)((iTestBackgroundX << 5) + TILESIZE) + 0.2f);
 		player->flipsidesifneeded();
 		return;
 	}
@@ -1177,14 +1181,14 @@ bool MovingPlatform::collision_detection_check_sides(IO_MovingObject * object)
 		//[ ][ ]
 		case 1:
 		{
-			if(object->ix + (object->collisionWidth >> 1) > txLeft * TILESIZE + TILESIZE)
+			if(object->ix + (object->collisionWidth >> 1) > (txLeft << 5) + TILESIZE)
 			{
-				object->xf((float)(txLeft * TILESIZE + TILESIZE) + 0.2f + fx - iHalfWidth);
+				object->xf((float)((txLeft << 5) + TILESIZE) + 0.2f + fx - iHalfWidth);
 				object->flipsidesifneeded();
 			}
 			else
 			{
-				object->yf((float)(tyTop * TILESIZE + TILESIZE) + 0.2f + fy - iHalfHeight);
+				object->yf((float)((tyTop << 5) + TILESIZE) + 0.2f + fy - iHalfHeight);
 			}
 
 			break;
@@ -1194,14 +1198,14 @@ bool MovingPlatform::collision_detection_check_sides(IO_MovingObject * object)
 		//[ ][ ]
 		case 2:
 		{
-			if(object->ix + (object->collisionWidth >> 1) < txRight * TILESIZE)
+			if(object->ix + (object->collisionWidth >> 1) < (txRight << 5))
 			{
-				object->xf((float)(txRight * TILESIZE - object->collisionWidth) - 0.2f + fx - iHalfWidth);
+				object->xf((float)((txRight << 5) - object->collisionWidth) - 0.2f + fx - iHalfWidth);
 				object->flipsidesifneeded();
 			}
 			else
 			{
-				object->yf((float)(tyTop * TILESIZE + TILESIZE) + 0.2f + fy - iHalfHeight);
+				object->yf((float)((tyTop << 5) + TILESIZE) + 0.2f + fy - iHalfHeight);
 			}
 
 			break;
@@ -1211,7 +1215,7 @@ bool MovingPlatform::collision_detection_check_sides(IO_MovingObject * object)
 		//[ ][ ]
 		case 3:
 		{
-			object->yf((float)(tyTop * TILESIZE + TILESIZE) + 0.2f + fy - iHalfHeight);
+			object->yf((float)((tyTop << 5) + TILESIZE) + 0.2f + fy - iHalfHeight);
 			break;
 		}
 
@@ -1219,14 +1223,14 @@ bool MovingPlatform::collision_detection_check_sides(IO_MovingObject * object)
 		//[X][ ]
 		case 4:
 		{
-			if(object->ix + (object->collisionWidth >> 1) > txLeft * TILESIZE + TILESIZE)
+			if(object->ix + (object->collisionWidth >> 1) > (txLeft << 5) + TILESIZE)
 			{
-				object->xf((float)(txLeft * TILESIZE + TILESIZE) + 0.2f + fx - iHalfWidth);
+				object->xf((float)((txLeft << 5) + TILESIZE) + 0.2f + fx - iHalfWidth);
 				object->flipsidesifneeded();
 			}
 			else
 			{
-				object->yf((float)(tyBottom * TILESIZE - object->collisionHeight) - 0.2f + fy - iHalfHeight);
+				object->yf((float)((tyBottom << 5) - object->collisionHeight) - 0.2f + fy - iHalfHeight);
 			}
 
 			break;
@@ -1236,7 +1240,7 @@ bool MovingPlatform::collision_detection_check_sides(IO_MovingObject * object)
 		//[X][ ]
 		case 5:
 		{
-			object->xf((float)(txLeft * TILESIZE + TILESIZE) + 0.2f + fx - iHalfWidth);
+			object->xf((float)((txLeft << 5) + TILESIZE) + 0.2f + fx - iHalfWidth);
 			object->flipsidesifneeded();
 			break;
 		}
@@ -1245,16 +1249,16 @@ bool MovingPlatform::collision_detection_check_sides(IO_MovingObject * object)
 		//[X][ ]
 		case 6:
 		{
-			if(object->ix + (object->collisionWidth >> 1) > txLeft * TILESIZE + TILESIZE)
+			if(object->ix + (object->collisionWidth >> 1) > (txLeft << 5) + TILESIZE)
 			{
-				object->yf((float)(tyTop * TILESIZE + TILESIZE) + 0.2f + fy - iHalfHeight);
-				object->xf((float)(txLeft * TILESIZE + TILESIZE) + 0.2f + fx - iHalfWidth);
+				object->yf((float)((tyTop << 5) + TILESIZE) + 0.2f + fy - iHalfHeight);
+				object->xf((float)((txLeft << 5) + TILESIZE) + 0.2f + fx - iHalfWidth);
 				object->flipsidesifneeded();
 			}
 			else
 			{
-				object->yf((float)(tyBottom * TILESIZE - object->collisionHeight) - 0.2f + fy - iHalfHeight);
-				object->xf((float)(txRight * TILESIZE - object->collisionWidth) - 0.2f + fx - iHalfWidth);
+				object->yf((float)((tyBottom << 5) - object->collisionHeight) - 0.2f + fy - iHalfHeight);
+				object->xf((float)((txRight << 5) - object->collisionWidth) - 0.2f + fx - iHalfWidth);
 				object->flipsidesifneeded();
 			}
 
@@ -1265,8 +1269,8 @@ bool MovingPlatform::collision_detection_check_sides(IO_MovingObject * object)
 		//[X][ ]
 		case 7:
 		{
-			object->yf((float)(tyTop * TILESIZE + TILESIZE) + 0.2f + fy - iHalfHeight);
-			object->xf((float)(txLeft * TILESIZE + TILESIZE) + 0.2f + fx - iHalfWidth);
+			object->yf((float)((tyTop << 5) + TILESIZE) + 0.2f + fy - iHalfHeight);
+			object->xf((float)((txLeft << 5) + TILESIZE) + 0.2f + fx - iHalfWidth);
 			object->flipsidesifneeded();
 			break;
 		}
@@ -1275,14 +1279,14 @@ bool MovingPlatform::collision_detection_check_sides(IO_MovingObject * object)
 		//[ ][X]
 		case 8:
 		{
-			if(object->ix + (object->collisionWidth >> 1) < txRight * TILESIZE)
+			if(object->ix + (object->collisionWidth >> 1) < (txRight << 5))
 			{
-				object->xf((float)(txRight * TILESIZE - object->collisionWidth) - 0.2f + fx - iHalfWidth);
+				object->xf((float)((txRight << 5) - object->collisionWidth) - 0.2f + fx - iHalfWidth);
 				object->flipsidesifneeded();
 			}
 			else
 			{
-				object->yf((float)(tyBottom * TILESIZE - object->collisionHeight) - 0.2f + fy - iHalfHeight);
+				object->yf((float)((tyBottom << 5) - object->collisionHeight) - 0.2f + fy - iHalfHeight);
 			}
 
 			break;
@@ -1292,16 +1296,16 @@ bool MovingPlatform::collision_detection_check_sides(IO_MovingObject * object)
 		//[ ][X]
 		case 9:
 		{
-			if(object->ix + (object->collisionWidth >> 1) > txLeft * TILESIZE + TILESIZE)
+			if(object->ix + (object->collisionWidth >> 1) > (txLeft << 5) + TILESIZE)
 			{
-				object->yf((float)(tyBottom * TILESIZE - object->collisionHeight) - 0.2f + fy - iHalfHeight);
-				object->xf((float)(txLeft * TILESIZE + TILESIZE) + 0.2f + fx - iHalfWidth);
+				object->yf((float)((tyBottom << 5) - object->collisionHeight) - 0.2f + fy - iHalfHeight);
+				object->xf((float)((txLeft << 5) + TILESIZE) + 0.2f + fx - iHalfWidth);
 				object->flipsidesifneeded();
 			}
 			else
 			{
-				object->yf((float)(tyTop * TILESIZE + TILESIZE) + 0.2f + fy - iHalfHeight);
-				object->xf((float)(txRight * TILESIZE - object->collisionWidth) - 0.2f + fx - iHalfWidth);
+				object->yf((float)((tyTop << 5) + TILESIZE) + 0.2f + fy - iHalfHeight);
+				object->xf((float)((txRight << 5) - object->collisionWidth) - 0.2f + fx - iHalfWidth);
 				object->flipsidesifneeded();
 			}
 
@@ -1312,7 +1316,7 @@ bool MovingPlatform::collision_detection_check_sides(IO_MovingObject * object)
 		//[ ][X]
 		case 10:
 		{
-			object->xf((float)(txRight * TILESIZE - object->collisionWidth) - 0.2f + fx - iHalfWidth);
+			object->xf((float)((txRight << 5) - object->collisionWidth) - 0.2f + fx - iHalfWidth);
 			object->flipsidesifneeded();
 			break;
 		}
@@ -1321,8 +1325,8 @@ bool MovingPlatform::collision_detection_check_sides(IO_MovingObject * object)
 		//[ ][X]
 		case 11:
 		{
-			object->yf((float)(tyTop * TILESIZE + TILESIZE) + 0.2f + fy - iHalfHeight);
-			object->xf((float)(txRight * TILESIZE - object->collisionWidth) - 0.2f + fx - iHalfWidth);
+			object->yf((float)((tyTop << 5) + TILESIZE) + 0.2f + fy - iHalfHeight);
+			object->xf((float)((txRight << 5) - object->collisionWidth) - 0.2f + fx - iHalfWidth);
 			object->flipsidesifneeded();
 			break;
 		}
@@ -1331,7 +1335,7 @@ bool MovingPlatform::collision_detection_check_sides(IO_MovingObject * object)
 		//[X][X]
 		case 12:
 		{
-			object->yf((float)(tyBottom * TILESIZE - object->collisionHeight) - 0.2f + fy - iHalfHeight);
+			object->yf((float)((tyBottom << 5) - object->collisionHeight) - 0.2f + fy - iHalfHeight);
 			break;
 		}
 
@@ -1339,8 +1343,8 @@ bool MovingPlatform::collision_detection_check_sides(IO_MovingObject * object)
 		//[X][X]
 		case 13:
 		{
-			object->yf((float)(tyBottom * TILESIZE - object->collisionHeight) - 0.2f + fy - iHalfHeight);
-			object->xf((float)(txLeft * TILESIZE + TILESIZE) + 0.2f + fx - iHalfWidth);
+			object->yf((float)((tyBottom << 5) - object->collisionHeight) - 0.2f + fy - iHalfHeight);
+			object->xf((float)((txLeft << 5) + TILESIZE) + 0.2f + fx - iHalfWidth);
 			object->flipsidesifneeded();
 			break;
 		}
@@ -1349,8 +1353,8 @@ bool MovingPlatform::collision_detection_check_sides(IO_MovingObject * object)
 		//[X][X]
 		case 14:
 		{
-			object->yf((float)(tyBottom * TILESIZE - object->collisionHeight) - 0.2f + fy - iHalfHeight);
-			object->xf((float)(txRight * TILESIZE - object->collisionWidth) - 0.2f + fx - iHalfWidth);
+			object->yf((float)((tyBottom << 5) - object->collisionHeight) - 0.2f + fy - iHalfHeight);
+			object->xf((float)((txRight << 5) - object->collisionWidth) - 0.2f + fx - iHalfWidth);
 			object->flipsidesifneeded();
 			break;
 		}
@@ -1360,7 +1364,7 @@ bool MovingPlatform::collision_detection_check_sides(IO_MovingObject * object)
 		//[X][X]
 		case 15:
 		{
-			object->yf((float)(tyBottom * TILESIZE + TILESIZE) + 0.2f + fy - iHalfHeight);
+			object->yf((float)((tyBottom << 5) + TILESIZE) + 0.2f + fy - iHalfHeight);
 			break;
 		}
 
@@ -1533,7 +1537,7 @@ void MovingPlatform::collide(IO_MovingObject * object)
 				}
 				else
 				{
-					object->xf((float)(tx * TILESIZE - object->collisionWidth) - 0.2f + fx - iHalfWidth);
+					object->xf((float)((tx << 5) - object->collisionWidth) - 0.2f + fx - iHalfWidth);
 					object->flipsidesifneeded();
 					
 					//test to see if we put the object on top of a background tile
@@ -1554,7 +1558,7 @@ void MovingPlatform::collide(IO_MovingObject * object)
 						(g_map.map(iTestBackgroundX, iTestBackgroundY) & tile_flag_solid) || 
 						(g_map.map(iTestBackgroundX, iTestBackgroundY2) & tile_flag_solid))
 					{
-						object->xf((float)(iTestBackgroundX * TILESIZE - object->collisionWidth) - 0.2f);
+						object->xf((float)((iTestBackgroundX << 5) - object->collisionWidth) - 0.2f);
 						object->flipsidesifneeded();
 					}
 
@@ -1607,7 +1611,7 @@ void MovingPlatform::collide(IO_MovingObject * object)
 				}
 				else
 				{
-					object->xf((float)(tx * TILESIZE + TILESIZE) + 0.2f + fx - iHalfWidth);
+					object->xf((float)((tx << 5) + TILESIZE) + 0.2f + fx - iHalfWidth);
 					object->flipsidesifneeded();
 
 					//test to see if we put the object on top of a background tile
@@ -1623,7 +1627,7 @@ void MovingPlatform::collide(IO_MovingObject * object)
 						(g_map.map(iTestBackgroundX, iTestBackgroundY) & tile_flag_solid) || 
 						(g_map.map(iTestBackgroundX, iTestBackgroundY2) & tile_flag_solid))
 					{
-						object->xf((float)(iTestBackgroundX * TILESIZE + TILESIZE) + 0.2f);
+						object->xf((float)((iTestBackgroundX << 5) + TILESIZE) + 0.2f);
 						object->flipsidesifneeded();
 					}
 
@@ -1702,7 +1706,7 @@ void MovingPlatform::collide(IO_MovingObject * object)
 				}
 				else
 				{
-					object->fPrecalculatedY = ty * TILESIZE + TILESIZE + 0.2f + fy - iHalfHeight;
+					object->fPrecalculatedY = (ty << 5) + TILESIZE + 0.2f + fy - iHalfHeight;
 					object->fOldY = object->fPrecalculatedY - fVelY - GRAVITATION;
 
 					if(object->vely < 0.0f && fVelY > 0.0f)
@@ -1735,7 +1739,7 @@ void MovingPlatform::collide(IO_MovingObject * object)
 			if(fRelativeX2 >= 0.0f && fRelativeX2 < iWidth)
 				t2 = iTileType[(short)fRelativeX2 / TILESIZE][ty].iFlags;
 
-			if(((t1 & tile_flag_solid_on_top) || (t2 & tile_flag_solid_on_top)) && object->fOldY + object->collisionHeight <= ty * TILESIZE + fOldY - iHalfHeight)
+			if(((t1 & tile_flag_solid_on_top) || (t2 & tile_flag_solid_on_top)) && object->fOldY + object->collisionHeight <= (ty << 5) + fOldY - iHalfHeight)
 			{
 				if(object->iVerticalPlatformCollision == 0)
 				{
@@ -1749,7 +1753,7 @@ void MovingPlatform::collide(IO_MovingObject * object)
 
 					object->iVerticalPlatformCollision = 2;
 
-					object->fPrecalculatedY = ty * TILESIZE - object->collisionHeight - 0.2f + fy - iHalfHeight;
+					object->fPrecalculatedY = (ty << 5) - object->collisionHeight - 0.2f + fy - iHalfHeight;
 					object->fOldY = object->fPrecalculatedY - fVelY;
 					object->vely = object->BottomBounce();
 					object->inair = false;
@@ -1777,7 +1781,7 @@ void MovingPlatform::collide(IO_MovingObject * object)
 
 					object->iVerticalPlatformCollision = 2;
 
-					object->fPrecalculatedY = ty * TILESIZE - object->collisionHeight - 0.2f + fy - iHalfHeight;
+					object->fPrecalculatedY = (ty << 5) - object->collisionHeight - 0.2f + fy - iHalfHeight;
 					object->fOldY = object->fPrecalculatedY - fVelY;
 					object->vely = object->BottomBounce();
 					object->inair = false;

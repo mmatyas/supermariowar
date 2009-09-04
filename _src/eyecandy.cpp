@@ -402,7 +402,7 @@ void EC_Corpse::update()
 			{	//on ground on tile solid_on_top
 				if((dy + 32.0f - vely) / TILESIZE < ty)
 				{	//only if we were above the tile in the previous frame
-					dy = (float) (ty * TILESIZE - 32);
+					dy = (float) ((ty << 5) - TILESIZE);
 					vely = 0.0f;
 					iy = (short)dy;
 
@@ -416,7 +416,7 @@ void EC_Corpse::update()
 			if((g_map.map(tx, ty) & 0x13) > 0 || (g_map.map(tx2, ty) & 0x13) > 0 ||
 				(leftblock && !leftblock->isTransparent() && !leftblock->isHidden()) || (rightblock && !rightblock->isTransparent() && !rightblock->isHidden()))
 			{	//on ground
-				dy = (float) (ty * TILESIZE - 32);
+				dy = (float) ((ty << 5)  - TILESIZE);
 				vely = 0.0f;
 				iy = (short)dy;
 
@@ -1219,4 +1219,198 @@ void CEyecandyContainer::cleandeadobjects()
 		}
 	}
 }
+
+static const short iSpotlightValues[8][4] = { {16, 8, 240, 96}, {32, 16, 336, 80}, {48, 24, 416, 64}, {64, 32, 416, 0}, {80, 40, 336, 0}, {96, 48, 240, 0}, {112, 56, 128, 0}, { 128, 64, 0, 0}};
+Spotlight::Spotlight(short x, short y, short size)
+{
+	ix = x;
+	iy = y;
+	iEndSize = size;
+	//iTransparency = 255;
+	iState = 0;
+	fUpdated = false;
+
+	iSizeCounter = 0;
+	iSize = 0;
+	
+	iWidth = iSpotlightValues[0][0];
+	iHalfWidth = iSpotlightValues[0][1];
+	
+	rSrc.x = iSpotlightValues[0][2];
+	rSrc.y = iSpotlightValues[0][3];
+	rSrc.w = iWidth;
+	rSrc.h = iWidth;
+}
+
+void Spotlight::Update()
+{
+	//If the spotlight's position wasn't updated this frame, that means the parent is dead and 
+	//this spotlight needs to be removed
+	if(!fUpdated)
+		iState = 2;
+
+	fUpdated = false;
+
+	if(iState == 0)
+	{
+		if(++iSizeCounter >= 4)
+		{
+			iSizeCounter = 0;
+			if(++iSize >= iEndSize)
+			{
+				iSize = iEndSize;
+				iState = 1; //spotlight has reached it's full size
+			}
+
+			iWidth = iSpotlightValues[iSize][0];
+			iHalfWidth = iSpotlightValues[iSize][1];
+			
+			rSrc.x = iSpotlightValues[iSize][2];
+			rSrc.y = iSpotlightValues[iSize][3];
+			rSrc.w = iWidth;
+			rSrc.h = iWidth;
+		}
+	}
+	else if(iState == 2)
+	{
+		if(++iSizeCounter >= 4)
+		{
+			iSizeCounter = 0;
+			if(--iSize < 0)
+			{
+				iSize = 0;
+				iState = 3; //stop drawing, spotlight is dead
+			}
+
+			iWidth = iSpotlightValues[iSize][0];
+			iHalfWidth = iSpotlightValues[iSize][1];
+			
+			rSrc.x = iSpotlightValues[iSize][2];
+			rSrc.y = iSpotlightValues[iSize][3];
+			rSrc.w = iWidth;
+			rSrc.h = iWidth;
+		}
+	}
+}
+
+void Spotlight::UpdatePosition(short x, short y)
+{
+	ix = x;
+	iy = y;
+	
+	fUpdated = true;
+}
+
+void Spotlight::Draw()
+{
+	SDL_Rect rDst = {ix - iHalfWidth, iy - iHalfWidth, iWidth, iWidth};
+	SDL_BlitSurface(spr_overlayhole.getSurface(), &rSrc, spr_overlay.getSurface(), &rDst);
+
+	if(ix - iHalfWidth < 0)
+	{
+		SDL_Rect rDstWrap = {ix - iHalfWidth + 640, iy - iHalfWidth, iWidth, iWidth};
+		SDL_BlitSurface(spr_overlayhole.getSurface(), &rSrc, spr_overlay.getSurface(), &rDstWrap);
+	}
+	else if(ix + iHalfWidth >= 640)
+	{
+		SDL_Rect rDstWrap = {ix - iHalfWidth - 640, iy - iHalfWidth, iWidth, iWidth};
+		SDL_BlitSurface(spr_overlayhole.getSurface(), &rSrc, spr_overlay.getSurface(), &rDstWrap);
+	}
+
+	/*
+	//Transparency fade in effect. Unfortunately, the perf was too slow
+	//Might be useful later if alpha fading perf is better
+	short iWidth = iSpotlightValues[iSize][0];
+	short iHalfWidth = iSpotlightValues[iSize][1];
+
+	spr_overlayhole.setalpha(255);
+
+	SDL_Rect rSrc = {iSpotlightValues[iSize][2], 0, iWidth, iWidth};
+	SDL_Rect rDst = {ix - iHalfWidth, iy - iHalfWidth, iWidth, iWidth};
+	SDL_BlitSurface(spr_overlayhole.getSurface(), &rSrc, spr_overlay.getSurface(), &rDst);
+
+	if(ix - iHalfWidth < 0)
+	{
+		SDL_Rect rDstWrap = {ix - iHalfWidth + 640, iy - iHalfWidth, iWidth, iWidth};
+		SDL_BlitSurface(spr_overlayhole.getSurface(), &rSrc, spr_overlay.getSurface(), &rDstWrap);
+	}
+	else if(ix + iHalfWidth >= 640)
+	{
+		SDL_Rect rDstWrap = {ix - iHalfWidth - 640, iy - iHalfWidth, iWidth, iWidth};
+		SDL_BlitSurface(spr_overlayhole.getSurface(), &rSrc, spr_overlay.getSurface(), &rDstWrap);
+	}
+
+	if(iTransparency <= 255 && iTransparency > 0)
+	{
+		spr_overlayhole.setalpha((Uint8)iTransparency);
+
+		SDL_Rect rTransSrc = {iSpotlightValues[iSize][2], 128, iWidth, iWidth};
+		SDL_Rect rTransDst = {ix - iHalfWidth, iy - iHalfWidth, iWidth, iWidth};
+		SDL_BlitSurface(spr_overlayhole.getSurface(), &rTransSrc, blitdest, &rTransDst);
+
+		if(ix - iHalfWidth < 0)
+		{
+			SDL_Rect rTransDstWrap = {ix - iHalfWidth + 640, iy - iHalfWidth, iWidth, iWidth};
+			SDL_BlitSurface(spr_overlayhole.getSurface(), &rTransSrc, blitdest, &rTransDstWrap);
+		}
+		else if(ix + iHalfWidth >= 640)
+		{
+			SDL_Rect rTransDstWrap = {ix - iHalfWidth - 640, iy - iHalfWidth, iWidth, iWidth};
+			SDL_BlitSurface(spr_overlayhole.getSurface(), &rTransSrc, blitdest, &rTransDstWrap);
+		}
+	}*/
+}
+
+Spotlight * SpotlightManager::AddSpotlight(short ix, short iy, short iSize)
+{
+	if(!game_values.spotlights)
+		return NULL;
+
+	Spotlight * s = new Spotlight(ix, iy, iSize);
+	spotlightList.push_back(s);
+	return s;
+}
+
+void SpotlightManager::DrawSpotlights()
+{
+	//Clear the overlay surface again with black
+	SDL_FillRect(spr_overlay.getSurface(), NULL, 0x0);
+
+	std::vector<Spotlight*>::iterator iter = spotlightList.begin(), lim = spotlightList.end();
+	
+	while (iter != lim)
+	{
+		(*iter)->Update();
+
+		if((*iter)->IsDead())
+		{
+			delete (*iter);
+			
+			iter = spotlightList.erase(iter);
+			lim = spotlightList.end();
+		}
+		else
+		{
+			(*iter)->Draw();
+			++iter;
+		}
+	}
+
+	//Draw the overlay
+	spr_overlay.draw(0, 0);
+}
+
+void SpotlightManager::ClearSpotlights()
+{
+	std::vector<Spotlight*>::iterator iter = spotlightList.begin(), lim = spotlightList.end();
+	
+	while (iter != lim)
+	{
+		delete (*iter);
+		++iter;
+	}
+
+	spotlightList.clear();
+}
+
 

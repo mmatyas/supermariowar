@@ -61,7 +61,7 @@ void Menu::WriteGameOptions()
 
 	if(fp != NULL)
 	{
-		fwrite(g_iVersion, sizeof(short), 4, fp);
+		fwrite(g_iVersion, sizeof(int), 4, fp);
 
 #ifdef _XBOX
 

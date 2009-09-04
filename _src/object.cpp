@@ -357,7 +357,7 @@ void IO_MovingObject::collision_detection_map()
 					return;
 				}
 
-				xf((float)(tx * TILESIZE - collisionWidth) - 0.2f); //move to the edge of the tile (tile on the right -> mind the object width)
+				xf((float)((tx << 5) - collisionWidth) - 0.2f); //move to the edge of the tile (tile on the right -> mind the object width)
 				fOldX = fx;
 				
 				if(velx > 0.0f)
@@ -425,7 +425,7 @@ void IO_MovingObject::collision_detection_map()
 					return;
 				}
 
-				xf((float)(tx * TILESIZE + TILESIZE) + 0.2f);			//move to the edge of the tile
+				xf((float)((tx << 5) + TILESIZE) + 0.2f);			//move to the edge of the tile
 				fOldX = fx;
 
 				if(velx < 0.0f)
@@ -486,7 +486,7 @@ void IO_MovingObject::collision_detection_map()
 			if(iVerticalPlatformCollision == 2)
 				KillObjectMapHazard();
 
-			yf((float)(ty * TILESIZE + TILESIZE) + 0.2f);
+			yf((float)((ty << 5) + TILESIZE) + 0.2f);
 			fOldY = fy - 1.0f;
 			
 			if(vely < 0.0f)
@@ -553,7 +553,7 @@ void IO_MovingObject::collision_detection_map()
 			if((fOldY + collisionHeight) / TILESIZE < ty)
 			{
 				vely = BottomBounce();
-				yf((float)(ty * TILESIZE - collisionHeight) - 0.2f);
+				yf((float)((ty << 5) - collisionHeight) - 0.2f);
 				fOldY = fy - GRAVITATION;
 				
 				if(!platform)
@@ -578,7 +578,7 @@ void IO_MovingObject::collision_detection_map()
 		if(((leftTile & tile_flag_solid) || (rightTile & tile_flag_solid)) && !fSuperDeathTileUnderObject)
 		{	
 			vely = BottomBounce();
-			yf((float)(ty * TILESIZE - collisionHeight) - 0.2f);
+			yf((float)((ty << 5) - collisionHeight) - 0.2f);
 			fOldY = fy;
 
 			if(!platform)
@@ -622,17 +622,11 @@ bool IO_MovingObject::collision_detection_checksides()
 	//First figure out where the corners of this object are touching
 	Uint8 iCase = 0;
 
-	short txl = -1, nofliptxl = -1;
+	short txl = -1, nofliptxl = ix >> 5;
 	if(ix < 0)
-	{
-		nofliptxl = (ix - TILESIZE) >> 5;
 		txl = (ix + 640) >> 5;
-	}
 	else
-	{
-		nofliptxl = ix >> 5;
 		txl = nofliptxl;
-	}
 
 	short txr = -1, nofliptxr = (ix + collisionWidth) >> 5;
 	if(ix + collisionWidth >= 640)
@@ -710,14 +704,14 @@ bool IO_MovingObject::collision_detection_checksides()
 		//[ ][ ]
 		case 1:
 		{
-			if(ix + (collisionWidth >> 1) > nofliptxl * TILESIZE + TILESIZE)
+			if(ix + (collisionWidth >> 1) > (nofliptxl << 5) + TILESIZE)
 			{
-				xf((float)(nofliptxl * TILESIZE + TILESIZE) + 0.2f);
+				xf((float)((nofliptxl << 5) + TILESIZE) + 0.2f);
 				flipsidesifneeded();
 			}
 			else
 			{
-				yf((float)(ty * TILESIZE + TILESIZE) + 0.2f);
+				yf((float)((ty << 5) + TILESIZE) + 0.2f);
 			}
 
 			break;
@@ -727,14 +721,14 @@ bool IO_MovingObject::collision_detection_checksides()
 		//[ ][ ]
 		case 2:
 		{
-			if(ix + (collisionWidth >> 1) < nofliptxr * TILESIZE)
+			if(ix + (collisionWidth >> 1) < (nofliptxr << 5))
 			{
-				xf((float)(nofliptxr * TILESIZE - collisionWidth) - 0.2f);
+				xf((float)((nofliptxr << TILESIZE) - collisionWidth) - 0.2f);
 				flipsidesifneeded();
 			}
 			else
 			{
-				yf((float)(ty * TILESIZE + TILESIZE) + 0.2f);
+				yf((float)((ty << 5) + TILESIZE) + 0.2f);
 			}
 
 			break;
@@ -744,7 +738,7 @@ bool IO_MovingObject::collision_detection_checksides()
 		//[ ][ ]
 		case 3:
 		{
-			yf((float)(ty * TILESIZE + TILESIZE) + 0.2f);
+			yf((float)((ty << 5) + TILESIZE) + 0.2f);
 			break;
 		}
 
@@ -752,14 +746,14 @@ bool IO_MovingObject::collision_detection_checksides()
 		//[X][ ]
 		case 4:
 		{
-			if(ix + (collisionWidth >> 1) > nofliptxl * TILESIZE + TILESIZE)
+			if(ix + (collisionWidth >> 1) > (nofliptxl << 5) + TILESIZE)
 			{
-				xf((float)(nofliptxl * TILESIZE + TILESIZE) + 0.2f);
+				xf((float)((nofliptxl << 5) + TILESIZE) + 0.2f);
 				flipsidesifneeded();
 			}
 			else
 			{
-				yf((float)(ty2 * TILESIZE - collisionHeight) - 0.2f);
+				yf((float)((ty2 << 5) - collisionHeight) - 0.2f);
 			}
 
 			break;
@@ -769,7 +763,7 @@ bool IO_MovingObject::collision_detection_checksides()
 		//[X][ ]
 		case 5:
 		{
-			xf((float)(nofliptxl * TILESIZE + TILESIZE) + 0.2f);
+			xf((float)((nofliptxl << 5) + TILESIZE) + 0.2f);
 			flipsidesifneeded();
 			break;
 		}
@@ -778,16 +772,16 @@ bool IO_MovingObject::collision_detection_checksides()
 		//[X][ ]
 		case 6:
 		{
-			if(ix + (collisionWidth >> 1) > nofliptxl * TILESIZE + TILESIZE)
+			if(ix + (collisionWidth >> 1) > (nofliptxl << 5) + TILESIZE)
 			{
-				yf((float)(ty * TILESIZE + TILESIZE) + 0.2f);
-				xf((float)(nofliptxl * TILESIZE + TILESIZE) + 0.2f);
+				yf((float)((ty << 5) + TILESIZE) + 0.2f);
+				xf((float)((nofliptxl << 5) + TILESIZE) + 0.2f);
 				flipsidesifneeded();
 			}
 			else
 			{
-				yf((float)(ty2 * TILESIZE - collisionHeight) - 0.2f);
-				xf((float)(nofliptxr * TILESIZE - collisionWidth) - 0.2f);
+				yf((float)((ty2 << 5) - collisionHeight) - 0.2f);
+				xf((float)((nofliptxr << 5) - collisionWidth) - 0.2f);
 				flipsidesifneeded();
 			}
 
@@ -798,8 +792,8 @@ bool IO_MovingObject::collision_detection_checksides()
 		//[X][ ]
 		case 7:
 		{
-			yf((float)(ty * TILESIZE + TILESIZE) + 0.2f);
-			xf((float)(nofliptxl * TILESIZE + TILESIZE) + 0.2f);
+			yf((float)((ty << 5) + TILESIZE) + 0.2f);
+			xf((float)((nofliptxl << 5) + TILESIZE) + 0.2f);
 			flipsidesifneeded();
 			break;
 		}
@@ -808,14 +802,14 @@ bool IO_MovingObject::collision_detection_checksides()
 		//[ ][X]
 		case 8:
 		{
-			if(ix + (collisionWidth >> 1) < nofliptxr * TILESIZE)
+			if(ix + (collisionWidth >> 1) < (nofliptxr << 5))
 			{
-				xf((float)(nofliptxr * TILESIZE - collisionWidth) - 0.2f);
+				xf((float)((nofliptxr << 5) - collisionWidth) - 0.2f);
 				flipsidesifneeded();
 			}
 			else
 			{
-				yf((float)(ty2 * TILESIZE - collisionHeight) - 0.2f);
+				yf((float)((ty2 << 5) - collisionHeight) - 0.2f);
 			}
 
 			break;
@@ -825,16 +819,16 @@ bool IO_MovingObject::collision_detection_checksides()
 		//[ ][X]
 		case 9:
 		{
-			if(ix + (collisionWidth >> 1) > nofliptxl * TILESIZE + TILESIZE)
+			if(ix + (collisionWidth >> 1) > (nofliptxl << 5) + TILESIZE)
 			{
-				yf((float)(ty2 * TILESIZE - collisionHeight) - 0.2f);
-				xf((float)(nofliptxl * TILESIZE + TILESIZE) + 0.2f);
+				yf((float)((ty2 << 5) - collisionHeight) - 0.2f);
+				xf((float)((nofliptxl << 5) + TILESIZE) + 0.2f);
 				flipsidesifneeded();
 			}
 			else
 			{
-				yf((float)(ty * TILESIZE + TILESIZE) + 0.2f);
-				xf((float)(nofliptxr * TILESIZE - collisionWidth) - 0.2f);
+				yf((float)((ty << 5) + TILESIZE) + 0.2f);
+				xf((float)((nofliptxr << 5) - collisionWidth) - 0.2f);
 				flipsidesifneeded();
 			}
 
@@ -845,7 +839,7 @@ bool IO_MovingObject::collision_detection_checksides()
 		//[ ][X]
 		case 10:
 		{
-			xf((float)(nofliptxr * TILESIZE - collisionWidth) - 0.2f);
+			xf((float)((nofliptxr << 5) - collisionWidth) - 0.2f);
 			flipsidesifneeded();
 			break;
 		}
@@ -854,8 +848,8 @@ bool IO_MovingObject::collision_detection_checksides()
 		//[ ][X]
 		case 11:
 		{
-			yf((float)(ty * TILESIZE + TILESIZE) + 0.2f);
-			xf((float)(nofliptxr * TILESIZE - collisionWidth) - 0.2f);
+			yf((float)((ty << 5) + TILESIZE) + 0.2f);
+			xf((float)((nofliptxr << 5) - collisionWidth) - 0.2f);
 			flipsidesifneeded();
 			break;
 		}
@@ -864,7 +858,7 @@ bool IO_MovingObject::collision_detection_checksides()
 		//[X][X]
 		case 12:
 		{
-			yf((float)(ty2 * TILESIZE - collisionHeight) - 0.2f);
+			yf((float)((ty2 << 5) - collisionHeight) - 0.2f);
 			break;
 		}
 
@@ -872,8 +866,8 @@ bool IO_MovingObject::collision_detection_checksides()
 		//[X][X]
 		case 13:
 		{
-			yf((float)(ty2 * TILESIZE - collisionHeight) - 0.2f);
-			xf((float)(nofliptxl * TILESIZE + TILESIZE) + 0.2f);
+			yf((float)((ty2 << 5) - collisionHeight) - 0.2f);
+			xf((float)((nofliptxl << 5) + TILESIZE) + 0.2f);
 			flipsidesifneeded();
 			break;
 		}
@@ -882,8 +876,8 @@ bool IO_MovingObject::collision_detection_checksides()
 		//[X][X]
 		case 14:
 		{
-			yf((float)(ty2 * TILESIZE - collisionHeight) - 0.2f);
-			xf((float)(nofliptxr * TILESIZE - collisionWidth) - 0.2f);
+			yf((float)((ty2 << 5) - collisionHeight) - 0.2f);
+			xf((float)((nofliptxr << 5) - collisionWidth) - 0.2f);
 			flipsidesifneeded();
 			break;
 		}
@@ -893,7 +887,7 @@ bool IO_MovingObject::collision_detection_checksides()
 		//[X][X]
 		case 15:
 		{
-			yf((float)(ty2 * TILESIZE + TILESIZE) + 0.2f);
+			yf((float)((ty2 << 5) + TILESIZE) + 0.2f);
 			break;
 		}
 

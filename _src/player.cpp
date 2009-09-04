@@ -7,7 +7,7 @@ extern CPlayer * GetPlayerFromGlobalID(short iGlobalID);
 extern short g_iWinningPlayer;
 extern short g_iSwirlSpawnLocations[4][2][25];
 extern void CheckSecret(short id);
-extern void AddSpotlight(short ix, short iy, short iSize);
+extern SpotlightManager spotlightManager;
 
 void CScore::AdjustScore(short iValue)
 {
@@ -62,6 +62,7 @@ CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamI
 	powerupused = -1;
 
 	//Do this so we have a valid x,y to say the player is so other items that init with the player will get valid positions
+	//The actual choosing of a spawning position happens later
 	FindSpawnPoint();
 
 	respawncounter = respawn;
@@ -398,7 +399,7 @@ void CPlayer::move()
 						if(block->getBlockType() == block_powerup)
 						{
 							block->dead = true;
-							B_ViewBlock * viewBlock = new B_ViewBlock(&spr_viewblock, block->col * TILESIZE, block->row * TILESIZE);
+							B_ViewBlock * viewBlock = new B_ViewBlock(&spr_viewblock, block->col << 5, block->row << 5);
 							
 							if(block->state != 0)
 							{
@@ -447,6 +448,37 @@ void CPlayer::move()
 		}
 	}*/
 
+	if(state == player_ready)
+	{
+		static const int iSecretCode[18] = {4, 8, 4, 8, 1, 1, 4, 8, 4, 8, 1, 1, 4, 8, 4, 8, 1, 1};
+
+		if(iSecretCodeIndex > 0)
+		{
+			if(++iSecretCodeTimer >= 186)
+			{
+				iSecretCodeIndex = 0;
+				iSecretCodeTimer = 0;
+			}
+		}
+	    
+		if (keymask & iSecretCode[iSecretCodeIndex]) 
+		{
+			iSecretCodeIndex++;
+		}
+		else if (keymask & ~iSecretCode[iSecretCodeIndex])
+		{
+			iSecretCodeIndex = 0;
+			iSecretCodeTimer = 0;
+		}
+
+		if (iSecretCodeIndex == 18 && iSecretCodeTimer < 186)
+		{
+			iSecretCodeIndex = 0;
+			iSecretCodeTimer = 0;
+			CheckSecret(3);
+		}
+	}
+
 	//Free player from the kuribo shoe
 	if (iKuriboShoe > 0 && state == player_ready && !frozen)
 	{
@@ -462,7 +494,9 @@ void CPlayer::move()
 		}
 	    
 		if (keymask & iExitKuriboShoeCode[iKuriboShoeExitIndex]) 
+		{
 			iKuriboShoeExitIndex++;
+		}
 		else if (keymask & ~iExitKuriboShoeCode[iKuriboShoeExitIndex])
 		{
 			iKuriboShoeExitIndex = 0;
@@ -1587,12 +1621,18 @@ void CPlayer::move()
 				velx = 0.0f;
 		}
 		
+		if(!inair)
+		{
+			if(game_values.unlocksecret3part2[globalID] > 0)
+				game_values.unlocksecret3part2[globalID]--;
+		}
+
 		fOldX = fx;
 		fOldY = fy;
 			
-		float oldvelx = velx;
 		if(game_values.windaffectsplayers)
 		{
+			oldvelx = velx;
 			float windx = game_values.gamewindx / (iKuriboShoe > 0 ? 3.0f : 1.5f);
 			velx = CapSideVelocity(velx + windx);
 		}
@@ -1600,8 +1640,8 @@ void CPlayer::move()
 		collision_detection_map();
 		
 		//If the player died or entered a warp, don't reset his velocity
-		if(state == player_ready)
-			velx = oldvelx;
+		if(game_values.windaffectsplayers && state == player_ready)
+			velx = oldvelx;		
 	}
 
 	//Player can be killed by map so only do this code if he is still living
@@ -1769,6 +1809,16 @@ void CPlayer::CommitAction()
 	else if(player_action_spintail == action)
 	{
 		SpinTail();
+	}
+
+	if(action == player_action_fireball)
+	{
+		game_values.unlocksecret3part1[globalID]++;
+		CheckSecret(2);
+	}
+	else if(action != player_action_none)
+	{
+		game_values.unlocksecret3part1[globalID] = 0;
 	}
 
 	action = player_action_none;
@@ -2031,8 +2081,9 @@ void CPlayer::chooseWarpExit()
 		state = player_exiting_warp_up;
 		warpcounter = PH + PHOFFSET;
 		velx = 0.0f;
+		oldvelx = velx;
 		vely = -4.0f;
-		warpplane = exit->warpy * TILESIZE;
+		warpplane = exit->warpy << 5;
 
 		//Trigger block that we warp into
 		short iCol = ix / TILESIZE;
@@ -2051,8 +2102,9 @@ void CPlayer::chooseWarpExit()
 		state = player_exiting_warp_right;
 		warpcounter = PW + PWOFFSET;
 		velx = 1.0f;
+		oldvelx = velx;
 		vely = 1.0f;
-		warpplane = exit->warpx * TILESIZE + TILESIZE;
+		warpplane = (exit->warpx << 5) + TILESIZE;
 
 		//Trigger block that we warp into
 		short iCol = ix / TILESIZE;
@@ -2071,9 +2123,10 @@ void CPlayer::chooseWarpExit()
 		state = player_exiting_warp_down;
 		warpcounter = TILESIZE - PHOFFSET;
 		velx = 0.0f;
+		oldvelx = velx;
 		vely = 1.1f;
 		inair = true;
-		warpplane = exit->warpy * TILESIZE + TILESIZE;
+		warpplane = (exit->warpy << 5) + TILESIZE;
 
 		//Trigger block that we warp into
 		short iCol = ix / TILESIZE;
@@ -2092,8 +2145,9 @@ void CPlayer::chooseWarpExit()
 		state = player_exiting_warp_left;
 		warpcounter = PW + PWOFFSET;
 		velx = -1.0f;
+		oldvelx = velx;
 		vely = 1.0f;
-		warpplane = exit->warpx * TILESIZE;
+		warpplane = (exit->warpx << 5);
 
 		//Trigger block that we warp into
 		short iCol = ix / TILESIZE;
@@ -2224,6 +2278,7 @@ void CPlayer::SetupNewPlayer()
 	action = player_action_none;
 
 	velx = 0.0f;
+	oldvelx = velx;
 	
 	if(game_values.spawnstyle == 1)
 		vely = 0.0f;
@@ -2255,6 +2310,8 @@ void CPlayer::SetupNewPlayer()
 	StripPowerups();
 	ClearPowerupStates();
 	
+	sSpotlight = NULL;
+
 	iCapeTimer = 0;
 	iCapeFrameX = 0;
 	iCapeFrameY = 0;
@@ -2296,9 +2353,11 @@ void CPlayer::SetupNewPlayer()
 	iKuriboShoeExitTimer = 0;
 	iKuriboShoeExitIndex = 0;
 
+	iSecretCodeTimer = 0;
+	iSecretCodeIndex = 0;
+
 	iDumpCollectionCardTimer = 0;
 	iDumpCollectionCardIndex = 0;
-
 
 	fSuperStomp = false;
 	iSuperStompTimer = 0;
@@ -2324,6 +2383,9 @@ void CPlayer::SetupNewPlayer()
 	}
 
 	throw_star = 0;
+
+	game_values.unlocksecret3part1[globalID] = 0;
+	game_values.unlocksecret3part2[globalID] = 0;
 }
 
 void CPlayer::StripPowerups()
@@ -3056,9 +3118,17 @@ void BounceAssistPlayer(CPlayer * o1, CPlayer * o2)
 
 void CPlayer::draw()
 {
-	if(state != player_wait && state != player_dead)
+	if(game_values.spotlights && state != player_wait && state != player_dead)
 	{
-		AddSpotlight(ix + HALFPW, iy + HALFPH, 0);
+		if(!sSpotlight)
+		{
+			sSpotlight = spotlightManager.AddSpotlight(ix + HALFPW, iy + HALFPH, 7);
+		}
+
+		if(sSpotlight)
+		{
+			sSpotlight->UpdatePosition(ix + HALFPW, iy + HALFPH);
+		}
 	}
 
 	//Don't draw a player that is waiting to respawn
@@ -3626,14 +3696,14 @@ void CPlayer::collision_detection_map()
 			//first check to see if player hit a warp
 			if(playerKeys->game_right.fDown && !frozen && g_map.checkforwarp(tx, ty, ty2, 3))
 			{
-				xf((float)(tx * TILESIZE - PW) - 0.2f);
+				xf((float)((tx << 5) - PW) - 0.2f);
 				enterwarp(g_map.warp(tx, ty2));
 				warpplane = ix + PW + 1;
 
-				if(iy - PHOFFSET < ty * TILESIZE)
-					yi(ty * TILESIZE + PHOFFSET);
-				else if(iy + PH > ty2 * TILESIZE + TILESIZE - 3)
-					yi(ty2 * TILESIZE + TILESIZE - PH - 3);
+				if(iy - PHOFFSET < (ty << 5))
+					yi((ty << 5) + PHOFFSET);
+				else if(iy + PH > (ty2 << 5) + TILESIZE - 3)
+					yi((ty2 << 5) + TILESIZE - PH - 3);
 
 				return;
 			}
@@ -3677,11 +3747,14 @@ void CPlayer::collision_detection_map()
 					return;
 				}
 
-				xf((float)(tx * TILESIZE - PW) - 0.2f);			//move to the edge of the tile (tile on the right -> mind the player width)
+				xf((float)((tx << 5) - PW) - 0.2f);			//move to the edge of the tile (tile on the right -> mind the player width)
 				fOldX = fx;
 				
 				if(velx > 0.0f)
 					velx = 0.0f;
+				
+				if(oldvelx > 0.0f)
+					oldvelx = 0.0f;
 
 				flipsidesifneeded();
 			}
@@ -3716,14 +3789,14 @@ void CPlayer::collision_detection_map()
 			//first check to see if player hit a warp
 			if(playerKeys->game_left.fDown && !frozen && g_map.checkforwarp(tx, ty, ty2, 1))
 			{
-				xf((float)(tx * TILESIZE + TILESIZE) + 0.2f);
+				xf((float)((tx << 5) + TILESIZE) + 0.2f);
 				enterwarp(g_map.warp(tx, ty2));
 				warpplane = ix;
 
-				if(iy - PHOFFSET < ty * TILESIZE)
-					yi(ty * TILESIZE + PHOFFSET);
-				else if(iy + PH > ty2 * TILESIZE + TILESIZE - 3)
-					yi(ty2 * TILESIZE + TILESIZE - PH - 3);
+				if(iy - PHOFFSET < (ty << 5))
+					yi((ty << 5) + PHOFFSET);
+				else if(iy + PH > (ty2 << 5) + TILESIZE - 3)
+					yi((ty2<< 5) + TILESIZE - PH - 3);
 
 				return;
 			}
@@ -3766,11 +3839,14 @@ void CPlayer::collision_detection_map()
 					return;
 				}
 
-				xf((float)(tx * TILESIZE + TILESIZE) + 0.2f);			//move to the edge of the tile
+				xf((float)((tx << 5) + TILESIZE) + 0.2f);			//move to the edge of the tile
 				fOldX = fx;
 				
 				if(velx < 0.0f)
 					velx = 0.0f;
+
+				if(oldvelx < 0.0f)
+					oldvelx = 0.0f;
 
 				flipsidesifneeded();
 			}
@@ -3806,19 +3882,19 @@ void CPlayer::collision_detection_map()
 
 	//printf("Before Y - ix: %d\tiy: %d\toldx: %.2f\toldy: %d\tty: %.2f\tty2: %d\ttxl: %d\ttxr: %d\tfx: %.2f\tfy: %.2f\tvelx: %.2f\tvely: %.2f\n", ix, iy, fOldX, fOldY, (int)(fPrecalculatedY) / TILESIZE, ((int)(fPrecalculatedY) + PH) / TILESIZE, txl, txr, fx, fy, velx, vely);
 
-	short overlaptxl = txl * TILESIZE + TILESIZE + 1;
+	short overlaptxl = (txl << 5) + TILESIZE + 1;
 
 	if(ix + HALFPW < overlaptxl)
 	{
 		alignedBlockX = txl;
 		unAlignedBlockX = txr;
-		unAlignedBlockFX = (float)(txr * TILESIZE - PW) - 0.2f;
+		unAlignedBlockFX = (float)((txr << 5) - PW) - 0.2f;
 	}
 	else
 	{
 		alignedBlockX = txr;
 		unAlignedBlockX = txl;
-		unAlignedBlockFX = (float)(txl * TILESIZE + TILESIZE) + 0.2f;
+		unAlignedBlockFX = (float)((txl << 5) + TILESIZE) + 0.2f;
 	}
 
 	float fMovingUp = vely;
@@ -3837,14 +3913,14 @@ void CPlayer::collision_detection_map()
 		
 		if(playerKeys->game_jump.fDown && !frozen && g_map.checkforwarp(alignedBlockX, unAlignedBlockX, ty, 2))
 		{
-			yf((float)(ty * TILESIZE + TILESIZE) + 0.2f);
+			yf((float)((ty << 5) + TILESIZE) + 0.2f);
 			enterwarp(g_map.warp(unAlignedBlockX, ty));
 			warpplane = iy;
 
-			if(ix - PWOFFSET < txl * TILESIZE + 1)
-				xi(txl * TILESIZE + PHOFFSET + 1);
-			else if(ix + PW + PWOFFSET > txr * TILESIZE + TILESIZE)
-				xi(txr * TILESIZE + TILESIZE - PW - PWOFFSET);
+			if(ix - PWOFFSET < (txl << 5) + 1)
+				xi((txl << 5) + PHOFFSET + 1);
+			else if(ix + PW + PWOFFSET > (txr << 5) + TILESIZE)
+				xi((txr << 5) + TILESIZE - PW - PWOFFSET);
 
 			return;
 		}
@@ -3872,7 +3948,7 @@ void CPlayer::collision_detection_map()
 		if((alignedTileType & tile_flag_solid) && !(alignedTileType & tile_flag_super_or_player_death_bottom) &&
 			(!(alignedTileType & tile_flag_death_on_bottom) || invincible || shield > 0 || shyguy))
 		{
-			yf((float)(ty * TILESIZE + TILESIZE) + 0.2f);
+			yf((float)((ty << 5) + TILESIZE) + 0.2f);
 			fOldY = fy - 1.0f;
 			
 			if(vely < 0.0f)
@@ -3949,17 +4025,17 @@ void CPlayer::collision_detection_map()
 		
 		if(playerKeys->game_down.fDown && !frozen && g_map.checkforwarp(txl, txr, ty, 0))
 		{
-			yf((float)(ty * TILESIZE - PH) - 0.2f);
+			yf((float)((ty << 5) - PH) - 0.2f);
 			enterwarp(g_map.warp(txr,ty));
 			warpplane = iy + PH + 1;
 
 			fallthrough = false;
 			platform = NULL;
 
-			if(ix - PWOFFSET < txl * TILESIZE + 1)
-				xi(txl * TILESIZE + PHOFFSET + 1);
-			else if(ix + PW + PWOFFSET > txr * TILESIZE + TILESIZE)
-				xi(txr * TILESIZE + TILESIZE - PW - PWOFFSET);
+			if(ix - PWOFFSET < (txl << 5) + 1)
+				xi((txl << 5) + PHOFFSET + 1);
+			else if(ix + PW + PWOFFSET > (txr << 5) + TILESIZE)
+				xi((txr << 5) + TILESIZE - PW - PWOFFSET);
 
 			return;
 		}
@@ -4010,7 +4086,7 @@ void CPlayer::collision_detection_map()
 		
 		bool fSolidTileUnderPlayer = (lefttile & tile_flag_solid)  || (righttile & tile_flag_solid);
 		
-		if((lefttile & tile_flag_solid_on_top || righttile & tile_flag_solid_on_top || fGapSupport) && fOldY + PH <= ty * TILESIZE)
+		if((lefttile & tile_flag_solid_on_top || righttile & tile_flag_solid_on_top || fGapSupport) && fOldY + PH <= (ty << 5))
 		{	//on ground
 			//Deal with player down jumping through solid on top tiles
 
@@ -4019,7 +4095,7 @@ void CPlayer::collision_detection_map()
 
 			if(fallthrough && !fSolidTileUnderPlayer)
 			{
-				yf((float)(ty * TILESIZE - PH) + 0.2f);
+				yf((float)((ty << 5) - PH) + 0.2f);
 
 				if(!platform)
 				{
@@ -4029,7 +4105,7 @@ void CPlayer::collision_detection_map()
 			else
 			{
 				//we were above the tile in the previous frame
-				yf((float)(ty * TILESIZE - PH) - 0.2f);
+				yf((float)((ty << 5) - PH) - 0.2f);
 				vely = GRAVITATION;
 
 				if(!platform)
@@ -4072,7 +4148,7 @@ void CPlayer::collision_detection_map()
 			(!fDeathTileUnderPlayer || invincible || shield > 0 || iKuriboShoe > 0 || shyguy) )
 		{	//on ground
 
-			yf((float)(ty * TILESIZE - PH) - 0.2f);
+			yf((float)((ty << 5) - PH) - 0.2f);
 			vely = GRAVITATION;				//1 so we test against the ground again int the next frame (0 would test against the ground in the next+1 frame)
 
 			if(!platform)
@@ -4184,7 +4260,7 @@ bool CPlayer::collision_detection_checktop()
 		(leftBlock && !leftBlock->isTransparent() && !leftBlock->isHidden()) || 
 		(rightBlock && !rightBlock->isTransparent() && !rightBlock->isHidden()))
 	{
-		yf((float)(ty * TILESIZE + TILESIZE) + 0.2f);
+		yf((float)((ty << 5) + TILESIZE) + 0.2f);
 		return true;
 	}
 
@@ -4220,7 +4296,7 @@ bool CPlayer::collision_detection_checkleft()
 		(topBlock && !topBlock->isTransparent() && !topBlock->isHidden()) || 
 		(bottomBlock && !bottomBlock->isTransparent() && !bottomBlock->isHidden()))
 	{
-		xf((float)(tx * TILESIZE + TILESIZE) + 0.2f);
+		xf((float)((tx << 5) + TILESIZE) + 0.2f);
 		flipsidesifneeded();
 		return true;
 	}
@@ -4262,7 +4338,7 @@ bool CPlayer::collision_detection_checkright()
 		(topBlock && !topBlock->isTransparent() && !topBlock->isHidden()) || 
 		(bottomBlock && !bottomBlock->isTransparent() && !bottomBlock->isHidden()))
 	{
-		xf((float)(tx * TILESIZE - PW) - 0.2f);
+		xf((float)((tx << 5) - PW) - 0.2f);
 		flipsidesifneeded();
 		return true;
 	}
@@ -4275,16 +4351,16 @@ void CPlayer::collision_detection_checksides()
 	//First figure out where the corners of this object are touching
 	Uint8 iCase = 0;
 
-	short txl = ix / TILESIZE;
+	short txl = ix >> 5;
 
 	short txr = -1;
 	if(ix + PW >= 640)
-		txr = (ix + PW - 640) / TILESIZE;
+		txr = (ix + PW - 640) >> 5;
 	else
-		txr = (ix + PW) / TILESIZE;
+		txr = (ix + PW) >> 5;
 
-	short ty = iy / TILESIZE;
-	short ty2 = (iy + PH) / TILESIZE;
+	short ty = iy >> 5;
+	short ty2 = (iy + PH) >> 5;
 
 	if(iy >= 0)
 	{
@@ -4352,14 +4428,14 @@ void CPlayer::collision_detection_checksides()
 		//[ ][ ]
 		case 1:
 		{
-			if(ix + (PW >> 1) > txl * TILESIZE + TILESIZE)
+			if(ix + (PW >> 1) > (txl << 5) + TILESIZE)
 			{
-				xf((float)(txl * TILESIZE + TILESIZE) + 0.2f);
+				xf((float)((txl << 5) + TILESIZE) + 0.2f);
 				flipsidesifneeded();
 			}
 			else
 			{
-				yf((float)(ty * TILESIZE + TILESIZE) + 0.2f);
+				yf((float)((ty << 5) + TILESIZE) + 0.2f);
 			}
 
 			break;
@@ -4369,14 +4445,14 @@ void CPlayer::collision_detection_checksides()
 		//[ ][ ]
 		case 2:
 		{
-			if(ix + (PW >> 1) < txr * TILESIZE)
+			if(ix + (PW >> 1) < (txr << 5))
 			{
-				xf((float)(txr * TILESIZE - PW) - 0.2f);
+				xf((float)((txr << 5) - PW) - 0.2f);
 				flipsidesifneeded();
 			}
 			else
 			{
-				yf((float)(ty * TILESIZE + TILESIZE) + 0.2f);
+				yf((float)((ty << 5) + TILESIZE) + 0.2f);
 			}
 
 			break;
@@ -4386,7 +4462,7 @@ void CPlayer::collision_detection_checksides()
 		//[ ][ ]
 		case 3:
 		{
-			yf((float)(ty * TILESIZE + TILESIZE) + 0.2f);
+			yf((float)((ty << 5) + TILESIZE) + 0.2f);
 			break;
 		}
 
@@ -4394,14 +4470,14 @@ void CPlayer::collision_detection_checksides()
 		//[X][ ]
 		case 4:
 		{
-			if(ix + (PW >> 1) > txl * TILESIZE + TILESIZE)
+			if(ix + (PW >> 1) > (txl << 5) + TILESIZE)
 			{
-				xf((float)(txl * TILESIZE + TILESIZE) + 0.2f);
+				xf((float)((txl << 5) + TILESIZE) + 0.2f);
 				flipsidesifneeded();
 			}
 			else
 			{
-				yf((float)(ty2 * TILESIZE - PH) - 0.2f);
+				yf((float)((ty2 << 5) - PH) - 0.2f);
 			}
 
 			break;
@@ -4411,7 +4487,7 @@ void CPlayer::collision_detection_checksides()
 		//[X][ ]
 		case 5:
 		{
-			xf((float)(txl * TILESIZE + TILESIZE) + 0.2f);
+			xf((float)((txl << 5) + TILESIZE) + 0.2f);
 			flipsidesifneeded();
 			break;
 		}
@@ -4420,16 +4496,16 @@ void CPlayer::collision_detection_checksides()
 		//[X][ ]
 		case 6:
 		{
-			if(ix + (PW >> 1) > txl * TILESIZE + TILESIZE)
+			if(ix + (PW >> 1) > (txl << 5) + TILESIZE)
 			{
-				yf((float)(ty * TILESIZE + TILESIZE) + 0.2f);
-				xf((float)(txl * TILESIZE + TILESIZE) + 0.2f);
+				yf((float)((ty << 5) + TILESIZE) + 0.2f);
+				xf((float)((txl << 5) + TILESIZE) + 0.2f);
 				flipsidesifneeded();
 			}
 			else
 			{
-				yf((float)(ty2 * TILESIZE - PH) - 0.2f);
-				xf((float)(txr * TILESIZE - PW) - 0.2f);
+				yf((float)((ty2 << 5) - PH) - 0.2f);
+				xf((float)((txr << 5) - PW) - 0.2f);
 				flipsidesifneeded();
 			}
 
@@ -4440,8 +4516,8 @@ void CPlayer::collision_detection_checksides()
 		//[X][ ]
 		case 7:
 		{
-			yf((float)(ty * TILESIZE + TILESIZE) + 0.2f);
-			xf((float)(txl * TILESIZE + TILESIZE) + 0.2f);
+			yf((float)((ty << 5) + TILESIZE) + 0.2f);
+			xf((float)((txl << 5) + TILESIZE) + 0.2f);
 			flipsidesifneeded();
 			break;
 		}
@@ -4450,14 +4526,14 @@ void CPlayer::collision_detection_checksides()
 		//[ ][X]
 		case 8:
 		{
-			if(ix + (PW >> 1) < txr * TILESIZE)
+			if(ix + (PW >> 1) < (txr << 5))
 			{
-				xf((float)(txr * TILESIZE - PW) - 0.2f);
+				xf((float)((txr << 5) - PW) - 0.2f);
 				flipsidesifneeded();
 			}
 			else
 			{
-				yf((float)(ty2 * TILESIZE - PH) - 0.2f);
+				yf((float)((ty2 << 5) - PH) - 0.2f);
 			}
 
 			break;
@@ -4467,16 +4543,16 @@ void CPlayer::collision_detection_checksides()
 		//[ ][X]
 		case 9:
 		{
-			if(ix + (PW >> 1) > txl * TILESIZE + TILESIZE)
+			if(ix + (PW >> 1) > (txl << 5) + TILESIZE)
 			{
-				yf((float)(ty2 * TILESIZE - PH) - 0.2f);
-				xf((float)(txl * TILESIZE + TILESIZE) + 0.2f);
+				yf((float)((ty2 << 5) - PH) - 0.2f);
+				xf((float)((txl << 5) + TILESIZE) + 0.2f);
 				flipsidesifneeded();
 			}
 			else
 			{
-				yf((float)(ty * TILESIZE + TILESIZE) + 0.2f);
-				xf((float)(txr * TILESIZE - PW) - 0.2f);
+				yf((float)((ty << 5) + TILESIZE) + 0.2f);
+				xf((float)((txr << 5) - PW) - 0.2f);
 				flipsidesifneeded();
 			}
 
@@ -4487,7 +4563,7 @@ void CPlayer::collision_detection_checksides()
 		//[ ][X]
 		case 10:
 		{
-			xf((float)(txr * TILESIZE - PW) - 0.2f);
+			xf((float)((txr << 5) - PW) - 0.2f);
 			flipsidesifneeded();
 			break;
 		}
@@ -4496,8 +4572,8 @@ void CPlayer::collision_detection_checksides()
 		//[ ][X]
 		case 11:
 		{
-			yf((float)(ty * TILESIZE + TILESIZE) + 0.2f);
-			xf((float)(txr * TILESIZE - PW) - 0.2f);
+			yf((float)((ty << 5) + TILESIZE) + 0.2f);
+			xf((float)((txr << 5) - PW) - 0.2f);
 			flipsidesifneeded();
 			break;
 		}
@@ -4506,7 +4582,7 @@ void CPlayer::collision_detection_checksides()
 		//[X][X]
 		case 12:
 		{
-			yf((float)(ty2 * TILESIZE - PH) - 0.2f);
+			yf((float)((ty2 << 5) - PH) - 0.2f);
 			break;
 		}
 
@@ -4514,8 +4590,8 @@ void CPlayer::collision_detection_checksides()
 		//[X][X]
 		case 13:
 		{
-			yf((float)(ty2 * TILESIZE - PH) - 0.2f);
-			xf((float)(txl * TILESIZE + TILESIZE) + 0.2f);
+			yf((float)((ty2 << 5) - PH) - 0.2f);
+			xf((float)((txl << 5) + TILESIZE) + 0.2f);
 			flipsidesifneeded();
 			break;
 		}
@@ -4524,8 +4600,8 @@ void CPlayer::collision_detection_checksides()
 		//[X][X]
 		case 14:
 		{
-			yf((float)(ty2 * TILESIZE - PH) - 0.2f);
-			xf((float)(txr * TILESIZE - PW) - 0.2f);
+			yf((float)((ty2 << 5) - PH) - 0.2f);
+			xf((float)((txr << 5) - PW) - 0.2f);
 			flipsidesifneeded();
 			break;
 		}
@@ -4535,7 +4611,7 @@ void CPlayer::collision_detection_checksides()
 		//[X][X]
 		case 15:
 		{
-			yf((float)(ty2 * TILESIZE + TILESIZE) + 0.2f);
+			yf((float)((ty2 << 5) + TILESIZE) + 0.2f);
 			break;
 		}
 
@@ -4551,24 +4627,28 @@ void CPlayer::enterwarp(Warp * warp)
 		state = player_entering_warp_down;
 		vely = 0.0f;
 		velx = 0.0f;
+		oldvelx = velx;
 	}
 	else if(warp->direction == 1)
 	{
 		state = player_entering_warp_left;
 		vely = 0.0f;
 		velx = -1.0f;
+		oldvelx = velx;
 	}
 	else if(warp->direction == 2)
 	{
 		state = player_entering_warp_up;
 		vely = 0.0f;
 		velx = 0.0f;
+		oldvelx = velx;
 	}
 	else if(warp->direction == 3)
 	{
 		state = player_entering_warp_right;
 		vely = 0.0f;
 		velx = 1.0f;
+		oldvelx = velx;
 	}
 
 	warpconnection = warp->connection;

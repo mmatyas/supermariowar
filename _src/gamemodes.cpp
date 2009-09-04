@@ -44,7 +44,7 @@ void SetupScoreBoard(bool fOrderMatters)
 {
 	short i, j;
 	
-	bool draw[4] = {false, false, false, false};
+	bool doneWithScore[4] = {false, false, false, false};
 
 	short oldmax = -1;
 	short max = -1;
@@ -55,16 +55,25 @@ void SetupScoreBoard(bool fOrderMatters)
 
 		for(j = 0; j < score_cnt; j++)
 		{
-			if(!draw[j])
+			if(!doneWithScore[j])
 			{	
-				//If this player's score is bigger
-				if(max == -1 || score[j]->score > score[max]->score)
+				//The boxes minigame doesn't use "score" it uses "subscore[0]" to determine the winner
+				if(game_values.gamemode->gamemode == game_mode_boxes_minigame)
 				{
-					max = j;
+					if(max == -1 || score[j]->subscore[0] > score[max]->subscore[0] ||
+						(score[j]->subscore[0] == score[max]->subscore[0] && score[j]->score > score[max]->score)) //or it is tied but they died later in the game
+					{
+						max = j;
+					}
 				}
-				else if(score[j]->score == score[max]->score && score[j]->order > score[max]->order) //or it is tied but they died later in the game
+				else
 				{
-					max = j;
+					//If this player's score is bigger
+					if(max == -1 || score[j]->score > score[max]->score ||
+						(score[j]->score == score[max]->score && score[j]->order > score[max]->order)) //or it is tied but they died later in the game
+					{
+						max = j;
+					}
 				}
 			}
 		}
@@ -74,11 +83,20 @@ void SetupScoreBoard(bool fOrderMatters)
 
 		if(!fOrderMatters && i > 0)
 		{
-			if(score[oldmax]->score == score[max]->score)
-				score[max]->place = score[oldmax]->place;
+			if(game_values.gamemode->gamemode == game_mode_boxes_minigame)
+			{
+				if(score[oldmax]->subscore[0] == score[max]->subscore[0] && 
+					score[oldmax]->score == score[max]->score)
+					score[max]->place = score[oldmax]->place;
+			}
+			else
+			{
+				if(score[oldmax]->score == score[max]->score)
+					score[max]->place = score[oldmax]->place;
+			}
 		}
 
-		draw[max] = true;	//this is the next biggest score - it doesn't belong to the remaining scores from now on
+		doneWithScore[max] = true;	//this is the next biggest score - it doesn't belong to the remaining scores from now on
 	}
 
 	//Add the treasure chests to the map in world mode if there were any awards for winning this match
@@ -2249,11 +2267,11 @@ void CGM_Stomp::think()
 			if(0 == iSelectedEnemy)
 				objectcontainer[0].add(new MO_Goomba(&spr_goomba, rand() % 2 == 0, false));
 			else if(1 == iSelectedEnemy)
-				objectcontainer[0].add(new MO_Koopa(&spr_koopa, rand() % 2 == 0, false, false));
+				objectcontainer[0].add(new MO_Koopa(&spr_koopa, rand() % 2 == 0, false, false, true));
 			else if(2 == iSelectedEnemy)
 				objectcontainer[2].add(new MO_CheepCheep(&spr_cheepcheep));
 			else if(3 == iSelectedEnemy)
-				objectcontainer[0].add(new MO_Koopa(&spr_redkoopa, rand() % 2 == 0, true, false));
+				objectcontainer[0].add(new MO_Koopa(&spr_redkoopa, rand() % 2 == 0, true, false, false));
 			else if(4 == iSelectedEnemy)
 				objectcontainer[0].add(new MO_Spiny(&spr_spiny, rand() % 2 == 0));
 			else if(5 == iSelectedEnemy)
@@ -2261,9 +2279,9 @@ void CGM_Stomp::think()
 			else if(6 == iSelectedEnemy)
 				objectcontainer[0].add(new MO_Goomba(&spr_paragoomba, rand() % 2 == 0, true));
 			else if(7 == iSelectedEnemy)
-				objectcontainer[0].add(new MO_Koopa(&spr_parakoopa, rand() % 2 == 0, false, true));
+				objectcontainer[0].add(new MO_Koopa(&spr_parakoopa, rand() % 2 == 0, false, true, true));
 			else
-				objectcontainer[0].add(new MO_Koopa(&spr_redparakoopa, rand() % 2 == 0, true, true));
+				objectcontainer[0].add(new MO_Koopa(&spr_redparakoopa, rand() % 2 == 0, true, true, true));
 		}
 	}
 }
@@ -3482,7 +3500,7 @@ void CGM_Boss_MiniGame::think()
 			//Randomly spawn koopas
 			if(--enemytimer <= 0)
 			{
-				objectcontainer[0].add(new MO_Koopa(&spr_koopa, rand() % 2 == 0, false, false));
+				objectcontainer[0].add(new MO_Koopa(&spr_koopa, rand() % 2 == 0, false, false, true));
 				enemytimer = (short)(rand() % 120) + 120;  //Spawn koopas slowly
 			}
 		}

@@ -1911,35 +1911,35 @@ void CMap::saveMap(const std::string& file)
 				//Write out warp exit x,y position for player and position for lock icon to display
 				if(warpdata[i][j].direction == 0)
 				{
-					WriteInt(((currentx * TILESIZE + TILESIZE - i * TILESIZE) >> 1) + i * TILESIZE - HALFPW, mapfile);
-					WriteInt(j * TILESIZE - 1 + PHOFFSET, mapfile);
+					WriteInt((((currentx << 5) + TILESIZE - (i << 5)) >> 1) + (i << 5) - HALFPW, mapfile);
+					WriteInt((j << 5) - 1 + PHOFFSET, mapfile);
 
-					WriteInt(((currentx * TILESIZE + TILESIZE - i * TILESIZE) >> 1) + i * TILESIZE - 16, mapfile);
-					WriteInt(j * TILESIZE, mapfile);
+					WriteInt((((currentx << 5) + TILESIZE - (i << 5)) >> 1) + (i << 5) - 16, mapfile);
+					WriteInt((j << 5), mapfile);
 				}
 				else if(warpdata[i][j].direction == 2)
 				{
-					WriteInt(((currentx * TILESIZE + TILESIZE - i * TILESIZE) >> 1) + i * TILESIZE - HALFPW, mapfile);
-					WriteInt(j * TILESIZE + 1 + PHOFFSET, mapfile);
+					WriteInt((((currentx << 5) + TILESIZE - (i << 5)) >> 1) + (i << 5) - HALFPW, mapfile);
+					WriteInt((j << 5) + 1 + PHOFFSET, mapfile);
 
-					WriteInt(((currentx * TILESIZE + TILESIZE - i * TILESIZE) >> 1) + i * TILESIZE - 16, mapfile);
-					WriteInt(j * TILESIZE, mapfile);
+					WriteInt((((currentx << 5) + TILESIZE - (i << 5)) >> 1) + (i << 5) - 16, mapfile);
+					WriteInt((j << 5), mapfile);
 				}
 				else if(warpdata[i][j].direction == 1)
 				{
-					WriteInt(i * TILESIZE + TILESIZE - PW - PWOFFSET, mapfile);
-					WriteInt(currenty * TILESIZE + TILESIZE - PH - 1, mapfile);
+					WriteInt((i << 5) + TILESIZE - PW - PWOFFSET, mapfile);
+					WriteInt((currenty << 5) + TILESIZE - PH - 1, mapfile);
 
-					WriteInt(i * TILESIZE, mapfile);
-					WriteInt(((currenty * TILESIZE + TILESIZE - j * TILESIZE) >> 1) + j * TILESIZE - 16, mapfile);
+					WriteInt((i << 5), mapfile);
+					WriteInt((((currenty << 5) + TILESIZE - (j << 5)) >> 1) + (j << 5) - 16, mapfile);
 				}
 				else if(warpdata[i][j].direction == 3)
 				{
-					WriteInt(i * TILESIZE - 1 + PWOFFSET, mapfile);
-					WriteInt(currenty * TILESIZE + TILESIZE - PH - 1, mapfile);
+					WriteInt((i << 5) - 1 + PWOFFSET, mapfile);
+					WriteInt((currenty << 5) + TILESIZE - PH - 1, mapfile);
 
-					WriteInt(i * TILESIZE, mapfile);
-					WriteInt(((currenty * TILESIZE + TILESIZE - j * TILESIZE) >> 1) + j * TILESIZE - 16, mapfile);
+					WriteInt((i << 5), mapfile);
+					WriteInt((((currenty << 5) + TILESIZE - (j << 5)) >> 1) + (j << 5) - 16, mapfile);
 				}
 
 				WriteInt(i, mapfile);
@@ -2038,10 +2038,10 @@ void CMap::saveMap(const std::string& file)
 					{
 						if(numdrawareas < MAXDRAWAREAS)
 						{
-							drawareas[numdrawareas].x = (Sint16)(i * TILESIZE);
-							drawareas[numdrawareas].y = (Sint16)(j * TILESIZE);
-							drawareas[numdrawareas].w = (Uint16)((rightsize - i) * TILESIZE);
-							drawareas[numdrawareas].h = (Uint16)((downsize - j) * TILESIZE);
+							drawareas[numdrawareas].x = (Sint16)(i << 5);
+							drawareas[numdrawareas].y = (Sint16)(j << 5);
+							drawareas[numdrawareas].w = (Uint16)((rightsize - i) << 5);
+							drawareas[numdrawareas].h = (Uint16)((downsize - j) << 5);
 
 							numdrawareas++;
 						}
@@ -2505,13 +2505,13 @@ void CMap::draw(SDL_Surface *targetSurface, int layer)
 
 						if(tile->iID >= 0) //If it is part of a tileset
 						{
-							gfx_setrect(&(animatedtile->rSrc[iLayer][0]), tile->iCol * TILESIZE, tile->iRow * TILESIZE, TILESIZE, TILESIZE);
+							gfx_setrect(&(animatedtile->rSrc[iLayer][0]), tile->iCol << 5, tile->iRow << 5, TILESIZE, TILESIZE);
 						}
 						else if(tile->iID == TILESETANIMATED)
 						{
 							for(short iRect = 0; iRect < 4; iRect++)
 							{
-								gfx_setrect(&(animatedtile->rSrc[iLayer][iRect]), (iRect + (tile->iCol << 2)) * TILESIZE, tile->iRow * TILESIZE, TILESIZE, TILESIZE);
+								gfx_setrect(&(animatedtile->rSrc[iLayer][iRect]), (iRect + (tile->iCol << 2)) << 5, tile->iRow << 5, TILESIZE, TILESIZE);
 							}
 
 							//Background is animated if it is a background layer or if it is a foreground layer and we are not displaying the foreground
@@ -2578,7 +2578,7 @@ void CMap::addPlatformAnimatedTiles()
 
 					for(short iRect = 0; iRect < 4; iRect++)
 					{
-						gfx_setrect(&(animatedtile->rSrc[0][iRect]), (iRect + (tile->iCol << 2)) * TILESIZE, tile->iRow * TILESIZE, TILESIZE, TILESIZE);
+						gfx_setrect(&(animatedtile->rSrc[0][iRect]), (iRect + (tile->iCol << 2)) << 5, tile->iRow << 5, TILESIZE, TILESIZE);
 					}
 
 					gfx_setrect(&(animatedtile->rDest), iDestX, iDestY, TILESIZE, TILESIZE);
@@ -2910,11 +2910,11 @@ void CMap::predrawbackground(gfxSprite &background, gfxSprite &mapspr)
 	
 	for(int m = 0; m < numspawnareas[iType]; m++)  
 	{
-		dest.x = spawnareas[iType][m].left * TILESIZE;
-		dest.y = spawnareas[iType][m].top * TILESIZE;
+		dest.x = spawnareas[iType][m].left << 5;
+		dest.y = spawnareas[iType][m].top << 5;
 
-		dest.w = (spawnareas[iType][m].width) * TILESIZE + TILESIZE;
-		dest.h = (spawnareas[iType][m].height) * TILESIZE + TILESIZE;
+		dest.w = (spawnareas[iType][m].width << 5) + TILESIZE;
+		dest.h = (spawnareas[iType][m].height << 5) + TILESIZE;
 
 		//int color = 0x00 << 24 | rand() % 256 << 16 | rand() % 256 << 8 | rand() % 256;
 		int color = 0x128 << 24 | 0x255 << 8;
@@ -3389,8 +3389,8 @@ bool CMap::findspawnpoint(short iType, short * x, short * y, short width, short 
 		if(spawnarea >= currentsize)
 			continue;
 
-		short areawidth = spawnareas[iType][m].width * TILESIZE + TILESIZE;
-		short areaheight = spawnareas[iType][m].height * TILESIZE + TILESIZE;
+		short areawidth = (spawnareas[iType][m].width << 5) + TILESIZE;
+		short areaheight = (spawnareas[iType][m].height << 5) + TILESIZE;
 
 		if(width > areawidth || height > areaheight)
 			continue;
@@ -3406,8 +3406,8 @@ bool CMap::findspawnpoint(short iType, short * x, short * y, short width, short 
 			if(yoffset > 0)
 				yoffset = (short)(rand() % yoffset);
 
-			*x = xoffset * TILESIZE + spawnareas[iType][m].left * TILESIZE + (TILESIZE >> 1) - (width >> 1);
-			*y = yoffset * TILESIZE + spawnareas[iType][m].top * TILESIZE + (TILESIZE >> 1) - (height >> 1);
+			*x = (xoffset << 5) + (spawnareas[iType][m].left << 5) + (TILESIZE >> 1) - (width >> 1);
+			*y = (yoffset << 5) + (spawnareas[iType][m].top << 5) + (TILESIZE >> 1) - (height >> 1);
 		}
 		else
 		{
@@ -3420,8 +3420,8 @@ bool CMap::findspawnpoint(short iType, short * x, short * y, short width, short 
 			if(yoffset > 0)
 				yoffset = (short)(rand() % yoffset) + 1;
 
-			*x = xoffset + spawnareas[iType][m].left * TILESIZE;
-			*y = yoffset + spawnareas[iType][m].top * TILESIZE;
+			*x = xoffset + (spawnareas[iType][m].left << 5);
+			*y = yoffset + (spawnareas[iType][m].top << 5);
 		}
 
 		break;
@@ -3490,7 +3490,7 @@ void CMap::drawfrontlayer()
 		{
 			if(mapdatatop[j][i].iType == tile_gap)
 			{
-				SDL_Rect r = {j * TILESIZE, i * TILESIZE, TILESIZE, TILESIZE};
+				SDL_Rect r = {j << 5, i << 5, TILESIZE, TILESIZE};
 				SDL_FillRect(blitdest, &r, SDL_MapRGB(blitdest->format, 255, 0, 255));
 			}
 		}	

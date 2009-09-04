@@ -221,6 +221,7 @@ class CPlayer
 		float velx, vely;	//velocity on x, y axis
 		float fOldX, fOldY;
 		float fPrecalculatedY;
+		float oldvelx;
 
 		float fNewSwapX, fNewSwapY; //For moving players around during player swap effect
 		float fOldSwapX, fOldSwapY;
@@ -284,6 +285,9 @@ class CPlayer
 		short iKuriboShoeAnimationFrame;
 		short iKuriboShoeExitTimer;
 		short iKuriboShoeExitIndex;
+
+		short iSecretCodeTimer;
+		short iSecretCodeIndex;
 
 		short iDumpCollectionCardTimer;
 		short iDumpCollectionCardIndex;
@@ -365,6 +369,8 @@ class CPlayer
 
 		short iSuicideCreditPlayerID;
 		short iSuicideCreditTimer;
+
+		Spotlight * sSpotlight;
 
 		friend bool coldec_player2player(CPlayer * o1, CPlayer * o2);
 		friend void collisionhandler_p2p(CPlayer * o1, CPlayer * o2);

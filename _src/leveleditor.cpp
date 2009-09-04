@@ -897,7 +897,16 @@ int editor_edit()
 							return EDITOR_TILES;
 
 						if(key == SDLK_i)
-							return EDITOR_BLOCKS;
+							if(edit_mode == 4)
+							{
+								for(short iRow = 0; iRow < MAPHEIGHT; iRow++)
+									for(short iCol = 0; iCol < MAPWIDTH; iCol++)
+										SetNoSpawn(nospawn_mode, iCol, iRow, !g_map.nospawn[nospawn_mode][iCol][iRow]);
+							}
+							else
+							{
+								return EDITOR_BLOCKS;
+							}
 
 						if(key == SDLK_a)
 						{
@@ -1714,7 +1723,8 @@ int editor_edit()
 					}
 				}
 
-				menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "No Player Spawn: [x] Global, [1-4] Team Spawn Zone, [a] All, [n] None");
+				menu_font_small.draw(0, 480 - (menu_font_small.getHeight() << 1), "No Player Spawn: [x] Global, [1-4] Team Spawn Zone");
+				menu_font_small.draw(0, 480 - menu_font_small.getHeight(), "[a] All, [n] None, [i] Invert");
 			}
 			else if(edit_mode == 5)
 			{

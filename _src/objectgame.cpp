@@ -12,7 +12,7 @@ extern short scorepowerupoffsets[3][3];
 
 extern CPlayer * GetPlayerFromGlobalID(short iGlobalID);
 extern void CheckSecret(short id);
-extern void AddSpotlight(short ix, short iy, short iSize);
+extern SpotlightManager spotlightManager;
 
 void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead)
 {
@@ -395,6 +395,9 @@ bool IO_Block::hitright(CPlayer * player, bool useBehavior)
 		
 		if(player->velx < 0.0f)
 			player->velx = 0.0f;
+
+		if(player->oldvelx < 0.0f)
+			player->oldvelx = 0.0f;
 	}
 
 	return false;
@@ -409,6 +412,9 @@ bool IO_Block::hitleft(CPlayer * player, bool useBehavior)
 		
 		if(player->velx > 0.0f)
 			player->velx = 0.0f;
+
+		if(player->oldvelx > 0.0f)
+			player->oldvelx = 0.0f;
 	}
 
 	return false;
@@ -1193,7 +1199,7 @@ B_NoteBlock::B_NoteBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short
 	hidden = ishiddentype = fHidden;
 
 	iType = type;
-	iTypeOffsetY = iType * TILESIZE;
+	iTypeOffsetY = iType << 5;
 }
 
 void B_NoteBlock::draw()
@@ -1285,6 +1291,9 @@ bool B_NoteBlock::hittop(CPlayer * player, bool useBehavior)
 		}
 
 		ifsoundonplay(sfx_bump);
+
+		game_values.unlocksecret3part2[player->globalID] += 2;
+		CheckSecret(2);
 	}
 	
 	return false;
@@ -1327,6 +1336,7 @@ bool B_NoteBlock::hitright(CPlayer * player, bool useBehavior)
 		player->xf((float)(iposx + iw) + 0.2f);
 		player->fOldX = player->fx;
 		player->velx = VELNOTEBLOCKREPEL;
+		player->oldvelx = VELNOTEBLOCKREPEL;
 
 		if(state == 0)
 		{
@@ -1347,6 +1357,7 @@ bool B_NoteBlock::hitleft(CPlayer * player, bool useBehavior)
 		player->xf((float)(iposx - PW) - 0.2f);
 		player->fOldX = player->fx;
 		player->velx = -VELNOTEBLOCKREPEL;
+		player->oldvelx = -VELNOTEBLOCKREPEL;
 
 		if(state == 0)
 		{
@@ -1632,13 +1643,7 @@ bool B_FlipBlock::hitright(CPlayer * player, bool useBehavior)
 {
 	if(useBehavior && state == 0)
 	{
-		player->xf((float)(iposx + iw) + 0.2f);
-		player->fOldX = player->fx;
-
-		if(player->velx < 0.0f)
-			player->velx = 0.0f;
-
-		return false;
+		IO_Block::hitright(player, useBehavior);
 	}
 	
 	return true;
@@ -1648,13 +1653,7 @@ bool B_FlipBlock::hitleft(CPlayer * player, bool useBehavior)
 {
 	if(useBehavior && state == 0)
 	{
-		player->xf((float)(iposx - PW) - 0.2f);
-		player->fOldX = player->fx;
-
-		if(player->velx > 0.0f)
-			player->velx = 0.0f;
-
-		return false;
+		IO_Block::hitleft(player, useBehavior);
 	}
 
 	return true;
@@ -2093,6 +2092,9 @@ bool B_SwitchBlock::hitright(CPlayer * player, bool)
 	if(player->velx < 0.0f)
 		player->velx = 0.0f;
 
+	if(player->oldvelx < 0.0f)
+		player->oldvelx = 0.0f;
+
 	return false;
 }
 
@@ -2103,6 +2105,9 @@ bool B_SwitchBlock::hitleft(CPlayer * player, bool)
 
 	if(player->velx > 0.0f)
 		player->velx = 0.0f;
+
+	if(player->oldvelx > 0.0f)
+		player->oldvelx = 0.0f;
 
 	return false;
 }
@@ -2376,6 +2381,9 @@ bool B_ThrowBlock::hitright(CPlayer * player, bool useBehavior)
 		if(player->velx < 0.0f)
 			player->velx = 0.0f;
 
+		if(player->oldvelx < 0.0f)
+			player->oldvelx = 0.0f;
+
 		if(player->IsAcceptingItem())
 		{
 			GiveBlockToPlayer(player);
@@ -2399,6 +2407,9 @@ bool B_ThrowBlock::hitleft(CPlayer * player, bool useBehavior)
 
 		if(player->velx > 0.0f)
 			player->velx = 0.0f;
+
+		if(player->oldvelx > 0.0f)
+			player->oldvelx = 0.0f;
 
 		if(player->IsAcceptingItem())
 		{
@@ -3111,7 +3122,9 @@ bool PU_SecretPowerup::collide (CPlayer *player)
 
 void PU_SecretPowerup::place()
 {
-	g_map.findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false);
+	short iAttempts = 10;
+	while(!g_map.findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false) && iAttempts-- > 0);
+
 	fx = (float)ix;
 	fy = (float)iy;
 }
@@ -3132,7 +3145,8 @@ PU_TreasureChestBonus::PU_TreasureChestBonus(gfxSprite *nspr, short iNumSpr, sho
 	state = 2;
 	bonusitem = iBonusItem;
 	
-	g_map.findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false);
+	short iAttempts = 10;
+	while(!g_map.findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false) && iAttempts-- > 0);
 	fx = (float)ix;
 	fy = (float)iy;
 
@@ -3748,6 +3762,8 @@ MO_Fireball::MO_Fireball(gfxSprite *nspr, short x, short y, short iNumSpr, bool 
 	state = 1;
 
 	ttl = game_values.fireballttl;
+
+	sSpotlight = NULL;
 }
 
 void MO_Fireball::update()
@@ -3757,6 +3773,18 @@ void MO_Fireball::update()
 	if(--ttl <= 0)
 	{
 		removeifprojectile(this, true, true);
+	}
+	else if(game_values.spotlights)
+	{
+		if(!sSpotlight)
+		{
+			sSpotlight = spotlightManager.AddSpotlight(ix - collisionOffsetX + (iw >> 1), iy - collisionOffsetY + (ih >> 1), 3);
+		}
+
+		if(sSpotlight)
+		{
+			sSpotlight->UpdatePosition(ix - collisionOffsetX + (iw >> 1), iy - collisionOffsetY + (ih >> 1));
+		}
 	}
 }
 
@@ -3783,8 +3811,6 @@ bool MO_Fireball::collide(CPlayer * player)
 void MO_Fireball::draw()
 {
 	spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, (velx > 0 ? 0 : 18) + colorOffset, iw, ih);
-
-	AddSpotlight(ix + (iw >> 1), iy + (ih >> 1), 1);
 }
 
 
@@ -3878,6 +3904,8 @@ MO_Hammer::MO_Hammer(gfxSprite *nspr, short x, short y, short iNumSpr, float fVe
 		drawframe = animationWidth - iw;
 
 	fObjectCollidesWithMap = false;
+
+	sSpotlight = NULL;
 }
 
 void MO_Hammer::update()
@@ -3912,7 +3940,21 @@ void MO_Hammer::update()
 		xi(ix - 640);
 	
 	if(iy > 480 || --ttl <= 0 || (fSuper && iy < -ih))
+	{
 		removeifprojectile(this, false, true);
+	}
+	else if(game_values.spotlights)
+	{
+		if(!sSpotlight)
+		{
+			sSpotlight = spotlightManager.AddSpotlight(ix - collisionOffsetX + (iw >> 1), iy - collisionOffsetY + (ih >> 1), 3);
+		}
+
+		if(sSpotlight)
+		{
+			sSpotlight->UpdatePosition(ix - collisionOffsetX + (iw >> 1), iy - collisionOffsetY + (ih >> 1));
+		}
+	}
 
 	//Detection collision with hammer breakable blocks
 	IO_Block * blocks[4];
@@ -3955,8 +3997,6 @@ bool MO_Hammer::collide(CPlayer * player)
 void MO_Hammer::draw()
 {
 	spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, colorOffset, iw, ih);
-
-	AddSpotlight(ix + (iw >> 1), iy + (ih >> 1), 1);
 }
 
 
@@ -4093,6 +4133,8 @@ MO_IceBlast::MO_IceBlast(gfxSprite *nspr, short x, short y, float fVelyX, short 
 	ttl = 120;
 
 	fObjectCollidesWithMap = false;
+
+	sSpotlight = NULL;
 }
 
 void MO_IceBlast::update()
@@ -4121,6 +4163,18 @@ void MO_IceBlast::update()
 	{
 		removeifprojectile(this, false, true);
 	}
+	else if(game_values.spotlights)
+	{
+		if(!sSpotlight)
+		{
+			sSpotlight = spotlightManager.AddSpotlight(ix - collisionOffsetX + (iw >> 1), iy - collisionOffsetY + (ih >> 1), 3);
+		}
+
+		if(sSpotlight)
+		{
+			sSpotlight->UpdatePosition(ix - collisionOffsetX + (iw >> 1), iy - collisionOffsetY + (ih >> 1));
+		}
+	}
 }
 
 bool MO_IceBlast::collide(CPlayer * player)
@@ -4140,7 +4194,6 @@ bool MO_IceBlast::collide(CPlayer * player)
 void MO_IceBlast::draw()
 {
 	IO_MovingObject::draw();
-	AddSpotlight(ix + (iw >> 1), iy + (ih >> 1), 1);
 }
 
 //------------------------------------------------------------------------------
@@ -4184,6 +4237,8 @@ MO_Boomerang::MO_Boomerang(gfxSprite *nspr, short x, short y, short iNumSpr, boo
 		iStyle = game_values.boomerangstyle;
 
 	fObjectCollidesWithMap = false;
+
+	sSpotlight = NULL;
 }
 
 void MO_Boomerang::update()
@@ -4433,6 +4488,19 @@ void MO_Boomerang::update()
 			}
 		}
 	}
+
+	if(game_values.spotlights)
+	{
+		if(!sSpotlight)
+		{
+			sSpotlight = spotlightManager.AddSpotlight(ix - collisionOffsetX + (iw >> 1), iy - collisionOffsetY + (ih >> 1), 3);
+		}
+
+		if(sSpotlight)
+		{
+			sSpotlight->UpdatePosition(ix - collisionOffsetX + (iw >> 1), iy - collisionOffsetY + (ih >> 1));
+		}
+	}
 }
 
 //Call to kill boomerang when it is not caught by player
@@ -4481,8 +4549,6 @@ bool MO_Boomerang::collide(CPlayer * player)
 void MO_Boomerang::draw()
 {
 	spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, colorOffset + (fMoveToRight ? 0 : 32), iw, ih);
-
-	AddSpotlight(ix + (iw >> 1), iy + (ih >> 1), 1);
 }
 
 //------------------------------------------------------------------------------
@@ -4509,6 +4575,8 @@ CO_Bomb::CO_Bomb(gfxSprite *nspr, short x, short y, float fVelX, float fVelY, sh
 	iOwnerRightOffset = 14;
 	iOwnerLeftOffset = -16;
 	iOwnerUpOffset = 40;
+
+	sSpotlight = NULL;
 }
 
 bool CO_Bomb::collide(CPlayer * player)
@@ -4558,6 +4626,19 @@ void CO_Bomb::update()
 	}
 
 	animate();
+
+	if(game_values.spotlights)
+	{
+		if(!sSpotlight)
+		{
+			sSpotlight = spotlightManager.AddSpotlight(ix - collisionOffsetX + (iw >> 1), iy - collisionOffsetY + (ih >> 1), 3);
+		}
+
+		if(sSpotlight)
+		{
+			sSpotlight->UpdatePosition(ix - collisionOffsetX + (iw >> 1), iy - collisionOffsetY + (ih >> 1));
+		}
+	}
 }
 
 void CO_Bomb::draw()
@@ -4693,16 +4774,11 @@ void MO_Coin::placeCoin()
 {
 	timer = 0;
 	
-	short tries = 0;
 	short x = 0, y = 0;
-	do
-	{
-		if(++tries > 32)
-			break;
-
-		g_map.findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false);
-	}
-	while(objectcontainer[1].getClosestMovingObject(x, y, movingobject_coin) <= 150.0f);
+	short iAttempts = 32;
+	while((!g_map.findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) ||
+		objectcontainer[1].getClosestMovingObject(x, y, movingobject_coin) < 150.0f)
+		&& iAttempts-- > 0);
 
 	xi(x);
 	yi(y);
@@ -5089,16 +5165,11 @@ void CO_Egg::placeEgg()
 		animationspeed = egganimationrates[5];
 	}
 	
-	short tries = 0;
 	short x = 0, y = 0;
-	do
-	{
-		if(++tries > 32)
-			break;
-
-		g_map.findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false);
-	}
-	while(objectcontainer[1].getClosestMovingObject(x, y, movingobject_yoshi) < 250.0f);
+	short iAttempts = 32;
+	while((!g_map.findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) ||
+		objectcontainer[1].getClosestMovingObject(x, y, movingobject_yoshi) < 250.0f)
+		&& iAttempts-- > 0);
 
 	xi(x);
 	yi(y);
@@ -5377,15 +5448,10 @@ void MO_FlagBase::placeFlagBase(bool fInit)
 	}
 	else
 	{
-		short tries = 0;
-		do
-		{
-			if(++tries > 32)
-				break;
-
-			g_map.findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, true);
-		}
-		while(objectcontainer[0].getClosestMovingObject(x, y, movingobject_flagbase) <= 200.0f);
+		short iAttempts = 32;
+		while((!g_map.findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) ||
+			objectcontainer[1].getClosestMovingObject(x, y, movingobject_flagbase) < 200.0f)
+			&& iAttempts-- > 0);
 	}
 
 	xi(x);
@@ -5571,9 +5637,12 @@ void CO_Flag::placeFlag()
 	{
 		Drop();
 		fInBase = false;
-		g_map.findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false);
+	
+		short iAttempts = 10;
+		while(!g_map.findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false) && iAttempts-- > 0);
 		fx = (float)ix;
 		fy = (float)iy;
+
 		velx = 0.0f;
 		vely = 0.0f;
 		fLastFlagDirection = false;
@@ -5688,13 +5757,13 @@ void MO_Yoshi::placeYoshi()
 					((ttRightTile & tile_flag_solid || ttRightTile & tile_flag_solid_on_top) && (ttRightTile & tile_flag_death_on_top) == 0) ||
 					g_map.block(iDeathX1, iDeathY) || g_map.block(iDeathX2, iDeathY))
 				{
-					short top = (iDeathY * TILESIZE - ih) / TILESIZE;
+					short top = ((iDeathY << 5) - ih) / TILESIZE;
 					
 					if(g_map.spawn(1, iDeathX1, top) && g_map.spawn(1, iDeathX2, top) && 
 						g_map.spawn(1, iDeathX1, iDeathY - 1) && g_map.spawn(1, iDeathX2, iDeathY - 1))
 					{
 						xi(ix);
-						yi(iDeathY * TILESIZE - ih);
+						yi((iDeathY << 5) - ih);
 						return;
 					}
 
@@ -5820,16 +5889,11 @@ void OMO_Area::update()
 
 void OMO_Area::placeArea()
 {
-	short tries = 0;
 	short x = 0, y = 0;
-	do
-	{
-		if(++tries > 32)
-			break;
-
-		g_map.findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, true);
-	}
-	while(objectcontainer[0].getClosestObject(x, y, object_area) <= (200.0f - ((numareas - 3) * 25.0f)));
+	short iAttempts = 32;
+	while((!g_map.findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) ||
+		objectcontainer[0].getClosestObject(x, y, object_area) <= (200.0f - ((numareas - 3) * 25.0f)))
+		&& iAttempts-- > 0);
 
 	xi(x);
 	yi(y);
@@ -5956,7 +6020,7 @@ void OMO_KingOfTheHillZone::update()
 	{
 		colorID = playersTouching[iMaxTeam]->colorID;
 		iPlayerID = playersTouching[iMaxTeam]->localID;
-		frame = (colorID + 1) * TILESIZE * 3;
+		frame = ((colorID + 1) << 5) * 3;
 	}
 	else
 	{
@@ -6091,14 +6155,14 @@ void OMO_KingOfTheHillZone::placeArea()
 			continue;
 
 		//Verify zone is not in a platform
-		if(g_map.IsInPlatformNoSpawnZone(x * TILESIZE, y * TILESIZE, size * TILESIZE, size * TILESIZE))
+		if(g_map.IsInPlatformNoSpawnZone(x << 5, y << 5, size << 5, size << 5))
 			continue;
 
 		break;
 	}
 
-	ix = x * TILESIZE;
-	iy = y * TILESIZE;
+	ix = x << 5;
+	iy = y << 5;
 }
 
 void OMO_KingOfTheHillZone::reset()
@@ -6365,16 +6429,11 @@ void MO_FrenzyCard::placeCard()
 {
 	timer = 0;
 
-	short tries = 0;
 	short x = 0, y = 0;
-	do
-	{
-		if(++tries > 32)
-			break;
-
-		g_map.findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false);
-	}
-	while(objectcontainer[1].getClosestObject(x, y, object_frenzycard) <= 150.0f);
+	short iAttempts = 32;
+	while((!g_map.findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) ||
+		objectcontainer[1].getClosestObject(x, y, object_frenzycard) <= 150.0f)
+		&& iAttempts-- > 0);
 
 	xi(x);
 	yi(y);
@@ -6511,16 +6570,11 @@ void MO_CollectionCard::placeCard()
 {
 	timer = 0;
 
-	short tries = 0;
 	short x = 0, y = 0;
-	do
-	{
-		if(++tries > 32)
-			break;
-
-		g_map.findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false);
-	}
-	while(objectcontainer[1].getClosestMovingObject(x, y, movingobject_collectioncard) <= 150.0f);
+	short iAttempts = 32;
+	while((!g_map.findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) ||
+		objectcontainer[1].getClosestMovingObject(x, y, movingobject_collectioncard) <= 150.0f)
+		&& iAttempts-- > 0);
 
 	xi(x);
 	yi(y);
@@ -6530,7 +6584,7 @@ void MO_CollectionCard::placeCard()
 //------------------------------------------------------------------------------
 // class walking enemy (base class for goomba and koopa)
 //------------------------------------------------------------------------------
-MO_WalkingEnemy::MO_WalkingEnemy(gfxSprite *nspr, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iAnimationOffsetX, short iAnimationOffsetY, short iAnimationHeight, short iAnimationWidth, bool moveToRight, bool killOnWeakWeapon, bool bouncing) :
+MO_WalkingEnemy::MO_WalkingEnemy(gfxSprite *nspr, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iAnimationOffsetX, short iAnimationOffsetY, short iAnimationHeight, short iAnimationWidth, bool moveToRight, bool killOnWeakWeapon, bool bouncing, bool fallOffLedges) :
 	IO_MovingObject(nspr, 0, 0, iNumSpr, aniSpeed, iCollisionWidth, iCollisionHeight, iCollisionOffsetX, iCollisionOffsetY, iAnimationOffsetX, iAnimationOffsetY, iAnimationHeight, iAnimationWidth)
 {
 	if(moveToRight)
@@ -6560,6 +6614,8 @@ MO_WalkingEnemy::MO_WalkingEnemy(gfxSprite *nspr, short iNumSpr, short aniSpeed,
 	frozentimer = 0;
 	frozenvelocity = velx;
 	frozenanimationspeed = aniSpeed;
+
+	fFallOffLedges = fallOffLedges;
 
 	place();
 }
@@ -6639,6 +6695,77 @@ void MO_WalkingEnemy::update()
 	else
 	{
 		burnuptimer = 0;
+	}
+
+	//If this enemy doesn't fall off of ledges, then take a look at the area in front of them
+	//to determine if they need to turn around
+	if(!inair && !fFallOffLedges)
+	{		
+		short probeCenterX = ix + (collisionWidth >> 1);
+		short probeFrontX = ix + (velx > 0.0f ? collisionWidth + 1 : -1);
+		short probeY = iy + collisionHeight + 5;
+
+		if(platform)
+		{
+			int iFrontTileType = platform->GetTileTypeFromCoord(probeFrontX, probeY);
+			int iCenterTileType = platform->GetTileTypeFromCoord(probeCenterX, probeY);
+
+			bool fFrontGap = iFrontTileType == tile_flag_nonsolid || iFrontTileType == tile_flag_super_death_top;
+			bool fCenterGap = iCenterTileType == tile_flag_nonsolid || iCenterTileType == tile_flag_super_death_top;
+
+			//If there is a hole or the type will kill the enemy, then turn around
+			if(fFrontGap && fCenterGap)
+			{
+				velx = -velx;
+			}
+		}
+		else
+		{
+			if(probeFrontX >= 640)
+			{
+				probeFrontX -= 640;
+			}
+			else if(probeFrontX < 0)
+			{
+				probeFrontX += 640;
+			}
+
+			if(probeCenterX >= 640)
+			{
+				probeCenterX -= 640;
+			}
+			else if(probeCenterX < 0)
+			{
+				probeCenterX += 640;
+			}
+
+			if(probeFrontX >= 0 && probeFrontX < 640 && probeCenterX >= 0 && probeCenterX < 640 && probeY >= 0 && probeY < 480)
+			{
+				probeFrontX /= TILESIZE;
+				probeCenterX /= TILESIZE;
+				probeY /= TILESIZE;
+				
+				IO_Block * frontBlock = g_map.block(probeFrontX, probeY);
+				IO_Block * centerBlock = g_map.block(probeCenterX, probeY);
+
+				bool fFoundFrontBlock = frontBlock && !frontBlock->isTransparent() && !frontBlock->isHidden();
+				bool fFoundCenterBlock = centerBlock && !centerBlock->isTransparent() && !centerBlock->isHidden();
+				
+				if(!fFoundFrontBlock && !fFoundCenterBlock)
+				{
+					int frontTile = g_map.map(probeFrontX, probeY);
+					int centerTile = g_map.map(probeCenterX, probeY);
+
+					bool fFrontGap = (frontTile & tile_flag_super_death_top) || (!(frontTile & tile_flag_solid) && !(frontTile & tile_flag_solid_on_top));
+					bool fCenterGap = (centerTile & tile_flag_super_death_top) || (!(centerTile & tile_flag_solid) && !(centerTile & tile_flag_solid_on_top));
+
+					if(fFrontGap && fCenterGap)
+					{
+						velx = -velx;
+					}
+				}
+			}
+		}
 	}
 }
 	
@@ -6762,7 +6889,8 @@ void MO_WalkingEnemy::collide(IO_MovingObject * object)
 
 void MO_WalkingEnemy::place()
 {
-	g_map.findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false);
+	short iAttempts = 10;
+	while(!g_map.findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false) && iAttempts-- > 0);
 	fx = (float)ix;
 	fy = (float)iy;
 }
@@ -6786,7 +6914,7 @@ void MO_WalkingEnemy::ShatterDie()
 // class goomba
 //------------------------------------------------------------------------------
 MO_Goomba::MO_Goomba(gfxSprite *nspr, bool moveToRight, bool fBouncing) :
-	MO_WalkingEnemy(nspr, 2, 8, 30, 20, 1, 11, 0, moveToRight ? 0 : 32, 32, 32, moveToRight, true, fBouncing)
+	MO_WalkingEnemy(nspr, 2, 8, 30, 20, 1, 11, 0, moveToRight ? 0 : 32, 32, 32, moveToRight, true, fBouncing, true)
 {
 	movingObjectType = movingobject_goomba;
 	iSpawnIconOffset = 64;
@@ -6890,8 +7018,8 @@ void MO_Goomba::Die()
 //------------------------------------------------------------------------------
 // class koopa
 //------------------------------------------------------------------------------
-MO_Koopa::MO_Koopa(gfxSprite *nspr, bool moveToRight, bool red, bool fBouncing) :
-	MO_WalkingEnemy(nspr, 2, 8, 30, 28, 1, 25, 0, moveToRight ? 0 : 54, 54, 32, moveToRight, true, fBouncing)
+MO_Koopa::MO_Koopa(gfxSprite *nspr, bool moveToRight, bool red, bool fBouncing, bool fFallOffLedges) :
+	MO_WalkingEnemy(nspr, 2, 8, 30, 28, 1, 25, 0, moveToRight ? 0 : 54, 54, 32, moveToRight, true, fBouncing, fFallOffLedges)
 {
 	fRed = red;
 	movingObjectType = movingobject_koopa;
@@ -6991,7 +7119,7 @@ void MO_Koopa::DropShell(bool fBounce, bool fFlip)
 // class buzzy beetle
 //------------------------------------------------------------------------------
 MO_BuzzyBeetle::MO_BuzzyBeetle(gfxSprite *nspr, bool moveToRight) :
-	MO_WalkingEnemy(nspr, 2, 8, 30, 20, 1, 11, 0, moveToRight ? 0 : 32, 32, 32, moveToRight, false, false)
+	MO_WalkingEnemy(nspr, 2, 8, 30, 20, 1, 11, 0, moveToRight ? 0 : 32, 32, 32, moveToRight, false, false, true)
 {
 	movingObjectType = movingobject_buzzybeetle;
 	iSpawnIconOffset = 160;
@@ -7056,7 +7184,7 @@ void MO_BuzzyBeetle::DropShell(bool fBounce, bool fFlip)
 // class spiny
 //------------------------------------------------------------------------------
 MO_Spiny::MO_Spiny(gfxSprite *nspr, bool moveToRight) :
-	MO_WalkingEnemy(nspr, 2, 8, 30, 20, 1, 11, 0, moveToRight ? 0 : 32, 32, 32, moveToRight, true, false)
+	MO_WalkingEnemy(nspr, 2, 8, 30, 20, 1, 11, 0, moveToRight ? 0 : 32, 32, 32, moveToRight, true, false, true)
 {
 	movingObjectType = movingobject_spiny;
 	iSpawnIconOffset = 176;
@@ -7910,6 +8038,8 @@ CO_Shell::CO_Shell(short type, short x, short y, bool dieOnMovingPlayerCollision
 	frozentimer = 0;
 	frozenvelocity = 0.0f;
 	frozenanimationspeed = 4;
+
+	sSpotlight = NULL;
 }
 
 bool CO_Shell::collide(CPlayer * player)
@@ -8265,6 +8395,26 @@ void CO_Shell::update()
 	{
 		IO_MovingObject::update();
 	}
+
+	if(game_values.spotlights)
+	{
+		if(state == 1)
+		{
+			if(!sSpotlight)
+			{
+				sSpotlight = spotlightManager.AddSpotlight(ix - collisionOffsetX + (iw >> 1), iy - collisionOffsetY + (ih >> 1), 3);
+			}
+
+			if(sSpotlight)
+			{
+				sSpotlight->UpdatePosition(ix - collisionOffsetX + (iw >> 1), iy - collisionOffsetY + (ih >> 1));
+			}
+		}
+		else
+		{
+			sSpotlight = NULL;
+		}
+	}
 }
 
 void CO_Shell::draw()
@@ -8503,6 +8653,8 @@ CO_ThrowBlock::CO_ThrowBlock(gfxSprite * nspr, short x, short y, short type) :
 	frozentimer = 0;
 	frozenvelocity = 0.0f;
 	frozenanimationspeed = 2;
+
+	sSpotlight = NULL;
 }
 
 bool CO_ThrowBlock::collide(CPlayer * player)
@@ -8687,6 +8839,19 @@ void CO_ThrowBlock::update()
 	}
 
 	animate();
+
+	if(game_values.spotlights && state == 1)
+	{
+		if(!sSpotlight)
+		{
+			sSpotlight = spotlightManager.AddSpotlight(ix - collisionOffsetX + (iw >> 1), iy - collisionOffsetY + (ih >> 1), 3);
+		}
+
+		if(sSpotlight)
+		{
+			sSpotlight->UpdatePosition(ix - collisionOffsetX + (iw >> 1), iy - collisionOffsetY + (ih >> 1));
+		}
+	}
 }
 
 void CO_ThrowBlock::draw()
@@ -8855,6 +9020,8 @@ CO_ThrowBox::CO_ThrowBox(gfxSprite * nspr, short x, short y, short item) :
 	frozen = false;
 	frozentimer = 0;
 	frozenanimationspeed = 8;
+
+	sSpotlight = NULL;
 }
 
 bool CO_ThrowBox::collide(CPlayer * player)
@@ -8988,6 +9155,19 @@ void CO_ThrowBox::update()
 	}
 
 	animate();
+
+	if(game_values.spotlights && HasKillVelocity())
+	{
+		if(!sSpotlight)
+		{
+			sSpotlight = spotlightManager.AddSpotlight(ix - collisionOffsetX + (iw >> 1), iy - collisionOffsetY + (ih >> 1), 3);
+		}
+
+		if(sSpotlight)
+		{
+			sSpotlight->UpdatePosition(ix - collisionOffsetX + (iw >> 1), iy - collisionOffsetY + (ih >> 1));
+		}
+	}
 }
 
 void CO_ThrowBox::draw()
@@ -9229,7 +9409,8 @@ void CO_Spring::draw()
 
 void CO_Spring::place()
 {
-	g_map.findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false);
+	short iAttempts = 10;
+	while(!g_map.findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false) && iAttempts-- > 0);
 	fx = (float)ix;
 	fy = (float)iy;
 
@@ -9981,7 +10162,8 @@ void CO_PhantoKey::placeKey()
 	relocatetimer = 0;
 	
 	short x = 0, y = 0;
-	g_map.findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false);
+	short iAttempts = 10;
+	while(!g_map.findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) && iAttempts-- > 0);
 
 	xi(x);
 	yi(y);

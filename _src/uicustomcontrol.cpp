@@ -4205,22 +4205,22 @@ void MI_World::Update()
 	//Player is moving from one tile to the next (up)
 	if(iPlayerState == 1)
 	{
-		if(g_worldmap.iHeight > 15 && iMapOffsetY < 0 && iPlayerY < g_worldmap.iHeight * TILESIZE - 256)
+		if(g_worldmap.iHeight > 15 && iMapOffsetY < 0 && iPlayerY < (g_worldmap.iHeight << 5) - 256)
 			iMapOffsetY += 2;
 	}
 	else if(iPlayerState == 2) //down
 	{
-		if(g_worldmap.iHeight > 15 && iMapOffsetY > 480 - g_worldmap.iHeight * TILESIZE && iPlayerY > 224)
+		if(g_worldmap.iHeight > 15 && iMapOffsetY > 480 - (g_worldmap.iHeight << 5) && iPlayerY > 224)
 			iMapOffsetY -= 2;
 	}
 	else if(iPlayerState == 3) //left
 	{
-		if(g_worldmap.iWidth > 20 && iMapOffsetX < 0 && iPlayerX < g_worldmap.iWidth * TILESIZE - 336)
+		if(g_worldmap.iWidth > 20 && iMapOffsetX < 0 && iPlayerX < (g_worldmap.iWidth << 5) - 336)
 			iMapOffsetX += 2;
 	}
 	else if(iPlayerState == 4) //right
 	{
-		if(g_worldmap.iWidth > 20 && iMapOffsetX > 640 - g_worldmap.iWidth * TILESIZE && iPlayerX > 304)
+		if(g_worldmap.iWidth > 20 && iMapOffsetX > 640 - (g_worldmap.iWidth << 5) && iPlayerX > 304)
 			iMapOffsetX -= 2;
 	}
 
@@ -4368,30 +4368,30 @@ void MI_World::SetMapOffset()
 
 	if(g_worldmap.iWidth > 20)
 	{
-		if(iPlayerX < g_worldmap.iWidth * TILESIZE - 336 && iPlayerX > 304)
+		if(iPlayerX < (g_worldmap.iWidth << 5) - 336 && iPlayerX > 304)
 			iMapOffsetX = 304 - iPlayerX;
 		else if(iPlayerX <= 304)
 			iMapOffsetX = 0;
 		else
-			iMapOffsetX = 640 - g_worldmap.iWidth * TILESIZE;
+			iMapOffsetX = 640 - (g_worldmap.iWidth << 5);
 	}
 	else
 	{
-		iMapOffsetX = (640 - g_worldmap.iWidth * TILESIZE) >> 1;
+		iMapOffsetX = (640 - (g_worldmap.iWidth << 5)) >> 1;
 	}
 
 	if(g_worldmap.iHeight > 15)
 	{
-		if(iPlayerY < g_worldmap.iHeight * TILESIZE - 256 && iPlayerY > 224)
+		if(iPlayerY < (g_worldmap.iHeight << 5) - 256 && iPlayerY > 224)
 			iMapOffsetY = 224 - iPlayerY;
 		else if(iPlayerY <= 224)
 			iMapOffsetY = 0;
 		else
-			iMapOffsetY = 480 - g_worldmap.iHeight * TILESIZE;
+			iMapOffsetY = 480 - (g_worldmap.iHeight << 5);
 	}
 	else
 	{
-		iMapOffsetY = (480 - g_worldmap.iHeight * TILESIZE) >> 1;
+		iMapOffsetY = (480 - (g_worldmap.iHeight << 5)) >> 1;
 	}
 }
 

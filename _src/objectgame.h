@@ -693,6 +693,7 @@ class MO_Fireball : public IO_MovingObject
 
 	private:
 		short ttl;
+		Spotlight * sSpotlight;
 };
 
 class MO_SuperFireball : public IO_MovingObject
@@ -727,6 +728,7 @@ class MO_Hammer : public IO_MovingObject
 	private:
 		short ttl;
 		bool fSuper;
+		Spotlight * sSpotlight;
 };
 
 class MO_SledgeHammer : public IO_MovingObject
@@ -762,6 +764,7 @@ class MO_IceBlast : public IO_MovingObject
 	private:
 		short colorOffset;
 		short ttl;
+		Spotlight * sSpotlight;
 };
 
 class MO_Boomerang : public IO_MovingObject
@@ -784,6 +787,7 @@ class MO_Boomerang : public IO_MovingObject
 		short iStateTimer;
 
 		short iStyle;
+		Spotlight * sSpotlight;
 };
 
 class MO_Coin : public IO_MovingObject
@@ -1168,7 +1172,7 @@ class MO_CollectionCard : public IO_MovingObject
 class MO_WalkingEnemy : public IO_MovingObject
 {
 	public:
-		MO_WalkingEnemy(gfxSprite *nspr, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iAnimationOffsetX, short iAnimationOffsetY, short iAnimationHeight, short iAnimationWidth, bool moveToRight, bool killOnWeakWeapon, bool fBouncing);
+		MO_WalkingEnemy(gfxSprite *nspr, short iNumSpr, short aniSpeed, short iCollisionWidth, short iCollisionHeight, short iCollisionOffsetX, short iCollisionOffsetY, short iAnimationOffsetX, short iAnimationOffsetY, short iAnimationHeight, short iAnimationWidth, bool moveToRight, bool killOnWeakWeapon, bool fBouncing, bool fallOffLedges);
 		virtual ~MO_WalkingEnemy(){};
 
 		virtual void draw();
@@ -1197,6 +1201,7 @@ class MO_WalkingEnemy : public IO_MovingObject
 		short burnuptimer;
 		bool fKillOnWeakWeapon;
 		bool fBouncing;
+		bool fFallOffLedges;
 
 		bool frozen;
 		short frozentimer;
@@ -1220,7 +1225,7 @@ class MO_Goomba : public MO_WalkingEnemy
 class MO_Koopa : public MO_WalkingEnemy
 {
 	public:
-		MO_Koopa(gfxSprite *nspr, bool moveToRight, bool red, bool fBouncing);
+		MO_Koopa(gfxSprite *nspr, bool moveToRight, bool red, bool fBouncing, bool fFallOffLedges);
 		~MO_Koopa(){};
 
 		void draw();
@@ -1405,6 +1410,8 @@ class CO_Shell : public MO_CarriedObject
 		float frozenvelocity;
 		short frozenanimationspeed;
 
+		Spotlight * sSpotlight;
+
 	friend class CPlayer;
 	friend class MO_Explosion;
 	friend class MO_BulletBill;
@@ -1464,6 +1471,8 @@ class CO_ThrowBlock : public MO_CarriedObject
 		float frozenvelocity;
 		short frozenanimationspeed;
 
+		Spotlight * sSpotlight;
+
 	friend class CPlayer;
 	friend class MO_Explosion;
 	friend class MO_BulletBill;
@@ -1513,6 +1522,8 @@ class CO_ThrowBox : public MO_CarriedObject
 		bool frozen;
 		short frozentimer;
 		short frozenanimationspeed;
+
+		Spotlight * sSpotlight;
 
 	friend class CPlayer;
 	friend class MO_Explosion;
@@ -1637,6 +1648,8 @@ class CO_Bomb : public MO_CarriedObject
 		
 		short iColorOffsetY;
 		short ttl;
+
+		Spotlight * sSpotlight;
 
 	friend class CPlayer;
 };
