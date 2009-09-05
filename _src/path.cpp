@@ -1,5 +1,6 @@
 #include <string>
 #include <iostream>
+#include <string.h>
 #include <sys/stat.h>
 
 #ifdef _WIN32

@@ -807,8 +807,6 @@ int editor_edit()
 			//handle messages
 			while(SDL_PollEvent(&event))
 			{
-				Uint8 * keystate = SDL_GetKeyState(NULL);
-
 				switch(event.type)
 				{
 					case SDL_KEYDOWN:
@@ -897,6 +895,7 @@ int editor_edit()
 							return EDITOR_TILES;
 
 						if(key == SDLK_i)
+						{
 							if(edit_mode == 4)
 							{
 								for(short iRow = 0; iRow < MAPHEIGHT; iRow++)
@@ -907,6 +906,7 @@ int editor_edit()
 							{
 								return EDITOR_BLOCKS;
 							}
+						}
 
 						if(key == SDLK_a)
 						{

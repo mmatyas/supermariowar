@@ -1256,7 +1256,6 @@ void CGM_ShyGuyTag::think()
 	{
 		if(++scorecounter >= game_values.pointspeed)
 		{
-			bool playwarning = false;
 			scorecounter = 0;
 
 			CPlayer * pCheckWinner = NULL;

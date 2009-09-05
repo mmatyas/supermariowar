@@ -2,6 +2,7 @@
 #include <math.h>
 
 extern void LoadCurrentMapBackground();
+extern void LoadMapHazards(bool fPreview);
 
 UI_Control::UI_Control(short x, short y)
 {

@@ -4307,8 +4307,11 @@ void MI_World::Update()
 	bool iShowStoredItems = false;
 	for(short iTeam = 0; iTeam < 4; iTeam++)
 	{
-		if(iShowStoredItems = iStateTransition[iTeam] == 1 || iStateTransition[iTeam] == 3)
+		if(iStateTransition[iTeam] == 1 || iStateTransition[iTeam] == 3)
+		{
+			iShowStoredItems = true;
 			break;
+		}
 	}
 
 	if(iShowStoredItems && iStoredItemPopupDrawY < 16)
@@ -4563,7 +4566,9 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 		if(!fNoInterestingMoves)
 		{
 			fNeedAiControl = true;
-			for(short iTeamMember = 0; iTeamMember < game_values.teamcounts[iControllingTeam]; iTeamMember++)
+
+			short iTeamMember;
+			for(iTeamMember = 0; iTeamMember < game_values.teamcounts[iControllingTeam]; iTeamMember++)
 			{
 				if(game_values.playercontrol[game_values.teamids[iControllingTeam][iTeamMember]] == 1)
 				{
@@ -4582,7 +4587,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 
 					//Clear out all input from cpu controlled team
 					COutputControl * playerKeys = NULL;
-					for(short iTeamMember = 0; iTeamMember < game_values.teamcounts[iControllingTeam]; iTeamMember++)
+					for(iTeamMember = 0; iTeamMember < game_values.teamcounts[iControllingTeam]; iTeamMember++)
 					{
 						playerKeys = &game_values.playerInput.outputControls[game_values.teamids[iControllingTeam][iTeamMember]];
 
