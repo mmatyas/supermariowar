@@ -1,8 +1,13 @@
+------------------------------------------------------------------------------
+1.9.0 by neagix - WorkInProgress (not yet released)
+------------------------------------------------------------------------------
+Source
+- various bugfixes due to improper C++ expressions
+- major refactoring, cleanup and improvements
 
 ------------------------------------------------------------------------------
- Whats New?                                                         09.4.2009
+1.8 Beta 2 - 09 April 2009
 ------------------------------------------------------------------------------
-1.8 Beta 2
 
 Game
  - Added animated tiles to platforms
@@ -171,8 +176,9 @@ Bug Fixes
 
  - Tons of other minor bugs
 
-
+------------------------------------------------------------------------------
 1.8 Beta 1
+------------------------------------------------------------------------------
 
  - Added pipe minigame to world
 
@@ -315,11 +321,9 @@ Bug Fixes
 
  - Added view blocks (from AFE), similar to powerup block except you can see what you're going to get when you hit it
 
- 
-
 ------------------------------------------------------------------------------
-
 1.7 April Fools Edition
+------------------------------------------------------------------------------
 
  - Animated lava and water tiles
 
@@ -345,10 +349,9 @@ Bug Fixes
 	* Contest winner gets special forum status and badge on splash screen for next release of SMW!
 	* So keep checking the forums for the latest codes and unlocked features!
 
-
 ------------------------------------------------------------------------------
-
 1.7
+------------------------------------------------------------------------------
 
  - Game Graphics Pack, Menu Graphics Pack, and Sound Pack Support
 
@@ -519,8 +522,8 @@ Bug Fixes
  - And probably something else I forgot, because Two52 put in so much new stuff (yay)
 
 ------------------------------------------------------------------------------
-
 1.6
+------------------------------------------------------------------------------
 
  - Readme in HTML format
 
@@ -631,8 +634,8 @@ Bug Fixes
  - Configurable respawn time
 
 ------------------------------------------------------------------------------
-
 1.5
+------------------------------------------------------------------------------
 
  - New interaction blocks
       Breakable blocks
@@ -694,6 +697,7 @@ Bug Fixes
  - More vibrantly colored player sprites
 
 ------------------------------------------------------------------------------
-
 1.23 and before
+------------------------------------------------------------------------------
+
  - the game

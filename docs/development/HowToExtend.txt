@@ -1,0 +1,42 @@
+Procedure for adding a new game mode:
+1) Add class to gamemodes.cpp and gamemodes.h
+2) Add game mode type to GameModeType enum in gamemodes.h
+3) Add new game mode to gamemodes array in main.cpp (gamemodes[X] line 1187)
+4) Update MI_SelectField * miGoalField[22]; line in menu.h to match the new number of modes
+5) Update UI_Menu mModeSettingsMenu[22]; line in modeoptionsmenu.h to accomodate a new settings menu
+6) Update modeoptionsmenu.cpp: ModeOptionsMenu::Refresh()
+7) Add game mode options to GameModeSettings in global.h
+8) Set default settings for settings in main.cpp
+9) Add menu fields to support these new options in menu.cpp and menu.h
+10) Update ParseTourStopLine() and WriteTourStopLine() in global.cpp
+11) Update SetRandomGameModeSettings() in modeoptionsmenu.cpp
+12) Add new mode gfx to gfx\packs\Classic\menu\menu_mode_large.png and menu_mode_small.png
+13) Update fShowSettingsButton[] array in menu.cpp
+14) Remove old options.bin (new settings will now be read from it)
+15) Change line 3186 in main.cpp: if(iMode == game_mode_pipe_minigame)
+16) Change line 3274 in main.cpp: if(iMode == game_mode_pipe_minigame)
+17) Update tours/0smw.txt to have documentation of mode and options
+18) Update worldeditor.cpp: "miModeField = new MI_ImageSelectField" to add new game mode
+19) Update worldeditor.cpp: "g_iNumGameModeSettings[]"
+
+
+Procedure for adding a new game mode option:
+1) Add game mode options to GameModeSettings in global.h
+2) Add to SetupDefaultGameModeSettings() in global.cpp
+3) Add menu fields to support these new options in modeoptionsmenu.cpp and modeoptionsmenu.h
+4) Update ParseTourStopLine() and WriteTourStopLine() in global.cpp
+5) Update SetRandomGameModeSettings() in modeoptionsmenu.cpp
+6) Remove old options.bin (new settings will now be read from it)
+7) Update tours/0smw.txt to have documentation of new mode option
+8) Update worldeditor.cpp: miModeField = new MI_ImageSelectField to add new game mode
+9) Update worldeditor.cpp: g_iNumGameModeSettings[]
+
+
+Procedure for adding a new powerup:
+1) Add class to object.cpp and object.h inhieriting from MO_Powerup
+2) Update CPlayer::move() to handle using new stored powerup
+3) Update NUM_POWERUPS in global.h
+4) Update CPlayer::SetPowerup() to use this powerup
+5) Add new gfx to gfx\packs\Classic\powerups\large.png and small.png
+6) Update iPowerupPositionMap[] in uicontrol.cpp
+7) Add to kill style array potentially for greed mode

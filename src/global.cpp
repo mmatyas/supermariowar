@@ -1416,6 +1416,7 @@ short g_iCollisionMap[MOVINGOBJECT_LAST][MOVINGOBJECT_LAST] = {
 
 short iPlatformPathDotSize[3] = {12, 6, 4};
 short iPlatformPathDotOffset[3] = {0, 12, 18};
+//RFC
 short iScreenshotSize[3][2] = {{640, 480}, {320, 240}, {160, 120}};
 void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short startY, short endX, short endY, float angle, float radiusX, float radiusY, short iSize, short iPlatformWidth, short iPlatformHeight, bool fDrawPlatform, bool fDrawShadow)
 {

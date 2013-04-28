@@ -192,13 +192,13 @@ void EC_Leaf::update()
     else if(dx < 0.0f)
         dx += smw->ScreenWidth;
 
-    if(vely > 0.0f && iy >= 480) {
+    if(vely > 0.0f && iy >= smw->ScreenHeight) {
         dy = -16.0f;
         dx = GetRandMax(smw->ScreenWidth);
 
         NextLeaf();
     } else if(vely < 0.0f && iy < -16) {
-        dy = 480.0f;
+        dy = smw->ScreenHeight;
         dx = GetRandMax(smw->ScreenWidth);
 
         NextLeaf();
@@ -251,11 +251,11 @@ void EC_Snow::update()
     else if(dx < 0.0f)
         dx += smw->ScreenWidth;
 
-    if(vely > 0.0f && iy >= 480) {
+    if(vely > 0.0f && iy >= smw->ScreenHeight) {
         dy = -16.0f;
         dx = GetRandMax(smw->ScreenWidth);
     } else if(vely < 0.0f && iy < -16) {
-        dy = 480.0f;
+        dy = smw->ScreenHeight;
         dx = GetRandMax(smw->ScreenWidth);
     }
 
@@ -285,7 +285,7 @@ void EC_Rain::update()
         dx += smw->ScreenWidth;
 
     //If rain is off bottom edge, change the rain gfx and start it from the top
-    if(iy >= 480)
+    if(iy >= smw->ScreenHeight)
         NextRainDrop();
 
     ix = (short)dx;
@@ -341,7 +341,7 @@ void EC_Bubble::NextBubble()
     velx = -1.0f + GetRandMax(9) / 4.0f;
     vely = -4.0f + GetRandMax(9) / 4.0f;
 
-    dy = 480.0f;
+    dy = smw->ScreenHeight;
     dx = GetRandMax(smw->ScreenWidth);
 
     iAnimationFrame = GetRandMax(4) << 4;
@@ -375,7 +375,7 @@ void EC_Corpse::update()
     if(vely != 0.0f) {
         short nexty = (short)(dy + 32.0f + vely);
 
-        if(nexty >= 480) {
+        if(nexty >= smw->ScreenHeight) {
             dead = true;
             return;
         }
@@ -453,7 +453,7 @@ void EC_GravText::update()
     y += vely;
     vely += GRAVITATION;
 
-    if(y > 480)
+	if(y > smw->ScreenHeight)
         dead = true;
 }
 
@@ -463,9 +463,9 @@ void EC_GravText::draw()
     font->draw((short)x, (short)y, text);
 
     if(x < 0)
-        font->draw((short)x + 640, (short)y, text);
-    else if(x + w > 639)
-        font->draw((short)x - 640, (short)y, text);
+		font->draw((short)x + smw->ScreenWidth, (short)y, text);
+    else if(x + w > smw->ScreenWidth - 1)
+        font->draw((short)x - smw->ScreenWidth, (short)y, text);
 
 }
 
@@ -570,7 +570,7 @@ void EC_FallingObject::update()
     ix = (short)fx;
     iy = (short)fy;
 
-    if(fy >= 480.0f) {
+    if(fy >= smw->ScreenHeight) {
         dead = true;
         return;
     }
@@ -1016,10 +1016,10 @@ EC_BossPeeker::EC_BossPeeker(gfxSprite *nspr, short speed, short bossType) :
 	iSpeed = speed;
 	iBossColorOffsetY = bossType * 64;
 
-	timer = 0;
-	state = 0;
-	ix = 592;
-	iy = 480;
+    timer = 0;
+    state = 0;
+    ix = 592;
+    iy = smw->ScreenHeight;
 
 	game_values.bosspeeking = bossType;
 }
@@ -1027,29 +1027,29 @@ EC_BossPeeker::EC_BossPeeker(gfxSprite *nspr, short speed, short bossType) :
 
 void EC_BossPeeker::update()
 {
-	if(state == 0)
-	{
-		iy -= 2;
-		if(iy <= 432)
-		{
-			iy = 432;
-			state = 1;
-		}
-	}
-	else if(state == 1)
-	{
-		if(++timer == iSpeed)
-			state = 2;
-	}
-	else if(state == 2)
-	{
-		iy += 2;
-		if(iy >= 480)
-		{
-			dead = true;
-			game_values.bosspeeking = -1;
-		}
-	}
+    if(state == 0)
+    {
+        iy -= 2;
+        if(iy <= 432)
+        {
+            iy = 432;
+            state = 1;
+        }
+    }
+    else if(state == 1)
+    {
+        if(++timer == iSpeed)
+            state = 2;
+    }
+    else if(state == 2)
+    {
+        iy += 2;
+        if(iy >= smw->ScreenHeight)
+        {
+            dead = true;
+            game_values.bosspeeking = -1;
+        }
+    }
 }
 
 
