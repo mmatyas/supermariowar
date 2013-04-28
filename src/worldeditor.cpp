@@ -414,6 +414,9 @@ int main(int argc, char *argv[])
 	g_tilesetmanager = new CTilesetManager();
 	filterslist = new FiltersList();
 	maplist = new MapList(false);
+	menugraphicspacklist = new GraphicsList;
+	gamegraphicspacklist = new GraphicsList;
+	worldlist = new WorldList;
 
 	game_values.sound = false;
 	game_values.music = false;
