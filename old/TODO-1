@@ -1,0 +1,289 @@
+TODO
+
+Before Final Release
+[ ] CLEAN UP OLD DLLS in SMW DIR!!!
+
+
+BUG!! Still reports of disappearing map tiles - caused when rRects is used out of bounds causing w and h to be set to 0 - happened with platform with tile using row 960
+      I think this was due to using old maps with newer versions of the 1.8 alpha - keep an eye on this, but it might be a non-issue
+
+BUG!! When you kill 2 players/bots rapidly one after another with the star and you have the announcer on, the invincibilty music stops.
+
+BUG!!  World AI needs ability to use stored items -> harder problem than I have time for
+
+[ ] On/Off switch [?] and note blocks and possibly other types of on/off blocks
+[ ] Thunderbolt style spawn
+[ ] Reverse gravity blue podoboos
+[ ] Bomb option in Star mode
+[ ] Mariokart-type podium at the end of a tournament/tour/whatever
+
+
+STUFF TO WATCH OUT FOR IN BETA2
+- animated tiles in platforms
+- collision detection and behavior of coins, ztar, collection cards
+
+
+Beta2 BUGS!
+[ ] Move resource loading into Init() methods instead of in the constructors
+    - this it to help the port to the Wii
+
+[ ] When you made items play the bump sound when they get squished, you forgot to change the flags in capture the flag mode, and the keys in phanto mode to play that sound.
+    - Items that get relocated play the "transform" sound and items that don't, play the "bump" sound
+[ ] The 0smw world was removed.
+    - Huh, it is in my copy.  Is anyone else missing this map?
+[ ] POW and MOd blocks don't work on people wearing kuribo's shoes.
+    - Yep, awesome huh?
+[ ] If you use an ice wand on someone using a kuribo's shoe, the player won't stick out of the shoe anymore.
+    - Intentional.  It looked weird to have the player's head sticking out of the ice block.
+[X] When you warp with the crown on your head, the crown is seen over the pipe, while Mario is not.
+    - Great bug.  This has been around since warps and crowns were originally added.
+[ ] Kills will still transfer the tag if "Touch Only" is set in Shy Guy Tag mode.
+    - It is working correctly.  The first shyguy is always created by a kill even with "Touch Only" set.
+[X] In the Shy Guy Tag menu, the top says "Tag Mode Menu" instead of "Shy Guy Tag Mode Menu".
+    - Fixed
+[X] Phanto Mode's menu says "Chase Mode Menu".
+    - Fixed
+[X] You don't have the numbers "5" and "6" shown for options in the world editor help menu.
+    - Fixed
+[X] When winning in Boxes minigam by having all 5 coins, all players have the death pic on the results.
+    - Good catch.  Fixed.
+[ ] Minor bug with the platforms. When you have a static non-moving platform placed, the skins will cycle through the standing and jumping poses very fast as shown in the picture below.
+[ ] When a reserve powerup is grabbed after you already won a game, the game acts as if you have a poison mushroom in reserve.
+
+
+Fixed
+[X] Finished secret 3 and 4
+[X] Fixed bug where you could throw items through the wall on the left map edge
+[X] Red Koopas detect platform edges and turn around
+[X] Cleaned up areas that used "*TILESIZE" and replaced them with "<< 5" for performance
+[X] Fixed bug that crashed world editor if the map was smaller than the screen
+[X] Fixed bug in world editor that didn't save worlds correct with boxes or bosses minigames
+[X] Fixed bug when placing maps into the tours folder, they are not found in the world editor
+
+Beta 1 Public Release Bugs
+[ ] Treasure chests from winning a stage that rewards an item in world mode can be spawned in areas where they fall forever, and can never be opened. (Though this is aesthetic)
+
+[ ] also usually the game does a good job not spawning you inside a platform(killing you) but I lined the bottom of a
+    map with death tiles and it started spawning inside the platform.  edit: also stomp mode has problems with spawning
+    them inside platforms(specifically continuous), only they don't die and still animate-it looks weird.  I guess you
+    have to take into account how much time is spent in the swirly spawn animation-an area can be empty initially, but
+    occupied by the time the animation is done
+
+[ ] Refreshing the map thumbnails hangs half way through on xbox (after icecap map)
+    -> Fixed memory leak in thumbnail creation, retest on xbox
+    -> Still Hangs :(
+    -> Fixed bug where some maps crashed when loaded
+
+[ ] The "thumbnail" sized tiles for the world editor have purple parts in all the foreground objects, including the level markers.
+    -> Write script to make these using 0x808080 gray background
+
+Considering Features
+
+[ ] BUG!!! In world mode when you win a boxes game, the ranking at the end of the game is based on lives left, not coins collected.  All players that didn't win should get 2nd place.
+
+[ ] BUG!!! A bug that isn't on the first post is that if you quit a tour in session, the game displays and error message and the program closes. Not sure if this is 100% garunteed.
+    -> No repro, need poster to post which tour and which stop this happened with
+
+[ ] Build in release mode and make sure we can still use special maps in world editor
+
+[ ] Get boss settings from forum and integrate them in
+
+
+Need To Test
+[ ] In the above picture, when I get killed on the spike but get the domination square below it, the square stays my color, even if I set it so that all my blocks go away when I die. All of my other ones turn neutral normally when I die like that.
+    -> made fix for this but need to test
+[ ] Test controllers on xbox where different tournament control settings are used
+    - Test all control cases with teams/bots keyboard/controllers menu/sub menus/bonus wheel/scoreboard and ties for winner/loser tournament ties etc.
+
+
+Can't Reproduce Bug
+[ ] Weird sound problems with the world music.
+    -> no repro
+[ ] Level editor crash when adding a new line segment platform, drawing only some solid on top tiles, then adjusting it's start and stop.  See video: http://www.youtube.com/watch?v=vXpnv8qpVDg
+    -> No repro
+[ ] Can run through walls that have 1 tile wide gaps : -> no repro, need map where this happened
+      X
+    P X  -> run across 1 tile gap into and through wall
+    XG
+    X
+[ ] P-Wings, not sure if there's a bug, but I collected a lot of other items, and I couldn't get rid of the P-Wings.
+    I kept activating the items I collected but I still had the P-Wings and didn't switch.
+    The activation worked though, as the animation played and the activated items disappeared.
+[ ] This may have already been mentioned, but I was playing a timed match against three bots,
+    and one of them had star invincibility at the time the clock ran out. The other two bots dropped off the stage
+    instantly as the victory fanfare played, but this bot remained along with my character. In fact, after his star
+    ran out, I killed him -- and he respawned just as my character would. Very odd.
+    -> No repro, but was it a tie game?  If so, the bot would have remained with you.
+[ ] No matter what I set the Glide setting to for Chicken mode in a Single Game, the Chicken can NEVER glide. I don't know if I'm doing anything wrong or what, but... It just won't work. Oddly enough, I believe I've seen it work in Tours/Worlds. O_o I know it works SOMEWHERE in the game...just not in the Single Game.
+    -> No repro
+[ ] Items get overlapped by platforms, no matter what layer they are.
+    -> No repro, verified powerup items appear over layer 1
+[ ] for the animated tiles, i tried to set it to solid for the waterfall tiles (as in the default tile type?), yet in game it does not work.
+    -> No repro, setting default tile types for animated tiles works fine -> though, it doesn't affect maps that have already been created before the change (maybe some confusion here)
+[ ] Player spawn zones are ignored in SpawnZonesIgnored.map on desktop
+    -> No repro, spawn zones work fine on this map
+    -> It is actually a no spawn zone feature.  Spawn zones are still calculated by making sure a player has something hard to land on, not death tiles
+    -> We probably need to do a little better job when no hard areas are defined to choose a good place
+[ ] Falling donut blocks turn into castle pieces in SMWarld mod (on desktop) -> ask Mr Mister it is his mod
+    -> The donut block from the standard tileset needs to be a "falling donut block" tile
+[ ] colission doesn't always work with the brown "bounce blocks" when you have a cape or leaf;
+    when jumping and rotating you sometimes glide through them from below
+    (not sure if it also happened with leaf, but it did happen with cape)
+    -> no repro
+[ ] I used the power-up to take off a CPU's win so I could redo the level and after the CPU won again, it just stands on that level and doesn't move...
+
+
+
+No Fix
+[ ] play world mode with the random skins, the change every time you enter a level; they suddenly change on the world map.  For random skins it should unrandomize them after the world starts. -> They should switch every time you start a game.
+    -> It looks a little weird, but it is acceptable and not worth the work to fix it (changing to a random skin happens deep inside the gamestart() code)
+[ ] On/Off switches placed just beside a column of switch blocks: -> intended gameplay
+    When you jump into the on/off switch and are some pixels into the switch block column you'll die.
+    It's really annoying since you often don't have the time to aim exactly.
+
+
+Beta 1 Public Release Feature Requests
+[ ] Update the Tanooki statues to be proportionally sized to players
+[ ] Use smb3_extended1up.wav (on desktop) for 5up sound
+[ ] Maybe the three waterfalls on the Classic tileset could animate differently
+[ ] Is there any way you could re-add that functionality to the game (maybe with a toggle to turn the secrets on or off) before the final release? You don't have to bring all of them back, but I really miss the super fireball, triple hammer, kaboomerang, extended POW and MOD blocks, super shell kick, and homing Bullet Bills.
+[ ] I think there should be a way to agree on a draw in world mode and thus skip a level. In one world there was a capture-the-flag level where you could only score with the flag in your own base, without touch return and a high auto-return time. We only were two players (human) and ended up carrying each others flag all the time and couldn't score. To bring back your own flag you had to drop the enemy flag, so stomping didn't help either. It's a bit unfair if one player has to intentionally lose just so the game can go on  (Unfair in the sense of world score, probably same for tournament I guess) Maybe just add an option for "draw" or "skip level" to the exit menu?
+[ ] it'd be a nice idea to add some weapon options for the Bomb powerup. Maybe a bomb limit that ranges from 1 to 5, and a fuse limit ranging from 3 to 10 seconds.
+[ ] Intro music attached to normal looped tracks
+[ ] Also, as P1 on the Bonus Island World against 3 CPUs, I was unable to use items in the World screen.
+[ ] Though the universal Overrides thing has Map-specific and World-specific overrides, it lacks Background-specific overrides.
+[ ] Volume control for individual tunes in music packs. Just changing a number in the text file would be a lot less trouble than having to edit the music files themselves.
+[ ] Bombs setting off other bombs (chain reaction) and bombs destroying breakable blocks
+[ ] Enemy specific spawn zones (as part of the mode objects locations in level editor)
+[ ] Be able to define a size of area in which the suicide timer runs (like, say, if you're in the same 3x3-tile area for long enough, you get killed). Right now, the game only checks to see if you haven't moved; this causes the bots to not get timed out unless you set the suicide timer to something really short, since they still jump occasionally.
+
+[ ] I hate that being trapped by ! block or even flip block kills you. That really sux and I request deleting it
+[ ] How difficult would it be to add another mode which would be basically identical to Greed mode, but with a couple of
+    tweaks? Basically it would act like Coin mode from Smash Bros. It could be called "Cash Clash" or something.
+    1) Players start with no coins, but still lose coins when hit.
+    2) There is a global timer like in Time Limit mode. The primary parameter of the mode is how long the game lasts,
+    like in Time Limit. At the end of the match, whoever has the most coins wins.
+    3) (Maybe) One extra game option - if you want, have it so whoever has the fewest coins at the end wins.
+[ ] donut blocks that respawn.
+[ ] ember eyecandy: works like bubbles but with different graphics and ash eyecandy: works like snow but with different graphics
+[ ] A Button in the Map items that activates and deactivates certain Platforms.
+[ ] an option to when pressing "k" over an siwtch, not ! block that it can be used only a certain amount of times that is adjustable
+[ ] i don't know if someone mentioned this already but it would be cool if you can kick items and shells upward like in SMW
+[ ] Also, why not an item that makes you partially transparent for awhile? Kind of like the cloaking device thing from Super Smash. -> maybe an item that turns on a hard shield for a while
+[ ] Make it easier to assign tile types in level editor by pressing keys or have a little menu pop up
+[ ] Switch that turns off and on certain movements of some hazards[like Fire-Bars, Roto-disks, and Piranha-plants]
+
+
+Feature Requests
+
+[ ] Author filter type where you can choose a single author and it will only show you the maps from that author.
+    At startup, it would scan all maps and extra the author (everything before the underscore) then create a list of
+    possible authors to filter on.
+
+[ ] Player needs bounce when killing hazards with shoe or tanooki?
+
+[ ] Roulette wheel should be stopped by any key pressed by the player
+
+[ ] In Yoshi's Eggs, could we have it so the options menu has two columns, one for eggs and one for Yoshis?
+    Oh, and an option to have the egg timer pause while the egg is being held would be nice.
+
+[ ] Have it so that if a player hits 0 coins but still has coins of their color in play, make it so they don't die
+    until their coins disappear.
+
+[ ] In Frenzy Mode it would be nice to have some presets like with the regular item switch.
+
+[ ] I also think we should fix the explosions. The bob-omb explosion should resemble the SMB3 bob-omb explosion
+    and the bomb powerup should break bricks when exploded.
+
+[ ] Since we have all these team-colored coins for Greed mode, could we have an option for higher-point coins in Coin mode?
+    Red could be 2, Green 3, and Blue 5.
+
+[ ] I have a question. If the clear boxes in SMWorld is hit, does it turn into a normal block? Or does it become an empty
+    clear box? In SMW it turns into a normal block and that looked funny to me. If it does not in World, I request that it
+    should be corrected.
+
+[ ] Bullet Bill shooters and piranha plants should not be active while a player is sitting on or next to it.
+
+[ ] Sometime in the unknown future I would like to see more types of bricks and [?] boxes. It is a tad weird when you
+    are making a SMB1 themed map with SMB3 bricks or [?] boxes.
+
+[ ] It'd be nice if the fortresses can get rid of a locked door like in SMB3.  Like you put down a fortress on your
+    world and with the world editor, link the fortress and the locked door together so that if you beat the fortress,
+    the locked door vanishes.
+
+[ ] By the way, this led me to an idea of how to re-implement the superfire if anyone wants it back. We could use a fire
+    wand that shoots them, and on impact, the player is engulfed in flame and disappears in a poof of smoke.
+
+[ ] Castle collapse tiles for world mode: instead of turning into the colored T tile, you can set an option for stages
+    clearing into an overworld foreground sprite. (The ones with the castles and such on them, since that image contains
+    collapsed castles too) You could have it under the stages section with a number denoting what sprite to change into,
+    0 for the T colored tile.
+
+[ ] In level previews, eyecandy should show, and animated tiles and interactive blocks should animate.
+
+[ ] Options to choose how many fireballs, hammers, boomerangs, etc can be on screen at once.
+
+[ ] Options to choose how long clocks and stars last.
+
+[ ] Option to choose how long the p-wing lets you fly.
+
+[ ] The level editor should use the newer menu graphics.
+
+[ ] Worlds with 2 draw-bridges and only one small path connected between them, and when you have the hourglass power-up in your reserves, you'll obviously be stuck if you activate it when you're in between them, so is there anyway you could make it so the hourglass is idiot-proof and doesn't allow you to use it when it figures out you'll be stuck if you activate it?
+
+[ ] The tail/ cape attack sounds like it's in a cave on all maps
+
+[ ] We need the ability to have Donut Blocks fall at certain times. Blue ones are fast, brown ones or normal, and grey ones are slow. Plus ability for donut blocks to come back after they are destroyed and customizable time for it to be triggered.
+
+
+BUGS:
+[ ] "Stage Type" sounds a bit misleading for configuring vehicles to go to stages
+
+[ ] if a player is holding a shell while frozen, the shell is still held in place.  *edit: even when you let go of run, the shell is held there.  i still don't know if this is intended or not. should probably kill the shell though. :x
+
+[ ] There are several repeated tiles in the SMB2 and SMB3 tilesets, such as two pairs of bullet bill blasters in SMB3 and what looks to be two identical layers of the tree from SMB2. If those are taken out, it would give at least a little bit of room to add stuff / organize.
+
+[ ] The "thumbnail" sized tiles for the world editor have purple parts in all the foreground objects, including the level markers.
+
+[ ] Yet another, though it might be impossible to fix: Clear blocks do not give you the displayed powerup when you hit them in certain modes that have mode specific items like Health and Jail and the block gives you that instead.
+
+[ ] Shells and mushrooms cannot do an about face when they hit the solid side of a moving platform, and just completely stop moving. example: continuous platform moves left, shell comes moving right, hits solid platform, doesn't move. It takes a stop and start from a player to get it moving again.
+    -> test on test/00000000stuckshell.map
+    -> or test/00000000movingstage.map
+    -> This is caused because a shell/mushroom is touching both the left and right side of a platform at the same time
+    -> Fixed part of this, but players and objects that are pushing against the side of the platform as it moves across the screen edge will lack good collision detection and cause the player to "bounce" against the side of the platform
+    -> Bouncing effect happens all the time when platofrm is moving right and player left... crap!
+
+[ ] You can't tag anyone when you're in the shoe.
+    -> Can't reproduce this, please post exact steps or wait for next build
+    1. Become tagged
+    2. Get in a shoe
+    3. Try to touch someone in the shoe while you're tagged.
+
+[ ] I wanted to stomp a bot,which stood on a continious upmoving, solid-on top platform, which was set on the highes velocity. Instead of stomping the bot, my character kind of "froze" in the jumping frame and hovered exactly over the bot's head. After the upmoving platform transported me out of the screen, i did not fall down, but i could move left and right. after i have left the area of the upmoving platform, i finally fell down.
+
+
+WAITING RESPONSE
+[ ] I can't tell if this is a bug or not but the key power-up for Jail pops up in other modes. All I remember was Greed, Phanto, and Classic.   but possibly others -> adjusted parens but I don't think this was possible before from other modes without the game type being wrong
+    -> no repro
+[ ] After deleting a tile in the leveleditor, the tiletype of it remains on the spot the tile has been before.
+    -> This is probably intended - there is a feature to not remove tile types if you customized them in that tile
+    -> Post your exact repro case and I'll look to see if it is actually a bug
+[ ] In frenzy mode if all card weights are set to 0, one ? card appears and that's it fo the game
+    -> no repro - check your mode settings
+[ ] World keys are rendered useless when two doors are adjacent to the spot in which you are standing.
+    -> Not sure what you mean
+[ ] Also, what does "Use Game" mean for the Item Block properties? If it means "use the game's item settings instead", shouldn't it be the default for each item block? Otherwise, all item blocks unless specified will use the same item settings regardless of what the user chooses.
+    -> if the user is changing the settings, then they should also change it to use those settings
+[ ] Bots still dont like levels that is nothing but one single gigantic moving platform it seems, as they'll just constantly run left as if always in danger. The spawning algorithm is the same way, always spawning players just in middle of the screen. -> maybe if everything is a falling area, then just allow spawning everywhere
+    -> The bot fall detection algorithm doesn't take into account moving platforms - it is computationally intensive to do this, the best solution for now is to make a row of solid tiles at the bottom of the map
+[ ] Oh and maybe you could move the button that opens the world mode item selection (the pop up on the bottom) from the space bar to something like maybe the Stored Item Use button? Using a gamepad on a world without the ability to open that up is really annoying.
+    -> For game controllers, it is mapped to the "Random" button for menus.  The world is technically a menu, not a game so it uses menu buttons.  See if that works for you.
+[ ] SMW just crashed on me while playing a world map on capture the flag mode. I'm not sure how it happened, but the almost finished chime started just as I grabbed a flag. I'll need to look into it.
+    -> Hope the projectile fix on the bottom row fixed this.  Keep an eye out for crashes in the next build.
+[ ] That platform (or, to be more exact, the whole stage) is moving left.  My character is partially in the vertical wooden block.
+    -> Please post map.
+[ ] Also, what does "Use Game" mean for the Item Block properties? If it means "use the game's item settings instead", shouldn't it be the default for each item block? Otherwise, all item blocks unless specified will use the same item settings regardless of what the user chooses.
+    -> if the user is changing the settings, then they should also change it to use those settings
+[ ] If you become a statue in the air, and have a feather, you can use its extra jump while a statue.
+    -> I can't reproduce this, it may have been fixed with another bug fix

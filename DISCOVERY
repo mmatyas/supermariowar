@@ -40,6 +40,12 @@ bomb explosion -> smaller
 
 AI should have a short memory to detect if the approach is not working out, then randomly change it
 
+Long term features
+------------------
+* Lua scripting language support
+* Network play (LAN)
+* Tiled support
+
 Data directory structure
 ------------------------
 

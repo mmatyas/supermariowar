@@ -1251,6 +1251,8 @@ int main(int argc, char *argv[])
     XLaunchNewImage( NULL, (LAUNCH_DATA*)&LaunchData );
 #endif
 
+	// release all resources
+	delete rm;
     delete smw;
 
     return 0;
