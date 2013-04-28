@@ -37,7 +37,7 @@ class MapList
 
 		const char* currentFilename(){return (*outercurrent).second->filename.c_str();}
         const char* currentShortmapname(){return (*outercurrent).first.c_str();}
-		const int currentShortMapNameLen(){return (*outercurrent).second->iShortNameLength;}
+		int currentShortMapNameLen(){return (*outercurrent).second->iShortNameLength;}
         
 		void prev(bool fUseFilters);
         void next(bool fUseFilters);
