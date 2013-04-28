@@ -351,7 +351,7 @@ char findstring[FILEBUFSIZE] = "";
 short g_iNumPlatforms = 0;
 MapPlatform g_Platforms[MAX_PLATFORMS];
 
-BackgroundList backgroundlist;
+BackgroundList *backgroundlist;
 extern const char * g_szMusicCategoryNames[MAXMUSICCATEGORY];
 extern char * g_szBackgroundConversion[26];
 extern short g_iMusicCategoryConversion[26];
@@ -405,6 +405,7 @@ int main(int argc, char *argv[])
 	maplist = new MapList(false);
 	menugraphicspacklist = new GraphicsList();
 	gamegraphicspacklist = new GraphicsList();
+	backgroundlist = new BackgroundList();
 
     /* This must occur before any data files are loaded */
     Initialize_Paths();
@@ -969,10 +970,10 @@ int editor_edit()
 						
 						if(key == SDLK_g)
 						{
-							backgroundlist.next();
+							backgroundlist->next();
 
-							spr_background.init(convertPath(backgroundlist.current_name()));
-							strcpy(g_map->szBackgroundFile, getFileFromPath(backgroundlist.current_name()).c_str());
+							spr_background.init(convertPath(backgroundlist->current_name()));
+							strcpy(g_map->szBackgroundFile, getFileFromPath(backgroundlist->current_name()).c_str());
 
 							if(!keystate[SDLK_LSHIFT] && !keystate[SDLK_RSHIFT])
 							{
@@ -4839,7 +4840,7 @@ int editor_tiletype()
 int editor_backgrounds()
 {
 	bool done = false;
-	short iPage = backgroundlist.GetCurrentIndex() / 16;
+	short iPage = backgroundlist->GetCurrentIndex() / 16;
 
 	SDL_Surface * sBackgrounds[16];
 	SDL_Rect rSrc = {0, 0, 160, 120};
@@ -4882,7 +4883,7 @@ int editor_backgrounds()
 					}
 					else if(event.key.keysym.sym == SDLK_PAGEDOWN || event.key.keysym.sym == SDLK_DOWN)
 					{
-						if((iPage + 1) * 16 < backgroundlist.GetCount())
+						if((iPage + 1) * 16 < backgroundlist->GetCount())
 						{
 							iPage++;
 							LoadBackgroundPage(sBackgrounds, iPage);
@@ -4904,17 +4905,17 @@ int editor_backgrounds()
 					{
 						for(short iBackground = 0; iBackground < 16; iBackground++)
 						{
-							if(iPage * 16 + iBackground >= backgroundlist.GetCount())
+							if(iPage * 16 + iBackground >= backgroundlist->GetCount())
 								break;
 
 							if(event.button.x >= rDst[iBackground].x && event.button.x < rDst[iBackground].x + rDst[iBackground].w && 
 								event.button.y >= rDst[iBackground].y && event.button.y < rDst[iBackground].y + rDst[iBackground].h)
 							{
 								done = true;
-								backgroundlist.SetCurrent(iPage * 16 + iBackground);
+								backgroundlist->SetCurrent(iPage * 16 + iBackground);
 
-								spr_background.init(convertPath(backgroundlist.current_name()));
-								strcpy(g_map->szBackgroundFile, getFileFromPath(backgroundlist.current_name()).c_str());
+								spr_background.init(convertPath(backgroundlist->current_name()));
+								strcpy(g_map->szBackgroundFile, getFileFromPath(backgroundlist->current_name()).c_str());
 
 								if(event.button.button == SDL_BUTTON_LEFT)
 								{
@@ -4943,7 +4944,7 @@ int editor_backgrounds()
 
 		for(short iBackground = 0; iBackground < 16; iBackground++)
 		{
-			if(iPage * 16 + iBackground >= backgroundlist.GetCount())
+			if(iPage * 16 + iBackground >= backgroundlist->GetCount())
 				break;
 
 			SDL_BlitSurface(sBackgrounds[iBackground], &rSrc, screen, &rDst[iBackground]);
@@ -4958,8 +4959,8 @@ int editor_backgrounds()
 
 		int iID = x / 160 + y / 120 * 4 + iPage * 16;
 
-		if(iID < backgroundlist.GetCount())
-			menu_font_small.draw(0, 0, backgroundlist.GetIndex(iID));
+		if(iID < backgroundlist->GetCount())
+			menu_font_small.draw(0, 0, backgroundlist->GetIndex(iID));
 
 		DrawMessage();
 		SDL_Flip(screen);
@@ -5201,7 +5202,7 @@ void LoadBackgroundPage(SDL_Surface ** sBackgrounds, short iPage)
 
 	for(short iIndex = 0; iIndex < 16; iIndex++)
 	{
-		const char * szFileName = backgroundlist.GetIndex(iPage * 16 + iIndex);
+		const char * szFileName = backgroundlist->GetIndex(iPage * 16 + iIndex);
 
 		if(!szFileName)
 			return;
@@ -5591,12 +5592,12 @@ void loadcurrentmap()
 	char filename[128];
 	sprintf(filename, "gfx/packs/Classic/backgrounds/%s", g_map->szBackgroundFile);
 	std::string path = convertPath(filename);
-	backgroundlist.SetCurrentName(filename);
+	backgroundlist->SetCurrentName(filename);
 	
 	if(!File_Exists(path))
 	{
 		path = convertPath("gfx/packs/Classic/backgrounds/Land_Classic.png");
-		backgroundlist.SetCurrentName("gfx/packs/Classic/backgrounds/Land_Classic.png");
+		backgroundlist->SetCurrentName("gfx/packs/Classic/backgrounds/Land_Classic.png");
 	}
 	
 	spr_background.init(path);

@@ -279,12 +279,12 @@ void loadmap(char * szMapFile)
 	char filename[128];
 	sprintf(filename, "gfx/packs/Classic/backgrounds/%s", g_map->szBackgroundFile);
 	std::string path = convertPath(filename);
-	backgroundlist.SetCurrentName(filename);
+	backoundlist->SetCurrentName(filename);
 	
 	if(!File_Exists(path))
 	{
 		path = convertPath("gfx/packs/Classic/backgrounds/Land_Classic.png");
-		backgroundlist.SetCurrentName("gfx/packs/Classic/backgrounds/Land_Classic.png");
+		backoundlist->SetCurrentName("gfx/packs/Classic/backgrounds/Land_Classic.png");
 	}
 	
 	spr_background.init(path);
