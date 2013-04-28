@@ -140,7 +140,7 @@ add_definitions(-fno-strict-aliasing -fno-exceptions)
 ## MAIN CONFIG
 
 ##TODO: clean code to not need this anymore
-add_definitions(-fpermissive -Wno-shadow -Wno-unused-result -Wno-ignored-qualifiers)
+add_definitions(-Wno-shadow -Wno-unused-result -Wno-ignored-qualifiers)
 
 ########################################
 # our relevant source files
