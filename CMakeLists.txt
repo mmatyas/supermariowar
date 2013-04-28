@@ -4,7 +4,7 @@
 #
 cmake_minimum_required(VERSION 2.6)
 
-project(supermariowar)
+project(smw)
 
 ## currently workign only with 1.2
 option(USE_PNG_SAVE "Enable PNG save feature" OFF)
@@ -146,34 +146,11 @@ add_definitions(-D_GNU_SOURCE=1 -D_REENTRANT)
 # our relevant source files
 #
 #add_definitions(-std=gnu++0x)
-#add_subdirectory(src)
 
-set(COMMON_SRCS src/FileIO.cpp src/FileList.cpp src/MapList.cpp 
-           src/SFont.c src/TilesetManager.cpp src/dirlist.cpp 
-           src/eyecandy.cpp src/gfx.cpp src/global.cpp src/input.cpp 
-           src/map.cpp src/movingplatform.cpp src/path.cpp 
-	src/sfx.cpp src/ResourceManager.cpp
-)
-
-set(SMW_SRCS src/HashTable.cpp src/ai.cpp src/gamemodes.cpp src/main.cpp 
-           src/map.cpp src/menu.cpp src/object.cpp src/player.cpp 
-           src/splash.cpp src/uicontrol.cpp src/uimenu.cpp src/world.cpp src/uicustomcontrol.cpp 
-        src/objectgame.cpp src/modeoptionsmenu.cpp src/objecthazard.cpp src/Game.cpp
-)
-
-set(LEVELEDIT_SRCS src/leveleditor.cpp)
-
-SET(WORLDEDIT_SRCS src/sfx.cpp src/world.cpp src/worldeditor.cpp src/uimenu.cpp src/object.cpp 
-        src/uicontrol.cpp src/modeoptionsmenu.cpp src/objecthazard.cpp
-)
 
 if(WIN32)
 #	enable_precompiled_headers(Src/stdafx.h Src/stdafx.cpp SRCS)
 endif(WIN32)
-
-add_executable(smw ${COMMON_SRCS} ${SMW_SRCS} src/global.h)
-add_executable(leveledit ${COMMON_SRCS} ${LEVELEDIT_SRCS} src/global.h)
-add_executable(worldedit ${COMMON_SRCS} ${WORLDEDIT_SRCS} src/global.h)
 
 ## add all SDL dependencies
 Include(FindSDL)
@@ -197,13 +174,20 @@ if(USE_PNG_SAVE)
 	LIST(APPEND COMMON_SRCS src/savepng.cpp)
 endif()
 
-target_link_libraries(smw ${CMAKE_THREAD_LIBS_INIT})
-
-target_link_libraries(smw ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLIMAGE_LIBRARY} SDLmain)
-target_link_libraries(leveledit ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLIMAGE_LIBRARY} SDLmain)
-target_link_libraries(worldedit ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLIMAGE_LIBRARY} SDLmain)
-
 ## end of SDL dependencies
+
+add_subdirectory(src/common)
+include_directories(src/common)
+
+add_subdirectory(src/smw)
+include_directories(src/smw)
+
+add_subdirectory(src/leveleditor)
+include_directories(src/leveleditor)
+
+add_subdirectory(src/worldeditor)
+include_directories(src/worldeditor)
+
 
 check_and_add_flag(VISIBILITY_INLINES_HIDDEN -fvisibility-inlines-hidden)
 
@@ -342,8 +326,9 @@ endif()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	# Install the application icon and menu item
-	install(FILES cpack/smw.xpm DESTINATION ${CMAKE_INSTALL_PREFIX}/share/pixmaps RENAME smw.xpm)
-	install(FILES cpack/smw.desktop DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
+	##TODO: restore these
+#	install(FILES src/cpack/smw.xpm DESTINATION ${CMAKE_INSTALL_PREFIX}/share/pixmaps RENAME smw.xpm)
+#	install(FILES src/cpack/smw.desktop DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
 endif()
 
 # packaging information
@@ -352,14 +337,14 @@ set(CPACK_PACKAGE_VENDOR "neagix")
 set(CPACK_PACKAGE_VERSION_MAJOR ${SMW_VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${SMW_VERSION_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH ${SMW_VERSION_PATCH})
-set(CPACK_PACKAGE_DESCRIPTION_FILE ${PROJECT_SOURCE_DIR}/cpack/package_description.txt)
+set(CPACK_PACKAGE_DESCRIPTION_FILE ${PROJECT_SOURCE_DIR}/src/cpack/package_description.txt)
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "SMW, arcade platform multiplayer game")
 
 set(CPACK_RPM_PACKAGE_GROUP Amusements/Games)
 set(CPACK_RPM_PACKAGE_LICENSE GPL-2.0)
 set(CPACK_RESOURCE_FILE_README ${PROJECT_SOURCE_DIR}/README.md)
 # TODO: CPACK_RESOURCE_FILE_WELCOME
-set(CPACK_PACKAGE_ICON ${PROJECT_SOURCE_DIR}/src/icons/smw.ico)
+set(CPACK_PACKAGE_ICON ${PROJECT_SOURCE_DIR}/src/resources/smw.ico)
 # TODO: CPACK_NSIS_*
 
 set(CPACK_SET_DESTDIR ON)

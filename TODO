@@ -2,4 +2,12 @@
 v1.9 by neagix
 ==============
 
+Following features are orphaned:
+- Mac OS X project & compilation (might be obsoleted by CMake)
+- XBox project & compilation
+- debian package (changelog is outdated)
+
+TODO:
+- check resources (icons, .res etc)
+
 See old/TODO.0 (possibly original Florian version) and old/TODO.1 (TODO of 1.8)
