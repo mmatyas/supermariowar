@@ -65,7 +65,7 @@ IO_MovingObject * createpowerup(short iType, short ix, short iy, bool side, bool
         break;
     }
     case COIN_POWERUP: {
-        short iRandCoin = rand() % 9;
+        short iRandCoin = GetRandMax(9);
         short iCoin = 2;
 
         if(iRandCoin == 8)
@@ -240,7 +240,7 @@ IO_MovingObject * createpowerup(short iType, short ix, short iy, bool side, bool
 
         return feather;
     } else { //If no powerups were selected for this block, then fire out a podobo
-        IO_MovingObject * podobo = new MO_Podobo(&rm->spr_podobo, ix + 2, iy, -(float(rand() % 5) / 2.0f) - 6.0f, -1, -1, -1, true);
+        IO_MovingObject * podobo = new MO_Podobo(&rm->spr_podobo, ix + 2, iy, -(float(GetRandMax(5)) / 2.0f) - 6.0f, -1, -1, -1, true);
         objectcontainer[2].add(podobo);
         return podobo;
     }
@@ -573,15 +573,15 @@ void B_PowerupBlock::update()
             state = 3;
             setYi(iposy);
 
-            if(game_values.gamemode->gamemode == game_mode_health && rand() % 100 < game_values.gamemodesettings.health.percentextralife) {
+            if(game_values.gamemode->gamemode == game_mode_health && GetRandMax(100) < game_values.gamemodesettings.health.percentextralife) {
                 createpowerup(HEALTH_POWERUP, ix, iy, side, true);
-            } else if((game_values.gamemode->gamemode == game_mode_timelimit && rand() % 100 < game_values.gamemodesettings.time.percentextratime) ||
-                      (game_values.gamemode->gamemode == game_mode_star && rand() % 100 < game_values.gamemodesettings.star.percentextratime)) {
+            } else if((game_values.gamemode->gamemode == game_mode_timelimit && GetRandMax(100) < game_values.gamemodesettings.time.percentextratime) ||
+                      (game_values.gamemode->gamemode == game_mode_star && GetRandMax(100) < game_values.gamemodesettings.star.percentextratime)) {
                 createpowerup(TIME_POWERUP, ix, iy, side, true);
-            } else if((game_values.gamemode->gamemode == game_mode_coins && rand() % 100 < game_values.gamemodesettings.coins.percentextracoin) ||
-                      (game_values.gamemode->gamemode == game_mode_greed && rand() % 100 < game_values.gamemodesettings.greed.percentextracoin)) {
+            } else if((game_values.gamemode->gamemode == game_mode_coins && GetRandMax(100) < game_values.gamemodesettings.coins.percentextracoin) ||
+                      (game_values.gamemode->gamemode == game_mode_greed && GetRandMax(100) < game_values.gamemodesettings.greed.percentextracoin)) {
                 createpowerup(COIN_POWERUP, ix, iy, side, true);
-            } else if(game_values.gamemode->gamemode == game_mode_jail && (rand() % 100) < game_values.gamemodesettings.jail.percentkey) {
+            } else if(game_values.gamemode->gamemode == game_mode_jail && (GetRandMax(100)) < game_values.gamemodesettings.jail.percentkey) {
                 createpowerup(JAIL_KEY_POWERUP, ix, iy, side, true);
             } else {
                 createpowerup(SelectPowerup(), ix, iy, side, true);
@@ -2777,7 +2777,7 @@ bool PU_SecretPowerup::collide (CPlayer *player)
         game_values.windaffectsplayers = true;
 
         for(short i = 0; i < 15; i++)
-            eyecandy[2].add(new EC_Snow(&rm->spr_snow, (float)(rand() % 640), (float)(rand() % smw->ScreenHeight), rand() % 4 + 1));
+            eyecandy[2].add(new EC_Snow(&rm->spr_snow, (float)(GetRandMax(640)), (float)(rand() % smw->ScreenHeight), GetRandMax(4) + 1));
     } else if(itemtype == 1) {
         game_values.spinscreen = true;
     } else if(itemtype == 2) {
@@ -3443,7 +3443,7 @@ MO_SuperFireball::MO_SuperFireball(gfxSprite *nspr, short x, short y, short iNum
 
     velx = fVelyX;
     vely = fVelyY;
-    ttl = rand() % 30 + 60;
+    ttl = GetRandMax(30) + 60;
 
     drawframe = 0;
 
@@ -3675,8 +3675,8 @@ void MO_SledgeHammer::explode()
         short iColorID = colorOffset / 32 - 1;
 
         for(short iHammer = 0; iHammer < 3; iHammer++) {
-            float dAngle = (float)(rand() % 628) / 100.0f;
-            float dVel = (float)(rand() % 5) / 2.0f + 3.0f;
+            float dAngle = (float)(GetRandMax(628)) / 100.0f;
+            float dVel = (float)(GetRandMax(5)) / 2.0f + 3.0f;
             float dVelX = dVel * cos(dAngle);
             float dVelY = dVel * sin(dAngle);
             objectcontainer[2].add(new MO_Hammer(&rm->spr_hammer, iCenterX, iCenterY, 6, dVelX, dVelY, 5, playerID, teamID, iColorID, true));
@@ -3806,7 +3806,7 @@ MO_Boomerang::MO_Boomerang(gfxSprite *nspr, short x, short y, short iNumSpr, boo
     iStateTimer = 0;
 
     if(game_values.boomerangstyle == 3)
-        iStyle = rand() % 3;
+        iStyle = GetRandMax(3);
     else
         iStyle = game_values.boomerangstyle;
 
@@ -4805,9 +4805,9 @@ MO_FlagBase::MO_FlagBase(gfxSprite *nspr, short iTeamID, short iColorID) :
     teamID = iTeamID;
     iGraphicOffsetX = iColorID * 48;
 
-    angle = (float)(rand()%1000 * 0.00628f);
-    anglechange = (float)(rand()%100 * 0.0002f);
-    anglechangetimer = (short)(rand() % 50 + 100);
+    angle = (float)(GetRandMax(1000) * 0.00628f);
+    anglechange = (float)(GetRandMax(100) * 0.0002f);
+    anglechangetimer = (short)(GetRandMax(50) + 100);
 
     velx = sin(angle);
     vely = cos(angle);
@@ -4844,8 +4844,8 @@ void MO_FlagBase::update()
 {
     if(game_values.gamemodesettings.flag.speed > 0) {
         if(--anglechangetimer <= 0) {
-            anglechange = (float)((rand()%101 - 50) * 0.0002f);
-            anglechangetimer = (short)(rand() % 50 + 100);
+            anglechange = (float)((GetRandMax(101) - 50) * 0.0002f);
+            anglechangetimer = (short)(GetRandMax(50) + 100);
         }
 
         angle += anglechange;
@@ -5572,9 +5572,9 @@ OMO_RaceGoal::OMO_RaceGoal(gfxSprite *nspr, short id) :
     for(short k = 0; k < 4; k++)
         tagged[k] = -1;
 
-    angle = (float)(rand()%1000 * 0.00628f);
-    anglechange = (float)(rand()%100 * 0.0002f);
-    anglechangetimer = (short)(rand() % 50 + 100);
+    angle = (float)(GetRandMax(1000) * 0.00628f);
+    anglechange = (float)(GetRandMax(100) * 0.0002f);
+    anglechangetimer = (short)(GetRandMax(50) + 100);
 
     velx = sin(angle);
     vely = cos(angle);
@@ -5930,7 +5930,7 @@ MO_WalkingEnemy::MO_WalkingEnemy(gfxSprite *nspr, short iNumSpr, short aniSpeed,
         bounce = GRAVITATION;
 
     spawnradius = 100.0f;
-    spawnangle = (float)(rand()%1000 * 0.00628f);
+    spawnangle = (float)(GetRandMax(1000) * 0.00628f);
     inair = true;
 
     iSpawnIconOffset = 0;
@@ -6525,19 +6525,19 @@ MO_CheepCheep::MO_CheepCheep(gfxSprite *nspr) :
     IO_MovingObject(nspr, 0, smw->ScreenHeight, 2, 8, 30, 28, 1, 3)
 {
     ih = 32;
-    setXi((short)(rand() % 608));
+    setXi((short)(GetRandMax(608)));
 
     velx = 0.0f;
     while(velx == 0.0f)
-        velx = float(rand() % 19 - 9) / 2.0f;
+        velx = float(GetRandMax(19) - 9) / 2.0f;
 
     //Cheep cheep up velocity is between 9.0 and 13.0 in 0.5 increments
-    vely = -(float(rand() % 11) / 2.0f) - 9.0f;
+    vely = -(float(GetRandMax(11)) / 2.0f) - 9.0f;
 
     movingObjectType = movingobject_cheepcheep;
     state = 1;
 
-    iColorOffsetY = (short)(rand() % 3) * 64;
+    iColorOffsetY = (short)(GetRandMax(3)) * 64;
 
     if(velx > 0.0f)
         iColorOffsetY += 32;
@@ -6823,29 +6823,29 @@ void MO_SledgeBrother::update()
                 //Spawn thwomps
                 ifsoundonplay(sfx_thunder);
 
-                short numThwomps = rand() % 5 + 6;
+                short numThwomps = GetRandMax(5) + 6;
 
                 for(short iThwomp = 0; iThwomp < numThwomps; iThwomp++) {
-                    objectcontainer[2].add(new OMO_Thwomp(&rm->spr_thwomp, (short)(rand() % 591), 2.0f + (float)(rand()%20)/10.0f));
+                    objectcontainer[2].add(new OMO_Thwomp(&rm->spr_thwomp, (short)(GetRandMax(591)), 2.0f + (float)(GetRandMax(20))/10.0f));
                 }
 
-                //short numBombs = rand() % 5 + 6;
+                //short numBombs = GetRandMax(5) + 6;
 
                 //for(short iBomb = 0; iBomb < numBombs; iBomb++)
                 //{
-                //	short iRandomX = rand() % 612;
-                //	short iRandomY = rand() % 442;
+                //	short iRandomX = GetRandMax(612);
+                //	short iRandomY = GetRandMax(442);
                 //	eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, iRandomX - 2, iRandomY + 3, 3, 8));
-                //	objectcontainer[2].add(new CO_Bomb(&rm->spr_bomb, iRandomX, iRandomY, 0.0f, 0.0f, 4, -1, -1, -1, rand() % 30 + 30));
+                //	objectcontainer[2].add(new CO_Bomb(&rm->spr_bomb, iRandomX, iRandomY, 0.0f, 0.0f, 4, -1, -1, -1, GetRandMax(30) + 30));
                 //}
             } else if(iType == 2) {
                 //Spawn lots of podobos
                 ifsoundonplay(sfx_thunder);
 
-                short numPodobos = rand() % 5 + 8;
+                short numPodobos = GetRandMax(5) + 8;
 
                 for(short iPodobo = 0; iPodobo < numPodobos; iPodobo++) {
-                    objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, (short)(rand() % 608), smw->ScreenHeight, -(float(rand() % 9) / 2.0f) - 9.0f, -1, -1, -1, false));
+                    objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, (short)(GetRandMax(608)), smw->ScreenHeight, -(float(GetRandMax(9)) / 2.0f) - 9.0f, -1, -1, -1, false));
                 }
             }
         }
@@ -6933,7 +6933,7 @@ void MO_SledgeBrother::update()
 
 void MO_SledgeBrother::randomaction()
 {
-    int randaction = rand() % 100;
+    int randaction = GetRandMax(100);
 
     //Force an action if it has been too long since the last action of that type
     if(need_action[0] > g_iSledgeBrotherNeedAction[iType][game_values.gamemodesettings.boss.difficulty][0])
@@ -6979,7 +6979,7 @@ void MO_SledgeBrother::move()
     else if(location == 4)
         moveright = false;
     else
-        moveright = rand() % 2 == 0;
+        moveright = GetRandMax(2) == 0;
 
     SetLastAction(3);
 
@@ -7008,15 +7008,15 @@ void MO_SledgeBrother::throwprojectile()
     arm_offset_x = 96;
 
     if(iType == 0) {
-        float fHammerVelX = ((float)(rand() % 9 + 2)) / 2.0f - (face_right ? 0.0f : 6.0f);
+        float fHammerVelX = ((float)(GetRandMax(9) + 2)) / 2.0f - (face_right ? 0.0f : 6.0f);
         objectcontainer[2].add(new MO_SledgeHammer(&rm->spr_sledgehammer, (face_right ? ix + 32 : ix) - collisionOffsetX, iy, 8, fHammerVelX, -HAMMERTHROW, 5, -1, -1, -1, false));
     } else if(iType == 1) {
-        float fBombVelX = ((float)(rand() % 5 + 12)) / 2.0f - (face_right ? 0.0f : 14.0f);
-        float fBombVelY = -(float)(rand() % 13) / 2.0f - 6.0f;
-        objectcontainer[2].add(new CO_Bomb(&rm->spr_bomb, face_right ? ix + iw - 32 : ix - 20, iy, fBombVelX, fBombVelY, 4, -1, -1, -1, rand() % 60 + 120));
+        float fBombVelX = ((float)(GetRandMax(5) + 12)) / 2.0f - (face_right ? 0.0f : 14.0f);
+        float fBombVelY = -(float)(GetRandMax(13)) / 2.0f - 6.0f;
+        objectcontainer[2].add(new CO_Bomb(&rm->spr_bomb, face_right ? ix + iw - 32 : ix - 20, iy, fBombVelX, fBombVelY, 4, -1, -1, -1, GetRandMax(60) + 120));
     } else if(iType == 2) {
-        float fFireVelX = ((float)(rand() % 9 + 6)) / 2.0f - (face_right ? 0.0f : 10.0f);
-        float fFireVelY = (float)(rand() % 17) / 2.0f - 4.0f;
+        float fFireVelX = ((float)(GetRandMax(9) + 6)) / 2.0f - (face_right ? 0.0f : 10.0f);
+        float fFireVelY = (float)(GetRandMax(17)) / 2.0f - 4.0f;
         objectcontainer[2].add(new MO_SuperFireball(&rm->spr_superfireball, face_right ? ix + iw - 32 : ix - 16, iy, 4, fFireVelX, fFireVelY, 4, -1, -1, -1));
     }
 
@@ -7624,7 +7624,7 @@ void CO_Shell::CheckAndDie()
 {
     if((fDieOnMovingPlayerCollision && state == 1) || ((fDieOnHoldingPlayerCollision || fFlipped)&& state == 3))
         Die();
-    else if(!fDieOnHoldingPlayerCollision && state == 3 && (rand() % 5) == 0)
+    else if(!fDieOnHoldingPlayerCollision && state == 3 && (GetRandMax(5)) == 0)
         Die();
 }
 
@@ -8931,7 +8931,7 @@ void OMO_Phanto::update()
 
     if(++iSpeedTimer > 62) {
         iSpeedTimer = 0;
-        dReactionSpeed = (0.05f + (float)(rand() % 20) / 100.0f) * dSpeedRatio;
+        dReactionSpeed = (0.05f + (float)(GetRandMax(20)) / 100.0f) * dSpeedRatio;
     }
 
     //Chase player or move off screen if there is no player holding the key

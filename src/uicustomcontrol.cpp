@@ -2294,16 +2294,16 @@ void MI_TournamentScoreboard::Update()
     if(uiMenu) {
         if(iTournamentWinner != -1) { //Single tournament winning team
             if(--iFireworksCounter < 0 && iTournamentWinner >= 0) {
-                iFireworksCounter = (short)(rand() % 30 + 10);
+                iFireworksCounter = (short)(GetRandMax(30) + 10);
 
                 if(--iExplosionCounter < 0) {
-                    iExplosionCounter = (short)(rand() % 6 + 5);
+                    iExplosionCounter = (short)(GetRandMax(6) + 5);
 
                     ifsoundonplay(sfx_bobombsound);
 
                     float dAngle = 0.0f;
-                    short iRandX = (short)(rand() % 440 + 100);
-                    short iRandY = (short)(rand() % 280 + 100);
+                    short iRandX = (short)(GetRandMax(440) + 100);
+                    short iRandY = (short)(GetRandMax(280) + 100);
 
                     for(short iBlock = 0; iBlock < 28; iBlock++) {
                         float dVel = 7.0f + ((iBlock % 2) * 5.0f);
@@ -2317,8 +2317,8 @@ void MI_TournamentScoreboard::Update()
                 } else {
                     ifsoundonplay(sfx_cannon);
 
-                    short iRandX = (short)(rand() % 576);
-                    short iRandY = (short)(rand() % 416);
+                    short iRandX = (short)(GetRandMax(576));
+                    short iRandY = (short)(GetRandMax(416));
                     short iRandomColor = (short)(rand() % iTeamCounts[iTournamentWinner]);
 
                     uiMenu->AddEyeCandy(new EC_SingleAnimation(&rm->spr_fireworks, iRandX, iRandY, 8, 4, 0, game_values.colorids[iTeamIDs[iTournamentWinner][iRandomColor]] << 6, 64, 64));
@@ -2326,7 +2326,7 @@ void MI_TournamentScoreboard::Update()
             }
 
             if(--iWinnerTextCounter < 0) {
-                iWinnerTextCounter = (short)(rand() % 35 + 15);
+                iWinnerTextCounter = (short)(GetRandMax(35) + 15);
 
                 char szWinnerText[64];
                 if(iTournamentWinner == -2)
@@ -2685,7 +2685,7 @@ void MI_TournamentScoreboard::RefreshTournamentScores(short gameWinner)
                 iSwirlIconTeam = iTeam;
                 iSwirlIconGame = iGame;
 
-                miIconImages[iTeam][iGame]->SetSwirl(true, 250.0f, (float)(rand() % 1000) * TWO_PI / 1000.0f, 3.0f, 0.1f);
+                miIconImages[iTeam][iGame]->SetSwirl(true, 250.0f, (float)(GetRandMax(1000)) * TWO_PI / 1000.0f, 3.0f, 0.1f);
             }
 
             miIconImages[iTeam][iGame]->SetPulse(false);
@@ -2821,7 +2821,7 @@ void MI_BonusWheel::Update()
 
         if(iSelectionSpeedTimer > 0) {
             if(--iSelectionSpeedTimer <= 0) {
-                dSelectionSpeedGoal = (float)(rand() % 100 + 200) * 0.0005f;
+                dSelectionSpeedGoal = (float)(GetRandMax(100) + 200) * 0.0005f;
                 iSelectionSpeedTimer = 0;
             }
         }
@@ -2834,14 +2834,14 @@ void MI_BonusWheel::Update()
 
                 if(dSelectionSpeed >= dSelectionSpeedGoal) {
                     dSelectionSpeed = dSelectionSpeedGoal;
-                    iSelectionSpeedTimer = rand() % 60 + 30;
+                    iSelectionSpeedTimer = GetRandMax(60) + 30;
                 }
             } else if(dSelectionSpeed > dSelectionSpeedGoal) {
                 dSelectionSpeed -= 0.0005f;
 
                 if(dSelectionSpeed <= dSelectionSpeedGoal) {
                     dSelectionSpeed = dSelectionSpeedGoal;
-                    iSelectionSpeedTimer = rand() % 60 + 30;
+                    iSelectionSpeedTimer = GetRandMax(60) + 30;
                 }
             }
         }
@@ -2977,9 +2977,9 @@ void MI_BonusWheel::Reset(bool fTournament)
     iSelectorAnimationCounter = 0;
 
     //Figure out the initial position and speed of the selector
-    dSelectionSpeed = (float)(rand() % 100 + 200) * 0.0005f;
+    dSelectionSpeed = (float)(GetRandMax(100) + 200) * 0.0005f;
     dSelectionAngle = (float)(rand() % NUMBONUSITEMSONWHEEL) * TWO_PI / (float)(NUMBONUSITEMSONWHEEL);
-    dSelectionSpeedGoal = (float)(rand() % 100 + 200) * 0.0005f;
+    dSelectionSpeedGoal = (float)(GetRandMax(100) + 200) * 0.0005f;
     iSelectionSpeedTimer = 0;
 
     for(short iSector = 0; iSector < NUMBONUSITEMSONWHEEL; iSector++) {
@@ -4448,7 +4448,7 @@ bool MI_World::UsePowerup(short iPlayer, short iTeam, short iIndex, bool fPopupI
         ifsoundonplay(sfx_collectpowerup);
         fUsedItem = true;
     } else if(iPowerup == NUM_POWERUPS) { //Music Box (put vehicles to sleep)
-        iSleepTurns = rand() % 4 + 2;
+        iSleepTurns = GetRandMax(4) + 2;
         fUsedItem = true;
         ifsoundonplay(sfx_collectpowerup);
 

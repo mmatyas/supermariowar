@@ -1133,11 +1133,11 @@ void CObjectContainer::pushBombs(short x, short y)
 
         if(dist < 10000) {
             if(bombx > 0)
-                bomb->velx += ((float)(rand() % 30) / 10.0f + 4.0f);
+                bomb->velx += ((float)(GetRandMax(30)) / 10.0f + 4.0f);
             else
-                bomb->velx -= ((float)(rand() % 30) / 10.0f + 4.0f);
+                bomb->velx -= ((float)(GetRandMax(30)) / 10.0f + 4.0f);
 
-            bomb->vely -= (float)(rand() % 30) / 10.0f + 6.0f;
+            bomb->vely -= (float)(GetRandMax(30)) / 10.0f + 6.0f;
         }
     }
 }

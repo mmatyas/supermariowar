@@ -2107,7 +2107,7 @@ void Menu::RunMenu()
                     SModeOption * options = game_values.gamemode->GetOptions();
 
                     //Choose a goal from the lower values for a quicker game
-                    short iRandOption = (rand() % 6) + 1;
+                    short iRandOption = (GetRandMax(6)) + 1;
                     game_values.gamemode->goal  = options[iRandOption].iValue;
 
                     miGoalField[currentgamemode]->SetKey(gamemodes[currentgamemode]->goal);
@@ -2307,7 +2307,7 @@ void Menu::RunMenu()
                     SModeOption * options = game_values.gamemode->GetOptions();
 
                     //Choose a goal from the lower values for a quicker game
-                    short iRandOption = (rand() % 6) + 1;
+                    short iRandOption = (GetRandMax(6)) + 1;
                     game_values.gamemode->goal  = options[iRandOption].iValue;
 
                     game_values.tournamentwinner = -1;
@@ -3337,11 +3337,11 @@ void Menu::GetNextScriptOperation()
 
             game_values.gamemode->setdebuggoal();
         } else if(mCurrentMenu == &mTourStopMenu) {
-            static int tournext = rand() % 200;
+            static int tournext = GetRandMax(200);
 
             if(--tournext < 0) {
                 game_values.playerInput.outputControls[0].menu_select.fPressed = true;
-                tournext = rand() % 200;
+                tournext = GetRandMax(200);
                 game_values.gamemode->setdebuggoal();
             }
             return;
@@ -3350,12 +3350,12 @@ void Menu::GetNextScriptOperation()
         return;
     } else if (iScriptState == 2) {
         if(mCurrentMenu == &mTournamentScoreboardMenu) {
-            static int scoreboardnext = rand() % 200;
+            static int scoreboardnext = GetRandMax(200);
 
             if(--scoreboardnext < 0) {
                 game_values.playerInput.outputControls[0].menu_select.fPressed = true;
                 iScriptState = 3;
-                scoreboardnext = rand() % 200;
+                scoreboardnext = GetRandMax(200);
             }
 
             return;
@@ -3367,20 +3367,20 @@ void Menu::GetNextScriptOperation()
             fScriptRunPreGameOptions = true;
             return;
         } else if(mCurrentMenu == &mBonusWheelMenu) {
-            static int bonuswheelnext = rand() % 200 + 300;
+            static int bonuswheelnext = GetRandMax(200) + 300;
 
             if(--bonuswheelnext < 0) {
                 game_values.playerInput.outputControls[0].menu_select.fPressed = true;
                 //iScriptState = 3;
-                bonuswheelnext = rand() % 200 + 300;
+                bonuswheelnext = GetRandMax(200) + 300;
             }
             return;
         } else if(mCurrentMenu == &mTourStopMenu) {
-            static int tournext = rand() % 200;
+            static int tournext = GetRandMax(200);
 
             if(--tournext < 0) {
                 game_values.playerInput.outputControls[0].menu_select.fPressed = true;
-                tournext = rand() % 200;
+                tournext = GetRandMax(200);
                 game_values.gamemode->setdebuggoal();
             }
             return;
@@ -3402,11 +3402,11 @@ void Menu::GetNextScriptOperation()
             fScriptRunPreGameOptions = true;
             return;
         } else if(mCurrentMenu == &mTourStopMenu) {
-            static int tournext = rand() % 200;
+            static int tournext = GetRandMax(200);
 
             if(--tournext < 0) {
                 game_values.playerInput.outputControls[0].menu_select.fPressed = true;
-                tournext = rand() % 200;
+                tournext = GetRandMax(200);
                 game_values.gamemode->setdebuggoal();
             }
             return;
@@ -3431,7 +3431,7 @@ void Menu::GetNextScriptOperation()
     short iController = op->iController;
 
     if(iController == 5)
-        iController = rand() % 4;
+        iController = GetRandMax(4);
 
     short iKeys[8];
     short iNumKeys = 0;

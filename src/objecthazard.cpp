@@ -615,7 +615,7 @@ MO_PirhanaPlant::MO_PirhanaPlant(short x, short y, short type, short freq, short
     iAnimationTimer = 0;
     //iAnimationX = 0;
 
-    iActionTimer = rand() % 8;
+    iActionTimer = GetRandMax(8);
     iFrame = 0;
 
     fObjectCollidesWithMap = false;
@@ -807,11 +807,11 @@ void MO_PirhanaPlant::SetNewTimer()
     if(iType == 0) {
         //Only point flower towards directions that make sense
         if((ix >> 5) == 19)
-            iFrame = rand() % 2;
+            iFrame = GetRandMax(2);
         else if(ix == 0)
-            iFrame = (rand() % 2) + 2;
+            iFrame = (GetRandMax(2)) + 2;
         else
-            iFrame = rand() % 4;
+            iFrame = GetRandMax(4);
     }
 }
 

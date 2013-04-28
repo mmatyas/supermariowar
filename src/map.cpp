@@ -2565,7 +2565,7 @@ void CMap::predrawbackground(gfxSprite &background, gfxSprite &mapspr)
     	dest.w = (spawnareas[iType][m].width << 5) + TILESIZE;
     	dest.h = (spawnareas[iType][m].height << 5) + TILESIZE;
 
-    	//int color = 0x00 << 24 | rand() % 256 << 16 | rand() % 256 << 8 | rand() % 256;
+    	//int color = 0x00 << 24 | GetRandMax(256) << 16 | GetRandMax(256) << 8 | GetRandMax(256);
     	int color = 0x128 << 24 | 0x255 << 8;
 
     	SDL_FillRect(mapspr.getSurface(), &dest, color);		//fill empty area with black
