@@ -38,6 +38,8 @@ better sound for eggs game
 
 bomb explosion -> smaller
 
+AI should have a short memory to detect if the approach is not working out, then randomly change it
+
 Data directory structure
 ------------------------
 

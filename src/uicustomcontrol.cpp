@@ -3315,8 +3315,8 @@ MI_MapBrowser::MI_MapBrowser() :
 
     srcRectBackground.x = 0;
     srcRectBackground.y = 0;
-    srcRectBackground.w = 640;
-    srcRectBackground.h = 480;
+	srcRectBackground.w = smw->ScreenWidth;
+	srcRectBackground.h = smw->ScreenHeight;
 
     dstRectBackground.x = 0;
     dstRectBackground.y = 0;
@@ -3801,16 +3801,16 @@ void MI_World::Update()
 
     //Player is moving from one tile to the next (up)
     if(iPlayerState == 1) {
-        if(g_worldmap.iHeight > 15 && iMapOffsetY < 0 && iPlayerY < (g_worldmap.iHeight << 5) - 256)
+        if(g_worldmap.iHeight > 15 && iMapOffsetY < 0 && iPlayerY < (g_worldmap.iHeight << 5) - (smw->ScreenHeight - (480 - 256)))
             iMapOffsetY += 2;
     } else if(iPlayerState == 2) { //down
-        if(g_worldmap.iHeight > 15 && iMapOffsetY > 480 - (g_worldmap.iHeight << 5) && iPlayerY > 224)
+		if(g_worldmap.iHeight > 15 && iMapOffsetY > smw->ScreenHeight - (g_worldmap.iHeight << 5) && iPlayerY > (smw->ScreenHeight - (480 - 224)))
             iMapOffsetY -= 2;
     } else if(iPlayerState == 3) { //left
-        if(g_worldmap.iWidth > 20 && iMapOffsetX < 0 && iPlayerX < (g_worldmap.iWidth << 5) - 336)
+		if(g_worldmap.iWidth > 20 && iMapOffsetX < 0 && iPlayerX < (g_worldmap.iWidth << 5) - (smw->ScreenWidth - (640 - 336)))
             iMapOffsetX += 2;
     } else if(iPlayerState == 4) { //right
-        if(g_worldmap.iWidth > 20 && iMapOffsetX > 640 - (g_worldmap.iWidth << 5) && iPlayerX > 304)
+		if(g_worldmap.iWidth > 20 && iMapOffsetX > smw->ScreenWidth - (g_worldmap.iWidth << 5) && iPlayerX > (smw->ScreenWidth - (640 - 304)))
             iMapOffsetX -= 2;
     }
 

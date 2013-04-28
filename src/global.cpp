@@ -595,7 +595,7 @@ TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld)
 
         //If a valid mode was not detected, then just choose a random mode
         if(ts->iMode < 0 || (ts->iMode >= GAMEMODE_LAST && ts->iMode != game_mode_pipe_minigame && ts->iMode != game_mode_boss_minigame && ts->iMode != game_mode_boxes_minigame))
-            ts->iMode = rand() % GAMEMODE_LAST;
+            ts->iMode = GetRandMax(GAMEMODE_LAST);
 
         pszTemp = strtok(NULL, ",\n");
 
@@ -610,7 +610,7 @@ TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld)
         //Default to a random goal if an invalid goal was used
         if(ts->iGoal <= 0) {
             if(ts->iMode < GAMEMODE_LAST)
-                ts->iGoal = gamemodes[ts->iMode]->GetOptions()[rand() % (GAMEMODE_NUM_OPTIONS - 1)].iValue;
+                ts->iGoal = gamemodes[ts->iMode]->GetOptions()[GetRandMax(GAMEMODE_NUM_OPTIONS - 1)].iValue;
             else
                 ts->iGoal = 50;
         }
@@ -1357,8 +1357,9 @@ void ResetTourStops()
     game_values.tourstopcurrent = 0;
     game_values.tourstoptotal = 0;
 
-    // we have an exception here
-    game_values.tourstops.clear();
+    // added to prevent 'vector iterators incompatible' exception
+    if (!game_values.tourstops.empty())
+        game_values.tourstops.clear();
 }
 
 void LoadCurrentMapBackground()
@@ -1986,7 +1987,7 @@ void CheckSecret(short id)
             game_values.unlocksecretunlocked[0] = true;
             ifsoundonplay(sfx_transform);
 
-            IO_MovingObject * object = createpowerup(SECRET1_POWERUP, rand() % 640, rand() % 480, true, false);
+            IO_MovingObject * object = createpowerup(SECRET1_POWERUP, GetRandMax(smw->ScreenWidth), GetRandMax(smw->ScreenHeight), true, false);
 
             if(object)
                 eyecandy[2].add(new EC_SingleAnimation(&spr_poof, object->ix - 8, object->iy - 8, 4, 5));
@@ -1996,7 +1997,7 @@ void CheckSecret(short id)
             game_values.unlocksecretunlocked[1] = true;
             ifsoundonplay(sfx_transform);
 
-            IO_MovingObject * object = createpowerup(SECRET2_POWERUP, rand() % 640, rand() % 480, true, false);
+            IO_MovingObject * object = createpowerup(SECRET2_POWERUP, GetRandMax(smw->ScreenWidth), GetRandMax(smw->ScreenHeight), true, false);
 
             if(object)
                 eyecandy[2].add(new EC_SingleAnimation(&spr_poof, object->ix - 8, object->iy - 8, 4, 5));
@@ -2008,7 +2009,7 @@ void CheckSecret(short id)
                 game_values.unlocksecretunlocked[2] = true;
                 ifsoundonplay(sfx_transform);
 
-                IO_MovingObject * object = createpowerup(SECRET3_POWERUP, rand() % 640, rand() % 480, true, false);
+                IO_MovingObject * object = createpowerup(SECRET3_POWERUP, GetRandMax(smw->ScreenWidth), GetRandMax(smw->ScreenHeight), true, false);
 
                 if(object)
                     eyecandy[2].add(new EC_SingleAnimation(&spr_poof, object->ix - 8, object->iy - 8, 4, 5));
@@ -2018,7 +2019,7 @@ void CheckSecret(short id)
         game_values.unlocksecretunlocked[3] = true;
         ifsoundonplay(sfx_transform);
 
-        IO_MovingObject * object = createpowerup(SECRET4_POWERUP, rand() % 640, rand() % 480, true, false);
+        IO_MovingObject * object = createpowerup(SECRET4_POWERUP, GetRandMax(smw->ScreenWidth), GetRandMax(smw->ScreenHeight), true, false);
 
         if(object)
             eyecandy[2].add(new EC_SingleAnimation(&spr_poof, object->ix - 8, object->iy - 8, 4, 5));

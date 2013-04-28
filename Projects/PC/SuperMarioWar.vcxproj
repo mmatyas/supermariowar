@@ -161,6 +161,7 @@
     </ClCompile>
     <ClCompile Include="..\..\src\global.cpp" />
     <ClCompile Include="..\..\src\HashTable.cpp" />
+    <ClCompile Include="..\..\src\HashTableTest.cpp" />
     <ClCompile Include="..\..\src\input.cpp" />
     <ClCompile Include="..\..\src\main.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>

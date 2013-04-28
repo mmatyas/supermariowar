@@ -360,12 +360,12 @@ EC_Corpse::EC_Corpse(gfxSprite *nspr, float nx, float ny, short iSrcOffsetX) :
     offsetx = iSrcOffsetX;
 
     if(ix + PWOFFSET < 0)
-        tx = (ix + 640 + PWOFFSET) / TILESIZE;
+		tx = (ix + smw->ScreenWidth + PWOFFSET) / TILESIZE;
     else
         tx = (ix + PWOFFSET) / TILESIZE;
 
-    if(ix + PWOFFSET + PW >= 640)
-        tx2 = (ix + PWOFFSET + PW - 640) / TILESIZE;
+    if(ix + PWOFFSET + PW >= smw->ScreenWidth)
+        tx2 = (ix + PWOFFSET + PW - smw->ScreenWidth) / TILESIZE;
     else
         tx2 = (ix + PWOFFSET + PW) / TILESIZE;
 }
@@ -1177,7 +1177,7 @@ Spotlight::Spotlight(short x, short y, short size)
     ix = x;
     iy = y;
     iEndSize = size;
-    //iTransparency = 255;
+    iTransparency = 255;
     iState = 0;
     fUpdated = false;
 
@@ -1251,14 +1251,14 @@ void Spotlight::Draw()
     SDL_BlitSurface(spr_overlayhole.getSurface(), &rSrc, spr_overlay.getSurface(), &rDst);
 
     if(ix - iHalfWidth < 0) {
-        SDL_Rect rDstWrap = {ix - iHalfWidth + 640, iy - iHalfWidth, iWidth, iWidth};
+		SDL_Rect rDstWrap = {ix - iHalfWidth + smw->ScreenWidth, iy - iHalfWidth, iWidth, iWidth};
         SDL_BlitSurface(spr_overlayhole.getSurface(), &rSrc, spr_overlay.getSurface(), &rDstWrap);
-    } else if(ix + iHalfWidth >= 640) {
+	} else if(ix + iHalfWidth >= smw->ScreenWidth) {
         SDL_Rect rDstWrap = {ix - iHalfWidth - 640, iy - iHalfWidth, iWidth, iWidth};
         SDL_BlitSurface(spr_overlayhole.getSurface(), &rSrc, spr_overlay.getSurface(), &rDstWrap);
     }
 
-    /*
+#if	0
     //Transparency fade in effect. Unfortunately, the perf was too slow
     //Might be useful later if alpha fading perf is better
     short iWidth = iSpotlightValues[iSize][0];
@@ -1272,12 +1272,12 @@ void Spotlight::Draw()
 
     if(ix - iHalfWidth < 0)
     {
-        SDL_Rect rDstWrap = {ix - iHalfWidth + 640, iy - iHalfWidth, iWidth, iWidth};
+        SDL_Rect rDstWrap = {ix - iHalfWidth + smw->ScreenWidth, iy - iHalfWidth, iWidth, iWidth};
         SDL_BlitSurface(spr_overlayhole.getSurface(), &rSrc, spr_overlay.getSurface(), &rDstWrap);
     }
     else if(ix + iHalfWidth >= 640)
     {
-        SDL_Rect rDstWrap = {ix - iHalfWidth - 640, iy - iHalfWidth, iWidth, iWidth};
+        SDL_Rect rDstWrap = {ix - iHalfWidth - smw->ScreenWidth, iy - iHalfWidth, iWidth, iWidth};
         SDL_BlitSurface(spr_overlayhole.getSurface(), &rSrc, spr_overlay.getSurface(), &rDstWrap);
     }
 
@@ -1291,15 +1291,16 @@ void Spotlight::Draw()
 
         if(ix - iHalfWidth < 0)
         {
-            SDL_Rect rTransDstWrap = {ix - iHalfWidth + 640, iy - iHalfWidth, iWidth, iWidth};
+            SDL_Rect rTransDstWrap = {ix - iHalfWidth + smw->ScreenWidth, iy - iHalfWidth, iWidth, iWidth};
             SDL_BlitSurface(spr_overlayhole.getSurface(), &rTransSrc, blitdest, &rTransDstWrap);
         }
-        else if(ix + iHalfWidth >= 640)
+		else if(ix + iHalfWidth >= smw->ScreenWidth)
         {
-            SDL_Rect rTransDstWrap = {ix - iHalfWidth - 640, iy - iHalfWidth, iWidth, iWidth};
+            SDL_Rect rTransDstWrap = {ix - iHalfWidth - smw->ScreenWidth, iy - iHalfWidth, iWidth, iWidth};
             SDL_BlitSurface(spr_overlayhole.getSurface(), &rTransSrc, blitdest, &rTransDstWrap);
         }
-    }*/
+    }
+#endif
 }
 
 Spotlight * SpotlightManager::AddSpotlight(short ix, short iy, short iSize)
