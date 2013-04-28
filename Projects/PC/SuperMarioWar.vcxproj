@@ -271,10 +271,6 @@
     <ClInclude Include="..\..\src\sfx.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\README.txt" />
-    <None Include="..\..\src\todo.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="..\..\src\icons\smw_icon.rc">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">\_projects\_old projects\SuperMarioWar\src\icons;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
