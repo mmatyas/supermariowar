@@ -62,3 +62,11 @@ Overlay packages can also have any custom file that overrides existing files. Th
 
 All packages shall be cached locally (in .smw/packagesCache directory for example) and be managed through online server (HTTP/HTTPS)
 Packages shall be cached as .zip, but for development purposes also directories shall be supported
+Packages shall also have version number, always the latest version is used of any package.
+
+Known issues
+------------
+
+Throws exception after exiting, possibly due to memory corruption of some brave new/delete operation.
+There are many weird code smells.
+I did not yet start reading the TODO to check what's missing and what not.
