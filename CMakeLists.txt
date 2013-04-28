@@ -342,20 +342,18 @@ endif()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	# Install the application icon and menu item
-	install(FILES cpack/smw.xpm
-		DESTINATION ${CMAKE_INSTALL_PREFIX}/share/pixmaps RENAME smw.xpm)
-	install(FILES smw.desktop
-		DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
+	install(FILES cpack/smw.xpm DESTINATION ${CMAKE_INSTALL_PREFIX}/share/pixmaps RENAME smw.xpm)
+	install(FILES cpack/smw.desktop DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
 endif()
 
 # packaging information
-set(CPACK_PACKAGE_NAME "supermariowar")
+set(CPACK_PACKAGE_NAME "smw")
 set(CPACK_PACKAGE_VENDOR "neagix")
 set(CPACK_PACKAGE_VERSION_MAJOR ${SMW_VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${SMW_VERSION_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH ${SMW_VERSION_PATCH})
-set(CPACK_PACKAGE_DESCRIPTION_FILE ${PROJECT_SOURCE_DIR}/cpack/cpack_package_description.txt)
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Super Mario War, platformer multiplayer")
+set(CPACK_PACKAGE_DESCRIPTION_FILE ${PROJECT_SOURCE_DIR}/cpack/package_description.txt)
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "SMW, arcade platform multiplayer game")
 
 set(CPACK_RPM_PACKAGE_GROUP Amusements/Games)
 set(CPACK_RPM_PACKAGE_LICENSE GPL-2.0)
