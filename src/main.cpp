@@ -408,244 +408,6 @@ float spinspeed = 0.0f;
 short spindirection = 1;
 short spintimer = 0;
 
-//------ sprites (maybe this should be done in a resource manger) ------
-gfxSprite		** spr_player[4];	//all player sprites (see global.h)
-gfxSprite		** spr_shyguy[4];
-gfxSprite		** spr_chocobo[4];
-gfxSprite		** spr_bobomb[4];
-gfxSprite		spr_clouds;
-gfxSprite		spr_ghosts;
-gfxSprite		spr_fish;
-gfxSprite		spr_leaves;
-gfxSprite		spr_snow;
-gfxSprite		spr_rain;
-
-gfxSprite		spr_background;
-gfxSprite		spr_backmap[2];
-gfxSprite		spr_frontmap[2];
-gfxSprite		spr_overlay;
-gfxSprite		menu_backdrop;
-
-gfxFont			menu_font_small;
-gfxFont			menu_font_large;
-gfxFont			game_font_small;
-gfxFont			game_font_large;
-
-gfxSprite		menu_shade;
-gfxSprite		menu_smw;
-gfxSprite		menu_version;
-gfxSprite		menu_plain_field;
-gfxSprite		menu_player_select;
-gfxSprite		menu_map_filter;
-gfxSprite		menu_match_select;
-gfxSprite		menu_dialog;
-gfxSprite		menu_slider_bar;
-gfxSprite		menu_verticalarrows;
-
-gfxSprite		menu_stomp;
-gfxSprite		menu_survival;
-gfxSprite		menu_egg;
-
-gfxSprite		menu_mode_small;
-gfxSprite		menu_mode_large;
-gfxSprite		spr_dialog;
-gfxSprite		spr_dialogbutton;
-gfxSprite		spr_tournament_background;
-gfxSprite		spr_tournament_powerup_splash;
-gfxSprite		spr_player_select_background;
-gfxSprite		spr_player_select_ready;
-//gfxSprite		spr_ipfield;
-gfxSprite		spr_selectfield;
-gfxSprite		spr_selectfielddisabled;
-gfxSprite		spr_map_filter_icons;
-gfxSprite		spr_tour_markers;
-gfxSprite		spr_menu_boxed_numbers;
-gfxSprite		spr_countdown_numbers;
-gfxSprite		spr_thumbnail_warps[2];
-gfxSprite		spr_thumbnail_mapitems[2];
-gfxSprite		spr_platformstarttile;
-gfxSprite		spr_platformendtile;
-gfxSprite		spr_platformpath;
-
-gfxSprite		spr_worldbackground[3];
-gfxSprite		spr_worldforeground[3];
-gfxSprite		spr_worldforegroundspecial[3];
-gfxSprite		spr_worldpaths[3];
-gfxSprite		spr_worldvehicle[3];
-
-gfxSprite		spr_worlditems;
-gfxSprite		spr_worlditempopup;
-gfxSprite		spr_worlditemssmall;
-gfxSprite		spr_worlditemsplace;
-gfxSprite		spr_worldbonushouse;
-
-gfxSprite		spr_announcementicons;
-
-gfxSprite		spr_noteblock;
-gfxSprite		spr_breakableblock;
-gfxSprite		spr_powerupblock;
-gfxSprite		spr_donutblock;
-gfxSprite		spr_flipblock;
-gfxSprite		spr_bounceblock;
-gfxSprite		spr_throwblock;
-gfxSprite		spr_switchblocks;
-gfxSprite		spr_viewblock;
-gfxSprite		spr_weaponbreakableblock;
-
-gfxSprite		spr_brokenyellowblock;
-gfxSprite		spr_brokenflipblock;
-gfxSprite		spr_brokenblueblock;
-gfxSprite		spr_brokengrayblock;
-
-gfxSprite		spr_brokeniceblock;
-gfxSprite		spr_iceblock;
-
-gfxSprite		spr_tileanimation[3];
-gfxSprite		spr_blocks[3];
-gfxSprite		spr_unknowntile[3];
-
-gfxSprite		spr_starpowerup;
-gfxSprite		spr_1uppowerup;
-gfxSprite		spr_2uppowerup;
-gfxSprite		spr_3uppowerup;
-gfxSprite		spr_5uppowerup;
-gfxSprite		spr_firepowerup;
-gfxSprite		spr_hammerpowerup;
-gfxSprite		spr_icewandpowerup;
-gfxSprite		spr_podobopowerup;
-gfxSprite		spr_poisonpowerup;
-gfxSprite		spr_mysterymushroompowerup;
-gfxSprite		spr_boomerangpowerup;
-gfxSprite		spr_clockpowerup;
-gfxSprite		spr_bobombpowerup;
-gfxSprite		spr_powpowerup;
-gfxSprite		spr_modpowerup;
-gfxSprite		spr_bulletbillpowerup;
-gfxSprite		spr_featherpowerup;
-gfxSprite		spr_leafpowerup;
-gfxSprite		spr_bombpowerup;
-gfxSprite		spr_pwingspowerup;
-gfxSprite       spr_tanooki, spr_statue;
-gfxSprite		spr_extraheartpowerup;
-gfxSprite		spr_extratimepowerup;
-gfxSprite		spr_jailkeypowerup;
-
-gfxSprite		spr_secret1;
-gfxSprite		spr_secret2;
-gfxSprite		spr_secret3;
-gfxSprite		spr_secret4;
-
-gfxSprite		spr_shade[3];
-gfxSprite		spr_scorehearts;
-gfxSprite		spr_scorecards;
-gfxSprite		spr_scorecoins;
-
-gfxSprite		spr_timershade;
-gfxSprite		spr_scoretext;
-gfxSprite		spr_racetext;
-gfxSprite		spr_crown;
-gfxSprite		spr_warplock;
-gfxSprite		spr_cape;
-gfxSprite		spr_tail;
-gfxSprite		spr_wings;
-gfxSprite		spr_coinsparkle;
-gfxSprite		spr_shinesparkle;
-gfxSprite		spr_shellbounce;
-gfxSprite		spr_superstomp;
-
-gfxSprite		spr_coin;
-gfxSprite		spr_egg;
-gfxSprite		spr_eggnumbers;
-gfxSprite		spr_star;
-gfxSprite		spr_frenzycards;
-gfxSprite		spr_collectcards;
-gfxSprite		spr_flags;
-gfxSprite		spr_yoshi;
-gfxSprite		spr_thwomp;
-gfxSprite		spr_podobo;
-gfxSprite		spr_bowserfire;
-gfxSprite		spr_areas;
-gfxSprite		spr_kingofthehillarea;
-gfxSprite		spr_jail;
-gfxSprite		spr_racegoal;
-gfxSprite		spr_pipegamebonus;
-gfxSprite		spr_chicken;
-
-gfxSprite		spr_bonuschest;
-gfxSprite		spr_teleportstar;
-
-gfxSprite		spr_goomba;
-gfxSprite		spr_goombadead;
-gfxSprite		spr_goombadeadflying;
-gfxSprite		spr_koopa;
-gfxSprite		spr_buzzybeetle;
-gfxSprite		spr_spiny;
-gfxSprite		spr_paragoomba;
-gfxSprite		spr_parakoopa;
-gfxSprite		spr_redparakoopa;
-gfxSprite		spr_sledgebrothers;
-gfxSprite		spr_sledgebrothersdead;
-gfxSprite		spr_redkoopa;
-gfxSprite		spr_cheepcheep;
-gfxSprite		spr_cheepcheepdead;
-gfxSprite		spr_bulletbill;
-gfxSprite		spr_bulletbilldead;
-
-gfxSprite		spr_fireball;
-gfxSprite		spr_hammer;
-gfxSprite		spr_iceblast;
-gfxSprite		spr_boomerang;
-gfxSprite		spr_shell;
-gfxSprite		spr_shelldead;
-gfxSprite		spr_blueblock;
-gfxSprite		spr_spring;
-gfxSprite		spr_spike;
-gfxSprite		spr_bomb;
-gfxSprite		spr_kuriboshoe;
-gfxSprite		spr_throwbox;
-
-gfxSprite		spr_sledgehammer;
-gfxSprite		spr_superfireball;
-
-gfxSprite		spr_hazard_fireball[3];
-gfxSprite		spr_hazard_rotodisc[3];
-gfxSprite		spr_hazard_bulletbill[3];
-gfxSprite		spr_hazard_bulletbilldead;
-gfxSprite		spr_hazard_flame[3];
-gfxSprite		spr_hazard_pirhanaplant[3];
-
-gfxSprite		spr_fireballexplosion;
-gfxSprite		spr_frictionsmoke;
-gfxSprite		spr_bobombsmoke;
-gfxSprite		spr_explosion;
-gfxSprite		spr_burnup;
-gfxSprite		spr_fireworks;
-gfxSprite		spr_poof;
-
-gfxSprite		spr_spawnsmoke;
-gfxSprite		spr_spawndoor;
-gfxSprite		spr_bonus;
-gfxSprite		spr_extralife;
-gfxSprite		spr_award;
-gfxSprite		spr_awardsolid;
-gfxSprite		spr_awardsouls;
-gfxSprite		spr_awardsoulspawn;
-gfxSprite		spr_awardkillsinrow;
-gfxSprite		spr_flagbases;
-gfxSprite		spr_ownedtags;
-gfxSprite		spr_phanto, spr_phantokey;
-
-gfxSprite		spr_storedpowerupsmall;
-gfxSprite		spr_storedpoweruplarge;
-gfxSprite		spr_powerupselector;
-
-gfxSprite		spr_scoreboard;
-gfxSprite		spr_abovearrows;
-
-gfxSprite		spr_windmeter;
-gfxSprite		spr_overlayhole;
-
-
 //------ game relevant stuff ------
 CPlayer			*list_players[4];
 short			list_players_cnt = 0;
@@ -682,15 +444,15 @@ CObjectContainer objectcontainer[3];
 bool g_fLoadMessages = true;
 
 STextAward awards[PAWARD_LAST] = {
-    STextAward("Double Kill", &game_font_small),
-    STextAward("Triple Kill", &game_font_small),
-    STextAward("Killing Spree",  &game_font_small),
-    STextAward("Killing Spree x 2", &game_font_small),
-    STextAward("Killing Spree x 3", &game_font_small),
-    STextAward("Dominating", &game_font_large),
-    STextAward("Dominating x 2", &game_font_large),
-    STextAward("Dominating x 3", &game_font_large),
-    STextAward("Unstoppable!", &game_font_large)
+    STextAward("Double Kill", &rm->game_font_small),
+    STextAward("Triple Kill", &rm->game_font_small),
+    STextAward("Killing Spree",  &rm->game_font_small),
+    STextAward("Killing Spree x 2", &rm->game_font_small),
+    STextAward("Killing Spree x 3", &rm->game_font_small),
+    STextAward("Dominating", &rm->game_font_large),
+    STextAward("Dominating x 2", &rm->game_font_large),
+    STextAward("Dominating x 3", &rm->game_font_large),
+    STextAward("Unstoppable!", &rm->game_font_large)
 };
 
 sfxSound sfx_announcer[PANNOUNCER_SOUND_LAST];
@@ -794,8 +556,6 @@ char szIPString[32] = "";
 
 //NetServer netServer;
 //NetClient netClient;
-
-extern Uint8 GetScreenBackgroundFade();
 
 extern short g_iCollisionMap[MOVINGOBJECT_LAST][MOVINGOBJECT_LAST];
 
@@ -1059,11 +819,11 @@ void SpinScreen()
         spinangle += TWO_PI;
     }
 
-    float shakey = spinspeed * 640.0f * sin(spinangle);
+    float shakey = spinspeed * smw->ScreenWidth * sin(spinangle);
     if(shakey < 0.0f)
         shakey -= 1.0f;
 
-    x_shake = (short)(spinspeed * 640.0f * cos(spinangle));
+    x_shake = (short)(spinspeed * smw->ScreenWidth * cos(spinangle));
     y_shake = (short)(shakey);
 }
 
@@ -1098,7 +858,8 @@ int main(int argc, char *argv[])
 
     // this instance will contain the other relevant objects
     smw = new CGame(RootDataDirectory);
-#pragma warning "delete this or use boost GC shared_ptr"
+	rm = new CResourceManager();
+#pragma warning ("delete these or use boost GC shared_ptr")
 
     g_map = new CMap();
     g_tilesetmanager = new CTilesetManager();
@@ -1128,12 +889,12 @@ int main(int argc, char *argv[])
     printf("-------------------------------------------------------------------------------\n");
     printf("\n---------------- startup ----------------\n");
 
-    gfx_init(640, 480, false);		//initialize the graphics (SDL)
+	gfx_init(smw->ScreenWidth, smw->ScreenHeight, false);		//initialize the graphics (SDL)
     blitdest = screen;
 
 #if	0
     //Comment this in to performance test the preview map loading
-    MI_MapField * miMapField = new MI_MapField(&spr_selectfield, 70, 165, "Map", 500, 120);
+    MI_MapField * miMapField = new MI_MapField(&rm->spr_selectfield, 70, 165, "Map", 500, 120);
 
     for(int k = 0; k < 100; k++) {
         game_values.playerInput.outputControls[3].menu_right.fPressed = true;
@@ -1386,12 +1147,12 @@ int main(int argc, char *argv[])
     }
 
 #ifdef _XBOX
-    gfx_setresolution(640, 480, false); //Sets flicker filter
+    gfx_setresolution(smw->ScreenWidth, smw->ScreenHeight, false); //Sets flicker filter
     SDL_SetHardwareFilter(game_values.hardwarefilter);
     blitdest = screen;
 #else
     if(game_values.fullscreen) {
-        gfx_setresolution(640, 480, true);
+        gfx_setresolution(smw->ScreenWidth, smw->ScreenHeight, true);
         blitdest = screen;
     }
 #endif
@@ -1467,16 +1228,16 @@ int main(int argc, char *argv[])
     //Delete player skins
     for(short k = 0; k < MAX_PLAYERS; k++) {
         for(short j = 0; j < PGFX_LAST; j++) {
-            delete spr_player[k][j];
-            delete spr_shyguy[k][j];
-            delete spr_chocobo[k][j];
-            delete spr_bobomb[k][j];
+            delete rm->spr_player[k][j];
+            delete rm->spr_shyguy[k][j];
+            delete rm->spr_chocobo[k][j];
+            delete rm->spr_bobomb[k][j];
         }
 
-        delete [] spr_player[k];
-        delete [] spr_shyguy[k];
-        delete [] spr_chocobo[k];
-        delete [] spr_bobomb[k];
+        delete [] rm->spr_player[k];
+        delete [] rm->spr_shyguy[k];
+        delete [] rm->spr_chocobo[k];
+        delete [] rm->spr_bobomb[k];
 
         delete score[k];
     }
@@ -1611,7 +1372,7 @@ void RunGame()
                 if(game_values.playercontrol[iPlayer] == 2)
                     ai = new CPlayerAI();
 
-                list_players[list_players_cnt] = new CPlayer(iPlayer, list_players_cnt, teamid, subteamid, game_values.colorids[iPlayer], spr_player[iPlayer], score[teamid], &(respawn[iPlayer]), ai);
+                list_players[list_players_cnt] = new CPlayer(iPlayer, list_players_cnt, teamid, subteamid, game_values.colorids[iPlayer], rm->spr_player[iPlayer], score[teamid], &(respawn[iPlayer]), ai);
                 list_players_cnt++;
             } else if(!game_values.keeppowerup) {
                 //Reset off player's stored powerups if they are not playing
@@ -1670,7 +1431,7 @@ void RunGame()
 
     for(i = 0; i < score_cnt; i++) {
         if(game_values.scoreboardstyle == 0 || game_values.scoreboardstyle == 1) {
-            score[i]->x = ((640 - totalspace) >> 1);
+            score[i]->x = ((smw->ScreenWidth - totalspace) >> 1);
 
             for(short k = 0; k < i; k++)
                 score[i]->x += 76 + game_values.teamcounts[k] * 34;
@@ -1702,13 +1463,13 @@ void RunGame()
                 float velx;			//speed of cloud, small clouds are slower than big ones
                 short srcy, w, h;
 
-                if(rand() % 2) {
-                    velx = (short)(rand() % 51 - 25) / 10.0f;	//big clouds: -3 - +3 pixel/frame
+                if(GetRandBool()) {
+                    velx = (short)(GetRandMax(51) - 25) / 10.0f;	//big clouds: -3 - +3 pixel/frame
                     srcy = 0;
                     w = 60;
                     h = 28;
                 } else {
-                    velx = (short)(rand() % 41 - 20) / 10.0f;	//small clouds: -2 - +2 pixel/frame
+                    velx = (short)(GetRandMax(41) - 20) / 10.0f;	//small clouds: -2 - +2 pixel/frame
                     srcy = 28;
                     w = 28;
                     h = 12;
@@ -1717,33 +1478,33 @@ void RunGame()
                 velx = velx < 0.5f && velx > -0.5f ? 1 : velx;	//no static clouds please
 
                 //add cloud to eyecandy array
-                eyecandy[iEyeCandyLayer].add(new EC_Cloud(&spr_clouds, (float)(rand()%640), (float)(rand()%100), velx, 0, srcy, w, h));
+				eyecandy[iEyeCandyLayer].add(new EC_Cloud(&rm->spr_clouds, (float)(GetRandMax(smw->ScreenWidth)), (float)(GetRandMax(100)), velx, 0, srcy, w, h));
             }
         }
 
         //Ghosts
         if(g_map->eyecandy[iEyeCandyLayer] & 2) {
             for(i = 0; i < 8; i++) {
-                short iGhostSrcY = (short)(rand() % 3) << 5;	//ghost type
+                short iGhostSrcY = (short)(GetRandMax(3)) << 5;	//ghost type
                 float velx = (short)(rand() % 51 - 25) / 10.0f;	//big clouds: -3 - +3 pixel/frame
 
                 velx = velx < 0.5f && velx > -0.5f ? (rand() % 1 ? 1.0f : -1.0f) : velx;	//no static clouds please
 
                 //add cloud to eyecandy array
-                eyecandy[iEyeCandyLayer].add(new EC_Ghost(&spr_ghosts, (float)(rand() % 640), (float)(rand() % 100), velx, 8, 2, velx < 0.0f ? 64 : 0, iGhostSrcY, 32, 32));
+				eyecandy[iEyeCandyLayer].add(new EC_Ghost(&rm->spr_ghosts, (float)(GetRandMax(smw->ScreenWidth)), (float)(GetRandMax(100)), velx, 8, 2, velx < 0.0f ? 64 : 0, iGhostSrcY, 32, 32));
             }
         }
 
         //Leaves
         if(g_map->eyecandy[iEyeCandyLayer] & 4) {
             for(i = 0; i < 15; i++)
-                eyecandy[iEyeCandyLayer].add(new EC_Leaf(&spr_leaves, (float)(rand() % 640), (float)(rand() % 480)));
+                eyecandy[iEyeCandyLayer].add(new EC_Leaf(&rm->spr_leaves, (float)(GetRandMax(smw->ScreenWidth)), (float)(rand() % GetRandMax(smw->ScreenHeight))));
         }
 
         //Snow
         if(g_map->eyecandy[iEyeCandyLayer] & 8) {
             for(i = 0; i < 15; i++)
-                eyecandy[iEyeCandyLayer].add(new EC_Snow(&spr_snow, (float)(rand() % 640), (float)(rand() % 480), 0));
+				eyecandy[iEyeCandyLayer].add(new EC_Snow(&rm->spr_snow, (float)(GetRandMax(smw->ScreenWidth)), (float)(GetRandMax(smw->ScreenHeight)), 0));
         }
 
         //Fish
@@ -1774,20 +1535,20 @@ void RunGame()
                 //add cloud to eyecandy array
 				short iPossibleY = (smw->ScreenHeight - h) / 10;
                 float dDestY = (float)(rand() % iPossibleY + iPossibleY * i);
-                eyecandy[iEyeCandyLayer].add(new EC_Cloud(&spr_fish, (float)(GetRandMax(smw->ScreenWidth)), dDestY, velx, srcx + (velx > 0.0f ? 64 : 0), srcy, w, h));
+                eyecandy[iEyeCandyLayer].add(new EC_Cloud(&rm->spr_fish, (float)(GetRandMax(smw->ScreenWidth)), dDestY, velx, srcx + (velx > 0.0f ? 64 : 0), srcy, w, h));
             }
         }
 
         //Rain
         if(g_map->eyecandy[iEyeCandyLayer] & 32) {
             for(i = 0; i < 20; i++)
-                eyecandy[iEyeCandyLayer].add(new EC_Rain(&spr_rain, (float)(GetRandMax(smw->ScreenWidth)), GetRandMax(smw->ScreenHeight)));
+                eyecandy[iEyeCandyLayer].add(new EC_Rain(&rm->spr_rain, (float)(GetRandMax(smw->ScreenWidth)), GetRandMax(smw->ScreenHeight)));
         }
 
         //Bubbles
         if(g_map->eyecandy[iEyeCandyLayer] & 64) {
             for(i = 0; i < 10; i++)
-                eyecandy[iEyeCandyLayer].add(new EC_Bubble(&spr_rain, (float)(GetRandMax(smw->ScreenWidth)), GetRandMax(smw->ScreenHeight)));
+                eyecandy[iEyeCandyLayer].add(new EC_Bubble(&rm->spr_rain, (float)(GetRandMax(smw->ScreenWidth)), GetRandMax(smw->ScreenHeight)));
         }
     }
 
@@ -1798,7 +1559,7 @@ void RunGame()
 
 
     short iWindTimer = 0;
-    float dNextWind = (float)((rand() % 41) - 20) / 4.0f;
+    float dNextWind = (float)(GetRandMax(41) - 20) / 4.0f;
     game_values.gamewindx = (float)((rand() % 41) - 20) / 4.0f;
 
     //Initialize players after game init has finished
@@ -1890,7 +1651,7 @@ void RunGame()
 
                     corners[0][1] = (list_players[k]->ix + PW) / TILESIZE;
 
-                    if(list_players[k]->ix + PW >= 640)
+                    if(list_players[k]->ix + PW >= smw->ScreenWidth)
 						corners[0][1] = (list_players[k]->ix + PW - smw->ScreenWidth) / TILESIZE;
 
                     corners[1][0] = list_players[k]->iy / TILESIZE;
@@ -1902,7 +1663,7 @@ void RunGame()
                             IO_Block * block = NULL;
                             short blocktype = -1;
 
-                            if(actualvalues[0][j] >= 0 && actualvalues[0][j] < 640 && actualvalues[1][i] > 0 && actualvalues[1][i] < 480) {
+                            if(actualvalues[0][j] >= 0 && actualvalues[0][j] < smw->ScreenWidth && actualvalues[1][i] > 0 && actualvalues[1][i] < smw->ScreenHeight) {
                                 tile = g_map->map(corners[0][j], corners[1][i]);
                                 block = g_map->block(corners[0][j], corners[1][i]);
                                 blocktype = g_map->blockat(corners[0][j], corners[1][i])->iType;
@@ -1993,7 +1754,7 @@ void RunGame()
                         return;
                     } else if(event.key.keysym.sym == SDLK_RETURN) {
                         game_values.fullscreen = !game_values.fullscreen;
-                        gfx_setresolution(640, 480, game_values.fullscreen);
+						gfx_setresolution(smw->ScreenWidth, smw->ScreenHeight, game_values.fullscreen);
                         blitdest = screen;
 
                         g_Menu.miFullscreenField->SetKey(game_values.fullscreen ? 1 : 0);
@@ -2037,74 +1798,74 @@ void RunGame()
                     list_players[iplayer]->shieldtimer = 620;
                 } else if(event.key.keysym.sym == SDLK_1) {
                     if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                        objectcontainer[0].add(new PU_IceWandPowerup(&spr_icewandpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, 0, 30, 30, 1, 1));
+                        objectcontainer[0].add(new PU_IceWandPowerup(&rm->spr_icewandpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, 0, 30, 30, 1, 1));
                     else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                        objectcontainer[0].add(new PU_BobombPowerup(&spr_bobombpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));
+                        objectcontainer[0].add(new PU_BobombPowerup(&rm->spr_bobombpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));
                     else
-                        objectcontainer[0].add(new PU_StarPowerup(&spr_starpowerup, list_players[0]->ix + 32, list_players[0]->iy, 4, true, 2, 30, 30, 1, 1));
+                        objectcontainer[0].add(new PU_StarPowerup(&rm->spr_starpowerup, list_players[0]->ix + 32, list_players[0]->iy, 4, true, 2, 30, 30, 1, 1));
                 } else if(event.key.keysym.sym == SDLK_2) {
                     if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                        objectcontainer[0].add(new PU_BombPowerup(&spr_bombpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, 0, 30, 30, 1, 1));
+                        objectcontainer[0].add(new PU_BombPowerup(&rm->spr_bombpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, 0, 30, 30, 1, 1));
                     else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                        objectcontainer[0].add(new PU_PowPowerup(&spr_powpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 8, true, 8, 30, 30, 1, 1));
+                        objectcontainer[0].add(new PU_PowPowerup(&rm->spr_powpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 8, true, 8, 30, 30, 1, 1));
                     else
-                        objectcontainer[0].add(new PU_ExtraGuyPowerup(&spr_1uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1, 1));
+                        objectcontainer[0].add(new PU_ExtraGuyPowerup(&rm->spr_1uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1, 1));
                 } else if(event.key.keysym.sym == SDLK_3) {
                     if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                        objectcontainer[0].add(new PU_PodoboPowerup(&spr_podobopowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, 0, 30, 30, 1, 1));
+                        objectcontainer[0].add(new PU_PodoboPowerup(&rm->spr_podobopowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, 0, 30, 30, 1, 1));
                     else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                        objectcontainer[0].add(new PU_BulletBillPowerup(&spr_bulletbillpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));
+                        objectcontainer[0].add(new PU_BulletBillPowerup(&rm->spr_bulletbillpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));
                     else
-                        objectcontainer[0].add(new PU_ExtraGuyPowerup(&spr_2uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1, 2));
+                        objectcontainer[0].add(new PU_ExtraGuyPowerup(&rm->spr_2uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1, 2));
                 } else if(event.key.keysym.sym == SDLK_4) {
                     if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
                         objectcontainer[0].add(new PU_Tanooki(list_players[0]->ix + 32, list_players[0]->iy));
                     else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
                         objectcontainer[1].add(new CO_Shell(0, list_players[0]->ix + 32, list_players[0]->iy, true, true, true, false));
                     else
-                        objectcontainer[0].add(new PU_ExtraGuyPowerup(&spr_3uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1, 3));
+                        objectcontainer[0].add(new PU_ExtraGuyPowerup(&rm->spr_3uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1, 3));
                 } else if(event.key.keysym.sym == SDLK_5) {
                     if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                        objectcontainer[0].add(new PU_PWingsPowerup(&spr_pwingspowerup, list_players[0]->ix + 32, list_players[0]->iy));
+                        objectcontainer[0].add(new PU_PWingsPowerup(&rm->spr_pwingspowerup, list_players[0]->ix + 32, list_players[0]->iy));
                     else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
                         objectcontainer[1].add(new CO_Shell(1, list_players[0]->ix + 32, list_players[0]->iy, false, true, true, false));
                     else
-                        objectcontainer[0].add(new PU_ExtraGuyPowerup(&spr_5uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1, 5));
+                        objectcontainer[0].add(new PU_ExtraGuyPowerup(&rm->spr_5uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1, 5));
                 } else if(event.key.keysym.sym == SDLK_6) {
                     if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                        objectcontainer[1].add(new CO_Spring(&spr_spring, list_players[0]->ix + 32, list_players[0]->iy, true));
+                        objectcontainer[1].add(new CO_Spring(&rm->spr_spring, list_players[0]->ix + 32, list_players[0]->iy, true));
                     else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
                         objectcontainer[1].add(new CO_Shell(2, list_players[0]->ix + 32, list_players[0]->iy, false, false, true, true));
                     else
-                        objectcontainer[0].add(new PU_FirePowerup(&spr_firepowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1));
+                        objectcontainer[0].add(new PU_FirePowerup(&rm->spr_firepowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1));
                 } else if(event.key.keysym.sym == SDLK_7) {
                     if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                        objectcontainer[1].add(new CO_ThrowBox(&spr_throwbox, list_players[0]->ix + 32, list_players[0]->iy, (rand() % NUM_POWERUPS + 3) - 3));
+                        objectcontainer[1].add(new CO_ThrowBox(&rm->spr_throwbox, list_players[0]->ix + 32, list_players[0]->iy, (rand() % NUM_POWERUPS + 3) - 3));
                     else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
                         objectcontainer[1].add(new CO_Shell(3, list_players[0]->ix + 32, list_players[0]->iy, false, true, false, false));
                     else
-                        objectcontainer[0].add(new PU_HammerPowerup(&spr_hammerpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1));
+                        objectcontainer[0].add(new PU_HammerPowerup(&rm->spr_hammerpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1));
                 } else if(event.key.keysym.sym == SDLK_8) {
                     if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                        objectcontainer[1].add(new CO_Spike(&spr_spike, list_players[0]->ix + 32, list_players[0]->iy));
+                        objectcontainer[1].add(new CO_Spike(&rm->spr_spike, list_players[0]->ix + 32, list_players[0]->iy));
                     else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                        objectcontainer[0].add(new PU_ModPowerup(&spr_modpowerup, list_players[0]->ix + 32, list_players[0]->iy, 8, true, 8, 30, 30, 1, 1));
+                        objectcontainer[0].add(new PU_ModPowerup(&rm->spr_modpowerup, list_players[0]->ix + 32, list_players[0]->iy, 8, true, 8, 30, 30, 1, 1));
                     else
-                        objectcontainer[0].add(new PU_PoisonPowerup(&spr_poisonpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1));
+                        objectcontainer[0].add(new PU_PoisonPowerup(&rm->spr_poisonpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1));
                 } else if(event.key.keysym.sym == SDLK_9) {
                     if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                        objectcontainer[1].add(new CO_KuriboShoe(&spr_kuriboshoe, list_players[0]->ix + 32, list_players[0]->iy, true));
+                        objectcontainer[1].add(new CO_KuriboShoe(&rm->spr_kuriboshoe, list_players[0]->ix + 32, list_players[0]->iy, true));
                     else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                        objectcontainer[0].add(new PU_FeatherPowerup(&spr_featherpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, 0, 30, 30, 1, 1));
+                        objectcontainer[0].add(new PU_FeatherPowerup(&rm->spr_featherpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, 0, 30, 30, 1, 1));
                     else
-                        objectcontainer[0].add(new PU_ClockPowerup(&spr_clockpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));
+                        objectcontainer[0].add(new PU_ClockPowerup(&rm->spr_clockpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));
                 } else if(event.key.keysym.sym == SDLK_0) {
                     if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                        objectcontainer[0].add(new PU_LeafPowerup(&spr_leafpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, 0, 30, 30, 1, 1));
+                        objectcontainer[0].add(new PU_LeafPowerup(&rm->spr_leafpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, 0, 30, 30, 1, 1));
                     else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                        objectcontainer[0].add(new PU_BoomerangPowerup(&spr_boomerangpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));
+                        objectcontainer[0].add(new PU_BoomerangPowerup(&rm->spr_boomerangpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));
                     else
-                        objectcontainer[0].add(new PU_MysteryMushroomPowerup(&spr_mysterymushroompowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));
+                        objectcontainer[0].add(new PU_MysteryMushroomPowerup(&rm->spr_mysterymushroompowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));
                 } else if(event.key.keysym.sym == SDLK_INSERT) {
                     g_fAutoTest = !g_fAutoTest;
                 }
@@ -2150,8 +1911,8 @@ void RunGame()
                         game_values.pausegame = !game_values.pausegame;
 
                         if(game_values.pausegame) {
-                            menu_shade.setalpha(GetScreenBackgroundFade());
-                            menu_shade.draw(0, 0);
+                            rm->menu_shade.setalpha(SCREEN_BACKGROUND_FADE	);
+                            rm->menu_shade.draw(0, 0);
 
                             //Stop the pwings sound if it is on
                             if(sfx_flyingsound.isplaying())
@@ -2179,8 +1940,8 @@ void RunGame()
                         return;
                     } else {
                         if(!game_values.pausegame && !game_values.exitinggame) {
-                            menu_shade.setalpha(GetScreenBackgroundFade());
-                            menu_shade.draw(0, 0);
+                            rm->menu_shade.setalpha(SCREEN_BACKGROUND_FADE	);
+                            rm->menu_shade.draw(0, 0);
                             game_values.exitinggame = true;
                             //ifsoundonpause(sfx_invinciblemusic);
                             //ifsoundonpause(sfx_slowdownmusic);
@@ -2405,7 +2166,7 @@ void RunGame()
                             if(--game_values.bulletbillspawntimer[iPlayer] <= 0) {
                                 game_values.bulletbillspawntimer[iPlayer] = (short)(rand() % 20 + 25);
                                 float speed = ((float)(rand() % 21 + 20)) / 10.0f;
-                                objectcontainer[2].add(new MO_BulletBill(&spr_bulletbill, &spr_bulletbilldead, 0, (short)(rand() % 448), (rand() % 2 ? speed : -speed), iPlayer, false));
+                                objectcontainer[2].add(new MO_BulletBill(&rm->spr_bulletbill, &rm->spr_bulletbilldead, 0, (short)(rand() % 448), (rand() % 2 ? speed : -speed), iPlayer, false));
                                 ifsoundonplay(sfx_bulletbillsound);
                             }
                         }
@@ -2650,11 +2411,11 @@ SWAPBREAK:
 
                     LoadCurrentMapBackground();
 
-                    g_map->predrawbackground(spr_background, spr_backmap[0]);
-                    g_map->predrawforeground(spr_frontmap[0]);
+                    g_map->predrawbackground(rm->spr_background, rm->spr_backmap[0]);
+                    g_map->predrawforeground(rm->spr_frontmap[0]);
 
-                    g_map->predrawbackground(spr_background, spr_backmap[1]);
-                    g_map->predrawforeground(spr_frontmap[1]);
+                    g_map->predrawbackground(rm->spr_background, rm->spr_backmap[1]);
+                    g_map->predrawforeground(rm->spr_frontmap[1]);
 
                     g_map->SetupAnimatedTiles();
                     LoadMapObjects(false);
@@ -2678,7 +2439,7 @@ SWAPBREAK:
             }
 
             //--------------- draw everything ----------------------
-            spr_backmap[g_iCurrentDrawIndex].draw(0, 0);
+            rm->spr_backmap[g_iCurrentDrawIndex].draw(0, 0);
 
             //draw back eyecandy behind players
             g_map->drawPlatforms(0);
@@ -2757,16 +2518,16 @@ SWAPBREAK:
                         sprintf(gameovertext, "Tie Game");
                     }
 
-                    game_font_large.drawCentered(320, 90, gameovertext);
+                    rm->game_font_large.drawCentered(smw->ScreenHeight/2, 90, gameovertext);
 
                 }
 
                 //in game scoreboards
                 for(i = 0; i < score_cnt; i++) {
                     if(game_values.gamemode->gamemode == game_mode_health || game_values.gamemode->gamemode == game_mode_collection || game_values.gamemode->gamemode == game_mode_boxes_minigame)
-                        spr_shade[game_values.teamcounts[i] - 1].draw(score[i]->x, score[i]->y);
+                        rm->spr_shade[game_values.teamcounts[i] - 1].draw(score[i]->x, score[i]->y);
                     else
-                        spr_shade[game_values.teamcounts[i] - 1].draw(score[i]->x, score[i]->y, 0, 0, 256, 41);
+                        rm->spr_shade[game_values.teamcounts[i] - 1].draw(score[i]->x, score[i]->y, 0, 0, 256, 41);
 
                     for(short k = 0; k < game_values.teamcounts[i]; k++) {
                         short globalID = game_values.teamids[i][k];
@@ -2783,8 +2544,8 @@ SWAPBREAK:
 
                             short scorex = score[i]->x + scoreoffsets[k];
                             short scorey = score[i]->y + 2;
-                            spr_egg.draw(scorex, scorey, respawnanimationframe[globalID], game_values.colorids[globalID] << 5, 32, 32);
-                            spr_eggnumbers.draw(scorex, scorey, ((respawn[globalID] - 1) >> 1) << 5, game_values.colorids[globalID] << 5, 32, 32);
+                            rm->spr_egg.draw(scorex, scorey, respawnanimationframe[globalID], game_values.colorids[globalID] << 5, 32, 32);
+                            rm->spr_eggnumbers.draw(scorex, scorey, ((respawn[globalID] - 1) >> 1) << 5, game_values.colorids[globalID] << 5, 32, 32);
                         } else { //otherwise draw the player's skin in the scoreboard
                             short iScoreboardSprite;
                             if(game_values.gamemode->gameover) {
@@ -2804,28 +2565,28 @@ SWAPBREAK:
                                 short iScoreOffsetY = score[i]->y + 2;
 
                                 if(player->ownerPlayerID > -1)
-                                    spr_ownedtags.draw(iScoreOffsetX - 8, iScoreOffsetY - 8, player->ownerColorOffsetX, 0, 48, 48);
+                                    rm->spr_ownedtags.draw(iScoreOffsetX - 8, iScoreOffsetY - 8, player->ownerColorOffsetX, 0, 48, 48);
 
                                 player->GetScoreboardSprite()[iScoreboardSprite]->draw(iScoreOffsetX, iScoreOffsetY, player->iSrcOffsetX, 0, 32, 32);
 
                                 //Display jail if player is jailed
                                 if(player->jailtimer > 0)
-                                    spr_jail.draw(iScoreOffsetX - 6, iScoreOffsetY - 6, (player->jailcolor + 1) * 44, 0, 44, 44);
+                                    rm->spr_jail.draw(iScoreOffsetX - 6, iScoreOffsetY - 6, (player->jailcolor + 1) * 44, 0, 44, 44);
 
                                 //Display current powerup if player is using one
                                 if(player->powerup > 0)
-                                    spr_storedpowerupsmall.draw(iScoreOffsetX, iScoreOffsetY + 16, g_iPowerupToIcon[player->powerup - 1], 0, 16, 16);
+                                    rm->spr_storedpowerupsmall.draw(iScoreOffsetX, iScoreOffsetY + 16, g_iPowerupToIcon[player->powerup - 1], 0, 16, 16);
 
                                 //Display tanooki powerup if player has it
                                 if(player->tanooki)
-                                    spr_storedpowerupsmall.draw(iScoreOffsetX + 16, iScoreOffsetY + 16, 320, 0, 16, 16);
+                                    rm->spr_storedpowerupsmall.draw(iScoreOffsetX + 16, iScoreOffsetY + 16, 320, 0, 16, 16);
                             } else {
-                                spr_player[globalID][iScoreboardSprite]->draw(score[i]->x + scoreoffsets[k], score[i]->y + 2, 0, 0, 32, 32);
+                                rm->spr_player[globalID][iScoreboardSprite]->draw(score[i]->x + scoreoffsets[k], score[i]->y + 2, 0, 0, 32, 32);
                             }
 
                             //give crown to player(s) with most kills
                             if(g_iWinningPlayer == i)
-                                spr_crown.draw(score[i]->x + scoreoffsets[k] + 12, score[i]->y - 4);
+                                rm->spr_crown.draw(score[i]->x + scoreoffsets[k] + 12, score[i]->y - 4);
                         }
 
                         short storedpowerupid = game_values.gamepowerups[globalID];
@@ -2833,7 +2594,7 @@ SWAPBREAK:
                         //Draw stored powerup
                         if(storedpowerupid != -1) {
                             if(!game_values.swapplayers) {
-                                spr_storedpowerupsmall.draw(score[i]->x + scorepowerupoffsets[game_values.teamcounts[i] - 1][k], score[i]->y + 25, storedpowerupid * 16, 0, 16, 16);
+                                rm->spr_storedpowerupsmall.draw(score[i]->x + scorepowerupoffsets[game_values.teamcounts[i] - 1][k], score[i]->y + 25, storedpowerupid * 16, 0, 16, 16);
                             }
                         }
                     }
@@ -2846,16 +2607,16 @@ SWAPBREAK:
 
                         for(short iHeart = 0; iHeart < iLife; iHeart++) {
                             if(iHeart == iMax - 1 && iHeart % 2 == 0)
-                                spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, 32, 0, 8, 16);
+                                rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, 32, 0, 8, 16);
                             else
-                                spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, iHeart % 2 ? 8 : 0, 0, 8, 16);
+                                rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, iHeart % 2 ? 8 : 0, 0, 8, 16);
                         }
 
                         for(short iHeart = iLife; iHeart < iMax; iHeart++) {
                             if(iHeart == iMax - 1 && iHeart % 2 == 0)
-                                spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, 40, 0, 8, 16);
+                                rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, 40, 0, 8, 16);
                             else
-                                spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, iHeart % 2 ? 24 : 16, 0, 8, 16);
+                                rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, iHeart % 2 ? 24 : 16, 0, 8, 16);
                         }
                     } else if(game_values.gamemode->gamemode == game_mode_collection) { //Draw cards for collection mode
                         //Flash collected cards if 3 have been collected
@@ -2865,7 +2626,7 @@ SWAPBREAK:
                             short iCardX = score[i]->x + scorepowerupoffsets[game_values.teamcounts[i] - 1][0] - 20;
 
                             for(short iCard = 0; iCard < iNumCards; iCard++) {
-                                spr_scorecards.draw(iCardX + iCard * 20, score[i]->y + 43, (iCardValues & 3) << 4, 0, 16, 16);
+                                rm->spr_scorecards.draw(iCardX + iCard * 20, score[i]->y + 43, (iCardValues & 3) << 4, 0, 16, 16);
                                 iCardValues >>= 2;
                             }
                         }
@@ -2876,27 +2637,27 @@ SWAPBREAK:
 
                         short iCoin = 0;
                         for(; iCoin < iNumCoins; iCoin++) {
-                            spr_scorecoins.draw(iCoinX + iCoin * 16, score[i]->y + 43, 0, 0, 16, 16);
+                            rm->spr_scorecoins.draw(iCoinX + iCoin * 16, score[i]->y + 43, 0, 0, 16, 16);
                         }
 
                         for(short iEmptyCoin = iCoin; iEmptyCoin < 5; iEmptyCoin++) {
-                            spr_scorecoins.draw(iCoinX + iEmptyCoin * 16, score[i]->y + 43, 16, 0, 16, 16);
+                            rm->spr_scorecoins.draw(iCoinX + iEmptyCoin * 16, score[i]->y + 43, 16, 0, 16, 16);
                         }
                     }
 
                     short iScoreX = score[i]->x + iScoreTextOffset[i];
                     short iScoreY = score[i]->y + 4;
 
-                    spr_scoretext.draw(iScoreX, iScoreY, score[i]->iDigitLeft, (score[i]->iDigitLeft == 0 ? 16 : 0), 16, 16);
-                    spr_scoretext.draw(iScoreX + 18, iScoreY, score[i]->iDigitMiddle, (score[i]->iDigitLeft == 0 && score[i]->iDigitMiddle == 0 ? 16 : 0), 16, 16);
-                    spr_scoretext.draw(iScoreX + 36, iScoreY, score[i]->iDigitRight, 0, 16, 16);
+                    rm->spr_scoretext.draw(iScoreX, iScoreY, score[i]->iDigitLeft, (score[i]->iDigitLeft == 0 ? 16 : 0), 16, 16);
+                    rm->spr_scoretext.draw(iScoreX + 18, iScoreY, score[i]->iDigitMiddle, (score[i]->iDigitLeft == 0 && score[i]->iDigitMiddle == 0 ? 16 : 0), 16, 16);
+                    rm->spr_scoretext.draw(iScoreX + 36, iScoreY, score[i]->iDigitRight, 0, 16, 16);
                 }
             }
 
             if(game_values.windaffectsplayers) {
                 short iDisplayWindMeterY = game_values.scoreboardstyle == 1 ? 8 : 440;
-                spr_windmeter.draw(210, iDisplayWindMeterY, 0, 0, 220, 32);
-                spr_windmeter.draw((short)(game_values.gamewindx * 20.0f) + 320, iDisplayWindMeterY + 6, 220, 0, 12, 20);
+                rm->spr_windmeter.draw(210, iDisplayWindMeterY, 0, 0, 220, 32);
+                rm->spr_windmeter.draw((short)(game_values.gamewindx * 20.0f) + 320, iDisplayWindMeterY + 6, 220, 0, 12, 20);
             }
 
             //draw arrows for being above the top of the screen
@@ -2906,7 +2667,7 @@ SWAPBREAK:
             //Draw countdown start timer
             if(iCountDownState > 0 && game_values.screenfade == 0) {
                 SDL_Rect * rects = iCountDownNumbers[iCountDownRectGroup[28 - iCountDownState]][iCountDownRectSize[28 - iCountDownState]];
-                spr_countdown_numbers.draw(rects[1].x, rects[1].y, rects[0].x, rects[0].y, rects[0].w, rects[0].h);
+                rm->spr_countdown_numbers.draw(rects[1].x, rects[1].y, rects[0].x, rects[0].y, rects[0].w, rects[0].h);
             }
 
             if(game_values.screenfadespeed != 0) {
@@ -2928,7 +2689,7 @@ SWAPBREAK:
 
                         short iMode = GetModeIconIndexFromMode(game_values.gamemode->gamemode);
 
-                        eyecandy[2].add(new EC_Announcement(&game_font_large, &menu_mode_large, szMode, iMode, 130, 90));
+                        eyecandy[2].add(new EC_Announcement(&rm->game_font_large, &rm->menu_mode_large, szMode, iMode, 130, 90));
                     }
                 } else if(game_values.screenfade >= 255) {
                     game_values.screenfadespeed = 0;
@@ -2937,8 +2698,8 @@ SWAPBREAK:
             }
 
             if(game_values.screenfade > 0) {
-                menu_shade.setalpha((Uint8)game_values.screenfade);
-                menu_shade.draw(0, 0);
+                rm->menu_shade.setalpha((Uint8)game_values.screenfade);
+                rm->menu_shade.draw(0, 0);
             }
 
             if(game_values.swapplayers) {
@@ -2958,7 +2719,7 @@ SWAPBREAK:
                             iPowerupY = (short)((float)(list_players[i]->iNewPowerupY - list_players[i]->iOldPowerupY) * game_values.swapplayersposition) + list_players[i]->iOldPowerupY;
                         }
 
-                        spr_storedpowerupsmall.draw(iPowerupX, iPowerupY, storedpowerupid * 16, 0, 16, 16);
+                        rm->spr_storedpowerupsmall.draw(iPowerupX, iPowerupY, storedpowerupid * 16, 0, 16, 16);
                     }
                 }
 
@@ -2985,36 +2746,36 @@ SWAPBREAK:
 
                     if(game_values.swapstyle == 1) {
                         for(i = 0; i < list_players_cnt; i++)
-                            eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, list_players[i]->ix + (HALFPW) - 16, list_players[i]->iy + (HALFPH) - 16, 3, 8));
+                            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, list_players[i]->ix + (HALFPW) - 16, list_players[i]->iy + (HALFPH) - 16, 3, 8));
                     }
                 }
             }
 
             //Draw black "behind" the game if we are shaking/moving the screen
             if(y_shake > 0) {
-                SDL_Rect rect = {0, 0, 640, y_shake};
+				SDL_Rect rect = {0, 0, smw->ScreenWidth, y_shake};
                 SDL_FillRect(screen, &rect, 0x0);		//fill empty area with black
             } else if(y_shake < 0) {
-                SDL_Rect rect = {0, 480 + y_shake, 640, 480};
+				SDL_Rect rect = {0, smw->ScreenHeight + y_shake, smw->ScreenWidth, smw->ScreenHeight};
                 SDL_FillRect(screen, &rect, 0x0);		//fill empty area with black
             }
 
             if(x_shake > 0) {
-                SDL_Rect rect = {0, 0, x_shake, 480};
+				SDL_Rect rect = {0, 0, x_shake, smw->ScreenHeight};
                 SDL_FillRect(screen, &rect, 0x0);		//fill empty area with black
             } else if(x_shake < 0) {
-                SDL_Rect rect = {640 + x_shake, 0, 640, 480};
+				SDL_Rect rect = {smw->ScreenWidth + x_shake, 0, smw->ScreenWidth, smw->ScreenHeight};
                 SDL_FillRect(screen, &rect, 0x0);		//fill empty area with black
             }
         } else {
             if(game_values.pausegame) {
-                spr_dialog.draw(224, 176);
-                menu_font_large.drawCentered(320, 194, "Pause");
+                rm->spr_dialog.draw(224, 176);
+				rm->menu_font_large.drawCentered(smw->ScreenHeight/2, 194, "Pause");
 
                 //menu_font_large.drawCentered(320, 240, game_values.gamemode->GetModeName());
                 short iMode = GetModeIconIndexFromMode(game_values.gamemode->gamemode);
 
-                menu_mode_large.draw(304, 224, iMode << 5, 0, 32, 32);
+                rm->menu_mode_large.draw(304, 224, iMode << 5, 0, 32, 32);
 
                 char szGoal[256];
                 strcpy(szGoal, game_values.gamemode->GetGoalName());
@@ -3025,18 +2786,18 @@ SWAPBREAK:
                 else
                     sprintf(szGoal + strlen(szGoal), "%d", game_values.gamemode->goal);
 
-                menu_font_large.drawCentered(320, 264, szGoal);
+				rm->menu_font_large.drawCentered(smw->ScreenWidth/2, 264, szGoal);
             }
 
             if(game_values.exitinggame) {
-                spr_dialog.draw(224, 176);
-                menu_font_large.drawCentered(320, 220 - (menu_font_large.getHeight() >> 1), "Exit Game");
+                rm->spr_dialog.draw(224, 176);
+                rm->menu_font_large.drawCentered(smw->ScreenWidth/2, 220 - (rm->menu_font_large.getHeight() >> 1), "Exit Game");
 
-                spr_dialogbutton.draw(235, 250, 0, (game_values.exityes ? 34 : 0), 80, 34);
-                spr_dialogbutton.draw(325, 250, 0, (game_values.exityes ? 0 : 34), 80, 34);
+                rm->spr_dialogbutton.draw(235, 250, 0, (game_values.exityes ? 34 : 0), 80, 34);
+                rm->spr_dialogbutton.draw(325, 250, 0, (game_values.exityes ? 0 : 34), 80, 34);
 
-                menu_font_large.draw(275 - (menu_font_large.getWidth("Yes") >> 1),  269 - (menu_font_large.getHeight() >> 1), "Yes");
-                menu_font_large.draw(365 - (menu_font_large.getWidth("No") >> 1),  269 - (menu_font_large.getHeight() >> 1), "No");
+                rm->menu_font_large.draw(275 - (rm->menu_font_large.getWidth("Yes") >> 1),  269 - (rm->menu_font_large.getHeight() >> 1), "Yes");
+                rm->menu_font_large.draw(365 - (rm->menu_font_large.getWidth("No") >> 1),  269 - (rm->menu_font_large.getHeight() >> 1), "No");
             }
         }
 
@@ -3073,12 +2834,12 @@ SWAPBREAK:
 
         if(game_values.showfps) {
             float potentialFps = 1000.0f / (float)(game_values.framelimiter == 0 ? 1 : game_values.framelimiter);
-            menu_font_large.drawf(0, 480-menu_font_large.getHeight(), "Actual:%.1f/%.1f, Flip:%.1f, Potential:%.1f", realfps, potentialFps, flipfps, 1000.0f / (float)ticks);
+            rm->menu_font_large.drawf(0, smw->ScreenHeight-rm->menu_font_large.getHeight(), "Actual:%.1f/%.1f, Flip:%.1f, Potential:%.1f", realfps, potentialFps, flipfps, 1000.0f / (float)ticks);
         }
 
 #ifdef _DEBUG
         if(g_fAutoTest)
-            menu_font_small.drawRightJustified(635, 5, "Auto");
+            rm->menu_font_small.drawRightJustified(635, 5, "Auto");
 #endif
 
         //double buffering -> flip buffers
@@ -3222,7 +2983,7 @@ void UpdateScoreBoard()
         }
 
         //Add powerups to player's world item inventory that they held at the end of the game
-        for(short iPlayer = 0; iPlayer < 4; iPlayer++) {
+        for(short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
             if(game_values.gamepowerups[iPlayer] != -1) {
                 short iTeamId = LookupTeamID(iPlayer);
                 if(game_values.worldpowerupcount[iTeamId] < 32)
@@ -3317,9 +3078,9 @@ bool coldec_player2player(CPlayer * o1, CPlayer * o2)
 {
     //Special cases to deal with players overlapping the right and left sides of the screen
     if(o1->ix + PW < o2->ix) {
-        return o1->ix + 640 < o2->ix + PW && o1->ix + PW + 640 >= o2->ix && o1->iy <= o2->iy + PH && o1->iy + PH >= o2->iy;
+		return o1->ix + smw->ScreenWidth < o2->ix + PW && o1->ix + PW + smw->ScreenWidth >= o2->ix && o1->iy <= o2->iy + PH && o1->iy + PH >= o2->iy;
     } else if(o2->ix + PW < o1->ix) {
-        return o1->ix < o2->ix + PW + 640 && o1->ix + PW >= o2->ix + 640 && o1->iy <= o2->iy + PH && o1->iy + PH >= o2->iy;
+		return o1->ix < o2->ix + PW + smw->ScreenWidth && o1->ix + PW >= o2->ix + smw->ScreenWidth && o1->iy <= o2->iy + PH && o1->iy + PH >= o2->iy;
     } else { //Normal case where no overlap
         return o1->ix < o2->ix + PW && o1->ix + PW >= o2->ix && o1->iy <= o2->iy + PH && o1->iy + PH >= o2->iy;
     }
@@ -3329,9 +3090,9 @@ bool coldec_player2obj(CPlayer * o1, CObject * o2)
 {
     //Special cases to deal with players overlapping the right and left sides of the screen
     if(o1->ix + PW < o2->ix) {
-        return o1->ix + 640 < o2->ix + o2->collisionWidth && o1->ix + PW + 640 >= o2->ix && o1->iy < o2->iy + o2->collisionHeight && o1->iy + PH >= o2->iy;
+		return o1->ix + smw->ScreenWidth < o2->ix + o2->collisionWidth && o1->ix + PW + smw->ScreenWidth >= o2->ix && o1->iy < o2->iy + o2->collisionHeight && o1->iy + PH >= o2->iy;
     } else if(o2->ix + o2->collisionWidth < o1->ix) {
-        return o1->ix < o2->ix + o2->collisionWidth + 640 && o1->ix + PW >= o2->ix + 640 && o1->iy < o2->iy + o2->collisionHeight && o1->iy + PH >= o2->iy;
+		return o1->ix < o2->ix + o2->collisionWidth + smw->ScreenWidth && o1->ix + PW >= o2->ix + smw->ScreenWidth && o1->iy < o2->iy + o2->collisionHeight && o1->iy + PH >= o2->iy;
     } else { //Normal case where no overlap
         return o1->ix < o2->ix + o2->collisionWidth && o1->ix + PW >= o2->ix && o1->iy < o2->iy + o2->collisionHeight && o2->iy <= o1->iy + PH;
     }
@@ -3346,9 +3107,9 @@ bool coldec_obj2obj(CObject * o1, CObject * o2)
     short o2b = o2->iy + o2->collisionHeight;
 
     if(o1r < o2->ix) {
-        return o1->ix + 640 < o2r && o1r + 640 >= o2->ix && o1->iy < o2b && o1b >= o2->iy;
+		return o1->ix + smw->ScreenWidth < o2r && o1r + smw->ScreenWidth >= o2->ix && o1->iy < o2b && o1b >= o2->iy;
     } else if(o2r < o1->ix) {
-        return o1->ix < o2r + 640 && o1r >= o2->ix + 640 && o1->iy < o2b && o1b >= o2->iy;
+		return o1->ix < o2r + smw->ScreenWidth && o1r >= o2->ix + smw->ScreenWidth && o1->iy < o2b && o1b >= o2->iy;
     } else {
         return o1->ix < o2r && o1r >= o2->ix && o1->iy < o2b && o1b >= o2->iy;
     }
@@ -3377,52 +3138,52 @@ void LoadMapObjects(bool fPreview)
         for(short y = 0; y < MAPHEIGHT; y++) {
             short iType = g_map->objectdata[x][y].iType;
             if(iType == 0) {
-                g_map->blockdata[x][y] = new B_BreakableBlock(&spr_breakableblock, x << 5, y << 5, 4, 10);
+                g_map->blockdata[x][y] = new B_BreakableBlock(&rm->spr_breakableblock, x << 5, y << 5, 4, 10);
                 noncolcontainer.add(g_map->blockdata[x][y]);
             } else if(iType == 1) {
-                g_map->blockdata[x][y] = new B_PowerupBlock(&spr_powerupblock, x << 5, y << 5, 4, 10, g_map->objectdata[x][y].fHidden, g_map->objectdata[x][y].iSettings);
+                g_map->blockdata[x][y] = new B_PowerupBlock(&rm->spr_powerupblock, x << 5, y << 5, 4, 10, g_map->objectdata[x][y].fHidden, g_map->objectdata[x][y].iSettings);
                 noncolcontainer.add(g_map->blockdata[x][y]);
             } else if(iType == 2) {
-                g_map->blockdata[x][y] = new B_DonutBlock(&spr_donutblock, x << 5, y << 5);
+                g_map->blockdata[x][y] = new B_DonutBlock(&rm->spr_donutblock, x << 5, y << 5);
                 noncolcontainer.add(g_map->blockdata[x][y]);
             } else if(iType == 3) {
-                g_map->blockdata[x][y] = new B_FlipBlock(&spr_flipblock, x << 5, y << 5, g_map->objectdata[x][y].fHidden);
+                g_map->blockdata[x][y] = new B_FlipBlock(&rm->spr_flipblock, x << 5, y << 5, g_map->objectdata[x][y].fHidden);
                 noncolcontainer.add(g_map->blockdata[x][y]);
             } else if(iType == 4) {
-                g_map->blockdata[x][y] = new B_BounceBlock(&spr_bounceblock, x << 5, y << 5, g_map->objectdata[x][y].fHidden);
+                g_map->blockdata[x][y] = new B_BounceBlock(&rm->spr_bounceblock, x << 5, y << 5, g_map->objectdata[x][y].fHidden);
                 noncolcontainer.add(g_map->blockdata[x][y]);
             } else if(iType == 5) {
-                g_map->blockdata[x][y] = new B_NoteBlock(&spr_noteblock, x << 5, y << 5, 4, 10, 1, g_map->objectdata[x][y].fHidden);
+                g_map->blockdata[x][y] = new B_NoteBlock(&rm->spr_noteblock, x << 5, y << 5, 4, 10, 1, g_map->objectdata[x][y].fHidden);
                 noncolcontainer.add(g_map->blockdata[x][y]);
             } else if(iType == 6) {
-                g_map->blockdata[x][y] = new B_ThrowBlock(&spr_throwblock, x << 5, y << 5, 4, 10, 0);
+                g_map->blockdata[x][y] = new B_ThrowBlock(&rm->spr_throwblock, x << 5, y << 5, 4, 10, 0);
                 noncolcontainer.add(g_map->blockdata[x][y]);
             } else if(iType >= 7 && iType <= 10) {
                 short iSwitchType = iType - 7;
-                g_map->blockdata[x][y] = new B_OnOffSwitchBlock(&spr_switchblocks, x << 5, y << 5, iSwitchType, g_map->iSwitches[iSwitchType]);
+                g_map->blockdata[x][y] = new B_OnOffSwitchBlock(&rm->spr_switchblocks, x << 5, y << 5, iSwitchType, g_map->iSwitches[iSwitchType]);
                 noncolcontainer.add(g_map->blockdata[x][y]);
                 g_map->switchBlocks[iSwitchType].push_back(g_map->blockdata[x][y]);
             } else if(iType >= 11 && iType <= 14) {
                 short iSwitchType = iType - 11;
 
-                //g_map->blockdata[x][y] = new B_SwitchBlock(&spr_switchblocks, x << 5, y << 5, iSwitchType, g_map->iSwitches[iSwitchType]);
-                g_map->blockdata[x][y] = new B_SwitchBlock(&spr_switchblocks, x << 5, y << 5, iSwitchType, g_map->objectdata[x][y].iSettings[0]);
+                //g_map->blockdata[x][y] = new B_SwitchBlock(&rm->spr_switchblocks, x << 5, y << 5, iSwitchType, g_map->iSwitches[iSwitchType]);
+                g_map->blockdata[x][y] = new B_SwitchBlock(&rm->spr_switchblocks, x << 5, y << 5, iSwitchType, g_map->objectdata[x][y].iSettings[0]);
                 noncolcontainer.add(g_map->blockdata[x][y]);
                 g_map->switchBlocks[iSwitchType + 4].push_back(g_map->blockdata[x][y]);
             } else if(iType == 15) {
-                g_map->blockdata[x][y] = new B_ViewBlock(&spr_viewblock, x << 5, y << 5, g_map->objectdata[x][y].fHidden, g_map->objectdata[x][y].iSettings);
+                g_map->blockdata[x][y] = new B_ViewBlock(&rm->spr_viewblock, x << 5, y << 5, g_map->objectdata[x][y].fHidden, g_map->objectdata[x][y].iSettings);
                 noncolcontainer.add(g_map->blockdata[x][y]);
             } else if(iType == 16) {
-                g_map->blockdata[x][y] = new B_ThrowBlock(&spr_throwblock, x << 5, y << 5, 4, 10, 2);
+                g_map->blockdata[x][y] = new B_ThrowBlock(&rm->spr_throwblock, x << 5, y << 5, 4, 10, 2);
                 noncolcontainer.add(g_map->blockdata[x][y]);
             } else if(iType == 17 || iType == 18) {
-                g_map->blockdata[x][y] = new B_NoteBlock(&spr_noteblock, x << 5, y << 5, 4, 10, iType == 17 ? 2 : 0, g_map->objectdata[x][y].fHidden);
+                g_map->blockdata[x][y] = new B_NoteBlock(&rm->spr_noteblock, x << 5, y << 5, 4, 10, iType == 17 ? 2 : 0, g_map->objectdata[x][y].fHidden);
                 noncolcontainer.add(g_map->blockdata[x][y]);
             } else if(iType == 19) {
-                g_map->blockdata[x][y] = new B_ThrowBlock(&spr_throwblock, x << 5, y << 5, 4, 10, 1);
+                g_map->blockdata[x][y] = new B_ThrowBlock(&rm->spr_throwblock, x << 5, y << 5, 4, 10, 1);
                 noncolcontainer.add(g_map->blockdata[x][y]);
             } else if(iType >= 20 && iType <= 29) {
-                g_map->blockdata[x][y] = new B_WeaponBreakableBlock(&spr_weaponbreakableblock, x << 5, y << 5, iType - 20);
+                g_map->blockdata[x][y] = new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, x << 5, y << 5, iType - 20);
                 noncolcontainer.add(g_map->blockdata[x][y]);
             } else {
                 g_map->blockdata[x][y] = NULL;
@@ -3464,7 +3225,7 @@ void LoadMapObjects(bool fPreview)
         //If map has less than 5 boxes, then insert coins into map in random locations
         short iExtraCoinsNeeded = 5 - iThrowBoxCount;
         for(short iExtraCoin = 0; iExtraCoin < iExtraCoinsNeeded; iExtraCoin++) {
-            objectcontainer[1].add(new MO_Coin(&spr_coin, 0.0f, 0.0f, 0, 0, 2, -1, 2, 0, true));
+            objectcontainer[1].add(new MO_Coin(&rm->spr_coin, 0.0f, 0.0f, 0, 0, 2, -1, 2, 0, true));
         }
     }
 
@@ -3477,15 +3238,15 @@ void LoadMapObjects(bool fPreview)
         short iy = mapItem->iy << 5;
 
         if(iType == 0)
-            objectcontainer[1].add(new CO_Spring(&spr_spring, ix, iy, false));
+            objectcontainer[1].add(new CO_Spring(&rm->spr_spring, ix, iy, false));
         else if(iType == 1)
-            objectcontainer[1].add(new CO_Spike(&spr_spike, ix, iy));
+            objectcontainer[1].add(new CO_Spike(&rm->spr_spike, ix, iy));
         else if(iType == 2)
-            objectcontainer[1].add(new CO_KuriboShoe(&spr_kuriboshoe, ix, iy, false));
+            objectcontainer[1].add(new CO_KuriboShoe(&rm->spr_kuriboshoe, ix, iy, false));
         else if(iType == 3)
-            objectcontainer[1].add(new CO_Spring(&spr_spring, ix, iy, true));
+            objectcontainer[1].add(new CO_Spring(&rm->spr_spring, ix, iy, true));
         else if(iType == 4)
-            objectcontainer[1].add(new CO_KuriboShoe(&spr_kuriboshoe, ix, iy, true));
+            objectcontainer[1].add(new CO_KuriboShoe(&rm->spr_kuriboshoe, ix, iy, true));
         else if(iType == 5) {
             short iItem = NO_POWERUP;
             if(!fPreview) {
@@ -3513,7 +3274,7 @@ void LoadMapObjects(bool fPreview)
                 }
             }
 
-            objectcontainer[1].add(new CO_ThrowBox(&spr_throwbox, ix, iy, iItem));
+            objectcontainer[1].add(new CO_ThrowBox(&rm->spr_throwbox, ix, iy, iItem));
             iAddThrowBoxIndex++;
         }
     }
@@ -3553,7 +3314,7 @@ bool SwapPlayers(short iUsingPlayerID)
             game_values.swapplayersblink = false;
             game_values.swapplayersblinkcount = 0;
         } else {
-            game_values.screenfade = GetScreenBackgroundFade();
+            game_values.screenfade = SCREEN_BACKGROUND_FADE	;
         }
     }
 
@@ -3588,7 +3349,7 @@ bool SwapPlayers(short iUsingPlayerID)
         spots[iPlayer].GetPlayer(list_players[iPlayer], &game_values.gamepowerups[list_players[iPlayer]->getGlobalID()]);
 
         if(game_values.swapstyle != 1)
-            eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, (short)list_players[iPlayer]->fNewSwapX + (HALFPW) - 16, (short)list_players[iPlayer]->fNewSwapY + (HALFPH) - 16, 3, 8));
+            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, (short)list_players[iPlayer]->fNewSwapX + (HALFPW) - 16, (short)list_players[iPlayer]->fNewSwapY + (HALFPH) - 16, 3, 8));
 
         if(game_values.swapstyle == 2) {
             list_players[iPlayer]->setXf(list_players[iPlayer]->fNewSwapX);

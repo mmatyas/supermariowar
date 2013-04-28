@@ -21,8 +21,8 @@ void HashTableTest() {
 
 		if(iAction == 0)
 		{
-//			CObject * pObject = new CObject(&menu_cpu, 0, 0);
-			CObject *pObject = new MO_Coin(&spr_coin, 0.0f, 0.0f, 0, 0, 2, 0, 0, 0, true);
+//			CObject * pObject = new CObject(&rm->menu_cpu, 0, 0);
+			CObject *pObject = new MO_Coin(&rm->spr_coin, 0.0f, 0.0f, 0, 0, 2, 0, 0, 0, true);
 
 			pObject->iNetworkID = GetRandMax(4096);
 

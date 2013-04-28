@@ -90,7 +90,7 @@ void SetupScoreBoard(bool fOrderMatters)
         for(short iBonus = 0; iBonus < iNumBonuses; iBonus++) {
             if(tourStop->wsbBonuses[iBonus].iWinnerPlace == 0) {
                 short iBonusType = tourStop->wsbBonuses[iBonus].iBonus;
-                objectcontainer[0].add(new PU_TreasureChestBonus(&spr_bonuschest, 1, 0, 30, 30, 1, 1, iBonusType));
+                objectcontainer[0].add(new PU_TreasureChestBonus(&rm->spr_bonuschest, 1, 0, 30, 30, 1, 1, iBonusType));
                 game_values.noexittimer = 0;
                 game_values.noexit = false;
             }
@@ -142,7 +142,7 @@ bool RemoveTeam(short teamid)
 
     //Announce that a team was removed
     if(game_values.deadteamnotice && game_values.teamdeadcounter < score_cnt - 1) {
-        eyecandy[2].add(new EC_Announcement(&game_font_large, &spr_announcementicons, "Team Removed!", iAnnouncementColor, 90, 200));
+        eyecandy[2].add(new EC_Announcement(&rm->game_font_large, &rm->spr_announcementicons, "Team Removed!", iAnnouncementColor, 90, 200));
         ifsoundonandreadyplay(sfx_announcer[iAnnouncementColor + 16]);
     }
 
@@ -196,14 +196,14 @@ short GameTimerDisplay::RunClock()
 
 void GameTimerDisplay::Draw()
 {
-    spr_timershade.draw(iScoreOffsetX, 5);
-    spr_scoretext.draw(iDigitRightDstX, 13, iDigitRightSrcX, 0, 16, 16);
+    rm->spr_timershade.draw(iScoreOffsetX, 5);
+    rm->spr_scoretext.draw(iDigitRightDstX, 13, iDigitRightSrcX, 0, 16, 16);
 
     if(iDigitLeftSrcX > 0) {
-        spr_scoretext.draw(iDigitMiddleDstX, 13, iDigitMiddleSrcX, 0, 16, 16);
-        spr_scoretext.draw(iDigitLeftDstX, 13, iDigitLeftSrcX, 0, 16, 16);
+        rm->spr_scoretext.draw(iDigitMiddleDstX, 13, iDigitMiddleSrcX, 0, 16, 16);
+        rm->spr_scoretext.draw(iDigitLeftDstX, 13, iDigitLeftSrcX, 0, 16, 16);
     } else if(iDigitMiddleSrcX > 0) {
-        spr_scoretext.draw(iDigitMiddleDstX, 13, iDigitMiddleSrcX, 0, 16, 16);
+        rm->spr_scoretext.draw(iDigitMiddleDstX, 13, iDigitMiddleSrcX, 0, 16, 16);
     }
 }
 
@@ -784,9 +784,9 @@ void CGM_Chicken::draw_foreground()
     //Draw the chicken indicator around the chicken
     if(game_values.gamemodesettings.chicken.usetarget && !gameover && chicken) {
         if(chicken->iswarping())
-            spr_chicken.draw(chicken->ix - PWOFFSET - 16, chicken->iy - PHOFFSET - 16, 0, 0, 64, 64, (short)chicken->state % 4, chicken->warpplane);
+            rm->spr_chicken.draw(chicken->ix - PWOFFSET - 16, chicken->iy - PHOFFSET - 16, 0, 0, 64, 64, (short)chicken->state % 4, chicken->warpplane);
         else if(chicken->isready())
-            spr_chicken.draw(chicken->ix + HALFPW - 32, chicken->iy + HALFPH - 32);
+            rm->spr_chicken.draw(chicken->ix + HALFPW - 32, chicken->iy + HALFPH - 32);
     }
 }
 
@@ -795,9 +795,9 @@ short CGM_Chicken::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killst
 {
     if(!chicken || &other == chicken) {
         chicken = &inflictor;
-        eyecandy[2].add(new EC_GravText(&game_font_large, inflictor.ix + HALFPW, inflictor.iy + PH, "Chicken!", -VELJUMP*1.5));
-        //eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, inflictor.ix + (HALFPW) - 16, inflictor.iy + (HALFPH) - 16, 3, 8));
-        eyecandy[2].add(new EC_SingleAnimation(&spr_poof, inflictor.ix + HALFPW - 24, inflictor.iy + HALFPH - 24, 4, 5));
+        eyecandy[2].add(new EC_GravText(&rm->game_font_large, inflictor.ix + HALFPW, inflictor.iy + PH, "Chicken!", -VELJUMP*1.5));
+        //eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, inflictor.ix + (HALFPW) - 16, inflictor.iy + (HALFPH) - 16, 3, 8));
+        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, inflictor.ix + HALFPW - 24, inflictor.iy + HALFPH - 24, 4, 5));
         ifsoundonplay(sfx_transform);
 
         if(&other == chicken)
@@ -943,8 +943,8 @@ short CGM_Tag::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle 
         tagged = &other;
         inflictor.shield = game_values.shieldstyle;
         inflictor.shieldtimer = 60;
-        eyecandy[2].add(new EC_GravText(&game_font_large, other.ix + (HALFPW), other.iy + PH, "Tagged!", -VELJUMP*1.5));
-        eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, other.ix + (HALFPW) - 16, other.iy + (HALFPH) - 16, 3, 8));
+        eyecandy[2].add(new EC_GravText(&rm->game_font_large, other.ix + (HALFPW), other.iy + PH, "Tagged!", -VELJUMP*1.5));
+        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, other.ix + (HALFPW) - 16, other.iy + (HALFPH) - 16, 3, 8));
         ifsoundonplay(sfx_transform);
     }
 
@@ -1168,8 +1168,8 @@ void CGM_ShyGuyTag::SetShyGuy(short iTeam)
         if(list_players[iPlayer]->getTeamID() == iTeam) {
             CPlayer * player = list_players[iPlayer];
             player->shyguy = true;
-            eyecandy[2].add(new EC_GravText(&game_font_large, player->ix + (HALFPW), player->iy + PH, "Shyguy!", -VELJUMP*1.5));
-            eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, player->ix + (HALFPW) - 16, player->iy + (HALFPH) - 16, 3, 8));
+            eyecandy[2].add(new EC_GravText(&rm->game_font_large, player->ix + (HALFPW), player->iy + PH, "Shyguy!", -VELJUMP*1.5));
+            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, player->ix + (HALFPW) - 16, player->iy + (HALFPH) - 16, 3, 8));
 
             player->StripPowerups();
             player->ClearPowerupStates();
@@ -1186,7 +1186,7 @@ void CGM_ShyGuyTag::FreeShyGuys()
     for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
         CPlayer * player = list_players[iPlayer];
         player->shyguy = false;
-        eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, player->ix + (HALFPW) - 16, player->iy + (HALFPH) - 16, 3, 8));
+        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, player->ix + (HALFPW) - 16, player->iy + (HALFPH) - 16, 3, 8));
     }
 }
 
@@ -1241,7 +1241,7 @@ void CGM_Coins::init()
         game_values.gamemodesettings.coins.quantity = 1;
 
     for(short iCoin = 0; iCoin < game_values.gamemodesettings.coins.quantity; iCoin++)
-        objectcontainer[1].add(new MO_Coin(&spr_coin, 0.0f, 0.0f, 0, 0, 2, 0, 0, 0, true));
+        objectcontainer[1].add(new MO_Coin(&rm->spr_coin, 0.0f, 0.0f, 0, 0, 2, 0, 0, 0, true));
 }
 
 
@@ -1320,7 +1320,7 @@ void CGM_Eggs::init()
                 break;
 
             fEgg[iEggs] = true;
-            objectcontainer[1].add(new CO_Egg(&spr_egg, iEggs));
+            objectcontainer[1].add(new CO_Egg(&rm->spr_egg, iEggs));
         }
     }
 
@@ -1332,13 +1332,13 @@ void CGM_Eggs::init()
             if(fEgg[iYoshis])
                 fAtLeastOneMatch = true;
 
-            objectcontainer[1].add(new MO_Yoshi(&spr_yoshi, iYoshis));
+            objectcontainer[1].add(new MO_Yoshi(&rm->spr_yoshi, iYoshis));
         }
     }
 
     if(!fAtLeastOneMatch) {
-        objectcontainer[1].add(new CO_Egg(&spr_egg, 1));
-        objectcontainer[1].add(new MO_Yoshi(&spr_yoshi, 1));
+        objectcontainer[1].add(new CO_Egg(&rm->spr_egg, 1));
+        objectcontainer[1].add(new MO_Yoshi(&rm->spr_yoshi, 1));
     }
 }
 
@@ -1434,7 +1434,7 @@ void CGM_Frenzy::think()
                         iWeightCount += game_values.gamemodesettings.frenzy.powerupweight[++iSelectedPowerup];
                 }
 
-                objectcontainer[1].add(new MO_FrenzyCard(&spr_frenzycards, iSelectedPowerup));
+                objectcontainer[1].add(new MO_FrenzyCard(&rm->spr_frenzycards, iSelectedPowerup));
             }
         }
     }
@@ -1509,10 +1509,10 @@ void CGM_Survival::think()
 
 #pragma warning("Replace all these magic constants with proportional values")
 			if(0 == iSelectedEnemy) {
-                objectcontainer[2].add(new OMO_Thwomp(&spr_thwomp, (short)GetRandMax(smw->ScreenWidth - (640- 591)), (float)game_values.gamemodesettings.survival.speed / 2.0f + (float)(GetRandMax(20))/10.0f));
+                objectcontainer[2].add(new OMO_Thwomp(&rm->spr_thwomp, (short)GetRandMax(smw->ScreenWidth - (640- 591)), (float)game_values.gamemodesettings.survival.speed / 2.0f + (float)(GetRandMax(20))/10.0f));
                 timer = (short)(GetRandMax(21) - 10 + rate);
             } else if(1 == iSelectedEnemy) {
-                objectcontainer[2].add(new MO_Podobo(&spr_podobo, (short)GetRandMax(smw->ScreenWidth - (640- 608)), smw->ScreenHeight, -(float(GetRandMax(9)) / 2.0f) - 8.0f, -1, -1, -1, false));
+                objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, (short)GetRandMax(smw->ScreenWidth - (640- 608)), smw->ScreenHeight, -(float(GetRandMax(9)) / 2.0f) - 8.0f, -1, -1, -1, false));
                 timer = (short)(GetRandMax(21) - 10 + rate - 20);
             } else {
                 float dSpeed = ((float)(GetRandMax(21) + 20)) / 10.0f;
@@ -1522,7 +1522,7 @@ void CGM_Survival::think()
                 if(dVel < 0)
                     x = 694;
 
-				objectcontainer[2].add(new OMO_BowserFire(&spr_bowserfire, x, (short)GetRandMax( smw->ScreenHeight - (480 - 448) ), dVel, 0.0f, -1, -1, -1));
+				objectcontainer[2].add(new OMO_BowserFire(&rm->spr_bowserfire, x, (short)GetRandMax( smw->ScreenHeight - (480 - 448) ), dVel, 0.0f, -1, -1, -1));
                 timer = (short)(GetRandMax(21) - 10 + rate);
             }
         }
@@ -1557,7 +1557,7 @@ void CGM_Domination::init()
         iNumAreas = list_players_cnt + iNumAreas - 12;
 
     for(short k = 0; k < iNumAreas; k++)
-        objectcontainer[0].add(new OMO_Area(&spr_areas, iNumAreas));
+        objectcontainer[0].add(new OMO_Area(&rm->spr_areas, iNumAreas));
 }
 
 short CGM_Domination::playerkilledplayer(CPlayer &player, CPlayer &other, killstyle style)
@@ -1742,7 +1742,7 @@ short CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle
             inflictor.score->AdjustScore(1);
 
             if(inflictor.jailtimer > 0) {
-                eyecandy[2].add(new EC_SingleAnimation(&spr_poof, inflictor.ix + HALFPW - 24, inflictor.iy + HALFPH - 24, 4, 5));
+                eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, inflictor.ix + HALFPW - 24, inflictor.iy + HALFPH - 24, 4, 5));
                 ifsoundonplay(sfx_transform);
                 inflictor.jailtimer = 0;
                 inflictor.jail = -1;
@@ -1792,7 +1792,7 @@ short CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle
                     for(short i = 0; i < list_players_cnt; i++) {
                         //If they weren't just the one killed and they were jailed, give them a transform cloud
                         if(list_players[i] != &other && list_players[i]->jailtimer > 0) {
-                            eyecandy[2].add(new EC_SingleAnimation(&spr_poof, list_players[i]->ix + HALFPW - 24, list_players[i]->iy + HALFPH - 24, 4, 5));
+                            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, list_players[i]->ix + HALFPW - 24, list_players[i]->iy + HALFPH - 24, 4, 5));
                             ifsoundonplay(sfx_transform);
                         }
 
@@ -1875,7 +1875,7 @@ short CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle
 
                             //If they weren't just the one killed and they were jailed, give them a transform cloud
                             if(list_players[i] != &other && list_players[i]->jailtimer > 0) {
-                                eyecandy[2].add(new EC_SingleAnimation(&spr_poof, list_players[i]->ix + HALFPW - 24, list_players[i]->iy + HALFPH - 24, 4, 5));
+                                eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, list_players[i]->ix + HALFPW - 24, list_players[i]->iy + HALFPH - 24, 4, 5));
                                 ifsoundonplay(sfx_transform);
                             }
 
@@ -1984,23 +1984,23 @@ void CGM_Stomp::think()
             }
 
             if(0 == iSelectedEnemy)
-                objectcontainer[0].add(new MO_Goomba(&spr_goomba, GetRandBool(), false));
+                objectcontainer[0].add(new MO_Goomba(&rm->spr_goomba, GetRandBool(), false));
             else if(1 == iSelectedEnemy)
-                objectcontainer[0].add(new MO_Koopa(&spr_koopa, GetRandBool(), false, false, true));
+                objectcontainer[0].add(new MO_Koopa(&rm->spr_koopa, GetRandBool(), false, false, true));
             else if(2 == iSelectedEnemy)
-                objectcontainer[2].add(new MO_CheepCheep(&spr_cheepcheep));
+                objectcontainer[2].add(new MO_CheepCheep(&rm->spr_cheepcheep));
             else if(3 == iSelectedEnemy)
-                objectcontainer[0].add(new MO_Koopa(&spr_redkoopa, GetRandBool(), true, false, false));
+                objectcontainer[0].add(new MO_Koopa(&rm->spr_redkoopa, GetRandBool(), true, false, false));
             else if(4 == iSelectedEnemy)
-                objectcontainer[0].add(new MO_Spiny(&spr_spiny, GetRandBool()));
+                objectcontainer[0].add(new MO_Spiny(&rm->spr_spiny, GetRandBool()));
             else if(5 == iSelectedEnemy)
-                objectcontainer[0].add(new MO_BuzzyBeetle(&spr_buzzybeetle, GetRandBool()));
+                objectcontainer[0].add(new MO_BuzzyBeetle(&rm->spr_buzzybeetle, GetRandBool()));
             else if(6 == iSelectedEnemy)
-                objectcontainer[0].add(new MO_Goomba(&spr_paragoomba, GetRandBool(), true));
+                objectcontainer[0].add(new MO_Goomba(&rm->spr_paragoomba, GetRandBool(), true));
             else if(7 == iSelectedEnemy)
-                objectcontainer[0].add(new MO_Koopa(&spr_parakoopa, GetRandBool(), false, true, true));
+                objectcontainer[0].add(new MO_Koopa(&rm->spr_parakoopa, GetRandBool(), false, true, true));
             else
-                objectcontainer[0].add(new MO_Koopa(&spr_redparakoopa, GetRandBool(), true, true, true));
+                objectcontainer[0].add(new MO_Koopa(&rm->spr_redparakoopa, GetRandBool(), true, true, true));
         }
     }
 }
@@ -2077,7 +2077,7 @@ void CGM_Race::init()
         game_values.gamemodesettings.race.penalty = penalty = 0;
 
     for(short iRaceGoal = 0; iRaceGoal < quantity; iRaceGoal++)
-        objectcontainer[2].add(new OMO_RaceGoal(&spr_racegoal, iRaceGoal));
+        objectcontainer[2].add(new OMO_RaceGoal(&rm->spr_racegoal, iRaceGoal));
 
     for(short iPlayer = 0; iPlayer < 4; iPlayer++)
         nextGoal[iPlayer] = 0;
@@ -2228,14 +2228,14 @@ void CGM_Star::SetupMode()
         for(short iStar = 0; iStar < iNumPlayers - 1; iStar++) {
             starPlayer[iStar] = players[iStar];
 
-            starItem[iStar] = new CO_Star(&spr_star, 1, iStar);
+            starItem[iStar] = new CO_Star(&rm->spr_star, 1, iStar);
             starItem[iStar]->setPlayerColor(starPlayer[iStar]->colorID);
             objectcontainer[1].add(starItem[iStar]);
         }
     } else { //otherwise, add just a single star
         starPlayer[0] = GetHighestScorePlayer(!fReverseScoring && iCurrentModeType == 0);
 
-        starItem[0] = new CO_Star(&spr_star, iCurrentModeType == 0 ? 0 : 1, 0);
+        starItem[0] = new CO_Star(&rm->spr_star, iCurrentModeType == 0 ? 0 : 1, 0);
         objectcontainer[1].add(starItem[0]);
     }
 }
@@ -2451,7 +2451,7 @@ CPlayer * CGM_Star::swapplayer(short id, CPlayer * player)
         oldstar = starPlayer[id];
         oldstar->shield = game_values.shieldstyle == 0 ? 1 : game_values.shieldstyle;
         oldstar->shieldtimer = 60;
-        eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, oldstar->ix + (HALFPW) - 16, oldstar->iy + (HALFPH) - 16, 3, 8));
+        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, oldstar->ix + (HALFPW) - 16, oldstar->iy + (HALFPH) - 16, 3, 8));
     }
 
     starPlayer[id] = player;
@@ -2460,11 +2460,11 @@ CPlayer * CGM_Star::swapplayer(short id, CPlayer * player)
         starItem[id]->setPlayerColor(starPlayer[id]->colorID);
 
     if(starItem[id]->getType() == 1)
-        eyecandy[2].add(new EC_GravText(&game_font_large, player->ix + HALFPW, player->iy + PH, iCurrentModeType == 2 ? "Star Get!" : "Shine Get!", -VELJUMP*1.5));
+        eyecandy[2].add(new EC_GravText(&rm->game_font_large, player->ix + HALFPW, player->iy + PH, iCurrentModeType == 2 ? "Star Get!" : "Shine Get!", -VELJUMP*1.5));
     else
-        eyecandy[2].add(new EC_GravText(&game_font_large, player->ix + HALFPW, player->iy + PH, "Ztarred!", -VELJUMP*1.5));
+        eyecandy[2].add(new EC_GravText(&rm->game_font_large, player->ix + HALFPW, player->iy + PH, "Ztarred!", -VELJUMP*1.5));
 
-    eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, player->ix + (HALFPW) - 16, player->iy + (HALFPH) - 16, 3, 8));
+    eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, player->ix + (HALFPW) - 16, player->iy + (HALFPH) - 16, 3, 8));
     ifsoundonplay(sfx_transform);
 
     return oldstar;
@@ -2494,18 +2494,18 @@ void CGM_CaptureTheFlag::init()
             fTeamUsed[iTeamID] = true;
 
             short iColorID = list_players[iPlayer]->colorID;
-            MO_FlagBase * base = new MO_FlagBase(&spr_flagbases, iTeamID, iColorID);
+            MO_FlagBase * base = new MO_FlagBase(&rm->spr_flagbases, iTeamID, iColorID);
             objectcontainer[0].add(base);
 
             if(!game_values.gamemodesettings.flag.centerflag) {
-                CO_Flag * flag = new CO_Flag(&spr_flags, base, iTeamID, iColorID);
+                CO_Flag * flag = new CO_Flag(&rm->spr_flags, base, iTeamID, iColorID);
                 objectcontainer[1].add(flag);
             }
         }
     }
 
     if(game_values.gamemodesettings.flag.centerflag) {
-        CO_Flag * centerflag = new CO_Flag(&spr_flags, NULL, -1, -1);
+        CO_Flag * centerflag = new CO_Flag(&rm->spr_flags, NULL, -1, -1);
         objectcontainer[1].add(centerflag);
     }
 }
@@ -2567,7 +2567,7 @@ CGM_KingOfTheHill::CGM_KingOfTheHill() : CGM_Domination()
 void CGM_KingOfTheHill::init()
 {
     CGameMode::init();
-    objectcontainer[2].add(new OMO_KingOfTheHillZone(&spr_kingofthehillarea));
+    objectcontainer[2].add(new OMO_KingOfTheHillZone(&rm->spr_kingofthehillarea));
 }
 
 short CGM_KingOfTheHill::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
@@ -2687,7 +2687,7 @@ short CGM_Greed::ReleaseCoins(CPlayer &player, killstyle style)
         float velx = vel * cos(angle);
         float vely = vel * sin(angle);
 
-        objectcontainer[1].add(new MO_Coin(&spr_coin, velx, vely, ix, iy, player.colorID, player.teamID, 1, 30, false));
+        objectcontainer[1].add(new MO_Coin(&rm->spr_coin, velx, vely, ix, iy, player.colorID, player.teamID, 1, 30, false));
     }
 
     //Play warning sound if game is almost over
@@ -2845,7 +2845,7 @@ void CGM_Collection::think()
             else if(iRandom >= 2)
                 iRandomCard = 1;
 
-            objectcontainer[1].add(new MO_CollectionCard(&spr_collectcards, 0, iRandomCard, 0, 0.0f, 0.0f, 0, 0));
+            objectcontainer[1].add(new MO_CollectionCard(&rm->spr_collectcards, 0, iRandomCard, 0, 0.0f, 0.0f, 0, 0));
         }
     }
 
@@ -2919,7 +2919,7 @@ void CGM_Collection::ReleaseCard(CPlayer &player)
 
         player.score->subscore[1] &= iCardMaskInverted;
 
-        objectcontainer[1].add(new MO_CollectionCard(&spr_collectcards, 1, iValue, 30, velx, vely, ix, iy));
+        objectcontainer[1].add(new MO_CollectionCard(&rm->spr_collectcards, 1, iValue, 30, velx, vely, ix, iy));
     }
 }
 
@@ -2974,11 +2974,11 @@ void CGM_Chase::init()
     //Add phantos based on settings
     for(short iPhanto = 0; iPhanto < 3; iPhanto++) {
         for(short iNumPhantos = 0; iNumPhantos < game_values.gamemodesettings.chase.phantoquantity[iPhanto]; iNumPhantos++)
-			objectcontainer[1].add(new OMO_Phanto(&spr_phanto, GetRandMax(smw->ScreenWidth), GetRandBool() ? -32 - CRUNCHMAX : smw->ScreenHeight, 0.0f, 0.0f, iPhanto));
+			objectcontainer[1].add(new OMO_Phanto(&rm->spr_phanto, GetRandMax(smw->ScreenWidth), GetRandBool() ? -32 - CRUNCHMAX : smw->ScreenHeight, 0.0f, 0.0f, iPhanto));
     }
 
     //Add a key
-    key = new CO_PhantoKey(&spr_phantokey);
+    key = new CO_PhantoKey(&rm->spr_phantokey);
     objectcontainer[1].add(key);
 }
 
@@ -3072,7 +3072,7 @@ void CGM_Boss_MiniGame::init()
     for(short iScore = 0; iScore < score_cnt; iScore++)
         score[iScore]->SetScore(goal);
 
-    objectcontainer[0].add(new MO_SledgeBrother(&spr_sledgebrothers, (iBossType == 0 ? 256 : (iBossType == 1 ? 256 : smw->ScreenWidth/2)), iBossType));
+    objectcontainer[0].add(new MO_SledgeBrother(&rm->spr_sledgebrothers, (iBossType == 0 ? 256 : (iBossType == 1 ? 256 : smw->ScreenWidth/2)), iBossType));
 }
 
 
@@ -3097,7 +3097,7 @@ void CGM_Boss_MiniGame::think()
         if(iBossType == 0) {
             //Randomly spawn koopas
             if(--enemytimer <= 0) {
-                objectcontainer[0].add(new MO_Koopa(&spr_koopa, GetRandBool(), false, false, true));
+                objectcontainer[0].add(new MO_Koopa(&rm->spr_koopa, GetRandBool(), false, false, true));
                 enemytimer = (short)GetRandMax(120) + 120;  //Spawn koopas slowly
             }
         } else if(iBossType == 1) {
@@ -3105,7 +3105,7 @@ void CGM_Boss_MiniGame::think()
         } else if(iBossType == 2) {
             //Only create podobos if the difficulty is moderate or greater
             if(--enemytimer <= 0 && game_values.gamemodesettings.boss.difficulty >= 2) {
-                objectcontainer[2].add(new MO_Podobo(&spr_podobo, (short)GetRandMax(smw->ScreenWidth - (640 - 608)), smw->ScreenHeight, -(float(GetRandMax(9)) / 2.0f) - 9.0f, -1, -1, -1, false));
+                objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, (short)GetRandMax(smw->ScreenWidth - (640 - 608)), smw->ScreenHeight, -(float(GetRandMax(9)) / 2.0f) - 9.0f, -1, -1, -1, false));
                 enemytimer = (short)(GetRandMax(80) + 60);
             }
 
@@ -3113,7 +3113,7 @@ void CGM_Boss_MiniGame::think()
                 poweruptimer = (short)(GetRandMax(80) + 60);
 
                 if(objectcontainer[1].countTypes(object_frenzycard) < list_players_cnt) {
-                    objectcontainer[1].add(new MO_FrenzyCard(&spr_frenzycards, 0));
+                    objectcontainer[1].add(new MO_FrenzyCard(&rm->spr_frenzycards, 0));
                 }
             }
         }
@@ -3124,14 +3124,14 @@ void CGM_Boss_MiniGame::draw_foreground()
 {
     if(gameover) {
         if(winningteam == -1) {
-            game_font_large.drawCentered(smw->ScreenWidth/2, 96, "You Failed To Defeat");
+            rm->game_font_large.drawCentered(smw->ScreenWidth/2, 96, "You Failed To Defeat");
 
             if(iBossType == 0)
-                game_font_large.drawCentered(smw->ScreenWidth/2, 118, "The Mighty Sledge Brother");
+                rm->game_font_large.drawCentered(smw->ScreenWidth/2, 118, "The Mighty Sledge Brother");
             else if(iBossType == 1)
-                game_font_large.drawCentered(smw->ScreenWidth/2, 118, "The Mighty Bomb Brother");
+                rm->game_font_large.drawCentered(smw->ScreenWidth/2, 118, "The Mighty Bomb Brother");
             else if(iBossType == 2)
-                game_font_large.drawCentered(smw->ScreenWidth/2, 118, "The Mighty Flame Brother");
+                rm->game_font_large.drawCentered(smw->ScreenWidth/2, 118, "The Mighty Flame Brother");
         }
     }
 }
@@ -3218,11 +3218,11 @@ bool CGM_Boss_MiniGame::SetWinner(CPlayer * player)
 
     /*
     if(iBossType == 0)
-        objectcontainer[0].add(new PU_SledgeHammerPowerup(&spr_sledgehammerpowerup, 304, -32, 1, 0, 30, 30, 1, 1));
+        objectcontainer[0].add(new PU_SledgeHammerPowerup(&rm->spr_sledgehammerpowerup, 304, -32, 1, 0, 30, 30, 1, 1));
     else if(iBossType == 1)
-        objectcontainer[0].add(new PU_BombPowerup(&spr_bombpowerup, 304, -32, 1, 0, 30, 30, 1, 1));
+        objectcontainer[0].add(new PU_BombPowerup(&rm->spr_bombpowerup, 304, -32, 1, 0, 30, 30, 1, 1));
     else if(iBossType == 2)
-        objectcontainer[0].add(new PU_PodoboPowerup(&spr_podobopowerup, 304, -32, 1, 0, 30, 30, 1, 1));
+        objectcontainer[0].add(new PU_PodoboPowerup(&rm->spr_podobopowerup, 304, -32, 1, 0, 30, 30, 1, 1));
     */
 
     return true;
@@ -3286,7 +3286,7 @@ void CGM_Bonus::init()
 
     //float dx = 288.0f - (dSpacing * (float)(iNumBonuses - 1) / 2.0f) ;
     for(short iChest = 0; iChest < iNumBonuses; iChest++) {
-        objectcontainer[0].add(new MO_BonusHouseChest(&spr_worldbonushouse, (short)dx, 384, tsTourStop->wsbBonuses[iChestOrder[iChest]].iBonus));
+        objectcontainer[0].add(new MO_BonusHouseChest(&rm->spr_worldbonushouse, (short)dx, 384, tsTourStop->wsbBonuses[iChestOrder[iChest]].iBonus));
         dx += dSpacing + 64.0f;
     }
 }
@@ -3295,19 +3295,19 @@ void CGM_Bonus::init()
 void CGM_Bonus::draw_background()
 {
     //Draw Toad
-    spr_worldbonushouse.draw(544, 256, list_players[0]->ix > 544 ? 224 : 192, 0, 32, 64);
+    rm->spr_worldbonushouse.draw(544, 256, list_players[0]->ix > 544 ? 224 : 192, 0, 32, 64);
 
     //Draw Bonus House Title
-    menu_plain_field.draw(0, 0, 0, 0, smw->ScreenWidth/2, 32);
-    menu_plain_field.draw(320, 0, 192, 0, smw->ScreenWidth/2, 32);
-    game_font_large.drawCentered(smw->ScreenWidth/2, 5, tsTourStop->szName);
+    rm->menu_plain_field.draw(0, 0, 0, 0, smw->ScreenWidth/2, 32);
+    rm->menu_plain_field.draw(320, 0, 192, 0, smw->ScreenWidth/2, 32);
+    rm->game_font_large.drawCentered(smw->ScreenWidth/2, 5, tsTourStop->szName);
 
     //Draw Bonus House Text
     if(tsTourStop->iBonusTextLines > 0) {
-        spr_worldbonushouse.draw(128, 128, 0, 64, 384, 128);
+        rm->spr_worldbonushouse.draw(128, 128, 0, 64, 384, 128);
 
         for(short iTextLine = 0; iTextLine < tsTourStop->iBonusTextLines; iTextLine++)
-            game_font_large.drawChopCentered(320, 132 + 24 * iTextLine, 372, tsTourStop->szBonusText[iTextLine]);
+            rm->game_font_large.drawChopCentered(320, 132 + 24 * iTextLine, 372, tsTourStop->szBonusText[iTextLine]);
     }
 }
 
@@ -3351,12 +3351,12 @@ void CGM_Pipe_MiniGame::think()
 
             short iRandPowerup = GetRandMax(50);
             if(iBonusType == 0 && iRandPowerup < 5) { //bonuses
-                objectcontainer[1].add(new OMO_PipeBonus(&spr_pipegamebonus, (float)(GetRandMax(21) - 10) / 2.0f, -((float)GetRandMax(11) / 2.0f + 7.0f), 304, 256, iRandPowerup, 620, 15));
+                objectcontainer[1].add(new OMO_PipeBonus(&rm->spr_pipegamebonus, (float)(GetRandMax(21) - 10) / 2.0f, -((float)GetRandMax(11) / 2.0f + 7.0f), 304, 256, iRandPowerup, 620, 15));
             } else if(iRandPowerup < 10) { //fireballs
-                objectcontainer[1].add(new OMO_PipeBonus(&spr_pipegamebonus, (float)(GetRandMax(21) - 10) / 2.0f, -((float)GetRandMax(11) / 2.0f + 7.0f), 304, 256, 5, 0, 15));
+                objectcontainer[1].add(new OMO_PipeBonus(&rm->spr_pipegamebonus, (float)(GetRandMax(21) - 10) / 2.0f, -((float)GetRandMax(11) / 2.0f + 7.0f), 304, 256, 5, 0, 15));
             } else { //coins
                 short iRandCoin = GetRandMax(20);
-                objectcontainer[1].add(new OMO_PipeCoin(&spr_coin, (float)(GetRandMax(21) - 10) / 2.0f, -((float)GetRandMax(11) / 2.0f + 7.0f), 304, 256, -1, iRandCoin < 16 ? 2 : (iRandCoin < 19 ? 0 : 1), 15));
+                objectcontainer[1].add(new OMO_PipeCoin(&rm->spr_coin, (float)(GetRandMax(21) - 10) / 2.0f, -((float)GetRandMax(11) / 2.0f + 7.0f), 304, 256, -1, iRandCoin < 16 ? 2 : (iRandCoin < 19 ? 0 : 1), 15));
             }
         } else if(iBonusType == 1) {
             iNextItemTimer = GetRandMax(10) + 10;
@@ -3369,10 +3369,10 @@ void CGM_Pipe_MiniGame::think()
 
             short iRandPlayer = game_values.teamids[iRandTeam][GetRandMax(game_values.teamcounts[iRandTeam])];
 
-            objectcontainer[1].add(new OMO_PipeCoin(&spr_coin, (float)((GetRandMax(21)) - 10) / 2.0f, -((float)GetRandMax(11) / 2.0f + 7.0f), 304, 256, iRandTeam, game_values.colorids[iRandPlayer], 15));
+            objectcontainer[1].add(new OMO_PipeCoin(&rm->spr_coin, (float)((GetRandMax(21)) - 10) / 2.0f, -((float)GetRandMax(11) / 2.0f + 7.0f), 304, 256, iRandTeam, game_values.colorids[iRandPlayer], 15));
         } else if(iBonusType == 3) {
             iNextItemTimer = GetRandMax(5) + 10;
-            objectcontainer[1].add(new OMO_PipeCoin(&spr_coin, (float)((GetRandMax(21)) - 10) / 2.0f, -((float)GetRandMax(11) / 2.0f + 7.0f), 304, 256, -1, 0, 15));
+            objectcontainer[1].add(new OMO_PipeCoin(&rm->spr_coin, (float)((GetRandMax(21)) - 10) / 2.0f, -((float)GetRandMax(11) / 2.0f + 7.0f), 304, 256, -1, 0, 15));
         }
     }
 
@@ -3595,7 +3595,7 @@ void CGM_Boxes_MiniGame::ReleaseCoin(CPlayer &player)
 
         ifsoundonplay(sfx_coin);
 
-        objectcontainer[1].add(new MO_Coin(&spr_coin, velx, vely, ix, iy, 2, -1, 2, 30, false));
+        objectcontainer[1].add(new MO_Coin(&rm->spr_coin, velx, vely, ix, iy, 2, -1, 2, 30, false));
     }
 }
 

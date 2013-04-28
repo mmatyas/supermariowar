@@ -17,8 +17,12 @@ public:
 
 	int ScreenWidth;
 	int ScreenHeight;
+
+
 //private:
 
 };
+
+
 
 #endif // __GAME_H

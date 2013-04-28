@@ -16,6 +16,7 @@ int g_iVersion[] = {1, 9, 0, 0};
 // main game directory, read from command line argument
 char		*RootDataDirectory;
 CGame	*smw;
+CResourceManager *rm;
 
 // generate uniformly distributed random number
 // rMax is not part of the set
@@ -359,7 +360,7 @@ void _load_drawmsg(const std::string& f)
         SDL_FillRect(screen, &r, col);		//fill empty area
         */
 
-        menu_font_small.draw(0, 0, f.c_str());
+        rm->menu_font_small.draw(0, 0, f.c_str());
     }
 }
 
@@ -449,15 +450,6 @@ std::string stripPathAndExtension(const std::string &path)
 
 short iScoreboardPlayerOffsetsX[3][3] = {{40, 0, 0}, {19, 59, 0}, {6, 40, 74}};
 short iKingOfTheHillZoneLimits[4][4] = {{0, 0, 1, 2}, {0, 1, 2, 4}, {0, 2, 4, 7}, {0, 2, 5, 12}};
-
-Uint8 GetScreenBackgroundFade()
-{
-#ifdef _XBOX
-    return 96; //TV's seem to need extra shade
-#else
-    return 72;
-#endif
-}
 
 const char * g_szBackgroundConversion[26] = {"Land_Classic.png",
         "Castle_Dungeon.png",
@@ -1372,7 +1364,7 @@ void LoadCurrentMapBackground()
     if(!File_Exists(path))
         path = convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->current_name());
 
-    gfx_loadimagenocolorkey(&spr_background, path);
+    gfx_loadimagenocolorkey(&rm->spr_background, path);
 }
 
 //TODO  - Review what is colliding with what and remove duplicates (i.e. shell vs. throwblock and throwblock vs. shell should only detect one way)
@@ -1451,10 +1443,10 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
                 if(tile->iID >= 0) {
                     SDL_BlitSurface(g_tilesetmanager->GetTileset(tile->iID)->GetSurface(iSize), &g_tilesetmanager->rRects[iSize][tile->iCol][tile->iRow], blitdest, &bltrect);
                 } else if(tile->iID == TILESETANIMATED) {
-                    SDL_BlitSurface(spr_tileanimation[iSize].getSurface(), &g_tilesetmanager->rRects[iSize][tile->iCol << 2][tile->iRow], blitdest, &bltrect);
+                    SDL_BlitSurface(rm->spr_tileanimation[iSize].getSurface(), &g_tilesetmanager->rRects[iSize][tile->iCol << 2][tile->iRow], blitdest, &bltrect);
                 } else if(tile->iID == TILESETUNKNOWN) {
                     //Draw unknown tile
-                    SDL_BlitSurface(spr_unknowntile[iSize].getSurface(), &g_tilesetmanager->rRects[iSize][0][0], blitdest, &bltrect);
+                    SDL_BlitSurface(rm->spr_unknowntile[iSize].getSurface(), &g_tilesetmanager->rRects[iSize][0][0], blitdest, &bltrect);
                 }
 
                 bool fNeedWrap = false;
@@ -1475,9 +1467,9 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
                     if(tile->iID >= 0)
                         SDL_BlitSurface(g_tilesetmanager->GetTileset(tile->iID)->GetSurface(iSize), &g_tilesetmanager->rRects[iSize][tile->iCol][tile->iRow], blitdest, &bltrect);
                     else if(tile->iID == TILESETANIMATED)
-                        SDL_BlitSurface(spr_tileanimation[iSize].getSurface(), &g_tilesetmanager->rRects[iSize][tile->iCol << 2][tile->iRow], blitdest, &bltrect);
+                        SDL_BlitSurface(rm->spr_tileanimation[iSize].getSurface(), &g_tilesetmanager->rRects[iSize][tile->iCol << 2][tile->iRow], blitdest, &bltrect);
                     else if(tile->iID == TILESETUNKNOWN)
-                        SDL_BlitSurface(spr_unknowntile[iSize].getSurface(), &g_tilesetmanager->rRects[iSize][0][0], blitdest, &bltrect);
+                        SDL_BlitSurface(rm->spr_unknowntile[iSize].getSurface(), &g_tilesetmanager->rRects[iSize][0][0], blitdest, &bltrect);
                 }
             }
         }
@@ -1490,14 +1482,14 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
             for(short iCol = 0; iCol < iPlatformWidth; iCol++) {
                 for(short iRow = 0; iRow < iPlatformHeight; iRow++) {
                     if(tiles[iCol][iRow].iID != -2)
-                        spr_platformstarttile.draw(iStartX - (iPlatformWidth << (iSizeShift - 1)) + (iCol << iSizeShift), iStartY - (iPlatformHeight << (iSizeShift - 1)) + (iRow << iSizeShift), 0, 0, iTileSize, iTileSize);
+                        rm->spr_platformstarttile.draw(iStartX - (iPlatformWidth << (iSizeShift - 1)) + (iCol << iSizeShift), iStartY - (iPlatformHeight << (iSizeShift - 1)) + (iRow << iSizeShift), 0, 0, iTileSize, iTileSize);
                 }
             }
 
             for(short iCol = 0; iCol < iPlatformWidth; iCol++) {
                 for(short iRow = 0; iRow < iPlatformHeight; iRow++) {
                     if(tiles[iCol][iRow].iID != -2)
-                        spr_platformendtile.draw(iEndX - (iPlatformWidth << (iSizeShift - 1)) + (iCol << iSizeShift), iEndY - (iPlatformHeight << (iSizeShift - 1)) + (iRow << iSizeShift), 0, 0, iTileSize, iTileSize);
+                        rm->spr_platformendtile.draw(iEndX - (iPlatformWidth << (iSizeShift - 1)) + (iCol << iSizeShift), iEndY - (iPlatformHeight << (iSizeShift - 1)) + (iRow << iSizeShift), 0, 0, iTileSize, iTileSize);
                 }
             }
         }
@@ -1517,7 +1509,7 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
 
         for(short iSpot = 0; iSpot < iNumSpots + 1; iSpot++) {
             gfx_setrect(&rPathDst, (short)dX, (short)dY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
-            SDL_BlitSurface(spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
+            SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
 
             dX += dIncrementX;
             dY += dIncrementY;
@@ -1527,7 +1519,7 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
             for(short iCol = 0; iCol < iPlatformWidth; iCol++) {
                 for(short iRow = 0; iRow < iPlatformHeight; iRow++) {
                     if(tiles[iCol][iRow].iID != -2)
-                        spr_platformstarttile.draw(iStartX - (iPlatformWidth << (iSizeShift - 1)) + (iCol << iSizeShift), iStartY - (iPlatformHeight << (iSizeShift - 1)) + (iRow << iSizeShift), 0, 0, iTileSize, iTileSize);
+                        rm->spr_platformstarttile.draw(iStartX - (iPlatformWidth << (iSizeShift - 1)) + (iCol << iSizeShift), iStartY - (iPlatformHeight << (iSizeShift - 1)) + (iRow << iSizeShift), 0, 0, iTileSize, iTileSize);
                 }
             }
         }
@@ -1540,7 +1532,7 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
 
         for(short iSpot = 0; iSpot < 50; iSpot++) {
             gfx_setrect(&rPathDst, (short)dX, (short)dY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
-            SDL_BlitSurface(spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
+            SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
 
             short iWrapX = (short)dX;
             short iWrapY = (short)dY;
@@ -1563,7 +1555,7 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
 
             if(fNeedWrap) {
                 gfx_setrect(&rPathDst, iWrapX, iWrapY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
-                SDL_BlitSurface(spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
+                SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
             }
 
             dX += dIncrementX;
@@ -1578,7 +1570,7 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
             for(short iCol = 0; iCol < iPlatformWidth; iCol++) {
                 for(short iRow = 0; iRow < iPlatformHeight; iRow++) {
                     if(tiles[iCol][iRow].iID != -2)
-                        spr_platformstarttile.draw(iEllipseStartX + (iCol << iSizeShift), iEllipseStartY + (iRow << iSizeShift), 0, 0, iTileSize, iTileSize);
+                        rm->spr_platformstarttile.draw(iEllipseStartX + (iCol << iSizeShift), iEllipseStartY + (iRow << iSizeShift), 0, 0, iTileSize, iTileSize);
                 }
             }
         }
@@ -1589,14 +1581,14 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
             short iY = (short)(fRadiusY * sin(fAngle)) - (iPlatformPathDotSize[iSize] >> 1) + iStartY;
 
             gfx_setrect(&rPathDst, iX, iY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
-            SDL_BlitSurface(spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
+            SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
 
             if(iX + iPlatformPathDotSize[iSize] >= iScreenshotSize[iSize][0]) {
                 gfx_setrect(&rPathDst, iX - iScreenshotSize[iSize][0], iY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
-                SDL_BlitSurface(spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
+                SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
             } else if(iX < 0) {
                 gfx_setrect(&rPathDst, iX + iScreenshotSize[iSize][0], iY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
-                SDL_BlitSurface(spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
+                SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
             }
 
             fAngle += TWO_PI / 32.0f;
@@ -1656,7 +1648,7 @@ void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
 
     if(fDrawCenter) {
         if(hazard->itype <= 1) {
-            SDL_BlitSurface(spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
+            SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
         }
     }
 
@@ -1669,7 +1661,7 @@ void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
             rDotDst.y = (short)(dRadius * sin(dAngle)) + rPathDst.y + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1);
             rDotDst.h = rDotDst.w = iPlatformPathDotSize[iSize];
 
-            spr_platformpath.draw(rDotDst.x, rDotDst.y, rDotSrc.x, rDotSrc.y, rDotDst.w, rDotDst.h);
+            rm->spr_platformpath.draw(rDotDst.x, rDotDst.y, rDotSrc.x, rDotSrc.y, rDotDst.w, rDotDst.h);
             dAngle += TWO_PI / iNumDots;
         }
 
@@ -1678,7 +1670,7 @@ void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
             short x = (hazard->ix << (iSizeShift - 1)) + (short)((float)(iFireball * (24 >> iSize)) * cos(hazard->dparam[1])) + (iTileSize >> 1) - (iFireballHazardSize[iSize] >> 1);
             short y = (hazard->iy << (iSizeShift - 1)) + (short)((float)(iFireball * (24 >> iSize)) * sin(hazard->dparam[1])) + (iTileSize >> 1) - (iFireballHazardSize[iSize] >> 1);
 
-            spr_hazard_fireball[iSize].draw(x, y, 0, 0, iFireballHazardSize[iSize], iFireballHazardSize[iSize]);
+            rm->spr_hazard_fireball[iSize].draw(x, y, 0, 0, iFireballHazardSize[iSize], iFireballHazardSize[iSize]);
         }
     } else if(hazard->itype == 1) { //rotodisc
         short iNumDots = 16;
@@ -1689,7 +1681,7 @@ void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
             rDotDst.y = (short)(dRadius * sin(dAngle)) + rPathDst.y + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1);
             rDotDst.h = rDotDst.w = iPlatformPathDotSize[iSize];
 
-            spr_platformpath.draw(rDotDst.x, rDotDst.y, rDotSrc.x, rDotSrc.y, rDotDst.w, rDotDst.h);
+            rm->spr_platformpath.draw(rDotDst.x, rDotDst.y, rDotSrc.x, rDotSrc.y, rDotDst.w, rDotDst.h);
             dAngle += TWO_PI / iNumDots;
         }
 
@@ -1701,12 +1693,12 @@ void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
             short x = rPathDst.x + (short)(dRadius * cos(dAngle));
             short y = rPathDst.y + (short)(dRadius * sin(dAngle));
 
-            spr_hazard_rotodisc[iSize].draw(x, y, 0, 0, iTileSize, iTileSize);
+            rm->spr_hazard_rotodisc[iSize].draw(x, y, 0, 0, iTileSize, iTileSize);
 
             dAngle += dSector;
         }
     } else if(hazard->itype == 2) { //bullet bill
-        spr_hazard_bulletbill[iSize].draw(rPathDst.x, rPathDst.y, 0, hazard->dparam[0] < 0.0f ? 0 : iTileSize, iTileSize, iTileSize);
+        rm->spr_hazard_bulletbill[iSize].draw(rPathDst.x, rPathDst.y, 0, hazard->dparam[0] < 0.0f ? 0 : iTileSize, iTileSize, iTileSize);
 
         short iBulletPathX = rPathDst.x - iPlatformPathDotSize[iSize];
         if(hazard->dparam[0] > 0.0f)
@@ -1715,7 +1707,7 @@ void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
         short iBulletPathSpacing = (short)(hazard->dparam[0] * dBulletBillFrequency[iSize]);
         while(iBulletPathX >= 0 && iBulletPathX < iScreenshotSize[iSize][0]) {
             gfx_setrect(&rDotDst, iBulletPathX, rPathDst.y + ((iTileSize - iPlatformPathDotSize[iSize]) >> 1), iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
-            SDL_BlitSurface(spr_platformpath.getSurface(), &rDotSrc, blitdest, &rDotDst);
+            SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rDotSrc, blitdest, &rDotDst);
 
             iBulletPathX += hazard->iparam[0] < 0.0f ? -iBulletPathSpacing : iBulletPathSpacing;
         }
@@ -1731,7 +1723,7 @@ void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
             iOffsetY = -(iTileSize << 1);
         }
 
-        spr_hazard_flame[iSize].draw(rPathDst.x + iOffsetX, rPathDst.y + iOffsetY, rect->x >> iSize, rect->y >> iSize, rect->w >> iSize, rect->h >> iSize);
+        rm->spr_hazard_flame[iSize].draw(rPathDst.x + iOffsetX, rPathDst.y + iOffsetY, rect->x >> iSize, rect->y >> iSize, rect->w >> iSize, rect->h >> iSize);
     } else if(hazard->itype >= 4 && hazard->itype <= 7) { //pirhana plants
         SDL_Rect * rect = &g_rPirhanaRects[hazard->itype - 4][hazard->iparam[1]][0];
         short iOffsetX = 0;
@@ -1749,7 +1741,7 @@ void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
                 iOffsetX = -(iTileSize >> 1);
         }
 
-        spr_hazard_pirhanaplant[iSize].draw(rPathDst.x + iOffsetX, rPathDst.y + iOffsetY, rect->x >> iSize, rect->y >> iSize, rect->w >> iSize, rect->h >> iSize);
+        rm->spr_hazard_pirhanaplant[iSize].draw(rPathDst.x + iOffsetX, rPathDst.y + iOffsetY, rect->x >> iSize, rect->y >> iSize, rect->w >> iSize, rect->h >> iSize);
     }
 }
 
@@ -1991,7 +1983,7 @@ void CheckSecret(short id)
             IO_MovingObject * object = createpowerup(SECRET1_POWERUP, GetRandMax(smw->ScreenWidth), GetRandMax(smw->ScreenHeight), true, false);
 
             if(object)
-                eyecandy[2].add(new EC_SingleAnimation(&spr_poof, object->ix - 8, object->iy - 8, 4, 5));
+                eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->ix - 8, object->iy - 8, 4, 5));
         }
     } else if(id == 1 && !game_values.unlocksecretunlocked[1]) {
         if(game_values.unlocksecret2part1 && game_values.unlocksecret2part2 >= 3) {
@@ -2001,7 +1993,7 @@ void CheckSecret(short id)
             IO_MovingObject * object = createpowerup(SECRET2_POWERUP, GetRandMax(smw->ScreenWidth), GetRandMax(smw->ScreenHeight), true, false);
 
             if(object)
-                eyecandy[2].add(new EC_SingleAnimation(&spr_poof, object->ix - 8, object->iy - 8, 4, 5));
+                eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->ix - 8, object->iy - 8, 4, 5));
         }
     } else if(id == 2 && !game_values.unlocksecretunlocked[2]) {
         for(short iPlayer = 0; iPlayer < 4; iPlayer++) {
@@ -2013,7 +2005,7 @@ void CheckSecret(short id)
                 IO_MovingObject * object = createpowerup(SECRET3_POWERUP, GetRandMax(smw->ScreenWidth), GetRandMax(smw->ScreenHeight), true, false);
 
                 if(object)
-                    eyecandy[2].add(new EC_SingleAnimation(&spr_poof, object->ix - 8, object->iy - 8, 4, 5));
+                    eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->ix - 8, object->iy - 8, 4, 5));
             }
         }
     } else if(id == 3 && !game_values.unlocksecretunlocked[3]) {
@@ -2023,7 +2015,7 @@ void CheckSecret(short id)
         IO_MovingObject * object = createpowerup(SECRET4_POWERUP, GetRandMax(smw->ScreenWidth), GetRandMax(smw->ScreenHeight), true, false);
 
         if(object)
-            eyecandy[2].add(new EC_SingleAnimation(&spr_poof, object->ix - 8, object->iy - 8, 4, 5));
+            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->ix - 8, object->iy - 8, 4, 5));
     }
 }
 

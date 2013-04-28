@@ -7,8 +7,6 @@ extern const char * Joynames[30];
 extern const char * GameInputNames[NUM_KEYS];
 extern const char * MenuInputNames[NUM_KEYS];
 
-extern bool LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDirections);
-
 extern short iScoreboardPlayerOffsetsX[3][3];
 extern WorldMap g_worldmap;
 extern short LookupTeamID(short id);
@@ -272,16 +270,16 @@ void MI_InputControlField::Draw()
     spr->draw(ix + iIndent - 16, iy, 0, (fSelected ? 96 : 64), 32, 32);
     spr->draw(ix + iIndent + 16, iy, 528 - iWidth + iIndent, (fSelected ? 32 : 0), iWidth - iIndent - 16, 32);
 
-    menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName);
+    rm->menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName);
 
     if(iKey == NULL)
-        menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 16, "Unassigned");
+        rm->menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 16, "Unassigned");
     else if(fModifying)
-        menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 16, "(Press Button)");
+        rm->menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 16, "(Press Button)");
     else if(iDevice == DEVICE_KEYBOARD)
-        menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 16, Keynames[*iKey]);
+        rm->menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 16, Keynames[*iKey]);
     else
-        menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 16, Joynames[*iKey]);
+        rm->menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 16, Joynames[*iKey]);
 }
 
 /**************************************
@@ -349,7 +347,7 @@ MI_InputControlContainer::MI_InputControlContainer(gfxSprite * spr_button, short
         miMenuInputControlFields[iKey]->SetKey(&game_values.playerInput.inputControls[iPlayerID]->inputGameControls[1].keys[iKey]);
     }
 
-    miBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
+    miBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
     miBackButton->SetCode(MENU_CODE_BACK_TO_CONTROLS_MENU);
 
     mInputMenu = new UI_Menu();
@@ -519,11 +517,11 @@ void MI_InputControlContainer::UpdateDeviceKeys(short iDevice)
  * MI_TeamSelect Class
  **************************************/
 
-MI_TeamSelect::MI_TeamSelect(gfxSprite * spr_background, short x, short y) :
+MI_TeamSelect::MI_TeamSelect(gfxSprite * spr_background_ref, short x, short y) :
     UI_Control(x, y)
 {
-    spr = spr_background;
-    miImage = new MI_Image(spr_background, ix, iy, 0, 0, 416, 256, 1, 1, 0);
+    spr = spr_background_ref;
+    miImage = new MI_Image(spr, ix, iy, 0, 0, 416, 256, 1, 1, 0);
 
     for(short iTeam = 0; iTeam < 4; iTeam++) {
         iTeamCounts[iTeam] = game_values.teamcounts[iTeam];
@@ -580,25 +578,25 @@ void MI_TeamSelect::Draw()
             if(game_values.randomskin[iPlayerID])
                 spr->draw(iTeam * 96 + 43 + ix, iTeamItem * 36 + 52 + iy, 416, fReady[iPlayerID] ? 0 : iRandomAnimationFrame, 42, 32);
             else
-                spr_player[iPlayerID][fReady[iPlayerID] ? 0 : iAnimationFrame]->draw(iTeam * 96 + 48 + ix, iTeamItem * 36 + 52 + iy, 0, 0, 32, 32);
+                rm->spr_player[iPlayerID][fReady[iPlayerID] ? 0 : iAnimationFrame]->draw(iTeam * 96 + 48 + ix, iTeamItem * 36 + 52 + iy, 0, 0, 32, 32);
 
-            spr_menu_boxed_numbers.draw(iTeam * 96 + 44 + ix, iTeamItem * 36 + 72 + iy, iPlayerID * 16, game_values.colorids[iPlayerID] * 16, 16, 16);
+            rm->spr_menu_boxed_numbers.draw(iTeam * 96 + 44 + ix, iTeamItem * 36 + 72 + iy, iPlayerID * 16, game_values.colorids[iPlayerID] * 16, 16, 16);
         }
 
         if(game_values.playercontrol[iTeam] > 0) {
-            spr_player_select_ready.draw(iTeam * 160 + 16, 368, 0, 0, 128, 96);
+            rm->spr_player_select_ready.draw(iTeam * 160 + 16, 368, 0, 0, 128, 96);
 
-            spr_menu_boxed_numbers.draw(iTeam * 160 + 32, 388, iTeam * 16, game_values.colorids[iTeam] * 16, 16, 16);
-            menu_font_small.drawChopRight(iTeam * 160 + 52, 404 - menu_font_small.getHeight(), 80, game_values.randomskin[iTeam] ? "Random" : skinlist->GetSkinName(game_values.skinids[iTeam]));
+            rm->spr_menu_boxed_numbers.draw(iTeam * 160 + 32, 388, iTeam * 16, game_values.colorids[iTeam] * 16, 16, 16);
+            rm->menu_font_small.drawChopRight(iTeam * 160 + 52, 404 - rm->menu_font_small.getHeight(), 80, game_values.randomskin[iTeam] ? "Random" : skinlist->GetSkinName(game_values.skinids[iTeam]));
 
-            spr_player_select_ready.draw(iTeam * 160 + 64, 408, 128, (!fReady[iTeam] ? 0 : (game_values.playercontrol[iTeam] == 1 ? 32 : 64)), 34, 32);
+            rm->spr_player_select_ready.draw(iTeam * 160 + 64, 408, 128, (!fReady[iTeam] ? 0 : (game_values.playercontrol[iTeam] == 1 ? 32 : 64)), 34, 32);
         }
     }
 
     if(fAllReady) {
-        menu_plain_field.draw(ix + 108, iy + 224, 0, 160, 100, 32);
-        menu_plain_field.draw(ix + 208, iy + 224, 412, 160, 100, 32);
-        menu_font_large.drawCentered(320, iy + 229, "Continue");
+        rm->menu_plain_field.draw(ix + 108, iy + 224, 0, 160, 100, 32);
+        rm->menu_plain_field.draw(ix + 208, iy + 224, 412, 160, 100, 32);
+        rm->menu_font_large.drawCentered(smw->ScreenWidth/2, iy + 229, "Continue");
     }
 }
 
@@ -632,7 +630,7 @@ MenuCodeEnum MI_TeamSelect::SendInput(CPlayerInput * playerInput)
                             if(--game_values.skinids[iPlayer] < 0)
                                 game_values.skinids[iPlayer] = (short)skinlist->GetCount() - 1;
                         }
-                    } while(!LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false));
+                    } while(!rm->LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false));
                 } else if(playerKeys->menu_up.fDown) {
                     if(iFastScroll[iPlayer] == 0) {
                         if(++iFastScrollTimer[iPlayer] > 40) {
@@ -643,7 +641,7 @@ MenuCodeEnum MI_TeamSelect::SendInput(CPlayerInput * playerInput)
                             do {
                                 if(--game_values.skinids[iPlayer] < 0)
                                     game_values.skinids[iPlayer] = (short)skinlist->GetCount() - 1;
-                            } while(!LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false));
+                            } while(!rm->LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false));
 
                             iFastScrollTimer[iPlayer] = 0;
                         }
@@ -653,12 +651,12 @@ MenuCodeEnum MI_TeamSelect::SendInput(CPlayerInput * playerInput)
                 if(playerKeys->menu_down.fPressed) {
                     do {
                         if(playerKeys->menu_up.fDown) {
-                            game_values.skinids[iPlayer] = rand() % skinlist->GetCount();
+                            game_values.skinids[iPlayer] = GetRandMax( skinlist->GetCount());
                         } else {
                             if(++game_values.skinids[iPlayer] >= skinlist->GetCount())
                                 game_values.skinids[iPlayer] = 0;
                         }
-                    } while(!LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false));
+                    } while(!rm->LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false));
                 } else if(playerKeys->menu_down.fDown) {
                     if(iFastScroll[iPlayer] == 0) {
                         if(++iFastScrollTimer[iPlayer] > 40) {
@@ -669,7 +667,7 @@ MenuCodeEnum MI_TeamSelect::SendInput(CPlayerInput * playerInput)
                             do {
                                 if(++game_values.skinids[iPlayer] >= skinlist->GetCount())
                                     game_values.skinids[iPlayer] = 0;
-                            } while(!LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false));
+                            } while(!rm->LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false));
 
                             iFastScrollTimer[iPlayer] = 0;
                         }
@@ -692,7 +690,7 @@ MenuCodeEnum MI_TeamSelect::SendInput(CPlayerInput * playerInput)
                 } else if(!game_values.randomskin[iPlayer]) {
                     do {
                         game_values.skinids[iPlayer] = rand() % skinlist->GetCount();
-                    } while(!LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false));
+                    } while(!rm->LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false));
                 }
             }
         }
@@ -776,7 +774,7 @@ void MI_TeamSelect::FindNewTeam(short iPlayerID, short iDirection)
                     game_values.colorids[iPlayerID] = iNewTeam;
 
                     //Skip skins that are invalid
-                    while(!LoadMenuSkin(iPlayerID, game_values.skinids[iPlayerID], iNewTeam, false)) {
+                    while(!rm->LoadMenuSkin(iPlayerID, game_values.skinids[iPlayerID], iNewTeam, false)) {
                         if(++game_values.skinids[iPlayerID] >= skinlist->GetCount())
                             game_values.skinids[iPlayerID] = 0;
                     }
@@ -892,7 +890,7 @@ void MI_TeamSelect::Reset()
             game_values.colorids[iPlayer] = iPlayer;
 
         //Skip skins that are invalid
-        while(!LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false)) {
+        while(!rm->LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false)) {
             if(++game_values.skinids[iPlayer] >= skinlist->GetCount())
                 game_values.skinids[iPlayer] = 0;
         }
@@ -1047,7 +1045,7 @@ void MI_PlayerSelect::Draw()
     spr->draw(ix + iIndent - 16, iy, 0, (fSelected ? 192 : 128), 32, 64);
     spr->draw(ix + iIndent + 16, iy, 528 - iWidth + iIndent, (fSelected ? 64 : 0), iWidth - iIndent - 16, 64);
 
-    menu_font_large.drawChopRight(ix + 16, iy + 20, iIndent - 8, szName);
+    rm->menu_font_large.drawChopRight(ix + 16, iy + 20, iIndent - 8, szName);
 
     miModifyImage->Draw();
 
@@ -1125,7 +1123,7 @@ MI_PowerupSelection::MI_PowerupSelection(short x, short y, short width, short nu
 
     mMenu = new UI_Menu();
 
-    miOverride = new MI_SelectField(&spr_selectfield, 70, iy, "Use Settings From", 500, 250);
+    miOverride = new MI_SelectField(&rm->spr_selectfield, 70, iy, "Use Settings From", 500, 250);
     miOverride->Add("Map Only", 0, "", false, false);
     miOverride->Add("Game Only", 1, "", false, false);
     miOverride->Add("Basic Average", 2, "", false, false);
@@ -1134,7 +1132,7 @@ MI_PowerupSelection::MI_PowerupSelection(short x, short y, short width, short nu
     miOverride->SetKey(game_values.overridepowerupsettings);
     //miOverride->SetItemChangedCode(MENU_CODE_POWERUP_OVERRIDE_CHANGED);
 
-    miPreset = new MI_SelectField(&spr_selectfield, 70, iy + 40, "Item Set", 500, 250);
+    miPreset = new MI_SelectField(&rm->spr_selectfield, 70, iy + 40, "Item Set", 500, 250);
     miPreset->Add("Custom Set 1", 0, "", false, false);
     miPreset->Add("Custom Set 2", 1, "", false, false);
     miPreset->Add("Custom Set 3", 2, "", false, false);
@@ -1157,7 +1155,7 @@ MI_PowerupSelection::MI_PowerupSelection(short x, short y, short width, short nu
     miPreset->SetItemChangedCode(MENU_CODE_POWERUP_PRESET_CHANGED);
 
     for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {
-        miPowerupSlider[iPowerup] = new MI_PowerupSlider(&spr_selectfield, &menu_slider_bar, &spr_storedpoweruplarge, 0, 0, 245, iPowerupPositionMap[iPowerup]);
+        miPowerupSlider[iPowerup] = new MI_PowerupSlider(&rm->spr_selectfield, &rm->menu_slider_bar, &rm->spr_storedpoweruplarge, 0, 0, 245, iPowerupPositionMap[iPowerup]);
         miPowerupSlider[iPowerup]->Add("", 0, "", false, false);
         miPowerupSlider[iPowerup]->Add("", 1, "", false, false);
         miPowerupSlider[iPowerup]->Add("", 2, "", false, false);
@@ -1175,18 +1173,18 @@ MI_PowerupSelection::MI_PowerupSelection(short x, short y, short width, short nu
         miPowerupSlider[iPowerup]->SetItemChangedCode(MENU_CODE_POWERUP_SETTING_CHANGED);
     }
 
-    miRestoreDefaultsButton = new MI_Button(&spr_selectfield, 160, 432, "Defaults", 150, 1);
+    miRestoreDefaultsButton = new MI_Button(&rm->spr_selectfield, 160, 432, "Defaults", 150, 1);
     miRestoreDefaultsButton->SetCode(MENU_CODE_RESTORE_DEFAULT_POWERUP_WEIGHTS);
 
-    miClearButton = new MI_Button(&spr_selectfield, 330, 432, "Clear", 150, 1);
+    miClearButton = new MI_Button(&rm->spr_selectfield, 330, 432, "Clear", 150, 1);
     miClearButton->SetCode(MENU_CODE_CLEAR_POWERUP_WEIGHTS);
 
     //Are You Sure dialog box
-    miDialogImage = new MI_Image(&spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
+    miDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
     miDialogAreYouText = new MI_Text("Are You", 320, 195, 0, 2, 1);
     miDialogSureText = new MI_Text("Sure?", 320, 220, 0, 2, 1);
-    miDialogYesButton = new MI_Button(&spr_selectfield, 235, 250, "Yes", 80, 1);
-    miDialogNoButton = new MI_Button(&spr_selectfield, 325, 250, "No", 80, 1);
+    miDialogYesButton = new MI_Button(&rm->spr_selectfield, 235, 250, "Yes", 80, 1);
+    miDialogNoButton = new MI_Button(&rm->spr_selectfield, 325, 250, "No", 80, 1);
 
     miDialogYesButton->SetCode(MENU_CODE_POWERUP_RESET_YES);
     miDialogNoButton->SetCode(MENU_CODE_POWERUP_RESET_NO);
@@ -1200,8 +1198,8 @@ MI_PowerupSelection::MI_PowerupSelection(short x, short y, short width, short nu
     mMenu->AddControl(miOverride, NULL, miPreset, NULL, NULL);
     mMenu->AddControl(miPreset, miOverride, miPowerupSlider[0], NULL, NULL);
 
-    miUpArrow = new MI_Image(&menu_verticalarrows, 310, 128, 20, 0, 20, 20, 1, 4, 8);
-    miDownArrow = new MI_Image(&menu_verticalarrows, 310, 406, 0, 0, 20, 20, 1, 4, 8);
+    miUpArrow = new MI_Image(&rm->menu_verticalarrows, 310, 128, 20, 0, 20, 20, 1, 4, 8);
+    miDownArrow = new MI_Image(&rm->menu_verticalarrows, 310, 406, 0, 0, 20, 20, 1, 4, 8);
     miUpArrow->Show(false);
 
     for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {
@@ -1751,8 +1749,8 @@ void MI_AnnouncerField::Draw()
     spr->draw(ix + iIndent - 16, iy, 0, (fSelected ? 96 : 64), 32, 32);
     spr->draw(ix + iIndent + 16, iy, 528 - iWidth + iIndent, (fSelected ? 32 : 0), iWidth - iIndent - 16, 32);
 
-    menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName);
-    menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 24, szFieldName);
+    rm->menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName);
+    rm->menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 24, szFieldName);
 
     miModifyImageLeft->Draw();
     miModifyImageRight->Draw();
@@ -1900,8 +1898,8 @@ void MI_PlaylistField::Draw()
     spr->draw(ix + iIndent - 16, iy, 0, (fSelected ? 96 : 64), 32, 32);
     spr->draw(ix + iIndent + 16, iy, 528 - iWidth + iIndent, (fSelected ? 32 : 0), iWidth - iIndent - 16, 32);
 
-    menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName);
-    menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 24, musiclist->current_name());
+    rm->menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName);
+    rm->menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 24, musiclist->current_name());
 
     miModifyImageLeft->Draw();
     miModifyImageRight->Draw();
@@ -1931,7 +1929,7 @@ MI_StoredPowerupResetButton::MI_StoredPowerupResetButton(gfxSprite * nspr, short
     iImageW = 0;
     iImageH = 0;
 
-    iTextW = (short)menu_font_large.getWidth(name);
+    iTextW = (short)rm->menu_font_large.getWidth(name);
 }
 
 void MI_StoredPowerupResetButton::Draw()
@@ -1942,8 +1940,8 @@ void MI_StoredPowerupResetButton::Draw()
     MI_Button::Draw();
 
     for(short iPowerup = 0; iPowerup < 4; iPowerup++) {
-        spr_selectfield.draw(ix + iWidth - 142 + iPowerup * 30, iy + 4, 188, 88, 24, 24);
-        spr_storedpowerupsmall.draw(ix + iWidth - 138 + iPowerup * 30, iy + 8, game_values.storedpowerups[iPowerup] * 16, 0, 16, 16);
+        rm->spr_selectfield.draw(ix + iWidth - 142 + iPowerup * 30, iy + 4, 188, 88, 24, 24);
+        rm->spr_storedpowerupsmall.draw(ix + iWidth - 138 + iPowerup * 30, iy + 8, game_values.storedpowerups[iPowerup] * 16, 0, 16, 16);
     }
 }
 
@@ -1958,47 +1956,47 @@ MI_TourStop::MI_TourStop(short x, short y, bool fWorld) :
     fIsWorld = fWorld;
 
     if(fIsWorld) {
-        miModeField = new MI_ImageSelectField(&spr_selectfielddisabled, &menu_mode_small, 70, 85, "Mode", 305, 90, 16, 16);
-        miGoalField = new MI_SelectField(&spr_selectfielddisabled, 380, 85, "Goal", 190, 90);
-        miPointsField = new MI_SelectField(&spr_selectfielddisabled, 380, 125, "Score", 190, 90);
+        miModeField = new MI_ImageSelectField(&rm->spr_selectfielddisabled, &rm->menu_mode_small, 70, 85, "Mode", 305, 90, 16, 16);
+        miGoalField = new MI_SelectField(&rm->spr_selectfielddisabled, 380, 85, "Goal", 190, 90);
+        miPointsField = new MI_SelectField(&rm->spr_selectfielddisabled, 380, 125, "Score", 190, 90);
 
-        miBonusField = new MI_SelectField(&spr_selectfielddisabled, 70, 125, "Bonus", 305, 90);
+        miBonusField = new MI_SelectField(&rm->spr_selectfielddisabled, 70, 125, "Bonus", 305, 90);
         miBonusField->Disable(true);
 
-        miEndStageImage[0] = new MI_Image(&spr_worlditemsplace, 54, 201, 0, 20, 80, 248, 1, 1, 0);
+        miEndStageImage[0] = new MI_Image(&rm->spr_worlditemsplace, 54, 201, 0, 20, 80, 248, 1, 1, 0);
         miEndStageImage[0]->Show(false);
 
-        miEndStageImage[1] = new MI_Image(&spr_worlditemsplace, 506, 201, 0, 20, 80, 248, 1, 1, 0);
+        miEndStageImage[1] = new MI_Image(&rm->spr_worlditemsplace, 506, 201, 0, 20, 80, 248, 1, 1, 0);
         miEndStageImage[1]->Show(false);
 
         for(short iBonus = 0; iBonus < 10; iBonus++) {
-            miBonusIcon[iBonus] = new MI_Image(&spr_worlditemssmall, 170 + iBonus * 20, 133, 0, 0, 16, 16, 1, 1, 0);
-            miBonusBackground[iBonus] = new MI_Image(&spr_worlditemsplace, 168 + iBonus * 20, 131, 0, 0, 20, 20, 1, 1, 0);
+            miBonusIcon[iBonus] = new MI_Image(&rm->spr_worlditemssmall, 170 + iBonus * 20, 133, 0, 0, 16, 16, 1, 1, 0);
+            miBonusBackground[iBonus] = new MI_Image(&rm->spr_worlditemsplace, 168 + iBonus * 20, 131, 0, 0, 20, 20, 1, 1, 0);
 
             miBonusIcon[iBonus]->Show(false);
             miBonusBackground[iBonus]->Show(false);
         }
     } else {
-        miModeField = new MI_ImageSelectField(&spr_selectfielddisabled, &menu_mode_small, 70, 85, "Mode", 500, 120, 16, 16);
-        miGoalField = new MI_SelectField(&spr_selectfielddisabled, 70, 125, "Goal", 246, 120);
-        miPointsField = new MI_SelectField(&spr_selectfielddisabled, 70 + 254, 125, "Score", 246, 120);
+        miModeField = new MI_ImageSelectField(&rm->spr_selectfielddisabled, &rm->menu_mode_small, 70, 85, "Mode", 500, 120, 16, 16);
+        miGoalField = new MI_SelectField(&rm->spr_selectfielddisabled, 70, 125, "Goal", 246, 120);
+        miPointsField = new MI_SelectField(&rm->spr_selectfielddisabled, 70 + 254, 125, "Score", 246, 120);
 
         miBonusField = 0;
     }
 
-    miStartButton = new MI_Button(&spr_selectfield, 70, 45, "Start", 500, 0);
+    miStartButton = new MI_Button(&rm->spr_selectfield, 70, 45, "Start", 500, 0);
     miStartButton->SetCode(MENU_CODE_TOUR_STOP_CONTINUE);
     miStartButton->Select(true);
 
-    miMapField = new MI_MapField(&spr_selectfielddisabled, 70, 165, "Map", 500, 120, false);
+    miMapField = new MI_MapField(&rm->spr_selectfielddisabled, 70, 165, "Map", 500, 120, false);
     miMapField->Disable(true);
 
     miModeField->Disable(true);
     miGoalField->Disable(true);
     miPointsField->Disable(true);
 
-    miTourStopLeftHeaderBar = new MI_Image(&menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
-    miTourStopMenuRightHeaderBar = new MI_Image(&menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
+    miTourStopLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
+    miTourStopMenuRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
     miTourStopMenuHeaderText = new MI_Text("Tour Stop", 320, 5, 0, 2, 1);
 }
 
@@ -2148,7 +2146,7 @@ void MI_TourStop::Refresh(short iTourStop)
                 bool fShowBonus = iBonus < tourstop->iNumBonuses;
                 if(fShowBonus) {
                     short iBonusIcon = tourstop->wsbBonuses[iBonus].iBonus;
-                    miBonusIcon[iBonus]->SetImageSource(iBonusIcon < NUM_POWERUPS ? &spr_storedpowerupsmall : &spr_worlditemssmall);
+                    miBonusIcon[iBonus]->SetImageSource(iBonusIcon < NUM_POWERUPS ? &rm->spr_storedpowerupsmall : &rm->spr_worlditemssmall);
                     miBonusIcon[iBonus]->SetImage((iBonusIcon < NUM_POWERUPS ? iBonusIcon : iBonusIcon - NUM_POWERUPS) << 4, 0, 16, 16);
                     miBonusBackground[iBonus]->SetImage(tourstop->wsbBonuses[iBonus].iWinnerPlace * 20, 0, 20, 20);
                 }
@@ -2313,7 +2311,7 @@ void MI_TournamentScoreboard::Update()
                         float dVelY = dVel * sin(dAngle);
 
                         short iRandomColor = (short)(rand() % iTeamCounts[iTournamentWinner]);
-                        uiMenu->AddEyeCandy(new EC_FallingObject(&spr_bonus, iRandX, iRandY, dVelX, dVelY, 4, 2, 0, game_values.colorids[iTeamIDs[iTournamentWinner][iRandomColor]] << 4, 16, 16));
+                        uiMenu->AddEyeCandy(new EC_FallingObject(&rm->spr_bonus, iRandX, iRandY, dVelX, dVelY, 4, 2, 0, game_values.colorids[iTeamIDs[iTournamentWinner][iRandomColor]] << 4, 16, 16));
                         dAngle -= (float)PI / 14;
                     }
                 } else {
@@ -2323,7 +2321,7 @@ void MI_TournamentScoreboard::Update()
                     short iRandY = (short)(rand() % 416);
                     short iRandomColor = (short)(rand() % iTeamCounts[iTournamentWinner]);
 
-                    uiMenu->AddEyeCandy(new EC_SingleAnimation(&spr_fireworks, iRandX, iRandY, 8, 4, 0, game_values.colorids[iTeamIDs[iTournamentWinner][iRandomColor]] << 6, 64, 64));
+                    uiMenu->AddEyeCandy(new EC_SingleAnimation(&rm->spr_fireworks, iRandX, iRandY, 8, 4, 0, game_values.colorids[iTeamIDs[iTournamentWinner][iRandomColor]] << 6, 64, 64));
                 }
             }
 
@@ -2338,11 +2336,11 @@ void MI_TournamentScoreboard::Update()
                 else if(iTeamCounts[iTournamentWinner] > 1)
                     sprintf(szWinnerText, "Team %d Wins!", iTournamentWinner + 1);
 
-                short iStringWidth = (short)menu_font_large.getWidth(szWinnerText);
-                short iRandX = (short)(rand() % (640 - iStringWidth) + (iStringWidth >> 1));
-                short iRandY = (short)(rand() % 380 + 100);
+                short iStringWidth = (short)rm->menu_font_large.getWidth(szWinnerText);
+                short iRandX = (short)(GetRandMax(smw->ScreenWidth - iStringWidth) + (iStringWidth >> 1));
+                short iRandY = (short)(GetRandMax(380) + 100);
 
-                uiMenu->AddEyeCandy(new EC_GravText(&menu_font_large, iRandX, iRandY, szWinnerText, -VELJUMP));
+                uiMenu->AddEyeCandy(new EC_GravText(&rm->menu_font_large, iRandX, iRandY, szWinnerText, -VELJUMP));
             }
         }
     }
@@ -2404,11 +2402,11 @@ void MI_TournamentScoreboard::Draw()
     }
 }
 
-void MI_TournamentScoreboard::CreateScoreboard(short numTeams, short numGames, gfxSprite * spr_icons)
+void MI_TournamentScoreboard::CreateScoreboard(short numTeams, short numGames, gfxSprite * spr_icons_ref)
 {
     FreeScoreboard();
 
-    sprIcons = spr_icons;
+    sprIcons = spr_icons_ref;
 
     for(short iTeam = 0; iTeam < 4; iTeam++) {
         iTeamCounts[iTeam] = game_values.teamcounts[iTeam];
@@ -2458,7 +2456,7 @@ void MI_TournamentScoreboard::CreateScoreboard(short numTeams, short numGames, g
         }
 
         for(short iPlayer = 0; iPlayer < iTeamCounts[iTeam]; iPlayer++) {
-            miPlayerImages[iTeam][iPlayer] = new MI_Image(spr_player[iTeamIDs[iTeam][iPlayer]][PGFX_STANDING_R], ix + iScoreboardPlayerOffsetsX[iTeamCounts[iTeam] - 1][iPlayer] - (fTour ? 40 : 0), iTeamY + 16, 0, 0, 32, 32, 2, 1, 0);
+            miPlayerImages[iTeam][iPlayer] = new MI_Image(rm->spr_player[iTeamIDs[iTeam][iPlayer]][PGFX_STANDING_R], ix + iScoreboardPlayerOffsetsX[iTeamCounts[iTeam] - 1][iPlayer] - (fTour ? 40 : 0), iTeamY + 16, 0, 0, 32, 32, 2, 1, 0);
         }
 
         if(fNotTournament)
@@ -2469,14 +2467,14 @@ void MI_TournamentScoreboard::CreateScoreboard(short numTeams, short numGames, g
             worldPlace[iTeam] = new MI_Image(sprIcons, ix + 102, iTeamY + 14, 0, 0, 32, 32, 4, 1, 8);
 
             for(short iBonus = 0; iBonus < MAX_WORLD_BONUSES_AWARDED; iBonus++) {
-                worldBonus[iTeam][iBonus] = new MI_Image(&spr_worlditems, ix + 180 + 38 * iBonus, iTeamY + 14, 0, 0, 32, 32, 1, 1, 0);
+                worldBonus[iTeam][iBonus] = new MI_Image(&rm->spr_worlditems, ix + 180 + 38 * iBonus, iTeamY + 14, 0, 0, 32, 32, 1, 1, 0);
                 worldBonus[iTeam][iBonus]->Show(false);
             }
         }
     }
 
     if(game_values.matchtype == MATCH_TYPE_WORLD) {
-        worldScoreModifier = new MI_Image(&spr_worlditems, 0, 0, 0, 0, 32, 32, 1, 1, 0);
+        worldScoreModifier = new MI_Image(&rm->spr_worlditems, 0, 0, 0, 0, 32, 32, 1, 1, 0);
         worldScore = new MI_ScoreText(0, 0);
     }
 
@@ -2515,7 +2513,7 @@ void MI_TournamentScoreboard::RefreshWorldScores(short gameWinner)
         for(short iPlayer = 0; iPlayer < iTeamCounts[iTeam]; iPlayer++) {
             static short iPlaceSprite[4] = {4, 0, 8, 9};
             miPlayerImages[iTeam][iPlayer]->SetPosition(ix + iScoreboardPlayerOffsetsX[iTeamCounts[iTeam] - 1][iPlayer] - 40, iTeamY + 16);
-            miPlayerImages[iTeam][iPlayer]->SetImageSource(spr_player[iTeamIDs[iTeam][iPlayer]][iPlaceSprite[game_values.tournament_scores[iTeam].wins]]);
+            miPlayerImages[iTeam][iPlayer]->SetImageSource(rm->spr_player[iTeamIDs[iTeam][iPlayer]][iPlaceSprite[game_values.tournament_scores[iTeam].wins]]);
         }
 
         tourScores[iTeam]->SetPosition(ix + 508, iTeamY + 24);
@@ -2562,7 +2560,7 @@ void MI_TournamentScoreboard::RefreshWorldScores(short gameWinner)
 
                         if(iBonusCounts[iDisplayPosition] < MAX_WORLD_BONUSES_AWARDED) {
                             worldBonus[iDisplayPosition][iBonusCounts[iDisplayPosition]]->Show(true);
-                            worldBonus[iDisplayPosition][iBonusCounts[iDisplayPosition]]->SetImageSource(bonus->iBonus < NUM_POWERUPS ? &spr_storedpoweruplarge : &spr_worlditems);
+                            worldBonus[iDisplayPosition][iBonusCounts[iDisplayPosition]]->SetImageSource(bonus->iBonus < NUM_POWERUPS ? &rm->spr_storedpoweruplarge : &rm->spr_worlditems);
                             worldBonus[iDisplayPosition][iBonusCounts[iDisplayPosition]]->SetImage((bonus->iBonus < NUM_POWERUPS ? bonus->iBonus : bonus->iBonus - NUM_POWERUPS) << 5, 0, 32, 32);
 
                             iBonusCounts[iDisplayPosition]++;
@@ -2599,7 +2597,7 @@ void MI_TournamentScoreboard::RefreshTourScores()
         for(short iPlayer = 0; iPlayer < iTeamCounts[iTeam]; iPlayer++) {
             static short iPlaceSprite[4] = {4, 0, 8, 9};
             miPlayerImages[iTeam][iPlayer]->SetPosition(ix + iScoreboardPlayerOffsetsX[iTeamCounts[iTeam] - 1][iPlayer] - 40, iTeamY + 16);
-            miPlayerImages[iTeam][iPlayer]->SetImageSource(spr_player[iTeamIDs[iTeam][iPlayer]][iPlaceSprite[game_values.tournament_scores[iTeam].wins]]);
+            miPlayerImages[iTeam][iPlayer]->SetImageSource(rm->spr_player[iTeamIDs[iTeam][iPlayer]][iPlaceSprite[game_values.tournament_scores[iTeam].wins]]);
         }
 
         for(short iGame = 0; iGame < game_values.tourstopcurrent; iGame++) {
@@ -2725,13 +2723,13 @@ MI_BonusWheel::MI_BonusWheel(short x, short y) :
         short iPowerupX = x + 160 + (short)(110.0f * cos(dSelectionSector[iImage]));
         short iPowerupY = y + 208 + (short)(110.0f * sin(dSelectionSector[iImage]));
 
-        miBonusImages[iImage] = new MI_Image(&spr_storedpoweruplarge, iPowerupX, iPowerupY, 0, 0, 32, 32, 1, 1, 0);
+        miBonusImages[iImage] = new MI_Image(&rm->spr_storedpoweruplarge, iPowerupX, iPowerupY, 0, 0, 32, 32, 1, 1, 0);
     }
 
     //Fix the last sector to allow correct detection of sector for tick sound
     dSelectionSector[NUMBONUSITEMSONWHEEL] = TWO_PI;
 
-    miContinueButton = new MI_Button(&menu_plain_field, ix + 76, iy + 390, "Continue", 200, 1);
+    miContinueButton = new MI_Button(&rm->menu_plain_field, ix + 76, iy + 390, "Continue", 200, 1);
     miContinueButton->Show(false);
     miContinueButton->SetCode(MENU_CODE_BONUS_DONE);
 }
@@ -2792,7 +2790,7 @@ void MI_BonusWheel::Update()
             short iPoofX = ix + 152 + (short)(110.0f * cos(dSelectionSector[iDisplayPowerupIndex]));
             short iPoofY = iy + 200 + (short)(110.0f * sin(dSelectionSector[iDisplayPowerupIndex]));
 
-            uiMenu->AddEyeCandy(new EC_SingleAnimation(&spr_poof, iPoofX, iPoofY, 4, 5));
+            uiMenu->AddEyeCandy(new EC_SingleAnimation(&rm->spr_poof, iPoofX, iPoofY, 4, 5));
 
             ifsoundonplay(sfx_cannon);
 
@@ -2890,13 +2888,13 @@ void MI_BonusWheel::Draw()
     if(!fShow)
         return;
 
-    spr_tournament_powerup_splash.draw(ix, iy);
+    rm->spr_tournament_powerup_splash.draw(ix, iy);
 
     short iSelectorX = ix + 144 + (short)(110.0f * cos(dSelectionAngle));
     short iSelectorY = iy + 190 + (short)(110.0f * sin(dSelectionAngle));
 
     if(iState > 0)
-        spr_powerupselector.draw(iSelectorX, iSelectorY, iSelectorAnimation * 64, 0, 64, 64);
+        rm->spr_powerupselector.draw(iSelectorX, iSelectorY, iSelectorAnimation * 64, 0, 64, 64);
 
     for(int iImage = 0; iImage < NUMBONUSITEMSONWHEEL; iImage++) {
         if(iImage >= iDisplayPowerupIndex)
@@ -2912,7 +2910,7 @@ void MI_BonusWheel::Draw()
     miContinueButton->Draw();
 
     if(iState == 1 && !fPressedSelect)
-        menu_font_large.drawCentered(320, iy + 390, "Press a Button To Stop The Wheel");
+        rm->menu_font_large.drawCentered(smw->ScreenWidth/2, iy + 390, "Press a Button To Stop The Wheel");
 }
 
 void MI_BonusWheel::Reset(bool fTournament)
@@ -2964,7 +2962,7 @@ void MI_BonusWheel::Reset(bool fTournament)
 
     short iPlayerX = ix + 160 - ((iNumPlayers - 1) * 17);
     for(short iPlayer = 0; iPlayer < iNumPlayers; iPlayer++) {
-        miPlayerImages[iPlayer] = new MI_Image(spr_player[game_values.teamids[iWinningTeam][iPlayer]][PGFX_JUMPING_R], iPlayerX, iy + 210, 0, 0, 32, 32, 1, 1, 0);
+        miPlayerImages[iPlayer] = new MI_Image(rm->spr_player[game_values.teamids[iWinningTeam][iPlayer]][PGFX_JUMPING_R], iPlayerX, iy + 210, 0, 0, 32, 32, 1, 1, 0);
         iPlayerX += 34;
     }
 
@@ -3229,12 +3227,12 @@ void MI_MapFilterScroll::Draw()
         return;
 
     //Draw the background for the map preview
-    menu_dialog.draw(ix, iy, 0, 0, iWidth - 16, iNumLines * 32 + 32);
-    menu_dialog.draw(ix + iWidth - 16, iy, 496, 0, 16, iNumLines * 32 + 32);
-    menu_dialog.draw(ix, iy + iNumLines * 32 + 32, 0, 464, iWidth - 16, 16);
-    menu_dialog.draw(ix + iWidth - 16, iy + iNumLines * 32 + 32, 496, 464, 16, 16);
+    rm->menu_dialog.draw(ix, iy, 0, 0, iWidth - 16, iNumLines * 32 + 32);
+    rm->menu_dialog.draw(ix + iWidth - 16, iy, 496, 0, 16, iNumLines * 32 + 32);
+    rm->menu_dialog.draw(ix, iy + iNumLines * 32 + 32, 0, 464, iWidth - 16, 16);
+    rm->menu_dialog.draw(ix + iWidth - 16, iy + iNumLines * 32 + 32, 496, 464, 16, 16);
 
-    menu_font_large.drawCentered(ix + (iWidth >> 1), iy + 5, "Map Filters");
+    rm->menu_font_large.drawCentered(ix + (iWidth >> 1), iy + 5, "Map Filters");
 
     //Draw each filter field
     for(short iLine = 0; iLine < iNumLines && (unsigned short)iLine < items.size(); iLine++) {
@@ -3245,7 +3243,7 @@ void MI_MapFilterScroll::Draw()
             spr->draw(ix + 16, iy + 32 + iLine * 32, 0, (iSelectedLine == iLine  && iSelectedColumn == 0 ? 32 : 0), iHalfLineWidth, 32);
             spr->draw(ix + 16 + iHalfLineWidth, iy + 32 + iLine * 32, 512 - iLineWidth + iHalfLineWidth, (iSelectedLine == iLine && iSelectedColumn == 0 ? 32 : 0), iLineWidth - iHalfLineWidth, 32);
 
-            menu_map_filter.draw(ix + iWidth - 48, iy + 32 + iLine * 32, 48, (iSelectedLine == iLine && iSelectedColumn == 1 ? 32 : 0), 32, 32);
+            rm->menu_map_filter.draw(ix + iWidth - 48, iy + 32 + iLine * 32, 48, (iSelectedLine == iLine && iSelectedColumn == 1 ? 32 : 0), 32, 32);
         } else {
             short iHalfLineWidth = (iWidth - 32) >> 1;
             short iLineWidth = iWidth - 32;
@@ -3254,10 +3252,10 @@ void MI_MapFilterScroll::Draw()
         }
 
         if(items[iOffset + iLine]->fSelected)
-            menu_map_filter.draw(ix + 24, iy + 32 + iLine * 32 + 4, 24, 0, 24, 24);
+            rm->menu_map_filter.draw(ix + 24, iy + 32 + iLine * 32 + 4, 24, 0, 24, 24);
 
-        menu_font_large.drawChopRight(ix + 52, iy + 5 + iLine * 32 + 32, iWidth - 104, items[iOffset + iLine]->sName.c_str());
-        spr_map_filter_icons.draw(ix + 28, iy + 32 + iLine * 32 + 8, items[iOffset + iLine]->iIcon % 10 * 16, items[iOffset + iLine]->iIcon / 10 * 16, 16, 16);
+        rm->menu_font_large.drawChopRight(ix + 52, iy + 5 + iLine * 32 + 32, iWidth - 104, items[iOffset + iLine]->sName.c_str());
+        rm->spr_map_filter_icons.draw(ix + 28, iy + 32 + iLine * 32 + 8, items[iOffset + iLine]->iIcon % 10 * 16, items[iOffset + iLine]->iIcon / 10 * 16, 16, 16);
     }
 }
 
@@ -3315,8 +3313,8 @@ MI_MapBrowser::MI_MapBrowser() :
 
     srcRectBackground.x = 0;
     srcRectBackground.y = 0;
-	srcRectBackground.w = smw->ScreenWidth;
-	srcRectBackground.h = smw->ScreenHeight;
+    srcRectBackground.w = smw->ScreenWidth;
+    srcRectBackground.h = smw->ScreenHeight;
 
     dstRectBackground.x = 0;
     dstRectBackground.y = 0;
@@ -3369,10 +3367,10 @@ void MI_MapBrowser::Draw()
 
                 if(iType == 0) {
                     if(mapListNodes[iRow * 3 + iCol]->pfFilters[game_values.selectedmapfilter])
-                        menu_map_filter.draw(rDst.x, rDst.y, iFilterTagAnimationFrame, 24, 24, 24);
+                        rm->menu_map_filter.draw(rDst.x, rDst.y, iFilterTagAnimationFrame, 24, 24, 24);
                 }
 
-                menu_font_large.drawChopRight(rDst.x, rDst.y + 120, 165, mapNames[iRow * 3 + iCol]);
+                rm->menu_font_large.drawChopRight(rDst.x, rDst.y + 120, 165, mapNames[iRow * 3 + iCol]);
             }
         }
     }
@@ -3381,19 +3379,19 @@ void MI_MapBrowser::Draw()
     rDst.y = iSelectedRow * 150 + 30;
     rDst.x = iSelectedCol * 200 + 40;
 
-    menu_dialog.draw(rDst.x - 16, rDst.y - 16, 0, 0, 176, 148);
-    menu_dialog.draw(rDst.x + 160, rDst.y - 16, 496, 0, 16, 148);
-    menu_dialog.draw(rDst.x - 16, rDst.y + 132, 0, 464, 176, 16);
-    menu_dialog.draw(rDst.x + 160, rDst.y + 132, 496, 464, 16, 16);
+    rm->menu_dialog.draw(rDst.x - 16, rDst.y - 16, 0, 0, 176, 148);
+    rm->menu_dialog.draw(rDst.x + 160, rDst.y - 16, 496, 0, 16, 148);
+    rm->menu_dialog.draw(rDst.x - 16, rDst.y + 132, 0, 464, 176, 16);
+    rm->menu_dialog.draw(rDst.x + 160, rDst.y + 132, 496, 464, 16, 16);
 
     SDL_BlitSurface(mapSurfaces[iSelectedRow * 3 + iSelectedCol], &rSrc, blitdest, &rDst);
 
     if(iType == 0) {
         if(mapListNodes[iSelectedRow * 3 + iSelectedCol]->pfFilters[game_values.selectedmapfilter])
-            menu_map_filter.draw(rDst.x, rDst.y, iFilterTagAnimationFrame, 24, 24, 24);
+            rm->menu_map_filter.draw(rDst.x, rDst.y, iFilterTagAnimationFrame, 24, 24, 24);
     }
 
-    menu_font_large.drawChopRight(rDst.x, rDst.y + 120, 165, mapNames[iSelectedRow * 3 + iSelectedCol]);
+    rm->menu_font_large.drawChopRight(rDst.x, rDst.y + 120, 165, mapNames[iSelectedRow * 3 + iSelectedCol]);
 }
 
 MenuCodeEnum MI_MapBrowser::Modify(bool modify)
@@ -3605,8 +3603,8 @@ MI_World::MI_World() :
 
     rectDstSurface.x = 0;
     rectDstSurface.y = 0;
-    rectDstSurface.w = 640;
-    rectDstSurface.h = 480;
+    rectDstSurface.w = smw->ScreenWidth;
+    rectDstSurface.h = smw->ScreenHeight;
 }
 
 MI_World::~MI_World()
@@ -3672,8 +3670,8 @@ void MI_World::Init()
     iPressSelectTimer = 0;
     pressSelectKeys = NULL;
 
-    iDrawWidth = g_worldmap.iWidth < 20 ? g_worldmap.iWidth << 5 : 640;
-    iDrawHeight = g_worldmap.iHeight < 15 ? g_worldmap.iHeight << 5 : 480;
+    iDrawWidth = g_worldmap.iWidth < 20 ? g_worldmap.iWidth << 5 : smw->ScreenWidth;
+    iDrawHeight = g_worldmap.iHeight < 15 ? g_worldmap.iHeight << 5 : smw->ScreenHeight;
 
     iSrcOffsetX = 0;
     iSrcOffsetY = 0;
@@ -3704,7 +3702,7 @@ void MI_World::DisplayTeamControlAnnouncement()
     else
         sprintf(szMessage, "Team %d Is In Control", iControllingTeam + 1);
 
-    uiMenu->AddEyeCandy(new EC_Announcement(&menu_font_large, &spr_announcementicons, szMessage, game_values.colorids[iControllingPlayerId], 120, 100));
+    uiMenu->AddEyeCandy(new EC_Announcement(&rm->menu_font_large, &rm->spr_announcementicons, szMessage, game_values.colorids[iControllingPlayerId], 120, 100));
 }
 
 void MI_World::SetCurrentStageToCompleted(short iWinningTeam)
@@ -3804,13 +3802,13 @@ void MI_World::Update()
         if(g_worldmap.iHeight > 15 && iMapOffsetY < 0 && iPlayerY < (g_worldmap.iHeight << 5) - (smw->ScreenHeight - (480 - 256)))
             iMapOffsetY += 2;
     } else if(iPlayerState == 2) { //down
-		if(g_worldmap.iHeight > 15 && iMapOffsetY > smw->ScreenHeight - (g_worldmap.iHeight << 5) && iPlayerY > (smw->ScreenHeight - (480 - 224)))
+        if(g_worldmap.iHeight > 15 && iMapOffsetY > smw->ScreenHeight - (g_worldmap.iHeight << 5) && iPlayerY > (smw->ScreenHeight - (480 - 224)))
             iMapOffsetY -= 2;
     } else if(iPlayerState == 3) { //left
-		if(g_worldmap.iWidth > 20 && iMapOffsetX < 0 && iPlayerX < (g_worldmap.iWidth << 5) - (smw->ScreenWidth - (640 - 336)))
+        if(g_worldmap.iWidth > 20 && iMapOffsetX < 0 && iPlayerX < (g_worldmap.iWidth << 5) - (smw->ScreenWidth - (640 - 336)))
             iMapOffsetX += 2;
     } else if(iPlayerState == 4) { //right
-		if(g_worldmap.iWidth > 20 && iMapOffsetX > smw->ScreenWidth - (g_worldmap.iWidth << 5) && iPlayerX > (smw->ScreenWidth - (640 - 304)))
+        if(g_worldmap.iWidth > 20 && iMapOffsetX > smw->ScreenWidth - (g_worldmap.iWidth << 5) && iPlayerX > (smw->ScreenWidth - (640 - 304)))
             iMapOffsetX -= 2;
     }
 
@@ -3940,9 +3938,9 @@ void MI_World::SetMapOffset()
         else if(iPlayerX <= 304)
             iMapOffsetX = 0;
         else
-            iMapOffsetX = 640 - (g_worldmap.iWidth << 5);
+            iMapOffsetX = smw->ScreenWidth - (g_worldmap.iWidth << 5);
     } else {
-        iMapOffsetX = (640 - (g_worldmap.iWidth << 5)) >> 1;
+        iMapOffsetX = (smw->ScreenWidth - (g_worldmap.iWidth << 5)) >> 1;
     }
 
     if(g_worldmap.iHeight > 15) {
@@ -3951,9 +3949,9 @@ void MI_World::SetMapOffset()
         else if(iPlayerY <= 224)
             iMapOffsetY = 0;
         else
-            iMapOffsetY = 480 - (g_worldmap.iHeight << 5);
+            iMapOffsetY = smw->ScreenHeight - (g_worldmap.iHeight << 5);
     } else {
-        iMapOffsetY = (480 - (g_worldmap.iHeight << 5)) >> 1;
+        iMapOffsetY = (smw->ScreenHeight - (g_worldmap.iHeight << 5)) >> 1;
     }
 }
 
@@ -4007,11 +4005,11 @@ void MI_World::Draw()
 
     //Draw the cloud if the player is one
     if(fUsingCloud && iState == -1)
-        spr_worlditems.draw(iPlayerX + iMapOffsetX, iPlayerY + iMapOffsetY, 32, 0, 32, 32);
+        rm->spr_worlditems.draw(iPlayerX + iMapOffsetX, iPlayerY + iMapOffsetY, 32, 0, 32, 32);
 
     //If a points modifier is in place, display it
     if(game_values.worldpointsbonus >= 0) {
-        spr_worlditems.draw(603, 5, (game_values.worldpointsbonus + 9) << 5, 0, 32, 32);
+        rm->spr_worlditems.draw(603, 5, (game_values.worldpointsbonus + 9) << 5, 0, 32, 32);
     }
 
     //Draw the teleport/warp stars effect
@@ -4021,7 +4019,7 @@ void MI_World::Draw()
             short iStarX = (short)(dTeleportStarRadius * cos(dAngle));
             short iStarY = (short)(dTeleportStarRadius * sin(dAngle));
 
-            spr_teleportstar.draw(iStarX + iPlayerX + iMapOffsetX, iStarY + iPlayerY + iMapOffsetY, iTeleportStarAnimationFrame, 0, 32, 32);
+            rm->spr_teleportstar.draw(iStarX + iPlayerX + iMapOffsetX, iStarY + iPlayerY + iMapOffsetY, iTeleportStarAnimationFrame, 0, 32, 32);
         }
     }
 
@@ -4038,9 +4036,9 @@ void MI_World::Draw()
             for(short iMemberStore = 0; iMemberStore < game_values.teamcounts[iTeamStore]; iMemberStore++) {
                 short iPlayerId = game_values.teamids[iTeamStore][iMemberStore];
 
-                spr_worlditempopup.draw(iStoredPowerupBoxX, iStoredItemPopupDrawY, game_values.colorids[iPlayerId] * 48, 256, 48, 48);
+                rm->spr_worlditempopup.draw(iStoredPowerupBoxX, iStoredItemPopupDrawY, game_values.colorids[iPlayerId] * 48, 256, 48, 48);
 
-                spr_storedpoweruplarge.draw(iStoredPowerupBoxX + 8, iStoredItemPopupDrawY + 8, game_values.storedpowerups[iPlayerId] << 5, 0, 32, 32);
+                rm->spr_storedpoweruplarge.draw(iStoredPowerupBoxX + 8, iStoredItemPopupDrawY + 8, game_values.storedpowerups[iPlayerId] << 5, 0, 32, 32);
 
                 iStoredPowerupBoxX += 96;
             }
@@ -4049,22 +4047,22 @@ void MI_World::Draw()
         for(short iTeam = 0; iTeam < 4; iTeam++) {
             if(iStateTransition[iTeam] != 0) {
                 short iColorId = game_values.colorids[game_values.teamids[iTeam][0]];
-                spr_worlditempopup.draw(0, 448 - iItemPopupDrawY[iTeam] - iPopupOffsetsCurrent[iTeam], 0, iColorId * 64 + 32 - iItemPopupDrawY[iTeam], 320, iItemPopupDrawY[iTeam] << 1);
-                spr_worlditempopup.draw(320, 448 - iItemPopupDrawY[iTeam] - iPopupOffsetsCurrent[iTeam], 192, iColorId * 64 + 32 - iItemPopupDrawY[iTeam], 320, iItemPopupDrawY[iTeam] << 1);
+                rm->spr_worlditempopup.draw(0, 448 - iItemPopupDrawY[iTeam] - iPopupOffsetsCurrent[iTeam], 0, iColorId * 64 + 32 - iItemPopupDrawY[iTeam], 320, iItemPopupDrawY[iTeam] << 1);
+                rm->spr_worlditempopup.draw(320, 448 - iItemPopupDrawY[iTeam] - iPopupOffsetsCurrent[iTeam], 192, iColorId * 64 + 32 - iItemPopupDrawY[iTeam], 320, iItemPopupDrawY[iTeam] << 1);
 
                 if(iStateTransition[iTeam] == 3) {
                     short iNumPowerups = game_values.worldpowerupcount[iTeam];
 
                     if(iNumPowerups > 0)
-                        spr_worlditempopup.draw(iItemCol[iTeam] * 52 + 114, 424 - iPopupOffsetsCurrent[iTeam], iColorId * 48, 256, 48, 48);
+                        rm->spr_worlditempopup.draw(iItemCol[iTeam] * 52 + 114, 424 - iPopupOffsetsCurrent[iTeam], iColorId * 48, 256, 48, 48);
 
                     short iStartItem = iItemPage[iTeam] << 3;
                     for(short iItem = iStartItem; iItem < iStartItem + 8 && iItem < iNumPowerups; iItem++) {
                         short iPowerup = game_values.worldpowerups[iTeam][iItem];
                         if(iPowerup >= NUM_POWERUPS)
-                            spr_worlditems.draw((iItem - iItemPage[iTeam] * 8) * 52 + 122, 432 - iPopupOffsetsCurrent[iTeam], (iPowerup - NUM_POWERUPS) << 5, 0, 32, 32);
+                            rm->spr_worlditems.draw((iItem - iItemPage[iTeam] * 8) * 52 + 122, 432 - iPopupOffsetsCurrent[iTeam], (iPowerup - NUM_POWERUPS) << 5, 0, 32, 32);
                         else
-                            spr_storedpoweruplarge.draw((iItem - iItemPage[iTeam] * 8) * 52 + 122, 432 - iPopupOffsetsCurrent[iTeam], iPowerup << 5, 0, 32, 32);
+                            rm->spr_storedpoweruplarge.draw((iItem - iItemPage[iTeam] * 8) * 52 + 122, 432 - iPopupOffsetsCurrent[iTeam], iPowerup << 5, 0, 32, 32);
                     }
                 }
             }
@@ -4072,8 +4070,8 @@ void MI_World::Draw()
     }
 
     if(iState == 4 || iState == 5) {
-        menu_shade.setalpha((Uint8)iScreenfade);
-        menu_shade.draw(0, 0);
+        rm->menu_shade.setalpha((Uint8)iScreenfade);
+        rm->menu_shade.draw(0, 0);
     }
 }
 
@@ -4492,7 +4490,7 @@ bool MI_World::UsePowerup(short iPlayer, short iTeam, short iIndex, bool fPopupI
             g_worldmap.UpdateTile(sMapSurface[0], iDestX - iMapDrawOffsetCol, iDestY - iMapDrawOffsetRow, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
             g_worldmap.UpdateTile(sMapSurface[1], iDestX - iMapDrawOffsetCol, iDestY - iMapDrawOffsetRow, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
 
-            uiMenu->AddEyeCandy(new EC_SingleAnimation(&spr_poof, (iDestX << 5) + iMapOffsetX - 8, (iDestY << 5) + iMapOffsetY - 8, 4, 5));
+            uiMenu->AddEyeCandy(new EC_SingleAnimation(&rm->spr_poof, (iDestX << 5) + iMapOffsetX - 8, (iDestY << 5) + iMapOffsetY - 8, 4, 5));
 
             fUsedItem = true;
             ifsoundonplay(sfx_transform);
@@ -4507,28 +4505,28 @@ bool MI_World::UsePowerup(short iPlayer, short iTeam, short iIndex, bool fPopupI
             short iPlayerY = (iPlayerCurrentTileY << 5) + iMapOffsetY;
 
             if(iDoorsOpened & 0x1) {
-                uiMenu->AddEyeCandy(new EC_SingleAnimation(&spr_fireballexplosion, iPlayerX - TILESIZE, iPlayerY, 3, 8));
+                uiMenu->AddEyeCandy(new EC_SingleAnimation(&rm->spr_fireballexplosion, iPlayerX - TILESIZE, iPlayerY, 3, 8));
 
                 g_worldmap.UpdateTile(sMapSurface[0], iPlayerCurrentTileX - iMapDrawOffsetCol - 1, iPlayerCurrentTileY - iMapDrawOffsetRow, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
                 g_worldmap.UpdateTile(sMapSurface[1], iPlayerCurrentTileX - iMapDrawOffsetCol - 1, iPlayerCurrentTileY - iMapDrawOffsetRow, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
             }
 
             if(iDoorsOpened & 0x2) {
-                uiMenu->AddEyeCandy(new EC_SingleAnimation(&spr_fireballexplosion, iPlayerX + TILESIZE, iPlayerY, 3, 8));
+                uiMenu->AddEyeCandy(new EC_SingleAnimation(&rm->spr_fireballexplosion, iPlayerX + TILESIZE, iPlayerY, 3, 8));
 
                 g_worldmap.UpdateTile(sMapSurface[0], iPlayerCurrentTileX - iMapDrawOffsetCol + 1, iPlayerCurrentTileY - iMapDrawOffsetRow, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
                 g_worldmap.UpdateTile(sMapSurface[1], iPlayerCurrentTileX - iMapDrawOffsetCol + 1, iPlayerCurrentTileY - iMapDrawOffsetRow, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
             }
 
             if(iDoorsOpened & 0x4) {
-                uiMenu->AddEyeCandy(new EC_SingleAnimation(&spr_fireballexplosion, iPlayerX, iPlayerY - TILESIZE, 3, 8));
+                uiMenu->AddEyeCandy(new EC_SingleAnimation(&rm->spr_fireballexplosion, iPlayerX, iPlayerY - TILESIZE, 3, 8));
 
                 g_worldmap.UpdateTile(sMapSurface[0], iPlayerCurrentTileX - iMapDrawOffsetCol, iPlayerCurrentTileY - iMapDrawOffsetRow - 1, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
                 g_worldmap.UpdateTile(sMapSurface[1], iPlayerCurrentTileX - iMapDrawOffsetCol, iPlayerCurrentTileY - iMapDrawOffsetRow - 1, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
             }
 
             if(iDoorsOpened & 0x8) {
-                uiMenu->AddEyeCandy(new EC_SingleAnimation(&spr_fireballexplosion, iPlayerX, iPlayerY + TILESIZE, 3, 8));
+                uiMenu->AddEyeCandy(new EC_SingleAnimation(&rm->spr_fireballexplosion, iPlayerX, iPlayerY + TILESIZE, 3, 8));
 
                 g_worldmap.UpdateTile(sMapSurface[0], iPlayerCurrentTileX - iMapDrawOffsetCol, iPlayerCurrentTileY - iMapDrawOffsetRow + 1, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
                 g_worldmap.UpdateTile(sMapSurface[1], iPlayerCurrentTileX - iMapDrawOffsetCol, iPlayerCurrentTileY - iMapDrawOffsetRow + 1, iMapDrawOffsetCol, iMapDrawOffsetRow, iAnimationFrame);
@@ -4591,5 +4589,5 @@ void MI_World::UseCloud(bool fUseCloud)
 
     short iPlayerX, iPlayerY;
     g_worldmap.GetPlayerPosition(&iPlayerX, &iPlayerY);
-    uiMenu->AddEyeCandy(new EC_SingleAnimation(&spr_poof, iPlayerX + iMapOffsetX - 8, iPlayerY + iMapOffsetY - 8, 4, 5));
+    uiMenu->AddEyeCandy(new EC_SingleAnimation(&rm->spr_poof, iPlayerX + iMapOffsetX - 8, iPlayerY + iMapOffsetY - 8, 4, 5));
 }

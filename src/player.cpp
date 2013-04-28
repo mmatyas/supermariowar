@@ -396,7 +396,7 @@ void CPlayer::move()
     					if(block->getBlockType() == block_powerup)
     					{
     						block->dead = true;
-    						B_ViewBlock * viewBlock = new B_ViewBlock(&spr_viewblock, block->col << 5, block->row << 5);
+    						B_ViewBlock * viewBlock = new B_ViewBlock(&rm->spr_viewblock, block->col << 5, block->row << 5);
 
     						if(block->state != 0)
     						{
@@ -424,7 +424,7 @@ void CPlayer::move()
     		if (secret_spring_index == 9)
     		{
     			ifsoundonplay(sfx_transform);
-    			objectcontainer[1].add(new CO_Spring(&spr_spring));
+    			objectcontainer[1].add(new CO_Spring(&rm->spr_spring));
     		}
     	}
 
@@ -440,7 +440,7 @@ void CPlayer::move()
     		if (secret_spike_index == 6)
     		{
     			ifsoundonplay(sfx_transform);
-    			objectcontainer[1].add(new CO_Spike(&spr_spike));
+    			objectcontainer[1].add(new CO_Spike(&rm->spr_spike));
     		}
     	}
     }
@@ -488,10 +488,10 @@ void CPlayer::move()
         }
 
         if (iKuriboShoeExitIndex == 4 && iKuriboShoeExitTimer < 32) {
-            CO_KuriboShoe * shoe = new CO_KuriboShoe(&spr_kuriboshoe, ix - PWOFFSET, iy - PHOFFSET - 2, iKuriboShoe == 2);
+            CO_KuriboShoe * shoe = new CO_KuriboShoe(&rm->spr_kuriboshoe, ix - PWOFFSET, iy - PHOFFSET - 2, iKuriboShoe == 2);
             shoe->collision_detection_checksides();
             objectcontainer[1].add(shoe);
-            eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
+            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
 
             iKuriboShoeExitIndex = 0;
             iKuriboShoeExitTimer = 0;
@@ -544,7 +544,7 @@ void CPlayer::move()
             statue_timer = 123;
 
             // perform tansformation effects
-            eyecandy[2].add(new EC_SingleAnimation(&spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
+            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
             ifsoundonplay(sfx_transform);
 
             // Neutralize lateral velocity
@@ -593,7 +593,7 @@ void CPlayer::move()
                     vely = -8.0;
 
                 // perform transformation effects
-                eyecandy[2].add(new EC_SingleAnimation(&spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
+                eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
                 ifsoundonplay(sfx_transform);
 
                 //Decrease the amount of tanooki uses, if feature is turned on
@@ -639,7 +639,7 @@ void CPlayer::move()
         //If they were super stomping and they are not in the air anymore (i.e. on the ground), then create the
         //super stomp attack zone, play the sound and show the stomp gfx
         if(fSuperStomp) {
-            eyecandy[2].add(new EC_SuperStompExplosion(&spr_superstomp, ix + HALFPW, iy + PH, 4));
+            eyecandy[2].add(new EC_SuperStompExplosion(&rm->spr_superstomp, ix + HALFPW, iy + PH, 4));
             ifsoundonplay(sfx_bobombsound);
             fSuperStomp = false;
 
@@ -719,9 +719,9 @@ void CPlayer::move()
                     state = player_spawning;
 
                     if(game_values.spawnstyle == 0) {
-                        eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
+                        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
                     } else if(game_values.spawnstyle == 1) {
-                        eyecandy[0].add(new EC_Door(&spr_spawndoor, sprites[spr], ix + HALFPW - 16, iy + HALFPH - 16, 1, iSrcOffsetX, colorID));
+                        eyecandy[0].add(new EC_Door(&rm->spr_spawndoor, sprites[spr], ix + HALFPW - 16, iy + HALFPH - 16, 1, iSrcOffsetX, colorID));
                     }
                 }
             }
@@ -748,7 +748,7 @@ void CPlayer::move()
                     short iColorIdOffset = colorID << 5;
 
                     for(short iSwirl = 0; iSwirl < 4; iSwirl++)
-                        eyecandy[2].add(new EC_SingleAnimation(&spr_spawnsmoke, ixoffset + g_iSwirlSpawnLocations[iSwirl][0][swirlindex], iyoffset + g_iSwirlSpawnLocations[iSwirl][1][swirlindex], 4, 4, 0, iColorIdOffset, 32, 32));
+                        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_spawnsmoke, ixoffset + g_iSwirlSpawnLocations[iSwirl][0][swirlindex], iyoffset + g_iSwirlSpawnLocations[iSwirl][1][swirlindex], 4, 4, 0, iColorIdOffset, 32, 32));
                 }
             }
         } else if(iswarping()) {
@@ -912,7 +912,7 @@ void CPlayer::move()
             case 22: { //golden podobo
                 short numPodobos = rand() % 6 + 10;
                 for(short iPodobo = 0; iPodobo < numPodobos; iPodobo++) {
-                    objectcontainer[2].add(new MO_Podobo(&spr_podobo, (short)GetRandMax(smw->ScreenWidth - (640 - 608)), smw->ScreenHeight, -(float(GetRandMax(9)) / 2.0f) - 9.0f, globalID, teamID, colorID, false));
+                    objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, (short)GetRandMax(smw->ScreenWidth - (640 - 608)), smw->ScreenHeight, -(float(GetRandMax(9)) / 2.0f) - 9.0f, globalID, teamID, colorID, false));
                 }
                 ifsoundonplay(sfx_thunder);
                 break;
@@ -937,7 +937,7 @@ void CPlayer::move()
                     jailtimer = 0;
                     jail = -1;
 
-                    eyecandy[2].add(new EC_SingleAnimation(&spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
+                    eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
                     ifsoundonplay(sfx_transform);
                 } else {
                     ifsoundonplay(sfx_hit);
@@ -983,7 +983,7 @@ void CPlayer::move()
             shield = game_values.shieldstyle > 0 ? game_values.shieldstyle : 1;
             shieldtimer = 60;
 
-            eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
+            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
         }
     }
 
@@ -1319,7 +1319,7 @@ void CPlayer::move()
                 //If rain candy is tyrned on
                 if((g_map->eyecandy[0] & 32 || g_map->eyecandy[1] & 32 || g_map->eyecandy[2] & 32) && velx > VELMOVINGADD && ++rainsteptimer > 7) {
                     rainsteptimer = 0;
-                    eyecandy[1].add(new EC_SingleAnimation(&spr_frictionsmoke, ix, iy + PH - 14, 5, 3, 0, 16, 16, 16));
+                    eyecandy[1].add(new EC_SingleAnimation(&rm->spr_frictionsmoke, ix, iy + PH - 14, 5, 3, 0, 16, 16, 16));
                 }
             }
         } else if(lrn == -1) {
@@ -1361,7 +1361,7 @@ void CPlayer::move()
 
                 if((g_map->eyecandy[0] & 32 || g_map->eyecandy[1] & 32 || g_map->eyecandy[2] & 32) && velx < -VELMOVINGADD && ++rainsteptimer > 7) {
                     rainsteptimer = 0;
-                    eyecandy[1].add(new EC_SingleAnimation(&spr_frictionsmoke, ix, iy + PH - 14, 5, 3, 0, 16, 16, 16));
+                    eyecandy[1].add(new EC_SingleAnimation(&rm->spr_frictionsmoke, ix, iy + PH - 14, 5, 3, 0, 16, 16, 16));
                 }
             }
         } else {
@@ -1427,7 +1427,7 @@ void CPlayer::move()
                         if(player_kill_nonkill != KillPlayerMapHazard(true, kill_style_environment, false))
                             return;
                     } else {
-                        eyecandy[0].add(new EC_SingleAnimation(&spr_burnup, ix + HALFPW - 16, iy + HALFPH - 16, 5, 4));
+                        eyecandy[0].add(new EC_SingleAnimation(&rm->spr_burnup, ix + HALFPW - 16, iy + HALFPH - 16, 5, 4));
                     }
                 }
             }
@@ -1470,7 +1470,7 @@ void CPlayer::move()
             if(--jailtimer <= 0) {
                 jailtimer = 0;
                 jail = -1;
-                eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
+                eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
                 ifsoundonplay(sfx_transform);
             }
         }
@@ -1483,10 +1483,10 @@ void CPlayer::CommitAction()
 {
     if(player_action_bobomb == action) {
         bobomb = false;
-        objectcontainer[2].add(new MO_Explosion(&spr_explosion, ix + HALFPW - 96, iy + HALFPH - 64, 2, 4, globalID, teamID, kill_style_bobomb));
+        objectcontainer[2].add(new MO_Explosion(&rm->spr_explosion, ix + HALFPW - 96, iy + HALFPH - 64, 2, 4, globalID, teamID, kill_style_bobomb));
         ifsoundonplay(sfx_bobombsound);
     } else if(player_action_fireball == action) {
-        objectcontainer[0].add(new MO_Fireball(&spr_fireball, ix + 6, iy, 4, IsPlayerFacingRight(), 5, globalID, teamID, colorID));
+        objectcontainer[0].add(new MO_Fireball(&rm->spr_fireball, ix + 6, iy, 4, IsPlayerFacingRight(), 5, globalID, teamID, colorID));
         ifsoundonplay(sfx_fireball);
 
         projectiles[globalID]++;
@@ -1495,9 +1495,9 @@ void CPlayer::CommitAction()
             DecreaseProjectileLimit();
     } else if(player_action_hammer == action) {
         if(IsPlayerFacingRight())
-            objectcontainer[2].add(new MO_Hammer(&spr_hammer, ix + 8, iy, 6, (game_values.reversewalk ? -velx : velx) + 2.0f, -HAMMERTHROW, 5, globalID, teamID, colorID, false));
+            objectcontainer[2].add(new MO_Hammer(&rm->spr_hammer, ix + 8, iy, 6, (game_values.reversewalk ? -velx : velx) + 2.0f, -HAMMERTHROW, 5, globalID, teamID, colorID, false));
         else
-            objectcontainer[2].add(new MO_Hammer(&spr_hammer, ix - 14, iy, 6, (game_values.reversewalk ? -velx : velx) - 2.0f, -HAMMERTHROW, 5, globalID, teamID, colorID, false));
+            objectcontainer[2].add(new MO_Hammer(&rm->spr_hammer, ix - 14, iy, 6, (game_values.reversewalk ? -velx : velx) - 2.0f, -HAMMERTHROW, 5, globalID, teamID, colorID, false));
 
         projectiles[globalID]++;
 
@@ -1507,16 +1507,16 @@ void CPlayer::CommitAction()
         if(game_values.hammerlimit > 0)
             DecreaseProjectileLimit();
     } else if(player_action_boomerang == action) {
-        objectcontainer[2].add(new MO_Boomerang(&spr_boomerang, ix, iy + HALFPH - 16, 4, IsPlayerFacingRight(), 5, globalID, teamID, colorID));
+        objectcontainer[2].add(new MO_Boomerang(&rm->spr_boomerang, ix, iy + HALFPH - 16, 4, IsPlayerFacingRight(), 5, globalID, teamID, colorID));
         projectiles[globalID]++;
 
         if(game_values.boomeranglimit > 0)
             DecreaseProjectileLimit();
     } else if(player_action_iceblast == action) {
         if(IsPlayerFacingRight())
-            objectcontainer[2].add(new MO_IceBlast(&spr_iceblast, ix + HALFPW - 2, iy + HALFPH - 16, 5.0f, globalID, teamID, colorID));
+            objectcontainer[2].add(new MO_IceBlast(&rm->spr_iceblast, ix + HALFPW - 2, iy + HALFPH - 16, 5.0f, globalID, teamID, colorID));
         else
-            objectcontainer[2].add(new MO_IceBlast(&spr_iceblast, ix + HALFPW - 30, iy + HALFPH - 16, -5.0f, globalID, teamID, colorID));
+            objectcontainer[2].add(new MO_IceBlast(&rm->spr_iceblast, ix + HALFPW - 30, iy + HALFPH - 16, -5.0f, globalID, teamID, colorID));
 
         projectiles[globalID]++;
 
@@ -1525,7 +1525,7 @@ void CPlayer::CommitAction()
         if(game_values.wandlimit > 0)
             DecreaseProjectileLimit();
     } else if(player_action_bomb == action) {
-        CO_Bomb * bomb = new CO_Bomb(&spr_bomb, ix + HALFPW - 14, iy - 8, IsPlayerFacingRight() ? 3.0f : -3.0f, -3.0f, 4, globalID, teamID, colorID, rand() % 120 + 120);
+        CO_Bomb * bomb = new CO_Bomb(&rm->spr_bomb, ix + HALFPW - 14, iy - 8, IsPlayerFacingRight() ? 3.0f : -3.0f, -3.0f, 4, globalID, teamID, colorID, rand() % 120 + 120);
 
         if(AcceptItem(bomb)) {
             bomb->owner = this;
@@ -1606,7 +1606,7 @@ void CPlayer::SetSprite()
 
                     if(++frictionslidetimer > 3) {
                         frictionslidetimer = 0;
-                        eyecandy[1].add(new EC_SingleAnimation(&spr_frictionsmoke, ix, iy + PH - 12, 4, 4, 0, 0, 16, 16));
+                        eyecandy[1].add(new EC_SingleAnimation(&rm->spr_frictionsmoke, ix, iy + PH - 12, 4, 4, 0, 0, 16, 16));
                     }
                 } else {
                     if(onice && !playerKeys->game_right.fDown && !playerKeys->game_left.fDown)
@@ -1645,7 +1645,7 @@ void CPlayer::SetSprite()
 
                     if(++frictionslidetimer > 3) {
                         frictionslidetimer = 0;
-                        eyecandy[1].add(new EC_SingleAnimation(&spr_frictionsmoke, ix + PW - 16, iy + PH - 12, 4, 4, 0, 0, 16, 16));
+                        eyecandy[1].add(new EC_SingleAnimation(&rm->spr_frictionsmoke, ix + PW - 16, iy + PH - 12, 4, 4, 0, 0, 16, 16));
                     }
                 } else {
                     if(onice && !playerKeys->game_right.fDown && !playerKeys->game_left.fDown)
@@ -1870,18 +1870,18 @@ void CPlayer::die(short deathStyle, bool fTeamRemoved, bool fKillCarriedItem)
 
         //If the player was a bobomb or chicken, make sure their death sprite matches
         if(diedas == 1 || game_values.gamemode->chicken == this)
-            corpseSprite = spr_chocobo[colorID][iDeathSprite];
+            corpseSprite = rm->spr_chocobo[colorID][iDeathSprite];
         else if(diedas == 2 || bobomb)
-            corpseSprite = spr_bobomb[colorID][iDeathSprite];
+            corpseSprite = rm->spr_bobomb[colorID][iDeathSprite];
         else if(diedas == 3 || shyguy)
-            corpseSprite = spr_shyguy[colorID][iDeathSprite];
+            corpseSprite = rm->spr_shyguy[colorID][iDeathSprite];
 
         //Add eyecandy for the dead player
         if(deathStyle == death_style_shatter || frozen) {
-            eyecandy[2].add(new EC_FallingObject(&spr_brokeniceblock, ix + HALFPW - 16, iy + HALFPH - 16, -1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
-            eyecandy[2].add(new EC_FallingObject(&spr_brokeniceblock, ix + HALFPW, iy + HALFPH - 16, 1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
-            eyecandy[2].add(new EC_FallingObject(&spr_brokeniceblock, ix + HALFPW - 16, iy + HALFPH, -1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
-            eyecandy[2].add(new EC_FallingObject(&spr_brokeniceblock, ix + HALFPW, iy + HALFPH, 1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
+            eyecandy[2].add(new EC_FallingObject(&rm->spr_brokeniceblock, ix + HALFPW - 16, iy + HALFPH - 16, -1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
+            eyecandy[2].add(new EC_FallingObject(&rm->spr_brokeniceblock, ix + HALFPW, iy + HALFPH - 16, 1.5f, -7.0f, 4, 2, 0, 0, 16, 16));
+            eyecandy[2].add(new EC_FallingObject(&rm->spr_brokeniceblock, ix + HALFPW - 16, iy + HALFPH, -1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
+            eyecandy[2].add(new EC_FallingObject(&rm->spr_brokeniceblock, ix + HALFPW, iy + HALFPH, 1.5f, -4.0f, 4, 2, 0, 0, 16, 16));
 
             game_values.unlocksecret2part2++;
         } else if(deathStyle == death_style_jump) {
@@ -1903,7 +1903,7 @@ void CPlayer::die(short deathStyle, bool fTeamRemoved, bool fKillCarriedItem)
 
     //Drop a shoe item if the player died in one
     if(iKuriboShoe > 0) {
-        CO_KuriboShoe * shoe = new CO_KuriboShoe(&spr_kuriboshoe, ix - PWOFFSET, iy - PHOFFSET, iKuriboShoe == 2);
+        CO_KuriboShoe * shoe = new CO_KuriboShoe(&rm->spr_kuriboshoe, ix - PWOFFSET, iy - PHOFFSET, iKuriboShoe == 2);
         shoe->collision_detection_checksides();
 
         objectcontainer[1].add(shoe);
@@ -2084,7 +2084,7 @@ bool CPlayer::FindSpawnPoint()
 void CPlayer::spawnText(const char * szText)
 {
     if(++spawntext >= 20) {
-        eyecandy[2].add(new EC_GravText(&game_font_large, ix + HALFPW, iy, szText, -VELJUMP));
+        eyecandy[2].add(new EC_GravText(&rm->game_font_large, ix + HALFPW, iy, szText, -VELJUMP));
         spawntext = 0;	//spawn text every 20 frames
     }
 }
@@ -2176,7 +2176,7 @@ void CPlayer::explodeawards()
         float awardvelx = 7.0f * cosangle;
         float awardvely = 7.0f * sinangle;
 
-        eyecandy[2].add(new EC_ExplodingAward(&spr_awardsolid, awardx, awardy, awardvelx, awardvely, 30, awards[k]));
+        eyecandy[2].add(new EC_ExplodingAward(&rm->spr_awardsolid, awardx, awardy, awardvelx, awardvely, 30, awards[k]));
     }
 }
 
@@ -2194,9 +2194,9 @@ void CPlayer::addswirlingawards()
         float angle = (float)k * addangle + awardangle;
 
         if(numawards == MAXAWARDS)
-            eyecandy[2].add(new EC_SwirlingAward(&spr_awardkillsinrow, ix + HALFPW - 8, iy + HALFPH - 8, angle, 30.0f, 0.05f, 60, 10, colorID, 16, 16, 4, 4));
+            eyecandy[2].add(new EC_SwirlingAward(&rm->spr_awardkillsinrow, ix + HALFPW - 8, iy + HALFPH - 8, angle, 30.0f, 0.05f, 60, 10, colorID, 16, 16, 4, 4));
         else
-            eyecandy[2].add(new EC_SwirlingAward(&spr_awardkillsinrow, ix + HALFPW - 8, iy + HALFPH - 8, angle, 30.0f, 0.05f, 60, numawards - 1, colorID, 16, 16));
+            eyecandy[2].add(new EC_SwirlingAward(&rm->spr_awardkillsinrow, ix + HALFPW - 8, iy + HALFPH - 8, angle, 30.0f, 0.05f, 60, numawards - 1, colorID, 16, 16));
     }
 }
 
@@ -2218,9 +2218,9 @@ void CPlayer::addrocketawards()
         float awardvely = 9.0f * sin(angle);
 
         if(numawards == MAXAWARDS)
-            eyecandy[2].add(new EC_RocketAward(&spr_awardkillsinrow, ix + HALFPW - 8, iy + HALFPH - 8, awardvelx, awardvely, 80, 10, colorID, 16, 16, 4, 4));
+            eyecandy[2].add(new EC_RocketAward(&rm->spr_awardkillsinrow, ix + HALFPW - 8, iy + HALFPH - 8, awardvelx, awardvely, 80, 10, colorID, 16, 16, 4, 4));
         else
-            eyecandy[2].add(new EC_RocketAward(&spr_awardkillsinrow, ix + HALFPW - 8, iy + HALFPH - 8, awardvelx, awardvely, 80, numawards - 1, colorID, 16, 16));
+            eyecandy[2].add(new EC_RocketAward(&rm->spr_awardkillsinrow, ix + HALFPW - 8, iy + HALFPH - 8, awardvelx, awardvely, 80, numawards - 1, colorID, 16, 16));
     }
 }
 
@@ -2229,7 +2229,7 @@ void CPlayer::DeathAwards()
     if(game_values.awardstyle == award_style_halo)
         explodeawards();
     else if(game_values.awardstyle == award_style_souls && killsinrow >= MINAWARDSNEEDED)
-        eyecandy[2].add(new EC_SoulsAward(&spr_awardsouls, &spr_awardsoulspawn, ix + HALFPW, iy + HALFPH, 60, 9.0f, killsinrow, awards));
+        eyecandy[2].add(new EC_SoulsAward(&rm->spr_awardsouls, &rm->spr_awardsoulspawn, ix + HALFPW, iy + HALFPH, 60, 9.0f, killsinrow, awards));
 
     killsinrow = 0;
     killsinrowinair = 0;
@@ -2243,7 +2243,7 @@ void CPlayer::AddKillsInRowInAirAward()
         float awardvelx = vel * cos(angle);
         float awardvely = vel * sin(angle);
 
-        eyecandy[2].add(new EC_FallingObject(&spr_bonus, ix + HALFPW - 8, iy + HALFPH - 8, awardvelx, awardvely, 4, 2, 0, colorID * 16, 16, 16));
+        eyecandy[2].add(new EC_FallingObject(&rm->spr_bonus, ix + HALFPW - 8, iy + HALFPH - 8, awardvelx, awardvely, 4, 2, 0, colorID * 16, 16, 16));
         angle -= (float)PI / 14;
     }
 
@@ -2332,7 +2332,7 @@ void AddAwardKill(CPlayer * killer, CPlayer * killed, killstyle style)
     	{
     		if(!game_values.gamemode->gameover && game_values.bosspeeking == -1)
     		{
-    			eyecandy[2].add(new EC_BossPeeker(&spr_sledgebrothers, rand()%90 + 90, 2));
+    			eyecandy[2].add(new EC_BossPeeker(&rm->spr_sledgebrothers, rand()%90 + 90, 2));
 
     			backgroundmusic[0].stop();
     			ifsoundonstop(sfx_invinciblemusic);
@@ -2432,13 +2432,13 @@ void collisionhandler_p2p(CPlayer * o1, CPlayer * o2)
         //Free teammates that are jailed
         if(game_values.gamemode->gamemode == game_mode_jail && game_values.gamemodesettings.jail.tagfree) {
             if(o1->jailtimer > 0) {
-                eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, o1->ix + HALFPW - 16, o1->iy + HALFPH - 16, 3, 8));
+                eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, o1->ix + HALFPW - 16, o1->iy + HALFPH - 16, 3, 8));
                 ifsoundonplay(sfx_transform);
                 o1->jailtimer = 0;
             }
 
             if(o2->jailtimer > 0) {
-                eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, o2->ix + HALFPW - 16, o2->iy + HALFPH - 16, 3, 8));
+                eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, o2->ix + HALFPW - 16, o2->iy + HALFPH - 16, 3, 8));
                 ifsoundonplay(sfx_transform);
                 o2->jailtimer = 0;
             }
@@ -2657,15 +2657,15 @@ void TransferTag(CPlayer * o1, CPlayer * o2)
         game_values.gamemode->tagged = o2;
         o1->shield = game_values.shieldstyle > 0 ? game_values.shieldstyle : 1;
         o1->shieldtimer = 60;
-        eyecandy[2].add(new EC_GravText(&game_font_large, game_values.gamemode->tagged->ix + HALFPW, game_values.gamemode->tagged->iy + PH, "Tagged!", -VELJUMP*1.5));
-        eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, game_values.gamemode->tagged->ix + HALFPW - 16, game_values.gamemode->tagged->iy + HALFPH - 16, 3, 8));
+        eyecandy[2].add(new EC_GravText(&rm->game_font_large, game_values.gamemode->tagged->ix + HALFPW, game_values.gamemode->tagged->iy + PH, "Tagged!", -VELJUMP*1.5));
+        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, game_values.gamemode->tagged->ix + HALFPW - 16, game_values.gamemode->tagged->iy + HALFPH - 16, 3, 8));
         ifsoundonplay(sfx_transform);
     } else if(game_values.gamemode->tagged == o2 && o1->shield == 0 && !o1->invincible) {
         game_values.gamemode->tagged = o1;
         o2->shield = game_values.shieldstyle > 0 ? game_values.shieldstyle : 1;
         o2->shieldtimer = 60;
-        eyecandy[2].add(new EC_GravText(&game_font_large, game_values.gamemode->tagged->ix + HALFPW, game_values.gamemode->tagged->iy + PH, "Tagged!", -VELJUMP*1.5));
-        eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, game_values.gamemode->tagged->ix + HALFPW - 16, game_values.gamemode->tagged->iy + HALFPH - 16, 3, 8));
+        eyecandy[2].add(new EC_GravText(&rm->game_font_large, game_values.gamemode->tagged->ix + HALFPW, game_values.gamemode->tagged->iy + PH, "Tagged!", -VELJUMP*1.5));
+        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, game_values.gamemode->tagged->ix + HALFPW - 16, game_values.gamemode->tagged->iy + HALFPH - 16, 3, 8));
         ifsoundonplay(sfx_transform);
     }
 }
@@ -2727,11 +2727,11 @@ void CPlayer::draw()
     if (statue_timer) {
         //Make sure the scoreboard still accurately represents the player
         if(bobomb)
-            pScoreboardSprite = spr_bobomb[colorID];
+            pScoreboardSprite = rm->spr_bobomb[colorID];
         else if(game_values.gamemode->chicken == this)
-            pScoreboardSprite = spr_chocobo[colorID];
+            pScoreboardSprite = rm->spr_chocobo[colorID];
         else if(shyguy)
-            pScoreboardSprite = spr_shyguy[colorID];
+            pScoreboardSprite = rm->spr_shyguy[colorID];
 
         //Blink the statue if the time is almost up
         if (isready() && (statue_timer < 50) && (statue_timer / 3 % 2))
@@ -2739,31 +2739,31 @@ void CPlayer::draw()
 
         //Draw the statue
         if(iswarping())
-            spr_statue.draw(ix - PWOFFSET, iy - 31, colorID << 5, 0, 32, 58, (short)state % 4, warpplane);
+            rm->spr_statue.draw(ix - PWOFFSET, iy - 31, colorID << 5, 0, 32, 58, (short)state % 4, warpplane);
         else
-            spr_statue.draw(ix - PWOFFSET, iy - 31, colorID << 5, 0, 32, 58);
+            rm->spr_statue.draw(ix - PWOFFSET, iy - 31, colorID << 5, 0, 32, 58);
 
         return;
     } else if(bobomb) { //draw him as bob-omb
-        pScoreboardSprite = spr_bobomb[colorID];
+        pScoreboardSprite = rm->spr_bobomb[colorID];
 
         //Add smoke to the top of the bomb
         if(++bobombsmoketimer > 2 && (velx != 0.0f || vely != GRAVITATION) && state == player_ready) {
             bobombsmoketimer = 0;
-            eyecandy[2].add(new EC_SingleAnimation(&spr_bobombsmoke, ix + HALFPH - 8, iy - PHOFFSET - 8, 4, 4));
+            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_bobombsmoke, ix + HALFPH - 8, iy - PHOFFSET - 8, 4, 4));
         }
     } else if(game_values.gamemode->chicken == this) { //draw him as chicken
-        pScoreboardSprite = spr_chocobo[colorID];
+        pScoreboardSprite = rm->spr_chocobo[colorID];
     } else if(shyguy) { //draw him as chicken
-        pScoreboardSprite = spr_shyguy[colorID];
-        spr_ownedtags.draw(ix - PWOFFSET - 8, iy - PHOFFSET - 8, ownerColorOffsetX, 0, 48, 48);
+        pScoreboardSprite = rm->spr_shyguy[colorID];
+        rm->spr_ownedtags.draw(ix - PWOFFSET - 8, iy - PHOFFSET - 8, ownerColorOffsetX, 0, 48, 48);
     }
 
     if(ownerPlayerID > -1) {
         if(iswarping())
-            spr_ownedtags.draw(ix - PWOFFSET - 8, iy - PHOFFSET - 8, ownerColorOffsetX, 0, 48, 48, (short)state % 4, warpplane);
+            rm->spr_ownedtags.draw(ix - PWOFFSET - 8, iy - PHOFFSET - 8, ownerColorOffsetX, 0, 48, 48, (short)state % 4, warpplane);
         else
-            spr_ownedtags.draw(ix - PWOFFSET - 8, iy - PHOFFSET - 8, ownerColorOffsetX, 0, 48, 48);
+            rm->spr_ownedtags.draw(ix - PWOFFSET - 8, iy - PHOFFSET - 8, ownerColorOffsetX, 0, 48, 48);
     }
 
     //Don't allow cape, tail, wings to be used with shoe
@@ -2793,17 +2793,17 @@ void CPlayer::draw()
     //Draw Kuribo's Shoe
     if(iKuriboShoe > 0) {
         if(state > player_ready) //warping
-            spr_kuriboshoe.draw(ix - PWOFFSET, iy - PHOFFSET, iKuriboShoeAnimationFrame + (iKuriboShoe == 2 ? 64 : 0), (spr & 0x1) == 0 ? 0 : 32, 32, 32, (short)state % 4, warpplane);
+            rm->spr_kuriboshoe.draw(ix - PWOFFSET, iy - PHOFFSET, iKuriboShoeAnimationFrame + (iKuriboShoe == 2 ? 64 : 0), (spr & 0x1) == 0 ? 0 : 32, 32, 32, (short)state % 4, warpplane);
         else
-            spr_kuriboshoe.draw(ix - PWOFFSET, iy - PHOFFSET, iKuriboShoeAnimationFrame + (iKuriboShoe == 2 ? 64 : 0), (spr & 0x1) == 0 ? 0 : 32, 32, 32);
+            rm->spr_kuriboshoe.draw(ix - PWOFFSET, iy - PHOFFSET, iKuriboShoeAnimationFrame + (iKuriboShoe == 2 ? 64 : 0), (spr & 0x1) == 0 ? 0 : 32, 32, 32);
     }
 
     //Draw the crown on the player
     if(game_values.showwinningcrown && g_iWinningPlayer == teamID) {
         if(state > player_ready) //warping
-            spr_crown.draw(ix + HALFPW - (IsPlayerFacingRight() ? 4 : 10), iy - 10 - (iKuriboShoe > 0 ? 16 : 0), 0, 0, 14, 14, (short)state % 4, warpplane);
+            rm->spr_crown.draw(ix + HALFPW - (IsPlayerFacingRight() ? 4 : 10), iy - 10 - (iKuriboShoe > 0 ? 16 : 0), 0, 0, 14, 14, (short)state % 4, warpplane);
         else
-            spr_crown.draw(ix + HALFPW - (IsPlayerFacingRight() ? 4 : 10), iy - 10 - (iKuriboShoe > 0 ? 16 : 0));
+            rm->spr_crown.draw(ix + HALFPW - (IsPlayerFacingRight() ? 4 : 10), iy - 10 - (iKuriboShoe > 0 ? 16 : 0));
     }
 
     if(state < player_ready)
@@ -2811,16 +2811,16 @@ void CPlayer::draw()
 
     if(frozen) {
         if(iswarping())
-            spr_iceblock.draw(ix - PWOFFSET, iy - PHOFFSET, 0, 0, 32, 32, (short)state % 4, warpplane);
+            rm->spr_iceblock.draw(ix - PWOFFSET, iy - PHOFFSET, 0, 0, 32, 32, (short)state % 4, warpplane);
         else
-            spr_iceblock.draw(ix - PWOFFSET, iy - PHOFFSET, 0, 0, 32, 32);
+            rm->spr_iceblock.draw(ix - PWOFFSET, iy - PHOFFSET, 0, 0, 32, 32);
     }
 
     if(jailtimer > 0) {
         if(state > player_ready) //warping
-            spr_jail.draw(ix - PWOFFSET - 6, iy - PHOFFSET - 6, (jailcolor + 1) * 44, 0, 44, 44, (short)state % 4, warpplane);
+            rm->spr_jail.draw(ix - PWOFFSET - 6, iy - PHOFFSET - 6, (jailcolor + 1) * 44, 0, 44, 44, (short)state % 4, warpplane);
         else
-            spr_jail.draw(ix - PWOFFSET - 6, iy - PHOFFSET - 6, (jailcolor + 1) * 44, 0, 44, 44);
+            rm->spr_jail.draw(ix - PWOFFSET - 6, iy - PHOFFSET - 6, (jailcolor + 1) * 44, 0, 44, 44);
     }
 
     if(suicidetimer > game_values.suicidetime)
@@ -2845,9 +2845,9 @@ void CPlayer::draw()
             short awardy = yoffset + (short)(30.0f * sin(angle));
 
             if(state > player_ready) //warping
-                spr_award.draw(awardx, awardy, awards[k] * 16, 0, 16, 16, (short)state % 4, warpplane);
+                rm->spr_award.draw(awardx, awardy, awards[k] * 16, 0, 16, 16, (short)state % 4, warpplane);
             else
-                spr_award.draw(awardx, awardy, awards[k] * 16, 0, 16, 16);
+                rm->spr_award.draw(awardx, awardy, awards[k] * 16, 0, 16, 16);
         }
     }
 
@@ -2864,9 +2864,9 @@ void CPlayer::draw()
             displayangle += addangle;
 
             if(state > player_ready) //warping
-                spr_storedpowerupsmall.draw(powerupX, powerupY, powerupused * 16, 0, 16, 16, (short)state %4, warpplane);
+                rm->spr_storedpowerupsmall.draw(powerupX, powerupY, powerupused * 16, 0, 16, 16, (short)state %4, warpplane);
             else
-                spr_storedpowerupsmall.draw(powerupX, powerupY, powerupused * 16, 0, 16, 16);
+                rm->spr_storedpowerupsmall.draw(powerupX, powerupY, powerupused * 16, 0, 16, 16);
         }
     }
 }
@@ -2930,9 +2930,9 @@ void CPlayer::DrawCape()
     }
 
     if(iswarping())
-        spr_cape.draw(ix - PWOFFSET + (fPlayerFacingRight ? - 18 : 18), iy - PHOFFSET + 4 + iCapeYOffset, (fPlayerFacingRight ? 128 : 0) + iCapeFrameX, iCapeFrameY, 32, 32, (short)state %4, warpplane);
+        rm->spr_cape.draw(ix - PWOFFSET + (fPlayerFacingRight ? - 18 : 18), iy - PHOFFSET + 4 + iCapeYOffset, (fPlayerFacingRight ? 128 : 0) + iCapeFrameX, iCapeFrameY, 32, 32, (short)state %4, warpplane);
     else
-        spr_cape.draw(ix - PWOFFSET + (fPlayerFacingRight ? - 18 : 18), iy - PHOFFSET + 4 + iCapeYOffset, (fPlayerFacingRight ? 128 : 0) + iCapeFrameX, iCapeFrameY, 32, 32);
+        rm->spr_cape.draw(ix - PWOFFSET + (fPlayerFacingRight ? - 18 : 18), iy - PHOFFSET + 4 + iCapeYOffset, (fPlayerFacingRight ? 128 : 0) + iCapeFrameX, iCapeFrameY, 32, 32);
 }
 
 void CPlayer::SpinPlayer()
@@ -3026,9 +3026,9 @@ void CPlayer::DrawTail()
         }
 
         if(iswarping())
-            spr_tail.draw(ix + (fPlayerFacingRight ? - 18 : 18), iy + 6, iTailFrame, (fPlayerFacingRight ? 0 : 26) + iOffsetY, 22, 26, (short)state %4, warpplane);
+            rm->spr_tail.draw(ix + (fPlayerFacingRight ? - 18 : 18), iy + 6, iTailFrame, (fPlayerFacingRight ? 0 : 26) + iOffsetY, 22, 26, (short)state %4, warpplane);
         else
-            spr_tail.draw(ix + (fPlayerFacingRight ? - 18 : 18), iy + 6, iTailFrame, (fPlayerFacingRight ? 0 : 26) + iOffsetY, 22, 26);
+            rm->spr_tail.draw(ix + (fPlayerFacingRight ? - 18 : 18), iy + 6, iTailFrame, (fPlayerFacingRight ? 0 : 26) + iOffsetY, 22, 26);
 
     }
 }
@@ -3049,9 +3049,9 @@ void CPlayer::DrawWings()
 
     bool fPlayerFacingRight = IsPlayerFacingRight();
     if(iswarping())
-        spr_wings.draw(ix + (fPlayerFacingRight ? - 19 : 15), iy - 10, iWingsFrame, fPlayerFacingRight ? 0 : 32, 26, 32, (short)state %4, warpplane);
+        rm->spr_wings.draw(ix + (fPlayerFacingRight ? - 19 : 15), iy - 10, iWingsFrame, fPlayerFacingRight ? 0 : 32, 26, 32, (short)state %4, warpplane);
     else
-        spr_wings.draw(ix + (fPlayerFacingRight ? - 19 : 15), iy - 10, iWingsFrame, fPlayerFacingRight ? 0 : 32, 26, 32);
+        rm->spr_wings.draw(ix + (fPlayerFacingRight ? - 19 : 15), iy - 10, iWingsFrame, fPlayerFacingRight ? 0 : 32, 26, 32);
 }
 
 void CPlayer::drawarrows()
@@ -3061,18 +3061,18 @@ void CPlayer::drawarrows()
 
     if(iy < 0) {
         if(iy + PH < -1 || (iy + PH <= 0 && vely <= 1)) {
-            spr_abovearrows.draw(ix - PWOFFSET, 0, colorID * 32, 0, 32, 26);
+            rm->spr_abovearrows.draw(ix - PWOFFSET, 0, colorID * 32, 0, 32, 26);
 
             //This displays the out of arena timer before the player is killed
             if(game_values.outofboundstime > 0 && outofarenadisplaytimer >= 0)
-                spr_awardkillsinrow.draw(ix - PWOFFSET + 8, 18, outofarenadisplaytimer << 4, colorID << 4, 16, 16);
+                rm->spr_awardkillsinrow.draw(ix - PWOFFSET + 8, 18, outofarenadisplaytimer << 4, colorID << 4, 16, 16);
         }
     }
 }
 
 void CPlayer::drawsuicidetimer()
 {
-    spr_awardkillsinrow.draw(ix - PWOFFSET + 8, iy - PHOFFSET + 8, suicidedisplaytimer << 4, colorID << 4, 16, 16);
+    rm->spr_awardkillsinrow.draw(ix - PWOFFSET + 8, iy - PHOFFSET + 8, suicidedisplaytimer << 4, colorID << 4, 16, 16);
 }
 
 void CPlayer::updateswap()
@@ -4112,7 +4112,7 @@ void CPlayer::makefrozen(short iTime)
         frozen = true;
         frozentimer = iTime;
 
-        eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
+        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
     }
 }
 
@@ -4186,7 +4186,7 @@ void CPlayer::SetPowerup(short iPowerup)
             SetStoredPowerup(8);
         else {
             ifsoundonplay(sfx_transform);
-            eyecandy[2].add(new EC_SingleAnimation(&spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
+            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
             bobomb = true;
         }
     } else if(iPowerup == 9) {
@@ -4212,7 +4212,7 @@ void CPlayer::SetPowerup(short iPowerup)
             SetStoredPowerup(iPowerup - 2); //Storing shells
     } else {
         if(iPowerup == 3 || iPowerup == 7 || iPowerup == 8) {
-            eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
+            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
         }
 
         if(powerup != iPowerup) {

@@ -537,7 +537,7 @@ void EC_Announcement::update()
 void EC_Announcement::draw()
 {
     for(short iRect = 0; iRect < 4; iRect++)
-        menu_dialog.draw(rDstRect[iRect].x, rDstRect[iRect].y, rSrcRect[iRect].x, rSrcRect[iRect].y, rSrcRect[iRect].w, rSrcRect[iRect].h);
+        rm->menu_dialog.draw(rDstRect[iRect].x, rDstRect[iRect].y, rSrcRect[iRect].x, rSrcRect[iRect].y, rSrcRect[iRect].w, rSrcRect[iRect].h);
 
     font->draw(ix + iFontOffsetX, iFontY, text);
 
@@ -680,7 +680,7 @@ void EC_ExplodingAward::update()
 
     if(++timer > ttl) {
         dead = true;
-        eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, (short)x + (w >> 1) - 16, (short)y + (h >> 1) - 16, 3, 8));
+        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, (short)x + (w >> 1) - 16, (short)y + (h >> 1) - 16, 3, 8));
     }
 }
 
@@ -728,7 +728,7 @@ void EC_SwirlingAward::update()
     if(++timer > ttl) {
         short awardx = x + (short)(radius * cos(angle)) + (w >> 1) - 16;
         short awardy = y + (short)(radius * sin(angle)) + (h >> 1) - 16;
-        eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, awardx, awardy, 3, 8));
+        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, awardx, awardy, 3, 8));
 
         dead = true;
     }
@@ -790,7 +790,7 @@ void EC_RocketAward::update()
     x += velx;
 
     if(++timer > ttl) {
-        eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, (short)x + (w >> 1) - 16, (short)y + (h >> 1) - 16, 3, 8));
+        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, (short)x + (w >> 1) - 16, (short)y + (h >> 1) - 16, 3, 8));
         dead = true;
     }
 
@@ -837,7 +837,7 @@ void EC_FloatingObject::update()
     x += velx;
 
     if(++timer > ttl) {
-        eyecandy[2].add(new EC_SingleAnimation(&spr_fireballexplosion, (short)x + (w >> 1) - 16, (short)y + (h >> 1) - 16, 3, 8));
+        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, (short)x + (w >> 1) - 16, (short)y + (h >> 1) - 16, 3, 8));
         dead = true;
     }
 }
@@ -905,7 +905,7 @@ void EC_SoulsAward::update()
         float velx = speed * cos(angle);
         float vely = speed * sin(angle);
 
-        eyecandy[2].add(new EC_RocketAward(&spr_awardsouls, x - 8, y - 8, velx, vely, ttl, id[count], 0, 16, 16));
+        eyecandy[2].add(new EC_RocketAward(&rm->spr_awardsouls, x - 8, y - 8, velx, vely, ttl, id[count], 0, 16, 16));
 
         if(++count >= numSouls) {
             endmode = true;
@@ -1248,14 +1248,14 @@ void Spotlight::UpdatePosition(short x, short y)
 void Spotlight::Draw()
 {
     SDL_Rect rDst = {ix - iHalfWidth, iy - iHalfWidth, iWidth, iWidth};
-    SDL_BlitSurface(spr_overlayhole.getSurface(), &rSrc, spr_overlay.getSurface(), &rDst);
+    SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rSrc, rm->spr_overlay.getSurface(), &rDst);
 
     if(ix - iHalfWidth < 0) {
 		SDL_Rect rDstWrap = {ix - iHalfWidth + smw->ScreenWidth, iy - iHalfWidth, iWidth, iWidth};
-        SDL_BlitSurface(spr_overlayhole.getSurface(), &rSrc, spr_overlay.getSurface(), &rDstWrap);
+        SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rSrc, rm->spr_overlay.getSurface(), &rDstWrap);
 	} else if(ix + iHalfWidth >= smw->ScreenWidth) {
-        SDL_Rect rDstWrap = {ix - iHalfWidth - 640, iy - iHalfWidth, iWidth, iWidth};
-        SDL_BlitSurface(spr_overlayhole.getSurface(), &rSrc, spr_overlay.getSurface(), &rDstWrap);
+		SDL_Rect rDstWrap = {ix - iHalfWidth - smw->ScreenWidth, iy - iHalfWidth, iWidth, iWidth};
+        SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rSrc, rm->spr_overlay.getSurface(), &rDstWrap);
     }
 
 #if	0
@@ -1264,40 +1264,40 @@ void Spotlight::Draw()
     short iWidth = iSpotlightValues[iSize][0];
     short iHalfWidth = iSpotlightValues[iSize][1];
 
-    spr_overlayhole.setalpha(255);
+    rm->spr_overlayhole.setalpha(255);
 
     SDL_Rect rSrc = {iSpotlightValues[iSize][2], 0, iWidth, iWidth};
     SDL_Rect rDst = {ix - iHalfWidth, iy - iHalfWidth, iWidth, iWidth};
-    SDL_BlitSurface(spr_overlayhole.getSurface(), &rSrc, spr_overlay.getSurface(), &rDst);
+    SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rSrc, rm->spr_overlay.getSurface(), &rDst);
 
     if(ix - iHalfWidth < 0)
     {
         SDL_Rect rDstWrap = {ix - iHalfWidth + smw->ScreenWidth, iy - iHalfWidth, iWidth, iWidth};
-        SDL_BlitSurface(spr_overlayhole.getSurface(), &rSrc, spr_overlay.getSurface(), &rDstWrap);
+        SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rSrc, rm->spr_overlay.getSurface(), &rDstWrap);
     }
     else if(ix + iHalfWidth >= 640)
     {
         SDL_Rect rDstWrap = {ix - iHalfWidth - smw->ScreenWidth, iy - iHalfWidth, iWidth, iWidth};
-        SDL_BlitSurface(spr_overlayhole.getSurface(), &rSrc, spr_overlay.getSurface(), &rDstWrap);
+        SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rSrc, rm->spr_overlay.getSurface(), &rDstWrap);
     }
 
     if(iTransparency <= 255 && iTransparency > 0)
     {
-        spr_overlayhole.setalpha((Uint8)iTransparency);
+        rm->spr_overlayhole.setalpha((Uint8)iTransparency);
 
         SDL_Rect rTransSrc = {iSpotlightValues[iSize][2], 128, iWidth, iWidth};
         SDL_Rect rTransDst = {ix - iHalfWidth, iy - iHalfWidth, iWidth, iWidth};
-        SDL_BlitSurface(spr_overlayhole.getSurface(), &rTransSrc, blitdest, &rTransDst);
+        SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rTransSrc, blitdest, &rTransDst);
 
         if(ix - iHalfWidth < 0)
         {
             SDL_Rect rTransDstWrap = {ix - iHalfWidth + smw->ScreenWidth, iy - iHalfWidth, iWidth, iWidth};
-            SDL_BlitSurface(spr_overlayhole.getSurface(), &rTransSrc, blitdest, &rTransDstWrap);
+            SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rTransSrc, blitdest, &rTransDstWrap);
         }
 		else if(ix + iHalfWidth >= smw->ScreenWidth)
         {
             SDL_Rect rTransDstWrap = {ix - iHalfWidth - smw->ScreenWidth, iy - iHalfWidth, iWidth, iWidth};
-            SDL_BlitSurface(spr_overlayhole.getSurface(), &rTransSrc, blitdest, &rTransDstWrap);
+            SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rTransSrc, blitdest, &rTransDstWrap);
         }
     }
 #endif
@@ -1316,7 +1316,7 @@ Spotlight * SpotlightManager::AddSpotlight(short ix, short iy, short iSize)
 void SpotlightManager::DrawSpotlights()
 {
     //Clear the overlay surface again with black
-    SDL_FillRect(spr_overlay.getSurface(), NULL, 0x0);
+    SDL_FillRect(rm->spr_overlay.getSurface(), NULL, 0x0);
 
     std::vector<Spotlight*>::iterator iter = spotlightList.begin(), lim = spotlightList.end();
 
@@ -1335,7 +1335,7 @@ void SpotlightManager::DrawSpotlights()
     }
 
     //Draw the overlay
-    spr_overlay.draw(0, 0);
+    rm->spr_overlay.draw(0, 0);
 }
 
 void SpotlightManager::ClearSpotlights()

@@ -158,12 +158,12 @@ void MI_IPField::Draw()
 
     for(int iSection = 0; iSection < 12; iSection += 3) {
         if(values[iSection] != 0)
-            menu_font_large.drawf(ix + iDigitPosition[iSection], iy + 12, "%i", values[iSection]);
+            rm->menu_font_large.drawf(ix + iDigitPosition[iSection], iy + 12, "%i", values[iSection]);
 
         if(values[iSection] != 0 || values[iSection + 1] != 0)
-            menu_font_large.drawf(ix + iDigitPosition[iSection + 1], iy + 12, "%i", values[iSection + 1]);
+            rm->menu_font_large.drawf(ix + iDigitPosition[iSection + 1], iy + 12, "%i", values[iSection + 1]);
 
-        menu_font_large.drawf(ix + iDigitPosition[iSection + 2], iy + 12, "%i", values[iSection + 2]);
+        rm->menu_font_large.drawf(ix + iDigitPosition[iSection + 2], iy + 12, "%i", values[iSection + 2]);
     }
 }
 
@@ -436,14 +436,14 @@ void MI_SelectField::Draw()
     }
 
     if(iIndent> 0)
-        menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName);
+        rm->menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName);
 
 	// RFC
     if(!items.empty()) {
         if(iIndent > 0)
-            menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 24, (*current)->sName.c_str());
+            rm->menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 24, (*current)->sName.c_str());
         else
-            menu_font_large.drawChopRight(ix + 16, iy + 5, iWidth - 32, (*current)->sName.c_str());
+            rm->menu_font_large.drawChopRight(ix + 16, iy + 5, iWidth - 32, (*current)->sName.c_str());
     }
 
     //TODO: invert order
@@ -677,10 +677,10 @@ void MI_ImageSelectField::Draw()
     spr->draw(ix + iIndent - 16, iy, 0, (fSelected ? 96 : 64), 32, 32);
     spr->draw(ix + iIndent + 16, iy, 528 - iWidth + iIndent, (fSelected ? 32 : 0), iWidth - iIndent - 16, 32);
 
-    menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName);
+    rm->menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName);
 
     if(!items.empty()) {
-        menu_font_large.drawChopRight(ix + iIndent + iImageWidth + 10, iy + 5, iWidth - iIndent - 24, (*current)->sName.c_str());
+        rm->menu_font_large.drawChopRight(ix + iIndent + iImageWidth + 10, iy + 5, iWidth - iIndent - 24, (*current)->sName.c_str());
     }
 
     spr_image->draw(ix + iIndent + 8, iy + 16 - (iImageHeight >> 1), ((*current)->iIconOverride >= 0 ? (*current)->iIconOverride : (*current)->iValue) * iImageWidth, 0, iImageWidth, iImageHeight);
@@ -722,10 +722,10 @@ void MI_SliderField::Draw()
     spr->draw(ix + iIndent - 16, iy, 0, (fSelected ? 96 : 64), 32, 32);
     spr->draw(ix + iIndent + 16, iy, 528 - iWidth + iIndent, (fSelected ? 32 : 0) + iAdjustmentY, iWidth - iIndent - 16, 32);
 
-    menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName);
+    rm->menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName);
 
     if(!items.empty()) {
-        menu_font_large.drawChopRight(ix + iIndent2 + 16, iy + 5, iWidth - iIndent2 - 24, (*current)->sName.c_str());
+        rm->menu_font_large.drawChopRight(ix + iIndent2 + 16, iy + 5, iWidth - iIndent2 - 24, (*current)->sName.c_str());
     }
 
     short iSpacing = (iIndent2 - iIndent - 20) / ((short)items.size() - 1);
@@ -839,7 +839,7 @@ MI_FrenzyModeOptions::MI_FrenzyModeOptions(short x, short y, short width, short 
 
     mMenu = new UI_Menu();
 
-    miQuantityField = new MI_SelectField(&spr_selectfield, 120, 40, "Limit", 400, 180);
+    miQuantityField = new MI_SelectField(&rm->spr_selectfield, 120, 40, "Limit", 400, 180);
     miQuantityField->Add("Single Powerup", 0, "", false, false);
     miQuantityField->Add("1 Powerup", 1, "", false, false);
     miQuantityField->Add("2 Powerups", 2, "", false, false);
@@ -854,7 +854,7 @@ MI_FrenzyModeOptions::MI_FrenzyModeOptions(short x, short y, short width, short 
     miQuantityField->SetData(&game_values.gamemodemenusettings.frenzy.quantity, NULL, NULL);
     miQuantityField->SetKey(game_values.gamemodemenusettings.frenzy.quantity);
 
-    miRateField = new MI_SelectField(&spr_selectfield, 120, 80, "Rate", 400, 180);
+    miRateField = new MI_SelectField(&rm->spr_selectfield, 120, 80, "Rate", 400, 180);
     miRateField->Add("Instant", 0, "", false, false);
     miRateField->Add("1 Second", 62, "", false, false);
     miRateField->Add("2 Seconds", 124, "", false, false);
@@ -868,7 +868,7 @@ MI_FrenzyModeOptions::MI_FrenzyModeOptions(short x, short y, short width, short 
     miRateField->SetData(&game_values.gamemodemenusettings.frenzy.rate, NULL, NULL);
     miRateField->SetKey(game_values.gamemodemenusettings.frenzy.rate);
 
-    miStoredShellsField = new MI_SelectField(&spr_selectfield, 120, 120, "Store Shells", 400, 180);
+    miStoredShellsField = new MI_SelectField(&rm->spr_selectfield, 120, 120, "Store Shells", 400, 180);
     miStoredShellsField->Add("Off", 0, "", false, false);
     miStoredShellsField->Add("On", 1, "", true, false);
     miStoredShellsField->SetData(NULL, NULL, &game_values.gamemodemenusettings.frenzy.storedshells);
@@ -877,7 +877,7 @@ MI_FrenzyModeOptions::MI_FrenzyModeOptions(short x, short y, short width, short 
 
     short iPowerupMap[] = {8, 5, 11, 17, 19, 21, 23, 24, 25, 20, 9, 16, 10, 22, 12, 13, 14, 15, 27};
     for(short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++) {
-        miPowerupSlider[iPowerup] = new MI_PowerupSlider(&spr_selectfield, &menu_slider_bar, &spr_storedpoweruplarge, iPowerup < 10 ? 65 : 330, 0, 245, iPowerupMap[iPowerup]);
+        miPowerupSlider[iPowerup] = new MI_PowerupSlider(&rm->spr_selectfield, &rm->menu_slider_bar, &rm->spr_storedpoweruplarge, iPowerup < 10 ? 65 : 330, 0, 245, iPowerupMap[iPowerup]);
         miPowerupSlider[iPowerup]->Add("", 0, "", false, false);
         miPowerupSlider[iPowerup]->Add("", 1, "", false, false);
         miPowerupSlider[iPowerup]->Add("", 2, "", false, false);
@@ -894,11 +894,11 @@ MI_FrenzyModeOptions::MI_FrenzyModeOptions(short x, short y, short width, short 
         miPowerupSlider[iPowerup]->SetKey(game_values.gamemodemenusettings.frenzy.powerupweight[iPowerup]);
     }
 
-    miBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
+    miBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
     miBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
-    miUpArrow = new MI_Image(&menu_verticalarrows, 310, 162, 20, 0, 20, 20, 1, 4, 8);
-    miDownArrow = new MI_Image(&menu_verticalarrows, 310, 402, 0, 0, 20, 20, 1, 4, 8);
+    miUpArrow = new MI_Image(&rm->menu_verticalarrows, 310, 162, 20, 0, 20, 20, 1, 4, 8);
+    miDownArrow = new MI_Image(&rm->menu_verticalarrows, 310, 402, 0, 0, 20, 20, 1, 4, 8);
     miUpArrow->Show(false);
 
     mMenu->AddControl(miQuantityField, NULL, miRateField, NULL, NULL);
@@ -1136,7 +1136,7 @@ MI_Button::MI_Button(gfxSprite * nspr, short x, short y, const char * name, shor
     iImageW = 0;
     iImageH = 0;
 
-    iTextW = (short)menu_font_large.getWidth(name);
+    iTextW = (short)rm->menu_font_large.getWidth(name);
 
     iAdjustmentY = width > 256 ? 0 : 128;
     iHalfWidth = width >> 1;
@@ -1165,17 +1165,17 @@ void MI_Button::Draw()
     spr->draw(ix + iHalfWidth, iy, 512 - iWidth + iHalfWidth, (fSelected ? 32 : 0) + iAdjustmentY, iWidth - iHalfWidth, 32);
 
     if(0 == iTextJustified) {
-        menu_font_large.drawChopRight(ix + 16 + (iImageW > 0 ? iImageW + 2 : 0), iy + 5, iWidth - 32, szName);
+        rm->menu_font_large.drawChopRight(ix + 16 + (iImageW > 0 ? iImageW + 2 : 0), iy + 5, iWidth - 32, szName);
 
         if(sprImage)
             sprImage->draw(ix + 16, iy + 16 - (iImageH >> 1), iImageSrcX, iImageSrcY, iImageW, iImageH);
     } else if(1 == iTextJustified) {
-        menu_font_large.drawCentered(ix + ((iWidth + (iImageW > 0 ? iImageW + 2 : 0)) >> 1), iy + 5, szName);
+        rm->menu_font_large.drawCentered(ix + ((iWidth + (iImageW > 0 ? iImageW + 2 : 0)) >> 1), iy + 5, szName);
 
         if(sprImage)
             sprImage->draw(ix + (iWidth >> 1) - ((iTextW + iImageW) >> 1) - 1, iy + 16 - (iImageH >> 1), iImageSrcX, iImageSrcY, iImageW, iImageH);
     } else {
-        menu_font_large.drawRightJustified(ix + iWidth - 16, iy + 5, szName);
+        rm->menu_font_large.drawRightJustified(ix + iWidth - 16, iy + 5, szName);
 
         if(sprImage)
             sprImage->draw(ix + iWidth - 18 - iTextW - iImageW, iy + 16 - (iImageH >> 1), iImageSrcX, iImageSrcY, iImageW, iImageH);
@@ -1188,7 +1188,7 @@ void MI_Button::SetName(const char * name)
     szName = new char[strlen(name) + 1];
     strcpy(szName, name);
 
-    iTextW = (short)menu_font_large.getWidth(name);
+    iTextW = (short)rm->menu_font_large.getWidth(name);
 }
 
 void MI_Button::SetImage(gfxSprite * nsprImage, short x, short y, short w, short h)
@@ -1339,9 +1339,9 @@ MI_Text::MI_Text(const char * text, short x, short y, short w, short size, short
     iJustified = justified;
 
     if(size == 0)
-        font = &menu_font_small;
+        font = &rm->menu_font_small;
     else
-        font = &menu_font_large;
+        font = &rm->menu_font_large;
 }
 
 MI_Text::~MI_Text()
@@ -1392,13 +1392,13 @@ void MI_ScoreText::Draw()
     if(!fShow)
         return;
 
-    spr_scoretext.draw(iDigitRightDstX, iy, iDigitRightSrcX, 0, 16, 16);
+    rm->spr_scoretext.draw(iDigitRightDstX, iy, iDigitRightSrcX, 0, 16, 16);
 
     if(iDigitLeftSrcX > 0) {
-        spr_scoretext.draw(iDigitMiddleDstX, iy, iDigitMiddleSrcX, 0, 16, 16);
-        spr_scoretext.draw(iDigitLeftDstX, iy, iDigitLeftSrcX, 0, 16, 16);
+        rm->spr_scoretext.draw(iDigitMiddleDstX, iy, iDigitMiddleSrcX, 0, 16, 16);
+        rm->spr_scoretext.draw(iDigitLeftDstX, iy, iDigitLeftSrcX, 0, 16, 16);
     } else if(iDigitMiddleSrcX > 0) {
-        spr_scoretext.draw(iDigitMiddleDstX, iy, iDigitMiddleSrcX, 0, 16, 16);
+        rm->spr_scoretext.draw(iDigitMiddleDstX, iy, iDigitMiddleSrcX, 0, 16, 16);
     }
 }
 
@@ -1618,13 +1618,13 @@ void MI_TextField::Draw()
     spr->draw(ix + iIndent - 16, iy, 0, (fSelected ? 96 : 64), 32, 32);
     spr->draw(ix + iIndent + 16, iy, 528 - iWidth + iIndent, (fSelected ? 32 : 0) + iAdjustmentY, iWidth - iIndent - 16, 32);
 
-    menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName);
+    rm->menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName);
 
     if(szValue) {
         if(iStringWidth <= iAllowedWidth || !fModifying) {
-            menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iAllowedWidth, szValue);
+            rm->menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iAllowedWidth, szValue);
         } else {
-            menu_font_large.drawChopLeft(ix + iWidth - 16, iy + 5, iAllowedWidth, szTempValue);
+            rm->menu_font_large.drawChopLeft(ix + iWidth - 16, iy + 5, iAllowedWidth, szTempValue);
         }
     }
 
@@ -1659,7 +1659,7 @@ MenuCodeEnum MI_TextField::MouseClick(short iMouseX, short iMouseY)
         szChar[1] = 0;
         for(short iChar = 0; iChar < iNumChars; iChar++) {
             szChar[0] = szValue[iChar];
-            iPixelCount += menu_font_large.getWidth(szChar);
+            iPixelCount += rm->menu_font_large.getWidth(szChar);
 
             if(iPixelCount >= iMouseX - (ix + iIndent + 8)) {
                 iCursorIndex = iChar;
@@ -1697,7 +1697,7 @@ void MI_TextField::UpdateCursor()
     strncpy(szTempValue, szValue, iCursorIndex);
     szTempValue[iCursorIndex] = 0;
 
-    iStringWidth = menu_font_large.getWidth(szTempValue);
+    iStringWidth = rm->menu_font_large.getWidth(szTempValue);
     if(iStringWidth <= iAllowedWidth) {
         miModifyCursor->SetPosition(ix + iIndent + 10 + iStringWidth, iy + 4);
     } else {
@@ -1736,15 +1736,15 @@ MI_MapField::MI_MapField(gfxSprite * nspr, short x, short y, const char * name, 
     miModifyImageRight = new MI_Image(nspr, ix + iWidth - 16, iy + 4, 32, 88, 26, 24, 4, 1, 8);
     miModifyImageRight->Show(false);
 
-    surfaceMapBackground = SDL_CreateRGBSurface(0, 320, 240, 16, 0, 0, 0, 0);
-    surfaceMapBlockLayer = SDL_CreateRGBSurface(0, 320, 240, 16, 0, 0, 0, 0);
-    surfaceMapForeground = SDL_CreateRGBSurface(0, 320, 240, 16, 0, 0, 0, 0);
+	surfaceMapBackground = SDL_CreateRGBSurface(0, smw->ScreenWidth/2, smw->ScreenHeight/2, 16, 0, 0, 0, 0);
+    surfaceMapBlockLayer = SDL_CreateRGBSurface(0, smw->ScreenWidth/2, smw->ScreenHeight/2, 16, 0, 0, 0, 0);
+    surfaceMapForeground = SDL_CreateRGBSurface(0, smw->ScreenWidth/2, smw->ScreenHeight/2, 16, 0, 0, 0, 0);
     LoadCurrentMap();
 
     rectDst.x = x + 16;
     rectDst.y = y + 44;
-    rectDst.w = 320;
-    rectDst.h = 240;
+    rectDst.w = smw->ScreenWidth/2;
+	rectDst.h = smw->ScreenHeight/2;
 
     if(fShowtags) {
         iSlideListOut = (iWidth - 352) >> 1;
@@ -1929,15 +1929,15 @@ void MI_MapField::Draw()
     short iMapBoxX = ix + (iWidth >> 1) - 176 - iSlideListOut;
 
     //Draw the background for the map preview
-    menu_dialog.draw(iMapBoxX, iy + 30, 0, 0, 336, 254);
-    menu_dialog.draw(iMapBoxX + 336, iy + 30, 496, 0, 16, 254);
-    menu_dialog.draw(iMapBoxX, iy + 284, 0, 464, 336, 16);
-    menu_dialog.draw(iMapBoxX + 336, iy + 284, 496, 464, 16, 16);
+    rm->menu_dialog.draw(iMapBoxX, iy + 30, 0, 0, 336, 254);
+    rm->menu_dialog.draw(iMapBoxX + 336, iy + 30, 496, 0, 16, 254);
+    rm->menu_dialog.draw(iMapBoxX, iy + 284, 0, 464, 336, 16);
+    rm->menu_dialog.draw(iMapBoxX + 336, iy + 284, 496, 464, 16, 16);
 
     rectDst.x = iMapBoxX + 16;
 
-    menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName);
-    menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 24, szMapName);
+    rm->menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName);
+    rm->menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 24, szMapName);
 
     SDL_BlitSurface(surfaceMapBackground, NULL, blitdest, &rectDst);
 
@@ -1980,7 +1980,7 @@ void MI_MapField::Draw()
     miModifyImageLeft->Draw();
     miModifyImageRight->Draw();
 
-    //menu_font_large.draw(rectDst.x, rectDst.y, sSearchString.c_str());
+    //rm->menu_font_large.draw(rectDst.x, rectDst.y, sSearchString.c_str());
 }
 
 void MI_MapField::LoadCurrentMap()
@@ -2000,7 +2000,7 @@ void MI_MapField::LoadMap(const char * szMapPath)
 
     SDL_Delay(10);  //Sleeps to help the music from skipping
 
-    g_map->preDrawPreviewBackground(&spr_background, surfaceMapBackground, false);
+    g_map->preDrawPreviewBackground(&rm->spr_background, surfaceMapBackground, false);
     SDL_Delay(10);  //Sleeps to help the music from skipping
     g_map->preDrawPreviewBlocks(surfaceMapBlockLayer, false);
     SDL_Delay(10);  //Sleeps to help the music from skipping

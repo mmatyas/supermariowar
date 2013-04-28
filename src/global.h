@@ -447,7 +447,7 @@ struct GameModeSettings {
 #include "gamemodes.h"
 #include "world.h"
 #include "TilesetManager.h"
-
+#include "ResourceManager.h"
 
 //------------- global variables / etc -------------
 //i know that using so much global variables is ugly, this will change somewhen
@@ -535,244 +535,6 @@ extern sfxSound			sfx_pickup;
 
 extern sfxMusic			backgroundmusic[6];
 
-extern gfxSprite        spr_tanooki, spr_statue;
-extern gfxSprite		spr_starpowerup;
-extern gfxSprite		spr_1uppowerup;
-extern gfxSprite		spr_2uppowerup;
-extern gfxSprite		spr_3uppowerup;
-extern gfxSprite		spr_5uppowerup;
-extern gfxSprite		spr_firepowerup;
-extern gfxSprite		spr_hammerpowerup;
-extern gfxSprite		spr_icewandpowerup;
-extern gfxSprite		spr_podobopowerup;
-extern gfxSprite		spr_poisonpowerup;
-extern gfxSprite		spr_mysterymushroompowerup;
-extern gfxSprite		spr_boomerangpowerup;
-extern gfxSprite		spr_clockpowerup;
-extern gfxSprite		spr_bobombpowerup;
-extern gfxSprite		spr_powpowerup;
-extern gfxSprite		spr_modpowerup;
-extern gfxSprite		spr_bulletbillpowerup;
-extern gfxSprite		spr_featherpowerup;
-extern gfxSprite		spr_leafpowerup;
-extern gfxSprite		spr_bombpowerup;
-extern gfxSprite		spr_pwingspowerup;
-extern gfxSprite		spr_extraheartpowerup;
-extern gfxSprite		spr_extratimepowerup;
-extern gfxSprite		spr_jailkeypowerup;
-
-extern gfxSprite		spr_secret1;
-extern gfxSprite		spr_secret2;
-extern gfxSprite		spr_secret3;
-extern gfxSprite		spr_secret4;
-
-extern gfxSprite		spr_shade[3];
-extern gfxSprite		spr_scorehearts;
-extern gfxSprite		spr_scorecards;
-extern gfxSprite		spr_scorecoins;
-
-extern gfxSprite		spr_timershade;
-extern gfxSprite		spr_scoretext;
-extern gfxSprite		spr_racetext;
-extern gfxSprite		spr_crown;
-extern gfxSprite		spr_cape;
-extern gfxSprite		spr_tail;
-extern gfxSprite		spr_wings;
-
-extern gfxSprite		spr_egg;
-extern gfxSprite		spr_eggnumbers;
-extern gfxSprite		spr_star;
-extern gfxSprite		spr_flags;
-extern gfxSprite		spr_frenzycards;
-extern gfxSprite		spr_collectcards;
-extern gfxSprite		spr_yoshi;
-extern gfxSprite		spr_coin;
-extern gfxSprite		spr_thwomp;
-extern gfxSprite		spr_podobo;
-extern gfxSprite		spr_bowserfire;
-extern gfxSprite		spr_areas;
-extern gfxSprite		spr_kingofthehillarea;
-extern gfxSprite		spr_jail;
-extern gfxSprite		spr_racegoal;
-extern gfxSprite		spr_pipegamebonus;
-extern gfxSprite		spr_chicken;
-extern gfxSprite		spr_phanto, spr_phantokey;
-
-extern gfxSprite		spr_bonuschest;
-extern gfxSprite		spr_teleportstar;
-
-extern gfxSprite		spr_goomba;
-extern gfxSprite		spr_goombadead;
-extern gfxSprite		spr_goombadeadflying;
-extern gfxSprite		spr_koopa;
-extern gfxSprite		spr_buzzybeetle;
-extern gfxSprite		spr_spiny;
-extern gfxSprite		spr_paragoomba;
-extern gfxSprite		spr_parakoopa;
-extern gfxSprite		spr_redparakoopa;
-extern gfxSprite		spr_sledgebrothers;
-extern gfxSprite		spr_sledgebrothersdead;
-extern gfxSprite		spr_redkoopa;
-extern gfxSprite		spr_cheepcheep;
-extern gfxSprite		spr_cheepcheepdead;
-extern gfxSprite		spr_bulletbill;
-extern gfxSprite		spr_bulletbilldead;
-
-extern gfxSprite		spr_fireball;
-extern gfxSprite		spr_superfireball;
-extern gfxSprite		spr_hammer;
-extern gfxSprite		spr_iceblast;
-extern gfxSprite		spr_boomerang;
-extern gfxSprite		spr_shell;
-extern gfxSprite		spr_shelldead;
-extern gfxSprite		spr_blueblock;
-extern gfxSprite		spr_spring;
-extern gfxSprite		spr_spike;
-extern gfxSprite		spr_bomb;
-extern gfxSprite		spr_kuriboshoe;
-extern gfxSprite		spr_throwbox;
-
-extern gfxSprite		spr_sledgehammer;
-extern gfxSprite		spr_superfireball;
-
-extern gfxSprite		spr_hazard_fireball[3];
-extern gfxSprite		spr_hazard_rotodisc[3];
-extern gfxSprite		spr_hazard_bulletbill[3];
-extern gfxSprite		spr_hazard_bulletbilldead;
-extern gfxSprite		spr_hazard_flame[3];
-extern gfxSprite		spr_hazard_pirhanaplant[3];
-
-extern gfxSprite		spr_fireballexplosion;
-extern gfxSprite		spr_frictionsmoke;
-extern gfxSprite		spr_bobombsmoke;
-extern gfxSprite		spr_explosion;
-extern gfxSprite		spr_burnup;
-extern gfxSprite		spr_fireworks;
-extern gfxSprite		spr_poof;
-
-extern gfxSprite		spr_spawnsmoke;
-extern gfxSprite		spr_spawndoor;
-extern gfxSprite		spr_bonus;
-extern gfxSprite		spr_extralife;
-extern gfxSprite		spr_award;
-extern gfxSprite		spr_awardsolid;
-extern gfxSprite		spr_awardsouls;
-extern gfxSprite		spr_awardsoulspawn;
-extern gfxSprite		spr_awardkillsinrow;
-extern gfxSprite		spr_flagbases;
-extern gfxSprite		spr_ownedtags;
-extern gfxSprite		spr_warplock;
-extern gfxSprite		spr_coinsparkle;
-extern gfxSprite		spr_shinesparkle;
-extern gfxSprite		spr_shellbounce;
-extern gfxSprite		spr_superstomp;
-
-extern gfxSprite		spr_storedpowerupsmall;
-extern gfxSprite		spr_storedpoweruplarge;
-extern gfxSprite		spr_powerupselector;
-
-extern gfxSprite		spr_scoreboard;
-extern gfxSprite		spr_abovearrows;
-
-extern gfxSprite		spr_windmeter;
-extern gfxSprite		spr_overlayhole;
-
-#ifndef _SMW_EDITOR
-extern gfxFont			menu_font_small;
-extern gfxFont			menu_font_large;
-extern gfxFont			game_font_small;
-extern gfxFont			game_font_large;
-
-extern gfxSprite		spr_noteblock;
-extern gfxSprite		spr_breakableblock;
-extern gfxSprite		spr_powerupblock;
-extern gfxSprite		spr_donutblock;
-extern gfxSprite		spr_flipblock;
-extern gfxSprite		spr_bounceblock;
-extern gfxSprite		spr_throwblock;
-extern gfxSprite		spr_switchblocks;
-extern gfxSprite		spr_viewblock;
-extern gfxSprite		spr_weaponbreakableblock;
-#endif
-
-extern gfxSprite		spr_brokenyellowblock;
-extern gfxSprite		spr_brokenflipblock;
-extern gfxSprite		spr_brokenblueblock;
-extern gfxSprite		spr_brokengrayblock;
-
-extern gfxSprite		spr_brokeniceblock;
-extern gfxSprite		spr_iceblock;
-
-extern gfxSprite		spr_tileanimation[3];
-extern gfxSprite		spr_blocks[3];
-extern gfxSprite		spr_unknowntile[3];
-
-extern gfxSprite		** spr_player[4];
-extern gfxSprite		** spr_shyguy[4];
-extern gfxSprite		** spr_chocobo[4];
-extern gfxSprite		** spr_bobomb[4];
-extern gfxSprite		spr_clouds;
-extern gfxSprite		spr_ghosts;
-extern gfxSprite		spr_fish;
-extern gfxSprite		spr_leaves;
-extern gfxSprite		spr_snow;
-extern gfxSprite		spr_rain;
-
-extern gfxSprite		spr_background;
-extern gfxSprite		spr_backmap[2];
-extern gfxSprite		spr_frontmap[2];
-extern gfxSprite		menu_backdrop;
-extern gfxSprite		spr_overlay;
-
-extern gfxSprite		menu_shade;
-extern gfxSprite		menu_smw;
-extern gfxSprite		menu_version;
-extern gfxSprite		menu_slider_bar;
-extern gfxSprite		menu_plain_field;
-extern gfxSprite		menu_player_select;
-extern gfxSprite		menu_map_filter;
-extern gfxSprite		menu_match_select;
-extern gfxSprite		menu_dialog;
-extern gfxSprite		menu_verticalarrows;
-
-extern gfxSprite		menu_stomp;
-extern gfxSprite		menu_survival;
-extern gfxSprite		menu_egg;
-
-extern gfxSprite		menu_mode_small;
-extern gfxSprite		menu_mode_large;
-extern gfxSprite		spr_dialog;
-extern gfxSprite		spr_dialogbutton;
-extern gfxSprite		spr_tournament_background;
-extern gfxSprite		spr_tournament_powerup_splash;
-extern gfxSprite		spr_player_select_background;
-extern gfxSprite		spr_player_select_ready;
-//extern gfxSprite		spr_ipfield;
-extern gfxSprite		spr_selectfield;
-extern gfxSprite		spr_selectfielddisabled;
-extern gfxSprite		spr_map_filter_icons;
-extern gfxSprite		spr_tour_markers;
-extern gfxSprite		spr_menu_boxed_numbers;
-extern gfxSprite		spr_countdown_numbers;
-extern gfxSprite		spr_thumbnail_warps[2];
-extern gfxSprite		spr_thumbnail_mapitems[2];
-extern gfxSprite		spr_platformstarttile;
-extern gfxSprite		spr_platformendtile;
-extern gfxSprite		spr_platformpath;
-
-extern gfxSprite		spr_worldbackground[3];
-extern gfxSprite		spr_worldforeground[3];
-extern gfxSprite		spr_worldforegroundspecial[3];
-extern gfxSprite		spr_worldpaths[3];
-extern gfxSprite		spr_worldvehicle[3];
-
-extern gfxSprite		spr_worlditems;
-extern gfxSprite		spr_worlditempopup;
-extern gfxSprite		spr_worlditemssmall;
-extern gfxSprite		spr_worlditemsplace;
-extern gfxSprite		spr_worldbonushouse;
-extern gfxSprite		spr_announcementicons;
-
 extern MapList *maplist;
 extern SkinList *skinlist;
 extern AnnouncerList *announcerlist;
@@ -807,6 +569,14 @@ extern short g_iCurrentPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
 
 extern short g_iCurrentDrawIndex;
 
+#pragma warning("This needs to be verified")
+#ifdef _XBOX
+//TV's seem to need extra shade
+#define	SCREEN_BACKGROUND_FADE	96
+#else
+#define	SCREEN_BACKGROUND_FADE	72
+#endif
+
 #include "randFuncs.h"
 
 void _load_drawmsg(const std::string& f);
@@ -817,6 +587,7 @@ void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter);
 
 // main game object - over time shall be used to
 extern CGame	*smw;
+extern CResourceManager *rm;
 
 //tournament scores
 struct ts {

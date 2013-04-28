@@ -204,6 +204,7 @@
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MaxSpeed</Optimization>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="..\..\src\ResourceManager.cpp" />
     <ClCompile Include="..\..\src\savepng.cpp" />
     <ClCompile Include="..\..\src\splash.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
@@ -261,6 +262,7 @@
     <ClInclude Include="..\..\src\path.h" />
     <ClInclude Include="..\..\src\player.h" />
     <ClInclude Include="..\..\src\randFuncs.h" />
+    <ClInclude Include="..\..\src\ResourceManager.h" />
     <ClInclude Include="..\..\src\savepng.h" />
     <ClInclude Include="..\..\src\Game.h" />
     <ClInclude Include="..\..\src\TilesetManager.h" />
