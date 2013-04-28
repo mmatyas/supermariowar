@@ -44,10 +44,10 @@
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\Debug\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\Debug\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkIncremental>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\zlib-1.2.3\include;.\SDL_mixer-1.2.12\include;.\SDL_image-1.2.12\include;.\libpng-1.2.37\include\libpng12;.\SDL-1.2.15\include;$(IncludePath)</IncludePath>
-    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\libpng-1.2.37\lib;.\zlib-1.2.3\lib;.\SDL-1.2.15\lib\x86;.\SDL_mixer-1.2.12\lib\x86;.\SDL_image-1.2.12\lib\x86;$(LibraryPath)</LibraryPath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\zlib-1.2.3\include;.\SDL-1.2.15\include;.\SDL_mixer-1.2.12\include;.\SDL_image-1.2.12\include;.\libpng-1.2.37\include\libpng12;$(IncludePath)</IncludePath>
-    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\SDL_mixer-1.2.12\lib\x86;.\zlib-1.2.3\lib;.\SDL-1.2.15\lib\x86;.\SDL_image-1.2.12\lib\x86;.\libpng-1.2.37\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\external\win32-include\zlib-1.2.3\include;..\..\external\win32-include\SDL_mixer-1.2.12\include;..\..\external\win32-include\SDL_image-1.2.12\include;..\..\external\win32-include\libpng-1.2.37\include\libpng12;..\..\external\win32-include\SDL-1.2.15\include;$(IncludePath)</IncludePath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\external\win32-include\libpng-1.2.37\lib;..\..\external\win32-include\zlib-1.2.3\lib;..\..\external\win32-include\SDL-1.2.15\lib\x86;..\..\external\win32-include\SDL_mixer-1.2.12\lib\x86;..\..\external\win32-include\SDL_image-1.2.12\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\external\win32-include\zlib-1.2.3\include;..\..\external\win32-include\SDL-1.2.15\include;..\..\external\win32-include\SDL_mixer-1.2.12\include;..\..\external\win32-include\SDL_image-1.2.12\include;..\..\external\win32-include\libpng-1.2.37\include\libpng12;$(IncludePath)</IncludePath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\external\win32-include\SDL_mixer-1.2.12\lib\x86;..\..\external\win32-include\zlib-1.2.3\lib;..\..\external\win32-include\SDL-1.2.15\lib\x86;..\..\external\win32-include\SDL_image-1.2.12\lib\x86;..\..\external\win32-include\libpng-1.2.37\lib;$(LibraryPath)</LibraryPath>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</GenerateManifest>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
