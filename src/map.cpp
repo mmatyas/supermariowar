@@ -363,8 +363,9 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
                 warpdata[i][j].connection = (short)ReadInt(mapfile);
                 warpdata[i][j].id = (short)ReadInt(mapfile);
 
-                for(short iType = 0; iType < NUMSPAWNAREATYPES; iType++)
-                    nospawn[iType][i][j] = ReadBool(mapfile);
+				for(short sType = 0; sType < NUMSPAWNAREATYPES; sType++)
+					nospawn[sType][i][j] = ReadBool(mapfile);
+
             }
         }
 
@@ -645,12 +646,13 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
                 warpdata[i][j].connection = (short)ReadInt(mapfile);
                 warpdata[i][j].id = (short)ReadInt(mapfile);
 
-                for(short iType = 0; iType < 6; iType += 5)
-                    nospawn[iType][i][j] = ReadInt(mapfile) == 0 ? false : true;
+				for(short sType = 0; sType < 6; sType += 5)
+					nospawn[sType][i][j] = ReadInt(mapfile) == 0 ? false : true;
 
-                //Copy player no spawn areas into team no spawn areas
-                for(short iType = 1; iType < 5; iType++)
-                    nospawn[iType][i][j] = nospawn[0][i][j];
+				//Copy player no spawn areas into team no spawn areas
+				for(short sType = 1; sType < 5; sType++)
+					nospawn[sType][i][j] = nospawn[0][i][j];
+
             }
         }
 
@@ -911,21 +913,21 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
         }
 
         //Then duplicate it for all the other spawn areas
-        for(short i = 1; i < NUMSPAWNAREATYPES; i++) {
-            totalspawnsize[i] = totalspawnsize[0];
-            numspawnareas[i] = numspawnareas[0];
+        for(short i2 = 1; i2 < NUMSPAWNAREATYPES; i2++) {
+            totalspawnsize[i2] = totalspawnsize[0];
+            numspawnareas[i2] = numspawnareas[0];
 
             //Read the only spawn area definition in the file
             for(int m = 0; m < numspawnareas[0]; m++) {
-                spawnareas[i][m].left = spawnareas[0][m].left;
-                spawnareas[i][m].top = spawnareas[0][m].top;
-                spawnareas[i][m].width = spawnareas[0][m].width;
-                spawnareas[i][m].height = spawnareas[0][m].height;
-                spawnareas[i][m].size = spawnareas[0][m].size;
+                spawnareas[i2][m].left = spawnareas[0][m].left;
+                spawnareas[i2][m].top = spawnareas[0][m].top;
+                spawnareas[i2][m].width = spawnareas[0][m].width;
+                spawnareas[i2][m].height = spawnareas[0][m].height;
+                spawnareas[i2][m].size = spawnareas[0][m].size;
 
                 if(VersionIsEqualOrBefore(version, 1, 6, 0, 10)) {
-                    spawnareas[i][m].width -= spawnareas[i][m].left;
-                    spawnareas[i][m].height -= spawnareas[i][m].top;
+                    spawnareas[i2][m].width -= spawnareas[i2][m].left;
+                    spawnareas[i2][m].height -= spawnareas[i2][m].top;
                 }
             }
         }
@@ -1889,19 +1891,19 @@ SDL_Surface * CMap::createThumbnailSurface(bool fUseClassicPack)
 {
     SDL_Surface * sThumbnail = SDL_CreateRGBSurface(screen->flags, 160, 120, 16, 0, 0, 0, 0);
 
-    char szBackgroundFile[128];
+    char localSzBackgroundFile[128];
     std::string path;
 
     if(fUseClassicPack) {
-        sprintf(szBackgroundFile, "gfx/packs/Classic/backgrounds/%s", g_map->szBackgroundFile);
-        path = convertPath(szBackgroundFile);
+        sprintf(localSzBackgroundFile, "gfx/packs/Classic/backgrounds/%s", g_map->szBackgroundFile);
+        path = convertPath(localSzBackgroundFile);
 
         //if the background file doesn't exist, use the classic background
         if(!File_Exists(path))
             path = convertPath("gfx/packs/Classic/backgrounds/Land_Classic.png");
     } else {
-        sprintf(szBackgroundFile, "gfx/packs/backgrounds/%s", g_map->szBackgroundFile);
-        path = convertPath(szBackgroundFile, gamegraphicspacklist->current_name());
+        sprintf(localSzBackgroundFile, "gfx/packs/backgrounds/%s", g_map->szBackgroundFile);
+        path = convertPath(localSzBackgroundFile, gamegraphicspacklist->current_name());
 
         //if the background file doesn't exist, use the classic background
         if(!File_Exists(path))
@@ -2007,7 +2009,7 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks, bool fIgnoreDea
                     for(m = j; m < MAPHEIGHT; m++) {
                         TileType type = mapdatatop[i][m].iType;
                         int flags = mapdatatop[i][m].iFlags;
-                        short block = objectdata[i][m].iType;
+                        short objBlock = objectdata[i][m].iType;
 
                         if(m == j && (flags & tile_flag_solid_on_top))
                             continue;
@@ -2018,12 +2020,12 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks, bool fIgnoreDea
                         }
 
                         if(fUseTempBlocks) {
-                            if((type != tile_nonsolid && type != tile_gap) || block != -1) {
+                            if((type != tile_nonsolid && type != tile_gap) || objBlock != -1) {
                                 break;
                             }
                         } else {
                             //Ignore the blocks that might not be there anymore (destroyed, turned off, etc)
-                            if((type != tile_nonsolid && type != tile_gap) || (block != -1 && block != 0 && block != 2 && block != 6 && (block < 11 || block > 14) && block != 16 && block < 19)) {
+                            if((type != tile_nonsolid && type != tile_gap) || (objBlock != -1 && objBlock != 0 && objBlock != 2 && objBlock != 6 && (objBlock < 11 || objBlock > 14) && objBlock != 16 && objBlock < 19)) {
                                 break;
                             }
                         }
@@ -2033,7 +2035,7 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks, bool fIgnoreDea
                     if(m == MAPHEIGHT) {
                         for(m = 0; m < j; m++) {
                             TileType type = mapdatatop[i][m].iType;
-                            short block = objectdata[i][m].iType;
+                            short objBlock = objectdata[i][m].iType;
 
                             if(type == tile_death_on_top || type == tile_death || type == tile_super_death_top || type == tile_super_death || type == tile_player_death) {
                                 fUsed = true;
@@ -2041,11 +2043,11 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks, bool fIgnoreDea
                             }
 
                             if(fUseTempBlocks) {
-                                if((type != tile_nonsolid && type != tile_gap) || block != -1) {
+                                if((type != tile_nonsolid && type != tile_gap) || objBlock != -1) {
                                     break;
                                 }
                             } else {
-                                if((type != tile_nonsolid && type != tile_gap) || (block != -1 && block != 0 && block != 2 && block != 6 && (block < 11 || block > 14) && block != 16 && block < 19)) {
+                                if((type != tile_nonsolid && type != tile_gap) || (objBlock != -1 && objBlock != 0 && objBlock != 2 && objBlock != 6 && (objBlock < 11 || objBlock > 14) && objBlock != 16 && objBlock < 19)) {
                                     break;
                                 }
                             }
@@ -2193,18 +2195,18 @@ void CMap::draw(SDL_Surface *targetSurface, int layer)
                     animatedtile->pPlatform = NULL;
 
                     for(short iLayer = 0; iLayer < 4; iLayer++) {
-                        TilesetTile * tile = &mapdata[i][j][iLayer];
+                        TilesetTile * layerTile = &mapdata[i][j][iLayer];
                         TilesetTile * toTile = &animatedtile->layers[iLayer];
 
-                        toTile->iID = tile->iID;
-                        toTile->iCol = tile->iCol;
-                        toTile->iRow = tile->iRow;
+                        toTile->iID = layerTile->iID;
+                        toTile->iCol = layerTile->iCol;
+                        toTile->iRow = layerTile->iRow;
 
-                        if(tile->iID >= 0) { //If it is part of a tileset
-                            gfx_setrect(&(animatedtile->rSrc[iLayer][0]), tile->iCol << 5, tile->iRow << 5, TILESIZE, TILESIZE);
-                        } else if(tile->iID == TILESETANIMATED) {
+                        if(layerTile->iID >= 0) { //If it is part of a tileset
+                            gfx_setrect(&(animatedtile->rSrc[iLayer][0]), layerTile->iCol << 5, layerTile->iRow << 5, TILESIZE, TILESIZE);
+                        } else if(layerTile->iID == TILESETANIMATED) {
                             for(short iRect = 0; iRect < 4; iRect++) {
-                                gfx_setrect(&(animatedtile->rSrc[iLayer][iRect]), (iRect + (tile->iCol << 2)) << 5, tile->iRow << 5, TILESIZE, TILESIZE);
+                                gfx_setrect(&(animatedtile->rSrc[iLayer][iRect]), (iRect + (layerTile->iCol << 2)) << 5, layerTile->iRow << 5, TILESIZE, TILESIZE);
                             }
 
                             //Background is animated if it is a background layer or if it is a foreground layer and we are not displaying the foreground
@@ -2327,10 +2329,10 @@ void CMap::preDrawPreviewWarps(SDL_Surface * targetSurface, bool fThumbnail)
 
     for(int j = 0; j < MAPHEIGHT; j++) {
         for(int i = 0; i < MAPWIDTH; i++) {
-            Warp * warp = &g_map->warpdata[i][j];
+            Warp * wWarp = &g_map->warpdata[i][j];
 
-            if(warp->connection != -1) {
-                SDL_Rect rSrc = {warp->connection * iTileSize, warp->direction * iTileSize, iTileSize, iTileSize};
+            if(wWarp->connection != -1) {
+                SDL_Rect rSrc = {wWarp->connection * iTileSize, wWarp->direction * iTileSize, iTileSize, iTileSize};
                 SDL_Rect rDst = {i * iTileSize, j * iTileSize, iTileSize, iTileSize};
 
                 SDL_BlitSurface(rm->spr_thumbnail_warps[iScreenshotSize].getSurface(), &rSrc, targetSurface, &rDst);
@@ -2619,8 +2621,8 @@ void CMap::SetupAnimatedTiles()
             //If the background layer has an animated tile, then create the set of 4 images that will be
             //drawn to this tile during the gameplay (gfx optimization by only drawing from animatedTilesSurface)
             if(tile->fBackgroundAnimated) {
-                for(short iTileAnimationFrame = 0; iTileAnimationFrame < 4; iTileAnimationFrame++) {
-                    gfx_setrect(&tile->rAnimationSrc[0][iTileAnimationFrame], &rDst);
+                for(short sTileAnimationFrame = 0; sTileAnimationFrame < 4; sTileAnimationFrame++) {
+                    gfx_setrect(&tile->rAnimationSrc[0][sTileAnimationFrame], &rDst);
 
                     SDL_BlitSurface(backgroundSurface, rSrc, animatedTilesSurface, &rDst);
 
@@ -2629,7 +2631,7 @@ void CMap::SetupAnimatedTiles()
                         if(tilesetTile->iID >= 0) {
                             SDL_BlitSurface(g_tilesetmanager->GetTileset(tilesetTile->iID)->GetSurface(0), &(tile->rSrc[iLayer][0]), animatedTilesSurface, &rDst);
                         } else if(tilesetTile->iID == TILESETANIMATED) {
-                            SDL_BlitSurface(animatedTileSrcSurface, &(tile->rSrc[iLayer][iTileAnimationFrame]), animatedTilesSurface, &rDst);
+                            SDL_BlitSurface(animatedTileSrcSurface, &(tile->rSrc[iLayer][sTileAnimationFrame]), animatedTilesSurface, &rDst);
                         } else if(tilesetTile->iID == TILESETUNKNOWN) {
                             SDL_BlitSurface(rm->spr_unknowntile[0].getSurface(), &g_tilesetmanager->rRects[0][0][0], animatedTilesSurface, &rDst);
                         }
@@ -2655,8 +2657,8 @@ void CMap::SetupAnimatedTiles()
             }
 
             if(tile->fForegroundAnimated) {
-                for(short iTileAnimationFrame = 0; iTileAnimationFrame < 4; iTileAnimationFrame++) {
-                    gfx_setrect(&tile->rAnimationSrc[1][iTileAnimationFrame], &rDst);
+                for(short sTileAnimationFrame = 0; sTileAnimationFrame < 4; sTileAnimationFrame++) {
+                    gfx_setrect(&tile->rAnimationSrc[1][sTileAnimationFrame], &rDst);
 
                     SDL_FillRect(animatedTilesSurface, &rDst, iTransparentColor);
 
@@ -2665,7 +2667,7 @@ void CMap::SetupAnimatedTiles()
                         if(tilesetTile->iID >= 0) {
                             SDL_BlitSurface(g_tilesetmanager->GetTileset(tilesetTile->iID)->GetSurface(0), &(tile->rSrc[iLayer][0]), animatedTilesSurface, &rDst);
                         } else if(tilesetTile->iID == TILESETANIMATED) {
-                            SDL_BlitSurface(animatedTileSrcSurface, &(tile->rSrc[iLayer][iTileAnimationFrame]), animatedTilesSurface, &rDst);
+                            SDL_BlitSurface(animatedTileSrcSurface, &(tile->rSrc[iLayer][sTileAnimationFrame]), animatedTilesSurface, &rDst);
                         } else if(tilesetTile->iID == TILESETUNKNOWN) {
                             SDL_BlitSurface(rm->spr_unknowntile[0].getSurface(), &g_tilesetmanager->rRects[0][0][0], animatedTilesSurface, &rDst);
                         }
@@ -2690,14 +2692,14 @@ void CMap::SetupAnimatedTiles()
             }
 
             if(tile->pPlatform) {
-                for(short iTileAnimationFrame = 0; iTileAnimationFrame < 4; iTileAnimationFrame++) {
-                    gfx_setrect(&tile->rAnimationSrc[0][iTileAnimationFrame], &rDst);
+                for(short sTileAnimationFrame = 0; sTileAnimationFrame < 4; sTileAnimationFrame++) {
+                    gfx_setrect(&tile->rAnimationSrc[0][sTileAnimationFrame], &rDst);
 
                     SDL_FillRect(animatedTilesSurface, &rDst, iTransparentColor);
 
                     TilesetTile * tilesetTile = &tile->layers[0];
                     if(tilesetTile->iID == TILESETANIMATED) {
-                        SDL_BlitSurface(animatedTileSrcSurface, &(tile->rSrc[0][iTileAnimationFrame]), animatedTilesSurface, &rDst);
+                        SDL_BlitSurface(animatedTileSrcSurface, &(tile->rSrc[0][sTileAnimationFrame]), animatedTilesSurface, &rDst);
                     } else {
                         cout << endl << " ERROR: A nonanimated platform tile was added to the animated tile list" << endl;
                     }

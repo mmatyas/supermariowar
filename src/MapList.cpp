@@ -442,14 +442,14 @@ void MapList::random(bool fUseFilters)
 
 const char* MapList::randomFilename()
 {
-    std::map<std::string, MapListNode*>::iterator random = maps.begin();
+    std::map<std::string, MapListNode*>::iterator rnd = maps.begin();
 
     short iRand = RNGMAX(maps.size());
 
     for(short iMap = 0; iMap < iRand; iMap++)
-        random++;
+        rnd++;
 
-    return (*random).second->filename.c_str();
+    return (*rnd).second->filename.c_str();
 }
 
 
@@ -499,10 +499,10 @@ void MapList::ReadFilters()
     current = maps.begin();
 
     //Used cached summary before trying to read the actual map file (to speed up load time)
-    FILE * fp = fopen(convertPath("maps/cache/mapsummary.txt").c_str(), "r");
+    FILE * mfp = fopen(convertPath("maps/cache/mapsummary.txt").c_str(), "r");
 
-    if(fp) {
-        while(fgets(buffer, 256, fp)) {
+    if(mfp) {
+        while(fgets(buffer, 256, mfp)) {
             char * pszMapName = strtok(buffer, ",\n");
 
             if(maps.find(pszMapName) != maps.end()) {
@@ -523,7 +523,7 @@ void MapList::ReadFilters()
             }
         }
 
-        fclose(fp);
+        fclose(mfp);
     }
 
     while(current != maps.end()) {
@@ -539,14 +539,14 @@ void MapList::ReadFilters()
     current = maps.begin();
     //Get user defined filters from files in filters directory
     for(short iFilter = 0; iFilter < filterslist->GetCount(); iFilter++) {
-        FILE * fp = fopen(filterslist->GetIndex(iFilter), "r");
+        FILE * ffp = fopen(filterslist->GetIndex(iFilter), "r");
 
-        if(!fp)
+        if(!ffp)
             continue;
 
         short iVersion[4] = {0, 0, 0, 0};
         short iReadState = 0;
-        while(fgets(buffer, 256, fp)) {
+        while(fgets(buffer, 256, ffp)) {
             if(buffer[0] == '#' || buffer[0] == '\n' || buffer[0] == '\r' || buffer[0] == ' ' || buffer[0] == '\t')
                 continue;
 
@@ -582,7 +582,7 @@ void MapList::ReadFilters()
             }
         }
 
-        fclose(fp);
+        fclose(ffp);
     }
 
     //Reset the current back to the beginning after setting up the filters for each map

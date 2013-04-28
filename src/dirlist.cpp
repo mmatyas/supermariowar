@@ -41,11 +41,11 @@ inline bool endsWith(string& s, string& q)
 
 
 
-DirectoryListing::DirectoryListing(string path, string file_ext)
+DirectoryListing::DirectoryListing(string dlPath, string file_ext)
 {
     /* Store optional filename extension and search path */
     Filename_Extension = file_ext;
-    this->path = path;
+    this->path = dlPath;
 
     /* Windows Directory Enumeration*/
     #ifdef _WIN32

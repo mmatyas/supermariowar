@@ -4,10 +4,10 @@
 
 #include "global.h"
 
-extern SDL_Rect rectSuperStompLeftSrc[8];
+/*extern SDL_Rect rectSuperStompLeftSrc[8];
 extern SDL_Rect rectSuperStompRightSrc[8];
 extern SDL_Rect rectSuperStompLeftDst[8];
-extern SDL_Rect rectSuperStompRightDst[8];
+extern SDL_Rect rectSuperStompRightDst[8];*/
 
 EC_StillImage::EC_StillImage(gfxSprite * nspr, short dstx, short dsty, short srcx, short srcy, short w, short h)
 {

@@ -140,7 +140,7 @@ add_definitions(-D_GNU_SOURCE=1 -D_REENTRANT)
 ## MAIN CONFIG
 
 ##TODO: clean code to not need this anymore
-add_definitions(-Wno-shadow)
+#add_definitions(-Wno-shadow)
 
 ########################################
 # our relevant source files
