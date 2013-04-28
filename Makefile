@@ -70,13 +70,13 @@ install-data : all
 	rm -rf $(DESTDIR)/usr/share/games/smw/*/*/*/*/.svn
 	rm -rf $(DESTDIR)/usr/share/games/smw/*/*/*/*/*/.svn
 	rm -rf $(DESTDIR)/usr/share/games/smw/*/*/*/*/*/*/.svn
+	chmod a+w $(DESTDIR)/usr/share/games/smw/maps -R
+	chmod a+w $(DESTDIR)/usr/share/games/smw/worlds -R
 
 install-bin : all
 	#assume DESTDIR is the prefix for installing
 	mkdir -p $(DESTDIR)/usr/games/
 	cp smw $(DESTDIR)/usr/games/
-	chmod a+w $(DESTDIR)/usr/share/games/smw/maps -R
-	chmod a+w $(DESTDIR)/usr/share/games/smw/worlds -R
 
 install-leveledit : all
 	mkdir -p $(DESTDIR)/usr/games/
