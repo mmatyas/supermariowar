@@ -2,7 +2,7 @@
 ------------------------------------------------------------------------------
  the SuperMarioWar development diary
  --------------------------------------
-								2004 © Florian Hufsky
+								2004 (C) Florian Hufsky
 								http://jnrdev.kbs-design.net
 
 								have a lot of fun
@@ -560,6 +560,6 @@ i've asked for help at 2dnow, gamedev and zfx.info
 
 
 
-2004 © Florian Hufsky
+2004 (C) Florian Hufsky
 mailto:fhufsky@phorus.at
 http://jnrdev.kbs-design.net/smw

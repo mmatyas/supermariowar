@@ -2,7 +2,7 @@
 ------------------------------------------------------------------------------
  the SuperMarioWar how-the-game-works file
  ------------------------------------------
-								2004 © Florian Hufsky
+								2004 (C) Florian Hufsky
 								http://jnrdev.kbs-design.net
 								
 								last changes: 08.5.2004
@@ -153,6 +153,6 @@ if you have any suggestions send me a mail: fhufsky@phorus.at
 
 
 
-2004 © Florian Hufsky
+2004 (C) Florian Hufsky
 mailto:fhufsky@phorus.at
 http://jnrdev.kbs-design.net/smw

@@ -6,7 +6,7 @@
 |                                                           |
 | this sourcecode is released under the GPL.				|
 |															|
-|				© 2007 Florian Hufsky <fhufsky@phorus.at>	|
+|			  (C) 2007 Florian Hufsky <fhufsky@phorus.at>	|
 +----------------------------------------------------------*/
 
 #define _SMW_EDITOR

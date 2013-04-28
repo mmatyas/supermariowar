@@ -22,7 +22,7 @@
 | start:		24.01.2003									|
 | last changes:	12.02.2008									|
 |															|
-|								© 2003-2009 Florian Hufsky  |
+|							  (C) 2003-2009 Florian Hufsky  |
 |								  florian.hufsky@gmail.com	|
 |                                     mtschaffer@gmail.com  |
 |								  http://smw.72dpiarmy.com	|

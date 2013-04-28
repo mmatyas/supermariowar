@@ -12,7 +12,7 @@
 | start:		18.12.2003									|
 | last changes:	 3.12.2007									|
 |															|
-|	© 2003-2009 Florian Hufsky <florian.hufsky@gmail.com>	|
+|  (C) 2003-2009 Florian Hufsky <florian.hufsky@gmail.com>	|
 +----------------------------------------------------------*/
 
 #define _SMW_EDITOR

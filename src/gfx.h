@@ -15,7 +15,7 @@
 |  + a class for fonts											|
 |																|
 | have a lot of fun!											|
-|		  © 2003-2008 Florian Hufsky <florian.hufsky@gmail.com>	|
+|		(C) 2003-2008 Florian Hufsky <florian.hufsky@gmail.com>	|
 +--------------------------------------------------------------*/
 
 #ifndef __GFX_H__
