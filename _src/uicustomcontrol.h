@@ -124,6 +124,9 @@ class MI_TeamSelect : public UI_Control
 		bool fReady[4];
 		bool fAllReady;
 
+		short iFastScroll[4];
+		short iFastScrollTimer[4];
+
 	friend class Menu;
 };
 

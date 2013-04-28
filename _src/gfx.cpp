@@ -15,6 +15,7 @@ using namespace std;
 		#pragma comment(lib, "SDL.lib")
 		#pragma comment(lib, "SDLmain.lib")
 	#endif
+
 #endif
 
 extern SDL_Surface *blitdest;

@@ -707,38 +707,102 @@ MenuCodeEnum MI_TeamSelect::SendInput(CPlayerInput * playerInput)
 					FindNewTeam(iPlayer, 1);
 			}
 
-			if(playerKeys->menu_up.fPressed && !game_values.randomskin[iPlayer])
+			//Scroll up/down through player skins
+			if(!game_values.randomskin[iPlayer])
 			{
-				do
+				if(playerKeys->menu_up.fPressed)
 				{
-					if(playerKeys->menu_down.fDown)
+					do
 					{
-						game_values.skinids[iPlayer] = rand() % skinlist.GetCount();
+						if(playerKeys->menu_down.fDown)
+						{
+							game_values.skinids[iPlayer] = rand() % skinlist.GetCount();
+						}
+						else
+						{
+							if(--game_values.skinids[iPlayer] < 0)
+								game_values.skinids[iPlayer] = (short)skinlist.GetCount() - 1;
+						}
+					}
+					while(!LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false));
+				}
+				else if(playerKeys->menu_up.fDown)
+				{
+					if(iFastScroll[iPlayer] == 0)
+					{
+						if(++iFastScrollTimer[iPlayer] > 40)
+						{
+							iFastScroll[iPlayer] = 1;
+						}
 					}
 					else
 					{
-						if(--game_values.skinids[iPlayer] < 0)
-							game_values.skinids[iPlayer] = (short)skinlist.GetCount() - 1;
+						if(++iFastScrollTimer[iPlayer] > 5)
+						{
+							do
+							{
+								if(--game_values.skinids[iPlayer] < 0)
+									game_values.skinids[iPlayer] = (short)skinlist.GetCount() - 1;
+							}
+							while(!LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false));
+
+							iFastScrollTimer[iPlayer] = 0;
+						}
 					}
 				}
-				while(!LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false));
-			}
 
-			if(playerKeys->menu_down.fPressed && !game_values.randomskin[iPlayer])
-			{
-				do
+				if(playerKeys->menu_down.fPressed)
 				{
-					if(playerKeys->menu_up.fDown)
+					do
 					{
-						game_values.skinids[iPlayer] = rand() % skinlist.GetCount();
+						if(playerKeys->menu_up.fDown)
+						{
+							game_values.skinids[iPlayer] = rand() % skinlist.GetCount();
+						}
+						else
+						{
+							if(++game_values.skinids[iPlayer] >= skinlist.GetCount())
+								game_values.skinids[iPlayer] = 0;
+						}
+					}								
+					while(!LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false));
+				}
+				else if(playerKeys->menu_down.fDown)
+				{
+					if(iFastScroll[iPlayer] == 0)
+					{
+						if(++iFastScrollTimer[iPlayer] > 40)
+						{
+							iFastScroll[iPlayer] = 1;
+						}
 					}
 					else
 					{
-						if(++game_values.skinids[iPlayer] >= skinlist.GetCount())
-							game_values.skinids[iPlayer] = 0;
+						if(++iFastScrollTimer[iPlayer] > 5)
+						{
+							do
+							{
+								if(++game_values.skinids[iPlayer] >= skinlist.GetCount())
+									game_values.skinids[iPlayer] = 0;
+							}
+							while(!LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false));
+
+							iFastScrollTimer[iPlayer] = 0;
+						}
 					}
-				}								
-				while(!LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false));
+				}
+				
+				if((!playerKeys->menu_up.fDown && !playerKeys->menu_down.fDown) ||
+					(playerKeys->menu_up.fDown && playerKeys->menu_down.fDown))
+				{
+					iFastScroll[iPlayer] = 0;
+					iFastScrollTimer[iPlayer] = 0;
+				}
+			}
+			else
+			{
+				iFastScroll[iPlayer] = 0;
+				iFastScrollTimer[iPlayer] = 0;
 			}
 
 			if(playerKeys->menu_random.fPressed)
@@ -962,6 +1026,9 @@ void MI_TeamSelect::Reset()
 
 	for(short iPlayer = 0; iPlayer < 4; iPlayer++)
 	{
+		iFastScroll[iPlayer] = 0;
+		iFastScrollTimer[iPlayer] = 0;
+
 		if(game_values.playercontrol[iPlayer] == 1)
 		{
 			fReady[iPlayer] = false;

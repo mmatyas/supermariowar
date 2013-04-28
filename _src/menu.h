@@ -72,7 +72,7 @@ class Menu
 		
 		MI_Image * miSMWTitle;
 		MI_Image * miSMWVersion;
-		MI_Text * miSMWVersionText;
+		//MI_Text * miSMWVersionText;
 	
 		MI_Button * miMainStartButton;
 		MI_Button * miQuickGameButton;

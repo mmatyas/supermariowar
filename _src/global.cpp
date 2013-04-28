@@ -8,7 +8,8 @@ extern bool g_fLoadMessages;
 //1.8.0.1 == Second release to staff
 //1.8.0.2 == beta1
 //1.8.0.3 == beta2
-int g_iVersion[] = {1, 8, 0, 3};
+//1.8.0.4 == final
+int g_iVersion[] = {1, 8, 0, 4};
 
 bool VersionIsEqual(int iVersion[], short iMajor, short iMinor, short iMicro, short iBuild)
 {

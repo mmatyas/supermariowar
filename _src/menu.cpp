@@ -193,7 +193,7 @@ void Menu::CreateMenu()
 
 	miSMWTitle = new MI_Image(&menu_smw, 320 - ((short)menu_smw.getWidth() >> 1), 30, 0, 0, 372, 140, 1, 1, 0);
 	miSMWVersion = new MI_Image(&menu_version, 570, 10, 0, 0, 58, 32, 1, 1, 0);
-	miSMWVersionText = new MI_Text("Beta 2", 630, 45, 0, 2, 2);
+	//miSMWVersionText = new MI_Text("Beta 2", 630, 45, 0, 2, 2);
 	
 	miMainStartButton = new MI_Button(&spr_selectfield, 120, 210, "Start", 310, 0);
 	miMainStartButton->SetCode(MENU_CODE_TO_MATCH_SELECTION_MENU);
@@ -226,7 +226,7 @@ void Menu::CreateMenu()
 
 	mMainMenu.AddNonControl(miSMWTitle);
 	mMainMenu.AddNonControl(miSMWVersion);
-	mMainMenu.AddNonControl(miSMWVersionText);
+	//mMainMenu.AddNonControl(miSMWVersionText);
 
 	//***********************
 	// Player Control Select Menu
@@ -708,7 +708,7 @@ void Menu::CreateMenu()
 	miPointSpeedField->SetData(&game_values.pointspeed, NULL, NULL);
 	miPointSpeedField->SetKey(game_values.pointspeed);
 	
-	miGameplayOptionsMenuBackButton = new MI_Button(&spr_selectfield, 544, 440, "Back", 80, 1);
+	miGameplayOptionsMenuBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
 	miGameplayOptionsMenuBackButton->SetCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 
 	miGameplayOptionsMenuLeftHeaderBar = new MI_Image(&menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);

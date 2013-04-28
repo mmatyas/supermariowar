@@ -31,6 +31,9 @@
 /*
 TODO
 
+Before Final Release
+[ ] CLEAN UP OLD DLLS in SMW DIR!!!
+
 
 BUG!! Still reports of disappearing map tiles - caused when rRects is used out of bounds causing w and h to be set to 0 - happened with platform with tile using row 960
       I think this was due to using old maps with newer versions of the 1.8 alpha - keep an eye on this, but it might be a non-issue
@@ -382,6 +385,7 @@ Procedure for adding a new powerup:
 
 		#define WIN32_LEAN_AND_MEAN
 		#include <windows.h>
+		
 	#endif
 #endif
 
