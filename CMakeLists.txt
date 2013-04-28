@@ -38,6 +38,7 @@ if((${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
 	set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install-dummy)
 else()
 	set(bindir  ${CMAKE_INSTALL_PREFIX}/bin               CACHE PATH "bindir")
+	## data dir will contain the default pack
 	set(datadir ${CMAKE_INSTALL_PREFIX}/share/smw CACHE PATH "datadir")
 	add_definitions(-DDATA_DIR="${datadir}/")
 endif()
@@ -156,10 +157,13 @@ endif(WIN32)
 Include(FindSDL)
 Include(FindSDL_image)
 Include(FindSDL_mixer)
+Include(FindSDL_net)
 
 find_package ( SDL REQUIRED )
 find_package ( SDL_mixer REQUIRED )
 find_package ( SDL_image REQUIRED )
+##TODO: make this optional
+find_package ( SDL_net REQUIRED )
 
 include_directories(${SDL_INCLUDE_DIR})
 

@@ -1,6 +1,8 @@
 #include "global.h"
 #include <string.h>
 
+#include "net.h"
+
 extern char szIPString[32];
 
 #ifdef _WIN32

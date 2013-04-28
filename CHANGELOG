@@ -2,7 +2,11 @@
 1.9.0 by neagix - WorkInProgress (not yet released)
 ------------------------------------------------------------------------------
 Source
+- CMake build system
 - various bugfixes due to improper C++ expressions
+- using faster random number generation
+- re-introduced net.cpp for preliminary support of network play
+- preliminary support of different screen resolutions
 - major refactoring, cleanup and improvements
 
 ------------------------------------------------------------------------------
@@ -598,7 +602,7 @@ Bug Fixes
  - Fixed general collision detection problems where players would end up inside blocks
 	Improved performance
 
- - New Maps (from 4matsy, j rok, nitsuja, ventuz, Xijar, Fernando Márquez and Quinn Storm)
+ - New Maps (from 4matsy, j rok, nitsuja, ventuz, Xijar, Fernando Mï¿½rquez and Quinn Storm)
 
  - New map layers (4 tile layers + 1 block layer)
 
