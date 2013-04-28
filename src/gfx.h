@@ -15,7 +15,7 @@
 |  + a class for fonts											|
 |																|
 | have a lot of fun!											|
-|		  © 2003-2008 Florian Hufsky <florian.hufsky@gmail.com>	|
+|		(C) 2003-2008 Florian Hufsky <florian.hufsky@gmail.com>	|
 +--------------------------------------------------------------*/
 
 #ifndef __GFX_H__
@@ -58,13 +58,18 @@ class gfxSprite
 
 		void setalpha(Uint8 alpha);
 
-		int getWidth(){return m_picture->w;}
-		int getHeight(){return m_picture->h;}
+    int getWidth() {
+        return m_picture->w;
+    }
+    int getHeight() {
+        return m_picture->h;
+    }
 
-		SDL_Surface *getSurface(){return m_picture;}
+    SDL_Surface *getSurface() {
+        return m_picture;
+    }
 		
-		void setSurface(SDL_Surface * surface)
-		{
+    void setSurface(SDL_Surface * surface) {
 			freeSurface();
 			m_picture = surface;
 			m_bltrect.w = (Uint16)m_picture->w; 
@@ -73,9 +78,16 @@ class gfxSprite
 
 		void freeSurface();
 
-		bool GetWrap() {return fWrap;}
-		void SetWrap(bool wrap) {fWrap = wrap;}
-		void SetWrap(bool wrap, short wrapsize) {fWrap = wrap; iWrapSize = wrapsize;}
+    bool GetWrap() {
+        return fWrap;
+    }
+    void SetWrap(bool wrap) {
+        fWrap = wrap;
+    }
+    void SetWrap(bool wrap, short wrapsize) {
+        fWrap = wrap;
+        iWrapSize = wrapsize;
+    }
 
 	private:
 		SDL_Surface *m_picture;
@@ -109,8 +121,12 @@ class gfxFont
 
 		void setalpha(Uint8 alpha);
 
-		int getHeight(){return SFont_TextHeight(m_font);};
-		int getWidth(const char *text){return SFont_TextWidth(m_font, text);};
+    int getHeight() {
+        return SFont_TextHeight(m_font);
+    };
+    int getWidth(const char *text) {
+        return SFont_TextWidth(m_font, text);
+    };
 
 	private:
 		SFont_Font *m_font;

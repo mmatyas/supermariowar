@@ -23,10 +23,14 @@ class sfxSound
 		void stop();
 		void sfx_pause();
 
-		void resetpause() {paused = false;}
+    void resetpause() {
+        paused = false;
+    }
 
 		void reset();
-		bool isready() {return ready;}
+    bool isready() {
+        return ready;
+    }
 		int isplaying();
 
 		void clearchannel();
@@ -52,10 +56,14 @@ class sfxMusic
 		void stop();
 		void sfx_pause();
 
-		void resetpause() {paused = false;}
+    void resetpause() {
+        paused = false;
+    }
 
 		void reset();
-		bool isready() {return ready;}
+    bool isready() {
+        return ready;
+    }
 		int isplaying();
 
 	private:

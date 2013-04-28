@@ -442,7 +442,7 @@ struct GameModeSettings {
 #include "object.h"
 #include "objectgame.h"
 #include "objecthazard.h"
-//#include "HashTable.h"
+#include "HashTable.h"
 #include "eyecandy.h"
 #include "gamemodes.h"
 #include "world.h"

@@ -11,8 +11,7 @@ class MO_CarriedObject;
 class CScore
 {
 	public:
-		CScore(short iPlace)
-		{
+    CScore(short iPlace) {
 			place = iPlace;
 			displayorder = iPlace;
 			
@@ -37,8 +36,7 @@ class CScore
 
 		void AdjustScore(short iValue);
 		
-		void SetScore(short iValue)
-		{
+    void SetScore(short iValue) {
 			score = iValue;
 			SetDigitCounters();
 		}
@@ -70,8 +68,7 @@ class CScore
 
 	private:
 
-		void SetDigitCounters()
-		{
+    void SetDigitCounters() {
 			short iDigits = score;
 			while(iDigits > 999)
 				iDigits -= 1000;
@@ -118,32 +115,58 @@ class CPlayer
 		void AddKillsInRowInAirAward();
 		void SetupNewPlayer();
 
-		short getGlobalID() {return globalID;}
-		short getTeamID() {return teamID;}
-		short getColorID() {return colorID;}
+    short getGlobalID() {
+        return globalID;
+    }
+    short getTeamID() {
+        return teamID;
+    }
+    short getColorID() {
+        return colorID;
+    }
 
 		bool bouncejump();
 
-		short GetWarpPlane() {return warpplane;}
+    short GetWarpPlane() {
+        return warpplane;
+    }
 		bool IsPlayerFacingRight();
 		
-		bool IsAcceptingItem() {return fAcceptingItem && statue_timer == 0 && iKuriboShoe == 0;}
-		bool PressedAcceptItemKey() {return fPressedAcceptItem;}
+    bool IsAcceptingItem() {
+        return fAcceptingItem && statue_timer == 0 && iKuriboShoe == 0;
+    }
+    bool PressedAcceptItemKey() {
+        return fPressedAcceptItem;
+    }
 		bool AcceptItem(MO_CarriedObject * item);
 
 		void SetPowerup(short iPowerup);
-		gfxSprite ** GetScoreboardSprite() {return pScoreboardSprite;}
+    gfxSprite ** GetScoreboardSprite() {
+        return pScoreboardSprite;
+    }
 
 		void DecreaseProjectileLimit();
 
-		bool isready() {return state == player_ready;}
-		bool isspawning() {return state == player_spawning;}
-		bool iswarping() {return state > player_ready;}
-		bool isdead() {return state == player_dead;}
+    bool isready() {
+        return state == player_ready;
+    }
+    bool isspawning() {
+        return state == player_spawning;
+    }
+    bool iswarping() {
+        return state > player_ready;
+    }
+    bool isdead() {
+        return state == player_dead;
+    }
 
 		void SetKuriboShoe(short iType);
-		bool IsInvincibleOnBottom() {return invincible || shield || iKuriboShoe;}
-		bool IsSuperStomping() {return fSuperStomp;}
+    bool IsInvincibleOnBottom() {
+        return invincible || shield || iKuriboShoe;
+    }
+    bool IsSuperStomping() {
+        return fSuperStomp;
+    }
 
 		void SetStoredPowerup(short iPowerup);
 		void StripPowerups();
@@ -173,10 +196,22 @@ class CPlayer
 
 		void ClearPowerupStates();
 
-		void xf(float xf){fx = xf; ix = (short)fx;};
- 		void xi(short xi){ix = xi; fx = (float)ix;};
-		void yf(float yf){fy = yf; iy = (short)fy;};
-		void yi(short yi){iy = yi; fy = (float)iy;};
+    void setXf(float xf) {
+        fx = xf;
+        ix = (short)fx;
+    }
+    void setXi(short xi) {
+        ix = xi;
+        fx = (float)ix;
+    }
+    void setYf(float yf) {
+        fy = yf;
+        iy = (short)fy;
+    }
+    void setYi(short yi) {
+        iy = yi;
+        fy = (float)iy;
+    }
 		
 		bool FindSpawnPoint();
 		void collision_detection_map();

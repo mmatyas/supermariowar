@@ -16,31 +16,25 @@ CObject * HashTable::Add(CObject * pObject)
 {
 	int iID = pObject->iNetworkID % capacity;
 
-	if(table[iID] == NULL)
-	{
+    if(table[iID] == NULL) {
 		HashNode * pNode = new HashNode;
 		pNode->data = pObject;
 		pNode->next = NULL;
 		table[iID] = pNode;
-	}
-	else
-	{
+    } else {
 		//printf("Collision - Slot: %d  ID: %d\n", iID, pObject->iNetworkID);
 
 		HashNode * pSearchNode = table[iID];
 		
-		if(pSearchNode->data->iNetworkID == pObject->iNetworkID)
-		{
+        if(pSearchNode->data->iNetworkID == pObject->iNetworkID) {
 			//printf("  + Duplicate found!\n");
 			CObject * pData = pSearchNode->data;
 			pSearchNode->data = pObject;
 			return pData;
 		}
 
-		while(pSearchNode->next)
-		{
-			if(pSearchNode->next->data->iNetworkID == pObject->iNetworkID)
-			{
+        while(pSearchNode->next) {
+            if(pSearchNode->next->data->iNetworkID == pObject->iNetworkID) {
 				//printf("  + Duplicate found!\n");
 				CObject * pData = pSearchNode->next->data;
 				pSearchNode->next->data = pObject;
@@ -65,8 +59,7 @@ CObject * HashTable::Get(int iNetworkID)
 {
 	HashNode * pNode = table[iNetworkID % capacity];
 
-	while(pNode)
-	{
+    while(pNode) {
 		if(pNode->data->iNetworkID == iNetworkID)
 			return pNode->data;
 
@@ -83,8 +76,7 @@ CObject * HashTable::Remove(int iNetworkID)
 	HashNode * pNode = table[iID];
 	HashNode * pPrevNode = NULL;
 
-	while(pNode)
-	{
+    while(pNode) {
 		if(pNode->data->iNetworkID == iNetworkID)
 			break;
 
@@ -111,10 +103,8 @@ CObject * HashTable::Remove(int iNetworkID)
 
 void HashTable::Clear()
 {
-	for(int k = 0; k < capacity; k++)
-	{
-		while(table[k])
-		{
+    for(int k = 0; k < capacity; k++) {
+        while(table[k]) {
 			HashNode * pNode = table[k];
 			table[k] = pNode->next;
 

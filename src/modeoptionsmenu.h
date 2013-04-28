@@ -12,8 +12,12 @@ class ModeOptionsMenu
 		void SetRandomGameModeSettings(short iMode);
 		void SetControllingTeam(short iControlTeam);
 
-		UI_Menu * GetOptionsMenu(short iMode) {return &mModeSettingsMenu[iMode];}
-		UI_Menu * GetBossOptionsMenu() {return &mBossSettingsMenu;}
+    UI_Menu * GetOptionsMenu(short iMode) {
+        return &mModeSettingsMenu[iMode];
+    }
+    UI_Menu * GetBossOptionsMenu() {
+        return &mBossSettingsMenu;
+    }
 
 		void HealthModeStartLifeChanged();
 		void HealthModeMaxLifeChanged();

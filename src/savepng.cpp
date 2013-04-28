@@ -82,23 +82,20 @@ int IMG_SavePNG_RW(SDL_Surface *face, SDL_RWops *src)
 	
 	png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, png_user_error, png_user_warn);
 	
-	if (png_ptr == NULL)
-	{
+    if (png_ptr == NULL) {
 		IMG_SetError("Couldn't allocate memory for PNG file");
 		return -1;
 	}
 	
 	/* Allocate/initialize the image information data.  REQUIRED */
 	info_ptr = png_create_info_struct(png_ptr);
-	if (info_ptr == NULL)
-	{
+    if (info_ptr == NULL) {
 		IMG_SetError("Couldn't create image information for PNG file");
 		goto done;
 	}
 	
 	/* Set error handling. */
-	if (setjmp(png_ptr->jmpbuf))
-	{
+    if (setjmp(png_ptr->jmpbuf)) {
 		/* If we get here, we had a problem reading the file */
 		IMG_SetError("Error writing the PNG file");
 		goto done;
@@ -128,8 +125,7 @@ int IMG_SavePNG_RW(SDL_Surface *face, SDL_RWops *src)
 	//row_pointers = (png_bytep*) malloc(sizeof(png_bytep)*surface->h);
 	row_pointers = new png_bytep[surface->h];
 	
-	if ( (row_pointers == NULL) ) 
-	{
+    if ( (row_pointers == NULL) ) {
 		IMG_SetError("Couldn't allocate PNG row pointers");
 		goto done;
 	}

@@ -75,7 +75,9 @@ class IO_BulletBillCannon : public CObject
 		void draw() {}
 		void update();
 
-		bool collide(CPlayer *) {return false;}
+    bool collide(CPlayer *) {
+        return false;
+    }
 		void collide(IO_MovingObject *) {}
 		
 	private:

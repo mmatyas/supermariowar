@@ -45,8 +45,7 @@ int ReadInt(FILE * inFile)
 #if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
 void ReadIntChunk(int * mem, size_t iQuantity, FILE * inFile)
 {
-	for(unsigned int i = 0; i < iQuantity; i++)
-	{
+    for(unsigned int i = 0; i < iQuantity; i++) {
 		fread(&mem[i], sizeof(Uint32), 1, inFile);
 
 		int t = mem[i];

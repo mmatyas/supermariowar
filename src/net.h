@@ -48,16 +48,14 @@ void net_close();
 bool net_runserver();
 bool net_connectclient();
 
-struct ServerClient
-{
+struct ServerClient {
 	int active;
 	TCPsocket sock;
 	IPaddress peer;
 	Uint8 name[256 + 1];
 };
 
-struct ClientPeer
-{
+struct ClientPeer {
 	int active;
 	Uint8 name[256 + 1];
 };

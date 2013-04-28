@@ -7,26 +7,22 @@ extern char szIPString[32];
 	#pragma comment(lib, "SDL_net.lib")
 #endif
 
-union
-{
+union {
 	float f;
 	unsigned char b[4];
 } dFloatAsBytes;
 
-union
-{
+union {
 	int i;
 	unsigned char b[4];
 } iIntAsBytes;
 
-union
-{
+union {
 	short s;
 	unsigned char b[2];
 } sShortAsBytes;
 
-union
-{
+union {
 	double d;
 	unsigned char b[8];
 } dDoubleAsBytes;
@@ -119,8 +115,7 @@ void WriteDoubleToBuffer(char * pData, double dDouble)
 
 bool net_init()
 {
-	if ( SDLNet_Init() < 0 ) 
-	{
+    if ( SDLNet_Init() < 0 ) {
 	    printf("SDLNet_Init: %s\n", SDLNet_GetError());
 	    return false;
 	}
@@ -148,8 +143,7 @@ NetServer::NetServer()
 {
 	numclients = 0;
 
-	for (int i = 0; i < MAXCLIENTS; ++i )
-	{
+    for (int i = 0; i < MAXCLIENTS; ++i ) {
 		clients[i].active = 0;
 		clients[i].sock = NULL;
 	}
@@ -167,8 +161,7 @@ bool NetServer::startserver()
 {
 	socketset = SDLNet_AllocSocketSet(MAXCLIENTS + 1);
 
-	if (socketset == NULL)
-	{
+    if (socketset == NULL) {
 		printf("Couldn't create socket set: %s\n", SDLNet_GetError());
 		return false;
 	}
@@ -179,8 +172,7 @@ bool NetServer::startserver()
 
 	tcpsock = SDLNet_TCP_Open(&ip);
 	
-	if (tcpsock == NULL)
-	{
+    if (tcpsock == NULL) {
 		cleanup();
 		printf("Couldn't create server socket: %s\n", SDLNet_GetError());
 		return false;
@@ -196,15 +188,12 @@ void NetServer::update()
 {
 	SDLNet_CheckSockets(socketset, 0);
 
-	if(SDLNet_SocketReady(tcpsock))
-	{
+    if(SDLNet_SocketReady(tcpsock)) {
 		handleserver();
 	}
 
-	for(int i = 0; i < MAXCLIENTS; ++i) 
-	{
-		if(SDLNet_SocketReady(clients[i].sock)) 
-		{
+    for(int i = 0; i < MAXCLIENTS; ++i) {
+        if(SDLNet_SocketReady(clients[i].sock)) {
 			handleclient(i);
 		}
 	}
@@ -221,21 +210,16 @@ void NetServer::handleserver()
 		return;
 	
 	/* Look for unconnected person slot */
-	for (which = 0; which < MAXCLIENTS; ++which)
-	{
-		if (!clients[which].sock)
-		{
+    for (which = 0; which < MAXCLIENTS; ++which) {
+        if (!clients[which].sock) {
 			break;
 		}
 	}
 
-	if (which == MAXCLIENTS)
-	{
+    if (which == MAXCLIENTS) {
 		/* Look for inactive person slot */
-		for (which = 0; which < MAXCLIENTS; ++which)
-		{
-			if (clients[which].sock && !clients[which].active)
-			{
+        for (which = 0; which < MAXCLIENTS; ++which) {
+            if (clients[which].sock && !clients[which].active) {
 				/* Kick them out.. */
 				data = NET_MSG_REJECT;
 				SDLNet_TCP_Send(clients[which].sock, &data, 1);
@@ -251,8 +235,7 @@ void NetServer::handleserver()
 		}
 	}
 
-	if (which == MAXCLIENTS)
-	{
+    if (which == MAXCLIENTS) {
 		/* No more room... */
 		data = NET_MSG_REJECT;
 		SDLNet_TCP_Send(newsock, &data, 1);
@@ -261,9 +244,7 @@ void NetServer::handleserver()
 #ifdef _DEBUG
 		printf("Connection refused -- server full\n");
 #endif
-	}
-	else
-	{
+    } else {
 		/* Add socket as an inactive person */
 		clients[which].sock = newsock;
 		clients[which].peer = *SDLNet_TCP_GetPeerAddress(newsock);
@@ -282,23 +263,19 @@ void NetServer::handleclient(int which)
 	int i;
 
 	/* Has the connection been closed? */
-	if (SDLNet_TCP_Recv(clients[which].sock, data, 512) <= 0)
-	{
+    if (SDLNet_TCP_Recv(clients[which].sock, data, 512) <= 0) {
 
 #ifdef _DEBUG
 		printf("Closing socket %d (was%s active)\n", which, clients[which].active ? "" : " not");
 #endif
 		/* Notify all active clients */
-		if (clients[which].active)
-		{
+        if (clients[which].active) {
 			clients[which].active = 0;
 			data[0] = NET_MSG_DEL;
 			data[NET_MSG_DEL_SLOT] = which;
 			
-			for (i = 0; i < MAXCLIENTS; ++i) 
-			{
-				if (clients[i].active) 
-				{
+            for (i = 0; i < MAXCLIENTS; ++i) {
+                if (clients[i].active) {
 					SDLNet_TCP_Send(clients[i].sock, data, 2);
 				}
 			}
@@ -307,13 +284,9 @@ void NetServer::handleclient(int which)
 		SDLNet_TCP_DelSocket(socketset, clients[which].sock);
 		SDLNet_TCP_Close(clients[which].sock);
 		clients[which].sock = NULL;
-	} 
-	else
-	{
-		switch (data[0]) 
-		{
-			case NET_MSG_JOIN: 
-			{
+    } else {
+        switch (data[0]) {
+        case NET_MSG_JOIN: {
 				/* An active connection */
 				memcpy(clients[which].name, &data[NET_MSG_JOIN_NAME], 256);
 				clients[which].name[256] = 0;
@@ -321,27 +294,22 @@ void NetServer::handleclient(int which)
 				printf("Activating socket %d (%s)\n", which, clients[which].name);
 #endif
 				/* Notify all active clients */
-				for (i = 0; i < MAXCLIENTS; ++i)
-				{
-					if (clients[i].active)
-					{
+            for (i = 0; i < MAXCLIENTS; ++i) {
+                if (clients[i].active) {
 						sendnewclientmessage(which, i);
 					}
 				}
 
 				/* Notify about all active clients */
 				clients[which].active = 1;
-				for (i = 0; i < MAXCLIENTS; ++i)
-				{
-					if (clients[i].active)
-					{
+            for (i = 0; i < MAXCLIENTS; ++i) {
+                if (clients[i].active) {
 						sendnewclientmessage(i, which);
 					}
 				}
 			}
 			break;
-			default: 
-			{
+        default: {
 				/* Unknown packet type?? */;
 			}
 			break;
@@ -370,14 +338,11 @@ void NetServer::broadcastmessage(char * szMsg)
 	data[NET_MSG_CHAT_NLEN] = iLength;
 	memcpy(&data[NET_MSG_CHAT_BODY], szMsg, iLength);
 	
-	for (int k = 0; k < MAXCLIENTS; ++k)
-	{
-		if (clients[k].active)
-		{
+    for (int k = 0; k < MAXCLIENTS; ++k) {
+        if (clients[k].active) {
 			int iResult = SDLNet_TCP_Send(clients[k].sock, data, iLength + NET_MSG_CHAT_BODY);
 			
-			if(iResult < iLength)
-			{
+            if(iResult < iLength) {
 				printf("SDLNet_TCP_Send Error: %s\n", SDLNet_GetError());
 				
 				// It may be good to disconnect sock because it is likely invalid now.
@@ -391,14 +356,12 @@ void NetServer::broadcastmessage(char * szMsg)
 
 void NetServer::cleanup()
 {
-	if (tcpsock != NULL)
-	{
+    if (tcpsock != NULL) {
 		SDLNet_TCP_Close(tcpsock);
 		tcpsock = NULL;
 	}
 	
-	if (socketset != NULL)
-	{
+    if (socketset != NULL) {
 		SDLNet_FreeSocketSet(socketset);
 		socketset = NULL;
 	}
@@ -427,16 +390,14 @@ bool NetClient::connecttoserver()
 
 	tcpsock = SDLNet_TCP_Open(&ip);
 	
-	if(!tcpsock)
-	{
+    if(!tcpsock) {
 		printf("SDLNet_TCP_Open: %s\n", SDLNet_GetError());
 		return false;
 	}
 
 	/* Allocate the socket set for polling the network */
 	socketset = SDLNet_AllocSocketSet(1);
-	if (socketset == NULL)
-	{
+    if (socketset == NULL) {
 		printf("Couldn't create socket set: %s\n", SDLNet_GetError());
 		return false;
 	}
@@ -450,8 +411,7 @@ void NetClient::update()
 {
 	SDLNet_CheckSockets(socketset, 0);
 
-	if (SDLNet_SocketReady(tcpsock))
-	{
+    if (SDLNet_SocketReady(tcpsock)) {
 		handleserver();
 	}
 
@@ -466,24 +426,19 @@ void NetClient::handleserver()
 	/* Has the connection been lost with the server? */
 	len = SDLNet_TCP_Recv(tcpsock, (char *)data, 512);
 
-	if ( len <= 0 ) 
-	{
+    if ( len <= 0 ) {
 		SDLNet_TCP_DelSocket(socketset, tcpsock);
 		SDLNet_TCP_Close(tcpsock);
 		tcpsock = NULL;
 
-	}
-	else
-	{
+    } else {
 		pos = 0;
-		while ( len > 0 )
-		{
+        while ( len > 0 ) {
 			used = handleserverdata(&data[pos]);
 			pos += used;
 			len -= used;
 			
-			if ( used == 0 )
-			{
+            if ( used == 0 ) {
 				/* We might lose data here.. oh well,
 				   we got a corrupt packet from server
 				 */
@@ -497,15 +452,12 @@ int NetClient::handleserverdata(Uint8 *data)
 {
 	int used;
 
-	switch (data[0])
-	{
-		case NET_MSG_ADD:
-		{
+    switch (data[0]) {
+    case NET_MSG_ADD: {
 			/* Figure out which channel we got */
 			Uint8 which = data[NET_MSG_ADD_SLOT];
 
-			if ((which >= MAXCLIENTS) || peers[which].active)
-			{
+        if ((which >= MAXCLIENTS) || peers[which].active) {
 				/* Invalid channel?? */
 				break;
 			}
@@ -522,14 +474,12 @@ int NetClient::handleserverdata(Uint8 *data)
 			break;
 		}
 		
-		case NET_MSG_DEL:
-		{
+    case NET_MSG_DEL: {
 			Uint8 which;
 
 			/* Figure out which channel we lost */
 			which = data[NET_MSG_DEL_SLOT];
-			if((which >= MAXCLIENTS) || !peers[which].active)
-			{
+        if((which >= MAXCLIENTS) || !peers[which].active) {
 				/* Invalid channel?? */
 				break;
 			}
@@ -542,15 +492,13 @@ int NetClient::handleserverdata(Uint8 *data)
 			break;
 		}
 
-		case NET_MSG_REJECT:
-		{
+    case NET_MSG_REJECT: {
 			printf("* Chat server full\n");
 			used = NET_MSG_REJECT_LEN;
 			break;
 		}
 
-		case NET_MSG_CHAT:
-		{
+    case NET_MSG_CHAT: {
 			/* Copy name into channel */
 			char szMsg[257];
 			memcpy(szMsg, &data[NET_MSG_CHAT_BODY], 256);
@@ -563,8 +511,7 @@ int NetClient::handleserverdata(Uint8 *data)
 			break;
 		}
 
-		default: 
-		{
+    default: {
 			/* Unknown packet type?? */;
 			used = 0;
 			break;
@@ -577,14 +524,12 @@ int NetClient::handleserverdata(Uint8 *data)
 void NetClient::cleanup()
 {
 	/* Close the network connections */
-	if (tcpsock != NULL)
-	{
+    if (tcpsock != NULL) {
 		SDLNet_TCP_Close(tcpsock);
 		tcpsock = NULL;
 	}
 	
-	if ( socketset != NULL )
-	{
+    if ( socketset != NULL ) {
 		SDLNet_FreeSocketSet(socketset);
 		socketset = NULL;
 	}
@@ -595,8 +540,7 @@ void NetClient::sendjoin()
 	char join[1+1+256];
 	char * name = "TestClient";
 
-	if ( tcpsock != NULL )
-	{
+    if ( tcpsock != NULL ) {
 		/* Construct the packet */
 		join[0] = NET_MSG_JOIN;
 

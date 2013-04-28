@@ -6,7 +6,7 @@
 |                                                           |
 | this sourcecode is released under the GPL.				|
 |															|
-|				© 2007 Florian Hufsky <fhufsky@phorus.at>	|
+|				(C) 2007 Florian Hufsky <fhufsky@phorus.at>	|
 +----------------------------------------------------------*/
 
 #define _SMW_EDITOR
@@ -70,7 +70,10 @@ void CPlayer::flipsidesifneeded() {}
 void CPlayer::KillPlayerMapHazard() {}
 void IO_MovingObject::flipsidesifneeded() {}
 void IO_MovingObject::KillObjectMapHazard() {}
-float CapFallingVelocity(float f) {return 0.0f;}
+float CapFallingVelocity(float f)
+{
+    return 0.0f;
+}
 void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead) {}
 gfxSprite		spr_thumbnail_platformarrows;
 gfxSprite		spr_thumbnail_warps[2];
@@ -95,8 +98,7 @@ char * szMapName = NULL;
 //main main main
 int main(int argc, char *argv[])
 {
-	if(argc != 2)
-	{
+    if(argc != 2) {
 		printf("Usage: screenshot mapfile.map\n");
 		exit(0);
 	}
@@ -129,8 +131,7 @@ int main(int argc, char *argv[])
 	g_map->loadTileSet(convertPath("maps/tileset.tls"), tileSetPNG);
 	
 	//Setup Platforms
-	for(short iPlatform = 0; iPlatform < MAX_PLATFORMS; iPlatform++)
-	{
+    for(short iPlatform = 0; iPlatform < MAX_PLATFORMS; iPlatform++) {
 		g_Platforms[iPlatform].rIcon[0].x = (iPlatform % 6) * 32;
 		g_Platforms[iPlatform].rIcon[0].y = (iPlatform / 6) * 32 + 224;
 		g_Platforms[iPlatform].rIcon[0].w = 32;
@@ -141,10 +142,8 @@ int main(int argc, char *argv[])
 		g_Platforms[iPlatform].rIcon[1].w = 32;
 		g_Platforms[iPlatform].rIcon[1].h = 32;
 
-		for(short iCol = 0; iCol < MAPWIDTH; iCol++)
-		{
-			for(short iRow = 0; iRow < MAPHEIGHT; iRow++)
-			{
+        for(short iCol = 0; iCol < MAPWIDTH; iCol++) {
+            for(short iRow = 0; iRow < MAPHEIGHT; iRow++) {
 				g_Platforms[iPlatform].tiles[iCol][iRow] = TILESETSIZE;
 			}
 		}
@@ -172,12 +171,10 @@ void drawlayer(int layer, bool fUseCopied, short iBlockSize)
 	
 	//draw left to right full vertical
 	bltrect.x = 0;
-	for(i = 0; i < MAPWIDTH; i++)
-	{
+    for(i = 0; i < MAPWIDTH; i++) {
 		bltrect.y = -iBlockSize;	//this is okay, see
 
-		for(j = 0; j < MAPHEIGHT; j++)
-		{
+        for(j = 0; j < MAPHEIGHT; j++) {
 			bltrect.y += iBlockSize;	// here
 
 			ts = g_map->mapdata[i][j][layer];
@@ -197,8 +194,7 @@ void drawlayer(int layer, bool fUseCopied, short iBlockSize)
 
 void drawmap(bool fScreenshot, short iBlockSize)
 {
-	if(iBlockSize != TILESIZE)
-	{
+    if(iBlockSize != TILESIZE) {
 		SDL_Rect srcrect;
 		srcrect.x = 0;
 		srcrect.y = 0;
@@ -211,14 +207,11 @@ void drawmap(bool fScreenshot, short iBlockSize)
 		dstrect.w = iBlockSize * 20;
 		dstrect.h = iBlockSize * 15;
 
-		if(SDL_SoftStretch(spr_background.getSurface(), &srcrect, blitdest, &dstrect) < 0)
-		{
+        if(SDL_SoftStretch(spr_background.getSurface(), &srcrect, blitdest, &dstrect) < 0) {
 			fprintf(stderr, "SDL_SoftStretch error: %s\n", SDL_GetError());
 			return;
 		}
-	}
-	else
-	{
+    } else {
 		spr_background.draw(0,0);
 	}
 
@@ -229,14 +222,11 @@ void drawmap(bool fScreenshot, short iBlockSize)
 	SDL_Rect rSrc = {0, 0, iBlockSize, iBlockSize};
 	SDL_Rect rDst = {0, 0, iBlockSize, iBlockSize};
 
-	for(int j = 0; j < MAPHEIGHT; j++)
-	{
-		for(int i = 0; i < MAPWIDTH; i++)
-		{
+    for(int j = 0; j < MAPHEIGHT; j++) {
+        for(int i = 0; i < MAPWIDTH; i++) {
 			int displayblock = displayblock = g_map->objectdata[i][j];
 
-			if(displayblock != BLOCKSETSIZE)
-			{
+            if(displayblock != BLOCKSETSIZE) {
 				rSrc.x = displayblock * iBlockSize;
 				rSrc.y = iBlockSize * 30;
 
@@ -254,14 +244,11 @@ void drawmap(bool fScreenshot, short iBlockSize)
 	drawlayer(2, false, iBlockSize);
 	drawlayer(3, false, iBlockSize);
 
-	for(int j = 0; j < MAPHEIGHT; j++)
-	{
-		for(int i = 0; i < MAPWIDTH; i++)
-		{
+    for(int j = 0; j < MAPHEIGHT; j++) {
+        for(int i = 0; i < MAPWIDTH; i++) {
 			Warp * warp = &g_map->warpdata[i][j];
 			
-			if(warp->connection != -1)
-			{
+            if(warp->connection != -1) {
 				SDL_Rect rSrc = {warp->connection * iBlockSize, warp->direction * iBlockSize, iBlockSize, iBlockSize};
 				SDL_Rect rDst = {i * iBlockSize, j * iBlockSize, iBlockSize, iBlockSize};
 
@@ -281,8 +268,7 @@ void loadmap(char * szMapFile)
 	std::string path = convertPath(filename);
 	backgroundlist.SetCurrentName(filename);
 	
-	if(!File_Exists(path))
-	{
+    if(!File_Exists(path)) {
 		path = convertPath("gfx/packs/Classic/backgrounds/Land_Classic.png");
 		backgroundlist.SetCurrentName("gfx/packs/Classic/backgrounds/Land_Classic.png");
 	}
@@ -291,18 +277,12 @@ void loadmap(char * szMapFile)
 
 	g_iNumPlatforms = g_map->iNumPlatforms;
 
-	for(short iPlatform = 0; iPlatform < g_iNumPlatforms; iPlatform++)
-	{
-		for(short iCol = 0; iCol < MAPWIDTH; iCol++)
-		{
-			for(short iRow = 0; iRow < MAPHEIGHT; iRow++)
-			{
-				if(iCol < g_map->platforms[iPlatform]->iTileWidth && iRow < g_map->platforms[iPlatform]->iTileHeight)
-				{
+    for(short iPlatform = 0; iPlatform < g_iNumPlatforms; iPlatform++) {
+        for(short iCol = 0; iCol < MAPWIDTH; iCol++) {
+            for(short iRow = 0; iRow < MAPHEIGHT; iRow++) {
+                if(iCol < g_map->platforms[iPlatform]->iTileWidth && iRow < g_map->platforms[iPlatform]->iTileHeight) {
 					g_Platforms[iPlatform].tiles[iCol][iRow] = g_map->platforms[iPlatform]->iTileData[iCol][iRow];
-				}
-				else
-				{
+                } else {
 					g_Platforms[iPlatform].tiles[iCol][iRow] = TILESETSIZE;
 				}
 			}
@@ -323,8 +303,7 @@ void takescreenshot()
 	short iTileSizes[3] = {32, 16, 8};
 	SDL_Surface * old_screen = screen;
 
-	for(short iScreenshotSize = 0; iScreenshotSize < 3; iScreenshotSize++)
-	{
+    for(short iScreenshotSize = 0; iScreenshotSize < 3; iScreenshotSize++) {
 		short iTileSize = iTileSizes[iScreenshotSize];
 
 		SDL_Surface * screenshot = SDL_CreateRGBSurface(old_screen->flags, iTileSize * 20, iTileSize * 15, old_screen->format->BitsPerPixel, 0, 0, 0, 0);
@@ -336,16 +315,12 @@ void takescreenshot()
 		SDL_Rect rSrc = {0, 0, iTileSize, iTileSize};
 		SDL_Rect rDst = {0, 0, iTileSize, iTileSize};
 
-		for(short iPlatform = 0; iPlatform < g_iNumPlatforms; iPlatform++)
-		{
-			for(short iPlatformX = 0; iPlatformX < g_map->platforms[iPlatform]->iTileWidth; iPlatformX++)
-			{
-				for(short iPlatformY = 0; iPlatformY < g_map->platforms[iPlatform]->iTileHeight; iPlatformY++)
-				{
+        for(short iPlatform = 0; iPlatform < g_iNumPlatforms; iPlatform++) {
+            for(short iPlatformX = 0; iPlatformX < g_map->platforms[iPlatform]->iTileWidth; iPlatformX++) {
+                for(short iPlatformY = 0; iPlatformY < g_map->platforms[iPlatform]->iTileHeight; iPlatformY++) {
 					short iTile = g_Platforms[iPlatform].tiles[iPlatformX][iPlatformY];
 
-					if(iTile != TILESETSIZE)
-					{
+                    if(iTile != TILESETSIZE) {
 						rSrc.x = iTile % TILESETWIDTH * iTileSize;
 						rSrc.y = iTile / TILESETWIDTH * iTileSize;
 
@@ -359,10 +334,8 @@ void takescreenshot()
 		}
 	
 		//And add platform paths
-		for(short iPlatform = 0; iPlatform < g_iNumPlatforms; iPlatform++)
-		{
-			if(g_Platforms[iPlatform].iStartX != g_Platforms[iPlatform].iEndX)
-			{
+        for(short iPlatform = 0; iPlatform < g_iNumPlatforms; iPlatform++) {
+            if(g_Platforms[iPlatform].iStartX != g_Platforms[iPlatform].iEndX) {
 				short iCenterOffsetY = (g_map->platforms[iPlatform]->iHeight >> 1) - 16;
 				iCenterOffsetY >>= iScreenshotSize; //Resize for preview and thumbnails
 
@@ -376,9 +349,7 @@ void takescreenshot()
 
 				spr_platformarrows[iScreenshotSize].draw((iSpotLeft - 1) * iTileSize, g_Platforms[iPlatform].iStartY * iTileSize + iCenterOffsetY, iTileSize * 2, 0, iTileSize, iTileSize);
 				spr_platformarrows[iScreenshotSize].draw((iSpotRight + 1) * iTileSize, g_Platforms[iPlatform].iStartY * iTileSize + iCenterOffsetY, iTileSize * 3, 0, iTileSize, iTileSize);
-			}
-			else
-			{
+            } else {
 				short iCenterOffsetX = (g_map->platforms[iPlatform]->iWidth >> 1) - 16;
 				iCenterOffsetX >>= iScreenshotSize; //Resize for preview and thumbnails
 

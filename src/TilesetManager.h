@@ -8,7 +8,9 @@ class CTileset
 		~CTileset();
 
 		bool ReadTileTypeFile(char * szFile);
-		char * GetName() {return szName;}
+    char * GetName() {
+        return szName;
+    }
 
 		TileType GetTileType(short iTileCol, short iTileRow);
 		void SetTileType(short iTileCol, short iTileRow, TileType type);
@@ -16,12 +18,19 @@ class CTileset
 		
 		void Draw(SDL_Surface * dstSurface, short iTileSize, SDL_Rect * srcRect, SDL_Rect * dstRect);
 
-		short GetHeight() {return iHeight;}
-		short GetWidth() {return iWidth;}
+    short GetHeight() {
+        return iHeight;
+    }
+    short GetWidth() {
+        return iWidth;
+    }
 		
 		void SaveTileset();
 
-		SDL_Surface * GetSurface(short iIndex) { if(iIndex < 0 || iIndex > 2) return NULL;  return sSurfaces[iIndex];}
+    SDL_Surface * GetSurface(short iIndex) {
+        if(iIndex < 0 || iIndex > 2) return NULL;
+        return sSurfaces[iIndex];
+    }
 
 	private:
 		char szName[256];
@@ -53,8 +62,12 @@ class CTilesetManager : public SimpleDirectoryList
 
 		void SaveTilesets();
 
-		CTileset * GetClassicTileset() {return tClassicTileset;}
-		short GetClassicTilesetIndex() {return iClassicTilesetIndex;}
+    CTileset * GetClassicTileset() {
+        return tClassicTileset;
+    }
+    short GetClassicTilesetIndex() {
+        return iClassicTilesetIndex;
+    }
 
 		CTileset * GetTileset(short iID);
 		SDL_Rect rRects[3][32][32];

@@ -1,9 +1,12 @@
 
 -----------------------------------< SFont >------------------------------------
 
-License: GPL or LGPL (at your choice)
-Author: Karl Bartel <karlb@gmx.net>
-WWW: http://www.linux-games.com
+License:
+GPL or LGPL (at your choice)
+Author:
+Karl Bartel <karlb@gmx.net>
+WWW:
+http://www.linux-games.com
 
 Usage:
     1. Load a font and place it in an SDL_Surface *. If your are using the 

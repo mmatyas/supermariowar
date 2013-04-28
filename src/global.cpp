@@ -5,6 +5,7 @@
 extern bool g_fLoadMessages;
 
 #include <cassert>
+
 //1.8.0.0 == Release to staff
 //1.8.0.1 == Second release to staff
 //1.8.0.2 == beta1
@@ -15,6 +16,7 @@ int g_iVersion[] = {1, 9, 0, 0};
 
 // main game directory, read from command line argument
 char		*RootDataDirectory;
+
 CGame	*smw;
 CResourceManager *rm;
 

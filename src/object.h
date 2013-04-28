@@ -22,10 +22,10 @@ class CObject
 		
 		virtual ObjectType getObjectType(){return objectType;}
 		
-		void xf(float xf){fx = xf; ix = (short)fx;};
- 		void xi(short xi){ix = xi; fx = (float)ix;};
-		void yf(float yf){fy = yf; if(fy < 0.0f) iy = (short)(fy - 1.0f); else iy = (short)fy;};
-		void yi(short yi){iy = yi; fy = (float)iy;};
+		void setXf(float xf){fx = xf; ix = (short)fx;};
+ 		void setXi(short xi){ix = xi; fx = (float)ix;};
+		void setYf(float yf){fy = yf; if(fy < 0.0f) iy = (short)(fy - 1.0f); else iy = (short)fy;};
+		void setYi(short yi){iy = yi; fy = (float)iy;};
 
 		int iNetworkID;
 		short ix, iy;
@@ -35,10 +35,17 @@ class CObject
 		short collisionOffsetX;
 		short collisionOffsetY;
 
-		short GetState() {return state;}
-		bool GetDead() {return dead;}
+    short GetState() {
+        return state;
+    }
+    bool GetDead() {
+        return dead;
+    }
 
-		bool GetWrap() { if (spr) return spr->GetWrap(); return true; }
+    bool GetWrap() {
+        if (spr) return spr->GetWrap();
+        return true;
+    }
 
 		void GetCollisionBlocks(IO_Block * blocks[4]);
 
@@ -79,20 +86,30 @@ class IO_MovingObject : public CObject
 		virtual bool collide(CPlayer * player);
 		
 		void collide(IO_MovingObject *){}
-		MovingObjectType getMovingObjectType() {return movingObjectType;}
+    MovingObjectType getMovingObjectType() {
+        return movingObjectType;
+    }
 		void applyfriction();
 		void collision_detection_map();
 		bool collision_detection_checksides();
 		void flipsidesifneeded();
 
 		virtual void SideBounce(bool fRightSide) {}
-		virtual float BottomBounce() {return bounce;}
+    virtual float BottomBounce() {
+        return bounce;
+    }
 		void KillObjectMapHazard(short playerID = -1);
 
-		virtual void CheckAndDie() {dead = true;}
-		virtual void Die() {dead = true;}
+    virtual void CheckAndDie() {
+        dead = true;
+    }
+    virtual void Die() {
+        dead = true;
+    }
 
-		bool CollidesWithMap() {return fObjectCollidesWithMap;}
+    bool CollidesWithMap() {
+        return fObjectCollidesWithMap;
+    }
 
 		short iPlayerID;
 		short iTeamID;
@@ -160,7 +177,9 @@ class IO_OverMapObject : public CObject
 		virtual void update();
 		virtual void animate();
 
-		virtual bool collide(CPlayer *){return false;}
+    virtual bool collide(CPlayer *) {
+        return false;
+    }
 		virtual void collide(IO_MovingObject *){}
 		
 	protected:
@@ -184,14 +203,12 @@ class CObjectContainer
 
 		void add(CObject *cio);
 
-		void update()
-		{
+    void update() {
 			for(short i = 0; i < list_end; i++)
 				list[i]->update();
 		};
 
-		void draw()
-		{
+    void draw() {
 			for(short i = list_end - 1; i >= 0; i--)
 				list[i]->draw();
 		};

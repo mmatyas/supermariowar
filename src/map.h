@@ -33,20 +33,17 @@ enum TileTypeFlag {tile_flag_nonsolid = 0, tile_flag_solid = 1, tile_flag_solid_
 
 class MovingPlatform;
 
-struct ScreenPoint
-{
+struct ScreenPoint {
 	short x, y;
 };
 
-struct Warp
-{
+struct Warp {
 	short direction;
 	short connection;
 	short id;
 };
 
-struct WarpExit
-{
+struct WarpExit {
 	short direction;
 	short connection;
 	short id;
@@ -64,8 +61,7 @@ struct WarpExit
 	short locktimer;  //If > 0, then warp is locked and has this many frames left until unlock
 };
 
-struct SpawnArea
-{
+struct SpawnArea {
 	short left;
 	short top;
 	short width;
@@ -73,15 +69,13 @@ struct SpawnArea
 	short size;
 };
 
-struct MapItem
-{
+struct MapItem {
 	short itype;
 	short ix;
 	short iy;
 };
 
-struct MapHazard
-{
+struct MapHazard {
 	short itype;
 	short ix;
 	short iy;
@@ -90,21 +84,18 @@ struct MapHazard
 	float dparam[NUMMAPHAZARDPARAMS];
 };
 
-struct TilesetTile
-{
+struct TilesetTile {
 	short iID;
 	short iCol;
 	short iRow;
 };
 
-struct TilesetTranslation
-{
+struct TilesetTranslation {
 	short iID;
 	char szName[128];
 };
 
-struct AnimatedTile
-{
+struct AnimatedTile {
 	short id;
 	TilesetTile layers[4];
 	SDL_Rect rSrc[4][4];
@@ -115,14 +106,12 @@ struct AnimatedTile
 	MovingPlatform * pPlatform;
 };
 
-struct MapTile
-{
+struct MapTile {
 	TileType iType;
 	int iFlags;
 };
 
-struct MapBlock
-{
+struct MapBlock {
 	short iType;
 	short iSettings[NUM_BLOCK_SETTINGS];
 	bool fHidden;
@@ -174,28 +163,23 @@ class CMap
 
 		//returns the tiletype at the specific position (map coordinates) of the
 		//front most visible tile
-		int map(int x, int y)
-		{
+    int map(int x, int y) {
 			return mapdatatop[x][y].iFlags;
 		}
 
-		IO_Block * block(short x, short y)
-		{
+    IO_Block * block(short x, short y) {
 			return blockdata[x][y];
 		}
 
-		Warp * warp(short x, short y)
-		{
+    Warp * warp(short x, short y) {
 			return &warpdata[x][y];
 		}
 
-		MapBlock * blockat(short x, short y)
-		{
+    MapBlock * blockat(short x, short y) {
 			return &objectdata[x][y];
 		}
 
-		bool spawn(short iType, short x, short y)
-		{
+    bool spawn(short iType, short x, short y) {
 			return !nospawn[iType][x][y];
 		}
 
@@ -208,7 +192,9 @@ class CMap
 		void movingPlatformCollision(IO_MovingObject * object);
 		bool movingPlatformCheckSides(IO_MovingObject * object);
 
-		bool isconnectionlocked(int connection) {return warplocked[connection];}
+    bool isconnectionlocked(int connection) {
+        return warplocked[connection];
+    }
 		void lockconnection(int connection);
 
 		WarpExit * getRandomWarpExit(int connection, int currentID);

@@ -112,32 +112,48 @@ class UI_Menu
 
 		void AddControl(UI_Control * control, UI_Control * up, UI_Control * down, UI_Control * left, UI_Control * right);
 		void AddNonControl(UI_Control * control);
-		UI_Control * GetHeadControl() {return headControl;}
+    UI_Control * GetHeadControl() {
+        return headControl;
+    }
 		void SetHeadControl(UI_Control * control);
 		void ResetMenu();
 
-		void SetCancelCode(MenuCodeEnum code) {cancelCode = code;}
+    void SetCancelCode(MenuCodeEnum code) {
+        cancelCode = code;
+    }
 
 		void Update();
 		void Draw();
 		
-		void ClearEyeCandy() {eyeCandy.clean();}
+    void ClearEyeCandy() {
+        eyeCandy.clean();
+    }
 
 		void ResetCurrentControl();
 		MenuCodeEnum SendInput(CPlayerInput * playerInput);
 
-		void AddEyeCandy(CEyecandy * ec) {eyeCandy.add(ec);}
+    void AddEyeCandy(CEyecandy * ec) {
+        eyeCandy.add(ec);
+    }
 
 		void RememberCurrent();
 		void RestoreCurrent();
 
-		UI_Control * GetCurrentControl() {return current;}
+    UI_Control * GetCurrentControl() {
+        return current;
+    }
 
-		void SetControllingTeam(short teamid) {iControllingTeam = teamid;}
-		void SetAllowExit(bool allowExit) {fAllowExitButton = allowExit;}
+    void SetControllingTeam(short teamid) {
+        iControllingTeam = teamid;
+    }
+    void SetAllowExit(bool allowExit) {
+        fAllowExitButton = allowExit;
+    }
 
 		MenuCodeEnum MouseClick(short iMouseX, short iMouseY);
-		bool IsModifying() {return fModifyingItem;}
+    bool IsModifying() {
+        return fModifyingItem;
+    }
 
 		void Refresh();
 

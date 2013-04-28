@@ -35,9 +35,15 @@ class MapList
         bool startswith(char letter);
 		bool startswith(std::string match);
 
-		const char* currentFilename(){return (*outercurrent).second->filename.c_str();}
-        const char* currentShortmapname(){return (*outercurrent).first.c_str();}
-		const int currentShortMapNameLen(){return (*outercurrent).second->iShortNameLength;}
+    const char* currentFilename() {
+        return (*outercurrent).second->filename.c_str();
+    }
+    const char* currentShortmapname() {
+        return (*outercurrent).first.c_str();
+    }
+    int currentShortMapNameLen() {
+        return (*outercurrent).second->iShortNameLength;
+    }
         
 		void prev(bool fUseFilters);
         void next(bool fUseFilters);
@@ -46,24 +52,44 @@ class MapList
 		const char* randomFilename();
 
 		//Sets/Gets if a map at the current map node is valid and can be loaded
-		void SetValid(bool fValid) {(*current).second->fValid = fValid;}
-		bool GetValid() {return (*current).second->fValid;}
+    void SetValid(bool fValid) {
+        (*current).second->fValid = fValid;
+    }
+    bool GetValid() {
+        return (*current).second->fValid;
+    }
         
 		//TODO: use size?
-		bool IsEmpty(){ return maps.empty(); }
-        
-		int GetFilteredCount() {return iFilteredMapCount;}
-		int GetCount() {return maps.size();}
-		
-		std::map<std::string, MapListNode*>::iterator GetCurrent() {return current;}
-		void SetCurrent(std::map<std::string, MapListNode*>::iterator itr) {outercurrent = current = itr;}
+    bool IsEmpty() {
+        return maps.empty();
+    }
+
+    int GetFilteredCount() {
+        return iFilteredMapCount;
+    }
+    int GetCount() {
+        return maps.size();
+    }
+
+    std::map<std::string, MapListNode*>::iterator GetCurrent() {
+        return current;
+    }
+    void SetCurrent(std::map<std::string, MapListNode*>::iterator itr) {
+        outercurrent = current = itr;
+    }
 
 		void WriteFilters();
 		void ReadFilters();
 		
-		bool GetFilter(short iFilter) {return (*current).second->pfFilters[iFilter];}
-		bool * GetFilters() {return (*current).second->pfFilters;}
-		void ToggleFilter(short iFilter) {(*current).second->pfFilters[iFilter] = !(*current).second->pfFilters[iFilter];}
+    bool GetFilter(short iFilter) {
+        return (*current).second->pfFilters[iFilter];
+    }
+    bool * GetFilters() {
+        return (*current).second->pfFilters;
+    }
+    void ToggleFilter(short iFilter) {
+        (*current).second->pfFilters[iFilter] = !(*current).second->pfFilters[iFilter];
+    }
 
 		bool FindFilteredMap();
 		void ApplyFilters(bool * pfFilters);
@@ -71,8 +97,12 @@ class MapList
 
 		std::map<std::string, MapListNode*>::iterator GetIteratorAt(unsigned short iIndex, bool fUseFilters);
 
-		void SaveCurrent() {savedcurrent = current;}
-		void ResumeCurrent() {current = savedcurrent;}
+    void SaveCurrent() {
+        savedcurrent = current;
+    }
+    void ResumeCurrent() {
+        current = savedcurrent;
+    }
 
 		void ReloadMapAutoFilters();
 		void WriteMapSummaryCache();

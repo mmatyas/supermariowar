@@ -116,8 +116,7 @@ bool DirectoryListing :: operator() (string &s)
 
             /* Try to get next file in list */
             current = readdir(dhandle);
-            if (current)
-            {
+        if (current) {
                 /* Return the filename */
                 s = current->d_name;
                 retval = true;
@@ -143,11 +142,9 @@ bool DirectoryListing :: NextDirectory (string &s)
 #ifdef _WIN32
 
 	struct stat fileinfo;
-	do
-    {
+    do {
         /* If we have a filename stored.. */
-        if (Stored_Filename.size())
-        {
+        if (Stored_Filename.size()) {
             /* Return this filename */
             s = Stored_Filename;
             
@@ -170,12 +167,10 @@ bool DirectoryListing :: NextDirectory (string &s)
 #else /* POSIX directory enumeration - more straightforward */
 
     struct stat fileinfo;
-    do
-    {
+    do {
         /* Try to get next file in list */
         current = readdir(dhandle);
-        if (current)
-        {
+        if (current) {
             /* Return the filename */
             s = current->d_name;
             retval = true;
@@ -183,8 +178,7 @@ bool DirectoryListing :: NextDirectory (string &s)
 
         /* There are no more files in the list*/
         else retval = false;
-    }
-    while (retval == true && (stat(fullName(s).c_str(), &fileinfo) == -1 || !S_ISDIR(fileinfo.st_mode) || s == "." || s == ".." || s == "CVS" || s == ".svn"));
+    } while (retval == true && (stat(fullName(s).c_str(), &fileinfo) == -1 || !S_ISDIR(fileinfo.st_mode) || s == "." || s == ".." || s == "CVS" || s == ".svn"));
 
 #endif
 

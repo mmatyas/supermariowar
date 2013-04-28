@@ -22,11 +22,21 @@ class MI_InputControlField : public UI_Control
 
 		MenuCodeEnum Modify(bool modify);
 
-		void SetDevice(short device) {iDevice = device;}
-		void SetKey(short * key) {iKey = key;}
-		void SetType(short type) {iType = type;}
-		void SetKeyIndex(short keyindex) {iKeyIndex = keyindex;}
-		void SetPlayerIndex(short playerindex) {iPlayerIndex = playerindex;}
+    void SetDevice(short device) {
+        iDevice = device;
+    }
+    void SetKey(short * key) {
+        iKey = key;
+    }
+    void SetType(short type) {
+        iType = type;
+    }
+    void SetKeyIndex(short keyindex) {
+        iKeyIndex = keyindex;
+    }
+    void SetPlayerIndex(short playerindex) {
+        iPlayerIndex = playerindex;
+    }
 
 	private:
 
@@ -381,8 +391,12 @@ class MI_TournamentScoreboard : public UI_Control
 	private:
 
 		void FreeScoreboard();
-		short GetYFromPlace(short iPlace) {return iy + iPlace * 69 + (4 - iNumTeams) * 35;}
-		float GetIconSpacing() {return (float)(372 - iNumGames * 32) / (float)(iNumGames + 1);}
+    short GetYFromPlace(short iPlace) {
+        return iy + iPlace * 69 + (4 - iNumTeams) * 35;
+    }
+    float GetIconSpacing() {
+        return (float)(372 - iNumGames * 32) / (float)(iNumGames + 1);
+    }
 
 		bool fCreated;
 
@@ -433,7 +447,9 @@ class MI_BonusWheel : public UI_Control
 		void Update();
 		void Draw();
 
-		bool GetPowerupSelectionDone() {return fPowerupSelectionDone;}
+    bool GetPowerupSelectionDone() {
+        return fPowerupSelectionDone;
+    }
 		void Reset(bool fTournament);
 
 	private:
@@ -496,14 +512,12 @@ class MI_ScreenResize : public UI_Control
 class MFS_ListItem
 {
 	public:
-		MFS_ListItem()
-		{
+    MFS_ListItem() {
 			sName = "";
 			fSelected = false;
 		}
 
-		MFS_ListItem(std::string sname, short icon, bool fselected)
-		{
+    MFS_ListItem(std::string sname, short icon, bool fselected) {
 			sName = sname;
 			iIcon = icon;
 			fSelected = fselected;
@@ -607,7 +621,9 @@ class MI_World : public UI_Control
 		void DisplayTeamControlAnnouncement();
 
 		void SetCurrentStageToCompleted(short iWinningTeam);
-		void ClearCloud() {fUsingCloud = false;}
+    void ClearCloud() {
+        fUsingCloud = false;
+    }
 
 	private:
 

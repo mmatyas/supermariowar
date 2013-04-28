@@ -5,8 +5,7 @@
 
 class MI_World;
 
-struct WorldMapTile
-{
+struct WorldMapTile {
 	//Id is used for searching for AI
 	short iID;
 
@@ -175,7 +174,10 @@ class WorldMap
 		void SetPlayerSprite(short iPlayerSprite);
 		bool IsVehicleMoving();
 
-		void GetWorldSize(short * w, short * h) {*w = iWidth; *h = iHeight;}
+    void GetWorldSize(short * w, short * h) {
+        *w = iWidth;
+        *h = iHeight;
+    }
 
 		void GetPlayerPosition(short * iPlayerX, short * iPlayerY);
 		void SetPlayerPosition(short iPlayerCol, short iPlayerRow);
@@ -209,9 +211,13 @@ class WorldMap
 
 		void SetInitialPowerups();
 
-		short GetMusicCategory() {return iMusicCategory;}
+    short GetMusicCategory() {
+        return iMusicCategory;
+    }
 
-		const char * GetWorldName() {return worldName.c_str();}
+    const char * GetWorldName() {
+        return worldName.c_str();
+    }
 
 	private:
 

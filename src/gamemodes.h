@@ -7,8 +7,7 @@
 enum GameModeType{game_mode_classic, game_mode_frag, game_mode_timelimit, game_mode_jail, game_mode_coins, game_mode_stomp, game_mode_eggs, game_mode_ctf, game_mode_chicken, game_mode_tag, game_mode_star, game_mode_domination, game_mode_koth, game_mode_race, game_mode_owned, game_mode_frenzy, game_mode_survival, game_mode_greed, game_mode_health, game_mode_collection, game_mode_chase, game_mode_shyguytag, GAMEMODE_LAST, game_mode_bonus = 999, game_mode_pipe_minigame = 1000, game_mode_boss_minigame = 1001, game_mode_boxes_minigame = 1002};
 enum PlayerKillType{player_kill_none, player_kill_normal, player_kill_removed, player_kill_nonkill};
 
-struct SModeOption
-{
+struct SModeOption {
 	char szName[64];
 	short iValue;
 };
@@ -64,9 +63,13 @@ class CGameMode
 		virtual short playerkilledself(CPlayer &player, killstyle style);
 		virtual void playerextraguy(CPlayer &player, short iType);
 
-		virtual short CheckWinner(CPlayer *) {return player_kill_normal;}
+    virtual short CheckWinner(CPlayer *) {
+        return player_kill_normal;
+    }
 
-		virtual bool HasStoredPowerups() {return true;}
+    virtual bool HasStoredPowerups() {
+        return true;
+    }
 
 		void transferbobombifneeded(CPlayer &inflictor, CPlayer &other);
 		void displayplayertext();
@@ -79,18 +82,28 @@ class CGameMode
 		CPlayer *tagged;
 		CPlayer *frenzyowner;
 
-		GameModeType getgamemode(){return gamemode;}
+    GameModeType getgamemode() {
+        return gamemode;
+    }
 		GameModeType gamemode;
 
-		char * GetModeName() {return szModeName;}
-		char * GetGoalName() {return szGoalName;}
-		SModeOption * GetOptions() {return modeOptions;}
+    char * GetModeName() {
+        return szModeName;
+    }
+    char * GetGoalName() {
+        return szGoalName;
+    }
+    SModeOption * GetOptions() {
+        return modeOptions;
+    }
 		
 		bool playedwarningsound;
 		short goal;
 
 		short GetClosestGoal(short iGoal);
-		bool GetReverseScoring() {return fReverseScoring;}
+    bool GetReverseScoring() {
+        return fReverseScoring;
+    }
 
 #ifdef _DEBUG
 		virtual void setdebuggoal() {};
@@ -125,7 +138,9 @@ class CGM_Frag : public CGameMode
 		short CheckWinner(CPlayer * player);
 
 #ifdef _DEBUG
-		void setdebuggoal() {goal = 5;}
+    void setdebuggoal() {
+        goal = 5;
+    }
 #endif
 		
 };
@@ -148,7 +163,9 @@ class CGM_TimeLimit : public CGameMode
 		void addtime(short iTime);
 
 #ifdef _DEBUG
-		void setdebuggoal() {goal = 30;}
+    void setdebuggoal() {
+        goal = 30;
+    }
 #endif
 
 	protected:
@@ -170,7 +187,9 @@ class CGM_Classic : public CGameMode
 		virtual void playerextraguy(CPlayer &player, short iType);
 
 #ifdef _DEBUG
-		void setdebuggoal() {goal = 5;}
+    void setdebuggoal() {
+        goal = 5;
+    }
 #endif
 
 };
@@ -191,7 +210,9 @@ class CGM_Chicken : public CGameMode
 		short CheckWinner(CPlayer * player);
 
 #ifdef _DEBUG
-		void setdebuggoal() {goal = 100;}
+    void setdebuggoal() {
+        goal = 100;
+    }
 #endif
 
 };
@@ -209,7 +230,9 @@ class CGM_Tag : public CGameMode
 		void playerextraguy(CPlayer &player, short iType);
 
 #ifdef _DEBUG
-		void setdebuggoal() {goal = 100;}
+    void setdebuggoal() {
+        goal = 100;
+    }
 #endif
 
 };
@@ -230,7 +253,9 @@ class CGM_ShyGuyTag : public CGameMode
 		void SetShyGuy(short iTeam);
 
 #ifdef _DEBUG
-		void setdebuggoal() {goal = 100;}
+    void setdebuggoal() {
+        goal = 100;
+    }
 #endif
 
 	private:
@@ -258,7 +283,9 @@ class CGM_Coins : public CGameMode
 		short CheckWinner(CPlayer * player);
 
 #ifdef _DEBUG
-		void setdebuggoal() {goal = 5;}
+    void setdebuggoal() {
+        goal = 5;
+    }
 #endif
 
 };
@@ -276,7 +303,9 @@ class CGM_Eggs : public CGameMode
 		short CheckWinner(CPlayer * player);
 
 #ifdef _DEBUG
-		void setdebuggoal() {goal = 5;}
+    void setdebuggoal() {
+        goal = 5;
+    }
 #endif
 
 };
@@ -331,7 +360,9 @@ class CGM_Domination : public CGameMode
 		short CheckWinner(CPlayer * player);
 
 #ifdef _DEBUG
-		void setdebuggoal() {goal = 100;}
+    void setdebuggoal() {
+        goal = 100;
+    }
 #endif
 };
 
@@ -348,7 +379,9 @@ class CGM_Owned : public CGameMode
 		void playerextraguy(CPlayer &player, short iType);
 
 #ifdef _DEBUG
-		void setdebuggoal() {goal = 100;}
+    void setdebuggoal() {
+        goal = 100;
+    }
 #endif
 
 	private:
@@ -409,11 +442,15 @@ class CGM_Race : public CGameMode
 		short playerkilledself(CPlayer &player, killstyle style);
 		void playerextraguy(CPlayer &player, short iType);
 
-		short getNextGoal(short teamID) {return nextGoal[teamID];}
+    short getNextGoal(short teamID) {
+        return nextGoal[teamID];
+    }
 		void setNextGoal(short teamID);
 
 #ifdef _DEBUG
-		void setdebuggoal() {goal = 5;}
+    void setdebuggoal() {
+        goal = 5;
+    }
 #endif
 
 	protected:
@@ -442,12 +479,18 @@ class CGM_Star : public CGM_TimeLimit
 
 		bool isplayerstar(CPlayer * player);
 		CPlayer * swapplayer(short id, CPlayer * player);
-		CPlayer * getstarplayer(short id) {return starPlayer[id];}
+    CPlayer * getstarplayer(short id) {
+        return starPlayer[id];
+    }
 
-		short getcurrentmodetype() {return iCurrentModeType;}
+    short getcurrentmodetype() {
+        return iCurrentModeType;
+    }
 
 #ifdef _DEBUG
-		void setdebuggoal() {goal = 1;}
+    void setdebuggoal() {
+        goal = 1;
+    }
 #endif
 
 	private:
@@ -475,7 +518,9 @@ class CGM_CaptureTheFlag : public CGameMode
 		short CheckWinner(CPlayer * player);
 
 #ifdef _DEBUG
-		void setdebuggoal() {goal = 5;}
+    void setdebuggoal() {
+        goal = 5;
+    }
 #endif
 };
 
@@ -493,7 +538,9 @@ class CGM_KingOfTheHill : public CGM_Domination
 		void playerextraguy(CPlayer &player, short iType);
 
 #ifdef _DEBUG
-		void setdebuggoal() {goal = 100;}
+    void setdebuggoal() {
+        goal = 100;
+    }
 #endif
 };
 
@@ -512,7 +559,9 @@ class CGM_Greed : public CGM_Classic
 		short ReleaseCoins(CPlayer &player, killstyle style);
 
 #ifdef _DEBUG
-		void setdebuggoal() {goal = 10;}
+    void setdebuggoal() {
+        goal = 10;
+    }
 #endif
 
 };
@@ -530,7 +579,9 @@ class CGM_Health : public CGM_Classic
 		virtual void playerextraguy(CPlayer &player, short iType);
 
 #ifdef _DEBUG
-		void setdebuggoal() {goal = 5;}
+    void setdebuggoal() {
+        goal = 5;
+    }
 #endif
 
 };
@@ -553,7 +604,9 @@ class CGM_Collection : public CGameMode
 		short CheckWinner(CPlayer * player);
 
 #ifdef _DEBUG
-		void setdebuggoal() {goal = 5;}
+    void setdebuggoal() {
+        goal = 5;
+    }
 #endif
 
 	private:
@@ -579,7 +632,9 @@ class CGM_Chase : public CGameMode
 		CPlayer * GetKeyHolder();
 
 #ifdef _DEBUG
-		void setdebuggoal() {goal = 50;}
+    void setdebuggoal() {
+        goal = 50;
+    }
 #endif
 
 	private:
@@ -606,9 +661,13 @@ class CGM_Boss_MiniGame : public CGameMode
 
 		bool SetWinner(CPlayer * player);
 		void SetBossType(short bosstype);
-		short GetBossType() {return iBossType;}
+    short GetBossType() {
+        return iBossType;
+    }
 
-		bool HasStoredPowerups() {return false;}
+    bool HasStoredPowerups() {
+        return false;
+    }
 
 	private:
 		
@@ -630,11 +689,17 @@ class CGM_Bonus : public CGameMode
 		//Override so it doesn't display winner text after you choose a powerup
 		void think() {}
 
-		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style) {return false;}
-		short playerkilledself(CPlayer &player, killstyle style) {return false;}
+    short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style) {
+        return false;
+    }
+    short playerkilledself(CPlayer &player, killstyle style) {
+        return false;
+    }
 		void playerextraguy(CPlayer &player, short iType) {}
 
-		bool HasStoredPowerups() {return false;}
+    bool HasStoredPowerups() {
+        return false;
+    }
 
 	private:
 
@@ -657,9 +722,13 @@ class CGM_Pipe_MiniGame : public CGameMode
 		short CheckWinner(CPlayer * player);
 
 		void SetBonus(short iType, short iTimer, short iTeamID);
-		bool IsSlowdown() {return fSlowdown;}
+    bool IsSlowdown() {
+        return fSlowdown;
+    }
 
-		bool HasStoredPowerups() {return false;}
+    bool HasStoredPowerups() {
+        return false;
+    }
 
 	private:
 
@@ -689,7 +758,9 @@ class CGM_Boxes_MiniGame : public CGameMode
 		short CheckWinner(CPlayer * player);
 		bool SetWinner(CPlayer * player);
 		
-		bool HasStoredPowerups() {return false;}
+    bool HasStoredPowerups() {
+        return false;
+    }
 
 	private:
 		

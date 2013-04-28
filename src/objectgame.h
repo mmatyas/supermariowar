@@ -19,8 +19,12 @@ class IO_Block : public CObject
 		
 		virtual BlockType getBlockType() = 0;
 
-		virtual bool isTransparent() {return false;}
-		virtual bool isHidden() {return hidden;}
+    virtual bool isTransparent() {
+        return false;
+    }
+    virtual bool isHidden() {
+        return hidden;
+    }
 
 		virtual bool hittop(CPlayer * player, bool useBehavior);
 		virtual bool hitbottom(CPlayer * player, bool useBehavior);
@@ -59,7 +63,9 @@ class B_PowerupBlock : public IO_Block
 		B_PowerupBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, bool fHidden, short * piSettings);
 		~B_PowerupBlock(){};
 
-		BlockType getBlockType(){return block_powerup;}
+    BlockType getBlockType() {
+        return block_powerup;
+    }
 
 		void draw();
 		void update();
@@ -100,7 +106,9 @@ class B_ViewBlock : public B_PowerupBlock
 		B_ViewBlock(gfxSprite *nspr, short x, short y, bool fHidden, short * piSettings);
 		~B_ViewBlock(){};
 
-		BlockType getBlockType(){return block_view;}
+    BlockType getBlockType() {
+        return block_view;
+    }
 
 		void draw();
 		void update();
@@ -123,7 +131,9 @@ class B_BreakableBlock : public IO_Block
 		B_BreakableBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed);
 		~B_BreakableBlock(){};
 
-		BlockType getBlockType(){return block_breakable;}
+    BlockType getBlockType() {
+        return block_breakable;
+    }
 
 		void draw();
 		void update();
@@ -152,7 +162,9 @@ class B_NoteBlock : public IO_Block
 		B_NoteBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short type, bool fHidden);
 		~B_NoteBlock(){};
 
-		BlockType getBlockType(){return block_note;}
+    BlockType getBlockType() {
+        return block_note;
+    }
 
 		void draw();
 		void update();
@@ -184,7 +196,9 @@ class B_DonutBlock : public IO_Block
 		B_DonutBlock(gfxSprite *nspr, short x, short y);
 		~B_DonutBlock(){};
 
-		BlockType getBlockType(){return block_donut;}
+    BlockType getBlockType() {
+        return block_donut;
+    }
 
 		void draw();
 		void update();
@@ -205,7 +219,9 @@ class B_FlipBlock : public IO_Block
 		B_FlipBlock(gfxSprite *nspr, short x, short y, bool fHidden);
 		~B_FlipBlock(){};
 
-		BlockType getBlockType(){return block_flip;}
+    BlockType getBlockType() {
+        return block_flip;
+    }
 
 		void draw();
 		void update();
@@ -214,7 +230,9 @@ class B_FlipBlock : public IO_Block
 		bool collide(CPlayer * player, short direction, bool useBehavior);
 		bool collide(IO_MovingObject * object, short direction);
 
-		bool isTransparent() {return state == 1;}
+    bool isTransparent() {
+        return state == 1;
+    }
 
 		bool hittop(CPlayer * player, bool useBehavior);
 		bool hitbottom(CPlayer * player, bool useBehavior);
@@ -244,7 +262,9 @@ class B_BounceBlock : public IO_Block
 		B_BounceBlock(gfxSprite *nspr, short x, short y, bool fHidden);
 		~B_BounceBlock(){};
 
-		BlockType getBlockType(){return block_bounce;}
+    BlockType getBlockType() {
+        return block_bounce;
+    }
 
 		void update();
 		void draw();
@@ -267,7 +287,9 @@ class B_ThrowBlock : public IO_Block
 		B_ThrowBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed, short type);
 		~B_ThrowBlock(){};
 
-		BlockType getBlockType(){return block_throw;}
+    BlockType getBlockType() {
+        return block_throw;
+    }
 
 		void draw();
 		void update();
@@ -295,7 +317,9 @@ class B_OnOffSwitchBlock : public IO_Block
 		B_OnOffSwitchBlock(gfxSprite *nspr, short x, short y, short colorID, short state);
 		~B_OnOffSwitchBlock(){};
 
-		BlockType getBlockType(){return block_onoff_switch;}
+    BlockType getBlockType() {
+        return block_onoff_switch;
+    }
 
 		void update();
 		void draw();
@@ -307,7 +331,9 @@ class B_OnOffSwitchBlock : public IO_Block
 		bool hitleft(IO_MovingObject * object);
 		bool hitright(IO_MovingObject * object);
 
-		void FlipState() {state = (state < 3 ? state + 3 : state - 3);}
+    void FlipState() {
+        state = (state < 3 ? state + 3 : state - 3);
+    }
 
 		void triggerBehavior(short playerID);
 
@@ -322,11 +348,15 @@ class B_SwitchBlock : public IO_Block
 		B_SwitchBlock(gfxSprite *nspr, short x, short y, short colorID, short state);
 		~B_SwitchBlock(){};
 
-		BlockType getBlockType(){return block_onoff;}
+    BlockType getBlockType() {
+        return block_onoff;
+    }
 
 		void draw();
 		bool collide(CPlayer * player, short direction, bool useBehavior);
-		bool isTransparent() {return state != 0;}
+    bool isTransparent() {
+        return state != 0;
+    }
 
 		bool hittop(CPlayer * player, bool useBehavior);
 		bool hitbottom(CPlayer * player, bool useBehavior);
@@ -350,7 +380,9 @@ class B_WeaponBreakableBlock : public IO_Block
 		B_WeaponBreakableBlock(gfxSprite *nspr, short x, short y, short type);
 		~B_WeaponBreakableBlock(){};
 
-		BlockType getBlockType(){return block_weaponbreakable;}
+    BlockType getBlockType() {
+        return block_weaponbreakable;
+    }
 
 		void draw();
 		void update();
@@ -865,16 +897,22 @@ class MO_CarriedObject : public IO_MovingObject
 
 		virtual void update() {}
 		virtual void draw();
-		virtual bool collide(CPlayer *) {return false;}
+    virtual bool collide(CPlayer *) {
+        return false;
+    }
 
 		virtual void MoveToOwner();
 
 		virtual void Drop();
 		virtual void Kick();
 
-		bool HasOwner() {return owner != NULL;}
+    bool HasOwner() {
+        return owner != NULL;
+    }
 
-		bool IsCarriedByKuriboShoe() { return fCarriedByKuriboShoe; }
+    bool IsCarriedByKuriboShoe() {
+        return fCarriedByKuriboShoe;
+    }
 
 	protected:
 
@@ -906,7 +944,9 @@ class CO_Egg : public MO_CarriedObject
 		void placeEgg();
 		void Drop();
 
-		short getColor() {return color;}
+    short getColor() {
+        return color;
+    }
 
 	private:
 		short relocatetimer;
@@ -939,8 +979,12 @@ class CO_Star : public MO_CarriedObject
 
 		void placeStar();
 
-		short getType() {return iType;}
-		void setPlayerColor(short iColor) {iOffsetY = 64 + (iColor << 5);}
+    short getType() {
+        return iType;
+    }
+    void setPlayerColor(short iColor) {
+        iOffsetY = 64 + (iColor << 5);
+    }
 
 	private:
 		short timer;
@@ -968,9 +1012,13 @@ class MO_FlagBase : public IO_MovingObject
 		void collide(IO_MovingObject * object);
 		void placeFlagBase(bool fInit);
 		void scoreFlag(CO_Flag * flag, CPlayer * player);
-		void setFlag(CO_Flag * flag) {homeflag = flag;}
+    void setFlag(CO_Flag * flag) {
+        homeflag = flag;
+    }
 
-		short GetTeamID() {return teamID;}
+    short GetTeamID() {
+        return teamID;
+    }
 	
 	private:
 		short teamID;
@@ -1002,8 +1050,12 @@ class CO_Flag : public MO_CarriedObject
 		void placeFlag();
 		void Drop();
 
-		bool GetInBase() {return fInBase;}
-		short GetTeamID() {return teamID;}
+    bool GetInBase() {
+        return fInBase;
+    }
+    short GetTeamID() {
+        return teamID;
+    }
 
 	private:
 		short timer;
@@ -1030,7 +1082,9 @@ class MO_Yoshi : public IO_MovingObject
 		bool collide(CPlayer * player);
 		void collide(IO_MovingObject * object);
 		void placeYoshi();
-		short getColor() {return color;}
+    short getColor() {
+        return color;
+    }
 
 	private:
 		short timer;
@@ -1048,7 +1102,9 @@ class OMO_Area : public IO_OverMapObject
 		bool collide(CPlayer * player);
 		void placeArea();
 		void reset();
-		short getColorID() {return colorID;}
+    short getColorID() {
+        return colorID;
+    }
 		void setOwner(CPlayer * player);
 	
 	private:
@@ -1077,7 +1133,9 @@ class OMO_KingOfTheHillZone : public IO_OverMapObject
 		bool collide(CPlayer * player);
 		void placeArea();
 		void reset();
-		short getColorID() {return colorID;}
+    short getColorID() {
+        return colorID;
+    }
 	
 	private:
 		CPlayer * playersTouching[4];
@@ -1108,9 +1166,15 @@ class OMO_RaceGoal : public IO_OverMapObject
 		void update();
 		bool collide(CPlayer * player);
 		void placeRaceGoal();
-		void reset(short teamID) {tagged[teamID] = -1;}
-		short isTagged(short teamID) {return tagged[teamID];}
-		short getGoalID() {return goalID;}
+    void reset(short teamID) {
+        tagged[teamID] = -1;
+    }
+    short isTagged(short teamID) {
+        return tagged[teamID];
+    }
+    short getGoalID() {
+        return goalID;
+    }
 	
 	private:
 		short tagged[4];
@@ -1155,8 +1219,12 @@ class MO_CollectionCard : public IO_MovingObject
 		bool collide(CPlayer * player);
 		void placeCard();
 
-		short getType() {return type;}
-		short getValue() {return value;}
+    short getType() {
+        return type;
+    }
+    short getValue() {
+        return value;
+    }
 
 	private:
 		short timer;
@@ -1186,10 +1254,19 @@ class MO_WalkingEnemy : public IO_MovingObject
 
 		virtual void ShatterDie();
 		virtual void Die() {}
-		virtual void DieAndDropShell(bool fBounce, bool fFlip) { if(frozen){ShatterDie();return;} dead = true; DropShell(fBounce, fFlip); }
+    virtual void DieAndDropShell(bool fBounce, bool fFlip) {
+        if(frozen) {
+            ShatterDie();
+            return;
+        }
+        dead = true;
+        DropShell(fBounce, fFlip);
+    }
 		virtual void DropShell(bool fBounce, bool fFlip) {}
 
-		killstyle getKillStyle() {return killStyle;}
+    killstyle getKillStyle() {
+        return killStyle;
+    }
 
 	protected:
 		float spawnradius;
@@ -1219,7 +1296,9 @@ class MO_Goomba : public MO_WalkingEnemy
 		void update();
 		bool hittop(CPlayer * player);
 		void Die();
-		void DieAndDropShell(bool fBounce, bool fFlip) { Die(); }
+    void DieAndDropShell(bool fBounce, bool fFlip) {
+        Die();
+    }
 };
 
 class MO_Koopa : public MO_WalkingEnemy
@@ -1376,7 +1455,9 @@ class CO_Shell : public MO_CarriedObject
 		void SideBounce(bool fRightSide);
 		void AddMovingKill(CPlayer * killer);
 
-		bool IsThreat() {return state == 1 || state == 3;}
+    bool IsThreat() {
+        return state == 1 || state == 3;
+    }
 
 		void Flip();
 
@@ -1665,8 +1746,12 @@ class OMO_PipeCoin: public IO_OverMapObject
 		void draw();
 		bool collide(CPlayer * player);
 
-		short GetColor() {return iColorID;}
-		short GetTeam() {return iTeamID;}
+    short GetColor() {
+        return iColorID;
+    }
+    short GetTeam() {
+        return iTeamID;
+    }
 
 	private:
 		short iTeamID, iColorID;
@@ -1687,7 +1772,9 @@ class OMO_PipeBonus: public IO_OverMapObject
 		void draw();
 		bool collide(CPlayer * player);
 
-		short GetType() {return iType;}
+    short GetType() {
+        return iType;
+    }
 
 	private:
 		short iType, iDuration;
@@ -1704,7 +1791,9 @@ class OMO_Phanto : public IO_OverMapObject
 		void update();
 		bool collide(CPlayer * player);
 
-		short GetType() {return iType;}
+    short GetType() {
+        return iType;
+    }
 
 	private:
 		short iType;
@@ -1739,8 +1828,7 @@ class CO_PhantoKey : public MO_CarriedObject
 class MysteryMushroomTempPlayer
 {
 	public:
-		MysteryMushroomTempPlayer()
-		{
+    MysteryMushroomTempPlayer() {
 			fUsed = false;
 		}
 

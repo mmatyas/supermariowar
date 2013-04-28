@@ -32,8 +32,7 @@ bool Options :: Ropen()
     File.read(&add_boobs, sizeof(add_boobs));
     if (add_boobs == 0xADDB00B5) NativeSex = true;
     else if (add_boobs == 0xB500DBAD) NativeSex = false;
-    else
-    {
+    else {
         // This file has no bytesex signature
         cout<< "The file \""<< FileName<< "\" has no bytesex signature"<< endl;
         File.close();
@@ -70,14 +69,12 @@ bool Options :: Opened()
 // Read or write strings of data. 
 bool Options :: Wread(void *n, size_t m)
 {
-    if (Writing)
-    {
+    if (Writing) {
         File.write(n, m);
         return true;
     }
 
-    else
-    {
+    else {
         File.read(n, m);
         // TODO: Check for errors
         return true;
@@ -86,13 +83,11 @@ bool Options :: Wread(void *n, size_t m)
 
 bool Options :: Do32(int *n)
 {
-    if (Writing)
-    {
+    if (Writing) {
         if (NativeSex)
             File.write(n, 4);
 
-        else
-        {
+        else {
             int m;
             ((char*)&m)[0] = ((char*)n)[3];
             ((char*)&m)[1] = ((char*)n)[2];
@@ -106,13 +101,11 @@ bool Options :: Do32(int *n)
     }
 
     // Reading
-    else
-    {
+    else {
         if (NativeSex)
             File.read(n, 4);  // TODO: Error checking
 
-        else
-        {
+        else {
             int m;
             File.read(&m, 4); // TODO: Error checking
 
@@ -128,13 +121,11 @@ bool Options :: Do32(int *n)
 
 bool Options :: Do16(short *n)
 {
-    if (Writing)
-    {
+    if (Writing) {
         if (NativeSex)
             File.write(n, 2);
 
-        else
-        {
+        else {
             short m;
             ((char*)&m)[0] = ((char*)n)[1];
             ((char*)&m)[1] = ((char*)n)[0];
@@ -146,13 +137,11 @@ bool Options :: Do16(short *n)
     }
 
     // Reading
-    else
-    {
+    else {
         if (NativeSex)
             File.read(n, 2);  // TODO: Error checking
 
-        else
-        {
+        else {
             short m;
             File.read(&m, 2); // TODO: Error checking
 
@@ -166,16 +155,14 @@ bool Options :: Do16(short *n)
 
 bool Options :: Do8(char *n)
 {
-    if (Writing)
-    {
+    if (Writing) {
         File.write(n, 1);
 
         return true;
     }
 
     // Reading
-    else
-    {
+    else {
         File.read(n, 1);  // TODO: Error checking
 
         return true;

@@ -10,46 +10,36 @@
 
 #define NUM_KEYS 8
 
-struct CKeyState
-{
+struct CKeyState {
 	bool fDown;
 	bool fPressed;
 };
 
-struct CInputControl
-{
-	union
-	{
-		struct
-		{
+struct CInputControl {
+    union {
+        struct {
 			short menu_up, menu_down, menu_left, menu_right, menu_select, menu_cancel, menu_random, menu_scrollfast;
 		};
-		struct
-		{
+        struct {
 			short game_left, game_right, game_jump, game_down, game_turbo, game_powerup, game_start, game_cancel;
 		};
 		short keys[NUM_KEYS];
 	};
 };
 
-struct COutputControl
-{
-	union
-	{
-		struct
-		{
+struct COutputControl {
+    union {
+        struct {
 			CKeyState menu_up, menu_down, menu_left, menu_right, menu_select, menu_cancel, menu_random, menu_scrollfast;
 		};
-		struct
-		{
+        struct {
 			CKeyState game_left, game_right, game_jump, game_down, game_turbo, game_powerup, game_start, game_cancel;
 		};
 		CKeyState keys[NUM_KEYS];
 	};
 };
 
-struct CInputPlayerControl
-{
+struct CInputPlayerControl {
 	short iDevice;
 	CInputControl inputGameControls[2]; //0 == game controls, 1 == menu controls
 };

@@ -2380,7 +2380,7 @@ void CMap::preDrawPreviewBackground(SDL_Surface * targetSurface, bool fThumbnail
     //drawPreviewBlocks(targetSurface, fThumbnail);
 }
 
-void CMap::preDrawPreviewBackground(gfxSprite * spr_background, SDL_Surface * targetSurface, bool fThumbnail)
+void CMap::preDrawPreviewBackground(gfxSprite * background, SDL_Surface * targetSurface, bool fThumbnail)
 {
     SDL_Rect srcrect;
     srcrect.x = 0;

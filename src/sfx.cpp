@@ -67,8 +67,7 @@ bool sfxSound::init(const string& filename)
 	cout << "load " << filename << "..." << endl;
 	sfx = Mix_LoadWAV(filename.c_str());
 	
-	if(sfx == NULL)
-	{
+    if(sfx == NULL) {
 		printf(" failed loading %s\n", filename.c_str());
 		return false;
 	}
@@ -88,8 +87,7 @@ int sfxSound::play()
 	int ticks = SDL_GetTicks();
 
 	//Don't play sounds right over the top (doubles volume)
-	if(channel < 0 || ticks - starttime > 40)
-	{
+    if(channel < 0 || ticks - starttime > 40) {
 		instances++;
 		channel = Mix_PlayChannel(-1, sfx, 0);
 
@@ -121,8 +119,7 @@ int sfxSound::playloop(int iLoop)
 
 void sfxSound::stop()
 {
-	if(channel != -1)
-	{
+    if(channel != -1) {
 		instances = 0;
 		Mix_HaltChannel(channel);
 		channel = -1;
@@ -141,8 +138,7 @@ void sfxSound::sfx_pause()
 
 void sfxSound::clearchannel()
 {
-	if(--instances <= 0)
-	{
+    if(--instances <= 0) {
 		instances = 0;
 		channel = -1;
 	}
@@ -187,8 +183,7 @@ bool sfxMusic::load(const string& filename)
     cout << "load " << filename << "..." << endl;
 	music = Mix_LoadMUS(filename.c_str());
 	
-	if(!music)
-	{
+    if(!music) {
 	    printf("Error Loading Music: %s\n", Mix_GetError());
 		return false;
 	}

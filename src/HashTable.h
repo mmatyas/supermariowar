@@ -3,8 +3,7 @@
 
 #include "global.h"
 
-struct HashNode
-{
+struct HashNode {
 	HashNode * next;
 	CObject * data;
 };

@@ -21,7 +21,8 @@ extern char *RootDataDirectory;
 using namespace std;
 char SMW_Root_Data_Dir[PATH_MAX + 2] = "";
 
-std::string	GetHomeDirectory() {
+std::string	GetHomeDirectory()
+{
 	//NOTE: _WIN32 is also defined on _XBOX
 #ifdef _XBOX
 		return std::string("D:\\.smw\\");
@@ -30,8 +31,7 @@ std::string	GetHomeDirectory() {
 			return std::string(folder) + std::string("/Library/Preferences/.smw/");
 #elif	_WIN32
 		 char folder[ MAX_PATH ];
-		if (SHGetFolderPathA( NULL, CSIDL_PROFILE, NULL, 0, folder ) != S_OK)
-		{
+    if (SHGetFolderPathA( NULL, CSIDL_PROFILE, NULL, 0, folder ) != S_OK) {
 			throw "I could not retrieve the user's home directory!\n";
 		}
 
@@ -60,8 +60,7 @@ bool File_Exists (const std::string fileName)
 /* Call this when your application launches */
 void Initialize_Paths()
 {
-	if(SMW_Root_Data_Dir[0] != 0)
-	{ 
+    if(SMW_Root_Data_Dir[0] != 0) {
 		return; 
 	}
 
@@ -120,8 +119,7 @@ const string convertPath(const string& source)
 #else
     static bool are_paths_initialized = false;
 
-    if (!are_paths_initialized)
-	{
+    if (!are_paths_initialized) {
 //		#ifdef PREFIXPATH
 			strcpy(SMW_Root_Data_Dir, RootDataDirectory);
 //		#endif
@@ -145,8 +143,7 @@ const string convertPath(const string& source)
 
 const string convertPath(const string& source, const string& pack)
 {
-	if(source.find("gfx/packs/") == 0)
-	{
+    if(source.find("gfx/packs/") == 0) {
 		string trailingdir = source.substr(9);
 
 #ifdef _XBOX
@@ -163,8 +160,7 @@ const string convertPath(const string& source, const string& pack)
 		return convertPath("gfx/packs/Classic" + trailingdir);
 	}
 
-	if(source.find("sfx/packs/") == 0)
-	{
+    if(source.find("sfx/packs/") == 0) {
 		string trailingdir = source.substr(9);
 
 #ifdef _XBOX		
