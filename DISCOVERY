@@ -40,6 +40,12 @@ bomb explosion -> smaller
 
 AI should have a short memory to detect if the approach is not working out, then randomly change it
 
+TODO lists should be unified into a current one
+
+All conversions of pre 1.8 maps shall be supported (on-the-fly) at least till 2.0
+
+Pre 1.9 maps (640x480) will play with a full-blocks frame when played at higher resolution
+
 Long term features
 ------------------
 * Lua scripting language support

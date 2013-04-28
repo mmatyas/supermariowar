@@ -132,15 +132,15 @@ endif(NOT MSVC)
 
 # gcc uses some optimizations which might break stuff without this flag
 ##TODO: test this please, coming from template (1)
-add_definitions(-fno-strict-aliasing -fno-exceptions)
+add_definitions(-fno-strict-aliasing -fexceptions)
 
 ##TODO: test this please, coming from smw Makefile
-#add_definitions(-D_GNU_SOURCE=1 -D_REENTRANT)
+add_definitions(-D_GNU_SOURCE=1 -D_REENTRANT)
 
 ## MAIN CONFIG
 
 ##TODO: clean code to not need this anymore
-add_definitions(-fpermissive -Wno-shadow -Wno-unused-result -Wno-ignored-qualifiers)
+add_definitions(-Wno-shadow)
 
 ########################################
 # our relevant source files
@@ -152,13 +152,13 @@ set(COMMON_SRCS src/FileIO.cpp src/FileList.cpp src/MapList.cpp
            src/SFont.c src/TilesetManager.cpp src/dirlist.cpp 
            src/eyecandy.cpp src/gfx.cpp src/global.cpp src/input.cpp 
            src/map.cpp src/movingplatform.cpp src/path.cpp 
-	src/sfx.cpp src/game.cpp
+	src/sfx.cpp src/ResourceManager.cpp
 )
 
 set(SMW_SRCS src/HashTable.cpp src/ai.cpp src/gamemodes.cpp src/main.cpp 
            src/map.cpp src/menu.cpp src/object.cpp src/player.cpp 
            src/splash.cpp src/uicontrol.cpp src/uimenu.cpp src/world.cpp src/uicustomcontrol.cpp 
-        src/objectgame.cpp src/modeoptionsmenu.cpp src/objecthazard.cpp
+        src/objectgame.cpp src/modeoptionsmenu.cpp src/objecthazard.cpp src/Game.cpp
 )
 
 set(LEVELEDIT_SRCS src/leveleditor.cpp)
@@ -342,7 +342,7 @@ endif()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	# Install the application icon and menu item
-	install(FILES misc/smw.xpm
+	install(FILES cpack/smw.xpm
 		DESTINATION ${CMAKE_INSTALL_PREFIX}/share/pixmaps RENAME smw.xpm)
 	install(FILES smw.desktop
 		DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
@@ -354,12 +354,12 @@ set(CPACK_PACKAGE_VENDOR "neagix")
 set(CPACK_PACKAGE_VERSION_MAJOR ${SMW_VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${SMW_VERSION_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH ${SMW_VERSION_PATCH})
-set(CPACK_PACKAGE_DESCRIPTION_FILE ${PROJECT_SOURCE_DIR}/misc/cpack_package_description.txt)
+set(CPACK_PACKAGE_DESCRIPTION_FILE ${PROJECT_SOURCE_DIR}/cpack/cpack_package_description.txt)
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Super Mario War, platformer multiplayer")
 
 set(CPACK_RPM_PACKAGE_GROUP Amusements/Games)
 set(CPACK_RPM_PACKAGE_LICENSE GPL-2.0)
-set(CPACK_RESOURCE_FILE_README ${PROJECT_SOURCE_DIR}/README)
+set(CPACK_RESOURCE_FILE_README ${PROJECT_SOURCE_DIR}/README.md)
 # TODO: CPACK_RESOURCE_FILE_WELCOME
 set(CPACK_PACKAGE_ICON ${PROJECT_SOURCE_DIR}/src/icons/smw.ico)
 # TODO: CPACK_NSIS_*
