@@ -176,19 +176,6 @@ endif()
 
 ## end of SDL dependencies
 
-add_subdirectory(src/common)
-include_directories(src/common)
-
-add_subdirectory(src/smw)
-include_directories(src/smw)
-
-add_subdirectory(src/leveleditor)
-include_directories(src/leveleditor)
-
-add_subdirectory(src/worldeditor)
-include_directories(src/worldeditor)
-
-
 check_and_add_flag(VISIBILITY_INLINES_HIDDEN -fvisibility-inlines-hidden)
 
 if(UNIX AND NOT APPLE)
@@ -310,7 +297,6 @@ endif()
 ########################################
 # Setup include directories (and make sure they are preferred over the Externals)
 #
-#include_directories(src)
 
 ########################################
 # Install shared data files
@@ -330,6 +316,26 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 #	install(FILES src/cpack/smw.xpm DESTINATION ${CMAKE_INSTALL_PREFIX}/share/pixmaps RENAME smw.xpm)
 #	install(FILES src/cpack/smw.desktop DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
 endif()
+
+## Here the actual magic happens
+include_directories(src/common)
+
+set(COMMON_SRCS ../common/FileIO.cpp ../common/FileList.cpp ../common/MapList.cpp 
+           ../common/SFont.c ../common/TilesetManager.cpp ../common/dirlist.cpp 
+           ../common/eyecandy.cpp ../common/gfx.cpp ../common/global.cpp ../common/input.cpp 
+           ../common/map.cpp ../common/movingplatform.cpp ../common/path.cpp 
+           ../common/uimenu.cpp ../common/sfx.cpp ../common/ResourceManager.cpp
+           ../common/uicontrol.cpp ../common/uimenu.cpp
+)
+
+include_directories(src/smw)
+add_subdirectory(src/smw)
+
+include_directories(src/leveleditor)
+add_subdirectory(src/leveleditor)
+
+include_directories(src/worldeditor)
+add_subdirectory(src/worldeditor)
 
 # packaging information
 set(CPACK_PACKAGE_NAME "smw")

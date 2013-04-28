@@ -1,7 +1,9 @@
 
+message( "COMMONS for SMW = ${COMMON_SRCS}" )
+
 set(SMW_SRCS HashTable.cpp ai.cpp gamemodes.cpp main.cpp 
            menu.cpp object.cpp player.cpp 
-           splash.cpp uicontrol.cpp uimenu.cpp world.cpp uicustomcontrol.cpp 
+           splash.cpp world.cpp uicustomcontrol.cpp 
         objectgame.cpp modeoptionsmenu.cpp objecthazard.cpp Game.cpp
 )
 add_executable(smw ${COMMON_SRCS} ${SMW_SRCS} ../common/global.h)
