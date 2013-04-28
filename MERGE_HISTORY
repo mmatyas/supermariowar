@@ -6,6 +6,6 @@ By neagix
 - src0: forked from erlehmann's fork <https://github.com/erlehmann/Super-Mario-War> that was done on September 2009
 - src1: merged sezaru's fork <https://github.com/sezaru/Super-Mario-War>
 - src2: merged current SVN repository trunk <https://code.google.com/p/supermariowar/source/checkout>, last updated in October 2009
+- added my working copy changes done over the trunk SVN repository
 
 In all cases I have checked correctness of the merge to keep the positive changes.
-On top of the above merges I have applied my changes and current development
