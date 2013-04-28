@@ -1,0 +1,822 @@
+Done  Pri  Description
+[X]        Down jump on solid on top blocks
+[X]        powerup selection on menu
+[X]        mushroom menu marker instead of ">"
+[X]        no "maps/" in front of map names
+[X]        button turns off menu so you can see the background map
+[X]        No "exit" or "fullscreen" on Xbox version
+[X]        Better screen resize feature for Xbox (left stick position, right stick size or top/left then bottom/right set size)
+[ ]        Victor of last game wears special marker?
+[ ]        Speed up/high jump mushroom powerup
+[ ]        Rideable objects like Yoshi and Bomb Cannon (make yoshi ridable in Yoshi's eggs mode so one player can try to move Yoshi away from other players.  Bomb cannon shoots fire balls and Yoshi can eat other players)
+[X]  High  Tournament play (keep track of wins and each time a player wins a tournament, they get a special item like Bomberman, each win is tracked with the icon from that game time (chicken, clock, coin, egg, etc))
+[X]        Add team play - allow setting of teams 2 on 2, 1 on 2, 3 on 1.  Adjust modes so that if one person on the team is chicken or tagged, then all players are chicken or tagged.  Adjust scoreboards so there is only 1 per team with all mario icons on that board.
+[X]  High  Drag select and move for map editor
+[X]        Add awards for kills in a row, kills in air in a row, dominating (score x% above everyone else, say 30%).  Awards should be like text eye candy, but be some sort of easily recognizable graphic and sound.
+[ ]        Report kills, deaths, kills in row, kills in air in row, other player's kill sprees stopped on score board when game ends, games won (possibly with graphic like a chicken icon for each chicken win, coin for coin match, egg for egg match, thwomp for survival, etc)
+[X]        Option on menu for spawning.  Allow instant, door(fast), swirl(slow), and top?
+[X]        Add Door eyecandy for door spawning
+[X]        When turning off menu to view map, make left/right keys switch map regardless of which menu option is selected
+[X]        Have back and front eyecandy so some objects can be behind player
+[X]        Have back and front objects so blocks are behind player and fireballs/powerups are in front of player
+[X]        Add menu help for random/map view buttons
+[X]        Stop invincible music when returning to menu
+[X]  Med   Add background music (have it stop when invincible music plays then resume afterward)
+[X]  Med   Background music for menu
+[X]        Add pause/resume feature
+[X]        Optimize collision loop for front and back interaction objects (get frame rate up!)
+[X]        Add Domination Mode
+[ ]  Low   Detect plugging in joysticks in the middle of running the game for XBox
+[X]        Add sound for tagging block in domination mode
+[X]        Add Bob-bom mode (and test it with 1up, player killed player, player killed self, invinciblity, etc...)
+[X]        Fix player overlapped on both sides of the screen collision detection (real pain) - also fixed items and blocks overlapped coldec also
+[X]        Add smoke poof when spawning instantly
+[X]  High  Pipe warping from one pipe to another
+[X]        Better note block super jumping (right now you have to hit the jump button before you hit the block)
+[X]  High  Two layer tile map where there is a possible background tile and a foreground tile.  At startup, both layers would be blitted to the background so there is no performance hit, but this would allow for things like fences, railings or rounded objects to appear infront of background type tiles
+[X]        Fix bug where if 3 players were bouncing off each other, the 1.5 bounce multiplyer could cause velx to exceed TILESIZE and players would move thorugh tiles.  Fixed with CapVelocity() function.
+[X]        Work on awards system - need a good way to reward players for cool moves or kills in a row.  Currently we just have one award for stomping on more than 1 player in a row in air.
+[X]  Low   Add PNG support - will reduce BMP background size quite a bit (project is currently 30MB unzipped)
+[ ]        Add Network support for PC version
+[X]  High  Fix powerup width/height to be more like mario (smaller width and height with drawing offset).  This will allow for powerups to fall through 1 tile holes.
+[X]        Fix Player4's controls from fcvb to 5123 for PC version - Tried, doesn't work because key states array is only 
+[X]        Fix game bug where in Yoshi's Eggs game mode if a player has the egg and is killed by a player with invincibility, they killed player doesn't lose the egg!
+[X]        Compressed formats for music (mp3 or ogg)
+[X]        Fix bug where player can be on edge of breakable block and if player hits edge and bottom at same time, player on block is not killed
+[X]        Kills in a row award should be blocks of player color swirling around player outwardly with the number of kills in a row on each block
+[X]  Low   Fix top row of blocks on the map.  They should only detect collision on bottom, not top or sides.  This will allow for the player to fall through the top if they are stuck up there, but hit the bottom to keep them in.  -> Perfect collision detection now occurs on top row with a out-of-bounds timer to kill player if he doesn't move back into main map
+[X]        Souls style awards where we keep track of which players the player has killed and upon his death, his killed souls escape (use 16x16 jump player sprites for souls)
+[X]        If players are in a continous falling loop, when they reach terminal velocity, they should start "burning up" and if they stay like that for too long, they die (fixes problem with somewhat invincible players in a continous falling loop).
+[X]        Fix bug if player is invincible and game ends and he gets game over mario, the invincible music keeps on playing
+[X]        In domination mode, if you die, all of the areas you control lose your color.  We'll have to see if this is a good change on gameplay.
+[X]        Customizable input controls
+[X]        Fix bug where players spawn invincible but still can collide with other players
+[X]        Add Unreal awards back in as award style option
+[X]        Make pressing down key on PC version do down jump and keep down + jump on Xbox for down jump
+[X]        Put unreal sounds back into project
+[X]        Make corpse eyecandy collision detection rect as wide as player so it doesn't get stuck in tiles on sides
+[X]  High  Add option to menu to turn on and off screen crunch
+[X]        Look at options.bin and write it big/little endian to possibly fix mac crash
+[X]  High  Select more than one awards style at a time?  How about making the unreal announcer an option to turn on and off.
+[X]  High  Add "Owned" mode where when a player kills another player, a colored marker is put on the killed player.  The killer scores points depending on how many players he has currently "owned".
+[X]  High  Option on menu to merge front layer into background layer to increase framerate on slow machines
+[X]        Fix exiting game to select no button by default and have to move to yes button and press Enter/A to select
+[X]        Tag mode should trade tags when players touch, not stomp.  Maybe lose goal/25 score when stomped by any player
+[X]  High  Add special items players can collect and use in a battle.  Add a new button to use the special item (star, fireflower, slow other players, 1up, steal key item (like bomb, chicken)) and use in battle.  Display special item in scoreboard for players.  Winning tournament gives player random special item to use.
+[X]        Spawn invincibility is all of a sudden shorter than normal (1/4 sec maybe).  Possibly caused by spawn style length of time (spawn invinciblity counter is ticking while spawning)
+[X]  High  Map loading latency on XBox (try commenting out the new new warp code to see if it fixes it, then optimize)
+[X]        Chicken and tagged should not score when warping
+[X]        Game crash when winning by a bomb blast in bob-omb mode (scenario: player 4 winning at 19 kills on 20 kill bob-omb mode)
+[X]        a second "no tag backs" after a tag is transfered -> made tagger spawn invincibled
+[X]        Reoranize map structure.  Read in each tile and all date with that tile.  Should be organized backgroundID,layer1,2,3,4,interactionblock,warp,layer1,2,3,4,inter... 
+[X]        Write and read functions to do both little and big endian (cleans up map saving and loading code quite a bit, also options.bin if needed)
+[ ]        timebased movement or hardwired fps or auto frameskipping or like in "rubber pig" by david olofson
+[X]  High  Add Mario skins where each sprite has 6 (3 for upper and 3 for lower... or more) mapped colors and the colors of the player are mapped onto that sprite at load time.  This way we don’t have to create 4 different sprites for each player!  Maybe make different skins unlockable (by winning tournaments) or just configurable on main menu.  Add all skins from fan sources + old classic blue overalls.
+[X]  High  Update Readme with new http://smw.72dpiarmy.com/ site and combine readme from all previous releases so credit is given to all who helped develop the game
+[X]        Optimize slow areas like tournament winner screen by predrawing everything to 1 layer
+[X]        Jail mode?  Stomp players and they spawn slowed down and take 20 seconds to unfreeze.  Can be freed by team players.
+[X]        Fix bug when player jumps into bottom of another player near the top of the screen, they will move to the side of the player and not ride all the way up.  Caused by rounding error -> switched yf() to yi().
+[X]        Optimize block collision detection by taking all blocks around player + 1 and just collision detecting against them, not all blocks in interaction object array
+[ ]        Add vegetable mode per zio tok's request - code has classes to support this (look at OverMapObject class).  Painful part is doing all the mario carrying sprites.
+[ ]        Add carryable SMB2 Bombs that explode after a certain time limit
+[X]        Add those blue throwable blocks.  Could use same carry and throw code from vegetable mode to do this.  Implement with a new type of interaction block that just dies when you try to carry it and creates a carryable object.
+[X]  High  Mortal Kombat announcer with "Fatality", "Excellent", "Brutality", "Combo"?
+[X]  High  Add pipe network locks so when a player enters a pipe network, it locks (so only one player is allowed in a network at one given time).  A little lock icon should be displayed on all the locked entrances/exits.  Should lock for 3 seconds maybe.  An alternative solution is to have players actually move along the pipe path and collide in transit.
+[X]  High  Make bomb card, fire card, egg, and coin (and any other appearing item?) appear in a location for 30 seconds, if no one grabs it, move it to a new location.
+[X]  High  Add color map image that has color->replacement color for all colors
+[X]        Add Kirby, Bubble Bobble, new GBA mario skins, Final Fantasy
+[X]  High  Link, shyguy and snifit skins
+[X]        Add stored powerup per player instead of one per score
+[X]        Race mode
+[X]        Fix problem when mario comes out of pipe and another player is there causing warping player to move inside block.  Need to map collision detect when moving players to the side of other players.
+[X]        Use a single skin file instead of the 10 separate files needed now.
+[X]        Add friendly fire to options menu to turn on and off
+[X]        Change green flag powerup to POW block.  Make it so only players on ground die during blast.  Get SMB2 POW sound.  
+[X]        Get SMB2 timer sound for slowdown powerup
+[X]        Add feature to convert 1.5 maps to 1.6 maps
+[ ]        Improve AI to deal with death spikes -> easy to detect but hard to do it effeciently (need to scan entire map and make notes of blocks to avoid and which sides are deadly).  Keep this info in an array in the map (you can prescan when we do warp areas) and use the threat style distance detection in the AI just like everything else (I'm not sure which object to return from the nearestSpike function).  Make sure that only downward or all direction spikes are counted when jumping and upward or all direction are counted when falling.
+[X]        Improve AI to deal with invincibility, down jumping, turbo 
+[X]        Improve AI to deal with goals other than killing other players -> now goals trump trying to kill other players.  AI will chase powerups, bob-omb and fireflower cards, coins, eggs, yoshi (if player has egg)
+[X]        Improve AI to deal with threats -> AI now avoids fireballs, explosions and thwomps
+[X]        Add new scoreboard shades and tournament images to allow for 3 person teams to easily display all player sprites nicely
+[X]        When using a stored powerup, do some sort of consuming swirl animation before powerup kicks in to give other players a warning that it is coming
+[X]        Option to turn music on/off
+[X]        Option to move score board from top/bottom/corners
+[X]        Fix bug with ring awards (last award is not shown and there is a hole in the ring)
+[X]        Fix bug with skins not loading on xbox and huge latency when loading skins.  Can press A -> back -> A to start without skins?!
+[X]        Stomp'em Mode where goombas are randomly walking around the screen or dropping in from up top and the first player to kill X goombas wins
+[X]        Poison mushroom powerup
+[X]        Carryable items
+[X]        Fix bug where when time is up on timed mode and two teams/players tie, then they are both left in game and allowed to score!  No scoring should happen after game is over!   Check all game modes.
+[X]        Fix bug where CPU doesn't need to run away from his own fireballs
+[X]        Fix bug on xbox, pressing start when map view is on in tournament mode should start game, not show player team/skin select -> Fixed?  Need to check.
+[X]        Fix bug where number and intensity of thwomps not being reset between games
+[X]        Fix bug in thwomp mode, red/green + yellow + blue -> green died taking red/green team to 0 lives and red player was left behind (was not removed from game!) until he was stomped on then he was removed but team had -1 score -> Problem is that CGM_MarioWar::playerkilledself(CPlayer &player) method doesn't handle killing all players on team!
+[X]        Fix bug if yoshi doesn't have egg returned to him in 30 seconds, move him (he can get stuck in middle of map if he can't find a spot)
+[X]        When players/teams die off one by one, keep track of who died first and when displaying end of game scoreboard, if scores are tied, then tie-break by who died last
+[X]        Add fireballs the color of the player that shot them.  This way you can tell which fireballs you are immune to and which you need to avoid.
+[ ]        "Catch Up" option on menu that gives players in last place toward the end of the game a speed boost/higher jump or possibly a slower speed and jump for the player in 1st place.
+[X]        Moving platforms
+[ ]        Along with moving platforms, add conveyor belts
+[ ]        Diggable sand tiles from SMB2.  When you press the turbo key over a sand tile, it "digs up" and disappears. Otherwise the tile acts just like solid on top tiles.
+[ ]        Water tiles where players can swim up in them
+[ ]        One way tiles that don't allow a player to move in the opposite direction of that shown on the tile (so really disallows movement tile, instead of forcing only movement in a single direction)
+[X]        Fix physics from nitsuja: 1-up mushrooms bounce off of thin air instead of falling off the platform of clouds, pushing sideways into a music note block while falling really fast will completely stop your falling, and pushing sideways into a music note block when you're falling not-so-fast sometimes makes you bounce way upward. -> Hard problem the way it is now because collision with map tiles and blocks happens in two seperate areas now allowing you to precalculate where fy will be for interaction obejcts like collision with tiles does
+[ ]        Use new libSDLx libraries for xbox release.  See if we can get the joystick recognition code working during the middle of the game.
+[ ]        New option for friendly fire called "Assist" where you can pogo off of your teammates for extra jump height or swap stored powerups
+[X]        Bullet bill bonus powerup where a bunch of survival style bullet bills come in from both sides for 15 seconds and initiating player is immune from death while this is happening (give them spawn invincibility during this time)
+[X]        Detect if we're going to play the same sound multiple times closely together and avoid doing this.  Maybe we need to implement a sound manager.  Something like manager.play(id) and it automatically keeps track of what sounds it has played recently and doesn't play them again (5 frames or something). -> no sound manager, but each sound tracks when it played last and if it is under 40ms, it doesn't play again.
+[X]        Fix bug with solid-on-top tiles with only a single tile space above and then a solid tile.  Player can't jump up into this space.
+[X]        Fix display bug where you use a stored powerup then go into a pipe (shows still ring of powerup around you)
+[ ]        Fix bug if you are pressing a direction then die and stop pressing a direction, your player will still be moving when you spawn
+[X]        Fix bug where items you are carrying (like eggs) disappear when warping
+[X]        Fix bug if two players are hitting a powerup block (helps if they are on the same team with friendly fire off) and one player hits the block and it bounces up and another player is traveling up when the block is coming down, the second player can get trapped in the bottom of the block.
+[X]        Bug where players get stuck inside blocks - has to do with collision detection after players collide with each other.  Since map collision detection happens after a player is moved to a new position based on the player's collision box, he can be moved into solid tiles.
+[X]        Fix bug where players spawn under ceiling spikes
+[ ]        Fix AI so it doesn't move into areas where they will be over spikes without falling on to something solid first.
+[X]        Option to turn on spawn invinciblity on options menu
+[X]        Animate interaction blocks like powerup, breakable and note blocks
+[X]        Make goombas die when player hits bottom of breakable, bounce or powerup block
+[X]        Only have POW block kill things on the ground (see if inair == false and kill that object) for the duration that shaketimer > 0 (also need to add teamID of killing team to game_values).
+[ ]        Winning pose - have player do a special winning pose when the game is over
+[X]        Figure out why fireballs are not being collision detected against bullet bills
+[X]        Add helper keys at bottom of team/skin select screen
+[X]        Fix all areas where colors for players matter (new colorID should be used)
+[X]        Fix yoshi's egg moving down to player's feet when warping
+[X]        Fix mario jumping up into a gap, but being "bounced" out
+[ ]        Move scores out of way of players jumping up into them
+[X]        Put location arrows at top of screen when player's iy + PH < 0 and have distance counter? -> Player out-of-bounds counter and when it reaches 0, player dies
+[X]        Fix top row of tiles and interaction blocks so player can't get stuck on top of screen
+[X]        Add substitutions to the clouds on each level, add option for clouds, nothing, and other flying things from mario games (ghosts, fish, birds, flying koopas?).  Have it as a setting on the map like background.
+[X]        Remove "name_" infront of map names when displaying
+[X]        Don't play music when "hurry up" music comes on
+[ ]        Speed up playing music after hurry up ->SDL_Mixer is not capable of doing this.  SDL_Mixer 2.0 should support this feature :)
+[X]        Play special game over music (maybe the music from SMB1 after sliding down the flag pole)
+[X]        Speed up cpu_think() by not taking the sqrt of the distance for each of the 5 distance functions.  Just use the raw squared distance instead.
+[ ]        Mario death gore option
+[X]        Spinning arrows around the chicken to more easily identify who is the chicken (especially with the new chicken color scheme)
+[X]        Spawn invincibility for pipe warping
+[X]        Update intro splash screen to use mountain (or random?) background with new text
+[X]        Fade out background on menus by blitting everything to a surface and overlaying with solid transparent black texture - need to draw all background objects to a single surface and draw transparent black over the top then just display that surface (might be slow to load new maps)
+[X]        Fade out background when game is paused or exiting
+[X]        Add sound when player finished "lap" - something from mario kart perhaps
+[X]        Stop background music when invincible
+[X]        Have better tournament menu music
+[X]        Fix SMB3Level2 music - at end of loop it doesn't smoothly flow into beginning again
+[X]        Add option to menu to not play music
+[ ]        Add a framerate movement adjustment to all moving items so when framerate dips below 62, it adjusts for smooth movement - caused problems with collision detection!
+[X]        NEED optimization for interaction object blocks -> maps are slow where lots of interaction blocks!
+[X]        Test new faded background under menus -> check load time for switching maps on xbox and check tournament end with exploding fireworks (should not see any degrade in performance)
+[X]        Add key to hold down to skip 10 maps at a time when choosing map (there are too many maps now :)
+[X]        New hammer powerup that is on top of blocks makes a small arc and falls to ground
+[X]        Fix bug with hurry up music where if a player is removed from the game (classic and tag) and there are two players left and one has the hurry up limit, the sound is not played until the next kill because the just dead player isn't removed from the game yet so the countaliveteams() still returns 3.
+[X]        Use bullet bill sound instead of cannon for bullet bill powerup
+[X]        Go through nitsuja's music files and clean them up.  Add music and use SMB3 world clear as new tournament over sound?
+[X]        Test poison mushrooms, fireballs, and hammers while players are warping (do they die mid-warp?)
+[X]        Make AI avoid poison mushroom instead of trying to collect it
+[X]        Figure out rogue crash on chainlink map where players were on the same team (2, 1, 1) log had half the new music playing line.  Only seems to happen in .exe, not when debugging or in ide. - Float rounding error in 2 places + tag dangling pointer
+[X]        Need better way to place items than 64 tries then put in middle.  Maybe give it 64 tries and if it still fails, try 64 times again next frame.
+[X]        Currently deleting string memory for bool and music descriptions that are passed as const parameters.  Is this OK?
+[X]        AI doesn't need to run away from poison mushroom when invincible
+[X]        Jailed AI just jumps in place - fixed, it was trying to tag itself in getNearestTeammate()
+[X]        Add check in autotester to see if a player is inside a solid block and to pause the game if this happens (make sure the automatic game end at 3 minutes doesn't kick in if paused)
+[X]        Fix bugs where accessing map.block, map.map, map.warp, and map.blockat.  Make sure we access within array bounds!  Corpse violates this right now on both tx and ty (falls off bottom of screen or overlaps sides)
+[X]        When player hits another player from side and bottom in same frame, the collisiontotop and collisiontoleft/right are true at the same time.  Need to integrate this into the collision handling when both top and right/left are true.
+[X]        Add copy and paste to level editor
+[X]        Don't display where tiles used to be when moving them
+[ ]        Look into SDL_Mixer 2.0 -> add playing .ogg sounds and changing music speed
+[ ]        Level editor port to Xbox
+[ ]        Sloped floors (possibly sliding down them like in smb3)
+[ ]        Several tile sets and you can choose which tileset you want to use for each level
+[X]        Preload and keep in memory menu, tournament, tournament over, and end of level music so there are no jumps when playing the music.
+[X]        Need to sleep a little in the level loading code so the menu music playing thread doesn't skip -> Done, need to test on Xbox -> better but not completely fixed
+[X] High   Fix Bug: screen flicker in full screen mode!!
+[ ]        Fix Bug: No stage clear music when playing race mode -> related is music continues on race mode after stage over -> No repro :(
+[X]        Domination suggestion: switching places from time to time -> moving all tiles after X seconds (30 maybe)
+[X]        Goomba collision detection reported to be a bit weird.  I've never encountered this issue, but some friends of mine said that if you hit a goomba in an angle close to 45 degrees (or thelike) you'll die.
+[X]        Race is a bit too penalizing.  Resetting a players laps if he dies is a bit harsh. Maybe only one lap should be removed to make it less punishing.
+[X]        Fireballs last too long.  They need a time to live and die if they don't hit anything.
+[X]        close button, Alt+enter, alt+f4 won't work in the loading-splash screen.
+[X]        alt+f4 / alt+enter won't work ingame.
+[X]        Music playlists configurable like the announcer is.  You could do an "All" list that had everything like it currently is now and a "NES" and "SNES" list, or "SMB3", "SMB2" etc.
+[X]        Volume slider control on options menu for sound and music
+[ ]        Difficulty settings for CPU controlled players
+[X]        Add more pipe pieces like 2x2 corner pieces, 1x1 corners and up/down pieces and middle pieces for 3x3 pipes and larger
+[X]        Add no player/item spawn indicators on map (addable in level editor) so that players and items can't spawn in certian areas)
+[ ]        Add X% avoidable areas on map so AI avoids these areas X% of the time.  Maybe make it so every player spawn these areas are calculated to be avoided or not avoided for this life or for this Y second interval.
+[ ]        The palette of sprites change in a strange way when eating a poison mushroom while invincible -> no repro
+[X]        The chicken mode should reward the chocobo for killing other players.
+[X]        The goombas should spawn more frequently.
+[X]        Throwing hammers are too strong, maybe just letting you throwing one?
+[X]        I find the default values of many modes too high, is there a way to save lower values in your preferences?
+[X]        The egg is lost (and appear in a new random position) if you kill yourself in Yoshi's Eggs, unlike the readme states. -> Updated Readme
+[ ]        Climbable tiles like vines and ladders
+[X]        Feather: Allows you to double-jump. Overlaps with other items, so for example you can have both a feather and a fire flower.
+[ ]        Leaf: Allows you to float. (Could make you fall down slowly while holding the jump button, or could allow you to float like the Princess in SMB2.) Also overlaps with other items, but not with the feather.
+[ ]        Vegetable: A la SMB2. When you grab one, it hovers over your head, and the next time you hit the fire button you throw it. If you have another projectile weapon, you keep it but can't use it until you've thrown the vegetable. If you hit someone with one of these, it bounces off them and can't hit anyone else.
+[ ]        Mystery Mushroom: A la Battle mode from SMB3 on Super Mario All-Stars. This red mushroom with a question mark on it will make all players randomly switch places with each other when someone grabs it.
+[ ]        Kuribo's Shoe: Makes you immune to spikes (unless you hit them with your head). Slows you down a bit and makes you do that little bounce-along-the-ground thing like in SMB3, but also makes you jump a lot higher and makes you immune to any weapon (including shells and veggies, which bounce off you) that hits you from the side or from below. You lose this when you get hit with three weapons or if you die from getting hit from above. Overlaps with all items. (Oh, come on, you know this would rule! :P )
+[ ]        Boo: A la Super Mario Kart. When you use this, you become transparent (i.e. can move through other players) and can't be killed for a short time (except by environmental hazards such as spikes). Additionally, if any other players have bonus items, you will steal one of them at random. (This would work best as a bonus item.)
+[ ]        N-Spade: A la SMB3. All over the course there are a bunch of cards (probably 12 or so). When you hit a card it turns your color and flips over to reveal a picture. After you hit a second card it checks to see whether there is a match. If not, they flip back. If there is a match with the other card of your color, you get points. If there is a match, but with a card of a different color, you split the points with whoever owns the other card. (So, of course, all point values should be even numbers, and ideally there would be several different values, so for example stars would be worth more than flowers, etc.) Jumping on players flips their cards back over; suicide does not. When all the cards are gone, a new set appears, and whoever gets to a certain score first wins.
+[ ]        Dr. Mario: There are three viruses on the screen (red, yellow, and blue) and three pills with corresponding colors. You have to pick up a pill and touch the virus of the right color with it to get a point. Touching the wrong color kills you, as does touching a virus without a pill. Killing several of the same color in a row grants bonus points. Jumping on someone allows you to steal their pill, but you can't carry more than one pill at once. Suicide doesn't get rid of your pill. Dying in any way does not kill your color combo. First one to reach a certain number of points wins.
+[ ]        Combo Race: First one to jump on a certain number of opponents in a row wins. Dying in any way breaks your combo.
+[ ]        Eat Your Vegetables: Veggie cards instead of fire or hammer cards.
+[X]        Shell Shock: Shell cards instead of fire or hammer cards.
+[X]        Cheep-Cheep: Same as Goomba mode except there are Cheep-Cheeps flying up from the bottom of the screen like they do in some SMB1 levels.
+[ ]        Cookie: Same as Survival except that the cookies from Yoshi's Cookie are raining down, and the goal is to be the first to reach a certain number. (Because cookies are tasty! ^_^)
+[X]        All Your Base: Same as Domination except that there are more bases (probably twice the number of players plus 1) and if you kill someone you get all their bases! Of course you should be able to claim other peoples' bases normally by just touching them. (I can't remember how Domination works off the bat but IIRC when someone dies in that they just lose all their bases regardless of how they died.)
+[X]        Add Item and option descriptions in the readme.
+[X]        Samuele Poletto's name spelt correctly in the docs and on the site.
+[ ]        Add a mode where jumping on foes' heads or hitting them with projectiles merely sends them skidding backwards, and the idea is to shove enemies into Poison Mushrooms and lethal hazards! Working title: Sumo Mode! If Sumo makes it into Super Mario War, pushing foes should have greater effect in this mode.
+[X]        Optimize release build for xbox (disable exception handling and optimize for speed over size)
+[X]        Fix bug where on unfeeling map players fall through bottom but can end up on top of ceiling to right or left of hole.
+[X]        Overlayer optimization (only draw rects that have stuff in them!)  Precalculate rects when saving map!
+[ ]        If a player is CPU controlled, but a player hits the controls for that player, it should popup a dialog asking if you want to turn that player into player controlled.
+[X]        Make clock, POW, and bullet bill powerups less powerful
+[X]        Make players start out with stored powerups at the beginning of each level
+[X]        Make all powerups available from powerup blocks (but assign percentage chances for each one where POW will be low)
+[X]        Make collecting a bomb, clock, bulletbill, or POW (or hammer/fire if you already have that ability) send it to your stored powerups
+[X]        When in race mode and player has star powerup and then the game ends, the end music doesn't play but the normal background music does
+[ ]        j rok spawned inside a wall, use his maps to reproduce and check what the spawn rects are on them! -> no repro
+[X]        Fix bug where controls could semi control a cpu player
+[X]        Fix bug where player hitting noteblock against a goomba would not give him the score point
+[X]        Allow map creators to choose which music file (or a list of files) that can play on their map.  It then would randomly pick one from the list to play.  If the user doesn't have any of the files on the list, then they would get a random music file they do have.  This does take some power away from the user, not allowing them to pick which songs play.  Maybe we could tie this into which background image there is.  Each time a song is added, we would specify in some config file which backgrounds it is allowed to play on.
+[ ]        Add "hurry up" sound to the announcer options
+[ ]        Customized tilesets for each map (with corresponding collision options for each tile)
+[X]        Customizable countdown timer before players respawn after death (could help calm down 4-player chaos a bit)
+[ ]        More music: http://cc.usu.edu/~jerr/smwremix_sample.mp3
+[X]        Change references of cristomarquez to "Fernando Márquez"
+[ ]        Treat lava differently than it is now.  Powerups and items should be destroyed when hitting lava/spikes.
+[ ]        Level Editor: Add an undo button
+[X]        1up should add a constant score to domination, chicken, owned and tag.  When goal is large like 1000, you get 100 score!
+[X]        Jail mode: Killing someone while you are jailed should be another way to get rid of your cage.
+[ ]        Jail mode bug: Getting a poisoned mushroom while you are jailed sometimes gets ride of your cage. -> no repro
+[ ]        Jail mode bug: When you kill a computer-controlled player with a hammer, it doesn't always jail them. -> no repro
+[X]        Jail mode bug: Two characters are jailed, two are not; one of the jailed characters kills one of the non-jailed characters, and all jails are removed except the player who did the killing. Makes no sense.
+[ ]        Poison Mushroom Bug: Kills you even when you have shield? -> no repro
+[X]        Fix it so you don't spawn in the middle of the air
+[ ]        If you have no music files in the music directory, SMW crashes on start up
+[X]        If you put more than 32 warps on a map, it can crash in the middle of game play
+[X]        Remove "Free Play" from tournament modes
+[X]        Apply powerup weightings to bonus wheel
+[X]        Hurry up music doesn't play if there are 3 players left on say tagand then one is removed from game and the two are below the hurry up threshold
+[X]        Game mode sub-options menu that allows players to customize details of a game mode (like add/remove chicken indicator, move domination goal boxes periodically, don't penalize race on death, slider bar for goal length, etc)
+[X]        Test to see if xbox can handle overlayer now
+[X]        Organize file list readers so that all code is in a central function
+[X]        Bug 1: If the tagged player kills a player which hasn't enough life remaining, the tagged player remains tagged (it also could cause him/her not to properly reflect his/her tagged status graphic, we aren't sure). This happened while the tagged player was using the hammer.
+[X]        Bug 2: If the winning player's life bar drops to 0 (for example, he accidentally eats a poison mushroom), he loses the crown on the scoreboard, and he earns no points from that stage (while in a tournament).
+[X]        CPU players should use stored powerups if they don't already have the ability
+[X]        Save fullscreen option for PC so it starts fullscreen next time
+[X]        It seems to me that Jail mode is kinda pointless with two players.  Maybe if there are only two players left the bonus for jailing everyone should be disabled.
+[X]        Perhaps the respawn timer could be set to allow half-second intervals as well
+[X]        The manual needs to be updated if the 1UP really does add a constant number now (many of the mode descriptions still say that it adds 10%).
+[X]        The offscreen arrow is really annoying sometimes because sometimes your opponents can force you to the top of the screen when you have virtually no time left. Someone else suggested letting the amount of time reload when you're on the screen for a certain time; maybe that would be a good idea. Say, for every five frames onscreen you get one more frame offscreen or something, up to the maximum of five seconds or whatever.
+[ ]        Seeing the arrow time in tenths of a second would be better, I think.
+[X]        An option to change the max arrow time would be nice.
+[X]        Another timer for setting the respawn rate of item boxes would also be nice.
+[X]        An item switch, so you can turn certain items on and off (on options menu) and set their weights.  Say you had all items set to 0 except for flowers at 4, Bob-Ombs at 2, and POWs at 1. Then the total number would be 7, and flowers would appear four out of seven times on average, Bob-Ombs 2 out of 7 times, and POWs 1 out of 7. 
+[X]        Don't draw "owned" spheres when warping -> also fixed jail and chicken marker
+[X]        AI is using bobomb early -> will use it early if it is escaping a threat or trying to clear spikes/lava
+[X]        Add item no spawn zones as well as player no spawn zones.  Then the players can be restricted to spawn in just a small area, but items can be lots of places.
+[ ]        Fast scrolling using triggers on xbox.  Have it so it just scrolls the names without loading the maps and when the trigger is released, then it loads the map.  Have the pressure of the trigger equal the speed in which it scrolls.  Have left trigger move up the alphabet and right move down.
+[X]        Slider on the game modes to show you what goal you have set for this mode and allow you to go to 400 from 500 easily.  
+[X]        Remove "Free Play" and replace with an infinity goal for each game mode.  This would allow playing goombas or coins for as long as you want.
+[X]        Bullet bills should kill goombas and players and attribute the kill to the bullet bill shooter
+[ ]        Random special music for menus and stage clears.  Can be specified in the music pack configs.  Will probably need a number before each section indicating how many track are in each section.
+[X]        Collision detection bug: Load the map Boarding Action and jump down the hole in the middle. Once you reach max velocity, hold left against the wall, and (if you haven't died already) you'll make it inside the top hole on the left. However, try the same thing but against the right wall. You won't get inside the hole, and you'll just die, even though the walls are identical. 
+[X]        Fix bug where if you're spawn invincible from using a bullet bill powerup and then you warp, your spawn invincibility will be reduced
+[X]        Fireballs and hammers when colliding with a group of goombas kills all the goombas
+[X]        Fix bug where when using a stored powerup and you collect another stored powerup in the middle of using a different one, the powerup you are using will switch to the one you just picked up
+[ ]        Add feature to give credit for kills to a player that touches another player then that player dies (poison mushroom, spikes, etc.) Essentially keep track of how long it has been since a player touched you when you "kill yourself".  If it has been less than a second or two, credit that player.
+[X]        Add flurry SMB2 skin
+[ ]        Add porcupo SMB2 skin
+[X]        Add a few vine tiles
+[X]        Color-code the Bullet Bills and whatnot like the fireballs and hammers. Would it be easier to make it so one cannot kill oneself with one's own Bullet Bills
+[X]        I've noticed that in free play, team members get points for killing each other if the "team kill" option is on.
+[ ]        Lakitu/spiny frenzies as well? Cheep-cheeps would come up from the bottom of the screen ala SMB1's bridge levels, and lakitus would fly randomly around the screen and drop spinys... Or just have one powerup that randomly picks one of the enemy frenzies...
+[X]        Just have one "frenzy" mode, but you can choose which item you want to use for the frenzy, so you could do frenzies with any item. (Bullet Bill or POW frenzies would be awesome, for example.)  Have these settings in the mode options
+[X]        Have seperate pages for tiles (pipe page, solid block, solid-on-top, death, etc) so there is more room for tiles and they are logically organized
+[X]        Add gamepad support for pc
+[ ]        Figure out impact of adding SDL_HWACCEL and possibly SDL_HWSURFACE | SDL_DOUBLEBUF to graphics init
+[X]        Make sound/music control turn off when you decrease it past 1
+[ ]        Player awards like "Most Frantic" etc.  Look on forums for ideas
+[ ]        Mode and powerup ideas from forums: http://forum.72dpiarmy.com/?q=node/41
+[ ]        Have each team appearance directly under the other in the same image, so its like the current images, but repeated 3 more times below with different colours. Then you could have the different team versions look slightly different. Have a sonic skin that is Sonic on blue, Knuckles on red, Tails on yellow and someone else on green.
+[X]        Fix hammers so that player's X velocity is added to the hammer's X velocity when shot
+[X]        Menu cleanup with different controls like toggles, text boxes, list boxes, map choosers, IP choosers etc
+[ ]        Test new controls options, try xbox and try pc with joystick/gamepad
+[ ]        SMK Bananas - sit still, kill shells and make players slip
+[ ]        map thumbnail browser
+[ ]        Climbable vines/ladders
+[ ]        Throwable [?] blocks that spawn items that are just like BTBs
+[ ]        the item-egg is an item, which behaves like the egg in Y.E. mode, spawns an item when it is moving and hits another player.  Item-egg only spawns non-carryable items(so it doesn't spawn shells or other item-eggs).
+[ ]        Fireworks powerup where 6 fireworks of the team color shoot off and kill anyone that touches them
+[ ]        Allow more than 18 backgrounds.  Read all backgrounds from directory and save background name to map file.  Then if that background isn't present in the game, load the default background. -> Problem!  Background music is based on backgrounds with IDs.  Dropping new backgrounds into the directory causes this system not to work.
+[ ]        Add stomp music, invincibility, slowdown clock, to customizable announcer sounds
+[ ]        Add "up" key to allow for climbing vines/ladders and throwing upjects upwards
+[ ]        If a breakable block is at the exit of a warp, make the block explode (test all directions) - current limitation - collision detection is not calculated when player is warping
+[ ]        Sumo Mode - when a player is touched, he gets an owner sphere.  When player kills himself, owner gets point.
+[ ]        Fix AI to ignore powerups that they can't collect in a certain time or ignore players that keep killing them or they don't kill within a certain time (because of vantage point, powerup, etc).
+[ ]        Clean up collision detection in main loop (find a better way like have all objects in a single array with a draw layer ID)
+           --> Make 2d chart of what collides with what and also what stage each item is drawn in
+           --> Can optimize the POW/MOD weapon (when visiting each node in the single item array, kill it if the pow is on and it is touching the ground and if the item is affected by POW/MOD)
+           --> Move code that kills objects like goombas, shells, bulletbills, etc that is outside the class into a single method of the object: void die()
+           --> On .Add() method, maintain several draw lists of what layer things are drawn on (then we just need to run through each list at draw time)
+           --> Have a 2d lookup array to see what collides with what and then just run through all the items against all the other items and test collision (first see if this is faster than the current collision detection method by counting the average size of the loops)
+[ ]        Map xbox controller triggers to pageup and pagedown for quick map switching
+[ ]        Figure out the compile warnings when disabling exception handling and using string, iostream, list classes.
+[ ]        Add hashtable for input keys so we can do a lookup instead of scanning 32 keys to see if a key was pressed
+[ ]        Optimization: make firework awards, rocket awards, EC_ExplodingAward, etc the same object, not individual objects for each firework piece
+[ ]        Have fireballs, hammer, boomerang have a limited number the player can fire
+[ ]        Add optional "Penalty" for players killing themselves for scores in game mode options for some modes
+[ ]        Add more warps 20?
+[ ]        Slower walking?
+[ ]        Sometimes, the music randomly stops playing - It happens near the end when you are about to win. - Happens mostly on classic mode - fixed?
+[ ]        Carried items need to be adjusted.  They are off by 1 pxl in both x and y directions -> Looks funny with mario sprite
+[ ]        Add "Restore Defaults" button for all options and for controls
+[ ]        Coin and Eggs - Allow customization for how much time it takes for coins/eggs/Yoshis to relocate themselves 
+[ ]        Domination - On death, cause your bases to disappear for a few seconds so that nobody can score from them (this would still keep them stolen if Steal Bases was on, but the stealer would get no points from them during this period) 
+[ ]        Owned - Player Steal (like stealing bases in Domination - would also allow you to own yourself for extra points!) 
+[ ]        Owned - Shuffle (every X seconds, ownerships are shuffled around, kind of like Mystery Mushroom effect (but without the M.M. graphical indication of course)) 
+[ ]        Owned - On death, cause your previously-owned players to become shielded for a few seconds so nobody can immediately reclaim them 
+[ ]        Ztar - Ztar and Shine at the same time? Score like in Shine mode, except that the Ztar player can't pick up the shine. Shine player should be immune from the Ztar, as well. 
+[ ]        Assign specific boxes that only give out powerups and others give out mushrooms. Or even more specific. We can assign a specific powerup to be given by the box. Lets say we make a map that you only want the players to use firepower. You can assign the mystery boxes to only give out the flower.
+[ ]        Alternative breakout blocks and mystery boxes - have smb1,smb3,smw style graphics, but same functionality for blocks in the 'I' menu.
+[ ]        In Tours, when two players tie, they are both ranked identically (i.e. given the same amount of points).  Shouldn't the game break ties by first to score?  (If so, then there's still the issue of people tying for last by not scoring at all - in that case, maybe give any points they should have gotten (third place if a two-way tie, second and third if a three-way tie) to the winner.)
+[ ]        Similar to this, in modes with lives, when there is a tie, the player who died most recently should have the crown.
+[ ]        Kirby style boomerangs
+[ ]        Slippery on top and side spikes tiles
+[ ]        Add multiple stars to star mode.  It would be like shine except players - 1 stars and when time goes off, if you're not holding a star, you die.  Like musical chairs.
+[ ]        Have "All Music" option for playlist field.  This would combine all music packs into a large list and play select from all music.
+[ ]        Configuration for number of throwable weapons on screen at once (like 1 or 3 fireballs at a time, etc)
+
+
+Considering for 1.7:
+--------------------------
+[X] Item selector (item weights that appear in ? box and bonus wheel)
+[X] Better menu system
+[X] On/Off Switch Blocks
+[X] map organizer to create custom map lists
+[X] More tile selection - snow vines, ladders, large pipe bends
+[X] Have seperate pages for tiles (pipe page, solid block, solid-on-top, death, etc) so there is more room for tiles and they are logically organized
+[X] Completely configurable controls
+[X] Add config option for out of bounds timer reset and how long the out of bounds timer is (default to 5 and no reset).
+[X] Fixed when shielded you can't kill goombas or bulletbills
+[X] Shells - 4 types: green - single hit death, red -  multiple hit death, blue spiked - multiple hit death + no jumping on it, buzzy shell - immune to fire/hammers
+[X] Throwable Blue Blocks
+[X] Mode called frenzy (instead of fire and hammer frenzy) where you can select frenzy item instead of being hard coded
+[X] Load .png files instead of .bmp
+[X] Improve AI to deal with blue blocks and shells
+[X] Multiple AI difficulty levels
+[X] Bullet bills should kill goombas and players and attribute the kill to the bullet bill shooter
+[X] Update the thanks.txt files
+[X] Moving platforms (turning out to be a real pain!)
+[X] 2up, 3up and 5up mushrooms (pink, blue, and yellow/gold respectively)
+[X] Animated POW/mod powerup (four frames with wrap around pow lettering from SMB2)
+[X] Timonator noted:  i noticed that after jumping onto a bullet after an enemy started a bullet-attack (whatever its called) and dying with the 'souls' death animation it shows a goomba icon
+[X] Support half seconds for respawn time
+[X] Configurable out of bounds time
+[X] Configurable item respawn time
+[X] Feather powerup
+[X] Add MOd powerup
+[X] Ztar Mode - global timer that counts down.  When it reaches 0, the ztar player is removed from the game (or loses a point).  Last player standing wins.
+[X] Cheep Cheep / Koopa Troopa Mode 
+[X] Capture The Flag
+[X] Option to turn on and off warp locks
+[X] Item no spawn zones
+[X] Allow joystick/gamepads from players 2, 3, 4 to use menu
+[X] One of Boomerang/wand/superflower?
+[X] Mystery Mushroom?
+[X] New race lap noise
+[X] Need to fix crash on startup bug when running out of IDE with release .exe - Off by one error causing crash in bonus powerup wheel initialization
+[X] Player's bullet bills kill each other if they collide
+[X] Add explosion when bullet bills hit each other
+[X] Mode configurable options
+	[X] Capture The Flag - slider for speed, touch return flag, move base after point
+	[X] Ztar - Length of Timer
+	[X] Chicken mode - Chicken Target On/Off
+	[X] Tag - Transfer tag on touch On/Off
+	[X] Jail - Tag to release, time to release
+	[X] Domination - Lose Bases on Death On/Off, Steal Bases on Kill On/Off, Relocate Bases Frequency slider, Relocate Your Bases on Death On/Off, Number of Bases 0x, 1x, 2x, or 3x players + 0, 1, 2, or 3 (but don't allow 0x+0)
+	[X] Race - Bases Death Penalty All/One/None, Base Speed Slider, Number of Bases (not including the checkered flag)
+	[X] Stomp - Goomba On/Off, Koopa On/Off, Cheep Cheep On/Off, Frequency High/Medium/Low, Limit # of enemies onscreen to 5/10/15/etc.
+	[X] Frenzy - Fire Flower On/Off, Hammer On/Off, Bob-omb On/Off, Feather On/Off, Pow On/Off, Bullet Bill On/Off, Mod On/Off, Available 1, 2, 3, 4, 5, players - 1, players, players + 1, players + 2, players + 3, Spawn Rate 1-10 seconds or when player that grabbed it no longer has it (like current Bob-Omb mode)
+	[X] Survival - Speed increase of thwomps, max on screen
+[X] Win the game when your opponent still has a star and the music will continue to play - Opponent gets a star, another player wins game, invincible player is removed from game, regular music then starts to play instead of the level end music
+[X] If you press Esc when someone is squished and quit the game, the menu will mess up. - Press Esc exactly when you squish someone and exit to the menu. 
+[X] Put alot of breakable blocks in a level, and some won't show. It can also crash the game. 
+[X] In Yoshi's egg mode, get a 1up mushroom after you win and the winner's song will play again.
+[X] Put test into level editor to check paths of moving platforms
+[X] Test out new AI for all new objects and modes
+[X] Corpses stop on non solid on/off blocks and maybe spinning flip blocks?
+[X] Add error checking to make sure that skin files have height = 32, width = 192, depth = 24 bit
+[X] Get auto tester code working again
+[X] Run a long stability test while watching memory and CPU usage
+[X] Add frame limiter to do 62, 55, 50, 45, 40, 35, 30 fps.
+[X] Add support for multiple graphics packages.  Use heirarchy to determine what graphic is used.
+[X] Fix bug where you can move through flip blocks on edges of map
+[X] Fixed bug where AI didn't calculate distances across screen borders
+[X] Test integration of mystery mushroom and boomerang
+[X] Finish boomerang powerup
+[X] Finish boomerang frenzy card
+[X] Reconfigure bonus wheel so that everything fits
+[X] Add Matthew Callis's chicken to chicken mode
+[X] Add TTL for fireballs, TTL for shells, hammers ttl/delay, blue blocks ttl
+[X] Adding skidding noise
+[X] Mystery mushroom gfx effect
+[X] Green shell to red/spiny/buzzy shell -> only green shell dies
+[X] Crown needs to be adjusted up 1 pxl
+[X] Make esc quit the game from the main menu
+[X] Boomerang sound quieter
+[X] Configurable delay to use a stored powerup
+[X] Configurable number of cape jumps you get (default to 2)
+[X] Select groups of tiles from tile screen in map editor
+[X] Automatically dropped Ztar after tag
+[X] Losers on scoreboard should have jump death sprite instead of normal standing sprite
+[X] Add "Are You Sure" button to "Restore Defaults"
+[X] Reverse the direction of the score counters for modes that currently show infinity or 999 when the point goal is "unlimited", so some kinda-useful info is still shown: 
+    [X] Time limit: have the timer count up from zero to show the total elapsed time 
+    [X] Classic: replace the lives counters with the number of deaths 
+    [X] Tag: show the total points for which you've been tagged 
+    [X] Ztar: replace the lives counters with the number of deaths 
+    [X] Survival: replace the lives counters with the number of deaths 
+[X] When a player goes through a warp pipe, if they're partially outside the boundary of the warp, snap their sprite to just inside the warp, so it doesn't look like part of them is disappearing into thin air. (Especially noticeable with 1-tile-wide warps, or entering horizontal warps while falling fast.) 
+[X] Stop invinciblity and tick-tock music effect when powerup is over and have it repeat the same way boomerang repeats now
+[X] Clear stored powerup when single game is selected
+[X] Shells are spawning in the corner of the map
+[X] In Ztar mode, if the AI become a bomb and are black, they won't pick up the ztar
+[X] Have invincibility stars not kill what you are carrying
+[X] I'm able to reproduce a bug with the boomerang. If I have my player split between two sides of the screen, when I throw the boomerang it flys off one side and never comes back. The flying sound effect continues forever and I can't throw another boomerang. This doesn't happen everytime, but I can get it to happen if I mess around enough. Using the mario skin, I throw it when just his nose is sticking out. I wonder if this is a simple index limit bug or something like that. 
+[X] If a Boomerang is fired off the top of the screen, it never disappears, keeping them from throwing another, or throwing more than one Hammer/Fireball at once.
+[X] Catch your own boomerang (i.e. kill it if it touches you and flipped is true)
+[X] when someone in possession of the Ztar dies NOT by getting stomped, he reverts to his original color in his death frame -> also fixed for tagged
+[X] When the bounds time is set to 10 seconds, it works as if it was set to infinite.
+[X] In stomp mode, if a moving platform stops moving down and starts moving up, all the Goombas/Koopas fall through.
+[X] Opponents with powerups don't pick up flags. 
+[X] Fix swap effect when no one to swap with
+[X] Disallow multiple inputs to be the same button
+[X] Fix 2x number of bases for domination mode.  The number of bases are wrong.
+[X] Screen off by 2 pixels after screen shake
+[X] Bullet bills attribute kills to team 0 in stomp mode
+[X] Turning shield off for survival mode overrides master shield option
+[X] Flags that get smashed by platforms don't reappear
+[X] Tour configurations where users can create xtour.txt files and those are available as tourament options.  Each tour would have a defined map, mode and goal.  Players would get points for which place they won for each mode.  All games are played in a tour and winner is the one with the most points at the end.
+[X] Controller code isn't working correct - when input is switched to gamepad -> keyboard stops responding, when input is saved as gamepad and you start the game up that way, it doesnt work for input
+[X] Flag collision detection allows it to be put into a solid block
+[X] There is one frame when a player is stopping and holding a shell/btb that if he lets go, it will shoot and kill him
+[X] Add "Tagged!" effect to ztar mode too like tagged mode -> "Ztarred!"
+[X] On the map previews that you see before you play, all the on/off switches said off, even when they weren't
+[X] enter-stage.wav sounds horrible
+[X] Higher fps was suggested, uncomment the turbo code!
+[X] Test new tour code by having tour files with more than 10 stops, using maps that don't exist, goals that don't exist and modes that don't exist.  Also malformatted files with X,X, or X,X or just X
+[X] Fix bug where on/off blocks in preview are not in correct on/off state
+[X] Allow any goal to be set in tour
+[X] Cape can be placed in front of player (probably while stopping and has to do with IsPlayerFacingRight())
+[X] Show run cycle on skin/team select screen for skins -> When loading skins, only load the 1st frame of both the right standing and running frames.  This should fix the optimization issue.
+[X] Fix how escape works with input configuration.  If a key is already mapped to escape then exit editing that key and put the old key back.  If player's device is not keyboard and escape is hit, always back out and replace with old key.  If keyboard is device and no key for any player is escape, make that input use the escape key.
+[X] In a tiny pit there was a 2-Up Mushroom and a Poison Mushroom behind it. He grabbed both simultaneously so I won 58 to 2, even though he technically had two lives
+[X] Tour with only one entry in it and add version number to tour so upgrades are possible and backwards compatility is too
+[X] Time warning music didn't play for coins mode -> normal music track started over -> Maybe fixed?
+[X] In Stomp mode, when the CPU gets a bomb, it should try to blow up the goombas/koopas/cheep-cheeps, not other players.
+[X] King of the Hill mode.  A single zone that when players are touching it, they are accumulating score.  If multiple players from different teams are touching, no one scores.  Similar to domination.
+[X] Add AI code to throw shells and btbs like we throw the ztar - except detect that player is slightly up to slightly lower instead of above
+[X] Shouldn't the koopas and goombas burn up by falling?
+[X] Add lava fireballs to survival mode.  Then have mode options to turn on frequency of thwomps and fireballs.
+[X] Add option to turn off the bonus wheel at the end of the tournament
+[X] Add button to reset stored powerups
+[X] Option to make the hammers behave like in SMB3 (go through all enemies)? 
+[X] Save the number of players/bots and their current colors/teams/skins...
+[X] Test how escape keys works when gamepads are selected as input device
+[X] Better background/music configs -> Classify music into categories and allow the map maker to select which category they want for their map.  Then save the background filename to the file instead of the ID and save the music ID to the file.  This allows for arbitrary backgrounds and bg music.
+[X] Item drop by pressing down when releasing turbo to drop the item instead of kick it.
+[X] Reports of custom backgrounds that are dropped into bg directory are not saving (defautls to clouds and waterfalls background)
+[X] Fix bug where backgrounds are not saved on maps correctly (or at all?!)
+[X] Could we change the in-game text to "Item" where it says "Powerup"? This would be in three places: the Powerups Selection menu (would be "Item Selection"* both in the main options menu and as the title for when it is selected), the Powerup Settings menu (would be "Item Settings" in both places and would contain "Reset Items"), and in the Controls config screens. 
+[X] In Classic Mode's Free Play, the counter shows how many times you died. But the highest number (e.g. most deaths) is the one that is labeled as the Leader.
+[X] When a key is pressed for input config and it already is mapped to something else, the proper thing to do is swap them rather than blocking the change. Currently, if someone has exactly as many buttons as commands they won't be able to remap at all.
+[X] I find the time after tagging someone before you be tagged again is short. Can you make this longer or make it customizable.
+[X] When you select a tour and then enter the tour screen and go back to the main menu, the music resets to the beginning - same with exiting a tournament
+[X] When a player is set to "Off", their stored powerups remain, and additionally, they are not reset after someone wins another one. 
+[X] When you kill 2+ players with a POW or MOd, you should get the multikill eyecandy.
+[X] When you grab a Mystery Mushroom, you should be able to take credit for any suicides that happen within about a second or two afterwards (you swapped them there, so it's ostensibly your fault they died).
+[X] Not sure exactly when or why, but sometimes a Ztar will get wedged in a wall when it gets auto-relocated. I think it's when someone holding the Ztar dies to a level hazard. 
+[X] If there is a moving set of downward-facing spikes, bumping your head on them causes death, regardless of any kind of invulnerability.
+[X] The Mystery Mushroom effect is too long (it's also not what happens in the game where the item is from, but I can live with that). - Speed it up and add a transition effect for moving the stored powerups as well.
+[X] The map's music should not start playing until the start sound/animation is finished. 
+[X] In tours, please add some sort of indicator so that it is possible to see how many game points each player has accumulated in between stops. 
+[X] An option to keep stored powerups even if someone else has one? 
+[X] point accrual in KotH is waaaay tooooo daaaarn sloooow.
+[X] Ability to adjust warp lock time. 
+[X] How about having moving platformes showing on the map previews that you see before you play
+[X] Custom point system for tours: That way you could make a tour, where the first matches are worth less point and they get progressively more important (worth more points)...to allow players in lower ranking to catch up. Or you could decide some are worth less and others are worth more....like 3 quick 1 point matches and then a longer 3 point match, etc.
+[X] Shine star for ztarred mode -> "Shine Get!" ->  to balance the Shine mode, make sure that shine warps out of the holding player's hands when the timer runs out
+[X] Allow kick for egg or flag into goal -> make option
+[X] Letting go of shell in same frame as turning kills you
+[X] When spawning call check sides code
+[X] Players spawning in solid tiles -> Fixed?
+[X] An option so that the song does not repeat but go on to another instead.
+[X] If you throw a spiky shell while a chicken, then kill yourself with it, you become the chicken again and you gain a point.
+[X] Default the music category when changing the background - How about 2 background buttons!  B=Change background + Music category. V=Change background only.
+[X] In the level editor, can you make Shift+S do the same thing it did on 1.6?  In 1.6, it took you to the new map when you saved it. 1.7 dosen't do this.
+[X] New area tag and no move mystery mushroom sound
+[X] Can shoot tons of hammers -> All you have to do is set hammers to multiple kills, then hit the other players with them while hammering the turbo button. You'll see the problem soon enough
+[X] Add sparkle eyecandy to coins, eggs, stars
+[X] Shielded players should be able to kill non shielded players
+[X] I'd like it if the sprites in the scoreboard changed colour along with the player. ie. when player is holding Ztar, or when player is It, the scoreboard sprite would change to black, or green, respectively. -> hard to do because player objects are removed from game when dead so state is not available
+[X] What about having the option of having the crown not only show up on the top of the screen, but also on the character itself?? This would save having to glance up. This would be especially useful in tight matches where the leader changes very quickly and often.  I say option, because it would be nice to turn on/off.-> Need to calculate winner for each frame, currently done in main
+[X] Detect no sound card and don't load sounds and default sound and music to off
+[X] Update 2005 to 2006 on splash screen
+[X] Joystick 2 Up keeps poping up when selecting input for controls
+[X] Add "Desert", "Clouds" and "Snow" music categories
+[X] Gray out leading zeros on scoreboard
+[X] At least add Bowser fireballs to Survival
+[X] for coin mode. getting stomped on = losing one of the coins you've earned (poof)....not a loose coin, just a minus coin...this way if 1 player is really far ahead, you can gang up and reduce coins.... 
+[X] Also, is it possible to make it so that you can leave comments for each tour stop, which replace the "Tour Stop X" text at the top of the screen?
+[X] Could include the bonus wheel as an item in the tour file so that you can place bonus wheels where desired and take out the bonus wheel at the end, unless specified in the tour.
+[X] Don't allow player input for cpu players
+[X] In Ztar mode, please add a short noise that plays when the clock hits 3, 2, and 1, so players know time is almost up.
+[X] Allow tag touch transfer when shielded
+[X] Look at spawning code -> players report spawning inside blocks -> Major pain, but much improved
+[X] Upgrade boomerang to have curved path or home in on player when returning -> Added both SMB3 and zelda style boomerangs (option on projectiles menu)
+[X] Rename backgrounds to use music category in name then convert all maps to use these new background names
+[X] Add limits to the number of times you can use a fireflower, hammer or boomerang
+[X] Allow map makers to choose the tile type for each tile on the map
+[X] Add feature to level editor to take screenshots for easy uploading to content DB.  Show warps and platforms (with arrows showing direction)
+[X] Make default eyecandy for map "none" instead of clouds
+[X] If u use two or more gamepads and u close the game and reopen it with one gamepad) and try to do the controlls with the player who had the gamepad the game gets all screwed up
+[X] Owned - 15-point bonus for killing already-owned players (similar to Chicken - maybe don't make an option and just have it like this?) 
+[X] Frenzy - Shell cards
+[X] Coin Options - Number of coins on screen and coin spawn rate
+[X] Make shell bouncing have sparks eyecandy
+[X] Add sgraff87's new tiles to tileset
+[X] Fix bug where tour affects which map is selected in normal single game mode (try selecting LKA's random tour then going to single game)
+[X] Add all the filter tag icons
+[X] Save filter files on exit
+[X] Create better graphics for selected filter and map in filter set
+[X] Start edit filter on current map
+[X] Add a star icon to the filters button when filters are enabled
+[X] Add button to browse maps by thumbnails
+[X] Performance test why it is slow loading at very beginning before splash screen and determine why each thumbnail page loads slow
+[X] Speed up loading of maps/applying filters at start up!
+[X] There is an AI bug in Team Mode when playing in Chicken Mode. If you are the Chicken, the CPU members of your team become stale. It would be good if it helped your team instead of sitting and looking at you.
+[X] Playing in tag mode, use the star near the tagged bot and ot will attack you when you have the star
+[X] Add snapping to screen size for xbox
+[X] Add custom favorites lists -> allow user to select multiple lists at the same time.  Allow list creator to choose the "icon" that is associated with this list.  Show Checkbox for each selected list.
+[X] Disable next song button after game is over
+[X] Support saving PNGs as screenshots
+[X] Need to test unplugging gamepads on xbox then starting up with more/less pads
+[X] Test xbox snapping to screen sizes - is it still blurry?  What about snapping instead of 20x20, something like 20x15, 40x30, 60x45, etc.
+[X] Verify xbox bug fix where you can pause then game when exiting or exit the game while paused!
+[X] Fix xbox nextmusic setting
+[X] AI treats the Shine like a Ztar (i.e. it tries to hit other players with it)
+[X] Make it so boomerang doesn't use screen edges to calculate return to player
+[X] If a player doesn't catch a boomerang, penalize them with an extra boomerang use
+[X] Make zelda style boomerang come back to player more quickly
+[X] Background preview in map editor to help you choose a background
+[X] Add puff of smoke and flash exchange for mystery mushroom
+[X] Fix memory leak with LoadPage() in thumbnail map control.  Compare to loading backgrounds in level editor to see if there is a leak there too.
+[X] Support random skin selection by random button or holding both up and down at the same time.
+[X] Black sparkles for Ztar please, and no sparkles for egg (I mean seriously, what's up with that?). 
+[X] Please change the Tag, Chicken and Owned stomp bonus to 5 points to restore the balance
+[X] the menu music should not play when the map intro sound is playing. There should be nothing but the intro sound during the fade. 
+[X] Beta 2 maps are causing platforms to show up in weird places on the level select screen
+[X] Replace stretched backgrounds with the source backgrounds from sgraff87
+[X] if you are playing king of the hill, can you make it so that if you are in teams, if both team members are inside the gate, you get points twice as fast
+[X] please add "unlimited" options to Shell and BB life, or at least some higher numbers.
+[X] When you press Shift + Delete, it should delete all the "l" tiles and creating new maps using "n" key doesn't clear old tiles
+[X] Level Editor: In the bottom of background thumbnail screen (and/or) in help (F1)screen could show [Page Up] = next screen..... [Page Down] = previous screen.
+[X] You can't set shells down.
+[X] If you close SMW using a gfx pack with an alternate palette, when you reboot SMW, it will revert to Classic's palette, even if it's still set to the alternate gfx pack. 
+[X] If awards is set to off, don't do "!" eyecandy for screenshake or stomping in air
+[X] all kills in Owned are worth 5 points now, not just repeat kills
+[X] Tagged colors are too green.  Change back to the way it was.
+[X] Have an option to only allow capturing the enemy flag if your own flag is at your base
+[X] Put text of 1UP, 5UP, etc. above the character when you get the mushroom. Would make it easier to remember and for new players to learn which mushrooms do what.
+[X] Fix how menu fields/buttons are drawn so that graphics packs have an easier time skinning
+[X] Add ready indicator to team select
+[X] Cache thumbnail images to speed up browsing by thumbnail and viewing filters
+[X] Add button to force all thumbnail images to be created
+[X] Revert zelda boomerang behavior back to wrapping around sides
+[X] A thumbnail generation button and save the thumbnails generated on the first visit to each page.
+[X] A key to change the music in-level, in case you don't like the current tune.
+[X] Have the default music specification of the map be automatic, user-overridable in the map editor.
+[X] I think when you press "b" in the level editor, it should show a list of the backgrounds.
+[X] Related to this, if an active shell is enclosed in a single block enclosure, it makes the spark on either side of it and it looks silly. Perhaps you could remove the spark, or lessen it or something when it's bouncing back and forth so quickly.
+[X] Add eyecandy images to 1up, 2up, etc.
+[X] Add friction to ice tiles (It takes you about three times as long to slow down on an ice tile as it takes you to slow down on a non-ice tile.)
+[X] If you warp into a pipe with a shell and someone throws a hammer at you while you warp, you will lose your shell.
+[X] See if we can fix when you press down and jump and you're not over a solid-on-top, then you jump instead of doing nothing
+[X] When you are holding an object and moving left and hold right without letting go of left, then let go of the item, it will be thrown backwards.
+[X] Investigate signals getting lost.  Possibly happens when we break when finding the key signal.  "I was holding down X and Right/Left to run, and then pressing A. Usually jumping worked, but sometimes there was no reaction."
+[X] Give eyecandy to players that have more than 1 kill in a row with a shell
+[X] Add a seperate file for the menu background to allow graphics packs to customize only the menu background
+[X] Cache map auto filter data so it speeds up the load time
+[X] Boomerang life option. Boomerangs should also vanish when their thrower dies.
+[X] Random skin option where skin is chosen at random before every game
+[X] 320x240 screenshot from level editor
+[X] Alphabetize the skin list
+[X] Display the skin name
+[X] Allow music pack makers to force certain maps or backgrounds to play a specific song/list of songs
+[X] New on/off switch sound
+[X] Make pause button exit the game when the game is over
+[X] Clean up AI code and put it into it's own class
+[X] Allow each player to have bullet bills on screen instead of just one
+[X] Fix bug where invincible players can die when hitting sides of death tiles
+[X] Please fix the Tag mode icon so that it uses the old palette again. The mode does now, but the icon doesn't (it's all green). If you need it, the old icon is still used for the manual. 
+[X] There is also a typo in the editor help screen - it says to press V for background changes but I believe the correct key is G? V is already used to hide interaction blocks. Please fix this. 
+[X] Make the scoreboard font and the font for the checkpoints in Race mode two different files
+[X] Fix powerup switching with mystery mushroom
+[X] Get rid of that blue bar under the text on the startup splash screen
+[X] If you have awards off, and you hit 2 people with a shell, the "!" block appears
+[X] If you are invincible and you stomp on a moving shell, instead of killing the shell, you make it stop moving. 
+[X] If someone is holding a shell and someone uses a mod block, the shell will die.
+[X] If you hit a ? Block that is on the top of the screen, and a shell comes out(Out of bounds), when you touch it, it dies
+[X] Add button to toggle full on/full off for slider fields
+[X] When you hit a switch with a shell or blue block, you forgot to make it play the new switch sound
+[X] Fixed Tour Markers not using transparent color
+[X] Split up game and menu graphics for gfx packs
+[X] Slow rising 1UP then disappears
+[X] Option to store shells in frenzy mode
+[X] When both keyboard and controller are being used, some times you can't jump.  Things work fine on keyboard alone but when we add in a controller the problem occurs for everyone playing -> might be fixed
+[X] Try out wasabimario's 9 tours and add some to build
+[X] Go through all maps and sort out the best ones (keep it below 200 maps)
+[X] Read through readme and comment to Jared
+[X] Figure out xbox screen resize blurryness - Download mednafen-nes xbox source code and see how they do the screen
+[X] Add exit button on xbox version to exit back to dash
+[X] Make libpng optional (screenshot function).  if libpng is not included, then screenshot to bmp
+[X] When exiting the level editor, it writes out a cache map image for the zzleveleditor map.
+[X] Add warps and platforms to thumbnail browser
+[X] Can you allow us to type capital letters when naming maps in the level editor? 
+[X] Can you also make ctrl+Delete clear no-spawn tiles? 
+[X] Sometimes, when you are invincible, and you stomp on a spiney shell, you die
+[X] Fix bug where shell is overlapping sides and it is kicked (will start traveling the wrong way)
+
+
+[ ] Add some graphics and finish Readme.html
+[ ] Crash when freeing skin memory skin pointer == 0xbaadfood (uninitialized).  Need to track down.
+[ ] Get auto tester working again
+[ ] SMWar won't read image files with capitalized file extensions. It will read .png but not .PNG (Which is what MSPaint saves as by default).
+[ ] Sometimes the 1-UP icon when you have your awards set to "Ring" will appear as a green shell icon.
+
+
+Rejected for 1.7:
+[ ] Eyecandy smoke is always on top, even on top of foreground objects -> Only background and foreground eyecandy -> no middle ground
+[ ] Fix corpses falling through moving platforms -> Computationally intensive for eyecandy
+[ ] Crash where a mushroom went to the bottom of the eeliot_chains level, and then the screw pushed it along. when both hit the side of the screen, the game "encountered an error". -> no repro
+[ ] Crash two players were hitting each other at the edge of the screen on paper_mario.map -> no repro
+[ ] Being able to set a mode's settings inside of tours tours since it currently sets what have been set outside of tours. (i.e. 20 bases for domination mode, etc)
+[ ] An item switch for the roulette wheel, as well as a dummy item which can go on it.
+[ ] A powerup that allows players to float down slowly (the Leaf)
+[ ] Fireball physics is not quite in line with the games. A fireball's downward velocity should be capped to match its horizontal velocity (i.e., it travels on a slope of -1). -> Plays very strange after playing with normal gravity all this time, I'm not sure we want to tweek this
+[ ] Ability to adjust how high the fireballs bounce/how fast they move. 
+[ ] Hopping on shell can kill you -> no repro
+[ ] If you are going to eat a poison mushroom when leaving a pipe, you pass through it without eating it, unless you are invulnerable. In that case, you eat it. -> gameplay is consistant, when warping you don't collide with objects
+[ ] Ok now i cant save the Maps. I hit Shift + S and name it. I run game and its not there. -> No repro
+[ ] You know the map eyecandy of the ghosts? Each ghost's second animation frame has the leftmost column of pixels cut off (so it looks like the first column of "pixels" is too thin). -> no repro
+[ ] Better spawning (if no solid areas are available, default to the hard calculated spawning that we used to do) -> spawning system works well enough
+[ ] Platform collision problem -> If you have a platform sliding through a solid block and you press against the solid block with the player, he can die! Tubularesque.map -> Good enough
+[ ] Make conversion tool for old music files to new music playlist files -> manual conversion is not that hard
+[ ] Saving the last map you played.
+[ ] while in tours/tournament, to go to next stage after tour summary screen you must press "back". I'd rather have this mapped to select button. -> no repro
+[ ] Leaf for wind effect eyecandy
+[ ] The game never plays "Platform" music. It always keeps playing the menu music. -> Called "platforms"
+[ ] It seems that shielded players can now stomp others... and I dun liek taht. >_> Needs an off switch plz.
+[ ] Clear thumbnail cache when switching gfx packs -> I'm not convinced we want to do this.  1) It takes considerable amount of time to delete 600+ thumbnails.  2) What if a user changes the gfxPack then changes it back.  We want to keep the same thumbnails for that.
+[ ] If someone gets a Mystery Mushroom, whoevr he trades spots with gets his stored item.
+[ ] try to get Kirby boomerangs working - it would be an option that allowed you to have more than one shot on screen at once
+[ ] I died once when jumping on a Buzzy shell -> no repro
+[ ] Have level editor accept map files and open then via double clicking windows file -> Can't do because the working directory gets screwed up and the path will be wrong for all the file/directory lists
+[ ] For some reason, I can't get the map-specific music override to work. It works fine for the background-specific override, but not map. even tried adding ".map" to the end, and even took off the name tag. Tried with all music packs. -> no repro, works for me
+[ ] When you start a killing spree with a cape, using nothing but cape kills, at least one or two of the kill markers show up as regular jumping kills. I use the Ring Awards graphics option, and it does it on there, I'm not sure if it does the same with others or not. -> no repro
+[ ] The invincibility music dosen't need to stop, when you pause. -> deferred, too much risk changing it now
+
+
+Things to Watch out for While Testing
+----------------------------------------------------
+**Beta 1**
+- Platform collision detection
+- New mode flaws
+- Collision detection in general
+- Carryable items and the control of the item when kicking it
+- Throwability of hammers - hammer's rate limiter and TTL
+- Playability of new Ztar and CTF modes
+- Controls configuration - try many different types of input devices with different button configurations
+- Are extra guys too powerful now with the 4 different types?
+- Using new stored powerups like shells and feather
+- Collision detection along right and left screen edges with items, blocks, tiles and platforms
+- Favorite maps system with tags and lists
+- Mystery Mushroom strangeness when switching spots with other players (especially when holding items or having powerups)
+
+**Beta 2**
+- Custom Tours using all types of maps, modes and goals (especially goals not normally allowed)
+- Collision detection of objects like flags, eggs, ztar, shells.  They should not be able to get stuck in the map.
+- Sound effects not playing, stoping early, or playing at the wrong time
+- Bonus Wheel off/single/all settings
+- Players on team select screen, switching numbers of players -> saved settings
+- Maps and music categories and backgrounds
+- Music playlists
+
+**Beta 3**
+- Shine option for star mode
+- Tour points and scores
+- Throwing flags and eggs for score
+- Scoreboard player icons -> is invincible too annoying?
+- Timer scores have been cut in half to allow for more time and stay under 1000 points
+- Test bowser fireballs in survival
+- Joystick input configs setting themselves to joystick up fixed
+- New SMB3 and zelda style boomerangs
+- Taking map screenshots and thumbnails
+
+**RC 1**
+- Down jumping on solid blocks
+- Controls not responding
+- Displayed skin names/hitting ready before game start
+- Playlist forcing music on specific maps/backgrounds
+- Random Skins
+- Cached map images and filters for page switching and load time speed up
+- Cleaned up AI class to allow for AI writters to create their own AI
+
+**RC 2**
+- Split game and menu gfx packs
+- Pressing fast scroll changes sliders from 0 to 10
+- Reduced map set from 800 maps to 200.
+- Added 9 tours - special thanks to WasabiMario!
+
+
+TODO Ship
+--------------------
+[ ] Compile in Release Mode - check paths
+[ ] Remove all printf statements
+[ ] Remove DevPartner perf instrumentation
+[ ] Run automated memory leak analysis using perfmon
+[ ] Change "Alpha" to "Beta" to removed
+[ ] Test keyboard as default controls when using joysticks
+[ ] Need to test all xbox menus, controls, screen resize, etc.
+[ ] Need to test what happens when you unplug some controllers from the xbox and then start up (device index will probably point to a gamepad that isn't in the list) and this will cause a crash
+[ ] On Xbox, the announcer titles in the announcer field have the full path name, not just the announcer name.  Fixed.  Need to test.
+[ ] Test players 2, 3, 4 changing their own controls and controlling the menu with joypads
+[ ] Need to fully test music packs (including category subdirectories) on xbox
+[ ] Search smw file tree for "svn" and remove all directories
+
+Beta 2
+[X] Come up with a good sample Tour
+
+RC 1
+[X] Include some better tours
+[ ] Announce AI programming competition
+
+Final
+[X] Get Sgraff's new menu and game gfx and use as defaults
+[X] Finalize map set
+[X] Get some good default filters
+[X] Update splash screen gfx to include "Steven Graff", "Jared McComb"
+[X] Go through xbox controls in the docs and make sure they are right
+[X] Make screenshots for manual
+
+
+
+Thinking about 1.8...
+[X] Expanded tileset -> spec it out - maybe allow a map only to choose 1 tileset it can use, need map between old and new tileset, need default tile types for each tileset
+[X] Save platform tile types like the map tile types are saved so that tileset.tls isn't read by the game at all.  Need to add a way to specify the platform tile types in the level editor and update the map files to include this information.
+[X] Side spikes tile type
+[X] ice-solid-on-top tile type
+[X] Map hazards -> bullet bills, canons, flame throwers, rotating fire shafts, rotodiscs, pirhana plants, nippers?
+[X] Special animated tiles like water, lava
+[X] Add mode options to tours -> If the tours are expanded in the future, they should allow you to set goals according to the number of players. I've found when making tours, certain goals on 2 player are fine, but add 2 other players and you're in for a long match, and vice versa. So, if you could manually set the goals depending on the number of players, it would allow you to great balanced tours for any number of players...
+[X] Jail mode updated to jail free for all where players only are released after a certain period of time or stomp another player or tag a team mate.  No bonuses for jailing all other players.
+[X] Greed mode added
+[X] Owned option to jail players instead of normal colored orb
+[ ] The invincibility music dosen't need to stop, when you pause.
+[ ] Goomba sprites should flip when changing direction. GFX packs which use Goombas that change sprites while changing directions can make them look like they're walking backwards.
+[ ] Ability to throw objects upwards like flags, stars, shells, blue blocks, eggs, ect.
+[ ] Input bug: if the menu select key is mapped to a letter, but then you select a map and press that letter to select the map, it won't select, but jump to the maps that begin with that letter!
+[X] New powerup weight menu to support arbitrary number of powerups
+[X] Solid on top ice tile type
+[X] New bonus wheel (something like pick 6 or 8 powerups and have a user controlled stopping point of the spinning, more like bomberman)
+[X] Fix bug where when beating a vehicle on a closed bridge, the bridge will open and trap the player in that spot.  Even hourglass powerups don't work when trapped (intentionally, because you're on a bridge! :))
+[X] New ice wand powerup: Throwable shattering ice ball (maybe remotely triggered like the exploding boomerang) that shatters into crystals
+[X] Support new mode customized HUDs
+[X] Match 3 cards mode (cards can be bumped out and stolen by other players)
+[X] Health mode - different attacks do different damage
+[X] Hidden blocks that popup when hit from below
+[X] Object destroyable blocks like fire, hammer, bomb, boomerang - done, need gfx
+[X] Powerup weights should be controlled by level creator with a global override in game
+[X] The game will crash if you go to a map with a view block with no powerups on.
+[X] If the bonus wheel is set to every turn, and you win a world, the tournament win song will play, but it will skip the results screen. 
+[X] Mode chosen start locations like flag bases, race goals, etc. set in level editor
+[X] Jail mode updates: 1. "Owned Jail": Because players get out of Jail when (#players – (#players in jail)=1), in 2P there is no Jail, in 3P only one person can be in jail at a time and 4P only two people can be in jail at once. As soon as the last free player is jailed, the player who jailed him gets a bonus and everyone is freed.  To make it more difficult to get out of jail and to reward the player who does more work to jail all other players, I suggest that the jails be color coded (like owned). And when someone does in fact jail everyone, they get a heftier bonus than for just being the last one to jail the group.  In 2P, the other player is jailed with a colored jail but no bonus points are awarded for this.  They stay jailed for x seconds and are released.  2. "Free for all Jail" : This takes away the whole idea of bonuses for jail. When you are jailed, you remain so until a) you stomp on another player (this includes stomping on other jailed players) or b) you are able to run out the timer for your  jail. The reward and strategy for someone who is not in jail is to try to keep others in jail by stomping/killing them consecutive times to prevent them from being freed. Basically, the idea being that keeping someone in jail is reward enough and you don't need an extra bonus for jailing the group. So, even in 2P, you would have a jail. 
+[X] New retro colored jail gfx. 
+[X] New Eyecandy! 
+[X] Trying to insert stages for the bonus world, I've found out it appears to have a stage limit of 20. What's with that?
+[X] Also, the player cannot skip a bonus house if it's blocking a path, even though you could in SMB3. 
+[X] I'm coming up with a whole slew of world bugs now! Locked doors do not work properly if set next to a stage. 
+[X] Urgh...why are vehicles invisible after you reload a map? Makes creating vehicle boundaries much harder then it should be... 
+[ ] I also have two sound bugs: The P Wing sound and the toad house music in world mode do not loop properly. 
+[X] Settable disappear time for hidden blocks
+[ ] New empty hidden block
+[X] Settable TTL for BTBs and RTBs
+[X] GTBs that multikill but do not bounce
+[X] Finish fish types for fish eyecandy
+ 
+Things I don't want to do
+- Anything having to do with new types of collision detection like slopes, water, and sliding or climbing tiles
