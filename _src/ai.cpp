@@ -344,8 +344,8 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 			if(--(itr->second->iTimer) == 0)
 			{
 				delete itr->second;
-			
-				itr = attentionObjects.erase(itr);
+
+				attentionObjects.erase(itr++);
 				lim = attentionObjects.end();
 			}
 		}

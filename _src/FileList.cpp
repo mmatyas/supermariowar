@@ -15,6 +15,7 @@
 #include "global.h"
 #include "dirlist.h"
 #include <ctype.h>
+#include <algorithm>
 #include <iostream>
 using std::cout;
 using std::endl;
