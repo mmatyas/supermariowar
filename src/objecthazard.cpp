@@ -96,8 +96,8 @@ bool OMO_OrbitHazard::collide(CPlayer * player)
 
 void OMO_OrbitHazard::CalculatePosition()
 {
-	xf(dCenterX + dRadius * cos(dAngle) - (float)iw / 2.0f);
-	yf(dCenterY + dRadius * sin(dAngle) - (float)ih / 2.0f);
+	setXf(dCenterX + dRadius * cos(dAngle) - (float)iw / 2.0f);
+	setYf(dCenterY + dRadius * sin(dAngle) - (float)ih / 2.0f);
 }
 
 
@@ -190,9 +190,9 @@ MO_BulletBill::MO_BulletBill(gfxSprite *nspr, gfxSprite *nsprdead, short x, shor
 	else
 	{
 		if(velx < 0.0f)
-			xi(640 + iw);
+			setXi(640 + iw);
 		else
-			xi(-iw);
+			setXi(-iw);
 
 		iPlayerID = playerID;
 		iColorID = game_values.colorids[iPlayerID];
@@ -207,8 +207,8 @@ MO_BulletBill::MO_BulletBill(gfxSprite *nspr, gfxSprite *nsprdead, short x, shor
 
 void MO_BulletBill::update()
 {
-	xf(fx + velx);
-	//yf(fy + vely);
+	setXf(fx + velx);
+	//setYf(fy + vely);
 
 	animate();
 
@@ -266,7 +266,7 @@ bool MO_BulletBill::collide(CPlayer * player)
 
 bool MO_BulletBill::hittop(CPlayer * player)
 {
-	player->yi(iy - PH - 1);
+	player->setYi(iy - PH - 1);
 	player->bouncejump();
 	player->collision_detection_checktop();
 	player->platform = NULL;

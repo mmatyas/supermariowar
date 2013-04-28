@@ -4162,8 +4162,8 @@ bool SwapPlayers(short iUsingPlayerID)
 
 		if(game_values.swapstyle == 2)
 		{
-			list_players[iPlayer]->xf(list_players[iPlayer]->fNewSwapX);
-			list_players[iPlayer]->yf(list_players[iPlayer]->fNewSwapY);
+			list_players[iPlayer]->setXf(list_players[iPlayer]->fNewSwapX);
+			list_players[iPlayer]->setYf(list_players[iPlayer]->fNewSwapY);
 
 			if(list_players[iPlayer]->carriedItem)
 				list_players[iPlayer]->carriedItem->MoveToOwner();
