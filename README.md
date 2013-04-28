@@ -11,7 +11,7 @@ Supported platforms:
 - MAC OS X
 
 How to compile on Linux
-==============
+=======================
 Enter the Build directory, run cmake, then make and finally you can use the binary smw in Build/Binaries directories.
 
 $# cd Build && cmake -DCMAKE_BUILD_TYPE=Release .. && make -j5
@@ -27,6 +27,15 @@ $# cd Build && cmake -DCMAKE_BUILD_TYPE=Debug .. && make -j5
 $# gsb Binaries/smw 
 gdb> run ../
 
+How to compile on Windows
+=========================
+
+Although compilation through CMake should work, I did not try it yet.
+
+Open the VS2010 solution available in Projects/PC, then set the following:
+
+- working directory: external/win32-dlls
+- command line argument: ../../
 
 Compilation options
 -------------------
