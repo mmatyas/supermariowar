@@ -25,15 +25,17 @@
 
 
 #ifdef LINUXFUNC
-	#include "linfunc.h"
+#include "linfunc.h"
 #endif
 
-struct STextAward
-{
-	const char		*name;
-	gfxFont			*font;
-	
-	STextAward(const char *nname, gfxFont *nfont) {name = nname; font = nfont;}
+struct STextAward {
+    const char		*name;
+    gfxFont			*font;
+
+    STextAward(const char *nname, gfxFont *nfont) {
+        name = nname;
+        font = nfont;
+    }
 };
 
 
@@ -105,7 +107,7 @@ struct STextAward
 #define VELKURIBOBOUNCE	3.0f
 #define VELENEMYBOUNCE  7.0f
 
-#define	GRAVITATION		0.40f		
+#define	GRAVITATION		0.40f
 
 #define MAXVELY			20.0f
 #define MAXSIDEVELY		10.0f
@@ -264,187 +266,164 @@ std::string stripCreatorAndDotMap(const std::string &filename);
 #define NUMFRENZYCARDS 19
 
 
-struct ClassicGameModeSettings
-{
-	short style;			//on kill, either respawn the player or shield them and let them keep playing
-	short scoring;			//When to credit a score, all kills or push kills only (sumo mode)
+struct ClassicGameModeSettings {
+    short style;			//on kill, either respawn the player or shield them and let them keep playing
+    short scoring;			//When to credit a score, all kills or push kills only (sumo mode)
 };
 
-struct FragGameModeSettings
-{
-	short style;			//on kill, either respawn the player or shield them and let them keep playing
-	short scoring;			//When to credit a score, all kills or push kills only (sumo mode)
+struct FragGameModeSettings {
+    short style;			//on kill, either respawn the player or shield them and let them keep playing
+    short scoring;			//When to credit a score, all kills or push kills only (sumo mode)
 };
 
-struct TimeGameModeSettings
-{
-	short style;			//on kill, either respawn the player or shield them and let them keep playing
-	short scoring;			//When to credit a score, all kills or push kills only (sumo mode)
-	short percentextratime; //percent chance a stopwatch with extra game time will spawn
+struct TimeGameModeSettings {
+    short style;			//on kill, either respawn the player or shield them and let them keep playing
+    short scoring;			//When to credit a score, all kills or push kills only (sumo mode)
+    short percentextratime; //percent chance a stopwatch with extra game time will spawn
 };
 
-struct JailGameModeSettings
-{
-	short style;			//Style of play: classic, owned, free for all
-	bool tagfree;			//Free jailed player by tagging on same team
-	short timetofree;		//Time it takes for a jailed player to be freed
-	short percentkey;		//percent chance a jail key will spawn
+struct JailGameModeSettings {
+    short style;			//Style of play: classic, owned, free for all
+    bool tagfree;			//Free jailed player by tagging on same team
+    short timetofree;		//Time it takes for a jailed player to be freed
+    short percentkey;		//percent chance a jail key will spawn
 };
 
-struct CoinGameModeSettings
-{
-	bool penalty;			//Player loses coin if stomped on
-	short quantity;			//Number of coins to have on screen at one time
-	short percentextracoin; //percent chance a bonus coin will appear
+struct CoinGameModeSettings {
+    bool penalty;			//Player loses coin if stomped on
+    short quantity;			//Number of coins to have on screen at one time
+    short percentextracoin; //percent chance a bonus coin will appear
 };
 
-struct StompGameModeSettings
-{
-	short rate;				//How fast they spawn
-	short enemyweight[NUMSTOMPENEMIES];	//What ratio the enemies are chosen
+struct StompGameModeSettings {
+    short rate;				//How fast they spawn
+    short enemyweight[NUMSTOMPENEMIES];	//What ratio the enemies are chosen
 };
 
-struct EggGameModeSettings
-{
-	short eggs[4];			//Number of eggs of each color in game
-	short yoshis[4];		//Nunber of yoshis of each color in game
-	short explode;			//Time until eggs explode
+struct EggGameModeSettings {
+    short eggs[4];			//Number of eggs of each color in game
+    short yoshis[4];		//Nunber of yoshis of each color in game
+    short explode;			//Time until eggs explode
 };
 
-struct FlagGameModeSettings
-{
-	short speed;			//How fast to move bases
-	bool touchreturn;		//Return to base if player touches their own flag
-	bool pointmove;			//Move base after point
-	short autoreturn;		//Time to automatically return flag to base
-	bool homescore;			//Need your flag at home base to score
-	bool centerflag;		//Have a single flag that all teams fight to return to their base
+struct FlagGameModeSettings {
+    short speed;			//How fast to move bases
+    bool touchreturn;		//Return to base if player touches their own flag
+    bool pointmove;			//Move base after point
+    short autoreturn;		//Time to automatically return flag to base
+    bool homescore;			//Need your flag at home base to score
+    bool centerflag;		//Have a single flag that all teams fight to return to their base
 };
 
-struct ChickenGameModeSettings
-{
-	bool usetarget;			//Display target around chicken
-	bool glide;				//Allow chicken to glide through the air (chicken gets perm leaf powerup)
+struct ChickenGameModeSettings {
+    bool usetarget;			//Display target around chicken
+    bool glide;				//Allow chicken to glide through the air (chicken gets perm leaf powerup)
 };
 
-struct TagGameModeSettings
-{
-	bool tagontouch;		//Transfer tag on touch
+struct TagGameModeSettings {
+    bool tagontouch;		//Transfer tag on touch
 };
 
-struct StarGameModeSettings
-{
-	short time;				//Time to get rid or keep star
-	short shine;			//If we are playing shine mode vs. ztar vs. stars mode
-	short percentextratime; //percent chance a stopwatch with extra game time will spawn
+struct StarGameModeSettings {
+    short time;				//Time to get rid or keep star
+    short shine;			//If we are playing shine mode vs. ztar vs. stars mode
+    short percentextratime; //percent chance a stopwatch with extra game time will spawn
 };
 
-struct DominationGameModeSettings
-{
-	bool loseondeath;		//Player loses his bases on death
-	bool stealondeath;		//Killing player steals bases on death
-	bool relocateondeath;	//Owned bases relocate on player's death
-	short relocationfrequency; //How fast the bases switch spots
-	short quantity;			//Number of bases
+struct DominationGameModeSettings {
+    bool loseondeath;		//Player loses his bases on death
+    bool stealondeath;		//Killing player steals bases on death
+    bool relocateondeath;	//Owned bases relocate on player's death
+    short relocationfrequency; //How fast the bases switch spots
+    short quantity;			//Number of bases
 };
 
-struct KingOfTheHillModeSettings
-{
-	short areasize;			//size of the hill area, 2x2, 3x3 etc.
-	short relocationfrequency;  //How often the hill switches spots
-	short maxmultiplier;	//as a player sits in the zone, the score will multiply
+struct KingOfTheHillModeSettings {
+    short areasize;			//size of the hill area, 2x2, 3x3 etc.
+    short relocationfrequency;  //How often the hill switches spots
+    short maxmultiplier;	//as a player sits in the zone, the score will multiply
 };
 
-struct RaceGameModeSettings
-{
-	short quantity;			//How many race goals
-	short speed;			//How fast goals move
-	short penalty;			//If dead players lose all tagged, one tagged or none
+struct RaceGameModeSettings {
+    short quantity;			//How many race goals
+    short speed;			//How fast goals move
+    short penalty;			//If dead players lose all tagged, one tagged or none
 };
 
-struct FrenzyGameModeSettings
-{
-	short quantity;			//How many powerups spawn
-	short rate;				//How fast they spawn
-	bool storedshells;		//Shells become stored instead of active
-	short powerupweight[NUMFRENZYCARDS];	//What ratio the powerups are chosen
+struct FrenzyGameModeSettings {
+    short quantity;			//How many powerups spawn
+    short rate;				//How fast they spawn
+    bool storedshells;		//Shells become stored instead of active
+    short powerupweight[NUMFRENZYCARDS];	//What ratio the powerups are chosen
 };
 
-struct SurvivalGameModeSettings
-{
-	short enemyweight[NUMSURVIVALENEMIES];       //The weighting of thwomps vs. podobos
-	short density;				//Number of thwomps on screen
-	short speed;				//How fast thwomps go
-	bool shield;				//Players are shielded when spawning
+struct SurvivalGameModeSettings {
+    short enemyweight[NUMSURVIVALENEMIES];       //The weighting of thwomps vs. podobos
+    short density;				//Number of thwomps on screen
+    short speed;				//How fast thwomps go
+    bool shield;				//Players are shielded when spawning
 };
 
-struct GreedGameModeSettings
-{
-	short coinlife;				//How long coins stick around before disappearing
-	bool owncoins;				//You can/can't pick up your own coins
-	short multiplier;			//How many coins are released when players are hit
-	short percentextracoin;		//percent chance a bonus coin will appear
+struct GreedGameModeSettings {
+    short coinlife;				//How long coins stick around before disappearing
+    bool owncoins;				//You can/can't pick up your own coins
+    short multiplier;			//How many coins are released when players are hit
+    short percentextracoin;		//percent chance a bonus coin will appear
 };
 
-struct HealthGameModeSettings
-{
-	short startlife;			//Number of hearts players start with
-	short maxlife;				//Number of hearts players can have
-	short percentextralife;		//Percent chance an extra heart with come from a powerup block
+struct HealthGameModeSettings {
+    short startlife;			//Number of hearts players start with
+    short maxlife;				//Number of hearts players can have
+    short percentextralife;		//Percent chance an extra heart with come from a powerup block
 };
 
-struct CollectionGameModeSettings
-{
-	short quantity;				//How many cards spawn
-	short rate;					//How fast they spawn
-	short banktime;				//Amount of time needed to bank cards to score
-	short cardlife;				//How long cards live after they are released from players
+struct CollectionGameModeSettings {
+    short quantity;				//How many cards spawn
+    short rate;					//How fast they spawn
+    short banktime;				//Amount of time needed to bank cards to score
+    short cardlife;				//How long cards live after they are released from players
 };
 
-struct ChaseGameModeSettings
-{
-	short phantospeed;			//How fast the phantos move
-	short phantoquantity[3];	//How many phantos there are
+struct ChaseGameModeSettings {
+    short phantospeed;			//How fast the phantos move
+    short phantoquantity[3];	//How many phantos there are
 };
 
-struct ShyGuyTagGameModeSettings
-{
-	bool tagonsuicide;			//If players become shyguys if they kill themselves
-	short tagtransfer;			//If players become shyguys if they are stomped
-	short freetime;				//How long all players will stay shyguys before the game is reset
+struct ShyGuyTagGameModeSettings {
+    bool tagonsuicide;			//If players become shyguys if they kill themselves
+    short tagtransfer;			//If players become shyguys if they are stomped
+    short freetime;				//How long all players will stay shyguys before the game is reset
 };
 
-struct BossGameModeSettings
-{
-	short bosstype;				//What type of boss battle it is
-	short difficulty;			//How hard the boss is to defeat
-	short hitpoints;			//How much life the boss has
+struct BossGameModeSettings {
+    short bosstype;				//What type of boss battle it is
+    short difficulty;			//How hard the boss is to defeat
+    short hitpoints;			//How much life the boss has
 };
 
-struct GameModeSettings
-{
-	ClassicGameModeSettings classic;
-	FragGameModeSettings frag;
-	TimeGameModeSettings time;
-	JailGameModeSettings jail;
-	CoinGameModeSettings coins;
-	StompGameModeSettings stomp;
-	EggGameModeSettings egg;
-	FlagGameModeSettings flag;
-	ChickenGameModeSettings chicken;
-	TagGameModeSettings tag;
-	StarGameModeSettings star;
-	DominationGameModeSettings domination;
-	KingOfTheHillModeSettings kingofthehill;
-	RaceGameModeSettings race;
-	FrenzyGameModeSettings frenzy;
-	SurvivalGameModeSettings survival;
-	GreedGameModeSettings greed;
-	HealthGameModeSettings health;
-	CollectionGameModeSettings collection;
-	ChaseGameModeSettings chase;
-	ShyGuyTagGameModeSettings shyguytag;
-	BossGameModeSettings boss;
+struct GameModeSettings {
+    ClassicGameModeSettings classic;
+    FragGameModeSettings frag;
+    TimeGameModeSettings time;
+    JailGameModeSettings jail;
+    CoinGameModeSettings coins;
+    StompGameModeSettings stomp;
+    EggGameModeSettings egg;
+    FlagGameModeSettings flag;
+    ChickenGameModeSettings chicken;
+    TagGameModeSettings tag;
+    StarGameModeSettings star;
+    DominationGameModeSettings domination;
+    KingOfTheHillModeSettings kingofthehill;
+    RaceGameModeSettings race;
+    FrenzyGameModeSettings frenzy;
+    SurvivalGameModeSettings survival;
+    GreedGameModeSettings greed;
+    HealthGameModeSettings health;
+    CollectionGameModeSettings collection;
+    ChaseGameModeSettings chase;
+    ShyGuyTagGameModeSettings shyguytag;
+    BossGameModeSettings boss;
 };
 
 
@@ -840,259 +819,257 @@ void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter);
 extern CGame	*smw;
 
 //tournament scores
-struct ts
-{
-	short		wins;
-	short		type[MAXTOURNAMENTGAMES];
-	short		total;		//used for running total in a tour
+struct ts {
+    short		wins;
+    short		type[MAXTOURNAMENTGAMES];
+    short		total;		//used for running total in a tour
 };
 
-struct gv
+// these are actually the program options
+class gv
 {
-	short		playercontrol[4];
-	bool		showfps;
-	bool		frameadvance;
-	bool		autokill;
-	short		framelimiter;
-	
-	bool		sound;
-	bool		music;
+    short		playercontrol[4];
+    bool		showfps;
+    bool		frameadvance;
+    bool		autokill;
+    short		framelimiter;
 
-	short		soundvolume;
-	short		musicvolume;
+    bool		sound;
+    bool		music;
 
-	bool		fullscreen;
-	gs			gamestate;
+    short		soundvolume;
+    short		musicvolume;
 
-	float		screenResizeX;
-	float		screenResizeY;
-	float		screenResizeW;
-	float		screenResizeH;
+    bool		fullscreen;
+    gs			gamestate;
 
-	short		flickerfilter;
-	short		hardwarefilter;
-	short		softfilter;
-	bool		aspectratio10x11;
+    float		screenResizeX;
+    float		screenResizeY;
+    float		screenResizeW;
+    float		screenResizeH;
 
-	CGameMode	*gamemode;
+    short		flickerfilter;
+    short		hardwarefilter;
+    short		softfilter;
+    bool		aspectratio10x11;
 
-	short		spawnstyle;
-	short		awardstyle;
+    CGameMode	*gamemode;
 
-	short		shieldtime;
-	short		shieldstyle;
+    short		spawnstyle;
+    short		awardstyle;
 
-	bool		pausegame;
-	bool		exitinggame;
-	bool		exityes;
+    short		shieldtime;
+    short		shieldstyle;
 
-	bool		showscoreboard;
-	float		scorepercentmove;
+    bool		pausegame;
+    bool		exitinggame;
+    bool		exityes;
 
-	short		matchtype;	//The currently selected match type: quick game, single, tournament, tour, world, minigame
+    bool		showscoreboard;
+    float		scorepercentmove;
 
-	short		tournamentgames;	//How many games that are played in this tournament
-	short		tournamentwinner;     //-2 for a tied tournament (for tours), -1 for no winner yet, 0 or greater for the team that has won the tournament
+    short		matchtype;	//The currently selected match type: quick game, single, tournament, tour, world, minigame
 
-	short		tournamentcontrolteam;   //The team ID that currently has control
-	short		tournamentcontrolstyle;  //ID for the player selected control style
-	short		tournamentnextcontrol;  //For round robin control style
-	
-	short		selectedminigame;
+    short		tournamentgames;	//How many games that are played in this tournament
+    short		tournamentwinner;     //-2 for a tied tournament (for tours), -1 for no winner yet, 0 or greater for the team that has won the tournament
 
-	short		tourindex;
-	short		tourstopcurrent;
-	short		tourstoptotal;
-	std::vector<TourStop*> tourstops;
-	
-	short		worldindex;
+    short		tournamentcontrolteam;   //The team ID that currently has control
+    short		tournamentcontrolstyle;  //ID for the player selected control style
+    short		tournamentnextcontrol;  //For round robin control style
 
-	short		slowdownon;
-	short		slowdowncounter;
+    short		selectedminigame;
 
-	short		storedpowerups[4];
-	short		gamepowerups[4];
-	short		powerupweights[NUM_POWERUPS];
-	short		poweruppreset;
+    short		tourindex;
+    short		tourstopcurrent;
+    short		tourstoptotal;
+    std::vector<TourStop*> tourstops;
 
-	short		worldpowerups[4][32];
-	short		worldpowerupcount[4];
+    short		worldindex;
 
-	short		worldpointsbonus;
+    short		slowdownon;
+    short		slowdowncounter;
 
-	short		teamids[4][3];
-	short		teamcounts[4];
-	short		skinids[4];
-	short		colorids[4];
-	bool		randomskin[4];
+    short		storedpowerups[4];
+    short		gamepowerups[4];
+    short		powerupweights[NUM_POWERUPS];
+    short		poweruppreset;
 
-	bool		screencrunch;
-	short		screenshaketimer;
-	short		screenshakeplayerid;
-	short		screenshaketeamid;
-	bool		screenshakekillinair;
-	short		screenshakekillscount;
+    short		worldpowerups[4][32];
+    short		worldpowerupcount[4];
 
-	short		bulletbilltimer[4];
-	short		bulletbillspawntimer[4];
+    short		worldpointsbonus;
 
-	short		teamcollision;
-	bool		toplayer;
-	short		scoreboardstyle;
-	bool		teamcolors;
+    short		teamids[4][3];
+    short		teamcounts[4];
+    short		skinids[4];
+    short		colorids[4];
+    bool		randomskin[4];
 
-	short		loadedannouncer;
-	short		loadedmusic;
+    bool		screencrunch;
+    short		screenshaketimer;
+    short		screenshakeplayerid;
+    short		screenshaketeamid;
+    bool		screenshakekillinair;
+    short		screenshakekillscount;
 
-	short		teamdeadcounter;
+    short		bulletbilltimer[4];
+    short		bulletbillspawntimer[4];
 
-	short		respawn;
-	short		itemrespawntime;
-	short		outofboundstime;
-	short		hiddenblockrespawn;
+    short		teamcollision;
+    bool		toplayer;
+    short		scoreboardstyle;
+    bool		teamcolors;
 
-	short		warplockstyle;
-	short		warplocktime;
+    short		loadedannouncer;
+    short		loadedmusic;
 
-	short		cputurn;
-	short		cpudifficulty;
+    short		teamdeadcounter;
 
-	short		networktype;		//Type of network game: 0=stand alone, 1=direct connect
-	bool		networkhost;		//If this machine is the one making collision detection and game state changes
-	bool		gamehost;			//If this client is responsible for choosing game type, map, options
-	char *		hostaddress;        //String from of the host ip address
+    short		respawn;
+    short		itemrespawntime;
+    short		outofboundstime;
+    short		hiddenblockrespawn;
 
-	CInputPlayerControl inputConfiguration[4][2]; //[NumPlayers][Keyboard/Joystick]
+    short		warplockstyle;
+    short		warplocktime;
 
-	//Player input used during game.  Reads SDL_Events and sets buttons that were pressed
-	CPlayerInput playerInput;
+    short		cputurn;
+    short		cpudifficulty;
 
-	ts			tournament_scores[4];
+    short		networktype;		//Type of network game: 0=stand alone, 1=direct connect
+    bool		networkhost;		//If this machine is the one making collision detection and game state changes
+    bool		gamehost;			//If this client is responsible for choosing game type, map, options
+    char *		hostaddress;        //String from of the host ip address
 
-	GameModeSettings gamemodesettings;
-	GameModeSettings gamemodemenusettings;
-	
-	short		fireballttl;
-	short		fireballlimit;
+    CInputPlayerControl inputConfiguration[4][2]; //[NumPlayers][Keyboard/Joystick]
 
-	short		hammerdelay;
-	short		hammerttl;
-	bool		hammerpower;
-	short		hammerlimit;
+    //Player input used during game.  Reads SDL_Events and sets buttons that were pressed
+    CPlayerInput playerInput;
 
-	short		boomerangstyle;
-	short		boomeranglife;
-	short		boomeranglimit;
+    ts			tournament_scores[4];
 
-	short		featherjumps;
-	short		featherlimit;
+    GameModeSettings gamemodesettings;
+    GameModeSettings gamemodemenusettings;
 
-	short		leaflimit;
-	short		pwingslimit;
+    short		fireballttl;
+    short		fireballlimit;
 
-	short		tanookilimit;
-	short		bombslimit;
-	
-	short		wandfreezetime;
-	short		wandlimit;
+    short		hammerdelay;
+    short		hammerttl;
+    bool		hammerpower;
+    short		hammerlimit;
 
-	short		shellttl;
-	short		blueblockttl;
-	short		redblockttl;
-	short		grayblockttl;
+    short		boomerangstyle;
+    short		boomeranglife;
+    short		boomeranglimit;
 
-	bool		playskidsound;
-	bool		playinvinciblesound;
-	bool		playflyingsound;
+    short		featherjumps;
+    short		featherlimit;
 
-	short		swapstyle;
-	bool		swapplayers;
-	float		swapplayersposition;
-	bool		swapplayersblink;
-	short		swapplayersblinkcount;
+    short		leaflimit;
+    short		pwingslimit;
 
-	short		screenfade;
-	short		screenfadespeed;
+    short		tanookilimit;
+    short		bombslimit;
 
-	short		storedpowerupdelay;
-	short		bonuswheel;
-	bool		keeppowerup;
+    short		wandfreezetime;
+    short		wandlimit;
 
-	bool		showwinningcrown;
+    short		shellttl;
+    short		blueblockttl;
+    short		redblockttl;
+    short		grayblockttl;
 
-	bool		playnextmusic;  //automatically advance to the next music track after one finishes
+    bool		playskidsound;
+    bool		playinvinciblesound;
+    bool		playflyingsound;
 
-	bool		soundcapable;
+    short		swapstyle;
+    bool		swapplayers;
+    float		swapplayersposition;
+    bool		swapplayersblink;
+    short		swapplayersblinkcount;
 
-	bool *		pfFilters;
-	short *		piFilterIcons;
-	short		selectedmapfilter;
-	bool		fNeedWriteFilters;
-	bool		fFiltersOn;
+    short		screenfade;
+    short		screenfadespeed;
 
-	short		pointspeed;
+    short		storedpowerupdelay;
+    short		bonuswheel;
+    bool		keeppowerup;
 
-	bool		noexit;
-	short		noexittimer;
-	short		forceexittimer;
+    bool		showwinningcrown;
 
-	short		singleplayermode;
+    bool		playnextmusic;  //automatically advance to the next music track after one finishes
 
-	bool		worldskipscoreboard;
+    bool		soundcapable;
 
-	short		overridepowerupsettings;
+    bool *		pfFilters;
+    short *		piFilterIcons;
+    short		selectedmapfilter;
+    bool		fNeedWriteFilters;
+    bool		fFiltersOn;
 
-	float		gamewindx;
-	float		gamewindy;
+    short		pointspeed;
 
-	bool		windaffectsplayers;
-	bool		spinscreen;
-	bool		reversewalk;
-	bool		spotlights;
+    bool		noexit;
+    short		noexittimer;
+    short		forceexittimer;
 
-	short		suicidetime;
-	bool		minigameunlocked;
+    short		singleplayermode;
 
-	bool		startgamecountdown;
-	bool		startmodedisplay;
-	bool		deadteamnotice;
+    bool		worldskipscoreboard;
 
-	bool		unlocksecret1part1[4];
-	short		unlocksecret1part2;
-	bool		unlocksecret2part1;
-	short		unlocksecret2part2;
-	short		unlocksecret3part1[4];
-	short		unlocksecret3part2[4];
-	bool		unlocksecretunlocked[4];
+    short		overridepowerupsettings;
+
+    float		gamewindx;
+    float		gamewindy;
+
+    bool		windaffectsplayers;
+    bool		spinscreen;
+    bool		reversewalk;
+    bool		spotlights;
+
+    short		suicidetime;
+    bool		minigameunlocked;
+
+    bool		startgamecountdown;
+    bool		startmodedisplay;
+    bool		deadteamnotice;
+
+    bool		unlocksecret1part1[4];
+    short		unlocksecret1part2;
+    bool		unlocksecret2part1;
+    short		unlocksecret2part2;
+    short		unlocksecret3part1[4];
+    short		unlocksecret3part2[4];
+    bool		unlocksecretunlocked[4];
 };
 
-struct WorldStageBonus
-{
-	short iWinnerPlace;
-	short iBonus;
-	char szBonusString[8];
+struct WorldStageBonus {
+    short iWinnerPlace;
+    short iBonus;
+    char szBonusString[8];
 };
 
-struct TourStop
-{
-	const char * pszMapFile;
-	short iMode;
-	short iGoal;
-	short iPoints;
-	short iBonusType;
-	char szName[128];
-	
-	bool fEndStage;
-	short iNumBonuses;
-	WorldStageBonus wsbBonuses[10];
-	short iStageType;
+struct TourStop {
+    const char * pszMapFile;
+    short iMode;
+    short iGoal;
+    short iPoints;
+    short iBonusType;
+    char szName[128];
 
-	bool fUseSettings;
-	short iNumUsedSettings;
-	GameModeSettings gmsSettings;
+    bool fEndStage;
+    short iNumBonuses;
+    WorldStageBonus wsbBonuses[10];
+    short iStageType;
 
-	short iBonusTextLines;
-	char szBonusText[5][128];
+    bool fUseSettings;
+    short iNumUsedSettings;
+    GameModeSettings gmsSettings;
+
+    short iBonusTextLines;
+    char szBonusText[5][128];
 };
 
 //TODO:: Move menu settings from game_values to global menu context structure
@@ -1100,7 +1077,7 @@ struct TourStop
 /*
 struct MenuContext
 {
-	
+
 };
 
 extern MenuContext menu_context;
@@ -1108,16 +1085,14 @@ extern MenuContext menu_context;
 
 #define	MAX_PLAYERS	4
 
-struct MapMusicOverride
-{
-	std::string mapname;
-	std::vector<std::string> songs;
+struct MapMusicOverride {
+    std::string mapname;
+    std::vector<std::string> songs;
 };
 
-struct WorldMusicOverride
-{
-	std::string worldname;
-	std::string song;
+struct WorldMusicOverride {
+    std::string worldname;
+    std::string song;
 };
 
 extern std::vector<MapMusicOverride*> mapmusicoverrides;

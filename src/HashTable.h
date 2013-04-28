@@ -27,5 +27,9 @@ class HashTable
 		HashNode * table[MAXOBJECTS * 8];
 };
 
+#if	_DEBUG
+extern void HashTableTest();
+#endif
+
 #endif //__HASHTABLE_H_
 

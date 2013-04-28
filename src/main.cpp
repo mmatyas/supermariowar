@@ -1095,6 +1095,7 @@ int main(int argc, char *argv[])
     RootDataDirectory = argv[1];
 #endif
 
+
     // this instance will contain the other relevant objects
     smw = new CGame(RootDataDirectory);
 #pragma warning "delete this or use boost GC shared_ptr"
@@ -1580,6 +1581,10 @@ int main(int argc, char *argv[])
         //net_close();
         return 0;
     }
+
+#if	_DEBUG
+	HashTableTest();
+#endif
 
     // all the game logic happens here
     smw->Go();
