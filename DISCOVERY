@@ -44,8 +44,12 @@ TODO lists should be unified into a current one
 
 All conversions of pre 1.8 maps shall be supported (on-the-fly) at least till 2.0
 
-Pre 1.9 maps (640x480) will play with a full-blocks frame when played at higher resolution
+Pre 1.9 maps (640x480) will play with a frame when played at higher resolution
 
+Only 800x600 shall be supported as new resolution (for now).
+
+Pre 1.9 maps shall be supported, but converted on-the-fly to human-readable format (only when accessing in directory mode)
+Tiled's TMX is a good candidate
 Long term features
 ------------------
 * Lua scripting language support
