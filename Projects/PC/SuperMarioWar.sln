@@ -1,47 +1,52 @@
-Microsoft Visual Studio Solution File, Format Version 8.00
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SuperMarioWar", "SuperMarioWar.vcproj", "{6A5E367D-CF8E-4B07-BB90-2115716D19D3}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SuperMarioWar", "SuperMarioWar.vcxproj", "{6A5E367D-CF8E-4B07-BB90-2115716D19D3}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Leveleditor", "Leveleditor.vcproj", "{4B9F6889-63C5-4B88-AF50-5D74B6646C7C}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Leveleditor", "Leveleditor.vcxproj", "{4B9F6889-63C5-4B88-AF50-5D74B6646C7C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SuperMarioWar_console", "SuperMarioWar_console.vcproj", "{0A95B4C9-BC78-4734-9F9C-015F53B55B89}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SuperMarioWar_console", "SuperMarioWar_console.vcxproj", "{0A95B4C9-BC78-4734-9F9C-015F53B55B89}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Worldeditor", "Worldeditor.vcproj", "{4B9F6889-63C5-4B88-AF50-5D74B6646C7C}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Worldeditor", "Worldeditor.vcxproj", "{115F3698-5EAD-4DDC-8861-ECE2F96F849E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ScreenshotMaker", "ScreenshotMaker.vcxproj", "{11BF2505-0482-4B47-A158-4004FF1AB79F}"
 EndProject
 Global
-	GlobalSection(SolutionConfiguration) = preSolution
-		Debug = Debug
-		Release = Release
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+		Template|Win32 = Template|Win32
 	EndGlobalSection
-	GlobalSection(ProjectDependencies) = postSolution
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6A5E367D-CF8E-4B07-BB90-2115716D19D3}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6A5E367D-CF8E-4B07-BB90-2115716D19D3}.Debug|Win32.Build.0 = Debug|Win32
+		{6A5E367D-CF8E-4B07-BB90-2115716D19D3}.Release|Win32.ActiveCfg = Release|Win32
+		{6A5E367D-CF8E-4B07-BB90-2115716D19D3}.Release|Win32.Build.0 = Release|Win32
+		{6A5E367D-CF8E-4B07-BB90-2115716D19D3}.Template|Win32.ActiveCfg = Release|Win32
+		{6A5E367D-CF8E-4B07-BB90-2115716D19D3}.Template|Win32.Build.0 = Release|Win32
+		{4B9F6889-63C5-4B88-AF50-5D74B6646C7C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4B9F6889-63C5-4B88-AF50-5D74B6646C7C}.Debug|Win32.Build.0 = Debug|Win32
+		{4B9F6889-63C5-4B88-AF50-5D74B6646C7C}.Release|Win32.ActiveCfg = Release|Win32
+		{4B9F6889-63C5-4B88-AF50-5D74B6646C7C}.Release|Win32.Build.0 = Release|Win32
+		{4B9F6889-63C5-4B88-AF50-5D74B6646C7C}.Template|Win32.ActiveCfg = Template|Win32
+		{4B9F6889-63C5-4B88-AF50-5D74B6646C7C}.Template|Win32.Build.0 = Template|Win32
+		{0A95B4C9-BC78-4734-9F9C-015F53B55B89}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0A95B4C9-BC78-4734-9F9C-015F53B55B89}.Debug|Win32.Build.0 = Debug|Win32
+		{0A95B4C9-BC78-4734-9F9C-015F53B55B89}.Release|Win32.ActiveCfg = Release|Win32
+		{0A95B4C9-BC78-4734-9F9C-015F53B55B89}.Release|Win32.Build.0 = Release|Win32
+		{0A95B4C9-BC78-4734-9F9C-015F53B55B89}.Template|Win32.ActiveCfg = Template|Win32
+		{0A95B4C9-BC78-4734-9F9C-015F53B55B89}.Template|Win32.Build.0 = Template|Win32
+		{115F3698-5EAD-4DDC-8861-ECE2F96F849E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{115F3698-5EAD-4DDC-8861-ECE2F96F849E}.Release|Win32.ActiveCfg = Release|Win32
+		{115F3698-5EAD-4DDC-8861-ECE2F96F849E}.Template|Win32.ActiveCfg = Template|Win32
+		{115F3698-5EAD-4DDC-8861-ECE2F96F849E}.Template|Win32.Build.0 = Template|Win32
+		{11BF2505-0482-4B47-A158-4004FF1AB79F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{11BF2505-0482-4B47-A158-4004FF1AB79F}.Debug|Win32.Build.0 = Debug|Win32
+		{11BF2505-0482-4B47-A158-4004FF1AB79F}.Release|Win32.ActiveCfg = Release|Win32
+		{11BF2505-0482-4B47-A158-4004FF1AB79F}.Release|Win32.Build.0 = Release|Win32
+		{11BF2505-0482-4B47-A158-4004FF1AB79F}.Template|Win32.ActiveCfg = Template|Win32
+		{11BF2505-0482-4B47-A158-4004FF1AB79F}.Template|Win32.Build.0 = Template|Win32
 	EndGlobalSection
-	GlobalSection(ProjectConfiguration) = postSolution
-		{6A5E367D-CF8E-4B07-BB90-2115716D19D3}.Debug.ActiveCfg = Debug|Win32
-		{6A5E367D-CF8E-4B07-BB90-2115716D19D3}.Debug.Build.0 = Debug|Win32
-		{6A5E367D-CF8E-4B07-BB90-2115716D19D3}.Release.ActiveCfg = Release|Win32
-		{6A5E367D-CF8E-4B07-BB90-2115716D19D3}.Release.Build.0 = Release|Win32
-		{4B9F6889-63C5-4B88-AF50-5D74B6646C7C}.Debug.ActiveCfg = Debug|Win32
-		{4B9F6889-63C5-4B88-AF50-5D74B6646C7C}.Debug.Build.0 = Debug|Win32
-		{4B9F6889-63C5-4B88-AF50-5D74B6646C7C}.Release.ActiveCfg = Release|Win32
-		{4B9F6889-63C5-4B88-AF50-5D74B6646C7C}.Release.Build.0 = Release|Win32
-		{0A95B4C9-BC78-4734-9F9C-015F53B55B89}.Debug.ActiveCfg = Debug|Win32
-		{0A95B4C9-BC78-4734-9F9C-015F53B55B89}.Debug.Build.0 = Debug|Win32
-		{0A95B4C9-BC78-4734-9F9C-015F53B55B89}.Release.ActiveCfg = Release|Win32
-		{0A95B4C9-BC78-4734-9F9C-015F53B55B89}.Release.Build.0 = Release|Win32
-		{4B9F6889-63C5-4B88-AF50-5D74B6646C7C}.Debug.ActiveCfg = Debug|Win32
-		{4B9F6889-63C5-4B88-AF50-5D74B6646C7C}.Debug.Build.0 = Debug|Win32
-		{4B9F6889-63C5-4B88-AF50-5D74B6646C7C}.Release.ActiveCfg = Release|Win32
-		{4B9F6889-63C5-4B88-AF50-5D74B6646C7C}.Release.Build.0 = Release|Win32
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-	EndGlobalSection
-	GlobalSection(ExtensibilityAddIns) = postSolution
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal

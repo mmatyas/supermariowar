@@ -1,0 +1,21 @@
+Discovery notes
+===============
+by neagix
+
+This document is kept as a diary of what I discover in the code during development.
+
+2013-04-23
+----------
+
+Modularity is not enforced.
+
+From a comment: Pressing insert in debug mode turns on automated testing
+
+2013-04-24
+----------
+
+Most of the fan-made content is lost e.g. mods, packs etc
+I am trying to recover it
+
+There should be an input playback feature to create sort of unit tests, this way we
+can serialize testing for specific issues, spot regressions but also improve playback
