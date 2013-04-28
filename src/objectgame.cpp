@@ -800,7 +800,7 @@ short B_PowerupBlock::SelectPowerup()
     if(iCountWeight == 0)
         return -1;
 
-    int iRandPowerup = rand() % iCountWeight + 1;
+    int iRandPowerup = GetRandMax(iCountWeight + 1);
     int iSelectedPowerup = 0;
 
     int iPowerupWeightCount = settings[iSelectedPowerup];
@@ -818,7 +818,7 @@ B_ViewBlock::B_ViewBlock(gfxSprite *nspr1, short x, short y, bool fHidden, short
     B_PowerupBlock(nspr1, x, y, 1, 32000, fHidden, piSettings)
 {
     poweruptimer = 0;
-    powerupindex = rand() % NUM_POWERUPS;
+    powerupindex = GetRandMax( NUM_POWERUPS);
 
     iw = 32;
     ih = 32;
@@ -869,7 +869,7 @@ void B_ViewBlock::GetNextPowerup()
     if(fNoPowerupsSelected)
         return;
 
-    int iRandPowerup = rand() % iCountWeight + 1;
+    int iRandPowerup = GetRandMax( iCountWeight) + 1;
     powerupindex = 0;
     int iPowerupWeightCount = settings[powerupindex];
 
@@ -2777,7 +2777,7 @@ bool PU_SecretPowerup::collide (CPlayer *player)
         game_values.windaffectsplayers = true;
 
         for(short i = 0; i < 15; i++)
-            eyecandy[2].add(new EC_Snow(&rm->spr_snow, (float)(GetRandMax(640)), (float)(rand() % smw->ScreenHeight), GetRandMax(4) + 1));
+            eyecandy[2].add(new EC_Snow(&rm->spr_snow, (float)(GetRandMax(640)), (float)GetRandMax(smw->ScreenHeight), GetRandMax(4) + 1));
     } else if(itemtype == 1) {
         game_values.spinscreen = true;
     } else if(itemtype == 2) {
@@ -5143,8 +5143,8 @@ void MO_Yoshi::placeYoshi()
     timer = 0;
 
     for(short tries = 0; tries < 64; tries++) {
-        ix = (short)(rand()%(640 - iw));
-        iy = (short)(rand()%(smw->ScreenHeight - ih - TILESIZE));	//don't spawn too low
+		ix = (short)GetRandMax(smw->ScreenWidth - iw);
+        iy = (short)GetRandMax(smw->ScreenHeight - ih - TILESIZE);	//don't spawn too low
 
         short ixl = ix / TILESIZE;
         short ixr = (ix + iw) / TILESIZE;
@@ -5468,8 +5468,8 @@ void OMO_KingOfTheHillZone::placeArea()
     short y;
 
     for(short iLoop = 0; iLoop < 64; iLoop++) {
-        x = (short)(rand()%(MAPWIDTH - size + 1));
-        y = (short)(rand()%(MAPHEIGHT - size));
+        x = (short)GetRandMax(MAPWIDTH - size + 1);
+        y = (short)GetRandMax(MAPHEIGHT - size);
 
         //First move the zone down so it is sitting on atleast 1 solid tile
         short iFindY = y + size;
@@ -5681,8 +5681,8 @@ void OMO_RaceGoal::placeRaceGoal()
             if(++tries > 32)
                 break;
 
-            x = (short)(rand() % (640 - collisionWidth));
-            y = (short)(rand() % (smw->ScreenHeight - collisionHeight));
+            x = (short)GetRandMax(640 - collisionWidth);
+            y = (short)GetRandMax(smw->ScreenHeight - collisionHeight);
         } while(objectcontainer[2].getClosestObject(x, y, object_race_goal) <= 250.0f - (quantity * 25.0f));
     }
 
@@ -5701,7 +5701,7 @@ MO_FrenzyCard::MO_FrenzyCard(gfxSprite *nspr, short iType) :
     type = iType;
 
     if(type == NUMFRENZYCARDS - 1)
-        type = rand() % (NUMFRENZYCARDS - 1);
+        type = GetRandMax (NUMFRENZYCARDS - 1);
 
     sparkleanimationtimer = 0;
     sparkledrawframe = 0;
@@ -7061,7 +7061,7 @@ void MO_SledgeBrother::wait(short min, short max)
 {
     SetLastAction(2);
 
-    wait_timer = rand() % (max - min) + min;
+    wait_timer = GetRand(min, max);
     iActionState = 1;
 
     need_action[3] = 0;

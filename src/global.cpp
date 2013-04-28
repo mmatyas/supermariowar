@@ -18,19 +18,24 @@ char		*RootDataDirectory;
 CGame	*smw;
 CResourceManager *rm;
 
+int GetRand(int rMin, int rMax)
+{
+    assert(rMax > rMin);
+    
+    int rVal = ((double) rand() / (((float)RAND_MAX)+1)) * (rMax-rMin) + rMin;
+
+    assert(rVal < rMax && rVal >= rMin);
+
+    return rVal;
+}
+
 // generate uniformly distributed random number
 // rMax is not part of the set
 int	GetRandMax(int rMax)
 {
     const int rMin = 0;
 
-    assert(rMax > rMin);
-    
-    int rVal = ((double) rand() / (((float)RAND_MAX)+1)) * (rMax-rMin) + rMin;
-
-    assert(rVal < rMax && rVal >= 0);
-
-    return rVal;
+	return GetRand(rMin, rMax);
 }
 
 bool GetRandBool()

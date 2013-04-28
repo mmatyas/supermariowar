@@ -1,3 +1,6 @@
+
+int	GetRand(int min, int max);
+
 // return a random integer in range 0...max
 int	GetRandMax(int max);
 bool GetRandBool();

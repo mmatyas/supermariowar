@@ -355,7 +355,7 @@ void IO_BulletBillCannon::update()
 
 void IO_BulletBillCannon::SetNewTimer()
 {
-    iTimer = iFreq + (rand() % iFreq);
+    iTimer = iFreq + GetRandMax(iFreq);
 }
 
 
@@ -540,7 +540,7 @@ bool IO_FlameCannon::collide(CPlayer * player)
 
 void IO_FlameCannon::SetNewTimer()
 {
-    iTimer = iFreq + (rand() % iFreq);
+    iTimer = iFreq + GetRandMax(iFreq);
 }
 
 
@@ -801,7 +801,7 @@ void MO_PirhanaPlant::collide(IO_MovingObject * object)
 
 void MO_PirhanaPlant::SetNewTimer()
 {
-    iTimer = iFreq + (rand() % iFreq);
+    iTimer = iFreq + GetRandMax(iFreq);
 
     //Face the green fireball plant in a random direction
     if(iType == 0) {

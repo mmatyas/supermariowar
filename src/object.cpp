@@ -1163,6 +1163,6 @@ CObject * CObjectContainer::getRandomObject()
     if(list_end == 0)
         return NULL;
 
-    return list[rand() % list_end];
+    return list[GetRandMax( list_end)];
 }
 

@@ -1185,20 +1185,20 @@ void RunGame()
                 velx = velx < 0.5f && velx > -0.5f ? (GetRandMax(1) ? 1.0f : -1.0f) : velx;	//no static clouds please
 
                 //add cloud to eyecandy array
-				eyecandy[iEyeCandyLayer].add(new EC_Ghost(&rm->spr_ghosts, (float)(GetRandMax(smw->ScreenWidth)), (float)(GetRandMax(100)), velx, 8, 2, velx < 0.0f ? 64 : 0, iGhostSrcY, 32, 32));
+				eyecandy[iEyeCandyLayer].add(new EC_Ghost(&rm->spr_ghosts, (float)(GetRandMax(smw->ScreenWidth)), (float)GetRandMax(100), velx, 8, 2, velx < 0.0f ? 64 : 0, iGhostSrcY, 32, 32));
             }
         }
 
         //Leaves
         if(g_map->eyecandy[iEyeCandyLayer] & 4) {
             for(i = 0; i < 15; i++)
-                eyecandy[iEyeCandyLayer].add(new EC_Leaf(&rm->spr_leaves, (float)(GetRandMax(smw->ScreenWidth)), (float)(rand() % GetRandMax(smw->ScreenHeight))));
+                eyecandy[iEyeCandyLayer].add(new EC_Leaf(&rm->spr_leaves, (float)(GetRandMax(smw->ScreenWidth)), (float)GetRandMax(smw->ScreenHeight)));
         }
 
         //Snow
         if(g_map->eyecandy[iEyeCandyLayer] & 8) {
             for(i = 0; i < 15; i++)
-				eyecandy[iEyeCandyLayer].add(new EC_Snow(&rm->spr_snow, (float)(GetRandMax(smw->ScreenWidth)), (float)(GetRandMax(smw->ScreenHeight)), 0));
+				eyecandy[iEyeCandyLayer].add(new EC_Snow(&rm->spr_snow, (float)(GetRandMax(smw->ScreenWidth)), (float)GetRandMax(smw->ScreenHeight), 0));
         }
 
         //Fish
@@ -1228,7 +1228,7 @@ void RunGame()
 
                 //add cloud to eyecandy array
 				short iPossibleY = (smw->ScreenHeight - h) / 10;
-                float dDestY = (float)(rand() % iPossibleY + iPossibleY * i);
+                float dDestY = (float)(GetRandMax(iPossibleY) + iPossibleY * i);
                 eyecandy[iEyeCandyLayer].add(new EC_Cloud(&rm->spr_fish, (float)(GetRandMax(smw->ScreenWidth)), dDestY, velx, srcx + (velx > 0.0f ? 64 : 0), srcy, w, h));
             }
         }
@@ -1484,10 +1484,10 @@ void RunGame()
                             list_players[k]->die(0, false, false);
                     }
                 } else if(event.key.keysym.sym == SDLK_x) {
-                    short iplayer = rand() % list_players_cnt;
+                    short iplayer = GetRandMax(list_players_cnt);
                     list_players[iplayer]->makefrozen(300);
                 } else if(event.key.keysym.sym == SDLK_c) {
-                    short iplayer = rand() % list_players_cnt;
+                    short iplayer = GetRandMax(list_players_cnt);
                     list_players[iplayer]->shield = GetRandMax(3) + 1;
                     list_players[iplayer]->shieldtimer = 620;
                 } else if(event.key.keysym.sym == SDLK_1) {
@@ -1534,7 +1534,7 @@ void RunGame()
                         objectcontainer[0].add(new PU_FirePowerup(&rm->spr_firepowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1));
                 } else if(event.key.keysym.sym == SDLK_7) {
                     if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                        objectcontainer[1].add(new CO_ThrowBox(&rm->spr_throwbox, list_players[0]->ix + 32, list_players[0]->iy, (rand() % NUM_POWERUPS + 3) - 3));
+                        objectcontainer[1].add(new CO_ThrowBox(&rm->spr_throwbox, list_players[0]->ix + 32, list_players[0]->iy, (GetRandMax(NUM_POWERUPS) + 3) - 3));
                     else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
                         objectcontainer[1].add(new CO_Shell(3, list_players[0]->ix + 32, list_players[0]->iy, false, true, false, false));
                     else
@@ -1769,7 +1769,7 @@ void RunGame()
 
                         //Randomize the order in which the players are killed (so that game modes where order matters is fair)
                         if(iNumKillPlayers > 0) {
-                            short iRandPlayer = rand() % iNumKillPlayers;
+                            short iRandPlayer = GetRandMax( iNumKillPlayers);
                             for(short iPlayer = 0; iPlayer < iNumKillPlayers; iPlayer++) {
                                 PlayerKilledPlayer(game_values.screenshakeplayerid, pKillPlayers[iRandPlayer], death_style_jump, kill_style_pow, false, false);
 
@@ -2906,7 +2906,7 @@ void LoadMapObjects(bool fPreview)
 
         //Randomly choose boxes to put 5 coins in
         for(short iItem = 0; iItem < 5 && iItem < iThrowBoxCount; iItem++) {
-            short iBoxIndex = rand() % iThrowBoxCount;
+            short iBoxIndex = GetRandMax(iThrowBoxCount);
 
             while(fBoxHasCoin[iBoxIndex]) {
                 if(++iBoxIndex >= iThrowBoxCount)
@@ -2958,7 +2958,7 @@ void LoadMapObjects(bool fPreview)
                 } else if(game_values.gamemode->gamemode == game_mode_jail && (GetRandMax(100)) < game_values.gamemodesettings.jail.percentkey) {
                     iItem = JAIL_KEY_POWERUP;
                 } else if(iCountWeight > 0 && (GetRandMax(100)) < 40) {
-                    int iRandPowerup = rand() % iCountWeight + 1;
+                    int iRandPowerup = GetRandMax( iCountWeight )+ 1;
                     iItem = 0;
 
                     int iPowerupWeightCount = game_values.powerupweights[iItem];
@@ -3012,7 +3012,7 @@ bool SwapPlayers(short iUsingPlayerID)
         }
     }
 
-    short iIncrement = rand() % (iNumAvailablePlayers - 1);
+    short iIncrement = GetRandMax (iNumAvailablePlayers - 1);
 
     MysteryMushroomTempPlayer spots[4];
     for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {

@@ -2893,7 +2893,7 @@ WarpExit * CMap::getRandomWarpExit(int connection, int currentID)
     if(numIndices == 0)
         return currentWarp;
 
-    return &warpexits[indices[rand() % numIndices]];
+    return &warpexits[indices[GetRandMax( numIndices)]];
 }
 
 void CMap::clearWarpLocks()
@@ -2962,7 +2962,7 @@ bool CMap::findspawnpoint(short iType, short * x, short * y, short width, short 
         return true;
     }
 
-    int spawnarea = rand() % totalspawnsize[iType];
+    int spawnarea = GetRandMax(totalspawnsize[iType]);
 
     int currentsize = 0;
     for(int m = 0; m < numspawnareas[iType]; m++) {
@@ -2982,10 +2982,10 @@ bool CMap::findspawnpoint(short iType, short * x, short * y, short width, short 
             short yoffset = spawnareas[iType][m].height;
 
             if(xoffset > 0)
-                xoffset = (short)(rand() % xoffset);
+                xoffset = (short)GetRandMax(xoffset);
 
             if(yoffset > 0)
-                yoffset = (short)(rand() % yoffset);
+                yoffset = (short)GetRandMax(yoffset);
 
             *x = (xoffset << 5) + (spawnareas[iType][m].left << 5) + (TILESIZE >> 1) - (width >> 1);
             *y = (yoffset << 5) + (spawnareas[iType][m].top << 5) + (TILESIZE >> 1) - (height >> 1);
@@ -2994,10 +2994,10 @@ bool CMap::findspawnpoint(short iType, short * x, short * y, short width, short 
             short yoffset = areaheight - height - 2;
 
             if(xoffset > 0)
-                xoffset = (short)(rand() % xoffset) + 1;
+                xoffset = (short)GetRandMax(xoffset) + 1;
 
             if(yoffset > 0)
-                yoffset = (short)(rand() % yoffset) + 1;
+                yoffset = (short)GetRandMax(yoffset) + 1;
 
             *x = xoffset + (spawnareas[iType][m].left << 5);
             *y = yoffset + (spawnareas[iType][m].top << 5);

@@ -1849,7 +1849,7 @@ void Menu::RunMenu()
                     }
                 }
 
-                game_values.tournamentcontrolteam = iInPlace[rand() % iNumInPlace];
+                game_values.tournamentcontrolteam = iInPlace[GetRandMax(iNumInPlace)];
                 break;
             }
 
@@ -1867,7 +1867,7 @@ void Menu::RunMenu()
                     }
                 }
 
-                game_values.tournamentcontrolteam = iInPlace[rand() % iNumInPlace];
+                game_values.tournamentcontrolteam = iInPlace[GetRandMax(iNumInPlace)];
                 break;
             }
 
@@ -1886,12 +1886,12 @@ void Menu::RunMenu()
                     }
                 }
 
-                game_values.tournamentcontrolteam = iInPlace[rand() % iNumInPlace];
+                game_values.tournamentcontrolteam = iInPlace[GetRandMax(iNumInPlace)];
                 break;
             }
 
             case 5: { //Random
-                game_values.tournamentcontrolteam = rand() % score_cnt;
+                game_values.tournamentcontrolteam = GetRandMax( score_cnt);
                 break;
             }
 
@@ -1914,7 +1914,7 @@ void Menu::RunMenu()
                     iInPlace[iNumInPlace++] = iTeam;
                 }
 
-                game_values.tournamentcontrolteam = iInPlace[rand() % iNumInPlace];
+                game_values.tournamentcontrolteam = iInPlace[GetRandMax(iNumInPlace)];
                 break;
             }
 
@@ -2088,7 +2088,7 @@ void Menu::RunMenu()
 
                     iTournamentAITimer = 60;
                 } else if(iTournamentAIStep == 2) {
-                    currentgamemode = rand() % GAMEMODE_LAST;
+                    currentgamemode = GetRandMax( GAMEMODE_LAST);
                     game_values.gamemode = gamemodes[currentgamemode];
 
                     miModeField->SetKey(currentgamemode);
@@ -2301,7 +2301,7 @@ void Menu::RunMenu()
 
                     StartGame();
                 } else if(MATCH_TYPE_QUICK_GAME == game_values.matchtype) {
-                    short iRandomMode = rand() % GAMEMODE_LAST;
+                    short iRandomMode = GetRandMax( GAMEMODE_LAST);
                     game_values.gamemode = gamemodes[iRandomMode];
 
                     SModeOption * options = game_values.gamemode->GetOptions();
@@ -2327,7 +2327,7 @@ void Menu::RunMenu()
                     } else if(game_values.matchtype == MATCH_TYPE_TOURNAMENT) {
                         //Set who is controlling the tournament menu
                         if(game_values.tournamentcontrolstyle == 5 || game_values.tournamentcontrolstyle == 6) //Random
-                            game_values.tournamentcontrolteam = rand() % score_cnt;
+                            game_values.tournamentcontrolteam = GetRandMax( score_cnt);
                         else if(game_values.tournamentcontrolstyle == 7) //Round robin
                             game_values.tournamentcontrolteam = 0;
                         else //The first game of the tournament is controlled by all players
@@ -2358,7 +2358,7 @@ void Menu::RunMenu()
                             }
 
                             miWorld->Init();
-                            miWorld->SetControllingTeam(rand() % score_cnt);
+                            miWorld->SetControllingTeam(GetRandMax( score_cnt));
                         }
                     }
 
@@ -3109,7 +3109,7 @@ void Menu::StartGame()
         if(game_values.playercontrol[k] > 0) {
             if(game_values.randomskin[k]) {
                 do {
-                    game_values.skinids[k] = rand() % skinlist->GetCount();
+                    game_values.skinids[k] = GetRandMax( skinlist->GetCount());
                 } while(!rm->LoadFullSkin(rm->spr_player[k], game_values.skinids[k], game_values.colorids[k]));
             } else {
                 rm->LoadFullSkin(rm->spr_player[k], game_values.skinids[k], game_values.colorids[k]);
@@ -3441,13 +3441,13 @@ void Menu::GetNextScriptOperation()
             iKeys[iNumKeys++] = i;
     }
 
-    if(iController == 4) { //All controllers
-        game_values.playerInput.outputControls[0].keys[iKeys[rand() % iNumKeys]].fPressed = true;
-        game_values.playerInput.outputControls[1].keys[iKeys[rand() % iNumKeys]].fPressed = true;
-        game_values.playerInput.outputControls[2].keys[iKeys[rand() % iNumKeys]].fPressed = true;
-        game_values.playerInput.outputControls[3].keys[iKeys[rand() % iNumKeys]].fPressed = true;
+    if(iController == MAX_PLAYERS) { //All controllers
+        game_values.playerInput.outputControls[0].keys[iKeys[GetRandMax(iNumKeys)]].fPressed = true;
+        game_values.playerInput.outputControls[1].keys[iKeys[GetRandMax(iNumKeys)]].fPressed = true;
+        game_values.playerInput.outputControls[2].keys[iKeys[GetRandMax(iNumKeys)]].fPressed = true;
+        game_values.playerInput.outputControls[3].keys[iKeys[GetRandMax(iNumKeys)]].fPressed = true;
     } else {
-        game_values.playerInput.outputControls[iController].keys[iKeys[rand() % iNumKeys]].fPressed = true;
+        game_values.playerInput.outputControls[iController].keys[iKeys[GetRandMax(iNumKeys)]].fPressed = true;
     }
 }
 

@@ -178,7 +178,7 @@ bool LoadAndSplashScreen()
 //
 //	for(int k = 0; k < NUM_CONTRIBUTORS; k++)
 //	{
-//		int index = rand() % NUM_CONTRIBUTORS;
+//		int index = GetRandMax(NUM_CONTRIBUTORS);
 //
 //		while(contributorUsed[index])
 //		{
