@@ -17,14 +17,14 @@ void HashTableTest() {
 
 	for(int k = 0; k < 1000000; k++)
 	{
-		int iAction = smw->rng->GetRandMax(10);
+		int iAction = RNGMAX(10);
 
 		if(iAction == 0)
 		{
 //			CObject * pObject = new CObject(&rm->menu_cpu, 0, 0);
 			CObject *pObject = new MO_Coin(&rm->spr_coin, 0.0f, 0.0f, 0, 0, 2, 0, 0, 0, true);
 
-			pObject->iNetworkID = smw->rng->GetRandMax(4096);
+			pObject->iNetworkID = RNGMAX(4096);
 
 			bool expectCollision = false;
 			if(fUsed[pObject->iNetworkID])
@@ -41,7 +41,7 @@ void HashTableTest() {
 		}
 		else if(iAction == 1)
 		{
-			int id = smw->rng->GetRandMax(4096);
+			int id = RNGMAX(4096);
 			CObject * pObject = ht.Remove(id);
 			delete pObject;
 
@@ -58,7 +58,7 @@ void HashTableTest() {
 		}
 		else
 		{
-			int id = smw->rng->GetRandMax(4096);
+			int id = RNGMAX(4096);
 			CObject * pObject = ht.Get(id);
 
 			bool expectGet = false;

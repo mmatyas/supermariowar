@@ -1849,7 +1849,7 @@ void Menu::RunMenu()
                     }
                 }
 
-                game_values.tournamentcontrolteam = iInPlace[smw->rng->GetRandMax(iNumInPlace)];
+                game_values.tournamentcontrolteam = iInPlace[RNGMAX(iNumInPlace)];
                 break;
             }
 
@@ -1867,7 +1867,7 @@ void Menu::RunMenu()
                     }
                 }
 
-                game_values.tournamentcontrolteam = iInPlace[smw->rng->GetRandMax(iNumInPlace)];
+                game_values.tournamentcontrolteam = iInPlace[RNGMAX(iNumInPlace)];
                 break;
             }
 
@@ -1886,12 +1886,12 @@ void Menu::RunMenu()
                     }
                 }
 
-                game_values.tournamentcontrolteam = iInPlace[smw->rng->GetRandMax(iNumInPlace)];
+                game_values.tournamentcontrolteam = iInPlace[RNGMAX(iNumInPlace)];
                 break;
             }
 
             case 5: { //Random
-                game_values.tournamentcontrolteam = smw->rng->GetRandMax( score_cnt);
+                game_values.tournamentcontrolteam = RNGMAX( score_cnt);
                 break;
             }
 
@@ -1914,7 +1914,7 @@ void Menu::RunMenu()
                     iInPlace[iNumInPlace++] = iTeam;
                 }
 
-                game_values.tournamentcontrolteam = iInPlace[smw->rng->GetRandMax(iNumInPlace)];
+                game_values.tournamentcontrolteam = iInPlace[RNGMAX(iNumInPlace)];
                 break;
             }
 
@@ -2088,7 +2088,7 @@ void Menu::RunMenu()
 
                     iTournamentAITimer = 60;
                 } else if(iTournamentAIStep == 2) {
-                    currentgamemode = smw->rng->GetRandMax( GAMEMODE_LAST);
+                    currentgamemode = RNGMAX( GAMEMODE_LAST);
                     game_values.gamemode = gamemodes[currentgamemode];
 
                     miModeField->SetKey(currentgamemode);
@@ -2107,7 +2107,7 @@ void Menu::RunMenu()
                     SModeOption * options = game_values.gamemode->GetOptions();
 
                     //Choose a goal from the lower values for a quicker game
-                    short iRandOption = (smw->rng->GetRandMax(6)) + 1;
+                    short iRandOption = (RNGMAX(6)) + 1;
                     game_values.gamemode->goal  = options[iRandOption].iValue;
 
                     miGoalField[currentgamemode]->SetKey(gamemodes[currentgamemode]->goal);
@@ -2301,13 +2301,13 @@ void Menu::RunMenu()
 
                     StartGame();
                 } else if(MATCH_TYPE_QUICK_GAME == game_values.matchtype) {
-                    short iRandomMode = smw->rng->GetRandMax( GAMEMODE_LAST);
+                    short iRandomMode = RNGMAX( GAMEMODE_LAST);
                     game_values.gamemode = gamemodes[iRandomMode];
 
                     SModeOption * options = game_values.gamemode->GetOptions();
 
                     //Choose a goal from the lower values for a quicker game
-                    short iRandOption = (smw->rng->GetRandMax(6)) + 1;
+                    short iRandOption = (RNGMAX(6)) + 1;
                     game_values.gamemode->goal  = options[iRandOption].iValue;
 
                     game_values.tournamentwinner = -1;
@@ -2327,7 +2327,7 @@ void Menu::RunMenu()
                     } else if(game_values.matchtype == MATCH_TYPE_TOURNAMENT) {
                         //Set who is controlling the tournament menu
                         if(game_values.tournamentcontrolstyle == 5 || game_values.tournamentcontrolstyle == 6) //Random
-                            game_values.tournamentcontrolteam = smw->rng->GetRandMax( score_cnt);
+                            game_values.tournamentcontrolteam = RNGMAX( score_cnt);
                         else if(game_values.tournamentcontrolstyle == 7) //Round robin
                             game_values.tournamentcontrolteam = 0;
                         else //The first game of the tournament is controlled by all players
@@ -2358,7 +2358,7 @@ void Menu::RunMenu()
                             }
 
                             miWorld->Init();
-                            miWorld->SetControllingTeam(smw->rng->GetRandMax( score_cnt));
+                            miWorld->SetControllingTeam(RNGMAX( score_cnt));
                         }
                     }
 
@@ -3109,7 +3109,7 @@ void Menu::StartGame()
         if(game_values.playercontrol[k] > 0) {
             if(game_values.randomskin[k]) {
                 do {
-                    game_values.skinids[k] = smw->rng->GetRandMax( skinlist->GetCount());
+                    game_values.skinids[k] = RNGMAX( skinlist->GetCount());
                 } while(!rm->LoadFullSkin(rm->spr_player[k], game_values.skinids[k], game_values.colorids[k]));
             } else {
                 rm->LoadFullSkin(rm->spr_player[k], game_values.skinids[k], game_values.colorids[k]);
@@ -3337,11 +3337,11 @@ void Menu::GetNextScriptOperation()
 
             game_values.gamemode->setdebuggoal();
         } else if(mCurrentMenu == &mTourStopMenu) {
-            static int tournext = smw->rng->GetRandMax(200);
+            static int tournext = RNGMAX(200);
 
             if(--tournext < 0) {
                 game_values.playerInput.outputControls[0].menu_select.fPressed = true;
-                tournext = smw->rng->GetRandMax(200);
+                tournext = RNGMAX(200);
                 game_values.gamemode->setdebuggoal();
             }
             return;
@@ -3350,12 +3350,12 @@ void Menu::GetNextScriptOperation()
         return;
     } else if (iScriptState == 2) {
         if(mCurrentMenu == &mTournamentScoreboardMenu) {
-            static int scoreboardnext = smw->rng->GetRandMax(200);
+            static int scoreboardnext = RNGMAX(200);
 
             if(--scoreboardnext < 0) {
                 game_values.playerInput.outputControls[0].menu_select.fPressed = true;
                 iScriptState = 3;
-                scoreboardnext = smw->rng->GetRandMax(200);
+                scoreboardnext = RNGMAX(200);
             }
 
             return;
@@ -3367,20 +3367,20 @@ void Menu::GetNextScriptOperation()
             fScriptRunPreGameOptions = true;
             return;
         } else if(mCurrentMenu == &mBonusWheelMenu) {
-            static int bonuswheelnext = smw->rng->GetRandMax(200) + 300;
+            static int bonuswheelnext = RNGMAX(200) + 300;
 
             if(--bonuswheelnext < 0) {
                 game_values.playerInput.outputControls[0].menu_select.fPressed = true;
                 //iScriptState = 3;
-                bonuswheelnext = smw->rng->GetRandMax(200) + 300;
+                bonuswheelnext = RNGMAX(200) + 300;
             }
             return;
         } else if(mCurrentMenu == &mTourStopMenu) {
-            static int tournext = smw->rng->GetRandMax(200);
+            static int tournext = RNGMAX(200);
 
             if(--tournext < 0) {
                 game_values.playerInput.outputControls[0].menu_select.fPressed = true;
-                tournext = smw->rng->GetRandMax(200);
+                tournext = RNGMAX(200);
                 game_values.gamemode->setdebuggoal();
             }
             return;
@@ -3402,11 +3402,11 @@ void Menu::GetNextScriptOperation()
             fScriptRunPreGameOptions = true;
             return;
         } else if(mCurrentMenu == &mTourStopMenu) {
-            static int tournext = smw->rng->GetRandMax(200);
+            static int tournext = RNGMAX(200);
 
             if(--tournext < 0) {
                 game_values.playerInput.outputControls[0].menu_select.fPressed = true;
-                tournext = smw->rng->GetRandMax(200);
+                tournext = RNGMAX(200);
                 game_values.gamemode->setdebuggoal();
             }
             return;
@@ -3431,7 +3431,7 @@ void Menu::GetNextScriptOperation()
     short iController = op->iController;
 
     if(iController == 5)
-        iController = smw->rng->GetRandMax(4);
+        iController = RNGMAX(4);
 
     short iKeys[8];
     short iNumKeys = 0;
@@ -3442,12 +3442,12 @@ void Menu::GetNextScriptOperation()
     }
 
     if(iController == MAX_PLAYERS) { //All controllers
-        game_values.playerInput.outputControls[0].keys[iKeys[smw->rng->GetRandMax(iNumKeys)]].fPressed = true;
-        game_values.playerInput.outputControls[1].keys[iKeys[smw->rng->GetRandMax(iNumKeys)]].fPressed = true;
-        game_values.playerInput.outputControls[2].keys[iKeys[smw->rng->GetRandMax(iNumKeys)]].fPressed = true;
-        game_values.playerInput.outputControls[3].keys[iKeys[smw->rng->GetRandMax(iNumKeys)]].fPressed = true;
+        game_values.playerInput.outputControls[0].keys[iKeys[RNGMAX(iNumKeys)]].fPressed = true;
+        game_values.playerInput.outputControls[1].keys[iKeys[RNGMAX(iNumKeys)]].fPressed = true;
+        game_values.playerInput.outputControls[2].keys[iKeys[RNGMAX(iNumKeys)]].fPressed = true;
+        game_values.playerInput.outputControls[3].keys[iKeys[RNGMAX(iNumKeys)]].fPressed = true;
     } else {
-        game_values.playerInput.outputControls[iController].keys[iKeys[smw->rng->GetRandMax(iNumKeys)]].fPressed = true;
+        game_values.playerInput.outputControls[iController].keys[iKeys[RNGMAX(iNumKeys)]].fPressed = true;
     }
 }
 

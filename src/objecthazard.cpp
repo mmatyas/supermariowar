@@ -355,7 +355,7 @@ void IO_BulletBillCannon::update()
 
 void IO_BulletBillCannon::SetNewTimer()
 {
-    iTimer = iFreq + smw->rng->GetRandMax(iFreq);
+    iTimer = iFreq + RNGMAX(iFreq);
 }
 
 
@@ -540,7 +540,7 @@ bool IO_FlameCannon::collide(CPlayer * player)
 
 void IO_FlameCannon::SetNewTimer()
 {
-    iTimer = iFreq + smw->rng->GetRandMax(iFreq);
+    iTimer = iFreq + RNGMAX(iFreq);
 }
 
 
@@ -615,7 +615,7 @@ MO_PirhanaPlant::MO_PirhanaPlant(short x, short y, short type, short freq, short
     iAnimationTimer = 0;
     //iAnimationX = 0;
 
-    iActionTimer = smw->rng->GetRandMax(8);
+    iActionTimer = RNGMAX(8);
     iFrame = 0;
 
     fObjectCollidesWithMap = false;
@@ -801,17 +801,17 @@ void MO_PirhanaPlant::collide(IO_MovingObject * object)
 
 void MO_PirhanaPlant::SetNewTimer()
 {
-    iTimer = iFreq + smw->rng->GetRandMax(iFreq);
+    iTimer = iFreq + RNGMAX(iFreq);
 
     //Face the green fireball plant in a random direction
     if(iType == 0) {
         //Only point flower towards directions that make sense
         if((ix >> 5) == 19)
-            iFrame = smw->rng->GetRandMax(2);
+            iFrame = RNGMAX(2);
         else if(ix == 0)
-            iFrame = (smw->rng->GetRandMax(2)) + 2;
+            iFrame = (RNGMAX(2)) + 2;
         else
-            iFrame = smw->rng->GetRandMax(4);
+            iFrame = RNGMAX(4);
     }
 }
 

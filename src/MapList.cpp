@@ -431,9 +431,9 @@ void MapList::random(bool fUseFilters)
         if(iFilteredMapCount < 2)
             return;
 
-        iShuffle = smw->rng->GetRandMax(iFilteredMapCount - 1);
+        iShuffle = RNGMAX(iFilteredMapCount - 1);
     } else {
-        iShuffle = smw->rng->GetRandMax(maps.size() - 1);
+        iShuffle = RNGMAX(maps.size() - 1);
     }
 
     for(int i = 0; i <= iShuffle; i++)
@@ -444,7 +444,7 @@ const char* MapList::randomFilename()
 {
     std::map<std::string, MapListNode*>::iterator random = maps.begin();
 
-    short iRand = smw->rng->GetRandMax(maps.size());
+    short iRand = RNGMAX(maps.size());
 
     for(short iMap = 0; iMap < iRand; iMap++)
         random++;

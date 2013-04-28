@@ -65,7 +65,7 @@ IO_MovingObject * createpowerup(short iType, short ix, short iy, bool side, bool
         break;
     }
     case COIN_POWERUP: {
-        short iRandCoin = smw->rng->GetRandMax(9);
+        short iRandCoin = RNGMAX(9);
         short iCoin = 2;
 
         if(iRandCoin == 8)
@@ -240,7 +240,7 @@ IO_MovingObject * createpowerup(short iType, short ix, short iy, bool side, bool
 
         return feather;
     } else { //If no powerups were selected for this block, then fire out a podobo
-        IO_MovingObject * podobo = new MO_Podobo(&rm->spr_podobo, ix + 2, iy, -(float(smw->rng->GetRandMax(5)) / 2.0f) - 6.0f, -1, -1, -1, true);
+        IO_MovingObject * podobo = new MO_Podobo(&rm->spr_podobo, ix + 2, iy, -(float(RNGMAX(5)) / 2.0f) - 6.0f, -1, -1, -1, true);
         objectcontainer[2].add(podobo);
         return podobo;
     }
@@ -573,15 +573,15 @@ void B_PowerupBlock::update()
             state = 3;
             setYi(iposy);
 
-            if(game_values.gamemode->gamemode == game_mode_health && smw->rng->GetRandMax(100) < game_values.gamemodesettings.health.percentextralife) {
+            if(game_values.gamemode->gamemode == game_mode_health && RNGMAX(100) < game_values.gamemodesettings.health.percentextralife) {
                 createpowerup(HEALTH_POWERUP, ix, iy, side, true);
-            } else if((game_values.gamemode->gamemode == game_mode_timelimit && smw->rng->GetRandMax(100) < game_values.gamemodesettings.time.percentextratime) ||
-                      (game_values.gamemode->gamemode == game_mode_star && smw->rng->GetRandMax(100) < game_values.gamemodesettings.star.percentextratime)) {
+            } else if((game_values.gamemode->gamemode == game_mode_timelimit && RNGMAX(100) < game_values.gamemodesettings.time.percentextratime) ||
+                      (game_values.gamemode->gamemode == game_mode_star && RNGMAX(100) < game_values.gamemodesettings.star.percentextratime)) {
                 createpowerup(TIME_POWERUP, ix, iy, side, true);
-            } else if((game_values.gamemode->gamemode == game_mode_coins && smw->rng->GetRandMax(100) < game_values.gamemodesettings.coins.percentextracoin) ||
-                      (game_values.gamemode->gamemode == game_mode_greed && smw->rng->GetRandMax(100) < game_values.gamemodesettings.greed.percentextracoin)) {
+            } else if((game_values.gamemode->gamemode == game_mode_coins && RNGMAX(100) < game_values.gamemodesettings.coins.percentextracoin) ||
+                      (game_values.gamemode->gamemode == game_mode_greed && RNGMAX(100) < game_values.gamemodesettings.greed.percentextracoin)) {
                 createpowerup(COIN_POWERUP, ix, iy, side, true);
-            } else if(game_values.gamemode->gamemode == game_mode_jail && (smw->rng->GetRandMax(100)) < game_values.gamemodesettings.jail.percentkey) {
+            } else if(game_values.gamemode->gamemode == game_mode_jail && (RNGMAX(100)) < game_values.gamemodesettings.jail.percentkey) {
                 createpowerup(JAIL_KEY_POWERUP, ix, iy, side, true);
             } else {
                 createpowerup(SelectPowerup(), ix, iy, side, true);
@@ -800,7 +800,7 @@ short B_PowerupBlock::SelectPowerup()
     if(iCountWeight == 0)
         return -1;
 
-    int iRandPowerup = smw->rng->GetRandMax(iCountWeight + 1);
+    int iRandPowerup = RNGMAX(iCountWeight + 1);
     int iSelectedPowerup = 0;
 
     int iPowerupWeightCount = settings[iSelectedPowerup];
@@ -818,7 +818,7 @@ B_ViewBlock::B_ViewBlock(gfxSprite *nspr1, short x, short y, bool fHidden, short
     B_PowerupBlock(nspr1, x, y, 1, 32000, fHidden, piSettings)
 {
     poweruptimer = 0;
-    powerupindex = smw->rng->GetRandMax( NUM_POWERUPS);
+    powerupindex = RNGMAX( NUM_POWERUPS);
 
     iw = 32;
     ih = 32;
@@ -869,7 +869,7 @@ void B_ViewBlock::GetNextPowerup()
     if(fNoPowerupsSelected)
         return;
 
-    int iRandPowerup = smw->rng->GetRandMax( iCountWeight) + 1;
+    int iRandPowerup = RNGMAX( iCountWeight) + 1;
     powerupindex = 0;
     int iPowerupWeightCount = settings[powerupindex];
 
@@ -2777,7 +2777,7 @@ bool PU_SecretPowerup::collide (CPlayer *player)
         game_values.windaffectsplayers = true;
 
         for(short i = 0; i < 15; i++)
-            eyecandy[2].add(new EC_Snow(&rm->spr_snow, (float)(smw->rng->GetRandMax(640)), (float)smw->rng->GetRandMax(smw->ScreenHeight), smw->rng->GetRandMax(4) + 1));
+            eyecandy[2].add(new EC_Snow(&rm->spr_snow, (float)(RNGMAX(640)), (float)RNGMAX(smw->ScreenHeight), RNGMAX(4) + 1));
     } else if(itemtype == 1) {
         game_values.spinscreen = true;
     } else if(itemtype == 2) {
@@ -3443,7 +3443,7 @@ MO_SuperFireball::MO_SuperFireball(gfxSprite *nspr, short x, short y, short iNum
 
     velx = fVelyX;
     vely = fVelyY;
-    ttl = smw->rng->GetRandMax(30) + 60;
+    ttl = RNGMAX(30) + 60;
 
     drawframe = 0;
 
@@ -3675,8 +3675,8 @@ void MO_SledgeHammer::explode()
         short iColorID = colorOffset / 32 - 1;
 
         for(short iHammer = 0; iHammer < 3; iHammer++) {
-            float dAngle = (float)(smw->rng->GetRandMax(628)) / 100.0f;
-            float dVel = (float)(smw->rng->GetRandMax(5)) / 2.0f + 3.0f;
+            float dAngle = (float)(RNGMAX(628)) / 100.0f;
+            float dVel = (float)(RNGMAX(5)) / 2.0f + 3.0f;
             float dVelX = dVel * cos(dAngle);
             float dVelY = dVel * sin(dAngle);
             objectcontainer[2].add(new MO_Hammer(&rm->spr_hammer, iCenterX, iCenterY, 6, dVelX, dVelY, 5, playerID, teamID, iColorID, true));
@@ -3806,7 +3806,7 @@ MO_Boomerang::MO_Boomerang(gfxSprite *nspr, short x, short y, short iNumSpr, boo
     iStateTimer = 0;
 
     if(game_values.boomerangstyle == 3)
-        iStyle = smw->rng->GetRandMax(3);
+        iStyle = RNGMAX(3);
     else
         iStyle = game_values.boomerangstyle;
 
@@ -4805,9 +4805,9 @@ MO_FlagBase::MO_FlagBase(gfxSprite *nspr, short iTeamID, short iColorID) :
     teamID = iTeamID;
     iGraphicOffsetX = iColorID * 48;
 
-    angle = (float)(smw->rng->GetRandMax(1000) * 0.00628f);
-    anglechange = (float)(smw->rng->GetRandMax(100) * 0.0002f);
-    anglechangetimer = (short)(smw->rng->GetRandMax(50) + 100);
+    angle = (float)(RNGMAX(1000) * 0.00628f);
+    anglechange = (float)(RNGMAX(100) * 0.0002f);
+    anglechangetimer = (short)(RNGMAX(50) + 100);
 
     velx = sin(angle);
     vely = cos(angle);
@@ -4844,8 +4844,8 @@ void MO_FlagBase::update()
 {
     if(game_values.gamemodesettings.flag.speed > 0) {
         if(--anglechangetimer <= 0) {
-            anglechange = (float)((smw->rng->GetRandMax(101) - 50) * 0.0002f);
-            anglechangetimer = (short)(smw->rng->GetRandMax(50) + 100);
+            anglechange = (float)((RNGMAX(101) - 50) * 0.0002f);
+            anglechangetimer = (short)(RNGMAX(50) + 100);
         }
 
         angle += anglechange;
@@ -5143,8 +5143,8 @@ void MO_Yoshi::placeYoshi()
     timer = 0;
 
     for(short tries = 0; tries < 64; tries++) {
-		ix = (short)smw->rng->GetRandMax(smw->ScreenWidth - iw);
-        iy = (short)smw->rng->GetRandMax(smw->ScreenHeight - ih - TILESIZE);	//don't spawn too low
+		ix = (short)RNGMAX(smw->ScreenWidth - iw);
+        iy = (short)RNGMAX(smw->ScreenHeight - ih - TILESIZE);	//don't spawn too low
 
         short ixl = ix / TILESIZE;
         short ixr = (ix + iw) / TILESIZE;
@@ -5468,8 +5468,8 @@ void OMO_KingOfTheHillZone::placeArea()
     short y;
 
     for(short iLoop = 0; iLoop < 64; iLoop++) {
-        x = (short)smw->rng->GetRandMax(MAPWIDTH - size + 1);
-        y = (short)smw->rng->GetRandMax(MAPHEIGHT - size);
+        x = (short)RNGMAX(MAPWIDTH - size + 1);
+        y = (short)RNGMAX(MAPHEIGHT - size);
 
         //First move the zone down so it is sitting on atleast 1 solid tile
         short iFindY = y + size;
@@ -5572,9 +5572,9 @@ OMO_RaceGoal::OMO_RaceGoal(gfxSprite *nspr, short id) :
     for(short k = 0; k < 4; k++)
         tagged[k] = -1;
 
-    angle = (float)(smw->rng->GetRandMax(1000) * 0.00628f);
-    anglechange = (float)(smw->rng->GetRandMax(100) * 0.0002f);
-    anglechangetimer = (short)(smw->rng->GetRandMax(50) + 100);
+    angle = (float)(RNGMAX(1000) * 0.00628f);
+    anglechange = (float)(RNGMAX(100) * 0.0002f);
+    anglechangetimer = (short)(RNGMAX(50) + 100);
 
     velx = sin(angle);
     vely = cos(angle);
@@ -5625,8 +5625,8 @@ void OMO_RaceGoal::draw()
 void OMO_RaceGoal::update()
 {
     if(--anglechangetimer <= 0) {
-        anglechange = (float)((smw->rng->GetRandMax(101) - 50) * 0.0002f);
-        anglechangetimer = (short)(smw->rng->GetRandMax(50) + 100);
+        anglechange = (float)((RNGMAX(101) - 50) * 0.0002f);
+        anglechangetimer = (short)(RNGMAX(50) + 100);
     }
 
     angle += anglechange;
@@ -5681,8 +5681,8 @@ void OMO_RaceGoal::placeRaceGoal()
             if(++tries > 32)
                 break;
 
-            x = (short)smw->rng->GetRandMax(640 - collisionWidth);
-            y = (short)smw->rng->GetRandMax(smw->ScreenHeight - collisionHeight);
+            x = (short)RNGMAX(640 - collisionWidth);
+            y = (short)RNGMAX(smw->ScreenHeight - collisionHeight);
         } while(objectcontainer[2].getClosestObject(x, y, object_race_goal) <= 250.0f - (quantity * 25.0f));
     }
 
@@ -5701,7 +5701,7 @@ MO_FrenzyCard::MO_FrenzyCard(gfxSprite *nspr, short iType) :
     type = iType;
 
     if(type == NUMFRENZYCARDS - 1)
-        type = smw->rng->GetRandMax (NUMFRENZYCARDS - 1);
+        type = RNGMAX (NUMFRENZYCARDS - 1);
 
     sparkleanimationtimer = 0;
     sparkledrawframe = 0;
@@ -5930,7 +5930,7 @@ MO_WalkingEnemy::MO_WalkingEnemy(gfxSprite *nspr, short iNumSpr, short aniSpeed,
         bounce = GRAVITATION;
 
     spawnradius = 100.0f;
-    spawnangle = (float)(smw->rng->GetRandMax(1000) * 0.00628f);
+    spawnangle = (float)(RNGMAX(1000) * 0.00628f);
     inair = true;
 
     iSpawnIconOffset = 0;
@@ -6525,19 +6525,19 @@ MO_CheepCheep::MO_CheepCheep(gfxSprite *nspr) :
     IO_MovingObject(nspr, 0, smw->ScreenHeight, 2, 8, 30, 28, 1, 3)
 {
     ih = 32;
-    setXi((short)(smw->rng->GetRandMax(608)));
+    setXi((short)(RNGMAX(608)));
 
     velx = 0.0f;
     while(velx == 0.0f)
-        velx = float(smw->rng->GetRandMax(19) - 9) / 2.0f;
+        velx = float(RNGMAX(19) - 9) / 2.0f;
 
     //Cheep cheep up velocity is between 9.0 and 13.0 in 0.5 increments
-    vely = -(float(smw->rng->GetRandMax(11)) / 2.0f) - 9.0f;
+    vely = -(float(RNGMAX(11)) / 2.0f) - 9.0f;
 
     movingObjectType = movingobject_cheepcheep;
     state = 1;
 
-    iColorOffsetY = (short)(smw->rng->GetRandMax(3)) * 64;
+    iColorOffsetY = (short)(RNGMAX(3)) * 64;
 
     if(velx > 0.0f)
         iColorOffsetY += 32;
@@ -6823,29 +6823,29 @@ void MO_SledgeBrother::update()
                 //Spawn thwomps
                 ifsoundonplay(sfx_thunder);
 
-                short numThwomps = smw->rng->GetRandMax(5) + 6;
+                short numThwomps = RNGMAX(5) + 6;
 
                 for(short iThwomp = 0; iThwomp < numThwomps; iThwomp++) {
-                    objectcontainer[2].add(new OMO_Thwomp(&rm->spr_thwomp, (short)(smw->rng->GetRandMax(591)), 2.0f + (float)(smw->rng->GetRandMax(20))/10.0f));
+                    objectcontainer[2].add(new OMO_Thwomp(&rm->spr_thwomp, (short)(RNGMAX(591)), 2.0f + (float)(RNGMAX(20))/10.0f));
                 }
 
-                //short numBombs = smw->rng->GetRandMax(5) + 6;
+                //short numBombs = RNGMAX(5) + 6;
 
                 //for(short iBomb = 0; iBomb < numBombs; iBomb++)
                 //{
-                //	short iRandomX = smw->rng->GetRandMax(612);
-                //	short iRandomY = smw->rng->GetRandMax(442);
+                //	short iRandomX = RNGMAX(612);
+                //	short iRandomY = RNGMAX(442);
                 //	eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, iRandomX - 2, iRandomY + 3, 3, 8));
-                //	objectcontainer[2].add(new CO_Bomb(&rm->spr_bomb, iRandomX, iRandomY, 0.0f, 0.0f, 4, -1, -1, -1, smw->rng->GetRandMax(30) + 30));
+                //	objectcontainer[2].add(new CO_Bomb(&rm->spr_bomb, iRandomX, iRandomY, 0.0f, 0.0f, 4, -1, -1, -1, RNGMAX(30) + 30));
                 //}
             } else if(iType == 2) {
                 //Spawn lots of podobos
                 ifsoundonplay(sfx_thunder);
 
-                short numPodobos = smw->rng->GetRandMax(5) + 8;
+                short numPodobos = RNGMAX(5) + 8;
 
                 for(short iPodobo = 0; iPodobo < numPodobos; iPodobo++) {
-                    objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, (short)(smw->rng->GetRandMax(608)), smw->ScreenHeight, -(float(smw->rng->GetRandMax(9)) / 2.0f) - 9.0f, -1, -1, -1, false));
+                    objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, (short)(RNGMAX(608)), smw->ScreenHeight, -(float(RNGMAX(9)) / 2.0f) - 9.0f, -1, -1, -1, false));
                 }
             }
         }
@@ -6933,7 +6933,7 @@ void MO_SledgeBrother::update()
 
 void MO_SledgeBrother::randomaction()
 {
-    int randaction = smw->rng->GetRandMax(100);
+    int randaction = RNGMAX(100);
 
     //Force an action if it has been too long since the last action of that type
     if(need_action[0] > g_iSledgeBrotherNeedAction[iType][game_values.gamemodesettings.boss.difficulty][0])
@@ -6979,7 +6979,7 @@ void MO_SledgeBrother::move()
     else if(location == 4)
         moveright = false;
     else
-        moveright = smw->rng->GetRandMax(2) == 0;
+        moveright = RNGMAX(2) == 0;
 
     SetLastAction(3);
 
@@ -7008,15 +7008,15 @@ void MO_SledgeBrother::throwprojectile()
     arm_offset_x = 96;
 
     if(iType == 0) {
-        float fHammerVelX = ((float)(smw->rng->GetRandMax(9) + 2)) / 2.0f - (face_right ? 0.0f : 6.0f);
+        float fHammerVelX = ((float)(RNGMAX(9) + 2)) / 2.0f - (face_right ? 0.0f : 6.0f);
         objectcontainer[2].add(new MO_SledgeHammer(&rm->spr_sledgehammer, (face_right ? ix + 32 : ix) - collisionOffsetX, iy, 8, fHammerVelX, -HAMMERTHROW, 5, -1, -1, -1, false));
     } else if(iType == 1) {
-        float fBombVelX = ((float)(smw->rng->GetRandMax(5) + 12)) / 2.0f - (face_right ? 0.0f : 14.0f);
-        float fBombVelY = -(float)(smw->rng->GetRandMax(13)) / 2.0f - 6.0f;
-        objectcontainer[2].add(new CO_Bomb(&rm->spr_bomb, face_right ? ix + iw - 32 : ix - 20, iy, fBombVelX, fBombVelY, 4, -1, -1, -1, smw->rng->GetRandMax(60) + 120));
+        float fBombVelX = ((float)(RNGMAX(5) + 12)) / 2.0f - (face_right ? 0.0f : 14.0f);
+        float fBombVelY = -(float)(RNGMAX(13)) / 2.0f - 6.0f;
+        objectcontainer[2].add(new CO_Bomb(&rm->spr_bomb, face_right ? ix + iw - 32 : ix - 20, iy, fBombVelX, fBombVelY, 4, -1, -1, -1, RNGMAX(60) + 120));
     } else if(iType == 2) {
-        float fFireVelX = ((float)(smw->rng->GetRandMax(9) + 6)) / 2.0f - (face_right ? 0.0f : 10.0f);
-        float fFireVelY = (float)(smw->rng->GetRandMax(17)) / 2.0f - 4.0f;
+        float fFireVelX = ((float)(RNGMAX(9) + 6)) / 2.0f - (face_right ? 0.0f : 10.0f);
+        float fFireVelY = (float)(RNGMAX(17)) / 2.0f - 4.0f;
         objectcontainer[2].add(new MO_SuperFireball(&rm->spr_superfireball, face_right ? ix + iw - 32 : ix - 16, iy, 4, fFireVelX, fFireVelY, 4, -1, -1, -1));
     }
 
@@ -7624,7 +7624,7 @@ void CO_Shell::CheckAndDie()
 {
     if((fDieOnMovingPlayerCollision && state == 1) || ((fDieOnHoldingPlayerCollision || fFlipped)&& state == 3))
         Die();
-    else if(!fDieOnHoldingPlayerCollision && state == 3 && (smw->rng->GetRandMax(5)) == 0)
+    else if(!fDieOnHoldingPlayerCollision && state == 3 && (RNGMAX(5)) == 0)
         Die();
 }
 
@@ -8931,7 +8931,7 @@ void OMO_Phanto::update()
 
     if(++iSpeedTimer > 62) {
         iSpeedTimer = 0;
-        dReactionSpeed = (0.05f + (float)(smw->rng->GetRandMax(20)) / 100.0f) * dSpeedRatio;
+        dReactionSpeed = (0.05f + (float)(RNGMAX(20)) / 100.0f) * dSpeedRatio;
     }
 
     //Chase player or move off screen if there is no player holding the key
@@ -8987,7 +8987,7 @@ void OMO_Phanto::update()
                 velx = 0.0f;
 
                 //Randomly position phanto off screen
-                setXi(smw->rng->GetRandMax(smw->ScreenWidth));
+                setXi(RNGMAX(smw->ScreenWidth));
 				setYi(smw->rng->GetRandBool() ? -ih - CRUNCHMAX: smw->ScreenHeight);
             }
         }

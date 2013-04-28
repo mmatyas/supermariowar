@@ -323,10 +323,10 @@ public:
 
     //Gets a random value, but does not set the control to that value
     short GetRandomShortValue() {
-        return goodRandomItems[smw->rng->GetRandMax(goodRandomItems.size())]->iValue;
+        return goodRandomItems[RNGMAX(goodRandomItems.size())]->iValue;
     }
     bool GetRandomBoolValue() {
-        return goodRandomItems[smw->rng->GetRandMax(goodRandomItems.size())]->fValue;
+        return goodRandomItems[RNGMAX(goodRandomItems.size())]->fValue;
     }
 
     //sets the currently selected item

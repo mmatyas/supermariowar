@@ -515,21 +515,21 @@ string MusicEntry::GetRandomMusic(int iMusicCategory, const char * szMapName, co
     //First check if there is specific map music
     if(fUsesMapOverrides && mapoverride.find(szMapName) != mapoverride.end()) {
         if(mapoverride[szMapName]->songs.size() > 0) {
-            iCurrentMusic = smw->rng->GetRandMax( mapoverride[szMapName]->songs.size());
+            iCurrentMusic = RNGMAX( mapoverride[szMapName]->songs.size());
             return songFileNames[mapoverride[szMapName]->songs[iCurrentMusic]];
         }
     }
     //Then check if there is specific background music
     if(fUsesBackgroundOverrides && backgroundoverride.find(szBackground) != backgroundoverride.end()) {
         if(backgroundoverride[szBackground]->songs.size() > 0) {
-            iCurrentMusic = smw->rng->GetRandMax(backgroundoverride[szBackground]->songs.size());
+            iCurrentMusic = RNGMAX(backgroundoverride[szBackground]->songs.size());
             return songFileNames[backgroundoverride[szBackground]->songs[iCurrentMusic]];
         }
     }
 
     //Then default to the music category
     if(iMusicCategory >= 0 && iMusicCategory < MAXMUSICCATEGORY && numsongsforcategory[iMusicCategory] > 0) {
-        iCurrentMusic = smw->rng->GetRandMax( numsongsforcategory[iMusicCategory]);
+        iCurrentMusic = RNGMAX( numsongsforcategory[iMusicCategory]);
         return songFileNames[songsforcategory[iMusicCategory][iCurrentMusic]];
     }
 

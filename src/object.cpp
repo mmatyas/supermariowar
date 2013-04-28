@@ -1133,11 +1133,11 @@ void CObjectContainer::pushBombs(short x, short y)
 
         if(dist < 10000) {
             if(bombx > 0)
-                bomb->velx += ((float)(smw->rng->GetRandMax(30)) / 10.0f + 4.0f);
+                bomb->velx += ((float)(RNGMAX(30)) / 10.0f + 4.0f);
             else
-                bomb->velx -= ((float)(smw->rng->GetRandMax(30)) / 10.0f + 4.0f);
+                bomb->velx -= ((float)(RNGMAX(30)) / 10.0f + 4.0f);
 
-            bomb->vely -= (float)(smw->rng->GetRandMax(30)) / 10.0f + 6.0f;
+            bomb->vely -= (float)(RNGMAX(30)) / 10.0f + 6.0f;
         }
     }
 }
@@ -1163,6 +1163,6 @@ CObject * CObjectContainer::getRandomObject()
     if(list_end == 0)
         return NULL;
 
-    return list[smw->rng->GetRandMax( list_end)];
+    return list[RNGMAX( list_end)];
 }
 
