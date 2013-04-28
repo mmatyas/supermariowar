@@ -140,7 +140,7 @@ add_definitions(-fno-strict-aliasing -fno-exceptions)
 ## MAIN CONFIG
 
 ##TODO: clean code to not need this anymore
-add_definitions(-Wno-shadow)
+add_definitions(-fpermissive -Wno-shadow -Wno-unused-result -Wno-ignored-qualifiers)
 
 ########################################
 # our relevant source files
@@ -152,7 +152,7 @@ set(COMMON_SRCS src/FileIO.cpp src/FileList.cpp src/MapList.cpp
            src/SFont.c src/TilesetManager.cpp src/dirlist.cpp 
            src/eyecandy.cpp src/gfx.cpp src/global.cpp src/input.cpp 
            src/map.cpp src/movingplatform.cpp src/path.cpp 
-	src/sfx.cpp
+	src/sfx.cpp src/game.cpp
 )
 
 set(SMW_SRCS src/HashTable.cpp src/ai.cpp src/gamemodes.cpp src/main.cpp 
@@ -359,7 +359,7 @@ set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Super Mario War, platformer multiplayer")
 
 set(CPACK_RPM_PACKAGE_GROUP Amusements/Games)
 set(CPACK_RPM_PACKAGE_LICENSE GPL-2.0)
-set(CPACK_RESOURCE_FILE_README ${PROJECT_SOURCE_DIR}/README.md)
+set(CPACK_RESOURCE_FILE_README ${PROJECT_SOURCE_DIR}/README)
 # TODO: CPACK_RESOURCE_FILE_WELCOME
 set(CPACK_PACKAGE_ICON ${PROJECT_SOURCE_DIR}/src/icons/smw.ico)
 # TODO: CPACK_NSIS_*

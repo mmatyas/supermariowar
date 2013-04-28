@@ -3,7 +3,14 @@ smw
 
 A multiplayer platformer game.
 
-How to compile
+Supported platforms:
+
+- Linux
+- Windows
+- XBox
+- MAC OS X
+
+How to compile on Linux
 ==============
 Enter the Build directory, run cmake, then make and finally you can use the binary smw in Build/Binaries directories.
 
