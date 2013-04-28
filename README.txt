@@ -43,5 +43,4 @@ For controls, descriptions of modes, and everything else you would expect to
 be in a proper manual, please see the file README.html which was included with
 this distribution.
 
-
 We hope you enjoy the game!

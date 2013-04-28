@@ -628,7 +628,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 			
 			for(short iBackground = 0; iBackground < 26; iBackground++)
 			{
-				char * szFindUnderscore = strstr(g_szBackgroundConversion[iBackground], "_");
+                          char * szFindUnderscore = strstr((char*)g_szBackgroundConversion[iBackground], "_");
 
 				if(szFindUnderscore)
 					szFindUnderscore++;
