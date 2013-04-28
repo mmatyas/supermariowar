@@ -16,6 +16,9 @@
 using namespace std;
 char SMW_Root_Data_Dir[PATH_MAX + 2] = "";
 
+// main game directory, read from command line argument
+char		*RootDataDirectory;
+
 bool File_Exists (const std::string fileName)
 {
 	struct stat buffer;

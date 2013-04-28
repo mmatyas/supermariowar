@@ -9,7 +9,7 @@
 //----------------------------------------------------------------
 
 #define TITLESTRING "Super Mario War"
-#define VERSIONNUMBER "1.8"
+#define VERSIONNUMBER "1.9"
 
 #include <stdlib.h>	//srand/rand (maybe replace with an own version)
 #include <string.h>

@@ -18,6 +18,8 @@
 #define _SMW_EDITOR
 #include "global.h"
 
+#include "path.h"
+
 #ifdef PNG_SAVE_FORMAT
 	#include "savepng.h"
 #endif
@@ -40,7 +42,8 @@
     #endif
 #endif
 
-#define MAPTITLESTRING "SMW 1.8 Leveleditor"
+#define MAPTITLESTRING "SMW 1.9 Leveleditor"
+
 
 enum {EDITOR_EDIT, EDITOR_TILES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_MAP, EDITOR_BLOCKS, NEW_MAP, SAVE, EDITOR_WARP, EDITOR_EYECANDY, DISPLAY_HELP, EDITOR_PLATFORM, EDITOR_TILETYPE, EDITOR_BACKGROUNDS, EDITOR_MAPITEMS, EDITOR_ANIMATION, EDITOR_PROPERTIES, EDITOR_MODEITEMS, EDITOR_MAPHAZARDS};
 
@@ -235,8 +238,8 @@ EditorMapTile	copiedtiles[MAPWIDTH][MAPHEIGHT];
 int				copiedlayer;
 
 //// Global stuff that the map editor doesn't need, but has references to
-GraphicsList menugraphicspacklist;
-GraphicsList gamegraphicspacklist;
+GraphicsList *menugraphicspacklist;
+GraphicsList *gamegraphicspacklist;
 FiltersList *filterslist;
 gfxSprite		spr_warplock;
 short			x_shake = 0;
@@ -400,6 +403,8 @@ int main(int argc, char *argv[])
 	g_tilesetmanager = new CTilesetManager();
 	filterslist = new FiltersList();
 	maplist = new MapList(false);
+	menugraphicspacklist = new GraphicsList();
+	gamegraphicspacklist = new GraphicsList();
 
     /* This must occur before any data files are loaded */
     Initialize_Paths();

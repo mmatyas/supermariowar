@@ -1096,9 +1096,6 @@ void SpinScreen()
 	y_shake = (short)(shakey);
 }
 
-// main game directory, read from command line argument
-char		*RootDataDirectory;
-
 // ------ MAIN ------
 int main(int argc, char *argv[])
 {
