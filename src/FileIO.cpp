@@ -5,16 +5,16 @@ FILE * OpenFile(const char * filename, const char * options)
 #ifdef _XBOX
 	std::string optionsbin = std::string("D:\\") + std::string(filename);
 #else
-	#ifdef PREFIXPATH
+//	#ifdef PREFIXPATH
 		char * folder=getenv("HOME");
 		#ifdef __MACOSX__
 			std::string optionsbin=std::string(folder) + std::string("/Library/Preferences/smw.") + std::string(filename);
 		#else
-			std::string optionsbin=std::string(folder) + std::string("/.smw.") + std::string(filename);
+			std::string optionsbin=std::string(folder) + std::string("/.smw/") + std::string(filename);
 		#endif
-	#else
-		std::string optionsbin = std::string(filename);
-	#endif
+//	#else
+//		std::string optionsbin = std::string(filename);
+//	#endif
 #endif
 
 	return fopen(optionsbin.c_str(), options);

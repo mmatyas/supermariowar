@@ -389,15 +389,15 @@ MovingPlatform::MovingPlatform(TilesetTile ** tiledata, MapTile ** tiletypes, sh
 
 				if(tile->iID >= 0)
 				{
-					g_tilesetmanager.Draw(sSurface[iSurface], tile->iID, iTileSizeIndex, tile->iCol, tile->iRow, iCol, iRow);
+					g_tilesetmanager->Draw(sSurface[iSurface], tile->iID, iTileSizeIndex, tile->iCol, tile->iRow, iCol, iRow);
 				}
 				else if(tile->iID == TILESETANIMATED)
 				{
-					SDL_BlitSurface(spr_tileanimation[iTileSizeIndex].getSurface(), &g_tilesetmanager.rRects[iTileSizeIndex][tile->iCol << 2][tile->iRow], sSurface[iSurface], &g_tilesetmanager.rRects[iTileSizeIndex][iCol][iRow]);
+					SDL_BlitSurface(spr_tileanimation[iTileSizeIndex].getSurface(), &g_tilesetmanager->rRects[iTileSizeIndex][tile->iCol << 2][tile->iRow], sSurface[iSurface], &g_tilesetmanager->rRects[iTileSizeIndex][iCol][iRow]);
 				}
 				else if(tile->iID == TILESETUNKNOWN)
 				{
-					SDL_BlitSurface(spr_unknowntile[iTileSizeIndex].getSurface(), &g_tilesetmanager.rRects[iTileSizeIndex][0][0], sSurface[iSurface], &g_tilesetmanager.rRects[iTileSizeIndex][iCol][iRow]);
+					SDL_BlitSurface(spr_unknowntile[iTileSizeIndex].getSurface(), &g_tilesetmanager->rRects[iTileSizeIndex][0][0], sSurface[iSurface], &g_tilesetmanager->rRects[iTileSizeIndex][iCol][iRow]);
 				}
 			}
 		}
@@ -1027,10 +1027,10 @@ void MovingPlatform::check_map_collision_right(CPlayer * player)
 
 	short iTestBackgroundY = ((short)player->fy + PH) / TILESIZE;
 	
-	IO_Block * topblock = g_map.block(iTestBackgroundX, iTestBackgroundY);
+	IO_Block * topblock = g_map->block(iTestBackgroundX, iTestBackgroundY);
 
 	if((topblock && !topblock->isTransparent() && !topblock->isHidden()) || 
-		(g_map.map(iTestBackgroundX, iTestBackgroundY) & tile_flag_solid))
+		(g_map->map(iTestBackgroundX, iTestBackgroundY) & tile_flag_solid))
 	{
 		player->xf((float)((iTestBackgroundX << 5) - PW) - 0.2f);
 		player->flipsidesifneeded();
@@ -1042,10 +1042,10 @@ void MovingPlatform::check_map_collision_right(CPlayer * player)
 
 	short iTestBackgroundY2 = (short)player->fy / TILESIZE;
 
-	IO_Block * bottomblock = g_map.block(iTestBackgroundX, iTestBackgroundY2);
+	IO_Block * bottomblock = g_map->block(iTestBackgroundX, iTestBackgroundY2);
 
 	if((bottomblock && !bottomblock->isTransparent() && !bottomblock->isHidden()) || 
-		(g_map.map(iTestBackgroundX, iTestBackgroundY2) & tile_flag_solid))
+		(g_map->map(iTestBackgroundX, iTestBackgroundY2) & tile_flag_solid))
 	{
 		player->xf((float)((iTestBackgroundX << 5) - PW) - 0.2f);
 		player->flipsidesifneeded();
@@ -1061,10 +1061,10 @@ void MovingPlatform::check_map_collision_left(CPlayer * player)
 	short iTestBackgroundX = (short)player->fx / TILESIZE;
 	short iTestBackgroundY = ((short)player->fy + PH) / TILESIZE;
 
-	IO_Block * topblock = g_map.block(iTestBackgroundX, iTestBackgroundY);
+	IO_Block * topblock = g_map->block(iTestBackgroundX, iTestBackgroundY);
 
 	if((topblock && !topblock->isTransparent() && !topblock->isHidden()) || 
-		(g_map.map(iTestBackgroundX, iTestBackgroundY) & tile_flag_solid))
+		(g_map->map(iTestBackgroundX, iTestBackgroundY) & tile_flag_solid))
 	{
 		player->xf((float)((iTestBackgroundX << 5) + TILESIZE) + 0.2f);
 		player->flipsidesifneeded();
@@ -1076,10 +1076,10 @@ void MovingPlatform::check_map_collision_left(CPlayer * player)
 
 	short iTestBackgroundY2 = (short)player->fy / TILESIZE;
 
-	IO_Block * bottomblock = g_map.block(iTestBackgroundX, iTestBackgroundY2);
+	IO_Block * bottomblock = g_map->block(iTestBackgroundX, iTestBackgroundY2);
 
 	if((bottomblock && !bottomblock->isTransparent() && !bottomblock->isHidden()) || 
-		(g_map.map(iTestBackgroundX, iTestBackgroundY2) & tile_flag_solid))
+		(g_map->map(iTestBackgroundX, iTestBackgroundY2) & tile_flag_solid))
 	{
 		player->xf((float)((iTestBackgroundX << 5) + TILESIZE) + 0.2f);
 		player->flipsidesifneeded();
@@ -1550,13 +1550,13 @@ void MovingPlatform::collide(IO_MovingObject * object)
 					else
 						iTestBackgroundX = ((short)object->fx + object->collisionWidth) / TILESIZE;
 					
-					IO_Block * topblock = g_map.block(iTestBackgroundX, iTestBackgroundY);
-					IO_Block * bottomblock = g_map.block(iTestBackgroundX, iTestBackgroundY2);
+					IO_Block * topblock = g_map->block(iTestBackgroundX, iTestBackgroundY);
+					IO_Block * bottomblock = g_map->block(iTestBackgroundX, iTestBackgroundY2);
 
 					if((topblock && !topblock->isTransparent() && !topblock->isHidden()) || 
 						(bottomblock && !bottomblock->isTransparent() && !bottomblock->isHidden()) ||
-						(g_map.map(iTestBackgroundX, iTestBackgroundY) & tile_flag_solid) || 
-						(g_map.map(iTestBackgroundX, iTestBackgroundY2) & tile_flag_solid))
+						(g_map->map(iTestBackgroundX, iTestBackgroundY) & tile_flag_solid) || 
+						(g_map->map(iTestBackgroundX, iTestBackgroundY2) & tile_flag_solid))
 					{
 						object->xf((float)((iTestBackgroundX << 5) - object->collisionWidth) - 0.2f);
 						object->flipsidesifneeded();
@@ -1619,13 +1619,13 @@ void MovingPlatform::collide(IO_MovingObject * object)
 					short iTestBackgroundY2 = ((short)object->fy + object->collisionHeight) / TILESIZE;
 					short iTestBackgroundX = (short)object->fx / TILESIZE;
 					
-					IO_Block * topblock = g_map.block(iTestBackgroundX, iTestBackgroundY);
-					IO_Block * bottomblock = g_map.block(iTestBackgroundX, iTestBackgroundY2);
+					IO_Block * topblock = g_map->block(iTestBackgroundX, iTestBackgroundY);
+					IO_Block * bottomblock = g_map->block(iTestBackgroundX, iTestBackgroundY2);
 
 					if((topblock && !topblock->isTransparent() && !topblock->isHidden()) || 
 						(bottomblock && !bottomblock->isTransparent() && !bottomblock->isHidden()) ||
-						(g_map.map(iTestBackgroundX, iTestBackgroundY) & tile_flag_solid) || 
-						(g_map.map(iTestBackgroundX, iTestBackgroundY2) & tile_flag_solid))
+						(g_map->map(iTestBackgroundX, iTestBackgroundY) & tile_flag_solid) || 
+						(g_map->map(iTestBackgroundX, iTestBackgroundY2) & tile_flag_solid))
 					{
 						object->xf((float)((iTestBackgroundX << 5) + TILESIZE) + 0.2f);
 						object->flipsidesifneeded();

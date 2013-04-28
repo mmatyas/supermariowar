@@ -266,7 +266,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 		for(short iTileset = 0; iTileset < iNumTilesets; iTileset++)
 		{
 			short iID = translation[iTileset].iID;
-			translationid[iID] = g_tilesetmanager.GetIndexFromName(translation[iTileset].szName);
+			translationid[iID] = g_tilesetmanager->GetIndexFromName(translation[iTileset].szName);
 
 			if(translationid[iID] == TILESETUNKNOWN)
 			{
@@ -275,8 +275,8 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 			}
 			else
 			{
-				tilesetwidths[iID] = g_tilesetmanager.GetTileset(translationid[iID])->GetWidth();
-				tilesetheights[iID] = g_tilesetmanager.GetTileset(translationid[iID])->GetHeight();
+				tilesetwidths[iID] = g_tilesetmanager->GetTileset(translationid[iID])->GetWidth();
+				tilesetheights[iID] = g_tilesetmanager->GetTileset(translationid[iID])->GetHeight();
 			}
 		}
 
@@ -574,7 +574,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 		cout << "[Version " << version[0] << '.' << version[1] << '.'
 			<< version[2] << '.' << version[3] << " Map Detected]\n";
 
-		short iClassicTilesetID = g_tilesetmanager.GetIndexFromName("Classic");
+		short iClassicTilesetID = g_tilesetmanager->GetIndexFromName("Classic");
 
 		//2. load map data
 		for(j = 0; j < MAPHEIGHT; j++)
@@ -628,7 +628,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 			
 			for(short iBackground = 0; iBackground < 26; iBackground++)
 			{
-                          char * szFindUnderscore = strstr((char*)g_szBackgroundConversion[iBackground], "_");
+				char * szFindUnderscore = strstr((char*)g_szBackgroundConversion[iBackground], "_");
 
 				if(szFindUnderscore)
 					szFindUnderscore++;
@@ -689,7 +689,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 
 		if(VersionIsEqualOrAfter(version, 1, 7, 0, 2))
 		{
-			//short translationid[1] = {g_tilesetmanager.GetIndexFromName("Classic")};
+			//short translationid[1] = {g_tilesetmanager->GetIndexFromName("Classic")};
 			loadPlatforms(mapfile, iReadType == read_type_preview, version);
 		}
 
@@ -837,7 +837,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 
 		if(VersionIsEqualOrBefore(version, 1, 7, 0, 1))
 		{
-			//short translationid[1] = {g_tilesetmanager.GetIndexFromName("Classic")};
+			//short translationid[1] = {g_tilesetmanager->GetIndexFromName("Classic")};
 			loadPlatforms(mapfile, iReadType == read_type_preview, version);
 		}
 
@@ -901,7 +901,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 						short iTileID = g_iTileConversion[iTile];
 
 						TilesetTile * tile = &mapdata[i][j][k];
-						tile->iID = g_tilesetmanager.GetClassicTilesetIndex();
+						tile->iID = g_tilesetmanager->GetClassicTilesetIndex();
 						tile->iCol = iTileID % 32;
 						tile->iRow = iTileID / 32;
 					}
@@ -913,7 +913,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 				for(k = MAPLAYERS - 1; k >= 0; k--)
 				{
 					TilesetTile * tile = &mapdata[i][j][k];
-					TileType type = g_tilesetmanager.GetClassicTileset()->GetTileType(tile->iCol, tile->iRow);
+					TileType type = g_tilesetmanager->GetClassicTileset()->GetTileType(tile->iCol, tile->iRow);
 					if(type != tile_nonsolid)
 					{
 						if(type >= 0 && type < NUMTILETYPES)
@@ -1110,11 +1110,11 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 				short iTileID = (short)ReadInt(mapfile);
 
 				TilesetTile * tile = &mapdata[i][j][1];
-				tile->iID = g_tilesetmanager.GetClassicTilesetIndex();
+				tile->iID = g_tilesetmanager->GetClassicTilesetIndex();
 				tile->iCol = iTileID % 32;
 				tile->iRow = iTileID / 32;
 
-				TileType iType = g_tilesetmanager.GetClassicTileset()->GetTileType(tile->iCol, tile->iRow);
+				TileType iType = g_tilesetmanager->GetClassicTileset()->GetTileType(tile->iCol, tile->iRow);
 
 				if(iType >= 0 && iType < NUMTILETYPES)
 				{
@@ -1340,11 +1340,11 @@ void CMap::loadPlatforms(FILE * mapfile, bool fPreview, int version[4], short * 
 					}
 					else
 					{
-						tile->iID = g_tilesetmanager.GetClassicTilesetIndex();
+						tile->iID = g_tilesetmanager->GetClassicTilesetIndex();
 						tile->iCol = iTile % TILESETWIDTH;
 						tile->iRow = iTile / TILESETWIDTH;
 
-						type = g_tilesetmanager.GetClassicTileset()->GetTileType(tile->iCol, tile->iRow);
+						type = g_tilesetmanager->GetClassicTileset()->GetTileType(tile->iCol, tile->iRow);
 					}
 	
 					if(type >= 0 && type < NUMTILETYPES)
@@ -1608,7 +1608,7 @@ void CMap::saveMap(const std::string& file)
 
 	//Write tileset names and indexes for translation at load time
 	//Number of tilesets used by this map
-	short iTilesetCount = g_tilesetmanager.GetCount();
+	short iTilesetCount = g_tilesetmanager->GetCount();
 	bool * fTilesetUsed = new bool[iTilesetCount];
 	for(short iTileset = 0; iTileset < iTilesetCount; iTileset++)
 		fTilesetUsed[iTileset] = false;
@@ -1659,7 +1659,7 @@ void CMap::saveMap(const std::string& file)
 			WriteInt(iTileset, mapfile);
 
 			//Tileset Name
-			WriteString(g_tilesetmanager.GetTileset(iTileset)->GetName(), mapfile);
+			WriteString(g_tilesetmanager->GetTileset(iTileset)->GetName(), mapfile);
 		}
 	}
 
@@ -1680,10 +1680,10 @@ void CMap::saveMap(const std::string& file)
 				//Make sure the tile's col and row are within the tileset
 				if(tile->iID >= 0)
 				{
-					if(tile->iCol < 0 || tile->iCol >= g_tilesetmanager.GetTileset(tile->iID)->GetWidth())
+					if(tile->iCol < 0 || tile->iCol >= g_tilesetmanager->GetTileset(tile->iID)->GetWidth())
 						tile->iCol = 0;
 
-					if(tile->iRow < 0 || tile->iRow >= g_tilesetmanager.GetTileset(tile->iID)->GetHeight())
+					if(tile->iRow < 0 || tile->iRow >= g_tilesetmanager->GetTileset(tile->iID)->GetHeight())
 						tile->iRow = 0;
 				}
 
@@ -1722,10 +1722,10 @@ void CMap::saveMap(const std::string& file)
 				//Make sure the tile's col and row are within the tileset
 				if(tile->iID >= 0)
 				{
-					if(tile->iCol < 0 || tile->iCol >= g_tilesetmanager.GetTileset(tile->iID)->GetWidth())
+					if(tile->iCol < 0 || tile->iCol >= g_tilesetmanager->GetTileset(tile->iID)->GetWidth())
 						tile->iCol = 0;
 
-					if(tile->iRow < 0 || tile->iRow >= g_tilesetmanager.GetTileset(tile->iID)->GetHeight())
+					if(tile->iRow < 0 || tile->iRow >= g_tilesetmanager->GetTileset(tile->iID)->GetHeight())
 						tile->iRow = 0;
 				}
 
@@ -2142,7 +2142,7 @@ SDL_Surface * CMap::createThumbnailSurface(bool fUseClassicPack)
 
 	if(fUseClassicPack)
 	{
-		sprintf(szBackgroundFile, "gfx/packs/Classic/backgrounds/%s", g_map.szBackgroundFile);
+		sprintf(szBackgroundFile, "gfx/packs/Classic/backgrounds/%s", g_map->szBackgroundFile);
 		path = convertPath(szBackgroundFile);
 
 		//if the background file doesn't exist, use the classic background
@@ -2151,12 +2151,12 @@ SDL_Surface * CMap::createThumbnailSurface(bool fUseClassicPack)
 	}
 	else
 	{
-		sprintf(szBackgroundFile, "gfx/packs/backgrounds/%s", g_map.szBackgroundFile);
-		path = convertPath(szBackgroundFile, gamegraphicspacklist.current_name());
+		sprintf(szBackgroundFile, "gfx/packs/backgrounds/%s", g_map->szBackgroundFile);
+		path = convertPath(szBackgroundFile, gamegraphicspacklist->current_name());
 
 		//if the background file doesn't exist, use the classic background
 		if(!File_Exists(path))
-			path = convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist.current_name());
+			path = convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->current_name());
 	}
 
 	SDL_Surface * temp = IMG_Load(path.c_str());
@@ -2464,8 +2464,8 @@ void CMap::draw(SDL_Surface *targetSurface, int layer)
 			//If this is an animated tile, then setup an animated tile struct for use in drawing
 			if(tile->iID >= 0)
 			{
-				g_tilesetmanager.Draw(targetSurface, tile->iID, 0, tile->iCol, tile->iRow, i, j);
-				//SDL_BlitSurface(spr_maptiles[0].getSurface(), &g_tilesetmanager.rRects[0][tile->iCol][tile->iRow], targetSurface, &bltrect);
+				g_tilesetmanager->Draw(targetSurface, tile->iID, 0, tile->iCol, tile->iRow, i, j);
+				//SDL_BlitSurface(spr_maptiles[0].getSurface(), &g_tilesetmanager->rRects[0][tile->iCol][tile->iRow], targetSurface, &bltrect);
 			}
 			else if(tile->iID == TILESETANIMATED)
 			{
@@ -2530,7 +2530,7 @@ void CMap::draw(SDL_Surface *targetSurface, int layer)
 			}
 			else if(tile->iID == TILESETUNKNOWN) //Draw red X where tile should be
 			{
-				SDL_BlitSurface(spr_unknowntile[0].getSurface(), &g_tilesetmanager.rRects[0][0][0], targetSurface, &bltrect);
+				SDL_BlitSurface(spr_unknowntile[0].getSurface(), &g_tilesetmanager->rRects[0][0][0], targetSurface, &bltrect);
 			}
 		}
 
@@ -2651,7 +2651,7 @@ void CMap::preDrawPreviewWarps(SDL_Surface * targetSurface, bool fThumbnail)
 	{
 		for(int i = 0; i < MAPWIDTH; i++)
 		{
-			Warp * warp = &g_map.warpdata[i][j];
+			Warp * warp = &g_map->warpdata[i][j];
 			
 			if(warp->connection != -1)
 			{
@@ -2795,16 +2795,16 @@ void CMap::drawPreview(SDL_Surface * targetSurface, int layer, bool fThumbnail)
 			//Handle drawing preview for animated tiles
 			if(tile->iID >= 0)
 			{
-				g_tilesetmanager.Draw(targetSurface, tile->iID, iTilesetIndex, tile->iCol, tile->iRow, i, j);
-				//SDL_BlitSurface(spr_maptiles[iTilesetIndex].getSurface(), &g_tilesetmanager.rRects[iTilesetIndex][tile->iCol][tile->iRow], targetSurface, &rectDst);
+				g_tilesetmanager->Draw(targetSurface, tile->iID, iTilesetIndex, tile->iCol, tile->iRow, i, j);
+				//SDL_BlitSurface(spr_maptiles[iTilesetIndex].getSurface(), &g_tilesetmanager->rRects[iTilesetIndex][tile->iCol][tile->iRow], targetSurface, &rectDst);
 			}
 			else if(tile->iID == TILESETANIMATED)
 			{				
-				SDL_BlitSurface(spr_tileanimation[iTilesetIndex].getSurface(), &g_tilesetmanager.rRects[iTilesetIndex][tile->iCol << 2][tile->iRow], targetSurface, &g_tilesetmanager.rRects[iTilesetIndex][i][j]);
+				SDL_BlitSurface(spr_tileanimation[iTilesetIndex].getSurface(), &g_tilesetmanager->rRects[iTilesetIndex][tile->iCol << 2][tile->iRow], targetSurface, &g_tilesetmanager->rRects[iTilesetIndex][i][j]);
 			}
 			else if(tile->iID == TILESETUNKNOWN)
 			{	
-				SDL_BlitSurface(spr_unknowntile[iTilesetIndex].getSurface(), &g_tilesetmanager.rRects[iTilesetIndex][0][0], targetSurface, &g_tilesetmanager.rRects[iTilesetIndex][i][j]);
+				SDL_BlitSurface(spr_unknowntile[iTilesetIndex].getSurface(), &g_tilesetmanager->rRects[iTilesetIndex][0][0], targetSurface, &g_tilesetmanager->rRects[iTilesetIndex][i][j]);
 			}
 		}
 	}
@@ -2985,7 +2985,7 @@ void CMap::SetupAnimatedTiles()
 						TilesetTile * tilesetTile = &tile->layers[iLayer];
 						if(tilesetTile->iID >= 0)
 						{
-							SDL_BlitSurface(g_tilesetmanager.GetTileset(tilesetTile->iID)->GetSurface(0), &(tile->rSrc[iLayer][0]), animatedTilesSurface, &rDst);
+							SDL_BlitSurface(g_tilesetmanager->GetTileset(tilesetTile->iID)->GetSurface(0), &(tile->rSrc[iLayer][0]), animatedTilesSurface, &rDst);
 						}
 						else if(tilesetTile->iID == TILESETANIMATED)
 						{
@@ -2993,7 +2993,7 @@ void CMap::SetupAnimatedTiles()
 						}
 						else if(tilesetTile->iID == TILESETUNKNOWN)
 						{
-							SDL_BlitSurface(spr_unknowntile[0].getSurface(), &g_tilesetmanager.rRects[0][0][0], animatedTilesSurface, &rDst);
+							SDL_BlitSurface(spr_unknowntile[0].getSurface(), &g_tilesetmanager->rRects[0][0][0], animatedTilesSurface, &rDst);
 						}
 					}
 
@@ -3032,7 +3032,7 @@ void CMap::SetupAnimatedTiles()
 						TilesetTile * tilesetTile = &tile->layers[iLayer];
 						if(tilesetTile->iID >= 0)
 						{
-							SDL_BlitSurface(g_tilesetmanager.GetTileset(tilesetTile->iID)->GetSurface(0), &(tile->rSrc[iLayer][0]), animatedTilesSurface, &rDst);
+							SDL_BlitSurface(g_tilesetmanager->GetTileset(tilesetTile->iID)->GetSurface(0), &(tile->rSrc[iLayer][0]), animatedTilesSurface, &rDst);
 						}
 						else if(tilesetTile->iID == TILESETANIMATED)
 						{
@@ -3040,7 +3040,7 @@ void CMap::SetupAnimatedTiles()
 						}
 						else if(tilesetTile->iID == TILESETUNKNOWN)
 						{
-							SDL_BlitSurface(spr_unknowntile[0].getSurface(), &g_tilesetmanager.rRects[0][0][0], animatedTilesSurface, &rDst);
+							SDL_BlitSurface(spr_unknowntile[0].getSurface(), &g_tilesetmanager->rRects[0][0][0], animatedTilesSurface, &rDst);
 						}
 					}
 
@@ -3526,7 +3526,7 @@ void CMap::optimize()
 			for(int m = 1; m < MAPLAYERS; m++)
 			{
 				TilesetTile * tile = &mapdata[i][j][m];
-				TileType type = g_tilesetmanager.GetTileset(tile->iID)->GetTileType(tile->iCol, tile->iRow);
+				TileType type = g_tilesetmanager->GetTileset(tile->iID)->GetTileType(tile->iCol, tile->iRow);
 				if(type != tile_nonsolid && type != tile_gap && type != tile_solid_on_top)
 				{
 					for(int k = m - 1; k >= 0; k--)

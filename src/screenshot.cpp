@@ -61,7 +61,7 @@ SDL_Surface		*blitdest;
 
 //GraphicsList menugraphicspacklist;
 GraphicsList gamegraphicspacklist;
-FiltersList filterslist;
+FiltersList *filterslist;
 gfxSprite		spr_warplock;
 short			x_shake = 0;
 short			y_shake = 0;
@@ -126,7 +126,7 @@ int main(int argc, char *argv[])
 	tileSetPNG[0] = convertPath("gfx/packs/Classic/tileset.png");
 	tileSetPNG[1] = convertPath("gfx/packs/Classic/tileset_medium.png");
 	tileSetPNG[2] = convertPath("gfx/packs/Classic/tileset_small.png");
-	g_map.loadTileSet(convertPath("maps/tileset.tls"), tileSetPNG);
+	g_map->loadTileSet(convertPath("maps/tileset.tls"), tileSetPNG);
 	
 	//Setup Platforms
 	for(short iPlatform = 0; iPlatform < MAX_PLATFORMS; iPlatform++)
@@ -180,7 +180,7 @@ void drawlayer(int layer, bool fUseCopied, short iBlockSize)
 		{
 			bltrect.y += iBlockSize;	// here
 
-			ts = g_map.mapdata[i][j][layer];
+			ts = g_map->mapdata[i][j][layer];
 
 			if(ts == TILESETSIZE)
 				continue;
@@ -188,7 +188,7 @@ void drawlayer(int layer, bool fUseCopied, short iBlockSize)
 			tilebltrect.x = (ts % TILESETWIDTH) * iBlockSize;
 			tilebltrect.y = (ts / TILESETWIDTH) * iBlockSize;
 
-			SDL_BlitSurface(g_map.tilesetsurface[iBlockSize == TILESIZE ? 0 : iBlockSize == PREVIEWTILESIZE ? 1 : 2], &tilebltrect, screen, &bltrect);
+			SDL_BlitSurface(g_map->tilesetsurface[iBlockSize == TILESIZE ? 0 : iBlockSize == PREVIEWTILESIZE ? 1 : 2], &tilebltrect, screen, &bltrect);
 		}
 
 		bltrect.x += iBlockSize;
@@ -233,7 +233,7 @@ void drawmap(bool fScreenshot, short iBlockSize)
 	{
 		for(int i = 0; i < MAPWIDTH; i++)
 		{
-			int displayblock = displayblock = g_map.objectdata[i][j];
+			int displayblock = displayblock = g_map->objectdata[i][j];
 
 			if(displayblock != BLOCKSETSIZE)
 			{
@@ -244,9 +244,9 @@ void drawmap(bool fScreenshot, short iBlockSize)
 				rDst.y = j * iBlockSize;
 
 				if(displayblock >= 7 && displayblock <= 14)
-					rSrc.y = iBlockSize * (g_map.iSwitches[(displayblock - 7) % 4] + 30);
+					rSrc.y = iBlockSize * (g_map->iSwitches[(displayblock - 7) % 4] + 30);
 				
-				SDL_BlitSurface(g_map.tilesetsurface[iBlockSize == TILESIZE ? 0 : iBlockSize == PREVIEWTILESIZE ? 1 : 2], &rSrc, screen, &rDst);
+				SDL_BlitSurface(g_map->tilesetsurface[iBlockSize == TILESIZE ? 0 : iBlockSize == PREVIEWTILESIZE ? 1 : 2], &rSrc, screen, &rDst);
 			}
 		}
 	}
@@ -258,7 +258,7 @@ void drawmap(bool fScreenshot, short iBlockSize)
 	{
 		for(int i = 0; i < MAPWIDTH; i++)
 		{
-			Warp * warp = &g_map.warpdata[i][j];
+			Warp * warp = &g_map->warpdata[i][j];
 			
 			if(warp->connection != -1)
 			{
@@ -274,10 +274,10 @@ void drawmap(bool fScreenshot, short iBlockSize)
 
 void loadmap(char * szMapFile)
 {
-	g_map.loadMap(szMapFile, read_type_full);
+	g_map->loadMap(szMapFile, read_type_full);
 
 	char filename[128];
-	sprintf(filename, "gfx/packs/Classic/backgrounds/%s", g_map.szBackgroundFile);
+	sprintf(filename, "gfx/packs/Classic/backgrounds/%s", g_map->szBackgroundFile);
 	std::string path = convertPath(filename);
 	backgroundlist.SetCurrentName(filename);
 	
@@ -289,7 +289,7 @@ void loadmap(char * szMapFile)
 	
 	spr_background.init(path);
 
-	g_iNumPlatforms = g_map.iNumPlatforms;
+	g_iNumPlatforms = g_map->iNumPlatforms;
 
 	for(short iPlatform = 0; iPlatform < g_iNumPlatforms; iPlatform++)
 	{
@@ -297,9 +297,9 @@ void loadmap(char * szMapFile)
 		{
 			for(short iRow = 0; iRow < MAPHEIGHT; iRow++)
 			{
-				if(iCol < g_map.platforms[iPlatform]->iTileWidth && iRow < g_map.platforms[iPlatform]->iTileHeight)
+				if(iCol < g_map->platforms[iPlatform]->iTileWidth && iRow < g_map->platforms[iPlatform]->iTileHeight)
 				{
-					g_Platforms[iPlatform].tiles[iCol][iRow] = g_map.platforms[iPlatform]->iTileData[iCol][iRow];
+					g_Platforms[iPlatform].tiles[iCol][iRow] = g_map->platforms[iPlatform]->iTileData[iCol][iRow];
 				}
 				else
 				{
@@ -308,11 +308,11 @@ void loadmap(char * szMapFile)
 			}
 		}
 
-		g_Platforms[iPlatform].iVelocity = (int)(g_map.platforms[iPlatform]->pPath->fVelocity * 4.0f);
-		g_Platforms[iPlatform].iStartX = (int)(g_map.platforms[iPlatform]->pPath->fStartX - g_map.platforms[iPlatform]->iHalfWidth + 1) / TILESIZE;
-		g_Platforms[iPlatform].iStartY = (int)(g_map.platforms[iPlatform]->pPath->fStartY - g_map.platforms[iPlatform]->iHalfHeight + 1) / TILESIZE;
-		g_Platforms[iPlatform].iEndX = (int)(g_map.platforms[iPlatform]->pPath->fEndX - g_map.platforms[iPlatform]->iHalfWidth + 1) / TILESIZE;
-		g_Platforms[iPlatform].iEndY = (int)(g_map.platforms[iPlatform]->pPath->fEndY - g_map.platforms[iPlatform]->iHalfHeight + 1) / TILESIZE;
+		g_Platforms[iPlatform].iVelocity = (int)(g_map->platforms[iPlatform]->pPath->fVelocity * 4.0f);
+		g_Platforms[iPlatform].iStartX = (int)(g_map->platforms[iPlatform]->pPath->fStartX - g_map->platforms[iPlatform]->iHalfWidth + 1) / TILESIZE;
+		g_Platforms[iPlatform].iStartY = (int)(g_map->platforms[iPlatform]->pPath->fStartY - g_map->platforms[iPlatform]->iHalfHeight + 1) / TILESIZE;
+		g_Platforms[iPlatform].iEndX = (int)(g_map->platforms[iPlatform]->pPath->fEndX - g_map->platforms[iPlatform]->iHalfWidth + 1) / TILESIZE;
+		g_Platforms[iPlatform].iEndY = (int)(g_map->platforms[iPlatform]->pPath->fEndY - g_map->platforms[iPlatform]->iHalfHeight + 1) / TILESIZE;
 	}
 }
 
@@ -338,9 +338,9 @@ void takescreenshot()
 
 		for(short iPlatform = 0; iPlatform < g_iNumPlatforms; iPlatform++)
 		{
-			for(short iPlatformX = 0; iPlatformX < g_map.platforms[iPlatform]->iTileWidth; iPlatformX++)
+			for(short iPlatformX = 0; iPlatformX < g_map->platforms[iPlatform]->iTileWidth; iPlatformX++)
 			{
-				for(short iPlatformY = 0; iPlatformY < g_map.platforms[iPlatform]->iTileHeight; iPlatformY++)
+				for(short iPlatformY = 0; iPlatformY < g_map->platforms[iPlatform]->iTileHeight; iPlatformY++)
 				{
 					short iTile = g_Platforms[iPlatform].tiles[iPlatformX][iPlatformY];
 
@@ -352,7 +352,7 @@ void takescreenshot()
 						rDst.x = (g_Platforms[iPlatform].iStartX + iPlatformX) * iTileSize;
 						rDst.y = (g_Platforms[iPlatform].iStartY + iPlatformY) * iTileSize;
 
-						SDL_BlitSurface(g_map.tilesetsurface[iScreenshotSize], &rSrc, blitdest, &rDst);
+						SDL_BlitSurface(g_map->tilesetsurface[iScreenshotSize], &rSrc, blitdest, &rDst);
 					}
 				}
 			}
@@ -363,13 +363,13 @@ void takescreenshot()
 		{
 			if(g_Platforms[iPlatform].iStartX != g_Platforms[iPlatform].iEndX)
 			{
-				short iCenterOffsetY = (g_map.platforms[iPlatform]->iHeight >> 1) - 16;
+				short iCenterOffsetY = (g_map->platforms[iPlatform]->iHeight >> 1) - 16;
 				iCenterOffsetY >>= iScreenshotSize; //Resize for preview and thumbnails
 
 				bool fMoveToRight = g_Platforms[iPlatform].iStartX < g_Platforms[iPlatform].iEndX;
 
 				short iSpotLeft = (fMoveToRight ? g_Platforms[iPlatform].iStartX : g_Platforms[iPlatform].iEndX) + 1;
-				short iSpotRight = (fMoveToRight ? g_Platforms[iPlatform].iEndX : g_Platforms[iPlatform].iStartX) - 2 + g_map.platforms[iPlatform]->iTileWidth;
+				short iSpotRight = (fMoveToRight ? g_Platforms[iPlatform].iEndX : g_Platforms[iPlatform].iStartX) - 2 + g_map->platforms[iPlatform]->iTileWidth;
 
 				for(short iSpot = iSpotLeft; iSpot <= iSpotRight; iSpot++)
 					spr_platformarrows[iScreenshotSize].draw(iSpot * iTileSize, g_Platforms[iPlatform].iStartY * iTileSize + iCenterOffsetY, iTileSize * 5, 0, iTileSize, iTileSize);
@@ -379,13 +379,13 @@ void takescreenshot()
 			}
 			else
 			{
-				short iCenterOffsetX = (g_map.platforms[iPlatform]->iWidth >> 1) - 16;
+				short iCenterOffsetX = (g_map->platforms[iPlatform]->iWidth >> 1) - 16;
 				iCenterOffsetX >>= iScreenshotSize; //Resize for preview and thumbnails
 
 				bool fMoveUp = g_Platforms[iPlatform].iStartY < g_Platforms[iPlatform].iEndY;
 
 				short iSpotTop = (fMoveUp ? g_Platforms[iPlatform].iStartY : g_Platforms[iPlatform].iEndY) + 1;
-				short iSpotBottom = (fMoveUp ? g_Platforms[iPlatform].iEndY : g_Platforms[iPlatform].iStartY) - 2 + g_map.platforms[iPlatform]->iTileHeight;
+				short iSpotBottom = (fMoveUp ? g_Platforms[iPlatform].iEndY : g_Platforms[iPlatform].iStartY) - 2 + g_map->platforms[iPlatform]->iTileHeight;
 
 				for(short iSpot = iSpotTop; iSpot <= iSpotBottom; iSpot++)
 					spr_platformarrows[iScreenshotSize].draw(g_Platforms[iPlatform].iStartX * iTileSize + iCenterOffsetX, iSpot * iTileSize, iTileSize * 4, 0, iTileSize, iTileSize);

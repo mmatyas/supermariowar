@@ -407,7 +407,7 @@ void CPlayer::move()
 								viewBlock->timer = ((B_PowerupBlock*)block)->timer;
 							}
 
-							g_map.blockdata[block->col][block->row] = viewBlock;
+							g_map->blockdata[block->col][block->row] = viewBlock;
 							noncolcontainer.add(viewBlock);
 						}
 					}
@@ -1218,8 +1218,8 @@ void CPlayer::move()
 							else
 								txr = (ix + PW) / TILESIZE;
 
-							int lefttile = g_map.map(txl, ty);
-							int righttile = g_map.map(txr, ty);
+							int lefttile = g_map->map(txl, ty);
+							int righttile = g_map->map(txr, ty);
 
 							if(((lefttile & tile_flag_solid_on_top) && (righttile & tile_flag_solid_on_top || righttile == tile_flag_nonsolid || righttile == tile_flag_gap)) ||
 								((righttile & tile_flag_solid_on_top) && (lefttile & tile_flag_solid_on_top || lefttile == tile_flag_nonsolid || lefttile == tile_flag_gap)))
@@ -1528,7 +1528,7 @@ void CPlayer::move()
 					game_values.playskidsound = true;
 
 				//If rain candy is tyrned on
-				if((g_map.eyecandy[0] & 32 || g_map.eyecandy[1] & 32 || g_map.eyecandy[2] & 32) && velx > VELMOVINGADD && ++rainsteptimer > 7)
+				if((g_map->eyecandy[0] & 32 || g_map->eyecandy[1] & 32 || g_map->eyecandy[2] & 32) && velx > VELMOVINGADD && ++rainsteptimer > 7)
 				{
 					rainsteptimer = 0;
 					eyecandy[1].add(new EC_SingleAnimation(&spr_frictionsmoke, ix, iy + PH - 14, 5, 3, 0, 16, 16, 16));
@@ -1581,7 +1581,7 @@ void CPlayer::move()
 				else if(velx > 0.0f)
 					game_values.playskidsound = true;
 
-				if((g_map.eyecandy[0] & 32 || g_map.eyecandy[1] & 32 || g_map.eyecandy[2] & 32) && velx < -VELMOVINGADD && ++rainsteptimer > 7)
+				if((g_map->eyecandy[0] & 32 || g_map->eyecandy[1] & 32 || g_map->eyecandy[2] & 32) && velx < -VELMOVINGADD && ++rainsteptimer > 7)
 				{
 					rainsteptimer = 0;
 					eyecandy[1].add(new EC_SingleAnimation(&spr_frictionsmoke, ix, iy + PH - 14, 5, 3, 0, 16, 16, 16));
@@ -2067,7 +2067,7 @@ void CPlayer::decreasewarpcounter()
 
 void CPlayer::chooseWarpExit()
 {
-	WarpExit * exit = g_map.getRandomWarpExit(warpconnection, warpid);
+	WarpExit * exit = g_map->getRandomWarpExit(warpconnection, warpid);
 	xi(exit->x);
 	yi(exit->y);
 	fOldX = fx;
@@ -2091,7 +2091,7 @@ void CPlayer::chooseWarpExit()
 
 		if(iRow - 1 >= 0)
 		{
-			IO_Block * block = g_map.block(iCol, iRow - 1);
+			IO_Block * block = g_map->block(iCol, iRow - 1);
 			
 			if(block && !block->isTransparent() && !block->isHidden())
 				block->triggerBehavior();
@@ -2113,7 +2113,7 @@ void CPlayer::chooseWarpExit()
 		if(iCol + 1 >= 20)
 			iCol -= 20;
 		
-		IO_Block * block = g_map.block(iCol + 1, iRow);
+		IO_Block * block = g_map->block(iCol + 1, iRow);
 		
 		if(block && !block->isTransparent() && !block->isHidden())
 			block->triggerBehavior();
@@ -2134,7 +2134,7 @@ void CPlayer::chooseWarpExit()
 
 		if(iRow + 1 < 15)
 		{
-			IO_Block * block = g_map.block(iCol, iRow + 1);
+			IO_Block * block = g_map->block(iCol, iRow + 1);
 			
 			if(block && !block->isTransparent() && !block->isHidden())
 				block->triggerBehavior();
@@ -2156,7 +2156,7 @@ void CPlayer::chooseWarpExit()
 		if(iCol - 1 < 0)
 			iCol += 20;
 		
-		IO_Block * block = g_map.block(iCol - 1, iRow);
+		IO_Block * block = g_map->block(iCol - 1, iRow);
 		
 		if(block && !block->isTransparent() && !block->isHidden())
 			block->triggerBehavior();
@@ -2406,14 +2406,14 @@ void CPlayer::StripPowerups()
 bool CPlayer::FindSpawnPoint()
 {
 	//Spawn the player at his flagbase if it is CTF
-	//if(game_values.gamemode->gamemode == game_mode_ctf && teamID < g_map.iNumFlagBases)
+	//if(game_values.gamemode->gamemode == game_mode_ctf && teamID < g_map->iNumFlagBases)
 	//{
-	//	ix = g_map.flagbaselocations[teamID].x + 16 - HALFPW;
-	//	iy = g_map.flagbaselocations[teamID].y + 16 - HALFPH;
+	//	ix = g_map->flagbaselocations[teamID].x + 16 - HALFPW;
+	//	iy = g_map->flagbaselocations[teamID].y + 16 - HALFPH;
 	//}
 	//else
 	//{
-	bool fRet = g_map.findspawnpoint(teamID + 1, &ix, &iy, PW, PH, false);
+	bool fRet = g_map->findspawnpoint(teamID + 1, &ix, &iy, PW, PH, false);
 	//}
 
 	fx = (float)ix;
@@ -3613,7 +3613,7 @@ void CPlayer::collision_detection_map()
 	iVerticalPlatformCollision = -1;
 	iPlatformCollisionPlayerId = -1;
 
-	g_map.movingPlatformCollision(this);
+	g_map->movingPlatformCollision(this);
 
 	if(state != player_ready)
 		return;
@@ -3681,11 +3681,11 @@ void CPlayer::collision_detection_map()
 			else if(tx > 19)
 				tx -= 20;
 
-			IO_Block * topblock = g_map.block(tx, ty);
-			IO_Block * bottomblock = g_map.block(tx, ty2);
+			IO_Block * topblock = g_map->block(tx, ty);
+			IO_Block * bottomblock = g_map->block(tx, ty2);
 			
-			int toptile = g_map.map(tx, ty);
-			int bottomtile = g_map.map(tx, ty2);
+			int toptile = g_map->map(tx, ty);
+			int bottomtile = g_map->map(tx, ty2);
 
 			bool fDeathTileToLeft = ((toptile & tile_flag_death_on_left) && (bottomtile & tile_flag_death_on_left)) ||
 									 ((toptile & tile_flag_death_on_left) && !(bottomtile & tile_flag_solid)) ||
@@ -3699,10 +3699,10 @@ void CPlayer::collision_detection_map()
 			bool fBottomBlockSolid = bottomblock && !bottomblock->isTransparent() && !bottomblock->isHidden();
 
 			//first check to see if player hit a warp
-			if(playerKeys->game_right.fDown && !frozen && g_map.checkforwarp(tx, ty, ty2, 3))
+			if(playerKeys->game_right.fDown && !frozen && g_map->checkforwarp(tx, ty, ty2, 3))
 			{
 				xf((float)((tx << 5) - PW) - 0.2f);
-				enterwarp(g_map.warp(tx, ty2));
+				enterwarp(g_map->warp(tx, ty2));
 				warpplane = ix + PW + 1;
 
 				if(iy - PHOFFSET < (ty << 5))
@@ -3774,11 +3774,11 @@ void CPlayer::collision_detection_map()
 			else if(tx > 19)
 				tx -= 20;
 
-			IO_Block * topblock = g_map.block(tx, ty);
-			IO_Block * bottomblock = g_map.block(tx, ty2);
+			IO_Block * topblock = g_map->block(tx, ty);
+			IO_Block * bottomblock = g_map->block(tx, ty2);
 
-			int toptile = g_map.map(tx, ty);
-			int bottomtile = g_map.map(tx, ty2);
+			int toptile = g_map->map(tx, ty);
+			int bottomtile = g_map->map(tx, ty2);
 
 			bool fDeathTileToRight = ((toptile & tile_flag_death_on_right) && (bottomtile & tile_flag_death_on_right)) ||
 									 ((toptile & tile_flag_death_on_right) && !(bottomtile & tile_flag_solid)) ||
@@ -3792,10 +3792,10 @@ void CPlayer::collision_detection_map()
 			bool fBottomBlockSolid = bottomblock && !bottomblock->isTransparent() && !bottomblock->isHidden();
 
 			//first check to see if player hit a warp
-			if(playerKeys->game_left.fDown && !frozen && g_map.checkforwarp(tx, ty, ty2, 1))
+			if(playerKeys->game_left.fDown && !frozen && g_map->checkforwarp(tx, ty, ty2, 1))
 			{
 				xf((float)((tx << 5) + TILESIZE) + 0.2f);
-				enterwarp(g_map.warp(tx, ty2));
+				enterwarp(g_map->warp(tx, ty2));
 				warpplane = ix;
 
 				if(iy - PHOFFSET < (ty << 5))
@@ -3912,14 +3912,14 @@ void CPlayer::collision_detection_map()
 
 		ty = (short)(fPrecalculatedY) / TILESIZE;
 
-		IO_Block * leftblock = g_map.block(txl, ty);
-		IO_Block * centerblock = g_map.block(txc, ty);
-		IO_Block * rightblock = g_map.block(txr, ty);
+		IO_Block * leftblock = g_map->block(txl, ty);
+		IO_Block * centerblock = g_map->block(txc, ty);
+		IO_Block * rightblock = g_map->block(txr, ty);
 		
-		if(playerKeys->game_jump.fDown && !frozen && g_map.checkforwarp(alignedBlockX, unAlignedBlockX, ty, 2))
+		if(playerKeys->game_jump.fDown && !frozen && g_map->checkforwarp(alignedBlockX, unAlignedBlockX, ty, 2))
 		{
 			yf((float)((ty << 5) + TILESIZE) + 0.2f);
-			enterwarp(g_map.warp(unAlignedBlockX, ty));
+			enterwarp(g_map->warp(unAlignedBlockX, ty));
 			warpplane = iy;
 
 			if(ix - PWOFFSET < (txl << 5) + 1)
@@ -3949,7 +3949,7 @@ void CPlayer::collision_detection_map()
 		//the player will then shift over and fully hit the super death on bottom and die even if shielded
 		//or invincible.
 
-		int alignedTileType = g_map.map(alignedBlockX, ty);
+		int alignedTileType = g_map->map(alignedBlockX, ty);
 		if((alignedTileType & tile_flag_solid) && !(alignedTileType & tile_flag_super_or_player_death_bottom) &&
 			(!(alignedTileType & tile_flag_death_on_bottom) || invincible || shield > 0 || shyguy))
 		{
@@ -3993,7 +3993,7 @@ void CPlayer::collision_detection_map()
 
 		//Player squeezed around the block, ice or death on top
 		//or if the player is invincible and hits death or death on bottom
-		int unalignedTileType = g_map.map(unAlignedBlockX, ty);
+		int unalignedTileType = g_map->map(unAlignedBlockX, ty);
 		if((unalignedTileType & tile_flag_solid) && !(unalignedTileType & tile_flag_super_or_player_death_bottom) && 
 			(!(unalignedTileType & tile_flag_death_on_bottom) || invincible || shield > 0 || shyguy))
 		{
@@ -4028,10 +4028,10 @@ void CPlayer::collision_detection_map()
 	{	//moving down / on ground
 		ty = ((short)fPrecalculatedY + PH) / TILESIZE;
 		
-		if(playerKeys->game_down.fDown && !frozen && g_map.checkforwarp(txl, txr, ty, 0))
+		if(playerKeys->game_down.fDown && !frozen && g_map->checkforwarp(txl, txr, ty, 0))
 		{
 			yf((float)((ty << 5) - PH) - 0.2f);
-			enterwarp(g_map.warp(txr,ty));
+			enterwarp(g_map->warp(txr,ty));
 			warpplane = iy + PH + 1;
 
 			fallthrough = false;
@@ -4045,8 +4045,8 @@ void CPlayer::collision_detection_map()
 			return;
 		}
 		
-		IO_Block * leftblock = g_map.block(txl, ty);
-		IO_Block * rightblock = g_map.block(txr, ty);
+		IO_Block * leftblock = g_map->block(txl, ty);
+		IO_Block * rightblock = g_map->block(txr, ty);
 
 		bool fLeftBlockSolid = leftblock && !leftblock->isTransparent() && !leftblock->isHidden();
 		bool fRightBlockSolid = rightblock && !rightblock->isTransparent() && !rightblock->isHidden();
@@ -4084,8 +4084,8 @@ void CPlayer::collision_detection_map()
 			}
 		}
 		
-		int lefttile = g_map.map(txl, ty);
-		int righttile = g_map.map(txr, ty);
+		int lefttile = g_map->map(txl, ty);
+		int righttile = g_map->map(txr, ty);
 
 		bool fGapSupport = (velx >= VELTURBOMOVING || velx <= -VELTURBOMOVING) && (lefttile == tile_flag_gap || righttile == tile_flag_gap);
 		
@@ -4115,9 +4115,9 @@ void CPlayer::collision_detection_map()
 
 				if(!platform)
 				{
-					int alignedtile = g_map.map(alignedBlockX, ty);
+					int alignedtile = g_map->map(alignedBlockX, ty);
 
-					if(alignedtile & tile_flag_ice || ((alignedtile == tile_flag_nonsolid || alignedtile == tile_flag_gap) && g_map.map(unAlignedBlockX, ty) & tile_flag_ice))
+					if(alignedtile & tile_flag_ice || ((alignedtile == tile_flag_nonsolid || alignedtile == tile_flag_gap) && g_map->map(unAlignedBlockX, ty) & tile_flag_ice))
 						onice = true;
 					else 
 						onice = false;
@@ -4158,9 +4158,9 @@ void CPlayer::collision_detection_map()
 
 			if(!platform)
 			{
-				int alignedtile = g_map.map(alignedBlockX, ty);
+				int alignedtile = g_map->map(alignedBlockX, ty);
 
-				if(alignedtile & tile_flag_ice || ((alignedtile == tile_flag_nonsolid || alignedtile == tile_flag_gap) && g_map.map(unAlignedBlockX, ty) & tile_flag_ice))
+				if(alignedtile & tile_flag_ice || ((alignedtile == tile_flag_nonsolid || alignedtile == tile_flag_gap) && g_map->map(unAlignedBlockX, ty) & tile_flag_ice))
 					onice = true;
 				else 
 					onice = false;
@@ -4256,10 +4256,10 @@ bool CPlayer::collision_detection_checktop()
 	if(txr < 0 || txr >= MAPWIDTH)
 		return false;
 	
-	int leftTile = g_map.map(txl, ty);
-	int rightTile = g_map.map(txr, ty);
-	IO_Block * leftBlock = g_map.block(txl, ty);
-	IO_Block * rightBlock = g_map.block(txr, ty);
+	int leftTile = g_map->map(txl, ty);
+	int rightTile = g_map->map(txr, ty);
+	IO_Block * leftBlock = g_map->block(txl, ty);
+	IO_Block * rightBlock = g_map->block(txr, ty);
 
 	if((leftTile & tile_flag_solid) || (rightTile & tile_flag_solid) || 
 		(leftBlock && !leftBlock->isTransparent() && !leftBlock->isHidden()) || 
@@ -4292,10 +4292,10 @@ bool CPlayer::collision_detection_checkleft()
 	if(tx < 0 || tx >= MAPWIDTH)
 		return false;
 
-	int topTile = g_map.map(tx, ty);
-	int bottomTile = g_map.map(tx, ty2);
-	IO_Block * topBlock = g_map.block(tx, ty);
-	IO_Block * bottomBlock = g_map.block(tx, ty2);
+	int topTile = g_map->map(tx, ty);
+	int bottomTile = g_map->map(tx, ty2);
+	IO_Block * topBlock = g_map->block(tx, ty);
+	IO_Block * bottomBlock = g_map->block(tx, ty2);
 
 	if((topTile & tile_flag_solid) || (bottomTile & tile_flag_solid) ||
 		(topBlock && !topBlock->isTransparent() && !topBlock->isHidden()) || 
@@ -4334,10 +4334,10 @@ bool CPlayer::collision_detection_checkright()
 	if(tx < 0 || tx >= MAPWIDTH)
 		return false;
 
-	int topTile = g_map.map(tx, ty);
-	int bottomTile = g_map.map(tx, ty2);
-	IO_Block * topBlock = g_map.block(tx, ty);
-	IO_Block * bottomBlock = g_map.block(tx, ty2);
+	int topTile = g_map->map(tx, ty);
+	int bottomTile = g_map->map(tx, ty2);
+	IO_Block * topBlock = g_map->block(tx, ty);
+	IO_Block * bottomBlock = g_map->block(tx, ty2);
 
 	if((topTile & tile_flag_solid) || (bottomTile & tile_flag_solid) ||
 		(topBlock && !topBlock->isTransparent() && !topBlock->isHidden()) || 
@@ -4373,9 +4373,9 @@ void CPlayer::collision_detection_checksides()
 		{
 			if(txl >= 0 && txl < MAPWIDTH)
 			{
-				IO_Block * block = g_map.block(txl, ty);
+				IO_Block * block = g_map->block(txl, ty);
 
-				if((block && !block->isTransparent() && !block->isHidden()) || (g_map.map(txl, ty) & tile_flag_solid))
+				if((block && !block->isTransparent() && !block->isHidden()) || (g_map->map(txl, ty) & tile_flag_solid))
 				{
 					iCase |= 0x01;
 				}
@@ -4383,9 +4383,9 @@ void CPlayer::collision_detection_checksides()
 
 			if(txr >= 0 && txr < MAPWIDTH)
 			{
-				IO_Block * block = g_map.block(txr, ty);
+				IO_Block * block = g_map->block(txr, ty);
 
-				if((block && !block->isTransparent() && !block->isHidden()) || (g_map.map(txr, ty) & tile_flag_solid))
+				if((block && !block->isTransparent() && !block->isHidden()) || (g_map->map(txr, ty) & tile_flag_solid))
 				{
 					iCase |= 0x02;
 				}
@@ -4400,9 +4400,9 @@ void CPlayer::collision_detection_checksides()
 		{
 			if(txl >= 0 && txl < MAPWIDTH)
 			{
-				IO_Block * block = g_map.block(txl, ty2);
+				IO_Block * block = g_map->block(txl, ty2);
 
-				if((block && !block->isTransparent() && !block->isHidden()) || (g_map.map(txl, ty2) & tile_flag_solid))
+				if((block && !block->isTransparent() && !block->isHidden()) || (g_map->map(txl, ty2) & tile_flag_solid))
 				{
 					iCase |= 0x04;
 				}
@@ -4410,9 +4410,9 @@ void CPlayer::collision_detection_checksides()
 
 			if(txr >= 0 && txr < MAPWIDTH)
 			{
-				IO_Block * block = g_map.block(txr, ty2);
+				IO_Block * block = g_map->block(txr, ty2);
 
-				if((block && !block->isTransparent() && !block->isHidden()) || (g_map.map(txr, ty2) & tile_flag_solid))
+				if((block && !block->isTransparent() && !block->isHidden()) || (g_map->map(txr, ty2) & tile_flag_solid))
 				{
 					iCase |= 0x08;
 				}
@@ -4662,11 +4662,11 @@ void CPlayer::enterwarp(Warp * warp)
 	if(game_values.warplocktime > 0)
 	{
 		if(game_values.warplockstyle == 0 || game_values.warplockstyle == 2) //Lock the entrance
-			g_map.warpexits[warp->id].locktimer = game_values.warplocktime;
+			g_map->warpexits[warp->id].locktimer = game_values.warplocktime;
 		else if(game_values.warplockstyle == 3) //Lock the connection
-			g_map.lockconnection(warpconnection);
+			g_map->lockconnection(warpconnection);
 		else if(game_values.warplockstyle == 4) //Lock all warps
-			g_map.lockconnection(-1);
+			g_map->lockconnection(-1);
 	}
 
 	ifsoundonplay(sfx_pipe);

@@ -56,18 +56,18 @@ Accessing The Map
 There are some things that will probably be useful when creating your own AI that the current code doesn't use.
 First is the map tiles.  This will tell you what tiles are in the map to help you write path finding.  Use:
 
-int tile = g_map.map(column, row); 
+int tile = g_map->map(column, row); 
 
 to get the tile at that column and row.  There are 20 columns and 15 rows.  To convert object position to map
 col and row, use:
 
-int tile = g_map.map(object->x / TILESIZE, object->y / TILESIZE); 
+int tile = g_map->map(object->x / TILESIZE, object->y / TILESIZE); 
 
 The int returned is an bit flag int of all the attributes of tiles like solid, solid-on-top, death on various sides, ice, etc.
 
 Second is the interaction blocks in the map.  You might want to know where a [?] block is so you can go hit it.
 
-short blocktype = g_map.blockat(col, row)->iType;
+short blocktype = g_map->blockat(col, row)->iType;
 
 blocktype will now be set to the type id for the block in that column and row.  If it is set to -1, then
 there is no interaction block in that space.
@@ -87,9 +87,9 @@ in a [?] that has been used and won't give you a powerup.
 
 To get this information, we use:
 
-if(g_map.blockat(col, row)->iType == 1)
+if(g_map->blockat(col, row)->iType == 1)
 {
-	B_PowerupBlock * block = (B_PowerupBlock*) g_map.block(col, row);
+	B_PowerupBlock * block = (B_PowerupBlock*) g_map->block(col, row);
 	if(block->GetState() == 0)
 	{
 		//Contains powerup and ready to be hit
@@ -98,9 +98,9 @@ if(g_map.blockat(col, row)->iType == 1)
 
 Flip blocks and On/Off Blocks have a solid state and a fall through state.  To get this information, use:
 
-if(g_map.blockat(col, row)->iType == 3)
+if(g_map->blockat(col, row)->iType == 3)
 {
-	B_FlipBlock * block = (B_FlipBlock*) g_map.block(col, row);
+	B_FlipBlock * block = (B_FlipBlock*) g_map->block(col, row);
 	if(block->isTransparent())
 	{
 		//Flip block is spinning and player will fall through
@@ -336,6 +336,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 	}
 
 	//Expire attention objects
+//	std::vector<AttentionObject*> toDelete();
 	std::map<int, AttentionObject*>::iterator itr = attentionObjects.begin(), lim = attentionObjects.end();
 	while(itr != lim)
 	{
@@ -344,7 +345,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 			if(--(itr->second->iTimer) == 0)
 			{
 				delete itr->second;
-
+			
 				attentionObjects.erase(itr++);
 				lim = attentionObjects.end();
 			}
@@ -399,8 +400,8 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 	* 3. Deal with closest item
 	***************************************************/
 	//return if no players, goals, or threats available
-	if((actionType != 0 || nearestObjects.player) && (actionType != 1 || nearestObjects.goal) && (actionType != 2 || nearestObjects.threat) && 
-		(actionType != 3 || nearestObjects.teammate) && (actionType != 4 || nearestObjects.stomp) && iFallDanger == 0)
+	if(((actionType != 0) || nearestObjects.player) && (actionType != 1 || nearestObjects.goal) && ((actionType != 2) || nearestObjects.threat) && 
+		((actionType != 3) || nearestObjects.teammate) && ((actionType != 4) || nearestObjects.stomp) && (iFallDanger == 0))
 	{
 		//Use turbo
 		if(pPlayer->bobomb)
@@ -417,8 +418,8 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 			{
 				//Hold important mode goal objects (we'll drop the star later if it is a bad star)
 				MovingObjectType carriedobjecttype = carriedItem->getMovingObjectType();
-				if(carriedobjecttype == movingobject_egg || carriedobjecttype == movingobject_flag ||
-					carriedobjecttype == movingobject_star || carriedobjecttype == movingobject_phantokey)
+				if((carriedobjecttype == movingobject_egg) || (carriedobjecttype == movingobject_flag) ||
+					(carriedobjecttype == movingobject_star) || (carriedobjecttype == movingobject_phantokey))
 				{
 					playerKeys->game_turbo.fDown = true;
 				}
@@ -459,7 +460,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 						{
 							//And we are facing toward that player, throw the star
 							if((player->ix > ix && pPlayer->IsPlayerFacingRight()) ||
-								player->ix < ix && !pPlayer->IsPlayerFacingRight())
+								(player->ix < ix) && !pPlayer->IsPlayerFacingRight())
 							{
 								pPlayer->throw_star = 30;
 								playerKeys->game_turbo.fDown = false;
@@ -802,8 +803,8 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 	//short depth = -1;
 	while(iDeathY < MAPHEIGHT)
 	{
-		int ttLeftTile = g_map.map(iDeathX1, iDeathY);
-		int ttRightTile = g_map.map(iDeathX2, iDeathY);
+		int ttLeftTile = g_map->map(iDeathX1, iDeathY);
+		int ttRightTile = g_map->map(iDeathX2, iDeathY);
 
 		bool fDeathTileUnderPlayer = ((ttLeftTile & tile_flag_death_on_top) && (ttRightTile & tile_flag_death_on_top)) ||
 									 ((ttLeftTile & tile_flag_death_on_top) && !(ttRightTile & tile_flag_solid)) ||
@@ -816,8 +817,8 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 
 			goto ExitDeathCheck;
 		}
-		else if((ttLeftTile & tile_flag_solid) || (ttLeftTile & tile_flag_solid_on_top) || g_map.block(iDeathX1, iDeathY) ||
-			(ttRightTile & tile_flag_solid) && (ttRightTile & tile_flag_solid_on_top) || g_map.block(iDeathX2, iDeathY))
+		else if((ttLeftTile & tile_flag_solid) || (ttLeftTile & tile_flag_solid_on_top) || g_map->block(iDeathX1, iDeathY) ||
+			(ttRightTile & tile_flag_solid) && (ttRightTile & tile_flag_solid_on_top) || g_map->block(iDeathX2, iDeathY))
 		{
 			iFallDanger = 0;
 			goto ExitDeathCheck;
@@ -825,10 +826,10 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 		
 
 		//Look through all platforms and see if we are hitting solid or death tiles in them
-		for(short iPlatform = 0; iPlatform < g_map.iNumPlatforms; iPlatform++)
+		for(short iPlatform = 0; iPlatform < g_map->iNumPlatforms; iPlatform++)
 		{
-			int lefttile = g_map.platforms[iPlatform]->GetTileTypeFromCoord(ix, iDeathY << 5);
-			int righttile = g_map.platforms[iPlatform]->GetTileTypeFromCoord(ix + PW, iDeathY << 5);
+			int lefttile = g_map->platforms[iPlatform]->GetTileTypeFromCoord(ix, iDeathY << 5);
+			int righttile = g_map->platforms[iPlatform]->GetTileTypeFromCoord(ix + PW, iDeathY << 5);
 
 			bool fDeathTileUnderPlayer = ((lefttile & tile_flag_death_on_top) && (righttile & tile_flag_death_on_top)) ||
 									 ((lefttile & tile_flag_death_on_top) && !(righttile & tile_flag_solid)) ||
@@ -882,12 +883,12 @@ ExitDeathCheck:
 	short heightlimit = 3;
 	while(iDeathY >= 0 && heightlimit > 0)
 	{
-		int ttLeftTile = g_map.map(iDeathX1, iDeathY);
-		int ttRightTile = g_map.map(iDeathX2, iDeathY);
+		int ttLeftTile = g_map->map(iDeathX1, iDeathY);
+		int ttRightTile = g_map->map(iDeathX2, iDeathY);
 
 		if((ttLeftTile & tile_flag_solid && (ttLeftTile & tile_flag_death_on_bottom) == 0) ||
 			(ttRightTile & tile_flag_solid && (ttRightTile & tile_flag_death_on_bottom) == 0) ||
-			g_map.block(iDeathX1, iDeathY) || g_map.block(iDeathX2, iDeathY))
+			g_map->block(iDeathX1, iDeathY) || g_map->block(iDeathX2, iDeathY))
 		{
 			break;
 		}
@@ -1079,7 +1080,7 @@ void CPlayerAI::GetNearestObjects()
 
 					if(iNumHeldCards == 3)
 					{
-						int iThreeHeldCards = iHeldCards && 63;
+						int iThreeHeldCards = iHeldCards & 63;
 
 						//If bot is holding all of the same type of card, then ignore all other cards
 						if(iThreeHeldCards == 42 || iThreeHeldCards == 21 || iThreeHeldCards == 0)
@@ -1088,7 +1089,7 @@ void CPlayerAI::GetNearestObjects()
 							break;
 						}
 
-						int iTwoHeldCards = iHeldCards && 15;
+						int iTwoHeldCards = iHeldCards & 15;
 						if(iTwoHeldCards == 10 || iTwoHeldCards == 5 || iTwoHeldCards == 0)
 						{
 							DistanceToObject(movingobject, &nearestObjects.goal, &nearestObjects.goaldistance, &nearestObjects.goalwrap);				
@@ -1101,7 +1102,7 @@ void CPlayerAI::GetNearestObjects()
 
 						if(iNumHeldCards == 2)
 						{
-							int iTwoHeldCards = iHeldCards && 15;
+							int iTwoHeldCards = iHeldCards & 15;
 						
 							if(iTwoHeldCards == 10 || iTwoHeldCards == 5 || iTwoHeldCards == 0)
 							{
@@ -1115,7 +1116,7 @@ void CPlayerAI::GetNearestObjects()
 						}
 						else if(iNumHeldCards == 1)
 						{
-							int iHeldCard = iHeldCards && 3;
+							int iHeldCard = iHeldCards & 3;
 							int iCardValue = card->getValue();
 							if(card->getType() == 1 || iHeldCard != iCardValue)
 							{

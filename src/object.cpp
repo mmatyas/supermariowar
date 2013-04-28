@@ -80,8 +80,8 @@ void CObject::GetCollisionBlocks(IO_Block * blocks[4])
 	{
 		short yt = iy / TILESIZE;
 
-		blocks[0] = g_map.block(xl, yt);
-		blocks[1] = g_map.block(xr, yt);
+		blocks[0] = g_map->block(xl, yt);
+		blocks[1] = g_map->block(xr, yt);
 	}
 
 	blocks[2] = NULL;
@@ -91,8 +91,8 @@ void CObject::GetCollisionBlocks(IO_Block * blocks[4])
 	{
 		short yb = (iy + ih) / TILESIZE;
 
-		blocks[2] = g_map.block(xl, yb);
-		blocks[3] = g_map.block(xr, yb);
+		blocks[2] = g_map->block(xl, yb);
+		blocks[3] = g_map->block(xr, yb);
 	}
 }
 
@@ -262,7 +262,7 @@ void IO_MovingObject::collision_detection_map()
 	iHorizontalPlatformCollision = -1;
 	iVerticalPlatformCollision = -1;
 
-	g_map.movingPlatformCollision(this);
+	g_map->movingPlatformCollision(this);
 
 	fy = fTempY;
 
@@ -308,8 +308,8 @@ void IO_MovingObject::collision_detection_map()
 			else
                 tx = ((short)fx + collisionWidth) / TILESIZE;
 
-			IO_Block * topblock = g_map.block(tx, ty);
-			IO_Block * bottomblock = g_map.block(tx, ty2);
+			IO_Block * topblock = g_map->block(tx, ty);
+			IO_Block * bottomblock = g_map->block(tx, ty2);
 
 			bool fTopBlockSolid = topblock && !topblock->isTransparent() && !topblock->isHidden();
 			bool fBottomBlockSolid = bottomblock && !bottomblock->isTransparent() && !bottomblock->isHidden();
@@ -348,7 +348,7 @@ void IO_MovingObject::collision_detection_map()
 					SideBounce(true);
 				}
 			}
-			else if((g_map.map(tx, ty) & tile_flag_solid) || (g_map.map(tx, ty2) & tile_flag_solid))
+			else if((g_map->map(tx, ty) & tile_flag_solid) || (g_map->map(tx, ty2) & tile_flag_solid))
 			{	//collision on the right side.
 
 				if(iHorizontalPlatformCollision == 3)
@@ -377,8 +377,8 @@ void IO_MovingObject::collision_detection_map()
 			if(tx < 0)
 				tx = 0;
 
-			IO_Block * topblock = g_map.block(tx, ty);
-			IO_Block * bottomblock = g_map.block(tx, ty2);
+			IO_Block * topblock = g_map->block(tx, ty);
+			IO_Block * bottomblock = g_map->block(tx, ty2);
 
 			bool fTopBlockSolid = topblock && !topblock->isTransparent() && !topblock->isHidden();
 			bool fBottomBlockSolid = bottomblock && !bottomblock->isTransparent() && !bottomblock->isHidden();
@@ -417,7 +417,7 @@ void IO_MovingObject::collision_detection_map()
 					SideBounce(false);
 				}
 			}
-			else if((g_map.map(tx, ty) & tile_flag_solid) || (g_map.map(tx, ty2) & tile_flag_solid))
+			else if((g_map->map(tx, ty) & tile_flag_solid) || (g_map->map(tx, ty2) & tile_flag_solid))
 			{
 				if(iHorizontalPlatformCollision == 1)
 				{
@@ -460,8 +460,8 @@ void IO_MovingObject::collision_detection_map()
 	{
 		ty = (short)(fPrecalculatedY) / TILESIZE;
 
-		IO_Block * leftblock = g_map.block(txl, ty);
-		IO_Block * rightblock = g_map.block(txr, ty);
+		IO_Block * leftblock = g_map->block(txl, ty);
+		IO_Block * rightblock = g_map->block(txr, ty);
 		
 		if(leftblock && !leftblock->isTransparent() && !leftblock->isHidden()) //then left
 		{	
@@ -481,7 +481,7 @@ void IO_MovingObject::collision_detection_map()
 			return;
 		}
 
-		if((g_map.map(txl, ty) & tile_flag_solid) || (g_map.map(txr, ty) & tile_flag_solid))
+		if((g_map->map(txl, ty) & tile_flag_solid) || (g_map->map(txr, ty) & tile_flag_solid))
 		{
 			if(iVerticalPlatformCollision == 2)
 				KillObjectMapHazard();
@@ -508,8 +508,8 @@ void IO_MovingObject::collision_detection_map()
 	{	//moving down / on ground
 		ty = ((short)fPrecalculatedY + collisionHeight) / TILESIZE;
 
-		IO_Block * leftblock = g_map.block(txl, ty);
-		IO_Block * rightblock = g_map.block(txr, ty);
+		IO_Block * leftblock = g_map->block(txl, ty);
+		IO_Block * rightblock = g_map->block(txr, ty);
 
 		bool fLeftBlockSolid = leftblock && !leftblock->isTransparent() && !leftblock->isHidden();
 		bool fRightBlockSolid = rightblock && !rightblock->isTransparent() && !rightblock->isHidden();
@@ -545,8 +545,8 @@ void IO_MovingObject::collision_detection_map()
 			return;
 		}
 
-		int leftTile = g_map.map(txl, ty);
-		int rightTile = g_map.map(txr, ty);
+		int leftTile = g_map->map(txl, ty);
+		int rightTile = g_map->map(txr, ty);
 
 		if((leftTile & tile_flag_solid_on_top) || (rightTile & tile_flag_solid_on_top))
 		{
@@ -643,9 +643,9 @@ bool IO_MovingObject::collision_detection_checksides()
 		{
 			if(txl >= 0 && txl < MAPWIDTH)
 			{
-				IO_Block * block = g_map.block(txl, ty);
+				IO_Block * block = g_map->block(txl, ty);
 
-				if((block && !block->isTransparent() && !block->isHidden()) || (g_map.map(txl, ty) & tile_flag_solid) > 0)
+				if((block && !block->isTransparent() && !block->isHidden()) || (g_map->map(txl, ty) & tile_flag_solid) > 0)
 				{
 					iCase |= 0x01;
 				}
@@ -653,9 +653,9 @@ bool IO_MovingObject::collision_detection_checksides()
 
 			if(txr >= 0 && txr < MAPWIDTH)
 			{
-				IO_Block * block = g_map.block(txr, ty);
+				IO_Block * block = g_map->block(txr, ty);
 
-				if((block && !block->isTransparent() && !block->isHidden()) || (g_map.map(txr, ty) & tile_flag_solid) > 0)
+				if((block && !block->isTransparent() && !block->isHidden()) || (g_map->map(txr, ty) & tile_flag_solid) > 0)
 				{
 					iCase |= 0x02;
 				}
@@ -669,9 +669,9 @@ bool IO_MovingObject::collision_detection_checksides()
 		{
 			if(txl >= 0 && txl < MAPWIDTH)
 			{
-				IO_Block * block = g_map.block(txl, ty2);
+				IO_Block * block = g_map->block(txl, ty2);
 
-				if((block && !block->isTransparent() && !block->isHidden()) || (g_map.map(txl, ty2) & tile_flag_solid) > 0)
+				if((block && !block->isTransparent() && !block->isHidden()) || (g_map->map(txl, ty2) & tile_flag_solid) > 0)
 				{
 					iCase |= 0x04;
 				}
@@ -679,9 +679,9 @@ bool IO_MovingObject::collision_detection_checksides()
 
 			if(txr >= 0 && txr < MAPWIDTH)
 			{
-				IO_Block * block = g_map.block(txr, ty2);
+				IO_Block * block = g_map->block(txr, ty2);
 
-				if((block && !block->isTransparent() && !block->isHidden()) || (g_map.map(txr, ty2) & tile_flag_solid) > 0)
+				if((block && !block->isTransparent() && !block->isHidden()) || (g_map->map(txr, ty2) & tile_flag_solid) > 0)
 				{
 					iCase |= 0x08;
 				}
@@ -723,7 +723,9 @@ bool IO_MovingObject::collision_detection_checksides()
 		{
 			if(ix + (collisionWidth >> 1) < (nofliptxr << 5))
 			{
-				xf((float)((nofliptxr << TILESIZE) - collisionWidth) - 0.2f);
+				int tmpnofliptxr = nofliptxr;
+				
+				xf((float)((tmpnofliptxr << TILESIZE) - collisionWidth) - 0.2f);
 				flipsidesifneeded();
 			}
 			else
@@ -903,7 +905,7 @@ bool IO_MovingObject::collision_detection_checksides()
 	fPrecalculatedY = fy;
 
 	//Check moving platforms and make sure this object is not inside one
-	fRet |= g_map.movingPlatformCheckSides(this);
+	fRet |= g_map->movingPlatformCheckSides(this);
 
 	return fRet;
 }

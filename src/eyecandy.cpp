@@ -398,7 +398,7 @@ void EC_Corpse::update()
 		{
 			short ty = nexty / TILESIZE;
 			
-			if(g_map.map(tx, ty) == tile_solid_on_top || g_map.map(tx2, ty) == tile_solid_on_top)
+			if(g_map->map(tx, ty) == tile_solid_on_top || g_map->map(tx2, ty) == tile_solid_on_top)
 			{	//on ground on tile solid_on_top
 				if((dy + 32.0f - vely) / TILESIZE < ty)
 				{	//only if we were above the tile in the previous frame
@@ -410,10 +410,10 @@ void EC_Corpse::update()
 				}
 			}
 
-			IO_Block * leftblock = g_map.block(tx, ty);
-			IO_Block * rightblock = g_map.block(tx2, ty);
+			IO_Block * leftblock = g_map->block(tx, ty);
+			IO_Block * rightblock = g_map->block(tx2, ty);
 
-			if((g_map.map(tx, ty) & 0x13) > 0 || (g_map.map(tx2, ty) & 0x13) > 0 ||
+			if((g_map->map(tx, ty) & 0x13) > 0 || (g_map->map(tx2, ty) & 0x13) > 0 ||
 				(leftblock && !leftblock->isTransparent() && !leftblock->isHidden()) || (rightblock && !rightblock->isTransparent() && !rightblock->isHidden()))
 			{	//on ground
 				dy = (float) ((ty << 5)  - TILESIZE);

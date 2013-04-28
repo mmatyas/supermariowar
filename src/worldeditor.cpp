@@ -130,7 +130,7 @@ gfxSprite		spr_unknowntile[3];
 //// Global stuff that the map editor doesn't need, but has references to
 GraphicsList menugraphicspacklist;
 GraphicsList gamegraphicspacklist;
-FiltersList filterslist;
+FiltersList *filterslist;
 gfxSprite		spr_warplock;
 short			x_shake = 0;
 short			y_shake = 0;
@@ -182,9 +182,9 @@ SkinList		skinlist;
 gfxSprite		**spr_player[4];
 CGameMode		*gamemodes[GAMEMODE_LAST];
 bool			fResumeMusic;
-MapList			maplist(true);
-CMap			g_map;
-CTilesetManager g_tilesetmanager;
+MapList			*maplist;
+CMap			*g_map;
+CTilesetManager *g_tilesetmanager;
 
 gfxSprite		spr_hazard_fireball[3];
 gfxSprite		spr_hazard_rotodisc[3];
@@ -399,6 +399,18 @@ void SetStageMode(short iIndex, const char * szModeName, const char * szGoalName
 //main main main
 int main(int argc, char *argv[])
 {
+	if (argc < 2) {
+		fprintf(stderr, "Please specify root data directory\n");
+		return -1;
+	}
+	
+	RootDataDirectory = argv[1];
+	
+	g_map = new CMap();
+	g_tilesetmanager = new CTilesetManager();
+	filterslist = new FiltersList();
+	maplist = new MapList(false);
+
 	game_values.sound = false;
 	game_values.music = false;
 
@@ -426,7 +438,7 @@ int main(int argc, char *argv[])
 
 	gfx_init(640,480, g_fFullScreen);
 	blitdest = screen;
-	g_tilesetmanager.Init(convertPath("gfx/Classic/tilesets").c_str());
+	g_tilesetmanager->Init(convertPath("gfx/Classic/tilesets").c_str());
 
 	SDL_WM_SetCaption(MAPTITLESTRING, "worldeditor.ico");
 
@@ -3982,10 +3994,10 @@ void DisplayStageDetails(bool fForce, short iStageId, short iMouseX, short iMous
 					sMapThumbnail = NULL;
 				}
 
-				if(maplist.findexact(pszMapName, false))
+				if(maplist->findexact(pszMapName, false))
 				{
-					g_map.loadMap(maplist.currentFilename(), read_type_preview);
-					sMapThumbnail = g_map.createThumbnailSurface(true);
+					g_map->loadMap(maplist->currentFilename(), read_type_preview);
+					sMapThumbnail = g_map->createThumbnailSurface(true);
 				}
 				else  //otherwise show a unknown map icon
 				{
@@ -4249,7 +4261,7 @@ void EditStage(short iEditStage)
 	miFinalStageField->SetData(NULL, NULL, &ts->fEndStage);
 
 	if(!ts->pszMapFile)
-		ts->pszMapFile = maplist.currentShortmapname();
+		ts->pszMapFile = maplist->currentShortmapname();
 
 	miMapField->SetMap(ts->pszMapFile, false);
 
@@ -4370,7 +4382,7 @@ void NewStage(short * iEditStage)
 	ts->szBonusText[3][0] = 0;
 	ts->szBonusText[4][0] = 0;
 
-	ts->pszMapFile = maplist.currentShortmapname();
+	ts->pszMapFile = maplist->currentShortmapname();
 	ts->iMode = 0;
 
 	ts->fUseSettings = true;
@@ -4619,7 +4631,7 @@ int editor_stage()
 
 					if(iEditStage == -1)
 					{
-						if(event.button.x >= 0 && event.button.y >= 0)
+//						if(event.button.x >= 0 && event.button.y >= 0)
 						{
 							short iMouseX = event.button.x / TILESIZE;
 							short iMouseY = event.button.y / TILESIZE;
@@ -4756,7 +4768,7 @@ int editor_stage()
 			}
 			else if(MENU_CODE_MAP_CHANGED == code)
 			{
-				game_values.tourstops[iEditStage]->pszMapFile = maplist.currentShortmapname();
+				game_values.tourstops[iEditStage]->pszMapFile = maplist->currentShortmapname();
 				fForceStageDisplay = true;
 			}
 			else if(MENU_CODE_TO_BONUS_PICKER_MENU == code)

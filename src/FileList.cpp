@@ -15,8 +15,8 @@
 #include "global.h"
 #include "dirlist.h"
 #include <ctype.h>
-#include <algorithm>
 #include <iostream>
+#include <algorithm>
 using std::cout;
 using std::endl;
 using std::string;
@@ -479,9 +479,9 @@ MusicEntry::MusicEntry(const std::string & musicdirectory)
 		std::string musicPath = musicdirectory + getDirectorySeperator() + std::string(g_szMusicCategoryNames[iMusicCategory]);
 		if(File_Exists(musicPath))
 		{
-			SimpleFileList musiclist(musicPath + getDirectorySeperator(), ".ogg");
+			SimpleFileList musList(musicPath + getDirectorySeperator(), ".ogg");
 
-			short iCount = musiclist.GetCount();
+			short iCount = musList.GetCount();
 
 			//printf("Found %d files in %s\n", iCount, musicPath.c_str());
 
@@ -489,13 +489,13 @@ MusicEntry::MusicEntry(const std::string & musicdirectory)
 			{
 				if(numsongsforcategory[iMusicCategory] < MAXCATEGORYTRACKS)
 				{
-					songFileNames.push_back(musiclist.current_name());
+					songFileNames.push_back(musiclist->current_name());
 					songsforcategory[iMusicCategory][numsongsforcategory[iMusicCategory]] = iNumFile;
 					numsongsforcategory[iMusicCategory]++;
 					iNumFile++;
 				}
 
-				musiclist.next();
+				musList.next();
 			}
 		}
 	}
@@ -854,7 +854,7 @@ string WorldMusicEntry::GetMusic(unsigned int musicID, const char * szWorldName)
 		return worldoverride[szWorldName];
 	}
 
-    if (musicID < 0 || musicID > WORLDMUSICSLEEP)
+    if (musicID > WORLDMUSICSLEEP)
         return songFileNames[0];
 
     return songFileNames[musicID];

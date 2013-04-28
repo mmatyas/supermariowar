@@ -94,7 +94,7 @@ bool gfx_loadpalette()
 {
 	gfx_freepalette();
 
-	SDL_Surface * palette = IMG_Load(convertPathCP("gfx/packs/palette.bmp", gamegraphicspacklist.current_name()));
+	SDL_Surface * palette = IMG_Load(convertPathCP("gfx/packs/palette.bmp", gamegraphicspacklist->current_name()));
 
 	if ( palette == NULL ) 
 	{

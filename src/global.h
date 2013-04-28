@@ -292,8 +292,8 @@ extern SDL_Surface		*blitdest;		//for gfx
 extern short			x_shake;
 extern short			y_shake;
 
-extern CMap				g_map;
-extern CTilesetManager	g_tilesetmanager;
+extern CMap				*g_map;
+extern CTilesetManager	*g_tilesetmanager;
 extern CPlayer			*list_players[4];
 extern short			list_players_cnt;
 
@@ -607,18 +607,18 @@ extern gfxSprite		spr_worlditemsplace;
 extern gfxSprite		spr_worldbonushouse;
 extern gfxSprite		spr_announcementicons;
 
-extern MapList maplist;
-extern SkinList skinlist;
-extern AnnouncerList announcerlist;
-extern MusicList musiclist;
-extern WorldMusicList worldmusiclist;
-extern GraphicsList menugraphicspacklist;
-extern GraphicsList worldgraphicspacklist;
-extern GraphicsList gamegraphicspacklist;
-extern SoundsList soundpacklist;
-extern TourList tourlist;
-extern WorldList worldlist;
-extern FiltersList filterslist;
+extern MapList *maplist;
+extern SkinList *skinlist;
+extern AnnouncerList *announcerlist;
+extern MusicList *musiclist;
+extern WorldMusicList *worldmusiclist;
+extern GraphicsList *menugraphicspacklist;
+extern GraphicsList *worldgraphicspacklist;
+extern GraphicsList *gamegraphicspacklist;
+extern SoundsList *soundpacklist;
+extern TourList *tourlist;
+extern WorldList *worldlist;
+extern FiltersList *filterslist;
 
 extern CGameMode * gamemodes[GAMEMODE_LAST];
 extern CGM_Bonus * bonushousemode;

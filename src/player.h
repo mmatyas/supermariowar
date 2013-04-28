@@ -148,6 +148,12 @@ class CPlayer
 		void SetStoredPowerup(short iPowerup);
 		void StripPowerups();
 
+		short shield;
+		//if true, the player is a shyguy in shyguy mode
+		bool shyguy;
+		bool invincible;
+		short globalID;
+		short teamID;
 	private:
 
 		void ResetSuicideTime();
@@ -210,9 +216,7 @@ class CPlayer
 		float awardangle;
 		short awards[MAXAWARDS];
 
-		short globalID;
 		short localID;
-		short teamID;
 		short subTeamID;
 		short colorID;
 
@@ -271,10 +275,8 @@ class CPlayer
 		short spr;
 		short sprswitch;
 	
-		bool invincible;
 		short invincibletimer;
 
-		short shield;
 		short shieldtimer;
 
 		bool frozen;
@@ -358,8 +360,6 @@ class CPlayer
 		short jailcolor;
 		short jailtimer;
 
-		//if true, the player is a shyguy in shyguy mode
-		bool shyguy;
 
 		bool fallthrough;
 
@@ -484,7 +484,8 @@ class CPlayer
 
 		friend class MO_CarriedObject;
 
-		friend class MO_Fireball;
+//		friend class MO_Fireball;
+//		friend class MO_SuperFireball;
 		friend class MO_Hammer;
 		friend class MO_IceBlast;
 		friend class MO_Boomerang;

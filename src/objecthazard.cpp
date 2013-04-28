@@ -16,9 +16,9 @@ void LoadMapHazards(bool fPreview)
 	objectcontainer[2].clean();
 
 	//Create objects for all the map hazards
-	for(short iMapHazard = 0; iMapHazard < g_map.iNumMapHazards; iMapHazard++)
+	for(short iMapHazard = 0; iMapHazard < g_map->iNumMapHazards; iMapHazard++)
 	{
-		MapHazard * hazard = &g_map.maphazards[iMapHazard];
+		MapHazard * hazard = &g_map->maphazards[iMapHazard];
 		if(hazard->itype == 0)
 		{
 			for(short iFireball = 0; iFireball < hazard->iparam[0]; iFireball++)
@@ -438,7 +438,7 @@ void MO_Explosion::update()
 				short iTestRow = iTestY / TILESIZE;
 				for(short iCol = 0; iCol < 7; iCol++)
 				{
-					IO_Block * block = g_map.block(iTestX / TILESIZE, iTestRow);
+					IO_Block * block = g_map->block(iTestX / TILESIZE, iTestRow);
 					if(block && block->getBlockType() == block_weaponbreakable)
 					{
 						B_WeaponBreakableBlock * weaponbreakableblock = (B_WeaponBreakableBlock*)block;

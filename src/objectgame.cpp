@@ -337,7 +337,7 @@ void IO_Block::update()
 			hidden = true;
 			reset();
 
-			g_map.UpdateTileGap(col, row);
+			g_map->UpdateTileGap(col, row);
 		}
 	}
 }
@@ -764,7 +764,7 @@ bool B_PowerupBlock::hitbottom(CPlayer * player, bool useBehavior)
 			KillPlayersAndObjectsInsideBlock(player->globalID);
 		}
 
-		g_map.UpdateTileGap(col, row);
+		g_map->UpdateTileGap(col, row);
 
 		if(state == 0)
 		{
@@ -1028,8 +1028,8 @@ void B_BreakableBlock::update()
 		{
 			iBumpPlayerID = -1;
 			dead = true;
-			g_map.blockdata[col][row] = NULL;
-			g_map.UpdateTileGap(col, row);
+			g_map->blockdata[col][row] = NULL;
+			g_map->UpdateTileGap(col, row);
 		}
 	}
 
@@ -1323,7 +1323,7 @@ bool B_NoteBlock::hitbottom(CPlayer * player, bool useBehavior)
 			KillPlayersAndObjectsInsideBlock(player->globalID);
 		}
 
-		g_map.UpdateTileGap(col, row);
+		g_map->UpdateTileGap(col, row);
 	}
 
 	return false;
@@ -1461,7 +1461,7 @@ void B_DonutBlock::triggerBehavior(short iPlayerId)
 	
 	TilesetTile ** tiledata = new TilesetTile*[1];
 	tiledata[0] = new TilesetTile[1];
-	tiledata[0][0].iID = g_tilesetmanager.GetClassicTilesetIndex();
+	tiledata[0][0].iID = g_tilesetmanager->GetClassicTilesetIndex();
 	tiledata[0][0].iCol = 29;
 	tiledata[0][0].iRow = 15;
 
@@ -1474,11 +1474,11 @@ void B_DonutBlock::triggerBehavior(short iPlayerId)
 	MovingPlatform * platform = new MovingPlatform(tiledata, typedata, 1, 1, 2, path, false);
 	platform->SetPlayerId(iPlayerId);
 
-	g_map.AddTemporaryPlatform(platform);
+	g_map->AddTemporaryPlatform(platform);
 
 	dead = true;
-	g_map.blockdata[col][row] = NULL;
-	g_map.UpdateTileGap(col, row);
+	g_map->blockdata[col][row] = NULL;
+	g_map->UpdateTileGap(col, row);
 }
 
 //------------------------------------------------------------------------------
@@ -1540,7 +1540,7 @@ void B_FlipBlock::update()
 		if(++timer >= 240)
 		{
 			reset();
-			g_map.UpdateTileGap(col, row);
+			g_map->UpdateTileGap(col, row);
 
 			KillPlayersAndObjectsInsideBlock(iBumpPlayerID);
 			iBumpPlayerID = -1;
@@ -1553,8 +1553,8 @@ void B_FlipBlock::update()
 	else if(state == 3)
 	{
 		dead = true;
-		g_map.blockdata[col][row] = NULL;
-		g_map.UpdateTileGap(col, row);
+		g_map->blockdata[col][row] = NULL;
+		g_map->UpdateTileGap(col, row);
 	}
 }
 
@@ -1630,7 +1630,7 @@ bool B_FlipBlock::hitbottom(CPlayer * player, bool useBehavior)
 			KillPlayersAndObjectsInsideBlock(iBumpPlayerID);
 		}
 
-		g_map.UpdateTileGap(col, row);
+		g_map->UpdateTileGap(col, row);
 
 		triggerBehavior();
 		return false;
@@ -1728,7 +1728,7 @@ bool B_FlipBlock::hitright(IO_MovingObject * object)
 				KillPlayersAndObjectsInsideBlock(iBumpPlayerID);
 			}
 
-			g_map.UpdateTileGap(col, row);
+			g_map->UpdateTileGap(col, row);
 
 			triggerBehavior();
 			return false;
@@ -1776,7 +1776,7 @@ bool B_FlipBlock::hitleft(IO_MovingObject * object)
 				KillPlayersAndObjectsInsideBlock(iBumpPlayerID);
 			}
 
-			g_map.UpdateTileGap(col, row);
+			g_map->UpdateTileGap(col, row);
 
 			triggerBehavior();
 			return false;
@@ -1793,7 +1793,7 @@ void B_FlipBlock::triggerBehavior()
 		state = 1;
 		frame = iw;
 
-		g_map.UpdateTileGap(col, row);
+		g_map->UpdateTileGap(col, row);
 	}
 }
 
@@ -2013,18 +2013,18 @@ void B_OnOffSwitchBlock::triggerBehavior(short playerID)
 		state++;
 		
 		//Switch all the switch blocks and all the on/off blocks of the same color
-		std::list<IO_Block*>::iterator iterateSwitches = g_map.switchBlocks[iColorID].begin();
+		std::list<IO_Block*>::iterator iterateSwitches = g_map->switchBlocks[iColorID].begin();
 
-		while (iterateSwitches != g_map.switchBlocks[iColorID].end())
+		while (iterateSwitches != g_map->switchBlocks[iColorID].end())
 		{
 			((B_OnOffSwitchBlock*)(*iterateSwitches))->FlipState();
 			iterateSwitches++;
 		}
 
 		//Switch all the switch blocks
-		iterateSwitches = g_map.switchBlocks[iColorID + 4].begin();
+		iterateSwitches = g_map->switchBlocks[iColorID + 4].begin();
 
-		while (iterateSwitches != g_map.switchBlocks[iColorID + 4].end())
+		while (iterateSwitches != g_map->switchBlocks[iColorID + 4].end())
 		{
 			((B_SwitchBlock*)(*iterateSwitches))->FlipState(playerID);
 			iterateSwitches++;
@@ -2164,7 +2164,7 @@ bool B_SwitchBlock::hitleft(IO_MovingObject * object)
 void B_SwitchBlock::FlipState(short playerID)
 {
 	state = 1 - state;
-	g_map.UpdateTileGap(col, row);
+	g_map->UpdateTileGap(col, row);
 
 	if(state == 0)
 		KillPlayersAndObjectsInsideBlock(playerID);
@@ -2268,7 +2268,7 @@ bool B_BounceBlock::hitbottom(CPlayer * player, bool useBehavior)
 			KillPlayersAndObjectsInsideBlock(iBumpPlayerID);
 		}
 
-		g_map.UpdateTileGap(col, row);
+		g_map->UpdateTileGap(col, row);
 	}
 
 	return false;
@@ -2431,8 +2431,8 @@ void B_ThrowBlock::GiveBlockToPlayer(CPlayer * player)
 	if(player->AcceptItem(block))
 	{
 		dead = true;
-		g_map.blockdata[col][row] = NULL;
-		g_map.UpdateTileGap(col, row);
+		g_map->blockdata[col][row] = NULL;
+		g_map->UpdateTileGap(col, row);
 
 		block->owner = player;
 		block->iPlayerID = player->globalID;
@@ -2447,8 +2447,8 @@ void B_ThrowBlock::GiveBlockToPlayer(CPlayer * player)
 void B_ThrowBlock::triggerBehavior()
 {
 	dead = true;
-	g_map.blockdata[col][row] = NULL;
-	g_map.UpdateTileGap(col, row);
+	g_map->blockdata[col][row] = NULL;
+	g_map->UpdateTileGap(col, row);
 
 	eyecandy[2].add(new EC_FallingObject(&spr_brokenblueblock, ix, iy, -1.5f, -7.0f, 6, 2, 0, iType << 4, 16, 16));
 	eyecandy[2].add(new EC_FallingObject(&spr_brokenblueblock, ix + 16, iy, 1.5f, -7.0f, 6, 2, 0, iType << 4, 16, 16));
@@ -2490,8 +2490,8 @@ void B_WeaponBreakableBlock::update()
 		{
 			iBumpPlayerID = -1;
 			dead = true;
-			g_map.blockdata[col][row] = NULL;
-			g_map.UpdateTileGap(col, row);
+			g_map->blockdata[col][row] = NULL;
+			g_map->UpdateTileGap(col, row);
 		}
 	}
 }
@@ -3123,7 +3123,7 @@ bool PU_SecretPowerup::collide (CPlayer *player)
 void PU_SecretPowerup::place()
 {
 	short iAttempts = 10;
-	while(!g_map.findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false) && iAttempts-- > 0);
+	while(!g_map->findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false) && iAttempts-- > 0);
 
 	fx = (float)ix;
 	fy = (float)iy;
@@ -3146,7 +3146,7 @@ PU_TreasureChestBonus::PU_TreasureChestBonus(gfxSprite *nspr, short iNumSpr, sho
 	bonusitem = iBonusItem;
 	
 	short iAttempts = 10;
-	while(!g_map.findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false) && iAttempts-- > 0);
+	while(!g_map->findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false) && iAttempts-- > 0);
 	fx = (float)ix;
 	fy = (float)iy;
 
@@ -4776,7 +4776,7 @@ void MO_Coin::placeCoin()
 	
 	short x = 0, y = 0;
 	short iAttempts = 32;
-	while((!g_map.findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) ||
+	while((!g_map->findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) ||
 		objectcontainer[1].getClosestMovingObject(x, y, movingobject_coin) < 150.0f)
 		&& iAttempts-- > 0);
 
@@ -5167,7 +5167,7 @@ void CO_Egg::placeEgg()
 	
 	short x = 0, y = 0;
 	short iAttempts = 32;
-	while((!g_map.findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) ||
+	while((!g_map->findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) ||
 		objectcontainer[1].getClosestMovingObject(x, y, movingobject_yoshi) < 250.0f)
 		&& iAttempts-- > 0);
 
@@ -5441,15 +5441,15 @@ void MO_FlagBase::placeFlagBase(bool fInit)
 	timer = 0;
 	short x = 0, y = 0;
 
-	if(fInit && teamID < g_map.iNumFlagBases)
+	if(fInit && teamID < g_map->iNumFlagBases)
 	{
-		x = g_map.flagbaselocations[teamID].x;
-		y = g_map.flagbaselocations[teamID].y;
+		x = g_map->flagbaselocations[teamID].x;
+		y = g_map->flagbaselocations[teamID].y;
 	}
 	else
 	{
 		short iAttempts = 32;
-		while((!g_map.findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) ||
+		while((!g_map->findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) ||
 			objectcontainer[1].getClosestMovingObject(x, y, movingobject_flagbase) < 200.0f)
 			&& iAttempts-- > 0);
 	}
@@ -5639,7 +5639,7 @@ void CO_Flag::placeFlag()
 		fInBase = false;
 	
 		short iAttempts = 10;
-		while(!g_map.findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false) && iAttempts-- > 0);
+		while(!g_map->findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false) && iAttempts-- > 0);
 		fx = (float)ix;
 		fy = (float)iy;
 
@@ -5734,14 +5734,14 @@ void MO_Yoshi::placeYoshi()
 		short iyt = iy / TILESIZE;
 		short iyb = (iy + ih) / TILESIZE;
 
-		int upperLeft = g_map.map(ixl, iyt);
-		int upperRight = g_map.map(ixr, iyt);
-		int lowerLeft = g_map.map(ixl, iyb);
-		int lowerRight = g_map.map(ixr, iyb);
+		int upperLeft = g_map->map(ixl, iyt);
+		int upperRight = g_map->map(ixr, iyt);
+		int lowerLeft = g_map->map(ixl, iyb);
+		int lowerRight = g_map->map(ixr, iyb);
 
 		if((upperLeft & tile_flag_solid) == 0 && (upperRight & tile_flag_solid) == 0 &&
 			(lowerLeft & tile_flag_solid) == 0 && (lowerRight & tile_flag_solid) == 0 && 
-			!g_map.block(ixl, iyt) && !g_map.block(ixr, iyt) && !g_map.block(ixl, iyb) && !g_map.block(ixr, iyb))
+			!g_map->block(ixl, iyt) && !g_map->block(ixr, iyt) && !g_map->block(ixl, iyb) && !g_map->block(ixr, iyb))
 		{
 			//spawn on ground, but not on spikes
 			short iDeathY = (iy+ih)/TILESIZE;
@@ -5750,17 +5750,17 @@ void MO_Yoshi::placeYoshi()
 			
 			while(iDeathY < MAPHEIGHT)
 			{
-				int ttLeftTile = g_map.map(iDeathX1, iDeathY);
-				int ttRightTile = g_map.map(iDeathX2, iDeathY);
+				int ttLeftTile = g_map->map(iDeathX1, iDeathY);
+				int ttRightTile = g_map->map(iDeathX2, iDeathY);
 
 				if(((ttLeftTile & tile_flag_solid || ttLeftTile & tile_flag_solid_on_top) && (ttLeftTile & tile_flag_death_on_top) == 0) ||  
 					((ttRightTile & tile_flag_solid || ttRightTile & tile_flag_solid_on_top) && (ttRightTile & tile_flag_death_on_top) == 0) ||
-					g_map.block(iDeathX1, iDeathY) || g_map.block(iDeathX2, iDeathY))
+					g_map->block(iDeathX1, iDeathY) || g_map->block(iDeathX2, iDeathY))
 				{
 					short top = ((iDeathY << 5) - ih) / TILESIZE;
 					
-					if(g_map.spawn(1, iDeathX1, top) && g_map.spawn(1, iDeathX2, top) && 
-						g_map.spawn(1, iDeathX1, iDeathY - 1) && g_map.spawn(1, iDeathX2, iDeathY - 1))
+					if(g_map->spawn(1, iDeathX1, top) && g_map->spawn(1, iDeathX2, top) && 
+						g_map->spawn(1, iDeathX1, iDeathY - 1) && g_map->spawn(1, iDeathX2, iDeathY - 1))
 					{
 						xi(ix);
 						yi((iDeathY << 5) - ih);
@@ -5891,7 +5891,7 @@ void OMO_Area::placeArea()
 {
 	short x = 0, y = 0;
 	short iAttempts = 32;
-	while((!g_map.findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) ||
+	while((!g_map->findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) ||
 		objectcontainer[0].getClosestObject(x, y, object_area) <= (200.0f - ((numareas - 3) * 25.0f)))
 		&& iAttempts-- > 0);
 
@@ -6100,8 +6100,8 @@ void OMO_KingOfTheHillZone::placeArea()
 		{
 			for(short iCol = 0; iCol < size; iCol++)
 			{
-				int type = g_map.map(x + iCol, iFindY);
-				if(((type & tile_flag_solid_on_top || type & tile_flag_solid) && (type & tile_flag_death_on_top) == 0) || g_map.block(x + iCol, iFindY))
+				int type = g_map->map(x + iCol, iFindY);
+				if(((type & tile_flag_solid_on_top || type & tile_flag_solid) && (type & tile_flag_death_on_top) == 0) || g_map->block(x + iCol, iFindY))
 				{
 					fDone = true;
 					break;
@@ -6133,7 +6133,7 @@ void OMO_KingOfTheHillZone::placeArea()
 			for(short iCol = 0; iCol < size; iCol++)
 			{
 				//If there is a solid tile inside the zone
-				if((g_map.map(x + iCol, y + iRow) & tile_flag_solid) || !g_map.spawn(1, x + iCol, y + iRow) || g_map.block(x + iCol, y + iRow))
+				if((g_map->map(x + iCol, y + iRow) & tile_flag_solid) || !g_map->spawn(1, x + iCol, y + iRow) || g_map->block(x + iCol, y + iRow))
 				{
 					iCountSolidTiles++;
 
@@ -6155,7 +6155,7 @@ void OMO_KingOfTheHillZone::placeArea()
 			continue;
 
 		//Verify zone is not in a platform
-		if(g_map.IsInPlatformNoSpawnZone(x << 5, y << 5, size << 5, size << 5))
+		if(g_map->IsInPlatformNoSpawnZone(x << 5, y << 5, size << 5, size << 5))
 			continue;
 
 		break;
@@ -6311,10 +6311,10 @@ void OMO_RaceGoal::placeRaceGoal()
 {
 	short x = 0, y = 0;
 
-	if(goalID < g_map.iNumRaceGoals)
+	if(goalID < g_map->iNumRaceGoals)
 	{
-		x = g_map.racegoallocations[goalID].x;
-		y = g_map.racegoallocations[goalID].y;
+		x = g_map->racegoallocations[goalID].x;
+		y = g_map->racegoallocations[goalID].y;
 	}
 	else
 	{
@@ -6431,7 +6431,7 @@ void MO_FrenzyCard::placeCard()
 
 	short x = 0, y = 0;
 	short iAttempts = 32;
-	while((!g_map.findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) ||
+	while((!g_map->findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) ||
 		objectcontainer[1].getClosestObject(x, y, object_frenzycard) <= 150.0f)
 		&& iAttempts-- > 0);
 
@@ -6572,7 +6572,7 @@ void MO_CollectionCard::placeCard()
 
 	short x = 0, y = 0;
 	short iAttempts = 32;
-	while((!g_map.findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) ||
+	while((!g_map->findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) ||
 		objectcontainer[1].getClosestMovingObject(x, y, movingobject_collectioncard) <= 150.0f)
 		&& iAttempts-- > 0);
 
@@ -6745,16 +6745,16 @@ void MO_WalkingEnemy::update()
 				probeCenterX /= TILESIZE;
 				probeY /= TILESIZE;
 				
-				IO_Block * frontBlock = g_map.block(probeFrontX, probeY);
-				IO_Block * centerBlock = g_map.block(probeCenterX, probeY);
+				IO_Block * frontBlock = g_map->block(probeFrontX, probeY);
+				IO_Block * centerBlock = g_map->block(probeCenterX, probeY);
 
 				bool fFoundFrontBlock = frontBlock && !frontBlock->isTransparent() && !frontBlock->isHidden();
 				bool fFoundCenterBlock = centerBlock && !centerBlock->isTransparent() && !centerBlock->isHidden();
 				
 				if(!fFoundFrontBlock && !fFoundCenterBlock)
 				{
-					int frontTile = g_map.map(probeFrontX, probeY);
-					int centerTile = g_map.map(probeCenterX, probeY);
+					int frontTile = g_map->map(probeFrontX, probeY);
+					int centerTile = g_map->map(probeCenterX, probeY);
 
 					bool fFrontGap = (frontTile & tile_flag_super_death_top) || (!(frontTile & tile_flag_solid) && !(frontTile & tile_flag_solid_on_top));
 					bool fCenterGap = (centerTile & tile_flag_super_death_top) || (!(centerTile & tile_flag_solid) && !(centerTile & tile_flag_solid_on_top));
@@ -6890,7 +6890,7 @@ void MO_WalkingEnemy::collide(IO_MovingObject * object)
 void MO_WalkingEnemy::place()
 {
 	short iAttempts = 10;
-	while(!g_map.findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false) && iAttempts-- > 0);
+	while(!g_map->findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false) && iAttempts-- > 0);
 	fx = (float)ix;
 	fy = (float)iy;
 }
@@ -9410,7 +9410,7 @@ void CO_Spring::draw()
 void CO_Spring::place()
 {
 	short iAttempts = 10;
-	while(!g_map.findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false) && iAttempts-- > 0);
+	while(!g_map->findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false) && iAttempts-- > 0);
 	fx = (float)ix;
 	fy = (float)iy;
 
@@ -9652,14 +9652,14 @@ void MO_SpinAttack::update()
 
 		if(iTop >= 0 && iTop < 15)
 		{
-			topleftblock = g_map.block(iLeft, iTop);
-			toprightblock = g_map.block(iRight, iTop);
+			topleftblock = g_map->block(iLeft, iTop);
+			toprightblock = g_map->block(iRight, iTop);
 		}
 
 		if(iBottom >= 0 && iBottom < 15)
 		{
-			bottomleftblock = g_map.block(iLeft, iBottom);
-			bottomrightblock = g_map.block(iRight, iBottom);
+			bottomleftblock = g_map->block(iLeft, iBottom);
+			bottomrightblock = g_map->block(iRight, iBottom);
 		}
 
 		bool fHitBlock = false;
@@ -10163,7 +10163,7 @@ void CO_PhantoKey::placeKey()
 	
 	short x = 0, y = 0;
 	short iAttempts = 10;
-	while(!g_map.findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) && iAttempts-- > 0);
+	while(!g_map->findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) && iAttempts-- > 0);
 
 	xi(x);
 	yi(y);

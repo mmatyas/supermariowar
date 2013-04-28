@@ -26,7 +26,7 @@ using std::string;
 
 extern int g_iVersion[];
 
-char * lowercase(char * name)
+char *lowercase(char *name)
 {
 	for(unsigned int k = 0; k < strlen(name); k++)
 	{
@@ -38,8 +38,8 @@ char * lowercase(char * name)
 
 MapListNode::MapListNode(std::string fullName)
 {
-	pfFilters = new bool[NUM_AUTO_FILTERS + filterslist.GetCount()];
-	for(short iFilter = 0; iFilter < filterslist.GetCount() + NUM_AUTO_FILTERS; iFilter++)
+	pfFilters = new bool[NUM_AUTO_FILTERS + filterslist->GetCount()];
+	for(short iFilter = 0; iFilter < filterslist->GetCount() + NUM_AUTO_FILTERS; iFilter++)
 		pfFilters[iFilter] = false;
 	
 	fInCurrentFilterSet = true;
@@ -264,7 +264,7 @@ void MapList::add(const char * name)
 
 bool MapList::find(const char * name)
 {
-	char * szLookForName = _strlwr(_strdup(name));
+	char * szLookForName = lowercase(_strdup(name));
 	bool fFound = false;
 
 	std::map<std::string, MapListNode*>::iterator oldCurrent = current;
@@ -272,7 +272,7 @@ bool MapList::find(const char * name)
 	{
 		next(false);	//sets us to the beginning if we hit the end -> loop through the maps
 
-		char * szCurrentName = _strlwr(_strdup((*current).second->filename.c_str()));
+		char * szCurrentName = lowercase(_strdup((*current).second->filename.c_str()));
 
 		if(strstr(szCurrentName, szLookForName))	//compare names after
 			fFound = true;
@@ -290,7 +290,7 @@ bool MapList::findexact(const char * name, bool fWorld)
 {
 	char * szLookForName = new char[strlen(name) + 1];
 	strcpy(szLookForName, name);
-	_strlwr(szLookForName);
+	lowercase(szLookForName);
 
 	bool fFound = false;
 
@@ -304,7 +304,7 @@ bool MapList::findexact(const char * name, bool fWorld)
 		{
 			char * szCurrentName = new char[iterateAll->first.length() + 1];
 			strcpy(szCurrentName, iterateAll->first.c_str());
-			_strlwr(szCurrentName);
+			lowercase(szCurrentName);
 
 			if(!strcmp(szCurrentName, szLookForName))
 			{
@@ -330,7 +330,7 @@ bool MapList::findexact(const char * name, bool fWorld)
 
 		char * szCurrentName = new char[current->first.length() + 1];
 		strcpy(szCurrentName, current->first.c_str());
-		_strlwr(szCurrentName);
+		lowercase(szCurrentName);
 
 		if(!strcmp(szCurrentName, szLookForName))
 			fFound = true;
@@ -505,9 +505,9 @@ void MapList::WriteFilters()
 	{
 		game_values.fNeedWriteFilters = false;
 
-		for(short iFilter = 0; iFilter < filterslist.GetCount(); iFilter++)
+		for(short iFilter = 0; iFilter < filterslist->GetCount(); iFilter++)
 		{
-			FILE * fp = fopen(filterslist.GetIndex(iFilter), "w");
+			FILE * fp = fopen(filterslist->GetIndex(iFilter), "w");
 
 			if(!fp)
 				continue;
@@ -533,7 +533,7 @@ void MapList::WriteFilters()
 			fclose(fp);
 			
 #if defined(__MACOSX__)
-			chmod(filterslist.GetIndex(iFilter), S_IRWXU | S_IRWXG | S_IROTH);
+			chmod(filterslist->GetIndex(iFilter), S_IRWXU | S_IRWXG | S_IROTH);
 #endif
 		}
 	}
@@ -586,8 +586,8 @@ void MapList::ReadFilters()
 		if(!current->second->fReadFromCache)
 		{
 			MapListNode * mln = current->second;
-			g_map.loadMap(mln->filename, read_type_summary);
-			memcpy(mln->pfFilters, g_map.fAutoFilter, sizeof(bool) * NUM_AUTO_FILTERS);
+			g_map->loadMap(mln->filename, read_type_summary);
+			memcpy(mln->pfFilters, g_map->fAutoFilter, sizeof(bool) * NUM_AUTO_FILTERS);
 		}
 
 		current++;
@@ -595,9 +595,9 @@ void MapList::ReadFilters()
 
 	current = maps.begin();
 	//Get user defined filters from files in filters directory
-	for(short iFilter = 0; iFilter < filterslist.GetCount(); iFilter++)
+	for(short iFilter = 0; iFilter < filterslist->GetCount(); iFilter++)
 	{
-		FILE * fp = fopen(filterslist.GetIndex(iFilter), "r");
+		FILE * fp = fopen(filterslist->GetIndex(iFilter), "r");
 
 		if(!fp)
 			continue;
@@ -662,8 +662,8 @@ void MapList::ReloadMapAutoFilters()
 	while(itr != lim)
 	{
 		MapListNode * mln = itr->second;
-		g_map.loadMap(mln->filename, read_type_summary);
-		memcpy(mln->pfFilters, g_map.fAutoFilter, sizeof(bool) * NUM_AUTO_FILTERS);
+		g_map->loadMap(mln->filename, read_type_summary);
+		memcpy(mln->pfFilters, g_map->fAutoFilter, sizeof(bool) * NUM_AUTO_FILTERS);
 
 		itr++;
 	}
@@ -708,7 +708,7 @@ void MapList::ApplyFilters(bool * pfFilters)
 	while(itr != lim)
 	{
 		bool fMatched = true;
-		for(short iFilter = 0; iFilter < NUM_AUTO_FILTERS + filterslist.GetCount(); iFilter++)
+		for(short iFilter = 0; iFilter < NUM_AUTO_FILTERS + filterslist->GetCount(); iFilter++)
 		{
 			if(pfFilters[iFilter])
 			{
@@ -735,7 +735,7 @@ void MapList::ApplyFilters(bool * pfFilters)
 	}
 
 	game_values.fFiltersOn = false;
-	for(short iFilter = 0; iFilter < NUM_AUTO_FILTERS + filterslist.GetCount(); iFilter++)
+	for(short iFilter = 0; iFilter < NUM_AUTO_FILTERS + filterslist->GetCount(); iFilter++)
 	{
 		if(pfFilters[iFilter])
 		{

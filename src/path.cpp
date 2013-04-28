@@ -1,6 +1,7 @@
 #include <string>
 #include <iostream>
 #include <sys/stat.h>
+#include <cstring>
 
 #ifdef _WIN32
 	#ifdef _XBOX
@@ -93,11 +94,11 @@ const string convertPath(const string& source)
 #else
     static bool are_paths_initialized = false;
 
-    if (!are_paths_initialized) 
+    if (!are_paths_initialized)
 	{
-		#ifdef PREFIXPATH
-			strcpy(SMW_Root_Data_Dir, PREFIXPATH);
-		#endif
+//		#ifdef PREFIXPATH
+			strcpy(SMW_Root_Data_Dir, RootDataDirectory);
+//		#endif
 
 		#ifdef __MACOSX__
 			Initialize_Paths();
@@ -122,7 +123,7 @@ const string convertPath(const string& source, const string& pack)
 	{
 		string trailingdir = source.substr(9);
 
-#ifdef _XBOX		
+#ifdef _XBOX
 		const string s = convertPartialPath(pack + trailingdir);  //Hack because pack already has d:\ in it
 #else
 		const string s = convertPath(pack + trailingdir);

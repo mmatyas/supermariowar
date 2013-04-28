@@ -69,7 +69,7 @@ bool sfxSound::init(const string& filename)
 	
 	if(sfx == NULL)
 	{
-		printf(" failed!\n");
+		printf(" failed loading %s\n", filename.c_str());
 		return false;
 	}
 

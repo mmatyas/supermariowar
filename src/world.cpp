@@ -176,7 +176,7 @@ void WorldPlayer::SetSprite(short iPlayer)
 {
 	while(!LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], true))
 	{
-		if(++game_values.skinids[iPlayer] >= skinlist.GetCount())
+		if(++game_values.skinids[iPlayer] >= skinlist->GetCount())
 			game_values.skinids[iPlayer] = 0;
 	}
 
@@ -422,7 +422,7 @@ bool WorldMap::Load(short tilesize)
 		iTileSheet = 2;
 	}
 
-	const char * szPath = worldlist.GetIndex(game_values.worldindex);
+	const char * szPath = worldlist->GetIndex(game_values.worldindex);
 	FILE * file = fopen(szPath, "r");
 	worldName = stripPathAndExtension(szPath);
 
@@ -899,7 +899,7 @@ void WorldMap::SetTileConnections(short iCol, short iRow)
 //Saves world to file
 bool WorldMap::Save()
 {
-	return Save(worldlist.GetIndex(game_values.worldindex));
+	return Save(worldlist->GetIndex(game_values.worldindex));
 }
 
 bool WorldMap::Save(const char * szPath)

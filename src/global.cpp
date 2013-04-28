@@ -526,35 +526,35 @@ TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld)
 			(ts->iMode == game_mode_pipe_minigame || ts->iMode == game_mode_boss_minigame || ts->iMode == game_mode_boxes_minigame))
 		{
 			//Get a bogus map name so the mode will know to load the default map
-			ts->pszMapFile = maplist.GetUnknownMapName();
+			ts->pszMapFile = maplist->GetUnknownMapName();
 		}
 		else
 		{
 			//Using the maplist to cheat and find a map for us
-			maplist.SaveCurrent();
+			maplist->SaveCurrent();
 
 			//If that map is not found
-			bool fMapFound = maplist.findexact(szMap, true);
+			bool fMapFound = maplist->findexact(szMap, true);
 
 			if(!fMapFound)
 			{
 				if(ts->iMode == game_mode_pipe_minigame || ts->iMode == game_mode_boss_minigame || ts->iMode == game_mode_boxes_minigame)
 				{
 					//Get a bogus map name so the mode will know to load the default map
-					ts->pszMapFile = maplist.GetUnknownMapName();
+					ts->pszMapFile = maplist->GetUnknownMapName();
 				}
 				else
 				{
-					maplist.random(false);
-					ts->pszMapFile = maplist.currentShortmapname();
+					maplist->random(false);
+					ts->pszMapFile = maplist->currentShortmapname();
 				}
 			}
 			else
 			{
-				ts->pszMapFile = maplist.currentShortmapname();
+				ts->pszMapFile = maplist->currentShortmapname();
 			}
 				
-			maplist.ResumeCurrent();
+			maplist->ResumeCurrent();
 		}
 
 		delete [] szMap;
@@ -1537,12 +1537,12 @@ void ResetTourStops()
 void LoadCurrentMapBackground()
 {
 	char filename[128];
-	sprintf(filename, "gfx/packs/backgrounds/%s", g_map.szBackgroundFile);
-	std::string path = convertPath(filename, gamegraphicspacklist.current_name());
+	sprintf(filename, "gfx/packs/backgrounds/%s", g_map->szBackgroundFile);
+	std::string path = convertPath(filename, gamegraphicspacklist->current_name());
 
 	//if the background file doesn't exist, use the classic background
 	if(!File_Exists(path))
-		path = convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist.current_name());
+		path = convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->current_name());
 
 	gfx_loadimagenocolorkey(&spr_background, path);
 }
@@ -1628,16 +1628,16 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
 				SDL_Rect bltrect = {iDstX, iDstY, iTileSize, iTileSize};
 				if(tile->iID >= 0)
 				{
-					SDL_BlitSurface(g_tilesetmanager.GetTileset(tile->iID)->GetSurface(iSize), &g_tilesetmanager.rRects[iSize][tile->iCol][tile->iRow], blitdest, &bltrect);
+					SDL_BlitSurface(g_tilesetmanager->GetTileset(tile->iID)->GetSurface(iSize), &g_tilesetmanager->rRects[iSize][tile->iCol][tile->iRow], blitdest, &bltrect);
 				}
 				else if(tile->iID == TILESETANIMATED)
 				{
-					SDL_BlitSurface(spr_tileanimation[iSize].getSurface(), &g_tilesetmanager.rRects[iSize][tile->iCol << 2][tile->iRow], blitdest, &bltrect);
+					SDL_BlitSurface(spr_tileanimation[iSize].getSurface(), &g_tilesetmanager->rRects[iSize][tile->iCol << 2][tile->iRow], blitdest, &bltrect);
 				}
 				else if(tile->iID == TILESETUNKNOWN)
 				{
 					//Draw unknown tile
-					SDL_BlitSurface(spr_unknowntile[iSize].getSurface(), &g_tilesetmanager.rRects[iSize][0][0], blitdest, &bltrect);
+					SDL_BlitSurface(spr_unknowntile[iSize].getSurface(), &g_tilesetmanager->rRects[iSize][0][0], blitdest, &bltrect);
 				}
 
 				bool fNeedWrap = false;
@@ -1660,11 +1660,11 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
 					bltrect.h = iTileSize;
 
 					if(tile->iID >= 0)
-						SDL_BlitSurface(g_tilesetmanager.GetTileset(tile->iID)->GetSurface(iSize), &g_tilesetmanager.rRects[iSize][tile->iCol][tile->iRow], blitdest, &bltrect);
+						SDL_BlitSurface(g_tilesetmanager->GetTileset(tile->iID)->GetSurface(iSize), &g_tilesetmanager->rRects[iSize][tile->iCol][tile->iRow], blitdest, &bltrect);
 					else if(tile->iID == TILESETANIMATED)
-						SDL_BlitSurface(spr_tileanimation[iSize].getSurface(), &g_tilesetmanager.rRects[iSize][tile->iCol << 2][tile->iRow], blitdest, &bltrect);
+						SDL_BlitSurface(spr_tileanimation[iSize].getSurface(), &g_tilesetmanager->rRects[iSize][tile->iCol << 2][tile->iRow], blitdest, &bltrect);
 					else if(tile->iID == TILESETUNKNOWN)
-						SDL_BlitSurface(spr_unknowntile[iSize].getSurface(), &g_tilesetmanager.rRects[iSize][0][0], blitdest, &bltrect);
+						SDL_BlitSurface(spr_unknowntile[iSize].getSurface(), &g_tilesetmanager->rRects[iSize][0][0], blitdest, &bltrect);
 				}
 			}
 		}

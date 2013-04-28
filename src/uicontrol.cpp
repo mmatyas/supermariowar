@@ -1938,10 +1938,10 @@ MenuCodeEnum MI_MapField::SendInput(CPlayerInput * playerInput)
 	{
 		else if(playerInput->iPressedKey == SDLK_PAGEUP)
 		{
-			short iOldIndex = maplist.GetCurrent()->second->iIndex;
-			maplist.prev(true);
+			short iOldIndex = maplist->GetCurrent()->second->iIndex;
+			maplist->prev(true);
 			
-			if(iOldIndex != maplist.GetCurrent()->second->iIndex)
+			if(iOldIndex != maplist->GetCurrent()->second->iIndex)
 			{
 				LoadCurrentMap();
 				return MENU_CODE_MAP_CHANGED;
@@ -1951,10 +1951,10 @@ MenuCodeEnum MI_MapField::SendInput(CPlayerInput * playerInput)
 		}
 		else if(playerInput->iPressedKey == SDLK_PAGEDOWN)
 		{
-			short iOldIndex = maplist.GetCurrent()->second->iIndex;
-			maplist.next(true);
+			short iOldIndex = maplist->GetCurrent()->second->iIndex;
+			maplist->next(true);
 
-			if(iOldIndex != maplist.GetCurrent()->second->iIndex)
+			if(iOldIndex != maplist->GetCurrent()->second->iIndex)
 			{
 				LoadCurrentMap();
 				return MENU_CODE_MAP_CHANGED;
@@ -2003,20 +2003,20 @@ MenuCodeEnum MI_MapField::SendInput(CPlayerInput * playerInput)
 				(iPressedKey >= SDLK_0 && iPressedKey <= SDLK_9) ||
 				iPressedKey == SDLK_MINUS || iPressedKey == SDLK_EQUALS)
 			{
-				short iOldIndex = maplist.GetCurrent()->second->iIndex;
+				short iOldIndex = maplist->GetCurrent()->second->iIndex;
 				
-				//maplist.startswith((char)playerInput->iPressedKey);
+				//maplist->startswith((char)playerInput->iPressedKey);
 
 				sSearchString += (char)iPressedKey;
 				iSearchStringTimer = 10;
 
-				if(!maplist.startswith(sSearchString.c_str()))
+				if(!maplist->startswith(sSearchString.c_str()))
 				{
 					sSearchString = "";
 					iSearchStringTimer = 0;
 				}
 				
-				if(iOldIndex != maplist.GetCurrent()->second->iIndex)
+				if(iOldIndex != maplist->GetCurrent()->second->iIndex)
 				{
 					LoadCurrentMap();
 					return MENU_CODE_MAP_CHANGED;
@@ -2032,10 +2032,10 @@ MenuCodeEnum MI_MapField::SendInput(CPlayerInput * playerInput)
 
 MenuCodeEnum MI_MapField::ChooseRandomMap()
 {
-	short iOldIndex = maplist.GetCurrent()->second->iIndex;
-	maplist.random(true);
+	short iOldIndex = maplist->GetCurrent()->second->iIndex;
+	maplist->random(true);
 
-	if(iOldIndex != maplist.GetCurrent()->second->iIndex)
+	if(iOldIndex != maplist->GetCurrent()->second->iIndex)
 	{
 		LoadCurrentMap();
 		return MENU_CODE_MAP_CHANGED;
@@ -2082,7 +2082,7 @@ void MI_MapField::Update()
 	miModifyImageRight->Update();
 	miModifyImageLeft->Update();
 
-	g_map.updatePlatforms();
+	g_map->updatePlatforms();
 }
 
 void MI_MapField::Draw()
@@ -2110,11 +2110,11 @@ void MI_MapField::Draw()
 
 	SDL_BlitSurface(surfaceMapBackground, NULL, blitdest, &rectDst);
 
-	g_map.drawPlatforms(rectDst.x, rectDst.y, 0);
+	g_map->drawPlatforms(rectDst.x, rectDst.y, 0);
 
 	SDL_BlitSurface(surfaceMapBlockLayer, NULL, blitdest, &rectDst);
 
-	g_map.drawPlatforms(rectDst.x, rectDst.y, 1);
+	g_map->drawPlatforms(rectDst.x, rectDst.y, 1);
 
 	//Draw map hazards
 	for(short i = 0; i < objectcontainer[1].list_end; i++)
@@ -2149,13 +2149,13 @@ void MI_MapField::Draw()
 		}
 	}
 
-	g_map.drawPlatforms(rectDst.x, rectDst.y, 2);
+	g_map->drawPlatforms(rectDst.x, rectDst.y, 2);
 
 	if(game_values.toplayer)
 		SDL_BlitSurface(surfaceMapForeground, NULL, blitdest, &rectDst);
 	
-	g_map.drawPlatforms(rectDst.x, rectDst.y, 3);
-	g_map.drawPlatforms(rectDst.x, rectDst.y, 4);
+	g_map->drawPlatforms(rectDst.x, rectDst.y, 3);
+	g_map->drawPlatforms(rectDst.x, rectDst.y, 4);
 
 	miModifyImageLeft->Draw();
 	miModifyImageRight->Draw();
@@ -2165,30 +2165,30 @@ void MI_MapField::Draw()
 
 void MI_MapField::LoadCurrentMap()
 {
-	strncpy(szMapName, maplist.currentShortmapname(), 255);
+	strncpy(szMapName, maplist->currentShortmapname(), 255);
 	szMapName[255] = 0;
 
-	LoadMap(maplist.currentFilename());	
+	LoadMap(maplist->currentFilename());	
 }
 
 void MI_MapField::LoadMap(const char * szMapPath)
 {
-	g_map.loadMap(szMapPath, read_type_preview);
+	g_map->loadMap(szMapPath, read_type_preview);
 	SDL_Delay(10);  //Sleeps to help the music from skipping
 	
 	LoadCurrentMapBackground();
 
 	SDL_Delay(10);  //Sleeps to help the music from skipping
 
-	g_map.preDrawPreviewBackground(&spr_background, surfaceMapBackground, false);
+	g_map->preDrawPreviewBackground(&spr_background, surfaceMapBackground, false);
 	SDL_Delay(10);  //Sleeps to help the music from skipping
-	g_map.preDrawPreviewBlocks(surfaceMapBlockLayer, false);
+	g_map->preDrawPreviewBlocks(surfaceMapBlockLayer, false);
 	SDL_Delay(10);  //Sleeps to help the music from skipping
-	g_map.preDrawPreviewMapItems(surfaceMapBackground, false);
+	g_map->preDrawPreviewMapItems(surfaceMapBackground, false);
 	SDL_Delay(10);  //Sleeps to help the music from skipping
-	g_map.preDrawPreviewForeground(surfaceMapForeground, false);
+	g_map->preDrawPreviewForeground(surfaceMapForeground, false);
 	SDL_Delay(10);  //Sleeps to help the music from skipping
-	g_map.preDrawPreviewWarps(game_values.toplayer ? surfaceMapForeground : surfaceMapBackground, false);
+	g_map->preDrawPreviewWarps(game_values.toplayer ? surfaceMapForeground : surfaceMapBackground, false);
 	SDL_Delay(10);  //Sleeps to help the music from skipping
 
 	LoadMapHazards(true);
@@ -2197,7 +2197,7 @@ void MI_MapField::LoadMap(const char * szMapPath)
 
 bool MI_MapField::SetMap(const char * szMapName, bool fWorld)
 {
-	bool fFound = maplist.findexact(szMapName, fWorld);
+	bool fFound = maplist->findexact(szMapName, fWorld);
 	LoadCurrentMap();
 
 	return fFound;
@@ -2264,16 +2264,16 @@ bool MI_MapField::Move(bool fNext, bool fScrollFast)
 	if(fScrollFast)
 		numadvance = 10;
 
-	short iOldIndex = maplist.GetCurrent()->second->iIndex;
+	short iOldIndex = maplist->GetCurrent()->second->iIndex;
 	for(int k = 0; k < numadvance; k++)
 	{
 		if(fNext)
-			maplist.next(true);
+			maplist->next(true);
 		else
-			maplist.prev(true);
+			maplist->prev(true);
 	}
 
-	if(iOldIndex != maplist.GetCurrent()->second->iIndex)
+	if(iOldIndex != maplist->GetCurrent()->second->iIndex)
 	{
 		LoadCurrentMap();
 		return true;

@@ -3,6 +3,8 @@
 
 #include <string>
 
+extern char *lowercase(char *s);
+
 //it was kinda a bad idea to have skinlist and announcer list based on this, because both are accessed in different ways (skinlist like an vector and announcer list like a list). grrrr
 class SimpleFileList
 {
@@ -51,7 +53,7 @@ class SimpleFileList
 
 		bool find(const char * name)
 		{
-			char * szLookForName = _strlwr(_strdup(name));
+			char * szLookForName = lowercase(_strdup(name));
 			bool fFound = false;
 
 			int oldCurrent = currentIndex;
@@ -59,7 +61,7 @@ class SimpleFileList
 			{
 				next();	//sets us to the beginning if we hit the end -> loop through the maps
 
-				char * szCurrentName = _strlwr(_strdup(filelist[currentIndex].c_str()));
+				char * szCurrentName = lowercase(_strdup(filelist[currentIndex].c_str()));
 
 				if(strstr(szCurrentName, szLookForName))	//compare names after
 					fFound = true;

@@ -6,6 +6,8 @@
 #define PATH_MAX 4096
 #endif
 
+extern char *RootDataDirectory;
+
 /* Call Initialize_Paths() when your application launches */
 
 bool File_Exists (const std::string fileName);

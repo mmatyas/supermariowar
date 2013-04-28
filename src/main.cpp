@@ -666,8 +666,8 @@ extern int g_iVersion[];
 //Locations for swirl spawn effects
 short g_iSwirlSpawnLocations[4][2][25];
 
-CMap			g_map;
-CTilesetManager g_tilesetmanager;
+CMap			*g_map;
+CTilesetManager *g_tilesetmanager;
 
 CEyecandyContainer eyecandy[3];
 SpotlightManager spotlightManager;
@@ -766,18 +766,18 @@ extern void LoadCurrentMapBackground();
 
 extern bool VersionIsEqual(int iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
 
-FiltersList filterslist;  //Filters list must be initiallized before maps list because it is used in maplist constructor
-MapList maplist(false);
-SkinList skinlist;
-AnnouncerList announcerlist;
-MusicList musiclist;
-WorldMusicList worldmusiclist;
-GraphicsList menugraphicspacklist;
-GraphicsList worldgraphicspacklist;
-GraphicsList gamegraphicspacklist;
-SoundsList soundpacklist;
-TourList tourlist;
-WorldList worldlist;
+FiltersList *filterslist;  //Filters list must be initiallized before maps list because it is used in maplist constructor
+MapList *maplist;
+SkinList *skinlist;
+AnnouncerList *announcerlist;
+MusicList *musiclist;
+WorldMusicList *worldmusiclist;
+GraphicsList *menugraphicspacklist;
+GraphicsList *worldgraphicspacklist;
+GraphicsList *gamegraphicspacklist;
+SoundsList *soundpacklist;
+TourList *tourlist;
+WorldList *worldlist;
 WorldMap g_worldmap;
 
 std::vector<MapMusicOverride*> mapmusicoverrides;
@@ -972,8 +972,8 @@ void DECLSPEC musicfinished()
 	{
 		if(game_values.playnextmusic)
 		{
-			musiclist.SetNextMusic(g_map.musicCategoryID, maplist.currentShortmapname(), g_map.szBackgroundFile);
-			backgroundmusic[0].load(musiclist.GetCurrentMusic()); //In Game Music
+			musiclist->SetNextMusic(g_map->musicCategoryID, maplist->currentShortmapname(), g_map->szBackgroundFile);
+			backgroundmusic[0].load(musiclist->GetCurrentMusic()); //In Game Music
 		}
 
 		backgroundmusic[0].play(game_values.playnextmusic, false);
@@ -1096,9 +1096,38 @@ void SpinScreen()
 	y_shake = (short)(shakey);
 }
 
+// main game directory, read from command line argument
+char		*RootDataDirectory;
+
 // ------ MAIN ------
 int main(int argc, char *argv[])
 {
+	if (argc < 2) {
+		fprintf(stderr, "Please specify root data directory\n");
+		return -1;
+	}
+	
+	RootDataDirectory = argv[1];
+	
+	printf("Now using RootDataDirectory=%s\n", RootDataDirectory);
+	
+	g_map = new CMap();
+	g_tilesetmanager = new CTilesetManager();
+	
+	filterslist = new FiltersList();
+	maplist = new MapList(false);
+	skinlist = new SkinList();
+	musiclist = new MusicList();
+	worldmusiclist = new WorldMusicList();
+	soundpacklist = new SoundsList();
+	announcerlist = new AnnouncerList();
+	tourlist = new TourList();
+	worldlist = new WorldList();
+	
+	menugraphicspacklist = new GraphicsList();
+	worldgraphicspacklist = new GraphicsList();
+	gamegraphicspacklist = new GraphicsList();
+	
 	printf("-------------------------------------------------------------------------------\n");
 	printf(" %s %s\n", TITLESTRING, VERSIONNUMBER);
 	printf("-------------------------------------------------------------------------------\n");
@@ -1115,7 +1144,7 @@ int main(int argc, char *argv[])
 	{
 		game_values.playerInput.outputControls[3].menu_right.fPressed = true;
 		miMapField->SendInput(&game_values.playerInput);
-		//printf("Map over-> %s\n", maplist.currentFilename());
+		//printf("Map over-> %s\n", maplist->currentFilename());
 	}
 
 	exit(0);
@@ -1258,11 +1287,11 @@ int main(int argc, char *argv[])
 	game_values.poweruppreset		= 0;
 	game_values.tournamentcontrolstyle = 0;
 
-	game_values.pfFilters			= new bool[NUM_AUTO_FILTERS + filterslist.GetCount()];
-	game_values.piFilterIcons		= new short[NUM_AUTO_FILTERS + filterslist.GetCount()];
+	game_values.pfFilters			= new bool[NUM_AUTO_FILTERS + filterslist->GetCount()];
+	game_values.piFilterIcons		= new short[NUM_AUTO_FILTERS + filterslist->GetCount()];
 	game_values.fNeedWriteFilters	= false;
 	
-	for(short iFilter = 0; iFilter < NUM_AUTO_FILTERS + filterslist.GetCount(); iFilter++)
+	for(short iFilter = 0; iFilter < NUM_AUTO_FILTERS + filterslist->GetCount(); iFilter++)
 	{
 		game_values.pfFilters[iFilter] = false;
 		game_values.piFilterIcons[iFilter] = 0;
@@ -1283,13 +1312,13 @@ int main(int argc, char *argv[])
 
 	UpdateMusicWithOverrides();
 
-	announcerlist.SetCurrent(0);
-	musiclist.SetCurrent(0);
-	worldmusiclist.SetCurrent(0);
-	menugraphicspacklist.SetCurrent(0);
-	worldgraphicspacklist.SetCurrent(0);
-	gamegraphicspacklist.SetCurrent(0);
-	soundpacklist.SetCurrent(0);
+	announcerlist->SetCurrent(0);
+	musiclist->SetCurrent(0);
+	worldmusiclist->SetCurrent(0);
+	menugraphicspacklist->SetCurrent(0);
+	worldgraphicspacklist->SetCurrent(0);
+	gamegraphicspacklist->SetCurrent(0);
+	soundpacklist->SetCurrent(0);
 
 	for(short iPlayer = 0; iPlayer < 4; iPlayer++)
 	{
@@ -1489,17 +1518,17 @@ int main(int argc, char *argv[])
 			//Load skin/team settings
 			for(short iPlayer = 0; iPlayer < 4; iPlayer++)
 			{
-				if(game_values.skinids[iPlayer] >= skinlist.GetCount() || game_values.skinids[iPlayer] < 0)
+				if(game_values.skinids[iPlayer] >= skinlist->GetCount() || game_values.skinids[iPlayer] < 0)
 					game_values.skinids[iPlayer] = 0;
 			}
 
-			announcerlist.SetCurrent((short) abyte[2]);
-			musiclist.SetCurrent((short) abyte[13]);
-			worldmusiclist.SetCurrent((short) abyte[14]);
-			menugraphicspacklist.SetCurrent((short) abyte[17]);
-			worldgraphicspacklist.SetCurrent((short) abyte[32]);
-			gamegraphicspacklist.SetCurrent((short) abyte[26]);
-			soundpacklist.SetCurrent((short) abyte[18]);
+			announcerlist->SetCurrent((short) abyte[2]);
+			musiclist->SetCurrent((short) abyte[13]);
+			worldmusiclist->SetCurrent((short) abyte[14]);
+			menugraphicspacklist->SetCurrent((short) abyte[17]);
+			worldgraphicspacklist->SetCurrent((short) abyte[32]);
+			gamegraphicspacklist->SetCurrent((short) abyte[26]);
+			soundpacklist->	SetCurrent((short) abyte[18]);
 
 			sfx_setmusicvolume(game_values.musicvolume);
 			sfx_setsoundvolume(game_values.soundvolume);
@@ -1864,7 +1893,7 @@ void RunGame()
 	for(short iEyeCandyLayer = 0; iEyeCandyLayer < 3; iEyeCandyLayer++)
 	{
 		//Clouds
-		if(g_map.eyecandy[iEyeCandyLayer] & 1)
+		if(g_map->eyecandy[iEyeCandyLayer] & 1)
 		{
 			for(i = 0; i < 4; i++)
 			{
@@ -1894,7 +1923,7 @@ void RunGame()
 		}
 		
 		//Ghosts
-		if(g_map.eyecandy[iEyeCandyLayer] & 2)
+		if(g_map->eyecandy[iEyeCandyLayer] & 2)
 		{
 			for(i = 0; i < 8; i++)
 			{
@@ -1909,14 +1938,14 @@ void RunGame()
 		}
 
 		//Leaves
-		if(g_map.eyecandy[iEyeCandyLayer] & 4)
+		if(g_map->eyecandy[iEyeCandyLayer] & 4)
 		{
 			for(i = 0; i < 15; i++)
 				eyecandy[iEyeCandyLayer].add(new EC_Leaf(&spr_leaves, (float)(rand() % 640), (float)(rand() % 480)));
 		}
 
 		//Snow
-		if(g_map.eyecandy[iEyeCandyLayer] & 8)
+		if(g_map->eyecandy[iEyeCandyLayer] & 8)
 		{
 			for(i = 0; i < 15; i++)
 				eyecandy[iEyeCandyLayer].add(new EC_Snow(&spr_snow, (float)(rand() % 640), (float)(rand() % 480), 0));
@@ -1925,7 +1954,7 @@ void RunGame()
 		//Fish
 		short iFishWeights[] = {20, 20, 15, 10, 10, 5, 10, 10};
 		short iFishSettings[][4] = { {0, 0, 64, 44}, {0, 44, 64, 44}, {0, 44, 48, 44}, {32, 32, 16, 12}, {32, 44, 16, 12}, {32, 16, 16, 28}, {32, 0, 32, 28}, {32, 44, 32, 28}}; 
-		if(g_map.eyecandy[iEyeCandyLayer] & 16)
+		if(g_map->eyecandy[iEyeCandyLayer] & 16)
 		{
 			for(i = 0; i < 8; i++)
 			{
@@ -1959,14 +1988,14 @@ void RunGame()
 		}
 		
 		//Rain
-		if(g_map.eyecandy[iEyeCandyLayer] & 32)
+		if(g_map->eyecandy[iEyeCandyLayer] & 32)
 		{
 			for(i = 0; i < 20; i++)
 				eyecandy[iEyeCandyLayer].add(new EC_Rain(&spr_rain, (float)(rand() % 640), (float)(rand() % 480)));
 		}
 
 		//Bubbles
-		if(g_map.eyecandy[iEyeCandyLayer] & 64)
+		if(g_map->eyecandy[iEyeCandyLayer] & 64)
 		{
 			for(i = 0; i < 10; i++)
 				eyecandy[iEyeCandyLayer].add(new EC_Bubble(&spr_rain, (float)(rand() % 640), (float)(rand() % 480)));
@@ -2049,9 +2078,9 @@ void RunGame()
 
 					if(list_players[k]->iy + HALFPH >= 0 && list_players[k]->iy + HALFPH < 480)
 					{
-						tile = g_map.map(x, y);
-						block = g_map.block(x, y);
-						blocktype = g_map.blockat(x, y)->iType;
+						tile = g_map->map(x, y);
+						block = g_map->block(x, y);
+						blocktype = g_map->blockat(x, y)->iType;
 					}
 
 					if((tile & tile_flag_solid) || 
@@ -2102,9 +2131,9 @@ void RunGame()
 
 							if(actualvalues[0][j] >= 0 && actualvalues[0][j] < 640 && actualvalues[1][i] > 0 && actualvalues[1][i] < 480)
 							{
-								tile = g_map.map(corners[0][j], corners[1][i]);
-								block = g_map.block(corners[0][j], corners[1][i]);
-								blocktype = g_map.blockat(corners[0][j], corners[1][i])->iType;
+								tile = g_map->map(corners[0][j], corners[1][i]);
+								block = g_map->block(corners[0][j], corners[1][i]);
+								blocktype = g_map->blockat(corners[0][j], corners[1][i])->iType;
 							}
 
 							if( (tile & tile_flag_solid) || 
@@ -2520,7 +2549,7 @@ void RunGame()
 				if(iCountDownState > COUNTDOWN_START_INDEX)
 				{
 					//Move platforms
-					g_map.updatePlatforms();
+					g_map->updatePlatforms();
 
 					//Keep updating map hazards
 					objectcontainer[0].cleandeadobjects();
@@ -2541,7 +2570,7 @@ void RunGame()
 					eyecandy[1].update();
 					eyecandy[2].update();
 					
-					g_map.update();
+					g_map->update();
 				}
 				else
 				{
@@ -2779,7 +2808,7 @@ void RunGame()
 					}
 					
 					//Move platforms
-					g_map.updatePlatforms();
+					g_map->updatePlatforms();
 
 					game_values.playskidsound = false;
 					game_values.playinvinciblesound = false;
@@ -2941,7 +2970,7 @@ void RunGame()
 						game_values.slowdowncounter = 0;
 					}
 
-					g_map.update();
+					g_map->update();
 
 					if(y_shake > 0 && !game_values.spinscreen)
 					{
@@ -2999,29 +3028,29 @@ void RunGame()
 					bossgamemode->SetBossType(0);
 
 					if(bossgamemode->GetBossType() == 0)
-						g_map.loadMap(convertPath("maps/special/dungeon.map"), read_type_full);
+						g_map->loadMap(convertPath("maps/special/dungeon.map"), read_type_full);
 					else if(bossgamemode->GetBossType() == 1)
-						g_map.loadMap(convertPath("maps/special/hills.map"), read_type_full);
+						g_map->loadMap(convertPath("maps/special/hills.map"), read_type_full);
 					else if(bossgamemode->GetBossType() == 2)
-						g_map.loadMap(convertPath("maps/special/volcano.map"), read_type_full);
+						g_map->loadMap(convertPath("maps/special/volcano.map"), read_type_full);
 
 					LoadCurrentMapBackground();
 
-					g_map.predrawbackground(spr_background, spr_backmap[0]);
-					g_map.predrawforeground(spr_frontmap[0]);
+					g_map->predrawbackground(spr_background, spr_backmap[0]);
+					g_map->predrawforeground(spr_frontmap[0]);
 					
-					g_map.predrawbackground(spr_background, spr_backmap[1]);
-					g_map.predrawforeground(spr_frontmap[1]);
+					g_map->predrawbackground(spr_background, spr_backmap[1]);
+					g_map->predrawforeground(spr_frontmap[1]);
 
-					g_map.SetupAnimatedTiles();
+					g_map->SetupAnimatedTiles();
 					LoadMapObjects(false);
 					///////////////////
 					*/
 
 					if(game_values.music)
 					{
-						musiclist.SetRandomMusic(g_map.musicCategoryID, "", "");
-						backgroundmusic[0].load(musiclist.GetCurrentMusic());
+						musiclist->SetRandomMusic(g_map->musicCategoryID, "", "");
+						backgroundmusic[0].load(musiclist->GetCurrentMusic());
 						backgroundmusic[0].play(game_values.playnextmusic, false);
 					}
 
@@ -3041,7 +3070,7 @@ void RunGame()
 			spr_backmap[g_iCurrentDrawIndex].draw(0, 0);
 
 			//draw back eyecandy behind players
-			g_map.drawPlatforms(0);
+			g_map->drawPlatforms(0);
 
 			eyecandy[0].draw();
 			noncolcontainer.draw();
@@ -3050,7 +3079,7 @@ void RunGame()
 
 			objectcontainer[0].draw();
 
-			g_map.drawPlatforms(1);
+			g_map->drawPlatforms(1);
 
 			if(!game_values.swapplayers)
 			{
@@ -3062,23 +3091,23 @@ void RunGame()
 
 			objectcontainer[1].draw();
 
-			g_map.drawPlatforms(2);
+			g_map->drawPlatforms(2);
 
 #ifdef _XBOX
-			g_map.drawfrontlayer();
+			g_map->drawfrontlayer();
 #else
 			if(game_values.toplayer)
-				g_map.drawfrontlayer();
+				g_map->drawfrontlayer();
 #endif
-			g_map.drawWarpLocks();
+			g_map->drawWarpLocks();
 
-			g_map.drawPlatforms(3);
+			g_map->drawPlatforms(3);
 
 			objectcontainer[2].draw();
 			eyecandy[2].draw();
 			game_values.gamemode->draw_foreground();
 		
-			g_map.drawPlatforms(4);
+			g_map->drawPlatforms(4);
 
 			if(game_values.spotlights)
 				spotlightManager.DrawSpotlights();
@@ -3308,7 +3337,7 @@ void RunGame()
 
 			if(game_values.screenfadespeed != 0)
 			{
-				g_map.update();
+				g_map->update();
 				game_values.screenfade += game_values.screenfadespeed;
 
 				if(game_values.screenfade <= 0)
@@ -3491,8 +3520,8 @@ void RunGame()
 		{
 			if(game_values.playnextmusic)
 			{
-				musiclist.SetNextMusic(g_map.musicCategoryID, maplist.currentShortmapname(), g_map.szBackgroundFile);
-				backgroundmusic[0].load(musiclist.GetCurrentMusic());
+				musiclist->SetNextMusic(g_map->musicCategoryID, maplist->currentShortmapname(), g_map->szBackgroundFile);
+				backgroundmusic[0].load(musiclist->GetCurrentMusic());
 			}
 
 			backgroundmusic[0].play(game_values.playnextmusic, false);
@@ -3605,8 +3634,8 @@ void CleanUp()
 	objectcontainer[2].clean();
 		
 	LoadMapObjects(true);
-	g_map.clearWarpLocks();
-	g_map.resetPlatforms();
+	g_map->clearWarpLocks();
+	g_map->resetPlatforms();
 	
 	//Stop all game sounds
 	sfx_stopallsounds();
@@ -3775,8 +3804,8 @@ void PlayNextMusicTrack()
 		return;
 
 	backgroundmusic[0].stop();
-	musiclist.SetNextMusic(g_map.musicCategoryID, maplist.currentShortmapname(), g_map.szBackgroundFile);
-	backgroundmusic[0].load(musiclist.GetCurrentMusic());
+	musiclist->SetNextMusic(g_map->musicCategoryID, maplist->currentShortmapname(), g_map->szBackgroundFile);
+	backgroundmusic[0].load(musiclist->GetCurrentMusic());
 	backgroundmusic[0].play(game_values.playnextmusic, false);
 }
 
@@ -3852,93 +3881,93 @@ void LoadMapObjects(bool fPreview)
 
 	//Clear all the previous switch settings
 	for(short iSwitch = 0; iSwitch < 8; iSwitch++)
-		g_map.switchBlocks[iSwitch].clear();
+		g_map->switchBlocks[iSwitch].clear();
 	
 	//Add blocks (breakable, note, switch, throwable, etc)
 	for(short x = 0; x < MAPWIDTH; x++)
 	{
 		for(short y = 0; y < MAPHEIGHT; y++)
 		{
-			short iType = g_map.objectdata[x][y].iType;
+			short iType = g_map->objectdata[x][y].iType;
 			if(iType == 0)
 			{
-				g_map.blockdata[x][y] = new B_BreakableBlock(&spr_breakableblock, x << 5, y << 5, 4, 10);
-				noncolcontainer.add(g_map.blockdata[x][y]);
+				g_map->blockdata[x][y] = new B_BreakableBlock(&spr_breakableblock, x << 5, y << 5, 4, 10);
+				noncolcontainer.add(g_map->blockdata[x][y]);
 			}
 			else if(iType == 1)
 			{
-				g_map.blockdata[x][y] = new B_PowerupBlock(&spr_powerupblock, x << 5, y << 5, 4, 10, g_map.objectdata[x][y].fHidden, g_map.objectdata[x][y].iSettings);
-				noncolcontainer.add(g_map.blockdata[x][y]);
+				g_map->blockdata[x][y] = new B_PowerupBlock(&spr_powerupblock, x << 5, y << 5, 4, 10, g_map->objectdata[x][y].fHidden, g_map->objectdata[x][y].iSettings);
+				noncolcontainer.add(g_map->blockdata[x][y]);
 			}
 			else if(iType == 2)
 			{
-				g_map.blockdata[x][y] = new B_DonutBlock(&spr_donutblock, x << 5, y << 5);
-				noncolcontainer.add(g_map.blockdata[x][y]);
+				g_map->blockdata[x][y] = new B_DonutBlock(&spr_donutblock, x << 5, y << 5);
+				noncolcontainer.add(g_map->blockdata[x][y]);
 			}
 			else if(iType == 3)
 			{
-				g_map.blockdata[x][y] = new B_FlipBlock(&spr_flipblock, x << 5, y << 5, g_map.objectdata[x][y].fHidden);
-				noncolcontainer.add(g_map.blockdata[x][y]);
+				g_map->blockdata[x][y] = new B_FlipBlock(&spr_flipblock, x << 5, y << 5, g_map->objectdata[x][y].fHidden);
+				noncolcontainer.add(g_map->blockdata[x][y]);
 			}
 			else if(iType == 4)
 			{
-				g_map.blockdata[x][y] = new B_BounceBlock(&spr_bounceblock, x << 5, y << 5, g_map.objectdata[x][y].fHidden);
-				noncolcontainer.add(g_map.blockdata[x][y]);
+				g_map->blockdata[x][y] = new B_BounceBlock(&spr_bounceblock, x << 5, y << 5, g_map->objectdata[x][y].fHidden);
+				noncolcontainer.add(g_map->blockdata[x][y]);
 			}
 			else if(iType == 5)
 			{
-				g_map.blockdata[x][y] = new B_NoteBlock(&spr_noteblock, x << 5, y << 5, 4, 10, 1, g_map.objectdata[x][y].fHidden);
-				noncolcontainer.add(g_map.blockdata[x][y]);
+				g_map->blockdata[x][y] = new B_NoteBlock(&spr_noteblock, x << 5, y << 5, 4, 10, 1, g_map->objectdata[x][y].fHidden);
+				noncolcontainer.add(g_map->blockdata[x][y]);
 			}
 			else if(iType == 6)
 			{
-				g_map.blockdata[x][y] = new B_ThrowBlock(&spr_throwblock, x << 5, y << 5, 4, 10, 0);
-				noncolcontainer.add(g_map.blockdata[x][y]);
+				g_map->blockdata[x][y] = new B_ThrowBlock(&spr_throwblock, x << 5, y << 5, 4, 10, 0);
+				noncolcontainer.add(g_map->blockdata[x][y]);
 			}
 			else if(iType >= 7 && iType <= 10)
 			{
 				short iSwitchType = iType - 7;
-				g_map.blockdata[x][y] = new B_OnOffSwitchBlock(&spr_switchblocks, x << 5, y << 5, iSwitchType, g_map.iSwitches[iSwitchType]);
-				noncolcontainer.add(g_map.blockdata[x][y]);
-				g_map.switchBlocks[iSwitchType].push_back(g_map.blockdata[x][y]);
+				g_map->blockdata[x][y] = new B_OnOffSwitchBlock(&spr_switchblocks, x << 5, y << 5, iSwitchType, g_map->iSwitches[iSwitchType]);
+				noncolcontainer.add(g_map->blockdata[x][y]);
+				g_map->switchBlocks[iSwitchType].push_back(g_map->blockdata[x][y]);
 			}
 			else if(iType >= 11 && iType <= 14)
 			{
 				short iSwitchType = iType - 11;
 
-				//g_map.blockdata[x][y] = new B_SwitchBlock(&spr_switchblocks, x << 5, y << 5, iSwitchType, g_map.iSwitches[iSwitchType]);
-				g_map.blockdata[x][y] = new B_SwitchBlock(&spr_switchblocks, x << 5, y << 5, iSwitchType, g_map.objectdata[x][y].iSettings[0]);
-				noncolcontainer.add(g_map.blockdata[x][y]);
-				g_map.switchBlocks[iSwitchType + 4].push_back(g_map.blockdata[x][y]);
+				//g_map->blockdata[x][y] = new B_SwitchBlock(&spr_switchblocks, x << 5, y << 5, iSwitchType, g_map->iSwitches[iSwitchType]);
+				g_map->blockdata[x][y] = new B_SwitchBlock(&spr_switchblocks, x << 5, y << 5, iSwitchType, g_map->objectdata[x][y].iSettings[0]);
+				noncolcontainer.add(g_map->blockdata[x][y]);
+				g_map->switchBlocks[iSwitchType + 4].push_back(g_map->blockdata[x][y]);
 			}
 			else if(iType == 15)
 			{
-				g_map.blockdata[x][y] = new B_ViewBlock(&spr_viewblock, x << 5, y << 5, g_map.objectdata[x][y].fHidden, g_map.objectdata[x][y].iSettings);
-				noncolcontainer.add(g_map.blockdata[x][y]);
+				g_map->blockdata[x][y] = new B_ViewBlock(&spr_viewblock, x << 5, y << 5, g_map->objectdata[x][y].fHidden, g_map->objectdata[x][y].iSettings);
+				noncolcontainer.add(g_map->blockdata[x][y]);
 			}
 			else if(iType == 16)
 			{
-				g_map.blockdata[x][y] = new B_ThrowBlock(&spr_throwblock, x << 5, y << 5, 4, 10, 2);
-				noncolcontainer.add(g_map.blockdata[x][y]);
+				g_map->blockdata[x][y] = new B_ThrowBlock(&spr_throwblock, x << 5, y << 5, 4, 10, 2);
+				noncolcontainer.add(g_map->blockdata[x][y]);
 			}
 			else if(iType == 17 || iType == 18)
 			{
-				g_map.blockdata[x][y] = new B_NoteBlock(&spr_noteblock, x << 5, y << 5, 4, 10, iType == 17 ? 2 : 0, g_map.objectdata[x][y].fHidden);
-				noncolcontainer.add(g_map.blockdata[x][y]);
+				g_map->blockdata[x][y] = new B_NoteBlock(&spr_noteblock, x << 5, y << 5, 4, 10, iType == 17 ? 2 : 0, g_map->objectdata[x][y].fHidden);
+				noncolcontainer.add(g_map->blockdata[x][y]);
 			}
 			else if(iType == 19)
 			{
-				g_map.blockdata[x][y] = new B_ThrowBlock(&spr_throwblock, x << 5, y << 5, 4, 10, 1);
-				noncolcontainer.add(g_map.blockdata[x][y]);
+				g_map->blockdata[x][y] = new B_ThrowBlock(&spr_throwblock, x << 5, y << 5, 4, 10, 1);
+				noncolcontainer.add(g_map->blockdata[x][y]);
 			}
 			else if(iType >= 20 && iType <= 29)
 			{
-				g_map.blockdata[x][y] = new B_WeaponBreakableBlock(&spr_weaponbreakableblock, x << 5, y << 5, iType - 20);
-				noncolcontainer.add(g_map.blockdata[x][y]);
+				g_map->blockdata[x][y] = new B_WeaponBreakableBlock(&spr_weaponbreakableblock, x << 5, y << 5, iType - 20);
+				noncolcontainer.add(g_map->blockdata[x][y]);
 			}
 			else
 			{
-				g_map.blockdata[x][y] = NULL;
+				g_map->blockdata[x][y] = NULL;
 			}
 		}
 	}
@@ -3954,9 +3983,9 @@ void LoadMapObjects(bool fPreview)
 
 	if(game_values.gamemode->gamemode == game_mode_boxes_minigame)
 	{
-		for(short iItem = 0; iItem < g_map.iNumMapItems; iItem++)
+		for(short iItem = 0; iItem < g_map->iNumMapItems; iItem++)
 		{
-			if(g_map.mapitems[iItem].itype == 5)
+			if(g_map->mapitems[iItem].itype == 5)
 				iThrowBoxCount++;
 		}
 
@@ -3988,9 +4017,9 @@ void LoadMapObjects(bool fPreview)
 
 	//Add map objects like springs, shoes and spikes
 	short iAddThrowBoxIndex = 0;
-	for(short i = 0; i < g_map.iNumMapItems; i++)
+	for(short i = 0; i < g_map->iNumMapItems; i++)
 	{
-		MapItem * mapItem = &g_map.mapitems[i];
+		MapItem * mapItem = &g_map->mapitems[i];
 		short iType = mapItem->itype;
 		short ix = mapItem->ix << 5;
 		short iy = mapItem->iy << 5;
@@ -4057,7 +4086,7 @@ void LoadMapObjects(bool fPreview)
 	}
 
 	//Set all the 1x1 gaps up so players can run across them
-	g_map.UpdateAllTileGaps();
+	g_map->UpdateAllTileGaps();
 }
 
 bool SwapPlayers(short iUsingPlayerID)
@@ -4263,8 +4292,8 @@ void UpdateMusicWithOverrides()
 		}
 	}
 
-	musiclist.UpdateEntriesWithOverrides();
-	worldmusiclist.UpdateEntriesWithOverrides();
+	musiclist->UpdateEntriesWithOverrides();
+	worldmusiclist->UpdateEntriesWithOverrides();
 
 	fclose(file);
 }

@@ -35,7 +35,7 @@ extern Uint8 GetScreenBackgroundFade();
 
 bool LoadStartGraphics()
 {
-	const char * graphicspack = menugraphicspacklist.current_name();
+	const char * graphicspack = menugraphicspacklist->current_name();
 
 	bool loadok = true;
 
@@ -66,7 +66,7 @@ bool LoadStartGraphics()
 
 bool LoadMenuGraphics()
 {
-	const char * graphicspack = menugraphicspacklist.current_name();
+	const char * graphicspack = menugraphicspacklist->current_name();
 	
 	gfx_loadimagenocolorkey(&menu_shade, convertPath("gfx/packs/menu/menu_shade.png", graphicspack));
 	menu_shade.setalpha(GetScreenBackgroundFade());
@@ -113,7 +113,7 @@ bool LoadMenuGraphics()
 
 bool LoadWorldGraphics()
 {
-	const char * graphicspack = worldgraphicspacklist.current_name();
+	const char * graphicspack = worldgraphicspacklist->current_name();
 
 	gfx_loadimage(&spr_worldbackground[0], convertPath("gfx/packs/world/world_background.png", graphicspack), false, false);
 	gfx_loadimage(&spr_worldbackground[1], convertPath("gfx/packs/world/preview/world_background.png", graphicspack), false, false);
@@ -141,9 +141,9 @@ bool LoadWorldGraphics()
 
 bool LoadGameGraphics()
 {
-	const char * graphicspack = gamegraphicspacklist.current_name();
+	const char * graphicspack = gamegraphicspacklist->current_name();
 
-	g_tilesetmanager.Init(graphicspack);
+	g_tilesetmanager->Init(graphicspack);
 
 	bool loadok = true;
 	loadok &= game_font_small.init(convertPath("gfx/packs/fonts/font_small.png", graphicspack));
@@ -393,7 +393,7 @@ bool LoadGameSounds()
 		return false;
 #endif
 
-	const char * soundpack = soundpacklist.current_name();
+	const char * soundpack = soundpacklist->current_name();
 
 	sfx_mip.init(convertPath("sfx/packs/mip.wav", soundpack));
 	sfx_deathsound.init(convertPath("sfx/packs/death.wav", soundpack));
@@ -455,13 +455,13 @@ bool LoadAndSplashScreen()
 	LoadStartGraphics();
 
 	gfxSprite menu_dpi_logo;
-	gfx_loadimagenocolorkey(&menu_dpi_logo, convertPath("gfx/packs/menu/splash_72dpi.png", menugraphicspacklist.current_name()));
+	gfx_loadimagenocolorkey(&menu_dpi_logo, convertPath("gfx/packs/menu/splash_72dpi.png", menugraphicspacklist->current_name()));
 
 	gfxSprite menu_contest_winners;
-	gfx_loadimagenocolorkey(&menu_contest_winners, convertPath("gfx/packs/menu/splash_contest_winners.png", menugraphicspacklist.current_name()));
+	gfx_loadimagenocolorkey(&menu_contest_winners, convertPath("gfx/packs/menu/splash_contest_winners.png", menugraphicspacklist->current_name()));
 
 	gfxSprite menu_credits;
-	gfx_loadimage(&menu_credits, convertPath("gfx/packs/menu/splash_credits.png", menugraphicspacklist.current_name()), false);
+	gfx_loadimage(&menu_credits, convertPath("gfx/packs/menu/splash_credits.png", menugraphicspacklist->current_name()), false);
 
 	int alpha = 0;
 	int state = 0;
@@ -692,7 +692,7 @@ bool LoadAndSplashScreen()
 
 		if(state == 7)
 		{
-			backgroundmusic[2].load(musiclist.GetMusic(1));
+			backgroundmusic[2].load(musiclist->GetMusic(1));
 
 			short k, j;
 			for(k = 0; k < 4; k++)
@@ -720,12 +720,12 @@ bool LoadAndSplashScreen()
 			LoadWorldGraphics();
 			LoadGameGraphics();
 
-			gfx_loadimagenocolorkey(&spr_backmap[0], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist.current_name()));
-			gfx_loadimagenocolorkey(&spr_backmap[1], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist.current_name()));
-			gfx_loadimagenocolorkey(&spr_frontmap[0], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist.current_name()));
-			gfx_loadimagenocolorkey(&spr_frontmap[1], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist.current_name()));
+			gfx_loadimagenocolorkey(&spr_backmap[0], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->current_name()));
+			gfx_loadimagenocolorkey(&spr_backmap[1], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->current_name()));
+			gfx_loadimagenocolorkey(&spr_frontmap[0], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->current_name()));
+			gfx_loadimagenocolorkey(&spr_frontmap[1], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->current_name()));
 
-			gfx_loadimage(&spr_overlay, convertPath("gfx/packs/menu/menu_shade.png", gamegraphicspacklist.current_name()), false, false);
+			gfx_loadimage(&spr_overlay, convertPath("gfx/packs/menu/menu_shade.png", gamegraphicspacklist->current_name()), false, false);
 
 			LoadGameSounds();
 
@@ -738,8 +738,8 @@ bool LoadAndSplashScreen()
 			}
 
 			//Read the map filter lists
-			maplist.ReadFilters();
-			maplist.ApplyFilters(game_values.pfFilters);
+			maplist->ReadFilters();
+			maplist->ApplyFilters(game_values.pfFilters);
 
 			ifsoundonplay(sfx_coin);
 			state++;
@@ -768,7 +768,7 @@ bool LoadAndSplashScreen()
 
 bool LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDirections)
 {
-	return gfx_loadmenuskin(spr_player[playerID], skinlist.GetIndex(skinID), 255, 0, 255, colorID, fLoadBothDirections);
+	return gfx_loadmenuskin(spr_player[playerID], skinlist->GetIndex(skinID), 255, 0, 255, colorID, fLoadBothDirections);
 }
 
 bool LoadFullSkin(gfxSprite ** sprites, const std::string& filename, short colorID)
@@ -778,6 +778,6 @@ bool LoadFullSkin(gfxSprite ** sprites, const std::string& filename, short color
 
 bool LoadFullSkin(gfxSprite ** sprites, short skinID, short colorID)
 {
-	return LoadFullSkin(sprites, skinlist.GetIndex(skinID), colorID);
+	return LoadFullSkin(sprites, skinlist->GetIndex(skinID), colorID);
 }
 

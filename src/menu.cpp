@@ -79,7 +79,7 @@ void Menu::WriteGameOptions()
 		unsigned char abyte[35];
 		abyte[0] = (unsigned char) game_values.spawnstyle;
 		abyte[1] = (unsigned char) game_values.awardstyle;
-		abyte[2] = (unsigned char) announcerlist.GetCurrentIndex();
+		abyte[2] = (unsigned char) announcerlist->GetCurrentIndex();
 		abyte[3] = (unsigned char) game_values.teamcollision;
 		abyte[4] = (unsigned char) game_values.screencrunch;
 		abyte[5] = (unsigned char) game_values.toplayer;
@@ -90,12 +90,12 @@ void Menu::WriteGameOptions()
 		abyte[10] = (unsigned char) game_values.musicvolume;
 		abyte[11] = (unsigned char) game_values.soundvolume;
 		abyte[12] = (unsigned char) game_values.respawn;
-		abyte[13] = (unsigned char) musiclist.GetCurrentIndex();
-		abyte[14] = (unsigned char) worldmusiclist.GetCurrentIndex();
+		abyte[13] = (unsigned char) musiclist->GetCurrentIndex();
+		abyte[14] = (unsigned char) worldmusiclist->GetCurrentIndex();
 		abyte[15] = (unsigned char) game_values.outofboundstime;
 		abyte[16] = (unsigned char) game_values.cpudifficulty;
-		abyte[17] = (unsigned char) menugraphicspacklist.GetCurrentIndex();
-		abyte[18] = (unsigned char) soundpacklist.GetCurrentIndex();
+		abyte[17] = (unsigned char) menugraphicspacklist->GetCurrentIndex();
+		abyte[18] = (unsigned char) soundpacklist->GetCurrentIndex();
 		abyte[19] = (unsigned char) game_values.framelimiter;
 		abyte[20] = (unsigned char) game_values.bonuswheel;
 		abyte[21] = (unsigned char) game_values.keeppowerup;
@@ -103,12 +103,12 @@ void Menu::WriteGameOptions()
 		abyte[23] = (unsigned char) game_values.playnextmusic;
 		abyte[24] = (unsigned char) game_values.pointspeed;
 		abyte[25] = (unsigned char) game_values.swapstyle;
-		abyte[26] = (unsigned char) gamegraphicspacklist.GetCurrentIndex();
+		abyte[26] = (unsigned char) gamegraphicspacklist->GetCurrentIndex();
 		abyte[28] = (unsigned char) game_values.overridepowerupsettings;
 		abyte[29] = (unsigned char) game_values.minigameunlocked;
 		abyte[30] = (unsigned char) game_values.startgamecountdown;
 		abyte[31] = (unsigned char) game_values.deadteamnotice;
-		abyte[32] = (unsigned char) worldgraphicspacklist.GetCurrentIndex();
+		abyte[32] = (unsigned char) worldgraphicspacklist->GetCurrentIndex();
 		abyte[33] = (unsigned char) game_values.tournamentcontrolstyle;
 		abyte[34] = (unsigned char) game_values.startmodedisplay;
 		fwrite(abyte, sizeof(unsigned char), 35, fp); 
@@ -174,8 +174,8 @@ void Menu::WriteGameOptions()
 		fclose(fp);
 	}
 
-	maplist.WriteFilters();
-	maplist.WriteMapSummaryCache();
+	maplist->WriteFilters();
+	maplist->WriteMapSummaryCache();
 }
 
 void Menu::CreateMenu()
@@ -416,9 +416,9 @@ void Menu::CreateMenu()
 	miFullscreenField->SetItemChangedCode(MENU_CODE_TOGGLE_FULLSCREEN);
 #endif //_XBOX
 
-	miMenuGraphicsPackField = new MI_PacksField(&spr_selectfield, 70, 240, "Menu Graphics", 500, 220, &menugraphicspacklist, MENU_CODE_MENU_GRAPHICS_PACK_CHANGED);
-	miWorldGraphicsPackField = new MI_PacksField(&spr_selectfield, 70, 280, "World Graphics", 500, 220, &worldgraphicspacklist, MENU_CODE_WORLD_GRAPHICS_PACK_CHANGED);
-	miGameGraphicsPackField = new MI_PacksField(&spr_selectfield, 70, 320, "Game Graphics", 500, 220, &gamegraphicspacklist, MENU_CODE_GAME_GRAPHICS_PACK_CHANGED);
+	miMenuGraphicsPackField = new MI_PacksField(&spr_selectfield, 70, 240, "Menu Graphics", 500, 220, menugraphicspacklist, MENU_CODE_MENU_GRAPHICS_PACK_CHANGED);
+	miWorldGraphicsPackField = new MI_PacksField(&spr_selectfield, 70, 280, "World Graphics", 500, 220, worldgraphicspacklist, MENU_CODE_WORLD_GRAPHICS_PACK_CHANGED);
+	miGameGraphicsPackField = new MI_PacksField(&spr_selectfield, 70, 320, "Game Graphics", 500, 220, gamegraphicspacklist, MENU_CODE_GAME_GRAPHICS_PACK_CHANGED);
 
 	miGraphicsOptionsMenuBackButton = new MI_Button(&spr_selectfield, 544, 432, "Back", 80, 1);
 	miGraphicsOptionsMenuBackButton->SetCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
@@ -775,21 +775,21 @@ void Menu::CreateMenu()
 	miPlayNextMusicField->SetKey(game_values.playnextmusic ? 1 : 0);
 	miPlayNextMusicField->SetAutoAdvance(true);
 
-	miAnnouncerField = new MI_AnnouncerField(&spr_selectfield, 70, 220, "Announcer", 500, 220, &announcerlist);
-	miSoundPackField = new MI_PacksField(&spr_selectfield, 70, 260, "Sound Pack", 500, 220, &soundpacklist, MENU_CODE_SOUND_PACK_CHANGED);
+	miAnnouncerField = new MI_AnnouncerField(&spr_selectfield, 70, 220, "Announcer", 500, 220, announcerlist);
+	miSoundPackField = new MI_PacksField(&spr_selectfield, 70, 260, "Sound Pack", 500, 220, soundpacklist, MENU_CODE_SOUND_PACK_CHANGED);
 
 	miPlaylistField = new MI_PlaylistField(&spr_selectfield, 70, 300, "Game Music Pack", 500, 220);
 	miWorldMusicField = new MI_SelectField(&spr_selectfield, 70, 340, "World Music Pack", 500, 220);
 	
-	int iCurrentMusic = worldmusiclist.GetCurrentIndex();
-	worldmusiclist.SetCurrent(0);
-	for(short iMusic = 0; iMusic < worldmusiclist.GetCount(); iMusic++)
+	int iCurrentMusic = worldmusiclist->GetCurrentIndex();
+	worldmusiclist->SetCurrent(0);
+	for(short iMusic = 0; iMusic < worldmusiclist->GetCount(); iMusic++)
 	{
-		miWorldMusicField->Add(worldmusiclist.current_name(), iMusic, "", false, false);
-		worldmusiclist.next();
+		miWorldMusicField->Add(worldmusiclist->current_name(), iMusic, "", false, false);
+		worldmusiclist->next();
 	}
 	miWorldMusicField->SetKey(iCurrentMusic);
-	worldmusiclist.SetCurrent(iCurrentMusic);
+	worldmusiclist->SetCurrent(iCurrentMusic);
 	miWorldMusicField->SetItemChangedCode(MENU_CODE_WORLD_MUSIC_CHANGED);
 	
 	miPointSpeedField->Add("Very Slow", 60, "", false, false);
@@ -1343,9 +1343,9 @@ void Menu::CreateMenu()
 	miTournamentField->Show(false);
 	
 	miTourField = new MI_SelectField(&spr_selectfield, 130, 380, "Tour", 380, 100);
-	for(short iTour = 0; iTour < tourlist.GetCount(); iTour++)
+	for(short iTour = 0; iTour < tourlist->GetCount(); iTour++)
 	{
-		GetNameFromFileName(szTemp, tourlist.GetIndex(iTour), true);
+		GetNameFromFileName(szTemp, tourlist->GetIndex(iTour), true);
 		//strcat(szTemp, " Tour");
 		miTourField->Add(szTemp, iTour, "", true, false);
 	}
@@ -1354,9 +1354,9 @@ void Menu::CreateMenu()
 	miTourField->Show(false);
 
 	miWorldField = new MI_SelectField(&spr_selectfield, 130, 380, "World", 380, 100);
-	for(short iWorld = 0; iWorld < worldlist.GetCount(); iWorld++)
+	for(short iWorld = 0; iWorld < worldlist->GetCount(); iWorld++)
 	{
-		GetNameFromFileName(szTemp, worldlist.GetIndex(iWorld), true);
+		GetNameFromFileName(szTemp, worldlist->GetIndex(iWorld), true);
 		miWorldField->Add(szTemp, iWorld, "", true, false);
 	}
 	miWorldField->SetData(&game_values.worldindex, NULL, NULL);
@@ -1458,9 +1458,9 @@ void Menu::CreateMenu()
 	}
 
 	//Add user defined filters
-	for(short iFilter = 0; iFilter < filterslist.GetCount(); iFilter++)
+	for(short iFilter = 0; iFilter < filterslist->GetCount(); iFilter++)
 	{
-		GetNameFromFileName(szTemp, filterslist.GetIndex(iFilter), true);
+		GetNameFromFileName(szTemp, filterslist->GetIndex(iFilter), true);
 		miMapFilterScroll->Add(szTemp, game_values.piFilterIcons[NUM_AUTO_FILTERS + iFilter]);
 	}
 	
@@ -2535,7 +2535,7 @@ void Menu::RunMenu()
 
 						if(MATCH_TYPE_SINGLE_GAME == game_values.matchtype || MATCH_TYPE_TOURNAMENT == game_values.matchtype)
 						{
-							maplist.findexact(szCurrentMapName, false);
+							maplist->findexact(szCurrentMapName, false);
 							miMapField->LoadCurrentMap();
 
 							game_values.gamemode = gamemodes[miModeField->GetShortValue()];
@@ -2932,7 +2932,7 @@ void Menu::RunMenu()
 			}
 			else if(MENU_CODE_WORLD_MUSIC_CHANGED == code)
 			{
-				worldmusiclist.SetCurrent(miWorldMusicField->GetShortValue());
+				worldmusiclist->SetCurrent(miWorldMusicField->GetShortValue());
 			}
 			else if (MENU_CODE_TOUR_STOP_CONTINUE == code || MENU_CODE_TOUR_STOP_CONTINUE_FORCED == code)
 			{
@@ -2978,10 +2978,10 @@ void Menu::RunMenu()
 			}
 			else if(MENU_CODE_MAP_FILTER_EXIT == code)
 			{
-				maplist.ApplyFilters(game_values.pfFilters);
+				maplist->ApplyFilters(game_values.pfFilters);
 				
 				//If the filtered map list has at least 1 map in it, then allow exiting the filter menu
-				if(maplist.MapInFilteredSet())
+				if(maplist->MapInFilteredSet())
 				{
 					miMapField->LoadCurrentMap();
 					szCurrentMapName = miMapField->GetMapName();
@@ -3136,12 +3136,12 @@ void Menu::RunMenu()
 
 				if(game_values.matchtype == MATCH_TYPE_WORLD && game_values.tourstops[game_values.tourstopcurrent]->iStageType == 1)
 				{
-					g_map.loadMap(convertPath("maps/special/two52_special_bonushouse.map"), read_type_full);
+					g_map->loadMap(convertPath("maps/special/two52_special_bonushouse.map"), read_type_full);
 					LoadCurrentMapBackground();
 
 					if(game_values.music)
 					{
-						backgroundmusic[0].load(worldmusiclist.GetMusic(WORLDMUSICBONUS, ""));
+						backgroundmusic[0].load(worldmusiclist->GetMusic(WORLDMUSICBONUS, ""));
 						backgroundmusic[0].play(false, false);
 					}
 				}
@@ -3157,12 +3157,12 @@ void Menu::RunMenu()
 							game_values.gamemode->gamemode == game_mode_boss_minigame ||
 							game_values.gamemode->gamemode == game_mode_boxes_minigame)
 						{
-							fMiniGameMapFound = maplist.findexact(game_values.tourstops[game_values.tourstopcurrent]->pszMapFile, true);
+							fMiniGameMapFound = maplist->findexact(game_values.tourstops[game_values.tourstopcurrent]->pszMapFile, true);
 
 							if(fMiniGameMapFound)
 							{
-								g_map.loadMap(maplist.currentFilename(), read_type_full);
-								sShortMapName = maplist.currentShortmapname();
+								g_map->loadMap(maplist->currentFilename(), read_type_full);
+								sShortMapName = maplist->currentShortmapname();
 							}
 						}
 					}
@@ -3171,7 +3171,7 @@ void Menu::RunMenu()
 					{
 						if(!fMiniGameMapFound)
 						{
-							g_map.loadMap(convertPath("maps/special/two52_special_pipe_minigame.map"), read_type_full);
+							g_map->loadMap(convertPath("maps/special/two52_special_pipe_minigame.map"), read_type_full);
 							sShortMapName = "minigamepipe";
 						}
 					}
@@ -3182,11 +3182,11 @@ void Menu::RunMenu()
 							short iBossType = game_values.gamemodesettings.boss.bosstype;
 							bossgamemode->SetBossType(iBossType);
 							if(iBossType == 0)
-								g_map.loadMap(convertPath("maps/special/two52_special_hammerboss_minigame.map"), read_type_full);
+								g_map->loadMap(convertPath("maps/special/two52_special_hammerboss_minigame.map"), read_type_full);
 							else if(iBossType == 1)
-								g_map.loadMap(convertPath("maps/special/two52_special_bombboss_minigame.map"), read_type_full);
+								g_map->loadMap(convertPath("maps/special/two52_special_bombboss_minigame.map"), read_type_full);
 							else if(iBossType == 2)
-								g_map.loadMap(convertPath("maps/special/two52_special_fireboss_minigame.map"), read_type_full);
+								g_map->loadMap(convertPath("maps/special/two52_special_fireboss_minigame.map"), read_type_full);
 							
 							sShortMapName = "minigameboss";
 						}
@@ -3195,21 +3195,21 @@ void Menu::RunMenu()
 					{
 						if(!fMiniGameMapFound)
 						{
-							g_map.loadMap(convertPath("maps/special/two52_special_boxes_minigame.map"), read_type_full);
+							g_map->loadMap(convertPath("maps/special/two52_special_boxes_minigame.map"), read_type_full);
 							sShortMapName = "minigameboxes";
 						}
 					}
 					else if(game_values.matchtype == MATCH_TYPE_QUICK_GAME)
 					{
 						//Load a random map for the quick game
-						const char * szMapName = maplist.randomFilename();
-						g_map.loadMap(szMapName, read_type_full);
+						const char * szMapName = maplist->randomFilename();
+						g_map->loadMap(szMapName, read_type_full);
 						sShortMapName = stripPathAndExtension(szMapName);
 					}
 					else
 					{
-						g_map.loadMap(maplist.currentFilename(), read_type_full);
-						sShortMapName = maplist.currentShortmapname();
+						g_map->loadMap(maplist->currentFilename(), read_type_full);
+						sShortMapName = maplist->currentShortmapname();
 					}
 
 					LoadCurrentMapBackground();
@@ -3219,21 +3219,21 @@ void Menu::RunMenu()
 
 					if(game_values.music)
 					{
-						musiclist.SetRandomMusic(g_map.musicCategoryID, sShortMapName.c_str(), g_map.szBackgroundFile);
-						backgroundmusic[0].load(musiclist.GetCurrentMusic());
+						musiclist->SetRandomMusic(g_map->musicCategoryID, sShortMapName.c_str(), g_map->szBackgroundFile);
+						backgroundmusic[0].load(musiclist->GetCurrentMusic());
 						backgroundmusic[0].play(game_values.playnextmusic, false);
 					}
 				}
 
 				game_values.gamestate = GS_GAME;			
 
-				g_map.predrawbackground(spr_background, spr_backmap[0]);
-				g_map.predrawforeground(spr_frontmap[0]);
+				g_map->predrawbackground(spr_background, spr_backmap[0]);
+				g_map->predrawforeground(spr_frontmap[0]);
 				
-				g_map.predrawbackground(spr_background, spr_backmap[1]);
-				g_map.predrawforeground(spr_frontmap[1]);
+				g_map->predrawbackground(spr_background, spr_backmap[1]);
+				g_map->predrawforeground(spr_frontmap[1]);
 
-				g_map.SetupAnimatedTiles();
+				g_map->SetupAnimatedTiles();
 				LoadMapObjects(false);
 
 				return;
@@ -3246,7 +3246,7 @@ void Menu::RunMenu()
 				mCurrentMenu->ResetMenu();
 
 				backgroundmusic[2].stop();
-				backgroundmusic[5].load(worldmusiclist.GetMusic(g_worldmap.GetMusicCategory(), g_worldmap.GetWorldName()));
+				backgroundmusic[5].load(worldmusiclist->GetMusic(g_worldmap.GetMusicCategory(), g_worldmap.GetWorldName()));
 				backgroundmusic[5].play(false, false);
 				fNeedMenuMusicReset = true;
 
@@ -3333,13 +3333,13 @@ void Menu::RunMenu()
 			backgroundmusic[2].sfx_pause();
 
 			//Reload map auto filters from live map files (don't use the cache)
-			maplist.ReloadMapAutoFilters();
+			maplist->ReloadMapAutoFilters();
 
 			//Write out all the map thumbnails for the map browser and filter editor
 			char szThumbnail[256];
-			std::map<std::string, MapListNode*>::iterator itr = maplist.GetIteratorAt(0, false);
+			std::map<std::string, MapListNode*>::iterator itr = maplist->GetIteratorAt(0, false);
 		
-			short iMapCount = maplist.GetCount();
+			short iMapCount = maplist->GetCount();
 			for(short iMap = 0; iMap < iMapCount; iMap++)
 			{
 				strcpy(szThumbnail, "maps/cache/");
@@ -3352,8 +3352,8 @@ void Menu::RunMenu()
 				strcat(szThumbnail, ".bmp");
 #endif
 
-				g_map.loadMap((*itr).second->filename, read_type_preview);
-				g_map.saveThumbnail(szThumbnail, false);
+				g_map->loadMap((*itr).second->filename, read_type_preview);
+				g_map->saveThumbnail(szThumbnail, false);
 
 				itr++;
 			}
@@ -3370,7 +3370,7 @@ bool Menu::ReadTourFile()
 {
 	ResetTourStops();
 
-	FILE * fp = fopen(tourlist.GetIndex(game_values.tourindex), "r");
+	FILE * fp = fopen(tourlist->GetIndex(game_values.tourindex), "r");
 
 	char buffer[256];
 	bool fReadVersion = false;
@@ -3445,7 +3445,7 @@ void Menu::StartGame()
 			{
 				do
 				{
-					game_values.skinids[k] = rand() % skinlist.GetCount();
+					game_values.skinids[k] = rand() % skinlist->GetCount();
 				}
 				while(!LoadFullSkin(spr_player[k], game_values.skinids[k], game_values.colorids[k]));
 			}
@@ -3457,15 +3457,15 @@ void Menu::StartGame()
 	}
 
 	//Load announcer sounds if changed
-	if(game_values.loadedannouncer != announcerlist.GetCurrentIndex())
+	if(game_values.loadedannouncer != announcerlist->GetCurrentIndex())
 	{
-		game_values.loadedannouncer = (short)announcerlist.GetCurrentIndex();
+		game_values.loadedannouncer = (short)announcerlist->GetCurrentIndex();
 
 		//Delete the old sounds
 		for(int k = 0; k < PANNOUNCER_SOUND_LAST; k++)
 			sfx_announcer[k].reset();
 
-		FILE * announcerfile = fopen(announcerlist.current_name(), "r");
+		FILE * announcerfile = fopen(announcerlist->current_name(), "r");
 		
 		char szBuffer[256];
 
@@ -3498,12 +3498,12 @@ void Menu::StartGame()
 	}
 
 	//Load soundtrack music if changed
-	if(game_values.loadedmusic != musiclist.GetCurrentIndex())
+	if(game_values.loadedmusic != musiclist->GetCurrentIndex())
 	{
-		game_values.loadedmusic = (short)musiclist.GetCurrentIndex();
-		backgroundmusic[1].load(musiclist.GetMusic(0)); //Stage Clear
-		backgroundmusic[3].load(musiclist.GetMusic(2)); //Tournament Menu
-		backgroundmusic[4].load(musiclist.GetMusic(3)); //Tournament Over
+		game_values.loadedmusic = (short)musiclist->GetCurrentIndex();
+		backgroundmusic[1].load(musiclist->GetMusic(0)); //Stage Clear
+		backgroundmusic[3].load(musiclist->GetMusic(2)); //Tournament Menu
+		backgroundmusic[4].load(musiclist->GetMusic(3)); //Tournament Over
 	}
 
 	backgroundmusic[2].stop();

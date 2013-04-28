@@ -669,7 +669,7 @@ void MI_TeamSelect::Draw()
 			spr_player_select_ready.draw(iTeam * 160 + 16, 368, 0, 0, 128, 96);
 			
 			spr_menu_boxed_numbers.draw(iTeam * 160 + 32, 388, iTeam * 16, game_values.colorids[iTeam] * 16, 16, 16);
-			menu_font_small.drawChopRight(iTeam * 160 + 52, 404 - menu_font_small.getHeight(), 80, game_values.randomskin[iTeam] ? "Random" : skinlist.GetSkinName(game_values.skinids[iTeam]));
+			menu_font_small.drawChopRight(iTeam * 160 + 52, 404 - menu_font_small.getHeight(), 80, game_values.randomskin[iTeam] ? "Random" : skinlist->GetSkinName(game_values.skinids[iTeam]));
 
 			spr_player_select_ready.draw(iTeam * 160 + 64, 408, 128, (!fReady[iTeam] ? 0 : (game_values.playercontrol[iTeam] == 1 ? 32 : 64)), 34, 32);
 		}
@@ -716,12 +716,12 @@ MenuCodeEnum MI_TeamSelect::SendInput(CPlayerInput * playerInput)
 					{
 						if(playerKeys->menu_down.fDown)
 						{
-							game_values.skinids[iPlayer] = rand() % skinlist.GetCount();
+							game_values.skinids[iPlayer] = rand() % skinlist->GetCount();
 						}
 						else
 						{
 							if(--game_values.skinids[iPlayer] < 0)
-								game_values.skinids[iPlayer] = (short)skinlist.GetCount() - 1;
+								game_values.skinids[iPlayer] = (short)skinlist->GetCount() - 1;
 						}
 					}
 					while(!LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false));
@@ -742,7 +742,7 @@ MenuCodeEnum MI_TeamSelect::SendInput(CPlayerInput * playerInput)
 							do
 							{
 								if(--game_values.skinids[iPlayer] < 0)
-									game_values.skinids[iPlayer] = (short)skinlist.GetCount() - 1;
+									game_values.skinids[iPlayer] = (short)skinlist->GetCount() - 1;
 							}
 							while(!LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false));
 
@@ -757,11 +757,11 @@ MenuCodeEnum MI_TeamSelect::SendInput(CPlayerInput * playerInput)
 					{
 						if(playerKeys->menu_up.fDown)
 						{
-							game_values.skinids[iPlayer] = rand() % skinlist.GetCount();
+							game_values.skinids[iPlayer] = rand() % skinlist->GetCount();
 						}
 						else
 						{
-							if(++game_values.skinids[iPlayer] >= skinlist.GetCount())
+							if(++game_values.skinids[iPlayer] >= skinlist->GetCount())
 								game_values.skinids[iPlayer] = 0;
 						}
 					}								
@@ -782,7 +782,7 @@ MenuCodeEnum MI_TeamSelect::SendInput(CPlayerInput * playerInput)
 						{
 							do
 							{
-								if(++game_values.skinids[iPlayer] >= skinlist.GetCount())
+								if(++game_values.skinids[iPlayer] >= skinlist->GetCount())
 									game_values.skinids[iPlayer] = 0;
 							}
 							while(!LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false));
@@ -815,7 +815,7 @@ MenuCodeEnum MI_TeamSelect::SendInput(CPlayerInput * playerInput)
 				{
 					do
 					{
-						game_values.skinids[iPlayer] = rand() % skinlist.GetCount();
+						game_values.skinids[iPlayer] = rand() % skinlist->GetCount();
 					}								
 					while(!LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false));
 				}
@@ -920,7 +920,7 @@ void MI_TeamSelect::FindNewTeam(short iPlayerID, short iDirection)
 					//Skip skins that are invalid
 					while(!LoadMenuSkin(iPlayerID, game_values.skinids[iPlayerID], iNewTeam, false))
 					{
-						if(++game_values.skinids[iPlayerID] >= skinlist.GetCount())
+						if(++game_values.skinids[iPlayerID] >= skinlist->GetCount())
 							game_values.skinids[iPlayerID] = 0;
 					}
 				}
@@ -1056,7 +1056,7 @@ void MI_TeamSelect::Reset()
 		//Skip skins that are invalid
 		while(!LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false))
 		{
-			if(++game_values.skinids[iPlayer] >= skinlist.GetCount())
+			if(++game_values.skinids[iPlayer] >= skinlist->GetCount())
 				game_values.skinids[iPlayer] = 0;
 		}
 	}	
@@ -2087,9 +2087,9 @@ MenuCodeEnum MI_PlaylistField::SendInput(CPlayerInput * playerInput)
 	{
 		if(playerInput->outputControls[iPlayer].menu_right.fPressed || playerInput->outputControls[iPlayer].menu_down.fPressed)
 		{
-			musiclist.next();
+			musiclist->next();
 			backgroundmusic[2].stop();
-			backgroundmusic[2].load(musiclist.GetMusic(1));
+			backgroundmusic[2].load(musiclist->GetMusic(1));
 			
 			if(game_values.music)
 				backgroundmusic[2].play(false, false);
@@ -2099,9 +2099,9 @@ MenuCodeEnum MI_PlaylistField::SendInput(CPlayerInput * playerInput)
 		
 		if(playerInput->outputControls[iPlayer].menu_left.fPressed || playerInput->outputControls[iPlayer].menu_up.fPressed)
 		{
-			musiclist.prev();
+			musiclist->prev();
 			backgroundmusic[2].stop();
-			backgroundmusic[2].load(musiclist.GetMusic(1));
+			backgroundmusic[2].load(musiclist->GetMusic(1));
 			
 			if(game_values.music)
 				backgroundmusic[2].play(false, false);
@@ -2111,9 +2111,9 @@ MenuCodeEnum MI_PlaylistField::SendInput(CPlayerInput * playerInput)
 
 		if(playerInput->outputControls[iPlayer].menu_random.fPressed)
 		{
-            musiclist.random();
+            musiclist->random();
 			backgroundmusic[2].stop();
-			backgroundmusic[2].load(musiclist.GetMusic(1));
+			backgroundmusic[2].load(musiclist->GetMusic(1));
 			
 			if(game_values.music)
 				backgroundmusic[2].play(false, false);
@@ -2152,7 +2152,7 @@ void MI_PlaylistField::Draw()
 	spr->draw(ix + iIndent + 16, iy, 528 - iWidth + iIndent, (fSelected ? 32 : 0), iWidth - iIndent - 16, 32);
 
 	menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName);
-	menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 24, musiclist.current_name());
+	menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 24, musiclist->current_name());
 
 	miModifyImageLeft->Draw();
 	miModifyImageRight->Draw();
@@ -3951,7 +3951,7 @@ MenuCodeEnum MI_MapBrowser::SendInput(CPlayerInput * playerInput)
 			}
 			else
 			{
-				maplist.SetCurrent(mapListItr[iSelectedRow * 3 + iSelectedCol]);
+				maplist->SetCurrent(mapListItr[iSelectedRow * 3 + iSelectedCol]);
 				return MENU_CODE_MAP_BROWSER_EXIT;
 			}
 
@@ -3973,17 +3973,17 @@ void MI_MapBrowser::Reset(short type)
 
 	if(iType == 0)
 	{
-		iSelectedIndex = maplist.GetCurrent()->second->iIndex;
+		iSelectedIndex = maplist->GetCurrent()->second->iIndex;
 
 		iFilterTagAnimationTimer = 0;
 		iFilterTagAnimationFrame = 72;
 
-		iMapCount = maplist.GetCount();
+		iMapCount = maplist->GetCount();
 	}
 	else
 	{
-		iSelectedIndex = maplist.GetCurrent()->second->iFilteredIndex;
-		iMapCount = maplist.GetFilteredCount();
+		iSelectedIndex = maplist->GetCurrent()->second->iFilteredIndex;
+		iMapCount = maplist->GetFilteredCount();
 	}
 
 	iSelectedRow = (iSelectedIndex / 3) % 3;
@@ -4002,7 +4002,7 @@ void MI_MapBrowser::LoadPage(short page, bool fUseFilters)
 		if(iIndex >= iMapCount)
 			return;
 
-		std::map<std::string, MapListNode*>::iterator itr = maplist.GetIteratorAt(iIndex, fUseFilters);
+		std::map<std::string, MapListNode*>::iterator itr = maplist->GetIteratorAt(iIndex, fUseFilters);
 		
 		//See if we already have a thumbnail saved for this map
 
@@ -4021,9 +4021,9 @@ void MI_MapBrowser::LoadPage(short page, bool fUseFilters)
 
 		if(!File_Exists(sConvertedPath))
 		{
-			g_map.loadMap((*itr).second->filename, read_type_preview);
+			g_map->loadMap((*itr).second->filename, read_type_preview);
 			SDL_Delay(10);  //Sleeps to help the music from skipping
-			g_map.saveThumbnail(sConvertedPath, false);
+			g_map->saveThumbnail(sConvertedPath, false);
 			SDL_Delay(10);
 		}
 		
@@ -4211,7 +4211,7 @@ void MI_World::AdvanceTurn()
 	{
 		if(--iSleepTurns <= 0)
 		{
-			backgroundmusic[5].load(worldmusiclist.GetMusic(g_worldmap.GetMusicCategory(), g_worldmap.GetWorldName()));
+			backgroundmusic[5].load(worldmusiclist->GetMusic(g_worldmap.GetMusicCategory(), g_worldmap.GetWorldName()));
 			backgroundmusic[5].play(false, false);
 		}
 	}
@@ -5059,7 +5059,7 @@ bool MI_World::UsePowerup(short iPlayer, short iTeam, short iIndex, bool fPopupI
 		fUsedItem = true;
 		ifsoundonplay(sfx_collectpowerup);
 
-		backgroundmusic[5].load(worldmusiclist.GetMusic(WORLDMUSICSLEEP, ""));
+		backgroundmusic[5].load(worldmusiclist->GetMusic(WORLDMUSICSLEEP, ""));
 		backgroundmusic[5].play(false, false);
 	}
 	else if(iPowerup == NUM_POWERUPS + 1) //Cloud (allows player to skip stages)
