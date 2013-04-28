@@ -823,42 +823,42 @@ void CPlayer::move()
 			
 			if(state == player_entering_warp_left)
 			{
-				setXi(ix - 1);
+				xi(ix - 1);
 				increasewarpcounter(PW + PWOFFSET);
 			}
 			else if(state == player_entering_warp_right)
 			{
-				setXi(ix + 1);
+				xi(ix + 1);
 				increasewarpcounter(PW + PWOFFSET);
 			}
 			else if(state == player_entering_warp_up)
 			{
-				setYi(iy - 1);
+				yi(iy - 1);
 				increasewarpcounter(TILESIZE - PHOFFSET);
 			}
 			else if(state == player_entering_warp_down)
 			{
-				setYi(iy + 1);
+				yi(iy + 1);
 				increasewarpcounter(PH + PHOFFSET);
 			}
 			else if(state == player_exiting_warp_left)
 			{
-				setXi(ix - 1);
+				xi(ix - 1);
 				decreasewarpcounter();
 			}
 			else if(state == player_exiting_warp_right)
 			{
-				setXi(ix + 1);
+				xi(ix + 1);
 				decreasewarpcounter();
 			}
 			else if(state == player_exiting_warp_up)
 			{
-				setYi(iy - 1);
+				yi(iy - 1);
 				decreasewarpcounter();
 			}
 			else if(state == player_exiting_warp_down)
 			{
-				setYi(iy + 1);
+				yi(iy + 1);
 				decreasewarpcounter();
 			}
 		}
@@ -2039,7 +2039,7 @@ void CPlayer::Jump(short iMove, float jumpModifier, bool fKuriboBounce)
 	if(platform)
 	{
 		//if(platform->fVelY < 0.0f)
-		//	setYf(fy + platform->fVelY);
+		//	yf(fy + platform->fVelY);
 
 		platform = NULL;
 	}
@@ -2068,8 +2068,8 @@ void CPlayer::decreasewarpcounter()
 void CPlayer::chooseWarpExit()
 {
 	WarpExit * exit = g_map->getRandomWarpExit(warpconnection, warpid);
-	setXi(exit->x);
-	setYi(exit->y);
+	xi(exit->x);
+	yi(exit->y);
 	fOldX = fx;
 	fOldY = fy;
 
@@ -2463,7 +2463,7 @@ bool CPlayer::isstomping(CPlayer * o)
 		//don't reposition if player is warping when he kills the other player
 		if(state == player_ready)
 		{
-			setYi(o->iy - PH);		//set new position to top of other player
+			yi(o->iy - PH);		//set new position to top of other player
 			collision_detection_checktop();
 			platform = NULL;
 		}
@@ -2956,12 +2956,12 @@ void _collisionhandler_p2p_pushback(CPlayer * o1, CPlayer * o2)
 	{
 		if(overlapcollision)
 		{//o2 reposition to the right side of o1, o1 stays
-			o2->setXi(o1->ix - PW + 639);
+			o2->xi(o1->ix - PW + 639);
 			o2->collision_detection_checkleft();
 		}
 		else
 		{
-			o2->setXi(o1->ix + PW + 1);
+			o2->xi(o1->ix + PW + 1);
 			o2->collision_detection_checkright();
 		}
 
@@ -2971,12 +2971,12 @@ void _collisionhandler_p2p_pushback(CPlayer * o1, CPlayer * o2)
 	{
 		if(overlapcollision)
 		{//o1 reposition to the left side of o2, o2 stays
-			o1->setXi(o2->ix + PW - 639);
+			o1->xi(o2->ix + PW - 639);	
 			o1->collision_detection_checkright();
 		}
 		else
 		{
-			o1->setXi(o2->ix - PW - 1);
+			o1->xi(o2->ix - PW - 1);	
 			o1->collision_detection_checkleft();
 		}
 
@@ -2988,8 +2988,8 @@ void _collisionhandler_p2p_pushback(CPlayer * o1, CPlayer * o2)
 		if(overlapcollision)
 		{
 			short middle = o2->ix - 640 + ((o1->ix + PW) - o2->ix - 640) / 2;		//no ABS needed (o1->x < o2->x -> o1->x+w > o2->x !)
-			o1->setXi(middle + 1);	//o1 is left
-			o2->setXi(middle - PW + 639);		//o2 is right
+			o1->xi(middle + 1);	//o1 is left
+			o2->xi(middle - PW + 639);		//o2 is right
 
 			o1->collision_detection_checkright();
 			o2->collision_detection_checkleft();
@@ -2998,8 +2998,8 @@ void _collisionhandler_p2p_pushback(CPlayer * o1, CPlayer * o2)
 		{
 			short middle = o2->ix + ((o1->ix + PW) - o2->ix) / 2;		//no ABS needed (o1->x < o2->x -> o1->x+w > o2->x !)
 			//printf("hlf:%f, o1x:%f, o2x:%f\n", hlf, o1->x, o2->x);
-			o1->setXi(middle - PW - 1);	//o1 is left
-			o2->setXi(middle + 1);		//o2 is right
+			o1->xi(middle - PW - 1);	//o1 is left
+			o2->xi(middle + 1);		//o2 is right
 
 			o1->collision_detection_checkleft();
 			o2->collision_detection_checkright();
@@ -3102,7 +3102,7 @@ void BounceAssistPlayer(CPlayer * o1, CPlayer * o2)
 {
 	if(o1->state == player_ready && o1->fOldY + PH <= o2->fOldY && o1->iy + PH >= o2->iy && o1->playerKeys->game_jump.fDown)
 	{
-		o1->setYi(o2->iy - PH);		//set new position to top of other player
+		o1->yi(o2->iy - PH);		//set new position to top of other player
 		o1->collision_detection_checktop();
 		o1->platform = NULL;
 		o1->vely = -VELSUPERJUMP;
@@ -3553,13 +3553,13 @@ void CPlayer::updateswap()
 
 	if(game_values.swapstyle == 1)
 	{
-		setXf(game_values.swapplayersblink ? fOldSwapX : fNewSwapX);
-		setYf(game_values.swapplayersblink ? fOldSwapY : fNewSwapY);
+		xf(game_values.swapplayersblink ? fOldSwapX : fNewSwapX);
+		yf(game_values.swapplayersblink ? fOldSwapY : fNewSwapY);
 	}
 	else
 	{
-		setXf(((fNewSwapX - fOldSwapX) * game_values.swapplayersposition) + fOldSwapX);
-		setYf(((fNewSwapY - fOldSwapY) * game_values.swapplayersposition) + fOldSwapY);
+		xf(((fNewSwapX - fOldSwapX) * game_values.swapplayersposition) + fOldSwapX);
+		yf(((fNewSwapY - fOldSwapY) * game_values.swapplayersposition) + fOldSwapY);
 	}
 
 	if(carriedItem)
@@ -3585,7 +3585,7 @@ void CPlayer::drawswap()
 
 void CPlayer::collision_detection_map()
 {
-	setXf(fx + velx);
+	xf(fx + velx);
 	flipsidesifneeded();
 
 	fPrecalculatedY = fy + vely;  //Fixes weird float rounding error.  Must be computed here before casting to int.  Otherwise, this will miss the bottom collision, but then hit the side collision and the player can slide out of 1x1 spaces.
@@ -3598,7 +3598,7 @@ void CPlayer::collision_detection_map()
 	if(platform)
 	{
 		fPlatformVelX = platform->fVelX;
-		setXf(fx + fPlatformVelX);
+		xf(fx + fPlatformVelX);
 		flipsidesifneeded();
 		
 		fPlatformVelY = platform->fVelY;
@@ -3622,7 +3622,7 @@ void CPlayer::collision_detection_map()
 
 	if(fPrecalculatedY + PH < 0.0f)
 	{				// on top outside of the screen
-		setYf(fPrecalculatedY);
+		yf(fPrecalculatedY);
 		vely = CapFallingVelocity(GRAVITATION + vely);
 
 		if(!platform)
@@ -3637,7 +3637,7 @@ void CPlayer::collision_detection_map()
 	}
 	else if(fPrecalculatedY + PH >= 480.0f)
 	{	//on ground outside of the screen?
-		setYi(-PH);
+		yi(-PH);
 		fOldY = (float)(-PH - 1);
 		fallthrough = false;
 		onice = false;
@@ -3701,14 +3701,14 @@ void CPlayer::collision_detection_map()
 			//first check to see if player hit a warp
 			if(playerKeys->game_right.fDown && !frozen && g_map->checkforwarp(tx, ty, ty2, 3))
 			{
-				setXf((float)((tx << 5) - PW) - 0.2f);
+				xf((float)((tx << 5) - PW) - 0.2f);
 				enterwarp(g_map->warp(tx, ty2));
 				warpplane = ix + PW + 1;
 
 				if(iy - PHOFFSET < (ty << 5))
-					setYi((ty << 5) + PHOFFSET);
+					yi((ty << 5) + PHOFFSET);
 				else if(iy + PH > (ty2 << 5) + TILESIZE - 3)
-					setYi((ty2 << 5) + TILESIZE - PH - 3);
+					yi((ty2 << 5) + TILESIZE - PH - 3);
 
 				return;
 			}
@@ -3752,7 +3752,7 @@ void CPlayer::collision_detection_map()
 					return;
 				}
 
-				setXf((float)((tx << 5) - PW) - 0.2f);			//move to the edge of the tile (tile on the right -> mind the player width)
+				xf((float)((tx << 5) - PW) - 0.2f);			//move to the edge of the tile (tile on the right -> mind the player width)
 				fOldX = fx;
 				
 				if(velx > 0.0f)
@@ -3794,14 +3794,14 @@ void CPlayer::collision_detection_map()
 			//first check to see if player hit a warp
 			if(playerKeys->game_left.fDown && !frozen && g_map->checkforwarp(tx, ty, ty2, 1))
 			{
-				setXf((float)((tx << 5) + TILESIZE) + 0.2f);
+				xf((float)((tx << 5) + TILESIZE) + 0.2f);
 				enterwarp(g_map->warp(tx, ty2));
 				warpplane = ix;
 
 				if(iy - PHOFFSET < (ty << 5))
-					setYi((ty << 5) + PHOFFSET);
+					yi((ty << 5) + PHOFFSET);
 				else if(iy + PH > (ty2 << 5) + TILESIZE - 3)
-					setYi((ty2<< 5) + TILESIZE - PH - 3);
+					yi((ty2<< 5) + TILESIZE - PH - 3);
 
 				return;
 			}
@@ -3844,7 +3844,7 @@ void CPlayer::collision_detection_map()
 					return;
 				}
 
-				setXf((float)((tx << 5) + TILESIZE) + 0.2f);			//move to the edge of the tile
+				xf((float)((tx << 5) + TILESIZE) + 0.2f);			//move to the edge of the tile
 				fOldX = fx;
 				
 				if(velx < 0.0f)
@@ -3918,14 +3918,14 @@ void CPlayer::collision_detection_map()
 		
 		if(playerKeys->game_jump.fDown && !frozen && g_map->checkforwarp(alignedBlockX, unAlignedBlockX, ty, 2))
 		{
-			setYf((float)((ty << 5) + TILESIZE) + 0.2f);
+			yf((float)((ty << 5) + TILESIZE) + 0.2f);
 			enterwarp(g_map->warp(unAlignedBlockX, ty));
 			warpplane = iy;
 
 			if(ix - PWOFFSET < (txl << 5) + 1)
-				setXi((txl << 5) + PHOFFSET + 1);
+				xi((txl << 5) + PHOFFSET + 1);
 			else if(ix + PW + PWOFFSET > (txr << 5) + TILESIZE)
-				setXi((txr << 5) + TILESIZE - PW - PWOFFSET);
+				xi((txr << 5) + TILESIZE - PW - PWOFFSET);
 
 			return;
 		}
@@ -3953,7 +3953,7 @@ void CPlayer::collision_detection_map()
 		if((alignedTileType & tile_flag_solid) && !(alignedTileType & tile_flag_super_or_player_death_bottom) &&
 			(!(alignedTileType & tile_flag_death_on_bottom) || invincible || shield > 0 || shyguy))
 		{
-			setYf((float)((ty << 5) + TILESIZE) + 0.2f);
+			yf((float)((ty << 5) + TILESIZE) + 0.2f);
 			fOldY = fy - 1.0f;
 			
 			if(vely < 0.0f)
@@ -3997,10 +3997,10 @@ void CPlayer::collision_detection_map()
 		if((unalignedTileType & tile_flag_solid) && !(unalignedTileType & tile_flag_super_or_player_death_bottom) && 
 			(!(unalignedTileType & tile_flag_death_on_bottom) || invincible || shield > 0 || shyguy))
 		{
-			setXf(unAlignedBlockFX);
+			xf(unAlignedBlockFX);
 			fOldX = fx;
 
-			setYf(fPrecalculatedY);
+			yf(fPrecalculatedY);
 			vely += GRAVITATION;
 		}
 		else if((alignedTileType & tile_flag_player_or_death_on_bottom) || (unalignedTileType & tile_flag_player_or_death_on_bottom))
@@ -4014,7 +4014,7 @@ void CPlayer::collision_detection_map()
 		}
 		else
 		{
-			setYf(fPrecalculatedY);
+			yf(fPrecalculatedY);
 			vely += GRAVITATION;
 		}
 		
@@ -4030,7 +4030,7 @@ void CPlayer::collision_detection_map()
 		
 		if(playerKeys->game_down.fDown && !frozen && g_map->checkforwarp(txl, txr, ty, 0))
 		{
-			setYf((float)((ty << 5) - PH) - 0.2f);
+			yf((float)((ty << 5) - PH) - 0.2f);
 			enterwarp(g_map->warp(txr,ty));
 			warpplane = iy + PH + 1;
 
@@ -4038,9 +4038,9 @@ void CPlayer::collision_detection_map()
 			platform = NULL;
 
 			if(ix - PWOFFSET < (txl << 5) + 1)
-				setXi((txl << 5) + PHOFFSET + 1);
+				xi((txl << 5) + PHOFFSET + 1);
 			else if(ix + PW + PWOFFSET > (txr << 5) + TILESIZE)
-				setXi((txr << 5) + TILESIZE - PW - PWOFFSET);
+				xi((txr << 5) + TILESIZE - PW - PWOFFSET);
 
 			return;
 		}
@@ -4100,7 +4100,7 @@ void CPlayer::collision_detection_map()
 
 			if(fallthrough && !fSolidTileUnderPlayer)
 			{
-				setYf((float)((ty << 5) - PH) + 0.2f);
+				yf((float)((ty << 5) - PH) + 0.2f);
 
 				if(!platform)
 				{
@@ -4110,7 +4110,7 @@ void CPlayer::collision_detection_map()
 			else
 			{
 				//we were above the tile in the previous frame
-				setYf((float)((ty << 5) - PH) - 0.2f);
+				yf((float)((ty << 5) - PH) - 0.2f);
 				vely = GRAVITATION;
 
 				if(!platform)
@@ -4153,7 +4153,7 @@ void CPlayer::collision_detection_map()
 			(!fDeathTileUnderPlayer || invincible || shield > 0 || iKuriboShoe > 0 || shyguy) )
 		{	//on ground
 
-			setYf((float)((ty << 5) - PH) - 0.2f);
+			yf((float)((ty << 5) - PH) - 0.2f);
 			vely = GRAVITATION;				//1 so we test against the ground again int the next frame (0 would test against the ground in the next+1 frame)
 
 			if(!platform)
@@ -4186,7 +4186,7 @@ void CPlayer::collision_detection_map()
 		else
 		{
 			//falling (in air)
-			setYf(fPrecalculatedY);
+			yf(fPrecalculatedY);
 			vely = CapFallingVelocity(GRAVITATION + vely);
 
 			if(!platform)
@@ -4265,7 +4265,7 @@ bool CPlayer::collision_detection_checktop()
 		(leftBlock && !leftBlock->isTransparent() && !leftBlock->isHidden()) || 
 		(rightBlock && !rightBlock->isTransparent() && !rightBlock->isHidden()))
 	{
-		setYf((float)((ty << 5) + TILESIZE) + 0.2f);
+		yf((float)((ty << 5) + TILESIZE) + 0.2f);
 		return true;
 	}
 
@@ -4301,7 +4301,7 @@ bool CPlayer::collision_detection_checkleft()
 		(topBlock && !topBlock->isTransparent() && !topBlock->isHidden()) || 
 		(bottomBlock && !bottomBlock->isTransparent() && !bottomBlock->isHidden()))
 	{
-		setXf((float)((tx << 5) + TILESIZE) + 0.2f);
+		xf((float)((tx << 5) + TILESIZE) + 0.2f);
 		flipsidesifneeded();
 		return true;
 	}
@@ -4343,7 +4343,7 @@ bool CPlayer::collision_detection_checkright()
 		(topBlock && !topBlock->isTransparent() && !topBlock->isHidden()) || 
 		(bottomBlock && !bottomBlock->isTransparent() && !bottomBlock->isHidden()))
 	{
-		setXf((float)((tx << 5) - PW) - 0.2f);
+		xf((float)((tx << 5) - PW) - 0.2f);
 		flipsidesifneeded();
 		return true;
 	}
@@ -4435,12 +4435,12 @@ void CPlayer::collision_detection_checksides()
 		{
 			if(ix + (PW >> 1) > (txl << 5) + TILESIZE)
 			{
-				setXf((float)((txl << 5) + TILESIZE) + 0.2f);
+				xf((float)((txl << 5) + TILESIZE) + 0.2f);
 				flipsidesifneeded();
 			}
 			else
 			{
-				setYf((float)((ty << 5) + TILESIZE) + 0.2f);
+				yf((float)((ty << 5) + TILESIZE) + 0.2f);
 			}
 
 			break;
@@ -4452,12 +4452,12 @@ void CPlayer::collision_detection_checksides()
 		{
 			if(ix + (PW >> 1) < (txr << 5))
 			{
-				setXf((float)((txr << 5) - PW) - 0.2f);
+				xf((float)((txr << 5) - PW) - 0.2f);
 				flipsidesifneeded();
 			}
 			else
 			{
-				setYf((float)((ty << 5) + TILESIZE) + 0.2f);
+				yf((float)((ty << 5) + TILESIZE) + 0.2f);
 			}
 
 			break;
@@ -4467,7 +4467,7 @@ void CPlayer::collision_detection_checksides()
 		//[ ][ ]
 		case 3:
 		{
-			setYf((float)((ty << 5) + TILESIZE) + 0.2f);
+			yf((float)((ty << 5) + TILESIZE) + 0.2f);
 			break;
 		}
 
@@ -4477,12 +4477,12 @@ void CPlayer::collision_detection_checksides()
 		{
 			if(ix + (PW >> 1) > (txl << 5) + TILESIZE)
 			{
-				setXf((float)((txl << 5) + TILESIZE) + 0.2f);
+				xf((float)((txl << 5) + TILESIZE) + 0.2f);
 				flipsidesifneeded();
 			}
 			else
 			{
-				setYf((float)((ty2 << 5) - PH) - 0.2f);
+				yf((float)((ty2 << 5) - PH) - 0.2f);
 			}
 
 			break;
@@ -4492,7 +4492,7 @@ void CPlayer::collision_detection_checksides()
 		//[X][ ]
 		case 5:
 		{
-			setXf((float)((txl << 5) + TILESIZE) + 0.2f);
+			xf((float)((txl << 5) + TILESIZE) + 0.2f);
 			flipsidesifneeded();
 			break;
 		}
@@ -4503,14 +4503,14 @@ void CPlayer::collision_detection_checksides()
 		{
 			if(ix + (PW >> 1) > (txl << 5) + TILESIZE)
 			{
-				setYf((float)((ty << 5) + TILESIZE) + 0.2f);
-				setXf((float)((txl << 5) + TILESIZE) + 0.2f);
+				yf((float)((ty << 5) + TILESIZE) + 0.2f);
+				xf((float)((txl << 5) + TILESIZE) + 0.2f);
 				flipsidesifneeded();
 			}
 			else
 			{
-				setYf((float)((ty2 << 5) - PH) - 0.2f);
-				setXf((float)((txr << 5) - PW) - 0.2f);
+				yf((float)((ty2 << 5) - PH) - 0.2f);
+				xf((float)((txr << 5) - PW) - 0.2f);
 				flipsidesifneeded();
 			}
 
@@ -4521,8 +4521,8 @@ void CPlayer::collision_detection_checksides()
 		//[X][ ]
 		case 7:
 		{
-			setYf((float)((ty << 5) + TILESIZE) + 0.2f);
-			setXf((float)((txl << 5) + TILESIZE) + 0.2f);
+			yf((float)((ty << 5) + TILESIZE) + 0.2f);
+			xf((float)((txl << 5) + TILESIZE) + 0.2f);
 			flipsidesifneeded();
 			break;
 		}
@@ -4533,12 +4533,12 @@ void CPlayer::collision_detection_checksides()
 		{
 			if(ix + (PW >> 1) < (txr << 5))
 			{
-				setXf((float)((txr << 5) - PW) - 0.2f);
+				xf((float)((txr << 5) - PW) - 0.2f);
 				flipsidesifneeded();
 			}
 			else
 			{
-				setYf((float)((ty2 << 5) - PH) - 0.2f);
+				yf((float)((ty2 << 5) - PH) - 0.2f);
 			}
 
 			break;
@@ -4550,14 +4550,14 @@ void CPlayer::collision_detection_checksides()
 		{
 			if(ix + (PW >> 1) > (txl << 5) + TILESIZE)
 			{
-				setYf((float)((ty2 << 5) - PH) - 0.2f);
-				setXf((float)((txl << 5) + TILESIZE) + 0.2f);
+				yf((float)((ty2 << 5) - PH) - 0.2f);
+				xf((float)((txl << 5) + TILESIZE) + 0.2f);
 				flipsidesifneeded();
 			}
 			else
 			{
-				setYf((float)((ty << 5) + TILESIZE) + 0.2f);
-				setXf((float)((txr << 5) - PW) - 0.2f);
+				yf((float)((ty << 5) + TILESIZE) + 0.2f);
+				xf((float)((txr << 5) - PW) - 0.2f);
 				flipsidesifneeded();
 			}
 
@@ -4568,7 +4568,7 @@ void CPlayer::collision_detection_checksides()
 		//[ ][X]
 		case 10:
 		{
-			setXf((float)((txr << 5) - PW) - 0.2f);
+			xf((float)((txr << 5) - PW) - 0.2f);
 			flipsidesifneeded();
 			break;
 		}
@@ -4577,8 +4577,8 @@ void CPlayer::collision_detection_checksides()
 		//[ ][X]
 		case 11:
 		{
-			setYf((float)((ty << 5) + TILESIZE) + 0.2f);
-			setXf((float)((txr << 5) - PW) - 0.2f);
+			yf((float)((ty << 5) + TILESIZE) + 0.2f);
+			xf((float)((txr << 5) - PW) - 0.2f);
 			flipsidesifneeded();
 			break;
 		}
@@ -4587,7 +4587,7 @@ void CPlayer::collision_detection_checksides()
 		//[X][X]
 		case 12:
 		{
-			setYf((float)((ty2 << 5) - PH) - 0.2f);
+			yf((float)((ty2 << 5) - PH) - 0.2f);
 			break;
 		}
 
@@ -4595,8 +4595,8 @@ void CPlayer::collision_detection_checksides()
 		//[X][X]
 		case 13:
 		{
-			setYf((float)((ty2 << 5) - PH) - 0.2f);
-			setXf((float)((txl << 5) + TILESIZE) + 0.2f);
+			yf((float)((ty2 << 5) - PH) - 0.2f);
+			xf((float)((txl << 5) + TILESIZE) + 0.2f);
 			flipsidesifneeded();
 			break;
 		}
@@ -4605,8 +4605,8 @@ void CPlayer::collision_detection_checksides()
 		//[X][X]
 		case 14:
 		{
-			setYf((float)((ty2 << 5) - PH) - 0.2f);
-			setXf((float)((txr << 5) - PW) - 0.2f);
+			yf((float)((ty2 << 5) - PH) - 0.2f);
+			xf((float)((txr << 5) - PW) - 0.2f);
 			flipsidesifneeded();
 			break;
 		}
@@ -4616,7 +4616,7 @@ void CPlayer::collision_detection_checksides()
 		//[X][X]
 		case 15:
 		{
-			setYf((float)((ty2 << 5) + TILESIZE) + 0.2f);
+			yf((float)((ty2 << 5) + TILESIZE) + 0.2f);
 			break;
 		}
 
@@ -4678,13 +4678,13 @@ void CPlayer::flipsidesifneeded()
 	if(ix < 0 || fx < 0.0f)
 	{
 		//This avoids rounding errors
-		setXf(fx + 640.0f);
+		xf(fx + 640.0f);
 		fOldX += 640.0f;
 		//printf("Flipped Left\n");
 	}
 	else if(ix >= 640 || fx >= 640.0f)
 	{
-		setXf(fx - 640.0f);
+		xf(fx - 640.0f);
 		fOldX -= 640.0f;
 		//printf("Flipped Right\n");
 	}

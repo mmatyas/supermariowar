@@ -22,7 +22,7 @@
 | start:		24.01.2003									|
 | last changes:	12.02.2008									|
 |															|
-|							  (C) 2003-2009 Florian Hufsky  |
+|								© 2003-2009 Florian Hufsky  |
 |								  florian.hufsky@gmail.com	|
 |                                     mtschaffer@gmail.com  |
 |								  http://smw.72dpiarmy.com	|
@@ -371,6 +371,9 @@ Procedure for adding a new powerup:
 #endif
 
 #include "global.h"				//all the global stuff
+
+#include "Game.h"
+
 #include <time.h>
 #include <math.h>
 
@@ -1002,6 +1005,7 @@ short GetModeIconIndexFromMode(short iMode)
 void RunGame();
 void CleanUp();
 bool LoadAndSplashScreen();
+void LoadAll();
 void SetGameModeSettingsFromMenu();
 void LoadMapObjects(bool fPreview);
 extern void LoadMapHazards(bool fPreview);
@@ -1012,10 +1016,6 @@ bool IsPauseAllowed();
 
 //Adds music overrides to the music lists
 void UpdateMusicWithOverrides();
-
-Menu g_Menu;
-gv game_values;
-//MenuContext menu_context;
 
 //Joystick-Init
 SDL_Joystick **joysticks = NULL;
@@ -1096,6 +1096,20 @@ void SpinScreen()
 	y_shake = (short)(shakey);
 }
 
+// main game object - over time shall be used to 
+CGame	*smw;
+
+Menu g_Menu;
+gv game_values;
+
+// main game directory, read from command line argument
+char		*RootDataDirectory;
+
+#ifdef	WIN32
+int CALLBACK WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,int nCmdShow)
+{
+    RootDataDirectory = lpCmdLine;
+#else
 // ------ MAIN ------
 int main(int argc, char *argv[])
 {
@@ -1105,14 +1119,24 @@ int main(int argc, char *argv[])
 	}
 	
 	RootDataDirectory = argv[1];
+#endif
 	
-	printf("Now using RootDataDirectory=%s\n", RootDataDirectory);
+    // this instance will contain the other relevant objects
+    smw = new CGame(RootDataDirectory);
+#pragma warning "delete this or use boost GC shared_ptr"
 	
 	g_map = new CMap();
 	g_tilesetmanager = new CTilesetManager();
 	
 	filterslist = new FiltersList();
 	maplist = new MapList(false);
+
+    //TODO: add proper test via size
+    if(maplist->IsEmpty())
+    {	
+        throw "Empty map directory!";
+    }
+
 	skinlist = new SkinList();
 	musiclist = new MusicList();
 	worldmusiclist = new WorldMusicList();
@@ -1133,7 +1157,7 @@ int main(int argc, char *argv[])
 	gfx_init(640, 480, false);		//initialize the graphics (SDL)
 	blitdest = screen;
 	
-	/*
+#if	0
 	//Comment this in to performance test the preview map loading
 	MI_MapField * miMapField = new MI_MapField(&spr_selectfield, 70, 165, "Map", 500, 120);
 
@@ -1144,8 +1168,8 @@ int main(int argc, char *argv[])
 		//printf("Map over-> %s\n", maplist->currentFilename());
 	}
 
-	exit(0);
-	*/
+    return 0;
+#endif
 
 	sfx_init();                     //init the sound system
 
@@ -1388,6 +1412,8 @@ int main(int argc, char *argv[])
 
 	SetupDefaultGameModeSettings();
 	
+	//TODO: only read from binary once, then always use text-based configuration
+
 	//Read saved settings from disk
 	FILE * fp = OpenFile("options.bin", "rb");
 
@@ -1600,30 +1626,8 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	printf("\n---------------- ready, steady, go! ----------------\n");
-
-	g_Menu.CreateMenu();
-	g_Menu.RunMenu();
-
-	while(game_values.gamestate != GS_QUIT)
-	{
-		switch(game_values.gamestate)
-		{
-			case GS_START_GAME:
-			case GS_GAME:
-				RunGame();
-			break;
-
-			case GS_MENU:
-				g_Menu.RunMenu();
-			break;
-
-            case GS_START_WORLD:
-            case GS_END_GAME:
-            case GS_QUIT: // added because of warning on not handling all of enum
-            break;
-		}
-	}	
+	// all the game logic happens here
+	smw->Go();
 
 	printf("\n---------------- shutdown ----------------\n");
 	
@@ -1645,7 +1649,7 @@ int main(int argc, char *argv[])
 	//netClient.cleanup();
 
 	//Delete player skins
-	for(short k = 0; k < 4; k++)
+    for(short k = 0; k < MAX_PLAYERS; k++)
 	{
 		for(short j = 0; j < PGFX_LAST; j++)
 		{
@@ -1671,6 +1675,8 @@ int main(int argc, char *argv[])
 	LD_LAUNCH_DASHBOARD LaunchData = { XLD_LAUNCH_DASHBOARD_MAIN_MENU };
 	XLaunchNewImage( NULL, (LAUNCH_DATA*)&LaunchData );
 #endif
+
+	delete smw;
 
 	return 0;
 }
@@ -4162,8 +4168,8 @@ bool SwapPlayers(short iUsingPlayerID)
 
 		if(game_values.swapstyle == 2)
 		{
-			list_players[iPlayer]->setXf(list_players[iPlayer]->fNewSwapX);
-			list_players[iPlayer]->setYf(list_players[iPlayer]->fNewSwapY);
+            list_players[iPlayer]->xf(list_players[iPlayer]->fNewSwapX);
+            list_players[iPlayer]->yf(list_players[iPlayer]->fNewSwapY);
 
 			if(list_players[iPlayer]->carriedItem)
 				list_players[iPlayer]->carriedItem->MoveToOwner();

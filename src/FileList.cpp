@@ -40,8 +40,8 @@ SimpleFileList::SimpleFileList(const std::string &path, const std::string &exten
 
 	if(filelist.empty())
 	{
+#pragma warning Print this line to log
 		//printf("ERROR: Empty directory!\n");
-		//exit(0);
 		currentIndex = -1;
 	}
 
@@ -224,8 +224,7 @@ MusicList::MusicList()
 	
 	if(entries.empty())
 	{
-		printf("ERROR: Empty Music directory!\n");
-		exit(0);
+        throw "Empty Music directory!";
 	}
 
 	currentIndex = 0;
@@ -489,7 +488,7 @@ MusicEntry::MusicEntry(const std::string & musicdirectory)
 			{
 				if(numsongsforcategory[iMusicCategory] < MAXCATEGORYTRACKS)
 				{
-					songFileNames.push_back(musList.current_name());
+                    songFileNames.push_back(musiclist->current_name());
 					songsforcategory[iMusicCategory][numsongsforcategory[iMusicCategory]] = iNumFile;
 					numsongsforcategory[iMusicCategory]++;
 					iNumFile++;
@@ -669,8 +668,7 @@ WorldMusicList::WorldMusicList()
 	
 	if(entries.empty())
 	{
-		printf("ERROR: Empty Music directory!\n");
-		exit(0);
+        throw "Empty Music directory!";
 	}
 
 	currentIndex = 0;

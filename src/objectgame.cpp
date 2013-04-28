@@ -363,7 +363,7 @@ bool IO_Block::hittop(CPlayer * player, bool useBehavior)
 {
 	if(useBehavior)
 	{
-		player->setYf((float)(iposy - PH) - 0.2f);
+		player->yf((float)(iposy - PH) - 0.2f);
 		player->inair = false;
 		player->fallthrough = false;
 		player->killsinrowinair = 0;
@@ -380,7 +380,7 @@ bool IO_Block::hitbottom(CPlayer * player, bool useBehavior)
 	{
 		//Player bounces off 
 		player->vely = CapFallingVelocity(-player->vely * BOUNCESTRENGTH);
-		player->setYf((float)(iposy + ih) + 0.2f);
+		player->yf((float)(iposy + ih) + 0.2f);
 	}
 
 	return false;
@@ -390,7 +390,7 @@ bool IO_Block::hitright(CPlayer * player, bool useBehavior)
 {
 	if(useBehavior)
 	{
-		player->setXf((float)(iposx + iw) + 0.2f);
+		player->xf((float)(iposx + iw) + 0.2f);
 		player->fOldX = player->fx;
 		
 		if(player->velx < 0.0f)
@@ -407,7 +407,7 @@ bool IO_Block::hitleft(CPlayer * player, bool useBehavior)
 {
 	if(useBehavior)
 	{
-		player->setXf((float)(iposx - PW) - 0.2f);
+		player->xf((float)(iposx - PW) - 0.2f);
 		player->fOldX = player->fx;
 		
 		if(player->velx > 0.0f)
@@ -434,7 +434,7 @@ bool IO_Block::collide(IO_MovingObject * object, short direction)
 
 bool IO_Block::hittop(IO_MovingObject * object)
 {
-	object->setYf((float)(iposy - object->collisionHeight) - 0.2f);
+	object->yf((float)(iposy - object->collisionHeight) - 0.2f);
 	object->fOldY = object->fy;
 	object->vely = object->BottomBounce();
 	return true;
@@ -442,7 +442,7 @@ bool IO_Block::hittop(IO_MovingObject * object)
 
 bool IO_Block::hitbottom(IO_MovingObject * object)
 {
-	object->setYf((float)(iposy + ih) + 0.2f);
+	object->yf((float)(iposy + ih) + 0.2f);
 	object->fOldY = object->fy;
 	object->vely = -object->vely;
 	return true;
@@ -450,7 +450,7 @@ bool IO_Block::hitbottom(IO_MovingObject * object)
 
 bool IO_Block::hitright(IO_MovingObject * object)
 {
-	object->setXf((float)(iposx + iw) + 0.2f);
+	object->xf((float)(iposx + iw) + 0.2f);
 	object->fOldX = object->fx;
 
 	if(object->velx < 0.0f)
@@ -461,7 +461,7 @@ bool IO_Block::hitright(IO_MovingObject * object)
 
 bool IO_Block::hitleft(IO_MovingObject * object)
 {
-	object->setXf((float)(iposx - object->collisionWidth) - 0.2f);
+	object->xf((float)(iposx - object->collisionWidth) - 0.2f);
 	object->fOldX = object->fx;
 	
 	if(object->velx > 0.0f)
@@ -640,7 +640,7 @@ void B_PowerupBlock::update()
 
 	if(state > 0)
 	{
-		setYf(fy + vely);
+		yf(fy + vely);
 		
 		if(state == 1 && fabsf(fposy - fy) > 10.0f)
 		{
@@ -652,7 +652,7 @@ void B_PowerupBlock::update()
 		{
 			vely = 0.0f;
 			state = 3;
-			setYi(iposy);
+			yi(iposy);
 
 			if(game_values.gamemode->gamemode == game_mode_health && rand() % 100 < game_values.gamemodesettings.health.percentextralife)
 			{
@@ -756,7 +756,7 @@ bool B_PowerupBlock::hitbottom(CPlayer * player, bool useBehavior)
 	{
 		//Player bounces off 
 		player->vely = CapFallingVelocity(-player->vely * BOUNCESTRENGTH);
-		player->setYf((float)(iposy + ih) + 0.2f);
+		player->yf((float)(iposy + ih) + 0.2f);
 
 		if(hidden)
 		{
@@ -792,7 +792,7 @@ bool B_PowerupBlock::collide(IO_MovingObject * object, short direction)
 
 bool B_PowerupBlock::hittop(IO_MovingObject * object)
 {
-	object->setYf((float)(iposy - object->collisionHeight) - 0.2f);
+	object->yf((float)(iposy - object->collisionHeight) - 0.2f);
 	object->fOldY = object->fy;
 	
 	MovingObjectType type = object->getMovingObjectType();
@@ -826,7 +826,7 @@ bool B_PowerupBlock::hittop(IO_MovingObject * object)
 bool B_PowerupBlock::hitright(IO_MovingObject * object)
 {
 	//Object bounces off
-	object->setXf((float)(iposx + iw) + 0.2f);
+	object->xf((float)(iposx + iw) + 0.2f);
 	object->fOldX = object->fx;
 
 	if(object->velx < 0.0f)
@@ -864,7 +864,7 @@ bool B_PowerupBlock::hitright(IO_MovingObject * object)
 bool B_PowerupBlock::hitleft(IO_MovingObject * object)
 {
 	//Object bounces off
-	object->setXf((float)(iposx - object->collisionWidth) - 0.2f);
+	object->xf((float)(iposx - object->collisionWidth) - 0.2f);
 	object->fOldX = object->fx;
 
 	if(object->velx > 0.0f)
@@ -1085,7 +1085,7 @@ bool B_BreakableBlock::hitbottom(CPlayer * player, bool useBehavior)
 			player->vely = -VELMAXBREAKBLOCK;
 		*/
 		player->vely = CapFallingVelocity(-player->vely * BOUNCESTRENGTH);
-		player->setYf((float)(iposy + ih) + 0.2f);
+		player->yf((float)(iposy + ih) + 0.2f);
 		
 		iBumpPlayerID = player->globalID;
 		iBumpTeamID = player->teamID;
@@ -1096,7 +1096,7 @@ bool B_BreakableBlock::hitbottom(CPlayer * player, bool useBehavior)
 
 bool B_BreakableBlock::hittop(IO_MovingObject * object)
 {
-	object->setYf((float)(iposy - object->collisionHeight) - 0.2f);
+	object->yf((float)(iposy - object->collisionHeight) - 0.2f);
 	object->fOldY = object->fy;
 	
 	if(state == 0)
@@ -1127,7 +1127,7 @@ bool B_BreakableBlock::hitright(IO_MovingObject * object)
 {
 	if(state == 0)
 	{
-		object->setXf((float)(iposx + iw) + 0.2f);
+		object->xf((float)(iposx + iw) + 0.2f);
 		object->fOldX = object->fx;
 
 		if(object->velx < 0.0f)
@@ -1148,7 +1148,7 @@ bool B_BreakableBlock::hitleft(IO_MovingObject * object)
 {
 	if(state == 0)
 	{
-		object->setXf((float)(iposx - object->collisionWidth) - 0.2f);
+		object->xf((float)(iposx - object->collisionWidth) - 0.2f);
 		object->fOldX = object->fx;
 		
 		if(object->velx > 0.0f)
@@ -1216,8 +1216,8 @@ void B_NoteBlock::update()
 
 	if(state > 0)
 	{
-		setXf(fx + velx);
-		setYf(fy + vely);
+		xf(fx + velx);
+		yf(fy + vely);
 
 		if(state == 1 && fabsf(fposx - fx) > 10.0f)
 		{
@@ -1257,8 +1257,8 @@ void B_NoteBlock::reset()
 	velx = 0.0f;
 	vely = 0.0f;
 	state = 0;
-	setXf(fposx);
-	setYf(fposy);
+	xf(fposx);
+	yf(fposy);
 }
 
 bool B_NoteBlock::collide(CPlayer * player, short direction, bool useBehavior)
@@ -1303,7 +1303,7 @@ bool B_NoteBlock::hitbottom(CPlayer * player, bool useBehavior)
 {
 	if(useBehavior)
 	{
-		player->setYf((float)(iposy + ih) + 0.2f);
+		player->yf((float)(iposy + ih) + 0.2f);
 		player->vely = VELNOTEBLOCKREPEL;
 
 		if(state == 0)
@@ -1333,7 +1333,7 @@ bool B_NoteBlock::hitright(CPlayer * player, bool useBehavior)
 {
 	if(useBehavior)
 	{
-		player->setXf((float)(iposx + iw) + 0.2f);
+		player->xf((float)(iposx + iw) + 0.2f);
 		player->fOldX = player->fx;
 		player->velx = VELNOTEBLOCKREPEL;
 		player->oldvelx = VELNOTEBLOCKREPEL;
@@ -1354,7 +1354,7 @@ bool B_NoteBlock::hitleft(CPlayer * player, bool useBehavior)
 {
 	if(useBehavior)
 	{
-		player->setXf((float)(iposx - PW) - 0.2f);
+		player->xf((float)(iposx - PW) - 0.2f);
 		player->fOldX = player->fx;
 		player->velx = -VELNOTEBLOCKREPEL;
 		player->oldvelx = -VELNOTEBLOCKREPEL;
@@ -1381,7 +1381,7 @@ bool B_NoteBlock::collide(IO_MovingObject * object, short direction)
 
 bool B_NoteBlock::hittop(IO_MovingObject * object)
 {
-	object->setYf((float)(iposy - object->collisionHeight) - 0.2f);
+	object->yf((float)(iposy - object->collisionHeight) - 0.2f);
 	object->fOldY = object->fy;
 	
 	if(state == 3 && object->bounce == GRAVITATION)
@@ -1619,7 +1619,7 @@ bool B_FlipBlock::hitbottom(CPlayer * player, bool useBehavior)
 	if(useBehavior && state == 0)
 	{
 		player->vely = CapFallingVelocity(-player->vely * BOUNCESTRENGTH);
-		player->setYf((float)(iposy + ih) + 0.2f);
+		player->yf((float)(iposy + ih) + 0.2f);
 		
 		iBumpPlayerID = player->globalID;
 		iBumpTeamID = player->teamID;
@@ -1671,7 +1671,7 @@ bool B_FlipBlock::hittop(IO_MovingObject * object)
 {
 	if(state == 0)
 	{
-		object->setYf((float)(iposy - object->collisionHeight) - 0.2f);
+		object->yf((float)(iposy - object->collisionHeight) - 0.2f);
 		object->fOldY = object->fy;
 		object->vely = object->BottomBounce();
 	}
@@ -1683,7 +1683,7 @@ bool B_FlipBlock::hitbottom(IO_MovingObject * object)
 {
 	if(state == 0)
 	{
-		object->setYf((float)(iposy + ih) + 0.2f);
+		object->yf((float)(iposy + ih) + 0.2f);
 		object->vely = -object->vely;
 	}
 	
@@ -1694,7 +1694,7 @@ bool B_FlipBlock::hitright(IO_MovingObject * object)
 {
 	if(state == 0)
 	{
-		object->setXf((float)(iposx + iw) + 0.2f);
+		object->xf((float)(iposx + iw) + 0.2f);
 		object->fOldX = object->fx;
 
 		if(object->velx < 0.0f)
@@ -1742,7 +1742,7 @@ bool B_FlipBlock::hitleft(IO_MovingObject * object)
 {
 	if(state == 0)
 	{
-		object->setXf((float)(iposx - object->collisionWidth) - 0.2f);
+		object->xf((float)(iposx - object->collisionWidth) - 0.2f);
 		object->fOldX = object->fx;
 		
 		if(object->velx > 0.0f)
@@ -1828,7 +1828,7 @@ void B_OnOffSwitchBlock::update()
 {
 	if(state != 0 && state != 3)
 	{
-		setYf(fy + vely);
+		yf(fy + vely);
 
 		if((state == 1 || state == 4) && fabsf(fposy - fy) > 10.0f)
 		{
@@ -1840,7 +1840,7 @@ void B_OnOffSwitchBlock::update()
 		{
 			vely = 0.0f;
 			state -= 2;
-			setYf(fposy);
+			yf(fposy);
 		}
 	}
 }
@@ -1880,7 +1880,7 @@ bool B_OnOffSwitchBlock::hitbottom(CPlayer * player, bool useBehavior)
 	if(useBehavior)
 	{
 		player->vely = CapFallingVelocity(-player->vely * BOUNCESTRENGTH);
-		player->setYf((float)(iposy + ih) + 0.2f);
+		player->yf((float)(iposy + ih) + 0.2f);
 
 		if(state == 0 || state == 3)
 		{
@@ -1896,7 +1896,7 @@ bool B_OnOffSwitchBlock::hitbottom(CPlayer * player, bool useBehavior)
 
 bool B_OnOffSwitchBlock::hittop(IO_MovingObject * object)
 {
-	object->setYf((float)(iposy - object->collisionHeight) - 0.2f);
+	object->yf((float)(iposy - object->collisionHeight) - 0.2f);
 	object->fOldY = object->fy;
 
 	MovingObjectType type = object->getMovingObjectType();
@@ -1928,7 +1928,7 @@ bool B_OnOffSwitchBlock::hittop(IO_MovingObject * object)
 bool B_OnOffSwitchBlock::hitright(IO_MovingObject * object)
 {
 	//Object bounces off
-	object->setXf((float)(iposx + iw) + 0.2f);
+	object->xf((float)(iposx + iw) + 0.2f);
 	object->fOldX = object->fx;
 
 	if(object->velx < 0.0f)
@@ -1967,7 +1967,7 @@ bool B_OnOffSwitchBlock::hitright(IO_MovingObject * object)
 bool B_OnOffSwitchBlock::hitleft(IO_MovingObject * object)
 {
 	//Object bounces off
-	object->setXf((float)(iposx - object->collisionWidth) - 0.2f);
+	object->xf((float)(iposx - object->collisionWidth) - 0.2f);
 	object->fOldX = object->fx;
 
 	if(object->velx > 0.0f)
@@ -2079,14 +2079,14 @@ bool B_SwitchBlock::hittop(CPlayer * player, bool useBehavior)
 bool B_SwitchBlock::hitbottom(CPlayer * player, bool)
 {
 	player->vely = CapFallingVelocity(-player->vely * BOUNCESTRENGTH);
-	player->setYf((float)(iposy + ih) + 0.2f);
+	player->yf((float)(iposy + ih) + 0.2f);
 	vely = -VELBLOCKBOUNCE;
 	return false;
 }
 
 bool B_SwitchBlock::hitright(CPlayer * player, bool)
 {
-	player->setXf((float)(iposx + iw) + 0.2f);
+	player->xf((float)(iposx + iw) + 0.2f);
 	player->fOldX = player->fx;
 
 	if(player->velx < 0.0f)
@@ -2100,7 +2100,7 @@ bool B_SwitchBlock::hitright(CPlayer * player, bool)
 
 bool B_SwitchBlock::hitleft(CPlayer * player, bool)
 {
-	player->setXf((float)(iposx - PW) - 0.2f);
+	player->xf((float)(iposx - PW) - 0.2f);
 	player->fOldX = player->fx;
 
 	if(player->velx > 0.0f)
@@ -2116,7 +2116,7 @@ bool B_SwitchBlock::hittop(IO_MovingObject * object)
 {
 	if(state == 0)
 	{
-		object->setYf((float)(iposy - object->collisionHeight) - 0.2f);
+		object->yf((float)(iposy - object->collisionHeight) - 0.2f);
 		object->fOldY = object->fy;
 		object->vely = object->BottomBounce();
 	}
@@ -2128,7 +2128,7 @@ bool B_SwitchBlock::hitbottom(IO_MovingObject * object)
 {
 	if(state == 0)
 	{
-		object->setYf((float)(iposy + ih) + 0.2f);
+		object->yf((float)(iposy + ih) + 0.2f);
 		object->vely = -object->vely;
 	}
 	
@@ -2139,7 +2139,7 @@ bool B_SwitchBlock::hitright(IO_MovingObject * object)
 {
 	if(state == 0)
 	{
-		object->setXf((float)(iposx + iw) + 0.2f);
+		object->xf((float)(iposx + iw) + 0.2f);
 
 		if(object->velx < 0.0f)
 			object->velx = -object->velx;
@@ -2152,7 +2152,7 @@ bool B_SwitchBlock::hitleft(IO_MovingObject * object)
 {
 	if(state == 0)
 	{
-		object->setXf((float)(iposx - object->collisionWidth) - 0.2f);
+		object->xf((float)(iposx - object->collisionWidth) - 0.2f);
 		
 		if(object->velx > 0.0f)
 			object->velx = -object->velx;
@@ -2193,7 +2193,7 @@ void B_BounceBlock::update()
 
 	if(state > 0)
 	{
-		setYf(fy + vely);
+		yf(fy + vely);
 
 		if(state == 1 && fabsf(fposy - fy) > 10.0f)
 		{
@@ -2212,7 +2212,7 @@ void B_BounceBlock::reset()
 {
 	vely = 0.0f;
 	state = 0;
-	setYf(fposy);
+	yf(fposy);
 }
 
 bool B_BounceBlock::collide(CPlayer * player, short direction, bool useBehavior)
@@ -2255,7 +2255,7 @@ bool B_BounceBlock::hitbottom(CPlayer * player, bool useBehavior)
 	if(useBehavior)
 	{
 		player->vely = CapFallingVelocity(-player->vely * BOUNCESTRENGTH);
-		player->setYf((float)(iposy + ih) + 0.2f);
+		player->yf((float)(iposy + ih) + 0.2f);
 
 		iBumpPlayerID = player->globalID;
 		iBumpTeamID = player->teamID;
@@ -2284,7 +2284,7 @@ bool B_BounceBlock::collide(IO_MovingObject * object, short direction)
 
 bool B_BounceBlock::hittop(IO_MovingObject * object)
 {
-	object->setYf((float)(iposy - object->collisionHeight) - 0.2f);
+	object->yf((float)(iposy - object->collisionHeight) - 0.2f);
 	object->fOldY = object->fy;
 	
 	if(state == 1 && object->bounce == GRAVITATION)
@@ -2349,7 +2349,7 @@ bool B_ThrowBlock::hittop(CPlayer * player, bool useBehavior)
 {
 	if(useBehavior)
 	{
-		player->setYf((float)(iposy - PH) - 0.2f);
+		player->yf((float)(iposy - PH) - 0.2f);
 		player->fOldY = player->fy;
 		player->inair = false;
 		player->fallthrough = false;
@@ -2375,7 +2375,7 @@ bool B_ThrowBlock::hitright(CPlayer * player, bool useBehavior)
 {
 	if(useBehavior)
 	{
-		player->setXf((float)(iposx + iw) + 0.2f);
+		player->xf((float)(iposx + iw) + 0.2f);
 		player->fOldX = player->fx;
 
 		if(player->velx < 0.0f)
@@ -2402,7 +2402,7 @@ bool B_ThrowBlock::hitleft(CPlayer * player, bool useBehavior)
 {
 	if(useBehavior)
 	{
-		player->setXf((float)(iposx - PW) - 0.2f);
+		player->xf((float)(iposx - PW) - 0.2f);
 		player->fOldX = player->fx;
 
 		if(player->velx > 0.0f)
@@ -2742,7 +2742,7 @@ void MO_Powerup::update()
 	//Have the powerup grow out of the powerup block
 	if(state == 0)
 	{
-		setYf(fy - 2.0f);
+		yf(fy - 2.0f);
 
 		if(fy <= desty)
 		{
@@ -2773,7 +2773,7 @@ bool MO_Powerup::collide(CPlayer *)
 void MO_Powerup::nospawn(short y)
 {
 	state = 1;
-	setYi(y);
+	yi(y);
 	vely = -VELJUMP / 2.0;
 }
 
@@ -3486,7 +3486,7 @@ void PU_FeatherPowerup::update()
 	//Have the powerup grow out of the powerup block
 	if(state == 0)
 	{
-		setYf(fy - 4.0f);
+		yf(fy - 4.0f);
 
 		if(fy <= desty)
 		{
@@ -3498,7 +3498,7 @@ void PU_FeatherPowerup::update()
 		fOldX = fx;
 		fOldY = fy;
 
-		setYf(fy - 4.0f);
+		yf(fy - 4.0f);
 		
 		if(fy <= desty - 128.0f)
 		{
@@ -3532,8 +3532,8 @@ void PU_FeatherPowerup::update()
 
 		dFloatCenterY += 1.0f;
 
-		setXf(64.0f * cos(dFloatAngle) + dFloatCenterX);
-		setYf(64.0f * sin(dFloatAngle) + dFloatCenterY);
+		xf(64.0f * cos(dFloatAngle) + dFloatCenterX);
+		yf(64.0f * sin(dFloatAngle) + dFloatCenterY);
 
 		if(fy >= 480.0f)
 			dead = true;
@@ -3555,7 +3555,7 @@ void PU_FeatherPowerup::nospawn(short y)
 {
 	state = 1;
 	desty = y;
-	setYi(y + TILESIZE - collisionHeight);
+	yi(y + TILESIZE - collisionHeight);
 }
 
 //------------------------------------------------------------------------------
@@ -3843,13 +3843,13 @@ void MO_SuperFireball::update()
 {
 	animate();
 
-	setXf(fx + velx);
-	setYf(fy + vely);
+	xf(fx + velx);
+	yf(fy + vely);
 	
 	if(ix < 0)
-		setXi(ix + 640);
+		xi(ix + 640);
 	else if(ix > 639)
-		setXi(ix - 640);
+		xi(ix - 640);
 	
 	if(iy > 480 || iy < -ih || --ttl <= 0)
 		removeifprojectile(this, false, true);
@@ -3928,16 +3928,16 @@ void MO_Hammer::update()
 		}
 	}
 
-	setXf(fx + velx);
-	setYf(fy + vely);
+	xf(fx + velx);
+	yf(fy + vely);
 	
 	if(!fSuper)
 		vely += GRAVITATION;
 
 	if(ix < 0)
-		setXi(ix + 640);
+		xi(ix + 640);
 	else if(ix > 639)
-		setXi(ix - 640);
+		xi(ix - 640);
 	
 	if(iy > 480 || --ttl <= 0 || (fSuper && iy < -ih))
 	{
@@ -4044,15 +4044,15 @@ void MO_SledgeHammer::update()
 		}
 	}
 
-	setXf(fx + velx);
-	setYf(fy + vely);
+	xf(fx + velx);
+	yf(fy + vely);
 	
 	vely += GRAVITATION;
 
 	if(ix < 0)
-		setXi(ix + 640);
+		xi(ix + 640);
 	else if(ix > 639)
-		setXi(ix - 640);
+		xi(ix - 640);
 	
 	if(iy >= 480)
 		dead = true;
@@ -4157,7 +4157,7 @@ void MO_IceBlast::update()
 		}
 	}
 
-	setXf(fx + velx);
+	xf(fx + velx);
 	
 	if(--ttl <= 0)
 	{
@@ -4225,9 +4225,9 @@ MO_Boomerang::MO_Boomerang(gfxSprite *nspr, short x, short y, short iNumSpr, boo
 
 	//Don't let boomerang start off the screen or it won't rebound correctly
 	if(moveToRight && fx + iw >= 640.0f)
-		setXf(fx - 640.0f);
+		xf(fx - 640.0f);
 	else if(!moveToRight && fx < 0.0f)
-		setXf(fx + 640.0f);
+		xf(fx + 640.0f);
 
 	iStateTimer = 0;
 
@@ -4268,7 +4268,7 @@ void MO_Boomerang::update()
 	if(iStyle == 0) //Flat style
 	{
 		fOldX = fx;
-		setXf(fx + velx);
+		xf(fx + velx);
 
 		if(fMoveToRight && fx + iw >= 640.0f && fOldX + iw < 640.0f)
 		{
@@ -4279,7 +4279,7 @@ void MO_Boomerang::update()
 			}
 			else
 			{
-				setXf(640.0f - iw);
+				xf(640.0f - iw);
 				fFlipped = true;
 				fMoveToRight = false;
 				velx = -velx;
@@ -4294,7 +4294,7 @@ void MO_Boomerang::update()
 			}
 			else
 			{
-				setXf(0.0f);
+				xf(0.0f);
 				fFlipped = true;
 				fMoveToRight = true;
 				velx = -velx;
@@ -4307,17 +4307,17 @@ void MO_Boomerang::update()
 		iStateTimer++;
 
 		fOldX = fx;
-		setXf(fx + velx);
+		xf(fx + velx);
 
 		if(fx < 0.0f)
-			setXf(fx + 640.0f);
+			xf(fx + 640.0f);
 		else if(fx + iw >= 640.0f)
-			setXf(fx - 640.0f);
+			xf(fx - 640.0f);
 
 		if(state == 1)
 		{
 			fOldY = fy;
-			setYf(fy - 3.2f);
+			yf(fy - 3.2f);
 
 			if(iStateTimer >= 20)
 			{
@@ -4336,7 +4336,7 @@ void MO_Boomerang::update()
 		else if(state == 3)
 		{
 			fOldY = fy;
-			setYf(fy + 1.0f);
+			yf(fy + 1.0f);
 
 			if(fMoveToRight)
 			{
@@ -4382,12 +4382,12 @@ void MO_Boomerang::update()
 		iStateTimer++;
 
 		fOldX = fx;
-		setXf(fx + velx);
+		xf(fx + velx);
 
 		if(fx < 0.0f)
-			setXf(fx + 640.0f);
+			xf(fx + 640.0f);
 		else if(fx + iw >= 640.0f)
-			setXf(fx - 640.0f);
+			xf(fx - 640.0f);
 
 		if(iStateTimer > game_values.boomeranglife)
 		{
@@ -4423,7 +4423,7 @@ void MO_Boomerang::update()
 		else if(state == 2)
 		{
 			fOldY = fy;
-			setYf(fy + vely);
+			yf(fy + vely);
 
 			//Follow the player zelda style
 			CPlayer * player = GetPlayerFromGlobalID(iPlayerID);
@@ -4780,8 +4780,8 @@ void MO_Coin::placeCoin()
 		objectcontainer[1].getClosestMovingObject(x, y, movingobject_coin) < 150.0f)
 		&& iAttempts-- > 0);
 
-	setXi(x);
-	setYi(y);
+	xi(x);
+	yi(y);
 }
 
 
@@ -4840,8 +4840,8 @@ void MO_Podobo::update()
 	//Special slow podobo gravity
 	vely += 0.2f;
 
-	setXf(fx + velx);
-	setYf(fy + vely);
+	xf(fx + velx);
+	yf(fy + vely);
 
 	animate();
 
@@ -4995,8 +4995,8 @@ void MO_CarriedObject::MoveToOwner()
 {
 	if(owner)
 	{
-		setXi(owner->ix + (owner->IsPlayerFacingRight() ? iOwnerRightOffset : iOwnerLeftOffset));
-		setYi(owner->iy + PH - iOwnerUpOffset + collisionOffsetY);
+		xi(owner->ix + (owner->IsPlayerFacingRight() ? iOwnerRightOffset : iOwnerLeftOffset));
+		yi(owner->iy + PH - iOwnerUpOffset + collisionOffsetY);
 	}
 }
 
@@ -5171,8 +5171,8 @@ void CO_Egg::placeEgg()
 		objectcontainer[1].getClosestMovingObject(x, y, movingobject_yoshi) < 250.0f)
 		&& iAttempts-- > 0);
 
-	setXi(x);
-	setYi(y);
+	xi(x);
+	yi(y);
 
 	vely = GRAVITATION;
 	velx = 0.0f;
@@ -5315,8 +5315,8 @@ void CO_Star::placeStar()
 
 	if(star)
 	{
-		setXf(star->fx + HALFPW - 16.0f);
-		setYf(star->fy + HALFPH - 17.0f);
+		xf(star->fx + HALFPW - 16.0f);
+		yf(star->fy + HALFPH - 17.0f);
 
 		velx = star->velx;
 		vely = star->vely;
@@ -5394,8 +5394,8 @@ void MO_FlagBase::update()
 		velx = speed * sin(angle);
 		vely = speed * cos(angle);
 		
-		setXf(fx + velx);
-		setYf(fy + vely);
+		xf(fx + velx);
+		yf(fy + vely);
 
 		if(ix < 0)
 		{
@@ -5454,8 +5454,8 @@ void MO_FlagBase::placeFlagBase(bool fInit)
 			&& iAttempts-- > 0);
 	}
 
-	setXi(x);
-	setYi(y);
+	xi(x);
+	yi(y);
 }
 
 void MO_FlagBase::collide(IO_MovingObject * object)
@@ -5563,8 +5563,8 @@ void CO_Flag::update()
 	{
 		if(flagbase)
 		{
-			setXf(flagbase->fx);
-			setYf(flagbase->fy);
+			xf(flagbase->fx);
+			yf(flagbase->fy);
 		}
 
 		owner_throw = NULL;
@@ -5651,8 +5651,8 @@ void CO_Flag::placeFlag()
 	{
 		Drop();
 		fInBase = true;
-		setXi(flagbase->ix);
-		setYi(flagbase->iy);
+		xi(flagbase->ix);
+		yi(flagbase->iy);
 		fLastFlagDirection = false;
 		flagbase->setFlag(this);
 	}
@@ -5762,8 +5762,8 @@ void MO_Yoshi::placeYoshi()
 					if(g_map->spawn(1, iDeathX1, top) && g_map->spawn(1, iDeathX2, top) && 
 						g_map->spawn(1, iDeathX1, iDeathY - 1) && g_map->spawn(1, iDeathX2, iDeathY - 1))
 					{
-						setXi(ix);
-						setYi((iDeathY << 5) - ih);
+						xi(ix);
+						yi((iDeathY << 5) - ih);
 						return;
 					}
 
@@ -5895,8 +5895,8 @@ void OMO_Area::placeArea()
 		objectcontainer[0].getClosestObject(x, y, object_area) <= (200.0f - ((numareas - 3) * 25.0f)))
 		&& iAttempts-- > 0);
 
-	setXi(x);
-	setYi(y);
+	xi(x);
+	yi(y);
 }
 
 void OMO_Area::reset()
@@ -6330,8 +6330,8 @@ void OMO_RaceGoal::placeRaceGoal()
 		while(objectcontainer[2].getClosestObject(x, y, object_race_goal) <= 250.0f - (quantity * 25.0f));
 	}
 
-	setXi(x);
-	setYi(y);
+	xi(x);
+	yi(y);
 }
 
 //------------------------------------------------------------------------------
@@ -6435,8 +6435,8 @@ void MO_FrenzyCard::placeCard()
 		objectcontainer[1].getClosestObject(x, y, object_frenzycard) <= 150.0f)
 		&& iAttempts-- > 0);
 
-	setXi(x);
-	setYi(y);
+	xi(x);
+	yi(y);
 }
 
 //------------------------------------------------------------------------------
@@ -6576,8 +6576,8 @@ void MO_CollectionCard::placeCard()
 		objectcontainer[1].getClosestMovingObject(x, y, movingobject_collectioncard) <= 150.0f)
 		&& iAttempts-- > 0);
 
-	setXi(x);
-	setYi(y);
+	xi(x);
+	yi(y);
 }
 
 
@@ -6960,7 +6960,7 @@ void MO_Goomba::update()
 	
 bool MO_Goomba::hittop(CPlayer * player)
 {
-	player->setYi(iy - PH - 1);
+	player->yi(iy - PH - 1);
 	player->bouncejump();
 	player->collision_detection_checktop();
 	player->platform = NULL;
@@ -7053,7 +7053,7 @@ void MO_Koopa::update()
 
 bool MO_Koopa::hittop(CPlayer * player)
 {
-	player->setYi(iy - PH - 1);
+	player->yi(iy - PH - 1);
 	player->bouncejump();
 	player->collision_detection_checktop();
 	player->platform = NULL;
@@ -7138,7 +7138,7 @@ void MO_BuzzyBeetle::update()
 
 bool MO_BuzzyBeetle::hittop(CPlayer * player)
 {
-	player->setYi(iy - PH - 1);
+	player->yi(iy - PH - 1);
 	player->bouncejump();
 	player->collision_detection_checktop();
 	player->platform = NULL;
@@ -7209,7 +7209,7 @@ bool MO_Spiny::hittop(CPlayer * player)
 
 	if(player->iKuriboShoe > 0)
 	{
-		player->setYi(iy - PH - 1);
+		player->yi(iy - PH - 1);
 		player->bouncejump();
 		player->collision_detection_checktop();
 		player->platform = NULL;
@@ -7260,7 +7260,7 @@ MO_CheepCheep::MO_CheepCheep(gfxSprite *nspr) :
 	IO_MovingObject(nspr, 0, 480, 2, 8, 30, 28, 1, 3)
 {
 	ih = 32;
-	setXi((short)(rand() % 608));
+	xi((short)(rand() % 608));
 	
 	velx = 0.0f;
 	while(velx == 0.0f)
@@ -7286,8 +7286,8 @@ void MO_CheepCheep::update()
 	fOldX = fx;
 	fOldY = fy;
 
-	setXf(fx + velx);
-	setYf(fy + vely);
+	xf(fx + velx);
+	yf(fy + vely);
 
 	//Cheep cheep gravitation
 	vely += 0.2f;
@@ -7342,7 +7342,7 @@ bool MO_CheepCheep::collide(CPlayer * player)
 
 bool MO_CheepCheep::hittop(CPlayer * player)
 {
-	player->setYi(iy - PH - 1);
+	player->yi(iy - PH - 1);
 	player->bouncejump();
 	player->collision_detection_checktop();
 	player->platform = NULL;
@@ -7520,13 +7520,13 @@ MO_SledgeBrother::MO_SledgeBrother(gfxSprite *nspr, short platformY, short type)
 	velx = 0.0f;
 	
 	iPlatformY = platformY - collisionHeight;
-	setYi(iPlatformY);
+	yi(iPlatformY);
 
 	for(short iLocation = 0; iLocation < 5; iLocation++)
 		iDestLocationX[iLocation] = 84 * iLocation + 128;
 
 	iDestX = iDestLocationX[location];
-	setXi(iDestX);
+	xi(iDestX);
 
 	for(short iAction = 0; iAction < 6; iAction++)
 		need_action[iAction] = 0;
@@ -7563,7 +7563,7 @@ void MO_SledgeBrother::update()
 	}
 	else if(iActionState == 2)
 	{
-		setYf(fy + vely);
+		yf(fy + vely);
 		vely += GRAVITATION;
 
 		if(iy >= iPlatformY)
@@ -8124,7 +8124,7 @@ bool CO_Shell::HitTop(CPlayer * player)
 	{
 		Stop();
 
-		player->setYi(iy - PH - 1);
+		player->yi(iy - PH - 1);
 		player->bouncejump();
 		player->collision_detection_checktop();
 		player->platform = NULL;
@@ -8139,7 +8139,7 @@ bool CO_Shell::HitTop(CPlayer * player)
 			Kick();
 			fSmoking = false;
 
-			player->setYi(iy - PH - 1);
+			player->yi(iy - PH - 1);
 			player->bouncejump();
 			player->collision_detection_checktop();
 			player->platform = NULL;
@@ -8368,13 +8368,13 @@ void CO_Shell::update()
 	//Have the powerup grow out of the powerup block
 	if(state == 0)
 	{
-		setYf(fy - 2.0f);
+		yf(fy - 2.0f);
 
 		if(fy <= iDestY)
 		{
 			state = 2;
 			vely = GRAVITATION;
-			setYf(iDestY);
+			yf(iDestY);
 		}
 
 		return;
@@ -8453,14 +8453,14 @@ void CO_Shell::Drop()
 	if(owner)
 	{
 		owner->carriedItem = NULL;
-		setXi(owner->ix + (owner->IsPlayerFacingRight() ? PW + 1: -31));
+		xi(owner->ix + (owner->IsPlayerFacingRight() ? PW + 1: -31));
 	}
 
 	if(collision_detection_checksides())
 	{
 		//Move back to where it was before checking sides, then kill it
-		setXi(owner->ix + (owner->IsPlayerFacingRight() ? PW + 1: -31));
-		setYi(owner->iy + PH - 32 + collisionOffsetY);
+		xi(owner->ix + (owner->IsPlayerFacingRight() ? PW + 1: -31));
+		yi(owner->iy + PH - 32 + collisionOffsetY);
 		Die();
 	}
 	else
@@ -8616,7 +8616,7 @@ void CO_Shell::Stop()
 void CO_Shell::nospawn(short y, bool fBounce)
 {
 	state = 2;
-	setYi(y);
+	yi(y);
 	
 	if(fBounce)
 		vely = -VELJUMP / 2.0;
@@ -8692,7 +8692,7 @@ bool CO_ThrowBlock::HitTop(CPlayer * player)
 
 				Kick();
 
-				player->setYi(iy - PH - 1);
+				player->yi(iy - PH - 1);
 				player->bouncejump();
 				player->collision_detection_checktop();
 				player->platform = NULL;
@@ -9333,7 +9333,7 @@ void CO_Spring::hittop(CPlayer * player)
 	state = 2;
 	drawframe += iw;
 
-	player->setYi(iy - PH - 1);
+	player->yi(iy - PH - 1);
 	player->collision_detection_checktop();
 	player->platform = NULL;
 	player->inair = false;
@@ -9615,8 +9615,8 @@ void MO_SpinAttack::update()
 	if(owner)
 	{
 		//Move to the owner
-		setXi(owner->ix - PWOFFSET + (fDirection ? 24 : -16));
-		setYi(owner->iy + PH - iOffsetY);
+		xi(owner->ix - PWOFFSET + (fDirection ? 24 : -16));
+		yi(owner->iy + PH - iOffsetY);
 
 		if(iTimer < 5 || iy + collisionHeight < 0)
 			return;
@@ -9812,8 +9812,8 @@ bool OMO_PipeCoin::collide(CPlayer * player)
 
 void OMO_PipeCoin::update()
 {
-	setXf(fx + velx);
-	setYf(fy + vely);
+	xf(fx + velx);
+	yf(fy + vely);
 
 	if(iTeamID == -1)
 		animate();
@@ -9957,13 +9957,13 @@ OMO_Phanto::OMO_Phanto(gfxSprite *nspr, short x, short y, float dVelX, float dVe
 
 void OMO_Phanto::update()
 {
-	setXf(fx + velx);
-	setYf(fy + vely);
+	xf(fx + velx);
+	yf(fy + vely);
 
 	if(fx < 0.0f)
-		setXf(fx + 640.0f);
+		xf(fx + 640.0f);
 	else if(fx + iw >= 640.0f)
-		setXf(fx - 640.0f);
+		xf(fx - 640.0f);
 
 	if(++iSpeedTimer > 62)
 	{
@@ -10038,8 +10038,8 @@ void OMO_Phanto::update()
 				velx = 0.0f;
 
 				//Randomly position phanto off screen
-				setXi(rand() % 640);
-				setYi(rand() % 2 == 0 ? -ih - CRUNCHMAX: 480);
+				xi(rand() % 640);
+				yi(rand() % 2 == 0 ? -ih - CRUNCHMAX: 480);
 			}
 		}
 	}
@@ -10165,8 +10165,8 @@ void CO_PhantoKey::placeKey()
 	short iAttempts = 10;
 	while(!g_map->findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) && iAttempts-- > 0);
 
-	setXi(x);
-	setYi(y);
+	xi(x);
+	yi(y);
 
 	vely = GRAVITATION;
 	velx = 0.0f;

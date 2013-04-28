@@ -23,6 +23,7 @@
 //#include "net.h"
 #include "path.h"
 
+
 #ifdef LINUXFUNC
 	#include "linfunc.h"
 #endif
@@ -129,10 +130,6 @@ struct STextAward
 #define NUMSPAWNAREATYPES 6
 #define MAXSPAWNAREAS   128
 #define MAXDRAWAREAS   128
-
-#define NUMSTOMPENEMIES 9
-#define NUMSURVIVALENEMIES 3
-#define NUMFRENZYCARDS 19
 
 #define	MAX_BONUS_CHESTS	5
 #define MAX_WORLD_BONUSES_AWARDED 3
@@ -262,11 +259,201 @@ std::string stripCreatorAndDotMap(const std::string &filename);
 
 #define COUNTDOWN_START_INDEX 4
 
+#define NUMSTOMPENEMIES 9
+#define NUMSURVIVALENEMIES 3
+#define NUMFRENZYCARDS 19
+
+
+struct ClassicGameModeSettings
+{
+	short style;			//on kill, either respawn the player or shield them and let them keep playing
+	short scoring;			//When to credit a score, all kills or push kills only (sumo mode)
+};
+
+struct FragGameModeSettings
+{
+	short style;			//on kill, either respawn the player or shield them and let them keep playing
+	short scoring;			//When to credit a score, all kills or push kills only (sumo mode)
+};
+
+struct TimeGameModeSettings
+{
+	short style;			//on kill, either respawn the player or shield them and let them keep playing
+	short scoring;			//When to credit a score, all kills or push kills only (sumo mode)
+	short percentextratime; //percent chance a stopwatch with extra game time will spawn
+};
+
+struct JailGameModeSettings
+{
+	short style;			//Style of play: classic, owned, free for all
+	bool tagfree;			//Free jailed player by tagging on same team
+	short timetofree;		//Time it takes for a jailed player to be freed
+	short percentkey;		//percent chance a jail key will spawn
+};
+
+struct CoinGameModeSettings
+{
+	bool penalty;			//Player loses coin if stomped on
+	short quantity;			//Number of coins to have on screen at one time
+	short percentextracoin; //percent chance a bonus coin will appear
+};
+
+struct StompGameModeSettings
+{
+	short rate;				//How fast they spawn
+	short enemyweight[NUMSTOMPENEMIES];	//What ratio the enemies are chosen
+};
+
+struct EggGameModeSettings
+{
+	short eggs[4];			//Number of eggs of each color in game
+	short yoshis[4];		//Nunber of yoshis of each color in game
+	short explode;			//Time until eggs explode
+};
+
+struct FlagGameModeSettings
+{
+	short speed;			//How fast to move bases
+	bool touchreturn;		//Return to base if player touches their own flag
+	bool pointmove;			//Move base after point
+	short autoreturn;		//Time to automatically return flag to base
+	bool homescore;			//Need your flag at home base to score
+	bool centerflag;		//Have a single flag that all teams fight to return to their base
+};
+
+struct ChickenGameModeSettings
+{
+	bool usetarget;			//Display target around chicken
+	bool glide;				//Allow chicken to glide through the air (chicken gets perm leaf powerup)
+};
+
+struct TagGameModeSettings
+{
+	bool tagontouch;		//Transfer tag on touch
+};
+
+struct StarGameModeSettings
+{
+	short time;				//Time to get rid or keep star
+	short shine;			//If we are playing shine mode vs. ztar vs. stars mode
+	short percentextratime; //percent chance a stopwatch with extra game time will spawn
+};
+
+struct DominationGameModeSettings
+{
+	bool loseondeath;		//Player loses his bases on death
+	bool stealondeath;		//Killing player steals bases on death
+	bool relocateondeath;	//Owned bases relocate on player's death
+	short relocationfrequency; //How fast the bases switch spots
+	short quantity;			//Number of bases
+};
+
+struct KingOfTheHillModeSettings
+{
+	short areasize;			//size of the hill area, 2x2, 3x3 etc.
+	short relocationfrequency;  //How often the hill switches spots
+	short maxmultiplier;	//as a player sits in the zone, the score will multiply
+};
+
+struct RaceGameModeSettings
+{
+	short quantity;			//How many race goals
+	short speed;			//How fast goals move
+	short penalty;			//If dead players lose all tagged, one tagged or none
+};
+
+struct FrenzyGameModeSettings
+{
+	short quantity;			//How many powerups spawn
+	short rate;				//How fast they spawn
+	bool storedshells;		//Shells become stored instead of active
+	short powerupweight[NUMFRENZYCARDS];	//What ratio the powerups are chosen
+};
+
+struct SurvivalGameModeSettings
+{
+	short enemyweight[NUMSURVIVALENEMIES];       //The weighting of thwomps vs. podobos
+	short density;				//Number of thwomps on screen
+	short speed;				//How fast thwomps go
+	bool shield;				//Players are shielded when spawning
+};
+
+struct GreedGameModeSettings
+{
+	short coinlife;				//How long coins stick around before disappearing
+	bool owncoins;				//You can/can't pick up your own coins
+	short multiplier;			//How many coins are released when players are hit
+	short percentextracoin;		//percent chance a bonus coin will appear
+};
+
+struct HealthGameModeSettings
+{
+	short startlife;			//Number of hearts players start with
+	short maxlife;				//Number of hearts players can have
+	short percentextralife;		//Percent chance an extra heart with come from a powerup block
+};
+
+struct CollectionGameModeSettings
+{
+	short quantity;				//How many cards spawn
+	short rate;					//How fast they spawn
+	short banktime;				//Amount of time needed to bank cards to score
+	short cardlife;				//How long cards live after they are released from players
+};
+
+struct ChaseGameModeSettings
+{
+	short phantospeed;			//How fast the phantos move
+	short phantoquantity[3];	//How many phantos there are
+};
+
+struct ShyGuyTagGameModeSettings
+{
+	bool tagonsuicide;			//If players become shyguys if they kill themselves
+	short tagtransfer;			//If players become shyguys if they are stomped
+	short freetime;				//How long all players will stay shyguys before the game is reset
+};
+
+struct BossGameModeSettings
+{
+	short bosstype;				//What type of boss battle it is
+	short difficulty;			//How hard the boss is to defeat
+	short hitpoints;			//How much life the boss has
+};
+
+struct GameModeSettings
+{
+	ClassicGameModeSettings classic;
+	FragGameModeSettings frag;
+	TimeGameModeSettings time;
+	JailGameModeSettings jail;
+	CoinGameModeSettings coins;
+	StompGameModeSettings stomp;
+	EggGameModeSettings egg;
+	FlagGameModeSettings flag;
+	ChickenGameModeSettings chicken;
+	TagGameModeSettings tag;
+	StarGameModeSettings star;
+	DominationGameModeSettings domination;
+	KingOfTheHillModeSettings kingofthehill;
+	RaceGameModeSettings race;
+	FrenzyGameModeSettings frenzy;
+	SurvivalGameModeSettings survival;
+	GreedGameModeSettings greed;
+	HealthGameModeSettings health;
+	CollectionGameModeSettings collection;
+	ChaseGameModeSettings chase;
+	ShyGuyTagGameModeSettings shyguytag;
+	BossGameModeSettings boss;
+};
+
+
 //------------- data structures / selfmade include files -------------
 #include "input.h"
 #include "uimenu.h"
-#include "uicontrol.h"
 #include "menu.h"
+#include "Game.h"
+#include "uicontrol.h"
 #include "MapList.h"
 #include "FileList.h"
 #include "movingplatform.h"
@@ -647,9 +834,6 @@ void _load_waitforkey();
 void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short startY, short endX, short endY, float angle, float radiusX, float radiusY, short iSize, short iPlatformWidth, short iPlatformHeight, bool fDrawPlatform, bool fDrawShadow);
 void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter);
 
-//----------------- game options all parts of the game need -----------
-enum gs{GS_MENU, GS_START_GAME, GS_START_WORLD, GS_END_GAME, GS_GAME, GS_QUIT};
-
 //tournament scores
 struct ts
 {
@@ -657,229 +841,6 @@ struct ts
 	short		type[MAXTOURNAMENTGAMES];
 	short		total;		//used for running total in a tour
 };
-
-struct ClassicGameModeSettings
-{
-	short style;			//on kill, either respawn the player or shield them and let them keep playing
-	short scoring;			//When to credit a score, all kills or push kills only (sumo mode)
-};
-
-struct FragGameModeSettings
-{
-	short style;			//on kill, either respawn the player or shield them and let them keep playing
-	short scoring;			//When to credit a score, all kills or push kills only (sumo mode)
-};
-
-struct TimeGameModeSettings
-{
-	short style;			//on kill, either respawn the player or shield them and let them keep playing
-	short scoring;			//When to credit a score, all kills or push kills only (sumo mode)
-	short percentextratime; //percent chance a stopwatch with extra game time will spawn
-};
-
-struct JailGameModeSettings
-{
-	short style;			//Style of play: classic, owned, free for all
-	bool tagfree;			//Free jailed player by tagging on same team
-	short timetofree;		//Time it takes for a jailed player to be freed
-	short percentkey;		//percent chance a jail key will spawn
-};
-
-struct CoinGameModeSettings
-{
-	bool penalty;			//Player loses coin if stomped on
-	short quantity;			//Number of coins to have on screen at one time
-	short percentextracoin; //percent chance a bonus coin will appear
-};
-
-struct StompGameModeSettings
-{
-	short rate;				//How fast they spawn
-	short enemyweight[NUMSTOMPENEMIES];	//What ratio the enemies are chosen
-};
-
-struct EggGameModeSettings
-{
-	short eggs[4];			//Number of eggs of each color in game
-	short yoshis[4];		//Nunber of yoshis of each color in game
-	short explode;			//Time until eggs explode
-};
-
-struct FlagGameModeSettings
-{
-	short speed;			//How fast to move bases
-	bool touchreturn;		//Return to base if player touches their own flag
-	bool pointmove;			//Move base after point
-	short autoreturn;		//Time to automatically return flag to base
-	bool homescore;			//Need your flag at home base to score
-	bool centerflag;		//Have a single flag that all teams fight to return to their base
-};
-
-struct ChickenGameModeSettings
-{
-	bool usetarget;			//Display target around chicken
-	bool glide;				//Allow chicken to glide through the air (chicken gets perm leaf powerup)
-};
-
-struct TagGameModeSettings
-{
-	bool tagontouch;		//Transfer tag on touch
-};
-
-struct StarGameModeSettings
-{
-	short time;				//Time to get rid or keep star
-	short shine;			//If we are playing shine mode vs. ztar vs. stars mode
-	short percentextratime; //percent chance a stopwatch with extra game time will spawn
-};
-
-struct DominationGameModeSettings
-{
-	bool loseondeath;		//Player loses his bases on death
-	bool stealondeath;		//Killing player steals bases on death
-	bool relocateondeath;	//Owned bases relocate on player's death
-	short relocationfrequency; //How fast the bases switch spots
-	short quantity;			//Number of bases
-};
-
-struct KingOfTheHillModeSettings
-{
-	short areasize;			//size of the hill area, 2x2, 3x3 etc.
-	short relocationfrequency;  //How often the hill switches spots
-	short maxmultiplier;	//as a player sits in the zone, the score will multiply
-};
-
-struct RaceGameModeSettings
-{
-	short quantity;			//How many race goals
-	short speed;			//How fast goals move
-	short penalty;			//If dead players lose all tagged, one tagged or none
-};
-
-struct FrenzyGameModeSettings
-{
-	short quantity;			//How many powerups spawn
-	short rate;				//How fast they spawn
-	bool storedshells;		//Shells become stored instead of active
-	short powerupweight[NUMFRENZYCARDS];	//What ratio the powerups are chosen
-};
-
-struct SurvivalGameModeSettings
-{
-	short enemyweight[NUMSURVIVALENEMIES];       //The weighting of thwomps vs. podobos
-	short density;				//Number of thwomps on screen
-	short speed;				//How fast thwomps go
-	bool shield;				//Players are shielded when spawning
-};
-
-struct GreedGameModeSettings
-{
-	short coinlife;				//How long coins stick around before disappearing
-	bool owncoins;				//You can/can't pick up your own coins
-	short multiplier;			//How many coins are released when players are hit
-	short percentextracoin;		//percent chance a bonus coin will appear
-};
-
-struct HealthGameModeSettings
-{
-	short startlife;			//Number of hearts players start with
-	short maxlife;				//Number of hearts players can have
-	short percentextralife;		//Percent chance an extra heart with come from a powerup block
-};
-
-struct CollectionGameModeSettings
-{
-	short quantity;				//How many cards spawn
-	short rate;					//How fast they spawn
-	short banktime;				//Amount of time needed to bank cards to score
-	short cardlife;				//How long cards live after they are released from players
-};
-
-struct ChaseGameModeSettings
-{
-	short phantospeed;			//How fast the phantos move
-	short phantoquantity[3];	//How many phantos there are
-};
-
-struct ShyGuyTagGameModeSettings
-{
-	bool tagonsuicide;			//If players become shyguys if they kill themselves
-	short tagtransfer;			//If players become shyguys if they are stomped
-	short freetime;				//How long all players will stay shyguys before the game is reset
-};
-
-struct BossGameModeSettings
-{
-	short bosstype;				//What type of boss battle it is
-	short difficulty;			//How hard the boss is to defeat
-	short hitpoints;			//How much life the boss has
-};
-
-struct GameModeSettings
-{
-	ClassicGameModeSettings classic;
-	FragGameModeSettings frag;
-	TimeGameModeSettings time;
-	JailGameModeSettings jail;
-	CoinGameModeSettings coins;
-	StompGameModeSettings stomp;
-	EggGameModeSettings egg;
-	FlagGameModeSettings flag;
-	ChickenGameModeSettings chicken;
-	TagGameModeSettings tag;
-	StarGameModeSettings star;
-	DominationGameModeSettings domination;
-	KingOfTheHillModeSettings kingofthehill;
-	RaceGameModeSettings race;
-	FrenzyGameModeSettings frenzy;
-	SurvivalGameModeSettings survival;
-	GreedGameModeSettings greed;
-	HealthGameModeSettings health;
-	CollectionGameModeSettings collection;
-	ChaseGameModeSettings chase;
-	ShyGuyTagGameModeSettings shyguytag;
-	BossGameModeSettings boss;
-};
-
-struct WorldStageBonus
-{
-	short iWinnerPlace;
-	short iBonus;
-	char szBonusString[8];
-};
-
-struct TourStop
-{
-	const char * pszMapFile;
-	short iMode;
-	short iGoal;
-	short iPoints;
-	short iBonusType;
-	char szName[128];
-	
-	bool fEndStage;
-	short iNumBonuses;
-	WorldStageBonus wsbBonuses[10];
-	short iStageType;
-
-	bool fUseSettings;
-	short iNumUsedSettings;
-	GameModeSettings gmsSettings;
-
-	short iBonusTextLines;
-	char szBonusText[5][128];
-};
-
-//TODO:: Move menu settings form game_values to global menu context structure
-//menu context (like game_values, but for menu)
-/*
-struct MenuContext
-{
-	
-};
-
-extern MenuContext menu_context;
-*/
 
 struct gv
 {
@@ -994,7 +955,7 @@ struct gv
 	short		networktype;		//Type of network game: 0=stand alone, 1=direct connect
 	bool		networkhost;		//If this machine is the one making collision detection and game state changes
 	bool		gamehost;			//If this client is responsible for choosing game type, map, options
-	char *		hostaddress;        //String form of the host ip address
+	char *		hostaddress;        //String from of the host ip address
 
 	CInputPlayerControl inputConfiguration[4][2]; //[NumPlayers][Keyboard/Joystick]
 
@@ -1100,7 +1061,47 @@ struct gv
 	bool		unlocksecretunlocked[4];
 };
 
-extern gv game_values;
+struct WorldStageBonus
+{
+	short iWinnerPlace;
+	short iBonus;
+	char szBonusString[8];
+};
+
+struct TourStop
+{
+	const char * pszMapFile;
+	short iMode;
+	short iGoal;
+	short iPoints;
+	short iBonusType;
+	char szName[128];
+	
+	bool fEndStage;
+	short iNumBonuses;
+	WorldStageBonus wsbBonuses[10];
+	short iStageType;
+
+	bool fUseSettings;
+	short iNumUsedSettings;
+	GameModeSettings gmsSettings;
+
+	short iBonusTextLines;
+	char szBonusText[5][128];
+};
+
+//TODO:: Move menu settings from game_values to global menu context structure
+//menu context (like game_values, but for menu)
+/*
+struct MenuContext
+{
+	
+};
+
+extern MenuContext menu_context;
+*/
+
+#define	MAX_PLAYERS	4
 
 struct MapMusicOverride
 {
@@ -1116,6 +1117,10 @@ struct WorldMusicOverride
 
 extern std::vector<MapMusicOverride*> mapmusicoverrides;
 extern std::vector<WorldMusicOverride*> worldmusicoverrides;
+
+extern Menu g_Menu;
+extern gv game_values;
+
 
 #endif
 

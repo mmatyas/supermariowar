@@ -6,7 +6,7 @@
 |                                                           |
 | this sourcecode is released under the GPL.				|
 |															|
-|			  (C) 2007 Florian Hufsky <fhufsky@phorus.at>	|
+|				© 2007 Florian Hufsky <fhufsky@phorus.at>	|
 +----------------------------------------------------------*/
 
 #define _SMW_EDITOR
@@ -279,12 +279,12 @@ void loadmap(char * szMapFile)
 	char filename[128];
 	sprintf(filename, "gfx/packs/Classic/backgrounds/%s", g_map->szBackgroundFile);
 	std::string path = convertPath(filename);
-	backoundlist->SetCurrentName(filename);
+	backgroundlist.SetCurrentName(filename);
 	
 	if(!File_Exists(path))
 	{
 		path = convertPath("gfx/packs/Classic/backgrounds/Land_Classic.png");
-		backoundlist->SetCurrentName("gfx/packs/Classic/backgrounds/Land_Classic.png");
+		backgroundlist.SetCurrentName("gfx/packs/Classic/backgrounds/Land_Classic.png");
 	}
 	
 	spr_background.init(path);

@@ -1,21 +1,12 @@
 #include "global.h"
+#include "path.h"
+
 
 FILE * OpenFile(const char * filename, const char * options)
 {
-#ifdef _XBOX
-	std::string optionsbin = std::string("D:\\") + std::string(filename);
-#else
-//	#ifdef PREFIXPATH
-		char * folder=getenv("HOME");
-		#ifdef __MACOSX__
-			std::string optionsbin=std::string(folder) + std::string("/Library/Preferences/smw.") + std::string(filename);
-		#else
-			std::string optionsbin=std::string(folder) + std::string("/.smw/") + std::string(filename);
-		#endif
-//	#else
-//		std::string optionsbin = std::string(filename);
-//	#endif
-#endif
+	std::string homeDirectory = GetHomeDirectory();
+
+	std::string optionsbin = homeDirectory + std::string(filename);
 
 	return fopen(optionsbin.c_str(), options);
 }

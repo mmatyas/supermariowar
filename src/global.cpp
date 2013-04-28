@@ -367,7 +367,7 @@ void GetNameFromFileName(char * szName, const char * szFileName, bool fStripAuth
 //and the first letter of the name will come back capitalized
 std::string stripCreatorAndDotMap(const std::string &filename)
 {
-	size_t firstUnderscore = filename.find("_");	//find first _
+	unsigned int firstUnderscore = filename.find("_");	//find first _
 	if(firstUnderscore == std::string::npos)	//if not found start with first character
 		firstUnderscore = 0;
 	else
@@ -387,7 +387,7 @@ std::string stripCreatorAndDotMap(const std::string &filename)
 //Takes a path to a file and gives you back just the name of the file with no author or file extention
 std::string stripPathAndExtension(const std::string &path)
 {
-	size_t chopHere = path.find("_");	//find first _
+	unsigned int chopHere = path.find("_");	//find first _
 	if(chopHere == std::string::npos)	//if not found, then find the beginning of the filename
 	{
 		chopHere = path.find_last_of(getDirectorySeperator());	//find last /

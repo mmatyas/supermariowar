@@ -22,10 +22,10 @@ class CObject
 		
 		virtual ObjectType getObjectType(){return objectType;}
 		
-		void setXf(float xf){fx = xf; ix = (short)fx;}
-		void setXi(short xi){ix = xi; fx = (float)ix;}
-		void setYf(float yf){fy = yf; if(fy < 0.0f) iy = (short)(fy - 1.0f); else iy = (short)fy;}
-		void setYi(short yi){iy = yi; fy = (float)iy;}
+		void xf(float xf){fx = xf; ix = (short)fx;};
+ 		void xi(short xi){ix = xi; fx = (float)ix;};
+		void yf(float yf){fy = yf; if(fy < 0.0f) iy = (short)(fy - 1.0f); else iy = (short)fy;};
+		void yi(short yi){iy = yi; fy = (float)iy;};
 
 		int iNetworkID;
 		short ix, iy;

@@ -37,7 +37,7 @@ class MapList
 
 		const char* currentFilename(){return (*outercurrent).second->filename.c_str();}
         const char* currentShortmapname(){return (*outercurrent).first.c_str();}
-		int currentShortMapNameLen(){return (*outercurrent).second->iShortNameLength;}
+		const int currentShortMapNameLen(){return (*outercurrent).second->iShortNameLength;}
         
 		void prev(bool fUseFilters);
         void next(bool fUseFilters);
@@ -48,6 +48,9 @@ class MapList
 		//Sets/Gets if a map at the current map node is valid and can be loaded
 		void SetValid(bool fValid) {(*current).second->fValid = fValid;}
 		bool GetValid() {return (*current).second->fValid;}
+        
+		//TODO: use size?
+		bool IsEmpty(){ return maps.empty(); }
         
 		int GetFilteredCount() {return iFilteredMapCount;}
 		int GetCount() {return maps.size();}

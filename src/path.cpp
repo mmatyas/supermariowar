@@ -7,6 +7,7 @@
 	#ifdef _XBOX
 		#include <xtl.h>
 	#else
+		#include <shlobj.h>
 		#include <SDL_platform.h>
 	#endif
 #endif
@@ -16,8 +17,26 @@
 using namespace std;
 char SMW_Root_Data_Dir[PATH_MAX + 2] = "";
 
-// main game directory, read from command line argument
-char		*RootDataDirectory;
+std::string	GetHomeDirectory() {
+	//NOTE: _WIN32 is also defined on _XBOX
+#ifdef _XBOX
+		return std::string("D:\\.smw\\");
+#elif __MACOSX__
+		char * folder=getenv("HOME");
+			return std::string(folder) + std::string("/Library/Preferences/.smw/");
+#elif	_WIN32
+		 char folder[ MAX_PATH ];
+		if (SHGetFolderPathA( NULL, CSIDL_PROFILE, NULL, 0, folder ) != S_OK)
+		{
+			throw "I could not retrieve the user's home directory!\n";
+		}
+
+		return std::string(folder) + std::string("\\.smw\\");
+#else // catch-all for Linux-based systems
+			char * folder=getenv("HOME");
+			return std::string(folder) + std::string("/.smw/");
+#endif
+}
 
 bool File_Exists (const std::string fileName)
 {

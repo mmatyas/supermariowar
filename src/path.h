@@ -22,9 +22,7 @@ const std::string getDirectorySeperator();
 const std::string convertPartialPath(const std::string & source);
 const std::string getFileFromPath(const std::string &path);
 
-//#undef convertPathC
-//#define convertPathC(s) s
-//#define convertPath(s) s 
+std::string	GetHomeDirectory();
 
 #ifdef __MACOSX__
     void Initialize_Paths();

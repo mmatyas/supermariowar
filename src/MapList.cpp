@@ -132,11 +132,11 @@ MapList::MapList(bool fWorldEditor)
 
 	}
 
+
 	//TODO: add proper test via size
 	if(maps.empty())
 	{	
-		printf("ERROR: Empty map directory!\n");
-		exit(0);
+		return;
 	}
 
 	current = maps.begin();

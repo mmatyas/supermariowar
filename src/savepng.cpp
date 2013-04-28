@@ -1,3 +1,6 @@
+#pragma once
+
+// this file will be empty if we have no support of PNG
 #ifdef PNG_SAVE_FORMAT
 
 

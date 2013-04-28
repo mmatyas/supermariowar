@@ -450,69 +450,125 @@ bool LoadGameSounds()
 	return true;
 }
 
+void LoadAll()
+{
+			// load initial coin sound
+			backgroundmusic[2].load(musiclist->GetMusic(1));
+
+			short k, j;
+			for(k = 0; k < 4; k++)
+			{
+				spr_player[k] = new gfxSprite * [PGFX_LAST];
+				spr_shyguy[k] = new gfxSprite * [PGFX_LAST];
+				spr_chocobo[k] = new gfxSprite * [PGFX_LAST];
+				spr_bobomb[k] = new gfxSprite * [PGFX_LAST];
+
+				for(j = 0; j < PGFX_LAST; j++)
+				{
+					spr_player[k][j] = new gfxSprite();
+					spr_shyguy[k][j] = new gfxSprite();
+					spr_chocobo[k][j] = new gfxSprite();
+					spr_bobomb[k][j] = new gfxSprite();
+
+					spr_player[k][j]->SetWrap(true);
+					spr_shyguy[k][j]->SetWrap(true);
+					spr_chocobo[k][j]->SetWrap(true);
+					spr_bobomb[k][j]->SetWrap(true);
+				}
+			}
+
+			LoadMenuGraphics();
+			LoadWorldGraphics();
+			LoadGameGraphics();
+
+			gfx_loadimagenocolorkey(&spr_backmap[0], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->current_name()));
+			gfx_loadimagenocolorkey(&spr_backmap[1], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->current_name()));
+			gfx_loadimagenocolorkey(&spr_frontmap[0], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->current_name()));
+			gfx_loadimagenocolorkey(&spr_frontmap[1], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->current_name()));
+
+			gfx_loadimage(&spr_overlay, convertPath("gfx/packs/menu/menu_shade.png", gamegraphicspacklist->current_name()), false, false);
+
+			LoadGameSounds();
+
+			if(!game_values.soundcapable)
+			{
+				game_values.sound = false;
+				game_values.music = false;
+				game_values.soundvolume = 0;
+				game_values.musicvolume = 0;
+			}
+
+			//Read the map filter lists
+			maplist->ReadFilters();
+			maplist->ApplyFilters(game_values.pfFilters);
+
+			ifsoundonplay(sfx_coin);
+}
+
+
 bool LoadAndSplashScreen()
 {
 	LoadStartGraphics();
 
 	gfxSprite menu_dpi_logo;
-	gfx_loadimagenocolorkey(&menu_dpi_logo, convertPath("gfx/packs/menu/splash_72dpi.png", menugraphicspacklist->current_name()));
+//	gfx_loadimagenocolorkey(&menu_dpi_logo, convertPath("gfx/packs/menu/splash_72dpi.png", menugraphicspacklist->current_name()));
 
 	gfxSprite menu_contest_winners;
-	gfx_loadimagenocolorkey(&menu_contest_winners, convertPath("gfx/packs/menu/splash_contest_winners.png", menugraphicspacklist->current_name()));
+//	gfx_loadimagenocolorkey(&menu_contest_winners, convertPath("gfx/packs/menu/splash_contest_winners.png", menugraphicspacklist->current_name()));
 
 	gfxSprite menu_credits;
 	gfx_loadimage(&menu_credits, convertPath("gfx/packs/menu/splash_credits.png", menugraphicspacklist->current_name()), false);
 
-	int alpha = 0;
-	int state = 0;
+	int alpha = 255;
+	int state = 7;
 	int timer = 120;
 
-	const char * contributors[] = {
-	"no_shorty", "redfalcon", "no_human", "dschingis", "funvill",
-	"matsche", "aeroflare", "Tymoe", "David Olofson", "scoti",
-	"affeOHNEwaffe", "mademan", "mario piuk", "yvoo", "DNightmare", 
-	"Armen", "vvill", "zio tiok", "Donny Viszneki","alex-rus07", "JacobTheHero",
-	"Stephan Peijnik", "ventuz", "Stefan Schury", "riahc3",
-	"jinkies.uk", "devguy", "Alexis Morrissette", "Bidbood", "Quinn Storm",
-	"Flexserve", "Xijar", "j rok", "nitsuja", "4matsy", "leftyfb",
-	"Brian Porter", "Brandon Stansbury", "Brian Smith", "Caesar Cypher",
-	"Chris Schager", "Alex Arnot", "Jason Lumbert", "Kevin King",
-	"Fernando Marquez", "DrJones", "SleepyP", "UltimateNinja9",
-	"Alex Brown", "GKi", "mpinger", "neonater", "NMcCoy", "Rogultgot", "Arima",
-	"Toadeeboy", "Crapcom", "Tonberry2k", "Jum2004", "Bacon", "Tetra Vega",
-	"Young Link", "Blordow", "Gozinzolo", "Ragey", "SaturnEchidna", "Link901",
-	"Techokami", "dolorous", "SMW Fan", "Timonator", "YoshiMonarch7", "Tiptup300",
-	"Dude", "Justinio", "Matthew Callis", "VenomousNinja",
-	"Discrosh", "Ikill4you", "Helix Snake", "tubesteak", "wasabimario", "Lee",
-	"Pikawil", "Marioman64", "Peardian", "Bob Ippolito", "Viper Snake", "neavea",
-	"Mr.Bob-omb", "milua", "bobmanperson", "DrTek", "somestrangeflea", "nes6502",
-	"XPort", "Naphistim", "Chaos", "NiGHTS", "Kutter", "Maximilian",
-	"Felix the Ghost", "Water Kirby"};
-
-#define NUM_CONTRIBUTORS ((int)(sizeof(contributors)/sizeof(char*)))
-
-	bool contributorUsed[NUM_CONTRIBUTORS];
-	int contributorOrder[NUM_CONTRIBUTORS];
-
-	for(int k = 0; k < NUM_CONTRIBUTORS; k++)
-	{
-		contributorUsed[k] = false;
-	}
-
-	for(int k = 0; k < NUM_CONTRIBUTORS; k++)
-	{
-		int index = rand() % NUM_CONTRIBUTORS;
-
-		while(contributorUsed[index])
-		{
-			if(++index >= NUM_CONTRIBUTORS)
-				index = 0;
-		}
-
-		contributorUsed[index] = true;
-		contributorOrder[k] = index;
-	}
-
+//	const char * contributors[] = {
+//	"no_shorty", "redfalcon", "no_human", "dschingis", "funvill",
+//	"matsche", "aeroflare", "Tymoe", "David Olofson", "scoti",
+//	"affeOHNEwaffe", "mademan", "mario piuk", "yvoo", "DNightmare", 
+//	"Armen", "vvill", "zio tiok", "Donny Viszneki","alex-rus07", "JacobTheHero",
+//	"Stephan Peijnik", "ventuz", "Stefan Schury", "riahc3",
+//	"jinkies.uk", "devguy", "Alexis Morrissette", "Bidbood", "Quinn Storm",
+//	"Flexserve", "Xijar", "j rok", "nitsuja", "4matsy", "leftyfb",
+//	"Brian Porter", "Brandon Stansbury", "Brian Smith", "Caesar Cypher",
+//	"Chris Schager", "Alex Arnot", "Jason Lumbert", "Kevin King",
+//	"Fernando Marquez", "DrJones", "SleepyP", "UltimateNinja9",
+//	"Alex Brown", "GKi", "mpinger", "neonater", "NMcCoy", "Rogultgot", "Arima",
+//	"Toadeeboy", "Crapcom", "Tonberry2k", "Jum2004", "Bacon", "Tetra Vega",
+//	"Young Link", "Blordow", "Gozinzolo", "Ragey", "SaturnEchidna", "Link901",
+//	"Techokami", "dolorous", "SMW Fan", "Timonator", "YoshiMonarch7", "Tiptup300",
+//	"Dude", "Justinio", "Matthew Callis", "VenomousNinja",
+//	"Discrosh", "Ikill4you", "Helix Snake", "tubesteak", "wasabimario", "Lee",
+//	"Pikawil", "Marioman64", "Peardian", "Bob Ippolito", "Viper Snake", "neavea",
+//	"Mr.Bob-omb", "milua", "bobmanperson", "DrTek", "somestrangeflea", "nes6502",
+//	"XPort", "Naphistim", "Chaos", "NiGHTS", "Kutter", "Maximilian",
+//	"Felix the Ghost", "Water Kirby"};
+//
+//#define NUM_CONTRIBUTORS ((int)(sizeof(contributors)/sizeof(char*)))
+//
+//	bool contributorUsed[NUM_CONTRIBUTORS];
+//	int contributorOrder[NUM_CONTRIBUTORS];
+//
+//	for(int k = 0; k < NUM_CONTRIBUTORS; k++)
+//	{
+//		contributorUsed[k] = false;
+//	}
+//
+//	for(int k = 0; k < NUM_CONTRIBUTORS; k++)
+//	{
+//		int index = rand() % NUM_CONTRIBUTORS;
+//
+//		while(contributorUsed[index])
+//		{
+//			if(++index >= NUM_CONTRIBUTORS)
+//				index = 0;
+//		}
+//
+//		contributorUsed[index] = true;
+//		contributorOrder[k] = index;
+//	}
+//
 
 	SDL_Event event;
 
@@ -575,12 +631,12 @@ bool LoadAndSplashScreen()
 				game_values.playerInput.outputControls[iPlayer].menu_cancel.fPressed ||
 				game_values.playerInput.outputControls[iPlayer].menu_random.fPressed)
 			{
-				if(state <= 6)
-				{
-					state = 6;
-					alpha = 255;
-				}
-				else
+				//if(state <= 6)
+				//{
+				//	state = 6;
+				//	alpha = 255;
+				//}
+				//else
 				{
 					blitdest = menu_backdrop.getSurface();
 					menu_shade.setalpha(GetScreenBackgroundFade());
@@ -597,55 +653,56 @@ bool LoadAndSplashScreen()
 			}
 		}
 
-		if(state == 0 || state == 3)
-		{
-			alpha += 4;
-			if(alpha >= 255)
-			{
-				alpha = 255;
-				state++;
-			}
-		}
-		else if(state == 1 || state == 4)
-		{
-			if(--timer <= 0)
-			{
-				timer = 120;
-				state++;
-			}
-		}
-		else if(state == 2 || state == 5)
-		{
-			alpha -= 4;
-			if(alpha <= 0)
-			{
-				alpha = 0;
-				state++;
-			}
-		}
-		else if(state == 6)
-		{
-			alpha += 5;
-			if(alpha >= 255)
-			{
-				alpha = 255;
-				state++;
-			}
-		}
+		//if(state == 0 || state == 3)
+		//{
+		//	alpha += 4;
+		//	if(alpha >= 255)
+		//	{
+		//		alpha = 255;
+		//		state++;
+		//	}
+		//}
+		//else if(state == 1 || state == 4)
+		//{
+		//	if(--timer <= 0)
+		//	{
+		//		timer = 120;
+		//		state++;
+		//	}
+		//}
+		//else if(state == 2 || state == 5)
+		//{
+		//	alpha -= 4;
+		//	if(alpha <= 0)
+		//	{
+		//		alpha = 0;
+		//		state++;
+		//	}
+		//}
+		//else if(state == 6)
+		//{
+		//	alpha += 5;
+		//	if(alpha >= 255)
+		//	{
+		//		alpha = 255;
+		//		state++;
+		//	}
+		//}
 
 		SDL_FillRect(screen, NULL, 0x0);
 
-		if(state == 0 || state == 1 || state == 2)
-		{
-			menu_dpi_logo.setalpha((Uint8)alpha);
-			menu_dpi_logo.draw(195, 186);
-		}
-		else if(state == 3 || state == 4 || state == 5)
-		{
-			menu_contest_winners.setalpha((Uint8)alpha);
-			menu_contest_winners.draw(0, 0);
-		}
-		else if(state == 6 || state == 7 || state == 8)
+		//if(state == 0 || state == 1 || state == 2)
+		//{
+		//	menu_dpi_logo.setalpha((Uint8)alpha);
+		//	menu_dpi_logo.draw(195, 186);
+		//}
+		//else if(state == 3 || state == 4 || state == 5)
+		//{
+		//	menu_contest_winners.setalpha((Uint8)alpha);
+		//	menu_contest_winners.draw(0, 0);
+		//}
+		//else
+			if(state == 6 || state == 7 || state == 8)
 		{
 			menu_backdrop.setalpha((Uint8)alpha);
 			menu_backdrop.draw(0, 0);
@@ -657,7 +714,7 @@ bool LoadAndSplashScreen()
 			menu_version.draw(570, 10);	//smw logo
 
 			menu_font_large.setalpha((Uint8)alpha);
-			//menu_font_large.drawRightJustified(630, 45, "Beta 2");
+			menu_font_large.drawRightJustified(630, 45, "WIP");
 
 			menu_credits.setalpha((Uint8)alpha);
 			menu_credits.draw(227, 200);
@@ -676,7 +733,7 @@ bool LoadAndSplashScreen()
 			eyecandy[2].update();
 			eyecandy[2].draw();
 
-			static int timer = 60;
+/*			static int timer = 60;
 			static int index = 0;
 			if(++timer >= 60)
 			{
@@ -685,63 +742,15 @@ bool LoadAndSplashScreen()
 
 				if(++index >= NUM_CONTRIBUTORS)
 					index = 0;
-			}
+			} */
 		}
 
 		SDL_Flip(screen);
 
 		if(state == 7)
 		{
-			backgroundmusic[2].load(musiclist->GetMusic(1));
+			LoadAll();
 
-			short k, j;
-			for(k = 0; k < 4; k++)
-			{
-				spr_player[k] = new gfxSprite * [PGFX_LAST];
-				spr_shyguy[k] = new gfxSprite * [PGFX_LAST];
-				spr_chocobo[k] = new gfxSprite * [PGFX_LAST];
-				spr_bobomb[k] = new gfxSprite * [PGFX_LAST];
-
-				for(j = 0; j < PGFX_LAST; j++)
-				{
-					spr_player[k][j] = new gfxSprite();
-					spr_shyguy[k][j] = new gfxSprite();
-					spr_chocobo[k][j] = new gfxSprite();
-					spr_bobomb[k][j] = new gfxSprite();
-
-					spr_player[k][j]->SetWrap(true);
-					spr_shyguy[k][j]->SetWrap(true);
-					spr_chocobo[k][j]->SetWrap(true);
-					spr_bobomb[k][j]->SetWrap(true);
-				}
-			}
-
-			LoadMenuGraphics();
-			LoadWorldGraphics();
-			LoadGameGraphics();
-
-			gfx_loadimagenocolorkey(&spr_backmap[0], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->current_name()));
-			gfx_loadimagenocolorkey(&spr_backmap[1], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->current_name()));
-			gfx_loadimagenocolorkey(&spr_frontmap[0], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->current_name()));
-			gfx_loadimagenocolorkey(&spr_frontmap[1], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->current_name()));
-
-			gfx_loadimage(&spr_overlay, convertPath("gfx/packs/menu/menu_shade.png", gamegraphicspacklist->current_name()), false, false);
-
-			LoadGameSounds();
-
-			if(!game_values.soundcapable)
-			{
-				game_values.sound = false;
-				game_values.music = false;
-				game_values.soundvolume = 0;
-				game_values.musicvolume = 0;
-			}
-
-			//Read the map filter lists
-			maplist->ReadFilters();
-			maplist->ApplyFilters(game_values.pfFilters);
-
-			ifsoundonplay(sfx_coin);
 			state++;
 		}
 
