@@ -290,7 +290,11 @@ short g_musiccategorydisplaytimer = 0;
 short g_messagedisplaytimer = 0;
 std::string g_szMessageTitle = "";
 std::string g_szMessageLine[3];
-void SetDisplayMessage(short iTime, char * szTitle, char * szLine1, char * szLine2, char * szLine3);
+void SetDisplayMessage(short iTime,
+					   const char *szTitle,
+					   const char *szLine1,
+					   const char *szLine2,
+					   const char *szLine3);
 void DrawMessage();
 
 //Menu keys to use for menus
@@ -5372,7 +5376,11 @@ int savecurrentworld()
 	return 0;
 }
 
-void SetDisplayMessage(short iTime, char * szTitle, char * szLine1, char * szLine2, char * szLine3)
+void SetDisplayMessage(short iTime,
+					   const char * szTitle,
+					   const char * szLine1,
+					   const char * szLine2,
+					   const char * szLine3)
 {
 	g_messagedisplaytimer = iTime;
 	g_szMessageTitle = szTitle;
