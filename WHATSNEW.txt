@@ -1,9 +1,178 @@
 
 ------------------------------------------------------------------------------
- Whats New?                                                         04.15.2008
+ Whats New?                                                         09.4.2009
 ------------------------------------------------------------------------------
+1.8 Beta 2
 
-1.8
+Game
+ - Added animated tiles to platforms
+
+ - Added Shyguy Tag Mode
+
+ - Added new boxes minigame
+
+ - Added boss minigame back in
+
+ - Added new throwable box map item that can spawn powerups
+
+ - Added 4 secret features that do some wacky things
+
+ - World/tour makers can select which map will be played for the pipe, boss and boxes minigames
+
+ - Added freezing of enemies, shells, throw blocks/boxes
+
+ - Red Koopas detect platform edges and turn around
+
+ - Tweak 1up-5up in star mode to give extra time except for 5up which gives a 1up
+
+ - Give credit to killing another player with a falling donut
+
+ - Button combo to drop cards in collection mode (turbo + turbo + turbo)
+
+ - Added new coin bonus to greed and coins mode
+
+ - Tanooki suit icon appears next to the weapon powerup on the HUD when a player has it
+
+ - Added hazards to map preview windows
+
+ - Added player only death tile type
+
+ - Decreased time required to get multiplier in KOTH by half
+
+ - Added Hazard deaths only option in the classic mode
+
+ - Allow critical mode items like flags, yoshi's egg, ect to be carried by players in Kuribo's shoe
+
+ - Randomize the transfer of tag/shyguy when a POW or MOd is used instead of always giving it to the first player in the players array
+
+ - When using world inventory item powerups, only give the powerup to the player that used it, not the entire team
+
+ - If players have stored powerups in world mode (i.e. they selected an item and are waiting to play the next game) and the world is exited, then that stored item will be kept
+
+ - Updated inventory menu in world mode - Allow multiple players to access inventory at same time plus display current selected item at top
+
+ - Updated Retro graphics pack to include new image items for new features
+
+ - Shelled enemies need to be flipped upside down when bumped from above instead of just acting like they were stomped.
+
+ - Items and objects are now destroyed when trapped in switch (on/off) blocks
+
+ - Bouncing off of stomp enemies with tanooki doesn't free player from being tanooki like stomping on players does
+
+ - Added flagpole gfx so that it is properly centered
+
+ - Boss now collides with fireballs, hammers, boomerangs, bulletbills, attackzones
+
+ - Updated some maps to use new animated tiles in platforms
+
+ - Play game time warning sound with only a single lap to go instead of 2 in race mode
+
+ - Updated year on splash screen to 2009
+
+ - Expanded animated tile gfx
+
+ - Added new expanded SMB3 and Yoshi's Island tilesets
+
+ - Reverting back to 1.7's color palette
+
+ - Make toad in toad house use full 64 pixel tall sprites for use by gfx pack creators
+
+
+Level and World Editor
+ - Added stage preview window to world editor when mousing over stage icons
+
+ - Added fast scroll feature as an option for select fields
+
+ - Split up foreground sprites into 3 menus in world editor (stage sprites, structure sprites, bridge sprites)
+
+ - Added vehicle icons for vehicle menu in world editor
+
+ - Added a complete stage editor - world creators no longer need to manually edit files.  This can be used to create tours as well (does require some manual text copying)
+
+ - Added a complete vehicle editor to world editor
+
+ - Added start items selection for world editor using 'i' key
+
+ - Allow -1 as CTF mode base relocate setting in tour/world so flag base stays stationary for the duration of the match
+
+ - Alt + enter on level editor or world editor should full screen and remember setting for next time
+
+ - Save last viewed world + coordinates in world editor
+
+ - Added feature to level editor to allow switching platforms around
+
+ - Added feature to level editor to show preview of platform when the icon is moused over
+
+ - Added "Are You Sure" message when exiting world and level editor
+
+ - Save map with Shift + s in level AND world editor and display on screen that the map was saved
+
+ - Added feature to adjust world size in the world editor. 
+
+ - Added tour and world only maps to map list in world and level editor
+
+
+AI
+ - AI handles strategy to play boxes and shyguy modes
+
+ - AI handles having platforms under their feet so they don't think they should run to one side to avoid death tiles below
+
+ - AI handles phanto and throwing key when it is close
+
+ - AI handles ignoring yoshi's eggs that don't have a matching yoshi
+
+ - AI smartly collects cards in collection mode -> stops at 3 cards, attempts to match cards that it can see
+
+ - Allowed bots to use super stomp move at the right time (kuribo's shoe and tanooki stomp)
+
+
+Bug Fixes
+ - Fixed major crashing bug when a vehicle goes next to right edge on map
+
+ - Fixed major crashing bug when a tileset was not present for a map that required it
+
+ - Fixed animation of upside-down SMB3 lava graphic
+
+ - Fixed p-wing sound repeating over and over when you paused the game
+
+ - Fixed bug where a warp is on a stage tile that activated the warp and stage at the same time
+
+ - Fixed world editor deleting the initial items list - Fixed bug where you could glide up when frozen with the p-wings
+
+ - Fixed missing sound for collecting a collection card
+
+ - Fixed colored coin powerup in pipeminigame that could cause a crash
+
+ - Fixed ground pound abuse where you could keep ground pounding when continuously falling after the ground pound wears off
+
+ - Fixed tanooki suit falling abuse where you could fall forever while transformed into the statue
+
+ - Fixed default ttls on menu for gray and red throw blocks are unlimited
+
+ - Fixed no sound when collecting extra time powerups
+
+ - Fixed bug where players with stored items would lose them in world mode if they finished a mode that didn't allow stored items
+
+ - Fixed bug where player would shoot projectile the same time they were picking up an item.  This caused ice blasts to kill throw blocks on pickup
+
+ - Fixed bug where players sometimes fell through 1x1 gaps when running over them
+
+ - Fixed killing players/enemies does not score player points when killed by turning an on/off block on
+
+ - Fixed dealing with corrupt tiles (row/col out of bounds) in level editor.  This was causing the mysterious falling tile bug
+
+ - Fixed bug where the worlds are in alphabetized by the creator's name, not the world's name
+
+ - Fixed bug that allowed players to pass through solid tiles that had hidden blocks placed on them
+
+ - Fixed setting P1's menu controls select and cancel to any letter keys will make it to where you cannot change the playable map, as the map search funtion takes precedence
+
+ - Fixed draw order of objects reversed so that the player collides first with the item drawn on top
+
+ - Tons of other minor bugs
+
+
+1.8 Beta 1
 
  - Added pipe minigame to world
 

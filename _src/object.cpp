@@ -723,7 +723,7 @@ bool IO_MovingObject::collision_detection_checksides()
 		{
 			if(ix + (collisionWidth >> 1) < (nofliptxr << 5))
 			{
-				xf((float)((nofliptxr << 5) - collisionWidth) - 0.2f);
+				xf((float)((nofliptxr << TILESIZE) - collisionWidth) - 0.2f);
 				flipsidesifneeded();
 			}
 			else

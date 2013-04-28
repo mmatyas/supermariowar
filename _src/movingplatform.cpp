@@ -1434,6 +1434,8 @@ void MovingPlatform::GetTileTypesFromPlayer(CPlayer * player, int * lefttile, in
 
 int MovingPlatform::GetTileTypeFromCoord(short x, short y)
 {
+	int tile = tile_flag_nonsolid;
+
 	float fRelativeY = y - fy + iHalfHeight;
 
 	if(fRelativeY < 0.0f || fRelativeY >= iHeight)

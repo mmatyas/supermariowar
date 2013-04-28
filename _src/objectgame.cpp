@@ -8189,7 +8189,7 @@ bool CO_Shell::HitOther(CPlayer * player)
 		else if(ix + iw < 320 && player->ix > 320)
 			flipx = -640;
 
-		if(iNoOwnerKillTime == 0 || player->globalID != iPlayerID || (player->ix + HALFPW + flipx >= ix + (iw >> 1) && velx > 0.0f) || (player->ix + HALFPW + flipx < ix + (iw >> 1) && velx < 0.0f))
+		if(iNoOwnerKillTime == 0 || player->globalID != iPlayerID || player->ix + HALFPW + flipx >= ix + (iw >> 1) && velx > 0.0f || player->ix + HALFPW + flipx < ix + (iw >> 1) && velx < 0.0f)
 			return KillPlayer(player);
 	}
 	else if(state == 3)  //Holding

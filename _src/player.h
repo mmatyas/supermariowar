@@ -488,6 +488,7 @@ class CPlayer
 		friend class MO_Hammer;
 		friend class MO_IceBlast;
 		friend class MO_Boomerang;
+		friend class MO_SuperFireball;
 		friend class CO_Shell;
 		friend class CO_ThrowBlock;
 		friend class CO_Spring;

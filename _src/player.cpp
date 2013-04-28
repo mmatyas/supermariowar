@@ -2822,7 +2822,7 @@ void collisionhandler_p2p(CPlayer * o1, CPlayer * o2)
 		}
 
 		//Transfer tag if assist is on
-		if((game_values.gamemode->gamemode == game_mode_tag && game_values.teamcollision == 1) || game_values.gamemodesettings.tag.tagontouch)
+		if(game_values.gamemode->gamemode == game_mode_tag && game_values.teamcollision == 1 || game_values.gamemodesettings.tag.tagontouch)
 			TransferTag(o1, o2);
 		
 		//Don't collision detect players on same team if friendly fire is turned off
@@ -3226,7 +3226,12 @@ void CPlayer::draw()
 
 	//Draw the crown on the player
 	if(game_values.showwinningcrown && g_iWinningPlayer == teamID)
-		spr_crown.draw(ix + HALFPW - (IsPlayerFacingRight() ? 4 : 10), iy - 10 - (iKuriboShoe > 0 ? 16 : 0));
+	{
+		if(state > player_ready) //warping
+			spr_crown.draw(ix + HALFPW - (IsPlayerFacingRight() ? 4 : 10), iy - 10 - (iKuriboShoe > 0 ? 16 : 0), 0, 0, 14, 14, (short)state % 4, warpplane);
+		else
+			spr_crown.draw(ix + HALFPW - (IsPlayerFacingRight() ? 4 : 10), iy - 10 - (iKuriboShoe > 0 ? 16 : 0));
+	}
 
 	if(state < player_ready)
 		return;

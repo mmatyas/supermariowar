@@ -1256,6 +1256,7 @@ void CGM_ShyGuyTag::think()
 	{
 		if(++scorecounter >= game_values.pointspeed)
 		{
+			bool playwarning = false;
 			scorecounter = 0;
 
 			CPlayer * pCheckWinner = NULL;
@@ -3461,6 +3462,9 @@ CGM_Boss_MiniGame::CGM_Boss_MiniGame() : CGameMode()
 void CGM_Boss_MiniGame::init()
 {
 	CGameMode::init();
+	
+	fReverseScoring = false;
+
 	enemytimer = (short)(rand() % 120) + 120;
 	poweruptimer = 120;
 
@@ -3752,6 +3756,8 @@ void CGM_Pipe_MiniGame::init()
 {
 	CGameMode::init();
 
+	fReverseScoring = false;
+
 	iNextItemTimer = 0;
 	iBonusTimer = 0;
 	iBonusType = 0;
@@ -3905,6 +3911,8 @@ CGM_Boxes_MiniGame::CGM_Boxes_MiniGame() : CGameMode()
 void CGM_Boxes_MiniGame::init()
 {
 	CGameMode::init();
+
+	fReverseScoring = false;
 
 	for(short iScore = 0; iScore < score_cnt; iScore++)
 	{

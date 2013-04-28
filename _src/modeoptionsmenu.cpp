@@ -1235,7 +1235,7 @@ void ModeOptionsMenu::CreateMenu()
 
 	miChaseModeLeftHeaderBar = new MI_Image(&menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
 	miChaseModeRightHeaderBar = new MI_Image(&menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-	miChaseModeHeaderText = new MI_Text("Chase Mode Menu", 320, 5, 0, 2, 1);
+	miChaseModeHeaderText = new MI_Text("Phanto Mode Menu", 320, 5, 0, 2, 1);
 
 	mModeSettingsMenu[20].AddControl(miChaseModeSpeedField, miChaseModeBackButton, miChaseModeQuantitySlider[0], NULL, miChaseModeBackButton);
 
@@ -1291,7 +1291,7 @@ void ModeOptionsMenu::CreateMenu()
 
 	miShyGuyTagModeLeftHeaderBar = new MI_Image(&menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
 	miShyGuyTagModeRightHeaderBar = new MI_Image(&menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-	miShyGuyTagModeHeaderText = new MI_Text("Tag Mode Menu", 320, 5, 0, 2, 1);
+	miShyGuyTagModeHeaderText = new MI_Text("Shyguy Tag Mode Menu", 320, 5, 0, 2, 1);
 
 	mModeSettingsMenu[21].AddControl(miShyGuyTagModeTagOnSuicideField, miShyGuyTagModeBackButton, miShyGuyTagModeTagOnStompField, NULL, miShyGuyTagModeBackButton);
 	mModeSettingsMenu[21].AddControl(miShyGuyTagModeTagOnStompField, miShyGuyTagModeTagOnSuicideField, miShyGuyTagModeFreeTimeField, NULL, miShyGuyTagModeBackButton);
@@ -1307,7 +1307,7 @@ void ModeOptionsMenu::CreateMenu()
 
 
 	//***********************
-	// Shyguy Tag Mode Settings
+	// Boss Mode Settings
 	//***********************
 
 	miBossModeTypeField = new MI_SelectField(&spr_selectfield, 120, 180, "Type", 400, 180);

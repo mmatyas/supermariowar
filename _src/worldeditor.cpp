@@ -287,7 +287,7 @@ short g_musiccategorydisplaytimer = 0;
 short g_messagedisplaytimer = 0;
 std::string g_szMessageTitle = "";
 std::string g_szMessageLine[3];
-void SetDisplayMessage(short iTime, const char * szTitle, const char * szLine1, const char * szLine2, const char * szLine3);
+void SetDisplayMessage(short iTime, char * szTitle, char * szLine1, char * szLine2, char * szLine3);
 void DrawMessage();
 
 //Menu keys to use for menus
@@ -1029,6 +1029,8 @@ int editor_edit()
 			//handle messages
 			while(SDL_PollEvent(&event))
 			{
+				Uint8 * keystate = SDL_GetKeyState(NULL);
+
 				switch(event.type)
 				{
 					case SDL_KEYDOWN:
@@ -5005,9 +5007,13 @@ int display_help()
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[2] - Land Mode");
 	offsety += menu_font_small.getHeight() + 2;
-	menu_font_small.draw(offsetx, offsety, "[3] - Objects Mode");
+	menu_font_small.draw(offsetx, offsety, "[3] - Stage Objects Mode");
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[4] - Path Mode");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[5] - Objects Mode");
+	offsety += menu_font_small.getHeight() + 2;
+	menu_font_small.draw(offsetx, offsety, "[6] - Bridges Mode");
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[p] - Connection Mode");
 	offsety += menu_font_small.getHeight() + 2;
@@ -5042,7 +5048,7 @@ int display_help()
 	offsety += menu_font_small.getHeight() + 2;
 	menu_font_small.draw(offsetx, offsety, "[pagedown] - Go To Next World");
 
-	offsetx = 320;
+	offsetx = 300;
 	offsety = 55;
 
 	menu_font_small.draw(offsetx, offsety, "Place Tiles:");
@@ -5351,7 +5357,7 @@ int savecurrentworld()
 	return 0;
 }
 
-void SetDisplayMessage(short iTime, const char * szTitle, const char * szLine1, const char * szLine2, const char * szLine3)
+void SetDisplayMessage(short iTime, char * szTitle, char * szLine1, char * szLine2, char * szLine3)
 {
 	g_messagedisplaytimer = iTime;
 	g_szMessageTitle = szTitle;

@@ -50,6 +50,35 @@ STUFF TO WATCH OUT FOR IN BETA2
 - animated tiles in platforms
 - collision detection and behavior of coins, ztar, collection cards
 
+
+Beta2 BUGS!
+[ ] Move resource loading into Init() methods instead of in the constructors
+    - this it to help the port to the Wii
+
+[ ] When you made items play the bump sound when they get squished, you forgot to change the flags in capture the flag mode, and the keys in phanto mode to play that sound.
+    - Items that get relocated play the "transform" sound and items that don't, play the "bump" sound
+[ ] The 0smw world was removed.
+    - Huh, it is in my copy.  Is anyone else missing this map?
+[ ] POW and MOd blocks don't work on people wearing kuribo's shoes.
+    - Yep, awesome huh?
+[ ] If you use an ice wand on someone using a kuribo's shoe, the player won't stick out of the shoe anymore.
+    - Intentional.  It looked weird to have the player's head sticking out of the ice block.
+[X] When you warp with the crown on your head, the crown is seen over the pipe, while Mario is not.
+    - Great bug.  This has been around since warps and crowns were originally added.
+[ ] Kills will still transfer the tag if "Touch Only" is set in Shy Guy Tag mode.
+    - It is working correctly.  The first shyguy is always created by a kill even with "Touch Only" set.
+[X] In the Shy Guy Tag menu, the top says "Tag Mode Menu" instead of "Shy Guy Tag Mode Menu".
+    - Fixed
+[X] Phanto Mode's menu says "Chase Mode Menu".
+    - Fixed
+[X] You don't have the numbers "5" and "6" shown for options in the world editor help menu.
+    - Fixed
+[X] When winning in Boxes minigam by having all 5 coins, all players have the death pic on the results.
+    - Good catch.  Fixed.
+[ ] Minor bug with the platforms. When you have a static non-moving platform placed, the skins will cycle through the standing and jumping poses very fast as shown in the picture below.
+[ ] When a reserve powerup is grabbed after you already won a game, the game acts as if you have a poison mushroom in reserve.
+
+
 Fixed
 [X] Finished secret 3 and 4
 [X] Fixed bug where you could throw items through the wall on the left map edge
@@ -3051,23 +3080,28 @@ void RunGame()
 				spotlightManager.DrawSpotlights();
 
 			g_iWinningPlayer = -1;
-			short mostkills = 0;
 			
 			//Draw scoreboards for all games (except special cases where we have a single player walking the map)
 			if(game_values.singleplayermode == -1)
 			{
+				short highestScore = 0;
+
 				bool fReverseScoring = game_values.gamemode->GetReverseScoring();
 				if(fReverseScoring)
-					mostkills = 32000;
+					highestScore = 32000;
 				
 				for(i = 0; i < score_cnt; i++)
 				{
-					if((score[i]->score > mostkills && !fReverseScoring) || (score[i]->score < mostkills && fReverseScoring))
+					int scoreValue = score[i]->score;
+					if(game_values.gamemode->gamemode == game_mode_boxes_minigame)
+						scoreValue = score[i]->subscore[0];
+					
+					if((scoreValue > highestScore && !fReverseScoring) || (scoreValue < highestScore && fReverseScoring))
 					{
-						mostkills = score[i]->score;
+						highestScore = scoreValue;
 						g_iWinningPlayer = i;
 					}
-					else if(score[i]->score == mostkills)
+					else if(scoreValue == highestScore)
 					{
 						g_iWinningPlayer = -1;
 					}
