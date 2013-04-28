@@ -4649,7 +4649,8 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 
 					//Clear out all input from cpu controlled team
 					COutputControl * playerKeys = NULL;
-					for(short iTeamMember = 0; iTeamMember < game_values.teamcounts[iControllingTeam]; iTeamMember++)
+					short iTeamMember = 0;
+					for(; iTeamMember < game_values.teamcounts[iControllingTeam]; iTeamMember++)
 					{
 						playerKeys = &game_values.playerInput.outputControls[game_values.teamids[iControllingTeam][iTeamMember]];
 
@@ -4662,7 +4663,6 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 
 						if(iControllingTeam != 0)
 							playerKeys->menu_cancel.fPressed = false;
-
 					}
 					
 					playerKeys = &game_values.playerInput.outputControls[game_values.teamids[iControllingTeam][0]];
