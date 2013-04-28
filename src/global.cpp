@@ -25,7 +25,7 @@ int	GetRandMax(int rMax)
 
     assert(rMax > rMin);
     
-    int rVal = ((double) rand() / (RAND_MAX+1)) * (rMax-rMin) + rMin;
+    int rVal = ((double) rand() / (((float)RAND_MAX)+1)) * (rMax-rMin) + rMin;
 
     assert(rVal < rMax && rVal >= 0);
 
