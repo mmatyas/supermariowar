@@ -495,18 +495,18 @@ void MI_InputControlContainer::SetPlayer(short playerID)
     mInputMenu->ResetMenu();
 }
 
-void MI_InputControlContainer::UpdateDeviceKeys(short iDevice)
+void MI_InputControlContainer::UpdateDeviceKeys(short lDevice)
 {
-    game_values.playerInput.inputControls[iPlayerID] = &game_values.inputConfiguration[iPlayerID][iDevice == DEVICE_KEYBOARD ? 0 : 1];
-    game_values.playerInput.inputControls[iPlayerID]->iDevice = iDevice;
+    game_values.playerInput.inputControls[iPlayerID] = &game_values.inputConfiguration[iPlayerID][lDevice == DEVICE_KEYBOARD ? 0 : 1];
+    game_values.playerInput.inputControls[iPlayerID]->iDevice = lDevice;
 
     for(int iKey = 0; iKey < NUM_KEYS; iKey++) {
-        miGameInputControlFields[iKey]->SetDevice(iDevice);
+        miGameInputControlFields[iKey]->SetDevice(lDevice);
         miGameInputControlFields[iKey]->SetKey(&game_values.playerInput.inputControls[iPlayerID]->inputGameControls[0].keys[iKey]);
     }
 
     for(int iKey = 0; iKey < NUM_KEYS; iKey++) {
-        miMenuInputControlFields[iKey]->SetDevice(iDevice);
+        miMenuInputControlFields[iKey]->SetDevice(lDevice);
         miMenuInputControlFields[iKey]->SetKey(&game_values.playerInput.inputControls[iPlayerID]->inputGameControls[1].keys[iKey]);
     }
 

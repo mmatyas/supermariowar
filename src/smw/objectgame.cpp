@@ -2912,8 +2912,8 @@ float PU_TreasureChestBonus::BottomBounce()
 //------------------------------------------------------------------------------
 // class treasure chest powerup
 //------------------------------------------------------------------------------
-MO_BonusHouseChest::MO_BonusHouseChest(gfxSprite *nspr, short ix, short iy, short iBonusItem) :
-    IO_MovingObject(nspr, ix, iy, 1, 0, 64, 64, 0, 0)
+MO_BonusHouseChest::MO_BonusHouseChest(gfxSprite *nspr, short iX, short iY, short iBonusItem) :
+    IO_MovingObject(nspr, iX, iY, 1, 0, 64, 64, 0, 0)
 {
     iw = 64;
     ih = 64;
@@ -8431,8 +8431,8 @@ void CO_Spring::place()
 //------------------------------------------------------------------------------
 // class spike
 //------------------------------------------------------------------------------
-CO_Spike::CO_Spike(gfxSprite *nspr, short ix, short iy) :
-    CO_Spring(nspr, ix, iy, false)
+CO_Spike::CO_Spike(gfxSprite *nspr, short iX, short iY) :
+    CO_Spring(nspr, iX, iY, false)
 {
     iw = 32;
     ih = 32;
@@ -8450,8 +8450,8 @@ void CO_Spike::hittop(CPlayer * player)
 //------------------------------------------------------------------------------
 // class kuribo's shoe
 //------------------------------------------------------------------------------
-CO_KuriboShoe::CO_KuriboShoe(gfxSprite *nspr, short ix, short iy, bool sticky) :
-    CO_Spring(nspr, ix, iy + 15, false)
+CO_KuriboShoe::CO_KuriboShoe(gfxSprite *nspr, short iX, short iY, bool sticky) :
+    CO_Spring(nspr, iX, iY + 15, false)
 {
     iw = 32;
     ih = 32;
@@ -8729,8 +8729,8 @@ void MO_SpinAttack::collide(IO_MovingObject * object)
 //------------------------------------------------------------------------------
 // class pipe coin (for coin pipe minigame)
 //------------------------------------------------------------------------------
-OMO_PipeCoin::OMO_PipeCoin(gfxSprite *nspr, float dvelx, float dvely, short ix, short iy, short teamid, short colorid, short uncollectabletime) :
-    IO_OverMapObject(nspr, ix, iy, 4, 8, 30, 30, 1, 1, 0, colorid << 5, 32, 32)
+OMO_PipeCoin::OMO_PipeCoin(gfxSprite *nspr, float dvelx, float dvely, short iX, short iY, short teamid, short colorid, short uncollectabletime) :
+    IO_OverMapObject(nspr, iX, iY, 4, 8, 30, 30, 1, 1, 0, colorid << 5, 32, 32)
 {
     iTeamID = teamid;
     iColorID = colorid;

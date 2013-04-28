@@ -484,11 +484,11 @@ void CPlayerAI::Think(COutputControl * playerKeys)
         int ttLeftTile = g_map->map(iDeathX1, iDeathY);
         int ttRightTile = g_map->map(iDeathX2, iDeathY);
 
-        bool fDeathTileUnderPlayer = ((ttLeftTile & tile_flag_death_on_top) && (ttRightTile & tile_flag_death_on_top)) ||
+        bool fDeathTileUnderPlayer1 = ((ttLeftTile & tile_flag_death_on_top) && (ttRightTile & tile_flag_death_on_top)) ||
                                      ((ttLeftTile & tile_flag_death_on_top) && !(ttRightTile & tile_flag_solid)) ||
                                      (!(ttLeftTile & tile_flag_solid) && (ttRightTile & tile_flag_death_on_top));
 
-        if(fDeathTileUnderPlayer) {
+        if(fDeathTileUnderPlayer1) {
             if(iFallDanger == 0)
                 iFallDanger = (playerKeys->game_right.fDown ? -1 : 1);
 
@@ -505,11 +505,11 @@ void CPlayerAI::Think(COutputControl * playerKeys)
             int lefttile = g_map->platforms[iPlatform]->GetTileTypeFromCoord(ix, iDeathY << 5);
             int righttile = g_map->platforms[iPlatform]->GetTileTypeFromCoord(ix + PW, iDeathY << 5);
 
-            bool fDeathTileUnderPlayer = ((lefttile & tile_flag_death_on_top) && (righttile & tile_flag_death_on_top)) ||
+            bool fDeathTileUnderPlayer2 = ((lefttile & tile_flag_death_on_top) && (righttile & tile_flag_death_on_top)) ||
                                          ((lefttile & tile_flag_death_on_top) && !(righttile & tile_flag_solid)) ||
                                          (!(lefttile & tile_flag_solid) && (righttile & tile_flag_death_on_top));
 
-            if(fDeathTileUnderPlayer) {
+            if(fDeathTileUnderPlayer2) {
                 if(iFallDanger == 0)
                     iFallDanger = (playerKeys->game_right.fDown ? -1 : 1);
 

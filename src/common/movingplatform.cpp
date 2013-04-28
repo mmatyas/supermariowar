@@ -1632,41 +1632,41 @@ short MovingPlatform::coldec_object(IO_MovingObject * object)
 }
 
 
-bool MovingPlatform::IsInNoSpawnZone(short x, short y, short w, short h)
+bool MovingPlatform::IsInNoSpawnZone(short iX, short iY, short w, short h)
 {
     short iTop = (short)pPath->dCurrentY[1] - iHalfHeight;
 
-    if(y + h < iTop)
+    if(iY + h < iTop)
         return false;
 
     short iBottom = (short)pPath->dCurrentY[1] + iHalfHeight;
 
-    if(y >= iBottom)
+    if(iY >= iBottom)
         return false;
 
     short iLeft = (short)pPath->dCurrentX[1] - iHalfWidth;
     short iRight = (short)pPath->dCurrentX[1] + iHalfWidth;
 
     //Deal with screen side overlap
-    if(x + w < iLeft)
-        x += smw->ScreenWidth;
-    else if(x >= iRight)
-        x -= smw->ScreenWidth;
+    if(iX + w < iLeft)
+    	iX += smw->ScreenWidth;
+    else if(iX >= iRight)
+    	iX -= smw->ScreenWidth;
 
-    if(x + w < iLeft || x >= iRight)
+    if(iX + w < iLeft || iX >= iRight)
         return false;
 
     //If we have reached this point, the item is colliding with the bounding rect of the platform
     //but not necessarily colliding with the platform (example a U shaped platform has an open area in the center)
 
-    short iRelativeX[2] = {x - iLeft, x + w - iLeft};
-    short iRelativeY[2] = {y - iTop, y + h - iTop};
+    short iRelativeX[2] = {iX - iLeft, iX + w - iLeft};
+    short iRelativeY[2] = {iY - iTop, iY + h - iTop};
 
-    for(short x = 0; x < 2; x++) {
-        for(short y = 0; y < 2; y++) {
-            if(iRelativeX[x] >= 0 && iRelativeX[x] < iWidth && iRelativeY[y] >= 0 && iRelativeY[y] < iHeight) {
-                short tx = iRelativeX[x] / TILESIZE;
-                short ty = iRelativeY[y] / TILESIZE;
+    for(short sX = 0; sX < 2; sX++) {
+        for(short sY = 0; sY < 2; sY++) {
+            if(iRelativeX[sX] >= 0 && iRelativeX[sX] < iWidth && iRelativeY[sY] >= 0 && iRelativeY[sY] < iHeight) {
+                short tx = iRelativeX[sX] / TILESIZE;
+                short ty = iRelativeY[sY] / TILESIZE;
 
                 int t = iTileType[tx][ty].iFlags;
 

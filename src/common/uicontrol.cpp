@@ -912,11 +912,11 @@ MI_FrenzyModeOptions::MI_FrenzyModeOptions(short x, short y, short width, short 
         else
             upcontrol = miPowerupSlider[iPowerup - 2];
 
-        UI_Control * downcontrol = NULL;
+        UI_Control * lDownControl1 = NULL;
         if(iPowerup >= NUMFRENZYCARDS - 2)
-            downcontrol = miBackButton;
+            lDownControl1 = miBackButton;
         else
-            downcontrol = miPowerupSlider[iPowerup + 2];
+            lDownControl1 = miPowerupSlider[iPowerup + 2];
 
         UI_Control * rightcontrol = NULL;
         if(iPowerup + 1 < NUMFRENZYCARDS)
@@ -924,7 +924,7 @@ MI_FrenzyModeOptions::MI_FrenzyModeOptions(short x, short y, short width, short 
         else
             rightcontrol = miBackButton;
 
-        mMenu->AddControl(miPowerupSlider[iPowerup], upcontrol, downcontrol, NULL, rightcontrol);
+        mMenu->AddControl(miPowerupSlider[iPowerup], upcontrol, lDownControl1, NULL, rightcontrol);
 
         if(++iPowerup < NUMFRENZYCARDS) {
             upcontrol = NULL;
@@ -933,13 +933,13 @@ MI_FrenzyModeOptions::MI_FrenzyModeOptions(short x, short y, short width, short 
             else
                 upcontrol = miPowerupSlider[iPowerup - 2];
 
-            UI_Control * downcontrol = NULL;
+            UI_Control * lDownControl2 = NULL;
             if(iPowerup >= NUMFRENZYCARDS - 2)
-                downcontrol = miBackButton;
+                lDownControl2 = miBackButton;
             else
-                downcontrol = miPowerupSlider[iPowerup + 2];
+                lDownControl2 = miPowerupSlider[iPowerup + 2];
 
-            mMenu->AddControl(miPowerupSlider[iPowerup], upcontrol, downcontrol, miPowerupSlider[iPowerup - 1], NULL);
+            mMenu->AddControl(miPowerupSlider[iPowerup], upcontrol, lDownControl2, miPowerupSlider[iPowerup - 1], NULL);
         }
     }
 
@@ -1402,9 +1402,9 @@ void MI_ScoreText::Draw()
     }
 }
 
-void MI_ScoreText::SetScore(short iScore)
+void MI_ScoreText::SetScore(short sScore)
 {
-    short iDigits = iScore;
+    short iDigits = sScore;
     while(iDigits > 999)
         iDigits -= 1000;
 
@@ -2015,9 +2015,9 @@ void MI_MapField::LoadMap(const char * szMapPath)
 
 }
 
-bool MI_MapField::SetMap(const char * szMapName, bool fWorld)
+bool MI_MapField::SetMap(const char * paramSzMapName, bool fWorld)
 {
-    bool fFound = maplist->findexact(szMapName, fWorld);
+    bool fFound = maplist->findexact(paramSzMapName, fWorld);
     LoadCurrentMap();
 
     return fFound;

@@ -1789,17 +1789,17 @@ short CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle
                 if(iTeamPoint >= 0) {
                     short numjailedplayers = 0;
 
-                    for(short i = 0; i < list_players_cnt; i++) {
+                    for(short iP = 0; iP < list_players_cnt; iP++) {
                         //If they weren't just the one killed and they were jailed, give them a transform cloud
-                        if(list_players[i] != &other && list_players[i]->jailtimer > 0) {
-                            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, list_players[i]->ix + HALFPW - 24, list_players[i]->iy + HALFPH - 24, 4, 5));
+                        if(list_players[iP] != &other && list_players[iP]->jailtimer > 0) {
+                            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, list_players[iP]->ix + HALFPW - 24, list_players[iP]->iy + HALFPH - 24, 4, 5));
                             ifsoundonplay(sfx_transform);
                         }
 
-                        if(list_players[i]->jailtimer > 0 && list_players[i]->teamID != iTeamPoint)
+                        if(list_players[iP]->jailtimer > 0 && list_players[iP]->teamID != iTeamPoint)
                             numjailedplayers++;
 
-                        list_players[i]->jailtimer = 0;
+                        list_players[iP]->jailtimer = 0;
                     }
 
                     //Give extra bonus score for being on the non-jailed team
@@ -2249,16 +2249,16 @@ void CGM_Star::think()
 
     //Make sure there is a star player(s)
     if(iCurrentModeType == 2) {
-        for(short iStar = 0; iStar < list_players_cnt - 1; iStar++) {
+        for(short iStar1 = 0; iStar1 < list_players_cnt - 1; iStar1++) {
             //If we're missing a star player, then reassign them all
-            if(!starPlayer[iStar]) {
+            if(!starPlayer[iStar1]) {
                 CPlayer * players[4];
                 short iNumPlayers = GetScoreRankedPlayerList(players, fReverseScoring);
 
-                for(short iStar = 0; iStar < iNumPlayers - 1; iStar++) {
-                    starPlayer[iStar] = players[iStar];
-                    starItem[iStar]->setPlayerColor(starPlayer[iStar]->colorID);
-                    starItem[iStar]->placeStar();
+                for(short iStar2 = 0; iStar2 < iNumPlayers - 1; iStar2++) {
+                    starPlayer[iStar2] = players[iStar2];
+                    starItem[iStar2]->setPlayerColor(starPlayer[iStar2]->colorID);
+                    starItem[iStar2]->placeStar();
                 }
 
                 break;

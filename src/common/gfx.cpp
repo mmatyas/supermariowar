@@ -921,7 +921,7 @@ bool gfxSprite::draw(short x, short y)
 }
 
 //TODO Perf Optimization: Set w/h once when sprite is initialized, set srcx/srcy just when animation frame advance happens
-bool gfxSprite::draw(short x, short y, short srcx, short srcy, short w, short h, short iHiddenDirection, short iHiddenValue)
+bool gfxSprite::draw(short x, short y, short srcx, short srcy, short w, short h, short sHiddenDirection, short sHiddenValue)
 {
     m_bltrect.x = x + x_shake;
     m_bltrect.y = y + y_shake;
@@ -933,8 +933,8 @@ bool gfxSprite::draw(short x, short y, short srcx, short srcy, short w, short h,
     m_srcrect.w = w;
     m_srcrect.h = h;
 
-    if(iHiddenDirection > -1) {
-        if(gfx_adjusthiddenrects(&m_srcrect, &m_bltrect, iHiddenDirection, iHiddenValue))
+    if(sHiddenDirection > -1) {
+        if(gfx_adjusthiddenrects(&m_srcrect, &m_bltrect, sHiddenDirection, sHiddenValue))
             return true;
     }
 
@@ -949,8 +949,8 @@ bool gfxSprite::draw(short x, short y, short srcx, short srcy, short w, short h,
             gfx_setrect(&m_srcrect, srcx, srcy, w, h);
             gfx_setrect(&m_bltrect, x - iWrapSize + x_shake, y + y_shake, w, h);
 
-            if(iHiddenDirection > -1) {
-                if(gfx_adjusthiddenrects(&m_srcrect, &m_bltrect, iHiddenDirection, iHiddenValue))
+            if(sHiddenDirection > -1) {
+                if(gfx_adjusthiddenrects(&m_srcrect, &m_bltrect, sHiddenDirection, sHiddenValue))
                     return true;
             }
 
@@ -962,8 +962,8 @@ bool gfxSprite::draw(short x, short y, short srcx, short srcy, short w, short h,
             gfx_setrect(&m_srcrect, srcx, srcy, w, h);
             gfx_setrect(&m_bltrect, x + iWrapSize + x_shake, y + y_shake, w, h);
 
-            if(iHiddenDirection > -1) {
-                if(gfx_adjusthiddenrects(&m_srcrect, &m_bltrect, iHiddenDirection, iHiddenValue))
+            if(sHiddenDirection > -1) {
+                if(gfx_adjusthiddenrects(&m_srcrect, &m_bltrect, sHiddenDirection, sHiddenValue))
                     return true;
             }
 
