@@ -825,22 +825,92 @@ struct ts {
     short		total;		//used for running total in a tour
 };
 
-// these are actually the program options
-class gv
-{
-    short		playercontrol[4];
+// the real configuration class
+class CGameConfig {
+public:
     bool		showfps;
-    bool		frameadvance;
-    bool		autokill;
-    short		framelimiter;
-
-    bool		sound;
-    bool		music;
-
     short		soundvolume;
     short		musicvolume;
-
     bool		fullscreen;
+    short		networktype;		//Type of network game: 0=stand alone, 1=direct connect
+    bool		networkhost;		//If this machine is the one making collision detection and game state changes
+    bool		gamehost;			//If this client is responsible for choosing game type, map, options
+    char *		hostaddress;        //String from of the host ip address
+    short		spawnstyle;
+    short		awardstyle;
+    short		teamcollision;
+    short		shellttl;
+    short		blueblockttl;
+    short		redblockttl;
+    short		grayblockttl;
+    short		bombslimit;
+    short		bonuswheel;
+    short		fireballttl;
+    short		fireballlimit;
+    short		boomerangstyle;
+    short		boomeranglife;
+    short		boomeranglimit;
+    short		cpudifficulty;
+    short		warplockstyle;
+    short		warplocktime;
+    short		hammerttl;
+    short		hammerdelay;
+    short		hammerlimit;
+    bool		hammerpower;
+    short		featherjumps;
+    short		featherlimit;
+    short		suicidetime;
+    bool		deadteamnotice;
+    short		framelimiter;
+    short		hiddenblockrespawn;
+    CInputPlayerControl inputConfiguration[4][2]; //[NumPlayers][Keyboard/Joystick]
+    short		itemrespawntime;
+    bool		keeppowerup;
+    short		leaflimit;
+    short		pwingslimit;
+    short		tanookilimit;
+    short		playercontrol[4];
+    CPlayerInput playerInput;
+    bool		playnextmusic;  //automatically advance to the next music track after one finishes
+    short		outofboundstime;
+    short		overridepowerupsettings;
+    bool		minigameunlocked;
+    GameModeSettings gamemodemenusettings;
+    bool		music;
+    short		pointspeed;
+    short		poweruppreset;
+    bool		randomskin[4];
+    short		scoreboardstyle;
+    bool		screencrunch;
+    short		shieldtime;
+    short		shieldstyle;
+    bool		showwinningcrown;
+	short		skinids[4];
+    short		wandlimit;
+    short		tournamentcontrolstyle;  //ID for the player selected control style
+    short		wandfreezetime;
+    short		teamids[4][3];
+    bool		toplayer;
+    bool		teamcolors;
+    bool		sound;
+    bool		startgamecountdown;
+    bool		startmodedisplay;
+    short		storedpowerupdelay;
+    short		teamcounts[4];
+    short		swapstyle;
+    short		respawn;
+
+	void ReadBinaryConfig();
+
+};
+
+// these are actually the program options
+class gv : public CGameConfig
+{
+public:
+    bool		frameadvance;
+    bool		autokill;
+
     gs			gamestate;
 
     float		screenResizeX;
@@ -855,12 +925,6 @@ class gv
 
     CGameMode	*gamemode;
 
-    short		spawnstyle;
-    short		awardstyle;
-
-    short		shieldtime;
-    short		shieldstyle;
-
     bool		pausegame;
     bool		exitinggame;
     bool		exityes;
@@ -874,7 +938,6 @@ class gv
     short		tournamentwinner;     //-2 for a tied tournament (for tours), -1 for no winner yet, 0 or greater for the team that has won the tournament
 
     short		tournamentcontrolteam;   //The team ID that currently has control
-    short		tournamentcontrolstyle;  //ID for the player selected control style
     short		tournamentnextcontrol;  //For round robin control style
 
     short		selectedminigame;
@@ -892,20 +955,14 @@ class gv
     short		storedpowerups[4];
     short		gamepowerups[4];
     short		powerupweights[NUM_POWERUPS];
-    short		poweruppreset;
 
     short		worldpowerups[4][32];
     short		worldpowerupcount[4];
 
     short		worldpointsbonus;
 
-    short		teamids[4][3];
-    short		teamcounts[4];
-    short		skinids[4];
     short		colorids[4];
-    bool		randomskin[4];
 
-    bool		screencrunch;
     short		screenshaketimer;
     short		screenshakeplayerid;
     short		screenshaketeamid;
@@ -915,76 +972,24 @@ class gv
     short		bulletbilltimer[4];
     short		bulletbillspawntimer[4];
 
-    short		teamcollision;
-    bool		toplayer;
-    short		scoreboardstyle;
-    bool		teamcolors;
-
     short		loadedannouncer;
     short		loadedmusic;
 
     short		teamdeadcounter;
 
-    short		respawn;
-    short		itemrespawntime;
-    short		outofboundstime;
-    short		hiddenblockrespawn;
-
-    short		warplockstyle;
-    short		warplocktime;
-
     short		cputurn;
-    short		cpudifficulty;
 
-    short		networktype;		//Type of network game: 0=stand alone, 1=direct connect
-    bool		networkhost;		//If this machine is the one making collision detection and game state changes
-    bool		gamehost;			//If this client is responsible for choosing game type, map, options
-    char *		hostaddress;        //String from of the host ip address
-
-    CInputPlayerControl inputConfiguration[4][2]; //[NumPlayers][Keyboard/Joystick]
 
     //Player input used during game.  Reads SDL_Events and sets buttons that were pressed
-    CPlayerInput playerInput;
 
     ts			tournament_scores[4];
 
     GameModeSettings gamemodesettings;
-    GameModeSettings gamemodemenusettings;
 
-    short		fireballttl;
-    short		fireballlimit;
-
-    short		hammerdelay;
-    short		hammerttl;
-    bool		hammerpower;
-    short		hammerlimit;
-
-    short		boomerangstyle;
-    short		boomeranglife;
-    short		boomeranglimit;
-
-    short		featherjumps;
-    short		featherlimit;
-
-    short		leaflimit;
-    short		pwingslimit;
-
-    short		tanookilimit;
-    short		bombslimit;
-
-    short		wandfreezetime;
-    short		wandlimit;
-
-    short		shellttl;
-    short		blueblockttl;
-    short		redblockttl;
-    short		grayblockttl;
-
-    bool		playskidsound;
+	bool		playskidsound;
     bool		playinvinciblesound;
     bool		playflyingsound;
 
-    short		swapstyle;
     bool		swapplayers;
     float		swapplayersposition;
     bool		swapplayersblink;
@@ -992,14 +997,6 @@ class gv
 
     short		screenfade;
     short		screenfadespeed;
-
-    short		storedpowerupdelay;
-    short		bonuswheel;
-    bool		keeppowerup;
-
-    bool		showwinningcrown;
-
-    bool		playnextmusic;  //automatically advance to the next music track after one finishes
 
     bool		soundcapable;
 
@@ -1009,8 +1006,6 @@ class gv
     bool		fNeedWriteFilters;
     bool		fFiltersOn;
 
-    short		pointspeed;
-
     bool		noexit;
     short		noexittimer;
     short		forceexittimer;
@@ -1018,8 +1013,6 @@ class gv
     short		singleplayermode;
 
     bool		worldskipscoreboard;
-
-    short		overridepowerupsettings;
 
     float		gamewindx;
     float		gamewindy;
@@ -1029,13 +1022,6 @@ class gv
     bool		reversewalk;
     bool		spotlights;
 
-    short		suicidetime;
-    bool		minigameunlocked;
-
-    bool		startgamecountdown;
-    bool		startmodedisplay;
-    bool		deadteamnotice;
-
     bool		unlocksecret1part1[4];
     short		unlocksecret1part2;
     bool		unlocksecret2part1;
@@ -1043,6 +1029,7 @@ class gv
     short		unlocksecret3part1[4];
     short		unlocksecret3part2[4];
     bool		unlocksecretunlocked[4];
+
 };
 
 struct WorldStageBonus {

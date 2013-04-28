@@ -2027,3 +2027,150 @@ void CheckSecret(short id)
     }
 }
 
+
+void CGameConfig::ReadBinaryConfig() {
+    //Read saved settings from disk
+    FILE * fp = OpenFile("options.bin", "rb");
+
+    if(fp) {
+        int version[4];
+        fread(version, sizeof(int), 4, fp);
+
+        if(VersionIsEqual(g_iVersion, version[0], version[1], version[2], version[3])) {
+#ifdef _XBOX
+            fread(&flickerfilter, sizeof(short), 1, fp);
+            fread(&hardwarefilter, sizeof(short), 1, fp);
+            fread(&softfilter, sizeof(short), 1, fp);
+            fread(&aspectratio10x11, sizeof(bool), 1, fp);
+
+            fread(&screenResizeX, sizeof(float), 1, fp);
+            fread(&screenResizeY, sizeof(float), 1, fp);
+            fread(&screenResizeW, sizeof(float), 1, fp);
+            fread(&screenResizeH, sizeof(float), 1, fp);
+
+            SDL_XBOX_SetScreenPosition(screenResizeX, screenResizeY);
+            SDL_XBOX_SetScreenStretch(screenResizeW, screenResizeH);
+#endif
+
+            unsigned char abyte[35];
+            fread(abyte, sizeof(unsigned char), 35, fp);
+            spawnstyle = (short) abyte[0];
+            awardstyle = (short) abyte[1];
+            teamcollision = (short)abyte[3];
+            screencrunch = ((short)abyte[4] > 0 ? true : false);
+            toplayer = ((short)abyte[5] > 0 ? true : false);
+            scoreboardstyle = (short)abyte[6];
+            teamcolors = ((short)abyte[7] > 0 ? true : false);
+            sound = ((short)abyte[8] > 0 ? true : false);
+            music = ((short)abyte[9] > 0 ? true : false);
+            musicvolume = (short)abyte[10];
+            soundvolume = (short)abyte[11];
+            respawn = (short)abyte[12];
+            outofboundstime = (short)abyte[15];
+            cpudifficulty = (short)abyte[16];
+            framelimiter = (short)abyte[19];
+            bonuswheel = (short)abyte[20];
+            keeppowerup = ((short)abyte[21] > 0 ? true : false);
+            showwinningcrown = ((short)abyte[22] > 0 ? true : false);
+            playnextmusic = ((short)abyte[23] > 0 ? true : false);
+            pointspeed = (short)abyte[24];
+            swapstyle = (short)abyte[25];
+            overridepowerupsettings = (short)abyte[28];
+            minigameunlocked = ((short)abyte[29] > 0 ? true : false);
+            startgamecountdown = ((short)abyte[30] > 0 ? true : false);
+            deadteamnotice = ((short)abyte[31] > 0 ? true : false);
+            tournamentcontrolstyle = (short)abyte[33];
+            startmodedisplay = ((short)abyte[34] > 0 ? true : false);
+
+            fread(&shieldtime, sizeof(short), 1, fp);
+            fread(&shieldstyle, sizeof(short), 1, fp);
+            fread(&itemrespawntime, sizeof(short), 1, fp);
+            fread(&hiddenblockrespawn, sizeof(short), 1, fp);
+            fread(&fireballttl, sizeof(short), 1, fp);
+            fread(&fireballlimit, sizeof(short), 1, fp);
+            fread(&hammerdelay, sizeof(short), 1, fp);
+            fread(&hammerttl, sizeof(short), 1, fp);
+            fread(&hammerpower, sizeof(bool), 1, fp);
+            fread(&hammerlimit, sizeof(short), 1, fp);
+            fread(&boomerangstyle, sizeof(short), 1, fp);
+            fread(&boomeranglife, sizeof(short), 1, fp);
+            fread(&boomeranglimit, sizeof(short), 1, fp);
+            fread(&featherjumps, sizeof(short), 1, fp);
+            fread(&featherlimit, sizeof(short), 1, fp);
+            fread(&leaflimit, sizeof(short), 1, fp);
+            fread(&pwingslimit, sizeof(short), 1, fp);
+            fread(&tanookilimit, sizeof(short), 1, fp);
+            fread(&bombslimit, sizeof(short), 1, fp);
+            fread(&wandfreezetime, sizeof(short), 1, fp);
+            fread(&wandlimit, sizeof(short), 1, fp);
+            fread(&shellttl, sizeof(short), 1, fp);
+            fread(&blueblockttl, sizeof(short), 1, fp);
+            fread(&redblockttl, sizeof(short), 1, fp);
+            fread(&grayblockttl, sizeof(short), 1, fp);
+            fread(&storedpowerupdelay, sizeof(short), 1, fp);
+            fread(&warplockstyle, sizeof(short), 1, fp);
+            fread(&warplocktime, sizeof(short), 1, fp);
+            fread(&suicidetime, sizeof(short), 1, fp);
+
+            fread(&poweruppreset, sizeof(short), 1, fp);
+            fread(&g_iCurrentPowerupPresets, sizeof(short), NUM_POWERUP_PRESETS * NUM_POWERUPS, fp);
+
+            //TODO: Need to test what happens when you unplug some controllers from the xbox
+            //and then start up (device index will probably point to a gamepad that isn't in the list)
+            //and this will cause a crash
+            fread(inputConfiguration, sizeof(CInputPlayerControl), 8, fp);
+
+            //setup player input controls for game
+            for(short iPlayer = 0; iPlayer < 4; iPlayer++) {
+                short iDevice;
+                fread(&iDevice, sizeof(short), 1, fp);
+
+#ifdef _XBOX
+                playerInput.inputControls[iPlayer] = &inputConfiguration[iPlayer][1]; //Always use gamepads as input devices on xbox
+#else
+                if(iDevice >= joystickcount)
+                    iDevice = DEVICE_KEYBOARD;
+
+                playerInput.inputControls[iPlayer] = &inputConfiguration[iPlayer][iDevice == DEVICE_KEYBOARD ? 0 : 1];
+#endif
+            }
+
+#ifndef _XBOX
+            fread(&fullscreen, sizeof(bool), 1, fp);
+#endif
+
+            for(short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++)
+                fread(&(gamemodes[iGameMode]->goal), sizeof(short), 1, fp);
+
+            fread(&gamemodemenusettings, sizeof(GameModeSettings), 1, fp);
+
+            fread(&teamcounts, sizeof(short), 4, fp);
+            fread(&teamids, sizeof(short), 12, fp);
+            fread(&skinids, sizeof(short), 4, fp);
+            fread(&randomskin, sizeof(bool), 4, fp);
+            fread(&playercontrol, sizeof(short), 4, fp);
+
+            //Load skin/team settings
+            for(short iPlayer = 0; iPlayer < 4; iPlayer++) {
+                if(skinids[iPlayer] >= skinlist->GetCount() || skinids[iPlayer] < 0)
+                    skinids[iPlayer] = 0;
+            }
+
+            announcerlist->SetCurrent((short) abyte[2]);
+            musiclist->SetCurrent((short) abyte[13]);
+            worldmusiclist->SetCurrent((short) abyte[14]);
+            menugraphicspacklist->SetCurrent((short) abyte[17]);
+            worldgraphicspacklist->SetCurrent((short) abyte[32]);
+            gamegraphicspacklist->SetCurrent((short) abyte[26]);
+            soundpacklist->	SetCurrent((short) abyte[18]);
+
+            sfx_setmusicvolume(musicvolume);
+            sfx_setsoundvolume(soundvolume);
+        } else {
+            printf("Old options.bin detected.  Skipped reading it.\n");
+        }
+
+        fclose(fp);
+    }
+
+}
