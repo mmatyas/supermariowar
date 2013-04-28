@@ -206,7 +206,7 @@ void WorldVehicle::Init(short iCol, short iRow, short iAction, short iSprite, sh
 
 void WorldVehicle::Move()
 {
-    iNumMoves = GetRandMax(iMaxMoves - iMinMoves + 1) + iMinMoves;
+    iNumMoves = smw->rng->GetRandMax(iMaxMoves - iMinMoves + 1) + iMinMoves;
 
     if(iNumMoves > 0) {
         iPaceOffset = 0;
@@ -256,7 +256,7 @@ void WorldVehicle::SetNextDest()
     }
 
     if(iNumConnections > 0) {
-        short iConnection = iConnections[GetRandMax(iNumConnections)];
+        short iConnection = iConnections[smw->rng->GetRandMax(iNumConnections)];
         WorldMovingObject::Move(iConnection);
     }
 }

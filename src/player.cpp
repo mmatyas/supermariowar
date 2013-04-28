@@ -910,9 +910,9 @@ void CPlayer::move()
                 break;
             }
             case 22: { //golden podobo
-                short numPodobos = GetRandMax(6) + 10;
+                short numPodobos = smw->rng->GetRandMax(6) + 10;
                 for(short iPodobo = 0; iPodobo < numPodobos; iPodobo++) {
-                    objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, (short)GetRandMax(smw->ScreenWidth - (640 - 608)), smw->ScreenHeight, -(float(GetRandMax(9)) / 2.0f) - 9.0f, globalID, teamID, colorID, false));
+                    objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, (short)smw->rng->GetRandMax(smw->ScreenWidth - (640 - 608)), smw->ScreenHeight, -(float(smw->rng->GetRandMax(9)) / 2.0f) - 9.0f, globalID, teamID, colorID, false));
                 }
                 ifsoundonplay(sfx_thunder);
                 break;
@@ -1188,7 +1188,7 @@ void CPlayer::move()
                     game_values.gamepowerups[globalID] = -1;
 
                     powerupradius = 100.0f;
-                    powerupangle = (float)(GetRandMax(1000) * 0.00628f);
+                    powerupangle = (float)(smw->rng->GetRandMax(1000) * 0.00628f);
 
                     ifsoundonplay(sfx_storedpowerupsound);
                 }
@@ -1525,7 +1525,7 @@ void CPlayer::CommitAction()
         if(game_values.wandlimit > 0)
             DecreaseProjectileLimit();
     } else if(player_action_bomb == action) {
-        CO_Bomb * bomb = new CO_Bomb(&rm->spr_bomb, ix + HALFPW - 14, iy - 8, IsPlayerFacingRight() ? 3.0f : -3.0f, -3.0f, 4, globalID, teamID, colorID, GetRandMax(120) + 120);
+        CO_Bomb * bomb = new CO_Bomb(&rm->spr_bomb, ix + HALFPW - 14, iy - 8, IsPlayerFacingRight() ? 3.0f : -3.0f, -3.0f, 4, globalID, teamID, colorID, smw->rng->GetRandMax(120) + 120);
 
         if(AcceptItem(bomb)) {
             bomb->owner = this;
@@ -2328,11 +2328,11 @@ void AddAwardKill(CPlayer * killer, CPlayer * killed, killstyle style)
     /*
     if(killer->killsinrow >= 10 && game_values.secrets)
     {
-    	if(GetRandMax(5) == 0)
+    	if(smw->rng->GetRandMax(5) == 0)
     	{
     		if(!game_values.gamemode->gameover && game_values.bosspeeking == -1)
     		{
-    			eyecandy[2].add(new EC_BossPeeker(&rm->spr_sledgebrothers, GetRandMax(90) + 90, 2));
+    			eyecandy[2].add(new EC_BossPeeker(&rm->spr_sledgebrothers, smw->rng->GetRandMax(90) + 90, 2));
 
     			backgroundmusic[0].stop();
     			ifsoundonstop(sfx_invinciblemusic);

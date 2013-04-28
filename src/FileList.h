@@ -42,7 +42,7 @@ public:
 
     void random() {
         if(!filelist.empty())
-            currentIndex = GetRandMax(filelist.size());
+            currentIndex = smw->rng->GetRandMax(filelist.size());
     };
 
     void SetCurrentName(const std::string &name);
@@ -227,7 +227,7 @@ public:
     void next();
     void prev();
     void random() {
-        currentIndex = GetRandMax(entries.size());
+        currentIndex = smw->rng->GetRandMax(entries.size());
     };
 
     void UpdateEntriesWithOverrides();
@@ -283,7 +283,7 @@ public:
     void next();
     void prev();
     void random() {
-        currentIndex = GetRandMax(entries.size());
+        currentIndex = smw->rng->GetRandMax(entries.size());
     }
 
     int GetCount() {

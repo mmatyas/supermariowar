@@ -579,7 +579,7 @@ bool MI_SelectField::MoveRandom()
     short iFindIndex = iIndex;
 
     while(true) {
-        int index = GetRandMax(items.size());
+        int index = smw->rng->GetRandMax(items.size());
 
         for(int k = 0; k < index; k++) {
             if(findRandom == --items.end()) {

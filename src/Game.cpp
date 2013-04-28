@@ -27,6 +27,8 @@ CGame::CGame(char *rootDirectory)
 
     ScreenWidth = 640;
     ScreenHeight = 480;
+
+	rng = new DefaultRandomNumberGenerator();
 }
 
 void CGame::Go()

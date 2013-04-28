@@ -18,43 +18,6 @@ char		*RootDataDirectory;
 CGame	*smw;
 CResourceManager *rm;
 
-int GetRand(int rMin, int rMax)
-{
-    assert(rMax > rMin);
-    
-    int rVal = ((double) rand() / (((float)RAND_MAX)+1)) * (rMax-rMin) + rMin;
-
-    assert(rVal < rMax && rVal >= rMin);
-
-    return rVal;
-}
-
-// generate uniformly distributed random number
-// rMax is not part of the set
-int	GetRandMax(int rMax)
-{
-    const int rMin = 0;
-
-	return GetRand(rMin, rMax);
-}
-
-bool GetRandBool()
-{
-    return GetRandBool(2);
-}
-
-bool GetRandBool(int scaleMax)
-{
-    // TODO: always match center of range, like (scaleMax/2 - 1)
-    return 0 == GetRandMax(scaleMax);
-}
-
-bool GetRandBool(int scaleMax, int positiveThreshold)
-{
-    assert(positiveThreshold < scaleMax && positiveThreshold >= 0);
-    return GetRandMax(scaleMax) > positiveThreshold;
-}
-
 bool VersionIsEqual(int iVersion[], short iMajor, short iMinor, short iMicro, short iBuild)
 {
     return iVersion[0] == iMajor && iVersion[1] == iMinor && iVersion[2] == iMicro && iVersion[3] == iBuild;
@@ -592,7 +555,7 @@ TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld)
 
         //If a valid mode was not detected, then just choose a random mode
         if(ts->iMode < 0 || (ts->iMode >= GAMEMODE_LAST && ts->iMode != game_mode_pipe_minigame && ts->iMode != game_mode_boss_minigame && ts->iMode != game_mode_boxes_minigame))
-            ts->iMode = GetRandMax(GAMEMODE_LAST);
+            ts->iMode = smw->rng->GetRandMax(GAMEMODE_LAST);
 
         pszTemp = strtok(NULL, ",\n");
 
@@ -607,7 +570,7 @@ TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld)
         //Default to a random goal if an invalid goal was used
         if(ts->iGoal <= 0) {
             if(ts->iMode < GAMEMODE_LAST)
-                ts->iGoal = gamemodes[ts->iMode]->GetOptions()[GetRandMax(GAMEMODE_NUM_OPTIONS - 1)].iValue;
+                ts->iGoal = gamemodes[ts->iMode]->GetOptions()[smw->rng->GetRandMax(GAMEMODE_NUM_OPTIONS - 1)].iValue;
             else
                 ts->iGoal = 50;
         }
@@ -1985,7 +1948,7 @@ void CheckSecret(short id)
             game_values.unlocksecretunlocked[0] = true;
             ifsoundonplay(sfx_transform);
 
-            IO_MovingObject * object = createpowerup(SECRET1_POWERUP, GetRandMax(smw->ScreenWidth), GetRandMax(smw->ScreenHeight), true, false);
+            IO_MovingObject * object = createpowerup(SECRET1_POWERUP, smw->rng->GetRandMax(smw->ScreenWidth), smw->rng->GetRandMax(smw->ScreenHeight), true, false);
 
             if(object)
                 eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->ix - 8, object->iy - 8, 4, 5));
@@ -1995,7 +1958,7 @@ void CheckSecret(short id)
             game_values.unlocksecretunlocked[1] = true;
             ifsoundonplay(sfx_transform);
 
-            IO_MovingObject * object = createpowerup(SECRET2_POWERUP, GetRandMax(smw->ScreenWidth), GetRandMax(smw->ScreenHeight), true, false);
+            IO_MovingObject * object = createpowerup(SECRET2_POWERUP, smw->rng->GetRandMax(smw->ScreenWidth), smw->rng->GetRandMax(smw->ScreenHeight), true, false);
 
             if(object)
                 eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->ix - 8, object->iy - 8, 4, 5));
@@ -2007,7 +1970,7 @@ void CheckSecret(short id)
                 game_values.unlocksecretunlocked[2] = true;
                 ifsoundonplay(sfx_transform);
 
-                IO_MovingObject * object = createpowerup(SECRET3_POWERUP, GetRandMax(smw->ScreenWidth), GetRandMax(smw->ScreenHeight), true, false);
+                IO_MovingObject * object = createpowerup(SECRET3_POWERUP, smw->rng->GetRandMax(smw->ScreenWidth), smw->rng->GetRandMax(smw->ScreenHeight), true, false);
 
                 if(object)
                     eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->ix - 8, object->iy - 8, 4, 5));
@@ -2017,7 +1980,7 @@ void CheckSecret(short id)
         game_values.unlocksecretunlocked[3] = true;
         ifsoundonplay(sfx_transform);
 
-        IO_MovingObject * object = createpowerup(SECRET4_POWERUP, GetRandMax(smw->ScreenWidth), GetRandMax(smw->ScreenHeight), true, false);
+        IO_MovingObject * object = createpowerup(SECRET4_POWERUP, smw->rng->GetRandMax(smw->ScreenWidth), smw->rng->GetRandMax(smw->ScreenHeight), true, false);
 
         if(object)
             eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->ix - 8, object->iy - 8, 4, 5));

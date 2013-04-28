@@ -178,7 +178,7 @@ bool LoadAndSplashScreen()
 //
 //	for(int k = 0; k < NUM_CONTRIBUTORS; k++)
 //	{
-//		int index = GetRandMax(NUM_CONTRIBUTORS);
+//		int index = smw->rng->GetRandMax(NUM_CONTRIBUTORS);
 //
 //		while(contributorUsed[index])
 //		{

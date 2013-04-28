@@ -4,6 +4,9 @@
 #include "uimenu.h"
 #include "input.h"
 #include "randFuncs.h"
+#include "Game.h"
+
+extern CGame *smw;
 
 class UI_Menu;
 
@@ -320,10 +323,10 @@ public:
 
     //Gets a random value, but does not set the control to that value
     short GetRandomShortValue() {
-        return goodRandomItems[GetRandMax(goodRandomItems.size())]->iValue;
+        return goodRandomItems[smw->rng->GetRandMax(goodRandomItems.size())]->iValue;
     }
     bool GetRandomBoolValue() {
-        return goodRandomItems[GetRandMax(goodRandomItems.size())]->fValue;
+        return goodRandomItems[smw->rng->GetRandMax(goodRandomItems.size())]->fValue;
     }
 
     //sets the currently selected item

@@ -194,12 +194,12 @@ void EC_Leaf::update()
 
     if(vely > 0.0f && iy >= smw->ScreenHeight) {
         dy = -16.0f;
-        dx = GetRandMax(smw->ScreenWidth);
+        dx = smw->rng->GetRandMax(smw->ScreenWidth);
 
         NextLeaf();
     } else if(vely < 0.0f && iy < -16) {
         dy = smw->ScreenHeight;
-        dx = GetRandMax(smw->ScreenWidth);
+        dx = smw->rng->GetRandMax(smw->ScreenWidth);
 
         NextLeaf();
     }
@@ -210,7 +210,7 @@ void EC_Leaf::update()
 
 void EC_Leaf::NextLeaf()
 {
-    short iRand = GetRandMax(20);
+    short iRand = smw->rng->GetRandMax(20);
     if(iRand < 12)
         iAnimationY = 0;
     else if(iRand < 15)
@@ -220,25 +220,25 @@ void EC_Leaf::NextLeaf()
     else
         iAnimationY = 48;
 
-    velx = GetRandMax(9) / 4.0f;
-    vely = GetRandMax(9) / 4.0f + 1.0f;
+    velx = smw->rng->GetRandMax(9) / 4.0f;
+    vely = smw->rng->GetRandMax(9) / 4.0f + 1.0f;
 
-    fForward = GetRandBool();
-    iAnimationFrame = (GetRandMax(3) + (fForward ? 0 : 1)) * iAnimationW;
-    iAnimationTimer = GetRandMax(16);
+    fForward = smw->rng->GetRandBool();
+    iAnimationFrame = (smw->rng->GetRandMax(3) + (fForward ? 0 : 1)) * iAnimationW;
+    iAnimationTimer = smw->rng->GetRandMax(16);
 }
 
 //------------------------------------------------------------------------------
 // class snow
 //------------------------------------------------------------------------------
 EC_Snow::EC_Snow(gfxSprite *nspr, float nx, float ny, short type) :
-    EC_StillImage(nspr, (short)nx, (short)ny, GetRandBool() << 4, type << 4, 16, 16)
+    EC_StillImage(nspr, (short)nx, (short)ny, smw->rng->GetRandBool() << 4, type << 4, 16, 16)
 {
     dx = nx;
     dy = ny;
 
-    velx = GetRandMax(9) / 4.0f;
-    vely = GetRandMax(9) / 4.0f + 1.0f;
+    velx = smw->rng->GetRandMax(9) / 4.0f;
+    vely = smw->rng->GetRandMax(9) / 4.0f + 1.0f;
 }
 
 void EC_Snow::update()
@@ -253,10 +253,10 @@ void EC_Snow::update()
 
     if(vely > 0.0f && iy >= smw->ScreenHeight) {
         dy = -16.0f;
-        dx = GetRandMax(smw->ScreenWidth);
+        dx = smw->rng->GetRandMax(smw->ScreenWidth);
     } else if(vely < 0.0f && iy < -16) {
         dy = smw->ScreenHeight;
-        dx = GetRandMax(smw->ScreenWidth);
+        dx = smw->rng->GetRandMax(smw->ScreenWidth);
     }
 
     ix = (short)dx;
@@ -294,13 +294,13 @@ void EC_Rain::update()
 
 void EC_Rain::NextRainDrop()
 {
-    velx = -5.0f + GetRandMax(5) / 4.0f;
-    vely = 4.0f + GetRandMax(5) / 4.0f;
+    velx = -5.0f + smw->rng->GetRandMax(5) / 4.0f;
+    vely = 4.0f + smw->rng->GetRandMax(5) / 4.0f;
 
     dy = -16.0f;
-    dx = GetRandMax(smw->ScreenWidth);
+    dx = smw->rng->GetRandMax(smw->ScreenWidth);
 
-    iSrcX = GetRandMax(8) * 10;
+    iSrcX = smw->rng->GetRandMax(8) * 10;
 }
 
 
@@ -338,13 +338,13 @@ void EC_Bubble::update()
 
 void EC_Bubble::NextBubble()
 {
-    velx = -1.0f + GetRandMax(9) / 4.0f;
-    vely = -4.0f + GetRandMax(9) / 4.0f;
+    velx = -1.0f + smw->rng->GetRandMax(9) / 4.0f;
+    vely = -4.0f + smw->rng->GetRandMax(9) / 4.0f;
 
     dy = smw->ScreenHeight;
-    dx = GetRandMax(smw->ScreenWidth);
+    dx = smw->rng->GetRandMax(smw->ScreenWidth);
 
-    iAnimationFrame = GetRandMax(4) << 4;
+    iAnimationFrame = smw->rng->GetRandMax(4) << 4;
 }
 
 //------------------------------------------------------------------------------
@@ -901,7 +901,7 @@ void EC_SoulsAward::update()
         float addangle = QUARTER_PI / 20.0f;
         float startangle = -HALF_PI;
 
-        float angle = (float)(GetRandMax(21) - 10) * addangle + startangle;
+        float angle = (float)(smw->rng->GetRandMax(21) - 10) * addangle + startangle;
         float velx = speed * cos(angle);
         float vely = speed * sin(angle);
 
