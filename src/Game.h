@@ -131,7 +131,35 @@ public:
 	int ScreenHeight;
 	CRandomNumberGenerator	*rng;
 
+	int GetScreenWidth(int iSize) {
+		//short iScreenshotSize[3][2] = {{640, 480}, {320, 240}, {160, 120}};
 
+		switch (iSize) {
+		case 0:
+			return ScreenWidth;
+		case 1:
+			return ScreenWidth/2;
+		case 2:
+			return ScreenWidth/4;
+		default:
+			throw "invalid iSize for width";
+		}
+	}
+
+	int GetScreenHeight(int iSize) {
+		//short iScreenshotSize[3][2] = {{640, 480}, {320, 240}, {160, 120}};
+
+		switch (iSize) {
+		case 0:
+			return ScreenHeight;
+		case 1:
+			return ScreenHeight/2;
+		case 2:
+			return ScreenHeight/4;
+		default:
+			throw "invalid iSize for height";
+		}
+	}
 //private:
 
 };

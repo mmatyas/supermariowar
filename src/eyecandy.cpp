@@ -1275,7 +1275,7 @@ void Spotlight::Draw()
         SDL_Rect rDstWrap = {ix - iHalfWidth + smw->ScreenWidth, iy - iHalfWidth, iWidth, iWidth};
         SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rSrc, rm->spr_overlay.getSurface(), &rDstWrap);
     }
-    else if(ix + iHalfWidth >= 640)
+    else if(ix + iHalfWidth >= smw->ScreenWidth)
     {
         SDL_Rect rDstWrap = {ix - iHalfWidth - smw->ScreenWidth, iy - iHalfWidth, iWidth, iWidth};
         SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rSrc, rm->spr_overlay.getSurface(), &rDstWrap);

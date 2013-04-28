@@ -461,7 +461,7 @@ void IO_Block::KillPlayersAndObjectsInsideBlock(short playerID)
 
         short iSwapSides = 0;
         if(player->fOldX >= iposx + TILESIZE)
-            iSwapSides = -640;
+            iSwapSides = -smw->ScreenWidth;
 
         if(player->fOldX + PW + iSwapSides >= iposx && player->fOldX + iSwapSides < iposx + TILESIZE &&
                 player->fOldY + PH >= iposy && player->fOldY < iposy + TILESIZE) {
@@ -487,7 +487,7 @@ void IO_Block::KillPlayersAndObjectsInsideBlock(short playerID)
 
             short iSwapSides = 0;
             if(movingobject->fOldX >= iposx + TILESIZE)
-                iSwapSides = -640;
+                iSwapSides = -smw->ScreenWidth;
 
             if(movingobject->fOldX + PW + iSwapSides >= iposx && movingobject->fOldX + iSwapSides < iposx + TILESIZE &&
                     movingobject->fOldY + PH >= iposy && movingobject->fOldY < iposy + TILESIZE) {
@@ -2777,7 +2777,7 @@ bool PU_SecretPowerup::collide (CPlayer *player)
         game_values.windaffectsplayers = true;
 
         for(short i = 0; i < 15; i++)
-            eyecandy[2].add(new EC_Snow(&rm->spr_snow, (float)(RNGMAX(640)), (float)RNGMAX(smw->ScreenHeight), RNGMAX(4) + 1));
+            eyecandy[2].add(new EC_Snow(&rm->spr_snow, (float)(RNGMAX(smw->ScreenWidth)), (float)RNGMAX(smw->ScreenHeight), RNGMAX(4) + 1));
     } else if(itemtype == 1) {
         game_values.spinscreen = true;
     } else if(itemtype == 2) {
@@ -3840,12 +3840,12 @@ void MO_Boomerang::update()
         fOldX = fx;
         setXf(fx + velx);
 
-        if(fMoveToRight && fx + iw >= 640.0f && fOldX + iw < 640.0f) {
+        if(fMoveToRight && fx + iw >= smw->ScreenWidth && fOldX + iw < smw->ScreenWidth) {
             if(fFlipped) {
                 forcedead();
                 return;
             } else {
-                setXf(640.0f - iw);
+                setXf(smw->ScreenWidth - iw);
                 fFlipped = true;
                 fMoveToRight = false;
                 velx = -velx;
@@ -3869,9 +3869,9 @@ void MO_Boomerang::update()
         setXf(fx + velx);
 
         if(fx < 0.0f)
-            setXf(fx + 640.0f);
-        else if(fx + iw >= 640.0f)
-            setXf(fx - 640.0f);
+            setXf(fx + smw->ScreenWidth);
+        else if(fx + iw >= smw->ScreenWidth)
+            setXf(fx - smw->ScreenWidth);
 
         if(state == 1) {
             fOldY = fy;
@@ -3913,7 +3913,7 @@ void MO_Boomerang::update()
         } else if(state == 4) {
             if(iStateTimer >= 46) {
                 if((fMoveToRight && fx < 0.0f && fOldX >= 0.0f) ||
-                        (!fMoveToRight && fx + iw >= 640.0f && fOldX + iw < 640.0f)) {
+                        (!fMoveToRight && fx + iw >= smw->ScreenWidth && fOldX + iw < smw->ScreenWidth)) {
                     forcedead();
                     return;
                 }
@@ -3926,9 +3926,9 @@ void MO_Boomerang::update()
         setXf(fx + velx);
 
         if(fx < 0.0f)
-            setXf(fx + 640.0f);
-        else if(fx + iw >= 640.0f)
-            setXf(fx - 640.0f);
+            setXf(fx + smw->ScreenWidth);
+        else if(fx + iw >= smw->ScreenWidth)
+            setXf(fx - smw->ScreenWidth);
 
         if(iStateTimer > game_values.boomeranglife) {
             forcedead();
@@ -4007,7 +4007,7 @@ void MO_Boomerang::update()
                 	velx = -5.0f;
 
                 if((fx < 0.0f && fOldX >= 0.0f) ||
-                	(fx + iw >= 640.0f && fOldX + iw < 640.0f))
+                	(fx + iw >= smw->ScreenWidth && fOldX + iw < smw->ScreenWidth))
                 {
                 	forcedead();
                 	return;
@@ -4413,7 +4413,7 @@ void OMO_BowserFire::update()
 {
     IO_OverMapObject::update();
 
-    if((velx < 0 && ix < -iw) || (velx > 0 && ix > 640)) {
+    if((velx < 0 && ix < -iw) || (velx > 0 && ix > smw->ScreenWidth)) {
         if(iPlayerID != -1 && projectiles[iPlayerID] > 0)
             projectiles[iPlayerID]--;
 
@@ -4429,8 +4429,8 @@ void OMO_BowserFire::draw()
 bool OMO_BowserFire::collide(CPlayer * player)
 {
     //if the fire is off the screen, don't wrap it to collide
-    if((ix < 0 && velx < 0.0f && player->ix > ix + iw && player->ix + PW < 640) ||
-            (ix + iw >= 640 && velx > 0.0f && player->ix + PW < ix && player->ix >= 0)) {
+    if((ix < 0 && velx < 0.0f && player->ix > ix + iw && player->ix + PW < smw->ScreenWidth) ||
+            (ix + iw >= smw->ScreenWidth && velx > 0.0f && player->ix + PW < ix && player->ix >= 0)) {
         return false;
     }
 
@@ -5681,7 +5681,7 @@ void OMO_RaceGoal::placeRaceGoal()
             if(++tries > 32)
                 break;
 
-            x = (short)RNGMAX(640 - collisionWidth);
+            x = (short)RNGMAX(smw->ScreenWidth - collisionWidth);
             y = (short)RNGMAX(smw->ScreenHeight - collisionHeight);
         } while(objectcontainer[2].getClosestObject(x, y, object_race_goal) <= 250.0f - (quantity * 25.0f));
     }
@@ -6031,19 +6031,19 @@ void MO_WalkingEnemy::update()
                 velx = -velx;
             }
         } else {
-            if(probeFrontX >= 640) {
-                probeFrontX -= 640;
+            if(probeFrontX >= smw->ScreenWidth) {
+                probeFrontX -= smw->ScreenWidth;
             } else if(probeFrontX < 0) {
-                probeFrontX += 640;
+                probeFrontX += smw->ScreenWidth;
             }
 
-            if(probeCenterX >= 640) {
-                probeCenterX -= 640;
+            if(probeCenterX >= smw->ScreenWidth) {
+                probeCenterX -= smw->ScreenWidth;
             } else if(probeCenterX < 0) {
-                probeCenterX += 640;
+                probeCenterX += smw->ScreenWidth;
             }
 
-            if(probeFrontX >= 0 && probeFrontX < 640 && probeCenterX >= 0 && probeCenterX < 640 && probeY >= 0 && probeY < smw->ScreenHeight) {
+            if(probeFrontX >= 0 && probeFrontX < smw->ScreenWidth && probeCenterX >= 0 && probeCenterX < smw->ScreenWidth && probeY >= 0 && probeY < smw->ScreenHeight) {
                 probeFrontX /= TILESIZE;
                 probeCenterX /= TILESIZE;
                 probeY /= TILESIZE;
@@ -7248,9 +7248,9 @@ bool CO_Shell::collide(CPlayer * player)
                 short flipx = 0;
 
                 if(player->ix + PW < 320 && ix > 320)
-                    flipx = 640;
+                    flipx = smw->ScreenWidth;
                 else if(ix + iw < 320 && player->ix > 320)
-                    flipx = -640;
+                    flipx = -smw->ScreenWidth;
 
                 if((player->ix + HALFPW + flipx >= ix + (iw >> 1) && velx > 0.0f) || (player->ix + HALFPW + flipx < ix + (iw >> 1) && velx < 0.0f)) {
                     Die();
@@ -7328,9 +7328,9 @@ bool CO_Shell::HitOther(CPlayer * player)
                 short flipx = 0;
 
                 if(player->ix + PW < 320 && ix > 320)
-                    flipx = 640;
+                    flipx = smw->ScreenWidth;
                 else if(ix + iw < 320 && player->ix > 320)
-                    flipx = -640;
+                    flipx = -smw->ScreenWidth;
 
                 owner = player;
                 Kick();
@@ -7344,9 +7344,9 @@ bool CO_Shell::HitOther(CPlayer * player)
         short flipx = 0;
 
         if(player->ix + PW < 320 && ix > 320)
-            flipx = 640;
+            flipx = smw->ScreenWidth;
         else if(ix + iw < 320 && player->ix > 320)
-            flipx = -640;
+            flipx = -smw->ScreenWidth;
 
         if(iNoOwnerKillTime == 0 || player->globalID != iPlayerID || player->ix + HALFPW + flipx >= ix + (iw >> 1) && velx > 0.0f || player->ix + HALFPW + flipx < ix + (iw >> 1) && velx < 0.0f)
             return KillPlayer(player);
@@ -7795,9 +7795,9 @@ bool CO_ThrowBlock::HitOther(CPlayer * player)
         short flipx = 0;
 
         if(player->ix + PW < 320 && ix > 320)
-            flipx = 640;
+            flipx = smw->ScreenWidth;
         else if(ix + iw < 320 && player->ix > 320)
-            flipx = -640;
+            flipx = -smw->ScreenWidth;
 
         if(iNoOwnerKillTime == 0 || player->globalID != iPlayerID || (player->ix + flipx > ix + (iw >> 1) && velx > 0.0f) || (player->ix + flipx <= ix - (iw >> 1) && velx < 0.0f)) {
             return KillPlayer(player);
@@ -8087,9 +8087,9 @@ bool CO_ThrowBox::collide(CPlayer * player)
         short flipx = 0;
 
         if(player->ix + PW < 320 && ix > 320)
-            flipx = 640;
+            flipx = smw->ScreenWidth;
         else if(ix + iw < 320 && player->ix > 320)
-            flipx = -640;
+            flipx = -smw->ScreenWidth;
 
         if(player->globalID != iPlayerID) {
             return KillPlayer(player);
@@ -8629,7 +8629,7 @@ void MO_SpinAttack::update()
 
         short iLeft;
         if(ix < 0)
-            iLeft = (ix + 640) / TILESIZE;
+            iLeft = (ix + smw->ScreenWidth) / TILESIZE;
         else
             iLeft = ix / TILESIZE;
 
@@ -8925,9 +8925,9 @@ void OMO_Phanto::update()
     setYf(fy + vely);
 
     if(fx < 0.0f)
-        setXf(fx + 640.0f);
-    else if(fx + iw >= 640.0f)
-        setXf(fx - 640.0f);
+        setXf(fx + smw->ScreenWidth);
+    else if(fx + iw >= smw->ScreenWidth)
+        setXf(fx - smw->ScreenWidth);
 
     if(++iSpeedTimer > 62) {
         iSpeedTimer = 0;

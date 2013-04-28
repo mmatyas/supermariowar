@@ -1918,7 +1918,7 @@ SDL_Surface * CMap::createThumbnailSurface(bool fUseClassicPack)
 
     SDL_FreeSurface(temp);
 
-	SDL_Rect srcRectBackground = {0, 0, 640, smw->ScreenHeight};
+	SDL_Rect srcRectBackground = {0, 0, smw->ScreenWidth, smw->ScreenHeight};
     SDL_Rect dstRectBackground = {0, 0, 160, 120};
 
     if(SDL_SoftStretch(sBackground, &srcRectBackground, sThumbnail, &dstRectBackground) < 0) {

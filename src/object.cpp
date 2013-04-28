@@ -62,13 +62,13 @@ void CObject::GetCollisionBlocks(IO_Block * blocks[4])
 {
     short xl = 0;
     if(ix < 0)
-        xl = (ix + 640) / TILESIZE;
+        xl = (ix + smw->ScreenWidth) / TILESIZE;
     else
         xl = ix / TILESIZE;
 
     short xr = 0;
-    if(ix + iw >= 640)
-        xr = (ix + iw - 640) / TILESIZE;
+    if(ix + iw >= smw->ScreenWidth)
+        xr = (ix + iw - smw->ScreenWidth) / TILESIZE;
     else
         xr = (ix + iw) / TILESIZE;
 
@@ -282,9 +282,9 @@ void IO_MovingObject::collision_detection_map()
     if(fy + collisionHeight >= 0.0f) {
         if(velx + fPlatformVelX > 0.01f || iHorizontalPlatformCollision == 3) {
             //moving right
-            if(fx + collisionWidth >= 640.0f) {
-                tx = (short)(fx + collisionWidth - 640.0f) / TILESIZE;
-                fOldX -= 640.0f;
+            if(fx + collisionWidth >= smw->ScreenWidth) {
+                tx = (short)(fx + collisionWidth - smw->ScreenWidth) / TILESIZE;
+                fOldX -= smw->ScreenWidth;
             } else
                 tx = ((short)fx + collisionWidth) / TILESIZE;
 
@@ -407,8 +407,8 @@ void IO_MovingObject::collision_detection_map()
 
     txl = ix / TILESIZE;
 
-    if(ix + collisionWidth >= 640)
-        txr = (ix + collisionWidth - 640) / TILESIZE;
+    if(ix + collisionWidth >= smw->ScreenWidth)
+        txr = (ix + collisionWidth - smw->ScreenWidth) / TILESIZE;
     else
         txr = (ix + collisionWidth) / TILESIZE;
 
@@ -566,13 +566,13 @@ bool IO_MovingObject::collision_detection_checksides()
 
     short txl = -1, nofliptxl = ix >> 5;
     if(ix < 0)
-        txl = (ix + 640) >> 5;
+        txl = (ix + smw->ScreenWidth) >> 5;
     else
         txl = nofliptxl;
 
     short txr = -1, nofliptxr = (ix + collisionWidth) >> 5;
-    if(ix + collisionWidth >= 640)
-        txr = (ix + collisionWidth - 640) >> 5;
+    if(ix + collisionWidth >= smw->ScreenWidth)
+        txr = (ix + collisionWidth - smw->ScreenWidth) >> 5;
     else
         txr = nofliptxr;
 
@@ -646,9 +646,7 @@ bool IO_MovingObject::collision_detection_checksides()
     //[ ][ ]
     case 2: {
         if(ix + (collisionWidth >> 1) < (nofliptxr << 5)) {
-            int tmpnofliptxr = nofliptxr;
-
-            setXf((float)((tmpnofliptxr << TILESIZE) - collisionWidth) - 0.2f);
+            setXf((float)((nofliptxr << 5) - collisionWidth) - 0.2f);
             flipsidesifneeded();
         } else {
             setYf((float)((ty << 5) + TILESIZE) + 0.2f);
@@ -809,11 +807,11 @@ void IO_MovingObject::flipsidesifneeded()
 {
     //Use ix here to avoid rounding issues (can crash if txr evals to over the right side of screen)
     if(ix < 0 || fx < 0.0f) {
-        setXf(fx + 640.0f);
-        fOldX += 640.0f;
-    } else if(ix >= 640 || fx >= 640.0f) {
-        setXf(fx - 640.0f);
-        fOldX -= 640.0f;
+        setXf(fx + smw->ScreenWidth);
+        fOldX += smw->ScreenWidth;
+    } else if(ix >= smw->ScreenWidth || fx >= smw->ScreenWidth) {
+        setXf(fx - smw->ScreenWidth);
+        fOldX -= smw->ScreenWidth;
     }
 }
 
@@ -1010,7 +1008,7 @@ bool CObjectContainer::isBlockAt(short x, short y)
 
 float CObjectContainer::getClosestObject(short ix, short iy, short objectType)
 {
-    int dist = 640000;  //Longest distance from corner to corner squared
+    int dist = smw->ScreenWidth * 1000;  //Longest distance from corner to corner squared
 
     for(short i = 0; i < list_end; i++) {
         if(list[i]->getObjectType() != objectType)
@@ -1030,7 +1028,7 @@ float CObjectContainer::getClosestObject(short ix, short iy, short objectType)
 
 float CObjectContainer::getClosestMovingObject(short ix, short iy, short movingObjectType)
 {
-    int dist = 640000;  //Longest distance from corner to corner squared
+    int dist = smw->ScreenWidth * 1000;  //Longest distance from corner to corner squared
 
     for(short i = 0; i < list_end; i++) {
         if(list[i]->getObjectType() != object_moving || ((IO_MovingObject*)list[i])->getMovingObjectType() != movingObjectType)

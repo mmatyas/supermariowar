@@ -113,9 +113,9 @@ void OMO_StraightPathHazard::update()
 
     //Wrap hazard if it is off the edge of the screen
     if(ix < 0)
-        ix += 640;
+        ix += smw->ScreenWidth;
     else if(ix + iw >= smw->ScreenWidth)
-        ix -= 640;
+        ix -= smw->ScreenWidth;
 }
 
 bool OMO_StraightPathHazard::collide(CPlayer * player)
@@ -170,7 +170,7 @@ MO_BulletBill::MO_BulletBill(gfxSprite *nspr, gfxSprite *nsprdead, short x, shor
         }
     } else {
         if(velx < 0.0f)
-            setXi(640 + iw);
+            setXi(smw->ScreenWidth + iw);
         else
             setXi(-iw);
 
@@ -192,7 +192,7 @@ void MO_BulletBill::update()
 
     animate();
 
-    if((velx < 0.0f && ix < -iw) || (velx > 0.0f && ix > 640))
+    if((velx < 0.0f && ix < -iw) || (velx > 0.0f && ix > smw->ScreenWidth))
         dead = true;
 }
 
@@ -219,8 +219,8 @@ bool MO_BulletBill::collide(CPlayer * player)
         return false;
 
     //if the bullet bill is off the screen, don't wrap it to collide
-    if((ix < 0 && velx < 0.0f && player->ix > ix + iw && player->ix + PW < 640) ||
-            (ix + iw >= 640 && velx > 0.0f && player->ix + PW < ix && player->ix >= 0)) {
+    if((ix < 0 && velx < 0.0f && player->ix > ix + iw && player->ix + PW < smw->ScreenWidth) ||
+            (ix + iw >= smw->ScreenWidth && velx > 0.0f && player->ix + PW < ix && player->ix >= 0)) {
         return false;
     }
 
@@ -288,9 +288,9 @@ void MO_BulletBill::collide(IO_MovingObject * object)
 
         short iOffsetX = 0;
         if(ix + iw < bulletbill->ix)
-            iOffsetX = 640;
+            iOffsetX = smw->ScreenWidth;
         else if(bulletbill->ix + bulletbill->iw < ix)
-            iOffsetX = -640;
+            iOffsetX = -smw->ScreenWidth;
 
         short iCenterX = ((ix + iOffsetX - bulletbill->ix) >> 1) + (bulletbill->ix + (bulletbill->iw >> 1));
         short iCenterY = ((iy - bulletbill->iy) >> 1) + (bulletbill->iy + (bulletbill->ih >> 1));
@@ -671,7 +671,7 @@ void MO_PirhanaPlant::update()
     if(iType == 1) { //face the plant towards the nearest player
         //Don't do this every frame, just once every 8 frames
         if(state > 0 && ++iActionTimer >= 8) {
-            int distance_to_player = 640000;
+            int distance_to_player = smw->ScreenWidth * 1000;
             short iDiffX = 1, iDiffY = 1;
 
             short iPlantX = ix + 16;
