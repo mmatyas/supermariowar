@@ -19,3 +19,5 @@ I am trying to recover it
 
 There should be an input playback feature to create sort of unit tests, this way we
 can serialize testing for specific issues, spot regressions but also improve playback
+
+Configuration shall be loaded from ini file

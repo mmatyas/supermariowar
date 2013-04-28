@@ -10,9 +10,13 @@
 		#include <shlobj.h>
 		#include <SDL_platform.h>
 	#endif
+#else
+#include <stdlib.h>
 #endif
 
 #include "path.h"
+
+extern char *RootDataDirectory;
 
 using namespace std;
 char SMW_Root_Data_Dir[PATH_MAX + 2] = "";

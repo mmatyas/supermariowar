@@ -1,6 +1,6 @@
 
 #include "global.h"
-//#include "Game.h"
+#include "Game.h"
 
 #if	_WIN32
 #include <windows.h>
@@ -8,11 +8,14 @@
 
 #include "path.h"
 
+extern void RunGame();
+
 CGame::CGame(char *rootDirectory)
 {
     // make sure that the .smw directory is created
     std::string smwHome = GetHomeDirectory();
 
+#if	_WIN32
     if (CreateDirectory(smwHome .c_str(), NULL) ||
         ERROR_ALREADY_EXISTS == GetLastError())
     {
@@ -20,6 +23,8 @@ CGame::CGame(char *rootDirectory)
     } else {
 #pragma warning print log message about error
     }
+#endif
+
 }
 
 void CGame::Go()

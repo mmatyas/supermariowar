@@ -488,7 +488,7 @@ MusicEntry::MusicEntry(const std::string & musicdirectory)
 			{
 				if(numsongsforcategory[iMusicCategory] < MAXCATEGORYTRACKS)
 				{
-                    songFileNames.push_back(musiclist->current_name());
+                    songFileNames.push_back(musList->current_name());
 					songsforcategory[iMusicCategory][numsongsforcategory[iMusicCategory]] = iNumFile;
 					numsongsforcategory[iMusicCategory]++;
 					iNumFile++;

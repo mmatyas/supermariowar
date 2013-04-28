@@ -9,7 +9,11 @@ extern bool g_fLoadMessages;
 //1.8.0.2 == beta1
 //1.8.0.3 == beta2
 //1.8.0.4 == final
-int g_iVersion[] = {1, 8, 0, 4};
+//1.9.0.0 == neagix work-in-progress, not released
+int g_iVersion[] = {1, 9, 0, 0};
+
+// main game directory, read from command line argument
+char		*RootDataDirectory;
 
 bool VersionIsEqual(int iVersion[], short iMajor, short iMinor, short iMicro, short iBuild)
 {

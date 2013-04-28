@@ -4650,7 +4650,8 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 
 					//Clear out all input from cpu controlled team
 					COutputControl * playerKeys = NULL;
-                    for(short iTeamMember = 0; iTeamMember < game_values.teamcounts[iControllingTeam]; iTeamMember++)
+					short iTeamMember;
+                    for(iTeamMember = 0; iTeamMember < game_values.teamcounts[iControllingTeam]; iTeamMember++)
 					{
 						playerKeys = &game_values.playerInput.outputControls[game_values.teamids[iControllingTeam][iTeamMember]];
 
