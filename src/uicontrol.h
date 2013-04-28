@@ -3,71 +3,101 @@
 
 #include "uimenu.h"
 #include "input.h"
+#include "randFuncs.h"
 
 class UI_Menu;
 
 class UI_Control
 {
-	public:
-		UI_Control(short x, short y);
-        virtual ~UI_Control() {}
-	
-		virtual void Update() {}
-		virtual void Draw() {}
+public:
+    UI_Control(short x, short y);
+    virtual ~UI_Control() {}
 
-		virtual MenuCodeEnum SendInput(CPlayerInput *) {return MENU_CODE_NONE;}
+    virtual void Update() {}
+    virtual void Draw() {}
 
-		bool Select(bool select) 
-		{
-			fSelected = select;
+    virtual MenuCodeEnum SendInput(CPlayerInput *) {
+        return MENU_CODE_NONE;
+    }
 
-			if(fSelected && fAutoModify)
-				Modify(true);
+    bool Select(bool select) {
+        fSelected = select;
 
-			return fModifying;
-		}
+        if(fSelected && fAutoModify)
+            Modify(true);
 
-		virtual MenuCodeEnum Modify(bool modify) {fModifying = modify; return MENU_CODE_MODIFY_ACCEPTED;}
+        return fModifying;
+    }
 
-		void SetAutoModify(bool autoModify) {fAutoModify = autoModify;}
-		bool IsAutoModify() {return fAutoModify;}
+    virtual MenuCodeEnum Modify(bool modify) {
+        fModifying = modify;
+        return MENU_CODE_MODIFY_ACCEPTED;
+    }
 
-		void SetPosition(short x, short y) {ix = x; iy = y;}
+    void SetAutoModify(bool autoModify) {
+        fAutoModify = autoModify;
+    }
+    bool IsAutoModify() {
+        return fAutoModify;
+    }
 
-		void SetNeighbor(short iNeighbor, UI_Control * uiControl) {neighborControls[iNeighbor] = uiControl;}
-		UI_Control * GetNeighbor(short iNeighbor) {return neighborControls[iNeighbor];}
+    void SetPosition(short x, short y) {
+        ix = x;
+        iy = y;
+    }
 
-		void Show(bool show) {fShow = show;}
-		bool IsVisible() {return fShow;}
+    void SetNeighbor(short iNeighbor, UI_Control * uiControl) {
+        neighborControls[iNeighbor] = uiControl;
+    }
+    UI_Control * GetNeighbor(short iNeighbor) {
+        return neighborControls[iNeighbor];
+    }
 
-		void SetMenuParent(UI_Menu * menu) {uiMenu = menu;}
+    void Show(bool show) {
+        fShow = show;
+    }
+    bool IsVisible() {
+        return fShow;
+    }
 
-		bool IsModifying() {return fModifying;}
+    void SetMenuParent(UI_Menu * menu) {
+        uiMenu = menu;
+    }
 
-		void SetControllingTeam(short teamid) {iControllingTeam = teamid;}
+    bool IsModifying() {
+        return fModifying;
+    }
 
-		virtual MenuCodeEnum MouseClick(short iMouseX, short iMouseY) {return MENU_CODE_NONE;}
+    void SetControllingTeam(short teamid) {
+        iControllingTeam = teamid;
+    }
 
-		virtual void Refresh() {}
+    virtual MenuCodeEnum MouseClick(short iMouseX, short iMouseY) {
+        return MENU_CODE_NONE;
+    }
 
-		virtual void Disable(bool disable) {fDisable = disable;}
+    virtual void Refresh() {}
 
-	protected:
+    virtual void Disable(bool disable) {
+        fDisable = disable;
+    }
 
-		bool fSelected;
-		bool fModifying;
-		bool fAutoModify;
-		bool fDisable;
+protected:
 
-		short ix, iy;
+    bool fSelected;
+    bool fModifying;
+    bool fAutoModify;
+    bool fDisable;
 
-		UI_Control * neighborControls[4];
+    short ix, iy;
 
-		bool fShow;
+    UI_Control * neighborControls[4];
 
-		UI_Menu * uiMenu;
+    bool fShow;
 
-		short iControllingTeam;
+    UI_Menu * uiMenu;
+
+    short iControllingTeam;
 };
 
 /*********************************************************
@@ -75,81 +105,115 @@ class UI_Control
  *********************************************************/
 class MI_Image : public UI_Control
 {
-	public:
-		MI_Image(gfxSprite * nspr, short x, short y, short srcx, short srcy, short w, short h, short numxframes, short numyframes, short speed);
-		virtual ~MI_Image();
-		
-		void Update();
-		void Draw();
+public:
+    MI_Image(gfxSprite * nspr, short x, short y, short srcx, short srcy, short w, short h, short numxframes, short numyframes, short speed);
+    virtual ~MI_Image();
 
-		void SetPosition(short x, short y) {ix = x; iy = y;}
-		void SetAnimationSpeed(short speed) {iSpeed = speed;}
-		void SetImage(short srcx, short srcy, short w, short h) {isrcx = srcx; isrcy = srcy; iw = w; ih = h; iXFrame = srcx; iYFrame = srcy;}
-		void SetImageSource(gfxSprite * nspr) {spr = nspr;}
+    void Update();
+    void Draw();
 
-		void SetPulse(bool pulse) {fPulse = pulse;}
-		void SetSwirl(bool swirl, float radius, float angle, float radiusSpeed, float angleSpeed) {fSwirl = swirl; dSwirlRadius = radius; dSwirlAngle = angle; dSwirlRadiusSpeed = radiusSpeed; dSwirlAngleSpeed = angleSpeed;}
-		void StopSwirl() {SetSwirl(false, 0.0f, 0.0f, 0.0f, 0.0f);}
-		void SetBlink(bool blink, short interval) {fBlink = blink; iBlinkInterval = interval;}
+    void SetPosition(short x, short y) {
+        ix = x;
+        iy = y;
+    }
+    void SetAnimationSpeed(short speed) {
+        iSpeed = speed;
+    }
+    void SetImage(short srcx, short srcy, short w, short h) {
+        isrcx = srcx;
+        isrcy = srcy;
+        iw = w;
+        ih = h;
+        iXFrame = srcx;
+        iYFrame = srcy;
+    }
+    void SetImageSource(gfxSprite * nspr) {
+        spr = nspr;
+    }
 
-		bool IsSwirling() {return fSwirl;}
+    void SetPulse(bool pulse) {
+        fPulse = pulse;
+    }
+    void SetSwirl(bool swirl, float radius, float angle, float radiusSpeed, float angleSpeed) {
+        fSwirl = swirl;
+        dSwirlRadius = radius;
+        dSwirlAngle = angle;
+        dSwirlRadiusSpeed = radiusSpeed;
+        dSwirlAngleSpeed = angleSpeed;
+    }
+    void StopSwirl() {
+        SetSwirl(false, 0.0f, 0.0f, 0.0f, 0.0f);
+    }
+    void SetBlink(bool blink, short interval) {
+        fBlink = blink;
+        iBlinkInterval = interval;
+    }
 
-		void GetPositionAndSize(short * x, short * y, short * w, short * h) {*x = ix; *y = iy; *w = iw; *h = ih;}
+    bool IsSwirling() {
+        return fSwirl;
+    }
 
-	private:
-		gfxSprite * spr;
+    void GetPositionAndSize(short * x, short * y, short * w, short * h) {
+        *x = ix;
+        *y = iy;
+        *w = iw;
+        *h = ih;
+    }
 
-		short iNumXFrames, iNumYFrames;
-		short isrcx, isrcy;
-		short iw, ih;
-		short iSpeed, iTimer;
-		short iXFrame, iYFrame;
+private:
+    gfxSprite * spr;
 
-		bool fPulse;
-		short iPulseValue, iPulseDelay;
-		bool fPulseOut;
+    short iNumXFrames, iNumYFrames;
+    short isrcx, isrcy;
+    short iw, ih;
+    short iSpeed, iTimer;
+    short iXFrame, iYFrame;
 
-		bool fSwirl;
-		float dSwirlRadius;
-		float dSwirlAngle;
-		float dSwirlRadiusSpeed;
-		float dSwirlAngleSpeed;
+    bool fPulse;
+    short iPulseValue, iPulseDelay;
+    bool fPulseOut;
 
-		bool fBlink;
-		short iBlinkInterval;
-		short iBlinkCounter;
-		bool fBlinkShow;
+    bool fSwirl;
+    float dSwirlRadius;
+    float dSwirlAngle;
+    float dSwirlRadiusSpeed;
+    float dSwirlAngleSpeed;
+
+    bool fBlink;
+    short iBlinkInterval;
+    short iBlinkCounter;
+    bool fBlinkShow;
 };
 
 class MI_Text : public UI_Control
 {
-	public:
-		MI_Text(const char * text, short x, short y, short w, short size, short justified);
-		virtual ~MI_Text();
-		
-		void SetText(const char * text);
-		void Draw();
+public:
+    MI_Text(const char * text, short x, short y, short w, short size, short justified);
+    virtual ~MI_Text();
 
-	private:
-		char * szText;
-		short iw;
-		short iJustified;
-		gfxFont * font;
+    void SetText(const char * text);
+    void Draw();
+
+private:
+    char * szText;
+    short iw;
+    short iJustified;
+    gfxFont * font;
 };
 
 class MI_ScoreText : public UI_Control
 {
-	public:
-		MI_ScoreText(short x, short y);
-		virtual ~MI_ScoreText() {}
-		
-		void Draw();
-		void SetScore(short iScore);
+public:
+    MI_ScoreText(short x, short y);
+    virtual ~MI_ScoreText() {}
 
-	private:
-		short iScore;
-		short iDigitLeftSrcX, iDigitMiddleSrcX, iDigitRightSrcX;
-		short iDigitLeftDstX, iDigitMiddleDstX, iDigitRightDstX;
+    void Draw();
+    void SetScore(short iScore);
+
+private:
+    short iScore;
+    short iDigitLeftSrcX, iDigitMiddleSrcX, iDigitRightSrcX;
+    short iDigitLeftDstX, iDigitMiddleDstX, iDigitRightDstX;
 
 };
 /*********************************************************
@@ -158,443 +222,483 @@ class MI_ScoreText : public UI_Control
 class MI_IPField : public UI_Control
 {
 
-	public:
+public:
 
-		MI_IPField(gfxSprite * nspr, short x, short y);
-		virtual ~MI_IPField();
+    MI_IPField(gfxSprite * nspr, short x, short y);
+    virtual ~MI_IPField();
 
-		char * GetValue();
-		
-		void Update();
-		void Draw();
-		
-		MenuCodeEnum SendInput(CPlayerInput * playerInput);
-		MenuCodeEnum Modify(bool modify);
-		
-		MenuCodeEnum MouseClick(short iMouseX, short iMouseY);
+    char * GetValue();
 
-	private:
+    void Update();
+    void Draw();
 
-		void AssignHostAddress();
-		void MoveImage();
+    MenuCodeEnum SendInput(CPlayerInput * playerInput);
+    MenuCodeEnum Modify(bool modify);
 
-		gfxSprite * spr;
+    MenuCodeEnum MouseClick(short iMouseX, short iMouseY);
 
-		int iSelectedDigit;
-		
-		int values[12];
+private:
 
-		char szValue[16];
-		short iDigitPosition[12];
+    void AssignHostAddress();
+    void MoveImage();
 
-		MI_Image * miModifyImage;
+    gfxSprite * spr;
+
+    int iSelectedDigit;
+
+    int values[12];
+
+    char szValue[16];
+    short iDigitPosition[12];
+
+    MI_Image * miModifyImage;
 };
 
 class SF_ListItem
 {
-	public:
-		SF_ListItem()
-		{
-			sName = "";
-			
-			iValue = 0;
-			sValue = "";
-			fValue = false;
-			fHidden = false;
-			iIconOverride = -1;
-		}
+public:
+    SF_ListItem() {
+        sName = "";
 
-		SF_ListItem(std::string sname, short ivalue, std::string svalue, bool fvalue, bool fhidden, short iiconoverride)
-		{
-			sName = sname;
+        iValue = 0;
+        sValue = "";
+        fValue = false;
+        fHidden = false;
+        iIconOverride = -1;
+    }
 
-			iValue = ivalue;
-			sValue = svalue;
-			fValue = fvalue;
-			fHidden = fhidden;
-			iIconOverride = iiconoverride;
-		}
+    SF_ListItem(std::string sname, short ivalue, std::string svalue, bool fvalue, bool fhidden, short iiconoverride) {
+        sName = sname;
 
-		~SF_ListItem() {}
+        iValue = ivalue;
+        sValue = svalue;
+        fValue = fvalue;
+        fHidden = fhidden;
+        iIconOverride = iiconoverride;
+    }
 
-		std::string sName;  //Display name
+    ~SF_ListItem() {}
 
-		short iValue;  //int data
-		std::string sValue;  //string data
-		bool fValue;  //bool data for toggle controls
+    std::string sName;  //Display name
 
-		bool fHidden;
+    short iValue;  //int data
+    std::string sValue;  //string data
+    bool fValue;  //bool data for toggle controls
 
-		short iIconOverride;
+    bool fHidden;
+
+    short iIconOverride;
 };
 
 class MI_SelectField : public UI_Control
 {
-	public:
+public:
 
-		MI_SelectField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent);
-		virtual ~MI_SelectField();
+    MI_SelectField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent);
+    virtual ~MI_SelectField();
 
-		void SetTitle(char * name);
+    void SetTitle(char * name);
 
-		//When this control is selected, advance the value one instead of modifying the control
-		void SetAutoAdvance(bool advance) {fAutoAdvance = advance;}
-		void SetNoWrap(bool nowrap) {fNoWrap = nowrap;}
+    //When this control is selected, advance the value one instead of modifying the control
+    void SetAutoAdvance(bool advance) {
+        fAutoAdvance = advance;
+    }
+    void SetNoWrap(bool nowrap) {
+        fNoWrap = nowrap;
+    }
 
-		//Gets the values of the currently selected item
-		short GetShortValue() {return (*current)->iValue;}
-		std::string GetStringValue() {return (*current)->sValue;}
-		bool GetBoolValue() {return (*current)->fValue;}
+    //Gets the values of the currently selected item
+    short GetShortValue() {
+        return (*current)->iValue;
+    }
+    std::string GetStringValue() {
+        return (*current)->sValue;
+    }
+    bool GetBoolValue() {
+        return (*current)->fValue;
+    }
 
-		//Gets a random value, but does not set the control to that value
-		short GetRandomShortValue() {return goodRandomItems[rand() % goodRandomItems.size()]->iValue;}
-		bool GetRandomBoolValue() {return goodRandomItems[rand() % goodRandomItems.size()]->fValue;}
+    //Gets a random value, but does not set the control to that value
+    short GetRandomShortValue() {
+        return goodRandomItems[GetRandMax(goodRandomItems.size())]->iValue;
+    }
+    bool GetRandomBoolValue() {
+        return goodRandomItems[GetRandMax(goodRandomItems.size())]->fValue;
+    }
 
-		//sets the currently selected item
-		bool SetKey(short iID);
-		bool SetIndex(unsigned short iPosition);
+    //sets the currently selected item
+    bool SetKey(short iID);
+    bool SetIndex(unsigned short iPosition);
 
-		//Gets the currently selected item
-		SF_ListItem GetValue() {return **current;}
+    //Gets the currently selected item
+    SF_ListItem GetValue() {
+        return **current;
+    }
 
-		//Called when user selects this control to change it's value
-		MenuCodeEnum Modify(bool modify);
+    //Called when user selects this control to change it's value
+    MenuCodeEnum Modify(bool modify);
 
-		//Adds an item to the list
-		void Add(std::string name, short ivalue, std::string svalue, bool fvalue, bool fhidden, bool fGoodRandom = true, short iIconOverride = -1);
-		void Clear() {items.clear();}
+    //Adds an item to the list
+    void Add(std::string name, short ivalue, std::string svalue, bool fvalue, bool fhidden, bool fGoodRandom = true, short iIconOverride = -1);
+    void Clear() {
+        items.clear();
+    }
 
-		bool HideItem(short iID, bool fhide);
-		void HideAllItems(bool fHide);
+    bool HideItem(short iID, bool fhide);
+    void HideAllItems(bool fHide);
 
-		//Updates animations or other events every frame
-		void Update();
+    //Updates animations or other events every frame
+    void Update();
 
-		//Draws every frame
-		virtual void Draw();
+    //Draws every frame
+    virtual void Draw();
 
-		//Sends player input to control on every frame
-		virtual MenuCodeEnum SendInput(CPlayerInput * playerInput);
+    //Sends player input to control on every frame
+    virtual MenuCodeEnum SendInput(CPlayerInput * playerInput);
 
-		//When the item is changed, this code will be returned from SendInput()
-		void SetItemChangedCode(MenuCodeEnum code) {mcItemChangedCode = code;}
-		void SetControlSelectedCode(MenuCodeEnum code) {mcControlSelectedCode = code;}
+    //When the item is changed, this code will be returned from SendInput()
+    void SetItemChangedCode(MenuCodeEnum code) {
+        mcItemChangedCode = code;
+    }
+    void SetControlSelectedCode(MenuCodeEnum code) {
+        mcControlSelectedCode = code;
+    }
 
-		//Set where the data of this control is written to (some member of game_values probably)
-		void SetData(short * ivalue, std::string * svalue, bool * fvalue) {iValue = ivalue; sValue = svalue; fValue = fvalue;}
-		
-		MenuCodeEnum MouseClick(short iMouseX, short iMouseY);
+    //Set where the data of this control is written to (some member of game_values probably)
+    void SetData(short * ivalue, std::string * svalue, bool * fvalue) {
+        iValue = ivalue;
+        sValue = svalue;
+        fValue = fvalue;
+    }
 
-		void Refresh();
+    MenuCodeEnum MouseClick(short iMouseX, short iMouseY);
 
-		void SetValues();
+    void Refresh();
 
-		void AllowFastScroll(bool fastscroll) {fFastScroll = fastscroll;}
+    void SetValues();
 
-	protected:
-		
-		bool MoveNext();
-		bool MovePrev();
-		bool MoveRandom();
+    void AllowFastScroll(bool fastscroll) {
+        fFastScroll = fastscroll;
+    }
 
-		gfxSprite * spr;
-		char * szName;
+protected:
 
-		short * iValue;
-		std::string * sValue;
-		bool * fValue;
+    bool MoveNext();
+    bool MovePrev();
+    bool MoveRandom();
 
-		std::vector<SF_ListItem*> items;
-		std::vector<SF_ListItem*>::iterator current;
+    gfxSprite * spr;
+    char * szName;
 
-		std::vector<SF_ListItem*> goodRandomItems;
+    short * iValue;
+    std::string * sValue;
+    bool * fValue;
 
-		short iIndex;
+    std::vector<SF_ListItem*> items;
+    std::vector<SF_ListItem*>::iterator current;
 
-		short iWidth, iIndent;
+    std::vector<SF_ListItem*> goodRandomItems;
 
-		MI_Image * miModifyImageLeft;
-		MI_Image * miModifyImageRight;
-		
-		MenuCodeEnum mcItemChangedCode;
-		MenuCodeEnum mcControlSelectedCode;
+    short iIndex;
 
-		bool fAutoAdvance;
-		bool fNoWrap;
+    short iWidth, iIndent;
 
-		short iAdjustmentY;
+    MI_Image * miModifyImageLeft;
+    MI_Image * miModifyImageRight;
 
-		bool fFastScroll;
+    MenuCodeEnum mcItemChangedCode;
+    MenuCodeEnum mcControlSelectedCode;
+
+    bool fAutoAdvance;
+    bool fNoWrap;
+
+    short iAdjustmentY;
+
+    bool fFastScroll;
 };
 
 class MI_ImageSelectField : public MI_SelectField
 {
-	public:
+public:
 
-		MI_ImageSelectField(gfxSprite * nspr, gfxSprite * nspr_image, short x, short y, const char * name, short width, short indent, short imageHeight, short imageWidth);
-		virtual ~MI_ImageSelectField();
+    MI_ImageSelectField(gfxSprite * nspr, gfxSprite * nspr_image, short x, short y, const char * name, short width, short indent, short imageHeight, short imageWidth);
+    virtual ~MI_ImageSelectField();
 
-		void Draw();
-		
-	private:
+    void Draw();
 
-		gfxSprite * spr_image;
-		short iImageWidth, iImageHeight;
+private:
+
+    gfxSprite * spr_image;
+    short iImageWidth, iImageHeight;
 };
 
 class MI_Button : public UI_Control
 {
-	public:
+public:
 
-		MI_Button(gfxSprite * nspr, short x, short y, const char * name, short width, short justified);
-		~MI_Button() {}
+    MI_Button(gfxSprite * nspr, short x, short y, const char * name, short width, short justified);
+    ~MI_Button() {}
 
-		MenuCodeEnum Modify(bool fModify);
+    MenuCodeEnum Modify(bool fModify);
 
-		void Draw();
-		MenuCodeEnum SendInput(CPlayerInput * playerInput);
+    void Draw();
+    MenuCodeEnum SendInput(CPlayerInput * playerInput);
 
-		void SetName(const char * name);
-		void SetCode(MenuCodeEnum code) {menuCode = code;}
-		void SetImage(gfxSprite * nsprImage, short x, short y, short w, short h);
+    void SetName(const char * name);
+    void SetCode(MenuCodeEnum code) {
+        menuCode = code;
+    }
+    void SetImage(gfxSprite * nsprImage, short x, short y, short w, short h);
 
-		MenuCodeEnum MouseClick(short iMouseX, short iMouseY);
+    MenuCodeEnum MouseClick(short iMouseX, short iMouseY);
 
-	protected:
+protected:
 
-		gfxSprite * spr;
-		char * szName;
+    gfxSprite * spr;
+    char * szName;
 
-		short iWidth, iIndent;
-		short iTextJustified;
+    short iWidth, iIndent;
+    short iTextJustified;
 
-		MenuCodeEnum menuCode;
+    MenuCodeEnum menuCode;
 
-		gfxSprite * sprImage;
-		short iImageSrcX;
-		short iImageSrcY;
-		short iImageW;
-		short iImageH;
+    gfxSprite * sprImage;
+    short iImageSrcX;
+    short iImageSrcY;
+    short iImageW;
+    short iImageH;
 
-		short iTextW;
+    short iTextW;
 
-		short iAdjustmentY;
-		short iHalfWidth;
+    short iAdjustmentY;
+    short iHalfWidth;
 
 };
 
 class MI_SliderField : public MI_SelectField
 {
-	public:
+public:
 
-		MI_SliderField(gfxSprite * nspr, gfxSprite * nsprSlider, short x, short y, const char * name, short width, short indent1, short indent2);
-		virtual ~MI_SliderField();
+    MI_SliderField(gfxSprite * nspr, gfxSprite * nsprSlider, short x, short y, const char * name, short width, short indent1, short indent2);
+    virtual ~MI_SliderField();
 
-		void SetPosition(short x, short y);
+    void SetPosition(short x, short y);
 
-		//Draws every frame
-		virtual void Draw();
-		//Sends player input to control on every frame
-		MenuCodeEnum SendInput(CPlayerInput * playerInput);
+    //Draws every frame
+    virtual void Draw();
+    //Sends player input to control on every frame
+    MenuCodeEnum SendInput(CPlayerInput * playerInput);
 
-	protected:
+protected:
 
-		gfxSprite * sprSlider;
-		short iIndent2;
+    gfxSprite * sprSlider;
+    short iIndent2;
 
 };
 
 class MI_PowerupSlider : public MI_SliderField
 {
-	public:
+public:
 
-		MI_PowerupSlider(gfxSprite * nspr, gfxSprite * nsprSlider, gfxSprite * nsprPowerup, short x, short y, short width, short powerupIndex);
-		virtual ~MI_PowerupSlider();
+    MI_PowerupSlider(gfxSprite * nspr, gfxSprite * nsprSlider, gfxSprite * nsprPowerup, short x, short y, short width, short powerupIndex);
+    virtual ~MI_PowerupSlider();
 
-		//Draws every frame
-		void Draw();
+    //Draws every frame
+    void Draw();
 
-	protected:
+protected:
 
-		gfxSprite * sprPowerup;
-		short iPowerupIndex;
-		short iHalfWidth;
+    gfxSprite * sprPowerup;
+    short iPowerupIndex;
+    short iHalfWidth;
 };
 
 class MI_FrenzyModeOptions : public UI_Control
 {
-	public:
+public:
 
-		MI_FrenzyModeOptions(short x, short y, short width, short numlines);
-		virtual ~MI_FrenzyModeOptions();
+    MI_FrenzyModeOptions(short x, short y, short width, short numlines);
+    virtual ~MI_FrenzyModeOptions();
 
-		MenuCodeEnum Modify(bool modify);
-		MenuCodeEnum SendInput(CPlayerInput * playerInput);
+    MenuCodeEnum Modify(bool modify);
+    MenuCodeEnum SendInput(CPlayerInput * playerInput);
 
-		void Update();
-		void Draw();
+    void Update();
+    void Draw();
 
-		void MoveNext();
-		void MovePrev();
+    void MoveNext();
+    void MovePrev();
 
-		void SetRandomGameModeSettings();
+    void SetRandomGameModeSettings();
 
-		MenuCodeEnum MouseClick(short iMouseX, short iMouseY);
+    MenuCodeEnum MouseClick(short iMouseX, short iMouseY);
 
-		void Refresh();
+    void Refresh();
 
-	private:
-		
-		void SetupPowerupFields();
-		void AdjustDisplayArrows();
+private:
 
-		short iIndex, iOffset;
-		short iTopStop, iBottomStop;
-		short iNumLines;
-		short iWidth;
+    void SetupPowerupFields();
+    void AdjustDisplayArrows();
 
-		UI_Menu * mMenu;
-	
-		MI_SelectField * miQuantityField;
-		MI_SelectField * miRateField;
-		MI_SelectField * miStoredShellsField;
-		MI_PowerupSlider * miPowerupSlider[NUMFRENZYCARDS];
-		MI_Button * miBackButton;
+    short iIndex, iOffset;
+    short iTopStop, iBottomStop;
+    short iNumLines;
+    short iWidth;
 
-		MI_Image * miUpArrow;
-		MI_Image * miDownArrow;
+    UI_Menu * mMenu;
+
+    MI_SelectField * miQuantityField;
+    MI_SelectField * miRateField;
+    MI_SelectField * miStoredShellsField;
+    MI_PowerupSlider * miPowerupSlider[NUMFRENZYCARDS];
+    MI_Button * miBackButton;
+
+    MI_Image * miUpArrow;
+    MI_Image * miDownArrow;
 };
 
 class MI_TextField : public UI_Control
 {
-	public:
+public:
 
-		MI_TextField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent);
-		virtual ~MI_TextField();
+    MI_TextField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent);
+    virtual ~MI_TextField();
 
-		void SetTitle(char * name);
+    void SetTitle(char * name);
 
-		//Gets the values of the currently selected item
-		char * GetValue() {return szValue;}
+    //Gets the values of the currently selected item
+    char * GetValue() {
+        return szValue;
+    }
 
-		//Called when user selects this control to change it's value
-		MenuCodeEnum Modify(bool modify);
+    //Called when user selects this control to change it's value
+    MenuCodeEnum Modify(bool modify);
 
-		void Clear() {szValue[0] = 0; iCursorIndex = 0; iNumChars = 1;}
+    void Clear() {
+        szValue[0] = 0;
+        iCursorIndex = 0;
+        iNumChars = 1;
+    }
 
-		//Updates animations or other events every frame
-		void Update();
+    //Updates animations or other events every frame
+    void Update();
 
-		//Draws every frame
-		virtual void Draw();
+    //Draws every frame
+    virtual void Draw();
 
-		//Sends player input to control on every frame
-		virtual MenuCodeEnum SendInput(CPlayerInput * playerInput);
+    //Sends player input to control on every frame
+    virtual MenuCodeEnum SendInput(CPlayerInput * playerInput);
 
-		//When the item is changed, this code will be returned from SendInput()
-		void SetItemChangedCode(MenuCodeEnum code) {mcItemChangedCode = code;}
-		void SetControlSelectedCode(MenuCodeEnum code) {mcControlSelectedCode = code;}
+    //When the item is changed, this code will be returned from SendInput()
+    void SetItemChangedCode(MenuCodeEnum code) {
+        mcItemChangedCode = code;
+    }
+    void SetControlSelectedCode(MenuCodeEnum code) {
+        mcControlSelectedCode = code;
+    }
 
-		//Set where the data of this control is written to (some member of game_values probably)
-		void SetData(char * value, short maxchars);
-		
-		MenuCodeEnum MouseClick(short iMouseX, short iMouseY);
+    //Set where the data of this control is written to (some member of game_values probably)
+    void SetData(char * value, short maxchars);
 
-		void Refresh();
+    MenuCodeEnum MouseClick(short iMouseX, short iMouseY);
 
-		void SetDisallowedChars(const char * chars);
+    void Refresh();
 
-	protected:
+    void SetDisallowedChars(const char * chars);
 
-		void UpdateCursor();
+protected:
 
-		short iCursorIndex;
-		short iNumChars, iMaxChars;
+    void UpdateCursor();
 
-		gfxSprite * spr;
-		char * szName;
+    short iCursorIndex;
+    short iNumChars, iMaxChars;
 
-		char * szValue;
+    gfxSprite * spr;
+    char * szName;
 
-		short iWidth, iIndent;
+    char * szValue;
 
-		MI_Image * miModifyCursor;
-		
-		MenuCodeEnum mcItemChangedCode;
-		MenuCodeEnum mcControlSelectedCode;
+    short iWidth, iIndent;
 
-		short iAdjustmentY;
-		char * szTempValue;
+    MI_Image * miModifyCursor;
 
-		short iStringWidth, iAllowedWidth;
+    MenuCodeEnum mcItemChangedCode;
+    MenuCodeEnum mcControlSelectedCode;
 
-		char szDisallowedChars[32];
+    short iAdjustmentY;
+    char * szTempValue;
+
+    short iStringWidth, iAllowedWidth;
+
+    char szDisallowedChars[32];
 };
 
 
 class MI_MapField : public UI_Control
 {
-	public:
+public:
 
-		MI_MapField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent, bool showtags);
-		virtual ~MI_MapField();
+    MI_MapField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent, bool showtags);
+    virtual ~MI_MapField();
 
-		//Called when user selects this control to change it's value
-		MenuCodeEnum Modify(bool modify);
+    //Called when user selects this control to change it's value
+    MenuCodeEnum Modify(bool modify);
 
-		//Updates animations or other events every frame
-		void Update();
+    //Updates animations or other events every frame
+    void Update();
 
-		//Draws every frame
-		void Draw();
+    //Draws every frame
+    void Draw();
 
-		//Sends player input to control on every frame
-		MenuCodeEnum SendInput(CPlayerInput * playerInput);
+    //Sends player input to control on every frame
+    MenuCodeEnum SendInput(CPlayerInput * playerInput);
 
-		void AdjustIndicators();
+    void AdjustIndicators();
 
-		void LoadCurrentMap();
-		void LoadMap(const char * szMapPath);
+    void LoadCurrentMap();
+    void LoadMap(const char * szMapPath);
 
-		bool SetMap(const char * szMapName, bool fWorld);
-		void SetSpecialMap(const char * szMapName, const char * szMapPath);
+    bool SetMap(const char * szMapName, bool fWorld);
+    void SetSpecialMap(const char * szMapName, const char * szMapPath);
 
-		const char * GetMapName() {return szMapName;}
+    const char * GetMapName() {
+        return szMapName;
+    }
 
-		MenuCodeEnum ChooseRandomMap();
+    MenuCodeEnum ChooseRandomMap();
 
-		MenuCodeEnum MouseClick(short iMouseX, short iMouseY);
+    MenuCodeEnum MouseClick(short iMouseX, short iMouseY);
 
-		bool MovePrev(bool fScrollFast);
-		bool MoveNext(bool fScrollFast);
+    bool MovePrev(bool fScrollFast);
+    bool MoveNext(bool fScrollFast);
 
-		void SetDimensions(short iWidth, short iIndent);
+    void SetDimensions(short iWidth, short iIndent);
 
-	protected:
+protected:
 
-		bool Move(bool fNext, bool fScrollFast);
+    bool Move(bool fNext, bool fScrollFast);
 
-		gfxSprite * spr;
-		
-		SDL_Surface * surfaceMapBackground;
-		SDL_Surface * surfaceMapBlockLayer;
-		SDL_Surface * surfaceMapForeground;
-		SDL_Rect rectDst;
+    gfxSprite * spr;
 
-		char * szName;
-		char szMapName[256];
-		short iWidth, iIndent;
+    SDL_Surface * surfaceMapBackground;
+    SDL_Surface * surfaceMapBlockLayer;
+    SDL_Surface * surfaceMapForeground;
+    SDL_Rect rectDst;
 
-		MI_Image * miModifyImageLeft;
-		MI_Image * miModifyImageRight;
+    char * szName;
+    char szMapName[256];
+    short iWidth, iIndent;
 
-		short iSlideListOut;
-		short iSlideListOutGoal;
+    MI_Image * miModifyImageLeft;
+    MI_Image * miModifyImageRight;
 
-		std::string sSearchString;
-		short iSearchStringTimer;
+    short iSlideListOut;
+    short iSlideListOutGoal;
 
-		bool fShowtags;
+    std::string sSearchString;
+    short iSearchStringTimer;
+
+    bool fShowtags;
 };
 
 #endif //__UICONTROL_H_

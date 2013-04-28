@@ -828,11 +828,16 @@ extern short g_iCurrentPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
 
 extern short g_iCurrentDrawIndex;
 
+#include "randFuncs.h"
+
 void _load_drawmsg(const std::string& f);
 void _load_waitforkey();
 
 void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short startY, short endX, short endY, float angle, float radiusX, float radiusY, short iSize, short iPlatformWidth, short iPlatformHeight, bool fDrawPlatform, bool fDrawShadow);
 void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter);
+
+// main game object - over time shall be used to
+extern CGame	*smw;
 
 //tournament scores
 struct ts

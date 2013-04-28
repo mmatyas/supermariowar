@@ -25,6 +25,8 @@ CGame::CGame(char *rootDirectory)
     }
 #endif
 
+    ScreenWidth = 640;
+    ScreenHeight = 480;
 }
 
 void CGame::Go()

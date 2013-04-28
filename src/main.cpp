@@ -1096,9 +1096,6 @@ void SpinScreen()
 	y_shake = (short)(shakey);
 }
 
-// main game object - over time shall be used to 
-CGame	*smw;
-
 Menu g_Menu;
 gv game_values;
 
@@ -1108,7 +1105,10 @@ char		*RootDataDirectory;
 #ifdef	WIN32
 int CALLBACK WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,int nCmdShow)
 {
-    RootDataDirectory = lpCmdLine;
+	// this will print important debugging information to debug console
+	_CrtSetReportMode( _CRT_WARN, _CRTDBG_MODE_DEBUG );
+	
+	RootDataDirectory = lpCmdLine;
 
 	if (strlen(RootDataDirectory) == 0){
 	fprintf(stderr, "Please specify root data directory\n");

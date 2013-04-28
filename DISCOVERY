@@ -28,6 +28,16 @@ Compatibility to old SMW directory paths shall be preserved at least till 2.0.
 
 numeric indexes in the .txt files shall be replaced by enum constants (like Music Category, etc)
 
+Replacing 'rand() %' with properly uniform distributed function GetRandMax()
+
+Adding preliminary support for bigger screen resolutions (might not work e.g. no big enough maps or missing scrolling support)
+
+AI-controlled players :)
+
+better sound for eggs game
+
+bomb explosion -> smaller
+
 Data directory structure
 ------------------------
 
