@@ -5789,8 +5789,8 @@ void MO_FrenzyCard::placeCard()
 //------------------------------------------------------------------------------
 // class collection card (for card collection mode)
 //------------------------------------------------------------------------------
-MO_CollectionCard::MO_CollectionCard(gfxSprite *nspr, short iType, short iValue, short iUncollectableTime, float dvelx, float dvely, short ix, short iy) :
-    IO_MovingObject(nspr, ix, iy, 6, 8, -1, -1, -1, -1, 0, 0, 32, 32)
+MO_CollectionCard::MO_CollectionCard(gfxSprite *nspr, short iType, short iValue, short iUncollectableTime, float dvelx, float dvely, short iX, short iY) :
+    IO_MovingObject(nspr, iX, iY, 6, 8, -1, -1, -1, -1, 0, 0, 32, 32)
 {
     state = 1;
     objectType = object_moving;
@@ -6293,8 +6293,8 @@ void MO_Goomba::Die()
 //------------------------------------------------------------------------------
 // class koopa
 //------------------------------------------------------------------------------
-MO_Koopa::MO_Koopa(gfxSprite *nspr, bool moveToRight, bool red, bool fBouncing, bool fFallOffLedges) :
-    MO_WalkingEnemy(nspr, 2, 8, 30, 28, 1, 25, 0, moveToRight ? 0 : 54, 54, 32, moveToRight, true, fBouncing, fFallOffLedges)
+MO_Koopa::MO_Koopa(gfxSprite *nspr, bool moveToRight, bool red, bool fBouncing, bool bFallOffLedges) :
+    MO_WalkingEnemy(nspr, 2, 8, 30, 28, 1, 25, 0, moveToRight ? 0 : 54, 54, 32, moveToRight, true, fBouncing, bFallOffLedges)
 {
     fRed = red;
     movingObjectType = movingobject_koopa;
@@ -8323,8 +8323,8 @@ bool CO_ThrowBox::HasKillVelocity()
 //------------------------------------------------------------------------------
 // class spring
 //------------------------------------------------------------------------------
-CO_Spring::CO_Spring(gfxSprite *nspr, short ix, short iy, bool fsuper) :
-    MO_CarriedObject(nspr, ix, iy, 4, 4, 30, 31, 1, 0)
+CO_Spring::CO_Spring(gfxSprite *nspr, short iX, short iY, bool fsuper) :
+    MO_CarriedObject(nspr, iX, iY, 4, 4, 30, 31, 1, 0)
 {
     fSuper = fsuper;
     iOffsetY = fSuper ? 32 : 0;
@@ -8831,8 +8831,8 @@ void OMO_PipeCoin::draw()
 //------------------------------------------------------------------------------
 // class pipe powerup (for coin pipe minigame)
 //------------------------------------------------------------------------------
-OMO_PipeBonus::OMO_PipeBonus(gfxSprite *nspr, float dvelx, float dvely, short ix, short iy, short type, short duration, short uncollectabletime) :
-    IO_OverMapObject(nspr, ix, iy, 4, 8, 30, 30, 1, 1, 0, type << 5, 32, 32)
+OMO_PipeBonus::OMO_PipeBonus(gfxSprite *nspr, float dvelx, float dvely, short iX, short iY, short type, short duration, short uncollectabletime) :
+    IO_OverMapObject(nspr, iX, iY, 4, 8, 30, 30, 1, 1, 0, type << 5, 32, 32)
 {
     iType = type;
     iDuration = duration;

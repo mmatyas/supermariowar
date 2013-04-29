@@ -23,10 +23,7 @@
 //#include "net.h"
 #include "path.h"
 
-
-#ifdef LINUXFUNC
 #include "linfunc.h"
-#endif
 
 struct STextAward {
     const char		*name;
@@ -451,6 +448,7 @@ struct GameModeSettings {
 
 //------------- global variables / etc -------------
 //i know that using so much global variables is ugly, this will change somewhen
+//neagix: that somewhen is *NOW*
 
 //gfx stuff
 extern SDL_Surface		*screen;		//for gfx
@@ -467,8 +465,8 @@ extern SDL_Joystick		**joysticks;
 extern short			joystickcount;
 
 extern CScore			*score[4];
-extern short			respawn[4];
-extern short			projectiles[4];
+//extern short			respawn[4];
+//extern short			projectiles[4];
 extern short			score_cnt;
 
 extern CObjectContainer noncolcontainer;

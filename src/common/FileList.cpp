@@ -344,31 +344,31 @@ MusicEntry::MusicEntry(const std::string & musicdirectory)
 
         //If we found a category header
         if(szBuffer[0] == '[') {
-            if(!_stricmp(szBuffer, "[land]"))
+            if(!strCiCompare(szBuffer, "[land]"))
                 iAddToCategory = 0;
-            else if(!_stricmp(szBuffer, "[underground]"))
+            else if(!strCiCompare(szBuffer, "[underground]"))
                 iAddToCategory = 1;
-            else if(!_stricmp(szBuffer, "[underwater]"))
+            else if(!strCiCompare(szBuffer, "[underwater]"))
                 iAddToCategory = 2;
-            else if(!_stricmp(szBuffer, "[castle]"))
+            else if(!strCiCompare(szBuffer, "[castle]"))
                 iAddToCategory = 3;
-            else if(!_stricmp(szBuffer, "[platforms]"))
+            else if(!strCiCompare(szBuffer, "[platforms]"))
                 iAddToCategory = 4;
-            else if(!_stricmp(szBuffer, "[ghost]"))
+            else if(!strCiCompare(szBuffer, "[ghost]"))
                 iAddToCategory = 5;
-            else if(!_stricmp(szBuffer, "[bonus]"))
+            else if(!strCiCompare(szBuffer, "[bonus]"))
                 iAddToCategory = 6;
-            else if(!_stricmp(szBuffer, "[battle]"))
+            else if(!strCiCompare(szBuffer, "[battle]"))
                 iAddToCategory = 7;
-            else if(!_stricmp(szBuffer, "[desert]"))
+            else if(!strCiCompare(szBuffer, "[desert]"))
                 iAddToCategory = 8;
-            else if(!_stricmp(szBuffer, "[clouds]"))
+            else if(!strCiCompare(szBuffer, "[clouds]"))
                 iAddToCategory = 9;
-            else if(!_stricmp(szBuffer, "[snow]"))
+            else if(!strCiCompare(szBuffer, "[snow]"))
                 iAddToCategory = 10;
-            else if(!_stricmp(szBuffer, "[maps]"))
+            else if(!strCiCompare(szBuffer, "[maps]"))
                 iAddToCategory = MAXMUSICCATEGORY;
-            else if(!_stricmp(szBuffer, "[backgrounds]"))
+            else if(!strCiCompare(szBuffer, "[backgrounds]"))
                 iAddToCategory = MAXMUSICCATEGORY + 1;
 
             continue;
@@ -708,29 +708,29 @@ WorldMusicEntry::WorldMusicEntry(const std::string & musicdirectory)
 
         //If we found a category header
         if(szBuffer[0] == '[') {
-            if(!_stricmp(szBuffer, "[grass]"))
+            if(!strCiCompare(szBuffer, "[grass]"))
                 iAddToCategory = 0;
-            else if(!_stricmp(szBuffer, "[desert]"))
+            else if(!strCiCompare(szBuffer, "[desert]"))
                 iAddToCategory = 1;
-            else if(!_stricmp(szBuffer, "[water]"))
+            else if(!strCiCompare(szBuffer, "[water]"))
                 iAddToCategory = 2;
-            else if(!_stricmp(szBuffer, "[giant]"))
+            else if(!strCiCompare(szBuffer, "[giant]"))
                 iAddToCategory = 3;
-            else if(!_stricmp(szBuffer, "[sky]"))
+            else if(!strCiCompare(szBuffer, "[sky]"))
                 iAddToCategory = 4;
-            else if(!_stricmp(szBuffer, "[ice]"))
+            else if(!strCiCompare(szBuffer, "[ice]"))
                 iAddToCategory = 5;
-            else if(!_stricmp(szBuffer, "[pipe]"))
+            else if(!strCiCompare(szBuffer, "[pipe]"))
                 iAddToCategory = 6;
-            else if(!_stricmp(szBuffer, "[dark]"))
+            else if(!strCiCompare(szBuffer, "[dark]"))
                 iAddToCategory = 7;
-            else if(!_stricmp(szBuffer, "[space]"))
+            else if(!strCiCompare(szBuffer, "[space]"))
                 iAddToCategory = 8;
-            else if(!_stricmp(szBuffer, "[bonus]"))
+            else if(!strCiCompare(szBuffer, "[bonus]"))
                 iAddToCategory = WORLDMUSICBONUS;
-            else if(!_stricmp(szBuffer, "[sleep]"))
+            else if(!strCiCompare(szBuffer, "[sleep]"))
                 iAddToCategory = WORLDMUSICSLEEP;
-            else if(!_stricmp(szBuffer, "[worlds]"))
+            else if(!strCiCompare(szBuffer, "[worlds]"))
                 iAddToCategory = WORLDMUSICWORLDS;
 
             continue;

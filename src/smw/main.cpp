@@ -1696,7 +1696,7 @@ void RunGame()
                         short iNumKillPlayers = 0;
                         CPlayer * pKillPlayers[4];
 
-                        CPlayer * killer = GetPlayerFromGlobalID(game_values.screenshakeplayerid);
+                        CPlayer * killer1 = GetPlayerFromGlobalID(game_values.screenshakeplayerid);
 
                         for(short k = 0; k < list_players_cnt; k++) {
                             CPlayer * player = list_players[k];
@@ -1714,11 +1714,11 @@ void RunGame()
                                 if(game_values.screenshakekillinair == player->inair) {
                                     pKillPlayers[iNumKillPlayers++] = player;
 
-                                    if(killer) {
+                                    if(killer1) {
                                         game_values.screenshakekillscount++;
 
-                                        if(killer->inair)
-                                            killer->killsinrowinair--;  //Don't want to give both shake and in air award
+                                        if(killer1->inair)
+                                            killer1->killsinrowinair--;  //Don't want to give both shake and in air award
                                     }
                                 }
                             }
@@ -1796,10 +1796,10 @@ void RunGame()
                         if(game_values.screenshakekillscount > 1 && game_values.awardstyle != award_style_none) {
                             game_values.screenshakekillscount = 0;
 
-                            CPlayer * killer = GetPlayerFromGlobalID(game_values.screenshakeplayerid);
+                            CPlayer * killer2 = GetPlayerFromGlobalID(game_values.screenshakeplayerid);
 
-                            if(killer)
-                                killer->AddKillsInRowInAirAward();
+                            if(killer2)
+                                killer2->AddKillsInRowInAirAward();
                         }
                     } else {
                         //Make sure we zero out the shake value after it is done
@@ -3060,9 +3060,9 @@ void UpdateMusicWithOverrides()
 
         //If we found a category header
         if(szBuffer[0] == '[') {
-            if(!_stricmp(szBuffer, "[maps]"))
+            if(!strCiCompare(szBuffer, "[maps]"))
                 iAddToCategory = 1;
-            else if(!_stricmp(szBuffer, "[worlds]"))
+            else if(!strCiCompare(szBuffer, "[worlds]"))
                 iAddToCategory = 2;
 
             continue;

@@ -238,14 +238,14 @@ void MI_InputControlField::SetKey(short * iSetKey, short key, short device)
         if(game_values.playerInput.inputControls[iPlayer]->iDevice != device)
             continue;
 
-        for(int iKey = 0; iKey < NUM_KEYS; iKey++) {
-            if(iKey == iKeyIndex && iPlayer == iPlayerIndex)
+        for(int selKey = 0; selKey < NUM_KEYS; selKey++) {
+            if(selKey == iKeyIndex && iPlayer == iPlayerIndex)
                 continue;
 
-            if(game_values.playerInput.inputControls[iPlayer]->inputGameControls[iType].keys[iKey] == key) {
+            if(game_values.playerInput.inputControls[iPlayer]->inputGameControls[iType].keys[selKey] == key) {
                 fNeedSwap = true;
                 iSwapPlayer = iPlayer;
-                iSwapKey = iKey;
+                iSwapKey = selKey;
                 break;
             }
         }
@@ -443,14 +443,14 @@ MenuCodeEnum MI_InputControlContainer::Modify(bool modify)
 
 void MI_InputControlContainer::SetVisibleInputFields()
 {
-    int iDevice = miDeviceSelectField->GetShortValue();
+    int selDevice = miDeviceSelectField->GetShortValue();
 
     for(int iKey = 0; iKey < NUM_KEYS; iKey++) {
-        miGameInputControlFields[iKey]->Show(0 == iSelectedInputType && (iKey < 6 || DEVICE_KEYBOARD != iDevice || iPlayerID == 0));
+        miGameInputControlFields[iKey]->Show(0 == iSelectedInputType && (iKey < 6 || DEVICE_KEYBOARD != selDevice || iPlayerID == 0));
     }
 
     for(int iKey = 0; iKey < NUM_KEYS; iKey++) {
-        miMenuInputControlFields[iKey]->Show(1 == iSelectedInputType && (iKey < 6 || DEVICE_KEYBOARD != iDevice || iPlayerID == 0));
+        miMenuInputControlFields[iKey]->Show(1 == iSelectedInputType && (iKey < 6 || DEVICE_KEYBOARD != selDevice || iPlayerID == 0));
     }
 }
 

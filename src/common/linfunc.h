@@ -1,17 +1,28 @@
 #ifndef LINFUNC_CPP
 #define LINFUNC_CPP
 
-//The purpose of this file is to create any compatibility functions needed for linux.
-//do NOT include it for non-linux builds!
-#define _strdup strdup
-#define _stricmp strcasecmp
-#define strlwr	lowercase
-#define _unlink unlink
-#define Sleep SDL_Delay
-#ifdef _DEBUG
+#ifdef	_WIN32
+
+#define strCiCompare	_stricmp
+#define	inPlaceLowerCase	_strlwr
+
+#else
+
+char *inPlaceLowerCase(char *str);
+
+//#define _strdup strdup
+//#define _stricmp strcasecmp
+//#define strlwr	lowercase
+//#define _unlink unlink
+//#define Sleep SDL_Delay
+
+#define strCiCompare	strcasecmp
+
+//_DEBUG
+#if 0
 bool CopyFile(const char *src, const char *dest, bool dontOverwrite);
 #endif
 
-//char *_strlwr(char *str);
-
 #endif
+
+#endif // LINFUNC_CPP

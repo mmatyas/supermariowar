@@ -423,7 +423,7 @@ void NetClient::handleserver()
 {
 	Uint8 data[512];
 	int pos, len;
-	int used;
+//	int used;
 
 	/* Has the connection been lost with the server? */
 	len = SDLNet_TCP_Recv(tcpsock, (char *)data, 512);
@@ -436,7 +436,7 @@ void NetClient::handleserver()
     } else {
 		pos = 0;
         while ( len > 0 ) {
-			used = handleserverdata(&data[pos]);
+			int used = handleserverdata(&data[pos]);
 			pos += used;
 			len -= used;
 			
@@ -540,7 +540,7 @@ void NetClient::cleanup()
 void NetClient::sendjoin()
 {
 	char join[1+1+256];
-	char * name = "TestClient";
+	const char * name = "TestClient";
 
     if ( tcpsock != NULL ) {
 		/* Construct the packet */

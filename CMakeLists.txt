@@ -294,10 +294,6 @@ if (APPLE)
 	#echo 'COMMON_OBJS:=$(COMMON_OBJS) build/linfunc.o build/SDLMain.o' >> configuration
 endif()
 
-if (NOT Win32)
-	add_definitions(-DLINUXFUNC)
-endif()
-
 ########################################
 # Setup include directories (and make sure they are preferred over the Externals)
 #
@@ -329,7 +325,7 @@ set(COMMON_SRCS ../common/FileIO.cpp ../common/FileList.cpp ../common/MapList.cp
            ../common/eyecandy.cpp ../common/gfx.cpp ../common/global.cpp ../common/input.cpp 
            ../common/map.cpp ../common/movingplatform.cpp ../common/path.cpp 
            ../common/uimenu.cpp ../common/sfx.cpp ../common/ResourceManager.cpp
-           ../common/uicontrol.cpp ../common/uimenu.cpp
+           ../common/uicontrol.cpp ../common/uimenu.cpp ../common/linfunc.cpp
 )
 
 include_directories(src/smw)

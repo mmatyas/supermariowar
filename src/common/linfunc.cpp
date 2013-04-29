@@ -1,7 +1,8 @@
 #include <ctype.h>
 #include <string.h>
 
-#ifdef _DEBUG
+//_DEBUG
+#if 0
 #include <iostream>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -33,7 +34,8 @@ bool CopyFile(const char *src, const char *dest, bool dontOverwrite)
 }
 #endif
 
-char *_strlwr(char *str)
+// apply lowercase without duplicating, used only internally
+char *inPlaceLowerCase(char *str)
 {
     char *p = str;
 
@@ -41,4 +43,10 @@ char *_strlwr(char *str)
         *p = tolower(*p);
 
     return str;
+}
+
+
+char *lowercaseDup(const char *name)
+{
+	return inPlaceLowerCase(strdup(name));
 }

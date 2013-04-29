@@ -26,14 +26,6 @@ using std::string;
 
 extern int g_iVersion[];
 
-char *lowercase(char *name)
-{
-    for(unsigned int k = 0; k < strlen(name); k++) {
-        name[k] = (char)tolower(name[k]);
-    }
-
-    return name;
-}
 
 MapListNode::MapListNode(std::string fullName)
 {
@@ -244,14 +236,14 @@ void MapList::add(const char * name)
 
 bool MapList::find(const char * name)
 {
-    char * szLookForName = lowercase(_strdup(name));
+    char * szLookForName = lowercaseDup(name);
     bool fFound = false;
 
     std::map<std::string, MapListNode*>::iterator oldCurrent = current;
     do {
         next(false);	//sets us to the beginning if we hit the end -> loop through the maps
 
-        char * szCurrentName = lowercase(_strdup((*current).second->filename.c_str()));
+        char * szCurrentName = lowercaseDup((*current).second->filename.c_str());
 
         if(strstr(szCurrentName, szLookForName))	//compare names after
             fFound = true;
@@ -268,7 +260,7 @@ bool MapList::findexact(const char * name, bool fWorld)
 {
     char * szLookForName = new char[strlen(name) + 1];
     strcpy(szLookForName, name);
-    lowercase(szLookForName);
+    inPlaceLowerCase(szLookForName);
 
     bool fFound = false;
 
@@ -280,7 +272,7 @@ bool MapList::findexact(const char * name, bool fWorld)
         while(iterateAll != lim && !fFound) {
             char * szCurrentName = new char[iterateAll->first.length() + 1];
             strcpy(szCurrentName, iterateAll->first.c_str());
-            lowercase(szCurrentName);
+            inPlaceLowerCase(szCurrentName);
 
             if(!strcmp(szCurrentName, szLookForName)) {
                 fFound = true;
@@ -304,7 +296,7 @@ bool MapList::findexact(const char * name, bool fWorld)
 
         char * szCurrentName = new char[current->first.length() + 1];
         strcpy(szCurrentName, current->first.c_str());
-        lowercase(szCurrentName);
+        inPlaceLowerCase(szCurrentName);
 
         if(!strcmp(szCurrentName, szLookForName))
             fFound = true;
