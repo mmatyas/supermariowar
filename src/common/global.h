@@ -169,7 +169,7 @@ struct STextAward {
 
 #define NUMBONUSITEMSONWHEEL 10
 
-#define ifsoundonplay(x) (game_values.sound ? x.play() : -1)
+#define ifsoundonplay(x) if (game_values.sound) x.play()
 #define ifsoundonandreadyplay(x) (x.isready() && game_values.sound ? x.play() : -1)
 #define ifsoundonplayloop(x,y) (game_values.sound ? x.playloop(y) : -1)
 #define ifsoundonstop(x) (game_values.sound ? x.stop() : void(NULL))
@@ -465,8 +465,7 @@ extern SDL_Joystick		**joysticks;
 extern short			joystickcount;
 
 extern CScore			*score[4];
-//extern short			respawn[4];
-//extern short			projectiles[4];
+
 extern short			score_cnt;
 
 extern CObjectContainer noncolcontainer;
@@ -479,6 +478,7 @@ extern sfxSound			sfx_announcer[PANNOUNCER_SOUND_LAST];
 
 extern bool fResumeMusic;
 
+//TODO: move all of these to resource manager and make sure they can be disposed/reloaded dynamically
 extern sfxSound			sfx_mip;
 extern sfxSound			sfx_deathsound;
 extern sfxSound			sfx_jump;
@@ -566,14 +566,6 @@ extern short g_iDefaultPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
 extern short g_iCurrentPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
 
 extern short g_iCurrentDrawIndex;
-
-#pragma warning("This needs to be verified")
-#ifdef _XBOX
-//TV's seem to need extra shade
-#define	SCREEN_BACKGROUND_FADE	96
-#else
-#define	SCREEN_BACKGROUND_FADE	72
-#endif
 
 #include "randFuncs.h"
 

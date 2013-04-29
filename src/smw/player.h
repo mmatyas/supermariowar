@@ -168,7 +168,16 @@ class CPlayer
         return fSuperStomp;
     }
 
-		void SetStoredPowerup(short iPowerup);
+    void decreaseProjectilesCount() {
+        if (projectiles > 0)
+            projectiles--;
+    }
+
+    void increaseProjectilesCount(int amount) {
+            projectiles += amount;
+    }
+
+    void SetStoredPowerup(short iPowerup);
 		void StripPowerups();
 
 		short shield;
@@ -348,6 +357,7 @@ class CPlayer
 
 		short powerup;
 		short projectilelimit;
+		int projectiles;
 		short tanookilimit;
 
 		bool bobomb;

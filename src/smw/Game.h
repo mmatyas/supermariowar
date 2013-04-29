@@ -129,6 +129,7 @@ public:
 
 	int ScreenWidth;
 	int ScreenHeight;
+	int MenuTransparency;
 	CRandomNumberGenerator	*rng;
 
 	int GetScreenWidth(int iSize) {

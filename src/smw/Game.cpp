@@ -18,10 +18,21 @@ CGame::CGame(char *rootDirectory)
 #if	_WIN32
     if (CreateDirectory(smwHome .c_str(), NULL) ||
             ERROR_ALREADY_EXISTS == GetLastError()) {
-#pragma warning ("print log message about success")
+    	//TODO: print that directory already exists
+
     } else {
-#pragma warning ("print log message about error")
+    	//TODO: print that we created the directory
     }
+#else
+    //TODO: create directory in MacOSX/Linux systems
+#endif
+
+#ifdef _XBOX
+    	//TODO: make this configurable!
+    	//TV's seem to need extra shade
+    	MenuTransparency = 96;
+#else
+    	MenuTransparency = 72;
 #endif
 
     ScreenWidth = 640;

@@ -1562,7 +1562,7 @@ void RunGame()
                         game_values.pausegame = !game_values.pausegame;
 
                         if(game_values.pausegame) {
-                            rm->menu_shade.setalpha(SCREEN_BACKGROUND_FADE	);
+                            rm->menu_shade.setalpha(smw->MenuTransparency	);
                             rm->menu_shade.draw(0, 0);
 
                             //Stop the pwings sound if it is on
@@ -1591,7 +1591,7 @@ void RunGame()
                         return;
                     } else {
                         if(!game_values.pausegame && !game_values.exitinggame) {
-                            rm->menu_shade.setalpha(SCREEN_BACKGROUND_FADE	);
+                            rm->menu_shade.setalpha(smw->MenuTransparency	);
                             rm->menu_shade.draw(0, 0);
                             game_values.exitinggame = true;
                             //ifsoundonpause(sfx_invinciblemusic);
@@ -2965,7 +2965,7 @@ bool SwapPlayers(short iUsingPlayerID)
             game_values.swapplayersblink = false;
             game_values.swapplayersblinkcount = 0;
         } else {
-            game_values.screenfade = SCREEN_BACKGROUND_FADE	;
+            game_values.screenfade = smw->MenuTransparency	;
         }
     }
 

@@ -251,7 +251,7 @@ bool LoadAndSplashScreen()
                 //else
                 {
                     blitdest = rm->menu_backdrop.getSurface();
-                    rm->menu_shade.setalpha(SCREEN_BACKGROUND_FADE);
+                    rm->menu_shade.setalpha(smw->MenuTransparency);
                     rm->menu_shade.draw(0, 0);
                     blitdest = screen;
 

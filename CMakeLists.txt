@@ -133,7 +133,7 @@ endif(NOT MSVC)
 
 # gcc uses some optimizations which might break stuff without this flag
 ##TODO: test this please, coming from template (1)
-add_definitions(-fno-strict-aliasing -fexceptions)
+add_definitions(-fno-strict-aliasing -fexceptions -Wno-shadow)
 
 ##TODO: test this please, coming from smw Makefile
 add_definitions(-D_GNU_SOURCE=1 -D_REENTRANT)

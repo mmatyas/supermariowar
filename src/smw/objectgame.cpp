@@ -29,8 +29,10 @@ void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead
         }
 
         if(fDie || forcedead) {
-            if(iPlayerID > -1 && projectiles[iPlayerID] > 0)
-                projectiles[iPlayerID]--;
+        	CPlayer * player = GetPlayerFromGlobalID(iPlayerID);
+
+        	if (player != NULL)
+        		player->decreaseProjectilesCount();
 
             object->dead = true;
             eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, object->ix + (object->iw >> 1) - 16, object->iy + (object->ih >> 1) - 16, 3, 4));
@@ -3682,7 +3684,9 @@ void MO_SledgeHammer::explode()
             objectcontainer[2].add(new MO_Hammer(&rm->spr_hammer, iCenterX, iCenterY, 6, dVelX, dVelY, 5, playerID, teamID, iColorID, true));
         }
 
-        projectiles[playerID] += 3;
+    	CPlayer * player = GetPlayerFromGlobalID(playerID);
+
+   		player->increaseProjectilesCount(3);
 
         ifsoundonplay(sfx_cannon);
     }
@@ -4166,8 +4170,10 @@ void CO_Bomb::Die()
         owner = NULL;
     }
 
-    if(iPlayerID > -1 && projectiles[iPlayerID] > 0)
-        projectiles[iPlayerID]--;
+	CPlayer * player = GetPlayerFromGlobalID(iPlayerID);
+
+	if (player != NULL)
+		player->decreaseProjectilesCount();
 
     dead = true;
     objectcontainer[2].add(new MO_Explosion(&rm->spr_explosion, ix + (iw >> 2) - 96, iy + (ih >> 2) - 64, 2, 4, iPlayerID, iTeamID, kill_style_bomb));
@@ -4414,8 +4420,10 @@ void OMO_BowserFire::update()
     IO_OverMapObject::update();
 
     if((velx < 0 && ix < -iw) || (velx > 0 && ix > smw->ScreenWidth)) {
-        if(iPlayerID != -1 && projectiles[iPlayerID] > 0)
-            projectiles[iPlayerID]--;
+    	CPlayer * player = GetPlayerFromGlobalID(iPlayerID);
+
+    	if (player != NULL)
+    		player->decreaseProjectilesCount();
 
         dead = true;
     }

@@ -250,7 +250,7 @@ bool CResourceManager::LoadMenuGraphics()
     const char * graphicspack = menugraphicspacklist->current_name();
 
     gfx_loadimagenocolorkey(&menu_shade, convertPath("gfx/packs/menu/menu_shade.png", graphicspack));
-    menu_shade.setalpha(SCREEN_BACKGROUND_FADE);
+    menu_shade.setalpha(smw->MenuTransparency);
 
     gfx_loadimage(&spr_scoreboard, convertPath("gfx/packs/menu/scoreboard.png", graphicspack), false);
     gfx_loadimage(&menu_slider_bar, convertPath("gfx/packs/menu/menu_slider_bar.png", graphicspack), false);

@@ -1204,11 +1204,12 @@ void CPlayer::move()
                     if(bobomb) { //If we're a bob-omb, explode
                         action = player_action_bobomb;
                     } else {
-                        if(powerup == 1 && projectiles[globalID] < 2) {
+
+                        if(powerup == 1 && projectiles < 2) {
                             if(game_values.fireballlimit == 0 || projectilelimit > 0) {
                                 action = player_action_fireball;
                             }
-                        } else if(powerup == 2 && projectiles[globalID] < 2 && hammertimer == 0) {
+                        } else if(powerup == 2 && projectiles < 2 && hammertimer == 0) {
                             if(game_values.hammerlimit == 0 || projectilelimit > 0) {
                                 action = player_action_hammer;
                             }
@@ -1216,15 +1217,15 @@ void CPlayer::move()
                             if(game_values.featherlimit == 0 || projectilelimit > 0) {
                                 action = player_action_spincape;
                             }
-                        } else if(powerup == 4 && projectiles[globalID] < 1) { //only allow one boomerang
+                        } else if(powerup == 4 && projectiles < 1) { //only allow one boomerang
                             if(game_values.boomeranglimit == 0 || projectilelimit > 0) {
                                 action = player_action_boomerang;
                             }
-                        } else if(powerup == 5 && projectiles[globalID] < 1) {
+                        } else if(powerup == 5 && projectiles < 1) {
                             if(game_values.wandlimit == 0 || projectilelimit > 0) {
                                 action = player_action_iceblast;
                             }
-                        } else if(powerup == 6 && projectiles[globalID] < 2 && hammertimer == 0) {
+                        } else if(powerup == 6 && projectiles < 2 && hammertimer == 0) {
                             if(game_values.bombslimit == 0 || projectilelimit > 0) {
                                 action = player_action_bomb;
                             }
@@ -1489,7 +1490,7 @@ void CPlayer::CommitAction()
         objectcontainer[0].add(new MO_Fireball(&rm->spr_fireball, ix + 6, iy, 4, IsPlayerFacingRight(), 5, globalID, teamID, colorID));
         ifsoundonplay(sfx_fireball);
 
-        projectiles[globalID]++;
+        projectiles++;
 
         if(game_values.fireballlimit > 0)
             DecreaseProjectileLimit();
@@ -1499,7 +1500,7 @@ void CPlayer::CommitAction()
         else
             objectcontainer[2].add(new MO_Hammer(&rm->spr_hammer, ix - 14, iy, 6, (game_values.reversewalk ? -velx : velx) - 2.0f, -HAMMERTHROW, 5, globalID, teamID, colorID, false));
 
-        projectiles[globalID]++;
+        projectiles++;
 
         hammertimer = game_values.hammerdelay;
         ifsoundonplay(sfx_fireball);
@@ -1508,7 +1509,7 @@ void CPlayer::CommitAction()
             DecreaseProjectileLimit();
     } else if(player_action_boomerang == action) {
         objectcontainer[2].add(new MO_Boomerang(&rm->spr_boomerang, ix, iy + HALFPH - 16, 4, IsPlayerFacingRight(), 5, globalID, teamID, colorID));
-        projectiles[globalID]++;
+        projectiles++;
 
         if(game_values.boomeranglimit > 0)
             DecreaseProjectileLimit();
@@ -1518,7 +1519,7 @@ void CPlayer::CommitAction()
         else
             objectcontainer[2].add(new MO_IceBlast(&rm->spr_iceblast, ix + HALFPW - 30, iy + HALFPH - 16, -5.0f, globalID, teamID, colorID));
 
-        projectiles[globalID]++;
+        projectiles++;
 
         ifsoundonplay(sfx_wand);
 
@@ -1533,7 +1534,7 @@ void CPlayer::CommitAction()
         }
 
         objectcontainer[1].add(bomb);
-        projectiles[globalID]++;
+        projectiles++;
 
         hammertimer = 90;
 
