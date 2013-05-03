@@ -2441,14 +2441,14 @@ SWAPBREAK:
             }
 
             if(game_values.exitinggame) {
-                rm->spr_dialog.draw(224, 176);
-                rm->menu_font_large.drawCentered(smw->ScreenWidth/2, 220 - (rm->menu_font_large.getHeight() >> 1), "Exit Game");
+                rm->spr_dialog.draw(smw->ScreenWidth * 0.35f, smw->ScreenHeight*0.37f);
+                rm->menu_font_large.drawCentered(smw->ScreenWidth * 0.5f, smw->ScreenHeight*0.46f - (rm->menu_font_large.getHeight() >> 1), "Exit Game");
 
-                rm->spr_dialogbutton.draw(235, 250, 0, (game_values.exityes ? 34 : 0), 80, 34);
-                rm->spr_dialogbutton.draw(325, 250, 0, (game_values.exityes ? 0 : 34), 80, 34);
+                rm->spr_dialogbutton.draw(smw->ScreenWidth * 0.37f, smw->ScreenHeight*0.52f, 0, (game_values.exityes ? 34 : 0), 80, 34);
+                rm->spr_dialogbutton.draw(smw->ScreenWidth * 0.51f, smw->ScreenHeight*0.52f, 0, (game_values.exityes ? 0 : 34), 80, 34);
 
-                rm->menu_font_large.draw(275 - (rm->menu_font_large.getWidth("Yes") >> 1),  269 - (rm->menu_font_large.getHeight() >> 1), "Yes");
-                rm->menu_font_large.draw(365 - (rm->menu_font_large.getWidth("No") >> 1),  269 - (rm->menu_font_large.getHeight() >> 1), "No");
+                rm->menu_font_large.draw(smw->ScreenWidth * 0.43f - (rm->menu_font_large.getWidth("Yes") >> 1),  smw->ScreenHeight*0.56f - (rm->menu_font_large.getHeight() >> 1), "Yes");
+                rm->menu_font_large.draw(smw->ScreenWidth * 0.57f - (rm->menu_font_large.getWidth("No") >> 1),  smw->ScreenHeight*0.56f - (rm->menu_font_large.getHeight() >> 1), "No");
             }
         }
 

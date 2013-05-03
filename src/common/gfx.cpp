@@ -25,7 +25,7 @@ extern SDL_Surface *screen;
 #ifdef _XBOX
 #define GFX_FLAGS	SDL_SWSURFACE | SDL_HWACCEL
 #else
-#define GFX_FLAGS	SDL_SWSURFACE /*| SDL_HWACCEL*/
+#define GFX_FLAGS	SDL_SWSURFACE | SDL_HWACCEL
 #endif
 
 //[colorcomponents][numcolors]
@@ -247,7 +247,7 @@ SDL_Surface * gfx_createskinsurface(SDL_Surface * skin, short spriteindex, Uint8
             tempcounter += 3;
         }
 
-        skincounter += smw->ScreenHeight + skin->pitch - (skin->w * 3);
+        skincounter += 5 * 96 + skin->pitch - (skin->w * 3);
         tempcounter += 96 * (loops - 1) + temp->pitch - (temp->w * 3);
     }
 

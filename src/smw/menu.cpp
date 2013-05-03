@@ -184,8 +184,8 @@ void Menu::CreateMenu()
 
     mCurrentMenu = &mMainMenu;
 
-    miSMWTitle = new MI_Image(&rm->menu_smw, 320 - ((short)rm->menu_smw.getWidth() >> 1), 30, 0, 0, 372, 140, 1, 1, 0);
-    miSMWVersion = new MI_Image(&rm->menu_version, 570, 10, 0, 0, 58, 32, 1, 1, 0);
+    miSMWTitle = new MI_Image(&rm->menu_smw, smw->ScreenWidth/2 - ((short)rm->menu_smw.getWidth() >> 1), 30, 0, 0, 372, 140, 1, 1, 0);
+    miSMWVersion = new MI_Image(&rm->menu_version, smw->ScreenWidth * 0.89f, 10, 0, 0, 58, 32, 1, 1, 0);
     //miSMWVersionText = new MI_Text("Beta 2", 630, 45, 0, 2, 2);
 
     miMainStartButton = new MI_Button(&rm->spr_selectfield, 120, 210, "Start", 310, 0);
@@ -202,7 +202,7 @@ void Menu::CreateMenu()
     miControlsButton = new MI_Button(&rm->spr_selectfield, 120, 362, "Controls", 400, 0);
     miControlsButton->SetCode(MENU_CODE_TO_CONTROLS_MENU);
 
-    miExitButton = new MI_Button(&rm->spr_selectfield, 120, 402, "Exit", 400, 0);
+    miExitButton = new MI_Button(&rm->spr_selectfield, 120, 402, "Exit", smw->ScreenWidth * 0.625f, 0);
     miExitButton->SetCode(MENU_CODE_EXIT_APPLICATION);
 
     mMainMenu.AddControl(miMainStartButton, miExitButton, miPlayerSelect, NULL, miQuickGameButton);
