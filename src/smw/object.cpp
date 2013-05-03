@@ -835,34 +835,34 @@ void IO_MovingObject::KillObjectMapHazard(short playerID)
         	if (player != NULL)
         		player->decreaseProjectilesCount();
 
-            ifsoundonplay(sfx_hit);
+            ifSoundOnPlay(sfx_hit);
         } else if(movingObjectType == movingobject_egg) {
             dead = false;
             ((CO_Egg*)this)->placeEgg();
-            ifsoundonplay(sfx_transform);
+            ifSoundOnPlay(sfx_transform);
         } else if(movingObjectType == movingobject_star) {
             dead = false;
             ((CO_Star*)this)->placeStar();
-            ifsoundonplay(sfx_transform);
+            ifSoundOnPlay(sfx_transform);
         } else if(movingObjectType == movingobject_flag) {
             dead = false;
             ((CO_Flag*)this)->placeFlag();
-            ifsoundonplay(sfx_transform);
+            ifSoundOnPlay(sfx_transform);
         } else if(movingObjectType == movingobject_bomb) {
         	CPlayer * player = GetPlayerFromGlobalID(playerID);
 
         	if (player != NULL)
         		player->decreaseProjectilesCount();
 
-            ifsoundonplay(sfx_hit);
+            ifSoundOnPlay(sfx_hit);
         } else if(movingObjectType == movingobject_phantokey) {
             dead = false;
             ((CO_PhantoKey*)this)->placeKey();
-            ifsoundonplay(sfx_transform);
+            ifSoundOnPlay(sfx_transform);
         } else if(game_mode_boxes_minigame == game_values.gamemode->gamemode && movingObjectType == movingobject_coin) {
             dead = false;
             ((MO_Coin*)this)->placeCoin();
-            ifsoundonplay(sfx_transform);
+            ifSoundOnPlay(sfx_transform);
         } else if(game_values.gamemode->gamemode == game_mode_stomp && (movingObjectType == movingobject_goomba || movingObjectType == movingobject_koopa || movingObjectType == movingobject_spiny || movingObjectType == movingobject_buzzybeetle || movingObjectType == movingobject_cheepcheep)) {
             if(!game_values.gamemode->gameover) {
                 CPlayer * player = GetPlayerFromGlobalID(playerID);
@@ -872,9 +872,9 @@ void IO_MovingObject::KillObjectMapHazard(short playerID)
                 }
             }
 
-            ifsoundonplay(sfx_hit);
+            ifSoundOnPlay(sfx_hit);
         } else {
-            ifsoundonplay(sfx_hit);
+            ifSoundOnPlay(sfx_hit);
         }
     }
 }

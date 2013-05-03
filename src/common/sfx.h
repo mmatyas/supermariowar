@@ -31,7 +31,7 @@ class sfxSound
     bool isready() {
         return ready;
     }
-		int isplaying();
+		int isPlaying();
 
 		void clearchannel();
 		

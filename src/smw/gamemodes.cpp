@@ -301,7 +301,7 @@ void CGameMode::playwarningsound()
     if(game_values.music && game_values.sound)
         backgroundmusic[0].stop();
 
-    ifsoundonplay(sfx_timewarning);
+    ifSoundOnPlay(sfx_timewarning);
 }
 
 void CGameMode::SetupModeStrings(const char * szMode, const char * szGoal, short iGoalSpacing)
@@ -457,7 +457,7 @@ short CGM_Frag::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle
     short iRet = CheckWinner(&inflictor);
 
     if(game_values.gamemode->gamemode == game_mode_frag && game_values.gamemodesettings.frag.style == 1) {
-        ifsoundonplay(sfx_powerdown);
+        ifSoundOnPlay(sfx_powerdown);
 
         other.shield = game_values.shieldstyle;
         other.shieldtimer = 60;
@@ -476,7 +476,7 @@ short CGM_Frag::playerkilledself(CPlayer &player, killstyle style)
         player.score->AdjustScore(-1);
 
         if(game_values.gamemode->gamemode == game_mode_frag && game_values.gamemodesettings.frag.style == 1) {
-            ifsoundonplay(sfx_powerdown);
+            ifSoundOnPlay(sfx_powerdown);
 
             player.shield = game_values.shieldstyle;
             player.shieldtimer = 60;
@@ -574,7 +574,7 @@ short CGM_TimeLimit::playerkilledplayer(CPlayer &inflictor, CPlayer &other, kill
         }
 
         if(game_values.gamemode->gamemode == game_mode_timelimit && game_values.gamemodesettings.time.style == 1) {
-            ifsoundonplay(sfx_powerdown);
+            ifSoundOnPlay(sfx_powerdown);
 
             other.shield = game_values.shieldstyle;
             other.shieldtimer = 60;
@@ -668,7 +668,7 @@ short CGM_Classic::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killst
     }
 
     if(game_values.gamemode->gamemode == game_mode_classic && game_values.gamemodesettings.classic.style == 1) {
-        ifsoundonplay(sfx_powerdown);
+        ifSoundOnPlay(sfx_powerdown);
 
         other.shield = game_values.shieldstyle;
         other.shieldtimer = 60;
@@ -719,7 +719,7 @@ short CGM_Classic::playerkilledself(CPlayer &player, killstyle style)
         }
 
         if(game_values.gamemode->gamemode == game_mode_classic && game_values.gamemodesettings.classic.style == 1) {
-            ifsoundonplay(sfx_powerdown);
+            ifSoundOnPlay(sfx_powerdown);
 
             player.shield = game_values.shieldstyle;
             player.shieldtimer = 60;
@@ -798,7 +798,7 @@ short CGM_Chicken::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killst
         eyecandy[2].add(new EC_GravText(&rm->game_font_large, inflictor.ix + HALFPW, inflictor.iy + PH, "Chicken!", -VELJUMP*1.5));
         //eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, inflictor.ix + (HALFPW) - 16, inflictor.iy + (HALFPH) - 16, 3, 8));
         eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, inflictor.ix + HALFPW - 24, inflictor.iy + HALFPH - 24, 4, 5));
-        ifsoundonplay(sfx_transform);
+        ifSoundOnPlay(sfx_transform);
 
         if(&other == chicken)
             other.diedas = 1; //flag to use chicken corpse sprite
@@ -945,7 +945,7 @@ short CGM_Tag::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle 
         inflictor.shieldtimer = 60;
         eyecandy[2].add(new EC_GravText(&rm->game_font_large, other.ix + (HALFPW), other.iy + PH, "Tagged!", -VELJUMP*1.5));
         eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, other.ix + (HALFPW) - 16, other.iy + (HALFPH) - 16, 3, 8));
-        ifsoundonplay(sfx_transform);
+        ifSoundOnPlay(sfx_transform);
     }
 
     if(!gameover) {
@@ -1081,7 +1081,7 @@ void CGM_ShyGuyTag::think()
             if(game_values.gamemodesettings.shyguytag.freetime > 0) {
                 fRunClock = true;
                 gameClock.SetTime(game_values.gamemodesettings.shyguytag.freetime);
-                ifsoundonplay(sfx_starwarning);
+                ifSoundOnPlay(sfx_starwarning);
             } else {
                 FreeShyGuys();
             }
@@ -1093,7 +1093,7 @@ void CGM_ShyGuyTag::think()
             fRunClock = false;
             FreeShyGuys();
         } else if(iTime > 0) {
-            ifsoundonplay(sfx_starwarning);
+            ifSoundOnPlay(sfx_starwarning);
         }
     }
 
@@ -1176,12 +1176,12 @@ void CGM_ShyGuyTag::SetShyGuy(short iTeam)
         }
     }
 
-    ifsoundonplay(sfx_transform);
+    ifSoundOnPlay(sfx_transform);
 }
 
 void CGM_ShyGuyTag::FreeShyGuys()
 {
-    ifsoundonplay(sfx_thunder);
+    ifSoundOnPlay(sfx_thunder);
 
     for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
         CPlayer * player = list_players[iPlayer];
@@ -1509,10 +1509,10 @@ void CGM_Survival::think()
 
 #pragma warning("Replace all these magic constants with proportional values")
 			if(0 == iSelectedEnemy) {
-                objectcontainer[2].add(new OMO_Thwomp(&rm->spr_thwomp, (short)RNGMAX(smw->ScreenWidth - (640- 591)), (float)game_values.gamemodesettings.survival.speed / 2.0f + (float)(RNGMAX(20))/10.0f));
+                objectcontainer[2].add(new OMO_Thwomp(&rm->spr_thwomp, (short)RNGMAX(smw->ScreenWidth * 0.92f), (float)game_values.gamemodesettings.survival.speed / 2.0f + (float)(RNGMAX(20))/10.0f));
                 timer = (short)(RNGMAX(21) - 10 + rate);
             } else if(1 == iSelectedEnemy) {
-                objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, (short)RNGMAX(smw->ScreenWidth - (640- 608)), smw->ScreenHeight, -(float(RNGMAX(9)) / 2.0f) - 8.0f, -1, -1, -1, false));
+                objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, (short)RNGMAX(smw->ScreenWidth * 0.95f ), smw->ScreenHeight, -(float(RNGMAX(9)) / 2.0f) - 8.0f, -1, -1, -1, false));
                 timer = (short)(RNGMAX(21) - 10 + rate - 20);
             } else {
                 float dSpeed = ((float)(RNGMAX(21) + 20)) / 10.0f;
@@ -1522,7 +1522,7 @@ void CGM_Survival::think()
                 if(dVel < 0)
                     x = 694;
 
-				objectcontainer[2].add(new OMO_BowserFire(&rm->spr_bowserfire, x, (short)RNGMAX( smw->ScreenHeight - (480 - 448) ), dVel, 0.0f, -1, -1, -1));
+				objectcontainer[2].add(new OMO_BowserFire(&rm->spr_bowserfire, x, (short)RNGMAX( smw->ScreenHeight * 0.93f ), dVel, 0.0f, -1, -1, -1));
                 timer = (short)(RNGMAX(21) - 10 + rate);
             }
         }
@@ -1743,7 +1743,7 @@ short CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle
 
             if(inflictor.jailtimer > 0) {
                 eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, inflictor.ix + HALFPW - 24, inflictor.iy + HALFPH - 24, 4, 5));
-                ifsoundonplay(sfx_transform);
+                ifSoundOnPlay(sfx_transform);
                 inflictor.jailtimer = 0;
                 inflictor.jail = -1;
             }
@@ -1793,7 +1793,7 @@ short CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle
                         //If they weren't just the one killed and they were jailed, give them a transform cloud
                         if(list_players[iP] != &other && list_players[iP]->jailtimer > 0) {
                             eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, list_players[iP]->ix + HALFPW - 24, list_players[iP]->iy + HALFPH - 24, 4, 5));
-                            ifsoundonplay(sfx_transform);
+                            ifSoundOnPlay(sfx_transform);
                         }
 
                         if(list_players[iP]->jailtimer > 0 && list_players[iP]->teamID != iTeamPoint)
@@ -1876,7 +1876,7 @@ short CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle
                             //If they weren't just the one killed and they were jailed, give them a transform cloud
                             if(list_players[i] != &other && list_players[i]->jailtimer > 0) {
                                 eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, list_players[i]->ix + HALFPW - 24, list_players[i]->iy + HALFPH - 24, 4, 5));
-                                ifsoundonplay(sfx_transform);
+                                ifSoundOnPlay(sfx_transform);
                             }
 
                             list_players[i]->jailtimer = 0;
@@ -2274,13 +2274,13 @@ void CGM_Star::think()
     //Count down the game time
     short iTime = gameClock.RunClock();
     if(iTime <= 5 && iTime > 0) {
-        ifsoundonplay(sfx_starwarning);
+        ifSoundOnPlay(sfx_starwarning);
     }
 
     //If the game time ran out, somebody needs to die and scores changed
     if(iTime == 0) {
         gameClock.SetTime(game_values.gamemodesettings.star.time < 1 ? 30 : game_values.gamemodesettings.star.time);
-        ifsoundonplay(sfx_thunder);
+        ifSoundOnPlay(sfx_thunder);
 
         if(iCurrentModeType == 0) {
             if(score[starPlayer[0]->teamID]->score > 1 || fReverseScoring)
@@ -2465,7 +2465,7 @@ CPlayer * CGM_Star::swapplayer(short id, CPlayer * player)
         eyecandy[2].add(new EC_GravText(&rm->game_font_large, player->ix + HALFPW, player->iy + PH, "Ztarred!", -VELJUMP*1.5));
 
     eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, player->ix + (HALFPW) - 16, player->iy + (HALFPH) - 16, 3, 8));
-    ifsoundonplay(sfx_transform);
+    ifSoundOnPlay(sfx_transform);
 
     return oldstar;
 }
@@ -2521,7 +2521,7 @@ short CGM_CaptureTheFlag::playerkilledself(CPlayer &player, killstyle style)
 
     if(player.carriedItem && player.carriedItem->getMovingObjectType() == movingobject_flag) {
         ((CO_Flag*)player.carriedItem)->placeFlag();
-        ifsoundonplay(sfx_transform);
+        ifSoundOnPlay(sfx_transform);
     }
 
     return player_kill_normal;
@@ -2664,7 +2664,7 @@ void CGM_Greed::playerextraguy(CPlayer &player, short iType)
 
 short CGM_Greed::ReleaseCoins(CPlayer &player, killstyle style)
 {
-    ifsoundonplay(sfx_cannon);
+    ifSoundOnPlay(sfx_cannon);
 
     player.shield = game_values.shieldstyle == 0 ? 1 : game_values.shieldstyle;
     player.shieldtimer = 60;
@@ -2758,7 +2758,7 @@ short CGM_Health::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killsty
 
         return iRet;
     } else {
-        ifsoundonplay(sfx_powerdown);
+        ifSoundOnPlay(sfx_powerdown);
 
         other.shield = game_values.shieldstyle;
         other.shieldtimer = 60;
@@ -2786,7 +2786,7 @@ short CGM_Health::playerkilledself(CPlayer &player, killstyle style)
 
         return iRet;
     } else {
-        ifsoundonplay(sfx_powerdown);
+        ifSoundOnPlay(sfx_powerdown);
 
         player.shield = game_values.shieldstyle;
         player.shieldtimer = 60;
@@ -3085,7 +3085,7 @@ void CGM_Boss_MiniGame::think()
             ifsoundonstop(sfx_invinciblemusic);
             ifsoundonstop(sfx_timewarning);
             ifsoundonstop(sfx_slowdownmusic);
-            ifsoundonplay(sfx_gameover);
+            ifSoundOnPlay(sfx_gameover);
 
             backgroundmusic[1].stop();
         }
@@ -3105,7 +3105,7 @@ void CGM_Boss_MiniGame::think()
         } else if(iBossType == 2) {
             //Only create podobos if the difficulty is moderate or greater
             if(--enemytimer <= 0 && game_values.gamemodesettings.boss.difficulty >= 2) {
-                objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, (short)RNGMAX(smw->ScreenWidth - (640 - 608)), smw->ScreenHeight, -(float(RNGMAX(9)) / 2.0f) - 9.0f, -1, -1, -1, false));
+                objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, (short)RNGMAX(smw->ScreenWidth * 0.95f), smw->ScreenHeight, -(float(RNGMAX(9)) / 2.0f) - 9.0f, -1, -1, -1, false));
                 enemytimer = (short)(RNGMAX(80) + 60);
             }
 
@@ -3437,9 +3437,9 @@ void CGM_Pipe_MiniGame::SetBonus(short iType, short iTimer, short iTeamID)
     iBonusTeam = iTeamID;
 
     if(iBonusType == 3)
-        ifsoundonplay(sfx_powerdown);
+        ifSoundOnPlay(sfx_powerdown);
     else
-        ifsoundonplay(sfx_collectpowerup);
+        ifSoundOnPlay(sfx_collectpowerup);
 }
 
 /*
@@ -3593,7 +3593,7 @@ void CGM_Boxes_MiniGame::ReleaseCoin(CPlayer &player)
         float velx = vel * cos(angle);
         float vely = vel * sin(angle);
 
-        ifsoundonplay(sfx_coin);
+        ifSoundOnPlay(sfx_coin);
 
         objectcontainer[1].add(new MO_Coin(&rm->spr_coin, velx, vely, ix, iy, 2, -1, 2, 30, false));
     }

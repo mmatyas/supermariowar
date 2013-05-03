@@ -2145,7 +2145,7 @@ void Menu::RunMenu()
                     }
 
                     if (iUnlockMinigameOptionIndex == 11) {
-                        ifsoundonplay(sfx_transform);
+                        ifSoundOnPlay(sfx_transform);
                         game_values.minigameunlocked = true;
 
                         miMatchSelectionField->HideItem(MATCH_TYPE_MINIGAME, false);
@@ -2515,7 +2515,7 @@ void Menu::RunMenu()
             } else if(MENU_CODE_SOUND_VOLUME_CHANGED == code) {
                 game_values.sound = game_values.soundvolume > 0;
                 sfx_setsoundvolume(game_values.soundvolume);
-                ifsoundonplay(sfx_coin);
+                ifSoundOnPlay(sfx_coin);
             } else if(MENU_CODE_MUSIC_VOLUME_CHANGED == code) {
                 sfx_setmusicvolume(game_values.musicvolume);
 

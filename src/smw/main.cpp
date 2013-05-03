@@ -1566,13 +1566,13 @@ void RunGame()
                             rm->menu_shade.draw(0, 0);
 
                             //Stop the pwings sound if it is on
-                            if(sfx_flyingsound.isplaying())
+                            if(sfx_flyingsound.isPlaying())
                                 ifsoundonstop(sfx_flyingsound);
                         }
 
                         //ifsoundonpause(sfx_invinciblemusic);
                         //ifsoundonpause(sfx_slowdownmusic);
-                        ifsoundonplay(sfx_pause);
+                        ifSoundOnPlay(sfx_pause);
                     }
                 }
 
@@ -1750,7 +1750,7 @@ void RunGame()
                                         if(!game_values.gamemode->gameover)
                                             killer->score->AdjustScore(1);
 
-                                        ifsoundonplay(sfx_kicksound);
+                                        ifSoundOnPlay(sfx_kicksound);
                                         ((MO_WalkingEnemy*)movingobject)->DieAndDropShell(true, true);
 
                                         game_values.screenshakekillscount++;
@@ -1818,7 +1818,7 @@ void RunGame()
                                 game_values.bulletbillspawntimer[iPlayer] = (short)(RNGMAX(20) + 25);
                                 float speed = ((float)(RNGMAX(21) + 20)) / 10.0f;
                                 objectcontainer[2].add(new MO_BulletBill(&rm->spr_bulletbill, &rm->spr_bulletbilldead, 0, (short)(RNGMAX(448)), (RNGMAX(2) ? speed : -speed), iPlayer, false));
-                                ifsoundonplay(sfx_bulletbillsound);
+                                ifSoundOnPlay(sfx_bulletbillsound);
                             }
                         }
                     }
@@ -1877,19 +1877,19 @@ void RunGame()
 
                     //Play sound for skidding players
                     if(game_values.playskidsound) {
-                        if(!sfx_skid.isplaying())
-                            ifsoundonplay(sfx_skid);
+                        if(!sfx_skid.isPlaying())
+                            ifSoundOnPlay(sfx_skid);
                     } else {
-                        if(sfx_skid.isplaying())
+                        if(sfx_skid.isPlaying())
                             ifsoundonstop(sfx_skid);
                     }
 
                     //Play sound for players using PWings
                     if(game_values.playflyingsound) {
-                        if(!sfx_flyingsound.isplaying())
-                            ifsoundonplay(sfx_flyingsound);
+                        if(!sfx_flyingsound.isPlaying())
+                            ifSoundOnPlay(sfx_flyingsound);
                     } else {
-                        if(sfx_flyingsound.isplaying())
+                        if(sfx_flyingsound.isPlaying())
                             ifsoundonstop(sfx_flyingsound);
                     }
 
@@ -2375,8 +2375,8 @@ SWAPBREAK:
                 }
 
                 if(game_values.swapstyle == 0) {
-                    if(!sfx_skid.isplaying())
-                        ifsoundonplay(sfx_skid);
+                    if(!sfx_skid.isPlaying())
+                        ifSoundOnPlay(sfx_skid);
                 }
 
                 if(++game_values.swapplayersblinkcount > 10) {
@@ -2393,7 +2393,7 @@ SWAPBREAK:
                     if(game_values.swapstyle == 0)
                         ifsoundonstop(sfx_skid);
 
-                    ifsoundonplay(sfx_transform);
+                    ifSoundOnPlay(sfx_transform);
 
                     if(game_values.swapstyle == 1) {
                         for(i = 0; i < list_players_cnt; i++)
@@ -2454,23 +2454,23 @@ SWAPBREAK:
 
         //Make sure music and sound effects keep playing
         if(game_values.slowdownon != -1) {
-            if(!sfx_slowdownmusic.isplaying())
-                ifsoundonplay(sfx_slowdownmusic);
+            if(!sfx_slowdownmusic.isPlaying())
+                ifSoundOnPlay(sfx_slowdownmusic);
         } else {
-            if(sfx_slowdownmusic.isplaying())
+            if(sfx_slowdownmusic.isPlaying())
                 ifsoundonstop(sfx_slowdownmusic);
         }
 
         if(game_values.playinvinciblesound) {
-            if(!sfx_invinciblemusic.isplaying() && !sfx_timewarning.isplaying() && !backgroundmusic[0].isplaying())
-                ifsoundonplay(sfx_invinciblemusic);
+            if(!sfx_invinciblemusic.isPlaying() && !sfx_timewarning.isPlaying() && !backgroundmusic[0].isplaying())
+                ifSoundOnPlay(sfx_invinciblemusic);
         } else {
-            if(sfx_invinciblemusic.isplaying())
+            if(sfx_invinciblemusic.isPlaying())
                 ifsoundonstop(sfx_invinciblemusic);
         }
 
         //If no background music is playing, then play some
-        if(!backgroundmusic[0].isplaying() && !sfx_invinciblemusic.isplaying() && !sfx_timewarning.isplaying() && !game_values.gamemode->gameover) {
+        if(!backgroundmusic[0].isplaying() && !sfx_invinciblemusic.isPlaying() && !sfx_timewarning.isPlaying() && !game_values.gamemode->gameover) {
             if(game_values.playnextmusic) {
                 musiclist->SetNextMusic(g_map->musicCategoryID, maplist->currentShortmapname(), g_map->szBackgroundFile);
                 backgroundmusic[0].load(musiclist->GetCurrentMusic());
@@ -2716,7 +2716,7 @@ void UpdateScoreBoard()
 
 void PlayNextMusicTrack()
 {
-    if(game_values.gamemode->gameover || game_values.playinvinciblesound || sfx_timewarning.isplaying())
+    if(game_values.gamemode->gameover || game_values.playinvinciblesound || sfx_timewarning.isPlaying())
         return;
 
     backgroundmusic[0].stop();

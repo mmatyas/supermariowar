@@ -226,7 +226,7 @@ bool MO_BulletBill::collide(CPlayer * player)
 
     if(player->invincible || player->shyguy) {
         AddAwardKill(player, NULL, kill_style_bulletbill);
-        ifsoundonplay(sfx_kicksound);
+        ifSoundOnPlay(sfx_kicksound);
 
         Die();
     } else {
@@ -249,7 +249,7 @@ bool MO_BulletBill::hittop(CPlayer * player)
 
     AddAwardKill(player, NULL, kill_style_bulletbill);
 
-    ifsoundonplay(sfx_mip);
+    ifSoundOnPlay(sfx_mip);
 
     Die();
 
@@ -296,7 +296,7 @@ void MO_BulletBill::collide(IO_MovingObject * object)
         short iCenterY = ((iy - bulletbill->iy) >> 1) + (bulletbill->iy + (bulletbill->ih >> 1));
 
         objectcontainer[2].add(new MO_Explosion(&rm->spr_explosion, iCenterX - 96, iCenterY - 64, 2, 4, -1, -1, kill_style_bulletbill));
-        ifsoundonplay(sfx_bobombsound);
+        ifSoundOnPlay(sfx_bobombsound);
     } else if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_throwbox || type == movingobject_attackzone || type == movingobject_explosion) {
         //Don't kill things with shells that are sitting still
         if(type == movingobject_shell && object->state == 2)
@@ -310,7 +310,7 @@ void MO_BulletBill::collide(IO_MovingObject * object)
             object->Die();
         }
 
-        ifsoundonplay(sfx_kicksound);
+        ifSoundOnPlay(sfx_kicksound);
         Die();
     }
 }
@@ -349,7 +349,7 @@ void IO_BulletBillCannon::update()
         SetNewTimer();
 
         objectcontainer[1].add(new MO_BulletBill(&rm->spr_hazard_bulletbill[fPreview ? 1 : 0], &rm->spr_hazard_bulletbilldead, ix + (dVel < 0.0f ? 32 : -32), iy, dVel, 0, true));
-        ifsoundonplay(sfx_bulletbillsound);
+        ifSoundOnPlay(sfx_bulletbillsound);
     }
 }
 
@@ -474,7 +474,7 @@ void IO_FlameCannon::update()
             iFrame = 0;
 
             state = 1;
-            ifsoundonplay(sfx_flamecannon);
+            ifSoundOnPlay(sfx_flamecannon);
         }
     } else if(state == 1 || state == 3) { //Start or end of flame but not deadly yet
         if(++iTimer >= 4) {
@@ -823,7 +823,7 @@ void MO_PirhanaPlant::KillPlant()
     SetNewTimer();
     state = 0;
 
-    ifsoundonplay(sfx_kicksound);
+    ifSoundOnPlay(sfx_kicksound);
     eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + (iDirection == 2 ? 0 : collisionWidth - 32), iy + (iDirection == 0 ? 0 : collisionHeight - 32), 3, 4));
 
     if(iDirection == 0)

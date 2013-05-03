@@ -2299,7 +2299,7 @@ void MI_TournamentScoreboard::Update()
                 if(--iExplosionCounter < 0) {
                     iExplosionCounter = (short)(RNGMAX(6) + 5);
 
-                    ifsoundonplay(sfx_bobombsound);
+                    ifSoundOnPlay(sfx_bobombsound);
 
                     float dAngle = 0.0f;
                     short iRandX = (short)(RNGMAX(440) + 100);
@@ -2315,7 +2315,7 @@ void MI_TournamentScoreboard::Update()
                         dAngle -= (float)PI / 14;
                     }
                 } else {
-                    ifsoundonplay(sfx_cannon);
+                    ifSoundOnPlay(sfx_cannon);
 
                     short iRandX = (short)(RNGMAX(576));
                     short iRandY = (short)(RNGMAX(416));
@@ -2792,7 +2792,7 @@ void MI_BonusWheel::Update()
 
             uiMenu->AddEyeCandy(new EC_SingleAnimation(&rm->spr_poof, iPoofX, iPoofY, 4, 5));
 
-            ifsoundonplay(sfx_cannon);
+            ifSoundOnPlay(sfx_cannon);
 
             if(++iDisplayPowerupIndex >= NUMBONUSITEMSONWHEEL) {
                 iState = 1;
@@ -2864,7 +2864,7 @@ void MI_BonusWheel::Update()
                 for(short iPlayer = 0; iPlayer < game_values.teamcounts[iWinningTeam]; iPlayer++)
                     game_values.storedpowerups[game_values.teamids[iWinningTeam][iPlayer]] = iSelectedPowerup;
 
-                ifsoundonplay(sfx_collectpowerup);
+                ifSoundOnPlay(sfx_collectpowerup);
             }
         }
 
@@ -2872,7 +2872,7 @@ void MI_BonusWheel::Update()
 
         //If we hit the next powerup, play a tick sound
         if(dSelectionAngle >= dSelectionSector[iNextSelectionSoundIndex]) {
-            ifsoundonplay(sfx_worldmove);
+            ifSoundOnPlay(sfx_worldmove);
 
             if(++iNextSelectionSoundIndex > NUMBONUSITEMSONWHEEL)
                 iNextSelectionSoundIndex = 1;
@@ -4213,13 +4213,13 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
 
                         iReturnDirection = 1;
 
-                        ifsoundonplay(sfx_worldmove);
+                        ifSoundOnPlay(sfx_worldmove);
 
                         //Start draw cycle over
                         RestartDrawCycleIfNeeded();
                     } else {
                         if(playerKeys->menu_up.fPressed)
-                            ifsoundonplay(sfx_hit);
+                            ifSoundOnPlay(sfx_hit);
                     }
                 } else if(playerKeys->menu_down.fPressed || playerKeys->menu_down.fDown) {
                     if((tile->fConnection[1] || tile->iConnectionType == 14) && !g_worldmap.IsDoor(iPlayerCurrentTileX, iPlayerCurrentTileY + 1) &&
@@ -4235,10 +4235,10 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
                         //Start draw cycle over
                         RestartDrawCycleIfNeeded();
 
-                        ifsoundonplay(sfx_worldmove);
+                        ifSoundOnPlay(sfx_worldmove);
                     } else {
                         if(playerKeys->menu_down.fPressed)
-                            ifsoundonplay(sfx_hit);
+                            ifSoundOnPlay(sfx_hit);
                     }
                 } else if(playerKeys->menu_left.fPressed || playerKeys->menu_left.fDown) {
                     if((tile->fConnection[2] || tile->iConnectionType == 12) && !g_worldmap.IsDoor(iPlayerCurrentTileX - 1, iPlayerCurrentTileY) &&
@@ -4254,12 +4254,12 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
                         //Start draw cycle over
                         RestartDrawCycleIfNeeded();
 
-                        ifsoundonplay(sfx_worldmove);
+                        ifSoundOnPlay(sfx_worldmove);
                     } else {
                         g_worldmap.FacePlayer(1);
 
                         if(playerKeys->menu_left.fPressed)
-                            ifsoundonplay(sfx_hit);
+                            ifSoundOnPlay(sfx_hit);
                     }
                 } else if(playerKeys->menu_right.fPressed || playerKeys->menu_right.fDown) {
                     if((tile->fConnection[3] || tile->iConnectionType == 12) && !g_worldmap.IsDoor(iPlayerCurrentTileX + 1, iPlayerCurrentTileY) &&
@@ -4275,12 +4275,12 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
                         //Start draw cycle over
                         RestartDrawCycleIfNeeded();
 
-                        ifsoundonplay(sfx_worldmove);
+                        ifSoundOnPlay(sfx_worldmove);
                     } else {
                         g_worldmap.FacePlayer(0);
 
                         if(playerKeys->menu_right.fPressed)
-                            ifsoundonplay(sfx_hit);
+                            ifSoundOnPlay(sfx_hit);
                     }
                 } else if(playerInput->outputControls[iPlayer].menu_select.fPressed) {
                     //Lookup current tile and see if it is a type of tile you can interact with
@@ -4303,7 +4303,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
                         iScreenfade = 0;
                         iScreenfadeRate = 8;
 
-                        ifsoundonplay(sfx_pipe);
+                        ifSoundOnPlay(sfx_pipe);
                     }
                 }
             }
@@ -4312,40 +4312,40 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
                 if(iItemPage[iTeamId] > 0) {
                     iItemPage[iTeamId]--;
                     iItemCol[iTeamId] = 0;
-                    ifsoundonplay(sfx_worldmove);
+                    ifSoundOnPlay(sfx_worldmove);
                 } else {
-                    ifsoundonplay(sfx_hit);
+                    ifSoundOnPlay(sfx_hit);
                 }
             } else if(playerKeys->menu_down.fPressed) {
                 if(iItemPage[iTeamId] < 3 && (iItemPage[iTeamId] + 1) * 8 < game_values.worldpowerupcount[iTeamId]) {
                     iItemPage[iTeamId]++;
                     iItemCol[iTeamId] = 0;
-                    ifsoundonplay(sfx_worldmove);
+                    ifSoundOnPlay(sfx_worldmove);
                 } else {
-                    ifsoundonplay(sfx_hit);
+                    ifSoundOnPlay(sfx_hit);
                 }
             } else if(playerKeys->menu_left.fPressed) {
                 if(iItemCol[iTeamId] > 0) {
                     iItemCol[iTeamId]--;
-                    ifsoundonplay(sfx_worldmove);
+                    ifSoundOnPlay(sfx_worldmove);
                 } else if(iItemCol[iTeamId] == 0 && iItemPage[iTeamId] > 0) {
                     iItemCol[iTeamId] = 7;
                     iItemPage[iTeamId]--;
-                    ifsoundonplay(sfx_worldmove);
+                    ifSoundOnPlay(sfx_worldmove);
                 } else {
-                    ifsoundonplay(sfx_hit);
+                    ifSoundOnPlay(sfx_hit);
                 }
             } else if(playerKeys->menu_right.fPressed) {
                 if(iItemPage[iTeamId] * 8 + iItemCol[iTeamId] + 1 < game_values.worldpowerupcount[iTeamId]) {
                     if(iItemCol[iTeamId] < 7) {
                         iItemCol[iTeamId]++;
-                        ifsoundonplay(sfx_worldmove);
+                        ifSoundOnPlay(sfx_worldmove);
                     } else if(iItemCol[iTeamId] == 7 && iItemPage[iTeamId] < 3) {
                         iItemCol[iTeamId] = 0;
                         iItemPage[iTeamId]++;
-                        ifsoundonplay(sfx_worldmove);
+                        ifSoundOnPlay(sfx_worldmove);
                     } else {
-                        ifsoundonplay(sfx_hit);
+                        ifSoundOnPlay(sfx_hit);
                     }
                 }
             } else if(playerKeys->menu_select.fPressed) {
@@ -4380,12 +4380,12 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
                     iItemPage[iTeamId] = 0;
                     iItemCol[iTeamId] = 0;
 
-                    ifsoundonplay(sfx_inventory);
+                    ifSoundOnPlay(sfx_inventory);
                 } else if (iStateTransition[iTeamId] == 3) {
                     iPopupFlag[iTeamId] = false;
 
                     iStateTransition[iTeamId] = 2;
-                    ifsoundonplay(sfx_inventory);
+                    ifSoundOnPlay(sfx_inventory);
                 }
             }
         }
@@ -4445,12 +4445,12 @@ bool MI_World::UsePowerup(short iPlayer, short iTeam, short iIndex, bool fPopupI
         //Give the powerup only to the player that selected it
         game_values.storedpowerups[iPlayer] = iPowerup;
 
-        ifsoundonplay(sfx_collectpowerup);
+        ifSoundOnPlay(sfx_collectpowerup);
         fUsedItem = true;
     } else if(iPowerup == NUM_POWERUPS) { //Music Box (put vehicles to sleep)
         iSleepTurns = RNGMAX(4) + 2;
         fUsedItem = true;
-        ifsoundonplay(sfx_collectpowerup);
+        ifSoundOnPlay(sfx_collectpowerup);
 
         backgroundmusic[5].load(worldmusiclist->GetMusic(WORLDMUSICSLEEP, ""));
         backgroundmusic[5].play(false, false);
@@ -4465,7 +4465,7 @@ bool MI_World::UsePowerup(short iPlayer, short iTeam, short iIndex, bool fPopupI
             DisplayTeamControlAnnouncement();
 
             fUsedItem = true;
-            ifsoundonplay(sfx_switchpress);
+            ifSoundOnPlay(sfx_switchpress);
             iState = 6;
             fNoInterestingMoves = false;
         }
@@ -4477,7 +4477,7 @@ bool MI_World::UsePowerup(short iPlayer, short iTeam, short iIndex, bool fPopupI
         if(iSprite < WORLD_BRIDGE_SPRITE_OFFSET || iSprite > WORLD_BRIDGE_SPRITE_OFFSET + 3) {
             AdvanceTurn();
             fUsedItem = true;
-            ifsoundonplay(sfx_switchpress);
+            ifSoundOnPlay(sfx_switchpress);
         }
     } else if(iPowerup == NUM_POWERUPS + 4 && iState == -1) { //Revive stage
         short iDestX, iDestY;
@@ -4493,13 +4493,13 @@ bool MI_World::UsePowerup(short iPlayer, short iTeam, short iIndex, bool fPopupI
             uiMenu->AddEyeCandy(new EC_SingleAnimation(&rm->spr_poof, (iDestX << 5) + iMapOffsetX - 8, (iDestY << 5) + iMapOffsetY - 8, 4, 5));
 
             fUsedItem = true;
-            ifsoundonplay(sfx_transform);
+            ifSoundOnPlay(sfx_transform);
         }
     } else if(iPowerup >= NUM_POWERUPS + 5 && iPowerup <= NUM_POWERUPS + 8 && iState == -1) { //Door Keys
         short iDoorsOpened = g_worldmap.UseKey(iPowerup - NUM_POWERUPS - 5, iPlayerCurrentTileX, iPlayerCurrentTileY, fUsingCloud);
 
         if(iDoorsOpened > 0) {
-            ifsoundonplay(sfx_transform);
+            ifSoundOnPlay(sfx_transform);
 
             short iPlayerX = (iPlayerCurrentTileX << 5) + iMapOffsetX;
             short iPlayerY = (iPlayerCurrentTileY << 5) + iMapOffsetY;
@@ -4538,7 +4538,7 @@ bool MI_World::UsePowerup(short iPlayer, short iTeam, short iIndex, bool fPopupI
     } else if(iPowerup >= NUM_POWERUPS + 9 && iPowerup <= NUM_POWERUPS + 14) { //Stage Points Modifiers
         game_values.worldpointsbonus = iPowerup - NUM_POWERUPS - 9;
         fUsedItem = true;
-        ifsoundonplay(sfx_switchpress);
+        ifSoundOnPlay(sfx_switchpress);
     }
 
     if(fUsedItem) {
@@ -4550,7 +4550,7 @@ bool MI_World::UsePowerup(short iPlayer, short iTeam, short iIndex, bool fPopupI
         if(fPopupIsUp)
             iStateTransition[iTeam] = 2;
     } else {
-        ifsoundonplay(sfx_stun);
+        ifSoundOnPlay(sfx_stun);
     }
 
     return fUsedItem;
@@ -4585,7 +4585,7 @@ MenuCodeEnum MI_World::Modify(bool modify)
 void MI_World::UseCloud(bool fUseCloud)
 {
     fUsingCloud = fUseCloud;
-    ifsoundonplay(sfx_transform);
+    ifSoundOnPlay(sfx_transform);
 
     short iPlayerX, iPlayerY;
     g_worldmap.GetPlayerPosition(&iPlayerX, &iPlayerY);

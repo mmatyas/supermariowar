@@ -156,7 +156,7 @@ void sfxSound::reset()
 	channel = -1;
 }
 
-int sfxSound::isplaying()
+int sfxSound::isPlaying()
 {
 	if(channel == -1)
 		return false;

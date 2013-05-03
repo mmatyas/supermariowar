@@ -169,9 +169,9 @@ struct STextAward {
 
 #define NUMBONUSITEMSONWHEEL 10
 
-#define ifsoundonplay(x) if (game_values.sound) x.play()
+#define ifSoundOnPlay(x) if (game_values.sound) x.play()
 #define ifsoundonandreadyplay(x) (x.isready() && game_values.sound ? x.play() : -1)
-#define ifsoundonplayloop(x,y) (game_values.sound ? x.playloop(y) : -1)
+#define ifSoundOnPlayLoop(x,y) (game_values.sound ? x.playloop(y) : -1)
 #define ifsoundonstop(x) (game_values.sound ? x.stop() : void(NULL))
 #define ifsoundonpause(x) (game_values.sound ? x.sfx_pause() : void(NULL))
 #define ifmusiconplay(x) (game_values.music ? x.play() : -1)
@@ -566,8 +566,6 @@ extern short g_iDefaultPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
 extern short g_iCurrentPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
 
 extern short g_iCurrentDrawIndex;
-
-#include "randFuncs.h"
 
 void _load_drawmsg(const std::string& f);
 void _load_waitforkey();

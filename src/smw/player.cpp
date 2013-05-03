@@ -173,7 +173,7 @@ void CPlayer::move()
     		extern int g_tanookiFlag;
     		if (konamiIndex == 11)
     		{
-    			ifsoundonplay(sfx_transform);
+    			ifSoundOnPlay(sfx_transform);
     			g_tanookiFlag++;
     		}
     	}
@@ -303,7 +303,7 @@ void CPlayer::move()
     		if (super_pow_index >= 3)
     		{
     			super_pow_index = 0;
-    			ifsoundonplay(sfx_transform);
+    			ifSoundOnPlay(sfx_transform);
     			super_pow = true;
     		}
     	}
@@ -321,7 +321,7 @@ void CPlayer::move()
     		if (super_mod_index >= 3)
     		{
     			super_mod_index = 0;
-    			ifsoundonplay(sfx_transform);
+    			ifSoundOnPlay(sfx_transform);
     			super_mod = true;
     		}
     	}
@@ -338,7 +338,7 @@ void CPlayer::move()
 
     			if (redKoopaIndex == 7)
     			{
-    				ifsoundonplay(sfx_transform);
+    				ifSoundOnPlay(sfx_transform);
     				game_values.redkoopas = true;
     			}
     		}
@@ -357,7 +357,7 @@ void CPlayer::move()
 
     			if (redThrowBlockIndex == 8)
     			{
-    				ifsoundonplay(sfx_transform);
+    				ifSoundOnPlay(sfx_transform);
     				game_values.redthrowblocks = true;
 
     				for(short iBlock = 0; iBlock < noncolcontainer.list_end; iBlock++)
@@ -387,7 +387,7 @@ void CPlayer::move()
 
     			if (viewBlockIndex == 7)
     			{
-    				ifsoundonplay(sfx_transform);
+    				ifSoundOnPlay(sfx_transform);
     				game_values.viewblocks = true;
 
     				for(short iBlock = 0; iBlock < noncolcontainer.list_end; iBlock++)
@@ -423,7 +423,7 @@ void CPlayer::move()
 
     		if (secret_spring_index == 9)
     		{
-    			ifsoundonplay(sfx_transform);
+    			ifSoundOnPlay(sfx_transform);
     			objectcontainer[1].add(new CO_Spring(&rm->spr_spring));
     		}
     	}
@@ -439,7 +439,7 @@ void CPlayer::move()
 
     		if (secret_spike_index == 6)
     		{
-    			ifsoundonplay(sfx_transform);
+    			ifSoundOnPlay(sfx_transform);
     			objectcontainer[1].add(new CO_Spike(&rm->spr_spike));
     		}
     	}
@@ -495,7 +495,7 @@ void CPlayer::move()
 
             iKuriboShoeExitIndex = 0;
             iKuriboShoeExitTimer = 0;
-            ifsoundonplay(sfx_transform);
+            ifSoundOnPlay(sfx_transform);
             iKuriboShoe = 0;
 
             fSuperStomp = false;
@@ -545,7 +545,7 @@ void CPlayer::move()
 
             // perform tansformation effects
             eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
-            ifsoundonplay(sfx_transform);
+            ifSoundOnPlay(sfx_transform);
 
             // Neutralize lateral velocity
             const float tv = 1.6f;
@@ -594,14 +594,14 @@ void CPlayer::move()
 
                 // perform transformation effects
                 eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
-                ifsoundonplay(sfx_transform);
+                ifSoundOnPlay(sfx_transform);
 
                 //Decrease the amount of tanooki uses, if feature is turned on
                 if(game_values.tanookilimit > 0 || tanookilimit > 0) {
                     if(--tanookilimit <= 0) {
                         tanooki = false;
                         tanookilimit = 0;
-                        ifsoundonplay(sfx_powerdown);
+                        ifSoundOnPlay(sfx_powerdown);
                     }
                 }
             }
@@ -640,7 +640,7 @@ void CPlayer::move()
         //super stomp attack zone, play the sound and show the stomp gfx
         if(fSuperStomp) {
             eyecandy[2].add(new EC_SuperStompExplosion(&rm->spr_superstomp, ix + HALFPW, iy + PH, 4));
-            ifsoundonplay(sfx_bobombsound);
+            ifSoundOnPlay(sfx_bobombsound);
             fSuperStomp = false;
 
             objectcontainer[1].add(new MO_AttackZone(globalID, teamID, ix - 32, iy + 10, 32, 15, 8, kill_style_kuriboshoe, false));
@@ -789,22 +789,22 @@ void CPlayer::move()
             switch(powerupused) {
             case 1: {
                 game_values.gamemode->playerextraguy(*this, 1);
-                ifsoundonplay(sfx_extraguysound);
+                ifSoundOnPlay(sfx_extraguysound);
                 break;
             }
             case 2: {
                 game_values.gamemode->playerextraguy(*this, 2);
-                ifsoundonplay(sfx_extraguysound);
+                ifSoundOnPlay(sfx_extraguysound);
                 break;
             }
             case 3: {
                 game_values.gamemode->playerextraguy(*this, 3);
-                ifsoundonplay(sfx_extraguysound);
+                ifSoundOnPlay(sfx_extraguysound);
                 break;
             }
             case 4: {
                 game_values.gamemode->playerextraguy(*this, 5);
-                ifsoundonplay(sfx_extraguysound);
+                ifSoundOnPlay(sfx_extraguysound);
                 break;
             }
             case 5: {
@@ -831,7 +831,7 @@ void CPlayer::move()
                 break;
             }
             case 9: {
-                ifsoundonplay(sfx_thunder);
+                ifSoundOnPlay(sfx_thunder);
                 game_values.screenshaketimer = 20;
                 game_values.screenshakeplayerid = globalID;
                 game_values.screenshaketeamid = teamID;
@@ -874,7 +874,7 @@ void CPlayer::move()
                 break;
             }
             case 16: {
-                ifsoundonplay(sfx_thunder);
+                ifSoundOnPlay(sfx_thunder);
                 game_values.screenshaketimer = 20;
                 game_values.screenshakeplayerid = globalID;
                 game_values.screenshaketeamid = teamID;
@@ -896,7 +896,7 @@ void CPlayer::move()
                 break;
             }
             case 20: { //tanooki
-                ifsoundonplay(sfx_collectpowerup);
+                ifSoundOnPlay(sfx_collectpowerup);
                 tanooki = true;
 
                 if(game_values.tanookilimit > 0)
@@ -912,9 +912,9 @@ void CPlayer::move()
             case 22: { //golden podobo
                 short numPodobos = RNGMAX(6) + 10;
                 for(short iPodobo = 0; iPodobo < numPodobos; iPodobo++) {
-                    objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, (short)RNGMAX(smw->ScreenWidth - (640 - 608)), smw->ScreenHeight, -(float(RNGMAX(9)) / 2.0f) - 9.0f, globalID, teamID, colorID, false));
+                    objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, (short)RNGMAX(smw->ScreenWidth * 0.95f), smw->ScreenHeight, -(float(RNGMAX(9)) / 2.0f) - 9.0f, globalID, teamID, colorID, false));
                 }
-                ifsoundonplay(sfx_thunder);
+                ifSoundOnPlay(sfx_thunder);
                 break;
             }
             case 23: { //bombs
@@ -938,9 +938,9 @@ void CPlayer::move()
                     jail = -1;
 
                     eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
-                    ifsoundonplay(sfx_transform);
+                    ifSoundOnPlay(sfx_transform);
                 } else {
-                    ifsoundonplay(sfx_hit);
+                    ifSoundOnPlay(sfx_hit);
                 }
 
                 break;
@@ -1106,23 +1106,23 @@ void CPlayer::move()
                             fallthrough = true;
                         } else {
                             Jump(lrn, 1.0f, false);
-                            ifsoundonplay(sfx_jump);
+                            ifSoundOnPlay(sfx_jump);
                         }
 
                         lockjump = true;
                     } else if(superjumptimer > 0) {
                         if(superjumptype == 3) { //Kuribo's Shoe Jump
                             Jump(lrn, 1.0f, false);
-                            ifsoundonplay(sfx_jump);
+                            ifSoundOnPlay(sfx_jump);
                         }
                         if(superjumptype == 2) {
                             vely = -VELSUPERJUMP;
                             inair = true;
-                            ifsoundonplay(sfx_superspring);
+                            ifSoundOnPlay(sfx_superspring);
                         } else if(superjumptype == 1) {
                             vely = -VELTURBOJUMP;
                             inair = true;
-                            ifsoundonplay(sfx_springjump);
+                            ifSoundOnPlay(sfx_springjump);
                         }
 
                         superjumptimer = 0;
@@ -1132,7 +1132,7 @@ void CPlayer::move()
                             if(game_values.featherlimit == 0 || projectilelimit > 0) {
                                 if(extrajumps < game_values.featherjumps) {
                                     Jump(lrn, 0.8f, false);
-                                    ifsoundonplay(sfx_capejump);
+                                    ifSoundOnPlay(sfx_capejump);
                                     lockjump = true;
                                 }
 
@@ -1190,7 +1190,7 @@ void CPlayer::move()
                     powerupradius = 100.0f;
                     powerupangle = (float)(RNGMAX(1000) * 0.00628f);
 
-                    ifsoundonplay(sfx_storedpowerupsound);
+                    ifSoundOnPlay(sfx_storedpowerupsound);
                 }
             }
 
@@ -1422,7 +1422,7 @@ void CPlayer::move()
             if(!invincible && shield == 0) {
                 if(++burnupstarttimer >= 20) {
                     if(burnupstarttimer == 20)
-                        ifsoundonplay(sfx_burnup);
+                        ifSoundOnPlay(sfx_burnup);
 
                     if(++burnuptimer > 80) {
                         if(player_kill_nonkill != KillPlayerMapHazard(true, kill_style_environment, false))
@@ -1472,7 +1472,7 @@ void CPlayer::move()
                 jailtimer = 0;
                 jail = -1;
                 eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
-                ifsoundonplay(sfx_transform);
+                ifSoundOnPlay(sfx_transform);
             }
         }
     }
@@ -1485,10 +1485,10 @@ void CPlayer::CommitAction()
     if(player_action_bobomb == action) {
         bobomb = false;
         objectcontainer[2].add(new MO_Explosion(&rm->spr_explosion, ix + HALFPW - 96, iy + HALFPH - 64, 2, 4, globalID, teamID, kill_style_bobomb));
-        ifsoundonplay(sfx_bobombsound);
+        ifSoundOnPlay(sfx_bobombsound);
     } else if(player_action_fireball == action) {
         objectcontainer[0].add(new MO_Fireball(&rm->spr_fireball, ix + 6, iy, 4, IsPlayerFacingRight(), 5, globalID, teamID, colorID));
-        ifsoundonplay(sfx_fireball);
+        ifSoundOnPlay(sfx_fireball);
 
         projectiles++;
 
@@ -1503,7 +1503,7 @@ void CPlayer::CommitAction()
         projectiles++;
 
         hammertimer = game_values.hammerdelay;
-        ifsoundonplay(sfx_fireball);
+        ifSoundOnPlay(sfx_fireball);
 
         if(game_values.hammerlimit > 0)
             DecreaseProjectileLimit();
@@ -1521,7 +1521,7 @@ void CPlayer::CommitAction()
 
         projectiles++;
 
-        ifsoundonplay(sfx_wand);
+        ifSoundOnPlay(sfx_wand);
 
         if(game_values.wandlimit > 0)
             DecreaseProjectileLimit();
@@ -1538,7 +1538,7 @@ void CPlayer::CommitAction()
 
         hammertimer = 90;
 
-        ifsoundonplay(sfx_fireball);
+        ifSoundOnPlay(sfx_fireball);
 
         if(game_values.bombslimit > 0)
             DecreaseProjectileLimit();
@@ -2161,7 +2161,7 @@ void CPlayer::explodeawards()
     if(killsinrow < MINAWARDSNEEDED)
         return;
 
-    ifsoundonplay(sfx_cannon);
+    ifSoundOnPlay(sfx_cannon);
 
     short numawards = (killsinrow > MAXAWARDS ? MAXAWARDS : killsinrow);
     float addangle = TWO_PI / (float)numawards;
@@ -2186,7 +2186,7 @@ void CPlayer::addswirlingawards()
     if(killsinrow < MINAWARDSNEEDED)
         return;
 
-    ifsoundonplay(sfx_cannon);
+    ifSoundOnPlay(sfx_cannon);
 
     short numawards = (killsinrow > MAXAWARDS ? MAXAWARDS : killsinrow);
     float addangle = TWO_PI / (float)numawards;
@@ -2206,7 +2206,7 @@ void CPlayer::addrocketawards()
     if(killsinrow < MINAWARDSNEEDED)
         return;
 
-    ifsoundonplay(sfx_cannon);
+    ifSoundOnPlay(sfx_cannon);
 
     short numawards = (killsinrow > MAXAWARDS ? MAXAWARDS : killsinrow);
 
@@ -2269,9 +2269,9 @@ short PlayerKilledPlayer(short iKiller, CPlayer * killed, short deathstyle, kill
 
         if(player_kill_nonkill != iKillType) {
             if(deathstyle == death_style_shatter)
-                ifsoundonplay(sfx_breakblock);
+                ifSoundOnPlay(sfx_breakblock);
             else
-                ifsoundonplay(sfx_deathsound);
+                ifSoundOnPlay(sfx_deathsound);
         }
 
         return iKillType;
@@ -2286,7 +2286,7 @@ short PlayerKilledPlayer(CPlayer * killer, CPlayer * killed, short deathstyle, k
 
     bool fSoundPlayed = false;
     if(game_values.gamemode->chicken == killer && style != kill_style_pow) {
-        ifsoundonplay(sfx_chicken);
+        ifSoundOnPlay(sfx_chicken);
         fSoundPlayed = true;
     }
 
@@ -2309,11 +2309,11 @@ short PlayerKilledPlayer(CPlayer * killer, CPlayer * killed, short deathstyle, k
         }
 
         if(deathstyle == death_style_jump)
-            ifsoundonplay(sfx_deathsound);
+            ifSoundOnPlay(sfx_deathsound);
         else if(deathstyle == death_style_squish)
-            ifsoundonplay(sfx_mip);
+            ifSoundOnPlay(sfx_mip);
         else if(deathstyle == death_style_shatter)
-            ifsoundonplay(sfx_breakblock);
+            ifSoundOnPlay(sfx_breakblock);
     }
 
     if(player_kill_normal == iKillType || (fForce && player_kill_nonkill == iKillType))
@@ -2434,13 +2434,13 @@ void collisionhandler_p2p(CPlayer * o1, CPlayer * o2)
         if(game_values.gamemode->gamemode == game_mode_jail && game_values.gamemodesettings.jail.tagfree) {
             if(o1->jailtimer > 0) {
                 eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, o1->ix + HALFPW - 16, o1->iy + HALFPH - 16, 3, 8));
-                ifsoundonplay(sfx_transform);
+                ifSoundOnPlay(sfx_transform);
                 o1->jailtimer = 0;
             }
 
             if(o2->jailtimer > 0) {
                 eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, o2->ix + HALFPW - 16, o2->iy + HALFPH - 16, 3, 8));
-                ifsoundonplay(sfx_transform);
+                ifSoundOnPlay(sfx_transform);
                 o2->jailtimer = 0;
             }
         }
@@ -2464,7 +2464,7 @@ void collisionhandler_p2p(CPlayer * o1, CPlayer * o2)
                 game_values.gamepowerups[o1->globalID] = game_values.gamepowerups[o2->globalID];
                 game_values.gamepowerups[o2->globalID] = iTempPowerup;
 
-                ifsoundonplay(sfx_storepowerup);
+                ifSoundOnPlay(sfx_storepowerup);
 
                 o1->playerKeys->game_powerup.fPressed = false;
                 o1->playerKeys->game_powerup.fDown = false;
@@ -2660,14 +2660,14 @@ void TransferTag(CPlayer * o1, CPlayer * o2)
         o1->shieldtimer = 60;
         eyecandy[2].add(new EC_GravText(&rm->game_font_large, game_values.gamemode->tagged->ix + HALFPW, game_values.gamemode->tagged->iy + PH, "Tagged!", -VELJUMP*1.5));
         eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, game_values.gamemode->tagged->ix + HALFPW - 16, game_values.gamemode->tagged->iy + HALFPH - 16, 3, 8));
-        ifsoundonplay(sfx_transform);
+        ifSoundOnPlay(sfx_transform);
     } else if(game_values.gamemode->tagged == o2 && o1->shield == 0 && !o1->invincible) {
         game_values.gamemode->tagged = o1;
         o2->shield = game_values.shieldstyle > 0 ? game_values.shieldstyle : 1;
         o2->shieldtimer = 60;
         eyecandy[2].add(new EC_GravText(&rm->game_font_large, game_values.gamemode->tagged->ix + HALFPW, game_values.gamemode->tagged->iy + PH, "Tagged!", -VELJUMP*1.5));
         eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, game_values.gamemode->tagged->ix + HALFPW - 16, game_values.gamemode->tagged->iy + HALFPH - 16, 3, 8));
-        ifsoundonplay(sfx_transform);
+        ifSoundOnPlay(sfx_transform);
     }
 }
 
@@ -2702,7 +2702,7 @@ void BounceAssistPlayer(CPlayer * o1, CPlayer * o2)
         o1->iSuperStompExitTimer = 0;
         o1->superstomp_lock = false;
 
-        ifsoundonplay(sfx_superspring);
+        ifSoundOnPlay(sfx_superspring);
     }
 }
 
@@ -2874,7 +2874,7 @@ void CPlayer::draw()
 
 void CPlayer::SpinCape()
 {
-    ifsoundonplay(sfx_tailspin);
+    ifSoundOnPlay(sfx_tailspin);
 
     iCapeTimer = 4; //Add one extra frame to sync with spinning player sprite
 
@@ -2945,7 +2945,7 @@ void CPlayer::SpinPlayer()
 void CPlayer::ShakeTail()
 {
     ifsoundonstop(sfx_tailspin);
-    ifsoundonplay(sfx_tailspin);
+    ifSoundOnPlay(sfx_tailspin);
     lockjump = true;
 
     iTailState = 1; //cause tail to shake
@@ -2955,7 +2955,7 @@ void CPlayer::ShakeTail()
 
 void CPlayer::SpinTail()
 {
-    ifsoundonplay(sfx_tailspin);
+    ifSoundOnPlay(sfx_tailspin);
 
     iTailState = 2; //cause tail to shake
     iTailTimer = -1; //Add one extra frame to sync with spinning player sprite
@@ -3682,7 +3682,7 @@ short CPlayer::KillPlayerMapHazard(bool fForce, killstyle style, bool fKillCarri
         if(player_kill_normal == iKillType || (player_kill_nonkill == iKillType && fForce))
             die(death_style_jump, false, fKillCarriedItem);
 
-        ifsoundonplay(sfx_deathsound);
+        ifSoundOnPlay(sfx_deathsound);
 
         return iKillType;
     }
@@ -4068,7 +4068,7 @@ void CPlayer::enterwarp(Warp * warp)
             g_map->lockconnection(-1);
     }
 
-    ifsoundonplay(sfx_pipe);
+    ifSoundOnPlay(sfx_pipe);
 }
 
 void CPlayer::flipsidesifneeded()
@@ -4178,7 +4178,7 @@ bool CPlayer::AcceptItem(MO_CarriedObject * item)
 void CPlayer::SetPowerup(short iPowerup)
 {
     if(shyguy) {
-        ifsoundonplay(sfx_stun);
+        ifSoundOnPlay(sfx_stun);
         return;
     }
 
@@ -4186,7 +4186,7 @@ void CPlayer::SetPowerup(short iPowerup)
         if(bobomb)
             SetStoredPowerup(8);
         else {
-            ifsoundonplay(sfx_transform);
+            ifSoundOnPlay(sfx_transform);
             eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
             bobomb = true;
         }
@@ -4194,7 +4194,7 @@ void CPlayer::SetPowerup(short iPowerup)
         if(tanooki)
             SetStoredPowerup(20);
         else {
-            ifsoundonplay(sfx_collectpowerup);
+            ifSoundOnPlay(sfx_collectpowerup);
             tanooki = true;
 
             if(game_values.tanookilimit > 0)
@@ -4218,9 +4218,9 @@ void CPlayer::SetPowerup(short iPowerup)
 
         if(powerup != iPowerup) {
             if(iPowerup == 3)
-                ifsoundonplay(sfx_collectfeather);
+                ifSoundOnPlay(sfx_collectfeather);
             else
-                ifsoundonplay(sfx_collectpowerup);
+                ifSoundOnPlay(sfx_collectpowerup);
         }
 
         ClearPowerupStates();
@@ -4283,12 +4283,12 @@ void CPlayer::SetStoredPowerup(short iPowerup)
 {
     //If the player as the poison mushroom or the game is over, don't store the powerup
     if(game_values.gamepowerups[globalID] == 0 || game_values.gamemode->gameover) {
-        ifsoundonplay(sfx_stun);
+        ifSoundOnPlay(sfx_stun);
         return;
     }
 
     game_values.gamepowerups[globalID] = iPowerup;
-    ifsoundonplay(sfx_storepowerup);
+    ifSoundOnPlay(sfx_storepowerup);
 }
 
 void CPlayer::ClearPowerupStates()
@@ -4312,6 +4312,6 @@ void CPlayer::DecreaseProjectileLimit()
     if(--projectilelimit <= 0) {
         projectilelimit = 0;
         powerup = -1;
-        ifsoundonplay(sfx_powerdown);
+        ifSoundOnPlay(sfx_powerdown);
     }
 }

@@ -325,17 +325,18 @@ bool LoadAndSplashScreen()
             rm->menu_version.draw(570, 10);	//smw logo
 
             rm->menu_font_large.setalpha((Uint8)alpha);
-			rm->menu_font_large.drawRightJustified(smw->ScreenWidth - (640 - 630), 45, "WIP");
+			rm->menu_font_large.drawRightJustified(smw->ScreenWidth * 0.98f, 45, "WIP");
 
             menu_credits.setalpha((Uint8)alpha);
             menu_credits.draw(227, 200);
         }
 
         if(state == 7) {
-            _load_drawmsg("Loading...");
-            rm->menu_font_large.drawCentered(320, 420, "Loading...");
+//            _load_drawmsg("Loading...");
+            rm->menu_font_large.drawCentered(smw->ScreenWidth/2, smw->ScreenHeight * 0.875f, "Loading...");
         } else if(state == 8) {
-            _load_drawmsg("Press Any Key To Continue");
+//            _load_drawmsg("Press Any Key To Continue");
+        	rm->menu_font_large.drawCentered(smw->ScreenWidth/2, smw->ScreenHeight * 0.875f, "Press Any Key To Continue");
 
             eyecandy[2].cleandeadobjects();
             eyecandy[2].update();
@@ -374,7 +375,7 @@ bool LoadAndSplashScreen()
 			maplist->ReadFilters();
 			maplist->ApplyFilters(game_values.pfFilters);
 
-			ifsoundonplay(sfx_coin);
+			ifSoundOnPlay(sfx_coin);
 
 
             state++;

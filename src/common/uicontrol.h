@@ -3,7 +3,6 @@
 
 #include "uimenu.h"
 #include "input.h"
-#include "randFuncs.h"
 #include "Game.h"
 
 extern CGame *smw;
