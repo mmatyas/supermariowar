@@ -240,9 +240,9 @@ void Menu::CreateMenu()
     miPlayerControlsBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
     miPlayerControlsBackButton->SetCode(MENU_CODE_TO_MAIN_MENU);
 
-    miPlayerControlsLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
-    miPlayerControlsMenuRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miPlayerControlsMenuHeaderText = new MI_Text("Player Controls Menu", 320, 5, 0, 2, 1);
+    miPlayerControlsLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
+    miPlayerControlsMenuRightHeaderBar = new MI_Image(&rm->menu_plain_field, smw->ScreenWidth/2, 0, 192, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
+    miPlayerControlsMenuHeaderText = new MI_Text("Player Controls Menu", smw->ScreenWidth/2, 5, 0, 2, 1);
 
     mPlayerControlsSelectMenu.AddControl(miPlayer1ControlsButton, miPlayerControlsBackButton, miPlayer2ControlsButton, NULL, miPlayerControlsBackButton);
     mPlayerControlsSelectMenu.AddControl(miPlayer2ControlsButton, miPlayer1ControlsButton, miPlayer3ControlsButton, NULL, miPlayerControlsBackButton);
@@ -308,13 +308,13 @@ void Menu::CreateMenu()
     miOptionsMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
     miOptionsMenuBackButton->SetCode(MENU_CODE_TO_MAIN_MENU);
 
-    miOptionsMenuLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
-    miOptionsMenuRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
-    miOptionsMenuHeaderText = new MI_Text("Options Menu", 320, 5, 0, 2, 1);
+    miOptionsMenuLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
+    miOptionsMenuRightHeaderBar = new MI_Image(&rm->menu_plain_field, smw->ScreenWidth/2, 0, 192, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
+    miOptionsMenuHeaderText = new MI_Text("Options Menu", smw->ScreenWidth/2, 5, 0, 2, 1);
 
     miGenerateThumbsDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
-    miGenerateThumbsDialogAreYouText = new MI_Text("Are You", 320, 195, 0, 2, 1);
-    miGenerateThumbsDialogSureText = new MI_Text("Sure?", 320, 220, 0, 2, 1);
+    miGenerateThumbsDialogAreYouText = new MI_Text("Are You", smw->ScreenWidth/2, 195, 0, 2, 1);
+    miGenerateThumbsDialogSureText = new MI_Text("Sure?", smw->ScreenWidth/2, 220, 0, 2, 1);
     miGenerateThumbsDialogYesButton = new MI_Button(&rm->spr_selectfield, 235, 250, "Yes", 80, 1);
     miGenerateThumbsDialogNoButton = new MI_Button(&rm->spr_selectfield, 325, 250, "No", 80, 1);
 

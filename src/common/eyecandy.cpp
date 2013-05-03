@@ -508,7 +508,7 @@ EC_Announcement::EC_Announcement(gfxFont *nfont, gfxSprite *nsprite, const char 
     short iWidth = 16 + iFontOffsetX + font->getWidth(text);
     short iHalfWidth = iWidth >> 1;
 
-    ix = 320 - iHalfWidth;
+    ix = smw->ScreenWidth/2 - iHalfWidth;
 
     gfx_setrect(&rDstRect[0], ix, iy, iHalfWidth, 32);
     gfx_setrect(&rDstRect[1], ix + iHalfWidth, iy, iHalfWidth, 32);
@@ -516,9 +516,9 @@ EC_Announcement::EC_Announcement(gfxFont *nfont, gfxSprite *nsprite, const char 
     gfx_setrect(&rDstRect[3], ix + iHalfWidth, iy + 32, iHalfWidth, 32);
 
     gfx_setrect(&rSrcRect[0], 0, 0, iHalfWidth, 32);
-    gfx_setrect(&rSrcRect[1], 512 - iHalfWidth, 0, iHalfWidth, 32);
-    gfx_setrect(&rSrcRect[2], 0, 448, iHalfWidth, 32);
-    gfx_setrect(&rSrcRect[3], 512 - iHalfWidth, 448, iHalfWidth, 32);
+    gfx_setrect(&rSrcRect[1], smw->ScreenWidth * 0.8f - iHalfWidth, 0, iHalfWidth, 32);
+    gfx_setrect(&rSrcRect[2], 0, smw->ScreenHeight * 0.93f, iHalfWidth, 32);
+    gfx_setrect(&rSrcRect[3], smw->ScreenWidth * 0.8f - iHalfWidth, smw->ScreenHeight * 0.93f, iHalfWidth, 32);
 }
 
 

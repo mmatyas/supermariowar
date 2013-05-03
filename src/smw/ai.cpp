@@ -995,10 +995,10 @@ void CPlayerAI::DistanceToObject(CObject * object, CObject ** target, int * near
     bool fScreenWrap = false;
 
     //See if it is a shorter distance wrapping around the screen
-    if(tx > 320) {
+    if(tx > smw->ScreenWidth/2) {
         tx = smw->ScreenWidth - tx;
         fScreenWrap = true;
-    } else if(tx < -320) {
+    } else if(tx < -smw->ScreenWidth/2) {
         tx = smw->ScreenWidth + tx;
         fScreenWrap = true;
     }
@@ -1019,10 +1019,10 @@ void CPlayerAI::DistanceToObjectCenter(CObject * object, CObject ** target, int 
     short ty = object->iy + (object->collisionHeight >> 1) - pPlayer->iy - HALFPH;
     bool fScreenWrap = false;
 
-    if(tx > 320) {
+    if(tx > smw->ScreenWidth/2) {
         tx = smw->ScreenWidth - tx;
         fScreenWrap = true;
-    } else if(tx < -320) {
+    } else if(tx < -smw->ScreenWidth/2) {
         tx = smw->ScreenWidth + tx;
         fScreenWrap = true;
     }
@@ -1044,10 +1044,10 @@ void CPlayerAI::DistanceToPlayer(CPlayer * player, CPlayer ** target, int * near
     short ty = player->iy - pPlayer->iy;
     bool fScreenWrap = false;
 
-    if(tx > 320) {
+    if(tx > smw->ScreenWidth/2) {
         tx = smw->ScreenWidth - tx;
         fScreenWrap = true;
-    } else if(tx < -320) {
+    } else if(tx < -smw->ScreenWidth/2) {
         tx = smw->ScreenWidth + tx;
         fScreenWrap = true;
     }

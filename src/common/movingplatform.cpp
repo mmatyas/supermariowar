@@ -158,8 +158,8 @@ StraightPathContinuous::StraightPathContinuous(float vel, float startX, float st
     dEdgeY = smw->ScreenHeight;
 
     if(preview) {
-        dEdgeX = 320.0f;
-        dEdgeY = 240.0f;
+        dEdgeX = smw->ScreenWidth/2;
+        dEdgeY = smw->ScreenHeight/2;
     }
 }
 
@@ -499,7 +499,7 @@ void MovingPlatform::draw()
 //Draw path for map preview
 void MovingPlatform::draw(short iOffsetX, short iOffsetY)
 {
-    gfx_drawpreview(sSurface[0], ix - iHalfWidth + iOffsetX, iy - iHalfHeight + iOffsetY, 0, 0, iWidth, iHeight, iOffsetX, iOffsetY, 320, 240, true);
+    gfx_drawpreview(sSurface[0], ix - iHalfWidth + iOffsetX, iy - iHalfHeight + iOffsetY, 0, 0, iWidth, iHeight, iOffsetX, iOffsetY, smw->ScreenWidth/2, smw->ScreenHeight/2, true);
 }
 
 void MovingPlatform::update()

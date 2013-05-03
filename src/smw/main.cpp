@@ -2230,7 +2230,7 @@ SWAPBREAK:
 
                                 //Display tanooki powerup if player has it
                                 if(player->tanooki)
-                                    rm->spr_storedpowerupsmall.draw(iScoreOffsetX + 16, iScoreOffsetY + 16, 320, 0, 16, 16);
+                                    rm->spr_storedpowerupsmall.draw(iScoreOffsetX + 16, iScoreOffsetY + 16, smw->ScreenWidth/2, 0, 16, 16);
                             } else {
                                 rm->spr_player[globalID][iScoreboardSprite]->draw(score[i]->x + scoreoffsets[k], score[i]->y + 2, 0, 0, 32, 32);
                             }
@@ -2308,7 +2308,7 @@ SWAPBREAK:
             if(game_values.windaffectsplayers) {
                 short iDisplayWindMeterY = game_values.scoreboardstyle == 1 ? 8 : 440;
                 rm->spr_windmeter.draw(210, iDisplayWindMeterY, 0, 0, 220, 32);
-                rm->spr_windmeter.draw((short)(game_values.gamewindx * 20.0f) + 320, iDisplayWindMeterY + 6, 220, 0, 12, 20);
+                rm->spr_windmeter.draw((short)(game_values.gamewindx * 20.0f) + smw->ScreenWidth/2, iDisplayWindMeterY + 6, 220, 0, 12, 20);
             }
 
             //draw arrows for being above the top of the screen
@@ -2423,7 +2423,7 @@ SWAPBREAK:
                 rm->spr_dialog.draw(224, 176);
 				rm->menu_font_large.drawCentered(smw->ScreenHeight/2, 194, "Pause");
 
-                //menu_font_large.drawCentered(320, 240, game_values.gamemode->GetModeName());
+                //menu_font_large.drawCentered(smw->ScreenWidth/2, smw->ScreenHeight/2, game_values.gamemode->GetModeName());
                 short iMode = GetModeIconIndexFromMode(game_values.gamemode->gamemode);
 
                 rm->menu_mode_large.draw(304, 224, iMode << 5, 0, 32, 32);

@@ -2960,7 +2960,7 @@ bool CMap::findspawnpoint(short iType, short * x, short * y, short width, short 
 {
     if(totalspawnsize[iType] <= 0) {
 		*x = RNGMAX(smw->ScreenWidth);
-		*y = RNGMAX(smw->ScreenHeight - (480 - 416));
+		*y = RNGMAX(smw->ScreenHeight * 0.87f);
         return true;
     }
 

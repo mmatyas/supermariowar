@@ -3299,7 +3299,7 @@ void CGM_Bonus::draw_background()
 
     //Draw Bonus House Title
     rm->menu_plain_field.draw(0, 0, 0, 0, smw->ScreenWidth/2, 32);
-    rm->menu_plain_field.draw(320, 0, 192, 0, smw->ScreenWidth/2, 32);
+    rm->menu_plain_field.draw(smw->ScreenWidth/2, 0, 192, 0, smw->ScreenWidth/2, 32);
     rm->game_font_large.drawCentered(smw->ScreenWidth/2, 5, tsTourStop->szName);
 
     //Draw Bonus House Text
@@ -3307,7 +3307,7 @@ void CGM_Bonus::draw_background()
         rm->spr_worldbonushouse.draw(128, 128, 0, 64, 384, 128);
 
         for(short iTextLine = 0; iTextLine < tsTourStop->iBonusTextLines; iTextLine++)
-            rm->game_font_large.drawChopCentered(320, 132 + 24 * iTextLine, 372, tsTourStop->szBonusText[iTextLine]);
+            rm->game_font_large.drawChopCentered(smw->ScreenWidth/2, 132 + 24 * iTextLine, 372, tsTourStop->szBonusText[iTextLine]);
     }
 }
 

@@ -247,6 +247,7 @@ SDL_Surface * gfx_createskinsurface(SDL_Surface * skin, short spriteindex, Uint8
             tempcounter += 3;
         }
 
+        // 5 * 96 shall be replaced by a better variable expression
         skincounter += 5 * 96 + skin->pitch - (skin->w * 3);
         tempcounter += 96 * (loops - 1) + temp->pitch - (temp->w * 3);
     }
