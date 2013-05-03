@@ -6,7 +6,9 @@ cmake_minimum_required(VERSION 2.6)
 
 project(smw)
 
-## currently workign only with 1.2
+option(DEBUG "Compile with debugging information" OFF)
+
+## currently working only with 1.2
 option(USE_PNG_SAVE "Enable PNG save feature" OFF)
 
 # version number
@@ -86,13 +88,24 @@ if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "^arm")
 
 	## NEON optimizations for armv7
 	if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "7")
-		add_definitions(-march=armv7-a -mfpu=neon)
- 		add_definitions(-D__ARM_NEON__)
+		##TODO: support armel
+		add_definitions(-mfpu=neon -mfloat-abi=softfp)
 	endif()
 
 	add_definitions(-D_M_ARM=1)
 	add_definitions(-D_M_GENERIC=1)
 endif()
+
+# Debugging CFLAGS.  Turn optimizations off; turn debugging symbols on.
+if(DEBUG)
+  add_definitions(-DDEBUG -D_DEBUG -DPNG_DEBUG=1)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -g -O0")
+else()
+  add_definitions(-DNDEBUG)
+#  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
+#  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -O3")
+endif(DEBUG)
 
 # Set these next two lines to test generic
 #set(_M_GENERIC 1)

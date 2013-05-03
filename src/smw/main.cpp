@@ -411,6 +411,9 @@ SDL_Joystick **joysticks = NULL;
 short joystickcount = 0;
 
 #ifdef _DEBUG
+
+extern void HashTableTest();
+
 bool g_fAutoTest = false;
 bool g_fRecordTest = false;
 #endif
@@ -2483,7 +2486,10 @@ SWAPBREAK:
         if(ticks == 0)
             ticks = 1;
 
-        if(game_values.showfps) {
+#if	!_DEBUG
+        if(game_values.showfps)
+#endif
+        {
             float potentialFps = 1000.0f / (float)(game_values.framelimiter == 0 ? 1 : game_values.framelimiter);
             rm->menu_font_large.drawf(0, smw->ScreenHeight-rm->menu_font_large.getHeight(), "Actual:%.1f/%.1f, Flip:%.1f, Potential:%.1f", realfps, potentialFps, flipfps, 1000.0f / (float)ticks);
         }

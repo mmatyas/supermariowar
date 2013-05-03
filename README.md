@@ -14,17 +14,17 @@ How to compile on Linux
 =======================
 Enter the Build directory, run cmake, then make and finally you can use the binary smw in Build/Binaries directories.
 
-$# cd Build && cmake -DCMAKE_BUILD_TYPE=Release .. && make -j5
+$# cd Build && cmake .. && make -j5
 $# Binaries/smw ../
 
 If you have troubles at compiling you might want to use instead:
 
 $# VERBOSE=1 make -j5
 
-To compile with debugging symbols:
+To compile with debugging symbols enable the relative option:
 
-$# cd Build && cmake -DCMAKE_BUILD_TYPE=Debug .. && make -j5
-$# gsb Binaries/smw 
+$# cd Build && cmake -DDEBUG=ON .. && make -j5
+$# gdb Binaries/smw 
 gdb> run ../
 
 How to compile on Windows

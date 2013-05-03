@@ -12,6 +12,7 @@ See also old/DevelopmentDiary-till-2004.txt for the original development diary.
 Modularity is not enforced.
 
 From a comment: Pressing insert in debug mode turns on automated testing
+TODO: Investigate this
 
 2013-04-24
 ----------
@@ -29,10 +30,9 @@ Compatibility to old SMW directory paths shall be preserved at least till 2.0.
 numeric indexes in the .txt files shall be replaced by enum constants (like Music Category, etc)
 
 Replacing 'rand() %' with properly uniform distributed function GetRandMax()
+DONE
 
 Adding preliminary support for bigger screen resolutions (might not work e.g. no big enough maps or missing scrolling support)
-
-AI-controlled players :)
 
 better sound for eggs game
 
@@ -50,6 +50,7 @@ Only 800x600 shall be supported as new resolution (for now).
 
 Pre 1.9 maps shall be supported, but converted on-the-fly to human-readable format (only when accessing in directory mode)
 Tiled's TMX is a good candidate
+
 Long term features
 ------------------
 * Lua scripting language support
@@ -85,6 +86,6 @@ Packages shall also have version number, always the latest version is used of an
 Known issues
 ------------
 
-Throws exception after exiting, possibly due to memory corruption of some brave new/delete operation.
+SEGFAULT when pressing Insert in debug mode (scripted operations not working)
 There are many weird code smells.
 I did not yet start reading the TODO to check what's missing and what not.

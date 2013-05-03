@@ -2946,7 +2946,9 @@ void Menu::RunMenu()
         if(ticks == 0)
             ticks = 1;
 
+#if	!_DEBUG
         if(game_values.showfps)
+#endif
             rm->menu_font_large.drawf(0, smw->ScreenHeight - rm->menu_font_large.getHeight(), "Actual:%.1f/%.1f, Flip:%.1f, Potential:%.1f", realfps, 1000.0f / (float)WAITTIME, flipfps, 1000.0f / (float)ticks);
 
 #ifdef _DEBUG
@@ -3415,6 +3417,7 @@ void Menu::GetNextScriptOperation()
         return;
     }
 
+    // here bad reference when pressing Ins!
     ScriptOperation * op = *current;
 
     while(op->iTimesExecuted >= op->iIterations) {

@@ -652,10 +652,10 @@ void gfx_drawpreview(SDL_Surface * surface, short dstX, short dstY, short srcX, 
         //Deal with wrapping over sides of screen
         bool fBlitSide = false;
         if(dstX < clipX) {
-            rDstRect.x = dstX + 320;
+            rDstRect.x = dstX + smw->ScreenWidth/2;
             fBlitSide = true;
         } else if(dstX + iw >= clipX + clipW) {
-            rDstRect.x = dstX - 320;
+            rDstRect.x = dstX - smw->ScreenWidth/2;
             fBlitSide = true;
         }
 
