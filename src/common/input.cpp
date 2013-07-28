@@ -3,7 +3,7 @@
 
 CPlayerInput::CPlayerInput()
 {
-    for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for(int iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
         for(int iKey = 0; iKey < NUM_KEYS; iKey++) {
 			outputControls[iPlayer].keys[iKey].fPressed = false;
 			outputControls[iPlayer].keys[iKey].fDown = false;
@@ -20,7 +20,7 @@ void CPlayerInput::CheckIfMouseUsed()
 #ifndef _XBOX
 
     for(short iGameState = 0; iGameState < 2; iGameState++) {
-        for(short iPlayer = 0; iPlayer < 4; iPlayer++) {
+        for(short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
 			CInputControl * inputControl = &inputControls[iPlayer]->inputGameControls[iGameState];
 
             for(short iKey = 0; iKey < NUM_KEYS; iKey++) {
@@ -45,7 +45,7 @@ void CPlayerInput::CheckIfMouseUsed()
 //Clear old button pushed states
 void CPlayerInput::ClearPressedKeys(short iGameState)
 {
-    for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for(int iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
 		CInputControl * inputControl = &inputControls[iPlayer]->inputGameControls[iGameState];
 		COutputControl * outputControl = &outputControls[iPlayer];
 
@@ -78,7 +78,7 @@ void CPlayerInput::ClearPressedKeys(short iGameState)
 //Call this when switching from menu to game
 void CPlayerInput::ResetKeys()
 {
-    for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for(int iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
         for(int iKey = 0; iKey < NUM_KEYS; iKey++) {
 			outputControls[iPlayer].keys[iKey].fPressed = false;
 			outputControls[iPlayer].keys[iKey].fDown = false;
@@ -95,7 +95,7 @@ void CPlayerInput::ResetKeys()
 void CPlayerInput::Update(SDL_Event event, short iGameState)
 {
 	bool fFound = false;
-    for(short iPlayer = -1; iPlayer < 4; iPlayer++) {
+    for(short iPlayer = -1; iPlayer < MAX_PLAYERS; iPlayer++) {
 		CInputControl * inputControl;
 		COutputControl * outputControl;
 		short iPlayerID = iPlayer;

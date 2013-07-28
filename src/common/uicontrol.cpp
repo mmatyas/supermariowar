@@ -1,18 +1,22 @@
 #include "global.h"
 #include <math.h>
+#include <cassert>
 
 extern void LoadCurrentMapBackground();
 extern void LoadMapHazards(bool fPreview);
 
-UI_Control::UI_Control(short x, short y)
+UI_Control::UI_Control(float x, float y)
 {
+	assert(x > 0 && x <= 1);
+	assert(y > 0 && y <= 1);
+
     fSelected = false;
     fModifying = false;
     fAutoModify = false;
     fDisable = false;
 
-    ix = x;
-    iy = y;
+    ix = x * smw->ScreenWidth;
+    iy = y * smw->ScreenHeight;
 
     fShow = true;
 
@@ -27,7 +31,7 @@ UI_Control::UI_Control(short x, short y)
 /**************************************
  * MI_IPField Class
  **************************************/
-MI_IPField::MI_IPField(gfxSprite * nspr, short x, short y) :
+MI_IPField::MI_IPField(gfxSprite * nspr, float x, float y) :
     UI_Control(x, y)
 {
     spr = nspr;
@@ -82,7 +86,7 @@ MenuCodeEnum MI_IPField::Modify(bool modify)
 
 MenuCodeEnum MI_IPField::SendInput(CPlayerInput * playerInput)
 {
-    for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for(int iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
         if(playerInput->outputControls[iPlayer].menu_right.fPressed) {
             if(++iSelectedDigit > 11)
                 iSelectedDigit = 0;
@@ -183,7 +187,7 @@ MenuCodeEnum MI_IPField::MouseClick(short iMouseX, short iMouseY)
  * MI_SelectField Class
  **************************************/
 
-MI_SelectField::MI_SelectField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent) :
+MI_SelectField::MI_SelectField(gfxSprite * nspr, float x, float y, const char * name, short width, short indent) :
     UI_Control(x, y)
 {
     spr = nspr;
@@ -368,7 +372,7 @@ MenuCodeEnum MI_SelectField::Modify(bool modify)
 
 MenuCodeEnum MI_SelectField::SendInput(CPlayerInput * playerInput)
 {
-    for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for(int iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
         short iNumMoves = 1;
         if(fFastScroll && playerInput->outputControls[iPlayer].menu_scrollfast.fDown)
             iNumMoves = 10;
@@ -428,11 +432,11 @@ void MI_SelectField::Draw()
     if(iIndent == 0) {
         short iHalfWidth = iWidth >> 1;
         spr->draw(ix, iy, 0, (fSelected ? 32 : 0) + iAdjustmentY, iHalfWidth, 32);
-        spr->draw(ix + iHalfWidth, iy, 512 - iHalfWidth, (fSelected ? 32 : 0) + iAdjustmentY, iWidth - iHalfWidth, 32);
+        spr->draw(ix + iHalfWidth, iy, smw->ScreenWidth * 0.8 - iHalfWidth, (fSelected ? 32 : 0) + iAdjustmentY, iWidth - iHalfWidth, 32);
     } else {
         spr->draw(ix, iy, 0, (fSelected ? 32 : 0) + iAdjustmentY, iIndent - 16, 32);
         spr->draw(ix + iIndent - 16, iy, 0, (fSelected ? 96 : 64), 32, 32);
-        spr->draw(ix + iIndent + 16, iy, 528 - iWidth + iIndent, (fSelected ? 32 : 0) + iAdjustmentY, iWidth - iIndent - 16, 32);
+        spr->draw(ix + iIndent + 16, iy, smw->ScreenWidth * 0.825 - iWidth + iIndent, (fSelected ? 32 : 0) + iAdjustmentY, iWidth - iIndent - 16, 32);
     }
 
     if(iIndent> 0)
@@ -446,7 +450,6 @@ void MI_SelectField::Draw()
             rm->menu_font_large.drawChopRight(ix + 16, iy + 5, iWidth - 32, (*current)->sName.c_str());
     }
 
-    //TODO: invert order
 	bool drawLeft = true;
     
 	if((items.begin() != items.end() && current == items.begin()))
@@ -455,18 +458,16 @@ void MI_SelectField::Draw()
 	if (!fNoWrap || drawLeft)
         miModifyImageLeft->Draw();
 
-    //TODO: invert order
-
 	bool drawRight = true;
 
-		if (items.end() != items.begin()) {
+	if (items.end() != items.begin()) {
 
-			if (items.begin() != --items.end()) {
+		if (items.begin() != --items.end()) {
 
-				if (current == --items.end())
-					drawRight = false;
-			}
+			if (current == --items.end())
+				drawRight = false;
 		}
+	}
 
     if(drawRight || !fNoWrap)
         miModifyImageRight->Draw();
@@ -656,7 +657,7 @@ void MI_SelectField::Refresh()
  * MI_ImageSelectField Class
  **************************************/
 
-MI_ImageSelectField::MI_ImageSelectField(gfxSprite * nspr, gfxSprite * nspr_image, short x, short y, const char * name, short width, short indent, short imageHeight, short imageWidth) :
+MI_ImageSelectField::MI_ImageSelectField(gfxSprite * nspr, gfxSprite * nspr_image, float x, float y, const char * name, short width, short indent, short imageHeight, short imageWidth) :
     MI_SelectField(nspr, x, y, name, width, indent)
 {
     spr_image = nspr_image;
@@ -694,7 +695,7 @@ void MI_ImageSelectField::Draw()
  * MI_SliderField Class
  **************************************/
 
-MI_SliderField::MI_SliderField(gfxSprite * nspr, gfxSprite * nsprSlider, short x, short y, const char * name, short width, short indent1, short indent2) :
+MI_SliderField::MI_SliderField(gfxSprite * nspr, gfxSprite * nsprSlider, float x, float y, const char * name, short width, short indent1, short indent2) :
     MI_SelectField(nspr, x, y, name, width, indent1)
 {
     iIndent2 = indent2;
@@ -751,7 +752,7 @@ void MI_SliderField::Draw()
 
 MenuCodeEnum MI_SliderField::SendInput(CPlayerInput * playerInput)
 {
-    for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for(int iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
         if(playerInput->outputControls[iPlayer].menu_scrollfast.fPressed) {
             if(iIndex == 0)
                 while(MoveNext());
@@ -770,7 +771,7 @@ MenuCodeEnum MI_SliderField::SendInput(CPlayerInput * playerInput)
  * MI_PowerupSlider Class
  **************************************/
 
-MI_PowerupSlider::MI_PowerupSlider(gfxSprite * nspr, gfxSprite * nsprSlider, gfxSprite * nsprPowerup, short x, short y, short width, short powerupIndex) :
+MI_PowerupSlider::MI_PowerupSlider(gfxSprite * nspr, gfxSprite * nsprSlider, gfxSprite * nsprPowerup, float x, float y, short width, short powerupIndex) :
     MI_SliderField(nspr, nsprSlider, x, y, "", width, 0, 0)
 {
     sprPowerup = nsprPowerup;
@@ -825,7 +826,7 @@ void MI_PowerupSlider::Draw()
 //Rearrange display of powerups
 short iFrenzyCardPositionMap[NUMFRENZYCARDS] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18};
 
-MI_FrenzyModeOptions::MI_FrenzyModeOptions(short x, short y, short width, short numlines) :
+MI_FrenzyModeOptions::MI_FrenzyModeOptions(float x, float y, short width, short numlines) :
     UI_Control(x, y)
 {
     iWidth = width;
@@ -894,11 +895,11 @@ MI_FrenzyModeOptions::MI_FrenzyModeOptions(short x, short y, short width, short 
         miPowerupSlider[iPowerup]->SetKey(game_values.gamemodemenusettings.frenzy.powerupweight[iPowerup]);
     }
 
-    miBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
+    miBackButton = new MI_Button(&rm->spr_selectfield, 0.85, 0.9, 80, "Back");
     miBackButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
-    miUpArrow = new MI_Image(&rm->menu_verticalarrows, 310, 162, 20, 0, 20, 20, 1, 4, 8);
-    miDownArrow = new MI_Image(&rm->menu_verticalarrows, 310, 402, 0, 0, 20, 20, 1, 4, 8);
+    miUpArrow = new MI_Image(&rm->menu_verticalarrows, 0.48, 0.34, 20, 0, 20, 20, 1, 4, 8);
+    miDownArrow = new MI_Image(&rm->menu_verticalarrows, 0.48, 0.84, 0, 0, 20, 20, 1, 4, 8);
     miUpArrow->Show(false);
 
     mMenu->AddControl(miQuantityField, NULL, miRateField, NULL, NULL);
@@ -970,7 +971,7 @@ void MI_FrenzyModeOptions::SetupPowerupFields()
             slider->Show(false);
         else {
             slider->Show(true);
-            slider->SetPosition(ix + (iPosition % 2) * 295, iy + 118 + 38 * (iPosition / 2 - iOffset));
+            slider->SetPosition(ix + (iPosition % 2) * smw->ScreenWidth * 0.46, iy + 118 + 38 * (iPosition / 2 - iOffset));
         }
     }
 }
@@ -1117,15 +1118,15 @@ void MI_FrenzyModeOptions::Refresh()
  * MI_Button Class
  **************************************/
 
-MI_Button::MI_Button(gfxSprite * nspr, short x, short y, const char * name, short width, short justified) :
-    UI_Control(x, y)
+MI_Button::MI_Button(gfxSprite * nspr, float rX, float rY, short w, const char * name, bool justified) :
+		UI_Control(smw->ScreenWidth * rX, smw->ScreenHeight * rY)
 {
     spr = nspr;
 
     szName = new char[strlen(name) + 1];
     strcpy(szName, name);
 
-    iWidth = width;
+    iWidth = w;
     iTextJustified = justified;
     fSelected = false;
     menuCode = MENU_CODE_NONE;
@@ -1138,8 +1139,8 @@ MI_Button::MI_Button(gfxSprite * nspr, short x, short y, const char * name, shor
 
     iTextW = (short)rm->menu_font_large.getWidth(name);
 
-    iAdjustmentY = width > 256 ? 0 : 128;
-    iHalfWidth = width >> 1;
+    iAdjustmentY = iWidth > 256 ? 0 : 128;
+    iHalfWidth = iWidth >> 1;
 }
 
 MenuCodeEnum MI_Button::Modify(bool)
@@ -1215,7 +1216,7 @@ MenuCodeEnum MI_Button::MouseClick(short iMouseX, short iMouseY)
 /**************************************
  * MI_Image Class
  **************************************/
-MI_Image::MI_Image(gfxSprite * nspr, short x, short y, short srcx, short srcy, short w, short h, short numxframes, short numyframes, short speed) :
+MI_Image::MI_Image(gfxSprite * nspr, float x, float y, short srcx, short srcy, short w, short h, short numxframes, short numyframes, short speed) :
     UI_Control(x, y)
 {
     spr = nspr;
@@ -1329,7 +1330,7 @@ void MI_Image::Draw()
  * MI_Text Class
  **************************************/
 
-MI_Text::MI_Text(const char * text, short x, short y, short w, short size, short justified) :
+MI_Text::MI_Text(const char * text, float x, float y, short w, short size, bool justified) :
     UI_Control(x, y)
 {
     szText = new char[strlen(text) + 1];
@@ -1373,7 +1374,7 @@ void MI_Text::Draw()
  * MI_ScoreText Class
  **************************************/
 
-MI_ScoreText::MI_ScoreText(short x, short y) :
+MI_ScoreText::MI_ScoreText(float x, float y) :
     UI_Control(x, y)
 {
     iScore = 0;
@@ -1431,7 +1432,7 @@ void MI_ScoreText::SetScore(short sScore)
  * MI_TextField Class
  **************************************/
 
-MI_TextField::MI_TextField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent) :
+MI_TextField::MI_TextField(gfxSprite * nspr, float x, float y, const char * name, short width, short indent) :
     UI_Control(x, y)
 {
     spr = nspr;
@@ -1496,7 +1497,7 @@ MenuCodeEnum MI_TextField::SendInput(CPlayerInput * playerInput)
 {
     Uint8 * keystate = SDL_GetKeyState(NULL);
 
-    for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for(int iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
         if(playerInput->outputControls[iPlayer].menu_select.fPressed || playerInput->outputControls[iPlayer].menu_cancel.fPressed) {
             miModifyCursor->Show(false);
 
@@ -1717,7 +1718,7 @@ void MI_TextField::SetDisallowedChars(const char * chars)
  * MI_MapField Class
  **************************************/
 
-MI_MapField::MI_MapField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent, bool showtags) :
+MI_MapField::MI_MapField(gfxSprite * nspr, float x, float y, const char * name, short width, short indent, bool showtags) :
     UI_Control(x, y)
 {
     spr = nspr;
@@ -1812,7 +1813,7 @@ MenuCodeEnum MI_MapField::SendInput(CPlayerInput * playerInput)
     }
     */
 
-    for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for(int iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
         if(playerInput->outputControls[iPlayer].menu_right.fPressed || playerInput->outputControls[iPlayer].menu_down.fPressed) {
             if(MoveNext(playerInput->outputControls[iPlayer].menu_scrollfast.fDown))
                 return MENU_CODE_MAP_CHANGED;
@@ -2106,7 +2107,7 @@ void MI_MapField::SetDimensions(short width, short indent)
     miModifyImageRight->SetPosition(ix + iWidth - 16, iy + 4);
 
     if(fShowtags) {
-        iSlideListOut = (iWidth - 352) >> 1;
+        iSlideListOut = (iWidth - smw->ScreenWidth * 0.55) >> 1;
         iSlideListOutGoal = iSlideListOut;
     }
 }

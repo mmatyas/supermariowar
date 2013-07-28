@@ -13,7 +13,7 @@ class MapListNode;
 class MI_InputControlField : public UI_Control
 {
 	public:
-		MI_InputControlField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent);
+		MI_InputControlField(gfxSprite * nspr, float x, float y, const char * name, short width, short indent);
         virtual ~MI_InputControlField() {};
 		
 		void Draw();
@@ -56,7 +56,7 @@ class MI_StoredPowerupResetButton : public MI_Button
 {
 	public:
 
-		MI_StoredPowerupResetButton(gfxSprite * nspr, short x, short y, const char * name, short width, short justified);
+		MI_StoredPowerupResetButton(gfxSprite * nspr, float x, float y, const char * name, short width, bool justified);
 		~MI_StoredPowerupResetButton() {}
 
 		void Draw();
@@ -66,7 +66,7 @@ class MI_InputControlContainer : public UI_Control
 {
 	public:
 
-		MI_InputControlContainer(gfxSprite * spr_button, short x, short y, short playerID);
+		MI_InputControlContainer(gfxSprite * spr_button, float x, float y, short playerID);
 		virtual ~MI_InputControlContainer();
 
 		void Update();
@@ -103,7 +103,7 @@ class MI_TeamSelect : public UI_Control
 {
 	public:
 
-		MI_TeamSelect(gfxSprite * spr_background, short x, short y);
+		MI_TeamSelect(gfxSprite * spr_background, float x, float y);
 		virtual ~MI_TeamSelect();
 
 		void Update();
@@ -144,7 +144,7 @@ class MI_PlayerSelect : public UI_Control
 {
 	public:
 
-		MI_PlayerSelect(gfxSprite * nspr, short x, short y, const char * name, short width, short indent);
+		MI_PlayerSelect(gfxSprite * nspr, float x, float y, const char * name, short width, short indent);
 		virtual ~MI_PlayerSelect();
 
 		void SetImagePosition();
@@ -172,7 +172,7 @@ class MI_PowerupSelection : public UI_Control
 {
 	public:
 
-		MI_PowerupSelection(short x, short y, short width, short numlines);
+		MI_PowerupSelection(float x, float y, short width, short numlines);
 		virtual ~MI_PowerupSelection();
 
 		MenuCodeEnum Modify(bool modify);
@@ -221,7 +221,7 @@ class MI_WorldPreviewDisplay : public UI_Control
 {
 	public:
 
-		MI_WorldPreviewDisplay(short x, short y, short cols, short rows);
+		MI_WorldPreviewDisplay(float x, float y, short cols, short rows);
 		virtual ~MI_WorldPreviewDisplay();
 
 		//Updates animations or other events every frame
@@ -262,7 +262,7 @@ class MI_AnnouncerField : public UI_Control
 {
 	public:
 
-		MI_AnnouncerField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent, SimpleFileList * pList);
+		MI_AnnouncerField(gfxSprite * nspr, float x, float y, const char * name, short width, short indent, SimpleFileList * pList);
 		virtual ~MI_AnnouncerField();
 
 		//Called when user selects this control to change it's value
@@ -298,7 +298,7 @@ class MI_PacksField : public MI_AnnouncerField
 {
 	public:
 
-		MI_PacksField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent, SimpleFileList * pList, MenuCodeEnum code);
+		MI_PacksField(gfxSprite * nspr, float x, float y, const char * name, short width, short indent, SimpleFileList * pList, MenuCodeEnum code);
 		virtual ~MI_PacksField();
 
 		MenuCodeEnum SendInput(CPlayerInput * playerInput);
@@ -311,7 +311,7 @@ class MI_PlaylistField : public UI_Control
 {
 	public:
 
-		MI_PlaylistField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent);
+		MI_PlaylistField(gfxSprite * nspr, float x, float y, const char * name, short width, short indent);
 		virtual ~MI_PlaylistField();
 
 		//Called when user selects this control to change it's value
@@ -341,7 +341,7 @@ class MI_TourStop : public UI_Control
 {
 	public:
 
-		MI_TourStop(short x, short y, bool fWorld);
+		MI_TourStop(float x, float y, bool fWorld);
 		virtual ~MI_TourStop();
 
 		MenuCodeEnum Modify(bool fModify);
@@ -375,7 +375,7 @@ class MI_TournamentScoreboard : public UI_Control
 {
 	public:
 
-		MI_TournamentScoreboard(gfxSprite * spr_background, short x, short y);
+		MI_TournamentScoreboard(gfxSprite * spr_background, float x, float y);
 		virtual ~MI_TournamentScoreboard();
 
 		void Update();
@@ -439,7 +439,7 @@ class MI_BonusWheel : public UI_Control
 {
 	public:
 
-		MI_BonusWheel(short x, short y);
+		MI_BonusWheel(float x, float y);
 		virtual ~MI_BonusWheel();
 
 		MenuCodeEnum Modify(bool modify);
@@ -533,7 +533,7 @@ class MFS_ListItem
 class MI_MapFilterScroll : public UI_Control
 {
 	public:
-		MI_MapFilterScroll(gfxSprite * nspr, short x, short y, short width, short numlines);
+		MI_MapFilterScroll(gfxSprite * nspr, float x, float y, short width, short numlines);
 		virtual ~MI_MapFilterScroll();
 
 		void Update();

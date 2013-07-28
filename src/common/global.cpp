@@ -1888,7 +1888,7 @@ void CheckSecret(short id)
 {
     if(id == 0 && !game_values.unlocksecretunlocked[0]) {
         short iCountTeams = 0;
-        for(short iPlayer = 0; iPlayer < 4; iPlayer++) {
+        for(short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
             if(game_values.unlocksecret1part1[iPlayer])
                 iCountTeams++;
         }
@@ -1913,7 +1913,7 @@ void CheckSecret(short id)
                 eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->ix - 8, object->iy - 8, 4, 5));
         }
     } else if(id == 2 && !game_values.unlocksecretunlocked[2]) {
-        for(short iPlayer = 0; iPlayer < 4; iPlayer++) {
+        for(short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
             //number of songs on thriller + number of released albums (figure it out :))
             if(game_values.unlocksecret3part1[iPlayer] >= 9 && game_values.unlocksecret3part2[iPlayer] >= 13) {
                 game_values.unlocksecretunlocked[2] = true;
@@ -2030,7 +2030,7 @@ void CGameConfig::ReadBinaryConfig() {
             fread(inputConfiguration, sizeof(CInputPlayerControl), 8, fp);
 
             //setup player input controls for game
-            for(short iPlayer = 0; iPlayer < 4; iPlayer++) {
+            for(short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
                 short iDevice;
                 fread(&iDevice, sizeof(short), 1, fp);
 
@@ -2060,7 +2060,7 @@ void CGameConfig::ReadBinaryConfig() {
             fread(&playercontrol, sizeof(short), 4, fp);
 
             //Load skin/team settings
-            for(short iPlayer = 0; iPlayer < 4; iPlayer++) {
+            for(short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
                 if(skinids[iPlayer] >= skinlist->GetCount() || skinids[iPlayer] < 0)
                     skinids[iPlayer] = 0;
             }
