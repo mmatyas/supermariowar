@@ -16,7 +16,7 @@ extern short LookupTeamID(short id);
  * MI_InputControlField Class
  **************************************/
 
-MI_InputControlField::MI_InputControlField(gfxSprite * nspr, float x, float y, const char * name, short width, short indent) :
+MI_InputControlField::MI_InputControlField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent) :
     UI_Control(x, y)
 {
     spr = nspr;
@@ -287,7 +287,7 @@ void MI_InputControlField::Draw()
  **************************************/
 
 //call with x = 94, y = 19
-MI_InputControlContainer::MI_InputControlContainer(gfxSprite * spr_button, float x, float y, short playerID) :
+MI_InputControlContainer::MI_InputControlContainer(gfxSprite * spr_button, short x, short y, short playerID) :
     UI_Control(x, y)
 {
     iPlayerID = playerID;
@@ -296,10 +296,10 @@ MI_InputControlContainer::MI_InputControlContainer(gfxSprite * spr_button, float
 
     char szTitle[128];
     sprintf(szTitle, "Player %d Controls", iPlayerID + 1);
-    miText = new MI_Text(szTitle, 0.5, 0.01, 0, 2, 1);
+    miText = new MI_Text(szTitle, 320, 5, 0, 2, 1);
 
     miImage[0] = new MI_Image(spr_button, 0, 0, 0, 0, 320, 32, 1, 1, 0);
-    miImage[1] = new MI_Image(spr_button, 0.5, 0, 192, 0, 320, 32, 1, 1, 0);
+    miImage[1] = new MI_Image(spr_button, 320, 0, 192, 0, 320, 32, 1, 1, 0);
 
     miDeviceSelectField = new MI_SelectField(spr_button, x + 16, y + 38, "Device", 420, 150);
     miDeviceSelectField->SetItemChangedCode(MENU_CODE_INPUT_DEVICE_CHANGED);
@@ -325,8 +325,9 @@ MI_InputControlContainer::MI_InputControlContainer(gfxSprite * spr_button, float
         miDeviceSelectField->SetKey(iDevice);
     }
 
-    miInputTypeButton = new MI_Button(spr_button, x + 336, y + 84, 100, "Game");
+    miInputTypeButton = new MI_Button(spr_button, x + 336, y + 84, "Game", 100, 1);
     miInputTypeButton->SetCode(MENU_CODE_INPUT_TYPE_CHANGED);
+
 
     for(short iKey = 0; iKey < NUM_KEYS; iKey++) {
         miGameInputControlFields[iKey] = new MI_InputControlField(spr_button, x + 16, y + 118 + iKey * 34, GameInputNames[iKey], 420, 150);
@@ -346,7 +347,7 @@ MI_InputControlContainer::MI_InputControlContainer(gfxSprite * spr_button, float
         miMenuInputControlFields[iKey]->SetKey(&game_values.playerInput.inputControls[iPlayerID]->inputGameControls[1].keys[iKey]);
     }
 
-    miBackButton = new MI_Button(&rm->spr_selectfield, 0.85, 0.9, 80, "Back");
+    miBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
     miBackButton->SetCode(MENU_CODE_BACK_TO_CONTROLS_MENU);
 
     mInputMenu = new UI_Menu();
@@ -458,7 +459,7 @@ void MI_InputControlContainer::SetPlayer(short playerID)
     //Hide input options that other players are using
     miDeviceSelectField->HideAllItems(false);
 
-    for(short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
+    for(short iPlayer = 0; iPlayer < 4; iPlayer++) {
         if(iPlayer == playerID)
             continue;
 
@@ -516,7 +517,7 @@ void MI_InputControlContainer::UpdateDeviceKeys(short lDevice)
  * MI_TeamSelect Class
  **************************************/
 
-MI_TeamSelect::MI_TeamSelect(gfxSprite * spr_background_ref, float x, float y) :
+MI_TeamSelect::MI_TeamSelect(gfxSprite * spr_background_ref, short x, short y) :
     UI_Control(x, y)
 {
     spr = spr_background_ref;
@@ -565,7 +566,7 @@ void MI_TeamSelect::Draw()
 
     short iPlayerCount = 0;
 
-    for(short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
+    for(short iPlayer = 0; iPlayer < 4; iPlayer++) {
         if(game_values.playercontrol[iPlayer] > 0)
             iPlayerCount++;
     }
@@ -601,7 +602,7 @@ void MI_TeamSelect::Draw()
 
 MenuCodeEnum MI_TeamSelect::SendInput(CPlayerInput * playerInput)
 {
-    for(short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
+    for(short iPlayer = 0; iPlayer < 4; iPlayer++) {
         COutputControl * playerKeys = &game_values.playerInput.outputControls[iPlayer];
 
         if(game_values.playercontrol[iPlayer] > 0 && !fReady[iPlayer]) { //if this player is player or cpu
@@ -755,7 +756,7 @@ void MI_TeamSelect::FindNewTeam(short iPlayerID, short iDirection)
                         iNewTeam = 0;
 
                     fOnlyTeam = true;
-                    for(int iMovePlayer = 0; iMovePlayer < MAX_PLAYERS; iMovePlayer++) {
+                    for(int iMovePlayer = 0; iMovePlayer < 4; iMovePlayer++) {
                         if(iMovePlayer == iNewTeam)
                             continue;
 
@@ -787,7 +788,7 @@ void MI_TeamSelect::FindNewTeam(short iPlayerID, short iDirection)
 
 void MI_TeamSelect::Reset()
 {
-    for(short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
+    for(short iPlayer = 0; iPlayer < 4; iPlayer++) {
         short iTeamID;
         short iSlotID;
         bool fFound = false;
@@ -863,7 +864,7 @@ void MI_TeamSelect::Reset()
 
     fAllReady = true;
 
-    for(short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
+    for(short iPlayer = 0; iPlayer < 4; iPlayer++) {
         iFastScroll[iPlayer] = 0;
         iFastScrollTimer[iPlayer] = 0;
 
@@ -930,7 +931,7 @@ short MI_TeamSelect::GetTeam(short iPlayerID)
 /**************************************
  * MI_PlayerSelect Class
  **************************************/
-MI_PlayerSelect::MI_PlayerSelect(gfxSprite * nspr, float x, float y, const char * name, short width, short indent) :
+MI_PlayerSelect::MI_PlayerSelect(gfxSprite * nspr, short x, short y, const char * name, short width, short indent) :
     UI_Control(x, y)
 {
     spr = nspr;
@@ -968,9 +969,9 @@ MenuCodeEnum MI_PlayerSelect::Modify(bool modify)
 
 MenuCodeEnum MI_PlayerSelect::SendInput(CPlayerInput * playerInput)
 {
-    for(int iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
+    for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
         if(playerInput->outputControls[iPlayer].menu_right.fPressed) {
-            if(++iSelectedPlayer > MAX_PLAYERS-1)
+            if(++iSelectedPlayer > 3)
                 iSelectedPlayer = 0;
 
             SetImagePosition();
@@ -978,7 +979,7 @@ MenuCodeEnum MI_PlayerSelect::SendInput(CPlayerInput * playerInput)
 
         if(playerInput->outputControls[iPlayer].menu_left.fPressed) {
             if(--iSelectedPlayer < 0)
-                iSelectedPlayer = MAX_PLAYERS - 1;
+                iSelectedPlayer = 3;
 
             SetImagePosition();
         }
@@ -989,7 +990,7 @@ MenuCodeEnum MI_PlayerSelect::SendInput(CPlayerInput * playerInput)
 
             if(game_values.playercontrol[iSelectedPlayer] == 0) {
                 int iCountPlayers = 0;
-                for(int iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
+                for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
                     if(game_values.playercontrol[iPlayer] > 0)
                         iCountPlayers++;
                 }
@@ -1005,7 +1006,7 @@ MenuCodeEnum MI_PlayerSelect::SendInput(CPlayerInput * playerInput)
 
             if(game_values.playercontrol[iSelectedPlayer] == 0) {
                 int iCountPlayers = 0;
-                for(int iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
+                for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
                     if(game_values.playercontrol[iPlayer] > 0)
                         iCountPlayers++;
                 }
@@ -1108,7 +1109,7 @@ short iPowerupPositionMap[NUM_POWERUPS] = { 1, 0, 2, 6, 3, 8, 4,20,18, 7, 5,10,1
 24 P-Wing  S.Shell
 */
 
-MI_PowerupSelection::MI_PowerupSelection(float x, float y, short width, short numlines) :
+MI_PowerupSelection::MI_PowerupSelection(short x, short y, short width, short numlines) :
     UI_Control(x, y)
 {
     iWidth = width;
@@ -1172,18 +1173,18 @@ MI_PowerupSelection::MI_PowerupSelection(float x, float y, short width, short nu
         miPowerupSlider[iPowerup]->SetItemChangedCode(MENU_CODE_POWERUP_SETTING_CHANGED);
     }
 
-    miRestoreDefaultsButton = new MI_Button(&rm->spr_selectfield, 160, 432, 150, "Defaults");
+    miRestoreDefaultsButton = new MI_Button(&rm->spr_selectfield, 160, 432, "Defaults", 150, 1);
     miRestoreDefaultsButton->SetCode(MENU_CODE_RESTORE_DEFAULT_POWERUP_WEIGHTS);
 
-    miClearButton = new MI_Button(&rm->spr_selectfield, 330, 432, 150, "Clear");
+    miClearButton = new MI_Button(&rm->spr_selectfield, 330, 432, "Clear", 150, 1);
     miClearButton->SetCode(MENU_CODE_CLEAR_POWERUP_WEIGHTS);
 
     //Are You Sure dialog box
     miDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
     miDialogAreYouText = new MI_Text("Are You", 320, 195, 0, 2, 1);
     miDialogSureText = new MI_Text("Sure?", 320, 220, 0, 2, 1);
-    miDialogYesButton = new MI_Button(&rm->spr_selectfield, 235, 250, 80, "Yes");
-    miDialogNoButton = new MI_Button(&rm->spr_selectfield, 325, 250, 80, "No");
+    miDialogYesButton = new MI_Button(&rm->spr_selectfield, 235, 250, "Yes", 80, 1);
+    miDialogNoButton = new MI_Button(&rm->spr_selectfield, 325, 250, "No", 80, 1);
 
     miDialogYesButton->SetCode(MENU_CODE_POWERUP_RESET_YES);
     miDialogNoButton->SetCode(MENU_CODE_POWERUP_RESET_NO);
@@ -1432,7 +1433,7 @@ void MI_PowerupSelection::AdjustDisplayArrows()
  * MI_WorldPreviewDisplay Class
  **************************************/
 
-MI_WorldPreviewDisplay::MI_WorldPreviewDisplay(float x, float y, short cols, short rows) :
+MI_WorldPreviewDisplay::MI_WorldPreviewDisplay(short x, short y, short cols, short rows) :
     UI_Control(x, y)
 {
     sMapSurface = SDL_CreateRGBSurface(screen->flags, 384, 304, screen->format->BitsPerPixel, 0, 0, 0, 0);
@@ -1657,7 +1658,7 @@ void MI_WorldPreviewDisplay::UpdateMapSurface(bool fFullRefresh)
  * MI_AnnouncerField Class
  **************************************/
 
-MI_AnnouncerField::MI_AnnouncerField(gfxSprite * nspr, float x, float y, const char * name, short width, short indent, SimpleFileList * pList) :
+MI_AnnouncerField::MI_AnnouncerField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent, SimpleFileList * pList) :
     UI_Control(x, y)
 {
     spr = nspr;
@@ -1760,7 +1761,7 @@ void MI_AnnouncerField::Draw()
  * MI_PacksField Class
  **************************************/
 
-MI_PacksField::MI_PacksField(gfxSprite * nspr, float x, float y, const char * name, short width, short indent, SimpleFileList * pList, MenuCodeEnum code) :
+MI_PacksField::MI_PacksField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent, SimpleFileList * pList, MenuCodeEnum code) :
     MI_AnnouncerField(nspr, x, y, name, width, indent, pList)
 {
     itemChangedCode = code;
@@ -1799,7 +1800,7 @@ MenuCodeEnum MI_PacksField::SendInput(CPlayerInput * playerInput)
  * MI_PlayListField Class
  **************************************/
 
-MI_PlaylistField::MI_PlaylistField(gfxSprite * nspr, float x, float y, const char * name, short width, short indent) :
+MI_PlaylistField::MI_PlaylistField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent) :
     UI_Control(x, y)
 {
     spr = nspr;
@@ -1909,8 +1910,8 @@ void MI_PlaylistField::Draw()
  * MI_StoredPowerupResetButton Class
  **************************************/
 
-MI_StoredPowerupResetButton::MI_StoredPowerupResetButton(gfxSprite * nspr, float x, float y, const char * name, short width, bool justified) :
-    MI_Button(nspr, x, y, width, name, justified)
+MI_StoredPowerupResetButton::MI_StoredPowerupResetButton(gfxSprite * nspr, short x, short y, const char * name, short width, short justified) :
+    MI_Button(nspr, x, y, name, width, justified)
 {
     spr = nspr;
 
@@ -1949,7 +1950,7 @@ void MI_StoredPowerupResetButton::Draw()
  **************************************/
 
 //Call with x = 70 and y == 80
-MI_TourStop::MI_TourStop(float x, float y, bool fWorld) :
+MI_TourStop::MI_TourStop(short x, short y, bool fWorld) :
     UI_Control(x, y)
 {
     fIsWorld = fWorld;
@@ -1983,11 +1984,11 @@ MI_TourStop::MI_TourStop(float x, float y, bool fWorld) :
         miBonusField = 0;
     }
 
-    miStartButton = new MI_Button(&rm->spr_selectfield, 0.11, 0.094, 500, "Start", false);
+    miStartButton = new MI_Button(&rm->spr_selectfield, 70, 45, "Start", 500, 0);
     miStartButton->SetCode(MENU_CODE_TOUR_STOP_CONTINUE);
     miStartButton->Select(true);
 
-    miMapField = new MI_MapField(&rm->spr_selectfielddisabled, 0.11, 0.34, "Map", 500, 120, false);
+    miMapField = new MI_MapField(&rm->spr_selectfielddisabled, 70, 165, "Map", 500, 120, false);
     miMapField->Disable(true);
 
     miModeField->Disable(true);
@@ -2162,7 +2163,7 @@ void MI_TourStop::Refresh(short iTourStop)
  **************************************/
 
 //Call with x = 70 and y == 80
-MI_TournamentScoreboard::MI_TournamentScoreboard(gfxSprite * spr_background, float x, float y) :
+MI_TournamentScoreboard::MI_TournamentScoreboard(gfxSprite * spr_background, short x, short y) :
     UI_Control(x, y)
 {
     sprBackground = spr_background;
@@ -2710,7 +2711,7 @@ void MI_TournamentScoreboard::StopSwirl()
  * MI_BonusWheel Class
  **************************************/
 
-MI_BonusWheel::MI_BonusWheel(float x, float y) :
+MI_BonusWheel::MI_BonusWheel(short x, short y) :
     UI_Control(x, y)
 {
     miPlayerImages = NULL;
@@ -2728,7 +2729,7 @@ MI_BonusWheel::MI_BonusWheel(float x, float y) :
     //Fix the last sector to allow correct detection of sector for tick sound
     dSelectionSector[NUMBONUSITEMSONWHEEL] = TWO_PI;
 
-    miContinueButton = new MI_Button(&rm->menu_plain_field, ((float)(ix + 76))/smw->ScreenWidth, ((float)(iy + 390)), 200, "Continue");
+    miContinueButton = new MI_Button(&rm->menu_plain_field, ix + 76, iy + 390, "Continue", 200, 1);
     miContinueButton->Show(false);
     miContinueButton->SetCode(MENU_CODE_BONUS_DONE);
 }
@@ -3125,7 +3126,7 @@ void MI_ScreenResize::Draw()
  * MI_MapFilterScroll Class
  **************************************/
 
-MI_MapFilterScroll::MI_MapFilterScroll(gfxSprite * nspr, float x, float y, short width, short numlines) :
+MI_MapFilterScroll::MI_MapFilterScroll(gfxSprite * nspr, short x, short y, short width, short numlines) :
     UI_Control(x, y)
 {
     spr = nspr;

@@ -188,21 +188,21 @@ void Menu::CreateMenu()
     miSMWVersion = new MI_Image(&rm->menu_version, smw->ScreenWidth * 0.89f, 10, 0, 0, 58, 32, 1, 1, 0);
     //miSMWVersionText = new MI_Text("Beta 2", 630, 45, 0, 2, 2);
 
-    miMainStartButton = new MI_Button(&rm->spr_selectfield, 0.1875, 0.4375, 310, "Start", 0);
+    miMainStartButton = new MI_Button(&rm->spr_selectfield, 120, 210, "Start", 310, 0);
     miMainStartButton->SetCode(MENU_CODE_TO_MATCH_SELECTION_MENU);
 
-    miQuickGameButton = new MI_Button(&rm->spr_selectfield, 0.6875, 0.4375, 80, "Go!", 0);
+    miQuickGameButton = new MI_Button(&rm->spr_selectfield, 440, 210, "Go!", 80, 0);
     miQuickGameButton->SetCode(MENU_CODE_QUICK_GAME_START);
 
-    miPlayerSelect = new MI_PlayerSelect(&rm->menu_player_select, 0.1875, 0.52, "Players", smw->ScreenWidth * 0.625f, 140);
+    miPlayerSelect = new MI_PlayerSelect(&rm->menu_player_select, 120, 250, "Players", 400, 140);
 
-    miOptionsButton = new MI_Button(&rm->spr_selectfield, 0.1875, 0.67, smw->ScreenWidth * 0.625f, "Options", 0);
+    miOptionsButton = new MI_Button(&rm->spr_selectfield, 120, 322, "Options", 400, 0);
     miOptionsButton->SetCode(MENU_CODE_TO_OPTIONS_MENU);
 
-    miControlsButton = new MI_Button(&rm->spr_selectfield, 0.1875, 0.75, smw->ScreenWidth * 0.625f, "Controls", 0);
+    miControlsButton = new MI_Button(&rm->spr_selectfield, 120, 362, "Controls", 400, 0);
     miControlsButton->SetCode(MENU_CODE_TO_CONTROLS_MENU);
 
-    miExitButton = new MI_Button(&rm->spr_selectfield, 0.1875, 0.8375, smw->ScreenWidth * 0.625f, "Exit", 0);
+    miExitButton = new MI_Button(&rm->spr_selectfield, 120, 402, "Exit", smw->ScreenWidth * 0.625f, 0);
     miExitButton->SetCode(MENU_CODE_EXIT_APPLICATION);
 
     mMainMenu.AddControl(miMainStartButton, miExitButton, miPlayerSelect, NULL, miQuickGameButton);
@@ -225,19 +225,19 @@ void Menu::CreateMenu()
     // Player Control Select Menu
     //***********************
 
-    miPlayer1ControlsButton = new MI_Button(&rm->spr_selectfield, 0.1875, 0.21875, smw->ScreenWidth * 0.625f, "Player 1", 1);
+    miPlayer1ControlsButton = new MI_Button(&rm->spr_selectfield, 120, 140, "Player 1", 400, 1);
     miPlayer1ControlsButton->SetCode(MENU_CODE_TO_PLAYER_1_CONTROLS);
 
-    miPlayer2ControlsButton = new MI_Button(&rm->spr_selectfield, 0.1875, 0.28175, smw->ScreenWidth * 0.625f, "Player 2", 1);
+    miPlayer2ControlsButton = new MI_Button(&rm->spr_selectfield, 120, 180, "Player 2", 400, 1);
     miPlayer2ControlsButton->SetCode(MENU_CODE_TO_PLAYER_2_CONTROLS);
 
-    miPlayer3ControlsButton = new MI_Button(&rm->spr_selectfield, 0.1875, 0.34375, smw->ScreenWidth * 0.625f, "Player 3", 1);
+    miPlayer3ControlsButton = new MI_Button(&rm->spr_selectfield, 120, 220, "Player 3", 400, 1);
     miPlayer3ControlsButton->SetCode(MENU_CODE_TO_PLAYER_3_CONTROLS);
 
-    miPlayer4ControlsButton = new MI_Button(&rm->spr_selectfield, 0.1875, 0.40625, smw->ScreenWidth * 0.625f, "Player 4", 1);
+    miPlayer4ControlsButton = new MI_Button(&rm->spr_selectfield, 120, 260, "Player 4", 400, 1);
     miPlayer4ControlsButton->SetCode(MENU_CODE_TO_PLAYER_4_CONTROLS);
 
-    miPlayerControlsBackButton = new MI_Button(&rm->spr_selectfield, 0.85, 0.675, 80, "Back");
+    miPlayerControlsBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
     miPlayerControlsBackButton->SetCode(MENU_CODE_TO_MAIN_MENU);
 
     miPlayerControlsLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
@@ -273,50 +273,50 @@ void Menu::CreateMenu()
     // Options Menu
     //***********************
 
-    miGameplayOptionsMenuButton = new MI_Button(&rm->spr_selectfield, 0.1875, 0.083, smw->ScreenWidth * 0.625f, "Gameplay");
+    miGameplayOptionsMenuButton = new MI_Button(&rm->spr_selectfield, 120, 40, "Gameplay", 400, 1);
     miGameplayOptionsMenuButton->SetCode(MENU_CODE_TO_GAMEPLAY_OPTIONS_MENU);
 
-    miTeamOptionsMenuButton = new MI_Button(&rm->spr_selectfield, 0.1875, 0.17, smw->ScreenWidth * 0.625f, "Team");
+    miTeamOptionsMenuButton = new MI_Button(&rm->spr_selectfield, 120, 80, "Team", 400, 1);
     miTeamOptionsMenuButton->SetCode(MENU_CODE_TO_TEAM_OPTIONS_MENU);
 
-    miPowerupOptionsMenuButton = new MI_Button(&rm->spr_selectfield, 0.1875, 0.25, smw->ScreenWidth * 0.625f, "Item Selection");
+    miPowerupOptionsMenuButton = new MI_Button(&rm->spr_selectfield, 120, 120, "Item Selection", 400, 1);
     miPowerupOptionsMenuButton->SetCode(MENU_CODE_TO_POWERUP_SELECTION_MENU);
 
-    miPowerupSettingsMenuButton = new MI_Button(&rm->spr_selectfield, 0.1875, 0.33, smw->ScreenWidth * 0.625f, "Item Settings");
+    miPowerupSettingsMenuButton = new MI_Button(&rm->spr_selectfield, 120, 160, "Item Settings", 400, 1);
     miPowerupSettingsMenuButton->SetCode(MENU_CODE_TO_POWERUP_SETTINGS_MENU);
 
-    miProjectilesOptionsMenuButton = new MI_Button(&rm->spr_selectfield, 0.1875, 0.42, smw->ScreenWidth * 0.625f, "Weapons & Projectiles");
+    miProjectilesOptionsMenuButton = new MI_Button(&rm->spr_selectfield, 120, 200, "Weapons & Projectiles", 400, 1);
     miProjectilesOptionsMenuButton->SetCode(MENU_CODE_TO_PROJECTILES_OPTIONS_MENU);
 
-    miProjectilesLimitsMenuButton = new MI_Button(&rm->spr_selectfield, 0.1875, 0.5, smw->ScreenWidth * 0.625f, "Weapon Use Limits");
+    miProjectilesLimitsMenuButton = new MI_Button(&rm->spr_selectfield, 120, 240, "Weapon Use Limits", 400, 1);
     miProjectilesLimitsMenuButton->SetCode(MENU_CODE_TO_PROJECTILES_LIMITS_MENU);
 
-    miGraphicsOptionsMenuButton = new MI_Button(&rm->spr_selectfield, 0.1875, 0.58, smw->ScreenWidth * 0.625f, "Graphics");
+    miGraphicsOptionsMenuButton = new MI_Button(&rm->spr_selectfield, 120, 280, "Graphics", 400, 1);
     miGraphicsOptionsMenuButton->SetCode(MENU_CODE_TO_GRAPHICS_OPTIONS_MENU);
 
-    miEyeCandyOptionsMenuButton = new MI_Button(&rm->spr_selectfield, 0.1875, 0.67, smw->ScreenWidth * 0.625f, "Eye Candy");
+    miEyeCandyOptionsMenuButton = new MI_Button(&rm->spr_selectfield, 120, 320, "Eye Candy", 400, 1);
     miEyeCandyOptionsMenuButton->SetCode(MENU_CODE_TO_EYECANDY_OPTIONS_MENU);
 
-    miSoundOptionsMenuButton = new MI_Button((game_values.soundcapable ? &rm->spr_selectfield : &rm->spr_selectfielddisabled), 0.1875, 0.75, smw->ScreenWidth * 0.625f, "Music & Sound");
+    miSoundOptionsMenuButton = new MI_Button((game_values.soundcapable ? &rm->spr_selectfield : &rm->spr_selectfielddisabled), 120, 360, "Music & Sound", 400, 1);
 
     if(game_values.soundcapable)
         miSoundOptionsMenuButton->SetCode(MENU_CODE_TO_SOUND_OPTIONS_MENU);
 
-    miGenerateMapThumbsButton = new MI_Button(&rm->spr_selectfield, 0.1875, 0.83, smw->ScreenWidth * 0.625f, "Refresh Maps", true);
+    miGenerateMapThumbsButton = new MI_Button(&rm->spr_selectfield, 120, 400, "Refresh Maps", 400, 1);
     miGenerateMapThumbsButton->SetCode(MENU_CODE_SAVE_ALL_MAP_THUMBNAILS);
 
-    miOptionsMenuBackButton = new MI_Button(&rm->spr_selectfield, 0.85, 0.9, 80, "Back");
+    miOptionsMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
     miOptionsMenuBackButton->SetCode(MENU_CODE_TO_MAIN_MENU);
 
     miOptionsMenuLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
     miOptionsMenuRightHeaderBar = new MI_Image(&rm->menu_plain_field, smw->ScreenWidth/2, 0, 192, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
     miOptionsMenuHeaderText = new MI_Text("Options Menu", smw->ScreenWidth/2, 5, 0, 2, 1);
 
-    miGenerateThumbsDialogImage = new MI_Image(&rm->spr_dialog, 0.35, 0.37, 0, 0, 192, 128, 1, 1, 0);
-    miGenerateThumbsDialogAreYouText = new MI_Text("Are You", smw->ScreenWidth/2, 0.41, 0, 2, 1);
-    miGenerateThumbsDialogSureText = new MI_Text("Sure?", smw->ScreenWidth/2, 0.46, 0, 2, 1);
-    miGenerateThumbsDialogYesButton = new MI_Button(&rm->spr_selectfield, 0.37, 0.52, 80, "Yes");
-    miGenerateThumbsDialogNoButton = new MI_Button(&rm->spr_selectfield, 0.51, 0.52, 80, "No");
+    miGenerateThumbsDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
+    miGenerateThumbsDialogAreYouText = new MI_Text("Are You", smw->ScreenWidth/2, 195, 0, 2, 1);
+    miGenerateThumbsDialogSureText = new MI_Text("Sure?", smw->ScreenWidth/2, 220, 0, 2, 1);
+    miGenerateThumbsDialogYesButton = new MI_Button(&rm->spr_selectfield, 235, 250, "Yes", 80, 1);
+    miGenerateThumbsDialogNoButton = new MI_Button(&rm->spr_selectfield, 325, 250, "No", 80, 1);
 
     miGenerateThumbsDialogYesButton->SetCode(MENU_CODE_GENERATE_THUMBS_RESET_YES);
     miGenerateThumbsDialogNoButton->SetCode(MENU_CODE_GENERATE_THUMBS_RESET_NO);
@@ -413,7 +413,7 @@ void Menu::CreateMenu()
     miWorldGraphicsPackField = new MI_PacksField(&rm->spr_selectfield, 70, 280, "World Graphics", 500, 220, worldgraphicspacklist, MENU_CODE_WORLD_GRAPHICS_PACK_CHANGED);
     miGameGraphicsPackField = new MI_PacksField(&rm->spr_selectfield, 70, 320, "Game Graphics", 500, 220, gamegraphicspacklist, MENU_CODE_GAME_GRAPHICS_PACK_CHANGED);
 
-    miGraphicsOptionsMenuBackButton = new MI_Button(&rm->spr_selectfield, 0.85, 0.9, 80, "Back");
+    miGraphicsOptionsMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
     miGraphicsOptionsMenuBackButton->SetCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 
     miGraphicsOptionsMenuLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
@@ -507,7 +507,7 @@ void Menu::CreateMenu()
     miDeadTeamNoticeField->SetKey(game_values.deadteamnotice ? 1 : 0);
     miDeadTeamNoticeField->SetAutoAdvance(true);
 
-    miEyeCandyOptionsMenuBackButton = new MI_Button(&rm->spr_selectfield, 0.85, 0.9, 80, "Back");
+    miEyeCandyOptionsMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
     miEyeCandyOptionsMenuBackButton->SetCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 
     miEyeCandyOptionsMenuLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
@@ -563,7 +563,7 @@ void Menu::CreateMenu()
     miTournamentControlField->SetData(&game_values.tournamentcontrolstyle, NULL, NULL);
     miTournamentControlField->SetKey(game_values.tournamentcontrolstyle);
 
-    miTeamOptionsMenuBackButton = new MI_Button(&rm->spr_selectfield, 0.85, 0.9, 80, "Back");
+    miTeamOptionsMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
     miTeamOptionsMenuBackButton->SetCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 
     miTeamOptionsMenuLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
@@ -701,7 +701,7 @@ void Menu::CreateMenu()
     miPointSpeedField->SetData(&game_values.pointspeed, NULL, NULL);
     miPointSpeedField->SetKey(game_values.pointspeed);
 
-    miGameplayOptionsMenuBackButton = new MI_Button(&rm->spr_selectfield, 0.85, 0.9, 80, "Back");
+    miGameplayOptionsMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
     miGameplayOptionsMenuBackButton->SetCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 
     miGameplayOptionsMenuLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
@@ -792,7 +792,7 @@ void Menu::CreateMenu()
     miPointSpeedField->SetData(&game_values.pointspeed, NULL, NULL);
     miPointSpeedField->SetKey(game_values.pointspeed);
 
-    miSoundOptionsMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, 80, "Back");
+    miSoundOptionsMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
     miSoundOptionsMenuBackButton->SetCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 
     miSoundOptionsMenuLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
@@ -963,7 +963,7 @@ void Menu::CreateMenu()
     miWandLimitField ->SetData(&game_values.wandlimit, NULL, NULL);
     miWandLimitField ->SetKey(game_values.wandlimit);
 
-    miProjectilesLimitsMenuBackButton = new MI_Button(&rm->spr_selectfield, 0.85, 0.9, 80, "Back");
+    miProjectilesLimitsMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
     miProjectilesLimitsMenuBackButton->SetCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 
     miProjectilesLimitsMenuLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
@@ -1168,7 +1168,7 @@ void Menu::CreateMenu()
     miRedBlockLifeField->SetData(&game_values.redblockttl, NULL, NULL);
     miRedBlockLifeField->SetKey(game_values.redblockttl);
 
-    miProjectilesOptionsMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, 80, "Back");
+    miProjectilesOptionsMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
     miProjectilesOptionsMenuBackButton->SetCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 
     miProjectilesOptionsMenuLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
@@ -1307,7 +1307,7 @@ void Menu::CreateMenu()
     // Match Selection Menu
     //***********************
 
-    miMatchSelectionStartButton = new MI_Button(&rm->spr_selectfield, 0.42, 0.875, 100, "Start");
+    miMatchSelectionStartButton = new MI_Button(&rm->spr_selectfield, 270, 420, "Start", 100, 0);
     miMatchSelectionStartButton->SetCode(MENU_CODE_MATCH_SELECTION_START);
 
     miMatchSelectionField = new MI_SelectField(&rm->spr_selectfield, 130, 340, "Match", 380, 100);
@@ -1393,7 +1393,7 @@ void Menu::CreateMenu()
     // Game Settings
     //***********************
 
-    miSettingsStartButton = new MI_Button(&rm->spr_selectfield, 0.11, 0.94, 500, "Start", false);
+    miSettingsStartButton = new MI_Button(&rm->spr_selectfield, 70, 45, "Start", 500, 0);
     miSettingsStartButton->SetCode(MENU_CODE_START_GAME);
 
     miModeField = new MI_ImageSelectField(&rm->spr_selectfield, &rm->menu_mode_small, 70, 85, "Mode", 500, 120, 16, 16);
@@ -1419,19 +1419,19 @@ void Menu::CreateMenu()
         miGoalField[iGameMode]->SetKey(gamemodes[iGameMode]->goal);
     }
 
-    miModeSettingsButton = new MI_Button(&rm->spr_selectfield, 0.67, 0.26, 140, "Settings", false);
+    miModeSettingsButton = new MI_Button(&rm->spr_selectfield, 430, 125, "Settings", 140, 0);
     miModeSettingsButton->SetCode(MENU_CODE_TO_MODE_SETTINGS_MENU);
 
     miMapField = new MI_MapField(&rm->spr_selectfield, 70, 165, "Map", 500, 120, true);
     szCurrentMapName = miMapField->GetMapName();
 
-    miMapFiltersButton = new MI_Button(&rm->spr_selectfield, 0.67, 0.43, 140, "Filters", false);
+    miMapFiltersButton = new MI_Button(&rm->spr_selectfield, 430, 205, "Filters", 140, 0);
     miMapFiltersButton->SetCode(MENU_CODE_TO_MAP_FILTERS);
 
-    miMapFiltersOnImage = new MI_Image(&rm->menu_map_filter, 0.83, 0.44, 0, 48, 16, 16, 1, 1, 0);
+    miMapFiltersOnImage = new MI_Image(&rm->menu_map_filter, 530, 213, 0, 48, 16, 16, 1, 1, 0);
     miMapFiltersOnImage->Show(false);
 
-    miMapThumbnailsButton = new MI_Button(&rm->spr_selectfield, 0.67, 0.51, 140, "Thumbs", false);
+    miMapThumbnailsButton = new MI_Button(&rm->spr_selectfield, 430, 245, "Thumbs", 140, 0);
     miMapThumbnailsButton->SetCode(MENU_CODE_TO_MAP_BROWSER_THUMBNAILS);
 
     miMapFilterScroll = new MI_MapFilterScroll(&rm->menu_plain_field, 120, 72, 400, 9);
@@ -1457,10 +1457,10 @@ void Menu::CreateMenu()
 
     //Exit tournament dialog box
     miGameSettingsExitDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
-    miGameSettingsExitDialogExitText = new MI_Text("Exit", 0.5, 0.41, 0, 2, 1);
-    miGameSettingsExitDialogTournamentText = new MI_Text("Tournament", 0.5, 0.46, 0, 2, 1);
-    miGameSettingsExitDialogYesButton = new MI_Button(&rm->spr_selectfield, 0.37, 0.52, 80, "Yes");
-    miGameSettingsExitDialogNoButton = new MI_Button(&rm->spr_selectfield, 0.51, 0.52, 80, "No");
+    miGameSettingsExitDialogExitText = new MI_Text("Exit", 320, 195, 0, 2, 1);
+    miGameSettingsExitDialogTournamentText = new MI_Text("Tournament", 320, 220, 0, 2, 1);
+    miGameSettingsExitDialogYesButton = new MI_Button(&rm->spr_selectfield, 235, 250, "Yes", 80, 1);
+    miGameSettingsExitDialogNoButton = new MI_Button(&rm->spr_selectfield, 325, 250, "No", 80, 1);
 
     miGameSettingsExitDialogYesButton->SetCode(MENU_CODE_EXIT_TOURNAMENT_YES);
     miGameSettingsExitDialogNoButton->SetCode(MENU_CODE_EXIT_TOURNAMENT_NO);
@@ -1526,8 +1526,8 @@ void Menu::CreateMenu()
     miTourStopExitDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
     miTourStopExitDialogExitTourText = new MI_Text("Exit Tour", 320, 205, 0, 2, 1);
 
-    miTourStopExitDialogYesButton = new MI_Button(&rm->spr_selectfield, 235, 250, 80, "Yes");
-    miTourStopExitDialogNoButton = new MI_Button(&rm->spr_selectfield, 325, 250, 80, "No");
+    miTourStopExitDialogYesButton = new MI_Button(&rm->spr_selectfield, 235, 250, "Yes", 80, 1);
+    miTourStopExitDialogNoButton = new MI_Button(&rm->spr_selectfield, 325, 250, "No", 80, 1);
 
     miTourStopExitDialogYesButton->SetCode(MENU_CODE_EXIT_TOUR_YES);
     miTourStopExitDialogNoButton->SetCode(MENU_CODE_EXIT_TOUR_NO);
@@ -1563,8 +1563,8 @@ void Menu::CreateMenu()
     miWorldExitDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
     miWorldExitDialogExitTourText = new MI_Text("Exit World", 320, 205, 0, 2, 1);
 
-    miWorldExitDialogYesButton = new MI_Button(&rm->spr_selectfield, 235, 250, 80, "Yes");
-    miWorldExitDialogNoButton = new MI_Button(&rm->spr_selectfield, 325, 250, 80, "No");
+    miWorldExitDialogYesButton = new MI_Button(&rm->spr_selectfield, 235, 250, "Yes", 80, 1);
+    miWorldExitDialogNoButton = new MI_Button(&rm->spr_selectfield, 325, 250, "No", 80, 1);
 
     miWorldExitDialogYesButton->SetCode(MENU_CODE_EXIT_WORLD_YES);
     miWorldExitDialogNoButton->SetCode(MENU_CODE_EXIT_WORLD_NO);
@@ -1614,7 +1614,7 @@ void Menu::CreateMenu()
 
     miTournamentScoreboard = new MI_TournamentScoreboard(&rm->spr_tournament_background, 70, 98);
 
-    miTournamentScoreboardNextButton = new MI_Button(&rm->spr_selectfield, 220, 416, 200, "Next");
+    miTournamentScoreboardNextButton = new MI_Button(&rm->spr_selectfield, 220, 416, "Next", 200, 1);
     miTournamentScoreboardNextButton->SetCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU);
 
     miTournamentScoreboardImage = new MI_Image(&rm->spr_scoreboard, 124, 12, 0, 0, 386, 59, 1, 1, 0);
@@ -1727,7 +1727,7 @@ void Menu::CreateMenu()
     miStoredPowerupResetButton = new MI_StoredPowerupResetButton(&rm->spr_selectfield, 70, 340, "Reset Stored Items", 500, 0);
     miStoredPowerupResetButton->SetCode(MENU_CODE_RESET_STORED_POWERUPS);
 
-    miPowerupSettingsMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, 80, "Back");
+    miPowerupSettingsMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
     miPowerupSettingsMenuBackButton->SetCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
 
     miPowerupSettingsMenuLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
@@ -3444,8 +3444,7 @@ void Menu::GetNextScriptOperation()
             iKeys[iNumKeys++] = i;
     }
 
-    if(iController == MAX_PLAYERS) {
-    	// press random keys on all controllers
+    if(iController == MAX_PLAYERS) { //All controllers
         game_values.playerInput.outputControls[0].keys[iKeys[RNGMAX(iNumKeys)]].fPressed = true;
         game_values.playerInput.outputControls[1].keys[iKeys[RNGMAX(iNumKeys)]].fPressed = true;
         game_values.playerInput.outputControls[2].keys[iKeys[RNGMAX(iNumKeys)]].fPressed = true;

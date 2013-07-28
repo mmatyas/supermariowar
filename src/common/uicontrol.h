@@ -12,7 +12,7 @@ class UI_Menu;
 class UI_Control
 {
 public:
-    UI_Control(float x, float y);
+    UI_Control(short x, short y);
     virtual ~UI_Control() {}
 
     virtual void Update() {}
@@ -51,7 +51,6 @@ public:
     void SetNeighbor(short iNeighbor, UI_Control * uiControl) {
         neighborControls[iNeighbor] = uiControl;
     }
-
     UI_Control * GetNeighbor(short iNeighbor) {
         return neighborControls[iNeighbor];
     }
@@ -59,7 +58,6 @@ public:
     void Show(bool show) {
         fShow = show;
     }
-
     bool IsVisible() {
         return fShow;
     }
@@ -110,7 +108,7 @@ protected:
 class MI_Image : public UI_Control
 {
 public:
-    MI_Image(gfxSprite * nspr, float x, float y, short srcx, short srcy, short srcw, short srch, short numxframes, short numyframes, short speed);
+    MI_Image(gfxSprite * nspr, short x, short y, short srcx, short srcy, short w, short h, short numxframes, short numyframes, short speed);
     virtual ~MI_Image();
 
     void Update();
@@ -192,7 +190,7 @@ private:
 class MI_Text : public UI_Control
 {
 public:
-    MI_Text(const char * text, float x, float y, short w, short size, bool justified = true);
+    MI_Text(const char * text, short x, short y, short w, short size, short justified);
     virtual ~MI_Text();
 
     void SetText(const char * text);
@@ -201,14 +199,14 @@ public:
 private:
     char * szText;
     short iw;
-    bool iJustified;
+    short iJustified;
     gfxFont * font;
 };
 
 class MI_ScoreText : public UI_Control
 {
 public:
-    MI_ScoreText(float x, float y);
+    MI_ScoreText(short x, short y);
     virtual ~MI_ScoreText() {}
 
     void Draw();
@@ -228,7 +226,7 @@ class MI_IPField : public UI_Control
 
 public:
 
-    MI_IPField(gfxSprite * nspr, float x, float y);
+    MI_IPField(gfxSprite * nspr, short x, short y);
     virtual ~MI_IPField();
 
     char * GetValue();
@@ -298,7 +296,7 @@ class MI_SelectField : public UI_Control
 {
 public:
 
-    MI_SelectField(gfxSprite * nspr, float x, float y, const char * name, short width, short indent);
+    MI_SelectField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent);
     virtual ~MI_SelectField();
 
     void SetTitle(char * name);
@@ -425,7 +423,7 @@ class MI_ImageSelectField : public MI_SelectField
 {
 public:
 
-    MI_ImageSelectField(gfxSprite * nspr, gfxSprite * nspr_image, float x, float y, const char * name, short width, short indent, short imageHeight, short imageWidth);
+    MI_ImageSelectField(gfxSprite * nspr, gfxSprite * nspr_image, short x, short y, const char * name, short width, short indent, short imageHeight, short imageWidth);
     virtual ~MI_ImageSelectField();
 
     void Draw();
@@ -440,7 +438,7 @@ class MI_Button : public UI_Control
 {
 public:
 
-	MI_Button(gfxSprite * nspr, float x, float y, short w, const char * name, bool justified = true);
+    MI_Button(gfxSprite * nspr, short x, short y, const char * name, short width, short justified);
     ~MI_Button() {}
 
     MenuCodeEnum Modify(bool fModify);
@@ -462,7 +460,7 @@ protected:
     char * szName;
 
     short iWidth, iIndent;
-    bool iTextJustified;
+    short iTextJustified;
 
     MenuCodeEnum menuCode;
 
@@ -483,14 +481,13 @@ class MI_SliderField : public MI_SelectField
 {
 public:
 
-    MI_SliderField(gfxSprite * nspr, gfxSprite * nsprSlider, float x, float y, const char * name, short width, short indent1, short indent2);
+    MI_SliderField(gfxSprite * nspr, gfxSprite * nsprSlider, short x, short y, const char * name, short width, short indent1, short indent2);
     virtual ~MI_SliderField();
 
     void SetPosition(short x, short y);
 
     //Draws every frame
     virtual void Draw();
-
     //Sends player input to control on every frame
     MenuCodeEnum SendInput(CPlayerInput * playerInput);
 
@@ -505,7 +502,7 @@ class MI_PowerupSlider : public MI_SliderField
 {
 public:
 
-    MI_PowerupSlider(gfxSprite * nspr, gfxSprite * nsprSlider, gfxSprite * nsprPowerup, float x, float y, short width, short powerupIndex);
+    MI_PowerupSlider(gfxSprite * nspr, gfxSprite * nsprSlider, gfxSprite * nsprPowerup, short x, short y, short width, short powerupIndex);
     virtual ~MI_PowerupSlider();
 
     //Draws every frame
@@ -522,7 +519,7 @@ class MI_FrenzyModeOptions : public UI_Control
 {
 public:
 
-    MI_FrenzyModeOptions(float x, float y, short width, short numlines);
+    MI_FrenzyModeOptions(short x, short y, short width, short numlines);
     virtual ~MI_FrenzyModeOptions();
 
     MenuCodeEnum Modify(bool modify);
@@ -566,7 +563,7 @@ class MI_TextField : public UI_Control
 {
 public:
 
-    MI_TextField(gfxSprite * nspr, float x, float y, const char * name, short width, short indent);
+    MI_TextField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent);
     virtual ~MI_TextField();
 
     void SetTitle(char * name);
@@ -643,7 +640,7 @@ class MI_MapField : public UI_Control
 {
 public:
 
-    MI_MapField(gfxSprite * nspr, float x, float y, const char * name, short width, short indent, bool showtags);
+    MI_MapField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent, bool showtags);
     virtual ~MI_MapField();
 
     //Called when user selects this control to change it's value

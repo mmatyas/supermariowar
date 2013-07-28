@@ -104,7 +104,7 @@ MenuCodeEnum UI_Menu::SendInput(CPlayerInput * playerInput)
 		return ret;
 	}
 
-    for(short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
+    for(short iPlayer = 0; iPlayer < 4; iPlayer++) {
 		//Only allow the controlling team to control the menu (if there is one)
         if(iControllingTeam != -1) {
 			//Pay attention to other player's exit button pushes so we can exit when AI is controlling
