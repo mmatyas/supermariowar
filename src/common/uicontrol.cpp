@@ -2106,7 +2106,8 @@ void MI_MapField::SetDimensions(short width, short indent)
     miModifyImageRight->SetPosition(ix + iWidth - 16, iy + 4);
 
     if(fShowtags) {
-        iSlideListOut = (iWidth - 352) >> 1;
+        //iSlideListOut = (iWidth - 352) >> 1;
+        iSlideListOut = ((int)(iWidth - smw->ScreenWidth * 0.55)) >> 1;
         iSlideListOutGoal = iSlideListOut;
     }
 }

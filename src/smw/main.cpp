@@ -849,7 +849,7 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-#if	_DEBUG
+#if	_DEBUG && !WIN32
 	HashTableTest();
 #endif
 

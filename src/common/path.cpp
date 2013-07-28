@@ -130,6 +130,9 @@ const string convertPath(const string& source)
 
 		#ifndef _WIN32
 			strcat(SMW_Root_Data_Dir, "/");
+		#else
+			if (SMW_Root_Data_Dir[strlen(SMW_Root_Data_Dir)-1] != '\\')
+				strcat(SMW_Root_Data_Dir, "\\");
 		#endif
 	    
 		are_paths_initialized = true;
