@@ -142,11 +142,11 @@ if(NOT MSVC)
 	check_and_add_flag(SHADOW -Wshadow)
 	check_and_add_flag(INIT_SELF -Winit-self)
 
+	# gcc uses some optimizations which might break stuff without this flag
+	add_definitions(-fno-strict-aliasing -fexceptions -Wno-shadow)
+
 endif(NOT MSVC)
 
-# gcc uses some optimizations which might break stuff without this flag
-##TODO: test this please, coming from template (1)
-add_definitions(-fno-strict-aliasing -fexceptions -Wno-shadow)
 
 ##TODO: test this please, coming from smw Makefile
 add_definitions(-D_GNU_SOURCE=1 -D_REENTRANT)
@@ -280,7 +280,7 @@ if(NOT CMAKE_BUILD_TYPE)
 		"Build type (Release/Debug/RelWithDebInfo/MinSizeRe)" FORCE)
 endif(NOT CMAKE_BUILD_TYPE)
 
-if(CMAKE_BUILD_TYPE STREQUAL Release AND NOT APPLE)
+if(CMAKE_BUILD_TYPE STREQUAL Release AND NOT APPLE AND NOT WIN32)
 	add_definitions(-fomit-frame-pointer)
 endif()
 
