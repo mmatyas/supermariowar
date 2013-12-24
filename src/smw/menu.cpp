@@ -279,9 +279,28 @@ void Menu::CreateMenu()
     miMultiplayerServersMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
     miMultiplayerServersMenuBackButton->SetCode(MENU_CODE_TO_MAIN_MENU);
 
-    mMultiplayerServersMenu.AddControl(miMultiplayerServersMenuBackButton, NULL, NULL, NULL, NULL);
+    miServerSlots = new MI_TextField* [5];
+    //miServerSlotAddRemoveButtons = new MI_Button* [5];
 
-    mMultiplayerServersMenu.SetHeadControl(miMultiplayerServersMenuBackButton);
+    for (int iServerSlot = 0; iServerSlot < 5; iServerSlot++) {
+        miServerSlots[iServerSlot] = new MI_TextField(&rm->menu_plain_field, 70, 20 + iServerSlot * 34, "Test", 500, 120);
+        //miServerSlotAddRemoveButtons
+    }
+    miNickNameField = new MI_TextField(&rm->menu_plain_field, 70, 220, "Test", 500, 120);
+    miNickNameField->SetData(testtext, 64);
+
+    mMultiplayerServersMenu.AddControl(miServerSlots[0], miMultiplayerServersMenuBackButton, miServerSlots[1], NULL, NULL);
+    //mMultiplayerServersMenu.AddControl + left, right
+    for (int iServerSlot = 1; iServerSlot < 4; iServerSlot++) {
+        mMultiplayerServersMenu.AddControl(miServerSlots[iServerSlot], miServerSlots[iServerSlot - 1], miServerSlots[iServerSlot + 1], NULL, NULL);
+        //mMultiplayerServersMenu.AddControl + left, right
+    }
+    mMultiplayerServersMenu.AddControl(miServerSlots[4], miServerSlots[3], miNickNameField, NULL, NULL);
+    //mMultiplayerServersMenu.AddControl + left, right
+    mMultiplayerServersMenu.AddControl(miNickNameField, miServerSlots[4], miMultiplayerServersMenuBackButton, NULL, NULL);
+    mMultiplayerServersMenu.AddControl(miMultiplayerServersMenuBackButton, miNickNameField, miServerSlots[0], NULL, NULL);
+
+    mMultiplayerServersMenu.SetHeadControl(miServerSlots[0]);
     mMultiplayerServersMenu.SetCancelCode(MENU_CODE_TO_MAIN_MENU);
 
 
@@ -2251,6 +2270,7 @@ void Menu::RunMenu()
             } else if(MENU_CODE_BACK_TO_CONTROLS_MENU == code) {
                 mCurrentMenu = &mPlayerControlsSelectMenu;
             } else if(MENU_CODE_TO_MULTIPLAYER_MENU == code) {
+                printf("%s\n", testtext);
                 mCurrentMenu = &mMultiplayerServersMenu;
                 mCurrentMenu->ResetMenu();
             } else if(MENU_CODE_TO_PLAYER_1_CONTROLS == code) {

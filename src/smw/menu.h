@@ -404,8 +404,12 @@ class Menu
 
 		//Multiplayer Server List Menu
 		UI_Menu mMultiplayerServersMenu;
-		// Buttons here
 
+		MI_TextField ** miServerSlots;
+		MI_Button ** miServerSlotAddRemoveButtons;
+
+		MI_TextField * miNickNameField;
+		char testtext[128];
 		MI_Button * miMultiplayerServersMenuBackButton;
 
 
