@@ -205,12 +205,16 @@ void Menu::CreateMenu()
     miExitButton = new MI_Button(&rm->spr_selectfield, 120, 402, "Exit", smw->ScreenWidth * 0.625f, 0);
     miExitButton->SetCode(MENU_CODE_EXIT_APPLICATION);
 
+    miMultiplayerButton = new MI_Button(&rm->spr_selectfield, 120, 442, "Multiplayer", 400, 0);
+    miMultiplayerButton->SetCode(MENU_CODE_TO_MULTIPLAYER_MENU);
+
     mMainMenu.AddControl(miMainStartButton, miExitButton, miPlayerSelect, NULL, miQuickGameButton);
     mMainMenu.AddControl(miQuickGameButton, miExitButton, miPlayerSelect, miMainStartButton, NULL);
     mMainMenu.AddControl(miPlayerSelect, miMainStartButton, miOptionsButton, NULL, NULL);
     mMainMenu.AddControl(miOptionsButton, miPlayerSelect, miControlsButton, NULL, NULL);
     mMainMenu.AddControl(miControlsButton, miOptionsButton, miExitButton, NULL, NULL);
-    mMainMenu.AddControl(miExitButton, miControlsButton, miMainStartButton, NULL, NULL);
+    mMainMenu.AddControl(miExitButton, miControlsButton, miMultiplayerButton, NULL, NULL);
+    mMainMenu.AddControl(miMultiplayerButton, miExitButton, miMainStartButton, NULL, NULL);
 
     mMainMenu.SetHeadControl(miMainStartButton);
 #ifndef _XBOX
@@ -267,6 +271,18 @@ void Menu::CreateMenu()
     mPlayerControlsMenu.AddControl(miInputContainer, NULL, NULL, NULL, NULL);
     mPlayerControlsMenu.SetHeadControl(miInputContainer);
     mPlayerControlsMenu.SetCancelCode(MENU_CODE_BACK_TO_CONTROLS_MENU);
+
+    //***********************
+    // Multiplayer Menu
+    //***********************
+
+    miMultiplayerServersMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
+    miMultiplayerServersMenuBackButton->SetCode(MENU_CODE_TO_MAIN_MENU);
+
+    mMultiplayerServersMenu.AddControl(miMultiplayerServersMenuBackButton, NULL, NULL, NULL, NULL);
+
+    mMultiplayerServersMenu.SetHeadControl(miMultiplayerServersMenuBackButton);
+    mMultiplayerServersMenu.SetCancelCode(MENU_CODE_TO_MAIN_MENU);
 
 
     //***********************
@@ -2234,6 +2250,9 @@ void Menu::RunMenu()
                 mCurrentMenu->ResetMenu();
             } else if(MENU_CODE_BACK_TO_CONTROLS_MENU == code) {
                 mCurrentMenu = &mPlayerControlsSelectMenu;
+            } else if(MENU_CODE_TO_MULTIPLAYER_MENU == code) {
+                mCurrentMenu = &mMultiplayerServersMenu;
+                mCurrentMenu->ResetMenu();
             } else if(MENU_CODE_TO_PLAYER_1_CONTROLS == code) {
                 miInputContainer->SetPlayer(0);
                 mCurrentMenu = &mPlayerControlsMenu;

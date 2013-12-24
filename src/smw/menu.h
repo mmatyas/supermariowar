@@ -78,6 +78,7 @@ class Menu
 	
 		MI_Button * miMainStartButton;
 		MI_Button * miQuickGameButton;
+		MI_Button * miMultiplayerButton;
 
 		MI_PlayerSelect * miPlayerSelect;
 	
@@ -400,6 +401,13 @@ class Menu
 		//Bonus Wheel
 		UI_Menu mBonusWheelMenu;
 		MI_BonusWheel * miBonusWheel;
+
+		//Multiplayer Server List Menu
+		UI_Menu mMultiplayerServersMenu;
+		// Buttons here
+
+		MI_Button * miMultiplayerServersMenuBackButton;
+
 
 		DisplayError iDisplayError;
 		short iDisplayErrorTimer;
