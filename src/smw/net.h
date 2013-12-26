@@ -60,33 +60,6 @@ struct ClientPeer {
 	Uint8 name[256 + 1];
 };
 
-class NetServer
-{
-	public:
-
-		NetServer();
-		~NetServer();
-
-		bool startserver();
-		void update();
-
-		void handleserver();
-		void handleclient(int which);
-		void sendnewclientmessage(int about, int to);
-		void broadcastmessage(char * szMsg);
-
-		void cleanup();
-
-	private:
-		
-		IPaddress ip;
-		TCPsocket tcpsock;
-		SDLNet_SocketSet socketset;
-
-		int numclients;
-		ServerClient clients[MAXCLIENTS];
-};
-
 class NetClient
 {
 	public:
