@@ -53,6 +53,7 @@ extern std::string stripPathAndExtension(const std::string &path);
 
 void Menu::WriteGameOptions()
 {
+    printf(">   WriteGameOptions()\n");
     FILE * fp = OpenFile("options.bin", "wb");
 
     if(fp != NULL) {
@@ -283,11 +284,11 @@ void Menu::CreateMenu()
     //miServerSlotAddRemoveButtons = new MI_Button* [5];
 
     for (int iServerSlot = 0; iServerSlot < 5; iServerSlot++) {
-        miServerSlots[iServerSlot] = new MI_TextField(&rm->menu_plain_field, 70, 20 + iServerSlot * 34, "Test", 500, 120);
+        miServerSlots[iServerSlot] = new MI_TextField(&rm->menu_plain_field, 70, 20 + iServerSlot * 34, "Test", 400, 120);
         //miServerSlotAddRemoveButtons
     }
-    miNickNameField = new MI_TextField(&rm->menu_plain_field, 70, 220, "Test", 500, 120);
-    miNickNameField->SetData(testtext, 64);
+    miNickNameField = new MI_TextField(&rm->menu_plain_field, 70, 220, "Your name", 400, 120);
+    miNickNameField->SetData(netplay.playername, 31);
 
     mMultiplayerServersMenu.AddControl(miServerSlots[0], miMultiplayerServersMenuBackButton, miServerSlots[1], NULL, NULL);
     //mMultiplayerServersMenu.AddControl + left, right
@@ -2217,6 +2218,7 @@ void Menu::RunMenu()
             } else if(MENU_CODE_TO_MAIN_MENU == code) {
                 iDisplayError = DISPLAY_ERROR_NONE;
                 iDisplayErrorTimer = 0;
+                netplay.client.endSession();
 
                 mCurrentMenu = &mMainMenu;
             } else if(MENU_CODE_BACK_TO_MATCH_SELECTION_MENU == code) {
@@ -2237,6 +2239,7 @@ void Menu::RunMenu()
                 miTeamSelect->Reset();
                 mCurrentMenu = &mTeamSelectMenu;
                 mCurrentMenu->ResetMenu();
+                printf("Hello\n");
 
                 if(game_values.matchtype != MATCH_TYPE_TOURNAMENT) {
                     game_values.tournamentcontrolteam = -1;
@@ -2270,9 +2273,12 @@ void Menu::RunMenu()
             } else if(MENU_CODE_BACK_TO_CONTROLS_MENU == code) {
                 mCurrentMenu = &mPlayerControlsSelectMenu;
             } else if(MENU_CODE_TO_MULTIPLAYER_MENU == code) {
-                printf("%s\n", testtext);
                 mCurrentMenu = &mMultiplayerServersMenu;
                 mCurrentMenu->ResetMenu();
+
+                printf("%s\n", netplay.playername);
+                netplay.client.startSession();
+
             } else if(MENU_CODE_TO_PLAYER_1_CONTROLS == code) {
                 miInputContainer->SetPlayer(0);
                 mCurrentMenu = &mPlayerControlsMenu;
@@ -2321,6 +2327,7 @@ void Menu::RunMenu()
                 bool fErrorReadingTourFile = false;
 
                 if(MATCH_TYPE_MINIGAME == game_values.matchtype) {
+                    printf(" Match type: Minigame\n");
                     short iMiniGameType = miMinigameField->GetShortValue();
 
                     if(iMiniGameType == 0) { //Pipe minigame
@@ -2340,6 +2347,7 @@ void Menu::RunMenu()
 
                     StartGame();
                 } else if(MATCH_TYPE_QUICK_GAME == game_values.matchtype) {
+                    printf(" Match type: Quick game\n");
                     short iRandomMode = RNGMAX( GAMEMODE_LAST);
                     game_values.gamemode = gamemodes[iRandomMode];
 
@@ -2356,6 +2364,7 @@ void Menu::RunMenu()
 
                     //Load the tour here if one was selected
                     if(game_values.matchtype == MATCH_TYPE_TOUR) {
+                        printf("  Match type: Tour\n");
                         if(!ReadTourFile()) {
                             iDisplayError = DISPLAY_ERROR_READ_TOUR_FILE;
                             iDisplayErrorTimer = 120;
@@ -2364,6 +2373,7 @@ void Menu::RunMenu()
                             miTournamentScoreboard->CreateScoreboard(score_cnt, game_values.tourstoptotal, &rm->spr_tour_markers);
                         }
                     } else if(game_values.matchtype == MATCH_TYPE_TOURNAMENT) {
+                        printf("  Match type: Tournament\n");
                         //Set who is controlling the tournament menu
                         if(game_values.tournamentcontrolstyle == 5 || game_values.tournamentcontrolstyle == 6) //Random
                             game_values.tournamentcontrolteam = RNGMAX( score_cnt);
@@ -2376,6 +2386,7 @@ void Menu::RunMenu()
 
                         miTournamentScoreboard->CreateScoreboard(score_cnt, game_values.tournamentgames, &rm->menu_mode_large);
                     } else if(game_values.matchtype == MATCH_TYPE_WORLD) {
+                        printf("  Match type: World\n");
                         if(!g_worldmap.Load(TILESIZE)) {
                             iDisplayError = DISPLAY_ERROR_READ_WORLD_FILE;
                             iDisplayErrorTimer = 120;
@@ -2402,6 +2413,7 @@ void Menu::RunMenu()
                     }
 
                     if(!fErrorReadingTourFile) {
+                        printf("  !fErrorReadingTourFile\n");
                         mTournamentScoreboardMenu.ClearEyeCandy();
 
                         //Initialize tournament values
@@ -2414,6 +2426,7 @@ void Menu::RunMenu()
                         }
 
                         if(MATCH_TYPE_SINGLE_GAME == game_values.matchtype || MATCH_TYPE_TOURNAMENT == game_values.matchtype) {
+                            printf("  MATCH_TYPE_SINGLE_GAME || MATCH_TYPE_TOURNAMENT\n");
                             maplist->findexact(szCurrentMapName, false);
                             miMapField->LoadCurrentMap();
 
@@ -2431,17 +2444,17 @@ void Menu::RunMenu()
                             //If it is a tournament, then set the controlling team
                             if(MATCH_TYPE_TOURNAMENT == game_values.matchtype)
                                 SetControllingTeamForSettingsMenu(game_values.tournamentcontrolteam, true);
-                        } else if(MATCH_TYPE_TOUR == game_values.matchtype) {
-                            mCurrentMenu = &mTourStopMenu;
-                            mCurrentMenu->ResetMenu();
-                        } else if(MATCH_TYPE_WORLD == game_values.matchtype) {
-                            game_values.screenfadespeed = 8;
-                            game_values.screenfade = 8;
-                            game_values.gamestate = GS_START_WORLD;
+                            } else if(MATCH_TYPE_TOUR == game_values.matchtype) {
+                                mCurrentMenu = &mTourStopMenu;
+                                mCurrentMenu->ResetMenu();
+                            } else if(MATCH_TYPE_WORLD == game_values.matchtype) {
+                                game_values.screenfadespeed = 8;
+                                game_values.screenfade = 8;
+                                game_values.gamestate = GS_START_WORLD;
 
-                            //Play enter world sound
-                            ifsoundonandreadyplay(sfx_enterstage);
-                        }
+                                //Play enter world sound
+                                ifsoundonandreadyplay(sfx_enterstage);
+                            }
 
                         //Setup items on next menu
                         for(short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
@@ -2822,6 +2835,9 @@ void Menu::RunMenu()
             }
         }
 
+        if (netplay.active)
+            netplay.client.update();
+
         //--------------- draw everything ----------------------
 
         //Don't draw backdrop for world
@@ -2926,6 +2942,8 @@ void Menu::RunMenu()
                         const char * szMapName = maplist->randomFilename();
                         g_map->loadMap(szMapName, read_type_full);
                         sShortMapName = stripPathAndExtension(szMapName);
+
+                        printf("  State: GS_START_GAME, Match type: MATCH_TYPE_QUICK_GAME\n");
                     } else {
                         g_map->loadMap(maplist->currentFilename(), read_type_full);
                         sShortMapName = maplist->currentShortmapname();
@@ -2944,6 +2962,7 @@ void Menu::RunMenu()
                 }
 
                 game_values.gamestate = GS_GAME;
+                printf("  GS_GAME\n");
 
                 g_map->predrawbackground(rm->spr_background, rm->spr_backmap[0]);
                 g_map->predrawforeground(rm->spr_frontmap[0]);
@@ -3134,6 +3153,7 @@ bool Menu::ReadTourFile()
 
 void Menu::StartGame()
 {
+    printf("> StartGame\n");
 #ifdef _DEBUG
     iScriptState = 2;
     fScriptRunPreGameOptions = false;
@@ -3208,6 +3228,7 @@ void Menu::StartGame()
 
     game_values.screenfade = 8;
     game_values.screenfadespeed = 8;
+    printf("< StartGame\n");
 }
 
 void Menu::SetControllingTeamForSettingsMenu(short iControlTeam, bool fDisplayMessage)

@@ -131,7 +131,7 @@ void MI_IPField::AssignHostAddress()
             values[iSelectedDigit] = 9;
     }
 
-    game_values.hostaddress = GetValue();
+    netplay.hostaddress = GetValue();
 }
 
 void MI_IPField::MoveImage()

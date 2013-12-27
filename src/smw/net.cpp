@@ -3,11 +3,38 @@
 
 #include "net.h"
 
-extern char szIPString[32];
-
 #ifdef _WIN32
 	#pragma comment(lib, "SDL_net.lib")
 #endif
+
+Networking netplay;
+
+
+bool sendTCPMessage(TCPsocket& target, void* data, int dataLength) // int a Send miatt
+{
+	if (!data || !dataLength || !target)
+		return false;
+
+	if (SDLNet_TCP_Send(target, data, dataLength) < dataLength) {
+		fprintf(stderr, "[Warning] Sending message failed. %s\n", SDLNet_GetError());
+		return false;
+	}
+
+	return true;
+}
+
+bool receiveTCPMessage(TCPsocket& source, void* buffer, int bufferMaxSize) // int a Recv miatt
+{
+	if (!buffer || bufferMaxSize <= 0 || !source)
+		return false;
+
+	if (SDLNet_TCP_Recv(source, buffer, bufferMaxSize) <= 0) {
+        fprintf(stderr, "[Warning] Receiving message failed. %s\n", SDLNet_GetError());
+        return false;
+    }
+
+    return true;
+}
 
 union {
 	float f;
@@ -117,18 +144,19 @@ void WriteDoubleToBuffer(char * pData, double dDouble)
 
 bool net_init()
 {
-    if ( SDLNet_Init() < 0 ) {
-	    printf("SDLNet_Init: %s\n", SDLNet_GetError());
-	    return false;
-	}
-	
-	atexit(SDLNet_Quit);
+    if (SDLNet_Init() < 0) {
+        fprintf(stderr, "[Error] SDLNet_Init: %s\n", SDLNet_GetError());
+        return false;
+    }
 
-	IPaddress ip;
-	SDLNet_ResolveHost(&ip, "happy", 12521);
-	sprintf(szIPString, "%d.%d.%d.%d", ip.host & 0xff, (ip.host >> 8) & 0xff, (ip.host >> 16) & 0xff, (ip.host >> 24) & 0xff);
+    atexit(SDLNet_Quit);
 
-	return true;
+    ServerAddress localhost;
+    localhost.hostname = "localhost";
+    localhost.port = 2000;
+    netplay.savedServers.push_back(localhost);
+
+    printf("Network system initialized.\n");
 }
 
 void net_close()
@@ -143,184 +171,108 @@ NetClient::NetClient()
 {}
 
 NetClient::~NetClient()
-{}
-
-bool NetClient::connecttoserver()
 {
-	//if(SDLNet_ResolveHost(&ip, game_values.hostaddress, 12521) == -1) 
-	//if(SDLNet_ResolveHost(&ip, "10.115.8.222", 12521) == -1) 
-	//if(SDLNet_ResolveHost(&ip, "10.115.5.65", 12521) == -1) 
-	if(SDLNet_ResolveHost(&ip, "192.168.0.2", 12521) == -1) 
-	//if(SDLNet_ResolveHost(&ip, "127.0.0.1", 12521) == -1) 
-	{
-		printf("SDLNet_ResolveHost: %s\n", SDLNet_GetError());
-		return false;
-	}
+	endSession();
+}
 
-	tcpsock = SDLNet_TCP_Open(&ip);
-	
-    if(!tcpsock) {
-		printf("SDLNet_TCP_Open: %s\n", SDLNet_GetError());
-		return false;
-	}
+bool NetClient::connect(const char* hostname, const uint16_t port)
+{
+    /* Resolve server address */
+    printf("Connecting to %s:%d...\n", hostname, port);
+    if (SDLNet_ResolveHost(&serverIP, hostname, port) < 0) {
+        if (serverIP.host == INADDR_NONE)
+            fprintf(stderr, "[Error] Couldn't resolve hostname\n");
+        else
+            fprintf(stderr, "[Error] SDLNet_ResolveHost: %s\n", SDLNet_GetError());
+        return false;
+    }
 
-	/* Allocate the socket set for polling the network */
-	socketset = SDLNet_AllocSocketSet(1);
-    if (socketset == NULL) {
-		printf("Couldn't create socket set: %s\n", SDLNet_GetError());
-		return false;
-	}
+    /* Open TCP socket */
+    tcpSocket = SDLNet_TCP_Open(&serverIP);
+    if (!tcpSocket) {
+        fprintf(stderr, "[Error] SDLNet_TCP_Open: %s\n", SDLNet_GetError());
+        return false;
+    }
+    SDLNet_TCP_AddSocket(sockets, tcpSocket);
 
-	SDLNet_TCP_AddSocket(socketset, tcpsock);
-	
-	return true;
+    return true;
 }
 
 void NetClient::update()
 {
-	SDLNet_CheckSockets(socketset, 0);
+	SDLNet_CheckSockets(sockets, 0);
 
-    if (SDLNet_SocketReady(tcpsock)) {
-		handleserver();
-	}
+    // TCP műveletek
+    if (SDLNet_SocketReady(tcpSocket))
+    {
+        printf("READY\n");
+        uint8_t response[128];
+        if (!receiveTCPMessage(tcpSocket, response, 128))
+            SDLNet_TCP_Close(tcpSocket);
+        else
+        {
+            switch (response[0])
+            {
+                case NET_RESPONSE_SERVERINFO:
+                    ServerInfoPackage serverInfo;
+                    memcpy(&serverInfo, response, sizeof(ServerInfoPackage));
 
-}
 
-void NetClient::handleserver()
-{
-	Uint8 data[512];
-	int pos, len;
-//	int used;
+                    printf("NET_RESPONSE_SERVERINFO [%lu byte]\n", sizeof(serverInfo));
+                    printf("{\n  name: %s\n  desc: %s\n  currentPlayers: %d\n  maxPlayers: %d\n}\n",
+                        serverInfo.name, serverInfo.description, serverInfo.currentPlayers, serverInfo.maxPlayers);
 
-	/* Has the connection been lost with the server? */
-	len = SDLNet_TCP_Recv(tcpsock, (char *)data, 512);
+                    SDLNet_TCP_Close(tcpSocket);
+                    break;
 
-    if ( len <= 0 ) {
-		SDLNet_TCP_DelSocket(socketset, tcpsock);
-		SDLNet_TCP_Close(tcpsock);
-		tcpsock = NULL;
+                default:
+                    SDLNet_TCP_Close(tcpSocket);
+                    break;
+            }
+        }
+    }
 
-    } else {
-		pos = 0;
-        while ( len > 0 ) {
-			int used = handleserverdata(&data[pos]);
-			pos += used;
-			len -= used;
-			
-            if ( used == 0 ) {
-				/* We might lose data here.. oh well,
-				   we got a corrupt packet from server
-				 */
-				len = 0;
-			}
-		}
-	}
-}
+    // UDP műveletek
+    /*if (SDLNet_SocketReady(client.udpSocket)) {
+        printf("UDP-t kaptam!\n");
+    }*/
 
-int NetClient::handleserverdata(Uint8 *data)
-{
-	int used;
-
-    switch (data[0]) {
-    case NET_MSG_ADD: {
-			/* Figure out which channel we got */
-			Uint8 which = data[NET_MSG_ADD_SLOT];
-
-        if ((which >= MAXCLIENTS) || peers[which].active) {
-				/* Invalid channel?? */
-				break;
-			}
-
-			/* Copy name into channel */
-			memcpy(peers[which].name, &data[NET_MSG_ADD_NAME], 256);
-			peers[which].name[256] = 0;
-			peers[which].active = 1;
-
-			/* Let the user know what happened */
-			printf("* New client on %d \"%s\"\n", which, peers[which].name);
-
-			used = NET_MSG_ADD_NAME + data[NET_MSG_ADD_NLEN];
-			break;
-		}
-		
-    case NET_MSG_DEL: {
-			Uint8 which;
-
-			/* Figure out which channel we lost */
-			which = data[NET_MSG_DEL_SLOT];
-        if((which >= MAXCLIENTS) || !peers[which].active) {
-				/* Invalid channel?? */
-				break;
-			}
-			peers[which].active = 0;
-
-			/* Let the user know what happened */
-			printf("* Lost client on %d (%s)\n", which, peers[which].name);
-
-			used = NET_MSG_DEL_LEN;
-			break;
-		}
-
-    case NET_MSG_REJECT: {
-			printf("* Chat server full\n");
-			used = NET_MSG_REJECT_LEN;
-			break;
-		}
-
-    case NET_MSG_CHAT: {
-			/* Copy name into channel */
-			char szMsg[257];
-			memcpy(szMsg, &data[NET_MSG_CHAT_BODY], 256);
-			szMsg[256] = 0;
-			
-			/* Let the user know what happened */
-			printf("Chat Message: \"%s\"\n", szMsg);
-
-			used = NET_MSG_CHAT_BODY + data[NET_MSG_CHAT_NLEN];
-			break;
-		}
-
-    default: {
-			/* Unknown packet type?? */;
-			used = 0;
-			break;
-		}
-	}
-
-	return(used);
 }
 
 void NetClient::cleanup()
 {
-	/* Close the network connections */
-    if (tcpsock != NULL) {
-		SDLNet_TCP_Close(tcpsock);
-		tcpsock = NULL;
-	}
-	
-    if ( socketset != NULL ) {
-		SDLNet_FreeSocketSet(socketset);
-		socketset = NULL;
-	}
+	if (tcpSocket) {
+        SDLNet_TCP_Close(tcpSocket);
+        tcpSocket = NULL;
+    }
+    if (udpSocket) {
+        SDLNet_UDP_Close(udpSocket);
+        udpSocket = NULL;
+    }
+
+    if (sockets) {
+        SDLNet_FreeSocketSet(sockets);
+        sockets = NULL;
+    }
 }
 
-void NetClient::sendjoin()
+bool NetClient::startSession()
 {
-	char join[1+1+256];
-	const char * name = "TestClient";
+	// Finish previous network session
+	endSession();
 
-    if ( tcpsock != NULL ) {
-		/* Construct the packet */
-		join[0] = NET_MSG_JOIN;
+	netplay.active = true;
+    sockets = SDLNet_AllocSocketSet(2);
+    if (!sockets) {
+        fprintf(stderr, "[Error] SDLNet_AllocSocketSet: %s\n", SDLNet_GetError());
+        return false;
+    }
 
-		int n = strlen(name);
-
-		join[NET_MSG_JOIN_NLEN] = n;
-		strncpy(&join[NET_MSG_JOIN_NAME], name, n);
-		join[NET_MSG_JOIN_NAME+n++] = 0;
-
-		/* Send it to the server */
-		SDLNet_TCP_Send(tcpsock, join, NET_MSG_JOIN_NAME+n);
-	}
+    return true;
 }
 
+void NetClient::endSession()
+{
+	netplay.active = false;
+	cleanup();
+}

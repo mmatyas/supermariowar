@@ -4,28 +4,21 @@
 #include "SDL.h"
 #include "SDL_net.h"
 
-#define MAXCLIENTS      4
-#define MAX_NETWORK_MESSAGE_SIZE 128
+#define NET_PROTOCOL_VERSION                1
+#define NET_MAX_MESSAGE_SIZE                128
 
-#define NET_MSG_JOIN			0
-#define NET_MSG_JOIN_NLEN		1
-#define NET_MSG_JOIN_NAME		NET_MSG_JOIN_NLEN + 1
+#define NET_REQUEST_SERVERINFO              1
+#define NET_RESPONSE_SERVERINFO             2
 
-#define NET_MSG_ADD				1
-#define NET_MSG_ADD_SLOT		1
-#define NET_MSG_ADD_NLEN		NET_MSG_ADD_SLOT + 2
-#define NET_MSG_ADD_NAME		NET_MSG_ADD_NLEN + 1
+#define NET_REQUEST_CONNECT                 10
+#define NET_RESPONSE_CONNECT_OK             11
+#define NET_RESPONSE_CONNECT_DENIED         12
+#define NET_RESPONSE_CONNECT_NAMETAKEN      13
 
-#define NET_MSG_DEL				2
-#define NET_MSG_DEL_SLOT		1
-#define NET_MSG_DEL_LEN			NET_MSG_DEL_SLOT + 1
+#define NET_RESPONSE_ROOMFULL
 
-#define NET_MSG_REJECT			255
-#define NET_MSG_REJECT_LEN		1
-
-#define NET_MSG_CHAT			3
-#define NET_MSG_CHAT_NLEN		1
-#define NET_MSG_CHAT_BODY		NET_MSG_CHAT_NLEN + 1
+bool sendTCPMessage(TCPsocket& target, void* data, int dataLength);
+bool receiveTCPMessage(TCPsocket& source, void* buffer, int bufferMaxSize);
 
 void ReadFloatFromBuffer(float * pFloat, char * pData);
 void ReadIntFromBuffer(int * pInt, char * pData);
@@ -45,19 +38,25 @@ void WriteDoubleToBuffer(char * pData, double dDouble);
 bool net_init();
 void net_close();
 
-bool net_runserver();
-bool net_connectclient();
-
-struct ServerClient {
-	int active;
-	TCPsocket sock;
-	IPaddress peer;
-	Uint8 name[256 + 1];
+struct MessageHeader {
+    uint8_t        protocolVersion;
+    uint8_t        messageTypeID;
 };
 
-struct ClientPeer {
-	int active;
-	Uint8 name[256 + 1];
+struct ServerAddress {
+    std::string    hostname;
+    uint16_t       port;
+};
+
+struct ServerInfoPackage : MessageHeader {
+    char           name[32];
+    char           description[64];
+    uint32_t       currentPlayers;
+    uint32_t       maxPlayers;
+};
+
+struct ClientConnectionPackage: MessageHeader {
+    char           playerName[32];
 };
 
 class NetClient
@@ -67,21 +66,19 @@ class NetClient
 		NetClient();
 		~NetClient();
 
-		bool connecttoserver();
+		bool connect(const char* hostname, const uint16_t port);
 		void update();
-		void handleserver();
-		int handleserverdata(Uint8 *data);
-		void sendjoin();
-		
 		void cleanup();
+
+		bool startSession();
+		void endSession();
 		
 	private:
 
-		IPaddress ip;
-		TCPsocket tcpsock;
-		SDLNet_SocketSet socketset;
-
-		ClientPeer peers[MAXCLIENTS];
+		IPaddress serverIP;
+		TCPsocket tcpSocket;
+		UDPsocket udpSocket;
+		SDLNet_SocketSet sockets;
 };
 
 #endif //__NETWORK_H_

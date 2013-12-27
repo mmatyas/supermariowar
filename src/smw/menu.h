@@ -409,7 +409,6 @@ class Menu
 		MI_Button ** miServerSlotAddRemoveButtons;
 
 		MI_TextField * miNickNameField;
-		char testtext[128];
 		MI_Button * miMultiplayerServersMenuBackButton;
 
 
