@@ -197,25 +197,25 @@ void Menu::CreateMenu()
 
     miPlayerSelect = new MI_PlayerSelect(&rm->menu_player_select, 120, 250, "Players", 400, 140);
 
-    miOptionsButton = new MI_Button(&rm->spr_selectfield, 120, 322, "Options", 400, 0);
+    miOptionsButton = new MI_Button(&rm->spr_selectfield, 120, 362, "Options", 200, 0);
     miOptionsButton->SetCode(MENU_CODE_TO_OPTIONS_MENU);
 
-    miControlsButton = new MI_Button(&rm->spr_selectfield, 120, 362, "Controls", 400, 0);
+    miControlsButton = new MI_Button(&rm->spr_selectfield, 320, 362, "Controls", 200, 0);
     miControlsButton->SetCode(MENU_CODE_TO_CONTROLS_MENU);
 
     miExitButton = new MI_Button(&rm->spr_selectfield, 120, 402, "Exit", smw->ScreenWidth * 0.625f, 0);
     miExitButton->SetCode(MENU_CODE_EXIT_APPLICATION);
 
-    miMultiplayerButton = new MI_Button(&rm->spr_selectfield, 120, 442, "Multiplayer", 400, 0);
+    miMultiplayerButton = new MI_Button(&rm->spr_selectfield, 120, 322, "Multiplayer", 400, 0);
     miMultiplayerButton->SetCode(MENU_CODE_TO_MULTIPLAYER_MENU);
 
     mMainMenu.AddControl(miMainStartButton, miExitButton, miPlayerSelect, NULL, miQuickGameButton);
     mMainMenu.AddControl(miQuickGameButton, miExitButton, miPlayerSelect, miMainStartButton, NULL);
-    mMainMenu.AddControl(miPlayerSelect, miMainStartButton, miOptionsButton, NULL, NULL);
+    mMainMenu.AddControl(miPlayerSelect, miMainStartButton, miMultiplayerButton, NULL, NULL);
+    mMainMenu.AddControl(miMultiplayerButton, miOptionsButton, miOptionsButton, NULL, NULL);
     mMainMenu.AddControl(miOptionsButton, miPlayerSelect, miControlsButton, NULL, NULL);
     mMainMenu.AddControl(miControlsButton, miOptionsButton, miExitButton, NULL, NULL);
     mMainMenu.AddControl(miExitButton, miControlsButton, miMultiplayerButton, NULL, NULL);
-    mMainMenu.AddControl(miMultiplayerButton, miExitButton, miMainStartButton, NULL, NULL);
 
     mMainMenu.SetHeadControl(miMainStartButton);
 #ifndef _XBOX

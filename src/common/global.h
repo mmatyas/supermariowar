@@ -815,9 +815,9 @@ struct TourStop {
 };
 
 struct Networking {
-    bool active; // True if netplay code is currently running
+    bool active;            // True if netplay code is currently running
     char * hostaddress;
-    char playername[32]; // last byte will be \0
+    char playername[32];    // last byte will be \0
 
     NetClient client;
     std::vector<ServerAddress> savedServers;
