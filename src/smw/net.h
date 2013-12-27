@@ -79,6 +79,11 @@ class NetClient
 		TCPsocket tcpSocket;
 		UDPsocket udpSocket;
 		SDLNet_SocketSet sockets;
+
+		int readySockets;
+
+		void closeTCPsocket();
+		void closeUDPsocket();
 };
 
 #endif //__NETWORK_H_

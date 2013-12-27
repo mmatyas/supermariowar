@@ -200,17 +200,16 @@ bool NetClient::connect(const char* hostname, const uint16_t port)
 
 void NetClient::update()
 {
-	SDLNet_CheckSockets(sockets, 0);
+	readySockets = SDLNet_CheckSockets(sockets, 0);
 
     // TCP műveletek
-    if (SDLNet_SocketReady(tcpSocket))
+    if (readySockets && SDLNet_SocketReady(tcpSocket))
     {
-        printf("READY\n");
+        printf("READY %d\n", readySockets);
         uint8_t response[128];
         if (!receiveTCPMessage(tcpSocket, response, 128))
-            SDLNet_TCP_Close(tcpSocket);
-        else
-        {
+            closeTCPsocket();
+        else {
             switch (response[0])
             {
                 case NET_RESPONSE_SERVERINFO:
@@ -222,11 +221,11 @@ void NetClient::update()
                     printf("{\n  name: %s\n  desc: %s\n  currentPlayers: %d\n  maxPlayers: %d\n}\n",
                         serverInfo.name, serverInfo.description, serverInfo.currentPlayers, serverInfo.maxPlayers);
 
-                    SDLNet_TCP_Close(tcpSocket);
+                    closeTCPsocket();
                     break;
 
                 default:
-                    SDLNet_TCP_Close(tcpSocket);
+                    closeTCPsocket();
                     break;
             }
         }
@@ -241,14 +240,8 @@ void NetClient::update()
 
 void NetClient::cleanup()
 {
-	if (tcpSocket) {
-        SDLNet_TCP_Close(tcpSocket);
-        tcpSocket = NULL;
-    }
-    if (udpSocket) {
-        SDLNet_UDP_Close(udpSocket);
-        udpSocket = NULL;
-    }
+	closeTCPsocket();
+	closeUDPsocket();
 
     if (sockets) {
         SDLNet_FreeSocketSet(sockets);
@@ -258,6 +251,7 @@ void NetClient::cleanup()
 
 bool NetClient::startSession()
 {
+	printf("Session start.\nPrevious: ");
 	// Finish previous network session
 	endSession();
 
@@ -268,11 +262,38 @@ bool NetClient::startSession()
         return false;
     }
 
+    for (unsigned iServer = 0; iServer < netplay.savedServers.size(); iServer++)
+    {
+        if (connect(netplay.savedServers[iServer].hostname.c_str(), netplay.savedServers[iServer].port)) {
+            uint8_t messageHead = NET_REQUEST_SERVERINFO;
+            sendTCPMessage(tcpSocket, &messageHead, sizeof(uint8_t));
+        }
+    }
+
     return true;
 }
 
 void NetClient::endSession()
 {
+	printf("Session end.\n");
 	netplay.active = false;
 	cleanup();
+}
+
+void NetClient::closeTCPsocket()
+{
+	if (tcpSocket) {
+		SDLNet_TCP_DelSocket(sockets, tcpSocket);
+		SDLNet_TCP_Close(tcpSocket);
+	    tcpSocket = NULL;
+	}
+}
+
+void NetClient::closeUDPsocket()
+{
+	if (udpSocket) {
+		SDLNet_UDP_DelSocket(sockets, udpSocket);
+		SDLNet_UDP_Close(udpSocket);
+	    udpSocket = NULL;
+	}
 }
