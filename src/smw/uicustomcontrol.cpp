@@ -4656,12 +4656,12 @@ MenuCodeEnum MI_NetworkListScroll::SendInput(CPlayerInput * playerInput)
 
         if(playerInput->outputControls[iPlayer].menu_select.fPressed) {
             netplay.selectedServerIndex = iIndex;
-            return MENU_CODE_MULTIPLAYER_LIST_EXIT;
+            return MENU_CODE_NET_LIST_EXIT;
         }
 
 
         if(playerInput->outputControls[iPlayer].menu_cancel.fPressed) {
-            return MENU_CODE_MULTIPLAYER_LIST_EXIT;
+            return MENU_CODE_NET_LIST_EXIT;
         }
     }
 

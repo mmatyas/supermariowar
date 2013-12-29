@@ -402,13 +402,18 @@ class Menu
 		UI_Menu mBonusWheelMenu;
 		MI_BonusWheel * miBonusWheel;
 
+
 		//Multiplayer Server List Menu
 		UI_Menu mMultiplayerServersMenu;
 
-		MI_TextField ** miServerSlots;
-		MI_Button ** miServerSlotAddRemoveButtons;
-
 		MI_TextField * miNickNameField;
+		//MI_Text * miMultiplayerServersMenuSelectedServerTitleText;
+		MI_Text * miMultiplayerServersMenuSelectedServerHostNameText;
+		MI_Button * miMultiplayerServersMenuConnectButton;
+		MI_Button * miMultiplayerServersMenuServerSelectButton;
+
+		MI_NetworkListScroll * miMultiplayerServersMenuServerListScroll;
+
 		MI_Button * miMultiplayerServersMenuBackButton;
 
 		MI_Image * miMultiplayerServersMenuLeftHeaderBar;
