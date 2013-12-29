@@ -53,7 +53,6 @@ extern std::string stripPathAndExtension(const std::string &path);
 
 void Menu::WriteGameOptions()
 {
-    printf(">   WriteGameOptions()\n");
     FILE * fp = OpenFile("options.bin", "wb");
 
     if(fp != NULL) {
@@ -212,10 +211,10 @@ void Menu::CreateMenu()
     mMainMenu.AddControl(miMainStartButton, miExitButton, miPlayerSelect, NULL, miQuickGameButton);
     mMainMenu.AddControl(miQuickGameButton, miExitButton, miPlayerSelect, miMainStartButton, NULL);
     mMainMenu.AddControl(miPlayerSelect, miMainStartButton, miMultiplayerButton, NULL, NULL);
-    mMainMenu.AddControl(miMultiplayerButton, miOptionsButton, miOptionsButton, NULL, NULL);
-    mMainMenu.AddControl(miOptionsButton, miPlayerSelect, miControlsButton, NULL, NULL);
-    mMainMenu.AddControl(miControlsButton, miOptionsButton, miExitButton, NULL, NULL);
-    mMainMenu.AddControl(miExitButton, miControlsButton, miMultiplayerButton, NULL, NULL);
+    mMainMenu.AddControl(miMultiplayerButton, miPlayerSelect, miOptionsButton, NULL, NULL);
+    mMainMenu.AddControl(miOptionsButton, miMultiplayerButton, miExitButton, miControlsButton, miControlsButton);
+    mMainMenu.AddControl(miControlsButton, miMultiplayerButton, miExitButton, miOptionsButton, miOptionsButton);
+    mMainMenu.AddControl(miExitButton, miOptionsButton, miMainStartButton, NULL, NULL);
 
     mMainMenu.SetHeadControl(miMainStartButton);
 #ifndef _XBOX
