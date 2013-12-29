@@ -4592,3 +4592,143 @@ void MI_World::UseCloud(bool fUseCloud)
     g_worldmap.GetPlayerPosition(&iPlayerX, &iPlayerY);
     uiMenu->AddEyeCandy(new EC_SingleAnimation(&rm->spr_poof, iPlayerX + iMapOffsetX - 8, iPlayerY + iMapOffsetY - 8, 4, 5));
 }
+
+
+/**************************************
+ * MI_NetworkListScroll Class
+ **************************************/
+
+MI_NetworkListScroll::MI_NetworkListScroll(gfxSprite * nspr, short x, short y, short width, short numlines, const std::string& title) :
+    UI_Control(x, y)
+{
+    spr = nspr;
+    iWidth = width;
+    iNumLines = numlines;
+
+    iSelectedLine = 0;
+    iIndex = 0;
+    iOffset = 0;
+
+    iTopStop = (iNumLines - 1) >> 1;
+    iBottomStop = 0;
+
+    sTitle = title;
+}
+
+MI_NetworkListScroll::~MI_NetworkListScroll()
+{}
+
+void MI_NetworkListScroll::Add(const std::string& left, const std::string& right)
+{
+    NLS_ListItem item(left, right);
+    items.push_back(item);
+
+    if(items.size() >= 1)
+        iIndex = 0;
+
+    iBottomStop = items.size() - iNumLines + iTopStop;
+}
+
+MenuCodeEnum MI_NetworkListScroll::Modify(bool modify)
+{
+    fModifying = modify;
+    return MENU_CODE_MODIFY_ACCEPTED;
+}
+
+MenuCodeEnum MI_NetworkListScroll::SendInput(CPlayerInput * playerInput)
+{
+    for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
+        //Only allow the controlling team to control the menu (if there is one)
+        if(iControllingTeam != -1) {
+            if(iControllingTeam != LookupTeamID(iPlayer) || game_values.playercontrol[iPlayer] != 1)
+                continue;
+        }
+
+        if(playerInput->outputControls[iPlayer].menu_down.fPressed) {
+            MoveNext();
+            return MENU_CODE_NONE;
+        }
+
+        if(playerInput->outputControls[iPlayer].menu_up.fPressed) {
+            MovePrev();
+            return MENU_CODE_NONE;
+        }
+
+        if(playerInput->outputControls[iPlayer].menu_select.fPressed) {
+            netplay.selectedServerIndex = iIndex;
+            return MENU_CODE_MULTIPLAYER_LIST_EXIT;
+        }
+
+
+        if(playerInput->outputControls[iPlayer].menu_cancel.fPressed) {
+            return MENU_CODE_MULTIPLAYER_LIST_EXIT;
+        }
+    }
+
+    return MENU_CODE_NONE;
+}
+
+
+void MI_NetworkListScroll::Update()
+{}
+
+void MI_NetworkListScroll::Draw()
+{
+    if(!fShow)
+        return;
+
+    //Draw the background for the map preview
+    rm->menu_dialog.draw(ix, iy, 0, 0, iWidth - 16, iNumLines * 32 + 32);
+    rm->menu_dialog.draw(ix + iWidth - 16, iy, 496, 0, 16, iNumLines * 32 + 32);
+    rm->menu_dialog.draw(ix, iy + iNumLines * 32 + 32, 0, 464, iWidth - 16, 16);
+    rm->menu_dialog.draw(ix + iWidth - 16, iy + iNumLines * 32 + 32, 496, 464, 16, 16);
+
+    rm->menu_font_large.drawCentered(ix + (iWidth >> 1), iy + 5, sTitle.c_str());
+
+    //Draw each filter field
+    for(short iLine = 0; iLine < iNumLines && (unsigned short)iLine < items.size(); iLine++) {
+        short iHalfLineWidth = (iWidth - 32) >> 1;
+        short iLineWidth = iWidth - 32;
+        spr->draw(ix + 16, iy + 32 + iLine * 32, 0, (iSelectedLine == iLine ? 32 : 0), iHalfLineWidth, 32);
+        spr->draw(ix + 16 + iHalfLineWidth, iy + 32 + iLine * 32, 512 - iLineWidth + iHalfLineWidth, (iSelectedLine == iLine ? 32 : 0), iLineWidth - iHalfLineWidth, 32);
+
+        rm->menu_font_large.drawChopRight(ix + 28, iy + 5 + iLine * 32 + 32, iWidth - 104, items[iOffset + iLine].sLeft.c_str());
+        rm->menu_font_large.drawRightJustified(ix + 28 + iWidth - 64, iy + 5 + iLine * 32 + 32, items[iOffset + iLine].sRight.c_str());
+    }
+}
+
+bool MI_NetworkListScroll::MoveNext()
+{
+    if(items.empty())
+        return false;
+
+    if(iIndex == items.size() - 1)
+        return false;
+
+    iIndex++;
+
+    if(iIndex > iTopStop && iIndex <= iBottomStop)
+        iOffset++;
+    else
+        iSelectedLine++;
+
+    return true;
+}
+
+bool MI_NetworkListScroll::MovePrev()
+{
+    if(items.empty())
+        return false;
+
+    if(iIndex == 0)
+        return false;
+
+    iIndex--;
+
+    if(iIndex >= iTopStop && iIndex < iBottomStop)
+        iOffset--;
+    else
+        iSelectedLine--;
+
+    return true;
+}
