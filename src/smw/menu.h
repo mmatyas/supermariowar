@@ -411,6 +411,10 @@ class Menu
 		MI_TextField * miNickNameField;
 		MI_Button * miMultiplayerServersMenuBackButton;
 
+		MI_Image * miMultiplayerServersMenuLeftHeaderBar;
+		MI_Image * miMultiplayerServersMenuRightHeaderBar;
+		MI_Text * miMultiplayerServersMenuHeaderText;
+
 
 		DisplayError iDisplayError;
 		short iDisplayErrorTimer;

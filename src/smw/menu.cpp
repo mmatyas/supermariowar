@@ -196,6 +196,9 @@ void Menu::CreateMenu()
 
     miPlayerSelect = new MI_PlayerSelect(&rm->menu_player_select, 120, 250, "Players", 400, 140);
 
+    miMultiplayerButton = new MI_Button(&rm->spr_selectfield, 120, 322, "Multiplayer", 400, 0);
+    miMultiplayerButton->SetCode(MENU_CODE_TO_MULTIPLAYER_MENU);
+
     miOptionsButton = new MI_Button(&rm->spr_selectfield, 120, 362, "Options", 200, 0);
     miOptionsButton->SetCode(MENU_CODE_TO_OPTIONS_MENU);
 
@@ -204,9 +207,6 @@ void Menu::CreateMenu()
 
     miExitButton = new MI_Button(&rm->spr_selectfield, 120, 402, "Exit", smw->ScreenWidth * 0.625f, 0);
     miExitButton->SetCode(MENU_CODE_EXIT_APPLICATION);
-
-    miMultiplayerButton = new MI_Button(&rm->spr_selectfield, 120, 322, "Multiplayer", 400, 0);
-    miMultiplayerButton->SetCode(MENU_CODE_TO_MULTIPLAYER_MENU);
 
     mMainMenu.AddControl(miMainStartButton, miExitButton, miPlayerSelect, NULL, miQuickGameButton);
     mMainMenu.AddControl(miQuickGameButton, miExitButton, miPlayerSelect, miMainStartButton, NULL);
@@ -279,6 +279,10 @@ void Menu::CreateMenu()
     miMultiplayerServersMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
     miMultiplayerServersMenuBackButton->SetCode(MENU_CODE_TO_MAIN_MENU);
 
+    miMultiplayerServersMenuLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
+    miMultiplayerServersMenuRightHeaderBar = new MI_Image(&rm->menu_plain_field, smw->ScreenWidth/2, 0, 192, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
+    miMultiplayerServersMenuHeaderText = new MI_Text("Multiplayer Servers Menu", smw->ScreenWidth/2, 5, 0, 2, 1);
+
     miServerSlots = new MI_TextField* [5];
     //miServerSlotAddRemoveButtons = new MI_Button* [5];
 
@@ -299,6 +303,10 @@ void Menu::CreateMenu()
     //mMultiplayerServersMenu.AddControl + left, right
     mMultiplayerServersMenu.AddControl(miNickNameField, miServerSlots[4], miMultiplayerServersMenuBackButton, NULL, NULL);
     mMultiplayerServersMenu.AddControl(miMultiplayerServersMenuBackButton, miNickNameField, miServerSlots[0], NULL, NULL);
+
+    mMultiplayerServersMenu.AddNonControl(miMultiplayerServersMenuLeftHeaderBar);
+    mMultiplayerServersMenu.AddNonControl(miMultiplayerServersMenuRightHeaderBar);
+    mMultiplayerServersMenu.AddNonControl(miMultiplayerServersMenuHeaderText);
 
     mMultiplayerServersMenu.SetHeadControl(miServerSlots[0]);
     mMultiplayerServersMenu.SetCancelCode(MENU_CODE_TO_MAIN_MENU);
