@@ -12,7 +12,8 @@ extern bool g_fLoadMessages;
 //1.8.0.3 == beta2
 //1.8.0.4 == final
 //1.9.0.0 == neagix work-in-progress, not released
-int g_iVersion[] = {1, 9, 0, 0};
+//2.0.0.0 == fluffypillow netplay code
+int g_iVersion[] = {2, 0, 0, 0};
 
 // main game directory, read from command line argument
 char		*RootDataDirectory;
