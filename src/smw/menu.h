@@ -406,11 +406,10 @@ class Menu
 		//Multiplayer Server List Menu
 		UI_Menu mMultiplayerServersMenu;
 
-		MI_TextField * miNickNameField;
-		//MI_Text * miMultiplayerServersMenuSelectedServerTitleText;
+		MI_Button * miMultiplayerServersMenuServerSelectButton;
 		MI_Text * miMultiplayerServersMenuSelectedServerHostNameText;
 		MI_Button * miMultiplayerServersMenuConnectButton;
-		MI_Button * miMultiplayerServersMenuServerSelectButton;
+		MI_TextField * miNickNameField;
 
 		MI_NetworkListScroll * miMultiplayerServersMenuServerListScroll;
 

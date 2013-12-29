@@ -283,7 +283,7 @@ void Menu::CreateMenu()
     miMultiplayerServersMenuRightHeaderBar = new MI_Image(&rm->menu_plain_field, smw->ScreenWidth/2, 0, 192, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
     miMultiplayerServersMenuHeaderText = new MI_Text("Multiplayer Servers Menu", smw->ScreenWidth/2, 5, 0, 2, 1);
 
-    miMultiplayerServersMenuServerListScroll = new MI_NetworkListScroll(&rm->menu_plain_field, 120, 72, 400, 9, "Saved Servers");
+    miMultiplayerServersMenuServerListScroll = new MI_NetworkListScroll(&rm->menu_plain_field, 90, 72, smw->ScreenWidth - 2 * 90, 9, "Saved Servers");
     miMultiplayerServersMenuServerListScroll->SetAutoModify(true);
     miMultiplayerServersMenuServerListScroll->Show(false);
 
@@ -296,19 +296,14 @@ void Menu::CreateMenu()
     miMultiplayerServersMenuSelectedServerHostNameText = new MI_Text(netplay.recentServers[netplay.selectedServerIndex].hostname.c_str(), smw->ScreenWidth/2, 175, 0, 2, 0);
 
     miMultiplayerServersMenuConnectButton = new MI_Button(&rm->spr_selectfield, 70, 210, "Connect", smw->ScreenWidth - 2 * 70, 1);
-    //miMultiplayerServersMenuServerSelectButton->SetCode(MENU_CODE_TO_SERVER_LIST);
-
-    //miMultiplayerServersMenuServerSelectButton = new MI_Button(&rm->spr_selectfield, smw->ScreenWidth/2 + 10, 200, "Servers", smw->ScreenWidth/2 - 80, 1);
     miMultiplayerServersMenuServerSelectButton->SetCode(MENU_CODE_TO_SERVER_LIST);
 
     miNickNameField = new MI_TextField(&rm->menu_plain_field, 70, 300, "Your name", smw->ScreenWidth - 2 * 70, 120);
     miNickNameField->SetData(netplay.playername, 31);
 
-    //mMultiplayerServersMenu.AddNonControl(miMultiplayerServersMenuSelectedServerTitleText);
     mMultiplayerServersMenu.AddControl(miMultiplayerServersMenuServerSelectButton, miMultiplayerServersMenuBackButton, miMultiplayerServersMenuConnectButton, NULL, NULL);
     mMultiplayerServersMenu.AddNonControl(miMultiplayerServersMenuSelectedServerHostNameText);
     mMultiplayerServersMenu.AddControl(miMultiplayerServersMenuConnectButton, miMultiplayerServersMenuServerSelectButton, miNickNameField, NULL, NULL);
-    //mMultiplayerServersMenu.AddControl(miMultiplayerServersMenuServerSelectButton, miMultiplayerServersMenuBackButton, miNickNameField, miMultiplayerServersMenuConnectButton, miMultiplayerServersMenuConnectButton);
     mMultiplayerServersMenu.AddControl(miNickNameField, miMultiplayerServersMenuConnectButton, miMultiplayerServersMenuBackButton, NULL, NULL);
     mMultiplayerServersMenu.AddControl(miMultiplayerServersMenuBackButton, miNickNameField, miMultiplayerServersMenuServerSelectButton, NULL, NULL);
 
@@ -2849,6 +2844,21 @@ void Menu::RunMenu()
                 modeOptionsMenu.HealthModeStartLifeChanged();
             } else if(MENU_CODE_HEALTH_MODE_MAX_LIFE_CHANGED == code) {
                 modeOptionsMenu.HealthModeMaxLifeChanged();
+            } else if(MENU_CODE_TO_SERVER_LIST == code) {
+                miMultiplayerServersMenuServerListScroll->Show(true);
+                mMultiplayerServersMenu.RememberCurrent();
+
+                mMultiplayerServersMenu.SetHeadControl(miMultiplayerServersMenuServerListScroll);
+                mMultiplayerServersMenu.SetCancelCode(MENU_CODE_NONE);
+                mMultiplayerServersMenu.ResetMenu();
+            } else if(MENU_CODE_NET_LIST_EXIT == code) {
+                miMultiplayerServersMenuServerListScroll->Show(false);
+                mMultiplayerServersMenu.SetHeadControl(miMultiplayerServersMenuServerSelectButton);
+                mMultiplayerServersMenu.SetCancelCode(MENU_CODE_TO_MAIN_MENU);
+
+                mMultiplayerServersMenu.RestoreCurrent();
+
+                iDisplayError = DISPLAY_ERROR_NONE;
             }
         }
 
