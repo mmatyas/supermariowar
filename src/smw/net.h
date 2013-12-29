@@ -39,6 +39,7 @@ void WriteDoubleToBuffer(char * pData, double dDouble);
 bool net_init();
 void net_close();
 void net_saveRecentServers();
+void net_loadRecentServers();
 
 struct MessageHeader {
     uint8_t        protocolVersion;

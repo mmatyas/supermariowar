@@ -8,6 +8,7 @@
 #endif
 
 extern int g_iVersion[];
+extern bool VersionIsEqual(int iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
 
 Networking netplay;
 
@@ -172,15 +173,41 @@ void net_saveRecentServers()
 {
     FILE * fp = OpenFile("servers.bin", "wb");
     if(fp) {
-        fwrite(g_iVersion, sizeof(uint8_t), 4, fp);
+        fwrite(g_iVersion, sizeof(int), 4, fp);
 
         for (unsigned iServer = 0; iServer < netplay.recentServers.size(); iServer++)
         {
-            ServerAddress* addr = &netplay.recentServers[iServer];
-            fwrite(addr->hostname.c_str(), addr->hostname.length() + 1, 1, fp);
-            fwrite(&addr->port, sizeof(uint16_t), 1, fp);
+            ServerAddress* host = &netplay.recentServers[iServer];
+
+            WriteString(host->hostname.c_str(), fp);
+            fwrite(&host->port, sizeof(uint16_t), 1, fp);
         }
     }
+    fclose(fp);
+}
+
+void net_loadRecentServers()
+{
+    FILE * fp = OpenFile("servers.bin", "rb");
+    if(fp) {
+        int version[4];
+        fread(version, sizeof(int), 4, fp);
+
+        if(VersionIsEqual(g_iVersion, version[0], version[1], version[2], version[3])) {
+            char buffer[128];
+            uint16_t port;
+
+            while (!feof(fp) && !ferror(fp)) {
+                ReadString(buffer, 128, fp);
+                fread(&port, sizeof(uint16_t), 1, fp);
+
+                ServerAddress host;
+                host.hostname = buffer;
+                host.port = port;
+            }
+        }
+    }
+    fclose(fp);
 }
 
 /********************************************************************
