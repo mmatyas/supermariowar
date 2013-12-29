@@ -820,7 +820,7 @@ struct Networking {
     char playername[32];    // last byte will be \0
 
     NetClient client;
-    std::vector<ServerAddress> savedServers;
+    std::vector<ServerAddress> recentServers;
 };
 
 //TODO:: Move menu settings from game_values to global menu context structure

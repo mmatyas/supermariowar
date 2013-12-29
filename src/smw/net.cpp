@@ -4,31 +4,33 @@
 #include "net.h"
 
 #ifdef _WIN32
-	#pragma comment(lib, "SDL_net.lib")
+    #pragma comment(lib, "SDL_net.lib")
 #endif
+
+extern int g_iVersion[];
 
 Networking netplay;
 
 
 bool sendTCPMessage(TCPsocket& target, void* data, int dataLength) // int a Send miatt
 {
-	if (!data || !dataLength || !target)
-		return false;
+    if (!data || !dataLength || !target)
+        return false;
 
-	if (SDLNet_TCP_Send(target, data, dataLength) < dataLength) {
-		fprintf(stderr, "[Warning] Sending message failed. %s\n", SDLNet_GetError());
-		return false;
-	}
+    if (SDLNet_TCP_Send(target, data, dataLength) < dataLength) {
+        fprintf(stderr, "[Warning] Sending message failed. %s\n", SDLNet_GetError());
+        return false;
+    }
 
-	return true;
+    return true;
 }
 
 bool receiveTCPMessage(TCPsocket& source, void* buffer, int bufferMaxSize) // int a Recv miatt
 {
-	if (!buffer || bufferMaxSize <= 0 || !source)
-		return false;
+    if (!buffer || bufferMaxSize <= 0 || !source)
+        return false;
 
-	if (SDLNet_TCP_Recv(source, buffer, bufferMaxSize) <= 0) {
+    if (SDLNet_TCP_Recv(source, buffer, bufferMaxSize) <= 0) {
         fprintf(stderr, "[Warning] Receiving message failed. %s\n", SDLNet_GetError());
         return false;
     }
@@ -37,109 +39,109 @@ bool receiveTCPMessage(TCPsocket& source, void* buffer, int bufferMaxSize) // in
 }
 
 union {
-	float f;
-	unsigned char b[4];
+    float f;
+    unsigned char b[4];
 } dFloatAsBytes;
 
 union {
-	int i;
-	unsigned char b[4];
+    int i;
+    unsigned char b[4];
 } iIntAsBytes;
 
 union {
-	short s;
-	unsigned char b[2];
+    short s;
+    unsigned char b[2];
 } sShortAsBytes;
 
 union {
-	double d;
-	unsigned char b[8];
+    double d;
+    unsigned char b[8];
 } dDoubleAsBytes;
 
 void ReadFloatFromBuffer(float * pFloat, char * pData)
 {
-	dFloatAsBytes.b[0] = pData[0];
-	dFloatAsBytes.b[1] = pData[1];
-	dFloatAsBytes.b[2] = pData[2];
-	dFloatAsBytes.b[3] = pData[3];
+    dFloatAsBytes.b[0] = pData[0];
+    dFloatAsBytes.b[1] = pData[1];
+    dFloatAsBytes.b[2] = pData[2];
+    dFloatAsBytes.b[3] = pData[3];
 
-	*pFloat = dFloatAsBytes.f;
+    *pFloat = dFloatAsBytes.f;
 }
 
 void ReadIntFromBuffer(int * pInt, char * pData)
 {
-	iIntAsBytes.b[0] = pData[0];
-	iIntAsBytes.b[1] = pData[1];
-	iIntAsBytes.b[2] = pData[2];
-	iIntAsBytes.b[3] = pData[3];
+    iIntAsBytes.b[0] = pData[0];
+    iIntAsBytes.b[1] = pData[1];
+    iIntAsBytes.b[2] = pData[2];
+    iIntAsBytes.b[3] = pData[3];
 
-	*pInt = iIntAsBytes.i;
+    *pInt = iIntAsBytes.i;
 }
 
 void ReadShortFromBuffer(short * pShort, char * pData)
 {
-	sShortAsBytes.b[0] = pData[0];
-	sShortAsBytes.b[1] = pData[1];
+    sShortAsBytes.b[0] = pData[0];
+    sShortAsBytes.b[1] = pData[1];
 
-	*pShort = sShortAsBytes.s;
+    *pShort = sShortAsBytes.s;
 }
 
 void ReadDoubleFromBuffer(double * pDouble, char * pData)
 {
-	dDoubleAsBytes.b[0] = pData[0];
-	dDoubleAsBytes.b[1] = pData[1];
-	dDoubleAsBytes.b[2] = pData[2];
-	dDoubleAsBytes.b[3] = pData[3];
-	dDoubleAsBytes.b[4] = pData[4];
-	dDoubleAsBytes.b[5] = pData[5];
-	dDoubleAsBytes.b[6] = pData[6];
-	dDoubleAsBytes.b[7] = pData[7];
+    dDoubleAsBytes.b[0] = pData[0];
+    dDoubleAsBytes.b[1] = pData[1];
+    dDoubleAsBytes.b[2] = pData[2];
+    dDoubleAsBytes.b[3] = pData[3];
+    dDoubleAsBytes.b[4] = pData[4];
+    dDoubleAsBytes.b[5] = pData[5];
+    dDoubleAsBytes.b[6] = pData[6];
+    dDoubleAsBytes.b[7] = pData[7];
 
-	*pDouble = dDoubleAsBytes.d;
+    *pDouble = dDoubleAsBytes.d;
 }
 
 void WriteFloatToBuffer(char * pData, float dFloat)
 {
-	dFloatAsBytes.f = dFloat;
-	
-  	pData[0] = dFloatAsBytes.b[0];
-	pData[1] = dFloatAsBytes.b[1];
-	pData[2] = dFloatAsBytes.b[2];
-	pData[3] = dFloatAsBytes.b[3];
+    dFloatAsBytes.f = dFloat;
+    
+      pData[0] = dFloatAsBytes.b[0];
+    pData[1] = dFloatAsBytes.b[1];
+    pData[2] = dFloatAsBytes.b[2];
+    pData[3] = dFloatAsBytes.b[3];
 }
 
 void WriteIntToBuffer(char * pData, int iInt)
 {
-	iIntAsBytes.i = iInt;
+    iIntAsBytes.i = iInt;
 
-	pData[0] = iIntAsBytes.b[0];
-	pData[1] = iIntAsBytes.b[1];
-	pData[2] = iIntAsBytes.b[2];
-	pData[3] = iIntAsBytes.b[3];
+    pData[0] = iIntAsBytes.b[0];
+    pData[1] = iIntAsBytes.b[1];
+    pData[2] = iIntAsBytes.b[2];
+    pData[3] = iIntAsBytes.b[3];
 }
 
 void WriteShortToBuffer(char * pData, short sShort)
 {
-	sShortAsBytes.s = sShort;
+    sShortAsBytes.s = sShort;
 
-	pData[0] = sShortAsBytes.b[0];
-	pData[1] = sShortAsBytes.b[1];
-	pData[2] = sShortAsBytes.b[2];
-	pData[3] = sShortAsBytes.b[3];
+    pData[0] = sShortAsBytes.b[0];
+    pData[1] = sShortAsBytes.b[1];
+    pData[2] = sShortAsBytes.b[2];
+    pData[3] = sShortAsBytes.b[3];
 }
 
 void WriteDoubleToBuffer(char * pData, double dDouble)
 {
-	dDoubleAsBytes.d = dDouble;
-	
-  	pData[0] = dDoubleAsBytes.b[0];
-	pData[1] = dDoubleAsBytes.b[1];
-	pData[2] = dDoubleAsBytes.b[2];
-	pData[3] = dDoubleAsBytes.b[3];
-	pData[4] = dDoubleAsBytes.b[4];
-	pData[5] = dDoubleAsBytes.b[5];
-	pData[6] = dDoubleAsBytes.b[6];
-	pData[7] = dDoubleAsBytes.b[7];
+    dDoubleAsBytes.d = dDouble;
+    
+      pData[0] = dDoubleAsBytes.b[0];
+    pData[1] = dDoubleAsBytes.b[1];
+    pData[2] = dDoubleAsBytes.b[2];
+    pData[3] = dDoubleAsBytes.b[3];
+    pData[4] = dDoubleAsBytes.b[4];
+    pData[5] = dDoubleAsBytes.b[5];
+    pData[6] = dDoubleAsBytes.b[6];
+    pData[7] = dDoubleAsBytes.b[7];
 }
 
 bool net_init()
@@ -153,15 +155,32 @@ bool net_init()
 
     ServerAddress localhost;
     localhost.hostname = "localhost";
-    localhost.port = 2000;
-    netplay.savedServers.push_back(localhost);
+    localhost.port = NET_DEFAULT_PORT;
+    netplay.recentServers.push_back(localhost);
 
     printf("Network system initialized.\n");
 }
 
 void net_close()
 {
-	SDLNet_Quit();
+    netplay.client.endSession();
+    net_saveRecentServers();
+    SDLNet_Quit();
+}
+
+void net_saveRecentServers()
+{
+    FILE * fp = OpenFile("servers.bin", "wb");
+    if(fp) {
+        fwrite(g_iVersion, sizeof(uint8_t), 4, fp);
+
+        for (unsigned iServer = 0; iServer < netplay.recentServers.size(); iServer++)
+        {
+            ServerAddress* addr = &netplay.recentServers[iServer];
+            fwrite(addr->hostname.c_str(), addr->hostname.length() + 1, 1, fp);
+            fwrite(&addr->port, sizeof(uint16_t), 1, fp);
+        }
+    }
 }
 
 /********************************************************************
@@ -172,7 +191,7 @@ NetClient::NetClient()
 
 NetClient::~NetClient()
 {
-	endSession();
+    endSession();
 }
 
 bool NetClient::connect(const char* hostname, const uint16_t port)
@@ -200,17 +219,19 @@ bool NetClient::connect(const char* hostname, const uint16_t port)
 
 void NetClient::update()
 {
-	readySockets = SDLNet_CheckSockets(sockets, 0);
+    readySockets = SDLNet_CheckSockets(sockets, 0);
 
     // TCP műveletek
     if (readySockets && SDLNet_SocketReady(tcpSocket))
     {
         printf("READY %d\n", readySockets);
-        uint8_t response[128];
-        if (!receiveTCPMessage(tcpSocket, response, 128))
+        uint8_t response[NET_MAX_MESSAGE_SIZE];
+        if (!receiveTCPMessage(tcpSocket, response, NET_MAX_MESSAGE_SIZE))
             closeTCPsocket();
         else {
-            switch (response[0])
+            uint8_t protocollVersion = response[0];
+            uint8_t responseCode = response[1];
+            switch (responseCode)
             {
                 case NET_RESPONSE_SERVERINFO:
                     ServerInfoPackage serverInfo;
@@ -218,8 +239,8 @@ void NetClient::update()
 
 
                     printf("NET_RESPONSE_SERVERINFO [%lu byte]\n", sizeof(serverInfo));
-                    printf("{\n  name: %s\n  desc: %s\n  currentPlayers: %d\n  maxPlayers: %d\n}\n",
-                        serverInfo.name, serverInfo.description, serverInfo.currentPlayers, serverInfo.maxPlayers);
+                    printf("Sending:\n  protocolVersion: %d\n  packageType: %d\n  name: %s\n  players/max: %d / %d\n",
+                        serverInfo.protocolVersion, serverInfo.packageType, serverInfo.name, serverInfo.currentPlayers, serverInfo.maxPlayers);
 
                     closeTCPsocket();
                     break;
@@ -238,36 +259,24 @@ void NetClient::update()
 
 }
 
-void NetClient::cleanup()
-{
-	closeTCPsocket();
-	closeUDPsocket();
-
-    if (sockets) {
-        SDLNet_FreeSocketSet(sockets);
-        sockets = NULL;
-    }
-}
-
 bool NetClient::startSession()
 {
-	printf("Session start.\nPrevious: ");
-	// Finish previous network session
-	endSession();
+    printf("Session start.\n");
+    // Finish previous network session
+    endSession();
 
-	netplay.active = true;
+    netplay.active = true;
     sockets = SDLNet_AllocSocketSet(2);
     if (!sockets) {
         fprintf(stderr, "[Error] SDLNet_AllocSocketSet: %s\n", SDLNet_GetError());
         return false;
     }
 
-    for (unsigned iServer = 0; iServer < netplay.savedServers.size(); iServer++)
-    {
-        if (connect(netplay.savedServers[iServer].hostname.c_str(), netplay.savedServers[iServer].port)) {
-            uint8_t messageHead = NET_REQUEST_SERVERINFO;
-            sendTCPMessage(tcpSocket, &messageHead, sizeof(uint8_t));
-        }
+    if (connect(netplay.recentServers[0].hostname.c_str(), netplay.recentServers[0].port)) {
+        MessageHeader message;
+        message.protocolVersion = NET_PROTOCOL_VERSION;
+        message.packageType = NET_REQUEST_SERVERINFO;
+        sendTCPMessage(tcpSocket, &message, sizeof(MessageHeader));
     }
 
     return true;
@@ -275,25 +284,38 @@ bool NetClient::startSession()
 
 void NetClient::endSession()
 {
-	printf("Session end.\n");
-	netplay.active = false;
-	cleanup();
+    if (netplay.active) {
+        printf("Session end.\n");
+        netplay.active = false;
+        cleanup();
+    }
+}
+
+void NetClient::cleanup()
+{
+    closeTCPsocket();
+    closeUDPsocket();
+
+    if (sockets) {
+        SDLNet_FreeSocketSet(sockets);
+        sockets = NULL;
+    }
 }
 
 void NetClient::closeTCPsocket()
 {
-	if (tcpSocket) {
-		SDLNet_TCP_DelSocket(sockets, tcpSocket);
-		SDLNet_TCP_Close(tcpSocket);
-	    tcpSocket = NULL;
-	}
+    if (tcpSocket) {
+        SDLNet_TCP_DelSocket(sockets, tcpSocket);
+        SDLNet_TCP_Close(tcpSocket);
+        tcpSocket = NULL;
+    }
 }
 
 void NetClient::closeUDPsocket()
 {
-	if (udpSocket) {
-		SDLNet_UDP_DelSocket(sockets, udpSocket);
-		SDLNet_UDP_Close(udpSocket);
-	    udpSocket = NULL;
-	}
+    if (udpSocket) {
+        SDLNet_UDP_DelSocket(sockets, udpSocket);
+        SDLNet_UDP_Close(udpSocket);
+        udpSocket = NULL;
+    }
 }

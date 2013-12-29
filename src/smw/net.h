@@ -6,6 +6,7 @@
 
 #define NET_PROTOCOL_VERSION                1
 #define NET_MAX_MESSAGE_SIZE                128
+#define NET_DEFAULT_PORT                    12521
 
 #define NET_REQUEST_SERVERINFO              1
 #define NET_RESPONSE_SERVERINFO             2
@@ -37,10 +38,11 @@ void WriteDoubleToBuffer(char * pData, double dDouble);
 
 bool net_init();
 void net_close();
+void net_saveRecentServers();
 
 struct MessageHeader {
     uint8_t        protocolVersion;
-    uint8_t        messageTypeID;
+    uint8_t        packageType;
 };
 
 struct ServerAddress {
@@ -50,7 +52,6 @@ struct ServerAddress {
 
 struct ServerInfoPackage : MessageHeader {
     char           name[32];
-    char           description[64];
     uint32_t       currentPlayers;
     uint32_t       maxPlayers;
 };
@@ -66,9 +67,8 @@ class NetClient
 		NetClient();
 		~NetClient();
 
-		bool connect(const char* hostname, const uint16_t port);
+		bool connect(const char* hostname, const uint16_t port = NET_DEFAULT_PORT);
 		void update();
-		void cleanup();
 
 		bool startSession();
 		void endSession();
@@ -82,6 +82,7 @@ class NetClient
 
 		int readySockets;
 
+		void cleanup();
 		void closeTCPsocket();
 		void closeUDPsocket();
 };

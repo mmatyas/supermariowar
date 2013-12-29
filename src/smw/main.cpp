@@ -874,9 +874,6 @@ int main(int argc, char *argv[])
     gfx_close();
     net_close();
 
-    //netServer.cleanup();
-    netplay.client.cleanup();
-
     //Delete player skins
     for(short k = 0; k < MAX_PLAYERS; k++) {
         for(short j = 0; j < PGFX_LAST; j++) {
