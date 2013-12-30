@@ -4656,7 +4656,6 @@ MenuCodeEnum MI_NetworkListScroll::SendInput(CPlayerInput * playerInput)
 
         if(playerInput->outputControls[iPlayer].menu_select.fPressed) {
             netplay.selectedServerIndex = iIndex;
-            printf("%d\n", netplay.selectedServerIndex);
             return MENU_CODE_NET_LIST_EXIT;
         }
 

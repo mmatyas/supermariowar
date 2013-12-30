@@ -66,13 +66,14 @@ void net_loadServerList()
 
         if(VersionIsEqual(g_iVersion, version[0], version[1], version[2], version[3])) {
             char buffer[128];
+            ReadString(buffer, 128, fp);
 
             while (!feof(fp) && !ferror(fp)) {
-                ReadString(buffer, 128, fp);
-
                 ServerAddress host;
                 host.hostname = buffer;
                 netplay.savedServers.push_back(host);
+
+                ReadString(buffer, 128, fp);
             }
         }
         fclose(fp);

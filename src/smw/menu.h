@@ -404,20 +404,21 @@ class Menu
 
 
 		//Multiplayer Server List Menu
-		UI_Menu mMultiplayerServersMenu;
+		UI_Menu mMultiplayerServers;
 
-		MI_Button * miMultiplayerServersMenuServerSelectButton;
-		MI_Text * miMultiplayerServersMenuSelectedServerHostNameText;
-		MI_Button * miMultiplayerServersMenuConnectButton;
-		MI_TextField * miNickNameField;
+		MI_Button * miMultiplayerServersSelectButton;
+		MI_Text * miMultiplayerServersSelectedHostText;
+		MI_Button * miMultiplayerServersConnectButton;
+		MI_Button * miMultiplayerServersAddRemoveButton;
+		MI_TextField * miMultiplayerServersNicknameField;
 
-		MI_NetworkListScroll * miMultiplayerServersMenuServerListScroll;
+		MI_NetworkListScroll * miMultiplayerServersScroll;
 
-		MI_Button * miMultiplayerServersMenuBackButton;
+		MI_Button * miMultiplayerServersBackButton;
 
-		MI_Image * miMultiplayerServersMenuLeftHeaderBar;
-		MI_Image * miMultiplayerServersMenuRightHeaderBar;
-		MI_Text * miMultiplayerServersMenuHeaderText;
+		MI_Image * miMultiplayerServersLeftHeaderBar;
+		MI_Image * miMultiplayerServersRightHeaderBar;
+		MI_Text * miMultiplayerServersHeaderText;
 
 
 		DisplayError iDisplayError;
