@@ -200,8 +200,9 @@ void NetClient::update()
     readySockets = SDLNet_CheckSockets(sockets, 0);
 
     // TCP műveletek
-    /*if (readySockets && SDLNet_SocketReady(tcpSocket))
+    if (readySockets && SDLNet_SocketReady(tcpSocket))
     {
+        printf("READY %d\n", readySockets);
         if (!receiveTCPMessage())
             closeTCPsocket();
         else {
@@ -226,10 +227,10 @@ void NetClient::update()
                     break;
             }
         }
-    }*/
+    }
 
     // UDP műveletek
-    if (readySockets && SDLNet_SocketReady(udpSocket)) {
+    /*if (readySockets && SDLNet_SocketReady(udpSocket)) {
         if (!receiveUDPMessage())
             closeUDPsocket();
         else {
@@ -239,9 +240,15 @@ void NetClient::update()
             printf("  status %d\n", udpIncomingPacket->status);
 
             uint8_t* addr = (Uint8*)&udpIncomingPacket->address;
-            printf("  source %d.%d.%d.%d\n", addr[0], addr[1], addr[2], addr[3]);
+            printf("  source %d.%d.%d.%d::%d\n", addr[0], addr[1], addr[2], addr[3], udpIncomingPacket->address.port);
+
+            for (int i = 0; i < udpIncomingPacket->len; i++)
+                printf("%3d ", udpIncomingPacket->data[i]);
+
+            printf("\n");
+            closeUDPsocket();
         }
-    }
+    }*/
 
 }
 
@@ -250,7 +257,7 @@ bool NetClient::startSession()
     printf("Session start.\n");
     endSession(); // Finish previous network session if active
 
-    udpIncomingPacket = SDLNet_AllocPacket(NET_MAX_MESSAGE_SIZE);
+    /*udpIncomingPacket = SDLNet_AllocPacket(NET_MAX_MESSAGE_SIZE);
     if(!udpIncomingPacket) {
         fprintf(stderr, "[Error] SDLNet_AllocPacket: %s\n", SDLNet_GetError());
         return false;
@@ -260,12 +267,7 @@ bool NetClient::startSession()
     if(!udpOutgoingPacket) {
         fprintf(stderr, "[Error] SDLNet_AllocPacket: %s\n", SDLNet_GetError());
         return false;
-    }
-
-    printf("chan %d\n", udpIncomingPacket->channel);
-    printf("len %d\n", udpIncomingPacket->len);
-    printf("maxlen %d\n", udpIncomingPacket->maxlen);
-    printf("status %d\n", udpIncomingPacket->status);
+    }*/
 
     netplay.active = true;
     sockets = SDLNet_AllocSocketSet(2);
@@ -278,7 +280,7 @@ bool NetClient::startSession()
         MessageHeader message;
         message.protocolVersion = NET_PROTOCOL_VERSION;
         message.packageType = NET_REQUEST_SERVERINFO;
-        sendUDPMessage(&message, sizeof(MessageHeader));
+        sendTCPMessage(&message, sizeof(MessageHeader));
     }
 
     return true;
@@ -297,15 +299,15 @@ bool NetClient::connect(const char* hostname, const uint16_t port)
     }
 
     /* Open TCP socket */
-    /*tcpSocket = SDLNet_TCP_Open(&serverIP);
+    tcpSocket = SDLNet_TCP_Open(&serverIP);
     if (!tcpSocket) {
         fprintf(stderr, "[Error] SDLNet_TCP_Open: %s\n", SDLNet_GetError());
         return false;
     }
-    SDLNet_TCP_AddSocket(sockets, tcpSocket);*/
+    SDLNet_TCP_AddSocket(sockets, tcpSocket);
 
     /* Open UDP socket */
-    udpSocket = SDLNet_UDP_Open(port);
+    /*udpSocket = SDLNet_UDP_Open(port);
     if (!udpSocket) {
         fprintf(stderr, "[Error] SDLNet_UDP_Open: %s\n", SDLNet_GetError());
         return false;
@@ -315,7 +317,7 @@ bool NetClient::connect(const char* hostname, const uint16_t port)
         fprintf(stderr, "[Error] SDLNet_UDP_Bind: %s\n", SDLNet_GetError());
         return false;
     }
-    SDLNet_UDP_AddSocket(sockets, udpSocket);
+    SDLNet_UDP_AddSocket(sockets, udpSocket);*/
 
     return true;
 }
@@ -354,22 +356,17 @@ void NetClient::closeUDPsocket()
     if (udpSocket) {
         SDLNet_UDP_DelSocket(sockets, udpSocket);
 
-printf("...\n");
+
         if (udpIncomingPacket) {
             SDLNet_FreePacket(udpIncomingPacket);
             udpIncomingPacket = NULL;
         }
 
-printf("...\n");
         if (udpOutgoingPacket) {
-printf("......\n");
-            SDLNet_FreePacket(udpOutgoingPacket);
-printf("......\n");
+            SDLNet_FreePacket(udpOutgoingPacket); // CRASH
             udpOutgoingPacket = NULL;
-printf("......\n");
         }
 
-printf("...\n");
         if (udpChannel)
             SDLNet_UDP_Unbind(udpSocket, udpChannel);
         SDLNet_UDP_Close(udpSocket);
