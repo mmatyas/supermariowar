@@ -822,7 +822,7 @@ struct Networking {
     NetClient client;
 
     unsigned selectedServerIndex;
-    std::vector<ServerAddress> recentServers;
+    std::vector<ServerAddress> savedServers;
 };
 
 //TODO:: Move menu settings from game_values to global menu context structure

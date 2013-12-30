@@ -18,8 +18,6 @@
 
 #define NET_RESPONSE_ROOMFULL
 
-bool sendTCPMessage(TCPsocket& target, void* data, int dataLength);
-bool receiveTCPMessage(TCPsocket& source, void* buffer, int bufferMaxSize);
 
 void ReadFloatFromBuffer(float * pFloat, char * pData);
 void ReadIntFromBuffer(int * pInt, char * pData);
@@ -38,8 +36,8 @@ void WriteDoubleToBuffer(char * pData, double dDouble);
 
 bool net_init();
 void net_close();
-void net_saveRecentServers();
-void net_loadRecentServers();
+void net_saveServerList();
+void net_loadServerList();
 
 struct MessageHeader {
     uint8_t        protocolVersion;
@@ -48,7 +46,6 @@ struct MessageHeader {
 
 struct ServerAddress {
     std::string    hostname;
-    uint16_t       port;
 };
 
 struct ServerInfoPackage : MessageHeader {
@@ -77,15 +74,27 @@ class NetClient
 	private:
 
 		IPaddress serverIP;
-		TCPsocket tcpSocket;
-		UDPsocket udpSocket;
-		SDLNet_SocketSet sockets;
 
+		TCPsocket tcpSocket;
+        uint8_t tcpResponseBuffer[NET_MAX_MESSAGE_SIZE];
+
+		UDPsocket udpSocket;
+        int udpChannel;
+        UDPpacket* udpOutgoingPacket;
+        UDPpacket* udpIncomingPacket;
+
+		SDLNet_SocketSet sockets;
 		int readySockets;
 
 		void cleanup();
 		void closeTCPsocket();
 		void closeUDPsocket();
+
+        bool sendTCPMessage(void* data, int dataLength);
+        bool receiveTCPMessage();
+
+        bool sendUDPMessage(void* data, int dataLength);
+        bool receiveUDPMessage();
 };
 
 #endif //__NETWORK_H_

@@ -287,13 +287,13 @@ void Menu::CreateMenu()
     miMultiplayerServersMenuServerListScroll->SetAutoModify(true);
     miMultiplayerServersMenuServerListScroll->Show(false);
 
-    for (unsigned iServer = 0; iServer < netplay.recentServers.size(); iServer++) {
-        ServerAddress * host = &netplay.recentServers[iServer];
+    for (unsigned iServer = 0; iServer < netplay.savedServers.size(); iServer++) {
+        ServerAddress * host = &netplay.savedServers[iServer];
         miMultiplayerServersMenuServerListScroll->Add(host->hostname, "");
     }
 
     miMultiplayerServersMenuServerSelectButton = new MI_Button(&rm->spr_selectfield, 70, 170, "Selected Server", smw->ScreenWidth - 2 * 70, 0);
-    miMultiplayerServersMenuSelectedServerHostNameText = new MI_Text(netplay.recentServers[netplay.selectedServerIndex].hostname.c_str(), smw->ScreenWidth/2, 175, 0, 2, 0);
+    miMultiplayerServersMenuSelectedServerHostNameText = new MI_Text(netplay.savedServers[netplay.selectedServerIndex].hostname.c_str(), smw->ScreenWidth/2, 175, 0, 2, 0);
 
     miMultiplayerServersMenuConnectButton = new MI_Button(&rm->spr_selectfield, 70, 210, "Connect", smw->ScreenWidth - 2 * 70, 1);
     miMultiplayerServersMenuServerSelectButton->SetCode(MENU_CODE_TO_SERVER_LIST);

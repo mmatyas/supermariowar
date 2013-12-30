@@ -13,32 +13,6 @@ extern bool VersionIsEqual(int iVersion[], short iMajor, short iMinor, short iMi
 Networking netplay;
 
 
-bool sendTCPMessage(TCPsocket& target, void* data, int dataLength) // int a Send miatt
-{
-    if (!data || !dataLength || !target)
-        return false;
-
-    if (SDLNet_TCP_Send(target, data, dataLength) < dataLength) {
-        fprintf(stderr, "[Warning] Sending message failed. %s\n", SDLNet_GetError());
-        return false;
-    }
-
-    return true;
-}
-
-bool receiveTCPMessage(TCPsocket& source, void* buffer, int bufferMaxSize) // int a Recv miatt
-{
-    if (!buffer || bufferMaxSize <= 0 || !source)
-        return false;
-
-    if (SDLNet_TCP_Recv(source, buffer, bufferMaxSize) <= 0) {
-        fprintf(stderr, "[Warning] Receiving message failed. %s\n", SDLNet_GetError());
-        return false;
-    }
-
-    return true;
-}
-
 union {
     float f;
     unsigned char b[4];
@@ -154,10 +128,15 @@ bool net_init()
 
     atexit(SDLNet_Quit);
 
+    /*ServerAddress none;
+    none.hostname = "(none)";
+    netplay.savedServers.push_back(none);*/
+
     ServerAddress localhost;
     localhost.hostname = "localhost";
-    localhost.port = NET_DEFAULT_PORT;
-    netplay.recentServers.push_back(localhost);
+    netplay.savedServers.push_back(localhost);
+
+    net_loadServerList();
 
     printf("Network system initialized.\n");
 }
@@ -165,28 +144,25 @@ bool net_init()
 void net_close()
 {
     netplay.client.endSession();
-    net_saveRecentServers();
+    net_saveServerList();
     SDLNet_Quit();
 }
 
-void net_saveRecentServers()
+void net_saveServerList()
 {
     FILE * fp = OpenFile("servers.bin", "wb");
     if(fp) {
         fwrite(g_iVersion, sizeof(int), 4, fp);
 
-        for (unsigned iServer = 0; iServer < netplay.recentServers.size(); iServer++)
-        {
-            ServerAddress* host = &netplay.recentServers[iServer];
-
+        for (unsigned iServer = 0; iServer < netplay.savedServers.size(); iServer++) {
+            ServerAddress* host = &netplay.savedServers[iServer];
             WriteString(host->hostname.c_str(), fp);
-            fwrite(&host->port, sizeof(uint16_t), 1, fp);
         }
     }
     fclose(fp);
 }
 
-void net_loadRecentServers()
+void net_loadServerList()
 {
     FILE * fp = OpenFile("servers.bin", "rb");
     if(fp) {
@@ -195,15 +171,13 @@ void net_loadRecentServers()
 
         if(VersionIsEqual(g_iVersion, version[0], version[1], version[2], version[3])) {
             char buffer[128];
-            uint16_t port;
 
             while (!feof(fp) && !ferror(fp)) {
                 ReadString(buffer, 128, fp);
-                fread(&port, sizeof(uint16_t), 1, fp);
 
                 ServerAddress host;
                 host.hostname = buffer;
-                host.port = port;
+                netplay.savedServers.push_back(host);
             }
         }
     }
@@ -221,48 +195,23 @@ NetClient::~NetClient()
     endSession();
 }
 
-bool NetClient::connect(const char* hostname, const uint16_t port)
-{
-    /* Resolve server address */
-    printf("Connecting to %s:%d...\n", hostname, port);
-    if (SDLNet_ResolveHost(&serverIP, hostname, port) < 0) {
-        if (serverIP.host == INADDR_NONE)
-            fprintf(stderr, "[Error] Couldn't resolve hostname\n");
-        else
-            fprintf(stderr, "[Error] SDLNet_ResolveHost: %s\n", SDLNet_GetError());
-        return false;
-    }
-
-    /* Open TCP socket */
-    tcpSocket = SDLNet_TCP_Open(&serverIP);
-    if (!tcpSocket) {
-        fprintf(stderr, "[Error] SDLNet_TCP_Open: %s\n", SDLNet_GetError());
-        return false;
-    }
-    SDLNet_TCP_AddSocket(sockets, tcpSocket);
-
-    return true;
-}
-
 void NetClient::update()
 {
     readySockets = SDLNet_CheckSockets(sockets, 0);
 
     // TCP műveletek
-    if (readySockets && SDLNet_SocketReady(tcpSocket))
+    /*if (readySockets && SDLNet_SocketReady(tcpSocket))
     {
-        printf("READY %d\n", readySockets);
-        uint8_t response[NET_MAX_MESSAGE_SIZE];
-        if (!receiveTCPMessage(tcpSocket, response, NET_MAX_MESSAGE_SIZE))
+        if (!receiveTCPMessage())
             closeTCPsocket();
         else {
-            uint8_t protocollVersion = response[0];
-            uint8_t responseCode = response[1];
+            uint8_t protocollVersion = tcpResponseBuffer[0];
+            uint8_t responseCode = tcpResponseBuffer[1];
             switch (responseCode)
             {
                 case NET_RESPONSE_SERVERINFO:
                     ServerInfoPackage serverInfo;
-                    memcpy(&serverInfo, response, sizeof(ServerInfoPackage));
+                    memcpy(&serverInfo, tcpResponseBuffer, sizeof(ServerInfoPackage));
 
 
                     printf("NET_RESPONSE_SERVERINFO [%lu byte]\n", sizeof(serverInfo));
@@ -277,20 +226,46 @@ void NetClient::update()
                     break;
             }
         }
-    }
+    }*/
 
     // UDP műveletek
-    /*if (SDLNet_SocketReady(client.udpSocket)) {
-        printf("UDP-t kaptam!\n");
-    }*/
+    if (readySockets && SDLNet_SocketReady(udpSocket)) {
+        if (!receiveUDPMessage())
+            closeUDPsocket();
+        else {
+            printf("  chan %d\n", udpIncomingPacket->channel);
+            printf("  len %d\n", udpIncomingPacket->len);
+            printf("  maxlen %d\n", udpIncomingPacket->maxlen);
+            printf("  status %d\n", udpIncomingPacket->status);
+
+            uint8_t* addr = (Uint8*)&udpIncomingPacket->address;
+            printf("  source %d.%d.%d.%d\n", addr[0], addr[1], addr[2], addr[3]);
+        }
+    }
 
 }
 
 bool NetClient::startSession()
 {
     printf("Session start.\n");
-    // Finish previous network session
-    endSession();
+    endSession(); // Finish previous network session if active
+
+    udpIncomingPacket = SDLNet_AllocPacket(NET_MAX_MESSAGE_SIZE);
+    if(!udpIncomingPacket) {
+        fprintf(stderr, "[Error] SDLNet_AllocPacket: %s\n", SDLNet_GetError());
+        return false;
+    }
+
+    udpOutgoingPacket = SDLNet_AllocPacket(NET_MAX_MESSAGE_SIZE);
+    if(!udpOutgoingPacket) {
+        fprintf(stderr, "[Error] SDLNet_AllocPacket: %s\n", SDLNet_GetError());
+        return false;
+    }
+
+    printf("chan %d\n", udpIncomingPacket->channel);
+    printf("len %d\n", udpIncomingPacket->len);
+    printf("maxlen %d\n", udpIncomingPacket->maxlen);
+    printf("status %d\n", udpIncomingPacket->status);
 
     netplay.active = true;
     sockets = SDLNet_AllocSocketSet(2);
@@ -299,12 +274,48 @@ bool NetClient::startSession()
         return false;
     }
 
-    if (connect(netplay.recentServers[0].hostname.c_str(), netplay.recentServers[0].port)) {
+    if ( connect(netplay.savedServers[0].hostname.c_str()) ) {
         MessageHeader message;
         message.protocolVersion = NET_PROTOCOL_VERSION;
         message.packageType = NET_REQUEST_SERVERINFO;
-        sendTCPMessage(tcpSocket, &message, sizeof(MessageHeader));
+        sendUDPMessage(&message, sizeof(MessageHeader));
     }
+
+    return true;
+}
+
+bool NetClient::connect(const char* hostname, const uint16_t port)
+{
+    /* Resolve server address */
+    printf("Connecting to %s:%d...\n", hostname, port);
+    if (SDLNet_ResolveHost(&serverIP, hostname, port) < 0) {
+        if (serverIP.host == INADDR_NONE)
+            fprintf(stderr, "[Error] Couldn't resolve hostname\n");
+        else
+            fprintf(stderr, "[Error] SDLNet_ResolveHost: %s\n", SDLNet_GetError());
+        return false;
+    }
+
+    /* Open TCP socket */
+    /*tcpSocket = SDLNet_TCP_Open(&serverIP);
+    if (!tcpSocket) {
+        fprintf(stderr, "[Error] SDLNet_TCP_Open: %s\n", SDLNet_GetError());
+        return false;
+    }
+    SDLNet_TCP_AddSocket(sockets, tcpSocket);*/
+
+    /* Open UDP socket */
+    udpSocket = SDLNet_UDP_Open(port);
+    if (!udpSocket) {
+        fprintf(stderr, "[Error] SDLNet_UDP_Open: %s\n", SDLNet_GetError());
+        return false;
+    }
+    udpChannel = SDLNet_UDP_Bind(udpSocket, -1, &serverIP);
+    if (udpChannel < 0) {
+        fprintf(stderr, "[Error] SDLNet_UDP_Bind: %s\n", SDLNet_GetError());
+        return false;
+    }
+    SDLNet_UDP_AddSocket(sockets, udpSocket);
 
     return true;
 }
@@ -342,7 +353,81 @@ void NetClient::closeUDPsocket()
 {
     if (udpSocket) {
         SDLNet_UDP_DelSocket(sockets, udpSocket);
+
+printf("...\n");
+        if (udpIncomingPacket) {
+            SDLNet_FreePacket(udpIncomingPacket);
+            udpIncomingPacket = NULL;
+        }
+
+printf("...\n");
+        if (udpOutgoingPacket) {
+printf("......\n");
+            SDLNet_FreePacket(udpOutgoingPacket);
+printf("......\n");
+            udpOutgoingPacket = NULL;
+printf("......\n");
+        }
+
+printf("...\n");
+        if (udpChannel)
+            SDLNet_UDP_Unbind(udpSocket, udpChannel);
         SDLNet_UDP_Close(udpSocket);
         udpSocket = NULL;
     }
+}
+
+bool NetClient::sendTCPMessage(void* data, int dataLength) // int a Send miatt
+{
+    if (!data || dataLength <= 0 || dataLength >= NET_MAX_MESSAGE_SIZE || !tcpSocket)
+        return false;
+
+    if (SDLNet_TCP_Send(tcpSocket, data, dataLength) < dataLength) {
+        fprintf(stderr, "[Warning] Sending TCP message failed. %s\n", SDLNet_GetError());
+        return false;
+    }
+
+    return true;
+}
+
+bool NetClient::receiveTCPMessage()
+{
+    if (!tcpSocket)
+        return false;
+
+    if (SDLNet_TCP_Recv(tcpSocket, tcpResponseBuffer, NET_MAX_MESSAGE_SIZE) <= 0) {
+        fprintf(stderr, "[Warning] Receiving TCP message failed. %s\n", SDLNet_GetError());
+        return false;
+    }
+
+    return true;
+}
+
+bool NetClient::sendUDPMessage(void* data, int dataLength)
+{
+    if (!data || dataLength <= 0 || dataLength >= NET_MAX_MESSAGE_SIZE || !udpSocket || !udpOutgoingPacket)
+        return false;
+
+    udpOutgoingPacket->data = (Uint8*)data;
+    udpOutgoingPacket->len = dataLength;
+
+    if (!SDLNet_UDP_Send(udpSocket, udpChannel, udpOutgoingPacket)) {
+        fprintf(stderr, "[Warning] Sending UDP message failed. %s\n", SDLNet_GetError());
+        return false;
+    }
+
+    return true;
+}
+
+bool NetClient::receiveUDPMessage()
+{
+    if (!udpSocket || !udpIncomingPacket)
+        return false;
+
+    if (SDLNet_UDP_Recv(udpSocket, udpIncomingPacket) <= 0) {
+        fprintf(stderr, "[Warning] Receiving UDP message failed. %s\n", SDLNet_GetError());
+        return false;
+    }
+
+    return true;
 }
