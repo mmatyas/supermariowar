@@ -293,13 +293,13 @@ void Menu::CreateMenu()
     }
 
     miMultiplayerServersMenuServerSelectButton = new MI_Button(&rm->spr_selectfield, 70, 170, "Selected Server", smw->ScreenWidth - 2 * 70, 0);
-    miMultiplayerServersMenuSelectedServerHostNameText = new MI_Text(netplay.savedServers[netplay.selectedServerIndex].hostname.c_str(), smw->ScreenWidth/2, 175, 0, 2, 0);
+    miMultiplayerServersMenuSelectedServerHostNameText = new MI_Text(netplay.savedServers[netplay.selectedServerIndex].hostname.c_str(), smw->ScreenWidth - 90, 175, 0, 2, 2);
 
     miMultiplayerServersMenuConnectButton = new MI_Button(&rm->spr_selectfield, 70, 210, "Connect", smw->ScreenWidth - 2 * 70, 1);
     miMultiplayerServersMenuServerSelectButton->SetCode(MENU_CODE_TO_SERVER_LIST);
 
-    miNickNameField = new MI_TextField(&rm->menu_plain_field, 70, 300, "Your name", smw->ScreenWidth - 2 * 70, 120);
-    miNickNameField->SetData(netplay.playername, 31);
+    miNickNameField = new MI_TextField(&rm->menu_plain_field, 70, 300, "Your name", smw->ScreenWidth - 2 * 70, 150);
+    miNickNameField->SetData(netplay.playername, NET_MAX_PLAYER_NAME_LENGTH);
 
     mMultiplayerServersMenu.AddControl(miMultiplayerServersMenuServerSelectButton, miMultiplayerServersMenuBackButton, miMultiplayerServersMenuConnectButton, NULL, NULL);
     mMultiplayerServersMenu.AddNonControl(miMultiplayerServersMenuSelectedServerHostNameText);

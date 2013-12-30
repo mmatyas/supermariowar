@@ -7,6 +7,7 @@
 #define NET_PROTOCOL_VERSION                1
 #define NET_MAX_MESSAGE_SIZE                128
 #define NET_DEFAULT_PORT                    12521
+#define NET_MAX_PLAYER_NAME_LENGTH          16
 
 #define NET_REQUEST_SERVERINFO              1
 #define NET_RESPONSE_SERVERINFO             2
@@ -45,7 +46,7 @@ struct ServerInfoPackage : MessageHeader {
 };
 
 struct ClientConnectionPackage: MessageHeader {
-    char           playerName[32];
+    char           playerName[NET_MAX_PLAYER_NAME_LENGTH];
 };
 
 class NetClient

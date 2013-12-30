@@ -22,13 +22,13 @@ bool net_init()
 
     atexit(SDLNet_Quit);
 
-    /*ServerAddress none;
+    ServerAddress none;
     none.hostname = "(none)";
-    netplay.savedServers.push_back(none);*/
+    netplay.savedServers.push_back(none);
 
-    ServerAddress localhost;
+    /*ServerAddress localhost;
     localhost.hostname = "localhost";
-    netplay.savedServers.push_back(localhost);
+    netplay.savedServers.push_back(localhost);*/
 
     net_loadServerList();
 
@@ -48,12 +48,13 @@ void net_saveServerList()
     if(fp) {
         fwrite(g_iVersion, sizeof(int), 4, fp);
 
-        for (unsigned iServer = 0; iServer < netplay.savedServers.size(); iServer++) {
+        // Don't save "(none)"
+        for (unsigned iServer = 1; iServer < netplay.savedServers.size(); iServer++) {
             ServerAddress* host = &netplay.savedServers[iServer];
             WriteString(host->hostname.c_str(), fp);
         }
+        fclose(fp);
     }
-    fclose(fp);
 }
 
 void net_loadServerList()
@@ -74,8 +75,8 @@ void net_loadServerList()
                 netplay.savedServers.push_back(host);
             }
         }
+        fclose(fp);
     }
-    fclose(fp);
 }
 
 /********************************************************************
