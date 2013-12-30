@@ -56,12 +56,16 @@ class NetClient
 		NetClient();
 		~NetClient();
 
-		bool connect(const char* hostname, const uint16_t port = NET_DEFAULT_PORT);
 		void update();
 
+        // called on network session start/end
 		bool startSession();
 		void endSession();
-		
+
+        // called on startup/shutdown
+        bool init();
+        void cleanup();
+
 	private:
 
 		IPaddress serverIP;
@@ -70,14 +74,15 @@ class NetClient
         uint8_t tcpResponseBuffer[NET_MAX_MESSAGE_SIZE];
 
 		UDPsocket udpSocket;
-        int udpChannel;
         UDPpacket* udpOutgoingPacket;
         UDPpacket* udpIncomingPacket;
 
 		SDLNet_SocketSet sockets;
 		int readySockets;
 
-		void cleanup();
+
+        bool connect(const char* hostname, const uint16_t port = NET_DEFAULT_PORT);
+
 		void closeTCPsocket();
 		void closeUDPsocket();
 
