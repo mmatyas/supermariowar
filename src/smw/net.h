@@ -87,25 +87,14 @@ class NetClient
 
 		IPaddress serverIP;
 
-		TCPsocket tcpSocket;
-        uint8_t tcpResponseBuffer[NET_MAX_MESSAGE_SIZE];
-
 		UDPsocket udpSocket;
         UDPpacket* udpOutgoingPacket;
         UDPpacket* udpIncomingPacket;
 
-		SDLNet_SocketSet sockets;
-		int readySockets;
-
 
         bool connect(const char* hostname, const uint16_t port = NET_DEFAULT_PORT);
 
-		void closeTCPsocket();
 		void closeUDPsocket();
-
-        bool sendTCPMessage(const void* data, const int dataLength);
-        bool receiveTCPMessage();
-
         bool sendUDPMessage(const void* data, const int dataLength);
         bool receiveUDPMessage();
 };
