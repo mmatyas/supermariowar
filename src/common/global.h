@@ -820,6 +820,8 @@ struct Networking {
     char playername[32];    // last byte will be \0
 
     NetClient client;
+    LastMessage lastSentMessage;
+    LastMessage lastReceivedMessage;
 
     unsigned selectedServerIndex;
     std::vector<ServerAddress> savedServers;

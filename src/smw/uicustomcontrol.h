@@ -726,7 +726,7 @@ class MI_NetworkListScroll : public UI_Control
 {
     public:
 
-        MI_NetworkListScroll(gfxSprite * nspr, short x, short y, short width, short numlines, const std::string& title);
+        MI_NetworkListScroll(gfxSprite * nspr, short x, short y, short width, short numlines, const std::string& title, MenuCodeEnum exitCode);
         virtual ~MI_NetworkListScroll();
 
         void Update();
@@ -745,6 +745,7 @@ class MI_NetworkListScroll : public UI_Control
         std::vector<NLS_ListItem> items;
 
         gfxSprite * spr;
+        MenuCodeEnum iExitCode;
 
         std::string sTitle;
         short iNumLines;

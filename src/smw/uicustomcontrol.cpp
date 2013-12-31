@@ -4598,7 +4598,7 @@ void MI_World::UseCloud(bool fUseCloud)
  * MI_NetworkListScroll Class
  **************************************/
 
-MI_NetworkListScroll::MI_NetworkListScroll(gfxSprite * nspr, short x, short y, short width, short numlines, const std::string& title) :
+MI_NetworkListScroll::MI_NetworkListScroll(gfxSprite * nspr, short x, short y, short width, short numlines, const std::string& title, MenuCodeEnum exitCode) :
     UI_Control(x, y)
 {
     spr = nspr;
@@ -4613,6 +4613,8 @@ MI_NetworkListScroll::MI_NetworkListScroll(gfxSprite * nspr, short x, short y, s
     iBottomStop = 0;
 
     sTitle = title;
+
+    iExitCode = exitCode;
 }
 
 MI_NetworkListScroll::~MI_NetworkListScroll()
@@ -4656,12 +4658,12 @@ MenuCodeEnum MI_NetworkListScroll::SendInput(CPlayerInput * playerInput)
 
         if(playerInput->outputControls[iPlayer].menu_select.fPressed) {
             netplay.selectedServerIndex = iIndex;
-            return MENU_CODE_NET_LIST_EXIT;
+            return iExitCode;
         }
 
 
         if(playerInput->outputControls[iPlayer].menu_cancel.fPressed) {
-            return MENU_CODE_NET_LIST_EXIT;
+            return iExitCode;
         }
     }
 

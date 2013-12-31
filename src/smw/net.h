@@ -30,6 +30,11 @@ void net_close();
 void net_saveServerList();
 void net_loadServerList();
 
+struct LastMessage {
+    uint8_t        packageType;
+    uint32_t       timestamp;
+};
+
 struct MessageHeader {
     uint8_t        protocolVersion;
     uint8_t        packageType;
@@ -57,6 +62,8 @@ class NetClient
 		~NetClient();
 
 		void update();
+
+        bool connectSelectedServer();
 
         // called on network session start/end
 		bool startSession();

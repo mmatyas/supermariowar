@@ -118,15 +118,28 @@ bool NetClient::startSession()
 
     netplay.active = true;
 
-    if ( connect(netplay.savedServers[0].hostname.c_str()) ) {
+    /*if ( connect(netplay.savedServers[0].hostname.c_str()) ) {
         MessageHeader message;
         message.protocolVersion = NET_PROTOCOL_VERSION;
         message.packageType = NET_REQUEST_SERVERINFO;
         //sendTCPMessage(&message, sizeof(MessageHeader));
         sendUDPMessage(&message, sizeof(MessageHeader));
-    }
+    }*/
 
     return true;
+}
+
+bool NetClient::connectSelectedServer()
+{
+    ServerAddress* selectedServer = &netplay.savedServers[netplay.selectedServerIndex];
+    if ( connect(selectedServer->hostname.c_str()) ) {
+        MessageHeader message;
+        message.protocolVersion = NET_PROTOCOL_VERSION;
+        message.packageType = NET_REQUEST_CONNECT;
+        sendUDPMessage(&message, sizeof(MessageHeader));
+        return true;
+    }
+    return false;
 }
 
 bool NetClient::connect(const char* hostname, const uint16_t port)
@@ -146,8 +159,9 @@ bool NetClient::connect(const char* hostname, const uint16_t port)
     if (!tcpSocket) {
         fprintf(stderr, "[Error] SDLNet_TCP_Open: %s\n", SDLNet_GetError());
         return false;
-    }
-    SDLNet_TCP_AddSocket(sockets, tcpSocket);*/
+    }*/
+    //SDLNet_TCP_AddSocket(sockets, tcpSocket);
+    //closeTCPsocket();
 
     /* Open UDP socket */
     udpSocket = SDLNet_UDP_Open(0);
@@ -156,6 +170,7 @@ bool NetClient::connect(const char* hostname, const uint16_t port)
         return false;
     }
     SDLNet_UDP_AddSocket(sockets, udpSocket);
+    printf("[] UDP open.\n");
 
     return true;
 }
@@ -175,46 +190,63 @@ void NetClient::update()
         else {
             uint8_t protocollVersion = tcpResponseBuffer[0];
             uint8_t responseCode = tcpResponseBuffer[1];
-            switch (responseCode)
-            {
-                case NET_RESPONSE_SERVERINFO:
-                    ServerInfoPackage serverInfo;
-                    memcpy(&serverInfo, tcpResponseBuffer, sizeof(ServerInfoPackage));
+            if (protocollVersion == NET_PROTOCOL_VERSION) {
+                switch (responseCode)
+                {
+                    case NET_RESPONSE_SERVERINFO:
+                        ServerInfoPackage serverInfo;
+                        memcpy(&serverInfo, tcpResponseBuffer, sizeof(ServerInfoPackage));
 
 
-                    printf("NET_RESPONSE_SERVERINFO [%lu byte]\n", sizeof(serverInfo));
-                    printf("Sending:\n  protocolVersion: %d\n  packageType: %d\n  name: %s\n  players/max: %d / %d\n",
-                        serverInfo.protocolVersion, serverInfo.packageType, serverInfo.name, serverInfo.currentPlayers, serverInfo.maxPlayers);
+                        printf("NET_RESPONSE_SERVERINFO [%lu byte]\n", sizeof(serverInfo));
+                        printf("Sending:\n  protocolVersion: %d\n  packageType: %d\n  name: %s\n  players/max: %d / %d\n",
+                            serverInfo.protocolVersion, serverInfo.packageType, serverInfo.name, serverInfo.currentPlayers, serverInfo.maxPlayers);
 
-                    closeTCPsocket();
-                    break;
+                        closeTCPsocket();
+                        break;
 
-                default:
-                    closeTCPsocket();
-                    break;
+                    default:
+                        closeTCPsocket();
+                        break;
+                }
+
+                netplay.lastReceivedMessage.packageType = responseCode;
+                netplay.lastReceivedMessage.timestamp = SDL_GetTicks();
             }
         }
     }
 
     // UDP műveletek
     if (SDLNet_SocketReady(udpSocket)) {
-        printf("READY UDP!\n");
-        if (!receiveUDPMessage())
-            closeUDPsocket();
-        else {
-            printf("  chan %d\n", udpIncomingPacket->channel);
-            printf("  len %d\n", udpIncomingPacket->len);
-            printf("  maxlen %d\n", udpIncomingPacket->maxlen);
-            printf("  status %d\n", udpIncomingPacket->status);
+        if (receiveUDPMessage()) {
+            if (udpIncomingPacket->len < 2)
+                return;
 
-            uint8_t* addr = (Uint8*)&udpIncomingPacket->address;
-            printf("  source %d.%d.%d.%d::%d\n", addr[0], addr[1], addr[2], addr[3], udpIncomingPacket->address.port);
+            uint8_t protocollVersion = udpIncomingPacket->data[0];
+            uint8_t responseCode = udpIncomingPacket->data[1];
+            if (protocollVersion == NET_PROTOCOL_VERSION) {
+                switch (responseCode)
+                {
+                    case NET_RESPONSE_SERVERINFO:
+                        ServerInfoPackage serverInfo;
+                        memcpy(&serverInfo, tcpResponseBuffer, sizeof(ServerInfoPackage));
 
-            for (int i = 0; i < udpIncomingPacket->len; i++)
-                printf("%3d (%c) ", udpIncomingPacket->data[i], udpIncomingPacket->data[i]);
 
-            printf("\n");
-            closeUDPsocket();
+                        printf("NET_RESPONSE_SERVERINFO [%lu byte]\n", sizeof(serverInfo));
+                        printf("Sending:\n  protocolVersion: %d\n  packageType: %d\n  name: %s\n  players/max: %d / %d\n",
+                            serverInfo.protocolVersion, serverInfo.packageType, serverInfo.name, serverInfo.currentPlayers, serverInfo.maxPlayers);
+
+                        closeUDPsocket();
+                        break;
+
+                    default:
+                        closeUDPsocket();
+                        break;
+                }
+
+                netplay.lastReceivedMessage.packageType = responseCode;
+                netplay.lastReceivedMessage.timestamp = SDL_GetTicks();
+            }
         }
     }
 }
@@ -252,6 +284,7 @@ void NetClient::cleanup()
 void NetClient::closeTCPsocket()
 {
     if (tcpSocket) {
+        printf("[] TCP closed.\n");
         SDLNet_TCP_DelSocket(sockets, tcpSocket);
         SDLNet_TCP_Close(tcpSocket);
         tcpSocket = NULL;
@@ -261,6 +294,7 @@ void NetClient::closeTCPsocket()
 void NetClient::closeUDPsocket()
 {
     if (udpSocket) {
+        printf("[] UDP closed.\n");
         SDLNet_UDP_DelSocket(sockets, udpSocket);
         SDLNet_UDP_Close(udpSocket);
         udpSocket = NULL;
@@ -280,6 +314,9 @@ bool NetClient::sendTCPMessage(void* data, int dataLength) // int a Send miatt
         fprintf(stderr, "[Warning] Sending TCP message failed. %s\n", SDLNet_GetError());
         return false;
     }
+
+    netplay.lastSentMessage.packageType = data[1];
+    netplay.lastSentMessage.timestamp = SDL_GetTicks();
 
     return true;
 }
@@ -312,6 +349,9 @@ bool NetClient::sendUDPMessage(void* data, int dataLength)
         return false;
     }
 
+    netplay.lastSentMessage.packageType = data[1];
+    netplay.lastSentMessage.timestamp = SDL_GetTicks();
+
     return true;
 }
 
@@ -324,6 +364,9 @@ bool NetClient::receiveUDPMessage()
         fprintf(stderr, "[Warning] Receiving UDP message failed. %s\n", SDLNet_GetError());
         return false;
     }
+
+    netplay.lastReceivedMessage.packageType = udpIncomingPacket->data[1];
+    netplay.lastReceivedMessage.timestamp = SDL_GetTicks();
 
     return true;
 }
