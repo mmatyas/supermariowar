@@ -414,7 +414,7 @@ class Menu
 
 		MI_NetworkListScroll * miMultiplayerServersScroll;
 		MI_Image * miMultiplayerServersConnectingDialogImage;
-		MI_Text * miMultiplayerServersConnectingDialogText;
+		MI_NetworkStatusDetector * miMultiplayerServersConnectionDetector;
 
 		MI_Button * miMultiplayerServersBackButton;
 

@@ -4639,6 +4639,7 @@ MenuCodeEnum MI_NetworkListScroll::Modify(bool modify)
 
 MenuCodeEnum MI_NetworkListScroll::SendInput(CPlayerInput * playerInput)
 {
+    printf("MI_NetworkListScroll SendInput\n");
     for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
         //Only allow the controlling team to control the menu (if there is one)
         if(iControllingTeam != -1) {
@@ -4669,7 +4670,6 @@ MenuCodeEnum MI_NetworkListScroll::SendInput(CPlayerInput * playerInput)
 
     return MENU_CODE_NONE;
 }
-
 
 void MI_NetworkListScroll::Update()
 {}
@@ -4733,4 +4733,75 @@ bool MI_NetworkListScroll::MovePrev()
         iSelectedLine--;
 
     return true;
+}
+
+/**************/
+
+
+MI_NetworkStatusDetector::MI_NetworkStatusDetector(gfxSprite * nspr, short x, short y, const char * name, short width, short justified) :
+    MI_Button(nspr, x, y, name, width, justified)
+{
+    iAbortCode = MENU_CODE_NONE;
+    iSuccessCode = MENU_CODE_NONE;
+    iWaitingCode = MENU_CODE_NONE;
+}
+
+MenuCodeEnum MI_NetworkStatusDetector::Modify(bool modify)
+{
+    printf("Modify\n");
+    return MI_Button::Modify(modify);
+}
+
+MenuCodeEnum MI_NetworkStatusDetector::SendInput(CPlayerInput * playerInput)
+{
+    printf("SendInput\n");
+    if (*flagPointer == flagSuccessValue)
+        return iSuccessCode;
+
+    for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
+        //Only allow the controlling team to control the menu (if there is one)
+        if(iControllingTeam != -1) {
+            if(iControllingTeam != LookupTeamID(iPlayer) || game_values.playercontrol[iPlayer] != 1)
+                continue;
+        }
+
+        if(playerInput->outputControls[iPlayer].menu_cancel.fPressed) {
+            return iAbortCode;
+        }
+    }
+
+    return iWaitingCode;
+}
+
+void MI_NetworkStatusDetector::Update()
+{
+    //printf("Update\n");
+    MI_Button::Update();
+}
+
+void MI_NetworkStatusDetector::AbortCode(MenuCodeEnum code)
+{
+    iAbortCode = code;
+}
+
+void MI_NetworkStatusDetector::SuccessCode(MenuCodeEnum code)
+{
+    iSuccessCode = code;
+}
+
+void MI_NetworkStatusDetector::WaitingCode(MenuCodeEnum code)
+{
+    iWaitingCode = code;
+}
+
+void MI_NetworkStatusDetector::SuccessIfEqual(uint8_t* flag, uint8_t value)
+{
+    flagPointer = flag;
+    flagSuccessValue = value;
+}
+
+void MI_NetworkStatusDetector::SuccessIfTrue(bool* flag)
+{
+    flagPointer = (uint8_t*)flag;
+    flagSuccessValue = 1;
 }

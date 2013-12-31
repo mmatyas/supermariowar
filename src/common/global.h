@@ -816,6 +816,9 @@ struct TourStop {
 
 struct Networking {
     bool active;            // True if netplay code is currently running
+    //bool networkErrorHappened;
+    bool connectSuccessful;
+
     char * hostaddress;
     char playername[32];    // last byte will be \0
 

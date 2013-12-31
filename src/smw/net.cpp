@@ -25,6 +25,8 @@ bool net_init()
 
     atexit(SDLNet_Quit);
 
+    netplay.connectSuccessful = false;
+
     /*ServerAddress none;
     none.hostname = "(none)";
     netplay.savedServers.push_back(none);*/
@@ -117,6 +119,7 @@ bool NetClient::startSession()
     endSession(); // Finish previous network session if active
 
     netplay.active = true;
+    netplay.connectSuccessful = false;
 
     /*if ( connect(netplay.savedServers[0].hostname.c_str()) ) {
         MessageHeader message;
@@ -129,7 +132,7 @@ bool NetClient::startSession()
     return true;
 }
 
-bool NetClient::connectSelectedServer()
+bool NetClient::sendConnectToSelectedServer()
 {
     ServerAddress* selectedServer = &netplay.savedServers[netplay.selectedServerIndex];
     if ( connect(selectedServer->hostname.c_str()) ) {
@@ -145,6 +148,7 @@ bool NetClient::connectSelectedServer()
 bool NetClient::connect(const char* hostname, const uint16_t port)
 {
     /* Resolve server address */
+    netplay.connectSuccessful = false;
     printf("Connecting to %s:%d...\n", hostname, port);
     if (SDLNet_ResolveHost(&serverIP, hostname, port) < 0) {
         if (serverIP.host == INADDR_NONE)
@@ -165,10 +169,6 @@ bool NetClient::connect(const char* hostname, const uint16_t port)
 
     /* Open UDP socket */
     udpSocket = SDLNet_UDP_Open(0);
-    if (!udpSocket) {
-        fprintf(stderr, "[Error] SDLNet_UDP_Open: %s\n", SDLNet_GetError());
-        return false;
-    }
     SDLNet_UDP_AddSocket(sockets, udpSocket);
     printf("[] UDP open.\n");
 
@@ -182,7 +182,7 @@ void NetClient::update()
         return;
 
     // TCP műveletek
-    if (SDLNet_SocketReady(tcpSocket))
+    /*if (SDLNet_SocketReady(tcpSocket))
     {
         printf("READY %d\n", readySockets);
         if (!receiveTCPMessage())
@@ -214,7 +214,7 @@ void NetClient::update()
                 netplay.lastReceivedMessage.timestamp = SDL_GetTicks();
             }
         }
-    }
+    }*/
 
     // UDP műveletek
     if (SDLNet_SocketReady(udpSocket)) {
@@ -236,8 +236,21 @@ void NetClient::update()
                         printf("Sending:\n  protocolVersion: %d\n  packageType: %d\n  name: %s\n  players/max: %d / %d\n",
                             serverInfo.protocolVersion, serverInfo.packageType, serverInfo.name, serverInfo.currentPlayers, serverInfo.maxPlayers);
 
+                        netplay.connectSuccessful = true;
                         closeUDPsocket();
                         break;
+
+                    /*case NET_RESPONSE_SERVERINFO:
+                        ServerInfoPackage serverInfo;
+                        memcpy(&serverInfo, tcpResponseBuffer, sizeof(ServerInfoPackage));
+
+
+                        printf("NET_RESPONSE_SERVERINFO [%lu byte]\n", sizeof(serverInfo));
+                        printf("Sending:\n  protocolVersion: %d\n  packageType: %d\n  name: %s\n  players/max: %d / %d\n",
+                            serverInfo.protocolVersion, serverInfo.packageType, serverInfo.name, serverInfo.currentPlayers, serverInfo.maxPlayers);
+
+                        closeUDPsocket();
+                        break;*/
 
                     default:
                         closeUDPsocket();
@@ -256,6 +269,7 @@ void NetClient::endSession()
     if (netplay.active) {
         printf("Session end.\n");
         netplay.active = false;
+        netplay.connectSuccessful = false;
 
         closeTCPsocket();
         closeUDPsocket();
@@ -315,7 +329,7 @@ bool NetClient::sendTCPMessage(void* data, int dataLength) // int a Send miatt
         return false;
     }
 
-    netplay.lastSentMessage.packageType = data[1];
+    netplay.lastSentMessage.packageType = ((uint8_t*)data)[1];
     netplay.lastSentMessage.timestamp = SDL_GetTicks();
 
     return true;
@@ -349,7 +363,7 @@ bool NetClient::sendUDPMessage(void* data, int dataLength)
         return false;
     }
 
-    netplay.lastSentMessage.packageType = data[1];
+    netplay.lastSentMessage.packageType = ((uint8_t*)data)[1];
     netplay.lastSentMessage.timestamp = SDL_GetTicks();
 
     return true;
