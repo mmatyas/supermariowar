@@ -758,11 +758,11 @@ class MI_NetworkListScroll : public UI_Control
         short iBottomStop;
 };
 
-class MI_NetworkStatusDetector : public MI_Button
+/*class MI_NetworkStatusDetector : public UI_Control
 {
 	public:
 
-		MI_NetworkStatusDetector(gfxSprite * nspr, short x, short y, const char * name, short width, short justified);
+		MI_NetworkStatusDetector(short x, short y);
 		~MI_NetworkStatusDetector() {}
 
 		void AbortCode(MenuCodeEnum code);
@@ -771,7 +771,6 @@ class MI_NetworkStatusDetector : public MI_Button
 		void SuccessCode(MenuCodeEnum code);
 		void WaitingCode(MenuCodeEnum code);
 
-		MenuCodeEnum Modify(bool modify);
 		MenuCodeEnum SendInput(CPlayerInput * playerInput);
 		void Update();
 
@@ -783,8 +782,7 @@ class MI_NetworkStatusDetector : public MI_Button
 
 		uint8_t* flagPointer;
 		uint8_t flagSuccessValue;
-};
-
+};*/
 
 #endif //__UICUSTOMCONTROL_H_
 

@@ -63,7 +63,7 @@ class NetClient
 
 		void update();
 
-        bool sendConnectToSelectedServer();
+        bool sendConnectRequestToSelectedServer();
 
         // called on network session start/end
 		bool startSession();

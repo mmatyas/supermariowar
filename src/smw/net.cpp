@@ -132,13 +132,14 @@ bool NetClient::startSession()
     return true;
 }
 
-bool NetClient::sendConnectToSelectedServer()
+bool NetClient::sendConnectRequestToSelectedServer()
 {
     ServerAddress* selectedServer = &netplay.savedServers[netplay.selectedServerIndex];
     if ( connect(selectedServer->hostname.c_str()) ) {
         MessageHeader message;
         message.protocolVersion = NET_PROTOCOL_VERSION;
         message.packageType = NET_REQUEST_CONNECT;
+
         sendUDPMessage(&message, sizeof(MessageHeader));
         return true;
     }

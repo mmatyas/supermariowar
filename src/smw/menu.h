@@ -413,8 +413,8 @@ class Menu
 		MI_TextField * miMultiplayerServersNicknameField;
 
 		MI_NetworkListScroll * miMultiplayerServersScroll;
-		MI_Image * miMultiplayerServersConnectingDialogImage;
-		MI_NetworkStatusDetector * miMultiplayerServersConnectionDetector;
+		//MI_Image * miMultiplayerServersConnectingDialogImage;
+		//MI_NetworkStatusDetector * miMultiplayerServersConnectionDetector;
 
 		MI_Button * miMultiplayerServersBackButton;
 

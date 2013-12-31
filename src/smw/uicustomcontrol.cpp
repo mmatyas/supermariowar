@@ -4738,23 +4738,22 @@ bool MI_NetworkListScroll::MovePrev()
 /**************/
 
 
-MI_NetworkStatusDetector::MI_NetworkStatusDetector(gfxSprite * nspr, short x, short y, const char * name, short width, short justified) :
-    MI_Button(nspr, x, y, name, width, justified)
+/*MI_NetworkStatusDetector::MI_NetworkStatusDetector(short x, short y) :
+    UI_Control(x, y)
 {
     iAbortCode = MENU_CODE_NONE;
     iSuccessCode = MENU_CODE_NONE;
     iWaitingCode = MENU_CODE_NONE;
 }
 
-MenuCodeEnum MI_NetworkStatusDetector::Modify(bool modify)
+void MI_NetworkStatusDetector::Update()
 {
-    printf("Modify\n");
-    return MI_Button::Modify(modify);
+    printf("update...\n");
 }
 
 MenuCodeEnum MI_NetworkStatusDetector::SendInput(CPlayerInput * playerInput)
 {
-    printf("SendInput\n");
+    printf("MI_NetworkStatusDetector SendInput\n");
     if (*flagPointer == flagSuccessValue)
         return iSuccessCode;
 
@@ -4771,12 +4770,6 @@ MenuCodeEnum MI_NetworkStatusDetector::SendInput(CPlayerInput * playerInput)
     }
 
     return iWaitingCode;
-}
-
-void MI_NetworkStatusDetector::Update()
-{
-    //printf("Update\n");
-    MI_Button::Update();
 }
 
 void MI_NetworkStatusDetector::AbortCode(MenuCodeEnum code)
@@ -4804,4 +4797,4 @@ void MI_NetworkStatusDetector::SuccessIfTrue(bool* flag)
 {
     flagPointer = (uint8_t*)flag;
     flagSuccessValue = 1;
-}
+}*/
