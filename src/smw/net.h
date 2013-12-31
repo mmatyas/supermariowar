@@ -8,14 +8,21 @@
 #define NET_MAX_MESSAGE_SIZE                128
 #define NET_DEFAULT_PORT                    12521
 #define NET_MAX_PLAYER_NAME_LENGTH          16
+#define NET_MAX_ROOM_NAME_LENGTH            32
 
 #define NET_REQUEST_SERVERINFO              1
 #define NET_RESPONSE_SERVERINFO             2
+#define NET_RESPONSE_BADPROTOCOL            3
 
 #define NET_REQUEST_CONNECT                 10
 #define NET_RESPONSE_CONNECT_OK             11
 #define NET_RESPONSE_CONNECT_DENIED         12
-#define NET_RESPONSE_CONNECT_NAMETAKEN      13
+#define NET_RESPONSE_CONNECT_SERVERFULL     13
+#define NET_RESPONSE_CONNECT_NAMETAKEN      14
+
+#define NET_REQUEST_ROOM_LIST               20
+#define NET_RESPONSE_NO_ROOMS               21
+#define NET_RESPONSE_ROOM_LIST_ENTRY        22
 
 #define NET_RESPONSE_ROOMFULL
 
@@ -73,6 +80,9 @@ class NetClient
         bool init();
         void cleanup();
 
+        //void refreshRoomList();
+        void requestRoomList();
+
 	private:
 
 		IPaddress serverIP;
@@ -93,10 +103,10 @@ class NetClient
 		void closeTCPsocket();
 		void closeUDPsocket();
 
-        bool sendTCPMessage(void* data, int dataLength);
+        bool sendTCPMessage(const void* data, const int dataLength);
         bool receiveTCPMessage();
 
-        bool sendUDPMessage(void* data, int dataLength);
+        bool sendUDPMessage(const void* data, const int dataLength);
         bool receiveUDPMessage();
 };
 

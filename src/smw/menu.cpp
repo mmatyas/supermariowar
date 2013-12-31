@@ -2885,11 +2885,11 @@ void Menu::RunMenu()
             } else if(MENU_CODE_NET_CONNECT_INPROGRESS == code) {
                 //miMultiplayerServersConnectingDialogImage->Show(true);
                 //miMultiplayerServersConnectionDetector->Show(true);
-                mMultiplayerServers.RememberCurrent();
+                /*mMultiplayerServers.RememberCurrent();
 
                 mMultiplayerServers.SetHeadControl(miMultiplayerServersConnectionDetector);
                 mMultiplayerServers.SetCancelCode(MENU_CODE_NONE);
-                mMultiplayerServers.ResetMenu();
+                mMultiplayerServers.ResetMenu();*/
 
                 netplay.client.sendConnectRequestToSelectedServer();
                 printf("last sent: %d\n", netplay.lastSentMessage.packageType);

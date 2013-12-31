@@ -135,12 +135,15 @@ bool NetClient::startSession()
 bool NetClient::sendConnectRequestToSelectedServer()
 {
     ServerAddress* selectedServer = &netplay.savedServers[netplay.selectedServerIndex];
-    if ( connect(selectedServer->hostname.c_str()) ) {
-        MessageHeader message;
+    if ( connect(selectedServer->hostname.c_str()) )
+    {
+        ClientConnectionPackage message;
         message.protocolVersion = NET_PROTOCOL_VERSION;
         message.packageType = NET_REQUEST_CONNECT;
+        memcpy(message.playerName, netplay.playername, NET_MAX_PLAYER_NAME_LENGTH);
+        message.playerName[NET_MAX_PLAYER_NAME_LENGTH - 1] = '\0';
 
-        sendUDPMessage(&message, sizeof(MessageHeader));
+        sendUDPMessage(&message, sizeof(ClientConnectionPackage));
         return true;
     }
     return false;
@@ -174,6 +177,15 @@ bool NetClient::connect(const char* hostname, const uint16_t port)
     printf("[] UDP open.\n");
 
     return true;
+}
+
+void NetClient::requestRoomList()
+{
+    MessageHeader msg;
+    msg.protocolVersion = NET_PROTOCOL_VERSION;
+    msg.packageType = NET_REQUEST_ROOM_LIST;
+
+    sendUDPMessage(&msg, sizeof(MessageHeader));
 }
 
 void NetClient::update()
@@ -220,6 +232,7 @@ void NetClient::update()
     // UDP műveletek
     if (SDLNet_SocketReady(udpSocket)) {
         if (receiveUDPMessage()) {
+            printf("READY\n");
             if (udpIncomingPacket->len < 2)
                 return;
 
@@ -237,23 +250,20 @@ void NetClient::update()
                         printf("Sending:\n  protocolVersion: %d\n  packageType: %d\n  name: %s\n  players/max: %d / %d\n",
                             serverInfo.protocolVersion, serverInfo.packageType, serverInfo.name, serverInfo.currentPlayers, serverInfo.maxPlayers);
 
-                        netplay.connectSuccessful = true;
                         closeUDPsocket();
                         break;
 
-                    /*case NET_RESPONSE_SERVERINFO:
-                        ServerInfoPackage serverInfo;
-                        memcpy(&serverInfo, tcpResponseBuffer, sizeof(ServerInfoPackage));
-
-
-                        printf("NET_RESPONSE_SERVERINFO [%lu byte]\n", sizeof(serverInfo));
-                        printf("Sending:\n  protocolVersion: %d\n  packageType: %d\n  name: %s\n  players/max: %d / %d\n",
-                            serverInfo.protocolVersion, serverInfo.packageType, serverInfo.name, serverInfo.currentPlayers, serverInfo.maxPlayers);
-
-                        closeUDPsocket();
-                        break;*/
+                    case NET_RESPONSE_CONNECT_OK:
+                        printf("Connection attempt successful.\n");
+                        netplay.connectSuccessful = true;
+                        requestRoomList();
+                        break;
 
                     default:
+                        printf("Unknown:\n");
+                        for (int a = 0; a < udpIncomingPacket->len; a++)
+                            printf("%3d ", udpIncomingPacket->data[a]);
+
                         closeUDPsocket();
                         break;
                 }
@@ -320,7 +330,7 @@ void NetClient::closeUDPsocket()
     Network Communication
 ****************************/
 
-bool NetClient::sendTCPMessage(void* data, int dataLength) // int a Send miatt
+bool NetClient::sendTCPMessage(const void* data, const int dataLength) // int a Send miatt
 {
     if (!data || dataLength <= 0 || dataLength >= NET_MAX_MESSAGE_SIZE || !tcpSocket)
         return false;
@@ -349,7 +359,7 @@ bool NetClient::receiveTCPMessage()
     return true;
 }
 
-bool NetClient::sendUDPMessage(void* data, int dataLength)
+bool NetClient::sendUDPMessage(const void* data, const int dataLength)
 {
     if (!data || dataLength <= 0 || dataLength >= NET_MAX_MESSAGE_SIZE || !udpSocket || !udpOutgoingPacket)
         return false;
