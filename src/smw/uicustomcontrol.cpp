@@ -4608,6 +4608,7 @@ MI_NetworkListScroll::MI_NetworkListScroll(gfxSprite * nspr, short x, short y, s
 
     iSelectedLine = 0;
     iIndex = 0;
+    iRemoteIndex = &iIndex;
     iOffset = 0;
 
     iTopStop = (iNumLines - 1) >> 1;
@@ -4671,7 +4672,7 @@ MenuCodeEnum MI_NetworkListScroll::SendInput(CPlayerInput * playerInput)
         }
 
         if(playerInput->outputControls[iPlayer].menu_select.fPressed) {
-            netplay.selectedServerIndex = iIndex;
+            printf("Selected index: %d\n", *iRemoteIndex);
             return iAcceptCode;
         }
 
@@ -4721,6 +4722,7 @@ bool MI_NetworkListScroll::MoveNext()
         return false;
 
     iIndex++;
+    *iRemoteIndex = iIndex;
 
     if(iIndex > iTopStop && iIndex <= iBottomStop)
         iOffset++;
@@ -4739,6 +4741,7 @@ bool MI_NetworkListScroll::MovePrev()
         return false;
 
     iIndex--;
+    *iRemoteIndex = iIndex;
 
     if(iIndex >= iTopStop && iIndex < iBottomStop)
         iOffset--;
@@ -4746,6 +4749,11 @@ bool MI_NetworkListScroll::MovePrev()
         iSelectedLine--;
 
     return true;
+}
+
+void MI_NetworkListScroll::RemoteIndex(unsigned short * index)
+{
+    iRemoteIndex = index;
 }
 
 /**************/

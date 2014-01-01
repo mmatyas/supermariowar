@@ -739,6 +739,7 @@ class MI_NetworkListScroll : public UI_Control
 
         bool MoveNext();
         bool MovePrev();
+        void RemoteIndex(unsigned short * index);
 
     protected:
 
@@ -752,6 +753,7 @@ class MI_NetworkListScroll : public UI_Control
         short iNumLines;
         short iSelectedLine;
         unsigned short iIndex;
+        unsigned short * iRemoteIndex;
         short iWidth;
         short iOffset;
 

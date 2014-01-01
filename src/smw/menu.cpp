@@ -286,6 +286,7 @@ void Menu::CreateMenu()
     miNetServersScroll = new MI_NetworkListScroll(&rm->menu_plain_field, 90, 72, smw->ScreenWidth - 2 * 90, 9, "Saved Servers", MENU_CODE_NET_SERVERLIST_EXIT, MENU_CODE_NET_SERVERLIST_EXIT);
     miNetServersScroll->SetAutoModify(true);
     miNetServersScroll->Show(false);
+    miNetServersScroll->RemoteIndex(&netplay.selectedServerIndex);
 
     for (unsigned iServer = 0; iServer < netplay.savedServers.size(); iServer++) {
         ServerAddress * host = &netplay.savedServers[iServer];
@@ -353,7 +354,7 @@ void Menu::CreateMenu()
 
     miNetRoomsScroll = new MI_NetworkListScroll(&rm->menu_plain_field, 40, 40, smw->ScreenWidth / 2, 9, "Rooms", MENU_CODE_TO_MAIN_MENU /* TODO: szobára ugrás */, MENU_CODE_TO_NET_SERVERS_MENU);
     miNetRoomsScroll->SetAutoModify(true);
-    //miNetRoomsScroll->Show(true);
+    miNetRoomsScroll->RemoteIndex(&netplay.selectedRoomIndex);
 
     /*for (unsigned iRoom = 0; iServer < netplay.rooms.size(); iRoom++) {
         Room * room = &netplay.rooms[iRoom];

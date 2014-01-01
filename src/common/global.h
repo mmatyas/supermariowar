@@ -826,8 +826,11 @@ struct Networking {
     LastMessage lastSentMessage;
     LastMessage lastReceivedMessage;
 
-    unsigned selectedServerIndex;
+    unsigned short selectedServerIndex;
     std::vector<ServerAddress> savedServers;
+
+    unsigned short selectedRoomIndex;
+    std::vector<RoomEntry> currentRooms;
 };
 
 //TODO:: Move menu settings from game_values to global menu context structure

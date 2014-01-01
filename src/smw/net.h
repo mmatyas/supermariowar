@@ -40,18 +40,29 @@ void net_close();
 void net_saveServerList();
 void net_loadServerList();
 
+
+// Local structures
+
 struct LastMessage {
     uint8_t        packageType;
     uint32_t       timestamp;
 };
 
+struct ServerAddress {
+    std::string    hostname;
+};
+
+struct RoomEntry {
+    std::string    name;
+    uint8_t        playerCount;
+};
+
+
+// Protocol structures
+
 struct MessageHeader {
     uint8_t        protocolVersion;
     uint8_t        packageType;
-};
-
-struct ServerAddress {
-    std::string    hostname;
 };
 
 struct ServerInfoPackage : MessageHeader {
@@ -63,6 +74,18 @@ struct ServerInfoPackage : MessageHeader {
 struct ClientConnectionPackage: MessageHeader {
     char           playerName[NET_MAX_PLAYER_NAME_LENGTH];
 };
+
+struct RoomInfoPackage : MessageHeader {
+    char           name[NET_MAX_ROOM_NAME_LENGTH];
+    uint8_t        playerCount;
+};
+
+struct NewRoomPackage : MessageHeader {
+    char           name[NET_MAX_ROOM_NAME_LENGTH];
+};
+
+
+// Network communication class
 
 class NetClient
 {

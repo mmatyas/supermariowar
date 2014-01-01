@@ -197,6 +197,18 @@ void NetClient::update()
                     requestRoomList();
                     break;
 
+                case NET_RESPONSE_ROOM_LIST_ENTRY: {
+                    RoomInfoPackage roomInfo;
+                    memcpy(&roomInfo, udpIncomingPacket->data, sizeof(RoomInfoPackage));
+                    printf("Room entry: %s (%d/4)\n", roomInfo.name, roomInfo.playerCount);
+
+                    RoomEntry newRoom;
+                    newRoom.name = roomInfo.name;
+                    newRoom.playerCount = roomInfo.playerCount;
+                    netplay.currentRooms.push_back(newRoom);
+                    }
+                    break;
+
                 case NET_RESPONSE_NO_ROOMS:
                     printf("There are no rooms currently on the server.\n");
                     break;
