@@ -166,6 +166,7 @@ void NetClient::requestRoomList()
     msg.packageType = NET_REQUEST_ROOM_LIST;
 
     sendUDPMessage(&msg, sizeof(MessageHeader));
+    printf("Req. room list.\n");
 }
 
 void NetClient::update()
@@ -196,12 +197,14 @@ void NetClient::update()
                     requestRoomList();
                     break;
 
+                case NET_RESPONSE_NO_ROOMS:
+                    printf("There are no rooms currently on the server.\n");
+                    break;
+
                 default:
                     printf("Unknown:\n");
                     for (int a = 0; a < udpIncomingPacket->len; a++)
                         printf("%3d ", udpIncomingPacket->data[a]);
-
-                    closeUDPsocket();
                     break;
             }
 
@@ -215,11 +218,21 @@ void NetClient::endSession()
 {
     if (netplay.active) {
         printf("Session end.\n");
+        sendGoodbye();
+        closeUDPsocket();
+
         netplay.active = false;
         netplay.connectSuccessful = false;
-
-        closeUDPsocket();
     }
+}
+
+void NetClient::sendGoodbye()
+{
+    MessageHeader msg;
+    msg.protocolVersion = NET_PROTOCOL_VERSION;
+    msg.packageType = NET_REQUEST_LEAVE_SERVER;
+
+    sendUDPMessage(&msg, sizeof(MessageHeader));
 }
 
 void NetClient::cleanup()
@@ -252,8 +265,10 @@ void NetClient::closeUDPsocket()
 
 bool NetClient::sendUDPMessage(const void* data, const int dataLength)
 {
-    if (!data || dataLength <= 2 || dataLength >= NET_MAX_MESSAGE_SIZE || !udpSocket || !udpOutgoingPacket)
+    if (!data || dataLength < 2 || dataLength >= NET_MAX_MESSAGE_SIZE || !udpSocket || !udpOutgoingPacket) {
+        printf("[Debug] Invalid call: sendUDPMessage\n");
         return false;
+    }
 
     memcpy(udpOutgoingPacket->data, data, dataLength);
     udpOutgoingPacket->len = dataLength;

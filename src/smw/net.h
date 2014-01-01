@@ -6,7 +6,7 @@
 
 #define NET_PROTOCOL_VERSION                1
 #define NET_MAX_MESSAGE_SIZE                128
-#define NET_DEFAULT_PORT                    12521
+#define NET_SERVER_PORT                     12521
 #define NET_MAX_PLAYER_NAME_LENGTH          16
 #define NET_MAX_ROOM_NAME_LENGTH            32
 
@@ -19,12 +19,15 @@
 #define NET_RESPONSE_CONNECT_DENIED         12
 #define NET_RESPONSE_CONNECT_SERVERFULL     13
 #define NET_RESPONSE_CONNECT_NAMETAKEN      14
+#define NET_REQUEST_LEAVE_SERVER            19
 
 #define NET_REQUEST_ROOM_LIST               20
 #define NET_RESPONSE_NO_ROOMS               21
 #define NET_RESPONSE_ROOM_LIST_ENTRY        22
 
-#define NET_RESPONSE_ROOMFULL
+#define NET_REQUEST_JOIN_ROOM               30
+#define NET_RESPONSE_ROOMFULL               31
+#define NET_REQUEST_LEAVE_ROOM              39
 
 
 //Write network handler class here
@@ -92,11 +95,13 @@ class NetClient
         UDPpacket* udpIncomingPacket;
 
 
-        bool connect(const char* hostname, const uint16_t port = NET_DEFAULT_PORT);
+        bool connect(const char* hostname, const uint16_t port = NET_SERVER_PORT);
 
 		void closeUDPsocket();
         bool sendUDPMessage(const void* data, const int dataLength);
         bool receiveUDPMessage();
+
+        void sendGoodbye();
 };
 
 #endif //__NETWORK_H_
