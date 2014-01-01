@@ -276,7 +276,11 @@ bool NetClient::receiveUDPMessage()
     if (!udpSocket || !udpIncomingPacket)
         return false;
 
-    if (SDLNet_UDP_Recv(udpSocket, udpIncomingPacket) <= 0) {
+    int receivedPackages = SDLNet_UDP_Recv(udpSocket, udpIncomingPacket);
+    if (receivedPackages == 0)
+        return false;
+
+    if (receivedPackages < 0) {
         fprintf(stderr, "[Warning] Receiving UDP message failed. %s\n", SDLNet_GetError());
         return false;
     }
