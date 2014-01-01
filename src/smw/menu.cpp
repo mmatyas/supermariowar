@@ -276,66 +276,108 @@ void Menu::CreateMenu()
     // Multiplayer Menu
     //***********************
 
-    miMultiplayerServersBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
-    miMultiplayerServersBackButton->SetCode(MENU_CODE_TO_MAIN_MENU);
+    miNetServersBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
+    miNetServersBackButton->SetCode(MENU_CODE_TO_MAIN_MENU);
 
-    miMultiplayerServersLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
-    miMultiplayerServersRightHeaderBar = new MI_Image(&rm->menu_plain_field, smw->ScreenWidth/2, 0, 192, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
-    miMultiplayerServersHeaderText = new MI_Text("Multiplayer Servers Menu", smw->ScreenWidth/2, 5, 0, 2, 1);
+    miNetServersLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
+    miNetServersRightHeaderBar = new MI_Image(&rm->menu_plain_field, smw->ScreenWidth/2, 0, 192, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
+    miNetServersHeaderText = new MI_Text("Multiplayer Servers Menu", smw->ScreenWidth/2, 5, 0, 2, 1);
 
-    miMultiplayerServersScroll = new MI_NetworkListScroll(&rm->menu_plain_field, 90, 72, smw->ScreenWidth - 2 * 90, 9, "Saved Servers", MENU_CODE_NET_SERVERLIST_EXIT);
-    miMultiplayerServersScroll->SetAutoModify(true);
-    miMultiplayerServersScroll->Show(false);
+    miNetServersScroll = new MI_NetworkListScroll(&rm->menu_plain_field, 90, 72, smw->ScreenWidth - 2 * 90, 9, "Saved Servers", MENU_CODE_NET_SERVERLIST_EXIT, MENU_CODE_NET_SERVERLIST_EXIT);
+    miNetServersScroll->SetAutoModify(true);
+    miNetServersScroll->Show(false);
 
     for (unsigned iServer = 0; iServer < netplay.savedServers.size(); iServer++) {
         ServerAddress * host = &netplay.savedServers[iServer];
-        miMultiplayerServersScroll->Add(host->hostname, "");
+        miNetServersScroll->Add(host->hostname, "");
     }
 
-    miMultiplayerServersSelectButton = new MI_Button(&rm->spr_selectfield, 70, 160, "Selected Server", smw->ScreenWidth - 2 * 70, 0);
-    miMultiplayerServersSelectButton->SetCode(MENU_CODE_TO_NET_SERVERLIST);
-    miMultiplayerServersSelectedHostText = new MI_Text(netplay.savedServers[netplay.selectedServerIndex].hostname.c_str(), smw->ScreenWidth - 90, 165, 0, 2, 2);
+    miNetServersSelectButton = new MI_Button(&rm->spr_selectfield, 70, 160, "Selected Server", smw->ScreenWidth - 2 * 70, 0);
+    miNetServersSelectButton->SetCode(MENU_CODE_TO_NET_SERVERLIST);
+    miNetServersSelectedHostText = new MI_Text(netplay.savedServers[netplay.selectedServerIndex].hostname.c_str(), smw->ScreenWidth - 90, 165, 0, 2, 2);
 
-    miMultiplayerServersConnectButton = new MI_Button(&rm->spr_selectfield, 70, 200, "Connect", smw->ScreenWidth - 2 * 70, 1);
-    miMultiplayerServersConnectButton->SetCode(MENU_CODE_NET_CONNECT_INPROGRESS);
+    miNetServersConnectButton = new MI_Button(&rm->spr_selectfield, 70, 200, "Connect", smw->ScreenWidth - 2 * 70, 1);
+    //miNetServersConnectButton->SetCode(MENU_CODE_NET_CONNECT_INPROGRESS);
+    miNetServersConnectButton->SetCode(MENU_CODE_TO_NET_ROOMS_MENU);
 
-    miMultiplayerServersAddRemoveButton = new MI_Button(&rm->spr_selectfield, 70, 240, "Add / Remove Server", smw->ScreenWidth - 2 * 70, 1);
-    miMultiplayerServersAddRemoveButton->SetCode(MENU_CODE_TO_NET_ADDREMOVE_SERVER_MENU);
+    miNetServersAddRemoveButton = new MI_Button(&rm->spr_selectfield, 70, 240, "Add / Remove Server", smw->ScreenWidth - 2 * 70, 1);
+    miNetServersAddRemoveButton->SetCode(MENU_CODE_TO_NET_ADDREMOVE_SERVER_MENU);
 
-    miMultiplayerServersNicknameField = new MI_TextField(&rm->menu_plain_field, 70, 320, "Your name", smw->ScreenWidth - 2 * 70, 150);
-    miMultiplayerServersNicknameField->SetData(netplay.playername, NET_MAX_PLAYER_NAME_LENGTH);
+    miNetServersNicknameField = new MI_TextField(&rm->menu_plain_field, 70, 320, "Your name", smw->ScreenWidth - 2 * 70, 150);
+    miNetServersNicknameField->SetData(netplay.playername, NET_MAX_PLAYER_NAME_LENGTH);
 
-    //miMultiplayerServersConnectingDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
-    //miMultiplayerServersConnectionDetector = new MI_NetworkStatusDetector(&rm->spr_selectfield, smw->ScreenWidth/2, smw->ScreenHeight/2 - 10, "Connecting...", 80, 1);
-    /*miMultiplayerServersConnectionDetector = new MI_NetworkStatusDetector(0, 0);
-    miMultiplayerServersConnectingDialogImage->Show(false);
-    miMultiplayerServersConnectionDetector->Show(false);*/
-    //miMultiplayerServersConnectionDetector->SetAutoModify(true);
+    //miNetServersConnectingDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
+    //miNetServersConnectionDetector = new MI_NetworkStatusDetector(&rm->spr_selectfield, smw->ScreenWidth/2, smw->ScreenHeight/2 - 10, "Connecting...", 80, 1);
+    /*miNetServersConnectionDetector = new MI_NetworkStatusDetector(0, 0);
+    miNetServersConnectingDialogImage->Show(false);
+    miNetServersConnectionDetector->Show(false);*/
+    //miNetServersConnectionDetector->SetAutoModify(true);
     
-    //miMultiplayerServersConnectionDetector->SetCode(MENU_CODE_NET_CONNECT_ABORT);
-    /*miMultiplayerServersConnectionDetector->SuccessIfTrue(&netplay.connectSuccessful);
-    miMultiplayerServersConnectionDetector->AbortCode(MENU_CODE_NET_CONNECT_ABORT);
-    miMultiplayerServersConnectionDetector->SuccessCode(MENU_CODE_NET_CONNECT_SUCCESS);
-    miMultiplayerServersConnectionDetector->WaitingCode(MENU_CODE_NET_CONNECT_INPROGRESS);*/
+    //miNetServersConnectionDetector->SetCode(MENU_CODE_NET_CONNECT_ABORT);
+    /*miNetServersConnectionDetector->SuccessIfTrue(&netplay.connectSuccessful);
+    miNetServersConnectionDetector->AbortCode(MENU_CODE_NET_CONNECT_ABORT);
+    miNetServersConnectionDetector->SuccessCode(MENU_CODE_NET_CONNECT_SUCCESS);
+    miNetServersConnectionDetector->WaitingCode(MENU_CODE_NET_CONNECT_INPROGRESS);*/
 
-    mMultiplayerServers.AddControl(miMultiplayerServersSelectButton, miMultiplayerServersBackButton, miMultiplayerServersConnectButton, NULL, NULL);
-    mMultiplayerServers.AddNonControl(miMultiplayerServersSelectedHostText);
-    mMultiplayerServers.AddControl(miMultiplayerServersConnectButton, miMultiplayerServersSelectButton, miMultiplayerServersAddRemoveButton, NULL, NULL);
-    mMultiplayerServers.AddControl(miMultiplayerServersAddRemoveButton, miMultiplayerServersConnectButton, miMultiplayerServersNicknameField, NULL, NULL);
-    mMultiplayerServers.AddControl(miMultiplayerServersNicknameField, miMultiplayerServersAddRemoveButton, miMultiplayerServersBackButton, NULL, NULL);
-    mMultiplayerServers.AddControl(miMultiplayerServersBackButton, miMultiplayerServersNicknameField, miMultiplayerServersSelectButton, NULL, NULL);
+    mNetServers.AddControl(miNetServersSelectButton, miNetServersBackButton, miNetServersConnectButton, NULL, NULL);
+    mNetServers.AddNonControl(miNetServersSelectedHostText);
+    mNetServers.AddControl(miNetServersConnectButton, miNetServersSelectButton, miNetServersAddRemoveButton, NULL, NULL);
+    mNetServers.AddControl(miNetServersAddRemoveButton, miNetServersConnectButton, miNetServersNicknameField, NULL, NULL);
+    mNetServers.AddControl(miNetServersNicknameField, miNetServersAddRemoveButton, miNetServersBackButton, NULL, NULL);
+    mNetServers.AddControl(miNetServersBackButton, miNetServersNicknameField, miNetServersSelectButton, NULL, NULL);
 
 
-    mMultiplayerServers.AddNonControl(miMultiplayerServersLeftHeaderBar);
-    mMultiplayerServers.AddNonControl(miMultiplayerServersRightHeaderBar);
-    mMultiplayerServers.AddNonControl(miMultiplayerServersHeaderText);
+    mNetServers.AddNonControl(miNetServersLeftHeaderBar);
+    mNetServers.AddNonControl(miNetServersRightHeaderBar);
+    mNetServers.AddNonControl(miNetServersHeaderText);
 
-    mMultiplayerServers.AddControl(miMultiplayerServersScroll, NULL, NULL, NULL, NULL);
-    //mMultiplayerServers.AddNonControl(miMultiplayerServersConnectingDialogImage);
-    //mMultiplayerServers.AddControl(miMultiplayerServersConnectionDetector, NULL, NULL, NULL, NULL);
+    mNetServers.AddControl(miNetServersScroll, NULL, NULL, NULL, NULL);
+    //mNetServers.AddNonControl(miNetServersConnectingDialogImage);
+    //mNetServers.AddControl(miNetServersConnectionDetector, NULL, NULL, NULL, NULL);
 
-    mMultiplayerServers.SetHeadControl(miMultiplayerServersSelectButton);
-    mMultiplayerServers.SetCancelCode(MENU_CODE_TO_MAIN_MENU);
+    mNetServers.SetHeadControl(miNetServersSelectButton);
+    mNetServers.SetCancelCode(MENU_CODE_TO_MAIN_MENU);
+
+    //****************************
+    // Multiplayer Room List Menu
+    //****************************
+
+    miNetRoomsBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
+    miNetRoomsBackButton->SetCode(MENU_CODE_TO_NET_SERVERS_MENU);
+
+    miNetRoomsBackButton2 = new MI_Button(&rm->spr_selectfield, 544, 332, "Back", 80, 1);
+    miNetRoomsBackButton2->SetCode(MENU_CODE_TO_NET_SERVERS_MENU);
+
+    miNetRoomsBackButton3 = new MI_Button(&rm->spr_selectfield, 544, 232, "Back", 80, 1);
+    miNetRoomsBackButton3->SetCode(MENU_CODE_TO_NET_SERVERS_MENU);
+
+    miNetRoomsScroll = new MI_NetworkListScroll(&rm->menu_plain_field, 40, 40, smw->ScreenWidth / 2, 9, "Rooms", MENU_CODE_TO_MAIN_MENU /* TODO: szobára ugrás */, MENU_CODE_TO_NET_SERVERS_MENU);
+    miNetRoomsScroll->SetAutoModify(true);
+    //miNetRoomsScroll->Show(true);
+
+    /*for (unsigned iRoom = 0; iServer < netplay.rooms.size(); iRoom++) {
+        Room * room = &netplay.rooms[iRoom];
+        playercount to string
+        miNetServersScroll->Add(room->name, "");
+    }*/
+        miNetRoomsScroll->Add("Teszt", "2/4");
+        miNetRoomsScroll->Add("J0in f4st FR3nZY", "0/4");
+
+    miNetRoomsLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
+    miNetRoomsRightHeaderBar = new MI_Image(&rm->menu_plain_field, smw->ScreenWidth/2, 0, 192, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
+    miNetRoomsHeaderText = new MI_Text("Multiplayer Rooms Menu", smw->ScreenWidth/2, 5, 0, 2, 1);
+
+    mNetRooms.AddControl(miNetRoomsScroll, NULL, NULL, NULL, miNetRoomsBackButton3);
+    mNetRooms.AddControl(miNetRoomsBackButton3, miNetRoomsBackButton, miNetRoomsBackButton2, miNetRoomsScroll, NULL);
+    mNetRooms.AddControl(miNetRoomsBackButton2, miNetRoomsBackButton3, miNetRoomsBackButton, miNetRoomsScroll, NULL);
+    mNetRooms.AddControl(miNetRoomsBackButton, miNetRoomsBackButton2, miNetRoomsBackButton3, miNetRoomsScroll, NULL);
+
+    mNetRooms.AddNonControl(miNetRoomsLeftHeaderBar);
+    mNetRooms.AddNonControl(miNetRoomsRightHeaderBar);
+    mNetRooms.AddNonControl(miNetRoomsHeaderText);
+
+    mNetRooms.SetHeadControl(miNetRoomsBackButton);
+    mNetRooms.SetCancelCode(MENU_CODE_TO_NET_SERVERS_MENU);
 
 
     //***********************
@@ -2306,12 +2348,9 @@ void Menu::RunMenu()
             } else if(MENU_CODE_BACK_TO_CONTROLS_MENU == code) {
                 mCurrentMenu = &mPlayerControlsSelectMenu;
             } else if(MENU_CODE_TO_NET_SERVERS_MENU == code) {
-                mCurrentMenu = &mMultiplayerServers;
+                mCurrentMenu = &mNetServers;
                 mCurrentMenu->ResetMenu();
-
-                printf("%s\n", netplay.playername);
                 netplay.client.startSession();
-
             } else if(MENU_CODE_TO_PLAYER_1_CONTROLS == code) {
                 miInputContainer->SetPlayer(0);
                 mCurrentMenu = &mPlayerControlsMenu;
@@ -2866,33 +2905,39 @@ void Menu::RunMenu()
             } else if(MENU_CODE_HEALTH_MODE_MAX_LIFE_CHANGED == code) {
                 modeOptionsMenu.HealthModeMaxLifeChanged();
             } else if(MENU_CODE_TO_NET_SERVERLIST == code) {
-                miMultiplayerServersScroll->Show(true);
-                mMultiplayerServers.RememberCurrent();
+                miNetServersScroll->Show(true);
+                mNetServers.RememberCurrent();
 
-                mMultiplayerServers.SetHeadControl(miMultiplayerServersScroll);
-                mMultiplayerServers.SetCancelCode(MENU_CODE_NONE);
-                mMultiplayerServers.ResetMenu();
+                mNetServers.SetHeadControl(miNetServersScroll);
+                mNetServers.SetCancelCode(MENU_CODE_NONE);
+                mNetServers.ResetMenu();
             } else if(MENU_CODE_NET_SERVERLIST_EXIT == code || MENU_CODE_NET_CONNECT_ABORT == code) {
-                miMultiplayerServersScroll->Show(false);
-                //miMultiplayerServersConnectingDialogImage->Show(false);
-                //miMultiplayerServersConnectionDetector->Show(false);
+                miNetServersScroll->Show(false);
+                //miNetServersConnectingDialogImage->Show(false);
+                //miNetServersConnectionDetector->Show(false);
 
-                mMultiplayerServers.SetHeadControl(miMultiplayerServersSelectButton);
-                mMultiplayerServers.SetCancelCode(MENU_CODE_TO_MAIN_MENU);
+                mNetServers.SetHeadControl(miNetServersSelectButton);
+                mNetServers.SetCancelCode(MENU_CODE_TO_MAIN_MENU);
 
-                mMultiplayerServers.RestoreCurrent();
+                mNetServers.RestoreCurrent();
                 iDisplayError = DISPLAY_ERROR_NONE;
             } else if(MENU_CODE_NET_CONNECT_INPROGRESS == code) {
-                //miMultiplayerServersConnectingDialogImage->Show(true);
-                //miMultiplayerServersConnectionDetector->Show(true);
-                /*mMultiplayerServers.RememberCurrent();
+                //miNetServersConnectingDialogImage->Show(true);
+                //miNetServersConnectionDetector->Show(true);
+                /*mNetServers.RememberCurrent();
 
-                mMultiplayerServers.SetHeadControl(miMultiplayerServersConnectionDetector);
-                mMultiplayerServers.SetCancelCode(MENU_CODE_NONE);
-                mMultiplayerServers.ResetMenu();*/
+                mNetServers.SetHeadControl(miNetServersConnectionDetector);
+                mNetServers.SetCancelCode(MENU_CODE_NONE);
+                mNetServers.ResetMenu();*/
 
-                netplay.client.sendConnectRequestToSelectedServer();
+                //netplay.client.sendConnectRequestToSelectedServer();
                 printf("last sent: %d\n", netplay.lastSentMessage.packageType);
+            } else if(MENU_CODE_TO_NET_ROOMS_MENU == code) {
+                netplay.client.sendConnectRequestToSelectedServer();
+
+                printf("MENU_CODE_TO_NET_ROOMS_MENU\n");
+                mCurrentMenu = &mNetRooms;
+                mCurrentMenu->ResetMenu();
             }
 
             /*if (code != MENU_CODE_NONE)

@@ -4598,7 +4598,8 @@ void MI_World::UseCloud(bool fUseCloud)
  * MI_NetworkListScroll Class
  **************************************/
 
-MI_NetworkListScroll::MI_NetworkListScroll(gfxSprite * nspr, short x, short y, short width, short numlines, const std::string& title, MenuCodeEnum exitCode) :
+MI_NetworkListScroll::MI_NetworkListScroll(gfxSprite * nspr, short x, short y, short width,
+    short numlines, const std::string& title, MenuCodeEnum acceptCode, MenuCodeEnum cancelCode) :
     UI_Control(x, y)
 {
     spr = nspr;
@@ -4614,7 +4615,8 @@ MI_NetworkListScroll::MI_NetworkListScroll(gfxSprite * nspr, short x, short y, s
 
     sTitle = title;
 
-    iExitCode = exitCode;
+    iAcceptCode = acceptCode;
+    iCancelCode = acceptCode;
 }
 
 MI_NetworkListScroll::~MI_NetworkListScroll()
@@ -4639,7 +4641,6 @@ MenuCodeEnum MI_NetworkListScroll::Modify(bool modify)
 
 MenuCodeEnum MI_NetworkListScroll::SendInput(CPlayerInput * playerInput)
 {
-    printf("MI_NetworkListScroll SendInput\n");
     for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
         //Only allow the controlling team to control the menu (if there is one)
         if(iControllingTeam != -1) {
@@ -4657,14 +4658,26 @@ MenuCodeEnum MI_NetworkListScroll::SendInput(CPlayerInput * playerInput)
             return MENU_CODE_NONE;
         }
 
+        if(playerInput->outputControls[iPlayer].menu_left.fPressed) {
+            if (neighborControls[2])
+                return MENU_CODE_UNSELECT_ITEM;
+            return MENU_CODE_NONE;
+        }
+
+        if(playerInput->outputControls[iPlayer].menu_right.fPressed) {
+            if (neighborControls[3])
+                return MENU_CODE_UNSELECT_ITEM;
+            return MENU_CODE_NONE;
+        }
+
         if(playerInput->outputControls[iPlayer].menu_select.fPressed) {
             netplay.selectedServerIndex = iIndex;
-            return iExitCode;
+            return iAcceptCode;
         }
 
 
         if(playerInput->outputControls[iPlayer].menu_cancel.fPressed) {
-            return iExitCode;
+            return iCancelCode;
         }
     }
 

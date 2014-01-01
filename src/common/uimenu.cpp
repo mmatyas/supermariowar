@@ -95,8 +95,8 @@ MenuCodeEnum UI_Menu::SendInput(CPlayerInput * playerInput)
         if(MENU_CODE_UNSELECT_ITEM == ret) {
 			fModifyingItem = false;
 			
-			if(current->IsAutoModify())
-				return cancelCode;
+			/*if(current->IsAutoModify())
+				return cancelCode;*/
 
 			return MENU_CODE_NONE;
 		}

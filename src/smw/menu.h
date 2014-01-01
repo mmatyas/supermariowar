@@ -404,23 +404,37 @@ class Menu
 
 
 		//Multiplayer Server List Menu
-		UI_Menu mMultiplayerServers;
+		UI_Menu mNetServers;
 
-		MI_Button * miMultiplayerServersSelectButton;
-		MI_Text * miMultiplayerServersSelectedHostText;
-		MI_Button * miMultiplayerServersConnectButton;
-		MI_Button * miMultiplayerServersAddRemoveButton;
-		MI_TextField * miMultiplayerServersNicknameField;
+		MI_Button * miNetServersSelectButton;
+		MI_Text * miNetServersSelectedHostText;
+		MI_Button * miNetServersConnectButton;
+		MI_Button * miNetServersAddRemoveButton;
+		MI_TextField * miNetServersNicknameField;
 
-		MI_NetworkListScroll * miMultiplayerServersScroll;
-		//MI_Image * miMultiplayerServersConnectingDialogImage;
-		//MI_NetworkStatusDetector * miMultiplayerServersConnectionDetector;
+		MI_NetworkListScroll * miNetServersScroll;
+		//MI_Image * miNetServersConnectingDialogImage;
+		//MI_NetworkStatusDetector * miNetServersConnectionDetector;
 
-		MI_Button * miMultiplayerServersBackButton;
+		MI_Button * miNetServersBackButton;
 
-		MI_Image * miMultiplayerServersLeftHeaderBar;
-		MI_Image * miMultiplayerServersRightHeaderBar;
-		MI_Text * miMultiplayerServersHeaderText;
+		MI_Image * miNetServersLeftHeaderBar;
+		MI_Image * miNetServersRightHeaderBar;
+		MI_Text * miNetServersHeaderText;
+
+
+		//Multiplayer Room List Menu
+		UI_Menu mNetRooms;
+
+		MI_NetworkListScroll * miNetRoomsScroll;
+
+		MI_Button * miNetRoomsBackButton;
+		MI_Button * miNetRoomsBackButton2;
+		MI_Button * miNetRoomsBackButton3;
+
+		MI_Image * miNetRoomsLeftHeaderBar;
+		MI_Image * miNetRoomsRightHeaderBar;
+		MI_Text * miNetRoomsHeaderText;
 
 
 		DisplayError iDisplayError;
