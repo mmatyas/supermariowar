@@ -1872,21 +1872,40 @@ void Menu::CreateMenu()
     miNetNewLevelContinueButton = new MI_Button(&rm->spr_selectfield, 70, 45, "Continue", 500, 0);
     miNetNewLevelContinueButton->SetCode(MENU_CODE_TO_NET_SERVERS_MENU);
 
-    miNetNewLevelModeField = miModeField;
-    miNetNewLevelGoalField = miGoalField;
+    //miNetNewLevelModeField = miModeField;
+    /*for(short iGoalField = 0; iGoalField < GAMEMODE_LAST; iGoalField++)
+        miNetNewLevelGoalField[iGoalField] = miGoalField[iGoalField];*/
 
-    mNetNewLevel.AddControl(miNetNewLevelContinueButton, NULL, miNetNewLevelModeField, NULL, NULL);
-    mNetNewLevel.AddControl(miNetNewLevelModeField, NULL, miNetNewLevelGoalField[0], NULL, NULL);
+    mNetNewLevel.AddControl(miNetNewLevelContinueButton, miMapField, miModeField, NULL, NULL);
+    //mNetNewLevel.AddControl(miNetNewLevelModeField, NULL, miNetNewLevelGoalField[0], NULL, NULL);
 
-    mNetNewLevel.AddControl(miNetNewLevelGoalField[0], miModeField, miNetNewLevelGoalField[1], NULL, miModeSettingsButton);
+    /*mNetNewLevel.AddControl(miNetNewLevelGoalField[0], miModeField, miNetNewLevelGoalField[1], NULL, miModeSettingsButton);
 
     for(short iGoalField = 1; iGoalField < GAMEMODE_LAST - 1; iGoalField++)
         mNetNewLevel.AddControl(miNetNewLevelGoalField[iGoalField], miNetNewLevelGoalField[iGoalField - 1], miNetNewLevelGoalField[iGoalField + 1], miNetNewLevelGoalField[iGoalField - 1], NULL);
 
     mNetNewLevel.AddControl(miNetNewLevelGoalField[GAMEMODE_LAST - 1], miNetNewLevelGoalField[GAMEMODE_LAST - 2], miMapField, miNetNewLevelGoalField[GAMEMODE_LAST - 2], NULL);
+*/
+    mNetNewLevel.AddControl(miModeField, miNetNewLevelContinueButton, miGoalField[0], NULL, NULL);
 
-    mNetNewLevel.SetHeadControl(miSettingsStartButton);
-    mNetNewLevel.SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
+    mNetNewLevel.AddControl(miGoalField[0], miModeField, miGoalField[1], NULL, miModeSettingsButton);
+
+    for(short iGoalField = 1; iGoalField < GAMEMODE_LAST - 1; iGoalField++)
+        mNetNewLevel.AddControl(miGoalField[iGoalField], miGoalField[iGoalField - 1], miGoalField[iGoalField + 1], miGoalField[iGoalField - 1], NULL);
+
+    mNetNewLevel.AddControl(miGoalField[GAMEMODE_LAST - 1], miGoalField[GAMEMODE_LAST - 2], miMapField, miGoalField[GAMEMODE_LAST - 2], NULL);
+
+    mNetNewLevel.AddControl(miMapField, miGoalField[GAMEMODE_LAST - 1], miNetNewLevelContinueButton, NULL, NULL);
+
+
+    mNetNewLevel.AddNonControl(miGameSettingsLeftHeaderBar);
+    mNetNewLevel.AddNonControl(miGameSettingsMenuRightHeaderBar);
+    mNetNewLevel.AddNonControl(miGameSettingsMenuHeaderText);
+
+    mNetNewLevel.AddNonControl(miMapFiltersOnImage);
+
+    mNetNewLevel.SetHeadControl(miNetNewLevelContinueButton);
+    mNetNewLevel.SetCancelCode(MENU_CODE_TO_NET_LOBBY_MENU);
 }
 
 //---------------------------------------------------------------
