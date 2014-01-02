@@ -829,6 +829,7 @@ struct Networking {
     unsigned short selectedServerIndex;
     std::vector<ServerAddress> savedServers;
 
+    char roomfilter[NET_MAX_ROOM_NAME_LENGTH];
     unsigned short selectedRoomIndex;
     std::vector<RoomEntry> currentRooms;
 };

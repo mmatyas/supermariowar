@@ -428,13 +428,44 @@ class Menu
 
 		MI_NetworkListScroll * miNetRoomsScroll;
 
+		MI_Button * miNetRoomsNewRoomButton;
+		MI_TextField * miNetRoomsFilterField;
+
 		MI_Button * miNetRoomsBackButton;
-		MI_Button * miNetRoomsBackButton2;
-		MI_Button * miNetRoomsBackButton3;
 
 		MI_Image * miNetRoomsLeftHeaderBar;
 		MI_Image * miNetRoomsRightHeaderBar;
 		MI_Text * miNetRoomsHeaderText;
+
+
+		//Multiplayer New Room Menu
+		UI_Menu mNetNewLevel;
+
+		MI_ImageSelectField * miNetNewLevelModeField;
+		MI_SelectField * miNetNewLevelGoalField[22];
+		/*MI_Button * miModeSettingsButton;
+		MI_MapField * miMapField;*/
+		MI_Button * miNetNewLevelContinueButton;
+		/*MI_Button * miMapFiltersButton;
+		MI_Button * miMapThumbnailsButton;
+		
+		MI_Image * miMapFiltersOnImage;
+		
+		MI_Image * miGameSettingsLeftHeaderBar;
+		MI_Image * miGameSettingsMenuRightHeaderBar;
+		MI_Text * miGameSettingsMenuHeaderText;
+
+		MI_Image * miGameSettingsExitDialogImage;
+		MI_Text * miGameSettingsExitDialogExitText;
+		MI_Text * miGameSettingsExitDialogTournamentText;
+		MI_Button * miGameSettingsExitDialogYesButton;
+		MI_Button * miGameSettingsExitDialogNoButton;
+
+		MI_MapFilterScroll * miMapFilterScroll;*/
+
+		MI_Image * miNetNewLevelLeftHeaderBar;
+		MI_Image * miNetNewLevelRightHeaderBar;
+		MI_Text * miNetNewLevelHeaderText;
 
 
 		DisplayError iDisplayError;

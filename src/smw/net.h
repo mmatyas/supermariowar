@@ -78,6 +78,7 @@ struct ClientConnectionPackage: MessageHeader {
 struct RoomInfoPackage : MessageHeader {
     char           name[NET_MAX_ROOM_NAME_LENGTH];
     uint8_t        playerCount;
+    bool           passwordRequired;
 };
 
 struct NewRoomPackage : MessageHeader {

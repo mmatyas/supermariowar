@@ -298,8 +298,8 @@ void Menu::CreateMenu()
     miNetServersSelectedHostText = new MI_Text(netplay.savedServers[netplay.selectedServerIndex].hostname.c_str(), smw->ScreenWidth - 90, 165, 0, 2, 2);
 
     miNetServersConnectButton = new MI_Button(&rm->spr_selectfield, 70, 200, "Connect", smw->ScreenWidth - 2 * 70, 1);
-    //miNetServersConnectButton->SetCode(MENU_CODE_NET_CONNECT_INPROGRESS);
-    miNetServersConnectButton->SetCode(MENU_CODE_TO_NET_ROOMS_MENU);
+    //miNetServersConnectButton->SetCode(MENU_CODE_NET_CONNECT_IN_PROGRESS);
+    miNetServersConnectButton->SetCode(MENU_CODE_TO_NET_LOBBY_MENU);
 
     miNetServersAddRemoveButton = new MI_Button(&rm->spr_selectfield, 70, 240, "Add / Remove Server", smw->ScreenWidth - 2 * 70, 1);
     miNetServersAddRemoveButton->SetCode(MENU_CODE_TO_NET_ADDREMOVE_SERVER_MENU);
@@ -318,7 +318,7 @@ void Menu::CreateMenu()
     /*miNetServersConnectionDetector->SuccessIfTrue(&netplay.connectSuccessful);
     miNetServersConnectionDetector->AbortCode(MENU_CODE_NET_CONNECT_ABORT);
     miNetServersConnectionDetector->SuccessCode(MENU_CODE_NET_CONNECT_SUCCESS);
-    miNetServersConnectionDetector->WaitingCode(MENU_CODE_NET_CONNECT_INPROGRESS);*/
+    miNetServersConnectionDetector->WaitingCode(MENU_CODE_NET_CONNECT_IN_PROGRESS);*/
 
     mNetServers.AddControl(miNetServersSelectButton, miNetServersBackButton, miNetServersConnectButton, NULL, NULL);
     mNetServers.AddNonControl(miNetServersSelectedHostText);
@@ -343,16 +343,16 @@ void Menu::CreateMenu()
     // Multiplayer Room List Menu
     //****************************
 
+    miNetRoomsNewRoomButton = new MI_Button(&rm->spr_selectfield, smw->ScreenWidth * (3.0/5.0) + 10, 40, "New room", smw->ScreenWidth * (2.0/5.0) - 30, 1);
+    miNetRoomsNewRoomButton->SetCode(MENU_CODE_TO_NET_NEW_ROOM_LEVEL_SELECT_MENU);
+
+    miNetRoomsFilterField = new MI_TextField(&rm->menu_plain_field, smw->ScreenWidth * (3.0/5.0) + 10, 80, "Search", smw->ScreenWidth * (2.0/5.0) + 10, 90);
+    miNetRoomsFilterField->SetData(netplay.roomfilter, NET_MAX_ROOM_NAME_LENGTH);
+
     miNetRoomsBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
     miNetRoomsBackButton->SetCode(MENU_CODE_TO_NET_SERVERS_MENU);
 
-    miNetRoomsBackButton2 = new MI_Button(&rm->spr_selectfield, 544, 332, "Back", 80, 1);
-    miNetRoomsBackButton2->SetCode(MENU_CODE_TO_NET_SERVERS_MENU);
-
-    miNetRoomsBackButton3 = new MI_Button(&rm->spr_selectfield, 544, 232, "Back", 80, 1);
-    miNetRoomsBackButton3->SetCode(MENU_CODE_TO_NET_SERVERS_MENU);
-
-    miNetRoomsScroll = new MI_NetworkListScroll(&rm->menu_plain_field, 40, 40, smw->ScreenWidth / 2, 9, "Rooms", MENU_CODE_TO_MAIN_MENU /* TODO: szobára ugrás */, MENU_CODE_TO_NET_SERVERS_MENU);
+    miNetRoomsScroll = new MI_NetworkListScroll(&rm->menu_plain_field, 10, 40, smw->ScreenWidth * (3.0/5.0), 11, "Rooms", MENU_CODE_TO_NET_ROOM_MENU, MENU_CODE_TO_NET_SERVERS_MENU);
     miNetRoomsScroll->SetAutoModify(true);
     miNetRoomsScroll->RemoteIndex(&netplay.selectedRoomIndex);
 
@@ -363,21 +363,22 @@ void Menu::CreateMenu()
     }*/
         miNetRoomsScroll->Add("Teszt", "2/4");
         miNetRoomsScroll->Add("J0in f4st FR3nZY", "0/4");
+        miNetRoomsScroll->Add("0123456789012345678901234567890", "K/4");
 
     miNetRoomsLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
     miNetRoomsRightHeaderBar = new MI_Image(&rm->menu_plain_field, smw->ScreenWidth/2, 0, 192, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
-    miNetRoomsHeaderText = new MI_Text("Multiplayer Rooms Menu", smw->ScreenWidth/2, 5, 0, 2, 1);
+    miNetRoomsHeaderText = new MI_Text("Multiplayer Lobby Menu", smw->ScreenWidth/2, 5, 0, 2, 1);
 
-    mNetRooms.AddControl(miNetRoomsScroll, NULL, NULL, NULL, miNetRoomsBackButton3);
-    mNetRooms.AddControl(miNetRoomsBackButton3, miNetRoomsBackButton, miNetRoomsBackButton2, miNetRoomsScroll, NULL);
-    mNetRooms.AddControl(miNetRoomsBackButton2, miNetRoomsBackButton3, miNetRoomsBackButton, miNetRoomsScroll, NULL);
-    mNetRooms.AddControl(miNetRoomsBackButton, miNetRoomsBackButton2, miNetRoomsBackButton3, miNetRoomsScroll, NULL);
+    mNetRooms.AddControl(miNetRoomsScroll, NULL, NULL, NULL, miNetRoomsNewRoomButton);
+    mNetRooms.AddControl(miNetRoomsNewRoomButton, miNetRoomsBackButton, miNetRoomsFilterField, miNetRoomsScroll, NULL);
+    mNetRooms.AddControl(miNetRoomsFilterField, miNetRoomsNewRoomButton, miNetRoomsBackButton, miNetRoomsScroll, NULL);
+    mNetRooms.AddControl(miNetRoomsBackButton, miNetRoomsFilterField, miNetRoomsNewRoomButton, miNetRoomsScroll, NULL);
 
     mNetRooms.AddNonControl(miNetRoomsLeftHeaderBar);
     mNetRooms.AddNonControl(miNetRoomsRightHeaderBar);
     mNetRooms.AddNonControl(miNetRoomsHeaderText);
 
-    mNetRooms.SetHeadControl(miNetRoomsBackButton);
+    mNetRooms.SetHeadControl(miNetRoomsNewRoomButton);
     mNetRooms.SetCancelCode(MENU_CODE_TO_NET_SERVERS_MENU);
 
 
@@ -1862,6 +1863,30 @@ void Menu::CreateMenu()
 
     mPowerupSettingsMenu.SetHeadControl(miStoredPowerupDelayField);
     mPowerupSettingsMenu.SetCancelCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
+
+
+    //***********************
+    // Multiplayer New Room
+    //***********************
+
+    miNetNewLevelContinueButton = new MI_Button(&rm->spr_selectfield, 70, 45, "Continue", 500, 0);
+    miNetNewLevelContinueButton->SetCode(MENU_CODE_TO_NET_SERVERS_MENU);
+
+    miNetNewLevelModeField = miModeField;
+    miNetNewLevelGoalField = miGoalField;
+
+    mNetNewLevel.AddControl(miNetNewLevelContinueButton, NULL, miNetNewLevelModeField, NULL, NULL);
+    mNetNewLevel.AddControl(miNetNewLevelModeField, NULL, miNetNewLevelGoalField[0], NULL, NULL);
+
+    mNetNewLevel.AddControl(miNetNewLevelGoalField[0], miModeField, miNetNewLevelGoalField[1], NULL, miModeSettingsButton);
+
+    for(short iGoalField = 1; iGoalField < GAMEMODE_LAST - 1; iGoalField++)
+        mNetNewLevel.AddControl(miNetNewLevelGoalField[iGoalField], miNetNewLevelGoalField[iGoalField - 1], miNetNewLevelGoalField[iGoalField + 1], miNetNewLevelGoalField[iGoalField - 1], NULL);
+
+    mNetNewLevel.AddControl(miNetNewLevelGoalField[GAMEMODE_LAST - 1], miNetNewLevelGoalField[GAMEMODE_LAST - 2], miMapField, miNetNewLevelGoalField[GAMEMODE_LAST - 2], NULL);
+
+    mNetNewLevel.SetHeadControl(miSettingsStartButton);
+    mNetNewLevel.SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
 }
 
 //---------------------------------------------------------------
@@ -2922,7 +2947,7 @@ void Menu::RunMenu()
 
                 mNetServers.RestoreCurrent();
                 iDisplayError = DISPLAY_ERROR_NONE;
-            } else if(MENU_CODE_NET_CONNECT_INPROGRESS == code) {
+            } else if(MENU_CODE_NET_CONNECT_IN_PROGRESS == code) {
                 //miNetServersConnectingDialogImage->Show(true);
                 //miNetServersConnectionDetector->Show(true);
                 /*mNetServers.RememberCurrent();
@@ -2933,11 +2958,14 @@ void Menu::RunMenu()
 
                 //netplay.client.sendConnectRequestToSelectedServer();
                 printf("last sent: %d\n", netplay.lastSentMessage.packageType);
-            } else if(MENU_CODE_TO_NET_ROOMS_MENU == code) {
+            } else if(MENU_CODE_TO_NET_LOBBY_MENU == code) {
                 netplay.client.sendConnectRequestToSelectedServer();
 
-                printf("MENU_CODE_TO_NET_ROOMS_MENU\n");
+                printf("MENU_CODE_TO_NET_LOBBY_MENU\n");
                 mCurrentMenu = &mNetRooms;
+                mCurrentMenu->ResetMenu();
+            } else if (MENU_CODE_TO_NET_NEW_ROOM_LEVEL_SELECT_MENU == code) {
+                mCurrentMenu = &mNetNewLevel;
                 mCurrentMenu->ResetMenu();
             }
 

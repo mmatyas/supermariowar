@@ -4676,7 +4676,6 @@ MenuCodeEnum MI_NetworkListScroll::SendInput(CPlayerInput * playerInput)
             return iAcceptCode;
         }
 
-
         if(playerInput->outputControls[iPlayer].menu_cancel.fPressed) {
             return iCancelCode;
         }
