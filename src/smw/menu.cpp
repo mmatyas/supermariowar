@@ -412,13 +412,13 @@ void Menu::CreateMenu()
     // Multiplayer New Room Page 2
     //*****************************
 
-    miNetNewRoomNameField = new MI_TextField(&rm->menu_plain_field, 70, 160, "Room name", smw->ScreenWidth - 2 * 70, 200);
+    miNetNewRoomNameField = new MI_TextField(&rm->menu_plain_field, 70, 160, "Room name", smw->ScreenWidth - 2 * 70, 230);
     miNetNewRoomNameField->SetData(netplay.newroom_name, NET_MAX_ROOM_NAME_LENGTH);
 
-    miNetNewRoomPasswordField = new MI_TextField(&rm->menu_plain_field, 70, 200, "Password (optional)", smw->ScreenWidth - 2 * 70, 200);
-    miNetNewRoomPasswordField->SetData(netplay.newroom_name, NET_MAX_ROOM_NAME_LENGTH);
+    miNetNewRoomPasswordField = new MI_TextField(&rm->menu_plain_field, 70, 200, "Password (optional)", smw->ScreenWidth - 2 * 70, 230);
+    miNetNewRoomPasswordField->SetData(netplay.newroom_password, NET_MAX_ROOM_PASSWORD_LENGTH);
 
-    miNetNewRoomPrivateToggle = new MI_SelectField(&rm->spr_selectfield, 70, 240, "Private?", smw->ScreenWidth - 2 * 70, 220);
+    miNetNewRoomPrivateToggle = new MI_SelectField(&rm->spr_selectfield, 70, 240, "Private?", smw->ScreenWidth - 2 * 70, 230);
     miNetNewRoomPrivateToggle->Add("No", 0, "", false, false);
     miNetNewRoomPrivateToggle->Add("Yes", 1, "", true, false);
     miNetNewRoomPrivateToggle->SetData(NULL, NULL, &netplay.newroom_private);

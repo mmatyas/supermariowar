@@ -834,6 +834,7 @@ struct Networking {
     std::vector<RoomEntry> currentRooms;
 
     char newroom_name[NET_MAX_ROOM_NAME_LENGTH];
+    char newroom_password[NET_MAX_ROOM_PASSWORD_LENGTH];
     bool newroom_private;
 };
 

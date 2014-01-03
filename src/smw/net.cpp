@@ -241,9 +241,10 @@ void NetClient::endSession()
 {
     if (netplay.active) {
         printf("Session end.\n");
-        sendGoodbye();
-        closeUDPsocket();
+        if (netplay.connectSuccessful)
+            sendGoodbye();
 
+        closeUDPsocket();
         netplay.active = false;
         netplay.connectSuccessful = false;
     }
@@ -255,6 +256,7 @@ void NetClient::sendGoodbye()
     msg.protocolVersion = NET_PROTOCOL_VERSION;
     msg.packageType = NET_REQUEST_LEAVE_SERVER;
 
+    printf("sendGoodbye\n");
     sendUDPMessage(&msg, sizeof(MessageHeader));
 }
 

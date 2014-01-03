@@ -9,6 +9,7 @@
 #define NET_SERVER_PORT                     12521
 #define NET_MAX_PLAYER_NAME_LENGTH          16
 #define NET_MAX_ROOM_NAME_LENGTH            32
+#define NET_MAX_ROOM_PASSWORD_LENGTH        16
 
 #define NET_REQUEST_SERVERINFO              1
 #define NET_RESPONSE_SERVERINFO             2
