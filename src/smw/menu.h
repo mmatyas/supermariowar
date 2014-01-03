@@ -443,25 +443,7 @@ class Menu
 
 		MI_ImageSelectField * miNetNewLevelModeField;
 		MI_SelectField * miNetNewLevelGoalField[22];
-		/*MI_Button * miModeSettingsButton;
-		MI_MapField * miMapField;*/
 		MI_Button * miNetNewLevelContinueButton;
-		/*MI_Button * miMapFiltersButton;
-		MI_Button * miMapThumbnailsButton;
-		
-		MI_Image * miMapFiltersOnImage;
-		
-		MI_Image * miGameSettingsLeftHeaderBar;
-		MI_Image * miGameSettingsMenuRightHeaderBar;
-		MI_Text * miGameSettingsMenuHeaderText;
-
-		MI_Image * miGameSettingsExitDialogImage;
-		MI_Text * miGameSettingsExitDialogExitText;
-		MI_Text * miGameSettingsExitDialogTournamentText;
-		MI_Button * miGameSettingsExitDialogYesButton;
-		MI_Button * miGameSettingsExitDialogNoButton;
-
-		MI_MapFilterScroll * miMapFilterScroll;*/
 
 		MI_Image * miNetNewLevelLeftHeaderBar;
 		MI_Image * miNetNewLevelRightHeaderBar;

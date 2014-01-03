@@ -1898,11 +1898,15 @@ void Menu::CreateMenu()
     mNetNewLevel.AddControl(miMapField, miGoalField[GAMEMODE_LAST - 1], miNetNewLevelContinueButton, NULL, NULL);
 
 
-    mNetNewLevel.AddNonControl(miGameSettingsLeftHeaderBar);
-    mNetNewLevel.AddNonControl(miGameSettingsMenuRightHeaderBar);
-    mNetNewLevel.AddNonControl(miGameSettingsMenuHeaderText);
+    miNetNewLevelLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
+    miNetNewLevelRightHeaderBar = new MI_Image(&rm->menu_plain_field, smw->ScreenWidth/2, 0, 192, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
+    miNetNewLevelHeaderText = new MI_Text("Multiplayer Level Select Menu", smw->ScreenWidth/2, 5, 0, 2, 1);
 
-    mNetNewLevel.AddNonControl(miMapFiltersOnImage);
+    mNetNewLevel.AddNonControl(miNetNewLevelLeftHeaderBar);
+    mNetNewLevel.AddNonControl(miNetNewLevelRightHeaderBar);
+    mNetNewLevel.AddNonControl(miNetNewLevelHeaderText);
+
+    //mNetNewLevel.AddNonControl(miMapFiltersOnImage);
 
     mNetNewLevel.SetHeadControl(miNetNewLevelContinueButton);
     mNetNewLevel.SetCancelCode(MENU_CODE_TO_NET_LOBBY_MENU);
