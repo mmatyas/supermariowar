@@ -368,6 +368,9 @@ void Menu::CreateMenu()
     miNetLobbyScroll->RemoteIndex(&netplay.selectedRoomIndex);
     miNetLobbyScroll->SetAutoModify(true);
 
+    // NetClient will add room entries to this list.
+    netplay.client.setRoomListUIControl(miNetLobbyScroll);
+
     miNetLobbyJoiningDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
     miNetLobbyJoiningDialogText = new MI_Text("Joining...", smw->ScreenWidth / 2, smw->ScreenHeight / 2 - 40, 0, 2, 1);
     miNetLobbyJoiningDialogDebugButton = new MI_Button(&rm->spr_selectfield, smw->ScreenWidth / 2 - 100, 250, "[Debug] Next", 200, 1);
@@ -3053,6 +3056,8 @@ void Menu::RunMenu()
                 mNetServers.SetCancelCode(MENU_CODE_NET_CONNECT_ABORT);
                 mNetServers.ResetMenu();
             } else if(MENU_CODE_TO_NET_LOBBY_MENU == code) {
+                netplay.client.requestRoomList();
+
                 // Restore NetServers layout
                     miNetServersScroll->Show(false);
                     miNetServersConnectingDialogImage->Show(false);
@@ -3102,8 +3107,13 @@ void Menu::RunMenu()
                 printf("Code: %d\n", code);*/
         }
 
-        if (netplay.active)
+        if (netplay.active) {
             netplay.client.update();
+
+            // ide a hibakezelést
+            // if lastmessage ez és lastresponse emez
+            // control.settext...
+        }
 
         //--------------- draw everything ----------------------
 

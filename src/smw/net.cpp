@@ -107,6 +107,11 @@ bool NetClient::init()
     return true;
 }
 
+void NetClient::setRoomListUIControl(MI_NetworkListScroll* control)
+{
+    uiRoomList = control;
+}
+
 /****************************
     Building up
 ****************************/
@@ -176,6 +181,38 @@ void NetClient::requestRoomList()
     msg.packageType = NET_REQUEST_ROOM_LIST;
 
     sendUDPMessage(&msg, sizeof(MessageHeader));
+
+    if (uiRoomList)
+        uiRoomList->Clear();
+}
+
+void NetClient::handleServerinfoAndClose()
+{
+    ServerInfoPackage serverInfo;
+    memcpy(&serverInfo, udpIncomingPacket->data, sizeof(ServerInfoPackage));
+
+    printf("NET_RESPONSE_SERVERINFO [%lu byte]\n", sizeof(serverInfo));
+    printf("Sending:\n  protocolVersion: %d\n  packageType: %d\n  name: %s\n  players/max: %d / %d\n",
+        serverInfo.protocolVersion, serverInfo.packageType, serverInfo.name, serverInfo.currentPlayers, serverInfo.maxPlayers);
+
+    closeUDPsocket();
+}
+
+void NetClient::handleNewRoomListEntry()
+{
+    RoomInfoPackage roomInfo;
+    memcpy(&roomInfo, udpIncomingPacket->data, sizeof(RoomInfoPackage));
+    printf("Room entry: %s (%d/4)\n", roomInfo.name, roomInfo.playerCount);
+
+    RoomEntry newRoom;
+    newRoom.name = roomInfo.name;
+    newRoom.playerCount = roomInfo.playerCount;
+    netplay.currentRooms.push_back(newRoom);
+
+    if (uiRoomList) {
+        char playerCountString[4] = {'0' + roomInfo.playerCount, '/', '4', '\0'};
+        uiRoomList->Add(newRoom.name, playerCountString);
+    }
 }
 
 void NetClient::update()
@@ -187,33 +224,16 @@ void NetClient::update()
             switch (responseCode)
             {
                 case NET_RESPONSE_SERVERINFO:
-                    ServerInfoPackage serverInfo;
-                    memcpy(&serverInfo, udpIncomingPacket->data, sizeof(ServerInfoPackage));
-
-
-                    printf("NET_RESPONSE_SERVERINFO [%lu byte]\n", sizeof(serverInfo));
-                    printf("Sending:\n  protocolVersion: %d\n  packageType: %d\n  name: %s\n  players/max: %d / %d\n",
-                        serverInfo.protocolVersion, serverInfo.packageType, serverInfo.name, serverInfo.currentPlayers, serverInfo.maxPlayers);
-
-                    closeUDPsocket();
+                    handleServerinfoAndClose();
                     break;
 
                 case NET_RESPONSE_CONNECT_OK:
                     printf("Connection attempt successful.\n");
                     netplay.connectSuccessful = true;
-                    requestRoomList();
                     break;
 
-                case NET_RESPONSE_ROOM_LIST_ENTRY: {
-                    RoomInfoPackage roomInfo;
-                    memcpy(&roomInfo, udpIncomingPacket->data, sizeof(RoomInfoPackage));
-                    printf("Room entry: %s (%d/4)\n", roomInfo.name, roomInfo.playerCount);
-
-                    RoomEntry newRoom;
-                    newRoom.name = roomInfo.name;
-                    newRoom.playerCount = roomInfo.playerCount;
-                    netplay.currentRooms.push_back(newRoom);
-                    }
+                case NET_RESPONSE_ROOM_LIST_ENTRY:
+                    handleNewRoomListEntry();
                     break;
 
                 case NET_RESPONSE_NO_ROOMS:

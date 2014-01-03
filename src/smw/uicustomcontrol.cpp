@@ -4635,6 +4635,15 @@ void MI_NetworkListScroll::Add(const std::string& left, const std::string& right
     iBottomStop = items.size() - iNumLines + iTopStop;
 }
 
+void MI_NetworkListScroll::Clear()
+{
+    items.clear();
+    iIndex = 0;
+    iSelectedLine = -1;
+    iSelectedLineBackup = 0;
+    iOffset = 0;
+}
+
 // This function runs when the scroll gets focus.
 MenuCodeEnum MI_NetworkListScroll::Modify(bool modify)
 {

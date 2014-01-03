@@ -42,6 +42,8 @@ void net_close();
 void net_saveServerList();
 void net_loadServerList();
 
+class MI_NetworkListScroll;
+
 
 // Local structures
 
@@ -109,6 +111,8 @@ class NetClient
         bool init();
         void cleanup();
 
+        void setRoomListUIControl(MI_NetworkListScroll*);
+
         //void refreshRoomList();
         void requestRoomList();
 
@@ -120,12 +124,16 @@ class NetClient
         UDPpacket* udpOutgoingPacket;
         UDPpacket* udpIncomingPacket;
 
+        MI_NetworkListScroll* uiRoomList;
+
 
         bool openSocket(const char* hostname, const uint16_t port = NET_SERVER_PORT);
-
 		void closeUDPsocket();
         bool sendUDPMessage(const void* data, const int dataLength);
         bool receiveUDPMessage();
+
+        void handleServerinfoAndClose();
+        void handleNewRoomListEntry();
 
         void sendGoodbye();
 };

@@ -736,6 +736,7 @@ class MI_NetworkListScroll : public UI_Control
         MenuCodeEnum Modify(bool modify);
 
         void Add(const std::string& left, const std::string& right);
+        void Clear();
 
         bool MoveNext();
         bool MovePrev();
