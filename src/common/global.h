@@ -820,7 +820,7 @@ struct Networking {
     bool connectSuccessful;
 
     char * hostaddress;
-    char playername[32];    // last byte will be \0
+    char playername[NET_MAX_PLAYER_NAME_LENGTH];    // last byte will be \0
 
     NetClient client;
     LastMessage lastSentMessage;
@@ -832,6 +832,9 @@ struct Networking {
     char roomfilter[NET_MAX_ROOM_NAME_LENGTH];
     unsigned short selectedRoomIndex;
     std::vector<RoomEntry> currentRooms;
+
+    char newroom_name[NET_MAX_ROOM_NAME_LENGTH];
+    bool newroom_private;
 };
 
 //TODO:: Move menu settings from game_values to global menu context structure

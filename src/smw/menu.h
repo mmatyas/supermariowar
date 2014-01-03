@@ -445,16 +445,34 @@ class Menu
 		MI_Text * miNetLobbyHeaderText;
 
 
-		//Multiplayer New Room Menu
+		//Multiplayer New Room Level Select Menu
 		UI_Menu mNetNewLevel;
 
-		MI_ImageSelectField * miNetNewLevelModeField;
-		MI_SelectField * miNetNewLevelGoalField[22];
+		//MI_ImageSelectField * miNetNewLevelModeField;
+		//MI_SelectField * miNetNewLevelGoalField[22];
 		MI_Button * miNetNewLevelContinueButton;
 
 		MI_Image * miNetNewLevelLeftHeaderBar;
 		MI_Image * miNetNewLevelRightHeaderBar;
 		MI_Text * miNetNewLevelHeaderText;
+
+
+		//Multiplayer New Room Settings Menu
+		UI_Menu mNetNewRoom;
+
+		MI_TextField * miNetNewRoomNameField;
+		MI_TextField * miNetNewRoomPasswordField;
+		MI_SelectField * miNetNewRoomPrivateToggle;
+		MI_Button * miNetNewRoomCreateButton;
+		MI_Button * miNetNewRoomBackButton;
+
+		MI_Image * miNetNewRoomCreatingDialogImage;
+		MI_Text * miNetNewRoomCreatingDialogText;
+		MI_Button * miNetNewRoomCreatingDialogDebugButton;
+
+		MI_Image * miNetNewRoomLeftHeaderBar;
+		MI_Image * miNetNewRoomRightHeaderBar;
+		MI_Text * miNetNewRoomHeaderText;
 
 
 		DisplayError iDisplayError;

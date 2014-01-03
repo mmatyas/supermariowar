@@ -408,6 +408,47 @@ void Menu::CreateMenu()
     mNetLobby.SetCancelCode(MENU_CODE_TO_NET_SERVERS_MENU);
 
 
+    //*****************************
+    // Multiplayer New Room Page 2
+    //*****************************
+
+    miNetNewRoomNameField = new MI_TextField(&rm->menu_plain_field, 70, 160, "Room name", smw->ScreenWidth - 2 * 70, 200);
+    miNetNewRoomNameField->SetData(netplay.newroom_name, NET_MAX_ROOM_NAME_LENGTH);
+
+    miNetNewRoomPasswordField = new MI_TextField(&rm->menu_plain_field, 70, 200, "Password (optional)", smw->ScreenWidth - 2 * 70, 200);
+    miNetNewRoomPasswordField->SetData(netplay.newroom_name, NET_MAX_ROOM_NAME_LENGTH);
+
+    miNetNewRoomPrivateToggle = new MI_SelectField(&rm->spr_selectfield, 70, 240, "Private?", smw->ScreenWidth - 2 * 70, 220);
+    miNetNewRoomPrivateToggle->Add("No", 0, "", false, false);
+    miNetNewRoomPrivateToggle->Add("Yes", 1, "", true, false);
+    miNetNewRoomPrivateToggle->SetData(NULL, NULL, &netplay.newroom_private);
+    miNetNewRoomPrivateToggle->SetKey(netplay.newroom_private ? 1 : 0);
+    miNetNewRoomPrivateToggle->SetAutoAdvance(true);
+
+    miNetNewRoomCreateButton = new MI_Button(&rm->spr_selectfield, 70, 320, "Create!", smw->ScreenWidth - 2 * 70, 1);
+    miNetNewRoomCreateButton->SetCode(MENU_CODE_TO_NET_SERVERS_MENU);
+
+    miNetNewRoomBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
+    miNetNewRoomBackButton->SetCode(MENU_CODE_TO_NET_NEW_ROOM_LEVEL_SELECT_MENU);
+
+    mNetNewRoom.AddControl(miNetNewRoomNameField, miNetNewRoomBackButton, miNetNewRoomPasswordField, NULL, NULL);
+    mNetNewRoom.AddControl(miNetNewRoomPasswordField, miNetNewRoomNameField, miNetNewRoomPrivateToggle, NULL, NULL);
+    mNetNewRoom.AddControl(miNetNewRoomPrivateToggle, miNetNewRoomPasswordField, miNetNewRoomCreateButton, NULL, NULL);
+    mNetNewRoom.AddControl(miNetNewRoomCreateButton, miNetNewRoomPrivateToggle, miNetNewRoomBackButton, NULL, NULL);
+    mNetNewRoom.AddControl(miNetNewRoomBackButton, miNetNewRoomCreateButton, miNetNewRoomNameField, NULL, NULL);
+
+    miNetNewRoomLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
+    miNetNewRoomRightHeaderBar = new MI_Image(&rm->menu_plain_field, smw->ScreenWidth/2, 0, 192, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
+    miNetNewRoomHeaderText = new MI_Text("New Room Settings Menu", smw->ScreenWidth/2, 5, 0, 2, 1);
+
+    mNetNewRoom.AddNonControl(miNetNewRoomLeftHeaderBar);
+    mNetNewRoom.AddNonControl(miNetNewRoomRightHeaderBar);
+    mNetNewRoom.AddNonControl(miNetNewRoomHeaderText);
+
+    mNetNewRoom.SetHeadControl(miNetNewRoomNameField);
+    mNetNewRoom.SetCancelCode(MENU_CODE_TO_NET_NEW_ROOM_LEVEL_SELECT_MENU);
+
+
     //***********************
     // Options Menu
     //***********************
@@ -1896,14 +1937,14 @@ void Menu::CreateMenu()
     //***********************
 
     miNetNewLevelContinueButton = new MI_Button(&rm->spr_selectfield, 70, 45, "Continue", 500, 0);
-    miNetNewLevelContinueButton->SetCode(MENU_CODE_TO_NET_SERVERS_MENU);
+    miNetNewLevelContinueButton->SetCode(MENU_CODE_TO_NET_NEW_ROOM_SETTINGS_MENU);
 
     //miNetNewLevelModeField = miModeField;
     /*for(short iGoalField = 0; iGoalField < GAMEMODE_LAST; iGoalField++)
         miNetNewLevelGoalField[iGoalField] = miGoalField[iGoalField];*/
 
-//mNetNewLevel.AddControl(miNetNewLevelContinueButton, miMapField, miModeField, NULL, NULL);
-    mNetNewLevel.AddControl(miNetNewLevelContinueButton, NULL, NULL, NULL, NULL);
+    mNetNewLevel.AddControl(miNetNewLevelContinueButton, miMapField, miModeField, NULL, NULL);
+    //mNetNewLevel.AddControl(miNetNewLevelContinueButton, NULL, NULL, NULL, NULL);
 
     //mNetNewLevel.AddControl(miNetNewLevelModeField, NULL, miNetNewLevelGoalField[0], NULL, NULL);
 
@@ -3029,6 +3070,9 @@ void Menu::RunMenu()
                 mCurrentMenu->ResetMenu();
             } else if (MENU_CODE_TO_NET_NEW_ROOM_LEVEL_SELECT_MENU == code) {
                 mCurrentMenu = &mNetNewLevel;
+                mCurrentMenu->ResetMenu();
+            } else if (MENU_CODE_TO_NET_NEW_ROOM_SETTINGS_MENU == code) {
+                mCurrentMenu = &mNetNewRoom;
                 mCurrentMenu->ResetMenu();
             } else if(MENU_CODE_NET_JOIN_ROOM_IN_PROGRESS == code) {
                 //netplay.client.sendConnectRequestToSelectedServer();
