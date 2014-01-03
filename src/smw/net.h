@@ -14,7 +14,7 @@
 #define NET_REQUEST_SERVERINFO              1
 #define NET_RESPONSE_SERVERINFO             2
 #define NET_RESPONSE_SERVER_MOTD            3 // Message of the Day
-#define NET_RESPONSE_BADPROTOCOL            4
+#define NET_RESPONSE_BADPROTOCOL            9
 
 #define NET_REQUEST_CONNECT                 10
 #define NET_RESPONSE_CONNECT_OK             11
