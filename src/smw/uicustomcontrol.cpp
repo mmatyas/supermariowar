@@ -4606,7 +4606,8 @@ MI_NetworkListScroll::MI_NetworkListScroll(gfxSprite * nspr, short x, short y, s
     iWidth = width;
     iNumLines = numlines;
 
-    iSelectedLine = 0;
+    iSelectedLine = -1;
+    iSelectedLineBackup = 0;
     iIndex = 0;
     iRemoteIndex = &iIndex;
     iOffset = 0;
@@ -4634,9 +4635,13 @@ void MI_NetworkListScroll::Add(const std::string& left, const std::string& right
     iBottomStop = items.size() - iNumLines + iTopStop;
 }
 
+// This function runs when the scroll gets focus.
 MenuCodeEnum MI_NetworkListScroll::Modify(bool modify)
 {
     fModifying = modify;
+    if (iSelectedLine == -1)
+        iSelectedLine = iSelectedLineBackup;
+
     return MENU_CODE_MODIFY_ACCEPTED;
 }
 
@@ -4660,14 +4665,20 @@ MenuCodeEnum MI_NetworkListScroll::SendInput(CPlayerInput * playerInput)
         }
 
         if(playerInput->outputControls[iPlayer].menu_left.fPressed) {
-            if (neighborControls[2])
+            if (neighborControls[2]) {
+                iSelectedLineBackup = iSelectedLine;
+                iSelectedLine = -1;
                 return MENU_CODE_UNSELECT_ITEM;
+            }
             return MENU_CODE_NONE;
         }
 
         if(playerInput->outputControls[iPlayer].menu_right.fPressed) {
-            if (neighborControls[3])
+            if (neighborControls[3]) {
+                iSelectedLineBackup = iSelectedLine;
+                iSelectedLine = -1;
                 return MENU_CODE_UNSELECT_ITEM;
+            }
             return MENU_CODE_NONE;
         }
 

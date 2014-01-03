@@ -343,22 +343,22 @@ void Menu::CreateMenu()
     // Multiplayer Room List Menu
     //****************************
 
-    miNetRoomsNewRoomButton = new MI_Button(&rm->spr_selectfield, smw->ScreenWidth * (3.0/5.0) + 10, 40, "New room", smw->ScreenWidth * (2.0/5.0) - 30, 1);
+    miNetRoomsNewRoomButton = new MI_Button(&rm->spr_selectfield, smw->ScreenWidth / 2 + 20, 80, "New room", smw->ScreenWidth / 2 - 30, 1);
     miNetRoomsNewRoomButton->SetCode(MENU_CODE_TO_NET_NEW_ROOM_LEVEL_SELECT_MENU);
 
-    miNetRoomsFilterField = new MI_TextField(&rm->menu_plain_field, smw->ScreenWidth * (3.0/5.0) + 10, 80, "Search", smw->ScreenWidth * (2.0/5.0) + 10, 90);
+    miNetRoomsFilterField = new MI_TextField(&rm->menu_plain_field, smw->ScreenWidth /2  + 20, 120, "Search", smw->ScreenWidth / 2 - 30, 90);
     miNetRoomsFilterField->SetData(netplay.roomfilter, NET_MAX_ROOM_NAME_LENGTH);
 
     miNetRoomsBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
     miNetRoomsBackButton->SetCode(MENU_CODE_TO_NET_SERVERS_MENU);
 
-    miNetRoomsScroll = new MI_NetworkListScroll(&rm->menu_plain_field, 10, 40, smw->ScreenWidth * (3.0/5.0), 11, "Rooms", MENU_CODE_TO_NET_ROOM_MENU, MENU_CODE_TO_NET_SERVERS_MENU);
-    miNetRoomsScroll->SetAutoModify(true);
+    miNetRoomsScroll = new MI_NetworkListScroll(&rm->menu_plain_field, 15, 40, smw->ScreenWidth / 2, 11, "Rooms", MENU_CODE_TO_NET_ROOM_MENU, MENU_CODE_TO_NET_SERVERS_MENU);
     miNetRoomsScroll->RemoteIndex(&netplay.selectedRoomIndex);
+    miNetRoomsScroll->SetAutoModify(true);
 
-    /*for (unsigned iRoom = 0; iServer < netplay.rooms.size(); iRoom++) {
+    /*for (unsigned iRoom = 0; iRoom < netplay.rooms.size(); iRoom++) {
         Room * room = &netplay.rooms[iRoom];
-        playercount to string
+        //playercount to string
         miNetServersScroll->Add(room->name, "");
     }*/
         miNetRoomsScroll->Add("Teszt", "2/4");

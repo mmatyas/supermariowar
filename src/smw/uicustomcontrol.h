@@ -752,6 +752,7 @@ class MI_NetworkListScroll : public UI_Control
         std::string sTitle;
         short iNumLines;
         short iSelectedLine;
+        short iSelectedLineBackup;
         unsigned short iIndex;
         unsigned short * iRemoteIndex;
         short iWidth;
