@@ -385,9 +385,6 @@ void Menu::CreateMenu()
         //playercount to string
         miNetServersScroll->Add(room->name, "");
     }*/
-        miNetLobbyScroll->Add("Teszt", "2/4");
-        miNetLobbyScroll->Add("J0in f4st FR3nZY", "0/4");
-        miNetLobbyScroll->Add("0123456789012345678901234567890", "K/4");
 
     miNetLobbyLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
     miNetLobbyRightHeaderBar = new MI_Image(&rm->menu_plain_field, smw->ScreenWidth/2, 0, 192, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
