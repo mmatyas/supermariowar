@@ -4618,7 +4618,7 @@ MI_NetworkListScroll::MI_NetworkListScroll(gfxSprite * nspr, short x, short y, s
     sTitle = title;
 
     iAcceptCode = acceptCode;
-    iCancelCode = acceptCode;
+    iCancelCode = cancelCode;
 }
 
 MI_NetworkListScroll::~MI_NetworkListScroll()

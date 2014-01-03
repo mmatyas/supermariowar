@@ -364,9 +364,18 @@ void Menu::CreateMenu()
     miNetLobbyBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
     miNetLobbyBackButton->SetCode(MENU_CODE_TO_NET_SERVERS_MENU);
 
-    miNetLobbyScroll = new MI_NetworkListScroll(&rm->menu_plain_field, 15, 40, smw->ScreenWidth / 2, 11, "Rooms", MENU_CODE_TO_NET_ROOM_MENU, MENU_CODE_TO_NET_SERVERS_MENU);
+    miNetLobbyScroll = new MI_NetworkListScroll(&rm->menu_plain_field, 15, 40, smw->ScreenWidth / 2, 11, "Rooms", MENU_CODE_NET_JOIN_ROOM_IN_PROGRESS, MENU_CODE_TO_NET_SERVERS_MENU);
     miNetLobbyScroll->RemoteIndex(&netplay.selectedRoomIndex);
     miNetLobbyScroll->SetAutoModify(true);
+
+    miNetLobbyJoiningDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
+    miNetLobbyJoiningDialogText = new MI_Text("Joining...", smw->ScreenWidth / 2, smw->ScreenHeight / 2 - 40, 0, 2, 1);
+    miNetLobbyJoiningDialogDebugButton = new MI_Button(&rm->spr_selectfield, smw->ScreenWidth / 2 - 100, 250, "[Debug] Next", 200, 1);
+    miNetLobbyJoiningDialogDebugButton->SetCode(MENU_CODE_TO_NET_ROOM_MENU);
+
+    miNetLobbyJoiningDialogImage->Show(false);
+    miNetLobbyJoiningDialogText->Show(false);
+    miNetLobbyJoiningDialogDebugButton->Show(false);
 
     /*for (unsigned iRoom = 0; iRoom < netplay.rooms.size(); iRoom++) {
         Room * room = &netplay.rooms[iRoom];
@@ -386,6 +395,10 @@ void Menu::CreateMenu()
     mNetLobby.AddControl(miNetLobbyFilterField, miNetLobbyNewRoomButton, miNetLobbyRefreshButton, miNetLobbyScroll, NULL);
     mNetLobby.AddControl(miNetLobbyRefreshButton, miNetLobbyFilterField, miNetLobbyBackButton, miNetLobbyScroll, NULL);
     mNetLobby.AddControl(miNetLobbyBackButton, miNetLobbyRefreshButton, miNetLobbyNewRoomButton, miNetLobbyScroll, NULL);
+
+    mNetLobby.AddNonControl(miNetLobbyJoiningDialogImage);
+    mNetLobby.AddNonControl(miNetLobbyJoiningDialogText);
+    mNetLobby.AddNonControl(miNetLobbyJoiningDialogDebugButton);
 
     mNetLobby.AddNonControl(miNetLobbyLeftHeaderBar);
     mNetLobby.AddNonControl(miNetLobbyRightHeaderBar);
@@ -3017,6 +3030,28 @@ void Menu::RunMenu()
             } else if (MENU_CODE_TO_NET_NEW_ROOM_LEVEL_SELECT_MENU == code) {
                 mCurrentMenu = &mNetNewLevel;
                 mCurrentMenu->ResetMenu();
+            } else if(MENU_CODE_NET_JOIN_ROOM_IN_PROGRESS == code) {
+                //netplay.client.sendConnectRequestToSelectedServer();
+                miNetLobbyJoiningDialogImage->Show(true);
+                miNetLobbyJoiningDialogText->Show(true);
+                miNetLobbyJoiningDialogDebugButton->Show(true);
+
+                printf("MENU_CODE_NET_JOIN_ROOM_IN_PROGRESS\n");
+                mNetLobby.RememberCurrent();
+                mNetLobby.SetHeadControl(miNetLobbyJoiningDialogDebugButton);
+                mNetLobby.SetCancelCode(MENU_CODE_NET_JOIN_ROOM_ABORT);
+                mNetLobby.ResetMenu();
+            } else if(MENU_CODE_NET_JOIN_ROOM_ABORT == code) {
+                miNetLobbyJoiningDialogImage->Show(false);
+                miNetLobbyJoiningDialogText->Show(false);
+                miNetLobbyJoiningDialogDebugButton->Show(false);
+
+                mNetLobby.SetHeadControl(miNetLobbyNewRoomButton);
+                mNetLobby.SetCancelCode(MENU_CODE_TO_NET_SERVERS_MENU);
+
+                printf("MENU_CODE_NET_JOIN_ROOM_ABORT\n");
+                mNetLobby.RestoreCurrent();
+                iDisplayError = DISPLAY_ERROR_NONE;
             }
 
             /*if (code != MENU_CODE_NONE)
