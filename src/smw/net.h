@@ -12,7 +12,8 @@
 
 #define NET_REQUEST_SERVERINFO              1
 #define NET_RESPONSE_SERVERINFO             2
-#define NET_RESPONSE_BADPROTOCOL            3
+#define NET_RESPONSE_SERVER_MOTD            3 // Message of the Day
+#define NET_RESPONSE_BADPROTOCOL            4
 
 #define NET_REQUEST_CONNECT                 10
 #define NET_RESPONSE_CONNECT_OK             11
@@ -119,7 +120,7 @@ class NetClient
         UDPpacket* udpIncomingPacket;
 
 
-        bool connect(const char* hostname, const uint16_t port = NET_SERVER_PORT);
+        bool openSocket(const char* hostname, const uint16_t port = NET_SERVER_PORT);
 
 		void closeUDPsocket();
         bool sendUDPMessage(const void* data, const int dataLength);

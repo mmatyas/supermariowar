@@ -413,7 +413,9 @@ class Menu
 		MI_TextField * miNetServersNicknameField;
 
 		MI_NetworkListScroll * miNetServersScroll;
-		//MI_Image * miNetServersConnectingDialogImage;
+		MI_Image * miNetServersConnectingDialogImage;
+		MI_Text * miNetServersConnectingDialogText;
+		MI_Button * miNetServersConnectingDialogDebugButton;
 		//MI_NetworkStatusDetector * miNetServersConnectionDetector;
 
 		MI_Button * miNetServersBackButton;
@@ -424,18 +426,23 @@ class Menu
 
 
 		//Multiplayer Room List Menu
-		UI_Menu mNetRooms;
+		UI_Menu mNetLobby;
 
-		MI_NetworkListScroll * miNetRoomsScroll;
+		MI_NetworkListScroll * miNetLobbyScroll;
 
-		MI_Button * miNetRoomsNewRoomButton;
-		MI_TextField * miNetRoomsFilterField;
+		MI_Button * miNetLobbyNewRoomButton;
+		MI_TextField * miNetLobbyFilterField;
+		MI_Button * miNetLobbyRefreshButton;
 
-		MI_Button * miNetRoomsBackButton;
+		MI_Image * miNetLobbyJoiningDialogImage;
+		MI_Text * miNetLobbyJoiningDialogText;
+		MI_Button * miNetLobbyJoiningDialogDebugButton;
 
-		MI_Image * miNetRoomsLeftHeaderBar;
-		MI_Image * miNetRoomsRightHeaderBar;
-		MI_Text * miNetRoomsHeaderText;
+		MI_Button * miNetLobbyBackButton;
+
+		MI_Image * miNetLobbyLeftHeaderBar;
+		MI_Image * miNetLobbyRightHeaderBar;
+		MI_Text * miNetLobbyHeaderText;
 
 
 		//Multiplayer New Room Menu

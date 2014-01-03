@@ -17,7 +17,7 @@ UI_Menu::~UI_Menu()
 	std::list<UI_Control*>::iterator iterateAll = controls.begin();
 	
     while (iterateAll != controls.end()) {
-		delete (*iterateAll);
+        delete (*iterateAll); // Can CRASH!
 		iterateAll++;
 	}
 

@@ -107,6 +107,10 @@ bool NetClient::init()
     return true;
 }
 
+/****************************
+    Building up
+****************************/
+
 bool NetClient::startSession()
 {
     printf("Session start.\n");
@@ -121,7 +125,7 @@ bool NetClient::startSession()
 bool NetClient::sendConnectRequestToSelectedServer()
 {
     ServerAddress* selectedServer = &netplay.savedServers[netplay.selectedServerIndex];
-    if ( connect(selectedServer->hostname.c_str()) )
+    if ( openSocket(selectedServer->hostname.c_str()) )
     {
         ClientConnectionPackage message;
         message.protocolVersion = NET_PROTOCOL_VERSION;
@@ -135,11 +139,11 @@ bool NetClient::sendConnectRequestToSelectedServer()
     return false;
 }
 
-bool NetClient::connect(const char* hostname, const uint16_t port)
+bool NetClient::openSocket(const char* hostname, const uint16_t port)
 {
     /* Resolve server address */
     netplay.connectSuccessful = false;
-    printf("Connecting to %s:%d...\n", hostname, port);
+    printf("Resolving %s:%d\n", hostname, port);
     if (SDLNet_ResolveHost(&serverIP, hostname, port) < 0) {
         if (serverIP.host == INADDR_NONE)
             fprintf(stderr, "[Error] Couldn't resolve hostname\n");
@@ -149,15 +153,21 @@ bool NetClient::connect(const char* hostname, const uint16_t port)
     }
 
     /* Open UDP socket */
-    udpSocket = SDLNet_UDP_Open(0);
     if (!udpSocket) {
-        fprintf(stderr, "[Error] SDLNet_UDP_Open: %s\n", SDLNet_GetError());
-        return false;
+        udpSocket = SDLNet_UDP_Open(0);
+        if (!udpSocket) {
+            fprintf(stderr, "[Error] SDLNet_UDP_Open: %s\n", SDLNet_GetError());
+            return false;
+        }
+        printf("[] UDP open.\n");
     }
-    printf("[] UDP open.\n");
 
     return true;
 }
+
+/****************************
+    Running
+****************************/
 
 void NetClient::requestRoomList()
 {
@@ -166,14 +176,11 @@ void NetClient::requestRoomList()
     msg.packageType = NET_REQUEST_ROOM_LIST;
 
     sendUDPMessage(&msg, sizeof(MessageHeader));
-    printf("Req. room list.\n");
 }
 
 void NetClient::update()
 {
     if (receiveUDPMessage()) {
-        printf("READY\n");
-
         uint8_t protocollVersion = udpIncomingPacket->data[0];
         uint8_t responseCode = udpIncomingPacket->data[1];
         if (protocollVersion == NET_PROTOCOL_VERSION) {
@@ -225,6 +232,10 @@ void NetClient::update()
         }
     }
 }
+
+/****************************
+    Building down
+****************************/
 
 void NetClient::endSession()
 {
