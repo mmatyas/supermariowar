@@ -13,6 +13,8 @@ class UI_Control
 {
 public:
     UI_Control(short x, short y);
+    UI_Control(const UI_Control&);
+    UI_Control & operator= (const UI_Control&);
     virtual ~UI_Control() {}
 
     virtual void Update() {}
