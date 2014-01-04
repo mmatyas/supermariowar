@@ -818,6 +818,7 @@ struct Networking {
     bool active;            // True if netplay code is currently running
     //bool networkErrorHappened;
     bool connectSuccessful;
+    bool joinSuccessful;
 
     char * hostaddress;
     char playername[NET_MAX_PLAYER_NAME_LENGTH];    // last byte will be \0
@@ -831,7 +832,8 @@ struct Networking {
 
     char roomfilter[NET_MAX_ROOM_NAME_LENGTH];
     unsigned short selectedRoomIndex;
-    std::vector<RoomEntry> currentRooms;
+    std::vector<RoomListEntry> currentRooms;
+    Room currentRoom;
 
     char newroom_name[NET_MAX_ROOM_NAME_LENGTH];
     char newroom_password[NET_MAX_ROOM_PASSWORD_LENGTH];

@@ -204,7 +204,7 @@ void NetClient::handleNewRoomListEntry()
     memcpy(&roomInfo, udpIncomingPacket->data, sizeof(RoomInfoPackage));
     printf("Room entry: %s (%d/4)\n", roomInfo.name, roomInfo.playerCount);
 
-    RoomEntry newRoom;
+    RoomListEntry newRoom;
     newRoom.name = roomInfo.name;
     newRoom.playerCount = roomInfo.playerCount;
     netplay.currentRooms.push_back(newRoom);

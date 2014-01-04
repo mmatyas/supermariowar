@@ -411,14 +411,13 @@ class Menu
 		MI_Button * miNetServersConnectButton;
 		MI_Button * miNetServersAddRemoveButton;
 		MI_TextField * miNetServersNicknameField;
+		MI_Button * miNetServersBackButton;
 
 		MI_NetworkListScroll * miNetServersScroll;
+
 		MI_Image * miNetServersConnectingDialogImage;
 		MI_Text * miNetServersConnectingDialogText;
 		MI_Button * miNetServersConnectingDialogDebugButton;
-		//MI_NetworkStatusDetector * miNetServersConnectionDetector;
-
-		MI_Button * miNetServersBackButton;
 
 		MI_Image * miNetServersLeftHeaderBar;
 		MI_Image * miNetServersRightHeaderBar;
@@ -433,12 +432,11 @@ class Menu
 		MI_Button * miNetLobbyNewRoomButton;
 		MI_TextField * miNetLobbyFilterField;
 		MI_Button * miNetLobbyRefreshButton;
+		MI_Button * miNetLobbyBackButton;
 
 		MI_Image * miNetLobbyJoiningDialogImage;
 		MI_Text * miNetLobbyJoiningDialogText;
 		MI_Button * miNetLobbyJoiningDialogDebugButton;
-
-		MI_Button * miNetLobbyBackButton;
 
 		MI_Image * miNetLobbyLeftHeaderBar;
 		MI_Image * miNetLobbyRightHeaderBar;
@@ -473,6 +471,27 @@ class Menu
 		MI_Image * miNetNewRoomLeftHeaderBar;
 		MI_Image * miNetNewRoomRightHeaderBar;
 		MI_Text * miNetNewRoomHeaderText;
+
+
+		//Multiplayer Room Menu
+		UI_Menu mNetRoom;
+
+		MI_Text * miNetRoomName;
+		MI_Text * miNetRoomPlayerName[4];
+		MI_ChatMessageBox * miNetRoomMessages;
+		MI_Image * miNetRoomMessagesPlaceholder;
+		MI_TextField * miNetRoomMessageField;
+		MI_Button * miNetRoomSendButton;
+		MI_Button * miNetRoomBackButton;
+
+		MI_Image * miNetRoomStartingDialogImage;
+		MI_Text * miNetRoomStartingDialogText;
+		MI_Button * miNetRoomStartingDialogDebugButton;
+
+		MI_Image * miNetRoomLeftHeaderBar;
+		MI_Image * miNetRoomRightHeaderBar;
+		MI_Text * miNetRoomHeaderText;
+
 
 
 		DisplayError iDisplayError;

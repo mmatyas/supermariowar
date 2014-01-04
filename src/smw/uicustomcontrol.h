@@ -789,5 +789,41 @@ class MI_NetworkListScroll : public UI_Control
 		uint8_t flagSuccessValue;
 };*/
 
+class ChatMessage
+{
+    public:
+
+        ChatMessage() {
+            playerName = "";
+            message = "";
+        }
+
+        ChatMessage(const std::string& name, const std::string& text) {
+            playerName = name;
+            message = text;
+        }
+
+        std::string playerName;
+        std::string message;
+        // time?
+};
+
+class MI_ChatMessageBox/* : public UI_Control */
+{
+    public:
+
+        MI_ChatMessageBox(/*gfxSprite * nspr, short x, short y, short width, short numlines*/) {}
+        virtual ~MI_ChatMessageBox() {}
+
+        //void Update();
+        //void Draw();
+
+    protected:
+
+        gfxSprite * spr;
+        std::vector<ChatMessage> messages;
+        short iNumLines;
+};
+
 #endif //__UICUSTOMCONTROL_H_
 

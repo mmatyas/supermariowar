@@ -464,6 +464,51 @@ void Menu::CreateMenu()
 
 
     //***********************
+    // Multiplayer Room Menu
+    //***********************
+
+    miNetRoomMessagesPlaceholder = new MI_Image(&rm->menu_plain_field, 20, 432 - 100, 0, 0, smw->ScreenWidth - 40, 100, 1, 1, 0);
+
+    miNetRoomMessageField = new MI_TextField(&rm->menu_plain_field, 26, 432, "Say", 464 - 36, 60);
+    miNetRoomMessageField->SetData(netplay.newroom_password, NET_MAX_ROOM_PASSWORD_LENGTH);
+
+    miNetRoomSendButton = new MI_Button(&rm->spr_selectfield, 464, 432, "Send", 80, 1);
+    miNetRoomSendButton->SetCode(MENU_CODE_NET_CHAT_SEND);
+
+    miNetRoomBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
+    miNetRoomBackButton->SetCode(MENU_CODE_TO_NET_LOBBY_MENU);
+
+    //mNetRoom.AddNonControl(miNetRoomMessagesPlaceholder);
+    mNetRoom.AddControl(miNetRoomMessageField, NULL, NULL, miNetRoomBackButton, miNetRoomSendButton);
+    mNetRoom.AddControl(miNetRoomSendButton, NULL, NULL, miNetRoomMessageField, miNetRoomBackButton);
+    mNetRoom.AddControl(miNetRoomBackButton, NULL, NULL, miNetRoomSendButton, miNetRoomMessageField);
+
+    miNetRoomStartingDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
+    miNetRoomStartingDialogText = new MI_Text("Starting...", smw->ScreenWidth / 2, smw->ScreenHeight / 2 - 40, 0, 2, 1);
+    miNetRoomStartingDialogDebugButton = new MI_Button(&rm->spr_selectfield, smw->ScreenWidth / 2 - 100, 250, "[Debug] Next", 200, 1);
+    miNetRoomStartingDialogDebugButton->SetCode(MENU_CODE_TO_NET_ROOM_MENU);
+
+    miNetRoomStartingDialogImage->Show(false);
+    miNetRoomStartingDialogText->Show(false);
+    miNetRoomStartingDialogDebugButton->Show(false);
+
+    mNetRoom.AddNonControl(miNetRoomStartingDialogImage);
+    mNetRoom.AddNonControl(miNetRoomStartingDialogText);
+    mNetRoom.AddControl(miNetRoomStartingDialogDebugButton, NULL, NULL, NULL, NULL);
+
+    miNetRoomLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
+    miNetRoomRightHeaderBar = new MI_Image(&rm->menu_plain_field, smw->ScreenWidth/2, 0, 192, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
+    miNetRoomHeaderText = new MI_Text("Multiplayer Room Menu", smw->ScreenWidth/2, 5, 0, 2, 1);
+
+    mNetRoom.AddNonControl(miNetRoomLeftHeaderBar);
+    mNetRoom.AddNonControl(miNetRoomRightHeaderBar);
+    mNetRoom.AddNonControl(miNetRoomHeaderText);
+
+    mNetRoom.SetHeadControl(miNetRoomMessageField);
+    mNetRoom.SetCancelCode(MENU_CODE_TO_NET_LOBBY_MENU);
+
+
+    //***********************
     // Options Menu
     //***********************
 
@@ -3089,6 +3134,9 @@ void Menu::RunMenu()
                 mCurrentMenu->ResetMenu();
             } else if (MENU_CODE_TO_NET_NEW_ROOM_SETTINGS_MENU == code) {
                 mCurrentMenu = &mNetNewRoom;
+                mCurrentMenu->ResetMenu();
+            } else if (MENU_CODE_TO_NET_ROOM_MENU == code) {
+                mCurrentMenu = &mNetRoom;
                 mCurrentMenu->ResetMenu();
             } else if(MENU_CODE_NET_JOIN_ROOM_IN_PROGRESS == code) {
                 //netplay.client.

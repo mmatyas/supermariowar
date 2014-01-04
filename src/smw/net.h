@@ -10,6 +10,7 @@
 #define NET_MAX_PLAYER_NAME_LENGTH          16
 #define NET_MAX_ROOM_NAME_LENGTH            32
 #define NET_MAX_ROOM_PASSWORD_LENGTH        16
+#define NET_MAX_CHAT_MSG_LENGTH             100
 
 #define NET_REQUEST_SERVERINFO              1
 #define NET_RESPONSE_SERVERINFO             2
@@ -56,9 +57,14 @@ struct ServerAddress {
     std::string    hostname;
 };
 
-struct RoomEntry {
+struct RoomListEntry {
     std::string    name;
     uint8_t        playerCount;
+};
+
+struct Room {
+    char            name[NET_MAX_ROOM_NAME_LENGTH];
+    char            playerNames[4][NET_MAX_PLAYER_NAME_LENGTH];
 };
 
 
