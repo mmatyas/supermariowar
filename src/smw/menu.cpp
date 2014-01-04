@@ -467,7 +467,7 @@ void Menu::CreateMenu()
     // Multiplayer Room Menu
     //***********************
 
-    miNetRoomMessagesPlaceholder = new MI_Image(&rm->menu_plain_field, 20, 432 - 100, 0, 0, smw->ScreenWidth - 40, 100, 1, 1, 0);
+    miNetRoomMessages = new MI_ChatMessageBox(20, 432 - 100, smw->ScreenWidth - 2 * 26, 1);
 
     miNetRoomMessageField = new MI_TextField(&rm->menu_plain_field, 26, 432, "Say", 464 - 36, 60);
     miNetRoomMessageField->SetData(netplay.newroom_password, NET_MAX_ROOM_PASSWORD_LENGTH);
@@ -478,7 +478,7 @@ void Menu::CreateMenu()
     miNetRoomBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
     miNetRoomBackButton->SetCode(MENU_CODE_TO_NET_LOBBY_MENU);
 
-    //mNetRoom.AddNonControl(miNetRoomMessagesPlaceholder);
+    mNetRoom.AddNonControl(miNetRoomMessages);
     mNetRoom.AddControl(miNetRoomMessageField, NULL, NULL, miNetRoomBackButton, miNetRoomSendButton);
     mNetRoom.AddControl(miNetRoomSendButton, NULL, NULL, miNetRoomMessageField, miNetRoomBackButton);
     mNetRoom.AddControl(miNetRoomBackButton, NULL, NULL, miNetRoomSendButton, miNetRoomMessageField);

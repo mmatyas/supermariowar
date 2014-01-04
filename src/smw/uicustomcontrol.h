@@ -763,32 +763,6 @@ class MI_NetworkListScroll : public UI_Control
         short iBottomStop;
 };
 
-/*class MI_NetworkStatusDetector : public UI_Control
-{
-	public:
-
-		MI_NetworkStatusDetector(short x, short y);
-		~MI_NetworkStatusDetector() {}
-
-		void AbortCode(MenuCodeEnum code);
-		void SuccessIfEqual(uint8_t* flag, uint8_t value);
-		void SuccessIfTrue(bool* flag);
-		void SuccessCode(MenuCodeEnum code);
-		void WaitingCode(MenuCodeEnum code);
-
-		MenuCodeEnum SendInput(CPlayerInput * playerInput);
-		void Update();
-
-	private:
-
-		MenuCodeEnum iAbortCode;
-		MenuCodeEnum iSuccessCode;
-		MenuCodeEnum iWaitingCode;
-
-		uint8_t* flagPointer;
-		uint8_t flagSuccessValue;
-};*/
-
 class ChatMessage
 {
     public:
@@ -808,21 +782,22 @@ class ChatMessage
         // time?
 };
 
-class MI_ChatMessageBox/* : public UI_Control */
+class MI_ChatMessageBox : public UI_Control
 {
     public:
 
-        MI_ChatMessageBox(/*gfxSprite * nspr, short x, short y, short width, short numlines*/) {}
+        MI_ChatMessageBox(short x, short y, short width, short numlines);
         virtual ~MI_ChatMessageBox() {}
 
         //void Update();
-        //void Draw();
+        void Draw();
 
     protected:
 
-        gfxSprite * spr;
         std::vector<ChatMessage> messages;
         short iNumLines;
+
+        short iWidth, iHeight;
 };
 
 #endif //__UICUSTOMCONTROL_H_

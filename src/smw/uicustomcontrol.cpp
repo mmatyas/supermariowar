@@ -4775,66 +4775,22 @@ void MI_NetworkListScroll::RemoteIndex(unsigned short * index)
     iRemoteIndex = index;
 }
 
-/**************/
+/**************************************
+ * MI_NetworkListScroll Class
+ **************************************/
 
-
-/*MI_NetworkStatusDetector::MI_NetworkStatusDetector(short x, short y) :
-    UI_Control(x, y)
+MI_ChatMessageBox::MI_ChatMessageBox(short x, short y, short width, short numlines)
+    : UI_Control(x, y)
 {
-    iAbortCode = MENU_CODE_NONE;
-    iSuccessCode = MENU_CODE_NONE;
-    iWaitingCode = MENU_CODE_NONE;
+    iWidth = width;
+    iNumLines = numlines;
+    //iHeight = iNumLines * 20;
 }
 
-void MI_NetworkStatusDetector::Update()
+void MI_ChatMessageBox::Draw()
 {
-    printf("update...\n");
+    rm->menu_dialog.draw(ix, iy, 0, 0, iWidth - 16, iNumLines * 32 + 32);
+    rm->menu_dialog.draw(ix + iWidth - 16, iy, 496, 0, 16, iNumLines * 32 + 32);
+    rm->menu_dialog.draw(ix, iy + iNumLines * 32 + 32, 0, 464, iWidth - 16, 16);
+    rm->menu_dialog.draw(ix + iWidth - 16, iy + iNumLines * 32 + 32, 496, 464, 16, 16);
 }
-
-MenuCodeEnum MI_NetworkStatusDetector::SendInput(CPlayerInput * playerInput)
-{
-    printf("MI_NetworkStatusDetector SendInput\n");
-    if (*flagPointer == flagSuccessValue)
-        return iSuccessCode;
-
-    for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
-        //Only allow the controlling team to control the menu (if there is one)
-        if(iControllingTeam != -1) {
-            if(iControllingTeam != LookupTeamID(iPlayer) || game_values.playercontrol[iPlayer] != 1)
-                continue;
-        }
-
-        if(playerInput->outputControls[iPlayer].menu_cancel.fPressed) {
-            return iAbortCode;
-        }
-    }
-
-    return iWaitingCode;
-}
-
-void MI_NetworkStatusDetector::AbortCode(MenuCodeEnum code)
-{
-    iAbortCode = code;
-}
-
-void MI_NetworkStatusDetector::SuccessCode(MenuCodeEnum code)
-{
-    iSuccessCode = code;
-}
-
-void MI_NetworkStatusDetector::WaitingCode(MenuCodeEnum code)
-{
-    iWaitingCode = code;
-}
-
-void MI_NetworkStatusDetector::SuccessIfEqual(uint8_t* flag, uint8_t value)
-{
-    flagPointer = flag;
-    flagSuccessValue = value;
-}
-
-void MI_NetworkStatusDetector::SuccessIfTrue(bool* flag)
-{
-    flagPointer = (uint8_t*)flag;
-    flagSuccessValue = 1;
-}*/
