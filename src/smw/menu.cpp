@@ -467,7 +467,23 @@ void Menu::CreateMenu()
     // Multiplayer Room Menu
     //***********************
 
+    miNetRoomName = new MI_Text("Room name here", 40, 50, 0, 2, 0);
+    miNetRoomPlayerName[0] = new MI_Text("P1 name here", 40, 110, 0, 2, 0);
+    miNetRoomPlayerName[1] = new MI_Text("P2 name here", 40, 160, 0, 2, 0);
+    miNetRoomPlayerName[2] = new MI_Text("P3 name here", 40, 210, 0, 2, 0);
+    miNetRoomPlayerName[3] = new MI_Text("P4 name here", 40, 250, 0, 2, 0);
+
+    mNetRoom.AddNonControl(miNetRoomName);
+    mNetRoom.AddNonControl(miNetRoomPlayerName[0]);
+    mNetRoom.AddNonControl(miNetRoomPlayerName[1]);
+    mNetRoom.AddNonControl(miNetRoomPlayerName[2]);
+    mNetRoom.AddNonControl(miNetRoomPlayerName[3]);
+
+    miNetRoomStartButton = new MI_Button(&rm->spr_selectfield, smw->ScreenWidth / 2, 300, "Start", smw->ScreenWidth / 2 - 40, 1);
+    miNetRoomStartButton->SetCode(MENU_CODE_NONE);
+
     miNetRoomMessages = new MI_ChatMessageBox(20, 432 - 100, smw->ScreenWidth - 2 * 26, 1);
+    miNetRoomMapPlaceholder = new MI_ChatMessageBox(smw->ScreenWidth / 2, 70, smw->ScreenWidth / 2 - 40, 5);
 
     miNetRoomMessageField = new MI_TextField(&rm->menu_plain_field, 26, 432, "Say", 464 - 36, 60);
     miNetRoomMessageField->SetData(netplay.newroom_password, NET_MAX_ROOM_PASSWORD_LENGTH);
@@ -479,9 +495,11 @@ void Menu::CreateMenu()
     miNetRoomBackButton->SetCode(MENU_CODE_TO_NET_LOBBY_MENU);
 
     mNetRoom.AddNonControl(miNetRoomMessages);
-    mNetRoom.AddControl(miNetRoomMessageField, NULL, NULL, miNetRoomBackButton, miNetRoomSendButton);
-    mNetRoom.AddControl(miNetRoomSendButton, NULL, NULL, miNetRoomMessageField, miNetRoomBackButton);
-    mNetRoom.AddControl(miNetRoomBackButton, NULL, NULL, miNetRoomSendButton, miNetRoomMessageField);
+    mNetRoom.AddNonControl(miNetRoomMapPlaceholder);
+    mNetRoom.AddControl(miNetRoomStartButton, miNetRoomMessageField, miNetRoomMessageField, miNetRoomMessageField, miNetRoomMessageField);
+    mNetRoom.AddControl(miNetRoomMessageField, miNetRoomStartButton, miNetRoomStartButton, miNetRoomBackButton, miNetRoomSendButton);
+    mNetRoom.AddControl(miNetRoomSendButton, miNetRoomStartButton, miNetRoomStartButton, miNetRoomMessageField, miNetRoomBackButton);
+    mNetRoom.AddControl(miNetRoomBackButton, miNetRoomStartButton, miNetRoomStartButton, miNetRoomSendButton, miNetRoomMessageField);
 
     miNetRoomStartingDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
     miNetRoomStartingDialogText = new MI_Text("Starting...", smw->ScreenWidth / 2, smw->ScreenHeight / 2 - 40, 0, 2, 1);
@@ -1661,7 +1679,7 @@ void Menu::CreateMenu()
     miModeSettingsButton = new MI_Button(&rm->spr_selectfield, 430, 125, "Settings", 140, 0);
     miModeSettingsButton->SetCode(MENU_CODE_TO_MODE_SETTINGS_MENU);
 
-    miMapField = new MI_MapField(&rm->spr_selectfield, 70, 165, "Map", 500, 120, true);
+    miMapField = new MI_MapField(&rm->spr_selectfield, 70, 165, "Map", 400, 120, true);
     szCurrentMapName = miMapField->GetMapName();
 
     miMapFiltersButton = new MI_Button(&rm->spr_selectfield, 430, 205, "Filters", 140, 0);

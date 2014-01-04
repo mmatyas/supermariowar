@@ -479,7 +479,9 @@ class Menu
 		MI_Text * miNetRoomName;
 		MI_Text * miNetRoomPlayerName[4];
 		MI_ChatMessageBox * miNetRoomMessages;
+		MI_ChatMessageBox * miNetRoomMapPlaceholder;
 		MI_TextField * miNetRoomMessageField;
+		MI_Button * miNetRoomStartButton;
 		MI_Button * miNetRoomSendButton;
 		MI_Button * miNetRoomBackButton;
 
