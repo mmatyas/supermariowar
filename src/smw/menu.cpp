@@ -341,6 +341,7 @@ void Menu::CreateMenu()
     mNetServers.AddNonControl(miNetServersConnectingDialogImage);
     mNetServers.AddNonControl(miNetServersConnectingDialogText);
     mNetServers.AddControl(miNetServersConnectingDialogDebugButton, NULL, NULL, NULL, NULL);
+
     mNetServers.AddControl(miNetServersScroll, NULL, NULL, NULL, NULL);
     //mNetServers.AddNonControl(miNetServersConnectingDialogImage);
     //mNetServers.AddControl(miNetServersConnectionDetector, NULL, NULL, NULL, NULL);
@@ -398,7 +399,7 @@ void Menu::CreateMenu()
 
     mNetLobby.AddNonControl(miNetLobbyJoiningDialogImage);
     mNetLobby.AddNonControl(miNetLobbyJoiningDialogText);
-    mNetLobby.AddNonControl(miNetLobbyJoiningDialogDebugButton);
+    mNetLobby.AddControl(miNetLobbyJoiningDialogDebugButton, NULL, NULL, NULL, NULL);
 
     mNetLobby.AddNonControl(miNetLobbyLeftHeaderBar);
     mNetLobby.AddNonControl(miNetLobbyRightHeaderBar);
@@ -426,7 +427,7 @@ void Menu::CreateMenu()
     miNetNewRoomPrivateToggle->SetAutoAdvance(true);
 
     miNetNewRoomCreateButton = new MI_Button(&rm->spr_selectfield, 70, 320, "Create!", smw->ScreenWidth - 2 * 70, 1);
-    miNetNewRoomCreateButton->SetCode(MENU_CODE_TO_NET_SERVERS_MENU);
+    miNetNewRoomCreateButton->SetCode(MENU_CODE_TO_NET_NEW_ROOM_CREATE_IN_PROGRESS);
 
     miNetNewRoomBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
     miNetNewRoomBackButton->SetCode(MENU_CODE_TO_NET_NEW_ROOM_LEVEL_SELECT_MENU);
@@ -436,6 +437,19 @@ void Menu::CreateMenu()
     mNetNewRoom.AddControl(miNetNewRoomPrivateToggle, miNetNewRoomPasswordField, miNetNewRoomCreateButton, NULL, NULL);
     mNetNewRoom.AddControl(miNetNewRoomCreateButton, miNetNewRoomPrivateToggle, miNetNewRoomBackButton, NULL, NULL);
     mNetNewRoom.AddControl(miNetNewRoomBackButton, miNetNewRoomCreateButton, miNetNewRoomNameField, NULL, NULL);
+
+    miNetNewRoomCreatingDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
+    miNetNewRoomCreatingDialogText = new MI_Text("Creating...", smw->ScreenWidth / 2, smw->ScreenHeight / 2 - 40, 0, 2, 1);
+    miNetNewRoomCreatingDialogDebugButton = new MI_Button(&rm->spr_selectfield, smw->ScreenWidth / 2 - 100, 250, "[Debug] Next", 200, 1);
+    miNetNewRoomCreatingDialogDebugButton->SetCode(MENU_CODE_TO_NET_ROOM_MENU);
+
+    miNetNewRoomCreatingDialogImage->Show(false);
+    miNetNewRoomCreatingDialogText->Show(false);
+    miNetNewRoomCreatingDialogDebugButton->Show(false);
+
+    mNetNewRoom.AddNonControl(miNetNewRoomCreatingDialogImage);
+    mNetNewRoom.AddNonControl(miNetNewRoomCreatingDialogText);
+    mNetNewRoom.AddControl(miNetNewRoomCreatingDialogDebugButton, NULL, NULL, NULL, NULL);
 
     miNetNewRoomLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
     miNetNewRoomRightHeaderBar = new MI_Image(&rm->menu_plain_field, smw->ScreenWidth/2, 0, 192, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
@@ -3077,7 +3091,7 @@ void Menu::RunMenu()
                 mCurrentMenu = &mNetNewRoom;
                 mCurrentMenu->ResetMenu();
             } else if(MENU_CODE_NET_JOIN_ROOM_IN_PROGRESS == code) {
-                //netplay.client.sendConnectRequestToSelectedServer();
+                //netplay.client.
                 miNetLobbyJoiningDialogImage->Show(true);
                 miNetLobbyJoiningDialogText->Show(true);
                 miNetLobbyJoiningDialogDebugButton->Show(true);
@@ -3097,6 +3111,28 @@ void Menu::RunMenu()
 
                 printf("MENU_CODE_NET_JOIN_ROOM_ABORT\n");
                 mNetLobby.RestoreCurrent();
+                iDisplayError = DISPLAY_ERROR_NONE;
+            } else if(MENU_CODE_TO_NET_NEW_ROOM_CREATE_IN_PROGRESS == code) {
+                //netplay.client.
+                miNetNewRoomCreatingDialogImage ->Show(true);
+                miNetNewRoomCreatingDialogText->Show(true);
+                miNetNewRoomCreatingDialogDebugButton->Show(true);
+
+                printf("MENU_CODE_TO_NET_NEW_ROOM_CREATE_IN_PROGRESS\n");
+                mNetNewRoom.RememberCurrent();
+                mNetNewRoom.SetHeadControl(miNetNewRoomCreatingDialogDebugButton);
+                mNetNewRoom.SetCancelCode(MENU_CODE_TO_NET_NEW_ROOM_CREATE_ABORT);
+                mNetNewRoom.ResetMenu();
+            } else if(MENU_CODE_TO_NET_NEW_ROOM_CREATE_ABORT == code) {
+                miNetNewRoomCreatingDialogImage->Show(false);
+                miNetNewRoomCreatingDialogText->Show(false);
+                miNetNewRoomCreatingDialogDebugButton->Show(false);
+
+                mNetNewRoom.SetHeadControl(miNetNewRoomNameField);
+                mNetNewRoom.SetCancelCode(MENU_CODE_TO_NET_NEW_ROOM_LEVEL_SELECT_MENU);
+
+                printf("MENU_CODE_TO_NET_NEW_ROOM_CREATE_ABORT\n");
+                mNetNewRoom.RestoreCurrent();
                 iDisplayError = DISPLAY_ERROR_NONE;
             }
 
