@@ -311,11 +311,11 @@ void NetClient::update()
                 //
                 // Join
                 //
-                case NET_RESPONSE_JOINED:
-                    printf("Not implemented: NET_RESPONSE_JOINED\n");
+                case NET_RESPONSE_JOIN_OK:
+                    printf("Not implemented: NET_RESPONSE_JOIN_OK\n");
                     break;
 
-                case NET_RESPONSE_ROOMFULL:
+                case NET_RESPONSE_ROOM_FULL:
                     printf("Not implemented: NET_RESPONSE_ROOMFULL\n");
                     break;
 

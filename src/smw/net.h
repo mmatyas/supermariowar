@@ -30,9 +30,9 @@
 
 #define NET_REQUEST_JOIN_ROOM               30
 #define NET_REQUEST_LEAVE_ROOM              31
-#define NET_RESPONSE_JOINED                 32
-#define NET_RESPONSE_ROOMFULL               33
-#define NET_NOTICE_ROOM_CHANGED             34
+#define NET_RESPONSE_JOIN_OK                32
+#define NET_RESPONSE_ROOM_FULL              33
+#define NET_NOTICE_ROOM_CHANGED             34 // + host quit?
 
 #define NET_REQUEST_CREATE_ROOM             40
 #define NET_RESPONSE_ROOM_CREATED           41
