@@ -18,11 +18,11 @@
 #define NET_RESPONSE_SERVER_MOTD            4 // Message of the Day
 
 #define NET_REQUEST_CONNECT                 10
-#define NET_RESPONSE_CONNECT_OK             11
-#define NET_RESPONSE_CONNECT_DENIED         12
-#define NET_RESPONSE_CONNECT_SERVERFULL     13
-#define NET_RESPONSE_CONNECT_NAMETAKEN      14
-#define NET_REQUEST_LEAVE_SERVER            19
+#define NET_REQUEST_LEAVE_SERVER            11
+#define NET_RESPONSE_CONNECT_OK             12
+#define NET_RESPONSE_CONNECT_DENIED         13
+#define NET_RESPONSE_CONNECT_SERVERFULL     14
+#define NET_RESPONSE_CONNECT_NAMETAKEN      15
 
 #define NET_REQUEST_ROOM_LIST               20
 #define NET_RESPONSE_NO_ROOMS               21

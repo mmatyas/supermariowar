@@ -262,21 +262,72 @@ void NetClient::update()
         if (protocollVersion == NET_PROTOCOL_VERSION) {
             switch (responseCode)
             {
+                //
+                // Query
+                //
+                case NET_RESPONSE_BADPROTOCOL:
+                    printf("Not implemented: NET_RESPONSE_BADPROTOCOL\n");
+                    break;
+
                 case NET_RESPONSE_SERVERINFO:
                     handleServerinfoAndClose();
                     break;
 
+                case NET_RESPONSE_SERVER_MOTD:
+                    printf("Not implemented: NET_RESPONSE_SERVER_MOTD\n");
+                    break;
+
+                //
+                // Connect
+                //
                 case NET_RESPONSE_CONNECT_OK:
                     printf("Connection attempt successful.\n");
                     netplay.connectSuccessful = true;
                     break;
 
+                case NET_RESPONSE_CONNECT_DENIED:
+                    printf("Not implemented: NET_RESPONSE_CONNECT_DENIED\n");
+                    break;
+
+                case NET_RESPONSE_CONNECT_SERVERFULL:
+                    printf("Not implemented: NET_RESPONSE_CONNECT_SERVERFULL\n");
+                    break;
+
+                case NET_RESPONSE_CONNECT_NAMETAKEN:
+                    printf("Not implemented: NET_RESPONSE_CONNECT_NAMETAKEN\n");
+                    break;
+
+                //
+                // Rooms
+                //
                 case NET_RESPONSE_ROOM_LIST_ENTRY:
                     handleNewRoomListEntry();
                     break;
 
                 case NET_RESPONSE_NO_ROOMS:
                     printf("There are no rooms currently on the server.\n");
+                    break;
+
+                //
+                // Join
+                //
+                case NET_RESPONSE_JOINED:
+                    printf("Not implemented: NET_RESPONSE_JOINED\n");
+                    break;
+
+                case NET_RESPONSE_ROOMFULL:
+                    printf("Not implemented: NET_RESPONSE_ROOMFULL\n");
+                    break;
+
+                //
+                // Create
+                //
+                case NET_RESPONSE_ROOM_CREATED:
+                    printf("Not implemented: NET_RESPONSE_ROOM_CREATED\n");
+                    break;
+
+                case NET_RESPONSE_CREATE_ERROR:
+                    printf("Not implemented: NET_RESPONSE_CREATE_ERROR\n");
                     break;
 
                 default:
