@@ -13,9 +13,9 @@
 #define NET_MAX_CHAT_MSG_LENGTH             100
 
 #define NET_REQUEST_SERVERINFO              1
-#define NET_RESPONSE_SERVERINFO             2
-#define NET_RESPONSE_SERVER_MOTD            3 // Message of the Day
-#define NET_RESPONSE_BADPROTOCOL            9
+#define NET_RESPONSE_BADPROTOCOL            2
+#define NET_RESPONSE_SERVERINFO             3
+#define NET_RESPONSE_SERVER_MOTD            4 // Message of the Day
 
 #define NET_REQUEST_CONNECT                 10
 #define NET_RESPONSE_CONNECT_OK             11
@@ -29,8 +29,14 @@
 #define NET_RESPONSE_ROOM_LIST_ENTRY        22
 
 #define NET_REQUEST_JOIN_ROOM               30
-#define NET_RESPONSE_ROOMFULL               31
-#define NET_REQUEST_LEAVE_ROOM              39
+#define NET_REQUEST_LEAVE_ROOM              31
+#define NET_RESPONSE_JOINED                 32
+#define NET_RESPONSE_ROOMFULL               33
+#define NET_NOTICE_ROOM_CHANGED             34
+
+#define NET_REQUEST_CREATE_ROOM             40
+#define NET_RESPONSE_ROOM_CREATED           41
+#define NET_RESPONSE_CREATE_ERROR           42 // TODO: What kind of error?
 
 
 //Write network handler class here
@@ -58,13 +64,15 @@ struct ServerAddress {
 };
 
 struct RoomListEntry {
+    uint32_t       roomID;
     std::string    name;
     uint8_t        playerCount;
 };
 
 struct Room {
-    char            name[NET_MAX_ROOM_NAME_LENGTH];
-    char            playerNames[4][NET_MAX_PLAYER_NAME_LENGTH];
+    uint32_t       roomID;
+    char           name[NET_MAX_ROOM_NAME_LENGTH];
+    char           playerNames[4][NET_MAX_PLAYER_NAME_LENGTH];
 };
 
 
@@ -86,6 +94,7 @@ struct ClientConnectionPackage: MessageHeader {
 };
 
 struct RoomInfoPackage : MessageHeader {
+    uint32_t       roomID;
     char           name[NET_MAX_ROOM_NAME_LENGTH];
     uint8_t        playerCount;
     bool           passwordRequired;
@@ -93,6 +102,19 @@ struct RoomInfoPackage : MessageHeader {
 
 struct NewRoomPackage : MessageHeader {
     char           name[NET_MAX_ROOM_NAME_LENGTH];
+    char           password[NET_MAX_ROOM_PASSWORD_LENGTH];
+    bool           privateRoom;
+};
+
+struct JoinRoomPackage : MessageHeader {
+    uint32_t       roomID;
+    char           password[NET_MAX_ROOM_PASSWORD_LENGTH];
+};
+
+struct CurrentRoomPackage : MessageHeader {
+    uint32_t       roomID;
+    char           name[NET_MAX_ROOM_NAME_LENGTH];
+    char           playerName[4][NET_MAX_PLAYER_NAME_LENGTH];
 };
 
 
@@ -108,6 +130,9 @@ class NetClient
 		void update();
 
         bool sendConnectRequestToSelectedServer();
+        void sendCreateRoomMessage();
+        void sendJoinRoomMessage();
+        void sendLeaveRoomMessage();
 
         // called on network session start/end
 		bool startSession();

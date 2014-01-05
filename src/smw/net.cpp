@@ -127,23 +127,6 @@ bool NetClient::startSession()
     return true;
 }
 
-bool NetClient::sendConnectRequestToSelectedServer()
-{
-    ServerAddress* selectedServer = &netplay.savedServers[netplay.selectedServerIndex];
-    if ( openSocket(selectedServer->hostname.c_str()) )
-    {
-        ClientConnectionPackage message;
-        message.protocolVersion = NET_PROTOCOL_VERSION;
-        message.packageType = NET_REQUEST_CONNECT;
-        memcpy(message.playerName, netplay.playername, NET_MAX_PLAYER_NAME_LENGTH);
-        message.playerName[NET_MAX_PLAYER_NAME_LENGTH - 1] = '\0';
-
-        sendUDPMessage(&message, sizeof(ClientConnectionPackage));
-        return true;
-    }
-    return false;
-}
-
 bool NetClient::openSocket(const char* hostname, const uint16_t port)
 {
     /* Resolve server address */
@@ -186,6 +169,61 @@ void NetClient::requestRoomList()
         uiRoomList->Clear();
 }
 
+bool NetClient::sendConnectRequestToSelectedServer()
+{
+    ServerAddress* selectedServer = &netplay.savedServers[netplay.selectedServerIndex];
+    if ( openSocket(selectedServer->hostname.c_str()) )
+    {
+        ClientConnectionPackage message;
+        message.protocolVersion = NET_PROTOCOL_VERSION;
+        message.packageType = NET_REQUEST_CONNECT;
+        memcpy(message.playerName, netplay.playername, NET_MAX_PLAYER_NAME_LENGTH);
+        message.playerName[NET_MAX_PLAYER_NAME_LENGTH - 1] = '\0';
+
+        sendUDPMessage(&message, sizeof(ClientConnectionPackage));
+        return true;
+    }
+    return false;
+}
+
+void NetClient::sendCreateRoomMessage()
+{
+    NewRoomPackage message;
+    message.protocolVersion = NET_PROTOCOL_VERSION;
+    message.packageType = NET_REQUEST_CREATE_ROOM;
+
+    memcpy(message.name, netplay.newroom_name, NET_MAX_ROOM_NAME_LENGTH);
+    message.name[NET_MAX_PLAYER_NAME_LENGTH - 1] = '\0';
+
+    memcpy(message.password, netplay.newroom_password, NET_MAX_ROOM_PASSWORD_LENGTH);
+    message.password[NET_MAX_PLAYER_NAME_LENGTH - 1] = '\0';
+
+    message.privateRoom = netplay.newroom_private;
+
+    sendUDPMessage(&message, sizeof(NewRoomPackage));
+}
+
+void NetClient::sendJoinRoomMessage()
+{
+    JoinRoomPackage message;
+    message.protocolVersion = NET_PROTOCOL_VERSION;
+    message.packageType = NET_REQUEST_JOIN_ROOM;
+
+    message.roomID = netplay.currentRooms[netplay.selectedRoomIndex].roomID;
+    message.password[0] = '\0'; // TODO: implement
+
+    sendUDPMessage(&message, sizeof(MessageHeader));
+}
+
+void NetClient::sendLeaveRoomMessage()
+{
+    MessageHeader message;
+    message.protocolVersion = NET_PROTOCOL_VERSION;
+    message.packageType = NET_REQUEST_LEAVE_ROOM;
+
+    sendUDPMessage(&message, sizeof(MessageHeader));
+}
+
 void NetClient::handleServerinfoAndClose()
 {
     ServerInfoPackage serverInfo;
@@ -205,6 +243,7 @@ void NetClient::handleNewRoomListEntry()
     printf("Room entry: %s (%d/4)\n", roomInfo.name, roomInfo.playerCount);
 
     RoomListEntry newRoom;
+    newRoom.roomID = roomInfo.roomID;
     newRoom.name = roomInfo.name;
     newRoom.playerCount = roomInfo.playerCount;
     netplay.currentRooms.push_back(newRoom);
@@ -241,9 +280,10 @@ void NetClient::update()
                     break;
 
                 default:
-                    printf("Unknown:\n");
+                    printf("Unknown: ");
                     for (int a = 0; a < udpIncomingPacket->len; a++)
                         printf("%3d ", udpIncomingPacket->data[a]);
+                    printf("\n");
                     break;
             }
 
