@@ -106,6 +106,10 @@ struct NewRoomPackage : MessageHeader {
     bool           privateRoom;
 };
 
+struct NewRoomCreatedPackage : MessageHeader {
+    uint32_t       roomID;
+};
+
 struct JoinRoomPackage : MessageHeader {
     uint32_t       roomID;
     char           password[NET_MAX_ROOM_PASSWORD_LENGTH];
@@ -165,6 +169,7 @@ class NetClient
 
         void handleServerinfoAndClose();
         void handleNewRoomListEntry();
+        void handleRoomCreatedMessage();
 
         void sendGoodbye();
 };

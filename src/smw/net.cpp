@@ -35,6 +35,10 @@ bool net_init()
     localhost.hostname = "localhost";
     netplay.savedServers.push_back(localhost);
 
+    ServerAddress szaz;
+    szaz.hostname = "192.168.1.100";
+    netplay.savedServers.push_back(szaz);
+
     net_loadServerList();
 
     printf("Network system initialized.\n");
@@ -254,6 +258,21 @@ void NetClient::handleNewRoomListEntry()
     }
 }
 
+void NetClient::handleRoomCreatedMessage()
+{
+    NewRoomCreatedPackage pkg;
+    memcpy(&pkg, udpIncomingPacket->data, sizeof(NewRoomCreatedPackage));
+
+    netplay.currentRoom.roomID = pkg.roomID;
+    memcpy(netplay.currentRoom.name, netplay.newroom_name, NET_MAX_ROOM_NAME_LENGTH);
+    memcpy(netplay.currentRoom.playerNames[0], netplay.playername, NET_MAX_PLAYER_NAME_LENGTH);
+    memcpy(netplay.currentRoom.playerNames[1], "(empty)", NET_MAX_PLAYER_NAME_LENGTH);
+    memcpy(netplay.currentRoom.playerNames[2], "(empty)", NET_MAX_PLAYER_NAME_LENGTH);
+    memcpy(netplay.currentRoom.playerNames[3], "(empty)", NET_MAX_PLAYER_NAME_LENGTH);
+
+    printf("Room created, ID: %u, %d\n", pkg.roomID, pkg.roomID);
+}
+
 void NetClient::update()
 {
     if (receiveUDPMessage()) {
@@ -319,11 +338,15 @@ void NetClient::update()
                     printf("Not implemented: NET_RESPONSE_ROOMFULL\n");
                     break;
 
+                case NET_NOTICE_ROOM_CHANGED:
+                    printf("Not implemented: NET_NOTICE_ROOM_CHANGED\n");
+                    break;
+
                 //
                 // Create
                 //
                 case NET_RESPONSE_ROOM_CREATED:
-                    printf("Not implemented: NET_RESPONSE_ROOM_CREATED\n");
+                    handleRoomCreatedMessage();
                     break;
 
                 case NET_RESPONSE_CREATE_ERROR:
