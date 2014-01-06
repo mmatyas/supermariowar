@@ -12,8 +12,8 @@ option(DEBUG "Compile with debugging information" OFF)
 option(USE_PNG_SAVE "Enable PNG save feature" OFF)
 
 # version number
-set(SMW_VERSION_MAJOR "1")
-set(SMW_VERSION_MINOR "9")
+set(SMW_VERSION_MAJOR "2")
+set(SMW_VERSION_MINOR "0")
 set(SMW_VERSION_PATCH "0")
 
 ########################################
@@ -352,12 +352,12 @@ add_subdirectory(src/worldeditor)
 
 # packaging information
 set(CPACK_PACKAGE_NAME "smw")
-set(CPACK_PACKAGE_VENDOR "neagix")
+set(CPACK_PACKAGE_VENDOR "72dpiarmy")
 set(CPACK_PACKAGE_VERSION_MAJOR ${SMW_VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${SMW_VERSION_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH ${SMW_VERSION_PATCH})
 set(CPACK_PACKAGE_DESCRIPTION_FILE ${PROJECT_SOURCE_DIR}/src/cpack/package_description.txt)
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "SMW, arcade platform multiplayer game")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Super Mario War, arcade platform multiplayer game")
 
 set(CPACK_RPM_PACKAGE_GROUP Amusements/Games)
 set(CPACK_RPM_PACKAGE_LICENSE GPL-2.0)
