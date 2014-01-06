@@ -35,9 +35,9 @@ bool net_init()
     localhost.hostname = "localhost";
     netplay.savedServers.push_back(localhost);
 
-    ServerAddress szaz;
-    szaz.hostname = "192.168.1.100";
-    netplay.savedServers.push_back(szaz);
+    /*ServerAddress rpi;
+    rpi.hostname = "192.168.1.103";
+    netplay.savedServers.push_back(rpi);*/
 
     net_loadServerList();
 
@@ -53,7 +53,7 @@ void net_close()
 void net_saveServerList()
 {
     FILE * fp = OpenFile("servers.bin", "wb");
-    if(fp) {
+    if (fp) {
         fwrite(g_iVersion, sizeof(int), 4, fp);
 
         // Don't save "(none)"
@@ -158,7 +158,7 @@ bool NetClient::openSocket(const char* hostname, const uint16_t port)
 }
 
 /****************************
-    Running
+    Outgoing messages
 ****************************/
 
 void NetClient::requestRoomList()
@@ -216,7 +216,7 @@ void NetClient::sendJoinRoomMessage()
     message.roomID = netplay.currentRooms[netplay.selectedRoomIndex].roomID;
     message.password[0] = '\0'; // TODO: implement
 
-    sendUDPMessage(&message, sizeof(MessageHeader));
+    sendUDPMessage(&message, sizeof(JoinRoomPackage));
 }
 
 void NetClient::sendLeaveRoomMessage()
@@ -227,6 +227,10 @@ void NetClient::sendLeaveRoomMessage()
 
     sendUDPMessage(&message, sizeof(MessageHeader));
 }
+
+/****************************
+    Incoming messages
+****************************/
 
 void NetClient::handleServerinfoAndClose()
 {
@@ -244,7 +248,7 @@ void NetClient::handleNewRoomListEntry()
 {
     RoomInfoPackage roomInfo;
     memcpy(&roomInfo, udpIncomingPacket->data, sizeof(RoomInfoPackage));
-    printf("Room entry: %s (%d/4)\n", roomInfo.name, roomInfo.playerCount);
+    printf("  Incoming room entry: [%u] %s (%d/4)\n", roomInfo.roomID, roomInfo.name, roomInfo.playerCount);
 
     RoomListEntry newRoom;
     newRoom.roomID = roomInfo.roomID;

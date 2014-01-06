@@ -838,6 +838,8 @@ struct Networking {
     char newroom_name[NET_MAX_ROOM_NAME_LENGTH];
     char newroom_password[NET_MAX_ROOM_PASSWORD_LENGTH];
     bool newroom_private;
+
+    char mychatmessage[NET_MAX_CHAT_MSG_LENGTH];
 };
 
 //TODO:: Move menu settings from game_values to global menu context structure

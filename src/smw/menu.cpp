@@ -484,7 +484,7 @@ void Menu::CreateMenu()
     miNetRoomMapPlaceholder = new MI_ChatMessageBox(smw->ScreenWidth / 2, 70, smw->ScreenWidth / 2 - 40, 5);
 
     miNetRoomMessageField = new MI_TextField(&rm->menu_plain_field, 26, 432, "Say", 464 - 36, 60);
-    miNetRoomMessageField->SetData(netplay.newroom_password, NET_MAX_ROOM_PASSWORD_LENGTH);
+    miNetRoomMessageField->SetData(netplay.mychatmessage, NET_MAX_ROOM_PASSWORD_LENGTH);
 
     miNetRoomSendButton = new MI_Button(&rm->spr_selectfield, 464, 432, "Send", 80, 1);
     miNetRoomSendButton->SetCode(MENU_CODE_NET_CHAT_SEND);
