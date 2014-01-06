@@ -73,6 +73,12 @@ struct Room {
     uint32_t       roomID;
     char           name[NET_MAX_ROOM_NAME_LENGTH];
     char           playerNames[4][NET_MAX_PLAYER_NAME_LENGTH];
+
+    Room() {
+        name[0] = '\0';
+        for (uint8_t p = 0; p < 4; p++)
+            playerNames[p][0] = '\0';
+    }
 };
 
 
@@ -170,6 +176,7 @@ class NetClient
         void handleServerinfoAndClose();
         void handleNewRoomListEntry();
         void handleRoomCreatedMessage();
+        void handleRoomChangedMessage();
 
         void sendGoodbye();
 };

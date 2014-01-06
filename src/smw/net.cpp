@@ -277,6 +277,21 @@ void NetClient::handleRoomCreatedMessage()
     printf("Room created, ID: %u, %d\n", pkg.roomID, pkg.roomID);
 }
 
+void NetClient::handleRoomChangedMessage()
+{
+    CurrentRoomPackage pkg;
+    memcpy(&pkg, udpIncomingPacket->data, sizeof(CurrentRoomPackage));
+
+    netplay.currentRoom.roomID = pkg.roomID;
+    memcpy(netplay.currentRoom.name, pkg.name, NET_MAX_ROOM_NAME_LENGTH);
+
+    printf("Room %u (%s) changed:\n", pkg.roomID, pkg.name);
+    for (uint8_t p = 0; p < 4; p++) {
+        memcpy(netplay.currentRoom.playerNames[p], pkg.playerName[p], NET_MAX_PLAYER_NAME_LENGTH);
+        printf("  player %d: %s\n", p+1, netplay.currentRoom.playerNames[p]);
+    }
+}
+
 void NetClient::update()
 {
     if (receiveUDPMessage()) {
@@ -343,7 +358,7 @@ void NetClient::update()
                     break;
 
                 case NET_NOTICE_ROOM_CHANGED:
-                    printf("Not implemented: NET_NOTICE_ROOM_CHANGED\n");
+                    handleRoomChangedMessage();
                     break;
 
                 //
