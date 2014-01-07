@@ -3109,6 +3109,9 @@ void Menu::RunMenu()
                 mNetServers.SetCancelCode(MENU_CODE_NONE);
                 mNetServers.ResetMenu();
             } else if(MENU_CODE_NET_SERVERLIST_EXIT == code || MENU_CODE_NET_CONNECT_ABORT == code) {
+                if (MENU_CODE_NET_SERVERLIST_EXIT == code)
+                    netplay.currentMenuChanged = true;
+
                 miNetServersScroll->Show(false);
                 miNetServersConnectingDialogImage->Show(false);
                 miNetServersConnectingDialogText->Show(false);
@@ -3181,7 +3184,7 @@ void Menu::RunMenu()
                 mCurrentMenu->ResetMenu();
             } else if (MENU_CODE_TO_NET_ROOM_MENU == code) {
 
-                // modify fields
+                netplay.currentMenuChanged = true;
 
 
                 mCurrentMenu = &mNetRoom;
@@ -3241,6 +3244,21 @@ void Menu::RunMenu()
 
         if (netplay.active) {
             netplay.client.update();
+
+            // on room change
+            if (netplay.currentMenuChanged) {
+
+                // Servers screen
+                const char* nethostname = netplay.savedServers[netplay.selectedServerIndex].hostname.c_str();
+                miNetServersSelectedHostText->SetText(nethostname);
+
+                // Room screen
+                miNetRoomName->SetText(netplay.currentRoom.name);
+                for (uint8_t p = 0; p < 4; p++)
+                    miNetRoomPlayerName[0]->SetText(netplay.currentRoom.playerNames[0]);
+
+                netplay.currentMenuChanged = false;
+            }
 
             // ide a hibakezelést
             // if lastmessage ez és lastresponse emez

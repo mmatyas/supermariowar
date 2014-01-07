@@ -275,6 +275,7 @@ void NetClient::handleRoomCreatedMessage()
     memcpy(netplay.currentRoom.playerNames[3], "(empty)", NET_MAX_PLAYER_NAME_LENGTH);
 
     printf("Room created, ID: %u, %d\n", pkg.roomID, pkg.roomID);
+    netplay.currentMenuChanged = true;
 }
 
 void NetClient::handleRoomChangedMessage()

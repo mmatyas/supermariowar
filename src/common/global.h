@@ -820,6 +820,8 @@ struct Networking {
     bool connectSuccessful;
     bool joinSuccessful;
 
+    bool currentMenuChanged;
+
     char * hostaddress;
     char playername[NET_MAX_PLAYER_NAME_LENGTH];    // last byte will be \0
 
