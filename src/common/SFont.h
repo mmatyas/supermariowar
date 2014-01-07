@@ -37,7 +37,7 @@
 #ifndef SFONT_H
 #define SFONT_H
 
-#include "SDL.h"
+#include <SDL/SDL.h>
 
 #ifdef __cplusplus 
 extern "C" {
