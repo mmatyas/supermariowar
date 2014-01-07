@@ -36,6 +36,10 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
+#ifdef _MSC_VER
+#include <crtdbg.h>
+#endif
+
 #endif
 #endif
 
@@ -484,10 +488,12 @@ gv game_values;
 #ifdef	WIN32
 int CALLBACK WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,int nCmdShow)
 {
-	// this will print important debugging information to debug console
-	_CrtSetReportMode( _CRT_WARN, _CRTDBG_MODE_DEBUG );
-	
-	RootDataDirectory = lpCmdLine;
+#ifdef _MSC_VER
+    // this will print important debugging information to debug console
+    _CrtSetReportMode( _CRT_WARN, _CRTDBG_MODE_DEBUG );
+#endif
+
+    RootDataDirectory = lpCmdLine;
 
     if (strlen(RootDataDirectory) == 0) {
         fprintf(stderr, "Please specify root data directory\n");

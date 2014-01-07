@@ -8,7 +8,7 @@
 		#include <xtl.h>
 	#else
 		#include <shlobj.h>
-		#include <SDL_platform.h>
+		#include <SDL/SDL_platform.h>
 	#endif
 #else
 #include <stdlib.h>
