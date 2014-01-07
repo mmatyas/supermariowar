@@ -4642,6 +4642,7 @@ void MI_NetworkListScroll::Clear()
     iSelectedLine = -1;
     iSelectedLineBackup = 0;
     iOffset = 0;
+    *iRemoteIndex = 0;
 }
 
 // This function runs when the scroll gets focus.

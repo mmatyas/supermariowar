@@ -209,11 +209,14 @@ void NetClient::sendCreateRoomMessage()
 
 void NetClient::sendJoinRoomMessage()
 {
+    if (netplay.selectedRoomIndex >= netplay.currentRooms.size())
+        return;
+
     JoinRoomPackage message;
     message.protocolVersion = NET_PROTOCOL_VERSION;
     message.packageType = NET_REQUEST_JOIN_ROOM;
 
-    message.roomID = netplay.currentRooms[netplay.selectedRoomIndex].roomID;
+    message.roomID = netplay.currentRooms.at(netplay.selectedRoomIndex).roomID;
     message.password[0] = '\0'; // TODO: implement
 
     sendUDPMessage(&message, sizeof(JoinRoomPackage));

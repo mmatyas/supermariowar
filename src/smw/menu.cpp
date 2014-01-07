@@ -3176,9 +3176,9 @@ void Menu::RunMenu()
                     // Temp.: Set dummy values to room fields.
                         netplay.currentRoom.name[0] = '\0';
                         netplay.currentRoom.playerNames[0][0] = '\0';
-                        netplay.currentRoom.playerNames[0][1] = '\0';
-                        netplay.currentRoom.playerNames[0][2] = '\0';
-                        netplay.currentRoom.playerNames[0][3] = '\0';
+                        netplay.currentRoom.playerNames[1][0] = '\0';
+                        netplay.currentRoom.playerNames[2][0] = '\0';
+                        netplay.currentRoom.playerNames[3][0] = '\0';
 
                     mCurrentMenu = &mNetLobby;
                     mCurrentMenu->ResetMenu();
