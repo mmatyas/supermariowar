@@ -417,7 +417,6 @@ class Menu
 
 		MI_Image * miNetServersConnectingDialogImage;
 		MI_Text * miNetServersConnectingDialogText;
-		MI_Button * miNetServersConnectingDialogDebugButton;
 
 		MI_Image * miNetServersLeftHeaderBar;
 		MI_Image * miNetServersRightHeaderBar;
@@ -436,7 +435,6 @@ class Menu
 
 		MI_Image * miNetLobbyJoiningDialogImage;
 		MI_Text * miNetLobbyJoiningDialogText;
-		MI_Button * miNetLobbyJoiningDialogDebugButton;
 
 		MI_Image * miNetLobbyLeftHeaderBar;
 		MI_Image * miNetLobbyRightHeaderBar;
@@ -466,7 +464,6 @@ class Menu
 
 		MI_Image * miNetNewRoomCreatingDialogImage;
 		MI_Text * miNetNewRoomCreatingDialogText;
-		MI_Button * miNetNewRoomCreatingDialogDebugButton;
 
 		MI_Image * miNetNewRoomLeftHeaderBar;
 		MI_Image * miNetNewRoomRightHeaderBar;

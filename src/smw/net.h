@@ -1,8 +1,8 @@
 #ifndef __NETWORK_H_
 #define __NETWORK_H_
 
-#include "SDL.h"
-#include "SDL_net.h"
+#include <SDL/SDL.h>
+#include <SDL/SDL_net.h>
 
 #define NET_PROTOCOL_VERSION                1
 #define NET_MAX_MESSAGE_SIZE                128

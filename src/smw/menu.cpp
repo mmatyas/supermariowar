@@ -3089,30 +3089,23 @@ void Menu::RunMenu()
             if (netplay.active) {
 
                 if (netplay.operationInProgress) {
-                    printf("waiting for ");
                     MenuCodeEnum previousCode = code;
 
                     uint8_t lastSendType = netplay.lastSentMessage.packageType;
                     uint8_t lastRecvType = netplay.lastReceivedMessage.packageType;
 
-                    if (lastSendType == NET_REQUEST_CONNECT && lastRecvType == NET_RESPONSE_CONNECT_OK) {
-                        printf("connect...\n");
+                    if (lastSendType == NET_REQUEST_CONNECT && lastRecvType == NET_RESPONSE_CONNECT_OK)
                         code = MENU_CODE_TO_NET_LOBBY_MENU;
-                    }
-                    else if (lastSendType == NET_REQUEST_JOIN_ROOM && lastRecvType == NET_RESPONSE_JOIN_OK) {
-                        printf("join...\n");
+                    else if (lastSendType == NET_REQUEST_JOIN_ROOM && lastRecvType == NET_RESPONSE_JOIN_OK)
                         code = MENU_CODE_TO_NET_ROOM_MENU;
-                    }
-                    else if (lastSendType == NET_REQUEST_CREATE_ROOM && lastRecvType == NET_RESPONSE_CREATE_OK) {
-                        printf("create...\n");
+                    else if (lastSendType == NET_REQUEST_CREATE_ROOM && lastRecvType == NET_RESPONSE_CREATE_OK)
                         code = MENU_CODE_TO_NET_ROOM_MENU;
-                    }
 
                     // ide a hibakezelést
                     // if lastmessage ez és lastresponse emez
                     // control.settext...
 
-                    // If we are  still waiting
+                    // If we have finished the waiting
                     if (code != previousCode)
                         netplay.operationInProgress = false;
                 }
