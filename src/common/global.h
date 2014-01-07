@@ -820,7 +820,8 @@ struct Networking {
     bool connectSuccessful;
     bool joinSuccessful;
 
-    bool currentMenuChanged;
+    bool currentMenuChanged; // eg. room players changed
+    bool operationInProgress; // waiting dialogs watch this variable
 
     char * hostaddress;
     char playername[NET_MAX_PLAYER_NAME_LENGTH];    // last byte will be \0
@@ -839,7 +840,6 @@ struct Networking {
 
     char newroom_name[NET_MAX_ROOM_NAME_LENGTH];
     char newroom_password[NET_MAX_ROOM_PASSWORD_LENGTH];
-    bool newroom_private;
 
     char mychatmessage[NET_MAX_CHAT_MSG_LENGTH];
 };

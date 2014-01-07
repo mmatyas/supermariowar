@@ -185,6 +185,7 @@ bool NetClient::sendConnectRequestToSelectedServer()
         message.playerName[NET_MAX_PLAYER_NAME_LENGTH - 1] = '\0';
 
         sendUDPMessage(&message, sizeof(ClientConnectionPackage));
+        netplay.operationInProgress = true;
         return true;
     }
     return false;
@@ -202,9 +203,8 @@ void NetClient::sendCreateRoomMessage()
     memcpy(message.password, netplay.newroom_password, NET_MAX_ROOM_PASSWORD_LENGTH);
     message.password[NET_MAX_PLAYER_NAME_LENGTH - 1] = '\0';
 
-    message.privateRoom = netplay.newroom_private;
-
     sendUDPMessage(&message, sizeof(NewRoomPackage));
+    netplay.operationInProgress = true;
 }
 
 void NetClient::sendJoinRoomMessage()
@@ -217,6 +217,7 @@ void NetClient::sendJoinRoomMessage()
     message.password[0] = '\0'; // TODO: implement
 
     sendUDPMessage(&message, sizeof(JoinRoomPackage));
+    netplay.operationInProgress = true;
 }
 
 void NetClient::sendLeaveRoomMessage()
@@ -239,7 +240,7 @@ void NetClient::handleServerinfoAndClose()
 
     printf("NET_RESPONSE_SERVERINFO [%lu byte]\n", sizeof(serverInfo));
     printf("Sending:\n  protocolVersion: %d\n  packageType: %d\n  name: %s\n  players/max: %d / %d\n",
-        serverInfo.protocolVersion, serverInfo.packageType, serverInfo.name, serverInfo.currentPlayers, serverInfo.maxPlayers);
+        serverInfo.protocolVersion, serverInfo.packageType, serverInfo.name, serverInfo.currentPlayerCount, serverInfo.maxPlayerCount);
 
     closeUDPsocket();
 }
@@ -248,16 +249,16 @@ void NetClient::handleNewRoomListEntry()
 {
     RoomInfoPackage roomInfo;
     memcpy(&roomInfo, udpIncomingPacket->data, sizeof(RoomInfoPackage));
-    printf("  Incoming room entry: [%u] %s (%d/4)\n", roomInfo.roomID, roomInfo.name, roomInfo.playerCount);
+    printf("  Incoming room entry: [%u] %s (%d/4)\n", roomInfo.roomID, roomInfo.name, roomInfo.currentPlayerCount);
 
     RoomListEntry newRoom;
     newRoom.roomID = roomInfo.roomID;
     newRoom.name = roomInfo.name;
-    newRoom.playerCount = roomInfo.playerCount;
+    newRoom.playerCount = roomInfo.currentPlayerCount;
     netplay.currentRooms.push_back(newRoom);
 
     if (uiRoomList) {
-        char playerCountString[4] = {'0' + roomInfo.playerCount, '/', '4', '\0'};
+        char playerCountString[4] = {'0' + roomInfo.currentPlayerCount, '/', '4', '\0'};
         uiRoomList->Add(newRoom.name, playerCountString);
     }
 }
@@ -365,7 +366,7 @@ void NetClient::update()
                 //
                 // Create
                 //
-                case NET_RESPONSE_ROOM_CREATED:
+                case NET_RESPONSE_CREATE_OK:
                     handleRoomCreatedMessage();
                     break;
 

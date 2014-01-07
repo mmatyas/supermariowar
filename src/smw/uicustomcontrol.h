@@ -801,4 +801,3 @@ class MI_ChatMessageBox : public UI_Control
 };
 
 #endif //__UICUSTOMCONTROL_H_
-

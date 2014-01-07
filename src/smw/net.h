@@ -35,7 +35,7 @@
 #define NET_NOTICE_ROOM_CHANGED             34 // + host quit?
 
 #define NET_REQUEST_CREATE_ROOM             40
-#define NET_RESPONSE_ROOM_CREATED           41
+#define NET_RESPONSE_CREATE_OK              41
 #define NET_RESPONSE_CREATE_ERROR           42 // TODO: What kind of error?
 
 
@@ -91,25 +91,24 @@ struct MessageHeader {
 
 struct ServerInfoPackage : MessageHeader {
     char           name[32];
-    uint32_t       currentPlayers;
-    uint32_t       maxPlayers;
+    uint32_t       currentPlayerCount;
+    uint32_t       maxPlayerCount;
 };
 
-struct ClientConnectionPackage: MessageHeader {
+struct ClientConnectionPackage : MessageHeader {
     char           playerName[NET_MAX_PLAYER_NAME_LENGTH];
 };
 
 struct RoomInfoPackage : MessageHeader {
     uint32_t       roomID;
     char           name[NET_MAX_ROOM_NAME_LENGTH];
-    uint8_t        playerCount;
+    uint8_t        currentPlayerCount;
     bool           passwordRequired;
 };
 
 struct NewRoomPackage : MessageHeader {
     char           name[NET_MAX_ROOM_NAME_LENGTH];
     char           password[NET_MAX_ROOM_PASSWORD_LENGTH];
-    bool           privateRoom;
 };
 
 struct NewRoomCreatedPackage : MessageHeader {

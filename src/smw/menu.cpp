@@ -308,12 +308,9 @@ void Menu::CreateMenu()
 
     miNetServersConnectingDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
     miNetServersConnectingDialogText = new MI_Text("Connecting...", smw->ScreenWidth / 2, smw->ScreenHeight / 2 - 40, 0, 2, 1);
-    miNetServersConnectingDialogDebugButton = new MI_Button(&rm->spr_selectfield, smw->ScreenWidth / 2 - 100, 250, "[Debug] Next", 200, 1);
-    miNetServersConnectingDialogDebugButton->SetCode(MENU_CODE_TO_NET_LOBBY_MENU);
 
     miNetServersConnectingDialogImage->Show(false);
     miNetServersConnectingDialogText->Show(false);
-    miNetServersConnectingDialogDebugButton->Show(false);
 
     //miNetServersConnectionDetector = new MI_NetworkStatusDetector(&rm->spr_selectfield, smw->ScreenWidth/2, smw->ScreenHeight/2 - 10, "Connecting...", 80, 1);
     /*miNetServersConnectionDetector = new MI_NetworkStatusDetector(0, 0);
@@ -340,7 +337,6 @@ void Menu::CreateMenu()
 
     mNetServers.AddNonControl(miNetServersConnectingDialogImage);
     mNetServers.AddNonControl(miNetServersConnectingDialogText);
-    mNetServers.AddControl(miNetServersConnectingDialogDebugButton, NULL, NULL, NULL, NULL);
 
     mNetServers.AddControl(miNetServersScroll, NULL, NULL, NULL, NULL);
     //mNetServers.AddNonControl(miNetServersConnectingDialogImage);
@@ -374,12 +370,9 @@ void Menu::CreateMenu()
 
     miNetLobbyJoiningDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
     miNetLobbyJoiningDialogText = new MI_Text("Joining...", smw->ScreenWidth / 2, smw->ScreenHeight / 2 - 40, 0, 2, 1);
-    miNetLobbyJoiningDialogDebugButton = new MI_Button(&rm->spr_selectfield, smw->ScreenWidth / 2 - 100, 250, "[Debug] Next", 200, 1);
-    miNetLobbyJoiningDialogDebugButton->SetCode(MENU_CODE_TO_NET_ROOM_MENU);
 
     miNetLobbyJoiningDialogImage->Show(false);
     miNetLobbyJoiningDialogText->Show(false);
-    miNetLobbyJoiningDialogDebugButton->Show(false);
 
     /*for (unsigned iRoom = 0; iRoom < netplay.rooms.size(); iRoom++) {
         Room * room = &netplay.rooms[iRoom];
@@ -399,7 +392,6 @@ void Menu::CreateMenu()
 
     mNetLobby.AddNonControl(miNetLobbyJoiningDialogImage);
     mNetLobby.AddNonControl(miNetLobbyJoiningDialogText);
-    mNetLobby.AddControl(miNetLobbyJoiningDialogDebugButton, NULL, NULL, NULL, NULL);
 
     mNetLobby.AddNonControl(miNetLobbyLeftHeaderBar);
     mNetLobby.AddNonControl(miNetLobbyRightHeaderBar);
@@ -419,13 +411,6 @@ void Menu::CreateMenu()
     miNetNewRoomPasswordField = new MI_TextField(&rm->menu_plain_field, 70, 200, "Password (optional)", smw->ScreenWidth - 2 * 70, 230);
     miNetNewRoomPasswordField->SetData(netplay.newroom_password, NET_MAX_ROOM_PASSWORD_LENGTH);
 
-    miNetNewRoomPrivateToggle = new MI_SelectField(&rm->spr_selectfield, 70, 240, "Private?", smw->ScreenWidth - 2 * 70, 230);
-    miNetNewRoomPrivateToggle->Add("No", 0, "", false, false);
-    miNetNewRoomPrivateToggle->Add("Yes", 1, "", true, false);
-    miNetNewRoomPrivateToggle->SetData(NULL, NULL, &netplay.newroom_private);
-    miNetNewRoomPrivateToggle->SetKey(netplay.newroom_private ? 1 : 0);
-    miNetNewRoomPrivateToggle->SetAutoAdvance(true);
-
     miNetNewRoomCreateButton = new MI_Button(&rm->spr_selectfield, 70, 320, "Create!", smw->ScreenWidth - 2 * 70, 1);
     miNetNewRoomCreateButton->SetCode(MENU_CODE_TO_NET_NEW_ROOM_CREATE_IN_PROGRESS);
 
@@ -433,23 +418,18 @@ void Menu::CreateMenu()
     miNetNewRoomBackButton->SetCode(MENU_CODE_TO_NET_NEW_ROOM_LEVEL_SELECT_MENU);
 
     mNetNewRoom.AddControl(miNetNewRoomNameField, miNetNewRoomBackButton, miNetNewRoomPasswordField, NULL, NULL);
-    mNetNewRoom.AddControl(miNetNewRoomPasswordField, miNetNewRoomNameField, miNetNewRoomPrivateToggle, NULL, NULL);
-    mNetNewRoom.AddControl(miNetNewRoomPrivateToggle, miNetNewRoomPasswordField, miNetNewRoomCreateButton, NULL, NULL);
-    mNetNewRoom.AddControl(miNetNewRoomCreateButton, miNetNewRoomPrivateToggle, miNetNewRoomBackButton, NULL, NULL);
+    mNetNewRoom.AddControl(miNetNewRoomPasswordField, miNetNewRoomNameField, miNetNewRoomCreateButton, NULL, NULL);
+    mNetNewRoom.AddControl(miNetNewRoomCreateButton, miNetNewRoomCreateButton, miNetNewRoomBackButton, NULL, NULL);
     mNetNewRoom.AddControl(miNetNewRoomBackButton, miNetNewRoomCreateButton, miNetNewRoomNameField, NULL, NULL);
 
     miNetNewRoomCreatingDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
     miNetNewRoomCreatingDialogText = new MI_Text("Creating...", smw->ScreenWidth / 2, smw->ScreenHeight / 2 - 40, 0, 2, 1);
-    miNetNewRoomCreatingDialogDebugButton = new MI_Button(&rm->spr_selectfield, smw->ScreenWidth / 2 - 100, 250, "[Debug] Next", 200, 1);
-    miNetNewRoomCreatingDialogDebugButton->SetCode(MENU_CODE_TO_NET_ROOM_MENU);
 
     miNetNewRoomCreatingDialogImage->Show(false);
     miNetNewRoomCreatingDialogText->Show(false);
-    miNetNewRoomCreatingDialogDebugButton->Show(false);
 
     mNetNewRoom.AddNonControl(miNetNewRoomCreatingDialogImage);
     mNetNewRoom.AddNonControl(miNetNewRoomCreatingDialogText);
-    mNetNewRoom.AddControl(miNetNewRoomCreatingDialogDebugButton, NULL, NULL, NULL, NULL);
 
     miNetNewRoomLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
     miNetNewRoomRightHeaderBar = new MI_Image(&rm->menu_plain_field, smw->ScreenWidth/2, 0, 192, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
@@ -2386,6 +2366,9 @@ void Menu::RunMenu()
             game_values.playerInput.Update(event, 1);
         }
 
+        if (netplay.active)
+            netplay.client.update();
+
         //If AI is controlling the tournament menu, select the options
         if(game_values.matchtype == MATCH_TYPE_TOURNAMENT && iTournamentAITimer > 0 && mCurrentMenu == &mGameSettingsMenu && mCurrentMenu->GetHeadControl() == miSettingsStartButton) {
             if(--iTournamentAITimer == 0) {
@@ -3101,168 +3084,191 @@ void Menu::RunMenu()
                 modeOptionsMenu.HealthModeStartLifeChanged();
             } else if(MENU_CODE_HEALTH_MODE_MAX_LIFE_CHANGED == code) {
                 modeOptionsMenu.HealthModeMaxLifeChanged();
-            } else if(MENU_CODE_TO_NET_SERVERLIST == code) {
-                miNetServersScroll->Show(true);
-                mNetServers.RememberCurrent();
+            }
 
-                mNetServers.SetHeadControl(miNetServersScroll);
-                mNetServers.SetCancelCode(MENU_CODE_NONE);
-                mNetServers.ResetMenu();
-            } else if(MENU_CODE_NET_SERVERLIST_EXIT == code || MENU_CODE_NET_CONNECT_ABORT == code) {
-                if (MENU_CODE_NET_SERVERLIST_EXIT == code)
-                    netplay.currentMenuChanged = true;
+            if (netplay.active) {
 
-                miNetServersScroll->Show(false);
-                miNetServersConnectingDialogImage->Show(false);
-                miNetServersConnectingDialogText->Show(false);
-                miNetServersConnectingDialogDebugButton->Show(false);
-                //miNetServersConnectionDetector->Show(false);
+                if (netplay.operationInProgress) {
+                    printf("waiting for ");
+                    MenuCodeEnum previousCode = code;
 
-                mNetServers.SetHeadControl(miNetServersSelectButton);
-                mNetServers.SetCancelCode(MENU_CODE_TO_MAIN_MENU);
+                    uint8_t lastSendType = netplay.lastSentMessage.packageType;
+                    uint8_t lastRecvType = netplay.lastReceivedMessage.packageType;
 
-                mNetServers.RestoreCurrent();
-                iDisplayError = DISPLAY_ERROR_NONE;
-            } else if(MENU_CODE_NET_CONNECT_IN_PROGRESS == code) {
-                netplay.client.sendConnectRequestToSelectedServer();
+                    if (lastSendType == NET_REQUEST_CONNECT && lastRecvType == NET_RESPONSE_CONNECT_OK) {
+                        printf("connect...\n");
+                        code = MENU_CODE_TO_NET_LOBBY_MENU;
+                    }
+                    else if (lastSendType == NET_REQUEST_JOIN_ROOM && lastRecvType == NET_RESPONSE_JOIN_OK) {
+                        printf("join...\n");
+                        code = MENU_CODE_TO_NET_ROOM_MENU;
+                    }
+                    else if (lastSendType == NET_REQUEST_CREATE_ROOM && lastRecvType == NET_RESPONSE_CREATE_OK) {
+                        printf("create...\n");
+                        code = MENU_CODE_TO_NET_ROOM_MENU;
+                    }
 
-                miNetServersConnectingDialogImage->Show(true);
-                miNetServersConnectingDialogText->Show(true);
-                miNetServersConnectingDialogDebugButton->Show(true);
-                mNetServers.RememberCurrent();
+                    // ide a hibakezelést
+                    // if lastmessage ez és lastresponse emez
+                    // control.settext...
 
-                mNetServers.SetHeadControl(miNetServersConnectingDialogDebugButton);
-                mNetServers.SetCancelCode(MENU_CODE_NET_CONNECT_ABORT);
-                mNetServers.ResetMenu();
-            } else if(MENU_CODE_TO_NET_LOBBY_MENU == code) {
-                // If we are leaving a room
-                if (netplay.currentRoom.roomID) {
-                    netplay.client.sendLeaveRoomMessage();
-                    netplay.currentRoom.roomID = 0;
+                    // If we are  still waiting
+                    if (code != previousCode)
+                        netplay.operationInProgress = false;
                 }
-                netplay.client.requestRoomList();
 
-                // Restore Servers layout
+                if(MENU_CODE_TO_NET_SERVERLIST == code) {
+                    miNetServersScroll->Show(true);
+                    mNetServers.RememberCurrent();
+
+                    mNetServers.SetHeadControl(miNetServersScroll);
+                    mNetServers.SetCancelCode(MENU_CODE_NONE);
+                    mNetServers.ResetMenu();
+                } else if(MENU_CODE_NET_SERVERLIST_EXIT == code || MENU_CODE_NET_CONNECT_ABORT == code) {
+                    if (MENU_CODE_NET_SERVERLIST_EXIT == code)
+                        netplay.currentMenuChanged = true;
+                    else
+                        netplay.operationInProgress = false;
+
                     miNetServersScroll->Show(false);
                     miNetServersConnectingDialogImage->Show(false);
                     miNetServersConnectingDialogText->Show(false);
-                    miNetServersConnectingDialogDebugButton->Show(false);
+
                     mNetServers.SetHeadControl(miNetServersSelectButton);
                     mNetServers.SetCancelCode(MENU_CODE_TO_MAIN_MENU);
-                    mNetServers.RestoreCurrent();
 
-                // Restore Lobby layout
+                    mNetServers.RestoreCurrent();
+                    iDisplayError = DISPLAY_ERROR_NONE;
+                } else if(MENU_CODE_NET_CONNECT_IN_PROGRESS == code) {
+                    netplay.client.sendConnectRequestToSelectedServer();
+                    netplay.operationInProgress = true;
+
+                    miNetServersConnectingDialogImage->Show(true);
+                    miNetServersConnectingDialogText->Show(true);
+                    mNetServers.RememberCurrent();
+
+                    mNetServers.SetHeadControl(miNetServersConnectingDialogText);
+                    mNetServers.SetCancelCode(MENU_CODE_NET_CONNECT_ABORT);
+                    mNetServers.ResetMenu();
+                } else if(MENU_CODE_TO_NET_LOBBY_MENU == code) {
+                    // If we are leaving a room
+                    if (netplay.currentRoom.roomID) {
+                        netplay.client.sendLeaveRoomMessage();
+                        netplay.currentRoom.roomID = 0;
+                    }
+                    netplay.client.requestRoomList();
+
+                    // Restore Servers layout
+                        miNetServersScroll->Show(false);
+                        miNetServersConnectingDialogImage->Show(false);
+                        miNetServersConnectingDialogText->Show(false);
+                        mNetServers.SetHeadControl(miNetServersSelectButton);
+                        mNetServers.SetCancelCode(MENU_CODE_TO_MAIN_MENU);
+                        mNetServers.RestoreCurrent();
+
+                    // Restore Lobby layout
+                        miNetLobbyJoiningDialogImage->Show(false);
+                        miNetLobbyJoiningDialogText->Show(false);
+                        mNetLobby.SetHeadControl(miNetLobbyNewRoomButton);
+                        mNetLobby.SetCancelCode(MENU_CODE_TO_NET_SERVERS_MENU);
+                        mNetLobby.RestoreCurrent();
+
+                    // Restore New Room layout
+                        miNetNewRoomCreatingDialogImage->Show(false);
+                        miNetNewRoomCreatingDialogText->Show(false);
+                        mNetNewRoom.SetHeadControl(miNetNewRoomNameField);
+                        mNetNewRoom.SetCancelCode(MENU_CODE_TO_NET_NEW_ROOM_LEVEL_SELECT_MENU);
+                        mNetNewRoom.RestoreCurrent();
+
+                    // Temp.: Set dummy values to room fields.
+                        netplay.currentRoom.name[0] = '\0';
+                        netplay.currentRoom.playerNames[0][0] = '\0';
+                        netplay.currentRoom.playerNames[0][1] = '\0';
+                        netplay.currentRoom.playerNames[0][2] = '\0';
+                        netplay.currentRoom.playerNames[0][3] = '\0';
+
+                    mCurrentMenu = &mNetLobby;
+                    mCurrentMenu->ResetMenu();
+                } else if (MENU_CODE_TO_NET_NEW_ROOM_LEVEL_SELECT_MENU == code) {
+                    mCurrentMenu = &mNetNewLevel;
+                    mCurrentMenu->ResetMenu();
+                } else if (MENU_CODE_TO_NET_NEW_ROOM_SETTINGS_MENU == code) {
+                    mCurrentMenu = &mNetNewRoom;
+                    mCurrentMenu->ResetMenu();
+                } else if (MENU_CODE_TO_NET_ROOM_MENU == code) {
+
+                    netplay.currentMenuChanged = true;
+
+
+                    mCurrentMenu = &mNetRoom;
+                    mCurrentMenu->ResetMenu();
+                } else if(MENU_CODE_NET_JOIN_ROOM_IN_PROGRESS == code) {
+                    netplay.client.sendJoinRoomMessage();
+                    netplay.operationInProgress = true;
+
+                    miNetLobbyJoiningDialogImage->Show(true);
+                    miNetLobbyJoiningDialogText->Show(true);
+
+                    mNetLobby.RememberCurrent();
+                    mNetLobby.SetHeadControl(miNetLobbyJoiningDialogText);
+                    mNetLobby.SetCancelCode(MENU_CODE_NET_JOIN_ROOM_ABORT);
+                    mNetLobby.ResetMenu();
+                } else if(MENU_CODE_NET_JOIN_ROOM_ABORT == code) {
                     miNetLobbyJoiningDialogImage->Show(false);
                     miNetLobbyJoiningDialogText->Show(false);
-                    miNetLobbyJoiningDialogDebugButton->Show(false);
+                    netplay.operationInProgress = false;
+
                     mNetLobby.SetHeadControl(miNetLobbyNewRoomButton);
                     mNetLobby.SetCancelCode(MENU_CODE_TO_NET_SERVERS_MENU);
-                    mNetLobby.RestoreCurrent();
 
-                // Restore New Room layout
+                    mNetLobby.RestoreCurrent();
+                    iDisplayError = DISPLAY_ERROR_NONE;
+                } else if(MENU_CODE_TO_NET_NEW_ROOM_CREATE_IN_PROGRESS == code) {
+                    if (strlen(netplay.newroom_name) > 2) {
+                        netplay.client.sendCreateRoomMessage();
+                        netplay.operationInProgress = true;
+
+                        miNetNewRoomCreatingDialogImage ->Show(true);
+                        miNetNewRoomCreatingDialogText->Show(true);
+
+                        mNetNewRoom.RememberCurrent();
+                        mNetNewRoom.SetHeadControl(miNetNewRoomCreatingDialogText);
+                        mNetNewRoom.SetCancelCode(MENU_CODE_TO_NET_NEW_ROOM_CREATE_ABORT);
+                        mNetNewRoom.ResetMenu();
+                    }
+                    else
+                        printf("Room name is too short!\n");
+
+                } else if(MENU_CODE_TO_NET_NEW_ROOM_CREATE_ABORT == code) {
                     miNetNewRoomCreatingDialogImage->Show(false);
                     miNetNewRoomCreatingDialogText->Show(false);
-                    miNetNewRoomCreatingDialogDebugButton->Show(false);
+                    netplay.operationInProgress = false;
+
                     mNetNewRoom.SetHeadControl(miNetNewRoomNameField);
                     mNetNewRoom.SetCancelCode(MENU_CODE_TO_NET_NEW_ROOM_LEVEL_SELECT_MENU);
+
                     mNetNewRoom.RestoreCurrent();
-
-                // Temp.: Set dummy values to room fields.
-                    netplay.currentRoom.name[0] = '\0';
-                    netplay.currentRoom.playerNames[0][0] = '\0';
-                    netplay.currentRoom.playerNames[0][1] = '\0';
-                    netplay.currentRoom.playerNames[0][2] = '\0';
-                    netplay.currentRoom.playerNames[0][3] = '\0';
-
-                mCurrentMenu = &mNetLobby;
-                mCurrentMenu->ResetMenu();
-            } else if (MENU_CODE_TO_NET_NEW_ROOM_LEVEL_SELECT_MENU == code) {
-                mCurrentMenu = &mNetNewLevel;
-                mCurrentMenu->ResetMenu();
-            } else if (MENU_CODE_TO_NET_NEW_ROOM_SETTINGS_MENU == code) {
-                mCurrentMenu = &mNetNewRoom;
-                mCurrentMenu->ResetMenu();
-            } else if (MENU_CODE_TO_NET_ROOM_MENU == code) {
-
-                netplay.currentMenuChanged = true;
-
-
-                mCurrentMenu = &mNetRoom;
-                mCurrentMenu->ResetMenu();
-            } else if(MENU_CODE_NET_JOIN_ROOM_IN_PROGRESS == code) {
-                netplay.client.sendJoinRoomMessage();
-
-                miNetLobbyJoiningDialogImage->Show(true);
-                miNetLobbyJoiningDialogText->Show(true);
-                miNetLobbyJoiningDialogDebugButton->Show(true);
-
-                mNetLobby.RememberCurrent();
-                mNetLobby.SetHeadControl(miNetLobbyJoiningDialogDebugButton);
-                mNetLobby.SetCancelCode(MENU_CODE_NET_JOIN_ROOM_ABORT);
-                mNetLobby.ResetMenu();
-            } else if(MENU_CODE_NET_JOIN_ROOM_ABORT == code) {
-                miNetLobbyJoiningDialogImage->Show(false);
-                miNetLobbyJoiningDialogText->Show(false);
-                miNetLobbyJoiningDialogDebugButton->Show(false);
-
-                mNetLobby.SetHeadControl(miNetLobbyNewRoomButton);
-                mNetLobby.SetCancelCode(MENU_CODE_TO_NET_SERVERS_MENU);
-
-                mNetLobby.RestoreCurrent();
-                iDisplayError = DISPLAY_ERROR_NONE;
-            } else if(MENU_CODE_TO_NET_NEW_ROOM_CREATE_IN_PROGRESS == code) {
-                if (strlen(netplay.newroom_name) > 2) {
-                    netplay.client.sendCreateRoomMessage();
-
-                    miNetNewRoomCreatingDialogImage ->Show(true);
-                    miNetNewRoomCreatingDialogText->Show(true);
-                    miNetNewRoomCreatingDialogDebugButton->Show(true);
-
-                    mNetNewRoom.RememberCurrent();
-                    mNetNewRoom.SetHeadControl(miNetNewRoomCreatingDialogDebugButton);
-                    mNetNewRoom.SetCancelCode(MENU_CODE_TO_NET_NEW_ROOM_CREATE_ABORT);
-                    mNetNewRoom.ResetMenu();
+                    iDisplayError = DISPLAY_ERROR_NONE;
                 }
-                else
-                    printf("Room name is too short!\n");
 
-            } else if(MENU_CODE_TO_NET_NEW_ROOM_CREATE_ABORT == code) {
-                miNetNewRoomCreatingDialogImage->Show(false);
-                miNetNewRoomCreatingDialogText->Show(false);
-                miNetNewRoomCreatingDialogDebugButton->Show(false);
+                // on room change
+                if (netplay.currentMenuChanged) {
 
-                mNetNewRoom.SetHeadControl(miNetNewRoomNameField);
-                mNetNewRoom.SetCancelCode(MENU_CODE_TO_NET_NEW_ROOM_LEVEL_SELECT_MENU);
+                    // Servers screen
+                    const char* nethostname = netplay.savedServers[netplay.selectedServerIndex].hostname.c_str();
+                    miNetServersSelectedHostText->SetText(nethostname);
 
-                mNetNewRoom.RestoreCurrent();
-                iDisplayError = DISPLAY_ERROR_NONE;
+                    // Room screen
+                    miNetRoomName->SetText(netplay.currentRoom.name);
+                    for (uint8_t p = 0; p < 4; p++)
+                        miNetRoomPlayerName[0]->SetText(netplay.currentRoom.playerNames[0]);
+
+                    netplay.currentMenuChanged = false;
+                }
             }
 
             /*if (code != MENU_CODE_NONE)
                 printf("Code: %d\n", code);*/
-        }
-
-        if (netplay.active) {
-            netplay.client.update();
-
-            // on room change
-            if (netplay.currentMenuChanged) {
-
-                // Servers screen
-                const char* nethostname = netplay.savedServers[netplay.selectedServerIndex].hostname.c_str();
-                miNetServersSelectedHostText->SetText(nethostname);
-
-                // Room screen
-                miNetRoomName->SetText(netplay.currentRoom.name);
-                for (uint8_t p = 0; p < 4; p++)
-                    miNetRoomPlayerName[0]->SetText(netplay.currentRoom.playerNames[0]);
-
-                netplay.currentMenuChanged = false;
-            }
-
-            // ide a hibakezelést
-            // if lastmessage ez és lastresponse emez
-            // control.settext...
         }
 
         //--------------- draw everything ----------------------
