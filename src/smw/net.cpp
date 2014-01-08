@@ -295,6 +295,8 @@ void NetClient::handleRoomChangedMessage()
         memcpy(netplay.currentRoom.playerNames[p], pkg.playerName[p], NET_MAX_PLAYER_NAME_LENGTH);
         printf("  player %d: %s\n", p+1, netplay.currentRoom.playerNames[p]);
     }
+
+    netplay.currentMenuChanged = true;
 }
 
 void NetClient::update()

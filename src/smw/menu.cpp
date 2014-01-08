@@ -307,7 +307,7 @@ void Menu::CreateMenu()
     miNetServersNicknameField->SetData(netplay.playername, NET_MAX_PLAYER_NAME_LENGTH);
 
     miNetServersConnectingDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
-    miNetServersConnectingDialogText = new MI_Text("Connecting...", smw->ScreenWidth / 2, smw->ScreenHeight / 2 - 40, 0, 2, 1);
+    miNetServersConnectingDialogText = new MI_Text("Connecting...", smw->ScreenWidth / 2, smw->ScreenHeight / 2 - 12, 0, 2, 1);
 
     miNetServersConnectingDialogImage->Show(false);
     miNetServersConnectingDialogText->Show(false);
@@ -369,7 +369,7 @@ void Menu::CreateMenu()
     netplay.client.setRoomListUIControl(miNetLobbyScroll);
 
     miNetLobbyJoiningDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
-    miNetLobbyJoiningDialogText = new MI_Text("Joining...", smw->ScreenWidth / 2, smw->ScreenHeight / 2 - 40, 0, 2, 1);
+    miNetLobbyJoiningDialogText = new MI_Text("Joining...", smw->ScreenWidth / 2, smw->ScreenHeight / 2 - 12, 0, 2, 1);
 
     miNetLobbyJoiningDialogImage->Show(false);
     miNetLobbyJoiningDialogText->Show(false);
@@ -411,7 +411,7 @@ void Menu::CreateMenu()
     miNetNewRoomPasswordField = new MI_TextField(&rm->menu_plain_field, 70, 200, "Password (optional)", smw->ScreenWidth - 2 * 70, 230);
     miNetNewRoomPasswordField->SetData(netplay.newroom_password, NET_MAX_ROOM_PASSWORD_LENGTH);
 
-    miNetNewRoomCreateButton = new MI_Button(&rm->spr_selectfield, 70, 320, "Create!", smw->ScreenWidth - 2 * 70, 1);
+    miNetNewRoomCreateButton = new MI_Button(&rm->spr_selectfield, 70, 240, "Create!", smw->ScreenWidth - 2 * 70, 1);
     miNetNewRoomCreateButton->SetCode(MENU_CODE_TO_NET_NEW_ROOM_CREATE_IN_PROGRESS);
 
     miNetNewRoomBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
@@ -419,11 +419,11 @@ void Menu::CreateMenu()
 
     mNetNewRoom.AddControl(miNetNewRoomNameField, miNetNewRoomBackButton, miNetNewRoomPasswordField, NULL, NULL);
     mNetNewRoom.AddControl(miNetNewRoomPasswordField, miNetNewRoomNameField, miNetNewRoomCreateButton, NULL, NULL);
-    mNetNewRoom.AddControl(miNetNewRoomCreateButton, miNetNewRoomCreateButton, miNetNewRoomBackButton, NULL, NULL);
+    mNetNewRoom.AddControl(miNetNewRoomCreateButton, miNetNewRoomPasswordField, miNetNewRoomBackButton, NULL, NULL);
     mNetNewRoom.AddControl(miNetNewRoomBackButton, miNetNewRoomCreateButton, miNetNewRoomNameField, NULL, NULL);
 
     miNetNewRoomCreatingDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
-    miNetNewRoomCreatingDialogText = new MI_Text("Creating...", smw->ScreenWidth / 2, smw->ScreenHeight / 2 - 40, 0, 2, 1);
+    miNetNewRoomCreatingDialogText = new MI_Text("Creating...", smw->ScreenWidth / 2, smw->ScreenHeight / 2 - 12, 0, 2, 1);
 
     miNetNewRoomCreatingDialogImage->Show(false);
     miNetNewRoomCreatingDialogText->Show(false);
@@ -3246,6 +3246,7 @@ void Menu::RunMenu()
 
                 // on room change
                 if (netplay.currentMenuChanged) {
+                    printf("menuChanged\n");
 
                     // Servers screen
                     const char* nethostname = netplay.savedServers[netplay.selectedServerIndex].hostname.c_str();
@@ -3254,7 +3255,7 @@ void Menu::RunMenu()
                     // Room screen
                     miNetRoomName->SetText(netplay.currentRoom.name);
                     for (uint8_t p = 0; p < 4; p++)
-                        miNetRoomPlayerName[0]->SetText(netplay.currentRoom.playerNames[0]);
+                        miNetRoomPlayerName[p]->SetText(netplay.currentRoom.playerNames[p]);
 
                     netplay.currentMenuChanged = false;
                 }
