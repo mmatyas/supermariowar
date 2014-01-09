@@ -1032,6 +1032,7 @@ void RunGame()
 
                 list_players[list_players_cnt] = new CPlayer(iPlayer, list_players_cnt, teamid, subteamid, game_values.colorids[iPlayer], rm->spr_player[iPlayer], score[teamid], &(respawn[iPlayer]), ai);
                 list_players_cnt++;
+                printf("list_players_cnt: %d\n", list_players_cnt);
             } else if(!game_values.keeppowerup) {
                 //Reset off player's stored powerups if they are not playing
                 game_values.storedpowerups[iPlayer] = -1;

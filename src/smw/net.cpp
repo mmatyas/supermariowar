@@ -7,6 +7,7 @@
     #pragma comment(lib, "SDL_net.lib")
 #endif
 
+extern gv game_values;
 extern int g_iVersion[];
 extern bool VersionIsEqual(int iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
 
@@ -127,6 +128,10 @@ bool NetClient::startSession()
 
     netplay.active = true;
     netplay.connectSuccessful = false;
+
+    // backup singleplayer settings
+    for (uint8_t p; p < 4; p++)
+        backup_playercontrol[p] = game_values.playercontrol[p];
 
     return true;
 }
@@ -280,6 +285,11 @@ void NetClient::handleRoomCreatedMessage()
 
     printf("Room created, ID: %u, %d\n", pkg.roomID, pkg.roomID);
     netplay.currentMenuChanged = true;
+
+    game_values.playercontrol[0] = 1;
+    game_values.playercontrol[1] = 0;
+    game_values.playercontrol[2] = 0;
+    game_values.playercontrol[3] = 0;
 }
 
 void NetClient::handleRoomChangedMessage()
@@ -294,6 +304,14 @@ void NetClient::handleRoomChangedMessage()
     for (uint8_t p = 0; p < 4; p++) {
         memcpy(netplay.currentRoom.playerNames[p], pkg.playerName[p], NET_MAX_PLAYER_NAME_LENGTH);
         printf("  player %d: %s\n", p+1, netplay.currentRoom.playerNames[p]);
+
+
+        if (strcmp(netplay.currentRoom.playerNames[p], "(empty)") == 0)
+            game_values.playercontrol[p] = 0;
+        else if (strcmp(netplay.currentRoom.playerNames[p], "(bot)") == 0)
+            game_values.playercontrol[p] = 2;
+        else
+            game_values.playercontrol[p] = 1; // valid player
     }
 
     netplay.currentMenuChanged = true;
@@ -407,6 +425,10 @@ void NetClient::endSession()
         closeUDPsocket();
         netplay.active = false;
         netplay.connectSuccessful = false;
+
+        // restore singleplayer settings
+        for (uint8_t p; p < 4; p++)
+            game_values.playercontrol[p] = backup_playercontrol[p];
     }
 }
 

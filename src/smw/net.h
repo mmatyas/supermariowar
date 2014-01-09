@@ -167,6 +167,9 @@ class NetClient
         MI_NetworkListScroll* uiRoomList;
 
 
+        short backup_playercontrol[4];
+
+
         bool openSocket(const char* hostname, const uint16_t port = NET_SERVER_PORT);
 		void closeUDPsocket();
         bool sendUDPMessage(const void* data, const int dataLength);

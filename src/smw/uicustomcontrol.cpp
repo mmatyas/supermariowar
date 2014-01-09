@@ -700,7 +700,7 @@ MenuCodeEnum MI_TeamSelect::SendInput(CPlayerInput * playerInput)
 
             if(fAllReady && (DEVICE_KEYBOARD != playerInput->inputControls[iPlayer]->iDevice || iPlayer == 0)) {
                 fModifying = false;
-                printf("MENU_CODE_TO_GAME_SETUP_MENU\n");
+                printf("MI_TeamSelect::SendInput MENU_CODE_TO_GAME_SETUP_MENU\n");
                 return MENU_CODE_TO_GAME_SETUP_MENU;
             }
 

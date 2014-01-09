@@ -2572,6 +2572,7 @@ void Menu::RunMenu()
             }
 #endif
             else if(MENU_CODE_TO_GAME_SETUP_MENU == code) {
+                printf("MENU_CODE_TO_GAME_SETUP_MENU\n");
                 //Moves teams to the first arrays in the list and counts the number of teams
                 score_cnt = miTeamSelect->OrganizeTeams();
                 iDisplayError = DISPLAY_ERROR_NONE;
@@ -3195,7 +3196,7 @@ void Menu::RunMenu()
 
                     mCurrentMenu = &mNetRoom;
                     mCurrentMenu->ResetMenu();
-                } else if(MENU_CODE_NET_JOIN_ROOM_IN_PROGRESS == code) {
+                } else if (MENU_CODE_NET_JOIN_ROOM_IN_PROGRESS == code) {
                     netplay.client.sendJoinRoomMessage();
                     netplay.operationInProgress = true;
 
@@ -3206,7 +3207,7 @@ void Menu::RunMenu()
                     mNetLobby.SetHeadControl(miNetLobbyJoiningDialogText);
                     mNetLobby.SetCancelCode(MENU_CODE_NET_JOIN_ROOM_ABORT);
                     mNetLobby.ResetMenu();
-                } else if(MENU_CODE_NET_JOIN_ROOM_ABORT == code) {
+                } else if (MENU_CODE_NET_JOIN_ROOM_ABORT == code) {
                     miNetLobbyJoiningDialogImage->Show(false);
                     miNetLobbyJoiningDialogText->Show(false);
                     netplay.operationInProgress = false;
@@ -3216,7 +3217,7 @@ void Menu::RunMenu()
 
                     mNetLobby.RestoreCurrent();
                     iDisplayError = DISPLAY_ERROR_NONE;
-                } else if(MENU_CODE_TO_NET_NEW_ROOM_CREATE_IN_PROGRESS == code) {
+                } else if (MENU_CODE_TO_NET_NEW_ROOM_CREATE_IN_PROGRESS == code) {
                     if (strlen(netplay.newroom_name) > 2) {
                         netplay.client.sendCreateRoomMessage();
                         netplay.operationInProgress = true;
@@ -3232,7 +3233,7 @@ void Menu::RunMenu()
                     else
                         printf("Room name is too short!\n");
 
-                } else if(MENU_CODE_TO_NET_NEW_ROOM_CREATE_ABORT == code) {
+                } else if (MENU_CODE_TO_NET_NEW_ROOM_CREATE_ABORT == code) {
                     miNetNewRoomCreatingDialogImage->Show(false);
                     miNetNewRoomCreatingDialogText->Show(false);
                     netplay.operationInProgress = false;
@@ -3242,6 +3243,72 @@ void Menu::RunMenu()
 
                     mNetNewRoom.RestoreCurrent();
                     iDisplayError = DISPLAY_ERROR_NONE;
+                } else if (MENU_CODE_NET_ROOM_START == code) {
+
+                    printf("MENU_CODE_NET_ROOM_START\n");
+/*
+                    game_values.matchtype = MATCH_TYPE_SINGLE_GAME;
+                    //miTeamSelect->Reset();
+
+                    game_values.tournamentcontrolteam = -1;
+                    SetControllingTeamForSettingsMenu(game_values.tournamentcontrolteam, false);
+
+                    //score_cnt = miTeamSelect->OrganizeTeams();
+                    iDisplayError = DISPLAY_ERROR_NONE;
+                    iDisplayErrorTimer = 0;
+                    bool fErrorReadingTourFile = false;
+
+
+                    mTournamentScoreboardMenu.ClearEyeCandy();
+                    game_values.tournamentwinner = -1; // Initialize tournament values
+
+                    //Setup wins counters for tournament/tour
+                    for(int k = 0; k < 4; k++) {
+                        game_values.tournament_scores[k].wins = 0;
+                        game_values.tournament_scores[k].total = 0;
+                    }
+
+                    maplist->findexact(szCurrentMapName, false);
+                    miMapField->LoadCurrentMap();
+
+                    game_values.gamemode = gamemodes[0]; // TODO: net
+
+                    // ???
+                    //for(short iMode = 0; iMode < GAMEMODE_LAST; iMode++) {
+                    //    gamemodes[iMode]->goal = miGoalField[iMode]->GetShortValue();
+                    //}
+                    // 
+
+                    StartGame();
+*/
+
+                    game_values.matchtype = MATCH_TYPE_QUICK_GAME;
+
+                    miTeamSelect->Reset();
+                    mCurrentMenu = &mTeamSelectMenu;
+                    mCurrentMenu->ResetMenu();
+
+                    game_values.tournamentcontrolteam = -1;
+                    SetControllingTeamForSettingsMenu(game_values.tournamentcontrolteam, false);
+
+                    score_cnt = miTeamSelect->OrganizeTeams();
+                    iDisplayError = DISPLAY_ERROR_NONE;
+                    iDisplayErrorTimer = 0;
+                    bool fErrorReadingTourFile = false;
+
+                    printf(" Match type: Quick game\n");
+                    short iRandomMode = RNGMAX( GAMEMODE_LAST);
+                    game_values.gamemode = gamemodes[iRandomMode];
+
+                    SModeOption * options = game_values.gamemode->GetOptions();
+
+                    //Choose a goal from the lower values for a quicker game
+                    short iRandOption = (RNGMAX(6)) + 1;
+                    game_values.gamemode->goal  = options[iRandOption].iValue;
+
+                    game_values.tournamentwinner = -1;
+
+                    StartGame();
                 }
 
                 // on room change
