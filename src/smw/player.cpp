@@ -99,7 +99,7 @@ void CPlayer::move()
             if(game_values.cputurn == globalID) {
                 cpu_think();
 
-                if(playerKeys->game_jump.fDown|| playerKeys->game_left.fDown || playerKeys->game_right.fDown)
+                if(playerKeys->game_jump.fDown || playerKeys->game_left.fDown || playerKeys->game_right.fDown)
                     ResetSuicideTime();
             }
         }

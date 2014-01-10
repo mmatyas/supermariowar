@@ -4,6 +4,8 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_net.h>
 
+#include "input.h"
+
 #define NET_PROTOCOL_VERSION                1
 #define NET_MAX_MESSAGE_SIZE                128
 #define NET_SERVER_PORT                     12521
@@ -38,6 +40,13 @@
 #define NET_RESPONSE_CREATE_OK              41
 #define NET_RESPONSE_CREATE_ERROR           42 // TODO: What kind of error?
 
+#define NET_REQUEST_START_SYNC              50
+#define NET_RESPONSE_READY                  51
+#define NET_NOTICE_GAME_STARTED             52
+
+#define NET_NOTICE_LOCAL_KEYS               60
+#define NET_NOTICE_REMOTE_KEYS              61
+
 
 //Write network handler class here
 //Do similar to how gfx/sfx works with init and clean up functions
@@ -50,6 +59,7 @@ void net_saveServerList();
 void net_loadServerList();
 
 class MI_NetworkListScroll;
+//union COutputControl;
 
 
 // Local structures
@@ -126,6 +136,14 @@ struct CurrentRoomPackage : MessageHeader {
     char           playerName[4][NET_MAX_PLAYER_NAME_LENGTH];
 };
 
+struct LocalKeysPackage : MessageHeader {
+    CKeyState      keys[8];
+};
+
+struct RemoteKeysPackage : MessageHeader {
+    uint32_t       playerID;
+    CKeyState      keys[8];
+};
 
 // Network communication class
 
@@ -136,12 +154,14 @@ class NetClient
 		NetClient();
 		~NetClient();
 
-		void update();
+		void listen();
 
         bool sendConnectRequestToSelectedServer();
         void sendCreateRoomMessage();
         void sendJoinRoomMessage();
         void sendLeaveRoomMessage();
+
+        void sendLocalKeys();
 
         // called on network session start/end
 		bool startSession();

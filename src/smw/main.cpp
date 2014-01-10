@@ -1225,10 +1225,24 @@ void RunGame()
     for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++)
         list_players[iPlayer]->Init();
 
+    COutputControl prev_keys = game_values.playerInput.outputControls[0];
 
     //This is the main game loop
     while (true) {
         framestart = SDL_GetTicks();
+
+        if (netplay.active) {
+            netplay.client.listen();
+
+            if (prev_keys != game_values.playerInput.outputControls[0])
+                netplay.client.sendLocalKeys();
+
+            prev_keys = game_values.playerInput.outputControls[0];
+        }
+
+        game_values.playerInput.outputControls[1] = game_values.playerInput.outputControls[0];
+        game_values.playerInput.outputControls[2] = game_values.playerInput.outputControls[0];
+        game_values.playerInput.outputControls[3] = game_values.playerInput.outputControls[0];
 
         if(iWindTimer <= 0) {
             //Then trigger next wind event

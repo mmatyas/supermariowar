@@ -237,6 +237,17 @@ void NetClient::sendLeaveRoomMessage()
     sendUDPMessage(&message, sizeof(MessageHeader));
 }
 
+void NetClient::sendLocalKeys()
+{
+    LocalKeysPackage pkg;
+    pkg.protocolVersion = NET_PROTOCOL_VERSION;
+    pkg.packageType = NET_NOTICE_LOCAL_KEYS;
+
+    memcpy(&pkg.keys, &game_values.playerInput.outputControls[0].keys, 8 * sizeof(CKeyState));
+
+    sendUDPMessage(&pkg, sizeof(LocalKeysPackage));
+}
+
 /****************************
     Incoming messages
 ****************************/
@@ -317,7 +328,7 @@ void NetClient::handleRoomChangedMessage()
     netplay.currentMenuChanged = true;
 }
 
-void NetClient::update()
+void NetClient::listen()
 {
     if (receiveUDPMessage()) {
         uint8_t protocollVersion = udpIncomingPacket->data[0];

@@ -2263,29 +2263,8 @@ void Menu::RunMenu()
         #endif
         */
 
-        /*
-        //Sample network code for TCP communication
-        if(game_values.networktype == 1)
-        {
-        	if(game_values.networkhost)
-        	{
-        		netServer.update();
-
-        		static int messagecounter = 0;
-
-        		if(++messagecounter > 120)
-        		{
-        			messagecounter = 0;
-        			char * szMessage = "Hello";
-        			netServer.broadcastmessage(szMessage);
-        		}
-        	}
-        	else
-        	{
-        		netClient.update();
-        	}
-        }
-        */
+        if (netplay.active)
+            netplay.client.listen();
 
         //Reset the keys that were down the last frame
         game_values.playerInput.ClearPressedKeys(1);
@@ -2368,9 +2347,6 @@ void Menu::RunMenu()
 
             game_values.playerInput.Update(event, 1);
         }
-
-        if (netplay.active)
-            netplay.client.update();
 
         //If AI is controlling the tournament menu, select the options
         if(game_values.matchtype == MATCH_TYPE_TOURNAMENT && iTournamentAITimer > 0 && mCurrentMenu == &mGameSettingsMenu && mCurrentMenu->GetHeadControl() == miSettingsStartButton) {
