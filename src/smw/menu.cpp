@@ -3253,74 +3253,21 @@ void Menu::RunMenu()
                     mNetNewRoom.RestoreCurrent();
                     iDisplayError = DISPLAY_ERROR_NONE;
                 } else if (MENU_CODE_NET_ROOM_START == code) {
-
-                    printf("MENU_CODE_NET_ROOM_START\n");
-/*
-                    game_values.matchtype = MATCH_TYPE_SINGLE_GAME;
-                    //miTeamSelect->Reset();
-
-                    game_values.tournamentcontrolteam = -1;
-                    SetControllingTeamForSettingsMenu(game_values.tournamentcontrolteam, false);
-
-                    //score_cnt = miTeamSelect->OrganizeTeams();
-                    iDisplayError = DISPLAY_ERROR_NONE;
-                    iDisplayErrorTimer = 0;
-                    bool fErrorReadingTourFile = false;
-
-
-                    mTournamentScoreboardMenu.ClearEyeCandy();
-                    game_values.tournamentwinner = -1; // Initialize tournament values
-
-                    //Setup wins counters for tournament/tour
-                    for(int k = 0; k < 4; k++) {
-                        game_values.tournament_scores[k].wins = 0;
-                        game_values.tournament_scores[k].total = 0;
-                    }
-
-                    maplist->findexact(szCurrentMapName, false);
-                    miMapField->LoadCurrentMap();
-
-                    game_values.gamemode = gamemodes[0]; // TODO: net
-
-                    // ???
-                    //for(short iMode = 0; iMode < GAMEMODE_LAST; iMode++) {
-                    //    gamemodes[iMode]->goal = miGoalField[iMode]->GetShortValue();
-                    //}
-                    // 
-
-                    StartGame();
-*/
-
                     game_values.matchtype = MATCH_TYPE_NET_GAME;
-                    //game_values.matchtype = MATCH_TYPE_QUICK_GAME;
 
                     miTeamSelect->Reset();
-                    //mCurrentMenu = &mTeamSelectMenu;
                     mTeamSelectMenu.ResetMenu();
+                    score_cnt = miTeamSelect->OrganizeTeams();
 
                     game_values.tournamentcontrolteam = -1;
-                    //SetControllingTeamForSettingsMenu(game_values.tournamentcontrolteam, false);
-
-                    score_cnt = miTeamSelect->OrganizeTeams();
-                    iDisplayError = DISPLAY_ERROR_NONE;
-                    iDisplayErrorTimer = 0;
-
-                    //short iRandomMode = RNGMAX( GAMEMODE_LAST);
-                    game_values.gamemode = gamemodes[0];
-
-                    SModeOption * options = game_values.gamemode->GetOptions();
-
-                    //Choose a goal from the lower values for a quicker game
-                    short iRandOption = (RNGMAX(6)) + 1;
-                    game_values.gamemode->goal  = options[1].iValue;
-
                     game_values.tournamentwinner = -1;
 
-                    //maplist->findexact(szCurrentMapName, false);
-                    //miMapField->LoadCurrentMap();
+                    game_values.gamemode = gamemodes[0];
+                    SModeOption * options = game_values.gamemode->GetOptions();
+                    game_values.gamemode->goal  = options[1].iValue;
 
-                    //game_values.gamemode = gamemodes[miModeField->GetShortValue()];
-
+                    iDisplayError = DISPLAY_ERROR_NONE;
+                    iDisplayErrorTimer = 0;
 
                     StartGame();
                 }
