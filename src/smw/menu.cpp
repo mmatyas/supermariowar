@@ -2444,6 +2444,15 @@ void Menu::RunMenu()
         if(GS_MENU == game_values.gamestate) {
             MenuCodeEnum code = mCurrentMenu->SendInput(&game_values.playerInput);
 
+            if (netplay.active) {
+                uint8_t lastSendType = netplay.lastSentMessage.packageType;
+                uint8_t lastRecvType = netplay.lastReceivedMessage.packageType;
+
+                if (lastSendType == NET_NOTICE_GAME_SYNCH_OK
+                    && lastRecvType == NET_NOTICE_GAME_STARTED)
+                code = MENU_CODE_NET_ROOM_GO;
+            }
+
             if(MENU_CODE_EXIT_APPLICATION == code) {
                 Exit();
                 return;
@@ -3085,10 +3094,6 @@ void Menu::RunMenu()
                     else if (lastSendType == NET_REQUEST_CREATE_ROOM
                             && lastRecvType == NET_RESPONSE_CREATE_OK)
                         code = MENU_CODE_TO_NET_ROOM_MENU;
-
-                    else if (lastSendType == NET_NOTICE_GAME_SYNCH_OK
-                            && lastRecvType == NET_NOTICE_GAME_STARTED)
-                        code = MENU_CODE_NET_ROOM_GO;
 
                     // ide a hibakezelést
                     // if lastmessage ez és lastresponse emez
