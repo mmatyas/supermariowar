@@ -973,6 +973,9 @@ void RunGame()
     short iCountDownState = 0;
     short iCountDownTimer = 0;
 
+    COutputControl* playerKeys = &game_values.playerInput.outputControls[0];
+    COutputControl previous_playerKeys = *playerKeys;
+
     if(game_values.startgamecountdown && game_values.singleplayermode == -1) {
         iCountDownState = 28;
         iCountDownTimer = iCountDownTimes[0];
@@ -1225,8 +1228,6 @@ void RunGame()
     for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++)
         list_players[iPlayer]->Init();
 
-    COutputControl prev_keys = game_values.playerInput.outputControls[0];
-
     //This is the main game loop
     while (true) {
         framestart = SDL_GetTicks();
@@ -1234,15 +1235,11 @@ void RunGame()
         if (netplay.active) {
             netplay.client.listen();
 
-            if (prev_keys != game_values.playerInput.outputControls[0])
+            if (netplay.gameRunning && previous_playerKeys != *playerKeys) {
                 netplay.client.sendLocalKeys();
-
-            prev_keys = game_values.playerInput.outputControls[0];
+                previous_playerKeys = *playerKeys;
+            }
         }
-
-        game_values.playerInput.outputControls[1] = game_values.playerInput.outputControls[0];
-        game_values.playerInput.outputControls[2] = game_values.playerInput.outputControls[0];
-        game_values.playerInput.outputControls[3] = game_values.playerInput.outputControls[0];
 
         if(iWindTimer <= 0) {
             //Then trigger next wind event

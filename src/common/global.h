@@ -819,6 +819,7 @@ struct Networking {
     //bool networkErrorHappened;
     bool connectSuccessful;
     bool joinSuccessful;
+    bool gameRunning;
 
     bool currentMenuChanged; // eg. room players changed
     bool operationInProgress; // waiting dialogs watch this variable

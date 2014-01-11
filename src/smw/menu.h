@@ -492,7 +492,6 @@ class Menu
 
 		MI_Image * miNetRoomStartingDialogImage;
 		MI_Text * miNetRoomStartingDialogText;
-		MI_Button * miNetRoomStartingDialogDebugButton;
 
 		MI_Image * miNetRoomLeftHeaderBar;
 		MI_Image * miNetRoomRightHeaderBar;

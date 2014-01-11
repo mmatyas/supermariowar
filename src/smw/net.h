@@ -18,6 +18,7 @@
 #define NET_RESPONSE_BADPROTOCOL            2
 #define NET_RESPONSE_SERVERINFO             3
 #define NET_RESPONSE_SERVER_MOTD            4 // Message of the Day
+#define NET_NOTICE_SERVER_STOPPED           5
 
 #define NET_REQUEST_CONNECT                 10
 #define NET_REQUEST_LEAVE_SERVER            11
@@ -40,9 +41,10 @@
 #define NET_RESPONSE_CREATE_OK              41
 #define NET_RESPONSE_CREATE_ERROR           42 // TODO: What kind of error?
 
-#define NET_REQUEST_START_SYNC              50
-#define NET_RESPONSE_READY                  51
-#define NET_NOTICE_GAME_STARTED             52
+#define NET_REQUEST_START_GAME              50
+#define NET_NOTICE_GAME_SYNCH               51 // check if everyone is ready
+#define NET_NOTICE_GAME_SYNCH_OK            52
+#define NET_NOTICE_GAME_STARTED             53
 
 #define NET_NOTICE_LOCAL_KEYS               60
 #define NET_NOTICE_REMOTE_KEYS              61
@@ -160,6 +162,7 @@ class NetClient
         void sendCreateRoomMessage();
         void sendJoinRoomMessage();
         void sendLeaveRoomMessage();
+        void sendStartRoomMessage();
 
         void sendLocalKeys();
 
@@ -200,6 +203,7 @@ class NetClient
         void handleRoomCreatedMessage();
         void handleRoomChangedMessage();
 
+        void sendSynchOKMessage();
         void sendGoodbye();
 };
 

@@ -27,6 +27,8 @@ bool net_init()
     atexit(SDLNet_Quit);
 
     netplay.connectSuccessful = false;
+    netplay.joinSuccessful = false;
+    netplay.gameRunning = false;
 
     /*ServerAddress none;
     none.hostname = "(none)";
@@ -237,6 +239,24 @@ void NetClient::sendLeaveRoomMessage()
     sendUDPMessage(&message, sizeof(MessageHeader));
 }
 
+void NetClient::sendStartRoomMessage()
+{
+    MessageHeader message;
+    message.protocolVersion = NET_PROTOCOL_VERSION;
+    message.packageType = NET_REQUEST_START_GAME;
+
+    sendUDPMessage(&message, sizeof(MessageHeader));
+}
+
+void NetClient::sendSynchOKMessage()
+{
+    MessageHeader message;
+    message.protocolVersion = NET_PROTOCOL_VERSION;
+    message.packageType = NET_NOTICE_GAME_SYNCH_OK;
+
+    sendUDPMessage(&message, sizeof(MessageHeader));
+}
+
 void NetClient::sendLocalKeys()
 {
     LocalKeysPackage pkg;
@@ -296,6 +316,7 @@ void NetClient::handleRoomCreatedMessage()
 
     printf("Room created, ID: %u, %d\n", pkg.roomID, pkg.roomID);
     netplay.currentMenuChanged = true;
+    netplay.joinSuccessful = true;
 
     game_values.playercontrol[0] = 1;
     game_values.playercontrol[1] = 0;
@@ -360,15 +381,18 @@ void NetClient::listen()
                     break;
 
                 case NET_RESPONSE_CONNECT_DENIED:
-                    printf("Not implemented: NET_RESPONSE_CONNECT_DENIED\n");
+                    printf("NET_RESPONSE_CONNECT_DENIED\n");
+                    netplay.connectSuccessful = false;
                     break;
 
                 case NET_RESPONSE_CONNECT_SERVERFULL:
-                    printf("Not implemented: NET_RESPONSE_CONNECT_SERVERFULL\n");
+                    printf("NET_RESPONSE_CONNECT_SERVERFULL\n");
+                    netplay.connectSuccessful = false;
                     break;
 
                 case NET_RESPONSE_CONNECT_NAMETAKEN:
-                    printf("Not implemented: NET_RESPONSE_CONNECT_NAMETAKEN\n");
+                    printf("NET_RESPONSE_CONNECT_NAMETAKEN\n");
+                    netplay.connectSuccessful = false;
                     break;
 
                 //
@@ -386,11 +410,13 @@ void NetClient::listen()
                 // Join
                 //
                 case NET_RESPONSE_JOIN_OK:
-                    printf("Not implemented: NET_RESPONSE_JOIN_OK\n");
+                    printf("NET_RESPONSE_JOIN_OK\n");
+                    netplay.joinSuccessful = true;
                     break;
 
                 case NET_RESPONSE_ROOM_FULL:
-                    printf("Not implemented: NET_RESPONSE_ROOMFULL\n");
+                    printf("NET_RESPONSE_ROOMFULL\n");
+                    netplay.joinSuccessful = false;
                     break;
 
                 case NET_NOTICE_ROOM_CHANGED:
@@ -407,6 +433,24 @@ void NetClient::listen()
                 case NET_RESPONSE_CREATE_ERROR:
                     printf("Not implemented: NET_RESPONSE_CREATE_ERROR\n");
                     break;
+
+                //
+                // Game
+                //
+
+                case NET_NOTICE_GAME_SYNCH:
+                    printf("NET_NOTICE_GAME_SYNCH\n");
+                    sendSynchOKMessage();
+                    break;
+
+                case NET_NOTICE_GAME_STARTED:
+                    printf("NET_NOTICE_GAME_STARTED\n");
+                    netplay.gameRunning = true;
+                    break;
+
+                //
+                // Default
+                //
 
                 default:
                     printf("Unknown: ");

@@ -458,7 +458,7 @@ void Menu::CreateMenu()
         mNetRoom.AddNonControl(miNetRoomPlayerName[p]);
 
     miNetRoomStartButton = new MI_Button(&rm->spr_selectfield, smw->ScreenWidth / 2, 300, "Start", smw->ScreenWidth / 2 - 40, 1);
-    miNetRoomStartButton->SetCode(MENU_CODE_NET_ROOM_START);
+    miNetRoomStartButton->SetCode(MENU_CODE_TO_NET_ROOM_START_IN_PROGRESS);
 
     miNetRoomMessages = new MI_ChatMessageBox(20, 432 - 100, smw->ScreenWidth - 2 * 26, 1);
     miNetRoomMapPlaceholder = new MI_ChatMessageBox(smw->ScreenWidth / 2, 70, smw->ScreenWidth / 2 - 40, 5);
@@ -485,16 +485,12 @@ void Menu::CreateMenu()
 
     miNetRoomStartingDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
     miNetRoomStartingDialogText = new MI_Text("Starting...", smw->ScreenWidth / 2, smw->ScreenHeight / 2 - 40, 0, 2, 1);
-    miNetRoomStartingDialogDebugButton = new MI_Button(&rm->spr_selectfield, smw->ScreenWidth / 2 - 100, 250, "[Debug] Next", 200, 1);
-    miNetRoomStartingDialogDebugButton->SetCode(MENU_CODE_TO_NET_ROOM_MENU);
 
     miNetRoomStartingDialogImage->Show(false);
     miNetRoomStartingDialogText->Show(false);
-    miNetRoomStartingDialogDebugButton->Show(false);
 
     mNetRoom.AddNonControl(miNetRoomStartingDialogImage);
     mNetRoom.AddNonControl(miNetRoomStartingDialogText);
-    mNetRoom.AddControl(miNetRoomStartingDialogDebugButton, NULL, NULL, NULL, NULL);
 
     miNetRoomLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
     miNetRoomRightHeaderBar = new MI_Image(&rm->menu_plain_field, smw->ScreenWidth/2, 0, 192, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
@@ -2069,6 +2065,8 @@ void Menu::RunMenu()
     } else if (game_values.matchtype == MATCH_TYPE_NET_GAME) {
         mCurrentMenu = &mNetLobby;
         mCurrentMenu->ResetMenu();
+        netplay.joinSuccessful = false;
+        netplay.gameRunning = false;
     }
 
     if(game_values.matchtype == MATCH_TYPE_WORLD) {
@@ -3069,18 +3067,28 @@ void Menu::RunMenu()
 
             if (netplay.active) {
 
+                // Override menu code if response has arrived
                 if (netplay.operationInProgress) {
                     MenuCodeEnum previousCode = code;
 
                     uint8_t lastSendType = netplay.lastSentMessage.packageType;
                     uint8_t lastRecvType = netplay.lastReceivedMessage.packageType;
 
-                    if (lastSendType == NET_REQUEST_CONNECT && lastRecvType == NET_RESPONSE_CONNECT_OK)
+                    if (lastSendType == NET_REQUEST_CONNECT
+                            && lastRecvType == NET_RESPONSE_CONNECT_OK)
                         code = MENU_CODE_TO_NET_LOBBY_MENU;
-                    else if (lastSendType == NET_REQUEST_JOIN_ROOM && lastRecvType == NET_RESPONSE_JOIN_OK)
+
+                    else if (lastSendType == NET_REQUEST_JOIN_ROOM
+                            && lastRecvType == NET_RESPONSE_JOIN_OK)
                         code = MENU_CODE_TO_NET_ROOM_MENU;
-                    else if (lastSendType == NET_REQUEST_CREATE_ROOM && lastRecvType == NET_RESPONSE_CREATE_OK)
+
+                    else if (lastSendType == NET_REQUEST_CREATE_ROOM
+                            && lastRecvType == NET_RESPONSE_CREATE_OK)
                         code = MENU_CODE_TO_NET_ROOM_MENU;
+
+                    else if (lastSendType == NET_NOTICE_GAME_SYNCH_OK
+                            && lastRecvType == NET_NOTICE_GAME_STARTED)
+                        code = MENU_CODE_NET_ROOM_GO;
 
                     // ide a hibakezelést
                     // if lastmessage ez és lastresponse emez
@@ -3092,6 +3100,7 @@ void Menu::RunMenu()
                 }
 
                 if(MENU_CODE_TO_NET_SERVERLIST == code) {
+                    netplay.connectSuccessful = false;
                     miNetServersScroll->Show(true);
                     mNetServers.RememberCurrent();
 
@@ -3129,6 +3138,8 @@ void Menu::RunMenu()
                     if (netplay.currentRoom.roomID) {
                         netplay.client.sendLeaveRoomMessage();
                         netplay.currentRoom.roomID = 0;
+                        netplay.joinSuccessful = false;
+                        netplay.gameRunning = false;
                     }
                     netplay.client.requestRoomList();
 
@@ -3170,10 +3181,16 @@ void Menu::RunMenu()
                     mCurrentMenu = &mNetNewRoom;
                     mCurrentMenu->ResetMenu();
                 } else if (MENU_CODE_TO_NET_ROOM_MENU == code) {
-
                     mCurrentMenu = &mNetRoom;
                     mCurrentMenu->ResetMenu();
                     netplay.currentMenuChanged = true;
+                    netplay.operationInProgress = false;
+
+                    // Restore Room layout
+                        miNetRoomStartingDialogImage->Show(false);
+                        miNetRoomStartingDialogText->Show(false);
+                        mNetRoom.SetHeadControl(miNetRoomMessageField);
+                        mNetRoom.SetCancelCode(MENU_CODE_TO_NET_LOBBY_MENU);
 
                     // Restore Lobby layout
                         miNetLobbyJoiningDialogImage->Show(false);
@@ -3228,7 +3245,20 @@ void Menu::RunMenu()
 
                     mNetNewRoom.RestoreCurrent();
                     iDisplayError = DISPLAY_ERROR_NONE;
-                } else if (MENU_CODE_NET_ROOM_START == code) {
+                } else if (MENU_CODE_TO_NET_ROOM_START_IN_PROGRESS == code) {
+                    netplay.client.sendStartRoomMessage();
+                    netplay.operationInProgress = true;
+
+                    miNetRoomStartingDialogImage->Show(true);
+                    miNetRoomStartingDialogText->Show(true);
+                    mNetRoom.RememberCurrent();
+
+                    mNetRoom.SetHeadControl(miNetRoomStartingDialogText);
+                    //mNetRoom.SetCancelCode(MENU_CODE_NET_START_ABORT);
+                    mNetRoom.SetCancelCode(MENU_CODE_NONE);
+                    mNetRoom.ResetMenu();
+                } else if (MENU_CODE_NET_ROOM_GO == code) {
+                    netplay.operationInProgress = false;
                     game_values.matchtype = MATCH_TYPE_NET_GAME;
 
                     miTeamSelect->Reset();
