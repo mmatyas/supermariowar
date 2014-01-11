@@ -257,7 +257,7 @@ void NetClient::sendSynchOKMessage()
     sendUDPMessage(&message, sizeof(MessageHeader));
 }
 
-void NetClient::sendLocalKeys()
+void NetClient::sendLocalInput()
 {
     LocalKeysPackage pkg;
     pkg.protocolVersion = NET_PROTOCOL_VERSION;
@@ -340,13 +340,46 @@ void NetClient::handleRoomChangedMessage()
 
         if (strcmp(netplay.currentRoom.playerNames[p], "(empty)") == 0)
             game_values.playercontrol[p] = 0;
-        else if (strcmp(netplay.currentRoom.playerNames[p], "(bot)") == 0)
-            game_values.playercontrol[p] = 2;
+        //else if (strcmp(netplay.currentRoom.playerNames[p], "(bot)") == 0)
+        //    game_values.playercontrol[p] = 2;
+        //    game_values.playercontrol[p] = 1;
         else
             game_values.playercontrol[p] = 1; // valid player
     }
+    remotePlayerNumber = pkg.remotePlayerNumber;
 
     netplay.currentMenuChanged = true;
+}
+
+void NetClient::handleRemoteInput()
+{
+    RemoteKeysPackage pkg;
+    memcpy(&pkg, udpIncomingPacket->data, sizeof(RemoteKeysPackage));
+
+    COutputControl* playerControl;
+    if (pkg.playerNumber != 0) {// local player is at 0
+        playerControl = &game_values.playerInput.outputControls[pkg.playerNumber];
+        printf("normal input\n");
+    }
+    else {
+        playerControl = &game_values.playerInput.outputControls[remotePlayerNumber];
+        printf("change input place\n");
+    }
+
+    printf("ittvagyok? pNum: %d, rpn: %d sizeof keystate: %d, pkg: %d, pointer: %p\n",
+        pkg.playerNumber, remotePlayerNumber, sizeof(CKeyState), sizeof(RemoteKeysPackage), playerControl);
+    for (int a = 0; a < 8; a++) {
+        printf(" {%d, %d}", pkg.keys[a].fDown, pkg.keys[a].fPressed);
+    }
+    printf("\nmost:");
+
+    for (int a = 0; a < 8; a++) {
+        printf(" {%d, %d}", playerControl->keys[a].fDown, playerControl->keys[a].fPressed);
+    }
+    printf("\n");
+
+    memcpy(playerControl->keys, pkg.keys, 8 * sizeof(CKeyState));
+    printf("most?\n");
 }
 
 void NetClient::listen()
@@ -446,6 +479,11 @@ void NetClient::listen()
                 case NET_NOTICE_GAME_STARTED:
                     printf("NET_NOTICE_GAME_STARTED\n");
                     netplay.gameRunning = true;
+                    break;
+
+                case NET_NOTICE_REMOTE_KEYS:
+                    printf("NET_NOTICE_REMOTE_KEYS\n");
+                    handleRemoteInput();
                     break;
 
                 //

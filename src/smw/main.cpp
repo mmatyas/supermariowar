@@ -1236,7 +1236,7 @@ void RunGame()
             netplay.client.listen();
 
             if (netplay.gameRunning && previous_playerKeys != *playerKeys) {
-                netplay.client.sendLocalKeys();
+                netplay.client.sendLocalInput();
                 previous_playerKeys = *playerKeys;
             }
         }

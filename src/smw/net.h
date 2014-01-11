@@ -96,7 +96,7 @@ struct Room {
 
 // Protocol structures
 
-struct MessageHeader {
+struct MessageHeader {      // TODO: add timestamp
     uint8_t        protocolVersion;
     uint8_t        packageType;
 };
@@ -136,6 +136,7 @@ struct CurrentRoomPackage : MessageHeader {
     uint32_t       roomID;
     char           name[NET_MAX_ROOM_NAME_LENGTH];
     char           playerName[4][NET_MAX_PLAYER_NAME_LENGTH];
+    uint8_t        remotePlayerNumber;
 };
 
 struct LocalKeysPackage : MessageHeader {
@@ -143,7 +144,7 @@ struct LocalKeysPackage : MessageHeader {
 };
 
 struct RemoteKeysPackage : MessageHeader {
-    uint32_t       playerID;
+    uint8_t        playerNumber;
     CKeyState      keys[8];
 };
 
@@ -164,7 +165,7 @@ class NetClient
         void sendLeaveRoomMessage();
         void sendStartRoomMessage();
 
-        void sendLocalKeys();
+        void sendLocalInput();
 
         // called on network session start/end
 		bool startSession();
@@ -190,6 +191,7 @@ class NetClient
         MI_NetworkListScroll* uiRoomList;
 
 
+        uint8_t remotePlayerNumber;
         short backup_playercontrol[4];
 
 
@@ -202,6 +204,7 @@ class NetClient
         void handleNewRoomListEntry();
         void handleRoomCreatedMessage();
         void handleRoomChangedMessage();
+        void handleRemoteInput();
 
         void sendSynchOKMessage();
         void sendGoodbye();
