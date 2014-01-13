@@ -843,6 +843,8 @@ struct Networking {
     char newroom_password[NET_MAX_ROOM_PASSWORD_LENGTH];
 
     char mychatmessage[NET_MAX_CHAT_MSG_LENGTH];
+
+    CPlayerInput netPlayerInput;
 };
 
 //TODO:: Move menu settings from game_values to global menu context structure

@@ -357,15 +357,15 @@ void NetClient::handleRemoteInput()
     memcpy(&pkg, udpIncomingPacket->data, sizeof(RemoteKeysPackage));
 
     COutputControl* playerControl;
-    if (pkg.playerNumber != 0) {// local player is at 0
+    /*if (pkg.playerNumber != 0) { // local player is at 0
         playerControl = &game_values.playerInput.outputControls[pkg.playerNumber];
         printf("normal input\n");
     }
     else
-        playerControl = &game_values.playerInput.outputControls[remotePlayerNumber];
+        playerControl = &game_values.playerInput.outputControls[remotePlayerNumber];*/
+    playerControl = &netplay.netPlayerInput.outputControls[remotePlayerNumber];
 
     memcpy(playerControl->keys, pkg.keys, 8 * sizeof(CKeyState));
-    printf("most?\n");
 }
 
 void NetClient::listen()

@@ -973,8 +973,8 @@ void RunGame()
     short iCountDownState = 0;
     short iCountDownTimer = 0;
 
-    COutputControl* playerKeys = &game_values.playerInput.outputControls[0];
-    COutputControl previous_playerKeys = *playerKeys;
+    COutputControl* current_playerKeys = &game_values.playerInput.outputControls[0];
+    COutputControl previous_playerKeys = *current_playerKeys;
 
     if(game_values.startgamecountdown && game_values.singleplayermode == -1) {
         iCountDownState = 28;
@@ -1235,9 +1235,9 @@ void RunGame()
         if (netplay.active) {
             netplay.client.listen();
 
-            if (netplay.gameRunning && previous_playerKeys != *playerKeys) {
+            if (netplay.gameRunning && previous_playerKeys != *current_playerKeys) {
                 netplay.client.sendLocalInput();
-                previous_playerKeys = *playerKeys;
+                previous_playerKeys = *current_playerKeys;
             }
         }
 
@@ -1575,7 +1575,11 @@ void RunGame()
             }
 
             for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
-                COutputControl * playerKeys = &game_values.playerInput.outputControls[iPlayer];
+                COutputControl * playerKeys;
+                if (netplay.active)
+                    playerKeys = &netplay.netPlayerInput.outputControls[iPlayer];
+                else
+                    playerKeys = &game_values.playerInput.outputControls[iPlayer];
 
                 //If the start key is pressed (pause key)
                 if(playerKeys->game_start.fPressed && IsPauseAllowed()) {
