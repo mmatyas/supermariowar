@@ -361,7 +361,7 @@ void NetClient::handleRemoteInput()
         playerControl = &game_values.playerInput.outputControls[pkg.playerNumber];
         printf("normal input\n");
     }
-    else {
+    else
         playerControl = &game_values.playerInput.outputControls[remotePlayerNumber];
 
     memcpy(playerControl->keys, pkg.keys, 8 * sizeof(CKeyState));
