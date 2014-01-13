@@ -139,6 +139,10 @@ struct CurrentRoomPackage : MessageHeader {
     uint8_t        remotePlayerNumber;
 };
 
+struct StartSynchPackage : MessageHeader {
+    uint32_t       commonRandomSeed;
+};
+
 struct LocalKeysPackage : MessageHeader {
     CKeyState      keys[8];
 };

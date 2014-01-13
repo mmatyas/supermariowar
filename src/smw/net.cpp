@@ -363,20 +363,6 @@ void NetClient::handleRemoteInput()
     }
     else {
         playerControl = &game_values.playerInput.outputControls[remotePlayerNumber];
-        printf("change input place\n");
-    }
-
-    printf("ittvagyok? pNum: %d, rpn: %d sizeof keystate: %d, pkg: %d, pointer: %p\n",
-        pkg.playerNumber, remotePlayerNumber, sizeof(CKeyState), sizeof(RemoteKeysPackage), playerControl);
-    for (int a = 0; a < 8; a++) {
-        printf(" {%d, %d}", pkg.keys[a].fDown, pkg.keys[a].fPressed);
-    }
-    printf("\nmost:");
-
-    for (int a = 0; a < 8; a++) {
-        printf(" {%d, %d}", playerControl->keys[a].fDown, playerControl->keys[a].fPressed);
-    }
-    printf("\n");
 
     memcpy(playerControl->keys, pkg.keys, 8 * sizeof(CKeyState));
     printf("most?\n");

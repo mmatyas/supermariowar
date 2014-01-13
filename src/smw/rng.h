@@ -12,6 +12,10 @@ public:
 		return RAND_MAX;
 	}
 
+	void ReSeed(unsigned int seed) {
+		srand(seed);
+	}
+
 	// generate uniformly distributed random number
 	// rMax is not part of the set
 	int	GetRandMax(int rMax)
@@ -83,19 +87,27 @@ private:
 		   return state[index];
 		}
 
+		void initialize() {
+			assert(sizeof(unsigned int) == 4);
+
+			index = 0;
+
+			for(int i =0; i < 16; i++) {
+				state[i] = rand();
+			}
+		}
+
 public:
 
 	// we initialize the state with (supposedly) true random numbers coming from the system
 	// this constitutes a good enough seed
 	Well512RandomNumberGenerator() {
+		initialize();
+	}
 
-		assert(sizeof(unsigned int) == 4);
-
-		index = 0;
-
-		for(int i =0; i < 16; i++) {
-			state[i] = rand();
-		}
+	void ReSeed(unsigned int seed) {
+		CRandomNumberGenerator::ReSeed(seed);
+		initialize();
 	}
 
 	int GetRand(int rMin, int rMax)
