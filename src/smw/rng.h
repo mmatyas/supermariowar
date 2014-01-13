@@ -94,7 +94,7 @@ private:
 
 			for(int i =0; i < 16; i++) {
 				//state[i] = rand();
-				state[i] = i;
+				state[i] = i; // TODO: fix this, same numbers must be generated across all platforms
 			}
 		}
 
