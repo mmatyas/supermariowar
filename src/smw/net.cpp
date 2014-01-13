@@ -459,6 +459,12 @@ void NetClient::listen()
 
                 case NET_NOTICE_GAME_SYNCH:
                     printf("NET_NOTICE_GAME_SYNCH\n");
+
+                    StartSynchPackage pkg;
+                    memcpy(&pkg, udpIncomingPacket->data, sizeof(StartSynchPackage));
+
+                    printf("reseed: %d\n", pkg.commonRandomSeed);
+                    smw->rng->ReSeed(pkg.commonRandomSeed);
                     sendSynchOKMessage();
                     break;
 

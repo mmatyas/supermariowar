@@ -2958,12 +2958,6 @@ void CMap::update()
 
 bool CMap::findspawnpoint(short iType, short * x, short * y, short width, short height, bool tilealigned)
 {
-    if (netplay.active) {
-        *x = smw->ScreenWidth / 2;
-        *y = smw->ScreenHeight / 2;
-        return true;
-    }
-
     if(totalspawnsize[iType] <= 0) {
 		*x = RNGMAX(smw->ScreenWidth);
 		*y = RNGMAX(smw->ScreenHeight * 0.87f);
