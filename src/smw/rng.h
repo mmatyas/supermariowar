@@ -93,7 +93,8 @@ private:
 			index = 0;
 
 			for(int i =0; i < 16; i++) {
-				state[i] = rand();
+				//state[i] = rand();
+				state[i] = i;
 			}
 		}
 
