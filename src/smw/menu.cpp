@@ -448,12 +448,12 @@ void Menu::CreateMenu()
     //***********************
 
     miNetRoomName = new MI_Text("Room name here", 40, 50, 0, 2, 0);
-    miNetRoomPlayerName[0] = new MI_Text("P1 name here", 40, 110, 0, 2, 0);
-    miNetRoomPlayerName[1] = new MI_Text("P2 name here", 40, 160, 0, 2, 0);
-    miNetRoomPlayerName[2] = new MI_Text("P3 name here", 40, 210, 0, 2, 0);
-    miNetRoomPlayerName[3] = new MI_Text("P4 name here", 40, 250, 0, 2, 0);
+    miNetRoomPlayerName[0] = new MI_Text("P1 name here", 40, 80, 0, 2, 0);
+    miNetRoomPlayerName[1] = new MI_Text("P2 name here", 40, 140, 0, 2, 0);
+    miNetRoomPlayerName[2] = new MI_Text("P3 name here", 40, 200, 0, 2, 0);
+    miNetRoomPlayerName[3] = new MI_Text("P4 name here", 40, 260, 0, 2, 0);
 
-    mNetRoom.AddNonControl(miNetRoomName);
+    //mNetRoom.AddNonControl(miNetRoomName);
     for (short p = 0; p < 4; p++)
         mNetRoom.AddNonControl(miNetRoomPlayerName[p]);
 
@@ -3286,14 +3286,14 @@ void Menu::RunMenu()
 
                 // on room change
                 if (netplay.currentMenuChanged) {
-                    printf("menuChanged\n");
+                    //printf("menuChanged\n");
 
                     // Servers screen
                     const char* nethostname = netplay.savedServers[netplay.selectedServerIndex].hostname.c_str();
                     miNetServersSelectedHostText->SetText(nethostname);
 
                     // Room screen
-                    miNetRoomName->SetText(netplay.currentRoom.name);
+                    miNetRoomHeaderText->SetText(netplay.currentRoom.name);
                     for (uint8_t p = 0; p < 4; p++)
                         miNetRoomPlayerName[p]->SetText(netplay.currentRoom.playerNames[p]);
 

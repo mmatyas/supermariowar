@@ -288,7 +288,7 @@ void NetClient::handleNewRoomListEntry()
 {
     RoomInfoPackage roomInfo;
     memcpy(&roomInfo, udpIncomingPacket->data, sizeof(RoomInfoPackage));
-    printf("  Incoming room entry: [%u] %s (%d/4)\n", roomInfo.roomID, roomInfo.name, roomInfo.currentPlayerCount);
+    //printf("  Incoming room entry: [%u] %s (%d/4)\n", roomInfo.roomID, roomInfo.name, roomInfo.currentPlayerCount);
 
     RoomListEntry newRoom;
     newRoom.roomID = roomInfo.roomID;
@@ -314,7 +314,7 @@ void NetClient::handleRoomCreatedMessage()
     memcpy(netplay.currentRoom.playerNames[2], "(empty)", NET_MAX_PLAYER_NAME_LENGTH);
     memcpy(netplay.currentRoom.playerNames[3], "(empty)", NET_MAX_PLAYER_NAME_LENGTH);
 
-    printf("Room created, ID: %u, %d\n", pkg.roomID, pkg.roomID);
+    //printf("Room created, ID: %u, %d\n", pkg.roomID, pkg.roomID);
     netplay.currentMenuChanged = true;
     netplay.joinSuccessful = true;
 
@@ -332,10 +332,10 @@ void NetClient::handleRoomChangedMessage()
     netplay.currentRoom.roomID = pkg.roomID;
     memcpy(netplay.currentRoom.name, pkg.name, NET_MAX_ROOM_NAME_LENGTH);
 
-    printf("Room %u (%s) changed:\n", pkg.roomID, pkg.name);
+    //printf("Room %u (%s) changed:\n", pkg.roomID, pkg.name);
     for (uint8_t p = 0; p < 4; p++) {
         memcpy(netplay.currentRoom.playerNames[p], pkg.playerName[p], NET_MAX_PLAYER_NAME_LENGTH);
-        printf("  player %d: %s\n", p+1, netplay.currentRoom.playerNames[p]);
+        //printf("  player %d: %s\n", p+1, netplay.currentRoom.playerNames[p]);
 
 
         if (strcmp(netplay.currentRoom.playerNames[p], "(empty)") == 0)
@@ -356,16 +356,7 @@ void NetClient::handleRemoteInput()
     RemoteKeysPackage pkg;
     memcpy(&pkg, udpIncomingPacket->data, sizeof(RemoteKeysPackage));
 
-    COutputControl* playerControl;
-    /*if (pkg.playerNumber != 0) { // local player is at 0
-        playerControl = &game_values.playerInput.outputControls[pkg.playerNumber];
-        printf("normal input\n");
-    }
-    else
-        playerControl = &game_values.playerInput.outputControls[remotePlayerNumber];*/
-    playerControl = &netplay.netPlayerInput.outputControls[pkg.playerNumber];
-    printf("gombnyomas p%d-tol\n", pkg.playerNumber);
-
+    COutputControl* playerControl = &netplay.netPlayerInput.outputControls[pkg.playerNumber];
     memcpy(playerControl->keys, pkg.keys, 8 * sizeof(CKeyState));
 }
 
@@ -464,7 +455,7 @@ void NetClient::listen()
                     StartSynchPackage pkg;
                     memcpy(&pkg, udpIncomingPacket->data, sizeof(StartSynchPackage));
 
-                    printf("reseed: %d\n", pkg.commonRandomSeed);
+                    //printf("reseed: %d\n", pkg.commonRandomSeed);
                     smw->rng->ReSeed(pkg.commonRandomSeed);
                     sendSynchOKMessage();
                     break;
@@ -475,7 +466,7 @@ void NetClient::listen()
                     break;
 
                 case NET_NOTICE_REMOTE_KEYS:
-                    printf("NET_NOTICE_REMOTE_KEYS\n");
+                    //printf("NET_NOTICE_REMOTE_KEYS\n");
                     handleRemoteInput();
                     break;
 
@@ -524,7 +515,7 @@ void NetClient::sendGoodbye()
     msg.protocolVersion = NET_PROTOCOL_VERSION;
     msg.packageType = NET_REQUEST_LEAVE_SERVER;
 
-    printf("sendGoodbye\n");
+    //printf("sendGoodbye\n");
     sendUDPMessage(&msg, sizeof(MessageHeader));
 }
 
@@ -548,7 +539,7 @@ void NetClient::closeUDPsocket()
     if (udpSocket) {
         SDLNet_UDP_Close(udpSocket);
         udpSocket = NULL;
-        printf("[] UDP closed.\n");
+        //printf("[] UDP closed.\n");
     }
 }
 
