@@ -363,7 +363,8 @@ void NetClient::handleRemoteInput()
     }
     else
         playerControl = &game_values.playerInput.outputControls[remotePlayerNumber];*/
-    playerControl = &netplay.netPlayerInput.outputControls[remotePlayerNumber];
+    playerControl = &netplay.netPlayerInput.outputControls[pkg.playerNumber];
+    printf("gombnyomas p%d-tol\n", pkg.playerNumber);
 
     memcpy(playerControl->keys, pkg.keys, 8 * sizeof(CKeyState));
 }

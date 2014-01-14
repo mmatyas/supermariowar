@@ -1405,6 +1405,7 @@ void RunGame()
 #endif
 
         game_values.playerInput.ClearPressedKeys(game_values.exitinggame ? 1 : 0);
+        netplay.netPlayerInput.ClearPressedKeys(game_values.exitinggame ? 1 : 0);
         //handle messages
 
         while(SDL_PollEvent(&event)) {
@@ -1575,11 +1576,7 @@ void RunGame()
             }
 
             for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
-                COutputControl * playerKeys;
-                if (netplay.active)
-                    playerKeys = &netplay.netPlayerInput.outputControls[iPlayer];
-                else
-                    playerKeys = &game_values.playerInput.outputControls[iPlayer];
+                COutputControl * playerKeys = &game_values.playerInput.outputControls[iPlayer];
 
                 //If the start key is pressed (pause key)
                 if(playerKeys->game_start.fPressed && IsPauseAllowed()) {
