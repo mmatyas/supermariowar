@@ -9,6 +9,8 @@
 
 extern gv game_values;
 extern int g_iVersion[];
+extern CPlayer *list_players[4];
+extern short list_players_cnt;
 extern bool VersionIsEqual(int iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
 
 Networking netplay;
@@ -280,6 +282,25 @@ void NetClient::sendLocalInput()
     sendUDPMessage(&pkg, sizeof(LocalKeysPackage));
 }
 
+void NetClient::sendCurrentGameState()
+{
+    if (!netplay.theHostIsMe)
+        return;
+
+    GameStatePackage pkg;
+    pkg.protocolVersion = NET_PROTOCOL_VERSION;
+    pkg.packageType = NET_NOTICE_HOST_STATE;
+
+    for (uint8_t p = 0; p < list_players_cnt; p++) {
+        pkg.player_x[p] = list_players[p]->fx;
+        pkg.player_y[p] = list_players[p]->fy;
+        pkg.player_xvel[p] = list_players[p]->velx;
+        pkg.player_xvel[p] = list_players[p]->vely;
+    }
+
+    sendUDPMessage(&pkg, sizeof(GameStatePackage));
+}
+
 /****************************
     Incoming messages
 ****************************/
@@ -330,6 +351,7 @@ void NetClient::handleRoomCreatedMessage()
     //printf("Room created, ID: %u, %d\n", pkg.roomID, pkg.roomID);
     netplay.currentMenuChanged = true;
     netplay.joinSuccessful = true;
+    netplay.theHostIsMe = true;
 
     game_values.playercontrol[0] = 1;
     game_values.playercontrol[1] = 0;
@@ -364,8 +386,11 @@ void NetClient::handleRoomChangedMessage()
             game_values.playercontrol[p] = 1; // valid player
     }
 
+    netplay.theHostIsMe = false;
     netplay.currentRoom.hostPlayerNumber = pkg.hostPlayerNumber;
     remotePlayerNumber = pkg.remotePlayerNumber;
+    if (remotePlayerNumber == pkg.hostPlayerNumber)
+        netplay.theHostIsMe = true;
 
     netplay.currentMenuChanged = true;
 }
@@ -377,6 +402,19 @@ void NetClient::handleRemoteInput()
 
     COutputControl* playerControl = &netplay.netPlayerInput.outputControls[pkg.playerNumber];
     memcpy(playerControl->keys, pkg.keys, 8 * sizeof(CKeyState));
+}
+
+void NetClient::handleRemoteGameState()
+{
+    GameStatePackage pkg;
+    memcpy(&pkg, udpIncomingPacket->data, sizeof(GameStatePackage));
+
+    for (uint8_t p = 0; p < list_players_cnt; p++) {
+        list_players[p]->fx = pkg.player_x[p];
+        list_players[p]->fy = pkg.player_y[p];
+        list_players[p]->velx = pkg.player_xvel[p];
+        list_players[p]->vely = pkg.player_yvel[p];
+    }
 }
 
 void NetClient::listen()
@@ -442,6 +480,7 @@ void NetClient::listen()
                 case NET_RESPONSE_JOIN_OK:
                     printf("NET_RESPONSE_JOIN_OK\n");
                     netplay.joinSuccessful = true;
+                    netplay.theHostIsMe = false;
                     break;
 
                 case NET_RESPONSE_ROOM_FULL:
@@ -487,6 +526,10 @@ void NetClient::listen()
                 case NET_NOTICE_REMOTE_KEYS:
                     //printf("NET_NOTICE_REMOTE_KEYS\n");
                     handleRemoteInput();
+                    break;
+
+                case NET_NOTICE_HOST_STATE:
+                    handleRemoteGameState();
                     break;
 
                 //
@@ -558,7 +601,7 @@ void NetClient::closeUDPsocket()
     if (udpSocket) {
         SDLNet_UDP_Close(udpSocket);
         udpSocket = NULL;
-        //printf("[] UDP closed.\n");
+        printf("[] UDP closed.\n");
     }
 }
 

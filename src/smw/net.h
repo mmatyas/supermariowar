@@ -48,6 +48,7 @@
 
 #define NET_NOTICE_LOCAL_KEYS               60
 #define NET_NOTICE_REMOTE_KEYS              61
+#define NET_NOTICE_HOST_STATE               62
 
 
 //Write network handler class here
@@ -154,6 +155,13 @@ struct RemoteKeysPackage : MessageHeader {
     CKeyState      keys[8];
 };
 
+struct GameStatePackage : MessageHeader {
+    float          player_x[4];
+    float          player_y[4];
+    float          player_xvel[4];
+    float          player_yvel[4];
+};
+
 // Network communication class
 
 class NetClient
@@ -172,6 +180,7 @@ class NetClient
         void sendStartRoomMessage();
 
         void sendLocalInput();
+        void sendCurrentGameState();
 
         // called on network session start/end
 		bool startSession();
@@ -211,6 +220,7 @@ class NetClient
         void handleRoomCreatedMessage();
         void handleRoomChangedMessage();
         void handleRemoteInput();
+        void handleRemoteGameState();
 
         void sendSynchOKMessage();
         void sendGoodbye();

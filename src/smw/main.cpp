@@ -1230,6 +1230,7 @@ void RunGame()
         framestart = SDL_GetTicks();
 
         if (netplay.active) {
+            netplay.client.sendCurrentGameState();
             netplay.client.listen();
 
             if (netplay.gameRunning && previous_playerKeys != *current_playerKeys) {

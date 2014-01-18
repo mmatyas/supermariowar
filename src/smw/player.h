@@ -565,6 +565,7 @@ class CPlayer
 
 		friend class CPlayerAI;
 		friend class CSimpleAI;
+		friend class NetClient;
 };
 
 
