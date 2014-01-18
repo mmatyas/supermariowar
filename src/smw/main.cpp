@@ -1230,10 +1230,13 @@ void RunGame()
         framestart = SDL_GetTicks();
 
         if (netplay.active) {
-            netplay.client.sendCurrentGameState();
             netplay.client.listen();
 
-            if (netplay.gameRunning && previous_playerKeys != *current_playerKeys) {
+            // The host sends the game state to clients
+            // The clients send input to host
+            if (netplay.theHostIsMe)
+                netplay.client.sendCurrentGameState();
+            else if (netplay.gameRunning && previous_playerKeys != *current_playerKeys) {
                 netplay.client.sendLocalInput();
                 previous_playerKeys = *current_playerKeys;
             }
