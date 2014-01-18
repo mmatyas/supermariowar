@@ -26,9 +26,21 @@ bool net_init()
 
     atexit(SDLNet_Quit);
 
+
+    netplay.active = false;
     netplay.connectSuccessful = false;
     netplay.joinSuccessful = false;
     netplay.gameRunning = false;
+
+    strcpy(netplay.myPlayerName, "Player");
+    netplay.currentMenuChanged = false;
+    netplay.theHostIsMe = false;
+    netplay.selectedRoomIndex = 0;
+    netplay.selectedServerIndex = 0;
+    netplay.roomFilter[0] = '\0';
+    netplay.newroom_name[0] = '\0';
+    netplay.newroom_password[0] = '\0';
+    netplay.mychatmessage[0] = '\0';
 
     /*ServerAddress none;
     none.hostname = "(none)";
@@ -188,7 +200,7 @@ bool NetClient::sendConnectRequestToSelectedServer()
         ClientConnectionPackage message;
         message.protocolVersion = NET_PROTOCOL_VERSION;
         message.packageType = NET_REQUEST_CONNECT;
-        memcpy(message.playerName, netplay.playername, NET_MAX_PLAYER_NAME_LENGTH);
+        memcpy(message.playerName, netplay.myPlayerName, NET_MAX_PLAYER_NAME_LENGTH);
         message.playerName[NET_MAX_PLAYER_NAME_LENGTH - 1] = '\0';
 
         sendUDPMessage(&message, sizeof(ClientConnectionPackage));
@@ -308,8 +320,9 @@ void NetClient::handleRoomCreatedMessage()
     memcpy(&pkg, udpIncomingPacket->data, sizeof(NewRoomCreatedPackage));
 
     netplay.currentRoom.roomID = pkg.roomID;
+    netplay.currentRoom.hostPlayerNumber = 0;
     memcpy(netplay.currentRoom.name, netplay.newroom_name, NET_MAX_ROOM_NAME_LENGTH);
-    memcpy(netplay.currentRoom.playerNames[0], netplay.playername, NET_MAX_PLAYER_NAME_LENGTH);
+    memcpy(netplay.currentRoom.playerNames[0], netplay.myPlayerName, NET_MAX_PLAYER_NAME_LENGTH);
     memcpy(netplay.currentRoom.playerNames[1], "(empty)", NET_MAX_PLAYER_NAME_LENGTH);
     memcpy(netplay.currentRoom.playerNames[2], "(empty)", NET_MAX_PLAYER_NAME_LENGTH);
     memcpy(netplay.currentRoom.playerNames[3], "(empty)", NET_MAX_PLAYER_NAME_LENGTH);
@@ -332,10 +345,14 @@ void NetClient::handleRoomChangedMessage()
     netplay.currentRoom.roomID = pkg.roomID;
     memcpy(netplay.currentRoom.name, pkg.name, NET_MAX_ROOM_NAME_LENGTH);
 
-    //printf("Room %u (%s) changed:\n", pkg.roomID, pkg.name);
+    printf("Room %u (%s) changed:\n", pkg.roomID, pkg.name);
+    printf("host: %d\n", pkg.hostPlayerNumber);
     for (uint8_t p = 0; p < 4; p++) {
         memcpy(netplay.currentRoom.playerNames[p], pkg.playerName[p], NET_MAX_PLAYER_NAME_LENGTH);
-        //printf("  player %d: %s\n", p+1, netplay.currentRoom.playerNames[p]);
+        printf("  player %d: %s", p+1, netplay.currentRoom.playerNames[p]);
+        if (p == pkg.hostPlayerNumber)
+            printf(" (HOST)");
+        printf("\n");
 
 
         if (strcmp(netplay.currentRoom.playerNames[p], "(empty)") == 0)
@@ -346,6 +363,8 @@ void NetClient::handleRoomChangedMessage()
         else
             game_values.playercontrol[p] = 1; // valid player
     }
+
+    netplay.currentRoom.hostPlayerNumber = pkg.hostPlayerNumber;
     remotePlayerNumber = pkg.remotePlayerNumber;
 
     netplay.currentMenuChanged = true;

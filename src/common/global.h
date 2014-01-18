@@ -822,19 +822,17 @@ struct Networking {
     bool gameRunning;
 
     bool currentMenuChanged; // eg. room players changed
-    bool operationInProgress; // waiting dialogs watch this variable
-
-    char * hostaddress;
-    char playername[NET_MAX_PLAYER_NAME_LENGTH];    // last byte will be \0
+    bool operationInProgress; // the waiting dialogs watch this variable
 
     NetClient client;
     LastMessage lastSentMessage;
     LastMessage lastReceivedMessage;
+    char myPlayerName[NET_MAX_PLAYER_NAME_LENGTH];    // last byte will be \0
 
     unsigned short selectedServerIndex;
     std::vector<ServerAddress> savedServers;
 
-    char roomfilter[NET_MAX_ROOM_NAME_LENGTH];
+    char roomFilter[NET_MAX_ROOM_NAME_LENGTH];
     unsigned short selectedRoomIndex;
     std::vector<RoomListEntry> currentRooms;
     Room currentRoom;
@@ -844,6 +842,7 @@ struct Networking {
 
     char mychatmessage[NET_MAX_CHAT_MSG_LENGTH];
 
+    bool theHostIsMe;
     CPlayerInput netPlayerInput;
 };
 

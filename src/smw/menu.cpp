@@ -304,7 +304,7 @@ void Menu::CreateMenu()
     miNetServersAddRemoveButton->SetCode(MENU_CODE_TO_NET_ADDREMOVE_SERVER_MENU);
 
     miNetServersNicknameField = new MI_TextField(&rm->menu_plain_field, 70, 320, "Your name", smw->ScreenWidth - 2 * 70, 150);
-    miNetServersNicknameField->SetData(netplay.playername, NET_MAX_PLAYER_NAME_LENGTH);
+    miNetServersNicknameField->SetData(netplay.myPlayerName, NET_MAX_PLAYER_NAME_LENGTH);
 
     miNetServersConnectingDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
     miNetServersConnectingDialogText = new MI_Text("Connecting...", smw->ScreenWidth / 2, smw->ScreenHeight / 2 - 12, 0, 2, 1);
@@ -353,7 +353,7 @@ void Menu::CreateMenu()
     miNetLobbyNewRoomButton->SetCode(MENU_CODE_TO_NET_NEW_ROOM_LEVEL_SELECT_MENU);
 
     miNetLobbyFilterField = new MI_TextField(&rm->menu_plain_field, smw->ScreenWidth /2  + 20, 160, "Search", smw->ScreenWidth / 2 - 30, 90);
-    miNetLobbyFilterField->SetData(netplay.roomfilter, NET_MAX_ROOM_NAME_LENGTH);
+    miNetLobbyFilterField->SetData(netplay.roomFilter, NET_MAX_ROOM_NAME_LENGTH);
 
     miNetLobbyRefreshButton = new MI_Button(&rm->spr_selectfield, smw->ScreenWidth / 2 + 20, 200, "Refresh", smw->ScreenWidth / 2 - 30, 1);
     miNetLobbyRefreshButton->SetCode(MENU_CODE_TO_NET_LOBBY_MENU);

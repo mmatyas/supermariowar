@@ -85,6 +85,7 @@ struct Room {
     uint32_t       roomID;
     char           name[NET_MAX_ROOM_NAME_LENGTH];
     char           playerNames[4][NET_MAX_PLAYER_NAME_LENGTH];
+    uint8_t        hostPlayerNumber; // 1-4
 
     Room() {
         name[0] = '\0';
@@ -136,7 +137,8 @@ struct CurrentRoomPackage : MessageHeader {
     uint32_t       roomID;
     char           name[NET_MAX_ROOM_NAME_LENGTH];
     char           playerName[4][NET_MAX_PLAYER_NAME_LENGTH];
-    uint8_t        remotePlayerNumber;
+    uint8_t        hostPlayerNumber; //  1-4
+    uint8_t        remotePlayerNumber; // of the receiving client
 };
 
 struct StartSynchPackage : MessageHeader {

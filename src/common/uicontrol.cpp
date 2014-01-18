@@ -157,8 +157,6 @@ void MI_IPField::AssignHostAddress()
         else if(values[iSelectedDigit] < 0)
             values[iSelectedDigit] = 9;
     }
-
-    netplay.hostaddress = GetValue();
 }
 
 void MI_IPField::MoveImage()

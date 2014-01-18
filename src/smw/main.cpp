@@ -711,8 +711,6 @@ int main(int argc, char *argv[])
     //game_values.networktype		= 0;
     //game_values.networkhost		= false;
     //game_values.gamehost			= false;
-    netplay.active                  = false;
-    strcpy(netplay.playername, "Player");
 
     //Set the default powerup weights for bonus wheel and [?] boxes
     for(short iPreset = 0; iPreset < NUM_POWERUP_PRESETS; iPreset++) {
@@ -1035,7 +1033,6 @@ void RunGame()
 
                 list_players[list_players_cnt] = new CPlayer(iPlayer, list_players_cnt, teamid, subteamid, game_values.colorids[iPlayer], rm->spr_player[iPlayer], score[teamid], &(respawn[iPlayer]), ai);
                 list_players_cnt++;
-                //printf("list_players_cnt: %d\n", list_players_cnt);
             } else if(!game_values.keeppowerup) {
                 //Reset off player's stored powerups if they are not playing
                 game_values.storedpowerups[iPlayer] = -1;
