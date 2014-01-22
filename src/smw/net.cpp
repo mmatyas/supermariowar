@@ -7,6 +7,7 @@
     #pragma comment(lib, "SDL_net.lib")
 #endif
 
+
 extern gv game_values;
 extern int g_iVersion[];
 extern CPlayer *list_players[4];
@@ -273,13 +274,30 @@ void NetClient::sendSynchOKMessage()
 
 void NetClient::sendLocalInput()
 {
-    LocalKeysPackage pkg;
+    InputPackage pkg;
     pkg.protocolVersion = NET_PROTOCOL_VERSION;
     pkg.packageType = NET_NOTICE_LOCAL_KEYS;
 
-    memcpy(&pkg.keys, &game_values.playerInput.outputControls[0].keys, 8 * sizeof(CKeyState));
+    COutputControl* playerControl = &netplay.netPlayerInput.outputControls[0];
 
-    sendUDPMessage(&pkg, sizeof(LocalKeysPackage));
+    pkg.input.key0_down = playerControl->keys[0].fDown;
+    pkg.input.key0_pressed = playerControl->keys[0].fPressed;
+    pkg.input.key1_down = playerControl->keys[1].fDown;
+    pkg.input.key1_pressed = playerControl->keys[1].fPressed;
+    pkg.input.key2_down = playerControl->keys[2].fDown;
+    pkg.input.key2_pressed = playerControl->keys[2].fPressed;
+    pkg.input.key3_down = playerControl->keys[3].fDown;
+    pkg.input.key3_pressed = playerControl->keys[3].fPressed;
+    pkg.input.key4_down = playerControl->keys[4].fDown;
+    pkg.input.key4_pressed = playerControl->keys[4].fPressed;
+    pkg.input.key5_down = playerControl->keys[5].fDown;
+    pkg.input.key5_pressed = playerControl->keys[5].fPressed;
+    pkg.input.key6_down = playerControl->keys[6].fDown;
+    pkg.input.key6_pressed = playerControl->keys[6].fPressed;
+    pkg.input.key7_down = playerControl->keys[7].fDown;
+    pkg.input.key7_pressed = playerControl->keys[7].fPressed;
+
+    sendUDPMessage(&pkg, sizeof(InputPackage));
 }
 
 void NetClient::sendCurrentGameState()
@@ -296,6 +314,25 @@ void NetClient::sendCurrentGameState()
         pkg.player_y[p] = list_players[p]->fy;
         pkg.player_xvel[p] = list_players[p]->velx;
         pkg.player_xvel[p] = list_players[p]->vely;
+
+        COutputControl* playerControl = &netplay.netPlayerInput.outputControls[p];
+
+        pkg.input[p].key0_down = playerControl->keys[0].fDown;
+        pkg.input[p].key0_pressed = playerControl->keys[0].fPressed;
+        pkg.input[p].key1_down = playerControl->keys[1].fDown;
+        pkg.input[p].key1_pressed = playerControl->keys[1].fPressed;
+        pkg.input[p].key2_down = playerControl->keys[2].fDown;
+        pkg.input[p].key2_pressed = playerControl->keys[2].fPressed;
+        pkg.input[p].key3_down = playerControl->keys[3].fDown;
+        pkg.input[p].key3_pressed = playerControl->keys[3].fPressed;
+        pkg.input[p].key4_down = playerControl->keys[4].fDown;
+        pkg.input[p].key4_pressed = playerControl->keys[4].fPressed;
+        pkg.input[p].key5_down = playerControl->keys[5].fDown;
+        pkg.input[p].key5_pressed = playerControl->keys[5].fPressed;
+        pkg.input[p].key6_down = playerControl->keys[6].fDown;
+        pkg.input[p].key6_pressed = playerControl->keys[6].fPressed;
+        pkg.input[p].key7_down = playerControl->keys[7].fDown;
+        pkg.input[p].key7_pressed = playerControl->keys[7].fPressed;
     }
 
     sendUDPMessage(&pkg, sizeof(GameStatePackage));
@@ -395,17 +432,37 @@ void NetClient::handleRoomChangedMessage()
     netplay.currentMenuChanged = true;
 }
 
-void NetClient::handleRemoteInput()
+void NetClient::handleRemoteInput() // only for room host
 {
-    RemoteKeysPackage pkg;
-    memcpy(&pkg, udpIncomingPacket->data, sizeof(RemoteKeysPackage));
+    assert(netplay.theHostIsMe);
+
+    RemoteInputPackage pkg;
+    memcpy(&pkg, udpIncomingPacket->data, sizeof(RemoteInputPackage));
 
     COutputControl* playerControl = &netplay.netPlayerInput.outputControls[pkg.playerNumber];
-    memcpy(playerControl->keys, pkg.keys, 8 * sizeof(CKeyState));
+
+    playerControl->keys[0].fDown = pkg.input.key0_down;
+    playerControl->keys[0].fPressed = pkg.input.key0_pressed;
+    playerControl->keys[1].fDown = pkg.input.key1_down;
+    playerControl->keys[1].fPressed = pkg.input.key1_pressed;
+    playerControl->keys[2].fDown = pkg.input.key2_down;
+    playerControl->keys[2].fPressed = pkg.input.key2_pressed;
+    playerControl->keys[3].fDown = pkg.input.key3_down;
+    playerControl->keys[3].fPressed = pkg.input.key3_pressed;
+    playerControl->keys[4].fDown = pkg.input.key4_down;
+    playerControl->keys[4].fPressed = pkg.input.key4_pressed;
+    playerControl->keys[5].fDown = pkg.input.key5_down;
+    playerControl->keys[5].fPressed = pkg.input.key5_pressed;
+    playerControl->keys[6].fDown = pkg.input.key6_down;
+    playerControl->keys[6].fPressed = pkg.input.key6_pressed;
+    playerControl->keys[7].fDown = pkg.input.key7_down;
+    playerControl->keys[7].fPressed = pkg.input.key7_pressed;
 }
 
-void NetClient::handleRemoteGameState()
+void NetClient::handleRemoteGameState() // for other clients
 {
+    assert(!netplay.theHostIsMe);
+
     GameStatePackage pkg;
     memcpy(&pkg, udpIncomingPacket->data, sizeof(GameStatePackage));
 
@@ -414,6 +471,25 @@ void NetClient::handleRemoteGameState()
         list_players[p]->fy = pkg.player_y[p];
         list_players[p]->velx = pkg.player_xvel[p];
         list_players[p]->vely = pkg.player_yvel[p];
+
+        COutputControl* playerControl = &netplay.netPlayerInput.outputControls[p];
+
+        playerControl->keys[0].fDown = pkg.input[p].key0_down;
+        playerControl->keys[0].fPressed = pkg.input[p].key0_pressed;
+        playerControl->keys[1].fDown = pkg.input[p].key1_down;
+        playerControl->keys[1].fPressed = pkg.input[p].key1_pressed;
+        playerControl->keys[2].fDown = pkg.input[p].key2_down;
+        playerControl->keys[2].fPressed = pkg.input[p].key2_pressed;
+        playerControl->keys[3].fDown = pkg.input[p].key3_down;
+        playerControl->keys[3].fPressed = pkg.input[p].key3_pressed;
+        playerControl->keys[4].fDown = pkg.input[p].key4_down;
+        playerControl->keys[4].fPressed = pkg.input[p].key4_pressed;
+        playerControl->keys[5].fDown = pkg.input[p].key5_down;
+        playerControl->keys[5].fPressed = pkg.input[p].key5_pressed;
+        playerControl->keys[6].fDown = pkg.input[p].key6_down;
+        playerControl->keys[6].fPressed = pkg.input[p].key6_pressed;
+        playerControl->keys[7].fDown = pkg.input[p].key7_down;
+        playerControl->keys[7].fPressed = pkg.input[p].key7_pressed;
     }
 }
 

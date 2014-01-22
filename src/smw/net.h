@@ -98,9 +98,10 @@ struct Room {
 
 // Protocol structures
 
-struct MessageHeader {      // TODO: add timestamp
+struct MessageHeader {
     uint8_t        protocolVersion;
     uint8_t        packageType;
+    //uint32_t       packageNumber;
 };
 
 struct ServerInfoPackage : MessageHeader {
@@ -146,13 +147,33 @@ struct StartSynchPackage : MessageHeader {
     uint32_t       commonRandomSeed;
 };
 
-struct LocalKeysPackage : MessageHeader {
-    CKeyState      keys[8];
+// 2 byte bit field instead of 8*2, but you can't use arrays :(
+struct RawInput {
+    bool           key0_down : 1;
+    bool           key0_pressed : 1;
+    bool           key1_down : 1;
+    bool           key1_pressed : 1;
+    bool           key2_down : 1;
+    bool           key2_pressed : 1;
+    bool           key3_down : 1;
+    bool           key3_pressed : 1;
+    bool           key4_down : 1;
+    bool           key4_pressed : 1;
+    bool           key5_down : 1;
+    bool           key5_pressed : 1;
+    bool           key6_down : 1;
+    bool           key6_pressed : 1;
+    bool           key7_down : 1;
+    bool           key7_pressed : 1;
 };
 
-struct RemoteKeysPackage : MessageHeader {
+struct InputPackage : MessageHeader {
+    RawInput       input;
+};
+
+struct RemoteInputPackage : MessageHeader {
     uint8_t        playerNumber;
-    CKeyState      keys[8];
+    RawInput       input;
 };
 
 struct GameStatePackage : MessageHeader {
@@ -160,6 +181,7 @@ struct GameStatePackage : MessageHeader {
     float          player_y[4];
     float          player_xvel[4];
     float          player_yvel[4];
+    RawInput       input[4];
 };
 
 // Network communication class

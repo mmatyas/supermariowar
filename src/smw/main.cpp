@@ -1233,14 +1233,17 @@ void RunGame()
             netplay.client.listen();
 
             // The host sends the game state to clients
-            // The clients send input to host
+            // Everyone send input to everyone
             if (netplay.theHostIsMe)
                 netplay.client.sendCurrentGameState();
-            else if (netplay.gameRunning && previous_playerKeys != *current_playerKeys) {
+            if (netplay.gameRunning && previous_playerKeys != *current_playerKeys) {
                 netplay.client.sendLocalInput();
                 previous_playerKeys = *current_playerKeys;
             }
         }
+
+        //printf("[%d;%d]\n", current_playerKeys->keys[0].fDown, current_playerKeys->keys[0].fPressed);
+        //printf("%d -> %f\n", list_players[0]->ix, list_players[0]->fx);
 
         if(iWindTimer <= 0) {
             //Then trigger next wind event
