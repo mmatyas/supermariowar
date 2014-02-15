@@ -19,15 +19,11 @@ Networking netplay;
 
 bool net_init()
 {
-    if (SDLNet_Init() < 0) {
-        fprintf(stderr, "[Error] SDLNet_Init: %s\n", SDLNet_GetError());
+    if (!networkHandler.init_networking())
         return false;
-    }
 
     if (!netplay.client.init())
         return false;
-
-    atexit(SDLNet_Quit);
 
 
     netplay.active = false;
@@ -65,7 +61,7 @@ bool net_init()
 void net_close()
 {
     net_saveServerList();
-    SDLNet_Quit();
+    networkHandler.cleanup();
 }
 
 void net_saveServerList()
@@ -119,12 +115,8 @@ NetClient::~NetClient()
 
 bool NetClient::init()
 {
-    udpOutgoingPacket = SDLNet_AllocPacket(NET_MAX_MESSAGE_SIZE);
-    udpIncomingPacket = SDLNet_AllocPacket(NET_MAX_MESSAGE_SIZE);
-    if (!udpOutgoingPacket || !udpIncomingPacket) {
-        fprintf(stderr, "[Error] SDLNet_AllocPacket: %s\n", SDLNet_GetError());
+    if (!networkHandler.init_client())
         return false;
-    }
 
     return true;
 }
@@ -153,30 +145,15 @@ bool NetClient::startSession()
     return true;
 }
 
-bool NetClient::openSocket(const char* hostname, const uint16_t port)
+bool NetClient::openConnection(const char* hostname, const uint16_t port)
 {
-    /* Resolve server address */
     netplay.connectSuccessful = false;
-    printf("Resolving %s:%d\n", hostname, port);
-    if (SDLNet_ResolveHost(&serverIP, hostname, port) < 0) {
-        if (serverIP.host == INADDR_NONE)
-            fprintf(stderr, "[Error] Couldn't resolve hostname\n");
-        else
-            fprintf(stderr, "[Error] SDLNet_ResolveHost: %s\n", SDLNet_GetError());
+    if (!networkHandler.openUDPConnection())
         return false;
-    }
-
-    /* Open UDP socket */
-    if (!udpSocket) {
-        udpSocket = SDLNet_UDP_Open(0);
-        if (!udpSocket) {
-            fprintf(stderr, "[Error] SDLNet_UDP_Open: %s\n", SDLNet_GetError());
-            return false;
-        }
-        printf("[] UDP open.\n");
-    }
 
     return true;
+    // now we wait for CONNECT_OK
+    // connectSuccessful will be set to 'true' there
 }
 
 /****************************
@@ -189,7 +166,7 @@ void NetClient::requestRoomList()
     msg.protocolVersion = NET_PROTOCOL_VERSION;
     msg.packageType = NET_REQUEST_ROOM_LIST;
 
-    sendUDPMessage(&msg, sizeof(MessageHeader));
+    sendMessage(&msg, sizeof(MessageHeader));
 
     if (uiRoomList)
         uiRoomList->Clear();
@@ -198,7 +175,7 @@ void NetClient::requestRoomList()
 bool NetClient::sendConnectRequestToSelectedServer()
 {
     ServerAddress* selectedServer = &netplay.savedServers[netplay.selectedServerIndex];
-    if ( openSocket(selectedServer->hostname.c_str()) )
+    if (openConnection(selectedServer->hostname.c_str()))
     {
         ClientConnectionPackage message;
         message.protocolVersion = NET_PROTOCOL_VERSION;
@@ -206,7 +183,7 @@ bool NetClient::sendConnectRequestToSelectedServer()
         memcpy(message.playerName, netplay.myPlayerName, NET_MAX_PLAYER_NAME_LENGTH);
         message.playerName[NET_MAX_PLAYER_NAME_LENGTH - 1] = '\0';
 
-        sendUDPMessage(&message, sizeof(ClientConnectionPackage));
+        sendMessage(&message, sizeof(ClientConnectionPackage));
         netplay.operationInProgress = true;
         return true;
     }
@@ -225,7 +202,7 @@ void NetClient::sendCreateRoomMessage()
     memcpy(message.password, netplay.newroom_password, NET_MAX_ROOM_PASSWORD_LENGTH);
     message.password[NET_MAX_PLAYER_NAME_LENGTH - 1] = '\0';
 
-    sendUDPMessage(&message, sizeof(NewRoomPackage));
+    sendMessage(&message, sizeof(NewRoomPackage));
     netplay.operationInProgress = true;
 }
 
@@ -241,7 +218,7 @@ void NetClient::sendJoinRoomMessage()
     message.roomID = netplay.currentRooms.at(netplay.selectedRoomIndex).roomID;
     message.password[0] = '\0'; // TODO: implement
 
-    sendUDPMessage(&message, sizeof(JoinRoomPackage));
+    sendMessage(&message, sizeof(JoinRoomPackage));
     netplay.operationInProgress = true;
 }
 
@@ -251,7 +228,7 @@ void NetClient::sendLeaveRoomMessage()
     message.protocolVersion = NET_PROTOCOL_VERSION;
     message.packageType = NET_REQUEST_LEAVE_ROOM;
 
-    sendUDPMessage(&message, sizeof(MessageHeader));
+    sendMessage(&message, sizeof(MessageHeader));
 }
 
 void NetClient::sendStartRoomMessage()
@@ -260,7 +237,7 @@ void NetClient::sendStartRoomMessage()
     message.protocolVersion = NET_PROTOCOL_VERSION;
     message.packageType = NET_REQUEST_START_GAME;
 
-    sendUDPMessage(&message, sizeof(MessageHeader));
+    sendMessage(&message, sizeof(MessageHeader));
 }
 
 void NetClient::sendSynchOKMessage()
@@ -269,7 +246,7 @@ void NetClient::sendSynchOKMessage()
     message.protocolVersion = NET_PROTOCOL_VERSION;
     message.packageType = NET_NOTICE_GAME_SYNCH_OK;
 
-    sendUDPMessage(&message, sizeof(MessageHeader));
+    sendMessage(&message, sizeof(MessageHeader));
 }
 
 void NetClient::sendLocalInput()
@@ -280,7 +257,16 @@ void NetClient::sendLocalInput()
 
     COutputControl* playerControl = &netplay.netPlayerInput.outputControls[0];
 
-    pkg.input.key0_down = playerControl->keys[0].fDown;
+    uint16_t bitPosition = 0;
+    pkg.input = 0;
+    for (uint8_t k = 0; k < 8; k++) {
+        pkg.input |= ( (playerControl->keys[k].fDown ? 1 : 0) << bitPosition);
+        bitPosition++;
+        pkg.input |= ( (playerControl->keys[k].fPressed ? 1 : 0) << bitPosition);
+        bitPosition++;
+    }
+
+    /*pkg.input.key0_down = playerControl->keys[0].fDown;
     pkg.input.key0_pressed = playerControl->keys[0].fPressed;
     pkg.input.key1_down = playerControl->keys[1].fDown;
     pkg.input.key1_pressed = playerControl->keys[1].fPressed;
@@ -295,9 +281,9 @@ void NetClient::sendLocalInput()
     pkg.input.key6_down = playerControl->keys[6].fDown;
     pkg.input.key6_pressed = playerControl->keys[6].fPressed;
     pkg.input.key7_down = playerControl->keys[7].fDown;
-    pkg.input.key7_pressed = playerControl->keys[7].fPressed;
+    pkg.input.key7_pressed = playerControl->keys[7].fPressed;*/
 
-    sendUDPMessage(&pkg, sizeof(InputPackage));
+    sendMessage(&pkg, sizeof(InputPackage));
 }
 
 void NetClient::sendCurrentGameState()
@@ -335,7 +321,7 @@ void NetClient::sendCurrentGameState()
         pkg.input[p].key7_pressed = playerControl->keys[7].fPressed;
     }
 
-    sendUDPMessage(&pkg, sizeof(GameStatePackage));
+    sendMessage(&pkg, sizeof(GameStatePackage));
 }
 
 /****************************
@@ -441,7 +427,15 @@ void NetClient::handleRemoteInput() // only for room host
 
     COutputControl* playerControl = &netplay.netPlayerInput.outputControls[pkg.playerNumber];
 
-    playerControl->keys[0].fDown = pkg.input.key0_down;
+    uint16_t mask = 1;
+    for (uint8_t k = 0; k < 8; k++) {
+        playerControl->keys[k].fDown = pkg.input & mask
+        mask <<= 1;
+        playerControl->keys[k].fPressed = pkg.input & mask;
+        mask <<= 1;
+    }
+
+    /*playerControl->keys[0].fDown = pkg.input.key0_down;
     playerControl->keys[0].fPressed = pkg.input.key0_pressed;
     playerControl->keys[1].fDown = pkg.input.key1_down;
     playerControl->keys[1].fPressed = pkg.input.key1_pressed;
@@ -456,7 +450,7 @@ void NetClient::handleRemoteInput() // only for room host
     playerControl->keys[6].fDown = pkg.input.key6_down;
     playerControl->keys[6].fPressed = pkg.input.key6_pressed;
     playerControl->keys[7].fDown = pkg.input.key7_down;
-    playerControl->keys[7].fPressed = pkg.input.key7_pressed;
+    playerControl->keys[7].fPressed = pkg.input.key7_pressed;*/
 }
 
 void NetClient::handleRemoteGameState() // for other clients
@@ -495,9 +489,9 @@ void NetClient::handleRemoteGameState() // for other clients
 
 void NetClient::listen()
 {
-    if (receiveUDPMessage()) {
-        uint8_t protocollVersion = udpIncomingPacket->data[0];
-        uint8_t responseCode = udpIncomingPacket->data[1];
+    if (receiveMessage()) {
+        uint8_t protocollVersion = incomingData[0];
+        uint8_t responseCode = incomingData[1];
         if (protocollVersion == NET_PROTOCOL_VERSION) {
             switch (responseCode)
             {
@@ -654,7 +648,7 @@ void NetClient::sendGoodbye()
     msg.packageType = NET_REQUEST_LEAVE_SERVER;
 
     //printf("sendGoodbye\n");
-    sendUDPMessage(&msg, sizeof(MessageHeader));
+    sendMessage(&msg, sizeof(MessageHeader));
 }
 
 void NetClient::cleanup()
@@ -685,22 +679,10 @@ void NetClient::closeUDPsocket()
     Network Communication
 ****************************/
 
-bool NetClient::sendUDPMessage(const void* data, const int dataLength)
+bool NetClient::sendMessage(const void* data, const int dataLength)
 {
-    if (!data || dataLength < 2 || dataLength >= NET_MAX_MESSAGE_SIZE || !udpSocket || !udpOutgoingPacket) {
-        printf("[Debug] Invalid call: sendUDPMessage\n");
+    if (!networkHandler.sendUDPMessage(data, dataLength))
         return false;
-    }
-
-    memcpy(udpOutgoingPacket->data, data, dataLength);
-    udpOutgoingPacket->len = dataLength;
-    udpOutgoingPacket->address.host = serverIP.host;
-    udpOutgoingPacket->address.port = serverIP.port;
-
-    if (!SDLNet_UDP_Send(udpSocket, -1, udpOutgoingPacket)) {
-        fprintf(stderr, "[Warning] Sending UDP message failed. %s\n", SDLNet_GetError());
-        return false;
-    }
 
     netplay.lastSentMessage.packageType = ((uint8_t*)data)[1];
     netplay.lastSentMessage.timestamp = SDL_GetTicks();
@@ -708,26 +690,13 @@ bool NetClient::sendUDPMessage(const void* data, const int dataLength)
     return true;
 }
 
-bool NetClient::receiveUDPMessage()
+bool NetClient::receiveMessage()
 {
-    if (!udpSocket || !udpIncomingPacket)
+    if (!networkHandler.receiveUDPMessage(incomingData))
         return false;
 
-    int receivedPackages = SDLNet_UDP_Recv(udpSocket, udpIncomingPacket);
-    if (receivedPackages == 0)
-        return false;
-
-    if (receivedPackages < 0) {
-        fprintf(stderr, "[Warning] Receiving UDP message failed. %s\n", SDLNet_GetError());
-        return false;
-    }
-
-    // Must have version and type field.
-    if (udpIncomingPacket->len < 2)
-        return false;
-
-    netplay.lastReceivedMessage.packageType = udpIncomingPacket->data[1];
-    netplay.lastReceivedMessage.timestamp = SDL_GetTicks();
+    netplay.lastReceivedMessage.packageType = incomingData[1];
+    netplay.lastReceivedMessage.timestamp = SDL_GetTicks(); /* TODO: csomagból */
 
     return true;
 }
