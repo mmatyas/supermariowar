@@ -7,6 +7,11 @@
     #pragma comment(lib, "SDL_net.lib")
 #endif
 
+// define platform guards here
+#define NetworkHandler NetworkHandlerSDL
+#include "platform/network/sdl/NetworkHandlerSDL.h"
+
+NetworkHandler networkHandler;
 
 extern gv game_values;
 extern int g_iVersion[];
@@ -148,7 +153,7 @@ bool NetClient::startSession()
 bool NetClient::openConnection(const char* hostname, const uint16_t port)
 {
     netplay.connectSuccessful = false;
-    if (!networkHandler.openUDPConnection())
+    if (!networkHandler.openUDPConnection(hostname, port))
         return false;
 
     return true;
@@ -162,11 +167,8 @@ bool NetClient::openConnection(const char* hostname, const uint16_t port)
 
 void NetClient::requestRoomList()
 {
-    MessageHeader msg;
-    msg.protocolVersion = NET_PROTOCOL_VERSION;
-    msg.packageType = NET_REQUEST_ROOM_LIST;
-
-    sendMessage(&msg, sizeof(MessageHeader));
+    RoomListPackage msg;
+    sendMessage(&msg, sizeof(RoomListPackage));
 
     if (uiRoomList)
         uiRoomList->Clear();
@@ -177,12 +179,7 @@ bool NetClient::sendConnectRequestToSelectedServer()
     ServerAddress* selectedServer = &netplay.savedServers[netplay.selectedServerIndex];
     if (openConnection(selectedServer->hostname.c_str()))
     {
-        ClientConnectionPackage message;
-        message.protocolVersion = NET_PROTOCOL_VERSION;
-        message.packageType = NET_REQUEST_CONNECT;
-        memcpy(message.playerName, netplay.myPlayerName, NET_MAX_PLAYER_NAME_LENGTH);
-        message.playerName[NET_MAX_PLAYER_NAME_LENGTH - 1] = '\0';
-
+        ClientConnectionPackage message(netplay.myPlayerName);
         sendMessage(&message, sizeof(ClientConnectionPackage));
         netplay.operationInProgress = true;
         return true;
@@ -192,17 +189,9 @@ bool NetClient::sendConnectRequestToSelectedServer()
 
 void NetClient::sendCreateRoomMessage()
 {
-    NewRoomPackage message;
-    message.protocolVersion = NET_PROTOCOL_VERSION;
-    message.packageType = NET_REQUEST_CREATE_ROOM;
+    NewRoomPackage msg(netplay.newroom_name, netplay.newroom_password);
 
-    memcpy(message.name, netplay.newroom_name, NET_MAX_ROOM_NAME_LENGTH);
-    message.name[NET_MAX_PLAYER_NAME_LENGTH - 1] = '\0';
-
-    memcpy(message.password, netplay.newroom_password, NET_MAX_ROOM_PASSWORD_LENGTH);
-    message.password[NET_MAX_PLAYER_NAME_LENGTH - 1] = '\0';
-
-    sendMessage(&message, sizeof(NewRoomPackage));
+    sendMessage(&msg, sizeof(NewRoomPackage));
     netplay.operationInProgress = true;
 }
 
@@ -211,79 +200,34 @@ void NetClient::sendJoinRoomMessage()
     if (netplay.selectedRoomIndex >= netplay.currentRooms.size())
         return;
 
-    JoinRoomPackage message;
-    message.protocolVersion = NET_PROTOCOL_VERSION;
-    message.packageType = NET_REQUEST_JOIN_ROOM;
-
-    message.roomID = netplay.currentRooms.at(netplay.selectedRoomIndex).roomID;
-    message.password[0] = '\0'; // TODO: implement
-
-    sendMessage(&message, sizeof(JoinRoomPackage));
+    // TODO: implement password
+    JoinRoomPackage msg(netplay.currentRooms.at(netplay.selectedRoomIndex).roomID, "");
+    sendMessage(&msg, sizeof(JoinRoomPackage));
     netplay.operationInProgress = true;
 }
 
 void NetClient::sendLeaveRoomMessage()
 {
-    MessageHeader message;
-    message.protocolVersion = NET_PROTOCOL_VERSION;
-    message.packageType = NET_REQUEST_LEAVE_ROOM;
-
-    sendMessage(&message, sizeof(MessageHeader));
+    LeaveRoomPackage msg;
+    sendMessage(&msg, sizeof(LeaveRoomPackage));
 }
 
 void NetClient::sendStartRoomMessage()
 {
-    MessageHeader message;
-    message.protocolVersion = NET_PROTOCOL_VERSION;
-    message.packageType = NET_REQUEST_START_GAME;
-
-    sendMessage(&message, sizeof(MessageHeader));
+    StartRoomPackage msg;
+    sendMessage(&msg, sizeof(StartRoomPackage));
 }
 
-void NetClient::sendSynchOKMessage()
+void NetClient::sendSyncOKMessage()
 {
-    MessageHeader message;
-    message.protocolVersion = NET_PROTOCOL_VERSION;
-    message.packageType = NET_NOTICE_GAME_SYNCH_OK;
-
-    sendMessage(&message, sizeof(MessageHeader));
+    SyncOKPackage msg;
+    sendMessage(&msg, sizeof(SyncOKPackage));
 }
 
 void NetClient::sendLocalInput()
 {
-    InputPackage pkg;
-    pkg.protocolVersion = NET_PROTOCOL_VERSION;
-    pkg.packageType = NET_NOTICE_LOCAL_KEYS;
-
-    COutputControl* playerControl = &netplay.netPlayerInput.outputControls[0];
-
-    uint16_t bitPosition = 0;
-    pkg.input = 0;
-    for (uint8_t k = 0; k < 8; k++) {
-        pkg.input |= ( (playerControl->keys[k].fDown ? 1 : 0) << bitPosition);
-        bitPosition++;
-        pkg.input |= ( (playerControl->keys[k].fPressed ? 1 : 0) << bitPosition);
-        bitPosition++;
-    }
-
-    /*pkg.input.key0_down = playerControl->keys[0].fDown;
-    pkg.input.key0_pressed = playerControl->keys[0].fPressed;
-    pkg.input.key1_down = playerControl->keys[1].fDown;
-    pkg.input.key1_pressed = playerControl->keys[1].fPressed;
-    pkg.input.key2_down = playerControl->keys[2].fDown;
-    pkg.input.key2_pressed = playerControl->keys[2].fPressed;
-    pkg.input.key3_down = playerControl->keys[3].fDown;
-    pkg.input.key3_pressed = playerControl->keys[3].fPressed;
-    pkg.input.key4_down = playerControl->keys[4].fDown;
-    pkg.input.key4_pressed = playerControl->keys[4].fPressed;
-    pkg.input.key5_down = playerControl->keys[5].fDown;
-    pkg.input.key5_pressed = playerControl->keys[5].fPressed;
-    pkg.input.key6_down = playerControl->keys[6].fDown;
-    pkg.input.key6_pressed = playerControl->keys[6].fPressed;
-    pkg.input.key7_down = playerControl->keys[7].fDown;
-    pkg.input.key7_pressed = playerControl->keys[7].fPressed;*/
-
-    sendMessage(&pkg, sizeof(InputPackage));
+    LocalInputPackage pkg(&netplay.netPlayerInput.outputControls[0]);
+    sendMessage(&pkg, sizeof(LocalInputPackage));
 }
 
 void NetClient::sendCurrentGameState()
@@ -292,33 +236,11 @@ void NetClient::sendCurrentGameState()
         return;
 
     GameStatePackage pkg;
-    pkg.protocolVersion = NET_PROTOCOL_VERSION;
-    pkg.packageType = NET_NOTICE_HOST_STATE;
 
     for (uint8_t p = 0; p < list_players_cnt; p++) {
-        pkg.player_x[p] = list_players[p]->fx;
-        pkg.player_y[p] = list_players[p]->fy;
-        pkg.player_xvel[p] = list_players[p]->velx;
-        pkg.player_xvel[p] = list_players[p]->vely;
-
-        COutputControl* playerControl = &netplay.netPlayerInput.outputControls[p];
-
-        pkg.input[p].key0_down = playerControl->keys[0].fDown;
-        pkg.input[p].key0_pressed = playerControl->keys[0].fPressed;
-        pkg.input[p].key1_down = playerControl->keys[1].fDown;
-        pkg.input[p].key1_pressed = playerControl->keys[1].fPressed;
-        pkg.input[p].key2_down = playerControl->keys[2].fDown;
-        pkg.input[p].key2_pressed = playerControl->keys[2].fPressed;
-        pkg.input[p].key3_down = playerControl->keys[3].fDown;
-        pkg.input[p].key3_pressed = playerControl->keys[3].fPressed;
-        pkg.input[p].key4_down = playerControl->keys[4].fDown;
-        pkg.input[p].key4_pressed = playerControl->keys[4].fPressed;
-        pkg.input[p].key5_down = playerControl->keys[5].fDown;
-        pkg.input[p].key5_pressed = playerControl->keys[5].fPressed;
-        pkg.input[p].key6_down = playerControl->keys[6].fDown;
-        pkg.input[p].key6_pressed = playerControl->keys[6].fPressed;
-        pkg.input[p].key7_down = playerControl->keys[7].fDown;
-        pkg.input[p].key7_pressed = playerControl->keys[7].fPressed;
+        pkg.setPlayerCoord(p, list_players[p]->fx, list_players[p]->fy);
+        pkg.setPlayerVel(p, list_players[p]->velx, list_players[p]->vely);
+        pkg.setPlayerKeys(p, &netplay.netPlayerInput.outputControls[p]);
     }
 
     sendMessage(&pkg, sizeof(GameStatePackage));
@@ -331,19 +253,19 @@ void NetClient::sendCurrentGameState()
 void NetClient::handleServerinfoAndClose()
 {
     ServerInfoPackage serverInfo;
-    memcpy(&serverInfo, udpIncomingPacket->data, sizeof(ServerInfoPackage));
+    memcpy(&serverInfo, incomingData, sizeof(ServerInfoPackage));
 
     printf("NET_RESPONSE_SERVERINFO [%lu byte]\n", sizeof(serverInfo));
     printf("Sending:\n  protocolVersion: %d\n  packageType: %d\n  name: %s\n  players/max: %d / %d\n",
         serverInfo.protocolVersion, serverInfo.packageType, serverInfo.name, serverInfo.currentPlayerCount, serverInfo.maxPlayerCount);
 
-    closeUDPsocket();
+    closeConnection();
 }
 
 void NetClient::handleNewRoomListEntry()
 {
     RoomInfoPackage roomInfo;
-    memcpy(&roomInfo, udpIncomingPacket->data, sizeof(RoomInfoPackage));
+    memcpy(&roomInfo, incomingData, sizeof(RoomInfoPackage));
     //printf("  Incoming room entry: [%u] %s (%d/4)\n", roomInfo.roomID, roomInfo.name, roomInfo.currentPlayerCount);
 
     RoomListEntry newRoom;
@@ -361,7 +283,7 @@ void NetClient::handleNewRoomListEntry()
 void NetClient::handleRoomCreatedMessage()
 {
     NewRoomCreatedPackage pkg;
-    memcpy(&pkg, udpIncomingPacket->data, sizeof(NewRoomCreatedPackage));
+    memcpy(&pkg, incomingData, sizeof(NewRoomCreatedPackage));
 
     netplay.currentRoom.roomID = pkg.roomID;
     netplay.currentRoom.hostPlayerNumber = 0;
@@ -385,7 +307,7 @@ void NetClient::handleRoomCreatedMessage()
 void NetClient::handleRoomChangedMessage()
 {
     CurrentRoomPackage pkg;
-    memcpy(&pkg, udpIncomingPacket->data, sizeof(CurrentRoomPackage));
+    memcpy(&pkg, incomingData, sizeof(CurrentRoomPackage));
 
     netplay.currentRoom.roomID = pkg.roomID;
     memcpy(netplay.currentRoom.name, pkg.name, NET_MAX_ROOM_NAME_LENGTH);
@@ -423,34 +345,9 @@ void NetClient::handleRemoteInput() // only for room host
     assert(netplay.theHostIsMe);
 
     RemoteInputPackage pkg;
-    memcpy(&pkg, udpIncomingPacket->data, sizeof(RemoteInputPackage));
+    memcpy(&pkg, incomingData, sizeof(RemoteInputPackage));
 
-    COutputControl* playerControl = &netplay.netPlayerInput.outputControls[pkg.playerNumber];
-
-    uint16_t mask = 1;
-    for (uint8_t k = 0; k < 8; k++) {
-        playerControl->keys[k].fDown = pkg.input & mask
-        mask <<= 1;
-        playerControl->keys[k].fPressed = pkg.input & mask;
-        mask <<= 1;
-    }
-
-    /*playerControl->keys[0].fDown = pkg.input.key0_down;
-    playerControl->keys[0].fPressed = pkg.input.key0_pressed;
-    playerControl->keys[1].fDown = pkg.input.key1_down;
-    playerControl->keys[1].fPressed = pkg.input.key1_pressed;
-    playerControl->keys[2].fDown = pkg.input.key2_down;
-    playerControl->keys[2].fPressed = pkg.input.key2_pressed;
-    playerControl->keys[3].fDown = pkg.input.key3_down;
-    playerControl->keys[3].fPressed = pkg.input.key3_pressed;
-    playerControl->keys[4].fDown = pkg.input.key4_down;
-    playerControl->keys[4].fPressed = pkg.input.key4_pressed;
-    playerControl->keys[5].fDown = pkg.input.key5_down;
-    playerControl->keys[5].fPressed = pkg.input.key5_pressed;
-    playerControl->keys[6].fDown = pkg.input.key6_down;
-    playerControl->keys[6].fPressed = pkg.input.key6_pressed;
-    playerControl->keys[7].fDown = pkg.input.key7_down;
-    playerControl->keys[7].fPressed = pkg.input.key7_pressed;*/
+    pkg.readKeys(&netplay.netPlayerInput.outputControls[pkg.playerNumber]);
 }
 
 void NetClient::handleRemoteGameState() // for other clients
@@ -458,32 +355,12 @@ void NetClient::handleRemoteGameState() // for other clients
     assert(!netplay.theHostIsMe);
 
     GameStatePackage pkg;
-    memcpy(&pkg, udpIncomingPacket->data, sizeof(GameStatePackage));
+    memcpy(&pkg, incomingData, sizeof(GameStatePackage));
 
     for (uint8_t p = 0; p < list_players_cnt; p++) {
-        list_players[p]->fx = pkg.player_x[p];
-        list_players[p]->fy = pkg.player_y[p];
-        list_players[p]->velx = pkg.player_xvel[p];
-        list_players[p]->vely = pkg.player_yvel[p];
-
-        COutputControl* playerControl = &netplay.netPlayerInput.outputControls[p];
-
-        playerControl->keys[0].fDown = pkg.input[p].key0_down;
-        playerControl->keys[0].fPressed = pkg.input[p].key0_pressed;
-        playerControl->keys[1].fDown = pkg.input[p].key1_down;
-        playerControl->keys[1].fPressed = pkg.input[p].key1_pressed;
-        playerControl->keys[2].fDown = pkg.input[p].key2_down;
-        playerControl->keys[2].fPressed = pkg.input[p].key2_pressed;
-        playerControl->keys[3].fDown = pkg.input[p].key3_down;
-        playerControl->keys[3].fPressed = pkg.input[p].key3_pressed;
-        playerControl->keys[4].fDown = pkg.input[p].key4_down;
-        playerControl->keys[4].fPressed = pkg.input[p].key4_pressed;
-        playerControl->keys[5].fDown = pkg.input[p].key5_down;
-        playerControl->keys[5].fPressed = pkg.input[p].key5_pressed;
-        playerControl->keys[6].fDown = pkg.input[p].key6_down;
-        playerControl->keys[6].fPressed = pkg.input[p].key6_pressed;
-        playerControl->keys[7].fDown = pkg.input[p].key7_down;
-        playerControl->keys[7].fPressed = pkg.input[p].key7_pressed;
+        pkg.getPlayerCoord(p, list_players[p]->fx, list_players[p]->fy);
+        pkg.getPlayerVel(p, list_players[p]->velx, list_players[p]->vely);
+        pkg.getPlayerKeys(p, &netplay.netPlayerInput.outputControls[p]);
     }
 }
 
@@ -577,15 +454,16 @@ void NetClient::listen()
                 // Game
                 //
 
-                case NET_NOTICE_GAME_SYNCH:
-                    printf("NET_NOTICE_GAME_SYNCH\n");
+                case NET_NOTICE_GAME_SYNC:
+                    printf("NET_NOTICE_GAME_SYNC\n");
+                    {
+                        StartSyncPackage pkg;
+                        memcpy(&pkg, incomingData, sizeof(StartSyncPackage));
 
-                    StartSynchPackage pkg;
-                    memcpy(&pkg, udpIncomingPacket->data, sizeof(StartSynchPackage));
-
-                    //printf("reseed: %d\n", pkg.commonRandomSeed);
-                    smw->rng->ReSeed(pkg.commonRandomSeed);
-                    sendSynchOKMessage();
+                        //printf("reseed: %d\n", pkg.commonRandomSeed);
+                        smw->rng->ReSeed(pkg.commonRandomSeed);
+                    }
+                    sendSyncOKMessage();
                     break;
 
                 case NET_NOTICE_GAME_STARTED:
@@ -608,8 +486,8 @@ void NetClient::listen()
 
                 default:
                     printf("Unknown: ");
-                    for (int a = 0; a < udpIncomingPacket->len; a++)
-                        printf("%3d ", udpIncomingPacket->data[a]);
+                    /*for (int a = 0; a < udpIncomingPacket->len; a++)
+                        printf("%3d ", incomingData[a]);*/
                     printf("\n");
                     break;
             }
@@ -631,7 +509,7 @@ void NetClient::endSession()
         if (netplay.connectSuccessful)
             sendGoodbye();
 
-        closeUDPsocket();
+        closeConnection();
         netplay.active = false;
         netplay.connectSuccessful = false;
 
@@ -643,36 +521,20 @@ void NetClient::endSession()
 
 void NetClient::sendGoodbye()
 {
-    MessageHeader msg;
-    msg.protocolVersion = NET_PROTOCOL_VERSION;
-    msg.packageType = NET_REQUEST_LEAVE_SERVER;
-
     //printf("sendGoodbye\n");
-    sendMessage(&msg, sizeof(MessageHeader));
+    ClientDisconnectionPackage msg;
+    sendMessage(&msg, sizeof(ClientDisconnectionPackage));
 }
 
 void NetClient::cleanup()
 {
     endSession();
-
-    if (udpIncomingPacket) {
-        SDLNet_FreePacket(udpIncomingPacket);
-        udpIncomingPacket = NULL;
-    }
-
-    if (udpOutgoingPacket) {
-        SDLNet_FreePacket(udpOutgoingPacket);
-        udpOutgoingPacket = NULL;
-    }
+    networkHandler.cleanup();
 }
 
-void NetClient::closeUDPsocket()
+void NetClient::closeConnection()
 {
-    if (udpSocket) {
-        SDLNet_UDP_Close(udpSocket);
-        udpSocket = NULL;
-        printf("[] UDP closed.\n");
-    }
+    networkHandler.closeUDPConnection();
 }
 
 /****************************

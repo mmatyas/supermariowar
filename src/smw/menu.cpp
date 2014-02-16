@@ -2448,7 +2448,7 @@ void Menu::RunMenu()
                 uint8_t lastSendType = netplay.lastSentMessage.packageType;
                 uint8_t lastRecvType = netplay.lastReceivedMessage.packageType;
 
-                if (lastSendType == NET_NOTICE_GAME_SYNCH_OK
+                if (lastSendType == NET_NOTICE_GAME_SYNC_OK
                     && lastRecvType == NET_NOTICE_GAME_STARTED)
                 code = MENU_CODE_NET_ROOM_GO;
             }
