@@ -1510,6 +1510,7 @@ class CO_Shell : public MO_CarriedObject
 	friend class B_WeaponBreakableBlock;
 	
 	friend void RunGame();
+		friend void shakeScreen();
 };
 
 class CO_ThrowBlock : public MO_CarriedObject
@@ -1569,6 +1570,7 @@ class CO_ThrowBlock : public MO_CarriedObject
 	friend class B_WeaponBreakableBlock;
 
 	friend void RunGame();
+		friend void shakeScreen();
 };
 
 class CO_ThrowBox : public MO_CarriedObject
@@ -1619,6 +1621,7 @@ class CO_ThrowBox : public MO_CarriedObject
 	friend class B_WeaponBreakableBlock;
 
 	friend void RunGame();
+		friend void shakeScreen();
 };
 
 class CO_Spring : public MO_CarriedObject

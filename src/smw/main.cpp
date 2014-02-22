@@ -1210,14 +1210,836 @@ void initRunGame()
     game_values.playerInput.ResetKeys();
 
 
-
     createPlayers();
-
     initGameplaySettings();
-
     initScoreDisplayPosition();
-
     initEyeCandy();
+}
+
+void checkWindEvent(short& iWindTimer, float& dNextWind)
+{
+    if(iWindTimer <= 0) {
+        //Then trigger next wind event
+        if(game_values.gamewindx < dNextWind) {
+            game_values.gamewindx += 0.02f;
+
+            if(game_values.gamewindx >= dNextWind)
+                iWindTimer = (RNGMAX(60)) + 30;
+        } else if(game_values.gamewindx >= dNextWind) {
+            game_values.gamewindx -= 0.02f;
+
+            if(game_values.gamewindx <= dNextWind)
+                iWindTimer = (RNGMAX(60)) + 30;
+        }
+    } else {
+        if(--iWindTimer <= 0) {
+            dNextWind = (float)((RNGMAX(41)) - 20) / 4.0f;
+        }
+    }
+}
+
+void cleanDeadNonPlayerObjects()
+{
+    eyecandy[0].cleandeadobjects();
+    eyecandy[1].cleandeadobjects();
+    eyecandy[2].cleandeadobjects();
+
+    objectcontainer[2].cleandeadobjects();
+    objectcontainer[1].cleandeadobjects();
+    objectcontainer[0].cleandeadobjects();
+    noncolcontainer.cleandeadobjects();
+}
+
+void animateDuringCountdown()
+{
+    //Move platforms
+    g_map->updatePlatforms();
+
+    cleanDeadNonPlayerObjects();
+
+    //Keep updating map hazards
+    noncolcontainer.update();
+    objectcontainer[0].update();
+    objectcontainer[1].update();
+    objectcontainer[2].update();
+
+    eyecandy[0].update();
+    eyecandy[1].update();
+    eyecandy[2].update();
+
+    g_map->update();
+}
+
+void shakeScreen()
+{
+    if(game_values.screenshaketimer > 0) {
+        game_values.screenshaketimer--;
+
+        static bool shakeleft = false;
+        if(shakeleft) {
+            x_shake -= 2;
+            if(x_shake <= -2) {
+                shakeleft = false;
+            }
+        } else {
+            x_shake += 2;
+            if(x_shake >= 2) {
+                shakeleft = true;
+            }
+        }
+
+        //Kill players touching the ground (or in air for MOd blocks)
+        short iNumKillPlayers = 0;
+        CPlayer * pKillPlayers[4];
+
+        CPlayer * killer1 = GetPlayerFromGlobalID(game_values.screenshakeplayerid);
+
+        for(short k = 0; k < list_players_cnt; k++) {
+            CPlayer * player = list_players[k];
+
+            //Don't kill the player that triggered the POW/MOd
+            if(player->globalID == game_values.screenshakeplayerid)
+                continue;
+
+            //Don't kill players on his team either (if friendly fire is off)
+            if(game_values.teamcollision != 2 && game_values.screenshaketeamid == player->teamID)
+                continue;
+
+            //Kill other players
+            if(!player->invincible && player->shield == 0 && player->iKuriboShoe == 0 && player->isready()) {
+                if(game_values.screenshakekillinair == player->inair) {
+                    pKillPlayers[iNumKillPlayers++] = player;
+
+                    if(killer1) {
+                        game_values.screenshakekillscount++;
+
+                        if(killer1->inair)
+                            killer1->killsinrowinair--;  //Don't want to give both shake and in air award
+                    }
+                }
+            }
+        }
+
+        //Randomize the order in which the players are killed (so that game modes where order matters is fair)
+        if(iNumKillPlayers > 0) {
+            short iRandPlayer = RNGMAX( iNumKillPlayers);
+            for(short iPlayer = 0; iPlayer < iNumKillPlayers; iPlayer++) {
+                PlayerKilledPlayer(game_values.screenshakeplayerid, pKillPlayers[iRandPlayer], death_style_jump, kill_style_pow, false, false);
+
+                if(++iRandPlayer >= iNumKillPlayers)
+                    iRandPlayer = 0;
+            }
+        }
+
+        //Kill goombas and koopas
+        for(short k = 0; k < objectcontainer[0].list_end; k++) {
+            CObject * object = objectcontainer[0].list[k];
+            if(object->getObjectType() == object_moving) {
+                IO_MovingObject * movingobject = (IO_MovingObject *)object;
+                MovingObjectType type = movingobject->getMovingObjectType();
+
+                if((type == movingobject_goomba || type == movingobject_koopa || type == movingobject_buzzybeetle || type == movingobject_spiny)
+                        && game_values.screenshakekillinair == movingobject->inair) {
+                    CPlayer * killer = GetPlayerFromGlobalID(game_values.screenshakeplayerid);
+
+                    if(killer) {
+                        if(!game_values.gamemode->gameover)
+                            killer->score->AdjustScore(1);
+
+                        ifSoundOnPlay(sfx_kicksound);
+                        ((MO_WalkingEnemy*)movingobject)->DieAndDropShell(true, true);
+
+                        game_values.screenshakekillscount++;
+
+                        if(killer->inair)
+                            killer->killsinrowinair--;  //Don't want to give both shake and in air award
+                    }
+                }
+            }
+        }
+
+        //Destroy throw blocks and flip shells over
+        for(short k = 0; k < objectcontainer[1].list_end; k++) {
+            CObject * object = objectcontainer[1].list[k];
+            if(object->getObjectType() == object_moving) {
+                IO_MovingObject * movingobject = (IO_MovingObject *)object;
+
+                if(game_values.screenshakekillinair == movingobject->inair) {
+                    if(movingobject->getMovingObjectType() == movingobject_shell) {
+                        CO_Shell * shell = (CO_Shell*)movingobject;
+                        if(shell->frozen || !shell->owner || shell->owner->inair == game_values.screenshakekillinair)
+                            shell->Flip();  //also breaks shells if frozen
+                    } else if(movingobject->getMovingObjectType() == movingobject_throwblock) {
+                        CO_ThrowBlock * throwblock = (CO_ThrowBlock*)movingobject;
+                        if(throwblock->frozen || !throwblock->owner || throwblock->owner->inair == game_values.screenshakekillinair)
+                            throwblock->Die();
+                    } else if(movingobject->getMovingObjectType() == movingobject_throwbox) {
+                        CO_ThrowBox * throwbox = (CO_ThrowBox*)movingobject;
+                        if(throwbox->frozen)
+                            throwbox->Die();
+                    } else if(movingobject->getMovingObjectType() == movingobject_pirhanaplant) {
+                        MO_PirhanaPlant * plant = (MO_PirhanaPlant*)movingobject;
+                        plant->KillPlant();
+                    } else if(movingobject->getMovingObjectType() == movingobject_bulletbill) {
+                        MO_BulletBill * bulletbill = (MO_BulletBill*)movingobject;
+                        bulletbill->Die();
+                    }
+                }
+            }
+        }
+
+        //Add kills in row for kills from pow and mod
+        if(game_values.screenshakekillscount > 1 && game_values.awardstyle != award_style_none) {
+            game_values.screenshakekillscount = 0;
+
+            CPlayer * killer2 = GetPlayerFromGlobalID(game_values.screenshakeplayerid);
+
+            if(killer2)
+                killer2->AddKillsInRowInAirAward();
+        }
+    } else {
+        //Make sure we zero out the shake value after it is done
+        x_shake = 0;
+    }
+}
+
+void handleP2PCollisions()
+{
+    //Player to player collisions
+    short i, j;
+    for(i = 0; i < list_players_cnt; i++) {
+        CPlayer * player1 = list_players[i];
+        if(player1->state > player_dead) {
+            for(j = i + 1; j < list_players_cnt; j++) {
+                CPlayer * player2 = list_players[j];
+                if(player2->state > player_dead) {
+                    if(coldec_player2player(player1, player2)) {
+                        collisionhandler_p2p(player1, player2);
+
+                        //if player was killed by another player, continue with next player for collision detection
+                        if(player1->state <= player_dead)
+                            break;
+                    }
+                }
+            }
+        }
+    }
+}
+
+void handleP2ObjCollisions()
+{
+    //Collide player with objects
+    for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
+        CPlayer * player = list_players[iPlayer];
+        if(player->state != player_ready)
+            continue;
+
+        //Collide with objects
+        for(short iLayer = 0; iLayer < 3; iLayer++) {
+            for(short iObject = 0; iObject < objectcontainer[iLayer].list_end; iObject++) {
+                CObject * object = objectcontainer[iLayer].list[iObject];
+
+                if(!object->GetDead()) {
+                    if(coldec_player2obj(player, object)) {
+                        if(collisionhandler_p2o(player, object))
+                            break;
+                    }
+                }
+            }
+
+            //if the object killed the player, then continue with the other players
+            if(player->state != player_ready)
+                break;
+
+            //If player collided with a swap mushroom, the break from colliding with everything else
+            if(game_values.swapplayers)
+                return;
+        }
+    }
+}
+
+void handleObj2ObjCollisions()
+{
+    for(short iLayer1 = 0; iLayer1 < 3; iLayer1++) {
+        short iContainerEnd1 = objectcontainer[iLayer1].list_end;
+        for(short iObject1 = 0; iObject1 < iContainerEnd1; iObject1++) {
+            CObject * object1 = objectcontainer[iLayer1].list[iObject1];
+
+            if(object1->getObjectType() != object_moving)
+                continue;
+
+            IO_MovingObject * movingobject1 = (IO_MovingObject*)object1;
+
+            for(short iLayer2 = iLayer1; iLayer2 < 3; iLayer2++) {
+                short iContainerEnd2 = objectcontainer[iLayer2].list_end;
+                for(short iObject2 = (iLayer1 == iLayer2 ? iObject1 + 1 : 0); iObject2 < iContainerEnd2; iObject2++) {
+                    CObject * object2 = objectcontainer[iLayer2].list[iObject2];
+
+                    if(object2->getObjectType() != object_moving)
+                        continue;
+
+                    IO_MovingObject * movingobject2 = (IO_MovingObject*)object2;
+
+                    //if(g_iCollisionMap[movingobject1->getMovingObjectType()][movingobject2->getMovingObjectType()])
+                    //  continue;
+
+                    //if(iLayer1 == iLayer2 && iObject1 == iObject2)
+                    //  continue;
+
+                    if(object2->GetDead())
+                        continue;
+
+                    MovingObjectType iType1 = movingobject1->getMovingObjectType();
+                    MovingObjectType iType2 = movingobject2->getMovingObjectType();
+                    if(g_iCollisionMap[iType1][iType2]) {
+                        if(coldec_obj2obj(movingobject1, movingobject2)) {
+                            collisionhandler_o2o(movingobject1, movingobject2);
+                        }
+                    } else if(g_iCollisionMap[iType2][iType1]) {
+                        if(coldec_obj2obj(movingobject2, movingobject1)) {
+                            collisionhandler_o2o(movingobject2, movingobject1);
+                        }
+                    }
+
+                    if(object1->GetDead())
+                        return; // CONTINUEOBJECT1
+                }
+            }
+        }
+    }
+}
+
+void drawScoreboard(short iScoreTextOffset[4])
+{
+    //Draw scoreboards for all games (except special cases where we have a single player walking the map)
+    short i;
+    if(game_values.singleplayermode == -1) {
+        short highestScore = 0;
+
+        bool fReverseScoring = game_values.gamemode->GetReverseScoring();
+        if(fReverseScoring)
+            highestScore = 32000;
+
+        for(i = 0; i < score_cnt; i++) {
+            int scoreValue = score[i]->score;
+            if(game_values.gamemode->gamemode == game_mode_boxes_minigame)
+                scoreValue = score[i]->subscore[0];
+
+            if((scoreValue > highestScore && !fReverseScoring) || (scoreValue < highestScore && fReverseScoring)) {
+                highestScore = scoreValue;
+                g_iWinningPlayer = i;
+            } else if(scoreValue == highestScore) {
+                g_iWinningPlayer = -1;
+            }
+        }
+
+        //big end game scoreboard (sorted)
+        if(game_values.showscoreboard) {
+            char gameovertext[128] = "";
+            if(game_values.gamemode->winningteam > -1) {
+                if(game_values.teamcounts[game_values.gamemode->winningteam] == 1)
+                    sprintf(gameovertext, "Player %d Wins!", game_values.teamids[game_values.gamemode->winningteam][0] + 1);
+                else
+                    sprintf(gameovertext, "Team %d Wins!", game_values.gamemode->winningteam + 1);
+            } else {
+                sprintf(gameovertext, "Tie Game");
+            }
+
+            rm->game_font_large.drawCentered(smw->ScreenHeight/2, 90, gameovertext);
+
+        }
+
+        //in game scoreboards
+        for(i = 0; i < score_cnt; i++) {
+            if(game_values.gamemode->gamemode == game_mode_health || game_values.gamemode->gamemode == game_mode_collection || game_values.gamemode->gamemode == game_mode_boxes_minigame)
+                rm->spr_shade[game_values.teamcounts[i] - 1].draw(score[i]->x, score[i]->y);
+            else
+                rm->spr_shade[game_values.teamcounts[i] - 1].draw(score[i]->x, score[i]->y, 0, 0, 256, 41);
+
+            for(short k = 0; k < game_values.teamcounts[i]; k++) {
+                short globalID = game_values.teamids[i][k];
+
+                //If player is respawning, draw an animated egg counter
+                if(respawnCount[globalID] > 0 && !game_values.gamemode->gameover) {
+                    if(++respawnanimationtimer[globalID] > 8) {
+                        respawnanimationtimer[globalID] = 0;
+                        respawnanimationframe[globalID] += 32;
+
+                        if(respawnanimationframe[globalID] > 32)
+                            respawnanimationframe[globalID] = 0;
+                    }
+
+                    short scorex = score[i]->x + scoreoffsets[k];
+                    short scorey = score[i]->y + 2;
+                    rm->spr_egg.draw(scorex, scorey, respawnanimationframe[globalID], game_values.colorids[globalID] << 5, 32, 32);
+                    rm->spr_eggnumbers.draw(scorex, scorey, ((respawnCount[globalID] - 1) >> 1) << 5, game_values.colorids[globalID] << 5, 32, 32);
+                } else { //otherwise draw the player's skin in the scoreboard
+                    short iScoreboardSprite;
+                    if(game_values.gamemode->gameover) {
+                        if(g_iWinningPlayer != i)
+                            iScoreboardSprite = PGFX_DEADFLYING;
+                        else
+                            iScoreboardSprite = PGFX_JUMPING_R;
+                    } else {
+                        iScoreboardSprite = PGFX_STANDING_R;
+                    }
+
+                    //Search for player state to display
+                    CPlayer * player = GetPlayerFromGlobalID(globalID);
+
+                    if(player && !game_values.gamemode->gameover) {
+                        short iScoreOffsetX = score[i]->x + scoreoffsets[k];
+                        short iScoreOffsetY = score[i]->y + 2;
+
+                        if(player->ownerPlayerID > -1)
+                            rm->spr_ownedtags.draw(iScoreOffsetX - 8, iScoreOffsetY - 8, player->ownerColorOffsetX, 0, 48, 48);
+
+                        player->GetScoreboardSprite()[iScoreboardSprite]->draw(iScoreOffsetX, iScoreOffsetY, player->iSrcOffsetX, 0, 32, 32);
+
+                        //Display jail if player is jailed
+                        if(player->jailtimer > 0)
+                            rm->spr_jail.draw(iScoreOffsetX - 6, iScoreOffsetY - 6, (player->jailcolor + 1) * 44, 0, 44, 44);
+
+                        //Display current powerup if player is using one
+                        if(player->powerup > 0)
+                            rm->spr_storedpowerupsmall.draw(iScoreOffsetX, iScoreOffsetY + 16, g_iPowerupToIcon[player->powerup - 1], 0, 16, 16);
+
+                        //Display tanooki powerup if player has it
+                        if(player->tanooki)
+                            rm->spr_storedpowerupsmall.draw(iScoreOffsetX + 16, iScoreOffsetY + 16, smw->ScreenWidth/2, 0, 16, 16);
+                    } else {
+                        rm->spr_player[globalID][iScoreboardSprite]->draw(score[i]->x + scoreoffsets[k], score[i]->y + 2, 0, 0, 32, 32);
+                    }
+
+                    //give crown to player(s) with most kills
+                    if(g_iWinningPlayer == i)
+                        rm->spr_crown.draw(score[i]->x + scoreoffsets[k] + 12, score[i]->y - 4);
+                }
+
+                short storedpowerupid = game_values.gamepowerups[globalID];
+
+                //Draw stored powerup
+                if(storedpowerupid != -1) {
+                    if(!game_values.swapplayers) {
+                        rm->spr_storedpowerupsmall.draw(score[i]->x + scorepowerupoffsets[game_values.teamcounts[i] - 1][k], score[i]->y + 25, storedpowerupid * 16, 0, 16, 16);
+                    }
+                }
+            }
+
+            //Draw hearts for health mode
+            if(game_values.gamemode->gamemode == game_mode_health) {
+                short iLife = score[i]->subscore[0];
+                short iMax = score[i]->subscore[1];
+                short iHeartX = score[i]->x + scorepowerupoffsets[game_values.teamcounts[i] - 1][0] - 32;
+
+                for(short iHeart = 0; iHeart < iLife; iHeart++) {
+                    if(iHeart == iMax - 1 && iHeart % 2 == 0)
+                        rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, 32, 0, 8, 16);
+                    else
+                        rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, iHeart % 2 ? 8 : 0, 0, 8, 16);
+                }
+
+                for(short iHeart = iLife; iHeart < iMax; iHeart++) {
+                    if(iHeart == iMax - 1 && iHeart % 2 == 0)
+                        rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, 40, 0, 8, 16);
+                    else
+                        rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, iHeart % 2 ? 24 : 16, 0, 8, 16);
+                }
+            } else if(game_values.gamemode->gamemode == game_mode_collection) { //Draw cards for collection mode
+                //Flash collected cards if 3 have been collected
+                if(score[i]->subscore[0] < 3 || score[i]->subscore[2] % 20 < 10) {
+                    short iNumCards = score[i]->subscore[0];
+                    short iCardValues = score[i]->subscore[1];
+                    short iCardX = score[i]->x + scorepowerupoffsets[game_values.teamcounts[i] - 1][0] - 20;
+
+                    for(short iCard = 0; iCard < iNumCards; iCard++) {
+                        rm->spr_scorecards.draw(iCardX + iCard * 20, score[i]->y + 43, (iCardValues & 3) << 4, 0, 16, 16);
+                        iCardValues >>= 2;
+                    }
+                }
+            } else if(game_values.gamemode->gamemode == game_mode_boxes_minigame) { //Draw coins for boxes minigame
+                //Flash collected cards if 3 have been collected
+                short iNumCoins = score[i]->subscore[0];
+                short iCoinX = score[i]->x + scorepowerupoffsets[game_values.teamcounts[i] - 1][0] - 32;
+
+                short iCoin = 0;
+                for(; iCoin < iNumCoins; iCoin++) {
+                    rm->spr_scorecoins.draw(iCoinX + iCoin * 16, score[i]->y + 43, 0, 0, 16, 16);
+                }
+
+                for(short iEmptyCoin = iCoin; iEmptyCoin < 5; iEmptyCoin++) {
+                    rm->spr_scorecoins.draw(iCoinX + iEmptyCoin * 16, score[i]->y + 43, 16, 0, 16, 16);
+                }
+            }
+
+            short iScoreX = score[i]->x + iScoreTextOffset[i];
+            short iScoreY = score[i]->y + 4;
+
+            rm->spr_scoretext.draw(iScoreX, iScoreY, score[i]->iDigitLeft, (score[i]->iDigitLeft == 0 ? 16 : 0), 16, 16);
+            rm->spr_scoretext.draw(iScoreX + 18, iScoreY, score[i]->iDigitMiddle, (score[i]->iDigitLeft == 0 && score[i]->iDigitMiddle == 0 ? 16 : 0), 16, 16);
+            rm->spr_scoretext.draw(iScoreX + 36, iScoreY, score[i]->iDigitRight, 0, 16, 16);
+        }
+    }
+}
+
+void drawScreenFade()
+{
+    if(game_values.screenfadespeed != 0) {
+        g_map->update();
+        game_values.screenfade += game_values.screenfadespeed;
+
+        if(game_values.screenfade <= 0) {
+            game_values.screenfadespeed = 0;
+            game_values.screenfade = 0;
+
+            //display the mode and goal at the start of the game
+            //if(game_values.matchtype == MATCH_TYPE_QUICK_GAME)
+            if(game_values.startmodedisplay && game_values.singleplayermode == -1) {
+                char szMode[128];
+                if(game_values.gamemode->goal < 0)
+                    sprintf(szMode, "%s  %s: X", game_values.gamemode->GetModeName(), game_values.gamemode->GetGoalName());
+                else
+                    sprintf(szMode, "%s  %s: %d", game_values.gamemode->GetModeName(), game_values.gamemode->GetGoalName(), game_values.gamemode->goal);
+
+                short iMode = GetModeIconIndexFromMode(game_values.gamemode->gamemode);
+
+                eyecandy[2].add(new EC_Announcement(&rm->game_font_large, &rm->menu_mode_large, szMode, iMode, 130, 90));
+            }
+        } else if(game_values.screenfade >= 255) {
+            game_values.screenfadespeed = 0;
+            game_values.screenfade = 255;
+        }
+    }
+
+    if(game_values.screenfade > 0) {
+        rm->menu_shade.setalpha((Uint8)game_values.screenfade);
+        rm->menu_shade.draw(0, 0);
+    }
+}
+
+void drawScreenShakeBackground()
+{
+    //Draw black "behind" the game if we are shaking/moving the screen
+    if(y_shake > 0) {
+        SDL_Rect rect = {0, 0, smw->ScreenWidth, y_shake};
+        SDL_FillRect(screen, &rect, 0x0);       //fill empty area with black
+    } else if(y_shake < 0) {
+        SDL_Rect rect = {0, smw->ScreenHeight + y_shake, smw->ScreenWidth, smw->ScreenHeight};
+        SDL_FillRect(screen, &rect, 0x0);       //fill empty area with black
+    }
+
+    if(x_shake > 0) {
+        SDL_Rect rect = {0, 0, x_shake, smw->ScreenHeight};
+        SDL_FillRect(screen, &rect, 0x0);       //fill empty area with black
+    } else if(x_shake < 0) {
+        SDL_Rect rect = {smw->ScreenWidth + x_shake, 0, smw->ScreenWidth, smw->ScreenHeight};
+        SDL_FillRect(screen, &rect, 0x0);       //fill empty area with black
+    }
+}
+
+void drawPlayerSwap()
+{
+    short i;
+    if(game_values.swapplayers) {
+        for(i = 0; i < list_players_cnt; i++) {
+            list_players[i]->drawswap();
+
+            short storedpowerupid = game_values.gamepowerups[list_players[i]->getGlobalID()];
+
+            if(storedpowerupid != -1) {
+                short iPowerupX, iPowerupY;
+
+                if(game_values.swapstyle == 1) {
+                    iPowerupX = game_values.swapplayersblink ? list_players[i]->iOldPowerupX : list_players[i]->iNewPowerupX;
+                    iPowerupY = game_values.swapplayersblink ? list_players[i]->iOldPowerupY : list_players[i]->iNewPowerupY;
+                } else {
+                    iPowerupX = (short)((float)(list_players[i]->iNewPowerupX - list_players[i]->iOldPowerupX) * game_values.swapplayersposition) + list_players[i]->iOldPowerupX;
+                    iPowerupY = (short)((float)(list_players[i]->iNewPowerupY - list_players[i]->iOldPowerupY) * game_values.swapplayersposition) + list_players[i]->iOldPowerupY;
+                }
+
+                rm->spr_storedpowerupsmall.draw(iPowerupX, iPowerupY, storedpowerupid * 16, 0, 16, 16);
+            }
+        }
+
+        if(game_values.swapstyle == 0) {
+            if(!sfx_skid.isPlaying())
+                ifSoundOnPlay(sfx_skid);
+        }
+
+        if(++game_values.swapplayersblinkcount > 10) {
+            game_values.swapplayersblinkcount = 0;
+            game_values.swapplayersblink = !game_values.swapplayersblink;
+        }
+
+        game_values.swapplayersposition += 0.02f;
+        if(game_values.swapplayersposition >= 1.0f) {
+            game_values.swapplayersposition = 0.0f;
+            game_values.swapplayers = false;
+            game_values.screenfade = 0;
+
+            if(game_values.swapstyle == 0)
+                ifsoundonstop(sfx_skid);
+
+            ifSoundOnPlay(sfx_transform);
+
+            if(game_values.swapstyle == 1) {
+                for(i = 0; i < list_players_cnt; i++)
+                    eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, list_players[i]->ix + (HALFPW) - 16, list_players[i]->iy + (HALFPH) - 16, 3, 8));
+            }
+        }
+    }
+}
+
+void drawBackLayer()
+{
+    rm->spr_backmap[g_iCurrentDrawIndex].draw(0, 0);
+
+    //draw back eyecandy behind players
+    g_map->drawPlatforms(0);
+
+    eyecandy[0].draw();
+    noncolcontainer.draw();
+
+    game_values.gamemode->draw_background();
+
+    objectcontainer[0].draw();
+}
+
+void drawMiddleLayer()
+{
+    g_map->drawPlatforms(1);
+
+    if(!game_values.swapplayers) {
+        for(short i = 0; i < list_players_cnt; i++)
+            list_players[i]->draw();
+    }
+
+    eyecandy[1].draw();
+
+    objectcontainer[1].draw();
+}
+
+void drawFrontLayer()
+{
+    g_map->drawPlatforms(2);
+
+#ifdef _XBOX
+    g_map->drawfrontlayer();
+#else
+    if(game_values.toplayer)
+        g_map->drawfrontlayer();
+#endif
+    g_map->drawWarpLocks();
+
+    g_map->drawPlatforms(3);
+
+    objectcontainer[2].draw();
+    eyecandy[2].draw();
+    game_values.gamemode->draw_foreground();
+
+    g_map->drawPlatforms(4);
+}
+
+void drawEverything(short iCountDownState, short iScoreTextOffset[4])
+{
+    drawBackLayer();
+    drawMiddleLayer();
+    drawFrontLayer();
+
+
+    if(game_values.spotlights)
+        spotlightManager.DrawSpotlights();
+
+    g_iWinningPlayer = -1;
+
+    drawScoreboard(iScoreTextOffset);
+
+    if(game_values.windaffectsplayers) {
+        short iDisplayWindMeterY = game_values.scoreboardstyle == 1 ? 8 : 440;
+        rm->spr_windmeter.draw(210, iDisplayWindMeterY, 0, 0, 220, 32);
+        rm->spr_windmeter.draw((short)(game_values.gamewindx * 20.0f) + smw->ScreenWidth/2, iDisplayWindMeterY + 6, 220, 0, 12, 20);
+    }
+
+    //draw arrows for being above the top of the screen
+    for(short i = 0; i < list_players_cnt; i++)
+        list_players[i]->drawarrows();
+
+    //Draw countdown start timer
+    if(iCountDownState > 0 && game_values.screenfade == 0) {
+        SDL_Rect * rects = iCountDownNumbers[iCountDownRectGroup[28 - iCountDownState]][iCountDownRectSize[28 - iCountDownState]];
+        rm->spr_countdown_numbers.draw(rects[1].x, rects[1].y, rects[0].x, rects[0].y, rects[0].w, rects[0].h);
+    }
+
+    drawScreenFade();
+    drawPlayerSwap();
+    drawScreenShakeBackground();
+}
+
+void drawExitPause()
+{
+    if(game_values.pausegame) {
+        rm->spr_dialog.draw(224, 176);
+        rm->menu_font_large.drawCentered(smw->ScreenHeight/2, 194, "Pause");
+
+        //menu_font_large.drawCentered(smw->ScreenWidth/2, smw->ScreenHeight/2, game_values.gamemode->GetModeName());
+        short iMode = GetModeIconIndexFromMode(game_values.gamemode->gamemode);
+
+        rm->menu_mode_large.draw(304, 224, iMode << 5, 0, 32, 32);
+
+        char szGoal[256];
+        strcpy(szGoal, game_values.gamemode->GetGoalName());
+        strcat(szGoal, ": ");
+
+        if(game_values.gamemode->goal == -1)
+            sprintf(szGoal + strlen(szGoal), "Unlimited");
+        else
+            sprintf(szGoal + strlen(szGoal), "%d", game_values.gamemode->goal);
+
+        rm->menu_font_large.drawCentered(smw->ScreenWidth/2, 264, szGoal);
+    }
+
+    if(game_values.exitinggame) {
+        rm->spr_dialog.draw(smw->ScreenWidth * 0.35f, smw->ScreenHeight*0.37f);
+        rm->menu_font_large.drawCentered(smw->ScreenWidth * 0.5f, smw->ScreenHeight*0.46f - (rm->menu_font_large.getHeight() >> 1), "Exit Game");
+
+        rm->spr_dialogbutton.draw(smw->ScreenWidth * 0.37f, smw->ScreenHeight*0.52f, 0, (game_values.exityes ? 34 : 0), 80, 34);
+        rm->spr_dialogbutton.draw(smw->ScreenWidth * 0.51f, smw->ScreenHeight*0.52f, 0, (game_values.exityes ? 0 : 34), 80, 34);
+
+        rm->menu_font_large.draw(smw->ScreenWidth * 0.43f - (rm->menu_font_large.getWidth("Yes") >> 1),  smw->ScreenHeight*0.56f - (rm->menu_font_large.getHeight() >> 1), "Yes");
+        rm->menu_font_large.draw(smw->ScreenWidth * 0.57f - (rm->menu_font_large.getWidth("No") >> 1),  smw->ScreenHeight*0.56f - (rm->menu_font_large.getHeight() >> 1), "No");
+    }
+}
+
+bool updateExitPause(short iCountDownState) // true on exit
+{
+    if(game_values.screenfade == 0 && iCountDownState <= COUNTDOWN_START_INDEX) {
+        //If the cancel button is pressed
+        if(game_values.forceexittimer > 0) {
+            if(--game_values.forceexittimer <= 0) {
+                game_values.gamestate = GS_END_GAME;
+                game_values.screenfade = 8;
+                game_values.screenfadespeed = 8;
+            }
+        }
+
+        for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
+            COutputControl * playerKeys = &game_values.playerInput.outputControls[iPlayer];
+
+            //If the start key is pressed (pause key)
+            if(playerKeys->game_start.fPressed && IsPauseAllowed()) {
+                if(!game_values.showscoreboard && !game_values.exitinggame) {
+                    game_values.pausegame = !game_values.pausegame;
+
+                    if(game_values.pausegame) {
+                        rm->menu_shade.setalpha(smw->MenuTransparency   );
+                        rm->menu_shade.draw(0, 0);
+
+                        //Stop the pwings sound if it is on
+                        if(sfx_flyingsound.isPlaying())
+                            ifsoundonstop(sfx_flyingsound);
+                    }
+
+                    //ifsoundonpause(sfx_invinciblemusic);
+                    //ifsoundonpause(sfx_slowdownmusic);
+                    ifSoundOnPlay(sfx_pause);
+                }
+            }
+
+            //Only player 1 is allowed to exit a game
+            //if(iPlayer != 0)
+            //  continue;
+
+            if((playerKeys->game_cancel.fPressed || (playerKeys->game_start.fPressed && game_values.gamemode->gameover)) && IsExitAllowed()) {
+                if(game_values.gamemode->gameover) {
+                    if(game_values.matchtype == MATCH_TYPE_TOUR || game_values.matchtype == MATCH_TYPE_TOURNAMENT)
+                        UpdateScoreBoard();
+
+                    CleanUp();
+                    game_values.gamestate = GS_MENU;
+
+                    return true;
+                } else {
+                    if(!game_values.pausegame && !game_values.exitinggame) {
+                        rm->menu_shade.setalpha(smw->MenuTransparency   );
+                        rm->menu_shade.draw(0, 0);
+                        game_values.exitinggame = true;
+                        //ifsoundonpause(sfx_invinciblemusic);
+                        //ifsoundonpause(sfx_slowdownmusic);
+
+                        //Reset the keys each time we switch from menu to game and back
+                        game_values.playerInput.ResetKeys();
+                    }
+                }
+            }
+
+            //Deal with input to game exit dialog box
+            if(game_values.exitinggame) {
+                if(playerKeys->menu_left.fPressed)
+                    game_values.exityes = true;
+                else if(playerKeys->menu_right.fPressed)
+                    game_values.exityes = false;
+
+                if(playerKeys->menu_select.fPressed) {
+                    if(game_values.exityes) {
+                        CleanUp();
+                        game_values.exitinggame = false;
+                        game_values.exityes = false;
+                        game_values.gamestate = GS_MENU;
+                        return true;
+                    } else {
+                        game_values.exitinggame = false;
+                        //ifsoundonpause(sfx_invinciblemusic);
+                        //ifsoundonpause(sfx_slowdownmusic);
+
+                        //Reset the keys each time we switch from menu to game and back
+                        game_values.playerInput.ResetKeys();
+                    }
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
+void updateScreenShake()
+{
+    if(y_shake > 0 && !game_values.spinscreen) {
+        y_shake -= CRUNCHVELOCITY;
+
+        if(y_shake < 0)
+            y_shake = 0;
+    }
+}
+
+void playMusic()
+{
+    //Make sure music and sound effects keep playing
+    if(game_values.slowdownon != -1) {
+        if(!sfx_slowdownmusic.isPlaying())
+            ifSoundOnPlay(sfx_slowdownmusic);
+    } else {
+        if(sfx_slowdownmusic.isPlaying())
+            ifsoundonstop(sfx_slowdownmusic);
+    }
+
+    if(game_values.playinvinciblesound) {
+        if(!sfx_invinciblemusic.isPlaying() && !sfx_timewarning.isPlaying() && !backgroundmusic[0].isplaying())
+            ifSoundOnPlay(sfx_invinciblemusic);
+    } else {
+        if(sfx_invinciblemusic.isPlaying())
+            ifsoundonstop(sfx_invinciblemusic);
+    }
+
+    //If no background music is playing, then play some
+    if(!backgroundmusic[0].isplaying() && !sfx_invinciblemusic.isPlaying() && !sfx_timewarning.isPlaying() && !game_values.gamemode->gameover) {
+        if(game_values.playnextmusic) {
+            musiclist->SetNextMusic(g_map->musicCategoryID, maplist->currentShortmapname(), g_map->szBackgroundFile);
+            backgroundmusic[0].load(musiclist->GetCurrentMusic());
+        }
+
+        backgroundmusic[0].play(game_values.playnextmusic, false);
+    }
 }
 
 void RunGame()
@@ -1279,24 +2101,7 @@ void RunGame()
         //printf("[%d;%d]\n", current_playerKeys->keys[0].fDown, current_playerKeys->keys[0].fPressed);
         //printf("%d -> %f\n", list_players[0]->ix, list_players[0]->fx);
 
-        if(iWindTimer <= 0) {
-            //Then trigger next wind event
-            if(game_values.gamewindx < dNextWind) {
-                game_values.gamewindx += 0.02f;
-
-                if(game_values.gamewindx >= dNextWind)
-                    iWindTimer = (RNGMAX(60)) + 30;
-            } else if(game_values.gamewindx >= dNextWind) {
-                game_values.gamewindx -= 0.02f;
-
-                if(game_values.gamewindx <= dNextWind)
-                    iWindTimer = (RNGMAX(60)) + 30;
-            }
-        } else {
-            if(--iWindTimer <= 0) {
-                dNextWind = (float)((RNGMAX(41)) - 20) / 4.0f;
-            }
-        }
+        checkWindEvent(iWindTimer, dNextWind);
 
         /*
         #ifdef _XBOX
@@ -1603,92 +2408,8 @@ void RunGame()
             game_values.playerInput.Update(event, (game_values.exitinggame ? 1 : 0));
         }
 
-        if(game_values.screenfade == 0 && iCountDownState <= COUNTDOWN_START_INDEX) {
-            //If the cancel button is pressed
-            if(game_values.forceexittimer > 0) {
-                if(--game_values.forceexittimer <= 0) {
-                    game_values.gamestate = GS_END_GAME;
-                    game_values.screenfade = 8;
-                    game_values.screenfadespeed = 8;
-                }
-            }
-
-            for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
-                COutputControl * playerKeys = &game_values.playerInput.outputControls[iPlayer];
-
-                //If the start key is pressed (pause key)
-                if(playerKeys->game_start.fPressed && IsPauseAllowed()) {
-                    if(!game_values.showscoreboard && !game_values.exitinggame) {
-                        game_values.pausegame = !game_values.pausegame;
-
-                        if(game_values.pausegame) {
-                            rm->menu_shade.setalpha(smw->MenuTransparency	);
-                            rm->menu_shade.draw(0, 0);
-
-                            //Stop the pwings sound if it is on
-                            if(sfx_flyingsound.isPlaying())
-                                ifsoundonstop(sfx_flyingsound);
-                        }
-
-                        //ifsoundonpause(sfx_invinciblemusic);
-                        //ifsoundonpause(sfx_slowdownmusic);
-                        ifSoundOnPlay(sfx_pause);
-                    }
-                }
-
-                //Only player 1 is allowed to exit a game
-                //if(iPlayer != 0)
-                //	continue;
-
-                if((playerKeys->game_cancel.fPressed || (playerKeys->game_start.fPressed && game_values.gamemode->gameover)) && IsExitAllowed()) {
-                    if(game_values.gamemode->gameover) {
-                        if(game_values.matchtype == MATCH_TYPE_TOUR || game_values.matchtype == MATCH_TYPE_TOURNAMENT)
-                            UpdateScoreBoard();
-
-                        CleanUp();
-                        game_values.gamestate = GS_MENU;
-
-                        return;
-                    } else {
-                        if(!game_values.pausegame && !game_values.exitinggame) {
-                            rm->menu_shade.setalpha(smw->MenuTransparency	);
-                            rm->menu_shade.draw(0, 0);
-                            game_values.exitinggame = true;
-                            //ifsoundonpause(sfx_invinciblemusic);
-                            //ifsoundonpause(sfx_slowdownmusic);
-
-                            //Reset the keys each time we switch from menu to game and back
-                            game_values.playerInput.ResetKeys();
-                        }
-                    }
-                }
-
-                //Deal with input to game exit dialog box
-                if(game_values.exitinggame) {
-                    if(playerKeys->menu_left.fPressed)
-                        game_values.exityes = true;
-                    else if(playerKeys->menu_right.fPressed)
-                        game_values.exityes = false;
-
-                    if(playerKeys->menu_select.fPressed) {
-                        if(game_values.exityes) {
-                            CleanUp();
-                            game_values.exitinggame = false;
-                            game_values.exityes = false;
-                            game_values.gamestate = GS_MENU;
-                            return;
-                        } else {
-                            game_values.exitinggame = false;
-                            //ifsoundonpause(sfx_invinciblemusic);
-                            //ifsoundonpause(sfx_slowdownmusic);
-
-                            //Reset the keys each time we switch from menu to game and back
-                            game_values.playerInput.ResetKeys();
-                        }
-                    }
-                }
-            }
-        }
+        if (updateExitPause(iCountDownState))
+            return;
 
         if(!game_values.pausegame && !game_values.exitinggame) {
             if(!game_values.swapplayers && game_values.screenfade == 0) {
@@ -1710,161 +2431,11 @@ void RunGame()
 
                 //Make updates to background stuff (animate map while countdown is counting)
                 if(iCountDownState > COUNTDOWN_START_INDEX) {
-                    //Move platforms
-                    g_map->updatePlatforms();
-
-                    //Keep updating map hazards
-                    objectcontainer[0].cleandeadobjects();
-                    objectcontainer[1].cleandeadobjects();
-                    objectcontainer[2].cleandeadobjects();
-                    noncolcontainer.cleandeadobjects();
-
-                    noncolcontainer.update();
-                    objectcontainer[0].update();
-                    objectcontainer[1].update();
-                    objectcontainer[2].update();
-
-                    eyecandy[0].cleandeadobjects();
-                    eyecandy[1].cleandeadobjects();
-                    eyecandy[2].cleandeadobjects();
-
-                    eyecandy[0].update();
-                    eyecandy[1].update();
-                    eyecandy[2].update();
-
-                    g_map->update();
+                    animateDuringCountdown();
                 } else {
                     //Shake screen
 
-                    if(game_values.screenshaketimer > 0) {
-                        game_values.screenshaketimer--;
-
-                        static bool shakeleft = false;
-                        if(shakeleft) {
-                            x_shake -= 2;
-                            if(x_shake <= -2) {
-                                shakeleft = false;
-                            }
-                        } else {
-                            x_shake += 2;
-                            if(x_shake >= 2) {
-                                shakeleft = true;
-                            }
-                        }
-
-                        //Kill players touching the ground (or in air for MOd blocks)
-                        short iNumKillPlayers = 0;
-                        CPlayer * pKillPlayers[4];
-
-                        CPlayer * killer1 = GetPlayerFromGlobalID(game_values.screenshakeplayerid);
-
-                        for(short k = 0; k < list_players_cnt; k++) {
-                            CPlayer * player = list_players[k];
-
-                            //Don't kill the player that triggered the POW/MOd
-                            if(player->globalID == game_values.screenshakeplayerid)
-                                continue;
-
-                            //Don't kill players on his team either (if friendly fire is off)
-                            if(game_values.teamcollision != 2 && game_values.screenshaketeamid == player->teamID)
-                                continue;
-
-                            //Kill other players
-                            if(!player->invincible && player->shield == 0 && player->iKuriboShoe == 0 && player->isready()) {
-                                if(game_values.screenshakekillinair == player->inair) {
-                                    pKillPlayers[iNumKillPlayers++] = player;
-
-                                    if(killer1) {
-                                        game_values.screenshakekillscount++;
-
-                                        if(killer1->inair)
-                                            killer1->killsinrowinair--;  //Don't want to give both shake and in air award
-                                    }
-                                }
-                            }
-                        }
-
-                        //Randomize the order in which the players are killed (so that game modes where order matters is fair)
-                        if(iNumKillPlayers > 0) {
-                            short iRandPlayer = RNGMAX( iNumKillPlayers);
-                            for(short iPlayer = 0; iPlayer < iNumKillPlayers; iPlayer++) {
-                                PlayerKilledPlayer(game_values.screenshakeplayerid, pKillPlayers[iRandPlayer], death_style_jump, kill_style_pow, false, false);
-
-                                if(++iRandPlayer >= iNumKillPlayers)
-                                    iRandPlayer = 0;
-                            }
-                        }
-
-                        //Kill goombas and koopas
-                        for(short k = 0; k < objectcontainer[0].list_end; k++) {
-                            CObject * object = objectcontainer[0].list[k];
-                            if(object->getObjectType() == object_moving) {
-                                IO_MovingObject * movingobject = (IO_MovingObject *)object;
-                                MovingObjectType type = movingobject->getMovingObjectType();
-
-                                if((type == movingobject_goomba || type == movingobject_koopa || type == movingobject_buzzybeetle || type == movingobject_spiny)
-                                        && game_values.screenshakekillinair == movingobject->inair) {
-                                    CPlayer * killer = GetPlayerFromGlobalID(game_values.screenshakeplayerid);
-
-                                    if(killer) {
-                                        if(!game_values.gamemode->gameover)
-                                            killer->score->AdjustScore(1);
-
-                                        ifSoundOnPlay(sfx_kicksound);
-                                        ((MO_WalkingEnemy*)movingobject)->DieAndDropShell(true, true);
-
-                                        game_values.screenshakekillscount++;
-
-                                        if(killer->inair)
-                                            killer->killsinrowinair--;  //Don't want to give both shake and in air award
-                                    }
-                                }
-                            }
-                        }
-
-                        //Destroy throw blocks and flip shells over
-                        for(short k = 0; k < objectcontainer[1].list_end; k++) {
-                            CObject * object = objectcontainer[1].list[k];
-                            if(object->getObjectType() == object_moving) {
-                                IO_MovingObject * movingobject = (IO_MovingObject *)object;
-
-                                if(game_values.screenshakekillinair == movingobject->inair) {
-                                    if(movingobject->getMovingObjectType() == movingobject_shell) {
-                                        CO_Shell * shell = (CO_Shell*)movingobject;
-                                        if(shell->frozen || !shell->owner || shell->owner->inair == game_values.screenshakekillinair)
-                                            shell->Flip();  //also breaks shells if frozen
-                                    } else if(movingobject->getMovingObjectType() == movingobject_throwblock) {
-                                        CO_ThrowBlock * throwblock = (CO_ThrowBlock*)movingobject;
-                                        if(throwblock->frozen || !throwblock->owner || throwblock->owner->inair == game_values.screenshakekillinair)
-                                            throwblock->Die();
-                                    } else if(movingobject->getMovingObjectType() == movingobject_throwbox) {
-                                        CO_ThrowBox * throwbox = (CO_ThrowBox*)movingobject;
-                                        if(throwbox->frozen)
-                                            throwbox->Die();
-                                    } else if(movingobject->getMovingObjectType() == movingobject_pirhanaplant) {
-                                        MO_PirhanaPlant * plant = (MO_PirhanaPlant*)movingobject;
-                                        plant->KillPlant();
-                                    } else if(movingobject->getMovingObjectType() == movingobject_bulletbill) {
-                                        MO_BulletBill * bulletbill = (MO_BulletBill*)movingobject;
-                                        bulletbill->Die();
-                                    }
-                                }
-                            }
-                        }
-
-                        //Add kills in row for kills from pow and mod
-                        if(game_values.screenshakekillscount > 1 && game_values.awardstyle != award_style_none) {
-                            game_values.screenshakekillscount = 0;
-
-                            CPlayer * killer2 = GetPlayerFromGlobalID(game_values.screenshakeplayerid);
-
-                            if(killer2)
-                                killer2->AddKillsInRowInAirAward();
-                        }
-                    } else {
-                        //Make sure we zero out the shake value after it is done
-                        x_shake = 0;
-                    }
+                    shakeScreen();
 
                     if(game_values.spinscreen) {
                         SpinScreen();
@@ -1905,24 +2476,7 @@ void RunGame()
                     if(++game_values.cputurn > 3)
                         game_values.cputurn = 0;
 
-                    //Player to player collisions
-                    for(i = 0; i < list_players_cnt; i++) {
-                        CPlayer * player1 = list_players[i];
-                        if(player1->state > player_dead) {
-                            for(j = i + 1; j < list_players_cnt; j++) {
-                                CPlayer * player2 = list_players[j];
-                                if(player2->state > player_dead) {
-                                    if(coldec_player2player(player1, player2)) {
-                                        collisionhandler_p2p(player1, player2);
-
-                                        //if player was killed by another player, continue with next player for collision detection
-                                        if(player1->state <= player_dead)
-                                            break;
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    handleP2PCollisions();
 
                     //Move platforms
                     g_map->updatePlatforms();
@@ -1958,101 +2512,18 @@ void RunGame()
                     objectcontainer[1].update();
                     objectcontainer[2].update();
 
-                    //Collide player with objects
-                    for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
-                        CPlayer * player = list_players[iPlayer];
-                        if(player->state != player_ready)
-                            continue;
+                    handleP2ObjCollisions();
+                    if (game_values.swapplayers)
+                        goto SWAPBREAK;
 
-                        //Collide with objects
-                        for(short iLayer = 0; iLayer < 3; iLayer++) {
-                            for(short iObject = 0; iObject < objectcontainer[iLayer].list_end; iObject++) {
-                                CObject * object = objectcontainer[iLayer].list[iObject];
-
-                                if(!object->GetDead()) {
-                                    if(coldec_player2obj(player, object)) {
-                                        if(collisionhandler_p2o(player, object))
-                                            break;
-                                    }
-                                }
-                            }
-
-                            //if the object killed the player, then continue with the other players
-                            if(player->state != player_ready)
-                                break;
-
-                            //If player collided with a swap mushroom, the break from colliding with everything else
-                            if(game_values.swapplayers)
-                                goto SWAPBREAK;
-                        }
-                    }
-
-                    for(short iLayer1 = 0; iLayer1 < 3; iLayer1++) {
-                        short iContainerEnd1 = objectcontainer[iLayer1].list_end;
-                        for(short iObject1 = 0; iObject1 < iContainerEnd1; iObject1++) {
-                            CObject * object1 = objectcontainer[iLayer1].list[iObject1];
-
-                            if(object1->getObjectType() != object_moving)
-                                continue;
-
-                            IO_MovingObject * movingobject1 = (IO_MovingObject*)object1;
-
-                            for(short iLayer2 = iLayer1; iLayer2 < 3; iLayer2++) {
-                                short iContainerEnd2 = objectcontainer[iLayer2].list_end;
-                                for(short iObject2 = (iLayer1 == iLayer2 ? iObject1 + 1 : 0); iObject2 < iContainerEnd2; iObject2++) {
-                                    CObject * object2 = objectcontainer[iLayer2].list[iObject2];
-
-                                    if(object2->getObjectType() != object_moving)
-                                        continue;
-
-                                    IO_MovingObject * movingobject2 = (IO_MovingObject*)object2;
-
-                                    //if(g_iCollisionMap[movingobject1->getMovingObjectType()][movingobject2->getMovingObjectType()])
-                                    //	continue;
-
-                                    //if(iLayer1 == iLayer2 && iObject1 == iObject2)
-                                    //	continue;
-
-                                    if(object2->GetDead())
-                                        continue;
-
-                                    MovingObjectType iType1 = movingobject1->getMovingObjectType();
-                                    MovingObjectType iType2 = movingobject2->getMovingObjectType();
-                                    if(g_iCollisionMap[iType1][iType2]) {
-                                        if(coldec_obj2obj(movingobject1, movingobject2)) {
-                                            collisionhandler_o2o(movingobject1, movingobject2);
-                                        }
-                                    } else if(g_iCollisionMap[iType2][iType1]) {
-                                        if(coldec_obj2obj(movingobject2, movingobject1)) {
-                                            collisionhandler_o2o(movingobject2, movingobject1);
-                                        }
-                                    }
-
-                                    if(object1->GetDead())
-                                        goto CONTINUEOBJECT1;
-                                }
-                            }
-
-                            //Labeled break
-CONTINUEOBJECT1:
-                            continue;
-                        }
-                    }
+                    handleObj2ObjCollisions();
 
                     //Commit all player actions at this point (after we have collided with any objects
                     //that the player might have picked up)
                     for(i = 0; i < list_players_cnt; i++)
                         list_players[i]->CommitAction();
 
-                    eyecandy[0].cleandeadobjects();
-                    eyecandy[1].cleandeadobjects();
-                    eyecandy[2].cleandeadobjects();
-
-                    objectcontainer[2].cleandeadobjects();
-                    objectcontainer[1].cleandeadobjects();
-                    objectcontainer[0].cleandeadobjects();
-                    noncolcontainer.cleandeadobjects();
-
+                    cleanDeadNonPlayerObjects();
                     CleanDeadPlayers();
 
                     eyecandy[0].update();
@@ -2068,12 +2539,7 @@ CONTINUEOBJECT1:
 
                     g_map->update();
 
-                    if(y_shake > 0 && !game_values.spinscreen) {
-                        y_shake -= CRUNCHVELOCITY;
-
-                        if(y_shake < 0)
-                            y_shake = 0;
-                    }
+                    updateScreenShake();
 
                     if(game_values.showscoreboard) {
                         if(game_values.scorepercentmove < 1.0f) {
@@ -2150,394 +2616,12 @@ SWAPBREAK:
             }
 
             //--------------- draw everything ----------------------
-            rm->spr_backmap[g_iCurrentDrawIndex].draw(0, 0);
-
-            //draw back eyecandy behind players
-            g_map->drawPlatforms(0);
-
-            eyecandy[0].draw();
-            noncolcontainer.draw();
-
-            game_values.gamemode->draw_background();
-
-            objectcontainer[0].draw();
-
-            g_map->drawPlatforms(1);
-
-            if(!game_values.swapplayers) {
-                for(i = 0; i < list_players_cnt; i++)
-                    list_players[i]->draw();
-            }
-
-            eyecandy[1].draw();
-
-            objectcontainer[1].draw();
-
-            g_map->drawPlatforms(2);
-
-#ifdef _XBOX
-            g_map->drawfrontlayer();
-#else
-            if(game_values.toplayer)
-                g_map->drawfrontlayer();
-#endif
-            g_map->drawWarpLocks();
-
-            g_map->drawPlatforms(3);
-
-            objectcontainer[2].draw();
-            eyecandy[2].draw();
-            game_values.gamemode->draw_foreground();
-
-            g_map->drawPlatforms(4);
-
-            if(game_values.spotlights)
-                spotlightManager.DrawSpotlights();
-
-            g_iWinningPlayer = -1;
-
-            //Draw scoreboards for all games (except special cases where we have a single player walking the map)
-            if(game_values.singleplayermode == -1) {
-                short highestScore = 0;
-
-                bool fReverseScoring = game_values.gamemode->GetReverseScoring();
-                if(fReverseScoring)
-                    highestScore = 32000;
-
-                for(i = 0; i < score_cnt; i++) {
-                    int scoreValue = score[i]->score;
-                    if(game_values.gamemode->gamemode == game_mode_boxes_minigame)
-                        scoreValue = score[i]->subscore[0];
-
-                    if((scoreValue > highestScore && !fReverseScoring) || (scoreValue < highestScore && fReverseScoring)) {
-                        highestScore = scoreValue;
-                        g_iWinningPlayer = i;
-                    } else if(scoreValue == highestScore) {
-                        g_iWinningPlayer = -1;
-                    }
-                }
-
-                //big end game scoreboard (sorted)
-                if(game_values.showscoreboard) {
-                    char gameovertext[128] = "";
-                    if(game_values.gamemode->winningteam > -1) {
-                        if(game_values.teamcounts[game_values.gamemode->winningteam] == 1)
-                            sprintf(gameovertext, "Player %d Wins!", game_values.teamids[game_values.gamemode->winningteam][0] + 1);
-                        else
-                            sprintf(gameovertext, "Team %d Wins!", game_values.gamemode->winningteam + 1);
-                    } else {
-                        sprintf(gameovertext, "Tie Game");
-                    }
-
-                    rm->game_font_large.drawCentered(smw->ScreenHeight/2, 90, gameovertext);
-
-                }
-
-                //in game scoreboards
-                for(i = 0; i < score_cnt; i++) {
-                    if(game_values.gamemode->gamemode == game_mode_health || game_values.gamemode->gamemode == game_mode_collection || game_values.gamemode->gamemode == game_mode_boxes_minigame)
-                        rm->spr_shade[game_values.teamcounts[i] - 1].draw(score[i]->x, score[i]->y);
-                    else
-                        rm->spr_shade[game_values.teamcounts[i] - 1].draw(score[i]->x, score[i]->y, 0, 0, 256, 41);
-
-                    for(short k = 0; k < game_values.teamcounts[i]; k++) {
-                        short globalID = game_values.teamids[i][k];
-
-                        //If player is respawning, draw an animated egg counter
-                        if(respawnCount[globalID] > 0 && !game_values.gamemode->gameover) {
-                            if(++respawnanimationtimer[globalID] > 8) {
-                                respawnanimationtimer[globalID] = 0;
-                                respawnanimationframe[globalID] += 32;
-
-                                if(respawnanimationframe[globalID] > 32)
-                                    respawnanimationframe[globalID] = 0;
-                            }
-
-                            short scorex = score[i]->x + scoreoffsets[k];
-                            short scorey = score[i]->y + 2;
-                            rm->spr_egg.draw(scorex, scorey, respawnanimationframe[globalID], game_values.colorids[globalID] << 5, 32, 32);
-                            rm->spr_eggnumbers.draw(scorex, scorey, ((respawnCount[globalID] - 1) >> 1) << 5, game_values.colorids[globalID] << 5, 32, 32);
-                        } else { //otherwise draw the player's skin in the scoreboard
-                            short iScoreboardSprite;
-                            if(game_values.gamemode->gameover) {
-                                if(g_iWinningPlayer != i)
-                                    iScoreboardSprite = PGFX_DEADFLYING;
-                                else
-                                    iScoreboardSprite = PGFX_JUMPING_R;
-                            } else {
-                                iScoreboardSprite = PGFX_STANDING_R;
-                            }
-
-                            //Search for player state to display
-                            CPlayer * player = GetPlayerFromGlobalID(globalID);
-
-                            if(player && !game_values.gamemode->gameover) {
-                                short iScoreOffsetX = score[i]->x + scoreoffsets[k];
-                                short iScoreOffsetY = score[i]->y + 2;
-
-                                if(player->ownerPlayerID > -1)
-                                    rm->spr_ownedtags.draw(iScoreOffsetX - 8, iScoreOffsetY - 8, player->ownerColorOffsetX, 0, 48, 48);
-
-                                player->GetScoreboardSprite()[iScoreboardSprite]->draw(iScoreOffsetX, iScoreOffsetY, player->iSrcOffsetX, 0, 32, 32);
-
-                                //Display jail if player is jailed
-                                if(player->jailtimer > 0)
-                                    rm->spr_jail.draw(iScoreOffsetX - 6, iScoreOffsetY - 6, (player->jailcolor + 1) * 44, 0, 44, 44);
-
-                                //Display current powerup if player is using one
-                                if(player->powerup > 0)
-                                    rm->spr_storedpowerupsmall.draw(iScoreOffsetX, iScoreOffsetY + 16, g_iPowerupToIcon[player->powerup - 1], 0, 16, 16);
-
-                                //Display tanooki powerup if player has it
-                                if(player->tanooki)
-                                    rm->spr_storedpowerupsmall.draw(iScoreOffsetX + 16, iScoreOffsetY + 16, smw->ScreenWidth/2, 0, 16, 16);
-                            } else {
-                                rm->spr_player[globalID][iScoreboardSprite]->draw(score[i]->x + scoreoffsets[k], score[i]->y + 2, 0, 0, 32, 32);
-                            }
-
-                            //give crown to player(s) with most kills
-                            if(g_iWinningPlayer == i)
-                                rm->spr_crown.draw(score[i]->x + scoreoffsets[k] + 12, score[i]->y - 4);
-                        }
-
-                        short storedpowerupid = game_values.gamepowerups[globalID];
-
-                        //Draw stored powerup
-                        if(storedpowerupid != -1) {
-                            if(!game_values.swapplayers) {
-                                rm->spr_storedpowerupsmall.draw(score[i]->x + scorepowerupoffsets[game_values.teamcounts[i] - 1][k], score[i]->y + 25, storedpowerupid * 16, 0, 16, 16);
-                            }
-                        }
-                    }
-
-                    //Draw hearts for health mode
-                    if(game_values.gamemode->gamemode == game_mode_health) {
-                        short iLife = score[i]->subscore[0];
-                        short iMax = score[i]->subscore[1];
-                        short iHeartX = score[i]->x + scorepowerupoffsets[game_values.teamcounts[i] - 1][0] - 32;
-
-                        for(short iHeart = 0; iHeart < iLife; iHeart++) {
-                            if(iHeart == iMax - 1 && iHeart % 2 == 0)
-                                rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, 32, 0, 8, 16);
-                            else
-                                rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, iHeart % 2 ? 8 : 0, 0, 8, 16);
-                        }
-
-                        for(short iHeart = iLife; iHeart < iMax; iHeart++) {
-                            if(iHeart == iMax - 1 && iHeart % 2 == 0)
-                                rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, 40, 0, 8, 16);
-                            else
-                                rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, iHeart % 2 ? 24 : 16, 0, 8, 16);
-                        }
-                    } else if(game_values.gamemode->gamemode == game_mode_collection) { //Draw cards for collection mode
-                        //Flash collected cards if 3 have been collected
-                        if(score[i]->subscore[0] < 3 || score[i]->subscore[2] % 20 < 10) {
-                            short iNumCards = score[i]->subscore[0];
-                            short iCardValues = score[i]->subscore[1];
-                            short iCardX = score[i]->x + scorepowerupoffsets[game_values.teamcounts[i] - 1][0] - 20;
-
-                            for(short iCard = 0; iCard < iNumCards; iCard++) {
-                                rm->spr_scorecards.draw(iCardX + iCard * 20, score[i]->y + 43, (iCardValues & 3) << 4, 0, 16, 16);
-                                iCardValues >>= 2;
-                            }
-                        }
-                    } else if(game_values.gamemode->gamemode == game_mode_boxes_minigame) { //Draw coins for boxes minigame
-                        //Flash collected cards if 3 have been collected
-                        short iNumCoins = score[i]->subscore[0];
-                        short iCoinX = score[i]->x + scorepowerupoffsets[game_values.teamcounts[i] - 1][0] - 32;
-
-                        short iCoin = 0;
-                        for(; iCoin < iNumCoins; iCoin++) {
-                            rm->spr_scorecoins.draw(iCoinX + iCoin * 16, score[i]->y + 43, 0, 0, 16, 16);
-                        }
-
-                        for(short iEmptyCoin = iCoin; iEmptyCoin < 5; iEmptyCoin++) {
-                            rm->spr_scorecoins.draw(iCoinX + iEmptyCoin * 16, score[i]->y + 43, 16, 0, 16, 16);
-                        }
-                    }
-
-                    short iScoreX = score[i]->x + iScoreTextOffset[i];
-                    short iScoreY = score[i]->y + 4;
-
-                    rm->spr_scoretext.draw(iScoreX, iScoreY, score[i]->iDigitLeft, (score[i]->iDigitLeft == 0 ? 16 : 0), 16, 16);
-                    rm->spr_scoretext.draw(iScoreX + 18, iScoreY, score[i]->iDigitMiddle, (score[i]->iDigitLeft == 0 && score[i]->iDigitMiddle == 0 ? 16 : 0), 16, 16);
-                    rm->spr_scoretext.draw(iScoreX + 36, iScoreY, score[i]->iDigitRight, 0, 16, 16);
-                }
-            }
-
-            if(game_values.windaffectsplayers) {
-                short iDisplayWindMeterY = game_values.scoreboardstyle == 1 ? 8 : 440;
-                rm->spr_windmeter.draw(210, iDisplayWindMeterY, 0, 0, 220, 32);
-                rm->spr_windmeter.draw((short)(game_values.gamewindx * 20.0f) + smw->ScreenWidth/2, iDisplayWindMeterY + 6, 220, 0, 12, 20);
-            }
-
-            //draw arrows for being above the top of the screen
-            for(i = 0; i < list_players_cnt; i++)
-                list_players[i]->drawarrows();
-
-            //Draw countdown start timer
-            if(iCountDownState > 0 && game_values.screenfade == 0) {
-                SDL_Rect * rects = iCountDownNumbers[iCountDownRectGroup[28 - iCountDownState]][iCountDownRectSize[28 - iCountDownState]];
-                rm->spr_countdown_numbers.draw(rects[1].x, rects[1].y, rects[0].x, rects[0].y, rects[0].w, rects[0].h);
-            }
-
-            if(game_values.screenfadespeed != 0) {
-                g_map->update();
-                game_values.screenfade += game_values.screenfadespeed;
-
-                if(game_values.screenfade <= 0) {
-                    game_values.screenfadespeed = 0;
-                    game_values.screenfade = 0;
-
-                    //display the mode and goal at the start of the game
-                    //if(game_values.matchtype == MATCH_TYPE_QUICK_GAME)
-                    if(game_values.startmodedisplay && game_values.singleplayermode == -1) {
-                        char szMode[128];
-                        if(game_values.gamemode->goal < 0)
-                            sprintf(szMode, "%s  %s: X", game_values.gamemode->GetModeName(), game_values.gamemode->GetGoalName());
-                        else
-                            sprintf(szMode, "%s  %s: %d", game_values.gamemode->GetModeName(), game_values.gamemode->GetGoalName(), game_values.gamemode->goal);
-
-                        short iMode = GetModeIconIndexFromMode(game_values.gamemode->gamemode);
-
-                        eyecandy[2].add(new EC_Announcement(&rm->game_font_large, &rm->menu_mode_large, szMode, iMode, 130, 90));
-                    }
-                } else if(game_values.screenfade >= 255) {
-                    game_values.screenfadespeed = 0;
-                    game_values.screenfade = 255;
-                }
-            }
-
-            if(game_values.screenfade > 0) {
-                rm->menu_shade.setalpha((Uint8)game_values.screenfade);
-                rm->menu_shade.draw(0, 0);
-            }
-
-            if(game_values.swapplayers) {
-                for(i = 0; i < list_players_cnt; i++) {
-                    list_players[i]->drawswap();
-
-                    short storedpowerupid = game_values.gamepowerups[list_players[i]->getGlobalID()];
-
-                    if(storedpowerupid != -1) {
-                        short iPowerupX, iPowerupY;
-
-                        if(game_values.swapstyle == 1) {
-                            iPowerupX = game_values.swapplayersblink ? list_players[i]->iOldPowerupX : list_players[i]->iNewPowerupX;
-                            iPowerupY = game_values.swapplayersblink ? list_players[i]->iOldPowerupY : list_players[i]->iNewPowerupY;
-                        } else {
-                            iPowerupX = (short)((float)(list_players[i]->iNewPowerupX - list_players[i]->iOldPowerupX) * game_values.swapplayersposition) + list_players[i]->iOldPowerupX;
-                            iPowerupY = (short)((float)(list_players[i]->iNewPowerupY - list_players[i]->iOldPowerupY) * game_values.swapplayersposition) + list_players[i]->iOldPowerupY;
-                        }
-
-                        rm->spr_storedpowerupsmall.draw(iPowerupX, iPowerupY, storedpowerupid * 16, 0, 16, 16);
-                    }
-                }
-
-                if(game_values.swapstyle == 0) {
-                    if(!sfx_skid.isPlaying())
-                        ifSoundOnPlay(sfx_skid);
-                }
-
-                if(++game_values.swapplayersblinkcount > 10) {
-                    game_values.swapplayersblinkcount = 0;
-                    game_values.swapplayersblink = !game_values.swapplayersblink;
-                }
-
-                game_values.swapplayersposition += 0.02f;
-                if(game_values.swapplayersposition >= 1.0f) {
-                    game_values.swapplayersposition = 0.0f;
-                    game_values.swapplayers = false;
-                    game_values.screenfade = 0;
-
-                    if(game_values.swapstyle == 0)
-                        ifsoundonstop(sfx_skid);
-
-                    ifSoundOnPlay(sfx_transform);
-
-                    if(game_values.swapstyle == 1) {
-                        for(i = 0; i < list_players_cnt; i++)
-                            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, list_players[i]->ix + (HALFPW) - 16, list_players[i]->iy + (HALFPH) - 16, 3, 8));
-                    }
-                }
-            }
-
-            //Draw black "behind" the game if we are shaking/moving the screen
-            if(y_shake > 0) {
-				SDL_Rect rect = {0, 0, smw->ScreenWidth, y_shake};
-                SDL_FillRect(screen, &rect, 0x0);		//fill empty area with black
-            } else if(y_shake < 0) {
-				SDL_Rect rect = {0, smw->ScreenHeight + y_shake, smw->ScreenWidth, smw->ScreenHeight};
-                SDL_FillRect(screen, &rect, 0x0);		//fill empty area with black
-            }
-
-            if(x_shake > 0) {
-				SDL_Rect rect = {0, 0, x_shake, smw->ScreenHeight};
-                SDL_FillRect(screen, &rect, 0x0);		//fill empty area with black
-            } else if(x_shake < 0) {
-				SDL_Rect rect = {smw->ScreenWidth + x_shake, 0, smw->ScreenWidth, smw->ScreenHeight};
-                SDL_FillRect(screen, &rect, 0x0);		//fill empty area with black
-            }
+            drawEverything(iCountDownState, iScoreTextOffset);
         } else {
-            if(game_values.pausegame) {
-                rm->spr_dialog.draw(224, 176);
-				rm->menu_font_large.drawCentered(smw->ScreenHeight/2, 194, "Pause");
-
-                //menu_font_large.drawCentered(smw->ScreenWidth/2, smw->ScreenHeight/2, game_values.gamemode->GetModeName());
-                short iMode = GetModeIconIndexFromMode(game_values.gamemode->gamemode);
-
-                rm->menu_mode_large.draw(304, 224, iMode << 5, 0, 32, 32);
-
-                char szGoal[256];
-                strcpy(szGoal, game_values.gamemode->GetGoalName());
-                strcat(szGoal, ": ");
-
-                if(game_values.gamemode->goal == -1)
-                    sprintf(szGoal + strlen(szGoal), "Unlimited");
-                else
-                    sprintf(szGoal + strlen(szGoal), "%d", game_values.gamemode->goal);
-
-				rm->menu_font_large.drawCentered(smw->ScreenWidth/2, 264, szGoal);
-            }
-
-            if(game_values.exitinggame) {
-                rm->spr_dialog.draw(smw->ScreenWidth * 0.35f, smw->ScreenHeight*0.37f);
-                rm->menu_font_large.drawCentered(smw->ScreenWidth * 0.5f, smw->ScreenHeight*0.46f - (rm->menu_font_large.getHeight() >> 1), "Exit Game");
-
-                rm->spr_dialogbutton.draw(smw->ScreenWidth * 0.37f, smw->ScreenHeight*0.52f, 0, (game_values.exityes ? 34 : 0), 80, 34);
-                rm->spr_dialogbutton.draw(smw->ScreenWidth * 0.51f, smw->ScreenHeight*0.52f, 0, (game_values.exityes ? 0 : 34), 80, 34);
-
-                rm->menu_font_large.draw(smw->ScreenWidth * 0.43f - (rm->menu_font_large.getWidth("Yes") >> 1),  smw->ScreenHeight*0.56f - (rm->menu_font_large.getHeight() >> 1), "Yes");
-                rm->menu_font_large.draw(smw->ScreenWidth * 0.57f - (rm->menu_font_large.getWidth("No") >> 1),  smw->ScreenHeight*0.56f - (rm->menu_font_large.getHeight() >> 1), "No");
-            }
+            drawExitPause();
         }
 
-        //Make sure music and sound effects keep playing
-        if(game_values.slowdownon != -1) {
-            if(!sfx_slowdownmusic.isPlaying())
-                ifSoundOnPlay(sfx_slowdownmusic);
-        } else {
-            if(sfx_slowdownmusic.isPlaying())
-                ifsoundonstop(sfx_slowdownmusic);
-        }
-
-        if(game_values.playinvinciblesound) {
-            if(!sfx_invinciblemusic.isPlaying() && !sfx_timewarning.isPlaying() && !backgroundmusic[0].isplaying())
-                ifSoundOnPlay(sfx_invinciblemusic);
-        } else {
-            if(sfx_invinciblemusic.isPlaying())
-                ifsoundonstop(sfx_invinciblemusic);
-        }
-
-        //If no background music is playing, then play some
-        if(!backgroundmusic[0].isplaying() && !sfx_invinciblemusic.isPlaying() && !sfx_timewarning.isPlaying() && !game_values.gamemode->gameover) {
-            if(game_values.playnextmusic) {
-                musiclist->SetNextMusic(g_map->musicCategoryID, maplist->currentShortmapname(), g_map->szBackgroundFile);
-                backgroundmusic[0].load(musiclist->GetCurrentMusic());
-            }
-
-            backgroundmusic[0].play(game_values.playnextmusic, false);
-        }
+        playMusic();
 
         ticks = SDL_GetTicks() - framestart;
         if(ticks == 0)

@@ -68,6 +68,8 @@ class CObject
 	friend class CObjectContainer;
 	friend class CPlayer;
 	friend void RunGame();
+		friend void shakeScreen();
+		friend void handleP2ObjCollisions();
 	friend class CO_Shell;
 	friend class B_BreakableBlock;
 	friend class B_WeaponBreakableBlock;
@@ -164,6 +166,8 @@ class IO_MovingObject : public CObject
 
 	friend void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead);
 	friend void RunGame();
+		friend void shakeScreen();
+		friend void handleP2ObjCollisions();
 };
 
 class IO_OverMapObject : public CObject

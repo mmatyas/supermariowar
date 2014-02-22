@@ -438,6 +438,11 @@ class CPlayer
 		friend void CleanDeadPlayers();
 		friend short CountAliveTeams(short * lastteam);
 		friend void RunGame();
+			friend void shakeScreen();
+			friend void handleP2PCollisions();
+			friend void handleP2ObjCollisions();
+			friend void drawScoreboard(short int*);
+			friend void drawPlayerSwap();
 		
 		friend class CObjectContainer;
 
