@@ -7,19 +7,21 @@
     #pragma comment(lib, "SDL_net.lib")
 #endif
 
+#include "network/NetworkProtocolPackages.h"
+
 // define platform guards here
 #define NetworkHandler NetworkHandlerSDL
 #include "platform/network/sdl/NetworkHandlerSDL.h"
 
+
 NetworkHandler networkHandler;
+Networking netplay;
 
 extern gv game_values;
 extern int g_iVersion[];
 extern CPlayer *list_players[4];
 extern short list_players_cnt;
 extern bool VersionIsEqual(int iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
-
-Networking netplay;
 
 
 bool net_init()

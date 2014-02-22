@@ -71,7 +71,7 @@ short			scorepowerupoffsets[3][3] = {{37, 0, 0},
     {71, 89, 0},
     {105, 123, 141}
 };
-short			respawn[4] = {0, 0, 0, 0};
+short			respawnCount[4] = {0, 0, 0, 0};
 short			respawnanimationtimer[4] = {0, 0, 0, 0};
 short			respawnanimationframe[4] = {0, 0, 0, 0};
 
@@ -276,11 +276,11 @@ void CleanDeadPlayers()
         if(list_players[i]->state == player_dead) {
             fCheckForGameOver = true;
 
-            if(respawn[list_players[i]->globalID] <= 0)
+            if(respawnCount[list_players[i]->globalID] <= 0)
                 list_players[i]->die(0, true, false);
 
             //Set this to zero so we don't display a spawn egg when player is removed from game
-            respawn[list_players[i]->globalID] = 0;
+            respawnCount[list_players[i]->globalID] = 0;
 
             if(game_values.gamemode->tagged == list_players[i])
                 game_values.gamemode->tagged = NULL;
@@ -739,7 +739,7 @@ int main(int argc, char *argv[])
         game_values.randomskin[iPlayer] = false;
 
         projectiles[iPlayer] = 0;
-        respawn[iPlayer] = 0;
+        respawnCount[iPlayer] = 0;
 
         //Setup the default key/button input configurations
         for(short iInputType = 0; iInputType < 2; iInputType++) { //for keyboard/joystick
@@ -961,66 +961,12 @@ short iSledgeBrotherSetting = 0;
 short iSledgeBrotherAttribute = 0;
 #endif
 
-void RunGame()
+void createPlayers()
 {
-    unsigned int	framestart, ticks;
-    SDL_Event		event;
-    short			i, j;
-    float			realfps = 0, flipfps = 0;
-
-    short iCountDownState = 0;
-    short iCountDownTimer = 0;
-
-    COutputControl* current_playerKeys = &game_values.playerInput.outputControls[0];
-    COutputControl previous_playerKeys = *current_playerKeys;
-
-    if(game_values.startgamecountdown && game_values.singleplayermode == -1) {
-        iCountDownState = 28;
-        iCountDownTimer = iCountDownTimes[0];
-    }
-
-    //Reset the screen spin variables
-    spinangle = 0.0f;
-    spinspeed = 0.0f;
-    spindirection = 1;
-    spintimer = 0;
-
-    //Reset Secret Counters
-    for(short iPlayer = 0; iPlayer < 4; iPlayer++)
-        game_values.unlocksecret1part1[iPlayer] = false;
-
-    game_values.unlocksecret1part2 = 0;
-    game_values.unlocksecret2part1 = false;
-    game_values.unlocksecret2part2 = 0;
-    game_values.unlocksecret3part1[0] = 0;
-    game_values.unlocksecret3part1[1] = 0;
-    game_values.unlocksecret3part1[2] = 0;
-    game_values.unlocksecret3part1[3] = 0;
-    game_values.unlocksecret3part2[0] = 0;
-    game_values.unlocksecret3part2[1] = 0;
-    game_values.unlocksecret3part2[2] = 0;
-    game_values.unlocksecret3part2[3] = 0;
-    game_values.unlocksecretunlocked[0] = false;
-    game_values.unlocksecretunlocked[1] = false;
-    game_values.unlocksecretunlocked[2] = false;
-    game_values.unlocksecretunlocked[3] = false;
-
-
-    //Reset the keys each time we switch from menu to game and back
-    game_values.playerInput.ResetKeys();
-
-#ifdef _DEBUG
-    static int exitgametimer = 0;
-    exitgametimer = 0;
-#endif
-
-    y_shake = 0;
-    x_shake = 0;
-
     //Create players for this game
     for(short iPlayer = 0; iPlayer < 4; iPlayer++) {
         projectiles[iPlayer] = 0;
-        respawn[iPlayer] = 0;
+        respawnCount[iPlayer] = 0;
 
         if(game_values.singleplayermode == -1 || game_values.singleplayermode == iPlayer) {
             if(game_values.playercontrol[iPlayer] > 0) {
@@ -1031,7 +977,7 @@ void RunGame()
                 if(game_values.playercontrol[iPlayer] == 2)
                     ai = new CPlayerAI();
 
-                list_players[list_players_cnt] = new CPlayer(iPlayer, list_players_cnt, teamid, subteamid, game_values.colorids[iPlayer], rm->spr_player[iPlayer], score[teamid], &(respawn[iPlayer]), ai);
+                list_players[list_players_cnt] = new CPlayer(iPlayer, list_players_cnt, teamid, subteamid, game_values.colorids[iPlayer], rm->spr_player[iPlayer], score[teamid], &(respawnCount[iPlayer]), ai);
                 list_players_cnt++;
             } else if(!game_values.keeppowerup) {
                 //Reset off player's stored powerups if they are not playing
@@ -1049,39 +995,11 @@ void RunGame()
         game_values.bulletbilltimer[iPlayer] = 0;
         game_values.bulletbillspawntimer[iPlayer] = 0;
     }
+}
 
-    game_values.pausegame = false;
-    game_values.exitinggame = false;
-    game_values.exityes = false;
-    game_values.teamdeadcounter = 0;
-    game_values.screenshaketimer = 0;
-    game_values.slowdownon = -1;
-    game_values.slowdowncounter	= 0;
-    game_values.showscoreboard = false;
-    game_values.scorepercentmove = 0.0f;
-    game_values.playskidsound = false;
-    game_values.playinvinciblesound = false;
-    game_values.playflyingsound = false;
-    game_values.swapplayers = false;
-    game_values.swapplayersposition = 0.0f;
-    game_values.swapplayersblink = false;
-    game_values.swapplayersblinkcount = 0;
-    game_values.screenfade = 255;
-    game_values.screenfadespeed = -8;
-    game_values.noexit = false;
-    game_values.noexittimer = 0;
-    game_values.forceexittimer = 0;
-    game_values.gamewindx = 0.0f;
-    game_values.gamewindy = 0.0f;
-
-    game_values.windaffectsplayers = false;
-    game_values.spinscreen = false;
-    game_values.reversewalk = false;
-    game_values.spotlights = false;
-
-    //Initialize game mode
-    game_values.gamemode->init();
-
+void initScoreDisplayPosition()
+{
+    short i;
     short totalspace = 0;
     for(i = 0; i < score_cnt; i++) {
         totalspace += 56 + game_values.teamcounts[i] * 34;
@@ -1114,43 +1032,47 @@ void RunGame()
         score[i]->place = i;
         score[i]->order = -1;
     }
+}
 
+void initEyeCandy()
+{
+    short i;
     for(short iEyeCandyLayer = 0; iEyeCandyLayer < 3; iEyeCandyLayer++) {
         //Clouds
         if(g_map->eyecandy[iEyeCandyLayer] & 1) {
             for(i = 0; i < 4; i++) {
-                float velx;			//speed of cloud, small clouds are slower than big ones
+                float velx;         //speed of cloud, small clouds are slower than big ones
                 short srcy, w, h;
 
                 if(smw->rng->GetRandBool()) {
-                    velx = (short)(RNGMAX(51) - 25) / 10.0f;	//big clouds: -3 - +3 pixel/frame
+                    velx = (short)(RNGMAX(51) - 25) / 10.0f;    //big clouds: -3 - +3 pixel/frame
                     srcy = 0;
                     w = 60;
                     h = 28;
                 } else {
-                    velx = (short)(RNGMAX(41) - 20) / 10.0f;	//small clouds: -2 - +2 pixel/frame
+                    velx = (short)(RNGMAX(41) - 20) / 10.0f;    //small clouds: -2 - +2 pixel/frame
                     srcy = 28;
                     w = 28;
                     h = 12;
                 }
 
-                velx = velx < 0.5f && velx > -0.5f ? 1 : velx;	//no static clouds please
+                velx = velx < 0.5f && velx > -0.5f ? 1 : velx;  //no static clouds please
 
                 //add cloud to eyecandy array
-				eyecandy[iEyeCandyLayer].add(new EC_Cloud(&rm->spr_clouds, (float)(RNGMAX(smw->ScreenWidth)), (float)(RNGMAX(100)), velx, 0, srcy, w, h));
+                eyecandy[iEyeCandyLayer].add(new EC_Cloud(&rm->spr_clouds, (float)(RNGMAX(smw->ScreenWidth)), (float)(RNGMAX(100)), velx, 0, srcy, w, h));
             }
         }
 
         //Ghosts
         if(g_map->eyecandy[iEyeCandyLayer] & 2) {
             for(i = 0; i < 8; i++) {
-                short iGhostSrcY = (short)(RNGMAX(3)) << 5;	//ghost type
-                float velx = (short)(RNGMAX(51) - 25) / 10.0f;	//big clouds: -3 - +3 pixel/frame
+                short iGhostSrcY = (short)(RNGMAX(3)) << 5; //ghost type
+                float velx = (short)(RNGMAX(51) - 25) / 10.0f;  //big clouds: -3 - +3 pixel/frame
 
-                velx = velx < 0.5f && velx > -0.5f ? (RNGMAX(1) ? 1.0f : -1.0f) : velx;	//no static clouds please
+                velx = velx < 0.5f && velx > -0.5f ? (RNGMAX(1) ? 1.0f : -1.0f) : velx; //no static clouds please
 
                 //add cloud to eyecandy array
-				eyecandy[iEyeCandyLayer].add(new EC_Ghost(&rm->spr_ghosts, (float)(RNGMAX(smw->ScreenWidth)), (float)RNGMAX(100), velx, 8, 2, velx < 0.0f ? 64 : 0, iGhostSrcY, 32, 32));
+                eyecandy[iEyeCandyLayer].add(new EC_Ghost(&rm->spr_ghosts, (float)(RNGMAX(smw->ScreenWidth)), (float)RNGMAX(100), velx, 8, 2, velx < 0.0f ? 64 : 0, iGhostSrcY, 32, 32));
             }
         }
 
@@ -1163,7 +1085,7 @@ void RunGame()
         //Snow
         if(g_map->eyecandy[iEyeCandyLayer] & 8) {
             for(i = 0; i < 15; i++)
-				eyecandy[iEyeCandyLayer].add(new EC_Snow(&rm->spr_snow, (float)(RNGMAX(smw->ScreenWidth)), (float)RNGMAX(smw->ScreenHeight), 0));
+                eyecandy[iEyeCandyLayer].add(new EC_Snow(&rm->spr_snow, (float)(RNGMAX(smw->ScreenWidth)), (float)RNGMAX(smw->ScreenHeight), 0));
         }
 
         //Fish
@@ -1192,7 +1114,7 @@ void RunGame()
                 }
 
                 //add cloud to eyecandy array
-				short iPossibleY = (smw->ScreenHeight - h) / 10;
+                short iPossibleY = (smw->ScreenHeight - h) / 10;
                 float dDestY = (float)(RNGMAX(iPossibleY) + iPossibleY * i);
                 eyecandy[iEyeCandyLayer].add(new EC_Cloud(&rm->spr_fish, (float)(RNGMAX(smw->ScreenWidth)), dDestY, velx, srcx + (velx > 0.0f ? 64 : 0), srcy, w, h));
             }
@@ -1210,6 +1132,118 @@ void RunGame()
                 eyecandy[iEyeCandyLayer].add(new EC_Bubble(&rm->spr_rain, (float)(RNGMAX(smw->ScreenWidth)), RNGMAX(smw->ScreenHeight)));
         }
     }
+}
+
+void initGameplaySettings()
+{
+    y_shake = 0;
+    x_shake = 0;
+
+    game_values.pausegame = false;
+    game_values.exitinggame = false;
+    game_values.exityes = false;
+    game_values.teamdeadcounter = 0;
+    game_values.screenshaketimer = 0;
+    game_values.slowdownon = -1;
+    game_values.slowdowncounter = 0;
+    game_values.showscoreboard = false;
+    game_values.scorepercentmove = 0.0f;
+    game_values.playskidsound = false;
+    game_values.playinvinciblesound = false;
+    game_values.playflyingsound = false;
+    game_values.swapplayers = false;
+    game_values.swapplayersposition = 0.0f;
+    game_values.swapplayersblink = false;
+    game_values.swapplayersblinkcount = 0;
+    game_values.screenfade = 255;
+    game_values.screenfadespeed = -8;
+    game_values.noexit = false;
+    game_values.noexittimer = 0;
+    game_values.forceexittimer = 0;
+    game_values.gamewindx = 0.0f;
+    game_values.gamewindy = 0.0f;
+
+    game_values.windaffectsplayers = false;
+    game_values.spinscreen = false;
+    game_values.reversewalk = false;
+    game_values.spotlights = false;
+
+    //Initialize game mode
+    game_values.gamemode->init();
+}
+
+void resetSecretCounters()
+{
+    //Reset Secret Counters
+    for(short iPlayer = 0; iPlayer < 4; iPlayer++)
+        game_values.unlocksecret1part1[iPlayer] = false;
+
+    game_values.unlocksecret1part2 = 0;
+    game_values.unlocksecret2part1 = false;
+    game_values.unlocksecret2part2 = 0;
+    game_values.unlocksecret3part1[0] = 0;
+    game_values.unlocksecret3part1[1] = 0;
+    game_values.unlocksecret3part1[2] = 0;
+    game_values.unlocksecret3part1[3] = 0;
+    game_values.unlocksecret3part2[0] = 0;
+    game_values.unlocksecret3part2[1] = 0;
+    game_values.unlocksecret3part2[2] = 0;
+    game_values.unlocksecret3part2[3] = 0;
+    game_values.unlocksecretunlocked[0] = false;
+    game_values.unlocksecretunlocked[1] = false;
+    game_values.unlocksecretunlocked[2] = false;
+    game_values.unlocksecretunlocked[3] = false;
+}
+
+void initRunGame()
+{
+    //Reset the screen spin variables
+    spinangle = 0.0f;
+    spinspeed = 0.0f;
+    spindirection = 1;
+    spintimer = 0;
+
+    resetSecretCounters();
+
+
+    //Reset the keys each time we switch from menu to game and back
+    game_values.playerInput.ResetKeys();
+
+
+
+    createPlayers();
+
+    initGameplaySettings();
+
+    initScoreDisplayPosition();
+
+    initEyeCandy();
+}
+
+void RunGame()
+{
+    unsigned int	framestart, ticks;
+    SDL_Event		event;
+    short			i, j;
+    float			realfps = 0, flipfps = 0;
+
+    short iCountDownState = 0;
+    short iCountDownTimer = 0;
+
+    if(game_values.startgamecountdown && game_values.singleplayermode == -1) {
+        iCountDownState = 28;
+        iCountDownTimer = iCountDownTimes[0];
+    }
+
+    COutputControl* current_playerKeys = &game_values.playerInput.outputControls[0];
+    COutputControl previous_playerKeys = *current_playerKeys;
+
+    initRunGame();
+
+#ifdef _DEBUG
+    static int exitgametimer = 0;
+    exitgametimer = 0;
+#endif
 
     short iScoreTextOffset[4];
     for(short iTeam = 0; iTeam < score_cnt; iTeam++) {
@@ -2210,7 +2244,7 @@ SWAPBREAK:
                         short globalID = game_values.teamids[i][k];
 
                         //If player is respawning, draw an animated egg counter
-                        if(respawn[globalID] > 0 && !game_values.gamemode->gameover) {
+                        if(respawnCount[globalID] > 0 && !game_values.gamemode->gameover) {
                             if(++respawnanimationtimer[globalID] > 8) {
                                 respawnanimationtimer[globalID] = 0;
                                 respawnanimationframe[globalID] += 32;
@@ -2222,7 +2256,7 @@ SWAPBREAK:
                             short scorex = score[i]->x + scoreoffsets[k];
                             short scorey = score[i]->y + 2;
                             rm->spr_egg.draw(scorex, scorey, respawnanimationframe[globalID], game_values.colorids[globalID] << 5, 32, 32);
-                            rm->spr_eggnumbers.draw(scorex, scorey, ((respawn[globalID] - 1) >> 1) << 5, game_values.colorids[globalID] << 5, 32, 32);
+                            rm->spr_eggnumbers.draw(scorex, scorey, ((respawnCount[globalID] - 1) >> 1) << 5, game_values.colorids[globalID] << 5, 32, 32);
                         } else { //otherwise draw the player's skin in the scoreboard
                             short iScoreboardSprite;
                             if(game_values.gamemode->gameover) {

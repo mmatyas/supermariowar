@@ -3,15 +3,15 @@
 
 #include <stdint.h>
 
-#include "../../network/NetworkProtocol.h"
+#include "../../network/NetworkProtocolCodes.h"
 
 class NetworkHandlerBase
 {
 	public:
-		virtual bool init_networking() = 0;
-		virtual bool init_client() = 0;
-		virtual bool init_server() = 0;
-		virtual void cleanup() = 0;
+		virtual bool init_networking() {};
+		virtual bool init_client() {};
+		virtual bool init_server() {};
+		virtual void cleanup() {};
 
 		virtual bool openUDPConnection(const char* hostname, const uint16_t port) = 0;
 		virtual void closeUDPConnection() = 0;

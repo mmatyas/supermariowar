@@ -92,7 +92,7 @@ enum deathstyle{death_style_jump = 0, death_style_squish = 1, death_style_shatte
 class CPlayer
 {
 	public:
-		CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamID, short iTeamColorID, gfxSprite * nsprites[PGFX_LAST], CScore *nscore, short * respawn, CPlayerAI * ai);
+		CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamID, short iTeamColorID, gfxSprite * nsprites[PGFX_LAST], CScore *nscore, short * respawnCounter, CPlayerAI * ai);
 		~CPlayer();
 
 		void Init();

@@ -814,37 +814,7 @@ struct TourStop {
     char szBonusText[5][128];
 };
 
-struct Networking {
-    bool active;            // True if netplay code is currently running
-    //bool networkErrorHappened;
-    bool connectSuccessful;
-    bool joinSuccessful;
-    bool gameRunning;
-
-    bool currentMenuChanged; // eg. room players changed
-    bool operationInProgress; // the waiting dialogs watch this variable
-
-    NetClient client;
-    LastMessage lastSentMessage;
-    LastMessage lastReceivedMessage;
-    char myPlayerName[NET_MAX_PLAYER_NAME_LENGTH];    // last byte will be \0
-
-    unsigned short selectedServerIndex;
-    std::vector<ServerAddress> savedServers;
-
-    char roomFilter[NET_MAX_ROOM_NAME_LENGTH];
-    unsigned short selectedRoomIndex;
-    std::vector<RoomListEntry> currentRooms;
-    Room currentRoom;
-
-    char newroom_name[NET_MAX_ROOM_NAME_LENGTH];
-    char newroom_password[NET_MAX_ROOM_PASSWORD_LENGTH];
-
-    char mychatmessage[NET_MAX_CHAT_MSG_LENGTH];
-
-    bool theHostIsMe;
-    CPlayerInput netPlayerInput;
-};
+struct Networking;
 
 //TODO:: Move menu settings from game_values to global menu context structure
 //menu context (like game_values, but for menu)

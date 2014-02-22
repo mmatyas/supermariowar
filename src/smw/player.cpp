@@ -22,7 +22,7 @@ void CScore::AdjustScore(short iValue)
     SetDigitCounters();
 }
 
-CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamID, short iColorID, gfxSprite * nsprites[PGFX_LAST], CScore *nscore, short * sRespawn, CPlayerAI * ai)
+CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamID, short iColorID, gfxSprite * nsprites[PGFX_LAST], CScore *nscore, short * sRespawnCounter, CPlayerAI * ai)
 {
     globalID = iGlobalID;
     localID = iLocalID;
@@ -68,7 +68,7 @@ CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamI
     //The actual choosing of a spawning position happens later
     FindSpawnPoint();
 
-    respawncounter = sRespawn;
+    respawncounter = sRespawnCounter;
     SetupNewPlayer();
     *respawncounter = 0;
 
