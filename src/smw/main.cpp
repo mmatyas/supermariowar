@@ -2012,6 +2012,46 @@ void updateScreenShake()
     }
 }
 
+void updateScoreboardAnimation() // scrolling to center at the end of game
+{
+    if(game_values.showscoreboard) {
+        if(game_values.scorepercentmove < 1.0f) {
+            game_values.scorepercentmove += 0.01f;
+
+            if(game_values.scorepercentmove >= 1.0f)
+                game_values.scorepercentmove = 1.0f;
+        } else {
+            game_values.scorepercentmove = 1.0f;
+        }
+
+        for(short i = 0; i < score_cnt; i++) {
+            score[i]->x = (short)((float)(score[i]->destx - score[i]->fromx) * game_values.scorepercentmove) + score[i]->fromx;
+            score[i]->y = (short)((float)(score[i]->desty - score[i]->fromy) * game_values.scorepercentmove) + score[i]->fromy;
+        }
+    }
+}
+
+void playSFX()
+{
+    //Play sound for skidding players
+    if(game_values.playskidsound) {
+        if(!sfx_skid.isPlaying())
+            ifSoundOnPlay(sfx_skid);
+    } else {
+        if(sfx_skid.isPlaying())
+            ifsoundonstop(sfx_skid);
+    }
+
+    //Play sound for players using PWings
+    if(game_values.playflyingsound) {
+        if(!sfx_flyingsound.isPlaying())
+            ifSoundOnPlay(sfx_flyingsound);
+    } else {
+        if(sfx_flyingsound.isPlaying())
+            ifsoundonstop(sfx_flyingsound);
+    }
+}
+
 void playMusic()
 {
     //Make sure music and sound effects keep playing
@@ -2042,12 +2082,133 @@ void playMusic()
     }
 }
 
+/*
+void secretBoss()
+{
+    //This code will help stop a game midway and load a new map and mode
+    //It was used for the secret boss mode in 1.7 AFE
+    game_values.gamemode = bossgamemode;  //boss type has already been set at this point
+    bossgamemode->SetBossType(0);
+
+    if(bossgamemode->GetBossType() == 0)
+        g_map->loadMap(convertPath("maps/special/dungeon.map"), read_type_full);
+    else if(bossgamemode->GetBossType() == 1)
+        g_map->loadMap(convertPath("maps/special/hills.map"), read_type_full);
+    else if(bossgamemode->GetBossType() == 2)
+        g_map->loadMap(convertPath("maps/special/volcano.map"), read_type_full);
+
+    LoadCurrentMapBackground();
+
+    g_map->predrawbackground(rm->spr_background, rm->spr_backmap[0]);
+    g_map->predrawforeground(rm->spr_frontmap[0]);
+
+    g_map->predrawbackground(rm->spr_background, rm->spr_backmap[1]);
+    g_map->predrawforeground(rm->spr_frontmap[1]);
+
+    g_map->SetupAnimatedTiles();
+    LoadMapObjects(false);
+    ///////////////////
+}
+*/
+
+class FPSHandler
+{
+    public:
+        FPSHandler() {
+            realfps = 0;
+            flipfps = 0;
+        }
+
+        void frameStart() {
+            framestart = SDL_GetTicks();
+        }
+
+        void frameBeforeFlip()
+        {
+            ticks = SDL_GetTicks() - framestart;
+            if(ticks == 0)
+                ticks = 1;
+
+#if !_DEBUG
+            if(game_values.showfps)
+#endif
+            {
+                float potentialFps = 1000.0f / (float)(game_values.framelimiter == 0 ? 1 : game_values.framelimiter);
+                rm->menu_font_large.drawf(0, smw->ScreenHeight-rm->menu_font_large.getHeight(), "Actual:%.1f/%.1f, Flip:%.1f, Potential:%.1f", realfps, potentialFps, flipfps, 1000.0f / (float)ticks);
+            }
+        }
+
+        void frameAfterFlip()
+        {
+            flipfps = 1000.0f / (float)ticks;
+
+            //Sleep for time just under what we need
+            short delay = (short)(game_values.framelimiter - SDL_GetTicks() + framestart - 2);
+
+            if(delay > 0) {
+                if(delay > game_values.framelimiter)
+                    delay = game_values.framelimiter;
+
+                SDL_Delay(delay);
+            }
+
+            //Fine tune wait here
+            while(SDL_GetTicks() - framestart < (unsigned short)game_values.framelimiter)
+                SDL_Delay(0);   //keep framerate constant at 1000/game_values.framelimiter fps
+
+            //Debug code to slow framerate down to 1 fps to see exact movement
+#ifdef _DEBUG
+            if(game_values.frameadvance) {
+                delay = (short)(1000 - SDL_GetTicks() + framestart);
+
+                if(delay > 0) {
+                    if(delay > 1000)
+                        delay = 1000;
+
+                    SDL_Delay(delay);
+                }
+
+                while(SDL_GetTicks() - framestart < 1000)
+                    SDL_Delay(0);
+            }
+#endif
+
+            ticks = SDL_GetTicks() - framestart;
+            if(ticks == 0)
+                ticks = game_values.framelimiter;
+
+            realfps = 1000.0f / (float)ticks;
+
+            /*
+            static float avgFPS = 0.0f;
+            static short outputtimer = 0;
+
+            avgFPS += realfps;
+
+            if(++outputtimer == 1)
+            {
+                FILE * out = fopen("fps.txt", "a+");
+
+                fprintf(out, "%.2f\n", avgFPS / (float)outputtimer);
+
+                fclose(out);
+
+                avgFPS = 0.0f;
+                outputtimer = 0;
+            }*/
+        }
+
+    private:
+        unsigned int    framestart, ticks;
+        float           realfps, flipfps;
+};
+
+
 void RunGame()
 {
-    unsigned int	framestart, ticks;
     SDL_Event		event;
     short			i, j;
-    float			realfps = 0, flipfps = 0;
+    FPSHandler      fpshandler;
 
     short iCountDownState = 0;
     short iCountDownTimer = 0;
@@ -2083,7 +2244,7 @@ void RunGame()
 
     //This is the main game loop
     while (true) {
-        framestart = SDL_GetTicks();
+        fpshandler.frameStart();
 
         if (netplay.active) {
             netplay.client.listen();
@@ -2489,23 +2650,7 @@ void RunGame()
                         list_players[i]->move();	//move all objects before doing object-object collision detection in
                     //->think(), so we test against the new position after object-map collision detection
 
-                    //Play sound for skidding players
-                    if(game_values.playskidsound) {
-                        if(!sfx_skid.isPlaying())
-                            ifSoundOnPlay(sfx_skid);
-                    } else {
-                        if(sfx_skid.isPlaying())
-                            ifsoundonstop(sfx_skid);
-                    }
-
-                    //Play sound for players using PWings
-                    if(game_values.playflyingsound) {
-                        if(!sfx_flyingsound.isPlaying())
-                            ifSoundOnPlay(sfx_flyingsound);
-                    } else {
-                        if(sfx_flyingsound.isPlaying())
-                            ifsoundonstop(sfx_flyingsound);
-                    }
+                    playSFX();
 
                     noncolcontainer.update();
                     objectcontainer[0].update();
@@ -2541,21 +2686,7 @@ void RunGame()
 
                     updateScreenShake();
 
-                    if(game_values.showscoreboard) {
-                        if(game_values.scorepercentmove < 1.0f) {
-                            game_values.scorepercentmove += 0.01f;
-
-                            if(game_values.scorepercentmove >= 1.0f)
-                                game_values.scorepercentmove = 1.0f;
-                        } else {
-                            game_values.scorepercentmove = 1.0f;
-                        }
-
-                        for(i = 0; i < score_cnt; i++) {
-                            score[i]->x = (short)((float)(score[i]->destx - score[i]->fromx) * game_values.scorepercentmove) + score[i]->fromx;
-                            score[i]->y = (short)((float)(score[i]->desty - score[i]->fromy) * game_values.scorepercentmove) + score[i]->fromy;
-                        }
-                    }
+                    updateScoreboardAnimation();
                 }
             }
             //Go to this label if a player collects a swap mushroom and we need to break out of two loops
@@ -2573,31 +2704,7 @@ SWAPBREAK:
                     SetGameModeSettingsFromMenu();
                     game_values.gamestate = GS_GAME;
 
-                    /*
-                    //This code will help stop a game midway and load a new map and mode
-                    //It was used for the secret boss mode in 1.7 AFE
-                    game_values.gamemode = bossgamemode;  //boss type has already been set at this point
-                    bossgamemode->SetBossType(0);
-
-                    if(bossgamemode->GetBossType() == 0)
-                        g_map->loadMap(convertPath("maps/special/dungeon.map"), read_type_full);
-                    else if(bossgamemode->GetBossType() == 1)
-                        g_map->loadMap(convertPath("maps/special/hills.map"), read_type_full);
-                    else if(bossgamemode->GetBossType() == 2)
-                        g_map->loadMap(convertPath("maps/special/volcano.map"), read_type_full);
-
-                    LoadCurrentMapBackground();
-
-                    g_map->predrawbackground(rm->spr_background, rm->spr_backmap[0]);
-                    g_map->predrawforeground(rm->spr_frontmap[0]);
-
-                    g_map->predrawbackground(rm->spr_background, rm->spr_backmap[1]);
-                    g_map->predrawforeground(rm->spr_frontmap[1]);
-
-                    g_map->SetupAnimatedTiles();
-                    LoadMapObjects(false);
-                    ///////////////////
-                    */
+                    //secretBoss();
 
                     if(game_values.music) {
                         musiclist->SetRandomMusic(g_map->musicCategoryID, "", "");
@@ -2623,83 +2730,17 @@ SWAPBREAK:
 
         playMusic();
 
-        ticks = SDL_GetTicks() - framestart;
-        if(ticks == 0)
-            ticks = 1;
-
-#if	!_DEBUG
-        if(game_values.showfps)
-#endif
-        {
-            float potentialFps = 1000.0f / (float)(game_values.framelimiter == 0 ? 1 : game_values.framelimiter);
-            rm->menu_font_large.drawf(0, smw->ScreenHeight-rm->menu_font_large.getHeight(), "Actual:%.1f/%.1f, Flip:%.1f, Potential:%.1f", realfps, potentialFps, flipfps, 1000.0f / (float)ticks);
-        }
 
 #ifdef _DEBUG
         if(g_fAutoTest)
             rm->menu_font_small.drawRightJustified(635, 5, "Auto");
 #endif
 
-        //double buffering -> flip buffers
-        SDL_Flip(screen);
+        fpshandler.frameBeforeFlip();
 
-        flipfps = 1000.0f / (float)ticks;
+        SDL_Flip(screen); //double buffering -> flip buffers
 
-
-        //Sleep for time just under what we need
-        short delay = (short)(game_values.framelimiter - SDL_GetTicks() + framestart - 2);
-
-        if(delay > 0) {
-            if(delay > game_values.framelimiter)
-                delay = game_values.framelimiter;
-
-            SDL_Delay(delay);
-        }
-
-        //Fine tune wait here
-        while(SDL_GetTicks() - framestart < (unsigned short)game_values.framelimiter)
-            SDL_Delay(0);   //keep framerate constant at 1000/game_values.framelimiter fps
-
-        //Debug code to slow framerate down to 1 fps to see exact movement
-#ifdef _DEBUG
-        if(game_values.frameadvance) {
-            delay = (short)(1000 - SDL_GetTicks() + framestart);
-
-            if(delay > 0) {
-                if(delay > 1000)
-                    delay = 1000;
-
-                SDL_Delay(delay);
-            }
-
-            while(SDL_GetTicks() - framestart < 1000)
-                SDL_Delay(0);
-        }
-#endif
-
-        ticks = SDL_GetTicks() - framestart;
-        if(ticks == 0)
-            ticks = game_values.framelimiter;
-
-        realfps = 1000.0f / (float)ticks;
-
-        /*
-        static float avgFPS = 0.0f;
-        static short outputtimer = 0;
-
-        avgFPS += realfps;
-
-        if(++outputtimer == 1)
-        {
-            FILE * out = fopen("fps.txt", "a+");
-
-            fprintf(out, "%.2f\n", avgFPS / (float)outputtimer);
-
-            fclose(out);
-
-            avgFPS = 0.0f;
-            outputtimer = 0;
-        }*/
+        fpshandler.frameAfterFlip();
     }
 
     //we never get here
@@ -3269,5 +3310,3 @@ void UpdateMusicWithOverrides()
 
     fclose(file);
 }
-
-
