@@ -19,8 +19,16 @@ class NetworkHandlerSDL : public NetworkHandlerBase
         bool sendUDPMessage(const void* data, const unsigned dataLength);
         bool receiveUDPMessage(void* dataBuffer);
 
+        bool openTCPConnection(const char* hostname, const uint16_t port);
+        void closeTCPConnection();
+
+        bool sendTCPMessage(const void* data, const unsigned dataLength);
+        bool receiveTCPMessage(void* dataBuffer);
+
     private:
         IPaddress serverIP;
+
+        TCPsocket tcpSocket;
 
         UDPsocket udpSocket;
         UDPpacket* udpOutgoingPacket;

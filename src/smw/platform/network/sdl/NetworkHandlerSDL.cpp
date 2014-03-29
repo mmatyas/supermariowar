@@ -46,6 +46,12 @@ bool NetworkHandlerSDL::init_server()
     return true;
 }
 
+//
+//
+// UDP
+//
+//
+
 bool NetworkHandlerSDL::openUDPConnection(const char* hostname, const uint16_t port)
 {
     /* Resolve server address */
@@ -122,5 +128,80 @@ bool NetworkHandlerSDL::receiveUDPMessage(void* dataBuffer)
     }
 
     memcpy(dataBuffer, udpIncomingPacket->data, NET_MAX_MESSAGE_SIZE);
+    return true;
+}
+
+//
+//
+// TCP
+//
+//
+
+bool NetworkHandlerSDL::openTCPConnection(const char* hostname, const uint16_t port)
+{
+    /* Resolve server address */
+    printf("Resolving %s:%d\n", hostname, port);
+    if (SDLNet_ResolveHost(&serverIP, hostname, port) < 0) {
+        if (serverIP.host == INADDR_NONE)
+            fprintf(stderr, "[net][error] Couldn't resolve hostname.\n");
+        else
+            fprintf(stderr, "[net][error] Error when resolving host name. %s\n", SDLNet_GetError());
+        return false;
+    }
+
+    /* Open UDP socket */
+    if (!tcpSocket) {
+        tcpSocket = SDLNet_TCP_Open(&serverIP);
+        if (!tcpSocket) {
+            fprintf(stderr, "[net][error] Couldn't open TCP socket. %s\n", SDLNet_GetError());
+            return false;
+        }
+        printf("[net] TCP open.\n");
+    }
+
+    return true;
+}
+
+void NetworkHandlerSDL::closeTCPConnection()
+{
+    if (tcpSocket) {
+        SDLNet_TCP_Close(tcpSocket);
+        tcpSocket = NULL;
+        printf("[net] TCP closed.\n");
+    }
+}
+
+bool NetworkHandlerSDL::sendTCPMessage(const void* data, const unsigned dataLength)
+{
+    if (!data || dataLength < 2 || dataLength >= NET_MAX_MESSAGE_SIZE || !tcpSocket) {
+        printf("[net][debug] Invalid call: sendTCPMessage.\n");
+        return false;
+    }
+
+    if (SDLNet_TCP_Send(tcpSocket, data, dataLength) < dataLength) {
+        fprintf(stderr, "[net][warning] Sending TCP message failed. %s\n", SDLNet_GetError());
+        return false;
+    }
+
+    return true;
+}
+
+bool NetworkHandlerSDL::receiveTCPMessage(void* dataBuffer)
+{
+    if (!tcpSocket || !dataBuffer)
+        return false;
+
+    int receivedBytes = SDLNet_TCP_Recv(tcpSocket, dataBuffer, NET_MAX_MESSAGE_SIZE);
+    if (receivedBytes <= 0) {
+        fprintf(stderr, "[net][warning] Receiving TCP message failed. %s\n", SDLNet_GetError());
+        return false;
+    }
+
+    // Must have version and type field.
+    if (receivedBytes < 2) {
+        fprintf(stderr, "[net][warning] Invalid incoming package.\n");
+        return false;
+    }
+
     return true;
 }
