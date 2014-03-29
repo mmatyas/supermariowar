@@ -40,13 +40,14 @@ Requirements
 
 - cmake
 - SDL 1.2, and
--- SDL_image
--- SDL_mixer
--- SDL_net
+- - SDL_image
+- - SDL_mixer
+- - SDL_net
 
 On Linux, this means the following packages: `cmake libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev`
 
 You can download the development files manually from:
+
 - http://www.cmake.org/cmake/resources/software.html#latest
 - http://www.libsdl.org/download-1.2.php
 - http://www.libsdl.org/projects/SDL_image/release-1.2.html
@@ -75,9 +76,10 @@ To compile with debugging symbols, enable the relative option:
 Windows
 -------
 
-Note: You can also use MinGW and MinGW Shell/Cygwin for compiling
+Note: You can also use MinGW and MinGW Shell/Cygwin for compiling.
 
 Visual Studio:
+
 - make sure you have CMake in your PATH
 - go to Build directory and issue `cmake ..`
 - open the generated solution smw.sln, right-click on the smw project and go to Configuration Properties -> C/C++ - Command line and remove everything there
