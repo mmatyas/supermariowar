@@ -1,6 +1,10 @@
 #ifndef __NETWORK_PROTOCOL_PACKAGES_H_
 #define __NETWORK_PROTOCOL_PACKAGES_H_
 
+#include <assert.h>
+
+#include "NetworkProtocolCodes.h"
+
 struct MessageHeader {
     uint8_t        protocolVersion;
     uint8_t        packageType;

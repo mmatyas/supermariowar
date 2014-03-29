@@ -8,6 +8,14 @@ bool NetworkHandlerSDL::init_networking()
     }
 
     atexit(SDLNet_Quit);
+
+    udpOutgoingPacket = SDLNet_AllocPacket(NET_MAX_MESSAGE_SIZE);
+    udpIncomingPacket = SDLNet_AllocPacket(NET_MAX_MESSAGE_SIZE);
+    if (!udpOutgoingPacket || !udpIncomingPacket) {
+        fprintf(stderr, "[net][error] Couldn't create UDP packets. %s\n", SDLNet_GetError());
+        return false;
+    }
+
     return true;
 }
 
@@ -28,19 +36,14 @@ void NetworkHandlerSDL::cleanup()
 
 bool NetworkHandlerSDL::init_client()
 {
-    udpOutgoingPacket = SDLNet_AllocPacket(NET_MAX_MESSAGE_SIZE);
-    udpIncomingPacket = SDLNet_AllocPacket(NET_MAX_MESSAGE_SIZE);
-    if (!udpOutgoingPacket || !udpIncomingPacket) {
-        fprintf(stderr, "[net][error] Couldn't create UDP packets. %s\n", SDLNet_GetError());
-        return false;
-    }
-
+    // Nothing to do here
     return true;
 }
 
 bool NetworkHandlerSDL::init_server()
 {
     fprintf(stderr, "[net][debug] NOT IMPLEMENTED\n");
+    return true;
 }
 
 bool NetworkHandlerSDL::openUDPConnection(const char* hostname, const uint16_t port)
@@ -119,4 +122,5 @@ bool NetworkHandlerSDL::receiveUDPMessage(void* dataBuffer)
     }
 
     memcpy(dataBuffer, udpIncomingPacket->data, NET_MAX_MESSAGE_SIZE);
+    return true;
 }

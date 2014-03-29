@@ -493,9 +493,6 @@ void NetClient::listen()
                     printf("\n");
                     break;
             }
-
-            netplay.lastReceivedMessage.packageType = responseCode;
-            netplay.lastReceivedMessage.timestamp = SDL_GetTicks();
         }
     }
 }
