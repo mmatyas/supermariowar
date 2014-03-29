@@ -93,9 +93,18 @@ private:
 			index = 0;
 
 			for(int i =0; i < 16; i++) {
-				//state[i] = rand();
-				state[i] = i; // TODO: fix this, same numbers must be generated across all platforms
+				state[i] = rand();
 			}
+		}
+
+		void initialize(unsigned seed) {
+			assert(sizeof(unsigned) == 4);
+
+			index = 0;
+			state[0] = seed;
+			for(int i = 1; i < 16; i++)
+				// see Linear congruential generator
+				state[i] = ((state[i-1] * 1103515245) + 12345) & 0x7fffffff;
 		}
 
 public:
@@ -106,9 +115,8 @@ public:
 		initialize();
 	}
 
-	void ReSeed(unsigned int seed) {
-		CRandomNumberGenerator::ReSeed(seed);
-		initialize();
+	void ReSeed(unsigned seed) {
+		initialize(seed);
 	}
 
 	int GetRand(int rMin, int rMax)
