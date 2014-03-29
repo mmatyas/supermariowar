@@ -128,13 +128,19 @@ bool NetClient::init()
     return true;
 }
 
+void NetClient::cleanup()
+{
+    endSession();
+    networkHandler.cleanup();
+}
+
 void NetClient::setRoomListUIControl(MI_NetworkListScroll* control)
 {
     uiRoomList = control;
 }
 
 /****************************
-    Building up
+    Session
 ****************************/
 
 bool NetClient::startSession()
@@ -152,15 +158,28 @@ bool NetClient::startSession()
     return true;
 }
 
-bool NetClient::openConnection(const char* hostname, const uint16_t port)
+void NetClient::endSession()
 {
-    netplay.connectSuccessful = false;
-    if (!networkHandler.openUDPConnection(hostname, port))
-        return false;
+    if (netplay.active) {
+        printf("Session end.\n");
+        if (netplay.connectSuccessful)
+            sendGoodbye();
 
-    return true;
-    // now we wait for CONNECT_OK
-    // connectSuccessful will be set to 'true' there
+        closeConnection();
+        netplay.active = false;
+        netplay.connectSuccessful = false;
+
+        // restore singleplayer settings
+        for (uint8_t p; p < 4; p++)
+            game_values.playercontrol[p] = backup_playercontrol[p];
+    }
+}
+
+void NetClient::sendGoodbye()
+{
+    //printf("sendGoodbye\n");
+    ClientDisconnectionPackage msg;
+    sendMessage(&msg, sizeof(ClientDisconnectionPackage));
 }
 
 /****************************
@@ -498,47 +517,24 @@ void NetClient::listen()
 }
 
 /****************************
-    Building down
+    Network Communication
 ****************************/
 
-void NetClient::endSession()
+bool NetClient::openConnection(const char* hostname, const uint16_t port)
 {
-    if (netplay.active) {
-        printf("Session end.\n");
-        if (netplay.connectSuccessful)
-            sendGoodbye();
+    netplay.connectSuccessful = false;
+    if (!networkHandler.openUDPConnection(hostname, port))
+        return false;
 
-        closeConnection();
-        netplay.active = false;
-        netplay.connectSuccessful = false;
-
-        // restore singleplayer settings
-        for (uint8_t p; p < 4; p++)
-            game_values.playercontrol[p] = backup_playercontrol[p];
-    }
-}
-
-void NetClient::sendGoodbye()
-{
-    //printf("sendGoodbye\n");
-    ClientDisconnectionPackage msg;
-    sendMessage(&msg, sizeof(ClientDisconnectionPackage));
-}
-
-void NetClient::cleanup()
-{
-    endSession();
-    networkHandler.cleanup();
+    return true;
+    // now we wait for CONNECT_OK
+    // connectSuccessful will be set to 'true' there
 }
 
 void NetClient::closeConnection()
 {
     networkHandler.closeUDPConnection();
 }
-
-/****************************
-    Network Communication
-****************************/
 
 bool NetClient::sendMessage(const void* data, const int dataLength)
 {
