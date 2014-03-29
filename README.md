@@ -40,9 +40,9 @@ Requirements
 
 - cmake
 - SDL 1.2, and
-- - SDL_image
-- - SDL_mixer
-- - SDL_net
+  - SDL_image
+  - SDL_mixer
+  - SDL_net
 
 On Linux, this means the following packages: `cmake libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev`
 
@@ -59,9 +59,9 @@ Linux
 
 Enter the Build directory, run cmake, then make and finally you can use the binary smw in Build/Binaries directories.
 
-`$ mkdir Build`
-`$ cd Build && cmake .. && make -j5`
-`$ Binaries/smw ../data_full`
+> `$ mkdir Build`
+> `$ cd Build && cmake .. && make -j5`
+> `$ Binaries/smw ../data_full`
 
 If you have troubles at compiling you might want to use instead:
 
@@ -69,9 +69,9 @@ If you have troubles at compiling you might want to use instead:
 
 To compile with debugging symbols, enable the relative option:
 
-`$ cd Build && cmake -DDEBUG=ON .. && make -j5`
-`$ gdb Binaries/smw`
-`gdb> run ../data_full`
+> `$ cd Build && cmake -DDEBUG=ON .. && make -j5`
+> `$ gdb Binaries/smw`
+> `gdb> run ../data_full`
 
 Windows
 -------
