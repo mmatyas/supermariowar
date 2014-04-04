@@ -1,41 +1,13 @@
 #ifndef __NETWORK_H_
 #define __NETWORK_H_
 
-#include "SDL.h"
-#include "SDL_net.h"
+#include "input.h"
 
-#define MAXCLIENTS      4
-#define MAX_NETWORK_MESSAGE_SIZE 128
+#include <cassert>
+#include <SDL/SDL.h>
 
-#define NET_MSG_JOIN			0
-#define NET_MSG_JOIN_NLEN		1
-#define NET_MSG_JOIN_NAME		NET_MSG_JOIN_NLEN + 1
+#include "network/NetworkProtocolCodes.h"
 
-#define NET_MSG_ADD				1
-#define NET_MSG_ADD_SLOT		1
-#define NET_MSG_ADD_NLEN		NET_MSG_ADD_SLOT + 2
-#define NET_MSG_ADD_NAME		NET_MSG_ADD_NLEN + 1
-
-#define NET_MSG_DEL				2
-#define NET_MSG_DEL_SLOT		1
-#define NET_MSG_DEL_LEN			NET_MSG_DEL_SLOT + 1
-
-#define NET_MSG_REJECT			255
-#define NET_MSG_REJECT_LEN		1
-
-#define NET_MSG_CHAT			3
-#define NET_MSG_CHAT_NLEN		1
-#define NET_MSG_CHAT_BODY		NET_MSG_CHAT_NLEN + 1
-
-void ReadFloatFromBuffer(float * pFloat, char * pData);
-void ReadIntFromBuffer(int * pInt, char * pData);
-void ReadShortFromBuffer(short * pShort, char * pData);
-void ReadDoubleFromBuffer(double * pDouble, char * pData);
-
-void WriteFloatToBuffer(char * pData, float dFloat);
-void WriteIntToBuffer(char * pData, int iInt);
-void WriteShortToBuffer(char * pData, short sShort);
-void WriteDoubleToBuffer(char * pData, double dDouble);
 
 //Write network handler class here
 //Do similar to how gfx/sfx works with init and clean up functions
@@ -44,48 +16,46 @@ void WriteDoubleToBuffer(char * pData, double dDouble);
 
 bool net_init();
 void net_close();
+void net_saveServerList();
+void net_loadServerList();
 
-bool net_runserver();
-bool net_connectclient();
+class MI_NetworkListScroll;
+//union COutputControl;
 
-struct ServerClient {
-	int active;
-	TCPsocket sock;
-	IPaddress peer;
-	Uint8 name[256 + 1];
+
+// Local structures
+
+struct LastMessage {
+    uint8_t        packageType;
+    uint32_t       timestamp;
 };
 
-struct ClientPeer {
-	int active;
-	Uint8 name[256 + 1];
+struct ServerAddress {
+    std::string    hostname;
 };
 
-class NetServer
-{
-	public:
-
-		NetServer();
-		~NetServer();
-
-		bool startserver();
-		void update();
-
-		void handleserver();
-		void handleclient(int which);
-		void sendnewclientmessage(int about, int to);
-		void broadcastmessage(char * szMsg);
-
-		void cleanup();
-
-	private:
-		
-		IPaddress ip;
-		TCPsocket tcpsock;
-		SDLNet_SocketSet socketset;
-
-		int numclients;
-		ServerClient clients[MAXCLIENTS];
+struct RoomListEntry {
+    uint32_t       roomID;
+    std::string    name;
+    uint8_t        playerCount;
 };
+
+struct Room {
+    uint32_t       roomID;
+    char           name[NET_MAX_ROOM_NAME_LENGTH];
+    char           playerNames[4][NET_MAX_PLAYER_NAME_LENGTH];
+    uint8_t        hostPlayerNumber; // 1-4
+
+    Room() {
+        name[0] = '\0';
+        for (uint8_t p = 0; p < 4; p++)
+            playerNames[p][0] = '\0';
+    }
+};
+
+
+
+// Network communication class
 
 class NetClient
 {
@@ -94,22 +64,92 @@ class NetClient
 		NetClient();
 		~NetClient();
 
-		bool connecttoserver();
-		void update();
-		void handleserver();
-		int handleserverdata(Uint8 *data);
-		void sendjoin();
-		
-		void cleanup();
-		
+		void listen();
+
+        bool sendConnectRequestToSelectedServer();
+        void sendCreateRoomMessage();
+        void sendJoinRoomMessage();
+        void sendLeaveRoomMessage();
+        void sendStartRoomMessage();
+
+        void sendLocalInput();
+        void sendCurrentGameState();
+
+        // called on network session start/end
+		bool startSession();
+		void endSession();
+
+        // called on startup/shutdown
+        bool init();
+        void cleanup();
+
+        void setRoomListUIControl(MI_NetworkListScroll*);
+
+        //void refreshRoomList();
+        void requestRoomList();
+
 	private:
 
-		IPaddress ip;
-		TCPsocket tcpsock;
-		SDLNet_SocketSet socketset;
+        MI_NetworkListScroll* uiRoomList;
 
-		ClientPeer peers[MAXCLIENTS];
+        uint8_t incomingData[NET_MAX_MESSAGE_SIZE];
+
+        uint8_t remotePlayerNumber;
+        short backup_playercontrol[4];
+
+
+        bool openConnection(const char* hostname, const uint16_t port = NET_SERVER_PORT);
+		void closeConnection();
+        bool sendMessage(const void* data, const int dataLength);
+        bool receiveMessage();
+
+        void handleServerinfoAndClose();
+        void handleNewRoomListEntry();
+        void handleRoomCreatedMessage();
+        void handleRoomChangedMessage();
+        void handleRemoteInput();
+        void handleRemoteGameState();
+
+        void sendSyncOKMessage();
+        void sendGoodbye();
+};
+
+
+
+struct Networking {
+    // Network status
+    bool active;            // True if netplay code is currently running
+    //bool networkErrorHappened;
+    bool connectSuccessful;
+    bool joinSuccessful;
+    bool gameRunning;
+    bool currentMenuChanged; // eg. room players changed
+    bool operationInProgress; // the waiting dialogs watch this variable
+
+    // 
+    NetClient client;
+    LastMessage lastSentMessage;
+    LastMessage lastReceivedMessage;
+    char myPlayerName[NET_MAX_PLAYER_NAME_LENGTH];    // last byte will be \0
+
+    // Server list
+    unsigned short selectedServerIndex;
+    std::vector<ServerAddress> savedServers;
+
+    // Room list
+    char roomFilter[NET_MAX_ROOM_NAME_LENGTH];
+    unsigned short selectedRoomIndex;
+    std::vector<RoomListEntry> currentRooms;
+    Room currentRoom;
+
+    // Current room
+    char newroom_name[NET_MAX_ROOM_NAME_LENGTH];
+    char newroom_password[NET_MAX_ROOM_PASSWORD_LENGTH];
+    char mychatmessage[NET_MAX_CHAT_MSG_LENGTH];
+
+    // In-game
+    bool theHostIsMe;
+    CPlayerInput netPlayerInput;
 };
 
 #endif //__NETWORK_H_
-

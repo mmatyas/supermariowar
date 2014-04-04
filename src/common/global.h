@@ -9,7 +9,7 @@
 //----------------------------------------------------------------
 
 #define TITLESTRING "Super Mario War"
-#define VERSIONNUMBER "1.9"
+#define VERSIONNUMBER "2.0"
 
 #include <stdlib.h>	//srand/rand (maybe replace with an own version)
 #include <string.h>
@@ -20,7 +20,7 @@
 
 #include "sfx.h"
 #include "gfx.h"
-//#include "net.h"
+#include "net.h"
 #include "path.h"
 
 #include "linfunc.h"
@@ -591,10 +591,6 @@ public:
     short		soundvolume;
     short		musicvolume;
     bool		fullscreen;
-    short		networktype;		//Type of network game: 0=stand alone, 1=direct connect
-    bool		networkhost;		//If this machine is the one making collision detection and game state changes
-    bool		gamehost;			//If this client is responsible for choosing game type, map, options
-    char *		hostaddress;        //String from of the host ip address
     short		spawnstyle;
     short		awardstyle;
     short		teamcollision;
@@ -818,6 +814,8 @@ struct TourStop {
     char szBonusText[5][128];
 };
 
+struct Networking;
+
 //TODO:: Move menu settings from game_values to global menu context structure
 //menu context (like game_values, but for menu)
 /*
@@ -846,6 +844,7 @@ extern std::vector<WorldMusicOverride*> worldmusicoverrides;
 
 extern Menu g_Menu;
 extern gv game_values;
+extern Networking netplay;
 
 
 #endif

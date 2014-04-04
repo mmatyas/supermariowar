@@ -25,7 +25,15 @@ class ScriptOperation
 };
 #endif
 
-enum MatchType {MATCH_TYPE_SINGLE_GAME = 0, MATCH_TYPE_TOURNAMENT = 1, MATCH_TYPE_TOUR = 2, MATCH_TYPE_WORLD = 4, MATCH_TYPE_MINIGAME = 3, MATCH_TYPE_QUICK_GAME = 5};
+enum MatchType {
+	MATCH_TYPE_SINGLE_GAME = 0,
+	MATCH_TYPE_TOURNAMENT = 1,
+	MATCH_TYPE_TOUR = 2,
+	MATCH_TYPE_WORLD = 4,
+	MATCH_TYPE_MINIGAME = 3,
+	MATCH_TYPE_QUICK_GAME = 5,
+	MATCH_TYPE_NET_GAME = 6
+};
 enum DisplayError {DISPLAY_ERROR_NONE, DISPLAY_ERROR_READ_TOUR_FILE, DISPLAY_ERROR_READ_WORLD_FILE, DISPLAY_ERROR_MAP_FILTER};
 
 class Menu
@@ -78,6 +86,7 @@ class Menu
 	
 		MI_Button * miMainStartButton;
 		MI_Button * miQuickGameButton;
+		MI_Button * miMultiplayerButton;
 
 		MI_PlayerSelect * miPlayerSelect;
 	
@@ -400,6 +409,95 @@ class Menu
 		//Bonus Wheel
 		UI_Menu mBonusWheelMenu;
 		MI_BonusWheel * miBonusWheel;
+
+
+		//Multiplayer Server List Menu
+		UI_Menu mNetServers;
+
+		MI_Button * miNetServersSelectButton;
+		MI_Text * miNetServersSelectedHostText;
+		MI_Button * miNetServersConnectButton;
+		MI_Button * miNetServersAddRemoveButton;
+		MI_TextField * miNetServersNicknameField;
+		MI_Button * miNetServersBackButton;
+
+		MI_NetworkListScroll * miNetServersScroll;
+
+		MI_Image * miNetServersConnectingDialogImage;
+		MI_Text * miNetServersConnectingDialogText;
+
+		MI_Image * miNetServersLeftHeaderBar;
+		MI_Image * miNetServersRightHeaderBar;
+		MI_Text * miNetServersHeaderText;
+
+
+		//Multiplayer Room List Menu
+		UI_Menu mNetLobby;
+
+		MI_NetworkListScroll * miNetLobbyScroll;
+
+		MI_Button * miNetLobbyNewRoomButton;
+		MI_TextField * miNetLobbyFilterField;
+		MI_Button * miNetLobbyRefreshButton;
+		MI_Button * miNetLobbyBackButton;
+
+		MI_Image * miNetLobbyJoiningDialogImage;
+		MI_Text * miNetLobbyJoiningDialogText;
+
+		MI_Image * miNetLobbyLeftHeaderBar;
+		MI_Image * miNetLobbyRightHeaderBar;
+		MI_Text * miNetLobbyHeaderText;
+
+
+		//Multiplayer New Room Level Select Menu
+		UI_Menu mNetNewLevel;
+
+		//MI_ImageSelectField * miNetNewLevelModeField;
+		//MI_SelectField * miNetNewLevelGoalField[22];
+		MI_Button * miNetNewLevelContinueButton;
+
+		MI_Image * miNetNewLevelLeftHeaderBar;
+		MI_Image * miNetNewLevelRightHeaderBar;
+		MI_Text * miNetNewLevelHeaderText;
+
+
+		//Multiplayer New Room Settings Menu
+		UI_Menu mNetNewRoom;
+
+		MI_TextField * miNetNewRoomNameField;
+		MI_TextField * miNetNewRoomPasswordField;
+		MI_SelectField * miNetNewRoomPrivateToggle;
+		MI_Button * miNetNewRoomCreateButton;
+		MI_Button * miNetNewRoomBackButton;
+
+		MI_Image * miNetNewRoomCreatingDialogImage;
+		MI_Text * miNetNewRoomCreatingDialogText;
+
+		MI_Image * miNetNewRoomLeftHeaderBar;
+		MI_Image * miNetNewRoomRightHeaderBar;
+		MI_Text * miNetNewRoomHeaderText;
+
+
+		//Multiplayer Room Menu
+		UI_Menu mNetRoom;
+
+		MI_Text * miNetRoomName;
+		MI_Text * miNetRoomPlayerName[4];
+		MI_ChatMessageBox * miNetRoomMessages;
+		MI_ChatMessageBox * miNetRoomMapPlaceholder;
+		MI_TextField * miNetRoomMessageField;
+		MI_Button * miNetRoomStartButton;
+		MI_Button * miNetRoomSendButton;
+		MI_Button * miNetRoomBackButton;
+
+		MI_Image * miNetRoomStartingDialogImage;
+		MI_Text * miNetRoomStartingDialogText;
+
+		MI_Image * miNetRoomLeftHeaderBar;
+		MI_Image * miNetRoomRightHeaderBar;
+		MI_Text * miNetRoomHeaderText;
+
+
 
 		DisplayError iDisplayError;
 		short iDisplayErrorTimer;

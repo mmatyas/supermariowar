@@ -512,12 +512,12 @@ class MI_ScreenResize : public UI_Control
 class MFS_ListItem
 {
 	public:
-    MFS_ListItem() {
+		MFS_ListItem() {
 			sName = "";
 			fSelected = false;
 		}
 
-    MFS_ListItem(std::string sname, short icon, bool fselected) {
+		MFS_ListItem(std::string sname, short icon, bool fselected) {
 			sName = sname;
 			iIcon = icon;
 			fSelected = fselected;
@@ -526,7 +526,7 @@ class MFS_ListItem
 		~MFS_ListItem();
 
 		std::string sName;  //Display name
-		short iIcon;		//Icon to display with name
+		short iIcon;        //Icon to display with name
 		bool fSelected;     //Filter selected
 };
 
@@ -548,7 +548,7 @@ class MI_MapFilterScroll : public UI_Control
 		bool MovePrev();
 
 	private:
-		
+
 		std::vector<MFS_ListItem*> items;
 		std::vector<MFS_ListItem*>::iterator current;
 
@@ -703,6 +703,101 @@ class MI_World : public UI_Control
 		COutputControl * pressSelectKeys;
 };
 
+class NLS_ListItem
+{
+    public:
+        NLS_ListItem() {
+            sLeft = "";
+            sRight = "";
+        }
+
+        NLS_ListItem(const std::string& left, const std::string& right) {
+            sLeft = left;
+            sRight = right;
+        }
+
+        ~NLS_ListItem() {};
+
+        std::string sLeft;  // Left-aligned text (eg. name)
+        std::string sRight; // Right-aligned text (eg. player count)
+};
+
+class MI_NetworkListScroll : public UI_Control
+{
+    public:
+
+        MI_NetworkListScroll(gfxSprite * nspr, short x, short y, short width, short numlines, const std::string& title, MenuCodeEnum acceptCode, MenuCodeEnum cancelCode);
+        virtual ~MI_NetworkListScroll();
+
+        void Update();
+        void Draw();
+
+        MenuCodeEnum SendInput(CPlayerInput * playerInput);
+        MenuCodeEnum Modify(bool modify);
+
+        void Add(const std::string& left, const std::string& right);
+        void Clear();
+
+        bool MoveNext();
+        bool MovePrev();
+        void RemoteIndex(unsigned short * index);
+
+    protected:
+
+        std::vector<NLS_ListItem> items;
+
+        gfxSprite * spr;
+        MenuCodeEnum iAcceptCode;
+        MenuCodeEnum iCancelCode;
+
+        std::string sTitle;
+        short iNumLines;
+        short iSelectedLine;
+        short iSelectedLineBackup;
+        unsigned short iIndex;
+        unsigned short * iRemoteIndex;
+        short iWidth;
+        short iOffset;
+
+        short iTopStop;
+        short iBottomStop;
+};
+
+class ChatMessage
+{
+    public:
+
+        ChatMessage() {
+            playerName = "";
+            message = "";
+        }
+
+        ChatMessage(const std::string& name, const std::string& text) {
+            playerName = name;
+            message = text;
+        }
+
+        std::string playerName;
+        std::string message;
+        // time?
+};
+
+class MI_ChatMessageBox : public UI_Control
+{
+    public:
+
+        MI_ChatMessageBox(short x, short y, short width, short numlines);
+        virtual ~MI_ChatMessageBox() {}
+
+        //void Update();
+        void Draw();
+
+    protected:
+
+        std::vector<ChatMessage> messages;
+        short iNumLines;
+
+        short iWidth, iHeight;
+};
 
 #endif //__UICUSTOMCONTROL_H_
-

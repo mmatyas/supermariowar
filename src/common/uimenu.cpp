@@ -17,7 +17,7 @@ UI_Menu::~UI_Menu()
 	std::list<UI_Control*>::iterator iterateAll = controls.begin();
 	
     while (iterateAll != controls.end()) {
-		delete (*iterateAll);
+        delete (*iterateAll); // Can CRASH!
 		iterateAll++;
 	}
 
@@ -95,8 +95,8 @@ MenuCodeEnum UI_Menu::SendInput(CPlayerInput * playerInput)
         if(MENU_CODE_UNSELECT_ITEM == ret) {
 			fModifyingItem = false;
 			
-			if(current->IsAutoModify())
-				return cancelCode;
+			/*if(current->IsAutoModify())
+				return cancelCode;*/
 
 			return MENU_CODE_NONE;
 		}

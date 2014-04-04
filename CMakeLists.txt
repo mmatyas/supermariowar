@@ -11,9 +11,11 @@ option(DEBUG "Compile with debugging information" OFF)
 ## currently working only with 1.2
 option(USE_PNG_SAVE "Enable PNG save feature" OFF)
 
+option(USE_EMSCRIPTEN "Output ASM.JS code using emscripten" OFF)
+
 # version number
-set(SMW_VERSION_MAJOR "1")
-set(SMW_VERSION_MINOR "9")
+set(SMW_VERSION_MAJOR "2")
+set(SMW_VERSION_MINOR "0")
 set(SMW_VERSION_PATCH "0")
 
 ########################################
@@ -80,7 +82,7 @@ function(enable_precompiled_headers PRECOMPILED_HEADER SOURCE_FILE SOURCE_VARIAB
 	endif(MSVC)
 endfunction(enable_precompiled_headers)
 
-message(${CMAKE_SYSTEM_PROCESSOR})
+message("${CMAKE_SYSTEM_PROCESSOR}")
 if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "^arm")
 	set(_M_GENERIC 1)
 	set(_M_ARM 1)
@@ -166,19 +168,21 @@ if(WIN32)
 #	enable_precompiled_headers(Src/stdafx.h Src/stdafx.cpp SRCS)
 endif(WIN32)
 
-## add all SDL dependencies
-Include(FindSDL)
-Include(FindSDL_image)
-Include(FindSDL_mixer)
-Include(FindSDL_net)
+if(NOT USE_EMSCRIPTEN)
+	## add all SDL dependencies
+	Include(FindSDL)
+	Include(FindSDL_image)
+	Include(FindSDL_mixer)
+	Include(FindSDL_net)
 
-find_package ( SDL REQUIRED )
-find_package ( SDL_mixer REQUIRED )
-find_package ( SDL_image REQUIRED )
-##TODO: make this optional
-find_package ( SDL_net REQUIRED )
+	find_package ( SDL REQUIRED )
+	find_package ( SDL_mixer REQUIRED )
+	find_package ( SDL_image REQUIRED )
+	##TODO: make this optional
+	find_package ( SDL_net REQUIRED )
 
-include_directories(${SDL_INCLUDE_DIR})
+	include_directories(${SDL_INCLUDE_DIR})
+endif(NOT USE_EMSCRIPTEN)
 
 ## the optional libpng package
 if(USE_PNG_SAVE)
@@ -330,6 +334,15 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 #	install(FILES src/cpack/smw.desktop DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
 endif()
 
+# Dump some information
+message("    SYSTEM:      ${CMAKE_SYSTEM_NAME}")
+message("    BUILD:       ${CMAKE_BUILD_TYPE}")
+message("    CC:          ${CMAKE_C_COMPILER}")
+message("    CXX:         ${CMAKE_CXX_COMPILER}")
+message("    C_FLAGS:     ${CMAKE_C_FLAGS}")
+message("    CXX_FLAGS:   ${CMAKE_CXX_FLAGS}")
+
+
 ## Here the actual magic happens
 include_directories(src/common)
 
@@ -352,12 +365,12 @@ add_subdirectory(src/worldeditor)
 
 # packaging information
 set(CPACK_PACKAGE_NAME "smw")
-set(CPACK_PACKAGE_VENDOR "neagix")
+set(CPACK_PACKAGE_VENDOR "72dpiarmy")
 set(CPACK_PACKAGE_VERSION_MAJOR ${SMW_VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${SMW_VERSION_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH ${SMW_VERSION_PATCH})
 set(CPACK_PACKAGE_DESCRIPTION_FILE ${PROJECT_SOURCE_DIR}/src/cpack/package_description.txt)
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "SMW, arcade platform multiplayer game")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Super Mario War, arcade platform multiplayer game")
 
 set(CPACK_RPM_PACKAGE_GROUP Amusements/Games)
 set(CPACK_RPM_PACKAGE_LICENSE GPL-2.0)

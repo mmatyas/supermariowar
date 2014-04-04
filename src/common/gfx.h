@@ -21,8 +21,8 @@
 #ifndef __GFX_H__
 #define __GFX_H__
 
-#include "SDL_image.h"
-#include "SDL.h"
+#include <SDL/SDL_image.h>
+#include <SDL/SDL.h>
 #include "SFont.h"
 #include <string>
 

@@ -24,6 +24,33 @@ UI_Control::UI_Control(short x, short y)
     iControllingTeam = -1;
 }
 
+UI_Control & UI_Control::operator= (const UI_Control& other)
+{
+    if (this != &other) {
+        fSelected = other.fSelected;
+        fModifying = other.fModifying;
+        fAutoModify = other.fAutoModify;
+        fDisable = other.fDisable;
+
+        ix = other.ix;
+        iy = other.iy;
+
+        fShow = other.fShow;
+
+        for(int iNeighbor = 0; iNeighbor < 4; iNeighbor++)
+            neighborControls[iNeighbor] = NULL;
+
+        uiMenu = NULL;
+        iControllingTeam = other.iControllingTeam;
+    }
+    return *this;
+}
+
+UI_Control::UI_Control(const UI_Control& other)
+{
+    *this = other;
+}
+
 /**************************************
  * MI_IPField Class
  **************************************/
@@ -130,8 +157,6 @@ void MI_IPField::AssignHostAddress()
         else if(values[iSelectedDigit] < 0)
             values[iSelectedDigit] = 9;
     }
-
-    game_values.hostaddress = GetValue();
 }
 
 void MI_IPField::MoveImage()

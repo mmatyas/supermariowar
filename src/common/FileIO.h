@@ -9,7 +9,7 @@ int ReadInt(FILE * inFile);
 void ReadIntChunk(int * mem, size_t iQuantity, FILE * inFile);
 void WriteFloat(float out, FILE * outFile);
 float ReadFloat(FILE * inFile);
-void WriteString(char * szString, FILE * outFile);
+void WriteString(const char * szString, FILE * outFile);
 void ReadString(char * szString, short size, FILE * outFile);
 void WriteByteFromShort(short out, FILE * outFile);
 short ReadByteAsShort(FILE * inFile);

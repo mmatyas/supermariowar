@@ -37,6 +37,18 @@ struct COutputControl {
 		};
 		CKeyState keys[NUM_KEYS];
 	};
+
+	bool operator == (const COutputControl& control) const {
+		for (uint8_t k = 0; k < NUM_KEYS; k++)
+			if (this->keys[k].fDown != control.keys[k].fDown
+				|| this->keys[k].fPressed != control.keys[k].fPressed)
+					return false;
+		return true;
+	}
+
+	bool operator != (const COutputControl& control) const {
+		return !(*this == control);
+	}
 };
 
 struct CInputPlayerControl {

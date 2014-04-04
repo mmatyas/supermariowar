@@ -22,7 +22,7 @@ void CScore::AdjustScore(short iValue)
     SetDigitCounters();
 }
 
-CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamID, short iColorID, gfxSprite * nsprites[PGFX_LAST], CScore *nscore, short * sRespawn, CPlayerAI * ai)
+CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamID, short iColorID, gfxSprite * nsprites[PGFX_LAST], CScore *nscore, short * sRespawnCounter, CPlayerAI * ai)
 {
     globalID = iGlobalID;
     localID = iLocalID;
@@ -35,7 +35,10 @@ CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamI
     if(pPlayerAI)
         pPlayerAI->SetPlayer(this);
 
-    playerKeys = &game_values.playerInput.outputControls[iGlobalID];
+    if (netplay.active)
+        playerKeys = &netplay.netPlayerInput.outputControls[iGlobalID];
+    else
+        playerKeys = &game_values.playerInput.outputControls[iGlobalID];
     playerDevice = game_values.playerInput.inputControls[globalID]->iDevice;
 
     score = nscore;
@@ -65,7 +68,7 @@ CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamI
     //The actual choosing of a spawning position happens later
     FindSpawnPoint();
 
-    respawncounter = sRespawn;
+    respawncounter = sRespawnCounter;
     SetupNewPlayer();
     *respawncounter = 0;
 
@@ -99,7 +102,7 @@ void CPlayer::move()
             if(game_values.cputurn == globalID) {
                 cpu_think();
 
-                if(playerKeys->game_jump.fDown|| playerKeys->game_left.fDown || playerKeys->game_right.fDown)
+                if(playerKeys->game_jump.fDown || playerKeys->game_left.fDown || playerKeys->game_right.fDown)
                     ResetSuicideTime();
             }
         }

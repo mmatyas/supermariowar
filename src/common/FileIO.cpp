@@ -95,7 +95,7 @@ float ReadFloat(FILE * inFile)
 	return in;
 }
 
-void WriteString(char * szString, FILE * outFile)
+void WriteString(const char * szString, FILE * outFile)
 {
 	int iLen = strlen(szString) + 1;
 	WriteInt(iLen, outFile);

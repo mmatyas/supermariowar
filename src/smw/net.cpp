@@ -3,370 +3,110 @@
 
 #include "net.h"
 
-extern char szIPString[32];
-
 #ifdef _WIN32
-	#pragma comment(lib, "SDL_net.lib")
+    #pragma comment(lib, "SDL_net.lib")
 #endif
 
-union {
-	float f;
-	unsigned char b[4];
-} dFloatAsBytes;
+#include "network/NetworkProtocolPackages.h"
 
-union {
-	int i;
-	unsigned char b[4];
-} iIntAsBytes;
+// define platform guards here
+#define NetworkHandler NetworkHandlerSDL
+#include "platform/network/sdl/NetworkHandlerSDL.h"
 
-union {
-	short s;
-	unsigned char b[2];
-} sShortAsBytes;
 
-union {
-	double d;
-	unsigned char b[8];
-} dDoubleAsBytes;
+NetworkHandler networkHandler;
+Networking netplay;
 
-void ReadFloatFromBuffer(float * pFloat, char * pData)
-{
-	dFloatAsBytes.b[0] = pData[0];
-	dFloatAsBytes.b[1] = pData[1];
-	dFloatAsBytes.b[2] = pData[2];
-	dFloatAsBytes.b[3] = pData[3];
+extern gv game_values;
+extern int g_iVersion[];
+extern CPlayer *list_players[4];
+extern short list_players_cnt;
+extern bool VersionIsEqual(int iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
 
-	*pFloat = dFloatAsBytes.f;
-}
-
-void ReadIntFromBuffer(int * pInt, char * pData)
-{
-	iIntAsBytes.b[0] = pData[0];
-	iIntAsBytes.b[1] = pData[1];
-	iIntAsBytes.b[2] = pData[2];
-	iIntAsBytes.b[3] = pData[3];
-
-	*pInt = iIntAsBytes.i;
-}
-
-void ReadShortFromBuffer(short * pShort, char * pData)
-{
-	sShortAsBytes.b[0] = pData[0];
-	sShortAsBytes.b[1] = pData[1];
-
-	*pShort = sShortAsBytes.s;
-}
-
-void ReadDoubleFromBuffer(double * pDouble, char * pData)
-{
-	dDoubleAsBytes.b[0] = pData[0];
-	dDoubleAsBytes.b[1] = pData[1];
-	dDoubleAsBytes.b[2] = pData[2];
-	dDoubleAsBytes.b[3] = pData[3];
-	dDoubleAsBytes.b[4] = pData[4];
-	dDoubleAsBytes.b[5] = pData[5];
-	dDoubleAsBytes.b[6] = pData[6];
-	dDoubleAsBytes.b[7] = pData[7];
-
-	*pDouble = dDoubleAsBytes.d;
-}
-
-void WriteFloatToBuffer(char * pData, float dFloat)
-{
-	dFloatAsBytes.f = dFloat;
-	
-  	pData[0] = dFloatAsBytes.b[0];
-	pData[1] = dFloatAsBytes.b[1];
-	pData[2] = dFloatAsBytes.b[2];
-	pData[3] = dFloatAsBytes.b[3];
-}
-
-void WriteIntToBuffer(char * pData, int iInt)
-{
-	iIntAsBytes.i = iInt;
-
-	pData[0] = iIntAsBytes.b[0];
-	pData[1] = iIntAsBytes.b[1];
-	pData[2] = iIntAsBytes.b[2];
-	pData[3] = iIntAsBytes.b[3];
-}
-
-void WriteShortToBuffer(char * pData, short sShort)
-{
-	sShortAsBytes.s = sShort;
-
-	pData[0] = sShortAsBytes.b[0];
-	pData[1] = sShortAsBytes.b[1];
-	pData[2] = sShortAsBytes.b[2];
-	pData[3] = sShortAsBytes.b[3];
-}
-
-void WriteDoubleToBuffer(char * pData, double dDouble)
-{
-	dDoubleAsBytes.d = dDouble;
-	
-  	pData[0] = dDoubleAsBytes.b[0];
-	pData[1] = dDoubleAsBytes.b[1];
-	pData[2] = dDoubleAsBytes.b[2];
-	pData[3] = dDoubleAsBytes.b[3];
-	pData[4] = dDoubleAsBytes.b[4];
-	pData[5] = dDoubleAsBytes.b[5];
-	pData[6] = dDoubleAsBytes.b[6];
-	pData[7] = dDoubleAsBytes.b[7];
-}
 
 bool net_init()
 {
-    if ( SDLNet_Init() < 0 ) {
-	    printf("SDLNet_Init: %s\n", SDLNet_GetError());
-	    return false;
-	}
-	
-	atexit(SDLNet_Quit);
+    if (!networkHandler.init_networking())
+        return false;
 
-	IPaddress ip;
-	SDLNet_ResolveHost(&ip, "happy", 12521);
-	sprintf(szIPString, "%d.%d.%d.%d", ip.host & 0xff, (ip.host >> 8) & 0xff, (ip.host >> 16) & 0xff, (ip.host >> 24) & 0xff);
+    if (!netplay.client.init())
+        return false;
 
-	return true;
+
+    netplay.active = false;
+    netplay.connectSuccessful = false;
+    netplay.joinSuccessful = false;
+    netplay.gameRunning = false;
+
+    strcpy(netplay.myPlayerName, "Player");
+    netplay.currentMenuChanged = false;
+    netplay.theHostIsMe = false;
+    netplay.selectedRoomIndex = 0;
+    netplay.selectedServerIndex = 0;
+    netplay.roomFilter[0] = '\0';
+    netplay.newroom_name[0] = '\0';
+    netplay.newroom_password[0] = '\0';
+    netplay.mychatmessage[0] = '\0';
+
+    /*ServerAddress none;
+    none.hostname = "(none)";
+    netplay.savedServers.push_back(none);*/
+
+    ServerAddress localhost;
+    localhost.hostname = "localhost";
+    netplay.savedServers.push_back(localhost);
+
+    /*ServerAddress rpi;
+    rpi.hostname = "192.168.1.103";
+    netplay.savedServers.push_back(rpi);*/
+
+    net_loadServerList();
+
+    printf("Network system initialized.\n");
 }
 
 void net_close()
 {
-	SDLNet_Quit();
+    net_saveServerList();
+    networkHandler.cleanup();
 }
 
-
-/********************************************************************
- * NetServer
- ********************************************************************/
-
-NetServer::NetServer()
+void net_saveServerList()
 {
-	numclients = 0;
+    FILE * fp = OpenFile("servers.bin", "wb");
+    if (fp) {
+        fwrite(g_iVersion, sizeof(int), 4, fp);
 
-    for (int i = 0; i < MAXCLIENTS; ++i ) {
-		clients[i].active = 0;
-		clients[i].sock = NULL;
-	}
-
-	tcpsock = NULL;
-	socketset = NULL;
+        // Don't save "(none)"
+        for (unsigned iServer = 1; iServer < netplay.savedServers.size(); iServer++) {
+            ServerAddress* host = &netplay.savedServers[iServer];
+            WriteString(host->hostname.c_str(), fp);
+        }
+        fclose(fp);
+    }
 }
 
-NetServer::~NetServer()
+void net_loadServerList()
 {
-	cleanup();
-}
+    FILE * fp = OpenFile("servers.bin", "rb");
+    if(fp) {
+        int version[4];
+        fread(version, sizeof(int), 4, fp);
 
-bool NetServer::startserver()
-{
-	socketset = SDLNet_AllocSocketSet(MAXCLIENTS + 1);
+        if(VersionIsEqual(g_iVersion, version[0], version[1], version[2], version[3])) {
+            char buffer[128];
+            ReadString(buffer, 128, fp);
 
-    if (socketset == NULL) {
-		printf("Couldn't create socket set: %s\n", SDLNet_GetError());
-		return false;
-	}
+            while (!feof(fp) && !ferror(fp)) {
+                ServerAddress host;
+                host.hostname = buffer;
+                netplay.savedServers.push_back(host);
 
-	SDLNet_ResolveHost(&ip, NULL, 12521);
-
-	printf("Server IP: %x:%d\n", ip.host, ip.port);
-
-	tcpsock = SDLNet_TCP_Open(&ip);
-	
-    if (tcpsock == NULL) {
-		cleanup();
-		printf("Couldn't create server socket: %s\n", SDLNet_GetError());
-		return false;
-	}
-
-	SDLNet_TCP_AddSocket(socketset, tcpsock);
-
-	return true;
-}
-
-
-void NetServer::update()
-{
-	SDLNet_CheckSockets(socketset, 0);
-
-    if(SDLNet_SocketReady(tcpsock)) {
-		handleserver();
-	}
-
-    for(int i = 0; i < MAXCLIENTS; ++i) {
-        if(SDLNet_SocketReady(clients[i].sock)) {
-			handleclient(i);
-		}
-	}
-}
-
-void NetServer::handleserver()
-{
-	int which;
-	unsigned char data;
-
-	TCPsocket newsock = SDLNet_TCP_Accept(tcpsock);
-
-	if (newsock == NULL)
-		return;
-	
-	/* Look for unconnected person slot */
-    for (which = 0; which < MAXCLIENTS; ++which) {
-        if (!clients[which].sock) {
-			break;
-		}
-	}
-
-    if (which == MAXCLIENTS) {
-		/* Look for inactive person slot */
-        for (which = 0; which < MAXCLIENTS; ++which) {
-            if (clients[which].sock && !clients[which].active) {
-				/* Kick them out.. */
-				data = NET_MSG_REJECT;
-				SDLNet_TCP_Send(clients[which].sock, &data, 1);
-				SDLNet_TCP_DelSocket(socketset, clients[which].sock);
-				SDLNet_TCP_Close(clients[which].sock);
-				numclients--;
-
-#ifdef _DEBUG
-				printf("Killed inactive socket %d\n", which);
-#endif
-				break;
-			}
-		}
-	}
-
-    if (which == MAXCLIENTS) {
-		/* No more room... */
-		data = NET_MSG_REJECT;
-		SDLNet_TCP_Send(newsock, &data, 1);
-		SDLNet_TCP_Close(newsock);
-
-#ifdef _DEBUG
-		printf("Connection refused -- server full\n");
-#endif
-    } else {
-		/* Add socket as an inactive person */
-		clients[which].sock = newsock;
-		clients[which].peer = *SDLNet_TCP_GetPeerAddress(newsock);
-		SDLNet_TCP_AddSocket(socketset, clients[which].sock);
-		numclients++;
-
-#ifdef _DEBUG
-		printf("New inactive socket %d\n", which);
-#endif
-	}
-}
-
-void NetServer::handleclient(int which)
-{
-	char data[512];
-	int i;
-
-	/* Has the connection been closed? */
-    if (SDLNet_TCP_Recv(clients[which].sock, data, 512) <= 0) {
-
-#ifdef _DEBUG
-		printf("Closing socket %d (was%s active)\n", which, clients[which].active ? "" : " not");
-#endif
-		/* Notify all active clients */
-        if (clients[which].active) {
-			clients[which].active = 0;
-			data[0] = NET_MSG_DEL;
-			data[NET_MSG_DEL_SLOT] = which;
-			
-            for (i = 0; i < MAXCLIENTS; ++i) {
-                if (clients[i].active) {
-					SDLNet_TCP_Send(clients[i].sock, data, 2);
-				}
-			}
-		}
-		
-		SDLNet_TCP_DelSocket(socketset, clients[which].sock);
-		SDLNet_TCP_Close(clients[which].sock);
-		clients[which].sock = NULL;
-    } else {
-        switch (data[0]) {
-        case NET_MSG_JOIN: {
-				/* An active connection */
-				memcpy(clients[which].name, &data[NET_MSG_JOIN_NAME], 256);
-				clients[which].name[256] = 0;
-#ifdef _DEBUG
-				printf("Activating socket %d (%s)\n", which, clients[which].name);
-#endif
-				/* Notify all active clients */
-            for (i = 0; i < MAXCLIENTS; ++i) {
-                if (clients[i].active) {
-						sendnewclientmessage(which, i);
-					}
-				}
-
-				/* Notify about all active clients */
-				clients[which].active = 1;
-            for (i = 0; i < MAXCLIENTS; ++i) {
-                if (clients[i].active) {
-						sendnewclientmessage(i, which);
-					}
-				}
-			}
-			break;
-        default: {
-				/* Unknown packet type?? */;
-			}
-			break;
-		}
-	}
-}
-
-void NetServer::sendnewclientmessage(int about, int to)
-{
-	char data[512];
-
-	int n = strlen((char *)clients[about].name) + 1;
-	data[0] = NET_MSG_ADD;
-	data[NET_MSG_ADD_SLOT] = about;
-	data[NET_MSG_ADD_NLEN] = n;
-	memcpy(&data[NET_MSG_ADD_NAME], clients[about].name, n);
-	SDLNet_TCP_Send(clients[to].sock, data, n + NET_MSG_ADD_NAME);
-}
-
-void NetServer::broadcastmessage(char * szMsg)
-{
-	char data[512];
-	int iLength = strlen(szMsg) + 1;
-
-	data[0] = NET_MSG_CHAT;
-	data[NET_MSG_CHAT_NLEN] = iLength;
-	memcpy(&data[NET_MSG_CHAT_BODY], szMsg, iLength);
-	
-    for (int k = 0; k < MAXCLIENTS; ++k) {
-        if (clients[k].active) {
-			int iResult = SDLNet_TCP_Send(clients[k].sock, data, iLength + NET_MSG_CHAT_BODY);
-			
-            if(iResult < iLength) {
-				printf("SDLNet_TCP_Send Error: %s\n", SDLNet_GetError());
-				
-				// It may be good to disconnect sock because it is likely invalid now.
-				SDLNet_TCP_DelSocket(socketset, clients[k].sock);
-				SDLNet_TCP_Close(clients[k].sock);
-				numclients--;
-			}
-		}
-	}
-}
-
-void NetServer::cleanup()
-{
-    if (tcpsock != NULL) {
-		SDLNet_TCP_Close(tcpsock);
-		tcpsock = NULL;
-	}
-	
-    if (socketset != NULL) {
-		SDLNet_FreeSocketSet(socketset);
-		socketset = NULL;
-	}
+                ReadString(buffer, 128, fp);
+            }
+        }
+        fclose(fp);
+    }
 }
 
 /********************************************************************
@@ -376,184 +116,444 @@ NetClient::NetClient()
 {}
 
 NetClient::~NetClient()
-{}
-
-bool NetClient::connecttoserver()
 {
-	//if(SDLNet_ResolveHost(&ip, game_values.hostaddress, 12521) == -1) 
-	//if(SDLNet_ResolveHost(&ip, "10.115.8.222", 12521) == -1) 
-	//if(SDLNet_ResolveHost(&ip, "10.115.5.65", 12521) == -1) 
-	if(SDLNet_ResolveHost(&ip, "192.168.0.2", 12521) == -1) 
-	//if(SDLNet_ResolveHost(&ip, "127.0.0.1", 12521) == -1) 
-	{
-		printf("SDLNet_ResolveHost: %s\n", SDLNet_GetError());
-		return false;
-	}
-
-	tcpsock = SDLNet_TCP_Open(&ip);
-	
-    if(!tcpsock) {
-		printf("SDLNet_TCP_Open: %s\n", SDLNet_GetError());
-		return false;
-	}
-
-	/* Allocate the socket set for polling the network */
-	socketset = SDLNet_AllocSocketSet(1);
-    if (socketset == NULL) {
-		printf("Couldn't create socket set: %s\n", SDLNet_GetError());
-		return false;
-	}
-
-	SDLNet_TCP_AddSocket(socketset, tcpsock);
-	
-	return true;
+    cleanup();
 }
 
-void NetClient::update()
+bool NetClient::init()
 {
-	SDLNet_CheckSockets(socketset, 0);
+    if (!networkHandler.init_client())
+        return false;
 
-    if (SDLNet_SocketReady(tcpsock)) {
-		handleserver();
-	}
-
-}
-
-void NetClient::handleserver()
-{
-	Uint8 data[512];
-	int pos, len;
-//	int used;
-
-	/* Has the connection been lost with the server? */
-	len = SDLNet_TCP_Recv(tcpsock, (char *)data, 512);
-
-    if ( len <= 0 ) {
-		SDLNet_TCP_DelSocket(socketset, tcpsock);
-		SDLNet_TCP_Close(tcpsock);
-		tcpsock = NULL;
-
-    } else {
-		pos = 0;
-        while ( len > 0 ) {
-			int used = handleserverdata(&data[pos]);
-			pos += used;
-			len -= used;
-			
-            if ( used == 0 ) {
-				/* We might lose data here.. oh well,
-				   we got a corrupt packet from server
-				 */
-				len = 0;
-			}
-		}
-	}
-}
-
-int NetClient::handleserverdata(Uint8 *data)
-{
-	int used;
-
-    switch (data[0]) {
-    case NET_MSG_ADD: {
-			/* Figure out which channel we got */
-			Uint8 which = data[NET_MSG_ADD_SLOT];
-
-        if ((which >= MAXCLIENTS) || peers[which].active) {
-				/* Invalid channel?? */
-				break;
-			}
-
-			/* Copy name into channel */
-			memcpy(peers[which].name, &data[NET_MSG_ADD_NAME], 256);
-			peers[which].name[256] = 0;
-			peers[which].active = 1;
-
-			/* Let the user know what happened */
-			printf("* New client on %d \"%s\"\n", which, peers[which].name);
-
-			used = NET_MSG_ADD_NAME + data[NET_MSG_ADD_NLEN];
-			break;
-		}
-		
-    case NET_MSG_DEL: {
-			Uint8 which;
-
-			/* Figure out which channel we lost */
-			which = data[NET_MSG_DEL_SLOT];
-        if((which >= MAXCLIENTS) || !peers[which].active) {
-				/* Invalid channel?? */
-				break;
-			}
-			peers[which].active = 0;
-
-			/* Let the user know what happened */
-			printf("* Lost client on %d (%s)\n", which, peers[which].name);
-
-			used = NET_MSG_DEL_LEN;
-			break;
-		}
-
-    case NET_MSG_REJECT: {
-			printf("* Chat server full\n");
-			used = NET_MSG_REJECT_LEN;
-			break;
-		}
-
-    case NET_MSG_CHAT: {
-			/* Copy name into channel */
-			char szMsg[257];
-			memcpy(szMsg, &data[NET_MSG_CHAT_BODY], 256);
-			szMsg[256] = 0;
-			
-			/* Let the user know what happened */
-			printf("Chat Message: \"%s\"\n", szMsg);
-
-			used = NET_MSG_CHAT_BODY + data[NET_MSG_CHAT_NLEN];
-			break;
-		}
-
-    default: {
-			/* Unknown packet type?? */;
-			used = 0;
-			break;
-		}
-	}
-
-	return(used);
+    return true;
 }
 
 void NetClient::cleanup()
 {
-	/* Close the network connections */
-    if (tcpsock != NULL) {
-		SDLNet_TCP_Close(tcpsock);
-		tcpsock = NULL;
-	}
-	
-    if ( socketset != NULL ) {
-		SDLNet_FreeSocketSet(socketset);
-		socketset = NULL;
-	}
+    endSession();
+    networkHandler.cleanup();
 }
 
-void NetClient::sendjoin()
+void NetClient::setRoomListUIControl(MI_NetworkListScroll* control)
 {
-	char join[1+1+256];
-	const char * name = "TestClient";
-
-    if ( tcpsock != NULL ) {
-		/* Construct the packet */
-		join[0] = NET_MSG_JOIN;
-
-		int n = strlen(name);
-
-		join[NET_MSG_JOIN_NLEN] = n;
-		strncpy(&join[NET_MSG_JOIN_NAME], name, n);
-		join[NET_MSG_JOIN_NAME+n++] = 0;
-
-		/* Send it to the server */
-		SDLNet_TCP_Send(tcpsock, join, NET_MSG_JOIN_NAME+n);
-	}
+    uiRoomList = control;
 }
 
+/****************************
+    Session
+****************************/
+
+bool NetClient::startSession()
+{
+    printf("Session start.\n");
+    endSession(); // Finish previous network session if active
+
+    netplay.active = true;
+    netplay.connectSuccessful = false;
+
+    // backup singleplayer settings
+    for (uint8_t p; p < 4; p++)
+        backup_playercontrol[p] = game_values.playercontrol[p];
+
+    return true;
+}
+
+void NetClient::endSession()
+{
+    if (netplay.active) {
+        printf("Session end.\n");
+        if (netplay.connectSuccessful)
+            sendGoodbye();
+
+        closeConnection();
+        netplay.active = false;
+        netplay.connectSuccessful = false;
+
+        // restore singleplayer settings
+        for (uint8_t p; p < 4; p++)
+            game_values.playercontrol[p] = backup_playercontrol[p];
+    }
+}
+
+void NetClient::sendGoodbye()
+{
+    //printf("sendGoodbye\n");
+    ClientDisconnectionPackage msg;
+    sendMessage(&msg, sizeof(ClientDisconnectionPackage));
+}
+
+/****************************
+    Outgoing messages
+****************************/
+
+void NetClient::requestRoomList()
+{
+    RoomListPackage msg;
+    sendMessage(&msg, sizeof(RoomListPackage));
+
+    if (uiRoomList)
+        uiRoomList->Clear();
+}
+
+bool NetClient::sendConnectRequestToSelectedServer()
+{
+    ServerAddress* selectedServer = &netplay.savedServers[netplay.selectedServerIndex];
+    if (openConnection(selectedServer->hostname.c_str()))
+    {
+        ClientConnectionPackage message(netplay.myPlayerName);
+        sendMessage(&message, sizeof(ClientConnectionPackage));
+        netplay.operationInProgress = true;
+        return true;
+    }
+    return false;
+}
+
+void NetClient::sendCreateRoomMessage()
+{
+    NewRoomPackage msg(netplay.newroom_name, netplay.newroom_password);
+
+    sendMessage(&msg, sizeof(NewRoomPackage));
+    netplay.operationInProgress = true;
+}
+
+void NetClient::sendJoinRoomMessage()
+{
+    if (netplay.selectedRoomIndex >= netplay.currentRooms.size())
+        return;
+
+    // TODO: implement password
+    JoinRoomPackage msg(netplay.currentRooms.at(netplay.selectedRoomIndex).roomID, "");
+    sendMessage(&msg, sizeof(JoinRoomPackage));
+    netplay.operationInProgress = true;
+}
+
+void NetClient::sendLeaveRoomMessage()
+{
+    LeaveRoomPackage msg;
+    sendMessage(&msg, sizeof(LeaveRoomPackage));
+}
+
+void NetClient::sendStartRoomMessage()
+{
+    StartRoomPackage msg;
+    sendMessage(&msg, sizeof(StartRoomPackage));
+}
+
+void NetClient::sendSyncOKMessage()
+{
+    SyncOKPackage msg;
+    sendMessage(&msg, sizeof(SyncOKPackage));
+}
+
+void NetClient::sendLocalInput()
+{
+    LocalInputPackage pkg(&netplay.netPlayerInput.outputControls[0]);
+    sendMessage(&pkg, sizeof(LocalInputPackage));
+}
+
+void NetClient::sendCurrentGameState()
+{
+    if (!netplay.theHostIsMe)
+        return;
+
+    GameStatePackage pkg;
+
+    for (uint8_t p = 0; p < list_players_cnt; p++) {
+        pkg.setPlayerCoord(p, list_players[p]->fx, list_players[p]->fy);
+        pkg.setPlayerVel(p, list_players[p]->velx, list_players[p]->vely);
+        pkg.setPlayerKeys(p, &netplay.netPlayerInput.outputControls[p]);
+    }
+
+    sendMessage(&pkg, sizeof(GameStatePackage));
+}
+
+/****************************
+    Incoming messages
+****************************/
+
+void NetClient::handleServerinfoAndClose()
+{
+    ServerInfoPackage serverInfo;
+    memcpy(&serverInfo, incomingData, sizeof(ServerInfoPackage));
+
+    printf("NET_RESPONSE_SERVERINFO [%lu byte]\n", sizeof(serverInfo));
+    printf("Sending:\n  protocolVersion: %d\n  packageType: %d\n  name: %s\n  players/max: %d / %d\n",
+        serverInfo.protocolVersion, serverInfo.packageType, serverInfo.name, serverInfo.currentPlayerCount, serverInfo.maxPlayerCount);
+
+    closeConnection();
+}
+
+void NetClient::handleNewRoomListEntry()
+{
+    RoomInfoPackage roomInfo;
+    memcpy(&roomInfo, incomingData, sizeof(RoomInfoPackage));
+    //printf("  Incoming room entry: [%u] %s (%d/4)\n", roomInfo.roomID, roomInfo.name, roomInfo.currentPlayerCount);
+
+    RoomListEntry newRoom;
+    newRoom.roomID = roomInfo.roomID;
+    newRoom.name = roomInfo.name;
+    newRoom.playerCount = roomInfo.currentPlayerCount;
+    netplay.currentRooms.push_back(newRoom);
+
+    if (uiRoomList) {
+        char playerCountString[4] = {'0' + roomInfo.currentPlayerCount, '/', '4', '\0'};
+        uiRoomList->Add(newRoom.name, playerCountString);
+    }
+}
+
+void NetClient::handleRoomCreatedMessage()
+{
+    NewRoomCreatedPackage pkg;
+    memcpy(&pkg, incomingData, sizeof(NewRoomCreatedPackage));
+
+    netplay.currentRoom.roomID = pkg.roomID;
+    netplay.currentRoom.hostPlayerNumber = 0;
+    memcpy(netplay.currentRoom.name, netplay.newroom_name, NET_MAX_ROOM_NAME_LENGTH);
+    memcpy(netplay.currentRoom.playerNames[0], netplay.myPlayerName, NET_MAX_PLAYER_NAME_LENGTH);
+    memcpy(netplay.currentRoom.playerNames[1], "(empty)", NET_MAX_PLAYER_NAME_LENGTH);
+    memcpy(netplay.currentRoom.playerNames[2], "(empty)", NET_MAX_PLAYER_NAME_LENGTH);
+    memcpy(netplay.currentRoom.playerNames[3], "(empty)", NET_MAX_PLAYER_NAME_LENGTH);
+
+    //printf("Room created, ID: %u, %d\n", pkg.roomID, pkg.roomID);
+    netplay.currentMenuChanged = true;
+    netplay.joinSuccessful = true;
+    netplay.theHostIsMe = true;
+
+    game_values.playercontrol[0] = 1;
+    game_values.playercontrol[1] = 0;
+    game_values.playercontrol[2] = 0;
+    game_values.playercontrol[3] = 0;
+}
+
+void NetClient::handleRoomChangedMessage()
+{
+    CurrentRoomPackage pkg;
+    memcpy(&pkg, incomingData, sizeof(CurrentRoomPackage));
+
+    netplay.currentRoom.roomID = pkg.roomID;
+    memcpy(netplay.currentRoom.name, pkg.name, NET_MAX_ROOM_NAME_LENGTH);
+
+    printf("Room %u (%s) changed:\n", pkg.roomID, pkg.name);
+    printf("host: %d\n", pkg.hostPlayerNumber);
+    for (uint8_t p = 0; p < 4; p++) {
+        memcpy(netplay.currentRoom.playerNames[p], pkg.playerName[p], NET_MAX_PLAYER_NAME_LENGTH);
+        printf("  player %d: %s", p+1, netplay.currentRoom.playerNames[p]);
+        if (p == pkg.hostPlayerNumber)
+            printf(" (HOST)");
+        printf("\n");
+
+
+        if (strcmp(netplay.currentRoom.playerNames[p], "(empty)") == 0)
+            game_values.playercontrol[p] = 0;
+        //else if (strcmp(netplay.currentRoom.playerNames[p], "(bot)") == 0)
+        //    game_values.playercontrol[p] = 2;
+        //    game_values.playercontrol[p] = 1;
+        else
+            game_values.playercontrol[p] = 1; // valid player
+    }
+
+    netplay.theHostIsMe = false;
+    netplay.currentRoom.hostPlayerNumber = pkg.hostPlayerNumber;
+    remotePlayerNumber = pkg.remotePlayerNumber;
+    if (remotePlayerNumber == pkg.hostPlayerNumber)
+        netplay.theHostIsMe = true;
+
+    netplay.currentMenuChanged = true;
+}
+
+void NetClient::handleRemoteInput() // only for room host
+{
+    assert(netplay.theHostIsMe);
+
+    RemoteInputPackage pkg;
+    memcpy(&pkg, incomingData, sizeof(RemoteInputPackage));
+
+    pkg.readKeys(&netplay.netPlayerInput.outputControls[pkg.playerNumber]);
+}
+
+void NetClient::handleRemoteGameState() // for other clients
+{
+    assert(!netplay.theHostIsMe);
+
+    GameStatePackage pkg;
+    memcpy(&pkg, incomingData, sizeof(GameStatePackage));
+
+    for (uint8_t p = 0; p < list_players_cnt; p++) {
+        pkg.getPlayerCoord(p, list_players[p]->fx, list_players[p]->fy);
+        pkg.getPlayerVel(p, list_players[p]->velx, list_players[p]->vely);
+        pkg.getPlayerKeys(p, &netplay.netPlayerInput.outputControls[p]);
+    }
+}
+
+void NetClient::listen()
+{
+    if (receiveMessage()) {
+        uint8_t protocollVersion = incomingData[0];
+        uint8_t responseCode = incomingData[1];
+        if (protocollVersion == NET_PROTOCOL_VERSION) {
+            switch (responseCode)
+            {
+                //
+                // Query
+                //
+                case NET_RESPONSE_BADPROTOCOL:
+                    printf("Not implemented: NET_RESPONSE_BADPROTOCOL\n");
+                    break;
+
+                case NET_RESPONSE_SERVERINFO:
+                    handleServerinfoAndClose();
+                    break;
+
+                case NET_RESPONSE_SERVER_MOTD:
+                    printf("Not implemented: NET_RESPONSE_SERVER_MOTD\n");
+                    break;
+
+                //
+                // Connect
+                //
+                case NET_RESPONSE_CONNECT_OK:
+                    printf("Connection attempt successful.\n");
+                    netplay.connectSuccessful = true;
+                    break;
+
+                case NET_RESPONSE_CONNECT_DENIED:
+                    printf("NET_RESPONSE_CONNECT_DENIED\n");
+                    netplay.connectSuccessful = false;
+                    break;
+
+                case NET_RESPONSE_CONNECT_SERVERFULL:
+                    printf("NET_RESPONSE_CONNECT_SERVERFULL\n");
+                    netplay.connectSuccessful = false;
+                    break;
+
+                case NET_RESPONSE_CONNECT_NAMETAKEN:
+                    printf("NET_RESPONSE_CONNECT_NAMETAKEN\n");
+                    netplay.connectSuccessful = false;
+                    break;
+
+                //
+                // Rooms
+                //
+                case NET_RESPONSE_ROOM_LIST_ENTRY:
+                    handleNewRoomListEntry();
+                    break;
+
+                case NET_RESPONSE_NO_ROOMS:
+                    printf("There are no rooms currently on the server.\n");
+                    break;
+
+                //
+                // Join
+                //
+                case NET_RESPONSE_JOIN_OK:
+                    printf("NET_RESPONSE_JOIN_OK\n");
+                    netplay.joinSuccessful = true;
+                    netplay.theHostIsMe = false;
+                    break;
+
+                case NET_RESPONSE_ROOM_FULL:
+                    printf("NET_RESPONSE_ROOMFULL\n");
+                    netplay.joinSuccessful = false;
+                    break;
+
+                case NET_NOTICE_ROOM_CHANGED:
+                    handleRoomChangedMessage();
+                    break;
+
+                //
+                // Create
+                //
+                case NET_RESPONSE_CREATE_OK:
+                    handleRoomCreatedMessage();
+                    break;
+
+                case NET_RESPONSE_CREATE_ERROR:
+                    printf("Not implemented: NET_RESPONSE_CREATE_ERROR\n");
+                    break;
+
+                //
+                // Game
+                //
+
+                case NET_NOTICE_GAME_SYNC:
+                    printf("NET_NOTICE_GAME_SYNC\n");
+                    {
+                        StartSyncPackage pkg;
+                        memcpy(&pkg, incomingData, sizeof(StartSyncPackage));
+
+                        //printf("reseed: %d\n", pkg.commonRandomSeed);
+                        smw->rng->ReSeed(pkg.commonRandomSeed);
+                    }
+                    sendSyncOKMessage();
+                    break;
+
+                case NET_NOTICE_GAME_STARTED:
+                    printf("NET_NOTICE_GAME_STARTED\n");
+                    netplay.gameRunning = true;
+                    break;
+
+                case NET_NOTICE_REMOTE_KEYS:
+                    //printf("NET_NOTICE_REMOTE_KEYS\n");
+                    handleRemoteInput();
+                    break;
+
+                case NET_NOTICE_HOST_STATE:
+                    handleRemoteGameState();
+                    break;
+
+                //
+                // Default
+                //
+
+                default:
+                    printf("Unknown: ");
+                    /*for (int a = 0; a < udpIncomingPacket->len; a++)
+                        printf("%3d ", incomingData[a]);*/
+                    printf("\n");
+                    break;
+            }
+        }
+    }
+}
+
+/****************************
+    Network Communication
+****************************/
+
+bool NetClient::openConnection(const char* hostname, const uint16_t port)
+{
+    netplay.connectSuccessful = false;
+    if (!networkHandler.openUDPConnection(hostname, port))
+        return false;
+
+    return true;
+    // now we wait for CONNECT_OK
+    // connectSuccessful will be set to 'true' there
+}
+
+void NetClient::closeConnection()
+{
+    networkHandler.closeUDPConnection();
+}
+
+bool NetClient::sendMessage(const void* data, const int dataLength)
+{
+    if (!networkHandler.sendUDPMessage(data, dataLength))
+        return false;
+
+    netplay.lastSentMessage.packageType = ((uint8_t*)data)[1];
+    netplay.lastSentMessage.timestamp = SDL_GetTicks();
+
+    return true;
+}
+
+bool NetClient::receiveMessage()
+{
+    if (!networkHandler.receiveUDPMessage(incomingData))
+        return false;
+
+    netplay.lastReceivedMessage.packageType = incomingData[1];
+    netplay.lastReceivedMessage.timestamp = SDL_GetTicks(); /* TODO: csomagból */
+
+    return true;
+}
