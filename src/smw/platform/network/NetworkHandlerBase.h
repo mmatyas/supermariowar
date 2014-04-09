@@ -8,9 +8,9 @@
 class NetworkHandlerBase
 {
 	public:
-		virtual bool init_networking() {};
-		virtual bool init_client() {};
-		virtual bool init_server() {};
+		virtual bool init_networking() { return true; };
+		virtual bool init_client() { return true; };
+		virtual bool init_server() { return true; };
 		virtual void cleanup() {};
 
 		// UDP

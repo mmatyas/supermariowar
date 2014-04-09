@@ -3,10 +3,6 @@
 
 #include "net.h"
 
-#ifdef _WIN32
-    #pragma comment(lib, "SDL_net.lib")
-#endif
-
 #include "network/NetworkProtocolPackages.h"
 
 // define platform guards here
@@ -63,6 +59,7 @@ bool net_init()
     net_loadServerList();
 
     printf("Network system initialized.\n");
+    return true;
 }
 
 void net_close()
