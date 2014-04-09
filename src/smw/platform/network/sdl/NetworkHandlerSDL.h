@@ -3,7 +3,7 @@
 
 #include "../NetworkHandlerBase.h"
 
-#include <SDL/SDL_net.h>
+#include "SDL_net.h"
 
 class NetworkHandlerSDL : public NetworkHandlerBase
 {

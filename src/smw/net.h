@@ -4,7 +4,6 @@
 #include "input.h"
 
 #include <cassert>
-#include <SDL/SDL.h>
 
 #include "network/NetworkProtocolCodes.h"
 

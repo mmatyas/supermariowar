@@ -10,7 +10,7 @@
 #ifndef _IMG_SavePNG_h
 #define _IMG_SavePNG_h
 
-#include <SDL/SDL.h>
+#include "SDL.h"
 
 /* Set up for C function definitions, even when using C++ */
 #ifdef __cplusplus

@@ -4,7 +4,7 @@
 #ifdef PNG_SAVE_FORMAT
 
 
-#include <SDL/SDL.h>
+#include "SDL.h"
 #include "savepng.h"
 #include "png.h"
 
