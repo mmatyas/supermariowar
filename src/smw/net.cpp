@@ -88,7 +88,10 @@ void net_loadServerList()
     FILE * fp = OpenFile("servers.bin", "rb");
     if(fp) {
         int version[4];
-        fread(version, sizeof(int), 4, fp);
+        if(4 != fread(version, sizeof(int), 4, fp)) {
+            fclose(fp);
+            return; // read error
+        }
 
         if(VersionIsEqual(g_iVersion, version[0], version[1], version[2], version[3])) {
             char buffer[128];
@@ -149,7 +152,7 @@ bool NetClient::startSession()
     netplay.connectSuccessful = false;
 
     // backup singleplayer settings
-    for (uint8_t p; p < 4; p++)
+    for (uint8_t p = 0; p < 4; p++)
         backup_playercontrol[p] = game_values.playercontrol[p];
 
     return true;
@@ -167,7 +170,7 @@ void NetClient::endSession()
         netplay.connectSuccessful = false;
 
         // restore singleplayer settings
-        for (uint8_t p; p < 4; p++)
+        for (uint8_t p = 0; p < 4; p++)
             game_values.playercontrol[p] = backup_playercontrol[p];
     }
 }
