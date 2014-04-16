@@ -10,6 +10,12 @@
 
 #define NUM_KEYS 8
 
+#ifdef USE_SDL2
+    #define SDL_KEYTYPE SDL_Keycode
+#else
+    #define SDL_KEYTYPE short
+#endif
+
 struct CKeyState {
 	bool fDown;
 	bool fPressed;
@@ -18,12 +24,12 @@ struct CKeyState {
 struct CInputControl {
     union {
         struct {
-			short menu_up, menu_down, menu_left, menu_right, menu_select, menu_cancel, menu_random, menu_scrollfast;
+			SDL_KEYTYPE menu_up, menu_down, menu_left, menu_right, menu_select, menu_cancel, menu_random, menu_scrollfast;
 		};
         struct {
-			short game_left, game_right, game_jump, game_down, game_turbo, game_powerup, game_start, game_cancel;
+			SDL_KEYTYPE game_left, game_right, game_jump, game_down, game_turbo, game_powerup, game_start, game_cancel;
 		};
-		short keys[NUM_KEYS];
+		SDL_KEYTYPE keys[NUM_KEYS];
 	};
 };
 
@@ -78,7 +84,7 @@ class CPlayerInput
 		//Use these structures to see what input has been pressed
 		COutputControl outputControls[4];
 
-		short iPressedKey;
+		SDL_KEYTYPE iPressedKey;
 
 	private:
 		bool fUsingMouse;

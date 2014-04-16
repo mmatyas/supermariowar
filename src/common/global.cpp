@@ -70,6 +70,11 @@ bool VersionIsEqualOrAfter(int iVersion[], short iMajor, short iMinor, short iMi
     return false;
 }
 
+#ifdef USE_SDL2
+    inline const char * Keynames(SDL_KEYTYPE key) {
+        SDL_GetKeyName(key); // FIXME
+    }
+#else
 //We're using these strings intead of the ugly ones returned by SDL_GetKeyName()
 const char * Keynames[340] = {"Unknown", "", "", "", "", "", "", "", "Backspace", "Tab",
                               "",	"", "Clear", "Return", "", "", "", "", "", "Pause",
@@ -106,6 +111,7 @@ const char * Keynames[340] = {"Unknown", "", "", "", "", "", "", "", "Backspace"
                               "Power", "Euro", "Undo", "Mouse Up", "Mouse Down", "Mouse Left", "Mouse Right", "Mouse Button 1", "Left Mouse Button", "Center Mouse Button",
                               "Right Mouse Button", "Mouse Scroll Up", "Mouse Scroll Down", "Mouse Button 4", "Mouse Button 5", "Mouse Button 6", "Mouse Button 7", "Mouse Button 8", "Mouse Button 9", "Mouse Button 10"
                              };
+#endif
 
 #ifdef _XBOX
 const char * Joynames[30] = {"Left Stick Up", "Left Stick Down", "Left Stick Left", "Left Stick Right", "Right Stick Up", "Right Stick Down", "Right Stick Left", "Right Stick Right", "Pad Up", "Pad Down",
@@ -122,7 +128,7 @@ const char * Joynames[30] = {"Joystick Up", "Joystick Down", "Joystick Left", "J
 
 
 //[Keyboard/Joystick][Game/Menu][NumPlayers][NumKeys]  left, right, jump, down, turbo, powerup, start, cancel
-short controlkeys[2][2][4][NUM_KEYS] = { { { {SDLK_LEFT, SDLK_RIGHT, SDLK_UP, SDLK_DOWN, SDLK_RCTRL, SDLK_RSHIFT, SDLK_RETURN, SDLK_ESCAPE},
+SDL_KEYTYPE controlkeys[2][2][4][NUM_KEYS] = { { { {SDLK_LEFT, SDLK_RIGHT, SDLK_UP, SDLK_DOWN, SDLK_RCTRL, SDLK_RSHIFT, SDLK_RETURN, SDLK_ESCAPE},
             {SDLK_a, SDLK_d, SDLK_w, SDLK_s, SDLK_e, SDLK_q, SDLK_UNKNOWN, SDLK_UNKNOWN},
             {SDLK_g, SDLK_j, SDLK_y, SDLK_h, SDLK_u, SDLK_t, SDLK_UNKNOWN, SDLK_UNKNOWN},
             {SDLK_l, SDLK_QUOTE, SDLK_p, SDLK_SEMICOLON, SDLK_LEFTBRACKET, SDLK_o, SDLK_UNKNOWN, SDLK_UNKNOWN}

@@ -328,7 +328,7 @@ void SetDisplayMessage(short iTime,
 void DrawMessage();
 
 //Menu keys to use for menus
-extern short controlkeys[2][2][4][NUM_KEYS];
+extern SDL_KEYTYPE controlkeys[2][2][4][NUM_KEYS];
 
 //Vehicle stuff
 std::vector<WorldVehicle*> vehiclelist;

@@ -25,6 +25,7 @@
 #include <math.h>
 
 //now it's really time for an "engine" (aka resource manager)
+// TODO: check SDL2 Windows libs
 #ifdef _WIN32
 #pragma comment(lib, "SDL_image.lib")
 
@@ -45,6 +46,11 @@
 
 
 //------ system stuff ------
+#ifdef USE_SDL2
+    SDL_Window       *window;        //the window
+    SDL_Renderer     *renderer;      //screen -> texture -> renderer -> window
+    SDL_Texture      *screenAsTexture;
+#endif
 SDL_Surface		*screen;		//for gfx (maybe the gfx system should be improved -> resource manager)
 SDL_Surface		*blitdest;		//the destination surface for all drawing (can be swapped from screen to another surface)
 
@@ -77,7 +83,7 @@ short			respawnanimationframe[4] = {0, 0, 0, 0};
 
 short			projectiles[4];
 
-extern short controlkeys[2][2][4][NUM_KEYS];
+extern SDL_KEYTYPE controlkeys[2][2][4][NUM_KEYS];
 extern int g_iVersion[];
 
 //Locations for swirl spawn effects
@@ -579,8 +585,13 @@ int main(int argc, char *argv[])
     //setting the icon isn't implemented in sdl ->  i'll ask on the mailing list
     char title[128];
     sprintf(title, "%s %s", TITLESTRING, VERSIONNUMBER);
+#ifdef USE_SDL2
+    SDL_SetWindowTitle(window, title);
+    SDL_SetRelativeMouseMode(SDL_TRUE);
+#else
     SDL_WM_SetCaption(title, "smw.ico");
     SDL_ShowCursor(SDL_DISABLE);
+#endif
 
     printf("\n---------------- loading ----------------\n");
 
@@ -2738,7 +2749,14 @@ SWAPBREAK:
 
         fpshandler.frameBeforeFlip();
 
+#ifdef USE_SDL2
+        SDL_UpdateTexture(screenAsTexture, NULL, screen->pixels, screen->pitch);
+        SDL_RenderClear(renderer);
+        SDL_RenderCopy(renderer, screenAsTexture, NULL, NULL);
+        SDL_RenderPresent(renderer);
+#else
         SDL_Flip(screen); //double buffering -> flip buffers
+#endif
 
         fpshandler.frameAfterFlip();
     }
@@ -3232,7 +3250,7 @@ void UpdateMusicWithOverrides()
 
     short iAddToCategory = 0;
     char szBuffer[256];
-    while(fgets(szBuffer, 1024, file)) {
+    while(fgets(szBuffer, 1024, file)) { // TODO: what's this?
         //Ignore comment lines
         if(szBuffer[0] == '#' || szBuffer[0] == '\n' || szBuffer[0] == '\r' || szBuffer[0] == ' ' || szBuffer[0] == '\t')
             continue;

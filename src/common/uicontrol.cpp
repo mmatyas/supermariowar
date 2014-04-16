@@ -1519,7 +1519,11 @@ short number_key_map[10] = {41, 33, 64, 35, 36, 37, 94, 38, 42, 40};
 
 MenuCodeEnum MI_TextField::SendInput(CPlayerInput * playerInput)
 {
+#ifdef USE_SDL2
+    const Uint8 * keystate = SDL_GetKeyboardState(NULL);
+#else
     Uint8 * keystate = SDL_GetKeyState(NULL);
+#endif
 
     for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
         if(playerInput->outputControls[iPlayer].menu_select.fPressed || playerInput->outputControls[iPlayer].menu_cancel.fPressed) {
@@ -1534,8 +1538,9 @@ MenuCodeEnum MI_TextField::SendInput(CPlayerInput * playerInput)
     if(!szValue || iNumChars >= iMaxChars)
         return MENU_CODE_NONE;
 
+    // TODO: check string conversion
     //Watch for characters typed in including delete and backspace
-    short key = playerInput->iPressedKey;
+    SDL_KEYTYPE key = playerInput->iPressedKey;
     if((key >= SDLK_a && key <= SDLK_z) || key == SDLK_SPACE || (key >= SDLK_0 && key <= SDLK_9) || key == SDLK_EQUALS ||
             key == SDLK_MINUS || key == SDLK_BACKQUOTE || (key >= SDLK_LEFTBRACKET && key <= SDLK_RIGHTBRACKET) ||
             key == SDLK_SEMICOLON || key == SDLK_QUOTE || key == SDLK_COMMA || key == SDLK_PERIOD || key == SDLK_SLASH) {

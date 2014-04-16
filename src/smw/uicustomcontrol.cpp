@@ -1,7 +1,12 @@
 #include "global.h"
 #include <math.h>
 
-extern const char * Keynames[340];
+#ifdef USE_SDL2
+    #define Keynames(key) SDL_GetKeyName(key) // FIXME
+#else
+    extern const char * Keynames[340];
+    #define Keynames(key) Keynames[key]
+#endif
 extern const char * Joynames[30];
 
 extern const char * GameInputNames[NUM_KEYS];
@@ -121,7 +126,7 @@ MenuCodeEnum MI_InputControlField::SendInput(CPlayerInput *)
 
         if(iDevice == DEVICE_KEYBOARD) {
             if (event.type == SDL_KEYDOWN) {
-                short key = (short)event.key.keysym.sym;
+                SDL_KEYTYPE key = (SDL_KEYTYPE)event.key.keysym.sym;
 
                 SetKey(iKey, key, iDevice);
                 done = true;
@@ -132,7 +137,7 @@ MenuCodeEnum MI_InputControlField::SendInput(CPlayerInput *)
                 if(xmag < MOUSE_X_DEAD_ZONE && ymag < MOUSE_Y_DEAD_ZONE)
                     continue;
 
-                short key = KEY_NONE;
+                SDL_KEYTYPE key = KEY_NONE;
                 if(xmag > ymag) {
                     if(event.motion.xrel < 0)
                         key = MOUSE_LEFT;
@@ -150,7 +155,7 @@ MenuCodeEnum MI_InputControlField::SendInput(CPlayerInput *)
                     done = true;
                 }
             } else if (event.type == SDL_MOUSEBUTTONDOWN) {
-                short key = event.button.button + MOUSE_BUTTON_START;
+                SDL_KEYTYPE key = event.button.button + MOUSE_BUTTON_START;
                 SetKey(iKey, key, iDevice);
                 done = true;
             }
@@ -160,7 +165,7 @@ MenuCodeEnum MI_InputControlField::SendInput(CPlayerInput *)
                     done = true;
                 }
             } else if(event.type == SDL_JOYHATMOTION) {
-                short key = KEY_NONE;
+                SDL_KEYTYPE key = KEY_NONE;
 
                 if (event.jhat.value & SDL_HAT_UP) {
                     key = JOY_HAT_UP;
@@ -177,7 +182,7 @@ MenuCodeEnum MI_InputControlField::SendInput(CPlayerInput *)
                     done = true;
                 }
             } else if (event.type == SDL_JOYAXISMOTION) {
-                short key = KEY_NONE;
+                SDL_KEYTYPE key = KEY_NONE;
 
                 if(event.jaxis.axis == 0) {
                     if (event.jaxis.value < -JOYSTICK_DEAD_ZONE) {
@@ -211,7 +216,7 @@ MenuCodeEnum MI_InputControlField::SendInput(CPlayerInput *)
                 }
             } else if (event.type == SDL_JOYBUTTONDOWN) {
                 if(event.jbutton.state == SDL_PRESSED) {
-                    short key = event.jbutton.button + JOY_BUTTON_START;
+                    SDL_KEYTYPE key = event.jbutton.button + JOY_BUTTON_START;
 
                     SetKey(iKey, key, iDevice);
                     done = true;
@@ -229,7 +234,7 @@ MenuCodeEnum MI_InputControlField::SendInput(CPlayerInput *)
     return MENU_CODE_UNSELECT_ITEM;
 }
 
-void MI_InputControlField::SetKey(short * iSetKey, short key, short device)
+void MI_InputControlField::SetKey(SDL_KEYTYPE * iSetKey, SDL_KEYTYPE key, short device)
 {
     bool fNeedSwap = false;
     short iSwapPlayer, iSwapKey;
@@ -277,7 +282,7 @@ void MI_InputControlField::Draw()
     else if(fModifying)
         rm->menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 16, "(Press Button)");
     else if(iDevice == DEVICE_KEYBOARD)
-        rm->menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 16, Keynames[*iKey]);
+        rm->menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 16, Keynames(*iKey));
     else
         rm->menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 16, Joynames[*iKey]);
 }
@@ -315,7 +320,11 @@ MI_InputControlContainer::MI_InputControlContainer(gfxSprite * spr_button, short
 
 #else
     for(short iJoystick = 0; iJoystick < joystickcount; iJoystick++) {
+    #ifdef USE_SDL2
+        miDeviceSelectField->Add(SDL_JoystickNameForIndex(iJoystick), iJoystick, "", false, false);
+    #else
         miDeviceSelectField->Add(SDL_JoystickName(iJoystick), iJoystick, "", false, false);
+    #endif
     }
 #endif
 

@@ -8,6 +8,8 @@
 #include <string>
 using namespace std;
 
+#include "sdl12wrapper.h"
+
 #ifdef _WIN32
 #pragma comment(lib, "SDL_image.lib")
 
@@ -18,6 +20,11 @@ using namespace std;
 
 #endif
 
+#ifdef USE_SDL2
+    extern SDL_Window   * window;
+    extern SDL_Renderer * renderer;
+    extern SDL_Texture  * screenAsTexture;
+#endif
 extern SDL_Surface *blitdest;
 extern SDL_Surface *screen;
 
@@ -43,15 +50,86 @@ extern short y_shake;
 //gfx_init
 bool gfx_init(int w, int h, bool fullscreen)
 {
-    printf("init SDL\n");
-    if( SDL_Init(SDL_INIT_VIDEO ) < 0 ) {
-        printf("Couldn't initialize SDL: %s\n", SDL_GetError());
+    // show SDL version
+    SDL_version ver_compiled;
+    SDL_version ver_current;
+    SDL_VERSION(&ver_compiled);
+#ifdef USE_SDL2
+    SDL_GetVersion(&ver_current);
+#else
+    const SDL_version * constptr_ver_current = SDL_Linked_Version(); // dyn. linked version
+    ver_current = *constptr_ver_current;
+#endif
+    printf("[info] Initializing SDL %d.%d.%d (compiled with %d.%d.%d) ... ",
+        ver_current.major, ver_current.minor, ver_current.patch,
+        ver_compiled.major, ver_compiled.minor, ver_compiled.patch);
+
+    // init SDL
+    if( SDL_Init(SDL_INIT_VIDEO) < 0 ) {
+        printf("error: %s\n", SDL_GetError());
         return false;
-    }
+    } else
+        printf("ok\n");
 
     // Clean up on exit
     atexit(SDL_Quit);
 
+
+    // show SDL_image version
+    const SDL_version * ver_img_current = IMG_Linked_Version();
+    SDL_IMAGE_VERSION(&ver_compiled);
+    printf("[info] Initializing SDL image %d.%d.%d (compiled with %d.%d.%d) ... ",
+        ver_img_current->major, ver_img_current->minor, ver_img_current->patch,
+        ver_compiled.major, ver_compiled.minor, ver_compiled.patch);
+
+    // init SDL_image
+    int img_flags = IMG_INIT_JPG | IMG_INIT_PNG;
+    if ((IMG_Init(img_flags) & img_flags) != img_flags) {
+        printf("error: %s\n", IMG_GetError());
+        return false;
+    } else
+        printf("ok\n");
+
+    // Clean up on exit
+    atexit(IMG_Quit);
+
+
+#ifdef USE_SDL2
+    window = SDL_CreateWindow("smw",
+        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+        w, h, fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
+        if ( window == NULL ) {
+            printf("Couldn't create %dx%d window: %s\n", w, h, SDL_GetError());
+            return false;
+        }
+
+    renderer = SDL_CreateRenderer(window, -1,
+        SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
+        if ( renderer == NULL ) {
+            printf("Couldn't create renderer: %s\n", SDL_GetError());
+            return false;
+        }
+
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+        SDL_RenderSetLogicalSize(renderer, w, h);
+
+    screen = SDL_CreateRGBSurface(0, w, h, 32,
+        0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
+        if ( screen == NULL ) {
+            printf("Couldn't create video buffer: %s\n", SDL_GetError());
+            return false;
+        }
+
+    screenAsTexture = SDL_CreateTexture(renderer,
+        SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, w, h);
+        if ( screenAsTexture == NULL ) {
+            printf("Couldn't create video texture: %s\n", SDL_GetError());
+            return false;
+        }
+
+
+#else
     if(fullscreen)
         screen = SDL_SetVideoMode(w, h, GFX_BPP, GFX_FLAGS | SDL_FULLSCREEN);
     else
@@ -61,8 +139,9 @@ bool gfx_init(int w, int h, bool fullscreen)
         printf("Couldn't set video mode %dx%d: %s\n", w, h, SDL_GetError());
         return false;
     }
+#endif
 
-    printf(" running @ %dx%d %dbpp (done)\n", w, h, screen->format->BitsPerPixel);
+    printf("[info] running at %dx%d %dbpp\n", w, h, screen->format->BitsPerPixel);
 
     for(int k = 0; k < 3; k++) {
         colorcodes[k] = NULL;
@@ -148,19 +227,46 @@ bool gfx_loadpalette()
 
 void gfx_setresolution(int w, int h, bool fullscreen)
 {
+#ifdef USE_SDL2
+    assert(window);
+    assert(renderer);
+    assert(screen);
+    assert(screenAsTexture);
+
+    if(fullscreen) {
+        SDL_DestroyWindow(window);
+        window = SDL_CreateWindow("smw",
+            SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+            w, h, SDL_WINDOW_FULLSCREEN_DESKTOP);
+    }
+    else
+        SDL_SetWindowSize(window, w, h);
+
+        if ( window == NULL ) {
+            printf("Couldn't set video mode %dx%d: %s\n", w, h, SDL_GetError());
+            //return false;
+        }
+
+    // on some systems there's a mouse input bug after re-creating the window
+    if (SDL_GetRelativeMouseMode()) {
+        SDL_SetRelativeMouseMode(SDL_FALSE);
+        SDL_SetRelativeMouseMode(SDL_TRUE);
+    }
+#else
     Uint32 flags = GFX_FLAGS;
     if(fullscreen)
         flags |= SDL_FULLSCREEN;
 
-#ifdef _XBOX
+    #ifdef _XBOX
 
-    if(game_values.aspectratio10x11)
-        flags |= SDL_10X11PIXELASPECTRATIO;
+        if(game_values.aspectratio10x11)
+            flags |= SDL_10X11PIXELASPECTRATIO;
 
-    screen = SDL_SetVideoModeWithFlickerFilter(w, h, GFX_BPP, flags, game_values.flickerfilter, game_values.softfilter);
+        screen = SDL_SetVideoModeWithFlickerFilter(w, h, GFX_BPP, flags, game_values.flickerfilter, game_values.softfilter);
 
-#else
-    screen = SDL_SetVideoMode(w, h, GFX_BPP, flags);
+    #else
+        screen = SDL_SetVideoMode(w, h, GFX_BPP, flags);
+    #endif
 #endif
 }
 
@@ -173,6 +279,12 @@ void gfx_close()
             for(int k = 0; k < NUM_SCHEMES; k++)
                 delete [] colorschemes[j][k][i];
     }
+#ifdef USE_SDL2
+    SDL_DestroyTexture(screenAsTexture);
+    SDL_FreeSurface(screen);
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+#endif
 }
 
 
@@ -255,7 +367,7 @@ SDL_Surface * gfx_createskinsurface(SDL_Surface * skin, short spriteindex, Uint8
     SDL_UnlockSurface(skin);
     SDL_UnlockSurface(temp);
 
-    if( SDL_SetColorKey(temp, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(temp->format, r, g, b)) < 0) {
+    if( SDL_SETCOLORKEY(temp, SDL_TRUE, SDL_MapRGB(temp->format, r, g, b)) < 0 ) {
         printf("\n ERROR: Couldn't set ColorKey + RLE for new skin surface: %s\n", SDL_GetError());
         return NULL;
     }
@@ -456,13 +568,13 @@ SDL_Surface * gfx_createteamcoloredsurface(SDL_Surface * sImage, short iColor, U
     SDL_UnlockSurface(sImage);
     SDL_UnlockSurface(sTempImage);
 
-    if( SDL_SetColorKey(sTempImage, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(sTempImage->format, r, g, b)) < 0) {
+    if( SDL_SETCOLORKEY(sTempImage, SDL_TRUE, SDL_MapRGB(sTempImage->format, r, g, b)) < 0 ) {
         printf("\n ERROR: Couldn't set ColorKey + RLE for new team colored surface: %s\n", SDL_GetError());
         return NULL;
     }
 
     if(a < 255) {
-        if(SDL_SetAlpha(sTempImage, SDL_SRCALPHA | SDL_RLEACCEL, a) < 0) {
+        if(SDL_SETALPHABYTE(sTempImage, SDL_TRUE, a) < 0) {
             cout << endl << " ERROR: Couldn't set per-surface alpha: " << SDL_GetError() << endl;
             return NULL;
         }
@@ -760,7 +872,7 @@ void gfxSprite::clearSurface()
 
 bool gfxSprite::init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b, bool fUseAccel)
 {
-    cout << "loading sprite " << filename << "...";
+    cout << "loading sprite (mode 1) " << filename << "...";
 
     if(m_picture) {
         SDL_FreeSurface(m_picture);
@@ -769,19 +881,19 @@ bool gfxSprite::init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b, boo
 
     // Load the BMP file into a surface
     m_picture = IMG_Load(filename.c_str());
-
     if (!m_picture) {
-        cout << endl << " ERROR: Couldn't load " << filename << ": " << SDL_GetError() << endl;
+        cout << endl << " ERROR: Couldn't load " << filename << ": " << IMG_GetError() << endl;
         return false;
     }
 
-    if( SDL_SetColorKey(m_picture, SDL_SRCCOLORKEY | (fUseAccel ? SDL_RLEACCEL : 0), SDL_MapRGB(m_picture->format, r, g, b)) < 0) {
+    if( SDL_SETCOLORKEY(m_picture, fUseAccel ? SDL_TRUE : SDL_FALSE, SDL_MapRGB(m_picture->format, r, g, b)) < 0) {
         cout << endl << " ERROR: Couldn't set ColorKey + RLE for "
              << filename << ": " << SDL_GetError() << endl;
         return false;
     }
 
     SDL_Surface *temp = SDL_DisplayFormat(m_picture);
+
     if(!temp) {
         cout << endl << " ERROR: Couldn't convert "
              << filename << " to the display's pixel format: " << SDL_GetError()
@@ -801,7 +913,7 @@ bool gfxSprite::init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b, boo
 
 bool gfxSprite::init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b, Uint8 a, bool fUseAccel)
 {
-    cout << "Loading sprite " << filename << " ...";
+    cout << "Loading sprite (mode 2) " << filename << " ...";
 
     if(m_picture) {
         SDL_FreeSurface(m_picture);
@@ -810,26 +922,31 @@ bool gfxSprite::init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b, Uin
 
     // Load the BMP file into a surface
     m_picture = IMG_Load(filename.c_str());
-
     if (!m_picture) {
         cout << endl << " ERROR: Couldn't load "
              << filename << ": " << SDL_GetError() << endl;
         return false;
     }
 
-    if( SDL_SetColorKey(m_picture, SDL_SRCCOLORKEY | (fUseAccel ? SDL_RLEACCEL : 0), SDL_MapRGB(m_picture->format, r, g, b)) < 0) {
+    if( SDL_SETCOLORKEY(m_picture, fUseAccel ? SDL_TRUE : SDL_FALSE, SDL_MapRGB(m_picture->format, r, g, b)) < 0) {
         cout << endl << " ERROR: Couldn't set ColorKey + RLE for "
              << filename << ": " << SDL_GetError() << endl;
         return false;
     }
 
-    if( (SDL_SetAlpha(m_picture, SDL_SRCALPHA | (fUseAccel ? SDL_RLEACCEL : 0), a)) < 0) {
+    if( (SDL_SETALPHABYTE(m_picture, fUseAccel ? SDL_TRUE : SDL_FALSE, a)) < 0) {
         cout << endl << " ERROR: Couldn't set per-surface alpha on "
              << filename << ": " << SDL_GetError() << endl;
         return false;
     }
 
+#ifdef USE_SDL2
+    printf("%d\n", screen->format);
+    SDL_Surface *temp = SDL_DisplayFormatAlpha(m_picture, screen);
+#else
     SDL_Surface *temp = SDL_DisplayFormatAlpha(m_picture);
+#endif
+
     if(!temp) {
         cout << endl << " ERROR: Couldn't convert "
              << filename << " to the display's pixel format: " << SDL_GetError()
@@ -848,7 +965,7 @@ bool gfxSprite::init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b, Uin
 
 bool gfxSprite::init(const std::string& filename)
 {
-    cout << "loading sprite " << filename << "...";
+    cout << "loading sprite (mode 3) " << filename << "...";
 
     if(m_picture) {
         SDL_FreeSurface(m_picture);
@@ -865,6 +982,7 @@ bool gfxSprite::init(const std::string& filename)
     }
 
     SDL_Surface *temp = SDL_DisplayFormat(m_picture);
+
     if(!temp) {
         cout << endl << " ERROR: Couldn't convert "
              << filename << " to the display's pixel format: " << SDL_GetError()
@@ -886,7 +1004,6 @@ bool gfxSprite::init(const std::string& filename)
     cout << "done" << endl;
     return true;
 }
-
 
 bool gfxSprite::draw(short x, short y)
 {
@@ -992,7 +1109,7 @@ bool gfxSprite::drawStretch(short x, short y, short w, short h, short srcx, shor
 
     // Looks like SoftStretch doesn't respect transparent colors
     // I need to look into the actual SDL code to see if I can fix this
-    if(SDL_SoftStretch(m_picture, &m_srcrect, blitdest, &m_bltrect) < 0) {
+    if(SDL_SCALEBLIT(m_picture, &m_srcrect, blitdest, &m_bltrect) < 0) {
         fprintf(stderr, "SDL_SoftStretch error: %s\n", SDL_GetError());
         return false;
     }
@@ -1002,7 +1119,9 @@ bool gfxSprite::drawStretch(short x, short y, short w, short h, short srcx, shor
 
 void gfxSprite::setalpha(Uint8 alpha)
 {
-    if( (SDL_SetAlpha(m_picture, SDL_SRCALPHA | SDL_RLEACCEL, alpha)) < 0) {
+    assert(m_picture != NULL);
+
+    if( (SDL_SETALPHABYTE(m_picture, SDL_TRUE, alpha)) < 0) {
         printf("\n ERROR: couldn't set alpha on sprite: %s\n", SDL_GetError());
     }
 }
@@ -1122,7 +1241,7 @@ void gfxFont::drawf(int x, int y, const char *s, ...)
 
 void gfxFont::setalpha(Uint8 alpha)
 {
-    if( (SDL_SetAlpha(m_font->Surface, SDL_SRCALPHA | SDL_RLEACCEL, alpha)) < 0) {
+    if( (SDL_SETALPHABYTE(m_font->Surface, SDL_TRUE, alpha)) < 0) {
         printf("\n ERROR: couldn't set alpha on sprite: %s\n", SDL_GetError());
     }
 }

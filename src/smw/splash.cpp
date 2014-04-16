@@ -354,7 +354,14 @@ bool LoadAndSplashScreen()
                         } */
         }
 
+#ifdef USE_SDL2
+        SDL_UpdateTexture(screenAsTexture, NULL, screen->pixels, screen->pitch);
+        SDL_RenderClear(renderer);
+        SDL_RenderCopy(renderer, screenAsTexture, NULL, NULL);
+        SDL_RenderPresent(renderer);
+#else
         SDL_Flip(screen);
+#endif
 
         if(state == 7) {
 			// load initial coin sound

@@ -2,17 +2,26 @@
 
 bool NetworkHandlerSDL::init_networking()
 {
+    SDL_version ver_compiled;
+    const SDL_version * ver_net_current = SDLNet_Linked_Version(); // needs const TODO: fix
+    SDL_NET_VERSION(&ver_compiled);
+    printf("[info] Initializing SDL net %d.%d.%d (compiled with %d.%d.%d) ... ",
+        ver_net_current->major, ver_net_current->minor, ver_net_current->patch,
+        ver_compiled.major, ver_compiled.minor, ver_compiled.patch);
+
     if (SDLNet_Init() < 0) {
-        fprintf(stderr, "[net][error] Couldn't initialize SDL_Net. %s\n", SDLNet_GetError());
+        fprintf(stderr, "[error][net] Couldn't initialize SDL_Net. %s\n", SDLNet_GetError());
+        printf("error: %s\n", SDLNet_GetError());
         return false;
-    }
+    } else
+        printf("ok\n");
 
     atexit(SDLNet_Quit);
 
     udpOutgoingPacket = SDLNet_AllocPacket(NET_MAX_MESSAGE_SIZE);
     udpIncomingPacket = SDLNet_AllocPacket(NET_MAX_MESSAGE_SIZE);
     if (!udpOutgoingPacket || !udpIncomingPacket) {
-        fprintf(stderr, "[net][error] Couldn't create UDP packets. %s\n", SDLNet_GetError());
+        fprintf(stderr, "[error][net] Couldn't create UDP packets. %s\n", SDLNet_GetError());
         return false;
     }
 
@@ -58,9 +67,9 @@ bool NetworkHandlerSDL::openUDPConnection(const char* hostname, const uint16_t p
     printf("Resolving %s:%d\n", hostname, port);
     if (SDLNet_ResolveHost(&serverIP, hostname, port) < 0) {
         if (serverIP.host == INADDR_NONE)
-            fprintf(stderr, "[net][error] Couldn't resolve hostname.\n");
+            fprintf(stderr, "[error][net] Couldn't resolve hostname.\n");
         else
-            fprintf(stderr, "[net][error] Error when resolving host name. %s\n", SDLNet_GetError());
+            fprintf(stderr, "[error][net] Error when resolving host name. %s\n", SDLNet_GetError());
         return false;
     }
 
@@ -68,7 +77,7 @@ bool NetworkHandlerSDL::openUDPConnection(const char* hostname, const uint16_t p
     if (!udpSocket) {
         udpSocket = SDLNet_UDP_Open(0);
         if (!udpSocket) {
-            fprintf(stderr, "[net][error] Couldn't open UDP socket. %s\n", SDLNet_GetError());
+            fprintf(stderr, "[error][net] Couldn't open UDP socket. %s\n", SDLNet_GetError());
             return false;
         }
         printf("[net] UDP open.\n");
@@ -143,9 +152,9 @@ bool NetworkHandlerSDL::openTCPConnection(const char* hostname, const uint16_t p
     printf("Resolving %s:%d\n", hostname, port);
     if (SDLNet_ResolveHost(&serverIP, hostname, port) < 0) {
         if (serverIP.host == INADDR_NONE)
-            fprintf(stderr, "[net][error] Couldn't resolve hostname.\n");
+            fprintf(stderr, "[error][net] Couldn't resolve hostname.\n");
         else
-            fprintf(stderr, "[net][error] Error when resolving host name. %s\n", SDLNet_GetError());
+            fprintf(stderr, "[error][net] Error when resolving host name. %s\n", SDLNet_GetError());
         return false;
     }
 
@@ -153,7 +162,7 @@ bool NetworkHandlerSDL::openTCPConnection(const char* hostname, const uint16_t p
     if (!tcpSocket) {
         tcpSocket = SDLNet_TCP_Open(&serverIP);
         if (!tcpSocket) {
-            fprintf(stderr, "[net][error] Couldn't open TCP socket. %s\n", SDLNet_GetError());
+            fprintf(stderr, "[error][net] Couldn't open TCP socket. %s\n", SDLNet_GetError());
             return false;
         }
         printf("[net] TCP open.\n");

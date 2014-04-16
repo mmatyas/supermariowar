@@ -26,6 +26,7 @@
 */
 
 #include "SDL.h"
+#include "sdl12wrapper.h"
 
 #include <assert.h>
 #include <stdlib.h>
@@ -96,7 +97,7 @@ SFont_Font* SFont_InitFont(SDL_Surface* Surface)
     
     pixel = GetPixel(Surface, 0, Surface->h-1);
     SDL_UnlockSurface(Surface);
-    SDL_SetColorKey(Surface, SDL_SRCCOLORKEY, pixel);
+    SDL_SETCOLORKEY(Surface, SDL_FALSE, pixel);
 
     return Font;
 }

@@ -11,7 +11,8 @@ option(DEBUG "Compile with debugging information" OFF)
 ## currently working only with 1.2
 option(USE_PNG_SAVE "Enable PNG save feature" OFF)
 
-option(USE_EMSCRIPTEN "Output ASM.JS code using emscripten" OFF)
+option(USE_EMSCRIPTEN "Output ASM.JS code using emscripten (needs SDL 2.x)" OFF)
+option(USE_SDL2_LIBS "Use SDL 2.x instead of SDL 1.x" OFF)
 
 # version number
 set(SMW_VERSION_MAJOR "2")
@@ -82,7 +83,6 @@ function(enable_precompiled_headers PRECOMPILED_HEADER SOURCE_FILE SOURCE_VARIAB
 	endif(MSVC)
 endfunction(enable_precompiled_headers)
 
-message("${CMAKE_SYSTEM_PROCESSOR}")
 if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "^arm")
 	set(_M_GENERIC 1)
 	set(_M_ARM 1)
@@ -168,21 +168,40 @@ if(WIN32)
 #	enable_precompiled_headers(Src/stdafx.h Src/stdafx.cpp SRCS)
 endif(WIN32)
 
+# emscripten uses (its own) SDL2
+if(USE_EMSCRIPTEN OR USE_SDL2_LIBS)
+	add_definitions(-DUSE_SDL2)
+endif()
+
 if(NOT USE_EMSCRIPTEN)
-	## add all SDL dependencies
-	Include(FindSDL)
-	Include(FindSDL_image)
-	Include(FindSDL_mixer)
-	Include(FindSDL_net)
+	if(USE_SDL2_LIBS)
+		INCLUDE(FindPkgConfig)
+		## add all SDL dependencies
+		## case sensitive!
+		PKG_SEARCH_MODULE ( SDL2 REQUIRED sdl2 )
+		PKG_SEARCH_MODULE ( SDL2_mixer REQUIRED SDL2_mixer )
+		PKG_SEARCH_MODULE ( SDL2_image REQUIRED SDL2_image )
+		PKG_SEARCH_MODULE ( SDL2_net REQUIRED SDL2_net )
 
-	find_package ( SDL REQUIRED )
-	find_package ( SDL_mixer REQUIRED )
-	find_package ( SDL_image REQUIRED )
-	##TODO: make this optional
-	find_package ( SDL_net REQUIRED )
+		#include_directories(${SDL2_INCLUDE_DIR})
+		#include_directories(pkg-config --cflags sdl2)
+		include_directories("/usr/include/SDL2")
+	else()
+		## add all SDL dependencies
+		Include(FindSDL)
+		Include(FindSDL_image)
+		Include(FindSDL_mixer)
+		Include(FindSDL_net)
 
-	include_directories(${SDL_INCLUDE_DIR})
-endif(NOT USE_EMSCRIPTEN)
+		find_package ( SDL REQUIRED )
+		find_package ( SDL_mixer REQUIRED )
+		find_package ( SDL_image REQUIRED )
+		##TODO: make this optional
+		find_package ( SDL_net REQUIRED )
+
+		include_directories(${SDL_INCLUDE_DIR})
+	endif()
+endif()
 
 ## the optional libpng package
 if(USE_PNG_SAVE)
@@ -335,12 +354,13 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 endif()
 
 # Dump some information
-message("    SYSTEM:      ${CMAKE_SYSTEM_NAME}")
+message("    SYSTEM:      ${CMAKE_SYSTEM_NAME} ${CMAKE_SYSTEM_PROCESSOR}")
 message("    BUILD:       ${CMAKE_BUILD_TYPE}")
 message("    CC:          ${CMAKE_C_COMPILER}")
 message("    CXX:         ${CMAKE_CXX_COMPILER}")
 message("    C_FLAGS:     ${CMAKE_C_FLAGS}")
 message("    CXX_FLAGS:   ${CMAKE_CXX_FLAGS}")
+message("    SDL_LOC:     ${SDL2_INCLUDE_DIR}")
 
 
 ## Here the actual magic happens

@@ -1,6 +1,9 @@
 #include "global.h"
 
-#include "savepng.h"
+// this function was added to SDL2
+#ifndef USE_SDL2
+    #include "savepng.h"
+#endif
 
 #if defined(__MACOSX__)
 #include <sys/stat.h>

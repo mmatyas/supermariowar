@@ -12,6 +12,13 @@ endif(DEBUG)
 
 add_executable(smw ${COMMON_SRCS} ${SMW_SRCS} ../common/global.h)
 
-target_link_libraries(smw ${CMAKE_THREAD_LIBS_INIT})
+# emscripten uses (its own) SDL2
+if(NOT USE_EMSCRIPTEN)
+	target_link_libraries(smw ${CMAKE_THREAD_LIBS_INIT})
 
-target_link_libraries(smw ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLIMAGE_LIBRARY} ${SDLNET_LIBRARY} SDLmain)
+	if(USE_SDL2_LIBS)
+		target_link_libraries(smw SDL2 SDL2_mixer SDL2_image SDL2_net SDL2main)
+	else()
+		target_link_libraries(smw ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLIMAGE_LIBRARY} ${SDLNET_LIBRARY} SDLmain)
+	endif()
+endif()

@@ -22,6 +22,8 @@ using std::endl;
 #endif
 #endif
 
+#include "sdl12wrapper.h"
+
 #define fopen(f,m) fopen(f.c_str(),m)
 
 extern gfxSprite spr_frontmap[2];
@@ -1911,6 +1913,10 @@ SDL_Surface * CMap::createThumbnailSurface(bool fUseClassicPack)
     }
 
     SDL_Surface * temp = IMG_Load(path.c_str());
+    if (!temp) {
+        printf("ERROR: Couldn't load thumbnail background: %s\n", IMG_GetError());
+        return NULL;
+    }
 
     SDL_Surface * sBackground = SDL_DisplayFormat(temp);
     if(!sBackground) {
@@ -1923,7 +1929,7 @@ SDL_Surface * CMap::createThumbnailSurface(bool fUseClassicPack)
 	SDL_Rect srcRectBackground = {0, 0, smw->ScreenWidth, smw->ScreenHeight};
     SDL_Rect dstRectBackground = {0, 0, 160, 120};
 
-    if(SDL_SoftStretch(sBackground, &srcRectBackground, sThumbnail, &dstRectBackground) < 0) {
+    if(SDL_SCALEBLIT(sBackground, &srcRectBackground, sThumbnail, &dstRectBackground) < 0) {
         fprintf(stderr, "SDL_SoftStretch error: %s\n", SDL_GetError());
         return NULL;
     }
@@ -2402,7 +2408,7 @@ void CMap::preDrawPreviewBackground(gfxSprite * background, SDL_Surface * target
         dstrect.h = smw->ScreenHeight/2;
     }
 
-    if(SDL_SoftStretch(background->getSurface(), &srcrect, targetSurface, &dstrect) < 0) {
+    if(SDL_SCALEBLIT(background->getSurface(), &srcrect, targetSurface, &dstrect) < 0) {
         fprintf(stderr, "SDL_SoftStretch error: %s\n", SDL_GetError());
         return;
     }
@@ -2416,7 +2422,7 @@ void CMap::preDrawPreviewBlocks(SDL_Surface * targetSurface, bool fThumbnail)
 {
     if(!fThumbnail) {
         SDL_FillRect(targetSurface, NULL, SDL_MapRGB(targetSurface->format, 255, 0, 255));
-        SDL_SetColorKey(targetSurface, SDL_SRCCOLORKEY, SDL_MapRGB(targetSurface->format, 255, 0, 255));
+        SDL_SETCOLORKEY(targetSurface, SDL_FALSE, SDL_MapRGB(targetSurface->format, 255, 0, 255));
         SDL_Delay(10);
     }
 
@@ -2428,7 +2434,7 @@ void CMap::preDrawPreviewForeground(SDL_Surface * targetSurface, bool fThumbnail
 {
     if(!fThumbnail) {
         SDL_FillRect(targetSurface, NULL, SDL_MapRGB(targetSurface->format, 255, 0, 255));
-        SDL_SetColorKey(targetSurface, SDL_SRCCOLORKEY, SDL_MapRGB(targetSurface->format, 255, 0, 255));
+        SDL_SETCOLORKEY(targetSurface, SDL_FALSE, SDL_MapRGB(targetSurface->format, 255, 0, 255));
         SDL_Delay(10);
     }
 
@@ -2578,7 +2584,7 @@ void CMap::predrawbackground(gfxSprite &background, gfxSprite &mapspr)
 void CMap::predrawforeground(gfxSprite &foregroundspr)
 {
     SDL_FillRect(foregroundspr.getSurface(), NULL, SDL_MapRGB(foregroundspr.getSurface()->format, 255, 0, 255));
-    SDL_SetColorKey(foregroundspr.getSurface(), SDL_SRCCOLORKEY, SDL_MapRGB(foregroundspr.getSurface()->format, 255, 0, 255));
+    SDL_SETCOLORKEY(foregroundspr.getSurface(), SDL_FALSE, SDL_MapRGB(foregroundspr.getSurface()->format, 255, 0, 255));
 
     draw(foregroundspr.getSurface(), 2);
     draw(foregroundspr.getSurface(), 3);

@@ -3487,8 +3487,15 @@ void Menu::RunMenu()
             rm->menu_font_small.drawRightJustified(635, 5, "Recording...");
 #endif
 
+#ifdef USE_SDL2
+        SDL_UpdateTexture(screenAsTexture, NULL, screen->pixels, screen->pitch);
+        SDL_RenderClear(renderer);
+        SDL_RenderCopy(renderer, screenAsTexture, NULL, NULL);
+        SDL_RenderPresent(renderer);
+#else
         //double buffering -> flip buffers
         SDL_Flip(screen);
+#endif
 
         flipfps = 1000.0f / (float)ticks;
 
