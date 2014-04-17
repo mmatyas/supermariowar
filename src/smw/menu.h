@@ -453,7 +453,8 @@ class Menu
 		UI_Menu mNetNewLevel;
 
 		MI_ImageSelectField * miNetNewLevelModeField;
-		//MI_SelectField * miNetNewLevelGoalField[22];
+		MI_SelectField * miNetNewLevelGoalField[22];
+		MI_MapField * miNetNewLevelMapField;
 		MI_Button * miNetNewLevelContinueButton;
 
 		MI_Image * miNetNewLevelLeftHeaderBar;
