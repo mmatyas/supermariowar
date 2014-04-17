@@ -360,7 +360,6 @@ message("    CC:          ${CMAKE_C_COMPILER}")
 message("    CXX:         ${CMAKE_CXX_COMPILER}")
 message("    C_FLAGS:     ${CMAKE_C_FLAGS}")
 message("    CXX_FLAGS:   ${CMAKE_CXX_FLAGS}")
-message("    SDL_LOC:     ${SDL2_INCLUDE_DIR}")
 
 
 ## Here the actual magic happens
