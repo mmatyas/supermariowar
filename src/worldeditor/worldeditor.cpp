@@ -433,12 +433,8 @@ void SetStageMode(short iIndex, const char * szModeName, const char * szGoalName
 //main main main
 int main(int argc, char *argv[])
 {
-	if (argc < 2) {
-		fprintf(stderr, "Please specify root data directory\n");
-		return -1;
-	}
-	
-	RootDataDirectory = argv[1];
+	if (argc >= 2) {
+		RootDataDirectory = argv[1];
 	
 	g_map = new CMap();
 	g_tilesetmanager = new CTilesetManager();

@@ -501,20 +501,14 @@ int CALLBACK WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine
 
     RootDataDirectory = lpCmdLine;
 
-    if (strlen(RootDataDirectory) == 0) {
-        fprintf(stderr, "Please specify root data directory\n");
-        return -1;
-    }
+    if (strlen(lpCmdLine) > 0)
+        RootDataDirectory = lpCmdLine;
 #else
 // ------ MAIN ------
 int main(int argc, char *argv[])
 {
-    if (argc < 2) {
-        fprintf(stderr, "Please specify root data directory\n");
-        return -1;
-    }
-
-    RootDataDirectory = argv[1];
+    if (argc >= 2)
+        RootDataDirectory = argv[1];
 #endif
 
 
