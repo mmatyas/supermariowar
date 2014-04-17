@@ -452,7 +452,7 @@ class Menu
 		//Multiplayer New Room Level Select Menu
 		UI_Menu mNetNewLevel;
 
-		//MI_ImageSelectField * miNetNewLevelModeField;
+		MI_ImageSelectField * miNetNewLevelModeField;
 		//MI_SelectField * miNetNewLevelGoalField[22];
 		MI_Button * miNetNewLevelContinueButton;
 

@@ -281,6 +281,17 @@ public:
         iIconOverride = iiconoverride;
     }
 
+    SF_ListItem(const SF_ListItem& other) {
+        sName = other.sName;
+
+        iValue = other.iValue;
+        sValue = other.sValue;
+        fValue = other.fValue;
+
+        fHidden = other.fHidden;
+        iIconOverride = other.iIconOverride;
+    }
+
     ~SF_ListItem() {}
 
     std::string sName;  //Display name
@@ -299,6 +310,7 @@ class MI_SelectField : public UI_Control
 public:
 
     MI_SelectField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent);
+    MI_SelectField(const MI_SelectField&);
     virtual ~MI_SelectField();
 
     void SetTitle(char * name);
@@ -426,6 +438,7 @@ class MI_ImageSelectField : public MI_SelectField
 public:
 
     MI_ImageSelectField(gfxSprite * nspr, gfxSprite * nspr_image, short x, short y, const char * name, short width, short indent, short imageHeight, short imageWidth);
+    MI_ImageSelectField(const MI_ImageSelectField&);
     virtual ~MI_ImageSelectField();
 
     void Draw();

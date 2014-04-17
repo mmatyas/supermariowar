@@ -475,7 +475,7 @@ void Menu::CreateMenu()
     mNetRoom.AddNonControl(miNetRoomMessages);
     mNetRoom.AddNonControl(miNetRoomMapPlaceholder);
 
-    // if IAmTheRoomHost
+    // TODO: if IAmTheRoomHost
     // else disable
 
     mNetRoom.AddControl(miNetRoomStartButton, miNetRoomMessageField, miNetRoomMessageField, miNetRoomMessageField, miNetRoomMessageField);
@@ -1994,7 +1994,7 @@ void Menu::CreateMenu()
     miNetNewLevelContinueButton = new MI_Button(&rm->spr_selectfield, 70, 45, "Continue", 500, 0);
     miNetNewLevelContinueButton->SetCode(MENU_CODE_TO_NET_NEW_ROOM_SETTINGS_MENU);
 
-    //miNetNewLevelModeField = miModeField;
+    //miNetNewLevelModeField = new MI_ImageSelectField(*miModeField);
     /*for(short iGoalField = 0; iGoalField < GAMEMODE_LAST; iGoalField++)
         miNetNewLevelGoalField[iGoalField] = miGoalField[iGoalField];*/
 

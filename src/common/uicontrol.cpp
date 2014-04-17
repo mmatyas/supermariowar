@@ -242,6 +242,41 @@ MI_SelectField::MI_SelectField(gfxSprite * nspr, short x, short y, const char * 
     fFastScroll = false;
 }
 
+MI_SelectField::MI_SelectField(const MI_SelectField& other)
+    : UI_Control(other)
+{
+    spr = other.spr;
+    szName = new char[strlen(other.szName) + 1];
+    strcpy(szName, other.szName);
+
+    SetData(other.iValue, other.sValue, other.fValue);
+
+    for (unsigned i = 0; i < other.items.size(); i++)
+        items.push_back(new SF_ListItem(*other.items[i]));
+
+    SetIndex(other.iIndex); // sets current and index
+
+    for (unsigned i = 0; i < other.goodRandomItems.size(); i++)
+        goodRandomItems.push_back(new SF_ListItem(*other.goodRandomItems[i]));
+
+    iWidth = other.iWidth;
+    iIndent = other.iIndent;
+
+    miModifyImageLeft = new MI_Image(spr, ix + iIndent - 26, iy + 4, 32, 64, 26, 24, 4, 1, 8);
+    miModifyImageLeft->Show(false);
+
+    miModifyImageRight = new MI_Image(spr, ix + iWidth - 16, iy + 4, 32, 88, 26, 24, 4, 1, 8);
+    miModifyImageRight->Show(false);
+
+    mcItemChangedCode = other.mcItemChangedCode;
+    mcControlSelectedCode = other.mcControlSelectedCode;
+
+    fAutoAdvance = other.fAutoAdvance;
+    fNoWrap = other.fNoWrap;
+    iAdjustmentY = other.iAdjustmentY;
+    fFastScroll = other.fFastScroll;
+}
+
 MI_SelectField::~MI_SelectField()
 {
     delete [] szName;
@@ -688,6 +723,14 @@ MI_ImageSelectField::MI_ImageSelectField(gfxSprite * nspr, gfxSprite * nspr_imag
 
     iImageWidth = imageWidth;
     iImageHeight = imageHeight;
+}
+
+MI_ImageSelectField::MI_ImageSelectField(const MI_ImageSelectField& other)
+    : MI_SelectField(other)
+{
+    spr_image = other.spr_image;
+    iImageWidth = other.iImageWidth;
+    iImageHeight = other.iImageHeight;
 }
 
 MI_ImageSelectField::~MI_ImageSelectField()
