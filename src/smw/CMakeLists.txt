@@ -9,11 +9,17 @@ if(DEBUG)
 	LIST(APPEND SMW_SRCS HashTable.cpp HashTableTest.cpp)
 endif(DEBUG)
 
+if(NOT USE_EMSCRIPTEN)
+	LIST(APPEND SMW_SRCS platform/network/sdl/NetworkHandlerSDL.cpp)
+else()
+	# disable networking for now...
+	LIST(APPEND SMW_SRCS platform/network/null/NetworkHandlerNULL.cpp)
+endif()
+
 add_executable(smw ${COMMON_SRCS} ${SMW_SRCS} ../common/global.h)
 
 # emscripten uses (its own) SDL2
 if(NOT USE_EMSCRIPTEN)
-	LIST(APPEND SMW_SRCS platform/network/sdl/NetworkHandlerSDL.cpp)
 	target_link_libraries(smw ${CMAKE_THREAD_LIBS_INIT})
 
 	if(USE_SDL2_LIBS)
@@ -21,7 +27,4 @@ if(NOT USE_EMSCRIPTEN)
 	else()
 		target_link_libraries(smw ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLIMAGE_LIBRARY} ${SDLNET_LIBRARY} SDLmain)
 	endif()
-else()
-	# disable networking for now...
-	LIST(APPEND SMW_SRCS platform/network/null/NetworkHandlerNULL.cpp)
 endif()
