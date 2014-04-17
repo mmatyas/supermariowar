@@ -8,7 +8,8 @@
 // define platform guards here
 #define NetworkHandler NetworkHandlerSDL
 #include "platform/network/sdl/NetworkHandlerSDL.h"
-
+//#define NetworkHandler NetworkHandlerNULL
+//#include "platform/network/null/NetworkHandlerNULL.h"
 
 NetworkHandler networkHandler;
 Networking netplay;
