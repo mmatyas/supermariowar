@@ -8,7 +8,10 @@ using std::cout;
 using std::endl;
 
 #ifdef PNG_SAVE_FORMAT
-#include "savepng.h"
+    // this function was added to SDL2
+    #ifndef USE_SDL2
+        #include "savepng.h"
+    #endif
 #endif
 
 #ifdef _WIN32
