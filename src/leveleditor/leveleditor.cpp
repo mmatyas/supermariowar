@@ -45,7 +45,10 @@
     #endif
 #endif
 
-#define MAPTITLESTRING "SMW 1.9 Leveleditor"
+#include "SDL.h"
+#include "sdl12wrapper.h"
+
+#define MAPTITLESTRING "SMW 2.0 Leveleditor"
 
 
 enum {EDITOR_EDIT, EDITOR_TILES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_MAP, EDITOR_BLOCKS, NEW_MAP, SAVE, EDITOR_WARP, EDITOR_EYECANDY, DISPLAY_HELP, EDITOR_PLATFORM, EDITOR_TILETYPE, EDITOR_BACKGROUNDS, EDITOR_MAPITEMS, EDITOR_ANIMATION, EDITOR_PROPERTIES, EDITOR_MODEITEMS, EDITOR_MAPHAZARDS};
@@ -63,79 +66,6 @@ class EditorMapTile
 		TileType	tiletype;
 		int			item;
 };
-
-class MapPlatform
-{
-	public:
-    MapPlatform() {
-			tiles = new TilesetTile*[MAPWIDTH];
-
-			for(short i = 0; i < MAPWIDTH; i++)
-				tiles[i] = new TilesetTile[MAPHEIGHT];
-
-			preview = NULL;
-		}
-
-    ~MapPlatform() {
-			for(short i = 0; i < MAPWIDTH; i++)
-				delete [] tiles[i];
-
-			delete [] tiles;
-
-			if(preview)
-				SDL_FreeSurface(preview);
-		}
-
-    void UpdatePreview() {
-        if(!preview) {
-				preview = SDL_CreateRGBSurface(screen->flags, 160, 120, screen->format->BitsPerPixel, 0, 0, 0, 0);
-				SDL_SetColorKey(preview, SDL_SRCCOLORKEY, SDL_MapRGB(preview->format, 255, 0, 255));
-			}
-
-			SDL_FillRect(preview, NULL, SDL_MapRGB(preview->format, 255, 0, 255));
-
-        for(short iPlatformX = 0; iPlatformX < MAPWIDTH; iPlatformX++) {
-            for(short iPlatformY = 0; iPlatformY < MAPHEIGHT; iPlatformY++) {
-					TilesetTile * tile = &tiles[iPlatformX][iPlatformY];
-
-					SDL_Rect bltrect = {iPlatformX << 3, iPlatformY << 3, THUMBTILESIZE, THUMBTILESIZE};
-                if(tile->iID >= 0) {
-						SDL_BlitSurface(g_tilesetmanager->GetTileset(tile->iID)->GetSurface(2), &g_tilesetmanager->rRects[2][tile->iCol][tile->iRow], preview, &bltrect);
-                } else if(tile->iID == TILESETANIMATED) {
-						SDL_BlitSurface(spr_tileanimation[2].getSurface(), &g_tilesetmanager->rRects[2][tile->iCol << 2][tile->iRow], preview, &bltrect);
-                } else if(tile->iID == TILESETUNKNOWN) {
-						//Draw unknown tile
-						SDL_BlitSurface(spr_unknowntile[2].getSurface(), &g_tilesetmanager->rRects[2][0][0], preview, &bltrect);
-					}
-				}				
-			}
-		}
-
-		TilesetTile ** tiles;
-		TileType types[MAPWIDTH][MAPHEIGHT];
-		short iVelocity;
-		short iStartX;
-		short iStartY;
-		short iEndX;
-		short iEndY;
-		
-		short iPathType;
-
-		float fAngle;
-		float fRadiusX;
-		float fRadiusY;
-
-		short iDrawLayer;
-
-		SDL_Rect rIcon[2];
-		SDL_Surface * preview;
-};
-
-extern TileType GetIncrementedTileType(TileType type);
-
-TileType * animatedtiletypes;
-bool ReadAnimatedTileTypeFile(const char * szFile);
-bool WriteAnimatedTileTypeFile(const char * szFile);
 
 SDL_Surface		*screen;
 SDL_Surface		*blitdest;
@@ -280,6 +210,80 @@ IO_MovingObject * createpowerup(short iType, short ix, short iy, bool side, bool
     return NULL;
 }
 ///////
+
+class MapPlatform
+{
+	public:
+    MapPlatform() {
+			tiles = new TilesetTile*[MAPWIDTH];
+
+			for(short i = 0; i < MAPWIDTH; i++)
+				tiles[i] = new TilesetTile[MAPHEIGHT];
+
+			preview = NULL;
+		}
+
+    ~MapPlatform() {
+			for(short i = 0; i < MAPWIDTH; i++)
+				delete [] tiles[i];
+
+			delete [] tiles;
+
+			if(preview)
+				SDL_FreeSurface(preview);
+		}
+
+    void UpdatePreview() {
+        if(!preview) {
+				preview = SDL_CreateRGBSurface(screen->flags, 160, 120, screen->format->BitsPerPixel, 0, 0, 0, 0);
+				SDL_SetColorKey(preview, SDL_SRCCOLORKEY, SDL_MapRGB(preview->format, 255, 0, 255));
+			}
+
+			SDL_FillRect(preview, NULL, SDL_MapRGB(preview->format, 255, 0, 255));
+
+        for(short iPlatformX = 0; iPlatformX < MAPWIDTH; iPlatformX++) {
+            for(short iPlatformY = 0; iPlatformY < MAPHEIGHT; iPlatformY++) {
+					TilesetTile * tile = &tiles[iPlatformX][iPlatformY];
+
+					SDL_Rect bltrect = {iPlatformX << 3, iPlatformY << 3, THUMBTILESIZE, THUMBTILESIZE};
+                if(tile->iID >= 0) {
+						SDL_BlitSurface(g_tilesetmanager->GetTileset(tile->iID)->GetSurface(2), &g_tilesetmanager->rRects[2][tile->iCol][tile->iRow], preview, &bltrect);
+                } else if(tile->iID == TILESETANIMATED) {
+						SDL_BlitSurface(spr_tileanimation[2].getSurface(), &g_tilesetmanager->rRects[2][tile->iCol << 2][tile->iRow], preview, &bltrect);
+                } else if(tile->iID == TILESETUNKNOWN) {
+						//Draw unknown tile
+						SDL_BlitSurface(spr_unknowntile[2].getSurface(), &g_tilesetmanager->rRects[2][0][0], preview, &bltrect);
+					}
+				}				
+			}
+		}
+
+		TilesetTile ** tiles;
+		TileType types[MAPWIDTH][MAPHEIGHT];
+		short iVelocity;
+		short iStartX;
+		short iStartY;
+		short iEndX;
+		short iEndY;
+		
+		short iPathType;
+
+		float fAngle;
+		float fRadiusX;
+		float fRadiusY;
+
+		short iDrawLayer;
+
+		SDL_Rect rIcon[2];
+		SDL_Surface * preview;
+};
+
+extern TileType GetIncrementedTileType(TileType type);
+
+TileType * animatedtiletypes;
+bool ReadAnimatedTileTypeFile(const char * szFile);
+bool WriteAnimatedTileTypeFile(const char * szFile);
+
 
 gfxSprite spr_eyecandy;
 SDL_Surface * s_platform;
