@@ -11,17 +11,29 @@ option(DEBUG "Compile with debugging information" OFF)
 ## currently working only with 1.2
 option(USE_PNG_SAVE "Enable PNG save feature" OFF)
 
-option(USE_EMSCRIPTEN "Output ASM.JS code using emscripten (needs SDL 2.x)" OFF)
-option(USE_SDL2_LIBS "Use SDL 2.x instead of SDL 1.x" OFF)
+option(USE_EMSCRIPTEN "Output asm.js code using emscripten" OFF)
+option(USE_SDL2_LIBS "Use SDL2 instead of SDL 1.x" OFF)
 
 # version number
 set(SMW_VERSION_MAJOR "2")
 set(SMW_VERSION_MINOR "0")
 set(SMW_VERSION_PATCH "0")
 
+# user settings directory
+set(userdir ".smw" CACHE STRING "User directory")
+add_definitions(-DUSER_DIR="${userdir}")
+
+# Set where the binary files will be built.  The program will not execute from
+# here.  You must run "make install" to install these to the proper location
+# as defined above.
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/Binaries)
+
+
 ########################################
 # Optional Targets
-#option(UNITTESTS "Build unitests" OFF)
+#
+
+# option(UNITTESTS "Build unittests" OFF)
 
 # Update compiler before calling project()
 if (APPLE)
@@ -47,13 +59,6 @@ else()
 	set(datadir ${CMAKE_INSTALL_PREFIX}/share/smw CACHE PATH "datadir")
 	add_definitions(-DDATA_DIR="${datadir}/")
 endif()
-set(userdir ".smw" CACHE STRING "User directory")
-add_definitions(-DUSER_DIR="${userdir}")
-
-# Set where the binary files will be built.  The program will not execute from
-# here.  You must run "make install" to install these to the proper location
-# as defined above.
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/Binaries)
 
 # Precompiled header support for MSVC:
 # Call this after setting the source list (and don't add the source file used
@@ -98,6 +103,11 @@ if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "^arm")
 	add_definitions(-D_M_GENERIC=1)
 endif()
 
+
+########################################
+# Compiler flags
+#
+
 # Debugging CFLAGS.  Turn optimizations off; turn debugging symbols on.
 if(DEBUG)
   add_definitions(-DDEBUG -D_DEBUG -DPNG_DEBUG=1)
@@ -105,15 +115,15 @@ if(DEBUG)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -g -O0")
 else()
   add_definitions(-DNDEBUG)
-#  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
-#  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -O3")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -O3")
 endif(DEBUG)
 
 # Set these next two lines to test generic
 #set(_M_GENERIC 1)
 #add_definitions(-D_M_GENERIC=1)
 # Various compile flags
-if(NOT _M_GENERIC)
+if(NOT _M_GENERIC AND NOT USE_EMSCRIPTEN)
 	add_definitions(-msse2)
 endif()
 
@@ -157,22 +167,22 @@ add_definitions(-D_GNU_SOURCE=1 -D_REENTRANT)
 
 ##TODO: clean code to not need this anymore
 #add_definitions(-Wno-shadow)
-
-########################################
-# our relevant source files
-#
 #add_definitions(-std=gnu++0x)
 
+
+########################################
+# Dependencies
+#
 
 if(WIN32)
 #	enable_precompiled_headers(Src/stdafx.h Src/stdafx.cpp SRCS)
 endif(WIN32)
 
-# emscripten uses (its own) SDL2
-if(USE_EMSCRIPTEN OR USE_SDL2_LIBS)
+if(USE_SDL2_LIBS)
 	add_definitions(-DUSE_SDL2)
 endif()
 
+# emscripten uses its own SDL, no need to include or link
 if(NOT USE_EMSCRIPTEN)
 	if(USE_SDL2_LIBS)
 		INCLUDE(FindPkgConfig)
@@ -196,7 +206,6 @@ if(NOT USE_EMSCRIPTEN)
 		find_package ( SDL REQUIRED )
 		find_package ( SDL_mixer REQUIRED )
 		find_package ( SDL_image REQUIRED )
-		##TODO: make this optional
 		find_package ( SDL_net REQUIRED )
 
 		include_directories(${SDL_INCLUDE_DIR})
@@ -205,7 +214,7 @@ endif()
 
 ## the optional libpng package
 if(USE_PNG_SAVE)
-	Include(FindPNG)
+	include(FindPNG)
 	add_definitions(-DPNG_SAVE_FORMAT)
 	find_package(PNG REQUIRED)
 	include_directories(${PNG_INCLUDE_DIR})
@@ -362,6 +371,10 @@ message("    C_FLAGS:     ${CMAKE_C_FLAGS}")
 message("    CXX_FLAGS:   ${CMAKE_CXX_FLAGS}")
 
 
+########################################
+# Project files
+#
+
 ## Here the actual magic happens
 include_directories(src/common)
 
@@ -405,4 +418,4 @@ list(APPEND CPACK_SOURCE_IGNORE_FILES "${CMAKE_BINARY_DIR}")
 
 # CPack must be included after the CPACK_* variables are set in order for those
 # variables to take effect.
-Include(CPack)
+include(CPack)
