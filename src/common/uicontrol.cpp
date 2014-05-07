@@ -1562,7 +1562,7 @@ short number_key_map[10] = {41, 33, 64, 35, 36, 37, 94, 38, 42, 40};
 
 MenuCodeEnum MI_TextField::SendInput(CPlayerInput * playerInput)
 {
-#ifdef USE_SDL2
+#if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
     const Uint8 * keystate = SDL_GetKeyboardState(NULL);
 #else
     Uint8 * keystate = SDL_GetKeyState(NULL);

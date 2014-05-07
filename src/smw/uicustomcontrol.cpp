@@ -52,7 +52,9 @@ MenuCodeEnum MI_InputControlField::SendInput(CPlayerInput *)
     bool done = false;
 
     while (!done) {
+        #ifndef __EMSCRIPTEN__
         SDL_WaitEvent(&event);
+        #endif
 
         /*
         if(event.type == SDL_KEYDOWN)
@@ -320,7 +322,7 @@ MI_InputControlContainer::MI_InputControlContainer(gfxSprite * spr_button, short
 
 #else
     for(short iJoystick = 0; iJoystick < joystickcount; iJoystick++) {
-    #ifdef USE_SDL2
+    #if defined(USE_SDL2) && !defined(__EMSCRIPTEN__)
         miDeviceSelectField->Add(SDL_JoystickNameForIndex(iJoystick), iJoystick, "", false, false);
     #else
         miDeviceSelectField->Add(SDL_JoystickName(iJoystick), iJoystick, "", false, false);

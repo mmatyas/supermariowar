@@ -101,8 +101,24 @@
     inline int SDL_SCALEBLIT(SDL_Surface* src, SDL_Rect* srcrect,
         SDL_Surface* dst, SDL_Rect* dstrect)
     {
+        #ifndef __EMSCRIPTEN__
         return SDL_SoftStretch(src, srcrect, dst, dstrect);
+        #else
+        return SDL_BlitSurface(src, srcrect, dst, dstrect);
+        #endif
     }
+
+    #ifdef __EMSCRIPTEN__
+    inline SDL_Surface * SDL_DisplayFormat(SDL_Surface *surface)
+    {
+        SDL_Surface * temp = SDL_CreateRGBSurface(SDL_SWSURFACE | SDL_SRCALPHA,
+            surface->w, surface->h, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
+
+        SDL_BlitSurface(temp, NULL, surface, NULL);
+        return temp;
+    }
+    #endif
+
 #endif
 
 

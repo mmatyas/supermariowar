@@ -6,10 +6,13 @@
 #include "network/NetworkProtocolPackages.h"
 
 // define platform guards here
-#define NetworkHandler NetworkHandlerSDL
-#include "platform/network/sdl/NetworkHandlerSDL.h"
-//#define NetworkHandler NetworkHandlerNULL
-//#include "platform/network/null/NetworkHandlerNULL.h"
+#ifndef __EMSCRIPTEN__
+    #define NetworkHandler NetworkHandlerSDL
+    #include "platform/network/sdl/NetworkHandlerSDL.h"
+#else
+    #define NetworkHandler NetworkHandlerNULL
+    #include "platform/network/null/NetworkHandlerNULL.h"
+#endif
 
 NetworkHandler networkHandler;
 Networking netplay;

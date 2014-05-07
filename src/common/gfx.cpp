@@ -75,12 +75,14 @@ bool gfx_init(int w, int h, bool fullscreen)
     atexit(SDL_Quit);
 
 
+#ifndef __EMSCRIPTEN__
     // show SDL_image version
     const SDL_version * ver_img_current = IMG_Linked_Version();
     SDL_IMAGE_VERSION(&ver_compiled);
     printf("[info] Initializing SDL image %d.%d.%d (compiled with %d.%d.%d) ... ",
         ver_img_current->major, ver_img_current->minor, ver_img_current->patch,
         ver_compiled.major, ver_compiled.minor, ver_compiled.patch);
+#endif
 
     // init SDL_image
     int img_flags = IMG_INIT_JPG | IMG_INIT_PNG;
@@ -90,8 +92,10 @@ bool gfx_init(int w, int h, bool fullscreen)
     } else
         printf("ok\n");
 
+#ifndef __EMSCRIPTEN__
     // Clean up on exit
     atexit(IMG_Quit);
+#endif
 
 
 #ifdef USE_SDL2
