@@ -69,4 +69,5 @@ void CGame::Go()
 
 CGame::~CGame(void)
 {
+    delete rng;
 }
