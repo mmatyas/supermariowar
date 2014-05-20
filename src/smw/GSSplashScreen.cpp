@@ -9,8 +9,13 @@
 #endif
 #endif
 
+#include "GSSplashScreen.h"
+
 #include "global.h"
 #include "time.h"
+#include "menu.h"
+#include "GSGameplay.h"
+
 #include <string>
 #include <iostream>
 using std::cout;
@@ -28,6 +33,23 @@ extern CEyecandyContainer eyecandy[3];
 // THE LOAD UP SEQUENCE + SPLASH SCREEN
 //-----------------------------------------------------------------------------
 //that's a bunch of ugly code, maybe i'll throw it out again
+
+SplashScreenState::SplashScreenState()
+{
+    alpha = 255;
+    state = 7;
+    timer = 120;
+}
+
+SplashScreenState& SplashScreenState::instance() {
+    static SplashScreenState ss;
+    return ss;
+}
+
+void SplashScreenState::onLeaveState()
+{
+    delete menu_credits;
+}
 
 bool LoadStartGraphics()
 {
@@ -127,23 +149,17 @@ bool LoadGameSounds()
     return true;
 }
 
-bool LoadAndSplashScreen()
+bool SplashScreenState::init()
 {
-    LoadStartGraphics();
+    if (!LoadStartGraphics())
+        return false;
 
-    gfxSprite menu_dpi_logo;
-//	gfx_loadimagenocolorkey(&rm->menu_dpi_logo, convertPath("gfx/packs/menu/splash_72dpi.png", menugraphicspacklist->current_name()));
+//  gfx_loadimagenocolorkey(&rm->menu_dpi_logo, convertPath("gfx/packs/menu/splash_72dpi.png", menugraphicspacklist->current_name()));
+//  gfx_loadimagenocolorkey(&rm->menu_contest_winners, convertPath("gfx/packs/menu/splash_contest_winners.png", menugraphicspacklist->current_name()));
 
-    gfxSprite menu_contest_winners;
-//	gfx_loadimagenocolorkey(&rm->menu_contest_winners, convertPath("gfx/packs/menu/splash_contest_winners.png", menugraphicspacklist->current_name()));
-
-    gfxSprite menu_credits;
-    gfx_loadimage(&menu_credits, convertPath("gfx/packs/menu/splash_credits.png", menugraphicspacklist->current_name()), false);
-
-    int alpha = 255;
-    int state = 7;
-    int timer = 120;
-
+    menu_credits = new gfxSprite();
+    gfx_loadimage(menu_credits, convertPath("gfx/packs/menu/splash_credits.png", menugraphicspacklist->current_name()), false);
+    
 //	const char * contributors[] = {
 //	"no_shorty", "redfalcon", "no_human", "dschingis", "funvill",
 //	"matsche", "aeroflare", "Tymoe", "David Olofson", "scoti",
@@ -191,219 +207,199 @@ bool LoadAndSplashScreen()
 //	}
 //
 
-    SDL_Event event;
+    return true;
+}
 
-    while (true) {
-        int framestart = SDL_GetTicks();
+void SplashScreenState::update()
+{
+    game_values.playerInput.ClearPressedKeys(1);
 
-        game_values.playerInput.ClearPressedKeys(1);
+    // TODO: move this out of this method maybe
 
-        while(SDL_PollEvent(&event)) {
-            switch(event.type) {
-
-#ifndef _XBOX
-            case SDL_QUIT: {
-                return false;
-            }
-            break;
-#endif
-            case SDL_KEYDOWN: {
-                switch(event.key.keysym.sym) {
-                case SDLK_RETURN:
-                    if(event.key.keysym.mod & (KMOD_LALT | KMOD_RALT)) {
-#ifndef _XBOX
-                        game_values.fullscreen = !game_values.fullscreen;
-                        gfx_setresolution(smw->ScreenWidth, smw->ScreenHeight, game_values.fullscreen);
-                        blitdest = screen;
-#endif
-                    }
-                    break;
+    while(SDL_PollEvent(&loop_event)) {
+        switch(loop_event.type) {
 
 #ifndef _XBOX
-                case SDLK_F4:
-                    if(event.key.keysym.mod & (KMOD_LALT | KMOD_RALT))
-                        return false;
-                    break;
+        case SDL_QUIT: {
+            game_values.gamestate = GS_QUIT;
+            return;
+        }
+        break;
 #endif
-
-                default:
-                    break;
+        case SDL_KEYDOWN: {
+            switch(loop_event.key.keysym.sym) {
+            case SDLK_RETURN:
+                if(loop_event.key.keysym.mod & (KMOD_LALT | KMOD_RALT)) {
+#ifndef _XBOX
+                    game_values.fullscreen = !game_values.fullscreen;
+                    gfx_setresolution(smw->ScreenWidth, smw->ScreenHeight, game_values.fullscreen);
+                    blitdest = screen;
+#endif
                 }
                 break;
-            }
+
+#ifndef _XBOX
+            case SDLK_F4:
+                if(loop_event.key.keysym.mod & (KMOD_LALT | KMOD_RALT))
+                    game_values.gamestate = GS_QUIT;
+                    return;
+                break;
+#endif
 
             default:
                 break;
             }
-
-            game_values.playerInput.Update(event, 1);
+            break;
         }
 
-        for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
-            if(game_values.playerInput.outputControls[iPlayer].menu_select.fPressed ||
-                    game_values.playerInput.outputControls[iPlayer].menu_cancel.fPressed ||
-                    game_values.playerInput.outputControls[iPlayer].menu_random.fPressed) {
-                //if(state <= 6)
-                //{
-                //	state = 6;
-                //	alpha = 255;
-                //}
-                //else
-                {
-                    blitdest = rm->menu_backdrop.getSurface();
-                    rm->menu_shade.setalpha(smw->MenuTransparency);
-                    rm->menu_shade.draw(0, 0);
-                    blitdest = screen;
-
-                    g_fLoadMessages = false;
-                    eyecandy[2].clean();
-
-                    game_values.playerInput.ResetKeys();
-
-                    return true;
-                }
-            }
+        default:
+            break;
         }
 
-        //if(state == 0 || state == 3)
-        //{
-        //	alpha += 4;
-        //	if(alpha >= 255)
-        //	{
-        //		alpha = 255;
-        //		state++;
-        //	}
-        //}
-        //else if(state == 1 || state == 4)
-        //{
-        //	if(--timer <= 0)
-        //	{
-        //		timer = 120;
-        //		state++;
-        //	}
-        //}
-        //else if(state == 2 || state == 5)
-        //{
-        //	alpha -= 4;
-        //	if(alpha <= 0)
-        //	{
-        //		alpha = 0;
-        //		state++;
-        //	}
-        //}
-        //else if(state == 6)
-        //{
-        //	alpha += 5;
-        //	if(alpha >= 255)
-        //	{
-        //		alpha = 255;
-        //		state++;
-        //	}
-        //}
-
-        SDL_FillRect(screen, NULL, 0x0);
-
-        //if(state == 0 || state == 1 || state == 2)
-        //{
-        //	menu_dpi_logo.setalpha((Uint8)alpha);
-        //	menu_dpi_logo.draw(195, 186);
-        //}
-        //else if(state == 3 || state == 4 || state == 5)
-        //{
-        //	menu_contest_winners.setalpha((Uint8)alpha);
-        //	menu_contest_winners.draw(0, 0);
-        //}
-        //else
-        if(state == 6 || state == 7 || state == 8) {
-            rm->menu_backdrop.setalpha((Uint8)alpha);
-            rm->menu_backdrop.draw(0, 0);
-
-            rm->menu_smw.setalpha((Uint8)alpha);
-			rm->menu_smw.draw(smw->ScreenWidth/2 - ((short)rm->menu_smw.getWidth() >> 1), 30);	//smw logo
-
-            rm->menu_version.setalpha((Uint8)alpha);
-            rm->menu_version.draw(570, 10);	//smw logo
-
-            rm->menu_font_large.setalpha((Uint8)alpha);
-			rm->menu_font_large.drawRightJustified(smw->ScreenWidth * 0.98f, 45, "WIP");
-
-            menu_credits.setalpha((Uint8)alpha);
-            menu_credits.draw(227, 200);
-        }
-
-        if(state == 7) {
-//            _load_drawmsg("Loading...");
-            rm->menu_font_large.drawCentered(smw->ScreenWidth/2, smw->ScreenHeight * 0.875f, "Loading...");
-        } else if(state == 8) {
-//            _load_drawmsg("Press Any Key To Continue");
-        	rm->menu_font_large.drawCentered(smw->ScreenWidth/2, smw->ScreenHeight * 0.875f, "Press Any Key To Continue");
-
-            eyecandy[2].cleandeadobjects();
-            eyecandy[2].update();
-            eyecandy[2].draw();
-
-            /*			static int timer = 60;
-                        static int index = 0;
-                        if(++timer >= 60)
-                        {
-                            eyecandy[2].add(new EC_GravText(&rm->menu_font_large, smw->ScreenWidth/2, smw->ScreenHeight, contributors[contributorOrder[index]], -8.2f));
-                            timer = 0;
-
-                            if(++index >= NUM_CONTRIBUTORS)
-                                index = 0;
-                        } */
-        }
-
-#ifdef USE_SDL2
-        SDL_UpdateTexture(screenAsTexture, NULL, screen->pixels, screen->pitch);
-        SDL_RenderClear(renderer);
-        SDL_RenderCopy(renderer, screenAsTexture, NULL, NULL);
-        SDL_RenderPresent(renderer);
-#else
-        SDL_Flip(screen);
-#endif
-
-        if(state == 7) {
-			// load initial coin sound
-			backgroundmusic[2].load(musiclist->GetMusic(1));
-
-            rm->LoadAllGraphics();
-
-			LoadGameSounds();
-
-			if(!game_values.soundcapable) {
-				game_values.sound = false;
-				game_values.music = false;
-				game_values.soundvolume = 0;
-				game_values.musicvolume = 0;
-			}
-
-			//Read the map filter lists
-			maplist->ReadFilters();
-			maplist->ApplyFilters(game_values.pfFilters);
-
-			ifSoundOnPlay(sfx_coin);
-
-
-            state++;
-        }
-
-        //Sleep for time just under what we need
-        int delay = WAITTIME - SDL_GetTicks() + framestart - 2;
-
-        if(delay > 0) {
-            if(delay > WAITTIME)
-                delay = WAITTIME;
-
-            SDL_Delay(delay);
-        }
-
-        //Fine tune wait here
-        while(SDL_GetTicks() - framestart < WAITTIME)
-            SDL_Delay(0);   //keep framerate constant at 1000/WAITTIME fps
-
+        game_values.playerInput.Update(loop_event, 1);
     }
 
-    return true;
-}
+    for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
+        if (game_values.playerInput.outputControls[iPlayer].menu_select.fPressed ||
+            game_values.playerInput.outputControls[iPlayer].menu_cancel.fPressed ||
+            game_values.playerInput.outputControls[iPlayer].menu_random.fPressed) {
+            //if(state <= 6)
+            //{
+            //  state = 6;
+            //  alpha = 255;
+            //}
+            //else
+            {
+                blitdest = rm->menu_backdrop.getSurface();
+                rm->menu_shade.setalpha(smw->MenuTransparency);
+                rm->menu_shade.draw(0, 0);
+                blitdest = screen;
 
+                g_fLoadMessages = false;
+                eyecandy[2].clean();
+
+                game_values.playerInput.ResetKeys();
+                game_values.gamestate = GS_MENU;
+
+                Menu::instance().init();
+                GameplayState::instance().init();
+                GameStateManager::instance().changeStateTo(&Menu::instance());
+                return;
+            }
+        }
+    }
+
+    //if(state == 0 || state == 3)
+    //{
+    //  alpha += 4;
+    //  if(alpha >= 255)
+    //  {
+    //      alpha = 255;
+    //      state++;
+    //  }
+    //}
+    //else if(state == 1 || state == 4)
+    //{
+    //  if(--timer <= 0)
+    //  {
+    //      timer = 120;
+    //      state++;
+    //  }
+    //}
+    //else if(state == 2 || state == 5)
+    //{
+    //  alpha -= 4;
+    //  if(alpha <= 0)
+    //  {
+    //      alpha = 0;
+    //      state++;
+    //  }
+    //}
+    //else if(state == 6)
+    //{
+    //  alpha += 5;
+    //  if(alpha >= 255)
+    //  {
+    //      alpha = 255;
+    //      state++;
+    //  }
+    //}
+
+    SDL_FillRect(screen, NULL, 0x0);
+
+    //if(state == 0 || state == 1 || state == 2)
+    //{
+    //  menu_dpi_logo.setalpha((Uint8)alpha);
+    //  menu_dpi_logo.draw(195, 186);
+    //}
+    //else if(state == 3 || state == 4 || state == 5)
+    //{
+    //  menu_contest_winners.setalpha((Uint8)alpha);
+    //  menu_contest_winners.draw(0, 0);
+    //}
+    //else
+    if(state == 6 || state == 7 || state == 8) {
+        rm->menu_backdrop.setalpha((Uint8)alpha);
+        rm->menu_backdrop.draw(0, 0);
+
+        rm->menu_smw.setalpha((Uint8)alpha);
+        rm->menu_smw.draw(smw->ScreenWidth/2 - ((short)rm->menu_smw.getWidth() >> 1), 30);  //smw logo
+
+        rm->menu_version.setalpha((Uint8)alpha);
+        rm->menu_version.draw(570, 10); //smw logo
+
+        rm->menu_font_large.setalpha((Uint8)alpha);
+        rm->menu_font_large.drawRightJustified(smw->ScreenWidth * 0.98f, 45, "WIP");
+
+        menu_credits->setalpha((Uint8)alpha);
+        menu_credits->draw(227, 200);
+    }
+
+    if(state == 7) {
+//            _load_drawmsg("Loading...");
+        rm->menu_font_large.drawCentered(smw->ScreenWidth/2, smw->ScreenHeight * 0.875f, "Loading...");
+    } else if(state == 8) {
+//            _load_drawmsg("Press Any Key To Continue");
+        rm->menu_font_large.drawCentered(smw->ScreenWidth/2, smw->ScreenHeight * 0.875f, "Press Any Key To Continue");
+
+        eyecandy[2].cleandeadobjects();
+        eyecandy[2].update();
+        eyecandy[2].draw();
+
+        /*          static int timer = 60;
+                    static int index = 0;
+                    if(++timer >= 60)
+                    {
+                        eyecandy[2].add(new EC_GravText(&rm->menu_font_large, smw->ScreenWidth/2, smw->ScreenHeight, contributors[contributorOrder[index]], -8.2f));
+                        timer = 0;
+
+                        if(++index >= NUM_CONTRIBUTORS)
+                            index = 0;
+                    } */
+    }
+
+    if(state == 7) {
+        // load initial coin sound
+        backgroundmusic[2].load(musiclist->GetMusic(1));
+
+        rm->LoadAllGraphics();
+
+        LoadGameSounds();
+
+        if(!game_values.soundcapable) {
+            game_values.sound = false;
+            game_values.music = false;
+            game_values.soundvolume = 0;
+            game_values.musicvolume = 0;
+        }
+
+        //Read the map filter lists
+        maplist->ReadFilters();
+        maplist->ApplyFilters(game_values.pfFilters);
+
+        ifSoundOnPlay(sfx_coin);
+
+
+        state++;
+    }
+}
