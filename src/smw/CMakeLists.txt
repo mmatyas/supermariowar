@@ -1,8 +1,9 @@
 
-set(SMW_SRCS HashTable.cpp ai.cpp gamemodes.cpp main.cpp
-           menu.cpp object.cpp player.cpp
-           splash.cpp world.cpp uicustomcontrol.cpp
-           objectgame.cpp modeoptionsmenu.cpp objecthazard.cpp Game.cpp net.cpp
+set(SMW_SRCS ai.cpp gamemodes.cpp main.cpp menu.cpp
+           object.cpp player.cpp world.cpp uicustomcontrol.cpp
+           objectgame.cpp modeoptionsmenu.cpp objecthazard.cpp
+           Game.cpp net.cpp FPSLimiter.cpp GSSplashScreen.cpp
+           GSGameplay.cpp
 )
 
 if(DEBUG)

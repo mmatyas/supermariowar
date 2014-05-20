@@ -6,9 +6,18 @@
 #include <windows.h>
 #endif
 
-#include "path.h"
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
-extern void RunGame();
+#include "path.h"
+#include "FPSLimiter.h"
+#include "GSSplashScreen.h"
+#include "menu.h"
+
+#ifdef __EMSCRIPTEN__
+void game_frame();
+#endif
 
 CGame::CGame(char *rootDirectory)
 {
@@ -42,32 +51,60 @@ CGame::CGame(char *rootDirectory)
 	rng = new Well512RandomNumberGenerator();
 }
 
-void CGame::Go()
-{
-    g_Menu.CreateMenu();
-    g_Menu.RunMenu();
-
-    while(game_values.gamestate != GS_QUIT) {
-        switch(game_values.gamestate) {
-        case GS_START_GAME:
-        case GS_GAME:
-            RunGame();
-            break;
-
-        case GS_MENU:
-            g_Menu.RunMenu();
-            break;
-
-        case GS_START_WORLD:
-        case GS_END_GAME:
-        case GS_QUIT: // added because of warning on not handling all of enum
-            break;
-        }
-    }
-
-}
-
 CGame::~CGame(void)
 {
     delete rng;
 }
+
+void CGame::Go()
+{
+    SplashScreenState::instance().init();
+    GameStateManager::instance().currentState = &SplashScreenState::instance();
+
+
+#ifdef __EMSCRIPTEN__
+    emscripten_set_main_loop(game_frame, 60, 1);
+}
+
+void game_frame()
+#else
+    while(game_values.gamestate != GS_QUIT)
+#endif
+    {
+        FPSLimiter::get().frameStart();
+
+
+        switch(game_values.gamestate) {
+        case GS_SPLASH:
+        case GS_START_GAME:
+        case GS_GAME:
+        case GS_MENU:
+            GameStateManager::instance().currentState->update();
+            break;
+
+        case GS_QUIT:
+            return;
+            break;
+
+        default:
+            break;
+        }
+
+
+        FPSLimiter::get().beforeFlip();
+
+#ifdef USE_SDL2
+        SDL_UpdateTexture(screenAsTexture, NULL, screen->pixels, screen->pitch);
+        SDL_RenderClear(renderer);
+        SDL_RenderCopy(renderer, screenAsTexture, NULL, NULL);
+        SDL_RenderPresent(renderer);
+#else
+        SDL_Flip(screen);
+#endif
+
+        FPSLimiter::get().afterFlip();
+    }
+
+#ifndef __EMSCRIPTEN__
+}
+#endif
