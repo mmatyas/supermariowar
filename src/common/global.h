@@ -427,7 +427,6 @@ struct GameModeSettings {
 //------------- data structures / selfmade include files -------------
 #include "input.h"
 #include "uimenu.h"
-#include "menu.h"
 #include "Game.h"
 #include "uicontrol.h"
 #include "MapList.h"
@@ -847,7 +846,6 @@ struct WorldMusicOverride {
 extern std::vector<MapMusicOverride*> mapmusicoverrides;
 extern std::vector<WorldMusicOverride*> worldmusicoverrides;
 
-extern Menu g_Menu;
 extern gv game_values;
 extern Networking netplay;
 

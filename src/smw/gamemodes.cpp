@@ -1,4 +1,5 @@
 #include "global.h"
+#include "menu.h"
 #include <math.h>
 
 extern	gfxFont font[3];

@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "net.h"
+#include "menu.h"
 
 #include "network/NetworkProtocolPackages.h"
 
