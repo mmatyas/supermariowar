@@ -1,6 +1,8 @@
 #ifndef __INPUT_H_
 #define __INPUT_H_
 
+#include <stdint.h>
+
 //This set of classes takes SDL input events, sees if a
 //player configured button is pressed, and sets the output
 //key structure if that button is down/pressed.

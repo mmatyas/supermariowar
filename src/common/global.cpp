@@ -414,7 +414,6 @@ const char * g_szWorldMusicCategoryNames[MAXWORLDMUSICCATEGORY] = {"Grass", "Des
 const char * g_szAutoFilterNames[NUM_AUTO_FILTERS] = {"Death Tiles", "Warps", "Ice", "Item Boxes", "Breakable Blocks", "Throwable Blocks", "On/Off Blocks", "Platforms", "Hazards", "Item Destroyable Blocks", "Hidden Blocks", "Map Items"};
 short g_iAutoFilterIcons[NUM_AUTO_FILTERS] = {37, 29, 33, 1, 0, 6, 40, 73, 19, 87, 17, 118};
 
-short g_iPowerupToIcon[8] = {80, 176, 272, 304, 336, 368, 384, 400};
 
 short ReadTourStopSetting(short * iSetting, bool * fSetting, short iDefault, bool fDefault)
 {

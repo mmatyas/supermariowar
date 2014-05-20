@@ -435,9 +435,7 @@ class CPlayer
 		friend void RemovePlayersButHighestScoring();
 		friend void RemovePlayersButTeam(short teamID);
 		friend bool RemoveTeam(short teamid);
-		friend void CleanDeadPlayers();
 		friend short CountAliveTeams(short * lastteam);
-		friend void RunGame();
 			friend void shakeScreen();
 			friend void handleP2PCollisions();
 			friend void handleP2ObjCollisions();
@@ -571,6 +569,7 @@ class CPlayer
 		friend class CPlayerAI;
 		friend class CSimpleAI;
 		friend class NetClient;
+		friend class GameplayState;
 };
 
 
