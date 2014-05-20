@@ -1,5 +1,7 @@
 
 #include "global.h"
+#include "menu.h"
+#include "GSGameplay.h"
 #include <math.h>
 
 #ifdef _XBOX
@@ -50,6 +52,18 @@ extern TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorl
 extern CScore *score[4];
 
 extern std::string stripPathAndExtension(const std::string &path);
+
+Menu& Menu::instance()
+{
+    static Menu menu;
+    return menu;
+}
+
+bool Menu::init()
+{
+    CreateMenu();
+    return true;
+}
 
 void Menu::WriteGameOptions()
 {
@@ -2042,7 +2056,7 @@ void Menu::CreateMenu()
 // RUN THE MENU
 //---------------------------------------------------------------
 
-void Menu::RunMenu()
+void Menu::onEnterState()
 {
     iUnlockMinigameOptionIndex = 0;
 
@@ -2094,8 +2108,8 @@ void Menu::RunMenu()
         }
         /*else if(game_values.tournamentwinner > -1) //World is completed
         {
-        	miBonusWheel->Reset(true);
-        	mCurrentMenu = &mBonusWheelMenu;
+            miBonusWheel->Reset(true);
+            mCurrentMenu = &mBonusWheelMenu;
         }*/
 
         UpdateScoreBoard();
@@ -2249,1331 +2263,1275 @@ void Menu::RunMenu()
         if(mCurrentMenu == &mGameSettingsMenu || mCurrentMenu == &mTournamentScoreboardMenu)
             miMapField->LoadCurrentMap();
     }
+}
 
-    float realfps = 0, flipfps = 0;
-    unsigned int framestart, ticks;
+void Menu::update()
+{
+    /*
+    #ifdef _XBOX
+        if(joystickcount != SDL_NumJoysticks())
+        reconnectjoysticks();
+    #endif
+    */
 
-    while (true) {
-        framestart = SDL_GetTicks();
+    if (netplay.active)
+        netplay.client.listen();
 
-        /*
-        #ifdef _XBOX
-        		if(joystickcount != SDL_NumJoysticks())
-        			reconnectjoysticks();
-        #endif
-        */
+    //Reset the keys that were down the last frame
+    game_values.playerInput.ClearPressedKeys(1);
 
-        if (netplay.active)
-            netplay.client.listen();
-
-        //Reset the keys that were down the last frame
-        game_values.playerInput.ClearPressedKeys(1);
-
-        //handle messages
-        SDL_Event event;
-        while(SDL_PollEvent(&event)) {
-            switch(event.type) {
+    //handle messages
+    SDL_Event event;
+    while(SDL_PollEvent(&event)) {
+        switch(event.type) {
 #ifndef _XBOX
-            case SDL_QUIT:
-                Exit();
-                return;
-                break;
+        case SDL_QUIT:
+            Exit();
+            return;
+            break;
 #endif
 
-            case SDL_KEYDOWN: {
-                if(event.key.keysym.sym == SDLK_F1) {
-                    game_values.showfps = !game_values.showfps;
-                }
+        case SDL_KEYDOWN: {
+            if(event.key.keysym.sym == SDLK_F1) {
+                game_values.showfps = !game_values.showfps;
+            }
 
 #ifndef _XBOX
 
 #ifdef _DEBUG
-                if(event.key.keysym.sym == SDLK_F2) {
-                    game_values.frameadvance = !game_values.frameadvance;
-                }
+            if(event.key.keysym.sym == SDLK_F2) {
+                game_values.frameadvance = !game_values.frameadvance;
+            }
 #endif
-                if(event.key.keysym.mod & (KMOD_LALT | KMOD_RALT)) {
-                    //ALT + F4 = close window
-                    if(event.key.keysym.sym == SDLK_F4) {
-                        Exit();
-                        return;
-                    } //ALT + Enter = fullscreen/windowed toggle
-                    else if(event.key.keysym.sym == SDLK_RETURN) {
-                        game_values.fullscreen = !game_values.fullscreen;
-						gfx_setresolution(smw->ScreenWidth, smw->ScreenHeight, game_values.fullscreen);
-                        blitdest = screen;
+            if(event.key.keysym.mod & (KMOD_LALT | KMOD_RALT)) {
+                //ALT + F4 = close window
+                if(event.key.keysym.sym == SDLK_F4) {
+                    Exit();
+                    return;
+                } //ALT + Enter = fullscreen/windowed toggle
+                else if(event.key.keysym.sym == SDLK_RETURN) {
+                    game_values.fullscreen = !game_values.fullscreen;
+					gfx_setresolution(smw->ScreenWidth, smw->ScreenHeight, game_values.fullscreen);
+                    blitdest = screen;
 
-                        miFullscreenField->SetKey(game_values.fullscreen ? 1 : 0);
+                    miFullscreenField->SetKey(game_values.fullscreen ? 1 : 0);
 
-                        continue;
-                    }
+                    continue;
                 }
+            }
 #endif
 #ifdef _DEBUG
-                //Pressing insert in debug mode turns on automated testing
-                if(event.key.keysym.sym == SDLK_INSERT) {
-                    g_fAutoTest = !g_fAutoTest;
+            //Pressing insert in debug mode turns on automated testing
+            if(event.key.keysym.sym == SDLK_INSERT) {
+                g_fAutoTest = !g_fAutoTest;
 
-                    if(g_fAutoTest) {
-                        mCurrentMenu = &mMainMenu;
-                        mCurrentMenu->ResetMenu();
+                if(g_fAutoTest) {
+                    mCurrentMenu = &mMainMenu;
+                    mCurrentMenu->ResetMenu();
 
-                        LoadScript("Scripts/StartMenuAutomation.txt");
-                    }
-                }
-
-                if(event.key.keysym.sym == SDLK_HOME) {
-                    g_fRecordTest = !g_fRecordTest;
-
-                    if(g_fRecordTest) {
-                        StartRecordScript();
-                    } else {
-                        SaveScript("Scripts/SavedScript.txt");
-                    }
-                }
-
-                if(event.key.keysym.sym == SDLK_END) {
-                    AddEmtpyLineToScript();
-                }
-
-#endif
-                break;
-
-            }
-
-            default:
-                break;
-            }
-
-            game_values.playerInput.Update(event, 1);
-        }
-
-        //If AI is controlling the tournament menu, select the options
-        if(game_values.matchtype == MATCH_TYPE_TOURNAMENT && iTournamentAITimer > 0 && mCurrentMenu == &mGameSettingsMenu && mCurrentMenu->GetHeadControl() == miSettingsStartButton) {
-            if(--iTournamentAITimer == 0) {
-                iTournamentAIStep++;
-
-                if(iTournamentAIStep == 1) {
-                    miMapField->ChooseRandomMap();
-
-                    iTournamentAITimer = 60;
-                } else if(iTournamentAIStep == 2) {
-                    currentgamemode = RNGMAX( GAMEMODE_LAST);
-                    game_values.gamemode = gamemodes[currentgamemode];
-
-                    miModeField->SetKey(currentgamemode);
-
-                    //Unhide/hide the settings button
-                    game_values.gamemode = gamemodes[miModeField->GetShortValue()];
-                    miModeSettingsButton->Show(miModeField->GetShortValue() != game_mode_owned);
-
-                    //Show the approprate goal field
-                    for(short iMode = 0; iMode < GAMEMODE_LAST; iMode++) {
-                        miGoalField[iMode]->Show(miModeField->GetShortValue() == iMode);
-                    }
-
-                    iTournamentAITimer = 60;
-                } else if(iTournamentAIStep == 3) {
-                    SModeOption * options = game_values.gamemode->GetOptions();
-
-                    //Choose a goal from the lower values for a quicker game
-                    short iRandOption = (RNGMAX(6)) + 1;
-                    game_values.gamemode->goal  = options[iRandOption].iValue;
-
-                    miGoalField[currentgamemode]->SetKey(gamemodes[currentgamemode]->goal);
-
-                    modeOptionsMenu.SetRandomGameModeSettings(game_values.gamemode->gamemode);
-
-                    iTournamentAITimer = 60;
-                } else if(iTournamentAIStep == 4) {
-                    iTournamentAIStep = 0;
-                    StartGame();
+                    LoadScript("Scripts/StartMenuAutomation.txt");
                 }
             }
-        }
 
-        //Watch for the konami code to unlock the minigames match type
-        if(!game_values.minigameunlocked && mCurrentMenu == &mMatchSelectionMenu) {
-            if(!mCurrentMenu->GetCurrentControl()->IsModifying()) {
-                int keymask =
-                    (game_values.playerInput.outputControls[0].menu_up.fPressed?1:0) |
-                    (game_values.playerInput.outputControls[0].menu_down.fPressed?2:0) |
-                    (game_values.playerInput.outputControls[0].menu_left.fPressed?4:0) |
-                    (game_values.playerInput.outputControls[0].menu_right.fPressed?8:0) |
-                    (game_values.playerInput.outputControls[0].menu_random.fPressed?16:0);
+            if(event.key.keysym.sym == SDLK_HOME) {
+                g_fRecordTest = !g_fRecordTest;
 
-                if (iUnlockMinigameOptionIndex < 11) {
-                    static const int konami_code[11] = {1,1,2,2,4,8,4,8,16,16,16};
-
-                    if (keymask & konami_code[iUnlockMinigameOptionIndex])
-                        iUnlockMinigameOptionIndex++;
-                    else if (keymask & ~konami_code[iUnlockMinigameOptionIndex]) {
-                        iUnlockMinigameOptionIndex = 0;
-
-                        if (keymask & konami_code[iUnlockMinigameOptionIndex])
-                            iUnlockMinigameOptionIndex++;
-                    }
-
-                    if (iUnlockMinigameOptionIndex == 11) {
-                        ifSoundOnPlay(sfx_transform);
-                        game_values.minigameunlocked = true;
-
-                        miMatchSelectionField->HideItem(MATCH_TYPE_MINIGAME, false);
-                        miMatchSelectionField->SetKey(MATCH_TYPE_MINIGAME);
-
-                        miTournamentField->Show(false);
-                        miTourField->Show(false);
-                        miWorldField->Show(false);
-                        miMinigameField->Show(true);
-
-                        miMatchSelectionDisplayImage->Show(true);
-                        miWorldPreviewDisplay->Show(false);
-                        miMatchSelectionDisplayImage->SetImage(0, smw->ScreenHeight/2 * game_values.matchtype, 320, smw->ScreenHeight/2);
-                    }
-                }
-            }
-        }
-
-#ifdef _DEBUG
-        if(g_fAutoTest)
-            GetNextScriptOperation();
-
-        if(g_fRecordTest)
-            SetNextScriptOperation();
-#endif
-
-        bool fGenerateMapThumbs = false;
-        if(GS_MENU == game_values.gamestate) {
-            MenuCodeEnum code = mCurrentMenu->SendInput(&game_values.playerInput);
-
-            if (netplay.active) {
-                uint8_t lastSendType = netplay.lastSentMessage.packageType;
-                uint8_t lastRecvType = netplay.lastReceivedMessage.packageType;
-
-                if (lastSendType == NET_NOTICE_GAME_SYNC_OK
-                    && lastRecvType == NET_NOTICE_GAME_STARTED)
-                code = MENU_CODE_NET_ROOM_GO;
-            }
-
-            if(MENU_CODE_EXIT_APPLICATION == code) {
-                Exit();
-                return;
-            } else if(MENU_CODE_TO_MAIN_MENU == code) {
-                iDisplayError = DISPLAY_ERROR_NONE;
-                iDisplayErrorTimer = 0;
-                netplay.client.endSession();
-
-                mCurrentMenu = &mMainMenu;
-            } else if(MENU_CODE_BACK_TO_MATCH_SELECTION_MENU == code) {
-                mCurrentMenu = &mMatchSelectionMenu;
-                iUnlockMinigameOptionIndex = 0;
-            } else if(MENU_CODE_TO_MATCH_SELECTION_MENU == code) {
-                miWorldPreviewDisplay->SetWorld();
-
-                mCurrentMenu = &mMatchSelectionMenu;
-                mCurrentMenu->ResetMenu();
-                iUnlockMinigameOptionIndex = 0;
-            } else if(MENU_CODE_MATCH_SELECTION_START == code || MENU_CODE_QUICK_GAME_START == code) {
-                if(MENU_CODE_QUICK_GAME_START == code)
-                    game_values.matchtype = MATCH_TYPE_QUICK_GAME;
-                else
-                    game_values.matchtype = miMatchSelectionField->GetShortValue();
-
-                miTeamSelect->Reset();
-                mCurrentMenu = &mTeamSelectMenu;
-                mCurrentMenu->ResetMenu();
-                printf("Hello\n");
-
-                if(game_values.matchtype != MATCH_TYPE_TOURNAMENT) {
-                    game_values.tournamentcontrolteam = -1;
-                    SetControllingTeamForSettingsMenu(game_values.tournamentcontrolteam, false);
-                }
-            } else if(MENU_CODE_MATCH_SELECTION_MATCH_CHANGED == code) {
-                miTournamentField->Show(game_values.matchtype == MATCH_TYPE_TOURNAMENT);
-                miTourField->Show(game_values.matchtype == MATCH_TYPE_TOUR);
-                miWorldField->Show(game_values.matchtype == MATCH_TYPE_WORLD);
-                miMinigameField->Show(game_values.matchtype == MATCH_TYPE_MINIGAME);
-
-                //miMatchSelectionDisplayImage->Show(game_values.matchtype != MATCH_TYPE_WORLD);
-                miWorldPreviewDisplay->Show(game_values.matchtype == MATCH_TYPE_WORLD);
-
-                if(game_values.matchtype == MATCH_TYPE_WORLD)
-                    miMatchSelectionDisplayImage->SetImage(320, 0, 320, 240);
-                else
-                    miMatchSelectionDisplayImage->SetImage(0, 240 * game_values.matchtype, 320, 240);
-            } else if(MENU_CODE_WORLD_MAP_CHANGED == code) {
-                miWorldPreviewDisplay->SetWorld();
-            } else if(MENU_CODE_TO_OPTIONS_MENU == code) {
-                mCurrentMenu = &mOptionsMenu;
-                mCurrentMenu->ResetMenu();
-            } else if(MENU_CODE_BACK_TO_OPTIONS_MENU == code) {
-                mCurrentMenu = &mOptionsMenu;
-            } else if(MENU_CODE_BACK_TO_GRAPHIC_OPTIONS_MENU == code) {
-                mCurrentMenu = &mGraphicsOptionsMenu;
-            } else if(MENU_CODE_TO_CONTROLS_MENU == code) {
-                mCurrentMenu = &mPlayerControlsSelectMenu;
-                mCurrentMenu->ResetMenu();
-            } else if(MENU_CODE_BACK_TO_CONTROLS_MENU == code) {
-                mCurrentMenu = &mPlayerControlsSelectMenu;
-            } else if(MENU_CODE_TO_NET_SERVERS_MENU == code) {
-                mCurrentMenu = &mNetServers;
-                mCurrentMenu->ResetMenu();
-                netplay.client.startSession();
-            } else if(MENU_CODE_TO_PLAYER_1_CONTROLS == code) {
-                miInputContainer->SetPlayer(0);
-                mCurrentMenu = &mPlayerControlsMenu;
-                mCurrentMenu->ResetMenu();
-            } else if(MENU_CODE_TO_PLAYER_2_CONTROLS == code) {
-                miInputContainer->SetPlayer(1);
-                mCurrentMenu = &mPlayerControlsMenu;
-                mCurrentMenu->ResetMenu();
-            } else if(MENU_CODE_TO_PLAYER_3_CONTROLS == code) {
-                miInputContainer->SetPlayer(2);
-                mCurrentMenu = &mPlayerControlsMenu;
-                mCurrentMenu->ResetMenu();
-            } else if(MENU_CODE_TO_PLAYER_4_CONTROLS == code) {
-                miInputContainer->SetPlayer(3);
-                mCurrentMenu = &mPlayerControlsMenu;
-                mCurrentMenu->ResetMenu();
-            }
-#ifdef _XBOX
-            else if(MENU_CODE_TO_SCREEN_SETTINGS == code) {
-                mCurrentMenu = &mScreenSettingsMenu;
-                mCurrentMenu->ResetMenu();
-            } else if(MENU_CODE_TO_SCREEN_RESIZE == code) {
-                mCurrentMenu = &mScreenResizeMenu;
-                mCurrentMenu->ResetMenu();
-            } else if(MENU_CODE_SCREEN_FILTER_CHANGED == code) {
-                SDL_SetHardwareFilter(game_values.hardwarefilter);
-                //Forces HW render so filter is applied
-                SDL_XBOX_SetScreenPosition(game_values.screenResizeX, game_values.screenResizeY);
-            } else if(MENU_CODE_SCREEN_SETTINGS_CHANGED == code) {
-                gfx_setresolution(smw->ScreenWidth, smw->ScreenHeight, false);
-                blitdest = screen;
-            } else if(MENU_CODE_BACK_TO_SCREEN_SETTINGS_MENU == code) {
-                mCurrentMenu = &mScreenSettingsMenu;
-            }
-#else
-            else if(MENU_CODE_TOGGLE_FULLSCREEN == code) {
-				gfx_setresolution(smw->ScreenWidth, smw->ScreenHeight, game_values.fullscreen);
-                blitdest = screen;
-            }
-#endif
-            else if(MENU_CODE_TO_GAME_SETUP_MENU == code) {
-                printf("MENU_CODE_TO_GAME_SETUP_MENU\n");
-                //Moves teams to the first arrays in the list and counts the number of teams
-                score_cnt = miTeamSelect->OrganizeTeams();
-                iDisplayError = DISPLAY_ERROR_NONE;
-                iDisplayErrorTimer = 0;
-                bool fErrorReadingTourFile = false;
-
-                if(MATCH_TYPE_MINIGAME == game_values.matchtype) {
-                    printf(" Match type: Minigame\n");
-                    short iMiniGameType = miMinigameField->GetShortValue();
-
-                    if(iMiniGameType == 0) { //Pipe minigame
-                        pipegamemode->goal = 50;
-                        game_values.gamemode = pipegamemode;
-                    } else if(iMiniGameType >= 1 && iMiniGameType <= 3) { //3 types of boss minigames
-                        game_values.gamemodemenusettings.boss.bosstype = iMiniGameType - 1;
-                        game_values.gamemodemenusettings.boss.difficulty = 2;
-                        game_values.gamemodemenusettings.boss.hitpoints = 5;
-
-                        bossgamemode->goal = 5;
-                        game_values.gamemode = bossgamemode;
-                    } else if(iMiniGameType == 4) { //boxes minigame
-                        boxesgamemode->goal = 10;
-                        game_values.gamemode = boxesgamemode;
-                    }
-
-                    StartGame();
-                } else if(MATCH_TYPE_QUICK_GAME == game_values.matchtype) {
-                    printf(" Match type: Quick game\n");
-                    short iRandomMode = RNGMAX( GAMEMODE_LAST);
-                    game_values.gamemode = gamemodes[iRandomMode];
-
-                    SModeOption * options = game_values.gamemode->GetOptions();
-
-                    //Choose a goal from the lower values for a quicker game
-                    short iRandOption = (RNGMAX(6)) + 1;
-                    game_values.gamemode->goal  = options[iRandOption].iValue;
-
-                    game_values.tournamentwinner = -1;
-
-                    StartGame();
+                if(g_fRecordTest) {
+                    StartRecordScript();
                 } else {
-
-                    //Load the tour here if one was selected
-                    if(game_values.matchtype == MATCH_TYPE_TOUR) {
-                        printf("  Match type: Tour\n");
-                        if(!ReadTourFile()) {
-                            iDisplayError = DISPLAY_ERROR_READ_TOUR_FILE;
-                            iDisplayErrorTimer = 120;
-                            fErrorReadingTourFile = true;
-                        } else {
-                            miTournamentScoreboard->CreateScoreboard(score_cnt, game_values.tourstoptotal, &rm->spr_tour_markers);
-                        }
-                    } else if(game_values.matchtype == MATCH_TYPE_TOURNAMENT) {
-                        printf("  Match type: Tournament\n");
-                        //Set who is controlling the tournament menu
-                        if(game_values.tournamentcontrolstyle == 5 || game_values.tournamentcontrolstyle == 6) //Random
-                            game_values.tournamentcontrolteam = RNGMAX( score_cnt);
-                        else if(game_values.tournamentcontrolstyle == 7) //Round robin
-                            game_values.tournamentcontrolteam = 0;
-                        else //The first game of the tournament is controlled by all players
-                            game_values.tournamentcontrolteam = -1;
-
-                        game_values.tournamentnextcontrol = 1;  //if round robin is selected, choose the next team next
-
-                        miTournamentScoreboard->CreateScoreboard(score_cnt, game_values.tournamentgames, &rm->menu_mode_large);
-                    } else if(game_values.matchtype == MATCH_TYPE_WORLD) {
-                        printf("  Match type: World\n");
-                        if(!g_worldmap.Load(TILESIZE)) {
-                            iDisplayError = DISPLAY_ERROR_READ_WORLD_FILE;
-                            iDisplayErrorTimer = 120;
-                            fErrorReadingTourFile = true;
-                        } else {
-                            miTournamentScoreboard->CreateScoreboard(score_cnt, 0, &rm->spr_tour_markers);
-
-                            g_worldmap.SetInitialPowerups();
-
-                            //If a player had a stored powerup from another game, add it to their inventory
-                            for(short iPlayer = 0; iPlayer < 4; iPlayer++) {
-                                if(game_values.storedpowerups[iPlayer] != -1) {
-                                    short iTeamId = LookupTeamID(iPlayer);
-                                    if(game_values.worldpowerupcount[iTeamId] < 32)
-                                        game_values.worldpowerups[iTeamId][game_values.worldpowerupcount[iTeamId]++] = game_values.storedpowerups[iPlayer];
-
-                                    game_values.storedpowerups[iPlayer] = -1;
-                                }
-                            }
-
-                            miWorld->Init();
-                            miWorld->SetControllingTeam(RNGMAX( score_cnt));
-                        }
-                    }
-
-                    if(!fErrorReadingTourFile) {
-                        printf("  !fErrorReadingTourFile\n");
-                        mTournamentScoreboardMenu.ClearEyeCandy();
-
-                        //Initialize tournament values
-                        game_values.tournamentwinner = -1;
-
-                        //Setup wins counters for tournament/tour
-                        for(int k = 0; k < 4; k++) {
-                            game_values.tournament_scores[k].wins = 0;
-                            game_values.tournament_scores[k].total = 0;
-                        }
-
-                        if(MATCH_TYPE_SINGLE_GAME == game_values.matchtype || MATCH_TYPE_TOURNAMENT == game_values.matchtype || MATCH_TYPE_NET_GAME == game_values.matchtype) {
-                            printf("  MATCH_TYPE_SINGLE_GAME || MATCH_TYPE_TOURNAMENT\n");
-                            printf("current map: %s\n", szCurrentMapName);
-                            maplist->findexact(szCurrentMapName, false);
-                            miMapField->LoadCurrentMap();
-
-                            game_values.gamemode = gamemodes[miModeField->GetShortValue()];
-
-                            for(short iMode = 0; iMode < GAMEMODE_LAST; iMode++) {
-                                gamemodes[iMode]->goal = miGoalField[iMode]->GetShortValue();
-                            }
-
-                            miModeSettingsButton->Show(miModeField->GetShortValue() != game_mode_owned);
-
-                            mCurrentMenu = &mGameSettingsMenu;
-                            mCurrentMenu->ResetMenu();
-
-                            //If it is a tournament, then set the controlling team
-                            if(MATCH_TYPE_TOURNAMENT == game_values.matchtype)
-                                SetControllingTeamForSettingsMenu(game_values.tournamentcontrolteam, true);
-                            } else if(MATCH_TYPE_TOUR == game_values.matchtype) {
-                                mCurrentMenu = &mTourStopMenu;
-                                mCurrentMenu->ResetMenu();
-                            } else if(MATCH_TYPE_WORLD == game_values.matchtype) {
-                                game_values.screenfadespeed = 8;
-                                game_values.screenfade = 8;
-                                game_values.gamestate = GS_START_WORLD;
-
-                                //Play enter world sound
-                                ifsoundonandreadyplay(sfx_enterstage);
-                            }
-
-                        //Setup items on next menu
-                        for(short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
-                            miGoalField[iGameMode]->HideItem(-1, game_values.matchtype == MATCH_TYPE_TOURNAMENT);
-                        }
-
-                        if(game_values.matchtype == MATCH_TYPE_WORLD)
-                            miGameSettingsMenuHeaderText->SetText("World Game Menu");
-                        else if(game_values.matchtype == MATCH_TYPE_TOUR)
-                            miGameSettingsMenuHeaderText->SetText("Tour Game Menu");
-                        else if(game_values.matchtype == MATCH_TYPE_TOURNAMENT)
-                            miGameSettingsMenuHeaderText->SetText("Tournament Game Menu");
-                        else
-                            miGameSettingsMenuHeaderText->SetText("Single Game Menu");
-
-                    }
+                    SaveScript("Scripts/SavedScript.txt");
                 }
-            } else if(MENU_CODE_BACK_TO_GAME_SETUP_MENU == code) {
-                bool fNeedTeamAnnouncement = false;
-                if(game_values.matchtype == MATCH_TYPE_WORLD) {
-                    if(game_values.tournamentwinner == -2 || (game_values.tournamentwinner >= 0 && game_values.bonuswheel == 0)) {
-                        ResetTournamentBackToMainMenu();
-                    } else if(game_values.tournamentwinner >= 0) {
-                        miBonusWheel->Reset(true);
-                        mCurrentMenu = &mBonusWheelMenu;
-                    } else {
-                        mCurrentMenu = &mWorldMenu;
-                        miWorldStop->Refresh(game_values.tourstopcurrent);
+            }
 
-                        fNeedTeamAnnouncement = true;
-                    }
-                } else {
-                    if(game_values.tournamentwinner == -2) { //Tied Tour Result
-                        ResetTournamentBackToMainMenu();
-                    } else if(game_values.tournamentwinner >= 0) { //Tournament/Tour Won and Bonus Wheel will be spun
-                        if(game_values.bonuswheel == 0 || (game_values.matchtype == MATCH_TYPE_TOUR && !game_values.tourstops[game_values.tourstopcurrent - 1]->iBonusType)) {
-                            ResetTournamentBackToMainMenu();
-                        } else {
-                            miBonusWheel->Reset(true);
-                            mCurrentMenu = &mBonusWheelMenu;
-                        }
-                    } else { //Next Tour/Tourament Game
-                        if(game_values.matchtype == MATCH_TYPE_TOUR) {
-                            mCurrentMenu = &mTourStopMenu;
-                        } else {
-                            mCurrentMenu = &mGameSettingsMenu;
-                        }
-                    }
-                }
+            if(event.key.keysym.sym == SDLK_END) {
+                AddEmtpyLineToScript();
+            }
 
-                mCurrentMenu->ResetMenu();
+#endif
+            break;
 
-                //Set the controlling team for tournament mode
-                if(MATCH_TYPE_TOURNAMENT == game_values.matchtype && game_values.tournamentwinner == -1)
-                    SetControllingTeamForSettingsMenu(game_values.tournamentcontrolteam, true);
+        }
 
-                if(fNeedTeamAnnouncement)
-                    miWorld->DisplayTeamControlAnnouncement();
-            } else if(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS == code) {
-                mCurrentMenu = &mGameSettingsMenu;
-            } else if(MENU_CODE_MODE_CHANGED == code) {
+        default:
+            break;
+        }
+
+        game_values.playerInput.Update(event, 1);
+    }
+
+    //If AI is controlling the tournament menu, select the options
+    if(game_values.matchtype == MATCH_TYPE_TOURNAMENT && iTournamentAITimer > 0 && mCurrentMenu == &mGameSettingsMenu && mCurrentMenu->GetHeadControl() == miSettingsStartButton) {
+        if(--iTournamentAITimer == 0) {
+            iTournamentAIStep++;
+
+            if(iTournamentAIStep == 1) {
+                miMapField->ChooseRandomMap();
+
+                iTournamentAITimer = 60;
+            } else if(iTournamentAIStep == 2) {
+                currentgamemode = RNGMAX( GAMEMODE_LAST);
+                game_values.gamemode = gamemodes[currentgamemode];
+
+                miModeField->SetKey(currentgamemode);
+
+                //Unhide/hide the settings button
                 game_values.gamemode = gamemodes[miModeField->GetShortValue()];
                 miModeSettingsButton->Show(miModeField->GetShortValue() != game_mode_owned);
 
+                //Show the approprate goal field
                 for(short iMode = 0; iMode < GAMEMODE_LAST; iMode++) {
                     miGoalField[iMode]->Show(miModeField->GetShortValue() == iMode);
                 }
-            } else if(MENU_CODE_BACK_TEAM_SELECT_MENU == code) {
-                if(game_values.matchtype == MATCH_TYPE_WORLD) {
-                    miWorldExitDialogImage->Show(true);
-                    miWorldExitDialogExitTourText->Show(true);
-                    miWorldExitDialogYesButton->Show(true);
-                    miWorldExitDialogNoButton->Show(true);
 
-                    mWorldMenu.RememberCurrent();
+                iTournamentAITimer = 60;
+            } else if(iTournamentAIStep == 3) {
+                SModeOption * options = game_values.gamemode->GetOptions();
 
-                    mWorldMenu.SetHeadControl(miWorldExitDialogNoButton);
-                    mWorldMenu.SetCancelCode(MENU_CODE_NONE);
-                    mWorldMenu.ResetMenu();
-                } else if(game_values.matchtype == MATCH_TYPE_TOUR) {
-                    miTourStopExitDialogImage->Show(true);
-                    miTourStopExitDialogExitTourText->Show(true);
-                    miTourStopExitDialogYesButton->Show(true);
-                    miTourStopExitDialogNoButton->Show(true);
+                //Choose a goal from the lower values for a quicker game
+                short iRandOption = (RNGMAX(6)) + 1;
+                game_values.gamemode->goal  = options[iRandOption].iValue;
 
-                    mTourStopMenu.RememberCurrent();
+                miGoalField[currentgamemode]->SetKey(gamemodes[currentgamemode]->goal);
 
-                    mTourStopMenu.SetHeadControl(miTourStopExitDialogNoButton);
-                    mTourStopMenu.SetCancelCode(MENU_CODE_NONE);
-                    mTourStopMenu.ResetMenu();
-                } else if(game_values.matchtype == MATCH_TYPE_TOURNAMENT) {
-                    miGameSettingsExitDialogImage->Show(true);
-                    miGameSettingsExitDialogTournamentText->Show(true);
-                    miGameSettingsExitDialogExitText->Show(true);
-                    miGameSettingsExitDialogYesButton->Show(true);
-                    miGameSettingsExitDialogNoButton->Show(true);
+                modeOptionsMenu.SetRandomGameModeSettings(game_values.gamemode->gamemode);
 
-                    mGameSettingsMenu.RememberCurrent();
-
-                    mGameSettingsMenu.SetHeadControl(miGameSettingsExitDialogNoButton);
-                    mGameSettingsMenu.SetCancelCode(MENU_CODE_NONE);
-                    mGameSettingsMenu.ResetMenu();
-
-                    if(iTournamentAITimer > 0)
-                        SetControllingTeamForSettingsMenu(-1, false);
-                } else {
-                    mCurrentMenu = &mTeamSelectMenu;
-                    mCurrentMenu->ResetMenu();
-                }
-            } else if(MENU_CODE_SOUND_VOLUME_CHANGED == code) {
-                game_values.sound = game_values.soundvolume > 0;
-                sfx_setsoundvolume(game_values.soundvolume);
-                ifSoundOnPlay(sfx_coin);
-            } else if(MENU_CODE_MUSIC_VOLUME_CHANGED == code) {
-                sfx_setmusicvolume(game_values.musicvolume);
-
-                if(game_values.musicvolume == 0)
-                    backgroundmusic[2].stop();
-                else if(game_values.musicvolume > 0 && !game_values.music)
-                    backgroundmusic[2].play(false, false);
-
-                game_values.music = game_values.musicvolume > 0;
-            } else if(MENU_CODE_START_GAME == code) {
+                iTournamentAITimer = 60;
+            } else if(iTournamentAIStep == 4) {
+                iTournamentAIStep = 0;
                 StartGame();
-            } else if(MENU_CODE_EXIT_TOURNAMENT_YES == code || MENU_CODE_EXIT_TOURNAMENT_NO == code) {
-                miGameSettingsExitDialogImage->Show(false);
-                miGameSettingsExitDialogTournamentText->Show(false);
-                miGameSettingsExitDialogExitText->Show(false);
-                miGameSettingsExitDialogYesButton->Show(false);
-                miGameSettingsExitDialogNoButton->Show(false);
+            }
+        }
+    }
+
+    //Watch for the konami code to unlock the minigames match type
+    if(!game_values.minigameunlocked && mCurrentMenu == &mMatchSelectionMenu) {
+        if(!mCurrentMenu->GetCurrentControl()->IsModifying()) {
+            int keymask =
+                (game_values.playerInput.outputControls[0].menu_up.fPressed?1:0) |
+                (game_values.playerInput.outputControls[0].menu_down.fPressed?2:0) |
+                (game_values.playerInput.outputControls[0].menu_left.fPressed?4:0) |
+                (game_values.playerInput.outputControls[0].menu_right.fPressed?8:0) |
+                (game_values.playerInput.outputControls[0].menu_random.fPressed?16:0);
+
+            if (iUnlockMinigameOptionIndex < 11) {
+                static const int konami_code[11] = {1,1,2,2,4,8,4,8,16,16,16};
+
+                if (keymask & konami_code[iUnlockMinigameOptionIndex])
+                    iUnlockMinigameOptionIndex++;
+                else if (keymask & ~konami_code[iUnlockMinigameOptionIndex]) {
+                    iUnlockMinigameOptionIndex = 0;
+
+                    if (keymask & konami_code[iUnlockMinigameOptionIndex])
+                        iUnlockMinigameOptionIndex++;
+                }
+
+                if (iUnlockMinigameOptionIndex == 11) {
+                    ifSoundOnPlay(sfx_transform);
+                    game_values.minigameunlocked = true;
+
+                    miMatchSelectionField->HideItem(MATCH_TYPE_MINIGAME, false);
+                    miMatchSelectionField->SetKey(MATCH_TYPE_MINIGAME);
+
+                    miTournamentField->Show(false);
+                    miTourField->Show(false);
+                    miWorldField->Show(false);
+                    miMinigameField->Show(true);
+
+                    miMatchSelectionDisplayImage->Show(true);
+                    miWorldPreviewDisplay->Show(false);
+                    miMatchSelectionDisplayImage->SetImage(0, smw->ScreenHeight/2 * game_values.matchtype, 320, smw->ScreenHeight/2);
+                }
+            }
+        }
+    }
+
+#ifdef _DEBUG
+    if(g_fAutoTest)
+        GetNextScriptOperation();
+
+    if(g_fRecordTest)
+        SetNextScriptOperation();
+#endif
+
+    bool fGenerateMapThumbs = false;
+    if(GS_MENU == game_values.gamestate) {
+        MenuCodeEnum code = mCurrentMenu->SendInput(&game_values.playerInput);
+
+        if (netplay.active) {
+            uint8_t lastSendType = netplay.lastSentMessage.packageType;
+            uint8_t lastRecvType = netplay.lastReceivedMessage.packageType;
+
+            if (lastSendType == NET_NOTICE_GAME_SYNC_OK
+                && lastRecvType == NET_NOTICE_GAME_STARTED)
+            code = MENU_CODE_NET_ROOM_GO;
+        }
+
+        if(MENU_CODE_EXIT_APPLICATION == code) {
+            Exit();
+            return;
+        } else if(MENU_CODE_TO_MAIN_MENU == code) {
+            iDisplayError = DISPLAY_ERROR_NONE;
+            iDisplayErrorTimer = 0;
+            netplay.client.endSession();
+
+            mCurrentMenu = &mMainMenu;
+        } else if(MENU_CODE_BACK_TO_MATCH_SELECTION_MENU == code) {
+            mCurrentMenu = &mMatchSelectionMenu;
+            iUnlockMinigameOptionIndex = 0;
+        } else if(MENU_CODE_TO_MATCH_SELECTION_MENU == code) {
+            miWorldPreviewDisplay->SetWorld();
+
+            mCurrentMenu = &mMatchSelectionMenu;
+            mCurrentMenu->ResetMenu();
+            iUnlockMinigameOptionIndex = 0;
+        } else if(MENU_CODE_MATCH_SELECTION_START == code || MENU_CODE_QUICK_GAME_START == code) {
+            printf("itt vagyok\n");
+
+            if(MENU_CODE_QUICK_GAME_START == code)
+                game_values.matchtype = MATCH_TYPE_QUICK_GAME;
+            else
+                game_values.matchtype = miMatchSelectionField->GetShortValue();
+
+            miTeamSelect->Reset();
+            mCurrentMenu = &mTeamSelectMenu;
+            mCurrentMenu->ResetMenu();
+            printf("Hello\n");
+
+            if(game_values.matchtype != MATCH_TYPE_TOURNAMENT) {
+                game_values.tournamentcontrolteam = -1;
+                SetControllingTeamForSettingsMenu(game_values.tournamentcontrolteam, false);
+            }
+        } else if(MENU_CODE_MATCH_SELECTION_MATCH_CHANGED == code) {
+            miTournamentField->Show(game_values.matchtype == MATCH_TYPE_TOURNAMENT);
+            miTourField->Show(game_values.matchtype == MATCH_TYPE_TOUR);
+            miWorldField->Show(game_values.matchtype == MATCH_TYPE_WORLD);
+            miMinigameField->Show(game_values.matchtype == MATCH_TYPE_MINIGAME);
+
+            //miMatchSelectionDisplayImage->Show(game_values.matchtype != MATCH_TYPE_WORLD);
+            miWorldPreviewDisplay->Show(game_values.matchtype == MATCH_TYPE_WORLD);
+
+            if(game_values.matchtype == MATCH_TYPE_WORLD)
+                miMatchSelectionDisplayImage->SetImage(320, 0, 320, 240);
+            else
+                miMatchSelectionDisplayImage->SetImage(0, 240 * game_values.matchtype, 320, 240);
+        } else if(MENU_CODE_WORLD_MAP_CHANGED == code) {
+            miWorldPreviewDisplay->SetWorld();
+        } else if(MENU_CODE_TO_OPTIONS_MENU == code) {
+            mCurrentMenu = &mOptionsMenu;
+            mCurrentMenu->ResetMenu();
+        } else if(MENU_CODE_BACK_TO_OPTIONS_MENU == code) {
+            mCurrentMenu = &mOptionsMenu;
+        } else if(MENU_CODE_BACK_TO_GRAPHIC_OPTIONS_MENU == code) {
+            mCurrentMenu = &mGraphicsOptionsMenu;
+        } else if(MENU_CODE_TO_CONTROLS_MENU == code) {
+            mCurrentMenu = &mPlayerControlsSelectMenu;
+            mCurrentMenu->ResetMenu();
+        } else if(MENU_CODE_BACK_TO_CONTROLS_MENU == code) {
+            mCurrentMenu = &mPlayerControlsSelectMenu;
+        } else if(MENU_CODE_TO_NET_SERVERS_MENU == code) {
+            mCurrentMenu = &mNetServers;
+            mCurrentMenu->ResetMenu();
+            netplay.client.startSession();
+        } else if(MENU_CODE_TO_PLAYER_1_CONTROLS == code) {
+            miInputContainer->SetPlayer(0);
+            mCurrentMenu = &mPlayerControlsMenu;
+            mCurrentMenu->ResetMenu();
+        } else if(MENU_CODE_TO_PLAYER_2_CONTROLS == code) {
+            miInputContainer->SetPlayer(1);
+            mCurrentMenu = &mPlayerControlsMenu;
+            mCurrentMenu->ResetMenu();
+        } else if(MENU_CODE_TO_PLAYER_3_CONTROLS == code) {
+            miInputContainer->SetPlayer(2);
+            mCurrentMenu = &mPlayerControlsMenu;
+            mCurrentMenu->ResetMenu();
+        } else if(MENU_CODE_TO_PLAYER_4_CONTROLS == code) {
+            miInputContainer->SetPlayer(3);
+            mCurrentMenu = &mPlayerControlsMenu;
+            mCurrentMenu->ResetMenu();
+        }
+#ifdef _XBOX
+        else if(MENU_CODE_TO_SCREEN_SETTINGS == code) {
+            mCurrentMenu = &mScreenSettingsMenu;
+            mCurrentMenu->ResetMenu();
+        } else if(MENU_CODE_TO_SCREEN_RESIZE == code) {
+            mCurrentMenu = &mScreenResizeMenu;
+            mCurrentMenu->ResetMenu();
+        } else if(MENU_CODE_SCREEN_FILTER_CHANGED == code) {
+            SDL_SetHardwareFilter(game_values.hardwarefilter);
+            //Forces HW render so filter is applied
+            SDL_XBOX_SetScreenPosition(game_values.screenResizeX, game_values.screenResizeY);
+        } else if(MENU_CODE_SCREEN_SETTINGS_CHANGED == code) {
+            gfx_setresolution(smw->ScreenWidth, smw->ScreenHeight, false);
+            blitdest = screen;
+        } else if(MENU_CODE_BACK_TO_SCREEN_SETTINGS_MENU == code) {
+            mCurrentMenu = &mScreenSettingsMenu;
+        }
+#else
+        else if(MENU_CODE_TOGGLE_FULLSCREEN == code) {
+			gfx_setresolution(smw->ScreenWidth, smw->ScreenHeight, game_values.fullscreen);
+            blitdest = screen;
+        }
+#endif
+        else if(MENU_CODE_TO_GAME_SETUP_MENU == code) {
+            printf("MENU_CODE_TO_GAME_SETUP_MENU\n");
+            //Moves teams to the first arrays in the list and counts the number of teams
+            score_cnt = miTeamSelect->OrganizeTeams();
+            iDisplayError = DISPLAY_ERROR_NONE;
+            iDisplayErrorTimer = 0;
+            bool fErrorReadingTourFile = false;
+
+            if(MATCH_TYPE_MINIGAME == game_values.matchtype) {
+                printf(" Match type: Minigame\n");
+                short iMiniGameType = miMinigameField->GetShortValue();
+
+                if(iMiniGameType == 0) { //Pipe minigame
+                    pipegamemode->goal = 50;
+                    game_values.gamemode = pipegamemode;
+                } else if(iMiniGameType >= 1 && iMiniGameType <= 3) { //3 types of boss minigames
+                    game_values.gamemodemenusettings.boss.bosstype = iMiniGameType - 1;
+                    game_values.gamemodemenusettings.boss.difficulty = 2;
+                    game_values.gamemodemenusettings.boss.hitpoints = 5;
+
+                    bossgamemode->goal = 5;
+                    game_values.gamemode = bossgamemode;
+                } else if(iMiniGameType == 4) { //boxes minigame
+                    boxesgamemode->goal = 10;
+                    game_values.gamemode = boxesgamemode;
+                }
+
+                StartGame();
+            } else if(MATCH_TYPE_QUICK_GAME == game_values.matchtype) {
+                printf(" Match type: Quick game\n");
+                short iRandomMode = RNGMAX( GAMEMODE_LAST);
+                game_values.gamemode = gamemodes[iRandomMode];
+
+                SModeOption * options = game_values.gamemode->GetOptions();
+
+                //Choose a goal from the lower values for a quicker game
+                short iRandOption = (RNGMAX(6)) + 1;
+                game_values.gamemode->goal  = options[iRandOption].iValue;
+
+                game_values.tournamentwinner = -1;
+
+                StartGame();
+            } else {
+
+                //Load the tour here if one was selected
+                if(game_values.matchtype == MATCH_TYPE_TOUR) {
+                    printf("  Match type: Tour\n");
+                    if(!ReadTourFile()) {
+                        iDisplayError = DISPLAY_ERROR_READ_TOUR_FILE;
+                        iDisplayErrorTimer = 120;
+                        fErrorReadingTourFile = true;
+                    } else {
+                        miTournamentScoreboard->CreateScoreboard(score_cnt, game_values.tourstoptotal, &rm->spr_tour_markers);
+                    }
+                } else if(game_values.matchtype == MATCH_TYPE_TOURNAMENT) {
+                    printf("  Match type: Tournament\n");
+                    //Set who is controlling the tournament menu
+                    if(game_values.tournamentcontrolstyle == 5 || game_values.tournamentcontrolstyle == 6) //Random
+                        game_values.tournamentcontrolteam = RNGMAX( score_cnt);
+                    else if(game_values.tournamentcontrolstyle == 7) //Round robin
+                        game_values.tournamentcontrolteam = 0;
+                    else //The first game of the tournament is controlled by all players
+                        game_values.tournamentcontrolteam = -1;
+
+                    game_values.tournamentnextcontrol = 1;  //if round robin is selected, choose the next team next
+
+                    miTournamentScoreboard->CreateScoreboard(score_cnt, game_values.tournamentgames, &rm->menu_mode_large);
+                } else if(game_values.matchtype == MATCH_TYPE_WORLD) {
+                    printf("  Match type: World\n");
+                    if(!g_worldmap.Load(TILESIZE)) {
+                        iDisplayError = DISPLAY_ERROR_READ_WORLD_FILE;
+                        iDisplayErrorTimer = 120;
+                        fErrorReadingTourFile = true;
+                    } else {
+                        miTournamentScoreboard->CreateScoreboard(score_cnt, 0, &rm->spr_tour_markers);
+
+                        g_worldmap.SetInitialPowerups();
+
+                        //If a player had a stored powerup from another game, add it to their inventory
+                        for(short iPlayer = 0; iPlayer < 4; iPlayer++) {
+                            if(game_values.storedpowerups[iPlayer] != -1) {
+                                short iTeamId = LookupTeamID(iPlayer);
+                                if(game_values.worldpowerupcount[iTeamId] < 32)
+                                    game_values.worldpowerups[iTeamId][game_values.worldpowerupcount[iTeamId]++] = game_values.storedpowerups[iPlayer];
+
+                                game_values.storedpowerups[iPlayer] = -1;
+                            }
+                        }
+
+                        miWorld->Init();
+                        miWorld->SetControllingTeam(RNGMAX( score_cnt));
+                    }
+                }
+
+                if(!fErrorReadingTourFile) {
+                    printf("  !fErrorReadingTourFile\n");
+                    mTournamentScoreboardMenu.ClearEyeCandy();
+
+                    //Initialize tournament values
+                    game_values.tournamentwinner = -1;
+
+                    //Setup wins counters for tournament/tour
+                    for(int k = 0; k < 4; k++) {
+                        game_values.tournament_scores[k].wins = 0;
+                        game_values.tournament_scores[k].total = 0;
+                    }
+
+                    if(MATCH_TYPE_SINGLE_GAME == game_values.matchtype || MATCH_TYPE_TOURNAMENT == game_values.matchtype || MATCH_TYPE_NET_GAME == game_values.matchtype) {
+                        printf("  MATCH_TYPE_SINGLE_GAME || MATCH_TYPE_TOURNAMENT\n");
+                        printf("current map: %s\n", szCurrentMapName);
+                        maplist->findexact(szCurrentMapName, false);
+                        miMapField->LoadCurrentMap();
+
+                        game_values.gamemode = gamemodes[miModeField->GetShortValue()];
+
+                        for(short iMode = 0; iMode < GAMEMODE_LAST; iMode++) {
+                            gamemodes[iMode]->goal = miGoalField[iMode]->GetShortValue();
+                        }
+
+                        miModeSettingsButton->Show(miModeField->GetShortValue() != game_mode_owned);
+
+                        mCurrentMenu = &mGameSettingsMenu;
+                        mCurrentMenu->ResetMenu();
+
+                        //If it is a tournament, then set the controlling team
+                        if(MATCH_TYPE_TOURNAMENT == game_values.matchtype)
+                            SetControllingTeamForSettingsMenu(game_values.tournamentcontrolteam, true);
+                        } else if(MATCH_TYPE_TOUR == game_values.matchtype) {
+                            mCurrentMenu = &mTourStopMenu;
+                            mCurrentMenu->ResetMenu();
+                        } else if(MATCH_TYPE_WORLD == game_values.matchtype) {
+                            game_values.screenfadespeed = 8;
+                            game_values.screenfade = 8;
+                            game_values.gamestate = GS_START_WORLD;
+
+                            //Play enter world sound
+                            ifsoundonandreadyplay(sfx_enterstage);
+                        }
+
+                    //Setup items on next menu
+                    for(short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
+                        miGoalField[iGameMode]->HideItem(-1, game_values.matchtype == MATCH_TYPE_TOURNAMENT);
+                    }
+
+                    if(game_values.matchtype == MATCH_TYPE_WORLD)
+                        miGameSettingsMenuHeaderText->SetText("World Game Menu");
+                    else if(game_values.matchtype == MATCH_TYPE_TOUR)
+                        miGameSettingsMenuHeaderText->SetText("Tour Game Menu");
+                    else if(game_values.matchtype == MATCH_TYPE_TOURNAMENT)
+                        miGameSettingsMenuHeaderText->SetText("Tournament Game Menu");
+                    else
+                        miGameSettingsMenuHeaderText->SetText("Single Game Menu");
+
+                }
+            }
+        } else if(MENU_CODE_BACK_TO_GAME_SETUP_MENU == code) {
+            bool fNeedTeamAnnouncement = false;
+            if(game_values.matchtype == MATCH_TYPE_WORLD) {
+                if(game_values.tournamentwinner == -2 || (game_values.tournamentwinner >= 0 && game_values.bonuswheel == 0)) {
+                    ResetTournamentBackToMainMenu();
+                } else if(game_values.tournamentwinner >= 0) {
+                    miBonusWheel->Reset(true);
+                    mCurrentMenu = &mBonusWheelMenu;
+                } else {
+                    mCurrentMenu = &mWorldMenu;
+                    miWorldStop->Refresh(game_values.tourstopcurrent);
+
+                    fNeedTeamAnnouncement = true;
+                }
+            } else {
+                if(game_values.tournamentwinner == -2) { //Tied Tour Result
+                    ResetTournamentBackToMainMenu();
+                } else if(game_values.tournamentwinner >= 0) { //Tournament/Tour Won and Bonus Wheel will be spun
+                    if(game_values.bonuswheel == 0 || (game_values.matchtype == MATCH_TYPE_TOUR && !game_values.tourstops[game_values.tourstopcurrent - 1]->iBonusType)) {
+                        ResetTournamentBackToMainMenu();
+                    } else {
+                        miBonusWheel->Reset(true);
+                        mCurrentMenu = &mBonusWheelMenu;
+                    }
+                } else { //Next Tour/Tourament Game
+                    if(game_values.matchtype == MATCH_TYPE_TOUR) {
+                        mCurrentMenu = &mTourStopMenu;
+                    } else {
+                        mCurrentMenu = &mGameSettingsMenu;
+                    }
+                }
+            }
+
+            mCurrentMenu->ResetMenu();
+
+            //Set the controlling team for tournament mode
+            if(MATCH_TYPE_TOURNAMENT == game_values.matchtype && game_values.tournamentwinner == -1)
+                SetControllingTeamForSettingsMenu(game_values.tournamentcontrolteam, true);
+
+            if(fNeedTeamAnnouncement)
+                miWorld->DisplayTeamControlAnnouncement();
+        } else if(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS == code) {
+            mCurrentMenu = &mGameSettingsMenu;
+        } else if(MENU_CODE_MODE_CHANGED == code) {
+            game_values.gamemode = gamemodes[miModeField->GetShortValue()];
+            miModeSettingsButton->Show(miModeField->GetShortValue() != game_mode_owned);
+
+            for(short iMode = 0; iMode < GAMEMODE_LAST; iMode++) {
+                miGoalField[iMode]->Show(miModeField->GetShortValue() == iMode);
+            }
+        } else if(MENU_CODE_BACK_TEAM_SELECT_MENU == code) {
+            if(game_values.matchtype == MATCH_TYPE_WORLD) {
+                miWorldExitDialogImage->Show(true);
+                miWorldExitDialogExitTourText->Show(true);
+                miWorldExitDialogYesButton->Show(true);
+                miWorldExitDialogNoButton->Show(true);
+
+                mWorldMenu.RememberCurrent();
+
+                mWorldMenu.SetHeadControl(miWorldExitDialogNoButton);
+                mWorldMenu.SetCancelCode(MENU_CODE_NONE);
+                mWorldMenu.ResetMenu();
+            } else if(game_values.matchtype == MATCH_TYPE_TOUR) {
+                miTourStopExitDialogImage->Show(true);
+                miTourStopExitDialogExitTourText->Show(true);
+                miTourStopExitDialogYesButton->Show(true);
+                miTourStopExitDialogNoButton->Show(true);
+
+                mTourStopMenu.RememberCurrent();
+
+                mTourStopMenu.SetHeadControl(miTourStopExitDialogNoButton);
+                mTourStopMenu.SetCancelCode(MENU_CODE_NONE);
+                mTourStopMenu.ResetMenu();
+            } else if(game_values.matchtype == MATCH_TYPE_TOURNAMENT) {
+                miGameSettingsExitDialogImage->Show(true);
+                miGameSettingsExitDialogTournamentText->Show(true);
+                miGameSettingsExitDialogExitText->Show(true);
+                miGameSettingsExitDialogYesButton->Show(true);
+                miGameSettingsExitDialogNoButton->Show(true);
+
+                mGameSettingsMenu.RememberCurrent();
+
+                mGameSettingsMenu.SetHeadControl(miGameSettingsExitDialogNoButton);
+                mGameSettingsMenu.SetCancelCode(MENU_CODE_NONE);
+                mGameSettingsMenu.ResetMenu();
+
+                if(iTournamentAITimer > 0)
+                    SetControllingTeamForSettingsMenu(-1, false);
+            } else {
+                mCurrentMenu = &mTeamSelectMenu;
+                mCurrentMenu->ResetMenu();
+            }
+        } else if(MENU_CODE_SOUND_VOLUME_CHANGED == code) {
+            game_values.sound = game_values.soundvolume > 0;
+            sfx_setsoundvolume(game_values.soundvolume);
+            ifSoundOnPlay(sfx_coin);
+        } else if(MENU_CODE_MUSIC_VOLUME_CHANGED == code) {
+            sfx_setmusicvolume(game_values.musicvolume);
+
+            if(game_values.musicvolume == 0)
+                backgroundmusic[2].stop();
+            else if(game_values.musicvolume > 0 && !game_values.music)
+                backgroundmusic[2].play(false, false);
+
+            game_values.music = game_values.musicvolume > 0;
+        } else if(MENU_CODE_START_GAME == code) {
+            StartGame();
+        } else if(MENU_CODE_EXIT_TOURNAMENT_YES == code || MENU_CODE_EXIT_TOURNAMENT_NO == code) {
+            miGameSettingsExitDialogImage->Show(false);
+            miGameSettingsExitDialogTournamentText->Show(false);
+            miGameSettingsExitDialogExitText->Show(false);
+            miGameSettingsExitDialogYesButton->Show(false);
+            miGameSettingsExitDialogNoButton->Show(false);
+
+            mGameSettingsMenu.SetHeadControl(miSettingsStartButton);
+            mGameSettingsMenu.SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
+
+            mGameSettingsMenu.RestoreCurrent();
+
+            if(MENU_CODE_EXIT_TOURNAMENT_YES == code)
+                ResetTournamentBackToMainMenu();
+            else
+                SetControllingTeamForSettingsMenu(game_values.tournamentcontrolteam, false);
+        } else if(MENU_CODE_EXIT_TOUR_YES == code || MENU_CODE_EXIT_TOUR_NO == code) {
+            miTourStopExitDialogImage->Show(false);
+            miTourStopExitDialogExitTourText->Show(false);
+            miTourStopExitDialogYesButton->Show(false);
+            miTourStopExitDialogNoButton->Show(false);
+
+            mTourStopMenu.SetHeadControl(miTourStop);
+            mTourStopMenu.SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
+
+            mTourStopMenu.RestoreCurrent();
+
+            if(MENU_CODE_EXIT_TOUR_YES == code)
+                ResetTournamentBackToMainMenu();
+        } else if(MENU_CODE_EXIT_WORLD_YES == code || MENU_CODE_EXIT_WORLD_NO == code) {
+            miWorldExitDialogImage->Show(false);
+            miWorldExitDialogExitTourText->Show(false);
+            miWorldExitDialogYesButton->Show(false);
+            miWorldExitDialogNoButton->Show(false);
+
+            mWorldMenu.SetHeadControl(miWorld);
+            mWorldMenu.SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
+
+            mWorldMenu.RestoreCurrent();
+
+            if(MENU_CODE_EXIT_WORLD_YES == code) {
+                //Clear out any stored items a player might have
+                for(short iPlayer = 0; iPlayer < 4; iPlayer++)
+                    game_values.storedpowerups[iPlayer] = -1;
+
+                ResetTournamentBackToMainMenu();
+                miWorldStop->Show(false);
+            }
+        } else if(MENU_CODE_BONUS_DONE == code) {
+            if(miBonusWheel->GetPowerupSelectionDone()) {
+                if(game_values.matchtype == MATCH_TYPE_WORLD) {
+                    if(game_values.tournamentwinner == -1)
+                        mCurrentMenu = &mTournamentScoreboardMenu;
+                    else
+                        ResetTournamentBackToMainMenu();
+                } else {
+                    if((game_values.matchtype == MATCH_TYPE_TOUR || game_values.matchtype == MATCH_TYPE_TOURNAMENT) && game_values.tournamentwinner == -1 &&
+                            ((game_values.matchtype != MATCH_TYPE_TOUR && game_values.bonuswheel == 2) || (game_values.matchtype == MATCH_TYPE_TOUR && game_values.tourstops[game_values.tourstopcurrent - 1]->iBonusType))) {
+                        mCurrentMenu = &mTournamentScoreboardMenu;
+                    } else if(game_values.matchtype == MATCH_TYPE_SINGLE_GAME) {
+                        mCurrentMenu = &mGameSettingsMenu;
+                        mCurrentMenu->ResetMenu();
+                        miMapField->LoadCurrentMap();
+                    } else {
+                        ResetTournamentBackToMainMenu();
+                    }
+                }
+            }
+        } else if (MENU_CODE_TO_POWERUP_SELECTION_MENU == code) {
+            mCurrentMenu = &mPowerupSelectionMenu;
+            mCurrentMenu->ResetMenu();
+        } else if (MENU_CODE_TO_POWERUP_SETTINGS_MENU == code) {
+            mCurrentMenu = &mPowerupSettingsMenu;
+            mCurrentMenu->ResetMenu();
+        } else if (MENU_CODE_TO_GRAPHICS_OPTIONS_MENU == code) {
+            mCurrentMenu = &mGraphicsOptionsMenu;
+            mCurrentMenu->ResetMenu();
+        } else if (MENU_CODE_TO_EYECANDY_OPTIONS_MENU == code) {
+            mCurrentMenu = &mEyeCandyOptionsMenu;
+            mCurrentMenu->ResetMenu();
+        } else if (MENU_CODE_TO_SOUND_OPTIONS_MENU == code) {
+            mCurrentMenu = &mSoundOptionsMenu;
+            mCurrentMenu->ResetMenu();
+        } else if (MENU_CODE_TO_GAMEPLAY_OPTIONS_MENU == code) {
+            mCurrentMenu = &mGameplayOptionsMenu;
+            mCurrentMenu->ResetMenu();
+        } else if (MENU_CODE_TO_TEAM_OPTIONS_MENU == code) {
+            mCurrentMenu = &mTeamOptionsMenu;
+            mCurrentMenu->ResetMenu();
+        } else if (MENU_CODE_TO_PROJECTILES_OPTIONS_MENU == code) {
+            mCurrentMenu = &mProjectilesOptionsMenu;
+            mCurrentMenu->ResetMenu();
+        } else if (MENU_CODE_TO_PROJECTILES_LIMITS_MENU == code) {
+            mCurrentMenu = &mProjectilesLimitsMenu;
+            mCurrentMenu->ResetMenu();
+        } else if (MENU_CODE_TO_MODE_SETTINGS_MENU == code) {
+            for(short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
+                if(miGoalField[iGameMode]->IsVisible()) {
+                    mCurrentMenu = modeOptionsMenu.GetOptionsMenu(iGameMode);
+                    mCurrentMenu->ResetMenu();
+                    break;
+                }
+            }
+        } else if (MENU_CODE_MENU_GRAPHICS_PACK_CHANGED == code) {
+            LoadStartGraphics();
+            rm->LoadMenuGraphics();
+
+            blitdest = rm->menu_backdrop.getSurface();
+            rm->menu_shade.setalpha(smw->MenuTransparency	);
+            rm->menu_shade.draw(0, 0);
+            blitdest = screen;
+        } else if (MENU_CODE_WORLD_GRAPHICS_PACK_CHANGED == code) {
+            rm->LoadWorldGraphics();
+        } else if (MENU_CODE_GAME_GRAPHICS_PACK_CHANGED == code) {
+            gfx_loadpalette();
+            rm->LoadGameGraphics();
+        } else if (MENU_CODE_SOUND_PACK_CHANGED == code) {
+            LoadGameSounds();
+
+            if(!game_values.soundcapable) {
+                game_values.sound = false;
+                game_values.music = false;
+                game_values.soundvolume = 0;
+                game_values.musicvolume = 0;
+            }
+        } else if (MENU_CODE_WORLD_STAGE_START == code) {
+            miWorldStop->Refresh(game_values.tourstopcurrent);
+            miWorldStop->Show(true);
+
+            mWorldMenu.RememberCurrent();
+
+            mWorldMenu.SetHeadControl(miWorldStop);
+            mWorldMenu.SetCancelCode(MENU_CODE_WORLD_STAGE_NO_START);
+
+            mWorldMenu.ResetMenu();
+        } else if (MENU_CODE_WORLD_STAGE_NO_START == code) {
+            miWorldStop->Show(false);
+
+            mWorldMenu.SetHeadControl(miWorld);
+            mWorldMenu.SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
+
+            mWorldMenu.RestoreCurrent();
+        } else if(MENU_CODE_WORLD_MUSIC_CHANGED == code) {
+            worldmusiclist->SetCurrent(miWorldMusicField->GetShortValue());
+        } else if (MENU_CODE_TOUR_STOP_CONTINUE == code || MENU_CODE_TOUR_STOP_CONTINUE_FORCED == code) {
+            //If this tour stop is forced, we need to load the map first
+            if(MENU_CODE_TOUR_STOP_CONTINUE_FORCED == code)
+                miWorldStop->Refresh(game_values.tourstopcurrent);
+
+            miWorld->ClearCloud();
+
+            //Tour bonus house
+            if(game_values.matchtype == MATCH_TYPE_WORLD && game_values.tourstops[game_values.tourstopcurrent]->iStageType == 1) {
+                bonushousemode->goal = 0;
+                game_values.gamemode = bonushousemode;
+            } else {
+                short iGameMode = game_values.tourstops[game_values.tourstopcurrent]->iMode;
+
+                if(iGameMode == game_mode_pipe_minigame)
+                    game_values.gamemode = pipegamemode;
+                else if(iGameMode == game_mode_boss_minigame)
+                    game_values.gamemode = bossgamemode;
+                else if(iGameMode == game_mode_boxes_minigame)
+                    game_values.gamemode = boxesgamemode;
+                else
+                    game_values.gamemode = gamemodes[iGameMode];
+
+                game_values.gamemode->goal = game_values.tourstops[game_values.tourstopcurrent]->iGoal;
+            }
+
+            StartGame();
+        } else if (MENU_CODE_RESET_STORED_POWERUPS == code) {
+            for(short iPlayer = 0; iPlayer < 4; iPlayer++)
+                game_values.storedpowerups[iPlayer] = -1;
+        } else if(MENU_CODE_MAP_CHANGED == code) {
+            if(game_values.matchtype != MATCH_TYPE_TOUR)
+                szCurrentMapName = miMapField->GetMapName();
+        } else if(MENU_CODE_MAP_FILTER_EXIT == code) {
+            maplist->ApplyFilters(game_values.pfFilters);
+
+            //If the filtered map list has at least 1 map in it, then allow exiting the filter menu
+            if(maplist->MapInFilteredSet()) {
+                miMapField->LoadCurrentMap();
+                szCurrentMapName = miMapField->GetMapName();
+
+                miMapFilterScroll->Show(false);
 
                 mGameSettingsMenu.SetHeadControl(miSettingsStartButton);
                 mGameSettingsMenu.SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
 
                 mGameSettingsMenu.RestoreCurrent();
 
-                if(MENU_CODE_EXIT_TOURNAMENT_YES == code)
-                    ResetTournamentBackToMainMenu();
-                else
-                    SetControllingTeamForSettingsMenu(game_values.tournamentcontrolteam, false);
-            } else if(MENU_CODE_EXIT_TOUR_YES == code || MENU_CODE_EXIT_TOUR_NO == code) {
-                miTourStopExitDialogImage->Show(false);
-                miTourStopExitDialogExitTourText->Show(false);
-                miTourStopExitDialogYesButton->Show(false);
-                miTourStopExitDialogNoButton->Show(false);
+                iDisplayError = DISPLAY_ERROR_NONE;
 
-                mTourStopMenu.SetHeadControl(miTourStop);
-                mTourStopMenu.SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
+                miMapFiltersOnImage->Show(game_values.fFiltersOn);
+            } else { //otherwise display a message
+                iDisplayError = DISPLAY_ERROR_MAP_FILTER;
+                iDisplayErrorTimer = 120;
+            }
+        } else if(MENU_CODE_TO_MAP_FILTERS == code) {
+            miMapFilterScroll->Show(true);
+            mGameSettingsMenu.RememberCurrent();
 
-                mTourStopMenu.RestoreCurrent();
+            mGameSettingsMenu.SetHeadControl(miMapFilterScroll);
+            mGameSettingsMenu.SetCancelCode(MENU_CODE_NONE);
+            mGameSettingsMenu.ResetMenu();
+        } else if(MENU_CODE_TO_MAP_FILTER_EDIT == code) {
+            miMapBrowser->Reset(0);
 
-                if(MENU_CODE_EXIT_TOUR_YES == code)
-                    ResetTournamentBackToMainMenu();
-            } else if(MENU_CODE_EXIT_WORLD_YES == code || MENU_CODE_EXIT_WORLD_NO == code) {
-                miWorldExitDialogImage->Show(false);
-                miWorldExitDialogExitTourText->Show(false);
-                miWorldExitDialogYesButton->Show(false);
-                miWorldExitDialogNoButton->Show(false);
+            mCurrentMenu = &mMapFilterEditMenu;
+            mCurrentMenu->ResetMenu();
+        } else if(MENU_CODE_MAP_BROWSER_EXIT == code) {
+            miMapField->LoadCurrentMap();
+            szCurrentMapName = miMapField->GetMapName();
 
-                mWorldMenu.SetHeadControl(miWorld);
-                mWorldMenu.SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
+            mCurrentMenu = &mGameSettingsMenu;
+            //mCurrentMenu->ResetMenu();
+        } else if(MENU_CODE_TO_MAP_BROWSER_THUMBNAILS == code) {
+            miMapBrowser->Reset(1);
 
-                mWorldMenu.RestoreCurrent();
+            mCurrentMenu = &mMapFilterEditMenu;
+            mCurrentMenu->ResetMenu();
+        } else if(MENU_CODE_SAVE_ALL_MAP_THUMBNAILS == code) {
+            miGenerateThumbsDialogImage->Show(true);
+            miGenerateThumbsDialogAreYouText->Show(true);
+            miGenerateThumbsDialogSureText->Show(true);
+            miGenerateThumbsDialogYesButton->Show(true);
+            miGenerateThumbsDialogNoButton->Show(true);
 
-                if(MENU_CODE_EXIT_WORLD_YES == code) {
-                    //Clear out any stored items a player might have
-                    for(short iPlayer = 0; iPlayer < 4; iPlayer++)
-                        game_values.storedpowerups[iPlayer] = -1;
+            mOptionsMenu.RememberCurrent();
 
-                    ResetTournamentBackToMainMenu();
-                    miWorldStop->Show(false);
-                }
-            } else if(MENU_CODE_BONUS_DONE == code) {
-                if(miBonusWheel->GetPowerupSelectionDone()) {
-                    if(game_values.matchtype == MATCH_TYPE_WORLD) {
-                        if(game_values.tournamentwinner == -1)
-                            mCurrentMenu = &mTournamentScoreboardMenu;
-                        else
-                            ResetTournamentBackToMainMenu();
-                    } else {
-                        if((game_values.matchtype == MATCH_TYPE_TOUR || game_values.matchtype == MATCH_TYPE_TOURNAMENT) && game_values.tournamentwinner == -1 &&
-                                ((game_values.matchtype != MATCH_TYPE_TOUR && game_values.bonuswheel == 2) || (game_values.matchtype == MATCH_TYPE_TOUR && game_values.tourstops[game_values.tourstopcurrent - 1]->iBonusType))) {
-                            mCurrentMenu = &mTournamentScoreboardMenu;
-                        } else if(game_values.matchtype == MATCH_TYPE_SINGLE_GAME) {
-                            mCurrentMenu = &mGameSettingsMenu;
-                            mCurrentMenu->ResetMenu();
-                            miMapField->LoadCurrentMap();
-                        } else {
-                            ResetTournamentBackToMainMenu();
-                        }
-                    }
-                }
-            } else if (MENU_CODE_TO_POWERUP_SELECTION_MENU == code) {
-                mCurrentMenu = &mPowerupSelectionMenu;
-                mCurrentMenu->ResetMenu();
-            } else if (MENU_CODE_TO_POWERUP_SETTINGS_MENU == code) {
-                mCurrentMenu = &mPowerupSettingsMenu;
-                mCurrentMenu->ResetMenu();
-            } else if (MENU_CODE_TO_GRAPHICS_OPTIONS_MENU == code) {
-                mCurrentMenu = &mGraphicsOptionsMenu;
-                mCurrentMenu->ResetMenu();
-            } else if (MENU_CODE_TO_EYECANDY_OPTIONS_MENU == code) {
-                mCurrentMenu = &mEyeCandyOptionsMenu;
-                mCurrentMenu->ResetMenu();
-            } else if (MENU_CODE_TO_SOUND_OPTIONS_MENU == code) {
-                mCurrentMenu = &mSoundOptionsMenu;
-                mCurrentMenu->ResetMenu();
-            } else if (MENU_CODE_TO_GAMEPLAY_OPTIONS_MENU == code) {
-                mCurrentMenu = &mGameplayOptionsMenu;
-                mCurrentMenu->ResetMenu();
-            } else if (MENU_CODE_TO_TEAM_OPTIONS_MENU == code) {
-                mCurrentMenu = &mTeamOptionsMenu;
-                mCurrentMenu->ResetMenu();
-            } else if (MENU_CODE_TO_PROJECTILES_OPTIONS_MENU == code) {
-                mCurrentMenu = &mProjectilesOptionsMenu;
-                mCurrentMenu->ResetMenu();
-            } else if (MENU_CODE_TO_PROJECTILES_LIMITS_MENU == code) {
-                mCurrentMenu = &mProjectilesLimitsMenu;
-                mCurrentMenu->ResetMenu();
-            } else if (MENU_CODE_TO_MODE_SETTINGS_MENU == code) {
-                for(short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
-                    if(miGoalField[iGameMode]->IsVisible()) {
-                        mCurrentMenu = modeOptionsMenu.GetOptionsMenu(iGameMode);
-                        mCurrentMenu->ResetMenu();
-                        break;
-                    }
-                }
-            } else if (MENU_CODE_MENU_GRAPHICS_PACK_CHANGED == code) {
-                LoadStartGraphics();
-                rm->LoadMenuGraphics();
+            mOptionsMenu.SetHeadControl(miGenerateThumbsDialogNoButton);
+            mOptionsMenu.SetCancelCode(MENU_CODE_GENERATE_THUMBS_RESET_NO);
+            mOptionsMenu.ResetMenu();
+        } else if(MENU_CODE_GENERATE_THUMBS_RESET_YES == code || MENU_CODE_GENERATE_THUMBS_RESET_NO == code) {
+            miGenerateThumbsDialogImage->Show(false);
+            miGenerateThumbsDialogAreYouText->Show(false);
+            miGenerateThumbsDialogSureText->Show(false);
+            miGenerateThumbsDialogYesButton->Show(false);
+            miGenerateThumbsDialogNoButton->Show(false);
 
-                blitdest = rm->menu_backdrop.getSurface();
-                rm->menu_shade.setalpha(smw->MenuTransparency	);
-                rm->menu_shade.draw(0, 0);
-                blitdest = screen;
-            } else if (MENU_CODE_WORLD_GRAPHICS_PACK_CHANGED == code) {
-                rm->LoadWorldGraphics();
-            } else if (MENU_CODE_GAME_GRAPHICS_PACK_CHANGED == code) {
-                gfx_loadpalette();
-                rm->LoadGameGraphics();
-            } else if (MENU_CODE_SOUND_PACK_CHANGED == code) {
-                LoadGameSounds();
+            mOptionsMenu.SetHeadControl(miGameplayOptionsMenuButton);
+            mOptionsMenu.SetCancelCode(MENU_CODE_TO_MAIN_MENU);
 
-                if(!game_values.soundcapable) {
-                    game_values.sound = false;
-                    game_values.music = false;
-                    game_values.soundvolume = 0;
-                    game_values.musicvolume = 0;
-                }
-            } else if (MENU_CODE_WORLD_STAGE_START == code) {
-                miWorldStop->Refresh(game_values.tourstopcurrent);
-                miWorldStop->Show(true);
+            mOptionsMenu.RestoreCurrent();
 
-                mWorldMenu.RememberCurrent();
+            if(MENU_CODE_GENERATE_THUMBS_RESET_YES == code) {
+                fGenerateMapThumbs = true;
+            }
+        } else if(MENU_CODE_HEALTH_MODE_START_LIFE_CHANGED == code) {
+            modeOptionsMenu.HealthModeStartLifeChanged();
+        } else if(MENU_CODE_HEALTH_MODE_MAX_LIFE_CHANGED == code) {
+            modeOptionsMenu.HealthModeMaxLifeChanged();
+        }
 
-                mWorldMenu.SetHeadControl(miWorldStop);
-                mWorldMenu.SetCancelCode(MENU_CODE_WORLD_STAGE_NO_START);
+        if (netplay.active) {
 
-                mWorldMenu.ResetMenu();
-            } else if (MENU_CODE_WORLD_STAGE_NO_START == code) {
-                miWorldStop->Show(false);
+            // Override menu code if response has arrived
+            if (netplay.operationInProgress) {
+                MenuCodeEnum previousCode = code;
 
-                mWorldMenu.SetHeadControl(miWorld);
-                mWorldMenu.SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
+                uint8_t lastSendType = netplay.lastSentMessage.packageType;
+                uint8_t lastRecvType = netplay.lastReceivedMessage.packageType;
 
-                mWorldMenu.RestoreCurrent();
-            } else if(MENU_CODE_WORLD_MUSIC_CHANGED == code) {
-                worldmusiclist->SetCurrent(miWorldMusicField->GetShortValue());
-            } else if (MENU_CODE_TOUR_STOP_CONTINUE == code || MENU_CODE_TOUR_STOP_CONTINUE_FORCED == code) {
-                //If this tour stop is forced, we need to load the map first
-                if(MENU_CODE_TOUR_STOP_CONTINUE_FORCED == code)
-                    miWorldStop->Refresh(game_values.tourstopcurrent);
+                if (lastSendType == NET_REQUEST_CONNECT
+                        && lastRecvType == NET_RESPONSE_CONNECT_OK)
+                    code = MENU_CODE_TO_NET_LOBBY_MENU;
 
-                miWorld->ClearCloud();
+                else if (lastSendType == NET_REQUEST_JOIN_ROOM
+                        && lastRecvType == NET_RESPONSE_JOIN_OK)
+                    code = MENU_CODE_TO_NET_ROOM_MENU;
 
-                //Tour bonus house
-                if(game_values.matchtype == MATCH_TYPE_WORLD && game_values.tourstops[game_values.tourstopcurrent]->iStageType == 1) {
-                    bonushousemode->goal = 0;
-                    game_values.gamemode = bonushousemode;
-                } else {
-                    short iGameMode = game_values.tourstops[game_values.tourstopcurrent]->iMode;
+                else if (lastSendType == NET_REQUEST_CREATE_ROOM
+                        && lastRecvType == NET_RESPONSE_CREATE_OK)
+                    code = MENU_CODE_TO_NET_ROOM_MENU;
 
-                    if(iGameMode == game_mode_pipe_minigame)
-                        game_values.gamemode = pipegamemode;
-                    else if(iGameMode == game_mode_boss_minigame)
-                        game_values.gamemode = bossgamemode;
-                    else if(iGameMode == game_mode_boxes_minigame)
-                        game_values.gamemode = boxesgamemode;
-                    else
-                        game_values.gamemode = gamemodes[iGameMode];
+                // ide a hibakezelést
+                // if lastmessage ez és lastresponse emez
+                // control.settext...
 
-                    game_values.gamemode->goal = game_values.tourstops[game_values.tourstopcurrent]->iGoal;
-                }
-
-                StartGame();
-            } else if (MENU_CODE_RESET_STORED_POWERUPS == code) {
-                for(short iPlayer = 0; iPlayer < 4; iPlayer++)
-                    game_values.storedpowerups[iPlayer] = -1;
-            } else if(MENU_CODE_MAP_CHANGED == code) {
-                if(game_values.matchtype != MATCH_TYPE_TOUR)
-                    szCurrentMapName = miMapField->GetMapName();
-            } else if(MENU_CODE_MAP_FILTER_EXIT == code) {
-                maplist->ApplyFilters(game_values.pfFilters);
-
-                //If the filtered map list has at least 1 map in it, then allow exiting the filter menu
-                if(maplist->MapInFilteredSet()) {
-                    miMapField->LoadCurrentMap();
-                    szCurrentMapName = miMapField->GetMapName();
-
-                    miMapFilterScroll->Show(false);
-
-                    mGameSettingsMenu.SetHeadControl(miSettingsStartButton);
-                    mGameSettingsMenu.SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
-
-                    mGameSettingsMenu.RestoreCurrent();
-
-                    iDisplayError = DISPLAY_ERROR_NONE;
-
-                    miMapFiltersOnImage->Show(game_values.fFiltersOn);
-                } else { //otherwise display a message
-                    iDisplayError = DISPLAY_ERROR_MAP_FILTER;
-                    iDisplayErrorTimer = 120;
-                }
-            } else if(MENU_CODE_TO_MAP_FILTERS == code) {
-                miMapFilterScroll->Show(true);
-                mGameSettingsMenu.RememberCurrent();
-
-                mGameSettingsMenu.SetHeadControl(miMapFilterScroll);
-                mGameSettingsMenu.SetCancelCode(MENU_CODE_NONE);
-                mGameSettingsMenu.ResetMenu();
-            } else if(MENU_CODE_TO_MAP_FILTER_EDIT == code) {
-                miMapBrowser->Reset(0);
-
-                mCurrentMenu = &mMapFilterEditMenu;
-                mCurrentMenu->ResetMenu();
-            } else if(MENU_CODE_MAP_BROWSER_EXIT == code) {
-                miMapField->LoadCurrentMap();
-                szCurrentMapName = miMapField->GetMapName();
-
-                mCurrentMenu = &mGameSettingsMenu;
-                //mCurrentMenu->ResetMenu();
-            } else if(MENU_CODE_TO_MAP_BROWSER_THUMBNAILS == code) {
-                miMapBrowser->Reset(1);
-
-                mCurrentMenu = &mMapFilterEditMenu;
-                mCurrentMenu->ResetMenu();
-            } else if(MENU_CODE_SAVE_ALL_MAP_THUMBNAILS == code) {
-                miGenerateThumbsDialogImage->Show(true);
-                miGenerateThumbsDialogAreYouText->Show(true);
-                miGenerateThumbsDialogSureText->Show(true);
-                miGenerateThumbsDialogYesButton->Show(true);
-                miGenerateThumbsDialogNoButton->Show(true);
-
-                mOptionsMenu.RememberCurrent();
-
-                mOptionsMenu.SetHeadControl(miGenerateThumbsDialogNoButton);
-                mOptionsMenu.SetCancelCode(MENU_CODE_GENERATE_THUMBS_RESET_NO);
-                mOptionsMenu.ResetMenu();
-            } else if(MENU_CODE_GENERATE_THUMBS_RESET_YES == code || MENU_CODE_GENERATE_THUMBS_RESET_NO == code) {
-                miGenerateThumbsDialogImage->Show(false);
-                miGenerateThumbsDialogAreYouText->Show(false);
-                miGenerateThumbsDialogSureText->Show(false);
-                miGenerateThumbsDialogYesButton->Show(false);
-                miGenerateThumbsDialogNoButton->Show(false);
-
-                mOptionsMenu.SetHeadControl(miGameplayOptionsMenuButton);
-                mOptionsMenu.SetCancelCode(MENU_CODE_TO_MAIN_MENU);
-
-                mOptionsMenu.RestoreCurrent();
-
-                if(MENU_CODE_GENERATE_THUMBS_RESET_YES == code) {
-                    fGenerateMapThumbs = true;
-                }
-            } else if(MENU_CODE_HEALTH_MODE_START_LIFE_CHANGED == code) {
-                modeOptionsMenu.HealthModeStartLifeChanged();
-            } else if(MENU_CODE_HEALTH_MODE_MAX_LIFE_CHANGED == code) {
-                modeOptionsMenu.HealthModeMaxLifeChanged();
+                // If we have finished the waiting
+                if (code != previousCode)
+                    netplay.operationInProgress = false;
             }
 
-            if (netplay.active) {
+            if(MENU_CODE_TO_NET_SERVERLIST == code) {
+                netplay.connectSuccessful = false;
+                miNetServersScroll->Show(true);
+                mNetServers.RememberCurrent();
 
-                // Override menu code if response has arrived
-                if (netplay.operationInProgress) {
-                    MenuCodeEnum previousCode = code;
+                mNetServers.SetHeadControl(miNetServersScroll);
+                mNetServers.SetCancelCode(MENU_CODE_NONE);
+                mNetServers.ResetMenu();
+            } else if(MENU_CODE_NET_SERVERLIST_EXIT == code || MENU_CODE_NET_CONNECT_ABORT == code) {
+                if (MENU_CODE_NET_SERVERLIST_EXIT == code)
+                    netplay.currentMenuChanged = true;
+                else
+                    netplay.operationInProgress = false;
 
-                    uint8_t lastSendType = netplay.lastSentMessage.packageType;
-                    uint8_t lastRecvType = netplay.lastReceivedMessage.packageType;
+                miNetServersScroll->Show(false);
+                miNetServersConnectingDialogImage->Show(false);
+                miNetServersConnectingDialogText->Show(false);
 
-                    if (lastSendType == NET_REQUEST_CONNECT
-                            && lastRecvType == NET_RESPONSE_CONNECT_OK)
-                        code = MENU_CODE_TO_NET_LOBBY_MENU;
+                mNetServers.SetHeadControl(miNetServersSelectButton);
+                mNetServers.SetCancelCode(MENU_CODE_TO_MAIN_MENU);
 
-                    else if (lastSendType == NET_REQUEST_JOIN_ROOM
-                            && lastRecvType == NET_RESPONSE_JOIN_OK)
-                        code = MENU_CODE_TO_NET_ROOM_MENU;
+                mNetServers.RestoreCurrent();
+                iDisplayError = DISPLAY_ERROR_NONE;
+            } else if(MENU_CODE_NET_CONNECT_IN_PROGRESS == code) {
+                netplay.client.sendConnectRequestToSelectedServer();
+                netplay.operationInProgress = true;
 
-                    else if (lastSendType == NET_REQUEST_CREATE_ROOM
-                            && lastRecvType == NET_RESPONSE_CREATE_OK)
-                        code = MENU_CODE_TO_NET_ROOM_MENU;
+                miNetServersConnectingDialogImage->Show(true);
+                miNetServersConnectingDialogText->Show(true);
+                mNetServers.RememberCurrent();
 
-                    // ide a hibakezelést
-                    // if lastmessage ez és lastresponse emez
-                    // control.settext...
-
-                    // If we have finished the waiting
-                    if (code != previousCode)
-                        netplay.operationInProgress = false;
+                mNetServers.SetHeadControl(miNetServersConnectingDialogText);
+                mNetServers.SetCancelCode(MENU_CODE_NET_CONNECT_ABORT);
+                mNetServers.ResetMenu();
+            } else if(MENU_CODE_TO_NET_LOBBY_MENU == code) {
+                // If we are leaving a room
+                if (netplay.currentRoom.roomID) {
+                    netplay.client.sendLeaveRoomMessage();
+                    netplay.currentRoom.roomID = 0;
+                    netplay.joinSuccessful = false;
+                    netplay.gameRunning = false;
                 }
+                netplay.client.requestRoomList();
 
-                if(MENU_CODE_TO_NET_SERVERLIST == code) {
-                    netplay.connectSuccessful = false;
-                    miNetServersScroll->Show(true);
-                    mNetServers.RememberCurrent();
-
-                    mNetServers.SetHeadControl(miNetServersScroll);
-                    mNetServers.SetCancelCode(MENU_CODE_NONE);
-                    mNetServers.ResetMenu();
-                } else if(MENU_CODE_NET_SERVERLIST_EXIT == code || MENU_CODE_NET_CONNECT_ABORT == code) {
-                    if (MENU_CODE_NET_SERVERLIST_EXIT == code)
-                        netplay.currentMenuChanged = true;
-                    else
-                        netplay.operationInProgress = false;
-
+                // Restore Servers layout
                     miNetServersScroll->Show(false);
                     miNetServersConnectingDialogImage->Show(false);
                     miNetServersConnectingDialogText->Show(false);
-
                     mNetServers.SetHeadControl(miNetServersSelectButton);
                     mNetServers.SetCancelCode(MENU_CODE_TO_MAIN_MENU);
-
                     mNetServers.RestoreCurrent();
-                    iDisplayError = DISPLAY_ERROR_NONE;
-                } else if(MENU_CODE_NET_CONNECT_IN_PROGRESS == code) {
-                    netplay.client.sendConnectRequestToSelectedServer();
-                    netplay.operationInProgress = true;
 
-                    miNetServersConnectingDialogImage->Show(true);
-                    miNetServersConnectingDialogText->Show(true);
-                    mNetServers.RememberCurrent();
-
-                    mNetServers.SetHeadControl(miNetServersConnectingDialogText);
-                    mNetServers.SetCancelCode(MENU_CODE_NET_CONNECT_ABORT);
-                    mNetServers.ResetMenu();
-                } else if(MENU_CODE_TO_NET_LOBBY_MENU == code) {
-                    // If we are leaving a room
-                    if (netplay.currentRoom.roomID) {
-                        netplay.client.sendLeaveRoomMessage();
-                        netplay.currentRoom.roomID = 0;
-                        netplay.joinSuccessful = false;
-                        netplay.gameRunning = false;
-                    }
-                    netplay.client.requestRoomList();
-
-                    // Restore Servers layout
-                        miNetServersScroll->Show(false);
-                        miNetServersConnectingDialogImage->Show(false);
-                        miNetServersConnectingDialogText->Show(false);
-                        mNetServers.SetHeadControl(miNetServersSelectButton);
-                        mNetServers.SetCancelCode(MENU_CODE_TO_MAIN_MENU);
-                        mNetServers.RestoreCurrent();
-
-                    // Restore Lobby layout
-                        miNetLobbyJoiningDialogImage->Show(false);
-                        miNetLobbyJoiningDialogText->Show(false);
-                        mNetLobby.SetHeadControl(miNetLobbyNewRoomButton);
-                        mNetLobby.SetCancelCode(MENU_CODE_TO_NET_SERVERS_MENU);
-                        mNetLobby.RestoreCurrent();
-
-                    // Restore New Room layout
-                        miNetNewRoomCreatingDialogImage->Show(false);
-                        miNetNewRoomCreatingDialogText->Show(false);
-                        mNetNewRoom.SetHeadControl(miNetNewRoomNameField);
-                        mNetNewRoom.SetCancelCode(MENU_CODE_TO_NET_NEW_ROOM_LEVEL_SELECT_MENU);
-                        mNetNewRoom.RestoreCurrent();
-
-                    // Temp.: Set dummy values to room fields.
-                        netplay.currentRoom.name[0] = '\0';
-                        netplay.currentRoom.playerNames[0][0] = '\0';
-                        netplay.currentRoom.playerNames[1][0] = '\0';
-                        netplay.currentRoom.playerNames[2][0] = '\0';
-                        netplay.currentRoom.playerNames[3][0] = '\0';
-
-                    mCurrentMenu = &mNetLobby;
-                    mCurrentMenu->ResetMenu();
-                } else if (MENU_CODE_TO_NET_NEW_ROOM_LEVEL_SELECT_MENU == code) {
-                    mCurrentMenu = &mNetNewLevel;
-                    mCurrentMenu->ResetMenu();
-                } else if (MENU_CODE_TO_NET_NEW_ROOM_SETTINGS_MENU == code) {
-                    mCurrentMenu = &mNetNewRoom;
-                    mCurrentMenu->ResetMenu();
-                } else if (MENU_CODE_TO_NET_ROOM_MENU == code) {
-                    mCurrentMenu = &mNetRoom;
-                    mCurrentMenu->ResetMenu();
-                    netplay.currentMenuChanged = true;
-                    netplay.operationInProgress = false;
-
-                    // Restore Room layout
-                        miNetRoomStartingDialogImage->Show(false);
-                        miNetRoomStartingDialogText->Show(false);
-                        mNetRoom.SetHeadControl(miNetRoomMessageField);
-                        mNetRoom.SetCancelCode(MENU_CODE_TO_NET_LOBBY_MENU);
-
-                    // Restore Lobby layout
-                        miNetLobbyJoiningDialogImage->Show(false);
-                        miNetLobbyJoiningDialogText->Show(false);
-                        mNetLobby.SetHeadControl(miNetLobbyNewRoomButton);
-                        mNetLobby.SetCancelCode(MENU_CODE_TO_NET_SERVERS_MENU);
-                        mNetLobby.RestoreCurrent();
-                } else if (MENU_CODE_NET_JOIN_ROOM_IN_PROGRESS == code) {
-                    netplay.client.sendJoinRoomMessage();
-                    netplay.operationInProgress = true;
-
-                    miNetLobbyJoiningDialogImage->Show(true);
-                    miNetLobbyJoiningDialogText->Show(true);
-
-                    mNetLobby.RememberCurrent();
-                    mNetLobby.SetHeadControl(miNetLobbyJoiningDialogText);
-                    mNetLobby.SetCancelCode(MENU_CODE_NET_JOIN_ROOM_ABORT);
-                    mNetLobby.ResetMenu();
-                } else if (MENU_CODE_NET_JOIN_ROOM_ABORT == code) {
+                // Restore Lobby layout
                     miNetLobbyJoiningDialogImage->Show(false);
                     miNetLobbyJoiningDialogText->Show(false);
-                    netplay.operationInProgress = false;
-
                     mNetLobby.SetHeadControl(miNetLobbyNewRoomButton);
                     mNetLobby.SetCancelCode(MENU_CODE_TO_NET_SERVERS_MENU);
-
                     mNetLobby.RestoreCurrent();
-                    iDisplayError = DISPLAY_ERROR_NONE;
-                } else if (MENU_CODE_TO_NET_NEW_ROOM_CREATE_IN_PROGRESS == code) {
-                    if (strlen(netplay.newroom_name) > 2) {
-                        netplay.client.sendCreateRoomMessage();
-                        netplay.operationInProgress = true;
 
-                        miNetNewRoomCreatingDialogImage ->Show(true);
-                        miNetNewRoomCreatingDialogText->Show(true);
-
-                        mNetNewRoom.RememberCurrent();
-                        mNetNewRoom.SetHeadControl(miNetNewRoomCreatingDialogText);
-                        mNetNewRoom.SetCancelCode(MENU_CODE_TO_NET_NEW_ROOM_CREATE_ABORT);
-                        mNetNewRoom.ResetMenu();
-                    }
-                    else
-                        printf("Room name is too short!\n");
-
-                } else if (MENU_CODE_TO_NET_NEW_ROOM_CREATE_ABORT == code) {
+                // Restore New Room layout
                     miNetNewRoomCreatingDialogImage->Show(false);
                     miNetNewRoomCreatingDialogText->Show(false);
-                    netplay.operationInProgress = false;
-
                     mNetNewRoom.SetHeadControl(miNetNewRoomNameField);
                     mNetNewRoom.SetCancelCode(MENU_CODE_TO_NET_NEW_ROOM_LEVEL_SELECT_MENU);
-
                     mNetNewRoom.RestoreCurrent();
-                    iDisplayError = DISPLAY_ERROR_NONE;
-                } else if (MENU_CODE_TO_NET_ROOM_START_IN_PROGRESS == code) {
-                    netplay.client.sendStartRoomMessage();
+
+                // Temp.: Set dummy values to room fields.
+                    netplay.currentRoom.name[0] = '\0';
+                    netplay.currentRoom.playerNames[0][0] = '\0';
+                    netplay.currentRoom.playerNames[1][0] = '\0';
+                    netplay.currentRoom.playerNames[2][0] = '\0';
+                    netplay.currentRoom.playerNames[3][0] = '\0';
+
+                mCurrentMenu = &mNetLobby;
+                mCurrentMenu->ResetMenu();
+            } else if (MENU_CODE_TO_NET_NEW_ROOM_LEVEL_SELECT_MENU == code) {
+                mCurrentMenu = &mNetNewLevel;
+                mCurrentMenu->ResetMenu();
+            } else if (MENU_CODE_TO_NET_NEW_ROOM_SETTINGS_MENU == code) {
+                mCurrentMenu = &mNetNewRoom;
+                mCurrentMenu->ResetMenu();
+            } else if (MENU_CODE_TO_NET_ROOM_MENU == code) {
+                mCurrentMenu = &mNetRoom;
+                mCurrentMenu->ResetMenu();
+                netplay.currentMenuChanged = true;
+                netplay.operationInProgress = false;
+
+                // Restore Room layout
+                    miNetRoomStartingDialogImage->Show(false);
+                    miNetRoomStartingDialogText->Show(false);
+                    mNetRoom.SetHeadControl(miNetRoomMessageField);
+                    mNetRoom.SetCancelCode(MENU_CODE_TO_NET_LOBBY_MENU);
+
+                // Restore Lobby layout
+                    miNetLobbyJoiningDialogImage->Show(false);
+                    miNetLobbyJoiningDialogText->Show(false);
+                    mNetLobby.SetHeadControl(miNetLobbyNewRoomButton);
+                    mNetLobby.SetCancelCode(MENU_CODE_TO_NET_SERVERS_MENU);
+                    mNetLobby.RestoreCurrent();
+            } else if (MENU_CODE_NET_JOIN_ROOM_IN_PROGRESS == code) {
+                netplay.client.sendJoinRoomMessage();
+                netplay.operationInProgress = true;
+
+                miNetLobbyJoiningDialogImage->Show(true);
+                miNetLobbyJoiningDialogText->Show(true);
+
+                mNetLobby.RememberCurrent();
+                mNetLobby.SetHeadControl(miNetLobbyJoiningDialogText);
+                mNetLobby.SetCancelCode(MENU_CODE_NET_JOIN_ROOM_ABORT);
+                mNetLobby.ResetMenu();
+            } else if (MENU_CODE_NET_JOIN_ROOM_ABORT == code) {
+                miNetLobbyJoiningDialogImage->Show(false);
+                miNetLobbyJoiningDialogText->Show(false);
+                netplay.operationInProgress = false;
+
+                mNetLobby.SetHeadControl(miNetLobbyNewRoomButton);
+                mNetLobby.SetCancelCode(MENU_CODE_TO_NET_SERVERS_MENU);
+
+                mNetLobby.RestoreCurrent();
+                iDisplayError = DISPLAY_ERROR_NONE;
+            } else if (MENU_CODE_TO_NET_NEW_ROOM_CREATE_IN_PROGRESS == code) {
+                if (strlen(netplay.newroom_name) > 2) {
+                    netplay.client.sendCreateRoomMessage();
                     netplay.operationInProgress = true;
 
-                    miNetRoomStartingDialogImage->Show(true);
-                    miNetRoomStartingDialogText->Show(true);
-                    mNetRoom.RememberCurrent();
+                    miNetNewRoomCreatingDialogImage ->Show(true);
+                    miNetNewRoomCreatingDialogText->Show(true);
 
-                    mNetRoom.SetHeadControl(miNetRoomStartingDialogText);
-                    //mNetRoom.SetCancelCode(MENU_CODE_NET_START_ABORT);
-                    mNetRoom.SetCancelCode(MENU_CODE_NONE);
-                    mNetRoom.ResetMenu();
-                } else if (MENU_CODE_NET_ROOM_GO == code) {
-                    netplay.operationInProgress = false;
-                    game_values.matchtype = MATCH_TYPE_NET_GAME;
-
-                    miTeamSelect->Reset();
-                    mTeamSelectMenu.ResetMenu();
-                    score_cnt = miTeamSelect->OrganizeTeams();
-
-                    game_values.tournamentcontrolteam = -1;
-                    game_values.tournamentwinner = -1;
-
-                    game_values.gamemode = gamemodes[0]; // TODO
-                    SModeOption * options = game_values.gamemode->GetOptions();
-                    game_values.gamemode->goal  = options[1].iValue; // TODO
-
-                    iDisplayError = DISPLAY_ERROR_NONE;
-                    iDisplayErrorTimer = 0;
-
-                    //game_values.noexit = true;
-                    StartGame();
+                    mNetNewRoom.RememberCurrent();
+                    mNetNewRoom.SetHeadControl(miNetNewRoomCreatingDialogText);
+                    mNetNewRoom.SetCancelCode(MENU_CODE_TO_NET_NEW_ROOM_CREATE_ABORT);
+                    mNetNewRoom.ResetMenu();
                 }
-
-                // on room change
-                if (netplay.currentMenuChanged) {
-                    //printf("menuChanged\n");
-
-                    // Servers screen
-                    const char* nethostname = netplay.savedServers[netplay.selectedServerIndex].hostname.c_str();
-                    miNetServersSelectedHostText->SetText(nethostname);
-
-                    // Room screen
-                    miNetRoomHeaderText->SetText(netplay.currentRoom.name);
-                    for (uint8_t p = 0; p < 4; p++)
-                        miNetRoomPlayerName[p]->SetText(netplay.currentRoom.playerNames[p]);
-
-                    netplay.currentMenuChanged = false;
-                }
-            }
-
-            /*if (code != MENU_CODE_NONE)
-                printf("Code: %d\n", code);*/
-        }
-
-        //--------------- draw everything ----------------------
-
-        //Don't draw backdrop for world
-        if(mCurrentMenu != &mWorldMenu)
-            rm->menu_backdrop.draw(0,0);
-        else
-            SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
-
-        mCurrentMenu->Update();
-        mCurrentMenu->Draw();
-
-        if(iDisplayError > DISPLAY_ERROR_NONE) {
-            rm->spr_selectfield.draw(70, 400, 0, 0, 484, 32);
-            rm->spr_selectfield.draw(554, 400, 496, 0, 16, 32);
-
-            if(iDisplayError == DISPLAY_ERROR_READ_TOUR_FILE)
-                rm->menu_font_large.drawCentered(320, 405, "Error Reading Tour File!");
-            if(iDisplayError == DISPLAY_ERROR_READ_WORLD_FILE)
-                rm->menu_font_large.drawCentered(320, 405, "Error Reading World File!");
-            else if(iDisplayError == DISPLAY_ERROR_MAP_FILTER)
-                rm->menu_font_large.drawCentered(320, 405, "No Maps Meet All Filter Conditions!");
-
-            if(--iDisplayErrorTimer == 0)
-                iDisplayError = DISPLAY_ERROR_NONE;
-        }
-
-        if(game_values.screenfadespeed != 0) {
-            game_values.screenfade += game_values.screenfadespeed;
-
-            if(game_values.screenfade <= 0) {
-                game_values.screenfadespeed = 0;
-                game_values.screenfade = 0;
-            } else if(game_values.screenfade >= 255) {
-                game_values.screenfadespeed = 0;
-                game_values.screenfade = 255;
-            }
-        }
-
-        if(game_values.screenfade > 0) {
-            rm->menu_shade.setalpha((Uint8)game_values.screenfade);
-            rm->menu_shade.draw(0, 0);
-        }
-
-        if(game_values.screenfade == 255) {
-            if(GS_START_GAME == game_values.gamestate) {
-                if(game_values.matchtype == MATCH_TYPE_QUICK_GAME)
-                    modeOptionsMenu.SetRandomGameModeSettings(game_values.gamemode->gamemode);
-                else if(game_values.matchtype == MATCH_TYPE_NET_GAME)
-                    // TODO: set from network
-                    modeOptionsMenu.SetRandomGameModeSettings(game_values.gamemode->gamemode);
                 else
-                    SetGameModeSettingsFromMenu();
+                    printf("Room name is too short!\n");
 
-                if(game_values.matchtype == MATCH_TYPE_WORLD && game_values.tourstops[game_values.tourstopcurrent]->iStageType == 1) {
-                    g_map->loadMap(convertPath("maps/special/two52_special_bonushouse.map"), read_type_full);
-                    LoadCurrentMapBackground();
+            } else if (MENU_CODE_TO_NET_NEW_ROOM_CREATE_ABORT == code) {
+                miNetNewRoomCreatingDialogImage->Show(false);
+                miNetNewRoomCreatingDialogText->Show(false);
+                netplay.operationInProgress = false;
 
-                    if(game_values.music) {
-                        backgroundmusic[0].load(worldmusiclist->GetMusic(WORLDMUSICBONUS, ""));
-                        backgroundmusic[0].play(false, false);
-                    }
-                } else {
-                    std::string sShortMapName = "";
+                mNetNewRoom.SetHeadControl(miNetNewRoomNameField);
+                mNetNewRoom.SetCancelCode(MENU_CODE_TO_NET_NEW_ROOM_LEVEL_SELECT_MENU);
 
-                    bool fMiniGameMapFound = false;
+                mNetNewRoom.RestoreCurrent();
+                iDisplayError = DISPLAY_ERROR_NONE;
+            } else if (MENU_CODE_TO_NET_ROOM_START_IN_PROGRESS == code) {
+                netplay.client.sendStartRoomMessage();
+                netplay.operationInProgress = true;
 
-                    if(game_values.matchtype == MATCH_TYPE_WORLD) {
-                        if(game_values.gamemode->gamemode == game_mode_pipe_minigame ||
-                                game_values.gamemode->gamemode == game_mode_boss_minigame ||
-                                game_values.gamemode->gamemode == game_mode_boxes_minigame) {
-                            fMiniGameMapFound = maplist->findexact(game_values.tourstops[game_values.tourstopcurrent]->pszMapFile, true);
+                miNetRoomStartingDialogImage->Show(true);
+                miNetRoomStartingDialogText->Show(true);
+                mNetRoom.RememberCurrent();
 
-                            if(fMiniGameMapFound) {
-                                g_map->loadMap(maplist->currentFilename(), read_type_full);
-                                sShortMapName = maplist->currentShortmapname();
-                            }
-                        }
-                    }
+                mNetRoom.SetHeadControl(miNetRoomStartingDialogText);
+                //mNetRoom.SetCancelCode(MENU_CODE_NET_START_ABORT);
+                mNetRoom.SetCancelCode(MENU_CODE_NONE);
+                mNetRoom.ResetMenu();
+            } else if (MENU_CODE_NET_ROOM_GO == code) {
+                netplay.operationInProgress = false;
+                game_values.matchtype = MATCH_TYPE_NET_GAME;
 
-                    if(game_values.gamemode->gamemode == game_mode_pipe_minigame) {
-                        if(!fMiniGameMapFound) {
-                            g_map->loadMap(convertPath("maps/special/two52_special_pipe_minigame.map"), read_type_full);
-                            sShortMapName = "minigamepipe";
-                        }
-                    } else if(game_values.gamemode->gamemode == game_mode_boss_minigame) {
-                        if(!fMiniGameMapFound) {
-                            short iBossType = game_values.gamemodesettings.boss.bosstype;
-                            bossgamemode->SetBossType(iBossType);
-                            if(iBossType == 0)
-                                g_map->loadMap(convertPath("maps/special/two52_special_hammerboss_minigame.map"), read_type_full);
-                            else if(iBossType == 1)
-                                g_map->loadMap(convertPath("maps/special/two52_special_bombboss_minigame.map"), read_type_full);
-                            else if(iBossType == 2)
-                                g_map->loadMap(convertPath("maps/special/two52_special_fireboss_minigame.map"), read_type_full);
+                miTeamSelect->Reset();
+                mTeamSelectMenu.ResetMenu();
+                score_cnt = miTeamSelect->OrganizeTeams();
 
-                            sShortMapName = "minigameboss";
-                        }
-                    } else if(game_values.gamemode->gamemode == game_mode_boxes_minigame) {
-                        if(!fMiniGameMapFound) {
-                            g_map->loadMap(convertPath("maps/special/two52_special_boxes_minigame.map"), read_type_full);
-                            sShortMapName = "minigameboxes";
-                        }
-                    } else if(game_values.matchtype == MATCH_TYPE_QUICK_GAME) {
-                        //Load a random map for the quick game
-                        const char * szMapName = maplist->randomFilename();
-                        g_map->loadMap(szMapName, read_type_full);
-                        sShortMapName = stripPathAndExtension(szMapName);
+                game_values.tournamentcontrolteam = -1;
+                game_values.tournamentwinner = -1;
 
-                        printf("  State: GS_START_GAME, Match type: MATCH_TYPE_QUICK_GAME\n");
-                    } else {
-                        g_map->loadMap(maplist->currentFilename(), read_type_full);
-                        sShortMapName = maplist->currentShortmapname();
-                    }
+                game_values.gamemode = gamemodes[0]; // TODO
+                SModeOption * options = game_values.gamemode->GetOptions();
+                game_values.gamemode->goal  = options[1].iValue; // TODO
 
-                    LoadCurrentMapBackground();
+                iDisplayError = DISPLAY_ERROR_NONE;
+                iDisplayErrorTimer = 0;
 
-                    //Allows all players to start the game
-                    game_values.singleplayermode = -1;
+                //game_values.noexit = true;
+                StartGame();
+            }
 
-                    if(game_values.music) {
-                        musiclist->SetRandomMusic(g_map->musicCategoryID, sShortMapName.c_str(), g_map->szBackgroundFile);
-                        backgroundmusic[0].load(musiclist->GetCurrentMusic());
-                        backgroundmusic[0].play(game_values.playnextmusic, false);
-                    }
-                }
+            // on room change
+            if (netplay.currentMenuChanged) {
+                //printf("menuChanged\n");
 
-                game_values.gamestate = GS_GAME;
-                printf("  GS_GAME\n");
+                // Servers screen
+                const char* nethostname = netplay.savedServers[netplay.selectedServerIndex].hostname.c_str();
+                miNetServersSelectedHostText->SetText(nethostname);
 
-                g_map->predrawbackground(rm->spr_background, rm->spr_backmap[0]);
-                g_map->predrawforeground(rm->spr_frontmap[0]);
+                // Room screen
+                miNetRoomHeaderText->SetText(netplay.currentRoom.name);
+                for (uint8_t p = 0; p < 4; p++)
+                    miNetRoomPlayerName[p]->SetText(netplay.currentRoom.playerNames[p]);
 
-                g_map->predrawbackground(rm->spr_background, rm->spr_backmap[1]);
-                g_map->predrawforeground(rm->spr_frontmap[1]);
-
-                g_map->SetupAnimatedTiles();
-                LoadMapObjects(false);
-
-                return;
-            } else if(GS_START_WORLD == game_values.gamestate) { //Fade to world match type
-                game_values.screenfadespeed = -8;
-
-                mCurrentMenu = &mWorldMenu;
-                mCurrentMenu->ResetMenu();
-
-                backgroundmusic[2].stop();
-                backgroundmusic[5].load(worldmusiclist->GetMusic(g_worldmap.GetMusicCategory(), g_worldmap.GetWorldName()));
-                backgroundmusic[5].play(false, false);
-                fNeedMenuMusicReset = true;
-
-                miWorld->DisplayTeamControlAnnouncement();
-
-                game_values.gamestate = GS_MENU;
+                netplay.currentMenuChanged = false;
             }
         }
 
-        if(fGenerateMapThumbs) {
-            rm->menu_dialog.draw(160, 176, 0, 0, 160, 64);
-			rm->menu_dialog.draw(smw->ScreenWidth/2, 176, 352, 0, 160, 64);
-            rm->menu_dialog.draw(160, 240, 0, 416, 160, 64);
-			rm->menu_dialog.draw(smw->ScreenWidth/2, smw->ScreenHeight/2, 352, 416, 160, 64);
-			rm->menu_font_large.drawCentered(smw->ScreenWidth/2, 215, "Refreshing Map Thumbnails");
-			rm->menu_font_large.drawCentered(smw->ScreenWidth/2, 245, "Please Wait...");
-        }
+        /*if (code != MENU_CODE_NONE)
+            printf("Code: %d\n", code);*/
+    }
 
-        ticks = SDL_GetTicks() - framestart;
-        if(ticks == 0)
-            ticks = 1;
+    //--------------- draw everything ----------------------
 
-#if	!_DEBUG
-        if(game_values.showfps)
-#endif
-            rm->menu_font_large.drawf(0, smw->ScreenHeight - rm->menu_font_large.getHeight(), "Actual:%.1f/%.1f, Flip:%.1f, Potential:%.1f", realfps, 1000.0f / (float)WAITTIME, flipfps, 1000.0f / (float)ticks);
+    //Don't draw backdrop for world
+    if(mCurrentMenu != &mWorldMenu)
+        rm->menu_backdrop.draw(0,0);
+    else
+        SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
 
-#ifdef _DEBUG
-        if(g_fAutoTest)
-            rm->menu_font_small.drawRightJustified(635, 5, "Auto");
+    mCurrentMenu->Update();
+    mCurrentMenu->Draw();
 
-        if(g_fRecordTest)
-            rm->menu_font_small.drawRightJustified(635, 5, "Recording...");
-#endif
+    if(iDisplayError > DISPLAY_ERROR_NONE) {
+        rm->spr_selectfield.draw(70, 400, 0, 0, 484, 32);
+        rm->spr_selectfield.draw(554, 400, 496, 0, 16, 32);
 
-#ifdef USE_SDL2
-        SDL_UpdateTexture(screenAsTexture, NULL, screen->pixels, screen->pitch);
-        SDL_RenderClear(renderer);
-        SDL_RenderCopy(renderer, screenAsTexture, NULL, NULL);
-        SDL_RenderPresent(renderer);
-#else
-        //double buffering -> flip buffers
-        SDL_Flip(screen);
-#endif
+        if(iDisplayError == DISPLAY_ERROR_READ_TOUR_FILE)
+            rm->menu_font_large.drawCentered(320, 405, "Error Reading Tour File!");
+        if(iDisplayError == DISPLAY_ERROR_READ_WORLD_FILE)
+            rm->menu_font_large.drawCentered(320, 405, "Error Reading World File!");
+        else if(iDisplayError == DISPLAY_ERROR_MAP_FILTER)
+            rm->menu_font_large.drawCentered(320, 405, "No Maps Meet All Filter Conditions!");
 
-        flipfps = 1000.0f / (float)ticks;
+        if(--iDisplayErrorTimer == 0)
+            iDisplayError = DISPLAY_ERROR_NONE;
+    }
 
+    if(game_values.screenfadespeed != 0) {
+        game_values.screenfade += game_values.screenfadespeed;
 
-        //Sleep for time just under what we need
-        short delay = (short)(game_values.framelimiter - SDL_GetTicks() + framestart - 2);
-
-        if(delay > 0) {
-            if(delay > game_values.framelimiter)
-                delay = game_values.framelimiter;
-
-            SDL_Delay(delay);
-        }
-
-        //Fine tune wait here
-        while(SDL_GetTicks() - framestart < (unsigned short)game_values.framelimiter)
-            SDL_Delay(0);   //keep framerate constant at 1000/game_values.framelimiter fps
-
-        //Debug code to slow framerate down to 1 fps to see exact movement
-#ifdef _DEBUG
-        if(game_values.frameadvance) {
-            delay = (short)(1000 - SDL_GetTicks() + framestart);
-
-            if(delay > 0) {
-                if(delay > 1000)
-                    delay = 1000;
-
-                SDL_Delay(delay);
-            }
-
-            while(SDL_GetTicks() - framestart < 1000)
-                SDL_Delay(0);
-        }
-#endif
-
-        ticks = SDL_GetTicks() - framestart;
-        if(ticks == 0)
-            ticks = game_values.framelimiter;
-
-        realfps = 1000.0f / (float)ticks;
-
-        if(fGenerateMapThumbs) {
-            fGenerateMapThumbs = false;
-            backgroundmusic[2].sfx_pause();
-
-            //Reload map auto filters from live map files (don't use the cache)
-            maplist->ReloadMapAutoFilters();
-
-            //Write out all the map thumbnails for the map browser and filter editor
-            char szThumbnail[256];
-            std::map<std::string, MapListNode*>::iterator itr = maplist->GetIteratorAt(0, false);
-
-            short iMapCount = maplist->GetCount();
-            for(short iMap = 0; iMap < iMapCount; iMap++) {
-                strcpy(szThumbnail, "maps/cache/");
-                char * pszThumbnail = szThumbnail + strlen(szThumbnail);
-                GetNameFromFileName(pszThumbnail, (*itr).second->filename.c_str());
-
-#ifdef PNG_SAVE_FORMAT
-                strcat(szThumbnail, ".png");
-#else
-                strcat(szThumbnail, ".bmp");
-#endif
-
-                g_map->loadMap((*itr).second->filename, read_type_preview);
-                g_map->saveThumbnail(szThumbnail, false);
-
-                itr++;
-            }
-
-            backgroundmusic[2].sfx_pause();
+        if(game_values.screenfade <= 0) {
+            game_values.screenfadespeed = 0;
+            game_values.screenfade = 0;
+        } else if(game_values.screenfade >= 255) {
+            game_values.screenfadespeed = 0;
+            game_values.screenfade = 255;
         }
     }
 
-    //we won't ever get here
-    return;
+    if(game_values.screenfade > 0) {
+        rm->menu_shade.setalpha((Uint8)game_values.screenfade);
+        rm->menu_shade.draw(0, 0);
+    }
+
+    if(game_values.screenfade == 255) {
+        if(GS_START_GAME == game_values.gamestate) {
+            if(game_values.matchtype == MATCH_TYPE_QUICK_GAME)
+                modeOptionsMenu.SetRandomGameModeSettings(game_values.gamemode->gamemode);
+            else if(game_values.matchtype == MATCH_TYPE_NET_GAME)
+                // TODO: set from network
+                modeOptionsMenu.SetRandomGameModeSettings(game_values.gamemode->gamemode);
+            else
+                SetGameModeSettingsFromMenu();
+
+            if(game_values.matchtype == MATCH_TYPE_WORLD && game_values.tourstops[game_values.tourstopcurrent]->iStageType == 1) {
+                g_map->loadMap(convertPath("maps/special/two52_special_bonushouse.map"), read_type_full);
+                LoadCurrentMapBackground();
+
+                if(game_values.music) {
+                    backgroundmusic[0].load(worldmusiclist->GetMusic(WORLDMUSICBONUS, ""));
+                    backgroundmusic[0].play(false, false);
+                }
+            } else {
+                std::string sShortMapName = "";
+
+                bool fMiniGameMapFound = false;
+
+                if(game_values.matchtype == MATCH_TYPE_WORLD) {
+                    if(game_values.gamemode->gamemode == game_mode_pipe_minigame ||
+                            game_values.gamemode->gamemode == game_mode_boss_minigame ||
+                            game_values.gamemode->gamemode == game_mode_boxes_minigame) {
+                        fMiniGameMapFound = maplist->findexact(game_values.tourstops[game_values.tourstopcurrent]->pszMapFile, true);
+
+                        if(fMiniGameMapFound) {
+                            g_map->loadMap(maplist->currentFilename(), read_type_full);
+                            sShortMapName = maplist->currentShortmapname();
+                        }
+                    }
+                }
+
+                if(game_values.gamemode->gamemode == game_mode_pipe_minigame) {
+                    if(!fMiniGameMapFound) {
+                        g_map->loadMap(convertPath("maps/special/two52_special_pipe_minigame.map"), read_type_full);
+                        sShortMapName = "minigamepipe";
+                    }
+                } else if(game_values.gamemode->gamemode == game_mode_boss_minigame) {
+                    if(!fMiniGameMapFound) {
+                        short iBossType = game_values.gamemodesettings.boss.bosstype;
+                        bossgamemode->SetBossType(iBossType);
+                        if(iBossType == 0)
+                            g_map->loadMap(convertPath("maps/special/two52_special_hammerboss_minigame.map"), read_type_full);
+                        else if(iBossType == 1)
+                            g_map->loadMap(convertPath("maps/special/two52_special_bombboss_minigame.map"), read_type_full);
+                        else if(iBossType == 2)
+                            g_map->loadMap(convertPath("maps/special/two52_special_fireboss_minigame.map"), read_type_full);
+
+                        sShortMapName = "minigameboss";
+                    }
+                } else if(game_values.gamemode->gamemode == game_mode_boxes_minigame) {
+                    if(!fMiniGameMapFound) {
+                        g_map->loadMap(convertPath("maps/special/two52_special_boxes_minigame.map"), read_type_full);
+                        sShortMapName = "minigameboxes";
+                    }
+                } else if(game_values.matchtype == MATCH_TYPE_QUICK_GAME) {
+                    //Load a random map for the quick game
+                    const char * szMapName = maplist->randomFilename();
+                    g_map->loadMap(szMapName, read_type_full);
+                    sShortMapName = stripPathAndExtension(szMapName);
+
+                    printf("  State: GS_START_GAME, Match type: MATCH_TYPE_QUICK_GAME\n");
+                } else {
+                    g_map->loadMap(maplist->currentFilename(), read_type_full);
+                    sShortMapName = maplist->currentShortmapname();
+                }
+
+                LoadCurrentMapBackground();
+
+                //Allows all players to start the game
+                game_values.singleplayermode = -1;
+
+                if(game_values.music) {
+                    musiclist->SetRandomMusic(g_map->musicCategoryID, sShortMapName.c_str(), g_map->szBackgroundFile);
+                    backgroundmusic[0].load(musiclist->GetCurrentMusic());
+                    backgroundmusic[0].play(game_values.playnextmusic, false);
+                }
+            }
+
+            game_values.gamestate = GS_GAME;
+            printf("  GS_GAME\n");
+
+            g_map->predrawbackground(rm->spr_background, rm->spr_backmap[0]);
+            g_map->predrawforeground(rm->spr_frontmap[0]);
+
+            g_map->predrawbackground(rm->spr_background, rm->spr_backmap[1]);
+            g_map->predrawforeground(rm->spr_frontmap[1]);
+
+            g_map->SetupAnimatedTiles();
+            LoadMapObjects(false);
+
+            GameStateManager::instance().changeStateTo(&GameplayState::instance());
+            return;
+        } else if(GS_START_WORLD == game_values.gamestate) { //Fade to world match type
+            game_values.screenfadespeed = -8;
+
+            mCurrentMenu = &mWorldMenu;
+            mCurrentMenu->ResetMenu();
+
+            backgroundmusic[2].stop();
+            backgroundmusic[5].load(worldmusiclist->GetMusic(g_worldmap.GetMusicCategory(), g_worldmap.GetWorldName()));
+            backgroundmusic[5].play(false, false);
+            fNeedMenuMusicReset = true;
+
+            miWorld->DisplayTeamControlAnnouncement();
+
+            game_values.gamestate = GS_MENU;
+        }
+    }
+
+    if(fGenerateMapThumbs) {
+        rm->menu_dialog.draw(160, 176, 0, 0, 160, 64);
+		rm->menu_dialog.draw(smw->ScreenWidth/2, 176, 352, 0, 160, 64);
+        rm->menu_dialog.draw(160, 240, 0, 416, 160, 64);
+		rm->menu_dialog.draw(smw->ScreenWidth/2, smw->ScreenHeight/2, 352, 416, 160, 64);
+		rm->menu_font_large.drawCentered(smw->ScreenWidth/2, 215, "Refreshing Map Thumbnails");
+		rm->menu_font_large.drawCentered(smw->ScreenWidth/2, 245, "Please Wait...");
+    }
+
+// TODO: FIX
+/*#if	!_DEBUG
+    if(game_values.showfps)
+#endif
+        rm->menu_font_large.drawf(0, smw->ScreenHeight - rm->menu_font_large.getHeight(), "Actual:%.1f/%.1f, Flip:%.1f, Potential:%.1f", realfps, 1000.0f / (float)WAITTIME, flipfps, 1000.0f / (float)ticks);
+*/
+
+#ifdef _DEBUG
+    if(g_fAutoTest)
+        rm->menu_font_small.drawRightJustified(635, 5, "Auto");
+
+    if(g_fRecordTest)
+        rm->menu_font_small.drawRightJustified(635, 5, "Recording...");
+#endif
+
+    if(fGenerateMapThumbs) {
+        fGenerateMapThumbs = false;
+        backgroundmusic[2].sfx_pause();
+
+        //Reload map auto filters from live map files (don't use the cache)
+        maplist->ReloadMapAutoFilters();
+
+        //Write out all the map thumbnails for the map browser and filter editor
+        char szThumbnail[256];
+        std::map<std::string, MapListNode*>::iterator itr = maplist->GetIteratorAt(0, false);
+
+        short iMapCount = maplist->GetCount();
+        for(short iMap = 0; iMap < iMapCount; iMap++) {
+            strcpy(szThumbnail, "maps/cache/");
+            char * pszThumbnail = szThumbnail + strlen(szThumbnail);
+            GetNameFromFileName(pszThumbnail, (*itr).second->filename.c_str());
+
+#ifdef PNG_SAVE_FORMAT
+            strcat(szThumbnail, ".png");
+#else
+            strcat(szThumbnail, ".bmp");
+#endif
+
+            g_map->loadMap((*itr).second->filename, read_type_preview);
+            g_map->saveThumbnail(szThumbnail, false);
+
+            itr++;
+        }
+
+        backgroundmusic[2].sfx_pause();
+    }
 }
 
 bool Menu::ReadTourFile()

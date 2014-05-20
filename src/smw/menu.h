@@ -4,6 +4,8 @@
 #include "modeoptionsmenu.h"
 #include "uicustomcontrol.h"
 
+#include "GameState.h"
+
 #ifdef _DEBUG
 class ScriptOperation
 {
@@ -36,14 +38,13 @@ enum MatchType {
 };
 enum DisplayError {DISPLAY_ERROR_NONE, DISPLAY_ERROR_READ_TOUR_FILE, DISPLAY_ERROR_READ_WORLD_FILE, DISPLAY_ERROR_MAP_FILTER};
 
-class Menu
+class Menu : public GameState
 {
 	public:
-		Menu() {}
-		~Menu() {}
+        bool init();
+        void update();
 
-		void CreateMenu();
-		void RunMenu();
+        static Menu& instance();
 
 #ifdef _DEBUG
 
@@ -63,7 +64,14 @@ class Menu
 #endif
 
 	private:
+		Menu() {}
+		~Menu() {}
+        Menu(Menu const&);
+        void operator=(Menu const&);
 
+		void onEnterState();
+
+		void CreateMenu();
 		bool ReadTourFile();
 		void StartGame();
 		void Exit();
@@ -511,7 +519,7 @@ class Menu
 		short iTournamentAIStep;
 		short iTournamentAITimer;
 
-		friend void RunGame();
+		friend class GameplayState;
 };
 
 #endif //__MENU_H_
