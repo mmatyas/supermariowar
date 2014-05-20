@@ -2,7 +2,7 @@
 #include <string.h>
 
 #include "net.h"
-#include "menu.h"
+#include "GSMenu.h"
 
 #include "network/NetworkProtocolPackages.h"
 

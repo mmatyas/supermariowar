@@ -13,7 +13,7 @@
 
 #include "global.h"
 #include "time.h"
-#include "menu.h"
+#include "GSMenu.h"
 #include "GSGameplay.h"
 
 #include <string>
@@ -281,9 +281,9 @@ void SplashScreenState::update()
                 game_values.playerInput.ResetKeys();
                 game_values.gamestate = GS_MENU;
 
-                Menu::instance().init();
+                MenuState::instance().init();
                 GameplayState::instance().init();
-                GameStateManager::instance().changeStateTo(&Menu::instance());
+                GameStateManager::instance().changeStateTo(&MenuState::instance());
                 return;
             }
         }

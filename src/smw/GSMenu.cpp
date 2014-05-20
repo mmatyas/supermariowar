@@ -1,6 +1,6 @@
 
 #include "global.h"
-#include "menu.h"
+#include "GSMenu.h"
 #include "GSGameplay.h"
 #include <math.h>
 
@@ -53,19 +53,19 @@ extern CScore *score[4];
 
 extern std::string stripPathAndExtension(const std::string &path);
 
-Menu& Menu::instance()
+MenuState& MenuState::instance()
 {
-    static Menu menu;
+    static MenuState menu;
     return menu;
 }
 
-bool Menu::init()
+bool MenuState::init()
 {
     CreateMenu();
     return true;
 }
 
-void Menu::WriteGameOptions()
+void MenuState::WriteGameOptions()
 {
     FILE * fp = OpenFile("options.bin", "wb");
 
@@ -185,7 +185,7 @@ void Menu::WriteGameOptions()
     maplist->WriteMapSummaryCache();
 }
 
-void Menu::CreateMenu()
+void MenuState::CreateMenu()
 {
     char szTemp[256];
 
@@ -2056,7 +2056,7 @@ void Menu::CreateMenu()
 // RUN THE MENU
 //---------------------------------------------------------------
 
-void Menu::onEnterState()
+void MenuState::onEnterState()
 {
     iUnlockMinigameOptionIndex = 0;
 
@@ -2265,7 +2265,7 @@ void Menu::onEnterState()
     }
 }
 
-void Menu::update()
+void MenuState::update()
 {
     /*
     #ifdef _XBOX
@@ -3534,7 +3534,7 @@ void Menu::update()
     }
 }
 
-bool Menu::ReadTourFile()
+bool MenuState::ReadTourFile()
 {
     ResetTourStops();
 
@@ -3588,7 +3588,7 @@ bool Menu::ReadTourFile()
     return game_values.tourstoptotal != 0;
 }
 
-void Menu::StartGame()
+void MenuState::StartGame()
 {
     printf("> StartGame\n");
 #ifdef _DEBUG
@@ -3668,7 +3668,7 @@ void Menu::StartGame()
     printf("< StartGame\n");
 }
 
-void Menu::SetControllingTeamForSettingsMenu(short iControlTeam, bool fDisplayMessage)
+void MenuState::SetControllingTeamForSettingsMenu(short iControlTeam, bool fDisplayMessage)
 {
     mGameSettingsMenu.SetControllingTeam(iControlTeam);
 
@@ -3701,7 +3701,7 @@ void Menu::SetControllingTeamForSettingsMenu(short iControlTeam, bool fDisplayMe
     }
 }
 
-void Menu::DisplayControllingTeamMessage(short iControlTeam)
+void MenuState::DisplayControllingTeamMessage(short iControlTeam)
 {
     //Display the team that is in control of selecting the next game
     char szMessage[128];
@@ -3715,13 +3715,13 @@ void Menu::DisplayControllingTeamMessage(short iControlTeam)
     mCurrentMenu->AddEyeCandy(new EC_Announcement(&rm->menu_font_large, &rm->spr_announcementicons, szMessage, iControlTeam < 0 ? 4 : game_values.colorids[game_values.teamids[iControlTeam][0]], 120, 100));
 }
 
-void Menu::Exit()
+void MenuState::Exit()
 {
     game_values.gamestate = GS_QUIT;
     WriteGameOptions();
 }
 
-void Menu::ResetTournamentBackToMainMenu()
+void MenuState::ResetTournamentBackToMainMenu()
 {
     mCurrentMenu = &mMainMenu;
     mCurrentMenu->ResetMenu();
@@ -3738,7 +3738,7 @@ void Menu::ResetTournamentBackToMainMenu()
 //Debugging code for writing and playing test scripts
 #ifdef _DEBUG
 
-void Menu::LoadScript(const char * szScriptFile)
+void MenuState::LoadScript(const char * szScriptFile)
 {
     operations.clear();
 
@@ -3773,7 +3773,7 @@ void Menu::LoadScript(const char * szScriptFile)
     iScriptState = 0;
 }
 
-void Menu::ResetScript()
+void MenuState::ResetScript()
 {
     std::vector<ScriptOperation*>::iterator itr = operations.begin();
 
@@ -3786,7 +3786,7 @@ void Menu::ResetScript()
     iScriptState = 0;
 }
 
-void Menu::GetNextScriptOperation()
+void MenuState::GetNextScriptOperation()
 {
     if(GS_MENU != game_values.gamestate)
         return;
@@ -3951,12 +3951,12 @@ void Menu::GetNextScriptOperation()
     }
 }
 
-void Menu::StartRecordScript()
+void MenuState::StartRecordScript()
 {
     operations.clear();
 }
 
-void Menu::SaveScript(const char * szScriptFile)
+void MenuState::SaveScript(const char * szScriptFile)
 {
     FILE * fp = fopen(szScriptFile, "w");
 
@@ -3992,14 +3992,14 @@ void Menu::SaveScript(const char * szScriptFile)
     }
 }
 
-void Menu::AddEmtpyLineToScript()
+void MenuState::AddEmtpyLineToScript()
 {
     ScriptOperation * op = new ScriptOperation();
     op->iController = -1;
     operations.push_back(op);
 }
 
-void Menu::SetNextScriptOperation()
+void MenuState::SetNextScriptOperation()
 {
     for(short i = 0; i < 8; i++) {
         if(game_values.playerInput.outputControls[0].keys[i].fPressed) {

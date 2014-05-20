@@ -137,7 +137,7 @@ class MI_TeamSelect : public UI_Control
 		short iFastScroll[4];
 		short iFastScrollTimer[4];
 
-	friend class Menu;
+	friend class MenuState;
 };
 
 class MI_PlayerSelect : public UI_Control

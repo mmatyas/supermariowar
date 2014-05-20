@@ -38,13 +38,13 @@ enum MatchType {
 };
 enum DisplayError {DISPLAY_ERROR_NONE, DISPLAY_ERROR_READ_TOUR_FILE, DISPLAY_ERROR_READ_WORLD_FILE, DISPLAY_ERROR_MAP_FILTER};
 
-class Menu : public GameState
+class MenuState : public GameState
 {
 	public:
         bool init();
         void update();
 
-        static Menu& instance();
+        static MenuState& instance();
 
 #ifdef _DEBUG
 
@@ -64,10 +64,10 @@ class Menu : public GameState
 #endif
 
 	private:
-		Menu() {}
-		~Menu() {}
-        Menu(Menu const&);
-        void operator=(Menu const&);
+		MenuState() {}
+		~MenuState() {}
+        MenuState(MenuState const&);
+        void operator=(MenuState const&);
 
 		void onEnterState();
 

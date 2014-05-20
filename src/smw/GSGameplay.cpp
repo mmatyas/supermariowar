@@ -1,7 +1,7 @@
 #include "GSGameplay.h"
 
 #include "global.h"                //all the global stuff
-#include "menu.h"
+#include "GSMenu.h"
 #include "math.h"
 
 
@@ -2010,7 +2010,7 @@ void GameplayState::update()
                     gfx_setresolution(smw->ScreenWidth, smw->ScreenHeight, game_values.fullscreen);
                     blitdest = screen;
 
-                    Menu::instance().miFullscreenField->SetKey(game_values.fullscreen ? 1 : 0);
+                    MenuState::instance().miFullscreenField->SetKey(game_values.fullscreen ? 1 : 0);
 
                     //Continue with input -> don't feed this event to the input
                     //otherwise it will pause the game when switching to full/windowed screen
@@ -2146,7 +2146,7 @@ void GameplayState::update()
     }
 
     if (updateExitPause(iCountDownState)) {
-        GameStateManager::instance().changeStateTo(&Menu::instance());
+        GameStateManager::instance().changeStateTo(&MenuState::instance());
         return;
     }
 
@@ -2295,7 +2295,7 @@ SWAPBREAK:
                 CleanUp();
                 game_values.gamestate = GS_MENU;
                 game_values.screenfadespeed = -8;
-                GameStateManager::instance().changeStateTo(&Menu::instance());
+                GameStateManager::instance().changeStateTo(&MenuState::instance());
 
                 return;
             }

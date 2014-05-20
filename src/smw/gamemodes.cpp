@@ -1,6 +1,7 @@
-#include "global.h"
-#include "menu.h"
 #include <math.h>
+
+#include "global.h"
+#include "GSMenu.h"
 
 extern	gfxFont font[3];
 extern CScore *score[4];

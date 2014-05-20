@@ -1,6 +1,6 @@
 
 #include "global.h"
-#include "menu.h"
+#include "GSMenu.h"
 
 
 void ModeOptionsMenu::CreateMenu()

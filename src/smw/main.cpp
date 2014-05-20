@@ -20,7 +20,7 @@
 #include "global.h"				//all the global stuff
 
 #include "Game.h"
-#include "menu.h"   // included for match types
+#include "GSMenu.h"             // included for match types
 
 #include <time.h>
 #include <math.h>

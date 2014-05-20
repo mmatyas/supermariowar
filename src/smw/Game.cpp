@@ -13,7 +13,6 @@
 #include "path.h"
 #include "FPSLimiter.h"
 #include "GSSplashScreen.h"
-#include "menu.h"
 
 #ifdef __EMSCRIPTEN__
 void game_frame();
