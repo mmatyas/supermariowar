@@ -1,8 +1,6 @@
-Super Mario War
-===============
+# Super Mario War
 
-About
-=====
+## About
 
 Super Mario War is a Super Mario multiplayer game.
 The goal is to stomp as many other Marios as possible to win the game.
@@ -10,8 +8,7 @@ It's a tribute to Nintendo and the game Mario War by Samuele Poletto.
 
 The game uses artwork and sounds from Nintendo games. We hope that this noncommercial fangame qualifies as fair use work. We just wanted to create this game to show how much we adore Nintendo's characters and games.
 
-Features
---------
+### Features
 
 - Up to four players deathmatch fun
 - a whole bunch of game modes (featuring GetTheChicken, Domination, CTF, ...)
@@ -24,29 +21,27 @@ Features
 - CPU Players
 - will make you happy and gives you a fuzzy feeling
 
-Supported platforms
--------------------
+### Supported platforms
 
 - Linux
 - Windows
-- XBox
-- MAC OS X
+- XBox (?)
+- Mac OS X (?)
+- asm.js/emscripten
 
-Building instructions
-=====================
+## Building instructions
 
-Requirements
-------------
+### Requirements
 
 - cmake
-- SDL 1.2, with
+- SDL 1.2 (preferred) or 2.0, with
     - SDL_image
     - SDL_mixer
     - SDL_net
 
-On Linux, this means the following packages: `cmake libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev`
+On Linux, this usually means the following packages: `cmake libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev`
 
-You can download the development files manually from:
+For other systems, you can download the development files manually from:
 
 - http://www.cmake.org/cmake/resources/software.html#latest
 - http://www.libsdl.org/download-1.2.php
@@ -54,10 +49,9 @@ You can download the development files manually from:
 - http://www.libsdl.org/projects/SDL_mixer/release-1.2.html
 - http://www.libsdl.org/projects/SDL_net/release-1.2.html
 
-Linux
------
+### Linux
 
-Enter the Build directory, run cmake, then make and finally you can use the binary smw in Build/Binaries directories.
+Enter the build directory, run cmake, then make and finally you can use the binary smw in Build/Binaries directories.
 
 ```sh
 $ mkdir Build
@@ -79,10 +73,9 @@ $ gdb Binaries/smw
 gdb> run ../data_full
 ```
 
-Windows
--------
+### Windows
 
-Note: You can also use MinGW and MinGW Shell/Cygwin for compiling.
+Note: You can use MinGW and MinGW Shell/Cygwin for compiling too.
 
 Visual Studio:
 
@@ -93,12 +86,31 @@ Visual Studio:
 - change also system to WINDOWS (not console)
 - now it will compile and smw.exe can be found in build\Binaries\Debug\smw.exe. make sure you copy the necessary SDL dlls along with smw.exe, otherwise it won't work
 
-Compilation options
--------------------
+### ASM.JS
 
-Open CMakeLists.txt to see what options are available, they are described on the first lines of the file.
+SMW can be build to run in your browser. For this, you need
+emscripten with the special LLVM backend, and clang.
+See [here](https://github.com/kripken/emscripten/wiki/LLVM-Backend) for more information.
 
-How to play
-===========
+You can prepare a build directory with the following commands:
+
+```sh
+$ mkdir build-js && cd build-js
+$ ln -s ../data data
+$ emconfigure cmake .. -DUSE_EMSCRIPTEN=1
+```
+
+Then build with:
+
+```sh
+$ emmake make
+$ emcc Binaries/smw.bc -o smw.html -O3 -v --preload-file data -s OUTLINING_LIMIT=60000 -s ALLOW_MEMORY_GROWTH=1
+```
+
+### Compilation options
+
+Open CMakeLists.txt to see what options are available, they are described on the beginning the file. You can also use `cmake-gui`.
+
+## How to play
 
 Please see documentation in docs/ directory.
