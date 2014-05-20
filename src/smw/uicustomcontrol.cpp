@@ -8,6 +8,14 @@
     extern const char * Keynames[340];
     #define Keynames(key) Keynames[key]
 #endif
+
+#ifndef __EMSCRIPTEN__
+    inline void smallDelay() { SDL_Delay(10); }
+#else
+    inline void smallDelay() {}
+#endif
+
+
 extern const char * Joynames[30];
 
 extern const char * GameInputNames[NUM_KEYS];
@@ -3576,9 +3584,9 @@ void MI_MapBrowser::LoadPage(short page, bool fUseFilters)
 
         if(!File_Exists(sConvertedPath)) {
             g_map->loadMap((*itr).second->filename, read_type_preview);
-            SDL_Delay(10);  //Sleeps to help the music from skipping
+            smallDelay();  //Sleeps to help the music from skipping
             g_map->saveThumbnail(sConvertedPath, false);
-            SDL_Delay(10);
+            smallDelay();
         }
 
         if(mapSurfaces[iMap])

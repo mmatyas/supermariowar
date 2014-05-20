@@ -4,6 +4,12 @@
 extern void LoadCurrentMapBackground();
 extern void LoadMapHazards(bool fPreview);
 
+#ifndef __EMSCRIPTEN__
+    inline void smallDelay() { SDL_Delay(10); }
+#else
+    inline void smallDelay() {}
+#endif
+
 UI_Control::UI_Control(short x, short y)
 {
     fSelected = false;
@@ -2067,25 +2073,27 @@ void MI_MapField::LoadCurrentMap()
 void MI_MapField::LoadMap(const char * szMapPath)
 {
     g_map->loadMap(szMapPath, read_type_preview);
-    SDL_Delay(10);  //Sleeps to help the music from skipping
+    smallDelay(); //Sleeps to help the music from skipping
 
     LoadCurrentMapBackground();
-
-    SDL_Delay(10);  //Sleeps to help the music from skipping
+    smallDelay();
 
     g_map->preDrawPreviewBackground(&rm->spr_background, surfaceMapBackground, false);
-    SDL_Delay(10);  //Sleeps to help the music from skipping
+    smallDelay();
+
     g_map->preDrawPreviewBlocks(surfaceMapBlockLayer, false);
-    SDL_Delay(10);  //Sleeps to help the music from skipping
+    smallDelay();
+
     g_map->preDrawPreviewMapItems(surfaceMapBackground, false);
-    SDL_Delay(10);  //Sleeps to help the music from skipping
+    smallDelay();
+
     g_map->preDrawPreviewForeground(surfaceMapForeground, false);
-    SDL_Delay(10);  //Sleeps to help the music from skipping
+    smallDelay();
+
     g_map->preDrawPreviewWarps(game_values.toplayer ? surfaceMapForeground : surfaceMapBackground, false);
-    SDL_Delay(10);  //Sleeps to help the music from skipping
+    smallDelay();
 
     LoadMapHazards(true);
-
 }
 
 bool MI_MapField::SetMap(const char * paramSzMapName, bool fWorld)

@@ -376,7 +376,11 @@ SDL_Surface * gfx_createskinsurface(SDL_Surface * skin, short spriteindex, Uint8
         return NULL;
     }
 
+#ifdef __EMSCRIPTEN__
+    SDL_Surface * final = SDL_DisplayFormatAlpha(temp);
+#else
     SDL_Surface * final = SDL_DisplayFormat(temp);
+#endif
     if(!final) {
         printf("\n ERROR: Couldn't create new surface using SDL_DisplayFormat(): %s\n", SDL_GetError());
         return NULL;
@@ -584,7 +588,11 @@ SDL_Surface * gfx_createteamcoloredsurface(SDL_Surface * sImage, short iColor, U
         }
     }
 
+#ifdef __EMSCRIPTEN__
+    SDL_Surface * sFinalImage = SDL_DisplayFormatAlpha(sTempImage);
+#else
     SDL_Surface * sFinalImage = SDL_DisplayFormat(sTempImage);
+#endif
     if(!sFinalImage) {
         printf("\n ERROR: Couldn't create new surface using SDL_DisplayFormat(): %s\n", SDL_GetError());
         return NULL;
@@ -896,7 +904,11 @@ bool gfxSprite::init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b, boo
         return false;
     }
 
-    SDL_Surface *temp = SDL_DisplayFormat(m_picture);
+#ifdef __EMSCRIPTEN__
+    SDL_Surface * temp = SDL_DisplayFormatAlpha(m_picture);
+#else
+    SDL_Surface * temp = SDL_DisplayFormat(m_picture);
+#endif
 
     if(!temp) {
         cout << endl << " ERROR: Couldn't convert "
@@ -985,7 +997,11 @@ bool gfxSprite::init(const std::string& filename)
         return false;
     }
 
-    SDL_Surface *temp = SDL_DisplayFormat(m_picture);
+#ifdef __EMSCRIPTEN__
+    SDL_Surface * temp = SDL_DisplayFormatAlpha(m_picture);
+#else
+    SDL_Surface * temp = SDL_DisplayFormat(m_picture);
+#endif
 
     if(!temp) {
         cout << endl << " ERROR: Couldn't convert "

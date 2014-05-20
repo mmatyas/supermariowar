@@ -14,6 +14,12 @@ using std::endl;
     #endif
 #endif
 
+#ifndef __EMSCRIPTEN__
+    inline void smallDelay() { SDL_Delay(10); }
+#else
+    inline void smallDelay() {}
+#endif
+
 #ifdef _WIN32
 #ifndef _XBOX
 #pragma comment(linker, "/NODEFAULTLIB:libc.lib")
@@ -2371,21 +2377,17 @@ void CMap::preDrawPreviewMapItems(SDL_Surface * targetSurface, bool fThumbnail)
 void CMap::preDrawPreviewBackground(SDL_Surface * targetSurface, bool fThumbnail)
 {
     drawPreview(targetSurface, 0, fThumbnail);
-
-    SDL_Delay(10);
+    smallDelay(); //Sleeps to help the music from skipping
 
     drawPreview(targetSurface, 1, fThumbnail);
-
-    SDL_Delay(10);
+    smallDelay();
 
     if(!game_values.toplayer) {
         drawPreview(targetSurface, 2, fThumbnail);
-
-        SDL_Delay(10);
+        smallDelay();
 
         drawPreview(targetSurface, 3, fThumbnail);
-
-        SDL_Delay(10);
+        smallDelay();
     }
 
     //drawPreviewBlocks(targetSurface, fThumbnail);
@@ -2416,8 +2418,7 @@ void CMap::preDrawPreviewBackground(gfxSprite * background, SDL_Surface * target
         return;
     }
 
-    SDL_Delay(10);  //Sleeps to help the music from skipping
-
+    smallDelay();
     preDrawPreviewBackground(targetSurface, fThumbnail);
 }
 
@@ -2426,7 +2427,7 @@ void CMap::preDrawPreviewBlocks(SDL_Surface * targetSurface, bool fThumbnail)
     if(!fThumbnail) {
         SDL_FillRect(targetSurface, NULL, SDL_MapRGB(targetSurface->format, 255, 0, 255));
         SDL_SETCOLORKEY(targetSurface, SDL_FALSE, SDL_MapRGB(targetSurface->format, 255, 0, 255));
-        SDL_Delay(10);
+        smallDelay();
     }
 
     drawPreviewBlocks(targetSurface, fThumbnail);
@@ -2438,16 +2439,14 @@ void CMap::preDrawPreviewForeground(SDL_Surface * targetSurface, bool fThumbnail
     if(!fThumbnail) {
         SDL_FillRect(targetSurface, NULL, SDL_MapRGB(targetSurface->format, 255, 0, 255));
         SDL_SETCOLORKEY(targetSurface, SDL_FALSE, SDL_MapRGB(targetSurface->format, 255, 0, 255));
-        SDL_Delay(10);
+        smallDelay();
     }
 
     if(!game_values.toplayer)
         return;
 
     drawPreview(targetSurface, 2, fThumbnail);
-
-    SDL_Delay(10);
-
+    smallDelay();
     drawPreview(targetSurface, 3, fThumbnail);
 }
 

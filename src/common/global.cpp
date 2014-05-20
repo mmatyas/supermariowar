@@ -291,6 +291,7 @@ void _load_drawmsg(const std::string& f)
 
 void _load_waitforkey()
 {
+#ifndef __EMSCRIPTEN__
     SDL_Event event;
     while (true) {
         while(SDL_PollEvent(&event)) {
@@ -302,6 +303,7 @@ void _load_waitforkey()
 
         SDL_Delay(10);
     }
+#endif
 }
 
 //Takes a path to a file and gives you back the file name (with or without author) as a char *

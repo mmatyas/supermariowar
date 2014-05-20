@@ -108,7 +108,7 @@
         #endif
     }
 
-    #ifdef __EMSCRIPTEN__
+    /*#ifdef __EMSCRIPTEN__
     inline SDL_Surface * SDL_DisplayFormat(SDL_Surface *surface)
     {
         SDL_Surface * temp = SDL_CreateRGBSurface(SDL_SWSURFACE | SDL_SRCALPHA,
@@ -117,7 +117,7 @@
         SDL_BlitSurface(temp, NULL, surface, NULL);
         return temp;
     }
-    #endif
+    #endif*/
 
 #endif
 
