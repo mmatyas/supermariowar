@@ -1,5 +1,5 @@
 #ifndef GAMESTATE_GAMEPLAY_H
-#define GAMESTATE_GAMEPLAY_H value
+#define GAMESTATE_GAMEPLAY_H
 
 #include "GameState.h"
 #include "global.h"
@@ -66,4 +66,4 @@ class GameplayState : public GameState
 
 };
 
-#endif
+#endif // GAMESTATE_GAMEPLAY_H
