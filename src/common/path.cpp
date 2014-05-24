@@ -60,7 +60,7 @@ bool File_Exists (const std::string fileName)
 /* Call this when your application launches */
 void Initialize_Paths()
 {
-    if(SMW_Root_Data_Dir[0] != 0) {
+    if (SMW_Root_Data_Dir[0] != 0) {
 		return;
 	}
 
@@ -146,7 +146,7 @@ const string convertPath(const string& source)
 
 const string convertPath(const string& source, const string& pack)
 {
-    if(source.find("gfx/packs/") == 0) {
+    if (source.find("gfx/packs/") == 0) {
 		string trailingdir = source.substr(9);
 
 #ifdef _XBOX
@@ -156,14 +156,14 @@ const string convertPath(const string& source, const string& pack)
 #endif
 
 		//If the file exists, return the path to it
-		if(File_Exists(s))
+		if (File_Exists(s))
 			return s;
 
 		//If not, use the classic file
 		return convertPath("gfx/packs/Classic" + trailingdir);
 	}
 
-    if(source.find("sfx/packs/") == 0) {
+    if (source.find("sfx/packs/") == 0) {
 		string trailingdir = source.substr(9);
 
 #ifdef _XBOX
@@ -173,7 +173,7 @@ const string convertPath(const string& source, const string& pack)
 #endif
 
 		//If the file exists, return the path to it
-		if(File_Exists(s))
+		if (File_Exists(s))
 			return s;
 
 		//If not, use the classic file
@@ -210,7 +210,7 @@ const string getFileFromPath(const string &path)
 {
 	short iPos = path.find_last_of(getDirectorySeperator()[0]);
 
-	if(iPos > 0)
+	if (iPos > 0)
 		return path.substr(iPos + 1);
 
 	return path;

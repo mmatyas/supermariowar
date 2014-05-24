@@ -30,11 +30,11 @@ void FPSLimiter::frameStart() {
 void FPSLimiter::beforeFlip()
 {
     ticks = SDL_GetTicks() - framestart;
-    if(ticks == 0)
+    if (ticks == 0)
         ticks = 1;
 
 #if !_DEBUG
-    if(game_values.showfps)
+    if (game_values.showfps)
 #endif
     {
         float potentialFps = 1000.0f / (float)(game_values.framelimiter == 0 ? 1 : game_values.framelimiter);
@@ -49,8 +49,8 @@ void FPSLimiter::afterFlip()
     //Sleep for time just under what we need
     short delay = (short)(game_values.framelimiter - SDL_GetTicks() + framestart - 2);
 
-    if(delay > 0) {
-        if(delay > game_values.framelimiter)
+    if (delay > 0) {
+        if (delay > game_values.framelimiter)
             delay = game_values.framelimiter;
 
         SDL_Delay(delay);
@@ -62,11 +62,11 @@ void FPSLimiter::afterFlip()
 
     //Debug code to slow framerate down to 1 fps to see exact movement
 #ifdef _DEBUG
-    if(game_values.frameadvance) {
+    if (game_values.frameadvance) {
         delay = (short)(1000 - SDL_GetTicks() + framestart);
 
-        if(delay > 0) {
-            if(delay > 1000)
+        if (delay > 0) {
+            if (delay > 1000)
                 delay = 1000;
 
             SDL_Delay(delay);
@@ -78,7 +78,7 @@ void FPSLimiter::afterFlip()
 #endif
 
     ticks = SDL_GetTicks() - framestart;
-    if(ticks == 0)
+    if (ticks == 0)
         ticks = game_values.framelimiter;
 
     realfps = 1000.0f / (float)ticks;
@@ -89,7 +89,7 @@ void FPSLimiter::afterFlip()
 
     avgFPS += realfps;
 
-    if(++outputtimer == 1)
+    if (++outputtimer == 1)
     {
         FILE * out = fopen("fps.txt", "a+");
 

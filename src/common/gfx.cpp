@@ -65,7 +65,7 @@ bool gfx_init(int w, int h, bool fullscreen)
         ver_compiled.major, ver_compiled.minor, ver_compiled.patch);
 
     // init SDL
-    if( SDL_Init(SDL_INIT_VIDEO) < 0 ) {
+    if ( SDL_Init(SDL_INIT_VIDEO) < 0 ) {
         printf("error: %s\n", SDL_GetError());
         return false;
     } else
@@ -134,7 +134,7 @@ bool gfx_init(int w, int h, bool fullscreen)
 
 
 #else
-    if(fullscreen)
+    if (fullscreen)
         screen = SDL_SetVideoMode(w, h, GFX_BPP, GFX_FLAGS | SDL_FULLSCREEN);
     else
         screen = SDL_SetVideoMode(w, h, GFX_BPP, GFX_FLAGS);
@@ -190,7 +190,7 @@ bool gfx_loadpalette()
                 colorschemes[i][j][k] = new Uint8[numcolors];
     }
 
-    if(SDL_MUSTLOCK(palette))
+    if (SDL_MUSTLOCK(palette))
         SDL_LockSurface(palette);
 
     int counter = 0;
@@ -237,7 +237,7 @@ void gfx_setresolution(int w, int h, bool fullscreen)
     assert(screen);
     assert(screenAsTexture);
 
-    if(fullscreen) {
+    if (fullscreen) {
         SDL_DestroyWindow(window);
         window = SDL_CreateWindow("smw",
             SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
@@ -258,12 +258,12 @@ void gfx_setresolution(int w, int h, bool fullscreen)
     }
 #else
     Uint32 flags = GFX_FLAGS;
-    if(fullscreen)
+    if (fullscreen)
         flags |= SDL_FULLSCREEN;
 
     #ifdef _XBOX
 
-        if(game_values.aspectratio10x11)
+        if (game_values.aspectratio10x11)
             flags |= SDL_10X11PIXELASPECTRATIO;
 
         screen = SDL_SetVideoModeWithFlickerFilter(w, h, GFX_BPP, flags, game_values.flickerfilter, game_values.softfilter);
@@ -294,7 +294,7 @@ void gfx_close()
 
 bool ValidSkinSurface(SDL_Surface * skin)
 {
-    if(skin->w == 192 && skin->h == 32 && skin->format->BitsPerPixel == 24)
+    if (skin->w == 192 && skin->h == 32 && skin->format->BitsPerPixel == 24)
         return true;
 
     return false;
@@ -303,17 +303,17 @@ bool ValidSkinSurface(SDL_Surface * skin)
 SDL_Surface * gfx_createskinsurface(SDL_Surface * skin, short spriteindex, Uint8 r, Uint8 g, Uint8 b, short colorScheme, bool expand, bool reverse)
 {
     int loops = 1;
-    if(expand)
+    if (expand)
         loops = NUM_SCHEMES;
 
     //Blit over loaded skin into player image set
     SDL_Surface * temp = SDL_CreateRGBSurface(skin->flags, 32 * loops, 32, skin->format->BitsPerPixel, skin->format->Rmask, skin->format->Gmask, skin->format->Bmask, skin->format->Amask);
 
     //Take the loaded skin and colorize it for each state (normal, 3 frames of invincibiliy, shielded, tagged, ztarred. got shine)
-    if(SDL_MUSTLOCK(temp))
+    if (SDL_MUSTLOCK(temp))
         SDL_LockSurface(temp);
 
-    if(SDL_MUSTLOCK(skin))
+    if (SDL_MUSTLOCK(skin))
         SDL_LockSurface(skin);
 
     int skincounter = spriteindex * 96;
@@ -330,7 +330,7 @@ SDL_Surface * gfx_createskinsurface(SDL_Surface * skin, short spriteindex, Uint8
 
     for (int j = 0; j < 32; j++) {
         for (int i = 0; i < 32; i++) {
-            if(reverse)
+            if (reverse)
                 reverseoffset = (31 - (i * 2)) * 3;
 
             Uint8 iColorByte1 = pixels[skincounter + iRedOffset];
@@ -339,7 +339,7 @@ SDL_Surface * gfx_createskinsurface(SDL_Surface * skin, short spriteindex, Uint8
 
             bool fFoundColor = false;
             for (int m = 0; m < numcolors; m++) {
-                if(iColorByte1 == colorcodes[0][m] && iColorByte2 == colorcodes[1][m] && iColorByte3 == colorcodes[2][m]) {
+                if (iColorByte1 == colorcodes[0][m] && iColorByte2 == colorcodes[1][m] && iColorByte3 == colorcodes[2][m]) {
                     for (int k = 0; k < loops; k++) {
                         temppixels[tempcounter + k * 96 + reverseoffset + iRedOffset] = colorschemes[colorScheme][k][0][m];
                         temppixels[tempcounter + k * 96 + reverseoffset + iGreenOffset] = colorschemes[colorScheme][k][1][m];
@@ -351,7 +351,7 @@ SDL_Surface * gfx_createskinsurface(SDL_Surface * skin, short spriteindex, Uint8
                 }
             }
 
-            if(!fFoundColor) {
+            if (!fFoundColor) {
                 for (int k = 0; k < loops; k++) {
                     temppixels[tempcounter + k * 96 + reverseoffset + iRedOffset] = iColorByte1;
                     temppixels[tempcounter + k * 96 + reverseoffset + iGreenOffset] = iColorByte2;
@@ -371,7 +371,7 @@ SDL_Surface * gfx_createskinsurface(SDL_Surface * skin, short spriteindex, Uint8
     SDL_UnlockSurface(skin);
     SDL_UnlockSurface(temp);
 
-    if( SDL_SETCOLORKEY(temp, SDL_TRUE, SDL_MapRGB(temp->format, r, g, b)) < 0 ) {
+    if ( SDL_SETCOLORKEY(temp, SDL_TRUE, SDL_MapRGB(temp->format, r, g, b)) < 0 ) {
         printf("\n ERROR: Couldn't set ColorKey + RLE for new skin surface: %s\n", SDL_GetError());
         return NULL;
     }
@@ -381,7 +381,7 @@ SDL_Surface * gfx_createskinsurface(SDL_Surface * skin, short spriteindex, Uint8
 #else
     SDL_Surface * final = SDL_DisplayFormat(temp);
 #endif
-    if(!final) {
+    if (!final) {
         printf("\n ERROR: Couldn't create new surface using SDL_DisplayFormat(): %s\n", SDL_GetError());
         return NULL;
     }
@@ -396,7 +396,7 @@ bool gfx_loadmenuskin(gfxSprite ** gSprite, const std::string& filename, Uint8 r
     // Load the BMP file into a surface
     SDL_Surface * skin = IMG_Load(filename.c_str());
 
-    if(!ValidSkinSurface(skin))
+    if (!ValidSkinSurface(skin))
         return false;
 
     if (skin == NULL) {
@@ -418,7 +418,7 @@ bool gfx_loadmenuskin(gfxSprite ** gSprite, const std::string& filename, Uint8 r
         gSprite[iSprite * 2]->setSurface(skinSurface);
     }
 
-    if(fLoadBothDirections) {
+    if (fLoadBothDirections) {
         for (short iSprite = 0; iSprite < 2; iSprite++) {
             SDL_Surface * skinSurface = gfx_createskinsurface(skin, iSprite, r, g, b, colorScheme, true, true);
 
@@ -444,7 +444,7 @@ bool gfx_loadfullskin(gfxSprite ** gSprites, const std::string& filename, Uint8 
     // Load the BMP file into a surface
     SDL_Surface * skin = IMG_Load(filename.c_str());
 
-    if(!ValidSkinSurface(skin))
+    if (!ValidSkinSurface(skin))
         return false;
 
     if (skin == NULL) {
@@ -500,10 +500,10 @@ SDL_Surface * gfx_createteamcoloredsurface(SDL_Surface * sImage, short iColor, U
     SDL_Surface * sTempImage = SDL_CreateRGBSurface(sImage->flags, iColor == -2 ? sImage->w << 2 : sImage->w, iColor == -1 ? sImage->h << 2 : sImage->h, sImage->format->BitsPerPixel, sImage->format->Rmask, sImage->format->Gmask, sImage->format->Bmask, sImage->format->Amask);
 
     //Take the loaded image and colorize it
-    if(SDL_MUSTLOCK(sTempImage))
+    if (SDL_MUSTLOCK(sTempImage))
         SDL_LockSurface(sTempImage);
 
-    if(SDL_MUSTLOCK(sImage))
+    if (SDL_MUSTLOCK(sImage))
         SDL_LockSurface(sImage);
 
     //Need two counters because the pitch of the surfaces could be different
@@ -512,9 +512,9 @@ SDL_Surface * gfx_createteamcoloredsurface(SDL_Surface * sImage, short iColor, U
 
     int iNextImageOffset = 0;
 
-    if(iColor == -1)
+    if (iColor == -1)
         iNextImageOffset = sImage->pitch * sImage->h;
-    else if(iColor == -2)
+    else if (iColor == -2)
         iNextImageOffset = sImage->w * 3;
 
     Uint8 * pixels = (Uint8*)sImage->pixels;
@@ -533,8 +533,8 @@ SDL_Surface * gfx_createteamcoloredsurface(SDL_Surface * sImage, short iColor, U
 
             bool fFoundColor = false;
             for (int m = 0; m < numcolors; m++) {
-                if(iColorByte1 == colorcodes[0][m] && iColorByte2 == colorcodes[1][m] && iColorByte3 == colorcodes[2][m]) {
-                    if(iColor < 0) {
+                if (iColorByte1 == colorcodes[0][m] && iColorByte2 == colorcodes[1][m] && iColorByte3 == colorcodes[2][m]) {
+                    if (iColor < 0) {
                         for (short iTeam = 0; iTeam < 4; iTeam++) {
                             temppixels[iDstPixelCounter + iRedOffset + iNextImageOffset * iTeam] = colorschemes[iTeam][0][0][m];
                             temppixels[iDstPixelCounter + iGreenOffset + iNextImageOffset * iTeam] = colorschemes[iTeam][0][1][m];
@@ -551,8 +551,8 @@ SDL_Surface * gfx_createteamcoloredsurface(SDL_Surface * sImage, short iColor, U
                 }
             }
 
-            if(!fFoundColor) {
-                if(iColor < 0) {
+            if (!fFoundColor) {
+                if (iColor < 0) {
                     for (short iTeam = 0; iTeam < 4; iTeam++) {
                         temppixels[iDstPixelCounter + iRedOffset + iNextImageOffset * iTeam] = iColorByte1;
                         temppixels[iDstPixelCounter + iGreenOffset + iNextImageOffset * iTeam] = iColorByte2;
@@ -576,13 +576,13 @@ SDL_Surface * gfx_createteamcoloredsurface(SDL_Surface * sImage, short iColor, U
     SDL_UnlockSurface(sImage);
     SDL_UnlockSurface(sTempImage);
 
-    if( SDL_SETCOLORKEY(sTempImage, SDL_TRUE, SDL_MapRGB(sTempImage->format, r, g, b)) < 0 ) {
+    if ( SDL_SETCOLORKEY(sTempImage, SDL_TRUE, SDL_MapRGB(sTempImage->format, r, g, b)) < 0 ) {
         printf("\n ERROR: Couldn't set ColorKey + RLE for new team colored surface: %s\n", SDL_GetError());
         return NULL;
     }
 
-    if(a < 255) {
-        if(SDL_SETALPHABYTE(sTempImage, SDL_TRUE, a) < 0) {
+    if (a < 255) {
+        if (SDL_SETALPHABYTE(sTempImage, SDL_TRUE, a) < 0) {
             cout << endl << " ERROR: Couldn't set per-surface alpha: " << SDL_GetError() << endl;
             return NULL;
         }
@@ -593,7 +593,7 @@ SDL_Surface * gfx_createteamcoloredsurface(SDL_Surface * sImage, short iColor, U
 #else
     SDL_Surface * sFinalImage = SDL_DisplayFormat(sTempImage);
 #endif
-    if(!sFinalImage) {
+    if (!sFinalImage) {
         printf("\n ERROR: Couldn't create new surface using SDL_DisplayFormat(): %s\n", SDL_GetError());
         return NULL;
     }
@@ -675,13 +675,13 @@ void gfx_setrect(SDL_Rect * rect, SDL_Rect * copyrect)
 
 void gfx_cliprect(SDL_Rect * srcRect, SDL_Rect * dstRect, short x, short y, short w, short h)
 {
-    if(dstRect->x >= x + w || dstRect->x + dstRect->w < x || dstRect->y >= y + h || dstRect->y + dstRect->h < y) {
+    if (dstRect->x >= x + w || dstRect->x + dstRect->w < x || dstRect->y >= y + h || dstRect->y + dstRect->h < y) {
         srcRect->w = 0;
         srcRect->h = 0;
         return;
     }
 
-    if(dstRect->x < x) {
+    if (dstRect->x < x) {
         short iDiffX = x - dstRect->x;
         srcRect->x += iDiffX;
         srcRect->w -= iDiffX;
@@ -689,13 +689,13 @@ void gfx_cliprect(SDL_Rect * srcRect, SDL_Rect * dstRect, short x, short y, shor
         //dstRect->w -= iDiffX;
     }
 
-    if(dstRect->x + dstRect->w >= x + w) {
+    if (dstRect->x + dstRect->w >= x + w) {
         short iDiffX = dstRect->x + dstRect->w - x - w;
         srcRect->w -= iDiffX;
         //dstRect->w -= iDiffX;
     }
 
-    if(dstRect->y < y) {
+    if (dstRect->y < y) {
         short iDiffY = y - dstRect->y;
         srcRect->y += iDiffY;
         srcRect->h -= iDiffY;
@@ -703,7 +703,7 @@ void gfx_cliprect(SDL_Rect * srcRect, SDL_Rect * dstRect, short x, short y, shor
         //dstRect->h -= iDiffY;
     }
 
-    if(dstRect->y + dstRect->h >= y + h) {
+    if (dstRect->y + dstRect->h >= y + h) {
         short iDiffY = dstRect->y + dstRect->h - y - h;
         srcRect->h -= iDiffY;
         //dstRect->h -= iDiffY;
@@ -712,9 +712,9 @@ void gfx_cliprect(SDL_Rect * srcRect, SDL_Rect * dstRect, short x, short y, shor
 
 bool gfx_adjusthiddenrects(SDL_Rect * srcRect, SDL_Rect * dstRect, short iHiddenDirection, short iHiddenValue)
 {
-    if(iHiddenDirection == 0) {
-        if(dstRect->y <= iHiddenValue) {
-            if(dstRect->y + srcRect->h <= iHiddenValue)
+    if (iHiddenDirection == 0) {
+        if (dstRect->y <= iHiddenValue) {
+            if (dstRect->y + srcRect->h <= iHiddenValue)
                 return true;
 
             short iDiff = iHiddenValue - dstRect->y;
@@ -723,25 +723,25 @@ bool gfx_adjusthiddenrects(SDL_Rect * srcRect, SDL_Rect * dstRect, short iHidden
             dstRect->y = iHiddenValue + y_shake;
             dstRect->h = srcRect->h;
         }
-    } else if(iHiddenDirection == 1) {
-        if(dstRect->x + srcRect->w >= iHiddenValue) {
-            if(dstRect->x >= iHiddenValue)
+    } else if (iHiddenDirection == 1) {
+        if (dstRect->x + srcRect->w >= iHiddenValue) {
+            if (dstRect->x >= iHiddenValue)
                 return true;
 
             srcRect->w = iHiddenValue - dstRect->x;
             dstRect->w = srcRect->w;
         }
-    } else if(iHiddenDirection == 2) {
-        if(dstRect->y + srcRect->h >= iHiddenValue) {
-            if(dstRect->y >= iHiddenValue)
+    } else if (iHiddenDirection == 2) {
+        if (dstRect->y + srcRect->h >= iHiddenValue) {
+            if (dstRect->y >= iHiddenValue)
                 return true;
 
             srcRect->h = iHiddenValue - dstRect->y;
             dstRect->h = srcRect->h;
         }
-    } else if(iHiddenDirection == 3) {
-        if(dstRect->x <= iHiddenValue) {
-            if(dstRect->x + srcRect->w <= iHiddenValue)
+    } else if (iHiddenDirection == 3) {
+        if (dstRect->x <= iHiddenValue) {
+            if (dstRect->x + srcRect->w <= iHiddenValue)
                 return true;
 
             short iDiff = iHiddenValue - dstRect->x;
@@ -763,27 +763,27 @@ void gfx_drawpreview(SDL_Surface * surface, short dstX, short dstY, short srcX, 
 
     gfx_cliprect(&rSrcRect, &rDstRect, clipX, clipY, clipW, clipH);
 
-    if(hiddenDirection > -1)
+    if (hiddenDirection > -1)
         gfx_adjusthiddenrects(&rSrcRect, &rDstRect, hiddenDirection, hiddenPlane);
 
     // Blit onto the screen surface
-    if(SDL_BlitSurface(surface, &rSrcRect, blitdest, &rDstRect) < 0) {
+    if (SDL_BlitSurface(surface, &rSrcRect, blitdest, &rDstRect) < 0) {
         fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
         return;
     }
 
-    if(wrap) {
+    if (wrap) {
         //Deal with wrapping over sides of screen
         bool fBlitSide = false;
-        if(dstX < clipX) {
+        if (dstX < clipX) {
             rDstRect.x = dstX + smw->ScreenWidth/2;
             fBlitSide = true;
-        } else if(dstX + iw >= clipX + clipW) {
+        } else if (dstX + iw >= clipX + clipW) {
             rDstRect.x = dstX - smw->ScreenWidth/2;
             fBlitSide = true;
         }
 
-        if(fBlitSide) {
+        if (fBlitSide) {
             //need to set source rect before each blit so it can be clipped correctly
             rSrcRect.x = srcX;
             rSrcRect.y = srcY;
@@ -796,10 +796,10 @@ void gfx_drawpreview(SDL_Surface * surface, short dstX, short dstY, short srcX, 
 
             gfx_cliprect(&rSrcRect, &rDstRect, clipX, clipY, clipW, clipH);
 
-            if(hiddenDirection > -1)
+            if (hiddenDirection > -1)
                 gfx_adjusthiddenrects(&rSrcRect, &rDstRect, hiddenDirection, hiddenPlane);
 
-            if(SDL_BlitSurface(surface, &rSrcRect, blitdest, &rDstRect) < 0) {
+            if (SDL_BlitSurface(surface, &rSrcRect, blitdest, &rDstRect) < 0) {
                 fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
                 return;
             }
@@ -826,7 +826,7 @@ bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, bool fWrap, bool f
 {
     bool fRet = gSprite->init(f, 255, 0, 255, fUseAccel);
 
-    if(fRet)
+    if (fRet)
         gSprite->SetWrap(fWrap);
 
     return fRet;
@@ -836,7 +836,7 @@ bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, Uint8 alpha, bool 
 {
     bool fRet = gSprite->init(f, 255, 0, 255, alpha, fUseAccel);
 
-    if(fRet)
+    if (fRet)
         gSprite->SetWrap(fWrap);
 
     return fRet;
@@ -846,7 +846,7 @@ bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, Uint8 r, Uint8 g, 
 {
     bool fRet = gSprite->init(f, r, g, b, fUseAccel);
 
-    if(fRet)
+    if (fRet)
         gSprite->SetWrap(fWrap);
 
     return fRet;
@@ -886,7 +886,7 @@ bool gfxSprite::init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b, boo
 {
     cout << "loading sprite (mode 1) " << filename << "...";
 
-    if(m_picture) {
+    if (m_picture) {
         SDL_FreeSurface(m_picture);
         m_picture = NULL;
     }
@@ -898,7 +898,7 @@ bool gfxSprite::init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b, boo
         return false;
     }
 
-    if( SDL_SETCOLORKEY(m_picture, fUseAccel ? SDL_TRUE : SDL_FALSE, SDL_MapRGB(m_picture->format, r, g, b)) < 0) {
+    if ( SDL_SETCOLORKEY(m_picture, fUseAccel ? SDL_TRUE : SDL_FALSE, SDL_MapRGB(m_picture->format, r, g, b)) < 0) {
         cout << endl << " ERROR: Couldn't set ColorKey + RLE for "
              << filename << ": " << SDL_GetError() << endl;
         return false;
@@ -910,7 +910,7 @@ bool gfxSprite::init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b, boo
     SDL_Surface * temp = SDL_DisplayFormat(m_picture);
 #endif
 
-    if(!temp) {
+    if (!temp) {
         cout << endl << " ERROR: Couldn't convert "
              << filename << " to the display's pixel format: " << SDL_GetError()
              << endl;
@@ -931,7 +931,7 @@ bool gfxSprite::init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b, Uin
 {
     cout << "Loading sprite (mode 2) " << filename << " ...";
 
-    if(m_picture) {
+    if (m_picture) {
         SDL_FreeSurface(m_picture);
         m_picture = NULL;
     }
@@ -944,13 +944,13 @@ bool gfxSprite::init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b, Uin
         return false;
     }
 
-    if( SDL_SETCOLORKEY(m_picture, fUseAccel ? SDL_TRUE : SDL_FALSE, SDL_MapRGB(m_picture->format, r, g, b)) < 0) {
+    if ( SDL_SETCOLORKEY(m_picture, fUseAccel ? SDL_TRUE : SDL_FALSE, SDL_MapRGB(m_picture->format, r, g, b)) < 0) {
         cout << endl << " ERROR: Couldn't set ColorKey + RLE for "
              << filename << ": " << SDL_GetError() << endl;
         return false;
     }
 
-    if( (SDL_SETALPHABYTE(m_picture, fUseAccel ? SDL_TRUE : SDL_FALSE, a)) < 0) {
+    if ( (SDL_SETALPHABYTE(m_picture, fUseAccel ? SDL_TRUE : SDL_FALSE, a)) < 0) {
         cout << endl << " ERROR: Couldn't set per-surface alpha on "
              << filename << ": " << SDL_GetError() << endl;
         return false;
@@ -963,7 +963,7 @@ bool gfxSprite::init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b, Uin
     SDL_Surface *temp = SDL_DisplayFormatAlpha(m_picture);
 #endif
 
-    if(!temp) {
+    if (!temp) {
         cout << endl << " ERROR: Couldn't convert "
              << filename << " to the display's pixel format: " << SDL_GetError()
              << endl;
@@ -983,7 +983,7 @@ bool gfxSprite::init(const std::string& filename)
 {
     cout << "loading sprite (mode 3) " << filename << "...";
 
-    if(m_picture) {
+    if (m_picture) {
         SDL_FreeSurface(m_picture);
         m_picture = NULL;
     }
@@ -1003,7 +1003,7 @@ bool gfxSprite::init(const std::string& filename)
     SDL_Surface * temp = SDL_DisplayFormat(m_picture);
 #endif
 
-    if(!temp) {
+    if (!temp) {
         cout << endl << " ERROR: Couldn't convert "
              << filename << " to the display's pixel format: " << SDL_GetError()
              << endl;
@@ -1030,25 +1030,25 @@ bool gfxSprite::draw(short x, short y)
     m_bltrect.x = x + x_shake;
     m_bltrect.y = y + y_shake;
 
-    if(SDL_BlitSurface(m_picture, NULL, blitdest, &m_bltrect) < 0) {
+    if (SDL_BlitSurface(m_picture, NULL, blitdest, &m_bltrect) < 0) {
         fprintf(stderr, "BlitSurface error: %s\n", SDL_GetError());
         return false;
     }
 
-    if(fWrap) {
-        if(x + m_picture->w >= iWrapSize) {
+    if (fWrap) {
+        if (x + m_picture->w >= iWrapSize) {
             m_bltrect.x = x - iWrapSize + x_shake;
             m_bltrect.y = y + y_shake;
 
-            if(SDL_BlitSurface(m_picture, NULL, blitdest, &m_bltrect) < 0) {
+            if (SDL_BlitSurface(m_picture, NULL, blitdest, &m_bltrect) < 0) {
                 fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
                 return false;
             }
-        } else if(x < 0) {
+        } else if (x < 0) {
             m_bltrect.x = x + iWrapSize + x_shake;
             m_bltrect.y = y + y_shake;
 
-            if(SDL_BlitSurface(m_picture, NULL, blitdest, &m_bltrect) < 0) {
+            if (SDL_BlitSurface(m_picture, NULL, blitdest, &m_bltrect) < 0) {
                 fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
                 return false;
             }
@@ -1071,41 +1071,41 @@ bool gfxSprite::draw(short x, short y, short srcx, short srcy, short w, short h,
     m_srcrect.w = w;
     m_srcrect.h = h;
 
-    if(sHiddenDirection > -1) {
-        if(gfx_adjusthiddenrects(&m_srcrect, &m_bltrect, sHiddenDirection, sHiddenValue))
+    if (sHiddenDirection > -1) {
+        if (gfx_adjusthiddenrects(&m_srcrect, &m_bltrect, sHiddenDirection, sHiddenValue))
             return true;
     }
 
     // Blit onto the screen surface
-    if(SDL_BlitSurface(m_picture, &m_srcrect, blitdest, &m_bltrect) < 0) {
+    if (SDL_BlitSurface(m_picture, &m_srcrect, blitdest, &m_bltrect) < 0) {
         fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
         return false;
     }
 
-    if(fWrap) {
-        if(x + w >= iWrapSize) {
+    if (fWrap) {
+        if (x + w >= iWrapSize) {
             gfx_setrect(&m_srcrect, srcx, srcy, w, h);
             gfx_setrect(&m_bltrect, x - iWrapSize + x_shake, y + y_shake, w, h);
 
-            if(sHiddenDirection > -1) {
-                if(gfx_adjusthiddenrects(&m_srcrect, &m_bltrect, sHiddenDirection, sHiddenValue))
+            if (sHiddenDirection > -1) {
+                if (gfx_adjusthiddenrects(&m_srcrect, &m_bltrect, sHiddenDirection, sHiddenValue))
                     return true;
             }
 
-            if(SDL_BlitSurface(m_picture, &m_srcrect, blitdest, &m_bltrect) < 0) {
+            if (SDL_BlitSurface(m_picture, &m_srcrect, blitdest, &m_bltrect) < 0) {
                 fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
                 return false;
             }
-        } else if(x < 0) {
+        } else if (x < 0) {
             gfx_setrect(&m_srcrect, srcx, srcy, w, h);
             gfx_setrect(&m_bltrect, x + iWrapSize + x_shake, y + y_shake, w, h);
 
-            if(sHiddenDirection > -1) {
-                if(gfx_adjusthiddenrects(&m_srcrect, &m_bltrect, sHiddenDirection, sHiddenValue))
+            if (sHiddenDirection > -1) {
+                if (gfx_adjusthiddenrects(&m_srcrect, &m_bltrect, sHiddenDirection, sHiddenValue))
                     return true;
             }
 
-            if(SDL_BlitSurface(m_picture, &m_srcrect, blitdest, &m_bltrect) < 0) {
+            if (SDL_BlitSurface(m_picture, &m_srcrect, blitdest, &m_bltrect) < 0) {
                 fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
                 return false;
             }
@@ -1129,7 +1129,7 @@ bool gfxSprite::drawStretch(short x, short y, short w, short h, short srcx, shor
 
     // Looks like SoftStretch doesn't respect transparent colors
     // I need to look into the actual SDL code to see if I can fix this
-    if(SDL_SCALEBLIT(m_picture, &m_srcrect, blitdest, &m_bltrect) < 0) {
+    if (SDL_SCALEBLIT(m_picture, &m_srcrect, blitdest, &m_bltrect) < 0) {
         fprintf(stderr, "SDL_SoftStretch error: %s\n", SDL_GetError());
         return false;
     }
@@ -1141,14 +1141,14 @@ void gfxSprite::setalpha(Uint8 alpha)
 {
     assert(m_picture != NULL);
 
-    if( (SDL_SETALPHABYTE(m_picture, SDL_TRUE, alpha)) < 0) {
+    if ( (SDL_SETALPHABYTE(m_picture, SDL_TRUE, alpha)) < 0) {
         printf("\n ERROR: couldn't set alpha on sprite: %s\n", SDL_GetError());
     }
 }
 
 void gfxSprite::freeSurface()
 {
-    if(m_picture) {
+    if (m_picture) {
         SDL_FreeSurface(m_picture);
         m_picture = NULL;
     }
@@ -1163,26 +1163,26 @@ gfxFont::gfxFont()
 
 gfxFont::~gfxFont()
 {
-    if(m_font)
+    if (m_font)
         SFont_FreeFont(m_font);
 };
 
 bool gfxFont::init(const std::string& filename)
 {
-    if(m_font)
+    if (m_font)
         SFont_FreeFont(m_font);
 
     cout << "loading font " << filename << " ... ";
 
     SDL_Surface *fontsurf = IMG_Load(filename.c_str());
-    if(fontsurf == NULL) {
+    if (fontsurf == NULL) {
         cout << endl << " ERROR: Couldn't load file "
              << filename << ": " << SDL_GetError() << endl;
         return false;
     }
 
     m_font = SFont_InitFont(fontsurf);
-    if(!m_font) {
+    if (!m_font) {
         cout << endl << " ERROR: an error occurre while loading the font." << endl;
         return false;
     }
@@ -1193,7 +1193,7 @@ bool gfxFont::init(const std::string& filename)
 
 void gfxFont::draw(int x, int y, const std::string& s)
 {
-    //if(y + getHeight() < 0)
+    //if (y + getHeight() < 0)
     //	return;
 
     SFont_Write(blitdest, m_font, x, y, s.c_str());
@@ -1201,7 +1201,7 @@ void gfxFont::draw(int x, int y, const std::string& s)
 
 void gfxFont::drawChopRight(int x, int y, int width, const char *s)
 {
-    //if(y + getHeight() < 0)
+    //if (y + getHeight() < 0)
     //	return;
 
     SFont_WriteChopRight(blitdest, m_font, x, y, width, s);
@@ -1209,7 +1209,7 @@ void gfxFont::drawChopRight(int x, int y, int width, const char *s)
 
 void gfxFont::drawChopLeft(int x, int y, int width, const char *s)
 {
-    //if(y + getHeight() < 0)
+    //if (y + getHeight() < 0)
     //	return;
 
     SFont_WriteChopLeft(blitdest, m_font, x, y, width, s);
@@ -1217,7 +1217,7 @@ void gfxFont::drawChopLeft(int x, int y, int width, const char *s)
 
 void gfxFont::drawCentered(int x, int y, const char *text)
 {
-    //if(y + getHeight() < 0)
+    //if (y + getHeight() < 0)
     //	return;
 
     SFont_WriteCenter(blitdest, m_font, x, y, text);
@@ -1225,7 +1225,7 @@ void gfxFont::drawCentered(int x, int y, const char *text)
 
 void gfxFont::drawChopCentered(int x, int y, int width, const char *text)
 {
-    //if(y + getHeight() < 0)
+    //if (y + getHeight() < 0)
     //	return;
 
     SFont_WriteChopCenter(blitdest, m_font, x, y, width, text);
@@ -1240,7 +1240,7 @@ void gfxFont::drawRightJustified(int x, int y, const char *s, ...)
     vsprintf(buffer, s, zeiger);
     va_end(zeiger);
 
-    //if(y + getHeight() < 0)
+    //if (y + getHeight() < 0)
     //	return;
 
     SFont_WriteRight(blitdest, m_font, x, y, buffer);
@@ -1261,7 +1261,7 @@ void gfxFont::drawf(int x, int y, const char *s, ...)
 
 void gfxFont::setalpha(Uint8 alpha)
 {
-    if( (SDL_SETALPHABYTE(m_font->Surface, SDL_TRUE, alpha)) < 0) {
+    if ( (SDL_SETALPHABYTE(m_font->Surface, SDL_TRUE, alpha)) < 0) {
         printf("\n ERROR: couldn't set alpha on sprite: %s\n", SDL_GetError());
     }
 }

@@ -18,23 +18,23 @@ void LoadMapHazards(bool fPreview)
     //Create objects for all the map hazards
     for (short iMapHazard = 0; iMapHazard < g_map->iNumMapHazards; iMapHazard++) {
         MapHazard * hazard = &g_map->maphazards[iMapHazard];
-        if(hazard->itype == 0) {
+        if (hazard->itype == 0) {
             for (short iFireball = 0; iFireball < hazard->iparam[0]; iFireball++)
                 objectcontainer[1].add(new OMO_OrbitHazard(&rm->spr_hazard_fireball[fPreview ? 1 : 0], (hazard->ix << 4) + 16, (hazard->iy << 4) + 16, (float)(iFireball * 24), hazard->dparam[0], hazard->dparam[1], 4, 8, 18, 18, 0, 0, 0, hazard->dparam[0] < 0.0f ? 18 : 0, 18, 18));
-        } else if(hazard->itype == 1) {
+        } else if (hazard->itype == 1) {
             float dSector = TWO_PI / hazard->iparam[0];
             for (short iRotoDisc = 0; iRotoDisc < hazard->iparam[0]; iRotoDisc++) {
                 float dAngle = hazard->dparam[1] + iRotoDisc * dSector;
-                if(dAngle > TWO_PI)
+                if (dAngle > TWO_PI)
                     dAngle -= TWO_PI;
 
                 objectcontainer[1].add(new OMO_OrbitHazard(&rm->spr_hazard_rotodisc[fPreview ? 1 : 0], (hazard->ix << 4) + 16, (hazard->iy << 4) + 16, hazard->dparam[2], hazard->dparam[0], dAngle, 21, 8, 32, 32, 0, 0, 0, 0, 32, 32));
             }
-        } else if(hazard->itype == 2) {
+        } else if (hazard->itype == 2) {
             noncolcontainer.add(new IO_BulletBillCannon(hazard->ix << 4, hazard->iy << 4, hazard->iparam[0], hazard->dparam[0], fPreview));
-        } else if(hazard->itype == 3) {
+        } else if (hazard->itype == 3) {
             objectcontainer[1].add(new IO_FlameCannon(hazard->ix << 4, hazard->iy << 4, hazard->iparam[0], hazard->iparam[1]));
-        } else if(hazard->itype >= 4 && hazard->itype <= 7) {
+        } else if (hazard->itype >= 4 && hazard->itype <= 7) {
             objectcontainer[1].add(new MO_PirhanaPlant(hazard->ix << 4, hazard->iy << 4, hazard->itype - 4, hazard->iparam[0], hazard->iparam[1], fPreview));
         }
     }
@@ -65,9 +65,9 @@ void OMO_OrbitHazard::update()
 
     dAngle += dVel;
 
-    if(dAngle < 0.0f)
+    if (dAngle < 0.0f)
         dAngle += TWO_PI;
-    else if(dAngle >= TWO_PI)
+    else if (dAngle >= TWO_PI)
         dAngle -= TWO_PI;
 
     CalculatePosition();
@@ -75,7 +75,7 @@ void OMO_OrbitHazard::update()
 
 bool OMO_OrbitHazard::collide(CPlayer * player)
 {
-    if(!player->invincible && player->shield == 0 && !player->shyguy) {
+    if (!player->invincible && player->shield == 0 && !player->shyguy) {
         return player->KillPlayerMapHazard(false, kill_style_environment, false) != player_kill_nonkill;
     }
 
@@ -108,23 +108,23 @@ void OMO_StraightPathHazard::update()
 {
     IO_OverMapObject::update();
 
-    if(iy + ih < 0 || iy >= smw->ScreenHeight)
+    if (iy + ih < 0 || iy >= smw->ScreenHeight)
         dead = true;
 
     //Wrap hazard if it is off the edge of the screen
-    if(ix < 0)
+    if (ix < 0)
         ix += smw->ScreenWidth;
-    else if(ix + iw >= smw->ScreenWidth)
+    else if (ix + iw >= smw->ScreenWidth)
         ix -= smw->ScreenWidth;
 }
 
 bool OMO_StraightPathHazard::collide(CPlayer * player)
 {
-    if(player->shield == 0) {
+    if (player->shield == 0) {
         eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + (iw >> 2) - 16, iy + (ih >> 2) - 16, 3, 8));
         dead = true;
 
-        if(!player->invincible && !player->shyguy) {
+        if (!player->invincible && !player->shyguy) {
             return player->KillPlayerMapHazard(false, kill_style_environment, false) != player_kill_nonkill;
         }
     }
@@ -154,14 +154,14 @@ MO_BulletBill::MO_BulletBill(gfxSprite *nspr, gfxSprite *nsprdead, short x, shor
 
     inair = true;
 
-    if(fIsSpawned) {
+    if (fIsSpawned) {
         iPlayerID = -1;
         iColorID = 0;
         iTeamID = -1;
 
         animationspeed = 0;
 
-        if(velx < 0.0f) {
+        if (velx < 0.0f) {
             iHiddenDirection = 1;
             iHiddenPlane = ix;
         } else {
@@ -169,7 +169,7 @@ MO_BulletBill::MO_BulletBill(gfxSprite *nspr, gfxSprite *nsprdead, short x, shor
             iHiddenPlane = ix + TILESIZE;
         }
     } else {
-        if(velx < 0.0f)
+        if (velx < 0.0f)
             setXi(smw->ScreenWidth + iw);
         else
             setXi(-iw);
@@ -192,13 +192,13 @@ void MO_BulletBill::update()
 
     animate();
 
-    if((velx < 0.0f && ix < -iw) || (velx > 0.0f && ix > smw->ScreenWidth))
+    if ((velx < 0.0f && ix < -iw) || (velx > 0.0f && ix > smw->ScreenWidth))
         dead = true;
 }
 
 void MO_BulletBill::draw()
 {
-    if(fIsSpawned)
+    if (fIsSpawned)
         spr->draw(ix, iy, drawframe, iColorOffsetY + iDirectionOffsetY, iw, ih, iHiddenDirection, iHiddenPlane);
     else
         spr->draw(ix, iy, drawframe, iColorOffsetY + iDirectionOffsetY, iw, ih);
@@ -207,7 +207,7 @@ void MO_BulletBill::draw()
 //For preview drawing
 void MO_BulletBill::draw(short iOffsetX, short iOffsetY)
 {
-    if(fIsSpawned)
+    if (fIsSpawned)
         gfx_drawpreview(spr->getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, drawframe >> 1, (iColorOffsetY + iDirectionOffsetY) >> 1, iw >> 1, ih >> 1, iOffsetX, iOffsetY, 320, 240, false, iHiddenDirection, (iHiddenPlane >> 1) + iOffsetX);
     else
         gfx_drawpreview(spr->getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, drawframe >> 1, (iColorOffsetY + iDirectionOffsetY) >> 1, iw >> 1, ih >> 1, iOffsetX, iOffsetY, 320, 240, false);
@@ -215,22 +215,22 @@ void MO_BulletBill::draw(short iOffsetX, short iOffsetY)
 
 bool MO_BulletBill::collide(CPlayer * player)
 {
-    if(dead)
+    if (dead)
         return false;
 
     //if the bullet bill is off the screen, don't wrap it to collide
-    if((ix < 0 && velx < 0.0f && player->ix > ix + iw && player->ix + PW < smw->ScreenWidth) ||
+    if ((ix < 0 && velx < 0.0f && player->ix > ix + iw && player->ix + PW < smw->ScreenWidth) ||
             (ix + iw >= smw->ScreenWidth && velx > 0.0f && player->ix + PW < ix && player->ix >= 0)) {
         return false;
     }
 
-    if(player->invincible || player->shyguy) {
+    if (player->invincible || player->shyguy) {
         AddAwardKill(player, NULL, kill_style_bulletbill);
         ifSoundOnPlay(sfx_kicksound);
 
         Die();
     } else {
-        if(player->fOldY + PH <= iy && player->iy + PH >= iy)
+        if (player->fOldY + PH <= iy && player->iy + PH >= iy)
             return hittop(player);
         else
             return hitother(player);
@@ -258,10 +258,10 @@ bool MO_BulletBill::hittop(CPlayer * player)
 
 bool MO_BulletBill::hitother(CPlayer * player)
 {
-    if(player->shield > 0 || player->globalID == iPlayerID)
+    if (player->shield > 0 || player->globalID == iPlayerID)
         return false;
 
-    if(game_values.teamcollision != 2 && iTeamID == player->teamID)
+    if (game_values.teamcollision != 2 && iTeamID == player->teamID)
         return false;
 
     //Find the player that owns this bullet bill so we can attribute a kill
@@ -276,20 +276,20 @@ void MO_BulletBill::collide(IO_MovingObject * object)
 
     MovingObjectType type = object->getMovingObjectType();
 
-    if(type == movingobject_bulletbill) {
+    if (type == movingobject_bulletbill) {
         MO_BulletBill * bulletbill = (MO_BulletBill*) object;
 
         //Same team bullet bills don't kill each other
-        if(bulletbill->iTeamID == iTeamID)
+        if (bulletbill->iTeamID == iTeamID)
             return;
 
         bulletbill->dead = true;
         dead = true;
 
         short iOffsetX = 0;
-        if(ix + iw < bulletbill->ix)
+        if (ix + iw < bulletbill->ix)
             iOffsetX = smw->ScreenWidth;
-        else if(bulletbill->ix + bulletbill->iw < ix)
+        else if (bulletbill->ix + bulletbill->iw < ix)
             iOffsetX = -smw->ScreenWidth;
 
         short iCenterX = ((ix + iOffsetX - bulletbill->ix) >> 1) + (bulletbill->ix + (bulletbill->iw >> 1));
@@ -297,16 +297,16 @@ void MO_BulletBill::collide(IO_MovingObject * object)
 
         objectcontainer[2].add(new MO_Explosion(&rm->spr_explosion, iCenterX - 96, iCenterY - 64, 2, 4, -1, -1, kill_style_bulletbill));
         ifSoundOnPlay(sfx_bobombsound);
-    } else if(type == movingobject_shell || type == movingobject_throwblock || type == movingobject_throwbox || type == movingobject_attackzone || type == movingobject_explosion) {
+    } else if (type == movingobject_shell || type == movingobject_throwblock || type == movingobject_throwbox || type == movingobject_attackzone || type == movingobject_explosion) {
         //Don't kill things with shells that are sitting still
-        if(type == movingobject_shell && object->state == 2)
+        if (type == movingobject_shell && object->state == 2)
             return;
 
         //Don't kill things with boxesx that aren't moving fast enough
-        if(type == movingobject_throwbox && !((CO_ThrowBox*)object)->HasKillVelocity())
+        if (type == movingobject_throwbox && !((CO_ThrowBox*)object)->HasKillVelocity())
             return;
 
-        if(type != movingobject_explosion) {
+        if (type != movingobject_explosion) {
             object->Die();
         }
 
@@ -345,7 +345,7 @@ IO_BulletBillCannon::IO_BulletBillCannon(short x, short y, short freq, float vel
 
 void IO_BulletBillCannon::update()
 {
-    if(--iTimer <= 0) {
+    if (--iTimer <= 0) {
         SetNewTimer();
 
         objectcontainer[1].add(new MO_BulletBill(&rm->spr_hazard_bulletbill[fPreview ? 1 : 0], &rm->spr_hazard_bulletbilldead, ix + (dVel < 0.0f ? 32 : -32), iy, dVel, 0, true));
@@ -378,7 +378,7 @@ MO_Explosion::MO_Explosion(gfxSprite *nspr, short x, short y, short iNumSpr, sho
 
 bool MO_Explosion::collide(CPlayer * player)
 {
-    if(player->globalID != iPlayerID && (game_values.teamcollision == 2 || iTeamID != player->teamID) && !player->invincible && player->shield == 0 && !player->shyguy) {
+    if (player->globalID != iPlayerID && (game_values.teamcollision == 2 || iTeamID != player->teamID) && !player->invincible && player->shield == 0 && !player->shyguy) {
         //Find the player that made this explosion so we can attribute a kill
         PlayerKilledPlayer(iPlayerID, player, death_style_jump, iStyle, false, false);
         return true;
@@ -392,29 +392,29 @@ void MO_Explosion::update()
     animate();
 
     //If this is the first frame, look for blocks to kill
-    if(timer == 0) {
+    if (timer == 0) {
         short iTestY = iy;
 
         for (short iRow = 0; iRow < 5; iRow++) {
             short iTestX = ix;
 
-            if(iTestX < 0)
+            if (iTestX < 0)
                 iTestX += smw->ScreenWidth;
 
-            if(iTestY >= 0 && iTestY < smw->ScreenHeight) {
+            if (iTestY >= 0 && iTestY < smw->ScreenHeight) {
                 short iTestRow = iTestY / TILESIZE;
                 for (short iCol = 0; iCol < 7; iCol++) {
                     IO_Block * block = g_map->block(iTestX / TILESIZE, iTestRow);
-                    if(block && block->getBlockType() == block_weaponbreakable) {
+                    if (block && block->getBlockType() == block_weaponbreakable) {
                         B_WeaponBreakableBlock * weaponbreakableblock = (B_WeaponBreakableBlock*)block;
-                        if(weaponbreakableblock->iType == 3) {
+                        if (weaponbreakableblock->iType == 3) {
                             weaponbreakableblock->triggerBehavior(iPlayerID, iTeamID);
                         }
                     }
 
                     iTestX += TILESIZE;
 
-                    if(iTestX >= smw->ScreenWidth)
+                    if (iTestX >= smw->ScreenWidth)
                         iTestX -= smw->ScreenWidth;
                 }
             }
@@ -422,13 +422,13 @@ void MO_Explosion::update()
 
             iTestY += TILESIZE;
 
-            if(iTestY >= smw->ScreenHeight)
+            if (iTestY >= smw->ScreenHeight)
                 break;
         }
     }
 
     //RFC: why 48?
-    if(++timer >= 48)
+    if (++timer >= 48)
         dead = true;
 }
 
@@ -458,17 +458,17 @@ IO_FlameCannon::IO_FlameCannon(short x, short y, short freq, short direction) :
 
     iFrame = 0;
 
-    if(iDirection == 1) {
+    if (iDirection == 1) {
         ix -= 64;
-    } else if(iDirection == 2) {
+    } else if (iDirection == 2) {
         iy -= 64;
     }
 }
 
 void IO_FlameCannon::update()
 {
-    if(state == 0) { //No flame, waiting
-        if(--iTimer <= 0) {
+    if (state == 0) { //No flame, waiting
+        if (--iTimer <= 0) {
             iTimer = 0;
             iCycle = 0;
             iFrame = 0;
@@ -476,18 +476,18 @@ void IO_FlameCannon::update()
             state = 1;
             ifSoundOnPlay(sfx_flamecannon);
         }
-    } else if(state == 1 || state == 3) { //Start or end of flame but not deadly yet
-        if(++iTimer >= 4) {
+    } else if (state == 1 || state == 3) { //Start or end of flame but not deadly yet
+        if (++iTimer >= 4) {
             iTimer = 0;
 
-            if(++iFrame > 1) {
+            if (++iFrame > 1) {
                 iFrame = 0;
 
-                if(++iCycle >= 4) {
+                if (++iCycle >= 4) {
                     iFrame = 2;
                     iCycle = 0;
 
-                    if(state == 1) {
+                    if (state == 1) {
                         state = 2;
                     } else {
                         state = 0;
@@ -496,14 +496,14 @@ void IO_FlameCannon::update()
                 }
             }
         }
-    } else if(state == 2) { //Full flame
-        if(++iTimer >= 4) {
+    } else if (state == 2) { //Full flame
+        if (++iTimer >= 4) {
             iTimer = 0;
 
-            if(++iFrame > 3) {
+            if (++iFrame > 3) {
                 iFrame = 2;
 
-                if(++iCycle >= 8) {
+                if (++iCycle >= 8) {
                     state = 3;
                     iFrame = 0;
                     iCycle = 0;
@@ -515,7 +515,7 @@ void IO_FlameCannon::update()
 
 void IO_FlameCannon::draw()
 {
-    if(state > 0) {
+    if (state > 0) {
         SDL_Rect * rect = &g_rFlameRects[iDirection][iFrame];
         rm->spr_hazard_flame[0].draw(ix, iy, rect->x, rect->y, rect->w, rect->h);
     }
@@ -524,7 +524,7 @@ void IO_FlameCannon::draw()
 //For preview
 void IO_FlameCannon::draw(short iOffsetX, short iOffsetY)
 {
-    if(state > 0) {
+    if (state > 0) {
         SDL_Rect * rect = &g_rFlameRects[iDirection][iFrame];
         gfx_drawpreview(rm->spr_hazard_flame[1].getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, rect->x >> 1, rect->y >> 1, rect->w >> 1, rect->h >> 1, iOffsetX, iOffsetY, 320, 240, true);
     }
@@ -532,7 +532,7 @@ void IO_FlameCannon::draw(short iOffsetX, short iOffsetY)
 
 bool IO_FlameCannon::collide(CPlayer * player)
 {
-    if(state == 2 && !player->invincible && player->shield == 0 && !player->shyguy)
+    if (state == 2 && !player->invincible && player->shield == 0 && !player->shyguy)
         return player->KillPlayerMapHazard(false, kill_style_environment, false) != player_kill_nonkill;
 
     return false;
@@ -566,42 +566,42 @@ MO_PirhanaPlant::MO_PirhanaPlant(short x, short y, short type, short freq, short
     state = 0;
     SetNewTimer();
 
-    if(iDirection <= 1)
+    if (iDirection <= 1)
         iw = 32;
     else
         ih = 32;
 
-    if(direction == 0)
+    if (direction == 0)
         iy += 32;
-    else if(direction == 2)
+    else if (direction == 2)
         ix += 32;
 
     /*
-    if(iType == 0 || iType == 1)
+    if (iType == 0 || iType == 1)
     {
         iSrcX = iDirection * 128;
         iSrcY = iType * 48;
     }
-    else if(iType == 2 || iType == 3)
+    else if (iType == 2 || iType == 3)
     {
         iSrcX = iDirection * 64;
         iSrcY = iType * 48 + (iType == 3 ? 16 : 0);
     }
     */
 
-    if(iDirection <= 1) {
-        if(iType == 2)
+    if (iDirection <= 1) {
+        if (iType == 2)
             ih = 64;
         else
             ih = 48;
     } else {
-        if(iType == 2)
+        if (iType == 2)
             iw = 64;
         else
             iw = 48;
     }
 
-    if(iDirection <= 1) {
+    if (iDirection <= 1) {
         collisionHeight = 0;
         collisionWidth = 32;
     } else {
@@ -627,50 +627,50 @@ void MO_PirhanaPlant::update()
     //if the plant hit the player from the top or not
     fOldY = (float)iy;
 
-    if(state == 0) { //waiting to appear
-        if(--iTimer <= 0) {
+    if (state == 0) { //waiting to appear
+        if (--iTimer <= 0) {
             iTimer = 0;
             state = 1;
         }
-    } else if(state == 1) { //appearing
-        if(iDirection <= 1)
+    } else if (state == 1) { //appearing
+        if (iDirection <= 1)
             collisionHeight += 2;
         else
             collisionWidth += 2;
 
-        if(iDirection == 0)
+        if (iDirection == 0)
             iy -= 2;
-        else if(iDirection == 2)
+        else if (iDirection == 2)
             ix -= 2;
 
-        if((iDirection <= 1 && collisionHeight >= ih) || (iDirection >= 2 && collisionWidth >= iw))
+        if ((iDirection <= 1 && collisionHeight >= ih) || (iDirection >= 2 && collisionWidth >= iw))
             state = 2;
-    } else if(state == 2) { //extended
-        if(++iTimer > 60) {
+    } else if (state == 2) { //extended
+        if (++iTimer > 60) {
             iTimer = 0;
             state = 3;
         }
-    } else if(state == 3) { //retreating
-        if(iDirection <= 1)
+    } else if (state == 3) { //retreating
+        if (iDirection <= 1)
             collisionHeight -= 2;
         else
             collisionWidth -= 2;
 
-        if(iDirection == 0)
+        if (iDirection == 0)
             iy += 2;
-        else if(iDirection == 2)
+        else if (iDirection == 2)
             ix += 2;
 
-        if((iDirection <= 1 && collisionHeight <= 0) || (iDirection >= 2 && collisionWidth <= 0)) {
+        if ((iDirection <= 1 && collisionHeight <= 0) || (iDirection >= 2 && collisionWidth <= 0)) {
             state = 0;
             SetNewTimer();
         }
     }
 
 
-    if(iType == 1) { //face the plant towards the nearest player
+    if (iType == 1) { //face the plant towards the nearest player
         //Don't do this every frame, just once every 8 frames
-        if(state > 0 && ++iActionTimer >= 8) {
+        if (state > 0 && ++iActionTimer >= 8) {
             int distance_to_player = smw->ScreenWidth * 1000;
             short iDiffX = 1, iDiffY = 1;
 
@@ -679,7 +679,7 @@ void MO_PirhanaPlant::update()
 
             for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
                 CPlayer * player = list_players[iPlayer];
-                if(player->state != player_ready)
+                if (player->state != player_ready)
                     continue;
 
                 //Calculate normal screen distance
@@ -697,39 +697,39 @@ void MO_PirhanaPlant::update()
 
             float dAngle = (float)atan2((double)iDiffX, (double)iDiffY);
 
-            if(dAngle >= 0.0f && dAngle < HALF_PI)
+            if (dAngle >= 0.0f && dAngle < HALF_PI)
                 iFrame = 0;
-            else if(dAngle >= HALF_PI && dAngle <= PI)
+            else if (dAngle >= HALF_PI && dAngle <= PI)
                 iFrame = iDirection <= 1 ? 1 : 2;
-            else if(dAngle >= -HALF_PI && dAngle < 0.0f)
+            else if (dAngle >= -HALF_PI && dAngle < 0.0f)
                 iFrame = iDirection <= 1 ? 2 : 1;
-            else if(dAngle >= -PI && dAngle < -HALF_PI)
+            else if (dAngle >= -PI && dAngle < -HALF_PI)
                 iFrame = 3;
         }
-    } else if(iType == 2 || iType == 3) { //Animate if these are animated plants
-        if(++iAnimationTimer >= 8) {
+    } else if (iType == 2 || iType == 3) { //Animate if these are animated plants
+        if (++iAnimationTimer >= 8) {
             iAnimationTimer = 0;
 
-            if(++iFrame > 1)
+            if (++iFrame > 1)
                 iFrame = 0;
         }
     }
 
     //Fire a fireball
-    if(iType <= 1 && state == 2 && iTimer == 30) {
+    if (iType <= 1 && state == 2 && iTimer == 30) {
         objectcontainer[1].add(new OMO_StraightPathHazard(&rm->spr_hazard_fireball[fPreview ? 1 : 0], iDirection != 3 ? ix + 7 : ix + iw - 23, iDirection != 1 ? iy + 7 : iy + ih - 23, GetFireballAngle(), 3.0f, 4, 8, 18, 18, 0, 0, 0, iFrame <= 1 ? 18 : 0, 18, 18));
     }
 }
 
 void MO_PirhanaPlant::draw()
 {
-    if(state > 0) {
+    if (state > 0) {
         SDL_Rect * rect = &g_rPirhanaRects[iType][iDirection][iFrame];
-        if(iDirection == 0)
+        if (iDirection == 0)
             rm->spr_hazard_pirhanaplant[0].draw(ix, iy, rect->x, rect->y, 32, collisionHeight);
-        else if(iDirection == 1)
+        else if (iDirection == 1)
             rm->spr_hazard_pirhanaplant[0].draw(ix, iy, rect->x, rect->y + ih - collisionHeight, 32, collisionHeight);
-        else if(iDirection == 2)
+        else if (iDirection == 2)
             rm->spr_hazard_pirhanaplant[0].draw(ix, iy, rect->x, rect->y, collisionWidth, 32);
         else
             rm->spr_hazard_pirhanaplant[0].draw(ix, iy, rect->x + iw - collisionWidth, rect->y, collisionWidth, 32);
@@ -742,13 +742,13 @@ void MO_PirhanaPlant::draw()
 //For preview drawing
 void MO_PirhanaPlant::draw(short iOffsetX, short iOffsetY)
 {
-    if(state > 0) {
+    if (state > 0) {
         SDL_Rect * rect = &g_rPirhanaRects[iType][iDirection][iFrame];
-        if(iDirection == 0)
+        if (iDirection == 0)
             gfx_drawpreview(rm->spr_hazard_pirhanaplant[1].getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, rect->x >> 1, rect->y >> 1, 16, collisionHeight >> 1, iOffsetX, iOffsetY, 320, 240, true);
-        else if(iDirection == 1)
+        else if (iDirection == 1)
             gfx_drawpreview(rm->spr_hazard_pirhanaplant[1].getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, rect->x >> 1, (rect->y + ih - collisionHeight) >> 1, 16, collisionHeight >> 1, iOffsetX, iOffsetY, 320, 240, true);
-        else if(iDirection == 2)
+        else if (iDirection == 2)
             gfx_drawpreview(rm->spr_hazard_pirhanaplant[1].getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, rect->x >> 1, rect->y >> 1, collisionWidth >> 1, 16, iOffsetX, iOffsetY, 320, 240, true);
         else
             gfx_drawpreview(rm->spr_hazard_pirhanaplant[1].getSurface(), (ix >> 1) + iOffsetX, (iy >> 1) + iOffsetY, (rect->x + iw - collisionWidth) >> 1, rect->y >> 1, collisionWidth >> 1, 16, iOffsetX, iOffsetY, 320, 240, true);
@@ -757,14 +757,14 @@ void MO_PirhanaPlant::draw(short iOffsetX, short iOffsetY)
 
 bool MO_PirhanaPlant::collide(CPlayer * player)
 {
-    if(state == 0)
+    if (state == 0)
         return false;
 
     bool fHitPlayerTop = fOldY + collisionHeight <= player->fOldY && iy + collisionHeight >= player->iy;
 
-    if(player->invincible || player->statue_timer || (player->iKuriboShoe > 0 && !fHitPlayerTop)) {
+    if (player->invincible || player->statue_timer || (player->iKuriboShoe > 0 && !fHitPlayerTop)) {
         KillPlant();
-    } else if(player->shield == 0 && !player->shyguy) {
+    } else if (player->shield == 0 && !player->shyguy) {
         return player->KillPlayerMapHazard(false, kill_style_environment, false) != player_kill_nonkill;
     }
 
@@ -773,25 +773,25 @@ bool MO_PirhanaPlant::collide(CPlayer * player)
 
 void MO_PirhanaPlant::collide(IO_MovingObject * object)
 {
-    if(state == 0)
+    if (state == 0)
         return;
 
     removeifprojectile(object, true, false);
 
     MovingObjectType type = object->getMovingObjectType();
 
-    if(type == movingobject_fireball || type == movingobject_hammer || type == movingobject_boomerang || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_throwbox || type == movingobject_attackzone || type == movingobject_explosion) {
+    if (type == movingobject_fireball || type == movingobject_hammer || type == movingobject_boomerang || type == movingobject_shell || type == movingobject_throwblock || type == movingobject_throwbox || type == movingobject_attackzone || type == movingobject_explosion) {
         //Don't kill things with shells that are sitting still
-        if(type == movingobject_shell && object->state == 2)
+        if (type == movingobject_shell && object->state == 2)
             return;
 
         //Don't kill things with boxesx that aren't moving fast enough
-        if(type == movingobject_throwbox && !((CO_ThrowBox*)object)->HasKillVelocity())
+        if (type == movingobject_throwbox && !((CO_ThrowBox*)object)->HasKillVelocity())
             return;
 
-        if(type == movingobject_shell || type == movingobject_throwblock) {
+        if (type == movingobject_shell || type == movingobject_throwblock) {
             object->CheckAndDie();
-        } else if(type == movingobject_attackzone || type == movingobject_throwbox) {
+        } else if (type == movingobject_attackzone || type == movingobject_throwbox) {
             object->Die();
         }
 
@@ -804,11 +804,11 @@ void MO_PirhanaPlant::SetNewTimer()
     iTimer = iFreq + RNGMAX(iFreq);
 
     //Face the green fireball plant in a random direction
-    if(iType == 0) {
+    if (iType == 0) {
         //Only point flower towards directions that make sense
-        if((ix >> 5) == 19)
+        if ((ix >> 5) == 19)
             iFrame = RNGMAX(2);
-        else if(ix == 0)
+        else if (ix == 0)
             iFrame = (RNGMAX(2)) + 2;
         else
             iFrame = RNGMAX(4);
@@ -817,7 +817,7 @@ void MO_PirhanaPlant::SetNewTimer()
 
 void MO_PirhanaPlant::KillPlant()
 {
-    if(state == 0)
+    if (state == 0)
         return;
 
     SetNewTimer();
@@ -826,12 +826,12 @@ void MO_PirhanaPlant::KillPlant()
     ifSoundOnPlay(sfx_kicksound);
     eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + (iDirection == 2 ? 0 : collisionWidth - 32), iy + (iDirection == 0 ? 0 : collisionHeight - 32), 3, 4));
 
-    if(iDirection == 0)
+    if (iDirection == 0)
         iy += collisionHeight;
-    else if(iDirection == 2)
+    else if (iDirection == 2)
         ix += collisionWidth;
 
-    if(iDirection <= 1)
+    if (iDirection <= 1)
         collisionHeight = 0;
     else
         collisionWidth = 0;
@@ -839,24 +839,24 @@ void MO_PirhanaPlant::KillPlant()
 
 float MO_PirhanaPlant::GetFireballAngle()
 {
-    if(iDirection <= 1) {
-        if(iFrame == 0)
+    if (iDirection <= 1) {
+        if (iFrame == 0)
             return -2.7214f;
-        else if(iFrame == 1)
+        else if (iFrame == 1)
             return 2.7214f;
-        else if(iFrame == 2)
+        else if (iFrame == 2)
             return -0.4202f;
-        else if(iFrame == 3)
+        else if (iFrame == 3)
             return 0.4202f;
     } else {
 
-        if(iFrame == 0)
+        if (iFrame == 0)
             return -1.9910f;
-        else if(iFrame == 1)
+        else if (iFrame == 1)
             return -1.1506f;
-        else if(iFrame == 2)
+        else if (iFrame == 2)
             return 1.9910f;
-        else if(iFrame == 3)
+        else if (iFrame == 3)
             return 1.1506f;
     }
 

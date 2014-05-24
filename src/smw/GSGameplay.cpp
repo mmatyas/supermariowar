@@ -78,11 +78,11 @@ short LookupTeamID(short id, short * teamID, short * subTeamID)
 {
     for (short i = 0; i < score_cnt; i++) {
         for (short j = 0; j < game_values.teamcounts[i]; j++) {
-            if(game_values.teamids[i][j] == id) {
-                if(teamID)
+            if (game_values.teamids[i][j] == id) {
+                if (teamID)
                     *teamID = i;
 
-                if(subTeamID)
+                if (subTeamID)
                     *subTeamID = j;
 
                 return i;
@@ -90,10 +90,10 @@ short LookupTeamID(short id, short * teamID, short * subTeamID)
         }
     }
 
-    if(teamID)
+    if (teamID)
         *teamID = -1;
 
-    if(subTeamID)
+    if (subTeamID)
         *subTeamID = -1;
 
     return -1;
@@ -107,7 +107,7 @@ short LookupTeamID(short id)
 CPlayer * GetPlayerFromGlobalID(short iGlobalID)
 {
     for (short i = 0; i < list_players_cnt; i++) {
-        if(list_players[i]->globalID == iGlobalID)
+        if (list_players[i]->globalID == iGlobalID)
             return list_players[i];
     }
 
@@ -118,7 +118,7 @@ sfxSound * g_PlayingSoundChannels[NUM_SOUND_CHANNELS];
 
 void DECLSPEC soundfinished(int channel)
 {
-    if(!g_PlayingSoundChannels[channel])
+    if (!g_PlayingSoundChannels[channel])
         printf("Error: SoundFinished() tried to clear a channel that was already cleared!\n");
     else {
         g_PlayingSoundChannels[channel]->clearchannel();
@@ -128,18 +128,18 @@ void DECLSPEC soundfinished(int channel)
 
 void DECLSPEC musicfinished()
 {
-    if(!game_values.music)
+    if (!game_values.music)
         return;
 
-    if(game_values.gamestate == GS_GAME && !game_values.gamemode->gameover) {
-        if(game_values.playnextmusic) {
+    if (game_values.gamestate == GS_GAME && !game_values.gamemode->gameover) {
+        if (game_values.playnextmusic) {
             musiclist->SetNextMusic(g_map->musicCategoryID, maplist->currentShortmapname(), g_map->szBackgroundFile);
             backgroundmusic[0].load(musiclist->GetCurrentMusic()); //In Game Music
         }
 
         backgroundmusic[0].play(game_values.playnextmusic, false);
     } else {
-        if(fResumeMusic) {
+        if (fResumeMusic) {
             backgroundmusic[3].play(false, false);
         }
     }
@@ -147,11 +147,11 @@ void DECLSPEC musicfinished()
 
 short GetModeIconIndexFromMode(short iMode)
 {
-    if(iMode == game_mode_pipe_minigame)
+    if (iMode == game_mode_pipe_minigame)
         iMode = 25;
-    else if(iMode == game_mode_boss_minigame)
+    else if (iMode == game_mode_boss_minigame)
         iMode = 26;
-    else if(iMode == game_mode_boxes_minigame)
+    else if (iMode == game_mode_boxes_minigame)
         iMode = 27;
 
     return iMode;
@@ -160,22 +160,22 @@ short GetModeIconIndexFromMode(short iMode)
 //Move the screen in a small circle
 void GameplayState::SpinScreen()
 {
-    if(spindirection == 0 || spindirection == 2) {
-        if(++spintimer >= 300) {
+    if (spindirection == 0 || spindirection == 2) {
+        if (++spintimer >= 300) {
             spindirection++;
             spintimer = 0;
         }
-    } else if(spindirection == 1) {
+    } else if (spindirection == 1) {
         spinspeed += 0.0008f;
 
-        if(spinspeed >= 0.05f) {
+        if (spinspeed >= 0.05f) {
             spinspeed = 0.05f;
             spindirection++;
         }
     } else {
         spinspeed -= 0.0008f;
 
-        if(spinspeed <= -0.05f) {
+        if (spinspeed <= -0.05f) {
             spinspeed = -0.05f;
             spindirection = 0;
         }
@@ -183,14 +183,14 @@ void GameplayState::SpinScreen()
 
     spinangle += spinspeed;
 
-    if(spinangle >= TWO_PI) {
+    if (spinangle >= TWO_PI) {
         spinangle -= TWO_PI;
-    } else if(spinangle < 0.0f) {
+    } else if (spinangle < 0.0f) {
         spinangle += TWO_PI;
     }
 
     float shakey = spinspeed * smw->ScreenWidth * sin(spinangle);
-    if(shakey < 0.0f)
+    if (shakey < 0.0f)
         shakey -= 1.0f;
 
     x_shake = (short)(spinspeed * smw->ScreenWidth * cos(spinangle));
@@ -207,25 +207,25 @@ void GameplayState::createPlayers()
         projectiles[iPlayer] = 0;
         respawnCount[iPlayer] = 0;
 
-        if(game_values.singleplayermode == -1 || game_values.singleplayermode == iPlayer) {
-            if(game_values.playercontrol[iPlayer] > 0) {
+        if (game_values.singleplayermode == -1 || game_values.singleplayermode == iPlayer) {
+            if (game_values.playercontrol[iPlayer] > 0) {
                 short teamid, subteamid;
                 LookupTeamID(iPlayer, &teamid, &subteamid);
 
                 CPlayerAI * ai = NULL;
-                if(game_values.playercontrol[iPlayer] == 2)
+                if (game_values.playercontrol[iPlayer] == 2)
                     ai = new CPlayerAI();
 
                 list_players[list_players_cnt] = new CPlayer(iPlayer, list_players_cnt, teamid, subteamid, game_values.colorids[iPlayer], rm->spr_player[iPlayer], score[teamid], &(respawnCount[iPlayer]), ai);
                 list_players_cnt++;
-            } else if(!game_values.keeppowerup) {
+            } else if (!game_values.keeppowerup) {
                 //Reset off player's stored powerups if they are not playing
                 game_values.storedpowerups[iPlayer] = -1;
             }
         }
 
         //If the gamemode allows stored powerups, then assign the game stored slot to the powerup this player has
-        if(game_values.gamemode->HasStoredPowerups())
+        if (game_values.gamemode->HasStoredPowerups())
             game_values.gamepowerups[iPlayer] = game_values.storedpowerups[iPlayer];
         else {
             game_values.gamepowerups[iPlayer] = -1;
@@ -246,20 +246,20 @@ void GameplayState::initScoreDisplayPosition()
     totalspace += 20 * (score_cnt - 1);
 
     for (i = 0; i < score_cnt; i++) {
-        if(game_values.scoreboardstyle == 0 || game_values.scoreboardstyle == 1) {
+        if (game_values.scoreboardstyle == 0 || game_values.scoreboardstyle == 1) {
             score[i]->x = ((smw->ScreenWidth - totalspace) >> 1);
 
             for (short k = 0; k < i; k++)
                 score[i]->x += 76 + game_values.teamcounts[k] * 34;
 
             short iScoreOffsetY = 0;
-            if(game_values.gamemode->gamemode == game_mode_health || game_values.gamemode->gamemode == game_mode_collection)
+            if (game_values.gamemode->gamemode == game_mode_health || game_values.gamemode->gamemode == game_mode_collection)
                 iScoreOffsetY = 18;
 
             score[i]->y = 5 + (game_values.scoreboardstyle == 1 ? 429 - iScoreOffsetY : 0);
         } else {
             short iScoreOffsetY = 0;
-            if(game_values.gamemode->gamemode == game_mode_health || game_values.gamemode->gamemode == game_mode_collection)
+            if (game_values.gamemode->gamemode == game_mode_health || game_values.gamemode->gamemode == game_mode_collection)
                 iScoreOffsetY = 18;
 
             score[i]->x = 5 + (574 - (34 * game_values.teamcounts[i])) * (i % 2);
@@ -278,12 +278,12 @@ void GameplayState::initEyeCandy()
     short i;
     for (short iEyeCandyLayer = 0; iEyeCandyLayer < 3; iEyeCandyLayer++) {
         //Clouds
-        if(g_map->eyecandy[iEyeCandyLayer] & 1) {
+        if (g_map->eyecandy[iEyeCandyLayer] & 1) {
             for (i = 0; i < 4; i++) {
                 float velx;         //speed of cloud, small clouds are slower than big ones
                 short srcy, w, h;
 
-                if(smw->rng->GetRandBool()) {
+                if (smw->rng->GetRandBool()) {
                     velx = (short)(RNGMAX(51) - 25) / 10.0f;    //big clouds: -3 - +3 pixel/frame
                     srcy = 0;
                     w = 60;
@@ -303,7 +303,7 @@ void GameplayState::initEyeCandy()
         }
 
         //Ghosts
-        if(g_map->eyecandy[iEyeCandyLayer] & 2) {
+        if (g_map->eyecandy[iEyeCandyLayer] & 2) {
             for (i = 0; i < 8; i++) {
                 short iGhostSrcY = (short)(RNGMAX(3)) << 5; //ghost type
                 float velx = (short)(RNGMAX(51) - 25) / 10.0f;  //big clouds: -3 - +3 pixel/frame
@@ -316,13 +316,13 @@ void GameplayState::initEyeCandy()
         }
 
         //Leaves
-        if(g_map->eyecandy[iEyeCandyLayer] & 4) {
+        if (g_map->eyecandy[iEyeCandyLayer] & 4) {
             for (i = 0; i < 15; i++)
                 eyecandy[iEyeCandyLayer].add(new EC_Leaf(&rm->spr_leaves, (float)(RNGMAX(smw->ScreenWidth)), (float)RNGMAX(smw->ScreenHeight)));
         }
 
         //Snow
-        if(g_map->eyecandy[iEyeCandyLayer] & 8) {
+        if (g_map->eyecandy[iEyeCandyLayer] & 8) {
             for (i = 0; i < 15; i++)
                 eyecandy[iEyeCandyLayer].add(new EC_Snow(&rm->spr_snow, (float)(RNGMAX(smw->ScreenWidth)), (float)RNGMAX(smw->ScreenHeight), 0));
         }
@@ -330,7 +330,7 @@ void GameplayState::initEyeCandy()
         //Fish
         short iFishWeights[] = {20, 20, 15, 10, 10, 5, 10, 10};
         short iFishSettings[][4] = { {0, 0, 64, 44}, {0, 44, 64, 44}, {0, 44, 48, 44}, {32, 32, 16, 12}, {32, 44, 16, 12}, {32, 16, 16, 28}, {32, 0, 32, 28}, {32, 44, 32, 28}};
-        if(g_map->eyecandy[iEyeCandyLayer] & 16) {
+        if (g_map->eyecandy[iEyeCandyLayer] & 16) {
             for (i = 0; i < 8; i++) {
                 float velx = (short)(RNGMAX(41) - 20) / 10.0f;
                 velx = velx < 0.5f && velx > -0.5f ? 1.0f : velx; //Keep fish from moving too slowly
@@ -343,7 +343,7 @@ void GameplayState::initEyeCandy()
                 for (short iFish = 0; iFish < 8; iFish++) {
                     iFishWeightCount += iFishWeights[iFish];
 
-                    if(iRandomFish < iFishWeightCount) {
+                    if (iRandomFish < iFishWeightCount) {
                         srcx = iFishSettings[iFish][0];
                         srcy = iFishSettings[iFish][1];
                         w = iFishSettings[iFish][2];
@@ -360,13 +360,13 @@ void GameplayState::initEyeCandy()
         }
 
         //Rain
-        if(g_map->eyecandy[iEyeCandyLayer] & 32) {
+        if (g_map->eyecandy[iEyeCandyLayer] & 32) {
             for (i = 0; i < 20; i++)
                 eyecandy[iEyeCandyLayer].add(new EC_Rain(&rm->spr_rain, (float)(RNGMAX(smw->ScreenWidth)), RNGMAX(smw->ScreenHeight)));
         }
 
         //Bubbles
-        if(g_map->eyecandy[iEyeCandyLayer] & 64) {
+        if (g_map->eyecandy[iEyeCandyLayer] & 64) {
             for (i = 0; i < 10; i++)
                 eyecandy[iEyeCandyLayer].add(new EC_Bubble(&rm->spr_rain, (float)(RNGMAX(smw->ScreenWidth)), RNGMAX(smw->ScreenHeight)));
         }
@@ -464,20 +464,20 @@ short CountAliveTeams(short * lastteam)
 
     bool teamalive[4] = {false, false, false, false};
     for (short k = 0; k < list_players_cnt; k++) {
-        if(!list_players[k]->isdead())
+        if (!list_players[k]->isdead())
             teamalive[list_players[k]->teamID] = true;
     }
 
     short numteams = 0;
     for (short k = 0; k < 4; k++) {
-        if(teamalive[k]) {
+        if (teamalive[k]) {
             findlastteam = k;
             numteams++;
         }
     }
 
-    if(lastteam != NULL) {
-        if(numteams == 1)
+    if (lastteam != NULL) {
+        if (numteams == 1)
             *lastteam = findlastteam;
         else
             *lastteam = -1;
@@ -491,19 +491,19 @@ void GameplayState::CleanDeadPlayers()
     bool fCheckForGameOver = false;
 
     for (short i = 0; i < list_players_cnt; i++) {
-        if(list_players[i]->state == player_dead) {
+        if (list_players[i]->state == player_dead) {
             fCheckForGameOver = true;
 
-            if(respawnCount[list_players[i]->globalID] <= 0)
+            if (respawnCount[list_players[i]->globalID] <= 0)
                 list_players[i]->die(0, true, false);
 
             //Set this to zero so we don't display a spawn egg when player is removed from game
             respawnCount[list_players[i]->globalID] = 0;
 
-            if(game_values.gamemode->tagged == list_players[i])
+            if (game_values.gamemode->tagged == list_players[i])
                 game_values.gamemode->tagged = NULL;
 
-            if(game_values.gamemode->chicken == list_players[i])
+            if (game_values.gamemode->chicken == list_players[i])
                 game_values.gamemode->chicken = NULL;
 
             delete list_players[i];
@@ -518,9 +518,9 @@ void GameplayState::CleanDeadPlayers()
         }
     }
 
-    if(fCheckForGameOver && game_values.gamemode->gamemode != game_mode_bonus && game_values.gamemode->gamemode != game_mode_boss_minigame) {
+    if (fCheckForGameOver && game_values.gamemode->gamemode != game_mode_bonus && game_values.gamemode->gamemode != game_mode_boss_minigame) {
         short lastteam = -1;
-        if(!game_values.gamemode->gameover && CountAliveTeams(&lastteam) <= 1) {
+        if (!game_values.gamemode->gameover && CountAliveTeams(&lastteam) <= 1) {
             game_values.gamemode->gameover = true;
             game_values.gamemode->winningteam = lastteam;
             SetupScoreBoard(true);  //pass true because the order the players died in matters
@@ -531,21 +531,21 @@ void GameplayState::CleanDeadPlayers()
 
 void checkWindEvent(short& iWindTimer, float& dNextWind)
 {
-    if(iWindTimer <= 0) {
+    if (iWindTimer <= 0) {
         //Then trigger next wind event
-        if(game_values.gamewindx < dNextWind) {
+        if (game_values.gamewindx < dNextWind) {
             game_values.gamewindx += 0.02f;
 
-            if(game_values.gamewindx >= dNextWind)
+            if (game_values.gamewindx >= dNextWind)
                 iWindTimer = (RNGMAX(60)) + 30;
-        } else if(game_values.gamewindx >= dNextWind) {
+        } else if (game_values.gamewindx >= dNextWind) {
             game_values.gamewindx -= 0.02f;
 
-            if(game_values.gamewindx <= dNextWind)
+            if (game_values.gamewindx <= dNextWind)
                 iWindTimer = (RNGMAX(60)) + 30;
         }
     } else {
-        if(--iWindTimer <= 0) {
+        if (--iWindTimer <= 0) {
             dNextWind = (float)((RNGMAX(41)) - 20) / 4.0f;
         }
     }
@@ -585,18 +585,18 @@ void animateDuringCountdown()
 
 void shakeScreen()
 {
-    if(game_values.screenshaketimer > 0) {
+    if (game_values.screenshaketimer > 0) {
         game_values.screenshaketimer--;
 
         static bool shakeleft = false;
-        if(shakeleft) {
+        if (shakeleft) {
             x_shake -= 2;
-            if(x_shake <= -2) {
+            if (x_shake <= -2) {
                 shakeleft = false;
             }
         } else {
             x_shake += 2;
-            if(x_shake >= 2) {
+            if (x_shake >= 2) {
                 shakeleft = true;
             }
         }
@@ -611,22 +611,22 @@ void shakeScreen()
             CPlayer * player = list_players[k];
 
             //Don't kill the player that triggered the POW/MOd
-            if(player->globalID == game_values.screenshakeplayerid)
+            if (player->globalID == game_values.screenshakeplayerid)
                 continue;
 
             //Don't kill players on his team either (if friendly fire is off)
-            if(game_values.teamcollision != 2 && game_values.screenshaketeamid == player->teamID)
+            if (game_values.teamcollision != 2 && game_values.screenshaketeamid == player->teamID)
                 continue;
 
             //Kill other players
-            if(!player->invincible && player->shield == 0 && player->iKuriboShoe == 0 && player->isready()) {
-                if(game_values.screenshakekillinair == player->inair) {
+            if (!player->invincible && player->shield == 0 && player->iKuriboShoe == 0 && player->isready()) {
+                if (game_values.screenshakekillinair == player->inair) {
                     pKillPlayers[iNumKillPlayers++] = player;
 
-                    if(killer1) {
+                    if (killer1) {
                         game_values.screenshakekillscount++;
 
-                        if(killer1->inair)
+                        if (killer1->inair)
                             killer1->killsinrowinair--;  //Don't want to give both shake and in air award
                     }
                 }
@@ -634,12 +634,12 @@ void shakeScreen()
         }
 
         //Randomize the order in which the players are killed (so that game modes where order matters is fair)
-        if(iNumKillPlayers > 0) {
+        if (iNumKillPlayers > 0) {
             short iRandPlayer = RNGMAX( iNumKillPlayers);
             for (short iPlayer = 0; iPlayer < iNumKillPlayers; iPlayer++) {
                 PlayerKilledPlayer(game_values.screenshakeplayerid, pKillPlayers[iRandPlayer], death_style_jump, kill_style_pow, false, false);
 
-                if(++iRandPlayer >= iNumKillPlayers)
+                if (++iRandPlayer >= iNumKillPlayers)
                     iRandPlayer = 0;
             }
         }
@@ -647,16 +647,16 @@ void shakeScreen()
         //Kill goombas and koopas
         for (short k = 0; k < objectcontainer[0].list_end; k++) {
             CObject * object = objectcontainer[0].list[k];
-            if(object->getObjectType() == object_moving) {
+            if (object->getObjectType() == object_moving) {
                 IO_MovingObject * movingobject = (IO_MovingObject *)object;
                 MovingObjectType type = movingobject->getMovingObjectType();
 
-                if((type == movingobject_goomba || type == movingobject_koopa || type == movingobject_buzzybeetle || type == movingobject_spiny)
+                if ((type == movingobject_goomba || type == movingobject_koopa || type == movingobject_buzzybeetle || type == movingobject_spiny)
                         && game_values.screenshakekillinair == movingobject->inair) {
                     CPlayer * killer = GetPlayerFromGlobalID(game_values.screenshakeplayerid);
 
-                    if(killer) {
-                        if(!game_values.gamemode->gameover)
+                    if (killer) {
+                        if (!game_values.gamemode->gameover)
                             killer->score->AdjustScore(1);
 
                         ifSoundOnPlay(sfx_kicksound);
@@ -664,7 +664,7 @@ void shakeScreen()
 
                         game_values.screenshakekillscount++;
 
-                        if(killer->inair)
+                        if (killer->inair)
                             killer->killsinrowinair--;  //Don't want to give both shake and in air award
                     }
                 }
@@ -674,26 +674,26 @@ void shakeScreen()
         //Destroy throw blocks and flip shells over
         for (short k = 0; k < objectcontainer[1].list_end; k++) {
             CObject * object = objectcontainer[1].list[k];
-            if(object->getObjectType() == object_moving) {
+            if (object->getObjectType() == object_moving) {
                 IO_MovingObject * movingobject = (IO_MovingObject *)object;
 
-                if(game_values.screenshakekillinair == movingobject->inair) {
-                    if(movingobject->getMovingObjectType() == movingobject_shell) {
+                if (game_values.screenshakekillinair == movingobject->inair) {
+                    if (movingobject->getMovingObjectType() == movingobject_shell) {
                         CO_Shell * shell = (CO_Shell*)movingobject;
-                        if(shell->frozen || !shell->owner || shell->owner->inair == game_values.screenshakekillinair)
+                        if (shell->frozen || !shell->owner || shell->owner->inair == game_values.screenshakekillinair)
                             shell->Flip();  //also breaks shells if frozen
-                    } else if(movingobject->getMovingObjectType() == movingobject_throwblock) {
+                    } else if (movingobject->getMovingObjectType() == movingobject_throwblock) {
                         CO_ThrowBlock * throwblock = (CO_ThrowBlock*)movingobject;
-                        if(throwblock->frozen || !throwblock->owner || throwblock->owner->inair == game_values.screenshakekillinair)
+                        if (throwblock->frozen || !throwblock->owner || throwblock->owner->inair == game_values.screenshakekillinair)
                             throwblock->Die();
-                    } else if(movingobject->getMovingObjectType() == movingobject_throwbox) {
+                    } else if (movingobject->getMovingObjectType() == movingobject_throwbox) {
                         CO_ThrowBox * throwbox = (CO_ThrowBox*)movingobject;
-                        if(throwbox->frozen)
+                        if (throwbox->frozen)
                             throwbox->Die();
-                    } else if(movingobject->getMovingObjectType() == movingobject_pirhanaplant) {
+                    } else if (movingobject->getMovingObjectType() == movingobject_pirhanaplant) {
                         MO_PirhanaPlant * plant = (MO_PirhanaPlant*)movingobject;
                         plant->KillPlant();
-                    } else if(movingobject->getMovingObjectType() == movingobject_bulletbill) {
+                    } else if (movingobject->getMovingObjectType() == movingobject_bulletbill) {
                         MO_BulletBill * bulletbill = (MO_BulletBill*)movingobject;
                         bulletbill->Die();
                     }
@@ -702,12 +702,12 @@ void shakeScreen()
         }
 
         //Add kills in row for kills from pow and mod
-        if(game_values.screenshakekillscount > 1 && game_values.awardstyle != award_style_none) {
+        if (game_values.screenshakekillscount > 1 && game_values.awardstyle != award_style_none) {
             game_values.screenshakekillscount = 0;
 
             CPlayer * killer2 = GetPlayerFromGlobalID(game_values.screenshakeplayerid);
 
-            if(killer2)
+            if (killer2)
                 killer2->AddKillsInRowInAirAward();
         }
     } else {
@@ -722,15 +722,15 @@ void handleP2PCollisions()
     short i, j;
     for (i = 0; i < list_players_cnt; i++) {
         CPlayer * player1 = list_players[i];
-        if(player1->state > player_dead) {
+        if (player1->state > player_dead) {
             for (j = i + 1; j < list_players_cnt; j++) {
                 CPlayer * player2 = list_players[j];
-                if(player2->state > player_dead) {
-                    if(coldec_player2player(player1, player2)) {
+                if (player2->state > player_dead) {
+                    if (coldec_player2player(player1, player2)) {
                         collisionhandler_p2p(player1, player2);
 
                         //if player was killed by another player, continue with next player for collision detection
-                        if(player1->state <= player_dead)
+                        if (player1->state <= player_dead)
                             break;
                     }
                 }
@@ -744,7 +744,7 @@ void handleP2ObjCollisions()
     //Collide player with objects
     for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
         CPlayer * player = list_players[iPlayer];
-        if(player->state != player_ready)
+        if (player->state != player_ready)
             continue;
 
         //Collide with objects
@@ -752,20 +752,20 @@ void handleP2ObjCollisions()
             for (short iObject = 0; iObject < objectcontainer[iLayer].list_end; iObject++) {
                 CObject * object = objectcontainer[iLayer].list[iObject];
 
-                if(!object->GetDead()) {
-                    if(coldec_player2obj(player, object)) {
-                        if(collisionhandler_p2o(player, object))
+                if (!object->GetDead()) {
+                    if (coldec_player2obj(player, object)) {
+                        if (collisionhandler_p2o(player, object))
                             break;
                     }
                 }
             }
 
             //if the object killed the player, then continue with the other players
-            if(player->state != player_ready)
+            if (player->state != player_ready)
                 break;
 
             //If player collided with a swap mushroom, the break from colliding with everything else
-            if(game_values.swapplayers)
+            if (game_values.swapplayers)
                 return;
         }
     }
@@ -778,7 +778,7 @@ void handleObj2ObjCollisions()
         for (short iObject1 = 0; iObject1 < iContainerEnd1; iObject1++) {
             CObject * object1 = objectcontainer[iLayer1].list[iObject1];
 
-            if(object1->getObjectType() != object_moving)
+            if (object1->getObjectType() != object_moving)
                 continue;
 
             IO_MovingObject * movingobject1 = (IO_MovingObject*)object1;
@@ -788,33 +788,33 @@ void handleObj2ObjCollisions()
                 for (short iObject2 = (iLayer1 == iLayer2 ? iObject1 + 1 : 0); iObject2 < iContainerEnd2; iObject2++) {
                     CObject * object2 = objectcontainer[iLayer2].list[iObject2];
 
-                    if(object2->getObjectType() != object_moving)
+                    if (object2->getObjectType() != object_moving)
                         continue;
 
                     IO_MovingObject * movingobject2 = (IO_MovingObject*)object2;
 
-                    //if(g_iCollisionMap[movingobject1->getMovingObjectType()][movingobject2->getMovingObjectType()])
+                    //if (g_iCollisionMap[movingobject1->getMovingObjectType()][movingobject2->getMovingObjectType()])
                     //  continue;
 
-                    //if(iLayer1 == iLayer2 && iObject1 == iObject2)
+                    //if (iLayer1 == iLayer2 && iObject1 == iObject2)
                     //  continue;
 
-                    if(object2->GetDead())
+                    if (object2->GetDead())
                         continue;
 
                     MovingObjectType iType1 = movingobject1->getMovingObjectType();
                     MovingObjectType iType2 = movingobject2->getMovingObjectType();
-                    if(g_iCollisionMap[iType1][iType2]) {
-                        if(coldec_obj2obj(movingobject1, movingobject2)) {
+                    if (g_iCollisionMap[iType1][iType2]) {
+                        if (coldec_obj2obj(movingobject1, movingobject2)) {
                             collisionhandler_o2o(movingobject1, movingobject2);
                         }
-                    } else if(g_iCollisionMap[iType2][iType1]) {
-                        if(coldec_obj2obj(movingobject2, movingobject1)) {
+                    } else if (g_iCollisionMap[iType2][iType1]) {
+                        if (coldec_obj2obj(movingobject2, movingobject1)) {
                             collisionhandler_o2o(movingobject2, movingobject1);
                         }
                     }
 
-                    if(object1->GetDead())
+                    if (object1->GetDead())
                         return; // CONTINUEOBJECT1
                 }
             }
@@ -826,31 +826,31 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
 {
     //Draw scoreboards for all games (except special cases where we have a single player walking the map)
     short i;
-    if(game_values.singleplayermode == -1) {
+    if (game_values.singleplayermode == -1) {
         short highestScore = 0;
 
         bool fReverseScoring = game_values.gamemode->GetReverseScoring();
-        if(fReverseScoring)
+        if (fReverseScoring)
             highestScore = 32000;
 
         for (i = 0; i < score_cnt; i++) {
             int scoreValue = score[i]->score;
-            if(game_values.gamemode->gamemode == game_mode_boxes_minigame)
+            if (game_values.gamemode->gamemode == game_mode_boxes_minigame)
                 scoreValue = score[i]->subscore[0];
 
-            if((scoreValue > highestScore && !fReverseScoring) || (scoreValue < highestScore && fReverseScoring)) {
+            if ((scoreValue > highestScore && !fReverseScoring) || (scoreValue < highestScore && fReverseScoring)) {
                 highestScore = scoreValue;
                 g_iWinningPlayer = i;
-            } else if(scoreValue == highestScore) {
+            } else if (scoreValue == highestScore) {
                 g_iWinningPlayer = -1;
             }
         }
 
         //big end game scoreboard (sorted)
-        if(game_values.showscoreboard) {
+        if (game_values.showscoreboard) {
             char gameovertext[128] = "";
-            if(game_values.gamemode->winningteam > -1) {
-                if(game_values.teamcounts[game_values.gamemode->winningteam] == 1)
+            if (game_values.gamemode->winningteam > -1) {
+                if (game_values.teamcounts[game_values.gamemode->winningteam] == 1)
                     sprintf(gameovertext, "Player %d Wins!", game_values.teamids[game_values.gamemode->winningteam][0] + 1);
                 else
                     sprintf(gameovertext, "Team %d Wins!", game_values.gamemode->winningteam + 1);
@@ -864,7 +864,7 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
 
         //in game scoreboards
         for (i = 0; i < score_cnt; i++) {
-            if(game_values.gamemode->gamemode == game_mode_health || game_values.gamemode->gamemode == game_mode_collection || game_values.gamemode->gamemode == game_mode_boxes_minigame)
+            if (game_values.gamemode->gamemode == game_mode_health || game_values.gamemode->gamemode == game_mode_collection || game_values.gamemode->gamemode == game_mode_boxes_minigame)
                 rm->spr_shade[game_values.teamcounts[i] - 1].draw(score[i]->x, score[i]->y);
             else
                 rm->spr_shade[game_values.teamcounts[i] - 1].draw(score[i]->x, score[i]->y, 0, 0, 256, 41);
@@ -873,12 +873,12 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
                 short globalID = game_values.teamids[i][k];
 
                 //If player is respawning, draw an animated egg counter
-                if(respawnCount[globalID] > 0 && !game_values.gamemode->gameover) {
-                    if(++respawnanimationtimer[globalID] > 8) {
+                if (respawnCount[globalID] > 0 && !game_values.gamemode->gameover) {
+                    if (++respawnanimationtimer[globalID] > 8) {
                         respawnanimationtimer[globalID] = 0;
                         respawnanimationframe[globalID] += 32;
 
-                        if(respawnanimationframe[globalID] > 32)
+                        if (respawnanimationframe[globalID] > 32)
                             respawnanimationframe[globalID] = 0;
                     }
 
@@ -888,8 +888,8 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
                     rm->spr_eggnumbers.draw(scorex, scorey, ((respawnCount[globalID] - 1) >> 1) << 5, game_values.colorids[globalID] << 5, 32, 32);
                 } else { //otherwise draw the player's skin in the scoreboard
                     short iScoreboardSprite;
-                    if(game_values.gamemode->gameover) {
-                        if(g_iWinningPlayer != i)
+                    if (game_values.gamemode->gameover) {
+                        if (g_iWinningPlayer != i)
                             iScoreboardSprite = PGFX_DEADFLYING;
                         else
                             iScoreboardSprite = PGFX_JUMPING_R;
@@ -900,67 +900,67 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
                     //Search for player state to display
                     CPlayer * player = GetPlayerFromGlobalID(globalID);
 
-                    if(player && !game_values.gamemode->gameover) {
+                    if (player && !game_values.gamemode->gameover) {
                         short iScoreOffsetX = score[i]->x + scoreoffsets[k];
                         short iScoreOffsetY = score[i]->y + 2;
 
-                        if(player->ownerPlayerID > -1)
+                        if (player->ownerPlayerID > -1)
                             rm->spr_ownedtags.draw(iScoreOffsetX - 8, iScoreOffsetY - 8, player->ownerColorOffsetX, 0, 48, 48);
 
                         player->GetScoreboardSprite()[iScoreboardSprite]->draw(iScoreOffsetX, iScoreOffsetY, player->iSrcOffsetX, 0, 32, 32);
 
                         //Display jail if player is jailed
-                        if(player->jailtimer > 0)
+                        if (player->jailtimer > 0)
                             rm->spr_jail.draw(iScoreOffsetX - 6, iScoreOffsetY - 6, (player->jailcolor + 1) * 44, 0, 44, 44);
 
                         //Display current powerup if player is using one
-                        if(player->powerup > 0)
+                        if (player->powerup > 0)
                             rm->spr_storedpowerupsmall.draw(iScoreOffsetX, iScoreOffsetY + 16, g_iPowerupToIcon[player->powerup - 1], 0, 16, 16);
 
                         //Display tanooki powerup if player has it
-                        if(player->tanooki)
+                        if (player->tanooki)
                             rm->spr_storedpowerupsmall.draw(iScoreOffsetX + 16, iScoreOffsetY + 16, smw->ScreenWidth/2, 0, 16, 16);
                     } else {
                         rm->spr_player[globalID][iScoreboardSprite]->draw(score[i]->x + scoreoffsets[k], score[i]->y + 2, 0, 0, 32, 32);
                     }
 
                     //give crown to player(s) with most kills
-                    if(g_iWinningPlayer == i)
+                    if (g_iWinningPlayer == i)
                         rm->spr_crown.draw(score[i]->x + scoreoffsets[k] + 12, score[i]->y - 4);
                 }
 
                 short storedpowerupid = game_values.gamepowerups[globalID];
 
                 //Draw stored powerup
-                if(storedpowerupid != -1) {
-                    if(!game_values.swapplayers) {
+                if (storedpowerupid != -1) {
+                    if (!game_values.swapplayers) {
                         rm->spr_storedpowerupsmall.draw(score[i]->x + scorepowerupoffsets[game_values.teamcounts[i] - 1][k], score[i]->y + 25, storedpowerupid * 16, 0, 16, 16);
                     }
                 }
             }
 
             //Draw hearts for health mode
-            if(game_values.gamemode->gamemode == game_mode_health) {
+            if (game_values.gamemode->gamemode == game_mode_health) {
                 short iLife = score[i]->subscore[0];
                 short iMax = score[i]->subscore[1];
                 short iHeartX = score[i]->x + scorepowerupoffsets[game_values.teamcounts[i] - 1][0] - 32;
 
                 for (short iHeart = 0; iHeart < iLife; iHeart++) {
-                    if(iHeart == iMax - 1 && iHeart % 2 == 0)
+                    if (iHeart == iMax - 1 && iHeart % 2 == 0)
                         rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, 32, 0, 8, 16);
                     else
                         rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, iHeart % 2 ? 8 : 0, 0, 8, 16);
                 }
 
                 for (short iHeart = iLife; iHeart < iMax; iHeart++) {
-                    if(iHeart == iMax - 1 && iHeart % 2 == 0)
+                    if (iHeart == iMax - 1 && iHeart % 2 == 0)
                         rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, 40, 0, 8, 16);
                     else
                         rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, iHeart % 2 ? 24 : 16, 0, 8, 16);
                 }
-            } else if(game_values.gamemode->gamemode == game_mode_collection) { //Draw cards for collection mode
+            } else if (game_values.gamemode->gamemode == game_mode_collection) { //Draw cards for collection mode
                 //Flash collected cards if 3 have been collected
-                if(score[i]->subscore[0] < 3 || score[i]->subscore[2] % 20 < 10) {
+                if (score[i]->subscore[0] < 3 || score[i]->subscore[2] % 20 < 10) {
                     short iNumCards = score[i]->subscore[0];
                     short iCardValues = score[i]->subscore[1];
                     short iCardX = score[i]->x + scorepowerupoffsets[game_values.teamcounts[i] - 1][0] - 20;
@@ -970,7 +970,7 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
                         iCardValues >>= 2;
                     }
                 }
-            } else if(game_values.gamemode->gamemode == game_mode_boxes_minigame) { //Draw coins for boxes minigame
+            } else if (game_values.gamemode->gamemode == game_mode_boxes_minigame) { //Draw coins for boxes minigame
                 //Flash collected cards if 3 have been collected
                 short iNumCoins = score[i]->subscore[0];
                 short iCoinX = score[i]->x + scorepowerupoffsets[game_values.teamcounts[i] - 1][0] - 32;
@@ -997,19 +997,19 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
 
 void GameplayState::drawScreenFade()
 {
-    if(game_values.screenfadespeed != 0) {
+    if (game_values.screenfadespeed != 0) {
         g_map->update();
         game_values.screenfade += game_values.screenfadespeed;
 
-        if(game_values.screenfade <= 0) {
+        if (game_values.screenfade <= 0) {
             game_values.screenfadespeed = 0;
             game_values.screenfade = 0;
 
             //display the mode and goal at the start of the game
-            //if(game_values.matchtype == MATCH_TYPE_QUICK_GAME)
-            if(game_values.startmodedisplay && game_values.singleplayermode == -1) {
+            //if (game_values.matchtype == MATCH_TYPE_QUICK_GAME)
+            if (game_values.startmodedisplay && game_values.singleplayermode == -1) {
                 char szMode[128];
-                if(game_values.gamemode->goal < 0)
+                if (game_values.gamemode->goal < 0)
                     sprintf(szMode, "%s  %s: X", game_values.gamemode->GetModeName(), game_values.gamemode->GetGoalName());
                 else
                     sprintf(szMode, "%s  %s: %d", game_values.gamemode->GetModeName(), game_values.gamemode->GetGoalName(), game_values.gamemode->goal);
@@ -1018,13 +1018,13 @@ void GameplayState::drawScreenFade()
 
                 eyecandy[2].add(new EC_Announcement(&rm->game_font_large, &rm->menu_mode_large, szMode, iMode, 130, 90));
             }
-        } else if(game_values.screenfade >= 255) {
+        } else if (game_values.screenfade >= 255) {
             game_values.screenfadespeed = 0;
             game_values.screenfade = 255;
         }
     }
 
-    if(game_values.screenfade > 0) {
+    if (game_values.screenfade > 0) {
         rm->menu_shade.setalpha((Uint8)game_values.screenfade);
         rm->menu_shade.draw(0, 0);
     }
@@ -1033,18 +1033,18 @@ void GameplayState::drawScreenFade()
 void GameplayState::drawScreenShakeBackground()
 {
     //Draw black "behind" the game if we are shaking/moving the screen
-    if(y_shake > 0) {
+    if (y_shake > 0) {
         SDL_Rect rect = {0, 0, smw->ScreenWidth, y_shake};
         SDL_FillRect(screen, &rect, 0x0);       //fill empty area with black
-    } else if(y_shake < 0) {
+    } else if (y_shake < 0) {
         SDL_Rect rect = {0, smw->ScreenHeight + y_shake, smw->ScreenWidth, smw->ScreenHeight};
         SDL_FillRect(screen, &rect, 0x0);       //fill empty area with black
     }
 
-    if(x_shake > 0) {
+    if (x_shake > 0) {
         SDL_Rect rect = {0, 0, x_shake, smw->ScreenHeight};
         SDL_FillRect(screen, &rect, 0x0);       //fill empty area with black
-    } else if(x_shake < 0) {
+    } else if (x_shake < 0) {
         SDL_Rect rect = {smw->ScreenWidth + x_shake, 0, smw->ScreenWidth, smw->ScreenHeight};
         SDL_FillRect(screen, &rect, 0x0);       //fill empty area with black
     }
@@ -1053,16 +1053,16 @@ void GameplayState::drawScreenShakeBackground()
 void GameplayState::drawPlayerSwap()
 {
     short i;
-    if(game_values.swapplayers) {
+    if (game_values.swapplayers) {
         for (i = 0; i < list_players_cnt; i++) {
             list_players[i]->drawswap();
 
             short storedpowerupid = game_values.gamepowerups[list_players[i]->getGlobalID()];
 
-            if(storedpowerupid != -1) {
+            if (storedpowerupid != -1) {
                 short iPowerupX, iPowerupY;
 
-                if(game_values.swapstyle == 1) {
+                if (game_values.swapstyle == 1) {
                     iPowerupX = game_values.swapplayersblink ? list_players[i]->iOldPowerupX : list_players[i]->iNewPowerupX;
                     iPowerupY = game_values.swapplayersblink ? list_players[i]->iOldPowerupY : list_players[i]->iNewPowerupY;
                 } else {
@@ -1074,28 +1074,28 @@ void GameplayState::drawPlayerSwap()
             }
         }
 
-        if(game_values.swapstyle == 0) {
-            if(!sfx_skid.isPlaying())
+        if (game_values.swapstyle == 0) {
+            if (!sfx_skid.isPlaying())
                 ifSoundOnPlay(sfx_skid);
         }
 
-        if(++game_values.swapplayersblinkcount > 10) {
+        if (++game_values.swapplayersblinkcount > 10) {
             game_values.swapplayersblinkcount = 0;
             game_values.swapplayersblink = !game_values.swapplayersblink;
         }
 
         game_values.swapplayersposition += 0.02f;
-        if(game_values.swapplayersposition >= 1.0f) {
+        if (game_values.swapplayersposition >= 1.0f) {
             game_values.swapplayersposition = 0.0f;
             game_values.swapplayers = false;
             game_values.screenfade = 0;
 
-            if(game_values.swapstyle == 0)
+            if (game_values.swapstyle == 0)
                 ifsoundonstop(sfx_skid);
 
             ifSoundOnPlay(sfx_transform);
 
-            if(game_values.swapstyle == 1) {
+            if (game_values.swapstyle == 1) {
                 for (i = 0; i < list_players_cnt; i++)
                     eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, list_players[i]->ix + (HALFPW) - 16, list_players[i]->iy + (HALFPH) - 16, 3, 8));
             }
@@ -1122,7 +1122,7 @@ void GameplayState::drawMiddleLayer()
 {
     g_map->drawPlatforms(1);
 
-    if(!game_values.swapplayers) {
+    if (!game_values.swapplayers) {
         for (short i = 0; i < list_players_cnt; i++)
             list_players[i]->draw();
     }
@@ -1139,7 +1139,7 @@ void GameplayState::drawFrontLayer()
 #ifdef _XBOX
     g_map->drawfrontlayer();
 #else
-    if(game_values.toplayer)
+    if (game_values.toplayer)
         g_map->drawfrontlayer();
 #endif
     g_map->drawWarpLocks();
@@ -1160,14 +1160,14 @@ void GameplayState::drawEverything(short iCountDownState, short iScoreTextOffset
     drawFrontLayer();
 
 
-    if(game_values.spotlights)
+    if (game_values.spotlights)
         spotlightManager.DrawSpotlights();
 
     g_iWinningPlayer = -1;
 
     drawScoreboard(iScoreTextOffset);
 
-    if(game_values.windaffectsplayers) {
+    if (game_values.windaffectsplayers) {
         short iDisplayWindMeterY = game_values.scoreboardstyle == 1 ? 8 : 440;
         rm->spr_windmeter.draw(210, iDisplayWindMeterY, 0, 0, 220, 32);
         rm->spr_windmeter.draw((short)(game_values.gamewindx * 20.0f) + smw->ScreenWidth/2, iDisplayWindMeterY + 6, 220, 0, 12, 20);
@@ -1178,7 +1178,7 @@ void GameplayState::drawEverything(short iCountDownState, short iScoreTextOffset
         list_players[i]->drawarrows();
 
     //Draw countdown start timer
-    if(iCountDownState > 0 && game_values.screenfade == 0) {
+    if (iCountDownState > 0 && game_values.screenfade == 0) {
         SDL_Rect * rects = iCountDownNumbers[iCountDownRectGroup[28 - iCountDownState]][iCountDownRectSize[28 - iCountDownState]];
         rm->spr_countdown_numbers.draw(rects[1].x, rects[1].y, rects[0].x, rects[0].y, rects[0].w, rects[0].h);
     }
@@ -1190,7 +1190,7 @@ void GameplayState::drawEverything(short iCountDownState, short iScoreTextOffset
 
 void drawExitPause()
 {
-    if(game_values.pausegame) {
+    if (game_values.pausegame) {
         rm->spr_dialog.draw(224, 176);
         rm->menu_font_large.drawCentered(smw->ScreenHeight/2, 194, "Pause");
 
@@ -1203,7 +1203,7 @@ void drawExitPause()
         strcpy(szGoal, game_values.gamemode->GetGoalName());
         strcat(szGoal, ": ");
 
-        if(game_values.gamemode->goal == -1)
+        if (game_values.gamemode->goal == -1)
             sprintf(szGoal + strlen(szGoal), "Unlimited");
         else
             sprintf(szGoal + strlen(szGoal), "%d", game_values.gamemode->goal);
@@ -1211,7 +1211,7 @@ void drawExitPause()
         rm->menu_font_large.drawCentered(smw->ScreenWidth/2, 264, szGoal);
     }
 
-    if(game_values.exitinggame) {
+    if (game_values.exitinggame) {
         rm->spr_dialog.draw(smw->ScreenWidth * 0.35f, smw->ScreenHeight*0.37f);
         rm->menu_font_large.drawCentered(smw->ScreenWidth * 0.5f, smw->ScreenHeight*0.46f - (rm->menu_font_large.getHeight() >> 1), "Exit Game");
 
@@ -1230,11 +1230,11 @@ bool IsPauseAllowed()
 
 bool IsExitAllowed()
 {
-    if(!game_values.noexit || list_players_cnt == 0)
+    if (!game_values.noexit || list_players_cnt == 0)
         return true;
 
     for (int iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
-        if(game_values.playercontrol[list_players[iPlayer]->getGlobalID()] == 1)
+        if (game_values.playercontrol[list_players[iPlayer]->getGlobalID()] == 1)
             return false;
     }
 
@@ -1243,13 +1243,13 @@ bool IsExitAllowed()
 
 void UpdateScoreBoard()
 {
-    if(game_values.matchtype == MATCH_TYPE_WORLD) {
+    if (game_values.matchtype == MATCH_TYPE_WORLD) {
         //If no one won, then nothing on the world map has changed
-        if(game_values.gamemode->winningteam < 0)
+        if (game_values.gamemode->winningteam < 0)
             return;
 
         //If this was the last stage, signal that the world is over
-        if(game_values.tourstops[game_values.tourstopcurrent]->fEndStage) {
+        if (game_values.tourstops[game_values.tourstopcurrent]->fEndStage) {
             game_values.tournamentwinner = 1;
             backgroundmusic[4].play(true, true);
         }
@@ -1261,7 +1261,7 @@ void UpdateScoreBoard()
         //Assign the order that players will show up on the scoreboard (ordered by score)
         for (short iMyScore = 0; iMyScore < score_cnt; iMyScore++) {
             for (short iTheirScore = 0; iTheirScore < score_cnt; iTheirScore++) {
-                if(game_values.tournament_scores[iMyScore].total > game_values.tournament_scores[iTheirScore].total) {
+                if (game_values.tournament_scores[iMyScore].total > game_values.tournament_scores[iTheirScore].total) {
                     game_values.tournament_scores[iTheirScore].wins++;
                 }
             }
@@ -1272,8 +1272,8 @@ void UpdateScoreBoard()
 
         for (short iScore = 0; iScore < score_cnt; iScore++) {
             for (short iBonus = 0; iBonus < tourStop->iNumBonuses; iBonus++) {
-                if(tourStop->wsbBonuses[iBonus].iWinnerPlace == score[iScore]->place) {
-                    if(game_values.worldpowerupcount[iScore] < 32)
+                if (tourStop->wsbBonuses[iBonus].iWinnerPlace == score[iScore]->place) {
+                    if (game_values.worldpowerupcount[iScore] < 32)
                         game_values.worldpowerups[iScore][game_values.worldpowerupcount[iScore]++] = tourStop->wsbBonuses[iBonus].iBonus;
                     else
                         game_values.worldpowerups[iScore][31] = tourStop->wsbBonuses[iBonus].iBonus;
@@ -1283,15 +1283,15 @@ void UpdateScoreBoard()
 
         //Add powerups to player's world item inventory that they held at the end of the game
         for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
-            if(game_values.gamepowerups[iPlayer] != -1) {
+            if (game_values.gamepowerups[iPlayer] != -1) {
                 short iTeamId = LookupTeamID(iPlayer);
-                if(game_values.worldpowerupcount[iTeamId] < 32)
+                if (game_values.worldpowerupcount[iTeamId] < 32)
                     game_values.worldpowerups[iTeamId][game_values.worldpowerupcount[iTeamId]++] = game_values.gamepowerups[iPlayer];
             }
         }
-    } else if(game_values.matchtype == MATCH_TYPE_TOUR) {
+    } else if (game_values.matchtype == MATCH_TYPE_TOUR) {
         //If no one won (tied game), then there is no need to update the scores because nothing has changed
-        if(game_values.gamemode->winningteam < 0)
+        if (game_values.gamemode->winningteam < 0)
             return;
 
         //For this game, set the player's place as the type of win
@@ -1312,23 +1312,23 @@ void UpdateScoreBoard()
 
         for (short iMyScore = 0; iMyScore < score_cnt; iMyScore++) {
             for (short iTheirScore = 0; iTheirScore < score_cnt; iTheirScore++) {
-                if(game_values.tournament_scores[iMyScore].total > game_values.tournament_scores[iTheirScore].total) {
+                if (game_values.tournament_scores[iMyScore].total > game_values.tournament_scores[iTheirScore].total) {
                     game_values.tournament_scores[iTheirScore].wins++;
                 }
             }
         }
 
-        if(++game_values.tourstopcurrent >= game_values.tourstoptotal) {
+        if (++game_values.tourstopcurrent >= game_values.tourstoptotal) {
             //Calculate Tour Winner by counting up 1st, 2nd, 3rd, and 4th place wins
 
             short iWinningTeam = -2;  //Set winning team to -2 to signify a tie between teams
             short iWinningScore = 0;
 
             for (short iScore = 0; iScore < score_cnt; iScore++) {
-                if(game_values.tournament_scores[iScore].total > iWinningScore) { //New winner found
+                if (game_values.tournament_scores[iScore].total > iWinningScore) { //New winner found
                     iWinningTeam = iScore;
                     iWinningScore = game_values.tournament_scores[iScore].total;
-                } else if(game_values.tournament_scores[iScore].total == iWinningScore) { //Winning position tied
+                } else if (game_values.tournament_scores[iScore].total == iWinningScore) { //Winning position tied
                     iWinningTeam = -2;
                 }
             }
@@ -1336,26 +1336,26 @@ void UpdateScoreBoard()
             game_values.tournamentwinner = iWinningTeam;
             backgroundmusic[4].play(true, true);
         }
-    } else if(game_values.matchtype == MATCH_TYPE_TOURNAMENT) {
+    } else if (game_values.matchtype == MATCH_TYPE_TOURNAMENT) {
         short maxScore = -1;  //Max score for game
         short maxTeam = -1;  //Team ID with the max score -> reset to -1 if two teams tied for win
 
         for (short i = 0; i < score_cnt; i++) {
-            if(score[i]->score > maxScore) {
+            if (score[i]->score > maxScore) {
                 maxScore = score[i]->score;
                 maxTeam = i;
-            } else if(score[i]->score == maxScore) {
+            } else if (score[i]->score == maxScore) {
                 maxTeam = -1;
             }
         }
 
-        if(maxTeam > -1) {
+        if (maxTeam > -1) {
             game_values.tournament_scores[maxTeam].type[game_values.tournament_scores[maxTeam].wins] = currentgamemode;
 
-            if(++game_values.tournament_scores[maxTeam].wins >= game_values.tournamentgames) {
+            if (++game_values.tournament_scores[maxTeam].wins >= game_values.tournamentgames) {
                 game_values.tournamentwinner = maxTeam;
 
-                if(game_values.music)
+                if (game_values.music)
                     backgroundmusic[4].play(true, true);
             }
         }
@@ -1374,52 +1374,52 @@ void LoadMapObjects(bool fPreview)
     for (short x = 0; x < MAPWIDTH; x++) {
         for (short y = 0; y < MAPHEIGHT; y++) {
             short iType = g_map->objectdata[x][y].iType;
-            if(iType == 0) {
+            if (iType == 0) {
                 g_map->blockdata[x][y] = new B_BreakableBlock(&rm->spr_breakableblock, x << 5, y << 5, 4, 10);
                 noncolcontainer.add(g_map->blockdata[x][y]);
-            } else if(iType == 1) {
+            } else if (iType == 1) {
                 g_map->blockdata[x][y] = new B_PowerupBlock(&rm->spr_powerupblock, x << 5, y << 5, 4, 10, g_map->objectdata[x][y].fHidden, g_map->objectdata[x][y].iSettings);
                 noncolcontainer.add(g_map->blockdata[x][y]);
-            } else if(iType == 2) {
+            } else if (iType == 2) {
                 g_map->blockdata[x][y] = new B_DonutBlock(&rm->spr_donutblock, x << 5, y << 5);
                 noncolcontainer.add(g_map->blockdata[x][y]);
-            } else if(iType == 3) {
+            } else if (iType == 3) {
                 g_map->blockdata[x][y] = new B_FlipBlock(&rm->spr_flipblock, x << 5, y << 5, g_map->objectdata[x][y].fHidden);
                 noncolcontainer.add(g_map->blockdata[x][y]);
-            } else if(iType == 4) {
+            } else if (iType == 4) {
                 g_map->blockdata[x][y] = new B_BounceBlock(&rm->spr_bounceblock, x << 5, y << 5, g_map->objectdata[x][y].fHidden);
                 noncolcontainer.add(g_map->blockdata[x][y]);
-            } else if(iType == 5) {
+            } else if (iType == 5) {
                 g_map->blockdata[x][y] = new B_NoteBlock(&rm->spr_noteblock, x << 5, y << 5, 4, 10, 1, g_map->objectdata[x][y].fHidden);
                 noncolcontainer.add(g_map->blockdata[x][y]);
-            } else if(iType == 6) {
+            } else if (iType == 6) {
                 g_map->blockdata[x][y] = new B_ThrowBlock(&rm->spr_throwblock, x << 5, y << 5, 4, 10, 0);
                 noncolcontainer.add(g_map->blockdata[x][y]);
-            } else if(iType >= 7 && iType <= 10) {
+            } else if (iType >= 7 && iType <= 10) {
                 short iSwitchType = iType - 7;
                 g_map->blockdata[x][y] = new B_OnOffSwitchBlock(&rm->spr_switchblocks, x << 5, y << 5, iSwitchType, g_map->iSwitches[iSwitchType]);
                 noncolcontainer.add(g_map->blockdata[x][y]);
                 g_map->switchBlocks[iSwitchType].push_back(g_map->blockdata[x][y]);
-            } else if(iType >= 11 && iType <= 14) {
+            } else if (iType >= 11 && iType <= 14) {
                 short iSwitchType = iType - 11;
 
                 //g_map->blockdata[x][y] = new B_SwitchBlock(&rm->spr_switchblocks, x << 5, y << 5, iSwitchType, g_map->iSwitches[iSwitchType]);
                 g_map->blockdata[x][y] = new B_SwitchBlock(&rm->spr_switchblocks, x << 5, y << 5, iSwitchType, g_map->objectdata[x][y].iSettings[0]);
                 noncolcontainer.add(g_map->blockdata[x][y]);
                 g_map->switchBlocks[iSwitchType + 4].push_back(g_map->blockdata[x][y]);
-            } else if(iType == 15) {
+            } else if (iType == 15) {
                 g_map->blockdata[x][y] = new B_ViewBlock(&rm->spr_viewblock, x << 5, y << 5, g_map->objectdata[x][y].fHidden, g_map->objectdata[x][y].iSettings);
                 noncolcontainer.add(g_map->blockdata[x][y]);
-            } else if(iType == 16) {
+            } else if (iType == 16) {
                 g_map->blockdata[x][y] = new B_ThrowBlock(&rm->spr_throwblock, x << 5, y << 5, 4, 10, 2);
                 noncolcontainer.add(g_map->blockdata[x][y]);
-            } else if(iType == 17 || iType == 18) {
+            } else if (iType == 17 || iType == 18) {
                 g_map->blockdata[x][y] = new B_NoteBlock(&rm->spr_noteblock, x << 5, y << 5, 4, 10, iType == 17 ? 2 : 0, g_map->objectdata[x][y].fHidden);
                 noncolcontainer.add(g_map->blockdata[x][y]);
-            } else if(iType == 19) {
+            } else if (iType == 19) {
                 g_map->blockdata[x][y] = new B_ThrowBlock(&rm->spr_throwblock, x << 5, y << 5, 4, 10, 1);
                 noncolcontainer.add(g_map->blockdata[x][y]);
-            } else if(iType >= 20 && iType <= 29) {
+            } else if (iType >= 20 && iType <= 29) {
                 g_map->blockdata[x][y] = new B_WeaponBreakableBlock(&rm->spr_weaponbreakableblock, x << 5, y << 5, iType - 20);
                 noncolcontainer.add(g_map->blockdata[x][y]);
             } else {
@@ -1437,9 +1437,9 @@ void LoadMapObjects(bool fPreview)
     short iThrowBoxCount = 0;
     bool * fBoxHasCoin = NULL;
 
-    if(game_values.gamemode->gamemode == game_mode_boxes_minigame) {
+    if (game_values.gamemode->gamemode == game_mode_boxes_minigame) {
         for (short iItem = 0; iItem < g_map->iNumMapItems; iItem++) {
-            if(g_map->mapitems[iItem].itype == 5)
+            if (g_map->mapitems[iItem].itype == 5)
                 iThrowBoxCount++;
         }
 
@@ -1452,7 +1452,7 @@ void LoadMapObjects(bool fPreview)
             short iBoxIndex = RNGMAX(iThrowBoxCount);
 
             while (fBoxHasCoin[iBoxIndex]) {
-                if(++iBoxIndex >= iThrowBoxCount)
+                if (++iBoxIndex >= iThrowBoxCount)
                     iBoxIndex = 0;
             }
 
@@ -1474,33 +1474,33 @@ void LoadMapObjects(bool fPreview)
         short ix = mapItem->ix << 5;
         short iy = mapItem->iy << 5;
 
-        if(iType == 0)
+        if (iType == 0)
             objectcontainer[1].add(new CO_Spring(&rm->spr_spring, ix, iy, false));
-        else if(iType == 1)
+        else if (iType == 1)
             objectcontainer[1].add(new CO_Spike(&rm->spr_spike, ix, iy));
-        else if(iType == 2)
+        else if (iType == 2)
             objectcontainer[1].add(new CO_KuriboShoe(&rm->spr_kuriboshoe, ix, iy, false));
-        else if(iType == 3)
+        else if (iType == 3)
             objectcontainer[1].add(new CO_Spring(&rm->spr_spring, ix, iy, true));
-        else if(iType == 4)
+        else if (iType == 4)
             objectcontainer[1].add(new CO_KuriboShoe(&rm->spr_kuriboshoe, ix, iy, true));
-        else if(iType == 5) {
+        else if (iType == 5) {
             short iItem = NO_POWERUP;
-            if(!fPreview) {
-                if(game_values.gamemode->gamemode == game_mode_boxes_minigame) {
-                    if(fBoxHasCoin[iAddThrowBoxIndex])
+            if (!fPreview) {
+                if (game_values.gamemode->gamemode == game_mode_boxes_minigame) {
+                    if (fBoxHasCoin[iAddThrowBoxIndex])
                         iItem = MINIGAME_COIN;
-                } else if(game_values.gamemode->gamemode == game_mode_health && RNGMAX(100) < game_values.gamemodesettings.health.percentextralife) {
+                } else if (game_values.gamemode->gamemode == game_mode_health && RNGMAX(100) < game_values.gamemodesettings.health.percentextralife) {
                     iItem = HEALTH_POWERUP;
-                } else if((game_values.gamemode->gamemode == game_mode_timelimit && RNGMAX(100) < game_values.gamemodesettings.time.percentextratime) ||
+                } else if ((game_values.gamemode->gamemode == game_mode_timelimit && RNGMAX(100) < game_values.gamemodesettings.time.percentextratime) ||
                           (game_values.gamemode->gamemode == game_mode_star && RNGMAX(100) < game_values.gamemodesettings.star.percentextratime)) {
                     iItem = TIME_POWERUP;
-                } else if((game_values.gamemode->gamemode == game_mode_coins && RNGMAX(100) < game_values.gamemodesettings.coins.percentextracoin) ||
+                } else if ((game_values.gamemode->gamemode == game_mode_coins && RNGMAX(100) < game_values.gamemodesettings.coins.percentextracoin) ||
                           (game_values.gamemode->gamemode == game_mode_greed && RNGMAX(100) < game_values.gamemodesettings.greed.percentextracoin)) {
                     iItem = COIN_POWERUP;
-                } else if(game_values.gamemode->gamemode == game_mode_jail && (RNGMAX(100)) < game_values.gamemodesettings.jail.percentkey) {
+                } else if (game_values.gamemode->gamemode == game_mode_jail && (RNGMAX(100)) < game_values.gamemodesettings.jail.percentkey) {
                     iItem = JAIL_KEY_POWERUP;
-                } else if(iCountWeight > 0 && (RNGMAX(100)) < 40) {
+                } else if (iCountWeight > 0 && (RNGMAX(100)) < 40) {
                     int iRandPowerup = RNGMAX( iCountWeight )+ 1;
                     iItem = 0;
 
@@ -1516,7 +1516,7 @@ void LoadMapObjects(bool fPreview)
         }
     }
 
-    if(fBoxHasCoin) {
+    if (fBoxHasCoin) {
         delete [] fBoxHasCoin;
         fBoxHasCoin = NULL;
     }
@@ -1560,10 +1560,10 @@ void CleanUp()
 
 bool updateExitPause(short iCountDownState) // true on exit
 {
-    if(game_values.screenfade == 0 && iCountDownState <= COUNTDOWN_START_INDEX) {
+    if (game_values.screenfade == 0 && iCountDownState <= COUNTDOWN_START_INDEX) {
         //If the cancel button is pressed
-        if(game_values.forceexittimer > 0) {
-            if(--game_values.forceexittimer <= 0) {
+        if (game_values.forceexittimer > 0) {
+            if (--game_values.forceexittimer <= 0) {
                 game_values.gamestate = GS_END_GAME;
                 game_values.screenfade = 8;
                 game_values.screenfadespeed = 8;
@@ -1574,16 +1574,16 @@ bool updateExitPause(short iCountDownState) // true on exit
             COutputControl * playerKeys = &game_values.playerInput.outputControls[iPlayer];
 
             //If the start key is pressed (pause key)
-            if(playerKeys->game_start.fPressed && IsPauseAllowed()) {
-                if(!game_values.showscoreboard && !game_values.exitinggame) {
+            if (playerKeys->game_start.fPressed && IsPauseAllowed()) {
+                if (!game_values.showscoreboard && !game_values.exitinggame) {
                     game_values.pausegame = !game_values.pausegame;
 
-                    if(game_values.pausegame) {
+                    if (game_values.pausegame) {
                         rm->menu_shade.setalpha(smw->MenuTransparency   );
                         rm->menu_shade.draw(0, 0);
 
                         //Stop the pwings sound if it is on
-                        if(sfx_flyingsound.isPlaying())
+                        if (sfx_flyingsound.isPlaying())
                             ifsoundonstop(sfx_flyingsound);
                     }
 
@@ -1594,12 +1594,12 @@ bool updateExitPause(short iCountDownState) // true on exit
             }
 
             //Only player 1 is allowed to exit a game
-            //if(iPlayer != 0)
+            //if (iPlayer != 0)
             //  continue;
 
-            if((playerKeys->game_cancel.fPressed || (playerKeys->game_start.fPressed && game_values.gamemode->gameover)) && IsExitAllowed()) {
-                if(game_values.gamemode->gameover) {
-                    if(game_values.matchtype == MATCH_TYPE_TOUR || game_values.matchtype == MATCH_TYPE_TOURNAMENT)
+            if ((playerKeys->game_cancel.fPressed || (playerKeys->game_start.fPressed && game_values.gamemode->gameover)) && IsExitAllowed()) {
+                if (game_values.gamemode->gameover) {
+                    if (game_values.matchtype == MATCH_TYPE_TOUR || game_values.matchtype == MATCH_TYPE_TOURNAMENT)
                         UpdateScoreBoard();
 
                     CleanUp();
@@ -1607,7 +1607,7 @@ bool updateExitPause(short iCountDownState) // true on exit
 
                     return true;
                 } else {
-                    if(!game_values.pausegame && !game_values.exitinggame) {
+                    if (!game_values.pausegame && !game_values.exitinggame) {
                         rm->menu_shade.setalpha(smw->MenuTransparency   );
                         rm->menu_shade.draw(0, 0);
                         game_values.exitinggame = true;
@@ -1621,14 +1621,14 @@ bool updateExitPause(short iCountDownState) // true on exit
             }
 
             //Deal with input to game exit dialog box
-            if(game_values.exitinggame) {
-                if(playerKeys->menu_left.fPressed)
+            if (game_values.exitinggame) {
+                if (playerKeys->menu_left.fPressed)
                     game_values.exityes = true;
-                else if(playerKeys->menu_right.fPressed)
+                else if (playerKeys->menu_right.fPressed)
                     game_values.exityes = false;
 
-                if(playerKeys->menu_select.fPressed) {
-                    if(game_values.exityes) {
+                if (playerKeys->menu_select.fPressed) {
+                    if (game_values.exityes) {
                         CleanUp();
                         game_values.exitinggame = false;
                         game_values.exityes = false;
@@ -1652,21 +1652,21 @@ bool updateExitPause(short iCountDownState) // true on exit
 
 void updateScreenShake()
 {
-    if(y_shake > 0 && !game_values.spinscreen) {
+    if (y_shake > 0 && !game_values.spinscreen) {
         y_shake -= CRUNCHVELOCITY;
 
-        if(y_shake < 0)
+        if (y_shake < 0)
             y_shake = 0;
     }
 }
 
 void updateScoreboardAnimation() // scrolling to center at the end of game
 {
-    if(game_values.showscoreboard) {
-        if(game_values.scorepercentmove < 1.0f) {
+    if (game_values.showscoreboard) {
+        if (game_values.scorepercentmove < 1.0f) {
             game_values.scorepercentmove += 0.01f;
 
-            if(game_values.scorepercentmove >= 1.0f)
+            if (game_values.scorepercentmove >= 1.0f)
                 game_values.scorepercentmove = 1.0f;
         } else {
             game_values.scorepercentmove = 1.0f;
@@ -1682,7 +1682,7 @@ void updateScoreboardAnimation() // scrolling to center at the end of game
 void SetGameModeSettingsFromMenu()
 {
     //If this is a tour stop and the tour has settings in it, use those.  Otherwise use the menu settings.
-    if(game_values.tourstops[game_values.tourstopcurrent]->fUseSettings &&
+    if (game_values.tourstops[game_values.tourstopcurrent]->fUseSettings &&
             (game_values.matchtype == MATCH_TYPE_TOUR || game_values.matchtype == MATCH_TYPE_WORLD))
         memcpy(&game_values.gamemodesettings, &game_values.tourstops[game_values.tourstopcurrent]->gmsSettings, sizeof(GameModeSettings));
     else
@@ -1692,20 +1692,20 @@ void SetGameModeSettingsFromMenu()
 void playSFX()
 {
     //Play sound for skidding players
-    if(game_values.playskidsound) {
-        if(!sfx_skid.isPlaying())
+    if (game_values.playskidsound) {
+        if (!sfx_skid.isPlaying())
             ifSoundOnPlay(sfx_skid);
     } else {
-        if(sfx_skid.isPlaying())
+        if (sfx_skid.isPlaying())
             ifsoundonstop(sfx_skid);
     }
 
     //Play sound for players using PWings
-    if(game_values.playflyingsound) {
-        if(!sfx_flyingsound.isPlaying())
+    if (game_values.playflyingsound) {
+        if (!sfx_flyingsound.isPlaying())
             ifSoundOnPlay(sfx_flyingsound);
     } else {
-        if(sfx_flyingsound.isPlaying())
+        if (sfx_flyingsound.isPlaying())
             ifsoundonstop(sfx_flyingsound);
     }
 }
@@ -1713,25 +1713,25 @@ void playSFX()
 void playMusic()
 {
     //Make sure music and sound effects keep playing
-    if(game_values.slowdownon != -1) {
-        if(!sfx_slowdownmusic.isPlaying())
+    if (game_values.slowdownon != -1) {
+        if (!sfx_slowdownmusic.isPlaying())
             ifSoundOnPlay(sfx_slowdownmusic);
     } else {
-        if(sfx_slowdownmusic.isPlaying())
+        if (sfx_slowdownmusic.isPlaying())
             ifsoundonstop(sfx_slowdownmusic);
     }
 
-    if(game_values.playinvinciblesound) {
-        if(!sfx_invinciblemusic.isPlaying() && !sfx_timewarning.isPlaying() && !backgroundmusic[0].isplaying())
+    if (game_values.playinvinciblesound) {
+        if (!sfx_invinciblemusic.isPlaying() && !sfx_timewarning.isPlaying() && !backgroundmusic[0].isplaying())
             ifSoundOnPlay(sfx_invinciblemusic);
     } else {
-        if(sfx_invinciblemusic.isPlaying())
+        if (sfx_invinciblemusic.isPlaying())
             ifsoundonstop(sfx_invinciblemusic);
     }
 
     //If no background music is playing, then play some
-    if(!backgroundmusic[0].isplaying() && !sfx_invinciblemusic.isPlaying() && !sfx_timewarning.isPlaying() && !game_values.gamemode->gameover) {
-        if(game_values.playnextmusic) {
+    if (!backgroundmusic[0].isplaying() && !sfx_invinciblemusic.isPlaying() && !sfx_timewarning.isPlaying() && !game_values.gamemode->gameover) {
+        if (game_values.playnextmusic) {
             musiclist->SetNextMusic(g_map->musicCategoryID, maplist->currentShortmapname(), g_map->szBackgroundFile);
             backgroundmusic[0].load(musiclist->GetCurrentMusic());
         }
@@ -1742,7 +1742,7 @@ void playMusic()
 
 void PlayNextMusicTrack()
 {
-    if(game_values.gamemode->gameover || game_values.playinvinciblesound || sfx_timewarning.isPlaying())
+    if (game_values.gamemode->gameover || game_values.playinvinciblesound || sfx_timewarning.isPlaying())
         return;
 
     backgroundmusic[0].stop();
@@ -1761,11 +1761,11 @@ void secretBoss()
     game_values.gamemode = bossgamemode;  //boss type has already been set at this point
     bossgamemode->SetBossType(0);
 
-    if(bossgamemode->GetBossType() == 0)
+    if (bossgamemode->GetBossType() == 0)
         g_map->loadMap(convertPath("maps/special/dungeon.map"), read_type_full);
-    else if(bossgamemode->GetBossType() == 1)
+    else if (bossgamemode->GetBossType() == 1)
         g_map->loadMap(convertPath("maps/special/hills.map"), read_type_full);
-    else if(bossgamemode->GetBossType() == 2)
+    else if (bossgamemode->GetBossType() == 2)
         g_map->loadMap(convertPath("maps/special/volcano.map"), read_type_full);
 
     LoadCurrentMapBackground();
@@ -1789,7 +1789,7 @@ void GameplayState::onEnterState()
     iCountDownState = 0;
     iCountDownTimer = 0;
 
-    if(game_values.startgamecountdown && game_values.singleplayermode == -1) {
+    if (game_values.startgamecountdown && game_values.singleplayermode == -1) {
         iCountDownState = 28;
         iCountDownTimer = iCountDownTimes[0];
     }
@@ -1841,20 +1841,20 @@ void GameplayState::update()
 
     /*
     #ifdef _XBOX
-            if(joystickcount != SDL_NumJoysticks())
+            if (joystickcount != SDL_NumJoysticks())
                 reconnectjoysticks();
     #endif
     */
 #ifdef _DEBUG
 
     static short endgametimer = (short)(RNGMAX(200));
-    if(g_fAutoTest && !game_values.swapplayers) {
+    if (g_fAutoTest && !game_values.swapplayers) {
         for (short k = 0; k < list_players_cnt; k++) {
-            if(list_players[k]->isready()) {
+            if (list_players[k]->isready()) {
                 //Detect player is in center of tile only
                 short x = (list_players[k]->ix + HALFPW) / TILESIZE;
 
-                if(list_players[k]->ix + HALFPW >= smw->ScreenWidth)
+                if (list_players[k]->ix + HALFPW >= smw->ScreenWidth)
                     x = (list_players[k]->ix + HALFPW - smw->ScreenWidth) / TILESIZE;
 
                 short y = (list_players[k]->iy + HALFPH) / TILESIZE;
@@ -1863,13 +1863,13 @@ void GameplayState::update()
                 IO_Block * block = NULL;
                 short blocktype = -1;
 
-                if(list_players[k]->iy + HALFPH >= 0 && list_players[k]->iy + HALFPH < smw->ScreenHeight) {
+                if (list_players[k]->iy + HALFPH >= 0 && list_players[k]->iy + HALFPH < smw->ScreenHeight) {
                     tile = g_map->map(x, y);
                     block = g_map->block(x, y);
                     blocktype = g_map->blockat(x, y)->iType;
                 }
 
-                if((tile & tile_flag_solid) ||
+                if ((tile & tile_flag_solid) ||
                         (block && blocktype != 3 && blocktype < 11)) {
                     game_values.pausegame = true;
                     game_values.frameadvance = true;
@@ -1881,12 +1881,12 @@ void GameplayState::update()
                 short actualvalues[2][2];
                 actualvalues[0][0] = list_players[k]->ix;
 
-                if(actualvalues[0][0] < 0)
+                if (actualvalues[0][0] < 0)
                     actualvalues[0][0] += smw->ScreenWidth;
 
                 actualvalues[0][1] = list_players[k]->ix + PW;
 
-                if(actualvalues[0][1] >= smw->ScreenWidth)
+                if (actualvalues[0][1] >= smw->ScreenWidth)
                     actualvalues[0][1] -= smw->ScreenWidth;
 
                 actualvalues[1][0] = list_players[k]->iy;
@@ -1895,12 +1895,12 @@ void GameplayState::update()
                 short corners[2][2];
                 corners[0][0] = list_players[k]->ix / TILESIZE;
 
-                if(list_players[k]->ix < 0)
+                if (list_players[k]->ix < 0)
                     corners[0][0] = (list_players[k]->ix + smw->ScreenWidth) / TILESIZE;
 
                 corners[0][1] = (list_players[k]->ix + PW) / TILESIZE;
 
-                if(list_players[k]->ix + PW >= smw->ScreenWidth)
+                if (list_players[k]->ix + PW >= smw->ScreenWidth)
                     corners[0][1] = (list_players[k]->ix + PW - smw->ScreenWidth) / TILESIZE;
 
                 corners[1][0] = list_players[k]->iy / TILESIZE;
@@ -1912,13 +1912,13 @@ void GameplayState::update()
                         IO_Block * block = NULL;
                         short blocktype = -1;
 
-                        if(actualvalues[0][j] >= 0 && actualvalues[0][j] < smw->ScreenWidth && actualvalues[1][i] > 0 && actualvalues[1][i] < smw->ScreenHeight) {
+                        if (actualvalues[0][j] >= 0 && actualvalues[0][j] < smw->ScreenWidth && actualvalues[1][i] > 0 && actualvalues[1][i] < smw->ScreenHeight) {
                             tile = g_map->map(corners[0][j], corners[1][i]);
                             block = g_map->block(corners[0][j], corners[1][i]);
                             blocktype = g_map->blockat(corners[0][j], corners[1][i])->iType;
                         }
 
-                        if( (tile & tile_flag_solid) ||
+                        if ( (tile & tile_flag_solid) ||
                                 (block && blocktype != 3 && blocktype < 11)) {
                             game_values.pausegame = true;
                             game_values.frameadvance = true;
@@ -1927,12 +1927,12 @@ void GameplayState::update()
                         }
                     }
 
-                    if(game_values.pausegame)
+                    if (game_values.pausegame)
                         break;
                 }
             }
 
-            if(game_values.pausegame)
+            if (game_values.pausegame)
                 break;
         }
 
@@ -1940,16 +1940,16 @@ void GameplayState::update()
         //Kill off players to test spawning
         static short chooseplayer = 0;
         static short killtimer = 0;
-        if(++killtimer > 20)
+        if (++killtimer > 20)
         {
             killtimer = 0;
 
-            if(++chooseplayer >= list_players_cnt)
+            if (++chooseplayer >= list_players_cnt)
                 chooseplayer = 0;
 
             list_players[chooseplayer]->DeathAwards();
 
-            if( !game_values.gamemode->playerkilledself(*(list_players[chooseplayer])) )
+            if ( !game_values.gamemode->playerkilledself(*(list_players[chooseplayer])) )
             {
                 list_players[chooseplayer]->die(0, false);
             }
@@ -1957,11 +1957,11 @@ void GameplayState::update()
 #endif
 
         //Automatically run menus
-        if(game_values.showscoreboard) {
-            if(--endgametimer < 0) {
+        if (game_values.showscoreboard) {
+            if (--endgametimer < 0) {
                 endgametimer = (short)(RNGMAX(200));
 
-                if(game_values.matchtype != MATCH_TYPE_SINGLE_GAME && game_values.matchtype != MATCH_TYPE_QUICK_GAME && game_values.matchtype != MATCH_TYPE_MINIGAME)
+                if (game_values.matchtype != MATCH_TYPE_SINGLE_GAME && game_values.matchtype != MATCH_TYPE_QUICK_GAME && game_values.matchtype != MATCH_TYPE_MINIGAME)
                     UpdateScoreBoard();
 
                 CleanUp();
@@ -1970,7 +1970,7 @@ void GameplayState::update()
                 return;
             }
         } else {
-            if(++exitgametimer >= 8000) {
+            if (++exitgametimer >= 8000) {
                 CleanUp();
                 game_values.exitinggame = false;
                 game_values.exityes = false;
@@ -2000,12 +2000,12 @@ void GameplayState::update()
 #endif
         case SDL_KEYDOWN: {
 #ifndef _XBOX
-            if(event.key.keysym.mod & (KMOD_LALT | KMOD_RALT)) {
-                if(event.key.keysym.sym == SDLK_F4) {
+            if (event.key.keysym.mod & (KMOD_LALT | KMOD_RALT)) {
+                if (event.key.keysym.sym == SDLK_F4) {
                     CleanUp();
                     game_values.gamestate = GS_QUIT;
                     return;
-                } else if(event.key.keysym.sym == SDLK_RETURN) {
+                } else if (event.key.keysym.sym == SDLK_RETURN) {
                     game_values.fullscreen = !game_values.fullscreen;
                     gfx_setresolution(smw->ScreenWidth, smw->ScreenHeight, game_values.fullscreen);
                     blitdest = screen;
@@ -2018,108 +2018,108 @@ void GameplayState::update()
                 }
             }
 #endif
-            if(event.key.keysym.sym == SDLK_F1) {
+            if (event.key.keysym.sym == SDLK_F1) {
                 game_values.showfps = !game_values.showfps;
-            } else if(event.key.keysym.sym == SDLK_ESCAPE) {
+            } else if (event.key.keysym.sym == SDLK_ESCAPE) {
                 game_values.playerInput.outputControls[0].game_cancel.fPressed = true;
-            } else if(event.key.keysym.sym == SDLK_TAB) {
+            } else if (event.key.keysym.sym == SDLK_TAB) {
                 PlayNextMusicTrack();
             }
 #ifdef _DEBUG
-            else if(event.key.keysym.sym == SDLK_LEFTBRACKET) {
+            else if (event.key.keysym.sym == SDLK_LEFTBRACKET) {
                 game_values.framelimiter++;
-            } else if(event.key.keysym.sym == SDLK_RIGHTBRACKET) {
-                if(game_values.framelimiter > 0)
+            } else if (event.key.keysym.sym == SDLK_RIGHTBRACKET) {
+                if (game_values.framelimiter > 0)
                     game_values.framelimiter--;
-            } else if(event.key.keysym.sym == SDLK_F2) {
+            } else if (event.key.keysym.sym == SDLK_F2) {
                 game_values.frameadvance = !game_values.frameadvance;
-            } else if(event.key.keysym.sym == SDLK_F5) {
+            } else if (event.key.keysym.sym == SDLK_F5) {
                 game_values.autokill = !game_values.autokill;
-            } else if(event.key.keysym.sym == SDLK_z) {
+            } else if (event.key.keysym.sym == SDLK_z) {
                 for (short k = 0; k < list_players_cnt; k++) {
                     list_players[k]->DeathAwards();
 
-                    if(game_values.gamemode->playerkilledself(*(list_players[k]), kill_style_environment) == player_kill_normal)
+                    if (game_values.gamemode->playerkilledself(*(list_players[k]), kill_style_environment) == player_kill_normal)
                         list_players[k]->die(0, false, false);
                 }
-            } else if(event.key.keysym.sym == SDLK_x) {
+            } else if (event.key.keysym.sym == SDLK_x) {
                 short iplayer = RNGMAX(list_players_cnt);
                 list_players[iplayer]->makefrozen(300);
-            } else if(event.key.keysym.sym == SDLK_c) {
+            } else if (event.key.keysym.sym == SDLK_c) {
                 short iplayer = RNGMAX(list_players_cnt);
                 list_players[iplayer]->shield = RNGMAX(3) + 1;
                 list_players[iplayer]->shieldtimer = 620;
-            } else if(event.key.keysym.sym == SDLK_1) {
-                if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
+            } else if (event.key.keysym.sym == SDLK_1) {
+                if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
                     objectcontainer[0].add(new PU_IceWandPowerup(&rm->spr_icewandpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, 0, 30, 30, 1, 1));
-                else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
+                else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
                     objectcontainer[0].add(new PU_BobombPowerup(&rm->spr_bobombpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));
                 else
                     objectcontainer[0].add(new PU_StarPowerup(&rm->spr_starpowerup, list_players[0]->ix + 32, list_players[0]->iy, 4, true, 2, 30, 30, 1, 1));
-            } else if(event.key.keysym.sym == SDLK_2) {
-                if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
+            } else if (event.key.keysym.sym == SDLK_2) {
+                if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
                     objectcontainer[0].add(new PU_BombPowerup(&rm->spr_bombpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, 0, 30, 30, 1, 1));
-                else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
+                else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
                     objectcontainer[0].add(new PU_PowPowerup(&rm->spr_powpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 8, true, 8, 30, 30, 1, 1));
                 else
                     objectcontainer[0].add(new PU_ExtraGuyPowerup(&rm->spr_1uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1, 1));
-            } else if(event.key.keysym.sym == SDLK_3) {
-                if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
+            } else if (event.key.keysym.sym == SDLK_3) {
+                if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
                     objectcontainer[0].add(new PU_PodoboPowerup(&rm->spr_podobopowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, 0, 30, 30, 1, 1));
-                else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
+                else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
                     objectcontainer[0].add(new PU_BulletBillPowerup(&rm->spr_bulletbillpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));
                 else
                     objectcontainer[0].add(new PU_ExtraGuyPowerup(&rm->spr_2uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1, 2));
-            } else if(event.key.keysym.sym == SDLK_4) {
-                if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
+            } else if (event.key.keysym.sym == SDLK_4) {
+                if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
                     objectcontainer[0].add(new PU_Tanooki(list_players[0]->ix + 32, list_players[0]->iy));
-                else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
+                else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
                     objectcontainer[1].add(new CO_Shell(0, list_players[0]->ix + 32, list_players[0]->iy, true, true, true, false));
                 else
                     objectcontainer[0].add(new PU_ExtraGuyPowerup(&rm->spr_3uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1, 3));
-            } else if(event.key.keysym.sym == SDLK_5) {
-                if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
+            } else if (event.key.keysym.sym == SDLK_5) {
+                if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
                     objectcontainer[0].add(new PU_PWingsPowerup(&rm->spr_pwingspowerup, list_players[0]->ix + 32, list_players[0]->iy));
-                else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
+                else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
                     objectcontainer[1].add(new CO_Shell(1, list_players[0]->ix + 32, list_players[0]->iy, false, true, true, false));
                 else
                     objectcontainer[0].add(new PU_ExtraGuyPowerup(&rm->spr_5uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1, 5));
-            } else if(event.key.keysym.sym == SDLK_6) {
-                if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
+            } else if (event.key.keysym.sym == SDLK_6) {
+                if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
                     objectcontainer[1].add(new CO_Spring(&rm->spr_spring, list_players[0]->ix + 32, list_players[0]->iy, true));
-                else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
+                else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
                     objectcontainer[1].add(new CO_Shell(2, list_players[0]->ix + 32, list_players[0]->iy, false, false, true, true));
                 else
                     objectcontainer[0].add(new PU_FirePowerup(&rm->spr_firepowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1));
-            } else if(event.key.keysym.sym == SDLK_7) {
-                if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
+            } else if (event.key.keysym.sym == SDLK_7) {
+                if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
                     objectcontainer[1].add(new CO_ThrowBox(&rm->spr_throwbox, list_players[0]->ix + 32, list_players[0]->iy, (RNGMAX(NUM_POWERUPS) + 3) - 3));
-                else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
+                else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
                     objectcontainer[1].add(new CO_Shell(3, list_players[0]->ix + 32, list_players[0]->iy, false, true, false, false));
                 else
                     objectcontainer[0].add(new PU_HammerPowerup(&rm->spr_hammerpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1));
-            } else if(event.key.keysym.sym == SDLK_8) {
-                if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
+            } else if (event.key.keysym.sym == SDLK_8) {
+                if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
                     objectcontainer[1].add(new CO_Spike(&rm->spr_spike, list_players[0]->ix + 32, list_players[0]->iy));
-                else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
+                else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
                     objectcontainer[0].add(new PU_ModPowerup(&rm->spr_modpowerup, list_players[0]->ix + 32, list_players[0]->iy, 8, true, 8, 30, 30, 1, 1));
                 else
                     objectcontainer[0].add(new PU_PoisonPowerup(&rm->spr_poisonpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1));
-            } else if(event.key.keysym.sym == SDLK_9) {
-                if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
+            } else if (event.key.keysym.sym == SDLK_9) {
+                if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
                     objectcontainer[1].add(new CO_KuriboShoe(&rm->spr_kuriboshoe, list_players[0]->ix + 32, list_players[0]->iy, true));
-                else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
+                else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
                     objectcontainer[0].add(new PU_FeatherPowerup(&rm->spr_featherpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, 0, 30, 30, 1, 1));
                 else
                     objectcontainer[0].add(new PU_ClockPowerup(&rm->spr_clockpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));
-            } else if(event.key.keysym.sym == SDLK_0) {
-                if(event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
+            } else if (event.key.keysym.sym == SDLK_0) {
+                if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
                     objectcontainer[0].add(new PU_LeafPowerup(&rm->spr_leafpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, 0, 30, 30, 1, 1));
-                else if(event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
+                else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
                     objectcontainer[0].add(new PU_BoomerangPowerup(&rm->spr_boomerangpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));
                 else
                     objectcontainer[0].add(new PU_MysteryMushroomPowerup(&rm->spr_mysterymushroompowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));
-            } else if(event.key.keysym.sym == SDLK_INSERT) {
+            } else if (event.key.keysym.sym == SDLK_INSERT) {
                 g_fAutoTest = !g_fAutoTest;
             }
 #endif
@@ -2128,7 +2128,7 @@ void GameplayState::update()
 
 #ifdef _XBOX
         case SDL_JOYBUTTONDOWN: {
-            if(event.jbutton.state == SDL_PRESSED && event.jbutton.button == 5) {
+            if (event.jbutton.state == SDL_PRESSED && event.jbutton.button == 5) {
                 PlayNextMusicTrack();
             }
 
@@ -2150,41 +2150,41 @@ void GameplayState::update()
         return;
     }
 
-    if(!game_values.pausegame && !game_values.exitinggame) {
-        if(!game_values.swapplayers && game_values.screenfade == 0) {
+    if (!game_values.pausegame && !game_values.exitinggame) {
+        if (!game_values.swapplayers && game_values.screenfade == 0) {
             //Count down start timer before each game
-            if(iCountDownState > 0 && --iCountDownTimer <= 0) {
+            if (iCountDownState > 0 && --iCountDownTimer <= 0) {
                 //There is one extra count here so we hit all the numbers.  When we
                 //reach 0 that means we are done counting (index 28 would be out of
                 //bounds on this array)
-                if(--iCountDownState != 0) {
+                if (--iCountDownState != 0) {
                     //28 is the magic number as there are 28 frames of animation
                     //spread over a few seconds for the countdown numbers
                     iCountDownTimer = iCountDownTimes[28 - iCountDownState];
 
                     short countDownAnnounce = iCountDownAnnounce[28 - iCountDownState];
-                    if(countDownAnnounce >= 0)
+                    if (countDownAnnounce >= 0)
                         ifsoundonandreadyplay(sfx_announcer[countDownAnnounce]);
                 }
             }
 
             //Make updates to background stuff (animate map while countdown is counting)
-            if(iCountDownState > COUNTDOWN_START_INDEX) {
+            if (iCountDownState > COUNTDOWN_START_INDEX) {
                 animateDuringCountdown();
             } else {
                 //Shake screen
 
                 shakeScreen();
 
-                if(game_values.spinscreen) {
+                if (game_values.spinscreen) {
                     SpinScreen();
                 }
 
                 for (short iPlayer = 0; iPlayer < 4; iPlayer++) {
-                    if(game_values.bulletbilltimer[iPlayer] > 0) {
+                    if (game_values.bulletbilltimer[iPlayer] > 0) {
                         game_values.bulletbilltimer[iPlayer]--;
 
-                        if(--game_values.bulletbillspawntimer[iPlayer] <= 0) {
+                        if (--game_values.bulletbillspawntimer[iPlayer] <= 0) {
                             game_values.bulletbillspawntimer[iPlayer] = (short)(RNGMAX(20) + 25);
                             float speed = ((float)(RNGMAX(21) + 20)) / 10.0f;
                             objectcontainer[2].add(new MO_BulletBill(&rm->spr_bulletbill, &rm->spr_bulletbilldead, 0, (short)(RNGMAX(448)), (RNGMAX(2) ? speed : -speed), iPlayer, false));
@@ -2193,26 +2193,26 @@ void GameplayState::update()
                     }
                 }
 
-                if(game_values.matchtype == MATCH_TYPE_WORLD && game_values.gamemode->gameover && game_values.forceexittimer <= 0) {
-                    if(--game_values.noexittimer <= 0)
+                if (game_values.matchtype == MATCH_TYPE_WORLD && game_values.gamemode->gameover && game_values.forceexittimer <= 0) {
+                    if (--game_values.noexittimer <= 0)
                         game_values.noexit = false;
                 }
 
                 //------------- update objects -----------------------
 
 #ifdef _DEBUG
-                if(game_values.autokill) {
+                if (game_values.autokill) {
                     for (short k = 0; k < list_players_cnt; k++) {
                         list_players[k]->DeathAwards();
 
-                        if(!game_values.gamemode->playerkilledself(*(list_players[k]), kill_style_environment))
+                        if (!game_values.gamemode->playerkilledself(*(list_players[k]), kill_style_environment))
                             list_players[k]->die(0, false, false);
                     }
                 }
 #endif
 
                 //Advance the cpu's turn (AI only calculates player's actions 1 out of 4 frames)
-                if(++game_values.cputurn > 3)
+                if (++game_values.cputurn > 3)
                     game_values.cputurn = 0;
 
                 handleP2PCollisions();
@@ -2255,7 +2255,7 @@ void GameplayState::update()
 
                 game_values.gamemode->think();
 
-                if(game_values.slowdownon != -1 && ++game_values.slowdowncounter > 580) {
+                if (game_values.slowdownon != -1 && ++game_values.slowdowncounter > 580) {
                     game_values.slowdownon = -1;
                     game_values.slowdowncounter = 0;
                 }
@@ -2270,28 +2270,28 @@ void GameplayState::update()
         //Go to this label if a player collects a swap mushroom and we need to break out of two loops
 SWAPBREAK:
 
-        if(game_values.swapplayers) {
+        if (game_values.swapplayers) {
             for (i = 0; i < list_players_cnt; i++) {
                 list_players[i]->updateswap();
             }
         }
 
-        if(game_values.screenfade == 255) {
-            if(game_values.gamestate == GS_START_GAME) {
+        if (game_values.screenfade == 255) {
+            if (game_values.gamestate == GS_START_GAME) {
                 CleanUp();
                 SetGameModeSettingsFromMenu();
                 game_values.gamestate = GS_GAME;
 
                 //secretBoss();
 
-                if(game_values.music) {
+                if (game_values.music) {
                     musiclist->SetRandomMusic(g_map->musicCategoryID, "", "");
                     backgroundmusic[0].load(musiclist->GetCurrentMusic());
                     backgroundmusic[0].play(game_values.playnextmusic, false);
                 }
 
                 return;
-            } else if(game_values.gamestate == GS_END_GAME) {
+            } else if (game_values.gamestate == GS_END_GAME) {
                 CleanUp();
                 game_values.gamestate = GS_MENU;
                 game_values.screenfadespeed = -8;
@@ -2311,7 +2311,7 @@ SWAPBREAK:
 
 
 #ifdef _DEBUG
-    if(g_fAutoTest)
+    if (g_fAutoTest)
         rm->menu_font_small.drawRightJustified(635, 5, "Auto");
 #endif
 
@@ -2320,9 +2320,9 @@ SWAPBREAK:
 bool coldec_player2player(CPlayer * o1, CPlayer * o2)
 {
     //Special cases to deal with players overlapping the right and left sides of the screen
-    if(o1->ix + PW < o2->ix) {
+    if (o1->ix + PW < o2->ix) {
         return o1->ix + smw->ScreenWidth < o2->ix + PW && o1->ix + PW + smw->ScreenWidth >= o2->ix && o1->iy <= o2->iy + PH && o1->iy + PH >= o2->iy;
-    } else if(o2->ix + PW < o1->ix) {
+    } else if (o2->ix + PW < o1->ix) {
         return o1->ix < o2->ix + PW + smw->ScreenWidth && o1->ix + PW >= o2->ix + smw->ScreenWidth && o1->iy <= o2->iy + PH && o1->iy + PH >= o2->iy;
     } else { //Normal case where no overlap
         return o1->ix < o2->ix + PW && o1->ix + PW >= o2->ix && o1->iy <= o2->iy + PH && o1->iy + PH >= o2->iy;
@@ -2332,9 +2332,9 @@ bool coldec_player2player(CPlayer * o1, CPlayer * o2)
 bool coldec_player2obj(CPlayer * o1, CObject * o2)
 {
     //Special cases to deal with players overlapping the right and left sides of the screen
-    if(o1->ix + PW < o2->ix) {
+    if (o1->ix + PW < o2->ix) {
         return o1->ix + smw->ScreenWidth < o2->ix + o2->collisionWidth && o1->ix + PW + smw->ScreenWidth >= o2->ix && o1->iy < o2->iy + o2->collisionHeight && o1->iy + PH >= o2->iy;
-    } else if(o2->ix + o2->collisionWidth < o1->ix) {
+    } else if (o2->ix + o2->collisionWidth < o1->ix) {
         return o1->ix < o2->ix + o2->collisionWidth + smw->ScreenWidth && o1->ix + PW >= o2->ix + smw->ScreenWidth && o1->iy < o2->iy + o2->collisionHeight && o1->iy + PH >= o2->iy;
     } else { //Normal case where no overlap
         return o1->ix < o2->ix + o2->collisionWidth && o1->ix + PW >= o2->ix && o1->iy < o2->iy + o2->collisionHeight && o2->iy <= o1->iy + PH;
@@ -2349,9 +2349,9 @@ bool coldec_obj2obj(CObject * o1, CObject * o2)
     short o2r = o2->ix + o2->collisionWidth;
     short o2b = o2->iy + o2->collisionHeight;
 
-    if(o1r < o2->ix) {
+    if (o1r < o2->ix) {
         return o1->ix + smw->ScreenWidth < o2r && o1r + smw->ScreenWidth >= o2->ix && o1->iy < o2b && o1b >= o2->iy;
-    } else if(o2r < o1->ix) {
+    } else if (o2r < o1->ix) {
         return o1->ix < o2r + smw->ScreenWidth && o1r >= o2->ix + smw->ScreenWidth && o1->iy < o2b && o1b >= o2->iy;
     } else {
         return o1->ix < o2r && o1r >= o2->ix && o1->iy < o2b && o1b >= o2->iy;
@@ -2363,7 +2363,7 @@ bool SwapPlayers(short iUsingPlayerID)
     //Count available players to switch with
     short iNumAvailablePlayers = 0;
     for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
-        if(list_players[iPlayer]->isready()) {
+        if (list_players[iPlayer]->isready()) {
             iNumAvailablePlayers++;
             list_players[iPlayer]->fOldSwapX = list_players[iPlayer]->ix;
             list_players[iPlayer]->fOldSwapY = list_players[iPlayer]->iy;
@@ -2373,14 +2373,14 @@ bool SwapPlayers(short iUsingPlayerID)
         }
     }
 
-    if(iNumAvailablePlayers <= 1)
+    if (iNumAvailablePlayers <= 1)
         return false;
 
-    if(game_values.swapstyle != 2) {
+    if (game_values.swapstyle != 2) {
         game_values.swapplayers = true;
         game_values.swapplayersposition = 0.0f;
 
-        if(game_values.swapstyle == 1) {
+        if (game_values.swapstyle == 1) {
             game_values.swapplayersblink = false;
             game_values.swapplayersblinkcount = 0;
         } else {
@@ -2392,13 +2392,13 @@ bool SwapPlayers(short iUsingPlayerID)
 
     MysteryMushroomTempPlayer spots[4];
     for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
-        if(!list_players[iPlayer]->isready())
+        if (!list_players[iPlayer]->isready())
             continue;
 
         short iNewSpot = iPlayer + iIncrement;
 
         do {
-            if(++iNewSpot >= list_players_cnt)
+            if (++iNewSpot >= list_players_cnt)
                 iNewSpot = 0;
         } while (spots[iNewSpot].fUsed || !list_players[iNewSpot]->isready());
 
@@ -2406,26 +2406,26 @@ bool SwapPlayers(short iUsingPlayerID)
         spots[iPlayer].SetPlayer(list_players[iNewSpot], game_values.gamepowerups[list_players[iNewSpot]->getGlobalID()]);
 
         //Give credit for deaths to the player that used the mystery mushroom
-        if(iUsingPlayerID == iNewSpot) {
+        if (iUsingPlayerID == iNewSpot) {
             list_players[iPlayer]->iSuicideCreditPlayerID = list_players[iNewSpot]->globalID;
             list_players[iPlayer]->iSuicideCreditTimer = 62;
         }
     }
 
     for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
-        if(!list_players[iPlayer]->isready())
+        if (!list_players[iPlayer]->isready())
             continue;
 
         spots[iPlayer].GetPlayer(list_players[iPlayer], &game_values.gamepowerups[list_players[iPlayer]->getGlobalID()]);
 
-        if(game_values.swapstyle != 1)
+        if (game_values.swapstyle != 1)
             eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, (short)list_players[iPlayer]->fNewSwapX + (HALFPW) - 16, (short)list_players[iPlayer]->fNewSwapY + (HALFPH) - 16, 3, 8));
 
-        if(game_values.swapstyle == 2) {
+        if (game_values.swapstyle == 2) {
             list_players[iPlayer]->setXf(list_players[iPlayer]->fNewSwapX);
             list_players[iPlayer]->setYf(list_players[iPlayer]->fNewSwapY);
 
-            if(list_players[iPlayer]->carriedItem)
+            if (list_players[iPlayer]->carriedItem)
                 list_players[iPlayer]->carriedItem->MoveToOwner();
         }
     }
@@ -2440,45 +2440,45 @@ void UpdateMusicWithOverrides()
 {
     FILE * file = fopen(convertPath("music/Overrides.txt").c_str(), "r");
 
-    if(!file)
+    if (!file)
         return;
 
     short iAddToCategory = 0;
     char szBuffer[256];
     while (fgets(szBuffer, 1024, file)) { // TODO: what's this?
         //Ignore comment lines
-        if(szBuffer[0] == '#' || szBuffer[0] == '\n' || szBuffer[0] == '\r' || szBuffer[0] == ' ' || szBuffer[0] == '\t')
+        if (szBuffer[0] == '#' || szBuffer[0] == '\n' || szBuffer[0] == '\r' || szBuffer[0] == ' ' || szBuffer[0] == '\t')
             continue;
 
         //Chop off line ending
         int stringLength = strlen(szBuffer);
         for (short k = 0; k < stringLength; k++) {
-            if(szBuffer[k] == '\r' || szBuffer[k] == '\n') {
+            if (szBuffer[k] == '\r' || szBuffer[k] == '\n') {
                 szBuffer[k] = '\0';
                 break;
             }
         }
 
         //If we found a category header
-        if(szBuffer[0] == '[') {
-            if(!strCiCompare(szBuffer, "[maps]"))
+        if (szBuffer[0] == '[') {
+            if (!strCiCompare(szBuffer, "[maps]"))
                 iAddToCategory = 1;
-            else if(!strCiCompare(szBuffer, "[worlds]"))
+            else if (!strCiCompare(szBuffer, "[worlds]"))
                 iAddToCategory = 2;
 
             continue;
         }
 
         //If we're not in a category, ignore this line
-        if(iAddToCategory == 0)
+        if (iAddToCategory == 0)
             continue;
 
         char * pszName = strtok(szBuffer, ",\n");
 
-        if(!pszName)
+        if (!pszName)
             continue;
 
-        if(iAddToCategory == 1) {
+        if (iAddToCategory == 1) {
             MapMusicOverride * override = new MapMusicOverride();
 
             override->mapname = pszName;
@@ -2487,7 +2487,7 @@ void UpdateMusicWithOverrides()
             while (pszMusic) {
                 std::string sPath = convertPath(pszMusic);
 
-                if(File_Exists(sPath.c_str())) {
+                if (File_Exists(sPath.c_str())) {
                     override->songs.push_back(sPath);
                 }
 
@@ -2495,22 +2495,22 @@ void UpdateMusicWithOverrides()
             }
 
             //Don't add overrides that have no songs
-            if(override->songs.size() == 0) {
+            if (override->songs.size() == 0) {
                 delete override;
                 continue;
             }
 
             mapmusicoverrides.push_back(override);
-        } else if(iAddToCategory == 2) {
+        } else if (iAddToCategory == 2) {
             WorldMusicOverride * override = new WorldMusicOverride();
 
             override->worldname = pszName;
 
             char * pszMusic = strtok(NULL, ",\n");
-            if(pszMusic) {
+            if (pszMusic) {
                 std::string sPath = convertPath(pszMusic);
 
-                if(File_Exists(sPath.c_str())) {
+                if (File_Exists(sPath.c_str())) {
                     override->song = sPath;
                     worldmusicoverrides.push_back(override);
                 }

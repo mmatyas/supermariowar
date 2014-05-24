@@ -116,31 +116,31 @@ MenuCodeEnum MI_IPField::Modify(bool modify)
 MenuCodeEnum MI_IPField::SendInput(CPlayerInput * playerInput)
 {
     for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
-        if(playerInput->outputControls[iPlayer].menu_right.fPressed) {
-            if(++iSelectedDigit > 11)
+        if (playerInput->outputControls[iPlayer].menu_right.fPressed) {
+            if (++iSelectedDigit > 11)
                 iSelectedDigit = 0;
 
             MoveImage();
         }
 
-        if(playerInput->outputControls[iPlayer].menu_left.fPressed) {
-            if(--iSelectedDigit < 0)
+        if (playerInput->outputControls[iPlayer].menu_left.fPressed) {
+            if (--iSelectedDigit < 0)
                 iSelectedDigit = 11;
 
             MoveImage();
         }
 
-        if(playerInput->outputControls[iPlayer].menu_up.fPressed) {
+        if (playerInput->outputControls[iPlayer].menu_up.fPressed) {
             values[iSelectedDigit]++;
             AssignHostAddress();
         }
 
-        if(playerInput->outputControls[iPlayer].menu_down.fPressed) {
+        if (playerInput->outputControls[iPlayer].menu_down.fPressed) {
             values[iSelectedDigit]--;
             AssignHostAddress();
         }
 
-        if(playerInput->outputControls[iPlayer].menu_select.fPressed || playerInput->outputControls[iPlayer].menu_cancel.fPressed) {
+        if (playerInput->outputControls[iPlayer].menu_select.fPressed || playerInput->outputControls[iPlayer].menu_cancel.fPressed) {
             miModifyImage->Show(false);
             fModifying = false;
             return MENU_CODE_UNSELECT_ITEM;
@@ -152,15 +152,15 @@ MenuCodeEnum MI_IPField::SendInput(CPlayerInput * playerInput)
 
 void MI_IPField::AssignHostAddress()
 {
-    if(iSelectedDigit == 0 || iSelectedDigit == 3 || iSelectedDigit == 6 || iSelectedDigit == 9) {
-        if(values[iSelectedDigit] > 2)
+    if (iSelectedDigit == 0 || iSelectedDigit == 3 || iSelectedDigit == 6 || iSelectedDigit == 9) {
+        if (values[iSelectedDigit] > 2)
             values[iSelectedDigit] = 0;
-        else if(values[iSelectedDigit] < 0)
+        else if (values[iSelectedDigit] < 0)
             values[iSelectedDigit] = 2;
     } else {
-        if(values[iSelectedDigit] > 9)
+        if (values[iSelectedDigit] > 9)
             values[iSelectedDigit] = 0;
-        else if(values[iSelectedDigit] < 0)
+        else if (values[iSelectedDigit] < 0)
             values[iSelectedDigit] = 9;
     }
 }
@@ -177,10 +177,10 @@ void MI_IPField::Update()
 
 void MI_IPField::Draw()
 {
-    if(!fShow)
+    if (!fShow)
         return;
 
-    if(fSelected)
+    if (fSelected)
         spr->draw(ix, iy, 0, 51, 278, 51);
     else
         spr->draw(ix, iy, 0, 0, 278, 51);
@@ -188,10 +188,10 @@ void MI_IPField::Draw()
     miModifyImage->Draw();
 
     for (int iSection = 0; iSection < 12; iSection += 3) {
-        if(values[iSection] != 0)
+        if (values[iSection] != 0)
             rm->menu_font_large.drawf(ix + iDigitPosition[iSection], iy + 12, "%i", values[iSection]);
 
-        if(values[iSection] != 0 || values[iSection + 1] != 0)
+        if (values[iSection] != 0 || values[iSection + 1] != 0)
             rm->menu_font_large.drawf(ix + iDigitPosition[iSection + 1], iy + 12, "%i", values[iSection + 1]);
 
         rm->menu_font_large.drawf(ix + iDigitPosition[iSection + 2], iy + 12, "%i", values[iSection + 2]);
@@ -200,10 +200,10 @@ void MI_IPField::Draw()
 
 MenuCodeEnum MI_IPField::MouseClick(short iMouseX, short iMouseY)
 {
-    if(fDisable)
+    if (fDisable)
         return MENU_CODE_NONE;
 
-    if(iMouseX >= ix && iMouseX < ix + 278 && iMouseY >= iy && iMouseY < iy + 51) {
+    if (iMouseX >= ix && iMouseX < ix + 278 && iMouseY >= iy && iMouseY < iy + 51) {
         return MENU_CODE_CLICKED;
     }
 
@@ -312,14 +312,14 @@ void MI_SelectField::SetTitle(char * name)
 //Sets current selected item based on the items int value
 bool MI_SelectField::SetKey(short iID)
 {
-    if(items.empty())
+    if (items.empty())
         return false;
 
     std::vector<SF_ListItem*>::iterator search = items.begin();
 
     iIndex  = 0;
     while (search != items.end()) {
-        if((*search)->iValue == iID) {
+        if ((*search)->iValue == iID) {
             current = search;
             SetValues();
             return true;
@@ -334,7 +334,7 @@ bool MI_SelectField::SetKey(short iID)
 
 bool MI_SelectField::SetIndex(unsigned short index)
 {
-    if(index >= items.size())
+    if (index >= items.size())
         return false;
 
     current = items.begin();
@@ -355,10 +355,10 @@ void MI_SelectField::Add(std::string name, short ivalue, std::string svalue, boo
     SF_ListItem * item = new SF_ListItem(name, ivalue, svalue, fvalue, fhidden, iIconOverride);
     items.push_back(item);
 
-    if(fGoodRandom)
+    if (fGoodRandom)
         goodRandomItems.push_back(item);
 
-    if(items.size() >= 1) {
+    if (items.size() >= 1) {
         current = items.begin();
         iIndex = 0;
     }
@@ -366,15 +366,15 @@ void MI_SelectField::Add(std::string name, short ivalue, std::string svalue, boo
 
 bool MI_SelectField::HideItem(short iID, bool fhide)
 {
-    if(items.empty())
+    if (items.empty())
         return false;
 
     std::vector<SF_ListItem*>::iterator search = items.begin(), lim = items.end();
 
     while (search != lim) {
-        if((*search)->iValue == iID) {
-            if(current == search && fhide) {
-                if(!MoveNext())
+        if ((*search)->iValue == iID) {
+            if (current == search && fhide) {
+                if (!MoveNext())
                     MovePrev();
             }
 
@@ -390,7 +390,7 @@ bool MI_SelectField::HideItem(short iID, bool fhide)
 
 void MI_SelectField::HideAllItems(bool fHide)
 {
-    if(items.empty())
+    if (items.empty())
         return;
 
     std::vector<SF_ListItem*>::iterator itr = items.begin();
@@ -403,12 +403,12 @@ void MI_SelectField::HideAllItems(bool fHide)
 
 MenuCodeEnum MI_SelectField::Modify(bool modify)
 {
-    if(fDisable)
+    if (fDisable)
         return MENU_CODE_UNSELECT_ITEM;
 
-    if(fAutoAdvance && modify) {
-        if(!items.empty()) {
-            if(current == --items.end()) {
+    if (fAutoAdvance && modify) {
+        if (!items.empty()) {
+            if (current == --items.end()) {
                 current = items.begin();
                 iIndex = 0;
             } else {
@@ -423,7 +423,7 @@ MenuCodeEnum MI_SelectField::Modify(bool modify)
         return mcItemChangedCode;
     }
 
-    if(MENU_CODE_NONE != mcControlSelectedCode)
+    if (MENU_CODE_NONE != mcControlSelectedCode)
         return mcControlSelectedCode;
 
     miModifyImageLeft->Show(modify);
@@ -436,35 +436,35 @@ MenuCodeEnum MI_SelectField::SendInput(CPlayerInput * playerInput)
 {
     for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
         short iNumMoves = 1;
-        if(fFastScroll && playerInput->outputControls[iPlayer].menu_scrollfast.fDown)
+        if (fFastScroll && playerInput->outputControls[iPlayer].menu_scrollfast.fDown)
             iNumMoves = 10;
 
-        if(playerInput->outputControls[iPlayer].menu_right.fPressed || playerInput->outputControls[iPlayer].menu_down.fPressed) {
+        if (playerInput->outputControls[iPlayer].menu_right.fPressed || playerInput->outputControls[iPlayer].menu_down.fPressed) {
             bool fMoved = false;
 
             for (short iMove = 0; iMove < iNumMoves; iMove++)
                 fMoved |= MoveNext();
 
-            if(fMoved)
+            if (fMoved)
                 return mcItemChangedCode;
         }
 
-        if(playerInput->outputControls[iPlayer].menu_left.fPressed || playerInput->outputControls[iPlayer].menu_up.fPressed) {
+        if (playerInput->outputControls[iPlayer].menu_left.fPressed || playerInput->outputControls[iPlayer].menu_up.fPressed) {
             bool fMoved = false;
 
             for (short iMove = 0; iMove < iNumMoves; iMove++)
                 fMoved |= MovePrev();
 
-            if(fMoved)
+            if (fMoved)
                 return mcItemChangedCode;
         }
 
-        if(playerInput->outputControls[iPlayer].menu_random.fPressed) {
-            if(MoveRandom())
+        if (playerInput->outputControls[iPlayer].menu_random.fPressed) {
+            if (MoveRandom())
                 return mcItemChangedCode;
         }
 
-        if(playerInput->outputControls[iPlayer].menu_select.fPressed || playerInput->outputControls[iPlayer].menu_cancel.fPressed) {
+        if (playerInput->outputControls[iPlayer].menu_select.fPressed || playerInput->outputControls[iPlayer].menu_cancel.fPressed) {
             miModifyImageLeft->Show(false);
             miModifyImageRight->Show(false);
 
@@ -488,10 +488,10 @@ void MI_SelectField::Update()
 
 void MI_SelectField::Draw()
 {
-    if(!fShow)
+    if (!fShow)
         return;
 
-    if(iIndent == 0) {
+    if (iIndent == 0) {
         short iHalfWidth = iWidth >> 1;
         spr->draw(ix, iy, 0, (fSelected ? 32 : 0) + iAdjustmentY, iHalfWidth, 32);
         spr->draw(ix + iHalfWidth, iy, 512 - iHalfWidth, (fSelected ? 32 : 0) + iAdjustmentY, iWidth - iHalfWidth, 32);
@@ -501,12 +501,12 @@ void MI_SelectField::Draw()
         spr->draw(ix + iIndent + 16, iy, 528 - iWidth + iIndent, (fSelected ? 32 : 0) + iAdjustmentY, iWidth - iIndent - 16, 32);
     }
 
-    if(iIndent> 0)
+    if (iIndent> 0)
         rm->menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName);
 
 	// RFC
-    if(!items.empty()) {
-        if(iIndent > 0)
+    if (!items.empty()) {
+        if (iIndent > 0)
             rm->menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iWidth - iIndent - 24, (*current)->sName.c_str());
         else
             rm->menu_font_large.drawChopRight(ix + 16, iy + 5, iWidth - 32, (*current)->sName.c_str());
@@ -515,7 +515,7 @@ void MI_SelectField::Draw()
     //TODO: invert order
 	bool drawLeft = true;
 
-	if((items.begin() != items.end() && current == items.begin()))
+	if ((items.begin() != items.end() && current == items.begin()))
 		drawLeft = false;
 
 	if (!fNoWrap || drawLeft)
@@ -534,33 +534,33 @@ void MI_SelectField::Draw()
 			}
 		}
 
-    if(drawRight || !fNoWrap)
+    if (drawRight || !fNoWrap)
         miModifyImageRight->Draw();
 }
 
 void MI_SelectField::SetValues()
 {
-    if(iValue)
+    if (iValue)
         *iValue = (*current)->iValue;
 
-    if(sValue)
+    if (sValue)
         *sValue = (*current)->sValue;
 
-    if(fValue)
+    if (fValue)
         *fValue = (*current)->fValue;
 }
 
 bool MI_SelectField::MoveNext()
 {
-    if(items.empty())
+    if (items.empty())
         return false;
 
     std::vector<SF_ListItem*>::iterator findNext = current;
     short iFindIndex = iIndex;
 
     while (true) {
-        if(findNext == --items.end()) {
-            if(fNoWrap) {
+        if (findNext == --items.end()) {
+            if (fNoWrap) {
                 return false;
             } else {
                 findNext = items.begin();
@@ -571,10 +571,10 @@ bool MI_SelectField::MoveNext()
             iFindIndex++;
         }
 
-        if(findNext == current)
+        if (findNext == current)
             return false;
 
-        if(!(*findNext)->fHidden) {
+        if (!(*findNext)->fHidden) {
             current = findNext;
             iIndex = iFindIndex;
             SetValues();
@@ -587,15 +587,15 @@ bool MI_SelectField::MoveNext()
 
 bool MI_SelectField::MovePrev()
 {
-    if(items.empty())
+    if (items.empty())
         return false;
 
     std::vector<SF_ListItem*>::iterator findPrev = current;
     short iFindIndex = iIndex;
 
     while (true) {
-        if(findPrev == items.begin()) {
-            if(fNoWrap) {
+        if (findPrev == items.begin()) {
+            if (fNoWrap) {
                 return false;
             } else {
                 findPrev = --items.end();
@@ -606,10 +606,10 @@ bool MI_SelectField::MovePrev()
             iFindIndex--;
         }
 
-        if(findPrev == current)
+        if (findPrev == current)
             return false;
 
-        if(!(*findPrev)->fHidden) {
+        if (!(*findPrev)->fHidden) {
             current = findPrev;
             iIndex = iFindIndex;
             SetValues();
@@ -623,14 +623,14 @@ bool MI_SelectField::MovePrev()
 bool MI_SelectField::MoveRandom()
 {
     //Can't pick a random item from a list of 1
-    if(items.size() <= 1)
+    if (items.size() <= 1)
         return false;
 
     std::vector<SF_ListItem*>::iterator searchHidden = items.begin();
 
     short iHiddenCount = 0;
     while (searchHidden != items.end()) {
-        if((*searchHidden)->fHidden) {
+        if ((*searchHidden)->fHidden) {
             iHiddenCount++;
         }
 
@@ -638,7 +638,7 @@ bool MI_SelectField::MoveRandom()
     }
 
     //Can't pick a random item from a list containing only 1 non-hidden item
-    if(items.size() - iHiddenCount <= 1)
+    if (items.size() - iHiddenCount <= 1)
         return false;
 
     std::vector<SF_ListItem*>::iterator findRandom = current;
@@ -648,7 +648,7 @@ bool MI_SelectField::MoveRandom()
         int index = RNGMAX(items.size());
 
         for (int k = 0; k < index; k++) {
-            if(findRandom == --items.end()) {
+            if (findRandom == --items.end()) {
                 findRandom = items.begin();
                 iFindIndex = 0;
             } else {
@@ -657,7 +657,7 @@ bool MI_SelectField::MoveRandom()
             }
         }
 
-        if(findRandom != current && !(*findRandom)->fHidden) {
+        if (findRandom != current && !(*findRandom)->fHidden) {
             current = findRandom;
             iIndex = iFindIndex;
             SetValues();
@@ -671,18 +671,18 @@ bool MI_SelectField::MoveRandom()
 
 MenuCodeEnum MI_SelectField::MouseClick(short iMouseX, short iMouseY)
 {
-    if(fDisable)
+    if (fDisable)
         return MENU_CODE_NONE;
 
     //If we are modifying this control, see if we clicked on a next/prev button
-    if(fModifying) {
+    if (fModifying) {
         short x, y, w, h;
         miModifyImageLeft->GetPositionAndSize(&x, &y, &w, &h);
 
-        if(iMouseX >= x && iMouseX < x + w &&
+        if (iMouseX >= x && iMouseX < x + w &&
                 iMouseY >= y && iMouseY < y + h) {
-            if(MovePrev()) {
-                if(mcItemChangedCode == MENU_CODE_NONE)
+            if (MovePrev()) {
+                if (mcItemChangedCode == MENU_CODE_NONE)
                     return MENU_CODE_CLICKED;
 
                 return mcItemChangedCode;
@@ -691,10 +691,10 @@ MenuCodeEnum MI_SelectField::MouseClick(short iMouseX, short iMouseY)
 
         miModifyImageRight->GetPositionAndSize(&x, &y, &w, &h);
 
-        if(iMouseX >= x && iMouseX < x + w &&
+        if (iMouseX >= x && iMouseX < x + w &&
                 iMouseY >= y && iMouseY < y + h) {
-            if(MoveNext()) {
-                if(mcItemChangedCode == MENU_CODE_NONE)
+            if (MoveNext()) {
+                if (mcItemChangedCode == MENU_CODE_NONE)
                     return MENU_CODE_CLICKED;
 
                 return mcItemChangedCode;
@@ -703,7 +703,7 @@ MenuCodeEnum MI_SelectField::MouseClick(short iMouseX, short iMouseY)
     }
 
     //Otherwise just check to see if we clicked on the whole control
-    if(iMouseX >= ix && iMouseX < ix + iWidth && iMouseY >= iy && iMouseY < iy + 32)
+    if (iMouseX >= ix && iMouseX < ix + iWidth && iMouseY >= iy && iMouseY < iy + 32)
         return MENU_CODE_CLICKED;
 
     //Otherwise this control wasn't clicked at all
@@ -712,9 +712,9 @@ MenuCodeEnum MI_SelectField::MouseClick(short iMouseX, short iMouseY)
 
 void MI_SelectField::Refresh()
 {
-    if(iValue)
+    if (iValue)
         SetKey(*iValue);
-    else if(fValue)
+    else if (fValue)
         SetKey(*fValue ? 1 : 0);
 }
 
@@ -744,7 +744,7 @@ MI_ImageSelectField::~MI_ImageSelectField()
 
 void MI_ImageSelectField::Draw()
 {
-    if(!fShow)
+    if (!fShow)
         return;
 
     spr->draw(ix, iy, 0, (fSelected ? 32 : 0), iIndent - 16, 32);
@@ -753,7 +753,7 @@ void MI_ImageSelectField::Draw()
 
     rm->menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName);
 
-    if(!items.empty()) {
+    if (!items.empty()) {
         rm->menu_font_large.drawChopRight(ix + iIndent + iImageWidth + 10, iy + 5, iWidth - iIndent - 24, (*current)->sName.c_str());
     }
 
@@ -789,7 +789,7 @@ void MI_SliderField::SetPosition(short x, short y)
 
 void MI_SliderField::Draw()
 {
-    if(!fShow)
+    if (!fShow)
         return;
 
     spr->draw(ix, iy, 0, (fSelected ? 32 : 0) + iAdjustmentY, iIndent - 16, 32);
@@ -798,7 +798,7 @@ void MI_SliderField::Draw()
 
     rm->menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName);
 
-    if(!items.empty()) {
+    if (!items.empty()) {
         rm->menu_font_large.drawChopRight(ix + iIndent2 + 16, iy + 5, iWidth - iIndent2 - 24, (*current)->sName.c_str());
     }
 
@@ -806,7 +806,7 @@ void MI_SliderField::Draw()
     short iSpot = 0;
 
     for (unsigned int index = 0; index < items.size(); index++) {
-        if(index < items.size() - 1)
+        if (index < items.size() - 1)
             sprSlider->draw(ix + iIndent + iSpot + 16, iy + 10, 0, 0, iSpacing, 13);
         else
             sprSlider->draw(ix + iIndent + iSpot + 16, iy + 10, 164, 0, 4, 13);
@@ -816,18 +816,18 @@ void MI_SliderField::Draw()
 
     sprSlider->draw(ix + iIndent + (iIndex * iSpacing) + 14, iy + 8, 168, 0, 8, 16);
 
-    if(current != items.begin() || !fNoWrap)
+    if (current != items.begin() || !fNoWrap)
         miModifyImageLeft->Draw();
 
-    if(current != --items.end() || !fNoWrap)
+    if (current != --items.end() || !fNoWrap)
         miModifyImageRight->Draw();
 }
 
 MenuCodeEnum MI_SliderField::SendInput(CPlayerInput * playerInput)
 {
     for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
-        if(playerInput->outputControls[iPlayer].menu_scrollfast.fPressed) {
-            if(iIndex == 0)
+        if (playerInput->outputControls[iPlayer].menu_scrollfast.fPressed) {
+            if (iIndex == 0)
                 while (MoveNext());
             else
                 while (MovePrev());
@@ -861,7 +861,7 @@ MI_PowerupSlider::~MI_PowerupSlider()
 
 void MI_PowerupSlider::Draw()
 {
-    if(!fShow)
+    if (!fShow)
         return;
 
     spr->draw(ix + 38, iy, 0, (fSelected ? 32 : 0) + iAdjustmentY, iHalfWidth, 32);
@@ -871,7 +871,7 @@ void MI_PowerupSlider::Draw()
     short iSpot = 0;
 
     for (unsigned int index = 0; index < items.size(); index++) {
-        if(index < items.size() - 1)
+        if (index < items.size() - 1)
             sprSlider->draw(ix + iSpot + 56, iy + 10, 0, 0, iSpacing, 13);
         else
             sprSlider->draw(ix + iSpot + 56, iy + 10, 164, 0, 4, 13);
@@ -885,10 +885,10 @@ void MI_PowerupSlider::Draw()
 
     sprPowerup->draw(ix, iy, iPowerupIndex * 32, 0, 32, 32);
 
-    if(current != items.begin() || !fNoWrap)
+    if (current != items.begin() || !fNoWrap)
         miModifyImageLeft->Draw();
 
-    if(current != --items.end() || !fNoWrap)
+    if (current != --items.end() || !fNoWrap)
         miModifyImageRight->Draw();
 }
 
@@ -981,34 +981,34 @@ MI_FrenzyModeOptions::MI_FrenzyModeOptions(short x, short y, short width, short 
 
     for (short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++) {
         UI_Control * upcontrol = NULL;
-        if(iPowerup == 0)
+        if (iPowerup == 0)
             upcontrol = miStoredShellsField;
         else
             upcontrol = miPowerupSlider[iPowerup - 2];
 
         UI_Control * lDownControl1 = NULL;
-        if(iPowerup >= NUMFRENZYCARDS - 2)
+        if (iPowerup >= NUMFRENZYCARDS - 2)
             lDownControl1 = miBackButton;
         else
             lDownControl1 = miPowerupSlider[iPowerup + 2];
 
         UI_Control * rightcontrol = NULL;
-        if(iPowerup + 1 < NUMFRENZYCARDS)
+        if (iPowerup + 1 < NUMFRENZYCARDS)
             rightcontrol = miPowerupSlider[iPowerup + 1];
         else
             rightcontrol = miBackButton;
 
         mMenu->AddControl(miPowerupSlider[iPowerup], upcontrol, lDownControl1, NULL, rightcontrol);
 
-        if(++iPowerup < NUMFRENZYCARDS) {
+        if (++iPowerup < NUMFRENZYCARDS) {
             upcontrol = NULL;
-            if(iPowerup == 1)
+            if (iPowerup == 1)
                 upcontrol = miStoredShellsField;
             else
                 upcontrol = miPowerupSlider[iPowerup - 2];
 
             UI_Control * lDownControl2 = NULL;
-            if(iPowerup >= NUMFRENZYCARDS - 2)
+            if (iPowerup >= NUMFRENZYCARDS - 2)
                 lDownControl2 = miBackButton;
             else
                 lDownControl2 = miPowerupSlider[iPowerup + 2];
@@ -1040,7 +1040,7 @@ void MI_FrenzyModeOptions::SetupPowerupFields()
         short iPosition = iFrenzyCardPositionMap[iPowerup];
         MI_PowerupSlider * slider = miPowerupSlider[iPosition];
 
-        if((iPosition >> 1) < iOffset || (iPosition >> 1) >= iOffset + iNumLines)
+        if ((iPosition >> 1) < iOffset || (iPosition >> 1) >= iOffset + iNumLines)
             slider->Show(false);
         else {
             slider->Show(true);
@@ -1069,14 +1069,14 @@ MenuCodeEnum MI_FrenzyModeOptions::SendInput(CPlayerInput * playerInput)
 
     UI_Control * nextControl = mMenu->GetCurrentControl();
 
-    if(MENU_CODE_CANCEL_INPUT == ret) {
+    if (MENU_CODE_CANCEL_INPUT == ret) {
         fModifying = false;
         return MENU_CODE_UNSELECT_ITEM;
-    } else if(MENU_CODE_NEIGHBOR_UP == ret) {
-        if(prevControl != miBackButton)
+    } else if (MENU_CODE_NEIGHBOR_UP == ret) {
+        if (prevControl != miBackButton)
             MovePrev();
-    } else if(MENU_CODE_NEIGHBOR_DOWN == ret) {
-        if(nextControl != miBackButton || prevControl == miPowerupSlider[NUMFRENZYCARDS - 2])
+    } else if (MENU_CODE_NEIGHBOR_DOWN == ret) {
+        if (nextControl != miBackButton || prevControl == miPowerupSlider[NUMFRENZYCARDS - 2])
             MoveNext();
     }
 
@@ -1090,7 +1090,7 @@ void MI_FrenzyModeOptions::Update()
 
 void MI_FrenzyModeOptions::Draw()
 {
-    if(!fShow)
+    if (!fShow)
         return;
 
     mMenu->Draw();
@@ -1100,7 +1100,7 @@ void MI_FrenzyModeOptions::MoveNext()
 {
     iIndex++;
 
-    if(iIndex > iTopStop && iIndex <= iBottomStop) {
+    if (iIndex > iTopStop && iIndex <= iBottomStop) {
         iOffset++;
         SetupPowerupFields();
     }
@@ -1112,7 +1112,7 @@ void MI_FrenzyModeOptions::MovePrev()
 {
     iIndex--;
 
-    if(iIndex >= iTopStop && iIndex < iBottomStop) {
+    if (iIndex >= iTopStop && iIndex < iBottomStop) {
         iOffset--;
         SetupPowerupFields();
     }
@@ -1132,12 +1132,12 @@ void MI_FrenzyModeOptions::SetRandomGameModeSettings()
 
 void MI_FrenzyModeOptions::AdjustDisplayArrows()
 {
-    if(iIndex > iTopStop)
+    if (iIndex > iTopStop)
         miUpArrow->Show(true);
     else
         miUpArrow->Show(false);
 
-    if(iIndex < iBottomStop)
+    if (iIndex < iBottomStop)
         miDownArrow->Show(true);
     else
         miDownArrow->Show(false);
@@ -1145,24 +1145,24 @@ void MI_FrenzyModeOptions::AdjustDisplayArrows()
 
 MenuCodeEnum MI_FrenzyModeOptions::MouseClick(short iMouseX, short iMouseY)
 {
-    if(fDisable)
+    if (fDisable)
         return MENU_CODE_NONE;
 
     //Loop through all controls to see if one was clicked on
     MenuCodeEnum ret = mMenu->MouseClick(iMouseX, iMouseY);
 
-    if(ret == MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS)
+    if (ret == MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS)
         return ret;
 
     for (short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++) {
         MI_PowerupSlider * slider = miPowerupSlider[iPowerup];
 
-        if(slider == mMenu->GetCurrentControl()) {
+        if (slider == mMenu->GetCurrentControl()) {
             iIndex = (iPowerup >> 1) + 3;
 
-            if(iIndex <= iTopStop)
+            if (iIndex <= iTopStop)
                 iOffset = 0;
-            else if(iIndex >= iBottomStop)
+            else if (iIndex >= iBottomStop)
                 iOffset = iBottomStop - iTopStop;
             else
                 iOffset = iIndex - iTopStop;
@@ -1218,7 +1218,7 @@ MI_Button::MI_Button(gfxSprite * nspr, short x, short y, const char * name, shor
 
 MenuCodeEnum MI_Button::Modify(bool)
 {
-    if(fDisable)
+    if (fDisable)
         return MENU_CODE_UNSELECT_ITEM;
 
     return menuCode;
@@ -1232,26 +1232,26 @@ MenuCodeEnum MI_Button::SendInput(CPlayerInput *)
 
 void MI_Button::Draw()
 {
-    if(!fShow)
+    if (!fShow)
         return;
 
     spr->draw(ix, iy, 0, (fSelected ? 32 : 0) + iAdjustmentY, iHalfWidth, 32);
     spr->draw(ix + iHalfWidth, iy, 512 - iWidth + iHalfWidth, (fSelected ? 32 : 0) + iAdjustmentY, iWidth - iHalfWidth, 32);
 
-    if(0 == iTextJustified) {
+    if (0 == iTextJustified) {
         rm->menu_font_large.drawChopRight(ix + 16 + (iImageW > 0 ? iImageW + 2 : 0), iy + 5, iWidth - 32, szName);
 
-        if(sprImage)
+        if (sprImage)
             sprImage->draw(ix + 16, iy + 16 - (iImageH >> 1), iImageSrcX, iImageSrcY, iImageW, iImageH);
-    } else if(1 == iTextJustified) {
+    } else if (1 == iTextJustified) {
         rm->menu_font_large.drawCentered(ix + ((iWidth + (iImageW > 0 ? iImageW + 2 : 0)) >> 1), iy + 5, szName);
 
-        if(sprImage)
+        if (sprImage)
             sprImage->draw(ix + (iWidth >> 1) - ((iTextW + iImageW) >> 1) - 1, iy + 16 - (iImageH >> 1), iImageSrcX, iImageSrcY, iImageW, iImageH);
     } else {
         rm->menu_font_large.drawRightJustified(ix + iWidth - 16, iy + 5, szName);
 
-        if(sprImage)
+        if (sprImage)
             sprImage->draw(ix + iWidth - 18 - iTextW - iImageW, iy + 16 - (iImageH >> 1), iImageSrcX, iImageSrcY, iImageW, iImageH);
     }
 }
@@ -1276,10 +1276,10 @@ void MI_Button::SetImage(gfxSprite * nsprImage, short x, short y, short w, short
 
 MenuCodeEnum MI_Button::MouseClick(short iMouseX, short iMouseY)
 {
-    if(fDisable)
+    if (fDisable)
         return MENU_CODE_NONE;
 
-    if(iMouseX >= ix && iMouseX < ix + iWidth && iMouseY >= iy && iMouseY < iy + 32) {
+    if (iMouseX >= ix && iMouseX < ix + iWidth && iMouseY >= iy && iMouseY < iy + 32) {
         return menuCode;
     }
 
@@ -1328,51 +1328,51 @@ MI_Image::~MI_Image()
 
 void MI_Image::Update()
 {
-    if(!fShow)
+    if (!fShow)
         return;
 
-    if(iSpeed > 0 && ++iTimer >= iSpeed) {
+    if (iSpeed > 0 && ++iTimer >= iSpeed) {
         iTimer = 0;
         iXFrame += iw;
 
-        if(iXFrame >= iNumXFrames * iw + isrcx) {
+        if (iXFrame >= iNumXFrames * iw + isrcx) {
             iXFrame = isrcx;
             iYFrame += ih;
 
-            if(iYFrame >= iNumYFrames * ih + isrcy) {
+            if (iYFrame >= iNumYFrames * ih + isrcy) {
                 iYFrame = isrcy;
             }
         }
     }
 
-    if(fPulse) {
-        if(++iPulseDelay >= 3) {
+    if (fPulse) {
+        if (++iPulseDelay >= 3) {
             iPulseDelay = 0;
 
-            if(fPulseOut) {
-                if(++iPulseValue >= 10) {
+            if (fPulseOut) {
+                if (++iPulseValue >= 10) {
                     fPulseOut = false;
                 }
             } else {
-                if(--iPulseValue <= 0) {
+                if (--iPulseValue <= 0) {
                     fPulseOut = true;
                 }
             }
         }
     }
 
-    if(fSwirl) {
+    if (fSwirl) {
         dSwirlRadius -= dSwirlRadiusSpeed;
 
-        if(dSwirlRadius <= 0.0f) {
+        if (dSwirlRadius <= 0.0f) {
             fSwirl = false;
         } else {
             dSwirlAngle += dSwirlAngleSpeed;
         }
     }
 
-    if(fBlink) {
-        if(++iBlinkCounter > iBlinkInterval) {
+    if (fBlink) {
+        if (++iBlinkCounter > iBlinkInterval) {
             fBlinkShow = !fBlinkShow;
             iBlinkCounter = 0;
         }
@@ -1381,18 +1381,18 @@ void MI_Image::Update()
 
 void MI_Image::Draw()
 {
-    if(!fShow || (fBlink && !fBlinkShow))
+    if (!fShow || (fBlink && !fBlinkShow))
         return;
 
     short iXOffset = 0;
     short iYOffset = 0;
 
-    if(fSwirl) {
+    if (fSwirl) {
         iXOffset = (short)(dSwirlRadius * cos(dSwirlAngle));
         iYOffset = (short)(dSwirlRadius * sin(dSwirlAngle));
     }
 
-    if(fPulse)
+    if (fPulse)
         spr->drawStretch(ix - iPulseValue + iXOffset, iy - iPulseValue + iYOffset, iw + (iPulseValue << 1), ih + (iPulseValue << 1), iXFrame, iYFrame, iw, ih);
     else
         spr->draw(ix + iXOffset, iy + iYOffset, iXFrame, iYFrame, iw, ih);
@@ -1412,7 +1412,7 @@ MI_Text::MI_Text(const char * text, short x, short y, short w, short size, short
     iw = w;
     iJustified = justified;
 
-    if(size == 0)
+    if (size == 0)
         font = &rm->menu_font_small;
     else
         font = &rm->menu_font_large;
@@ -1430,16 +1430,16 @@ void MI_Text::SetText(const char * text)
 
 void MI_Text::Draw()
 {
-    if(!fShow)
+    if (!fShow)
         return;
 
-    if(iJustified == 0 && iw == 0)
+    if (iJustified == 0 && iw == 0)
         font->draw(ix, iy, szText);
-    else if(iJustified == 0)
+    else if (iJustified == 0)
         font->drawChopRight(ix, iy, iw, szText);
-    else if(iJustified == 1)
+    else if (iJustified == 1)
         font->drawCentered(ix, iy, szText);
-    else if(iJustified == 2)
+    else if (iJustified == 2)
         font->drawRightJustified(ix, iy, szText);
 }
 
@@ -1463,15 +1463,15 @@ MI_ScoreText::MI_ScoreText(short x, short y) :
 
 void MI_ScoreText::Draw()
 {
-    if(!fShow)
+    if (!fShow)
         return;
 
     rm->spr_scoretext.draw(iDigitRightDstX, iy, iDigitRightSrcX, 0, 16, 16);
 
-    if(iDigitLeftSrcX > 0) {
+    if (iDigitLeftSrcX > 0) {
         rm->spr_scoretext.draw(iDigitMiddleDstX, iy, iDigitMiddleSrcX, 0, 16, 16);
         rm->spr_scoretext.draw(iDigitLeftDstX, iy, iDigitLeftSrcX, 0, 16, 16);
-    } else if(iDigitMiddleSrcX > 0) {
+    } else if (iDigitMiddleSrcX > 0) {
         rm->spr_scoretext.draw(iDigitMiddleDstX, iy, iDigitMiddleSrcX, 0, 16, 16);
     }
 }
@@ -1486,8 +1486,8 @@ void MI_ScoreText::SetScore(short sScore)
     iDigitMiddleSrcX = iDigits % 100 / 10 * 16;
     iDigitRightSrcX = iDigits % 10 * 16;
 
-    if(iDigitLeftSrcX == 0) {
-        if(iDigitMiddleSrcX == 0) {
+    if (iDigitLeftSrcX == 0) {
+        if (iDigitMiddleSrcX == 0) {
             iDigitRightDstX = ix - 8;
         } else {
             iDigitMiddleDstX = ix - 16;
@@ -1553,10 +1553,10 @@ void MI_TextField::SetTitle(char * name)
 
 MenuCodeEnum MI_TextField::Modify(bool modify)
 {
-    if(fDisable)
+    if (fDisable)
         return MENU_CODE_UNSELECT_ITEM;
 
-    if(MENU_CODE_NONE != mcControlSelectedCode)
+    if (MENU_CODE_NONE != mcControlSelectedCode)
         return mcControlSelectedCode;
 
     miModifyCursor->Show(modify);
@@ -1575,7 +1575,7 @@ MenuCodeEnum MI_TextField::SendInput(CPlayerInput * playerInput)
 #endif
 
     for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
-        if(playerInput->outputControls[iPlayer].menu_select.fPressed || playerInput->outputControls[iPlayer].menu_cancel.fPressed) {
+        if (playerInput->outputControls[iPlayer].menu_select.fPressed || playerInput->outputControls[iPlayer].menu_cancel.fPressed) {
             miModifyCursor->Show(false);
 
             fModifying = false;
@@ -1584,39 +1584,39 @@ MenuCodeEnum MI_TextField::SendInput(CPlayerInput * playerInput)
         }
     }
 
-    if(!szValue || iNumChars >= iMaxChars)
+    if (!szValue || iNumChars >= iMaxChars)
         return MENU_CODE_NONE;
 
     // TODO: check string conversion
     //Watch for characters typed in including delete and backspace
     SDL_KEYTYPE key = playerInput->iPressedKey;
-    if((key >= SDLK_a && key <= SDLK_z) || key == SDLK_SPACE || (key >= SDLK_0 && key <= SDLK_9) || key == SDLK_EQUALS ||
+    if ((key >= SDLK_a && key <= SDLK_z) || key == SDLK_SPACE || (key >= SDLK_0 && key <= SDLK_9) || key == SDLK_EQUALS ||
             key == SDLK_MINUS || key == SDLK_BACKQUOTE || (key >= SDLK_LEFTBRACKET && key <= SDLK_RIGHTBRACKET) ||
             key == SDLK_SEMICOLON || key == SDLK_QUOTE || key == SDLK_COMMA || key == SDLK_PERIOD || key == SDLK_SLASH) {
-        if(iNumChars < iMaxChars - 1) {
+        if (iNumChars < iMaxChars - 1) {
             //Take care of holding shift to shift the pressed key to another character
-            if(keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT]) {
-                if(key >= SDLK_a && key <= SDLK_z) {
+            if (keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT]) {
+                if (key >= SDLK_a && key <= SDLK_z) {
                     key -= 32;
-                } else if(key >= SDLK_0 && key <= SDLK_9) {
+                } else if (key >= SDLK_0 && key <= SDLK_9) {
                     key = number_key_map[key - 48];
-                } else if(key == SDLK_MINUS) {
+                } else if (key == SDLK_MINUS) {
                     key = SDLK_UNDERSCORE;
-                } else if(key == SDLK_EQUALS) {
+                } else if (key == SDLK_EQUALS) {
                     key = SDLK_PLUS;
-                } else if(key == SDLK_BACKQUOTE) {
+                } else if (key == SDLK_BACKQUOTE) {
                     key = 126;
-                } else if(key >= SDLK_LEFTBRACKET && key <= SDLK_RIGHTBRACKET) {
+                } else if (key >= SDLK_LEFTBRACKET && key <= SDLK_RIGHTBRACKET) {
                     key += 32;
-                } else if(key == SDLK_SEMICOLON) {
+                } else if (key == SDLK_SEMICOLON) {
                     key = SDLK_COLON;
-                } else if(key == SDLK_QUOTE) {
+                } else if (key == SDLK_QUOTE) {
                     key = SDLK_QUOTEDBL;
-                } else if(key == SDLK_COMMA) {
+                } else if (key == SDLK_COMMA) {
                     key = SDLK_LESS;
-                } else if(key == SDLK_PERIOD) {
+                } else if (key == SDLK_PERIOD) {
                     key = SDLK_GREATER;
-                } else if(key == SDLK_SLASH) {
+                } else if (key == SDLK_SLASH) {
                     key = SDLK_QUESTION;
                 }
             }
@@ -1624,14 +1624,14 @@ MenuCodeEnum MI_TextField::SendInput(CPlayerInput * playerInput)
             //Check to see if this is an allowed character for this field
             bool fAllowed = true;
             for (short iIndex = 0; iIndex < 32 && szDisallowedChars[iIndex] != 0; iIndex++) {
-                if(szDisallowedChars[iIndex] == key) {
+                if (szDisallowedChars[iIndex] == key) {
                     fAllowed = false;
                     break;
                 }
             }
 
             //If it is an allowed character, then add it to the field
-            if(fAllowed) {
+            if (fAllowed) {
                 iNumChars++;
 
                 for (short iCopy = iNumChars - 1; iCopy >= iCursorIndex; iCopy--) {
@@ -1644,8 +1644,8 @@ MenuCodeEnum MI_TextField::SendInput(CPlayerInput * playerInput)
                 return mcItemChangedCode;
             }
         }
-    } else if(key == SDLK_BACKSPACE) {
-        if(iCursorIndex > 0) {
+    } else if (key == SDLK_BACKSPACE) {
+        if (iCursorIndex > 0) {
             iCursorIndex--;
             iNumChars--;
             for (short iCopy = iCursorIndex; iCopy < iNumChars; iCopy++) {
@@ -1656,8 +1656,8 @@ MenuCodeEnum MI_TextField::SendInput(CPlayerInput * playerInput)
             UpdateCursor();
             return mcItemChangedCode;
         }
-    } else if(key == SDLK_DELETE) {
-        if(iCursorIndex < iNumChars) {
+    } else if (key == SDLK_DELETE) {
+        if (iCursorIndex < iNumChars) {
             for (short iCopy = iCursorIndex; iCopy < iNumChars; iCopy++) {
                 szValue[iCopy] = szValue[iCopy + 1];
             }
@@ -1667,13 +1667,13 @@ MenuCodeEnum MI_TextField::SendInput(CPlayerInput * playerInput)
             UpdateCursor();
             return mcItemChangedCode;
         }
-    } else if(key == SDLK_LEFT) {
-        if(iCursorIndex > 0) {
+    } else if (key == SDLK_LEFT) {
+        if (iCursorIndex > 0) {
             iCursorIndex--;
             UpdateCursor();
         }
-    } else if(key == SDLK_RIGHT) {
-        if(iCursorIndex < iNumChars) {
+    } else if (key == SDLK_RIGHT) {
+        if (iCursorIndex < iNumChars) {
             iCursorIndex++;
             UpdateCursor();
         }
@@ -1690,7 +1690,7 @@ void MI_TextField::Update()
 
 void MI_TextField::Draw()
 {
-    if(!fShow)
+    if (!fShow)
         return;
 
     spr->draw(ix, iy, 0, (fSelected ? 32 : 0) + iAdjustmentY, iIndent - 16, 32);
@@ -1699,8 +1699,8 @@ void MI_TextField::Draw()
 
     rm->menu_font_large.drawChopRight(ix + 16, iy + 5, iIndent - 8, szName);
 
-    if(szValue) {
-        if(iStringWidth <= iAllowedWidth || !fModifying) {
+    if (szValue) {
+        if (iStringWidth <= iAllowedWidth || !fModifying) {
             rm->menu_font_large.drawChopRight(ix + iIndent + 8, iy + 5, iAllowedWidth, szValue);
         } else {
             rm->menu_font_large.drawChopLeft(ix + iWidth - 16, iy + 5, iAllowedWidth, szTempValue);
@@ -1717,7 +1717,7 @@ void MI_TextField::SetData(char * data, short maxchars)
     iCursorIndex = strlen(szValue);
     iNumChars = iCursorIndex;
 
-    if(szTempValue)
+    if (szTempValue)
         delete [] szTempValue;
 
     szTempValue = new char[iMaxChars];
@@ -1727,11 +1727,11 @@ void MI_TextField::SetData(char * data, short maxchars)
 
 MenuCodeEnum MI_TextField::MouseClick(short iMouseX, short iMouseY)
 {
-    if(!szValue || fDisable)
+    if (!szValue || fDisable)
         return MENU_CODE_NONE;
 
     //If we are modifying this control, see if we clicked on a next/prev button
-    if(fModifying) {
+    if (fModifying) {
         //Move cursor to index in string where clicked
         short iPixelCount = 0;
         char szChar[2];
@@ -1740,7 +1740,7 @@ MenuCodeEnum MI_TextField::MouseClick(short iMouseX, short iMouseY)
             szChar[0] = szValue[iChar];
             iPixelCount += rm->menu_font_large.getWidth(szChar);
 
-            if(iPixelCount >= iMouseX - (ix + iIndent + 8)) {
+            if (iPixelCount >= iMouseX - (ix + iIndent + 8)) {
                 iCursorIndex = iChar;
                 UpdateCursor();
                 return MENU_CODE_NONE;
@@ -1749,7 +1749,7 @@ MenuCodeEnum MI_TextField::MouseClick(short iMouseX, short iMouseY)
     }
 
     //Otherwise just check to see if we clicked on the whole control
-    if(iMouseX >= ix && iMouseX < ix + iWidth && iMouseY >= iy && iMouseY < iy + 32) {
+    if (iMouseX >= ix && iMouseX < ix + iWidth && iMouseY >= iy && iMouseY < iy + 32) {
         iCursorIndex = strlen(szValue);
         UpdateCursor();
         return MENU_CODE_CLICKED;
@@ -1762,7 +1762,7 @@ MenuCodeEnum MI_TextField::MouseClick(short iMouseX, short iMouseY)
 void MI_TextField::Refresh()
 {
     //Look at destination string and update control based on that value
-    if(!szValue)
+    if (!szValue)
         return;
 
     SetData(szValue, iMaxChars);
@@ -1770,14 +1770,14 @@ void MI_TextField::Refresh()
 
 void MI_TextField::UpdateCursor()
 {
-    if(!szValue)
+    if (!szValue)
         return;
 
     strncpy(szTempValue, szValue, iCursorIndex);
     szTempValue[iCursorIndex] = 0;
 
     iStringWidth = rm->menu_font_large.getWidth(szTempValue);
-    if(iStringWidth <= iAllowedWidth) {
+    if (iStringWidth <= iAllowedWidth) {
         miModifyCursor->SetPosition(ix + iIndent + 10 + iStringWidth, iy + 4);
     } else {
         miModifyCursor->SetPosition(ix + iIndent + 10 + iAllowedWidth, iy + 4);
@@ -1825,7 +1825,7 @@ MI_MapField::MI_MapField(gfxSprite * nspr, short x, short y, const char * name, 
     rectDst.w = smw->ScreenWidth/2;
 	rectDst.h = smw->ScreenHeight/2;
 
-    if(fShowtags) {
+    if (fShowtags) {
         iSlideListOut = (iWidth - 352) >> 1;
         iSlideListOutGoal = iSlideListOut;
     } else {
@@ -1845,7 +1845,7 @@ MI_MapField::~MI_MapField()
 
 MenuCodeEnum MI_MapField::Modify(bool modify)
 {
-    if(fDisable)
+    if (fDisable)
         return MENU_CODE_UNSELECT_ITEM;
 
     miModifyImageLeft->Show(modify);
@@ -1860,14 +1860,14 @@ MenuCodeEnum MI_MapField::SendInput(CPlayerInput * playerInput)
     short iPressedKey = playerInput->iPressedKey;
 
     /*
-    if(playerInput->iPressedKey > 0)
+    if (playerInput->iPressedKey > 0)
     {
-        else if(playerInput->iPressedKey == SDLK_PAGEUP)
+        else if (playerInput->iPressedKey == SDLK_PAGEUP)
         {
             short iOldIndex = maplist->GetCurrent()->second->iIndex;
             maplist->prev(true);
 
-            if(iOldIndex != maplist->GetCurrent()->second->iIndex)
+            if (iOldIndex != maplist->GetCurrent()->second->iIndex)
             {
                 LoadCurrentMap();
                 return MENU_CODE_MAP_CHANGED;
@@ -1875,12 +1875,12 @@ MenuCodeEnum MI_MapField::SendInput(CPlayerInput * playerInput)
 
             return MENU_CODE_NONE;
         }
-        else if(playerInput->iPressedKey == SDLK_PAGEDOWN)
+        else if (playerInput->iPressedKey == SDLK_PAGEDOWN)
         {
             short iOldIndex = maplist->GetCurrent()->second->iIndex;
             maplist->next(true);
 
-            if(iOldIndex != maplist->GetCurrent()->second->iIndex)
+            if (iOldIndex != maplist->GetCurrent()->second->iIndex)
             {
                 LoadCurrentMap();
                 return MENU_CODE_MAP_CHANGED;
@@ -1892,25 +1892,25 @@ MenuCodeEnum MI_MapField::SendInput(CPlayerInput * playerInput)
     */
 
     for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
-        if(playerInput->outputControls[iPlayer].menu_right.fPressed || playerInput->outputControls[iPlayer].menu_down.fPressed) {
-            if(MoveNext(playerInput->outputControls[iPlayer].menu_scrollfast.fDown))
+        if (playerInput->outputControls[iPlayer].menu_right.fPressed || playerInput->outputControls[iPlayer].menu_down.fPressed) {
+            if (MoveNext(playerInput->outputControls[iPlayer].menu_scrollfast.fDown))
                 return MENU_CODE_MAP_CHANGED;
 
             return MENU_CODE_NONE;
         }
 
-        if(playerInput->outputControls[iPlayer].menu_left.fPressed || playerInput->outputControls[iPlayer].menu_up.fPressed) {
-            if(MovePrev(playerInput->outputControls[iPlayer].menu_scrollfast.fDown))
+        if (playerInput->outputControls[iPlayer].menu_left.fPressed || playerInput->outputControls[iPlayer].menu_up.fPressed) {
+            if (MovePrev(playerInput->outputControls[iPlayer].menu_scrollfast.fDown))
                 return MENU_CODE_MAP_CHANGED;
 
             return MENU_CODE_NONE;
         }
 
-        if(playerInput->outputControls[iPlayer].menu_random.fPressed) {
+        if (playerInput->outputControls[iPlayer].menu_random.fPressed) {
             return ChooseRandomMap();
         }
 
-        if(playerInput->outputControls[iPlayer].menu_select.fPressed || playerInput->outputControls[iPlayer].menu_cancel.fPressed) {
+        if (playerInput->outputControls[iPlayer].menu_select.fPressed || playerInput->outputControls[iPlayer].menu_cancel.fPressed) {
             miModifyImageLeft->Show(false);
             miModifyImageRight->Show(false);
 
@@ -1918,8 +1918,8 @@ MenuCodeEnum MI_MapField::SendInput(CPlayerInput * playerInput)
             return MENU_CODE_UNSELECT_ITEM;
         }
 
-        if(iPlayer == 0 && iPressedKey > 0) {
-            if((iPressedKey >= SDLK_a && iPressedKey <= SDLK_z) ||
+        if (iPlayer == 0 && iPressedKey > 0) {
+            if ((iPressedKey >= SDLK_a && iPressedKey <= SDLK_z) ||
                     (iPressedKey >= SDLK_0 && iPressedKey <= SDLK_9) ||
                     iPressedKey == SDLK_MINUS || iPressedKey == SDLK_EQUALS) {
                 short iOldIndex = maplist->GetCurrent()->second->iIndex;
@@ -1929,12 +1929,12 @@ MenuCodeEnum MI_MapField::SendInput(CPlayerInput * playerInput)
                 sSearchString += (char)iPressedKey;
                 iSearchStringTimer = 10;
 
-                if(!maplist->startswith(sSearchString.c_str())) {
+                if (!maplist->startswith(sSearchString.c_str())) {
                     sSearchString = "";
                     iSearchStringTimer = 0;
                 }
 
-                if(iOldIndex != maplist->GetCurrent()->second->iIndex) {
+                if (iOldIndex != maplist->GetCurrent()->second->iIndex) {
                     LoadCurrentMap();
                     return MENU_CODE_MAP_CHANGED;
                 }
@@ -1952,7 +1952,7 @@ MenuCodeEnum MI_MapField::ChooseRandomMap()
     short iOldIndex = maplist->GetCurrent()->second->iIndex;
     maplist->random(true);
 
-    if(iOldIndex != maplist->GetCurrent()->second->iIndex) {
+    if (iOldIndex != maplist->GetCurrent()->second->iIndex) {
         LoadCurrentMap();
         return MENU_CODE_MAP_CHANGED;
     }
@@ -1963,22 +1963,22 @@ MenuCodeEnum MI_MapField::ChooseRandomMap()
 void MI_MapField::Update()
 {
     //Empty out the search string after a certain time
-    if(iSearchStringTimer > 0) {
-        if(--iSearchStringTimer == 0) {
+    if (iSearchStringTimer > 0) {
+        if (--iSearchStringTimer == 0) {
             sSearchString = "";
         }
     }
 
-    if(iSlideListOut != iSlideListOutGoal) {
-        if(iSlideListOutGoal > iSlideListOut) {
+    if (iSlideListOut != iSlideListOutGoal) {
+        if (iSlideListOutGoal > iSlideListOut) {
             iSlideListOut += 4;
 
-            if(iSlideListOut > iSlideListOutGoal)
+            if (iSlideListOut > iSlideListOutGoal)
                 iSlideListOut = iSlideListOutGoal;
-        } else if(iSlideListOutGoal < iSlideListOut) {
+        } else if (iSlideListOutGoal < iSlideListOut) {
             iSlideListOut -= 4;
 
-            if(iSlideListOut < iSlideListOutGoal)
+            if (iSlideListOut < iSlideListOutGoal)
                 iSlideListOut = iSlideListOutGoal;
         }
     }
@@ -1997,7 +1997,7 @@ void MI_MapField::Update()
 
 void MI_MapField::Draw()
 {
-    if(!fShow)
+    if (!fShow)
         return;
 
     //Draw the select field background
@@ -2031,18 +2031,18 @@ void MI_MapField::Draw()
         CObject * object = objectcontainer[1].list[i];
         ObjectType type = object->getObjectType();
 
-        if(type == object_orbithazard) {
+        if (type == object_orbithazard) {
             ((OMO_OrbitHazard*)object)->draw(rectDst.x, rectDst.y);
-        } else if(type == object_pathhazard) {
+        } else if (type == object_pathhazard) {
             ((OMO_StraightPathHazard*)object)->draw(rectDst.x, rectDst.y);
-        } else if(type == object_flamecannon) {
+        } else if (type == object_flamecannon) {
             ((IO_FlameCannon*)object)->draw(rectDst.x, rectDst.y);
-        } else if(type == object_moving) {
+        } else if (type == object_moving) {
             IO_MovingObject * movingobject = (IO_MovingObject *) object;
 
-            if(movingobject->getMovingObjectType() == movingobject_bulletbill) {
+            if (movingobject->getMovingObjectType() == movingobject_bulletbill) {
                 ((MO_BulletBill*)movingobject)->draw(rectDst.x, rectDst.y);
-            } else if(movingobject->getMovingObjectType() == movingobject_pirhanaplant) {
+            } else if (movingobject->getMovingObjectType() == movingobject_pirhanaplant) {
                 ((MO_PirhanaPlant*)movingobject)->draw(rectDst.x, rectDst.y);
             }
         }
@@ -2050,7 +2050,7 @@ void MI_MapField::Draw()
 
     g_map->drawPlatforms(rectDst.x, rectDst.y, 2);
 
-    if(game_values.toplayer)
+    if (game_values.toplayer)
         SDL_BlitSurface(surfaceMapForeground, NULL, blitdest, &rectDst);
 
     g_map->drawPlatforms(rectDst.x, rectDst.y, 3);
@@ -2114,31 +2114,31 @@ void MI_MapField::SetSpecialMap(const char * mapName, const char * szMapPath)
 
 MenuCodeEnum MI_MapField::MouseClick(short iMouseX, short iMouseY)
 {
-    if(fDisable)
+    if (fDisable)
         return MENU_CODE_NONE;
 
     //If we are modifying this control, see if we clicked on a next/prev button
-    if(fModifying) {
+    if (fModifying) {
         short x, y, w, h;
         miModifyImageLeft->GetPositionAndSize(&x, &y, &w, &h);
 
-        if(iMouseX >= x && iMouseX < x + w &&
+        if (iMouseX >= x && iMouseX < x + w &&
                 iMouseY >= y && iMouseY < y + h) {
-            if(MovePrev(false))
+            if (MovePrev(false))
                 return MENU_CODE_MAP_CHANGED;
         }
 
         miModifyImageRight->GetPositionAndSize(&x, &y, &w, &h);
 
-        if(iMouseX >= x && iMouseX < x + w &&
+        if (iMouseX >= x && iMouseX < x + w &&
                 iMouseY >= y && iMouseY < y + h) {
-            if(MoveNext(false))
+            if (MoveNext(false))
                 return MENU_CODE_MAP_CHANGED;
         }
     }
 
     //Otherwise just check to see if we clicked on the whole control
-    if(iMouseX >= ix && iMouseX < ix + iWidth && iMouseY >= iy && iMouseY < iy + 32)
+    if (iMouseX >= ix && iMouseX < ix + iWidth && iMouseY >= iy && iMouseY < iy + 32)
         return MENU_CODE_CLICKED;
 
     //Otherwise this control wasn't clicked at all
@@ -2159,18 +2159,18 @@ bool MI_MapField::MoveNext(bool fScrollFast)
 bool MI_MapField::Move(bool fNext, bool fScrollFast)
 {
     int numadvance = 1;
-    if(fScrollFast)
+    if (fScrollFast)
         numadvance = 10;
 
     short iOldIndex = maplist->GetCurrent()->second->iIndex;
     for (int k = 0; k < numadvance; k++) {
-        if(fNext)
+        if (fNext)
             maplist->next(true);
         else
             maplist->prev(true);
     }
 
-    if(iOldIndex != maplist->GetCurrent()->second->iIndex) {
+    if (iOldIndex != maplist->GetCurrent()->second->iIndex) {
         LoadCurrentMap();
         return true;
     }
@@ -2186,7 +2186,7 @@ void MI_MapField::SetDimensions(short width, short indent)
     miModifyImageLeft->SetPosition(ix + indent - 26, iy + 4);
     miModifyImageRight->SetPosition(ix + iWidth - 16, iy + 4);
 
-    if(fShowtags) {
+    if (fShowtags) {
         //iSlideListOut = (iWidth - 352) >> 1;
         iSlideListOut = ((int)(iWidth - smw->ScreenWidth * 0.55)) >> 1;
         iSlideListOutGoal = iSlideListOut;

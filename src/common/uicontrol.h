@@ -27,7 +27,7 @@ public:
     bool Select(bool select) {
         fSelected = select;
 
-        if(fSelected && fAutoModify)
+        if (fSelected && fAutoModify)
             Modify(true);
 
         return fModifying;

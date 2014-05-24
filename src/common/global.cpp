@@ -28,18 +28,18 @@ bool VersionIsEqual(int iVersion[], short iMajor, short iMinor, short iMicro, sh
 
 bool VersionIsEqualOrBefore(int iVersion[], short iMajor, short iMinor, short iMicro, short iBuild)
 {
-    if(iVersion[0] < iMajor)
+    if (iVersion[0] < iMajor)
         return true;
 
-    if(iVersion[0] == iMajor) {
-        if(iVersion[1] < iMinor)
+    if (iVersion[0] == iMajor) {
+        if (iVersion[1] < iMinor)
             return true;
 
-        if(iVersion[1] == iMinor) {
-            if(iVersion[2] < iMicro)
+        if (iVersion[1] == iMinor) {
+            if (iVersion[2] < iMicro)
                 return true;
 
-            if(iVersion[2] == iMicro) {
+            if (iVersion[2] == iMicro) {
                 return iVersion[3] <= iBuild;
             }
         }
@@ -50,18 +50,18 @@ bool VersionIsEqualOrBefore(int iVersion[], short iMajor, short iMinor, short iM
 
 bool VersionIsEqualOrAfter(int iVersion[], short iMajor, short iMinor, short iMicro, short iBuild)
 {
-    if(iVersion[0] > iMajor)
+    if (iVersion[0] > iMajor)
         return true;
 
-    if(iVersion[0] == iMajor) {
-        if(iVersion[1] > iMinor)
+    if (iVersion[0] == iMajor) {
+        if (iVersion[1] > iMinor)
             return true;
 
-        if(iVersion[1] == iMinor) {
-            if(iVersion[2] > iMicro)
+        if (iVersion[1] == iMinor) {
+            if (iVersion[2] > iMicro)
                 return true;
 
-            if(iVersion[2] == iMicro) {
+            if (iVersion[2] == iMicro) {
                 return iVersion[3] >= iBuild;
             }
         }
@@ -274,7 +274,7 @@ short g_iTileConversion[] =    {0,1,2,3,4,5,6,7,8,9,
 
 void _load_drawmsg(const std::string& f)
 {
-    if(g_fLoadMessages) {
+    if (g_fLoadMessages) {
         /*
         static SDL_Rect r;
         r.x = 0;
@@ -295,9 +295,9 @@ void _load_waitforkey()
     SDL_Event event;
     while (true) {
         while (SDL_PollEvent(&event)) {
-            if(event.type == SDL_KEYDOWN)
+            if (event.type == SDL_KEYDOWN)
                 return;
-            if(event.type == SDL_JOYBUTTONDOWN)
+            if (event.type == SDL_JOYBUTTONDOWN)
                 return;
         }
 
@@ -322,15 +322,15 @@ void GetNameFromFileName(char * szName, const char * szFileName, bool fStripAuth
 
     strcpy(szName, p);
 
-    if(fStripAuthor) {
+    if (fStripAuthor) {
         char * pUnderscore = strchr(szName, '_');
-        if(pUnderscore)
+        if (pUnderscore)
             strcpy(szName, ++pUnderscore);
     }
 
     char * pLastPeriod = strrchr(szName, '.');
 
-    if(pLastPeriod)
+    if (pLastPeriod)
         *pLastPeriod = 0;
 }
 
@@ -339,7 +339,7 @@ void GetNameFromFileName(char * szName, const char * szFileName, bool fStripAuth
 std::string stripCreatorAndDotMap(const std::string &filename)
 {
     size_t firstUnderscore = filename.find("_");	//find first _
-    if(firstUnderscore == std::string::npos)	//if not found start with first character
+    if (firstUnderscore == std::string::npos)	//if not found start with first character
         firstUnderscore = 0;
     else
         firstUnderscore++;						//we don't want the _
@@ -349,7 +349,7 @@ std::string stripCreatorAndDotMap(const std::string &filename)
     //																return filename.substr(firstUnderscore, filename.length()-4);
 
     //Capitalize the first letter so the hash table sorting works correctly
-    if(withoutPrefix[0] >= 97 && withoutPrefix[0] <= 122)
+    if (withoutPrefix[0] >= 97 && withoutPrefix[0] <= 122)
         withoutPrefix[0] -= 32;
 
     return withoutPrefix;
@@ -359,9 +359,9 @@ std::string stripCreatorAndDotMap(const std::string &filename)
 std::string stripPathAndExtension(const std::string &path)
 {
     size_t chopHere = path.find("_");	//find first _
-    if(chopHere == std::string::npos) {	//if not found, then find the beginning of the filename
+    if (chopHere == std::string::npos) {	//if not found, then find the beginning of the filename
         chopHere = path.find_last_of(getDirectorySeperator());	//find last /
-        if(chopHere == std::string::npos)	//if not found, start with first character
+        if (chopHere == std::string::npos)	//if not found, start with first character
             chopHere = 0;
         else
             chopHere++;						//we don't want the /
@@ -420,19 +420,19 @@ short g_iAutoFilterIcons[NUM_AUTO_FILTERS] = {37, 29, 33, 1, 0, 6, 40, 73, 19, 8
 short ReadTourStopSetting(short * iSetting, bool * fSetting, short iDefault, bool fDefault)
 {
     char * pszTemp = strtok(NULL, ",\n");
-    if(pszTemp) {
-        if(iSetting)
+    if (pszTemp) {
+        if (iSetting)
             *iSetting = atoi(pszTemp);
 
-        if(fSetting)
+        if (fSetting)
             *fSetting = atoi(pszTemp) == 1;
 
         return 1;
     } else {
-        if(iSetting)
+        if (iSetting)
             *iSetting = iDefault;
 
-        if(fSetting)
+        if (fSetting)
             *fSetting = fDefault;
     }
 
@@ -448,9 +448,9 @@ TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld)
     char * pszTemp = strtok(buffer, ",\n");
 
     short iStageType = 0;
-    if(fIsWorld) {
+    if (fIsWorld) {
         iStageType = atoi(pszTemp);
-        if(iStageType < 0 || iStageType > 1)
+        if (iStageType < 0 || iStageType > 1)
             iStageType = 0;
 
         pszTemp = strtok(NULL, ",\n");
@@ -464,19 +464,19 @@ TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld)
     ts->szBonusText[3][0] = 0;
     ts->szBonusText[4][0] = 0;
 
-    if(iStageType == 0) {
+    if (iStageType == 0) {
         char * szMap = new char[strlen(pszTemp) + 1];
         strcpy(szMap, pszTemp);
 
         pszTemp = strtok(NULL, ",\n");
 
-        if(pszTemp)
+        if (pszTemp)
             ts->iMode = atoi(pszTemp);
         else
             ts->iMode = -1;
 
         //If this is 1.8.0.2 or earlier and we are playing a minigame, use the default map
-        if(VersionIsEqualOrBefore(iVersion, 1, 8, 0, 2) &&
+        if (VersionIsEqualOrBefore(iVersion, 1, 8, 0, 2) &&
                 (ts->iMode == game_mode_pipe_minigame || ts->iMode == game_mode_boss_minigame || ts->iMode == game_mode_boxes_minigame)) {
             //Get a bogus map name so the mode will know to load the default map
             ts->pszMapFile = maplist->GetUnknownMapName();
@@ -487,8 +487,8 @@ TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld)
             //If that map is not found
             bool fMapFound = maplist->findexact(szMap, true);
 
-            if(!fMapFound) {
-                if(ts->iMode == game_mode_pipe_minigame || ts->iMode == game_mode_boss_minigame || ts->iMode == game_mode_boxes_minigame) {
+            if (!fMapFound) {
+                if (ts->iMode == game_mode_pipe_minigame || ts->iMode == game_mode_boss_minigame || ts->iMode == game_mode_boxes_minigame) {
                     //Get a bogus map name so the mode will know to load the default map
                     ts->pszMapFile = maplist->GetUnknownMapName();
                 } else {
@@ -506,45 +506,45 @@ TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld)
 
         //The pipe minigame was using the value 24 from version 1.8.0.0 to 1.8.0.2
         //It was later switched to 1000 to accomodate new modes easily
-        if(VersionIsEqualOrBefore(iVersion, 1, 8, 0, 2)) {
-            if(ts->iMode == 24)
+        if (VersionIsEqualOrBefore(iVersion, 1, 8, 0, 2)) {
+            if (ts->iMode == 24)
                 ts->iMode = game_mode_pipe_minigame;
         }
 
         //If a valid mode was not detected, then just choose a random mode
-        if(ts->iMode < 0 || (ts->iMode >= GAMEMODE_LAST && ts->iMode != game_mode_pipe_minigame && ts->iMode != game_mode_boss_minigame && ts->iMode != game_mode_boxes_minigame))
+        if (ts->iMode < 0 || (ts->iMode >= GAMEMODE_LAST && ts->iMode != game_mode_pipe_minigame && ts->iMode != game_mode_boss_minigame && ts->iMode != game_mode_boxes_minigame))
             ts->iMode = RNGMAX(GAMEMODE_LAST);
 
         pszTemp = strtok(NULL, ",\n");
 
         //This gets the closest game mode to what the tour has
         ts->iGoal = -1;
-        if(pszTemp) {
+        if (pszTemp) {
             //If it is commented out, this will allow things like 33 coins, 17 kill goals, etc.
             //ts->iGoal = gamemodes[ts->iMode]->GetClosestGoal(atoi(pszTemp));
             ts->iGoal = atoi(pszTemp);
         }
 
         //Default to a random goal if an invalid goal was used
-        if(ts->iGoal <= 0) {
-            if(ts->iMode < GAMEMODE_LAST)
+        if (ts->iGoal <= 0) {
+            if (ts->iMode < GAMEMODE_LAST)
                 ts->iGoal = gamemodes[ts->iMode]->GetOptions()[RNGMAX(GAMEMODE_NUM_OPTIONS - 1)].iValue;
             else
                 ts->iGoal = 50;
         }
 
-        if(VersionIsEqualOrAfter(iVersion, 1, 7, 0, 2)) {
+        if (VersionIsEqualOrAfter(iVersion, 1, 7, 0, 2)) {
             pszTemp = strtok(NULL, ",\n");
 
             //Read in point value for tour stop
-            if(pszTemp)
+            if (pszTemp)
                 ts->iPoints = atoi(pszTemp);
             else
                 ts->iPoints = 1;
 
             pszTemp = strtok(NULL, ",\n");
 
-            if(fIsWorld) {
+            if (fIsWorld) {
                 ts->iBonusType = 0;
                 ts->iNumBonuses = 0;
 
@@ -552,14 +552,14 @@ TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld)
 
                 while (pszStart != NULL) {
                     char * pszEnd = strstr(pszStart, "|");
-                    if(pszEnd)
+                    if (pszEnd)
                         *pszEnd = 0;
 
                     //if it is "0", then no bonuses
                     short iWinnerPlace = pszStart[0] - 48;
-                    if(iWinnerPlace == 0)
+                    if (iWinnerPlace == 0)
                         break;
-                    else if(iWinnerPlace < 1 || iWinnerPlace > 4)
+                    else if (iWinnerPlace < 1 || iWinnerPlace > 4)
                         iWinnerPlace = 1;
 
                     strcpy(ts->wsbBonuses[ts->iNumBonuses].szBonusString, pszStart);
@@ -567,27 +567,27 @@ TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld)
                     ts->wsbBonuses[ts->iNumBonuses].iWinnerPlace = iWinnerPlace - 1;
 
                     short iPowerupOffset = 0;
-                    if(pszStart[1] == 'w' || pszStart[1] == 'W')
+                    if (pszStart[1] == 'w' || pszStart[1] == 'W')
                         iPowerupOffset += NUM_POWERUPS;
 
                     pszStart += 2;
 
                     short iBonus = atoi(pszStart) + iPowerupOffset;
-                    if(iBonus < 0 || iBonus >= NUM_POWERUPS + NUM_WORLD_POWERUPS)
+                    if (iBonus < 0 || iBonus >= NUM_POWERUPS + NUM_WORLD_POWERUPS)
                         iBonus = 0;
 
                     ts->wsbBonuses[ts->iNumBonuses].iBonus = iBonus;
 
-                    if(++ts->iNumBonuses >= 10)
+                    if (++ts->iNumBonuses >= 10)
                         break;
 
-                    if(pszEnd)
+                    if (pszEnd)
                         pszStart = pszEnd + 1;
                     else
                         pszStart = NULL;
                 }
             } else {
-                if(pszTemp)
+                if (pszTemp)
                     ts->iBonusType = atoi(pszTemp);
                 else
                     ts->iBonusType = 0;
@@ -595,7 +595,7 @@ TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld)
 
             pszTemp = strtok(NULL, ",\n");
 
-            if(pszTemp) {
+            if (pszTemp) {
                 strncpy(ts->szName, pszTemp, 127);
                 ts->szName[127] = 0;
             } else {
@@ -607,12 +607,12 @@ TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld)
             sprintf(ts->szName, "Tour Stop %d", game_values.tourstoptotal + 1);
         }
 
-        if(VersionIsEqualOrAfter(iVersion, 1, 8, 0, 0)) {
-            if(fIsWorld) {
+        if (VersionIsEqualOrAfter(iVersion, 1, 8, 0, 0)) {
+            if (fIsWorld) {
                 //is this a world ending stage?
                 pszTemp = strtok(NULL, ",\n");
 
-                if(pszTemp)
+                if (pszTemp)
                     ts->fEndStage = pszTemp[0] == '1';
                 else
                     ts->fEndStage = false;
@@ -621,40 +621,40 @@ TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld)
             //Copy in default values first
             memcpy(&ts->gmsSettings, &game_values.gamemodemenusettings, sizeof(GameModeSettings));
 
-            if(ts->iMode == 0) { //classic
+            if (ts->iMode == 0) { //classic
                 ts->fUseSettings = true;
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.classic.style, NULL, game_values.gamemodemenusettings.classic.style, false);
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.classic.scoring, NULL, game_values.gamemodemenusettings.classic.scoring, false);
-            } else if(ts->iMode == 1) { //frag
+            } else if (ts->iMode == 1) { //frag
                 ts->fUseSettings = true;
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.frag.style, NULL, game_values.gamemodemenusettings.frag.style, false);
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.frag.scoring, NULL, game_values.gamemodemenusettings.frag.scoring, false);
-            } else if(ts->iMode == 2) { //time
+            } else if (ts->iMode == 2) { //time
                 ts->fUseSettings = true;
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.time.style, NULL, game_values.gamemodemenusettings.time.style, false);
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.time.scoring, NULL, game_values.gamemodemenusettings.time.scoring, false);
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.time.percentextratime, NULL, game_values.gamemodemenusettings.time.percentextratime, false);
-            } else if(ts->iMode == 3) { //jail
+            } else if (ts->iMode == 3) { //jail
                 ts->fUseSettings = true;
 
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.jail.style, NULL, game_values.gamemodemenusettings.jail.style, false);
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.jail.timetofree, NULL, game_values.gamemodemenusettings.jail.timetofree, false);
                 ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.jail.tagfree, 0, game_values.gamemodemenusettings.jail.tagfree);
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.jail.percentkey, NULL, game_values.gamemodemenusettings.jail.percentkey, false);
-            } else if(ts->iMode == 4) { //coins
+            } else if (ts->iMode == 4) { //coins
                 ts->fUseSettings = true;
 
                 ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.coins.penalty, 0, game_values.gamemodemenusettings.coins.penalty);
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.coins.quantity, NULL, game_values.gamemodemenusettings.coins.quantity, false);
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.coins.percentextracoin, NULL, game_values.gamemodemenusettings.coins.percentextracoin, false);
-            } else if(ts->iMode == 5) { //stomp
+            } else if (ts->iMode == 5) { //stomp
                 ts->fUseSettings = true;
 
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.stomp.rate, NULL, game_values.gamemodemenusettings.stomp.rate, false);
 
                 for (int iEnemy = 0; iEnemy < NUMSTOMPENEMIES; iEnemy++)
                     ts->iNumUsedSettings += ReadTourStopSetting(&(ts->gmsSettings.stomp.enemyweight[iEnemy]), NULL, game_values.gamemodemenusettings.stomp.enemyweight[iEnemy], false);
-            } else if(ts->iMode == 6) { //egg
+            } else if (ts->iMode == 6) { //egg
                 ts->fUseSettings = true;
 
                 for (int iEgg = 0; iEgg < 4; iEgg++)
@@ -664,7 +664,7 @@ TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld)
                     ts->iNumUsedSettings += ReadTourStopSetting(&(ts->gmsSettings.egg.yoshis[iYoshi]), NULL, game_values.gamemodemenusettings.egg.yoshis[iYoshi], false);
 
                 ts->iNumUsedSettings += ReadTourStopSetting(&(ts->gmsSettings.egg.explode), NULL, game_values.gamemodemenusettings.egg.explode, false);
-            } else if(ts->iMode == 7) { //capture the flag
+            } else if (ts->iMode == 7) { //capture the flag
                 ts->fUseSettings = true;
 
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.flag.speed, NULL, game_values.gamemodemenusettings.flag.speed, false);
@@ -673,22 +673,22 @@ TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld)
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.flag.autoreturn, NULL, game_values.gamemodemenusettings.flag.autoreturn, false);
                 ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.flag.homescore, 0, game_values.gamemodemenusettings.flag.homescore);
                 ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.flag.centerflag, 0, game_values.gamemodemenusettings.flag.centerflag);
-            } else if(ts->iMode == 8) { //chicken
+            } else if (ts->iMode == 8) { //chicken
                 ts->fUseSettings = true;
 
                 ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.chicken.usetarget, 0, game_values.gamemodemenusettings.chicken.usetarget);
                 ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.chicken.glide, 0, game_values.gamemodemenusettings.chicken.glide);
-            } else if(ts->iMode == 9) { //tag
+            } else if (ts->iMode == 9) { //tag
                 ts->fUseSettings = true;
 
                 ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.tag.tagontouch, 0, game_values.gamemodemenusettings.tag.tagontouch);
-            } else if(ts->iMode == 10) { //star
+            } else if (ts->iMode == 10) { //star
                 ts->fUseSettings = true;
 
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.star.time, NULL, game_values.gamemodemenusettings.star.time, false);
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.star.shine, NULL, game_values.gamemodemenusettings.star.shine, false);
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.star.percentextratime, NULL, game_values.gamemodemenusettings.star.percentextratime, false);
-            } else if(ts->iMode == 11) { //domination
+            } else if (ts->iMode == 11) { //domination
                 ts->fUseSettings = true;
 
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.domination.quantity, NULL, game_values.gamemodemenusettings.domination.quantity, false);
@@ -696,19 +696,19 @@ TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld)
                 ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.domination.loseondeath, 0, game_values.gamemodemenusettings.domination.loseondeath);
                 ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.domination.relocateondeath, 0, game_values.gamemodemenusettings.domination.relocateondeath);
                 ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.domination.stealondeath, 0, game_values.gamemodemenusettings.domination.stealondeath);
-            } else if(ts->iMode == 12) { //king of the hill
+            } else if (ts->iMode == 12) { //king of the hill
                 ts->fUseSettings = true;
 
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.kingofthehill.areasize, NULL, game_values.gamemodemenusettings.kingofthehill.areasize, false);
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.kingofthehill.relocationfrequency, NULL, game_values.gamemodemenusettings.kingofthehill.relocationfrequency, false);
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.kingofthehill.maxmultiplier, NULL, game_values.gamemodemenusettings.kingofthehill.maxmultiplier, false);
-            } else if(ts->iMode == 13) { //race
+            } else if (ts->iMode == 13) { //race
                 ts->fUseSettings = true;
 
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.race.quantity, NULL, game_values.gamemodemenusettings.race.quantity, false);
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.race.speed, NULL, game_values.gamemodemenusettings.race.speed, false);
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.race.penalty, NULL, game_values.gamemodemenusettings.race.penalty, false);
-            } else if(ts->iMode == 15) { //frenzy
+            } else if (ts->iMode == 15) { //frenzy
                 ts->fUseSettings = true;
 
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.frenzy.quantity, NULL, game_values.gamemodemenusettings.frenzy.quantity, false);
@@ -717,7 +717,7 @@ TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld)
 
                 for (short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++)
                     ts->iNumUsedSettings += ReadTourStopSetting(&(ts->gmsSettings.frenzy.powerupweight[iPowerup]), NULL, game_values.gamemodemenusettings.frenzy.powerupweight[iPowerup], false);
-            } else if(ts->iMode == 16) { //survival
+            } else if (ts->iMode == 16) { //survival
                 ts->fUseSettings = true;
 
                 for (short iEnemy = 0; iEnemy < NUMSURVIVALENEMIES; iEnemy++)
@@ -726,40 +726,40 @@ TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld)
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.survival.density, NULL, game_values.gamemodemenusettings.survival.density, false);
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.survival.speed, NULL, game_values.gamemodemenusettings.survival.speed, false);
                 ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.survival.shield, 0, game_values.gamemodemenusettings.survival.shield);
-            } else if(ts->iMode == 17) { //greed
+            } else if (ts->iMode == 17) { //greed
                 ts->fUseSettings = true;
 
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.greed.coinlife, NULL, game_values.gamemodemenusettings.greed.coinlife, false);
                 ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.greed.owncoins, 0, game_values.gamemodemenusettings.greed.owncoins);
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.greed.multiplier, NULL, game_values.gamemodemenusettings.greed.multiplier, false);
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.greed.percentextracoin, NULL, game_values.gamemodemenusettings.greed.percentextracoin, false);
-            } else if(ts->iMode == 18) { //health
+            } else if (ts->iMode == 18) { //health
                 ts->fUseSettings = true;
 
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.health.startlife, NULL, game_values.gamemodemenusettings.health.startlife, false);
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.health.maxlife, NULL, game_values.gamemodemenusettings.health.maxlife, false);
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.health.percentextralife, NULL, game_values.gamemodemenusettings.health.percentextralife, false);
-            } else if(ts->iMode == 19) { //card collection
+            } else if (ts->iMode == 19) { //card collection
                 ts->fUseSettings = true;
 
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.collection.quantity, NULL, game_values.gamemodemenusettings.collection.quantity, false);
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.collection.rate, NULL, game_values.gamemodemenusettings.collection.rate, false);
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.collection.banktime, NULL, game_values.gamemodemenusettings.collection.banktime, false);
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.collection.cardlife, NULL, game_values.gamemodemenusettings.collection.cardlife, false);
-            } else if(ts->iMode == 20) { //chase (phanto)
+            } else if (ts->iMode == 20) { //chase (phanto)
                 ts->fUseSettings = true;
 
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.chase.phantospeed, NULL, game_values.gamemodemenusettings.chase.phantospeed, false);
 
                 for (short iPhanto = 0; iPhanto < 3; iPhanto++)
                     ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.chase.phantoquantity[iPhanto], NULL, game_values.gamemodemenusettings.chase.phantoquantity[iPhanto], false);
-            } else if(ts->iMode == 21) { //shyguy tag
+            } else if (ts->iMode == 21) { //shyguy tag
                 ts->fUseSettings = true;
 
                 ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.shyguytag.tagonsuicide, 0, game_values.gamemodemenusettings.shyguytag.tagonsuicide);
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.shyguytag.tagtransfer, NULL, game_values.gamemodemenusettings.shyguytag.tagtransfer, false);
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.shyguytag.freetime, NULL, game_values.gamemodemenusettings.shyguytag.freetime, false);
-            } else if(ts->iMode == 1001) { //boss minigame
+            } else if (ts->iMode == 1001) { //boss minigame
                 ts->fUseSettings = true;
 
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.boss.bosstype, NULL, game_values.gamemodemenusettings.boss.bosstype, false);
@@ -767,8 +767,8 @@ TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld)
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.boss.hitpoints, NULL, game_values.gamemodemenusettings.boss.hitpoints, false);
             }
         }
-    } else if(iStageType == 1) { //Bonus House
-        if(pszTemp) {
+    } else if (iStageType == 1) { //Bonus House
+        if (pszTemp) {
             strncpy(ts->szName, pszTemp, 127);
             ts->szName[127] = 0;
         } else {
@@ -778,7 +778,7 @@ TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld)
         pszTemp = strtok(NULL, ",\n");
 
         short iBonusOrdering = atoi(pszTemp);
-        if(iBonusOrdering < 0 || iBonusOrdering > 1)
+        if (iBonusOrdering < 0 || iBonusOrdering > 1)
             iBonusOrdering = 0;
 
         ts->iBonusType = iBonusOrdering;
@@ -791,12 +791,12 @@ TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld)
         while (pszStart != NULL && pszStart[0] != '-') {
             char * pszEnd = strstr(pszStart, "|");
 
-            if(pszEnd)
+            if (pszEnd)
                 *pszEnd = 0;
 
             strcpy(ts->szBonusText[ts->iBonusTextLines], pszStart);
 
-            if(++ts->iBonusTextLines >= 5 || !pszEnd)
+            if (++ts->iBonusTextLines >= 5 || !pszEnd)
                 break;
 
             pszStart = pszEnd + 1;
@@ -808,21 +808,21 @@ TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld)
             strcpy(ts->wsbBonuses[ts->iNumBonuses].szBonusString, pszTemp);
 
             short iPowerupOffset = 0;
-            if(pszTemp[0] == 'w' || pszTemp[0] == 'W')
+            if (pszTemp[0] == 'w' || pszTemp[0] == 'W')
                 iPowerupOffset += NUM_POWERUPS;
-            else if(pszTemp[0] == 's' || pszTemp[0] == 'S')
+            else if (pszTemp[0] == 's' || pszTemp[0] == 'S')
                 iPowerupOffset += NUM_POWERUPS + NUM_WORLD_POWERUPS - 1;
 
             pszTemp++;
 
             short iBonus = atoi(pszTemp) + iPowerupOffset;
-            if(iBonus < 0 || iBonus >= NUM_POWERUPS + NUM_WORLD_POWERUPS + NUM_WORLD_SCORE_BONUSES)
+            if (iBonus < 0 || iBonus >= NUM_POWERUPS + NUM_WORLD_POWERUPS + NUM_WORLD_SCORE_BONUSES)
                 iBonus = 0;
 
             ts->wsbBonuses[ts->iNumBonuses].iBonus = iBonus;
             ts->wsbBonuses[ts->iNumBonuses].iWinnerPlace = -1;
 
-            if(++ts->iNumBonuses >= MAX_BONUS_CHESTS)
+            if (++ts->iNumBonuses >= MAX_BONUS_CHESTS)
                 break;
 
             pszTemp = strtok(NULL, ",\n");
@@ -837,14 +837,14 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
     buffer[0] = 0;
     char szTemp[32];
 
-    if(fIsWorld) {
+    if (fIsWorld) {
         //Write stage type (battle stage vs. bonus house, etc.)
         sprintf(szTemp, "%d,", ts->iStageType);
         strcat(buffer, szTemp);
     }
 
     //Battle stage
-    if(ts->iStageType == 0) {
+    if (ts->iStageType == 0) {
         strcat(buffer, ts->pszMapFile);
         strcat(buffer, ",");
 
@@ -857,12 +857,12 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
         sprintf(szTemp, "%d,", ts->iPoints);
         strcat(buffer, szTemp);
 
-        if(fIsWorld) {
-            if(ts->iNumBonuses <= 0) {
+        if (fIsWorld) {
+            if (ts->iNumBonuses <= 0) {
                 strcat(buffer, "0");
             } else {
                 for (short iBonus = 0; iBonus < ts->iNumBonuses; iBonus++) {
-                    if(iBonus > 0)
+                    if (iBonus > 0)
                         strcat(buffer, "|");
 
                     strcat(buffer, ts->wsbBonuses[iBonus].szBonusString);
@@ -878,372 +878,372 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
         strcat(buffer, ts->szName);
         strcat(buffer, ",");
 
-        if(fIsWorld) {
+        if (fIsWorld) {
             sprintf(szTemp, "%d", ts->fEndStage);
             strcat(buffer, szTemp);
         }
 
-        if(ts->fUseSettings) {
-            if(ts->iMode == 0) { //classic
-                if(ts->iNumUsedSettings > 0) {
+        if (ts->fUseSettings) {
+            if (ts->iMode == 0) { //classic
+                if (ts->iNumUsedSettings > 0) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.classic.style);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 1) {
+                if (ts->iNumUsedSettings > 1) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.classic.scoring);
                     strcat(buffer, szTemp);
                 }
-            } else if(ts->iMode == 1) { //frag
-                if(ts->iNumUsedSettings > 0) {
+            } else if (ts->iMode == 1) { //frag
+                if (ts->iNumUsedSettings > 0) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.frag.style);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 1) {
+                if (ts->iNumUsedSettings > 1) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.frag.scoring);
                     strcat(buffer, szTemp);
                 }
-            } else if(ts->iMode == 2) { //time
-                if(ts->iNumUsedSettings > 0) {
+            } else if (ts->iMode == 2) { //time
+                if (ts->iNumUsedSettings > 0) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.time.style);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 1) {
+                if (ts->iNumUsedSettings > 1) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.time.scoring);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 2) {
+                if (ts->iNumUsedSettings > 2) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.time.percentextratime);
                     strcat(buffer, szTemp);
                 }
-            } else if(ts->iMode == 3) { //jail
-                if(ts->iNumUsedSettings > 0) {
+            } else if (ts->iMode == 3) { //jail
+                if (ts->iNumUsedSettings > 0) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.jail.style);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 1) {
+                if (ts->iNumUsedSettings > 1) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.jail.timetofree);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 2) {
+                if (ts->iNumUsedSettings > 2) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.jail.tagfree);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 3) {
+                if (ts->iNumUsedSettings > 3) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.jail.percentkey);
                     strcat(buffer, szTemp);
                 }
-            } else if(ts->iMode == 4) { //coins
-                if(ts->iNumUsedSettings > 0) {
+            } else if (ts->iMode == 4) { //coins
+                if (ts->iNumUsedSettings > 0) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.coins.penalty);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 1) {
+                if (ts->iNumUsedSettings > 1) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.coins.quantity);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 2) {
+                if (ts->iNumUsedSettings > 2) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.coins.percentextracoin);
                     strcat(buffer, szTemp);
                 }
-            } else if(ts->iMode == 5) { //stomp
-                if(ts->iNumUsedSettings > 0) {
+            } else if (ts->iMode == 5) { //stomp
+                if (ts->iNumUsedSettings > 0) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.stomp.rate);
                     strcat(buffer, szTemp);
                 }
 
                 for (int iEnemy = 0; iEnemy < NUMSTOMPENEMIES; iEnemy++) {
-                    if(ts->iNumUsedSettings > iEnemy + 1) {
+                    if (ts->iNumUsedSettings > iEnemy + 1) {
                         sprintf(szTemp, ",%d", ts->gmsSettings.stomp.enemyweight[iEnemy]);
                         strcat(buffer, szTemp);
                     }
                 }
-            } else if(ts->iMode == 6) { //egg
+            } else if (ts->iMode == 6) { //egg
                 for (int iEgg = 0; iEgg < 4; iEgg++) {
-                    if(ts->iNumUsedSettings > iEgg) {
+                    if (ts->iNumUsedSettings > iEgg) {
                         sprintf(szTemp, ",%d", ts->gmsSettings.egg.eggs[iEgg]);
                         strcat(buffer, szTemp);
                     }
                 }
 
                 for (int iYoshi = 0; iYoshi < 4; iYoshi++) {
-                    if(ts->iNumUsedSettings > iYoshi + 4) {
+                    if (ts->iNumUsedSettings > iYoshi + 4) {
                         sprintf(szTemp, ",%d", ts->gmsSettings.egg.yoshis[iYoshi]);
                         strcat(buffer, szTemp);
                     }
                 }
 
-                if(ts->iNumUsedSettings > 8) {
+                if (ts->iNumUsedSettings > 8) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.egg.explode);
                     strcat(buffer, szTemp);
                 }
-            } else if(ts->iMode == 7) { //capture the flag
-                if(ts->iNumUsedSettings > 0) {
+            } else if (ts->iMode == 7) { //capture the flag
+                if (ts->iNumUsedSettings > 0) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.flag.speed);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 1) {
+                if (ts->iNumUsedSettings > 1) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.flag.touchreturn);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 2) {
+                if (ts->iNumUsedSettings > 2) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.flag.pointmove);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 3) {
+                if (ts->iNumUsedSettings > 3) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.flag.autoreturn);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 4) {
+                if (ts->iNumUsedSettings > 4) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.flag.homescore);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 5) {
+                if (ts->iNumUsedSettings > 5) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.flag.centerflag);
                     strcat(buffer, szTemp);
                 }
-            } else if(ts->iMode == 8) { //chicken
-                if(ts->iNumUsedSettings > 0) {
+            } else if (ts->iMode == 8) { //chicken
+                if (ts->iNumUsedSettings > 0) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.chicken.usetarget);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 1) {
+                if (ts->iNumUsedSettings > 1) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.chicken.glide);
                     strcat(buffer, szTemp);
                 }
-            } else if(ts->iMode == 9) { //tag
-                if(ts->iNumUsedSettings > 0) {
+            } else if (ts->iMode == 9) { //tag
+                if (ts->iNumUsedSettings > 0) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.tag.tagontouch);
                     strcat(buffer, szTemp);
                 }
-            } else if(ts->iMode == 10) { //star
-                if(ts->iNumUsedSettings > 0) {
+            } else if (ts->iMode == 10) { //star
+                if (ts->iNumUsedSettings > 0) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.star.time);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 1) {
+                if (ts->iNumUsedSettings > 1) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.star.shine);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 2) {
+                if (ts->iNumUsedSettings > 2) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.star.percentextratime);
                     strcat(buffer, szTemp);
                 }
-            } else if(ts->iMode == 11) { //domination
-                if(ts->iNumUsedSettings > 0) {
+            } else if (ts->iMode == 11) { //domination
+                if (ts->iNumUsedSettings > 0) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.domination.quantity);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 1) {
+                if (ts->iNumUsedSettings > 1) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.domination.relocationfrequency);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 2) {
+                if (ts->iNumUsedSettings > 2) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.domination.loseondeath);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 3) {
+                if (ts->iNumUsedSettings > 3) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.domination.relocateondeath);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 4) {
+                if (ts->iNumUsedSettings > 4) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.domination.stealondeath);
                     strcat(buffer, szTemp);
                 }
-            } else if(ts->iMode == 12) { //king of the hill
-                if(ts->iNumUsedSettings > 0) {
+            } else if (ts->iMode == 12) { //king of the hill
+                if (ts->iNumUsedSettings > 0) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.kingofthehill.areasize);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 1) {
+                if (ts->iNumUsedSettings > 1) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.kingofthehill.relocationfrequency);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 2) {
+                if (ts->iNumUsedSettings > 2) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.kingofthehill.maxmultiplier);
                     strcat(buffer, szTemp);
                 }
-            } else if(ts->iMode == 13) { //race
-                if(ts->iNumUsedSettings > 0) {
+            } else if (ts->iMode == 13) { //race
+                if (ts->iNumUsedSettings > 0) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.race.quantity);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 1) {
+                if (ts->iNumUsedSettings > 1) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.race.speed);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 2) {
+                if (ts->iNumUsedSettings > 2) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.race.penalty);
                     strcat(buffer, szTemp);
                 }
-            } else if(ts->iMode == 15) { //frenzy
-                if(ts->iNumUsedSettings > 0) {
+            } else if (ts->iMode == 15) { //frenzy
+                if (ts->iNumUsedSettings > 0) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.frenzy.quantity);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 1) {
+                if (ts->iNumUsedSettings > 1) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.frenzy.rate);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 2) {
+                if (ts->iNumUsedSettings > 2) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.frenzy.storedshells);
                     strcat(buffer, szTemp);
                 }
 
                 for (short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++) {
-                    if(ts->iNumUsedSettings > iPowerup + 3) {
+                    if (ts->iNumUsedSettings > iPowerup + 3) {
                         sprintf(szTemp, ",%d", ts->gmsSettings.frenzy.powerupweight[iPowerup]);
                         strcat(buffer, szTemp);
                     }
                 }
-            } else if(ts->iMode == 16) { //survival
+            } else if (ts->iMode == 16) { //survival
                 for (short iEnemy = 0; iEnemy < NUMSURVIVALENEMIES; iEnemy++) {
-                    if(ts->iNumUsedSettings > iEnemy) {
+                    if (ts->iNumUsedSettings > iEnemy) {
                         sprintf(szTemp, ",%d", ts->gmsSettings.survival.enemyweight[iEnemy]);
                         strcat(buffer, szTemp);
                     }
                 }
 
-                if(ts->iNumUsedSettings > 3) {
+                if (ts->iNumUsedSettings > 3) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.survival.density);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 4) {
+                if (ts->iNumUsedSettings > 4) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.survival.speed);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 5) {
+                if (ts->iNumUsedSettings > 5) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.survival.shield);
                     strcat(buffer, szTemp);
                 }
-            } else if(ts->iMode == 17) { //greed
-                if(ts->iNumUsedSettings > 0) {
+            } else if (ts->iMode == 17) { //greed
+                if (ts->iNumUsedSettings > 0) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.greed.coinlife);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 1) {
+                if (ts->iNumUsedSettings > 1) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.greed.owncoins);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 2) {
+                if (ts->iNumUsedSettings > 2) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.greed.multiplier);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 3) {
+                if (ts->iNumUsedSettings > 3) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.greed.percentextracoin);
                     strcat(buffer, szTemp);
                 }
-            } else if(ts->iMode == 18) { //health
-                if(ts->iNumUsedSettings > 0) {
+            } else if (ts->iMode == 18) { //health
+                if (ts->iNumUsedSettings > 0) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.health.startlife);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 1) {
+                if (ts->iNumUsedSettings > 1) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.health.maxlife);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 2) {
+                if (ts->iNumUsedSettings > 2) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.health.percentextralife);
                     strcat(buffer, szTemp);
                 }
-            } else if(ts->iMode == 19) { //card collection
-                if(ts->iNumUsedSettings > 0) {
+            } else if (ts->iMode == 19) { //card collection
+                if (ts->iNumUsedSettings > 0) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.collection.quantity);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 1) {
+                if (ts->iNumUsedSettings > 1) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.collection.rate);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 2) {
+                if (ts->iNumUsedSettings > 2) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.collection.banktime);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 3) {
+                if (ts->iNumUsedSettings > 3) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.collection.cardlife);
                     strcat(buffer, szTemp);
                 }
-            } else if(ts->iMode == 20) { //phanto chase mode
-                if(ts->iNumUsedSettings > 0) {
+            } else if (ts->iMode == 20) { //phanto chase mode
+                if (ts->iNumUsedSettings > 0) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.chase.phantospeed);
                     strcat(buffer, szTemp);
                 }
 
                 for (short iPhanto = 0; iPhanto < 3; iPhanto++) {
-                    if(ts->iNumUsedSettings > iPhanto + 1) {
+                    if (ts->iNumUsedSettings > iPhanto + 1) {
                         sprintf(szTemp, ",%d", ts->gmsSettings.chase.phantoquantity[iPhanto]);
                         strcat(buffer, szTemp);
                     }
                 }
-            } else if(ts->iMode == 21) { //shyguy tag
-                if(ts->iNumUsedSettings > 0) {
+            } else if (ts->iMode == 21) { //shyguy tag
+                if (ts->iNumUsedSettings > 0) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.shyguytag.tagonsuicide);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 1) {
+                if (ts->iNumUsedSettings > 1) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.shyguytag.tagtransfer);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 2) {
+                if (ts->iNumUsedSettings > 2) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.shyguytag.freetime);
                     strcat(buffer, szTemp);
                 }
-            } else if(ts->iMode == 1001) { //boss minigame
-                if(ts->iNumUsedSettings > 0) {
+            } else if (ts->iMode == 1001) { //boss minigame
+                if (ts->iNumUsedSettings > 0) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.boss.bosstype);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 1) {
+                if (ts->iNumUsedSettings > 1) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.boss.difficulty);
                     strcat(buffer, szTemp);
                 }
 
-                if(ts->iNumUsedSettings > 2) {
+                if (ts->iNumUsedSettings > 2) {
                     sprintf(szTemp, ",%d", ts->gmsSettings.boss.hitpoints);
                     strcat(buffer, szTemp);
                 }
             }
         }
-    } else if(ts->iStageType == 1) { //Bonus House
+    } else if (ts->iStageType == 1) { //Bonus House
         strcat(buffer, ts->szName);
         strcat(buffer, ",");
 
@@ -1251,13 +1251,13 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
         strcat(buffer, szTemp);
 
         for (short iText = 0; iText < ts->iBonusTextLines; iText++) {
-            if(iText != 0)
+            if (iText != 0)
                 strcat(buffer, "|");
 
             strcat(buffer, ts->szBonusText[iText]);
         }
 
-        if(ts->iNumBonuses == 0) {
+        if (ts->iNumBonuses == 0) {
             strcat(buffer, ",p0");
         } else {
             for (short iBonus = 0; iBonus < ts->iNumBonuses; iBonus++) {
@@ -1287,7 +1287,7 @@ void LoadCurrentMapBackground()
     std::string path = convertPath(filename, gamegraphicspacklist->current_name());
 
     //if the background file doesn't exist, use the classic background
-    if(!File_Exists(path))
+    if (!File_Exists(path))
         path = convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->current_name());
 
     gfx_loadimagenocolorkey(&rm->spr_background, path);
@@ -1348,7 +1348,7 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
     short iSizeShift = 5 - iSize;
     int iTileSize = 1 << iSizeShift;
 
-    if(fDrawPlatform) {
+    if (fDrawPlatform) {
         for (short iPlatformX = 0; iPlatformX < iPlatformWidth; iPlatformX++) {
             for (short iPlatformY = 0; iPlatformY < iPlatformHeight; iPlatformY++) {
                 TilesetTile * tile = &tiles[iPlatformX][iPlatformY];
@@ -1356,7 +1356,7 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
                 int iDstX = 0;
                 int iDstY = 0;
 
-                if(pathtype == 2) {
+                if (pathtype == 2) {
                     iDstX = iStartX + (iPlatformX << iSizeShift) + (short)(fRadiusX * cos(angle)) - (iPlatformWidth << (iSizeShift - 1));
                     iDstY = iStartY + (iPlatformY << iSizeShift) + (short)(fRadiusY * sin(angle)) - (iPlatformHeight << (iSizeShift - 1));
                 } else {
@@ -1365,35 +1365,35 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
                 }
 
                 SDL_Rect bltrect = {iDstX, iDstY, iTileSize, iTileSize};
-                if(tile->iID >= 0) {
+                if (tile->iID >= 0) {
                     SDL_BlitSurface(g_tilesetmanager->GetTileset(tile->iID)->GetSurface(iSize), &g_tilesetmanager->rRects[iSize][tile->iCol][tile->iRow], blitdest, &bltrect);
-                } else if(tile->iID == TILESETANIMATED) {
+                } else if (tile->iID == TILESETANIMATED) {
                     SDL_BlitSurface(rm->spr_tileanimation[iSize].getSurface(), &g_tilesetmanager->rRects[iSize][tile->iCol << 2][tile->iRow], blitdest, &bltrect);
-                } else if(tile->iID == TILESETUNKNOWN) {
+                } else if (tile->iID == TILESETUNKNOWN) {
                     //Draw unknown tile
                     SDL_BlitSurface(rm->spr_unknowntile[iSize].getSurface(), &g_tilesetmanager->rRects[iSize][0][0], blitdest, &bltrect);
                 }
 
                 bool fNeedWrap = false;
-                if(iDstX + iTileSize >= smw->GetScreenWidth(iSize)) {
+                if (iDstX + iTileSize >= smw->GetScreenWidth(iSize)) {
                     iDstX -= smw->GetScreenWidth(iSize);
                     fNeedWrap = true;
-                } else if(iDstX < 0) {
+                } else if (iDstX < 0) {
                     iDstX += smw->GetScreenWidth(iSize);
                     fNeedWrap = true;
                 }
 
-                if(fNeedWrap) {
+                if (fNeedWrap) {
                     bltrect.x = iDstX;
                     bltrect.y = iDstY;
                     bltrect.w = iTileSize;
                     bltrect.h = iTileSize;
 
-                    if(tile->iID >= 0)
+                    if (tile->iID >= 0)
                         SDL_BlitSurface(g_tilesetmanager->GetTileset(tile->iID)->GetSurface(iSize), &g_tilesetmanager->rRects[iSize][tile->iCol][tile->iRow], blitdest, &bltrect);
-                    else if(tile->iID == TILESETANIMATED)
+                    else if (tile->iID == TILESETANIMATED)
                         SDL_BlitSurface(rm->spr_tileanimation[iSize].getSurface(), &g_tilesetmanager->rRects[iSize][tile->iCol << 2][tile->iRow], blitdest, &bltrect);
-                    else if(tile->iID == TILESETUNKNOWN)
+                    else if (tile->iID == TILESETUNKNOWN)
                         SDL_BlitSurface(rm->spr_unknowntile[iSize].getSurface(), &g_tilesetmanager->rRects[iSize][0][0], blitdest, &bltrect);
                 }
             }
@@ -1402,18 +1402,18 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
 
     SDL_Rect rPathSrc = {iPlatformPathDotOffset[iSize], 0, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]}, rPathDst;
 
-    if(pathtype == 0) { //line segment
-        if(fDrawShadow) {
+    if (pathtype == 0) { //line segment
+        if (fDrawShadow) {
             for (short iCol = 0; iCol < iPlatformWidth; iCol++) {
                 for (short iRow = 0; iRow < iPlatformHeight; iRow++) {
-                    if(tiles[iCol][iRow].iID != -2)
+                    if (tiles[iCol][iRow].iID != -2)
                         rm->spr_platformstarttile.draw(iStartX - (iPlatformWidth << (iSizeShift - 1)) + (iCol << iSizeShift), iStartY - (iPlatformHeight << (iSizeShift - 1)) + (iRow << iSizeShift), 0, 0, iTileSize, iTileSize);
                 }
             }
 
             for (short iCol = 0; iCol < iPlatformWidth; iCol++) {
                 for (short iRow = 0; iRow < iPlatformHeight; iRow++) {
-                    if(tiles[iCol][iRow].iID != -2)
+                    if (tiles[iCol][iRow].iID != -2)
                         rm->spr_platformendtile.draw(iEndX - (iPlatformWidth << (iSizeShift - 1)) + (iCol << iSizeShift), iEndY - (iPlatformHeight << (iSizeShift - 1)) + (iRow << iSizeShift), 0, 0, iTileSize, iTileSize);
                 }
             }
@@ -1439,11 +1439,11 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
             dX += dIncrementX;
             dY += dIncrementY;
         }
-    } else if(pathtype == 1) { //continuous straight path
-        if(fDrawShadow) {
+    } else if (pathtype == 1) { //continuous straight path
+        if (fDrawShadow) {
             for (short iCol = 0; iCol < iPlatformWidth; iCol++) {
                 for (short iRow = 0; iRow < iPlatformHeight; iRow++) {
-                    if(tiles[iCol][iRow].iID != -2)
+                    if (tiles[iCol][iRow].iID != -2)
                         rm->spr_platformstarttile.draw(iStartX - (iPlatformWidth << (iSizeShift - 1)) + (iCol << iSizeShift), iStartY - (iPlatformHeight << (iSizeShift - 1)) + (iRow << iSizeShift), 0, 0, iTileSize, iTileSize);
                 }
             }
@@ -1462,23 +1462,23 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
             short iWrapX = (short)dX;
             short iWrapY = (short)dY;
             bool fNeedWrap = false;
-            if(dX + iPlatformPathDotSize[iSize] >= smw->GetScreenWidth(iSize)) {
+            if (dX + iPlatformPathDotSize[iSize] >= smw->GetScreenWidth(iSize)) {
                 iWrapX = (short)(dX - smw->GetScreenWidth(iSize));
                 fNeedWrap = true;
-            } else if(dX < 0.0f) {
+            } else if (dX < 0.0f) {
                 iWrapX = (short)(dX + smw->GetScreenWidth(iSize));
                 fNeedWrap = true;
             }
 
-            if(dY + iPlatformPathDotSize[iSize] >= smw->GetScreenHeight(iSize)) {
+            if (dY + iPlatformPathDotSize[iSize] >= smw->GetScreenHeight(iSize)) {
                 iWrapY = (short)(dY - smw->GetScreenHeight(iSize));
                 fNeedWrap = true;
-            } else if(dY < 0.0f) {
+            } else if (dY < 0.0f) {
                 iWrapY = (short)(dY + smw->GetScreenHeight(iSize));
                 fNeedWrap = true;
             }
 
-            if(fNeedWrap) {
+            if (fNeedWrap) {
                 gfx_setrect(&rPathDst, iWrapX, iWrapY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
                 SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
             }
@@ -1486,15 +1486,15 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
             dX += dIncrementX;
             dY += dIncrementY;
         }
-    } else if(pathtype == 2) { //ellipse
+    } else if (pathtype == 2) { //ellipse
         //Calculate the starting position
-        if(fDrawShadow) {
+        if (fDrawShadow) {
             short iEllipseStartX = (short)(fRadiusX * cos(angle)) - (iPlatformWidth << (iSizeShift - 1)) + iStartX;
             short iEllipseStartY = (short)(fRadiusY * sin(angle)) - (iPlatformHeight << (iSizeShift - 1)) + iStartY;
 
             for (short iCol = 0; iCol < iPlatformWidth; iCol++) {
                 for (short iRow = 0; iRow < iPlatformHeight; iRow++) {
-                    if(tiles[iCol][iRow].iID != -2)
+                    if (tiles[iCol][iRow].iID != -2)
                         rm->spr_platformstarttile.draw(iEllipseStartX + (iCol << iSizeShift), iEllipseStartY + (iRow << iSizeShift), 0, 0, iTileSize, iTileSize);
                 }
             }
@@ -1508,10 +1508,10 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
             gfx_setrect(&rPathDst, iX, iY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
             SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
 
-            if(iX + iPlatformPathDotSize[iSize] >= smw->GetScreenWidth(iSize)) {
+            if (iX + iPlatformPathDotSize[iSize] >= smw->GetScreenWidth(iSize)) {
                 gfx_setrect(&rPathDst, iX - smw->GetScreenWidth(iSize), iY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
                 SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
-            } else if(iX < 0) {
+            } else if (iX < 0) {
                 gfx_setrect(&rPathDst, iX + smw->GetScreenWidth(iSize), iY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
                 SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
             }
@@ -1571,13 +1571,13 @@ void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
 
     gfx_setrect(&rPathDst, hazard->ix << (iSizeShift - 1), hazard->iy << (iSizeShift - 1), iTileSize, iTileSize);
 
-    if(fDrawCenter) {
-        if(hazard->itype <= 1) {
+    if (fDrawCenter) {
+        if (hazard->itype <= 1) {
             SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
         }
     }
 
-    if(hazard->itype == 0) { //fireball string
+    if (hazard->itype == 0) { //fireball string
         short iNumDots = 16;
         float dRadius = (float)((hazard->iparam[0] - 1) * 24) / (float)(1 << iSize) + (iPlatformPathDotSize[iSize] >> 1);
         float dAngle = hazard->dparam[1];
@@ -1597,7 +1597,7 @@ void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
 
             rm->spr_hazard_fireball[iSize].draw(x, y, 0, 0, iFireballHazardSize[iSize], iFireballHazardSize[iSize]);
         }
-    } else if(hazard->itype == 1) { //rotodisc
+    } else if (hazard->itype == 1) { //rotodisc
         short iNumDots = 16;
         float dRadius = (hazard->dparam[2] + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1)) / (float)(1 << iSize);
         float dAngle = hazard->dparam[1];
@@ -1622,11 +1622,11 @@ void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
 
             dAngle += dSector;
         }
-    } else if(hazard->itype == 2) { //bullet bill
+    } else if (hazard->itype == 2) { //bullet bill
         rm->spr_hazard_bulletbill[iSize].draw(rPathDst.x, rPathDst.y, 0, hazard->dparam[0] < 0.0f ? 0 : iTileSize, iTileSize, iTileSize);
 
         short iBulletPathX = rPathDst.x - iPlatformPathDotSize[iSize];
-        if(hazard->dparam[0] > 0.0f)
+        if (hazard->dparam[0] > 0.0f)
             iBulletPathX = rPathDst.x + iTileSize;
 
         short iBulletPathSpacing = (short)(hazard->dparam[0] * dBulletBillFrequency[iSize]);
@@ -1636,31 +1636,31 @@ void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
 
             iBulletPathX += hazard->iparam[0] < 0.0f ? -iBulletPathSpacing : iBulletPathSpacing;
         }
-    } else if(hazard->itype == 3) { //flame cannon
+    } else if (hazard->itype == 3) { //flame cannon
         SDL_Rect * rect = &g_rFlameRects[hazard->iparam[1]][2];
 
         short iOffsetX = 0;
         short iOffsetY = 0;
 
-        if(hazard->iparam[1] == 1) {
+        if (hazard->iparam[1] == 1) {
             iOffsetX = -(iTileSize << 1);
-        } else if(hazard->iparam[1] == 2) {
+        } else if (hazard->iparam[1] == 2) {
             iOffsetY = -(iTileSize << 1);
         }
 
         rm->spr_hazard_flame[iSize].draw(rPathDst.x + iOffsetX, rPathDst.y + iOffsetY, rect->x >> iSize, rect->y >> iSize, rect->w >> iSize, rect->h >> iSize);
-    } else if(hazard->itype >= 4 && hazard->itype <= 7) { //pirhana plants
+    } else if (hazard->itype >= 4 && hazard->itype <= 7) { //pirhana plants
         SDL_Rect * rect = &g_rPirhanaRects[hazard->itype - 4][hazard->iparam[1]][0];
         short iOffsetX = 0;
         short iOffsetY = 0;
 
-        if(hazard->iparam[1] == 0) {
-            if(hazard->itype == 6)
+        if (hazard->iparam[1] == 0) {
+            if (hazard->itype == 6)
                 iOffsetY = -iTileSize;
             else
                 iOffsetY = -(iTileSize >> 1);
-        } else if(hazard->iparam[1] == 2) {
-            if(hazard->itype == 6)
+        } else if (hazard->iparam[1] == 2) {
+            if (hazard->itype == 6)
                 iOffsetX = -iTileSize;
             else
                 iOffsetX = -(iTileSize >> 1);
@@ -1702,43 +1702,43 @@ short iCountDownAnnounce[28] = {-1, -1, -1, 12, -1, -1, -1, -1, -1, -1, 13, -1, 
 
 TileType GetIncrementedTileType(TileType type)
 {
-    if(type == tile_nonsolid)
+    if (type == tile_nonsolid)
         return tile_solid;
-    else if(type == tile_solid)
+    else if (type == tile_solid)
         return tile_solid_on_top;
-    else if(type == tile_solid_on_top)
+    else if (type == tile_solid_on_top)
         return tile_ice;
-    else if(type == tile_ice)
+    else if (type == tile_ice)
         return tile_death;
-    else if(type == tile_death)
+    else if (type == tile_death)
         return tile_death_on_top;
-    else if(type == tile_death_on_top)
+    else if (type == tile_death_on_top)
         return tile_death_on_bottom;
-    else if(type == tile_death_on_bottom)
+    else if (type == tile_death_on_bottom)
         return tile_death_on_left;
-    else if(type == tile_death_on_left)
+    else if (type == tile_death_on_left)
         return tile_death_on_right;
-    else if(type == tile_death_on_right)
+    else if (type == tile_death_on_right)
         return tile_ice_on_top;
-    else if(type == tile_ice_on_top)
+    else if (type == tile_ice_on_top)
         return tile_ice_death_on_bottom;
-    else if(type == tile_ice_death_on_bottom)
+    else if (type == tile_ice_death_on_bottom)
         return tile_ice_death_on_left;
-    else if(type == tile_ice_death_on_left)
+    else if (type == tile_ice_death_on_left)
         return tile_ice_death_on_right;
-    else if(type == tile_ice_death_on_right)
+    else if (type == tile_ice_death_on_right)
         return tile_super_death;
-    else if(type == tile_super_death)
+    else if (type == tile_super_death)
         return tile_super_death_top;
-    else if(type == tile_super_death_top)
+    else if (type == tile_super_death_top)
         return tile_super_death_bottom;
-    else if(type == tile_super_death_bottom)
+    else if (type == tile_super_death_bottom)
         return tile_super_death_left;
-    else if(type == tile_super_death_left)
+    else if (type == tile_super_death_left)
         return tile_super_death_right;
-    else if(type == tile_super_death_right)
+    else if (type == tile_super_death_right)
         return tile_player_death;
-    else if(type == tile_player_death)
+    else if (type == tile_player_death)
         return tile_nonsolid;
 
     return tile_nonsolid;
@@ -1894,52 +1894,52 @@ extern IO_MovingObject * createpowerup(short iType, short ix, short iy, bool sid
 
 void CheckSecret(short id)
 {
-    if(id == 0 && !game_values.unlocksecretunlocked[0]) {
+    if (id == 0 && !game_values.unlocksecretunlocked[0]) {
         short iCountTeams = 0;
         for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
-            if(game_values.unlocksecret1part1[iPlayer])
+            if (game_values.unlocksecret1part1[iPlayer])
                 iCountTeams++;
         }
 
-        if(iCountTeams >= 2 && game_values.unlocksecret1part2 >= 8) {
+        if (iCountTeams >= 2 && game_values.unlocksecret1part2 >= 8) {
             game_values.unlocksecretunlocked[0] = true;
             ifSoundOnPlay(sfx_transform);
 
             IO_MovingObject * object = createpowerup(SECRET1_POWERUP, RNGMAX(smw->ScreenWidth), RNGMAX(smw->ScreenHeight), true, false);
 
-            if(object)
+            if (object)
                 eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->ix - 8, object->iy - 8, 4, 5));
         }
-    } else if(id == 1 && !game_values.unlocksecretunlocked[1]) {
-        if(game_values.unlocksecret2part1 && game_values.unlocksecret2part2 >= 3) {
+    } else if (id == 1 && !game_values.unlocksecretunlocked[1]) {
+        if (game_values.unlocksecret2part1 && game_values.unlocksecret2part2 >= 3) {
             game_values.unlocksecretunlocked[1] = true;
             ifSoundOnPlay(sfx_transform);
 
             IO_MovingObject * object = createpowerup(SECRET2_POWERUP, RNGMAX(smw->ScreenWidth), RNGMAX(smw->ScreenHeight), true, false);
 
-            if(object)
+            if (object)
                 eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->ix - 8, object->iy - 8, 4, 5));
         }
-    } else if(id == 2 && !game_values.unlocksecretunlocked[2]) {
+    } else if (id == 2 && !game_values.unlocksecretunlocked[2]) {
         for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
             //number of songs on thriller + number of released albums (figure it out :))
-            if(game_values.unlocksecret3part1[iPlayer] >= 9 && game_values.unlocksecret3part2[iPlayer] >= 13) {
+            if (game_values.unlocksecret3part1[iPlayer] >= 9 && game_values.unlocksecret3part2[iPlayer] >= 13) {
                 game_values.unlocksecretunlocked[2] = true;
                 ifSoundOnPlay(sfx_transform);
 
                 IO_MovingObject * object = createpowerup(SECRET3_POWERUP, RNGMAX(smw->ScreenWidth), RNGMAX(smw->ScreenHeight), true, false);
 
-                if(object)
+                if (object)
                     eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->ix - 8, object->iy - 8, 4, 5));
             }
         }
-    } else if(id == 3 && !game_values.unlocksecretunlocked[3]) {
+    } else if (id == 3 && !game_values.unlocksecretunlocked[3]) {
         game_values.unlocksecretunlocked[3] = true;
         ifSoundOnPlay(sfx_transform);
 
         IO_MovingObject * object = createpowerup(SECRET4_POWERUP, RNGMAX(smw->ScreenWidth), RNGMAX(smw->ScreenHeight), true, false);
 
-        if(object)
+        if (object)
             eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->ix - 8, object->iy - 8, 4, 5));
     }
 }
@@ -1949,11 +1949,11 @@ void CGameConfig::ReadBinaryConfig() {
     //Read saved settings from disk
     FILE * fp = OpenFile("options.bin", "rb");
 
-    if(fp) {
+    if (fp) {
         int version[4];
         fread(version, sizeof(int), 4, fp);
 
-        if(VersionIsEqual(g_iVersion, version[0], version[1], version[2], version[3])) {
+        if (VersionIsEqual(g_iVersion, version[0], version[1], version[2], version[3])) {
 #ifdef _XBOX
             fread(&flickerfilter, sizeof(short), 1, fp);
             fread(&hardwarefilter, sizeof(short), 1, fp);
@@ -2045,7 +2045,7 @@ void CGameConfig::ReadBinaryConfig() {
 #ifdef _XBOX
                 playerInput.inputControls[iPlayer] = &inputConfiguration[iPlayer][1]; //Always use gamepads as input devices on xbox
 #else
-                if(iDevice >= joystickcount)
+                if (iDevice >= joystickcount)
                     iDevice = DEVICE_KEYBOARD;
 
                 playerInput.inputControls[iPlayer] = &inputConfiguration[iPlayer][iDevice == DEVICE_KEYBOARD ? 0 : 1];
@@ -2069,7 +2069,7 @@ void CGameConfig::ReadBinaryConfig() {
 
             //Load skin/team settings
             for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
-                if(skinids[iPlayer] >= skinlist->GetCount() || skinids[iPlayer] < 0)
+                if (skinids[iPlayer] >= skinlist->GetCount() || skinids[iPlayer] < 0)
                     skinids[iPlayer] = 0;
             }
 

@@ -1255,7 +1255,7 @@ class MO_WalkingEnemy : public IO_MovingObject
 		virtual void ShatterDie();
 		virtual void Die() {}
     virtual void DieAndDropShell(bool fBounce, bool fFlip) {
-        if(frozen) {
+        if (frozen) {
             ShatterDie();
             return;
         }

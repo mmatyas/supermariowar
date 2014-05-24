@@ -69,7 +69,7 @@ void MenuState::WriteGameOptions()
 {
     FILE * fp = OpenFile("options.bin", "wb");
 
-    if(fp != NULL) {
+    if (fp != NULL) {
         fwrite(g_iVersion, sizeof(int), 4, fp);
 
 #ifdef _XBOX
@@ -548,7 +548,7 @@ void MenuState::CreateMenu()
 
     miSoundOptionsMenuButton = new MI_Button((game_values.soundcapable ? &rm->spr_selectfield : &rm->spr_selectfielddisabled), 120, 360, "Music & Sound", 400, 1);
 
-    if(game_values.soundcapable)
+    if (game_values.soundcapable)
         miSoundOptionsMenuButton->SetCode(MENU_CODE_TO_SOUND_OPTIONS_MENU);
 
     miGenerateMapThumbsButton = new MI_Button(&rm->spr_selectfield, 120, 400, "Refresh Maps", 400, 1);
@@ -2085,8 +2085,8 @@ void MenuState::onEnterState()
         netplay.gameRunning = false;
     }
 
-    if(game_values.matchtype == MATCH_TYPE_WORLD) {
-        if(game_values.gamemode->winningteam > -1 && game_values.tournamentwinner == -1) { //Stage is completed
+    if (game_values.matchtype == MATCH_TYPE_WORLD) {
+        if (game_values.gamemode->winningteam > -1 && game_values.tournamentwinner == -1) { //Stage is completed
             miWorld->SetControllingTeam(game_values.gamemode->winningteam);
             miWorld->SetCurrentStageToCompleted(game_values.gamemode->winningteam);
 
@@ -2098,15 +2098,15 @@ void MenuState::onEnterState()
             mWorldMenu.RestoreCurrent();
 
             //Clear out the stored powerups after a game that had a winner
-            if(!game_values.worldskipscoreboard) {
+            if (!game_values.worldskipscoreboard) {
                 //Only clear out the stored powerup if we were allowed to use it in the game
-                if(game_values.gamemode->HasStoredPowerups()) {
+                if (game_values.gamemode->HasStoredPowerups()) {
                     for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++)
                         game_values.storedpowerups[iPlayer] = -1;
                 }
             }
         }
-        /*else if(game_values.tournamentwinner > -1) //World is completed
+        /*else if (game_values.tournamentwinner > -1) //World is completed
         {
             miBonusWheel->Reset(true);
             mCurrentMenu = &mBonusWheelMenu;
@@ -2115,7 +2115,7 @@ void MenuState::onEnterState()
         UpdateScoreBoard();
 
         //If we're suposed to skip the scoreboard, then reset back to the world map
-        if(game_values.worldskipscoreboard) {
+        if (game_values.worldskipscoreboard) {
             mCurrentMenu = &mWorldMenu;
             mCurrentMenu->ResetMenu();
 
@@ -2123,14 +2123,14 @@ void MenuState::onEnterState()
         } else {
             miTournamentScoreboard->RefreshWorldScores(game_values.gamemode->winningteam);
         }
-    } else if(game_values.matchtype == MATCH_TYPE_TOUR) {
+    } else if (game_values.matchtype == MATCH_TYPE_TOUR) {
         miTournamentScoreboard->RefreshTourScores();
 
-        if(game_values.tourstopcurrent < game_values.tourstoptotal)
+        if (game_values.tourstopcurrent < game_values.tourstoptotal)
             miTourStop->Refresh(game_values.tourstopcurrent);
-    } else if(game_values.matchtype == MATCH_TYPE_TOURNAMENT) {
+    } else if (game_values.matchtype == MATCH_TYPE_TOURNAMENT) {
         miTournamentScoreboard->StopSwirl();
-        if(game_values.gamemode->winningteam > -1) {
+        if (game_values.gamemode->winningteam > -1) {
             miTournamentScoreboard->RefreshTournamentScores(game_values.gamemode->winningteam);
 
             //Set the next controlling team
@@ -2145,9 +2145,9 @@ void MenuState::onEnterState()
                 short iInPlace[4];
                 short iLowestPlace = 0;
                 for (short iScore = 0; iScore < score_cnt; iScore++) {
-                    if(score[iScore]->place == iLowestPlace) {
+                    if (score[iScore]->place == iLowestPlace) {
                         iInPlace[iNumInPlace++] = iScore;
-                    } else if(score[iScore]->place > iLowestPlace) {
+                    } else if (score[iScore]->place > iLowestPlace) {
                         iNumInPlace = 1;
                         iInPlace[0] = iScore;
                         iLowestPlace = score[iScore]->place;
@@ -2163,9 +2163,9 @@ void MenuState::onEnterState()
                 short iInPlace[4];
                 short iMostWins = 0;
                 for (short iTeam = 0; iTeam < score_cnt; iTeam++) {
-                    if(game_values.tournament_scores[iTeam].wins == iMostWins) {
+                    if (game_values.tournament_scores[iTeam].wins == iMostWins) {
                         iInPlace[iNumInPlace++] = iTeam;
-                    } else if(game_values.tournament_scores[iTeam].wins > iMostWins) {
+                    } else if (game_values.tournament_scores[iTeam].wins > iMostWins) {
                         iNumInPlace = 1;
                         iInPlace[0] = iTeam;
                         iMostWins = game_values.tournament_scores[iTeam].wins;
@@ -2182,9 +2182,9 @@ void MenuState::onEnterState()
                 short iLeastWins = 20; //Most possible wins are 10
 
                 for (short iTeam = 0; iTeam < score_cnt; iTeam++) {
-                    if(game_values.tournament_scores[iTeam].wins == iLeastWins) {
+                    if (game_values.tournament_scores[iTeam].wins == iLeastWins) {
                         iInPlace[iNumInPlace++] = iTeam;
-                    } else if(game_values.tournament_scores[iTeam].wins < iLeastWins) {
+                    } else if (game_values.tournament_scores[iTeam].wins < iLeastWins) {
                         iNumInPlace = 1;
                         iInPlace[0] = iTeam;
                         iLeastWins = game_values.tournament_scores[iTeam].wins;
@@ -2206,14 +2206,14 @@ void MenuState::onEnterState()
                 short iWinner = 0;
 
                 for (short iTeam = 0; iTeam < score_cnt; iTeam++) {
-                    if(score[iTeam]->place == 0) {
+                    if (score[iTeam]->place == 0) {
                         iWinner = iTeam;
                         break;
                     }
                 }
 
                 for (short iTeam = 0; iTeam < score_cnt; iTeam++) {
-                    if(iTeam == iWinner)
+                    if (iTeam == iWinner)
                         continue;
 
                     iInPlace[iNumInPlace++] = iTeam;
@@ -2226,7 +2226,7 @@ void MenuState::onEnterState()
             case 7: { //Round Robin
                 game_values.tournamentcontrolteam = game_values.tournamentnextcontrol;
 
-                if(++game_values.tournamentnextcontrol >= score_cnt)
+                if (++game_values.tournamentnextcontrol >= score_cnt)
                     game_values.tournamentnextcontrol = 0;
 
                 break;
@@ -2245,22 +2245,22 @@ void MenuState::onEnterState()
 
     //Keep track if we entered the menu loop as part of a tournament, if we exit the tournament
     //we need to reset the menu music back to normal
-    if(game_values.matchtype != MATCH_TYPE_SINGLE_GAME && game_values.matchtype != MATCH_TYPE_QUICK_GAME && game_values.matchtype != MATCH_TYPE_MINIGAME && game_values.matchtype != MATCH_TYPE_NET_GAME)
+    if (game_values.matchtype != MATCH_TYPE_SINGLE_GAME && game_values.matchtype != MATCH_TYPE_QUICK_GAME && game_values.matchtype != MATCH_TYPE_MINIGAME && game_values.matchtype != MATCH_TYPE_NET_GAME)
         fNeedMenuMusicReset = true;
 
-    if(game_values.music) {
-        if(game_values.tournamentwinner < 0) {
-            if(game_values.matchtype == MATCH_TYPE_SINGLE_GAME || game_values.matchtype == MATCH_TYPE_QUICK_GAME || game_values.matchtype == MATCH_TYPE_MINIGAME || game_values.matchtype == MATCH_TYPE_NET_GAME)
+    if (game_values.music) {
+        if (game_values.tournamentwinner < 0) {
+            if (game_values.matchtype == MATCH_TYPE_SINGLE_GAME || game_values.matchtype == MATCH_TYPE_QUICK_GAME || game_values.matchtype == MATCH_TYPE_MINIGAME || game_values.matchtype == MATCH_TYPE_NET_GAME)
                 backgroundmusic[2].play(false, false);
-            else if(game_values.matchtype == MATCH_TYPE_WORLD)
+            else if (game_values.matchtype == MATCH_TYPE_WORLD)
                 backgroundmusic[5].play(false, false);
             else
                 backgroundmusic[3].play(false, false);
         }
     }
 
-    if(game_values.matchtype != MATCH_TYPE_WORLD && game_values.matchtype != MATCH_TYPE_QUICK_GAME && game_values.matchtype != MATCH_TYPE_NET_GAME) {
-        if(mCurrentMenu == &mGameSettingsMenu || mCurrentMenu == &mTournamentScoreboardMenu)
+    if (game_values.matchtype != MATCH_TYPE_WORLD && game_values.matchtype != MATCH_TYPE_QUICK_GAME && game_values.matchtype != MATCH_TYPE_NET_GAME) {
+        if (mCurrentMenu == &mGameSettingsMenu || mCurrentMenu == &mTournamentScoreboardMenu)
             miMapField->LoadCurrentMap();
     }
 }
@@ -2269,7 +2269,7 @@ void MenuState::update()
 {
     /*
     #ifdef _XBOX
-        if(joystickcount != SDL_NumJoysticks())
+        if (joystickcount != SDL_NumJoysticks())
         reconnectjoysticks();
     #endif
     */
@@ -2292,24 +2292,24 @@ void MenuState::update()
 #endif
 
         case SDL_KEYDOWN: {
-            if(event.key.keysym.sym == SDLK_F1) {
+            if (event.key.keysym.sym == SDLK_F1) {
                 game_values.showfps = !game_values.showfps;
             }
 
 #ifndef _XBOX
 
 #ifdef _DEBUG
-            if(event.key.keysym.sym == SDLK_F2) {
+            if (event.key.keysym.sym == SDLK_F2) {
                 game_values.frameadvance = !game_values.frameadvance;
             }
 #endif
-            if(event.key.keysym.mod & (KMOD_LALT | KMOD_RALT)) {
+            if (event.key.keysym.mod & (KMOD_LALT | KMOD_RALT)) {
                 //ALT + F4 = close window
-                if(event.key.keysym.sym == SDLK_F4) {
+                if (event.key.keysym.sym == SDLK_F4) {
                     Exit();
                     return;
                 } //ALT + Enter = fullscreen/windowed toggle
-                else if(event.key.keysym.sym == SDLK_RETURN) {
+                else if (event.key.keysym.sym == SDLK_RETURN) {
                     game_values.fullscreen = !game_values.fullscreen;
 					gfx_setresolution(smw->ScreenWidth, smw->ScreenHeight, game_values.fullscreen);
                     blitdest = screen;
@@ -2322,10 +2322,10 @@ void MenuState::update()
 #endif
 #ifdef _DEBUG
             //Pressing insert in debug mode turns on automated testing
-            if(event.key.keysym.sym == SDLK_INSERT) {
+            if (event.key.keysym.sym == SDLK_INSERT) {
                 g_fAutoTest = !g_fAutoTest;
 
-                if(g_fAutoTest) {
+                if (g_fAutoTest) {
                     mCurrentMenu = &mMainMenu;
                     mCurrentMenu->ResetMenu();
 
@@ -2333,17 +2333,17 @@ void MenuState::update()
                 }
             }
 
-            if(event.key.keysym.sym == SDLK_HOME) {
+            if (event.key.keysym.sym == SDLK_HOME) {
                 g_fRecordTest = !g_fRecordTest;
 
-                if(g_fRecordTest) {
+                if (g_fRecordTest) {
                     StartRecordScript();
                 } else {
                     SaveScript("Scripts/SavedScript.txt");
                 }
             }
 
-            if(event.key.keysym.sym == SDLK_END) {
+            if (event.key.keysym.sym == SDLK_END) {
                 AddEmtpyLineToScript();
             }
 
@@ -2360,15 +2360,15 @@ void MenuState::update()
     }
 
     //If AI is controlling the tournament menu, select the options
-    if(game_values.matchtype == MATCH_TYPE_TOURNAMENT && iTournamentAITimer > 0 && mCurrentMenu == &mGameSettingsMenu && mCurrentMenu->GetHeadControl() == miSettingsStartButton) {
-        if(--iTournamentAITimer == 0) {
+    if (game_values.matchtype == MATCH_TYPE_TOURNAMENT && iTournamentAITimer > 0 && mCurrentMenu == &mGameSettingsMenu && mCurrentMenu->GetHeadControl() == miSettingsStartButton) {
+        if (--iTournamentAITimer == 0) {
             iTournamentAIStep++;
 
-            if(iTournamentAIStep == 1) {
+            if (iTournamentAIStep == 1) {
                 miMapField->ChooseRandomMap();
 
                 iTournamentAITimer = 60;
-            } else if(iTournamentAIStep == 2) {
+            } else if (iTournamentAIStep == 2) {
                 currentgamemode = RNGMAX( GAMEMODE_LAST);
                 game_values.gamemode = gamemodes[currentgamemode];
 
@@ -2384,7 +2384,7 @@ void MenuState::update()
                 }
 
                 iTournamentAITimer = 60;
-            } else if(iTournamentAIStep == 3) {
+            } else if (iTournamentAIStep == 3) {
                 SModeOption * options = game_values.gamemode->GetOptions();
 
                 //Choose a goal from the lower values for a quicker game
@@ -2396,7 +2396,7 @@ void MenuState::update()
                 modeOptionsMenu.SetRandomGameModeSettings(game_values.gamemode->gamemode);
 
                 iTournamentAITimer = 60;
-            } else if(iTournamentAIStep == 4) {
+            } else if (iTournamentAIStep == 4) {
                 iTournamentAIStep = 0;
                 StartGame();
             }
@@ -2404,8 +2404,8 @@ void MenuState::update()
     }
 
     //Watch for the konami code to unlock the minigames match type
-    if(!game_values.minigameunlocked && mCurrentMenu == &mMatchSelectionMenu) {
-        if(!mCurrentMenu->GetCurrentControl()->IsModifying()) {
+    if (!game_values.minigameunlocked && mCurrentMenu == &mMatchSelectionMenu) {
+        if (!mCurrentMenu->GetCurrentControl()->IsModifying()) {
             int keymask =
                 (game_values.playerInput.outputControls[0].menu_up.fPressed?1:0) |
                 (game_values.playerInput.outputControls[0].menu_down.fPressed?2:0) |
@@ -2446,15 +2446,15 @@ void MenuState::update()
     }
 
 #ifdef _DEBUG
-    if(g_fAutoTest)
+    if (g_fAutoTest)
         GetNextScriptOperation();
 
-    if(g_fRecordTest)
+    if (g_fRecordTest)
         SetNextScriptOperation();
 #endif
 
     bool fGenerateMapThumbs = false;
-    if(GS_MENU == game_values.gamestate) {
+    if (GS_MENU == game_values.gamestate) {
         MenuCodeEnum code = mCurrentMenu->SendInput(&game_values.playerInput);
 
         if (netplay.active) {
@@ -2466,28 +2466,28 @@ void MenuState::update()
             code = MENU_CODE_NET_ROOM_GO;
         }
 
-        if(MENU_CODE_EXIT_APPLICATION == code) {
+        if (MENU_CODE_EXIT_APPLICATION == code) {
             Exit();
             return;
-        } else if(MENU_CODE_TO_MAIN_MENU == code) {
+        } else if (MENU_CODE_TO_MAIN_MENU == code) {
             iDisplayError = DISPLAY_ERROR_NONE;
             iDisplayErrorTimer = 0;
             netplay.client.endSession();
 
             mCurrentMenu = &mMainMenu;
-        } else if(MENU_CODE_BACK_TO_MATCH_SELECTION_MENU == code) {
+        } else if (MENU_CODE_BACK_TO_MATCH_SELECTION_MENU == code) {
             mCurrentMenu = &mMatchSelectionMenu;
             iUnlockMinigameOptionIndex = 0;
-        } else if(MENU_CODE_TO_MATCH_SELECTION_MENU == code) {
+        } else if (MENU_CODE_TO_MATCH_SELECTION_MENU == code) {
             miWorldPreviewDisplay->SetWorld();
 
             mCurrentMenu = &mMatchSelectionMenu;
             mCurrentMenu->ResetMenu();
             iUnlockMinigameOptionIndex = 0;
-        } else if(MENU_CODE_MATCH_SELECTION_START == code || MENU_CODE_QUICK_GAME_START == code) {
+        } else if (MENU_CODE_MATCH_SELECTION_START == code || MENU_CODE_QUICK_GAME_START == code) {
             printf("itt vagyok\n");
 
-            if(MENU_CODE_QUICK_GAME_START == code)
+            if (MENU_CODE_QUICK_GAME_START == code)
                 game_values.matchtype = MATCH_TYPE_QUICK_GAME;
             else
                 game_values.matchtype = miMatchSelectionField->GetShortValue();
@@ -2497,11 +2497,11 @@ void MenuState::update()
             mCurrentMenu->ResetMenu();
             printf("Hello\n");
 
-            if(game_values.matchtype != MATCH_TYPE_TOURNAMENT) {
+            if (game_values.matchtype != MATCH_TYPE_TOURNAMENT) {
                 game_values.tournamentcontrolteam = -1;
                 SetControllingTeamForSettingsMenu(game_values.tournamentcontrolteam, false);
             }
-        } else if(MENU_CODE_MATCH_SELECTION_MATCH_CHANGED == code) {
+        } else if (MENU_CODE_MATCH_SELECTION_MATCH_CHANGED == code) {
             miTournamentField->Show(game_values.matchtype == MATCH_TYPE_TOURNAMENT);
             miTourField->Show(game_values.matchtype == MATCH_TYPE_TOUR);
             miWorldField->Show(game_values.matchtype == MATCH_TYPE_WORLD);
@@ -2510,69 +2510,69 @@ void MenuState::update()
             //miMatchSelectionDisplayImage->Show(game_values.matchtype != MATCH_TYPE_WORLD);
             miWorldPreviewDisplay->Show(game_values.matchtype == MATCH_TYPE_WORLD);
 
-            if(game_values.matchtype == MATCH_TYPE_WORLD)
+            if (game_values.matchtype == MATCH_TYPE_WORLD)
                 miMatchSelectionDisplayImage->SetImage(320, 0, 320, 240);
             else
                 miMatchSelectionDisplayImage->SetImage(0, 240 * game_values.matchtype, 320, 240);
-        } else if(MENU_CODE_WORLD_MAP_CHANGED == code) {
+        } else if (MENU_CODE_WORLD_MAP_CHANGED == code) {
             miWorldPreviewDisplay->SetWorld();
-        } else if(MENU_CODE_TO_OPTIONS_MENU == code) {
+        } else if (MENU_CODE_TO_OPTIONS_MENU == code) {
             mCurrentMenu = &mOptionsMenu;
             mCurrentMenu->ResetMenu();
-        } else if(MENU_CODE_BACK_TO_OPTIONS_MENU == code) {
+        } else if (MENU_CODE_BACK_TO_OPTIONS_MENU == code) {
             mCurrentMenu = &mOptionsMenu;
-        } else if(MENU_CODE_BACK_TO_GRAPHIC_OPTIONS_MENU == code) {
+        } else if (MENU_CODE_BACK_TO_GRAPHIC_OPTIONS_MENU == code) {
             mCurrentMenu = &mGraphicsOptionsMenu;
-        } else if(MENU_CODE_TO_CONTROLS_MENU == code) {
+        } else if (MENU_CODE_TO_CONTROLS_MENU == code) {
             mCurrentMenu = &mPlayerControlsSelectMenu;
             mCurrentMenu->ResetMenu();
-        } else if(MENU_CODE_BACK_TO_CONTROLS_MENU == code) {
+        } else if (MENU_CODE_BACK_TO_CONTROLS_MENU == code) {
             mCurrentMenu = &mPlayerControlsSelectMenu;
-        } else if(MENU_CODE_TO_NET_SERVERS_MENU == code) {
+        } else if (MENU_CODE_TO_NET_SERVERS_MENU == code) {
             mCurrentMenu = &mNetServers;
             mCurrentMenu->ResetMenu();
             netplay.client.startSession();
-        } else if(MENU_CODE_TO_PLAYER_1_CONTROLS == code) {
+        } else if (MENU_CODE_TO_PLAYER_1_CONTROLS == code) {
             miInputContainer->SetPlayer(0);
             mCurrentMenu = &mPlayerControlsMenu;
             mCurrentMenu->ResetMenu();
-        } else if(MENU_CODE_TO_PLAYER_2_CONTROLS == code) {
+        } else if (MENU_CODE_TO_PLAYER_2_CONTROLS == code) {
             miInputContainer->SetPlayer(1);
             mCurrentMenu = &mPlayerControlsMenu;
             mCurrentMenu->ResetMenu();
-        } else if(MENU_CODE_TO_PLAYER_3_CONTROLS == code) {
+        } else if (MENU_CODE_TO_PLAYER_3_CONTROLS == code) {
             miInputContainer->SetPlayer(2);
             mCurrentMenu = &mPlayerControlsMenu;
             mCurrentMenu->ResetMenu();
-        } else if(MENU_CODE_TO_PLAYER_4_CONTROLS == code) {
+        } else if (MENU_CODE_TO_PLAYER_4_CONTROLS == code) {
             miInputContainer->SetPlayer(3);
             mCurrentMenu = &mPlayerControlsMenu;
             mCurrentMenu->ResetMenu();
         }
 #ifdef _XBOX
-        else if(MENU_CODE_TO_SCREEN_SETTINGS == code) {
+        else if (MENU_CODE_TO_SCREEN_SETTINGS == code) {
             mCurrentMenu = &mScreenSettingsMenu;
             mCurrentMenu->ResetMenu();
-        } else if(MENU_CODE_TO_SCREEN_RESIZE == code) {
+        } else if (MENU_CODE_TO_SCREEN_RESIZE == code) {
             mCurrentMenu = &mScreenResizeMenu;
             mCurrentMenu->ResetMenu();
-        } else if(MENU_CODE_SCREEN_FILTER_CHANGED == code) {
+        } else if (MENU_CODE_SCREEN_FILTER_CHANGED == code) {
             SDL_SetHardwareFilter(game_values.hardwarefilter);
             //Forces HW render so filter is applied
             SDL_XBOX_SetScreenPosition(game_values.screenResizeX, game_values.screenResizeY);
-        } else if(MENU_CODE_SCREEN_SETTINGS_CHANGED == code) {
+        } else if (MENU_CODE_SCREEN_SETTINGS_CHANGED == code) {
             gfx_setresolution(smw->ScreenWidth, smw->ScreenHeight, false);
             blitdest = screen;
-        } else if(MENU_CODE_BACK_TO_SCREEN_SETTINGS_MENU == code) {
+        } else if (MENU_CODE_BACK_TO_SCREEN_SETTINGS_MENU == code) {
             mCurrentMenu = &mScreenSettingsMenu;
         }
 #else
-        else if(MENU_CODE_TOGGLE_FULLSCREEN == code) {
+        else if (MENU_CODE_TOGGLE_FULLSCREEN == code) {
 			gfx_setresolution(smw->ScreenWidth, smw->ScreenHeight, game_values.fullscreen);
             blitdest = screen;
         }
 #endif
-        else if(MENU_CODE_TO_GAME_SETUP_MENU == code) {
+        else if (MENU_CODE_TO_GAME_SETUP_MENU == code) {
             printf("MENU_CODE_TO_GAME_SETUP_MENU\n");
             //Moves teams to the first arrays in the list and counts the number of teams
             score_cnt = miTeamSelect->OrganizeTeams();
@@ -2580,27 +2580,27 @@ void MenuState::update()
             iDisplayErrorTimer = 0;
             bool fErrorReadingTourFile = false;
 
-            if(MATCH_TYPE_MINIGAME == game_values.matchtype) {
+            if (MATCH_TYPE_MINIGAME == game_values.matchtype) {
                 printf(" Match type: Minigame\n");
                 short iMiniGameType = miMinigameField->GetShortValue();
 
-                if(iMiniGameType == 0) { //Pipe minigame
+                if (iMiniGameType == 0) { //Pipe minigame
                     pipegamemode->goal = 50;
                     game_values.gamemode = pipegamemode;
-                } else if(iMiniGameType >= 1 && iMiniGameType <= 3) { //3 types of boss minigames
+                } else if (iMiniGameType >= 1 && iMiniGameType <= 3) { //3 types of boss minigames
                     game_values.gamemodemenusettings.boss.bosstype = iMiniGameType - 1;
                     game_values.gamemodemenusettings.boss.difficulty = 2;
                     game_values.gamemodemenusettings.boss.hitpoints = 5;
 
                     bossgamemode->goal = 5;
                     game_values.gamemode = bossgamemode;
-                } else if(iMiniGameType == 4) { //boxes minigame
+                } else if (iMiniGameType == 4) { //boxes minigame
                     boxesgamemode->goal = 10;
                     game_values.gamemode = boxesgamemode;
                 }
 
                 StartGame();
-            } else if(MATCH_TYPE_QUICK_GAME == game_values.matchtype) {
+            } else if (MATCH_TYPE_QUICK_GAME == game_values.matchtype) {
                 printf(" Match type: Quick game\n");
                 short iRandomMode = RNGMAX( GAMEMODE_LAST);
                 game_values.gamemode = gamemodes[iRandomMode];
@@ -2617,21 +2617,21 @@ void MenuState::update()
             } else {
 
                 //Load the tour here if one was selected
-                if(game_values.matchtype == MATCH_TYPE_TOUR) {
+                if (game_values.matchtype == MATCH_TYPE_TOUR) {
                     printf("  Match type: Tour\n");
-                    if(!ReadTourFile()) {
+                    if (!ReadTourFile()) {
                         iDisplayError = DISPLAY_ERROR_READ_TOUR_FILE;
                         iDisplayErrorTimer = 120;
                         fErrorReadingTourFile = true;
                     } else {
                         miTournamentScoreboard->CreateScoreboard(score_cnt, game_values.tourstoptotal, &rm->spr_tour_markers);
                     }
-                } else if(game_values.matchtype == MATCH_TYPE_TOURNAMENT) {
+                } else if (game_values.matchtype == MATCH_TYPE_TOURNAMENT) {
                     printf("  Match type: Tournament\n");
                     //Set who is controlling the tournament menu
-                    if(game_values.tournamentcontrolstyle == 5 || game_values.tournamentcontrolstyle == 6) //Random
+                    if (game_values.tournamentcontrolstyle == 5 || game_values.tournamentcontrolstyle == 6) //Random
                         game_values.tournamentcontrolteam = RNGMAX( score_cnt);
-                    else if(game_values.tournamentcontrolstyle == 7) //Round robin
+                    else if (game_values.tournamentcontrolstyle == 7) //Round robin
                         game_values.tournamentcontrolteam = 0;
                     else //The first game of the tournament is controlled by all players
                         game_values.tournamentcontrolteam = -1;
@@ -2639,9 +2639,9 @@ void MenuState::update()
                     game_values.tournamentnextcontrol = 1;  //if round robin is selected, choose the next team next
 
                     miTournamentScoreboard->CreateScoreboard(score_cnt, game_values.tournamentgames, &rm->menu_mode_large);
-                } else if(game_values.matchtype == MATCH_TYPE_WORLD) {
+                } else if (game_values.matchtype == MATCH_TYPE_WORLD) {
                     printf("  Match type: World\n");
-                    if(!g_worldmap.Load(TILESIZE)) {
+                    if (!g_worldmap.Load(TILESIZE)) {
                         iDisplayError = DISPLAY_ERROR_READ_WORLD_FILE;
                         iDisplayErrorTimer = 120;
                         fErrorReadingTourFile = true;
@@ -2652,9 +2652,9 @@ void MenuState::update()
 
                         //If a player had a stored powerup from another game, add it to their inventory
                         for (short iPlayer = 0; iPlayer < 4; iPlayer++) {
-                            if(game_values.storedpowerups[iPlayer] != -1) {
+                            if (game_values.storedpowerups[iPlayer] != -1) {
                                 short iTeamId = LookupTeamID(iPlayer);
-                                if(game_values.worldpowerupcount[iTeamId] < 32)
+                                if (game_values.worldpowerupcount[iTeamId] < 32)
                                     game_values.worldpowerups[iTeamId][game_values.worldpowerupcount[iTeamId]++] = game_values.storedpowerups[iPlayer];
 
                                 game_values.storedpowerups[iPlayer] = -1;
@@ -2666,7 +2666,7 @@ void MenuState::update()
                     }
                 }
 
-                if(!fErrorReadingTourFile) {
+                if (!fErrorReadingTourFile) {
                     printf("  !fErrorReadingTourFile\n");
                     mTournamentScoreboardMenu.ClearEyeCandy();
 
@@ -2679,7 +2679,7 @@ void MenuState::update()
                         game_values.tournament_scores[k].total = 0;
                     }
 
-                    if(MATCH_TYPE_SINGLE_GAME == game_values.matchtype || MATCH_TYPE_TOURNAMENT == game_values.matchtype || MATCH_TYPE_NET_GAME == game_values.matchtype) {
+                    if (MATCH_TYPE_SINGLE_GAME == game_values.matchtype || MATCH_TYPE_TOURNAMENT == game_values.matchtype || MATCH_TYPE_NET_GAME == game_values.matchtype) {
                         printf("  MATCH_TYPE_SINGLE_GAME || MATCH_TYPE_TOURNAMENT\n");
                         printf("current map: %s\n", szCurrentMapName);
                         maplist->findexact(szCurrentMapName, false);
@@ -2697,12 +2697,12 @@ void MenuState::update()
                         mCurrentMenu->ResetMenu();
 
                         //If it is a tournament, then set the controlling team
-                        if(MATCH_TYPE_TOURNAMENT == game_values.matchtype)
+                        if (MATCH_TYPE_TOURNAMENT == game_values.matchtype)
                             SetControllingTeamForSettingsMenu(game_values.tournamentcontrolteam, true);
-                        } else if(MATCH_TYPE_TOUR == game_values.matchtype) {
+                        } else if (MATCH_TYPE_TOUR == game_values.matchtype) {
                             mCurrentMenu = &mTourStopMenu;
                             mCurrentMenu->ResetMenu();
-                        } else if(MATCH_TYPE_WORLD == game_values.matchtype) {
+                        } else if (MATCH_TYPE_WORLD == game_values.matchtype) {
                             game_values.screenfadespeed = 8;
                             game_values.screenfade = 8;
                             game_values.gamestate = GS_START_WORLD;
@@ -2716,23 +2716,23 @@ void MenuState::update()
                         miGoalField[iGameMode]->HideItem(-1, game_values.matchtype == MATCH_TYPE_TOURNAMENT);
                     }
 
-                    if(game_values.matchtype == MATCH_TYPE_WORLD)
+                    if (game_values.matchtype == MATCH_TYPE_WORLD)
                         miGameSettingsMenuHeaderText->SetText("World Game Menu");
-                    else if(game_values.matchtype == MATCH_TYPE_TOUR)
+                    else if (game_values.matchtype == MATCH_TYPE_TOUR)
                         miGameSettingsMenuHeaderText->SetText("Tour Game Menu");
-                    else if(game_values.matchtype == MATCH_TYPE_TOURNAMENT)
+                    else if (game_values.matchtype == MATCH_TYPE_TOURNAMENT)
                         miGameSettingsMenuHeaderText->SetText("Tournament Game Menu");
                     else
                         miGameSettingsMenuHeaderText->SetText("Single Game Menu");
 
                 }
             }
-        } else if(MENU_CODE_BACK_TO_GAME_SETUP_MENU == code) {
+        } else if (MENU_CODE_BACK_TO_GAME_SETUP_MENU == code) {
             bool fNeedTeamAnnouncement = false;
-            if(game_values.matchtype == MATCH_TYPE_WORLD) {
-                if(game_values.tournamentwinner == -2 || (game_values.tournamentwinner >= 0 && game_values.bonuswheel == 0)) {
+            if (game_values.matchtype == MATCH_TYPE_WORLD) {
+                if (game_values.tournamentwinner == -2 || (game_values.tournamentwinner >= 0 && game_values.bonuswheel == 0)) {
                     ResetTournamentBackToMainMenu();
-                } else if(game_values.tournamentwinner >= 0) {
+                } else if (game_values.tournamentwinner >= 0) {
                     miBonusWheel->Reset(true);
                     mCurrentMenu = &mBonusWheelMenu;
                 } else {
@@ -2742,17 +2742,17 @@ void MenuState::update()
                     fNeedTeamAnnouncement = true;
                 }
             } else {
-                if(game_values.tournamentwinner == -2) { //Tied Tour Result
+                if (game_values.tournamentwinner == -2) { //Tied Tour Result
                     ResetTournamentBackToMainMenu();
-                } else if(game_values.tournamentwinner >= 0) { //Tournament/Tour Won and Bonus Wheel will be spun
-                    if(game_values.bonuswheel == 0 || (game_values.matchtype == MATCH_TYPE_TOUR && !game_values.tourstops[game_values.tourstopcurrent - 1]->iBonusType)) {
+                } else if (game_values.tournamentwinner >= 0) { //Tournament/Tour Won and Bonus Wheel will be spun
+                    if (game_values.bonuswheel == 0 || (game_values.matchtype == MATCH_TYPE_TOUR && !game_values.tourstops[game_values.tourstopcurrent - 1]->iBonusType)) {
                         ResetTournamentBackToMainMenu();
                     } else {
                         miBonusWheel->Reset(true);
                         mCurrentMenu = &mBonusWheelMenu;
                     }
                 } else { //Next Tour/Tourament Game
-                    if(game_values.matchtype == MATCH_TYPE_TOUR) {
+                    if (game_values.matchtype == MATCH_TYPE_TOUR) {
                         mCurrentMenu = &mTourStopMenu;
                     } else {
                         mCurrentMenu = &mGameSettingsMenu;
@@ -2763,22 +2763,22 @@ void MenuState::update()
             mCurrentMenu->ResetMenu();
 
             //Set the controlling team for tournament mode
-            if(MATCH_TYPE_TOURNAMENT == game_values.matchtype && game_values.tournamentwinner == -1)
+            if (MATCH_TYPE_TOURNAMENT == game_values.matchtype && game_values.tournamentwinner == -1)
                 SetControllingTeamForSettingsMenu(game_values.tournamentcontrolteam, true);
 
-            if(fNeedTeamAnnouncement)
+            if (fNeedTeamAnnouncement)
                 miWorld->DisplayTeamControlAnnouncement();
-        } else if(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS == code) {
+        } else if (MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS == code) {
             mCurrentMenu = &mGameSettingsMenu;
-        } else if(MENU_CODE_MODE_CHANGED == code) {
+        } else if (MENU_CODE_MODE_CHANGED == code) {
             game_values.gamemode = gamemodes[miModeField->GetShortValue()];
             miModeSettingsButton->Show(miModeField->GetShortValue() != game_mode_owned);
 
             for (short iMode = 0; iMode < GAMEMODE_LAST; iMode++) {
                 miGoalField[iMode]->Show(miModeField->GetShortValue() == iMode);
             }
-        } else if(MENU_CODE_BACK_TEAM_SELECT_MENU == code) {
-            if(game_values.matchtype == MATCH_TYPE_WORLD) {
+        } else if (MENU_CODE_BACK_TEAM_SELECT_MENU == code) {
+            if (game_values.matchtype == MATCH_TYPE_WORLD) {
                 miWorldExitDialogImage->Show(true);
                 miWorldExitDialogExitTourText->Show(true);
                 miWorldExitDialogYesButton->Show(true);
@@ -2789,7 +2789,7 @@ void MenuState::update()
                 mWorldMenu.SetHeadControl(miWorldExitDialogNoButton);
                 mWorldMenu.SetCancelCode(MENU_CODE_NONE);
                 mWorldMenu.ResetMenu();
-            } else if(game_values.matchtype == MATCH_TYPE_TOUR) {
+            } else if (game_values.matchtype == MATCH_TYPE_TOUR) {
                 miTourStopExitDialogImage->Show(true);
                 miTourStopExitDialogExitTourText->Show(true);
                 miTourStopExitDialogYesButton->Show(true);
@@ -2800,7 +2800,7 @@ void MenuState::update()
                 mTourStopMenu.SetHeadControl(miTourStopExitDialogNoButton);
                 mTourStopMenu.SetCancelCode(MENU_CODE_NONE);
                 mTourStopMenu.ResetMenu();
-            } else if(game_values.matchtype == MATCH_TYPE_TOURNAMENT) {
+            } else if (game_values.matchtype == MATCH_TYPE_TOURNAMENT) {
                 miGameSettingsExitDialogImage->Show(true);
                 miGameSettingsExitDialogTournamentText->Show(true);
                 miGameSettingsExitDialogExitText->Show(true);
@@ -2813,28 +2813,28 @@ void MenuState::update()
                 mGameSettingsMenu.SetCancelCode(MENU_CODE_NONE);
                 mGameSettingsMenu.ResetMenu();
 
-                if(iTournamentAITimer > 0)
+                if (iTournamentAITimer > 0)
                     SetControllingTeamForSettingsMenu(-1, false);
             } else {
                 mCurrentMenu = &mTeamSelectMenu;
                 mCurrentMenu->ResetMenu();
             }
-        } else if(MENU_CODE_SOUND_VOLUME_CHANGED == code) {
+        } else if (MENU_CODE_SOUND_VOLUME_CHANGED == code) {
             game_values.sound = game_values.soundvolume > 0;
             sfx_setsoundvolume(game_values.soundvolume);
             ifSoundOnPlay(sfx_coin);
-        } else if(MENU_CODE_MUSIC_VOLUME_CHANGED == code) {
+        } else if (MENU_CODE_MUSIC_VOLUME_CHANGED == code) {
             sfx_setmusicvolume(game_values.musicvolume);
 
-            if(game_values.musicvolume == 0)
+            if (game_values.musicvolume == 0)
                 backgroundmusic[2].stop();
-            else if(game_values.musicvolume > 0 && !game_values.music)
+            else if (game_values.musicvolume > 0 && !game_values.music)
                 backgroundmusic[2].play(false, false);
 
             game_values.music = game_values.musicvolume > 0;
-        } else if(MENU_CODE_START_GAME == code) {
+        } else if (MENU_CODE_START_GAME == code) {
             StartGame();
-        } else if(MENU_CODE_EXIT_TOURNAMENT_YES == code || MENU_CODE_EXIT_TOURNAMENT_NO == code) {
+        } else if (MENU_CODE_EXIT_TOURNAMENT_YES == code || MENU_CODE_EXIT_TOURNAMENT_NO == code) {
             miGameSettingsExitDialogImage->Show(false);
             miGameSettingsExitDialogTournamentText->Show(false);
             miGameSettingsExitDialogExitText->Show(false);
@@ -2846,11 +2846,11 @@ void MenuState::update()
 
             mGameSettingsMenu.RestoreCurrent();
 
-            if(MENU_CODE_EXIT_TOURNAMENT_YES == code)
+            if (MENU_CODE_EXIT_TOURNAMENT_YES == code)
                 ResetTournamentBackToMainMenu();
             else
                 SetControllingTeamForSettingsMenu(game_values.tournamentcontrolteam, false);
-        } else if(MENU_CODE_EXIT_TOUR_YES == code || MENU_CODE_EXIT_TOUR_NO == code) {
+        } else if (MENU_CODE_EXIT_TOUR_YES == code || MENU_CODE_EXIT_TOUR_NO == code) {
             miTourStopExitDialogImage->Show(false);
             miTourStopExitDialogExitTourText->Show(false);
             miTourStopExitDialogYesButton->Show(false);
@@ -2861,9 +2861,9 @@ void MenuState::update()
 
             mTourStopMenu.RestoreCurrent();
 
-            if(MENU_CODE_EXIT_TOUR_YES == code)
+            if (MENU_CODE_EXIT_TOUR_YES == code)
                 ResetTournamentBackToMainMenu();
-        } else if(MENU_CODE_EXIT_WORLD_YES == code || MENU_CODE_EXIT_WORLD_NO == code) {
+        } else if (MENU_CODE_EXIT_WORLD_YES == code || MENU_CODE_EXIT_WORLD_NO == code) {
             miWorldExitDialogImage->Show(false);
             miWorldExitDialogExitTourText->Show(false);
             miWorldExitDialogYesButton->Show(false);
@@ -2874,7 +2874,7 @@ void MenuState::update()
 
             mWorldMenu.RestoreCurrent();
 
-            if(MENU_CODE_EXIT_WORLD_YES == code) {
+            if (MENU_CODE_EXIT_WORLD_YES == code) {
                 //Clear out any stored items a player might have
                 for (short iPlayer = 0; iPlayer < 4; iPlayer++)
                     game_values.storedpowerups[iPlayer] = -1;
@@ -2882,18 +2882,18 @@ void MenuState::update()
                 ResetTournamentBackToMainMenu();
                 miWorldStop->Show(false);
             }
-        } else if(MENU_CODE_BONUS_DONE == code) {
-            if(miBonusWheel->GetPowerupSelectionDone()) {
-                if(game_values.matchtype == MATCH_TYPE_WORLD) {
-                    if(game_values.tournamentwinner == -1)
+        } else if (MENU_CODE_BONUS_DONE == code) {
+            if (miBonusWheel->GetPowerupSelectionDone()) {
+                if (game_values.matchtype == MATCH_TYPE_WORLD) {
+                    if (game_values.tournamentwinner == -1)
                         mCurrentMenu = &mTournamentScoreboardMenu;
                     else
                         ResetTournamentBackToMainMenu();
                 } else {
-                    if((game_values.matchtype == MATCH_TYPE_TOUR || game_values.matchtype == MATCH_TYPE_TOURNAMENT) && game_values.tournamentwinner == -1 &&
+                    if ((game_values.matchtype == MATCH_TYPE_TOUR || game_values.matchtype == MATCH_TYPE_TOURNAMENT) && game_values.tournamentwinner == -1 &&
                             ((game_values.matchtype != MATCH_TYPE_TOUR && game_values.bonuswheel == 2) || (game_values.matchtype == MATCH_TYPE_TOUR && game_values.tourstops[game_values.tourstopcurrent - 1]->iBonusType))) {
                         mCurrentMenu = &mTournamentScoreboardMenu;
-                    } else if(game_values.matchtype == MATCH_TYPE_SINGLE_GAME) {
+                    } else if (game_values.matchtype == MATCH_TYPE_SINGLE_GAME) {
                         mCurrentMenu = &mGameSettingsMenu;
                         mCurrentMenu->ResetMenu();
                         miMapField->LoadCurrentMap();
@@ -2931,7 +2931,7 @@ void MenuState::update()
             mCurrentMenu->ResetMenu();
         } else if (MENU_CODE_TO_MODE_SETTINGS_MENU == code) {
             for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
-                if(miGoalField[iGameMode]->IsVisible()) {
+                if (miGoalField[iGameMode]->IsVisible()) {
                     mCurrentMenu = modeOptionsMenu.GetOptionsMenu(iGameMode);
                     mCurrentMenu->ResetMenu();
                     break;
@@ -2953,7 +2953,7 @@ void MenuState::update()
         } else if (MENU_CODE_SOUND_PACK_CHANGED == code) {
             LoadGameSounds();
 
-            if(!game_values.soundcapable) {
+            if (!game_values.soundcapable) {
                 game_values.sound = false;
                 game_values.music = false;
                 game_values.soundvolume = 0;
@@ -2976,27 +2976,27 @@ void MenuState::update()
             mWorldMenu.SetCancelCode(MENU_CODE_BACK_TEAM_SELECT_MENU);
 
             mWorldMenu.RestoreCurrent();
-        } else if(MENU_CODE_WORLD_MUSIC_CHANGED == code) {
+        } else if (MENU_CODE_WORLD_MUSIC_CHANGED == code) {
             worldmusiclist->SetCurrent(miWorldMusicField->GetShortValue());
         } else if (MENU_CODE_TOUR_STOP_CONTINUE == code || MENU_CODE_TOUR_STOP_CONTINUE_FORCED == code) {
             //If this tour stop is forced, we need to load the map first
-            if(MENU_CODE_TOUR_STOP_CONTINUE_FORCED == code)
+            if (MENU_CODE_TOUR_STOP_CONTINUE_FORCED == code)
                 miWorldStop->Refresh(game_values.tourstopcurrent);
 
             miWorld->ClearCloud();
 
             //Tour bonus house
-            if(game_values.matchtype == MATCH_TYPE_WORLD && game_values.tourstops[game_values.tourstopcurrent]->iStageType == 1) {
+            if (game_values.matchtype == MATCH_TYPE_WORLD && game_values.tourstops[game_values.tourstopcurrent]->iStageType == 1) {
                 bonushousemode->goal = 0;
                 game_values.gamemode = bonushousemode;
             } else {
                 short iGameMode = game_values.tourstops[game_values.tourstopcurrent]->iMode;
 
-                if(iGameMode == game_mode_pipe_minigame)
+                if (iGameMode == game_mode_pipe_minigame)
                     game_values.gamemode = pipegamemode;
-                else if(iGameMode == game_mode_boss_minigame)
+                else if (iGameMode == game_mode_boss_minigame)
                     game_values.gamemode = bossgamemode;
-                else if(iGameMode == game_mode_boxes_minigame)
+                else if (iGameMode == game_mode_boxes_minigame)
                     game_values.gamemode = boxesgamemode;
                 else
                     game_values.gamemode = gamemodes[iGameMode];
@@ -3008,14 +3008,14 @@ void MenuState::update()
         } else if (MENU_CODE_RESET_STORED_POWERUPS == code) {
             for (short iPlayer = 0; iPlayer < 4; iPlayer++)
                 game_values.storedpowerups[iPlayer] = -1;
-        } else if(MENU_CODE_MAP_CHANGED == code) {
-            if(game_values.matchtype != MATCH_TYPE_TOUR)
+        } else if (MENU_CODE_MAP_CHANGED == code) {
+            if (game_values.matchtype != MATCH_TYPE_TOUR)
                 szCurrentMapName = miMapField->GetMapName();
-        } else if(MENU_CODE_MAP_FILTER_EXIT == code) {
+        } else if (MENU_CODE_MAP_FILTER_EXIT == code) {
             maplist->ApplyFilters(game_values.pfFilters);
 
             //If the filtered map list has at least 1 map in it, then allow exiting the filter menu
-            if(maplist->MapInFilteredSet()) {
+            if (maplist->MapInFilteredSet()) {
                 miMapField->LoadCurrentMap();
                 szCurrentMapName = miMapField->GetMapName();
 
@@ -3033,30 +3033,30 @@ void MenuState::update()
                 iDisplayError = DISPLAY_ERROR_MAP_FILTER;
                 iDisplayErrorTimer = 120;
             }
-        } else if(MENU_CODE_TO_MAP_FILTERS == code) {
+        } else if (MENU_CODE_TO_MAP_FILTERS == code) {
             miMapFilterScroll->Show(true);
             mGameSettingsMenu.RememberCurrent();
 
             mGameSettingsMenu.SetHeadControl(miMapFilterScroll);
             mGameSettingsMenu.SetCancelCode(MENU_CODE_NONE);
             mGameSettingsMenu.ResetMenu();
-        } else if(MENU_CODE_TO_MAP_FILTER_EDIT == code) {
+        } else if (MENU_CODE_TO_MAP_FILTER_EDIT == code) {
             miMapBrowser->Reset(0);
 
             mCurrentMenu = &mMapFilterEditMenu;
             mCurrentMenu->ResetMenu();
-        } else if(MENU_CODE_MAP_BROWSER_EXIT == code) {
+        } else if (MENU_CODE_MAP_BROWSER_EXIT == code) {
             miMapField->LoadCurrentMap();
             szCurrentMapName = miMapField->GetMapName();
 
             mCurrentMenu = &mGameSettingsMenu;
             //mCurrentMenu->ResetMenu();
-        } else if(MENU_CODE_TO_MAP_BROWSER_THUMBNAILS == code) {
+        } else if (MENU_CODE_TO_MAP_BROWSER_THUMBNAILS == code) {
             miMapBrowser->Reset(1);
 
             mCurrentMenu = &mMapFilterEditMenu;
             mCurrentMenu->ResetMenu();
-        } else if(MENU_CODE_SAVE_ALL_MAP_THUMBNAILS == code) {
+        } else if (MENU_CODE_SAVE_ALL_MAP_THUMBNAILS == code) {
             miGenerateThumbsDialogImage->Show(true);
             miGenerateThumbsDialogAreYouText->Show(true);
             miGenerateThumbsDialogSureText->Show(true);
@@ -3068,7 +3068,7 @@ void MenuState::update()
             mOptionsMenu.SetHeadControl(miGenerateThumbsDialogNoButton);
             mOptionsMenu.SetCancelCode(MENU_CODE_GENERATE_THUMBS_RESET_NO);
             mOptionsMenu.ResetMenu();
-        } else if(MENU_CODE_GENERATE_THUMBS_RESET_YES == code || MENU_CODE_GENERATE_THUMBS_RESET_NO == code) {
+        } else if (MENU_CODE_GENERATE_THUMBS_RESET_YES == code || MENU_CODE_GENERATE_THUMBS_RESET_NO == code) {
             miGenerateThumbsDialogImage->Show(false);
             miGenerateThumbsDialogAreYouText->Show(false);
             miGenerateThumbsDialogSureText->Show(false);
@@ -3080,12 +3080,12 @@ void MenuState::update()
 
             mOptionsMenu.RestoreCurrent();
 
-            if(MENU_CODE_GENERATE_THUMBS_RESET_YES == code) {
+            if (MENU_CODE_GENERATE_THUMBS_RESET_YES == code) {
                 fGenerateMapThumbs = true;
             }
-        } else if(MENU_CODE_HEALTH_MODE_START_LIFE_CHANGED == code) {
+        } else if (MENU_CODE_HEALTH_MODE_START_LIFE_CHANGED == code) {
             modeOptionsMenu.HealthModeStartLifeChanged();
-        } else if(MENU_CODE_HEALTH_MODE_MAX_LIFE_CHANGED == code) {
+        } else if (MENU_CODE_HEALTH_MODE_MAX_LIFE_CHANGED == code) {
             modeOptionsMenu.HealthModeMaxLifeChanged();
         }
 
@@ -3119,7 +3119,7 @@ void MenuState::update()
                     netplay.operationInProgress = false;
             }
 
-            if(MENU_CODE_TO_NET_SERVERLIST == code) {
+            if (MENU_CODE_TO_NET_SERVERLIST == code) {
                 netplay.connectSuccessful = false;
                 miNetServersScroll->Show(true);
                 mNetServers.RememberCurrent();
@@ -3127,7 +3127,7 @@ void MenuState::update()
                 mNetServers.SetHeadControl(miNetServersScroll);
                 mNetServers.SetCancelCode(MENU_CODE_NONE);
                 mNetServers.ResetMenu();
-            } else if(MENU_CODE_NET_SERVERLIST_EXIT == code || MENU_CODE_NET_CONNECT_ABORT == code) {
+            } else if (MENU_CODE_NET_SERVERLIST_EXIT == code || MENU_CODE_NET_CONNECT_ABORT == code) {
                 if (MENU_CODE_NET_SERVERLIST_EXIT == code)
                     netplay.currentMenuChanged = true;
                 else
@@ -3142,7 +3142,7 @@ void MenuState::update()
 
                 mNetServers.RestoreCurrent();
                 iDisplayError = DISPLAY_ERROR_NONE;
-            } else if(MENU_CODE_NET_CONNECT_IN_PROGRESS == code) {
+            } else if (MENU_CODE_NET_CONNECT_IN_PROGRESS == code) {
                 netplay.client.sendConnectRequestToSelectedServer();
                 netplay.operationInProgress = true;
 
@@ -3153,7 +3153,7 @@ void MenuState::update()
                 mNetServers.SetHeadControl(miNetServersConnectingDialogText);
                 mNetServers.SetCancelCode(MENU_CODE_NET_CONNECT_ABORT);
                 mNetServers.ResetMenu();
-            } else if(MENU_CODE_TO_NET_LOBBY_MENU == code) {
+            } else if (MENU_CODE_TO_NET_LOBBY_MENU == code) {
                 // If we are leaving a room
                 if (netplay.currentRoom.roomID) {
                     netplay.client.sendLeaveRoomMessage();
@@ -3323,7 +3323,7 @@ void MenuState::update()
     //--------------- draw everything ----------------------
 
     //Don't draw backdrop for world
-    if(mCurrentMenu != &mWorldMenu)
+    if (mCurrentMenu != &mWorldMenu)
         rm->menu_backdrop.draw(0,0);
     else
         SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
@@ -3331,53 +3331,53 @@ void MenuState::update()
     mCurrentMenu->Update();
     mCurrentMenu->Draw();
 
-    if(iDisplayError > DISPLAY_ERROR_NONE) {
+    if (iDisplayError > DISPLAY_ERROR_NONE) {
         rm->spr_selectfield.draw(70, 400, 0, 0, 484, 32);
         rm->spr_selectfield.draw(554, 400, 496, 0, 16, 32);
 
-        if(iDisplayError == DISPLAY_ERROR_READ_TOUR_FILE)
+        if (iDisplayError == DISPLAY_ERROR_READ_TOUR_FILE)
             rm->menu_font_large.drawCentered(320, 405, "Error Reading Tour File!");
-        if(iDisplayError == DISPLAY_ERROR_READ_WORLD_FILE)
+        if (iDisplayError == DISPLAY_ERROR_READ_WORLD_FILE)
             rm->menu_font_large.drawCentered(320, 405, "Error Reading World File!");
-        else if(iDisplayError == DISPLAY_ERROR_MAP_FILTER)
+        else if (iDisplayError == DISPLAY_ERROR_MAP_FILTER)
             rm->menu_font_large.drawCentered(320, 405, "No Maps Meet All Filter Conditions!");
 
-        if(--iDisplayErrorTimer == 0)
+        if (--iDisplayErrorTimer == 0)
             iDisplayError = DISPLAY_ERROR_NONE;
     }
 
-    if(game_values.screenfadespeed != 0) {
+    if (game_values.screenfadespeed != 0) {
         game_values.screenfade += game_values.screenfadespeed;
 
-        if(game_values.screenfade <= 0) {
+        if (game_values.screenfade <= 0) {
             game_values.screenfadespeed = 0;
             game_values.screenfade = 0;
-        } else if(game_values.screenfade >= 255) {
+        } else if (game_values.screenfade >= 255) {
             game_values.screenfadespeed = 0;
             game_values.screenfade = 255;
         }
     }
 
-    if(game_values.screenfade > 0) {
+    if (game_values.screenfade > 0) {
         rm->menu_shade.setalpha((Uint8)game_values.screenfade);
         rm->menu_shade.draw(0, 0);
     }
 
-    if(game_values.screenfade == 255) {
-        if(GS_START_GAME == game_values.gamestate) {
-            if(game_values.matchtype == MATCH_TYPE_QUICK_GAME)
+    if (game_values.screenfade == 255) {
+        if (GS_START_GAME == game_values.gamestate) {
+            if (game_values.matchtype == MATCH_TYPE_QUICK_GAME)
                 modeOptionsMenu.SetRandomGameModeSettings(game_values.gamemode->gamemode);
-            else if(game_values.matchtype == MATCH_TYPE_NET_GAME)
+            else if (game_values.matchtype == MATCH_TYPE_NET_GAME)
                 // TODO: set from network
                 modeOptionsMenu.SetRandomGameModeSettings(game_values.gamemode->gamemode);
             else
                 SetGameModeSettingsFromMenu();
 
-            if(game_values.matchtype == MATCH_TYPE_WORLD && game_values.tourstops[game_values.tourstopcurrent]->iStageType == 1) {
+            if (game_values.matchtype == MATCH_TYPE_WORLD && game_values.tourstops[game_values.tourstopcurrent]->iStageType == 1) {
                 g_map->loadMap(convertPath("maps/special/two52_special_bonushouse.map"), read_type_full);
                 LoadCurrentMapBackground();
 
-                if(game_values.music) {
+                if (game_values.music) {
                     backgroundmusic[0].load(worldmusiclist->GetMusic(WORLDMUSICBONUS, ""));
                     backgroundmusic[0].play(false, false);
                 }
@@ -3386,43 +3386,43 @@ void MenuState::update()
 
                 bool fMiniGameMapFound = false;
 
-                if(game_values.matchtype == MATCH_TYPE_WORLD) {
-                    if(game_values.gamemode->gamemode == game_mode_pipe_minigame ||
+                if (game_values.matchtype == MATCH_TYPE_WORLD) {
+                    if (game_values.gamemode->gamemode == game_mode_pipe_minigame ||
                             game_values.gamemode->gamemode == game_mode_boss_minigame ||
                             game_values.gamemode->gamemode == game_mode_boxes_minigame) {
                         fMiniGameMapFound = maplist->findexact(game_values.tourstops[game_values.tourstopcurrent]->pszMapFile, true);
 
-                        if(fMiniGameMapFound) {
+                        if (fMiniGameMapFound) {
                             g_map->loadMap(maplist->currentFilename(), read_type_full);
                             sShortMapName = maplist->currentShortmapname();
                         }
                     }
                 }
 
-                if(game_values.gamemode->gamemode == game_mode_pipe_minigame) {
-                    if(!fMiniGameMapFound) {
+                if (game_values.gamemode->gamemode == game_mode_pipe_minigame) {
+                    if (!fMiniGameMapFound) {
                         g_map->loadMap(convertPath("maps/special/two52_special_pipe_minigame.map"), read_type_full);
                         sShortMapName = "minigamepipe";
                     }
-                } else if(game_values.gamemode->gamemode == game_mode_boss_minigame) {
-                    if(!fMiniGameMapFound) {
+                } else if (game_values.gamemode->gamemode == game_mode_boss_minigame) {
+                    if (!fMiniGameMapFound) {
                         short iBossType = game_values.gamemodesettings.boss.bosstype;
                         bossgamemode->SetBossType(iBossType);
-                        if(iBossType == 0)
+                        if (iBossType == 0)
                             g_map->loadMap(convertPath("maps/special/two52_special_hammerboss_minigame.map"), read_type_full);
-                        else if(iBossType == 1)
+                        else if (iBossType == 1)
                             g_map->loadMap(convertPath("maps/special/two52_special_bombboss_minigame.map"), read_type_full);
-                        else if(iBossType == 2)
+                        else if (iBossType == 2)
                             g_map->loadMap(convertPath("maps/special/two52_special_fireboss_minigame.map"), read_type_full);
 
                         sShortMapName = "minigameboss";
                     }
-                } else if(game_values.gamemode->gamemode == game_mode_boxes_minigame) {
-                    if(!fMiniGameMapFound) {
+                } else if (game_values.gamemode->gamemode == game_mode_boxes_minigame) {
+                    if (!fMiniGameMapFound) {
                         g_map->loadMap(convertPath("maps/special/two52_special_boxes_minigame.map"), read_type_full);
                         sShortMapName = "minigameboxes";
                     }
-                } else if(game_values.matchtype == MATCH_TYPE_QUICK_GAME) {
+                } else if (game_values.matchtype == MATCH_TYPE_QUICK_GAME) {
                     //Load a random map for the quick game
                     const char * szMapName = maplist->randomFilename();
                     g_map->loadMap(szMapName, read_type_full);
@@ -3439,7 +3439,7 @@ void MenuState::update()
                 //Allows all players to start the game
                 game_values.singleplayermode = -1;
 
-                if(game_values.music) {
+                if (game_values.music) {
                     musiclist->SetRandomMusic(g_map->musicCategoryID, sShortMapName.c_str(), g_map->szBackgroundFile);
                     backgroundmusic[0].load(musiclist->GetCurrentMusic());
                     backgroundmusic[0].play(game_values.playnextmusic, false);
@@ -3460,7 +3460,7 @@ void MenuState::update()
 
             GameStateManager::instance().changeStateTo(&GameplayState::instance());
             return;
-        } else if(GS_START_WORLD == game_values.gamestate) { //Fade to world match type
+        } else if (GS_START_WORLD == game_values.gamestate) { //Fade to world match type
             game_values.screenfadespeed = -8;
 
             mCurrentMenu = &mWorldMenu;
@@ -3477,7 +3477,7 @@ void MenuState::update()
         }
     }
 
-    if(fGenerateMapThumbs) {
+    if (fGenerateMapThumbs) {
         rm->menu_dialog.draw(160, 176, 0, 0, 160, 64);
 		rm->menu_dialog.draw(smw->ScreenWidth/2, 176, 352, 0, 160, 64);
         rm->menu_dialog.draw(160, 240, 0, 416, 160, 64);
@@ -3488,20 +3488,20 @@ void MenuState::update()
 
 // TODO: FIX
 /*#if	!_DEBUG
-    if(game_values.showfps)
+    if (game_values.showfps)
 #endif
         rm->menu_font_large.drawf(0, smw->ScreenHeight - rm->menu_font_large.getHeight(), "Actual:%.1f/%.1f, Flip:%.1f, Potential:%.1f", realfps, 1000.0f / (float)WAITTIME, flipfps, 1000.0f / (float)ticks);
 */
 
 #ifdef _DEBUG
-    if(g_fAutoTest)
+    if (g_fAutoTest)
         rm->menu_font_small.drawRightJustified(635, 5, "Auto");
 
-    if(g_fRecordTest)
+    if (g_fRecordTest)
         rm->menu_font_small.drawRightJustified(635, 5, "Recording...");
 #endif
 
-    if(fGenerateMapThumbs) {
+    if (fGenerateMapThumbs) {
         fGenerateMapThumbs = false;
         backgroundmusic[2].sfx_pause();
 
@@ -3544,26 +3544,26 @@ bool MenuState::ReadTourFile()
     bool fReadVersion = false;
     int iVersion[4] = {0, 0, 0, 0};
     while (fgets(buffer, 256, fp) && game_values.tourstoptotal < 10) {
-        if(buffer[0] == '#' || buffer[0] == '\n' || buffer[0] == ' ' || buffer[0] == '\t')
+        if (buffer[0] == '#' || buffer[0] == '\n' || buffer[0] == ' ' || buffer[0] == '\t')
             continue;
 
-        if(!fReadVersion) {
+        if (!fReadVersion) {
             fReadVersion = true;
 
             char * psz = strtok(buffer, ".\n");
-            if(psz)
+            if (psz)
                 iVersion[0] = atoi(psz);
 
             psz = strtok(NULL, ".\n");
-            if(psz)
+            if (psz)
                 iVersion[1] = atoi(psz);
 
             psz = strtok(NULL, ".\n");
-            if(psz)
+            if (psz)
                 iVersion[2] = atoi(psz);
 
             psz = strtok(NULL, ".\n");
-            if(psz)
+            if (psz)
                 iVersion[3] = atoi(psz);
 
             continue;
@@ -3575,11 +3575,11 @@ bool MenuState::ReadTourFile()
         game_values.tourstoptotal++;
     }
 
-    if(game_values.tourstoptotal != 0) {
+    if (game_values.tourstoptotal != 0) {
         miTourStop->Refresh(game_values.tourstopcurrent);
 
         //For old tours, turn on the bonus wheel at the end
-        if(iVersion[0] == 1 && iVersion[1] == 7 && iVersion[2] == 0 && iVersion[3] <= 1)
+        if (iVersion[0] == 1 && iVersion[1] == 7 && iVersion[2] == 0 && iVersion[3] <= 1)
             game_values.tourstops[game_values.tourstoptotal - 1]->iBonusType = 1;
     }
 
@@ -3604,8 +3604,8 @@ void MenuState::StartGame()
 
     //Load skins for players
     for (int k = 0; k < 4; k++) {
-        if(game_values.playercontrol[k] > 0) {
-            if(game_values.randomskin[k]) {
+        if (game_values.playercontrol[k] > 0) {
+            if (game_values.randomskin[k]) {
                 do {
                     game_values.skinids[k] = RNGMAX( skinlist->GetCount());
                 } while (!rm->LoadFullSkin(rm->spr_player[k], game_values.skinids[k], game_values.colorids[k]));
@@ -3616,7 +3616,7 @@ void MenuState::StartGame()
     }
 
     //Load announcer sounds if changed
-    if(game_values.loadedannouncer != announcerlist->GetCurrentIndex()) {
+    if (game_values.loadedannouncer != announcerlist->GetCurrentIndex()) {
         game_values.loadedannouncer = (short)announcerlist->GetCurrentIndex();
 
         //Delete the old sounds
@@ -3631,19 +3631,19 @@ void MenuState::StartGame()
 
         while (fgets(szBuffer, 256, announcerfile) && announcerIndex < PANNOUNCER_SOUND_LAST) {
             //Ignore comment lines
-            if(szBuffer[0] == '#' || szBuffer[0] == ' ' || szBuffer[0] == '\t' || szBuffer[0] == '\n' || szBuffer[0] == '\r')
+            if (szBuffer[0] == '#' || szBuffer[0] == ' ' || szBuffer[0] == '\t' || szBuffer[0] == '\n' || szBuffer[0] == '\r')
                 continue;
 
             //Clean off carriage returns
             for (int k = 0; k < (int)strlen(szBuffer); k++) {
-                if(szBuffer[k] == '\r' || szBuffer[k] == '\n') {
+                if (szBuffer[k] == '\r' || szBuffer[k] == '\n') {
                     szBuffer[k] = '\0';
                     break;
                 }
             }
 
             //If it is not "[none]", then add this announcer sound
-            if(strcmp(szBuffer, "[none]"))
+            if (strcmp(szBuffer, "[none]"))
                 sfx_announcer[announcerIndex].init(convertPath(szBuffer));
 
             announcerIndex++;
@@ -3653,7 +3653,7 @@ void MenuState::StartGame()
     }
 
     //Load soundtrack music if changed
-    if(game_values.loadedmusic != musiclist->GetCurrentIndex()) {
+    if (game_values.loadedmusic != musiclist->GetCurrentIndex()) {
         game_values.loadedmusic = (short)musiclist->GetCurrentIndex();
         backgroundmusic[1].load(musiclist->GetMusic(0)); //Stage Clear
         backgroundmusic[3].load(musiclist->GetMusic(2)); //Tournament Menu
@@ -3677,7 +3677,7 @@ void MenuState::SetControllingTeamForSettingsMenu(short iControlTeam, bool fDisp
     miMapFilterScroll->SetControllingTeam(iControlTeam);
     miMapBrowser->SetControllingTeam(iControlTeam);
 
-    if(fDisplayMessage)
+    if (fDisplayMessage)
         DisplayControllingTeamMessage(iControlTeam);
 
     //Scan controlling team members and if they are only bots, then let the cpu control the selection
@@ -3685,16 +3685,16 @@ void MenuState::SetControllingTeamForSettingsMenu(short iControlTeam, bool fDisp
     iTournamentAIStep = 0;
     mGameSettingsMenu.SetAllowExit(false);
 
-    if(iControlTeam >= 0) {
+    if (iControlTeam >= 0) {
         bool fNeedAI = true;
         for (short iPlayer = 0; iPlayer < game_values.teamcounts[iControlTeam]; iPlayer++) {
-            if(game_values.playercontrol[game_values.teamids[iControlTeam][iPlayer]] == 1) {
+            if (game_values.playercontrol[game_values.teamids[iControlTeam][iPlayer]] == 1) {
                 fNeedAI = false;
                 break;
             }
         }
 
-        if(fNeedAI) {
+        if (fNeedAI) {
             iTournamentAITimer = 60;
             mGameSettingsMenu.SetAllowExit(true);
         }
@@ -3705,9 +3705,9 @@ void MenuState::DisplayControllingTeamMessage(short iControlTeam)
 {
     //Display the team that is in control of selecting the next game
     char szMessage[128];
-    if(iControlTeam < 0)
+    if (iControlTeam < 0)
         sprintf(szMessage, "All Teams Are In Control");
-    else if(game_values.teamcounts[iControlTeam] <= 1)
+    else if (game_values.teamcounts[iControlTeam] <= 1)
         sprintf(szMessage, "Player %d Is In Control", game_values.teamids[iControlTeam][0] + 1);
     else
         sprintf(szMessage, "Team %d Is In Control", iControlTeam + 1);
@@ -3726,8 +3726,8 @@ void MenuState::ResetTournamentBackToMainMenu()
     mCurrentMenu = &mMainMenu;
     mCurrentMenu->ResetMenu();
 
-    if(game_values.matchtype != MATCH_TYPE_SINGLE_GAME && game_values.matchtype != MATCH_TYPE_QUICK_GAME && game_values.matchtype != MATCH_TYPE_MINIGAME && game_values.matchtype != MATCH_TYPE_NET_GAME) {
-        if(fNeedMenuMusicReset) {
+    if (game_values.matchtype != MATCH_TYPE_SINGLE_GAME && game_values.matchtype != MATCH_TYPE_QUICK_GAME && game_values.matchtype != MATCH_TYPE_MINIGAME && game_values.matchtype != MATCH_TYPE_NET_GAME) {
+        if (fNeedMenuMusicReset) {
             backgroundmusic[3].stop();
             backgroundmusic[2].play(false, false);
             fNeedMenuMusicReset = false;
@@ -3744,10 +3744,10 @@ void MenuState::LoadScript(const char * szScriptFile)
 
     FILE * fp = fopen(szScriptFile, "r");
 
-    if(fp != NULL) {
+    if (fp != NULL) {
         char buffer[256];
         while (fgets(buffer, 256, fp) != NULL) {
-            if(buffer[0] == '#' || buffer[0] == '\n' || buffer[0] == ' ' || buffer[0] == '\t')
+            if (buffer[0] == '#' || buffer[0] == '\n' || buffer[0] == ' ' || buffer[0] == '\t')
                 continue;
 
             ScriptOperation * op = new ScriptOperation();
@@ -3788,57 +3788,57 @@ void MenuState::ResetScript()
 
 void MenuState::GetNextScriptOperation()
 {
-    if(GS_MENU != game_values.gamestate)
+    if (GS_MENU != game_values.gamestate)
         return;
 
     //static short slowdowntimer = 0;
-    //if(++slowdowntimer < 30)
+    //if (++slowdowntimer < 30)
     //return;
     //slowdowntimer = 0;
 
-    if(iScriptState == 1) {
-        if(mCurrentMenu == &mGameSettingsMenu) {
-            if(!fScriptRunPreGameOptions) {
+    if (iScriptState == 1) {
+        if (mCurrentMenu == &mGameSettingsMenu) {
+            if (!fScriptRunPreGameOptions) {
                 fScriptRunPreGameOptions = true;
                 LoadScript("Scripts/GameModeOptionsOnly.txt");
                 iScriptState = 0;
                 return;
-            } else if(game_values.gamemode->gamemode == game_mode_frag ||
+            } else if (game_values.gamemode->gamemode == game_mode_frag ||
                       game_values.gamemode->gamemode == game_mode_timelimit ||
                       game_values.gamemode->gamemode == game_mode_coins ||
                       game_values.gamemode->gamemode == game_mode_classic ||
                       game_values.gamemode->gamemode == game_mode_eggs ||
                       game_values.gamemode->gamemode == game_mode_owned) {
                 LoadScript("Scripts/NoModeOptions.txt");
-            } else if(game_values.gamemode->gamemode == game_mode_jail) {
+            } else if (game_values.gamemode->gamemode == game_mode_jail) {
                 LoadScript("Scripts/JailModeOptions.txt");
-            } else if(game_values.gamemode->gamemode == game_mode_stomp) {
+            } else if (game_values.gamemode->gamemode == game_mode_stomp) {
                 LoadScript("Scripts/StompModeOptions.txt");
-            } else if(game_values.gamemode->gamemode == game_mode_ctf) {
+            } else if (game_values.gamemode->gamemode == game_mode_ctf) {
                 LoadScript("Scripts/CaptureTheFlagModeOptions.txt");
-            } else if(game_values.gamemode->gamemode == game_mode_chicken) {
+            } else if (game_values.gamemode->gamemode == game_mode_chicken) {
                 LoadScript("Scripts/ChickenModeOptions.txt");
-            } else if(game_values.gamemode->gamemode == game_mode_tag) {
+            } else if (game_values.gamemode->gamemode == game_mode_tag) {
                 LoadScript("Scripts/TagModeOptions.txt");
-            } else if(game_values.gamemode->gamemode == game_mode_star) {
+            } else if (game_values.gamemode->gamemode == game_mode_star) {
                 LoadScript("Scripts/StarModeOptions.txt");
-            } else if(game_values.gamemode->gamemode == game_mode_domination) {
+            } else if (game_values.gamemode->gamemode == game_mode_domination) {
                 LoadScript("Scripts/DominationModeOptions.txt");
-            } else if(game_values.gamemode->gamemode == game_mode_koth) {
+            } else if (game_values.gamemode->gamemode == game_mode_koth) {
                 LoadScript("Scripts/KingOfTheHillModeOptions.txt");
-            } else if(game_values.gamemode->gamemode == game_mode_race) {
+            } else if (game_values.gamemode->gamemode == game_mode_race) {
                 LoadScript("Scripts/RaceModeOptions.txt");
-            } else if(game_values.gamemode->gamemode == game_mode_frenzy) {
+            } else if (game_values.gamemode->gamemode == game_mode_frenzy) {
                 LoadScript("Scripts/FrenzyModeOptions.txt");
-            } else if(game_values.gamemode->gamemode == game_mode_survival) {
+            } else if (game_values.gamemode->gamemode == game_mode_survival) {
                 LoadScript("Scripts/SurvivalModeOptions.txt");
             }
 
             game_values.gamemode->setdebuggoal();
-        } else if(mCurrentMenu == &mTourStopMenu) {
+        } else if (mCurrentMenu == &mTourStopMenu) {
             static int tournext = RNGMAX(200);
 
-            if(--tournext < 0) {
+            if (--tournext < 0) {
                 game_values.playerInput.outputControls[0].menu_select.fPressed = true;
                 tournext = RNGMAX(200);
                 game_values.gamemode->setdebuggoal();
@@ -3848,36 +3848,36 @@ void MenuState::GetNextScriptOperation()
 
         return;
     } else if (iScriptState == 2) {
-        if(mCurrentMenu == &mTournamentScoreboardMenu) {
+        if (mCurrentMenu == &mTournamentScoreboardMenu) {
             static int scoreboardnext = RNGMAX(200);
 
-            if(--scoreboardnext < 0) {
+            if (--scoreboardnext < 0) {
                 game_values.playerInput.outputControls[0].menu_select.fPressed = true;
                 iScriptState = 3;
                 scoreboardnext = RNGMAX(200);
             }
 
             return;
-        } else if(mCurrentMenu == &mGameSettingsMenu) {
+        } else if (mCurrentMenu == &mGameSettingsMenu) {
             iScriptState = 0;
             mCurrentMenu = &mMainMenu;
             mCurrentMenu->ResetMenu();
             LoadScript("Scripts/StartMenuAutomation.txt");
             fScriptRunPreGameOptions = true;
             return;
-        } else if(mCurrentMenu == &mBonusWheelMenu) {
+        } else if (mCurrentMenu == &mBonusWheelMenu) {
             static int bonuswheelnext = RNGMAX(200) + 300;
 
-            if(--bonuswheelnext < 0) {
+            if (--bonuswheelnext < 0) {
                 game_values.playerInput.outputControls[0].menu_select.fPressed = true;
                 //iScriptState = 3;
                 bonuswheelnext = RNGMAX(200) + 300;
             }
             return;
-        } else if(mCurrentMenu == &mTourStopMenu) {
+        } else if (mCurrentMenu == &mTourStopMenu) {
             static int tournext = RNGMAX(200);
 
-            if(--tournext < 0) {
+            if (--tournext < 0) {
                 game_values.playerInput.outputControls[0].menu_select.fPressed = true;
                 tournext = RNGMAX(200);
                 game_values.gamemode->setdebuggoal();
@@ -3887,23 +3887,23 @@ void MenuState::GetNextScriptOperation()
 
         return;
     } else if (iScriptState == 3) {
-        if(mCurrentMenu == &mBonusWheelMenu) {
+        if (mCurrentMenu == &mBonusWheelMenu) {
             game_values.playerInput.outputControls[0].menu_select.fPressed = true;
             return;
-        } else if(mCurrentMenu == &mGameSettingsMenu) {
+        } else if (mCurrentMenu == &mGameSettingsMenu) {
             iScriptState = 0;
             LoadScript("Scripts/GameModeOptionsOnly.txt");
             fScriptRunPreGameOptions = true;
             return;
-        } else if(mCurrentMenu == &mMainMenu) {
+        } else if (mCurrentMenu == &mMainMenu) {
             iScriptState = 0;
             LoadScript("Scripts/StartMenuAutomation.txt");
             fScriptRunPreGameOptions = true;
             return;
-        } else if(mCurrentMenu == &mTourStopMenu) {
+        } else if (mCurrentMenu == &mTourStopMenu) {
             static int tournext = RNGMAX(200);
 
-            if(--tournext < 0) {
+            if (--tournext < 0) {
                 game_values.playerInput.outputControls[0].menu_select.fPressed = true;
                 tournext = RNGMAX(200);
                 game_values.gamemode->setdebuggoal();
@@ -3918,7 +3918,7 @@ void MenuState::GetNextScriptOperation()
     ScriptOperation * op = *current;
 
     while (op->iTimesExecuted >= op->iIterations) {
-        if(++current == operations.end()) {
+        if (++current == operations.end()) {
             iScriptState = 1;
             return;
         }
@@ -3930,18 +3930,18 @@ void MenuState::GetNextScriptOperation()
 
     short iController = op->iController;
 
-    if(iController == 5)
+    if (iController == 5)
         iController = RNGMAX(4);
 
     short iKeys[8];
     short iNumKeys = 0;
 
     for (short i = 0; i < 8; i++) {
-        if(op->fInput[i])
+        if (op->fInput[i])
             iKeys[iNumKeys++] = i;
     }
 
-    if(iController == MAX_PLAYERS) { //All controllers
+    if (iController == MAX_PLAYERS) { //All controllers
         game_values.playerInput.outputControls[0].keys[iKeys[RNGMAX(iNumKeys)]].fPressed = true;
         game_values.playerInput.outputControls[1].keys[iKeys[RNGMAX(iNumKeys)]].fPressed = true;
         game_values.playerInput.outputControls[2].keys[iKeys[RNGMAX(iNumKeys)]].fPressed = true;
@@ -3960,14 +3960,14 @@ void MenuState::SaveScript(const char * szScriptFile)
 {
     FILE * fp = fopen(szScriptFile, "w");
 
-    if(fp) {
+    if (fp) {
         std::vector<ScriptOperation*>::iterator itr = operations.begin();
 
         while (itr != operations.end()) {
             ScriptOperation * op = *itr;
 
             //Add line breaks
-            if(op->iController == -1) {
+            if (op->iController == -1) {
                 fprintf(fp, "\n");
                 itr++;
                 continue;
@@ -4002,7 +4002,7 @@ void MenuState::AddEmtpyLineToScript()
 void MenuState::SetNextScriptOperation()
 {
     for (short i = 0; i < 8; i++) {
-        if(game_values.playerInput.outputControls[0].keys[i].fPressed) {
+        if (game_values.playerInput.outputControls[0].keys[i].fPressed) {
             ScriptOperation * op = new ScriptOperation();
 
             op->iController = 0;

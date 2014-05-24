@@ -200,10 +200,10 @@ extern void SetupDefaultGameModeSettings();
 
 float CapFallingVelocity(float vel)
 {
-    //if(vel < -MAXVELY)
+    //if (vel < -MAXVELY)
     //	return -MAXVELY;
 
-    if(vel > MAXVELY)
+    if (vel > MAXVELY)
         return MAXVELY;
 
     return vel;
@@ -211,10 +211,10 @@ float CapFallingVelocity(float vel)
 
 float CapSideVelocity(float vel)
 {
-    if(vel < -MAXSIDEVELY)
+    if (vel < -MAXSIDEVELY)
         return -MAXSIDEVELY;
 
-    if(vel > MAXSIDEVELY)
+    if (vel > MAXSIDEVELY)
         return MAXSIDEVELY;
 
     return vel;
@@ -238,7 +238,7 @@ extern void HashTableTest();
 /*
 void EnterBossMode(short type)
 {
-    if(game_values.gamestate == GS_GAME && game_values.gamemode->gamemode != game_mode_boss_minigame)
+    if (game_values.gamestate == GS_GAME && game_values.gamemode->gamemode != game_mode_boss_minigame)
     {
         bossgamemode->SetBossType(type);
 
@@ -290,7 +290,7 @@ int main(int argc, char *argv[])
     maplist = new MapList(false);
 
     //TODO: add proper test via size
-    if(maplist->IsEmpty()) {
+    if (maplist->IsEmpty()) {
         throw "Empty map directory!";
     }
 
@@ -576,7 +576,7 @@ int main(int argc, char *argv[])
     SDL_SetHardwareFilter(game_values.hardwarefilter);
     blitdest = screen;
 #else
-    if(game_values.fullscreen) {
+    if (game_values.fullscreen) {
         gfx_setresolution(smw->ScreenWidth, smw->ScreenHeight, true);
         blitdest = screen;
     }
@@ -616,7 +616,7 @@ int main(int argc, char *argv[])
 /*
     bool fLoadOK = LoadAndSplashScreenState();
 
-    if(!fLoadOK) {
+    if (!fLoadOK) {
         printf("\n---------------- EXIT DURING LOADING ----------------\n\n");
         sfx_close();
         gfx_close();

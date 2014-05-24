@@ -22,17 +22,17 @@ EC_StillImage::EC_StillImage(gfxSprite * nspr, short dstx, short dsty, short src
     iw = w;
     ih = h;
 
-    if(iw == 0)
+    if (iw == 0)
         iw = (short)spr->getWidth();
 
-    if(ih == 0)
+    if (ih == 0)
         ih = (short)spr->getHeight();
 
 }
 
 void EC_StillImage::draw()
 {
-    if(!dead)
+    if (!dead)
         spr->draw(ix, iy, iSrcX, iSrcY, iw, ih);
 }
 
@@ -49,10 +49,10 @@ EC_Animated::EC_Animated(gfxSprite * nspr, short dstx, short dsty, short srcx, s
     iAnimationW = w;
     iAnimationH = h;
 
-    if(iAnimationW == 0)
+    if (iAnimationW == 0)
         iAnimationW = (short)spr->getWidth();
 
-    if(iAnimationH == 0)
+    if (iAnimationH == 0)
         iAnimationH = (short)spr->getHeight();
 
     iAnimationSpeed = speed;
@@ -67,11 +67,11 @@ EC_Animated::EC_Animated(gfxSprite * nspr, short dstx, short dsty, short srcx, s
 
 void EC_Animated::animate()
 {
-    if(iAnimationSpeed > 0 && ++iAnimationTimer >= iAnimationSpeed) {
+    if (iAnimationSpeed > 0 && ++iAnimationTimer >= iAnimationSpeed) {
         iAnimationTimer = 0;
         iAnimationFrame += iAnimationW;
 
-        if(iAnimationFrame >= iAnimationFrames) {
+        if (iAnimationFrame >= iAnimationFrames) {
             iAnimationFrame = iAnimationX;
         }
     }
@@ -84,7 +84,7 @@ void EC_Animated::update()
 
 void EC_Animated::draw()
 {
-    if(!dead)
+    if (!dead)
         spr->draw(ix, iy, iAnimationFrame, iAnimationY, iAnimationW, iAnimationH);
 }
 
@@ -100,18 +100,18 @@ EC_OscillatingAnimation::EC_OscillatingAnimation(gfxSprite * nspr, short dstx, s
 
 void EC_OscillatingAnimation::animate()
 {
-    if(iAnimationSpeed > 0 && ++iAnimationTimer >= iAnimationSpeed) {
+    if (iAnimationSpeed > 0 && ++iAnimationTimer >= iAnimationSpeed) {
         iAnimationTimer = 0;
 
-        if(fForward) {
+        if (fForward) {
             iAnimationFrame += iAnimationW;
 
-            if(iAnimationFrame >= iAnimationFrames - iAnimationW)
+            if (iAnimationFrame >= iAnimationFrames - iAnimationW)
                 fForward = false;
         } else {
             iAnimationFrame -= iAnimationW;
 
-            if(iAnimationFrame <= 0)
+            if (iAnimationFrame <= 0)
                 fForward = true;
         }
     }
@@ -132,9 +132,9 @@ void EC_Cloud::update()
 {
     dx += velx;
 
-    if(dx > smw->ScreenWidth)
+    if (dx > smw->ScreenWidth)
         dx -= smw->ScreenWidth;
-    else if(dx < 0.0f)
+    else if (dx < 0.0f)
         dx += smw->ScreenWidth;
 
     ix = (short)dx;
@@ -158,9 +158,9 @@ void EC_Ghost::update()
 
     dx += velx;
 
-    if(dx >= smw->ScreenWidth)
+    if (dx >= smw->ScreenWidth)
         dx -= smw->ScreenWidth;
-    else if(dx < 0.0f)
+    else if (dx < 0.0f)
         dx += smw->ScreenWidth;
 
     ix = (short)dx;
@@ -187,17 +187,17 @@ void EC_Leaf::update()
     dx += velx + game_values.gamewindx;
     dy += vely + game_values.gamewindy;
 
-    if(dx >= smw->ScreenWidth)
+    if (dx >= smw->ScreenWidth)
         dx -= smw->ScreenWidth;
-    else if(dx < 0.0f)
+    else if (dx < 0.0f)
         dx += smw->ScreenWidth;
 
-    if(vely > 0.0f && iy >= smw->ScreenHeight) {
+    if (vely > 0.0f && iy >= smw->ScreenHeight) {
         dy = -16.0f;
         dx = RNGMAX(smw->ScreenWidth);
 
         NextLeaf();
-    } else if(vely < 0.0f && iy < -16) {
+    } else if (vely < 0.0f && iy < -16) {
         dy = smw->ScreenHeight;
         dx = RNGMAX(smw->ScreenWidth);
 
@@ -211,11 +211,11 @@ void EC_Leaf::update()
 void EC_Leaf::NextLeaf()
 {
     short iRand = RNGMAX(20);
-    if(iRand < 12)
+    if (iRand < 12)
         iAnimationY = 0;
-    else if(iRand < 15)
+    else if (iRand < 15)
         iAnimationY = 16;
-    else if(iRand < 18)
+    else if (iRand < 18)
         iAnimationY = 32;
     else
         iAnimationY = 48;
@@ -246,15 +246,15 @@ void EC_Snow::update()
     dx += velx + game_values.gamewindx;
     dy += vely + game_values.gamewindy;
 
-    if(dx >= smw->ScreenWidth)
+    if (dx >= smw->ScreenWidth)
         dx -= smw->ScreenWidth;
-    else if(dx < 0.0f)
+    else if (dx < 0.0f)
         dx += smw->ScreenWidth;
 
-    if(vely > 0.0f && iy >= smw->ScreenHeight) {
+    if (vely > 0.0f && iy >= smw->ScreenHeight) {
         dy = -16.0f;
         dx = RNGMAX(smw->ScreenWidth);
-    } else if(vely < 0.0f && iy < -16) {
+    } else if (vely < 0.0f && iy < -16) {
         dy = smw->ScreenHeight;
         dx = RNGMAX(smw->ScreenWidth);
     }
@@ -281,11 +281,11 @@ void EC_Rain::update()
     dy += vely;
 
     //If rain is off left edge, wrap it
-    if(dx < 0.0f)
+    if (dx < 0.0f)
         dx += smw->ScreenWidth;
 
     //If rain is off bottom edge, change the rain gfx and start it from the top
-    if(iy >= smw->ScreenHeight)
+    if (iy >= smw->ScreenHeight)
         NextRainDrop();
 
     ix = (short)dx;
@@ -323,13 +323,13 @@ void EC_Bubble::update()
     dy += vely;
 
     //If bubble is off the edges, wrap it
-    if(dx < 0.0f)
+    if (dx < 0.0f)
         dx += smw->ScreenWidth;
-    else if(dx + iAnimationW >= smw->ScreenWidth)
+    else if (dx + iAnimationW >= smw->ScreenWidth)
         dx -= smw->ScreenWidth;
 
     //If bubble is off top edge, move it back to the bottom to start again
-    if(iy + iAnimationH < 0)
+    if (iy + iAnimationH < 0)
         NextBubble();
 
     ix = (short)dx;
@@ -359,12 +359,12 @@ EC_Corpse::EC_Corpse(gfxSprite *nspr, float nx, float ny, short iSrcOffsetX) :
     timeleft = CORPSESTAY;
     offsetx = iSrcOffsetX;
 
-    if(ix + PWOFFSET < 0)
+    if (ix + PWOFFSET < 0)
 		tx = (ix + smw->ScreenWidth + PWOFFSET) / TILESIZE;
     else
         tx = (ix + PWOFFSET) / TILESIZE;
 
-    if(ix + PWOFFSET + PW >= smw->ScreenWidth)
+    if (ix + PWOFFSET + PW >= smw->ScreenWidth)
         tx2 = (ix + PWOFFSET + PW - smw->ScreenWidth) / TILESIZE;
     else
         tx2 = (ix + PWOFFSET + PW) / TILESIZE;
@@ -372,20 +372,20 @@ EC_Corpse::EC_Corpse(gfxSprite *nspr, float nx, float ny, short iSrcOffsetX) :
 
 void EC_Corpse::update()
 {
-    if(vely != 0.0f) {
+    if (vely != 0.0f) {
         short nexty = (short)(dy + 32.0f + vely);
 
-        if(nexty >= smw->ScreenHeight) {
+        if (nexty >= smw->ScreenHeight) {
             dead = true;
             return;
         }
 
-        if(nexty >= 0) {
+        if (nexty >= 0) {
             short ty = nexty / TILESIZE;
 
-            if(g_map->map(tx, ty) == tile_solid_on_top || g_map->map(tx2, ty) == tile_solid_on_top) {
+            if (g_map->map(tx, ty) == tile_solid_on_top || g_map->map(tx2, ty) == tile_solid_on_top) {
                 //on ground on tile solid_on_top
-                if((dy + 32.0f - vely) / TILESIZE < ty) {
+                if ((dy + 32.0f - vely) / TILESIZE < ty) {
                     //only if we were above the tile in the previous frame
                     dy = (float) ((ty << 5) - TILESIZE);
                     vely = 0.0f;
@@ -398,7 +398,7 @@ void EC_Corpse::update()
             IO_Block * leftblock = g_map->block(tx, ty);
             IO_Block * rightblock = g_map->block(tx2, ty);
 
-            if((g_map->map(tx, ty) & 0x13) > 0 || (g_map->map(tx2, ty) & 0x13) > 0 ||
+            if ((g_map->map(tx, ty) & 0x13) > 0 || (g_map->map(tx2, ty) & 0x13) > 0 ||
                     (leftblock && !leftblock->isTransparent() && !leftblock->isHidden()) || (rightblock && !rightblock->isTransparent() && !rightblock->isHidden())) {
                 //on ground
                 dy = (float) ((ty << 5)  - TILESIZE);
@@ -413,7 +413,7 @@ void EC_Corpse::update()
         dy += vely;
         vely = CapFallingVelocity(GRAVITATION + vely);
     } else {
-        if(timeleft > 0)
+        if (timeleft > 0)
             timeleft--;
         else
             dead = true;
@@ -439,7 +439,7 @@ EC_GravText::EC_GravText(gfxFont *nfont, short nx, short ny, const char *ntext, 
     text = new char[strlen(ntext)+1];
 
     //Test if we got the memory
-    if(text)
+    if (text)
         strcpy(text, ntext);
     else
         dead = true;
@@ -453,7 +453,7 @@ void EC_GravText::update()
     y += vely;
     vely += GRAVITATION;
 
-	if(y > smw->ScreenHeight)
+	if (y > smw->ScreenHeight)
         dead = true;
 }
 
@@ -462,9 +462,9 @@ void EC_GravText::draw()
 {
     font->draw((short)x, (short)y, text);
 
-    if(x < 0)
+    if (x < 0)
 		font->draw((short)x + smw->ScreenWidth, (short)y, text);
-    else if(x + w > smw->ScreenWidth - 1)
+    else if (x + w > smw->ScreenWidth - 1)
         font->draw((short)x - smw->ScreenWidth, (short)y, text);
 
 }
@@ -492,7 +492,7 @@ EC_Announcement::EC_Announcement(gfxFont *nfont, gfxSprite *nsprite, const char 
     text = new char[strlen(ntext)+1];
 
     //Test if we got the memory
-    if(text)
+    if (text)
         strcpy(text, ntext);
     else
         dead = true;
@@ -530,7 +530,7 @@ EC_Announcement::~EC_Announcement()
 
 void EC_Announcement::update()
 {
-    if(++iTimer >= iTime)
+    if (++iTimer >= iTime)
         dead = true;
 }
 
@@ -541,7 +541,7 @@ void EC_Announcement::draw()
 
     font->draw(ix + iFontOffsetX, iFontY, text);
 
-    if(sprite)
+    if (sprite)
         sprite->draw(ix + 16, iy + 16, iIcon << 5, 0, 32, 32);
 }
 
@@ -570,7 +570,7 @@ void EC_FallingObject::update()
     ix = (short)fx;
     iy = (short)fy;
 
-    if(fy >= smw->ScreenHeight) {
+    if (fy >= smw->ScreenHeight) {
         dead = true;
         return;
     }
@@ -596,7 +596,7 @@ void EC_SingleAnimation::update()
     animate();
 
     //This means that the animation wrapped and it is time to kill it
-    if(iAnimationTimer == 0 && iAnimationFrame == iAnimationX)
+    if (iAnimationTimer == 0 && iAnimationFrame == iAnimationX)
         dead = true;
 }
 
@@ -615,8 +615,8 @@ void EC_LoopingAnimation::update()
 {
     animate();
 
-    if(iAnimationTimer == 0 && iAnimationFrame == iAnimationX) {
-        if(iLoops > 0 && ++iCountLoops >= iLoops)
+    if (iAnimationTimer == 0 && iAnimationFrame == iAnimationX) {
+        if (iLoops > 0 && ++iCountLoops >= iLoops)
             dead = true;
     }
 }
@@ -643,7 +643,7 @@ void EC_Award::update()
 	x += velx;
 	y += vely;
 
-	if( fabsf(dx - x) < fabsf(velx) && fabsf(dy - y) < fabsf(vely))
+	if ( fabsf(dx - x) < fabsf(velx) && fabsf(dy - y) < fabsf(vely))
 	{
 		dead = true;
 	}
@@ -678,7 +678,7 @@ void EC_ExplodingAward::update()
     y += vely;
     x += velx;
 
-    if(++timer > ttl) {
+    if (++timer > ttl) {
         dead = true;
         eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, (short)x + (w >> 1) - 16, (short)y + (h >> 1) - 16, 3, 8));
     }
@@ -725,7 +725,7 @@ void EC_SwirlingAward::update()
     angle += vel;
     radius += 3.0f;
 
-    if(++timer > ttl) {
+    if (++timer > ttl) {
         short awardx = x + (short)(radius * cos(angle)) + (w >> 1) - 16;
         short awardy = y + (short)(radius * sin(angle)) + (h >> 1) - 16;
         eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, awardx, awardy, 3, 8));
@@ -733,11 +733,11 @@ void EC_SwirlingAward::update()
         dead = true;
     }
 
-    if(iAnimationRate > 0 && ++iAnimationTimer > iAnimationRate) {
+    if (iAnimationRate > 0 && ++iAnimationTimer > iAnimationRate) {
         iAnimationTimer = 0;
 
         iAnimationFrame += w;
-        if(iAnimationFrame >= iAnimationEndFrame)
+        if (iAnimationFrame >= iAnimationEndFrame)
             iAnimationFrame = iSrcX;
     }
 }
@@ -789,16 +789,16 @@ void EC_RocketAward::update()
     y += vely;
     x += velx;
 
-    if(++timer > ttl) {
+    if (++timer > ttl) {
         eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, (short)x + (w >> 1) - 16, (short)y + (h >> 1) - 16, 3, 8));
         dead = true;
     }
 
-    if(iAnimationRate > 0 && ++iAnimationTimer > iAnimationRate) {
+    if (iAnimationRate > 0 && ++iAnimationTimer > iAnimationRate) {
         iAnimationTimer = 0;
 
         iAnimationFrame += w;
-        if(iAnimationFrame >= iAnimationEndFrame)
+        if (iAnimationFrame >= iAnimationEndFrame)
             iAnimationFrame = iSrcX;
     }
 }
@@ -836,7 +836,7 @@ void EC_FloatingObject::update()
     y += vely;
     x += velx;
 
-    if(++timer > ttl) {
+    if (++timer > ttl) {
         eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, (short)x + (w >> 1) - 16, (short)y + (h >> 1) - 16, 3, 8));
         dead = true;
     }
@@ -864,7 +864,7 @@ EC_SoulsAward::EC_SoulsAward(gfxSprite *nspr, gfxSprite *nspr2, short nx, short 
     ttl = timetolive;
     numSouls = nSouls;
 
-    if(numSouls > MAXAWARDS)
+    if (numSouls > MAXAWARDS)
         numSouls = MAXAWARDS;
 
     id = new short[numSouls];
@@ -876,7 +876,7 @@ EC_SoulsAward::EC_SoulsAward(gfxSprite *nspr, gfxSprite *nspr2, short nx, short 
     speed = nSpeed;
     count = 0;
 
-    if(numSouls < 1)
+    if (numSouls < 1)
         dead = true;
 
     animationCount = 0;
@@ -895,7 +895,7 @@ EC_SoulsAward::~EC_SoulsAward()
 
 void EC_SoulsAward::update()
 {
-    if(!endmode && ++timer > speed) {
+    if (!endmode && ++timer > speed) {
         timer = 0;
 
         float addangle = QUARTER_PI / 20.0f;
@@ -907,20 +907,20 @@ void EC_SoulsAward::update()
 
         eyecandy[2].add(new EC_RocketAward(&rm->spr_awardsouls, x - 8, y - 8, velx, vely, ttl, id[count], 0, 16, 16));
 
-        if(++count >= numSouls) {
+        if (++count >= numSouls) {
             endmode = true;
             frame = 4;
         }
     }
 
-    if(++animationCount > 6) {
+    if (++animationCount > 6) {
         animationCount = 0;
 
         frame++;
 
-        if(!endmode && frame >= 4)
+        if (!endmode && frame >= 4)
             frame = 0;
-        else if(endmode && frame >= 7)
+        else if (endmode && frame >= 7)
             dead = true;
     }
 }
@@ -960,32 +960,32 @@ EC_Door::EC_Door(gfxSprite *nspr, gfxSprite *nmariospr, short nx, short ny, shor
 
 void EC_Door::update()
 {
-    if(++timer > rate) {
+    if (++timer > rate) {
         timer = 0;
 
-        if(state == 0) {
+        if (state == 0) {
             offsety -= 3;
 
-            if(offsety <= 0) {
+            if (offsety <= 0) {
                 state = 1;
                 offsety = 0;
             }
 
             frame = 1;
-        } else if(state == 1) {
-            if(++frame >= 9) {
+        } else if (state == 1) {
+            if (++frame >= 9) {
                 state = 2;
                 frame = 9;
             }
-        } else if(state == 2) {
-            if(--frame <= 1) {
+        } else if (state == 2) {
+            if (--frame <= 1) {
                 state = 3;
                 frame = 1;
             }
-        } else if(state == 3) {
+        } else if (state == 3) {
             offsety += 3;
 
-            if(offsety >= 32) {
+            if (offsety >= 32) {
                 dead = true;
                 offsety = 32;
             }
@@ -999,7 +999,7 @@ void EC_Door::draw()
 {
     spr->draw(x, y + offsety, 0, colorOffset, iw, ih - offsety);
 
-    if(state == 1)
+    if (state == 1)
         mariospr->draw(x + 16 - HALFPW - PWOFFSET, y + 16 - HALFPH - PHOFFSET + offsety, offsetx, 0, iw, ih - offsety);
 
     spr->draw(x, y + offsety, frame * iw, colorOffset, iw, ih - offsety);
@@ -1027,24 +1027,24 @@ EC_BossPeeker::EC_BossPeeker(gfxSprite *nspr, short speed, short bossType) :
 
 void EC_BossPeeker::update()
 {
-    if(state == 0)
+    if (state == 0)
     {
         iy -= 2;
-        if(iy <= 432)
+        if (iy <= 432)
         {
             iy = 432;
             state = 1;
         }
     }
-    else if(state == 1)
+    else if (state == 1)
     {
-        if(++timer == iSpeed)
+        if (++timer == iSpeed)
             state = 2;
     }
-    else if(state == 2)
+    else if (state == 2)
     {
         iy += 2;
-        if(iy >= smw->ScreenHeight)
+        if (iy >= smw->ScreenHeight)
         {
             dead = true;
             game_values.bosspeeking = -1;
@@ -1075,10 +1075,10 @@ EC_SuperStompExplosion::EC_SuperStompExplosion(gfxSprite *nspr, short x, short y
 
 void EC_SuperStompExplosion::update()
 {
-    if(++iAnimationTimer >= iRate) {
+    if (++iAnimationTimer >= iRate) {
         iAnimationTimer = 0;
 
-        if(++iAnimationFrame > 7) {
+        if (++iAnimationFrame > 7) {
             dead = true;
         }
     }
@@ -1086,7 +1086,7 @@ void EC_SuperStompExplosion::update()
 
 void EC_SuperStompExplosion::draw()
 {
-    if(dead)
+    if (dead)
         return;
 
     static const SDL_Rect rectSuperStompLeftSrc[8] = {{0,0,48,40},{0,40,54,42},{0,82,48,58},{0,140,42,70},{0,210,44,78},{108,0,44,82},{96,82,42,76},{88,158,34,74}};
@@ -1129,7 +1129,7 @@ void CEyecandyContainer::clean()
 
 short CEyecandyContainer::add(CEyecandy *ec)
 {
-    if(list_end < MAXEYECANDY) {
+    if (list_end < MAXEYECANDY) {
         list[list_end] = ec;
         ec->dead = false;
         list_end++;
@@ -1149,7 +1149,7 @@ void CEyecandyContainer::remove(short i)
     delete list[i];
     list_end--;
 
-    if(i != list_end) {
+    if (i != list_end) {
         //if we didn't remove the last element we move the last elemnt in the new free place in the eyecandy list
         list[i] = list[list_end];
     }
@@ -1158,11 +1158,11 @@ void CEyecandyContainer::remove(short i)
 void CEyecandyContainer::cleandeadobjects()
 {
     for (short i = 0; i < list_end; i++) {
-        if(list[i]->dead) {
+        if (list[i]->dead) {
             delete list[i];
             list_end--;
 
-            if(i != list_end) {
+            if (i != list_end) {
                 list[i] = list[list_end];
             }
 
@@ -1197,15 +1197,15 @@ void Spotlight::Update()
 {
     //If the spotlight's position wasn't updated this frame, that means the parent is dead and
     //this spotlight needs to be removed
-    if(!fUpdated)
+    if (!fUpdated)
         iState = 2;
 
     fUpdated = false;
 
-    if(iState == 0) {
-        if(++iSizeCounter >= 4) {
+    if (iState == 0) {
+        if (++iSizeCounter >= 4) {
             iSizeCounter = 0;
-            if(++iSize >= iEndSize) {
+            if (++iSize >= iEndSize) {
                 iSize = iEndSize;
                 iState = 1; //spotlight has reached it's full size
             }
@@ -1218,10 +1218,10 @@ void Spotlight::Update()
             rSrc.w = iWidth;
             rSrc.h = iWidth;
         }
-    } else if(iState == 2) {
-        if(++iSizeCounter >= 4) {
+    } else if (iState == 2) {
+        if (++iSizeCounter >= 4) {
             iSizeCounter = 0;
-            if(--iSize < 0) {
+            if (--iSize < 0) {
                 iSize = 0;
                 iState = 3; //stop drawing, spotlight is dead
             }
@@ -1250,10 +1250,10 @@ void Spotlight::Draw()
     SDL_Rect rDst = {ix - iHalfWidth, iy - iHalfWidth, iWidth, iWidth};
     SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rSrc, rm->spr_overlay.getSurface(), &rDst);
 
-    if(ix - iHalfWidth < 0) {
+    if (ix - iHalfWidth < 0) {
 		SDL_Rect rDstWrap = {ix - iHalfWidth + smw->ScreenWidth, iy - iHalfWidth, iWidth, iWidth};
         SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rSrc, rm->spr_overlay.getSurface(), &rDstWrap);
-	} else if(ix + iHalfWidth >= smw->ScreenWidth) {
+	} else if (ix + iHalfWidth >= smw->ScreenWidth) {
 		SDL_Rect rDstWrap = {ix - iHalfWidth - smw->ScreenWidth, iy - iHalfWidth, iWidth, iWidth};
         SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rSrc, rm->spr_overlay.getSurface(), &rDstWrap);
     }
@@ -1270,18 +1270,18 @@ void Spotlight::Draw()
     SDL_Rect rDst = {ix - iHalfWidth, iy - iHalfWidth, iWidth, iWidth};
     SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rSrc, rm->spr_overlay.getSurface(), &rDst);
 
-    if(ix - iHalfWidth < 0)
+    if (ix - iHalfWidth < 0)
     {
         SDL_Rect rDstWrap = {ix - iHalfWidth + smw->ScreenWidth, iy - iHalfWidth, iWidth, iWidth};
         SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rSrc, rm->spr_overlay.getSurface(), &rDstWrap);
     }
-    else if(ix + iHalfWidth >= smw->ScreenWidth)
+    else if (ix + iHalfWidth >= smw->ScreenWidth)
     {
         SDL_Rect rDstWrap = {ix - iHalfWidth - smw->ScreenWidth, iy - iHalfWidth, iWidth, iWidth};
         SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rSrc, rm->spr_overlay.getSurface(), &rDstWrap);
     }
 
-    if(iTransparency <= 255 && iTransparency > 0)
+    if (iTransparency <= 255 && iTransparency > 0)
     {
         rm->spr_overlayhole.setalpha((Uint8)iTransparency);
 
@@ -1289,12 +1289,12 @@ void Spotlight::Draw()
         SDL_Rect rTransDst = {ix - iHalfWidth, iy - iHalfWidth, iWidth, iWidth};
         SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rTransSrc, blitdest, &rTransDst);
 
-        if(ix - iHalfWidth < 0)
+        if (ix - iHalfWidth < 0)
         {
             SDL_Rect rTransDstWrap = {ix - iHalfWidth + smw->ScreenWidth, iy - iHalfWidth, iWidth, iWidth};
             SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rTransSrc, blitdest, &rTransDstWrap);
         }
-		else if(ix + iHalfWidth >= smw->ScreenWidth)
+		else if (ix + iHalfWidth >= smw->ScreenWidth)
         {
             SDL_Rect rTransDstWrap = {ix - iHalfWidth - smw->ScreenWidth, iy - iHalfWidth, iWidth, iWidth};
             SDL_BlitSurface(rm->spr_overlayhole.getSurface(), &rTransSrc, blitdest, &rTransDstWrap);
@@ -1305,7 +1305,7 @@ void Spotlight::Draw()
 
 Spotlight * SpotlightManager::AddSpotlight(short ix, short iy, short iSize)
 {
-    if(!game_values.spotlights)
+    if (!game_values.spotlights)
         return NULL;
 
     Spotlight * s = new Spotlight(ix, iy, iSize);
@@ -1323,7 +1323,7 @@ void SpotlightManager::DrawSpotlights()
     while (iter != lim) {
         (*iter)->Update();
 
-        if((*iter)->IsDead()) {
+        if ((*iter)->IsDead()) {
             delete (*iter);
 
             iter = spotlightList.erase(iter);

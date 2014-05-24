@@ -158,7 +158,7 @@ int IMG_SavePNG(SDL_Surface *surface, const char *file)
 {
     SDL_RWops *out = SDL_RWFromFile(file, "wb");
     int ret;
-    if(!out)
+    if (!out)
 		return -1;
     ret = IMG_SavePNG_RW(surface, out);
     SDL_RWclose(out);

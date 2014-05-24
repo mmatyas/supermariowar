@@ -1374,31 +1374,31 @@ void ModeOptionsMenu::SetControllingTeam(short iControlTeam)
 
 void ModeOptionsMenu::SetRandomGameModeSettings(short iMode)
 {
-    if(iMode == game_mode_classic) { //classic
+    if (iMode == game_mode_classic) { //classic
         game_values.gamemodesettings.classic.style = miClassicModeStyleField->GetRandomShortValue();
         game_values.gamemodesettings.classic.scoring = miClassicModeScoringField->GetRandomShortValue();
-    } else if(iMode == game_mode_frag) { //frag
+    } else if (iMode == game_mode_frag) { //frag
         game_values.gamemodesettings.frag.style = miFragModeStyleField->GetRandomShortValue();
         game_values.gamemodesettings.frag.scoring = miFragModeScoringField->GetRandomShortValue();
-    } else if(iMode == game_mode_timelimit) { //time
+    } else if (iMode == game_mode_timelimit) { //time
         game_values.gamemodesettings.time.style = miTimeLimitModeStyleField->GetRandomShortValue();
         game_values.gamemodesettings.time.scoring = miTimeLimitModeScoringField->GetRandomShortValue();
         game_values.gamemodesettings.time.percentextratime = miTimeLimitModePercentExtraTime->GetRandomShortValue();
-    } else if(iMode == game_mode_jail) { //jail
+    } else if (iMode == game_mode_jail) { //jail
         game_values.gamemodesettings.jail.style = miJailModeStyleField->GetRandomShortValue();
         game_values.gamemodesettings.jail.timetofree = miJailModeTimeFreeField->GetRandomShortValue();
         game_values.gamemodesettings.jail.tagfree = miJailModeTagFreeField->GetRandomBoolValue();
         game_values.gamemodesettings.jail.percentkey = miJailModeJailKeyField->GetRandomShortValue();
-    } else if(iMode == game_mode_coins) { //coins
+    } else if (iMode == game_mode_coins) { //coins
         game_values.gamemodesettings.coins.penalty = miCoinModePenaltyField->GetRandomBoolValue();
         game_values.gamemodesettings.coins.quantity = miCoinModeQuantityField->GetRandomShortValue();
         game_values.gamemodesettings.coins.percentextracoin = miCoinModePercentExtraCoin->GetRandomShortValue();
-    } else if(iMode == game_mode_stomp) { //stomp
+    } else if (iMode == game_mode_stomp) { //stomp
         game_values.gamemodesettings.stomp.rate = miStompModeRateField->GetRandomShortValue();
 
         for (short iEnemy = 0; iEnemy < NUMSTOMPENEMIES; iEnemy++)
             game_values.gamemodesettings.stomp.enemyweight[iEnemy] = miStompModeEnemySlider[iEnemy]->GetRandomShortValue();
-    } else if(iMode == game_mode_eggs) { //egg
+    } else if (iMode == game_mode_eggs) { //egg
         for (int iEgg = 0; iEgg < 4; iEgg++)
             game_values.gamemodesettings.egg.eggs[iEgg] = miEggModeEggQuantityField[iEgg]->GetRandomShortValue();
 
@@ -1406,69 +1406,69 @@ void ModeOptionsMenu::SetRandomGameModeSettings(short iMode)
             game_values.gamemodesettings.egg.yoshis[iYoshi] = miEggModeYoshiQuantityField[iYoshi]->GetRandomShortValue();
 
         game_values.gamemodesettings.egg.explode = miEggModeExplosionTimeField->GetRandomShortValue();
-    } else if(iMode == game_mode_ctf) { //capture the flag
+    } else if (iMode == game_mode_ctf) { //capture the flag
         game_values.gamemodesettings.flag.speed = miFlagModeSpeedField->GetRandomShortValue();
         game_values.gamemodesettings.flag.touchreturn = miFlagModeTouchReturnField->GetRandomBoolValue();
         game_values.gamemodesettings.flag.pointmove = miFlagModePointMoveField->GetRandomBoolValue();
         game_values.gamemodesettings.flag.autoreturn = miFlagModeAutoReturnField->GetRandomShortValue();
         game_values.gamemodesettings.flag.homescore = miFlagModeHomeScoreField->GetRandomBoolValue();
         game_values.gamemodesettings.flag.centerflag = miFlagModeCenterFlagField->GetRandomBoolValue();
-    } else if(iMode == game_mode_chicken) { //chicken
+    } else if (iMode == game_mode_chicken) { //chicken
         game_values.gamemodesettings.chicken.usetarget = miChickenModeShowTargetField->GetRandomBoolValue();
         game_values.gamemodesettings.chicken.glide = miChickenModeGlideField->GetRandomBoolValue();
-    } else if(iMode == game_mode_tag) { //tag
+    } else if (iMode == game_mode_tag) { //tag
         game_values.gamemodesettings.tag.tagontouch = miTagModeTagOnTouchField->GetRandomBoolValue();
-    } else if(iMode == game_mode_star) { //star
+    } else if (iMode == game_mode_star) { //star
         game_values.gamemodesettings.star.time = miStarModeTimeField->GetRandomShortValue();
         game_values.gamemodesettings.star.shine = miStarModeShineField->GetRandomShortValue();
         game_values.gamemodesettings.star.percentextratime = miStarModePercentExtraTime->GetRandomShortValue();
-    } else if(iMode == game_mode_domination) { //domination
+    } else if (iMode == game_mode_domination) { //domination
         game_values.gamemodesettings.domination.quantity = miDominationModeQuantityField->GetRandomShortValue();
         game_values.gamemodesettings.domination.loseondeath = miDominationModeLoseOnDeathField->GetRandomBoolValue();
         game_values.gamemodesettings.domination.relocateondeath = miDominationModeRelocateOnDeathField->GetRandomBoolValue();
         game_values.gamemodesettings.domination.stealondeath = miDominationModeStealOnDeathField->GetRandomBoolValue();
         game_values.gamemodesettings.domination.relocationfrequency = miDominationModeRelocateFrequencyField->GetRandomShortValue();
-    } else if(iMode == game_mode_koth) { //king of the hill
+    } else if (iMode == game_mode_koth) { //king of the hill
         game_values.gamemodesettings.kingofthehill.areasize = miKingOfTheHillModeSizeField->GetRandomShortValue();
         game_values.gamemodesettings.kingofthehill.relocationfrequency = miKingOfTheHillModeRelocateFrequencyField->GetRandomShortValue();
         game_values.gamemodesettings.kingofthehill.maxmultiplier = miKingOfTheHillModeMultiplierField->GetRandomShortValue();
-    } else if(iMode == game_mode_race) { //race
+    } else if (iMode == game_mode_race) { //race
         game_values.gamemodesettings.race.quantity = miRaceModeQuantityField->GetRandomShortValue();
         game_values.gamemodesettings.race.speed = miRaceModeSpeedField->GetRandomShortValue();
         game_values.gamemodesettings.race.penalty = miRaceModePenaltyField->GetRandomShortValue();
-    } else if(iMode == game_mode_frenzy) { //frenzy
+    } else if (iMode == game_mode_frenzy) { //frenzy
         miFrenzyModeOptions->SetRandomGameModeSettings();
-    } else if(iMode == game_mode_survival) { //survival
+    } else if (iMode == game_mode_survival) { //survival
         game_values.gamemodesettings.survival.density = miSurvivalModeDensityField->GetRandomShortValue();
         game_values.gamemodesettings.survival.speed = miSurvivalModeSpeedField->GetRandomShortValue();
         game_values.gamemodesettings.survival.shield = miSurvivalModeShieldField->GetRandomBoolValue();
 
         for (short iEnemy = 0; iEnemy < NUMSURVIVALENEMIES; iEnemy++)
             game_values.gamemodesettings.survival.enemyweight[iEnemy] = miSurvivalModeEnemySlider[iEnemy]->GetRandomShortValue();
-    } else if(iMode == game_mode_greed) { //greed
+    } else if (iMode == game_mode_greed) { //greed
         game_values.gamemodesettings.greed.coinlife = miGreedModeCoinLife->GetRandomShortValue();
         game_values.gamemodesettings.greed.owncoins = miGreedModeOwnCoins->GetRandomBoolValue();
         game_values.gamemodesettings.greed.multiplier = miGreedModeMultiplier->GetRandomShortValue();
         game_values.gamemodesettings.greed.percentextracoin = miGreedModePercentExtraCoin->GetRandomShortValue();
-    } else if(iMode == game_mode_health) { //health
+    } else if (iMode == game_mode_health) { //health
         game_values.gamemodesettings.health.startlife = miHealthModeStartLife->GetRandomShortValue();
         game_values.gamemodesettings.health.maxlife = miHealthModeMaxLife->GetRandomShortValue();
         game_values.gamemodesettings.health.percentextralife = miHealthModePercentExtraLife->GetRandomShortValue();
-    } else if(iMode == game_mode_collection) { //card collection
+    } else if (iMode == game_mode_collection) { //card collection
         game_values.gamemodesettings.collection.quantity = miCollectionModeQuantityField->GetRandomShortValue();
         game_values.gamemodesettings.collection.rate = miCollectionModeRateField->GetRandomShortValue();
         game_values.gamemodesettings.collection.banktime = miCollectionModeBankTimeField->GetRandomShortValue();
         game_values.gamemodesettings.collection.cardlife = miCollectionModeCardLifeField->GetRandomShortValue();
-    } else if(iMode == game_mode_chase) { //chase (phanto)
+    } else if (iMode == game_mode_chase) { //chase (phanto)
         game_values.gamemodesettings.chase.phantospeed = miChaseModeSpeedField->GetRandomShortValue();
 
         for (short iPhanto = 0; iPhanto < 3; iPhanto++)
             game_values.gamemodesettings.chase.phantoquantity[iPhanto] = miChaseModeQuantitySlider[iPhanto]->GetRandomShortValue();
-    } else if(iMode == game_mode_shyguytag) { //shyguy tag
+    } else if (iMode == game_mode_shyguytag) { //shyguy tag
         game_values.gamemodesettings.shyguytag.tagonsuicide = miShyGuyTagModeTagOnSuicideField->GetRandomBoolValue();
         game_values.gamemodesettings.shyguytag.tagtransfer = miShyGuyTagModeTagOnStompField->GetRandomShortValue();
         game_values.gamemodesettings.shyguytag.freetime = miShyGuyTagModeTagOnStompField->GetRandomShortValue();
-    } else if(iMode == game_mode_boss_minigame) { //boss
+    } else if (iMode == game_mode_boss_minigame) { //boss
         game_values.gamemodesettings.boss.bosstype = miBossModeTypeField->GetRandomShortValue();
         game_values.gamemodesettings.boss.difficulty = miBossModeDifficultyField->GetRandomShortValue();
         game_values.gamemodesettings.boss.hitpoints = miBossModeHitPointsField->GetRandomShortValue();
@@ -1478,7 +1478,7 @@ void ModeOptionsMenu::SetRandomGameModeSettings(short iMode)
 void ModeOptionsMenu::HealthModeStartLifeChanged()
 {
     short iMaxLife = miHealthModeMaxLife->GetShortValue();
-    if(miHealthModeStartLife->GetShortValue() > iMaxLife) {
+    if (miHealthModeStartLife->GetShortValue() > iMaxLife) {
         miHealthModeStartLife->SetKey(iMaxLife);
     }
 }
@@ -1486,7 +1486,7 @@ void ModeOptionsMenu::HealthModeStartLifeChanged()
 void ModeOptionsMenu::HealthModeMaxLifeChanged()
 {
     short iStartLife = miHealthModeStartLife->GetShortValue();
-    if(miHealthModeMaxLife->GetShortValue() < iStartLife) {
+    if (miHealthModeMaxLife->GetShortValue() < iStartLife) {
         miHealthModeMaxLife->SetKey(iStartLife);
     }
 }

@@ -16,7 +16,7 @@ CObject::CObject(gfxSprite *nspr1, short x, short y)
     setXi(x);
     setYi(y);
 
-    if(spr) {
+    if (spr) {
         iw = (short)spr->getWidth();
         ih = (short)spr->getHeight();
     }
@@ -61,13 +61,13 @@ void CObject::readNetworkUpdate(short size, char * pData)
 void CObject::GetCollisionBlocks(IO_Block * blocks[4])
 {
     short xl = 0;
-    if(ix < 0)
+    if (ix < 0)
         xl = (ix + smw->ScreenWidth) / TILESIZE;
     else
         xl = ix / TILESIZE;
 
     short xr = 0;
-    if(ix + iw >= smw->ScreenWidth)
+    if (ix + iw >= smw->ScreenWidth)
         xr = (ix + iw - smw->ScreenWidth) / TILESIZE;
     else
         xr = (ix + iw) / TILESIZE;
@@ -75,7 +75,7 @@ void CObject::GetCollisionBlocks(IO_Block * blocks[4])
     blocks[0] = NULL;
     blocks[1] = NULL;
 
-    if(iy >= 0 && iy < smw->ScreenHeight) {
+    if (iy >= 0 && iy < smw->ScreenHeight) {
         short yt = iy / TILESIZE;
 
         blocks[0] = g_map->block(xl, yt);
@@ -85,7 +85,7 @@ void CObject::GetCollisionBlocks(IO_Block * blocks[4])
     blocks[2] = NULL;
     blocks[3] = NULL;
 
-	if(iy + ih >= 0 && iy + ih < smw->ScreenHeight) {
+	if (iy + ih >= 0 && iy + ih < smw->ScreenHeight) {
         short yb = (iy + ih) / TILESIZE;
 
         blocks[2] = g_map->block(xl, yb);
@@ -101,17 +101,17 @@ IO_MovingObject::IO_MovingObject(gfxSprite *nspr, short x, short y, short iNumSp
 {
     iNumSprites = iNumSpr;
 
-    if(iAnimationWidth > -1)
+    if (iAnimationWidth > -1)
         iw = iAnimationWidth;
-    else if(spr)
+    else if (spr)
         iw = (short)spr->getWidth() / iNumSprites;
 
-    if(iAnimationHeight > -1)
+    if (iAnimationHeight > -1)
         ih = iAnimationHeight;
 
     animationtimer = 0;
 
-    if(spr)
+    if (spr)
         animationWidth = (short)spr->getWidth();
 
     fOldX = fx;
@@ -122,7 +122,7 @@ IO_MovingObject::IO_MovingObject(gfxSprite *nspr, short x, short y, short iNumSp
     objectType = object_moving;
     movingObjectType = movingobject_none;
 
-    if(iCollisionWidth > -1) {
+    if (iCollisionWidth > -1) {
         collisionWidth = iCollisionWidth;
         collisionHeight = iCollisionHeight;
         collisionOffsetX = iCollisionOffsetX;
@@ -134,7 +134,7 @@ IO_MovingObject::IO_MovingObject(gfxSprite *nspr, short x, short y, short iNumSp
         collisionOffsetY = 0;
     }
 
-    if(iAnimationOffsetX > -1) {
+    if (iAnimationOffsetX > -1) {
         animationOffsetX = iAnimationOffsetX;
         animationOffsetY = iAnimationOffsetY;
     } else {
@@ -176,11 +176,11 @@ void IO_MovingObject::update()
 
 void IO_MovingObject::animate()
 {
-    if(animationspeed > 0 && ++animationtimer >= animationspeed) {
+    if (animationspeed > 0 && ++animationtimer >= animationspeed) {
         animationtimer = 0;
 
         drawframe += iw;
-        if(drawframe >= animationWidth)
+        if (drawframe >= animationWidth)
             drawframe = animationOffsetX;
     }
 }
@@ -194,25 +194,25 @@ bool IO_MovingObject::collide(CPlayer *)
 void IO_MovingObject::applyfriction()
 {
     //Add air/ground friction
-    if(velx > 0.0f) {
-        if(inair)
+    if (velx > 0.0f) {
+        if (inair)
             velx -= VELAIRFRICTION;
-        else if(onice)
+        else if (onice)
             velx -= VELICEFRICTION;
         else
             velx -= VELMOVINGFRICTION;
 
-        if(velx < 0.0f)
+        if (velx < 0.0f)
             velx = 0.0f;
-    } else if(velx < 0.0f) {
-        if(inair)
+    } else if (velx < 0.0f) {
+        if (inair)
             velx += VELAIRFRICTION;
-        else if(onice)
+        else if (onice)
             velx += VELICEFRICTION;
         else
             velx += VELMOVINGFRICTION;
 
-        if(velx > 0.0f)
+        if (velx > 0.0f)
             velx = 0.0f;
     }
 }
@@ -229,8 +229,8 @@ void IO_MovingObject::collision_detection_map()
 
     float fTempY = fy;
 
-    if(platform) {
-        if(!onice) {
+    if (platform) {
+        if (!onice) {
             fPlatformVelX = platform->fVelX;
             setXf(fx + fPlatformVelX);
             flipsidesifneeded();
@@ -238,7 +238,7 @@ void IO_MovingObject::collision_detection_map()
 
         fPlatformVelY = platform->fVelY;
 
-        if(platform->fOldVelY < 0.0f)
+        if (platform->fOldVelY < 0.0f)
             fy += platform->fOldVelY;
 
         fPrecalculatedY += platform->fOldVelY;
@@ -251,18 +251,18 @@ void IO_MovingObject::collision_detection_map()
 
     fy = fTempY;
 
-    if(fPrecalculatedY + collisionHeight < 0.0f) {
+    if (fPrecalculatedY + collisionHeight < 0.0f) {
         // on top outside of the screen
         setYf(fPrecalculatedY);
         vely = CapFallingVelocity(GRAVITATION + vely);
 
-        if(!platform) {
+        if (!platform) {
             inair = true;
             onice = false;
         }
 
         return;
-    } else if(fPrecalculatedY + collisionHeight >= smw->ScreenHeight) {
+    } else if (fPrecalculatedY + collisionHeight >= smw->ScreenHeight) {
         //on ground outside of the screen?
         setYi(-collisionHeight);
         fOldY = fy - 1.0f;
@@ -279,10 +279,10 @@ void IO_MovingObject::collision_detection_map()
     //-----------------------------------------------------------------
     //  x axis first (--)
     //-----------------------------------------------------------------
-    if(fy + collisionHeight >= 0.0f) {
-        if(velx + fPlatformVelX > 0.01f || iHorizontalPlatformCollision == 3) {
+    if (fy + collisionHeight >= 0.0f) {
+        if (velx + fPlatformVelX > 0.01f || iHorizontalPlatformCollision == 3) {
             //moving right
-            if(fx + collisionWidth >= smw->ScreenWidth) {
+            if (fx + collisionWidth >= smw->ScreenWidth) {
                 tx = (short)(fx + collisionWidth - smw->ScreenWidth) / TILESIZE;
                 fOldX -= smw->ScreenWidth;
             } else
@@ -293,10 +293,10 @@ void IO_MovingObject::collision_detection_map()
 
             bool fTopBlockSolid = topblock && !topblock->isTransparent() && !topblock->isHidden();
             bool fBottomBlockSolid = bottomblock && !bottomblock->isTransparent() && !bottomblock->isHidden();
-            if(fTopBlockSolid || fBottomBlockSolid) {
+            if (fTopBlockSolid || fBottomBlockSolid) {
                 bool processOtherBlock = true;
-                if(fTopBlockSolid) { //collide with top block
-                    if(iHorizontalPlatformCollision == 3) {
+                if (fTopBlockSolid) { //collide with top block
+                    if (iHorizontalPlatformCollision == 3) {
                         KillObjectMapHazard();
                         return;
                     }
@@ -310,8 +310,8 @@ void IO_MovingObject::collision_detection_map()
                     SideBounce(true);
                 }
 
-                if(processOtherBlock && fBottomBlockSolid) { //then bottom
-                    if(iHorizontalPlatformCollision == 3) {
+                if (processOtherBlock && fBottomBlockSolid) { //then bottom
+                    if (iHorizontalPlatformCollision == 3) {
                         KillObjectMapHazard();
                         return;
                     }
@@ -322,10 +322,10 @@ void IO_MovingObject::collision_detection_map()
 
                     SideBounce(true);
                 }
-            } else if((g_map->map(tx, ty) & tile_flag_solid) || (g_map->map(tx, ty2) & tile_flag_solid)) {
+            } else if ((g_map->map(tx, ty) & tile_flag_solid) || (g_map->map(tx, ty2) & tile_flag_solid)) {
                 //collision on the right side.
 
-                if(iHorizontalPlatformCollision == 3) {
+                if (iHorizontalPlatformCollision == 3) {
                     KillObjectMapHazard();
                     return;
                 }
@@ -333,7 +333,7 @@ void IO_MovingObject::collision_detection_map()
                 setXf((float)((tx << 5) - collisionWidth) - 0.2f); //move to the edge of the tile (tile on the right -> mind the object width)
                 fOldX = fx;
 
-                if(velx > 0.0f)
+                if (velx > 0.0f)
                     velx = -velx;
 
                 flipsidesifneeded();
@@ -341,12 +341,12 @@ void IO_MovingObject::collision_detection_map()
 
                 SideBounce(true);
             }
-        } else if(velx + fPlatformVelX < -0.01f || iHorizontalPlatformCollision == 1) {
+        } else if (velx + fPlatformVelX < -0.01f || iHorizontalPlatformCollision == 1) {
             //moving left
             tx = (short)fx / TILESIZE;
 
             //Just in case fx < 0 and wasn't caught by flipsidesifneeded()
-            if(tx < 0)
+            if (tx < 0)
                 tx = 0;
 
             IO_Block * topblock = g_map->block(tx, ty);
@@ -354,10 +354,10 @@ void IO_MovingObject::collision_detection_map()
 
             bool fTopBlockSolid = topblock && !topblock->isTransparent() && !topblock->isHidden();
             bool fBottomBlockSolid = bottomblock && !bottomblock->isTransparent() && !bottomblock->isHidden();
-            if(fTopBlockSolid || fBottomBlockSolid) {
+            if (fTopBlockSolid || fBottomBlockSolid) {
                 bool processOtherBlock = true;
-                if(fTopBlockSolid) { //collide with top block
-                    if(iHorizontalPlatformCollision == 1) {
+                if (fTopBlockSolid) { //collide with top block
+                    if (iHorizontalPlatformCollision == 1) {
                         KillObjectMapHazard();
                         return;
                     }
@@ -371,8 +371,8 @@ void IO_MovingObject::collision_detection_map()
                     SideBounce(false);
                 }
 
-                if(processOtherBlock && fBottomBlockSolid) { //then bottom
-                    if(iHorizontalPlatformCollision == 1) {
+                if (processOtherBlock && fBottomBlockSolid) { //then bottom
+                    if (iHorizontalPlatformCollision == 1) {
                         KillObjectMapHazard();
                         return;
                     }
@@ -383,8 +383,8 @@ void IO_MovingObject::collision_detection_map()
 
                     SideBounce(false);
                 }
-            } else if((g_map->map(tx, ty) & tile_flag_solid) || (g_map->map(tx, ty2) & tile_flag_solid)) {
-                if(iHorizontalPlatformCollision == 1) {
+            } else if ((g_map->map(tx, ty) & tile_flag_solid) || (g_map->map(tx, ty2) & tile_flag_solid)) {
+                if (iHorizontalPlatformCollision == 1) {
                     KillObjectMapHazard();
                     return;
                 }
@@ -392,7 +392,7 @@ void IO_MovingObject::collision_detection_map()
                 setXf((float)((tx << 5) + TILESIZE) + 0.2f);			//move to the edge of the tile
                 fOldX = fx;
 
-                if(velx < 0.0f)
+                if (velx < 0.0f)
                     velx = -velx;
 
                 flipsidesifneeded();
@@ -407,7 +407,7 @@ void IO_MovingObject::collision_detection_map()
 
     txl = ix / TILESIZE;
 
-    if(ix + collisionWidth >= smw->ScreenWidth)
+    if (ix + collisionWidth >= smw->ScreenWidth)
         txr = (ix + collisionWidth - smw->ScreenWidth) / TILESIZE;
     else
         txr = (ix + collisionWidth) / TILESIZE;
@@ -417,46 +417,46 @@ void IO_MovingObject::collision_detection_map()
     //-----------------------------------------------------------------
 
     float fMovingUp = vely;
-    if(platform)
+    if (platform)
         fMovingUp = vely + fPlatformVelY - bounce;
 
-    if(fMovingUp < -0.01f) {
+    if (fMovingUp < -0.01f) {
         ty = (short)(fPrecalculatedY) / TILESIZE;
 
         IO_Block * leftblock = g_map->block(txl, ty);
         IO_Block * rightblock = g_map->block(txr, ty);
 
-        if(leftblock && !leftblock->isTransparent() && !leftblock->isHidden()) { //then left
-            if(iVerticalPlatformCollision == 2)
+        if (leftblock && !leftblock->isTransparent() && !leftblock->isHidden()) { //then left
+            if (iVerticalPlatformCollision == 2)
                 KillObjectMapHazard();
 
             leftblock->collide(this, 0);
             return;
         }
 
-        if(rightblock && !rightblock->isTransparent() && !rightblock->isHidden()) { //then right
-            if(iVerticalPlatformCollision == 2)
+        if (rightblock && !rightblock->isTransparent() && !rightblock->isHidden()) { //then right
+            if (iVerticalPlatformCollision == 2)
                 KillObjectMapHazard();
 
             rightblock->collide(this, 0);
             return;
         }
 
-        if((g_map->map(txl, ty) & tile_flag_solid) || (g_map->map(txr, ty) & tile_flag_solid)) {
-            if(iVerticalPlatformCollision == 2)
+        if ((g_map->map(txl, ty) & tile_flag_solid) || (g_map->map(txr, ty) & tile_flag_solid)) {
+            if (iVerticalPlatformCollision == 2)
                 KillObjectMapHazard();
 
             setYf((float)((ty << 5) + TILESIZE) + 0.2f);
             fOldY = fy - 1.0f;
 
-            if(vely < 0.0f)
+            if (vely < 0.0f)
                 vely = -vely;
         } else {
             setYf(fPrecalculatedY);
             vely += GRAVITATION;
         }
 
-        if(!platform) {
+        if (!platform) {
             inair = true;
             onice = false;
         }
@@ -470,27 +470,27 @@ void IO_MovingObject::collision_detection_map()
         bool fLeftBlockSolid = leftblock && !leftblock->isTransparent() && !leftblock->isHidden();
         bool fRightBlockSolid = rightblock && !rightblock->isTransparent() && !rightblock->isHidden();
 
-        if(fLeftBlockSolid || fRightBlockSolid) {
+        if (fLeftBlockSolid || fRightBlockSolid) {
             bool processOtherBlock = true;
-            if(fLeftBlockSolid) { //collide with left block
+            if (fLeftBlockSolid) { //collide with left block
                 processOtherBlock = leftblock->collide(this, 2);
 
-                if(!platform) {
+                if (!platform) {
                     inair = false;
                     onice = false;
                 }
             }
 
-            if(processOtherBlock && fRightBlockSolid) { //then right
+            if (processOtherBlock && fRightBlockSolid) { //then right
                 rightblock->collide(this, 2);
 
-                if(!platform) {
+                if (!platform) {
                     inair = false;
                     onice = false;
                 }
             }
 
-            if(iVerticalPlatformCollision == 0)
+            if (iVerticalPlatformCollision == 0)
                 KillObjectMapHazard();
 
             return;
@@ -499,20 +499,20 @@ void IO_MovingObject::collision_detection_map()
         int leftTile = g_map->map(txl, ty);
         int rightTile = g_map->map(txr, ty);
 
-        if((leftTile & tile_flag_solid_on_top) || (rightTile & tile_flag_solid_on_top)) {
-            if((fOldY + collisionHeight) / TILESIZE < ty) {
+        if ((leftTile & tile_flag_solid_on_top) || (rightTile & tile_flag_solid_on_top)) {
+            if ((fOldY + collisionHeight) / TILESIZE < ty) {
                 vely = BottomBounce();
                 setYf((float)((ty << 5) - collisionHeight) - 0.2f);
                 fOldY = fy - GRAVITATION;
 
-                if(!platform) {
+                if (!platform) {
                     inair = false;
                     onice = false;
                 }
 
                 platform = NULL;
 
-                if(iVerticalPlatformCollision == 0)
+                if (iVerticalPlatformCollision == 0)
                     KillObjectMapHazard();
 
                 return;
@@ -523,15 +523,15 @@ void IO_MovingObject::collision_detection_map()
                                           ((leftTile & tile_flag_super_death_top) && !(rightTile & tile_flag_solid)) ||
                                           (!(leftTile & tile_flag_solid) && (rightTile & tile_flag_super_death_top)));
 
-        if(((leftTile & tile_flag_solid) || (rightTile & tile_flag_solid)) && !fSuperDeathTileUnderObject) {
+        if (((leftTile & tile_flag_solid) || (rightTile & tile_flag_solid)) && !fSuperDeathTileUnderObject) {
             vely = BottomBounce();
             setYf((float)((ty << 5) - collisionHeight) - 0.2f);
             fOldY = fy;
 
-            if(!platform) {
+            if (!platform) {
                 inair = false;
 
-                if((leftTile & tile_flag_ice && ((rightTile & tile_flag_ice) || rightTile == tile_flag_nonsolid || rightTile == tile_flag_gap)) ||
+                if ((leftTile & tile_flag_ice && ((rightTile & tile_flag_ice) || rightTile == tile_flag_nonsolid || rightTile == tile_flag_gap)) ||
                         (rightTile & tile_flag_ice && ((leftTile & tile_flag_ice) || leftTile == tile_flag_nonsolid || leftTile == tile_flag_gap)))
                     onice = true;
                 else
@@ -540,21 +540,21 @@ void IO_MovingObject::collision_detection_map()
 
             platform = NULL;
 
-            if(iVerticalPlatformCollision == 0)
+            if (iVerticalPlatformCollision == 0)
                 KillObjectMapHazard();
-        } else if(fSuperDeathTileUnderObject) {
+        } else if (fSuperDeathTileUnderObject) {
             KillObjectMapHazard();
             return;
         } else {
             setYf(fPrecalculatedY);
             vely = CapFallingVelocity(GRAVITATION + vely);
 
-            if(!platform)
+            if (!platform)
                 inair = true;
         }
     }
 
-    if(!platform && inair)
+    if (!platform && inair)
         onice = false;
 }
 
@@ -565,13 +565,13 @@ bool IO_MovingObject::collision_detection_checksides()
     Uint8 iCase = 0;
 
     short txl = -1, nofliptxl = ix >> 5;
-    if(ix < 0)
+    if (ix < 0)
         txl = (ix + smw->ScreenWidth) >> 5;
     else
         txl = nofliptxl;
 
     short txr = -1, nofliptxr = (ix + collisionWidth) >> 5;
-    if(ix + collisionWidth >= smw->ScreenWidth)
+    if (ix + collisionWidth >= smw->ScreenWidth)
         txr = (ix + collisionWidth - smw->ScreenWidth) >> 5;
     else
         txr = nofliptxr;
@@ -579,40 +579,40 @@ bool IO_MovingObject::collision_detection_checksides()
     short ty = iy >> 5;
     short ty2 = (iy + collisionHeight) >> 5;
 
-    if(iy >= 0) {
-        if(ty < MAPHEIGHT) {
-            if(txl >= 0 && txl < MAPWIDTH) {
+    if (iy >= 0) {
+        if (ty < MAPHEIGHT) {
+            if (txl >= 0 && txl < MAPWIDTH) {
                 IO_Block * block = g_map->block(txl, ty);
 
-                if((block && !block->isTransparent() && !block->isHidden()) || (g_map->map(txl, ty) & tile_flag_solid) > 0) {
+                if ((block && !block->isTransparent() && !block->isHidden()) || (g_map->map(txl, ty) & tile_flag_solid) > 0) {
                     iCase |= 0x01;
                 }
             }
 
-            if(txr >= 0 && txr < MAPWIDTH) {
+            if (txr >= 0 && txr < MAPWIDTH) {
                 IO_Block * block = g_map->block(txr, ty);
 
-                if((block && !block->isTransparent() && !block->isHidden()) || (g_map->map(txr, ty) & tile_flag_solid) > 0) {
+                if ((block && !block->isTransparent() && !block->isHidden()) || (g_map->map(txr, ty) & tile_flag_solid) > 0) {
                     iCase |= 0x02;
                 }
             }
         }
     }
 
-    if(iy + collisionHeight >= 0.0f) {
-        if(ty2 < MAPHEIGHT) {
-            if(txl >= 0 && txl < MAPWIDTH) {
+    if (iy + collisionHeight >= 0.0f) {
+        if (ty2 < MAPHEIGHT) {
+            if (txl >= 0 && txl < MAPWIDTH) {
                 IO_Block * block = g_map->block(txl, ty2);
 
-                if((block && !block->isTransparent() && !block->isHidden()) || (g_map->map(txl, ty2) & tile_flag_solid) > 0) {
+                if ((block && !block->isTransparent() && !block->isHidden()) || (g_map->map(txl, ty2) & tile_flag_solid) > 0) {
                     iCase |= 0x04;
                 }
             }
 
-            if(txr >= 0 && txr < MAPWIDTH) {
+            if (txr >= 0 && txr < MAPWIDTH) {
                 IO_Block * block = g_map->block(txr, ty2);
 
-                if((block && !block->isTransparent() && !block->isHidden()) || (g_map->map(txr, ty2) & tile_flag_solid) > 0) {
+                if ((block && !block->isTransparent() && !block->isHidden()) || (g_map->map(txr, ty2) & tile_flag_solid) > 0) {
                     iCase |= 0x08;
                 }
             }
@@ -632,7 +632,7 @@ bool IO_MovingObject::collision_detection_checksides()
         //[X][ ]
         //[ ][ ]
     case 1: {
-        if(ix + (collisionWidth >> 1) > (nofliptxl << 5) + TILESIZE) {
+        if (ix + (collisionWidth >> 1) > (nofliptxl << 5) + TILESIZE) {
             setXf((float)((nofliptxl << 5) + TILESIZE) + 0.2f);
             flipsidesifneeded();
         } else {
@@ -645,7 +645,7 @@ bool IO_MovingObject::collision_detection_checksides()
     //[ ][X]
     //[ ][ ]
     case 2: {
-        if(ix + (collisionWidth >> 1) < (nofliptxr << 5)) {
+        if (ix + (collisionWidth >> 1) < (nofliptxr << 5)) {
             setXf((float)((nofliptxr << 5) - collisionWidth) - 0.2f);
             flipsidesifneeded();
         } else {
@@ -665,7 +665,7 @@ bool IO_MovingObject::collision_detection_checksides()
     //[ ][ ]
     //[X][ ]
     case 4: {
-        if(ix + (collisionWidth >> 1) > (nofliptxl << 5) + TILESIZE) {
+        if (ix + (collisionWidth >> 1) > (nofliptxl << 5) + TILESIZE) {
             setXf((float)((nofliptxl << 5) + TILESIZE) + 0.2f);
             flipsidesifneeded();
         } else {
@@ -686,7 +686,7 @@ bool IO_MovingObject::collision_detection_checksides()
     //[ ][X]
     //[X][ ]
     case 6: {
-        if(ix + (collisionWidth >> 1) > (nofliptxl << 5) + TILESIZE) {
+        if (ix + (collisionWidth >> 1) > (nofliptxl << 5) + TILESIZE) {
             setYf((float)((ty << 5) + TILESIZE) + 0.2f);
             setXf((float)((nofliptxl << 5) + TILESIZE) + 0.2f);
             flipsidesifneeded();
@@ -711,7 +711,7 @@ bool IO_MovingObject::collision_detection_checksides()
     //[ ][ ]
     //[ ][X]
     case 8: {
-        if(ix + (collisionWidth >> 1) < (nofliptxr << 5)) {
+        if (ix + (collisionWidth >> 1) < (nofliptxr << 5)) {
             setXf((float)((nofliptxr << 5) - collisionWidth) - 0.2f);
             flipsidesifneeded();
         } else {
@@ -724,7 +724,7 @@ bool IO_MovingObject::collision_detection_checksides()
     //[X][ ]
     //[ ][X]
     case 9: {
-        if(ix + (collisionWidth >> 1) > (nofliptxl << 5) + TILESIZE) {
+        if (ix + (collisionWidth >> 1) > (nofliptxl << 5) + TILESIZE) {
             setYf((float)((ty2 << 5) - collisionHeight) - 0.2f);
             setXf((float)((nofliptxl << 5) + TILESIZE) + 0.2f);
             flipsidesifneeded();
@@ -806,10 +806,10 @@ bool IO_MovingObject::collision_detection_checksides()
 void IO_MovingObject::flipsidesifneeded()
 {
     //Use ix here to avoid rounding issues (can crash if txr evals to over the right side of screen)
-    if(ix < 0 || fx < 0.0f) {
+    if (ix < 0 || fx < 0.0f) {
         setXf(fx + smw->ScreenWidth);
         fOldX += smw->ScreenWidth;
-    } else if(ix >= smw->ScreenWidth || fx >= smw->ScreenWidth) {
+    } else if (ix >= smw->ScreenWidth || fx >= smw->ScreenWidth) {
         setXf(fx - smw->ScreenWidth);
         fOldX -= smw->ScreenWidth;
     }
@@ -819,9 +819,9 @@ void IO_MovingObject::flipsidesifneeded()
 //And let it handle not dying and placing itself somewhere else if necessary
 void IO_MovingObject::KillObjectMapHazard(short playerID)
 {
-    if(!dead) {
+    if (!dead) {
         //If it is a throw box, trigger it's behavior and return
-        if(movingObjectType == movingobject_throwbox) {
+        if (movingObjectType == movingobject_throwbox) {
             ((CO_ThrowBox*)this)->Die();
             return;
         }
@@ -829,45 +829,45 @@ void IO_MovingObject::KillObjectMapHazard(short playerID)
         dead = true;
         eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + (iw >> 1) - 16, iy + (ih >> 1) - 16, 3, 4));
 
-        if(movingObjectType == movingobject_fireball) {
+        if (movingObjectType == movingobject_fireball) {
         	CPlayer * player = GetPlayerFromGlobalID(playerID);
 
         	if (player != NULL)
         		player->decreaseProjectilesCount();
 
             ifSoundOnPlay(sfx_hit);
-        } else if(movingObjectType == movingobject_egg) {
+        } else if (movingObjectType == movingobject_egg) {
             dead = false;
             ((CO_Egg*)this)->placeEgg();
             ifSoundOnPlay(sfx_transform);
-        } else if(movingObjectType == movingobject_star) {
+        } else if (movingObjectType == movingobject_star) {
             dead = false;
             ((CO_Star*)this)->placeStar();
             ifSoundOnPlay(sfx_transform);
-        } else if(movingObjectType == movingobject_flag) {
+        } else if (movingObjectType == movingobject_flag) {
             dead = false;
             ((CO_Flag*)this)->placeFlag();
             ifSoundOnPlay(sfx_transform);
-        } else if(movingObjectType == movingobject_bomb) {
+        } else if (movingObjectType == movingobject_bomb) {
         	CPlayer * player = GetPlayerFromGlobalID(playerID);
 
         	if (player != NULL)
         		player->decreaseProjectilesCount();
 
             ifSoundOnPlay(sfx_hit);
-        } else if(movingObjectType == movingobject_phantokey) {
+        } else if (movingObjectType == movingobject_phantokey) {
             dead = false;
             ((CO_PhantoKey*)this)->placeKey();
             ifSoundOnPlay(sfx_transform);
-        } else if(game_mode_boxes_minigame == game_values.gamemode->gamemode && movingObjectType == movingobject_coin) {
+        } else if (game_mode_boxes_minigame == game_values.gamemode->gamemode && movingObjectType == movingobject_coin) {
             dead = false;
             ((MO_Coin*)this)->placeCoin();
             ifSoundOnPlay(sfx_transform);
-        } else if(game_values.gamemode->gamemode == game_mode_stomp && (movingObjectType == movingobject_goomba || movingObjectType == movingobject_koopa || movingObjectType == movingobject_spiny || movingObjectType == movingobject_buzzybeetle || movingObjectType == movingobject_cheepcheep)) {
-            if(!game_values.gamemode->gameover) {
+        } else if (game_values.gamemode->gamemode == game_mode_stomp && (movingObjectType == movingobject_goomba || movingObjectType == movingobject_koopa || movingObjectType == movingobject_spiny || movingObjectType == movingobject_buzzybeetle || movingObjectType == movingobject_cheepcheep)) {
+            if (!game_values.gamemode->gameover) {
                 CPlayer * player = GetPlayerFromGlobalID(playerID);
 
-                if(NULL != player) {
+                if (NULL != player) {
                     player->score->AdjustScore(1);
                 }
             }
@@ -891,21 +891,21 @@ IO_OverMapObject::IO_OverMapObject(gfxSprite *nspr, short x, short y, short iNum
 
     iNumSprites = iNumSpr;
 
-    if(iAnimationWidth > -1)
+    if (iAnimationWidth > -1)
         iw = iAnimationWidth;
-    else if(spr)
+    else if (spr)
         iw = (short)spr->getWidth() / iNumSprites;
 
-    if(iAnimationHeight > -1)
+    if (iAnimationHeight > -1)
         ih = iAnimationHeight;
 
     animationspeed = aniSpeed;
     animationtimer = 0;
 
-    if(spr)
+    if (spr)
         animationWidth = (short)spr->getWidth();
 
-    if(iCollisionWidth > -1) {
+    if (iCollisionWidth > -1) {
         collisionWidth = iCollisionWidth;
         collisionHeight = iCollisionHeight;
         collisionOffsetX = iCollisionOffsetX;
@@ -917,7 +917,7 @@ IO_OverMapObject::IO_OverMapObject(gfxSprite *nspr, short x, short y, short iNum
         collisionOffsetY = 0;
     }
 
-    if(iAnimationOffsetX > -1) {
+    if (iAnimationOffsetX > -1) {
         animationOffsetX = iAnimationOffsetX;
         animationOffsetY = iAnimationOffsetY;
     } else {
@@ -948,10 +948,10 @@ void IO_OverMapObject::update()
 
 void IO_OverMapObject::animate()
 {
-    if(animationspeed > 0 && ++animationtimer == animationspeed) {
+    if (animationspeed > 0 && ++animationtimer == animationspeed) {
         animationtimer = 0;
         drawframe += iw;
-        if(drawframe >= animationWidth)
+        if (drawframe >= animationWidth)
             drawframe = animationOffsetX;
     }
 }
@@ -987,7 +987,7 @@ void CObjectContainer::clean()
 
 void CObjectContainer::add(CObject *ec)
 {
-    if(list_end < MAXOBJECTS) {
+    if (list_end < MAXOBJECTS) {
         list[list_end] = ec;
         ec->index = list_end;	//save index for removing
         list_end++;
@@ -1000,7 +1000,7 @@ void CObjectContainer::add(CObject *ec)
 bool CObjectContainer::isBlockAt(short x, short y)
 {
     for (short i = 0; i < list_end; i++) {
-        if(x >= list[i]->ix && x < list[i]->ix + list[i]->iw &&
+        if (x >= list[i]->ix && x < list[i]->ix + list[i]->iw &&
                 y >= list[i]->iy && y < list[i]->iy + list[i]->ih &&
                 list[i]->getObjectType() == object_block) {
             return true;
@@ -1015,7 +1015,7 @@ float CObjectContainer::getClosestObject(short ix, short iy, short objectType)
     int dist = smw->ScreenWidth * 1000;  //Longest distance from corner to corner squared
 
     for (short i = 0; i < list_end; i++) {
-        if(list[i]->getObjectType() != objectType)
+        if (list[i]->getObjectType() != objectType)
             continue;
 
         short x = list[i]->ix - ix;
@@ -1023,7 +1023,7 @@ float CObjectContainer::getClosestObject(short ix, short iy, short objectType)
 
         int calcdist = x * x + y * y;
 
-        if(calcdist < dist)
+        if (calcdist < dist)
             dist = calcdist;
     }
 
@@ -1035,7 +1035,7 @@ float CObjectContainer::getClosestMovingObject(short ix, short iy, short movingO
     int dist = smw->ScreenWidth * 1000;  //Longest distance from corner to corner squared
 
     for (short i = 0; i < list_end; i++) {
-        if(list[i]->getObjectType() != object_moving || ((IO_MovingObject*)list[i])->getMovingObjectType() != movingObjectType)
+        if (list[i]->getObjectType() != object_moving || ((IO_MovingObject*)list[i])->getMovingObjectType() != movingObjectType)
             continue;
 
         short x = list[i]->ix - ix;
@@ -1043,7 +1043,7 @@ float CObjectContainer::getClosestMovingObject(short ix, short iy, short movingO
 
         int calcdist = x * x + y * y;
 
-        if(calcdist < dist)
+        if (calcdist < dist)
             dist = calcdist;
     }
 
@@ -1055,7 +1055,7 @@ short CObjectContainer::countTypes(ObjectType type)
     short count = 0;
 
     for (short i = 0; i < list_end; i++) {
-        if(list[i]->getObjectType() == type) {
+        if (list[i]->getObjectType() == type) {
             count++;
         }
     }
@@ -1068,7 +1068,7 @@ short CObjectContainer::countMovingTypes(MovingObjectType type)
     short count = 0;
 
     for (short i = 0; i < list_end; i++) {
-        if(list[i]->getObjectType() == object_moving && ((IO_MovingObject*)list[i])->getMovingObjectType() == type) {
+        if (list[i]->getObjectType() == object_moving && ((IO_MovingObject*)list[i])->getMovingObjectType() == type) {
             count++;
         }
     }
@@ -1079,16 +1079,16 @@ short CObjectContainer::countMovingTypes(MovingObjectType type)
 void CObjectContainer::adjustPlayerAreas(CPlayer * player, CPlayer * other)
 {
     for (short i = 0; i < list_end; i++) {
-        if(list[i]->getObjectType() == object_area) {
+        if (list[i]->getObjectType() == object_area) {
             OMO_Area * area = (OMO_Area*)list[i];
 
-            if(area->colorID == other->colorID) {
-                if(game_values.gamemodesettings.domination.relocateondeath)
+            if (area->colorID == other->colorID) {
+                if (game_values.gamemodesettings.domination.relocateondeath)
                     area->placeArea();
 
-                if(game_values.gamemodesettings.domination.stealondeath && player)
+                if (game_values.gamemodesettings.domination.stealondeath && player)
                     area->setOwner(player);
-                else if(game_values.gamemodesettings.domination.loseondeath)
+                else if (game_values.gamemodesettings.domination.loseondeath)
                     area->reset();
             }
         }
@@ -1097,14 +1097,14 @@ void CObjectContainer::adjustPlayerAreas(CPlayer * player, CPlayer * other)
 
 void CObjectContainer::removePlayerRaceGoals(short id, short iGoal)
 {
-    if(game_values.gamemodesettings.race.penalty == 0 && iGoal != -1)
+    if (game_values.gamemodesettings.race.penalty == 0 && iGoal != -1)
         return;
 
     for (short i = 0; i < list_end; i++) {
-        if(list[i]->getObjectType() == object_race_goal) {
+        if (list[i]->getObjectType() == object_race_goal) {
             OMO_RaceGoal * goal = (OMO_RaceGoal*)list[i];
 
-            if(iGoal == -1 || 2 == game_values.gamemodesettings.race.penalty ||
+            if (iGoal == -1 || 2 == game_values.gamemodesettings.race.penalty ||
                     (1 == game_values.gamemodesettings.race.penalty && goal->getGoalID() == iGoal)) {
                 goal->reset(id);
             }
@@ -1115,17 +1115,17 @@ void CObjectContainer::removePlayerRaceGoals(short id, short iGoal)
 void CObjectContainer::pushBombs(short x, short y)
 {
     for (short i = 0; i < list_end; i++) {
-        if(list[i]->getObjectType() != object_moving)
+        if (list[i]->getObjectType() != object_moving)
             continue;
 
         IO_MovingObject * mo = (IO_MovingObject*)list[i];
 
-        if(mo->getMovingObjectType() != movingobject_bomb)
+        if (mo->getMovingObjectType() != movingobject_bomb)
             continue;
 
         CO_Bomb * bomb = (CO_Bomb*)list[i];
 
-        if(bomb->HasOwner())
+        if (bomb->HasOwner())
             continue;
 
         int bombx = bomb->ix + (bomb->iw >> 1) - x;
@@ -1133,8 +1133,8 @@ void CObjectContainer::pushBombs(short x, short y)
 
         int dist = bombx * bombx + bomby * bomby;
 
-        if(dist < 10000) {
-            if(bombx > 0)
+        if (dist < 10000) {
+            if (bombx > 0)
                 bomb->velx += ((float)(RNGMAX(30)) / 10.0f + 4.0f);
             else
                 bomb->velx -= ((float)(RNGMAX(30)) / 10.0f + 4.0f);
@@ -1147,11 +1147,11 @@ void CObjectContainer::pushBombs(short x, short y)
 void CObjectContainer::cleandeadobjects()
 {
     for (short i = 0; i < list_end; i++) {
-        if(list[i]->dead) {
+        if (list[i]->dead) {
             delete list[i];
             list_end--;
 
-            if(i != list_end) {
+            if (i != list_end) {
                 list[i] = list[list_end];
             }
 
@@ -1162,7 +1162,7 @@ void CObjectContainer::cleandeadobjects()
 
 CObject * CObjectContainer::getRandomObject()
 {
-    if(list_end == 0)
+    if (list_end == 0)
         return NULL;
 
     return list[RNGMAX( list_end)];

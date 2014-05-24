@@ -101,7 +101,7 @@ char * szMapName = NULL;
 //main main main
 int main(int argc, char *argv[])
 {
-    if(argc != 2) {
+    if (argc != 2) {
 		printf("Usage: screenshot mapfile.map\n");
 		exit(0);
 	}
@@ -182,7 +182,7 @@ void drawlayer(int layer, bool fUseCopied, short iBlockSize)
 
 			ts = g_map->mapdata[i][j][layer];
 
-			if(ts == TILESETSIZE)
+			if (ts == TILESETSIZE)
 				continue;
 
 			tilebltrect.x = (ts % TILESETWIDTH) * iBlockSize;
@@ -197,7 +197,7 @@ void drawlayer(int layer, bool fUseCopied, short iBlockSize)
 
 void drawmap(bool fScreenshot, short iBlockSize)
 {
-    if(iBlockSize != TILESIZE) {
+    if (iBlockSize != TILESIZE) {
 		SDL_Rect srcrect;
 		srcrect.x = 0;
 		srcrect.y = 0;
@@ -210,7 +210,7 @@ void drawmap(bool fScreenshot, short iBlockSize)
 		dstrect.w = iBlockSize * 20;
 		dstrect.h = iBlockSize * 15;
 
-        if(SDL_SCALEBLIT(spr_background.getSurface(), &srcrect, blitdest, &dstrect) < 0) {
+        if (SDL_SCALEBLIT(spr_background.getSurface(), &srcrect, blitdest, &dstrect) < 0) {
 			fprintf(stderr, "SDL_SCALEBLIT error: %s\n", SDL_GetError());
 			return;
 		}
@@ -229,14 +229,14 @@ void drawmap(bool fScreenshot, short iBlockSize)
         for (int i = 0; i < MAPWIDTH; i++) {
 			int displayblock = displayblock = g_map->objectdata[i][j];
 
-            if(displayblock != BLOCKSETSIZE) {
+            if (displayblock != BLOCKSETSIZE) {
 				rSrc.x = displayblock * iBlockSize;
 				rSrc.y = iBlockSize * 30;
 
 				rDst.x = i * iBlockSize;
 				rDst.y = j * iBlockSize;
 
-				if(displayblock >= 7 && displayblock <= 14)
+				if (displayblock >= 7 && displayblock <= 14)
 					rSrc.y = iBlockSize * (g_map->iSwitches[(displayblock - 7) % 4] + 30);
 
 				SDL_BlitSurface(g_map->tilesetsurface[iBlockSize == TILESIZE ? 0 : iBlockSize == PREVIEWTILESIZE ? 1 : 2], &rSrc, screen, &rDst);
@@ -251,7 +251,7 @@ void drawmap(bool fScreenshot, short iBlockSize)
         for (int i = 0; i < MAPWIDTH; i++) {
 			Warp * warp = &g_map->warpdata[i][j];
 
-            if(warp->connection != -1) {
+            if (warp->connection != -1) {
 				SDL_Rect rSrc = {warp->connection * iBlockSize, warp->direction * iBlockSize, iBlockSize, iBlockSize};
 				SDL_Rect rDst = {i * iBlockSize, j * iBlockSize, iBlockSize, iBlockSize};
 
@@ -271,7 +271,7 @@ void loadmap(char * szMapFile)
 	std::string path = convertPath(filename);
 	backgroundlist.SetCurrentName(filename);
 
-    if(!File_Exists(path)) {
+    if (!File_Exists(path)) {
 		path = convertPath("gfx/packs/Classic/backgrounds/Land_Classic.png");
 		backgroundlist.SetCurrentName("gfx/packs/Classic/backgrounds/Land_Classic.png");
 	}
@@ -283,7 +283,7 @@ void loadmap(char * szMapFile)
     for (short iPlatform = 0; iPlatform < g_iNumPlatforms; iPlatform++) {
         for (short iCol = 0; iCol < MAPWIDTH; iCol++) {
             for (short iRow = 0; iRow < MAPHEIGHT; iRow++) {
-                if(iCol < g_map->platforms[iPlatform]->iTileWidth && iRow < g_map->platforms[iPlatform]->iTileHeight) {
+                if (iCol < g_map->platforms[iPlatform]->iTileWidth && iRow < g_map->platforms[iPlatform]->iTileHeight) {
 					g_Platforms[iPlatform].tiles[iCol][iRow] = g_map->platforms[iPlatform]->iTileData[iCol][iRow];
                 } else {
 					g_Platforms[iPlatform].tiles[iCol][iRow] = TILESETSIZE;
@@ -323,7 +323,7 @@ void takescreenshot()
                 for (short iPlatformY = 0; iPlatformY < g_map->platforms[iPlatform]->iTileHeight; iPlatformY++) {
 					short iTile = g_Platforms[iPlatform].tiles[iPlatformX][iPlatformY];
 
-                    if(iTile != TILESETSIZE) {
+                    if (iTile != TILESETSIZE) {
 						rSrc.x = iTile % TILESETWIDTH * iTileSize;
 						rSrc.y = iTile / TILESETWIDTH * iTileSize;
 
@@ -338,7 +338,7 @@ void takescreenshot()
 
 		//And add platform paths
         for (short iPlatform = 0; iPlatform < g_iNumPlatforms; iPlatform++) {
-            if(g_Platforms[iPlatform].iStartX != g_Platforms[iPlatform].iEndX) {
+            if (g_Platforms[iPlatform].iStartX != g_Platforms[iPlatform].iEndX) {
 				short iCenterOffsetY = (g_map->platforms[iPlatform]->iHeight >> 1) - 16;
 				iCenterOffsetY >>= iScreenshotSize; //Resize for preview and thumbnails
 
@@ -375,9 +375,9 @@ void takescreenshot()
 		char * pszSaveFile = szSaveFile + strlen(szSaveFile);
 		GetNameFromFileName(pszSaveFile, szMapName);
 
-		if(iTileSize == PREVIEWTILESIZE)
+		if (iTileSize == PREVIEWTILESIZE)
 			strcat(szSaveFile, "_preview");
-		else if(iTileSize == THUMBTILESIZE)
+		else if (iTileSize == THUMBTILESIZE)
 			strcat(szSaveFile, "_thumb");
 
 #ifdef PNG_SAVE_FORMAT

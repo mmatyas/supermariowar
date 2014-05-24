@@ -61,13 +61,13 @@ sfxSound::~sfxSound()
 
 bool sfxSound::init(const string& filename)
 {
-	if(sfx)
+	if (sfx)
 		reset();
 
 	cout << "load " << filename << "..." << endl;
 	sfx = Mix_LoadWAV(filename.c_str());
 
-    if(sfx == NULL) {
+    if (sfx == NULL) {
 		printf(" failed loading %s\n", filename.c_str());
 		return false;
 	}
@@ -87,16 +87,16 @@ int sfxSound::play()
 	int ticks = SDL_GetTicks();
 
 	//Don't play sounds right over the top (doubles volume)
-    if(channel < 0 || ticks - starttime > 40) {
+    if (channel < 0 || ticks - starttime > 40) {
 		instances++;
 		channel = Mix_PlayChannel(-1, sfx, 0);
 
-		if(channel < 0)
+		if (channel < 0)
 			return channel;
 
 		starttime = ticks;
 
-		if(g_PlayingSoundChannels[channel])
+		if (g_PlayingSoundChannels[channel])
 			printf("Error: Sound was played on channel that was not cleared!\n");
 
 		g_PlayingSoundChannels[channel] = this;
@@ -109,7 +109,7 @@ int sfxSound::playloop(int iLoop)
 	instances++;
 	channel = Mix_PlayChannel(-1, sfx, iLoop);
 
-	if(channel < 0)
+	if (channel < 0)
 		return channel;
 
 	g_PlayingSoundChannels[channel] = this;
@@ -119,7 +119,7 @@ int sfxSound::playloop(int iLoop)
 
 void sfxSound::stop()
 {
-    if(channel != -1) {
+    if (channel != -1) {
 		instances = 0;
 		Mix_HaltChannel(channel);
 		channel = -1;
@@ -130,7 +130,7 @@ void sfxSound::sfx_pause()
 {
 	paused = !paused;
 
-	if(paused)
+	if (paused)
 		Mix_Pause(channel);
 	else
 		Mix_Resume(channel);
@@ -138,7 +138,7 @@ void sfxSound::sfx_pause()
 
 void sfxSound::clearchannel()
 {
-    if(--instances <= 0) {
+    if (--instances <= 0) {
 		instances = 0;
 		channel = -1;
 	}
@@ -150,7 +150,7 @@ void sfxSound::reset()
 	sfx = NULL;
 	ready = false;
 
-	if(channel > -1)
+	if (channel > -1)
 		g_PlayingSoundChannels[channel] = NULL;
 
 	channel = -1;
@@ -158,7 +158,7 @@ void sfxSound::reset()
 
 int sfxSound::isPlaying()
 {
-	if(channel == -1)
+	if (channel == -1)
 		return false;
 
 	return Mix_Playing(channel);
@@ -177,13 +177,13 @@ sfxMusic::~sfxMusic()
 
 bool sfxMusic::load(const string& filename)
 {
-	if(music)
+	if (music)
 		reset();
 
     cout << "load " << filename << "..." << endl;
 	music = Mix_LoadMUS(filename.c_str());
 
-    if(!music) {
+    if (!music) {
 	    printf("Error Loading Music: %s\n", Mix_GetError());
 		return false;
 	}
@@ -210,7 +210,7 @@ void sfxMusic::sfx_pause()
 {
 	paused = !paused;
 
-	if(paused)
+	if (paused)
 		Mix_PauseMusic();
 	else
 		Mix_ResumeMusic();

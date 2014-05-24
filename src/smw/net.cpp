@@ -91,14 +91,14 @@ void net_saveServerList()
 void net_loadServerList()
 {
     FILE * fp = OpenFile("servers.bin", "rb");
-    if(fp) {
+    if (fp) {
         int version[4];
-        if(4 != fread(version, sizeof(int), 4, fp)) {
+        if (4 != fread(version, sizeof(int), 4, fp)) {
             fclose(fp);
             return; // read error
         }
 
-        if(VersionIsEqual(g_iVersion, version[0], version[1], version[2], version[3])) {
+        if (VersionIsEqual(g_iVersion, version[0], version[1], version[2], version[3])) {
             char buffer[128];
             ReadString(buffer, 128, fp);
 

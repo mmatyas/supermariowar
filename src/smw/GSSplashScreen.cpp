@@ -60,7 +60,7 @@ bool LoadStartGraphics()
     loadok &= rm->menu_font_small.init(convertPath("gfx/packs/menu/menu_font_small.png", graphicspack));
     loadok &= rm->menu_font_large.init(convertPath("gfx/packs/menu/menu_font_large.png", graphicspack));
 
-    if(!loadok) {
+    if (!loadok) {
         _load_drawmsg("ERROR: error loading the fonts!\n");
         _load_waitforkey();
         return false;
@@ -71,7 +71,7 @@ bool LoadStartGraphics()
     loadok &= gfx_loadimage(&rm->menu_smw, convertPath("gfx/packs/menu/menu_smw.png", graphicspack), false);
     loadok &= gfx_loadimage(&rm->menu_version, convertPath("gfx/packs/menu/menu_version.png", graphicspack), false);
 
-    if(!loadok) {
+    if (!loadok) {
         _load_drawmsg("ERROR: error loading the start graphics!\n");
         _load_waitforkey();
         return false;
@@ -88,7 +88,7 @@ bool LoadGameSounds()
     int frequency, channels;
     Uint16 format;
 
-    if(0 == Mix_QuerySpec(&frequency, &format, &channels))
+    if (0 == Mix_QuerySpec(&frequency, &format, &channels))
         return false;
 #endif
 
@@ -198,7 +198,7 @@ bool SplashScreenState::init()
 //
 //		while (contributorUsed[index])
 //		{
-//			if(++index >= NUM_CONTRIBUTORS)
+//			if (++index >= NUM_CONTRIBUTORS)
 //				index = 0;
 //		}
 //
@@ -229,7 +229,7 @@ void SplashScreenState::update()
         case SDL_KEYDOWN: {
             switch(loop_event.key.keysym.sym) {
             case SDLK_RETURN:
-                if(loop_event.key.keysym.mod & (KMOD_LALT | KMOD_RALT)) {
+                if (loop_event.key.keysym.mod & (KMOD_LALT | KMOD_RALT)) {
 #ifndef _XBOX
                     game_values.fullscreen = !game_values.fullscreen;
                     gfx_setresolution(smw->ScreenWidth, smw->ScreenHeight, game_values.fullscreen);
@@ -240,7 +240,7 @@ void SplashScreenState::update()
 
 #ifndef _XBOX
             case SDLK_F4:
-                if(loop_event.key.keysym.mod & (KMOD_LALT | KMOD_RALT))
+                if (loop_event.key.keysym.mod & (KMOD_LALT | KMOD_RALT))
                     game_values.gamestate = GS_QUIT;
                     return;
                 break;
@@ -263,7 +263,7 @@ void SplashScreenState::update()
         if (game_values.playerInput.outputControls[iPlayer].menu_select.fPressed ||
             game_values.playerInput.outputControls[iPlayer].menu_cancel.fPressed ||
             game_values.playerInput.outputControls[iPlayer].menu_random.fPressed) {
-            //if(state <= 6)
+            //if (state <= 6)
             //{
             //  state = 6;
             //  alpha = 255;
@@ -289,36 +289,36 @@ void SplashScreenState::update()
         }
     }
 
-    //if(state == 0 || state == 3)
+    //if (state == 0 || state == 3)
     //{
     //  alpha += 4;
-    //  if(alpha >= 255)
+    //  if (alpha >= 255)
     //  {
     //      alpha = 255;
     //      state++;
     //  }
     //}
-    //else if(state == 1 || state == 4)
+    //else if (state == 1 || state == 4)
     //{
-    //  if(--timer <= 0)
+    //  if (--timer <= 0)
     //  {
     //      timer = 120;
     //      state++;
     //  }
     //}
-    //else if(state == 2 || state == 5)
+    //else if (state == 2 || state == 5)
     //{
     //  alpha -= 4;
-    //  if(alpha <= 0)
+    //  if (alpha <= 0)
     //  {
     //      alpha = 0;
     //      state++;
     //  }
     //}
-    //else if(state == 6)
+    //else if (state == 6)
     //{
     //  alpha += 5;
-    //  if(alpha >= 255)
+    //  if (alpha >= 255)
     //  {
     //      alpha = 255;
     //      state++;
@@ -327,18 +327,18 @@ void SplashScreenState::update()
 
     SDL_FillRect(screen, NULL, 0x0);
 
-    //if(state == 0 || state == 1 || state == 2)
+    //if (state == 0 || state == 1 || state == 2)
     //{
     //  menu_dpi_logo.setalpha((Uint8)alpha);
     //  menu_dpi_logo.draw(195, 186);
     //}
-    //else if(state == 3 || state == 4 || state == 5)
+    //else if (state == 3 || state == 4 || state == 5)
     //{
     //  menu_contest_winners.setalpha((Uint8)alpha);
     //  menu_contest_winners.draw(0, 0);
     //}
     //else
-    if(state == 6 || state == 7 || state == 8) {
+    if (state == 6 || state == 7 || state == 8) {
         rm->menu_backdrop.setalpha((Uint8)alpha);
         rm->menu_backdrop.draw(0, 0);
 
@@ -355,10 +355,10 @@ void SplashScreenState::update()
         menu_credits->draw(227, 200);
     }
 
-    if(state == 7) {
+    if (state == 7) {
 //            _load_drawmsg("Loading...");
         rm->menu_font_large.drawCentered(smw->ScreenWidth/2, smw->ScreenHeight * 0.875f, "Loading...");
-    } else if(state == 8) {
+    } else if (state == 8) {
 //            _load_drawmsg("Press Any Key To Continue");
         rm->menu_font_large.drawCentered(smw->ScreenWidth/2, smw->ScreenHeight * 0.875f, "Press Any Key To Continue");
 
@@ -368,17 +368,17 @@ void SplashScreenState::update()
 
         /*          static int timer = 60;
                     static int index = 0;
-                    if(++timer >= 60)
+                    if (++timer >= 60)
                     {
                         eyecandy[2].add(new EC_GravText(&rm->menu_font_large, smw->ScreenWidth/2, smw->ScreenHeight, contributors[contributorOrder[index]], -8.2f));
                         timer = 0;
 
-                        if(++index >= NUM_CONTRIBUTORS)
+                        if (++index >= NUM_CONTRIBUTORS)
                             index = 0;
                     } */
     }
 
-    if(state == 7) {
+    if (state == 7) {
         // load initial coin sound
         backgroundmusic[2].load(musiclist->GetMusic(1));
 
@@ -386,7 +386,7 @@ void SplashScreenState::update()
 
         LoadGameSounds();
 
-        if(!game_values.soundcapable) {
+        if (!game_values.soundcapable) {
             game_values.sound = false;
             game_values.music = false;
             game_values.soundvolume = 0;

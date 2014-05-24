@@ -330,7 +330,7 @@ bool CResourceManager::LoadGameGraphics()
     loadok &= game_font_small.init(convertPath("gfx/packs/fonts/font_small.png", graphicspack));
     loadok &= game_font_large.init(convertPath("gfx/packs/fonts/font_large.png", graphicspack));
 
-    if(!loadok) {
+    if (!loadok) {
         _load_drawmsg("ERROR: error loading the fonts!\n");
         _load_waitforkey();
         return false;

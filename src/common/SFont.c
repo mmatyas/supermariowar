@@ -115,7 +115,7 @@ void SFont_Write(SDL_Surface *Surface, const SFont_Font *Font,
     int charoffset;
     SDL_Rect srcrect, dstrect;
 
-    if(text == NULL)
+    if (text == NULL)
 		return;
 
     // these values won't change in the loop
@@ -156,7 +156,7 @@ int SFont_TextWidth(const SFont_Font *Font, const char *text)
     int charoffset=0;
     int width = 0;
 
-    if(text == NULL)
+    if (text == NULL)
 	return 0;
 
     for (c = text; *c != '\0'; c++) {
@@ -204,7 +204,7 @@ void SFont_WriteChopCenter(SDL_Surface *Surface, const SFont_Font* Font, int x, 
 		else
 			iNextWidth = Font->CharPos[charoffset+1] - Font->CharPos[charoffset];
 
-        if(iCurrentWidth + iNextWidth > w) {
+        if (iCurrentWidth + iNextWidth > w) {
 			szText[iCurrentChar] = '\0';
 			break;
 		}
@@ -233,7 +233,7 @@ void SFont_WriteChopRight(SDL_Surface *Surface, const SFont_Font *Font,
 	int width = 0;
 	int charsize = sizeof(char);
 
-    if(text == NULL)
+    if (text == NULL)
 		return;
 
     // these values won't change in the loop
@@ -254,7 +254,7 @@ void SFont_WriteChopRight(SDL_Surface *Surface, const SFont_Font *Font,
 
 		width = Font->CharPos[charoffset+1] - Font->CharPos[charoffset];
 
-		if(x - startx + width > w)
+		if (x - startx + width > w)
 			break;
 
 		srcrect.x = (Sint16)(Font->CharPos[charoffset] + Font->CharPos[charoffset-1]) >> 1;
@@ -284,7 +284,7 @@ void SFont_WriteChopLeft(SDL_Surface *Surface, const SFont_Font *Font,
 	short iPrintedWidth = 0;
 	int startx = x;
 
-    if(text == NULL)
+    if (text == NULL)
 		return;
 
     // these values won't change in the loop
@@ -310,7 +310,7 @@ void SFont_WriteChopLeft(SDL_Surface *Surface, const SFont_Font *Font,
 
 		iPrintedWidth += width;
 
-		if(iPrintedWidth > w)
+		if (iPrintedWidth > w)
 			break;
 
 		x -= width;

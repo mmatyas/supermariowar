@@ -80,7 +80,7 @@ MapList::MapList(bool fWorldEditor)
 #endif
 
     //If this is for the world editor, load all the world maps into the map viewer UI control
-    if(fWorldEditor) {
+    if (fWorldEditor) {
         //Load in the "tour only" maps directory
         DirectoryListing tourMapDir(convertPath("maps/tour/"), ".map");
 
@@ -116,7 +116,7 @@ MapList::MapList(bool fWorldEditor)
     }
 
     //TODO: add proper test via size
-    if(maps.empty()) {
+    if (maps.empty()) {
         printf("ERROR: Empty map directory!\n");
         exit(0);
     }
@@ -225,7 +225,7 @@ void MapList::add(const char * name)
     std::string fullName = convertPath("maps/") + name;
 
     for (std::map<std::string, MapListNode*>::iterator i = maps.begin(); i != maps.end(); ++i) {
-        if((*i).second->filename == fullName)
+        if ((*i).second->filename == fullName)
             return;
     }
 
@@ -245,7 +245,7 @@ bool MapList::find(const char * name)
 
         char * szCurrentName = lowercaseDup((*current).second->filename.c_str());
 
-        if(strstr(szCurrentName, szLookForName))	//compare names after
+        if (strstr(szCurrentName, szLookForName))	//compare names after
             fFound = true;
 
         free(szCurrentName);
@@ -266,7 +266,7 @@ bool MapList::findexact(const char * name, bool fWorld)
 
     //If we're looking for a world, then search the world maps first
     //if the world map isn't found, then search the regular map list
-    if(fWorld) {
+    if (fWorld) {
         std::map<std::string, MapListNode*>::iterator iterateAll = worldmaps.begin(), lim = worldmaps.end();
 
         while (iterateAll != lim && !fFound) {
@@ -274,7 +274,7 @@ bool MapList::findexact(const char * name, bool fWorld)
             strcpy(szCurrentName, iterateAll->first.c_str());
             inPlaceLowerCase(szCurrentName);
 
-            if(!strcmp(szCurrentName, szLookForName)) {
+            if (!strcmp(szCurrentName, szLookForName)) {
                 fFound = true;
                 outercurrent = iterateAll;
             }
@@ -284,7 +284,7 @@ bool MapList::findexact(const char * name, bool fWorld)
             iterateAll++;
         }
 
-        if(fFound)
+        if (fFound)
             return true;
     }
 
@@ -298,7 +298,7 @@ bool MapList::findexact(const char * name, bool fWorld)
         strcpy(szCurrentName, current->first.c_str());
         inPlaceLowerCase(szCurrentName);
 
-        if(!strcmp(szCurrentName, szLookForName))
+        if (!strcmp(szCurrentName, szLookForName))
             fFound = true;
 
         delete[] szCurrentName;
@@ -312,7 +312,7 @@ bool MapList::findexact(const char * name, bool fWorld)
 //Returns true if the map needs to be reloaded
 bool MapList::FindFilteredMap()
 {
-    if((*current).second->fInCurrentFilterSet)
+    if ((*current).second->fInCurrentFilterSet)
         return false;
 
     next(true);
@@ -323,14 +323,14 @@ bool MapList::FindFilteredMap()
 bool MapList::startswith(char letter)
 {
     //Captialize the letter becuase all maps have first letter in caps
-    if(letter >= SDLK_a && letter <= SDLK_z)
+    if (letter >= SDLK_a && letter <= SDLK_z)
         letter -= 32;
 
     std::map<std::string, MapListNode*>::iterator oldCurrent = current;
     do {
         next(true);	//sets us to the beginning if we hit the end -> loop through the maps
 
-        if(currentShortmapname()[0] == letter)
+        if (currentShortmapname()[0] == letter)
             return true;
     } while (current != oldCurrent);
 
@@ -349,11 +349,11 @@ bool MapList::startswith(std::string match)
         const char * szMapName = currentShortmapname();
         const int iMapNameLen = currentShortMapNameLen();
 
-        if(iMatchLen > iMapNameLen)
+        if (iMatchLen > iMapNameLen)
             continue;
 
         for (short iIndex = 0; iIndex < iMatchLen && iIndex < iMapNameLen; iIndex++) {
-            if(tolower(szMapName[iIndex]) == tolower(match[iIndex]))
+            if (tolower(szMapName[iIndex]) == tolower(match[iIndex]))
                 continue;
 
             goto TRYNEXTMAP;
@@ -372,17 +372,17 @@ TRYNEXTMAP:
 
 void MapList::prev(bool fUseFilters)
 {
-    if(fUseFilters) {
+    if (fUseFilters) {
         std::map<std::string, MapListNode*>::iterator oldCurrent = current;
 
         do {
             prev(false);
 
-            if((*current).second->fInCurrentFilterSet)
+            if ((*current).second->fInCurrentFilterSet)
                 return;
         } while (current != oldCurrent);
     } else {
-        if(current == maps.begin())	//we are at the first element
+        if (current == maps.begin())	//we are at the first element
             current = --maps.end();	//continue from end
         else
             --current;
@@ -395,17 +395,17 @@ void MapList::prev(bool fUseFilters)
 
 void MapList::next(bool fUseFilters)
 {
-    if(fUseFilters) {
+    if (fUseFilters) {
         std::map<std::string, MapListNode*>::iterator oldCurrent = current;
 
         do {
             next(false);
 
-            if((*current).second->fInCurrentFilterSet)
+            if ((*current).second->fInCurrentFilterSet)
                 return;
         } while (current != oldCurrent);
     } else {
-        if(current == --maps.end())	//we are at the last valid element
+        if (current == --maps.end())	//we are at the last valid element
             current = maps.begin();	//continue from start
         else
             ++current;
@@ -419,8 +419,8 @@ void MapList::next(bool fUseFilters)
 void MapList::random(bool fUseFilters)
 {
     int iShuffle = 0;
-    if(fUseFilters) {
-        if(iFilteredMapCount < 2)
+    if (fUseFilters) {
+        if (iFilteredMapCount < 2)
             return;
 
         iShuffle = RNGMAX(iFilteredMapCount - 1);
@@ -448,13 +448,13 @@ const char* MapList::randomFilename()
 void MapList::WriteFilters()
 {
     //Save user defined filters back to files
-    if(game_values.fNeedWriteFilters) {
+    if (game_values.fNeedWriteFilters) {
         game_values.fNeedWriteFilters = false;
 
         for (short iFilter = 0; iFilter < filterslist->GetCount(); iFilter++) {
             FILE * fp = fopen(filterslist->GetIndex(iFilter), "w");
 
-            if(!fp)
+            if (!fp)
                 continue;
 
             fprintf(fp, "#Version\n");
@@ -468,7 +468,7 @@ void MapList::WriteFilters()
             std::map<std::string, MapListNode*>::iterator itr = maps.begin(), lim = maps.end();
 
             while (itr != lim) {
-                if((*itr).second->pfFilters[iFilter + NUM_AUTO_FILTERS])
+                if ((*itr).second->pfFilters[iFilter + NUM_AUTO_FILTERS])
                     fprintf(fp, "%s\n", (*itr).first.c_str());
 
                 itr++;
@@ -493,16 +493,16 @@ void MapList::ReadFilters()
     //Used cached summary before trying to read the actual map file (to speed up load time)
     FILE * mfp = fopen(convertPath("maps/cache/mapsummary.txt").c_str(), "r");
 
-    if(mfp) {
+    if (mfp) {
         while (fgets(buffer, 256, mfp)) {
             char * pszMapName = strtok(buffer, ",\n");
 
-            if(maps.find(pszMapName) != maps.end()) {
+            if (maps.find(pszMapName) != maps.end()) {
                 bool fErrorReading = false;
                 for (short iFilter = 0; iFilter < NUM_AUTO_FILTERS; iFilter++) {
                     char * psz = strtok(NULL, ",\n");
 
-                    if(psz) {
+                    if (psz) {
                         maps[pszMapName]->pfFilters[iFilter] = strcmp(psz, "0") != 0;
                     } else {
                         fErrorReading = true;
@@ -510,7 +510,7 @@ void MapList::ReadFilters()
                     }
                 }
 
-                if(!fErrorReading)
+                if (!fErrorReading)
                     maps[pszMapName]->fReadFromCache = true;
             }
         }
@@ -519,7 +519,7 @@ void MapList::ReadFilters()
     }
 
     while (current != maps.end()) {
-        if(!current->second->fReadFromCache) {
+        if (!current->second->fReadFromCache) {
             MapListNode * mln = current->second;
             g_map->loadMap(mln->filename, read_type_summary);
             memcpy(mln->pfFilters, g_map->fAutoFilter, sizeof(bool) * NUM_AUTO_FILTERS);
@@ -533,35 +533,35 @@ void MapList::ReadFilters()
     for (short iFilter = 0; iFilter < filterslist->GetCount(); iFilter++) {
         FILE * ffp = fopen(filterslist->GetIndex(iFilter), "r");
 
-        if(!ffp)
+        if (!ffp)
             continue;
 
         short iVersion[4] = {0, 0, 0, 0};
         short iReadState = 0;
         while (fgets(buffer, 256, ffp)) {
-            if(buffer[0] == '#' || buffer[0] == '\n' || buffer[0] == '\r' || buffer[0] == ' ' || buffer[0] == '\t')
+            if (buffer[0] == '#' || buffer[0] == '\n' || buffer[0] == '\r' || buffer[0] == ' ' || buffer[0] == '\t')
                 continue;
 
-            if(0 == iReadState) {
+            if (0 == iReadState) {
                 char * psz = strtok(buffer, ".\n");
-                if(psz)
+                if (psz)
                     iVersion[0] = atoi(psz);
 
                 psz = strtok(NULL, ".\n");
-                if(psz)
+                if (psz)
                     iVersion[1] = atoi(psz);
 
                 psz = strtok(NULL, ".\n");
-                if(psz)
+                if (psz)
                     iVersion[2] = atoi(psz);
 
                 psz = strtok(NULL, ".\n");
-                if(psz)
+                if (psz)
                     iVersion[3] = atoi(psz);
 
                 iReadState = 1;
                 continue;
-            } else if(1 == iReadState) {
+            } else if (1 == iReadState) {
                 game_values.piFilterIcons[iFilter + NUM_AUTO_FILTERS] = atoi(buffer);
                 iReadState = 2;
                 continue;
@@ -569,7 +569,7 @@ void MapList::ReadFilters()
                 char * pszMap = strtok(buffer, "\r\n");
 
                 //If that map is found
-                if(findexact(pszMap, false))
+                if (findexact(pszMap, false))
                     (*current).second->pfFilters[iFilter + NUM_AUTO_FILTERS] = true;
             }
         }
@@ -600,7 +600,7 @@ void MapList::WriteMapSummaryCache()
 {
     FILE * fp = fopen(convertPath("maps/cache/mapsummary.txt").c_str(), "w");
 
-    if(!fp)
+    if (!fp)
         return;
 
     std::map<std::string, MapListNode*>::iterator itr = maps.begin(), lim = maps.end();
@@ -634,8 +634,8 @@ void MapList::ApplyFilters(bool * pfFilters)
     while (itr != lim) {
         bool fMatched = true;
         for (short iFilter = 0; iFilter < NUM_AUTO_FILTERS + filterslist->GetCount(); iFilter++) {
-            if(pfFilters[iFilter]) {
-                if(!(*itr).second->pfFilters[iFilter]) {
+            if (pfFilters[iFilter]) {
+                if (!(*itr).second->pfFilters[iFilter]) {
                     fMatched = false;
                     break;
                 }
@@ -644,7 +644,7 @@ void MapList::ApplyFilters(bool * pfFilters)
 
         (*itr).second->fInCurrentFilterSet = fMatched;
 
-        if(fMatched) {
+        if (fMatched) {
             (*itr).second->iFilteredIndex = iFilteredMapCount;
             mlnFilteredMaps[iFilteredMapCount] = itr;
             iFilteredMapCount++;
@@ -657,7 +657,7 @@ void MapList::ApplyFilters(bool * pfFilters)
 
     game_values.fFiltersOn = false;
     for (short iFilter = 0; iFilter < NUM_AUTO_FILTERS + filterslist->GetCount(); iFilter++) {
-        if(pfFilters[iFilter]) {
+        if (pfFilters[iFilter]) {
             game_values.fFiltersOn = true;
             break;
         }
@@ -673,13 +673,13 @@ bool MapList::MapInFilteredSet()
 
 std::map<std::string, MapListNode*>::iterator MapList::GetIteratorAt(unsigned short iIndex, bool fUseFilters)
 {
-    if(fUseFilters) {
-        if(iIndex >= iFilteredMapCount)
+    if (fUseFilters) {
+        if (iIndex >= iFilteredMapCount)
             return maps.end();
 
         return mlnFilteredMaps[iIndex];
     } else {
-        if(iIndex >= maps.size())
+        if (iIndex >= maps.size())
             return maps.end();
 
         return mlnMaps[iIndex];

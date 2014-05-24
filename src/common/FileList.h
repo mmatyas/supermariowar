@@ -21,17 +21,17 @@ public:
         return currentIndex;
     };
     void SetCurrent(unsigned int index) {
-        if(filelist.empty())
+        if (filelist.empty())
             return;
 
-        if(index < filelist.size())
+        if (index < filelist.size())
             currentIndex = index;
         else
             currentIndex = 0;
     };
 
     const char * current_name() {
-        if(currentIndex > -1)
+        if (currentIndex > -1)
             return filelist[currentIndex].c_str();
 
         return NULL;
@@ -41,7 +41,7 @@ public:
     void prev();
 
     void random() {
-        if(!filelist.empty())
+        if (!filelist.empty())
             currentIndex = RNGMAX(filelist.size());
     };
 
@@ -61,7 +61,7 @@ public:
 
             char * szCurrentName = lowercaseDup(filelist[currentIndex].c_str());
 
-            if(strstr(szCurrentName, szLookForName))	//compare names after
+            if (strstr(szCurrentName, szLookForName))	//compare names after
                 fFound = true;
 
             free(szCurrentName);
@@ -215,7 +215,7 @@ public:
         return currentIndex;
     };
     void SetCurrent(unsigned int index) {
-        if(index < entries.size())
+        if (index < entries.size())
             currentIndex = index;
         else
             currentIndex = 0;
@@ -271,7 +271,7 @@ public:
         return currentIndex;
     }
     void SetCurrent(unsigned int index) {
-        if(index < entries.size())
+        if (index < entries.size())
             currentIndex = index;
         else
             currentIndex = 0;

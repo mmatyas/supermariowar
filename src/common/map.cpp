@@ -82,16 +82,16 @@ void CMap::convertMap()
 			for (k = 0; k < MAPLAYERS; k++)
 			{
 				//if we find an empty tile (value 960), then we already have a converted map
-				if(mapdata[i][j][k] == TILESETSIZE)
+				if (mapdata[i][j][k] == TILESETSIZE)
 					fTilesNeedConversion = false;
 			}
 
-			if(objectdata[i][j.iType == -1)
+			if (objectdata[i][j.iType == -1)
 				fBlocksNeedConversion = false;
 		}
 	}
 
-	if(!fTilesNeedConversion && !fBlocksNeedConversion)
+	if (!fTilesNeedConversion && !fBlocksNeedConversion)
 		return;
 
 	//Otherwise, convert this map
@@ -146,7 +146,7 @@ void CMap::clearPlatforms()
     for (short iLayer = 0; iLayer < 5; iLayer++)
         platformdrawlayer[iLayer].clear();
 
-    if(platforms) {
+    if (platforms) {
         for (short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++) {
             delete platforms[iPlatform];
         }
@@ -196,16 +196,16 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
     /*
     cout << "loading map " << file;
 
-    if(iReadType == read_type_preview)
+    if (iReadType == read_type_preview)
     	cout << " (preview)";
-    if(iReadType == read_type_summary)
+    if (iReadType == read_type_summary)
     	cout << " (summary)";
 
     cout << " ...";
     */
 
     mapfile = fopen(file, "rb");
-    if(mapfile == NULL) {
+    if (mapfile == NULL) {
         cout << endl << " ERROR: Couldn't open map" << endl;
         return;
     }
@@ -219,7 +219,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 
     ReadIntChunk(version, 4, mapfile);
 
-    if(VersionIsEqualOrAfter(version, 1, 8, 0, 0)) {
+    if (VersionIsEqualOrAfter(version, 1, 8, 0, 0)) {
         //Read summary information here
 
         int iAutoFilterValues[NUM_AUTO_FILTERS + 1];
@@ -228,7 +228,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
         for (short iFilter = 0; iFilter < NUM_AUTO_FILTERS; iFilter++)
             fAutoFilter[iFilter] = iAutoFilterValues[iFilter] > 0;
 
-        if(iReadType == read_type_summary) {
+        if (iReadType == read_type_summary) {
             fclose(mapfile);
             return;
         }
@@ -237,7 +237,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 
         cout << "loading map " << file;
 
-        if(iReadType == read_type_preview)
+        if (iReadType == read_type_preview)
             cout << " (preview)";
 
         cout << " [Version " << version[0] << '.' << version[1] << '.'
@@ -253,7 +253,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
             short iTilesetID = ReadInt(mapfile);
             translation[iTileset].iID = iTilesetID;
 
-            if(iTilesetID > iMaxTilesetID)
+            if (iTilesetID > iMaxTilesetID)
                 iMaxTilesetID = iTilesetID;
 
             ReadString(translation[iTileset].szName, 128, mapfile);
@@ -267,7 +267,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
             short iID = translation[iTileset].iID;
             translationid[iID] = g_tilesetmanager->GetIndexFromName(translation[iTileset].szName);
 
-            if(translationid[iID] == TILESETUNKNOWN) {
+            if (translationid[iID] == TILESETUNKNOWN) {
                 tilesetwidths[iID] = 1;
                 tilesetheights[iID] = 1;
             } else {
@@ -287,15 +287,15 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
                     tile->iCol = ReadByteAsShort(mapfile);
                     tile->iRow = ReadByteAsShort(mapfile);
 
-                    if(tile->iID >= 0) {
-                        if(tile->iID > iMaxTilesetID)
+                    if (tile->iID >= 0) {
+                        if (tile->iID > iMaxTilesetID)
                             tile->iID = 0;
 
                         //Make sure the column and row we read in is within the bounds of the tileset
-                        if(tile->iCol < 0 || tile->iCol >= tilesetwidths[tile->iID])
+                        if (tile->iCol < 0 || tile->iCol >= tilesetwidths[tile->iID])
                             tile->iCol = 0;
 
-                        if(tile->iRow < 0 || tile->iRow >= tilesetheights[tile->iID])
+                        if (tile->iRow < 0 || tile->iRow >= tilesetheights[tile->iID])
                             tile->iRow = 0;
 
                         //Convert tileset ids into the current game's tileset's ids
@@ -348,7 +348,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
         }
 
         //For all layers if the map format supports it
-        if(VersionIsEqualOrAfter(version, 1, 8, 0, 2)) {
+        if (VersionIsEqualOrAfter(version, 1, 8, 0, 2)) {
             eyecandy[0] = (short)ReadInt(mapfile);
             eyecandy[1] = (short)ReadInt(mapfile);
         }
@@ -362,7 +362,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
             for (i = 0; i < MAPWIDTH; i++) {
                 TileType iType = (TileType)ReadInt(mapfile);
 
-                if(iType >= 0 && iType < NUMTILETYPES) {
+                if (iType >= 0 && iType < NUMTILETYPES) {
                     mapdatatop[i][j].iType = iType;
                     mapdatatop[i][j].iFlags = g_iTileTypeConversion[iType];
                 } else {
@@ -389,7 +389,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
             objectdata[iCol][iRow].iSettings[0] = ReadByteAsShort(mapfile);
         }
 
-        if(iReadType == read_type_preview) {
+        if (iReadType == read_type_preview) {
             fclose(mapfile);
             return;
         }
@@ -411,7 +411,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
             warpexits[i].warpy = (short)ReadInt(mapfile);
             warpexits[i].numblocks = (short)ReadInt(mapfile);
 
-            if(warpexits[i].connection > maxConnection)
+            if (warpexits[i].connection > maxConnection)
                 maxConnection = warpexits[i].connection;
         }
 
@@ -421,7 +421,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
                 ReadInt(mapfile);
         }
 
-        if(numwarpexits > MAXWARPS)
+        if (numwarpexits > MAXWARPS)
             numwarpexits = MAXWARPS;
 
         //Read spawn areas
@@ -430,7 +430,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
             totalspawnsize[i] = 0;
             numspawnareas[i] = (short)ReadInt(mapfile);
 
-            if(numspawnareas[i] > MAXSPAWNAREAS) {
+            if (numspawnareas[i] > MAXSPAWNAREAS) {
                 cout << endl << " ERROR: Number of spawn areas (" << numspawnareas[i]
                      << ") was greater than max allowed (" << MAXSPAWNAREAS << ')'
                      << endl;
@@ -448,7 +448,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
             }
 
             //If no spawn areas were identified, then create one big spawn area
-            if(totalspawnsize[i] == 0) {
+            if (totalspawnsize[i] == 0) {
                 numspawnareas[i] = 1;
                 spawnareas[i][0].left = 0;
                 spawnareas[i][0].width = 20;
@@ -462,7 +462,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
         //Read draw areas (foreground tiles drawing optimization)
         numdrawareas = (short)ReadInt(mapfile);
 
-        if(numdrawareas > MAXDRAWAREAS) {
+        if (numdrawareas > MAXDRAWAREAS) {
             cout << endl << " ERROR: Number of draw areas (" << numdrawareas
                  << ") was greater than max allowed (" << MAXDRAWAREAS << ')'
                  << endl;
@@ -500,12 +500,12 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
             flagbaselocations[j].x = (short)ReadInt(mapfile);
             flagbaselocations[j].y = (short)ReadInt(mapfile);
         }
-    } else if(VersionIsEqualOrAfter(version, 1, 7, 0, 0)) {
+    } else if (VersionIsEqualOrAfter(version, 1, 7, 0, 0)) {
         iNumMapItems = 0;
         iNumMapHazards = 0;
 
         //Read summary information here
-        if(VersionIsEqualOrAfter(version, 1, 7, 0, 2)) {
+        if (VersionIsEqualOrAfter(version, 1, 7, 0, 2)) {
             int iAutoFilterValues[9];
             ReadIntChunk(iAutoFilterValues, 9, mapfile);
 
@@ -522,7 +522,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
                 fAutoFilter[iFilter] = false;
         }
 
-        if(iReadType == read_type_summary) {
+        if (iReadType == read_type_summary) {
             fclose(mapfile);
             return;
         }
@@ -531,7 +531,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 
         cout << "loading map " << file;
 
-        if(iReadType == read_type_preview)
+        if (iReadType == read_type_preview)
             cout << " (preview)";
 
         cout << " ";
@@ -549,7 +549,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 
                     TilesetTile * tile = &mapdata[i][j][k];
 
-                    if(iTileID == TILESETSIZE) {
+                    if (iTileID == TILESETSIZE) {
                         tile->iID = TILESETNONE;
                         tile->iCol = 0;
                         tile->iRow = 0;
@@ -561,33 +561,33 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
                 }
 
                 objectdata[i][j].iType = (short)ReadInt(mapfile);
-                if(objectdata[i][j].iType == 15)
+                if (objectdata[i][j].iType == 15)
                     objectdata[i][j].iType = -1;
 
                 objectdata[i][j].fHidden = false;
 
-                if(objectdata[i][j].iType == 1) {
+                if (objectdata[i][j].iType == 1) {
                     for (short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++)
                         objectdata[i][j].iSettings[iSetting] = g_iDefaultPowerupPresets[0][iSetting];
                 }
             }
         }
 
-        if(VersionIsEqualOrAfter(version, 1, 7, 0, 2)) {
+        if (VersionIsEqualOrAfter(version, 1, 7, 0, 2)) {
             //Read in background to use
             ReadString(szBackgroundFile, 128, mapfile);
             //printf("Background: %s", szBackgroundFile);
-        } else if(VersionIsEqualOrAfter(version, 1, 7, 0, 1)) {
+        } else if (VersionIsEqualOrAfter(version, 1, 7, 0, 1)) {
             //Read in background to use
             ReadString(szBackgroundFile, 128, mapfile);
 
             for (short iBackground = 0; iBackground < 26; iBackground++) {
                 const char * szFindUnderscore = strstr(g_szBackgroundConversion[iBackground], "_");
 
-                if(szFindUnderscore)
+                if (szFindUnderscore)
                     szFindUnderscore++;
 
-                if(!strcmp(szFindUnderscore, szBackgroundFile)) {
+                if (!strcmp(szFindUnderscore, szBackgroundFile)) {
                     strcpy(szBackgroundFile, g_szBackgroundConversion[iBackground]);
                 }
             }
@@ -597,7 +597,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
             strcpy(szBackgroundFile, g_szBackgroundConversion[backgroundID]);
         }
 
-        if(VersionIsEqualOrAfter(version, 1, 7, 0, 1)) {
+        if (VersionIsEqualOrAfter(version, 1, 7, 0, 1)) {
             //Read on/off switches
             for (short iSwitch = 0; iSwitch < 4; iSwitch++) {
                 iSwitches[iSwitch] = 1 - (short)ReadInt(mapfile);
@@ -606,12 +606,12 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
             //Set all the on/off blocks correctly
             for (j = 0; j < MAPHEIGHT; j++) {
                 for (i = 0; i < MAPWIDTH; i++) {
-                    if(objectdata[i][j].iType >= 11 && objectdata[i][j].iType <= 14) {
+                    if (objectdata[i][j].iType >= 11 && objectdata[i][j].iType <= 14) {
                         objectdata[i][j].iSettings[0] = iSwitches[objectdata[i][j].iType - 11];
                     }
                 }
             }
-        } else if(iReadType == read_type_preview) { //if it is a preview, for older maps, set the on/off blocks to on by default
+        } else if (iReadType == read_type_preview) { //if it is a preview, for older maps, set the on/off blocks to on by default
             //Read on/off switches
             for (short iSwitch = 0; iSwitch < 4; iSwitch++) {
                 iSwitches[iSwitch] = 1;
@@ -620,14 +620,14 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
             //Set all the on/off blocks correctly
             for (j = 0; j < MAPHEIGHT; j++) {
                 for (i = 0; i < MAPWIDTH; i++) {
-                    if(objectdata[i][j].iType >= 11 && objectdata[i][j].iType <= 14) {
+                    if (objectdata[i][j].iType >= 11 && objectdata[i][j].iType <= 14) {
                         objectdata[i][j].iSettings[0] = 1;
                     }
                 }
             }
         }
 
-        if(VersionIsEqualOrAfter(version, 1, 7, 0, 2)) {
+        if (VersionIsEqualOrAfter(version, 1, 7, 0, 2)) {
             //short translationid[1] = {g_tilesetmanager->GetIndexFromName("Classic")};
             loadPlatforms(mapfile, iReadType == read_type_preview, version);
         }
@@ -635,7 +635,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
         //Read in eyecandy to use
         eyecandy[2] = (short)ReadInt(mapfile);
 
-        if(VersionIsEqualOrAfter(version, 1, 7, 0, 1)) {
+        if (VersionIsEqualOrAfter(version, 1, 7, 0, 1)) {
             musicCategoryID = ReadInt(mapfile);
         } else {
             musicCategoryID = g_iMusicCategoryConversion[backgroundID];
@@ -645,7 +645,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
             for (i = 0; i < MAPWIDTH; i++) {
                 TileType iType = (TileType)ReadInt(mapfile);
 
-                if(iType >= 0 && iType < NUMTILETYPES) {
+                if (iType >= 0 && iType < NUMTILETYPES) {
                     mapdatatop[i][j].iType = iType;
                     mapdatatop[i][j].iFlags = g_iTileTypeConversion[iType];
                 } else {
@@ -667,7 +667,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
             }
         }
 
-        if(iReadType == read_type_preview) {
+        if (iReadType == read_type_preview) {
             fclose(mapfile);
             return;
         }
@@ -689,7 +689,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
             warpexits[i].warpy = (short)ReadInt(mapfile);
             warpexits[i].numblocks = (short)ReadInt(mapfile);
 
-            if(warpexits[i].connection > maxConnection)
+            if (warpexits[i].connection > maxConnection)
                 maxConnection = warpexits[i].connection;
         }
 
@@ -699,7 +699,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
                 ReadInt(mapfile);
         }
 
-        if(numwarpexits > MAXWARPS)
+        if (numwarpexits > MAXWARPS)
             numwarpexits = MAXWARPS;
 
         //Read spawn areas
@@ -707,7 +707,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
             totalspawnsize[i] = 0;
             numspawnareas[i] = (short)ReadInt(mapfile);
 
-            if(numspawnareas[i] > MAXSPAWNAREAS) {
+            if (numspawnareas[i] > MAXSPAWNAREAS) {
                 cout << endl << " ERROR: Number of spawn areas (" << numspawnareas[i]
                      << ") was greater than max allowed (" << MAXSPAWNAREAS << ')'
                      << endl;
@@ -742,7 +742,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
         //Read draw areas (foreground tiles drawing optimization)
         numdrawareas = (short)ReadInt(mapfile);
 
-        if(numdrawareas > MAXDRAWAREAS) {
+        if (numdrawareas > MAXDRAWAREAS) {
             cout << endl << " ERROR: Number of draw areas (" << numdrawareas
                  << ") was greater than max allowed (" << MAXDRAWAREAS << ')'
                  << endl;
@@ -757,12 +757,12 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
             drawareas[m].h = (Uint16)ReadInt(mapfile);
         }
 
-        if(VersionIsEqualOrBefore(version, 1, 7, 0, 1)) {
+        if (VersionIsEqualOrBefore(version, 1, 7, 0, 1)) {
             //short translationid[1] = {g_tilesetmanager->GetIndexFromName("Classic")};
             loadPlatforms(mapfile, iReadType == read_type_preview, version);
         }
 
-        if(VersionIsEqual(version, 1, 7, 0, 0)) {
+        if (VersionIsEqual(version, 1, 7, 0, 0)) {
             for (short iSwitch = 0; iSwitch < 4; iSwitch++) {
                 iSwitches[iSwitch] = 1 - (short)ReadInt(mapfile);
             }
@@ -770,20 +770,20 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
             //Set all the on/off blocks correctly
             for (j = 0; j < MAPHEIGHT; j++) {
                 for (i = 0; i < MAPWIDTH; i++) {
-                    if(objectdata[i][j].iType >= 11 && objectdata[i][j].iType <= 14) {
+                    if (objectdata[i][j].iType >= 11 && objectdata[i][j].iType <= 14) {
                         objectdata[i][j].iSettings[0] = iSwitches[objectdata[i][j].iType - 11];
                     }
                 }
             }
         }
-    } else if(VersionIsEqualOrAfter(version, 1, 6, 0, 0)) {
+    } else if (VersionIsEqualOrAfter(version, 1, 6, 0, 0)) {
         iNumMapItems = 0;
         iNumMapHazards = 0;
 
         for (short iFilter = 0; iFilter < NUM_AUTO_FILTERS; iFilter++)
             fAutoFilter[iFilter] = false;
 
-        if(iReadType == read_type_summary) {
+        if (iReadType == read_type_summary) {
             fclose(mapfile);
             return;
         }
@@ -802,7 +802,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
                     //This converts from 1.6 tileset to 1.7 tileset
                     short iTile = (short)ReadInt(mapfile);
 
-                    if(iTile == 300) {
+                    if (iTile == 300) {
                         mapdata[i][j][k].iID = TILESETNONE;
                     } else {
                         short iTileID = g_iTileConversion[iTile];
@@ -820,8 +820,8 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
                 for (k = MAPLAYERS - 1; k >= 0; k--) {
                     TilesetTile * tile = &mapdata[i][j][k];
                     TileType type = g_tilesetmanager->GetClassicTileset()->GetTileType(tile->iCol, tile->iRow);
-                    if(type != tile_nonsolid) {
-                        if(type >= 0 && type < NUMTILETYPES) {
+                    if (type != tile_nonsolid) {
+                        if (type >= 0 && type < NUMTILETYPES) {
                             mapdatatop[i][j].iType = type;
                             mapdatatop[i][j].iFlags = g_iTileTypeConversion[type];
                         } else {
@@ -834,12 +834,12 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
                 }
 
                 objectdata[i][j].iType = (short)ReadInt(mapfile);
-                if(objectdata[i][j].iType == 6)
+                if (objectdata[i][j].iType == 6)
                     objectdata[i][j].iType = -1;
 
                 objectdata[i][j].fHidden = false;
 
-                if(objectdata[i][j].iType == 1) {
+                if (objectdata[i][j].iType == 1) {
                     for (short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++)
                         objectdata[i][j].iSettings[iSetting] = g_iDefaultPowerupPresets[0][iSetting];
                 }
@@ -848,7 +848,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
                 warpdata[i][j].connection = (short)ReadInt(mapfile);
                 warpdata[i][j].id = (short)ReadInt(mapfile);
 
-                if(VersionIsEqualOrAfter(version, 1, 6, 1, 0)) {
+                if (VersionIsEqualOrAfter(version, 1, 6, 1, 0)) {
                     nospawn[0][i][j] = ReadInt(mapfile) == 0 ? false : true;
 
                     for (short iType = 1; iType < NUMSPAWNAREATYPES; iType++)
@@ -883,7 +883,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
             warpexits[i].warpy = (short)ReadInt(mapfile);
             warpexits[i].numblocks = (short)ReadInt(mapfile);
 
-            if(warpexits[i].connection > maxConnection)
+            if (warpexits[i].connection > maxConnection)
                 maxConnection = warpexits[i].connection;
         }
 
@@ -893,14 +893,14 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
                 ReadInt(mapfile);
         }
 
-        if(numwarpexits > MAXWARPS)
+        if (numwarpexits > MAXWARPS)
             numwarpexits = MAXWARPS;
 
         //Read spawn areas
         totalspawnsize[0] = 0;
         numspawnareas[0] = (short)ReadInt(mapfile);
 
-        if(numspawnareas[0] > MAXSPAWNAREAS) {
+        if (numspawnareas[0] > MAXSPAWNAREAS) {
             cout << endl << " ERROR: Number of spawn areas (" << numspawnareas[0]
                  << ") was greater than max allowed (" << MAXSPAWNAREAS << ')'
                  << endl;
@@ -915,7 +915,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
             spawnareas[0][m].height = (short)ReadInt(mapfile);
             spawnareas[0][m].size = (short)ReadInt(mapfile);
 
-            if(VersionIsEqualOrBefore(version, 1, 6, 0, 10)) {
+            if (VersionIsEqualOrBefore(version, 1, 6, 0, 10)) {
                 spawnareas[0][m].width -= spawnareas[0][m].left;
                 spawnareas[0][m].height -= spawnareas[0][m].top;
             }
@@ -936,17 +936,17 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
                 spawnareas[i2][m].height = spawnareas[0][m].height;
                 spawnareas[i2][m].size = spawnareas[0][m].size;
 
-                if(VersionIsEqualOrBefore(version, 1, 6, 0, 10)) {
+                if (VersionIsEqualOrBefore(version, 1, 6, 0, 10)) {
                     spawnareas[i2][m].width -= spawnareas[i2][m].left;
                     spawnareas[i2][m].height -= spawnareas[i2][m].top;
                 }
             }
         }
 
-        if(VersionIsEqualOrAfter(version, 1, 6, 1, 0)) {
+        if (VersionIsEqualOrAfter(version, 1, 6, 1, 0)) {
             numdrawareas = (short)ReadInt(mapfile);
 
-            if(numdrawareas > MAXDRAWAREAS) {
+            if (numdrawareas > MAXDRAWAREAS) {
                 cout << endl << " ERROR: Number of draw areas (" << numdrawareas
                      << ") was greater than max allowed (" << MAXDRAWAREAS << ')'
                      << endl;
@@ -971,7 +971,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
         for (short iFilter = 0; iFilter < NUM_AUTO_FILTERS; iFilter++)
             fAutoFilter[iFilter] = false;
 
-        if(iReadType == read_type_summary) {
+        if (iReadType == read_type_summary) {
             fclose(mapfile);
             return;
         }
@@ -1000,7 +1000,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 
                 TileType iType = g_tilesetmanager->GetClassicTileset()->GetTileType(tile->iCol, tile->iRow);
 
-                if(iType >= 0 && iType < NUMTILETYPES) {
+                if (iType >= 0 && iType < NUMTILETYPES) {
                     mapdatatop[i][j].iType = iType;
                     mapdatatop[i][j].iFlags = g_iTileTypeConversion[iType];
                 } else {
@@ -1018,12 +1018,12 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
         for (j = 0; j < MAPHEIGHT; j++) {
             for (i = 0; i < MAPWIDTH; i++) {
                 objectdata[i][j].iType = (short)ReadInt(mapfile);
-                if(objectdata[i][j].iType == 6)
+                if (objectdata[i][j].iType == 6)
                     objectdata[i][j].iType = -1;
 
                 objectdata[i][j].fHidden = false;
 
-                if(objectdata[i][j].iType == 1) {
+                if (objectdata[i][j].iType == 1) {
                     for (short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++)
                         objectdata[i][j].iSettings[iSetting] = g_iDefaultPowerupPresets[0][iSetting];
                 }
@@ -1062,13 +1062,13 @@ void CMap::UpdateTileGap(short i, short j)
 {
     for (short iRow = j; iRow <= j + 1; iRow++) {
         for (short iCol = i - 1; iCol <= i + 1; iCol++) {
-            if(iRow >= MAPHEIGHT)
+            if (iRow >= MAPHEIGHT)
                 break;
 
             short ix = iCol;
-            if(ix < 0)
+            if (ix < 0)
                 ix = MAPWIDTH - 1;
-            else if(ix >= MAPWIDTH)
+            else if (ix >= MAPWIDTH)
                 ix = 0;
 
             SetTileGap(ix, iRow);
@@ -1079,11 +1079,11 @@ void CMap::UpdateTileGap(short i, short j)
 void CMap::SetTileGap(short i, short j)
 {
     short iLeftTile = i - 1;
-    if(iLeftTile < 0)
+    if (iLeftTile < 0)
         iLeftTile = MAPWIDTH - 1;
 
     short iRightTile = i + 1;
-    if(iRightTile >= MAPWIDTH)
+    if (iRightTile >= MAPWIDTH)
         iRightTile = 0;
 
     int topLeftTile = 0;
@@ -1094,7 +1094,7 @@ void CMap::SetTileGap(short i, short j)
     IO_Block * topCenterBlock = NULL;
     IO_Block * topRightBlock = NULL;
 
-    if(j > 0) {
+    if (j > 0) {
         topLeftTile = mapdatatop[iLeftTile][j - 1].iFlags;
         topCenterTile = mapdatatop[i][j - 1].iFlags;
         topRightTile = mapdatatop[iRightTile][j - 1].iFlags;
@@ -1125,10 +1125,10 @@ void CMap::SetTileGap(short i, short j)
     bool fTopCenterSolid = (topCenterTile & tile_flag_solid) || (topCenterBlock && !topCenterBlock->isTransparent() && !topCenterBlock->isHidden());
     bool fTopRightSolid = (topRightTile & tile_flag_solid) || (topRightBlock && !topRightBlock->isTransparent() && !topRightBlock->isHidden());
 
-    if(fLeftSolid && !fCenterSolid && fRightSolid && !fTopLeftSolid && !fTopCenterSolid && !fTopRightSolid) {
+    if (fLeftSolid && !fCenterSolid && fRightSolid && !fTopLeftSolid && !fTopCenterSolid && !fTopRightSolid) {
         mapdatatop[i][j].iType = tile_gap;
         mapdatatop[i][j].iFlags = tile_flag_gap;
-    } else if(mapdatatop[i][j].iFlags == tile_flag_gap) {
+    } else if (mapdatatop[i][j].iFlags == tile_flag_gap) {
         mapdatatop[i][j].iType = tile_nonsolid;
         mapdatatop[i][j].iFlags = tile_flag_nonsolid;
     }
@@ -1156,30 +1156,30 @@ void CMap::loadPlatforms(FILE * mapfile, bool fPreview, int version[4], short * 
             for (short iRow = 0; iRow < iHeight; iRow++) {
                 TilesetTile * tile = &tiles[iCol][iRow];
 
-                if(VersionIsEqualOrAfter(version, 1, 8, 0, 0)) {
+                if (VersionIsEqualOrAfter(version, 1, 8, 0, 0)) {
                     tile->iID = ReadByteAsShort(mapfile);
                     tile->iCol = ReadByteAsShort(mapfile);
                     tile->iRow = ReadByteAsShort(mapfile);
 
-                    if(tile->iID >= 0) {
-                        if(iMaxTilesetID != -1 && tile->iID > iMaxTilesetID)
+                    if (tile->iID >= 0) {
+                        if (iMaxTilesetID != -1 && tile->iID > iMaxTilesetID)
                             tile->iID = 0;
 
                         //Make sure the column and row we read in is within the bounds of the tileset
-                        if(tile->iCol < 0 || (tilesetwidths && tile->iCol >= tilesetwidths[tile->iID]))
+                        if (tile->iCol < 0 || (tilesetwidths && tile->iCol >= tilesetwidths[tile->iID]))
                             tile->iCol = 0;
 
-                        if(tile->iRow < 0 || (tilesetheights && tile->iRow >= tilesetheights[tile->iID]))
+                        if (tile->iRow < 0 || (tilesetheights && tile->iRow >= tilesetheights[tile->iID]))
                             tile->iRow = 0;
 
                         //Convert tileset ids into the current game's tileset's ids
-                        if(translationid)
+                        if (translationid)
                             tile->iID = translationid[tile->iID];
                     }
 
                     TileType iType = (TileType)ReadInt(mapfile);
 
-                    if(iType >= 0 && iType < NUMTILETYPES) {
+                    if (iType >= 0 && iType < NUMTILETYPES) {
                         types[iCol][iRow].iType = iType;
                         types[iCol][iRow].iFlags = g_iTileTypeConversion[iType];
                     } else {
@@ -1190,7 +1190,7 @@ void CMap::loadPlatforms(FILE * mapfile, bool fPreview, int version[4], short * 
                     short iTile = ReadInt(mapfile);
                     TileType type;
 
-                    if(iTile == TILESETSIZE) {
+                    if (iTile == TILESETSIZE) {
                         tile->iID = TILESETNONE;
                         tile->iCol = 0;
                         tile->iRow = 0;
@@ -1204,7 +1204,7 @@ void CMap::loadPlatforms(FILE * mapfile, bool fPreview, int version[4], short * 
                         type = g_tilesetmanager->GetClassicTileset()->GetTileType(tile->iCol, tile->iRow);
                     }
 
-                    if(type >= 0 && type < NUMTILETYPES) {
+                    if (type >= 0 && type < NUMTILETYPES) {
                         types[iCol][iRow].iType = type;
                         types[iCol][iRow].iFlags = g_iTileTypeConversion[type];
                     } else {
@@ -1216,20 +1216,20 @@ void CMap::loadPlatforms(FILE * mapfile, bool fPreview, int version[4], short * 
         }
 
         short iDrawLayer = 2;
-        if(VersionIsEqualOrAfter(version, 1, 8, 0, 1))
+        if (VersionIsEqualOrAfter(version, 1, 8, 0, 1))
             iDrawLayer = ReadInt(mapfile);
 
         //printf("Layer: %d\n", iDrawLayer);
 
         short iPathType = 0;
 
-        if(VersionIsEqualOrAfter(version, 1, 8, 0, 0))
+        if (VersionIsEqualOrAfter(version, 1, 8, 0, 0))
             iPathType = ReadInt(mapfile);
 
         //printf("PathType: %d\n", iPathType);
 
         MovingPlatformPath * path = NULL;
-        if(iPathType == 0) { //segment path
+        if (iPathType == 0) { //segment path
             float fStartX = ReadFloat(mapfile);
             float fStartY = ReadFloat(mapfile);
             float fEndX = ReadFloat(mapfile);
@@ -1240,7 +1240,7 @@ void CMap::loadPlatforms(FILE * mapfile, bool fPreview, int version[4], short * 
 
             //printf("Read segment path\n");
             //printf("StartX: %.2f StartY:%.2f EndX:%.2f EndY:%.2f Velocity:%.2f\n", fStartX, fStartY, fEndX, fEndY, fVelocity);
-        } else if(iPathType == 1) { //continuous path
+        } else if (iPathType == 1) { //continuous path
             float fStartX = ReadFloat(mapfile);
             float fStartY = ReadFloat(mapfile);
             float fAngle = ReadFloat(mapfile);
@@ -1250,7 +1250,7 @@ void CMap::loadPlatforms(FILE * mapfile, bool fPreview, int version[4], short * 
 
             //printf("Read continuous path\n");
             //printf("StartX: %.2f StartY:%.2f Angle:%.2f Velocity:%.2f\n", fStartX, fStartY, fAngle, fVelocity);
-        } else if(iPathType == 2) { //elliptical path
+        } else if (iPathType == 2) { //elliptical path
             float fRadiusX = ReadFloat(mapfile);
             float fRadiusY = ReadFloat(mapfile);
             float fCenterX = ReadFloat(mapfile);
@@ -1278,7 +1278,7 @@ void CMap::saveMap(const std::string& file)
     cout << "saving map " << file << " ... ";
 
     mapfile = fopen(file, "wb");
-    if(mapfile == NULL) {
+    if (mapfile == NULL) {
         cout << endl << " ERROR: couldn't save map" << endl;
         return;
     }
@@ -1317,7 +1317,7 @@ void CMap::saveMap(const std::string& file)
             for (short iRow = 0; iRow < platforms[iPlatform]->iTileHeight; iRow++) {
                 //Set the tile type flags for each tile
                 int iType = platforms[iPlatform]->iTileType[iCol][iRow].iType;
-                if(iType >= 0 && iType < NUMTILETYPES) {
+                if (iType >= 0 && iType < NUMTILETYPES) {
                     platforms[iPlatform]->iTileType[iCol][iRow].iFlags = g_iTileTypeConversion[iType];
                 } else {
                     platforms[iPlatform]->iTileType[iCol][iRow].iType = tile_nonsolid;
@@ -1327,13 +1327,13 @@ void CMap::saveMap(const std::string& file)
                 TilesetTile * tile = &platforms[iPlatform]->iTileData[iCol][iRow];
                 int iFlags = platforms[iPlatform]->iTileType[iCol][iRow].iFlags;
 
-                if(tile->iID != TILESETNONE)
+                if (tile->iID != TILESETNONE)
                     iPlatformCount++;
 
-                if(iFlags & tile_flag_has_death)
+                if (iFlags & tile_flag_has_death)
                     iHazardCount++;
 
-                if(iFlags & tile_flag_ice)
+                if (iFlags & tile_flag_ice)
                     iIceCount++;
             }
         }
@@ -1345,7 +1345,7 @@ void CMap::saveMap(const std::string& file)
         for (i = 0; i < MAPWIDTH; i++) {
             //Set the tile type flags for each tile
             int iType = mapdatatop[i][j].iType;
-            if(iType >= 0 && iType < NUMTILETYPES) {
+            if (iType >= 0 && iType < NUMTILETYPES) {
                 mapdatatop[i][j].iFlags = g_iTileTypeConversion[iType];
             } else {
                 mapdatatop[i][j].iType = tile_nonsolid;
@@ -1355,24 +1355,24 @@ void CMap::saveMap(const std::string& file)
             //Calculate what warp tiles belong together (any warps that have the same connection that are
             //next to each other are merged into a single warp)
             //If there are too many warps, then remove any warp encountered that is over that limit
-            if(warpdata[i][j].connection != -1 && !usedtile[i][j]) {
+            if (warpdata[i][j].connection != -1 && !usedtile[i][j]) {
                 int movex = 0, movey = 0;
                 int currentx = i, currenty = j;
 
-                if(warpdata[i][j].direction == 0 || warpdata[i][j].direction == 2)
+                if (warpdata[i][j].direction == 0 || warpdata[i][j].direction == 2)
                     movex = 1;
                 else
                     movey = 1;
 
                 while (currentx < MAPWIDTH && currenty < MAPHEIGHT) {
-                    if(warpdata[currentx][currenty].direction != warpdata[i][j].direction ||
+                    if (warpdata[currentx][currenty].direction != warpdata[i][j].direction ||
                             warpdata[currentx][currenty].connection != warpdata[i][j].connection) {
                         break;
                     }
 
                     usedtile[currentx][currenty] = true;
 
-                    if(numWarpExits < MAXWARPS) {
+                    if (numWarpExits < MAXWARPS) {
                         warpdata[currentx][currenty].id = numWarpExits;
                     } else {
                         warpdata[currentx][currenty].connection = -1;
@@ -1390,34 +1390,34 @@ void CMap::saveMap(const std::string& file)
             int iFlags = mapdatatop[i][j].iFlags;
 
             //Calculate auto map filters
-            if(iFlags & tile_flag_has_death)
+            if (iFlags & tile_flag_has_death)
                 iHazardCount++;
 
-            if(warpdata[i][j].connection != -1)
+            if (warpdata[i][j].connection != -1)
                 iWarpCount++;
 
-            if(iFlags & tile_flag_ice)
+            if (iFlags & tile_flag_ice)
                 iIceCount++;
 
-            if(iBlockType == 1 || iBlockType == 15) //Powerup/View Block
+            if (iBlockType == 1 || iBlockType == 15) //Powerup/View Block
                 iPowerupBlockCount++;
 
-            if(iBlockType == 0) //Breakable Block
+            if (iBlockType == 0) //Breakable Block
                 iBreakableBlockCount++;
 
-            if(iBlockType == 6 || iBlockType == 16) //Blue/Red Throw Block
+            if (iBlockType == 6 || iBlockType == 16) //Blue/Red Throw Block
                 iThrowBlockCount++;
 
-            if(iBlockType >= 11 && iBlockType <= 14) //On/Off Block
+            if (iBlockType >= 11 && iBlockType <= 14) //On/Off Block
                 iOnOffBlockCount++;
 
-            if(iFlags & tile_flag_solid)
+            if (iFlags & tile_flag_solid)
                 iDensity++;
 
-            if((iBlockType == 1 || iBlockType == 3 || iBlockType == 4 || iBlockType == 5 || iBlockType == 15 || iBlockType == 17 || iBlockType == 18) && objectdata[i][j].fHidden) //Hidden blocks
+            if ((iBlockType == 1 || iBlockType == 3 || iBlockType == 4 || iBlockType == 5 || iBlockType == 15 || iBlockType == 17 || iBlockType == 18) && objectdata[i][j].fHidden) //Hidden blocks
                 iHiddenBlockCount++;
 
-            if(iBlockType >= 20 && iBlockType <= 29) //Item Destroyable Blocks
+            if (iBlockType >= 20 && iBlockType <= 29) //Item Destroyable Blocks
                 iItemDestroyableBlockCount++;
         }
     }
@@ -1448,7 +1448,7 @@ void CMap::saveMap(const std::string& file)
     for (j = 0; j < MAPHEIGHT; j++) {
         for (i = 0; i < MAPWIDTH; i++) {
             for (k = 0; k < MAPLAYERS; k++) {
-                if(mapdata[i][j][k].iID >= 0)
+                if (mapdata[i][j][k].iID >= 0)
                     fTilesetUsed[mapdata[i][j][k].iID] = true;
             }
         }
@@ -1460,7 +1460,7 @@ void CMap::saveMap(const std::string& file)
             for (short iRow = 0; iRow < platforms[iPlatform]->iTileHeight; iRow++) {
                 TilesetTile * tile = &platforms[iPlatform]->iTileData[iCol][iRow];
 
-                if(tile->iID >= 0)
+                if (tile->iID >= 0)
                     fTilesetUsed[tile->iID] = true;
             }
         }
@@ -1468,7 +1468,7 @@ void CMap::saveMap(const std::string& file)
 
     short iUsedTilesets = 0;
     for (short iTileset = 0; iTileset < iTilesetCount; iTileset++) {
-        if(fTilesetUsed[iTileset])
+        if (fTilesetUsed[iTileset])
             iUsedTilesets++;
     }
 
@@ -1476,7 +1476,7 @@ void CMap::saveMap(const std::string& file)
 
     //Write each of the tileset names with the index that will be used by this mapfile to represent that tileset
     for (short iTileset = 0; iTileset < iTilesetCount; iTileset++) {
-        if(fTilesetUsed[iTileset]) {
+        if (fTilesetUsed[iTileset]) {
             //Tileset ID
             WriteInt(iTileset, mapfile);
 
@@ -1497,11 +1497,11 @@ void CMap::saveMap(const std::string& file)
                 TilesetTile * tile = &mapdata[i][j][k];
 
                 //Make sure the tile's col and row are within the tileset
-                if(tile->iID >= 0) {
-                    if(tile->iCol < 0 || tile->iCol >= g_tilesetmanager->GetTileset(tile->iID)->GetWidth())
+                if (tile->iID >= 0) {
+                    if (tile->iCol < 0 || tile->iCol >= g_tilesetmanager->GetTileset(tile->iID)->GetWidth())
                         tile->iCol = 0;
 
-                    if(tile->iRow < 0 || tile->iRow >= g_tilesetmanager->GetTileset(tile->iID)->GetHeight())
+                    if (tile->iRow < 0 || tile->iRow >= g_tilesetmanager->GetTileset(tile->iID)->GetHeight())
                         tile->iRow = 0;
                 }
 
@@ -1535,11 +1535,11 @@ void CMap::saveMap(const std::string& file)
                 TilesetTile * tile = &platforms[iPlatform]->iTileData[iCol][iRow];
 
                 //Make sure the tile's col and row are within the tileset
-                if(tile->iID >= 0) {
-                    if(tile->iCol < 0 || tile->iCol >= g_tilesetmanager->GetTileset(tile->iID)->GetWidth())
+                if (tile->iID >= 0) {
+                    if (tile->iCol < 0 || tile->iCol >= g_tilesetmanager->GetTileset(tile->iID)->GetWidth())
                         tile->iCol = 0;
 
-                    if(tile->iRow < 0 || tile->iRow >= g_tilesetmanager->GetTileset(tile->iID)->GetHeight())
+                    if (tile->iRow < 0 || tile->iRow >= g_tilesetmanager->GetTileset(tile->iID)->GetHeight())
                         tile->iRow = 0;
                 }
 
@@ -1556,20 +1556,20 @@ void CMap::saveMap(const std::string& file)
         short iPathType = platforms[iPlatform]->pPath->iType;
         WriteInt(iPathType, mapfile);
 
-        if(iPathType == 0) {
+        if (iPathType == 0) {
             StraightPath * path = (StraightPath*)platforms[iPlatform]->pPath;
             WriteFloat(path->dPathPointX[0], mapfile);
             WriteFloat(path->dPathPointY[0], mapfile);
             WriteFloat(path->dPathPointX[1], mapfile);
             WriteFloat(path->dPathPointY[1], mapfile);
             WriteFloat(path->dVelocity, mapfile);
-        } else if(iPathType == 1) {
+        } else if (iPathType == 1) {
             StraightPathContinuous * path = (StraightPathContinuous*)platforms[iPlatform]->pPath;
             WriteFloat(path->dPathPointX[0], mapfile);
             WriteFloat(path->dPathPointY[0], mapfile);
             WriteFloat(path->dAngle, mapfile);
             WriteFloat(path->dVelocity, mapfile);
-        } else if(iPathType == 2) { //elliptical path
+        } else if (iPathType == 2) { //elliptical path
             EllipsePath * path = (EllipsePath*)platforms[iPlatform]->pPath;
             WriteFloat(path->dRadiusX, mapfile);
             WriteFloat(path->dRadiusY, mapfile);
@@ -1635,11 +1635,11 @@ void CMap::saveMap(const std::string& file)
     for (j = 0; j < MAPHEIGHT; j++) {
         for (i = 0; i < MAPWIDTH; i++) {
             //powerup block
-            if(objectdata[i][j].iType == 1 || objectdata[i][j].iType == 15)
+            if (objectdata[i][j].iType == 1 || objectdata[i][j].iType == 15)
                 iBlockCount++;
 
             //switched blocks
-            if(objectdata[i][j].iType >= 11 && objectdata[i][j].iType <= 14)
+            if (objectdata[i][j].iType >= 11 && objectdata[i][j].iType <= 14)
                 iSwitchBlockCount++;
         }
     }
@@ -1648,7 +1648,7 @@ void CMap::saveMap(const std::string& file)
     WriteInt(iSwitchBlockCount, mapfile);
     for (j = 0; j < MAPHEIGHT; j++) {
         for (i = 0; i < MAPWIDTH; i++) {
-            if(objectdata[i][j].iType >= 11 && objectdata[i][j].iType <= 14) {
+            if (objectdata[i][j].iType >= 11 && objectdata[i][j].iType <= 14) {
                 WriteByteFromShort(i, mapfile);
                 WriteByteFromShort(j, mapfile);
                 WriteByteFromShort(objectdata[i][j].iSettings[0], mapfile);
@@ -1671,11 +1671,11 @@ void CMap::saveMap(const std::string& file)
         for (i = 0; i < MAPWIDTH; i++) {
             //if we found a warp area and it hasn't been consumed by another warp area
             //then scan for surrounding warp areas and consume them to create a warp exit
-            if(warpdata[i][j].connection != -1 && !usedtile[i][j]) {
+            if (warpdata[i][j].connection != -1 && !usedtile[i][j]) {
                 int movex = 0, movey = 0;
                 int currentx = i, currenty = j;
 
-                if(warpdata[i][j].direction == 0 || warpdata[i][j].direction == 2)
+                if (warpdata[i][j].direction == 0 || warpdata[i][j].direction == 2)
                     movex = 1;
                 else
                     movey = 1;
@@ -1683,7 +1683,7 @@ void CMap::saveMap(const std::string& file)
 
                 int numblocks = 0;
                 while (currentx < MAPWIDTH && currenty < MAPHEIGHT) {
-                    if(warpdata[currentx][currenty].direction != warpdata[i][j].direction ||
+                    if (warpdata[currentx][currenty].direction != warpdata[i][j].direction ||
                             warpdata[currentx][currenty].connection != warpdata[i][j].connection) {
                         break;
                     }
@@ -1704,25 +1704,25 @@ void CMap::saveMap(const std::string& file)
                 WriteInt(warpdata[i][j].id, mapfile);
 
                 //Write out warp exit x,y position for player and position for lock icon to display
-                if(warpdata[i][j].direction == 0) {
+                if (warpdata[i][j].direction == 0) {
                     WriteInt((((currentx << 5) + TILESIZE - (i << 5)) >> 1) + (i << 5) - HALFPW, mapfile);
                     WriteInt((j << 5) - 1 + PHOFFSET, mapfile);
 
                     WriteInt((((currentx << 5) + TILESIZE - (i << 5)) >> 1) + (i << 5) - 16, mapfile);
                     WriteInt((j << 5), mapfile);
-                } else if(warpdata[i][j].direction == 2) {
+                } else if (warpdata[i][j].direction == 2) {
                     WriteInt((((currentx << 5) + TILESIZE - (i << 5)) >> 1) + (i << 5) - HALFPW, mapfile);
                     WriteInt((j << 5) + 1 + PHOFFSET, mapfile);
 
                     WriteInt((((currentx << 5) + TILESIZE - (i << 5)) >> 1) + (i << 5) - 16, mapfile);
                     WriteInt((j << 5), mapfile);
-                } else if(warpdata[i][j].direction == 1) {
+                } else if (warpdata[i][j].direction == 1) {
                     WriteInt((i << 5) + TILESIZE - PW - PWOFFSET, mapfile);
                     WriteInt((currenty << 5) + TILESIZE - PH - 1, mapfile);
 
                     WriteInt((i << 5), mapfile);
                     WriteInt((((currenty << 5) + TILESIZE - (j << 5)) >> 1) + (j << 5) - 16, mapfile);
-                } else if(warpdata[i][j].direction == 3) {
+                } else if (warpdata[i][j].direction == 3) {
                     WriteInt((i << 5) - 1 + PWOFFSET, mapfile);
                     WriteInt((currenty << 5) + TILESIZE - PH - 1, mapfile);
 
@@ -1743,11 +1743,11 @@ void CMap::saveMap(const std::string& file)
         calculatespawnareas(iType, false, false);
 
         //Ok try to find somewhere to spawn using areas that may or may not be there
-        if(numspawnareas[iType] == 0)
+        if (numspawnareas[iType] == 0)
             calculatespawnareas(iType, true, false);
 
         //Ok, try to find somewhere to spawn that might be over a death tile
-        if(numspawnareas[iType] == 0)
+        if (numspawnareas[iType] == 0)
             calculatespawnareas(iType, true, true);
     }
 
@@ -1771,7 +1771,7 @@ void CMap::saveMap(const std::string& file)
     //Figure out areas that contain tiles in layers 2 and 3
     for (j = 0; j < MAPHEIGHT; j++) {
         for (i = 0; i < MAPWIDTH; i++) {
-            if(mapdata[i][j][2].iID <= TILESETNONE && mapdata[i][j][3].iID <= TILESETNONE)
+            if (mapdata[i][j][2].iID <= TILESETNONE && mapdata[i][j][3].iID <= TILESETNONE)
                 usedtile[i][j] = true;
         }
     }
@@ -1780,7 +1780,7 @@ void CMap::saveMap(const std::string& file)
     numdrawareas = 0;
     for (j = 0; j < MAPHEIGHT; j++) {
         for (i = 0; i < MAPWIDTH; i++) {
-            if(!usedtile[i][j]) {
+            if (!usedtile[i][j]) {
                 bool fDownDone = false;
                 bool fRightDone = false;
 
@@ -1789,28 +1789,28 @@ void CMap::saveMap(const std::string& file)
                 int attempt = 1;
 
                 while (true) {
-                    if(!fRightDone) {
+                    if (!fRightDone) {
                         for (int right = i; right < rightsize; right++) {
-                            if(right >= MAPWIDTH || j + attempt >= MAPHEIGHT || usedtile[right][j + attempt])
+                            if (right >= MAPWIDTH || j + attempt >= MAPHEIGHT || usedtile[right][j + attempt])
                                 fRightDone = true;
                         }
 
-                        if(!fRightDone)
+                        if (!fRightDone)
                             downsize++;
                     }
 
-                    if(!fDownDone) {
+                    if (!fDownDone) {
                         for (int down = j; down < downsize; down++) {
-                            if(i + attempt >= MAPWIDTH || down >= MAPHEIGHT || usedtile[i + attempt][down])
+                            if (i + attempt >= MAPWIDTH || down >= MAPHEIGHT || usedtile[i + attempt][down])
                                 fDownDone = true;
                         }
 
-                        if(!fDownDone)
+                        if (!fDownDone)
                             rightsize++;
                     }
 
-                    if(fDownDone && fRightDone) {
-                        if(numdrawareas < MAXDRAWAREAS) {
+                    if (fDownDone && fRightDone) {
+                        if (numdrawareas < MAXDRAWAREAS) {
                             drawareas[numdrawareas].x = (Sint16)(i << 5);
                             drawareas[numdrawareas].y = (Sint16)(j << 5);
                             drawareas[numdrawareas].w = (Uint16)((rightsize - i) << 5);
@@ -1849,7 +1849,7 @@ void CMap::saveMap(const std::string& file)
 
     for (j = 0; j < MAPHEIGHT; j++) {
         for (i = 0; i < MAPWIDTH; i++) {
-            if(objectdata[i][j].iType == 1 || objectdata[i][j].iType == 15) { //powerup or view block
+            if (objectdata[i][j].iType == 1 || objectdata[i][j].iType == 15) { //powerup or view block
                 WriteByteFromShort(i, mapfile);
                 WriteByteFromShort(j, mapfile);
 
@@ -1905,19 +1905,19 @@ SDL_Surface * CMap::createThumbnailSurface(bool fUseClassicPack)
     char localSzBackgroundFile[128];
     std::string path;
 
-    if(fUseClassicPack) {
+    if (fUseClassicPack) {
         sprintf(localSzBackgroundFile, "gfx/packs/Classic/backgrounds/%s", g_map->szBackgroundFile);
         path = convertPath(localSzBackgroundFile);
 
         //if the background file doesn't exist, use the classic background
-        if(!File_Exists(path))
+        if (!File_Exists(path))
             path = convertPath("gfx/packs/Classic/backgrounds/Land_Classic.png");
     } else {
         sprintf(localSzBackgroundFile, "gfx/packs/backgrounds/%s", g_map->szBackgroundFile);
         path = convertPath(localSzBackgroundFile, gamegraphicspacklist->current_name());
 
         //if the background file doesn't exist, use the classic background
-        if(!File_Exists(path))
+        if (!File_Exists(path))
             path = convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->current_name());
     }
 
@@ -1928,7 +1928,7 @@ SDL_Surface * CMap::createThumbnailSurface(bool fUseClassicPack)
     }
 
     SDL_Surface * sBackground = SDL_DisplayFormat(temp);
-    if(!sBackground) {
+    if (!sBackground) {
         printf("ERROR: Couldn't convert thumbnail background to diplay pixel format: %s\n", SDL_GetError());
         return NULL;
     }
@@ -1938,7 +1938,7 @@ SDL_Surface * CMap::createThumbnailSurface(bool fUseClassicPack)
 	SDL_Rect srcRectBackground = {0, 0, smw->ScreenWidth, smw->ScreenHeight};
     SDL_Rect dstRectBackground = {0, 0, 160, 120};
 
-    if(SDL_SCALEBLIT(sBackground, &srcRectBackground, sThumbnail, &dstRectBackground) < 0) {
+    if (SDL_SCALEBLIT(sBackground, &srcRectBackground, sThumbnail, &dstRectBackground) < 0) {
         fprintf(stderr, "SDL_SoftStretch error: %s\n", SDL_GetError());
         return NULL;
     }
@@ -1961,7 +1961,7 @@ void CMap::saveThumbnail(const std::string &sFile, bool fUseClassicPack)
 {
     SDL_Surface * sThumbnail = createThumbnailSurface(fUseClassicPack);
 
-    if(!sThumbnail)
+    if (!sThumbnail)
         return;
 
     //Save the screenshot with the same name as the map file
@@ -1989,86 +1989,86 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks, bool fIgnoreDea
         for (i = 0; i < MAPWIDTH; i++) {
             bool fUsed = false;
 
-            if(j >= 13 || j == 0)
+            if (j >= 13 || j == 0)
                 fUsed = true;
 
-            if(!fUsed) {
-                if(nospawn[iType][i][j])
+            if (!fUsed) {
+                if (nospawn[iType][i][j])
                     fUsed = true;
             }
 
-            if(!fUsed && (mapdatatop[i][j].iFlags & tile_flag_solid)) {
+            if (!fUsed && (mapdatatop[i][j].iFlags & tile_flag_solid)) {
                 fUsed = true;
             }
 
             //If there is a block there
-            if(!fUsed) {
-                if(objectdata[i][j].iType != -1)
+            if (!fUsed) {
+                if (objectdata[i][j].iType != -1)
                     fUsed = true;
             }
 
             //If this is a player spawn area, have extra restrictions like don't spawn over spikes etc.
-            if(0 <= iType && 4 >= iType) {
+            if (0 <= iType && 4 >= iType) {
                 //If there is a death tile directly above
-                if(!fUsed) {
-                    if(j > 0) {
-                        if(mapdatatop[i][j - 1].iFlags & tile_flag_death_on_bottom) {
+                if (!fUsed) {
+                    if (j > 0) {
+                        if (mapdatatop[i][j - 1].iFlags & tile_flag_death_on_bottom) {
                             fUsed = true;
                         }
                     }
                 }
 
                 //If there is a death tile anywhere below this tile
-                if(!fUsed && !fIgnoreDeath) {
+                if (!fUsed && !fIgnoreDeath) {
                     int m;
                     for (m = j; m < MAPHEIGHT; m++) {
                         TileType type = mapdatatop[i][m].iType;
                         int flags = mapdatatop[i][m].iFlags;
                         short objBlock = objectdata[i][m].iType;
 
-                        if(m == j && (flags & tile_flag_solid_on_top))
+                        if (m == j && (flags & tile_flag_solid_on_top))
                             continue;
 
-                        if(type == tile_death_on_top || type == tile_death || type == tile_super_death_top || type == tile_super_death || type == tile_player_death) {
+                        if (type == tile_death_on_top || type == tile_death || type == tile_super_death_top || type == tile_super_death || type == tile_player_death) {
                             fUsed = true;
                             break;
                         }
 
-                        if(fUseTempBlocks) {
-                            if((type != tile_nonsolid && type != tile_gap) || objBlock != -1) {
+                        if (fUseTempBlocks) {
+                            if ((type != tile_nonsolid && type != tile_gap) || objBlock != -1) {
                                 break;
                             }
                         } else {
                             //Ignore the blocks that might not be there anymore (destroyed, turned off, etc)
-                            if((type != tile_nonsolid && type != tile_gap) || (objBlock != -1 && objBlock != 0 && objBlock != 2 && objBlock != 6 && (objBlock < 11 || objBlock > 14) && objBlock != 16 && objBlock < 19)) {
+                            if ((type != tile_nonsolid && type != tile_gap) || (objBlock != -1 && objBlock != 0 && objBlock != 2 && objBlock != 6 && (objBlock < 11 || objBlock > 14) && objBlock != 16 && objBlock < 19)) {
                                 break;
                             }
                         }
                     }
 
                     //If we didn't find a landing spot from here to bottom, then try to wrap around and see
-                    if(m == MAPHEIGHT) {
+                    if (m == MAPHEIGHT) {
                         for (m = 0; m < j; m++) {
                             TileType type = mapdatatop[i][m].iType;
                             short objBlock = objectdata[i][m].iType;
 
-                            if(type == tile_death_on_top || type == tile_death || type == tile_super_death_top || type == tile_super_death || type == tile_player_death) {
+                            if (type == tile_death_on_top || type == tile_death || type == tile_super_death_top || type == tile_super_death || type == tile_player_death) {
                                 fUsed = true;
                                 break;
                             }
 
-                            if(fUseTempBlocks) {
-                                if((type != tile_nonsolid && type != tile_gap) || objBlock != -1) {
+                            if (fUseTempBlocks) {
+                                if ((type != tile_nonsolid && type != tile_gap) || objBlock != -1) {
                                     break;
                                 }
                             } else {
-                                if((type != tile_nonsolid && type != tile_gap) || (objBlock != -1 && objBlock != 0 && objBlock != 2 && objBlock != 6 && (objBlock < 11 || objBlock > 14) && objBlock != 16 && objBlock < 19)) {
+                                if ((type != tile_nonsolid && type != tile_gap) || (objBlock != -1 && objBlock != 0 && objBlock != 2 && objBlock != 6 && (objBlock < 11 || objBlock > 14) && objBlock != 16 && objBlock < 19)) {
                                     break;
                                 }
                             }
                         }
 
-                        //if(m == j)
+                        //if (m == j)
                         //fUsed = true;
                     }
                 }
@@ -2082,7 +2082,7 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks, bool fIgnoreDea
     numspawnareas[iType] = 0;
     for (j = 0; j < MAPHEIGHT; j++) {
         for (i = 0; i < MAPWIDTH; i++) {
-            if(!usedtile[i][j]) {
+            if (!usedtile[i][j]) {
                 bool fDownDone = false;
                 bool fRightDone = false;
 
@@ -2091,28 +2091,28 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks, bool fIgnoreDea
                 short attempt = 1;
 
                 while (true) {
-                    if(!fRightDone) {
+                    if (!fRightDone) {
                         for (int right = i; right < rightsize; right++) {
-                            if(right >= MAPWIDTH || j + attempt >= MAPHEIGHT || usedtile[right][j + attempt])
+                            if (right >= MAPWIDTH || j + attempt >= MAPHEIGHT || usedtile[right][j + attempt])
                                 fRightDone = true;
                         }
 
-                        if(!fRightDone)
+                        if (!fRightDone)
                             downsize++;
                     }
 
-                    if(!fDownDone) {
+                    if (!fDownDone) {
                         for (int down = j; down < downsize; down++) {
-                            if(i + attempt >= MAPWIDTH || down >= MAPHEIGHT || usedtile[i + attempt][down])
+                            if (i + attempt >= MAPWIDTH || down >= MAPHEIGHT || usedtile[i + attempt][down])
                                 fDownDone = true;
                         }
 
-                        if(!fDownDone)
+                        if (!fDownDone)
                             rightsize++;
                     }
 
-                    if(fDownDone && fRightDone) {
-                        if(numspawnareas[iType] < MAXSPAWNAREAS) {
+                    if (fDownDone && fRightDone) {
+                        if (numspawnareas[iType] < MAXSPAWNAREAS) {
                             spawnareas[iType][numspawnareas[iType]].left = i;
                             spawnareas[iType][numspawnareas[iType]].top = j;
                             spawnareas[iType][numspawnareas[iType]].width = rightsize - 1 - i;
@@ -2142,7 +2142,7 @@ void CMap::AnimateTiles(short iFrame)
 {
     //If the end index for this frame is the same as the next frame, that means there are 0
     //animated tiles to paint this frame so we should skip it
-    if(iAnimatedVectorIndices[iFrame] == iAnimatedVectorIndices[iFrame + 1])
+    if (iAnimatedVectorIndices[iFrame] == iAnimatedVectorIndices[iFrame + 1])
         return;
 
     //For each animated tile we are painting this frame, paint it to the map tiles or a platform
@@ -2150,15 +2150,15 @@ void CMap::AnimateTiles(short iFrame)
         AnimatedTile * tile = animatedtiles[iTile];
         SDL_Rect * rDst = &(tile->rDest);
 
-        if(tile->fBackgroundAnimated) {
+        if (tile->fBackgroundAnimated) {
             SDL_BlitSurface(animatedTilesSurface, &(tile->rAnimationSrc[0][iTileAnimationFrame]), animatedBackmapSurface, rDst);
         }
 
-        if(tile->fForegroundAnimated) {
+        if (tile->fForegroundAnimated) {
             SDL_BlitSurface(animatedTilesSurface, &(tile->rAnimationSrc[1][iTileAnimationFrame]), animatedFrontmapSurface, rDst);
         }
 
-        if(tile->pPlatform) {
+        if (tile->pPlatform) {
             SDL_BlitSurface(animatedTilesSurface, &(tile->rAnimationSrc[0][iTileAnimationFrame]), tile->pPlatform->sSurface[g_iCurrentDrawIndex], rDst);
         }
     }
@@ -2179,21 +2179,21 @@ void CMap::draw(SDL_Surface *targetSurface, int layer)
             TilesetTile * tile = &mapdata[i][j][layer];
 
             //If there is no tile to draw, continue
-            if(tile->iID == TILESETNONE)
+            if (tile->iID == TILESETNONE)
                 continue;
 
             //If this is an animated tile, then setup an animated tile struct for use in drawing
-            if(tile->iID >= 0) {
+            if (tile->iID >= 0) {
                 g_tilesetmanager->Draw(targetSurface, tile->iID, 0, tile->iCol, tile->iRow, i, j);
                 //SDL_BlitSurface(rm->spr_maptiles[0].getSurface(), &g_tilesetmanager->rRects[0][tile->iCol][tile->iRow], targetSurface, &bltrect);
-            } else if(tile->iID == TILESETANIMATED) {
+            } else if (tile->iID == TILESETANIMATED) {
                 //See if we already have this tile
                 bool fNeedNewAnimatedTile = true;
 
                 short iNewTileId = j * MAPWIDTH + i;
                 std::vector<AnimatedTile*>::iterator iter = animatedtiles.begin(), lim = animatedtiles.end();
                 while (iter != lim) {
-                    if(iNewTileId == (*iter)->id) {
+                    if (iNewTileId == (*iter)->id) {
                         fNeedNewAnimatedTile = false;
                         break;
                     }
@@ -2201,7 +2201,7 @@ void CMap::draw(SDL_Surface *targetSurface, int layer)
                     ++iter;
                 }
 
-                if(fNeedNewAnimatedTile) {
+                if (fNeedNewAnimatedTile) {
                     AnimatedTile * animatedtile = new AnimatedTile();
                     animatedtile->id = iNewTileId;
 
@@ -2217,19 +2217,19 @@ void CMap::draw(SDL_Surface *targetSurface, int layer)
                         toTile->iCol = layerTile->iCol;
                         toTile->iRow = layerTile->iRow;
 
-                        if(layerTile->iID >= 0) { //If it is part of a tileset
+                        if (layerTile->iID >= 0) { //If it is part of a tileset
                             gfx_setrect(&(animatedtile->rSrc[iLayer][0]), layerTile->iCol << 5, layerTile->iRow << 5, TILESIZE, TILESIZE);
-                        } else if(layerTile->iID == TILESETANIMATED) {
+                        } else if (layerTile->iID == TILESETANIMATED) {
                             for (short iRect = 0; iRect < 4; iRect++) {
                                 gfx_setrect(&(animatedtile->rSrc[iLayer][iRect]), (iRect + (layerTile->iCol << 2)) << 5, layerTile->iRow << 5, TILESIZE, TILESIZE);
                             }
 
                             //Background is animated if it is a background layer or if it is a foreground layer and we are not displaying the foreground
-                            if(iLayer < 2 || !game_values.toplayer)
+                            if (iLayer < 2 || !game_values.toplayer)
                                 animatedtile->fBackgroundAnimated = true;
 
                             //Foreground is animated if it is a foreground layer and we are displaying the foreground
-                            if(iLayer >= 2 && game_values.toplayer)
+                            if (iLayer >= 2 && game_values.toplayer)
                                 animatedtile->fForegroundAnimated = true;
                         }
                     }
@@ -2237,7 +2237,7 @@ void CMap::draw(SDL_Surface *targetSurface, int layer)
                     gfx_setrect(&(animatedtile->rDest), bltrect.x, bltrect.y, TILESIZE, TILESIZE);
                     animatedtiles.push_back(animatedtile);
                 }
-            } else if(tile->iID == TILESETUNKNOWN) { //Draw red X where tile should be
+            } else if (tile->iID == TILESETUNKNOWN) { //Draw red X where tile should be
                 SDL_BlitSurface(rm->spr_unknowntile[0].getSurface(), &g_tilesetmanager->rRects[0][0][0], targetSurface, &bltrect);
             }
         }
@@ -2265,7 +2265,7 @@ void CMap::addPlatformAnimatedTiles()
 
         for (short iRow = 0; iRow < iHeight; iRow++) {
             for (short iCol = 0; iCol < iWidth; iCol++) {
-                if(tiles[iCol][iRow].iID == TILESETANIMATED) {
+                if (tiles[iCol][iRow].iID == TILESETANIMATED) {
                     AnimatedTile * animatedtile = new AnimatedTile();
                     animatedtile->id = -1;  //we don't want this ID to collide with an animated map tile
 
@@ -2317,13 +2317,13 @@ void CMap::drawThumbnailPlatforms(SDL_Surface * targetSurface)
         MovingPlatform * platform = platforms[iPlatform];
         MovingPlatformPath * basepath = platform->pPath;
 
-        if(basepath->iType == 0) {
+        if (basepath->iType == 0) {
             StraightPath * path = (StraightPath*) basepath;
             DrawPlatform(path->iType, platform->iTileData, ((short)path->dPathPointX[0]) << 1, ((short)path->dPathPointY[0]) << 1, ((short)path->dPathPointX[1]) << 1, ((short)path->dPathPointY[1]) << 1, 0.0f, 0.0f, 0.0f, 2, platform->iTileWidth, platform->iTileHeight, true, true);
-        } else if(basepath->iType == 1) {
+        } else if (basepath->iType == 1) {
             StraightPathContinuous * path = (StraightPathContinuous*) basepath;
             DrawPlatform(path->iType, platform->iTileData, ((short)path->dPathPointX[0]) << 1, ((short)path->dPathPointY[0]) << 1, 0, 0, path->dAngle, 0.0f, 0.0f, 2, platform->iTileWidth, platform->iTileHeight, true, true);
-        } else if(basepath->iType == 2) {
+        } else if (basepath->iType == 2) {
             EllipsePath * path = (EllipsePath*) basepath;
             DrawPlatform(path->iType, platform->iTileData, ((short)path->dPathPointX[0]) << 1, ((short)path->dPathPointY[0]) << 1, 0, 0, path->dStartAngle, path->dRadiusX * 2, path->dRadiusY * 2, 2, platform->iTileWidth, platform->iTileHeight, true, true);
         }
@@ -2337,7 +2337,7 @@ void CMap::preDrawPreviewWarps(SDL_Surface * targetSurface, bool fThumbnail)
     short iTileSize = 16;
     short iScreenshotSize = 0;
 
-    if(fThumbnail) {
+    if (fThumbnail) {
         iTileSize = 8;
         iScreenshotSize = 1;
     }
@@ -2346,7 +2346,7 @@ void CMap::preDrawPreviewWarps(SDL_Surface * targetSurface, bool fThumbnail)
         for (int i = 0; i < MAPWIDTH; i++) {
             Warp * wWarp = &g_map->warpdata[i][j];
 
-            if(wWarp->connection != -1) {
+            if (wWarp->connection != -1) {
                 SDL_Rect rSrc = {wWarp->connection * iTileSize, wWarp->direction * iTileSize, iTileSize, iTileSize};
                 SDL_Rect rDst = {i * iTileSize, j * iTileSize, iTileSize, iTileSize};
 
@@ -2361,7 +2361,7 @@ void CMap::preDrawPreviewMapItems(SDL_Surface * targetSurface, bool fThumbnail)
     short iTileSize = 16;
     short iScreenshotSize = 0;
 
-    if(fThumbnail) {
+    if (fThumbnail) {
         iTileSize = 8;
         iScreenshotSize = 1;
     }
@@ -2382,7 +2382,7 @@ void CMap::preDrawPreviewBackground(SDL_Surface * targetSurface, bool fThumbnail
     drawPreview(targetSurface, 1, fThumbnail);
     smallDelay();
 
-    if(!game_values.toplayer) {
+    if (!game_values.toplayer) {
         drawPreview(targetSurface, 2, fThumbnail);
         smallDelay();
 
@@ -2405,7 +2405,7 @@ void CMap::preDrawPreviewBackground(gfxSprite * background, SDL_Surface * target
     dstrect.x = 0;
     dstrect.y = 0;
 
-    if(fThumbnail) {
+    if (fThumbnail) {
         dstrect.w = 160;
         dstrect.h = 120;
     } else {
@@ -2413,7 +2413,7 @@ void CMap::preDrawPreviewBackground(gfxSprite * background, SDL_Surface * target
         dstrect.h = smw->ScreenHeight/2;
     }
 
-    if(SDL_SCALEBLIT(background->getSurface(), &srcrect, targetSurface, &dstrect) < 0) {
+    if (SDL_SCALEBLIT(background->getSurface(), &srcrect, targetSurface, &dstrect) < 0) {
         fprintf(stderr, "SDL_SoftStretch error: %s\n", SDL_GetError());
         return;
     }
@@ -2424,7 +2424,7 @@ void CMap::preDrawPreviewBackground(gfxSprite * background, SDL_Surface * target
 
 void CMap::preDrawPreviewBlocks(SDL_Surface * targetSurface, bool fThumbnail)
 {
-    if(!fThumbnail) {
+    if (!fThumbnail) {
         SDL_FillRect(targetSurface, NULL, SDL_MapRGB(targetSurface->format, 255, 0, 255));
         SDL_SETCOLORKEY(targetSurface, SDL_FALSE, SDL_MapRGB(targetSurface->format, 255, 0, 255));
         smallDelay();
@@ -2436,13 +2436,13 @@ void CMap::preDrawPreviewBlocks(SDL_Surface * targetSurface, bool fThumbnail)
 
 void CMap::preDrawPreviewForeground(SDL_Surface * targetSurface, bool fThumbnail)
 {
-    if(!fThumbnail) {
+    if (!fThumbnail) {
         SDL_FillRect(targetSurface, NULL, SDL_MapRGB(targetSurface->format, 255, 0, 255));
         SDL_SETCOLORKEY(targetSurface, SDL_FALSE, SDL_MapRGB(targetSurface->format, 255, 0, 255));
         smallDelay();
     }
 
-    if(!game_values.toplayer)
+    if (!game_values.toplayer)
         return;
 
     drawPreview(targetSurface, 2, fThumbnail);
@@ -2457,22 +2457,22 @@ void CMap::drawPreview(SDL_Surface * targetSurface, int layer, bool fThumbnail)
     //draw left to right full vertical
     short iTilesetIndex = 1;
 
-    if(fThumbnail)
+    if (fThumbnail)
         iTilesetIndex = 2;
 
     for (i = 0; i < MAPWIDTH; i++) {
         for (j = 0; j < MAPHEIGHT; j++) {
             TilesetTile * tile = &mapdata[i][j][layer];
-            if(tile->iID == TILESETNONE)
+            if (tile->iID == TILESETNONE)
                 continue;
 
             //Handle drawing preview for animated tiles
-            if(tile->iID >= 0) {
+            if (tile->iID >= 0) {
                 g_tilesetmanager->Draw(targetSurface, tile->iID, iTilesetIndex, tile->iCol, tile->iRow, i, j);
                 //SDL_BlitSurface(rm->spr_maptiles[iTilesetIndex].getSurface(), &g_tilesetmanager->rRects[iTilesetIndex][tile->iCol][tile->iRow], targetSurface, &rectDst);
-            } else if(tile->iID == TILESETANIMATED) {
+            } else if (tile->iID == TILESETANIMATED) {
                 SDL_BlitSurface(rm->spr_tileanimation[iTilesetIndex].getSurface(), &g_tilesetmanager->rRects[iTilesetIndex][tile->iCol << 2][tile->iRow], targetSurface, &g_tilesetmanager->rRects[iTilesetIndex][i][j]);
-            } else if(tile->iID == TILESETUNKNOWN) {
+            } else if (tile->iID == TILESETUNKNOWN) {
                 SDL_BlitSurface(rm->spr_unknowntile[iTilesetIndex].getSurface(), &g_tilesetmanager->rRects[iTilesetIndex][0][0], targetSurface, &g_tilesetmanager->rRects[iTilesetIndex][i][j]);
             }
         }
@@ -2485,7 +2485,7 @@ void CMap::drawPreviewBlocks(SDL_Surface * targetSurface, bool fThumbnail)
 
     short iBlockSize = PREVIEWTILESIZE;
 
-    if(fThumbnail)
+    if (fThumbnail)
         iBlockSize = THUMBTILESIZE;
 
     SDL_Rect rectDst;
@@ -2504,32 +2504,32 @@ void CMap::drawPreviewBlocks(SDL_Surface * targetSurface, bool fThumbnail)
             rectDst.y += iBlockSize;	// here
 
             ts = objectdata[i][j].iType;
-            if(ts == -1)
+            if (ts == -1)
                 continue;
 
             //Don't draw hidden blocks
-            if(objectdata[i][j].fHidden)
+            if (objectdata[i][j].fHidden)
                 continue;
 
             rectSrc.x = (Sint16)(ts * iBlockSize);
             rectSrc.y = 0;
 
             //Draw the turned off switch blocks too
-            if(ts >= 7 && ts <= 10) {
-                if(iSwitches[(ts - 7) % 4] == 0)
+            if (ts >= 7 && ts <= 10) {
+                if (iSwitches[(ts - 7) % 4] == 0)
                     rectSrc.y = iBlockSize;
-            } else if(ts >= 11 && ts <= 14) {
-                if(objectdata[i][j].iSettings[0] == 0)
+            } else if (ts >= 11 && ts <= 14) {
+                if (objectdata[i][j].iSettings[0] == 0)
                     rectSrc.y = iBlockSize;
-            } else if(ts >= 15 && ts <= 19) {
+            } else if (ts >= 15 && ts <= 19) {
                 rectSrc.x = iBlockSize * (ts - 15);
                 rectSrc.y = iBlockSize;
-            } else if(ts >= 20 && ts <= 29) {
+            } else if (ts >= 20 && ts <= 29) {
                 rectSrc.x = iBlockSize * (ts - 20);
                 rectSrc.y = iBlockSize << 1;
             }
 
-            if(fThumbnail)
+            if (fThumbnail)
                 SDL_BlitSurface(rm->spr_blocks[2].getSurface(), &rectSrc, targetSurface, &rectDst);
             else
                 SDL_BlitSurface(rm->spr_blocks[1].getSurface(), &rectSrc, targetSurface, &rectDst);
@@ -2552,7 +2552,7 @@ void CMap::predrawbackground(gfxSprite &background, gfxSprite &mapspr)
     draw(mapspr.getSurface(), 0);
     draw(mapspr.getSurface(), 1);
 
-    if(!game_values.toplayer) {
+    if (!game_values.toplayer) {
         draw(mapspr.getSurface(), 2);
         draw(mapspr.getSurface(), 3);
     }
@@ -2595,19 +2595,19 @@ void CMap::predrawforeground(gfxSprite &foregroundspr)
 void CMap::SetupAnimatedTiles()
 {
     iAnimatedBackgroundLayers = 2;
-    if(!game_values.toplayer)
+    if (!game_values.toplayer)
         iAnimatedBackgroundLayers = 4;
 
     g_iCurrentDrawIndex = 0;
 
     iAnimatedTileCount = animatedtiles.size();
 
-    if(animatedTilesSurface) {
+    if (animatedTilesSurface) {
         SDL_FreeSurface(animatedTilesSurface);
         animatedTilesSurface = NULL;
     }
 
-    if(iAnimatedTileCount > 0) {
+    if (iAnimatedTileCount > 0) {
         SDL_Surface * backgroundSurface = rm->spr_background.getSurface();
         SDL_Surface * animatedTileSrcSurface = rm->spr_tileanimation[0].getSurface();
 
@@ -2628,7 +2628,7 @@ void CMap::SetupAnimatedTiles()
 
             //If the background layer has an animated tile, then create the set of 4 images that will be
             //drawn to this tile during the gameplay (gfx optimization by only drawing from animatedTilesSurface)
-            if(tile->fBackgroundAnimated) {
+            if (tile->fBackgroundAnimated) {
                 for (short sTileAnimationFrame = 0; sTileAnimationFrame < 4; sTileAnimationFrame++) {
                     gfx_setrect(&tile->rAnimationSrc[0][sTileAnimationFrame], &rDst);
 
@@ -2636,20 +2636,20 @@ void CMap::SetupAnimatedTiles()
 
                     for (short iLayer = 0; iLayer < iAnimatedBackgroundLayers; iLayer++) {
                         TilesetTile * tilesetTile = &tile->layers[iLayer];
-                        if(tilesetTile->iID >= 0) {
+                        if (tilesetTile->iID >= 0) {
                             SDL_BlitSurface(g_tilesetmanager->GetTileset(tilesetTile->iID)->GetSurface(0), &(tile->rSrc[iLayer][0]), animatedTilesSurface, &rDst);
-                        } else if(tilesetTile->iID == TILESETANIMATED) {
+                        } else if (tilesetTile->iID == TILESETANIMATED) {
                             SDL_BlitSurface(animatedTileSrcSurface, &(tile->rSrc[iLayer][sTileAnimationFrame]), animatedTilesSurface, &rDst);
-                        } else if(tilesetTile->iID == TILESETUNKNOWN) {
+                        } else if (tilesetTile->iID == TILESETUNKNOWN) {
                             SDL_BlitSurface(rm->spr_unknowntile[0].getSurface(), &g_tilesetmanager->rRects[0][0][0], animatedTilesSurface, &rDst);
                         }
                     }
 
                     rDst.x += 32;
-                    if(rDst.x >= 1024) {
+                    if (rDst.x >= 1024) {
                         rDst.x = 0;
                         rDst.y += 32;
-                        if(rDst.y >= 1024) {
+                        if (rDst.y >= 1024) {
                             tile->fForegroundAnimated = false;
                             fSrcSurfaceFull = true;
                             break;
@@ -2659,12 +2659,12 @@ void CMap::SetupAnimatedTiles()
             }
 
             //If we have run out of room on the animatedTilesSurface surface, then stop reading animated tiles
-            if(fSrcSurfaceFull) {
+            if (fSrcSurfaceFull) {
                 iter++;
                 break;
             }
 
-            if(tile->fForegroundAnimated) {
+            if (tile->fForegroundAnimated) {
                 for (short sTileAnimationFrame = 0; sTileAnimationFrame < 4; sTileAnimationFrame++) {
                     gfx_setrect(&tile->rAnimationSrc[1][sTileAnimationFrame], &rDst);
 
@@ -2672,20 +2672,20 @@ void CMap::SetupAnimatedTiles()
 
                     for (short iLayer = 2; iLayer < 4; iLayer++) {
                         TilesetTile * tilesetTile = &tile->layers[iLayer];
-                        if(tilesetTile->iID >= 0) {
+                        if (tilesetTile->iID >= 0) {
                             SDL_BlitSurface(g_tilesetmanager->GetTileset(tilesetTile->iID)->GetSurface(0), &(tile->rSrc[iLayer][0]), animatedTilesSurface, &rDst);
-                        } else if(tilesetTile->iID == TILESETANIMATED) {
+                        } else if (tilesetTile->iID == TILESETANIMATED) {
                             SDL_BlitSurface(animatedTileSrcSurface, &(tile->rSrc[iLayer][sTileAnimationFrame]), animatedTilesSurface, &rDst);
-                        } else if(tilesetTile->iID == TILESETUNKNOWN) {
+                        } else if (tilesetTile->iID == TILESETUNKNOWN) {
                             SDL_BlitSurface(rm->spr_unknowntile[0].getSurface(), &g_tilesetmanager->rRects[0][0][0], animatedTilesSurface, &rDst);
                         }
                     }
 
                     rDst.x += 32;
-                    if(rDst.x >= 1024) {
+                    if (rDst.x >= 1024) {
                         rDst.x = 0;
                         rDst.y += 32;
-                        if(rDst.y >= 1024) {
+                        if (rDst.y >= 1024) {
                             fSrcSurfaceFull = true;
                             break;
                         }
@@ -2694,29 +2694,29 @@ void CMap::SetupAnimatedTiles()
             }
 
             //If we have run out of room on the animatedTilesSurface surface, then stop reading animated tiles
-            if(fSrcSurfaceFull) {
+            if (fSrcSurfaceFull) {
                 iter++;
                 break;
             }
 
-            if(tile->pPlatform) {
+            if (tile->pPlatform) {
                 for (short sTileAnimationFrame = 0; sTileAnimationFrame < 4; sTileAnimationFrame++) {
                     gfx_setrect(&tile->rAnimationSrc[0][sTileAnimationFrame], &rDst);
 
                     SDL_FillRect(animatedTilesSurface, &rDst, iTransparentColor);
 
                     TilesetTile * tilesetTile = &tile->layers[0];
-                    if(tilesetTile->iID == TILESETANIMATED) {
+                    if (tilesetTile->iID == TILESETANIMATED) {
                         SDL_BlitSurface(animatedTileSrcSurface, &(tile->rSrc[0][sTileAnimationFrame]), animatedTilesSurface, &rDst);
                     } else {
                         cout << endl << " ERROR: A nonanimated platform tile was added to the animated tile list" << endl;
                     }
 
                     rDst.x += 32;
-                    if(rDst.x >= 1024) {
+                    if (rDst.x >= 1024) {
                         rDst.x = 0;
                         rDst.y += 32;
-                        if(rDst.y >= 1024) {
+                        if (rDst.y >= 1024) {
                             fSrcSurfaceFull = true;
                             break;
                         }
@@ -2765,7 +2765,7 @@ void CMap::updatePlatforms()
     std::list<MovingPlatform*>::iterator iter = tempPlatforms.begin(), lim = tempPlatforms.end();
 
     while (iter != lim) {
-        if((*iter)->fDead) {
+        if ((*iter)->fDead) {
             delete (*iter);
 
             iter = tempPlatforms.erase(iter);
@@ -2786,7 +2786,7 @@ void CMap::drawPlatforms(short iLayer)
         iterate++;
     }
 
-    if(iLayer == 2) {
+    if (iLayer == 2) {
         std::list<MovingPlatform*>::iterator iterateTemps = tempPlatforms.begin(), limTemps = tempPlatforms.end();
         while (iterateTemps != limTemps) {
             (*iterateTemps)->draw();
@@ -2811,7 +2811,7 @@ void CMap::movingPlatformCollision(CPlayer * player)
     for (short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++) {
         platforms[iPlatform]->collide(player);
 
-        if(!player->isready())
+        if (!player->isready())
             return;
     }
 
@@ -2820,7 +2820,7 @@ void CMap::movingPlatformCollision(CPlayer * player)
     while (iterateAll != lim) {
         (*iterateAll)->collide(player);
 
-        if(!player->isready())
+        if (!player->isready())
             return;
 
         iterateAll++;
@@ -2875,7 +2875,7 @@ void CMap::resetPlatforms()
 void CMap::lockconnection(int connection)
 {
     //Lock all warp connections
-    if(connection == -1) {
+    if (connection == -1) {
         for (short iConnection = 0; iConnection <= maxConnection; iConnection++) {
             warplocked[iConnection] = true;
         }
@@ -2892,15 +2892,15 @@ WarpExit * CMap::getRandomWarpExit(int connection, int currentID)
     WarpExit * currentWarp = NULL;
 
     for (int k = 0; k < numwarpexits; k++) {
-        if(warpexits[k].connection == connection) {
-            if(warpexits[k].id == currentID)
+        if (warpexits[k].connection == connection) {
+            if (warpexits[k].id == currentID)
                 currentWarp = &warpexits[k];
             else
                 indices[numIndices++] = k;
         }
     }
 
-    if(numIndices == 0)
+    if (numIndices == 0)
         return currentWarp;
 
     return &warpexits[indices[RNGMAX( numIndices)]];
@@ -2921,7 +2921,7 @@ void CMap::clearWarpLocks()
 void CMap::drawWarpLocks()
 {
     for (int iWarpExit = 0; iWarpExit < numwarpexits; iWarpExit++) {
-        if(warplocked[warpexits[iWarpExit].connection] || warpexits[iWarpExit].locktimer > 0) {
+        if (warplocked[warpexits[iWarpExit].connection] || warpexits[iWarpExit].locktimer > 0) {
             rm->spr_warplock.draw(warpexits[iWarpExit].lockx, warpexits[iWarpExit].locky);
         }
     }
@@ -2931,8 +2931,8 @@ void CMap::update()
 {
     //Unlock locked warps if the time is up
     for (short iConnection = 0; iConnection <= maxConnection; iConnection++) {
-        if(warplocked[iConnection]) {
-            if(++warplocktimer[iConnection] > game_values.warplocktime) {
+        if (warplocked[iConnection]) {
+            if (++warplocktimer[iConnection] > game_values.warplocktime) {
                 warplocked[iConnection] = false;
                 warplocktimer[iConnection] = 0;
             }
@@ -2941,12 +2941,12 @@ void CMap::update()
 
     //If warp is individually locked, then reduce lock timer
     for (short iWarpExit = 0; iWarpExit < numwarpexits; iWarpExit++) {
-        if(warpexits[iWarpExit].locktimer > 0)
+        if (warpexits[iWarpExit].locktimer > 0)
             --warpexits[iWarpExit].locktimer;
     }
 
     //Animate the animated tiles
-    if(++iTileAnimationTimer >= NUM_FRAMES_BETWEEN_TILE_ANIMATION) {
+    if (++iTileAnimationTimer >= NUM_FRAMES_BETWEEN_TILE_ANIMATION) {
         iTileAnimationTimer = 0;
 
         //Flip front and back buffers
@@ -2955,18 +2955,18 @@ void CMap::update()
 
         g_iCurrentDrawIndex = 1 - g_iCurrentDrawIndex;
 
-        if(++iTileAnimationFrame >= NUM_FRAMES_IN_TILE_ANIMATION)
+        if (++iTileAnimationFrame >= NUM_FRAMES_IN_TILE_ANIMATION)
             iTileAnimationFrame = 0;
     }
 
     //If there is at least 1 animated tile, then draw its animation
-    if(iAnimatedTileCount > 0)
+    if (iAnimatedTileCount > 0)
         AnimateTiles(iTileAnimationTimer);
 }
 
 bool CMap::findspawnpoint(short iType, short * x, short * y, short width, short height, bool tilealigned)
 {
-    if(totalspawnsize[iType] <= 0) {
+    if (totalspawnsize[iType] <= 0) {
 		*x = RNGMAX(smw->ScreenWidth);
 		*y = RNGMAX(smw->ScreenHeight * 0.87f);
         return true;
@@ -2978,23 +2978,23 @@ bool CMap::findspawnpoint(short iType, short * x, short * y, short width, short 
     for (int m = 0; m < numspawnareas[iType]; m++) {
         currentsize += spawnareas[iType][m].size;
 
-        if(spawnarea >= currentsize)
+        if (spawnarea >= currentsize)
             continue;
 
         short areawidth = (spawnareas[iType][m].width << 5) + TILESIZE;
         short areaheight = (spawnareas[iType][m].height << 5) + TILESIZE;
 
-        if(width > areawidth || height > areaheight)
+        if (width > areawidth || height > areaheight)
             continue;
 
-        if(tilealigned) {
+        if (tilealigned) {
             short xoffset = spawnareas[iType][m].width;
             short yoffset = spawnareas[iType][m].height;
 
-            if(xoffset > 0)
+            if (xoffset > 0)
                 xoffset = (short)RNGMAX(xoffset);
 
-            if(yoffset > 0)
+            if (yoffset > 0)
                 yoffset = (short)RNGMAX(yoffset);
 
             *x = (xoffset << 5) + (spawnareas[iType][m].left << 5) + (TILESIZE >> 1) - (width >> 1);
@@ -3003,10 +3003,10 @@ bool CMap::findspawnpoint(short iType, short * x, short * y, short width, short 
             short xoffset = areawidth - width - 2;
             short yoffset = areaheight - height - 2;
 
-            if(xoffset > 0)
+            if (xoffset > 0)
                 xoffset = (short)RNGMAX(xoffset) + 1;
 
-            if(yoffset > 0)
+            if (yoffset > 0)
                 yoffset = (short)RNGMAX(yoffset) + 1;
 
             *x = xoffset + (spawnareas[iType][m].left << 5);
@@ -3017,14 +3017,14 @@ bool CMap::findspawnpoint(short iType, short * x, short * y, short width, short 
     }
     //Check to see if we are spawning into a platform
     for (short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++) {
-        if(platforms[iPlatform]->IsInNoSpawnZone(*x, *y, width, height))
+        if (platforms[iPlatform]->IsInNoSpawnZone(*x, *y, width, height))
             return false;
     }
 
     //Check to see if we are spawning into a temporary (falling) platform
     std::list<MovingPlatform*>::iterator iterateAll = tempPlatforms.begin(), lim = tempPlatforms.end();
     while (iterateAll != lim) {
-        if((*iterateAll)->IsInNoSpawnZone(*x, *y, width, height))
+        if ((*iterateAll)->IsInNoSpawnZone(*x, *y, width, height))
             return false;
 
         iterateAll++;
@@ -3047,13 +3047,13 @@ void CMap::AddTemporaryPlatform(MovingPlatform * platform)
 bool CMap::IsInPlatformNoSpawnZone(short x, short y, short width, short height)
 {
     for (short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++) {
-        if(platforms[iPlatform]->IsInNoSpawnZone(x, y, width, height))
+        if (platforms[iPlatform]->IsInNoSpawnZone(x, y, width, height))
             return true;
     }
 
     std::list<MovingPlatform*>::iterator iterateAll = tempPlatforms.begin(), lim = tempPlatforms.end();
     while (iterateAll != lim) {
-        if((*iterateAll)->IsInNoSpawnZone(x, y, width, height))
+        if ((*iterateAll)->IsInNoSpawnZone(x, y, width, height))
             return true;
 
         iterateAll++;
@@ -3073,7 +3073,7 @@ void CMap::drawfrontlayer()
     {
     	for (short j = 0; j < MAPWIDTH; j++)
     	{
-    		if(mapdatatop[j][i].iType == tile_gap)
+            if (mapdatatop[j][i].iType == tile_gap)
     		{
     			SDL_Rect r = {j << 5, i << 5, TILESIZE, TILESIZE};
     			SDL_FillRect(blitdest, &r, SDL_MapRGB(blitdest->format, 255, 0, 255));
@@ -3087,7 +3087,7 @@ bool CMap::checkforwarp(short iData1, short iData2, short iData3, short iDirecti
     Warp * warp1 = NULL;
     Warp * warp2 = NULL;
 
-    if(iDirection == 0 || iDirection == 2) {
+    if (iDirection == 0 || iDirection == 2) {
         warp1 = &warpdata[iData1][iData3];
         warp2 = &warpdata[iData2][iData3];
     } else {
@@ -3106,10 +3106,10 @@ void CMap::optimize()
             for (int m = 1; m < MAPLAYERS; m++) {
                 TilesetTile * tile = &mapdata[i][j][m];
                 TileType type = g_tilesetmanager->GetTileset(tile->iID)->GetTileType(tile->iCol, tile->iRow);
-                if(type != tile_nonsolid && type != tile_gap && type != tile_solid_on_top) {
+                if (type != tile_nonsolid && type != tile_gap && type != tile_solid_on_top) {
                     for (int k = m - 1; k >= 0; k--) {
                         TilesetTile * compareTile = &mapdata[i][j][k];
-                        if(compareTile->iID == TILESETNONE) {
+                        if (compareTile->iID == TILESETNONE) {
                             TilesetTile * fromTile = &mapdata[i][j][k + 1];
                             compareTile->iID = fromTile->iID;
                             compareTile->iCol = fromTile->iCol;

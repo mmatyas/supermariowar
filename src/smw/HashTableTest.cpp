@@ -19,7 +19,7 @@ void HashTableTest() {
 	{
 		int iAction = RNGMAX(10);
 
-		if(iAction == 0)
+		if (iAction == 0)
 		{
 //			CObject * pObject = new CObject(&rm->menu_cpu, 0, 0);
 			CObject *pObject = new MO_Coin(&rm->spr_coin, 0.0f, 0.0f, 0, 0, 2, 0, 0, 0, true);
@@ -27,7 +27,7 @@ void HashTableTest() {
 			pObject->iNetworkID = RNGMAX(4096);
 
 			bool expectCollision = false;
-			if(fUsed[pObject->iNetworkID])
+			if (fUsed[pObject->iNetworkID])
 				expectCollision = true;
 
 			fUsed[pObject->iNetworkID] = true;
@@ -35,23 +35,23 @@ void HashTableTest() {
 			pObject = ht.Add(pObject);
 			delete pObject;
 
-			if((pObject && !expectCollision) || (!pObject && expectCollision))
+			if ((pObject && !expectCollision) || (!pObject && expectCollision))
 				printf("Failure! ID: %d  Ret: %d  Expect: %d\n", pObject->iNetworkID, pObject, expectCollision);
 
 		}
-		else if(iAction == 1)
+		else if (iAction == 1)
 		{
 			int id = RNGMAX(4096);
 			CObject * pObject = ht.Remove(id);
 			delete pObject;
 
 			bool expectRemove = false;
-			if(fUsed[id])
+			if (fUsed[id])
 				expectRemove = true;
 
 			fUsed[id] = false;
 
-			if((pObject && !expectRemove) || (!pObject && expectRemove))
+			if ((pObject && !expectRemove) || (!pObject && expectRemove))
 			{
 				printf("Remove Failed!  ID: %d  Ret: %d  Expect: %d\n", id, pObject, expectRemove);
 			}
@@ -62,10 +62,10 @@ void HashTableTest() {
 			CObject * pObject = ht.Get(id);
 
 			bool expectGet = false;
-			if(fUsed[id])
+			if (fUsed[id])
 				expectGet = true;
 
-			if((pObject && !expectGet) || (!pObject && expectGet))
+			if ((pObject && !expectGet) || (!pObject && expectGet))
 			{
 				printf("Get Failed!  ID: %d  Ret: %d  Expect: %d\n", id, pObject, expectGet);
 			}

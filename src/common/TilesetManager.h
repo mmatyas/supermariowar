@@ -28,7 +28,7 @@ class CTileset
 		void SaveTileset();
 
     SDL_Surface * GetSurface(short iIndex) {
-        if(iIndex < 0 || iIndex > 2) return NULL;
+        if (iIndex < 0 || iIndex > 2) return NULL;
         return sSurfaces[iIndex];
     }
 
