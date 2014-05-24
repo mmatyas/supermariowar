@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <climits>
+#include <ctime>
 
 #define	RNGMAX(rMaxInt)	smw->rng->GetRandMax(rMaxInt)
 
