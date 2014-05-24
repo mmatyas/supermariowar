@@ -789,7 +789,7 @@ void CPlayer::move()
         powerupangle += 0.05f;
 
         if (powerupradius < 0.0f) {
-            switch(powerupused) {
+            switch (powerupused) {
             case 1: {
                 game_values.gamemode->playerextraguy(*this, 1);
                 ifSoundOnPlay(sfx_extraguysound);
@@ -3860,7 +3860,7 @@ void CPlayer::collision_detection_checksides()
     }
 
     //Then determine which way is the best way to move this object out of the solid map areas
-    switch(iCase) {
+    switch (iCase) {
         //Do nothing
         //[ ][ ]
         //[ ][ ]

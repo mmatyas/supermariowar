@@ -53,7 +53,7 @@ IO_MovingObject * createpowerup(short iType, short ix, short iy, bool side, bool
     short iSpawnX = ix + 1;
     short iSpawnY = iy - 1;
 
-    switch(iType) {
+    switch (iType) {
     case HEALTH_POWERUP: {
         powerup = new PU_ExtraHeartPowerup(&rm->spr_extraheartpowerup, iSpawnX, iSpawnY);
         break;
@@ -5724,7 +5724,7 @@ bool MO_FrenzyCard::collide(CPlayer * player)
         player->SetPowerup(type);
         game_values.gamemode->frenzyowner = player;
     } else {
-        switch(type) {
+        switch (type) {
         case 14: {
             CO_Shell * shell = new CO_Shell(0, 0, 0, true, true, true, false);
             objectcontainer[1].add(shell);

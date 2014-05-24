@@ -44,7 +44,7 @@
         }
         vf = screen->format;
 
-        switch(vf->BytesPerPixel) {
+        switch (vf->BytesPerPixel) {
             case 2:
             /* For XGY5[56]5, use, AXGY8888, where {X, Y} = {R, B}.
                For anything else (like ARGB4444) it doesn't matter

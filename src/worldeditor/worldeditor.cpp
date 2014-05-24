@@ -918,7 +918,7 @@ int main(int argc, char *argv[])
 	printf("entering world editor loop...\n");
 	done = false;
     while (!done) {
-        switch(state) {
+        switch (state) {
 			case EDITOR_EDIT:
 				state = editor_edit();
 			break;
@@ -1057,7 +1057,7 @@ int editor_edit()
             while (SDL_PollEvent(&event)) {
 				Uint8 * keystate = SDL_GetKeyState(NULL);
 
-                switch(event.type) {
+                switch (event.type) {
                 case SDL_KEYDOWN: {
 						SDLKey key = event.key.keysym.sym;
 
@@ -1084,7 +1084,7 @@ int editor_edit()
             while (SDL_PollEvent(&event)) {
 				Uint8 * keystate = SDL_GetKeyState(NULL);
 
-                switch(event.type) {
+                switch (event.type) {
                 case SDL_QUIT: {
 						done = true;
 						break;
@@ -2492,7 +2492,7 @@ int editor_warp()
 
 		//handle messages
         while (SDL_PollEvent(&event)) {
-            switch(event.type) {
+            switch (event.type) {
             case SDL_QUIT: {
 					done = true;
 					break;
@@ -2590,7 +2590,7 @@ int editor_start_items()
 
 		//handle messages
         while (SDL_PollEvent(&event)) {
-            switch(event.type) {
+            switch (event.type) {
             case SDL_QUIT: {
 					done = true;
 					break;
@@ -2688,7 +2688,7 @@ int editor_boundary()
 
 		//handle messages
         while (SDL_PollEvent(&event)) {
-            switch(event.type) {
+            switch (event.type) {
             case SDL_QUIT: {
 					done = true;
 					break;
@@ -2766,7 +2766,7 @@ int editor_type()
 
 		//handle messages
         while (SDL_PollEvent(&event)) {
-            switch(event.type) {
+            switch (event.type) {
             case SDL_QUIT: {
 					done = true;
 					break;
@@ -2840,7 +2840,7 @@ int editor_water()
 
 		//handle messages
         while (SDL_PollEvent(&event)) {
-            switch(event.type) {
+            switch (event.type) {
             case SDL_QUIT: {
 					done = true;
 					break;
@@ -2905,7 +2905,7 @@ int editor_background()
 
 		//handle messages
         while (SDL_PollEvent(&event)) {
-            switch(event.type) {
+            switch (event.type) {
             case SDL_QUIT: {
 					done = true;
 					break;
@@ -2994,7 +2994,7 @@ int editor_stageforeground()
 
 		//handle messages
         while (SDL_PollEvent(&event)) {
-            switch(event.type) {
+            switch (event.type) {
             case SDL_QUIT: {
 					done = true;
 					break;
@@ -3071,7 +3071,7 @@ int editor_bridges()
 
 		//handle messages
         while (SDL_PollEvent(&event)) {
-            switch(event.type) {
+            switch (event.type) {
             case SDL_QUIT: {
 					done = true;
 					break;
@@ -3136,7 +3136,7 @@ int editor_structureforeground()
 
 		//handle messages
         while (SDL_PollEvent(&event)) {
-            switch(event.type) {
+            switch (event.type) {
             case SDL_QUIT: {
 					done = true;
 					break;
@@ -3208,7 +3208,7 @@ int editor_pathsprite()
 
         //handle messages
         while (SDL_PollEvent(&event)) {
-            switch(event.type) {
+            switch (event.type) {
             case SDL_QUIT: {
 					done = true;
 					break;
@@ -3298,7 +3298,7 @@ int editor_vehicles()
 
 		//handle messages
         while (SDL_PollEvent(&event)) {
-            switch(event.type) {
+            switch (event.type) {
             case SDL_QUIT: {
 					edit_mode = 5;
 					game_values.playerInput.ResetKeys();
@@ -3398,7 +3398,7 @@ int editor_path()
 
 		//handle messages
         while (SDL_PollEvent(&event)) {
-            switch(event.type) {
+            switch (event.type) {
             case SDL_QUIT: {
 					done = true;
 					break;
@@ -3892,7 +3892,7 @@ int editor_stage()
 
 		//handle messages
         while (SDL_PollEvent(&event)) {
-            switch(event.type) {
+            switch (event.type) {
             case SDL_QUIT: {
 					done = true;
 					break;
@@ -4442,7 +4442,7 @@ int display_help()
 
 		//handle messages
         while (SDL_PollEvent(&event)) {
-            switch(event.type) {
+            switch (event.type) {
 				case SDL_QUIT:
 					return 0;
 				break;
@@ -4501,7 +4501,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 
 		//handle messages
         while (SDL_PollEvent(&event)) {
-            switch(event.type) {
+            switch (event.type) {
 				case SDL_QUIT:
 					return false;
 				break;

@@ -621,7 +621,7 @@ bool IO_MovingObject::collision_detection_checksides()
 
     bool fRet = true;
     //Then determine which way is the best way to move this object out of the solid map areas
-    switch(iCase) {
+    switch (iCase) {
         //Do nothing
         //[ ][ ]
         //[ ][ ]

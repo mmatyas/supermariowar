@@ -2133,7 +2133,7 @@ void MenuState::onEnterState()
             miTournamentScoreboard->RefreshTournamentScores(game_values.gamemode->winningteam);
 
             //Set the next controlling team
-            switch(game_values.tournamentcontrolstyle) {
+            switch (game_values.tournamentcontrolstyle) {
             case 1: { //Winning Team
                 game_values.tournamentcontrolteam = game_values.gamemode->winningteam;
                 break;
@@ -2282,7 +2282,7 @@ void MenuState::update()
     //handle messages
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
-        switch(event.type) {
+        switch (event.type) {
 #ifndef _XBOX
         case SDL_QUIT:
             Exit();

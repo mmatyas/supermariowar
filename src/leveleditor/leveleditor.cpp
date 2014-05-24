@@ -571,7 +571,7 @@ int main(int argc, char *argv[])
 	printf("entering level editor loop...\n");
 	done = false;
     while (!done) {
-        switch(state) {
+        switch (state) {
 			case EDITOR_EDIT:
 				move_nodrag = false;
 				state = editor_edit();
@@ -805,7 +805,7 @@ int editor_edit()
             while (SDL_PollEvent(&event)) {
 				Uint8 * keystate = SDL_GetKeyState(NULL);
 
-                switch(event.type) {
+                switch (event.type) {
                 case SDL_KEYDOWN: {
 						SDLKey key = event.key.keysym.sym;
 
@@ -832,7 +832,7 @@ int editor_edit()
             while (SDL_PollEvent(&event)) {
 				Uint8 * keystate = SDL_GetKeyState(NULL);
 
-                switch(event.type) {
+                switch (event.type) {
                 case SDL_QUIT: {
 						done = true;
 						break;
@@ -1831,7 +1831,7 @@ int editor_warp()
 
 		//handle messages
         while (SDL_PollEvent(&event)) {
-            switch(event.type) {
+            switch (event.type) {
 				case SDL_QUIT:
 					done = true;
 				break;
@@ -1896,7 +1896,7 @@ int editor_eyecandy()
 
 		//handle messages
         while (SDL_PollEvent(&event)) {
-            switch(event.type) {
+            switch (event.type) {
             case SDL_QUIT: {
 					done = true;
 					break;
@@ -2015,7 +2015,7 @@ int editor_properties(short iBlockCol, short iBlockRow)
 
 		//handle messages
         while (SDL_PollEvent(&event)) {
-            switch(event.type) {
+            switch (event.type) {
             case SDL_QUIT: {
 					done = true;
 					break;
@@ -2251,7 +2251,7 @@ int editor_platforms()
 
 		//handle messages
         while (SDL_PollEvent(&event)) {
-            switch(event.type) {
+            switch (event.type) {
             case SDL_QUIT: {
 					done = true;
 					break;
@@ -2963,7 +2963,7 @@ int editor_maphazards()
 
 		//handle messages
         while (SDL_PollEvent(&event)) {
-            switch(event.type) {
+            switch (event.type) {
             case SDL_QUIT: {
 					done = true;
 					break;
@@ -3413,7 +3413,7 @@ int editor_tiles()
 
 		//handle messages
         while (SDL_PollEvent(&event)) {
-            switch(event.type) {
+            switch (event.type) {
 				case SDL_QUIT:
 					done = true;
 				break;
@@ -3656,7 +3656,7 @@ int editor_blocks()
 
 		//handle messages
         while (SDL_PollEvent(&event)) {
-            switch(event.type) {
+            switch (event.type) {
 				case SDL_QUIT:
 					done = true;
 				break;
@@ -3760,7 +3760,7 @@ int editor_mapitems()
 
 		//handle messages
         while (SDL_PollEvent(&event)) {
-            switch(event.type) {
+            switch (event.type) {
 				case SDL_QUIT:
 					done = true;
 				break;
@@ -3830,7 +3830,7 @@ int editor_modeitems()
 
 		//handle messages
         while (SDL_PollEvent(&event)) {
-            switch(event.type) {
+            switch (event.type) {
             case SDL_QUIT: {
 					done = true;
 					break;
@@ -3991,7 +3991,7 @@ int editor_tiletype()
 
 		//handle messages
         while (SDL_PollEvent(&event)) {
-            switch(event.type) {
+            switch (event.type) {
 				case SDL_QUIT:
 					done = true;
 				break;
@@ -4077,7 +4077,7 @@ int editor_backgrounds()
 
 		//handle messages
         while (SDL_PollEvent(&event)) {
-            switch(event.type) {
+            switch (event.type) {
 				case SDL_QUIT:
 					done = true;
 				break;
@@ -4191,7 +4191,7 @@ int editor_animation()
 
 			bool fInValidTile = iRow >= 0 && iRow <= 7;
 
-            switch(event.type) {
+            switch (event.type) {
             case SDL_QUIT: {
 					done = true;
 					break;
@@ -4505,7 +4505,7 @@ int display_help()
 
 		//handle messages
         while (SDL_PollEvent(&event)) {
-            switch(event.type) {
+            switch (event.type) {
 				case SDL_QUIT:
 					return 0;
 				break;
@@ -4563,7 +4563,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 
 		//handle messages
         while (SDL_PollEvent(&event)) {
-            switch(event.type) {
+            switch (event.type) {
 				case SDL_QUIT:
 					return false;
 				break;

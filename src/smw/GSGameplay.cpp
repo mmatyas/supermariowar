@@ -1983,7 +1983,7 @@ void GameplayState::update()
 
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
-        switch(event.type) {
+        switch (event.type) {
 #ifndef _XBOX
         case SDL_QUIT: {
             CleanUp();

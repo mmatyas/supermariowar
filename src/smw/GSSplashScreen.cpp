@@ -217,7 +217,7 @@ void SplashScreenState::update()
     // TODO: move this out of this method maybe
 
     while (SDL_PollEvent(&loop_event)) {
-        switch(loop_event.type) {
+        switch (loop_event.type) {
 
 #ifndef _XBOX
         case SDL_QUIT: {
@@ -227,7 +227,7 @@ void SplashScreenState::update()
         break;
 #endif
         case SDL_KEYDOWN: {
-            switch(loop_event.key.keysym.sym) {
+            switch (loop_event.key.keysym.sym) {
             case SDLK_RETURN:
                 if (loop_event.key.keysym.mod & (KMOD_LALT | KMOD_RALT)) {
 #ifndef _XBOX

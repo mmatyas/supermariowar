@@ -1061,7 +1061,7 @@ bool MovingPlatform::collision_detection_check_sides(IO_MovingObject * object)
     }
 
     //Then determine which way is the best way to move this object out of the solid areas
-    switch(iCase) {
+    switch (iCase) {
         //Do nothing
         //[ ][ ]
         //[ ][ ]

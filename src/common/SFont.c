@@ -45,7 +45,7 @@ static Uint32 GetPixel(SDL_Surface *Surface, Sint32 X, Sint32 Y)
    bits = ((Uint8 *)Surface->pixels)+Y*Surface->pitch+X*Bpp;
 
    // Get the pixel
-   switch(Bpp) {
+   switch (Bpp) {
       case 1:
          return *((Uint8 *)Surface->pixels + Y * Surface->pitch + X);
          break;
