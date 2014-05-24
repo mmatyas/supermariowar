@@ -70,11 +70,11 @@ void game_frame()
     while(game_values.gamestate != GS_QUIT)
 #endif
     {
-        FPSLimiter::get().frameStart();
+        FPSLimiter::instance().frameStart();
 
         GameStateManager::instance().currentState->update();
 
-        FPSLimiter::get().beforeFlip();
+        FPSLimiter::instance().beforeFlip();
 
 #ifdef USE_SDL2
         SDL_UpdateTexture(screenAsTexture, NULL, screen->pixels, screen->pitch);
@@ -85,7 +85,7 @@ void game_frame()
         SDL_Flip(screen);
 #endif
 
-        FPSLimiter::get().afterFlip();
+        FPSLimiter::instance().afterFlip();
     }
 
 #ifndef __EMSCRIPTEN__

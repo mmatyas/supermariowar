@@ -8,7 +8,7 @@ class FPSLimiter
         void beforeFlip();
         void afterFlip();
 
-        static FPSLimiter& get(); // get instance
+        static FPSLimiter& instance();
 
     private:
         unsigned int    framestart, ticks;

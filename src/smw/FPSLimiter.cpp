@@ -8,7 +8,7 @@ FPSLimiter::FPSLimiter() {
     flipfps = 0;
 }
 
-FPSLimiter& FPSLimiter::get()
+FPSLimiter& FPSLimiter::instance()
 {
     static FPSLimiter instance;
     return instance;
