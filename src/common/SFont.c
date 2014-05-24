@@ -87,7 +87,7 @@ SFont_Font* SFont_InitFont(SDL_Surface* Surface)
     while (x < Surface->w) {
 	if (GetPixel(Surface, x, 0) == pink) {
     	    Font->CharPos[i++]=x;
-    	    while((x < Surface->w) && (GetPixel(Surface, x, 0)== pink))
+            while ((x < Surface->w) && (GetPixel(Surface, x, 0)== pink))
 		x++;
 	    Font->CharPos[i++]=x;
 	}

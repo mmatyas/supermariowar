@@ -1364,7 +1364,7 @@ void CMap::saveMap(const std::string& file)
                 else
                     movey = 1;
 
-                while(currentx < MAPWIDTH && currenty < MAPHEIGHT) {
+                while (currentx < MAPWIDTH && currenty < MAPHEIGHT) {
                     if(warpdata[currentx][currenty].direction != warpdata[i][j].direction ||
                             warpdata[currentx][currenty].connection != warpdata[i][j].connection) {
                         break;
@@ -1682,7 +1682,7 @@ void CMap::saveMap(const std::string& file)
 
 
                 int numblocks = 0;
-                while(currentx < MAPWIDTH && currenty < MAPHEIGHT) {
+                while (currentx < MAPWIDTH && currenty < MAPHEIGHT) {
                     if(warpdata[currentx][currenty].direction != warpdata[i][j].direction ||
                             warpdata[currentx][currenty].connection != warpdata[i][j].connection) {
                         break;
@@ -1788,7 +1788,7 @@ void CMap::saveMap(const std::string& file)
                 int rightsize = i + 1;
                 int attempt = 1;
 
-                while(true) {
+                while (true) {
                     if(!fRightDone) {
                         for (int right = i; right < rightsize; right++) {
                             if(right >= MAPWIDTH || j + attempt >= MAPHEIGHT || usedtile[right][j + attempt])
@@ -2090,7 +2090,7 @@ void CMap::calculatespawnareas(short iType, bool fUseTempBlocks, bool fIgnoreDea
                 short rightsize = i + 1;
                 short attempt = 1;
 
-                while(true) {
+                while (true) {
                     if(!fRightDone) {
                         for (int right = i; right < rightsize; right++) {
                             if(right >= MAPWIDTH || j + attempt >= MAPHEIGHT || usedtile[right][j + attempt])

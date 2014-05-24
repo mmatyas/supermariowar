@@ -1451,7 +1451,7 @@ void LoadMapObjects(bool fPreview)
         for (short iItem = 0; iItem < 5 && iItem < iThrowBoxCount; iItem++) {
             short iBoxIndex = RNGMAX(iThrowBoxCount);
 
-            while(fBoxHasCoin[iBoxIndex]) {
+            while (fBoxHasCoin[iBoxIndex]) {
                 if(++iBoxIndex >= iThrowBoxCount)
                     iBoxIndex = 0;
             }
@@ -1506,7 +1506,7 @@ void LoadMapObjects(bool fPreview)
 
                     int iPowerupWeightCount = game_values.powerupweights[iItem];
 
-                    while(iPowerupWeightCount < iRandPowerup)
+                    while (iPowerupWeightCount < iRandPowerup)
                         iPowerupWeightCount += game_values.powerupweights[++iItem];
                 }
             }
@@ -1988,7 +1988,7 @@ void GameplayState::update()
     //handle messages
 
     SDL_Event event;
-    while(SDL_PollEvent(&event)) {
+    while (SDL_PollEvent(&event)) {
         switch(event.type) {
 #ifndef _XBOX
         case SDL_QUIT: {
@@ -2400,7 +2400,7 @@ bool SwapPlayers(short iUsingPlayerID)
         do {
             if(++iNewSpot >= list_players_cnt)
                 iNewSpot = 0;
-        } while(spots[iNewSpot].fUsed || !list_players[iNewSpot]->isready());
+        } while (spots[iNewSpot].fUsed || !list_players[iNewSpot]->isready());
 
         spots[iNewSpot].fUsed = true;
         spots[iPlayer].SetPlayer(list_players[iNewSpot], game_values.gamepowerups[list_players[iNewSpot]->getGlobalID()]);
@@ -2445,7 +2445,7 @@ void UpdateMusicWithOverrides()
 
     short iAddToCategory = 0;
     char szBuffer[256];
-    while(fgets(szBuffer, 1024, file)) { // TODO: what's this?
+    while (fgets(szBuffer, 1024, file)) { // TODO: what's this?
         //Ignore comment lines
         if(szBuffer[0] == '#' || szBuffer[0] == '\n' || szBuffer[0] == '\r' || szBuffer[0] == ' ' || szBuffer[0] == '\t')
             continue;
@@ -2484,7 +2484,7 @@ void UpdateMusicWithOverrides()
             override->mapname = pszName;
 
             char * pszMusic = strtok(NULL, ",\n");
-            while(pszMusic) {
+            while (pszMusic) {
                 std::string sPath = convertPath(pszMusic);
 
                 if(File_Exists(sPath.c_str())) {

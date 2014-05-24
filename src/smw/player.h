@@ -70,7 +70,7 @@ class CScore
 
     void SetDigitCounters() {
 			short iDigits = score;
-			while(iDigits > 999)
+			while (iDigits > 999)
 				iDigits -= 1000;
 
 			iDigitLeft = iDigits / 100 * 16;

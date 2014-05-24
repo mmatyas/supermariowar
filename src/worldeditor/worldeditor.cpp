@@ -920,7 +920,7 @@ int main(int argc, char *argv[])
 
 	printf("entering world editor loop...\n");
 	done = false;
-    while(!done) {
+    while (!done) {
         switch(state) {
 			case EDITOR_EDIT:
 				state = editor_edit();
@@ -1057,7 +1057,7 @@ int editor_edit()
 
         if(fExiting) {
 			//handle messages
-            while(SDL_PollEvent(&event)) {
+            while (SDL_PollEvent(&event)) {
 				Uint8 * keystate = SDL_GetKeyState(NULL);
 
                 switch(event.type) {
@@ -1084,7 +1084,7 @@ int editor_edit()
 			}
         } else {
 			//handle messages
-            while(SDL_PollEvent(&event)) {
+            while (SDL_PollEvent(&event)) {
 				Uint8 * keystate = SDL_GetKeyState(NULL);
 
                 switch(event.type) {
@@ -1165,7 +1165,7 @@ int editor_edit()
 							short iRow = iButtonY / TILESIZE + draw_offset_row;
 
 							std::vector<WorldVehicle*>::iterator itr = vehiclelist.begin(), lim = vehiclelist.end();
-                        while(itr != lim) {
+                        while (itr != lim) {
 								WorldVehicle * vehicle = *itr;
                             if(vehicle->iCurrentTileX == iCol && vehicle->iCurrentTileY == iRow) {
 									g_wvVehicleStamp.iDrawSprite = vehicle->iDrawSprite;
@@ -1663,7 +1663,7 @@ int editor_edit()
 							iStageDisplay = -1;
 
 							std::vector<WorldVehicle*>::iterator itr = vehiclelist.begin(), lim = vehiclelist.end();
-                        while(itr != lim) {
+                        while (itr != lim) {
 								WorldVehicle * vehicle = *itr;
                             if(vehicle->iCurrentTileX == iCol && vehicle->iCurrentTileY == iRow) {
 									iStageDisplay = vehicle->iActionId;
@@ -1744,7 +1744,7 @@ int editor_edit()
 				}
             } else if(edit_mode == 6) { //draw warps
 				std::vector<WorldWarp*>::iterator itr = warplist.begin(), lim = warplist.end();
-                while(itr != lim) {
+                while (itr != lim) {
 					WorldWarp * warp = *itr;
 
 					short ix, iy;
@@ -1809,7 +1809,7 @@ int editor_edit()
             if(edit_mode == 5 || edit_mode == 8) { //draw vehicles
 				std::vector<WorldVehicle*>::iterator itr = vehiclelist.begin(), lim = vehiclelist.end();
 				int color = SDL_MapRGB(blitdest->format, 0, 0, 128);
-                while(itr != lim) {
+                while (itr != lim) {
 					WorldVehicle * vehicle = *itr;
 
 					short ix = (vehicle->iCurrentTileX  - draw_offset_col) * TILESIZE + draw_offset_x;
@@ -1925,7 +1925,7 @@ bool ForegroundTileValuesChanged(short iCol, short iRow, short iOldTiles[9])
 void ReadVehiclesIntoEditor()
 {
 	std::vector<WorldVehicle*>::iterator itr = vehiclelist.begin(), lim = vehiclelist.end();
-    while(itr != lim) {
+    while (itr != lim) {
 		delete (*itr);
 		itr++;
 	}
@@ -1979,7 +1979,7 @@ void AddVehicleToTile(short iCol, short iRow, short iType)
 {
 	std::vector<WorldVehicle*>::iterator itr = vehiclelist.begin(), lim = vehiclelist.end();
 	WorldVehicle * newvehicle = NULL;
-    while(itr != lim) {
+    while (itr != lim) {
 		WorldVehicle * vehicle = *itr;
         if(vehicle->iCurrentTileX == iCol && vehicle->iCurrentTileY == iRow) {
 			newvehicle = vehicle;
@@ -2008,7 +2008,7 @@ void AddVehicleToTile(short iCol, short iRow, short iType)
 void RemoveVehicleFromTile(short iCol, short iRow)
 {
 	std::vector<WorldVehicle*>::iterator itr = vehiclelist.begin(), lim = vehiclelist.end();
-    while(itr != lim) {
+    while (itr != lim) {
 		WorldVehicle * vehicle = *itr;
         if(vehicle->iCurrentTileX == iCol && vehicle->iCurrentTileY == iRow) {
 			delete (*itr);
@@ -2026,7 +2026,7 @@ void RemoveVehicleFromTile(short iCol, short iRow)
 void ReadWarpsIntoEditor()
 {
 	std::vector<WorldWarp*>::iterator itr = warplist.begin(), lim = warplist.end();
-    while(itr != lim) {
+    while (itr != lim) {
 		delete (*itr);
 		itr++;
 	}
@@ -2072,7 +2072,7 @@ void AddWarpToTile(short iCol, short iRow, short iType)
 {
 	std::vector<WorldWarp*>::iterator itr = warplist.begin(), lim = warplist.end();
 	WorldWarp * newwarp = NULL;
-    while(itr != lim) {
+    while (itr != lim) {
 		WorldWarp * warp = *itr;
         if(warp->iID == iType) {
 			newwarp = warp;
@@ -2106,7 +2106,7 @@ void AddWarpToTile(short iCol, short iRow, short iType)
 void RemoveWarpFromTile(short iCol, short iRow)
 {
 	std::vector<WorldWarp*>::iterator itr = warplist.begin(), lim = warplist.end();
-    while(itr != lim) {
+    while (itr != lim) {
 		WorldWarp * warp = *itr;
         if(warp->iCol1 == iCol && warp->iRow1 == iRow) {
             if(warp->iCol2 == -1 && warp->iRow2 == -1) {
@@ -2494,7 +2494,7 @@ int editor_warp()
 		int framestart = SDL_GetTicks();
 
 		//handle messages
-        while(SDL_PollEvent(&event)) {
+        while (SDL_PollEvent(&event)) {
             switch(event.type) {
             case SDL_QUIT: {
 					done = true;
@@ -2592,7 +2592,7 @@ int editor_start_items()
 		int framestart = SDL_GetTicks();
 
 		//handle messages
-        while(SDL_PollEvent(&event)) {
+        while (SDL_PollEvent(&event)) {
             switch(event.type) {
             case SDL_QUIT: {
 					done = true;
@@ -2690,7 +2690,7 @@ int editor_boundary()
 		int framestart = SDL_GetTicks();
 
 		//handle messages
-        while(SDL_PollEvent(&event)) {
+        while (SDL_PollEvent(&event)) {
             switch(event.type) {
             case SDL_QUIT: {
 					done = true;
@@ -2768,7 +2768,7 @@ int editor_type()
 		int framestart = SDL_GetTicks();
 
 		//handle messages
-        while(SDL_PollEvent(&event)) {
+        while (SDL_PollEvent(&event)) {
             switch(event.type) {
             case SDL_QUIT: {
 					done = true;
@@ -2842,7 +2842,7 @@ int editor_water()
 		int framestart = SDL_GetTicks();
 
 		//handle messages
-        while(SDL_PollEvent(&event)) {
+        while (SDL_PollEvent(&event)) {
             switch(event.type) {
             case SDL_QUIT: {
 					done = true;
@@ -2907,7 +2907,7 @@ int editor_background()
 		int framestart = SDL_GetTicks();
 
 		//handle messages
-        while(SDL_PollEvent(&event)) {
+        while (SDL_PollEvent(&event)) {
             switch(event.type) {
             case SDL_QUIT: {
 					done = true;
@@ -2996,7 +2996,7 @@ int editor_stageforeground()
 		int framestart = SDL_GetTicks();
 
 		//handle messages
-        while(SDL_PollEvent(&event)) {
+        while (SDL_PollEvent(&event)) {
             switch(event.type) {
             case SDL_QUIT: {
 					done = true;
@@ -3073,7 +3073,7 @@ int editor_bridges()
 		int framestart = SDL_GetTicks();
 
 		//handle messages
-        while(SDL_PollEvent(&event)) {
+        while (SDL_PollEvent(&event)) {
             switch(event.type) {
             case SDL_QUIT: {
 					done = true;
@@ -3138,7 +3138,7 @@ int editor_structureforeground()
 		int framestart = SDL_GetTicks();
 
 		//handle messages
-        while(SDL_PollEvent(&event)) {
+        while (SDL_PollEvent(&event)) {
             switch(event.type) {
             case SDL_QUIT: {
 					done = true;
@@ -3210,7 +3210,7 @@ int editor_pathsprite()
 		int framestart = SDL_GetTicks();
 
         //handle messages
-        while(SDL_PollEvent(&event)) {
+        while (SDL_PollEvent(&event)) {
             switch(event.type) {
             case SDL_QUIT: {
 					done = true;
@@ -3300,7 +3300,7 @@ int editor_vehicles()
 		MenuCodeEnum code = MENU_CODE_NONE;
 
 		//handle messages
-        while(SDL_PollEvent(&event)) {
+        while (SDL_PollEvent(&event)) {
             switch(event.type) {
             case SDL_QUIT: {
 					edit_mode = 5;
@@ -3400,7 +3400,7 @@ int editor_path()
 		int framestart = SDL_GetTicks();
 
 		//handle messages
-        while(SDL_PollEvent(&event)) {
+        while (SDL_PollEvent(&event)) {
             switch(event.type) {
             case SDL_QUIT: {
 					done = true;
@@ -3894,7 +3894,7 @@ int editor_stage()
 		MenuCodeEnum code = MENU_CODE_NONE;
 
 		//handle messages
-        while(SDL_PollEvent(&event)) {
+        while (SDL_PollEvent(&event)) {
             switch(event.type) {
             case SDL_QUIT: {
 					done = true;
@@ -4179,7 +4179,7 @@ int editor_stage()
 
 					//Scan vehicles and remove references to deleted stage
 					std::vector<WorldVehicle*>::iterator itrVehicle = vehiclelist.begin(), limVehicle = vehiclelist.end();
-                    while(itrVehicle != limVehicle) {
+                    while (itrVehicle != limVehicle) {
 						WorldVehicle * vehicle = *itrVehicle;
                         if(vehicle->iActionId == iEditStage) {
 							RemoveVehicleFromTile(vehicle->iCurrentTileX, vehicle->iCurrentTileY);
@@ -4446,7 +4446,7 @@ int display_help()
 		int framestart = SDL_GetTicks();
 
 		//handle messages
-        while(SDL_PollEvent(&event)) {
+        while (SDL_PollEvent(&event)) {
             switch(event.type) {
 				case SDL_QUIT:
 					return 0;
@@ -4505,7 +4505,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 		int framestart = SDL_GetTicks();
 
 		//handle messages
-        while(SDL_PollEvent(&event)) {
+        while (SDL_PollEvent(&event)) {
             switch(event.type) {
 				case SDL_QUIT:
 					return false;
@@ -4721,7 +4721,7 @@ int new_world()
 			iHeight = 1;
 
 		std::vector<WorldVehicle*>::iterator itrVehicle = vehiclelist.begin(), limVehicle = vehiclelist.end();
-        while(itrVehicle != limVehicle) {
+        while (itrVehicle != limVehicle) {
 			delete (*itrVehicle);
 			itrVehicle++;
 		}
@@ -4729,7 +4729,7 @@ int new_world()
 		vehiclelist.clear();
 
 		std::vector<WorldWarp*>::iterator itrWarp = warplist.begin(), limWarp = warplist.end();
-        while(itrWarp != limWarp) {
+        while (itrWarp != limWarp) {
 			delete (*itrWarp);
 			itrWarp++;
 		}
@@ -4764,7 +4764,7 @@ int resize_world()
 			iHeight = 1;
 
 		std::vector<WorldVehicle*>::iterator itrVehicle = vehiclelist.begin(), limVehicle = vehiclelist.end();
-        while(itrVehicle != limVehicle) {
+        while (itrVehicle != limVehicle) {
 			if((*itrVehicle)->iCurrentTileX >= iWidth || (*itrVehicle)->iCurrentTileY >= iHeight)
 				RemoveVehicleFromTile((*itrVehicle)->iCurrentTileX, (*itrVehicle)->iCurrentTileY);
 
@@ -4772,7 +4772,7 @@ int resize_world()
 		}
 
 		std::vector<WorldWarp*>::iterator itrWarp = warplist.begin(), limWarp = warplist.end();
-        while(itrWarp != limWarp) {
+        while (itrWarp != limWarp) {
 			delete (*itrWarp);
 
 			itrWarp = warplist.erase(itrWarp);
@@ -4810,7 +4810,7 @@ void takescreenshot()
 
 		//Draw vehicles to screenshot
 		std::vector<WorldVehicle*>::iterator itr = vehiclelist.begin(), lim = vehiclelist.end();
-        while(itr != lim) {
+        while (itr != lim) {
 			WorldVehicle * vehicle = *itr;
 
 			short ix = vehicle->iCurrentTileX * iTileSize;
@@ -4823,7 +4823,7 @@ void takescreenshot()
 
 		//Draw warps to screenshot
 		std::vector<WorldWarp*>::iterator itrWarp = warplist.begin(), limWarp = warplist.end();
-        while(itrWarp != limWarp) {
+        while (itrWarp != limWarp) {
 			WorldWarp * warp = *itrWarp;
 
 			if(warp->iCol1 >= 0)

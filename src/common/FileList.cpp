@@ -31,7 +31,7 @@ SimpleFileList::SimpleFileList(const std::string &path, const std::string &exten
 {
     DirectoryListing d(path, extension);
     std::string curname;
-    while(d(curname)) {
+    while (d(curname)) {
         filelist.insert(filelist.end(), d.fullName(curname));
     }
 
@@ -56,7 +56,7 @@ SimpleFileList::SimpleFileList(const std::string &path, const std::string &exten
 
         //Now bubblesort them
         bool fDone = false;
-        while(!fDone) {
+        while (!fDone) {
             fDone = true;
             for (short i = 0; i < iSize - 1; i++) {
                 if(names[i].compare(names[i + 1]) > 0) {
@@ -138,7 +138,7 @@ SkinList::SkinList()
 {
     DirectoryListing d(convertPath("gfx/skins/"), ".bmp");
     std::string curname;
-    while(d(curname)) {
+    while (d(curname)) {
         std::string sShortSkinName = stripCreatorAndDotMap(curname);
         SkinListNode * node = new SkinListNode(sShortSkinName, d.fullName(curname));
 
@@ -147,7 +147,7 @@ SkinList::SkinList()
         } else {
             std::vector<SkinListNode*>::iterator itr = skins.begin(), lim = skins.end();
 
-            while(itr != lim) {
+            while (itr != lim) {
                 if(sShortSkinName.compare((*itr)->sSkinName) < 0)
                     break;
 
@@ -180,7 +180,7 @@ SimpleDirectoryList::SimpleDirectoryList(const std::string &path)
 {
     DirectoryListing d(path);
     std::string curname;
-    while(d.NextDirectory(curname)) {
+    while (d.NextDirectory(curname)) {
         filelist.insert(filelist.end(), d.fullName(curname));
     }
     if(filelist.empty()) {
@@ -197,7 +197,7 @@ MusicList::MusicList()
 {
     DirectoryListing d(convertPath("music/game/"));
     std::string currentdir;
-    while(d.NextDirectory(currentdir)) {
+    while (d.NextDirectory(currentdir)) {
         MusicEntry *m = new MusicEntry(d.fullName(currentdir));
         if (!m->fError)
             entries.push_back(m);
@@ -328,7 +328,7 @@ MusicEntry::MusicEntry(const std::string & musicdirectory)
 
     int iAddToCategory = -1;
     char szBuffer[256];
-    while(fgets(szBuffer, 256, in)) {
+    while (fgets(szBuffer, 256, in)) {
         //Ignore comment lines
         if(szBuffer[0] == '#' || szBuffer[0] == ' ' || szBuffer[0] == '\t' || szBuffer[0] == '\n' || szBuffer[0] == '\r')
             continue;
@@ -394,7 +394,7 @@ MusicEntry::MusicEntry(const std::string & musicdirectory)
                 }
 
                 char * pszMusic = strtok(NULL, ",\n");
-                while(pszMusic) {
+                while (pszMusic) {
                     std::string sPath = musicdirectory + getDirectorySeperator() + convertPartialPath(std::string(pszMusic));
 
                     if(File_Exists(sPath.c_str())) {
@@ -482,7 +482,7 @@ MusicEntry::MusicEntry(const std::string & musicdirectory)
 
     printf("------ Songlist ------\n");
     short iCounter = 0;
-    while(itr != songFileNames.end())
+    while (itr != songFileNames.end())
     {
         printf("%d: %s\n", iCounter++, itr->c_str());
         itr++;
@@ -594,7 +594,7 @@ WorldMusicList::WorldMusicList()
 {
     DirectoryListing d(convertPath("music/world/"));
     std::string currentdir;
-    while(d.NextDirectory(currentdir)) {
+    while (d.NextDirectory(currentdir)) {
         WorldMusicEntry *m = new WorldMusicEntry(d.fullName(currentdir));
         if (!m->fError)
             entries.push_back(m);
@@ -692,7 +692,7 @@ WorldMusicEntry::WorldMusicEntry(const std::string & musicdirectory)
 
     int iAddToCategory = -1;
     char szBuffer[256];
-    while(fgets(szBuffer, 256, in)) {
+    while (fgets(szBuffer, 256, in)) {
         //Ignore comment lines
         if(szBuffer[0] == '#' || szBuffer[0] == ' ' || szBuffer[0] == '\t' || szBuffer[0] == '\n' || szBuffer[0] == '\r')
             continue;

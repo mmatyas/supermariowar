@@ -650,7 +650,7 @@ MenuCodeEnum MI_TeamSelect::SendInput(CPlayerInput * playerInput)
                             if(--game_values.skinids[iPlayer] < 0)
                                 game_values.skinids[iPlayer] = (short)skinlist->GetCount() - 1;
                         }
-                    } while(!rm->LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false));
+                    } while (!rm->LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false));
                 } else if(playerKeys->menu_up.fDown) {
                     if(iFastScroll[iPlayer] == 0) {
                         if(++iFastScrollTimer[iPlayer] > 40) {
@@ -661,7 +661,7 @@ MenuCodeEnum MI_TeamSelect::SendInput(CPlayerInput * playerInput)
                             do {
                                 if(--game_values.skinids[iPlayer] < 0)
                                     game_values.skinids[iPlayer] = (short)skinlist->GetCount() - 1;
-                            } while(!rm->LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false));
+                            } while (!rm->LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false));
 
                             iFastScrollTimer[iPlayer] = 0;
                         }
@@ -676,7 +676,7 @@ MenuCodeEnum MI_TeamSelect::SendInput(CPlayerInput * playerInput)
                             if(++game_values.skinids[iPlayer] >= skinlist->GetCount())
                                 game_values.skinids[iPlayer] = 0;
                         }
-                    } while(!rm->LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false));
+                    } while (!rm->LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false));
                 } else if(playerKeys->menu_down.fDown) {
                     if(iFastScroll[iPlayer] == 0) {
                         if(++iFastScrollTimer[iPlayer] > 40) {
@@ -687,7 +687,7 @@ MenuCodeEnum MI_TeamSelect::SendInput(CPlayerInput * playerInput)
                             do {
                                 if(++game_values.skinids[iPlayer] >= skinlist->GetCount())
                                     game_values.skinids[iPlayer] = 0;
-                            } while(!rm->LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false));
+                            } while (!rm->LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false));
 
                             iFastScrollTimer[iPlayer] = 0;
                         }
@@ -710,7 +710,7 @@ MenuCodeEnum MI_TeamSelect::SendInput(CPlayerInput * playerInput)
                 } else if(!game_values.randomskin[iPlayer]) {
                     do {
                         game_values.skinids[iPlayer] = RNGMAX(skinlist->GetCount());
-                    } while(!rm->LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false));
+                    } while (!rm->LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false));
                 }
             }
         }
@@ -786,7 +786,7 @@ void MI_TeamSelect::FindNewTeam(short iPlayerID, short iDirection)
                             break;
                         }
                     }
-                } while(fOnlyTeam);
+                } while (fOnlyTeam);
 
                 iTeamIDs[iNewTeam][iTeamCounts[iNewTeam]] = iPlayerID;
                 iTeamCounts[iNewTeam]++;
@@ -795,7 +795,7 @@ void MI_TeamSelect::FindNewTeam(short iPlayerID, short iDirection)
                     game_values.colorids[iPlayerID] = iNewTeam;
 
                     //Skip skins that are invalid
-                    while(!rm->LoadMenuSkin(iPlayerID, game_values.skinids[iPlayerID], iNewTeam, false)) {
+                    while (!rm->LoadMenuSkin(iPlayerID, game_values.skinids[iPlayerID], iNewTeam, false)) {
                         if(++game_values.skinids[iPlayerID] >= skinlist->GetCount())
                             game_values.skinids[iPlayerID] = 0;
                     }
@@ -841,7 +841,7 @@ void MI_TeamSelect::Reset()
             if(game_values.playercontrol[iPlayer] > 0) {
                 short iLookForNewTeam = iPlayer;
 
-                while(iTeamCounts[iLookForNewTeam] >= 3) {
+                while (iTeamCounts[iLookForNewTeam] >= 3) {
                     if(++iLookForNewTeam >= 4)
                         iLookForNewTeam = 0;
                 }
@@ -911,7 +911,7 @@ void MI_TeamSelect::Reset()
             game_values.colorids[iPlayer] = iPlayer;
 
         //Skip skins that are invalid
-        while(!rm->LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false)) {
+        while (!rm->LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false)) {
             if(++game_values.skinids[iPlayer] >= skinlist->GetCount())
                 game_values.skinids[iPlayer] = 0;
         }
@@ -2780,7 +2780,7 @@ MenuCodeEnum MI_BonusWheel::Modify(bool fModify)
         float dFinalAngle = dSelectionAngle + dWinddownAngle;
 
         //Bring the radians back down to between 0 and TWO_PI to do comparisons to the powerups on the wheel
-        while(dFinalAngle > TWO_PI)
+        while (dFinalAngle > TWO_PI)
             dFinalAngle -= TWO_PI;
 
         float dSectorSize = TWO_PI / NUMBONUSITEMSONWHEEL;
@@ -2899,7 +2899,7 @@ void MI_BonusWheel::Update()
                 iNextSelectionSoundIndex = 1;
         }
 
-        while(dSelectionAngle > TWO_PI)
+        while (dSelectionAngle > TWO_PI)
             dSelectionAngle -= TWO_PI;
     }
 }
@@ -2961,7 +2961,7 @@ void MI_BonusWheel::Reset(bool fTournament)
             int iRandPowerup = RNGMAX(iCountWeight + 1);
             int iPowerupWeightCount = game_values.powerupweights[iChoosePowerup];
 
-            while(iPowerupWeightCount < iRandPowerup)
+            while (iPowerupWeightCount < iRandPowerup)
                 iPowerupWeightCount += game_values.powerupweights[++iChoosePowerup];
         }
 
@@ -3061,7 +3061,7 @@ MenuCodeEnum MI_ScreenResize::SendInput(CPlayerInput * playerInput)
     while (!done) {
         game_values.playerInput.ClearPressedKeys(1);
 
-        while(SDL_PollEvent(&event)) {
+        while (SDL_PollEvent(&event)) {
             game_values.playerInput.Update(event, 1);
 
             for (int iPlayer = 0; iPlayer < 4; iPlayer++) {

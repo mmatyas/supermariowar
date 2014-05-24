@@ -67,7 +67,7 @@ void CGame::Go()
 
 void game_frame()
 #else
-    while(game_values.gamestate != GS_QUIT)
+    while (game_values.gamestate != GS_QUIT)
 #endif
     {
         FPSLimiter::instance().frameStart();

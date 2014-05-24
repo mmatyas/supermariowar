@@ -318,7 +318,7 @@ bool MI_SelectField::SetKey(short iID)
     std::vector<SF_ListItem*>::iterator search = items.begin();
 
     iIndex  = 0;
-    while(search != items.end()) {
+    while (search != items.end()) {
         if((*search)->iValue == iID) {
             current = search;
             SetValues();
@@ -371,7 +371,7 @@ bool MI_SelectField::HideItem(short iID, bool fhide)
 
     std::vector<SF_ListItem*>::iterator search = items.begin(), lim = items.end();
 
-    while(search != lim) {
+    while (search != lim) {
         if((*search)->iValue == iID) {
             if(current == search && fhide) {
                 if(!MoveNext())
@@ -395,7 +395,7 @@ void MI_SelectField::HideAllItems(bool fHide)
 
     std::vector<SF_ListItem*>::iterator itr = items.begin();
 
-    while(itr != items.end()) {
+    while (itr != items.end()) {
         (*itr)->fHidden = fHide;
         ++itr;
     }
@@ -558,7 +558,7 @@ bool MI_SelectField::MoveNext()
     std::vector<SF_ListItem*>::iterator findNext = current;
     short iFindIndex = iIndex;
 
-    while(true) {
+    while (true) {
         if(findNext == --items.end()) {
             if(fNoWrap) {
                 return false;
@@ -593,7 +593,7 @@ bool MI_SelectField::MovePrev()
     std::vector<SF_ListItem*>::iterator findPrev = current;
     short iFindIndex = iIndex;
 
-    while(true) {
+    while (true) {
         if(findPrev == items.begin()) {
             if(fNoWrap) {
                 return false;
@@ -629,7 +629,7 @@ bool MI_SelectField::MoveRandom()
     std::vector<SF_ListItem*>::iterator searchHidden = items.begin();
 
     short iHiddenCount = 0;
-    while(searchHidden != items.end()) {
+    while (searchHidden != items.end()) {
         if((*searchHidden)->fHidden) {
             iHiddenCount++;
         }
@@ -644,7 +644,7 @@ bool MI_SelectField::MoveRandom()
     std::vector<SF_ListItem*>::iterator findRandom = current;
     short iFindIndex = iIndex;
 
-    while(true) {
+    while (true) {
         int index = RNGMAX(items.size());
 
         for (int k = 0; k < index; k++) {
@@ -828,9 +828,9 @@ MenuCodeEnum MI_SliderField::SendInput(CPlayerInput * playerInput)
     for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
         if(playerInput->outputControls[iPlayer].menu_scrollfast.fPressed) {
             if(iIndex == 0)
-                while(MoveNext());
+                while (MoveNext());
             else
-                while(MovePrev());
+                while (MovePrev());
 
             return mcItemChangedCode;
         }
@@ -1479,7 +1479,7 @@ void MI_ScoreText::Draw()
 void MI_ScoreText::SetScore(short sScore)
 {
     short iDigits = sScore;
-    while(iDigits > 999)
+    while (iDigits > 999)
         iDigits -= 1000;
 
     iDigitLeftSrcX = iDigits / 100 * 16;

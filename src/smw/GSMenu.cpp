@@ -2282,7 +2282,7 @@ void MenuState::update()
 
     //handle messages
     SDL_Event event;
-    while(SDL_PollEvent(&event)) {
+    while (SDL_PollEvent(&event)) {
         switch(event.type) {
 #ifndef _XBOX
         case SDL_QUIT:
@@ -3543,7 +3543,7 @@ bool MenuState::ReadTourFile()
     char buffer[256];
     bool fReadVersion = false;
     int iVersion[4] = {0, 0, 0, 0};
-    while(fgets(buffer, 256, fp) && game_values.tourstoptotal < 10) {
+    while (fgets(buffer, 256, fp) && game_values.tourstoptotal < 10) {
         if(buffer[0] == '#' || buffer[0] == '\n' || buffer[0] == ' ' || buffer[0] == '\t')
             continue;
 
@@ -3608,7 +3608,7 @@ void MenuState::StartGame()
             if(game_values.randomskin[k]) {
                 do {
                     game_values.skinids[k] = RNGMAX( skinlist->GetCount());
-                } while(!rm->LoadFullSkin(rm->spr_player[k], game_values.skinids[k], game_values.colorids[k]));
+                } while (!rm->LoadFullSkin(rm->spr_player[k], game_values.skinids[k], game_values.colorids[k]));
             } else {
                 rm->LoadFullSkin(rm->spr_player[k], game_values.skinids[k], game_values.colorids[k]);
             }
@@ -3629,7 +3629,7 @@ void MenuState::StartGame()
 
         int announcerIndex = 0;
 
-        while(fgets(szBuffer, 256, announcerfile) && announcerIndex < PANNOUNCER_SOUND_LAST) {
+        while (fgets(szBuffer, 256, announcerfile) && announcerIndex < PANNOUNCER_SOUND_LAST) {
             //Ignore comment lines
             if(szBuffer[0] == '#' || szBuffer[0] == ' ' || szBuffer[0] == '\t' || szBuffer[0] == '\n' || szBuffer[0] == '\r')
                 continue;
@@ -3746,7 +3746,7 @@ void MenuState::LoadScript(const char * szScriptFile)
 
     if(fp != NULL) {
         char buffer[256];
-        while(fgets(buffer, 256, fp) != NULL) {
+        while (fgets(buffer, 256, fp) != NULL) {
             if(buffer[0] == '#' || buffer[0] == '\n' || buffer[0] == ' ' || buffer[0] == '\t')
                 continue;
 
@@ -3917,7 +3917,7 @@ void MenuState::GetNextScriptOperation()
     // here bad reference when pressing Ins!
     ScriptOperation * op = *current;
 
-    while(op->iTimesExecuted >= op->iIterations) {
+    while (op->iTimesExecuted >= op->iIterations) {
         if(++current == operations.end()) {
             iScriptState = 1;
             return;

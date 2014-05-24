@@ -157,7 +157,7 @@ void WorldPlayer::Draw(short iMapOffsetX, short iMapOffsetY)
 
 void WorldPlayer::SetSprite(short iPlayer)
 {
-    while(!rm->LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], true)) {
+    while (!rm->LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], true)) {
         if(++game_values.skinids[iPlayer] >= skinlist->GetCount())
             game_values.skinids[iPlayer] = 0;
     }
@@ -396,7 +396,7 @@ bool WorldMap::Load(short tilesize)
     short iCurrentWarp = 0;
     short iCurrentVehicle = 0;
 
-    while(fgets(buffer, 1024, file)) {
+    while (fgets(buffer, 1024, file)) {
         if(buffer[0] == '#' || buffer[0] == '\n' || buffer[0] == '\r' || buffer[0] == ' ' || buffer[0] == '\t')
             continue;
 
@@ -710,7 +710,7 @@ bool WorldMap::Load(short tilesize)
 
             iNumInitialBonuses = 0;
 
-            while(psz != NULL) {
+            while (psz != NULL) {
                 //0 indicates no initial bonuses
                 if(psz[0] == '0')
                     break;
@@ -1588,7 +1588,7 @@ short WorldMap::GetNextInterestingMove(short iCol, short iRow)
             short iBackTileDirection = visitedTiles[tile->iID];
             short iBackTileId = tile->iID;
 
-            while(true) {
+            while (true) {
                 if(iBackTileDirection == 0)
                     iBackTileId -= iWidth;
                 else if(iBackTileDirection == 1)

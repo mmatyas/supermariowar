@@ -57,7 +57,7 @@ void FPSLimiter::afterFlip()
     }
 
     //Fine tune wait here
-    while(SDL_GetTicks() - framestart < (unsigned short)game_values.framelimiter)
+    while (SDL_GetTicks() - framestart < (unsigned short)game_values.framelimiter)
         SDL_Delay(0);   //keep framerate constant at 1000/game_values.framelimiter fps
 
     //Debug code to slow framerate down to 1 fps to see exact movement
@@ -72,7 +72,7 @@ void FPSLimiter::afterFlip()
             SDL_Delay(delay);
         }
 
-        while(SDL_GetTicks() - framestart < 1000)
+        while (SDL_GetTicks() - framestart < 1000)
             SDL_Delay(0);
     }
 #endif

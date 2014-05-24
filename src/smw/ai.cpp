@@ -114,7 +114,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
     //Expire attention objects
 	std::vector<int> toDelete;
     std::map<int, AttentionObject*>::iterator itr = attentionObjects.begin(), lim = attentionObjects.end();
-    while(itr != lim) {
+    while (itr != lim) {
         if(itr->second->iTimer > 0) {
             if(--(itr->second->iTimer) == 0) {
 
@@ -480,7 +480,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
         iDeathY = 0;
 
     //short depth = -1;
-    while(iDeathY < MAPHEIGHT) {
+    while (iDeathY < MAPHEIGHT) {
         int ttLeftTile = g_map->map(iDeathX1, iDeathY);
         int ttRightTile = g_map->map(iDeathX2, iDeathY);
 
@@ -549,7 +549,7 @@ ExitDeathCheck:
         iDeathY = 0;
 
     short heightlimit = 3;
-    while(iDeathY >= 0 && heightlimit > 0) {
+    while (iDeathY >= 0 && heightlimit > 0) {
         int ttLeftTile = g_map->map(iDeathX1, iDeathY);
         int ttRightTile = g_map->map(iDeathX2, iDeathY);
 

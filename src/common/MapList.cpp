@@ -60,20 +60,20 @@ MapList::MapList(bool fWorldEditor)
     DirectoryListing d(convertPath("maps/"), ".map");
     std::string curname;
 
-    while(d(curname)) {
+    while (d(curname)) {
         MapListNode * node = new MapListNode(d.fullName(curname));
         maps[stripCreatorAndDotMap(curname)] = node;
     }
 
 #ifdef _DEBUG
     DirectoryListing debugMapDir(convertPath("maps/test/"), ".map");
-    while(debugMapDir(curname)) {
+    while (debugMapDir(curname)) {
         MapListNode * node = new MapListNode(debugMapDir.fullName(curname));
         maps[stripCreatorAndDotMap(curname)] = node;
     }
 
     DirectoryListing specialDebugMapDir(convertPath("maps/special/"), ".map");
-    while(specialDebugMapDir(curname)) {
+    while (specialDebugMapDir(curname)) {
         MapListNode * node = new MapListNode(specialDebugMapDir.fullName(curname));
         maps[stripCreatorAndDotMap(curname)] = node;
     }
@@ -84,7 +84,7 @@ MapList::MapList(bool fWorldEditor)
         //Load in the "tour only" maps directory
         DirectoryListing tourMapDir(convertPath("maps/tour/"), ".map");
 
-        while(tourMapDir(curname)) {
+        while (tourMapDir(curname)) {
             MapListNode * node = new MapListNode(tourMapDir.fullName(curname));
             maps[stripCreatorAndDotMap(curname)] = node;
         }
@@ -97,7 +97,7 @@ MapList::MapList(bool fWorldEditor)
 
             DirectoryListing worldMapDir(convertPath(std::string(szName) + std::string("/")), ".map");
 
-            while(worldMapDir(curname)) {
+            while (worldMapDir(curname)) {
                 MapListNode * node = new MapListNode(worldMapDir.fullName(curname));
                 maps[stripCreatorAndDotMap(curname)] = node;
             }
@@ -107,7 +107,7 @@ MapList::MapList(bool fWorldEditor)
 
 #ifndef _DEBUG
         DirectoryListing specialEditorMapDir(convertPath("maps/special/"), ".map");
-        while(specialEditorMapDir(curname)) {
+        while (specialEditorMapDir(curname)) {
             MapListNode * node = new MapListNode(specialEditorMapDir.fullName(curname));
             maps[stripCreatorAndDotMap(curname)] = node;
         }
@@ -124,7 +124,7 @@ MapList::MapList(bool fWorldEditor)
     current = maps.begin();
 
     short iIndex = 0;
-    while(current != maps.end()) {
+    while (current != maps.end()) {
         (*current).second->iIndex = iIndex++;
         current++;
     }
@@ -141,7 +141,7 @@ MapList::MapList(bool fWorldEditor)
     //Load in the "tour only" maps directory
     DirectoryListing tourMapDir(convertPath("maps/tour/"), ".map");
 
-    while(tourMapDir(curname)) {
+    while (tourMapDir(curname)) {
         MapListNode * node = new MapListNode(tourMapDir.fullName(curname));
         worldmaps[stripCreatorAndDotMap(curname)] = node;
     }
@@ -155,7 +155,7 @@ MapList::MapList(bool fWorldEditor)
 
         DirectoryListing worldMapDir(convertPath(std::string(szName) + std::string("/")), ".map");
 
-        while(worldMapDir(curname)) {
+        while (worldMapDir(curname)) {
             MapListNode * node = new MapListNode(worldMapDir.fullName(curname));
             worldmaps[stripCreatorAndDotMap(curname)] = node;
         }
@@ -164,7 +164,7 @@ MapList::MapList(bool fWorldEditor)
     }
 
     DirectoryListing specialMapDir(convertPath("maps/special/"), ".map");
-    while(specialMapDir(curname)) {
+    while (specialMapDir(curname)) {
         MapListNode * node = new MapListNode(specialMapDir.fullName(curname));
         worldmaps[stripCreatorAndDotMap(curname)] = node;
     }
@@ -211,7 +211,7 @@ void MapList::addWorldMaps()
         DirectoryListing specialDebugMapDir(convertPath("maps/special/"), ".map");
 
         std::string curname;
-        while(worldMapDir(curname)) {
+        while (worldMapDir(curname)) {
             MapListNode * node = new MapListNode(worldMapDir.fullName(curname));
             maps[stripCreatorAndDotMap(curname)] = node;
         }
@@ -249,7 +249,7 @@ bool MapList::find(const char * name)
             fFound = true;
 
         free(szCurrentName);
-    } while(current != oldCurrent && !fFound);
+    } while (current != oldCurrent && !fFound);
 
     free(szLookForName);
 
@@ -269,7 +269,7 @@ bool MapList::findexact(const char * name, bool fWorld)
     if(fWorld) {
         std::map<std::string, MapListNode*>::iterator iterateAll = worldmaps.begin(), lim = worldmaps.end();
 
-        while(iterateAll != lim && !fFound) {
+        while (iterateAll != lim && !fFound) {
             char * szCurrentName = new char[iterateAll->first.length() + 1];
             strcpy(szCurrentName, iterateAll->first.c_str());
             inPlaceLowerCase(szCurrentName);
@@ -302,7 +302,7 @@ bool MapList::findexact(const char * name, bool fWorld)
             fFound = true;
 
         delete[] szCurrentName;
-    } while(current != oldCurrent && !fFound);
+    } while (current != oldCurrent && !fFound);
 
     delete[] szLookForName;
 
@@ -332,7 +332,7 @@ bool MapList::startswith(char letter)
 
         if(currentShortmapname()[0] == letter)
             return true;
-    } while(current != oldCurrent);
+    } while (current != oldCurrent);
 
     return false;
 }
@@ -365,7 +365,7 @@ bool MapList::startswith(std::string match)
         //Label that we break to if we don't match (it'd be nice if we had labeled continues in c++)
 TRYNEXTMAP:
         continue;
-    } while(current != oldCurrent);
+    } while (current != oldCurrent);
 
     return false;
 }
@@ -380,7 +380,7 @@ void MapList::prev(bool fUseFilters)
 
             if((*current).second->fInCurrentFilterSet)
                 return;
-        } while(current != oldCurrent);
+        } while (current != oldCurrent);
     } else {
         if(current == maps.begin())	//we are at the first element
             current = --maps.end();	//continue from end
@@ -403,7 +403,7 @@ void MapList::next(bool fUseFilters)
 
             if((*current).second->fInCurrentFilterSet)
                 return;
-        } while(current != oldCurrent);
+        } while (current != oldCurrent);
     } else {
         if(current == --maps.end())	//we are at the last valid element
             current = maps.begin();	//continue from start
@@ -467,7 +467,7 @@ void MapList::WriteFilters()
 
             std::map<std::string, MapListNode*>::iterator itr = maps.begin(), lim = maps.end();
 
-            while(itr != lim) {
+            while (itr != lim) {
                 if((*itr).second->pfFilters[iFilter + NUM_AUTO_FILTERS])
                     fprintf(fp, "%s\n", (*itr).first.c_str());
 
@@ -494,7 +494,7 @@ void MapList::ReadFilters()
     FILE * mfp = fopen(convertPath("maps/cache/mapsummary.txt").c_str(), "r");
 
     if(mfp) {
-        while(fgets(buffer, 256, mfp)) {
+        while (fgets(buffer, 256, mfp)) {
             char * pszMapName = strtok(buffer, ",\n");
 
             if(maps.find(pszMapName) != maps.end()) {
@@ -518,7 +518,7 @@ void MapList::ReadFilters()
         fclose(mfp);
     }
 
-    while(current != maps.end()) {
+    while (current != maps.end()) {
         if(!current->second->fReadFromCache) {
             MapListNode * mln = current->second;
             g_map->loadMap(mln->filename, read_type_summary);
@@ -538,7 +538,7 @@ void MapList::ReadFilters()
 
         short iVersion[4] = {0, 0, 0, 0};
         short iReadState = 0;
-        while(fgets(buffer, 256, ffp)) {
+        while (fgets(buffer, 256, ffp)) {
             if(buffer[0] == '#' || buffer[0] == '\n' || buffer[0] == '\r' || buffer[0] == ' ' || buffer[0] == '\t')
                 continue;
 
@@ -587,7 +587,7 @@ void MapList::ReloadMapAutoFilters()
 {
     std::map<std::string, MapListNode*>::iterator itr = maps.begin(), lim = maps.end();
 
-    while(itr != lim) {
+    while (itr != lim) {
         MapListNode * mln = itr->second;
         g_map->loadMap(mln->filename, read_type_summary);
         memcpy(mln->pfFilters, g_map->fAutoFilter, sizeof(bool) * NUM_AUTO_FILTERS);
@@ -605,7 +605,7 @@ void MapList::WriteMapSummaryCache()
 
     std::map<std::string, MapListNode*>::iterator itr = maps.begin(), lim = maps.end();
 
-    while(itr != lim) {
+    while (itr != lim) {
         fprintf(fp, itr->first.c_str());
 
         for (short iFilter = 0; iFilter < NUM_AUTO_FILTERS; iFilter++)
@@ -631,7 +631,7 @@ void MapList::ApplyFilters(bool * pfFilters)
 
     iFilteredMapCount = 0;
     short iTotalCount = 0;
-    while(itr != lim) {
+    while (itr != lim) {
         bool fMatched = true;
         for (short iFilter = 0; iFilter < NUM_AUTO_FILTERS + filterslist->GetCount(); iFilter++) {
             if(pfFilters[iFilter]) {

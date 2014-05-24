@@ -227,10 +227,10 @@ bool EllipsePath::Move(short type)
     dAngle[type] += dVelocity;
 
     if(dVelocity < 0.0f) {
-        while(dAngle[type] < 0.0f)
+        while (dAngle[type] < 0.0f)
             dAngle[type] += TWO_PI;
     } else {
-        while(dAngle[type] >= TWO_PI)
+        while (dAngle[type] >= TWO_PI)
             dAngle[type] -= TWO_PI;
     }
 

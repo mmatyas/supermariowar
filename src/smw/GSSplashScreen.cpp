@@ -196,7 +196,7 @@ bool SplashScreenState::init()
 //	{
 //		int index = RNGMAX(NUM_CONTRIBUTORS);
 //
-//		while(contributorUsed[index])
+//		while (contributorUsed[index])
 //		{
 //			if(++index >= NUM_CONTRIBUTORS)
 //				index = 0;
@@ -216,7 +216,7 @@ void SplashScreenState::update()
 
     // TODO: move this out of this method maybe
 
-    while(SDL_PollEvent(&loop_event)) {
+    while (SDL_PollEvent(&loop_event)) {
         switch(loop_event.type) {
 
 #ifndef _XBOX

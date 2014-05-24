@@ -212,7 +212,7 @@ void GameTimerDisplay::Draw()
 void GameTimerDisplay::SetDigitCounters()
 {
     short iDigits = timeleft;
-    while(iDigits > 999)
+    while (iDigits > 999)
         iDigits -= 1000;
 
     iDigitLeftSrcX = iDigits / 100 * 16;
@@ -397,7 +397,7 @@ short CGameMode::GetScoreRankedPlayerList(CPlayer * players[4], bool fGetHighest
     //Bubble sort players in to score order
     bool fNeedSwap = true;
 
-    while(fNeedSwap) {
+    while (fNeedSwap) {
         fNeedSwap = false;
         short iRandom = 0;
         for (short iIndex = 0; iIndex < iNumPlayersInList - 1; iIndex++) {
@@ -1432,7 +1432,7 @@ void CGM_Frenzy::think()
                     iSelectedPowerup = 0;
                     int iWeightCount = game_values.gamemodesettings.frenzy.powerupweight[iSelectedPowerup];
 
-                    while(iWeightCount < iRandPowerup)
+                    while (iWeightCount < iRandPowerup)
                         iWeightCount += game_values.gamemodesettings.frenzy.powerupweight[++iSelectedPowerup];
                 }
 
@@ -1506,7 +1506,7 @@ void CGM_Survival::think()
             iSelectedEnemy = 0;
             int iWeightCount = game_values.gamemodesettings.survival.enemyweight[iSelectedEnemy];
 
-            while(iWeightCount < iRandEnemy)
+            while (iWeightCount < iRandEnemy)
                 iWeightCount += game_values.gamemodesettings.survival.enemyweight[++iSelectedEnemy];
 
 #pragma warning("Replace all these magic constants with proportional values")
@@ -1981,7 +1981,7 @@ void CGM_Stomp::think()
                 iSelectedEnemy = 0;
                 int iWeightCount = game_values.gamemodesettings.stomp.enemyweight[iSelectedEnemy];
 
-                while(iWeightCount < iRandEnemy)
+                while (iWeightCount < iRandEnemy)
                     iWeightCount += game_values.gamemodesettings.stomp.enemyweight[++iSelectedEnemy];
             }
 
@@ -3272,7 +3272,7 @@ void CGM_Bonus::init()
         for (short iChest = 0; iChest < iNumBonuses; iChest++) {
             short iRandChest = RNGMAX(iNumBonuses);
 
-            while(fChestUsed[iRandChest]) {
+            while (fChestUsed[iRandChest]) {
                 if(++iRandChest >= iNumBonuses)
                     iRandChest = 0;
             }
@@ -3603,6 +3603,6 @@ void CGM_Boxes_MiniGame::ReleaseCoin(CPlayer &player)
 
 void CGM_Boxes_MiniGame::ReleaseAllCoinsFromTeam(CPlayer &player)
 {
-    while(player.score->subscore[0] > 0)
+    while (player.score->subscore[0] > 0)
         ReleaseCoin(player);
 }

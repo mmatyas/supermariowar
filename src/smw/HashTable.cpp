@@ -33,7 +33,7 @@ CObject * HashTable::Add(CObject * pObject)
 			return pData;
 		}
 
-        while(pSearchNode->next) {
+        while (pSearchNode->next) {
             if(pSearchNode->next->data->iNetworkID == pObject->iNetworkID) {
 				//printf("  + Duplicate found!\n");
 				CObject * pData = pSearchNode->next->data;
@@ -59,7 +59,7 @@ CObject * HashTable::Get(int iNetworkID)
 {
 	HashNode * pNode = table[iNetworkID % capacity];
 
-    while(pNode) {
+    while (pNode) {
 		if(pNode->data->iNetworkID == iNetworkID)
 			return pNode->data;
 
@@ -76,7 +76,7 @@ CObject * HashTable::Remove(int iNetworkID)
 	HashNode * pNode = table[iID];
 	HashNode * pPrevNode = NULL;
 
-    while(pNode) {
+    while (pNode) {
 		if(pNode->data->iNetworkID == iNetworkID)
 			break;
 
@@ -104,7 +104,7 @@ CObject * HashTable::Remove(int iNetworkID)
 void HashTable::Clear()
 {
     for (int k = 0; k < capacity; k++) {
-        while(table[k]) {
+        while (table[k]) {
 			HashNode * pNode = table[k];
 			table[k] = pNode->next;
 

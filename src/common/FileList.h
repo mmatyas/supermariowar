@@ -65,7 +65,7 @@ public:
                 fFound = true;
 
             free(szCurrentName);
-        } while(currentIndex != oldCurrent && !fFound);
+        } while (currentIndex != oldCurrent && !fFound);
 
         free(szLookForName);
 

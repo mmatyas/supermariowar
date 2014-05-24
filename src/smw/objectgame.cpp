@@ -807,7 +807,7 @@ short B_PowerupBlock::SelectPowerup()
 
     int iPowerupWeightCount = settings[iSelectedPowerup];
 
-    while(iPowerupWeightCount < iRandPowerup)
+    while (iPowerupWeightCount < iRandPowerup)
         iPowerupWeightCount += settings[++iSelectedPowerup];
 
     return iSelectedPowerup;
@@ -875,7 +875,7 @@ void B_ViewBlock::GetNextPowerup()
     powerupindex = 0;
     int iPowerupWeightCount = settings[powerupindex];
 
-    while(iPowerupWeightCount < iRandPowerup)
+    while (iPowerupWeightCount < iRandPowerup)
         iPowerupWeightCount += settings[++powerupindex];
 }
 
@@ -2797,7 +2797,7 @@ bool PU_SecretPowerup::collide (CPlayer *player)
 void PU_SecretPowerup::place()
 {
     short iAttempts = 10;
-    while(!g_map->findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false) && iAttempts-- > 0);
+    while (!g_map->findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false) && iAttempts-- > 0);
 
     fx = (float)ix;
     fy = (float)iy;
@@ -2820,7 +2820,7 @@ PU_TreasureChestBonus::PU_TreasureChestBonus(gfxSprite *nspr, short iNumSpr, sho
     bonusitem = iBonusItem;
 
     short iAttempts = 10;
-    while(!g_map->findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false) && iAttempts-- > 0);
+    while (!g_map->findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false) && iAttempts-- > 0);
     fx = (float)ix;
     fy = (float)iy;
 
@@ -4282,7 +4282,7 @@ void MO_Coin::placeCoin()
 
     short x = 0, y = 0;
     short iAttempts = 32;
-    while((!g_map->findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) ||
+    while ((!g_map->findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) ||
             objectcontainer[1].getClosestMovingObject(x, y, movingobject_coin) < 150.0f)
             && iAttempts-- > 0);
 
@@ -4650,7 +4650,7 @@ void CO_Egg::placeEgg()
 
     short x = 0, y = 0;
     short iAttempts = 32;
-    while((!g_map->findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) ||
+    while ((!g_map->findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) ||
             objectcontainer[1].getClosestMovingObject(x, y, movingobject_yoshi) < 250.0f)
             && iAttempts-- > 0);
 
@@ -4907,7 +4907,7 @@ void MO_FlagBase::placeFlagBase(bool fInit)
         y = g_map->flagbaselocations[teamID].y;
     } else {
         short iAttempts = 32;
-        while((!g_map->findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) ||
+        while ((!g_map->findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) ||
                 objectcontainer[1].getClosestMovingObject(x, y, movingobject_flagbase) < 200.0f)
                 && iAttempts-- > 0);
     }
@@ -5070,7 +5070,7 @@ void CO_Flag::placeFlag()
         fInBase = false;
 
         short iAttempts = 10;
-        while(!g_map->findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false) && iAttempts-- > 0);
+        while (!g_map->findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false) && iAttempts-- > 0);
         fx = (float)ix;
         fy = (float)iy;
 
@@ -5172,7 +5172,7 @@ void MO_Yoshi::placeYoshi()
             short iDeathX1 = ix/TILESIZE;
             short iDeathX2 = (ix+iw)/TILESIZE;
 
-            while(iDeathY < MAPHEIGHT) {
+            while (iDeathY < MAPHEIGHT) {
                 int ttLeftTile = g_map->map(iDeathX1, iDeathY);
                 int ttRightTile = g_map->map(iDeathX2, iDeathY);
 
@@ -5299,7 +5299,7 @@ void OMO_Area::placeArea()
 {
     short x = 0, y = 0;
     short iAttempts = 32;
-    while((!g_map->findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) ||
+    while ((!g_map->findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) ||
             objectcontainer[0].getClosestObject(x, y, object_area) <= (200.0f - ((numareas - 3) * 25.0f)))
             && iAttempts-- > 0);
 
@@ -5485,7 +5485,7 @@ void OMO_KingOfTheHillZone::placeArea()
         bool fTryAgain = false;
         bool fDone = false;
 
-        while(!fDone) {
+        while (!fDone) {
             for (short iCol = 0; iCol < size; iCol++) {
                 int type = g_map->map(x + iCol, iFindY);
                 if(((type & tile_flag_solid_on_top || type & tile_flag_solid) && (type & tile_flag_death_on_top) == 0) || g_map->block(x + iCol, iFindY)) {
@@ -5691,7 +5691,7 @@ void OMO_RaceGoal::placeRaceGoal()
 
             x = (short)RNGMAX(smw->ScreenWidth - collisionWidth);
             y = (short)RNGMAX(smw->ScreenHeight - collisionHeight);
-        } while(objectcontainer[2].getClosestObject(x, y, object_race_goal) <= 250.0f - (quantity * 25.0f));
+        } while (objectcontainer[2].getClosestObject(x, y, object_race_goal) <= 250.0f - (quantity * 25.0f));
     }
 
     setXi(x);
@@ -5786,7 +5786,7 @@ void MO_FrenzyCard::placeCard()
 
     short x = 0, y = 0;
     short iAttempts = 32;
-    while((!g_map->findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) ||
+    while ((!g_map->findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) ||
             objectcontainer[1].getClosestObject(x, y, object_frenzycard) <= 150.0f)
             && iAttempts-- > 0);
 
@@ -5909,7 +5909,7 @@ void MO_CollectionCard::placeCard()
 
     short x = 0, y = 0;
     short iAttempts = 32;
-    while((!g_map->findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) ||
+    while ((!g_map->findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) ||
             objectcontainer[1].getClosestMovingObject(x, y, movingobject_collectioncard) <= 150.0f)
             && iAttempts-- > 0);
 
@@ -6181,7 +6181,7 @@ void MO_WalkingEnemy::collide(IO_MovingObject * object)
 void MO_WalkingEnemy::place()
 {
     short iAttempts = 10;
-    while(!g_map->findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false) && iAttempts-- > 0);
+    while (!g_map->findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false) && iAttempts-- > 0);
     fx = (float)ix;
     fy = (float)iy;
 }
@@ -6536,7 +6536,7 @@ MO_CheepCheep::MO_CheepCheep(gfxSprite *nspr) :
     setXi((short)(RNGMAX(608)));
 
     velx = 0.0f;
-    while(velx == 0.0f)
+    while (velx == 0.0f)
         velx = float(RNGMAX(19) - 9) / 2.0f;
 
     //Cheep cheep up velocity is between 9.0 and 13.0 in 0.5 increments
@@ -8428,7 +8428,7 @@ void CO_Spring::draw()
 void CO_Spring::place()
 {
     short iAttempts = 10;
-    while(!g_map->findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false) && iAttempts-- > 0);
+    while (!g_map->findspawnpoint(5, &ix, &iy, collisionWidth, collisionHeight, false) && iAttempts-- > 0);
     fx = (float)ix;
     fy = (float)iy;
 
@@ -9105,7 +9105,7 @@ void CO_PhantoKey::placeKey()
 
     short x = 0, y = 0;
     short iAttempts = 10;
-    while(!g_map->findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) && iAttempts-- > 0);
+    while (!g_map->findspawnpoint(5, &x, &y, collisionWidth, collisionHeight, false) && iAttempts-- > 0);
 
     setXi(x);
     setYi(y);

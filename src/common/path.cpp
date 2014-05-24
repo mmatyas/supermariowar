@@ -84,7 +84,7 @@ void Initialize_Paths()
 
 	strlcat(SMW_Root_Data_Dir, (char*)temp, PATH_MAX);
 	int i = strlen(SMW_Root_Data_Dir) -1;
-	while(SMW_Root_Data_Dir[i] !='/'){
+	while (SMW_Root_Data_Dir[i] !='/'){
 	   SMW_Root_Data_Dir[i] = 0;
 	   --i;
 	}

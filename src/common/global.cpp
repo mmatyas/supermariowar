@@ -294,7 +294,7 @@ void _load_waitforkey()
 #ifndef __EMSCRIPTEN__
     SDL_Event event;
     while (true) {
-        while(SDL_PollEvent(&event)) {
+        while (SDL_PollEvent(&event)) {
             if(event.type == SDL_KEYDOWN)
                 return;
             if(event.type == SDL_JOYBUTTONDOWN)
@@ -550,7 +550,7 @@ TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld)
 
                 char * pszStart = pszTemp;
 
-                while(pszStart != NULL) {
+                while (pszStart != NULL) {
                     char * pszEnd = strstr(pszStart, "|");
                     if(pszEnd)
                         *pszEnd = 0;
@@ -788,7 +788,7 @@ TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld)
         char * pszStart = pszTemp;
 
         ts->iBonusTextLines = 0;
-        while(pszStart != NULL && pszStart[0] != '-') {
+        while (pszStart != NULL && pszStart[0] != '-') {
             char * pszEnd = strstr(pszStart, "|");
 
             if(pszEnd)
@@ -804,7 +804,7 @@ TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld)
 
         ts->iNumBonuses = 0;
         pszTemp = strtok(NULL, ",\n");
-        while(pszTemp) {
+        while (pszTemp) {
             strcpy(ts->wsbBonuses[ts->iNumBonuses].szBonusString, pszTemp);
 
             short iPowerupOffset = 0;
@@ -1630,7 +1630,7 @@ void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
             iBulletPathX = rPathDst.x + iTileSize;
 
         short iBulletPathSpacing = (short)(hazard->dparam[0] * dBulletBillFrequency[iSize]);
-        while(iBulletPathX >= 0 && iBulletPathX < smw->GetScreenWidth(iSize)) {
+        while (iBulletPathX >= 0 && iBulletPathX < smw->GetScreenWidth(iSize)) {
             gfx_setrect(&rDotDst, iBulletPathX, rPathDst.y + ((iTileSize - iPlatformPathDotSize[iSize]) >> 1), iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
             SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rDotSrc, blitdest, &rDotDst);
 

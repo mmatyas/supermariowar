@@ -167,7 +167,7 @@ MenuCodeEnum UI_Menu::MoveNextControl(MenuCodeEnum iDirection)
 
 	UI_Control * neighbor = current->GetNeighbor(iDirection);
 
-    while(neighbor && !neighbor->IsVisible()) {
+    while (neighbor && !neighbor->IsVisible()) {
 		neighbor = neighbor->GetNeighbor(iDirection);
 	}
 
@@ -207,7 +207,7 @@ MenuCodeEnum UI_Menu::MouseClick(short iMouseX, short iMouseY)
 	std::list<UI_Control*>::iterator itr = controls.begin(), lim = controls.end();
 	UI_Control * pFound = NULL;
 	MenuCodeEnum code = MENU_CODE_NONE;
-    while(itr != lim) {
+    while (itr != lim) {
         if((*itr)->IsVisible()) {
 			code = (*itr)->MouseClick(iMouseX, iMouseY);
 
@@ -254,7 +254,7 @@ MenuCodeEnum UI_Menu::MouseClick(short iMouseX, short iMouseY)
 void UI_Menu::Refresh()
 {
 	std::list<UI_Control*>::iterator itr = controls.begin(), lim = controls.end();
-    while(itr != lim) {
+    while (itr != lim) {
 		(*itr)->Refresh();
 		itr++;
 	}

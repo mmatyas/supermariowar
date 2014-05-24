@@ -570,7 +570,7 @@ int main(int argc, char *argv[])
 
 	printf("entering level editor loop...\n");
 	done = false;
-    while(!done) {
+    while (!done) {
         switch(state) {
 			case EDITOR_EDIT:
 				move_nodrag = false;
@@ -803,7 +803,7 @@ int editor_edit()
 
         if(fExiting) {
 			//handle messages
-            while(SDL_PollEvent(&event)) {
+            while (SDL_PollEvent(&event)) {
 				Uint8 * keystate = SDL_GetKeyState(NULL);
 
                 switch(event.type) {
@@ -830,7 +830,7 @@ int editor_edit()
 			}
         } else {
 			//handle messages
-            while(SDL_PollEvent(&event)) {
+            while (SDL_PollEvent(&event)) {
 				Uint8 * keystate = SDL_GetKeyState(NULL);
 
                 switch(event.type) {
@@ -998,7 +998,7 @@ int editor_edit()
                     if(key == SDLK_PAGEUP) {
                         do {
 								maplist->prev(false);
-                        } while(!maplist->GetValid());
+                        } while (!maplist->GetValid());
 
 							loadcurrentmap();
 						}
@@ -1006,20 +1006,20 @@ int editor_edit()
                     if(key == SDLK_PAGEDOWN) {
                         do {
 								maplist->next(false);
-                        } while(!maplist->GetValid());
+                        } while (!maplist->GetValid());
 
 							loadcurrentmap();
 
 							//Look for a certain tile in maps for testing
 							/*
 							bool fKeepgoing = true;
-							while(fKeepgoing)
+							while (fKeepgoing)
 							{
 								do
 								{
 									maplist->next(false);
 								}
-								while(!maplist->GetValid());
+								while (!maplist->GetValid());
 
 								loadcurrentmap();
 
@@ -1831,7 +1831,7 @@ int editor_warp()
 		int framestart = SDL_GetTicks();
 
 		//handle messages
-        while(SDL_PollEvent(&event)) {
+        while (SDL_PollEvent(&event)) {
             switch(event.type) {
 				case SDL_QUIT:
 					done = true;
@@ -1896,7 +1896,7 @@ int editor_eyecandy()
 		int framestart = SDL_GetTicks();
 
 		//handle messages
-        while(SDL_PollEvent(&event)) {
+        while (SDL_PollEvent(&event)) {
             switch(event.type) {
             case SDL_QUIT: {
 					done = true;
@@ -2015,7 +2015,7 @@ int editor_properties(short iBlockCol, short iBlockRow)
 		int framestart = SDL_GetTicks();
 
 		//handle messages
-        while(SDL_PollEvent(&event)) {
+        while (SDL_PollEvent(&event)) {
             switch(event.type) {
             case SDL_QUIT: {
 					done = true;
@@ -2251,7 +2251,7 @@ int editor_platforms()
 		int framestart = SDL_GetTicks();
 
 		//handle messages
-        while(SDL_PollEvent(&event)) {
+        while (SDL_PollEvent(&event)) {
             switch(event.type) {
             case SDL_QUIT: {
 					done = true;
@@ -2963,7 +2963,7 @@ int editor_maphazards()
 		int framestart = SDL_GetTicks();
 
 		//handle messages
-        while(SDL_PollEvent(&event)) {
+        while (SDL_PollEvent(&event)) {
             switch(event.type) {
             case SDL_QUIT: {
 					done = true;
@@ -3413,7 +3413,7 @@ int editor_tiles()
 		int framestart = SDL_GetTicks();
 
 		//handle messages
-        while(SDL_PollEvent(&event)) {
+        while (SDL_PollEvent(&event)) {
             switch(event.type) {
 				case SDL_QUIT:
 					done = true;
@@ -3656,7 +3656,7 @@ int editor_blocks()
 		int framestart = SDL_GetTicks();
 
 		//handle messages
-        while(SDL_PollEvent(&event)) {
+        while (SDL_PollEvent(&event)) {
             switch(event.type) {
 				case SDL_QUIT:
 					done = true;
@@ -3760,7 +3760,7 @@ int editor_mapitems()
 		int framestart = SDL_GetTicks();
 
 		//handle messages
-        while(SDL_PollEvent(&event)) {
+        while (SDL_PollEvent(&event)) {
             switch(event.type) {
 				case SDL_QUIT:
 					done = true;
@@ -3830,7 +3830,7 @@ int editor_modeitems()
 		int framestart = SDL_GetTicks();
 
 		//handle messages
-        while(SDL_PollEvent(&event)) {
+        while (SDL_PollEvent(&event)) {
             switch(event.type) {
             case SDL_QUIT: {
 					done = true;
@@ -3991,7 +3991,7 @@ int editor_tiletype()
 		int framestart = SDL_GetTicks();
 
 		//handle messages
-        while(SDL_PollEvent(&event)) {
+        while (SDL_PollEvent(&event)) {
             switch(event.type) {
 				case SDL_QUIT:
 					done = true;
@@ -4077,7 +4077,7 @@ int editor_backgrounds()
 		int framestart = SDL_GetTicks();
 
 		//handle messages
-        while(SDL_PollEvent(&event)) {
+        while (SDL_PollEvent(&event)) {
             switch(event.type) {
 				case SDL_QUIT:
 					done = true;
@@ -4186,7 +4186,7 @@ int editor_animation()
 		int framestart = SDL_GetTicks();
 
 		//handle messages
-        while(SDL_PollEvent(&event)) {
+        while (SDL_PollEvent(&event)) {
 			short iCol = event.button.x / TILESIZE + view_animated_tileset_x;
 			short iRow = event.button.y / TILESIZE;
 
@@ -4505,7 +4505,7 @@ int display_help()
 		int framestart = SDL_GetTicks();
 
 		//handle messages
-        while(SDL_PollEvent(&event)) {
+        while (SDL_PollEvent(&event)) {
             switch(event.type) {
 				case SDL_QUIT:
 					return 0;
@@ -4563,7 +4563,7 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 		int framestart = SDL_GetTicks();
 
 		//handle messages
-        while(SDL_PollEvent(&event)) {
+        while (SDL_PollEvent(&event)) {
             switch(event.type) {
 				case SDL_QUIT:
 					return false;
