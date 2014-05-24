@@ -263,8 +263,6 @@ int CALLBACK WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine
     _CrtSetReportMode( _CRT_WARN, _CRTDBG_MODE_DEBUG );
 #endif
 
-    RootDataDirectory = lpCmdLine;
-
     if (strlen(lpCmdLine) > 0)
         RootDataDirectory = lpCmdLine;
 #else
