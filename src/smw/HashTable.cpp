@@ -25,7 +25,7 @@ CObject * HashTable::Add(CObject * pObject)
 		//printf("Collision - Slot: %d  ID: %d\n", iID, pObject->iNetworkID);
 
 		HashNode * pSearchNode = table[iID];
-		
+
         if(pSearchNode->data->iNetworkID == pObject->iNetworkID) {
 			//printf("  + Duplicate found!\n");
 			CObject * pData = pSearchNode->data;

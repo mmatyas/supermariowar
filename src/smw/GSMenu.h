@@ -77,27 +77,27 @@ class MenuState : public GameState
 		void Exit();
 		void WriteGameOptions();
 		void ResetTournamentBackToMainMenu();
-	
+
 		void SetControllingTeamForSettingsMenu(short iControlTeam, bool fDisplayMessage);
 		void DisplayControllingTeamMessage(short iControlTeam);
-		
+
 		ModeOptionsMenu modeOptionsMenu;
 
 		UI_Menu * mCurrentMenu;
-		
+
 		//Main Menu
 		UI_Menu mMainMenu;
-		
+
 		MI_Image * miSMWTitle;
 		MI_Image * miSMWVersion;
 		//MI_Text * miSMWVersionText;
-	
+
 		MI_Button * miMainStartButton;
 		MI_Button * miQuickGameButton;
 		MI_Button * miMultiplayerButton;
 
 		MI_PlayerSelect * miPlayerSelect;
-	
+
 		MI_Button * miOptionsButton;
 		MI_Button * miControlsButton;
 
@@ -111,7 +111,7 @@ class MenuState : public GameState
 		MI_Button * miPlayer2ControlsButton;
 		MI_Button * miPlayer3ControlsButton;
 		MI_Button * miPlayer4ControlsButton;
-		
+
 		MI_Button * miPlayerControlsBackButton;
 
 		MI_Image * miPlayerControlsLeftHeaderBar;
@@ -135,13 +135,13 @@ class MenuState : public GameState
 		MI_Button * miEyeCandyOptionsMenuButton;
 		MI_Button * miSoundOptionsMenuButton;
 		MI_Button * miGenerateMapThumbsButton;
-		
+
 		MI_Button * miOptionsMenuBackButton;
 
 		MI_Image * miOptionsMenuLeftHeaderBar;
 		MI_Image * miOptionsMenuRightHeaderBar;
 		MI_Text * miOptionsMenuHeaderText;
-		
+
 		MI_Image * miGenerateThumbsDialogImage;
 		MI_Text * miGenerateThumbsDialogAreYouText;
 		MI_Text * miGenerateThumbsDialogSureText;
@@ -243,7 +243,7 @@ class MenuState : public GameState
 		MI_SelectField * miBoomerangStyleField;
 		MI_SelectField * miBoomerangLifeField;
 		MI_SelectField * miFeatherJumpsField;
-		
+
 		MI_Button * miProjectilesOptionsMenuBackButton;
 
 		MI_Text * miFireballText;
@@ -290,7 +290,7 @@ class MenuState : public GameState
 		MI_SelectField * miDeadTeamNoticeField;
 
 		MI_Button * miEyeCandyOptionsMenuBackButton;
-		
+
 		MI_Image * miEyeCandyOptionsMenuLeftHeaderBar;
 		MI_Image * miEyeCandyOptionsMenuRightHeaderBar;
 		MI_Text * miEyeCandyOptionsMenuHeaderText;
@@ -312,13 +312,13 @@ class MenuState : public GameState
 
 #ifdef _XBOX
 		UI_Menu mScreenSettingsMenu;
-		
+
 		MI_Button * miScreenResizeButton;
 		MI_SelectField * miScreenHardwareFilterField;
 		MI_SelectField * miScreenFlickerFilterField;
 		MI_SelectField * miScreenSoftFilterField;
 		//MI_SelectField * miScreenAspectRatioField;
-		
+
 		MI_Button * miScreenSettingsMenuBackButton;
 
 		MI_Image * miScreenSettingsMenuLeftHeaderBar;
@@ -328,7 +328,7 @@ class MenuState : public GameState
 		UI_Menu mScreenResizeMenu;
 		MI_ScreenResize * miScreenResize;
 #endif
-	
+
 		//Match Selection Menu
 		UI_Menu mMatchSelectionMenu;
 
@@ -358,9 +358,9 @@ class MenuState : public GameState
 		MI_Button * miSettingsStartButton;
 		MI_Button * miMapFiltersButton;
 		MI_Button * miMapThumbnailsButton;
-		
+
 		MI_Image * miMapFiltersOnImage;
-		
+
 		MI_Image * miGameSettingsLeftHeaderBar;
 		MI_Image * miGameSettingsMenuRightHeaderBar;
 		MI_Text * miGameSettingsMenuHeaderText;
@@ -372,7 +372,7 @@ class MenuState : public GameState
 		MI_Button * miGameSettingsExitDialogNoButton;
 
 		MI_MapFilterScroll * miMapFilterScroll;
-		
+
 		//Map Filter Edit Menu
 		UI_Menu mMapFilterEditMenu;
 		MI_MapBrowser * miMapBrowser;
@@ -381,7 +381,7 @@ class MenuState : public GameState
 		UI_Menu mTourStopMenu;
 
 		MI_TourStop * miTourStop;
-		
+
 		MI_Image * miTourStopExitDialogImage;
 		MI_Text * miTourStopExitDialogExitTourText;
 		MI_Button * miTourStopExitDialogYesButton;
@@ -397,11 +397,11 @@ class MenuState : public GameState
 		MI_Button * miWorldExitDialogYesButton;
 		MI_Button * miWorldExitDialogNoButton;
 
-		
+
 		//Team Select
 		UI_Menu mTeamSelectMenu;
 		MI_TeamSelect * miTeamSelect;
-		
+
 		MI_Image * miTeamSelectLeftHeaderBar;
 		MI_Image * miTeamSelectRightHeaderBar;
 		MI_Text * miTeamSelectHeaderText;

@@ -50,10 +50,10 @@ void ReadIntChunk(int * mem, size_t iQuantity, FILE * inFile)
 
 		int t = mem[i];
 
-		((char*)&mem[i])[0] = ((char*)&t)[3]; 
-		((char*)&mem[i])[1] = ((char*)&t)[2]; 
-		((char*)&mem[i])[2] = ((char*)&t)[1]; 
-		((char*)&mem[i])[3] = ((char*)&t)[0]; 
+		((char*)&mem[i])[0] = ((char*)&t)[3];
+		((char*)&mem[i])[1] = ((char*)&t)[2];
+		((char*)&mem[i])[2] = ((char*)&t)[1];
+		((char*)&mem[i])[3] = ((char*)&t)[0];
 	}
 }
 #else

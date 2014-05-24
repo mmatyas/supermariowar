@@ -68,11 +68,11 @@ class gfxSprite
     SDL_Surface *getSurface() {
         return m_picture;
     }
-		
+
     void setSurface(SDL_Surface * surface) {
 			freeSurface();
 			m_picture = surface;
-			m_bltrect.w = (Uint16)m_picture->w; 
+			m_bltrect.w = (Uint16)m_picture->w;
 			m_bltrect.h = (Uint16)m_picture->h;
 		}
 

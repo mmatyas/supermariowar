@@ -514,7 +514,7 @@ void MI_SelectField::Draw()
 
     //TODO: invert order
 	bool drawLeft = true;
-    
+
 	if((items.begin() != items.end() && current == items.begin()))
 		drawLeft = false;
 

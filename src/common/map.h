@@ -23,11 +23,11 @@ enum TileTypeFlag {tile_flag_nonsolid = 0, tile_flag_solid = 1, tile_flag_solid_
 	tile_ice_death_on_left = 37		0	0	0	0	0	0	0	1	0	0	1	0	1
 	tile_ice_death_on_right = 69	0	0	0	0	0	0	1	0	0	0	1	0	1
 	tile_gap = 128					0	0	0	0	0	1	0	0	0	0	0	0	0
-	tile_super_death = 3961			0	1	1	1	1	0	1	1	1	1	0	0	1	
-	tile_super_death_top = 265		0	0	0	0	1	0	0	0	0	1	0	0	1	
-	tile_super_death_bottom	= 529	0	0	0	1	0	0	0	0	1	0	0	0	1	
-	tile_super_death_left = 1057	0	0	1	0	0	0	0	1	0	0	0	0	1	
-	tile_super_death_right = 2113	0	1	0	0	0	0	1	0	0	0	0	0	1	
+	tile_super_death = 3961			0	1	1	1	1	0	1	1	1	1	0	0	1
+	tile_super_death_top = 265		0	0	0	0	1	0	0	0	0	1	0	0	1
+	tile_super_death_bottom	= 529	0	0	0	1	0	0	0	0	1	0	0	0	1
+	tile_super_death_left = 1057	0	0	1	0	0	0	0	1	0	0	0	0	1
+	tile_super_death_right = 2113	0	1	0	0	0	0	1	0	0	0	0	0	1
 	tile_player_death =	4096		1	0	0	0	0	0	0	0	0	0	0	0	0
 */
 
@@ -47,12 +47,12 @@ struct WarpExit {
 	short direction;
 	short connection;
 	short id;
-	
+
 	short x; //Player location where player warps out of
-	short y; 
+	short y;
 
 	short lockx;  //Location to display lock icon
-	short locky;  
+	short locky;
 
 	short warpx;  //map grid location for first block in warp
 	short warpy;
@@ -147,7 +147,7 @@ class CMap
 		void predrawforeground(gfxSprite &foregroundspr);
 
 		void SetupAnimatedTiles();
-		
+
 		void preDrawPreviewBackground(SDL_Surface * targetSurface, bool fThumbnail);
 		void preDrawPreviewBackground(gfxSprite * spr_background, SDL_Surface * targetSurface, bool fThumbnail);
 		void preDrawPreviewBlocks(SDL_Surface * targetSurface, bool fThumbnail);
@@ -206,7 +206,7 @@ class CMap
 
 		void AddPermanentPlatform(MovingPlatform * platform);
 		void AddTemporaryPlatform(MovingPlatform * platform);
-		
+
 		bool findspawnpoint(short iType, short * x, short * y, short width, short height, bool tilealigned);
 		bool IsInPlatformNoSpawnZone(short x, short y, short width, short height);
 
@@ -214,7 +214,7 @@ class CMap
 		short backgroundID;
 		short eyecandy[3];
 		short musicCategoryID;
-		
+
 		short iNumMapItems;
 		short iNumMapHazards;
 
@@ -266,7 +266,7 @@ class CMap
 		bool		fAutoFilter[NUM_AUTO_FILTERS];
 
 		ScreenPoint	racegoallocations[MAXRACEGOALS];
-		
+
 		ScreenPoint flagbaselocations[4];
 
 		short		iTileAnimationTimer;
@@ -309,7 +309,7 @@ class CMap
 		friend bool TileTypeIsModified(short x, short y);
 
 		friend void AdjustMapItems(short iClickX, short iClickY);
-		friend void RemoveMapItemAt(short x, short y);	
+		friend void RemoveMapItemAt(short x, short y);
 
 		friend int editor_edit();
 		friend int editor_tiles();
@@ -331,7 +331,7 @@ class CMap
 		friend void loadmap(char * szMapFile);
 		friend void SetNoSpawn(short nospawnmode, short col, short row, bool value);
 		friend int editor_platforms();
-		
+
 		friend class B_BreakableBlock;
 		friend class B_DonutBlock;
 		friend class B_ThrowBlock;

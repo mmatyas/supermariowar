@@ -128,9 +128,9 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 	for(std::vector<int>::iterator tdIt = toDelete.begin(); tdIt != toDelete.end(); ++tdIt) {
 		// perform the actual disposal and removal
 		std::map<int, AttentionObject*>::iterator deadObjIt = attentionObjects.find(*tdIt);
-		
+
 		delete deadObjIt->second;
-		
+
 		attentionObjects.erase(deadObjIt);
 	}
 

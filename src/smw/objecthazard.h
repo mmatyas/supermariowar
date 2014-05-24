@@ -47,7 +47,7 @@ class MO_BulletBill : public IO_MovingObject
 
 		bool hittop(CPlayer * player);
 		bool hitother(CPlayer * player);
-		
+
 		void Die();
 		void SetDirectionOffset();
 
@@ -55,7 +55,7 @@ class MO_BulletBill : public IO_MovingObject
 		gfxSprite * spr_dead;
 
 		short iColorID;
-		
+
 		short iColorOffsetY;
 		short iDirectionOffsetY;
 
@@ -79,7 +79,7 @@ class IO_BulletBillCannon : public CObject
         return false;
     }
 		void collide(IO_MovingObject *) {}
-		
+
 	private:
 		void SetNewTimer();
 
@@ -97,9 +97,9 @@ class MO_Explosion : public IO_MovingObject
 
 		void update();
 		bool collide(CPlayer * player);
-		
+
 	private:
-		
+
 		short timer;
 		killstyle iStyle;
 };
@@ -117,7 +117,7 @@ class IO_FlameCannon : public CObject
 
 		bool collide(CPlayer * player);
 		void collide(IO_MovingObject *) {}
-				
+
 	private:
 		void SetNewTimer();
 
@@ -142,12 +142,12 @@ class MO_PirhanaPlant : public IO_MovingObject
 
 		bool collide(CPlayer * player);
 		void collide(IO_MovingObject *);
-		
+
 		void KillPlant();
 
 	private:
 		void SetNewTimer();
-		
+
 		float GetFireballAngle();
 
 		short iType, iDirection;

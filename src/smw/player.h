@@ -14,12 +14,12 @@ class CScore
     CScore(short iPlace) {
 			place = iPlace;
 			displayorder = iPlace;
-			
+
 			score = 0;
 
 			for(short iSubScore = 0; iSubScore < 3; iSubScore++)
 				subscore[iSubScore] = 0;
-			
+
 			x = 0;
 			y = 0;
 			destx = 0;
@@ -35,7 +35,7 @@ class CScore
 		~CScore() {}
 
 		void AdjustScore(short iValue);
-		
+
     void SetScore(short iValue) {
 			score = iValue;
 			SetDigitCounters();
@@ -72,7 +72,7 @@ class CScore
 			short iDigits = score;
 			while(iDigits > 999)
 				iDigits -= 1000;
-				
+
 			iDigitLeft = iDigits / 100 * 16;
 			iDigitMiddle = iDigits % 100 / 10 * 16;
 			iDigitRight = iDigits % 10 * 16;
@@ -131,7 +131,7 @@ class CPlayer
         return warpplane;
     }
 		bool IsPlayerFacingRight();
-		
+
     bool IsAcceptingItem() {
         return fAcceptingItem && statue_timer == 0 && iKuriboShoe == 0;
     }
@@ -191,7 +191,7 @@ class CPlayer
 		void ResetSuicideTime();
 		void SetSprite();
 		void Jump(short iMove, float jumpModifier, bool fKuriboBounce);
-		
+
 		void SpinCape();
 		void DrawCape();
 
@@ -221,7 +221,7 @@ class CPlayer
         iy = yi;
         fy = (float)iy;
     }
-		
+
 		bool FindSpawnPoint();
 		void collision_detection_map();
 		bool collision_detection_checktop();
@@ -239,12 +239,12 @@ class CPlayer
 		void addrocketawards();
 
 		short KillPlayerMapHazard(bool fForce, killstyle ks, bool fKillCarriedItem, short iPlayerId = -1);
-		
+
         void enterwarp(Warp * warp);
 		void chooseWarpExit();
 		void increasewarpcounter(short iGoal);
 		void decreasewarpcounter();
-		
+
 		COutputControl * playerKeys;
 		short playerDevice;
 
@@ -278,7 +278,7 @@ class CPlayer
 
 		short iNewPowerupX, iNewPowerupY;  //For moving powerups around during player swap effect
 		short iOldPowerupX, iOldPowerupY;
-		
+
 		bool inair;			//true... player is in the air, false... player is on the ground
 							//inair is set in CPlayer::collision_detection_map()
 		bool onice;			//on ice... friction goes way down
@@ -295,7 +295,7 @@ class CPlayer
 		short iTailTimer;
 		short iTailState;
 		short iTailFrame;
-		
+
 		short iSpinTimer;
 		short iSpinState;
 
@@ -305,7 +305,7 @@ class CPlayer
 		short superjumptimer;		//this is true when a player is able to do a super jump off a note block
 		short superjumptype;		//type of the note block they hit
 		short hammertimer;		//Only allow the player to throw powerful hammers so fast
-		
+
 		short frictionslidetimer;  //this controls how much friction smoke is generated when sliding
 		short bobombsmoketimer;   //timer for the bobomb smoke animation
 		short rainsteptimer;
@@ -318,7 +318,7 @@ class CPlayer
 
 		short spr;
 		short sprswitch;
-	
+
 		short invincibletimer;
 
 		short shieldtimer;
@@ -441,7 +441,7 @@ class CPlayer
 			friend void handleP2ObjCollisions();
 			friend void drawScoreboard(short int*);
 			friend void drawPlayerSwap();
-		
+
 		friend class CObjectContainer;
 
 		friend class CGameMode;
@@ -473,7 +473,7 @@ class CPlayer
 		friend class CGM_Pipe_MiniGame;
 		friend class CGM_Boss_MiniGame;
 		friend class CGM_Boxes_MiniGame;
-		
+
 		friend class MI_InputDevice;
 		friend class MI_InputLeft;
 		friend class MI_InputRight;
@@ -507,7 +507,7 @@ class CPlayer
 		friend class CO_Egg;
 		friend class CO_Star;
 		friend class CO_Flag;
-		
+
 		friend class MO_Coin;
 		friend class MO_CollectionCard;
 
@@ -547,7 +547,7 @@ class CPlayer
 
 		friend class MO_SuperFireball;
 		friend class MO_SledgeHammer;
-		
+
 		friend class MO_WalkingEnemy;
 		friend class MO_Goomba;
 		friend class MO_Koopa;

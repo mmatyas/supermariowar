@@ -71,7 +71,7 @@ class CPlayerInput
 		CPlayerInput();
 		~CPlayerInput(){}
 
-		//Called before 
+		//Called before
 		void CheckIfMouseUsed();
 
 		//Clears key pressed states

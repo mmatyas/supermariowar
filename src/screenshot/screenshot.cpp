@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
 	tileSetPNG[1] = convertPath("gfx/packs/Classic/tileset_medium.png");
 	tileSetPNG[2] = convertPath("gfx/packs/Classic/tileset_small.png");
 	g_map->loadTileSet(convertPath("maps/tileset.tls"), tileSetPNG);
-	
+
 	//Setup Platforms
     for(short iPlatform = 0; iPlatform < MAX_PLATFORMS; iPlatform++) {
 		g_Platforms[iPlatform].rIcon[0].x = (iPlatform % 6) * 32;
@@ -166,12 +166,12 @@ void drawlayer(int layer, bool fUseCopied, short iBlockSize)
 {
 	int i, j, ts;
 	SDL_Rect bltrect, tilebltrect;
-	
+
 	tilebltrect.w = iBlockSize;
 	tilebltrect.h = iBlockSize;
 	bltrect.w = iBlockSize;
 	bltrect.h = iBlockSize;
-	
+
 	//draw left to right full vertical
 	bltrect.x = 0;
     for(i = 0; i < MAPWIDTH; i++) {
@@ -238,7 +238,7 @@ void drawmap(bool fScreenshot, short iBlockSize)
 
 				if(displayblock >= 7 && displayblock <= 14)
 					rSrc.y = iBlockSize * (g_map->iSwitches[(displayblock - 7) % 4] + 30);
-				
+
 				SDL_BlitSurface(g_map->tilesetsurface[iBlockSize == TILESIZE ? 0 : iBlockSize == PREVIEWTILESIZE ? 1 : 2], &rSrc, screen, &rDst);
 			}
 		}
@@ -250,7 +250,7 @@ void drawmap(bool fScreenshot, short iBlockSize)
     for(int j = 0; j < MAPHEIGHT; j++) {
         for(int i = 0; i < MAPWIDTH; i++) {
 			Warp * warp = &g_map->warpdata[i][j];
-			
+
             if(warp->connection != -1) {
 				SDL_Rect rSrc = {warp->connection * iBlockSize, warp->direction * iBlockSize, iBlockSize, iBlockSize};
 				SDL_Rect rDst = {i * iBlockSize, j * iBlockSize, iBlockSize, iBlockSize};
@@ -270,12 +270,12 @@ void loadmap(char * szMapFile)
 	sprintf(filename, "gfx/packs/Classic/backgrounds/%s", g_map->szBackgroundFile);
 	std::string path = convertPath(filename);
 	backgroundlist.SetCurrentName(filename);
-	
+
     if(!File_Exists(path)) {
 		path = convertPath("gfx/packs/Classic/backgrounds/Land_Classic.png");
 		backgroundlist.SetCurrentName("gfx/packs/Classic/backgrounds/Land_Classic.png");
 	}
-	
+
 	spr_background.init(path);
 
 	g_iNumPlatforms = g_map->iNumPlatforms;
@@ -335,7 +335,7 @@ void takescreenshot()
 				}
 			}
 		}
-	
+
 		//And add platform paths
         for(short iPlatform = 0; iPlatform < g_iNumPlatforms; iPlatform++) {
             if(g_Platforms[iPlatform].iStartX != g_Platforms[iPlatform].iEndX) {
@@ -374,7 +374,7 @@ void takescreenshot()
 		strcpy(szSaveFile, "screenshots/");
 		char * pszSaveFile = szSaveFile + strlen(szSaveFile);
 		GetNameFromFileName(pszSaveFile, szMapName);
-		
+
 		if(iTileSize == PREVIEWTILESIZE)
 			strcat(szSaveFile, "_preview");
 		else if(iTileSize == THUMBTILESIZE)

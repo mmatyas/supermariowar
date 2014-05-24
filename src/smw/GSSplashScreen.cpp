@@ -159,7 +159,7 @@ bool SplashScreenState::init()
 
     menu_credits = new gfxSprite();
     gfx_loadimage(menu_credits, convertPath("gfx/packs/menu/splash_credits.png", menugraphicspacklist->current_name()), false);
-    
+
 //	const char * contributors[] = {
 //	"no_shorty", "redfalcon", "no_human", "dschingis", "funvill",
 //	"matsche", "aeroflare", "Tymoe", "David Olofson", "scoti",

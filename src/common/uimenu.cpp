@@ -8,14 +8,14 @@ UI_Menu::UI_Menu()
 	fModifyingItem = false;
 	headControl = NULL;
 	current = NULL;
-	
+
 	iControllingTeam = -1;
 }
 
 UI_Menu::~UI_Menu()
 {
 	std::list<UI_Control*>::iterator iterateAll = controls.begin();
-	
+
     while (iterateAll != controls.end()) {
         delete (*iterateAll); // Can CRASH!
 		iterateAll++;
@@ -65,7 +65,7 @@ void UI_Menu::ResetMenu()
 void UI_Menu::Update()
 {
 	std::list<UI_Control*>::iterator iterateAll = controls.begin();
-	
+
     while (iterateAll != controls.end()) {
 		(*iterateAll)->Update();
 		iterateAll++;
@@ -78,7 +78,7 @@ void UI_Menu::Update()
 void UI_Menu::Draw()
 {
 	std::list<UI_Control*>::iterator iterateAll = controls.begin();
-	
+
     while (iterateAll != controls.end()) {
 		(*iterateAll)->Draw();
 		iterateAll++;
@@ -91,16 +91,16 @@ MenuCodeEnum UI_Menu::SendInput(CPlayerInput * playerInput)
 {
     if(fModifyingItem) {
 		MenuCodeEnum ret = current->SendInput(playerInput);
-		
+
         if(MENU_CODE_UNSELECT_ITEM == ret) {
 			fModifyingItem = false;
-			
+
 			/*if(current->IsAutoModify())
 				return cancelCode;*/
 
 			return MENU_CODE_NONE;
 		}
-		
+
 		return ret;
 	}
 
@@ -109,7 +109,7 @@ MenuCodeEnum UI_Menu::SendInput(CPlayerInput * playerInput)
         if(iControllingTeam != -1) {
 			//Pay attention to other player's exit button pushes so we can exit when AI is controlling
 			if(game_values.playercontrol[iPlayer] != 1 || (iControllingTeam != LookupTeamID(iPlayer) && (!fAllowExitButton || !playerInput->outputControls[iPlayer].menu_cancel.fPressed)))
-				continue;			
+				continue;
 		}
 		//Only let player 1 on the keyboard control the menu unless there is another controlling team
         else if(iPlayer != 0 && game_values.playerInput.inputControls[iPlayer] && game_values.playerInput.inputControls[iPlayer]->iDevice == DEVICE_KEYBOARD) {
@@ -123,7 +123,7 @@ MenuCodeEnum UI_Menu::SendInput(CPlayerInput * playerInput)
         if(playerInput->outputControls[iPlayer].menu_down.fPressed) {
 			return MoveNextControl(MENU_CODE_NEIGHBOR_DOWN);
 		}
-		
+
         if(playerInput->outputControls[iPlayer].menu_left.fPressed) {
 			return MoveNextControl(MENU_CODE_NEIGHBOR_LEFT);
 		}
@@ -134,21 +134,21 @@ MenuCodeEnum UI_Menu::SendInput(CPlayerInput * playerInput)
 
         if(playerInput->outputControls[iPlayer].menu_select.fPressed) {
 			MenuCodeEnum ret = MENU_CODE_NONE;
-			
+
             if(current) {
 				ret = current->Modify(true);
-			
+
                 if(MENU_CODE_MODIFY_ACCEPTED == ret) {
 					fModifyingItem = true;
 					return MENU_CODE_NONE;
 				}
-				
+
                 if(MENU_CODE_UNSELECT_ITEM == ret) {
 					fModifyingItem = false;
 					return MENU_CODE_NONE;
 				}
 			}
-			
+
 			return ret;
 		}
 
@@ -156,7 +156,7 @@ MenuCodeEnum UI_Menu::SendInput(CPlayerInput * playerInput)
 			return cancelCode;
 		}
 	}
-	
+
 	return MENU_CODE_NONE;
 }
 
@@ -257,5 +257,5 @@ void UI_Menu::Refresh()
     while(itr != lim) {
 		(*itr)->Refresh();
 		itr++;
-	}	
+	}
 }

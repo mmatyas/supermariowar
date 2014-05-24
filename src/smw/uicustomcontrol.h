@@ -15,7 +15,7 @@ class MI_InputControlField : public UI_Control
 	public:
 		MI_InputControlField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent);
         virtual ~MI_InputControlField() {};
-		
+
 		void Draw();
 		MenuCodeEnum SendInput(CPlayerInput * playerInput);
 		void SetKey(SDL_KEYTYPE * iSetKey, SDL_KEYTYPE key, short device);
@@ -86,7 +86,7 @@ class MI_InputControlContainer : public UI_Control
 		short iPlayerID;
 		short iDevice;
 		short iSelectedInputType;
-		
+
 		UI_Menu * mInputMenu;
 
 		MI_Image * miImage[2];
@@ -126,7 +126,7 @@ class MI_TeamSelect : public UI_Control
 		short iTeamIDs[4][3];
 		short iTeamCounts[4];
 		short iNumTeams;
-		
+
 		short iAnimationTimer;
 		short iAnimationFrame;
 		short iRandomAnimationFrame;
@@ -185,7 +185,7 @@ class MI_PowerupSelection : public UI_Control
 		void MovePrev();
 
 	private:
-		
+
 		void AdjustDisplayArrows();
 
 		void SetupPowerupFields();
@@ -233,7 +233,7 @@ class MI_WorldPreviewDisplay : public UI_Control
 		void SetWorld();
 
 	protected:
-		
+
 		void Init();
 		void UpdateMapSurface(bool fFullRefresh);
 
@@ -282,10 +282,10 @@ class MI_AnnouncerField : public UI_Control
 		void UpdateName();
 
 		gfxSprite * spr;
-		
+
 		char * szName;
 		short iWidth, iIndent;
-		
+
 		char szFieldName[256];
 
 		MI_Image * miModifyImageLeft;
@@ -329,10 +329,10 @@ class MI_PlaylistField : public UI_Control
 	protected:
 
 		gfxSprite * spr;
-		
+
 		char * szName;
 		short iWidth, iIndent;
-		
+
 		MI_Image * miModifyImageLeft;
 		MI_Image * miModifyImageRight;
 };
@@ -595,7 +595,7 @@ class MI_MapBrowser : public UI_Control
 
 		short iFilterTagAnimationTimer;
 		short iFilterTagAnimationFrame;
-		
+
 		short iType;
 		short iMapCount;
 
@@ -672,7 +672,7 @@ class MI_World : public UI_Control
 
 		short iNextMapDrawOffsetCol;
 		short iNextMapDrawOffsetRow;
-			
+
 		short iDrawWidth, iDrawHeight;
 		short iSrcOffsetX, iSrcOffsetY;
 		short iDstOffsetX, iDstOffsetY;

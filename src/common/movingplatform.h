@@ -54,7 +54,7 @@ class StraightPath : public MovingPlatformPath
 
 	protected:
 		void SetVelocity(short type);
-		
+
 		short iOnStep[2];
 		short iSteps;
 		short iGoalPoint[2];
@@ -96,7 +96,7 @@ class EllipsePath : public MovingPlatformPath
 		void Reset();
 
 	private:
-		
+
 		float dRadiusX, dRadiusY;
 		float dAngle[2], dStartAngle;
 
@@ -116,7 +116,7 @@ class FallingPath : public MovingPlatformPath
 		void Reset();
 
 	private:
-	
+
 	friend class MovingPlatform;
 };
 

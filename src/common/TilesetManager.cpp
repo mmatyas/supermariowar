@@ -53,7 +53,7 @@ bool CTileset::ReadTileTypeFile(char * szFile)
 			printf("ERROR: couldn't open tileset file: %s\n", szFile);
 			return false;
 		}
-		
+
 		iTileTypeSize = ReadInt(tsf);
 
         if(iTileTypeSize <= 0 || iTileTypeSize > 1024) {
@@ -119,7 +119,7 @@ void CTileset::SaveTileset()
 		printf("ERROR: couldn't open tileset file to save tile types: %s\n", szTilesetPath);
 		return;
 	}
-	
+
 	WriteInt(iTileTypeSize, tsf);
 
     for(short i = 0; i < iTileTypeSize; i++) {
@@ -127,7 +127,7 @@ void CTileset::SaveTileset()
 	}
 
 	fclose(tsf);
-	
+
 #if defined(__MACOSX__)
 	chmod(szTilesetPath, S_IRWXU | S_IRWXG | S_IROTH);
 #endif
@@ -147,7 +147,7 @@ CTilesetManager::CTilesetManager() :
 			gfx_setrect(&rRects[0][j][i], x1, y1, TILESIZE, TILESIZE);
 			gfx_setrect(&rRects[1][j][i], x2, y2, PREVIEWTILESIZE, PREVIEWTILESIZE);
 			gfx_setrect(&rRects[2][j][i], x3, y3, THUMBTILESIZE, THUMBTILESIZE);
-			
+
 			x1 += TILESIZE;
 			x2 += PREVIEWTILESIZE;
 			x3 += THUMBTILESIZE;
@@ -170,7 +170,7 @@ void CTilesetManager::Init(const char * szGfxPack)
 	std::vector<CTileset*>::iterator iter = tilesetlist.begin(), lim = tilesetlist.end();
     while (iter != lim) {
 		delete (*iter);
-		
+
 		iter = tilesetlist.erase(iter);
 		lim = tilesetlist.end();
 	}

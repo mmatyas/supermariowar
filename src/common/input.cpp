@@ -27,7 +27,7 @@ void CPlayerInput::CheckIfMouseUsed()
 				SDL_KEYTYPE iInputKey = inputControl->keys[iKey];
 
 				//Need to reset analog mouse and joystick because there isn't a no longer moving event
-				if((iInputKey >= MOUSE_UP && iInputKey <= MOUSE_RIGHT) || 
+				if((iInputKey >= MOUSE_UP && iInputKey <= MOUSE_RIGHT) ||
                         iInputKey == MOUSE_BUTTON_START + 4 || iInputKey == MOUSE_BUTTON_START + 5) {
 					fUsingMouse = true;
 					return;
@@ -88,8 +88,8 @@ void CPlayerInput::ResetKeys()
 	iPressedKey = 0;
 }
 
-//Called during game loop to read input events and see if 
-//configured keys were pressed.  If they were, then turn on 
+//Called during game loop to read input events and see if
+//configured keys were pressed.  If they were, then turn on
 //key flags to be used by game logic
 //iGameState == 0 for in game and 1 for menu
 void CPlayerInput::Update(SDL_Event event, short iGameState)
@@ -119,7 +119,7 @@ void CPlayerInput::Update(SDL_Event event, short iGameState)
 			outputControl = &outputControls[iPlayer];
 			iDeviceID = inputControls[iPlayer]->iDevice;
 		}
-		
+
         if(iDeviceID == DEVICE_KEYBOARD) {
             if(SDL_KEYDOWN == event.type) {
                 for(int iKey = 0; iKey < NUM_KEYS && !fFound; iKey++) {
@@ -153,10 +153,10 @@ void CPlayerInput::Update(SDL_Event event, short iGameState)
             } else if(SDL_MOUSEMOTION == event.type) {
                 for(int iKey = 0; iKey < NUM_KEYS && !fFound; iKey++) {
                     if(inputControl->keys[iKey] >= MOUSE_UP) {
-						if((inputControl->keys[iKey] == MOUSE_UP && event.motion.yrel < -MOUSE_Y_DEAD_ZONE) || 
+						if((inputControl->keys[iKey] == MOUSE_UP && event.motion.yrel < -MOUSE_Y_DEAD_ZONE) ||
 							(inputControl->keys[iKey] == MOUSE_DOWN && event.motion.yrel > MOUSE_Y_DEAD_ZONE) ||
-							(inputControl->keys[iKey] == MOUSE_LEFT && event.motion.xrel < -MOUSE_X_DEAD_ZONE) || 
-							(inputControl->keys[iKey] == MOUSE_RIGHT && event.motion.xrel > MOUSE_X_DEAD_ZONE) || 
+							(inputControl->keys[iKey] == MOUSE_LEFT && event.motion.xrel < -MOUSE_X_DEAD_ZONE) ||
+							(inputControl->keys[iKey] == MOUSE_RIGHT && event.motion.xrel > MOUSE_X_DEAD_ZONE) ||
                                 (inputControl->keys[iKey] >= MOUSE_BUTTON_START && (event.motion.state & SDL_BUTTON(inputControl->keys[iKey] - MOUSE_BUTTON_START)))) {
 							fFound = true;
 
@@ -220,7 +220,7 @@ void CPlayerInput::Update(SDL_Event event, short iGameState)
 
                 for(int iKey = 0; iKey < NUM_KEYS; iKey++) {
                     if(inputControl->keys[iKey] >= JOY_HAT_UP && inputControl->keys[iKey] <= JOY_HAT_RIGHT) {
-						if((inputControl->keys[iKey] == JOY_HAT_UP && (event.jhat.value & SDL_HAT_UP)) || 
+						if((inputControl->keys[iKey] == JOY_HAT_UP && (event.jhat.value & SDL_HAT_UP)) ||
 							(inputControl->keys[iKey] == JOY_HAT_DOWN && (event.jhat.value & SDL_HAT_DOWN)) ||
 							(inputControl->keys[iKey] == JOY_HAT_LEFT && (event.jhat.value & SDL_HAT_LEFT)) ||
                                 (inputControl->keys[iKey] == JOY_HAT_RIGHT && (event.jhat.value & SDL_HAT_RIGHT))) {
@@ -283,7 +283,7 @@ void CPlayerInput::Update(SDL_Event event, short iGameState)
                 for(int iKey = 0; iKey < NUM_KEYS; iKey++) {
 					bool fUseJoystickInput = false;
 					bool fJoystickDown = false;
-					
+
                     if(event.jaxis.axis == 0 && inputControl->keys[iKey] == JOY_STICK_1_LEFT) {
 						fUseJoystickInput = true;
 

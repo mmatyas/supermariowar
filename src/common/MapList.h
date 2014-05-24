@@ -44,7 +44,7 @@ class MapList
     int currentShortMapNameLen() {
         return (*outercurrent).second->iShortNameLength;
     }
-        
+
 		void prev(bool fUseFilters);
         void next(bool fUseFilters);
 		void random(bool fUseFilters);
@@ -58,7 +58,7 @@ class MapList
     bool GetValid() {
         return (*current).second->fValid;
     }
-        
+
 		//TODO: use size?
     bool IsEmpty() {
         return maps.empty();
@@ -80,7 +80,7 @@ class MapList
 
 		void WriteFilters();
 		void ReadFilters();
-		
+
     bool GetFilter(short iFilter) {
         return (*current).second->pfFilters[iFilter];
     }

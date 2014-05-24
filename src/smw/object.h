@@ -19,9 +19,9 @@ class CObject
 		virtual void update() = 0;
 		virtual bool collide(CPlayer *){return false;}
 		virtual void collide(IO_MovingObject *){}
-		
+
 		virtual ObjectType getObjectType(){return objectType;}
-		
+
 		void setXf(float xf){fx = xf; ix = (short)fx;};
  		void setXi(short xi){ix = xi; fx = (float)ix;};
 		void setYf(float yf){fy = yf; if(fy < 0.0f) iy = (short)(fy - 1.0f); else iy = (short)fy;};
@@ -58,7 +58,7 @@ class CObject
 		short iw, ih;
 		float fx, fy;
 		float velx, vely;
-		
+
 		gfxSprite *spr;
 		short state;
 		bool dead;
@@ -86,7 +86,7 @@ class IO_MovingObject : public CObject
 		virtual void animate();
 
 		virtual bool collide(CPlayer * player);
-		
+
 		void collide(IO_MovingObject *){}
     MovingObjectType getMovingObjectType() {
         return movingObjectType;
@@ -185,7 +185,7 @@ class IO_OverMapObject : public CObject
         return false;
     }
 		virtual void collide(IO_MovingObject *){}
-		
+
 	protected:
 
 		short iNumSprites;

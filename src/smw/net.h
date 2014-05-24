@@ -125,7 +125,7 @@ struct Networking {
     bool currentMenuChanged; // eg. room players changed
     bool operationInProgress; // the waiting dialogs watch this variable
 
-    // 
+    //
     NetClient client;
     LastMessage lastSentMessage;
     LastMessage lastReceivedMessage;

@@ -49,10 +49,10 @@ class GameTimerDisplay
 class CGameMode
 {
 	public:
-		
+
 		CGameMode();
         virtual ~CGameMode();
-		
+
 		virtual void init();  //called once when the game is started
 		virtual void think();	//called once a frame
 		virtual void draw_background() {}
@@ -96,7 +96,7 @@ class CGameMode
     SModeOption * GetOptions() {
         return modeOptions;
     }
-		
+
 		bool playedwarningsound;
 		short goal;
 
@@ -108,7 +108,7 @@ class CGameMode
 #ifdef _DEBUG
 		virtual void setdebuggoal() {};
 #endif
-		
+
 	protected:
 		char szModeName[64];
 		char szGoalName[64];
@@ -130,7 +130,7 @@ class CGM_Frag : public CGameMode
 	public:
         CGM_Frag();
 		virtual ~CGM_Frag() {}
-		
+
 		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
 		short playerkilledself(CPlayer &player, killstyle style);
 		void playerextraguy(CPlayer &player, short iType);
@@ -142,7 +142,7 @@ class CGM_Frag : public CGameMode
         goal = 5;
     }
 #endif
-		
+
 };
 
 
@@ -152,7 +152,7 @@ class CGM_TimeLimit : public CGameMode
 	public:
         CGM_TimeLimit();
 		virtual ~CGM_TimeLimit() {}
-		
+
 		void init();
 		void think();
 		void draw_foreground();
@@ -180,7 +180,7 @@ class CGM_Classic : public CGameMode
 	public:
         CGM_Classic();
 		virtual ~CGM_Classic() {}
-		
+
 		virtual void init();
 		virtual short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
 		virtual short playerkilledself(CPlayer &player, killstyle style);
@@ -201,7 +201,7 @@ class CGM_Chicken : public CGameMode
 	public:
         CGM_Chicken();
 		virtual ~CGM_Chicken() {}
-	
+
 		void think();
 		void draw_foreground();
 		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
@@ -222,7 +222,7 @@ class CGM_Tag : public CGameMode
 	public:
         CGM_Tag();
 		virtual ~CGM_Tag() {}
-		
+
 		void init();
 		void think();
 		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
@@ -242,7 +242,7 @@ class CGM_ShyGuyTag : public CGameMode
 	public:
         CGM_ShyGuyTag();
 		virtual ~CGM_ShyGuyTag() {}
-		
+
 		void init();
 		void think();
 		void draw_foreground();
@@ -274,7 +274,7 @@ class CGM_Coins : public CGameMode
 		public:
         CGM_Coins();
 		virtual ~CGM_Coins() {}
-		
+
 		virtual void init();
 		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
 		short playerkilledself(CPlayer &player, killstyle style);
@@ -295,7 +295,7 @@ class CGM_Eggs : public CGameMode
 	public:
         CGM_Eggs();
 		virtual ~CGM_Eggs() {}
-		
+
 		void init();
 		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
 		short playerkilledself(CPlayer &player, killstyle style);
@@ -316,7 +316,7 @@ class CGM_Frenzy : public CGM_Frag
 	public:
         CGM_Frenzy();
 		virtual ~CGM_Frenzy() {}
-		
+
 		void init();
 		void think();
 		char *getMenuString(char *buffer64);
@@ -332,7 +332,7 @@ class CGM_Survival : public CGM_Classic
 	public:
         CGM_Survival();
 		virtual ~CGM_Survival() {}
-		
+
 		void init();
 		void think();
 		char *getMenuString(char *buffer64);
@@ -352,7 +352,7 @@ class CGM_Domination : public CGameMode
 	public:
         CGM_Domination();
 		virtual ~CGM_Domination() {}
-		
+
 		void init();
 		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
 		short playerkilledself(CPlayer &player, killstyle style);
@@ -372,7 +372,7 @@ class CGM_Owned : public CGameMode
 	public:
         CGM_Owned();
 		virtual ~CGM_Owned() {}
-		
+
 		void think();
 		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
 		short playerkilledself(CPlayer &player, killstyle style);
@@ -400,7 +400,7 @@ class CGM_Jail : public CGM_Frag
 	public:
         CGM_Jail();
 		virtual ~CGM_Jail() {}
-		
+
 		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
 		void playerextraguy(CPlayer &player, short iType);
 		char *getMenuString(char *buffer64);
@@ -412,7 +412,7 @@ class CGM_Stomp : public CGameMode
 	public:
         CGM_Stomp();
 		virtual ~CGM_Stomp() {}
-		
+
 		void init();
 		void think();
 
@@ -469,7 +469,7 @@ class CGM_Star : public CGM_TimeLimit
 	public:
         CGM_Star();
 		virtual ~CGM_Star() {}
-		
+
 		void init();
 		void think();
 		void draw_foreground();
@@ -510,7 +510,7 @@ class CGM_CaptureTheFlag : public CGameMode
 	public:
         CGM_CaptureTheFlag();
 		virtual ~CGM_CaptureTheFlag() {}
-		
+
 		void init();
 		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
 		short playerkilledself(CPlayer &player, killstyle style);
@@ -531,7 +531,7 @@ class CGM_KingOfTheHill : public CGM_Domination
 	public:
         CGM_KingOfTheHill();
 		virtual ~CGM_KingOfTheHill() {}
-		
+
 		void init();
 		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
 		short playerkilledself(CPlayer &player, killstyle style);
@@ -550,7 +550,7 @@ class CGM_Greed : public CGM_Classic
 	public:
         CGM_Greed();
 		virtual ~CGM_Greed() {}
-		
+
 		void init();
 		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
 		short playerkilledself(CPlayer &player, killstyle style);
@@ -572,7 +572,7 @@ class CGM_Health : public CGM_Classic
 	public:
         CGM_Health();
 		virtual ~CGM_Health() {}
-		
+
 		virtual void init();
 		virtual short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
 		virtual short playerkilledself(CPlayer &player, killstyle style);
@@ -592,7 +592,7 @@ class CGM_Collection : public CGameMode
 	public:
         CGM_Collection();
 		virtual ~CGM_Collection() {}
-		
+
 		void init();
 		void think();
 		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
@@ -620,7 +620,7 @@ class CGM_Chase : public CGameMode
 	public:
         CGM_Chase();
 		virtual ~CGM_Chase() {}
-		
+
 		void init();
 		void think();
 		short playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style);
@@ -648,7 +648,7 @@ class CGM_Boss_MiniGame : public CGameMode
 	public:
         CGM_Boss_MiniGame();
 		virtual ~CGM_Boss_MiniGame() {}
-		
+
 		void init();
 		void think();
 		void draw_foreground();
@@ -670,7 +670,7 @@ class CGM_Boss_MiniGame : public CGameMode
     }
 
 	private:
-		
+
 		short enemytimer, poweruptimer;
 		short iBossType;
 };
@@ -682,7 +682,7 @@ class CGM_Bonus : public CGameMode
 	public:
         CGM_Bonus();
 		virtual ~CGM_Bonus() {}
-		
+
 		void init();
 		void draw_background();
 
@@ -712,7 +712,7 @@ class CGM_Pipe_MiniGame : public CGameMode
 	public:
         CGM_Pipe_MiniGame();
 		virtual ~CGM_Pipe_MiniGame() {}
-		
+
 		void init();
 		void think();
 
@@ -745,7 +745,7 @@ class CGM_Boxes_MiniGame : public CGameMode
 	public:
         CGM_Boxes_MiniGame();
 		virtual ~CGM_Boxes_MiniGame() {}
-		
+
 		void init();
 		void think();
 
@@ -757,13 +757,13 @@ class CGM_Boxes_MiniGame : public CGameMode
 
 		short CheckWinner(CPlayer * player);
 		bool SetWinner(CPlayer * player);
-		
+
     bool HasStoredPowerups() {
         return false;
     }
 
 	private:
-		
+
 		void ReleaseCoin(CPlayer &player);
 		void ReleaseAllCoinsFromTeam(CPlayer &player);
 };

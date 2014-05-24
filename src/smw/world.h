@@ -49,7 +49,7 @@ class WorldMovingObject
 		short iCurrentTileY;
 		short iDestTileX;
 		short iDestTileY;
-			
+
 		short iState;
 		short iDrawSprite;
 		short iDrawDirection;
@@ -58,7 +58,7 @@ class WorldMovingObject
 
 		short iTileSize;
 		short iTileSheet;
-	
+
 	friend class WorldMap;
 	friend void takescreenshot();
 };
@@ -66,7 +66,7 @@ class WorldMovingObject
 class WorldPlayer : public WorldMovingObject
 {
 	public:
-	
+
 		WorldPlayer();
 		~WorldPlayer();
 
@@ -81,20 +81,20 @@ class WorldPlayer : public WorldMovingObject
 class WorldVehicle : public WorldMovingObject
 {
 	public:
-		
+
 		WorldVehicle();
 		~WorldVehicle();
 
 		void Init(short iCol, short iRow, short iAction, short iSprite, short iMinMoves, short iMaxMoves, bool fSpritePaces, short iInitialDirection, short iBoundary, short tilesize);
 		void Move();
-		
+
 		bool Update();
 		void Draw(short iWorldOffsetX, short iWorldOffsetY, bool fVehiclesSleeping);
 
 	private:
 
 		void SetNextDest();
-					
+
 		SDL_Rect srcRects[5];
 
 		short iMinMoves;
@@ -116,7 +116,7 @@ class WorldVehicle : public WorldMovingObject
 	friend void RemoveVehicleFromTile(short iCol, short iRow);
 	friend void ReadVehiclesIntoEditor();
 	friend void WriteVehiclesIntoWorld();
-	
+
 	friend int editor_stage();
 	friend int editor_edit();
 	friend int resize_world();
@@ -164,7 +164,7 @@ class WorldMap
 
 		bool Update(bool * fPlayerVehicleCollision);
 		void Draw(short iMapOffsetX, short iMapOffsetY, bool fDrawPlayer, bool fVehiclesSleeping);
-		
+
 		void UpdateTile(SDL_Surface * surface, short iCol, short iRow, short iMapDrawOffsetCol, short iMapDrawOffsetRow, short iAnimationFrame);
 
 		void ResetDrawCycle();
@@ -243,7 +243,7 @@ class WorldMap
 		short iInitialBonuses[32];
 
 		short iMusicCategory;
-		
+
 		short iTileSize;
 		short iTileSizeShift;
 		short iTileSheet;

@@ -331,7 +331,7 @@ void MenuState::CreateMenu()
     miNetServersConnectingDialogImage->Show(false);
     miNetServersConnectionDetector->Show(false);*/
     //miNetServersConnectionDetector->SetAutoModify(true);
-    
+
     //miNetServersConnectionDetector->SetCode(MENU_CODE_NET_CONNECT_ABORT);
     /*miNetServersConnectionDetector->SuccessIfTrue(&netplay.connectSuccessful);
     miNetServersConnectionDetector->AbortCode(MENU_CODE_NET_CONNECT_ABORT);

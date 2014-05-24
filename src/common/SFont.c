@@ -4,25 +4,25 @@
     License: GPL or LGPL (at your choice)
     WWW: http://www.linux-games.com/sfont/
 
-    This program is free software; you can redistribute it and/or modify        
-    it under the terms of the GNU General Public License as published by        
-    the Free Software Foundation; either version 2 of the License, or           
-    (at your option) any later version.                                         
-                                                                                
-    This program is distributed in the hope that it will be useful,       
-    but WITHOUT ANY WARRANTY; without even the implied warranty of              
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the               
-    GNU General Public License for more details.                
-                                                                               
-    You should have received a copy of the GNU General Public License           
-    along with this program; if not, write to the Free Software                 
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA   
-                                                                                
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
     Karl Bartel
-    Cecilienstr. 14                                                    
+    Cecilienstr. 14
     12307 Berlin
     GERMANY
-    karlb@gmx.net                                                      
+    karlb@gmx.net
 */
 
 #include "SDL.h"
@@ -40,7 +40,7 @@ static Uint32 GetPixel(SDL_Surface *Surface, Sint32 X, Sint32 Y)
 
    assert(X>=0);
    assert(X<Surface->w);
-   
+
    Bpp = Surface->format->BytesPerPixel;
    bits = ((Uint8 *)Surface->pixels)+Y*Surface->pitch+X*Bpp;
 
@@ -52,7 +52,7 @@ static Uint32 GetPixel(SDL_Surface *Surface, Sint32 X, Sint32 Y)
       case 2:
          return *((Uint16 *)Surface->pixels + Y * Surface->pitch/2 + X);
          break;
-      case 3: { // Format/endian independent 
+      case 3: { // Format/endian independent
          Uint8 r, g, b;
          r = *((bits)+Surface->format->Rshift/8);
          g = *((bits)+Surface->format->Gshift/8);
@@ -85,7 +85,7 @@ SFont_Font* SFont_InitFont(SDL_Surface* Surface)
 
     pink = SDL_MapRGB(Surface->format, 255, 0, 255);
     while (x < Surface->w) {
-	if (GetPixel(Surface, x, 0) == pink) { 
+	if (GetPixel(Surface, x, 0) == pink) {
     	    Font->CharPos[i++]=x;
     	    while((x < Surface->w) && (GetPixel(Surface, x, 0)== pink))
 		x++;
@@ -94,7 +94,7 @@ SFont_Font* SFont_InitFont(SDL_Surface* Surface)
 	x++;
     }
     Font->MaxPos = x-1;
-    
+
     pixel = GetPixel(Surface, 0, Surface->h-1);
     SDL_UnlockSurface(Surface);
     SDL_SETCOLORKEY(Surface, SDL_FALSE, pixel);
@@ -135,16 +135,16 @@ void SFont_Write(SDL_Surface *Surface, const SFont_Font *Font,
 			((Font->CharPos[charoffset] + Font->CharPos[charoffset-1]) >> 1));
 
 		srcrect.x = (Sint16)(Font->CharPos[charoffset] + Font->CharPos[charoffset-1]) >> 1;
-		
+
 		//changed (Florian Hufsky) (caused a float to short warning)
 		//dstrect.x = x - (float)(Font->CharPos[charoffset]
 		//		      - Font->CharPos[charoffset-1])/2;
-		dstrect.x = (short) (x - (float)((Font->CharPos[charoffset] 
+		dstrect.x = (short) (x - (float)((Font->CharPos[charoffset]
 					- Font->CharPos[charoffset-1]) >> 1)) + x_shake;
 
 		dstrect.y = (Sint16)(y + y_shake);
 
-		SDL_BlitSurface(Font->Surface, &srcrect, Surface, &dstrect); 
+		SDL_BlitSurface(Font->Surface, &srcrect, Surface, &dstrect);
 
 		x += Font->CharPos[charoffset+1] - Font->CharPos[charoffset];
     }
@@ -161,13 +161,13 @@ int SFont_TextWidth(const SFont_Font *Font, const char *text)
 
     for(c = text; *c != '\0'; c++) {
 		charoffset = ((int) *c - 33) * 2 + 1;
-		
+
 		// skip spaces and nonprintable characters
         if (*c == ' ' || charoffset < 0 || charoffset > Font->MaxPos) {
             width += Font->CharPos[2] - Font->CharPos[1];
 			continue;
 		}
-	
+
 		width += Font->CharPos[charoffset+1] - Font->CharPos[charoffset];
     }
 
@@ -197,13 +197,13 @@ void SFont_WriteChopCenter(SDL_Surface *Surface, const SFont_Font* Font, int x, 
 
     for(c = text; *c != '\0'; c++) {
 		int charoffset = ((int) text[iCurrentChar] - 33) * 2 + 1;
-		
+
 		int iNextWidth = 0;
-		if (*c == ' ' || charoffset < 0 || charoffset > Font->MaxPos) 
+		if (*c == ' ' || charoffset < 0 || charoffset > Font->MaxPos)
 			iNextWidth = Font->CharPos[2] - Font->CharPos[1];
 		else
 			iNextWidth = Font->CharPos[charoffset+1] - Font->CharPos[charoffset];
-		
+
         if(iCurrentWidth + iNextWidth > w) {
 			szText[iCurrentChar] = '\0';
 			break;
@@ -251,7 +251,7 @@ void SFont_WriteChopRight(SDL_Surface *Surface, const SFont_Font *Font,
 		srcrect.w = dstrect.w = (Sint16)
 			(((Font->CharPos[charoffset+2] + Font->CharPos[charoffset+1]) >> 1) -
 			((Font->CharPos[charoffset] + Font->CharPos[charoffset-1]) >> 1));
-		
+
 		width = Font->CharPos[charoffset+1] - Font->CharPos[charoffset];
 
 		if(x - startx + width > w)
@@ -266,7 +266,7 @@ void SFont_WriteChopRight(SDL_Surface *Surface, const SFont_Font *Font,
 
 		dstrect.y = (Sint16)(y + y_shake);
 
-		SDL_BlitSurface(Font->Surface, &srcrect, Surface, &dstrect); 
+		SDL_BlitSurface(Font->Surface, &srcrect, Surface, &dstrect);
 
 		x += width;
     }
@@ -305,7 +305,7 @@ void SFont_WriteChopLeft(SDL_Surface *Surface, const SFont_Font *Font,
 		srcrect.w = dstrect.w = (Sint16)
 			(((Font->CharPos[charoffset+2] + Font->CharPos[charoffset+1]) >> 1) -
 			((Font->CharPos[charoffset] + Font->CharPos[charoffset-1]) >> 1));
-		
+
 		width = Font->CharPos[charoffset+1] - Font->CharPos[charoffset];
 
 		iPrintedWidth += width;
@@ -323,8 +323,8 @@ void SFont_WriteChopLeft(SDL_Surface *Surface, const SFont_Font *Font,
 
 		//x -= (width - srcrect.w);
 
-		SDL_BlitSurface(Font->Surface, &srcrect, Surface, &dstrect); 
-		
+		SDL_BlitSurface(Font->Surface, &srcrect, Surface, &dstrect);
+
     }
 }
 

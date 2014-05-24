@@ -97,7 +97,7 @@ bool DirectoryListing :: operator() (string &s)
             {
                 /* Return this filename */
                 s = Stored_Filename;
-                
+
                 /* Ask for another filename */
                 if (FindNextFile(findhandle, &finddata))
                     Stored_Filename = finddata.cFileName;
@@ -109,7 +109,7 @@ bool DirectoryListing :: operator() (string &s)
 
             /* No files remain */
             else retval = false;
-            
+
 
         /* POSIX directory enumeration - more straightforward */
         #else
@@ -147,7 +147,7 @@ bool DirectoryListing :: NextDirectory (string &s)
         if (Stored_Filename.size()) {
             /* Return this filename */
             s = Stored_Filename;
-            
+
             /* Ask for another filename */
             if (FindNextFile(findhandle, &finddata))
                 Stored_Filename = finddata.cFileName;
@@ -158,7 +158,7 @@ bool DirectoryListing :: NextDirectory (string &s)
         }
 
         /* No files remain */
-        else 
+        else
             retval = false;
 	}
     //while (retval == true && ((GetFileAttributes(s.c_str()) & FILE_ATTRIBUTE_DIRECTORY) == 0 || s == "." || s == ".." || s == "CVS" || s == ".svn"));

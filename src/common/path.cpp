@@ -46,7 +46,7 @@ bool File_Exists (const std::string fileName)
 {
 	struct stat buffer;
 	int i = stat(fileName.c_str(), &buffer);
-   
+
 	return (i == 0);
 }
 
@@ -61,7 +61,7 @@ bool File_Exists (const std::string fileName)
 void Initialize_Paths()
 {
     if(SMW_Root_Data_Dir[0] != 0) {
-		return; 
+		return;
 	}
 
 #ifdef APPBUNDLE
@@ -75,20 +75,20 @@ void Initialize_Paths()
     }
 
 	dirURL = CFBundleCopyBundleURL(mainBundle);
-	
+
     if (!CFURLGetFileSystemRepresentation(dirURL, TRUE, temp,
         PATH_MAX)) {
         cout << "Could not get file system representation" << endl;
         return;
     }
 
-	strlcat(SMW_Root_Data_Dir, (char*)temp, PATH_MAX); 
-	int i = strlen(SMW_Root_Data_Dir) -1; 
-	while(SMW_Root_Data_Dir[i] !='/'){ 
-	   SMW_Root_Data_Dir[i] = 0; 
-	   --i; 
-	} 
-	SMW_Root_Data_Dir[i] = 0; 
+	strlcat(SMW_Root_Data_Dir, (char*)temp, PATH_MAX);
+	int i = strlen(SMW_Root_Data_Dir) -1;
+	while(SMW_Root_Data_Dir[i] !='/'){
+	   SMW_Root_Data_Dir[i] = 0;
+	   --i;
+	}
+	SMW_Root_Data_Dir[i] = 0;
 
     CFRelease(dirURL);
 #else
@@ -107,7 +107,7 @@ const string convertPath(const string& source)
 
 /****** XBOX ******/
 #ifdef _XBOX
-	
+
 	s = source;
     int slash = string :: npos;
 
@@ -134,7 +134,7 @@ const string convertPath(const string& source)
 			if (SMW_Root_Data_Dir[strlen(SMW_Root_Data_Dir)-1] != '\\')
 				strcat(SMW_Root_Data_Dir, "\\");
 		#endif
-	    
+
 		are_paths_initialized = true;
     }
 
@@ -166,7 +166,7 @@ const string convertPath(const string& source, const string& pack)
     if(source.find("sfx/packs/") == 0) {
 		string trailingdir = source.substr(9);
 
-#ifdef _XBOX		
+#ifdef _XBOX
 		const string s = convertPartialPath(pack + trailingdir);  //Hack because pack already has d:\ in it
 #else
 		const string s = convertPath(pack + trailingdir);
