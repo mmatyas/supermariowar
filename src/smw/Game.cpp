@@ -72,23 +72,7 @@ void game_frame()
     {
         FPSLimiter::get().frameStart();
 
-
-        switch(game_values.gamestate) {
-        case GS_SPLASH:
-        case GS_START_GAME:
-        case GS_GAME:
-        case GS_MENU:
-            GameStateManager::instance().currentState->update();
-            break;
-
-        case GS_QUIT:
-            return;
-            break;
-
-        default:
-            break;
-        }
-
+        GameStateManager::instance().currentState->update();
 
         FPSLimiter::get().beforeFlip();
 
