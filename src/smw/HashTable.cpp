@@ -5,7 +5,7 @@ HashTable::HashTable()
 	size = 0;
 	capacity = MAXOBJECTS * 8;
 
-	for(int k = 0; k < capacity; k++)
+	for (int k = 0; k < capacity; k++)
 		table[k] = NULL;
 }
 
@@ -103,7 +103,7 @@ CObject * HashTable::Remove(int iNetworkID)
 
 void HashTable::Clear()
 {
-    for(int k = 0; k < capacity; k++) {
+    for (int k = 0; k < capacity; k++) {
         while(table[k]) {
 			HashNode * pNode = table[k];
 			table[k] = pNode->next;

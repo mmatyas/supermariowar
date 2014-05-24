@@ -962,7 +962,7 @@ void IO_OverMapObject::animate()
 //------------------------------------------------------------------------------
 CObjectContainer::CObjectContainer()
 {
-    for(short i = 0; i < MAXOBJECTS; i++)
+    for (short i = 0; i < MAXOBJECTS; i++)
         list[i] = NULL;
 
     list_end = 0;
@@ -977,7 +977,7 @@ CObjectContainer::~CObjectContainer()
 
 void CObjectContainer::clean()
 {
-    for(short i = 0; i < list_end; i++) {
+    for (short i = 0; i < list_end; i++) {
         delete list[i];
         list[i] = NULL;
     }
@@ -999,7 +999,7 @@ void CObjectContainer::add(CObject *ec)
 
 bool CObjectContainer::isBlockAt(short x, short y)
 {
-    for(short i = 0; i < list_end; i++) {
+    for (short i = 0; i < list_end; i++) {
         if(x >= list[i]->ix && x < list[i]->ix + list[i]->iw &&
                 y >= list[i]->iy && y < list[i]->iy + list[i]->ih &&
                 list[i]->getObjectType() == object_block) {
@@ -1014,7 +1014,7 @@ float CObjectContainer::getClosestObject(short ix, short iy, short objectType)
 {
     int dist = smw->ScreenWidth * 1000;  //Longest distance from corner to corner squared
 
-    for(short i = 0; i < list_end; i++) {
+    for (short i = 0; i < list_end; i++) {
         if(list[i]->getObjectType() != objectType)
             continue;
 
@@ -1034,7 +1034,7 @@ float CObjectContainer::getClosestMovingObject(short ix, short iy, short movingO
 {
     int dist = smw->ScreenWidth * 1000;  //Longest distance from corner to corner squared
 
-    for(short i = 0; i < list_end; i++) {
+    for (short i = 0; i < list_end; i++) {
         if(list[i]->getObjectType() != object_moving || ((IO_MovingObject*)list[i])->getMovingObjectType() != movingObjectType)
             continue;
 
@@ -1054,7 +1054,7 @@ short CObjectContainer::countTypes(ObjectType type)
 {
     short count = 0;
 
-    for(short i = 0; i < list_end; i++) {
+    for (short i = 0; i < list_end; i++) {
         if(list[i]->getObjectType() == type) {
             count++;
         }
@@ -1067,7 +1067,7 @@ short CObjectContainer::countMovingTypes(MovingObjectType type)
 {
     short count = 0;
 
-    for(short i = 0; i < list_end; i++) {
+    for (short i = 0; i < list_end; i++) {
         if(list[i]->getObjectType() == object_moving && ((IO_MovingObject*)list[i])->getMovingObjectType() == type) {
             count++;
         }
@@ -1078,7 +1078,7 @@ short CObjectContainer::countMovingTypes(MovingObjectType type)
 
 void CObjectContainer::adjustPlayerAreas(CPlayer * player, CPlayer * other)
 {
-    for(short i = 0; i < list_end; i++) {
+    for (short i = 0; i < list_end; i++) {
         if(list[i]->getObjectType() == object_area) {
             OMO_Area * area = (OMO_Area*)list[i];
 
@@ -1100,7 +1100,7 @@ void CObjectContainer::removePlayerRaceGoals(short id, short iGoal)
     if(game_values.gamemodesettings.race.penalty == 0 && iGoal != -1)
         return;
 
-    for(short i = 0; i < list_end; i++) {
+    for (short i = 0; i < list_end; i++) {
         if(list[i]->getObjectType() == object_race_goal) {
             OMO_RaceGoal * goal = (OMO_RaceGoal*)list[i];
 
@@ -1114,7 +1114,7 @@ void CObjectContainer::removePlayerRaceGoals(short id, short iGoal)
 
 void CObjectContainer::pushBombs(short x, short y)
 {
-    for(short i = 0; i < list_end; i++) {
+    for (short i = 0; i < list_end; i++) {
         if(list[i]->getObjectType() != object_moving)
             continue;
 
@@ -1146,7 +1146,7 @@ void CObjectContainer::pushBombs(short x, short y)
 
 void CObjectContainer::cleandeadobjects()
 {
-    for(short i = 0; i < list_end; i++) {
+    for (short i = 0; i < list_end; i++) {
         if(list[i]->dead) {
             delete list[i];
             list_end--;

@@ -12,7 +12,7 @@ extern short CountAliveTeams(short * lastteam);
 
 void RemovePlayersButTeam(short teamid)
 {
-    for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
+    for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
         if(list_players[iPlayer]->teamID != teamid) {
             list_players[iPlayer]->state = player_dead;
         }
@@ -24,13 +24,13 @@ void RemovePlayersButHighestScoring()
     short iMaxScore = -1;
 
     //Figure out what the maximum score is
-    for(short iScore = 0; iScore < score_cnt; iScore++) {
+    for (short iScore = 0; iScore < score_cnt; iScore++) {
         if(score[iScore]->score > iMaxScore)
             iMaxScore = score[iScore]->score;
     }
 
     //Remove all players that don't have that max score
-    for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
+    for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
         if(list_players[iPlayer]->score->score < iMaxScore) {
             list_players[iPlayer]->state = player_dead;
         }
@@ -45,11 +45,11 @@ void SetupScoreBoard(bool fOrderMatters)
 
     short oldmax = -1;
     short max = -1;
-    for(i = 0; i < score_cnt; i++) {
+    for (i = 0; i < score_cnt; i++) {
         oldmax = max;
         max = -1;
 
-        for(j = 0; j < score_cnt; j++) {
+        for (j = 0; j < score_cnt; j++) {
             if(!doneWithScore[j]) {
                 //The boxes minigame doesn't use "score" it uses "subscore[0]" to determine the winner
                 if(game_values.gamemode->gamemode == game_mode_boxes_minigame) {
@@ -89,7 +89,7 @@ void SetupScoreBoard(bool fOrderMatters)
         TourStop * tourStop = game_values.tourstops[game_values.tourstopcurrent];
         short iNumBonuses = tourStop->iNumBonuses;
 
-        for(short iBonus = 0; iBonus < iNumBonuses; iBonus++) {
+        for (short iBonus = 0; iBonus < iNumBonuses; iBonus++) {
             if(tourStop->wsbBonuses[iBonus].iWinnerPlace == 0) {
                 short iBonusType = tourStop->wsbBonuses[iBonus].iBonus;
                 objectcontainer[0].add(new PU_TreasureChestBonus(&rm->spr_bonuschest, 1, 0, 30, 30, 1, 1, iBonusType));
@@ -108,7 +108,7 @@ void ShowScoreBoard()
     if(game_values.gamemode->gamemode == game_mode_health || game_values.gamemode->gamemode == game_mode_collection || game_values.gamemode->gamemode == game_mode_boxes_minigame)
         iScoreboardElementHeight = 63;
 
-    for(short i = 0; i < score_cnt; i++) {
+    for (short i = 0; i < score_cnt; i++) {
         score[i]->destx = 309 - 34 * game_values.teamcounts[i];
         score[i]->desty = score[i]->displayorder * iScoreboardElementHeight + 140;
     }
@@ -131,7 +131,7 @@ bool RemoveTeam(short teamid)
 
     //kill all players on the dead team
     short iAnnouncementColor = -1;
-    for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
+    for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
         if(list_players[iPlayer]->teamID == teamid) {
             if(iAnnouncementColor == -1)
                 iAnnouncementColor = list_players[iPlayer]->colorID;
@@ -271,7 +271,7 @@ void CGameMode::init()  //called once when the game is started
     gameover = false;
     playedwarningsound = false;
 
-    for(short iScore = 0; iScore < score_cnt; iScore++) {
+    for (short iScore = 0; iScore < score_cnt; iScore++) {
         score[iScore]->SetScore(0);
     }
 };
@@ -285,7 +285,7 @@ void CGameMode::think()
 void CGameMode::displayplayertext()
 {
     if(winningteam > -1) {
-        for(short k = 0; k < list_players_cnt; k++) {
+        for (short k = 0; k < list_players_cnt; k++) {
             if(list_players[k]->teamID == winningteam)
                 list_players[k]->spawnText("Winner!");
         }
@@ -311,7 +311,7 @@ void CGameMode::SetupModeStrings(const char * szMode, const char * szGoal, short
     strcpy(szModeName, szMode);
     strcpy(szGoalName, szGoal);
 
-    for(short iMode = 0; iMode < GAMEMODE_NUM_OPTIONS; iMode++) {
+    for (short iMode = 0; iMode < GAMEMODE_NUM_OPTIONS; iMode++) {
         if(iMode == GAMEMODE_NUM_OPTIONS - 1) {
             modeOptions[iMode].iValue = -1;
             strcpy(modeOptions[iMode].szName, "Unlimited");
@@ -357,7 +357,7 @@ CPlayer * CGameMode::GetHighestScorePlayer(bool fGetHighest)
     tiedplayers[0] = 0;
 
     //Find the first non-dead player and use them for the first player to compare to
-    for(j = 0; j < list_players_cnt; j++) {
+    for (j = 0; j < list_players_cnt; j++) {
         if(!list_players[j]->isdead()) {
             count = 1;
             tiedplayers[0] = j;
@@ -366,7 +366,7 @@ CPlayer * CGameMode::GetHighestScorePlayer(bool fGetHighest)
     }
 
     //Loop through all players, comparing scores to find the highest/lowest
-    for(i = j + 1; i < list_players_cnt; i++) {
+    for (i = j + 1; i < list_players_cnt; i++) {
         if(!list_players[i]->isdead()) {
             if((!fGetHighest && list_players[i]->score->score < list_players[tiedplayers[0]]->score->score) ||
                     (fGetHighest && list_players[i]->score->score > list_players[tiedplayers[0]]->score->score)) {
@@ -387,7 +387,7 @@ short CGameMode::GetScoreRankedPlayerList(CPlayer * players[4], bool fGetHighest
 {
     short iNumPlayersInList = 0;
 
-    for(short iIndex = 0; iIndex < list_players_cnt; iIndex++) {
+    for (short iIndex = 0; iIndex < list_players_cnt; iIndex++) {
         if(list_players[iIndex]->isdead())
             continue;
 
@@ -400,7 +400,7 @@ short CGameMode::GetScoreRankedPlayerList(CPlayer * players[4], bool fGetHighest
     while(fNeedSwap) {
         fNeedSwap = false;
         short iRandom = 0;
-        for(short iIndex = 0; iIndex < iNumPlayersInList - 1; iIndex++) {
+        for (short iIndex = 0; iIndex < iNumPlayersInList - 1; iIndex++) {
             if((fGetHighest && players[iIndex]->score->score < players[iIndex + 1]->score->score) ||
                     (!fGetHighest && players[iIndex]->score->score > players[iIndex + 1]->score->score) ||
                     (players[iIndex]->score->score == players[iIndex + 1]->score->score && smw->rng->GetRandBool() && iRandom++ < 5)) {
@@ -421,7 +421,7 @@ short CGameMode::GetClosestGoal(short iGoal)
     short iDifference = 16000;
     short iOptionValue = 0;
 
-    for(short iOption = 0; iOption < GAMEMODE_NUM_OPTIONS - 1; iOption++) {
+    for (short iOption = 0; iOption < GAMEMODE_NUM_OPTIONS - 1; iOption++) {
         short iDiff = abs(modeOptions[iOption].iValue - iGoal);
         if(iDiff < iDifference) {
             iOptionValue = modeOptions[iOption].iValue;
@@ -627,7 +627,7 @@ void CGM_Classic::init()
 
     fReverseScoring = goal == -1;
 
-    for(short iScore = 0; iScore < score_cnt; iScore++) {
+    for (short iScore = 0; iScore < score_cnt; iScore++) {
         if(fReverseScoring)
             score[iScore]->SetScore(0);
         else
@@ -650,7 +650,7 @@ short CGM_Classic::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killst
 
             if(!playedwarningsound) {
                 short countscore = 0;
-                for(short k = 0; k < score_cnt; k++) {
+                for (short k = 0; k < score_cnt; k++) {
                     if(inflictor.score == score[k])
                         continue;
 
@@ -694,8 +694,8 @@ short CGM_Classic::playerkilledself(CPlayer &player, killstyle style)
             if(!playedwarningsound) {
                 short countscore = 0;
                 bool playwarning = false;
-                for(short j = 0; j < score_cnt; j++) {
-                    for(short k = 0; k < score_cnt; k++) {
+                for (short j = 0; j < score_cnt; j++) {
+                    for (short k = 0; k < score_cnt; k++) {
                         if(j == k)
                             continue;
 
@@ -877,7 +877,7 @@ void CGM_Tag::init()
     CGameMode::init();
     fReverseScoring = goal == -1;
 
-    for(short iScore = 0; iScore < score_cnt; iScore++) {
+    for (short iScore = 0; iScore < score_cnt; iScore++) {
         if(fReverseScoring)
             score[iScore]->SetScore(0);
         else
@@ -912,8 +912,8 @@ void CGM_Tag::think()
 
         short countscore = 0;
         bool playwarning = false;
-        for(short j = 0; j < score_cnt; j++) {
-            for(short k = 0; k < score_cnt; k++) {
+        for (short j = 0; j < score_cnt; j++) {
+            for (short k = 0; k < score_cnt; k++) {
                 if(j == k)
                     continue;
 
@@ -959,7 +959,7 @@ short CGM_Tag::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle 
         }
 
         short countscore = 0;
-        for(short k = 0; k < score_cnt; k++) {
+        for (short k = 0; k < score_cnt; k++) {
             if(inflictor.score == score[k])
                 continue;
 
@@ -995,8 +995,8 @@ short CGM_Tag::playerkilledself(CPlayer &player, killstyle style)
 
         short countscore = 0;
         bool playwarning = false;
-        for(short j = 0; j < score_cnt; j++) {
-            for(short k = 0; k < score_cnt; k++) {
+        for (short j = 0; j < score_cnt; j++) {
+            for (short k = 0; k < score_cnt; k++) {
                 if(j == k)
                     continue;
 
@@ -1058,11 +1058,11 @@ void CGM_ShyGuyTag::init()
     fRunClock = false;
     gameClock.Init(0, true);
 
-    for(short iScore = 0; iScore < score_cnt; iScore++) {
+    for (short iScore = 0; iScore < score_cnt; iScore++) {
         score[iScore]->SetScore(0);
     }
 
-    for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
+    for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
         list_players[iPlayer]->ownerColorOffsetX = list_players[iPlayer]->getColorID() * 48;
     }
 }
@@ -1107,7 +1107,7 @@ void CGM_ShyGuyTag::think()
 
             CPlayer * pCheckWinner = NULL;
             bool fAlreadyScored[4] = {false, false, false, false};
-            for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
+            for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
                 if(!list_players[iPlayer]->shyguy) {
                     short iTeam = list_players[iPlayer]->getTeamID();
                     if(!fAlreadyScored[iTeam]) {
@@ -1166,7 +1166,7 @@ void CGM_ShyGuyTag::playerextraguy(CPlayer &player, short iType)
 
 void CGM_ShyGuyTag::SetShyGuy(short iTeam)
 {
-    for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
+    for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
         if(list_players[iPlayer]->getTeamID() == iTeam) {
             CPlayer * player = list_players[iPlayer];
             player->shyguy = true;
@@ -1185,7 +1185,7 @@ void CGM_ShyGuyTag::FreeShyGuys()
 {
     ifSoundOnPlay(sfx_thunder);
 
-    for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
+    for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
         CPlayer * player = list_players[iPlayer];
         player->shyguy = false;
         eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, player->ix + (HALFPW) - 16, player->iy + (HALFPH) - 16, 3, 8));
@@ -1216,7 +1216,7 @@ short CGM_ShyGuyTag::CheckWinner(CPlayer * player)
 short CGM_ShyGuyTag::CountShyGuys()
 {
     short shyguycount = 0;
-    for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
+    for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
         if(list_players[iPlayer]->shyguy)
             shyguycount++;
     }
@@ -1242,7 +1242,7 @@ void CGM_Coins::init()
     if(game_values.gamemodesettings.coins.quantity < 1)
         game_values.gamemodesettings.coins.quantity = 1;
 
-    for(short iCoin = 0; iCoin < game_values.gamemodesettings.coins.quantity; iCoin++)
+    for (short iCoin = 0; iCoin < game_values.gamemodesettings.coins.quantity; iCoin++)
         objectcontainer[1].add(new MO_Coin(&rm->spr_coin, 0.0f, 0.0f, 0, 0, 2, 0, 0, 0, true));
 }
 
@@ -1316,8 +1316,8 @@ void CGM_Eggs::init()
     bool fEgg[4] = {false, false, false, false};
     bool fAtLeastOneMatch = false;
 
-    for(short iEggs = 0; iEggs < 4; iEggs++) {
-        for(short iEgg = 0; iEgg < game_values.gamemodesettings.egg.eggs[iEggs]; iEgg++) {
+    for (short iEggs = 0; iEggs < 4; iEggs++) {
+        for (short iEgg = 0; iEgg < game_values.gamemodesettings.egg.eggs[iEggs]; iEgg++) {
             if(iEgg > 9)
                 break;
 
@@ -1326,8 +1326,8 @@ void CGM_Eggs::init()
         }
     }
 
-    for(short iYoshis = 0; iYoshis < 4; iYoshis++) {
-        for(short iYoshi = 0; iYoshi < game_values.gamemodesettings.egg.yoshis[iYoshis]; iYoshi++) {
+    for (short iYoshis = 0; iYoshis < 4; iYoshis++) {
+        for (short iYoshi = 0; iYoshi < game_values.gamemodesettings.egg.yoshis[iYoshis]; iYoshi++) {
             if(iYoshi > 9)
                 break;
 
@@ -1402,7 +1402,7 @@ void CGM_Frenzy::init()
     timer = 0;
 
     iItemWeightCount = 0;
-    for(short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++)
+    for (short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++)
         iItemWeightCount += game_values.gamemodesettings.frenzy.powerupweight[iPowerup];
 }
 
@@ -1481,7 +1481,7 @@ void CGM_Survival::init()
     ratetimer = 0;
 
     iEnemyWeightCount = 0;
-    for(short iEnemy = 0; iEnemy < NUMSURVIVALENEMIES; iEnemy++)
+    for (short iEnemy = 0; iEnemy < NUMSURVIVALENEMIES; iEnemy++)
         iEnemyWeightCount += game_values.gamemodesettings.survival.enemyweight[iEnemy];
 
     if(iEnemyWeightCount == 0)
@@ -1558,7 +1558,7 @@ void CGM_Domination::init()
     else if(iNumAreas > 10)
         iNumAreas = list_players_cnt + iNumAreas - 12;
 
-    for(short k = 0; k < iNumAreas; k++)
+    for (short k = 0; k < iNumAreas; k++)
         objectcontainer[0].add(new OMO_Area(&rm->spr_areas, iNumAreas));
 }
 
@@ -1627,8 +1627,8 @@ void CGM_Owned::think()
         if(++counter >= game_values.pointspeed) {
             counter = 0;
 
-            for(short i = 0; i < list_players_cnt; i++) {
-                for(short k = 0; k < list_players_cnt; k++) {
+            for (short i = 0; i < list_players_cnt; i++) {
+                for (short k = 0; k < list_players_cnt; k++) {
                     if(i == k)
                         continue;
 
@@ -1663,7 +1663,7 @@ short CGM_Owned::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyl
             inflictor.score->AdjustScore(5);
 
         //Release all players owned by the killed player
-        for(short i = 0; i < list_players_cnt; i++) {
+        for (short i = 0; i < list_players_cnt; i++) {
             if(list_players[i]->ownerPlayerID == other.globalID) {
                 list_players[i]->ownerPlayerID = -1;
             }
@@ -1685,7 +1685,7 @@ short CGM_Owned::playerkilledself(CPlayer &player, killstyle style)
 {
     CGameMode::playerkilledself(player, style);
 
-    for(short i = 0; i < list_players_cnt; i++) {
+    for (short i = 0; i < list_players_cnt; i++) {
         if(list_players[i]->ownerPlayerID == player.globalID) {
             list_players[i]->ownerPlayerID = -1;
         }
@@ -1763,11 +1763,11 @@ short CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle
                 short jailedteams[4];
 
                 short i;
-                for(i = 0; i < score_cnt; i++)
+                for (i = 0; i < score_cnt; i++)
                     jailedteams[i] = game_values.teamcounts[i];
 
                 //Figure out which teams have been jailed
-                for(i = 0; i < list_players_cnt; i++) {
+                for (i = 0; i < list_players_cnt; i++) {
                     if(list_players[i]->jailtimer > 0) {
                         jailedteams[list_players[i]->teamID]--;
                     }
@@ -1775,7 +1775,7 @@ short CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle
 
                 //Determine if a single team is the only one not completely jailed
                 short iTeamPoint = -1;
-                for(i = 0; i < score_cnt; i++) {
+                for (i = 0; i < score_cnt; i++) {
                     if(jailedteams[i] == 0)
                         continue;
 
@@ -1791,7 +1791,7 @@ short CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle
                 if(iTeamPoint >= 0) {
                     short numjailedplayers = 0;
 
-                    for(short iP = 0; iP < list_players_cnt; iP++) {
+                    for (short iP = 0; iP < list_players_cnt; iP++) {
                         //If they weren't just the one killed and they were jailed, give them a transform cloud
                         if(list_players[iP] != &other && list_players[iP]->jailtimer > 0) {
                             eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, list_players[iP]->ix + HALFPW - 24, list_players[iP]->iy + HALFPH - 24, 4, 5));
@@ -1814,7 +1814,7 @@ short CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle
                 short jailedteams[4] = {-1, -1, -1, -1};
 
                 //Figure out which teams have been jailed
-                for(short i = 0; i < list_players_cnt; i++) {
+                for (short i = 0; i < list_players_cnt; i++) {
                     short * piMarker = &jailedteams[list_players[i]->teamID];
 
                     if(*piMarker == -2)
@@ -1830,9 +1830,9 @@ short CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle
 
                 //Determine if a single team is the only one not completely jailed
                 short iTeamPoint = -1;
-                for(short i = 0; i < score_cnt; i++) {
+                for (short i = 0; i < score_cnt; i++) {
                     short iJailOwner = -1;
-                    for(short j = 0; j < score_cnt; j++) {
+                    for (short j = 0; j < score_cnt; j++) {
                         if(i == j)
                             continue;
 
@@ -1860,7 +1860,7 @@ short CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle
                 if(iTeamPoint >= 0) {
                     short numjailedplayers = 0;
 
-                    for(short i = 0; i < list_players_cnt; i++) {
+                    for (short i = 0; i < list_players_cnt; i++) {
                         if(list_players[i]->jailtimer > 0 && list_players[i]->teamID != iTeamPoint)
                             numjailedplayers++;
                     }
@@ -1870,7 +1870,7 @@ short CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle
                         score[iTeamPoint]->AdjustScore(1);
 
                         //Release other teams if a bonus was awarded for locking them up
-                        for(short i = 0; i < list_players_cnt; i++) {
+                        for (short i = 0; i < list_players_cnt; i++) {
                             //Don't release players that were not jailed by this team
                             if(list_players[i]->jail != iTeamPoint)
                                 continue;
@@ -1950,7 +1950,7 @@ void CGM_Stomp::init()
     ResetSpawnTimer();
 
     iEnemyWeightCount = 0;
-    for(short iEnemy = 0; iEnemy < NUMSTOMPENEMIES; iEnemy++)
+    for (short iEnemy = 0; iEnemy < NUMSTOMPENEMIES; iEnemy++)
         iEnemyWeightCount += game_values.gamemodesettings.stomp.enemyweight[iEnemy];
 
     //if(iEnemyWeightCount == 0)
@@ -1963,7 +1963,7 @@ void CGM_Stomp::think()
     if(gameover) {
         displayplayertext();
     } else {
-        for(short i = 0; i < list_players_cnt; i++) {
+        for (short i = 0; i < list_players_cnt; i++) {
             CheckWinner(list_players[i]);
         }
     }
@@ -2078,10 +2078,10 @@ void CGM_Race::init()
     if(penalty < 0 || penalty > 2)
         game_values.gamemodesettings.race.penalty = penalty = 0;
 
-    for(short iRaceGoal = 0; iRaceGoal < quantity; iRaceGoal++)
+    for (short iRaceGoal = 0; iRaceGoal < quantity; iRaceGoal++)
         objectcontainer[2].add(new OMO_RaceGoal(&rm->spr_racegoal, iRaceGoal));
 
-    for(short iPlayer = 0; iPlayer < 4; iPlayer++)
+    for (short iPlayer = 0; iPlayer < 4; iPlayer++)
         nextGoal[iPlayer] = 0;
 }
 
@@ -2194,14 +2194,14 @@ void CGM_Star::init()
     fReverseScoring = goal == -1;
 
     //Set initial scores
-    for(short iScore = 0; iScore < score_cnt; iScore++) {
+    for (short iScore = 0; iScore < score_cnt; iScore++) {
         if(fReverseScoring)
             score[iScore]->SetScore(0);
         else
             score[iScore]->SetScore(goal);
     }
 
-    for(short iStar = 0; iStar < 3; iStar++) {
+    for (short iStar = 0; iStar < 3; iStar++) {
         starItem[iStar] = NULL;
         starPlayer[iStar] = NULL;
     }
@@ -2212,7 +2212,7 @@ void CGM_Star::init()
 void CGM_Star::SetupMode()
 {
     //Clean up old stars
-    for(short iStar = 0; iStar < 3; iStar++) {
+    for (short iStar = 0; iStar < 3; iStar++) {
         if(starItem[iStar]) {
             starItem[iStar]->Drop();
             starItem[iStar]->dead = true;
@@ -2227,7 +2227,7 @@ void CGM_Star::SetupMode()
         CPlayer * players[4];
         short iNumPlayers = GetScoreRankedPlayerList(players, fReverseScoring);
 
-        for(short iStar = 0; iStar < iNumPlayers - 1; iStar++) {
+        for (short iStar = 0; iStar < iNumPlayers - 1; iStar++) {
             starPlayer[iStar] = players[iStar];
 
             starItem[iStar] = new CO_Star(&rm->spr_star, 1, iStar);
@@ -2251,13 +2251,13 @@ void CGM_Star::think()
 
     //Make sure there is a star player(s)
     if(iCurrentModeType == 2) {
-        for(short iStar1 = 0; iStar1 < list_players_cnt - 1; iStar1++) {
+        for (short iStar1 = 0; iStar1 < list_players_cnt - 1; iStar1++) {
             //If we're missing a star player, then reassign them all
             if(!starPlayer[iStar1]) {
                 CPlayer * players[4];
                 short iNumPlayers = GetScoreRankedPlayerList(players, fReverseScoring);
 
-                for(short iStar2 = 0; iStar2 < iNumPlayers - 1; iStar2++) {
+                for (short iStar2 = 0; iStar2 < iNumPlayers - 1; iStar2++) {
                     starPlayer[iStar2] = players[iStar2];
                     starItem[iStar2]->setPlayerColor(starPlayer[iStar2]->colorID);
                     starItem[iStar2]->placeStar();
@@ -2302,7 +2302,7 @@ void CGM_Star::think()
             starPlayer[0] = GetHighestScorePlayer(!fReverseScoring);
             starItem[0]->placeStar();
         } else if(iCurrentModeType == 1) {
-            for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
+            for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
                 if(starPlayer[0]->teamID == list_players[iPlayer]->teamID)
                     continue;
 
@@ -2314,7 +2314,7 @@ void CGM_Star::think()
             if(fReverseScoring) {
                 starPlayer[0]->score->AdjustScore(1);
             } else {
-                for(short iTeam = 0; iTeam < score_cnt; iTeam++) {
+                for (short iTeam = 0; iTeam < score_cnt; iTeam++) {
                     if(starPlayer[0]->teamID == iTeam)
                         continue;
 
@@ -2329,9 +2329,9 @@ void CGM_Star::think()
             starPlayer[0] = GetHighestScorePlayer(false);
             starItem[0]->placeStar();
         } else if(iCurrentModeType == 2) {
-            for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
+            for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
                 bool fFound = false;
-                for(short iStar = 0; iStar < list_players_cnt - 1; iStar++) {
+                for (short iStar = 0; iStar < list_players_cnt - 1; iStar++) {
                     if(starPlayer[iStar] == list_players[iPlayer]) {
                         fFound = true;
                         break;
@@ -2365,7 +2365,7 @@ void CGM_Star::think()
                     CPlayer * players[4];
                     short iNumPlayers = GetScoreRankedPlayerList(players, fReverseScoring);
 
-                    for(short iStar = 0; iStar < iNumPlayers - 1; iStar++) {
+                    for (short iStar = 0; iStar < iNumPlayers - 1; iStar++) {
                         starPlayer[iStar] = players[iStar];
                         starItem[iStar]->setPlayerColor(starPlayer[iStar]->colorID);
                         starItem[iStar]->placeStar();
@@ -2380,8 +2380,8 @@ void CGM_Star::think()
         if(!fReverseScoring) {
             if(!playedwarningsound) {
                 short countscore = 0;
-                for(short j = 0; j < score_cnt; j++) {
-                    for(short k = 0; k < score_cnt; k++) {
+                for (short j = 0; j < score_cnt; j++) {
+                    for (short k = 0; k < score_cnt; k++) {
                         if(j == k)
                             continue;
 
@@ -2438,7 +2438,7 @@ void CGM_Star::playerextraguy(CPlayer &player, short iType)
 
 bool CGM_Star::isplayerstar(CPlayer * player)
 {
-    for(short iPlayer = 0; iPlayer < list_players_cnt - 1; iPlayer++) {
+    for (short iPlayer = 0; iPlayer < list_players_cnt - 1; iPlayer++) {
         if(starPlayer[iPlayer] == player)
             return true;
     }
@@ -2490,7 +2490,7 @@ void CGM_CaptureTheFlag::init()
 
     bool fTeamUsed[4] = {false, false, false, false};
 
-    for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
+    for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
         short iTeamID = list_players[iPlayer]->teamID;
         if(!fTeamUsed[iTeamID]) {
             fTeamUsed[iTeamID] = true;
@@ -2635,7 +2635,7 @@ void CGM_Greed::init()
 
     short iGoal = goal == -1 ? 0 : goal;
 
-    for(short iScore = 0; iScore < score_cnt; iScore++) {
+    for (short iScore = 0; iScore < score_cnt; iScore++) {
         score[iScore]->SetScore(iGoal);
     }
 }
@@ -2683,7 +2683,7 @@ short CGM_Greed::ReleaseCoins(CPlayer &player, killstyle style)
     short ix = player.ix + HALFPW - 16;
     short iy = player.iy + HALFPH - 16;
 
-    for(short k = 0; k < iDamage; k++) {
+    for (short k = 0; k < iDamage; k++) {
         float vel = 7.0f + ((float)RNGMAX(9)) / 2.0f;
         float angle = -((float)RNGMAX(314)) / 100.0f;
         float velx = vel * cos(angle);
@@ -2695,9 +2695,9 @@ short CGM_Greed::ReleaseCoins(CPlayer &player, killstyle style)
     //Play warning sound if game is almost over
     if(goal != -1 && !playedwarningsound) {
         bool playwarning = false;
-        for(short j = 0; j < score_cnt; j++) {
+        for (short j = 0; j < score_cnt; j++) {
             short countscore = 0;
-            for(short k = 0; k < score_cnt; k++) {
+            for (short k = 0; k < score_cnt; k++) {
                 if(j == k)
                     continue;
 
@@ -2735,7 +2735,7 @@ void CGM_Health::init()
 {
     CGM_Classic::init();
 
-    for(short iScore = 0; iScore < score_cnt; iScore++) {
+    for (short iScore = 0; iScore < score_cnt; iScore++) {
         score[iScore]->subscore[0] = game_values.gamemodesettings.health.startlife;
         score[iScore]->subscore[1] = score[iScore]->subscore[0];
     }
@@ -2823,7 +2823,7 @@ void CGM_Collection::init()
     timer = 0;
 
     //Zero out the number of cards teams have
-    for(short iScore = 0; iScore < score_cnt; iScore++) {
+    for (short iScore = 0; iScore < score_cnt; iScore++) {
         score[iScore]->subscore[0] = 0;
         score[iScore]->subscore[1] = 0;
     }
@@ -2857,7 +2857,7 @@ void CGM_Collection::think()
     }
 
     //Check if this team has collected 3 cards
-    for(short iScore = 0; iScore < score_cnt; iScore++) {
+    for (short iScore = 0; iScore < score_cnt; iScore++) {
         if(score[iScore]->subscore[0] >= 3) {
             if(++score[iScore]->subscore[2] >= game_values.gamemodemenusettings.collection.banktime) {
                 short iPoints = 1;
@@ -2878,7 +2878,7 @@ void CGM_Collection::think()
         }
     }
 
-    for(short i = 0; i < list_players_cnt; i++) {
+    for (short i = 0; i < list_players_cnt; i++) {
         CheckWinner(list_players[i]);
     }
 }
@@ -2945,7 +2945,7 @@ short CGM_Collection::CheckWinner(CPlayer * player)
             ShowScoreBoard();
             RemovePlayersButTeam(winningteam);
 
-            for(short iScore = 0; iScore < score_cnt; iScore++) {
+            for (short iScore = 0; iScore < score_cnt; iScore++) {
                 score[iScore]->subscore[0] = 0;
                 score[iScore]->subscore[1] = 0;
                 score[iScore]->subscore[2] = 0;
@@ -2974,8 +2974,8 @@ void CGM_Chase::init()
     CGameMode::init();
 
     //Add phantos based on settings
-    for(short iPhanto = 0; iPhanto < 3; iPhanto++) {
-        for(short iNumPhantos = 0; iNumPhantos < game_values.gamemodesettings.chase.phantoquantity[iPhanto]; iNumPhantos++)
+    for (short iPhanto = 0; iPhanto < 3; iPhanto++) {
+        for (short iNumPhantos = 0; iNumPhantos < game_values.gamemodesettings.chase.phantoquantity[iPhanto]; iNumPhantos++)
 			objectcontainer[1].add(new OMO_Phanto(&rm->spr_phanto, RNGMAX(smw->ScreenWidth), smw->rng->GetRandBool() ? -32 - CRUNCHMAX : smw->ScreenHeight, 0.0f, 0.0f, iPhanto));
     }
 
@@ -3071,7 +3071,7 @@ void CGM_Boss_MiniGame::init()
     enemytimer = (short)(RNGMAX(120) + 120);
     poweruptimer = 120;
 
-    for(short iScore = 0; iScore < score_cnt; iScore++)
+    for (short iScore = 0; iScore < score_cnt; iScore++)
         score[iScore]->SetScore(goal);
 
     objectcontainer[0].add(new MO_SledgeBrother(&rm->spr_sledgebrothers, (iBossType == 0 ? 256 : (iBossType == 1 ? 256 : smw->ScreenWidth/2)), iBossType));
@@ -3145,7 +3145,7 @@ short CGM_Boss_MiniGame::playerkilledplayer(CPlayer &inflictor, CPlayer &other, 
 
         if(!playedwarningsound) {
             short countscore = 0;
-            for(short k = 0; k < score_cnt; k++)
+            for (short k = 0; k < score_cnt; k++)
                 countscore += score[k]->score;
 
             if(countscore <= 2)
@@ -3170,7 +3170,7 @@ short CGM_Boss_MiniGame::playerkilledself(CPlayer &player, killstyle style)
 
         if(!playedwarningsound) {
             short countscore = 0;
-            for(short k = 0; k < score_cnt; k++)
+            for (short k = 0; k < score_cnt; k++)
                 countscore += score[k]->score;
 
             if(countscore <= 2)
@@ -3199,7 +3199,7 @@ bool CGM_Boss_MiniGame::SetWinner(CPlayer * player)
 
     RemovePlayersButTeam(winningteam);
 
-    for(short iScore = 0; iScore < score_cnt; iScore++) {
+    for (short iScore = 0; iScore < score_cnt; iScore++) {
         if(winningteam == iScore)
             continue;
 
@@ -3263,13 +3263,13 @@ void CGM_Bonus::init()
     short iNumChests = 0;
 
     if(tsTourStop->iBonusType == 0) {
-        for(short iChest = 0; iChest < iNumBonuses; iChest++)
+        for (short iChest = 0; iChest < iNumBonuses; iChest++)
             iChestOrder[iNumChests++] = iChest;
     } else {
-        for(short iChest = 0; iChest < iNumBonuses; iChest++)
+        for (short iChest = 0; iChest < iNumBonuses; iChest++)
             fChestUsed[iChest] = false;
 
-        for(short iChest = 0; iChest < iNumBonuses; iChest++) {
+        for (short iChest = 0; iChest < iNumBonuses; iChest++) {
             short iRandChest = RNGMAX(iNumBonuses);
 
             while(fChestUsed[iRandChest]) {
@@ -3287,7 +3287,7 @@ void CGM_Bonus::init()
     float dx = 128.0f + dSpacing;
 
     //float dx = 288.0f - (dSpacing * (float)(iNumBonuses - 1) / 2.0f) ;
-    for(short iChest = 0; iChest < iNumBonuses; iChest++) {
+    for (short iChest = 0; iChest < iNumBonuses; iChest++) {
         objectcontainer[0].add(new MO_BonusHouseChest(&rm->spr_worldbonushouse, (short)dx, 384, tsTourStop->wsbBonuses[iChestOrder[iChest]].iBonus));
         dx += dSpacing + 64.0f;
     }
@@ -3308,7 +3308,7 @@ void CGM_Bonus::draw_background()
     if(tsTourStop->iBonusTextLines > 0) {
         rm->spr_worldbonushouse.draw(128, 128, 0, 64, 384, 128);
 
-        for(short iTextLine = 0; iTextLine < tsTourStop->iBonusTextLines; iTextLine++)
+        for (short iTextLine = 0; iTextLine < tsTourStop->iBonusTextLines; iTextLine++)
             rm->game_font_large.drawChopCentered(smw->ScreenWidth/2, 132 + 24 * iTextLine, 372, tsTourStop->szBonusText[iTextLine]);
     }
 }
@@ -3468,7 +3468,7 @@ void CGM_Boxes_MiniGame::init()
 
     fReverseScoring = false;
 
-    for(short iScore = 0; iScore < score_cnt; iScore++) {
+    for (short iScore = 0; iScore < score_cnt; iScore++) {
         score[iScore]->SetScore(goal);
         score[iScore]->subscore[0] = 0;
     }
@@ -3494,7 +3494,7 @@ short CGM_Boxes_MiniGame::playerkilledplayer(CPlayer &inflictor, CPlayer &other,
 
     if(!playedwarningsound) {
         short countscore = 0;
-        for(short k = 0; k < score_cnt; k++) {
+        for (short k = 0; k < score_cnt; k++) {
             if(inflictor.score == score[k])
                 continue;
 
@@ -3527,8 +3527,8 @@ short CGM_Boxes_MiniGame::playerkilledself(CPlayer &player, killstyle style)
     if(!playedwarningsound) {
         short countscore = 0;
         bool playwarning = false;
-        for(short j = 0; j < score_cnt; j++) {
-            for(short k = 0; k < score_cnt; k++) {
+        for (short j = 0; j < score_cnt; j++) {
+            for (short k = 0; k < score_cnt; k++) {
                 if(j == k)
                     continue;
 

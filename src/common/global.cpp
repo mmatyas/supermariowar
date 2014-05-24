@@ -652,15 +652,15 @@ TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld)
 
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.stomp.rate, NULL, game_values.gamemodemenusettings.stomp.rate, false);
 
-                for(int iEnemy = 0; iEnemy < NUMSTOMPENEMIES; iEnemy++)
+                for (int iEnemy = 0; iEnemy < NUMSTOMPENEMIES; iEnemy++)
                     ts->iNumUsedSettings += ReadTourStopSetting(&(ts->gmsSettings.stomp.enemyweight[iEnemy]), NULL, game_values.gamemodemenusettings.stomp.enemyweight[iEnemy], false);
             } else if(ts->iMode == 6) { //egg
                 ts->fUseSettings = true;
 
-                for(int iEgg = 0; iEgg < 4; iEgg++)
+                for (int iEgg = 0; iEgg < 4; iEgg++)
                     ts->iNumUsedSettings += ReadTourStopSetting(&(ts->gmsSettings.egg.eggs[iEgg]), NULL, game_values.gamemodemenusettings.egg.eggs[iEgg], false);
 
-                for(int iYoshi = 0; iYoshi < 4; iYoshi++)
+                for (int iYoshi = 0; iYoshi < 4; iYoshi++)
                     ts->iNumUsedSettings += ReadTourStopSetting(&(ts->gmsSettings.egg.yoshis[iYoshi]), NULL, game_values.gamemodemenusettings.egg.yoshis[iYoshi], false);
 
                 ts->iNumUsedSettings += ReadTourStopSetting(&(ts->gmsSettings.egg.explode), NULL, game_values.gamemodemenusettings.egg.explode, false);
@@ -715,12 +715,12 @@ TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld)
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.frenzy.rate, NULL, game_values.gamemodemenusettings.frenzy.rate, false);
                 ts->iNumUsedSettings += ReadTourStopSetting(NULL, &ts->gmsSettings.frenzy.storedshells, 0, game_values.gamemodemenusettings.frenzy.storedshells);
 
-                for(short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++)
+                for (short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++)
                     ts->iNumUsedSettings += ReadTourStopSetting(&(ts->gmsSettings.frenzy.powerupweight[iPowerup]), NULL, game_values.gamemodemenusettings.frenzy.powerupweight[iPowerup], false);
             } else if(ts->iMode == 16) { //survival
                 ts->fUseSettings = true;
 
-                for(short iEnemy = 0; iEnemy < NUMSURVIVALENEMIES; iEnemy++)
+                for (short iEnemy = 0; iEnemy < NUMSURVIVALENEMIES; iEnemy++)
                     ts->iNumUsedSettings += ReadTourStopSetting(&(ts->gmsSettings.survival.enemyweight[iEnemy]), NULL, game_values.gamemodemenusettings.survival.enemyweight[iEnemy], false);
 
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.survival.density, NULL, game_values.gamemodemenusettings.survival.density, false);
@@ -751,7 +751,7 @@ TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld)
 
                 ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.chase.phantospeed, NULL, game_values.gamemodemenusettings.chase.phantospeed, false);
 
-                for(short iPhanto = 0; iPhanto < 3; iPhanto++)
+                for (short iPhanto = 0; iPhanto < 3; iPhanto++)
                     ts->iNumUsedSettings += ReadTourStopSetting(&ts->gmsSettings.chase.phantoquantity[iPhanto], NULL, game_values.gamemodemenusettings.chase.phantoquantity[iPhanto], false);
             } else if(ts->iMode == 21) { //shyguy tag
                 ts->fUseSettings = true;
@@ -861,7 +861,7 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
             if(ts->iNumBonuses <= 0) {
                 strcat(buffer, "0");
             } else {
-                for(short iBonus = 0; iBonus < ts->iNumBonuses; iBonus++) {
+                for (short iBonus = 0; iBonus < ts->iNumBonuses; iBonus++) {
                     if(iBonus > 0)
                         strcat(buffer, "|");
 
@@ -960,21 +960,21 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
                     strcat(buffer, szTemp);
                 }
 
-                for(int iEnemy = 0; iEnemy < NUMSTOMPENEMIES; iEnemy++) {
+                for (int iEnemy = 0; iEnemy < NUMSTOMPENEMIES; iEnemy++) {
                     if(ts->iNumUsedSettings > iEnemy + 1) {
                         sprintf(szTemp, ",%d", ts->gmsSettings.stomp.enemyweight[iEnemy]);
                         strcat(buffer, szTemp);
                     }
                 }
             } else if(ts->iMode == 6) { //egg
-                for(int iEgg = 0; iEgg < 4; iEgg++) {
+                for (int iEgg = 0; iEgg < 4; iEgg++) {
                     if(ts->iNumUsedSettings > iEgg) {
                         sprintf(szTemp, ",%d", ts->gmsSettings.egg.eggs[iEgg]);
                         strcat(buffer, szTemp);
                     }
                 }
 
-                for(int iYoshi = 0; iYoshi < 4; iYoshi++) {
+                for (int iYoshi = 0; iYoshi < 4; iYoshi++) {
                     if(ts->iNumUsedSettings > iYoshi + 4) {
                         sprintf(szTemp, ",%d", ts->gmsSettings.egg.yoshis[iYoshi]);
                         strcat(buffer, szTemp);
@@ -1116,14 +1116,14 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
                     strcat(buffer, szTemp);
                 }
 
-                for(short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++) {
+                for (short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++) {
                     if(ts->iNumUsedSettings > iPowerup + 3) {
                         sprintf(szTemp, ",%d", ts->gmsSettings.frenzy.powerupweight[iPowerup]);
                         strcat(buffer, szTemp);
                     }
                 }
             } else if(ts->iMode == 16) { //survival
-                for(short iEnemy = 0; iEnemy < NUMSURVIVALENEMIES; iEnemy++) {
+                for (short iEnemy = 0; iEnemy < NUMSURVIVALENEMIES; iEnemy++) {
                     if(ts->iNumUsedSettings > iEnemy) {
                         sprintf(szTemp, ",%d", ts->gmsSettings.survival.enemyweight[iEnemy]);
                         strcat(buffer, szTemp);
@@ -1205,7 +1205,7 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
                     strcat(buffer, szTemp);
                 }
 
-                for(short iPhanto = 0; iPhanto < 3; iPhanto++) {
+                for (short iPhanto = 0; iPhanto < 3; iPhanto++) {
                     if(ts->iNumUsedSettings > iPhanto + 1) {
                         sprintf(szTemp, ",%d", ts->gmsSettings.chase.phantoquantity[iPhanto]);
                         strcat(buffer, szTemp);
@@ -1250,7 +1250,7 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
         sprintf(szTemp, "%d,", ts->iBonusType);
         strcat(buffer, szTemp);
 
-        for(short iText = 0; iText < ts->iBonusTextLines; iText++) {
+        for (short iText = 0; iText < ts->iBonusTextLines; iText++) {
             if(iText != 0)
                 strcat(buffer, "|");
 
@@ -1260,7 +1260,7 @@ void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld)
         if(ts->iNumBonuses == 0) {
             strcat(buffer, ",p0");
         } else {
-            for(short iBonus = 0; iBonus < ts->iNumBonuses; iBonus++) {
+            for (short iBonus = 0; iBonus < ts->iNumBonuses; iBonus++) {
                 strcat(buffer, ",");
                 strcat(buffer, ts->wsbBonuses[iBonus].szBonusString);
             }
@@ -1349,8 +1349,8 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
     int iTileSize = 1 << iSizeShift;
 
     if(fDrawPlatform) {
-        for(short iPlatformX = 0; iPlatformX < iPlatformWidth; iPlatformX++) {
-            for(short iPlatformY = 0; iPlatformY < iPlatformHeight; iPlatformY++) {
+        for (short iPlatformX = 0; iPlatformX < iPlatformWidth; iPlatformX++) {
+            for (short iPlatformY = 0; iPlatformY < iPlatformHeight; iPlatformY++) {
                 TilesetTile * tile = &tiles[iPlatformX][iPlatformY];
 
                 int iDstX = 0;
@@ -1404,15 +1404,15 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
 
     if(pathtype == 0) { //line segment
         if(fDrawShadow) {
-            for(short iCol = 0; iCol < iPlatformWidth; iCol++) {
-                for(short iRow = 0; iRow < iPlatformHeight; iRow++) {
+            for (short iCol = 0; iCol < iPlatformWidth; iCol++) {
+                for (short iRow = 0; iRow < iPlatformHeight; iRow++) {
                     if(tiles[iCol][iRow].iID != -2)
                         rm->spr_platformstarttile.draw(iStartX - (iPlatformWidth << (iSizeShift - 1)) + (iCol << iSizeShift), iStartY - (iPlatformHeight << (iSizeShift - 1)) + (iRow << iSizeShift), 0, 0, iTileSize, iTileSize);
                 }
             }
 
-            for(short iCol = 0; iCol < iPlatformWidth; iCol++) {
-                for(short iRow = 0; iRow < iPlatformHeight; iRow++) {
+            for (short iCol = 0; iCol < iPlatformWidth; iCol++) {
+                for (short iRow = 0; iRow < iPlatformHeight; iRow++) {
                     if(tiles[iCol][iRow].iID != -2)
                         rm->spr_platformendtile.draw(iEndX - (iPlatformWidth << (iSizeShift - 1)) + (iCol << iSizeShift), iEndY - (iPlatformHeight << (iSizeShift - 1)) + (iRow << iSizeShift), 0, 0, iTileSize, iTileSize);
                 }
@@ -1432,7 +1432,7 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
         float dX = (float)(iStartX) - (float)(iPlatformPathDotSize[iSize] >> 1);
         float dY = (float)(iStartY) - (float)(iPlatformPathDotSize[iSize] >> 1);
 
-        for(short iSpot = 0; iSpot < iNumSpots + 1; iSpot++) {
+        for (short iSpot = 0; iSpot < iNumSpots + 1; iSpot++) {
             gfx_setrect(&rPathDst, (short)dX, (short)dY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
             SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
 
@@ -1441,8 +1441,8 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
         }
     } else if(pathtype == 1) { //continuous straight path
         if(fDrawShadow) {
-            for(short iCol = 0; iCol < iPlatformWidth; iCol++) {
-                for(short iRow = 0; iRow < iPlatformHeight; iRow++) {
+            for (short iCol = 0; iCol < iPlatformWidth; iCol++) {
+                for (short iRow = 0; iRow < iPlatformHeight; iRow++) {
                     if(tiles[iCol][iRow].iID != -2)
                         rm->spr_platformstarttile.draw(iStartX - (iPlatformWidth << (iSizeShift - 1)) + (iCol << iSizeShift), iStartY - (iPlatformHeight << (iSizeShift - 1)) + (iRow << iSizeShift), 0, 0, iTileSize, iTileSize);
                 }
@@ -1455,7 +1455,7 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
         float dX = (float)(iStartX) - (float)(iPlatformPathDotSize[iSize] >> 1);
         float dY = (float)(iStartY) - (float)(iPlatformPathDotSize[iSize] >> 1);
 
-        for(short iSpot = 0; iSpot < 50; iSpot++) {
+        for (short iSpot = 0; iSpot < 50; iSpot++) {
             gfx_setrect(&rPathDst, (short)dX, (short)dY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
             SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
 
@@ -1492,8 +1492,8 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
             short iEllipseStartX = (short)(fRadiusX * cos(angle)) - (iPlatformWidth << (iSizeShift - 1)) + iStartX;
             short iEllipseStartY = (short)(fRadiusY * sin(angle)) - (iPlatformHeight << (iSizeShift - 1)) + iStartY;
 
-            for(short iCol = 0; iCol < iPlatformWidth; iCol++) {
-                for(short iRow = 0; iRow < iPlatformHeight; iRow++) {
+            for (short iCol = 0; iCol < iPlatformWidth; iCol++) {
+                for (short iRow = 0; iRow < iPlatformHeight; iRow++) {
                     if(tiles[iCol][iRow].iID != -2)
                         rm->spr_platformstarttile.draw(iEllipseStartX + (iCol << iSizeShift), iEllipseStartY + (iRow << iSizeShift), 0, 0, iTileSize, iTileSize);
                 }
@@ -1501,7 +1501,7 @@ void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short star
         }
 
         float fAngle = angle;
-        for(short iSpot = 0; iSpot < 32; iSpot++) {
+        for (short iSpot = 0; iSpot < 32; iSpot++) {
             short iX = (short)(fRadiusX * cos(fAngle)) - (iPlatformPathDotSize[iSize] >> 1) + iStartX;
             short iY = (short)(fRadiusY * sin(fAngle)) - (iPlatformPathDotSize[iSize] >> 1) + iStartY;
 
@@ -1581,7 +1581,7 @@ void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
         short iNumDots = 16;
         float dRadius = (float)((hazard->iparam[0] - 1) * 24) / (float)(1 << iSize) + (iPlatformPathDotSize[iSize] >> 1);
         float dAngle = hazard->dparam[1];
-        for(short iDot = 0; iDot < iNumDots; iDot++) {
+        for (short iDot = 0; iDot < iNumDots; iDot++) {
             rDotDst.x = (short)(dRadius * cos(dAngle)) + rPathDst.x + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1);
             rDotDst.y = (short)(dRadius * sin(dAngle)) + rPathDst.y + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1);
             rDotDst.h = rDotDst.w = iPlatformPathDotSize[iSize];
@@ -1591,7 +1591,7 @@ void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
         }
 
         //Draw the fireball string
-        for(short iFireball = 0; iFireball < hazard->iparam[0]; iFireball++) {
+        for (short iFireball = 0; iFireball < hazard->iparam[0]; iFireball++) {
             short x = (hazard->ix << (iSizeShift - 1)) + (short)((float)(iFireball * (24 >> iSize)) * cos(hazard->dparam[1])) + (iTileSize >> 1) - (iFireballHazardSize[iSize] >> 1);
             short y = (hazard->iy << (iSizeShift - 1)) + (short)((float)(iFireball * (24 >> iSize)) * sin(hazard->dparam[1])) + (iTileSize >> 1) - (iFireballHazardSize[iSize] >> 1);
 
@@ -1601,7 +1601,7 @@ void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
         short iNumDots = 16;
         float dRadius = (hazard->dparam[2] + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1)) / (float)(1 << iSize);
         float dAngle = hazard->dparam[1];
-        for(short iDot = 0; iDot < iNumDots; iDot++) {
+        for (short iDot = 0; iDot < iNumDots; iDot++) {
             rDotDst.x = (short)(dRadius * cos(dAngle)) + rPathDst.x + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1);
             rDotDst.y = (short)(dRadius * sin(dAngle)) + rPathDst.y + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1);
             rDotDst.h = rDotDst.w = iPlatformPathDotSize[iSize];
@@ -1614,7 +1614,7 @@ void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
         float dSector = TWO_PI / hazard->iparam[0];
         dAngle = hazard->dparam[1];
         dRadius = hazard->dparam[2] / (float)(1 << iSize);
-        for(short iRotodisc = 0; iRotodisc < hazard->iparam[0]; iRotodisc++) {
+        for (short iRotodisc = 0; iRotodisc < hazard->iparam[0]; iRotodisc++) {
             short x = rPathDst.x + (short)(dRadius * cos(dAngle));
             short y = rPathDst.y + (short)(dRadius * sin(dAngle));
 
@@ -1896,7 +1896,7 @@ void CheckSecret(short id)
 {
     if(id == 0 && !game_values.unlocksecretunlocked[0]) {
         short iCountTeams = 0;
-        for(short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
+        for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
             if(game_values.unlocksecret1part1[iPlayer])
                 iCountTeams++;
         }
@@ -1921,7 +1921,7 @@ void CheckSecret(short id)
                 eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->ix - 8, object->iy - 8, 4, 5));
         }
     } else if(id == 2 && !game_values.unlocksecretunlocked[2]) {
-        for(short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
+        for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
             //number of songs on thriller + number of released albums (figure it out :))
             if(game_values.unlocksecret3part1[iPlayer] >= 9 && game_values.unlocksecret3part2[iPlayer] >= 13) {
                 game_values.unlocksecretunlocked[2] = true;
@@ -2038,7 +2038,7 @@ void CGameConfig::ReadBinaryConfig() {
             fread(inputConfiguration, sizeof(CInputPlayerControl), 8, fp);
 
             //setup player input controls for game
-            for(short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
+            for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
                 short iDevice;
                 fread(&iDevice, sizeof(short), 1, fp);
 
@@ -2056,7 +2056,7 @@ void CGameConfig::ReadBinaryConfig() {
             fread(&fullscreen, sizeof(bool), 1, fp);
 #endif
 
-            for(short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++)
+            for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++)
                 fread(&(gamemodes[iGameMode]->goal), sizeof(short), 1, fp);
 
             fread(&gamemodemenusettings, sizeof(GameModeSettings), 1, fp);
@@ -2068,7 +2068,7 @@ void CGameConfig::ReadBinaryConfig() {
             fread(&playercontrol, sizeof(short), 4, fp);
 
             //Load skin/team settings
-            for(short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
+            for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
                 if(skinids[iPlayer] >= skinlist->GetCount() || skinids[iPlayer] < 0)
                     skinids[iPlayer] = 0;
             }

@@ -299,7 +299,7 @@ void ModeOptionsMenu::CreateMenu()
     miStompModeRateField->SetData(&game_values.gamemodemenusettings.stomp.rate, NULL, NULL);
     miStompModeRateField->SetKey(game_values.gamemodemenusettings.stomp.rate);
 
-    for(short iEnemy = 0; iEnemy < NUMSTOMPENEMIES; iEnemy++) {
+    for (short iEnemy = 0; iEnemy < NUMSTOMPENEMIES; iEnemy++) {
         miStompModeEnemySlider[iEnemy] = new MI_PowerupSlider(&rm->spr_selectfield, &rm->menu_slider_bar, &rm->menu_stomp, 120, 80 + 40 * iEnemy, 400, iEnemy);
         miStompModeEnemySlider[iEnemy]->Add("", 0, "", false, false);
         miStompModeEnemySlider[iEnemy]->Add("", 1, "", false, false);
@@ -351,7 +351,7 @@ void ModeOptionsMenu::CreateMenu()
     // Yoshi's Eggs Mode Settings
     //***********************
 
-    for(short iEggField = 0; iEggField < 4; iEggField++) {
+    for (short iEggField = 0; iEggField < 4; iEggField++) {
         miEggModeEggQuantityField[iEggField] = new MI_PowerupSlider(&rm->spr_selectfield, &rm->menu_slider_bar, &rm->menu_egg, 170, 60 + 40 * iEggField, 300, iEggField);
         miEggModeEggQuantityField[iEggField]->Add("0", 0, "", false, false, iEggField == 0 ? false : true);
         miEggModeEggQuantityField[iEggField]->Add("1", 1, "", false, false, iEggField >= 2 ? false : true);
@@ -363,7 +363,7 @@ void ModeOptionsMenu::CreateMenu()
         miEggModeEggQuantityField[iEggField]->SetNoWrap(true);
     }
 
-    for(short iYoshiField = 0; iYoshiField < 4; iYoshiField++) {
+    for (short iYoshiField = 0; iYoshiField < 4; iYoshiField++) {
         miEggModeYoshiQuantityField[iYoshiField] = new MI_PowerupSlider(&rm->spr_selectfield, &rm->menu_slider_bar, &rm->menu_egg, 170, 220 + 40 * iYoshiField, 300, iYoshiField + 4);
         miEggModeYoshiQuantityField[iYoshiField]->Add("0", 0, "", false, false, iYoshiField == 0 ? false : true);
         miEggModeYoshiQuantityField[iYoshiField]->Add("1", 1, "", false, false, iYoshiField >= 2 ? false : true);
@@ -878,7 +878,7 @@ void ModeOptionsMenu::CreateMenu()
     // Survival Mode Settings
     //***********************
 
-    for(short iEnemy = 0; iEnemy < NUMSURVIVALENEMIES; iEnemy++) {
+    for (short iEnemy = 0; iEnemy < NUMSURVIVALENEMIES; iEnemy++) {
         miSurvivalModeEnemySlider[iEnemy] = new MI_PowerupSlider(&rm->spr_selectfield, &rm->menu_slider_bar, &rm->menu_survival, 120, 120 + 40 * iEnemy, 400, iEnemy);
         miSurvivalModeEnemySlider[iEnemy]->Add("", 0, "", false, false);
         miSurvivalModeEnemySlider[iEnemy]->Add("", 1, "", false, false);
@@ -1213,7 +1213,7 @@ void ModeOptionsMenu::CreateMenu()
     miChaseModeSpeedField->SetData(&game_values.gamemodemenusettings.chase.phantospeed, NULL, NULL);
     miChaseModeSpeedField->SetKey(game_values.gamemodemenusettings.chase.phantospeed);
 
-    for(short iPhanto = 0; iPhanto < 3; iPhanto++) {
+    for (short iPhanto = 0; iPhanto < 3; iPhanto++) {
         miChaseModeQuantitySlider[iPhanto] = new MI_PowerupSlider(&rm->spr_selectfield, &rm->menu_slider_bar, &rm->spr_phanto, 120, 200 + 40 * iPhanto, 400, iPhanto);
         miChaseModeQuantitySlider[iPhanto]->Add("", 0, "", false, false, iPhanto == 0 ? false : true);
         miChaseModeQuantitySlider[iPhanto]->Add("", 1, "", false, false);
@@ -1368,7 +1368,7 @@ void ModeOptionsMenu::CreateMenu()
 
 void ModeOptionsMenu::SetControllingTeam(short iControlTeam)
 {
-    for(short iMode = 0; iMode < GAMEMODE_LAST; iMode++)
+    for (short iMode = 0; iMode < GAMEMODE_LAST; iMode++)
         mModeSettingsMenu[iMode].SetControllingTeam(iControlTeam);
 }
 
@@ -1396,13 +1396,13 @@ void ModeOptionsMenu::SetRandomGameModeSettings(short iMode)
     } else if(iMode == game_mode_stomp) { //stomp
         game_values.gamemodesettings.stomp.rate = miStompModeRateField->GetRandomShortValue();
 
-        for(short iEnemy = 0; iEnemy < NUMSTOMPENEMIES; iEnemy++)
+        for (short iEnemy = 0; iEnemy < NUMSTOMPENEMIES; iEnemy++)
             game_values.gamemodesettings.stomp.enemyweight[iEnemy] = miStompModeEnemySlider[iEnemy]->GetRandomShortValue();
     } else if(iMode == game_mode_eggs) { //egg
-        for(int iEgg = 0; iEgg < 4; iEgg++)
+        for (int iEgg = 0; iEgg < 4; iEgg++)
             game_values.gamemodesettings.egg.eggs[iEgg] = miEggModeEggQuantityField[iEgg]->GetRandomShortValue();
 
-        for(int iYoshi = 0; iYoshi < 4; iYoshi++)
+        for (int iYoshi = 0; iYoshi < 4; iYoshi++)
             game_values.gamemodesettings.egg.yoshis[iYoshi] = miEggModeYoshiQuantityField[iYoshi]->GetRandomShortValue();
 
         game_values.gamemodesettings.egg.explode = miEggModeExplosionTimeField->GetRandomShortValue();
@@ -1443,7 +1443,7 @@ void ModeOptionsMenu::SetRandomGameModeSettings(short iMode)
         game_values.gamemodesettings.survival.speed = miSurvivalModeSpeedField->GetRandomShortValue();
         game_values.gamemodesettings.survival.shield = miSurvivalModeShieldField->GetRandomBoolValue();
 
-        for(short iEnemy = 0; iEnemy < NUMSURVIVALENEMIES; iEnemy++)
+        for (short iEnemy = 0; iEnemy < NUMSURVIVALENEMIES; iEnemy++)
             game_values.gamemodesettings.survival.enemyweight[iEnemy] = miSurvivalModeEnemySlider[iEnemy]->GetRandomShortValue();
     } else if(iMode == game_mode_greed) { //greed
         game_values.gamemodesettings.greed.coinlife = miGreedModeCoinLife->GetRandomShortValue();
@@ -1462,7 +1462,7 @@ void ModeOptionsMenu::SetRandomGameModeSettings(short iMode)
     } else if(iMode == game_mode_chase) { //chase (phanto)
         game_values.gamemodesettings.chase.phantospeed = miChaseModeSpeedField->GetRandomShortValue();
 
-        for(short iPhanto = 0; iPhanto < 3; iPhanto++)
+        for (short iPhanto = 0; iPhanto < 3; iPhanto++)
             game_values.gamemodesettings.chase.phantoquantity[iPhanto] = miChaseModeQuantitySlider[iPhanto]->GetRandomShortValue();
     } else if(iMode == game_mode_shyguytag) { //shyguy tag
         game_values.gamemodesettings.shyguytag.tagonsuicide = miShyGuyTagModeTagOnSuicideField->GetRandomBoolValue();
@@ -1493,7 +1493,7 @@ void ModeOptionsMenu::HealthModeMaxLifeChanged()
 
 void ModeOptionsMenu::Refresh()
 {
-    for(short iMode = 0; iMode < GAMEMODE_LAST; iMode++) {
+    for (short iMode = 0; iMode < GAMEMODE_LAST; iMode++) {
         mModeSettingsMenu[iMode].Refresh();
     }
 

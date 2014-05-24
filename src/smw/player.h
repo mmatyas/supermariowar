@@ -17,7 +17,7 @@ class CScore
 
 			score = 0;
 
-			for(short iSubScore = 0; iSubScore < 3; iSubScore++)
+			for (short iSubScore = 0; iSubScore < 3; iSubScore++)
 				subscore[iSubScore] = 0;
 
 			x = 0;

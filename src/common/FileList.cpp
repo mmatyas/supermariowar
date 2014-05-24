@@ -49,7 +49,7 @@ SimpleFileList::SimpleFileList(const std::string &path, const std::string &exten
         std::string * names = new std::string[iSize];
 
         //Get only the names of the files, no author information
-        for(short i = 0; i < iSize; i++) {
+        for (short i = 0; i < iSize; i++) {
             names[i] = stripPathAndExtension(filelist[i]);
             std::transform(names[i].begin(), names[i].end(), names[i].begin(), tolower);
         }
@@ -58,7 +58,7 @@ SimpleFileList::SimpleFileList(const std::string &path, const std::string &exten
         bool fDone = false;
         while(!fDone) {
             fDone = true;
-            for(short i = 0; i < iSize - 1; i++) {
+            for (short i = 0; i < iSize - 1; i++) {
                 if(names[i].compare(names[i + 1]) > 0) {
                     fDone = false;
                     std::string tempName = names[i];
@@ -118,7 +118,7 @@ void SimpleFileList::SetCurrentName(const std::string &name)
     if(filelist.empty())
         return;
 
-    for(unsigned short i = 0; i < filelist.size(); i++) {
+    for (unsigned short i = 0; i < filelist.size(); i++) {
         if(!strcmp(filelist[i].c_str(), name.c_str())) {
             currentIndex = i;
             break;
@@ -214,7 +214,7 @@ MusicList::MusicList()
 
 MusicList::~MusicList()
 {
-    for(unsigned int i = 0; i < entries.size(); i++) {
+    for (unsigned int i = 0; i < entries.size(); i++) {
         delete entries[i];
     }
 
@@ -260,7 +260,7 @@ void MusicList::prev()
 
 void MusicList::UpdateEntriesWithOverrides()
 {
-    for(unsigned short i = 0; i < entries.size(); i++) {
+    for (unsigned short i = 0; i < entries.size(); i++) {
         entries[i]->UpdateWithOverrides();
     }
 }
@@ -279,7 +279,7 @@ MusicEntry::MusicEntry(const std::string & musicdirectory)
 
     char * szDir = (char*)(musicdirectory.c_str());
 
-    for(k = 0; k < MAXMUSICCATEGORY; k++)
+    for (k = 0; k < MAXMUSICCATEGORY; k++)
         numsongsforcategory[k] = 0;
 
     char musiclistname[FILEBUFSIZE];
@@ -290,7 +290,7 @@ MusicEntry::MusicEntry(const std::string & musicdirectory)
     else p++;
     strcpy(musiclistname, p);
 
-    for(i = (int)strlen(musiclistname); i >= 0; i--) {
+    for (i = (int)strlen(musiclistname); i >= 0; i--) {
         if(musiclistname[i] == '.') {
             musiclistname[i] = '\0';
             break;
@@ -335,7 +335,7 @@ MusicEntry::MusicEntry(const std::string & musicdirectory)
 
         //Chop off line ending
         int stringLength = strlen(szBuffer);
-        for(k = 0; k < stringLength; k++) {
+        for (k = 0; k < stringLength; k++) {
             if(szBuffer[k] == '\r' || szBuffer[k] == '\n') {
                 szBuffer[k] = '\0';
                 break;
@@ -433,7 +433,7 @@ MusicEntry::MusicEntry(const std::string & musicdirectory)
 
     //Now read labeled subdirectories like "Land", "Underground", "Castle", etc for more songs
 
-    for(short iMusicCategory = 0; iMusicCategory < MAXMUSICCATEGORY; iMusicCategory++) {
+    for (short iMusicCategory = 0; iMusicCategory < MAXMUSICCATEGORY; iMusicCategory++) {
         std::string musicPath = musicdirectory + getDirectorySeperator() + std::string(g_szMusicCategoryNames[iMusicCategory]);
         if(File_Exists(musicPath)) {
             SimpleFileList musList(musicPath + getDirectorySeperator(), ".ogg");
@@ -442,7 +442,7 @@ MusicEntry::MusicEntry(const std::string & musicdirectory)
 
             //printf("Found %d files in %s\n", iCount, musicPath.c_str());
 
-            for(short iFile = 0; iFile < iCount; iFile++) {
+            for (short iFile = 0; iFile < iCount; iFile++) {
                 if(numsongsforcategory[iMusicCategory] < MAXCATEGORYTRACKS) {
                     songFileNames.push_back(musList.current_name());
                     songsforcategory[iMusicCategory][numsongsforcategory[iMusicCategory]] = iNumFile;
@@ -462,7 +462,7 @@ MusicEntry::MusicEntry(const std::string & musicdirectory)
     }
 
     //Verify we have at least one track for each category
-    for(i = 0; i < MAXMUSICCATEGORY; i++) {
+    for (i = 0; i < MAXMUSICCATEGORY; i++) {
         if(numsongsforcategory[i] == 0) {
             if(i < 4) {
                 printf("Error: Missing track definition for music category: %s\n", g_szMusicCategoryNames[i]);
@@ -470,7 +470,7 @@ MusicEntry::MusicEntry(const std::string & musicdirectory)
                 return;
             } else { //Use default category
                 numsongsforcategory[i] = numsongsforcategory[g_iDefaultMusicCategory[i]];
-                for(k = 0; k < numsongsforcategory[i]; k++) {
+                for (k = 0; k < numsongsforcategory[i]; k++) {
                     songsforcategory[i][k] = songsforcategory[g_iDefaultMusicCategory[i]][k];
                 }
             }
@@ -490,11 +490,11 @@ MusicEntry::MusicEntry(const std::string & musicdirectory)
 
     printf("\n\n");
 
-    for(i = 0; i < MAXMUSICCATEGORY; i++)
+    for (i = 0; i < MAXMUSICCATEGORY; i++)
     {
         printf("---- %d ----\n", i);
         printf("Count: %d\n", numsongsforcategory[i]);
-        for(k = 0; k < numsongsforcategory[i]; k++)
+        for (k = 0; k < numsongsforcategory[i]; k++)
             printf("%d\n", songsforcategory[i][k]);
     }
     */
@@ -575,13 +575,13 @@ void MusicEntry::UpdateWithOverrides()
     if(mapmusicoverrides.size() > 0)
         fUsesMapOverrides = true;
 
-    for(unsigned short i = 0; i < mapmusicoverrides.size(); i++) {
+    for (unsigned short i = 0; i < mapmusicoverrides.size(); i++) {
         MapMusicOverride * override = mapmusicoverrides[i];
 
         if(mapoverride.find(override->mapname) == mapoverride.end())
             mapoverride[override->mapname] = new MusicOverride();
 
-        for(unsigned short j = 0; j < override->songs.size(); j++) {
+        for (unsigned short j = 0; j < override->songs.size(); j++) {
             songFileNames.push_back(override->songs[j]);
             mapoverride[override->mapname]->songs.push_back(iNumFile);
             iNumFile++;
@@ -611,7 +611,7 @@ WorldMusicList::WorldMusicList()
 
 WorldMusicList::~WorldMusicList()
 {
-    for(unsigned int i = 0; i < entries.size(); i++) {
+    for (unsigned int i = 0; i < entries.size(); i++) {
         delete entries[i];
     }
 
@@ -647,7 +647,7 @@ void WorldMusicList::prev()
 
 void WorldMusicList::UpdateEntriesWithOverrides()
 {
-    for(unsigned short i = 0; i < entries.size(); i++) {
+    for (unsigned short i = 0; i < entries.size(); i++) {
         entries[i]->UpdateWithOverrides();
     }
 }
@@ -671,7 +671,7 @@ WorldMusicEntry::WorldMusicEntry(const std::string & musicdirectory)
     else p++;
     strcpy(musiclistname, p);
 
-    for(i = (int)strlen(musiclistname); i >= 0; i--) {
+    for (i = (int)strlen(musiclistname); i >= 0; i--) {
         if(musiclistname[i] == '.') {
             musiclistname[i] = '\0';
             break;
@@ -699,7 +699,7 @@ WorldMusicEntry::WorldMusicEntry(const std::string & musicdirectory)
 
         //Chop off line ending
         int stringLength = strlen(szBuffer);
-        for(k = 0; k < stringLength; k++) {
+        for (k = 0; k < stringLength; k++) {
             if(szBuffer[k] == '\r' || szBuffer[k] == '\n') {
                 szBuffer[k] = '\0';
                 break;
@@ -786,7 +786,7 @@ void WorldMusicEntry::UpdateWithOverrides()
     if(worldmusicoverrides.size() > 0)
         fUsesWorldOverrides = true;
 
-    for(unsigned short i = 0; i < worldmusicoverrides.size(); i++) {
+    for (unsigned short i = 0; i < worldmusicoverrides.size(); i++) {
         WorldMusicOverride * override = worldmusicoverrides[i];
         worldoverride[override->worldname] = override->song;
     }

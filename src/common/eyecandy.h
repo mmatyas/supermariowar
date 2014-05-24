@@ -420,11 +420,11 @@ public:
     short add(CEyecandy *ec);
 
     void update() {
-        for(short i = 0; i < list_end; i++)
+        for (short i = 0; i < list_end; i++)
             list[i]->update();
     };
     void draw() {
-        for(short i = 0; i < list_end; i++)
+        for (short i = 0; i < list_end; i++)
             list[i]->draw();
     };
 

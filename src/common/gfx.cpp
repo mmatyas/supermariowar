@@ -147,11 +147,11 @@ bool gfx_init(int w, int h, bool fullscreen)
 
     printf("[info] running at %dx%d %dbpp\n", w, h, screen->format->BitsPerPixel);
 
-    for(int k = 0; k < 3; k++) {
+    for (int k = 0; k < 3; k++) {
         colorcodes[k] = NULL;
 
-        for(int i = 0; i < 4; i++)
-            for(int j = 0; j < NUM_SCHEMES; j++)
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < NUM_SCHEMES; j++)
                 colorschemes[i][j][k] = NULL;
     }
 
@@ -160,11 +160,11 @@ bool gfx_init(int w, int h, bool fullscreen)
 
 void gfx_freepalette()
 {
-    for(int k = 0; k < 3; k++) {
+    for (int k = 0; k < 3; k++) {
         delete [] colorcodes[k];
 
-        for(int i = 0; i < 4; i++)
-            for(int j = 0; j < NUM_SCHEMES; j++)
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < NUM_SCHEMES; j++)
                 delete [] colorschemes[i][j][k];
     }
 }
@@ -182,11 +182,11 @@ bool gfx_loadpalette()
 
     numcolors = (short)palette->w;
 
-    for(int k = 0; k < 3; k++) {
+    for (int k = 0; k < 3; k++) {
         colorcodes[k] = new Uint8[numcolors];
 
-        for(int i = 0; i < 4; i++)
-            for(int j = 0; j < NUM_SCHEMES; j++)
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < NUM_SCHEMES; j++)
                 colorschemes[i][j][k] = new Uint8[numcolors];
     }
 
@@ -201,7 +201,7 @@ bool gfx_loadpalette()
     short iGreenIndex = palette->format->Gshift >> 3;
     short iBlueIndex = palette->format->Bshift >> 3;
 
-    for(int k = 0; k < numcolors; k++) {
+    for (int k = 0; k < numcolors; k++) {
         colorcodes[iRedIndex][k] = pixels[counter++];
         colorcodes[iGreenIndex][k] = pixels[counter++];
         colorcodes[iBlueIndex][k] = pixels[counter++];
@@ -209,9 +209,9 @@ bool gfx_loadpalette()
 
     counter += palette->pitch - palette->w * 3;
 
-    for(int i = 0; i < 4; i++) {
-        for(int j = 0; j < NUM_SCHEMES; j++) {
-            for(int m = 0; m < numcolors; m++) {
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < NUM_SCHEMES; j++) {
+            for (int m = 0; m < numcolors; m++) {
                 colorschemes[i][j][iRedIndex][m] = pixels[counter++];
                 colorschemes[i][j][iGreenIndex][m] = pixels[counter++];
                 colorschemes[i][j][iBlueIndex][m] = pixels[counter++];
@@ -276,11 +276,11 @@ void gfx_setresolution(int w, int h, bool fullscreen)
 
 void gfx_close()
 {
-    for(int i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; i++) {
         delete [] colorcodes[i];
 
-        for(int j = 0; j < 4; j++)
-            for(int k = 0; k < NUM_SCHEMES; k++)
+        for (int j = 0; j < 4; j++)
+            for (int k = 0; k < NUM_SCHEMES; k++)
                 delete [] colorschemes[j][k][i];
     }
 #ifdef USE_SDL2
@@ -328,8 +328,8 @@ SDL_Surface * gfx_createskinsurface(SDL_Surface * skin, short spriteindex, Uint8
     short iGreenOffset = skin->format->Gshift >> 3;
     short iBlueOffset = skin->format->Bshift >> 3;
 
-    for(int j = 0; j < 32; j++) {
-        for(int i = 0; i < 32; i++) {
+    for (int j = 0; j < 32; j++) {
+        for (int i = 0; i < 32; i++) {
             if(reverse)
                 reverseoffset = (31 - (i * 2)) * 3;
 
@@ -338,9 +338,9 @@ SDL_Surface * gfx_createskinsurface(SDL_Surface * skin, short spriteindex, Uint8
             Uint8 iColorByte3 = pixels[skincounter + iBlueOffset];
 
             bool fFoundColor = false;
-            for(int m = 0; m < numcolors; m++) {
+            for (int m = 0; m < numcolors; m++) {
                 if(iColorByte1 == colorcodes[0][m] && iColorByte2 == colorcodes[1][m] && iColorByte3 == colorcodes[2][m]) {
-                    for(int k = 0; k < loops; k++) {
+                    for (int k = 0; k < loops; k++) {
                         temppixels[tempcounter + k * 96 + reverseoffset + iRedOffset] = colorschemes[colorScheme][k][0][m];
                         temppixels[tempcounter + k * 96 + reverseoffset + iGreenOffset] = colorschemes[colorScheme][k][1][m];
                         temppixels[tempcounter + k * 96 + reverseoffset + iBlueOffset] = colorschemes[colorScheme][k][2][m];
@@ -352,7 +352,7 @@ SDL_Surface * gfx_createskinsurface(SDL_Surface * skin, short spriteindex, Uint8
             }
 
             if(!fFoundColor) {
-                for(int k = 0; k < loops; k++) {
+                for (int k = 0; k < loops; k++) {
                     temppixels[tempcounter + k * 96 + reverseoffset + iRedOffset] = iColorByte1;
                     temppixels[tempcounter + k * 96 + reverseoffset + iGreenOffset] = iColorByte2;
                     temppixels[tempcounter + k * 96 + reverseoffset + iBlueOffset] = iColorByte3;
@@ -405,7 +405,7 @@ bool gfx_loadmenuskin(gfxSprite ** gSprite, const std::string& filename, Uint8 r
         return false;
     }
 
-    for(short iSprite = 0; iSprite < 2; iSprite++) {
+    for (short iSprite = 0; iSprite < 2; iSprite++) {
         SDL_Surface * skinSurface = gfx_createskinsurface(skin, iSprite, r, g, b, colorScheme, true, false);
 
         if (skinSurface == NULL) {
@@ -419,7 +419,7 @@ bool gfx_loadmenuskin(gfxSprite ** gSprite, const std::string& filename, Uint8 r
     }
 
     if(fLoadBothDirections) {
-        for(short iSprite = 0; iSprite < 2; iSprite++) {
+        for (short iSprite = 0; iSprite < 2; iSprite++) {
             SDL_Surface * skinSurface = gfx_createskinsurface(skin, iSprite, r, g, b, colorScheme, true, true);
 
             if (skinSurface == NULL) {
@@ -453,8 +453,8 @@ bool gfx_loadfullskin(gfxSprite ** gSprites, const std::string& filename, Uint8 
         return false;
     }
 
-    for(short k = 0; k < 4; k++) {
-        for(short j = 0; j < 2; j++) {
+    for (short k = 0; k < 4; k++) {
+        for (short j = 0; j < 2; j++) {
             SDL_Surface * skinSurface = gfx_createskinsurface(skin, k, r, g, b, colorScheme, true, j != 0);
 
             if (skinSurface == NULL) {
@@ -525,17 +525,17 @@ SDL_Surface * gfx_createteamcoloredsurface(SDL_Surface * sImage, short iColor, U
     short iGreenOffset = sImage->format->Gshift >> 3;
     short iBlueOffset = sImage->format->Bshift >> 3;
 
-    for(int j = 0; j < sImage->w; j++) {
-        for(int i = 0; i < sImage->h; i++) {
+    for (int j = 0; j < sImage->w; j++) {
+        for (int i = 0; i < sImage->h; i++) {
             Uint8 iColorByte1 = pixels[iSrcPixelCounter + iRedOffset];
             Uint8 iColorByte2 = pixels[iSrcPixelCounter + iGreenOffset];
             Uint8 iColorByte3 = pixels[iSrcPixelCounter + iBlueOffset];
 
             bool fFoundColor = false;
-            for(int m = 0; m < numcolors; m++) {
+            for (int m = 0; m < numcolors; m++) {
                 if(iColorByte1 == colorcodes[0][m] && iColorByte2 == colorcodes[1][m] && iColorByte3 == colorcodes[2][m]) {
                     if(iColor < 0) {
-                        for(short iTeam = 0; iTeam < 4; iTeam++) {
+                        for (short iTeam = 0; iTeam < 4; iTeam++) {
                             temppixels[iDstPixelCounter + iRedOffset + iNextImageOffset * iTeam] = colorschemes[iTeam][0][0][m];
                             temppixels[iDstPixelCounter + iGreenOffset + iNextImageOffset * iTeam] = colorschemes[iTeam][0][1][m];
                             temppixels[iDstPixelCounter + iBlueOffset + iNextImageOffset * iTeam] = colorschemes[iTeam][0][2][m];
@@ -553,7 +553,7 @@ SDL_Surface * gfx_createteamcoloredsurface(SDL_Surface * sImage, short iColor, U
 
             if(!fFoundColor) {
                 if(iColor < 0) {
-                    for(short iTeam = 0; iTeam < 4; iTeam++) {
+                    for (short iTeam = 0; iTeam < 4; iTeam++) {
                         temppixels[iDstPixelCounter + iRedOffset + iNextImageOffset * iTeam] = iColorByte1;
                         temppixels[iDstPixelCounter + iGreenOffset + iNextImageOffset * iTeam] = iColorByte2;
                         temppixels[iDstPixelCounter + iBlueOffset + iNextImageOffset * iTeam] = iColorByte3;
@@ -612,7 +612,7 @@ bool gfx_loadteamcoloredimage(gfxSprite ** gSprites, const std::string& filename
         return false;
     }
 
-    for(short k = 0; k < 4; k++) {
+    for (short k = 0; k < 4; k++) {
         SDL_Surface * sTeamColoredSurface = gfx_createteamcoloredsurface(sImage, k, r, g, b, a);
 
         if (sTeamColoredSurface == NULL) {

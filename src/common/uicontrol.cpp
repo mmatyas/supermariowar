@@ -22,7 +22,7 @@ UI_Control::UI_Control(short x, short y)
 
     fShow = true;
 
-    for(int iNeighbor = 0; iNeighbor < 4; iNeighbor++)
+    for (int iNeighbor = 0; iNeighbor < 4; iNeighbor++)
         neighborControls[iNeighbor] = NULL;
 
     uiMenu = NULL;
@@ -43,7 +43,7 @@ UI_Control & UI_Control::operator= (const UI_Control& other)
 
         fShow = other.fShow;
 
-        for(int iNeighbor = 0; iNeighbor < 4; iNeighbor++)
+        for (int iNeighbor = 0; iNeighbor < 4; iNeighbor++)
             neighborControls[iNeighbor] = NULL;
 
         uiMenu = NULL;
@@ -67,7 +67,7 @@ MI_IPField::MI_IPField(gfxSprite * nspr, short x, short y) :
 
     iSelectedDigit = 0;
 
-    for(short k = 0; k < 12; k++)
+    for (short k = 0; k < 12; k++)
         values[k] = 0;
 
     iDigitPosition[0] = 16;
@@ -115,7 +115,7 @@ MenuCodeEnum MI_IPField::Modify(bool modify)
 
 MenuCodeEnum MI_IPField::SendInput(CPlayerInput * playerInput)
 {
-    for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
         if(playerInput->outputControls[iPlayer].menu_right.fPressed) {
             if(++iSelectedDigit > 11)
                 iSelectedDigit = 0;
@@ -187,7 +187,7 @@ void MI_IPField::Draw()
 
     miModifyImage->Draw();
 
-    for(int iSection = 0; iSection < 12; iSection += 3) {
+    for (int iSection = 0; iSection < 12; iSection += 3) {
         if(values[iSection] != 0)
             rm->menu_font_large.drawf(ix + iDigitPosition[iSection], iy + 12, "%i", values[iSection]);
 
@@ -339,7 +339,7 @@ bool MI_SelectField::SetIndex(unsigned short index)
 
     current = items.begin();
 
-    for(unsigned int iSearch = 0; iSearch < index; iSearch++) {
+    for (unsigned int iSearch = 0; iSearch < index; iSearch++) {
         ++current;
     }
 
@@ -434,7 +434,7 @@ MenuCodeEnum MI_SelectField::Modify(bool modify)
 
 MenuCodeEnum MI_SelectField::SendInput(CPlayerInput * playerInput)
 {
-    for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
         short iNumMoves = 1;
         if(fFastScroll && playerInput->outputControls[iPlayer].menu_scrollfast.fDown)
             iNumMoves = 10;
@@ -442,7 +442,7 @@ MenuCodeEnum MI_SelectField::SendInput(CPlayerInput * playerInput)
         if(playerInput->outputControls[iPlayer].menu_right.fPressed || playerInput->outputControls[iPlayer].menu_down.fPressed) {
             bool fMoved = false;
 
-            for(short iMove = 0; iMove < iNumMoves; iMove++)
+            for (short iMove = 0; iMove < iNumMoves; iMove++)
                 fMoved |= MoveNext();
 
             if(fMoved)
@@ -452,7 +452,7 @@ MenuCodeEnum MI_SelectField::SendInput(CPlayerInput * playerInput)
         if(playerInput->outputControls[iPlayer].menu_left.fPressed || playerInput->outputControls[iPlayer].menu_up.fPressed) {
             bool fMoved = false;
 
-            for(short iMove = 0; iMove < iNumMoves; iMove++)
+            for (short iMove = 0; iMove < iNumMoves; iMove++)
                 fMoved |= MovePrev();
 
             if(fMoved)
@@ -647,7 +647,7 @@ bool MI_SelectField::MoveRandom()
     while(true) {
         int index = RNGMAX(items.size());
 
-        for(int k = 0; k < index; k++) {
+        for (int k = 0; k < index; k++) {
             if(findRandom == --items.end()) {
                 findRandom = items.begin();
                 iFindIndex = 0;
@@ -805,7 +805,7 @@ void MI_SliderField::Draw()
     short iSpacing = (iIndent2 - iIndent - 20) / ((short)items.size() - 1);
     short iSpot = 0;
 
-    for(unsigned int index = 0; index < items.size(); index++) {
+    for (unsigned int index = 0; index < items.size(); index++) {
         if(index < items.size() - 1)
             sprSlider->draw(ix + iIndent + iSpot + 16, iy + 10, 0, 0, iSpacing, 13);
         else
@@ -825,7 +825,7 @@ void MI_SliderField::Draw()
 
 MenuCodeEnum MI_SliderField::SendInput(CPlayerInput * playerInput)
 {
-    for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
         if(playerInput->outputControls[iPlayer].menu_scrollfast.fPressed) {
             if(iIndex == 0)
                 while(MoveNext());
@@ -870,7 +870,7 @@ void MI_PowerupSlider::Draw()
     short iSpacing = (iWidth - 100) / ((short)items.size() - 1);
     short iSpot = 0;
 
-    for(unsigned int index = 0; index < items.size(); index++) {
+    for (unsigned int index = 0; index < items.size(); index++) {
         if(index < items.size() - 1)
             sprSlider->draw(ix + iSpot + 56, iy + 10, 0, 0, iSpacing, 13);
         else
@@ -950,7 +950,7 @@ MI_FrenzyModeOptions::MI_FrenzyModeOptions(short x, short y, short width, short 
     miStoredShellsField->SetAutoAdvance(true);
 
     short iPowerupMap[] = {8, 5, 11, 17, 19, 21, 23, 24, 25, 20, 9, 16, 10, 22, 12, 13, 14, 15, 27};
-    for(short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++) {
+    for (short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++) {
         miPowerupSlider[iPowerup] = new MI_PowerupSlider(&rm->spr_selectfield, &rm->menu_slider_bar, &rm->spr_storedpoweruplarge, iPowerup < 10 ? 65 : 330, 0, 245, iPowerupMap[iPowerup]);
         miPowerupSlider[iPowerup]->Add("", 0, "", false, false);
         miPowerupSlider[iPowerup]->Add("", 1, "", false, false);
@@ -979,7 +979,7 @@ MI_FrenzyModeOptions::MI_FrenzyModeOptions(short x, short y, short width, short 
     mMenu->AddControl(miRateField, miQuantityField, miStoredShellsField, NULL, NULL);
     mMenu->AddControl(miStoredShellsField, miRateField, miPowerupSlider[0], NULL, NULL);
 
-    for(short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++) {
+    for (short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++) {
         UI_Control * upcontrol = NULL;
         if(iPowerup == 0)
             upcontrol = miStoredShellsField;
@@ -1036,7 +1036,7 @@ MI_FrenzyModeOptions::~MI_FrenzyModeOptions()
 
 void MI_FrenzyModeOptions::SetupPowerupFields()
 {
-    for(short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++) {
+    for (short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++) {
         short iPosition = iFrenzyCardPositionMap[iPowerup];
         MI_PowerupSlider * slider = miPowerupSlider[iPosition];
 
@@ -1126,7 +1126,7 @@ void MI_FrenzyModeOptions::SetRandomGameModeSettings()
     game_values.gamemodesettings.frenzy.rate = miRateField->GetRandomShortValue();
     game_values.gamemodesettings.frenzy.storedshells = miStoredShellsField->GetRandomBoolValue();
 
-    for(short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++)
+    for (short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++)
         game_values.gamemodesettings.frenzy.powerupweight[iPowerup] = miPowerupSlider[iPowerup]->GetRandomShortValue();
 }
 
@@ -1154,7 +1154,7 @@ MenuCodeEnum MI_FrenzyModeOptions::MouseClick(short iMouseX, short iMouseY)
     if(ret == MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS)
         return ret;
 
-    for(short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++) {
+    for (short iPowerup = 0; iPowerup < NUMFRENZYCARDS; iPowerup++) {
         MI_PowerupSlider * slider = miPowerupSlider[iPowerup];
 
         if(slider == mMenu->GetCurrentControl()) {
@@ -1574,7 +1574,7 @@ MenuCodeEnum MI_TextField::SendInput(CPlayerInput * playerInput)
     Uint8 * keystate = SDL_GetKeyState(NULL);
 #endif
 
-    for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
         if(playerInput->outputControls[iPlayer].menu_select.fPressed || playerInput->outputControls[iPlayer].menu_cancel.fPressed) {
             miModifyCursor->Show(false);
 
@@ -1623,7 +1623,7 @@ MenuCodeEnum MI_TextField::SendInput(CPlayerInput * playerInput)
 
             //Check to see if this is an allowed character for this field
             bool fAllowed = true;
-            for(short iIndex = 0; iIndex < 32 && szDisallowedChars[iIndex] != 0; iIndex++) {
+            for (short iIndex = 0; iIndex < 32 && szDisallowedChars[iIndex] != 0; iIndex++) {
                 if(szDisallowedChars[iIndex] == key) {
                     fAllowed = false;
                     break;
@@ -1634,7 +1634,7 @@ MenuCodeEnum MI_TextField::SendInput(CPlayerInput * playerInput)
             if(fAllowed) {
                 iNumChars++;
 
-                for(short iCopy = iNumChars - 1; iCopy >= iCursorIndex; iCopy--) {
+                for (short iCopy = iNumChars - 1; iCopy >= iCursorIndex; iCopy--) {
                     szValue[iCopy + 1] = szValue[iCopy];
                 }
 
@@ -1648,7 +1648,7 @@ MenuCodeEnum MI_TextField::SendInput(CPlayerInput * playerInput)
         if(iCursorIndex > 0) {
             iCursorIndex--;
             iNumChars--;
-            for(short iCopy = iCursorIndex; iCopy < iNumChars; iCopy++) {
+            for (short iCopy = iCursorIndex; iCopy < iNumChars; iCopy++) {
                 szValue[iCopy] = szValue[iCopy + 1];
             }
             szValue[iNumChars] = 0;
@@ -1658,7 +1658,7 @@ MenuCodeEnum MI_TextField::SendInput(CPlayerInput * playerInput)
         }
     } else if(key == SDLK_DELETE) {
         if(iCursorIndex < iNumChars) {
-            for(short iCopy = iCursorIndex; iCopy < iNumChars; iCopy++) {
+            for (short iCopy = iCursorIndex; iCopy < iNumChars; iCopy++) {
                 szValue[iCopy] = szValue[iCopy + 1];
             }
 
@@ -1736,7 +1736,7 @@ MenuCodeEnum MI_TextField::MouseClick(short iMouseX, short iMouseY)
         short iPixelCount = 0;
         char szChar[2];
         szChar[1] = 0;
-        for(short iChar = 0; iChar < iNumChars; iChar++) {
+        for (short iChar = 0; iChar < iNumChars; iChar++) {
             szChar[0] = szValue[iChar];
             iPixelCount += rm->menu_font_large.getWidth(szChar);
 
@@ -1891,7 +1891,7 @@ MenuCodeEnum MI_MapField::SendInput(CPlayerInput * playerInput)
     }
     */
 
-    for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
         if(playerInput->outputControls[iPlayer].menu_right.fPressed || playerInput->outputControls[iPlayer].menu_down.fPressed) {
             if(MoveNext(playerInput->outputControls[iPlayer].menu_scrollfast.fDown))
                 return MENU_CODE_MAP_CHANGED;
@@ -2027,7 +2027,7 @@ void MI_MapField::Draw()
     g_map->drawPlatforms(rectDst.x, rectDst.y, 1);
 
     //Draw map hazards
-    for(short i = 0; i < objectcontainer[1].list_end; i++) {
+    for (short i = 0; i < objectcontainer[1].list_end; i++) {
         CObject * object = objectcontainer[1].list[i];
         ObjectType type = object->getObjectType();
 
@@ -2163,7 +2163,7 @@ bool MI_MapField::Move(bool fNext, bool fScrollFast)
         numadvance = 10;
 
     short iOldIndex = maplist->GetCurrent()->second->iIndex;
-    for(int k = 0; k < numadvance; k++) {
+    for (int k = 0; k < numadvance; k++) {
         if(fNext)
             maplist->next(true);
         else

@@ -76,8 +76,8 @@ void collisionhandler_o2o(IO_MovingObject * o1, IO_MovingObject * o2)
 //Must only be called after organizeteams() is called
 short LookupTeamID(short id, short * teamID, short * subTeamID)
 {
-    for(short i = 0; i < score_cnt; i++) {
-        for(short j = 0; j < game_values.teamcounts[i]; j++) {
+    for (short i = 0; i < score_cnt; i++) {
+        for (short j = 0; j < game_values.teamcounts[i]; j++) {
             if(game_values.teamids[i][j] == id) {
                 if(teamID)
                     *teamID = i;
@@ -106,7 +106,7 @@ short LookupTeamID(short id)
 
 CPlayer * GetPlayerFromGlobalID(short iGlobalID)
 {
-    for(short i = 0; i < list_players_cnt; i++) {
+    for (short i = 0; i < list_players_cnt; i++) {
         if(list_players[i]->globalID == iGlobalID)
             return list_players[i];
     }
@@ -203,7 +203,7 @@ void GameplayState::SpinScreen()
 void GameplayState::createPlayers()
 {
     //Create players for this game
-    for(short iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (short iPlayer = 0; iPlayer < 4; iPlayer++) {
         projectiles[iPlayer] = 0;
         respawnCount[iPlayer] = 0;
 
@@ -240,16 +240,16 @@ void GameplayState::initScoreDisplayPosition()
 {
     short i;
     short totalspace = 0;
-    for(i = 0; i < score_cnt; i++) {
+    for (i = 0; i < score_cnt; i++) {
         totalspace += 56 + game_values.teamcounts[i] * 34;
     }
     totalspace += 20 * (score_cnt - 1);
 
-    for(i = 0; i < score_cnt; i++) {
+    for (i = 0; i < score_cnt; i++) {
         if(game_values.scoreboardstyle == 0 || game_values.scoreboardstyle == 1) {
             score[i]->x = ((smw->ScreenWidth - totalspace) >> 1);
 
-            for(short k = 0; k < i; k++)
+            for (short k = 0; k < i; k++)
                 score[i]->x += 76 + game_values.teamcounts[k] * 34;
 
             short iScoreOffsetY = 0;
@@ -276,10 +276,10 @@ void GameplayState::initScoreDisplayPosition()
 void GameplayState::initEyeCandy()
 {
     short i;
-    for(short iEyeCandyLayer = 0; iEyeCandyLayer < 3; iEyeCandyLayer++) {
+    for (short iEyeCandyLayer = 0; iEyeCandyLayer < 3; iEyeCandyLayer++) {
         //Clouds
         if(g_map->eyecandy[iEyeCandyLayer] & 1) {
-            for(i = 0; i < 4; i++) {
+            for (i = 0; i < 4; i++) {
                 float velx;         //speed of cloud, small clouds are slower than big ones
                 short srcy, w, h;
 
@@ -304,7 +304,7 @@ void GameplayState::initEyeCandy()
 
         //Ghosts
         if(g_map->eyecandy[iEyeCandyLayer] & 2) {
-            for(i = 0; i < 8; i++) {
+            for (i = 0; i < 8; i++) {
                 short iGhostSrcY = (short)(RNGMAX(3)) << 5; //ghost type
                 float velx = (short)(RNGMAX(51) - 25) / 10.0f;  //big clouds: -3 - +3 pixel/frame
 
@@ -317,13 +317,13 @@ void GameplayState::initEyeCandy()
 
         //Leaves
         if(g_map->eyecandy[iEyeCandyLayer] & 4) {
-            for(i = 0; i < 15; i++)
+            for (i = 0; i < 15; i++)
                 eyecandy[iEyeCandyLayer].add(new EC_Leaf(&rm->spr_leaves, (float)(RNGMAX(smw->ScreenWidth)), (float)RNGMAX(smw->ScreenHeight)));
         }
 
         //Snow
         if(g_map->eyecandy[iEyeCandyLayer] & 8) {
-            for(i = 0; i < 15; i++)
+            for (i = 0; i < 15; i++)
                 eyecandy[iEyeCandyLayer].add(new EC_Snow(&rm->spr_snow, (float)(RNGMAX(smw->ScreenWidth)), (float)RNGMAX(smw->ScreenHeight), 0));
         }
 
@@ -331,7 +331,7 @@ void GameplayState::initEyeCandy()
         short iFishWeights[] = {20, 20, 15, 10, 10, 5, 10, 10};
         short iFishSettings[][4] = { {0, 0, 64, 44}, {0, 44, 64, 44}, {0, 44, 48, 44}, {32, 32, 16, 12}, {32, 44, 16, 12}, {32, 16, 16, 28}, {32, 0, 32, 28}, {32, 44, 32, 28}};
         if(g_map->eyecandy[iEyeCandyLayer] & 16) {
-            for(i = 0; i < 8; i++) {
+            for (i = 0; i < 8; i++) {
                 float velx = (short)(RNGMAX(41) - 20) / 10.0f;
                 velx = velx < 0.5f && velx > -0.5f ? 1.0f : velx; //Keep fish from moving too slowly
 
@@ -340,7 +340,7 @@ void GameplayState::initEyeCandy()
                 short iRandomFish = RNGMAX(100);
 
                 short iFishWeightCount = 0;
-                for(short iFish = 0; iFish < 8; iFish++) {
+                for (short iFish = 0; iFish < 8; iFish++) {
                     iFishWeightCount += iFishWeights[iFish];
 
                     if(iRandomFish < iFishWeightCount) {
@@ -361,13 +361,13 @@ void GameplayState::initEyeCandy()
 
         //Rain
         if(g_map->eyecandy[iEyeCandyLayer] & 32) {
-            for(i = 0; i < 20; i++)
+            for (i = 0; i < 20; i++)
                 eyecandy[iEyeCandyLayer].add(new EC_Rain(&rm->spr_rain, (float)(RNGMAX(smw->ScreenWidth)), RNGMAX(smw->ScreenHeight)));
         }
 
         //Bubbles
         if(g_map->eyecandy[iEyeCandyLayer] & 64) {
-            for(i = 0; i < 10; i++)
+            for (i = 0; i < 10; i++)
                 eyecandy[iEyeCandyLayer].add(new EC_Bubble(&rm->spr_rain, (float)(RNGMAX(smw->ScreenWidth)), RNGMAX(smw->ScreenHeight)));
         }
     }
@@ -414,7 +414,7 @@ void initGameplaySettings()
 void resetSecretCounters()
 {
     //Reset Secret Counters
-    for(short iPlayer = 0; iPlayer < 4; iPlayer++)
+    for (short iPlayer = 0; iPlayer < 4; iPlayer++)
         game_values.unlocksecret1part1[iPlayer] = false;
 
     game_values.unlocksecret1part2 = 0;
@@ -463,13 +463,13 @@ short CountAliveTeams(short * lastteam)
     short findlastteam = 0;
 
     bool teamalive[4] = {false, false, false, false};
-    for(short k = 0; k < list_players_cnt; k++) {
+    for (short k = 0; k < list_players_cnt; k++) {
         if(!list_players[k]->isdead())
             teamalive[list_players[k]->teamID] = true;
     }
 
     short numteams = 0;
-    for(short k = 0; k < 4; k++) {
+    for (short k = 0; k < 4; k++) {
         if(teamalive[k]) {
             findlastteam = k;
             numteams++;
@@ -490,7 +490,7 @@ void GameplayState::CleanDeadPlayers()
 {
     bool fCheckForGameOver = false;
 
-    for(short i = 0; i < list_players_cnt; i++) {
+    for (short i = 0; i < list_players_cnt; i++) {
         if(list_players[i]->state == player_dead) {
             fCheckForGameOver = true;
 
@@ -508,7 +508,7 @@ void GameplayState::CleanDeadPlayers()
 
             delete list_players[i];
 
-            for(short j = i; j < list_players_cnt - 1; j++) {
+            for (short j = i; j < list_players_cnt - 1; j++) {
                 list_players[j] = list_players[j + 1];
                 list_players[j]->localID = j;
             }
@@ -607,7 +607,7 @@ void shakeScreen()
 
         CPlayer * killer1 = GetPlayerFromGlobalID(game_values.screenshakeplayerid);
 
-        for(short k = 0; k < list_players_cnt; k++) {
+        for (short k = 0; k < list_players_cnt; k++) {
             CPlayer * player = list_players[k];
 
             //Don't kill the player that triggered the POW/MOd
@@ -636,7 +636,7 @@ void shakeScreen()
         //Randomize the order in which the players are killed (so that game modes where order matters is fair)
         if(iNumKillPlayers > 0) {
             short iRandPlayer = RNGMAX( iNumKillPlayers);
-            for(short iPlayer = 0; iPlayer < iNumKillPlayers; iPlayer++) {
+            for (short iPlayer = 0; iPlayer < iNumKillPlayers; iPlayer++) {
                 PlayerKilledPlayer(game_values.screenshakeplayerid, pKillPlayers[iRandPlayer], death_style_jump, kill_style_pow, false, false);
 
                 if(++iRandPlayer >= iNumKillPlayers)
@@ -645,7 +645,7 @@ void shakeScreen()
         }
 
         //Kill goombas and koopas
-        for(short k = 0; k < objectcontainer[0].list_end; k++) {
+        for (short k = 0; k < objectcontainer[0].list_end; k++) {
             CObject * object = objectcontainer[0].list[k];
             if(object->getObjectType() == object_moving) {
                 IO_MovingObject * movingobject = (IO_MovingObject *)object;
@@ -672,7 +672,7 @@ void shakeScreen()
         }
 
         //Destroy throw blocks and flip shells over
-        for(short k = 0; k < objectcontainer[1].list_end; k++) {
+        for (short k = 0; k < objectcontainer[1].list_end; k++) {
             CObject * object = objectcontainer[1].list[k];
             if(object->getObjectType() == object_moving) {
                 IO_MovingObject * movingobject = (IO_MovingObject *)object;
@@ -720,10 +720,10 @@ void handleP2PCollisions()
 {
     //Player to player collisions
     short i, j;
-    for(i = 0; i < list_players_cnt; i++) {
+    for (i = 0; i < list_players_cnt; i++) {
         CPlayer * player1 = list_players[i];
         if(player1->state > player_dead) {
-            for(j = i + 1; j < list_players_cnt; j++) {
+            for (j = i + 1; j < list_players_cnt; j++) {
                 CPlayer * player2 = list_players[j];
                 if(player2->state > player_dead) {
                     if(coldec_player2player(player1, player2)) {
@@ -742,14 +742,14 @@ void handleP2PCollisions()
 void handleP2ObjCollisions()
 {
     //Collide player with objects
-    for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
+    for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
         CPlayer * player = list_players[iPlayer];
         if(player->state != player_ready)
             continue;
 
         //Collide with objects
-        for(short iLayer = 0; iLayer < 3; iLayer++) {
-            for(short iObject = 0; iObject < objectcontainer[iLayer].list_end; iObject++) {
+        for (short iLayer = 0; iLayer < 3; iLayer++) {
+            for (short iObject = 0; iObject < objectcontainer[iLayer].list_end; iObject++) {
                 CObject * object = objectcontainer[iLayer].list[iObject];
 
                 if(!object->GetDead()) {
@@ -773,9 +773,9 @@ void handleP2ObjCollisions()
 
 void handleObj2ObjCollisions()
 {
-    for(short iLayer1 = 0; iLayer1 < 3; iLayer1++) {
+    for (short iLayer1 = 0; iLayer1 < 3; iLayer1++) {
         short iContainerEnd1 = objectcontainer[iLayer1].list_end;
-        for(short iObject1 = 0; iObject1 < iContainerEnd1; iObject1++) {
+        for (short iObject1 = 0; iObject1 < iContainerEnd1; iObject1++) {
             CObject * object1 = objectcontainer[iLayer1].list[iObject1];
 
             if(object1->getObjectType() != object_moving)
@@ -783,9 +783,9 @@ void handleObj2ObjCollisions()
 
             IO_MovingObject * movingobject1 = (IO_MovingObject*)object1;
 
-            for(short iLayer2 = iLayer1; iLayer2 < 3; iLayer2++) {
+            for (short iLayer2 = iLayer1; iLayer2 < 3; iLayer2++) {
                 short iContainerEnd2 = objectcontainer[iLayer2].list_end;
-                for(short iObject2 = (iLayer1 == iLayer2 ? iObject1 + 1 : 0); iObject2 < iContainerEnd2; iObject2++) {
+                for (short iObject2 = (iLayer1 == iLayer2 ? iObject1 + 1 : 0); iObject2 < iContainerEnd2; iObject2++) {
                     CObject * object2 = objectcontainer[iLayer2].list[iObject2];
 
                     if(object2->getObjectType() != object_moving)
@@ -833,7 +833,7 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
         if(fReverseScoring)
             highestScore = 32000;
 
-        for(i = 0; i < score_cnt; i++) {
+        for (i = 0; i < score_cnt; i++) {
             int scoreValue = score[i]->score;
             if(game_values.gamemode->gamemode == game_mode_boxes_minigame)
                 scoreValue = score[i]->subscore[0];
@@ -863,13 +863,13 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
         }
 
         //in game scoreboards
-        for(i = 0; i < score_cnt; i++) {
+        for (i = 0; i < score_cnt; i++) {
             if(game_values.gamemode->gamemode == game_mode_health || game_values.gamemode->gamemode == game_mode_collection || game_values.gamemode->gamemode == game_mode_boxes_minigame)
                 rm->spr_shade[game_values.teamcounts[i] - 1].draw(score[i]->x, score[i]->y);
             else
                 rm->spr_shade[game_values.teamcounts[i] - 1].draw(score[i]->x, score[i]->y, 0, 0, 256, 41);
 
-            for(short k = 0; k < game_values.teamcounts[i]; k++) {
+            for (short k = 0; k < game_values.teamcounts[i]; k++) {
                 short globalID = game_values.teamids[i][k];
 
                 //If player is respawning, draw an animated egg counter
@@ -945,14 +945,14 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
                 short iMax = score[i]->subscore[1];
                 short iHeartX = score[i]->x + scorepowerupoffsets[game_values.teamcounts[i] - 1][0] - 32;
 
-                for(short iHeart = 0; iHeart < iLife; iHeart++) {
+                for (short iHeart = 0; iHeart < iLife; iHeart++) {
                     if(iHeart == iMax - 1 && iHeart % 2 == 0)
                         rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, 32, 0, 8, 16);
                     else
                         rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, iHeart % 2 ? 8 : 0, 0, 8, 16);
                 }
 
-                for(short iHeart = iLife; iHeart < iMax; iHeart++) {
+                for (short iHeart = iLife; iHeart < iMax; iHeart++) {
                     if(iHeart == iMax - 1 && iHeart % 2 == 0)
                         rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, 40, 0, 8, 16);
                     else
@@ -965,7 +965,7 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
                     short iCardValues = score[i]->subscore[1];
                     short iCardX = score[i]->x + scorepowerupoffsets[game_values.teamcounts[i] - 1][0] - 20;
 
-                    for(short iCard = 0; iCard < iNumCards; iCard++) {
+                    for (short iCard = 0; iCard < iNumCards; iCard++) {
                         rm->spr_scorecards.draw(iCardX + iCard * 20, score[i]->y + 43, (iCardValues & 3) << 4, 0, 16, 16);
                         iCardValues >>= 2;
                     }
@@ -976,11 +976,11 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
                 short iCoinX = score[i]->x + scorepowerupoffsets[game_values.teamcounts[i] - 1][0] - 32;
 
                 short iCoin = 0;
-                for(; iCoin < iNumCoins; iCoin++) {
+                for (; iCoin < iNumCoins; iCoin++) {
                     rm->spr_scorecoins.draw(iCoinX + iCoin * 16, score[i]->y + 43, 0, 0, 16, 16);
                 }
 
-                for(short iEmptyCoin = iCoin; iEmptyCoin < 5; iEmptyCoin++) {
+                for (short iEmptyCoin = iCoin; iEmptyCoin < 5; iEmptyCoin++) {
                     rm->spr_scorecoins.draw(iCoinX + iEmptyCoin * 16, score[i]->y + 43, 16, 0, 16, 16);
                 }
             }
@@ -1054,7 +1054,7 @@ void GameplayState::drawPlayerSwap()
 {
     short i;
     if(game_values.swapplayers) {
-        for(i = 0; i < list_players_cnt; i++) {
+        for (i = 0; i < list_players_cnt; i++) {
             list_players[i]->drawswap();
 
             short storedpowerupid = game_values.gamepowerups[list_players[i]->getGlobalID()];
@@ -1096,7 +1096,7 @@ void GameplayState::drawPlayerSwap()
             ifSoundOnPlay(sfx_transform);
 
             if(game_values.swapstyle == 1) {
-                for(i = 0; i < list_players_cnt; i++)
+                for (i = 0; i < list_players_cnt; i++)
                     eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, list_players[i]->ix + (HALFPW) - 16, list_players[i]->iy + (HALFPH) - 16, 3, 8));
             }
         }
@@ -1123,7 +1123,7 @@ void GameplayState::drawMiddleLayer()
     g_map->drawPlatforms(1);
 
     if(!game_values.swapplayers) {
-        for(short i = 0; i < list_players_cnt; i++)
+        for (short i = 0; i < list_players_cnt; i++)
             list_players[i]->draw();
     }
 
@@ -1174,7 +1174,7 @@ void GameplayState::drawEverything(short iCountDownState, short iScoreTextOffset
     }
 
     //draw arrows for being above the top of the screen
-    for(short i = 0; i < list_players_cnt; i++)
+    for (short i = 0; i < list_players_cnt; i++)
         list_players[i]->drawarrows();
 
     //Draw countdown start timer
@@ -1233,7 +1233,7 @@ bool IsExitAllowed()
     if(!game_values.noexit || list_players_cnt == 0)
         return true;
 
-    for(int iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
+    for (int iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
         if(game_values.playercontrol[list_players[iPlayer]->getGlobalID()] == 1)
             return false;
     }
@@ -1255,12 +1255,12 @@ void UpdateScoreBoard()
         }
 
         //Add up all the winnings so far and determine overall place in the standings
-        for(short iScore = 0; iScore < score_cnt; iScore++)
+        for (short iScore = 0; iScore < score_cnt; iScore++)
             game_values.tournament_scores[iScore].wins = 0;
 
         //Assign the order that players will show up on the scoreboard (ordered by score)
-        for(short iMyScore = 0; iMyScore < score_cnt; iMyScore++) {
-            for(short iTheirScore = 0; iTheirScore < score_cnt; iTheirScore++) {
+        for (short iMyScore = 0; iMyScore < score_cnt; iMyScore++) {
+            for (short iTheirScore = 0; iTheirScore < score_cnt; iTheirScore++) {
                 if(game_values.tournament_scores[iMyScore].total > game_values.tournament_scores[iTheirScore].total) {
                     game_values.tournament_scores[iTheirScore].wins++;
                 }
@@ -1270,8 +1270,8 @@ void UpdateScoreBoard()
         //Give players the item bonuses that were won
         TourStop * tourStop = game_values.tourstops[game_values.tourstopcurrent];
 
-        for(short iScore = 0; iScore < score_cnt; iScore++) {
-            for(short iBonus = 0; iBonus < tourStop->iNumBonuses; iBonus++) {
+        for (short iScore = 0; iScore < score_cnt; iScore++) {
+            for (short iBonus = 0; iBonus < tourStop->iNumBonuses; iBonus++) {
                 if(tourStop->wsbBonuses[iBonus].iWinnerPlace == score[iScore]->place) {
                     if(game_values.worldpowerupcount[iScore] < 32)
                         game_values.worldpowerups[iScore][game_values.worldpowerupcount[iScore]++] = tourStop->wsbBonuses[iBonus].iBonus;
@@ -1282,7 +1282,7 @@ void UpdateScoreBoard()
         }
 
         //Add powerups to player's world item inventory that they held at the end of the game
-        for(short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
+        for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
             if(game_values.gamepowerups[iPlayer] != -1) {
                 short iTeamId = LookupTeamID(iPlayer);
                 if(game_values.worldpowerupcount[iTeamId] < 32)
@@ -1295,23 +1295,23 @@ void UpdateScoreBoard()
             return;
 
         //For this game, set the player's place as the type of win
-        for(short iScore = 0; iScore < score_cnt; iScore++) {
+        for (short iScore = 0; iScore < score_cnt; iScore++) {
             game_values.tournament_scores[iScore].type[game_values.tourstopcurrent] = score[iScore]->place;
         }
 
         //Add up all the winnings so far and determine overall place in tour
-        for(short iScore = 0; iScore < score_cnt; iScore++) {
+        for (short iScore = 0; iScore < score_cnt; iScore++) {
             game_values.tournament_scores[iScore].total = 0;
 
-            for(short iTourStop = 0; iTourStop <= game_values.tourstopcurrent; iTourStop++) {
+            for (short iTourStop = 0; iTourStop <= game_values.tourstopcurrent; iTourStop++) {
                 game_values.tournament_scores[iScore].total += (3 - game_values.tournament_scores[iScore].type[iTourStop]) * game_values.tourstops[iTourStop]->iPoints;
             }
 
             game_values.tournament_scores[iScore].wins = 0;
         }
 
-        for(short iMyScore = 0; iMyScore < score_cnt; iMyScore++) {
-            for(short iTheirScore = 0; iTheirScore < score_cnt; iTheirScore++) {
+        for (short iMyScore = 0; iMyScore < score_cnt; iMyScore++) {
+            for (short iTheirScore = 0; iTheirScore < score_cnt; iTheirScore++) {
                 if(game_values.tournament_scores[iMyScore].total > game_values.tournament_scores[iTheirScore].total) {
                     game_values.tournament_scores[iTheirScore].wins++;
                 }
@@ -1324,7 +1324,7 @@ void UpdateScoreBoard()
             short iWinningTeam = -2;  //Set winning team to -2 to signify a tie between teams
             short iWinningScore = 0;
 
-            for(short iScore = 0; iScore < score_cnt; iScore++) {
+            for (short iScore = 0; iScore < score_cnt; iScore++) {
                 if(game_values.tournament_scores[iScore].total > iWinningScore) { //New winner found
                     iWinningTeam = iScore;
                     iWinningScore = game_values.tournament_scores[iScore].total;
@@ -1340,7 +1340,7 @@ void UpdateScoreBoard()
         short maxScore = -1;  //Max score for game
         short maxTeam = -1;  //Team ID with the max score -> reset to -1 if two teams tied for win
 
-        for(short i = 0; i < score_cnt; i++) {
+        for (short i = 0; i < score_cnt; i++) {
             if(score[i]->score > maxScore) {
                 maxScore = score[i]->score;
                 maxTeam = i;
@@ -1367,12 +1367,12 @@ void LoadMapObjects(bool fPreview)
     LoadMapHazards(fPreview);
 
     //Clear all the previous switch settings
-    for(short iSwitch = 0; iSwitch < 8; iSwitch++)
+    for (short iSwitch = 0; iSwitch < 8; iSwitch++)
         g_map->switchBlocks[iSwitch].clear();
 
     //Add blocks (breakable, note, switch, throwable, etc)
-    for(short x = 0; x < MAPWIDTH; x++) {
-        for(short y = 0; y < MAPHEIGHT; y++) {
+    for (short x = 0; x < MAPWIDTH; x++) {
+        for (short y = 0; y < MAPHEIGHT; y++) {
             short iType = g_map->objectdata[x][y].iType;
             if(iType == 0) {
                 g_map->blockdata[x][y] = new B_BreakableBlock(&rm->spr_breakableblock, x << 5, y << 5, 4, 10);
@@ -1431,24 +1431,24 @@ void LoadMapObjects(bool fPreview)
     //Scan for throw box objects and add items to them if approprate
     //Add special coins to them for the boxes minigame
     short iCountWeight = 0;
-    for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
+    for (short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
         iCountWeight += game_values.powerupweights[iPowerup];
 
     short iThrowBoxCount = 0;
     bool * fBoxHasCoin = NULL;
 
     if(game_values.gamemode->gamemode == game_mode_boxes_minigame) {
-        for(short iItem = 0; iItem < g_map->iNumMapItems; iItem++) {
+        for (short iItem = 0; iItem < g_map->iNumMapItems; iItem++) {
             if(g_map->mapitems[iItem].itype == 5)
                 iThrowBoxCount++;
         }
 
         fBoxHasCoin = new bool[iThrowBoxCount];
-        for(short iItem = 0; iItem < iThrowBoxCount; iItem++)
+        for (short iItem = 0; iItem < iThrowBoxCount; iItem++)
             fBoxHasCoin[iItem] = false;
 
         //Randomly choose boxes to put 5 coins in
-        for(short iItem = 0; iItem < 5 && iItem < iThrowBoxCount; iItem++) {
+        for (short iItem = 0; iItem < 5 && iItem < iThrowBoxCount; iItem++) {
             short iBoxIndex = RNGMAX(iThrowBoxCount);
 
             while(fBoxHasCoin[iBoxIndex]) {
@@ -1461,14 +1461,14 @@ void LoadMapObjects(bool fPreview)
 
         //If map has less than 5 boxes, then insert coins into map in random locations
         short iExtraCoinsNeeded = 5 - iThrowBoxCount;
-        for(short iExtraCoin = 0; iExtraCoin < iExtraCoinsNeeded; iExtraCoin++) {
+        for (short iExtraCoin = 0; iExtraCoin < iExtraCoinsNeeded; iExtraCoin++) {
             objectcontainer[1].add(new MO_Coin(&rm->spr_coin, 0.0f, 0.0f, 0, 0, 2, -1, 2, 0, true));
         }
     }
 
     //Add map objects like springs, shoes and spikes
     short iAddThrowBoxIndex = 0;
-    for(short i = 0; i < g_map->iNumMapItems; i++) {
+    for (short i = 0; i < g_map->iNumMapItems; i++) {
         MapItem * mapItem = &g_map->mapitems[i];
         short iType = mapItem->itype;
         short ix = mapItem->ix << 5;
@@ -1529,7 +1529,7 @@ void CleanUp()
 {
     short i;
     //delete object list
-    for(i = 0; i < list_players_cnt; i++) {
+    for (i = 0; i < list_players_cnt; i++) {
         delete list_players[i];
     }
     list_players_cnt = 0;
@@ -1570,7 +1570,7 @@ bool updateExitPause(short iCountDownState) // true on exit
             }
         }
 
-        for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
+        for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
             COutputControl * playerKeys = &game_values.playerInput.outputControls[iPlayer];
 
             //If the start key is pressed (pause key)
@@ -1672,7 +1672,7 @@ void updateScoreboardAnimation() // scrolling to center at the end of game
             game_values.scorepercentmove = 1.0f;
         }
 
-        for(short i = 0; i < score_cnt; i++) {
+        for (short i = 0; i < score_cnt; i++) {
             score[i]->x = (short)((float)(score[i]->destx - score[i]->fromx) * game_values.scorepercentmove) + score[i]->fromx;
             score[i]->y = (short)((float)(score[i]->desty - score[i]->fromy) * game_values.scorepercentmove) + score[i]->fromy;
         }
@@ -1808,7 +1808,7 @@ void GameplayState::onEnterState()
 
 void GameplayState::update()
 {
-    for(short iTeam = 0; iTeam < score_cnt; iTeam++) {
+    for (short iTeam = 0; iTeam < score_cnt; iTeam++) {
         iScoreTextOffset[iTeam] = 34 * game_values.teamcounts[iTeam] + 1;
     }
 
@@ -1818,7 +1818,7 @@ void GameplayState::update()
     game_values.gamewindx = (float)((RNGMAX(41)) - 20) / 4.0f;
 
     //Initialize players after game init has finished
-    for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++)
+    for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++)
         list_players[iPlayer]->Init();
 
     if (netplay.active) {
@@ -1849,7 +1849,7 @@ void GameplayState::update()
 
     static short endgametimer = (short)(RNGMAX(200));
     if(g_fAutoTest && !game_values.swapplayers) {
-        for(short k = 0; k < list_players_cnt; k++) {
+        for (short k = 0; k < list_players_cnt; k++) {
             if(list_players[k]->isready()) {
                 //Detect player is in center of tile only
                 short x = (list_players[k]->ix + HALFPW) / TILESIZE;
@@ -1906,8 +1906,8 @@ void GameplayState::update()
                 corners[1][0] = list_players[k]->iy / TILESIZE;
                 corners[1][1] = (list_players[k]->iy + PH) / TILESIZE;
 
-                for(short i = 0; i < 2; i++) {
-                    for(short j = 0; j < 2; j++) {
+                for (short i = 0; i < 2; i++) {
+                    for (short j = 0; j < 2; j++) {
                         int tile = tile_flag_nonsolid;
                         IO_Block * block = NULL;
                         short blocktype = -1;
@@ -2036,7 +2036,7 @@ void GameplayState::update()
             } else if(event.key.keysym.sym == SDLK_F5) {
                 game_values.autokill = !game_values.autokill;
             } else if(event.key.keysym.sym == SDLK_z) {
-                for(short k = 0; k < list_players_cnt; k++) {
+                for (short k = 0; k < list_players_cnt; k++) {
                     list_players[k]->DeathAwards();
 
                     if(game_values.gamemode->playerkilledself(*(list_players[k]), kill_style_environment) == player_kill_normal)
@@ -2180,7 +2180,7 @@ void GameplayState::update()
                     SpinScreen();
                 }
 
-                for(short iPlayer = 0; iPlayer < 4; iPlayer++) {
+                for (short iPlayer = 0; iPlayer < 4; iPlayer++) {
                     if(game_values.bulletbilltimer[iPlayer] > 0) {
                         game_values.bulletbilltimer[iPlayer]--;
 
@@ -2202,7 +2202,7 @@ void GameplayState::update()
 
 #ifdef _DEBUG
                 if(game_values.autokill) {
-                    for(short k = 0; k < list_players_cnt; k++) {
+                    for (short k = 0; k < list_players_cnt; k++) {
                         list_players[k]->DeathAwards();
 
                         if(!game_values.gamemode->playerkilledself(*(list_players[k]), kill_style_environment))
@@ -2224,7 +2224,7 @@ void GameplayState::update()
                 game_values.playinvinciblesound = false;
                 game_values.playflyingsound = false;
 
-                for(i = 0; i < list_players_cnt; i++)
+                for (i = 0; i < list_players_cnt; i++)
                     list_players[i]->move();    //move all objects before doing object-object collision detection in
                 //->think(), so we test against the new position after object-map collision detection
 
@@ -2243,7 +2243,7 @@ void GameplayState::update()
 
                 //Commit all player actions at this point (after we have collided with any objects
                 //that the player might have picked up)
-                for(i = 0; i < list_players_cnt; i++)
+                for (i = 0; i < list_players_cnt; i++)
                     list_players[i]->CommitAction();
 
                 cleanDeadNonPlayerObjects();
@@ -2271,7 +2271,7 @@ void GameplayState::update()
 SWAPBREAK:
 
         if(game_values.swapplayers) {
-            for(i = 0; i < list_players_cnt; i++) {
+            for (i = 0; i < list_players_cnt; i++) {
                 list_players[i]->updateswap();
             }
         }
@@ -2362,7 +2362,7 @@ bool SwapPlayers(short iUsingPlayerID)
 {
     //Count available players to switch with
     short iNumAvailablePlayers = 0;
-    for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
+    for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
         if(list_players[iPlayer]->isready()) {
             iNumAvailablePlayers++;
             list_players[iPlayer]->fOldSwapX = list_players[iPlayer]->ix;
@@ -2391,7 +2391,7 @@ bool SwapPlayers(short iUsingPlayerID)
     short iIncrement = RNGMAX (iNumAvailablePlayers - 1);
 
     MysteryMushroomTempPlayer spots[4];
-    for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
+    for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
         if(!list_players[iPlayer]->isready())
             continue;
 
@@ -2412,7 +2412,7 @@ bool SwapPlayers(short iUsingPlayerID)
         }
     }
 
-    for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
+    for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
         if(!list_players[iPlayer]->isready())
             continue;
 
@@ -2452,7 +2452,7 @@ void UpdateMusicWithOverrides()
 
         //Chop off line ending
         int stringLength = strlen(szBuffer);
-        for(short k = 0; k < stringLength; k++) {
+        for (short k = 0; k < stringLength; k++) {
             if(szBuffer[k] == '\r' || szBuffer[k] == '\n') {
                 szBuffer[k] = '\0';
                 break;

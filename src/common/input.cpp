@@ -3,8 +3,8 @@
 
 CPlayerInput::CPlayerInput()
 {
-    for(int iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
-        for(int iKey = 0; iKey < NUM_KEYS; iKey++) {
+    for (int iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
+        for (int iKey = 0; iKey < NUM_KEYS; iKey++) {
 			outputControls[iPlayer].keys[iKey].fPressed = false;
 			outputControls[iPlayer].keys[iKey].fDown = false;
 		}
@@ -19,11 +19,11 @@ void CPlayerInput::CheckIfMouseUsed()
 {
 #ifndef _XBOX
 
-    for(short iGameState = 0; iGameState < 2; iGameState++) {
-        for(short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
+    for (short iGameState = 0; iGameState < 2; iGameState++) {
+        for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
 			CInputControl * inputControl = &inputControls[iPlayer]->inputGameControls[iGameState];
 
-            for(short iKey = 0; iKey < NUM_KEYS; iKey++) {
+            for (short iKey = 0; iKey < NUM_KEYS; iKey++) {
 				SDL_KEYTYPE iInputKey = inputControl->keys[iKey];
 
 				//Need to reset analog mouse and joystick because there isn't a no longer moving event
@@ -45,11 +45,11 @@ void CPlayerInput::CheckIfMouseUsed()
 //Clear old button pushed states
 void CPlayerInput::ClearPressedKeys(short iGameState)
 {
-    for(int iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
+    for (int iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
 		CInputControl * inputControl = &inputControls[iPlayer]->inputGameControls[iGameState];
 		COutputControl * outputControl = &outputControls[iPlayer];
 
-        for(int iKey = 0; iKey < NUM_KEYS; iKey++) {
+        for (int iKey = 0; iKey < NUM_KEYS; iKey++) {
 			outputControl->keys[iKey].fPressed = false;
 
 #ifndef _XBOX
@@ -78,8 +78,8 @@ void CPlayerInput::ClearPressedKeys(short iGameState)
 //Call this when switching from menu to game
 void CPlayerInput::ResetKeys()
 {
-    for(int iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
-        for(int iKey = 0; iKey < NUM_KEYS; iKey++) {
+    for (int iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
+        for (int iKey = 0; iKey < NUM_KEYS; iKey++) {
 			outputControls[iPlayer].keys[iKey].fPressed = false;
 			outputControls[iPlayer].keys[iKey].fDown = false;
 		}
@@ -95,7 +95,7 @@ void CPlayerInput::ResetKeys()
 void CPlayerInput::Update(SDL_Event event, short iGameState)
 {
 	bool fFound = false;
-    for(short iPlayer = -1; iPlayer < MAX_PLAYERS; iPlayer++) {
+    for (short iPlayer = -1; iPlayer < MAX_PLAYERS; iPlayer++) {
 		CInputControl * inputControl;
 		COutputControl * outputControl;
 		short iPlayerID = iPlayer;
@@ -122,7 +122,7 @@ void CPlayerInput::Update(SDL_Event event, short iGameState)
 
         if(iDeviceID == DEVICE_KEYBOARD) {
             if(SDL_KEYDOWN == event.type) {
-                for(int iKey = 0; iKey < NUM_KEYS && !fFound; iKey++) {
+                for (int iKey = 0; iKey < NUM_KEYS && !fFound; iKey++) {
                     if(inputControl->keys[iKey] == event.key.keysym.sym) {
 						fFound = true;
 
@@ -139,7 +139,7 @@ void CPlayerInput::Update(SDL_Event event, short iGameState)
 
 				iPressedKey = (SDL_KEYTYPE)event.key.keysym.sym;
             } else if(SDL_KEYUP == event.type) {
-                for(int iKey = 0; iKey < NUM_KEYS && !fFound; iKey++) {
+                for (int iKey = 0; iKey < NUM_KEYS && !fFound; iKey++) {
                     if(inputControl->keys[iKey] == event.key.keysym.sym) {
 						fFound = true;
 
@@ -151,7 +151,7 @@ void CPlayerInput::Update(SDL_Event event, short iGameState)
 					}
 				}
             } else if(SDL_MOUSEMOTION == event.type) {
-                for(int iKey = 0; iKey < NUM_KEYS && !fFound; iKey++) {
+                for (int iKey = 0; iKey < NUM_KEYS && !fFound; iKey++) {
                     if(inputControl->keys[iKey] >= MOUSE_UP) {
 						if((inputControl->keys[iKey] == MOUSE_UP && event.motion.yrel < -MOUSE_Y_DEAD_ZONE) ||
 							(inputControl->keys[iKey] == MOUSE_DOWN && event.motion.yrel > MOUSE_Y_DEAD_ZONE) ||
@@ -182,7 +182,7 @@ void CPlayerInput::Update(SDL_Event event, short iGameState)
 					}
 				}
             } else if(SDL_MOUSEBUTTONDOWN == event.type) {
-                for(int iKey = 0; iKey < NUM_KEYS && !fFound; iKey++) {
+                for (int iKey = 0; iKey < NUM_KEYS && !fFound; iKey++) {
                     if(inputControl->keys[iKey] == event.button.button + MOUSE_BUTTON_START) {
 						fFound = true;
 
@@ -197,7 +197,7 @@ void CPlayerInput::Update(SDL_Event event, short iGameState)
 					}
 				}
             } else if(SDL_MOUSEBUTTONUP == event.type) {
-                for(int iKey = 0; iKey < NUM_KEYS && !fFound; iKey++) {
+                for (int iKey = 0; iKey < NUM_KEYS && !fFound; iKey++) {
                     if(inputControl->keys[iKey] == event.button.button + MOUSE_BUTTON_START) {
 						fFound = true;
 
@@ -218,7 +218,7 @@ void CPlayerInput::Update(SDL_Event event, short iGameState)
 				if(iDeviceID != event.jhat.which)
 					continue;
 
-                for(int iKey = 0; iKey < NUM_KEYS; iKey++) {
+                for (int iKey = 0; iKey < NUM_KEYS; iKey++) {
                     if(inputControl->keys[iKey] >= JOY_HAT_UP && inputControl->keys[iKey] <= JOY_HAT_RIGHT) {
 						if((inputControl->keys[iKey] == JOY_HAT_UP && (event.jhat.value & SDL_HAT_UP)) ||
 							(inputControl->keys[iKey] == JOY_HAT_DOWN && (event.jhat.value & SDL_HAT_DOWN)) ||
@@ -247,7 +247,7 @@ void CPlayerInput::Update(SDL_Event event, short iGameState)
 				if(iDeviceID != event.jbutton.which)
 					continue;
 
-                for(int iKey = 0; iKey < NUM_KEYS && !fFound; iKey++) {
+                for (int iKey = 0; iKey < NUM_KEYS && !fFound; iKey++) {
                     if(inputControl->keys[iKey] == event.jbutton.button + JOY_BUTTON_START) {
 						fFound = true;
 
@@ -265,7 +265,7 @@ void CPlayerInput::Update(SDL_Event event, short iGameState)
 				if(iDeviceID != event.jbutton.which)
 					continue;
 
-                for(int iKey = 0; iKey < NUM_KEYS && !fFound; iKey++) {
+                for (int iKey = 0; iKey < NUM_KEYS && !fFound; iKey++) {
                     if(inputControl->keys[iKey] == event.jbutton.button + JOY_BUTTON_START) {
 						fFound = true;
 
@@ -280,7 +280,7 @@ void CPlayerInput::Update(SDL_Event event, short iGameState)
 				if(iDeviceID != event.jaxis.which)
 					continue;
 
-                for(int iKey = 0; iKey < NUM_KEYS; iKey++) {
+                for (int iKey = 0; iKey < NUM_KEYS; iKey++) {
 					bool fUseJoystickInput = false;
 					bool fJoystickDown = false;
 

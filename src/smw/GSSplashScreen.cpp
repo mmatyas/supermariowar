@@ -187,12 +187,12 @@ bool SplashScreenState::init()
 //	bool contributorUsed[NUM_CONTRIBUTORS];
 //	int contributorOrder[NUM_CONTRIBUTORS];
 //
-//	for(int k = 0; k < NUM_CONTRIBUTORS; k++)
+//	for (int k = 0; k < NUM_CONTRIBUTORS; k++)
 //	{
 //		contributorUsed[k] = false;
 //	}
 //
-//	for(int k = 0; k < NUM_CONTRIBUTORS; k++)
+//	for (int k = 0; k < NUM_CONTRIBUTORS; k++)
 //	{
 //		int index = RNGMAX(NUM_CONTRIBUTORS);
 //
@@ -259,7 +259,7 @@ void SplashScreenState::update()
         game_values.playerInput.Update(loop_event, 1);
     }
 
-    for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
         if (game_values.playerInput.outputControls[iPlayer].menu_select.fPressed ||
             game_values.playerInput.outputControls[iPlayer].menu_cancel.fPressed ||
             game_values.playerInput.outputControls[iPlayer].menu_random.fPressed) {

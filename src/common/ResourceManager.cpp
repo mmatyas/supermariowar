@@ -20,7 +20,7 @@ void CResourceManager::LoadAllSprites() {
     const char * graphicspack = menugraphicspacklist->current_name();
 
     //Just load menu skins for now (just standing right sprite)
-    for(short k = 0; k < MAX_PLAYERS; k++) {
+    for (short k = 0; k < MAX_PLAYERS; k++) {
         //LoadMenuSkin(k, game_values.skinids[k], game_values.colorids[k], false);
         LoadFullSkin(spr_shyguy[k], convertPath("gfx/packs/modeskins/shyguy.bmp", graphicspack), k);
         LoadFullSkin(spr_chocobo[k], convertPath("gfx/packs/modeskins/chicken.bmp", graphicspack), k);
@@ -345,13 +345,13 @@ void CResourceManager::LoadAllGraphics()
 {
 
     short k, j;
-    for(k = 0; k < MAX_PLAYERS; k++) {
+    for (k = 0; k < MAX_PLAYERS; k++) {
         spr_player[k] = new gfxSprite * [PGFX_LAST];
         spr_shyguy[k] = new gfxSprite * [PGFX_LAST];
         spr_chocobo[k] = new gfxSprite * [PGFX_LAST];
         spr_bobomb[k] = new gfxSprite * [PGFX_LAST];
 
-        for(j = 0; j < PGFX_LAST; j++) {
+        for (j = 0; j < PGFX_LAST; j++) {
             spr_player[k][j] = new gfxSprite();
             spr_shyguy[k][j] = new gfxSprite();
             spr_chocobo[k][j] = new gfxSprite();

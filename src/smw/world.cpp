@@ -191,7 +191,7 @@ void WorldVehicle::Init(short iCol, short iRow, short iAction, short iSprite, sh
         iRectOffsetY = iDrawSprite * tilesize;
     }
 
-    for(short iRect = 0; iRect < 5; iRect++)
+    for (short iRect = 0; iRect < 5; iRect++)
         gfx_setrect(&srcRects[iRect], iRect * tilesize + iRectOffsetX, iRectOffsetY, tilesize, tilesize);
 
     iNumMoves = 0;
@@ -243,7 +243,7 @@ void WorldVehicle::SetNextDest()
     //Can't move through doors or vehicle boundaries
     short iConnections[4];
     short iNumConnections = 0;
-    for(short iDirection = 0; iDirection < 4; iDirection++) {
+    for (short iDirection = 0; iDirection < 4; iDirection++) {
         bool fIsDoor = false;
         if(iDirection == 0)
             fIsDoor = g_worldmap.IsDoor(iCurrentTileX, iCurrentTileY - 1) || (iBoundary != 0 && g_worldmap.GetVehicleBoundary(iCurrentTileX, iCurrentTileY - 1) == iBoundary);
@@ -430,7 +430,7 @@ bool WorldMap::Load(short tilesize)
 
             tiles = new WorldMapTile*[iWidth];
 
-            for(short iCol = 0; iCol < iWidth; iCol++)
+            for (short iCol = 0; iCol < iWidth; iCol++)
                 tiles[iCol] = new WorldMapTile[iHeight];
 
             short iDrawSurfaceTiles = iWidth * iHeight;
@@ -442,7 +442,7 @@ bool WorldMap::Load(short tilesize)
         } else if(iReadType == 4) { //background sprites
             char * psz = strtok(buffer, ",\n");
 
-            for(short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
+            for (short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
                 if(!psz)
                     goto RETURN;
 
@@ -459,7 +459,7 @@ bool WorldMap::Load(short tilesize)
         } else if(iReadType == 5) { //background sprites
             char * psz = strtok(buffer, ",\n");
 
-            for(short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
+            for (short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
                 if(!psz)
                     goto RETURN;
 
@@ -481,7 +481,7 @@ bool WorldMap::Load(short tilesize)
         } else if(iReadType == 6) { //foreground sprites
             char * psz = strtok(buffer, ",\n");
 
-            for(short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
+            for (short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
                 if(!psz)
                     goto RETURN;
 
@@ -514,7 +514,7 @@ bool WorldMap::Load(short tilesize)
         } else if(iReadType == 7) { //path connections
             char * psz = strtok(buffer, ",\n");
 
-            for(short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
+            for (short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
                 if(!psz)
                     goto RETURN;
 
@@ -532,8 +532,8 @@ bool WorldMap::Load(short tilesize)
                 //7 == -|  8 == -`-  9 == |-  10 == -,-  11 == +
                 //12 == horizontal bridge starts open,  13 == horizontal bridge closed
                 //14 == vertical bridge starts open,  15 == vertical bridge closed
-                for(short iRow = 0; iRow < iHeight; iRow++) {
-                    for(short iCol = 0; iCol < iWidth; iCol++) {
+                for (short iRow = 0; iRow < iHeight; iRow++) {
+                    for (short iCol = 0; iCol < iWidth; iCol++) {
                         SetTileConnections(iCol, iRow);
                     }
                 }
@@ -541,7 +541,7 @@ bool WorldMap::Load(short tilesize)
         } else if(iReadType == 8) { //stages
             char * psz = strtok(buffer, ",\n");
 
-            for(short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
+            for (short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
                 if(!psz)
                     goto RETURN;
 
@@ -566,7 +566,7 @@ bool WorldMap::Load(short tilesize)
         } else if(iReadType == 9) { //vehicle boundaries
             char * psz = strtok(buffer, ",\n");
 
-            for(short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
+            for (short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
                 if(!psz)
                     goto RETURN;
 
@@ -591,8 +591,8 @@ bool WorldMap::Load(short tilesize)
             if(++iCurrentStage >= iNumStages) {
                 //Scan stage IDs and make sure we have a stage for each one
                 short iMaxStage = game_values.tourstoptotal + 5;
-                for(short iRow = 0; iRow < iHeight; iRow++) {
-                    for(short iCol = 0; iCol < iWidth; iCol++) {
+                for (short iRow = 0; iRow < iHeight; iRow++) {
+                    for (short iCol = 0; iCol < iWidth; iCol++) {
                         short iType = tiles[iCol][iRow].iType;
                         if(iType < 0 || iType > iMaxStage)
                             goto RETURN;
@@ -752,7 +752,7 @@ void WorldMap::SetTileConnections(short iCol, short iRow)
 
     WorldMapTile * tile = &tiles[iCol][iRow];
 
-    for(short iDirection = 0; iDirection < 4; iDirection++)
+    for (short iDirection = 0; iDirection < 4; iDirection++)
         tile->fConnection[iDirection] = false;
 
     if(iRow > 0) {
@@ -825,8 +825,8 @@ bool WorldMap::Save(const char * szPath)
 
     fprintf(file, "#Sprite Water Layer\n");
 
-    for(short iMapTileReadRow = 0; iMapTileReadRow < iHeight; iMapTileReadRow++) {
-        for(short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
+    for (short iMapTileReadRow = 0; iMapTileReadRow < iHeight; iMapTileReadRow++) {
+        for (short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
             WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
             fprintf(file, "%d", tile->iBackgroundWater);
 
@@ -840,8 +840,8 @@ bool WorldMap::Save(const char * szPath)
 
     fprintf(file, "#Sprite Background Layer\n");
 
-    for(short iMapTileReadRow = 0; iMapTileReadRow < iHeight; iMapTileReadRow++) {
-        for(short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
+    for (short iMapTileReadRow = 0; iMapTileReadRow < iHeight; iMapTileReadRow++) {
+        for (short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
             WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
             fprintf(file, "%d", tile->iBackgroundSprite);
 
@@ -855,8 +855,8 @@ bool WorldMap::Save(const char * szPath)
 
     fprintf(file, "#Sprite Foreground Layer\n");
 
-    for(short iMapTileReadRow = 0; iMapTileReadRow < iHeight; iMapTileReadRow++) {
-        for(short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
+    for (short iMapTileReadRow = 0; iMapTileReadRow < iHeight; iMapTileReadRow++) {
+        for (short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
             WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
             fprintf(file, "%d", tile->iForegroundSprite);
 
@@ -870,8 +870,8 @@ bool WorldMap::Save(const char * szPath)
 
     fprintf(file, "#Connections\n");
 
-    for(short iMapTileReadRow = 0; iMapTileReadRow < iHeight; iMapTileReadRow++) {
-        for(short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
+    for (short iMapTileReadRow = 0; iMapTileReadRow < iHeight; iMapTileReadRow++) {
+        for (short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
             WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
             fprintf(file, "%d", tile->iConnectionType);
 
@@ -885,8 +885,8 @@ bool WorldMap::Save(const char * szPath)
 
     fprintf(file, "#Tile Types (Stages, Doors, Start Tiles)\n");
 
-    for(short iMapTileReadRow = 0; iMapTileReadRow < iHeight; iMapTileReadRow++) {
-        for(short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
+    for (short iMapTileReadRow = 0; iMapTileReadRow < iHeight; iMapTileReadRow++) {
+        for (short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
             WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
             fprintf(file, "%d", tile->iType);
 
@@ -900,8 +900,8 @@ bool WorldMap::Save(const char * szPath)
 
     fprintf(file, "#Vehicle Boundaries\n");
 
-    for(short iMapTileReadRow = 0; iMapTileReadRow < iHeight; iMapTileReadRow++) {
-        for(short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
+    for (short iMapTileReadRow = 0; iMapTileReadRow < iHeight; iMapTileReadRow++) {
+        for (short iMapTileReadCol = 0; iMapTileReadCol < iWidth; iMapTileReadCol++) {
             WorldMapTile * tile = &tiles[iMapTileReadCol][iMapTileReadRow];
             fprintf(file, "%d", tile->iVehicleBoundary);
 
@@ -919,7 +919,7 @@ bool WorldMap::Save(const char * szPath)
 
     fprintf(file, "%d\n", game_values.tourstoptotal);
 
-    for(short iStage = 0; iStage < game_values.tourstoptotal; iStage++) {
+    for (short iStage = 0; iStage < game_values.tourstoptotal; iStage++) {
         char szLine[4096];
         WriteTourStopLine(game_values.tourstops[iStage], szLine, true);
         fprintf(file, szLine);
@@ -931,7 +931,7 @@ bool WorldMap::Save(const char * szPath)
 
     fprintf(file, "%d\n", iNumWarps);
 
-    for(short iWarp = 0; iWarp < iNumWarps; iWarp++) {
+    for (short iWarp = 0; iWarp < iNumWarps; iWarp++) {
         fprintf(file, "%d,", warps[iWarp].iCol1);
         fprintf(file, "%d,", warps[iWarp].iRow1);
         fprintf(file, "%d,", warps[iWarp].iCol2);
@@ -944,7 +944,7 @@ bool WorldMap::Save(const char * szPath)
 
     fprintf(file, "%d\n", iNumVehicles);
 
-    for(short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++) {
+    for (short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++) {
         fprintf(file, "%d,", vehicles[iVehicle].iDrawSprite);
         fprintf(file, "%d,", vehicles[iVehicle].iActionId);
         fprintf(file, "%d,", vehicles[iVehicle].iCurrentTileX);
@@ -959,7 +959,7 @@ bool WorldMap::Save(const char * szPath)
 
     fprintf(file, "#Initial Items\n");
 
-    for(short iItem = 0; iItem < iNumInitialBonuses; iItem++) {
+    for (short iItem = 0; iItem < iNumInitialBonuses; iItem++) {
         if(iItem != 0)
             fprintf(file, ",");
 
@@ -990,8 +990,8 @@ bool WorldMap::Save(const char * szPath)
 void WorldMap::Clear()
 {
     if(tiles) {
-        for(short iCol = 0; iCol < iWidth; iCol++) {
-            for(short iRow = 0; iRow < iHeight; iRow++) {
+        for (short iCol = 0; iCol < iWidth; iCol++) {
+            for (short iRow = 0; iRow < iHeight; iRow++) {
                 tiles[iCol][iRow].iBackgroundSprite = 0;
                 tiles[iCol][iRow].iBackgroundWater = 0;
                 tiles[iCol][iRow].iForegroundSprite = 0;
@@ -1029,7 +1029,7 @@ void WorldMap::New(short w, short h)
 
     tiles = new WorldMapTile*[iWidth];
 
-    for(short iCol = 0; iCol < iWidth; iCol++)
+    for (short iCol = 0; iCol < iWidth; iCol++)
         tiles[iCol] = new WorldMapTile[iHeight];
 
     Clear();
@@ -1046,10 +1046,10 @@ void WorldMap::Resize(short w, short h)
     if(tiles) {
         tempTiles = new WorldMapTile*[w];
 
-        for(short iCol = 0; iCol < w && iCol < iOldWidth; iCol++) {
+        for (short iCol = 0; iCol < w && iCol < iOldWidth; iCol++) {
             tempTiles[iCol] = new WorldMapTile[h];
 
-            for(short iRow = 0; iRow < h && iRow < iOldHeight; iRow++) {
+            for (short iRow = 0; iRow < h && iRow < iOldHeight; iRow++) {
                 tempTiles[iCol][iRow].iBackgroundSprite = tiles[iCol][iRow].iBackgroundSprite;
                 tempTiles[iCol][iRow].iBackgroundWater = tiles[iCol][iRow].iBackgroundWater;
                 tempTiles[iCol][iRow].iForegroundSprite = tiles[iCol][iRow].iForegroundSprite;
@@ -1064,8 +1064,8 @@ void WorldMap::Resize(short w, short h)
 
     //Copy into new map
     if(tempTiles) {
-        for(short iCol = 0; iCol < w && iCol < iOldWidth; iCol++) {
-            for(short iRow = 0; iRow < h && iRow < iOldHeight; iRow++) {
+        for (short iCol = 0; iCol < w && iCol < iOldWidth; iCol++) {
+            for (short iRow = 0; iRow < h && iRow < iOldHeight; iRow++) {
                 tiles[iCol][iRow].iBackgroundSprite = tempTiles[iCol][iRow].iBackgroundSprite;
                 tiles[iCol][iRow].iBackgroundWater = tempTiles[iCol][iRow].iBackgroundWater;
                 tiles[iCol][iRow].iForegroundSprite = tempTiles[iCol][iRow].iForegroundSprite;
@@ -1074,7 +1074,7 @@ void WorldMap::Resize(short w, short h)
             }
         }
 
-        for(short iCol = 0; iCol < w; iCol++)
+        for (short iCol = 0; iCol < w; iCol++)
             delete [] tempTiles[iCol];
 
         delete [] tempTiles;
@@ -1093,7 +1093,7 @@ bool WorldMap::Update(bool * fPlayerVehicleCollision)
     bool fPlayerDoneMove = player.Update();
 
     *fPlayerVehicleCollision = false;
-    for(short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++) {
+    for (short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++) {
         if(!vehicles[iVehicle].fEnabled)
             continue;
 
@@ -1111,7 +1111,7 @@ bool WorldMap::Update(bool * fPlayerVehicleCollision)
 
 void WorldMap::Draw(short iMapOffsetX, short iMapOffsetY, bool fDrawPlayer, bool fVehiclesSleeping)
 {
-    for(short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++) {
+    for (short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++) {
         if(!vehicles[iVehicle].fEnabled)
             continue;
 
@@ -1129,8 +1129,8 @@ void WorldMap::UpdateTile(SDL_Surface * surface, short iCol, short iRow, short i
 
 void WorldMap::DrawMapToSurface(SDL_Surface * surface)
 {
-    for(short iRow = 0; iRow < iHeight; iRow++) {
-        for(short iCol = 0; iCol < iWidth; iCol++) {
+    for (short iRow = 0; iRow < iHeight; iRow++) {
+        for (short iCol = 0; iCol < iWidth; iCol++) {
             DrawTileToSurface(surface, iCol, iRow, 0, 0, true, 0, 0);
         }
     }
@@ -1149,8 +1149,8 @@ void WorldMap::DrawMapToSurface(short iCycleIndex, bool fFullRefresh, SDL_Surfac
 
     short iCounter = 0, iRow, iCol;
     short iLayer = iCycleIndex == -1 ? 0 : iCycleIndex < 8 ? 1 : 2;
-    for(iRow = iLastDrawRow; iRow < iRowEnd; iRow++) {
-        for(iCol = iLastDrawCol; iCol < iColEnd; iCol++) {
+    for (iRow = iLastDrawRow; iRow < iRowEnd; iRow++) {
+        for (iCol = iLastDrawCol; iCol < iColEnd; iCol++) {
             DrawTileToSurface(surface, iCol, iRow, iMapDrawOffsetCol, iMapDrawOffsetRow, fFullRefresh, iAnimationFrame, iLayer);
 
             if(iCycleIndex >= 0 && iCycleIndex != 7 && iCycleIndex != 15 && ++iCounter > iTilesPerCycle)
@@ -1279,7 +1279,7 @@ void WorldMap::Cleanup()
     iNumInitialBonuses = 0;
 
     if(tiles) {
-        for(short iCol = 0; iCol < iWidth; iCol++)
+        for (short iCol = 0; iCol < iWidth; iCol++)
             delete [] tiles[iCol];
 
         delete [] tiles;
@@ -1309,7 +1309,7 @@ void WorldMap::SetPlayerSprite(short iPlayerSprite)
 
 bool WorldMap::IsVehicleMoving()
 {
-    for(short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++) {
+    for (short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++) {
         if(!vehicles[iVehicle].fEnabled)
             continue;
 
@@ -1350,7 +1350,7 @@ short WorldMap::GetPlayerState()
 
 short WorldMap::GetVehicleInPlayerTile(short * vehicleIndex)
 {
-    for(short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++) {
+    for (short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++) {
         WorldVehicle * vehicle = &vehicles[iVehicle];
 
         if(!vehicle->fEnabled)
@@ -1389,7 +1389,7 @@ void WorldMap::FacePlayer(short iDirection)
 
 void WorldMap::MoveVehicles()
 {
-    for(short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++) {
+    for (short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++) {
         if(!vehicles[iVehicle].fEnabled)
             continue;
 
@@ -1405,7 +1405,7 @@ void WorldMap::RemoveVehicle(short iVehicleIndex)
 short WorldMap::NumVehiclesInTile(short iTileX, short iTileY)
 {
     short iVehicleCount = 0;
-    for(short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++) {
+    for (short iVehicle = 0; iVehicle < iNumVehicles; iVehicle++) {
         WorldVehicle * vehicle = &vehicles[iVehicle];
 
         if(!vehicle->fEnabled)
@@ -1425,8 +1425,8 @@ short WorldMap::GetVehicleStageScore(short iVehicleIndex)
 
 void WorldMap::MoveBridges()
 {
-    for(short iRow = 0; iRow < iHeight; iRow++) {
-        for(short iCol = 0; iCol < iWidth; iCol++) {
+    for (short iRow = 0; iRow < iHeight; iRow++) {
+        for (short iCol = 0; iCol < iWidth; iCol++) {
             if(tiles[iCol][iRow].iConnectionType == 12) {
                 tiles[iCol][iRow].iConnectionType = 13;
                 SetTileConnections(iCol, iRow);
@@ -1619,7 +1619,7 @@ short WorldMap::GetNextInterestingMove(short iCol, short iRow)
             }
         }
 
-        for(short iNeighbor = 0; iNeighbor < 4; iNeighbor++) {
+        for (short iNeighbor = 0; iNeighbor < 4; iNeighbor++) {
             if(tile->fConnection[iNeighbor]) {
                 if(iNeighbor == 0 && tile->iRow > 0) {
                     WorldMapTile * topTile = &tiles[tile->iCol][tile->iRow - 1];
@@ -1691,10 +1691,10 @@ short WorldMap::GetNextInterestingMove(short iCol, short iRow)
 
 void WorldMap::SetInitialPowerups()
 {
-    for(short iTeam = 0; iTeam < 4; iTeam++) {
+    for (short iTeam = 0; iTeam < 4; iTeam++) {
         game_values.worldpowerupcount[iTeam] = iNumInitialBonuses;
 
-        for(short iItem = 0; iItem < iNumInitialBonuses; iItem++)
+        for (short iItem = 0; iItem < iNumInitialBonuses; iItem++)
             game_values.worldpowerups[iTeam][iItem] = iInitialBonuses[iItem];
     }
 }

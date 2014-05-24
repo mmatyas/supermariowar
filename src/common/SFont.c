@@ -122,7 +122,7 @@ void SFont_Write(SDL_Surface *Surface, const SFont_Font *Font,
     srcrect.y = 1;
     srcrect.h = dstrect.h = (Uint16)Font->Surface->h - 1;
 
-    for(c = text; *c != '\0' && x <= Surface->w ; c++) {
+    for (c = text; *c != '\0' && x <= Surface->w ; c++) {
 		charoffset = ((int) (*c - 33)) * 2 + 1;
 		// skip spaces and nonprintable characters
         if (*c == ' ' || charoffset < 0 || charoffset > Font->MaxPos) {
@@ -159,7 +159,7 @@ int SFont_TextWidth(const SFont_Font *Font, const char *text)
     if(text == NULL)
 	return 0;
 
-    for(c = text; *c != '\0'; c++) {
+    for (c = text; *c != '\0'; c++) {
 		charoffset = ((int) *c - 33) * 2 + 1;
 
 		// skip spaces and nonprintable characters
@@ -195,7 +195,7 @@ void SFont_WriteChopCenter(SDL_Surface *Surface, const SFont_Font* Font, int x, 
 	strncpy(szText, text, 255);
 	szText[255] = 0;
 
-    for(c = text; *c != '\0'; c++) {
+    for (c = text; *c != '\0'; c++) {
 		int charoffset = ((int) text[iCurrentChar] - 33) * 2 + 1;
 
 		int iNextWidth = 0;
@@ -240,7 +240,7 @@ void SFont_WriteChopRight(SDL_Surface *Surface, const SFont_Font *Font,
     srcrect.y = 1;
     srcrect.h = dstrect.h = (Uint16)Font->Surface->h - 1;
 
-    for(c = text; *c != '\0' && x <= Surface->w ; c += charsize) {
+    for (c = text; *c != '\0' && x <= Surface->w ; c += charsize) {
 		charoffset = ((int) (*c - 33)) * 2 + 1;
 		// skip spaces and nonprintable characters
         if (*c == ' ' || charoffset < 0 || charoffset > Font->MaxPos) {
@@ -291,7 +291,7 @@ void SFont_WriteChopLeft(SDL_Surface *Surface, const SFont_Font *Font,
     srcrect.y = 1;
     srcrect.h = dstrect.h = (Uint16)Font->Surface->h - 1;
 
-    for(c = text + (strlen(text) - 1) * charsize; c >= text && x >= startx - w ; c -= charsize) {
+    for (c = text + (strlen(text) - 1) * charsize; c >= text && x >= startx - w ; c -= charsize) {
 		charoffset = ((int) (*c - 33)) * 2 + 1;
 		// skip spaces and nonprintable characters
         if (*c == ' ' || charoffset < 0 || charoffset > Font->MaxPos) {

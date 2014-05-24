@@ -134,7 +134,7 @@ int main(int argc, char *argv[])
 	g_map->loadTileSet(convertPath("maps/tileset.tls"), tileSetPNG);
 
 	//Setup Platforms
-    for(short iPlatform = 0; iPlatform < MAX_PLATFORMS; iPlatform++) {
+    for (short iPlatform = 0; iPlatform < MAX_PLATFORMS; iPlatform++) {
 		g_Platforms[iPlatform].rIcon[0].x = (iPlatform % 6) * 32;
 		g_Platforms[iPlatform].rIcon[0].y = (iPlatform / 6) * 32 + 224;
 		g_Platforms[iPlatform].rIcon[0].w = 32;
@@ -145,8 +145,8 @@ int main(int argc, char *argv[])
 		g_Platforms[iPlatform].rIcon[1].w = 32;
 		g_Platforms[iPlatform].rIcon[1].h = 32;
 
-        for(short iCol = 0; iCol < MAPWIDTH; iCol++) {
-            for(short iRow = 0; iRow < MAPHEIGHT; iRow++) {
+        for (short iCol = 0; iCol < MAPWIDTH; iCol++) {
+            for (short iRow = 0; iRow < MAPHEIGHT; iRow++) {
 				g_Platforms[iPlatform].tiles[iCol][iRow] = TILESETSIZE;
 			}
 		}
@@ -174,10 +174,10 @@ void drawlayer(int layer, bool fUseCopied, short iBlockSize)
 
 	//draw left to right full vertical
 	bltrect.x = 0;
-    for(i = 0; i < MAPWIDTH; i++) {
+    for (i = 0; i < MAPWIDTH; i++) {
 		bltrect.y = -iBlockSize;	//this is okay, see
 
-        for(j = 0; j < MAPHEIGHT; j++) {
+        for (j = 0; j < MAPHEIGHT; j++) {
 			bltrect.y += iBlockSize;	// here
 
 			ts = g_map->mapdata[i][j][layer];
@@ -225,8 +225,8 @@ void drawmap(bool fScreenshot, short iBlockSize)
 	SDL_Rect rSrc = {0, 0, iBlockSize, iBlockSize};
 	SDL_Rect rDst = {0, 0, iBlockSize, iBlockSize};
 
-    for(int j = 0; j < MAPHEIGHT; j++) {
-        for(int i = 0; i < MAPWIDTH; i++) {
+    for (int j = 0; j < MAPHEIGHT; j++) {
+        for (int i = 0; i < MAPWIDTH; i++) {
 			int displayblock = displayblock = g_map->objectdata[i][j];
 
             if(displayblock != BLOCKSETSIZE) {
@@ -247,8 +247,8 @@ void drawmap(bool fScreenshot, short iBlockSize)
 	drawlayer(2, false, iBlockSize);
 	drawlayer(3, false, iBlockSize);
 
-    for(int j = 0; j < MAPHEIGHT; j++) {
-        for(int i = 0; i < MAPWIDTH; i++) {
+    for (int j = 0; j < MAPHEIGHT; j++) {
+        for (int i = 0; i < MAPWIDTH; i++) {
 			Warp * warp = &g_map->warpdata[i][j];
 
             if(warp->connection != -1) {
@@ -280,9 +280,9 @@ void loadmap(char * szMapFile)
 
 	g_iNumPlatforms = g_map->iNumPlatforms;
 
-    for(short iPlatform = 0; iPlatform < g_iNumPlatforms; iPlatform++) {
-        for(short iCol = 0; iCol < MAPWIDTH; iCol++) {
-            for(short iRow = 0; iRow < MAPHEIGHT; iRow++) {
+    for (short iPlatform = 0; iPlatform < g_iNumPlatforms; iPlatform++) {
+        for (short iCol = 0; iCol < MAPWIDTH; iCol++) {
+            for (short iRow = 0; iRow < MAPHEIGHT; iRow++) {
                 if(iCol < g_map->platforms[iPlatform]->iTileWidth && iRow < g_map->platforms[iPlatform]->iTileHeight) {
 					g_Platforms[iPlatform].tiles[iCol][iRow] = g_map->platforms[iPlatform]->iTileData[iCol][iRow];
                 } else {
@@ -306,7 +306,7 @@ void takescreenshot()
 	short iTileSizes[3] = {32, 16, 8};
 	SDL_Surface * old_screen = screen;
 
-    for(short iScreenshotSize = 0; iScreenshotSize < 3; iScreenshotSize++) {
+    for (short iScreenshotSize = 0; iScreenshotSize < 3; iScreenshotSize++) {
 		short iTileSize = iTileSizes[iScreenshotSize];
 
 		SDL_Surface * screenshot = SDL_CreateRGBSurface(old_screen->flags, iTileSize * 20, iTileSize * 15, old_screen->format->BitsPerPixel, 0, 0, 0, 0);
@@ -318,9 +318,9 @@ void takescreenshot()
 		SDL_Rect rSrc = {0, 0, iTileSize, iTileSize};
 		SDL_Rect rDst = {0, 0, iTileSize, iTileSize};
 
-        for(short iPlatform = 0; iPlatform < g_iNumPlatforms; iPlatform++) {
-            for(short iPlatformX = 0; iPlatformX < g_map->platforms[iPlatform]->iTileWidth; iPlatformX++) {
-                for(short iPlatformY = 0; iPlatformY < g_map->platforms[iPlatform]->iTileHeight; iPlatformY++) {
+        for (short iPlatform = 0; iPlatform < g_iNumPlatforms; iPlatform++) {
+            for (short iPlatformX = 0; iPlatformX < g_map->platforms[iPlatform]->iTileWidth; iPlatformX++) {
+                for (short iPlatformY = 0; iPlatformY < g_map->platforms[iPlatform]->iTileHeight; iPlatformY++) {
 					short iTile = g_Platforms[iPlatform].tiles[iPlatformX][iPlatformY];
 
                     if(iTile != TILESETSIZE) {
@@ -337,7 +337,7 @@ void takescreenshot()
 		}
 
 		//And add platform paths
-        for(short iPlatform = 0; iPlatform < g_iNumPlatforms; iPlatform++) {
+        for (short iPlatform = 0; iPlatform < g_iNumPlatforms; iPlatform++) {
             if(g_Platforms[iPlatform].iStartX != g_Platforms[iPlatform].iEndX) {
 				short iCenterOffsetY = (g_map->platforms[iPlatform]->iHeight >> 1) - 16;
 				iCenterOffsetY >>= iScreenshotSize; //Resize for preview and thumbnails
@@ -347,7 +347,7 @@ void takescreenshot()
 				short iSpotLeft = (fMoveToRight ? g_Platforms[iPlatform].iStartX : g_Platforms[iPlatform].iEndX) + 1;
 				short iSpotRight = (fMoveToRight ? g_Platforms[iPlatform].iEndX : g_Platforms[iPlatform].iStartX) - 2 + g_map->platforms[iPlatform]->iTileWidth;
 
-				for(short iSpot = iSpotLeft; iSpot <= iSpotRight; iSpot++)
+				for (short iSpot = iSpotLeft; iSpot <= iSpotRight; iSpot++)
 					spr_platformarrows[iScreenshotSize].draw(iSpot * iTileSize, g_Platforms[iPlatform].iStartY * iTileSize + iCenterOffsetY, iTileSize * 5, 0, iTileSize, iTileSize);
 
 				spr_platformarrows[iScreenshotSize].draw((iSpotLeft - 1) * iTileSize, g_Platforms[iPlatform].iStartY * iTileSize + iCenterOffsetY, iTileSize * 2, 0, iTileSize, iTileSize);
@@ -361,7 +361,7 @@ void takescreenshot()
 				short iSpotTop = (fMoveUp ? g_Platforms[iPlatform].iStartY : g_Platforms[iPlatform].iEndY) + 1;
 				short iSpotBottom = (fMoveUp ? g_Platforms[iPlatform].iEndY : g_Platforms[iPlatform].iStartY) - 2 + g_map->platforms[iPlatform]->iTileHeight;
 
-				for(short iSpot = iSpotTop; iSpot <= iSpotBottom; iSpot++)
+				for (short iSpot = iSpotTop; iSpot <= iSpotBottom; iSpot++)
 					spr_platformarrows[iScreenshotSize].draw(g_Platforms[iPlatform].iStartX * iTileSize + iCenterOffsetX, iSpot * iTileSize, iTileSize * 4, 0, iTileSize, iTileSize);
 
 				spr_platformarrows[iScreenshotSize].draw(g_Platforms[iPlatform].iStartX * iTileSize + iCenterOffsetX, (iSpotTop - 1) * iTileSize, 0, 0, iTileSize, iTileSize);

@@ -16,7 +16,7 @@ MovingPlatformPath::MovingPlatformPath(float vel, float startX, float startY, fl
 {
     dVelocity = vel;
 
-    for(short type = 0; type < 2; type++) {
+    for (short type = 0; type < 2; type++) {
         dVelX[type] = 0.0f;
         dVelY[type] = 0.0f;
     }
@@ -41,10 +41,10 @@ void MovingPlatformPath::Reset()
 {
     //advance the spawn test platform
     if(game_values.spawnstyle == 1) {
-        for(short i = 0; i < 36; i++)
+        for (short i = 0; i < 36; i++)
             Move(1);
     } else if(game_values.spawnstyle == 2) {
-        for(short i = 0; i < 50; i++)
+        for (short i = 0; i < 50; i++)
             Move(1);
     }
 }
@@ -83,7 +83,7 @@ StraightPath::StraightPath(float vel, float startX, float startY, float endX, fl
 
     iSteps = (short)(dLength / dVelocity) + 1;
 
-    for(short type = 0; type < 2; type++)
+    for (short type = 0; type < 2; type++)
         SetVelocity(type);
 }
 
@@ -126,7 +126,7 @@ void StraightPath::SetVelocity(short type)
 
 void StraightPath::Reset()
 {
-    for(short type = 0; type < 2; type++) {
+    for (short type = 0; type < 2; type++) {
         iOnStep[type] = 0;
 
         dCurrentX[type] = dPathPointX[0];
@@ -151,7 +151,7 @@ StraightPathContinuous::StraightPathContinuous(float vel, float startX, float st
 
     dAngle = angle;
 
-    for(short type = 0; type < 2; type++) {
+    for (short type = 0; type < 2; type++) {
         iGoalPoint[type] = 1;
         SetVelocity(type);
     }
@@ -186,7 +186,7 @@ bool StraightPathContinuous::Move(short type)
 
 void StraightPathContinuous::Reset()
 {
-    for(short type = 0; type < 2; type++) {
+    for (short type = 0; type < 2; type++) {
         dCurrentX[type] = dPathPointX[0];
         dCurrentY[type] = dPathPointY[0];
     }
@@ -213,7 +213,7 @@ EllipsePath::EllipsePath(float vel, float angle, float radiusx, float radiusy, f
         dRadiusY = radiusy;
     }
 
-    for(short type = 0; type < 2; type++) {
+    for (short type = 0; type < 2; type++) {
         dAngle[type] = angle;
         SetPosition(type);
     }
@@ -250,7 +250,7 @@ void EllipsePath::SetPosition(short type)
 
 void EllipsePath::Reset()
 {
-    for(short type = 0; type < 2; type++) {
+    for (short type = 0; type < 2; type++) {
         dAngle[type] = dStartAngle;
         SetPosition(type);
     }
@@ -272,7 +272,7 @@ bool FallingPath::Move(short type)
 
     if(pPlatform->fy - pPlatform->iHalfHeight >= smw->ScreenHeight) {
         //If a player is standing on this platform, clear him off
-        for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
+        for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
             if(list_players[iPlayer]->platform == pPlatform) {
                 list_players[iPlayer]->platform = NULL;
                 list_players[iPlayer]->vely = dVelY[type];
@@ -289,7 +289,7 @@ bool FallingPath::Move(short type)
 
 void FallingPath::Reset()
 {
-    for(short type = 0; type < 2; type++) {
+    for (short type = 0; type < 2; type++) {
         dCurrentX[type] = dPathPointX[0];
         dCurrentY[type] = dPathPointY[0];
     }
@@ -335,7 +335,7 @@ MovingPlatform::MovingPlatform(TilesetTile ** tiledata, MapTile ** tiletypes, sh
 
     ResetPath();
 
-    for(short iSurface = 0; iSurface < 2; iSurface++) {
+    for (short iSurface = 0; iSurface < 2; iSurface++) {
         sSurface[iSurface] = SDL_CreateRGBSurface(screen->flags, w * iTileSize, h * iTileSize, screen->format->BitsPerPixel, 0, 0, 0, 0);
 
         if( SDL_SETCOLORKEY(sSurface[iSurface], SDL_FALSE, SDL_MapRGB(sSurface[iSurface]->format, 255, 0, 255)) < 0)
@@ -346,9 +346,9 @@ MovingPlatform::MovingPlatform(TilesetTile ** tiledata, MapTile ** tiletypes, sh
 
     //Run through all tiles in the platform, detect unknown and blank tiles,
     //and draw all static tiles to the platform surface
-    for(short iSurface = 0; iSurface < 2; iSurface++) {
-        for(short iCol = 0; iCol < iTileWidth; iCol++) {
-            for(short iRow = 0; iRow < iTileHeight; iRow++) {
+    for (short iSurface = 0; iSurface < 2; iSurface++) {
+        for (short iCol = 0; iCol < iTileWidth; iCol++) {
+            for (short iRow = 0; iRow < iTileHeight; iRow++) {
                 TilesetTile * tile = &iTileData[iCol][iRow];
 
                 if(tile->iID == TILESETNONE)
@@ -384,7 +384,7 @@ MovingPlatform::MovingPlatform(TilesetTile ** tiledata, MapTile ** tiletypes, sh
 
 MovingPlatform::~MovingPlatform()
 {
-    for(short iCol = 0; iCol < iTileWidth; iCol++) {
+    for (short iCol = 0; iCol < iTileWidth; iCol++) {
         delete [] iTileData[iCol];
         delete [] iTileType[iCol];
     }
@@ -1664,8 +1664,8 @@ bool MovingPlatform::IsInNoSpawnZone(short iX, short iY, short w, short h)
     short iRelativeX[2] = {iX - iLeft, iX + w - iLeft};
     short iRelativeY[2] = {iY - iTop, iY + h - iTop};
 
-    for(short sX = 0; sX < 2; sX++) {
-        for(short sY = 0; sY < 2; sY++) {
+    for (short sX = 0; sX < 2; sX++) {
+        for (short sY = 0; sY < 2; sY++) {
             if(iRelativeX[sX] >= 0 && iRelativeX[sX] < iWidth && iRelativeY[sY] >= 0 && iRelativeY[sY] < iHeight) {
                 short tx = iRelativeX[sX] / TILESIZE;
                 short ty = iRelativeY[sY] / TILESIZE;

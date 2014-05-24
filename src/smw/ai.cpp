@@ -28,7 +28,7 @@ void CPlayerAI::Init()
     if(game_values.gamemode->gamemode == game_mode_eggs) {
         bool fYoshi[4] = {false, false, false, false};
         //Scan Yoshis to see which ones are present
-        for(short i = 0; i < objectcontainer[1].list_end; i++) {
+        for (short i = 0; i < objectcontainer[1].list_end; i++) {
             CObject * object = objectcontainer[1].list[i];
 
             if(object_moving == object->getObjectType()) {
@@ -42,7 +42,7 @@ void CPlayerAI::Init()
         }
 
         //Now scan eggs and ignore any egg that doesn't have a yoshi
-        for(short i = 0; i < objectcontainer[1].list_end; i++) {
+        for (short i = 0; i < objectcontainer[1].list_end; i++) {
             CObject * object = objectcontainer[1].list[i];
 
             if(object_moving == object->getObjectType()) {
@@ -125,7 +125,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
         ++itr;
 	}
 
-	for(std::vector<int>::iterator tdIt = toDelete.begin(); tdIt != toDelete.end(); ++tdIt) {
+	for (std::vector<int>::iterator tdIt = toDelete.begin(); tdIt != toDelete.end(); ++tdIt) {
 		// perform the actual disposal and removal
 		std::map<int, AttentionObject*>::iterator deadObjIt = attentionObjects.find(*tdIt);
 
@@ -501,7 +501,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 
 
         //Look through all platforms and see if we are hitting solid or death tiles in them
-        for(short iPlatform = 0; iPlatform < g_map->iNumPlatforms; iPlatform++) {
+        for (short iPlatform = 0; iPlatform < g_map->iNumPlatforms; iPlatform++) {
             int lefttile = g_map->platforms[iPlatform]->GetTileTypeFromCoord(ix, iDeathY << 5);
             int righttile = g_map->platforms[iPlatform]->GetTileTypeFromCoord(ix + PW, iDeathY << 5);
 
@@ -585,7 +585,7 @@ ExitDeathCheck:
             playerKeys->game_powerup.fDown = true;
         } else if(iStoredPowerup == 18) { //mystery mushroom
             //See if another player has a powerup
-            for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
+            for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
                 if(iPlayer == pPlayer->localID || list_players[iPlayer]->teamID == iTeamID)
                     continue;
 
@@ -611,7 +611,7 @@ void CPlayerAI::GetNearestObjects()
 
     std::map<int, AttentionObject*>::iterator lim = attentionObjects.end();
 
-    for(short i = 0; i < objectcontainer[1].list_end; i++) {
+    for (short i = 0; i < objectcontainer[1].list_end; i++) {
         CObject * object = objectcontainer[1].list[i];
 
         if(attentionObjects.find(object->iNetworkID) != lim) {
@@ -808,7 +808,7 @@ void CPlayerAI::GetNearestObjects()
         }
     }
 
-    for(short i = 0; i < objectcontainer[0].list_end; i++) {
+    for (short i = 0; i < objectcontainer[0].list_end; i++) {
         CObject * object = objectcontainer[0].list[i];
 
         if(attentionObjects.find(object->iNetworkID) != lim) {
@@ -873,7 +873,7 @@ void CPlayerAI::GetNearestObjects()
         }
     }
 
-    for(short i = 0; i < objectcontainer[2].list_end; i++) {
+    for (short i = 0; i < objectcontainer[2].list_end; i++) {
         CObject * object = objectcontainer[2].list[i];
 
         if(attentionObjects.find(object->iNetworkID) != lim) {
@@ -963,7 +963,7 @@ void CPlayerAI::GetNearestObjects()
     }
 
     //Figure out where the other players are
-    for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
+    for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
         if(iPlayer == pPlayer->localID || list_players[iPlayer]->state != player_ready)
             continue;
 

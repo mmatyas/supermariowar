@@ -208,12 +208,12 @@ class CObjectContainer
 		void add(CObject *cio);
 
     void update() {
-			for(short i = 0; i < list_end; i++)
+			for (short i = 0; i < list_end; i++)
 				list[i]->update();
 		};
 
     void draw() {
-			for(short i = list_end - 1; i >= 0; i--)
+			for (short i = list_end - 1; i >= 0; i--)
 				list[i]->draw();
 		};
 

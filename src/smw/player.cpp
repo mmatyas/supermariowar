@@ -45,7 +45,7 @@ CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamI
 
     spr = PGFX_JUMPING_R;
 
-    for(short i = 0; i < PGFX_LAST; i++)
+    for (short i = 0; i < PGFX_LAST; i++)
         sprites[i] = nsprites[i];
 
     sprswitch = 0;
@@ -137,7 +137,7 @@ void CPlayer::move()
 #if	0
     if(game_values.secrets)
     {
-    	for(short bossType = 0; bossType < 3; bossType++)
+        for (short bossType = 0; bossType < 3; bossType++)
     	{
     		if(game_values.bosspeeking == bossType)
     		{
@@ -363,7 +363,7 @@ void CPlayer::move()
     				ifSoundOnPlay(sfx_transform);
     				game_values.redthrowblocks = true;
 
-    				for(short iBlock = 0; iBlock < noncolcontainer.list_end; iBlock++)
+                    for (short iBlock = 0; iBlock < noncolcontainer.list_end; iBlock++)
     				{
     					if(((IO_Block*)noncolcontainer.list[iBlock])->getBlockType() == block_throw)
     					{
@@ -393,7 +393,7 @@ void CPlayer::move()
     				ifSoundOnPlay(sfx_transform);
     				game_values.viewblocks = true;
 
-    				for(short iBlock = 0; iBlock < noncolcontainer.list_end; iBlock++)
+                    for (short iBlock = 0; iBlock < noncolcontainer.list_end; iBlock++)
     				{
     					IO_Block * block = (IO_Block*)noncolcontainer.list[iBlock];
     					if(block->getBlockType() == block_powerup)
@@ -750,7 +750,7 @@ void CPlayer::move()
                     short iyoffset = iy - PHOFFSET;
                     short iColorIdOffset = colorID << 5;
 
-                    for(short iSwirl = 0; iSwirl < 4; iSwirl++)
+                    for (short iSwirl = 0; iSwirl < 4; iSwirl++)
                         eyecandy[2].add(new EC_SingleAnimation(&rm->spr_spawnsmoke, ixoffset + g_iSwirlSpawnLocations[iSwirl][0][swirlindex], iyoffset + g_iSwirlSpawnLocations[iSwirl][1][swirlindex], 4, 4, 0, iColorIdOffset, 32, 32));
                 }
             }
@@ -914,7 +914,7 @@ void CPlayer::move()
             }
             case 22: { //golden podobo
                 short numPodobos = RNGMAX(6) + 10;
-                for(short iPodobo = 0; iPodobo < numPodobos; iPodobo++) {
+                for (short iPodobo = 0; iPodobo < numPodobos; iPodobo++) {
                     objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, (short)RNGMAX(smw->ScreenWidth * 0.95f), smw->ScreenHeight, -(float(RNGMAX(9)) / 2.0f) - 9.0f, globalID, teamID, colorID, false));
                 }
                 ifSoundOnPlay(sfx_thunder);
@@ -2169,7 +2169,7 @@ void CPlayer::explodeawards()
     short numawards = (killsinrow > MAXAWARDS ? MAXAWARDS : killsinrow);
     float addangle = TWO_PI / (float)numawards;
 
-    for(short k = 0; k < numawards; k++) {
+    for (short k = 0; k < numawards; k++) {
         float angle = (float)k * addangle + awardangle;
         float cosangle = cos(angle);
         float sinangle = sin(angle);
@@ -2194,7 +2194,7 @@ void CPlayer::addswirlingawards()
     short numawards = (killsinrow > MAXAWARDS ? MAXAWARDS : killsinrow);
     float addangle = TWO_PI / (float)numawards;
 
-    for(short k = 0; k < numawards; k++) {
+    for (short k = 0; k < numawards; k++) {
         float angle = (float)k * addangle + awardangle;
 
         if(numawards == MAXAWARDS)
@@ -2216,7 +2216,7 @@ void CPlayer::addrocketawards()
     float addangle = QUARTER_PI / 10.0f;
     float startangle = -HALF_PI - ((addangle / 2) * (float)(numawards - 1));
 
-    for(short k = 0; k < numawards; k++) {
+    for (short k = 0; k < numawards; k++) {
         float angle = (float)k * addangle + startangle;
         float awardvelx = 9.0f * cos(angle);
         float awardvely = 9.0f * sin(angle);
@@ -2242,7 +2242,7 @@ void CPlayer::DeathAwards()
 void CPlayer::AddKillsInRowInAirAward()
 {
     float angle = 0.0f;
-    for(short k = 0; k < 15; k++) {
+    for (short k = 0; k < 15; k++) {
         float vel = 7.0f + ((k % 2) * 5.0f);
         float awardvelx = vel * cos(angle);
         float awardvely = vel * sin(angle);
@@ -2843,7 +2843,7 @@ void CPlayer::draw()
         short xoffset = ix + HALFPW - 8;
         short yoffset = iy + HALFPH - 8;
 
-        for(short k = 0; k < numawards; k++) {
+        for (short k = 0; k < numawards; k++) {
             float angle = (float)k * addangle + awardangle;
             short awardx = xoffset + (short)(30.0f * cos(angle));
             short awardy = yoffset + (short)(30.0f * sin(angle));
@@ -2861,7 +2861,7 @@ void CPlayer::draw()
         float addangle = TWO_PI / numeyecandy;
         float displayangle = powerupangle;
 
-        for(short k = 0; k < numeyecandy; k++) {
+        for (short k = 0; k < numeyecandy; k++) {
             short powerupX = ix + HALFPW - 8 + (short)(powerupradius * cos(displayangle));
             short powerupY = iy + HALFPH - 8 + (short)(powerupradius * sin(displayangle));
 

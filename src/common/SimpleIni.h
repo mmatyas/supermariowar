@@ -1717,7 +1717,7 @@ CSimpleIniTempl<SI_CHAR,SI_STRLESS,SI_CONVERTER>::LoadMultiLineText(
     // followed by a newline. No whitespace removal is done while
     // searching for this tag.
     SI_CHAR cEndOfLineChar = *a_pData;
-    for(;;) {
+    for (;;) {
         // if we are loading comments then we need a comment character as
         // the first character on every line
         if (!a_pTagName && !IsComment(*a_pData)) {

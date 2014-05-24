@@ -20,7 +20,7 @@ bool sfx_init()
 	Mix_OpenAudio(44100, AUDIO_S16, 2, 2048);
 	Mix_AllocateChannels(NUM_SOUND_CHANNELS);
 
-	for(short iChannel = 0; iChannel < NUM_SOUND_CHANNELS; iChannel++)
+	for (short iChannel = 0; iChannel < NUM_SOUND_CHANNELS; iChannel++)
 		g_PlayingSoundChannels[iChannel] = NULL;
 
     return true;
@@ -35,7 +35,7 @@ void sfx_stopallsounds()
 {
 	Mix_HaltChannel(-1);
 
-	for(short iChannel = 0; iChannel < NUM_SOUND_CHANNELS; iChannel++)
+	for (short iChannel = 0; iChannel < NUM_SOUND_CHANNELS; iChannel++)
 		g_PlayingSoundChannels[iChannel] = NULL;
 }
 

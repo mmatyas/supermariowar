@@ -30,7 +30,7 @@ extern int g_iVersion[];
 MapListNode::MapListNode(std::string fullName)
 {
     pfFilters = new bool[NUM_AUTO_FILTERS + filterslist->GetCount()];
-    for(short iFilter = 0; iFilter < filterslist->GetCount() + NUM_AUTO_FILTERS; iFilter++)
+    for (short iFilter = 0; iFilter < filterslist->GetCount() + NUM_AUTO_FILTERS; iFilter++)
         pfFilters[iFilter] = false;
 
     fInCurrentFilterSet = true;
@@ -92,7 +92,7 @@ MapList::MapList(bool fWorldEditor)
         SimpleDirectoryList worldeditormapdirs(convertPath("worlds/"));
 
         short iEditorDirCount = worldeditormapdirs.GetCount();
-        for(short iDir = 0; iDir < iEditorDirCount; iDir++) {
+        for (short iDir = 0; iDir < iEditorDirCount; iDir++) {
             const char * szName = worldeditormapdirs.current_name();
 
             DirectoryListing worldMapDir(convertPath(std::string(szName) + std::string("/")), ".map");
@@ -150,7 +150,7 @@ MapList::MapList(bool fWorldEditor)
     SimpleDirectoryList worldmapdirs(convertPath("worlds/"));
 
     short iDirCount = worldmapdirs.GetCount();
-    for(short iDir = 0; iDir < iDirCount; iDir++) {
+    for (short iDir = 0; iDir < iDirCount; iDir++) {
         const char * szName = worldmapdirs.current_name();
 
         DirectoryListing worldMapDir(convertPath(std::string(szName) + std::string("/")), ".map");
@@ -203,7 +203,7 @@ void MapList::addWorldMaps()
     SimpleDirectoryList worldmapdirs(convertPath("worlds/"));
 
     short iDirCount = worldmapdirs.GetCount();
-    for(short iDir = 0; iDir < iDirCount; iDir++) {
+    for (short iDir = 0; iDir < iDirCount; iDir++) {
         const char * szName = worldmapdirs.current_name();
 
         DirectoryListing worldMapDir(convertPath(std::string(szName) + std::string("/")), ".map");
@@ -224,7 +224,7 @@ void MapList::add(const char * name)
 {
     std::string fullName = convertPath("maps/") + name;
 
-    for(std::map<std::string, MapListNode*>::iterator i = maps.begin(); i != maps.end(); ++i) {
+    for (std::map<std::string, MapListNode*>::iterator i = maps.begin(); i != maps.end(); ++i) {
         if((*i).second->filename == fullName)
             return;
     }
@@ -352,7 +352,7 @@ bool MapList::startswith(std::string match)
         if(iMatchLen > iMapNameLen)
             continue;
 
-        for(short iIndex = 0; iIndex < iMatchLen && iIndex < iMapNameLen; iIndex++) {
+        for (short iIndex = 0; iIndex < iMatchLen && iIndex < iMapNameLen; iIndex++) {
             if(tolower(szMapName[iIndex]) == tolower(match[iIndex]))
                 continue;
 
@@ -428,7 +428,7 @@ void MapList::random(bool fUseFilters)
         iShuffle = RNGMAX(maps.size() - 1);
     }
 
-    for(int i = 0; i <= iShuffle; i++)
+    for (int i = 0; i <= iShuffle; i++)
         next(fUseFilters);
 }
 
@@ -438,7 +438,7 @@ const char* MapList::randomFilename()
 
     short iRand = RNGMAX(maps.size());
 
-    for(short iMap = 0; iMap < iRand; iMap++)
+    for (short iMap = 0; iMap < iRand; iMap++)
         rnd++;
 
     return (*rnd).second->filename.c_str();
@@ -451,7 +451,7 @@ void MapList::WriteFilters()
     if(game_values.fNeedWriteFilters) {
         game_values.fNeedWriteFilters = false;
 
-        for(short iFilter = 0; iFilter < filterslist->GetCount(); iFilter++) {
+        for (short iFilter = 0; iFilter < filterslist->GetCount(); iFilter++) {
             FILE * fp = fopen(filterslist->GetIndex(iFilter), "w");
 
             if(!fp)
@@ -499,7 +499,7 @@ void MapList::ReadFilters()
 
             if(maps.find(pszMapName) != maps.end()) {
                 bool fErrorReading = false;
-                for(short iFilter = 0; iFilter < NUM_AUTO_FILTERS; iFilter++) {
+                for (short iFilter = 0; iFilter < NUM_AUTO_FILTERS; iFilter++) {
                     char * psz = strtok(NULL, ",\n");
 
                     if(psz) {
@@ -530,7 +530,7 @@ void MapList::ReadFilters()
 
     current = maps.begin();
     //Get user defined filters from files in filters directory
-    for(short iFilter = 0; iFilter < filterslist->GetCount(); iFilter++) {
+    for (short iFilter = 0; iFilter < filterslist->GetCount(); iFilter++) {
         FILE * ffp = fopen(filterslist->GetIndex(iFilter), "r");
 
         if(!ffp)
@@ -608,7 +608,7 @@ void MapList::WriteMapSummaryCache()
     while(itr != lim) {
         fprintf(fp, itr->first.c_str());
 
-        for(short iFilter = 0; iFilter < NUM_AUTO_FILTERS; iFilter++)
+        for (short iFilter = 0; iFilter < NUM_AUTO_FILTERS; iFilter++)
             fprintf(fp, ",%d", itr->second->pfFilters[iFilter]);
 
         fprintf(fp, "\n");
@@ -633,7 +633,7 @@ void MapList::ApplyFilters(bool * pfFilters)
     short iTotalCount = 0;
     while(itr != lim) {
         bool fMatched = true;
-        for(short iFilter = 0; iFilter < NUM_AUTO_FILTERS + filterslist->GetCount(); iFilter++) {
+        for (short iFilter = 0; iFilter < NUM_AUTO_FILTERS + filterslist->GetCount(); iFilter++) {
             if(pfFilters[iFilter]) {
                 if(!(*itr).second->pfFilters[iFilter]) {
                     fMatched = false;
@@ -656,7 +656,7 @@ void MapList::ApplyFilters(bool * pfFilters)
     }
 
     game_values.fFiltersOn = false;
-    for(short iFilter = 0; iFilter < NUM_AUTO_FILTERS + filterslist->GetCount(); iFilter++) {
+    for (short iFilter = 0; iFilter < NUM_AUTO_FILTERS + filterslist->GetCount(); iFilter++) {
         if(pfFilters[iFilter]) {
             game_values.fFiltersOn = true;
             break;

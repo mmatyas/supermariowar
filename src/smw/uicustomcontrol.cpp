@@ -123,7 +123,7 @@ MenuCodeEnum MI_InputControlField::SendInput(CPlayerInput *)
         //configured to something that he wanted to use in game, it would cancel that action.
         //This happened a lot when configuring the in game exit button.
         /*
-        for(int iPlayer = 0; iPlayer < 4; iPlayer++)
+        for (int iPlayer = 0; iPlayer < 4; iPlayer++)
         {
             if (playerInput->outputControls[iPlayer].menu_cancel.fPressed)
             {
@@ -250,11 +250,11 @@ void MI_InputControlField::SetKey(SDL_KEYTYPE * iSetKey, SDL_KEYTYPE key, short 
     bool fNeedSwap = false;
     short iSwapPlayer, iSwapKey;
 
-    for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
         if(game_values.playerInput.inputControls[iPlayer]->iDevice != device)
             continue;
 
-        for(int selKey = 0; selKey < NUM_KEYS; selKey++) {
+        for (int selKey = 0; selKey < NUM_KEYS; selKey++) {
             if(selKey == iKeyIndex && iPlayer == iPlayerIndex)
                 continue;
 
@@ -323,14 +323,14 @@ MI_InputControlContainer::MI_InputControlContainer(gfxSprite * spr_button, short
 #ifdef _XBOX
     miDeviceSelectField->Disable(true);
 
-    for(int iJoystick = 0; iJoystick < 4; iJoystick++) {
+    for (int iJoystick = 0; iJoystick < 4; iJoystick++) {
         char szJoystickNumber[2];
         sprintf(szJoystickNumber, "%d", iJoystick + 1);
         miDeviceSelectField->Add(std::string("Gamepad ") + std::string(szJoystickNumber), iJoystick, "", false, false);
     }
 
 #else
-    for(short iJoystick = 0; iJoystick < joystickcount; iJoystick++) {
+    for (short iJoystick = 0; iJoystick < joystickcount; iJoystick++) {
     #if defined(USE_SDL2) && !defined(__EMSCRIPTEN__)
         miDeviceSelectField->Add(SDL_JoystickNameForIndex(iJoystick), iJoystick, "", false, false);
     #else
@@ -349,7 +349,7 @@ MI_InputControlContainer::MI_InputControlContainer(gfxSprite * spr_button, short
     miInputTypeButton->SetCode(MENU_CODE_INPUT_TYPE_CHANGED);
 
 
-    for(short iKey = 0; iKey < NUM_KEYS; iKey++) {
+    for (short iKey = 0; iKey < NUM_KEYS; iKey++) {
         miGameInputControlFields[iKey] = new MI_InputControlField(spr_button, x + 16, y + 118 + iKey * 34, GameInputNames[iKey], 420, 150);
         miGameInputControlFields[iKey]->SetDevice(iDevice);
         miGameInputControlFields[iKey]->SetType(0);
@@ -358,7 +358,7 @@ MI_InputControlContainer::MI_InputControlContainer(gfxSprite * spr_button, short
         miGameInputControlFields[iKey]->SetKey(&game_values.playerInput.inputControls[iPlayerID]->inputGameControls[0].keys[iKey]);
     }
 
-    for(short iKey = 0; iKey < NUM_KEYS; iKey++) {
+    for (short iKey = 0; iKey < NUM_KEYS; iKey++) {
         miMenuInputControlFields[iKey] = new MI_InputControlField(spr_button, x + 16, y + 118 + iKey * 34, MenuInputNames[iKey], 420, 150);
         miMenuInputControlFields[iKey]->SetDevice(iDevice);
         miMenuInputControlFields[iKey]->SetType(1);
@@ -465,11 +465,11 @@ void MI_InputControlContainer::SetVisibleInputFields()
 {
     int selDevice = miDeviceSelectField->GetShortValue();
 
-    for(int iKey = 0; iKey < NUM_KEYS; iKey++) {
+    for (int iKey = 0; iKey < NUM_KEYS; iKey++) {
         miGameInputControlFields[iKey]->Show(0 == iSelectedInputType && (iKey < 6 || DEVICE_KEYBOARD != selDevice || iPlayerID == 0));
     }
 
-    for(int iKey = 0; iKey < NUM_KEYS; iKey++) {
+    for (int iKey = 0; iKey < NUM_KEYS; iKey++) {
         miMenuInputControlFields[iKey]->Show(1 == iSelectedInputType && (iKey < 6 || DEVICE_KEYBOARD != selDevice || iPlayerID == 0));
     }
 }
@@ -479,7 +479,7 @@ void MI_InputControlContainer::SetPlayer(short playerID)
     //Hide input options that other players are using
     miDeviceSelectField->HideAllItems(false);
 
-    for(short iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (short iPlayer = 0; iPlayer < 4; iPlayer++) {
         if(iPlayer == playerID)
             continue;
 
@@ -491,7 +491,7 @@ void MI_InputControlContainer::SetPlayer(short playerID)
     iDevice = game_values.playerInput.inputControls[iPlayerID]->iDevice;
     miDeviceSelectField->SetKey(iDevice);
 
-    for(int iKey = 0; iKey < NUM_KEYS; iKey++) {
+    for (int iKey = 0; iKey < NUM_KEYS; iKey++) {
         miGameInputControlFields[iKey]->SetDevice(iDevice);
         miGameInputControlFields[iKey]->SetType(0);
         miGameInputControlFields[iKey]->SetKeyIndex(iKey);
@@ -499,7 +499,7 @@ void MI_InputControlContainer::SetPlayer(short playerID)
         miGameInputControlFields[iKey]->SetKey(&game_values.playerInput.inputControls[iPlayerID]->inputGameControls[0].keys[iKey]);
     }
 
-    for(int iKey = 0; iKey < NUM_KEYS; iKey++) {
+    for (int iKey = 0; iKey < NUM_KEYS; iKey++) {
         miMenuInputControlFields[iKey]->SetDevice(iDevice);
         miMenuInputControlFields[iKey]->SetType(1);
         miMenuInputControlFields[iKey]->SetKeyIndex(iKey);
@@ -520,12 +520,12 @@ void MI_InputControlContainer::UpdateDeviceKeys(short lDevice)
     game_values.playerInput.inputControls[iPlayerID] = &game_values.inputConfiguration[iPlayerID][lDevice == DEVICE_KEYBOARD ? 0 : 1];
     game_values.playerInput.inputControls[iPlayerID]->iDevice = lDevice;
 
-    for(int iKey = 0; iKey < NUM_KEYS; iKey++) {
+    for (int iKey = 0; iKey < NUM_KEYS; iKey++) {
         miGameInputControlFields[iKey]->SetDevice(lDevice);
         miGameInputControlFields[iKey]->SetKey(&game_values.playerInput.inputControls[iPlayerID]->inputGameControls[0].keys[iKey]);
     }
 
-    for(int iKey = 0; iKey < NUM_KEYS; iKey++) {
+    for (int iKey = 0; iKey < NUM_KEYS; iKey++) {
         miMenuInputControlFields[iKey]->SetDevice(lDevice);
         miMenuInputControlFields[iKey]->SetKey(&game_values.playerInput.inputControls[iPlayerID]->inputGameControls[1].keys[iKey]);
     }
@@ -543,10 +543,10 @@ MI_TeamSelect::MI_TeamSelect(gfxSprite * spr_background_ref, short x, short y) :
     spr = spr_background_ref;
     miImage = new MI_Image(spr, ix, iy, 0, 0, 416, 256, 1, 1, 0);
 
-    for(short iTeam = 0; iTeam < 4; iTeam++) {
+    for (short iTeam = 0; iTeam < 4; iTeam++) {
         iTeamCounts[iTeam] = game_values.teamcounts[iTeam];
 
-        for(short iSlot = 0; iSlot < 3; iSlot++)
+        for (short iSlot = 0; iSlot < 3; iSlot++)
             iTeamIDs[iTeam][iSlot] = game_values.teamids[iTeam][iSlot];
 
         fReady[iTeam] = false;
@@ -586,13 +586,13 @@ void MI_TeamSelect::Draw()
 
     short iPlayerCount = 0;
 
-    for(short iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (short iPlayer = 0; iPlayer < 4; iPlayer++) {
         if(game_values.playercontrol[iPlayer] > 0)
             iPlayerCount++;
     }
 
-    for(short iTeam = 0; iTeam < 4; iTeam++) {
-        for(short iTeamItem = 0; iTeamItem < iTeamCounts[iTeam]; iTeamItem++) {
+    for (short iTeam = 0; iTeam < 4; iTeam++) {
+        for (short iTeamItem = 0; iTeamItem < iTeamCounts[iTeam]; iTeamItem++) {
             short iPlayerID = iTeamIDs[iTeam][iTeamItem];
 
             if(game_values.randomskin[iPlayerID])
@@ -622,7 +622,7 @@ void MI_TeamSelect::Draw()
 
 MenuCodeEnum MI_TeamSelect::SendInput(CPlayerInput * playerInput)
 {
-    for(short iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (short iPlayer = 0; iPlayer < 4; iPlayer++) {
         COutputControl * playerKeys = &game_values.playerInput.outputControls[iPlayer];
 
         if(game_values.playercontrol[iPlayer] > 0 && !fReady[iPlayer]) { //if this player is player or cpu
@@ -725,7 +725,7 @@ MenuCodeEnum MI_TeamSelect::SendInput(CPlayerInput * playerInput)
             }
 
             fAllReady = true;
-            for(short i = 0; i < 4; i++) {
+            for (short i = 0; i < 4; i++) {
                 if(!fReady[i]) {
                     fAllReady = false;
                     break;
@@ -757,12 +757,12 @@ MenuCodeEnum MI_TeamSelect::Modify(bool modify)
 
 void MI_TeamSelect::FindNewTeam(short iPlayerID, short iDirection)
 {
-    for(short iTeam = 0; iTeam < 4; iTeam++) {
-        for(short iTeamItem = 0; iTeamItem < iTeamCounts[iTeam]; iTeamItem++) {
+    for (short iTeam = 0; iTeam < 4; iTeam++) {
+        for (short iTeamItem = 0; iTeamItem < iTeamCounts[iTeam]; iTeamItem++) {
             if(iTeamIDs[iTeam][iTeamItem] == iPlayerID) {
                 iTeamCounts[iTeam]--;
 
-                for(int iMovePlayer = iTeamItem; iMovePlayer < iTeamCounts[iTeam]; iMovePlayer++)
+                for (int iMovePlayer = iTeamItem; iMovePlayer < iTeamCounts[iTeam]; iMovePlayer++)
                     iTeamIDs[iTeam][iMovePlayer] = iTeamIDs[iTeam][iMovePlayer + 1];
 
                 short iNewTeam = iTeam;
@@ -777,7 +777,7 @@ void MI_TeamSelect::FindNewTeam(short iPlayerID, short iDirection)
                         iNewTeam = 0;
 
                     fOnlyTeam = true;
-                    for(int iMovePlayer = 0; iMovePlayer < 4; iMovePlayer++) {
+                    for (int iMovePlayer = 0; iMovePlayer < 4; iMovePlayer++) {
                         if(iMovePlayer == iNewTeam)
                             continue;
 
@@ -809,12 +809,12 @@ void MI_TeamSelect::FindNewTeam(short iPlayerID, short iDirection)
 
 void MI_TeamSelect::Reset()
 {
-    for(short iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (short iPlayer = 0; iPlayer < 4; iPlayer++) {
         short iTeamID;
         short iSlotID;
         bool fFound = false;
-        for(iTeamID = 0; iTeamID < 4; iTeamID++) {
-            for(iSlotID = 0; iSlotID < iTeamCounts[iTeamID]; iSlotID++) {
+        for (iTeamID = 0; iTeamID < 4; iTeamID++) {
+            for (iSlotID = 0; iSlotID < iTeamCounts[iTeamID]; iSlotID++) {
                 if(iTeamIDs[iTeamID][iSlotID] == iPlayer) {
                     fFound = true;
                     break;
@@ -831,7 +831,7 @@ void MI_TeamSelect::Reset()
                 iTeamCounts[iTeamID]--;
 
                 if(iTeamCounts[iTeamID] > iSlotID) {
-                    for(short iSlot = iSlotID; iSlot < iTeamCounts[iTeamID]; iSlot++) {
+                    for (short iSlot = iSlotID; iSlot < iTeamCounts[iTeamID]; iSlot++) {
                         iTeamIDs[iTeamID][iSlot] = iTeamIDs[iTeamID][iSlot + 1];
                     }
                 }
@@ -859,7 +859,7 @@ void MI_TeamSelect::Reset()
 
     short iCountTeams = 0;
     short iLastTeam = 0;
-    for(short iTeamID = 0; iTeamID < 4; iTeamID++) {
+    for (short iTeamID = 0; iTeamID < 4; iTeamID++) {
         if(iTeamCounts[iTeamID] > 0) {
             iCountTeams++;
             iLastTeam = iTeamID;
@@ -885,7 +885,7 @@ void MI_TeamSelect::Reset()
 
     fAllReady = true;
 
-    for(short iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (short iPlayer = 0; iPlayer < 4; iPlayer++) {
         iFastScroll[iPlayer] = 0;
         iFastScrollTimer[iPlayer] = 0;
 
@@ -921,11 +921,11 @@ void MI_TeamSelect::Reset()
 short MI_TeamSelect::OrganizeTeams()
 {
     iNumTeams = 0;
-    for(short iTeam = 0; iTeam < 4; iTeam++) {
+    for (short iTeam = 0; iTeam < 4; iTeam++) {
         game_values.teamcounts[iTeam] = 0;
 
         if(iTeamCounts[iTeam] > 0) {
-            for(short iTeamSpot = 0; iTeamSpot < 3; iTeamSpot++)
+            for (short iTeamSpot = 0; iTeamSpot < 3; iTeamSpot++)
                 game_values.teamids[iNumTeams][iTeamSpot] = iTeamIDs[iTeam][iTeamSpot];
 
             game_values.teamcounts[iNumTeams] = iTeamCounts[iTeam];
@@ -938,8 +938,8 @@ short MI_TeamSelect::OrganizeTeams()
 
 short MI_TeamSelect::GetTeam(short iPlayerID)
 {
-    for(short iTeam = 0; iTeam < 4; iTeam++) {
-        for(short iSlot = 0; iSlot < iTeamCounts[iTeam]; iSlot++) {
+    for (short iTeam = 0; iTeam < 4; iTeam++) {
+        for (short iSlot = 0; iSlot < iTeamCounts[iTeam]; iSlot++) {
             if(iTeamIDs[iTeam][iSlot] == iPlayerID) {
                 return iTeam;
             }
@@ -990,7 +990,7 @@ MenuCodeEnum MI_PlayerSelect::Modify(bool modify)
 
 MenuCodeEnum MI_PlayerSelect::SendInput(CPlayerInput * playerInput)
 {
-    for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
         if(playerInput->outputControls[iPlayer].menu_right.fPressed) {
             if(++iSelectedPlayer > 3)
                 iSelectedPlayer = 0;
@@ -1011,7 +1011,7 @@ MenuCodeEnum MI_PlayerSelect::SendInput(CPlayerInput * playerInput)
 
             if(game_values.playercontrol[iSelectedPlayer] == 0) {
                 int iCountPlayers = 0;
-                for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
+                for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
                     if(game_values.playercontrol[iPlayer] > 0)
                         iCountPlayers++;
                 }
@@ -1027,7 +1027,7 @@ MenuCodeEnum MI_PlayerSelect::SendInput(CPlayerInput * playerInput)
 
             if(game_values.playercontrol[iSelectedPlayer] == 0) {
                 int iCountPlayers = 0;
-                for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
+                for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
                     if(game_values.playercontrol[iPlayer] > 0)
                         iCountPlayers++;
                 }
@@ -1070,7 +1070,7 @@ void MI_PlayerSelect::Draw()
 
     miModifyImage->Draw();
 
-    for(short iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (short iPlayer = 0; iPlayer < 4; iPlayer++) {
         spr->draw(ix + iPlayerPosition[iPlayer], iy + 16, game_values.playercontrol[iPlayer] * 34 + 32, 206, 34, 32);
     }
 }
@@ -1175,7 +1175,7 @@ MI_PowerupSelection::MI_PowerupSelection(short x, short y, short width, short nu
     miPreset->SetKey(game_values.poweruppreset);
     miPreset->SetItemChangedCode(MENU_CODE_POWERUP_PRESET_CHANGED);
 
-    for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {
+    for (short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {
         miPowerupSlider[iPowerup] = new MI_PowerupSlider(&rm->spr_selectfield, &rm->menu_slider_bar, &rm->spr_storedpoweruplarge, 0, 0, 245, iPowerupPositionMap[iPowerup]);
         miPowerupSlider[iPowerup]->Add("", 0, "", false, false);
         miPowerupSlider[iPowerup]->Add("", 1, "", false, false);
@@ -1223,7 +1223,7 @@ MI_PowerupSelection::MI_PowerupSelection(short x, short y, short width, short nu
     miDownArrow = new MI_Image(&rm->menu_verticalarrows, 310, 406, 0, 0, 20, 20, 1, 4, 8);
     miUpArrow->Show(false);
 
-    for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {
+    for (short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {
         UI_Control * upcontrol = NULL;
         if(iPowerup == 0)
             upcontrol = miPreset;
@@ -1285,7 +1285,7 @@ MI_PowerupSelection::~MI_PowerupSelection()
 
 void MI_PowerupSelection::SetupPowerupFields()
 {
-    for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {
+    for (short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {
         short iPosition = iPowerupPositionMap[iPowerup];
         MI_PowerupSlider * slider = miPowerupSlider[iPosition];
 
@@ -1300,7 +1300,7 @@ void MI_PowerupSelection::SetupPowerupFields()
 
 void MI_PowerupSelection::EnablePowerupFields(bool fEnable)
 {
-    for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {
+    for (short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {
         miPowerupSlider[iPowerup]->Disable(!fEnable);
     }
 
@@ -1328,7 +1328,7 @@ MenuCodeEnum MI_PowerupSelection::SendInput(CPlayerInput * playerInput)
         fModifying = false;
         return MENU_CODE_UNSELECT_ITEM;
     } else if (MENU_CODE_POWERUP_PRESET_CHANGED == ret) {
-        for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {
+        for (short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {
             short iCurrentValue = g_iCurrentPowerupPresets[game_values.poweruppreset][iPowerupPositionMap[iPowerup]];
             miPowerupSlider[iPowerup]->SetKey(iCurrentValue);
             game_values.powerupweights[iPowerupPositionMap[iPowerup]] = iCurrentValue;
@@ -1338,7 +1338,7 @@ MenuCodeEnum MI_PowerupSelection::SendInput(CPlayerInput * playerInput)
         //EnablePowerupFields(game_values.poweruppreset >= 1 && game_values.poweruppreset <= 3);
     } else if (MENU_CODE_POWERUP_SETTING_CHANGED == ret) {
         //Update the custom presets
-        for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
+        for (short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
             g_iCurrentPowerupPresets[game_values.poweruppreset][iPowerupPositionMap[iPowerup]] = game_values.powerupweights[iPowerupPositionMap[iPowerup]];
     } else if (MENU_CODE_RESTORE_DEFAULT_POWERUP_WEIGHTS == ret || MENU_CODE_CLEAR_POWERUP_WEIGHTS == ret) {
         miDialogImage->Show(true);
@@ -1372,7 +1372,7 @@ MenuCodeEnum MI_PowerupSelection::SendInput(CPlayerInput * playerInput)
 
         if(MENU_CODE_POWERUP_RESET_YES == ret) {
             //restore default powerup weights for powerup selection menu
-            for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {
+            for (short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {
                 short iDefaultValue = g_iDefaultPowerupPresets[game_values.poweruppreset][iPowerupPositionMap[iPowerup]];
                 miPowerupSlider[iPowerup]->SetKey(iDefaultValue);
                 game_values.powerupweights[iPowerupPositionMap[iPowerup]] = iDefaultValue;
@@ -1381,7 +1381,7 @@ MenuCodeEnum MI_PowerupSelection::SendInput(CPlayerInput * playerInput)
             }
         } else if(MENU_CODE_POWERUP_CLEAR_YES == ret) {
             //restore default powerup weights for powerup selection menu
-            for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {
+            for (short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {
                 miPowerupSlider[iPowerup]->SetKey(0);
                 game_values.powerupweights[iPowerup] = 0;
 
@@ -1717,7 +1717,7 @@ MenuCodeEnum MI_AnnouncerField::Modify(bool modify)
 
 MenuCodeEnum MI_AnnouncerField::SendInput(CPlayerInput * playerInput)
 {
-    for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
         if(playerInput->outputControls[iPlayer].menu_right.fPressed || playerInput->outputControls[iPlayer].menu_down.fPressed) {
             list->next();
             UpdateName();
@@ -1803,7 +1803,7 @@ MenuCodeEnum MI_PacksField::SendInput(CPlayerInput * playerInput)
     if(iLastIndex != list->GetCurrentIndex())
         returnCode = itemChangedCode;
 
-    for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
         if(playerInput->outputControls[iPlayer].menu_right.fPressed || playerInput->outputControls[iPlayer].menu_down.fPressed)
             return returnCode;
 
@@ -1856,7 +1856,7 @@ MenuCodeEnum MI_PlaylistField::Modify(bool modify)
 
 MenuCodeEnum MI_PlaylistField::SendInput(CPlayerInput * playerInput)
 {
-    for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
         if(playerInput->outputControls[iPlayer].menu_right.fPressed || playerInput->outputControls[iPlayer].menu_down.fPressed) {
             musiclist->next();
             backgroundmusic[2].stop();
@@ -1960,7 +1960,7 @@ void MI_StoredPowerupResetButton::Draw()
 
     MI_Button::Draw();
 
-    for(short iPowerup = 0; iPowerup < 4; iPowerup++) {
+    for (short iPowerup = 0; iPowerup < 4; iPowerup++) {
         rm->spr_selectfield.draw(ix + iWidth - 142 + iPowerup * 30, iy + 4, 188, 88, 24, 24);
         rm->spr_storedpowerupsmall.draw(ix + iWidth - 138 + iPowerup * 30, iy + 8, game_values.storedpowerups[iPowerup] * 16, 0, 16, 16);
     }
@@ -1990,7 +1990,7 @@ MI_TourStop::MI_TourStop(short x, short y, bool fWorld) :
         miEndStageImage[1] = new MI_Image(&rm->spr_worlditemsplace, 506, 201, 0, 20, 80, 248, 1, 1, 0);
         miEndStageImage[1]->Show(false);
 
-        for(short iBonus = 0; iBonus < 10; iBonus++) {
+        for (short iBonus = 0; iBonus < 10; iBonus++) {
             miBonusIcon[iBonus] = new MI_Image(&rm->spr_worlditemssmall, 170 + iBonus * 20, 133, 0, 0, 16, 16, 1, 1, 0);
             miBonusBackground[iBonus] = new MI_Image(&rm->spr_worlditemsplace, 168 + iBonus * 20, 131, 0, 0, 20, 20, 1, 1, 0);
 
@@ -2034,7 +2034,7 @@ MI_TourStop::~MI_TourStop()
         delete miEndStageImage[0];
         delete miEndStageImage[1];
 
-        for(short iBonus = 0; iBonus < 10; iBonus++) {
+        for (short iBonus = 0; iBonus < 10; iBonus++) {
             delete miBonusIcon[iBonus];
             delete miBonusBackground[iBonus];
         }
@@ -2084,7 +2084,7 @@ void MI_TourStop::Draw()
         miEndStageImage[0]->Draw();
         miEndStageImage[1]->Draw();
 
-        for(short iBonus = 0; iBonus < 10; iBonus++) {
+        for (short iBonus = 0; iBonus < 10; iBonus++) {
             miBonusBackground[iBonus]->Draw();
             miBonusIcon[iBonus]->Draw();
         }
@@ -2163,7 +2163,7 @@ void MI_TourStop::Refresh(short iTourStop)
             miEndStageImage[0]->Show(tourstop->fEndStage);
             miEndStageImage[1]->Show(tourstop->fEndStage);
 
-            for(short iBonus = 0; iBonus < 10; iBonus++) {
+            for (short iBonus = 0; iBonus < 10; iBonus++) {
                 bool fShowBonus = iBonus < tourstop->iNumBonuses;
                 if(fShowBonus) {
                     short iBonusIcon = tourstop->wsbBonuses[iBonus].iBonus;
@@ -2193,17 +2193,17 @@ MI_TournamentScoreboard::MI_TournamentScoreboard(gfxSprite * spr_background, sho
     worldScore = NULL;
     worldScoreModifier = NULL;
 
-    for(short iTeam = 0; iTeam < 4; iTeam++) {
+    for (short iTeam = 0; iTeam < 4; iTeam++) {
         tourScores[iTeam] = NULL;
 
-        for(short iBonus = 0; iBonus < MAX_WORLD_BONUSES_AWARDED; iBonus++)
+        for (short iBonus = 0; iBonus < MAX_WORLD_BONUSES_AWARDED; iBonus++)
             worldBonus[iTeam][iBonus] = NULL;
 
         worldPlace[iTeam] = NULL;
         worldPointsBackground[iTeam] = NULL;
     }
 
-    for(short iGame = 0; iGame < 10; iGame++) {
+    for (short iGame = 0; iGame < 10; iGame++) {
         tourPoints[iGame] = NULL;
         tourBonus[iGame] = NULL;
     }
@@ -2221,12 +2221,12 @@ void MI_TournamentScoreboard::FreeScoreboard()
     if(!fCreated)
         return;
 
-    for(short iTeam = 0; iTeam < iNumTeams; iTeam++) {
-        for(int iGame = 0; iGame < iNumGames; iGame++) {
+    for (short iTeam = 0; iTeam < iNumTeams; iTeam++) {
+        for (int iGame = 0; iGame < iNumGames; iGame++) {
             delete miIconImages[iTeam][iGame];
         }
 
-        for(int iPlayer = 0; iPlayer < iTeamCounts[iTeam]; iPlayer++) {
+        for (int iPlayer = 0; iPlayer < iTeamCounts[iTeam]; iPlayer++) {
             delete miPlayerImages[iTeam][iPlayer];
         }
 
@@ -2244,7 +2244,7 @@ void MI_TournamentScoreboard::FreeScoreboard()
             worldPlace[iTeam] = NULL;
         }
 
-        for(short iBonus = 0; iBonus < MAX_WORLD_BONUSES_AWARDED; iBonus++) {
+        for (short iBonus = 0; iBonus < MAX_WORLD_BONUSES_AWARDED; iBonus++) {
             if(worldBonus[iTeam][iBonus]) {
                 delete worldBonus[iTeam][iBonus];
                 worldBonus[iTeam][iBonus] = NULL;
@@ -2257,7 +2257,7 @@ void MI_TournamentScoreboard::FreeScoreboard()
         }
     }
 
-    for(short iGame = 0; iGame < iNumGames; iGame++) {
+    for (short iGame = 0; iGame < iNumGames; iGame++) {
         if(tourPoints[iGame]) {
             delete tourPoints[iGame];
             tourPoints[iGame] = NULL;
@@ -2290,14 +2290,14 @@ void MI_TournamentScoreboard::FreeScoreboard()
 
 void MI_TournamentScoreboard::Update()
 {
-    for(short iTeam = 0; iTeam < iNumTeams; iTeam++) {
+    for (short iTeam = 0; iTeam < iNumTeams; iTeam++) {
         miTeamImages[iTeam]->Update();
 
-        for(short iGame = 0; iGame < iNumGames; iGame++) {
+        for (short iGame = 0; iGame < iNumGames; iGame++) {
             miIconImages[iTeam][iGame]->Update();
         }
 
-        for(short iPlayer = 0; iPlayer < iTeamCounts[iTeam]; iPlayer++) {
+        for (short iPlayer = 0; iPlayer < iTeamCounts[iTeam]; iPlayer++) {
             miPlayerImages[iTeam][iPlayer]->Update();
         }
 
@@ -2306,7 +2306,7 @@ void MI_TournamentScoreboard::Update()
     }
 
     if(game_values.matchtype == MATCH_TYPE_TOUR) {
-        for(short iGame = 0; iGame < iNumGames; iGame++) {
+        for (short iGame = 0; iGame < iNumGames; iGame++) {
             if(tourBonus[iGame])
                 tourBonus[iGame]->Update();
         }
@@ -2326,7 +2326,7 @@ void MI_TournamentScoreboard::Update()
                     short iRandX = (short)(RNGMAX(440) + 100);
                     short iRandY = (short)(RNGMAX(280) + 100);
 
-                    for(short iBlock = 0; iBlock < 28; iBlock++) {
+                    for (short iBlock = 0; iBlock < 28; iBlock++) {
                         float dVel = 7.0f + ((iBlock % 2) * 5.0f);
                         float dVelX = dVel * cos(dAngle);
                         float dVelY = dVel * sin(dAngle);
@@ -2372,15 +2372,15 @@ void MI_TournamentScoreboard::Draw()
     if(!fShow)
         return;
 
-    for(int iTeam = 0; iTeam < iNumTeams; iTeam++) {
+    for (int iTeam = 0; iTeam < iNumTeams; iTeam++) {
         miTeamImages[iTeam]->Draw();
 
-        for(int iGame = 0; iGame < iNumGames; iGame++) {
+        for (int iGame = 0; iGame < iNumGames; iGame++) {
             if(iSwirlIconTeam != iTeam || iSwirlIconGame != iGame)
                 miIconImages[iTeam][iGame]->Draw();
         }
 
-        for(int iPlayer = 0; iPlayer < iTeamCounts[iTeam]; iPlayer++) {
+        for (int iPlayer = 0; iPlayer < iTeamCounts[iTeam]; iPlayer++) {
             miPlayerImages[iTeam][iPlayer]->Draw();
         }
     }
@@ -2391,12 +2391,12 @@ void MI_TournamentScoreboard::Draw()
 
     //Draw tour totals
     if(game_values.matchtype == MATCH_TYPE_TOUR) {
-        for(short iTeam = 0; iTeam < iNumTeams; iTeam++)
+        for (short iTeam = 0; iTeam < iNumTeams; iTeam++)
             tourScores[iTeam]->Draw();
 
         miTourPointBar->Draw();
 
-        for(short iGame = 0; iGame < iNumGames; iGame++) {
+        for (short iGame = 0; iGame < iNumGames; iGame++) {
             if(tourBonus[iGame])
                 tourBonus[iGame]->Draw();
 
@@ -2405,15 +2405,15 @@ void MI_TournamentScoreboard::Draw()
     }
 
     if(game_values.matchtype == MATCH_TYPE_WORLD) {
-        for(short iTeam = 0; iTeam < iNumTeams; iTeam++) {
+        for (short iTeam = 0; iTeam < iNumTeams; iTeam++) {
             worldPointsBackground[iTeam]->Draw();
         }
 
-        for(short iTeam = 0; iTeam < iNumTeams; iTeam++) {
+        for (short iTeam = 0; iTeam < iNumTeams; iTeam++) {
             tourScores[iTeam]->Draw();
             worldPlace[iTeam]->Draw();
 
-            for(short iBonus = 0; iBonus < MAX_WORLD_BONUSES_AWARDED; iBonus++) {
+            for (short iBonus = 0; iBonus < MAX_WORLD_BONUSES_AWARDED; iBonus++) {
                 worldBonus[iTeam][iBonus]->Draw();
             }
         }
@@ -2429,10 +2429,10 @@ void MI_TournamentScoreboard::CreateScoreboard(short numTeams, short numGames, g
 
     sprIcons = spr_icons_ref;
 
-    for(short iTeam = 0; iTeam < 4; iTeam++) {
+    for (short iTeam = 0; iTeam < 4; iTeam++) {
         iTeamCounts[iTeam] = game_values.teamcounts[iTeam];
 
-        for(short iTeamSpot = 0; iTeamSpot < 3; iTeamSpot++) {
+        for (short iTeamSpot = 0; iTeamSpot < 3; iTeamSpot++) {
             iTeamIDs[iTeam][iTeamSpot] = game_values.teamids[iTeam][iTeamSpot];
         }
     }
@@ -2457,7 +2457,7 @@ void MI_TournamentScoreboard::CreateScoreboard(short numTeams, short numGames, g
     bool fTour = game_values.matchtype == MATCH_TYPE_TOUR;
     bool fNotTournament = game_values.matchtype != MATCH_TYPE_TOURNAMENT;
 
-    for(short iTeam = 0; iTeam < iNumTeams; iTeam++) {
+    for (short iTeam = 0; iTeam < iNumTeams; iTeam++) {
         short iTeamY = GetYFromPlace(iTeam);
 
         if(fTour)
@@ -2468,7 +2468,7 @@ void MI_TournamentScoreboard::CreateScoreboard(short numTeams, short numGames, g
         miPlayerImages[iTeam] = new MI_Image * [iTeamCounts[iTeam]];
 
         if(game_values.matchtype != MATCH_TYPE_WORLD) {
-            for(short iGame = 0; iGame < iNumGames; iGame++) {
+            for (short iGame = 0; iGame < iNumGames; iGame++) {
                 float dSpacing = GetIconSpacing();
 
                 miIconImages[iTeam][iGame] = new MI_Image(sprIcons, ix + 128 + (short)dSpacing + (short)((float)iGame * (32.0f + dSpacing)) - (fTour ? 40 : 0), iTeamY + 16, 0, 0, 32, 32, fTour ? 4 : 1, 1, fTour ? 8 : 0);
@@ -2476,7 +2476,7 @@ void MI_TournamentScoreboard::CreateScoreboard(short numTeams, short numGames, g
             }
         }
 
-        for(short iPlayer = 0; iPlayer < iTeamCounts[iTeam]; iPlayer++) {
+        for (short iPlayer = 0; iPlayer < iTeamCounts[iTeam]; iPlayer++) {
             miPlayerImages[iTeam][iPlayer] = new MI_Image(rm->spr_player[iTeamIDs[iTeam][iPlayer]][PGFX_STANDING_R], ix + iScoreboardPlayerOffsetsX[iTeamCounts[iTeam] - 1][iPlayer] - (fTour ? 40 : 0), iTeamY + 16, 0, 0, 32, 32, 2, 1, 0);
         }
 
@@ -2487,7 +2487,7 @@ void MI_TournamentScoreboard::CreateScoreboard(short numTeams, short numGames, g
             worldPointsBackground[iTeam] = new MI_Image(sprBackground, ix + 476, iTeamY, 516, 160, 64, 64, 1, 2, 0);
             worldPlace[iTeam] = new MI_Image(sprIcons, ix + 102, iTeamY + 14, 0, 0, 32, 32, 4, 1, 8);
 
-            for(short iBonus = 0; iBonus < MAX_WORLD_BONUSES_AWARDED; iBonus++) {
+            for (short iBonus = 0; iBonus < MAX_WORLD_BONUSES_AWARDED; iBonus++) {
                 worldBonus[iTeam][iBonus] = new MI_Image(&rm->spr_worlditems, ix + 180 + 38 * iBonus, iTeamY + 14, 0, 0, 32, 32, 1, 1, 0);
                 worldBonus[iTeam][iBonus]->Show(false);
             }
@@ -2500,7 +2500,7 @@ void MI_TournamentScoreboard::CreateScoreboard(short numTeams, short numGames, g
     }
 
     if(fTour) {
-        for(short iGame = 0; iGame < iNumGames; iGame++) {
+        for (short iGame = 0; iGame < iNumGames; iGame++) {
             float dSpacing = GetIconSpacing();
             short iTourPointX = ix + 105 + (short)dSpacing + (short)((float)iGame * (32.0f + dSpacing));
             tourPoints[iGame] = new MI_ScoreText(iTourPointX, GetYFromPlace(0));
@@ -2525,13 +2525,13 @@ void MI_TournamentScoreboard::RefreshWorldScores(short gameWinner)
 
     TourStop * tourStop = game_values.tourstops[game_values.tourstopcurrent];
 
-    for(short iTeam = 0; iTeam < iNumTeams; iTeam++) {
+    for (short iTeam = 0; iTeam < iNumTeams; iTeam++) {
         short iTeamY = GetYFromPlace(game_values.tournament_scores[iTeam].wins);
 
         miTeamImages[iTeam]->SetPosition(ix - 40, iTeamY);
         worldPointsBackground[iTeam]->SetPosition(ix + 476, iTeamY);
 
-        for(short iPlayer = 0; iPlayer < iTeamCounts[iTeam]; iPlayer++) {
+        for (short iPlayer = 0; iPlayer < iTeamCounts[iTeam]; iPlayer++) {
             static short iPlaceSprite[4] = {4, 0, 8, 9};
             miPlayerImages[iTeam][iPlayer]->SetPosition(ix + iScoreboardPlayerOffsetsX[iTeamCounts[iTeam] - 1][iPlayer] - 40, iTeamY + 16);
             miPlayerImages[iTeam][iPlayer]->SetImageSource(rm->spr_player[iTeamIDs[iTeam][iPlayer]][iPlaceSprite[game_values.tournament_scores[iTeam].wins]]);
@@ -2571,11 +2571,11 @@ void MI_TournamentScoreboard::RefreshWorldScores(short gameWinner)
     short iBonusCounts[4] = {0, 0, 0, 0};
 
     if(gameWinner >= 0) {
-        for(short iBonus = 0; iBonus < tourStop->iNumBonuses; iBonus++) {
+        for (short iBonus = 0; iBonus < tourStop->iNumBonuses; iBonus++) {
             WorldStageBonus * bonus = &tourStop->wsbBonuses[iBonus];
 
             if(bonus->iWinnerPlace < iNumTeams) {
-                for(short iTeam = 0; iTeam < iNumTeams; iTeam++) {
+                for (short iTeam = 0; iTeam < iNumTeams; iTeam++) {
                     if(score[iTeam]->place == bonus->iWinnerPlace) {
                         short iDisplayPosition = game_values.tournament_scores[iTeam].wins;
 
@@ -2592,8 +2592,8 @@ void MI_TournamentScoreboard::RefreshWorldScores(short gameWinner)
         }
     }
 
-    for(short iTeam = 0; iTeam < iNumTeams;  iTeam++) {
-        for(short iBonus = iBonusCounts[iTeam]; iBonus < MAX_WORLD_BONUSES_AWARDED; iBonus++) {
+    for (short iTeam = 0; iTeam < iNumTeams;  iTeam++) {
+        for (short iBonus = iBonusCounts[iTeam]; iBonus < MAX_WORLD_BONUSES_AWARDED; iBonus++) {
             worldBonus[iTeam][iBonus]->Show(false);
         }
     }
@@ -2607,7 +2607,7 @@ void MI_TournamentScoreboard::RefreshTourScores()
 {
     DetermineScoreboardWinners();
 
-    for(short iTeam = 0; iTeam < iNumTeams; iTeam++) {
+    for (short iTeam = 0; iTeam < iNumTeams; iTeam++) {
         short iTeamY = GetYFromPlace(game_values.tournament_scores[iTeam].wins);
         iTeamY += 28; //shift down 28 pxls for extra tour points bar
 
@@ -2615,13 +2615,13 @@ void MI_TournamentScoreboard::RefreshTourScores()
 
         miTeamImages[iTeam]->SetPosition(ix - 40, iTeamY);
 
-        for(short iPlayer = 0; iPlayer < iTeamCounts[iTeam]; iPlayer++) {
+        for (short iPlayer = 0; iPlayer < iTeamCounts[iTeam]; iPlayer++) {
             static short iPlaceSprite[4] = {4, 0, 8, 9};
             miPlayerImages[iTeam][iPlayer]->SetPosition(ix + iScoreboardPlayerOffsetsX[iTeamCounts[iTeam] - 1][iPlayer] - 40, iTeamY + 16);
             miPlayerImages[iTeam][iPlayer]->SetImageSource(rm->spr_player[iTeamIDs[iTeam][iPlayer]][iPlaceSprite[game_values.tournament_scores[iTeam].wins]]);
         }
 
-        for(short iGame = 0; iGame < game_values.tourstopcurrent; iGame++) {
+        for (short iGame = 0; iGame < game_values.tourstopcurrent; iGame++) {
             miIconImages[iTeam][iGame]->SetImage(0, game_values.tournament_scores[iTeam].type[iGame] * 32, 32, 32);
 
             miIconImages[iTeam][iGame]->SetPosition(ix + 128 + (short)dSpacing + (short)((float)iGame * (32.0f + dSpacing)) - 40, iTeamY + 16);
@@ -2631,7 +2631,7 @@ void MI_TournamentScoreboard::RefreshTourScores()
             miIconImages[iTeam][iGame]->Show(true);
         }
 
-        for(short iGame = game_values.tourstopcurrent; iGame < game_values.tourstoptotal; iGame++) {
+        for (short iGame = game_values.tourstopcurrent; iGame < game_values.tourstoptotal; iGame++) {
             miIconImages[iTeam][iGame]->Show(false);
         }
 
@@ -2646,15 +2646,15 @@ void MI_TournamentScoreboard::DetermineScoreboardWinners()
     short iNumWinningTeams = 0;
     short iWinningTeams[4] = {-1, -1, -1, -1};
 
-    for(short iTeam = 0; iTeam < iNumTeams; iTeam++) {
+    for (short iTeam = 0; iTeam < iNumTeams; iTeam++) {
         if(game_values.tournament_scores[iTeam].wins == 0) {
             iWinningTeams[iNumWinningTeams++] = iTeam;
         }
     }
 
     //Adjust tied scores so display is right
-    for(short iMyTeam = 0; iMyTeam < iNumTeams; iMyTeam++) {
-        for(short iTheirTeam = 0; iTheirTeam < iNumTeams; iTheirTeam++) {
+    for (short iMyTeam = 0; iMyTeam < iNumTeams; iMyTeam++) {
+        for (short iTheirTeam = 0; iTheirTeam < iNumTeams; iTheirTeam++) {
             if(iMyTeam == iTheirTeam)
                 continue;
 
@@ -2674,7 +2674,7 @@ void MI_TournamentScoreboard::DetermineScoreboardWinners()
         game_values.tournamentwinner = iTournamentWinner;
 
         //Flash the background of the winning teams
-        for(short iTeam = 0; iTeam < iNumWinningTeams; iTeam++) {
+        for (short iTeam = 0; iTeam < iNumWinningTeams; iTeam++) {
             miTeamImages[iWinningTeams[iTeam]]->SetAnimationSpeed(20);
 
             if(worldPointsBackground[iWinningTeams[iTeam]])
@@ -2698,8 +2698,8 @@ void MI_TournamentScoreboard::RefreshTournamentScores(short gameWinner)
             worldPointsBackground[iTournamentWinner]->SetAnimationSpeed(20);
     }
 
-    for(short iTeam = 0; iTeam < iNumTeams; iTeam++) {
-        for(short iGame = 0; iGame < game_values.tournament_scores[iTeam].wins; iGame++) {
+    for (short iTeam = 0; iTeam < iNumTeams; iTeam++) {
+        for (short iGame = 0; iGame < game_values.tournament_scores[iTeam].wins; iGame++) {
             miIconImages[iTeam][iGame]->SetImage(game_values.tournament_scores[iTeam].type[iGame] * 32, 0, 32, 32);
 
             if(iTournamentWinner < 0 && iGameWinner == iTeam && iGame == game_values.tournament_scores[iTeam].wins - 1) {
@@ -2713,7 +2713,7 @@ void MI_TournamentScoreboard::RefreshTournamentScores(short gameWinner)
             miIconImages[iTeam][iGame]->Show(true);
         }
 
-        for(short iGame = game_values.tournament_scores[iTeam].wins; iGame < iNumGames; iGame++) {
+        for (short iGame = game_values.tournament_scores[iTeam].wins; iGame < iNumGames; iGame++) {
             miIconImages[iTeam][iGame]->Show(false);
         }
     }
@@ -2738,7 +2738,7 @@ MI_BonusWheel::MI_BonusWheel(short x, short y) :
     miPlayerImages = NULL;
     fCpuControlled = false;
 
-    for(short iImage = 0; iImage < NUMBONUSITEMSONWHEEL; iImage++) {
+    for (short iImage = 0; iImage < NUMBONUSITEMSONWHEEL; iImage++) {
         dSelectionSector[iImage] = (float)iImage * TWO_PI / (float)(NUMBONUSITEMSONWHEEL);
 
         short iPowerupX = x + 160 + (short)(110.0f * cos(dSelectionSector[iImage]));
@@ -2758,12 +2758,12 @@ MI_BonusWheel::MI_BonusWheel(short x, short y) :
 MI_BonusWheel::~MI_BonusWheel()
 {
     if(miBonusImages) {
-        for(int iImage = 0; iImage < NUMBONUSITEMSONWHEEL; iImage++)
+        for (int iImage = 0; iImage < NUMBONUSITEMSONWHEEL; iImage++)
             delete miBonusImages[iImage];
     }
 
     if(miPlayerImages) {
-        for(int iPlayer = 0; iPlayer < iNumPlayers; iPlayer++)
+        for (int iPlayer = 0; iPlayer < iNumPlayers; iPlayer++)
             delete miPlayerImages[iPlayer];
 
         delete [] miPlayerImages;
@@ -2784,7 +2784,7 @@ MenuCodeEnum MI_BonusWheel::Modify(bool fModify)
             dFinalAngle -= TWO_PI;
 
         float dSectorSize = TWO_PI / NUMBONUSITEMSONWHEEL;
-        for(short iSector = 0; iSector < NUMBONUSITEMSONWHEEL; iSector++) {
+        for (short iSector = 0; iSector < NUMBONUSITEMSONWHEEL; iSector++) {
             if(dFinalAngle >= iSector * dSectorSize && dFinalAngle < (iSector + 1) * dSectorSize) {
                 iSelectedPowerup = iChosenPowerups[iSector + 1 >= NUMBONUSITEMSONWHEEL ? 0 : iSector + 1];
                 float dNewWinddownAngle = dWinddownAngle + (iSector + 1) * dSectorSize - dFinalAngle;
@@ -2823,11 +2823,11 @@ void MI_BonusWheel::Update()
         if(!fPressedSelect && (fCpuControlled || ++iPressSelectTimer > 620))
             Modify(true);
 
-        for(int iImage = 0; iImage < NUMBONUSITEMSONWHEEL; iImage++) {
+        for (int iImage = 0; iImage < NUMBONUSITEMSONWHEEL; iImage++) {
             miBonusImages[iImage]->Update();
         }
 
-        for(int iPlayer = 0; iPlayer < iNumPlayers; iPlayer++) {
+        for (int iPlayer = 0; iPlayer < iNumPlayers; iPlayer++) {
             miPlayerImages[iPlayer]->Update();
         }
 
@@ -2877,12 +2877,12 @@ void MI_BonusWheel::Update()
 
                 //Reset all player's stored item
                 if(!game_values.keeppowerup) {
-                    for(short iPlayer = 0; iPlayer < 4; iPlayer++)
+                    for (short iPlayer = 0; iPlayer < 4; iPlayer++)
                         game_values.storedpowerups[iPlayer] = -1;
                 }
 
                 //Give the newly won stored item to the winning players
-                for(short iPlayer = 0; iPlayer < game_values.teamcounts[iWinningTeam]; iPlayer++)
+                for (short iPlayer = 0; iPlayer < game_values.teamcounts[iWinningTeam]; iPlayer++)
                     game_values.storedpowerups[game_values.teamids[iWinningTeam][iPlayer]] = iSelectedPowerup;
 
                 ifSoundOnPlay(sfx_collectpowerup);
@@ -2917,14 +2917,14 @@ void MI_BonusWheel::Draw()
     if(iState > 0)
         rm->spr_powerupselector.draw(iSelectorX, iSelectorY, iSelectorAnimation * 64, 0, 64, 64);
 
-    for(int iImage = 0; iImage < NUMBONUSITEMSONWHEEL; iImage++) {
+    for (int iImage = 0; iImage < NUMBONUSITEMSONWHEEL; iImage++) {
         if(iImage >= iDisplayPowerupIndex)
             break;
 
         miBonusImages[iImage]->Draw();
     }
 
-    for(int iPlayer = 0; iPlayer < iNumPlayers; iPlayer++) {
+    for (int iPlayer = 0; iPlayer < iNumPlayers; iPlayer++) {
         miPlayerImages[iPlayer]->Draw();
     }
 
@@ -2948,13 +2948,13 @@ void MI_BonusWheel::Reset(bool fTournament)
 
     //Randomly display the powerups around the ring
     short iCountWeight = 0;
-    for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
+    for (short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
         iCountWeight += game_values.powerupweights[iPowerup];
 
     //Always have at least 1 poison mushroom to try to avoid
     short iPoisonMushroom = RNGMAX(NUMBONUSITEMSONWHEEL);
 
-    for(short iPowerup = 0; iPowerup < NUMBONUSITEMSONWHEEL; iPowerup++) {
+    for (short iPowerup = 0; iPowerup < NUMBONUSITEMSONWHEEL; iPowerup++) {
         int iChoosePowerup = 0;
 
         if(iCountWeight > 0 && iPoisonMushroom != iPowerup) {
@@ -2971,7 +2971,7 @@ void MI_BonusWheel::Reset(bool fTournament)
 
     //Setup player images on wheel
     if(miPlayerImages) {
-        for(short iPlayer = 0; iPlayer < iNumPlayers; iPlayer++)
+        for (short iPlayer = 0; iPlayer < iNumPlayers; iPlayer++)
             delete miPlayerImages[iPlayer];
 
         delete [] miPlayerImages;
@@ -2982,7 +2982,7 @@ void MI_BonusWheel::Reset(bool fTournament)
     miPlayerImages = new MI_Image * [iNumPlayers];
 
     short iPlayerX = ix + 160 - ((iNumPlayers - 1) * 17);
-    for(short iPlayer = 0; iPlayer < iNumPlayers; iPlayer++) {
+    for (short iPlayer = 0; iPlayer < iNumPlayers; iPlayer++) {
         miPlayerImages[iPlayer] = new MI_Image(rm->spr_player[game_values.teamids[iWinningTeam][iPlayer]][PGFX_JUMPING_R], iPlayerX, iy + 210, 0, 0, 32, 32, 1, 1, 0);
         iPlayerX += 34;
     }
@@ -3003,7 +3003,7 @@ void MI_BonusWheel::Reset(bool fTournament)
     dSelectionSpeedGoal = (float)(RNGMAX(100) + 200) * 0.0005f;
     iSelectionSpeedTimer = 0;
 
-    for(short iSector = 0; iSector < NUMBONUSITEMSONWHEEL; iSector++) {
+    for (short iSector = 0; iSector < NUMBONUSITEMSONWHEEL; iSector++) {
         if(dSelectionAngle > dSelectionSector[iSector])
             iNextSelectionSoundIndex = iSector + 1;
         else
@@ -3012,7 +3012,7 @@ void MI_BonusWheel::Reset(bool fTournament)
 
     //Figure out if only cpus are on the winning team, if so, the wheel will be stopped early
     fCpuControlled = true;
-    for(short iPlayer = 0; iPlayer < game_values.teamcounts[iWinningTeam]; iPlayer++) {
+    for (short iPlayer = 0; iPlayer < game_values.teamcounts[iWinningTeam]; iPlayer++) {
         if(game_values.playercontrol[game_values.teamids[iWinningTeam][iPlayer]] == 1)
             fCpuControlled = false;
     }
@@ -3040,7 +3040,7 @@ MI_ScreenResize::MI_ScreenResize() :
 
 MI_ScreenResize::~MI_ScreenResize()
 {
-    for(int iText = 0; iText < 7; iText++)
+    for (int iText = 0; iText < 7; iText++)
         delete miText[iText];
 }
 
@@ -3064,7 +3064,7 @@ MenuCodeEnum MI_ScreenResize::SendInput(CPlayerInput * playerInput)
         while(SDL_PollEvent(&event)) {
             game_values.playerInput.Update(event, 1);
 
-            for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
+            for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
                 if (playerInput->outputControls[iPlayer].menu_cancel.fPressed ||
                         playerInput->outputControls[iPlayer].menu_select.fPressed) {
                     done = true;
@@ -3137,7 +3137,7 @@ void MI_ScreenResize::Draw()
     if(!fShow)
         return;
 
-    for(int iText = 0; iText < 7; iText++)
+    for (int iText = 0; iText < 7; iText++)
         miText[iText]->Draw();
 }
 #endif //_XBOX
@@ -3187,7 +3187,7 @@ MenuCodeEnum MI_MapFilterScroll::Modify(bool modify)
 
 MenuCodeEnum MI_MapFilterScroll::SendInput(CPlayerInput * playerInput)
 {
-    for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
         //Only allow the controlling team to control the menu (if there is one)
         if(iControllingTeam != -1) {
             if(iControllingTeam != LookupTeamID(iPlayer) || game_values.playercontrol[iPlayer] != 1)
@@ -3256,7 +3256,7 @@ void MI_MapFilterScroll::Draw()
     rm->menu_font_large.drawCentered(ix + (iWidth >> 1), iy + 5, "Map Filters");
 
     //Draw each filter field
-    for(short iLine = 0; iLine < iNumLines && (unsigned short)iLine < items.size(); iLine++) {
+    for (short iLine = 0; iLine < iNumLines && (unsigned short)iLine < items.size(); iLine++) {
         if(iOffset + iLine >= NUM_AUTO_FILTERS) {
             short iHalfLineWidth = (iWidth - 64) >> 1;
             short iLineWidth = iWidth - 64;
@@ -3329,7 +3329,7 @@ bool MI_MapFilterScroll::MovePrev()
 MI_MapBrowser::MI_MapBrowser() :
     UI_Control(0, 0)
 {
-    for(short iSurface = 0; iSurface < 9; iSurface++)
+    for (short iSurface = 0; iSurface < 9; iSurface++)
         mapSurfaces[iSurface] = NULL;
 
     srcRectBackground.x = 0;
@@ -3347,7 +3347,7 @@ MI_MapBrowser::MI_MapBrowser() :
 
 MI_MapBrowser::~MI_MapBrowser()
 {
-    for(short iSurface = 0; iSurface < 9; iSurface++) {
+    for (short iSurface = 0; iSurface < 9; iSurface++) {
         if(mapSurfaces[iSurface]) {
             SDL_FreeSurface(mapSurfaces[iSurface]);
             mapSurfaces[iSurface] = NULL;
@@ -3374,10 +3374,10 @@ void MI_MapBrowser::Draw()
     SDL_Rect rSrc = {0, 0, 160, 120};
     SDL_Rect rDst = {0, 0, 160, 120};
 
-    for(short iRow = 0; iRow < 3; iRow++) {
+    for (short iRow = 0; iRow < 3; iRow++) {
         rDst.y = iRow * 150 + 30;
 
-        for(short iCol = 0; iCol < 3; iCol++) {
+        for (short iCol = 0; iCol < 3; iCol++) {
             if(iSelectedCol != iCol || iSelectedRow != iRow) {
                 if(iRow * 3 + iCol + iPage * 9 >= iMapCount)
                     break;
@@ -3423,7 +3423,7 @@ MenuCodeEnum MI_MapBrowser::Modify(bool modify)
 
 MenuCodeEnum MI_MapBrowser::SendInput(CPlayerInput * playerInput)
 {
-    for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
         //Only allow the controlling team to control the menu (if there is one)
         if(iControllingTeam != -1) {
             if(iControllingTeam != LookupTeamID(iPlayer) || game_values.playercontrol[iPlayer] != 1)
@@ -3559,7 +3559,7 @@ void MI_MapBrowser::Reset(short type)
 
 void MI_MapBrowser::LoadPage(short page, bool fUseFilters)
 {
-    for(short iMap = 0; iMap < 9; iMap++) {
+    for (short iMap = 0; iMap < 9; iMap++) {
         short iIndex = iMap + page * 9;
 
         if(iIndex >= iMapCount)
@@ -3659,7 +3659,7 @@ void MI_World::Init()
 
     iState = -2;
 
-    for(short iTeam = 0; iTeam < 4; iTeam++) {
+    for (short iTeam = 0; iTeam < 4; iTeam++) {
         iStateTransition[iTeam] = 0;
         iItemPopupDrawY[iTeam] = 0;
         iPopupFlag[iTeam] = false;
@@ -3854,7 +3854,7 @@ void MI_World::Update()
     }
 
     if(iNumPopups > 0) {
-        for(short iTeam = 0; iTeam < 4; iTeam++) {
+        for (short iTeam = 0; iTeam < 4; iTeam++) {
             //Do inventory popup open effect
             if(iStateTransition[iTeam] == 1) {
                 iItemPopupDrawY[iTeam] += 4;
@@ -3872,7 +3872,7 @@ void MI_World::Update()
 
                     //Shift down popup menus if one was removed that was below
                     bool fStartShift = false;
-                    for(short iMoveTeam = 0; iMoveTeam < iNumPopups - 1; iMoveTeam++) {
+                    for (short iMoveTeam = 0; iMoveTeam < iNumPopups - 1; iMoveTeam++) {
                         if(iPopupOrder[iMoveTeam] == iTeam) {
                             fStartShift = true;
                         }
@@ -3888,7 +3888,7 @@ void MI_World::Update()
             }
         }
 
-        for(short iTeam = 0; iTeam < 4; iTeam++) {
+        for (short iTeam = 0; iTeam < 4; iTeam++) {
             //Transition the inventory popup to it's new location if it needs to move
             if(iPopupOffsetsCurrent[iTeam] > iPopupOffsets[iTeam]) {
                 iPopupOffsetsCurrent[iTeam] -= 4;
@@ -3899,7 +3899,7 @@ void MI_World::Update()
     }
 
     bool iShowStoredItems = false;
-    for(short iTeam = 0; iTeam < 4; iTeam++) {
+    for (short iTeam = 0; iTeam < 4; iTeam++) {
         if(iShowStoredItems = iStateTransition[iTeam] == 1 || iStateTransition[iTeam] == 3)
             break;
     }
@@ -4035,7 +4035,7 @@ void MI_World::Draw()
 
     //Draw the teleport/warp stars effect
     if(iState == -2 || iState >= 4) {
-        for(short iStar = 0; iStar < 10; iStar++) {
+        for (short iStar = 0; iStar < 10; iStar++) {
             float dAngle = dTeleportStarAngle + (TWO_PI / 10.0f) * (float)iStar;
             short iStarX = (short)(dTeleportStarRadius * cos(dAngle));
             short iStarY = (short)(dTeleportStarRadius * sin(dAngle));
@@ -4048,13 +4048,13 @@ void MI_World::Draw()
     if(iNumPopups > 0) {
         //Draw Spots and Stored Powerups
         short iPlayerCount = 0;
-        for(short iCountPlayers = 0; iCountPlayers < 4; iCountPlayers++) {
+        for (short iCountPlayers = 0; iCountPlayers < 4; iCountPlayers++) {
             iPlayerCount += game_values.teamcounts[iCountPlayers];
         }
 
         short iStoredPowerupBoxX = 296 - 48 * (iPlayerCount - 1);
-        for(short iTeamStore = 0; iTeamStore < 4; iTeamStore++) {
-            for(short iMemberStore = 0; iMemberStore < game_values.teamcounts[iTeamStore]; iMemberStore++) {
+        for (short iTeamStore = 0; iTeamStore < 4; iTeamStore++) {
+            for (short iMemberStore = 0; iMemberStore < game_values.teamcounts[iTeamStore]; iMemberStore++) {
                 short iPlayerId = game_values.teamids[iTeamStore][iMemberStore];
 
                 rm->spr_worlditempopup.draw(iStoredPowerupBoxX, iStoredItemPopupDrawY, game_values.colorids[iPlayerId] * 48, 256, 48, 48);
@@ -4065,7 +4065,7 @@ void MI_World::Draw()
             }
         }
 
-        for(short iTeam = 0; iTeam < 4; iTeam++) {
+        for (short iTeam = 0; iTeam < 4; iTeam++) {
             if(iStateTransition[iTeam] != 0) {
                 short iColorId = game_values.colorids[game_values.teamids[iTeam][0]];
                 rm->spr_worlditempopup.draw(0, 448 - iItemPopupDrawY[iTeam] - iPopupOffsetsCurrent[iTeam], 0, iColorId * 64 + 32 - iItemPopupDrawY[iTeam], 320, iItemPopupDrawY[iTeam] << 1);
@@ -4078,7 +4078,7 @@ void MI_World::Draw()
                         rm->spr_worlditempopup.draw(iItemCol[iTeam] * 52 + 114, 424 - iPopupOffsetsCurrent[iTeam], iColorId * 48, 256, 48, 48);
 
                     short iStartItem = iItemPage[iTeam] << 3;
-                    for(short iItem = iStartItem; iItem < iStartItem + 8 && iItem < iNumPowerups; iItem++) {
+                    for (short iItem = iStartItem; iItem < iStartItem + 8 && iItem < iNumPowerups; iItem++) {
                         short iPowerup = game_values.worldpowerups[iTeam][iItem];
                         if(iPowerup >= NUM_POWERUPS)
                             rm->spr_worlditems.draw((iItem - iItemPage[iTeam] * 8) * 52 + 122, 432 - iPopupOffsetsCurrent[iTeam], (iPowerup - NUM_POWERUPS) << 5, 0, 32, 32);
@@ -4108,7 +4108,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
     if(fForceStageStart) {
         iState = -1;
 
-        for(short iTeam = 0; iTeam < 4; iTeam++) {
+        for (short iTeam = 0; iTeam < 4; iTeam++) {
             iNumPopups = 0;
             iStateTransition[iTeam] = 0;
             iItemPopupDrawY[iTeam] = 0;
@@ -4127,7 +4127,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
         if(!fNoInterestingMoves) {
             fNeedAiControl = true;
             short iTeamMember;
-            for(iTeamMember = 0; iTeamMember < game_values.teamcounts[iControllingTeam]; iTeamMember++) {
+            for (iTeamMember = 0; iTeamMember < game_values.teamcounts[iControllingTeam]; iTeamMember++) {
                 if(game_values.playercontrol[game_values.teamids[iControllingTeam][iTeamMember]] == 1) {
                     fNeedAiControl = false;
                     break;
@@ -4143,7 +4143,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
                     //Clear out all input from cpu controlled team
                     COutputControl * playerKeys = NULL;
                     short iTeamMember;
-                    for(iTeamMember = 0; iTeamMember < game_values.teamcounts[iControllingTeam]; iTeamMember++) {
+                    for (iTeamMember = 0; iTeamMember < game_values.teamcounts[iControllingTeam]; iTeamMember++) {
                         playerKeys = &game_values.playerInput.outputControls[game_values.teamids[iControllingTeam][iTeamMember]];
 
                         playerKeys->menu_up.fPressed = false;
@@ -4169,7 +4169,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
                         g_worldmap.IsTouchingDoor(iPlayerCurrentTileX, iPlayerCurrentTileY, fDoor);
 
                         //See if we can use a key to keep going
-                        for(short iPowerup = 0; iPowerup < game_values.worldpowerupcount[iControllingTeam]; iPowerup++) {
+                        for (short iPowerup = 0; iPowerup < game_values.worldpowerupcount[iControllingTeam]; iPowerup++) {
                             short iType = game_values.worldpowerups[iControllingTeam][iPowerup];
 
                             if(iType >= NUM_POWERUPS + 5 && iType <= NUM_POWERUPS + 8) { //Door Keys
@@ -4207,7 +4207,7 @@ MenuCodeEnum MI_World::SendInput(CPlayerInput * playerInput)
         }
     }
 
-    for(short iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (short iPlayer = 0; iPlayer < 4; iPlayer++) {
         COutputControl * playerKeys = &game_values.playerInput.outputControls[iPlayer];
 
         short iPlayerCurrentTileX, iPlayerCurrentTileY;
@@ -4458,7 +4458,7 @@ bool MI_World::UsePowerup(short iPlayer, short iTeam, short iIndex, bool fPopupI
     if(iPowerup < NUM_POWERUPS) {
         /*
         //Comment this in to give the powerup to all members of the team
-        for(short iPlayer = 0; iPlayer < game_values.teamcounts[iTeam]; iPlayer++)
+        for (short iPlayer = 0; iPlayer < game_values.teamcounts[iTeam]; iPlayer++)
         {
             game_values.storedpowerups[game_values.teamids[iTeam][iPlayer]] = iPowerup;
         }*/
@@ -4565,7 +4565,7 @@ bool MI_World::UsePowerup(short iPlayer, short iTeam, short iIndex, bool fPopupI
     if(fUsedItem) {
         short iNumItems = --game_values.worldpowerupcount[iTeam];
 
-        for(short iItem = iIndex; iItem < iNumItems; iItem++)
+        for (short iItem = iIndex; iItem < iNumItems; iItem++)
             game_values.worldpowerups[iTeam][iItem] = game_values.worldpowerups[iTeam][iItem + 1];
 
         if(fPopupIsUp)
@@ -4588,7 +4588,7 @@ MenuCodeEnum MI_World::InitGame(short iStage, short iPlayer, bool fNeedAiControl
         game_values.singleplayermode = iPlayer;
 
     //If player was trying to get to his inventory menu, cancel that because a game is about to start
-    for(short iTeam = 0; iTeam < 4; iTeam++)
+    for (short iTeam = 0; iTeam < 4; iTeam++)
         iPopupFlag[iTeam] = false;
 
     if(fNeedAiControl || fBonusHouse)
@@ -4677,7 +4677,7 @@ MenuCodeEnum MI_NetworkListScroll::Modify(bool modify)
 
 MenuCodeEnum MI_NetworkListScroll::SendInput(CPlayerInput * playerInput)
 {
-    for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
         //Only allow the controlling team to control the menu (if there is one)
         if(iControllingTeam != -1) {
             if(iControllingTeam != LookupTeamID(iPlayer) || game_values.playercontrol[iPlayer] != 1)
@@ -4742,7 +4742,7 @@ void MI_NetworkListScroll::Draw()
     rm->menu_font_large.drawCentered(ix + (iWidth >> 1), iy + 5, sTitle.c_str());
 
     //Draw each filter field
-    for(short iLine = 0; iLine < iNumLines && (unsigned short)iLine < items.size(); iLine++) {
+    for (short iLine = 0; iLine < iNumLines && (unsigned short)iLine < items.size(); iLine++) {
         short iHalfLineWidth = (iWidth - 32) >> 1;
         short iLineWidth = iWidth - 32;
         spr->draw(ix + 16, iy + 32 + iLine * 32, 0, (iSelectedLine == iLine ? 32 : 0), iHalfLineWidth, 32);

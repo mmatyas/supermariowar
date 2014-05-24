@@ -536,7 +536,7 @@ void EC_Announcement::update()
 
 void EC_Announcement::draw()
 {
-    for(short iRect = 0; iRect < 4; iRect++)
+    for (short iRect = 0; iRect < 4; iRect++)
         rm->menu_dialog.draw(rDstRect[iRect].x, rDstRect[iRect].y, rSrcRect[iRect].x, rSrcRect[iRect].y, rSrcRect[iRect].w, rSrcRect[iRect].h);
 
     font->draw(ix + iFontOffsetX, iFontY, text);
@@ -869,7 +869,7 @@ EC_SoulsAward::EC_SoulsAward(gfxSprite *nspr, gfxSprite *nspr2, short nx, short 
 
     id = new short[numSouls];
 
-    for(short k = 0; k < numSouls; k++)
+    for (short k = 0; k < numSouls; k++)
         id[k] = nSoulArray[k];
 
     timer = 0;
@@ -1104,7 +1104,7 @@ void EC_SuperStompExplosion::draw()
 //------------------------------------------------------------------------------
 CEyecandyContainer::CEyecandyContainer()
 {
-    for(short i = 0; i < MAXEYECANDY; i++)
+    for (short i = 0; i < MAXEYECANDY; i++)
         list[i] = NULL;
 
     list_end = 0;
@@ -1119,7 +1119,7 @@ CEyecandyContainer::~CEyecandyContainer()
 
 void CEyecandyContainer::clean()
 {
-    for(short i = 0; i < list_end; i++) {
+    for (short i = 0; i < list_end; i++) {
         delete list[i];
         list[i] = NULL;
     }
@@ -1157,7 +1157,7 @@ void CEyecandyContainer::remove(short i)
 
 void CEyecandyContainer::cleandeadobjects()
 {
-    for(short i = 0; i < list_end; i++) {
+    for (short i = 0; i < list_end; i++) {
         if(list[i]->dead) {
             delete list[i];
             list_end--;

@@ -455,7 +455,7 @@ void IO_Block::BounceMovingObject(IO_MovingObject * object)
 void IO_Block::KillPlayersAndObjectsInsideBlock(short playerID)
 {
     //Loop through players
-    for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
+    for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
         CPlayer * player = list_players[iPlayer];
 
         if(!player->isready())
@@ -474,9 +474,9 @@ void IO_Block::KillPlayersAndObjectsInsideBlock(short playerID)
     }
 
     //Loop through objects
-    for(short iLayer = 0; iLayer < 3; iLayer++) {
+    for (short iLayer = 0; iLayer < 3; iLayer++) {
         short iContainerEnd = objectcontainer[iLayer].list_end;
-        for(short iObject = 0; iObject < iContainerEnd; iObject++) {
+        for (short iObject = 0; iObject < iContainerEnd; iObject++) {
             CObject * object = objectcontainer[iLayer].list[iObject];
 
             if(object->getObjectType() != object_moving)
@@ -519,24 +519,24 @@ B_PowerupBlock::B_PowerupBlock(gfxSprite *nspr1, short x, short y, short iNumSpr
     hidden = ishiddentype = fHidden;
 
     if(piSettings[0] == -1 || game_values.overridepowerupsettings == 1) { //Game Only
-        for(short iSetting = 0; iSetting < NUM_POWERUPS; iSetting++)
+        for (short iSetting = 0; iSetting < NUM_POWERUPS; iSetting++)
             settings[iSetting] = game_values.powerupweights[iSetting];
     } else if(game_values.overridepowerupsettings == 0) { //Map Only
-        for(short iSetting = 0; iSetting < NUM_POWERUPS; iSetting++)
+        for (short iSetting = 0; iSetting < NUM_POWERUPS; iSetting++)
             settings[iSetting] = piSettings[iSetting];
     } else if(game_values.overridepowerupsettings == 2) { //Average
-        for(short iSetting = 0; iSetting < NUM_POWERUPS; iSetting++)
+        for (short iSetting = 0; iSetting < NUM_POWERUPS; iSetting++)
             settings[iSetting] = piSettings[iSetting] + game_values.powerupweights[iSetting];
     } else if(game_values.overridepowerupsettings == 3) { //Weighted
         float dMapWeightCount = 0;
-        for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
+        for (short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
             dMapWeightCount += piSettings[iPowerup];
 
         float dGameWeightCount = 0;
-        for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
+        for (short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
             dGameWeightCount += game_values.powerupweights[iPowerup];
 
-        for(short iSetting = 0; iSetting < NUM_POWERUPS; iSetting++) {
+        for (short iSetting = 0; iSetting < NUM_POWERUPS; iSetting++) {
             float dWeight = ((float)piSettings[iSetting] / dMapWeightCount + (float)game_values.powerupweights[iSetting] / dGameWeightCount) * 100.0f;
 
             //Cap lowest value at 1
@@ -548,7 +548,7 @@ B_PowerupBlock::B_PowerupBlock(gfxSprite *nspr1, short x, short y, short iNumSpr
     }
 
     iCountWeight = 0;
-    for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
+    for (short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
         iCountWeight += settings[iPowerup];
 }
 
@@ -826,7 +826,7 @@ B_ViewBlock::B_ViewBlock(gfxSprite *nspr1, short x, short y, bool fHidden, short
     ih = 32;
 
     iCountWeight = 0;
-    for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
+    for (short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++)
         iCountWeight += settings[iPowerup];
 
     fNoPowerupsSelected = iCountWeight == 0;
@@ -2778,7 +2778,7 @@ bool PU_SecretPowerup::collide (CPlayer *player)
     if(itemtype == 0) {
         game_values.windaffectsplayers = true;
 
-        for(short i = 0; i < 15; i++)
+        for (short i = 0; i < 15; i++)
             eyecandy[2].add(new EC_Snow(&rm->spr_snow, (float)(RNGMAX(smw->ScreenWidth)), (float)RNGMAX(smw->ScreenHeight), RNGMAX(4) + 1));
     } else if(itemtype == 1) {
         game_values.spinscreen = true;
@@ -3562,7 +3562,7 @@ void MO_Hammer::update()
     //Detection collision with hammer breakable blocks
     IO_Block * blocks[4];
     GetCollisionBlocks(blocks);
-    for(short iBlock = 0; iBlock < 4; iBlock++) {
+    for (short iBlock = 0; iBlock < 4; iBlock++) {
         if(blocks[iBlock] && blocks[iBlock]->getBlockType() == block_weaponbreakable) {
             B_WeaponBreakableBlock * weaponbreakableblock = (B_WeaponBreakableBlock*)blocks[iBlock];
             if(weaponbreakableblock->iType == 5) {
@@ -3676,7 +3676,7 @@ void MO_SledgeHammer::explode()
         short iCenterY = iy + (ih >> 1) - 14;
         short iColorID = colorOffset / 32 - 1;
 
-        for(short iHammer = 0; iHammer < 3; iHammer++) {
+        for (short iHammer = 0; iHammer < 3; iHammer++) {
             float dAngle = (float)(RNGMAX(628)) / 100.0f;
             float dVel = (float)(RNGMAX(5)) / 2.0f + 3.0f;
             float dVelX = dVel * cos(dAngle);
@@ -3829,7 +3829,7 @@ void MO_Boomerang::update()
     //Detection collision with boomerang breakable blocks
     IO_Block * blocks[4];
     GetCollisionBlocks(blocks);
-    for(short iBlock = 0; iBlock < 4; iBlock++) {
+    for (short iBlock = 0; iBlock < 4; iBlock++) {
         if(blocks[iBlock] && blocks[iBlock]->getBlockType() == block_weaponbreakable) {
             B_WeaponBreakableBlock * weaponbreakableblock = (B_WeaponBreakableBlock*)blocks[iBlock];
             if(weaponbreakableblock->iType == 4) {
@@ -5150,7 +5150,7 @@ void MO_Yoshi::placeYoshi()
 {
     timer = 0;
 
-    for(short tries = 0; tries < 64; tries++) {
+    for (short tries = 0; tries < 64; tries++) {
 		ix = (short)RNGMAX(smw->ScreenWidth - iw);
         iy = (short)RNGMAX(smw->ScreenHeight - ih - TILESIZE);	//don't spawn too low
 
@@ -5355,7 +5355,7 @@ OMO_KingOfTheHillZone::OMO_KingOfTheHillZone(gfxSprite *nspr) :
     relocatetimer = 0;
     iPlayerID = -1;
 
-    for(short iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (short iPlayer = 0; iPlayer < 4; iPlayer++) {
         playersTouching[iPlayer] = NULL;
         playersTouchingCount[iPlayer] = 0;
     }
@@ -5380,14 +5380,14 @@ bool OMO_KingOfTheHillZone::collide(CPlayer * player)
 
 void OMO_KingOfTheHillZone::draw()
 {
-    for(short iRow = 0; iRow < size; iRow++) {
+    for (short iRow = 0; iRow < size; iRow++) {
         short iYPiece = TILESIZE;
         if(iRow == 0)
             iYPiece = 0;
         if(iRow == size - 1)
             iYPiece = TILESIZE * 2;
 
-        for(short iCol = 0; iCol < size; iCol++) {
+        for (short iCol = 0; iCol < size; iCol++) {
             short iXPiece = TILESIZE;
             if(iCol == 0)
                 iXPiece = 0;
@@ -5410,7 +5410,7 @@ void OMO_KingOfTheHillZone::update()
     short iMax = 0;
     short iMaxTeam = -1;
 
-    for(short iTeam = 0; iTeam < 4; iTeam++) {
+    for (short iTeam = 0; iTeam < 4; iTeam++) {
         if(playersTouchingCount[iTeam] > iMax) {
             iMax = playersTouchingCount[iTeam];
             iMaxTeam = iTeam;
@@ -5454,7 +5454,7 @@ void OMO_KingOfTheHillZone::update()
         }
     }
 
-    for(short iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (short iPlayer = 0; iPlayer < 4; iPlayer++) {
         playersTouching[iPlayer] = NULL;
         playersTouchingCount[iPlayer] = 0;
     }
@@ -5475,7 +5475,7 @@ void OMO_KingOfTheHillZone::placeArea()
     short x;
     short y;
 
-    for(short iLoop = 0; iLoop < 64; iLoop++) {
+    for (short iLoop = 0; iLoop < 64; iLoop++) {
         x = (short)RNGMAX(MAPWIDTH - size + 1);
         y = (short)RNGMAX(MAPHEIGHT - size);
 
@@ -5486,7 +5486,7 @@ void OMO_KingOfTheHillZone::placeArea()
         bool fDone = false;
 
         while(!fDone) {
-            for(short iCol = 0; iCol < size; iCol++) {
+            for (short iCol = 0; iCol < size; iCol++) {
                 int type = g_map->map(x + iCol, iFindY);
                 if(((type & tile_flag_solid_on_top || type & tile_flag_solid) && (type & tile_flag_death_on_top) == 0) || g_map->block(x + iCol, iFindY)) {
                     fDone = true;
@@ -5513,8 +5513,8 @@ void OMO_KingOfTheHillZone::placeArea()
 
         //Now verify that the area is not completely covered with solid tiles
         short iCountSolidTiles = 0;
-        for(short iRow = 0; iRow < size; iRow++) {
-            for(short iCol = 0; iCol < size; iCol++) {
+        for (short iRow = 0; iRow < size; iRow++) {
+            for (short iCol = 0; iCol < size; iCol++) {
                 //If there is a solid tile inside the zone
                 if((g_map->map(x + iCol, y + iRow) & tile_flag_solid) || !g_map->spawn(1, x + iCol, y + iRow) || g_map->block(x + iCol, y + iRow)) {
                     iCountSolidTiles++;
@@ -5577,7 +5577,7 @@ OMO_RaceGoal::OMO_RaceGoal(gfxSprite *nspr, short id) :
 
     goalID = id;
 
-    for(short k = 0; k < 4; k++)
+    for (short k = 0; k < 4; k++)
         tagged[k] = -1;
 
     angle = (float)(RNGMAX(1000) * 0.00628f);
@@ -5621,7 +5621,7 @@ void OMO_RaceGoal::draw()
     } else {
         spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, 0, iw, ih);
 
-        for(short k = 0; k < score_cnt; k++) {
+        for (short k = 0; k < score_cnt; k++) {
             if(tagged[k] > -1)
                 rm->spr_bonus.draw(ix - collisionOffsetX + flagpositions[score_cnt - 2][k][0], iy - collisionOffsetY + flagpositions[score_cnt - 2][k][1], 0, tagged[k] * 16, 16, 16);
         }
@@ -5964,7 +5964,7 @@ void MO_WalkingEnemy::draw()
         float addangle = TWO_PI / numeyecandy;
         float displayangle = spawnangle;
 
-        for(short k = 0; k < numeyecandy; k++) {
+        for (short k = 0; k < numeyecandy; k++) {
             short spawnX = ix + (collisionWidth >> 1) - 8 + (short)(spawnradius * cos(displayangle));
             short spawnY = iy + (collisionHeight >> 1) - 8 + (short)(spawnradius * sin(displayangle));
 
@@ -6779,13 +6779,13 @@ MO_SledgeBrother::MO_SledgeBrother(gfxSprite *nspr, short platformY, short type)
     iPlatformY = platformY - collisionHeight;
     setYi(iPlatformY);
 
-    for(short iLocation = 0; iLocation < 5; iLocation++)
+    for (short iLocation = 0; iLocation < 5; iLocation++)
         iDestLocationX[iLocation] = 84 * iLocation + 128;
 
     iDestX = iDestLocationX[location];
     setXi(iDestX);
 
-    for(short iAction = 0; iAction < 6; iAction++)
+    for (short iAction = 0; iAction < 6; iAction++)
         need_action[iAction] = 0;
 
     last_action = -1;
@@ -6798,7 +6798,7 @@ void MO_SledgeBrother::draw()
     spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, leg_offset_x + arm_offset_x + (face_right ? 0 : 192), hit_offset_y, iw, ih);
 
     if(hit_timer != 0) {
-        for(short iHeart = 0; iHeart < hit_points; iHeart++)
+        for (short iHeart = 0; iHeart < hit_points; iHeart++)
             rm->spr_scorehearts.draw(ix - collisionOffsetX + iHeart * 8, iy - collisionOffsetY - 18, 0, 0, 16, 16);
     }
 }
@@ -6833,13 +6833,13 @@ void MO_SledgeBrother::update()
 
                 short numThwomps = RNGMAX(5) + 6;
 
-                for(short iThwomp = 0; iThwomp < numThwomps; iThwomp++) {
+                for (short iThwomp = 0; iThwomp < numThwomps; iThwomp++) {
                     objectcontainer[2].add(new OMO_Thwomp(&rm->spr_thwomp, (short)(RNGMAX(591)), 2.0f + (float)(RNGMAX(20))/10.0f));
                 }
 
                 //short numBombs = RNGMAX(5) + 6;
 
-                //for(short iBomb = 0; iBomb < numBombs; iBomb++)
+                //for (short iBomb = 0; iBomb < numBombs; iBomb++)
                 //{
                 //	short iRandomX = RNGMAX(612);
                 //	short iRandomY = RNGMAX(442);
@@ -6852,7 +6852,7 @@ void MO_SledgeBrother::update()
 
                 short numPodobos = RNGMAX(5) + 8;
 
-                for(short iPodobo = 0; iPodobo < numPodobos; iPodobo++) {
+                for (short iPodobo = 0; iPodobo < numPodobos; iPodobo++) {
                     objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, (short)(RNGMAX(608)), smw->ScreenHeight, -(float(RNGMAX(9)) / 2.0f) - 9.0f, -1, -1, -1, false));
                 }
             }
@@ -6975,7 +6975,7 @@ void MO_SledgeBrother::randomaction()
     else
         move();
 
-    for(short iAction = 0; iAction < 6; iAction++)
+    for (short iAction = 0; iAction < 6; iAction++)
         need_action[iAction]++;
 }
 

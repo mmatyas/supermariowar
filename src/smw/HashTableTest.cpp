@@ -10,12 +10,12 @@
 void HashTableTest() {
 	bool fUsed[4096];
 
-	for(int j = 0; j < 4096; j++)
+	for (int j = 0; j < 4096; j++)
 		fUsed[j] = false;
 
 	HashTable ht;
 
-	for(int k = 0; k < 1000000; k++)
+	for (int k = 0; k < 1000000; k++)
 	{
 		int iAction = RNGMAX(10);
 

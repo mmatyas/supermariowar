@@ -424,7 +424,7 @@ void SetStageMode(short iIndex, const char * szModeName, const char * szGoalName
 
 	sm->iDefaultGoal = iDefault;
 
-    for(short iModeOption = 0; iModeOption < GAMEMODE_NUM_OPTIONS - 1; iModeOption++) {
+    for (short iModeOption = 0; iModeOption < GAMEMODE_NUM_OPTIONS - 1; iModeOption++) {
 		sm->options[iModeOption].iValue = (iModeOption + 1) * iIncrement;
 		sprintf(sm->options[iModeOption].szName, "%d", sm->options[iModeOption].iValue);
 	}
@@ -595,8 +595,8 @@ int main(int argc, char *argv[])
 
 	//Setup input for menus
 	game_values.inputConfiguration[0][0].iDevice = DEVICE_KEYBOARD;
-    for(short iInputState = 0; iInputState < 2; iInputState++) { //for game/menu
-        for(short iKey = 0; iKey < NUM_KEYS; iKey++) {
+    for (short iInputState = 0; iInputState < 2; iInputState++) { //for game/menu
+        for (short iKey = 0; iKey < NUM_KEYS; iKey++) {
 			game_values.inputConfiguration[0][0].inputGameControls[iInputState].keys[iKey] = controlkeys[0][iInputState][0][iKey];
 		}
 	}
@@ -638,13 +638,13 @@ int main(int argc, char *argv[])
 	//miModeField->SetKey(0);
 	miModeField->SetItemChangedCode(MENU_CODE_MODE_CHANGED);
 
-    for(short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
+    for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
 		miModeField->Add(stagemodes[iGameMode].szName, iGameMode, "", false, false);
 
 		miGoalField[iGameMode] = new MI_SelectField(&spr_selectfield, 70, 100, stagemodes[iGameMode].szGoal, 352, 120);
 		miGoalField[iGameMode]->Show(iGameMode == 0);
 
-        for(short iGameModeOption = 0; iGameModeOption < GAMEMODE_NUM_OPTIONS - 1; iGameModeOption++) {
+        for (short iGameModeOption = 0; iGameModeOption < GAMEMODE_NUM_OPTIONS - 1; iGameModeOption++) {
 			StageModeOption * option = &stagemodes[iGameMode].options[iGameModeOption];
 			miGoalField[iGameMode]->Add(option->szName, option->iValue, "", false, false);
 		}
@@ -662,7 +662,7 @@ int main(int argc, char *argv[])
 	miSpecialGoalField[0] = new MI_SelectField(&spr_selectfield, 70, 100, "Points", 352, 120);
 	miSpecialGoalField[0]->Show(false);
 
-    for(short iGameModeOption = 0; iGameModeOption < GAMEMODE_NUM_OPTIONS - 1; iGameModeOption++) {
+    for (short iGameModeOption = 0; iGameModeOption < GAMEMODE_NUM_OPTIONS - 1; iGameModeOption++) {
 		short iValue = 10 + iGameModeOption * 10;
 		char szName[16];
 		sprintf(szName, "%d", iValue);
@@ -673,7 +673,7 @@ int main(int argc, char *argv[])
 	miSpecialGoalField[1] = new MI_SelectField(&spr_selectfield, 70, 100, "Lives", 352, 120);
 	miSpecialGoalField[1]->Show(false);
 
-    for(short iGameLives = 1; iGameLives <= 30; iGameLives++) {
+    for (short iGameLives = 1; iGameLives <= 30; iGameLives++) {
 		char szName[16];
 		sprintf(szName, "%d", iGameLives);
 		miSpecialGoalField[1]->Add(szName, iGameLives, "", false, false);
@@ -683,7 +683,7 @@ int main(int argc, char *argv[])
 	miSpecialGoalField[2] = new MI_SelectField(&spr_selectfield, 70, 100, "Lives", 352, 120);
 	miSpecialGoalField[2]->Show(false);
 
-    for(short iGameLives = 1; iGameLives <= 30; iGameLives++) {
+    for (short iGameLives = 1; iGameLives <= 30; iGameLives++) {
 		char szName[16];
 		sprintf(szName, "%d", iGameLives);
 		miSpecialGoalField[2]->Add(szName, iGameLives, "", false, false);
@@ -695,7 +695,7 @@ int main(int argc, char *argv[])
 
 	//Points Field
 	miPointsField = new MI_SelectField(&spr_selectfield, 70, 140, "Points", 245, 120);
-    for(short iPoints = 0; iPoints <= 20; iPoints++) {
+    for (short iPoints = 0; iPoints <= 20; iPoints++) {
 		char szPoints[8];
 		sprintf(szPoints, "%d", iPoints);
 		miPointsField->Add(szPoints, iPoints, "", false, false);
@@ -762,7 +762,7 @@ int main(int argc, char *argv[])
 	//Add Mode Goal Fields
 	mStageSettingsMenu.AddControl(miGoalField[0], miModeField, miGoalField[1], NULL, miModeSettingsButton);
 
-	for(short iGoalField = 1; iGoalField < GAMEMODE_LAST - 1; iGoalField++)
+	for (short iGoalField = 1; iGoalField < GAMEMODE_LAST - 1; iGoalField++)
 		mStageSettingsMenu.AddControl(miGoalField[iGoalField], miGoalField[iGoalField - 1], miGoalField[iGoalField + 1], miGoalField[iGoalField - 1], miModeSettingsButton);
 
 	mStageSettingsMenu.AddControl(miGoalField[GAMEMODE_LAST - 1], miGoalField[GAMEMODE_LAST - 2], miSpecialGoalField[0], miGoalField[GAMEMODE_LAST - 2], miModeSettingsButton);
@@ -841,7 +841,7 @@ int main(int argc, char *argv[])
 
 	miVehicleMinMovesField = new MI_SelectField(&spr_selectfield, 70, 160, "Min Moves", 500, 150);
 
-    for(short iMinMoves = 0; iMinMoves <= 100; iMinMoves++) {
+    for (short iMinMoves = 0; iMinMoves <= 100; iMinMoves++) {
 		char szMinMoves[8];
 		sprintf(szMinMoves, "%d", iMinMoves);
 		miVehicleMinMovesField->Add(szMinMoves, iMinMoves, "", false, false);
@@ -855,7 +855,7 @@ int main(int argc, char *argv[])
 
 	miVehicleMaxMovesField = new MI_SelectField(&spr_selectfield, 70, 200, "Max Moves", 500, 150);
 
-    for(short iMaxMoves = 0; iMaxMoves <= 100; iMaxMoves++) {
+    for (short iMaxMoves = 0; iMaxMoves <= 100; iMaxMoves++) {
 		char szMaxMoves[8];
 		sprintf(szMaxMoves, "%d", iMaxMoves);
 		miVehicleMaxMovesField->Add(szMaxMoves, iMaxMoves, "", false, false);
@@ -884,7 +884,7 @@ int main(int argc, char *argv[])
 	miVehicleBoundaryField = new MI_SelectField(&spr_selectfield, 70, 320, "Boundary", 500, 150);
 	miVehicleBoundaryField->Add("No Boundary", 0, "", false, false);
 
-    for(short iBoundary = 1; iBoundary <= 100; iBoundary++) {
+    for (short iBoundary = 1; iBoundary <= 100; iBoundary++) {
 		char szBoundary[8];
 		sprintf(szBoundary, "%d", iBoundary);
 		miVehicleBoundaryField->Add(szBoundary, iBoundary, "", false, false);
@@ -1734,8 +1734,8 @@ int editor_edit()
         } else {
 			//Draw Paths
             if(edit_mode == 2) {
-                for(short iRow = draw_offset_row; iRow < draw_offset_row + 15 && iRow < iWorldHeight; iRow++) {
-                    for(short iCol = draw_offset_col; iCol <= draw_offset_col + 20 && iCol < iWorldWidth; iCol++) {
+                for (short iRow = draw_offset_row; iRow < draw_offset_row + 15 && iRow < iWorldHeight; iRow++) {
+                    for (short iCol = draw_offset_col; iCol <= draw_offset_col + 20 && iCol < iWorldWidth; iCol++) {
 						short iConnection = g_worldmap.tiles[iCol][iRow].iConnectionType;
 
 						if(iConnection > 0)
@@ -1767,8 +1767,8 @@ int editor_edit()
 				}
             } else if(edit_mode == 8) { //draw boundaries
 				int color = SDL_MapRGB(blitdest->format, 255, 0, 255);
-                for(short iRow = draw_offset_row; iRow < draw_offset_row + 15 && iRow < iWorldHeight; iRow++) {
-                    for(short iCol = draw_offset_col; iCol <= draw_offset_col + 20 && iCol < iWorldWidth; iCol++) {
+                for (short iRow = draw_offset_row; iRow < draw_offset_row + 15 && iRow < iWorldHeight; iRow++) {
+                    for (short iCol = draw_offset_col; iCol <= draw_offset_col + 20 && iCol < iWorldWidth; iCol++) {
 						short iBoundary = g_worldmap.tiles[iCol][iRow].iVehicleBoundary - 1;
 
                         if(iBoundary >= 0) {
@@ -1783,8 +1783,8 @@ int editor_edit()
 				}
             } else if(edit_mode == 9) { //draw stages
 				int color = SDL_MapRGB(blitdest->format, 0, 0, 255);
-                for(short iRow = draw_offset_row; iRow < draw_offset_row + 15 && iRow < iWorldHeight; iRow++) {
-                    for(short iCol = draw_offset_col; iCol <= draw_offset_col + 20 && iCol < iWorldWidth; iCol++) {
+                for (short iRow = draw_offset_row; iRow < draw_offset_row + 15 && iRow < iWorldHeight; iRow++) {
+                    for (short iCol = draw_offset_col; iCol <= draw_offset_col + 20 && iCol < iWorldWidth; iCol++) {
 						short iType = g_worldmap.tiles[iCol][iRow].iType - 6;
 
                         if(iType >= 0) {
@@ -1895,23 +1895,23 @@ void DrawMessage()
 void GetForegroundTileValues(short iCol, short iRow, short iOldTiles[9])
 {
 	short iIndex = 0;
-    for(short iAutoRow = iRow - 1; iAutoRow <= iRow + 1; iAutoRow++) {
-        for(short iAutoCol = iCol - 1; iAutoCol <= iCol + 1; iAutoCol++) {
+    for (short iAutoRow = iRow - 1; iAutoRow <= iRow + 1; iAutoRow++) {
+        for (short iAutoCol = iCol - 1; iAutoCol <= iCol + 1; iAutoCol++) {
             if(iAutoRow >= 0 && iAutoRow < iWorldHeight && iAutoCol >= 0 && iAutoCol < iWorldWidth) {
 				iOldTiles[iIndex++] = g_worldmap.tiles[iAutoCol][iAutoRow].iForegroundSprite;
 			}
 		}
 	}
 
-	for(short i = iIndex; i < 9; i++)
+	for (short i = iIndex; i < 9; i++)
 		iOldTiles[i] = 0;
 }
 
 bool ForegroundTileValuesChanged(short iCol, short iRow, short iOldTiles[9])
 {
 	short iIndex = 0;
-    for(short iAutoRow = iRow - 1; iAutoRow <= iRow + 1; iAutoRow++) {
-        for(short iAutoCol = iCol - 1; iAutoCol <= iCol + 1; iAutoCol++) {
+    for (short iAutoRow = iRow - 1; iAutoRow <= iRow + 1; iAutoRow++) {
+        for (short iAutoCol = iCol - 1; iAutoCol <= iCol + 1; iAutoCol++) {
             if(iAutoRow >= 0 && iAutoRow < iWorldHeight && iAutoCol >= 0 && iAutoCol < iWorldWidth) {
 				if(g_worldmap.tiles[iAutoCol][iAutoRow].iForegroundSprite != iOldTiles[iIndex++])
 					return true;
@@ -1932,7 +1932,7 @@ void ReadVehiclesIntoEditor()
 
 	vehiclelist.clear();
 
-    for(short iVehicle = 0; iVehicle < g_worldmap.iNumVehicles; iVehicle++) {
+    for (short iVehicle = 0; iVehicle < g_worldmap.iNumVehicles; iVehicle++) {
 		WorldVehicle * vehicle = &g_worldmap.vehicles[iVehicle];
 		WorldVehicle * vehiclecopy = new WorldVehicle();
 
@@ -1959,7 +1959,7 @@ void WriteVehiclesIntoWorld()
 	g_worldmap.iNumVehicles = vehiclelist.size();
 	g_worldmap.vehicles = new WorldVehicle[g_worldmap.iNumVehicles];
 
-    for(short iVehicle = 0; iVehicle < g_worldmap.iNumVehicles; iVehicle++) {
+    for (short iVehicle = 0; iVehicle < g_worldmap.iNumVehicles; iVehicle++) {
 		WorldVehicle * vehicle = vehiclelist[iVehicle];
 		WorldVehicle * vehiclecopy = &g_worldmap.vehicles[iVehicle];
 
@@ -2033,7 +2033,7 @@ void ReadWarpsIntoEditor()
 
 	warplist.clear();
 
-    for(short iWarp = 0; iWarp < g_worldmap.iNumWarps; iWarp++) {
+    for (short iWarp = 0; iWarp < g_worldmap.iNumWarps; iWarp++) {
 		WorldWarp * warp = &g_worldmap.warps[iWarp];
 		WorldWarp * warpcopy = new WorldWarp();
 
@@ -2056,7 +2056,7 @@ void WriteWarpsIntoWorld()
 	g_worldmap.iNumWarps = warplist.size();
 	g_worldmap.warps = new WorldWarp[g_worldmap.iNumWarps];
 
-    for(short iWarp = 0; iWarp < g_worldmap.iNumWarps; iWarp++) {
+    for (short iWarp = 0; iWarp < g_worldmap.iNumWarps; iWarp++) {
 		WorldWarp * warp = warplist[iWarp];
 		WorldWarp * warpcopy = &g_worldmap.warps[iWarp];
 
@@ -2140,8 +2140,8 @@ void RemoveWarpFromTile(short iCol, short iRow)
 
 void UpdatePathSprite(short iCol, short iRow)
 {
-    for(short iAutoRow = iRow - 1; iAutoRow <= iRow + 1; iAutoRow++) {
-        for(short iAutoCol = iCol - 1; iAutoCol <= iCol + 1; iAutoCol++) {
+    for (short iAutoRow = iRow - 1; iAutoRow <= iRow + 1; iAutoRow++) {
+        for (short iAutoCol = iCol - 1; iAutoCol <= iCol + 1; iAutoCol++) {
             if(iAutoRow >= 0 && iAutoRow < iWorldHeight && iAutoCol >= 0 && iAutoCol < iWorldWidth) {
 				AutoSetPathSprite(iAutoCol, iAutoRow);
 			}
@@ -2162,8 +2162,8 @@ void AutoSetPathSprite(short iCol, short iRow)
 	if(iForegroundSprite == 0 || iForegroundSprite >= WORLD_FOREGROUND_STAGE_OFFSET)
 		return;
 
-    for(short iAutoRow = iRow - 1; iAutoRow <= iRow + 1; iAutoRow++) {
-        for(short iAutoCol = iCol - 1; iAutoCol <= iCol + 1; iAutoCol++) {
+    for (short iAutoRow = iRow - 1; iAutoRow <= iRow + 1; iAutoRow++) {
+        for (short iAutoCol = iCol - 1; iAutoCol <= iCol + 1; iAutoCol++) {
 			if(iAutoCol == iCol && iAutoRow == iRow)
 				continue;
 
@@ -2249,8 +2249,8 @@ short AdjustForeground(short iSprite, short iCol, short iRow)
 
 void UpdatePath(short iCol, short iRow)
 {
-    for(short iAutoRow = iRow - 1; iAutoRow <= iRow + 1; iAutoRow++) {
-        for(short iAutoCol = iCol - 1; iAutoCol <= iCol + 1; iAutoCol++) {
+    for (short iAutoRow = iRow - 1; iAutoRow <= iRow + 1; iAutoRow++) {
+        for (short iAutoCol = iCol - 1; iAutoCol <= iCol + 1; iAutoCol++) {
             if(iAutoRow >= 0 && iAutoRow < iWorldHeight && iAutoCol >= 0 && iAutoCol < iWorldWidth) {
 				AutoSetPath(iAutoCol, iAutoRow);
 			}
@@ -2268,8 +2268,8 @@ void AutoSetPath(short iCol, short iRow)
 	if(g_worldmap.tiles[iCol][iRow].iConnectionType == 0)
 		return;
 
-    for(short iAutoRow = iRow - 1; iAutoRow <= iRow + 1; iAutoRow++) {
-        for(short iAutoCol = iCol - 1; iAutoCol <= iCol + 1; iAutoCol++) {
+    for (short iAutoRow = iRow - 1; iAutoRow <= iRow + 1; iAutoRow++) {
+        for (short iAutoCol = iCol - 1; iAutoCol <= iCol + 1; iAutoCol++) {
 			if(iAutoCol == iCol && iAutoRow == iRow)
 				continue;
 
@@ -2320,8 +2320,8 @@ bool UpdateCoastline(short iCol, short iRow)
 	short iEndRow = iRow == iWorldHeight - 1 ? iWorldHeight - 1 : iRow + 1;
 
 	bool fRet = false;
-    for(short iAutoRow = iStartRow; iAutoRow <= iEndRow; iAutoRow++) {
-        for(short iAutoCol = iStartCol; iAutoCol <= iEndCol; iAutoCol++) {
+    for (short iAutoRow = iStartRow; iAutoRow <= iEndRow; iAutoRow++) {
+        for (short iAutoCol = iStartCol; iAutoCol <= iEndCol; iAutoCol++) {
 			fRet |= AutoSetTile(iAutoCol, iAutoRow);
 			fRet |= UpdateForeground(iAutoCol, iAutoRow);
 		}
@@ -2341,8 +2341,8 @@ bool AutoSetTile(short iCol, short iRow)
 
 	short iNeighborStyle[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-    for(short iAutoRow = iRow - 1; iAutoRow <= iRow + 1; iAutoRow++) {
-        for(short iAutoCol = iCol - 1; iAutoCol <= iCol + 1; iAutoCol++) {
+    for (short iAutoRow = iRow - 1; iAutoRow <= iRow + 1; iAutoRow++) {
+        for (short iAutoCol = iCol - 1; iAutoCol <= iCol + 1; iAutoCol++) {
 			if(iAutoCol == iCol && iAutoRow == iRow)
 				continue;
 
@@ -2361,7 +2361,7 @@ bool AutoSetTile(short iCol, short iRow)
 
 	short iMaxStyle = 0;
 	short iTileStyleOffset = 0;
-    for(short iStyle = 0; iStyle < 10; iStyle++) {
+    for (short iStyle = 0; iStyle < 10; iStyle++) {
         if(iNeighborStyle[iStyle] > iMaxStyle) {
 			iMaxStyle = iNeighborStyle[iStyle];
 			iTileStyleOffset = iStyle * WORLD_BACKGROUND_SPRITE_SET_SIZE;
@@ -2564,7 +2564,7 @@ int editor_start_items()
 
 	short iColCount = 0;
 	short iRowCount = 0;
-    for(short iItem = 0; iItem < NUM_POWERUPS + NUM_WORLD_POWERUPS; iItem++) {
+    for (short iItem = 0; iItem < NUM_POWERUPS + NUM_WORLD_POWERUPS; iItem++) {
 		rItemDst[iItem].x = 16 + iColCount * 48;
 		rItemDst[iItem].y = 16 + iRowCount * 48;
 		rItemDst[iItem].w = 32;
@@ -2577,8 +2577,8 @@ int editor_start_items()
 	}
 
 	short iPickedItem = 0;
-    for(short iPickedItemY = 0; iPickedItemY < 4; iPickedItemY++) {
-        for(short iPickedItemX = 0; iPickedItemX < 8; iPickedItemX++) {
+    for (short iPickedItemY = 0; iPickedItemY < 4; iPickedItemY++) {
+        for (short iPickedItemX = 0; iPickedItemX < 8; iPickedItemX++) {
 			rPickedItemDst[iPickedItem].x = 122 + iPickedItemX * 52;
 			rPickedItemDst[iPickedItem].y = 240 + iPickedItemY * 64;
 			rPickedItemDst[iPickedItem].w = 32;
@@ -2609,7 +2609,7 @@ int editor_start_items()
 
                 if(event.button.button == SDL_BUTTON_LEFT || event.button.button == SDL_BUTTON_RIGHT) {
                     if(g_worldmap.iNumInitialBonuses < 32) {
-                        for(short iItem = 0; iItem < NUM_POWERUPS + NUM_WORLD_POWERUPS; iItem++) {
+                        for (short iItem = 0; iItem < NUM_POWERUPS + NUM_WORLD_POWERUPS; iItem++) {
 								if(iButtonX >= rItemDst[iItem].x && iButtonX < rItemDst[iItem].w + rItemDst[iItem].x &&
                                     iButtonY >= rItemDst[iItem].y && iButtonY < rItemDst[iItem].h + rItemDst[iItem].y) {
 									g_worldmap.iInitialBonuses[g_worldmap.iNumInitialBonuses++] = iItem;
@@ -2618,10 +2618,10 @@ int editor_start_items()
 							}
 						}
 
-                    for(short iRemoveItem = 0; iRemoveItem < g_worldmap.iNumInitialBonuses; iRemoveItem++) {
+                    for (short iRemoveItem = 0; iRemoveItem < g_worldmap.iNumInitialBonuses; iRemoveItem++) {
 							if(iButtonX >= rPickedItemDst[iRemoveItem].x && iButtonX < rPickedItemDst[iRemoveItem].w + rPickedItemDst[iRemoveItem].x &&
                                 iButtonY >= rPickedItemDst[iRemoveItem].y && iButtonY < rPickedItemDst[iRemoveItem].h + rPickedItemDst[iRemoveItem].y) {
-                            for(short iAdjust = iRemoveItem; iAdjust < g_worldmap.iNumInitialBonuses - 1; iAdjust++) {
+                            for (short iAdjust = iRemoveItem; iAdjust < g_worldmap.iNumInitialBonuses - 1; iAdjust++) {
 									g_worldmap.iInitialBonuses[iAdjust] = g_worldmap.iInitialBonuses[iAdjust + 1];
 								}
 
@@ -2644,20 +2644,20 @@ int editor_start_items()
 		drawmap(false, TILESIZE);
 		menu_shade.draw(0, 0);
 
-        for(short iItem = 0; iItem < NUM_POWERUPS; iItem++) {
+        for (short iItem = 0; iItem < NUM_POWERUPS; iItem++) {
 			spr_storedpoweruplarge.draw(rItemDst[iItem].x, rItemDst[iItem].y, iItem << 5, 0, 32, 32);
 		}
 
-        for(short iWorldItem = 0; iWorldItem < NUM_WORLD_POWERUPS; iWorldItem++) {
+        for (short iWorldItem = 0; iWorldItem < NUM_WORLD_POWERUPS; iWorldItem++) {
 			spr_worlditems.draw(rItemDst[iWorldItem + NUM_POWERUPS].x, rItemDst[iWorldItem + NUM_POWERUPS].y, iWorldItem << 5, 0, 32, 32);
 		}
 
-        for(short iPopup = 0; iPopup < 4; iPopup++) {
+        for (short iPopup = 0; iPopup < 4; iPopup++) {
 			spr_worldpopup.draw(0, 416 - (iPopup << 6), 0, 0, 320, 64);
 			spr_worldpopup.draw(320, 416 - (iPopup << 6), 192, 0, 320, 64);
 		}
 
-        for(short iPickedItem = 0; iPickedItem < g_worldmap.iNumInitialBonuses; iPickedItem++) {
+        for (short iPickedItem = 0; iPickedItem < g_worldmap.iNumInitialBonuses; iPickedItem++) {
 			short iPowerup = g_worldmap.iInitialBonuses[iPickedItem];
 			if(iPowerup >= NUM_POWERUPS)
 				spr_worlditems.draw(rPickedItemDst[iPickedItem].x, rPickedItemDst[iPickedItem].y, (iPowerup - NUM_POWERUPS) << 5, 0, 32, 32);
@@ -2880,7 +2880,7 @@ int editor_water()
 
 		SDL_FillRect(screen, NULL, 0x0);
 
-		for(short iWater = 0; iWater < 3; iWater++)
+		for (short iWater = 0; iWater < 3; iWater++)
 			spr_worldbackground[0].draw(iWater << 5, 0, 512 + (iWater << 7), 0, 32, 32);
 
 		DrawMessage();
@@ -3042,8 +3042,8 @@ int editor_stageforeground()
 
 		SDL_FillRect(screen, NULL, 0x0);
 
-        for(short iRow = 0; iRow < 10; iRow++) {
-            for(short iCol = 0; iCol < 10; iCol++) {
+        for (short iRow = 0; iRow < 10; iRow++) {
+            for (short iCol = 0; iCol < 10; iCol++) {
 				spr_worldforegroundspecial[0].draw(iCol << 5, iRow << 5, 384, iForegroundScreen << 5, 32, 32);
 			}
 		}
@@ -3247,7 +3247,7 @@ int editor_pathsprite()
 
 		SDL_FillRect(screen, NULL, 0x0);
 
-        for(short iPath = 0; iPath < 8; iPath++) {
+        for (short iPath = 0; iPath < 8; iPath++) {
 			spr_worldpaths[0].draw(iPath << 5, 0, (iPath % 4) * 160, (iPath / 4) * 320, 32, 192);
 		}
 
@@ -3283,7 +3283,7 @@ int editor_vehicles()
 
 	miVehicleStageField->Clear();
 
-    for(short iStage = 0; iStage < g_worldmap.iNumStages; iStage++) {
+    for (short iStage = 0; iStage < g_worldmap.iNumStages; iStage++) {
 		TourStop * ts = game_values.tourstops[iStage];
 		char szStageName[256];
 		sprintf(szStageName, "(%d) %s", iStage + 1, ts->szName);
@@ -3528,7 +3528,7 @@ void DisplayStageDetails(bool fForce, short iStageId, short iMouseX, short iMous
 		sprintf(szPrint, "End: %s", ts->fEndStage ? "Yes" : "No");
 		menu_font_small.drawChopRight(iMouseX + 126, iMouseY + 176, 80, szPrint);
 
-        for(short iBonus = 0; iBonus < ts->iNumBonuses; iBonus++) {
+        for (short iBonus = 0; iBonus < ts->iNumBonuses; iBonus++) {
 			WorldStageBonus * wsb = &ts->wsbBonuses[iBonus];
 			spr_worlditemsplace.draw(iMouseX + iBonus * 20 + 16, iMouseY + 194, wsb->iWinnerPlace * 20, 0, 20, 20);
 
@@ -3547,7 +3547,7 @@ void DisplayStageDetails(bool fForce, short iStageId, short iMouseX, short iMous
 		sprintf(szPrint, "Sort: %s", ts->iBonusType == 0 ? "Fixed" : "Random");
 		menu_font_small.drawChopRight(iMouseX + 52, iMouseY + 34, 164, szPrint);
 
-        for(short iBonus = 0; iBonus < ts->iNumBonuses; iBonus++) {
+        for (short iBonus = 0; iBonus < ts->iNumBonuses; iBonus++) {
 			short iBonusIcon = ts->wsbBonuses[iBonus].iBonus;
 			gfxSprite * spr_icon = NULL;
 			short iSrcX = 0, iSrcY = 0;
@@ -3610,7 +3610,7 @@ void TestAndSetBonusItem(TourStop * ts, short iPlace, short iButtonX, short iBut
 		if(ts->iStageType == 0)
 			iNumSelectableItems = NUM_POWERUPS + NUM_WORLD_POWERUPS;
 
-        for(short iItem = 0; iItem < iNumSelectableItems; iItem++) {
+        for (short iItem = 0; iItem < iNumSelectableItems; iItem++) {
 			if(iButtonX >= rItemDst[iItem].x && iButtonX < rItemDst[iItem].w + rItemDst[iItem].x &&
                     iButtonY >= rItemDst[iItem].y && iButtonY < rItemDst[iItem].h + rItemDst[iItem].y) {
 				//If this is a normal stage, then alert the player that they need to select the place for this item
@@ -3644,10 +3644,10 @@ void AdjustBonuses(TourStop * ts)
 
     if(ts->iStageType == 0) {
 		//Remove any score bonuses
-        for(short iBonus = 0; iBonus < ts->iNumBonuses; iBonus++) {
+        for (short iBonus = 0; iBonus < ts->iNumBonuses; iBonus++) {
             if(ts->wsbBonuses[iBonus].iBonus >= NUM_POWERUPS + NUM_WORLD_POWERUPS) {
 				ts->iNumBonuses--;
-                for(short iRemoveBonus = iBonus; iRemoveBonus < ts->iNumBonuses; iRemoveBonus++) {
+                for (short iRemoveBonus = iBonus; iRemoveBonus < ts->iNumBonuses; iRemoveBonus++) {
 					ts->wsbBonuses[iRemoveBonus].iBonus = ts->wsbBonuses[iRemoveBonus + 1].iBonus;
 					ts->wsbBonuses[iRemoveBonus].iWinnerPlace = ts->wsbBonuses[iRemoveBonus + 1].iWinnerPlace;
 					strcpy(ts->wsbBonuses[iRemoveBonus].szBonusString, ts->wsbBonuses[iRemoveBonus + 1].szBonusString);
@@ -3656,7 +3656,7 @@ void AdjustBonuses(TourStop * ts)
 		}
 
 		//Add places to bonuses
-        for(short iBonus = 0; iBonus < ts->iNumBonuses; iBonus++) {
+        for (short iBonus = 0; iBonus < ts->iNumBonuses; iBonus++) {
 			if(ts->wsbBonuses[iBonus].iWinnerPlace < 0 || ts->wsbBonuses[iBonus].iWinnerPlace > 3)
 				ts->wsbBonuses[iBonus].iWinnerPlace = 0;
 
@@ -3667,7 +3667,7 @@ void AdjustBonuses(TourStop * ts)
 		if(ts->iNumBonuses > MAX_BONUS_CHESTS)
 			ts->iNumBonuses = MAX_BONUS_CHESTS;
 
-        for(short iBonus = 0; iBonus < ts->iNumBonuses; iBonus++) {
+        for (short iBonus = 0; iBonus < ts->iNumBonuses; iBonus++) {
 			SetBonusString(ts->wsbBonuses[iBonus].szBonusString, 0, ts->wsbBonuses[iBonus].iBonus, ts->iStageType);
 		}
 	}
@@ -3744,7 +3744,7 @@ void EditStage(short iEditStage)
 
 		miModeSettingsButton->Show(iMode != game_mode_owned);
 
-        for(short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
+        for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
 			miGoalField[iGameMode]->Show(iMode == iGameMode);
 		}
 
@@ -3759,7 +3759,7 @@ void EditStage(short iEditStage)
 		//Show the settings button for boss mode
 		miModeSettingsButton->Show(iMode == 1001);
 
-        for(short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
+        for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
 			miGoalField[iGameMode]->Show(false);
 		}
 
@@ -3781,7 +3781,7 @@ void EnableStageMenu(bool fEnable)
 	miNameField->Disable(!fEnable);
 	miModeField->Disable(!fEnable);
 
-	for(short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++)
+	for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++)
 		miGoalField[iGameMode]->Disable(!fEnable);
 
 	miSpecialGoalField[0]->Disable(!fEnable);
@@ -3857,7 +3857,7 @@ int editor_stage()
 
 	short iColCount = 0;
 	short iRowCount = 0;
-    for(short iItem = 0; iItem < NUM_WORLD_ITEMS; iItem++) {
+    for (short iItem = 0; iItem < NUM_WORLD_ITEMS; iItem++) {
 		rItemDst[iItem].x = 16 + iColCount * 48;
 		rItemDst[iItem].y = 16 + iRowCount * 48;
 		rItemDst[iItem].w = 32;
@@ -3869,7 +3869,7 @@ int editor_stage()
 		}
 	}
 
-    for(short iStageBonus = 0; iStageBonus < 10; iStageBonus++) {
+    for (short iStageBonus = 0; iStageBonus < 10; iStageBonus++) {
 		rStageBonusDst[iStageBonus].x = 35 + iStageBonus * 58;
 		rStageBonusDst[iStageBonus].y = 360;
 		rStageBonusDst[iStageBonus].w = 32;
@@ -3878,7 +3878,7 @@ int editor_stage()
 
 	short iStartItemX = (640 - (MAX_BONUS_CHESTS * 58 - 10)) >> 1;
 
-    for(short iHouseBonus = 0; iHouseBonus < MAX_BONUS_CHESTS; iHouseBonus++) {
+    for (short iHouseBonus = 0; iHouseBonus < MAX_BONUS_CHESTS; iHouseBonus++) {
 		rHouseBonusDst[iHouseBonus].x = iStartItemX + iHouseBonus * 58;
 		rHouseBonusDst[iHouseBonus].y = 360;
 		rHouseBonusDst[iHouseBonus].w = 32;
@@ -3981,7 +3981,7 @@ int editor_stage()
 							TestAndSetBonusItem(ts, 0, iButtonX, iButtonY);
 
 							//See if we clicked an already added item and remove it
-                        for(short iRemoveItem = 0; iRemoveItem < ts->iNumBonuses; iRemoveItem++) {
+                        for (short iRemoveItem = 0; iRemoveItem < ts->iNumBonuses; iRemoveItem++) {
 								SDL_Rect * rects = rStageBonusDst;
 
 								if(ts->iStageType == 1)
@@ -3989,7 +3989,7 @@ int editor_stage()
 
 								if(iButtonX >= rects[iRemoveItem].x && iButtonX < rects[iRemoveItem].w + rects[iRemoveItem].x &&
                                     iButtonY >= rects[iRemoveItem].y && iButtonY < rects[iRemoveItem].h + rects[iRemoveItem].y) {
-                                for(short iAdjust = iRemoveItem; iAdjust < ts->iNumBonuses - 1; iAdjust++) {
+                                for (short iAdjust = iRemoveItem; iAdjust < ts->iNumBonuses - 1; iAdjust++) {
 										ts->wsbBonuses[iAdjust].iBonus = ts->wsbBonuses[iAdjust + 1].iBonus;
 										ts->wsbBonuses[iAdjust].iWinnerPlace = ts->wsbBonuses[iAdjust + 1].iWinnerPlace;
 										strcpy(ts->wsbBonuses[iAdjust].szBonusString, ts->wsbBonuses[iAdjust + 1].szBonusString);
@@ -4077,7 +4077,7 @@ int editor_stage()
                 if(iMode >= 0 && iMode < GAMEMODE_LAST) {
 					miModeSettingsButton->Show(iMode != game_mode_owned);
 
-                    for(short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
+                    for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
 						miGoalField[iGameMode]->Show(iMode == iGameMode);
 					}
 
@@ -4092,7 +4092,7 @@ int editor_stage()
 					//Show the settings button for boss mode
 					miModeSettingsButton->Show(iMode == 26);
 
-					for(short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++)
+					for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++)
 						miGoalField[iGameMode]->Show(false);
 
                     if(iMode == 24) {
@@ -4109,7 +4109,7 @@ int editor_stage()
 
             } else if (MENU_CODE_TO_MODE_SETTINGS_MENU == code) {
 				bool fModeFound = false;
-                for(short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
+                for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
                     if(miGoalField[iGameMode]->IsVisible()) {
 						mCurrentMenu = modeOptionsMenu.GetOptionsMenu(iGameMode);
 						mCurrentMenu->ResetMenu();
@@ -4167,8 +4167,8 @@ int editor_stage()
                 if(MENU_CODE_DELETE_STAGE_YES == code) {
 					//Scan the grid of stages and remove any references to this stage
 					//and decrement stage numbers greater than this stage
-                    for(short iRow = 0; iRow < iWorldHeight; iRow++) {
-                        for(short iCol = 0; iCol < iWorldWidth; iCol++) {
+                    for (short iRow = 0; iRow < iWorldHeight; iRow++) {
+                        for (short iCol = 0; iCol < iWorldWidth; iCol++) {
                             if(g_worldmap.tiles[iCol][iRow].iType == iEditStage + 6) {
 								g_worldmap.tiles[iCol][iRow].iType = 0;
                             } else if(g_worldmap.tiles[iCol][iRow].iType > iEditStage + 6) {
@@ -4224,7 +4224,7 @@ int editor_stage()
 		int color = SDL_MapRGB(blitdest->format, 0, 0, 255);
 
         if(iEditStage == -1) {
-            for(short iStage = 0; iStage < g_worldmap.iNumStages; iStage++) {
+            for (short iStage = 0; iStage < g_worldmap.iNumStages; iStage++) {
 				short ix = (iStage % 20) << 5;
 				short iy = ((iStage / 20) << 5);
 
@@ -4268,18 +4268,18 @@ int editor_stage()
 			TourStop * ts = game_values.tourstops[iEditStage];
 
 			//Game powerups
-            for(short iItem = 0; iItem < NUM_POWERUPS; iItem++) {
+            for (short iItem = 0; iItem < NUM_POWERUPS; iItem++) {
 				spr_storedpoweruplarge.draw(rItemDst[iItem].x, rItemDst[iItem].y, iItem << 5, 0, 32, 32);
 			}
 
 			//World Powerups
-            for(short iWorldItem = 0; iWorldItem < NUM_WORLD_POWERUPS; iWorldItem++) {
+            for (short iWorldItem = 0; iWorldItem < NUM_WORLD_POWERUPS; iWorldItem++) {
 				spr_worlditems.draw(rItemDst[iWorldItem + NUM_POWERUPS].x, rItemDst[iWorldItem + NUM_POWERUPS].y, iWorldItem << 5, 0, 32, 32);
 			}
 
 			//Score Bonuses
             if(ts->iStageType == 1) {
-                for(short iScoreBonus = 0; iScoreBonus < NUM_WORLD_SCORE_BONUSES; iScoreBonus++) {
+                for (short iScoreBonus = 0; iScoreBonus < NUM_WORLD_SCORE_BONUSES; iScoreBonus++) {
 					spr_worlditems.draw(rItemDst[iScoreBonus + NUM_POWERUPS + NUM_WORLD_POWERUPS].x, rItemDst[iScoreBonus + NUM_POWERUPS + NUM_WORLD_POWERUPS].y, iScoreBonus < 10 ? iScoreBonus << 5 : (iScoreBonus - 10) << 5, iScoreBonus < 10 ? 32 : 64, 32, 32);
 				}
 			}
@@ -4293,7 +4293,7 @@ int editor_stage()
 			if(ts->iStageType == 1)
 				rects = rHouseBonusDst;
 
-            for(short iPickedItem = 0; iPickedItem < ts->iNumBonuses; iPickedItem++) {
+            for (short iPickedItem = 0; iPickedItem < ts->iNumBonuses; iPickedItem++) {
 				short iBonus = ts->wsbBonuses[iPickedItem].iBonus;
 				short iPlace = ts->wsbBonuses[iPickedItem].iWinnerPlace;
 
@@ -4795,7 +4795,7 @@ void takescreenshot()
 {
 	short iTileSizes[3] = {32, 16, 8};
 
-    for(short iScreenshotSize = 0; iScreenshotSize < 3; iScreenshotSize++) {
+    for (short iScreenshotSize = 0; iScreenshotSize < 3; iScreenshotSize++) {
 		short iTileSize = iTileSizes[iScreenshotSize];
 		g_worldmap.Load(iTileSize);
 

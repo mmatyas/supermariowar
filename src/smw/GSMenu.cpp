@@ -157,7 +157,7 @@ void MenuState::WriteGameOptions()
 
         fwrite(game_values.inputConfiguration, sizeof(CInputPlayerControl), 8, fp);
 
-        for(int iPlayer = 0; iPlayer < 4; iPlayer++) {
+        for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
             fwrite(&game_values.playerInput.inputControls[iPlayer]->iDevice, sizeof(short), 1, fp);
         }
 
@@ -165,7 +165,7 @@ void MenuState::WriteGameOptions()
         fwrite(&game_values.fullscreen, sizeof(bool), 1, fp);
 #endif
         //Write out game mode goals
-        for(short k = 0; k < GAMEMODE_LAST; k++) {
+        for (short k = 0; k < GAMEMODE_LAST; k++) {
             short iGoal = miGoalField[k]->GetShortValue();
             fwrite(&iGoal, sizeof(short), 1, fp);
         }
@@ -1025,7 +1025,7 @@ void MenuState::CreateMenu()
 
     int iCurrentMusic = worldmusiclist->GetCurrentIndex();
     worldmusiclist->SetCurrent(0);
-    for(short iMusic = 0; iMusic < worldmusiclist->GetCount(); iMusic++) {
+    for (short iMusic = 0; iMusic < worldmusiclist->GetCount(); iMusic++) {
         miWorldMusicField->Add(worldmusiclist->current_name(), iMusic, "", false, false);
         worldmusiclist->next();
     }
@@ -1584,7 +1584,7 @@ void MenuState::CreateMenu()
     miTournamentField->Show(false);
 
     miTourField = new MI_SelectField(&rm->spr_selectfield, 130, 380, "Tour", 380, 100);
-    for(short iTour = 0; iTour < tourlist->GetCount(); iTour++) {
+    for (short iTour = 0; iTour < tourlist->GetCount(); iTour++) {
         GetNameFromFileName(szTemp, tourlist->GetIndex(iTour), true);
         //strcat(szTemp, " Tour");
         miTourField->Add(szTemp, iTour, "", true, false);
@@ -1594,7 +1594,7 @@ void MenuState::CreateMenu()
     miTourField->Show(false);
 
     miWorldField = new MI_SelectField(&rm->spr_selectfield, 130, 380, "World", 380, 100);
-    for(short iWorld = 0; iWorld < worldlist->GetCount(); iWorld++) {
+    for (short iWorld = 0; iWorld < worldlist->GetCount(); iWorld++) {
         GetNameFromFileName(szTemp, worldlist->GetIndex(iWorld), true);
         miWorldField->Add(szTemp, iWorld, "", true, false);
     }
@@ -1647,19 +1647,19 @@ void MenuState::CreateMenu()
 
     miModeField = new MI_ImageSelectField(&rm->spr_selectfield, &rm->menu_mode_small, 70, 85, "Mode", 500, 120, 16, 16);
 
-    for(short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
+    for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
         miModeField->Add(gamemodes[iGameMode]->GetModeName(), iGameMode, "", false, false);
     }
     miModeField->SetData(&currentgamemode, NULL, NULL);
     miModeField->SetKey(0);
     miModeField->SetItemChangedCode(MENU_CODE_MODE_CHANGED);
 
-    for(short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
+    for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
         miGoalField[iGameMode] = new MI_SelectField(&rm->spr_selectfield, 70, 125, gamemodes[iGameMode]->GetGoalName(), 352, 120);
         //miGoalField[iGameMode]->SetKey(gamemodes[iGameMode]->goal);
         miGoalField[iGameMode]->Show(iGameMode == 0);
 
-        for(short iGameModeOption = 0; iGameModeOption < GAMEMODE_NUM_OPTIONS; iGameModeOption++) {
+        for (short iGameModeOption = 0; iGameModeOption < GAMEMODE_NUM_OPTIONS; iGameModeOption++) {
             SModeOption * option = &gamemodes[iGameMode]->GetOptions()[iGameModeOption];
             miGoalField[iGameMode]->Add(option->szName, option->iValue, "", false, false);
         }
@@ -1688,12 +1688,12 @@ void MenuState::CreateMenu()
     miMapFilterScroll->Show(false);
 
     //Add auto map filters
-    for(short iFilter = 0; iFilter < NUM_AUTO_FILTERS; iFilter++) {
+    for (short iFilter = 0; iFilter < NUM_AUTO_FILTERS; iFilter++) {
         miMapFilterScroll->Add(g_szAutoFilterNames[iFilter], g_iAutoFilterIcons[iFilter]);
     }
 
     //Add user defined filters
-    for(short iFilter = 0; iFilter < filterslist->GetCount(); iFilter++) {
+    for (short iFilter = 0; iFilter < filterslist->GetCount(); iFilter++) {
         GetNameFromFileName(szTemp, filterslist->GetIndex(iFilter), true);
         miMapFilterScroll->Add(szTemp, game_values.piFilterIcons[NUM_AUTO_FILTERS + iFilter]);
     }
@@ -1725,7 +1725,7 @@ void MenuState::CreateMenu()
 
     mGameSettingsMenu.AddControl(miGoalField[0], miModeField, miGoalField[1], NULL, miModeSettingsButton);
 
-    for(short iGoalField = 1; iGoalField < GAMEMODE_LAST - 1; iGoalField++)
+    for (short iGoalField = 1; iGoalField < GAMEMODE_LAST - 1; iGoalField++)
         mGameSettingsMenu.AddControl(miGoalField[iGoalField], miGoalField[iGoalField - 1], miGoalField[iGoalField + 1], miGoalField[iGoalField - 1], miModeSettingsButton);
 
     mGameSettingsMenu.AddControl(miGoalField[GAMEMODE_LAST - 1], miGoalField[GAMEMODE_LAST - 2], miMapField, miGoalField[GAMEMODE_LAST - 2], miModeSettingsButton);
@@ -2009,7 +2009,7 @@ void MenuState::CreateMenu()
     miNetNewLevelContinueButton->SetCode(MENU_CODE_TO_NET_NEW_ROOM_SETTINGS_MENU);
 
     miNetNewLevelModeField = new MI_ImageSelectField(*miModeField);
-    for(short iGoalField = 0; iGoalField < GAMEMODE_LAST; iGoalField++)
+    for (short iGoalField = 0; iGoalField < GAMEMODE_LAST; iGoalField++)
         miNetNewLevelGoalField[iGoalField] = new MI_SelectField(*miGoalField[iGoalField]);
 
     miNetNewLevelMapField = new MI_MapField(&rm->spr_selectfield, 70, 165, "Map", 400, 120, true);
@@ -2019,7 +2019,7 @@ void MenuState::CreateMenu()
     mNetNewLevel.AddControl(miNetNewLevelModeField, miNetNewLevelContinueButton, miNetNewLevelGoalField[0], NULL, NULL);
 
     mNetNewLevel.AddControl(miNetNewLevelGoalField[0], miNetNewLevelModeField, miNetNewLevelGoalField[1], NULL, /*FIXME: miModeSettingsButton*/ NULL);
-    for(short iGoalField = 1; iGoalField < GAMEMODE_LAST - 1; iGoalField++)
+    for (short iGoalField = 1; iGoalField < GAMEMODE_LAST - 1; iGoalField++)
         mNetNewLevel.AddControl(miNetNewLevelGoalField[iGoalField],
             miNetNewLevelGoalField[iGoalField - 1],
             miNetNewLevelGoalField[iGoalField + 1],
@@ -2030,7 +2030,7 @@ void MenuState::CreateMenu()
 
 /*    mNetNewLevel.AddControl(miGoalField[0], miModeField, miGoalField[1], NULL, miModeSettingsButton);
 
-    for(short iGoalField = 1; iGoalField < GAMEMODE_LAST - 1; iGoalField++)
+    for (short iGoalField = 1; iGoalField < GAMEMODE_LAST - 1; iGoalField++)
         mNetNewLevel.AddControl(miGoalField[iGoalField], miGoalField[iGoalField - 1], miGoalField[iGoalField + 1], miGoalField[iGoalField - 1], NULL);
 
     mNetNewLevel.AddControl(miGoalField[GAMEMODE_LAST - 1], miGoalField[GAMEMODE_LAST - 2], miMapField, miGoalField[GAMEMODE_LAST - 2], NULL);
@@ -2101,7 +2101,7 @@ void MenuState::onEnterState()
             if(!game_values.worldskipscoreboard) {
                 //Only clear out the stored powerup if we were allowed to use it in the game
                 if(game_values.gamemode->HasStoredPowerups()) {
-                    for(short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++)
+                    for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++)
                         game_values.storedpowerups[iPlayer] = -1;
                 }
             }
@@ -2144,7 +2144,7 @@ void MenuState::onEnterState()
                 short iNumInPlace = 0;
                 short iInPlace[4];
                 short iLowestPlace = 0;
-                for(short iScore = 0; iScore < score_cnt; iScore++) {
+                for (short iScore = 0; iScore < score_cnt; iScore++) {
                     if(score[iScore]->place == iLowestPlace) {
                         iInPlace[iNumInPlace++] = iScore;
                     } else if(score[iScore]->place > iLowestPlace) {
@@ -2162,7 +2162,7 @@ void MenuState::onEnterState()
                 short iNumInPlace = 0;
                 short iInPlace[4];
                 short iMostWins = 0;
-                for(short iTeam = 0; iTeam < score_cnt; iTeam++) {
+                for (short iTeam = 0; iTeam < score_cnt; iTeam++) {
                     if(game_values.tournament_scores[iTeam].wins == iMostWins) {
                         iInPlace[iNumInPlace++] = iTeam;
                     } else if(game_values.tournament_scores[iTeam].wins > iMostWins) {
@@ -2181,7 +2181,7 @@ void MenuState::onEnterState()
                 short iInPlace[4];
                 short iLeastWins = 20; //Most possible wins are 10
 
-                for(short iTeam = 0; iTeam < score_cnt; iTeam++) {
+                for (short iTeam = 0; iTeam < score_cnt; iTeam++) {
                     if(game_values.tournament_scores[iTeam].wins == iLeastWins) {
                         iInPlace[iNumInPlace++] = iTeam;
                     } else if(game_values.tournament_scores[iTeam].wins < iLeastWins) {
@@ -2205,14 +2205,14 @@ void MenuState::onEnterState()
                 short iInPlace[4];
                 short iWinner = 0;
 
-                for(short iTeam = 0; iTeam < score_cnt; iTeam++) {
+                for (short iTeam = 0; iTeam < score_cnt; iTeam++) {
                     if(score[iTeam]->place == 0) {
                         iWinner = iTeam;
                         break;
                     }
                 }
 
-                for(short iTeam = 0; iTeam < score_cnt; iTeam++) {
+                for (short iTeam = 0; iTeam < score_cnt; iTeam++) {
                     if(iTeam == iWinner)
                         continue;
 
@@ -2379,7 +2379,7 @@ void MenuState::update()
                 miModeSettingsButton->Show(miModeField->GetShortValue() != game_mode_owned);
 
                 //Show the approprate goal field
-                for(short iMode = 0; iMode < GAMEMODE_LAST; iMode++) {
+                for (short iMode = 0; iMode < GAMEMODE_LAST; iMode++) {
                     miGoalField[iMode]->Show(miModeField->GetShortValue() == iMode);
                 }
 
@@ -2651,7 +2651,7 @@ void MenuState::update()
                         g_worldmap.SetInitialPowerups();
 
                         //If a player had a stored powerup from another game, add it to their inventory
-                        for(short iPlayer = 0; iPlayer < 4; iPlayer++) {
+                        for (short iPlayer = 0; iPlayer < 4; iPlayer++) {
                             if(game_values.storedpowerups[iPlayer] != -1) {
                                 short iTeamId = LookupTeamID(iPlayer);
                                 if(game_values.worldpowerupcount[iTeamId] < 32)
@@ -2674,7 +2674,7 @@ void MenuState::update()
                     game_values.tournamentwinner = -1;
 
                     //Setup wins counters for tournament/tour
-                    for(int k = 0; k < 4; k++) {
+                    for (int k = 0; k < 4; k++) {
                         game_values.tournament_scores[k].wins = 0;
                         game_values.tournament_scores[k].total = 0;
                     }
@@ -2687,7 +2687,7 @@ void MenuState::update()
 
                         game_values.gamemode = gamemodes[miModeField->GetShortValue()];
 
-                        for(short iMode = 0; iMode < GAMEMODE_LAST; iMode++) {
+                        for (short iMode = 0; iMode < GAMEMODE_LAST; iMode++) {
                             gamemodes[iMode]->goal = miGoalField[iMode]->GetShortValue();
                         }
 
@@ -2712,7 +2712,7 @@ void MenuState::update()
                         }
 
                     //Setup items on next menu
-                    for(short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
+                    for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
                         miGoalField[iGameMode]->HideItem(-1, game_values.matchtype == MATCH_TYPE_TOURNAMENT);
                     }
 
@@ -2774,7 +2774,7 @@ void MenuState::update()
             game_values.gamemode = gamemodes[miModeField->GetShortValue()];
             miModeSettingsButton->Show(miModeField->GetShortValue() != game_mode_owned);
 
-            for(short iMode = 0; iMode < GAMEMODE_LAST; iMode++) {
+            for (short iMode = 0; iMode < GAMEMODE_LAST; iMode++) {
                 miGoalField[iMode]->Show(miModeField->GetShortValue() == iMode);
             }
         } else if(MENU_CODE_BACK_TEAM_SELECT_MENU == code) {
@@ -2876,7 +2876,7 @@ void MenuState::update()
 
             if(MENU_CODE_EXIT_WORLD_YES == code) {
                 //Clear out any stored items a player might have
-                for(short iPlayer = 0; iPlayer < 4; iPlayer++)
+                for (short iPlayer = 0; iPlayer < 4; iPlayer++)
                     game_values.storedpowerups[iPlayer] = -1;
 
                 ResetTournamentBackToMainMenu();
@@ -2930,7 +2930,7 @@ void MenuState::update()
             mCurrentMenu = &mProjectilesLimitsMenu;
             mCurrentMenu->ResetMenu();
         } else if (MENU_CODE_TO_MODE_SETTINGS_MENU == code) {
-            for(short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
+            for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
                 if(miGoalField[iGameMode]->IsVisible()) {
                     mCurrentMenu = modeOptionsMenu.GetOptionsMenu(iGameMode);
                     mCurrentMenu->ResetMenu();
@@ -3006,7 +3006,7 @@ void MenuState::update()
 
             StartGame();
         } else if (MENU_CODE_RESET_STORED_POWERUPS == code) {
-            for(short iPlayer = 0; iPlayer < 4; iPlayer++)
+            for (short iPlayer = 0; iPlayer < 4; iPlayer++)
                 game_values.storedpowerups[iPlayer] = -1;
         } else if(MENU_CODE_MAP_CHANGED == code) {
             if(game_values.matchtype != MATCH_TYPE_TOUR)
@@ -3513,7 +3513,7 @@ void MenuState::update()
         std::map<std::string, MapListNode*>::iterator itr = maplist->GetIteratorAt(0, false);
 
         short iMapCount = maplist->GetCount();
-        for(short iMap = 0; iMap < iMapCount; iMap++) {
+        for (short iMap = 0; iMap < iMapCount; iMap++) {
             strcpy(szThumbnail, "maps/cache/");
             char * pszThumbnail = szThumbnail + strlen(szThumbnail);
             GetNameFromFileName(pszThumbnail, (*itr).second->filename.c_str());
@@ -3603,7 +3603,7 @@ void MenuState::StartGame()
     WriteGameOptions();
 
     //Load skins for players
-    for(int k = 0; k < 4; k++) {
+    for (int k = 0; k < 4; k++) {
         if(game_values.playercontrol[k] > 0) {
             if(game_values.randomskin[k]) {
                 do {
@@ -3620,7 +3620,7 @@ void MenuState::StartGame()
         game_values.loadedannouncer = (short)announcerlist->GetCurrentIndex();
 
         //Delete the old sounds
-        for(int k = 0; k < PANNOUNCER_SOUND_LAST; k++)
+        for (int k = 0; k < PANNOUNCER_SOUND_LAST; k++)
             sfx_announcer[k].reset();
 
         FILE * announcerfile = fopen(announcerlist->current_name(), "r");
@@ -3635,7 +3635,7 @@ void MenuState::StartGame()
                 continue;
 
             //Clean off carriage returns
-            for(int k = 0; k < (int)strlen(szBuffer); k++) {
+            for (int k = 0; k < (int)strlen(szBuffer); k++) {
                 if(szBuffer[k] == '\r' || szBuffer[k] == '\n') {
                     szBuffer[k] = '\0';
                     break;
@@ -3687,7 +3687,7 @@ void MenuState::SetControllingTeamForSettingsMenu(short iControlTeam, bool fDisp
 
     if(iControlTeam >= 0) {
         bool fNeedAI = true;
-        for(short iPlayer = 0; iPlayer < game_values.teamcounts[iControlTeam]; iPlayer++) {
+        for (short iPlayer = 0; iPlayer < game_values.teamcounts[iControlTeam]; iPlayer++) {
             if(game_values.playercontrol[game_values.teamids[iControlTeam][iPlayer]] == 1) {
                 fNeedAI = false;
                 break;
@@ -3759,7 +3759,7 @@ void MenuState::LoadScript(const char * szScriptFile)
             op->iIterations = atoi(strtok(NULL, ",\n"));
 
             //Get input operations to perform
-            for(short i = 0; i < 8; i++) {
+            for (short i = 0; i < 8; i++) {
                 op->fInput[i] = atoi(strtok(NULL, ",\n")) != 0;
             }
 
@@ -3936,7 +3936,7 @@ void MenuState::GetNextScriptOperation()
     short iKeys[8];
     short iNumKeys = 0;
 
-    for(short i = 0; i < 8; i++) {
+    for (short i = 0; i < 8; i++) {
         if(op->fInput[i])
             iKeys[iNumKeys++] = i;
     }
@@ -3975,7 +3975,7 @@ void MenuState::SaveScript(const char * szScriptFile)
 
             fprintf(fp, "%d,%d", op->iController, op->iIterations);
 
-            for(short i = 0; i < 8; i++) {
+            for (short i = 0; i < 8; i++) {
                 fprintf(fp, ",%d", op->fInput[i]);
             }
 
@@ -4001,14 +4001,14 @@ void MenuState::AddEmtpyLineToScript()
 
 void MenuState::SetNextScriptOperation()
 {
-    for(short i = 0; i < 8; i++) {
+    for (short i = 0; i < 8; i++) {
         if(game_values.playerInput.outputControls[0].keys[i].fPressed) {
             ScriptOperation * op = new ScriptOperation();
 
             op->iController = 0;
             op->iIterations = 1;
 
-            for(short iKey = 0; iKey < 8; iKey++) {
+            for (short iKey = 0; iKey < 8; iKey++) {
                 op->fInput[iKey] = false;
             }
 

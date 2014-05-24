@@ -318,7 +318,7 @@ int main(int argc, char *argv[])
     //Comment this in to performance test the preview map loading
     MI_MapField * miMapField = new MI_MapField(&rm->spr_selectfield, 70, 165, "Map", 500, 120);
 
-    for(int k = 0; k < 100; k++) {
+    for (int k = 0; k < 100; k++) {
         game_values.playerInput.outputControls[3].menu_right.fPressed = true;
         miMapField->SendInput(&game_values.playerInput);
         //printf("Map over-> %s\n", maplist->currentFilename());
@@ -336,7 +336,7 @@ int main(int argc, char *argv[])
     joystickcount = (short)SDL_NumJoysticks();
     joysticks = new SDL_Joystick*[joystickcount];
 
-    for(short i = 0; i < joystickcount; i++)
+    for (short i = 0; i < joystickcount; i++)
         joysticks[i] = SDL_JoystickOpen(i);
 
     SDL_JoystickEventState(SDL_ENABLE);
@@ -355,7 +355,7 @@ int main(int argc, char *argv[])
 
     printf("\n---------------- loading ----------------\n");
 
-    for(short iScore = 0; iScore < 4; iScore++)
+    for (short iScore = 0; iScore < 4; iScore++)
         score[iScore] = new CScore(iScore);
 
     //set standard game values
@@ -474,7 +474,7 @@ int main(int argc, char *argv[])
     game_values.piFilterIcons		= new short[NUM_AUTO_FILTERS + filterslist->GetCount()];
     game_values.fNeedWriteFilters	= false;
 
-    for(short iFilter = 0; iFilter < NUM_AUTO_FILTERS + filterslist->GetCount(); iFilter++) {
+    for (short iFilter = 0; iFilter < NUM_AUTO_FILTERS + filterslist->GetCount(); iFilter++) {
         game_values.pfFilters[iFilter] = false;
         game_values.piFilterIcons[iFilter] = 0;
     }
@@ -484,8 +484,8 @@ int main(int argc, char *argv[])
     //game_values.gamehost			= false;
 
     //Set the default powerup weights for bonus wheel and [?] boxes
-    for(short iPreset = 0; iPreset < NUM_POWERUP_PRESETS; iPreset++) {
-        for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {
+    for (short iPreset = 0; iPreset < NUM_POWERUP_PRESETS; iPreset++) {
+        for (short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {
             g_iCurrentPowerupPresets[iPreset][iPowerup] = g_iDefaultPowerupPresets[iPreset][iPowerup];
         }
     }
@@ -500,7 +500,7 @@ int main(int argc, char *argv[])
     gamegraphicspacklist->SetCurrent(0);
     soundpacklist->SetCurrent(0);
 
-    for(short iPlayer = 0; iPlayer < 4; iPlayer++) {
+    for (short iPlayer = 0; iPlayer < 4; iPlayer++) {
         game_values.storedpowerups[iPlayer] = -1;
         game_values.gamepowerups[iPlayer] = -1;
         game_values.teamids[iPlayer][0] = iPlayer;
@@ -510,11 +510,11 @@ int main(int argc, char *argv[])
         game_values.randomskin[iPlayer] = false;
 
         //Setup the default key/button input configurations
-        for(short iInputType = 0; iInputType < 2; iInputType++) { //for keyboard/joystick
+        for (short iInputType = 0; iInputType < 2; iInputType++) { //for keyboard/joystick
             game_values.inputConfiguration[iPlayer][iInputType].iDevice = iInputType - 1;
 
-            for(short iInputState = 0; iInputState < 2; iInputState++) { //for game/menu
-                for(short iKey = 0; iKey < NUM_KEYS; iKey++) {
+            for (short iInputState = 0; iInputState < 2; iInputState++) { //for game/menu
+                for (short iKey = 0; iKey < NUM_KEYS; iKey++) {
                     game_values.inputConfiguration[iPlayer][iInputType].inputGameControls[iInputState].keys[iKey] = controlkeys[iInputType][iInputState][iPlayer][iKey];
                 }
             }
@@ -567,7 +567,7 @@ int main(int argc, char *argv[])
 	game_values.ReadBinaryConfig();
 
     //Assign the powerup weights to the selected preset
-    for(short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {
+    for (short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {
         game_values.powerupweights[iPowerup] = g_iCurrentPowerupPresets[game_values.poweruppreset][iPowerup];
     }
 
@@ -586,7 +586,7 @@ int main(int argc, char *argv[])
     float spawnradius = 100.0f;
     float spawnangle = 0.0f;
 
-    for(short i = 0; i < 25; i++) {
+    for (short i = 0; i < 25; i++) {
         g_iSwirlSpawnLocations[0][0][i] = (short)(spawnradius * cos(spawnangle));
         g_iSwirlSpawnLocations[0][1][i] = (short)(spawnradius * sin(spawnangle));
 
@@ -642,11 +642,11 @@ int main(int argc, char *argv[])
 
     printf("\n---------------- shutdown ----------------\n");
 
-    for(short i = 0; i < GAMEMODE_LAST; i++)
+    for (short i = 0; i < GAMEMODE_LAST; i++)
         delete gamemodes[i];
 
 #ifdef _XBOX
-    for(i = 0; i < joystickcount; i++)
+    for (i = 0; i < joystickcount; i++)
         SDL_JoystickClose(joysticks[i]);
 
     delete[] joysticks;
@@ -657,8 +657,8 @@ int main(int argc, char *argv[])
     net_close();
 
     //Delete player skins
-    for(short k = 0; k < MAX_PLAYERS; k++) {
-        for(short j = 0; j < PGFX_LAST; j++) {
+    for (short k = 0; k < MAX_PLAYERS; k++) {
+        for (short j = 0; j < PGFX_LAST; j++) {
             delete rm->spr_player[k][j];
             delete rm->spr_shyguy[k][j];
             delete rm->spr_chocobo[k][j];
@@ -695,7 +695,7 @@ int main(int argc, char *argv[])
 
 void reconnectjoysticks()
 {
-    for(int i = 0; i < joystickcount; i++)
+    for (int i = 0; i < joystickcount; i++)
         SDL_JoystickClose(joysticks[i]);
 
     delete[] joysticks;
@@ -706,7 +706,7 @@ void reconnectjoysticks()
     joystickcount = SDL_NumJoysticks();
     joysticks = new SDL_Joystick*[joystickcount];
 
-    for(i = 0; i < joystickcount; i++)
+    for (i = 0; i < joystickcount; i++)
         joysticks[i] = SDL_JoystickOpen(i);
 
     SDL_JoystickEventState(SDL_ENABLE);

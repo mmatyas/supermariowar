@@ -16,14 +16,14 @@ void LoadMapHazards(bool fPreview)
     objectcontainer[2].clean();
 
     //Create objects for all the map hazards
-    for(short iMapHazard = 0; iMapHazard < g_map->iNumMapHazards; iMapHazard++) {
+    for (short iMapHazard = 0; iMapHazard < g_map->iNumMapHazards; iMapHazard++) {
         MapHazard * hazard = &g_map->maphazards[iMapHazard];
         if(hazard->itype == 0) {
-            for(short iFireball = 0; iFireball < hazard->iparam[0]; iFireball++)
+            for (short iFireball = 0; iFireball < hazard->iparam[0]; iFireball++)
                 objectcontainer[1].add(new OMO_OrbitHazard(&rm->spr_hazard_fireball[fPreview ? 1 : 0], (hazard->ix << 4) + 16, (hazard->iy << 4) + 16, (float)(iFireball * 24), hazard->dparam[0], hazard->dparam[1], 4, 8, 18, 18, 0, 0, 0, hazard->dparam[0] < 0.0f ? 18 : 0, 18, 18));
         } else if(hazard->itype == 1) {
             float dSector = TWO_PI / hazard->iparam[0];
-            for(short iRotoDisc = 0; iRotoDisc < hazard->iparam[0]; iRotoDisc++) {
+            for (short iRotoDisc = 0; iRotoDisc < hazard->iparam[0]; iRotoDisc++) {
                 float dAngle = hazard->dparam[1] + iRotoDisc * dSector;
                 if(dAngle > TWO_PI)
                     dAngle -= TWO_PI;
@@ -395,7 +395,7 @@ void MO_Explosion::update()
     if(timer == 0) {
         short iTestY = iy;
 
-        for(short iRow = 0; iRow < 5; iRow++) {
+        for (short iRow = 0; iRow < 5; iRow++) {
             short iTestX = ix;
 
             if(iTestX < 0)
@@ -403,7 +403,7 @@ void MO_Explosion::update()
 
             if(iTestY >= 0 && iTestY < smw->ScreenHeight) {
                 short iTestRow = iTestY / TILESIZE;
-                for(short iCol = 0; iCol < 7; iCol++) {
+                for (short iCol = 0; iCol < 7; iCol++) {
                     IO_Block * block = g_map->block(iTestX / TILESIZE, iTestRow);
                     if(block && block->getBlockType() == block_weaponbreakable) {
                         B_WeaponBreakableBlock * weaponbreakableblock = (B_WeaponBreakableBlock*)block;
@@ -677,7 +677,7 @@ void MO_PirhanaPlant::update()
             short iPlantX = ix + 16;
             short iPlantY = iy + (iDirection == 0 ? 16 : ih - 16);
 
-            for(short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
+            for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
                 CPlayer * player = list_players[iPlayer];
                 if(player->state != player_ready)
                     continue;
