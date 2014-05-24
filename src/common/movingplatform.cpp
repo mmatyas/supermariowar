@@ -742,7 +742,7 @@ void MovingPlatform::collide(CPlayer * player)
         fRelativeX2 = player->fx + PW - fx + iHalfWidth;
     } else if (coldec == collision_overlap_left) {
         fRelativeX1 = player->fx - fx + iHalfWidth - smw->ScreenWidth;
-        fRelativeX2 = player->fx + PW - fx + iHalfWidth - smw->ScreenWidth ;
+        fRelativeX2 = player->fx + PW - fx + iHalfWidth - smw->ScreenWidth;
     } else {
         fRelativeX1 = player->fx - fx + iHalfWidth + smw->ScreenWidth;
         fRelativeX2 = player->fx + PW - fx + iHalfWidth + smw->ScreenWidth;

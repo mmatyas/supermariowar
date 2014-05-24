@@ -2384,7 +2384,7 @@ bool SwapPlayers(short iUsingPlayerID)
             game_values.swapplayersblink = false;
             game_values.swapplayersblinkcount = 0;
         } else {
-            game_values.screenfade = smw->MenuTransparency  ;
+            game_values.screenfade = smw->MenuTransparency;
         }
     }
 
