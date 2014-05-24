@@ -79,4 +79,3 @@ class CTilesetManager : public SimpleDirectoryList
 };
 
 #endif //__TILESETMANAGER_H_
-

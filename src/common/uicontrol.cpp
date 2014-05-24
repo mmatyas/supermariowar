@@ -1791,7 +1791,6 @@ void MI_TextField::SetDisallowedChars(const char * chars)
 }
 
 
-
 /**************************************
  * MI_MapField Class
  **************************************/
@@ -2192,4 +2191,3 @@ void MI_MapField::SetDimensions(short width, short indent)
         iSlideListOutGoal = iSlideListOut;
     }
 }
-

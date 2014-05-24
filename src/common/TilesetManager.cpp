@@ -258,4 +258,3 @@ void CTilesetManager::SaveTilesets()
 		tilesetlist[i]->SaveTileset();
 	}
 }
-

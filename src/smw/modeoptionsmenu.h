@@ -256,4 +256,3 @@ class ModeOptionsMenu
 };
 
 #endif //__MODEOPTIONSMENU_H_
-

@@ -1,4 +1,3 @@
-
 #ifndef	__CRESMAN_H
 #define	__CRESMAN_H
 

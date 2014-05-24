@@ -523,4 +523,3 @@ class MenuState : public GameState
 };
 
 #endif //__MENU_H_
-

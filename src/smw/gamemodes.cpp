@@ -246,7 +246,6 @@ void GameTimerDisplay::AddTime(short iTime)
 }
 
 
-
 CGameMode::CGameMode()
 {
     winningteam = -1;
@@ -2959,7 +2958,6 @@ short CGM_Collection::CheckWinner(CPlayer * player)
 }
 
 
-
 //Chase (hold a key for points while phantos chase you)
 CGM_Chase::CGM_Chase() : CGameMode()
 {
@@ -3234,7 +3232,6 @@ void CGM_Boss_MiniGame::SetBossType(short bosstype)
 {
     iBossType = bosstype;
 }
-
 
 
 //Bonus Mode (not really a game mode, but involves using the map so we need a mode to play)

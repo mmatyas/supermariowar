@@ -282,4 +282,3 @@ class WorldMap
 };
 
 #endif //__WORLD_H_
-

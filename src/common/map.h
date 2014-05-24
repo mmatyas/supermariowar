@@ -1,4 +1,3 @@
-
 #ifndef SMW_MAP_H
 #define SMW_MAP_H
 
@@ -348,5 +347,4 @@ class CMap
 		friend class OMO_RaceGoal;
 };
 
-#endif
-
+#endif // SMW_MAP_H

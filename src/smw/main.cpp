@@ -72,8 +72,6 @@ CScore			*score[4];
 short			score_cnt;
 
 
-
-
 extern SDL_KEYTYPE controlkeys[2][2][4][NUM_KEYS];
 extern int g_iVersion[];
 
@@ -639,7 +637,6 @@ int main(int argc, char *argv[])
     //**********************************************************
 
 
-
     printf("\n---------------- shutdown ----------------\n");
 
     for (short i = 0; i < GAMEMODE_LAST; i++)
@@ -714,4 +711,3 @@ void reconnectjoysticks()
 
 #endif
 */
-

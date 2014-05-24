@@ -39,9 +39,6 @@
 			#pragma comment(lib, "libpng.lib")
 			#pragma comment(lib, "zlib.lib")
 		#endif
-
-
-
     #endif
 #endif
 
@@ -4334,8 +4331,6 @@ int editor_stage()
 	return EDITOR_QUIT;
 }
 
-
-
 int display_help()
 {
 	//unsigned int currentChar = 0;
@@ -4860,5 +4855,3 @@ void takescreenshot()
 	g_worldmap.Load(iTileSizes[0]);
 	blitdest = screen;
 }
-
-

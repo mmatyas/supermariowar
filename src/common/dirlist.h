@@ -74,5 +74,4 @@ class DirectoryListing
         #endif
 };
 
-#endif
-
+#endif // LIST_DIRECTORIES_HEADER

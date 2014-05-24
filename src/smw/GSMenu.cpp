@@ -1,4 +1,3 @@
-
 #include "global.h"
 #include "GSMenu.h"
 #include "GSGameplay.h"
@@ -4020,4 +4019,3 @@ void MenuState::SetNextScriptOperation()
 }
 
 #endif
-

@@ -656,7 +656,6 @@ int main(int argc, char *argv[])
 	}
 
 
-
 	printf("\n---------------- save map ----------------\n");
 
 	save_map(convertPath("maps/ZZleveleditor.map"));
@@ -5259,7 +5258,6 @@ bool ReadAnimatedTileTypeFile(const char * szFile)
 	return true;
 }
 
-
 bool WriteAnimatedTileTypeFile(const char * szFile)
 {
 	FILE * tsf = fopen(szFile, "wb");
@@ -5275,6 +5273,3 @@ bool WriteAnimatedTileTypeFile(const char * szFile)
 	fclose(tsf);
 	return true;
 }
-
-
-

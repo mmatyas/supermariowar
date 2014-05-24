@@ -239,11 +239,7 @@ void CResourceManager::LoadAllSprites() {
     gfx_loadimage(&spr_powerupselector, convertPath("gfx/packs/awards/award.png", graphicspack), false);
 
     gfx_loadimage(&spr_abovearrows, convertPath("gfx/packs/eyecandy/abovearrows.png", graphicspack), true);
-
 }
-
-
-
 
 bool CResourceManager::LoadMenuGraphics()
 {
@@ -375,4 +371,3 @@ void CResourceManager::LoadAllGraphics()
 
     gfx_loadimage(&spr_overlay, convertPath("gfx/packs/menu/menu_shade.png", gamegraphicspacklist->current_name()), false, false);
 }
-

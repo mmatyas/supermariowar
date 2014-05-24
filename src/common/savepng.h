@@ -26,4 +26,3 @@ int IMG_SavePNG(SDL_Surface *surface, const char *file);
 #endif
 
 #endif	// _IMG_SavePNG_h
-

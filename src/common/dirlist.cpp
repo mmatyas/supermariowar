@@ -39,8 +39,6 @@ inline bool endsWith(string& s, string& q)
     return s.substr(size_s-size_q, size_q) == q;
 }
 
-
-
 DirectoryListing::DirectoryListing(string dlPath, string file_ext)
 {
     /* Store optional filename extension and search path */
@@ -61,8 +59,6 @@ DirectoryListing::DirectoryListing(string dlPath, string file_ext)
         Success = dhandle != NULL;
     #endif
 }
-
-
 
 DirectoryListing::~DirectoryListing()
 {
@@ -184,4 +180,3 @@ bool DirectoryListing :: NextDirectory (string &s)
 
     return retval;
 }
-

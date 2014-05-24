@@ -719,4 +719,3 @@ protected:
 };
 
 #endif //__UICONTROL_H_
-

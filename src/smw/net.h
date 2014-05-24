@@ -53,7 +53,6 @@ struct Room {
 };
 
 
-
 // Network communication class
 
 class NetClient
@@ -112,7 +111,6 @@ class NetClient
         void sendSyncOKMessage();
         void sendGoodbye();
 };
-
 
 
 struct Networking {

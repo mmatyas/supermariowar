@@ -1698,4 +1698,3 @@ void WorldMap::SetInitialPowerups()
             game_values.worldpowerups[iTeam][iItem] = iInitialBonuses[iItem];
     }
 }
-

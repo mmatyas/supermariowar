@@ -227,5 +227,3 @@ int sfxMusic::isplaying()
 {
 	return Mix_PlayingMusic();
 }
-
-

@@ -51,6 +51,4 @@ public:
 
 };
 
-
-
 #endif // __GAME_H

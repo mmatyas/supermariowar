@@ -1448,8 +1448,6 @@ void MI_PowerupSelection::AdjustDisplayArrows()
 }
 
 
-
-
 /**************************************
  * MI_WorldPreviewDisplay Class
  **************************************/

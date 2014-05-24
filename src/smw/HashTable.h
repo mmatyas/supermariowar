@@ -27,4 +27,3 @@ class HashTable
 };
 
 #endif //__HASHTABLE_H_
-

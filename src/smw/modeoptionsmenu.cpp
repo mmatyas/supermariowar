@@ -1,4 +1,3 @@
-
 #include "global.h"
 #include "GSMenu.h"
 
@@ -501,7 +500,6 @@ void ModeOptionsMenu::CreateMenu()
     mModeSettingsMenu[7].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
 
-
     //***********************
     // Chicken Mode Settings
     //***********************
@@ -568,7 +566,6 @@ void ModeOptionsMenu::CreateMenu()
 
     mModeSettingsMenu[9].SetHeadControl(miTagModeTagOnTouchField);
     mModeSettingsMenu[9].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
-
 
 
     //***********************
@@ -739,7 +736,6 @@ void ModeOptionsMenu::CreateMenu()
 
     mModeSettingsMenu[11].SetHeadControl(miDominationModeQuantityField);
     mModeSettingsMenu[11].SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
-
 
 
     //***********************

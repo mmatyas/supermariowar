@@ -3338,7 +3338,6 @@ bool PU_CoinPowerup::collide(CPlayer * player)
 }
 
 
-
 //------------------------------------------------------------------------------
 // class special jail key powerup for jail mode
 //------------------------------------------------------------------------------
@@ -9187,4 +9186,3 @@ void MysteryMushroomTempPlayer::GetPlayer(CPlayer * player, short * iPowerup)
     if (player->carriedItem)
         player->carriedItem->MoveToOwner();
 }
-

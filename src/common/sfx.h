@@ -71,4 +71,3 @@ class sfxMusic
 		bool paused;
 		bool ready;
 };
-

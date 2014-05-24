@@ -3127,4 +3127,3 @@ void CMap::optimize()
         }
     }
 }
-

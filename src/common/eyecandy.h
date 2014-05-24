@@ -480,5 +480,4 @@ private:
 
 };
 
-#endif
-
+#endif // _EYECANDY_H

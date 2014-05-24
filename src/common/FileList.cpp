@@ -1,4 +1,3 @@
-
 #ifdef _XBOX
 #include <xtl.h>
 #endif
@@ -500,8 +499,6 @@ MusicEntry::MusicEntry(const std::string & musicdirectory)
     */
 }
 
-
-
 string MusicEntry::GetMusic(unsigned int musicID)
 {
     if (musicID >= songFileNames.size())
@@ -766,8 +763,6 @@ WorldMusicEntry::WorldMusicEntry(const std::string & musicdirectory)
     fclose(in);
 }
 
-
-
 string WorldMusicEntry::GetMusic(unsigned int musicID, const char * szWorldName)
 {
     //First check if there is specific map music
@@ -791,5 +786,3 @@ void WorldMusicEntry::UpdateWithOverrides()
         worldoverride[override->worldname] = override->song;
     }
 }
-
-

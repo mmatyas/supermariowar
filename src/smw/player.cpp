@@ -1856,12 +1856,10 @@ void CPlayer::chooseWarpExit()
     }
 }
 
-
 void CPlayer::cpu_think()
 {
     pPlayerAI->Think(playerKeys);
 }
-
 
 void CPlayer::die(short deathStyle, bool fTeamRemoved, bool fKillCarriedItem)
 {
@@ -2084,7 +2082,6 @@ bool CPlayer::FindSpawnPoint()
     return fRet;
 }
 
-
 void CPlayer::spawnText(const char * szText)
 {
     if (++spawntext >= 20) {
@@ -2109,8 +2106,6 @@ bool CPlayer::bouncejump()
         return false;
     }
 }
-
-
 
 bool CPlayer::isstomping(CPlayer * o)
 {

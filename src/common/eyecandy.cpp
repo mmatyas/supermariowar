@@ -1,4 +1,3 @@
-
 #include <string.h>
 #include <math.h>
 
@@ -421,8 +420,6 @@ void EC_Corpse::update()
 
     iy = (short)dy;
 }
-
-
 
 //------------------------------------------------------------------------------
 // class EC_GravText
@@ -1349,5 +1346,3 @@ void SpotlightManager::ClearSpotlights()
 
     spotlightList.clear();
 }
-
-

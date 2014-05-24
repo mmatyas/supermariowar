@@ -114,4 +114,3 @@ void HashTable::Clear()
 
 	size = 0;
 }
-

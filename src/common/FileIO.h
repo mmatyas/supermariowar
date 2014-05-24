@@ -19,4 +19,3 @@ void WriteByte(Uint8 out, FILE * outFile);
 Uint8 ReadByte(FILE * inFile);
 
 #endif //__FILEIO_H_
-

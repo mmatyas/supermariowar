@@ -351,4 +351,3 @@ void CPlayerInput::Update(SDL_Event event, short iGameState)
 			//break;
 	}
 }
-

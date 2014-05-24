@@ -126,7 +126,6 @@ const char * Joynames[30] = {"Joystick Up", "Joystick Down", "Joystick Left", "J
 #endif
 
 
-
 //[Keyboard/Joystick][Game/Menu][NumPlayers][NumKeys]  left, right, jump, down, turbo, powerup, start, cancel
 SDL_KEYTYPE controlkeys[2][2][4][NUM_KEYS] = { { { {SDLK_LEFT, SDLK_RIGHT, SDLK_UP, SDLK_DOWN, SDLK_RCTRL, SDLK_RSHIFT, SDLK_RETURN, SDLK_ESCAPE},
             {SDLK_a, SDLK_d, SDLK_w, SDLK_s, SDLK_e, SDLK_q, SDLK_UNKNOWN, SDLK_UNKNOWN},
@@ -310,9 +309,9 @@ void _load_waitforkey()
 void GetNameFromFileName(char * szName, const char * szFileName, bool fStripAuthor)
 {
 #ifdef _XBOX
-    const char * p = strrchr(szFileName,'\\');
+    const char * p = strrchr(szFileName, '\\');
 #else
-    const char * p = strrchr(szFileName,'/');
+    const char * p = strrchr(szFileName, '/');
 #endif
 
     if (!p)
@@ -1670,7 +1669,8 @@ void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
     }
 }
 
-SDL_Rect iCountDownNumbers[4][4][2] = { {{{0, 0, 64, 64},{288, 208, 64, 64}},
+SDL_Rect iCountDownNumbers[4][4][2] =
+    {   {{{0, 0, 64, 64},{288, 208, 64, 64}},
         {{0, 64, 48, 48},{296, 216, 48, 48}},
         {{192, 64, 32, 32},{304, 224, 32, 32}},
         {{0, 112, 16, 16},{312, 232, 16, 16}}

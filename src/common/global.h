@@ -1,4 +1,3 @@
-
 #ifndef _GLOBAL_H
 #define _GLOBAL_H
 
@@ -34,7 +33,6 @@ struct STextAward {
         font = nfont;
     }
 };
-
 
 
 //------------- global definitions -------------
@@ -850,5 +848,4 @@ extern gv game_values;
 extern Networking netplay;
 
 
-#endif
-
+#endif // _GLOBAL_H

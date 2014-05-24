@@ -581,4 +581,3 @@ void TransferShyGuy(CPlayer * o1, CPlayer * o2);
 void BounceAssistPlayer(CPlayer * o1, CPlayer * o2);
 
 #endif  //_PLAYER_H
-

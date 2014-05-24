@@ -218,4 +218,3 @@ class MovingPlatform
 };
 
 #endif  //_MOVINGPLATFORM_H_
-

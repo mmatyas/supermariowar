@@ -1751,8 +1751,6 @@ void PlayNextMusicTrack()
     backgroundmusic[0].play(game_values.playnextmusic, false);
 }
 
-
-
 /*
 void secretBoss()
 {
@@ -1782,8 +1780,6 @@ void secretBoss()
 }
 */
 
-
-
 void GameplayState::onEnterState()
 {
     iCountDownState = 0;
@@ -1803,8 +1799,6 @@ void GameplayState::onEnterState()
     exitgametimer = 0;
 #endif
 }
-
-
 
 void GameplayState::update()
 {

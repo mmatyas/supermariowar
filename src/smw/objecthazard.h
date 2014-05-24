@@ -164,4 +164,3 @@ class MO_PirhanaPlant : public IO_MovingObject
 };
 
 #endif //_OBJECTHAZARD_H
-

@@ -239,4 +239,3 @@ class CObjectContainer
 };
 
 #endif //_OBJECT_H
-

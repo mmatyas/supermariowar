@@ -123,7 +123,6 @@ class CGameMode
 };
 
 
-
 //Fraglimit
 class CGM_Frag : public CGameMode
 {
@@ -769,4 +768,3 @@ class CGM_Boxes_MiniGame : public CGameMode
 };
 
 #endif
-

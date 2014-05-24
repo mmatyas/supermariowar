@@ -215,4 +215,3 @@ const string getFileFromPath(const string &path)
 
 	return path;
 }
-

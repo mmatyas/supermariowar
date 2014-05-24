@@ -93,4 +93,3 @@ class CPlayerInput
 };
 
 #endif //__INPUT_H_
-

@@ -862,4 +862,3 @@ float MO_PirhanaPlant::GetFireballAngle()
 
     return 0.0f;
 }
-

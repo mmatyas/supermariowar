@@ -27,8 +27,7 @@ std::string	GetHomeDirectory();
 #ifdef __MACOSX__
     void Initialize_Paths();
 #else
-#  define Initialize_Paths() ;
+#  define Initialize_Paths();
 #endif
 
-#endif
-
+#endif // SMW_PATH_HEADER

@@ -1865,4 +1865,3 @@ class MysteryMushroomTempPlayer
 };
 
 #endif //_OBJECTGAME_H
-

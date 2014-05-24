@@ -1681,4 +1681,3 @@ bool MovingPlatform::IsInNoSpawnZone(short iX, short iY, short w, short h)
 
     return false;
 }
-

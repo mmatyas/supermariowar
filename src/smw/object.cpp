@@ -1167,4 +1167,3 @@ CObject * CObjectContainer::getRandomObject()
 
     return list[RNGMAX( list_end)];
 }
-
