@@ -1,5 +1,5 @@
-#ifndef _EYECANDY_H
-#define _EYECANDY_H
+#ifndef EYECANDY_H
+#define EYECANDY_H
 
 
 //this system is pretty cool ;)
@@ -480,4 +480,4 @@ private:
 
 };
 
-#endif // _EYECANDY_H
+#endif // EYECANDY_H

@@ -9,7 +9,7 @@
 |				(C) 2007 Florian Hufsky <fhufsky@phorus.at>	|
 +----------------------------------------------------------*/
 
-#define _SMW_EDITOR
+#define SMW_EDITOR
 #include "global.h"
 
 #ifdef PNG_SAVE_FORMAT
@@ -215,7 +215,7 @@ void drawmap(bool fScreenshot, short iBlockSize)
 			return;
 		}
     } else {
-		spr_background.draw(0,0);
+		spr_background.draw(0, 0);
 	}
 
 	drawlayer(0, false, iBlockSize);

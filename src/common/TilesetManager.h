@@ -1,5 +1,5 @@
-#ifndef __TILESETMANAGER_H_
-#define __TILESETMANAGER_H_
+#ifndef TILESETMANAGER_H
+#define TILESETMANAGER_H
 
 class CTileset
 {
@@ -78,4 +78,4 @@ class CTilesetManager : public SimpleDirectoryList
 		short iClassicTilesetIndex;
 };
 
-#endif //__TILESETMANAGER_H_
+#endif // TILESETMANAGER_H

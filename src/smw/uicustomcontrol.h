@@ -1,5 +1,5 @@
-#ifndef __UICUSTOMCONTROL_H_
-#define __UICUSTOMCONTROL_H_
+#ifndef UICUSTOMCONTROL_H
+#define UICUSTOMCONTROL_H
 
 #include "uicontrol.h"
 #include "uimenu.h"
@@ -800,4 +800,4 @@ class MI_ChatMessageBox : public UI_Control
         short iWidth, iHeight;
 };
 
-#endif //__UICUSTOMCONTROL_H_
+#endif // UICUSTOMCONTROL_H

@@ -1,5 +1,5 @@
-#ifndef __MENU_H_
-#define __MENU_H_
+#ifndef GAMESTATE_MENU_H
+#define GAMESTATE_MENU_H
 
 #include "modeoptionsmenu.h"
 #include "uicustomcontrol.h"
@@ -522,4 +522,4 @@ class MenuState : public GameState
 		friend class GameplayState;
 };
 
-#endif //__MENU_H_
+#endif // GAMESTATE_MENU_H

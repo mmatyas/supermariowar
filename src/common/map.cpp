@@ -21,14 +21,14 @@ using std::endl;
 #endif
 
 #ifdef _WIN32
-#ifndef _XBOX
-#pragma comment(linker, "/NODEFAULTLIB:libc.lib")
+    #ifndef _XBOX
+        #pragma comment(linker, "/NODEFAULTLIB:libc.lib")
 
-#ifdef PNG_SAVE_FORMAT
-#pragma comment(lib, "libpng.lib")
-#pragma comment(lib, "zlib.lib")
-#endif
-#endif
+        #ifdef PNG_SAVE_FORMAT
+            #pragma comment(lib, "libpng.lib")
+            #pragma comment(lib, "zlib.lib")
+        #endif
+    #endif
 #endif
 
 #include "sdl12wrapper.h"

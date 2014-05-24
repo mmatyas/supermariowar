@@ -1,5 +1,5 @@
-#ifndef __NETWORK_PROTOCOL_PACKAGES_H_
-#define __NETWORK_PROTOCOL_PACKAGES_H_
+#ifndef NETWORK_PROTOCOL_PACKAGES_H
+#define NETWORK_PROTOCOL_PACKAGES_H
 
 #include <assert.h>
 
@@ -209,4 +209,4 @@ struct GameStatePackage : MessageHeader {
     }
 };
 
-#endif // __NETWORK_PROTOCOL_PACKAGES_H_
+#endif // NETWORK_PROTOCOL_PACKAGES_H

@@ -16,7 +16,7 @@
 
 //Checkin
 
-#define _SMW_EDITOR
+#define SMW_EDITOR
 #include "global.h"
 
 #ifdef PNG_SAVE_FORMAT

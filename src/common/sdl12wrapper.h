@@ -40,7 +40,7 @@
 
         if ( !screen ) {
             SDL_SetError("No video mode has been set");
-            return(NULL);
+            return NULL;
         }
         vf = screen->format;
 
@@ -79,7 +79,7 @@
         format = SDL_AllocFormat(SDL_MasksToPixelFormatEnum(32, rmask, gmask, bmask, amask));
         converted = SDL_ConvertSurface(surface, format, 0);
         SDL_FreeFormat(format);
-        return(converted);
+        return converted;
     }
 
     inline int SDL_SCALEBLIT(SDL_Surface* src, SDL_Rect* srcrect,

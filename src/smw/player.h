@@ -1,5 +1,5 @@
-#ifndef _PLAYER_H
-#define _PLAYER_H
+#ifndef PLAYER_H
+#define PLAYER_H
 
 #include "ai.h"
 enum PlayerState {player_wait, player_spawning, player_dead, player_ready, player_entering_warp_up, player_entering_warp_right, player_entering_warp_down, player_entering_warp_left, player_exiting_warp_down, player_exiting_warp_left, player_exiting_warp_up, player_exiting_warp_right};
@@ -580,4 +580,4 @@ void TransferTag(CPlayer * o1, CPlayer * o2);
 void TransferShyGuy(CPlayer * o1, CPlayer * o2);
 void BounceAssistPlayer(CPlayer * o1, CPlayer * o2);
 
-#endif  //_PLAYER_H
+#endif // PLAYER_H

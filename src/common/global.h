@@ -1,5 +1,5 @@
-#ifndef _GLOBAL_H
-#define _GLOBAL_H
+#ifndef GLOBAL_H
+#define GLOBAL_H
 
 #define FILEBUFSIZE 1024
 
@@ -848,4 +848,4 @@ extern gv game_values;
 extern Networking netplay;
 
 
-#endif // _GLOBAL_H
+#endif // GLOBAL_H

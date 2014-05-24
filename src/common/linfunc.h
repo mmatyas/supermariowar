@@ -1,5 +1,5 @@
-#ifndef LINFUNC_CPP
-#define LINFUNC_CPP
+#ifndef LINFUNC_H
+#define LINFUNC_H
 
 #ifdef	_WIN32
 
@@ -25,4 +25,4 @@ bool CopyFile(const char *src, const char *dest, bool dontOverwrite);
 
 #endif
 
-#endif // LINFUNC_CPP
+#endif // LINFUNC_H

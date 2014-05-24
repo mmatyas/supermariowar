@@ -1,5 +1,5 @@
-#ifndef _AI_H
-#define _AI_H
+#ifndef AI_H
+#define AI_H
 
 class CObject;
 
@@ -104,4 +104,4 @@ public:
 
 };
 
-#endif  //_AI_H
+#endif // AI_H

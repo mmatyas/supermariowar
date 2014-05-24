@@ -15,7 +15,7 @@
 |  (C) 2003-2009 Florian Hufsky <florian.hufsky@gmail.com>	|
 +----------------------------------------------------------*/
 
-#define _SMW_EDITOR
+#define SMW_EDITOR
 #include "global.h"
 
 #include "path.h"

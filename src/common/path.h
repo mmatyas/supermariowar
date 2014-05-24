@@ -1,5 +1,5 @@
-#ifndef SMW_PATH_HEADER
-#define SMW_PATH_HEADER
+#ifndef PATH_H
+#define PATH_H
 #include <string>
 
 #ifndef PATH_MAX
@@ -30,4 +30,4 @@ std::string	GetHomeDirectory();
 #  define Initialize_Paths();
 #endif
 
-#endif // SMW_PATH_HEADER
+#endif // PATH_H

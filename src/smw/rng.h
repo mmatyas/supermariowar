@@ -1,3 +1,5 @@
+#ifndef RANDOMGENERATOR_H
+#define RANDOMGENERATOR_H
 
 #include <cassert>
 #include <climits>
@@ -131,3 +133,5 @@ public:
 		return rVal;
 	}
 };
+
+#endif // RANDOMGENERATOR_H

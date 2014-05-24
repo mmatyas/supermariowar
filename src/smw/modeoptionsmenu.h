@@ -1,5 +1,5 @@
-#ifndef __MODEOPTIONSMENU_H_
-#define __MODEOPTIONSMENU_H_
+#ifndef MODEOPTIONSMENU_H
+#define MODEOPTIONSMENU_H
 
 class ModeOptionsMenu
 {
@@ -255,4 +255,4 @@ class ModeOptionsMenu
 		MI_Text * miBossModeHeaderText;
 };
 
-#endif //__MODEOPTIONSMENU_H_
+#endif // MODEOPTIONSMENU_H

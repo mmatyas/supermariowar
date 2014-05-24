@@ -1,4 +1,3 @@
-
 #if	_DEBUG
 
 #include "HashTable.h"

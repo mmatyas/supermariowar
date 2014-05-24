@@ -1,5 +1,5 @@
-#ifndef _MOVINGPLATFORM_H_
-#define _MOVINGPLATFORM_H_
+#ifndef MOVINGPLATFORM_H
+#define MOVINGPLATFORM_H
 
 class CPlayer;
 class IO_MovingObject;
@@ -217,4 +217,4 @@ class MovingPlatform
 
 };
 
-#endif  //_MOVINGPLATFORM_H_
+#endif // MOVINGPLATFORM_H

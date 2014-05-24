@@ -1,5 +1,5 @@
-#ifndef __INPUT_H_
-#define __INPUT_H_
+#ifndef INPUT_H
+#define INPUT_H
 
 #include <stdint.h>
 
@@ -92,4 +92,4 @@ class CPlayerInput
 		bool fUsingMouse;
 };
 
-#endif //__INPUT_H_
+#endif // INPUT_H

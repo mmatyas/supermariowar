@@ -1,5 +1,5 @@
-#ifndef _OBJECTHAZARD_H
-#define _OBJECTHAZARD_H
+#ifndef OBJECTHAZARD_H
+#define OBJECTHAZARD_H
 
 class OMO_OrbitHazard : public IO_OverMapObject
 {
@@ -163,4 +163,4 @@ class MO_PirhanaPlant : public IO_MovingObject
 	friend class CPlayerAI;
 };
 
-#endif //_OBJECTHAZARD_H
+#endif // OBJECTHAZARD_H

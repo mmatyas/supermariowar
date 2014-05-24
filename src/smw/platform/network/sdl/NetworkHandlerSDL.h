@@ -1,5 +1,5 @@
-#ifndef __NETWORK_HANDLER_SDL_H_
-#define __NETWORK_HANDLER_SDL_H_
+#ifndef NETWORK_HANDLER_SDL_H
+#define NETWORK_HANDLER_SDL_H
 
 #include "../NetworkHandlerBase.h"
 
@@ -35,4 +35,4 @@ class NetworkHandlerSDL : public NetworkHandlerBase
         UDPpacket* udpIncomingPacket;
 };
 
-#endif // __NETWORK_HANDLER_SDL_H_
+#endif // NETWORK_HANDLER_SDL_H

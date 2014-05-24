@@ -1,5 +1,5 @@
-#ifndef _GAMEMODES_H
-#define _GAMEMODES_H
+#ifndef GAMEMODES_H
+#define GAMEMODES_H
 
 #define GAMEMODE_NUM_OPTIONS 21
 
@@ -767,4 +767,4 @@ class CGM_Boxes_MiniGame : public CGameMode
 		void ReleaseAllCoinsFromTeam(CPlayer &player);
 };
 
-#endif
+#endif // GAMEMODES_H

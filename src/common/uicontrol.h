@@ -1,5 +1,5 @@
-#ifndef __UICONTROL_H_
-#define __UICONTROL_H_
+#ifndef UICONTROL_H
+#define UICONTROL_H
 
 #include "uimenu.h"
 #include "input.h"
@@ -718,4 +718,4 @@ protected:
     bool fShowtags;
 };
 
-#endif //__UICONTROL_H_
+#endif // UICONTROL_H

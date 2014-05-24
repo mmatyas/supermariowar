@@ -1,5 +1,5 @@
-#ifndef __NETWORK_HANDLER_NULL_H_
-#define __NETWORK_HANDLER_NULL_H_
+#ifndef NETWORK_HANDLER_NULL_H
+#define NETWORK_HANDLER_NULL_H
 
 #include "../NetworkHandlerBase.h"
 
@@ -19,4 +19,4 @@ class NetworkHandlerNULL : public NetworkHandlerBase
         bool receiveTCPMessage(void* dataBuffer) {}
 };
 
-#endif // __NETWORK_HANDLER_NULL_H_
+#endif // NETWORK_HANDLER_NULL_H

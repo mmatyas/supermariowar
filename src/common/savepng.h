@@ -7,8 +7,8 @@
  Endian fixes by J. Fortmann
 
 */
-#ifndef _IMG_SavePNG_h
-#define _IMG_SavePNG_h
+#ifndef IMG_SAVEPNG_H
+#define IMG_SAVEPNG_H
 
 #include "SDL.h"
 
@@ -25,4 +25,4 @@ int IMG_SavePNG(SDL_Surface *surface, const char *file);
 };
 #endif
 
-#endif	// _IMG_SavePNG_h
+#endif	// IMG_SAVEPNG_H

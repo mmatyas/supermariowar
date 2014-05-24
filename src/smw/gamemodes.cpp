@@ -3,7 +3,7 @@
 #include "global.h"
 #include "GSMenu.h"
 
-extern	gfxFont font[3];
+extern gfxFont font[3];
 extern CScore *score[4];
 
 #include <string.h>

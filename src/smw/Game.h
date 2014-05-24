@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef	__GAME_H
-#define	__GAME_H
+#ifndef GAME_H
+#define GAME_H
 
 #include "rng.h"
 
@@ -22,6 +22,7 @@ public:
 	int MenuTransparency;
 	CRandomNumberGenerator	*rng;
 
+	// TODO: move these to a config class/struct
 	int GetScreenWidth(int iSize) {
 		switch (iSize) {
 		case 0:
@@ -51,4 +52,4 @@ public:
 
 };
 
-#endif // __GAME_H
+#endif // GAME_H

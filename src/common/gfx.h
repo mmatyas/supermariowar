@@ -18,8 +18,8 @@
 |		(C) 2003-2008 Florian Hufsky <florian.hufsky@gmail.com>	|
 +--------------------------------------------------------------*/
 
-#ifndef __GFX_H__
-#define __GFX_H__
+#ifndef GFX_H
+#define GFX_H
 
 #include "SDL.h"
 #include "SDL_image.h"
@@ -148,4 +148,4 @@ bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, bool fWrap = true,
 bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, Uint8 alpha, bool fWrap = true, bool fUseAccel = true);
 bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, Uint8 r, Uint8 g, Uint8 b, bool fWrap = true, bool fUseAccel = true);
 
-#endif //__GFX_H__
+#endif // GFX_H

@@ -1,5 +1,5 @@
-#ifndef __WORLD_H_
-#define __WORLD_H_
+#ifndef WORLD_H
+#define WORLD_H
 
 #include <queue>
 
@@ -281,4 +281,4 @@ class WorldMap
 	friend void WriteWarpsIntoWorld();
 };
 
-#endif //__WORLD_H_
+#endif // WORLD_H

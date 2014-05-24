@@ -86,4 +86,4 @@ void SFont_WriteChopLeft(SDL_Surface *Surface, const SFont_Font *Font, int x, in
 }
 #endif
 
-#endif /* SFONT_H */
+#endif // SFONT_H

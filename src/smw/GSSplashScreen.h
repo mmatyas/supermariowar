@@ -1,5 +1,5 @@
-#ifndef GAMESTATE_SPLASHSCREENSTATE_H
-#define GAMESTATE_SPLASHSCREENSTATE_H
+#ifndef GAMESTATE_SPLASHSCREEN_H
+#define GAMESTATE_SPLASHSCREEN_H
 
 #include "GameState.h"
 
@@ -35,4 +35,4 @@ class SplashScreenState : public GameState
         void operator=(SplashScreenState const&);
 };
 
-#endif // GAMESTATE_SPLASHSCREENSTATE_H
+#endif // GAMESTATE_SPLASHSCREEN_H

@@ -1,5 +1,5 @@
-#ifndef __NETWORK_H_
-#define __NETWORK_H_
+#ifndef NETWORK_H
+#define NETWORK_H
 
 #include "input.h"
 
@@ -149,4 +149,4 @@ struct Networking {
     CPlayerInput netPlayerInput;
 };
 
-#endif //__NETWORK_H_
+#endif // NETWORK_H

@@ -1,3 +1,6 @@
+#ifndef SFX_H
+#define SFX_H
+
 #include "SDL.h"
 #include "SDL_mixer.h"
 #include <string>
@@ -71,3 +74,5 @@ class sfxMusic
 		bool paused;
 		bool ready;
 };
+
+#endif // SFX_H

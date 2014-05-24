@@ -1,5 +1,5 @@
-#ifndef __NETWORK_HANDLER_H_
-#define __NETWORK_HANDLER_H_
+#ifndef NETWORK_HANDLER_H
+#define NETWORK_HANDLER_H
 
 #include <stdint.h>
 
@@ -28,4 +28,4 @@ class NetworkHandlerBase
 		virtual bool receiveTCPMessage(void* dataBuffer) = 0;
 };
 
-#endif // __NETWORK_HANDLER_H_
+#endif // NETWORK_HANDLER_H

@@ -1,5 +1,5 @@
-#ifndef	__CRESMAN_H
-#define	__CRESMAN_H
+#ifndef CRESMAN_H
+#define CRESMAN_H
 
 class CResourceManager {
 public:
@@ -253,4 +253,4 @@ public:
 
 };
 
-#endif //	__CRESMAN_H
+#endif // CRESMAN_H

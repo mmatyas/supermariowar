@@ -3323,7 +3323,7 @@ void MenuState::update()
 
     //Don't draw backdrop for world
     if (mCurrentMenu != &mWorldMenu)
-        rm->menu_backdrop.draw(0,0);
+        rm->menu_backdrop.draw(0, 0);
     else
         SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
 

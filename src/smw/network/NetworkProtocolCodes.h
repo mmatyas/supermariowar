@@ -1,5 +1,5 @@
-#ifndef __NETWORK_PROTOCOL_CODES_H_
-#define __NETWORK_PROTOCOL_CODES_H_
+#ifndef NETWORK_PROTOCOL_CODES_H
+#define NETWORK_PROTOCOL_CODES_H
 
 
 #define NET_PROTOCOL_VERSION                1
@@ -47,4 +47,4 @@
 #define NET_NOTICE_HOST_STATE               62
 
 
-#endif // __NETWORK_PROTOCOL_CODES_H_
+#endif // NETWORK_PROTOCOL_CODES_H

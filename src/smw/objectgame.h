@@ -1,5 +1,5 @@
-#ifndef _OBJECTGAME_H
-#define _OBJECTGAME_H
+#ifndef OBJECTGAME_H
+#define OBJECTGAME_H
 
 class IO_MovingObject;
 
@@ -1864,4 +1864,4 @@ class MysteryMushroomTempPlayer
 		short iOldPowerupX, iOldPowerupY;
 };
 
-#endif //_OBJECTGAME_H
+#endif // OBJECTGAME_H

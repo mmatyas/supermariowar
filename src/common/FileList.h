@@ -1,5 +1,5 @@
-#ifndef __FILELIST_H_
-#define __FILELIST_H_
+#ifndef FILELIST_H
+#define FILELIST_H
 
 #include <string>
 
@@ -298,4 +298,4 @@ private:
     int currentIndex;
 };
 
-#endif //__FILELIST_H_
+#endif // FILELIST_H

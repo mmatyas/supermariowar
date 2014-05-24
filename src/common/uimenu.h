@@ -1,5 +1,5 @@
-#ifndef __UIMENU_H_
-#define __UIMENU_H_
+#ifndef UIMENU_H
+#define UIMENU_H
 
 enum MenuCodeEnum {
 	MENU_CODE_NEIGHBOR_UP = 0,
@@ -194,4 +194,4 @@ class UI_Menu
 		bool fAllowExitButton;
 };
 
-#endif //__UIMENU_H_
+#endif // UIMENU_H

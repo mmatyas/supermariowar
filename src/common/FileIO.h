@@ -1,5 +1,5 @@
-#ifndef __FILEIO_H_
-#define __FILEIO_H_
+#ifndef FILEIO_H
+#define FILEIO_H
 
 #include <stdio.h>
 
@@ -18,4 +18,4 @@ bool ReadBool(FILE * inFile);
 void WriteByte(Uint8 out, FILE * outFile);
 Uint8 ReadByte(FILE * inFile);
 
-#endif //__FILEIO_H_
+#endif // FILEIO_H

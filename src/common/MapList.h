@@ -1,3 +1,6 @@
+#ifndef MAPLIST_H
+#define MAPLIST_H
+
 #include <string>
 
 class MapListNode
@@ -126,3 +129,5 @@ class MapList
 
 		char szUnknownMapString[2];
 };
+
+#endif // MAPLIST_H

@@ -1,5 +1,5 @@
-#ifndef __HASHTABLE_H_
-#define __HASHTABLE_H_
+#ifndef HASHTABLE_H
+#define HASHTABLE_H
 
 #include "global.h"
 
@@ -26,4 +26,4 @@ class HashTable
 		HashNode * table[MAXOBJECTS * 8];
 };
 
-#endif //__HASHTABLE_H_
+#endif // HASHTABLE_H
