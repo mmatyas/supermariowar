@@ -2438,8 +2438,8 @@ void UpdateMusicWithOverrides()
         return;
 
     short iAddToCategory = 0;
-    char szBuffer[256];
-    while (fgets(szBuffer, 1024, file)) { // TODO: what's this?
+    char szBuffer[1024];
+    while (fgets(szBuffer, 1024, file)) {
         //Ignore comment lines
         if (szBuffer[0] == '#' || szBuffer[0] == '\n' || szBuffer[0] == '\r' || szBuffer[0] == ' ' || szBuffer[0] == '\t')
             continue;
