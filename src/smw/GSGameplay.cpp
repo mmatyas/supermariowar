@@ -949,14 +949,14 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
                     if (iHeart == iMax - 1 && iHeart % 2 == 0)
                         rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, 32, 0, 8, 16);
                     else
-                        rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, iHeart % 2 ? 8 : 0, 0, 8, 16);
+                        rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, (iHeart % 2) ? 8 : 0, 0, 8, 16);
                 }
 
                 for (short iHeart = iLife; iHeart < iMax; iHeart++) {
                     if (iHeart == iMax - 1 && iHeart % 2 == 0)
                         rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, 40, 0, 8, 16);
                     else
-                        rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, iHeart % 2 ? 24 : 16, 0, 8, 16);
+                        rm->spr_scorehearts.draw(iHeartX + iHeart * 8, score[i]->y + 43, (iHeart % 2) ? 24 : 16, 0, 8, 16);
                 }
             } else if (game_values.gamemode->gamemode == game_mode_collection) { //Draw cards for collection mode
                 //Flash collected cards if 3 have been collected

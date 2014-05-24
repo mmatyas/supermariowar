@@ -2444,7 +2444,7 @@ void collisionhandler_p2p(CPlayer * o1, CPlayer * o2)
         }
 
         //Transfer tag if assist is on
-        if (game_values.gamemode->gamemode == game_mode_tag && game_values.teamcollision == 1 || game_values.gamemodesettings.tag.tagontouch)
+        if ((game_values.gamemode->gamemode == game_mode_tag && game_values.teamcollision == 1) || game_values.gamemodesettings.tag.tagontouch)
             TransferTag(o1, o2);
 
         //Don't collision detect players on same team if friendly fire is turned off

@@ -3898,7 +3898,7 @@ void MI_World::Update()
 
     bool iShowStoredItems = false;
     for (short iTeam = 0; iTeam < 4; iTeam++) {
-        if (iShowStoredItems = iStateTransition[iTeam] == 1 || iStateTransition[iTeam] == 3)
+        if ((iShowStoredItems = (iStateTransition[iTeam] == 1 || iStateTransition[iTeam] == 3)))
             break;
     }
 
