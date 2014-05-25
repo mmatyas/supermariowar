@@ -68,7 +68,6 @@ struct STextAward {
 #define PGFX_LAST		10
 
 #define PANNOUNCER_SOUND_LAST	20
-#define PAWARD_LAST		9
 
 #define PH				25		//Player height
 #define PW				22		//Player width
@@ -477,8 +476,6 @@ extern CObjectContainer noncolcontainer;
 extern CObjectContainer objectcontainer[3];
 
 extern CEyecandyContainer eyecandy[3];
-
-extern STextAward		awards[PAWARD_LAST];
 
 extern bool fResumeMusic;
 

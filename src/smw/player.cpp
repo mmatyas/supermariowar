@@ -9,6 +9,20 @@ extern short g_iSwirlSpawnLocations[4][2][25];
 extern void CheckSecret(short id);
 extern SpotlightManager spotlightManager;
 
+#define PAWARD_LAST     9
+
+STextAward awardtexts[PAWARD_LAST] = {
+    STextAward("Double Kill", &rm->game_font_small),
+    STextAward("Triple Kill", &rm->game_font_small),
+    STextAward("Killing Spree",  &rm->game_font_small),
+    STextAward("Killing Spree x 2", &rm->game_font_small),
+    STextAward("Killing Spree x 3", &rm->game_font_small),
+    STextAward("Dominating", &rm->game_font_large),
+    STextAward("Dominating x 2", &rm->game_font_large),
+    STextAward("Dominating x 3", &rm->game_font_large),
+    STextAward("Unstoppable!", &rm->game_font_large)
+};
+
 void CScore::AdjustScore(short iValue)
 {
     if (game_values.gamemode->gameover)
@@ -2402,19 +2416,19 @@ void AddAwardKill(CPlayer * killer, CPlayer * killed, killstyle style)
         if (game_values.awardstyle == award_style_text) {
             if (killer->killsinrow >= 2) {
                 char	text[128];				//text to show
-                sprintf(text, "%d - %s", killer->killsinrow, awards[awardIndex].name);
+                sprintf(text, "%d - %s", killer->killsinrow, awardtexts[awardIndex].name);
 
                 //now add the eyecandy
-                eyecandy[2].add(new EC_GravText(awards[awardIndex].font, killer->ix + HALFPW, killer->iy+PH, text, -VELJUMP));
+                eyecandy[2].add(new EC_GravText(awardtexts[awardIndex].font, killer->ix + HALFPW, killer->iy+PH, text, -VELJUMP));
             }
 
             //if we stopped the other players run show another award
             if (killed && killed->killsinrow >= 2) {
                 short a = (killed->killsinrow - 2) >= PAWARD_LAST ? PAWARD_LAST -1 : (killed->killsinrow - 2);
                 char text[128];
-                sprintf(text, "%s Stopped!",  awards[a].name);
+                sprintf(text, "%s Stopped!",  awardtexts[a].name);
 
-                eyecandy[2].add(new EC_GravText(awards[a].font, killed->ix + HALFPW, killed->iy+PH, text, -VELJUMP*1.3f));
+                eyecandy[2].add(new EC_GravText(awardtexts[a].font, killed->ix + HALFPW, killed->iy+PH, text, -VELJUMP*1.3f));
             }
         }
     }

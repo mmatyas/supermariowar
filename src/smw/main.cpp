@@ -87,18 +87,6 @@ CObjectContainer objectcontainer[3];
 
 bool g_fLoadMessages = true;
 
-STextAward awards[PAWARD_LAST] = {
-    STextAward("Double Kill", &rm->game_font_small),
-    STextAward("Triple Kill", &rm->game_font_small),
-    STextAward("Killing Spree",  &rm->game_font_small),
-    STextAward("Killing Spree x 2", &rm->game_font_small),
-    STextAward("Killing Spree x 3", &rm->game_font_small),
-    STextAward("Dominating", &rm->game_font_large),
-    STextAward("Dominating x 2", &rm->game_font_large),
-    STextAward("Dominating x 3", &rm->game_font_large),
-    STextAward("Unstoppable!", &rm->game_font_large)
-};
-
 
 bool  fResumeMusic = true;
 
