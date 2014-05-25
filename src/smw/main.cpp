@@ -145,10 +145,6 @@ void PlayNextMusicTrack();
 //Adds music overrides to the music lists
 void UpdateMusicWithOverrides();
 
-#ifdef _DEBUG
-extern void HashTableTest();
-#endif
-
 /*
 void EnterBossMode(short type)
 {
@@ -576,10 +572,6 @@ int main(int argc, char *argv[])
         net_close();
         return 0;
     }
-
-#if	_DEBUG && !WIN32
-	HashTableTest();
-#endif
 */
 
 

@@ -6,10 +6,6 @@ set(SMW_SRCS ai.cpp gamemodes.cpp main.cpp GSMenu.cpp
            GSGameplay.cpp
 )
 
-if(DEBUG)
-	LIST(APPEND SMW_SRCS HashTable.cpp HashTableTest.cpp)
-endif(DEBUG)
-
 # disable networking in emscripten build for now...
 if(NOT USE_EMSCRIPTEN)
 	LIST(APPEND SMW_SRCS platform/network/sdl/NetworkHandlerSDL.cpp)
