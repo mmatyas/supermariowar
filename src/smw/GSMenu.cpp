@@ -2252,11 +2252,11 @@ void MenuState::onEnterState()
     if (game_values.music) {
         if (game_values.tournamentwinner < 0) {
             if (game_values.matchtype == MATCH_TYPE_SINGLE_GAME || game_values.matchtype == MATCH_TYPE_QUICK_GAME || game_values.matchtype == MATCH_TYPE_MINIGAME || game_values.matchtype == MATCH_TYPE_NET_GAME)
-                backgroundmusic[2].play(false, false);
+                rm->backgroundmusic[2].play(false, false);
             else if (game_values.matchtype == MATCH_TYPE_WORLD)
-                backgroundmusic[5].play(false, false);
+                rm->backgroundmusic[5].play(false, false);
             else
-                backgroundmusic[3].play(false, false);
+                rm->backgroundmusic[3].play(false, false);
         }
     }
 
@@ -2427,7 +2427,7 @@ void MenuState::update()
                 }
 
                 if (iUnlockMinigameOptionIndex == 11) {
-                    ifSoundOnPlay(sfx_transform);
+                    ifSoundOnPlay(rm->sfx_transform);
                     game_values.minigameunlocked = true;
 
                     miMatchSelectionField->HideItem(MATCH_TYPE_MINIGAME, false);
@@ -2709,7 +2709,7 @@ void MenuState::update()
                             game_values.gamestate = GS_START_WORLD;
 
                             //Play enter world sound
-                            ifsoundonandreadyplay(sfx_enterstage);
+                            ifsoundonandreadyplay(rm->sfx_enterstage);
                         }
 
                     //Setup items on next menu
@@ -2823,14 +2823,14 @@ void MenuState::update()
         } else if (MENU_CODE_SOUND_VOLUME_CHANGED == code) {
             game_values.sound = game_values.soundvolume > 0;
             sfx_setsoundvolume(game_values.soundvolume);
-            ifSoundOnPlay(sfx_coin);
+            ifSoundOnPlay(rm->sfx_coin);
         } else if (MENU_CODE_MUSIC_VOLUME_CHANGED == code) {
             sfx_setmusicvolume(game_values.musicvolume);
 
             if (game_values.musicvolume == 0)
-                backgroundmusic[2].stop();
+                rm->backgroundmusic[2].stop();
             else if (game_values.musicvolume > 0 && !game_values.music)
-                backgroundmusic[2].play(false, false);
+                rm->backgroundmusic[2].play(false, false);
 
             game_values.music = game_values.musicvolume > 0;
         } else if (MENU_CODE_START_GAME == code) {
@@ -2952,7 +2952,7 @@ void MenuState::update()
             gfx_loadpalette();
             rm->LoadGameGraphics();
         } else if (MENU_CODE_SOUND_PACK_CHANGED == code) {
-            LoadGameSounds();
+            rm->LoadGameSounds();
 
             if (!game_values.soundcapable) {
                 game_values.sound = false;
@@ -3379,8 +3379,8 @@ void MenuState::update()
                 LoadCurrentMapBackground();
 
                 if (game_values.music) {
-                    backgroundmusic[0].load(worldmusiclist->GetMusic(WORLDMUSICBONUS, ""));
-                    backgroundmusic[0].play(false, false);
+                    rm->backgroundmusic[0].load(worldmusiclist->GetMusic(WORLDMUSICBONUS, ""));
+                    rm->backgroundmusic[0].play(false, false);
                 }
             } else {
                 std::string sShortMapName = "";
@@ -3442,8 +3442,8 @@ void MenuState::update()
 
                 if (game_values.music) {
                     musiclist->SetRandomMusic(g_map->musicCategoryID, sShortMapName.c_str(), g_map->szBackgroundFile);
-                    backgroundmusic[0].load(musiclist->GetCurrentMusic());
-                    backgroundmusic[0].play(game_values.playnextmusic, false);
+                    rm->backgroundmusic[0].load(musiclist->GetCurrentMusic());
+                    rm->backgroundmusic[0].play(game_values.playnextmusic, false);
                 }
             }
 
@@ -3467,9 +3467,9 @@ void MenuState::update()
             mCurrentMenu = &mWorldMenu;
             mCurrentMenu->ResetMenu();
 
-            backgroundmusic[2].stop();
-            backgroundmusic[5].load(worldmusiclist->GetMusic(g_worldmap.GetMusicCategory(), g_worldmap.GetWorldName()));
-            backgroundmusic[5].play(false, false);
+            rm->backgroundmusic[2].stop();
+            rm->backgroundmusic[5].load(worldmusiclist->GetMusic(g_worldmap.GetMusicCategory(), g_worldmap.GetWorldName()));
+            rm->backgroundmusic[5].play(false, false);
             fNeedMenuMusicReset = true;
 
             miWorld->DisplayTeamControlAnnouncement();
@@ -3504,7 +3504,7 @@ void MenuState::update()
 
     if (fGenerateMapThumbs) {
         fGenerateMapThumbs = false;
-        backgroundmusic[2].sfx_pause();
+        rm->backgroundmusic[2].sfx_pause();
 
         //Reload map auto filters from live map files (don't use the cache)
         maplist->ReloadMapAutoFilters();
@@ -3531,7 +3531,7 @@ void MenuState::update()
             itr++;
         }
 
-        backgroundmusic[2].sfx_pause();
+        rm->backgroundmusic[2].sfx_pause();
     }
 }
 
@@ -3622,7 +3622,7 @@ void MenuState::StartGame()
 
         //Delete the old sounds
         for (int k = 0; k < PANNOUNCER_SOUND_LAST; k++)
-            sfx_announcer[k].reset();
+            rm->sfx_announcer[k].reset();
 
         FILE * announcerfile = fopen(announcerlist->current_name(), "r");
 
@@ -3645,7 +3645,7 @@ void MenuState::StartGame()
 
             //If it is not "[none]", then add this announcer sound
             if (strcmp(szBuffer, "[none]"))
-                sfx_announcer[announcerIndex].init(convertPath(szBuffer));
+                rm->sfx_announcer[announcerIndex].init(convertPath(szBuffer));
 
             announcerIndex++;
         }
@@ -3656,13 +3656,13 @@ void MenuState::StartGame()
     //Load soundtrack music if changed
     if (game_values.loadedmusic != musiclist->GetCurrentIndex()) {
         game_values.loadedmusic = (short)musiclist->GetCurrentIndex();
-        backgroundmusic[1].load(musiclist->GetMusic(0)); //Stage Clear
-        backgroundmusic[3].load(musiclist->GetMusic(2)); //Tournament Menu
-        backgroundmusic[4].load(musiclist->GetMusic(3)); //Tournament Over
+        rm->backgroundmusic[1].load(musiclist->GetMusic(0)); //Stage Clear
+        rm->backgroundmusic[3].load(musiclist->GetMusic(2)); //Tournament Menu
+        rm->backgroundmusic[4].load(musiclist->GetMusic(3)); //Tournament Over
     }
 
-    backgroundmusic[2].stop();
-    ifsoundonandreadyplay(sfx_announcer[11]);
+    rm->backgroundmusic[2].stop();
+    ifsoundonandreadyplay(rm->sfx_announcer[11]);
 
     game_values.screenfade = 8;
     game_values.screenfadespeed = 8;
@@ -3729,8 +3729,8 @@ void MenuState::ResetTournamentBackToMainMenu()
 
     if (game_values.matchtype != MATCH_TYPE_SINGLE_GAME && game_values.matchtype != MATCH_TYPE_QUICK_GAME && game_values.matchtype != MATCH_TYPE_MINIGAME && game_values.matchtype != MATCH_TYPE_NET_GAME) {
         if (fNeedMenuMusicReset) {
-            backgroundmusic[3].stop();
-            backgroundmusic[2].play(false, false);
+            rm->backgroundmusic[3].stop();
+            rm->backgroundmusic[2].play(false, false);
             fNeedMenuMusicReset = false;
         }
     }

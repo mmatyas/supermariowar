@@ -1103,8 +1103,8 @@ bool WorldMap::Update(bool * fPlayerVehicleCollision)
             fPlayMovingVehicleSound = true;
     }
 
-    if (fPlayMovingVehicleSound && !sfx_boomerang.isPlaying())
-        ifSoundOnPlay(sfx_boomerang);
+    if (fPlayMovingVehicleSound && !rm->sfx_boomerang.isPlaying())
+        ifSoundOnPlay(rm->sfx_boomerang);
 
     return fPlayerDoneMove;
 }

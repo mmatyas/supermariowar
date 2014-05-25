@@ -39,7 +39,7 @@ void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead
         }
 
         if (playsound)
-            ifSoundOnPlay(sfx_hit);
+            ifSoundOnPlay(rm->sfx_hit);
     }
 }
 
@@ -213,7 +213,7 @@ IO_MovingObject * createpowerup(short iType, short ix, short iy, bool side, bool
     }
 
     if (coin) {
-        ifSoundOnPlay(sfx_coin);
+        ifSoundOnPlay(rm->sfx_coin);
         objectcontainer[1].add(coin);
         return coin;
     } else if (powerup) {
@@ -423,7 +423,7 @@ void IO_Block::BounceMovingObject(IO_MovingObject * object)
 {
     MovingObjectType type = object->getMovingObjectType();
     if (type == movingobject_goomba || type == movingobject_koopa || type == movingobject_buzzybeetle || type == movingobject_spiny) {
-        ifSoundOnPlay(sfx_kicksound);
+        ifSoundOnPlay(rm->sfx_kicksound);
 
         MO_WalkingEnemy * enemy = (MO_WalkingEnemy *)object;
         killstyle style = enemy->getKillStyle();
@@ -589,7 +589,7 @@ void B_PowerupBlock::update()
                 createpowerup(SelectPowerup(), ix, iy, side, true);
             }
 
-            ifSoundOnPlay(sfx_sprout);
+            ifSoundOnPlay(rm->sfx_sprout);
         } else if (state == 3) {
             if (game_values.itemrespawntime > 0 && ++timer >= game_values.itemrespawntime) {
                 reset();
@@ -666,7 +666,7 @@ bool B_PowerupBlock::hitbottom(CPlayer * player, bool useBehavior)
         g_map->UpdateTileGap(col, row);
 
         if (state == 0) {
-            ifSoundOnPlay(sfx_bump);
+            ifSoundOnPlay(rm->sfx_bump);
 
             iBumpPlayerID = player->globalID;
             iBumpTeamID = player->teamID;
@@ -696,7 +696,7 @@ bool B_PowerupBlock::hittop(IO_MovingObject * object)
     MovingObjectType type = object->getMovingObjectType();
     if (type == movingobject_throwbox && ((CO_ThrowBox*)object)->HasKillVelocity()) {
         if (state == 0) {
-            ifSoundOnPlay(sfx_bump);
+            ifSoundOnPlay(rm->sfx_bump);
 
             iBumpPlayerID = -1;
             vely = -VELBLOCKBOUNCE;
@@ -736,7 +736,7 @@ bool B_PowerupBlock::hitright(IO_MovingObject * object)
             return false;
 
         if (state == 0) {
-            ifSoundOnPlay(sfx_bump);
+            ifSoundOnPlay(rm->sfx_bump);
 
             iBumpPlayerID = -1;
             vely = -VELBLOCKBOUNCE;
@@ -771,7 +771,7 @@ bool B_PowerupBlock::hitleft(IO_MovingObject * object)
             return false;
 
         if (state == 0) {
-            ifSoundOnPlay(sfx_bump);
+            ifSoundOnPlay(rm->sfx_bump);
 
             iBumpPlayerID = -1;
             vely = -VELBLOCKBOUNCE;
@@ -788,7 +788,7 @@ bool B_PowerupBlock::hitleft(IO_MovingObject * object)
 void B_PowerupBlock::triggerBehavior()
 {
     if (state == 0) {
-        ifSoundOnPlay(sfx_bump);
+        ifSoundOnPlay(rm->sfx_bump);
 
         iBumpPlayerID = -1;
         vely = -VELBLOCKBOUNCE;
@@ -1037,7 +1037,7 @@ void B_BreakableBlock::triggerBehavior()
         eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenyellowblock, ix + 16, iy + 16, 2.2f, -5.5f, 4, 2, 0, 0, 16, 16));
 
         state = 1;
-        ifSoundOnPlay(sfx_breakblock);
+        ifSoundOnPlay(rm->sfx_breakblock);
     }
 
     game_values.unlocksecret1part2++;
@@ -1139,7 +1139,7 @@ bool B_NoteBlock::hittop(CPlayer * player, bool useBehavior)
             state = 3;
         }
 
-        ifSoundOnPlay(sfx_bump);
+        ifSoundOnPlay(rm->sfx_bump);
 
         game_values.unlocksecret3part2[player->globalID] += 2;
         CheckSecret(2);
@@ -1161,7 +1161,7 @@ bool B_NoteBlock::hitbottom(CPlayer * player, bool useBehavior)
             vely = -VELNOTEBLOCKBOUNCE;
             state = 3;
 
-            ifSoundOnPlay(sfx_bump);
+            ifSoundOnPlay(rm->sfx_bump);
         }
 
         if (hidden) {
@@ -1188,7 +1188,7 @@ bool B_NoteBlock::hitright(CPlayer * player, bool useBehavior)
             state = 1;
         }
 
-        ifSoundOnPlay(sfx_bump);
+        ifSoundOnPlay(rm->sfx_bump);
     }
 
     return false;
@@ -1207,7 +1207,7 @@ bool B_NoteBlock::hitleft(CPlayer * player, bool useBehavior)
             state = 1;
         }
 
-        ifSoundOnPlay(sfx_bump);
+        ifSoundOnPlay(rm->sfx_bump);
     }
 
     return false;
@@ -1604,7 +1604,7 @@ void B_FlipBlock::explode()
     eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenflipblock, ix, iy + 16, -2.2f, -5.5f, 4, 2, 0, 0, 16, 16));
     eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenflipblock, ix + 16, iy + 16, 2.2f, -5.5f, 4, 2, 0, 0, 16, 16));
 
-    ifSoundOnPlay(sfx_breakblock);
+    ifSoundOnPlay(rm->sfx_breakblock);
 }
 
 //------------------------------------------------------------------------------
@@ -1734,7 +1734,7 @@ bool B_OnOffSwitchBlock::hitright(IO_MovingObject * object)
             iBumpPlayerID = -1;
             triggerBehavior(((IO_MovingObject*)object)->iPlayerID);
         } else {
-            ifSoundOnPlay(sfx_bump);
+            ifSoundOnPlay(rm->sfx_bump);
         }
 
         return true;
@@ -1767,7 +1767,7 @@ bool B_OnOffSwitchBlock::hitleft(IO_MovingObject * object)
             iBumpPlayerID = -1;
             triggerBehavior(((IO_MovingObject*)object)->iPlayerID);
         } else {
-            ifSoundOnPlay(sfx_bump);
+            ifSoundOnPlay(rm->sfx_bump);
         }
 
         return true;
@@ -1779,7 +1779,7 @@ bool B_OnOffSwitchBlock::hitleft(IO_MovingObject * object)
 void B_OnOffSwitchBlock::triggerBehavior(short playerID)
 {
     if (state == 0 || state == 3) {
-        ifSoundOnPlay(sfx_switchpress);
+        ifSoundOnPlay(rm->sfx_switchpress);
         vely = -VELBLOCKBOUNCE;
 
         state++;
@@ -2058,7 +2058,7 @@ void B_BounceBlock::triggerBehavior()
     if (state == 0) {
         vely = -VELBLOCKBOUNCE;
         state = 1;
-        ifSoundOnPlay(sfx_bump);
+        ifSoundOnPlay(rm->sfx_bump);
     }
 }
 
@@ -2190,7 +2190,7 @@ void B_ThrowBlock::triggerBehavior()
     eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenblueblock, ix, iy + 16, -1.5f, -4.0f, 6, 2, 0, iType << 4, 16, 16));
     eyecandy[2].add(new EC_FallingObject(&rm->spr_brokenblueblock, ix + 16, iy + 16, 1.5f, -4.0f, 6, 2, 0, iType << 4, 16, 16));
 
-    ifSoundOnPlay(sfx_breakblock);
+    ifSoundOnPlay(rm->sfx_breakblock);
 }
 
 
@@ -2371,7 +2371,7 @@ void B_WeaponBreakableBlock::triggerBehavior(short iPlayerID, short iTeamID)
         eyecandy[2].add(new EC_FallingObject(&rm->spr_brokengrayblock, ix + 16, iy + 16, 2.2f, -5.5f, 4, 2, 0, 0, 16, 16));
 
         state = 1;
-        ifSoundOnPlay(sfx_breakblock);
+        ifSoundOnPlay(rm->sfx_breakblock);
 
         iBumpPlayerID = iPlayerID;
         iBumpTeamID = iTeamID;
@@ -2555,7 +2555,7 @@ bool PU_ExtraGuyPowerup::collide(CPlayer * player)
 {
     if (state > 0) {
         game_values.gamemode->playerextraguy(*player, iType);
-        ifSoundOnPlay(sfx_extraguysound);
+        ifSoundOnPlay(rm->sfx_extraguysound);
 
         eyecandy[2].add(new EC_FloatingObject(&rm->spr_extralife, player->ix + HALFPW - 19, player->iy - 16, 0.0f, -1.5f, 62, player->colorID * 38, (iType == 5 ? 3 : iType - 1) * 16, 38, 16));
 
@@ -2617,7 +2617,7 @@ bool PU_MysteryMushroomPowerup::collide(CPlayer * player)
 
         if (!SwapPlayers(player->localID)) {
             eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, player->ix + (HALFPW) - 16, player->iy + (HALFPH) - 16, 3, 8));
-            ifSoundOnPlay(sfx_spit);
+            ifSoundOnPlay(rm->sfx_spit);
         }
     }
 
@@ -2788,7 +2788,7 @@ bool PU_SecretPowerup::collide (CPlayer *player)
         game_values.spotlights = true;
     }
 
-    ifSoundOnPlay(sfx_pickup);
+    ifSoundOnPlay(rm->sfx_pickup);
 
     dead = true;
     return false;
@@ -2872,7 +2872,7 @@ void PU_TreasureChestBonus::draw()
 bool PU_TreasureChestBonus::collide(CPlayer * player)
 {
     if (state == 1) {
-        ifSoundOnPlay(sfx_treasurechest);
+        ifSoundOnPlay(rm->sfx_treasurechest);
         //if (game_values.worldpowerupcount[player->teamID] < 32)
         //    game_values.worldpowerups[player->teamID][game_values.worldpowerupcount[player->teamID]++] = bonusitem;
         //else
@@ -2990,7 +2990,7 @@ bool MO_BonusHouseChest::collide(CPlayer * player)
                 game_values.tournament_scores[player->teamID].total = 0;
         }
 
-        ifSoundOnPlay(sfx_treasurechest);
+        ifSoundOnPlay(rm->sfx_treasurechest);
         state = 2;
 
         drawbonusitemy = iy + 32;
@@ -3250,7 +3250,7 @@ bool PU_ExtraHeartPowerup::collide(CPlayer * player)
                 player->score->subscore[0]++;
         }
 
-        ifSoundOnPlay(sfx_collectpowerup);
+        ifSoundOnPlay(rm->sfx_collectpowerup);
         dead = true;
     }
 
@@ -3274,7 +3274,7 @@ bool PU_ExtraTimePowerup::collide(CPlayer * player)
             timelimitmode->addtime(timelimitmode->goal / 5);
         }
 
-        ifSoundOnPlay(sfx_collectpowerup);
+        ifSoundOnPlay(rm->sfx_collectpowerup);
         dead = true;
     }
 
@@ -3330,7 +3330,7 @@ bool PU_CoinPowerup::collide(CPlayer * player)
             }
         }
 
-        ifSoundOnPlay(sfx_coin);
+        ifSoundOnPlay(rm->sfx_coin);
         dead = true;
     }
 
@@ -3472,7 +3472,7 @@ bool MO_SuperFireball::collide(CPlayer * player)
     if (player->shield == 0) {
         dead = true;
         eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + (iw >> 1) - 16, iy + (ih >> 1) - 16, 3, 4));
-        ifSoundOnPlay(sfx_hit);
+        ifSoundOnPlay(rm->sfx_hit);
 
         if (!player->invincible && !player->shyguy) {
             return player->KillPlayerMapHazard(false, kill_style_environment, false) != player_kill_nonkill;
@@ -3655,7 +3655,7 @@ bool MO_SledgeHammer::collide(CPlayer * player)
     if (player->shield == 0) {
         dead = true;
         eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + (iw >> 1) - 16, iy + (ih >> 1) - 16, 3, 4));
-        ifSoundOnPlay(sfx_hit);
+        ifSoundOnPlay(rm->sfx_hit);
 
         if (!player->invincible && !player->shyguy) {
             return player->KillPlayerMapHazard(false, kill_style_environment, false) != player_kill_nonkill;
@@ -3669,7 +3669,7 @@ void MO_SledgeHammer::explode()
 {
     if (fSuper) {
         objectcontainer[2].add(new MO_Explosion(&rm->spr_explosion, ix + (iw >> 2) - 96, iy + (ih >> 2) - 64, 2, 4, -1, -1, kill_style_hammer));
-        ifSoundOnPlay(sfx_bobombsound);
+        ifSoundOnPlay(rm->sfx_bobombsound);
     } else {
         short iCenterX = ix + (iw >> 1) - 14;
         short iCenterY = iy + (ih >> 1) - 14;
@@ -3687,7 +3687,7 @@ void MO_SledgeHammer::explode()
 
    		player->increaseProjectilesCount(3);
 
-        ifSoundOnPlay(sfx_cannon);
+        ifSoundOnPlay(rm->sfx_cannon);
     }
 }
 
@@ -3820,8 +3820,8 @@ MO_Boomerang::MO_Boomerang(gfxSprite *nspr, short x, short y, short iNumSpr, boo
 
 void MO_Boomerang::update()
 {
-    if (!sfx_boomerang.isPlaying())
-        ifSoundOnPlay(sfx_boomerang);
+    if (!rm->sfx_boomerang.isPlaying())
+        ifSoundOnPlay(rm->sfx_boomerang);
 
     animate();
 
@@ -4035,7 +4035,7 @@ void MO_Boomerang::update()
 void MO_Boomerang::forcedead()
 {
     removeifprojectile(this, false, true);
-    ifsoundonstop(sfx_boomerang);
+    ifsoundonstop(rm->sfx_boomerang);
 
     if (game_values.boomeranglimit == 0)
         return;
@@ -4176,7 +4176,7 @@ void CO_Bomb::Die()
 
     dead = true;
     objectcontainer[2].add(new MO_Explosion(&rm->spr_explosion, ix + (iw >> 2) - 96, iy + (ih >> 2) - 64, 2, 4, iPlayerID, iTeamID, kill_style_bomb));
-    ifSoundOnPlay(sfx_bobombsound);
+    ifSoundOnPlay(rm->sfx_bobombsound);
 }
 
 //------------------------------------------------------------------------------
@@ -4227,7 +4227,7 @@ bool MO_Coin::collide(CPlayer * player)
 
     eyecandy[2].add(new EC_SingleAnimation(&rm->spr_coinsparkle, ix, iy, 7, 4));
 
-    ifSoundOnPlay(sfx_coin);
+    ifSoundOnPlay(rm->sfx_coin);
 
     if (iType == 0)
         placeCoin();
@@ -4392,7 +4392,7 @@ void MO_Podobo::collide(IO_MovingObject * object)
         else if (type == movingobject_bulletbill)
             ((MO_BulletBill*) object)->Die();
 
-        ifSoundOnPlay(sfx_kicksound);
+        ifSoundOnPlay(rm->sfx_kicksound);
     }
 }
 
@@ -4516,7 +4516,7 @@ void MO_CarriedObject::Kick()
     if (owner) {
         velx = owner->velx + (owner->IsPlayerFacingRight() ? dKickX : -dKickX);
         vely = -dKickY;
-        ifSoundOnPlay(sfx_kicksound);
+        ifSoundOnPlay(rm->sfx_kicksound);
     }
 
     Drop();
@@ -4606,7 +4606,7 @@ void CO_Egg::update()
                 objectcontainer[2].add(new MO_Explosion(&rm->spr_explosion, ix + (iw >> 1) - 96, iy + (ih >> 1) - 64, 2, 4, -1, -1, kill_style_bomb));
                 placeEgg();
 
-                ifSoundOnPlay(sfx_bobombsound);
+                ifSoundOnPlay(rm->sfx_bobombsound);
             } else {
                 if (explosiondrawframe < 5)
                     animationspeed = egganimationrates[explosiondrawframe];
@@ -4933,7 +4933,7 @@ void MO_FlagBase::scoreFlag(CO_Flag * flag, CPlayer * player)
 {
     if (flag->teamID == teamID) {
         flag->placeFlag();
-        ifSoundOnPlay(sfx_areatag);
+        ifSoundOnPlay(rm->sfx_areatag);
     } else if (!game_values.gamemodesettings.flag.homescore || homeflag != NULL || game_values.gamemodesettings.flag.centerflag) {
         flag->placeFlag();
         if (!game_values.gamemode->gameover) {
@@ -4941,7 +4941,7 @@ void MO_FlagBase::scoreFlag(CO_Flag * flag, CPlayer * player)
             game_values.gamemode->CheckWinner(player);
         }
 
-        ifSoundOnPlay(sfx_racesound);
+        ifSoundOnPlay(rm->sfx_racesound);
 
         if (game_values.gamemodesettings.flag.pointmove) {
             //Set the values way outside the map so it will place the base correctly
@@ -4982,7 +4982,7 @@ bool CO_Flag::collide(CPlayer * player)
     if (owner == NULL && player->isready() && (!fInBase || teamID != player->teamID)) {
         if (game_values.gamemodesettings.flag.touchreturn && teamID == player->teamID) {
             placeFlag();
-            ifSoundOnPlay(sfx_areatag);
+            ifSoundOnPlay(rm->sfx_areatag);
         } else if (player->AcceptItem(this)) {
             owner = player;
             owner_throw = player;
@@ -5130,7 +5130,7 @@ bool MO_Yoshi::collide(CPlayer * player)
             CO_Egg * egg = (CO_Egg*)player->carriedItem;
             egg->placeEgg();
 
-            ifSoundOnPlay(sfx_yoshi);
+            ifSoundOnPlay(rm->sfx_yoshi);
         }
     }
 
@@ -5217,7 +5217,7 @@ void MO_Yoshi::collide(IO_MovingObject * object)
             placeYoshi();
             egg->placeEgg();
 
-            ifSoundOnPlay(sfx_yoshi);
+            ifSoundOnPlay(rm->sfx_yoshi);
         }
     }
 }
@@ -5324,7 +5324,7 @@ void OMO_Area::setOwner(CPlayer * player)
         colorID = player->colorID;
 
         frame = (colorID + 1) * iw;
-        ifSoundOnPlay(sfx_areatag);
+        ifSoundOnPlay(rm->sfx_areatag);
     }
 }
 
@@ -5602,9 +5602,9 @@ bool OMO_RaceGoal::collide(CPlayer * player)
             tagged[player->teamID] = player->colorID;
 
             if (isfinishline)
-                ifSoundOnPlay(sfx_racesound);
+                ifSoundOnPlay(rm->sfx_racesound);
             else
-                ifSoundOnPlay(sfx_areatag);
+                ifSoundOnPlay(rm->sfx_areatag);
         }
 
         if (gamemode->getNextGoal(player->teamID) == goalID)
@@ -5828,7 +5828,7 @@ bool MO_CollectionCard::collide(CPlayer * player)
     if ((type == 1 && uncollectabletime > 0) || state != 1)
         return false;
 
-    ifSoundOnPlay(sfx_areatag);
+    ifSoundOnPlay(rm->sfx_areatag);
 
     //Add this card to the team's score
     if (player->score->subscore[0] < 3) {
@@ -6092,7 +6092,7 @@ bool MO_WalkingEnemy::collide(CPlayer * player)
         if (frozen) {
             ShatterDie();
         } else {
-            ifSoundOnPlay(sfx_kicksound);
+            ifSoundOnPlay(rm->sfx_kicksound);
             Die();
         }
     } else {
@@ -6148,7 +6148,7 @@ void MO_WalkingEnemy::collide(IO_MovingObject * object)
             if (frozen) {
                 ShatterDie();
             } else {
-                ifSoundOnPlay(sfx_kicksound);
+                ifSoundOnPlay(rm->sfx_kicksound);
 
                 if (type == movingobject_attackzone)
                     DieAndDropShell(true, false);
@@ -6187,7 +6187,7 @@ void MO_WalkingEnemy::place()
 
 void MO_WalkingEnemy::ShatterDie()
 {
-    ifSoundOnPlay(sfx_breakblock);
+    ifSoundOnPlay(rm->sfx_breakblock);
     dead = true;
 
     short iBrokenIceX = ix - collisionOffsetX + iw - 32, iBrokenIceY = iy - collisionOffsetY + ih - 32;
@@ -6280,7 +6280,7 @@ bool MO_Goomba::hittop(CPlayer * player)
         eyecandy[0].add(new EC_Corpse(&rm->spr_goombadead, (float)(ix - collisionOffsetX), (float)(iy + collisionHeight - 32), 0));
     }
 
-    ifSoundOnPlay(sfx_mip);
+    ifSoundOnPlay(rm->sfx_mip);
 
     return false;
 }
@@ -6356,7 +6356,7 @@ bool MO_Koopa::hittop(CPlayer * player)
         DropShell(false, false);
     }
 
-    ifSoundOnPlay(sfx_mip);
+    ifSoundOnPlay(rm->sfx_mip);
 
     return false;
 }
@@ -6424,7 +6424,7 @@ bool MO_BuzzyBeetle::hittop(CPlayer * player)
     if (game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover)
         player->score->AdjustScore(1);
 
-    ifSoundOnPlay(sfx_mip);
+    ifSoundOnPlay(rm->sfx_mip);
 
     DropShell(false, false);
 
@@ -6496,7 +6496,7 @@ bool MO_Spiny::hittop(CPlayer * player)
 
         DropShell(false, false);
 
-        ifSoundOnPlay(sfx_mip);
+        ifSoundOnPlay(rm->sfx_mip);
     }
 
     return false;
@@ -6591,7 +6591,7 @@ bool MO_CheepCheep::collide(CPlayer * player)
         if (frozen) {
             ShatterDie();
         } else {
-            ifSoundOnPlay(sfx_kicksound);
+            ifSoundOnPlay(rm->sfx_kicksound);
             Die();
         }
     } else {
@@ -6617,7 +6617,7 @@ bool MO_CheepCheep::hittop(CPlayer * player)
     if (game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover)
         player->score->AdjustScore(1);
 
-    ifSoundOnPlay(sfx_mip);
+    ifSoundOnPlay(rm->sfx_mip);
 
     Die();
 
@@ -6663,7 +6663,7 @@ void MO_CheepCheep::collide(IO_MovingObject * object)
             if (frozen) {
                 ShatterDie();
             } else {
-                ifSoundOnPlay(sfx_kicksound);
+                ifSoundOnPlay(rm->sfx_kicksound);
                 Die();
             }
 
@@ -6694,7 +6694,7 @@ void MO_CheepCheep::Die()
 
 void MO_CheepCheep::ShatterDie()
 {
-    ifSoundOnPlay(sfx_breakblock);
+    ifSoundOnPlay(rm->sfx_breakblock);
     dead = true;
 
     short iBrokenIceX = ix - collisionOffsetX, iBrokenIceY = iy - collisionOffsetY;
@@ -6820,7 +6820,7 @@ void MO_SledgeBrother::update()
 
             if (iType == 0) {
                 //Shake screen and kill players
-                ifSoundOnPlay(sfx_thunder);
+                ifSoundOnPlay(rm->sfx_thunder);
                 game_values.screenshaketimer = 20;
                 game_values.screenshakeplayerid = -1;
                 game_values.screenshaketeamid = -1;
@@ -6828,7 +6828,7 @@ void MO_SledgeBrother::update()
                 game_values.screenshakekillscount = 0;
             } else if (iType == 1) {
                 //Spawn thwomps
-                ifSoundOnPlay(sfx_thunder);
+                ifSoundOnPlay(rm->sfx_thunder);
 
                 short numThwomps = RNGMAX(5) + 6;
 
@@ -6847,7 +6847,7 @@ void MO_SledgeBrother::update()
                 //}
             } else if (iType == 2) {
                 //Spawn lots of podobos
-                ifSoundOnPlay(sfx_thunder);
+                ifSoundOnPlay(rm->sfx_thunder);
 
                 short numPodobos = RNGMAX(5) + 8;
 
@@ -7034,7 +7034,7 @@ void MO_SledgeBrother::taunt()
 {
     SetLastAction(2);
 
-    ifSoundOnPlayLoop(sfx_boomerang, 3);
+    ifSoundOnPlayLoop(rm->sfx_boomerang, 3);
     taunt_timer = 60;
     iActionState = 5;
 
@@ -7080,7 +7080,7 @@ bool MO_SledgeBrother::collide(CPlayer * player)
         return false;
 
     if (player->invincible) {
-        ifSoundOnPlay(sfx_kicksound);
+        ifSoundOnPlay(rm->sfx_kicksound);
         Die();
 
         if (game_values.gamemode->gamemode == game_mode_boss_minigame) {
@@ -7135,11 +7135,11 @@ void MO_SledgeBrother::collide(IO_MovingObject * object)
             Damage(object->iPlayerID);
 
             if (type == movingobject_shell || type == movingobject_throwblock || type == movingobject_throwbox || type == movingobject_attackzone) {
-                ifSoundOnPlay(sfx_kicksound);
+                ifSoundOnPlay(rm->sfx_kicksound);
                 object->Die();
             }
         } else {
-            ifSoundOnPlay(sfx_hit);
+            ifSoundOnPlay(rm->sfx_hit);
 
             if (type == movingobject_attackzone || type == movingobject_bulletbill)
                 object->Die();
@@ -7170,7 +7170,7 @@ void MO_SledgeBrother::Damage(short playerID)
             }
         } else {
             hit_timer = 60;
-            ifSoundOnPlay(sfx_stun);
+            ifSoundOnPlay(rm->sfx_stun);
         }
     }
 }
@@ -7486,7 +7486,7 @@ void CO_Shell::update()
             if (game_values.shellttl > 0 && ++iDeathTime >= game_values.shellttl) {
                 eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix, iy, 3, 8));
                 dead = true;
-                ifSoundOnPlay(sfx_kicksound);
+                ifSoundOnPlay(rm->sfx_kicksound);
 
                 if (owner) {
                     owner->carriedItem = NULL;
@@ -7589,7 +7589,7 @@ void CO_Shell::Kick()
     {
     	vel = 10.0f;
     	fSmoking = true;
-    	ifSoundOnPlay(sfx_cannon);
+    	ifSoundOnPlay(rm->sfx_cannon);
     }
     */
 
@@ -7624,7 +7624,7 @@ void CO_Shell::Kick()
     if (collision_detection_checksides())
         Die();
     else
-        ifSoundOnPlay(sfx_kicksound);
+        ifSoundOnPlay(rm->sfx_kicksound);
 }
 
 void CO_Shell::CheckAndDie()
@@ -7644,7 +7644,7 @@ void CO_Shell::Die()
 
     eyecandy[2].add(new EC_FallingObject(&rm->spr_shelldead, ix, iy, -velx / 4.0f, -VELJUMP / 2.0f, 1, 0, iShellType * 32, 0, 32, 32));
     dead = true;
-    ifSoundOnPlay(sfx_kicksound);
+    ifSoundOnPlay(rm->sfx_kicksound);
     iKillCounter = 0;
 
     if (owner) {
@@ -7656,7 +7656,7 @@ void CO_Shell::Die()
 void CO_Shell::ShatterDie()
 {
     dead = true;
-    ifSoundOnPlay(sfx_breakblock);
+    ifSoundOnPlay(rm->sfx_breakblock);
     iKillCounter = 0;
 
     if (owner) {
@@ -7676,7 +7676,7 @@ void CO_Shell::SideBounce(bool fRightSide)
     if (state == 1) {
         if (iBounceCounter == 0) {
             eyecandy[2].add(new EC_SingleAnimation(&rm->spr_shellbounce, ix + (velx > 0 ? 0 : collisionWidth) - 21, iy + (collisionHeight >> 1) - 20, 4, 4));
-            ifSoundOnPlay(sfx_bump);
+            ifSoundOnPlay(rm->sfx_bump);
 
             iBounceCounter = 7; //Allow bounce stars to show on each bounce on a 2x wide pit
         }
@@ -7710,7 +7710,7 @@ void CO_Shell::Stop()
     velx = 0.0f;
     state = 2;
     fSmoking = false;
-    ifSoundOnPlay(sfx_kicksound);
+    ifSoundOnPlay(rm->sfx_kicksound);
     iKillCounter = 0;
 }
 
@@ -7949,7 +7949,7 @@ void CO_ThrowBlock::Kick()
     {
     	vel = 12.0f;
     	fSmoking = true;
-    	ifSoundOnPlay(sfx_cannon);
+    	ifSoundOnPlay(rm->sfx_cannon);
     }
     */
 
@@ -7986,7 +7986,7 @@ void CO_ThrowBlock::Kick()
     if (collision_detection_checksides())
         Die();
     else
-        ifSoundOnPlay(sfx_kicksound);
+        ifSoundOnPlay(rm->sfx_kicksound);
 }
 
 void CO_ThrowBlock::CheckAndDie()
@@ -8031,7 +8031,7 @@ void CO_ThrowBlock::ShatterDie()
 void CO_ThrowBlock::DieHelper()
 {
     dead = true;
-    ifSoundOnPlay(sfx_breakblock);
+    ifSoundOnPlay(rm->sfx_breakblock);
 
     if (owner) {
         owner->carriedItem = NULL;
@@ -8046,7 +8046,7 @@ void CO_ThrowBlock::SideBounce(bool fRightSide)
     } else if (state == 1) {
         if (iBounceCounter == 0) {
             eyecandy[2].add(new EC_SingleAnimation(&rm->spr_shellbounce, ix + (velx > 0 ? 0 : collisionWidth) - 21, iy + (collisionHeight >> 1) - 20, 4, 4));
-            ifSoundOnPlay(sfx_bump);
+            ifSoundOnPlay(rm->sfx_bump);
 
             iBounceCounter = 7; //Allow bounce stars to show on each bounce on a 2x wide pit
         }
@@ -8281,7 +8281,7 @@ void CO_ThrowBox::ShatterDie()
 void CO_ThrowBox::DieHelper()
 {
     dead = true;
-    ifSoundOnPlay(sfx_breakblock);
+    ifSoundOnPlay(rm->sfx_breakblock);
 
     if (owner) {
         owner->carriedItem = NULL;
@@ -8373,7 +8373,7 @@ void CO_Spring::hittop(CPlayer * player)
     player->superjumptype = fSuper ? 2 : 1;
     player->vely = -VELNOTEBLOCKREPEL;
 
-    ifSoundOnPlay(sfx_bump);
+    ifSoundOnPlay(rm->sfx_bump);
 }
 
 void CO_Spring::hitother(CPlayer * player)
@@ -8478,7 +8478,7 @@ void CO_KuriboShoe::hittop(CPlayer * player)
     if (player->iKuriboShoe == 0 && player->statue_timer == 0) {
         dead = true;
         player->SetKuriboShoe(fSticky ? 2 : 1);
-        ifSoundOnPlay(sfx_transform);
+        ifSoundOnPlay(rm->sfx_transform);
         eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, player->ix + HALFPW - 16, player->iy + HALFPH - 16, 3, 8));
     }
 }
@@ -8570,7 +8570,7 @@ void MO_AttackZone::collide(IO_MovingObject * object)
                 box->Die();
         }
 
-        ifSoundOnPlay(sfx_kicksound);
+        ifSoundOnPlay(rm->sfx_kicksound);
     }
 }
 
@@ -8704,7 +8704,7 @@ void MO_SpinAttack::collide(IO_MovingObject * object)
                 shell->ShatterDie();
             } else {
                 shell->Flip();
-                ifSoundOnPlay(sfx_kicksound);
+                ifSoundOnPlay(rm->sfx_kicksound);
             }
 
             Die();
@@ -8715,7 +8715,7 @@ void MO_SpinAttack::collide(IO_MovingObject * object)
                 block->ShatterDie();
             } else if (!block->owner || block->owner->globalID != iPlayerID) {
                 block->Die();
-                ifSoundOnPlay(sfx_kicksound);
+                ifSoundOnPlay(rm->sfx_kicksound);
                 Die();
             }
         } else if (type == movingobject_throwbox) {
@@ -8725,7 +8725,7 @@ void MO_SpinAttack::collide(IO_MovingObject * object)
                 box->ShatterDie();
             } else if (!box->owner || box->owner->globalID != iPlayerID) {
                 box->Die();
-                ifSoundOnPlay(sfx_kicksound);
+                ifSoundOnPlay(rm->sfx_kicksound);
                 Die();
             }
         }
@@ -8766,18 +8766,18 @@ bool OMO_PipeCoin::collide(CPlayer * player)
         if (iTeamID != -1) {
             if (player->teamID == iTeamID) {
                 player->score->AdjustScore(1);
-                ifSoundOnPlay(sfx_coin);
+                ifSoundOnPlay(rm->sfx_coin);
             }
         } else {
             if (iColorID == 2) {
                 player->score->AdjustScore(1);
-                ifSoundOnPlay(sfx_coin);
+                ifSoundOnPlay(rm->sfx_coin);
             } else if (iColorID == 0) {
                 player->score->AdjustScore(-1);
-                ifSoundOnPlay(sfx_stun);
+                ifSoundOnPlay(rm->sfx_stun);
             } else if (iColorID == 1) {
                 player->score->AdjustScore(5);
-                ifSoundOnPlay(sfx_extraguysound);
+                ifSoundOnPlay(rm->sfx_extraguysound);
             }
         }
 
@@ -9021,7 +9021,7 @@ bool OMO_Phanto::collide(CPlayer * player)
 
                     if (!game_values.gamemode->gameover && iType == 1) {
                         player->score->AdjustScore(-10);
-                        ifSoundOnPlay(sfx_stun);
+                        ifSoundOnPlay(rm->sfx_stun);
                     }
 
                     return true;

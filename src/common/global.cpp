@@ -1903,7 +1903,7 @@ void CheckSecret(short id)
 
         if (iCountTeams >= 2 && game_values.unlocksecret1part2 >= 8) {
             game_values.unlocksecretunlocked[0] = true;
-            ifSoundOnPlay(sfx_transform);
+            ifSoundOnPlay(rm->sfx_transform);
 
             IO_MovingObject * object = createpowerup(SECRET1_POWERUP, RNGMAX(smw->ScreenWidth), RNGMAX(smw->ScreenHeight), true, false);
 
@@ -1913,7 +1913,7 @@ void CheckSecret(short id)
     } else if (id == 1 && !game_values.unlocksecretunlocked[1]) {
         if (game_values.unlocksecret2part1 && game_values.unlocksecret2part2 >= 3) {
             game_values.unlocksecretunlocked[1] = true;
-            ifSoundOnPlay(sfx_transform);
+            ifSoundOnPlay(rm->sfx_transform);
 
             IO_MovingObject * object = createpowerup(SECRET2_POWERUP, RNGMAX(smw->ScreenWidth), RNGMAX(smw->ScreenHeight), true, false);
 
@@ -1925,7 +1925,7 @@ void CheckSecret(short id)
             //number of songs on thriller + number of released albums (figure it out :))
             if (game_values.unlocksecret3part1[iPlayer] >= 9 && game_values.unlocksecret3part2[iPlayer] >= 13) {
                 game_values.unlocksecretunlocked[2] = true;
-                ifSoundOnPlay(sfx_transform);
+                ifSoundOnPlay(rm->sfx_transform);
 
                 IO_MovingObject * object = createpowerup(SECRET3_POWERUP, RNGMAX(smw->ScreenWidth), RNGMAX(smw->ScreenHeight), true, false);
 
@@ -1935,7 +1935,7 @@ void CheckSecret(short id)
         }
     } else if (id == 3 && !game_values.unlocksecretunlocked[3]) {
         game_values.unlocksecretunlocked[3] = true;
-        ifSoundOnPlay(sfx_transform);
+        ifSoundOnPlay(rm->sfx_transform);
 
         IO_MovingObject * object = createpowerup(SECRET4_POWERUP, RNGMAX(smw->ScreenWidth), RNGMAX(smw->ScreenHeight), true, false);
 

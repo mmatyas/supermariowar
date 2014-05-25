@@ -371,3 +371,72 @@ void CResourceManager::LoadAllGraphics()
 
     gfx_loadimage(&spr_overlay, convertPath("gfx/packs/menu/menu_shade.png", gamegraphicspacklist->current_name()), false, false);
 }
+
+bool CResourceManager::LoadGameSounds()
+{
+    game_values.soundcapable = false;
+
+#if !defined(_XBOX) && !defined(__EMSCRIPTEN__)  //xbox and emscripten has sound capabilities
+    int frequency, channels;
+    Uint16 format;
+
+    if (0 == Mix_QuerySpec(&frequency, &format, &channels))
+        return false;
+#endif
+
+    const char * soundpack = soundpacklist->current_name();
+
+    sfx_mip.init(convertPath("sfx/packs/mip.wav", soundpack));
+    sfx_deathsound.init(convertPath("sfx/packs/death.wav", soundpack));
+    sfx_jump.init(convertPath("sfx/packs/jump.wav", soundpack));
+    sfx_skid.init(convertPath("sfx/packs/skid.wav", soundpack));
+    sfx_capejump.init(convertPath("sfx/packs/capejump.wav", soundpack));
+    sfx_invinciblemusic.init(convertPath("sfx/packs/invincible.wav", soundpack));
+    sfx_extraguysound.init(convertPath("sfx/packs/1up.wav", soundpack));
+    sfx_sprout.init(convertPath("sfx/packs/sprout.wav", soundpack));
+    sfx_collectpowerup.init(convertPath("sfx/packs/collectpowerup.wav", soundpack));
+    sfx_collectfeather.init(convertPath("sfx/packs/feather.wav", soundpack));
+    sfx_tailspin.init(convertPath("sfx/packs/tail.wav", soundpack));
+    sfx_storepowerup.init(convertPath("sfx/packs/storeitem.wav", soundpack));
+    sfx_breakblock.init(convertPath("sfx/packs/breakblock.wav", soundpack));
+    sfx_bump.init(convertPath("sfx/packs/bump.wav", soundpack));
+    sfx_coin.init(convertPath("sfx/packs/coin.wav", soundpack));
+    sfx_fireball.init(convertPath("sfx/packs/fireball.wav", soundpack));
+    sfx_springjump.init(convertPath("sfx/packs/springjump.wav", soundpack));
+    sfx_timewarning.init(convertPath("sfx/packs/timewarning.wav", soundpack));
+    sfx_hit.init(convertPath("sfx/packs/hit.wav", soundpack));
+    sfx_chicken.init(convertPath("sfx/packs/chicken.wav", soundpack));
+    sfx_transform.init(convertPath("sfx/packs/transform.wav", soundpack));
+    sfx_yoshi.init(convertPath("sfx/packs/yoshi.wav", soundpack));
+    sfx_pause.init(convertPath("sfx/packs/pause.wav", soundpack));
+    sfx_bobombsound.init(convertPath("sfx/packs/bob-omb.wav", soundpack));
+    sfx_areatag.init(convertPath("sfx/packs/dcoin.wav", soundpack));
+    sfx_cannon.init(convertPath("sfx/packs/cannon.wav", soundpack));
+    sfx_burnup.init(convertPath("sfx/packs/burnup.wav", soundpack));
+    sfx_pipe.init(convertPath("sfx/packs/warp.wav", soundpack));
+    sfx_thunder.init(convertPath("sfx/packs/thunder.wav", soundpack));
+    sfx_slowdownmusic.init(convertPath("sfx/packs/clock.wav", soundpack));
+    sfx_flyingsound.init(convertPath("sfx/packs/slowdown.wav", soundpack));
+    sfx_storedpowerupsound.init(convertPath("sfx/packs/storedpowerup.wav", soundpack));
+    sfx_kicksound.init(convertPath("sfx/packs/kick.wav", soundpack));
+    sfx_racesound.init(convertPath("sfx/packs/race.wav", soundpack));
+    sfx_bulletbillsound.init(convertPath("sfx/packs/bulletbill.wav", soundpack));
+    sfx_boomerang.init(convertPath("sfx/packs/boomerang.wav", soundpack));
+    sfx_spit.init(convertPath("sfx/packs/spit.wav", soundpack));
+    sfx_starwarning.init(convertPath("sfx/packs/starwarning.wav", soundpack));
+    sfx_powerdown.init(convertPath("sfx/packs/powerdown.wav", soundpack));
+    sfx_switchpress.init(convertPath("sfx/packs/switchpress.wav", soundpack));
+    sfx_superspring.init(convertPath("sfx/packs/superspring.wav", soundpack));
+    sfx_stun.init(convertPath("sfx/packs/stun.wav", soundpack));
+    sfx_inventory.init(convertPath("sfx/packs/inventory.wav", soundpack));
+    sfx_worldmove.init(convertPath("sfx/packs/mapmove.wav", soundpack));
+    sfx_treasurechest.init(convertPath("sfx/packs/treasurechest.wav", soundpack));
+    sfx_flamecannon.init(convertPath("sfx/packs/flamecannon.wav", soundpack));
+    sfx_wand.init(convertPath("sfx/packs/wand.wav", soundpack));
+    sfx_enterstage.init(convertPath("sfx/packs/enter-stage.wav", soundpack));
+    sfx_gameover.init(convertPath("sfx/packs/gameover.wav", soundpack));
+    sfx_pickup.init(convertPath("sfx/packs/pickup.wav", soundpack));
+
+    game_values.soundcapable = true;
+    return true;
+}

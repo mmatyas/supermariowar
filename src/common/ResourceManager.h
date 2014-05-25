@@ -13,6 +13,9 @@ public:
 	bool LoadMenuGraphics();
 	bool LoadGameGraphics();
 
+	bool LoadGameSounds();
+
+public:
 
 	//------ sprites (maybe this should be done in a resource manger) ------
 	gfxSprite		** spr_player[4];	//all player sprites (see global.h)
@@ -250,6 +253,65 @@ public:
 
 	gfxSprite		spr_windmeter;
 	gfxSprite		spr_overlayhole;
+
+
+	//------ sfx ------
+
+	sfxSound sfx_announcer[PANNOUNCER_SOUND_LAST];
+
+	sfxSound sfx_mip;
+	sfxSound sfx_deathsound;
+	sfxSound sfx_jump;
+	sfxSound sfx_skid;
+	sfxSound sfx_capejump;
+
+	sfxSound sfx_invinciblemusic;
+	sfxSound sfx_extraguysound;
+	sfxSound sfx_sprout;
+	sfxSound sfx_collectpowerup;
+	sfxSound sfx_collectfeather;
+	sfxSound sfx_storepowerup;
+	sfxSound sfx_tailspin;
+	sfxSound sfx_breakblock;
+	sfxSound sfx_bump;
+	sfxSound sfx_coin;
+	sfxSound sfx_fireball;
+	sfxSound sfx_springjump;
+	sfxSound sfx_timewarning;
+	sfxSound sfx_hit;
+	sfxSound sfx_chicken;
+	sfxSound sfx_transform;
+	sfxSound sfx_yoshi;
+	sfxSound sfx_pause;
+	sfxSound sfx_bobombsound;
+	sfxSound sfx_areatag;
+	sfxSound sfx_cannon;
+	sfxSound sfx_burnup;
+	sfxSound sfx_pipe;
+	sfxSound sfx_thunder;
+	sfxSound sfx_slowdownmusic;
+	sfxSound sfx_flyingsound;
+	sfxSound sfx_storedpowerupsound;
+	sfxSound sfx_kicksound;
+	sfxSound sfx_racesound;
+	sfxSound sfx_bulletbillsound;
+	sfxSound sfx_boomerang;
+	sfxSound sfx_spit;
+	sfxSound sfx_starwarning;
+	sfxSound sfx_powerdown;
+	sfxSound sfx_switchpress;
+	sfxSound sfx_superspring;
+	sfxSound sfx_stun;
+	sfxSound sfx_inventory;
+	sfxSound sfx_worldmove;
+	sfxSound sfx_treasurechest;
+	sfxSound sfx_flamecannon;
+	sfxSound sfx_wand;
+	sfxSound sfx_enterstage;
+	sfxSound sfx_gameover;
+	sfxSound sfx_pickup;
+
+	sfxMusic backgroundmusic[6];
 
 };
 

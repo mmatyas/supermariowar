@@ -476,64 +476,9 @@ extern CObjectContainer objectcontainer[3];
 extern CEyecandyContainer eyecandy[3];
 
 extern STextAward		awards[PAWARD_LAST];
-extern sfxSound			sfx_announcer[PANNOUNCER_SOUND_LAST];
 
 extern bool fResumeMusic;
 
-//TODO: move all of these to resource manager and make sure they can be disposed/reloaded dynamically
-extern sfxSound			sfx_mip;
-extern sfxSound			sfx_deathsound;
-extern sfxSound			sfx_jump;
-extern sfxSound			sfx_skid;
-extern sfxSound			sfx_capejump;
-
-extern sfxSound			sfx_invinciblemusic;
-extern sfxSound			sfx_extraguysound;
-extern sfxSound			sfx_sprout;
-extern sfxSound			sfx_collectpowerup;
-extern sfxSound			sfx_collectfeather;
-extern sfxSound			sfx_storepowerup;
-extern sfxSound			sfx_tailspin;
-extern sfxSound			sfx_breakblock;
-extern sfxSound			sfx_bump;
-extern sfxSound			sfx_coin;
-extern sfxSound			sfx_fireball;
-extern sfxSound			sfx_springjump;
-extern sfxSound			sfx_timewarning;
-extern sfxSound			sfx_hit;
-extern sfxSound			sfx_chicken;
-extern sfxSound			sfx_transform;
-extern sfxSound			sfx_yoshi;
-extern sfxSound			sfx_pause;
-extern sfxSound			sfx_bobombsound;
-extern sfxSound			sfx_areatag;
-extern sfxSound			sfx_cannon;
-extern sfxSound			sfx_burnup;
-extern sfxSound			sfx_pipe;
-extern sfxSound			sfx_thunder;
-extern sfxSound			sfx_slowdownmusic;
-extern sfxSound			sfx_flyingsound;
-extern sfxSound			sfx_storedpowerupsound;
-extern sfxSound			sfx_kicksound;
-extern sfxSound			sfx_racesound;
-extern sfxSound			sfx_bulletbillsound;
-extern sfxSound			sfx_boomerang;
-extern sfxSound			sfx_spit;
-extern sfxSound			sfx_starwarning;
-extern sfxSound			sfx_powerdown;
-extern sfxSound			sfx_switchpress;
-extern sfxSound			sfx_superspring;
-extern sfxSound			sfx_stun;
-extern sfxSound			sfx_inventory;
-extern sfxSound			sfx_worldmove;
-extern sfxSound			sfx_treasurechest;
-extern sfxSound			sfx_flamecannon;
-extern sfxSound			sfx_wand;
-extern sfxSound			sfx_enterstage;
-extern sfxSound			sfx_gameover;
-extern sfxSound			sfx_pickup;
-
-extern sfxMusic			backgroundmusic[6];
 
 extern MapList *maplist;
 extern SkinList *skinlist;
