@@ -3,6 +3,7 @@
 
 #include "net.h"
 #include "GSMenu.h"
+#include "FileIO.h"
 
 #include "network/NetworkProtocolPackages.h"
 

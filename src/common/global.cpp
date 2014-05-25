@@ -1,6 +1,7 @@
 #include "global.h"
 #include <math.h>
 
+#include "FileIO.h"
 #include "gfx.h"
 extern bool g_fLoadMessages;
 

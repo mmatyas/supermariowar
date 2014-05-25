@@ -435,7 +435,6 @@ struct GameModeSettings {
 #include "MapList.h"
 #include "FileList.h"
 #include "movingplatform.h"
-#include "FileIO.h"
 #include "map.h"
 #include "player.h"
 #include "object.h"

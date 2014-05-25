@@ -3,6 +3,7 @@
 #endif
 
 #include "global.h"
+#include "FileIO.h"
 
 /*********************************
 *  CTileset
