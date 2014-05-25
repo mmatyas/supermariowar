@@ -126,10 +126,6 @@ float CapSideVelocity(float vel)
     return vel;
 }
 
-void LoadAll();
-void SetGameModeSettingsFromMenu();
-void PlayNextMusicTrack();
-
 //Adds music overrides to the music lists
 void UpdateMusicWithOverrides();
 
