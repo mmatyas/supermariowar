@@ -1,6 +1,8 @@
 #include "global.h"
 #include "GSMenu.h"
 #include "GSGameplay.h"
+#include "MatchTypes.h"
+
 #include <math.h>
 
 #ifdef _XBOX

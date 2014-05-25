@@ -1,7 +1,7 @@
 #include <math.h>
 
 #include "global.h"
-#include "GSMenu.h"
+#include "MatchTypes.h"
 
 extern gfxFont font[3];
 extern CScore *score[4];

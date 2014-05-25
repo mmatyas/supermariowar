@@ -2,7 +2,9 @@
 
 #include "global.h"                //all the global stuff
 #include "GSMenu.h"
-#include "math.h"
+#include "MatchTypes.h"
+
+#include <math.h>
 
 
 CEyecandyContainer eyecandy[3];

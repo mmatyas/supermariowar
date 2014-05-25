@@ -1,5 +1,6 @@
 #include "global.h"
 #include "GSMenu.h"
+#include "MatchTypes.h"
 #include <math.h>
 
 #ifdef USE_SDL2
