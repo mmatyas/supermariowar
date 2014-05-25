@@ -360,9 +360,9 @@ void CResourceManager::LoadAllGraphics()
         }
     }
 
-    rm->LoadMenuGraphics();
-    rm->LoadWorldGraphics();
-    rm->LoadGameGraphics();
+    LoadMenuGraphics();
+    LoadWorldGraphics();
+    LoadGameGraphics();
 
     gfx_loadimagenocolorkey(&spr_backmap[0], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->current_name()));
     gfx_loadimagenocolorkey(&spr_backmap[1], convertPath("gfx/packs/backgrounds/Land_Classic.png", gamegraphicspacklist->current_name()));
