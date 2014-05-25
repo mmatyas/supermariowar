@@ -19,8 +19,9 @@
 
 #include "global.h"				//all the global stuff
 
-#include "Game.h"
 #include "MatchTypes.h"
+#include "FPSLimiter.h"
+#include "GSSplashScreen.h"
 
 #include <time.h>
 #include <math.h>
@@ -199,6 +200,47 @@ void EnterBossMode(short type)
 }*/
 
 gv game_values;
+
+
+#ifdef __EMSCRIPTEN__
+void gameloop_frame();
+#endif
+
+void gameloop()
+{
+    SplashScreenState::instance().init();
+    GameStateManager::instance().currentState = &SplashScreenState::instance();
+
+#ifdef __EMSCRIPTEN__
+    emscripten_set_main_loop(gameloop_frame, 60, 1);
+}
+
+void gameloop_frame()
+#else
+    while (game_values.gamestate != GS_QUIT)
+#endif
+    {
+        FPSLimiter::instance().frameStart();
+
+        GameStateManager::instance().currentState->update();
+
+        FPSLimiter::instance().beforeFlip();
+
+#ifdef USE_SDL2
+        SDL_UpdateTexture(screenAsTexture, NULL, screen->pixels, screen->pitch);
+        SDL_RenderClear(renderer);
+        SDL_RenderCopy(renderer, screenAsTexture, NULL, NULL);
+        SDL_RenderPresent(renderer);
+#else
+        SDL_Flip(screen);
+#endif
+
+        FPSLimiter::instance().afterFlip();
+    }
+
+#ifndef __EMSCRIPTEN__
+}
+#endif
 
 
 #ifdef	WIN32
@@ -575,7 +617,7 @@ int main(int argc, char *argv[])
     //**********************************************************
 
 
-    smw->Go(); // all the game logic happens here
+    gameloop(); // all the game logic happens here
 
 
     //**********************************************************

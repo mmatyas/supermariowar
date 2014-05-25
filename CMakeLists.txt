@@ -382,7 +382,7 @@ set(COMMON_SRCS ../common/FileIO.cpp ../common/FileList.cpp ../common/MapList.cp
            ../common/SFont.c ../common/TilesetManager.cpp ../common/dirlist.cpp
            ../common/eyecandy.cpp ../common/gfx.cpp ../common/global.cpp ../common/input.cpp
            ../common/map.cpp ../common/movingplatform.cpp ../common/path.cpp
-           ../common/uimenu.cpp ../common/sfx.cpp ../common/ResourceManager.cpp
+           ../common/Game.cpp ../common/sfx.cpp ../common/ResourceManager.cpp
            ../common/uicontrol.cpp ../common/uimenu.cpp ../common/linfunc.cpp
 )
 

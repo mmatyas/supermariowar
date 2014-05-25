@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <climits>
+#include <cstdlib>
 #include <ctime>
 
 #define	RNGMAX(rMaxInt)	smw->rng->GetRandMax(rMaxInt)
@@ -10,10 +11,7 @@
 class CRandomNumberGenerator {
 public:
 
-	virtual int	GetRand(int min, int max) {
-		// this should never be called
-		return RAND_MAX;
-	}
+	virtual int	GetRand(int min, int max) = 0;
 
 	void ReSeed(unsigned int seed) {
 		srand(seed);

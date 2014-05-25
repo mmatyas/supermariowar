@@ -2,7 +2,7 @@
 set(SMW_SRCS ai.cpp gamemodes.cpp main.cpp GSMenu.cpp
            object.cpp player.cpp world.cpp uicustomcontrol.cpp
            objectgame.cpp modeoptionsmenu.cpp objecthazard.cpp
-           Game.cpp net.cpp FPSLimiter.cpp GSSplashScreen.cpp
+           net.cpp FPSLimiter.cpp GSSplashScreen.cpp
            GSGameplay.cpp
 )
 
