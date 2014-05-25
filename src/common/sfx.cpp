@@ -57,7 +57,9 @@ sfxSound::sfxSound()
 }
 
 sfxSound::~sfxSound()
-{}
+{
+	reset();
+}
 
 bool sfxSound::init(const string& filename)
 {
@@ -173,7 +175,9 @@ sfxMusic::sfxMusic()
 }
 
 sfxMusic::~sfxMusic()
-{}
+{
+	reset();
+}
 
 bool sfxMusic::load(const string& filename)
 {
