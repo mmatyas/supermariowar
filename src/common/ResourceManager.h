@@ -8,12 +8,14 @@ public:
 
 	bool LoadWorldGraphics();
 	bool LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDirections);
-	void LoadAllSprites();
 	void LoadAllGraphics();
 	bool LoadMenuGraphics();
 	bool LoadGameGraphics();
 
 	bool LoadGameSounds();
+
+private:
+	void LoadAllSprites();
 
 public:
 
