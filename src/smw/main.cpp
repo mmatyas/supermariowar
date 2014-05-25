@@ -111,34 +111,7 @@ CGM_Boxes_MiniGame	*boxesgamemode = NULL;
 
 short		currentgamemode = 0;
 
-extern void LoadCurrentMapBackground();
-
-extern bool VersionIsEqual(int iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
-
-FiltersList *filterslist;  //Filters list must be initiallized before maps list because it is used in maplist constructor
-MapList *maplist;
-SkinList *skinlist;
-AnnouncerList *announcerlist;
-MusicList *musiclist;
-WorldMusicList *worldmusiclist;
-GraphicsList *menugraphicspacklist;
-GraphicsList *worldgraphicspacklist;
-GraphicsList *gamegraphicspacklist;
-SoundsList *soundpacklist;
-TourList *tourlist;
-WorldList *worldlist;
 WorldMap g_worldmap;
-
-std::vector<MapMusicOverride*> mapmusicoverrides;
-std::vector<WorldMusicOverride*> worldmusicoverrides;
-
-//Network stuff
-int g_iNextNetworkID = 0;
-int g_iNextMessageID = 0;
-char szIPString[32] = "";
-
-//NetServer netServer;
-//NetClient netClient;
 
 
 extern void SetupDefaultGameModeSettings();
@@ -171,10 +144,6 @@ void PlayNextMusicTrack();
 
 //Adds music overrides to the music lists
 void UpdateMusicWithOverrides();
-
-//Joystick-Init
-SDL_Joystick **joysticks = NULL;
-short joystickcount = 0;
 
 #ifdef _DEBUG
 extern void HashTableTest();

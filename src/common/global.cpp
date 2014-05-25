@@ -70,6 +70,33 @@ bool VersionIsEqualOrAfter(int iVersion[], short iMajor, short iMinor, short iMi
     return false;
 }
 
+
+FiltersList *filterslist;  //Filters list must be initiallized before maps list because it is used in maplist constructor
+MapList *maplist;
+SkinList *skinlist;
+AnnouncerList *announcerlist;
+MusicList *musiclist;
+WorldMusicList *worldmusiclist;
+GraphicsList *menugraphicspacklist;
+GraphicsList *worldgraphicspacklist;
+GraphicsList *gamegraphicspacklist;
+SoundsList *soundpacklist;
+TourList *tourlist;
+WorldList *worldlist;
+
+std::vector<MapMusicOverride*> mapmusicoverrides;
+std::vector<WorldMusicOverride*> worldmusicoverrides;
+
+//Network stuff
+int g_iNextNetworkID = 0;
+int g_iNextMessageID = 0;
+char szIPString[32] = "";
+
+//Joystick-Init
+SDL_Joystick **joysticks = NULL;
+short joystickcount = 0;
+
+
 #ifdef USE_SDL2
     inline const char * Keynames(SDL_KEYTYPE key) {
         SDL_GetKeyName(key); // FIXME
