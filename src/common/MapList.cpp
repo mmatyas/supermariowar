@@ -17,6 +17,8 @@
 
 #include "global.h"
 #include "dirlist.h"
+#include "linfunc.h"
+
 #include <ctype.h>
 #include <iostream>
 using std::cout;

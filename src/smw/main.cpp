@@ -18,6 +18,7 @@
 #endif
 
 #include "global.h"				//all the global stuff
+#include "linfunc.h"
 
 #include "MatchTypes.h"
 #include "FPSLimiter.h"
