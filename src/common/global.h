@@ -425,7 +425,6 @@ struct GameModeSettings {
 
 
 //------------- data structures / selfmade include files -------------
-#include "input.h"
 #include "uimenu.h"
 #include "Game.h"
 #include "uicontrol.h"
