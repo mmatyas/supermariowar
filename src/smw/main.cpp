@@ -101,8 +101,6 @@ CGM_Boxes_MiniGame	*boxesgamemode = NULL;
 
 short		currentgamemode = 0;
 
-WorldMap g_worldmap;
-
 float CapFallingVelocity(float vel)
 {
     //if (vel < -MAXVELY)
