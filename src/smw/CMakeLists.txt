@@ -11,11 +11,10 @@ if(NOT USE_EMSCRIPTEN)
 	LIST(APPEND SMW_SRCS platform/network/sdl/NetworkHandlerSDL.cpp)
 endif()
 
+add_executable(smw ${COMMON_SRCS} ${SMW_SRCS} ../common/global.h)
 # add .bc extension when building with emscripten
-if(NOT USE_EMSCRIPTEN)
-	add_executable(smw ${COMMON_SRCS} ${SMW_SRCS} ../common/global.h)
-else()
-	add_executable(smw.bc ${COMMON_SRCS} ${SMW_SRCS} ../common/global.h)
+if(USE_EMSCRIPTEN)
+	set_target_properties(smw PROPERTIES SUFFIX ".bc")
 endif()
 
 # emscripten uses its own SDL
