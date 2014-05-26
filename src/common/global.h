@@ -607,6 +607,9 @@ public:
 class gv : public CGameConfig
 {
 public:
+    void init();
+    void SetupDefaultGameModeSettings();
+
     bool		frameadvance;
     bool		autokill;
 
@@ -728,7 +731,6 @@ public:
     short		unlocksecret3part1[4];
     short		unlocksecret3part2[4];
     bool		unlocksecretunlocked[4];
-
 };
 
 struct WorldStageBonus {

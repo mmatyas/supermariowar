@@ -2,6 +2,7 @@
 #include <math.h>
 
 #include "FileIO.h"
+#include "MatchTypes.h"
 #include "gfx.h"
 extern bool g_fLoadMessages;
 
@@ -973,6 +974,312 @@ void fwrite_or_exception(const void * ptr, size_t size, size_t count, FILE * str
 {
     if (fwrite(ptr, size, count, stream) != count)
         throw "File write error";
+}
+
+void gv::init()
+{
+    for (short iScore = 0; iScore < 4; iScore++)
+        score[iScore] = new CScore(iScore);
+
+    //set standard game values
+    playercontrol[0]  = 1;
+    playercontrol[1]  = 1;
+    showfps       = false;
+    frameadvance    = false;
+    autokill      = false;
+    framelimiter    = WAITTIME;
+    sound       = true;
+    music       = true;
+    gamestate     = GS_SPLASH;
+#ifdef _DEBUG
+    fullscreen      = false;
+#else
+    fullscreen      = false;
+#endif
+
+    screenResizeX   = 20.0f;
+    screenResizeY   = 20.0f;
+    screenResizeW   = -40.0f;
+    screenResizeH   = -40.0f;
+
+    flickerfilter   = 5;  //Full flicker filter by default
+    hardwarefilter    = 2;  //Bilinear by default
+    softfilter      = 0;  //No soft filter by default
+    aspectratio10x11  = false;  //No 10x11 aspect ratio by default
+
+#ifdef _XBOX
+    SDL_XBOX_SetScreenPosition(screenResizeX, screenResizeY);
+    SDL_XBOX_SetScreenStretch(screenResizeW, screenResizeH);
+#endif
+
+    pausegame     = false;
+    exitinggame     = false;
+    exityes       = false;
+    awardstyle      = award_style_fireworks;
+    spawnstyle      = 2;
+    tournamentgames   = 2;
+    tournamentwinner  = -1;
+    selectedminigame  = 0;
+    matchtype     = MATCH_TYPE_SINGLE_GAME;
+    tourindex     = 0;
+    tourstopcurrent   = 0;
+    tourstoptotal   = 0;
+    worldindex      = 0;
+    slowdownon      = -1;
+    slowdowncounter   = 0;
+    teamcollision   = 0;
+    screencrunch    = true;
+    screenshaketimer  = 0;
+    screenshakeplayerid = -1;
+    screenshaketeamid = -1;
+    toplayer      = true;
+    loadedannouncer   = -1;
+    loadedmusic     = -1;
+    scoreboardstyle     = 0;
+    teamcolors          = true;
+    cputurn       = -1;
+    shieldtime      = 62;
+    shieldstyle     = 2;
+    musicvolume     = 128;
+    soundvolume     = 128;
+    respawn       = 2;
+    itemrespawntime   = 1860;  //default item respawn is 30 seconds (30 * 62 fps)
+    hiddenblockrespawn  = 1860;  //default item respawn is 30 seconds
+    outofboundstime   = 5;
+    warplockstyle   = 1;  // Lock Warp Exit Only
+    warplocktime    = 186;  // 3 seconds
+#ifdef _DEBUG
+    suicidetime     = 0;  // Turn off suicide kills for debug
+#else
+    suicidetime     = 310;  // 5 seconds
+#endif
+    cpudifficulty   = 2;
+    fireballttl     = 310;  // 5 seconds
+    shellttl      = 496;  // 8 seconds
+    blueblockttl    = 310;  // 5 seconds
+    redblockttl     = 310;  // 5 seconds
+    grayblockttl    = 310;  // 5 seconds
+    hammerdelay     = 25; // 0.4 second
+    hammerttl     = 49; // 0.8 second
+    hammerpower     = true; //hammers die on first hit
+    fireballlimit   = 0;  //Unlimited
+    hammerlimit     = 0;  //Unlimited
+    boomerangstyle    = 1;  //SMB3 style
+    boomeranglife   = 248;  // 4 seconds of zelda boomerang
+    boomeranglimit    = 0;  //Unlimited
+    featherjumps    = 1;  //Allow one extra cape jump
+    featherlimit    = 0;  //Unlimited
+    leaflimit     = 0;  //Unlimited
+    pwingslimit     = 0;  //Unlimited
+    tanookilimit    = 0;  //Unlimited
+    bombslimit      = 0;  //Unlimited
+    wandfreezetime    = 310;  //5 seconds of freeze time
+    wandlimit     = 0;  //Unlimited
+    storedpowerupdelay  = 4;
+    bonuswheel      = 1;
+    keeppowerup     = false;
+    showwinningcrown  = false;
+    startgamecountdown  = true;
+    startmodedisplay  = true;
+    deadteamnotice    = true;
+    playnextmusic   = false;
+    pointspeed      = 20;
+    swapstyle     = 1;  //Blink then swap
+    worldpointsbonus  = -1; //no world multiplier until player uses item to boost it
+    singleplayermode  = -1;
+    worldskipscoreboard = false;
+    overridepowerupsettings = 0;
+    minigameunlocked  = false;
+    poweruppreset   = 0;
+    tournamentcontrolstyle = 0;
+
+    pfFilters     = new bool[NUM_AUTO_FILTERS + filterslist->GetCount()];
+    piFilterIcons   = new short[NUM_AUTO_FILTERS + filterslist->GetCount()];
+    fNeedWriteFilters = false;
+
+    for (short iFilter = 0; iFilter < NUM_AUTO_FILTERS + filterslist->GetCount(); iFilter++) {
+        pfFilters[iFilter] = false;
+        piFilterIcons[iFilter] = 0;
+    }
+
+    //networktype   = 0;
+    //networkhost   = false;
+    //gamehost      = false;
+
+    for (short iPlayer = 0; iPlayer < 4; iPlayer++) {
+        storedpowerups[iPlayer] = -1;
+        gamepowerups[iPlayer] = -1;
+        teamids[iPlayer][0] = iPlayer;
+        teamcounts[iPlayer] = 1;
+        skinids[iPlayer] = 0;
+        colorids[iPlayer] = iPlayer;
+        randomskin[iPlayer] = false;
+
+        //Setup the default key/button input configurations
+        for (short iInputType = 0; iInputType < 2; iInputType++) { //for keyboard/joystick
+            inputConfiguration[iPlayer][iInputType].iDevice = iInputType - 1;
+
+            for (short iInputState = 0; iInputState < 2; iInputState++) { //for game/menu
+                for (short iKey = 0; iKey < NUM_KEYS; iKey++) {
+                    inputConfiguration[iPlayer][iInputType].inputGameControls[iInputState].keys[iKey] = controlkeys[iInputType][iInputState][iPlayer][iKey];
+                }
+            }
+        }
+
+        //Set the players input to the default configuration (will be overwritten by options.bin settings)
+#ifdef _XBOX
+        inputConfiguration[iPlayer][1].iDevice = iPlayer;
+        playerInput.inputControls[iPlayer] = &inputConfiguration[iPlayer][1];
+#else
+        playerInput.inputControls[iPlayer] = &inputConfiguration[iPlayer][0];
+#endif
+    }
+}
+
+void gv::SetupDefaultGameModeSettings()
+{
+    //Setup the default game mode settings
+    //Classic
+    gamemodemenusettings.classic.style = 0;     //Respawn on death
+    gamemodemenusettings.classic.scoring = 0;   //All kills will score
+
+    //Frag
+    gamemodemenusettings.frag.style = 0;        //Respawn on death
+    gamemodemenusettings.frag.scoring = 0;      //All kills will score
+
+    //Time Limit
+    gamemodemenusettings.time.style = 0;        //Respawn on death
+    gamemodemenusettings.time.scoring = 0;      //All kills will score
+    gamemodemenusettings.time.percentextratime = 10;    //10% chance of a heart spawning
+
+    //Jail
+    gamemodemenusettings.jail.style = 1;            //defaults to color jail play
+    gamemodemenusettings.jail.tagfree = true;       //players on same team can free player by touching
+    gamemodemenusettings.jail.timetofree = 1240;   //20 seconds of jail
+    gamemodemenusettings.jail.percentkey = 30;      //30% chance of a key spawning
+
+    //Coins
+    gamemodemenusettings.coins.penalty = false;     //no penalty for getting stomped
+    gamemodemenusettings.coins.quantity = 1;        //only 1 coin on screen
+    gamemodemenusettings.coins.percentextracoin = 10;  //10% chance of an extra coin powerup
+
+    //Stomp
+    gamemodemenusettings.stomp.rate = 90; //Moderate
+    gamemodemenusettings.stomp.enemyweight[0] = 4; // turn on goombas, koopa and cheep cheeps by default
+    gamemodemenusettings.stomp.enemyweight[1] = 4;
+    gamemodemenusettings.stomp.enemyweight[2] = 6;
+    gamemodemenusettings.stomp.enemyweight[3] = 2;
+    gamemodemenusettings.stomp.enemyweight[4] = 2;
+    gamemodemenusettings.stomp.enemyweight[5] = 4;
+    gamemodemenusettings.stomp.enemyweight[6] = 1;
+    gamemodemenusettings.stomp.enemyweight[7] = 1;
+    gamemodemenusettings.stomp.enemyweight[8] = 1;
+
+    //Eggs
+    gamemodemenusettings.egg.eggs[0] = 0;
+    gamemodemenusettings.egg.eggs[1] = 1;
+    gamemodemenusettings.egg.eggs[2] = 0;
+    gamemodemenusettings.egg.eggs[3] = 0;
+    gamemodemenusettings.egg.yoshis[0] = 0;
+    gamemodemenusettings.egg.yoshis[1] = 1;
+    gamemodemenusettings.egg.yoshis[2] = 0;
+    gamemodemenusettings.egg.yoshis[3] = 0;
+    gamemodemenusettings.egg.explode = 0;  //Exploding eggs is turned off by default
+
+    //Capture The Flag
+    gamemodemenusettings.flag.speed = 0;  //Bases don't move by default
+    gamemodemenusettings.flag.touchreturn = false;  //Don't return by touching
+    gamemodemenusettings.flag.pointmove = true;  //Move base after point
+    gamemodemenusettings.flag.autoreturn = 1240;  //Return flag automatically after 20 seconds
+    gamemodemenusettings.flag.homescore = false;  //Don't require flag to be home to score
+    gamemodemenusettings.flag.centerflag = false; //Do normal CTF, not center flag style
+
+    //Chicken
+    gamemodemenusettings.chicken.usetarget = true;  //default to displaying a target around the chicken
+    gamemodemenusettings.chicken.glide = false;     //don't give the chicken the ability to glide
+
+    //Tag
+    gamemodemenusettings.tag.tagontouch = true;  //default to transfer tag on touching other players
+
+    //Star
+    gamemodemenusettings.star.time = 30;                //default to 30 seconds
+    gamemodemenusettings.star.shine = 0;                //default to hot potato (ztar)
+    gamemodemenusettings.star.percentextratime = 10;    //10 percent chance of an extra time poweurp spawning
+
+    //Domination
+    gamemodemenusettings.domination.loseondeath = true;
+    gamemodemenusettings.domination.stealondeath = false;
+    gamemodemenusettings.domination.relocateondeath = false;
+    gamemodemenusettings.domination.quantity = 13; //# Players + 1 = 13
+    gamemodemenusettings.domination.relocationfrequency = 1240;  //Relocate after 20 seconds = 1240
+
+    //King Of The Hill
+    gamemodemenusettings.kingofthehill.areasize = 3;
+    gamemodemenusettings.kingofthehill.relocationfrequency = 1240;
+    gamemodemenusettings.kingofthehill.maxmultiplier = 1;   //No multiplier
+
+    //Race
+    gamemodemenusettings.race.quantity = 4;
+    gamemodemenusettings.race.speed = 4;
+    gamemodemenusettings.race.penalty = 2;  //0 == none, 1 = 1 base, 2 = all bases lost on death
+
+    //Frenzy
+    gamemodemenusettings.frenzy.quantity = 6; //#players - 1
+    gamemodemenusettings.frenzy.rate = 186; //3 seconds
+    gamemodemenusettings.frenzy.storedshells = true; //Shells are stored by default
+    gamemodemenusettings.frenzy.powerupweight[0] = 0;
+    gamemodemenusettings.frenzy.powerupweight[1] = 1;  // turn on flowers and hammers by default
+    gamemodemenusettings.frenzy.powerupweight[2] = 1;
+    gamemodemenusettings.frenzy.powerupweight[3] = 0;
+    gamemodemenusettings.frenzy.powerupweight[4] = 0;
+    gamemodemenusettings.frenzy.powerupweight[5] = 0;
+    gamemodemenusettings.frenzy.powerupweight[6] = 0;
+    gamemodemenusettings.frenzy.powerupweight[7] = 0;
+    gamemodemenusettings.frenzy.powerupweight[8] = 0;
+    gamemodemenusettings.frenzy.powerupweight[9] = 0;
+    gamemodemenusettings.frenzy.powerupweight[10] = 0;
+    gamemodemenusettings.frenzy.powerupweight[11] = 0;
+
+    //Survival
+    gamemodemenusettings.survival.enemyweight[0] = 1;
+    gamemodemenusettings.survival.enemyweight[1] = 0;
+    gamemodemenusettings.survival.enemyweight[2] = 0;
+    gamemodemenusettings.survival.density = 20;
+    gamemodemenusettings.survival.speed = 4;
+    gamemodemenusettings.survival.shield = true;
+
+    //Greed
+    gamemodemenusettings.greed.coinlife = 124;          //Coins disappear after 2 seconds
+    gamemodemenusettings.greed.owncoins = true;         //Can collect own coins
+    gamemodemenusettings.greed.multiplier = 2;          //Single multiplier
+    gamemodemenusettings.greed.percentextracoin = 10;  //10% chance of an extra coin powerup
+
+    //Health
+    gamemodemenusettings.health.startlife = 6;          //Start with 3 whole hearts (each increment is a half heart)
+    gamemodemenusettings.health.maxlife = 10;           //Maximum of 5 hearts
+    gamemodemenusettings.health.percentextralife = 20;  //20% chance of a heart spawning
+
+    //Card Collection
+    gamemodemenusettings.collection.quantity = 6;       //#players - 1
+    gamemodemenusettings.collection.rate = 186;         //3 seconds to spawn
+    gamemodemenusettings.collection.banktime = 310;     //5 seconds to bank
+    gamemodemenusettings.collection.cardlife = 310;     //5 seconds to live
+
+    //Phanto Chase
+    gamemodemenusettings.chase.phantospeed = 6;         //Medium speed
+    gamemodemenusettings.chase.phantoquantity[0] = 1;
+    gamemodemenusettings.chase.phantoquantity[1] = 1;
+    gamemodemenusettings.chase.phantoquantity[2] = 0;
+
+    //Shyguy Tag
+    gamemodemenusettings.shyguytag.tagonsuicide = false;
+    gamemodemenusettings.shyguytag.tagtransfer = 0;
+    gamemodemenusettings.shyguytag.freetime = 5;
+
+    //Boss Minigame
+    gamemodemenusettings.boss.bosstype = 0;         //Default to hammer boss
+    gamemodemenusettings.boss.difficulty = 2;       //Medium difficulty
+    gamemodemenusettings.boss.hitpoints = 5;        //5 hits to kill
 }
 
 void CGameConfig::ReadBinaryConfig() {
