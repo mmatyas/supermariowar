@@ -963,33 +963,46 @@ void CheckSecret(short id)
     }
 }
 
+void fread_or_exception(void * ptr, size_t size, size_t count, FILE * stream)
+{
+    if (fread(ptr, size, count, stream) != count)
+        throw "File read error";
+}
+
+void fwrite_or_exception(const void * ptr, size_t size, size_t count, FILE * stream)
+{
+    if (fwrite(ptr, size, count, stream) != count)
+        throw "File write error";
+}
 
 void CGameConfig::ReadBinaryConfig() {
     //Read saved settings from disk
     FILE * fp = OpenFile("options.bin", "rb");
 
     if (fp) {
+      try
+      {
         int version[4];
-        fread(version, sizeof(int), 4, fp);
+        fread_or_exception(version, sizeof(int), 4, fp);
 
         if (VersionIsEqual(g_iVersion, version[0], version[1], version[2], version[3])) {
 #ifdef _XBOX
-            fread(&flickerfilter, sizeof(short), 1, fp);
-            fread(&hardwarefilter, sizeof(short), 1, fp);
-            fread(&softfilter, sizeof(short), 1, fp);
-            fread(&aspectratio10x11, sizeof(bool), 1, fp);
+            fread_or_exception(&flickerfilter, sizeof(short), 1, fp);
+            fread_or_exception(&hardwarefilter, sizeof(short), 1, fp);
+            fread_or_exception(&softfilter, sizeof(short), 1, fp);
+            fread_or_exception(&aspectratio10x11, sizeof(bool), 1, fp);
 
-            fread(&screenResizeX, sizeof(float), 1, fp);
-            fread(&screenResizeY, sizeof(float), 1, fp);
-            fread(&screenResizeW, sizeof(float), 1, fp);
-            fread(&screenResizeH, sizeof(float), 1, fp);
+            fread_or_exception(&screenResizeX, sizeof(float), 1, fp);
+            fread_or_exception(&screenResizeY, sizeof(float), 1, fp);
+            fread_or_exception(&screenResizeW, sizeof(float), 1, fp);
+            fread_or_exception(&screenResizeH, sizeof(float), 1, fp);
 
             SDL_XBOX_SetScreenPosition(screenResizeX, screenResizeY);
             SDL_XBOX_SetScreenStretch(screenResizeW, screenResizeH);
 #endif
 
             unsigned char abyte[35];
-            fread(abyte, sizeof(unsigned char), 35, fp);
+            fread_or_exception(abyte, sizeof(unsigned char), 35, fp);
             spawnstyle = (short) abyte[0];
             awardstyle = (short) abyte[1];
             teamcollision = (short)abyte[3];
@@ -1018,48 +1031,48 @@ void CGameConfig::ReadBinaryConfig() {
             tournamentcontrolstyle = (short)abyte[33];
             startmodedisplay = ((short)abyte[34] > 0 ? true : false);
 
-            fread(&shieldtime, sizeof(short), 1, fp);
-            fread(&shieldstyle, sizeof(short), 1, fp);
-            fread(&itemrespawntime, sizeof(short), 1, fp);
-            fread(&hiddenblockrespawn, sizeof(short), 1, fp);
-            fread(&fireballttl, sizeof(short), 1, fp);
-            fread(&fireballlimit, sizeof(short), 1, fp);
-            fread(&hammerdelay, sizeof(short), 1, fp);
-            fread(&hammerttl, sizeof(short), 1, fp);
-            fread(&hammerpower, sizeof(bool), 1, fp);
-            fread(&hammerlimit, sizeof(short), 1, fp);
-            fread(&boomerangstyle, sizeof(short), 1, fp);
-            fread(&boomeranglife, sizeof(short), 1, fp);
-            fread(&boomeranglimit, sizeof(short), 1, fp);
-            fread(&featherjumps, sizeof(short), 1, fp);
-            fread(&featherlimit, sizeof(short), 1, fp);
-            fread(&leaflimit, sizeof(short), 1, fp);
-            fread(&pwingslimit, sizeof(short), 1, fp);
-            fread(&tanookilimit, sizeof(short), 1, fp);
-            fread(&bombslimit, sizeof(short), 1, fp);
-            fread(&wandfreezetime, sizeof(short), 1, fp);
-            fread(&wandlimit, sizeof(short), 1, fp);
-            fread(&shellttl, sizeof(short), 1, fp);
-            fread(&blueblockttl, sizeof(short), 1, fp);
-            fread(&redblockttl, sizeof(short), 1, fp);
-            fread(&grayblockttl, sizeof(short), 1, fp);
-            fread(&storedpowerupdelay, sizeof(short), 1, fp);
-            fread(&warplockstyle, sizeof(short), 1, fp);
-            fread(&warplocktime, sizeof(short), 1, fp);
-            fread(&suicidetime, sizeof(short), 1, fp);
+            fread_or_exception(&shieldtime, sizeof(short), 1, fp);
+            fread_or_exception(&shieldstyle, sizeof(short), 1, fp);
+            fread_or_exception(&itemrespawntime, sizeof(short), 1, fp);
+            fread_or_exception(&hiddenblockrespawn, sizeof(short), 1, fp);
+            fread_or_exception(&fireballttl, sizeof(short), 1, fp);
+            fread_or_exception(&fireballlimit, sizeof(short), 1, fp);
+            fread_or_exception(&hammerdelay, sizeof(short), 1, fp);
+            fread_or_exception(&hammerttl, sizeof(short), 1, fp);
+            fread_or_exception(&hammerpower, sizeof(bool), 1, fp);
+            fread_or_exception(&hammerlimit, sizeof(short), 1, fp);
+            fread_or_exception(&boomerangstyle, sizeof(short), 1, fp);
+            fread_or_exception(&boomeranglife, sizeof(short), 1, fp);
+            fread_or_exception(&boomeranglimit, sizeof(short), 1, fp);
+            fread_or_exception(&featherjumps, sizeof(short), 1, fp);
+            fread_or_exception(&featherlimit, sizeof(short), 1, fp);
+            fread_or_exception(&leaflimit, sizeof(short), 1, fp);
+            fread_or_exception(&pwingslimit, sizeof(short), 1, fp);
+            fread_or_exception(&tanookilimit, sizeof(short), 1, fp);
+            fread_or_exception(&bombslimit, sizeof(short), 1, fp);
+            fread_or_exception(&wandfreezetime, sizeof(short), 1, fp);
+            fread_or_exception(&wandlimit, sizeof(short), 1, fp);
+            fread_or_exception(&shellttl, sizeof(short), 1, fp);
+            fread_or_exception(&blueblockttl, sizeof(short), 1, fp);
+            fread_or_exception(&redblockttl, sizeof(short), 1, fp);
+            fread_or_exception(&grayblockttl, sizeof(short), 1, fp);
+            fread_or_exception(&storedpowerupdelay, sizeof(short), 1, fp);
+            fread_or_exception(&warplockstyle, sizeof(short), 1, fp);
+            fread_or_exception(&warplocktime, sizeof(short), 1, fp);
+            fread_or_exception(&suicidetime, sizeof(short), 1, fp);
 
-            fread(&poweruppreset, sizeof(short), 1, fp);
-            fread(&g_iCurrentPowerupPresets, sizeof(short), NUM_POWERUP_PRESETS * NUM_POWERUPS, fp);
+            fread_or_exception(&poweruppreset, sizeof(short), 1, fp);
+            fread_or_exception(&g_iCurrentPowerupPresets, sizeof(short), NUM_POWERUP_PRESETS * NUM_POWERUPS, fp);
 
             //TODO: Need to test what happens when you unplug some controllers from the xbox
             //and then start up (device index will probably point to a gamepad that isn't in the list)
             //and this will cause a crash
-            fread(inputConfiguration, sizeof(CInputPlayerControl), 8, fp);
+            fread_or_exception(inputConfiguration, sizeof(CInputPlayerControl), 8, fp);
 
             //setup player input controls for game
             for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
                 short iDevice;
-                fread(&iDevice, sizeof(short), 1, fp);
+                fread_or_exception(&iDevice, sizeof(short), 1, fp);
 
 #ifdef _XBOX
                 playerInput.inputControls[iPlayer] = &inputConfiguration[iPlayer][1]; //Always use gamepads as input devices on xbox
@@ -1072,19 +1085,19 @@ void CGameConfig::ReadBinaryConfig() {
             }
 
 #ifndef _XBOX
-            fread(&fullscreen, sizeof(bool), 1, fp);
+            fread_or_exception(&fullscreen, sizeof(bool), 1, fp);
 #endif
 
             for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++)
-                fread(&(gamemodes[iGameMode]->goal), sizeof(short), 1, fp);
+                fread_or_exception(&(gamemodes[iGameMode]->goal), sizeof(short), 1, fp);
 
-            fread(&gamemodemenusettings, sizeof(GameModeSettings), 1, fp);
+            fread_or_exception(&gamemodemenusettings, sizeof(GameModeSettings), 1, fp);
 
-            fread(&teamcounts, sizeof(short), 4, fp);
-            fread(&teamids, sizeof(short), 12, fp);
-            fread(&skinids, sizeof(short), 4, fp);
-            fread(&randomskin, sizeof(bool), 4, fp);
-            fread(&playercontrol, sizeof(short), 4, fp);
+            fread_or_exception(&teamcounts, sizeof(short), 4, fp);
+            fread_or_exception(&teamids, sizeof(short), 12, fp);
+            fread_or_exception(&skinids, sizeof(short), 4, fp);
+            fread_or_exception(&randomskin, sizeof(bool), 4, fp);
+            fread_or_exception(&playercontrol, sizeof(short), 4, fp);
 
             //Load skin/team settings
             for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
@@ -1105,8 +1118,13 @@ void CGameConfig::ReadBinaryConfig() {
         } else {
             printf("Old options.bin detected.  Skipped reading it.\n");
         }
+      }
+      catch (char* errormsg)
+      {
+        perror(errormsg);
+      }
 
-        fclose(fp);
+      fclose(fp);
     }
 
 }
