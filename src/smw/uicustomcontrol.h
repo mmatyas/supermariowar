@@ -50,6 +50,11 @@ class MI_InputControlField : public UI_Control
 		short iType;
 		short iKeyIndex;
 		short iPlayerIndex;
+
+		static const char * Joynames[30];
+#ifndef USE_SDL2
+		static const char * Keynames[340];
+#endif
 };
 
 class MI_StoredPowerupResetButton : public MI_Button

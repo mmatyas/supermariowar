@@ -3,13 +3,6 @@
 #include "MatchTypes.h"
 #include <math.h>
 
-#ifdef USE_SDL2
-    #define Keynames(key) SDL_GetKeyName(key) // FIXME
-#else
-    extern const char * Keynames[340];
-    #define Keynames(key) Keynames[key]
-#endif
-
 #ifndef __EMSCRIPTEN__
     inline void smallDelay() { SDL_Delay(10); }
 #else
@@ -49,6 +42,63 @@ MI_InputControlField::MI_InputControlField(gfxSprite * nspr, short x, short y, c
     iKeyIndex = 0;
     iPlayerIndex = 0;
 }
+
+#ifdef USE_SDL2
+    #define Keynames(key) SDL_GetKeyName(key) // FIXME
+#else
+    //We're using these strings intead of the ugly ones returned by SDL_GetKeyName()
+    const char * MI_InputControlField::Keynames[340] = {
+        "Unknown", "", "", "", "", "", "", "", "Backspace", "Tab",
+        "",   "", "Clear", "Return", "", "", "", "", "", "Pause",
+        "", "", "", "", "", "", "", "Escape", "", "",
+        "", "", "Space Bar", "!", "\"", "#", "$", "", "&", "'",
+        "(", ")", "*", "+", ",", "-", ".", "/", "0", "1",
+        "2", "3", "4", "5", "6", "7", "8", "9", ":", ";",
+        "<", "=", ">", "?", "@", "", "", "", "", "",
+        "", "", "", "", "", "", "", "", "", "",
+        "", "", "", "", "", "", "", "", "", "",
+        "", "[", "\\", "]", "^", "_", "`", "A", "B", "C",
+        /*100*/   "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
+        "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W",
+        "X", "Y", "Z", "", "", "", "", "Delete", "", "",
+        "", "", "", "", "", "", "", "", "", "",
+        "", "", "", "", "", "", "", "", "", "",
+        "", "", "", "", "", "", "", "", "", "",
+        "World 0", "World 1", "World 2", "World 3", "World 4", "World 5", "World 6", "World 7", "World 8", "World 9",
+        "World 10", "World 11", "World 12", "World 13", "World 14", "World 15", "World 16", "World 17", "World 18", "World 19",
+        "World 20", "World 21", "World 22", "World 23", "World 24", "World 25", "World 26", "World 27", "World 28", "World 29",
+        "World 30", "World 31", "World 32", "World 33", "World 34", "World 35", "World 36", "World 37", "World 38", "World 39",
+        /*200*/   "World 40", "World 41", "World 42", "World 43", "World 44", "World 45", "World 46", "World 47", "World 48", "World 49",
+        "World 50", "World 51", "World 52", "World 53", "World 54", "World 55", "World 56", "World 57", "World 58", "World 59",
+        "World 60", "World 61", "World 62", "World 63", "World 64", "World 65", "World 66", "World 67", "World 68", "World 69",
+        "World 70", "World 71", "World 72", "World 73", "World 74", "World 75", "World 76", "World 67", "World 78", "World 79",
+        "World 80", "World 81", "World 82", "World 83", "World 84", "World 85", "World 86", "World 77", "World 88", "World 89",
+        "World 90", "World 91", "World 92", "World 93", "World 94", "World 95", "Keypad 0", "Keypad 1", "Keypad 2", "Keypad 3",
+        "Keypad 4", "Keypad 5", "Keypad 6", "Keypad 7", "Keypad 8", "Keypad 9", "Keypad .", "Keypad /", "Keypad *", "Keypad -",
+        "Keypad +", "Keypad Enter", "Keypad =", "Up", "Down", "Right", "Left", "Insert", "Home", "End",
+        "Page Up", "Page Down", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8",
+        "F9", "F10", "F11", "F12", "F13", "F14", "F15", "", "", "",
+        /*300*/   "Num Lock", "Caps Lock", "Scroll Lock", "Right Shift", "Left Shift", "Right Control", "Left Control", "Right Alt", "Left Alt", "Right Meta",
+        "Left Meta", "Left Super", "Right Super", "Mode", "Compose", "Help", "Print", "Sys Req", "Break", "Menu",
+        "Power", "Euro", "Undo", "Mouse Up", "Mouse Down", "Mouse Left", "Mouse Right", "Mouse Button 1", "Left Mouse Button", "Center Mouse Button",
+        "Right Mouse Button", "Mouse Scroll Up", "Mouse Scroll Down", "Mouse Button 4", "Mouse Button 5", "Mouse Button 6", "Mouse Button 7", "Mouse Button 8", "Mouse Button 9", "Mouse Button 10"
+    };
+    #define Keynames(key) Keynames[key]
+#endif
+
+#ifdef _XBOX
+    const char * MI_InputControlField::Joynames[30] = {
+        "Left Stick Up", "Left Stick Down", "Left Stick Left", "Left Stick Right", "Right Stick Up", "Right Stick Down", "Right Stick Left", "Right Stick Right", "Pad Up", "Pad Down",
+        "Pad Left", "Pad Right", "A Button", "B Button", "X Button", "Y Button", "Black Button", "White Button", "Left Trigger", "Right Trigger",
+        "Start Button", "Back Button", "Left Stick Click", "Right Stick Click", "Button 1", "Button 2", "Button 3", "Button 4", "Button 5", "Button 6"
+    };
+#else
+    const char * MI_InputControlField::Joynames[30] = {
+        "Joystick Up", "Joystick Down", "Joystick Left", "Joystick Right", "Stick 2 Up", "Stick 2 Down", "Stick 2 Left", "Stick 2 Right", "Pad Up", "Pad Down",
+        "Pad Left", "Pad Right", "Button 1", "Button 2", "Button 3", "Button 4", "Button 5", "Button 6", "Button 7", "Button 8",
+        "Button 9", "Button 10", "Button 11", "Button 12", "Button 13", "Button 14", "Button 15", "Button 16", "Button 17", "Button 18"
+    };
+#endif
 
 MenuCodeEnum MI_InputControlField::Modify(bool modify)
 {
