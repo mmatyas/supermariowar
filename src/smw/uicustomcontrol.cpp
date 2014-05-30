@@ -962,6 +962,7 @@ void MI_TeamSelect::Reset()
             game_values.colorids[iPlayer] = iPlayer;
 
         //Skip skins that are invalid
+        //TODO: this loops forever in emscripten build
         while (!rm->LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false)) {
             if (++game_values.skinids[iPlayer] >= skinlist->GetCount())
                 game_values.skinids[iPlayer] = 0;
