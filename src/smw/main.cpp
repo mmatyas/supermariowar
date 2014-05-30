@@ -76,20 +76,8 @@ CScore			*score[4];
 short			score_cnt;
 
 
-
 //Locations for swirl spawn effects
 short g_iSwirlSpawnLocations[4][2][25];
-
-CMap			*g_map;
-CTilesetManager *g_tilesetmanager;
-
-CObjectContainer noncolcontainer;
-CObjectContainer objectcontainer[3];
-
-bool g_fLoadMessages = true;
-
-
-bool  fResumeMusic = true;
 
 
 CGameMode			*gamemodes[GAMEMODE_LAST];
@@ -146,8 +134,6 @@ void EnterBossMode(short type)
         game_values.gamestate = GS_START_GAME;
     }
 }*/
-
-gv game_values;
 
 
 #ifdef __EMSCRIPTEN__

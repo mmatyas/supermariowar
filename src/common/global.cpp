@@ -72,6 +72,7 @@ bool VersionIsEqualOrAfter(int iVersion[], short iMajor, short iMinor, short iMi
     return false;
 }
 
+gv game_values;
 
 FiltersList *filterslist;  //Filters list must be initiallized before maps list because it is used in maplist constructor
 MapList *maplist;
@@ -88,6 +89,16 @@ WorldList *worldlist;
 
 std::vector<MapMusicOverride*> mapmusicoverrides;
 std::vector<WorldMusicOverride*> worldmusicoverrides;
+
+CMap      *g_map;
+CTilesetManager *g_tilesetmanager;
+
+CObjectContainer noncolcontainer;
+CObjectContainer objectcontainer[3];
+
+bool g_fLoadMessages = true;
+
+bool  fResumeMusic = true;
 
 //Network stuff
 int g_iNextNetworkID = 0;
