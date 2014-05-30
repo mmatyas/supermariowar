@@ -28,6 +28,7 @@ class SplashScreenState : public GameState
         int alpha;
         int state;
         int timer;
+        bool firstFrame;
 
         SplashScreenState();
         ~SplashScreenState() {}

@@ -39,6 +39,7 @@ SplashScreenState::SplashScreenState()
     alpha = 255;
     state = 7;
     timer = 120;
+    firstFrame = true;
 }
 
 SplashScreenState& SplashScreenState::instance() {
@@ -307,6 +308,12 @@ void SplashScreenState::update()
                         if (++index >= NUM_CONTRIBUTORS)
                             index = 0;
                     } */
+    }
+
+    // Only start loading after we displayed something, in the 2nd frame
+    if (firstFrame) {
+        firstFrame = false;
+        return;
     }
 
     if (state == 7) {
