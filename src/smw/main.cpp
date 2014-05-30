@@ -76,8 +76,6 @@ CScore			*score[4];
 short			score_cnt;
 
 
-extern SDL_KEYTYPE controlkeys[2][2][4][NUM_KEYS];
-extern int g_iVersion[];
 
 //Locations for swirl spawn effects
 short g_iSwirlSpawnLocations[4][2][25];
