@@ -19,6 +19,7 @@
 #include "global.h"
 
 #include "path.h"
+#include "FileIO.h"
 
 #ifdef PNG_SAVE_FORMAT
 	// this function was added to SDL2
@@ -48,7 +49,7 @@
 #include "SDL.h"
 #include "sdl12wrapper.h"
 
-#define MAPTITLESTRING "SMW 2.0 Leveleditor"
+#define MAPTITLESTRING "SMW 2.0 Level Editor"
 
 
 enum {EDITOR_EDIT, EDITOR_TILES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_MAP, EDITOR_BLOCKS, NEW_MAP, SAVE, EDITOR_WARP, EDITOR_EYECANDY, DISPLAY_HELP, EDITOR_PLATFORM, EDITOR_TILETYPE, EDITOR_BACKGROUNDS, EDITOR_MAPITEMS, EDITOR_ANIMATION, EDITOR_PROPERTIES, EDITOR_MODEITEMS, EDITOR_MAPHAZARDS};
@@ -151,8 +152,6 @@ int				move_drag_start_y = 0;
 int				move_drag_offset_x = 0;
 int				move_drag_offset_y = 0;
 
-CMap			*g_map;
-CTilesetManager *g_tilesetmanager;
 int				state;
 bool			selectedtiles[MAPWIDTH][MAPHEIGHT];
 bool			moveselectedtiles[MAPWIDTH][MAPHEIGHT];
@@ -160,13 +159,9 @@ EditorMapTile	copiedtiles[MAPWIDTH][MAPHEIGHT];
 int				copiedlayer;
 
 //// Global stuff that the map editor doesn't need, but has references to
-GraphicsList *menugraphicspacklist;
-GraphicsList *gamegraphicspacklist;
-FiltersList *filterslist;
 gfxSprite		spr_warplock;
 short			x_shake = 0;
 short			y_shake = 0;
-gv				game_values;
 void CPlayer::flipsidesifneeded() {}
 short CPlayer::KillPlayerMapHazard(bool fForce, killstyle style, bool fKillCarriedItem, short iPlayerId)
 {
@@ -189,21 +184,11 @@ CGameMode		*gamemodes[GAMEMODE_LAST];
 CPlayer			*list_players[4];
 short			list_players_cnt = 0;
 
-bool			g_fLoadMessages = true;
-
-bool			fResumeMusic;
 void DECLSPEC soundfinished(int channel){}
 void DECLSPEC musicfinished(){}
 sfxSound * g_PlayingSoundChannels[NUM_SOUND_CHANNELS];
 short			g_iCurrentDrawIndex = 0;
 gfxSprite		menu_dialog;
-
-std::vector<MapMusicOverride*> mapmusicoverrides;
-std::vector<WorldMusicOverride*> worldmusicoverrides;
-
-gfxSprite		spr_poof;
-sfxSound		sfx_transform;
-gfxSprite		spr_overlay, spr_overlayhole;
 
 IO_MovingObject * createpowerup(short iType, short ix, short iy, bool side, bool spawn)
 {
@@ -304,7 +289,6 @@ void drawmap(bool fScreenshot, short iBlockSize, bool fWithPlatforms = false);
 void draw_platform(short iPlatform, bool fDrawTileTypes);
 void SetPlatformToDefaults(short iPlatform);
 
-MapList *maplist;
 void loadcurrentmap();
 int savecurrentmap();
 int findcurrentstring();
@@ -400,12 +384,12 @@ int main(int argc, char *argv[])
 	if (argc >= 2)
 		RootDataDirectory = argv[1];
 
+	smw = new CGame(RootDataDirectory);
+	rm = new CResourceManager();
 	g_map = new CMap();
 	g_tilesetmanager = new CTilesetManager();
 	filterslist = new FiltersList();
 	maplist = new MapList(false);
-    menugraphicspacklist = new GraphicsList();
-    gamegraphicspacklist = new GraphicsList();
     backgroundlist = new BackgroundList();
 
     /* This must occur before any data files are loaded */
@@ -1051,7 +1035,8 @@ int editor_edit()
 							view_only_layer = !view_only_layer;
 						}
 
-	#ifdef _DEBUG
+	//#ifdef _DEBUG
+	#if 0
 						if (key == SDLK_HOME)
 							convertAll();
 
