@@ -116,26 +116,6 @@ void UpdateMusicWithOverrides();
 void SetupDefaultGameModeSettings();
 
 
-/*
-void EnterBossMode(short type)
-{
-    if (game_values.gamestate == GS_GAME && game_values.gamemode->gamemode != game_mode_boss_minigame)
-    {
-        bossgamemode->SetBossType(type);
-
-        game_values.screenfade = 2;
-        game_values.screenfadespeed = 2;
-
-        rm->backgroundmusic[0].stop();
-        ifsoundonstop(rm->sfx_invinciblemusic);
-        ifsoundonstop(rm->sfx_timewarning);
-        ifsoundonstop(rm->sfx_slowdownmusic);
-
-        game_values.gamestate = GS_START_GAME;
-    }
-}*/
-
-
 #ifdef __EMSCRIPTEN__
 void gameloop_frame();
 #endif
