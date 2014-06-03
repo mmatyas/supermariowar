@@ -18,6 +18,8 @@
 
 #define SMW_EDITOR
 #include "global.h"
+#include "FileIO.h"
+#include "modeoptionsmenu.h"
 
 #ifdef PNG_SAVE_FORMAT
 	// this function was added to SDL2
@@ -42,7 +44,7 @@
     #endif
 #endif
 
-#define MAPTITLESTRING "SMW 1.9 World Editor"
+#define MAPTITLESTRING "SMW 2.0 World Editor"
 
 enum {EDITOR_EDIT, EDITOR_WATER, EDITOR_BACKGROUND, EDITOR_STAGEFOREGROUND, EDITOR_STRUCTUREFOREGROUND, EDITOR_BRIDGES, EDITOR_PATHSPRITE, EDITOR_VEHICLES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_WORLD, NEW_WORLD, RESIZE_WORLD, SAVE, EDITOR_WARP, DISPLAY_HELP, EDITOR_PATH, EDITOR_TYPE, EDITOR_BOUNDARY, EDITOR_START_ITEMS, EDITOR_STAGE};
 
@@ -430,7 +432,7 @@ void SetStageMode(short iIndex, const char * szModeName, const char * szGoalName
 //main main main
 int main(int argc, char *argv[])
 {
-	if (argc >= 2) {
+	if (argc >= 2)
 		RootDataDirectory = argv[1];
 
 	g_map = new CMap();
