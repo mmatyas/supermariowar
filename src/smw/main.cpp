@@ -116,6 +116,11 @@ void UpdateMusicWithOverrides();
 void SetupDefaultGameModeSettings();
 
 
+//*************************************
+//  MAIN LOOP
+//*************************************
+
+
 #ifdef __EMSCRIPTEN__
 void gameloop_frame();
 #endif
@@ -155,6 +160,11 @@ void gameloop_frame()
 #ifndef __EMSCRIPTEN__
 }
 #endif
+
+
+//*************************************
+//  PROGRAM ENTRY POINT
+//*************************************
 
 
 #ifdef	WIN32
