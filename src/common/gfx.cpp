@@ -293,12 +293,28 @@ void gfx_close()
 
 bool ValidSkinSurface(SDL_Surface * skin)
 {
+#ifdef __EMSCRIPTEN__
+    if (skin->w == 192 && skin->h == 32 && skin->format->BitsPerPixel == 32)
+#else
     if (skin->w == 192 && skin->h == 32 && skin->format->BitsPerPixel == 24)
+#endif
         return true;
 
     return false;
 }
 
+/**
+ * Makes skin surface frame from a loaded sprite strip
+ * @param  skin         sprite strip surface
+ * @param  spriteindex  frame index [0-5]
+ * @param  r            transparent color red value
+ * @param  g            transparent color green value
+ * @param  b            transparent color blue value
+ * @param  colorScheme  player color [0-3]
+ * @param  expand       wide frame?
+ * @param  reverse
+ * @return              skin frame surface
+ */
 SDL_Surface * gfx_createskinsurface(SDL_Surface * skin, short spriteindex, Uint8 r, Uint8 g, Uint8 b, short colorScheme, bool expand, bool reverse)
 {
     int loops = 1;
@@ -315,7 +331,13 @@ SDL_Surface * gfx_createskinsurface(SDL_Surface * skin, short spriteindex, Uint8
     if (SDL_MUSTLOCK(skin))
         SDL_LockSurface(skin);
 
-    int skincounter = spriteindex * 96;
+#ifdef __EMSCRIPTEN__
+    Uint8 byteperframe = 128;
+#else
+    Uint8 byteperframe = 96;
+#endif
+
+    int skincounter = spriteindex * byteperframe;
     int tempcounter = 0;
 
     int reverseoffset = 0;
@@ -340,9 +362,9 @@ SDL_Surface * gfx_createskinsurface(SDL_Surface * skin, short spriteindex, Uint8
             for (int m = 0; m < numcolors; m++) {
                 if (iColorByte1 == colorcodes[0][m] && iColorByte2 == colorcodes[1][m] && iColorByte3 == colorcodes[2][m]) {
                     for (int k = 0; k < loops; k++) {
-                        temppixels[tempcounter + k * 96 + reverseoffset + iRedOffset] = colorschemes[colorScheme][k][0][m];
-                        temppixels[tempcounter + k * 96 + reverseoffset + iGreenOffset] = colorschemes[colorScheme][k][1][m];
-                        temppixels[tempcounter + k * 96 + reverseoffset + iBlueOffset] = colorschemes[colorScheme][k][2][m];
+                        temppixels[tempcounter + k * byteperframe + reverseoffset + iRedOffset] = colorschemes[colorScheme][k][0][m];
+                        temppixels[tempcounter + k * byteperframe + reverseoffset + iGreenOffset] = colorschemes[colorScheme][k][1][m];
+                        temppixels[tempcounter + k * byteperframe + reverseoffset + iBlueOffset] = colorschemes[colorScheme][k][2][m];
                     }
 
                     fFoundColor = true;
@@ -352,9 +374,9 @@ SDL_Surface * gfx_createskinsurface(SDL_Surface * skin, short spriteindex, Uint8
 
             if (!fFoundColor) {
                 for (int k = 0; k < loops; k++) {
-                    temppixels[tempcounter + k * 96 + reverseoffset + iRedOffset] = iColorByte1;
-                    temppixels[tempcounter + k * 96 + reverseoffset + iGreenOffset] = iColorByte2;
-                    temppixels[tempcounter + k * 96 + reverseoffset + iBlueOffset] = iColorByte3;
+                    temppixels[tempcounter + k * byteperframe + reverseoffset + iRedOffset] = iColorByte1;
+                    temppixels[tempcounter + k * byteperframe + reverseoffset + iGreenOffset] = iColorByte2;
+                    temppixels[tempcounter + k * byteperframe + reverseoffset + iBlueOffset] = iColorByte3;
                 }
             }
 
@@ -363,8 +385,8 @@ SDL_Surface * gfx_createskinsurface(SDL_Surface * skin, short spriteindex, Uint8
         }
 
         // 5 * 96 shall be replaced by a better variable expression
-        skincounter += 5 * 96 + skin->pitch - (skin->w * 3);
-        tempcounter += 96 * (loops - 1) + temp->pitch - (temp->w * 3);
+        skincounter += 5 * byteperframe + skin->pitch - (skin->w * 3);
+        tempcounter += byteperframe * (loops - 1) + temp->pitch - (temp->w * 3);
     }
 
     SDL_UnlockSurface(skin);
@@ -384,6 +406,7 @@ SDL_Surface * gfx_createskinsurface(SDL_Surface * skin, short spriteindex, Uint8
         printf("\n ERROR: Couldn't create new surface using SDL_DisplayFormat(): %s\n", SDL_GetError());
         return NULL;
     }
+
     SDL_FreeSurface(temp);
 
     return final;
