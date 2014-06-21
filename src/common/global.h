@@ -447,11 +447,6 @@ struct GameModeSettings {
 //neagix: that somewhen is *NOW*
 
 //gfx stuff
-#ifdef USE_SDL2
-    extern SDL_Window       *window;        //the window
-    extern SDL_Renderer     *renderer;      //screen -> texture -> renderer -> window
-    extern SDL_Texture      *screenAsTexture;
-#endif
 extern SDL_Surface		*screen;		//for gfx
 extern SDL_Surface		*blitdest;		//for gfx
 extern short			x_shake;

@@ -19,9 +19,9 @@ using namespace std;
 #endif
 
 #ifdef USE_SDL2
-    SDL_Window * sdl2_window;
-    SDL_Renderer * sdl2_renderer;
-    SDL_Texture * sdl2_screenAsTexture;
+    SDL_Window   * sdl2_window;           //the window
+    SDL_Renderer * sdl2_renderer;         //screen -> texture -> renderer -> window
+    SDL_Texture  * sdl2_screenAsTexture;
 #endif
 
 extern SDL_Surface * blitdest;
