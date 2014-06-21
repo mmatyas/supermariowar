@@ -2,6 +2,7 @@
 #define MAPLIST_H
 
 #include <string>
+#include <map>
 
 class MapListNode
 {

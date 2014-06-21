@@ -10,13 +10,6 @@
 #define TITLESTRING "Super Mario War"
 #define VERSIONNUMBER "2.0"
 
-#include <stdlib.h>	//srand/rand (maybe replace with an own version)
-#include <string.h>
-//#include <string>
-#include <map>
-#include <vector>
-#include <list>
-
 #include "sfx.h"
 #include "gfx.h"
 #include "path.h"

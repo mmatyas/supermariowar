@@ -1,6 +1,9 @@
 #ifndef UIMENU_H
 #define UIMENU_H
 
+#include <vector>
+#include <list>
+
 enum MenuCodeEnum {
 	MENU_CODE_NEIGHBOR_UP = 0,
 	MENU_CODE_NEIGHBOR_DOWN = 1,
