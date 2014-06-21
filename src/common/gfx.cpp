@@ -1,31 +1,36 @@
 #include "gfx.h"
-#include "global.h"
 
-#include <stdarg.h>		//atexit?
-#include <stdlib.h>		//atexit?
+#include <cassert>
 #include <iostream>
 #include <string>
 using namespace std;
 
+#include "path.h"
+#include "FileList.h"
 #include "sdl12wrapper.h"
 
 #ifdef _WIN32
-#pragma comment(lib, "SDL_image.lib")
+    #pragma comment(lib, "SDL_image.lib")
 
-#ifndef _XBOX
-#pragma comment(lib, "SDL.lib")
-#pragma comment(lib, "SDLmain.lib")
-#endif
-
+    #ifndef _XBOX
+        #pragma comment(lib, "SDL.lib")
+        #pragma comment(lib, "SDLmain.lib")
+    #endif
 #endif
 
 #ifdef USE_SDL2
-    extern SDL_Window   * window;
-    extern SDL_Renderer * renderer;
-    extern SDL_Texture  * screenAsTexture;
+    SDL_Window * sdl2_window;
+    SDL_Renderer * sdl2_renderer;
+    SDL_Texture * sdl2_screenAsTexture;
 #endif
-extern SDL_Surface *blitdest;
-extern SDL_Surface *screen;
+
+extern SDL_Surface * blitdest;
+extern SDL_Surface * screen;
+
+extern GraphicsList *gamegraphicspacklist;
+
+extern short x_shake;
+extern short y_shake;
 
 #define GFX_BPP		16
 #ifdef _XBOX
@@ -42,9 +47,6 @@ Uint8 * colorcodes[3];
 //[numplayers][colorscheme][colorcomponents][numcolors]
 Uint8 * colorschemes[4][NUM_SCHEMES][3];
 short numcolors = 0;
-
-extern short x_shake;
-extern short y_shake;
 
 //gfx_init
 bool gfx_init(int w, int h, bool fullscreen)
@@ -155,6 +157,18 @@ bool gfx_init(int w, int h, bool fullscreen)
     }
 
     return true;
+}
+
+void gfx_flipscreen()
+{
+#ifdef USE_SDL2
+    SDL_UpdateTexture(sdl2_screenAsTexture, NULL, screen->pixels, screen->pitch);
+    SDL_RenderClear(sdl2_renderer);
+    SDL_RenderCopy(sdl2_renderer, sdl2_screenAsTexture, NULL, NULL);
+    SDL_RenderPresent(sdl2_renderer);
+#else
+    SDL_Flip(screen);
+#endif
 }
 
 void gfx_freepalette()
@@ -798,10 +812,10 @@ void gfx_drawpreview(SDL_Surface * surface, short dstX, short dstY, short srcX, 
         //Deal with wrapping over sides of screen
         bool fBlitSide = false;
         if (dstX < clipX) {
-            rDstRect.x = dstX + smw->ScreenWidth/2;
+            rDstRect.x = dstX + 400;
             fBlitSide = true;
         } else if (dstX + iw >= clipX + clipW) {
-            rDstRect.x = dstX - smw->ScreenWidth/2;
+            rDstRect.x = dstX - 400;
             fBlitSide = true;
         }
 
@@ -880,7 +894,7 @@ bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, Uint8 r, Uint8 g, 
 gfxSprite::gfxSprite()
 {
     clearSurface();
-    iWrapSize = smw->ScreenWidth;
+    iWrapSize = 800;
 }
 
 gfxSprite::~gfxSprite()

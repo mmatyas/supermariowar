@@ -3,6 +3,7 @@
 #include "global.h"                //all the global stuff
 #include "GSMenu.h"
 #include "MatchTypes.h"
+#include "RandomNumberGenerator.h"
 
 #include <math.h>
 
@@ -285,7 +286,7 @@ void GameplayState::initEyeCandy()
                 float velx;         //speed of cloud, small clouds are slower than big ones
                 short srcy, w, h;
 
-                if (smw->rng->GetRandBool()) {
+                if (RANDOM_BOOL()) {
                     velx = (short)(RNGMAX(51) - 25) / 10.0f;    //big clouds: -3 - +3 pixel/frame
                     srcy = 0;
                     w = 60;

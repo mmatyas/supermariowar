@@ -7068,7 +7068,7 @@ void MO_SledgeBrother::wait(short min, short max)
 {
     SetLastAction(2);
 
-    wait_timer = smw->rng->GetRand(min, max);
+    wait_timer = RandomNumberGenerator::generator().getInteger(min, max);
     iActionState = 1;
 
     need_action[3] = 0;
@@ -8995,7 +8995,7 @@ void OMO_Phanto::update()
 
                 //Randomly position phanto off screen
                 setXi(RNGMAX(smw->ScreenWidth));
-				setYi(smw->rng->GetRandBool() ? -ih - CRUNCHMAX: smw->ScreenHeight);
+				setYi(RANDOM_BOOL() ? -ih - CRUNCHMAX: smw->ScreenHeight);
             }
         }
     }

@@ -3,8 +3,6 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "rng.h"
-
 class CGame
 {
 public:
@@ -14,7 +12,6 @@ public:
 	int ScreenWidth;
 	int ScreenHeight;
 	int MenuTransparency;
-	CRandomNumberGenerator	*rng;
 
 	// TODO: move these to a config class/struct
 	int GetScreenWidth(int iSize) {

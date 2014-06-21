@@ -1,12 +1,12 @@
 #include <math.h>
+#include <string.h>
 
 #include "global.h"
 #include "MatchTypes.h"
+#include "RandomNumberGenerator.h"
 
 extern gfxFont font[3];
 extern CScore *score[4];
-
-#include <string.h>
 
 extern short CountAliveTeams(short * lastteam);
 
@@ -402,7 +402,7 @@ short CGameMode::GetScoreRankedPlayerList(CPlayer * players[4], bool fGetHighest
         for (short iIndex = 0; iIndex < iNumPlayersInList - 1; iIndex++) {
             if ((fGetHighest && players[iIndex]->score->score < players[iIndex + 1]->score->score) ||
                     (!fGetHighest && players[iIndex]->score->score > players[iIndex + 1]->score->score) ||
-                    (players[iIndex]->score->score == players[iIndex + 1]->score->score && smw->rng->GetRandBool() && iRandom++ < 5)) {
+                    (players[iIndex]->score->score == players[iIndex + 1]->score->score && RANDOM_BOOL() && iRandom++ < 5)) {
                 CPlayer * pTemp = players[iIndex];
                 players[iIndex] = players[iIndex + 1];
                 players[iIndex + 1] = pTemp;
@@ -1517,7 +1517,7 @@ void CGM_Survival::think()
                 timer = (short)(RNGMAX(21) - 10 + rate - 20);
             } else {
                 float dSpeed = ((float)(RNGMAX(21) + 20)) / 10.0f;
-                float dVel = smw->rng->GetRandBool() ? dSpeed : -dSpeed;
+                float dVel = RANDOM_BOOL() ? dSpeed : -dSpeed;
 
                 short x = -54;
                 if (dVel < 0)
@@ -1985,23 +1985,23 @@ void CGM_Stomp::think()
             }
 
             if (0 == iSelectedEnemy)
-                objectcontainer[0].add(new MO_Goomba(&rm->spr_goomba, smw->rng->GetRandBool(), false));
+                objectcontainer[0].add(new MO_Goomba(&rm->spr_goomba, RANDOM_BOOL(), false));
             else if (1 == iSelectedEnemy)
-                objectcontainer[0].add(new MO_Koopa(&rm->spr_koopa, smw->rng->GetRandBool(), false, false, true));
+                objectcontainer[0].add(new MO_Koopa(&rm->spr_koopa, RANDOM_BOOL(), false, false, true));
             else if (2 == iSelectedEnemy)
                 objectcontainer[2].add(new MO_CheepCheep(&rm->spr_cheepcheep));
             else if (3 == iSelectedEnemy)
-                objectcontainer[0].add(new MO_Koopa(&rm->spr_redkoopa, smw->rng->GetRandBool(), true, false, false));
+                objectcontainer[0].add(new MO_Koopa(&rm->spr_redkoopa, RANDOM_BOOL(), true, false, false));
             else if (4 == iSelectedEnemy)
-                objectcontainer[0].add(new MO_Spiny(&rm->spr_spiny, smw->rng->GetRandBool()));
+                objectcontainer[0].add(new MO_Spiny(&rm->spr_spiny, RANDOM_BOOL()));
             else if (5 == iSelectedEnemy)
-                objectcontainer[0].add(new MO_BuzzyBeetle(&rm->spr_buzzybeetle, smw->rng->GetRandBool()));
+                objectcontainer[0].add(new MO_BuzzyBeetle(&rm->spr_buzzybeetle, RANDOM_BOOL()));
             else if (6 == iSelectedEnemy)
-                objectcontainer[0].add(new MO_Goomba(&rm->spr_paragoomba, smw->rng->GetRandBool(), true));
+                objectcontainer[0].add(new MO_Goomba(&rm->spr_paragoomba, RANDOM_BOOL(), true));
             else if (7 == iSelectedEnemy)
-                objectcontainer[0].add(new MO_Koopa(&rm->spr_parakoopa, smw->rng->GetRandBool(), false, true, true));
+                objectcontainer[0].add(new MO_Koopa(&rm->spr_parakoopa, RANDOM_BOOL(), false, true, true));
             else
-                objectcontainer[0].add(new MO_Koopa(&rm->spr_redparakoopa, smw->rng->GetRandBool(), true, true, true));
+                objectcontainer[0].add(new MO_Koopa(&rm->spr_redparakoopa, RANDOM_BOOL(), true, true, true));
         }
     }
 }
@@ -2974,7 +2974,7 @@ void CGM_Chase::init()
     //Add phantos based on settings
     for (short iPhanto = 0; iPhanto < 3; iPhanto++) {
         for (short iNumPhantos = 0; iNumPhantos < game_values.gamemodesettings.chase.phantoquantity[iPhanto]; iNumPhantos++)
-			objectcontainer[1].add(new OMO_Phanto(&rm->spr_phanto, RNGMAX(smw->ScreenWidth), smw->rng->GetRandBool() ? -32 - CRUNCHMAX : smw->ScreenHeight, 0.0f, 0.0f, iPhanto));
+			objectcontainer[1].add(new OMO_Phanto(&rm->spr_phanto, RNGMAX(smw->ScreenWidth), RANDOM_BOOL() ? -32 - CRUNCHMAX : smw->ScreenHeight, 0.0f, 0.0f, iPhanto));
     }
 
     //Add a key
@@ -3097,7 +3097,7 @@ void CGM_Boss_MiniGame::think()
         if (iBossType == 0) {
             //Randomly spawn koopas
             if (--enemytimer <= 0) {
-                objectcontainer[0].add(new MO_Koopa(&rm->spr_koopa, smw->rng->GetRandBool(), false, false, true));
+                objectcontainer[0].add(new MO_Koopa(&rm->spr_koopa, RANDOM_BOOL(), false, false, true));
                 enemytimer = (short)RNGMAX(120) + 120;  //Spawn koopas slowly
             }
         } else if (iBossType == 1) {

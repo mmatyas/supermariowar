@@ -33,12 +33,8 @@ CGame::CGame(char *rootDirectory)
 
     ScreenWidth = 640;
     ScreenHeight = 480;
-
-	// a supposedly faster RNG
-	rng = new Well512RandomNumberGenerator();
 }
 
 CGame::~CGame(void)
 {
-    delete rng;
 }

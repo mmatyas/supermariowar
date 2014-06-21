@@ -1,7 +1,15 @@
 #ifndef FILELIST_H
 #define FILELIST_H
 
+#include <map>
 #include <string>
+#include <vector>
+
+#include "RandomNumberGenerator.h"
+
+#define MAXMUSICCATEGORY        11
+#define MAXWORLDMUSICCATEGORY   9
+#define MAXCATEGORYTRACKS      64
 
 extern char *lowercaseDup(const char *s);
 

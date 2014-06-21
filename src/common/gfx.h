@@ -28,6 +28,7 @@
 
 bool gfx_init(int w, int h, bool fullscreen);
 void gfx_setresolution(int w, int h, bool fullscreen);
+void gfx_flipscreen();
 
 void gfx_close();
 bool gfx_loadpalette();

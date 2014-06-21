@@ -53,11 +53,6 @@
 
 
 //------ system stuff ------
-#ifdef USE_SDL2
-    SDL_Window       *window;        //the window
-    SDL_Renderer     *renderer;      //screen -> texture -> renderer -> window
-    SDL_Texture      *screenAsTexture;
-#endif
 SDL_Surface		*screen;		//for gfx (maybe the gfx system should be improved -> resource manager)
 SDL_Surface		*blitdest;		//the destination surface for all drawing (can be swapped from screen to another surface)
 
@@ -144,16 +139,7 @@ void gameloop_frame()
         GameStateManager::instance().currentState->update();
 
         FPSLimiter::instance().beforeFlip();
-
-#ifdef USE_SDL2
-        SDL_UpdateTexture(screenAsTexture, NULL, screen->pixels, screen->pitch);
-        SDL_RenderClear(renderer);
-        SDL_RenderCopy(renderer, screenAsTexture, NULL, NULL);
-        SDL_RenderPresent(renderer);
-#else
-        SDL_Flip(screen);
-#endif
-
+        gfx_flipscreen();
         FPSLimiter::instance().afterFlip();
     }
 

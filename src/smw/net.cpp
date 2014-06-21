@@ -2,8 +2,10 @@
 #include <string.h>
 
 #include "net.h"
-#include "GSMenu.h"
+
 #include "FileIO.h"
+#include "GSMenu.h"
+#include "RandomNumberGenerator.h"
 
 #include "network/NetworkProtocolPackages.h"
 
@@ -488,7 +490,7 @@ void NetClient::listen()
                         memcpy(&pkg, incomingData, sizeof(StartSyncPackage));
 
                         //printf("reseed: %d\n", pkg.commonRandomSeed);
-                        smw->rng->ReSeed(pkg.commonRandomSeed);
+                        RandomNumberGenerator::generator().reseed(pkg.commonRandomSeed);
                     }
                     sendSyncOKMessage();
                     break;

@@ -4,6 +4,8 @@
 
 #include "global.h"
 #include "FileIO.h"
+#include "RandomNumberGenerator.h"
+
 #include <iostream>
 using std::cout;
 using std::endl;

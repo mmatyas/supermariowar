@@ -3,9 +3,7 @@
 
 #include "uimenu.h"
 #include "input.h"
-#include "Game.h"
-
-extern CGame *smw;
+#include "RandomNumberGenerator.h"
 
 class UI_Menu;
 

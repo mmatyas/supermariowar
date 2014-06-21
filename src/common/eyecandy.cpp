@@ -2,6 +2,7 @@
 #include <math.h>
 
 #include "global.h"
+#include "RandomNumberGenerator.h"
 
 /*extern SDL_Rect rectSuperStompLeftSrc[8];
 extern SDL_Rect rectSuperStompRightSrc[8];
@@ -222,7 +223,7 @@ void EC_Leaf::NextLeaf()
     velx = RNGMAX(9) / 4.0f;
     vely = RNGMAX(9) / 4.0f + 1.0f;
 
-    fForward = smw->rng->GetRandBool();
+    fForward = RANDOM_BOOL();
     iAnimationFrame = (RNGMAX(3) + (fForward ? 0 : 1)) * iAnimationW;
     iAnimationTimer = RNGMAX(16);
 }
@@ -231,7 +232,7 @@ void EC_Leaf::NextLeaf()
 // class snow
 //------------------------------------------------------------------------------
 EC_Snow::EC_Snow(gfxSprite *nspr, float nx, float ny, short type) :
-    EC_StillImage(nspr, (short)nx, (short)ny, smw->rng->GetRandBool() << 4, type << 4, 16, 16)
+    EC_StillImage(nspr, (short)nx, (short)ny, RANDOM_BOOL() << 4, type << 4, 16, 16)
 {
     dx = nx;
     dy = ny;
