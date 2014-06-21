@@ -1,4 +1,5 @@
 #include "global.h"
+#include "net.h"
 #include <math.h>
 
 extern bool SwapPlayers(short iUsingPlayerID);

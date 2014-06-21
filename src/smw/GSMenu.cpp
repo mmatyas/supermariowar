@@ -1,4 +1,5 @@
 #include "global.h"
+#include "net.h"
 #include "GSMenu.h"
 #include "GSGameplay.h"
 #include "MatchTypes.h"

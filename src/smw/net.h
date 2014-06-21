@@ -1,10 +1,10 @@
 #ifndef NETWORK_H
 #define NETWORK_H
 
+#include <string>
+#include <vector>
+
 #include "input.h"
-
-#include <cassert>
-
 #include "network/NetworkProtocolCodes.h"
 
 
@@ -148,5 +148,7 @@ struct Networking {
     bool theHostIsMe;
     CPlayerInput netPlayerInput;
 };
+
+extern Networking netplay;
 
 #endif // NETWORK_H

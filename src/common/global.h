@@ -19,7 +19,6 @@
 
 #include "sfx.h"
 #include "gfx.h"
-#include "net.h"
 #include "path.h"
 
 
@@ -755,8 +754,6 @@ struct TourStop {
     char szBonusText[5][128];
 };
 
-struct Networking;
-
 //TODO:: Move menu settings from game_values to global menu context structure
 //menu context (like game_values, but for menu)
 /*
@@ -784,7 +781,6 @@ extern std::vector<MapMusicOverride*> mapmusicoverrides;
 extern std::vector<WorldMusicOverride*> worldmusicoverrides;
 
 extern gv game_values;
-extern Networking netplay;
 
 
 #endif // GLOBAL_H

@@ -18,6 +18,7 @@
 #endif
 
 #include "global.h"				//all the global stuff
+#include "net.h"
 #include "linfunc.h"
 
 #include "MatchTypes.h"

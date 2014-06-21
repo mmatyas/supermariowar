@@ -1,6 +1,7 @@
 #include "GSGameplay.h"
 
 #include "global.h"                //all the global stuff
+#include "net.h"
 #include "GSMenu.h"
 #include "MatchTypes.h"
 #include "RandomNumberGenerator.h"

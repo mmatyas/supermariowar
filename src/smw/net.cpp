@@ -1,8 +1,9 @@
-#include "global.h"
+#include <cassert>
 #include <string.h>
 
 #include "net.h"
 
+#include "global.h"
 #include "FileIO.h"
 #include "GSMenu.h"
 #include "RandomNumberGenerator.h"
