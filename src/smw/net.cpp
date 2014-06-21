@@ -187,8 +187,8 @@ void NetClient::endSession()
 void NetClient::sendGoodbye()
 {
     //printf("sendGoodbye\n");
-    ClientDisconnectionPackage msg;
-    sendMessage(&msg, sizeof(ClientDisconnectionPackage));
+    Net_ClientDisconnectionPackage msg;
+    sendMessage(&msg, sizeof(Net_ClientDisconnectionPackage));
 }
 
 /****************************
@@ -197,8 +197,8 @@ void NetClient::sendGoodbye()
 
 void NetClient::requestRoomList()
 {
-    RoomListPackage msg;
-    sendMessage(&msg, sizeof(RoomListPackage));
+    Net_RoomListPackage msg;
+    sendMessage(&msg, sizeof(Net_RoomListPackage));
 
     if (uiRoomList)
         uiRoomList->Clear();
@@ -209,8 +209,8 @@ bool NetClient::sendConnectRequestToSelectedServer()
     ServerAddress* selectedServer = &netplay.savedServers[netplay.selectedServerIndex];
     if (openConnection(selectedServer->hostname.c_str()))
     {
-        ClientConnectionPackage message(netplay.myPlayerName);
-        sendMessage(&message, sizeof(ClientConnectionPackage));
+        Net_ClientConnectionPackage message(netplay.myPlayerName);
+        sendMessage(&message, sizeof(Net_ClientConnectionPackage));
         netplay.operationInProgress = true;
         return true;
     }
@@ -219,9 +219,9 @@ bool NetClient::sendConnectRequestToSelectedServer()
 
 void NetClient::sendCreateRoomMessage()
 {
-    NewRoomPackage msg(netplay.newroom_name, netplay.newroom_password);
+    Net_NewRoomPackage msg(netplay.newroom_name, netplay.newroom_password);
 
-    sendMessage(&msg, sizeof(NewRoomPackage));
+    sendMessage(&msg, sizeof(Net_NewRoomPackage));
     netplay.operationInProgress = true;
 }
 
@@ -231,33 +231,33 @@ void NetClient::sendJoinRoomMessage()
         return;
 
     // TODO: implement password
-    JoinRoomPackage msg(netplay.currentRooms.at(netplay.selectedRoomIndex).roomID, "");
-    sendMessage(&msg, sizeof(JoinRoomPackage));
+    Net_JoinRoomPackage msg(netplay.currentRooms.at(netplay.selectedRoomIndex).roomID, "");
+    sendMessage(&msg, sizeof(Net_JoinRoomPackage));
     netplay.operationInProgress = true;
 }
 
 void NetClient::sendLeaveRoomMessage()
 {
-    LeaveRoomPackage msg;
-    sendMessage(&msg, sizeof(LeaveRoomPackage));
+    Net_LeaveRoomPackage msg;
+    sendMessage(&msg, sizeof(Net_LeaveRoomPackage));
 }
 
 void NetClient::sendStartRoomMessage()
 {
-    StartRoomPackage msg;
-    sendMessage(&msg, sizeof(StartRoomPackage));
+    Net_StartRoomPackage msg;
+    sendMessage(&msg, sizeof(Net_StartRoomPackage));
 }
 
 void NetClient::sendSyncOKMessage()
 {
-    SyncOKPackage msg;
-    sendMessage(&msg, sizeof(SyncOKPackage));
+    Net_SyncOKPackage msg;
+    sendMessage(&msg, sizeof(Net_SyncOKPackage));
 }
 
 void NetClient::sendLocalInput()
 {
-    LocalInputPackage pkg(&netplay.netPlayerInput.outputControls[0]);
-    sendMessage(&pkg, sizeof(LocalInputPackage));
+    Net_LocalInputPackage pkg(&netplay.netPlayerInput.outputControls[0]);
+    sendMessage(&pkg, sizeof(Net_LocalInputPackage));
 }
 
 void NetClient::sendCurrentGameState()
@@ -265,7 +265,7 @@ void NetClient::sendCurrentGameState()
     if (!netplay.theHostIsMe)
         return;
 
-    GameStatePackage pkg;
+    Net_GameStatePackage pkg;
 
     for (uint8_t p = 0; p < list_players_cnt; p++) {
         pkg.setPlayerCoord(p, list_players[p]->fx, list_players[p]->fy);
@@ -273,7 +273,7 @@ void NetClient::sendCurrentGameState()
         pkg.setPlayerKeys(p, &netplay.netPlayerInput.outputControls[p]);
     }
 
-    sendMessage(&pkg, sizeof(GameStatePackage));
+    sendMessage(&pkg, sizeof(Net_GameStatePackage));
 }
 
 /****************************
@@ -282,8 +282,8 @@ void NetClient::sendCurrentGameState()
 
 void NetClient::handleServerinfoAndClose()
 {
-    ServerInfoPackage serverInfo;
-    memcpy(&serverInfo, incomingData, sizeof(ServerInfoPackage));
+    Net_ServerInfoPackage serverInfo;
+    memcpy(&serverInfo, incomingData, sizeof(Net_ServerInfoPackage));
 
     printf("NET_RESPONSE_SERVERINFO [%lu byte]\n", sizeof(serverInfo));
     printf("Sending:\n  protocolVersion: %d\n  packageType: %d\n  name: %s\n  players/max: %d / %d\n",
@@ -294,8 +294,8 @@ void NetClient::handleServerinfoAndClose()
 
 void NetClient::handleNewRoomListEntry()
 {
-    RoomInfoPackage roomInfo;
-    memcpy(&roomInfo, incomingData, sizeof(RoomInfoPackage));
+    Net_RoomInfoPackage roomInfo;
+    memcpy(&roomInfo, incomingData, sizeof(Net_RoomInfoPackage));
     //printf("  Incoming room entry: [%u] %s (%d/4)\n", roomInfo.roomID, roomInfo.name, roomInfo.currentPlayerCount);
 
     RoomListEntry newRoom;
@@ -312,8 +312,8 @@ void NetClient::handleNewRoomListEntry()
 
 void NetClient::handleRoomCreatedMessage()
 {
-    NewRoomCreatedPackage pkg;
-    memcpy(&pkg, incomingData, sizeof(NewRoomCreatedPackage));
+    Net_NewRoomCreatedPackage pkg;
+    memcpy(&pkg, incomingData, sizeof(Net_NewRoomCreatedPackage));
 
     netplay.currentRoom.roomID = pkg.roomID;
     netplay.currentRoom.hostPlayerNumber = 0;
@@ -336,8 +336,8 @@ void NetClient::handleRoomCreatedMessage()
 
 void NetClient::handleRoomChangedMessage()
 {
-    CurrentRoomPackage pkg;
-    memcpy(&pkg, incomingData, sizeof(CurrentRoomPackage));
+    Net_CurrentRoomPackage pkg;
+    memcpy(&pkg, incomingData, sizeof(Net_CurrentRoomPackage));
 
     netplay.currentRoom.roomID = pkg.roomID;
     memcpy(netplay.currentRoom.name, pkg.name, NET_MAX_ROOM_NAME_LENGTH);
@@ -374,8 +374,8 @@ void NetClient::handleRemoteInput() // only for room host
 {
     assert(netplay.theHostIsMe);
 
-    RemoteInputPackage pkg;
-    memcpy(&pkg, incomingData, sizeof(RemoteInputPackage));
+    Net_RemoteInputPackage pkg;
+    memcpy(&pkg, incomingData, sizeof(Net_RemoteInputPackage));
 
     pkg.readKeys(&netplay.netPlayerInput.outputControls[pkg.playerNumber]);
 }
@@ -384,8 +384,8 @@ void NetClient::handleRemoteGameState() // for other clients
 {
     assert(!netplay.theHostIsMe);
 
-    GameStatePackage pkg;
-    memcpy(&pkg, incomingData, sizeof(GameStatePackage));
+    Net_GameStatePackage pkg;
+    memcpy(&pkg, incomingData, sizeof(Net_GameStatePackage));
 
     for (uint8_t p = 0; p < list_players_cnt; p++) {
         pkg.getPlayerCoord(p, list_players[p]->fx, list_players[p]->fy);
@@ -487,8 +487,8 @@ void NetClient::listen()
                 case NET_NOTICE_GAME_SYNC:
                     printf("NET_NOTICE_GAME_SYNC\n");
                     {
-                        StartSyncPackage pkg;
-                        memcpy(&pkg, incomingData, sizeof(StartSyncPackage));
+                        Net_StartSyncPackage pkg;
+                        memcpy(&pkg, incomingData, sizeof(Net_StartSyncPackage));
 
                         //printf("reseed: %d\n", pkg.commonRandomSeed);
                         RandomNumberGenerator::generator().reseed(pkg.commonRandomSeed);
