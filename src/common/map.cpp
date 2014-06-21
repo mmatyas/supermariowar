@@ -51,6 +51,8 @@ extern bool VersionIsEqualOrAfter(int iVersion[], short iMajor, short iMinor, sh
 //Converts the tile type into the flags that this tile carries (solid + ice + death, etc)
 short g_iTileTypeConversion[NUMTILETYPES] = {0, 1, 2, 5, 121, 9, 17, 33, 65, 6, 21, 37, 69, 3961, 265, 529, 1057, 2113, 4096};
 
+short g_iCurrentDrawIndex = 0;
+
 CMap::CMap()
 {
     platforms = NULL;

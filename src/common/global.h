@@ -503,8 +503,6 @@ extern char szIPString[32];
 extern short g_iDefaultPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
 extern short g_iCurrentPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
 
-extern short g_iCurrentDrawIndex;
-
 void _load_drawmsg(const std::string& f);
 void _load_waitforkey();
 

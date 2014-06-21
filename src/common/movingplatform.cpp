@@ -6,6 +6,8 @@
 extern short x_shake;
 extern short y_shake;
 
+extern short g_iCurrentDrawIndex;
+
 enum CollisionStyle {collision_none, collision_normal, collision_overlap_left, collision_overlap_right};
 
 //------------------------------------------------------------------------------

@@ -8,6 +8,7 @@
 
 #include <math.h>
 
+extern short g_iCurrentDrawIndex;
 
 CEyecandyContainer eyecandy[3];
 SpotlightManager spotlightManager;
