@@ -26,17 +26,6 @@
 enum gs {GS_SPLASH, GS_MENU, GS_START_GAME, GS_START_WORLD, GS_END_GAME, GS_GAME, GS_QUIT};
 
 
-struct STextAward {
-    const char		*name;
-    gfxFont			*font;
-
-    STextAward(const char *nname, gfxFont *nfont) {
-        name = nname;
-        font = nfont;
-    }
-};
-
-
 //------------- global definitions -------------
 
 

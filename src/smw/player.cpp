@@ -10,8 +10,17 @@ extern short g_iSwirlSpawnLocations[4][2][25];
 extern void CheckSecret(short id);
 extern SpotlightManager spotlightManager;
 
-#define PAWARD_LAST     9
+struct STextAward {
+    const char      *name;
+    gfxFont         *font;
 
+    STextAward(const char *nname, gfxFont *nfont) {
+        name = nname;
+        font = nfont;
+    }
+};
+
+#define PAWARD_LAST     9
 STextAward awardtexts[PAWARD_LAST] = {
     STextAward("Double Kill", &rm->game_font_small),
     STextAward("Triple Kill", &rm->game_font_small),
