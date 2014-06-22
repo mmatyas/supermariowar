@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include "path.h"
 #include "RandomNumberGenerator.h"
 
 #define MAXMUSICCATEGORY        11
