@@ -812,10 +812,10 @@ void gfx_drawpreview(SDL_Surface * surface, short dstX, short dstY, short srcX, 
         //Deal with wrapping over sides of screen
         bool fBlitSide = false;
         if (dstX < clipX) {
-            rDstRect.x = dstX + 400;
+            rDstRect.x = dstX + 320; // TODO: Get it from a global setting.
             fBlitSide = true;
         } else if (dstX + iw >= clipX + clipW) {
-            rDstRect.x = dstX - 400;
+            rDstRect.x = dstX - 320; // TODO: Get it from a global setting.
             fBlitSide = true;
         }
 
@@ -894,7 +894,7 @@ bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, Uint8 r, Uint8 g, 
 gfxSprite::gfxSprite()
 {
     clearSurface();
-    iWrapSize = 800;
+    iWrapSize = 640; // TODO: Get it from a global setting.
 }
 
 gfxSprite::~gfxSprite()
