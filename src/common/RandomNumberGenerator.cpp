@@ -9,25 +9,25 @@
 // ABSTRACT RNG CLASS
 //
 
-void RandomNumberGeneratoreratorType::reseed(unsigned seed)
+void RandomNumberGeneratorType::reseed(unsigned seed)
 {
     srand(seed);
 }
 
 // generate uniformly distributed random number
 // rMax is not part of the set
-int RandomNumberGeneratoreratorType::getInteger(int rMax)
+int RandomNumberGeneratorType::getInteger(int rMax)
 {
     return getInteger(0, rMax);
 }
 
-bool RandomNumberGeneratoreratorType::getBoolean()
+bool RandomNumberGeneratorType::getBoolean()
 {
     return getBoolean(2);
 }
 
 // will return true only if 1/scaleMax is verified
-bool RandomNumberGeneratoreratorType::getBoolean(int scaleMax)
+bool RandomNumberGeneratorType::getBoolean(int scaleMax)
 {
     // maybe we shall match center of range, like (scaleMax/2 - 1) ?
     return 0 == getInteger(scaleMax);
@@ -35,7 +35,7 @@ bool RandomNumberGeneratoreratorType::getBoolean(int scaleMax)
 
 // make a decision using 'scaleMax' steps and 'positiveThreshold' as threshold
 // returns true only when random value is above the threshold
-bool RandomNumberGeneratoreratorType::getBoolean(int scaleMax, int positiveThreshold)
+bool RandomNumberGeneratorType::getBoolean(int scaleMax, int positiveThreshold)
 {
     assert(positiveThreshold < scaleMax && positiveThreshold >= 0);
     return getInteger(scaleMax) > positiveThreshold;
@@ -46,14 +46,14 @@ bool RandomNumberGeneratoreratorType::getBoolean(int scaleMax, int positiveThres
 //
 
 RandomNumberGenerator::RandomNumberGenerator() {
-    rng = new Well512RandomNumberGeneratorerator();
+    rng = new Well512RandomNumberGenerator();
 }
 
 RandomNumberGenerator::~RandomNumberGenerator() {
     delete rng;
 }
 
-RandomNumberGeneratoreratorType& RandomNumberGenerator::generator() {
+RandomNumberGeneratorType& RandomNumberGenerator::generator() {
     static RandomNumberGenerator grng;
     return *(grng.rng);
 }
@@ -63,7 +63,7 @@ RandomNumberGeneratoreratorType& RandomNumberGenerator::generator() {
 //
 
 // default random number generator, using system
-int SystemRandomNumberGeneratorerator::getInteger(int rMin, int rMax)
+int SystemRandomNumberGenerator::getInteger(int rMin, int rMax)
 {
     assert(rMax > rMin);
     int rVal = ((double) rand() / (((float)RAND_MAX)+1)) * (rMax-rMin) + rMin;
@@ -77,7 +77,7 @@ int SystemRandomNumberGeneratorerator::getInteger(int rMin, int rMax)
 
 // we initialize the state with (supposedly) true random numbers coming from the system
 // this constitutes a good enough seed
-unsigned Well512RandomNumberGeneratorerator::getNext()
+unsigned Well512RandomNumberGenerator::getNext()
 {
    unsigned a, b, c, d;
    a = state[index];
@@ -93,7 +93,7 @@ unsigned Well512RandomNumberGeneratorerator::getNext()
    return state[index];
 }
 
-void Well512RandomNumberGeneratorerator::initialize()
+void Well512RandomNumberGenerator::initialize()
 {
     index = 0;
     srand(time(0));
@@ -102,7 +102,7 @@ void Well512RandomNumberGeneratorerator::initialize()
     }
 }
 
-void Well512RandomNumberGeneratorerator::initialize(unsigned seed)
+void Well512RandomNumberGenerator::initialize(unsigned seed)
 {
     assert(sizeof(unsigned) == 4);
 
@@ -115,17 +115,17 @@ void Well512RandomNumberGeneratorerator::initialize(unsigned seed)
 
 // we initialize the state with (supposedly) true random numbers coming from the system
 // this constitutes a good enough seed
-Well512RandomNumberGeneratorerator::Well512RandomNumberGeneratorerator()
+Well512RandomNumberGenerator::Well512RandomNumberGenerator()
 {
     initialize();
 }
 
-void Well512RandomNumberGeneratorerator::reseed(unsigned seed)
+void Well512RandomNumberGenerator::reseed(unsigned seed)
 {
     initialize(seed);
 }
 
-int Well512RandomNumberGeneratorerator::getInteger(int rMin, int rMax)
+int Well512RandomNumberGenerator::getInteger(int rMin, int rMax)
 {
     assert(rMax > rMin);
     int rVal = ((double) getNext() / (((float)UINT_MAX)+1)) * (rMax-rMin) + rMin;

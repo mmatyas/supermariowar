@@ -4,7 +4,7 @@
 #define RNGMAX(rMaxInt) RandomNumberGenerator::generator().getInteger(rMaxInt)
 #define RANDOM_BOOL() RandomNumberGenerator::generator().getBoolean()
 
-class RandomNumberGeneratoreratorType {
+class RandomNumberGeneratorType {
 public:
     virtual void reseed(unsigned seed);
     virtual int getInteger(int min, int max) = 0;
@@ -25,7 +25,7 @@ public:
 
 class RandomNumberGenerator {
 public:
-    static RandomNumberGeneratoreratorType& generator();
+    static RandomNumberGeneratorType& generator();
 
 private:
     RandomNumberGenerator();
@@ -33,18 +33,18 @@ private:
     RandomNumberGenerator(RandomNumberGenerator const&);
     void operator=(RandomNumberGenerator const&);
 
-    RandomNumberGeneratoreratorType* rng;
+    RandomNumberGeneratorType* rng;
 };
 
 // default random number generator, using system
-class SystemRandomNumberGeneratorerator : public RandomNumberGeneratoreratorType {
+class SystemRandomNumberGenerator : public RandomNumberGeneratorType {
 public:
     int getInteger(int rMin, int rMax);
 };
 
 
 // default random number generator, using system
-class Well512RandomNumberGeneratorerator : public RandomNumberGeneratoreratorType {
+class Well512RandomNumberGenerator : public RandomNumberGeneratorType {
 private:
     /* initialize state to random bits */
     unsigned state[16];
@@ -59,7 +59,7 @@ private:
 
 public:
 
-    Well512RandomNumberGeneratorerator();
+    Well512RandomNumberGenerator();
     void reseed(unsigned seed);
     int getInteger(int rMin, int rMax);
 };
