@@ -58,13 +58,11 @@ gfxSprite		spr_warps[3];
 CMap			g_map;
 
 //// Global stuff that the map editor doesn't need, but has references to
-gfxSprite		spr_frontmap;
 SDL_Surface		*screen;
 SDL_Surface		*blitdest;
 
 //GraphicsList menugraphicspacklist;
 GraphicsList gamegraphicspacklist;
-FiltersList *filterslist;
 gfxSprite		spr_warplock;
 short			x_shake = 0;
 short			y_shake = 0;
@@ -73,23 +71,13 @@ void CPlayer::flipsidesifneeded() {}
 void CPlayer::KillPlayerMapHazard() {}
 void IO_MovingObject::flipsidesifneeded() {}
 void IO_MovingObject::KillObjectMapHazard() {}
-float CapFallingVelocity(float f)
-{
-    return 0.0f;
-}
 void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead) {}
-gfxSprite		spr_thumbnail_platformarrows;
-gfxSprite		spr_thumbnail_warps[2];
 ///////
 
 void drawmap(bool fScreenshot, short iBlockSize);
 
 void loadmap(char * szMapFile);
 void takescreenshot();
-
-bool viewblocks = true;
-bool view_only_layer = false;
-bool viewwarps = true;
 
 short g_iNumPlatforms = 0;
 MapPlatform g_Platforms[MAX_PLATFORMS];

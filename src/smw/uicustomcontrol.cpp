@@ -1,6 +1,5 @@
 #include "global.h"
 #include "GSMenu.h"
-#include "MatchTypes.h"
 #include <math.h>
 
 #ifndef __EMSCRIPTEN__

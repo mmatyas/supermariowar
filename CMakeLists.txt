@@ -385,6 +385,7 @@ set(COMMON_SRCS ../common/FileIO.cpp ../common/FileList.cpp ../common/MapList.cp
            ../common/map.cpp ../common/movingplatform.cpp ../common/path.cpp
            ../common/Game.cpp ../common/sfx.cpp ../common/ResourceManager.cpp
            ../common/uicontrol.cpp ../common/uimenu.cpp ../common/linfunc.cpp
+           ../common/GameValues.cpp ../common/GameModeSettings.cpp
 )
 
 include_directories(src/smw)

@@ -21,7 +21,6 @@
 #include "net.h"
 #include "linfunc.h"
 
-#include "MatchTypes.h"
 #include "FPSLimiter.h"
 #include "GSSplashScreen.h"
 
@@ -82,32 +81,8 @@ CGM_Boxes_MiniGame	*boxesgamemode = NULL;
 
 short		currentgamemode = 0;
 
-float CapFallingVelocity(float vel)
-{
-    //if (vel < -MAXVELY)
-    //    return -MAXVELY;
-
-    if (vel > MAXVELY)
-        return MAXVELY;
-
-    return vel;
-}
-
-float CapSideVelocity(float vel)
-{
-    if (vel < -MAXSIDEVELY)
-        return -MAXSIDEVELY;
-
-    if (vel > MAXSIDEVELY)
-        return MAXSIDEVELY;
-
-    return vel;
-}
-
 //Adds music overrides to the music lists
 void UpdateMusicWithOverrides();
-
-void SetupDefaultGameModeSettings();
 
 
 //*************************************
@@ -248,6 +223,9 @@ int main(int argc, char *argv[])
 
     printf("\n---------------- loading ----------------\n");
 
+    for (short iScore = 0; iScore < 4; iScore++)
+        score[iScore] = new CScore(iScore);
+
     game_values.init();
 
     //Set the default powerup weights for bonus wheel and [?] boxes
@@ -300,8 +278,7 @@ int main(int argc, char *argv[])
     bossgamemode = new CGM_Boss_MiniGame();
     boxesgamemode = new CGM_Boxes_MiniGame();
 
-    game_values.SetupDefaultGameModeSettings();
-	game_values.ReadBinaryConfig();
+    game_values.ReadBinaryConfig();
 
     //Assign the powerup weights to the selected preset
     for (short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {

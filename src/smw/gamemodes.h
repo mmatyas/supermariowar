@@ -1,6 +1,8 @@
 #ifndef GAMEMODES_H
 #define GAMEMODES_H
 
+#include "player.h"
+
 #define GAMEMODE_NUM_OPTIONS 21
 
 //Enum for each game mode
@@ -14,6 +16,7 @@ struct SModeOption {
 
 struct TourStop;
 class CO_PhantoKey;
+class CO_Star;
 
 class GameTimerDisplay
 {

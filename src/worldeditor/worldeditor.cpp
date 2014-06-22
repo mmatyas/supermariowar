@@ -389,7 +389,6 @@ SDL_Surface * sMapThumbnail = NULL;
 short iOldStageId = -1;
 
 //Sets up default mode options
-extern void SetupDefaultGameModeSettings();
 extern void LoadMapHazards(bool fPreview);
 
 struct StageModeOption {
@@ -579,8 +578,6 @@ int main(int argc, char *argv[])
 
 
 	sMapSurface = SDL_CreateRGBSurface(screen->flags, 768, 608, screen->format->BitsPerPixel, 0, 0, 0, 0);
-
-	SetupDefaultGameModeSettings();
 
     worldlist->find(findstring);
     game_values.worldindex = worldlist->GetCurrentIndex();

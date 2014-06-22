@@ -33,6 +33,28 @@ STextAward awardtexts[PAWARD_LAST] = {
     STextAward("Unstoppable!", &rm->game_font_large)
 };
 
+float CapFallingVelocity(float vel)
+{
+    //if (vel < -MAXVELY)
+    //    return -MAXVELY;
+
+    if (vel > MAXVELY)
+        return MAXVELY;
+
+    return vel;
+}
+
+float CapSideVelocity(float vel)
+{
+    if (vel < -MAXSIDEVELY)
+        return -MAXSIDEVELY;
+
+    if (vel > MAXSIDEVELY)
+        return MAXSIDEVELY;
+
+    return vel;
+}
+
 void CScore::AdjustScore(short iValue)
 {
     if (game_values.gamemode->gameover)

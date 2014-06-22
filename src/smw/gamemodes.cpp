@@ -2,7 +2,6 @@
 #include <string.h>
 
 #include "global.h"
-#include "MatchTypes.h"
 #include "RandomNumberGenerator.h"
 
 extern gfxFont font[3];

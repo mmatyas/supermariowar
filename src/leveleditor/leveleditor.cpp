@@ -163,16 +163,8 @@ gfxSprite		spr_warplock;
 short			x_shake = 0;
 short			y_shake = 0;
 void CPlayer::flipsidesifneeded() {}
-short CPlayer::KillPlayerMapHazard(bool fForce, killstyle style, bool fKillCarriedItem, short iPlayerId)
-{
-    return 0;
-}
 void IO_MovingObject::flipsidesifneeded() {}
 void IO_MovingObject::KillObjectMapHazard(short playerID) {}
-float CapFallingVelocity(float f)
-{
-    return 0.0f;
-}
 void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead) {}
 gfxSprite		spr_thumbnail_warps[2];
 gfxSprite		spr_thumbnail_mapitems[2];
@@ -187,7 +179,6 @@ short			list_players_cnt = 0;
 void DECLSPEC soundfinished(int channel){}
 void DECLSPEC musicfinished(){}
 sfxSound * g_PlayingSoundChannels[NUM_SOUND_CHANNELS];
-short			g_iCurrentDrawIndex = 0;
 gfxSprite		menu_dialog;
 
 IO_MovingObject * createpowerup(short iType, short ix, short iy, bool side, bool spawn)

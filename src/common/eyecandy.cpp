@@ -2,7 +2,13 @@
 #include <math.h>
 
 #include "global.h"
+#include "eyecandy.h"
+#include "GameValues.h"
 #include "RandomNumberGenerator.h"
+#include "Game.h"
+
+extern CGame * smw;
+extern gv game_values;
 
 /*extern SDL_Rect rectSuperStompLeftSrc[8];
 extern SDL_Rect rectSuperStompRightSrc[8];

@@ -2,7 +2,6 @@
 #include "net.h"
 #include "GSMenu.h"
 #include "GSGameplay.h"
-#include "MatchTypes.h"
 #include "FileIO.h"
 
 #include <math.h>
