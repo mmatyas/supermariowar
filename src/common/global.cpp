@@ -4,7 +4,6 @@
 #include "FileIO.h"
 #include "GameValues.h"
 #include "gfx.h"
-extern bool g_fLoadMessages;
 
 #include <cassert>
 
@@ -18,9 +17,9 @@ extern bool g_fLoadMessages;
 int g_iVersion[] = {2, 0, 0, 0};
 
 // main game directory, read from command line argument
-char		*RootDataDirectory = "data";
+char *RootDataDirectory = "data";
 
-CGame	*smw;
+CGame *smw;
 CResourceManager *rm;
 
 bool VersionIsEqual(int iVersion[], short iMajor, short iMinor, short iMicro, short iBuild)
@@ -217,7 +216,7 @@ void _load_drawmsg(const std::string& f)
         r.w = 500;
         r.h = (Uint16)menu_font_small.getHeight();
         Uint32 col = SDL_MapRGB(screen->format, 189, 251, 255);
-        SDL_FillRect(screen, &r, col);		//fill empty area
+        SDL_FillRect(screen, &r, col);      //fill empty area
         */
 
         rm->menu_font_small.draw(0, 0, f.c_str());
@@ -273,15 +272,15 @@ void GetNameFromFileName(char * szName, const char * szFileName, bool fStripAuth
 //and the first letter of the name will come back capitalized
 std::string stripCreatorAndDotMap(const std::string &filename)
 {
-    size_t firstUnderscore = filename.find("_");	//find first _
-    if (firstUnderscore == std::string::npos)	//if not found start with first character
+    size_t firstUnderscore = filename.find("_");    //find first _
+    if (firstUnderscore == std::string::npos)   //if not found start with first character
         firstUnderscore = 0;
     else
-        firstUnderscore++;						//we don't want the _
+        firstUnderscore++;                      //we don't want the _
 
-    std::string withoutPrefix = filename.substr(firstUnderscore);	//substring without bla_ and .map (length-4)
-    withoutPrefix = withoutPrefix.substr(0, withoutPrefix.length() - 4);		//i have no idea why this doesn't work if i do it like this: (leaves .map if the map starts with an underscore)
-    //																return filename.substr(firstUnderscore, filename.length()-4);
+    std::string withoutPrefix = filename.substr(firstUnderscore);   //substring without bla_ and .map (length-4)
+    withoutPrefix = withoutPrefix.substr(0, withoutPrefix.length() - 4);        //i have no idea why this doesn't work if i do it like this: (leaves .map if the map starts with an underscore)
+    //                                                              return filename.substr(firstUnderscore, filename.length()-4);
 
     //Capitalize the first letter so the hash table sorting works correctly
     if (withoutPrefix[0] >= 97 && withoutPrefix[0] <= 122)
@@ -293,18 +292,18 @@ std::string stripCreatorAndDotMap(const std::string &filename)
 //Takes a path to a file and gives you back just the name of the file with no author or file extention
 std::string stripPathAndExtension(const std::string &path)
 {
-    size_t chopHere = path.find("_");	//find first _
-    if (chopHere == std::string::npos) {	//if not found, then find the beginning of the filename
-        chopHere = path.find_last_of(getDirectorySeperator());	//find last /
-        if (chopHere == std::string::npos)	//if not found, start with first character
+    size_t chopHere = path.find("_");   //find first _
+    if (chopHere == std::string::npos) {    //if not found, then find the beginning of the filename
+        chopHere = path.find_last_of(getDirectorySeperator());  //find last /
+        if (chopHere == std::string::npos)  //if not found, start with first character
             chopHere = 0;
         else
-            chopHere++;						//we don't want the /
+            chopHere++;                     //we don't want the /
     } else {
-        chopHere++;						//we don't want the _
+        chopHere++;                     //we don't want the _
     }
 
-    std::string withoutPath = path.substr(chopHere);	//substring without bla_
+    std::string withoutPath = path.substr(chopHere);    //substring without bla_
     withoutPath = withoutPath.substr(0, withoutPath.length() - 4); //and without extension like .map (length-4)
 
     return withoutPath;
@@ -633,6 +632,8 @@ short iStandardOffset[3] = {0, 32, 48};
 float dBulletBillFrequency[3] = {10.0f, 5.0f, 2.5f};
 
 short iPirhanaPlantOffsetY[4][3] = {{0, 0, 0}, {48, 24, 12}, {96, 48, 24}, {160, 80, 40}};
+
+
 void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
 {
     short iSizeShift = 5 - iSize;
@@ -775,98 +776,46 @@ short iCountDownAnnounce[28] = {-1, -1, -1, 12, -1, -1, -1, -1, -1, -1, 13, -1, 
 
 TileType GetIncrementedTileType(TileType type)
 {
-    if (type == tile_nonsolid)
+    switch (type) {
+    case tile_nonsolid:
         return tile_solid;
-    else if (type == tile_solid)
+    case tile_solid:
         return tile_solid_on_top;
-    else if (type == tile_solid_on_top)
+    case tile_solid_on_top:
         return tile_ice;
-    else if (type == tile_ice)
+    case tile_ice:
         return tile_death;
-    else if (type == tile_death)
+    case tile_death:
         return tile_death_on_top;
-    else if (type == tile_death_on_top)
+    case tile_death_on_top:
         return tile_death_on_bottom;
-    else if (type == tile_death_on_bottom)
+    case tile_death_on_bottom:
         return tile_death_on_left;
-    else if (type == tile_death_on_left)
+    case tile_death_on_left:
         return tile_death_on_right;
-    else if (type == tile_death_on_right)
+    case tile_death_on_right:
         return tile_ice_on_top;
-    else if (type == tile_ice_on_top)
+    case tile_ice_on_top:
         return tile_ice_death_on_bottom;
-    else if (type == tile_ice_death_on_bottom)
+    case tile_ice_death_on_bottom:
         return tile_ice_death_on_left;
-    else if (type == tile_ice_death_on_left)
+    case tile_ice_death_on_left:
         return tile_ice_death_on_right;
-    else if (type == tile_ice_death_on_right)
+    case tile_ice_death_on_right:
         return tile_super_death;
-    else if (type == tile_super_death)
+    case tile_super_death:
         return tile_super_death_top;
-    else if (type == tile_super_death_top)
+    case tile_super_death_top:
         return tile_super_death_bottom;
-    else if (type == tile_super_death_bottom)
+    case tile_super_death_bottom:
         return tile_super_death_left;
-    else if (type == tile_super_death_left)
+    case tile_super_death_left:
         return tile_super_death_right;
-    else if (type == tile_super_death_right)
+    case tile_super_death_right:
         return tile_player_death;
-    else if (type == tile_player_death)
+    case tile_player_death:
         return tile_nonsolid;
+    }
 
     return tile_nonsolid;
-}
-
-extern IO_MovingObject * createpowerup(short iType, short ix, short iy, bool side, bool spawn);
-
-void CheckSecret(short id)
-{
-    if (id == 0 && !game_values.unlocksecretunlocked[0]) {
-        short iCountTeams = 0;
-        for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
-            if (game_values.unlocksecret1part1[iPlayer])
-                iCountTeams++;
-        }
-
-        if (iCountTeams >= 2 && game_values.unlocksecret1part2 >= 8) {
-            game_values.unlocksecretunlocked[0] = true;
-            ifSoundOnPlay(rm->sfx_transform);
-
-            IO_MovingObject * object = createpowerup(SECRET1_POWERUP, RNGMAX(smw->ScreenWidth), RNGMAX(smw->ScreenHeight), true, false);
-
-            if (object)
-                eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->ix - 8, object->iy - 8, 4, 5));
-        }
-    } else if (id == 1 && !game_values.unlocksecretunlocked[1]) {
-        if (game_values.unlocksecret2part1 && game_values.unlocksecret2part2 >= 3) {
-            game_values.unlocksecretunlocked[1] = true;
-            ifSoundOnPlay(rm->sfx_transform);
-
-            IO_MovingObject * object = createpowerup(SECRET2_POWERUP, RNGMAX(smw->ScreenWidth), RNGMAX(smw->ScreenHeight), true, false);
-
-            if (object)
-                eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->ix - 8, object->iy - 8, 4, 5));
-        }
-    } else if (id == 2 && !game_values.unlocksecretunlocked[2]) {
-        for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
-            //number of songs on thriller + number of released albums (figure it out :))
-            if (game_values.unlocksecret3part1[iPlayer] >= 9 && game_values.unlocksecret3part2[iPlayer] >= 13) {
-                game_values.unlocksecretunlocked[2] = true;
-                ifSoundOnPlay(rm->sfx_transform);
-
-                IO_MovingObject * object = createpowerup(SECRET3_POWERUP, RNGMAX(smw->ScreenWidth), RNGMAX(smw->ScreenHeight), true, false);
-
-                if (object)
-                    eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->ix - 8, object->iy - 8, 4, 5));
-            }
-        }
-    } else if (id == 3 && !game_values.unlocksecretunlocked[3]) {
-        game_values.unlocksecretunlocked[3] = true;
-        ifSoundOnPlay(rm->sfx_transform);
-
-        IO_MovingObject * object = createpowerup(SECRET4_POWERUP, RNGMAX(smw->ScreenWidth), RNGMAX(smw->ScreenHeight), true, false);
-
-        if (object)
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, object->ix - 8, object->iy - 8, 4, 5));
-    }
 }
