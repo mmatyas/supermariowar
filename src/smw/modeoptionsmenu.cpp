@@ -1,5 +1,13 @@
-#include "global.h"
-#include "GSMenu.h"
+#include "modeoptionsmenu.h"
+
+//#include "global.h"
+//#include "GSMenu.h"
+#include "GameValues.h"
+#include "GameMode.h"
+#include "ResourceManager.h"
+
+extern CGameValues game_values;
+extern CResourceManager* rm;
 
 
 void ModeOptionsMenu::CreateMenu()
@@ -853,7 +861,7 @@ void ModeOptionsMenu::CreateMenu()
     // Frenzy Mode Settings
     //***********************
 
-    miFrenzyModeOptions = new MI_FrenzyModeOptions(50, 44, smw->ScreenWidth, 7);
+    miFrenzyModeOptions = new MI_FrenzyModeOptions(50, 44, 640, 7);
     miFrenzyModeOptions->SetAutoModify(true);
 
     miFrenzyModeLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);

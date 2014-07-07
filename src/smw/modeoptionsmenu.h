@@ -1,6 +1,9 @@
 #ifndef MODEOPTIONSMENU_H
 #define MODEOPTIONSMENU_H
 
+#include "uimenu.h"
+#include "uicontrol.h"
+
 class ModeOptionsMenu
 {
 	public:
