@@ -1,12 +1,11 @@
 #include "uicustomcontrol.h"
 
 #include "FileList.h"
-#include "global.h"
-#include "GSMenu.h"
 #include "Game.h"
 #include "GameMode.h"
 #include "gamemodes.h"
 #include "GameValues.h"
+#include "GSMenu.h"
 #include "map.h"
 #include "MapList.h"
 #include "RandomNumberGenerator.h"

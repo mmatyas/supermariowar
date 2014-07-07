@@ -25,7 +25,7 @@ private:
 
 public:
 
-	gfxSprite		** spr_player[4];	//all player sprites (see global.h)
+	gfxSprite		** spr_player[4];	//all player sprites
 	gfxSprite		** spr_shyguy[4];
 	gfxSprite		** spr_chocobo[4];
 	gfxSprite		** spr_bobomb[4];

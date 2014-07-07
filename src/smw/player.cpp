@@ -3,7 +3,6 @@
 #include "eyecandy.h"
 #include "gamemodes.h"
 #include "GameValues.h"
-#include "global.h"
 #include "map.h"
 #include "movingplatform.h"
 #include "net.h"

@@ -1,6 +1,5 @@
 #include "world.h"
 
-#include "global.h"
 #include "GameMode.h"
 #include "GameValues.h"
 #include "RandomNumberGenerator.h"

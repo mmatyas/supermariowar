@@ -2,7 +2,6 @@
 
 #include "Game.h"
 #include "GameValues.h"
-#include "global.h"
 #include "map.h"
 #include "ObjectContainer.h"
 #include "objectgame.h"

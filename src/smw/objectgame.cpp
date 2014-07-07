@@ -1,7 +1,6 @@
 #include "objectgame.h"
 
 #include "eyecandy.h"
-#include "global.h"
 #include "GameMode.h"
 #include "gamemodes.h"
 #include "GameValues.h"

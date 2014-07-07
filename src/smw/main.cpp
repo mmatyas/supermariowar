@@ -18,7 +18,6 @@
 #define VERSIONNUMBER "2.0"
 
 
-//#include "global.h"				//all the global stuff
 #include "FileList.h"
 #include "GameMode.h"
 #include "gamemodes.h"

@@ -1,6 +1,5 @@
 #include "GSMenu.h"
 
-#include "global.h"
 #include "FileIO.h"
 #include "FileList.h"
 #include "Game.h"

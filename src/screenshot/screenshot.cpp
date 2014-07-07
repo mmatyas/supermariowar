@@ -9,8 +9,10 @@
 |				(C) 2007 Florian Hufsky <fhufsky@phorus.at>	|
 +----------------------------------------------------------*/
 
+// TODO: Update this project.
+
 #define SMW_EDITOR
-#include "global.h"
+//#include "global.h"
 
 #ifdef PNG_SAVE_FORMAT
 	// this function was added to SDL2

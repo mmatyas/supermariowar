@@ -1,7 +1,5 @@
 #include "modeoptionsmenu.h"
 
-//#include "global.h"
-//#include "GSMenu.h"
 #include "GameValues.h"
 #include "GameMode.h"
 #include "ResourceManager.h"

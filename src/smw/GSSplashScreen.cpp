@@ -2,8 +2,6 @@
 
 #include "FileList.h"
 #include "MapList.h"
-#include "global.h"
-//#include "time.h"
 #include "Game.h"
 #include "GameValues.h"
 #include "GSMenu.h"

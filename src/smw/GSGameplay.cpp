@@ -1,7 +1,6 @@
 #include "GSGameplay.h"
 
 #include "FileList.h"
-#include "global.h"                //all the global stuff
 #include "GameMode.h"
 #include "gamemodes.h"
 #include "GameValues.h"
