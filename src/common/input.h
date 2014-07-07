@@ -2,7 +2,6 @@
 #define INPUT_H
 
 #include "SDL.h"
-
 #include <stdint.h>
 
 //This set of classes takes SDL input events, sees if a

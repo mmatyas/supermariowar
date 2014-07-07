@@ -1,5 +1,9 @@
-#include "global.h"
 #include "input.h"
+
+#include "GameValues.h"
+#include "GlobalConstants.h"
+
+extern CGameValues game_values;
 
 CPlayerInput::CPlayerInput()
 {
