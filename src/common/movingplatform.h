@@ -1,10 +1,10 @@
 #ifndef MOVINGPLATFORM_H
 #define MOVINGPLATFORM_H
 
-class CPlayer;
-class IO_MovingObject;
 #include "map.h"
 
+class CPlayer;
+class IO_MovingObject;
 class MovingPlatform;
 
 class MovingPlatformPath

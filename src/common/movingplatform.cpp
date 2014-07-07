@@ -1,12 +1,36 @@
-#include "global.h"
-#include <math.h>
+#include "movingplatform.h"
+
+#include "BlockBase.h"
+#include "Game.h"
+#include "GameValues.h"
+#include "map.h"
+#include "object.h"
+#include "player.h"
+#include "PlayerKillTypes.h"
+#include "ResourceManager.h"
+#include "TilesetManager.h"
 
 #include "sdl12wrapper.h"
+
+#include <cmath>
+
+extern SDL_Surface* screen;
+extern SDL_Surface* blitdest;
 
 extern short x_shake;
 extern short y_shake;
 
 extern short g_iCurrentDrawIndex;
+
+extern CMap* g_map;
+extern CTilesetManager* g_tilesetmanager;
+
+extern CPlayer* list_players[4];
+extern short list_players_cnt;
+
+extern CGameValues game_values;
+extern CResourceManager* rm;
+extern CGame* smw;
 
 enum CollisionStyle {collision_none, collision_normal, collision_overlap_left, collision_overlap_right};
 
