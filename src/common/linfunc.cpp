@@ -1,5 +1,5 @@
 #include <ctype.h>
-#include <string.h>
+#include <cstring>
 
 //_DEBUG
 #if 0
@@ -44,7 +44,6 @@ char *inPlaceLowerCase(char *str)
 
     return str;
 }
-
 
 char *lowercaseDup(const char *name)
 {

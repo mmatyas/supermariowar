@@ -9,6 +9,7 @@
 #else
 
 char *inPlaceLowerCase(char *str);
+char *lowercaseDup(const char *name);
 
 //#define _strdup strdup
 //#define _stricmp strcasecmp
