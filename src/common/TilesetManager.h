@@ -1,6 +1,13 @@
 #ifndef TILESETMANAGER_H
 #define TILESETMANAGER_H
 
+#include "FileList.h"
+#include "gfx.h"
+#include "map.h"
+
+#include "SDL.h"
+#include <vector>
+
 class CTileset
 {
 	public:

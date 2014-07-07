@@ -1,9 +1,12 @@
+#include "TilesetManager.h"
+
+#include "FileIO.h"
+#include "map.h"
+
 #if defined(__MACOSX__)
 #include <sys/stat.h>
 #endif
 
-#include "global.h"
-#include "FileIO.h"
 
 /*********************************
 *  CTileset
