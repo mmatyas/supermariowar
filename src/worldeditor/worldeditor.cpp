@@ -38,6 +38,7 @@
 	#endif
 #endif
 
+#include <cstdlib>
 #include <string.h>
 #include <ctype.h>
 
@@ -52,6 +53,11 @@
 			#pragma comment(lib, "zlib.lib")
 		#endif
     #endif
+#endif
+
+// TODO: Fix JS related problems.
+#ifdef __EMSCRIPTEN__
+#define SDL_Delay(n) ;
 #endif
 
 #define MAPTITLESTRING "SMW 2.0 World Editor"
@@ -1071,7 +1077,11 @@ int editor_edit()
         if (fExiting) {
 			//handle messages
             while (SDL_PollEvent(&event)) {
-				Uint8 * keystate = SDL_GetKeyState(NULL);
+            #if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
+                const Uint8 * keystate = SDL_GetKeyboardState(NULL);
+            #else
+                Uint8 * keystate = SDL_GetKeyState(NULL);
+            #endif
 
                 switch (event.type) {
                 case SDL_KEYDOWN: {
@@ -1098,7 +1108,11 @@ int editor_edit()
         } else {
 			//handle messages
             while (SDL_PollEvent(&event)) {
-				Uint8 * keystate = SDL_GetKeyState(NULL);
+            #if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
+                const Uint8 * keystate = SDL_GetKeyboardState(NULL);
+            #else
+                Uint8 * keystate = SDL_GetKeyState(NULL);
+            #endif
 
                 switch (event.type) {
                 case SDL_QUIT: {
@@ -4552,7 +4566,11 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 							//insert character into fileName and onScreenText and increment current char
 							Uint8 key = event.key.keysym.sym;
 
-							Uint8 * keystate = SDL_GetKeyState(NULL);
+                        #if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
+                            const Uint8 * keystate = SDL_GetKeyboardState(NULL);
+                        #else
+                            Uint8 * keystate = SDL_GetKeyState(NULL);
+                        #endif
                         if (keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT]) {
 								if (event.key.keysym.sym == 45)
 									key = 95;
