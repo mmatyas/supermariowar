@@ -25,13 +25,14 @@
     karlb@gmx.net
 */
 
-#include "SDL.h"
-#include "sdl12wrapper.h"
+#include "SFont.h"
 
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-#include "SFont.h"
+
+#include "SDL.h"
+#include "sdl12wrapper.h"
 
 static Uint32 GetPixel(SDL_Surface *Surface, Sint32 X, Sint32 Y)
 {
