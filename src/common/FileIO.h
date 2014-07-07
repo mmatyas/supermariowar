@@ -1,8 +1,8 @@
 #ifndef FILEIO_H
 #define FILEIO_H
 
-#include <stdio.h>
 #include "SDL.h"
+#include <stdio.h>
 
 FILE * OpenFile(const char * filename, const char * options);
 void WriteInt(int out, FILE * outFile);
