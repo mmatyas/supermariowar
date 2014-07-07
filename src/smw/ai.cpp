@@ -1,8 +1,29 @@
-#include "global.h"
 #include "ai.h"
+
+#include "gamemodes.h"
+#include "GameValues.h"
+#include "input.h"
+#include "map.h"
+#include "movingplatform.h"
+#include "object.h"
+#include "ObjectContainer.h"
+#include "objectgame.h"
+#include "objecthazard.h"
+#include "player.h"
 #include "RandomNumberGenerator.h"
 
+#include <cstdlib> // abs()
+
 // see docs/development/HowAIWorks.txt for more information
+
+extern CObjectContainer objectcontainer[3];
+
+extern CPlayer* list_players[4];
+extern short list_players_cnt;
+
+extern CMap* g_map;
+extern CGameValues game_values;
+
 
 CPlayerAI::CPlayerAI()
 {

@@ -1,14 +1,15 @@
 #ifndef AI_H
 #define AI_H
 
+#include <cstdio>
 #include <map>
+
+#include "Game.h"
+extern CGame *smw;
 
 class CObject;
 class CPlayer;
-
-#include "Game.h"
-
-extern CGame *smw;
+class COutputControl;
 
 class NearestObjects
 {
