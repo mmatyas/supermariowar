@@ -1,97 +1,28 @@
-#include <string.h>
-#include <math.h>
+#include "object.h"
 
+#include "eyecandy.h"
 #include "global.h"
+#include "gamemodes.h"
+#include "GameValues.h"
+#include "map.h"
+#include "movingplatform.h"
+#include "objectgame.h"
+#include "player.h"
+#include "RandomNumberGenerator.h"
+#include "ResourceManager.h"
+
+#include <cmath>
+#include <cstring>
+
+extern CMap* g_map;
+extern CEyecandyContainer eyecandy[3];
+
+extern CGameValues game_values;
+extern CResourceManager* rm;
+
 
 extern CPlayer * GetPlayerFromGlobalID(short iGlobalID);
 
-//------------------------------------------------------------------------------
-// class Object base class
-//------------------------------------------------------------------------------
-CObject::CObject(gfxSprite *nspr1, short x, short y)
-{
-    dead = false;
-
-    spr = nspr1;
-    setXi(x);
-    setYi(y);
-
-    if (spr) {
-        iw = (short)spr->getWidth();
-        ih = (short)spr->getHeight();
-    }
-
-    velx = 0.0f;
-    vely = 0.0f;
-
-    state = 0;
-
-    collisionWidth = iw;
-    collisionHeight = ih;
-    collisionOffsetX = 0;
-    collisionOffsetY = 0;
-
-    iNetworkID = g_iNextNetworkID++;
-}
-
-/*
-short CObject::writeNetworkUpdate(char * pData)
-{
-	//To send different messages from the same object
-	//put in a message type ID that tells it to write and
-	//read the message differently
-	WriteIntToBuffer(&pData[0], iNetworkID);
-	WriteShortToBuffer(&pData[4], ix);
-	WriteShortToBuffer(&pData[6], iy);
-	WriteFloatToBuffer(&pData[8], velx);
-	WriteFloatToBuffer(&pData[12], vely);
-	return 16;
-}
-
-void CObject::readNetworkUpdate(short size, char * pData)
-{
-	//ReadIntFromBuffer(&iNetworkID, &pData[0]);
-	ReadShortFromBuffer(&ix, &pData[4]);
-	ReadShortFromBuffer(&iy, &pData[6]);
-	ReadFloatFromBuffer(&velx, &pData[8]);
-	ReadFloatFromBuffer(&vely, &pData[12]);
-}*/
-
-//returns the blocks touching each of the four corners
-void CObject::GetCollisionBlocks(IO_Block * blocks[4])
-{
-    short xl = 0;
-    if (ix < 0)
-        xl = (ix + smw->ScreenWidth) / TILESIZE;
-    else
-        xl = ix / TILESIZE;
-
-    short xr = 0;
-    if (ix + iw >= smw->ScreenWidth)
-        xr = (ix + iw - smw->ScreenWidth) / TILESIZE;
-    else
-        xr = (ix + iw) / TILESIZE;
-
-    blocks[0] = NULL;
-    blocks[1] = NULL;
-
-    if (iy >= 0 && iy < smw->ScreenHeight) {
-        short yt = iy / TILESIZE;
-
-        blocks[0] = g_map->block(xl, yt);
-        blocks[1] = g_map->block(xr, yt);
-    }
-
-    blocks[2] = NULL;
-    blocks[3] = NULL;
-
-	if (iy + ih >= 0 && iy + ih < smw->ScreenHeight) {
-        short yb = (iy + ih) / TILESIZE;
-
-        blocks[2] = g_map->block(xl, yb);
-        blocks[3] = g_map->block(xr, yb);
-    }
-}
 
 //------------------------------------------------------------------------------
 // class MovingObject (all moving objects inheirit from this class)
@@ -954,216 +885,4 @@ void IO_OverMapObject::animate()
         if (drawframe >= animationWidth)
             drawframe = animationOffsetX;
     }
-}
-
-
-//------------------------------------------------------------------------------
-// class object_container
-//------------------------------------------------------------------------------
-CObjectContainer::CObjectContainer()
-{
-    for (short i = 0; i < MAXOBJECTS; i++)
-        list[i] = NULL;
-
-    list_end = 0;
-}
-
-
-CObjectContainer::~CObjectContainer()
-{
-    clean();
-}
-
-
-void CObjectContainer::clean()
-{
-    for (short i = 0; i < list_end; i++) {
-        delete list[i];
-        list[i] = NULL;
-    }
-    list_end = 0;
-}
-
-
-void CObjectContainer::add(CObject *ec)
-{
-    if (list_end < MAXOBJECTS) {
-        list[list_end] = ec;
-        ec->index = list_end;	//save index for removing
-        list_end++;
-    } else {
-        delete ec;	//otherwise memory leak!
-        //printf("eyecandy list full!\n");
-    }
-}
-
-bool CObjectContainer::isBlockAt(short x, short y)
-{
-    for (short i = 0; i < list_end; i++) {
-        if (x >= list[i]->ix && x < list[i]->ix + list[i]->iw &&
-                y >= list[i]->iy && y < list[i]->iy + list[i]->ih &&
-                list[i]->getObjectType() == object_block) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-float CObjectContainer::getClosestObject(short ix, short iy, short objectType)
-{
-    int dist = smw->ScreenWidth * 1000;  //Longest distance from corner to corner squared
-
-    for (short i = 0; i < list_end; i++) {
-        if (list[i]->getObjectType() != objectType)
-            continue;
-
-        short x = list[i]->ix - ix;
-        short y = list[i]->iy - iy;
-
-        int calcdist = x * x + y * y;
-
-        if (calcdist < dist)
-            dist = calcdist;
-    }
-
-    return (float)sqrt((double)dist);
-}
-
-float CObjectContainer::getClosestMovingObject(short ix, short iy, short movingObjectType)
-{
-    int dist = smw->ScreenWidth * 1000;  //Longest distance from corner to corner squared
-
-    for (short i = 0; i < list_end; i++) {
-        if (list[i]->getObjectType() != object_moving || ((IO_MovingObject*)list[i])->getMovingObjectType() != movingObjectType)
-            continue;
-
-        short x = list[i]->ix - ix;
-        short y = list[i]->iy - iy;
-
-        int calcdist = x * x + y * y;
-
-        if (calcdist < dist)
-            dist = calcdist;
-    }
-
-    return (float)sqrt((double)dist);
-}
-
-short CObjectContainer::countTypes(ObjectType type)
-{
-    short count = 0;
-
-    for (short i = 0; i < list_end; i++) {
-        if (list[i]->getObjectType() == type) {
-            count++;
-        }
-    }
-
-    return count;
-}
-
-short CObjectContainer::countMovingTypes(MovingObjectType type)
-{
-    short count = 0;
-
-    for (short i = 0; i < list_end; i++) {
-        if (list[i]->getObjectType() == object_moving && ((IO_MovingObject*)list[i])->getMovingObjectType() == type) {
-            count++;
-        }
-    }
-
-    return count;
-}
-
-void CObjectContainer::adjustPlayerAreas(CPlayer * player, CPlayer * other)
-{
-    for (short i = 0; i < list_end; i++) {
-        if (list[i]->getObjectType() == object_area) {
-            OMO_Area * area = (OMO_Area*)list[i];
-
-            if (area->colorID == other->colorID) {
-                if (game_values.gamemodesettings.domination.relocateondeath)
-                    area->placeArea();
-
-                if (game_values.gamemodesettings.domination.stealondeath && player)
-                    area->setOwner(player);
-                else if (game_values.gamemodesettings.domination.loseondeath)
-                    area->reset();
-            }
-        }
-    }
-}
-
-void CObjectContainer::removePlayerRaceGoals(short id, short iGoal)
-{
-    if (game_values.gamemodesettings.race.penalty == 0 && iGoal != -1)
-        return;
-
-    for (short i = 0; i < list_end; i++) {
-        if (list[i]->getObjectType() == object_race_goal) {
-            OMO_RaceGoal * goal = (OMO_RaceGoal*)list[i];
-
-            if (iGoal == -1 || 2 == game_values.gamemodesettings.race.penalty ||
-                    (1 == game_values.gamemodesettings.race.penalty && goal->getGoalID() == iGoal)) {
-                goal->reset(id);
-            }
-        }
-    }
-}
-
-void CObjectContainer::pushBombs(short x, short y)
-{
-    for (short i = 0; i < list_end; i++) {
-        if (list[i]->getObjectType() != object_moving)
-            continue;
-
-        IO_MovingObject * mo = (IO_MovingObject*)list[i];
-
-        if (mo->getMovingObjectType() != movingobject_bomb)
-            continue;
-
-        CO_Bomb * bomb = (CO_Bomb*)list[i];
-
-        if (bomb->HasOwner())
-            continue;
-
-        int bombx = bomb->ix + (bomb->iw >> 1) - x;
-        int bomby = bomb->iy + (bomb->ih >> 1) - y;
-
-        int dist = bombx * bombx + bomby * bomby;
-
-        if (dist < 10000) {
-            if (bombx > 0)
-                bomb->velx += ((float)(RNGMAX(30)) / 10.0f + 4.0f);
-            else
-                bomb->velx -= ((float)(RNGMAX(30)) / 10.0f + 4.0f);
-
-            bomb->vely -= (float)(RNGMAX(30)) / 10.0f + 6.0f;
-        }
-    }
-}
-
-void CObjectContainer::cleandeadobjects()
-{
-    for (short i = 0; i < list_end; i++) {
-        if (list[i]->dead) {
-            delete list[i];
-            list_end--;
-
-            if (i != list_end) {
-                list[i] = list[list_end];
-            }
-
-            i--;
-        }
-    }
-}
-
-CObject * CObjectContainer::getRandomObject()
-{
-    if (list_end == 0)
-        return NULL;
-
-    return list[RNGMAX( list_end)];
 }

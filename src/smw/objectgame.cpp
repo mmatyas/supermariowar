@@ -1,7 +1,22 @@
-#include <string.h>
-#include <math.h>
+#include "objectgame.h"
 
+#include "eyecandy.h"
 #include "global.h"
+#include "GameMode.h"
+#include "gamemodes.h"
+#include "GameValues.h"
+#include "map.h"
+#include "movingplatform.h"
+#include "object.h"
+#include "ObjectContainer.h"
+#include "objecthazard.h"
+#include "RandomNumberGenerator.h"
+#include "ResourceManager.h"
+#include "TilesetManager.h"
+
+#include <cstdlib> // abs()
+#include <cstring>
+#include <cmath>
 
 extern short iKingOfTheHillZoneLimits[4][4];
 extern void PlayerKilledPlayer(short iKiller, CPlayer * killed, short deathstyle, short killstyle, bool fForce, bool fKillCarriedItem);
@@ -13,6 +28,20 @@ extern short scorepowerupoffsets[3][3];
 extern CPlayer * GetPlayerFromGlobalID(short iGlobalID);
 extern void CheckSecret(short id);
 extern SpotlightManager spotlightManager;
+extern CObjectContainer objectcontainer[3];
+
+extern CGM_Pipe_MiniGame * pipegamemode;
+
+extern CPlayer* list_players[4];
+extern short list_players_cnt;
+extern short score_cnt;
+
+extern CMap* g_map;
+extern CTilesetManager* g_tilesetmanager;
+extern CEyecandyContainer eyecandy[3];
+
+extern CGameValues game_values;
+extern CResourceManager* rm;
 
 void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead)
 {
