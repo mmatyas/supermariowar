@@ -1,10 +1,36 @@
-#include <string.h>
-#include <math.h>
+#include "objecthazard.h"
 
+#include "Game.h"
+#include "GameValues.h"
 #include "global.h"
+#include "map.h"
+#include "ObjectContainer.h"
+#include "objectgame.h"
+#include "player.h"
+#include "PlayerKillTypes.h"
+#include "RandomNumberGenerator.h"
+#include "ResourceManager.h"
+#include "eyecandy.h"
+
+#include <cstring>
+#include <cmath>
+
 
 extern short LookupTeamID(short id);
 extern void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead);
+
+extern CObjectContainer noncolcontainer;
+extern CObjectContainer objectcontainer[3];
+
+extern CPlayer* list_players[4];
+extern short list_players_cnt;
+
+extern CMap* g_map;
+extern CEyecandyContainer eyecandy[3];
+
+extern CGameValues game_values;
+extern CResourceManager* rm;
+extern CGame* smw;
 
 
 void LoadMapHazards(bool fPreview)

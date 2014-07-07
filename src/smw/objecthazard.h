@@ -1,6 +1,13 @@
 #ifndef OBJECTHAZARD_H
 #define OBJECTHAZARD_H
 
+#include "gfx.h"
+#include "object.h"
+#include "PlayerKillStyles.h"
+
+class CPlayer;
+class IO_MovingObject;
+
 class OMO_OrbitHazard : public IO_OverMapObject
 {
 	public:
