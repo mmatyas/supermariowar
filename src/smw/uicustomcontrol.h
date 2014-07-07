@@ -1,10 +1,13 @@
 #ifndef UICUSTOMCONTROL_H
 #define UICUSTOMCONTROL_H
 
+#include "input.h"
 #include "uicontrol.h"
 #include "uimenu.h"
-#include "input.h"
 #include "world.h"
+
+#include <map>
+#include <string>
 
 class UI_Menu;
 class SimpleFileList;

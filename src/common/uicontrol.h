@@ -1,9 +1,10 @@
 #ifndef UICONTROL_H
 #define UICONTROL_H
 
-#include "uimenu.h"
 #include "input.h"
+#include "ObjectContainer.h"
 #include "RandomNumberGenerator.h"
+#include "uimenu.h"
 
 class UI_Menu;
 

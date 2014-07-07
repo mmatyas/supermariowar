@@ -1,6 +1,11 @@
-#include "global.h"
+#include "uimenu.h"
+
+#include "GameValues.h" // UI_Menu::SendInput
+#include "uicontrol.h"
 
 extern short LookupTeamID(short id);
+
+extern CGameValues game_values;
 
 UI_Menu::UI_Menu()
 {

@@ -1,14 +1,31 @@
-#include "global.h"
-#include <math.h>
+#include "uicontrol.h"
 
+#include "GameValues.h"
+#include "map.h" // MI_MapField
+#include "MapList.h" // MI_MapField
+#include "ResourceManager.h"
+#include "objecthazard.h" // MI_MapField
+
+#include <cmath>
+
+// MI_MapField
+extern SDL_Surface* blitdest;
+extern CMap* g_map;
+extern MapList *maplist;
+extern CObjectContainer noncolcontainer;
+extern CObjectContainer objectcontainer[3];
 extern void LoadCurrentMapBackground();
 extern void LoadMapHazards(bool fPreview);
+
+extern CGameValues game_values;
+extern CResourceManager* rm;
 
 #ifndef __EMSCRIPTEN__
     inline void smallDelay() { SDL_Delay(10); }
 #else
     inline void smallDelay() {}
 #endif
+
 
 UI_Control::UI_Control(short x, short y)
 {
@@ -30,7 +47,7 @@ UI_Control::UI_Control(short x, short y)
     iControllingTeam = -1;
 }
 
-UI_Control & UI_Control::operator= (const UI_Control& other)
+UI_Control& UI_Control::operator= (const UI_Control& other)
 {
     if (this != &other) {
         fSelected = other.fSelected;
