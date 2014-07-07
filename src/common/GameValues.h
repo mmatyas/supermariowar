@@ -1,10 +1,10 @@
 #ifndef GAMEVALUES_H
 #define GAMEVALUES_H
 
-#include <vector>
-
-#include "input.h"
 #include "GameModeSettings.h"
+#include "input.h"
+
+#include <vector>
 
 struct GameModeSettings;
 class FiltersList;
@@ -144,15 +144,14 @@ public:
     short		teamcounts[4];
     short		swapstyle;
     short		respawn;
-
-	void ReadBinaryConfig();
 };
 
 // these are actually the program options
-class gv : public CGameConfig
+class CGameValues : public CGameConfig
 {
 public:
     void init();
+    void ReadBinaryConfig();
     void SetupDefaultGameModeSettings();
 
     bool		frameadvance;

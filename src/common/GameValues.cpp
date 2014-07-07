@@ -1,12 +1,12 @@
 #include "GameValues.h"
 
-#include <stdio.h>
-
 #include "FileIO.h"
 #include "FileList.h"
-#include "gamemodes.h"
+#include "GameMode.h"
 #include "GlobalConstants.h"
 #include "sfx.h"
+
+#include <stdio.h>
 
 // TODO: Refactor externs
 
@@ -91,7 +91,7 @@ void fwrite_or_exception(const void * ptr, size_t size, size_t count, FILE * str
         throw "File write error";
 }
 
-void gv::init()
+void CGameValues::init()
 {
     //set standard game values
     playercontrol[0]  = 1;
@@ -249,7 +249,7 @@ void gv::init()
     }
 }
 
-void CGameConfig::ReadBinaryConfig() {
+void CGameValues::ReadBinaryConfig() {
     //Read saved settings from disk
     FILE * fp = OpenFile("options.bin", "rb");
 
