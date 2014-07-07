@@ -1,10 +1,10 @@
 #include "Game.h"
 
-#if	_WIN32
+#include "path.h"
+
+#if _WIN32
 #include <windows.h>
 #endif
-
-#include "path.h"
 
 CGame::CGame(char *rootDirectory)
 {
