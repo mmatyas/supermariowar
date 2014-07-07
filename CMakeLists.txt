@@ -377,16 +377,21 @@ message("    CXX_FLAGS:   ${CMAKE_CXX_FLAGS}")
 
 ## Here the actual magic happens
 include_directories(src/common)
+add_subdirectory(src/common)
 
-set(COMMON_SRCS ../common/FileIO.cpp ../common/FileList.cpp ../common/MapList.cpp
-           ../common/SFont.c ../common/TilesetManager.cpp ../common/dirlist.cpp
-           ../common/eyecandy.cpp ../common/gfx.cpp ../common/global.cpp
-           ../common/input.cpp ../common/RandomNumberGenerator.cpp
-           ../common/map.cpp ../common/movingplatform.cpp ../common/path.cpp
-           ../common/Game.cpp ../common/sfx.cpp ../common/ResourceManager.cpp
-           ../common/uicontrol.cpp ../common/uimenu.cpp ../common/linfunc.cpp
-           ../common/GameValues.cpp ../common/GameModeSettings.cpp
-)
+#set(COMMON_SRCS ../common/FileIO.cpp ../common/FileList.cpp ../common/MapList.cpp
+#           ../common/SFont.c ../common/TilesetManager.cpp ../common/dirlist.cpp
+#           #../common/eyecandy.cpp ../common/gfx.cpp ../common/global.cpp
+#           ../common/gfx.cpp #../common/global.cpp
+#           ../common/input.cpp ../common/RandomNumberGenerator.cpp
+#           #../common/map.cpp ../common/movingplatform.cpp ../common/path.cpp
+#           ../common/map.cpp ../common/path.cpp
+#           ../common/Game.cpp ../common/sfx.cpp ../common/ResourceManager.cpp
+#           #../common/uicontrol.cpp ../common/uimenu.cpp ../common/linfunc.cpp
+#           ../common/linfunc.cpp
+#           ../common/GameValues.cpp ../common/GameModeSettings.cpp
+#           ../common/global.cpp
+#)
 
 include_directories(src/smw)
 add_subdirectory(src/smw)

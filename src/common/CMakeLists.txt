@@ -1,0 +1,22 @@
+add_library ( CommonFiles
+    dirlist.cpp
+    eyecandy.cpp
+    FileIO.cpp
+    FileList.cpp
+    Game.cpp
+    GameModeSettings.cpp
+    GameValues.cpp
+    gfx.cpp
+    global.cpp
+    input.cpp
+    linfunc.cpp
+    map.cpp
+    MapList.cpp
+    ObjectBase.cpp
+    path.cpp
+    RandomNumberGenerator.cpp
+    ResourceManager.cpp
+    SFont.c
+    sfx.cpp
+    TilesetManager.cpp
+)
