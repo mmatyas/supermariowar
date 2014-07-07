@@ -13,22 +13,38 @@
     You should have received a copy of the GNU General Public License
     along with SMW.  If not, see <http://www.gnu.org/licenses/>. */
 
-#ifdef _XBOX
-#include <xtl.h>
-#endif
 
-#include "global.h"				//all the global stuff
+#define TITLESTRING "Super Mario War"
+#define VERSIONNUMBER "2.0"
+
+
+//#include "global.h"				//all the global stuff
+#include "FileList.h"
+#include "GameMode.h"
+#include "gamemodes.h"
+#include "GameValues.h"
+#include "map.h"
+#include "MapList.h"
 #include "net.h"
 #include "linfunc.h"
+#include "player.h"
+#include "ResourceManager.h"
+#include "sfx.h"
+#include "TilesetManager.h"
 
 #include "FPSLimiter.h"
 #include "GSSplashScreen.h"
 
-#include <time.h>
-#include <math.h>
+#include <ctime>
+#include <cmath>
+#include <cstdlib> // srand()
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
+#endif
+
+#ifdef _XBOX
+#include <xtl.h>
 #endif
 
 //now it's really time for an "engine" (aka resource manager)
@@ -47,7 +63,6 @@
         #ifdef _MSC_VER
         #include <crtdbg.h>
         #endif
-
     #endif
 #endif
 
@@ -79,11 +94,36 @@ CGM_Pipe_MiniGame	*pipegamemode = NULL;
 CGM_Boss_MiniGame	*bossgamemode = NULL;
 CGM_Boxes_MiniGame	*boxesgamemode = NULL;
 
-short		currentgamemode = 0;
+short currentgamemode = 0;
 
 //Adds music overrides to the music lists
-void UpdateMusicWithOverrides();
+extern void UpdateMusicWithOverrides();
 
+extern SDL_Joystick     **joysticks;
+extern short            joystickcount;
+
+extern short g_iDefaultPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
+extern short g_iCurrentPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
+
+extern CMap* g_map;
+extern CTilesetManager* g_tilesetmanager;
+
+extern FiltersList* filterslist;
+extern MapList* maplist;
+extern SkinList* skinlist;
+extern AnnouncerList* announcerlist;
+extern MusicList* musiclist;
+extern WorldMusicList* worldmusiclist;
+extern GraphicsList* menugraphicspacklist;
+extern GraphicsList* worldgraphicspacklist;
+extern GraphicsList* gamegraphicspacklist;
+extern SoundsList* soundpacklist;
+extern TourList* tourlist;
+extern WorldList* worldlist;
+
+extern char *RootDataDirectory;
+extern CGameValues game_values;
+extern CResourceManager* rm;
 
 //*************************************
 //  MAIN LOOP
@@ -423,92 +463,3 @@ void reconnectjoysticks()
 
 #endif
 */
-
-
-void UpdateMusicWithOverrides()
-{
-    FILE * file = fopen(convertPath("music/Overrides.txt").c_str(), "r");
-
-    if (!file)
-        return;
-
-    short iAddToCategory = 0;
-    char szBuffer[1024];
-    while (fgets(szBuffer, 1024, file)) {
-        //Ignore comment lines
-        if (szBuffer[0] == '#' || szBuffer[0] == '\n' || szBuffer[0] == '\r' || szBuffer[0] == ' ' || szBuffer[0] == '\t')
-            continue;
-
-        //Chop off line ending
-        int stringLength = strlen(szBuffer);
-        for (short k = 0; k < stringLength; k++) {
-            if (szBuffer[k] == '\r' || szBuffer[k] == '\n') {
-                szBuffer[k] = '\0';
-                break;
-            }
-        }
-
-        //If we found a category header
-        if (szBuffer[0] == '[') {
-            if (!strCiCompare(szBuffer, "[maps]"))
-                iAddToCategory = 1;
-            else if (!strCiCompare(szBuffer, "[worlds]"))
-                iAddToCategory = 2;
-
-            continue;
-        }
-
-        //If we're not in a category, ignore this line
-        if (iAddToCategory == 0)
-            continue;
-
-        char * pszName = strtok(szBuffer, ",\n");
-
-        if (!pszName)
-            continue;
-
-        if (iAddToCategory == 1) {
-            MapMusicOverride * override = new MapMusicOverride();
-
-            override->mapname = pszName;
-
-            char * pszMusic = strtok(NULL, ",\n");
-            while (pszMusic) {
-                std::string sPath = convertPath(pszMusic);
-
-                if (File_Exists(sPath.c_str())) {
-                    override->songs.push_back(sPath);
-                }
-
-                pszMusic = strtok(NULL, ",\n");
-            }
-
-            //Don't add overrides that have no songs
-            if (override->songs.size() == 0) {
-                delete override;
-                continue;
-            }
-
-            mapmusicoverrides.push_back(override);
-        } else if (iAddToCategory == 2) {
-            WorldMusicOverride * override = new WorldMusicOverride();
-
-            override->worldname = pszName;
-
-            char * pszMusic = strtok(NULL, ",\n");
-            if (pszMusic) {
-                std::string sPath = convertPath(pszMusic);
-
-                if (File_Exists(sPath.c_str())) {
-                    override->song = sPath;
-                    worldmusicoverrides.push_back(override);
-                }
-            }
-        }
-    }
-
-    musiclist->UpdateEntriesWithOverrides();
-    worldmusiclist->UpdateEntriesWithOverrides();
-
-    fclose(file);
-}
