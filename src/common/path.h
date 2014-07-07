@@ -1,5 +1,6 @@
 #ifndef PATH_H
 #define PATH_H
+
 #include <string>
 
 #ifndef PATH_MAX
@@ -29,5 +30,9 @@ std::string	GetHomeDirectory();
 #else
 #  define Initialize_Paths();
 #endif
+
+void GetNameFromFileName(char * szName, const char * szFileName, bool fStripAuthor = false);
+std::string stripCreatorAndDotMap(const std::string &filename);
+std::string stripPathAndExtension(const std::string &path);
 
 #endif // PATH_H

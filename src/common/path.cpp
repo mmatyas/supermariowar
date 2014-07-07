@@ -1,20 +1,21 @@
-#include <string>
-#include <iostream>
-#include <sys/stat.h>
+#include "path.h"
+
 #include <cstring>
+#include <iostream>
+#include <string>
+#include <sys/stat.h>
 
 #ifdef _WIN32
-	#ifdef _XBOX
-		#include <xtl.h>
-	#else
-		#include <shlobj.h>
-		#include "SDL_platform.h"
-	#endif
+    #ifdef _XBOX
+        #include <xtl.h>
+    #else
+        #include <shlobj.h>
+        #include "SDL_platform.h"
+    #endif
 #else
 #include <stdlib.h>
 #endif
 
-#include "path.h"
 
 extern char *RootDataDirectory;
 
@@ -214,4 +215,73 @@ const string getFileFromPath(const string &path)
 		return path.substr(iPos + 1);
 
 	return path;
+}
+
+//Takes a path to a file and gives you back the file name (with or without author) as a char *
+void GetNameFromFileName(char * szName, const char * szFileName, bool fStripAuthor)
+{
+#ifdef _XBOX
+    const char * p = strrchr(szFileName, '\\');
+#else
+    const char * p = strrchr(szFileName, '/');
+#endif
+
+    if (!p)
+        p = szFileName;
+    else
+        p++;
+
+    strcpy(szName, p);
+
+    if (fStripAuthor) {
+        char * pUnderscore = strchr(szName, '_');
+        if (pUnderscore)
+            strcpy(szName, ++pUnderscore);
+    }
+
+    char * pLastPeriod = strrchr(szName, '.');
+
+    if (pLastPeriod)
+        *pLastPeriod = 0;
+}
+
+//Takes a file name and gives you back just the name of the file with no author or file extention
+//and the first letter of the name will come back capitalized
+std::string stripCreatorAndDotMap(const std::string &filename)
+{
+    size_t firstUnderscore = filename.find("_");    //find first _
+    if (firstUnderscore == std::string::npos)   //if not found start with first character
+        firstUnderscore = 0;
+    else
+        firstUnderscore++;                      //we don't want the _
+
+    std::string withoutPrefix = filename.substr(firstUnderscore);   //substring without bla_ and .map (length-4)
+    withoutPrefix = withoutPrefix.substr(0, withoutPrefix.length() - 4);        //i have no idea why this doesn't work if i do it like this: (leaves .map if the map starts with an underscore)
+    //                                                              return filename.substr(firstUnderscore, filename.length()-4);
+
+    //Capitalize the first letter so the hash table sorting works correctly
+    if (withoutPrefix[0] >= 97 && withoutPrefix[0] <= 122)
+        withoutPrefix[0] -= 32;
+
+    return withoutPrefix;
+}
+
+//Takes a path to a file and gives you back just the name of the file with no author or file extention
+std::string stripPathAndExtension(const std::string &path)
+{
+    size_t chopHere = path.find("_");   //find first _
+    if (chopHere == std::string::npos) {    //if not found, then find the beginning of the filename
+        chopHere = path.find_last_of(getDirectorySeperator());  //find last /
+        if (chopHere == std::string::npos)  //if not found, start with first character
+            chopHere = 0;
+        else
+            chopHere++;                     //we don't want the /
+    } else {
+        chopHere++;                     //we don't want the _
+    }
+
+    std::string withoutPath = path.substr(chopHere);    //substring without bla_
+    withoutPath = withoutPath.substr(0, withoutPath.length() - 4); //and without extension like .map (length-4)
+
+    return withoutPath;
 }

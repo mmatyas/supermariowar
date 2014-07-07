@@ -1,11 +1,18 @@
 #include "global.h"
-#include <math.h>
 
 #include "FileIO.h"
+#include "FileList.h"
 #include "GameValues.h"
+#include "Game.h"
 #include "gfx.h"
+#include "map.h"
+#include "MapList.h"
+#include "MovingObjectTypes.h"
+#include "ResourceManager.h"
+#include "TilesetManager.h"
 
 #include <cassert>
+#include <cmath>
 
 //1.8.0.0 == Release to staff
 //1.8.0.1 == Second release to staff
@@ -71,7 +78,7 @@ bool VersionIsEqualOrAfter(int iVersion[], short iMajor, short iMinor, short iMi
     return false;
 }
 
-gv game_values;
+CGameValues game_values;
 
 FiltersList *filterslist;  //Filters list must be initiallized before maps list because it is used in maplist constructor
 MapList *maplist;
@@ -86,18 +93,11 @@ SoundsList *soundpacklist;
 TourList *tourlist;
 WorldList *worldlist;
 
-std::vector<MapMusicOverride*> mapmusicoverrides;
-std::vector<WorldMusicOverride*> worldmusicoverrides;
-
 CMap      *g_map;
 CTilesetManager *g_tilesetmanager;
 
-CObjectContainer noncolcontainer;
-CObjectContainer objectcontainer[3];
 
 bool g_fLoadMessages = true;
-
-bool  fResumeMusic = true;
 
 //Network stuff
 int g_iNextNetworkID = 0;
@@ -240,105 +240,39 @@ void _load_waitforkey()
 #endif
 }
 
-//Takes a path to a file and gives you back the file name (with or without author) as a char *
-void GetNameFromFileName(char * szName, const char * szFileName, bool fStripAuthor)
-{
-#ifdef _XBOX
-    const char * p = strrchr(szFileName, '\\');
-#else
-    const char * p = strrchr(szFileName, '/');
-#endif
 
-    if (!p)
-        p = szFileName;
-    else
-        p++;
-
-    strcpy(szName, p);
-
-    if (fStripAuthor) {
-        char * pUnderscore = strchr(szName, '_');
-        if (pUnderscore)
-            strcpy(szName, ++pUnderscore);
-    }
-
-    char * pLastPeriod = strrchr(szName, '.');
-
-    if (pLastPeriod)
-        *pLastPeriod = 0;
-}
-
-//Takes a file name and gives you back just the name of the file with no author or file extention
-//and the first letter of the name will come back capitalized
-std::string stripCreatorAndDotMap(const std::string &filename)
-{
-    size_t firstUnderscore = filename.find("_");    //find first _
-    if (firstUnderscore == std::string::npos)   //if not found start with first character
-        firstUnderscore = 0;
-    else
-        firstUnderscore++;                      //we don't want the _
-
-    std::string withoutPrefix = filename.substr(firstUnderscore);   //substring without bla_ and .map (length-4)
-    withoutPrefix = withoutPrefix.substr(0, withoutPrefix.length() - 4);        //i have no idea why this doesn't work if i do it like this: (leaves .map if the map starts with an underscore)
-    //                                                              return filename.substr(firstUnderscore, filename.length()-4);
-
-    //Capitalize the first letter so the hash table sorting works correctly
-    if (withoutPrefix[0] >= 97 && withoutPrefix[0] <= 122)
-        withoutPrefix[0] -= 32;
-
-    return withoutPrefix;
-}
-
-//Takes a path to a file and gives you back just the name of the file with no author or file extention
-std::string stripPathAndExtension(const std::string &path)
-{
-    size_t chopHere = path.find("_");   //find first _
-    if (chopHere == std::string::npos) {    //if not found, then find the beginning of the filename
-        chopHere = path.find_last_of(getDirectorySeperator());  //find last /
-        if (chopHere == std::string::npos)  //if not found, start with first character
-            chopHere = 0;
-        else
-            chopHere++;                     //we don't want the /
-    } else {
-        chopHere++;                     //we don't want the _
-    }
-
-    std::string withoutPath = path.substr(chopHere);    //substring without bla_
-    withoutPath = withoutPath.substr(0, withoutPath.length() - 4); //and without extension like .map (length-4)
-
-    return withoutPath;
-}
 
 short iScoreboardPlayerOffsetsX[3][3] = {{40, 0, 0}, {19, 59, 0}, {6, 40, 74}};
 short iKingOfTheHillZoneLimits[4][4] = {{0, 0, 1, 2}, {0, 1, 2, 4}, {0, 2, 4, 7}, {0, 2, 5, 12}};
 
-const char * g_szBackgroundConversion[26] = {"Land_Classic.png",
-        "Castle_Dungeon.png",
-        "Desert_Pyramids.png",
-        "Ghost_GhostHouse.png",
-        "Underground_Cave.png",
-        "Clouds_AboveTheClouds.png",
-        "Castle_GoombaHall.png",
-        "Platforms_GreenSpottedHills.png",
-        "Snow_SnowTrees.png",
-        "Desert_Desert.png",
-        "Underground_BrownRockWall.png",
-        "Land_CastleWall.png",
-        "Clouds_Clouds.png",
-        "Land_GreenMountains.png",
-        "Land_InTheTrees.png",
-        "Battle_Manor.png",
-        "Platforms_JaggedGreenStones.png",
-        "Underground_RockWallAndPlants.png",
-        "Underground_DarkPipes.png",
-        "Bonus_StarryNight.png",
-        "Platforms_CloudsAndWaterfalls.png",
-        "Battle_GoombaPillars.png",
-        "Bonus_HillsAtNight.png",
-        "Castle_CastlePillars.png",
-        "Land_GreenHillsAndClouds.png",
-        "Platforms_BlueSpottedHills.png"
-                                            };
+const char * g_szBackgroundConversion[26] = {
+    "Land_Classic.png",
+    "Castle_Dungeon.png",
+    "Desert_Pyramids.png",
+    "Ghost_GhostHouse.png",
+    "Underground_Cave.png",
+    "Clouds_AboveTheClouds.png",
+    "Castle_GoombaHall.png",
+    "Platforms_GreenSpottedHills.png",
+    "Snow_SnowTrees.png",
+    "Desert_Desert.png",
+    "Underground_BrownRockWall.png",
+    "Land_CastleWall.png",
+    "Clouds_Clouds.png",
+    "Land_GreenMountains.png",
+    "Land_InTheTrees.png",
+    "Battle_Manor.png",
+    "Platforms_JaggedGreenStones.png",
+    "Underground_RockWallAndPlants.png",
+    "Underground_DarkPipes.png",
+    "Bonus_StarryNight.png",
+    "Platforms_CloudsAndWaterfalls.png",
+    "Battle_GoombaPillars.png",
+    "Bonus_HillsAtNight.png",
+    "Castle_CastlePillars.png",
+    "Land_GreenHillsAndClouds.png",
+    "Platforms_BlueSpottedHills.png"
+};
 
 //Conversion from backgrounds to music categories created by NMcCoy
 short g_iMusicCategoryConversion[26] = {0, 3, 8, 5, 1, 9, 3, 4, 10, 8, 1, 0, 9, 0, 0, 7, 4, 1, 1, 6, 4, 7, 6, 3, 0, 4};
@@ -403,345 +337,6 @@ short g_iCollisionMap[MOVINGOBJECT_LAST][MOVINGOBJECT_LAST] = {
     {0,0,0,1,1,0,0,1,1,0,0,0,1,1,0,0,0,0,0,0,1,1,0,1,1,0,0,0,0,0,1,0,0,1}, //movingobject_throwbox = 33
 };
 
-short iPlatformPathDotSize[3] = {12, 6, 4};
-short iPlatformPathDotOffset[3] = {0, 12, 18};
-
-void DrawPlatform(short pathtype, TilesetTile ** tiles, short startX, short startY, short endX, short endY, float angle, float radiusX, float radiusY, short iSize, short iPlatformWidth, short iPlatformHeight, bool fDrawPlatform, bool fDrawShadow)
-{
-    short iStartX = startX >> iSize;
-    short iStartY = startY >> iSize;
-    short iEndX = endX >> iSize;
-    short iEndY = endY >> iSize;
-
-    float fRadiusX = radiusX / (float)(1 << iSize);
-    float fRadiusY = radiusY / (float)(1 << iSize);
-
-    short iSizeShift = 5 - iSize;
-    int iTileSize = 1 << iSizeShift;
-
-    if (fDrawPlatform) {
-        for (short iPlatformX = 0; iPlatformX < iPlatformWidth; iPlatformX++) {
-            for (short iPlatformY = 0; iPlatformY < iPlatformHeight; iPlatformY++) {
-                TilesetTile * tile = &tiles[iPlatformX][iPlatformY];
-
-                int iDstX = 0;
-                int iDstY = 0;
-
-                if (pathtype == 2) {
-                    iDstX = iStartX + (iPlatformX << iSizeShift) + (short)(fRadiusX * cos(angle)) - (iPlatformWidth << (iSizeShift - 1));
-                    iDstY = iStartY + (iPlatformY << iSizeShift) + (short)(fRadiusY * sin(angle)) - (iPlatformHeight << (iSizeShift - 1));
-                } else {
-                    iDstX = iStartX + (iPlatformX << iSizeShift) - (iPlatformWidth << (iSizeShift - 1));
-                    iDstY = iStartY + (iPlatformY << iSizeShift) - (iPlatformHeight << (iSizeShift - 1));
-                }
-
-                SDL_Rect bltrect = {iDstX, iDstY, iTileSize, iTileSize};
-                if (tile->iID >= 0) {
-                    SDL_BlitSurface(g_tilesetmanager->GetTileset(tile->iID)->GetSurface(iSize), &g_tilesetmanager->rRects[iSize][tile->iCol][tile->iRow], blitdest, &bltrect);
-                } else if (tile->iID == TILESETANIMATED) {
-                    SDL_BlitSurface(rm->spr_tileanimation[iSize].getSurface(), &g_tilesetmanager->rRects[iSize][tile->iCol << 2][tile->iRow], blitdest, &bltrect);
-                } else if (tile->iID == TILESETUNKNOWN) {
-                    //Draw unknown tile
-                    SDL_BlitSurface(rm->spr_unknowntile[iSize].getSurface(), &g_tilesetmanager->rRects[iSize][0][0], blitdest, &bltrect);
-                }
-
-                bool fNeedWrap = false;
-                if (iDstX + iTileSize >= smw->GetScreenWidth(iSize)) {
-                    iDstX -= smw->GetScreenWidth(iSize);
-                    fNeedWrap = true;
-                } else if (iDstX < 0) {
-                    iDstX += smw->GetScreenWidth(iSize);
-                    fNeedWrap = true;
-                }
-
-                if (fNeedWrap) {
-                    bltrect.x = iDstX;
-                    bltrect.y = iDstY;
-                    bltrect.w = iTileSize;
-                    bltrect.h = iTileSize;
-
-                    if (tile->iID >= 0)
-                        SDL_BlitSurface(g_tilesetmanager->GetTileset(tile->iID)->GetSurface(iSize), &g_tilesetmanager->rRects[iSize][tile->iCol][tile->iRow], blitdest, &bltrect);
-                    else if (tile->iID == TILESETANIMATED)
-                        SDL_BlitSurface(rm->spr_tileanimation[iSize].getSurface(), &g_tilesetmanager->rRects[iSize][tile->iCol << 2][tile->iRow], blitdest, &bltrect);
-                    else if (tile->iID == TILESETUNKNOWN)
-                        SDL_BlitSurface(rm->spr_unknowntile[iSize].getSurface(), &g_tilesetmanager->rRects[iSize][0][0], blitdest, &bltrect);
-                }
-            }
-        }
-    }
-
-    SDL_Rect rPathSrc = {iPlatformPathDotOffset[iSize], 0, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]}, rPathDst;
-
-    if (pathtype == 0) { //line segment
-        if (fDrawShadow) {
-            for (short iCol = 0; iCol < iPlatformWidth; iCol++) {
-                for (short iRow = 0; iRow < iPlatformHeight; iRow++) {
-                    if (tiles[iCol][iRow].iID != -2)
-                        rm->spr_platformstarttile.draw(iStartX - (iPlatformWidth << (iSizeShift - 1)) + (iCol << iSizeShift), iStartY - (iPlatformHeight << (iSizeShift - 1)) + (iRow << iSizeShift), 0, 0, iTileSize, iTileSize);
-                }
-            }
-
-            for (short iCol = 0; iCol < iPlatformWidth; iCol++) {
-                for (short iRow = 0; iRow < iPlatformHeight; iRow++) {
-                    if (tiles[iCol][iRow].iID != -2)
-                        rm->spr_platformendtile.draw(iEndX - (iPlatformWidth << (iSizeShift - 1)) + (iCol << iSizeShift), iEndY - (iPlatformHeight << (iSizeShift - 1)) + (iRow << iSizeShift), 0, 0, iTileSize, iTileSize);
-                }
-            }
-        }
-
-        //Draw connecting dots
-        float dDiffX = (float)(iEndX - iStartX);
-        float dDiffY = (float)(iEndY - iStartY);
-
-        short iDistance = (short)sqrt(dDiffX * dDiffX + dDiffY * dDiffY);
-
-        short iNumSpots = (iDistance >> iSizeShift);
-        float dIncrementX = dDiffX / (float)iNumSpots;
-        float dIncrementY = dDiffY / (float)iNumSpots;
-
-        float dX = (float)(iStartX) - (float)(iPlatformPathDotSize[iSize] >> 1);
-        float dY = (float)(iStartY) - (float)(iPlatformPathDotSize[iSize] >> 1);
-
-        for (short iSpot = 0; iSpot < iNumSpots + 1; iSpot++) {
-            gfx_setrect(&rPathDst, (short)dX, (short)dY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
-            SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
-
-            dX += dIncrementX;
-            dY += dIncrementY;
-        }
-    } else if (pathtype == 1) { //continuous straight path
-        if (fDrawShadow) {
-            for (short iCol = 0; iCol < iPlatformWidth; iCol++) {
-                for (short iRow = 0; iRow < iPlatformHeight; iRow++) {
-                    if (tiles[iCol][iRow].iID != -2)
-                        rm->spr_platformstarttile.draw(iStartX - (iPlatformWidth << (iSizeShift - 1)) + (iCol << iSizeShift), iStartY - (iPlatformHeight << (iSizeShift - 1)) + (iRow << iSizeShift), 0, 0, iTileSize, iTileSize);
-                }
-            }
-        }
-
-        float dIncrementX = (float)iTileSize * cos(angle);
-        float dIncrementY = (float)iTileSize * sin(angle);
-
-        float dX = (float)(iStartX) - (float)(iPlatformPathDotSize[iSize] >> 1);
-        float dY = (float)(iStartY) - (float)(iPlatformPathDotSize[iSize] >> 1);
-
-        for (short iSpot = 0; iSpot < 50; iSpot++) {
-            gfx_setrect(&rPathDst, (short)dX, (short)dY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
-            SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
-
-            short iWrapX = (short)dX;
-            short iWrapY = (short)dY;
-            bool fNeedWrap = false;
-            if (dX + iPlatformPathDotSize[iSize] >= smw->GetScreenWidth(iSize)) {
-                iWrapX = (short)(dX - smw->GetScreenWidth(iSize));
-                fNeedWrap = true;
-            } else if (dX < 0.0f) {
-                iWrapX = (short)(dX + smw->GetScreenWidth(iSize));
-                fNeedWrap = true;
-            }
-
-            if (dY + iPlatformPathDotSize[iSize] >= smw->GetScreenHeight(iSize)) {
-                iWrapY = (short)(dY - smw->GetScreenHeight(iSize));
-                fNeedWrap = true;
-            } else if (dY < 0.0f) {
-                iWrapY = (short)(dY + smw->GetScreenHeight(iSize));
-                fNeedWrap = true;
-            }
-
-            if (fNeedWrap) {
-                gfx_setrect(&rPathDst, iWrapX, iWrapY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
-                SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
-            }
-
-            dX += dIncrementX;
-            dY += dIncrementY;
-        }
-    } else if (pathtype == 2) { //ellipse
-        //Calculate the starting position
-        if (fDrawShadow) {
-            short iEllipseStartX = (short)(fRadiusX * cos(angle)) - (iPlatformWidth << (iSizeShift - 1)) + iStartX;
-            short iEllipseStartY = (short)(fRadiusY * sin(angle)) - (iPlatformHeight << (iSizeShift - 1)) + iStartY;
-
-            for (short iCol = 0; iCol < iPlatformWidth; iCol++) {
-                for (short iRow = 0; iRow < iPlatformHeight; iRow++) {
-                    if (tiles[iCol][iRow].iID != -2)
-                        rm->spr_platformstarttile.draw(iEllipseStartX + (iCol << iSizeShift), iEllipseStartY + (iRow << iSizeShift), 0, 0, iTileSize, iTileSize);
-                }
-            }
-        }
-
-        float fAngle = angle;
-        for (short iSpot = 0; iSpot < 32; iSpot++) {
-            short iX = (short)(fRadiusX * cos(fAngle)) - (iPlatformPathDotSize[iSize] >> 1) + iStartX;
-            short iY = (short)(fRadiusY * sin(fAngle)) - (iPlatformPathDotSize[iSize] >> 1) + iStartY;
-
-            gfx_setrect(&rPathDst, iX, iY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
-            SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
-
-            if (iX + iPlatformPathDotSize[iSize] >= smw->GetScreenWidth(iSize)) {
-                gfx_setrect(&rPathDst, iX - smw->GetScreenWidth(iSize), iY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
-                SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
-            } else if (iX < 0) {
-                gfx_setrect(&rPathDst, iX + smw->GetScreenWidth(iSize), iY, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
-                SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
-            }
-
-            fAngle += TWO_PI / 32.0f;
-        }
-    }
-}
-
-//[Direction][Frame]
-SDL_Rect g_rFlameRects[4][4] = { { {0, 0, 96, 32}, {0, 32, 96, 32}, {0, 64, 96, 32}, {0, 96, 96, 32} },
-    { {96, 0, 96, 32}, {96, 32, 96, 32}, {96, 64, 96, 32}, {96, 96, 96, 32} },
-    { {0, 128, 32, 96}, {32, 128, 32, 96}, {64, 128, 32, 96}, {96, 128, 32, 96} },
-    { {128, 128, 32, 96}, {160, 128, 32, 96}, {192, 128, 32, 96}, {224, 128, 32, 96} }
-};
-
-//[Type][Direction][Frame]
-SDL_Rect g_rPirhanaRects[4][4][4] = { { { {0, 0, 32, 48}, {32, 0, 32, 48}, {64, 0, 32, 48}, {96, 0, 32, 48} },
-        { {128, 0, 32, 48}, {160, 0, 32, 48}, {192, 0, 32, 48}, {224, 0, 32, 48} },
-        { {304, 0, 48, 32}, {304, 32, 48, 32}, {304, 64, 48, 32}, {304, 96, 48, 32} },
-        { {304, 128, 48, 32}, {304, 160, 48, 32}, {304, 192, 48, 32}, {304, 224, 48, 32} }
-    },
-
-    {   { {0, 48, 32, 48}, {32, 48, 32, 48}, {64, 48, 32, 48}, {96, 48, 32, 48} },
-        { {128, 48, 32, 48}, {160, 48, 32, 48}, {192, 48, 32, 48}, {224, 48, 32, 48} },
-        { {256, 0, 48, 32}, {256, 32, 48, 32}, {256, 64, 48, 32}, {256, 96, 48, 32} },
-        { {256, 128, 48, 32}, {256, 160, 48, 32}, {256, 192, 48, 32}, {256, 224, 48, 32} }
-    },
-
-    {   { {0, 96, 32, 64}, {32, 96, 32, 64}, {0, 0, 0, 0}, {0, 0, 0, 0} },
-        { {64, 96, 32, 64}, {96, 96, 32, 64}, {0, 0, 0, 0}, {0, 0, 0, 0} },
-        { {192, 128, 64, 32}, {192, 160, 64, 32}, {0, 0, 0, 0}, {0, 0, 0, 0} },
-        { {192, 192, 64, 32}, {192, 224, 64, 32}, {0, 0, 0, 0}, {0, 0, 0, 0} }
-    },
-
-    {   { {0, 160, 32, 48}, {32, 160, 32, 48}, {0, 0, 0, 0}, {0, 0, 0, 0} },
-        { {64, 160, 32, 48}, {96, 160, 32, 48}, {0, 0, 0, 0}, {0, 0, 0, 0} },
-        { {144, 128, 48, 32}, {144, 160, 48, 32}, {0, 0, 0, 0}, {0, 0, 0, 0} },
-        { {144, 192, 48, 32}, {144, 224, 48, 32}, {0, 0, 0, 0}, {0, 0, 0, 0} }
-    }
-};
-
-
-short iFireballHazardSize[3] = {18, 9, 5};
-
-short iStandardOffset[3] = {0, 32, 48};
-float dBulletBillFrequency[3] = {10.0f, 5.0f, 2.5f};
-
-short iPirhanaPlantOffsetY[4][3] = {{0, 0, 0}, {48, 24, 12}, {96, 48, 24}, {160, 80, 40}};
-
-
-void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter)
-{
-    short iSizeShift = 5 - iSize;
-    short iTileSize = 1 << iSizeShift;
-
-    SDL_Rect rDotSrc = {iPlatformPathDotOffset[iSize] + 22, 0, iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]}, rDotDst;
-    SDL_Rect rPathSrc = {iStandardOffset[iSize], 12, iTileSize, iTileSize}, rPathDst;
-
-    gfx_setrect(&rPathDst, hazard->ix << (iSizeShift - 1), hazard->iy << (iSizeShift - 1), iTileSize, iTileSize);
-
-    if (fDrawCenter) {
-        if (hazard->itype <= 1) {
-            SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rPathSrc, blitdest, &rPathDst);
-        }
-    }
-
-    if (hazard->itype == 0) { //fireball string
-        short iNumDots = 16;
-        float dRadius = (float)((hazard->iparam[0] - 1) * 24) / (float)(1 << iSize) + (iPlatformPathDotSize[iSize] >> 1);
-        float dAngle = hazard->dparam[1];
-        for (short iDot = 0; iDot < iNumDots; iDot++) {
-            rDotDst.x = (short)(dRadius * cos(dAngle)) + rPathDst.x + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1);
-            rDotDst.y = (short)(dRadius * sin(dAngle)) + rPathDst.y + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1);
-            rDotDst.h = rDotDst.w = iPlatformPathDotSize[iSize];
-
-            rm->spr_platformpath.draw(rDotDst.x, rDotDst.y, rDotSrc.x, rDotSrc.y, rDotDst.w, rDotDst.h);
-            dAngle += TWO_PI / iNumDots;
-        }
-
-        //Draw the fireball string
-        for (short iFireball = 0; iFireball < hazard->iparam[0]; iFireball++) {
-            short x = (hazard->ix << (iSizeShift - 1)) + (short)((float)(iFireball * (24 >> iSize)) * cos(hazard->dparam[1])) + (iTileSize >> 1) - (iFireballHazardSize[iSize] >> 1);
-            short y = (hazard->iy << (iSizeShift - 1)) + (short)((float)(iFireball * (24 >> iSize)) * sin(hazard->dparam[1])) + (iTileSize >> 1) - (iFireballHazardSize[iSize] >> 1);
-
-            rm->spr_hazard_fireball[iSize].draw(x, y, 0, 0, iFireballHazardSize[iSize], iFireballHazardSize[iSize]);
-        }
-    } else if (hazard->itype == 1) { //rotodisc
-        short iNumDots = 16;
-        float dRadius = (hazard->dparam[2] + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1)) / (float)(1 << iSize);
-        float dAngle = hazard->dparam[1];
-        for (short iDot = 0; iDot < iNumDots; iDot++) {
-            rDotDst.x = (short)(dRadius * cos(dAngle)) + rPathDst.x + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1);
-            rDotDst.y = (short)(dRadius * sin(dAngle)) + rPathDst.y + (iTileSize >> 1) - (iPlatformPathDotSize[iSize] >> 1);
-            rDotDst.h = rDotDst.w = iPlatformPathDotSize[iSize];
-
-            rm->spr_platformpath.draw(rDotDst.x, rDotDst.y, rDotSrc.x, rDotSrc.y, rDotDst.w, rDotDst.h);
-            dAngle += TWO_PI / iNumDots;
-        }
-
-        //Draw the rotodiscs
-        float dSector = TWO_PI / hazard->iparam[0];
-        dAngle = hazard->dparam[1];
-        dRadius = hazard->dparam[2] / (float)(1 << iSize);
-        for (short iRotodisc = 0; iRotodisc < hazard->iparam[0]; iRotodisc++) {
-            short x = rPathDst.x + (short)(dRadius * cos(dAngle));
-            short y = rPathDst.y + (short)(dRadius * sin(dAngle));
-
-            rm->spr_hazard_rotodisc[iSize].draw(x, y, 0, 0, iTileSize, iTileSize);
-
-            dAngle += dSector;
-        }
-    } else if (hazard->itype == 2) { //bullet bill
-        rm->spr_hazard_bulletbill[iSize].draw(rPathDst.x, rPathDst.y, 0, hazard->dparam[0] < 0.0f ? 0 : iTileSize, iTileSize, iTileSize);
-
-        short iBulletPathX = rPathDst.x - iPlatformPathDotSize[iSize];
-        if (hazard->dparam[0] > 0.0f)
-            iBulletPathX = rPathDst.x + iTileSize;
-
-        short iBulletPathSpacing = (short)(hazard->dparam[0] * dBulletBillFrequency[iSize]);
-        while (iBulletPathX >= 0 && iBulletPathX < smw->GetScreenWidth(iSize)) {
-            gfx_setrect(&rDotDst, iBulletPathX, rPathDst.y + ((iTileSize - iPlatformPathDotSize[iSize]) >> 1), iPlatformPathDotSize[iSize], iPlatformPathDotSize[iSize]);
-            SDL_BlitSurface(rm->spr_platformpath.getSurface(), &rDotSrc, blitdest, &rDotDst);
-
-            iBulletPathX += hazard->iparam[0] < 0.0f ? -iBulletPathSpacing : iBulletPathSpacing;
-        }
-    } else if (hazard->itype == 3) { //flame cannon
-        SDL_Rect * rect = &g_rFlameRects[hazard->iparam[1]][2];
-
-        short iOffsetX = 0;
-        short iOffsetY = 0;
-
-        if (hazard->iparam[1] == 1) {
-            iOffsetX = -(iTileSize << 1);
-        } else if (hazard->iparam[1] == 2) {
-            iOffsetY = -(iTileSize << 1);
-        }
-
-        rm->spr_hazard_flame[iSize].draw(rPathDst.x + iOffsetX, rPathDst.y + iOffsetY, rect->x >> iSize, rect->y >> iSize, rect->w >> iSize, rect->h >> iSize);
-    } else if (hazard->itype >= 4 && hazard->itype <= 7) { //pirhana plants
-        SDL_Rect * rect = &g_rPirhanaRects[hazard->itype - 4][hazard->iparam[1]][0];
-        short iOffsetX = 0;
-        short iOffsetY = 0;
-
-        if (hazard->iparam[1] == 0) {
-            if (hazard->itype == 6)
-                iOffsetY = -iTileSize;
-            else
-                iOffsetY = -(iTileSize >> 1);
-        } else if (hazard->iparam[1] == 2) {
-            if (hazard->itype == 6)
-                iOffsetX = -iTileSize;
-            else
-                iOffsetX = -(iTileSize >> 1);
-        }
-
-        rm->spr_hazard_pirhanaplant[iSize].draw(rPathDst.x + iOffsetX, rPathDst.y + iOffsetY, rect->x >> iSize, rect->y >> iSize, rect->w >> iSize, rect->h >> iSize);
-    }
-}
 
 SDL_Rect iCountDownNumbers[4][4][2] =
     {   {{{0, 0, 64, 64},{288, 208, 64, 64}},
