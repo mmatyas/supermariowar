@@ -1,18 +1,16 @@
 #ifndef FILELIST_H
 #define FILELIST_H
 
+#include "path.h"
+#include "RandomNumberGenerator.h"
+
 #include <map>
 #include <string>
 #include <vector>
 
-#include "path.h"
-#include "RandomNumberGenerator.h"
-
 #define MAXMUSICCATEGORY        11
 #define MAXWORLDMUSICCATEGORY   9
-#define MAXCATEGORYTRACKS      64
-
-extern char *lowercaseDup(const char *s);
+#define MAXCATEGORYTRACKS       64
 
 //it was kinda a bad idea to have skinlist and announcer list based on this, because both are accessed in different ways (skinlist like an vector and announcer list like a list). grrrr
 class SimpleFileList
@@ -29,57 +27,17 @@ public:
     int GetCurrentIndex() {
         return currentIndex;
     };
-    void SetCurrent(unsigned int index) {
-        if (filelist.empty())
-            return;
+    void SetCurrent(unsigned int index);
 
-        if (index < filelist.size())
-            currentIndex = index;
-        else
-            currentIndex = 0;
-    };
-
-    const char * current_name() {
-        if (currentIndex > -1)
-            return filelist[currentIndex].c_str();
-
-        return NULL;
-    };
+    const char * current_name();
+    void SetCurrentName(const std::string &name);
 
     void next();
     void prev();
+    void random();
 
-    void random() {
-        if (!filelist.empty())
-            currentIndex = RNGMAX(filelist.size());
-    };
-
-    void SetCurrentName(const std::string &name);
-
-    void add(const char * name) {
-        filelist.push_back(name);
-    }
-
-    bool find(const char * name) {
-        char * szLookForName = lowercaseDup(name);
-        bool fFound = false;
-
-        int oldCurrent = currentIndex;
-        do {
-            next();	//sets us to the beginning if we hit the end -> loop through the maps
-
-            char * szCurrentName = lowercaseDup(filelist[currentIndex].c_str());
-
-            if (strstr(szCurrentName, szLookForName))	//compare names after
-                fFound = true;
-
-            free(szCurrentName);
-        } while (currentIndex != oldCurrent && !fFound);
-
-        free(szLookForName);
-
-        return fFound;
-    }
+    void add(const char * name);
+    bool find(const char * name);
 
 protected:
     std::vector<std::string> filelist;
@@ -193,8 +151,8 @@ public:
     std::string GetRandomMusic(int iCategoryID, const char * szMapName, const char * szBackground);
     std::string GetNextMusic(int iCategoryID, const char * szMapName, const char * szBackground);
 
-    int		numsongsforcategory[MAXMUSICCATEGORY];
-    int		songsforcategory[MAXMUSICCATEGORY][MAXCATEGORYTRACKS];
+    int numsongsforcategory[MAXMUSICCATEGORY];
+    int songsforcategory[MAXMUSICCATEGORY][MAXCATEGORYTRACKS];
     std::vector<std::string> songFileNames;
 
     std::map<std::string, MusicOverride*> mapoverride;

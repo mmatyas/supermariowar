@@ -3,12 +3,12 @@
 #endif
 
 #ifdef _WIN32
-#ifndef _XBOX
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#endif
+    #ifndef _XBOX
+        #define WIN32_LEAN_AND_MEAN
+        #include <windows.h>
+    #endif
 #else
-#include <dirent.h>
+    #include <dirent.h>
 #endif
 
 #include "global.h"
@@ -25,7 +25,23 @@ using std::string;
 extern const char * g_szMusicCategoryNames[MAXMUSICCATEGORY];
 extern short g_iDefaultMusicCategory[MAXMUSICCATEGORY];
 
-extern std::string stripPathAndExtension(const std::string &path);
+
+struct MapMusicOverride {
+    std::string mapname;
+    std::vector<std::string> songs;
+};
+
+struct WorldMusicOverride {
+    std::string worldname;
+    std::string song;
+};
+
+std::vector<MapMusicOverride*> mapmusicoverrides;
+std::vector<WorldMusicOverride*> worldmusicoverrides;
+
+extern MusicList* musiclist;
+extern WorldMusicList* worldmusiclist;
+
 
 ///////////// SimpleFileList ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 SimpleFileList::SimpleFileList(const std::string &path, const std::string &extension, bool fAlphabetize)
@@ -82,6 +98,24 @@ SimpleFileList::~SimpleFileList()
     filelist.clear();
 }
 
+void SimpleFileList::SetCurrent(unsigned int index)
+{
+    if (filelist.empty())
+        return;
+
+    if (index < filelist.size())
+        currentIndex = index;
+    else
+        currentIndex = 0;
+};
+
+const char * SimpleFileList::current_name()
+{
+    if (currentIndex > -1)
+        return filelist[currentIndex].c_str();
+
+    return NULL;
+};
 
 void SimpleFileList::next()
 {
@@ -105,6 +139,12 @@ void SimpleFileList::prev()
         currentIndex--;
 }
 
+void SimpleFileList::random()
+{
+    if (!filelist.empty())
+        currentIndex = RNGMAX(filelist.size());
+};
+
 const char * SimpleFileList::GetIndex(unsigned int index)
 {
     if (index < filelist.size())
@@ -112,7 +152,6 @@ const char * SimpleFileList::GetIndex(unsigned int index)
 
     return NULL;
 }
-
 
 void SimpleFileList::SetCurrentName(const std::string &name)
 {
@@ -125,6 +164,33 @@ void SimpleFileList::SetCurrentName(const std::string &name)
             break;
         }
     }
+}
+
+void SimpleFileList::add(const char * name)
+{
+    filelist.push_back(name);
+}
+
+bool SimpleFileList::find(const char * name)
+{
+    char * szLookForName = lowercaseDup(name);
+    bool fFound = false;
+
+    int oldCurrent = currentIndex;
+    do {
+        next(); //sets us to the beginning if we hit the end -> loop through the maps
+
+        char * szCurrentName = lowercaseDup(filelist[currentIndex].c_str());
+
+        if (strstr(szCurrentName, szLookForName))   //compare names after
+            fFound = true;
+
+        free(szCurrentName);
+    } while (currentIndex != oldCurrent && !fFound);
+
+    free(szLookForName);
+
+    return fFound;
 }
 
 ///////////// SkinList ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
