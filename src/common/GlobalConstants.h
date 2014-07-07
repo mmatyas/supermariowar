@@ -1,8 +1,9 @@
 #ifndef GLOBALCONSTANTS_H
 #define GLOBALCONSTANTS_H
 
-
 //------------- global definitions -------------
+
+#define FILEBUFSIZE 1024
 
 //----------------------------------------------------------------
 // DON'T CHANGE THE ORDER xxx_R xxx_L xxx_R xxx_L !!!
