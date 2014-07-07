@@ -1,9 +1,9 @@
+#include "RandomNumberGenerator.h"
+
 #include <cassert>
 #include <climits>
 #include <cstdlib>
 #include <ctime>
-
-#include "RandomNumberGenerator.h"
 
 //
 // ABSTRACT RNG CLASS
