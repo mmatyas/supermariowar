@@ -1,6 +1,8 @@
 #include "sfx.h"
+
 #include <iostream>
 #include <string>
+
 using namespace std;
 
 #ifdef _WIN32
@@ -9,11 +11,11 @@ using namespace std;
 	#endif
 #endif
 
-extern bool fResumeMusic;
+bool fResumeMusic = true;
 extern void DECLSPEC soundfinished(int channel);
 extern void DECLSPEC musicfinished();
 
-extern sfxSound * g_PlayingSoundChannels[NUM_SOUND_CHANNELS];
+sfxSound * g_PlayingSoundChannels[NUM_SOUND_CHANNELS];
 
 bool sfx_init()
 {
