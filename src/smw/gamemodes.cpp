@@ -1,11 +1,33 @@
-#include <math.h>
-#include <string.h>
+#include "gamemodes.h"
 
+#include "eyecandy.h"
 #include "global.h"
+#include "GameValues.h"
+#include "gfx.h"
+#include "object.h"
+#include "ObjectContainer.h"
+#include "objectgame.h"
 #include "RandomNumberGenerator.h"
+#include "ResourceManager.h"
+#include "Score.h"
+
+#include <cmath>
+#include <cstdlib> // abs()
+#include <cstring>
 
 extern gfxFont font[3];
+
 extern CScore *score[4];
+extern short score_cnt;
+
+extern CObjectContainer objectcontainer[3];
+extern CEyecandyContainer eyecandy[3];
+
+extern CPlayer* list_players[4];
+extern short list_players_cnt;
+
+extern CResourceManager* rm;
+extern CGameValues game_values;
 
 extern short CountAliveTeams(short * lastteam);
 
