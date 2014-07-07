@@ -1,5 +1,24 @@
-#include "global.h"
 #include "ResourceManager.h"
+
+#include "FileList.h"
+#include "Game.h"
+#include "GameValues.h"
+#include "TilesetManager.h"
+
+extern SkinList *skinlist;
+extern GraphicsList *menugraphicspacklist;
+extern GraphicsList *worldgraphicspacklist;
+extern GraphicsList *gamegraphicspacklist;
+extern SoundsList *soundpacklist;
+
+extern CTilesetManager  *g_tilesetmanager;
+
+extern CGameValues game_values;
+
+extern CGame* smw;
+
+extern void _load_drawmsg(const std::string& f);
+extern void _load_waitforkey();
 
 bool CResourceManager::LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDirections)
 {
