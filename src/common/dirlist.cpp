@@ -18,11 +18,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
 #include "dirlist.h"
+
 #include "path.h"
+
 #include <string>
-using namespace std;
-#include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+
+using namespace std;
 
 
 /* Use references to avoid copying */
