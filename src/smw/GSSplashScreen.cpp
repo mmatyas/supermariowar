@@ -1,3 +1,19 @@
+#include "GSSplashScreen.h"
+
+#include "FileList.h"
+#include "MapList.h"
+#include "global.h"
+//#include "time.h"
+#include "Game.h"
+#include "GameValues.h"
+#include "GSMenu.h"
+#include "GSGameplay.h"
+#include "eyecandy.h"
+#include "ResourceManager.h"
+
+#include <string>
+#include <iostream>
+
 #ifdef _XBOX
 #include <xtl.h>
 #endif
@@ -9,18 +25,12 @@
 #endif
 #endif
 
-#include "GSSplashScreen.h"
-
-#include "global.h"
-#include "time.h"
-#include "GSMenu.h"
-#include "GSGameplay.h"
-
-#include <string>
-#include <iostream>
 using std::cout;
 using std::endl;
 using std::string;
+
+extern SDL_Surface* screen;
+extern SDL_Surface* blitdest;
 
 extern bool g_fLoadMessages;
 
@@ -28,6 +38,17 @@ extern bool gfx_createmenuskin(gfxSprite ** gSprites, const std::string& filenam
 extern bool gfx_createfullskin(gfxSprite ** gSprites, const std::string& filename, Uint8 r, Uint8 g, Uint8 b, short colorScheme);
 
 extern CEyecandyContainer eyecandy[3];
+
+extern MapList *maplist;
+extern MusicList *musiclist;
+extern GraphicsList *menugraphicspacklist;
+
+extern CGameValues game_values;
+extern CResourceManager* rm;
+extern CGame* smw;
+
+extern void _load_drawmsg(const std::string& f);
+extern void _load_waitforkey();
 
 //-----------------------------------------------------------------------------
 // THE LOAD UP SEQUENCE + SPLASH SCREEN

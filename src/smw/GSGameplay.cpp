@@ -1,13 +1,50 @@
 #include "GSGameplay.h"
 
+#include "FileList.h"
 #include "global.h"                //all the global stuff
-#include "net.h"
+#include "GameMode.h"
+#include "gamemodes.h"
+#include "GameValues.h"
 #include "GSMenu.h"
+#include "net.h"
+#include "map.h"
+#include "MapList.h"
+#include "object.h"
+#include "objectgame.h"
+#include "objecthazard.h"
+#include "player.h"
 #include "RandomNumberGenerator.h"
+#include "ResourceManager.h"
+#include "Score.h"
+#include "sfx.h"
 
-#include <math.h>
+#include <cmath>
 
+extern SDL_Surface* screen;
+extern SDL_Surface* blitdest;
+
+extern bool fResumeMusic;
 extern short g_iCurrentDrawIndex;
+extern CPlayer * GetPlayerFromGlobalID(short iGlobalID);
+
+extern CGM_Boss_MiniGame * bossgamemode;
+extern short currentgamemode;
+
+extern CMap* g_map;
+
+extern CPlayer* list_players[4];
+extern short list_players_cnt;
+extern CScore* score[4];
+extern short score_cnt;
+
+extern MapList *maplist;
+extern MusicList *musiclist;
+
+extern CGameValues game_values;
+extern CResourceManager* rm;
+
+CObjectContainer noncolcontainer;
+CObjectContainer objectcontainer[3];
 
 CEyecandyContainer eyecandy[3];
 SpotlightManager spotlightManager;
@@ -108,17 +145,7 @@ short LookupTeamID(short id)
     return LookupTeamID(id, NULL, NULL);
 }
 
-CPlayer * GetPlayerFromGlobalID(short iGlobalID)
-{
-    for (short i = 0; i < list_players_cnt; i++) {
-        if (list_players[i]->globalID == iGlobalID)
-            return list_players[i];
-    }
-
-    return NULL;
-}
-
-sfxSound * g_PlayingSoundChannels[NUM_SOUND_CHANNELS];
+extern sfxSound * g_PlayingSoundChannels[NUM_SOUND_CHANNELS];
 
 void DECLSPEC soundfinished(int channel)
 {

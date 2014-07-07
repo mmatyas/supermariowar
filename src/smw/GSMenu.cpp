@@ -1,10 +1,20 @@
-#include "global.h"
-#include "net.h"
 #include "GSMenu.h"
-#include "GSGameplay.h"
-#include "FileIO.h"
 
-#include <math.h>
+#include "global.h"
+#include "FileIO.h"
+#include "FileList.h"
+#include "Game.h"
+#include "GameValues.h"
+#include "gamemodes.h"
+#include "GSGameplay.h"
+#include "net.h"
+#include "map.h"
+#include "MapList.h"
+#include "ResourceManager.h"
+#include "Score.h"
+
+#include <cmath>
+#include <cstdlib> // atoi()
 
 #ifdef _XBOX
 #include <xtl.h>
@@ -25,6 +35,9 @@ extern void reconnectjoysticks();
 extern int joystickcount;
 #endif
 */
+
+extern SDL_Surface* screen;
+extern SDL_Surface* blitdest;
 
 #ifdef _DEBUG
 extern bool	g_fAutoTest;
@@ -51,9 +64,38 @@ extern void LoadCurrentMapBackground();
 
 extern TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld);
 
+extern CMap* g_map;
+
 extern CScore *score[4];
+extern short score_cnt;
 
 extern std::string stripPathAndExtension(const std::string &path);
+
+extern CGameMode * gamemodes[GAMEMODE_LAST];
+extern CGM_Bonus * bonushousemode;
+extern CGM_Pipe_MiniGame * pipegamemode;
+extern CGM_Boss_MiniGame * bossgamemode;
+extern CGM_Boxes_MiniGame * boxesgamemode;
+extern short currentgamemode;
+
+extern CResourceManager* rm;
+extern CGameValues game_values;
+extern CGame* smw;
+
+extern FiltersList *filterslist;
+extern MapList *maplist;
+extern SkinList *skinlist;
+extern AnnouncerList *announcerlist;
+extern MusicList *musiclist;
+extern WorldMusicList *worldmusiclist;
+extern GraphicsList *menugraphicspacklist;
+extern GraphicsList *worldgraphicspacklist;
+extern GraphicsList *gamegraphicspacklist;
+extern SoundsList *soundpacklist;
+extern TourList *tourlist;
+extern WorldList *worldlist;
+
+extern short g_iCurrentPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
 
 MenuState& MenuState::instance()
 {

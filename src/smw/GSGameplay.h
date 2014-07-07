@@ -2,7 +2,7 @@
 #define GAMESTATE_GAMEPLAY_H
 
 #include "GameState.h"
-#include "global.h"
+#include "input.h"
 
 class GameplayState : public GameState
 {
