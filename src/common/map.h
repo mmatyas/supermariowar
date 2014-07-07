@@ -1,6 +1,13 @@
 #ifndef SMW_MAP_H
 #define SMW_MAP_H
 
+#include "GlobalConstants.h"
+#include "gfx.h"
+
+#include "SDL.h"
+#include <list>
+#include <vector>
+
 enum TileType{tile_nonsolid = 0, tile_solid = 1, tile_solid_on_top = 2, tile_ice = 3, tile_death = 4, tile_death_on_top = 5, tile_death_on_bottom = 6, tile_death_on_left = 7, tile_death_on_right = 8, tile_ice_on_top = 9, tile_ice_death_on_bottom = 10, tile_ice_death_on_left = 11, tile_ice_death_on_right = 12, tile_super_death = 13, tile_super_death_top = 14, tile_super_death_bottom = 15, tile_super_death_left = 16, tile_super_death_right = 17, tile_player_death = 18, tile_gap = 19};
 enum ReadType{read_type_full = 0, read_type_preview = 1, read_type_summary = 2};
 
@@ -30,7 +37,9 @@ enum TileTypeFlag {tile_flag_nonsolid = 0, tile_flag_solid = 1, tile_flag_solid_
 	tile_player_death =	4096		1	0	0	0	0	0	0	0	0	0	0	0	0
 */
 
+class CPlayer;
 class MovingPlatform;
+class IO_MovingObject;
 
 struct ScreenPoint {
 	short x, y;
@@ -117,6 +126,13 @@ struct MapBlock {
 };
 
 class IO_Block;
+
+void DrawMapHazard(MapHazard * hazard, short iSize, bool fDrawCenter);
+void DrawPlatform(short pathtype, TilesetTile ** tiles,
+	short startX, short startY, short endX, short endY,
+	float angle, float radiusX, float radiusY,
+	short iSize, short iPlatformWidth, short iPlatformHeight,
+	bool fDrawPlatform, bool fDrawShadow);
 
 class CMap
 {
