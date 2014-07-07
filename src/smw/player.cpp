@@ -1,14 +1,40 @@
+#include "player.h"
+
+#include "eyecandy.h"
+#include "gamemodes.h"
+#include "GameValues.h"
 #include "global.h"
+#include "map.h"
+#include "movingplatform.h"
 #include "net.h"
-#include <math.h>
+#include "object.h"
+#include "ObjectContainer.h"
+#include "objectgame.h"
+#include "objecthazard.h"
+#include "RandomNumberGenerator.h"
+#include "ResourceManager.h"
+
+#include <cmath>
 
 extern bool SwapPlayers(short iUsingPlayerID);
 extern void EnterBossMode(short bossType);
-extern CPlayer * GetPlayerFromGlobalID(short iGlobalID);
 extern short g_iWinningPlayer;
 extern short g_iSwirlSpawnLocations[4][2][25];
 extern void CheckSecret(short id);
 extern SpotlightManager spotlightManager;
+
+extern CObjectContainer noncolcontainer;
+extern CObjectContainer objectcontainer[3];
+
+extern CMap* g_map;
+extern CEyecandyContainer eyecandy[3];
+
+extern CPlayer* list_players[4];
+extern short list_players_cnt;
+
+extern CGameValues game_values;
+extern CResourceManager* rm;
+
 
 struct STextAward {
     const char      *name;
@@ -33,28 +59,6 @@ STextAward awardtexts[PAWARD_LAST] = {
     STextAward("Unstoppable!", &rm->game_font_large)
 };
 
-float CapFallingVelocity(float vel)
-{
-    //if (vel < -MAXVELY)
-    //    return -MAXVELY;
-
-    if (vel > MAXVELY)
-        return MAXVELY;
-
-    return vel;
-}
-
-float CapSideVelocity(float vel)
-{
-    if (vel < -MAXSIDEVELY)
-        return -MAXSIDEVELY;
-
-    if (vel > MAXSIDEVELY)
-        return MAXSIDEVELY;
-
-    return vel;
-}
-
 void CScore::AdjustScore(short iValue)
 {
     if (game_values.gamemode->gameover)
@@ -66,6 +70,38 @@ void CScore::AdjustScore(short iValue)
         score = 0;
 
     SetDigitCounters();
+}
+
+void CMap::movingPlatformCollision(CPlayer * player)
+{
+    //Collide player with normal moving platforms
+    for (short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++) {
+        platforms[iPlatform]->collide(player);
+
+        if (!player->isready())
+            return;
+    }
+
+    //Collide player with temporary platforms (like falling donut blocks)
+    std::list<MovingPlatform*>::iterator iterateAll = tempPlatforms.begin(), lim = tempPlatforms.end();
+    while (iterateAll != lim) {
+        (*iterateAll)->collide(player);
+
+        if (!player->isready())
+            return;
+
+        iterateAll++;
+    }
+}
+
+CPlayer * GetPlayerFromGlobalID(short iGlobalID)
+{
+    for (short i = 0; i < list_players_cnt; i++) {
+        if (list_players[i]->globalID == iGlobalID)
+            return list_players[i];
+    }
+
+    return NULL;
 }
 
 CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamID, short iColorID, gfxSprite * nsprites[PGFX_LAST], CScore *nscore, short * sRespawnCounter, CPlayerAI * ai)

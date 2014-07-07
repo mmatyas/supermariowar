@@ -1,13 +1,38 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "GlobalConstants.h"
-
 #include "ai.h"
 #include "gfx.h"
+#include "GlobalConstants.h"
+#include "Score.h"
+#include "PlayerKillStyles.h"
 
-enum PlayerState {player_wait, player_spawning, player_dead, player_ready, player_entering_warp_up, player_entering_warp_right, player_entering_warp_down, player_entering_warp_left, player_exiting_warp_down, player_exiting_warp_left, player_exiting_warp_up, player_exiting_warp_right};
-enum PlayerAction {player_action_none, player_action_bobomb, player_action_fireball, player_action_hammer, player_action_boomerang, player_action_iceblast, player_action_bomb, player_action_spincape, player_action_spintail};
+enum PlayerState {
+	player_wait,
+    player_spawning,
+    player_dead,
+    player_ready,
+    player_entering_warp_up,
+    player_entering_warp_right,
+    player_entering_warp_down,
+    player_entering_warp_left,
+    player_exiting_warp_down,
+    player_exiting_warp_left,
+    player_exiting_warp_up,
+    player_exiting_warp_right
+};
+
+enum PlayerAction {
+	player_action_none,
+    player_action_bobomb,
+    player_action_fireball,
+    player_action_hammer,
+    player_action_boomerang,
+    player_action_iceblast,
+    player_action_bomb,
+    player_action_spincape,
+    player_action_spintail
+};
 
 class CObject;
 class MO_CarriedObject;
@@ -15,82 +40,12 @@ class MovingPlatform;
 class Spotlight;
 struct Warp;
 
-class CScore
-{
-	public:
-    CScore(short iPlace) {
-			place = iPlace;
-			displayorder = iPlace;
 
-			score = 0;
-
-			for (short iSubScore = 0; iSubScore < 3; iSubScore++)
-				subscore[iSubScore] = 0;
-
-			x = 0;
-			y = 0;
-			destx = 0;
-			desty = 0;
-			order = 0;
-			fromx = 0;
-			fromy = 0;
-			iDigitRight = 0;
-			iDigitMiddle = 0;
-			iDigitLeft = 0;
-		}
-
-		~CScore() {}
-
-		void AdjustScore(short iValue);
-
-    void SetScore(short iValue) {
-			score = iValue;
-			SetDigitCounters();
-		}
-
-		//keeps track of what the actual score value is
-		short score;
-
-		//keeps track of other scoring elements for some games (health, collected cards, etc)
-		short subscore[3];
-
-		//Where to display score
-		short x;
-		short y;
-
-		short destx;
-		short desty;
-
-		short place;
-		short displayorder;
-		short order;  //the order in which the team died
-
-		short fromx;
-		short fromy;
-
-		//One less array dereference doing vars like this
-		short iDigitRight;
-		short iDigitMiddle;
-		short iDigitLeft;
-
-	private:
-
-    void SetDigitCounters() {
-			short iDigits = score;
-			while (iDigits > 999)
-				iDigits -= 1000;
-
-			iDigitLeft = iDigits / 100 * 16;
-			iDigitMiddle = iDigits % 100 / 10 * 16;
-			iDigitRight = iDigits % 10 * 16;
-		}
-
-	//friend class CGM_Star;
+enum deathstyle{
+	death_style_jump = 0,
+    death_style_squish = 1,
+    death_style_shatter = 2
 };
-
-
-enum killstyle{kill_style_stomp = 0, kill_style_star = 1, kill_style_fireball = 2, kill_style_bobomb = 3, kill_style_bounce = 4, kill_style_pow = 5, kill_style_goomba = 6, kill_style_bulletbill = 7, kill_style_hammer = 8, kill_style_shell = 9, kill_style_throwblock = 10, kill_style_cheepcheep = 11, kill_style_koopa = 12, kill_style_boomerang = 13, kill_style_feather = 14, kill_style_iceblast = 15, kill_style_podobo = 16, kill_style_bomb = 17, kill_style_leaf = 18, kill_style_pwings = 19, kill_style_kuriboshoe = 20, kill_style_poisonmushroom = 21, kill_style_environment = 22, kill_style_push = 23, kill_style_buzzybeetle = 24, kill_style_spiny = 25, kill_style_phanto = 26, KILL_STYLE_LAST};
-enum deathstyle{death_style_jump = 0, death_style_squish = 1, death_style_shatter = 2};
 
 
 //the player class - a lot of optimization can be done here
