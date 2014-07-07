@@ -1,13 +1,14 @@
 #include "gfx.h"
 
+#include "FileList.h"
+#include "path.h"
+#include "sdl12wrapper.h"
+
 #include <cassert>
 #include <iostream>
 #include <string>
-using namespace std;
 
-#include "path.h"
-#include "FileList.h"
-#include "sdl12wrapper.h"
+using namespace std;
 
 #ifdef _WIN32
     #pragma comment(lib, "SDL_image.lib")

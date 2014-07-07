@@ -21,9 +21,10 @@
 #ifndef GFX_H
 #define GFX_H
 
+#include "SFont.h"
+
 #include "SDL.h"
 #include "SDL_image.h"
-#include "SFont.h"
 #include <string>
 
 bool gfx_init(int w, int h, bool fullscreen);
