@@ -1,12 +1,10 @@
-#include <cassert>
-#include <string.h>
-
 #include "net.h"
 
-#include "global.h"
 #include "FileIO.h"
+#include "GameValues.h"
 #include "GSMenu.h"
 #include "RandomNumberGenerator.h"
+#include "player.h"
 
 #include "network/NetworkProtocolPackages.h"
 
@@ -19,12 +17,15 @@
     #include "platform/network/null/NetworkHandlerNULL.h"
 #endif
 
+#include <cassert>
+#include <cstring>
+
 NetworkHandler networkHandler;
 Networking netplay;
 
-extern gv game_values;
+extern CGameValues game_values;
 extern int g_iVersion[];
-extern CPlayer *list_players[4];
+extern CPlayer* list_players[4];
 extern short list_players_cnt;
 extern bool VersionIsEqual(int iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
 

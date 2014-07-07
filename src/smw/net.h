@@ -1,11 +1,11 @@
 #ifndef NETWORK_H
 #define NETWORK_H
 
-#include <string>
-#include <vector>
-
 #include "input.h"
 #include "network/NetworkProtocolCodes.h"
+
+#include <string>
+#include <vector>
 
 
 //Write network handler class here
