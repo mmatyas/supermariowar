@@ -16,10 +16,31 @@
 +----------------------------------------------------------*/
 
 #define SMW_EDITOR
-#include "global.h"
 
+#include "eyecandy.h"
+#include "GameMode.h"
+#include "gfx.h"
+#include "GlobalConstants.h"
+#include "map.h"
+#include "MapList.h"
+#include "movingplatform.h"
 #include "path.h"
 #include "FileIO.h"
+#include "ResourceManager.h"
+#include "sfx.h"
+#include "TilesetManager.h"
+
+// Included only for movingplatform
+// TODO: Remove and fix linker errors
+#include "object.h"
+#include "player.h"
+void CPlayer::flipsidesifneeded() {}
+short CPlayer::KillPlayerMapHazard(bool, killstyle, bool, short) { return 0; }
+void IO_MovingObject::flipsidesifneeded() {}
+void IO_MovingObject::KillObjectMapHazard(short playerID) {}
+void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead) {}
+
+#include "sdl12wrapper.h"
 
 #ifdef PNG_SAVE_FORMAT
 	// this function was added to SDL2
@@ -28,9 +49,10 @@
 	#endif
 #endif
 
-#include <string.h>
+#include <cmath>
 #include <ctype.h>
-#include <math.h>
+#include <cstring>
+#include <cstdlib>
 
 #ifdef _WIN32
 	#include <windows.h>
@@ -47,9 +69,25 @@
 #endif
 
 #include "SDL.h"
-#include "sdl12wrapper.h"
+
+#ifdef __EMSCRIPTEN__
+#define SDL_Delay(n) ;
+#endif
+
 
 #define MAPTITLESTRING "SMW 2.0 Level Editor"
+
+
+extern CMap* g_map;
+extern CTilesetManager* g_tilesetmanager;
+
+extern FiltersList *filterslist;
+extern MapList *maplist;
+
+extern short g_iDefaultPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
+extern short g_iCurrentPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
+
+extern CResourceManager* rm;
 
 
 enum {EDITOR_EDIT, EDITOR_TILES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_MAP, EDITOR_BLOCKS, NEW_MAP, SAVE, EDITOR_WARP, EDITOR_EYECANDY, DISPLAY_HELP, EDITOR_PLATFORM, EDITOR_TILETYPE, EDITOR_BACKGROUNDS, EDITOR_MAPITEMS, EDITOR_ANIMATION, EDITOR_PROPERTIES, EDITOR_MODEITEMS, EDITOR_MAPHAZARDS};
@@ -162,10 +200,7 @@ int				copiedlayer;
 gfxSprite		spr_warplock;
 short			x_shake = 0;
 short			y_shake = 0;
-void CPlayer::flipsidesifneeded() {}
-void IO_MovingObject::flipsidesifneeded() {}
-void IO_MovingObject::KillObjectMapHazard(short playerID) {}
-void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead) {}
+
 gfxSprite		spr_thumbnail_warps[2];
 gfxSprite		spr_thumbnail_mapitems[2];
 gfxSprite		spr_awardsouls, spr_fireballexplosion;
@@ -178,7 +213,7 @@ short			list_players_cnt = 0;
 
 void DECLSPEC soundfinished(int channel){}
 void DECLSPEC musicfinished(){}
-sfxSound * g_PlayingSoundChannels[NUM_SOUND_CHANNELS];
+//sfxSound * g_PlayingSoundChannels[NUM_SOUND_CHANNELS];
 gfxSprite		menu_dialog;
 
 IO_MovingObject * createpowerup(short iType, short ix, short iy, bool side, bool spawn)
@@ -507,6 +542,8 @@ int main(int argc, char *argv[])
 
 	menu_font_small.init(convertPath("gfx/packs/Classic/fonts/font_small.png"));
 	menu_font_large.init(convertPath("gfx/packs/Classic/fonts/font_large.png"));
+	rm->menu_font_small.init(convertPath("gfx/packs/Classic/fonts/menu_font_small.png"));
+	rm->menu_font_large.init(convertPath("gfx/packs/Classic/fonts/menu_font_large.png"));
 
 	printf("\n---------------- load map ----------------\n");
 
@@ -778,7 +815,11 @@ int editor_edit()
         if (fExiting) {
 			//handle messages
             while (SDL_PollEvent(&event)) {
-				Uint8 * keystate = SDL_GetKeyState(NULL);
+            #if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
+                const Uint8 * keystate = SDL_GetKeyboardState(NULL);
+            #else
+                Uint8 * keystate = SDL_GetKeyState(NULL);
+            #endif
 
                 switch (event.type) {
                 case SDL_KEYDOWN: {
@@ -805,7 +846,11 @@ int editor_edit()
         } else {
 			//handle messages
             while (SDL_PollEvent(&event)) {
-				Uint8 * keystate = SDL_GetKeyState(NULL);
+            #if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
+                const Uint8 * keystate = SDL_GetKeyboardState(NULL);
+            #else
+                Uint8 * keystate = SDL_GetKeyState(NULL);
+            #endif
 
                 switch (event.type) {
                 case SDL_QUIT: {
@@ -2017,7 +2062,11 @@ int editor_properties(short iBlockCol, short iBlockRow)
 						else if (event.key.keysym.sym == SDLK_d)
 							iValue = g_iDefaultPowerupPresets[0][iSettingIndex];
 
-						Uint8 * keystate = SDL_GetKeyState(NULL);
+                    #if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
+                        const Uint8 * keystate = SDL_GetKeyboardState(NULL);
+                    #else
+                        Uint8 * keystate = SDL_GetKeyState(NULL);
+                    #endif
                     if (keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT]) {
                         for (short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++) {
 								if (event.key.keysym.sym == SDLK_d)
@@ -2473,7 +2522,11 @@ int editor_platforms()
 								g_Platforms[iEditPlatform].types[ix][iy] = set_tiletype;
 							}
                     } else if (PLATFORM_EDIT_STATE_PATH == iPlatformEditState) {
-							Uint8 * keystate = SDL_GetKeyState(NULL);
+                    #if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
+                        const Uint8 * keystate = SDL_GetKeyboardState(NULL);
+                    #else
+                        Uint8 * keystate = SDL_GetKeyState(NULL);
+                    #endif
                         if (g_Platforms[iEditPlatform].iPathType == 2 && (keystate[SDLK_z] || keystate[SDLK_x] || keystate[SDLK_c])) {
 								UpdatePlatformPathRadius(iEditPlatform, event.button.x, event.button.y, keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT], keystate[SDLK_z] != 0, keystate[SDLK_c] != 0);
                         } else {
@@ -2492,7 +2545,11 @@ int editor_platforms()
                     } else if (PLATFORM_EDIT_STATE_TILETYPE == iPlatformEditState) {
 							g_Platforms[iEditPlatform].types[ix][iy] = tile_nonsolid;
                     } else if (PLATFORM_EDIT_STATE_PATH == iPlatformEditState) {
-							Uint8 * keystate = SDL_GetKeyState(NULL);
+                    #if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
+                        const Uint8 * keystate = SDL_GetKeyboardState(NULL);
+                    #else
+                        Uint8 * keystate = SDL_GetKeyState(NULL);
+                    #endif
                         if (g_Platforms[iEditPlatform].iPathType == 0) {
 								UpdatePlatformPathEnd(iEditPlatform, event.button.x, event.button.y, keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT]);
                         } else if (g_Platforms[iEditPlatform].iPathType == 1 || g_Platforms[iEditPlatform].iPathType == 2) {
@@ -2533,14 +2590,22 @@ int editor_platforms()
 							g_Platforms[iEditPlatform].types[ix][iy] = tile_nonsolid;
                 } else if (PLATFORM_EDIT_STATE_PATH == iPlatformEditState) {
                     if (event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT)) {
-							Uint8 * keystate = SDL_GetKeyState(NULL);
+                    #if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
+                        const Uint8 * keystate = SDL_GetKeyboardState(NULL);
+                    #else
+                        Uint8 * keystate = SDL_GetKeyState(NULL);
+                    #endif
                         if (g_Platforms[iEditPlatform].iPathType == 2 && (keystate[SDLK_z] || keystate[SDLK_x] || keystate[SDLK_c])) {
 								UpdatePlatformPathRadius(iEditPlatform, event.button.x, event.button.y, keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT], keystate[SDLK_z] != 0, keystate[SDLK_c] != 0);
                         } else {
 								UpdatePlatformPathStart(iEditPlatform, event.button.x, event.button.y, keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT]);
 							}
                     } else if (event.motion.state == SDL_BUTTON(SDL_BUTTON_RIGHT)) {
-							Uint8 * keystate = SDL_GetKeyState(NULL);
+                    #if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
+                        const Uint8 * keystate = SDL_GetKeyboardState(NULL);
+                    #else
+                        Uint8 * keystate = SDL_GetKeyState(NULL);
+                    #endif
                         if (g_Platforms[iEditPlatform].iPathType == 0) {
 								UpdatePlatformPathEnd(iEditPlatform, event.button.x, event.button.y, keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT]);
                         } else if (g_Platforms[iEditPlatform].iPathType == 1 || g_Platforms[iEditPlatform].iPathType == 2) {
@@ -3324,7 +3389,11 @@ void AdjustMapHazardRadius(MapHazard * hazard, short iClickX, short iClickY)
 	if (angle < 0.0f)
 		angle += TWO_PI;
 
-	Uint8 * keystate = SDL_GetKeyState(NULL);
+    #if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
+        const Uint8 * keystate = SDL_GetKeyboardState(NULL);
+    #else
+        Uint8 * keystate = SDL_GetKeyState(NULL);
+    #endif
     if (keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT]) {
 		float dSector = TWO_PI / 16;
 		angle += TWO_PI / 32;
@@ -3879,7 +3948,11 @@ int editor_modeitems()
 
             case SDL_MOUSEMOTION: {
                 if (dragmodeitem >= 0 && event.motion.state == SDL_BUTTON(SDL_BUTTON_LEFT)) {
-						Uint8 * keystate = SDL_GetKeyState(NULL);
+                        #if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
+                            const Uint8 * keystate = SDL_GetKeyboardState(NULL);
+                        #else
+                            Uint8 * keystate = SDL_GetKeyState(NULL);
+                        #endif
 						bool fShiftDown = keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT];
 
                     if (modeitemmode == 0) {
@@ -4574,7 +4647,11 @@ bool dialog(const char * title, const char * instructions, char * input, int inp
 							//insert character into fileName and onScreenText and increment current char
 							Uint8 key = event.key.keysym.sym;
 
-							Uint8 * keystate = SDL_GetKeyState(NULL);
+                        #if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
+                            const Uint8 * keystate = SDL_GetKeyboardState(NULL);
+                        #else
+                            Uint8 * keystate = SDL_GetKeyState(NULL);
+                        #endif
                         if (keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT]) {
 								if (event.key.keysym.sym == 45)
 									key = 95;
