@@ -1,8 +1,8 @@
 #ifndef MAPLIST_H
 #define MAPLIST_H
 
-#include <string>
 #include <map>
+#include <string>
 
 class MapListNode
 {

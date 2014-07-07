@@ -1,3 +1,17 @@
+#include "MapList.h"
+
+#include "dirlist.h"
+#include "FileList.h"
+#include "GameValues.h"
+#include "linfunc.h"
+#include "map.h"
+
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctype.h>
+#include <iostream>
+
 #ifdef _XBOX
 #include <xtl.h>
 #endif
@@ -15,18 +29,15 @@
 #include <sys/stat.h>
 #endif
 
-#include "global.h"
-#include "dirlist.h"
-#include "linfunc.h"
-
-#include <ctype.h>
-#include <iostream>
 using std::cout;
 using std::endl;
 using std::string;
 
 extern int g_iVersion[];
 
+extern CMap* g_map;
+extern FiltersList* filterslist;
+extern CGameValues game_values;
 
 MapListNode::MapListNode(std::string fullName)
 {
@@ -117,10 +128,8 @@ MapList::MapList(bool fWorldEditor)
     }
 
     //TODO: add proper test via size
-    if (maps.empty()) {
-        printf("ERROR: Empty map directory!\n");
-        exit(0);
-    }
+    if (maps.empty())
+        throw "ERROR: Empty map directory!";
 
     current = maps.begin();
 
@@ -324,7 +333,7 @@ bool MapList::FindFilteredMap()
 bool MapList::startswith(char letter)
 {
     //Captialize the letter becuase all maps have first letter in caps
-    if (letter >= SDLK_a && letter <= SDLK_z)
+    if (letter >= 'a' && letter <= 'z')
         letter -= 32;
 
     std::map<std::string, MapListNode*>::iterator oldCurrent = current;
