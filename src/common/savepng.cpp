@@ -3,10 +3,10 @@
 // this file will be empty if we have no support of PNG
 #ifdef PNG_SAVE_FORMAT
 
-
-#include "SDL.h"
 #include "savepng.h"
+
 #include "png.h"
+#include "SDL.h"
 
 #define IMG_SetError(a) SDL_SetError(a)
 
