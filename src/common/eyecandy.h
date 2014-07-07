@@ -1,10 +1,10 @@
 #ifndef EYECANDY_H
 #define EYECANDY_H
 
-#include <vector>
-
 #include "gfx.h"
 #include "GlobalConstants.h"
+
+#include <vector>
 
 //this system is pretty cool ;)
 //it can be easily changed to handle every object in the game

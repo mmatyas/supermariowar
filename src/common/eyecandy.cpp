@@ -1,14 +1,22 @@
-#include <string.h>
-#include <math.h>
-
-#include "global.h"
 #include "eyecandy.h"
+
+#include "BlockBase.h"
+#include "Game.h"
 #include "GameValues.h"
 #include "RandomNumberGenerator.h"
-#include "Game.h"
+#include "ResourceManager.h"
+#include "map.h"
+
+#include <cstring>
+#include <cmath>
+
+extern CEyecandyContainer eyecandy[3];
+
+extern CMap* g_map;
 
 extern CGame * smw;
-extern gv game_values;
+extern CResourceManager* rm;
+extern CGameValues game_values;
 
 /*extern SDL_Rect rectSuperStompLeftSrc[8];
 extern SDL_Rect rectSuperStompRightSrc[8];
