@@ -1,4 +1,17 @@
+#include "world.h"
+
 #include "global.h"
+#include "GameMode.h"
+#include "GameValues.h"
+#include "RandomNumberGenerator.h"
+#include "ResourceManager.h"
+#include "FileList.h"
+#include "MapList.h"
+
+#include <cstdlib> // atoi()
+
+#include <map>
+#include <queue>
 
 // this function was added to SDL2
 #ifndef USE_SDL2
@@ -21,6 +34,17 @@ extern int g_iVersion[];
 extern bool VersionIsEqual(int iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
 extern bool VersionIsEqualOrBefore(int iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
 extern bool VersionIsEqualOrAfter(int iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
+
+extern CGameMode * gamemodes[GAMEMODE_LAST];
+
+extern SDL_Surface* blitdest;
+
+extern CGameValues game_values;
+extern CResourceManager* rm;
+
+extern MapList *maplist;
+extern SkinList *skinlist;
+extern WorldList *worldlist;
 
 using std::queue;
 using std::map;

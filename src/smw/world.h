@@ -1,7 +1,9 @@
 #ifndef WORLD_H
 #define WORLD_H
 
-#include <queue>
+#include "SDL.h"
+
+#include <string>
 
 class MI_World;
 
