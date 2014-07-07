@@ -17,9 +17,19 @@
 //Checkin
 
 #define SMW_EDITOR
-#include "global.h"
+
 #include "FileIO.h"
+#include "FileList.h"
+#include "GameMode.h"
+#include "GameValues.h"
+#include "map.h"
+#include "MapList.h"
 #include "modeoptionsmenu.h"
+#include "objectgame.h"
+#include "ResourceManager.h"
+#include "sfx.h"
+#include "TilesetManager.h"
+#include "world.h"
 
 #ifdef PNG_SAVE_FORMAT
 	// this function was added to SDL2
@@ -49,6 +59,7 @@
 enum {EDITOR_EDIT, EDITOR_WATER, EDITOR_BACKGROUND, EDITOR_STAGEFOREGROUND, EDITOR_STRUCTUREFOREGROUND, EDITOR_BRIDGES, EDITOR_PATHSPRITE, EDITOR_VEHICLES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_WORLD, NEW_WORLD, RESIZE_WORLD, SAVE, EDITOR_WARP, DISPLAY_HELP, EDITOR_PATH, EDITOR_TYPE, EDITOR_BOUNDARY, EDITOR_START_ITEMS, EDITOR_STAGE};
 
 const char * szEditModes[10] = {"Background Mode", "Foreground Mode", "Path Sprite Mode", "Stage Mode", "Path Mode", "Vehicle Mode", "Warp Mode", "Start/Door Mode", "Boundary Mode", "Stage Mode"};
+
 
 SDL_Surface		*screen;
 SDL_Surface		*blitdest;
@@ -130,13 +141,10 @@ gfxSprite		spr_blocks[3];
 gfxSprite		spr_unknowntile[3];
 
 //// Global stuff that the map editor doesn't need, but has references to
-GraphicsList *menugraphicspacklist;
-GraphicsList *gamegraphicspacklist;
-FiltersList *filterslist;
 gfxSprite		spr_warplock;
 short			x_shake = 0;
 short			y_shake = 0;
-gv				game_values;
+extern CGameValues game_values;
 
 void CPlayer::flipsidesifneeded() {}
 short CPlayer::KillPlayerMapHazard(bool fForce, killstyle style, bool fKillCarriedItem, short iPlayerId)
@@ -153,6 +161,9 @@ bool CPlayer::bouncejump()
 }
 
 void B_WeaponBreakableBlock::triggerBehavior(short iPlayerID, short iTeamID) {}
+
+//void IO_MovingObject::flipsidesifneeded() {}
+//void IO_MovingObject::KillObjectMapHazard(short playerID) {}
 
 void CO_Egg::placeEgg() {}
 void CO_Flag::placeFlag() {}
@@ -179,10 +190,10 @@ CPlayer * GetPlayerFromGlobalID(short id)
     return NULL;
 }
 
-float CapFallingVelocity(float f)
+/*float CapFallingVelocity(float f)
 {
     return 0.0f;
-}
+}*/
 void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead) {}
 bool LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDirections)
 {
@@ -204,13 +215,20 @@ sfxSound		sfx_kicksound;
 sfxSound		sfx_mip;
 sfxSound		sfx_transform;
 
-SkinList		*skinlist;
 gfxSprite		**spr_player[4];
 CGameMode		*gamemodes[GAMEMODE_LAST];
-bool			fResumeMusic;
-MapList			*maplist;
-CMap			*g_map;
-CTilesetManager *g_tilesetmanager;
+
+extern FiltersList *filterslist;
+extern MapList* maplist;
+extern GraphicsList *menugraphicspacklist;
+extern GraphicsList *gamegraphicspacklist;
+
+extern CMap* g_map;
+extern CTilesetManager* g_tilesetmanager;
+
+extern CResourceManager* rm;
+extern CGame* smw;
+extern char *RootDataDirectory;
 
 gfxSprite		spr_hazard_fireball[3];
 gfxSprite		spr_hazard_rotodisc[3];
@@ -222,17 +240,12 @@ gfxSprite		spr_overlay, spr_overlayhole;
 void DECLSPEC soundfinished(int channel){}
 void DECLSPEC musicfinished(){}
 
-sfxSound * g_PlayingSoundChannels[NUM_SOUND_CHANNELS];
 CEyecandyContainer eyecandy[3];
 gfxSprite		spr_frontmap[2];
 
 CPlayer			*list_players[4];
 short			list_players_cnt = 0;
-bool			g_fLoadMessages = true;
-short			g_iCurrentDrawIndex = 0;
 
-std::vector<MapMusicOverride*> mapmusicoverrides;
-std::vector<WorldMusicOverride*> worldmusicoverrides;
 
 short LookupTeamID(short id)
 {
@@ -241,7 +254,6 @@ short LookupTeamID(short id)
 gfxSprite		spr_scoretext;
 gfxSprite		spr_poof;
 
-int g_iNextNetworkID = 0;
 short projectiles[4];
 
 IO_MovingObject * createpowerup(short iType, short ix, short iy, bool side, bool spawn)
@@ -284,8 +296,8 @@ void WriteWarpsIntoWorld();
 void AddWarpToTile(short iCol, short iRow, short iType);
 void RemoveWarpFromTile(short iCol, short iRow);
 
-WorldMap g_worldmap;
-WorldList *worldlist;
+extern WorldMap g_worldmap;
+extern WorldList *worldlist;
 void loadcurrentworld();
 int savecurrentworld();
 int findcurrentstring();
@@ -434,6 +446,9 @@ int main(int argc, char *argv[])
 	if (argc >= 2)
 		RootDataDirectory = argv[1];
 
+    smw = new CGame(RootDataDirectory);
+    rm = new CResourceManager();
+
 	g_map = new CMap();
 	g_tilesetmanager = new CTilesetManager();
 	filterslist = new FiltersList();
@@ -490,6 +505,8 @@ int main(int argc, char *argv[])
 
 	menu_font_small.init(convertPath("gfx/packs/Classic/fonts/font_small.png"));
 	menu_font_large.init(convertPath("gfx/packs/Classic/fonts/font_large.png"));
+    rm->menu_font_small.init(convertPath("gfx/packs/Classic/fonts/font_small.png"));
+    rm->menu_font_large.init(convertPath("gfx/packs/Classic/fonts/font_large.png"));
 
 	spr_platformpath.init(convertPath("gfx/leveleditor/leveleditor_platform_path.png"), 255, 0, 255, 128, true);
 
