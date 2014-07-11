@@ -261,6 +261,23 @@ public:
 	gfxSprite		spr_windmeter;
 	gfxSprite		spr_overlayhole;
 
+	// Level Editor sprites
+
+	gfxSprite		spr_tiletypes;
+	gfxSprite		spr_transparenttiles;
+	gfxSprite		spr_backgroundlevel;
+	gfxSprite		spr_tilesetlevel;
+	gfxSprite		spr_eyecandy;
+	gfxSprite		spr_warps[3];
+	gfxSprite		spr_selectedtile;
+	gfxSprite		spr_nospawntile;
+	gfxSprite		spr_noitemspawntile;
+	gfxSprite		spr_mapitems[3];
+	gfxSprite		spr_powerups;
+	gfxSprite		spr_hidden_marker;
+	gfxSprite		spr_racegoals;
+	gfxSprite		spr_number_icons;
+
 
 	//------ sfx ------
 
