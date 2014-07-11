@@ -8,6 +8,8 @@
 class NetworkHandlerBase
 {
 	public:
+		virtual ~NetworkHandlerBase() {};
+
 		virtual bool init_networking() { return true; };
 		virtual bool init_client() { return true; };
 		virtual bool init_server() { return true; };
