@@ -62,7 +62,7 @@ bool gfx_init(int w, int h, bool fullscreen)
     const SDL_version * constptr_ver_current = SDL_Linked_Version(); // dyn. linked version
     ver_current = *constptr_ver_current;
 #endif
-    printf("[info] Initializing SDL %d.%d.%d (compiled with %d.%d.%d) ... ",
+    printf("[gfx] Initializing SDL %d.%d.%d (compiled with %d.%d.%d) ... ",
         ver_current.major, ver_current.minor, ver_current.patch,
         ver_compiled.major, ver_compiled.minor, ver_compiled.patch);
 
@@ -81,7 +81,7 @@ bool gfx_init(int w, int h, bool fullscreen)
     // show SDL_image version
     const SDL_version * ver_img_current = IMG_Linked_Version();
     SDL_IMAGE_VERSION(&ver_compiled);
-    printf("[info] Initializing SDL image %d.%d.%d (compiled with %d.%d.%d) ... ",
+    printf("[gfx] Initializing SDL image %d.%d.%d (compiled with %d.%d.%d) ... ",
         ver_img_current->major, ver_img_current->minor, ver_img_current->patch,
         ver_compiled.major, ver_compiled.minor, ver_compiled.patch);
 #endif
@@ -147,7 +147,7 @@ bool gfx_init(int w, int h, bool fullscreen)
     }
 #endif
 
-    printf("[info] running at %dx%d %dbpp\n", w, h, screen->format->BitsPerPixel);
+    printf("[gfx] Running at %dx%d %dbpp\n", w, h, screen->format->BitsPerPixel);
 
     for (int k = 0; k < 3; k++) {
         colorcodes[k] = NULL;

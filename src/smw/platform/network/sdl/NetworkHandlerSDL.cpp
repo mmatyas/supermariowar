@@ -5,7 +5,7 @@ bool NetworkHandlerSDL::init_networking()
     SDL_version ver_compiled;
     const SDL_version * ver_net_current = SDLNet_Linked_Version(); // needs const TODO: fix
     SDL_NET_VERSION(&ver_compiled);
-    printf("[info] Initializing SDL net %d.%d.%d (compiled with %d.%d.%d) ... ",
+    printf("[net] Initializing SDL net %d.%d.%d (compiled with %d.%d.%d) ... ",
         ver_net_current->major, ver_net_current->minor, ver_net_current->patch,
         ver_compiled.major, ver_compiled.minor, ver_compiled.patch);
 
