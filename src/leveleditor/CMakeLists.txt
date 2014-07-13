@@ -1,6 +1,6 @@
 set(LEVELEDIT_SRCS leveleditor.cpp)
 
-add_executable(leveledit ../common/movingplatform.cpp ${LEVELEDIT_SRCS})
+add_executable(leveledit ../common/movingplatform.cpp ../smw/FPSLimiter.cpp ${LEVELEDIT_SRCS})
 target_link_libraries(leveledit CommonFiles)
 
 # add .bc extension when building with emscripten

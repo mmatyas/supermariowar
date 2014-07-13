@@ -18,6 +18,7 @@
 #define SMW_EDITOR
 
 #include "eyecandy.h"
+#include "FPSLimiter.h"
 #include "GameMode.h"
 #include "gfx.h"
 #include "GlobalConstants.h"
@@ -71,7 +72,7 @@ void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead
 #include "SDL.h"
 
 #ifdef __EMSCRIPTEN__
-#define SDL_Delay(n) ;
+#include <emscripten.h>
 #endif
 
 
@@ -356,6 +357,10 @@ void SetNoSpawn(short nospawnmode, short col, short row, bool value);
 
 bool g_fFullScreen = false;
 
+#ifdef __EMSCRIPTEN__
+void gameloop_frame();
+#endif
+
 //main main main
 int main(int argc, char *argv[])
 {
@@ -531,8 +536,18 @@ int main(int argc, char *argv[])
 	resetselectedtiles();
 
 	printf("entering level editor loop...\n");
+#ifdef __EMSCRIPTEN__
+    emscripten_set_main_loop(gameloop_frame, 0, 1);
+}
+
+void gameloop_frame()
+#else
 	done = false;
-    while (!done) {
+    while (!done)
+#endif
+    {
+        FPSLimiter::instance().frameStart();
+
         switch (state) {
 			case EDITOR_EDIT:
 				move_nodrag = false;
@@ -584,7 +599,9 @@ int main(int argc, char *argv[])
 			break;
 
 			case EDITOR_QUIT:
+			#ifndef __EMSCRIPTEN__
 				done = true;
+			#endif
 			break;
 
 			case DISPLAY_HELP:
@@ -615,6 +632,12 @@ int main(int argc, char *argv[])
 				printf(" PANIC: WEIRD STATE: %d\n", state);
 			break;
 		}
+
+        FPSLimiter::instance().beforeFlip();
+        gfx_flipscreen();
+        FPSLimiter::instance().afterFlip();
+
+#ifndef __EMSCRIPTEN__
 	}
 
 
@@ -635,6 +658,7 @@ int main(int argc, char *argv[])
 
 	printf("\n---------------- shutdown ----------------\n");
 	return 0;
+#endif
 }
 
 TileType CalculateTileType(short x, short y)
@@ -707,13 +731,25 @@ void RemoveMapItemAt(short x, short y)
 	}
 }
 
+bool fExiting = false;
+bool fSelectedYes = false;
+
+bool editor_edit_initialized = false;
+void init_editor_edit()
+{
+    if (editor_edit_initialized)
+        return;
+
+    fExiting = false;
+    fSelectedYes = false;
+    g_musiccategorydisplaytimer = 0;
+
+    editor_edit_initialized = true;
+}
+
 int editor_edit()
 {
-	bool done = false;
-	g_musiccategorydisplaytimer = 0;
-
-	bool fExiting = false;
-	bool fSelectedYes = false;
+    init_editor_edit();
 
 	//int iTickStart = 0, iTicks = 0;
 	//int iMax = 0, iMin = 100000000, iTotal = 0;
@@ -724,9 +760,6 @@ int editor_edit()
 	//maplist->next(false);
 	//maplist->next(false);
 	//maplist->next(false);
-
-    while (!done) {
-		int framestart = SDL_GetTicks();
 
 		/*
 		//Code to print out map loading times (perf test map loader)
@@ -772,25 +805,25 @@ int editor_edit()
             #endif
 
                 switch (event.type) {
-                case SDL_KEYDOWN: {
-						SDLKey key = event.key.keysym.sym;
+                    case SDL_KEYDOWN: {
+                        SDLKey key = event.key.keysym.sym;
 
-                    if (key == SDLK_LEFT) {
-							fSelectedYes = true;
-                    } else if (key == SDLK_RIGHT) {
-							fSelectedYes = false;
-                    } else if (event.key.keysym.sym == SDLK_KP_ENTER || event.key.keysym.sym == SDLK_RETURN) {
-							if (fSelectedYes)
-								return EDITOR_QUIT;
+                        if (key == SDLK_LEFT) {
+                            fSelectedYes = true;
+                        } else if (key == SDLK_RIGHT) {
+                            fSelectedYes = false;
+                        } else if (event.key.keysym.sym == SDLK_KP_ENTER || event.key.keysym.sym == SDLK_RETURN) {
+                            if (fSelectedYes)
+                                return EDITOR_QUIT;
 
-							fExiting = false;
-						}
-#ifdef _DEBUG
-                    else if (event.key.keysym.sym == SDLK_ESCAPE) {
-							return EDITOR_QUIT;
-						}
-#endif
-					}
+                            fExiting = false;
+                        }
+				#ifdef _DEBUG
+                        else if (event.key.keysym.sym == SDLK_ESCAPE) {
+                            return EDITOR_QUIT;
+                        }
+				#endif
+				    }
 				}
 			}
         } else {
@@ -803,10 +836,8 @@ int editor_edit()
             #endif
 
                 switch (event.type) {
-                case SDL_QUIT: {
-						done = true;
-						break;
-					}
+                case SDL_QUIT:
+					return EDITOR_QUIT;
 
                 case SDL_KEYDOWN: {
 						SDLKey key = event.key.keysym.sym;
@@ -836,20 +867,24 @@ int editor_edit()
 							}
 						}
 
-						if (key == SDLK_INSERT)
-							takescreenshot();
+					if (key == SDLK_INSERT)
+						takescreenshot();
 
-						if (key == SDLK_t)
-							return EDITOR_TILES;
+					if (key == SDLK_t) {
+                        editor_edit_initialized = false;
+						return EDITOR_TILES;
+                    }
 
-						if (key == SDLK_i)
+					if (key == SDLK_i) {
                         if (edit_mode == 4) {
 								for (short iRow = 0; iRow < MAPHEIGHT; iRow++)
 									for (short iCol = 0; iCol < MAPWIDTH; iCol++)
 										SetNoSpawn(nospawn_mode, iCol, iRow, !g_map->nospawn[nospawn_mode][iCol][iRow]);
                         } else {
-								return EDITOR_BLOCKS;
-							}
+                            editor_edit_initialized = false;
+							return EDITOR_BLOCKS;
+						}
+					}
 
                     if (key == SDLK_a) {
                         if (edit_mode == 4) {
@@ -857,18 +892,25 @@ int editor_edit()
 									for (short iCol = 0; iCol < MAPWIDTH; iCol++)
 										SetNoSpawn(nospawn_mode, iCol, iRow, true);
                         } else {
+                                editor_edit_initialized = false;
 								return EDITOR_ANIMATION;
 							}
 						}
 
-						if (key == SDLK_o)
+						if (key == SDLK_o) {
+                            editor_edit_initialized = false;
 							return EDITOR_MAPITEMS;
+                        }
 
-						if (key == SDLK_j)
+						if (key == SDLK_j) {
+                            editor_edit_initialized = false;
 							return EDITOR_MODEITEMS;
+                        }
 
-						if (key == SDLK_h)
+						if (key == SDLK_h) {
+                            editor_edit_initialized = false;
 							return EDITOR_MAPHAZARDS;
+                        }
 
                     if (key == SDLK_k) {
 							int iMouseX, iMouseY;
@@ -883,8 +925,10 @@ int editor_edit()
 						}
 
 						//if 'B' is pressed, rotate backgrounds
-						if (key == SDLK_b)
+						if (key == SDLK_b) {
+                            editor_edit_initialized = false;
 							return EDITOR_BACKGROUNDS;
+                        }
 
                     if (key == SDLK_g) {
                         backgroundlist->next();
@@ -952,17 +996,25 @@ int editor_edit()
 						if (key == SDLK_v)
 							viewblocks = !viewblocks;
 
-						if (key == SDLK_e)
+						if (key == SDLK_e) {
+                            editor_edit_initialized = false;
 							return EDITOR_EYECANDY;
+                        }
 
-						if (key == SDLK_w)
+						if (key == SDLK_w) {
+                            editor_edit_initialized = false;
 							return EDITOR_WARP;
+                        }
 
-						if (key == SDLK_l)
+						if (key == SDLK_l) {
+                            editor_edit_initialized = false;
 							return EDITOR_TILETYPE;
+                        }
 
-						if (key == SDLK_F1)
+						if (key == SDLK_F1) {
+                            //editor_edit_initialized = false; //TODO?
 							return DISPLAY_HELP;
+                        }
 
                     if (key == SDLK_PAGEUP) {
                         do {
@@ -1073,8 +1125,10 @@ int editor_edit()
 						if (key == SDLK_LCTRL)
 							move_nodrag = true;
 
-						if (key == SDLK_p)
+						if (key == SDLK_p) {
+                            editor_edit_initialized = false;
 							return EDITOR_PLATFORM;
+                        }
 
                     if (key == SDLK_c) {
                         if (edit_mode == 3) {
@@ -1534,18 +1588,7 @@ int editor_edit()
 			DrawMessage();
 		}
 
-		SDL_Flip(screen);
-
-		int delay = WAITTIME - (SDL_GetTicks() - framestart);
-		if (delay < 0)
-			delay = 0;
-		else if (delay > WAITTIME)
-			delay = WAITTIME;
-
-		SDL_Delay(delay);
-	}
-
-	return EDITOR_QUIT;
+		return EDITOR_EDIT;
 }
 
 void DrawMessage()
@@ -1787,25 +1830,15 @@ void drawmap(bool fScreenshot, short iBlockSize, bool fWithPlatforms)
 	*/
 }
 
+SDL_Rect r;
+
 int editor_warp()
 {
-	bool done = false;
-
-	SDL_Rect r;
-	r.x = 0;
-	r.y = 0;
-	r.w = 640;
-	r.h = 480;
-
-    while (!done) {
-		int framestart = SDL_GetTicks();
-
 		//handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
 				case SDL_QUIT:
-					done = true;
-				break;
+					return EDITOR_QUIT;
 
 				case SDL_KEYDOWN:
 					edit_mode = 2;  //change to edit mode using warps
@@ -1837,22 +1870,16 @@ int editor_warp()
 		drawmap(false, TILESIZE);
 		rm->menu_shade.draw(0, 0);
 
+        r.x = 0;
+        r.y = 0;
+        r.w = 640;
+        r.h = 480;
+
 		SDL_BlitSurface(rm->spr_warps[0].getSurface(), NULL, screen, &r);
 		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
 
 		DrawMessage();
-		SDL_Flip(screen);
-
-		int delay = WAITTIME - (SDL_GetTicks() - framestart);
-		if (delay < 0)
-			delay = 0;
-		else if (delay > WAITTIME)
-			delay = WAITTIME;
-
-		SDL_Delay(delay);
-	}
-
-	return EDITOR_QUIT;
+        return EDITOR_WARP;
 }
 
 #define NUM_EYECANDY 7
@@ -1860,18 +1887,11 @@ const char * szEyecandyNames[NUM_EYECANDY] = {"Clouds", "Ghosts", "Leaves", "Sno
 const char * szLayerNames[3] = {"Back Layer", "Mid Layer", "Top Layer"};
 int editor_eyecandy()
 {
-	bool done = false;
-
-    while (!done) {
-		int framestart = SDL_GetTicks();
-
 		//handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-            case SDL_QUIT: {
-					done = true;
-					break;
-				}
+            case SDL_QUIT:
+				return EDITOR_QUIT;
 
             case SDL_KEYDOWN: {
                 if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_e) {
@@ -1945,18 +1965,7 @@ int editor_eyecandy()
 		//rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
 
 		DrawMessage();
-		SDL_Flip(screen);
-
-		int delay = WAITTIME - (SDL_GetTicks() - framestart);
-		if (delay < 0)
-			delay = 0;
-		else if (delay > WAITTIME)
-			delay = WAITTIME;
-
-		SDL_Delay(delay);
-	}
-
-	return EDITOR_QUIT;
+		return EDITOR_EYECANDY;
 }
 
 short * GetBlockProperty(short x, short y, short iBlockCol, short iBlockRow, short * iSettingIndex)
@@ -1976,25 +1985,32 @@ short * GetBlockProperty(short x, short y, short iBlockCol, short iBlockRow, sho
 	return NULL;
 }
 
+short iBlockType;
+bool editor_properties_initialized = false;
+void init_editor_properties(short iBlockCol, short iBlockRow)
+{
+    if (editor_properties_initialized)
+        return;
+
+    iBlockType = g_map->objectdata[iBlockCol][iBlockRow].iType;
+
+    editor_properties_initialized = true;
+}
+
 int editor_properties(short iBlockCol, short iBlockRow)
 {
-	bool done = false;
-	short iBlockType = g_map->objectdata[iBlockCol][iBlockRow].iType;
-
-    while (!done) {
-		int framestart = SDL_GetTicks();
+    init_editor_properties(iBlockCol, iBlockRow);
 
 		//handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-            case SDL_QUIT: {
-					done = true;
-					break;
-				}
+            case SDL_QUIT:
+				return EDITOR_QUIT;
 
             case SDL_KEYDOWN: {
                 if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_k) {
-						return EDITOR_EDIT;
+                    editor_properties_initialized = false;
+					return EDITOR_EDIT;
                 } else if ((iBlockType == 1 || iBlockType == 15) && ((event.key.keysym.sym >= SDLK_0 && event.key.keysym.sym <= SDLK_9) || event.key.keysym.sym == SDLK_BACKQUOTE || event.key.keysym.sym == SDLK_d)) {
 						int iMouseX, iMouseY;
 						SDL_GetMouseState(&iMouseX, &iMouseY);
@@ -2152,85 +2168,81 @@ int editor_properties(short iBlockCol, short iBlockRow)
 		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
 
 		DrawMessage();
-		SDL_Flip(screen);
-
-		int delay = WAITTIME - (SDL_GetTicks() - framestart);
-		if (delay < 0)
-			delay = 0;
-		else if (delay > WAITTIME)
-			delay = WAITTIME;
-
-		SDL_Delay(delay);
-	}
-
-	return EDITOR_QUIT;
+		return EDITOR_PROPERTIES;
 }
 
+//SDL_Rect r;
+SDL_Rect rNewButton[2];
+SDL_Rect rTypeButton[3][4];
+
+const char * szPathNames[3] = {"Line Segment", "Continuous", "Ellipse"};
+
+enum {PLATFORM_EDIT_STATE_SELECT, PLATFORM_EDIT_STATE_PATH_TYPE, PLATFORM_EDIT_STATE_CHANGE_PATH_TYPE, PLATFORM_EDIT_STATE_EDIT, PLATFORM_EDIT_STATE_PATH, PLATFORM_EDIT_STATE_TEST, PLATFORM_EDIT_STATE_TILETYPE, PLATFORM_EDIT_STATE_ANIMATED, PLATFORM_EDIT_STATE_MOVE};
+
+short iPlatformEditState = PLATFORM_EDIT_STATE_SELECT;
+short iPlatformSwitchState = 0, iPlatformSwitchIndex = 0;
+short iEditPlatform = 0;
+short iPlatformTop, iPlatformLeft, iPlatformWidth, iPlatformHeight;
+
+short iPlatformPreview = -1;
+
+bool editor_platforms_initialized = false;
+void init_editor_platforms()
+{
+    if (editor_platforms_initialized)
+        return;
+
+    r.x = 192;
+    r.y = 128;
+    r.w = 256;
+    r.h = 224;
+
+    rNewButton[0].x = 0;
+    rNewButton[0].y = 352;
+    rNewButton[0].w = 76;
+    rNewButton[0].h = 32;
+
+    rNewButton[1].x = r.x + (r.w >> 1) - (rNewButton[0].w >> 1);
+    rNewButton[1].y = r.y + r.h - 64;
+    rNewButton[1].w = 76;
+    rNewButton[1].h = 32;
+
+    for (short iType = 0; iType < 3; iType++) {
+        rTypeButton[iType][0].x = 0;
+        rTypeButton[iType][0].y = 0;
+        rTypeButton[iType][0].w = 192;
+        rTypeButton[iType][0].h = 32;
+
+        rTypeButton[iType][1].x = 320 - (rTypeButton[iType][0].w >> 1);
+        rTypeButton[iType][1].y = 180 + iType * 40;
+        rTypeButton[iType][1].w = 192;
+        rTypeButton[iType][1].h = 32;
+
+        rTypeButton[iType][2].x = 24 * iType;
+        rTypeButton[iType][2].y = 32;
+        rTypeButton[iType][2].w = 24;
+        rTypeButton[iType][2].h = 24;
+
+        rTypeButton[iType][3].x = rTypeButton[iType][1].x + 8;
+        rTypeButton[iType][3].y = rTypeButton[iType][1].y + 4;
+        rTypeButton[iType][3].w = 24;
+        rTypeButton[iType][3].h = 24;
+    }
+
+    editor_platforms_initialized = true;
+}
+
+// TODO: Check this for problems.
 int editor_platforms()
 {
-	bool done = false;
-
-	SDL_Rect r;
-	r.x = 192;
-	r.y = 128;
-	r.w = 256;
-	r.h = 224;
-
-	SDL_Rect rNewButton[2];
-	rNewButton[0].x = 0;
-	rNewButton[0].y = 352;
-	rNewButton[0].w = 76;
-	rNewButton[0].h = 32;
-
-	rNewButton[1].x = r.x + (r.w >> 1) - (rNewButton[0].w >> 1);
-	rNewButton[1].y = r.y + r.h - 64;
-	rNewButton[1].w = 76;
-	rNewButton[1].h = 32;
-
-	SDL_Rect rTypeButton[3][4];
-    for (short iType = 0; iType < 3; iType++) {
-		rTypeButton[iType][0].x = 0;
-		rTypeButton[iType][0].y = 0;
-		rTypeButton[iType][0].w = 192;
-		rTypeButton[iType][0].h = 32;
-
-		rTypeButton[iType][1].x = 320 - (rTypeButton[iType][0].w >> 1);
-		rTypeButton[iType][1].y = 180 + iType * 40;
-		rTypeButton[iType][1].w = 192;
-		rTypeButton[iType][1].h = 32;
-
-		rTypeButton[iType][2].x = 24 * iType;
-		rTypeButton[iType][2].y = 32;
-		rTypeButton[iType][2].w = 24;
-		rTypeButton[iType][2].h = 24;
-
-		rTypeButton[iType][3].x = rTypeButton[iType][1].x + 8;
-		rTypeButton[iType][3].y = rTypeButton[iType][1].y + 4;
-		rTypeButton[iType][3].w = 24;
-		rTypeButton[iType][3].h = 24;
-	}
-
-	const char * szPathNames[3] = {"Line Segment", "Continuous", "Ellipse"};
-
-	enum {PLATFORM_EDIT_STATE_SELECT, PLATFORM_EDIT_STATE_PATH_TYPE, PLATFORM_EDIT_STATE_CHANGE_PATH_TYPE, PLATFORM_EDIT_STATE_EDIT, PLATFORM_EDIT_STATE_PATH, PLATFORM_EDIT_STATE_TEST, PLATFORM_EDIT_STATE_TILETYPE, PLATFORM_EDIT_STATE_ANIMATED, PLATFORM_EDIT_STATE_MOVE};
-
-	short iPlatformEditState = PLATFORM_EDIT_STATE_SELECT;
-	short iPlatformSwitchState = 0, iPlatformSwitchIndex = 0;
-	short iEditPlatform = 0;
-	short iPlatformTop, iPlatformLeft, iPlatformWidth, iPlatformHeight;
-
-	short iPlatformPreview = -1;
-
-    while (!done) {
-		int framestart = SDL_GetTicks();
+    init_editor_platforms();
 
 		//handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-            case SDL_QUIT: {
-					done = true;
-					break;
-				}
+            case SDL_QUIT:
+				return EDITOR_QUIT;
+
             case SDL_KEYDOWN: {
                 if (event.key.keysym.sym == SDLK_s) {
 						savecurrentmap();
@@ -2331,6 +2343,7 @@ int editor_platforms()
 						}
                 } else if (event.key.keysym.sym == SDLK_ESCAPE) {
                     if (PLATFORM_EDIT_STATE_SELECT == iPlatformEditState) {
+                            editor_platforms_initialized = false;
 							return EDITOR_EDIT;
                     } else if (PLATFORM_EDIT_STATE_EDIT == iPlatformEditState || PLATFORM_EDIT_STATE_ANIMATED == iPlatformEditState || PLATFORM_EDIT_STATE_MOVE == iPlatformEditState || PLATFORM_EDIT_STATE_TEST == iPlatformEditState) {
 							iPlatformPreview = -1;
@@ -2701,18 +2714,7 @@ int editor_platforms()
 		}
 
 		DrawMessage();
-		SDL_Flip(screen);
-
-		int delay = WAITTIME - (SDL_GetTicks() - framestart);
-		if (delay < 0)
-			delay = 0;
-		else if (delay > WAITTIME)
-			delay = WAITTIME;
-
-		SDL_Delay(delay);
-	}
-
-	return EDITOR_QUIT;
+		return EDITOR_PLATFORM;
 }
 
 void DisplayPlatformPreview(short iPlatformId, short iMouseX, short iMouseY)
@@ -2878,87 +2880,92 @@ void draw_platform(short iPlatform, bool fDrawTileTypes)
 	}
 }
 
-int editor_maphazards()
+enum {MAPHAZARD_EDIT_STATE_SELECT, MAPHAZARD_EDIT_STATE_TYPE, MAPHAZARD_EDIT_STATE_LOCATION, MAPHAZARD_EDIT_STATE_PROPERTIES};
+
+short iEditState = MAPHAZARD_EDIT_STATE_SELECT;
+short iEditMapHazard = 0;
+
+SDL_Rect rBackground[2];
+//SDL_Rect rNewButton[2];
+//SDL_Rect rTypeButton[8][4];
+SDL_Rect rIconRects[MAXMAPHAZARDS][2];
+
+const char * szHazardNames[8] = {"Fireballs", "Rotodisc", "Bullet Bill", "Flame Thrower", "Green Pirhana", "Red Pirhana", "Tall Pirhana", "Short Pirhana"};
+
+bool editor_maphazards_initialized = false;
+void init_editor_maphazards()
 {
-	bool done = false;
+    if (editor_maphazards_initialized)
+        return;
 
-	enum {MAPHAZARD_EDIT_STATE_SELECT, MAPHAZARD_EDIT_STATE_TYPE, MAPHAZARD_EDIT_STATE_LOCATION, MAPHAZARD_EDIT_STATE_PROPERTIES};
+    rBackground[0].x = 0;
+    rBackground[0].y = 0;
+    rBackground[0].w = 256;
+    rBackground[0].h = 224;
 
-	short iEditState = MAPHAZARD_EDIT_STATE_SELECT;
-	short iEditMapHazard = 0;
+    rBackground[1].x = 320 - (rBackground[0].w >> 1);
+    rBackground[1].y = 240 - (rBackground[0].h >> 1);
+    rBackground[1].w = 256;
+    rBackground[1].h = 224;
 
-	SDL_Rect rBackground[2];
-	rBackground[0].x = 0;
-	rBackground[0].y = 0;
-	rBackground[0].w = 256;
-	rBackground[0].h = 224;
+    rNewButton[0].x = 0;
+    rNewButton[0].y = 352;
+    rNewButton[0].w = 76;
+    rNewButton[0].h = 32;
 
-	rBackground[1].x = 320 - (rBackground[0].w >> 1);
-	rBackground[1].y = 240 - (rBackground[0].h >> 1);
-	rBackground[1].w = 256;
-	rBackground[1].h = 224;
-
-	SDL_Rect rNewButton[2];
-	rNewButton[0].x = 0;
-	rNewButton[0].y = 352;
-	rNewButton[0].w = 76;
-	rNewButton[0].h = 32;
-
-	rNewButton[1].x = rBackground[1].x + (rBackground[1].w >> 1) - (rNewButton[0].w >> 1);
-	rNewButton[1].y = rBackground[1].y + rBackground[1].h + 8;
-	rNewButton[1].w = 76;
-	rNewButton[1].h = 32;
-
-	SDL_Rect rTypeButton[8][4];
+    rNewButton[1].x = rBackground[1].x + (rBackground[1].w >> 1) - (rNewButton[0].w >> 1);
+    rNewButton[1].y = rBackground[1].y + rBackground[1].h + 8;
+    rNewButton[1].w = 76;
+    rNewButton[1].h = 32;
 
     for (short iType = 0; iType < 8; iType++) {
-		rTypeButton[iType][0].x = 0;
-		rTypeButton[iType][0].y = 0;
-		rTypeButton[iType][0].w = 192;
-		rTypeButton[iType][0].h = 32;
+        rTypeButton[iType][0].x = 0;
+        rTypeButton[iType][0].y = 0;
+        rTypeButton[iType][0].w = 192;
+        rTypeButton[iType][0].h = 32;
 
-		rTypeButton[iType][1].x = 320 - (rTypeButton[iType][0].w >> 1);
-		rTypeButton[iType][1].y = 84 + iType * 40;
-		rTypeButton[iType][1].w = 192;
-		rTypeButton[iType][1].h = 32;
+        rTypeButton[iType][1].x = 320 - (rTypeButton[iType][0].w >> 1);
+        rTypeButton[iType][1].y = 84 + iType * 40;
+        rTypeButton[iType][1].w = 192;
+        rTypeButton[iType][1].h = 32;
 
-		rTypeButton[iType][2].x = 24 * iType;
-		rTypeButton[iType][2].y = 32;
-		rTypeButton[iType][2].w = 24;
-		rTypeButton[iType][2].h = 24;
+        rTypeButton[iType][2].x = 24 * iType;
+        rTypeButton[iType][2].y = 32;
+        rTypeButton[iType][2].w = 24;
+        rTypeButton[iType][2].h = 24;
 
-		rTypeButton[iType][3].x = rTypeButton[iType][1].x + 8;
-		rTypeButton[iType][3].y = rTypeButton[iType][1].y + 4;
-		rTypeButton[iType][3].w = 24;
-		rTypeButton[iType][3].h = 24;
-	}
+        rTypeButton[iType][3].x = rTypeButton[iType][1].x + 8;
+        rTypeButton[iType][3].y = rTypeButton[iType][1].y + 4;
+        rTypeButton[iType][3].w = 24;
+        rTypeButton[iType][3].h = 24;
+    }
 
-	//Setup Map Hazard Icons
-	SDL_Rect rIconRects[MAXMAPHAZARDS][2];
+    //Setup Map Hazard Icons
     for (short iMapHazard = 0; iMapHazard < MAXMAPHAZARDS; iMapHazard++) {
-		rIconRects[iMapHazard][0].x = (iMapHazard % 8) * 32;
-		rIconRects[iMapHazard][0].y = (iMapHazard / 8) * 32 + 224;
-		rIconRects[iMapHazard][0].w = 32;
-		rIconRects[iMapHazard][0].h = 32;
+        rIconRects[iMapHazard][0].x = (iMapHazard % 8) * 32;
+        rIconRects[iMapHazard][0].y = (iMapHazard / 8) * 32 + 224;
+        rIconRects[iMapHazard][0].w = 32;
+        rIconRects[iMapHazard][0].h = 32;
 
-		rIconRects[iMapHazard][1].x = (iMapHazard % 6) * 40 + 204;
-		rIconRects[iMapHazard][1].y = (iMapHazard / 6) * 40 + rBackground[1].y + 16;
-		rIconRects[iMapHazard][1].w = 32;
-		rIconRects[iMapHazard][1].h = 32;
-	}
+        rIconRects[iMapHazard][1].x = (iMapHazard % 6) * 40 + 204;
+        rIconRects[iMapHazard][1].y = (iMapHazard / 6) * 40 + rBackground[1].y + 16;
+        rIconRects[iMapHazard][1].w = 32;
+        rIconRects[iMapHazard][1].h = 32;
+    }
 
-	const char * szHazardNames[8] = {"Fireballs", "Rotodisc", "Bullet Bill", "Flame Thrower", "Green Pirhana", "Red Pirhana", "Tall Pirhana", "Short Pirhana"};
+    editor_maphazards_initialized = true;
+}
 
-    while (!done) {
-		int framestart = SDL_GetTicks();
+int editor_maphazards()
+{
+	init_editor_maphazards();
 
-		//handle messages
+        //handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-            case SDL_QUIT: {
-					done = true;
-					break;
-				}
+            case SDL_QUIT:
+				return EDITOR_QUIT;
+
             case SDL_KEYDOWN: {
                 if (event.key.keysym.sym == SDLK_s) {
 						savecurrentmap();
@@ -3002,6 +3009,7 @@ int editor_maphazards()
 						}
                 } else if (event.key.keysym.sym == SDLK_ESCAPE) {
                     if (MAPHAZARD_EDIT_STATE_SELECT == iEditState) {
+                            editor_maphazards_initialized = false;
 							return EDITOR_EDIT;
                     } else if (MAPHAZARD_EDIT_STATE_LOCATION == iEditState || MAPHAZARD_EDIT_STATE_PROPERTIES == iEditState) {
 							iEditState = MAPHAZARD_EDIT_STATE_SELECT;
@@ -3255,18 +3263,7 @@ int editor_maphazards()
 		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
 
 		DrawMessage();
-		SDL_Flip(screen);
-
-		int delay = WAITTIME - (SDL_GetTicks() - framestart);
-		if (delay < 0)
-			delay = 0;
-		else if (delay > WAITTIME)
-			delay = WAITTIME;
-
-		SDL_Delay(delay);
-	}
-
-	return EDITOR_QUIT;
+		return EDITOR_MAPHAZARDS;
 }
 
 short NewMapHazard()
@@ -3383,10 +3380,27 @@ void AdjustMapHazardRadius(MapHazard * hazard, short iClickX, short iClickY)
 	}
 }
 
+CTileset * tileset;
+short view_tileset_repeat_direction = -1;
+short view_tileset_repeat_timer = 0;
+
+bool editor_tiles_initialized = false;
+void init_editor_tiles()
+{
+    if (editor_tiles_initialized)
+        return;
+
+    set_tile_drag = false;
+    view_tileset_repeat_direction = -1;
+    view_tileset_repeat_timer = 0;
+    tileset = g_tilesetmanager->GetTileset(set_tile_tileset);
+
+    editor_tiles_initialized = true;
+}
+
 int editor_tiles()
 {
-	int i, j;
-	bool done = false;
+    init_editor_tiles();
 
 	/*
 	short iCurrentTile = 0;
@@ -3396,22 +3410,11 @@ int editor_tiles()
 		iConvertedTile[iTile] = g_iTileConversion[iTile];
 	*/
 
-	set_tile_drag = false;
-
-	CTileset * tileset = g_tilesetmanager->GetTileset(set_tile_tileset);
-
-	short view_tileset_repeat_direction = -1;
-	short view_tileset_repeat_timer = 0;
-
-    while (!done) {
-		int framestart = SDL_GetTicks();
-
 		//handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
 				case SDL_QUIT:
-					done = true;
-				break;
+					return EDITOR_QUIT;
 
             case SDL_KEYDOWN: {
                 if (!set_tile_drag) {
@@ -3461,6 +3464,7 @@ int editor_tiles()
                     } else {
 							edit_mode = 1;  //change to edit mode using tiles
 							set_tile_drag = false;
+                            editor_tiles_initialized = false;
 							return EDITOR_EDIT;
 						}
 					}
@@ -3511,6 +3515,7 @@ int editor_tiles()
 
 							set_tile_drag = false;
 							edit_mode = 1;  //change to edit mode using tiles
+                            editor_tiles_initialized = false;
 							return EDITOR_EDIT;
 
 						}
@@ -3578,16 +3583,16 @@ int editor_tiles()
 		rectSrc.w = tileset->GetWidth() > 20 ? 640 : tileset->GetWidth() << 5;
 		rectSrc.h = tileset->GetHeight() > 15 ? 480 : tileset->GetHeight() << 5;
 
-		SDL_Rect r;
-		r.x = 0;
-		r.y = 0;
-		r.w = 640;
-		r.h = 480;
+        r.x = 0;
+        r.y = 0;
+        r.w = 640;
+        r.h = 480;
 
 		SDL_BlitSurface(g_tilesetmanager->GetTileset(set_tile_tileset)->GetSurface(0), &rectSrc, screen, &r);
 		//rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
 		rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), tileset->GetName());
 
+        int i, j;
         for (i = view_tileset_x; i < view_tileset_x + 20 && i < tileset->GetWidth(); i++) {
             for (j = view_tileset_y; j < view_tileset_y + 15 && j < tileset->GetHeight(); j++) {
 				TileType t = tileset->GetTileType(i, j);
@@ -3628,33 +3633,16 @@ int editor_tiles()
 
 
 		DrawMessage();
-		SDL_Flip(screen);
-
-		int delay = WAITTIME - (SDL_GetTicks() - framestart);
-		if (delay < 0)
-			delay = 0;
-		else if (delay > WAITTIME)
-			delay = WAITTIME;
-
-		SDL_Delay(delay);
-	}
-
-	return EDITOR_QUIT;
+		return EDITOR_TILES;
 }
 
 int editor_blocks()
 {
-	bool done = false;
-
-    while (!done) {
-		int framestart = SDL_GetTicks();
-
 		//handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
 				case SDL_QUIT:
-					done = true;
-				break;
+					return EDITOR_QUIT;
 
 				case SDL_KEYDOWN:
 					edit_mode = 0;
@@ -3731,34 +3719,17 @@ int editor_blocks()
 		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
 
 		DrawMessage();
-		SDL_Flip(screen);
-
-		int delay = WAITTIME - (SDL_GetTicks() - framestart);
-		if (delay < 0)
-			delay = 0;
-		else if (delay > WAITTIME)
-			delay = WAITTIME;
-
-		SDL_Delay(delay);
-	}
-
-	return EDITOR_QUIT;
+		return EDITOR_BLOCKS;
 }
 
 
 int editor_mapitems()
 {
-	bool done = false;
-
-    while (!done) {
-		int framestart = SDL_GetTicks();
-
 		//handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
 				case SDL_QUIT:
-					done = true;
-				break;
+					return EDITOR_QUIT;
 
 				case SDL_KEYDOWN:
 					edit_mode = 7;
@@ -3797,39 +3768,37 @@ int editor_mapitems()
 		rm->menu_font_small.drawRightJustified(0, 480 - rm->menu_font_small.getHeight(), "Map Items");
 
 		DrawMessage();
-		SDL_Flip(screen);
-
-		int delay = WAITTIME - (SDL_GetTicks() - framestart);
-		if (delay < 0)
-			delay = 0;
-		else if (delay > WAITTIME)
-			delay = WAITTIME;
-
-		SDL_Delay(delay);
-	}
-
-	return EDITOR_QUIT;
+		return EDITOR_MAPITEMS;
 }
 
+short modeitemmode = 0;
+short dragmodeitem = -1;
+short dragoffsetx = 0;
+short dragoffsety = 0;
+
+bool editor_modeitems_initialized = false;
+void init_editor_modeitems()
+{
+    if (editor_modeitems_initialized)
+        return;
+
+    modeitemmode = 0;
+    dragmodeitem = -1;
+    dragoffsetx = 0;
+    dragoffsety = 0;
+
+    editor_modeitems_initialized = true;
+}
 
 int editor_modeitems()
 {
-	bool done = false;
-	short modeitemmode = 0;
-	short dragmodeitem = -1;
-	short dragoffsetx = 0;
-	short dragoffsety = 0;
-
-    while (!done) {
-		int framestart = SDL_GetTicks();
+    init_editor_modeitems();
 
 		//handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-            case SDL_QUIT: {
-					done = true;
-					break;
-				}
+            case SDL_QUIT:
+				return EDITOR_QUIT;
 
             case SDL_KEYDOWN: {
 					dragmodeitem = -1;
@@ -3837,7 +3806,8 @@ int editor_modeitems()
                 if (event.key.keysym.sym == SDLK_s) {
 						savecurrentmap();
                 } else if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_j) {
-						return EDITOR_EDIT;
+                    editor_modeitems_initialized = false;
+					return EDITOR_EDIT;
                 } else if (event.key.keysym.sym >= SDLK_1 && event.key.keysym.sym <= SDLK_2) {
 						modeitemmode = event.key.keysym.sym - SDLK_1;
                 } else if (event.key.keysym.sym == SDLK_r) {
@@ -3966,34 +3936,17 @@ int editor_modeitems()
 		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
 
 		DrawMessage();
-		SDL_Flip(screen);
-
-		int delay = WAITTIME - (SDL_GetTicks() - framestart);
-		if (delay < 0)
-			delay = 0;
-		else if (delay > WAITTIME)
-			delay = WAITTIME;
-
-		SDL_Delay(delay);
-	}
-
-	return EDITOR_QUIT;
+		return EDITOR_MODEITEMS;
 }
 
 
 int editor_tiletype()
 {
-	bool done = false;
-
-    while (!done) {
-		int framestart = SDL_GetTicks();
-
 		//handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
 				case SDL_QUIT:
-					done = true;
-				break;
+					return EDITOR_QUIT;
 
             case SDL_KEYDOWN: {
 					edit_mode = 6;
@@ -4033,57 +3986,61 @@ int editor_tiletype()
 		rm->menu_font_small.drawRightJustified(640, 0, maplist->currentFilename());
 
 		DrawMessage();
-		SDL_Flip(screen);
+		return EDITOR_TILETYPE;
+}
 
-		int delay = WAITTIME - (SDL_GetTicks() - framestart);
-		if (delay < 0)
-			delay = 0;
-		else if (delay > WAITTIME)
-			delay = WAITTIME;
+short iPage;
+SDL_Surface * sBackgrounds[16];
+SDL_Rect rSrc = {0, 0, 160, 120};
+SDL_Rect rDst[16];
 
-		SDL_Delay(delay);
-	}
+bool editor_backgrounds_initialized = false;
+void init_editor_backgrounds()
+{
+    if (editor_backgrounds_initialized)
+        return;
 
-	return EDITOR_QUIT;
+    iPage = backgroundlist->GetCurrentIndex() / 16;
+
+    for (short iRectY = 0; iRectY < 4; iRectY++) {
+        for (short iRectX = 0; iRectX < 4; iRectX++) {
+            rDst[iRectY * 4 + iRectX].x = iRectX * 160;
+            rDst[iRectY * 4 + iRectX].y = iRectY * 120;
+            rDst[iRectY * 4 + iRectX].w = 160;
+            rDst[iRectY * 4 + iRectX].h = 120;
+        }
+    }
+
+    for (short iSurface = 0; iSurface < 16; iSurface++)
+        sBackgrounds[iSurface] = SDL_CreateRGBSurface(screen->flags, 160, 120, 16, 0, 0, 0, 0);
+
+    LoadBackgroundPage(sBackgrounds, iPage);
+
+    editor_backgrounds_initialized = true;
 }
 
 int editor_backgrounds()
 {
-	bool done = false;
-    short iPage = backgroundlist->GetCurrentIndex() / 16;
-
-	SDL_Surface * sBackgrounds[16];
-	SDL_Rect rSrc = {0, 0, 160, 120};
-
-	SDL_Rect rDst[16];
-
-    for (short iRectY = 0; iRectY < 4; iRectY++) {
-        for (short iRectX = 0; iRectX < 4; iRectX++) {
-			rDst[iRectY * 4 + iRectX].x = iRectX * 160;
-			rDst[iRectY * 4 + iRectX].y = iRectY * 120;
-			rDst[iRectY * 4 + iRectX].w = 160;
-			rDst[iRectY * 4 + iRectX].h = 120;
-		}
-	}
-
-	for (short iSurface = 0; iSurface < 16; iSurface++)
-		sBackgrounds[iSurface] = SDL_CreateRGBSurface(screen->flags, 160, 120, 16, 0, 0, 0, 0);
-
-	LoadBackgroundPage(sBackgrounds, iPage);
-
-    while (!done) {
-		int framestart = SDL_GetTicks();
+    init_editor_backgrounds();
 
 		//handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
 				case SDL_QUIT:
-					done = true;
+                    for (short iSurface = 0; iSurface < 16; iSurface++)
+                        SDL_FreeSurface(sBackgrounds[iSurface]);
+
+                    editor_backgrounds_initialized = false;
+                    return EDITOR_EDIT;
 				break;
 
 				case SDL_KEYDOWN:
                 if (event.key.keysym.sym == SDLK_ESCAPE) {
-						done = true;
+					for (short iSurface = 0; iSurface < 16; iSurface++)
+                        SDL_FreeSurface(sBackgrounds[iSurface]);
+
+                    editor_backgrounds_initialized = false;
+                    return EDITOR_EDIT;
                 } else if (event.key.keysym.sym == SDLK_PAGEDOWN || event.key.keysym.sym == SDLK_DOWN) {
                     if ((iPage + 1) * 16 < backgroundlist->GetCount()) {
 							iPage++;
@@ -4105,22 +4062,28 @@ int editor_backgrounds()
 								break;
 
 							if (event.button.x >= rDst[iBackground].x && event.button.x < rDst[iBackground].x + rDst[iBackground].w &&
-                                event.button.y >= rDst[iBackground].y && event.button.y < rDst[iBackground].y + rDst[iBackground].h) {
-								done = true;
-                            backgroundlist->SetCurrent(iPage * 16 + iBackground);
+                                event.button.y >= rDst[iBackground].y && event.button.y < rDst[iBackground].y + rDst[iBackground].h)
+                            {
+                                backgroundlist->SetCurrent(iPage * 16 + iBackground);
 
-                            rm->spr_background.init(convertPath(backgroundlist->current_name()));
-                            strcpy(g_map->szBackgroundFile, getFileFromPath(backgroundlist->current_name()).c_str());
+                                rm->spr_background.init(convertPath(backgroundlist->current_name()));
+                                strcpy(g_map->szBackgroundFile, getFileFromPath(backgroundlist->current_name()).c_str());
 
-                            if (event.button.button == SDL_BUTTON_LEFT) {
+                                if (event.button.button == SDL_BUTTON_LEFT) {
 									//Set music to background default
-                                for (short iCategory = 0; iCategory < MAXMUSICCATEGORY; iCategory++) {
-                                    if (!strncmp(g_szMusicCategoryNames[iCategory], g_map->szBackgroundFile, strlen(g_szMusicCategoryNames[iCategory]))) {
+                                    for (short iCategory = 0; iCategory < MAXMUSICCATEGORY; iCategory++) {
+                                        if (!strncmp(g_szMusicCategoryNames[iCategory], g_map->szBackgroundFile, strlen(g_szMusicCategoryNames[iCategory]))) {
 											g_map->musicCategoryID = iCategory;
 											break;
 										}
 									}
 								}
+
+                                for (short iSurface = 0; iSurface < 16; iSurface++)
+                                    SDL_FreeSurface(sBackgrounds[iSurface]);
+
+                                editor_backgrounds_initialized = false;
+                                return EDITOR_EDIT;
 							}
 						}
 					}
@@ -4154,34 +4117,28 @@ int editor_backgrounds()
             rm->menu_font_small.draw(0, 0, backgroundlist->GetIndex(iID));
 
 		DrawMessage();
-		SDL_Flip(screen);
+		return EDITOR_BACKGROUNDS;
+}
 
-		int delay = WAITTIME - (SDL_GetTicks() - framestart);
-		if (delay < 0)
-			delay = 0;
-		else if (delay > WAITTIME)
-			delay = WAITTIME;
+//short view_tileset_repeat_direction = -1;
+//short view_tileset_repeat_timer = 0;
 
-		SDL_Delay(delay);
-	}
+bool editor_animation_initialized = false;
+void init_editor_animation()
+{
+    if (editor_animation_initialized)
+        return;
 
-	for (short iSurface = 0; iSurface < 16; iSurface++)
-		SDL_FreeSurface(sBackgrounds[iSurface]);
+    set_tile_drag = false;
+    view_tileset_repeat_direction = -1;
+    view_tileset_repeat_timer = 0;
 
-	return EDITOR_EDIT;
+    editor_animation_initialized = true;
 }
 
 int editor_animation()
 {
-	bool done = false;
-
-	set_tile_drag = false;
-
-	short view_tileset_repeat_direction = -1;
-	short view_tileset_repeat_timer = 0;
-
-    while (!done) {
-		int framestart = SDL_GetTicks();
+    init_editor_animation();
 
 		//handle messages
         while (SDL_PollEvent(&event)) {
@@ -4191,15 +4148,14 @@ int editor_animation()
 			bool fInValidTile = iRow >= 0 && iRow <= 7;
 
             switch (event.type) {
-            case SDL_QUIT: {
-					done = true;
-					break;
-				}
+            case SDL_QUIT:
+                return EDITOR_QUIT;
 
             case SDL_KEYDOWN: {
                 if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_a) {
                     if (!set_tile_drag) {
 							edit_mode = 8;
+                            editor_animation_initialized = false;
 							return EDITOR_EDIT;
 						}
                 } else if (event.key.keysym.sym == SDLK_LEFT) {
@@ -4254,6 +4210,7 @@ int editor_animation()
 
 							set_tile_drag = false;
 							edit_mode = 8;  //change to edit mode using tiles
+                            editor_animation_initialized = false;
 							return EDITOR_EDIT;
 
 						}
@@ -4334,18 +4291,7 @@ int editor_animation()
 		rm->menu_font_small.draw(0, 480 - rm->menu_font_small.getHeight(), "Use Arrow Keys To Scroll");
 
 		DrawMessage();
-		SDL_Flip(screen);
-
-		int delay = WAITTIME - (SDL_GetTicks() - framestart);
-		if (delay < 0)
-			delay = 0;
-		else if (delay > WAITTIME)
-			delay = WAITTIME;
-
-		SDL_Delay(delay);
-	}
-
-	return EDITOR_QUIT;
+		return EDITOR_ANIMATION;
 }
 
 void LoadBackgroundPage(SDL_Surface ** sBackgrounds, short iPage)
@@ -4497,11 +4443,6 @@ int display_help()
 	rm->menu_font_small.draw(offsetx, offsety, "[alt] + [enter] - Full Screen/Window");
 
 
-	SDL_Flip(screen);
-
-    while (true) {
-		int framestart = SDL_GetTicks();
-
 		//handle messages
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
@@ -4518,16 +4459,7 @@ int display_help()
 			}
 		}
 
-		int delay = WAITTIME - (SDL_GetTicks() - framestart);
-		if (delay < 0)
-			delay = 0;
-		else if (delay > WAITTIME)
-			delay = WAITTIME;
-
-		SDL_Delay(delay);
-	}
-
-	return 0;
+	return DISPLAY_HELP;
 }
 
 int save_as()
@@ -4547,6 +4479,10 @@ int save_as()
 
 bool dialog(const char * title, const char * instructions, char * input, int inputsize)
 {
+// FIXME
+#ifdef __EMSCRIPTEN__
+    return false;
+#endif
 	unsigned int currentChar = 0;
 
 	drawmap(false, TILESIZE);

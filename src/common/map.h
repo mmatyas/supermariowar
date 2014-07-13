@@ -331,6 +331,7 @@ class CMap
 		friend int editor_blocks();
 		friend int editor_warp();
 		friend int editor_modeitems();
+		friend void init_editor_properties(short iBlockCol, short iBlockRow);
 		friend int editor_properties(short iBlockCol, short iBlockRow);
 		friend int editor_maphazards();
 		friend short NewMapHazard();
