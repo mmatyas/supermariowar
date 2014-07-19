@@ -345,23 +345,23 @@ void MenuState::CreateMenu()
     miNetServersScroll->Show(false);
     miNetServersScroll->RemoteIndex(&netplay.selectedServerIndex);
 
+    miNetServersNicknameField = new MI_TextField(&rm->menu_plain_field, 70, 120, "Your name", smw->ScreenWidth - 2 * 70, 150);
+    miNetServersNicknameField->SetData(netplay.myPlayerName, NET_MAX_PLAYER_NAME_LENGTH);
+
     for (unsigned iServer = 0; iServer < netplay.savedServers.size(); iServer++) {
         ServerAddress * host = &netplay.savedServers[iServer];
         miNetServersScroll->Add(host->hostname, "");
     }
 
-    miNetServersSelectButton = new MI_Button(&rm->spr_selectfield, 70, 160, "Selected Server", smw->ScreenWidth - 2 * 70, 0);
+    miNetServersSelectButton = new MI_Button(&rm->spr_selectfield, 70, 200, "Selected Server", smw->ScreenWidth - 2 * 70, 0);
     miNetServersSelectButton->SetCode(MENU_CODE_TO_NET_SERVERLIST);
-    miNetServersSelectedHostText = new MI_Text(netplay.savedServers[netplay.selectedServerIndex].hostname.c_str(), smw->ScreenWidth - 90, 165, 0, 2, 2);
+    miNetServersSelectedHostText = new MI_Text(netplay.savedServers[netplay.selectedServerIndex].hostname.c_str(), smw->ScreenWidth - 90, 205, 0, 2, 2);
 
-    miNetServersConnectButton = new MI_Button(&rm->spr_selectfield, 70, 200, "Connect", smw->ScreenWidth - 2 * 70, 1);
+    miNetServersConnectButton = new MI_Button(&rm->spr_selectfield, 70, 240, "Connect", smw->ScreenWidth - 2 * 70, 1);
     miNetServersConnectButton->SetCode(MENU_CODE_NET_CONNECT_IN_PROGRESS);
 
-    miNetServersAddRemoveButton = new MI_Button(&rm->spr_selectfield, 70, 240, "Add / Remove Server", smw->ScreenWidth - 2 * 70, 1);
+    miNetServersAddRemoveButton = new MI_Button(&rm->spr_selectfield, 70, 280, "Add / Remove Server", smw->ScreenWidth - 2 * 70, 1);
     miNetServersAddRemoveButton->SetCode(MENU_CODE_TO_NET_ADDREMOVE_SERVER_MENU);
-
-    miNetServersNicknameField = new MI_TextField(&rm->menu_plain_field, 70, 320, "Your name", smw->ScreenWidth - 2 * 70, 150);
-    miNetServersNicknameField->SetData(netplay.myPlayerName, NET_MAX_PLAYER_NAME_LENGTH);
 
     miNetServersConnectingDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
     miNetServersConnectingDialogText = new MI_Text("Connecting...", smw->ScreenWidth / 2, smw->ScreenHeight / 2 - 12, 0, 2, 1);
@@ -381,12 +381,12 @@ void MenuState::CreateMenu()
     miNetServersConnectionDetector->SuccessCode(MENU_CODE_NET_CONNECT_SUCCESS);
     miNetServersConnectionDetector->WaitingCode(MENU_CODE_NET_CONNECT_IN_PROGRESS);*/
 
-    mNetServers.AddControl(miNetServersSelectButton, miNetServersBackButton, miNetServersConnectButton, NULL, NULL);
+    mNetServers.AddControl(miNetServersNicknameField, miNetServersBackButton, miNetServersSelectButton, NULL, NULL);
+    mNetServers.AddControl(miNetServersSelectButton, miNetServersNicknameField, miNetServersConnectButton, NULL, NULL);
     mNetServers.AddNonControl(miNetServersSelectedHostText);
     mNetServers.AddControl(miNetServersConnectButton, miNetServersSelectButton, miNetServersAddRemoveButton, NULL, NULL);
-    mNetServers.AddControl(miNetServersAddRemoveButton, miNetServersConnectButton, miNetServersNicknameField, NULL, NULL);
-    mNetServers.AddControl(miNetServersNicknameField, miNetServersAddRemoveButton, miNetServersBackButton, NULL, NULL);
-    mNetServers.AddControl(miNetServersBackButton, miNetServersNicknameField, miNetServersSelectButton, NULL, NULL);
+    mNetServers.AddControl(miNetServersAddRemoveButton, miNetServersConnectButton, miNetServersBackButton, NULL, NULL);
+    mNetServers.AddControl(miNetServersBackButton, miNetServersAddRemoveButton, miNetServersNicknameField, NULL, NULL);
 
     mNetServers.AddNonControl(miNetServersLeftHeaderBar);
     mNetServers.AddNonControl(miNetServersRightHeaderBar);
@@ -2504,9 +2504,9 @@ void MenuState::update()
             uint8_t lastSendType = netplay.lastSentMessage.packageType;
             uint8_t lastRecvType = netplay.lastReceivedMessage.packageType;
 
-            if (lastSendType == NET_NOTICE_GAME_SYNC_OK
+            /*if (lastSendType == NET_NOTICE_GAME_SYNC_OK
                 && lastRecvType == NET_NOTICE_GAME_STARTED)
-            code = MENU_CODE_NET_ROOM_GO;
+            code = MENU_CODE_NET_ROOM_GO;*/
         }
 
         if (MENU_CODE_EXIT_APPLICATION == code) {
@@ -3140,6 +3140,8 @@ void MenuState::update()
 
                 uint8_t lastSendType = netplay.lastSentMessage.packageType;
                 uint8_t lastRecvType = netplay.lastReceivedMessage.packageType;
+
+                printf("\rlastSendType: %d, lastRecvType: %d", lastSendType, lastRecvType);
 
                 if (lastSendType == NET_REQUEST_CONNECT
                         && lastRecvType == NET_RESPONSE_CONNECT_OK)
