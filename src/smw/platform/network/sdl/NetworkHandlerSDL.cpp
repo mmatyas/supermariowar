@@ -131,7 +131,7 @@ bool NetworkHandlerSDL::receiveUDPMessage(void* dataBuffer)
     }
 
     // Must have version and type field.
-    if (udpIncomingPacket->len < 2) {
+    if (udpIncomingPacket->len < 3) {
         fprintf(stderr, "[net][warning] Invalid incoming package.\n");
         return false;
     }

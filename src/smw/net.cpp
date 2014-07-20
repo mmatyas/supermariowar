@@ -6,15 +6,15 @@
 #include "RandomNumberGenerator.h"
 #include "player.h"
 
-#include "network/NetworkProtocolPackages.h"
+#include "network/ProtocolPackages.h"
 
 // define platform guards here
 #ifndef __EMSCRIPTEN__
-    #define NetworkHandler NetworkHandlerSDL
-    #include "platform/network/sdl/NetworkHandlerSDL.h"
+    #include "platform/network/enet/NetworkLayerENet.h"
+    #define NetworkHandler NetworkLayerENet
 #else
-    #define NetworkHandler NetworkHandlerNULL
     #include "platform/network/null/NetworkHandlerNULL.h"
+    #define NetworkHandler NetworkHandlerNULL
 #endif
 
 #include <cassert>
@@ -29,10 +29,11 @@ extern CPlayer* list_players[4];
 extern short list_players_cnt;
 extern bool VersionIsEqual(int iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
 
+short backup_playercontrol[4];
 
 bool net_init()
 {
-    if (!networkHandler.init_networking())
+    if (!networkHandler.init())
         return false;
 
     if (!netplay.client.init())
@@ -68,13 +69,17 @@ bool net_init()
 
     net_loadServerList();
 
-    printf("Network system initialized.\n");
+    printf("[net] Network system initialized.\n");
     return true;
 }
 
 void net_close()
 {
     net_saveServerList();
+
+    net_endSession();
+    netplay.client.cleanup();
+
     networkHandler.cleanup();
 }
 
@@ -119,45 +124,15 @@ void net_loadServerList()
     }
 }
 
-/********************************************************************
- * NetClient
- ********************************************************************/
-NetClient::NetClient()
-{}
-
-NetClient::~NetClient()
-{
-    cleanup();
-}
-
-bool NetClient::init()
-{
-    if (!networkHandler.init_client())
-        return false;
-
-    return true;
-}
-
-void NetClient::cleanup()
-{
-    endSession();
-    networkHandler.cleanup();
-}
-
-void NetClient::setRoomListUIControl(MI_NetworkListScroll* control)
-{
-    uiRoomList = control;
-}
-
 /****************************
     Session
 ****************************/
 
-bool NetClient::startSession()
+bool net_startSession()
 {
-    printf("Session start.\n");
-    endSession(); // Finish previous network session if active
+    net_endSession(); // Finish previous network session if active
 
+    printf("[net] Session start.\n");
     netplay.active = true;
     netplay.connectSuccessful = false;
 
@@ -165,17 +140,16 @@ bool NetClient::startSession()
     for (uint8_t p = 0; p < 4; p++)
         backup_playercontrol[p] = game_values.playercontrol[p];
 
-    return true;
+    return netplay.client.start();
 }
 
-void NetClient::endSession()
+void net_endSession()
 {
     if (netplay.active) {
-        printf("Session end.\n");
-        if (netplay.connectSuccessful)
-            sendGoodbye();
+        printf("[net] Session end.\n");
 
-        closeConnection();
+        netplay.client.stop();
+
         netplay.active = false;
         netplay.connectSuccessful = false;
 
@@ -185,118 +159,135 @@ void NetClient::endSession()
     }
 }
 
+/********************************************************************
+ * NetClient
+ ********************************************************************/
+
+NetClient::NetClient()
+{
+    //printf("NetClient::ctor\n");
+}
+
+NetClient::~NetClient()
+{
+    //printf("NetClient::dtor\n");
+    cleanup();
+}
+
+bool NetClient::init()
+{
+    //printf("NetClient::init\n");
+    // init client stuff first
+    // ...
+
+    // then finally gamehost
+    if (!local_gamehost.init())
+        return false;
+
+    return true;
+}
+
+bool NetClient::start() // startSession
+{
+    //printf("NetClient::start\n");
+    if (!networkHandler.client_restart())
+        return false;
+
+    return true;
+}
+
+void NetClient::update()
+{
+    local_gamehost.update();
+    networkHandler.client_listen(*this);
+}
+
+void NetClient::stop() // endSession
+{
+    //printf("NetClient::stop\n");
+    local_gamehost.stop();
+
+    if (netplay.connectSuccessful)
+        sendGoodbye();
+
+    if (foreign_lobbyserver) {
+        foreign_lobbyserver->disconnect();
+        foreign_lobbyserver = NULL;
+    }
+    if (foreign_gamehost) {
+        foreign_gamehost->disconnect();
+        foreign_gamehost = NULL;
+    }
+
+    networkHandler.client_shutdown();
+}
+
+void NetClient::cleanup()
+{
+    //printf("NetClient::cleanup\n");
+    stop();
+
+    // ...
+}
+
+void NetClient::setRoomListUIControl(MI_NetworkListScroll* control)
+{
+    uiRoomList = control;
+}
+
+/****************************
+    Phase 1: Connect
+****************************/
+
+bool NetClient::sendConnectRequestToSelectedServer()
+{
+    ServerAddress* selectedServer = &netplay.savedServers[netplay.selectedServerIndex];
+    if (!openConnection(selectedServer->hostname.c_str()))
+        return false;
+    
+    netplay.operationInProgress = true;
+    return true;
+}
+
 void NetClient::sendGoodbye()
 {
     //printf("sendGoodbye\n");
     Net_ClientDisconnectionPackage msg;
-    sendMessage(&msg, sizeof(Net_ClientDisconnectionPackage));
+    sendMessageToLobbyServer(&msg, sizeof(Net_ClientDisconnectionPackage));
+}
+
+void NetClient::handleServerinfoAndClose(const uint8_t* data, size_t dataLength)
+{
+    // TODO: Remove copies.
+
+    Net_ServerInfoPackage serverInfo;
+    memcpy(&serverInfo, data, sizeof(Net_ServerInfoPackage));
+
+    printf("[net] Server information: Name: %s, Protocol version: %u.%u  Players/Max: %d / %d\n",
+        serverInfo.name, serverInfo.protocolMajorVersion, serverInfo.protocolMinorVersion,
+        serverInfo.currentPlayerCount, serverInfo.maxPlayerCount);
+
+    foreign_lobbyserver->disconnect();
+    foreign_lobbyserver = NULL;
 }
 
 /****************************
-    Outgoing messages
+    Phase 2: Join room
 ****************************/
 
 void NetClient::requestRoomList()
 {
     Net_RoomListPackage msg;
-    sendMessage(&msg, sizeof(Net_RoomListPackage));
+    sendMessageToLobbyServer(&msg, sizeof(Net_RoomListPackage));
 
     if (uiRoomList)
         uiRoomList->Clear();
 }
 
-bool NetClient::sendConnectRequestToSelectedServer()
-{
-    ServerAddress* selectedServer = &netplay.savedServers[netplay.selectedServerIndex];
-    if (openConnection(selectedServer->hostname.c_str()))
-    {
-        Net_ClientConnectionPackage message(netplay.myPlayerName);
-        sendMessage(&message, sizeof(Net_ClientConnectionPackage));
-        netplay.operationInProgress = true;
-        return true;
-    }
-    return false;
-}
-
-void NetClient::sendCreateRoomMessage()
-{
-    Net_NewRoomPackage msg(netplay.newroom_name, netplay.newroom_password);
-
-    sendMessage(&msg, sizeof(Net_NewRoomPackage));
-    netplay.operationInProgress = true;
-}
-
-void NetClient::sendJoinRoomMessage()
-{
-    if (netplay.selectedRoomIndex >= netplay.currentRooms.size())
-        return;
-
-    // TODO: implement password
-    Net_JoinRoomPackage msg(netplay.currentRooms.at(netplay.selectedRoomIndex).roomID, "");
-    sendMessage(&msg, sizeof(Net_JoinRoomPackage));
-    netplay.operationInProgress = true;
-}
-
-void NetClient::sendLeaveRoomMessage()
-{
-    Net_LeaveRoomPackage msg;
-    sendMessage(&msg, sizeof(Net_LeaveRoomPackage));
-}
-
-void NetClient::sendStartRoomMessage()
-{
-    Net_StartRoomPackage msg;
-    sendMessage(&msg, sizeof(Net_StartRoomPackage));
-}
-
-void NetClient::sendSyncOKMessage()
-{
-    Net_SyncOKPackage msg;
-    sendMessage(&msg, sizeof(Net_SyncOKPackage));
-}
-
-void NetClient::sendLocalInput()
-{
-    Net_LocalInputPackage pkg(&netplay.netPlayerInput.outputControls[0]);
-    sendMessage(&pkg, sizeof(Net_LocalInputPackage));
-}
-
-void NetClient::sendCurrentGameState()
-{
-    if (!netplay.theHostIsMe)
-        return;
-
-    Net_GameStatePackage pkg;
-
-    for (uint8_t p = 0; p < list_players_cnt; p++) {
-        pkg.setPlayerCoord(p, list_players[p]->fx, list_players[p]->fy);
-        pkg.setPlayerVel(p, list_players[p]->velx, list_players[p]->vely);
-        pkg.setPlayerKeys(p, &netplay.netPlayerInput.outputControls[p]);
-    }
-
-    sendMessage(&pkg, sizeof(Net_GameStatePackage));
-}
-
-/****************************
-    Incoming messages
-****************************/
-
-void NetClient::handleServerinfoAndClose()
-{
-    Net_ServerInfoPackage serverInfo;
-    memcpy(&serverInfo, incomingData, sizeof(Net_ServerInfoPackage));
-
-    printf("NET_RESPONSE_SERVERINFO [%lu byte]\n", sizeof(serverInfo));
-    printf("Sending:\n  protocolVersion: %d\n  packageType: %d\n  name: %s\n  players/max: %d / %d\n",
-        serverInfo.protocolVersion, serverInfo.packageType, serverInfo.name, serverInfo.currentPlayerCount, serverInfo.maxPlayerCount);
-
-    closeConnection();
-}
-
-void NetClient::handleNewRoomListEntry()
+void NetClient::handleNewRoomListEntry(const uint8_t* data, size_t dataLength)
 {
     Net_RoomInfoPackage roomInfo;
-    memcpy(&roomInfo, incomingData, sizeof(Net_RoomInfoPackage));
+    memcpy(&roomInfo, data, sizeof(Net_RoomInfoPackage));
     //printf("  Incoming room entry: [%u] %s (%d/4)\n", roomInfo.roomID, roomInfo.name, roomInfo.currentPlayerCount);
 
     RoomListEntry newRoom;
@@ -311,10 +302,18 @@ void NetClient::handleNewRoomListEntry()
     }
 }
 
-void NetClient::handleRoomCreatedMessage()
+void NetClient::sendCreateRoomMessage()
+{
+    Net_NewRoomPackage msg(netplay.newroom_name, netplay.newroom_password);
+
+    sendMessageToLobbyServer(&msg, sizeof(Net_NewRoomPackage));
+    netplay.operationInProgress = true;
+}
+
+void NetClient::handleRoomCreatedMessage(const uint8_t* data, size_t dataLength)
 {
     Net_NewRoomCreatedPackage pkg;
-    memcpy(&pkg, incomingData, sizeof(Net_NewRoomCreatedPackage));
+    memcpy(&pkg, data, sizeof(Net_NewRoomCreatedPackage));
 
     netplay.currentRoom.roomID = pkg.roomID;
     netplay.currentRoom.hostPlayerNumber = 0;
@@ -333,12 +332,33 @@ void NetClient::handleRoomCreatedMessage()
     game_values.playercontrol[1] = 0;
     game_values.playercontrol[2] = 0;
     game_values.playercontrol[3] = 0;
+
+    local_gamehost.start(foreign_lobbyserver);
 }
 
-void NetClient::handleRoomChangedMessage()
+void NetClient::sendJoinRoomMessage()
+{
+    if (netplay.selectedRoomIndex >= netplay.currentRooms.size())
+        return;
+
+    // TODO: implement password
+    Net_JoinRoomPackage msg(netplay.currentRooms.at(netplay.selectedRoomIndex).roomID, "");
+    sendMessageToLobbyServer(&msg, sizeof(Net_JoinRoomPackage));
+    netplay.operationInProgress = true;
+}
+
+void NetClient::sendLeaveRoomMessage()
+{
+    local_gamehost.stop();
+
+    Net_LeaveRoomPackage msg;
+    sendMessageToLobbyServer(&msg, sizeof(Net_LeaveRoomPackage));
+}
+
+void NetClient::handleRoomChangedMessage(const uint8_t* data, size_t dataLength)
 {
     Net_CurrentRoomPackage pkg;
-    memcpy(&pkg, incomingData, sizeof(Net_CurrentRoomPackage));
+    memcpy(&pkg, data, sizeof(Net_CurrentRoomPackage));
 
     netplay.currentRoom.roomID = pkg.roomID;
     memcpy(netplay.currentRoom.name, pkg.name, NET_MAX_ROOM_NAME_LENGTH);
@@ -371,22 +391,26 @@ void NetClient::handleRoomChangedMessage()
     netplay.currentMenuChanged = true;
 }
 
-void NetClient::handleRemoteInput() // only for room host
+/****************************
+    Phase 3: Play
+****************************/
+
+void NetClient::sendSyncOKMessage()
 {
-    assert(netplay.theHostIsMe);
-
-    Net_RemoteInputPackage pkg;
-    memcpy(&pkg, incomingData, sizeof(Net_RemoteInputPackage));
-
-    pkg.readKeys(&netplay.netPlayerInput.outputControls[pkg.playerNumber]);
+    Net_SyncOKPackage msg;
+    sendMessageToGameHost(&msg, sizeof(Net_SyncOKPackage));
 }
 
-void NetClient::handleRemoteGameState() // for other clients
+void NetClient::sendLocalInput()
 {
-    assert(!netplay.theHostIsMe);
+    Net_LocalInputPackage pkg(&netplay.netPlayerInput.outputControls[0]);
+    sendMessageToGameHost(&pkg, sizeof(Net_LocalInputPackage));
+}
 
+void NetClient::handleRemoteGameState(const uint8_t* data, size_t dataLength) // for other clients
+{
     Net_GameStatePackage pkg;
-    memcpy(&pkg, incomingData, sizeof(Net_GameStatePackage));
+    memcpy(&pkg, data, sizeof(Net_GameStatePackage));
 
     for (uint8_t p = 0; p < list_players_cnt; p++) {
         pkg.getPlayerCoord(p, list_players[p]->fx, list_players[p]->fy);
@@ -395,135 +419,152 @@ void NetClient::handleRemoteGameState() // for other clients
     }
 }
 
-void NetClient::listen()
+/****************
+    Listening
+****************/
+
+// This client sucesfully connected to a host
+void NetClient::onConnect(NetPeer* server)
 {
-    if (receiveMessage()) {
-        uint8_t protocollVersion = incomingData[0];
-        uint8_t responseCode = incomingData[1];
-        if (protocollVersion == NET_PROTOCOL_VERSION) {
-            switch (responseCode)
+    assert(server != NULL);
+    assert(foreign_lobbyserver == NULL);
+    foreign_lobbyserver = server;
+
+    Net_ClientConnectionPackage message(netplay.myPlayerName);
+    sendMessageToLobbyServer(&message, sizeof(Net_ClientConnectionPackage));
+}
+
+void NetClient::onDisconnect(NetPeer& client)
+{
+    // ...
+}
+
+void NetClient::onReceive(NetPeer& client, const uint8_t* data, size_t dataLength)
+{
+    uint8_t protocolMajor = data[0];
+    uint8_t protocolMinor = data[1];
+    uint8_t packageType = data[2];
+    if (protocolMajor != NET_PROTOCOL_VERSION_MAJOR)
+        return;
+
+    switch (packageType)
+    {
+        //
+        // Query
+        //
+        case NET_RESPONSE_BADPROTOCOL:
+            printf("Not implemented: NET_RESPONSE_BADPROTOCOL\n");
+            break;
+
+        case NET_RESPONSE_SERVERINFO:
+            handleServerinfoAndClose(data, dataLength);
+            break;
+
+        case NET_RESPONSE_SERVER_MOTD:
+            printf("Not implemented: NET_RESPONSE_SERVER_MOTD\n");
+            break;
+
+        //
+        // Connect
+        //
+        case NET_RESPONSE_CONNECT_OK:
+            //printf("[net] Connection attempt successful.\n");
+            netplay.connectSuccessful = true;
+            break;
+
+        case NET_RESPONSE_CONNECT_DENIED:
+            printf("Not implemented: NET_RESPONSE_CONNECT_DENIED\n");
+            netplay.connectSuccessful = false;
+            break;
+
+        case NET_RESPONSE_CONNECT_SERVERFULL:
+            printf("Not implemented: NET_RESPONSE_CONNECT_SERVERFULL\n");
+            netplay.connectSuccessful = false;
+            break;
+
+        case NET_RESPONSE_CONNECT_NAMETAKEN:
+            printf("Not implemented: NET_RESPONSE_CONNECT_NAMETAKEN\n");
+            netplay.connectSuccessful = false;
+            break;
+
+        //
+        // Rooms
+        //
+        case NET_RESPONSE_ROOM_LIST_ENTRY:
+            handleNewRoomListEntry(data, dataLength);
+            break;
+
+        case NET_RESPONSE_NO_ROOMS:
+            printf("Not implemented: [net] There are no rooms currently on the server.\n");
+            break;
+
+        //
+        // Join
+        //
+        case NET_RESPONSE_JOIN_OK:
+            printf("Not implemented: [net] Joined to room.\n");
+            netplay.joinSuccessful = true;
+            netplay.theHostIsMe = false;
+            break;
+
+        case NET_RESPONSE_ROOM_FULL:
+            printf("Not implemented: [net] The room is full\n");
+            netplay.joinSuccessful = false;
+            break;
+
+        case NET_NOTICE_ROOM_CHANGED:
+            handleRoomChangedMessage(data, dataLength);
+            break;
+
+        //
+        // Create
+        //
+        case NET_RESPONSE_CREATE_OK:
+            handleRoomCreatedMessage(data, dataLength);
+            break;
+
+        case NET_RESPONSE_CREATE_ERROR:
+            printf("Not implemented: NET_RESPONSE_CREATE_ERROR\n");
+            break;
+
+        //
+        // Game
+        //
+
+        case NET_NOTICE_GAMEHOST_INFO:
+            printf("Not fully implemented: NET_RECV_GAMEHOST_INFO\n");
             {
-                //
-                // Query
-                //
-                case NET_RESPONSE_BADPROTOCOL:
-                    printf("Not implemented: NET_RESPONSE_BADPROTOCOL\n");
-                    break;
+                Net_StartSyncPackage pkg;
+                memcpy(&pkg, data, sizeof(Net_StartSyncPackage));
 
-                case NET_RESPONSE_SERVERINFO:
-                    handleServerinfoAndClose();
-                    break;
-
-                case NET_RESPONSE_SERVER_MOTD:
-                    printf("Not implemented: NET_RESPONSE_SERVER_MOTD\n");
-                    break;
-
-                //
-                // Connect
-                //
-                case NET_RESPONSE_CONNECT_OK:
-                    printf("Connection attempt successful.\n");
-                    netplay.connectSuccessful = true;
-                    break;
-
-                case NET_RESPONSE_CONNECT_DENIED:
-                    printf("NET_RESPONSE_CONNECT_DENIED\n");
-                    netplay.connectSuccessful = false;
-                    break;
-
-                case NET_RESPONSE_CONNECT_SERVERFULL:
-                    printf("NET_RESPONSE_CONNECT_SERVERFULL\n");
-                    netplay.connectSuccessful = false;
-                    break;
-
-                case NET_RESPONSE_CONNECT_NAMETAKEN:
-                    printf("NET_RESPONSE_CONNECT_NAMETAKEN\n");
-                    netplay.connectSuccessful = false;
-                    break;
-
-                //
-                // Rooms
-                //
-                case NET_RESPONSE_ROOM_LIST_ENTRY:
-                    handleNewRoomListEntry();
-                    break;
-
-                case NET_RESPONSE_NO_ROOMS:
-                    printf("There are no rooms currently on the server.\n");
-                    break;
-
-                //
-                // Join
-                //
-                case NET_RESPONSE_JOIN_OK:
-                    printf("NET_RESPONSE_JOIN_OK\n");
-                    netplay.joinSuccessful = true;
-                    netplay.theHostIsMe = false;
-                    break;
-
-                case NET_RESPONSE_ROOM_FULL:
-                    printf("NET_RESPONSE_ROOMFULL\n");
-                    netplay.joinSuccessful = false;
-                    break;
-
-                case NET_NOTICE_ROOM_CHANGED:
-                    handleRoomChangedMessage();
-                    break;
-
-                //
-                // Create
-                //
-                case NET_RESPONSE_CREATE_OK:
-                    handleRoomCreatedMessage();
-                    break;
-
-                case NET_RESPONSE_CREATE_ERROR:
-                    printf("Not implemented: NET_RESPONSE_CREATE_ERROR\n");
-                    break;
-
-                //
-                // Game
-                //
-
-                case NET_NOTICE_GAME_SYNC:
-                    printf("NET_NOTICE_GAME_SYNC\n");
-                    {
-                        Net_StartSyncPackage pkg;
-                        memcpy(&pkg, incomingData, sizeof(Net_StartSyncPackage));
-
-                        //printf("reseed: %d\n", pkg.commonRandomSeed);
-                        RandomNumberGenerator::generator().reseed(pkg.commonRandomSeed);
-                    }
-                    sendSyncOKMessage();
-                    break;
-
-                case NET_NOTICE_GAME_STARTED:
-                    printf("NET_NOTICE_GAME_STARTED\n");
-                    netplay.gameRunning = true;
-                    break;
-
-                case NET_NOTICE_REMOTE_KEYS:
-                    //printf("NET_NOTICE_REMOTE_KEYS\n");
-                    handleRemoteInput();
-                    break;
-
-                case NET_NOTICE_HOST_STATE:
-                    handleRemoteGameState();
-                    break;
-
-                //
-                // Default
-                //
-
-                default:
-                    printf("Unknown: ");
-                    /*for (int a = 0; a < udpIncomingPacket->len; a++)
-                        printf("%3d ", incomingData[a]);*/
-                    printf("\n");
-                    break;
+                //printf("reseed: %d\n", pkg.commonRandomSeed);
+                RandomNumberGenerator::generator().reseed(pkg.commonRandomSeed);
             }
-        }
+            sendSyncOKMessage();
+            break;
+
+        case NET_G2P_GAME_START:
+            printf("NET_RECV_GAMEHOST_GAME_STARTED\n");
+            netplay.gameRunning = true;
+            break;
+
+        case NET_G2P_GAME_STATE:
+            handleRemoteGameState(data, dataLength);
+            break;
+
+        //
+        // Default
+        //
+
+        default:
+            printf("Unknown: ");
+            /*for (int a = 0; a < udpIncomingPacket->len; a++)
+                printf("%3d ", incomingData[a]);*/
+            printf("\n");
+            return; // do not set as last message
     }
+
+    setAsLastReceivedMessage(packageType);
 }
 
 /****************************
@@ -533,7 +574,7 @@ void NetClient::listen()
 bool NetClient::openConnection(const char* hostname, const uint16_t port)
 {
     netplay.connectSuccessful = false;
-    if (!networkHandler.openUDPConnection(hostname, port))
+    if (!networkHandler.connectToLobbyServer(hostname, port))
         return false;
 
     return true;
@@ -541,29 +582,199 @@ bool NetClient::openConnection(const char* hostname, const uint16_t port)
     // connectSuccessful will be set to 'true' there
 }
 
-void NetClient::closeConnection()
+bool NetClient::sendTo(NetPeer*& peer, const void* data, int dataLength)
 {
-    networkHandler.closeUDPConnection();
-}
+    assert(peer);
 
-bool NetClient::sendMessage(const void* data, const int dataLength)
-{
-    if (!networkHandler.sendUDPMessage(data, dataLength))
+    if (dataLength < 3)
         return false;
 
-    netplay.lastSentMessage.packageType = ((uint8_t*)data)[1];
-    netplay.lastSentMessage.timestamp = SDL_GetTicks();
+    if (!peer->send(data, dataLength))
+        return false;
 
+    setAsLastSentMessage(((uint8_t*)data)[2]);
     return true;
 }
 
-bool NetClient::receiveMessage()
+bool NetClient::sendMessageToLobbyServer(const void* data, int dataLength)
 {
-    if (!networkHandler.receiveUDPMessage(incomingData))
+    return sendTo(foreign_lobbyserver, data, dataLength);
+}
+
+bool NetClient::sendMessageToGameHost(const void* data, int dataLength)
+{
+    return sendTo(foreign_gamehost, data, dataLength);
+}
+
+void NetClient::setAsLastSentMessage(uint8_t packageType)
+{
+    printf("setAsLastSentMessage: %d.\n", packageType);
+    lastSentMessage.packageType = packageType;
+    lastSentMessage.timestamp = SDL_GetTicks();
+}
+
+void NetClient::setAsLastReceivedMessage(uint8_t packageType)
+{
+    printf("setAsLastReceivedMessage: %d.\n", packageType);
+    lastReceivedMessage.packageType = packageType;
+    lastReceivedMessage.timestamp = SDL_GetTicks();
+}
+
+
+
+
+
+NetGameHost::NetGameHost()
+    : active(false)
+    , foreign_lobbyserver(NULL)
+{
+    //printf("NetGameHost::ctor\n");
+}
+
+NetGameHost::~NetGameHost()
+{
+    //printf("NetGameHost::dtor\n");
+    cleanup();
+}
+
+bool NetGameHost::init()
+{
+    //printf("NetGameHost::init\n");
+    return true;
+}
+
+bool NetGameHost::start(NetPeer* &lobbyserver)
+{
+    assert(!active);
+    assert(lobbyserver);
+
+    //printf("NetGameHost::start\n");
+    if (active)
         return false;
 
-    netplay.lastReceivedMessage.packageType = incomingData[1];
-    netplay.lastReceivedMessage.timestamp = SDL_GetTicks(); /* TODO: csomagból */
+    foreign_lobbyserver = lobbyserver;
 
+    if (!networkHandler.gamehost_restart())
+        return false;
+
+    active = true;
     return true;
+}
+
+void NetGameHost::update()
+{
+    assert(active);
+    if (active)
+        networkHandler.gamehost_listen(*this);
+}
+
+void NetGameHost::stop()
+{
+    assert(active);
+    //printf("NetGameHost::stop\n");
+    if (!active)
+        return;
+
+    active = false;
+
+    foreign_lobbyserver = NULL; // client may be still connected
+    for (short p = 0; p < 3; p++) {
+        if (clients[p]) {
+            clients[p]->disconnect();
+            clients[p] = NULL;
+        }
+    }
+
+    networkHandler.gamehost_shutdown();
+}
+
+void NetGameHost::cleanup()
+{
+    //printf("NetGameHost::cleanup\n");
+    stop();
+}
+
+// A client connected to this host
+void NetGameHost::onConnect(NetPeer* new_player)
+{
+
+}
+
+void NetGameHost::onDisconnect(NetPeer& player)
+{
+
+}
+
+void NetGameHost::onReceive(NetPeer& player, const uint8_t* data, size_t dataLength)
+{
+    uint8_t protocolMajor = data[0];
+    uint8_t protocolMinor = data[1];
+    uint8_t packageType = data[2];
+    if (protocolMajor != NET_PROTOCOL_VERSION_MAJOR)
+        return;
+
+    switch (packageType)
+    {
+
+        case NET_P2G_LOCAL_KEYS:
+            //printf("NET_NOTICE_REMOTE_KEYS\n");
+            handleRemoteInput(data, dataLength);
+            break;
+    }
+}
+
+void NetGameHost::sendStartRoomMessage()
+{
+    assert(foreign_lobbyserver);
+
+    Net_StartRoomPackage msg;
+    foreign_lobbyserver->send(&msg, sizeof(Net_StartRoomPackage));
+}
+
+void NetGameHost::sendCurrentGameState()
+{
+    Net_GameStatePackage pkg;
+
+    for (uint8_t p = 0; p < list_players_cnt; p++) {
+        pkg.setPlayerCoord(p, list_players[p]->fx, list_players[p]->fy);
+        pkg.setPlayerVel(p, list_players[p]->velx, list_players[p]->vely);
+        pkg.setPlayerKeys(p, &netplay.netPlayerInput.outputControls[p]);
+    }
+
+    for (int c = 0; c < 3; c++) {
+        if (clients[c])
+            clients[c]->send(&pkg, sizeof(Net_GameStatePackage));
+    }
+}
+
+bool NetGameHost::sendMessageToMyPeers(const void* data, int dataLength)
+{
+    for (int c = 0; c < 3; c++) {
+        if (clients[c])
+            clients[c]->send(data, dataLength);
+    }
+
+    setAsLastSentMessage(((uint8_t*)data)[2]);
+    return true;
+}
+
+void NetGameHost::handleRemoteInput(const uint8_t* data, size_t dataLength) // only for room host
+{
+    Net_RemoteInputPackage pkg;
+    memcpy(&pkg, data, sizeof(Net_RemoteInputPackage));
+
+    // TODO: Remove/check player number field.
+    pkg.readKeys(&netplay.netPlayerInput.outputControls[pkg.playerNumber]);
+}
+
+void NetGameHost::setAsLastSentMessage(uint8_t packageType)
+{
+    lastSentMessage.packageType = packageType;
+    lastSentMessage.timestamp = SDL_GetTicks();
+}
+
+void NetGameHost::setAsLastReceivedMessage(uint8_t packageType)
+{
+    lastReceivedMessage.packageType = packageType;
+    lastReceivedMessage.timestamp = SDL_GetTicks();
 }

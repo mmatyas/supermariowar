@@ -1,8 +1,8 @@
-#ifndef NETWORK_PROTOCOL_CODES_H
-#define NETWORK_PROTOCOL_CODES_H
+#ifndef NETWORK_PROTOCOL_DEFINITIONS_H
+#define NETWORK_PROTOCOL_DEFINITIONS_H
 
-
-#define NET_PROTOCOL_VERSION                1
+#define NET_PROTOCOL_VERSION_MAJOR          1
+#define NET_PROTOCOL_VERSION_MINOR          0
 #define NET_MAX_MESSAGE_SIZE                128
 #define NET_SERVER_PORT                     12521
 #define NET_MAX_PLAYER_NAME_LENGTH          16
@@ -31,20 +31,20 @@
 #define NET_REQUEST_LEAVE_ROOM              31
 #define NET_RESPONSE_JOIN_OK                32
 #define NET_RESPONSE_ROOM_FULL              33
-#define NET_NOTICE_ROOM_CHANGED             34 // + host quit?
+#define NET_NOTICE_ROOM_CHANGED             34
 
 #define NET_REQUEST_CREATE_ROOM             40
 #define NET_RESPONSE_CREATE_OK              41
 #define NET_RESPONSE_CREATE_ERROR           42 // TODO: What kind of error?
 
-#define NET_REQUEST_START_GAME              50
-#define NET_NOTICE_GAME_SYNC                51 // check if everyone is ready
-#define NET_NOTICE_GAME_SYNC_OK             52
-#define NET_NOTICE_GAME_STARTED             53
+#define NET_G2L_START_ROOM                  50 // Game Host -> Server: "OK, we're ready to go!"
+#define NET_NOTICE_GAMEHOST_INFO            51 // Server -> Normal Players: "Connect to this guy to play"
+#define NET_P2G_SYNC_OK                     52 // Normal Player -> Game Host: "I'm ready!"
+#define NET_G2P_GAME_START                  53 // Game Host -> Everyone: "Everybody connected successfully!"
 
-#define NET_NOTICE_LOCAL_KEYS               60
-#define NET_NOTICE_REMOTE_KEYS              61
-#define NET_NOTICE_HOST_STATE               62
+#define NET_P2G_LOCAL_KEYS                  60 // Normal players -> Game host
+#define NET_P2G_LEAVE_GAME                  61 // Normal players -> Game host
+#define NET_G2P_GAME_STATE                  62 // GH -> Players
+#define NET_G2L_GAME_RESULTS                63 // GH -> Server
 
-
-#endif // NETWORK_PROTOCOL_CODES_H
+#endif // NETWORK_PROTOCOL_DEFINITIONS_H

@@ -532,7 +532,10 @@ class CPlayer
 
 		friend class CPlayerAI;
 		friend class CSimpleAI;
+
 		friend class NetClient;
+		friend class NetGameHost;
+
 		friend class GameplayState;
 };
 

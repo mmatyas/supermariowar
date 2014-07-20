@@ -2,7 +2,8 @@
 #define NETWORK_H
 
 #include "input.h"
-#include "network/NetworkProtocolCodes.h"
+#include "network/NetworkInterface.h"
+#include "network/ProtocolDefinitions.h"
 
 #include <string>
 #include <vector>
@@ -17,6 +18,10 @@ bool net_init();
 void net_close();
 void net_saveServerList();
 void net_loadServerList();
+
+// called on network session start/end
+bool net_startSession();
+void net_endSession();
 
 class MI_NetworkListScroll;
 //union COutputControl;
@@ -53,80 +58,147 @@ struct Room {
 };
 
 
-// Network communication class
+// Network communication classes
 
-class NetClient
+class NetGameHost : public NetworkEventHandler
 {
-	public:
+    public:
+        NetGameHost();
+        ~NetGameHost();
 
-		NetClient();
-		~NetClient();
+        bool init();
+        bool start(NetPeer*&);
+        void update();
+        void stop();
+        void cleanup();
 
-		void listen();
+        bool isActive() { return active; }
 
-        bool sendConnectRequestToSelectedServer();
-        void sendCreateRoomMessage();
-        void sendJoinRoomMessage();
-        void sendLeaveRoomMessage();
+        // Listen to network events
+        void onConnect(NetPeer*);
+        void onReceive(NetPeer&, const uint8_t*, size_t);
+        void onDisconnect(NetPeer& client);
+
+        // P2. Join room
         void sendStartRoomMessage();
 
-        void sendLocalInput();
+
+        LastMessage lastSentMessage;
+        LastMessage lastReceivedMessage;
+
+    private:
+        bool active;
+
+        // connected players except local client
+        // TODO: support more players?
+        NetPeer* clients[3];
+        NetPeer* foreign_lobbyserver;
+
+        // P3. Play
+        void handleRemoteInput(const uint8_t* data, size_t dataLength);
         void sendCurrentGameState();
 
-        // called on network session start/end
-		bool startSession();
-		void endSession();
+        bool sendMessageToMyPeers(const void* data, int dataLength);
 
-        // called on startup/shutdown
+        void setAsLastSentMessage(uint8_t packageType);
+        void setAsLastReceivedMessage(uint8_t packageType);
+};
+
+class NetClient : public NetworkEventHandler
+{
+    public:
+        NetClient();
+        ~NetClient();
+
         bool init();
+        bool start();
+        void update();
+        void stop();
         void cleanup();
 
         void setRoomListUIControl(MI_NetworkListScroll*);
 
-        //void refreshRoomList();
-        void requestRoomList();
+        // Listen to network events
+        void onConnect(NetPeer*);
+        void onReceive(NetPeer&, const uint8_t*, size_t);
+        void onDisconnect(NetPeer& client);
 
-	private:
+        // P1. Connect
+        bool sendConnectRequestToSelectedServer();
+
+        // P2. Join room
+        void requestRoomList();
+        void sendCreateRoomMessage();
+        void sendJoinRoomMessage();
+        void sendLeaveRoomMessage();
+
+        // P3. Play
+        void sendLocalInput();
+
+
+        LastMessage lastSentMessage;
+        LastMessage lastReceivedMessage;
+
+        NetGameHost local_gamehost;
+
+    private:
+        NetPeer* foreign_lobbyserver;
+        NetPeer* foreign_gamehost;
 
         MI_NetworkListScroll* uiRoomList;
 
-        uint8_t incomingData[NET_MAX_MESSAGE_SIZE];
+        //uint8_t incomingData[NET_MAX_MESSAGE_SIZE];
 
         uint8_t remotePlayerNumber;
-        short backup_playercontrol[4];
 
 
         bool openConnection(const char* hostname, const uint16_t port = NET_SERVER_PORT);
-		void closeConnection();
-        bool sendMessage(const void* data, const int dataLength);
-        bool receiveMessage();
+        void closeConnection();
 
-        void handleServerinfoAndClose();
-        void handleNewRoomListEntry();
-        void handleRoomCreatedMessage();
-        void handleRoomChangedMessage();
-        void handleRemoteInput();
-        void handleRemoteGameState();
+        bool sendMessageToLobbyServer(const void* data, int dataLength);
+        bool sendMessageToGameHost(const void* data, int dataLength);
+        bool sendTo(NetPeer*& peer, const void* data, int dataLength);
+
+        //void setAsLastSentMessage(const void* data, int dataLength);
+        //void setAsLastReceivedMessage();
+
+        void handleServerinfoAndClose(const uint8_t*, size_t);
+        void handleNewRoomListEntry(const uint8_t*, size_t);
+        void handleRoomCreatedMessage(const uint8_t*, size_t);
+        void handleRoomChangedMessage(const uint8_t*, size_t);
+
+        void handleRemoteGameState(const uint8_t*, size_t);
 
         void sendSyncOKMessage();
         void sendGoodbye();
+
+        void setAsLastSentMessage(uint8_t packageType);
+        void setAsLastReceivedMessage(uint8_t packageType);
 };
 
+enum NetworkState {
+    INACTIVE,
+    DISCONNECTED,
+    CONNECTED,
+    JOINED,
+    PLAYING
+};
 
 struct Networking {
     // Network status
     bool active;            // True if netplay code is currently running
     //bool networkErrorHappened;
+
+    // TODO: State Pattern
     bool connectSuccessful;
     bool joinSuccessful;
     bool gameRunning;
+
     bool currentMenuChanged; // eg. room players changed
     bool operationInProgress; // the waiting dialogs watch this variable
 
     //
     NetClient client;
-    LastMessage lastSentMessage;
-    LastMessage lastReceivedMessage;
     char myPlayerName[NET_MAX_PLAYER_NAME_LENGTH];    // last byte will be \0
 
     // Server list

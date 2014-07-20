@@ -7,7 +7,7 @@ set(SMW_SRCS ai.cpp gamemodes.cpp GSMenu.cpp
 
 # disable networking in emscripten build for now...
 if(NOT USE_EMSCRIPTEN)
-	LIST(APPEND SMW_SRCS platform/network/sdl/NetworkHandlerSDL.cpp)
+	LIST(APPEND SMW_SRCS platform/network/enet/NetworkLayerENet.cpp)
 endif()
 
 #add_executable(smw ${COMMON_SRCS} ${SMW_SRCS} ../common/global.h)
@@ -28,4 +28,6 @@ if(NOT USE_EMSCRIPTEN)
 	else()
 		target_link_libraries(smw ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLIMAGE_LIBRARY} ${SDLNET_LIBRARY} SDLmain)
 	endif()
+
+	target_link_libraries(smw enet)
 endif()

@@ -1846,16 +1846,23 @@ void GameplayState::update()
         list_players[iPlayer]->Init();
 
     if (netplay.active) {
-        netplay.client.listen();
+        netplay.client.update();
 
         // The host sends the game state to clients
         // Everyone send input to everyone
-        if (netplay.theHostIsMe)
+        //
+        //
+        //
+        // WIP/TODO/FIXME
+        //
+        //
+        //
+        /*if (netplay.theHostIsMe)
             netplay.client.sendCurrentGameState();
         if (netplay.gameRunning && previous_playerKeys != *current_playerKeys) {
             netplay.client.sendLocalInput();
             previous_playerKeys = *current_playerKeys;
-        }
+        }*/
     }
 
     //printf("[%d;%d]\n", current_playerKeys->keys[0].fDown, current_playerKeys->keys[0].fPressed);

@@ -188,10 +188,11 @@ if(NOT USE_EMSCRIPTEN)
 		INCLUDE(FindPkgConfig)
 		## add all SDL dependencies
 		## case sensitive!
+		#TODO: Create SDL2 modules
 		PKG_SEARCH_MODULE ( SDL2 REQUIRED sdl2 )
 		PKG_SEARCH_MODULE ( SDL2_mixer REQUIRED SDL2_mixer )
 		PKG_SEARCH_MODULE ( SDL2_image REQUIRED SDL2_image )
-		PKG_SEARCH_MODULE ( SDL2_net REQUIRED SDL2_net )
+		#Include(FindENet) #TODO: Create enet module
 
 		#include_directories(${SDL2_INCLUDE_DIR})
 		#include_directories(pkg-config --cflags sdl2)
@@ -201,12 +202,12 @@ if(NOT USE_EMSCRIPTEN)
 		Include(FindSDL)
 		Include(FindSDL_image)
 		Include(FindSDL_mixer)
-		Include(FindSDL_net)
+		#Include(FindENet) #TODO: Create enet module
 
 		find_package ( SDL REQUIRED )
 		find_package ( SDL_mixer REQUIRED )
 		find_package ( SDL_image REQUIRED )
-		find_package ( SDL_net REQUIRED )
+		#find_package ( enet REQUIRED )
 
 		include_directories(${SDL_INCLUDE_DIR})
 	endif()

@@ -1,20 +1,31 @@
 #ifndef NETWORK_PROTOCOL_PACKAGES_H
 #define NETWORK_PROTOCOL_PACKAGES_H
 
-#include <assert.h>
+#include "ProtocolDefinitions.h"
 
-#include "NetworkProtocolCodes.h"
+#include <cassert>
+
 
 struct Net_MessageHeader {
-    uint8_t     protocolVersion;
+    uint8_t     protocolMajorVersion;
+    uint8_t     protocolMinorVersion;
     uint8_t     packageType;
     //uint32_t       packageNumber;
 
     Net_MessageHeader(uint8_t packageType = 0) {
-        protocolVersion = NET_PROTOCOL_VERSION;
+        protocolMajorVersion = NET_PROTOCOL_VERSION_MAJOR;
+        protocolMinorVersion = NET_PROTOCOL_VERSION_MINOR;
         this->packageType = packageType;
     }
 };
+
+
+/*
+
+    Connection packages
+
+*/
+
 
 struct Net_ServerInfoPackage : Net_MessageHeader {
     char        name[32];
@@ -38,6 +49,14 @@ struct Net_ClientConnectionPackage : Net_MessageHeader {
 struct Net_ClientDisconnectionPackage : Net_MessageHeader {
     Net_ClientDisconnectionPackage() : Net_MessageHeader(NET_REQUEST_LEAVE_SERVER) {}
 };
+
+
+/*
+
+    Room packages
+
+*/
+
 
 struct Net_RoomListPackage : Net_MessageHeader {
     Net_RoomListPackage() : Net_MessageHeader(NET_REQUEST_ROOM_LIST) {}
@@ -91,11 +110,11 @@ struct Net_LeaveRoomPackage : Net_MessageHeader {
 };
 
 struct Net_StartRoomPackage : Net_MessageHeader {
-    Net_StartRoomPackage() : Net_MessageHeader(NET_REQUEST_START_GAME) {}
+    Net_StartRoomPackage() : Net_MessageHeader(NET_G2L_START_ROOM) {}
 };
 
 struct Net_SyncOKPackage : Net_MessageHeader {
-    Net_SyncOKPackage() : Net_MessageHeader(NET_NOTICE_GAME_SYNC_OK) {}
+    Net_SyncOKPackage() : Net_MessageHeader(NET_P2G_SYNC_OK) {}
 };
 
 struct Net_CurrentRoomPackage : Net_MessageHeader {
@@ -111,6 +130,14 @@ struct Net_CurrentRoomPackage : Net_MessageHeader {
 struct Net_StartSyncPackage : Net_MessageHeader {
     uint32_t    commonRandomSeed;
 };
+
+
+/*
+
+    Gameplay packages
+
+*/
+
 
 // 2 byte bit field instead of 8*2, but you can't use arrays :(
 struct Net_RawInput {
@@ -137,7 +164,7 @@ struct Net_LocalInputPackage : Net_MessageHeader {
     Net_RawInput    input;
 
     Net_LocalInputPackage(const COutputControl* playerControl)
-        : Net_MessageHeader(NET_NOTICE_LOCAL_KEYS)
+        : Net_MessageHeader(NET_P2G_LOCAL_KEYS)
     {
         assert(playerControl);
         for (uint8_t k = 0; k < 8; k++)
@@ -150,6 +177,7 @@ struct Net_RemoteInputPackage : Net_MessageHeader {
     Net_RawInput    input;
 
     // Response package
+
     void readKeys(COutputControl* playerControl) {
         assert(playerControl);
         for (uint8_t k = 0; k < 8; k++)
@@ -164,7 +192,7 @@ struct Net_GameStatePackage : Net_MessageHeader {
     float           player_yvel[4];
     Net_RawInput    input[4];
 
-    Net_GameStatePackage() : Net_MessageHeader(NET_NOTICE_HOST_STATE) {}
+    Net_GameStatePackage() : Net_MessageHeader(NET_G2P_GAME_STATE) {}
 
     // SEND
     void setPlayerCoord(uint8_t playerNum, float x, float y) {

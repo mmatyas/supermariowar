@@ -2318,7 +2318,7 @@ void MenuState::update()
     */
 
     if (netplay.active)
-        netplay.client.listen();
+        netplay.client.update();
 
     //Reset the keys that were down the last frame
     game_values.playerInput.ClearPressedKeys(1);
@@ -2501,12 +2501,12 @@ void MenuState::update()
         MenuCodeEnum code = mCurrentMenu->SendInput(&game_values.playerInput);
 
         if (netplay.active) {
-            uint8_t lastSendType = netplay.lastSentMessage.packageType;
-            uint8_t lastRecvType = netplay.lastReceivedMessage.packageType;
+            uint8_t lastSendType = netplay.client.lastSentMessage.packageType;
+            uint8_t lastRecvType = netplay.client.lastReceivedMessage.packageType;
 
-            /*if (lastSendType == NET_NOTICE_GAME_SYNC_OK
-                && lastRecvType == NET_NOTICE_GAME_STARTED)
-            code = MENU_CODE_NET_ROOM_GO;*/
+            if (lastSendType == NET_P2G_SYNC_OK
+                && lastRecvType == NET_G2P_GAME_START)
+            code = MENU_CODE_NET_ROOM_GO;
         }
 
         if (MENU_CODE_EXIT_APPLICATION == code) {
@@ -2515,7 +2515,7 @@ void MenuState::update()
         } else if (MENU_CODE_TO_MAIN_MENU == code) {
             iDisplayError = DISPLAY_ERROR_NONE;
             iDisplayErrorTimer = 0;
-            netplay.client.endSession();
+            net_endSession();
 
             mCurrentMenu = &mMainMenu;
         } else if (MENU_CODE_BACK_TO_MATCH_SELECTION_MENU == code) {
@@ -2574,7 +2574,7 @@ void MenuState::update()
         } else if (MENU_CODE_TO_NET_SERVERS_MENU == code) {
             mCurrentMenu = &mNetServers;
             mCurrentMenu->ResetMenu();
-            netplay.client.startSession();
+            net_startSession();
         } else if (MENU_CODE_TO_PLAYER_1_CONTROLS == code) {
             miInputContainer->SetPlayer(0);
             mCurrentMenu = &mPlayerControlsMenu;
@@ -3138,10 +3138,10 @@ void MenuState::update()
             if (netplay.operationInProgress) {
                 MenuCodeEnum previousCode = code;
 
-                uint8_t lastSendType = netplay.lastSentMessage.packageType;
-                uint8_t lastRecvType = netplay.lastReceivedMessage.packageType;
+                uint8_t lastSendType = netplay.client.lastSentMessage.packageType;
+                uint8_t lastRecvType = netplay.client.lastReceivedMessage.packageType;
 
-                printf("\rlastSendType: %d, lastRecvType: %d", lastSendType, lastRecvType);
+                //printf("\rlastSendType: %d, lastRecvType: %d", lastSendType, lastRecvType);
 
                 if (lastSendType == NET_REQUEST_CONNECT
                         && lastRecvType == NET_RESPONSE_CONNECT_OK)
@@ -3311,7 +3311,7 @@ void MenuState::update()
                 mNetNewRoom.RestoreCurrent();
                 iDisplayError = DISPLAY_ERROR_NONE;
             } else if (MENU_CODE_TO_NET_ROOM_START_IN_PROGRESS == code) {
-                netplay.client.sendStartRoomMessage();
+                netplay.client.local_gamehost.sendStartRoomMessage();
                 netplay.operationInProgress = true;
 
                 miNetRoomStartingDialogImage->Show(true);
