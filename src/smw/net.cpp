@@ -13,8 +13,8 @@
     #include "platform/network/enet/NetworkLayerENet.h"
     #define NetworkHandler NetworkLayerENet
 #else
-    #include "platform/network/null/NetworkHandlerNULL.h"
-    #define NetworkHandler NetworkHandlerNULL
+    #include "platform/network/null/NetworkLayerNULL.h"
+    #define NetworkHandler NetworkLayerNULL
 #endif
 
 #include <cassert>

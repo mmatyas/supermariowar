@@ -34,7 +34,7 @@ class NetworkLayer
         NetworkLayer() {}
         virtual ~NetworkLayer() {}
 
-        virtual bool init() {}
+        virtual bool init() { return true; }
         virtual void cleanup() {}
 
         virtual bool client_restart() = 0;
