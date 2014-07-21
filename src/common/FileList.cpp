@@ -234,7 +234,7 @@ void SimpleFileList::prev()
 void SimpleFileList::random()
 {
     if (!filelist.empty())
-        currentIndex = RNGMAX(filelist.size());
+        currentIndex = RANDOM_INT(filelist.size());
 };
 
 const char * SimpleFileList::GetIndex(unsigned int index)
@@ -672,21 +672,21 @@ string MusicEntry::GetRandomMusic(int iMusicCategory, const char * szMapName, co
     //First check if there is specific map music
     if (fUsesMapOverrides && mapoverride.find(szMapName) != mapoverride.end()) {
         if (mapoverride[szMapName]->songs.size() > 0) {
-            iCurrentMusic = RNGMAX( mapoverride[szMapName]->songs.size());
+            iCurrentMusic = RANDOM_INT( mapoverride[szMapName]->songs.size());
             return songFileNames[mapoverride[szMapName]->songs[iCurrentMusic]];
         }
     }
     //Then check if there is specific background music
     if (fUsesBackgroundOverrides && backgroundoverride.find(szBackground) != backgroundoverride.end()) {
         if (backgroundoverride[szBackground]->songs.size() > 0) {
-            iCurrentMusic = RNGMAX(backgroundoverride[szBackground]->songs.size());
+            iCurrentMusic = RANDOM_INT(backgroundoverride[szBackground]->songs.size());
             return songFileNames[backgroundoverride[szBackground]->songs[iCurrentMusic]];
         }
     }
 
     //Then default to the music category
     if (iMusicCategory >= 0 && iMusicCategory < MAXMUSICCATEGORY && numsongsforcategory[iMusicCategory] > 0) {
-        iCurrentMusic = RNGMAX( numsongsforcategory[iMusicCategory]);
+        iCurrentMusic = RANDOM_INT( numsongsforcategory[iMusicCategory]);
         return songFileNames[songsforcategory[iMusicCategory][iCurrentMusic]];
     }
 

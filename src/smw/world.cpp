@@ -237,7 +237,7 @@ void WorldVehicle::Init(short iCol, short iRow, short iAction, short iSprite, sh
 
 void WorldVehicle::Move()
 {
-    iNumMoves = RNGMAX(iMaxMoves - iMinMoves + 1) + iMinMoves;
+    iNumMoves = RANDOM_INT(iMaxMoves - iMinMoves + 1) + iMinMoves;
 
     if (iNumMoves > 0) {
         iPaceOffset = 0;
@@ -287,7 +287,7 @@ void WorldVehicle::SetNextDest()
     }
 
     if (iNumConnections > 0) {
-        short iConnection = iConnections[RNGMAX(iNumConnections)];
+        short iConnection = iConnections[RANDOM_INT(iNumConnections)];
         WorldMovingObject::Move(iConnection);
     }
 }
@@ -1828,7 +1828,7 @@ TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld)
 
         //If a valid mode was not detected, then just choose a random mode
         if (ts->iMode < 0 || (ts->iMode >= GAMEMODE_LAST && ts->iMode != game_mode_pipe_minigame && ts->iMode != game_mode_boss_minigame && ts->iMode != game_mode_boxes_minigame))
-            ts->iMode = RNGMAX(GAMEMODE_LAST);
+            ts->iMode = RANDOM_INT(GAMEMODE_LAST);
 
         pszTemp = strtok(NULL, ",\n");
 
@@ -1843,7 +1843,7 @@ TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld)
         //Default to a random goal if an invalid goal was used
         if (ts->iGoal <= 0) {
             if (ts->iMode < GAMEMODE_LAST)
-                ts->iGoal = gamemodes[ts->iMode]->GetOptions()[RNGMAX(GAMEMODE_NUM_OPTIONS - 1)].iValue;
+                ts->iGoal = gamemodes[ts->iMode]->GetOptions()[RANDOM_INT(GAMEMODE_NUM_OPTIONS - 1)].iValue;
             else
                 ts->iGoal = 50;
         }

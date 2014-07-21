@@ -1,7 +1,7 @@
 #ifndef RANDOMNUMBERGENERATOR_H
 #define RANDOMNUMBERGENERATOR_H
 
-#define RNGMAX(rMaxInt) RandomNumberGenerator::generator().getInteger(rMaxInt)
+#define RANDOM_INT(rMaxInt) RandomNumberGenerator::generator().getInteger(rMaxInt)
 #define RANDOM_BOOL() RandomNumberGenerator::generator().getBoolean()
 
 class RandomNumberGeneratorType {

@@ -314,12 +314,12 @@ void GameplayState::initEyeCandy()
                 short srcy, w, h;
 
                 if (RANDOM_BOOL()) {
-                    velx = (short)(RNGMAX(51) - 25) / 10.0f;    //big clouds: -3 - +3 pixel/frame
+                    velx = (short)(RANDOM_INT(51) - 25) / 10.0f;    //big clouds: -3 - +3 pixel/frame
                     srcy = 0;
                     w = 60;
                     h = 28;
                 } else {
-                    velx = (short)(RNGMAX(41) - 20) / 10.0f;    //small clouds: -2 - +2 pixel/frame
+                    velx = (short)(RANDOM_INT(41) - 20) / 10.0f;    //small clouds: -2 - +2 pixel/frame
                     srcy = 28;
                     w = 28;
                     h = 12;
@@ -328,33 +328,33 @@ void GameplayState::initEyeCandy()
                 velx = velx < 0.5f && velx > -0.5f ? 1 : velx;  //no static clouds please
 
                 //add cloud to eyecandy array
-                eyecandy[iEyeCandyLayer].add(new EC_Cloud(&rm->spr_clouds, (float)(RNGMAX(smw->ScreenWidth)), (float)(RNGMAX(100)), velx, 0, srcy, w, h));
+                eyecandy[iEyeCandyLayer].add(new EC_Cloud(&rm->spr_clouds, (float)(RANDOM_INT(smw->ScreenWidth)), (float)(RANDOM_INT(100)), velx, 0, srcy, w, h));
             }
         }
 
         //Ghosts
         if (g_map->eyecandy[iEyeCandyLayer] & 2) {
             for (i = 0; i < 8; i++) {
-                short iGhostSrcY = (short)(RNGMAX(3)) << 5; //ghost type
-                float velx = (short)(RNGMAX(51) - 25) / 10.0f;  //big clouds: -3 - +3 pixel/frame
+                short iGhostSrcY = (short)(RANDOM_INT(3)) << 5; //ghost type
+                float velx = (short)(RANDOM_INT(51) - 25) / 10.0f;  //big clouds: -3 - +3 pixel/frame
 
-                velx = velx < 0.5f && velx > -0.5f ? (RNGMAX(1) ? 1.0f : -1.0f) : velx; //no static clouds please
+                velx = velx < 0.5f && velx > -0.5f ? (RANDOM_INT(1) ? 1.0f : -1.0f) : velx; //no static clouds please
 
                 //add cloud to eyecandy array
-                eyecandy[iEyeCandyLayer].add(new EC_Ghost(&rm->spr_ghosts, (float)(RNGMAX(smw->ScreenWidth)), (float)RNGMAX(100), velx, 8, 2, velx < 0.0f ? 64 : 0, iGhostSrcY, 32, 32));
+                eyecandy[iEyeCandyLayer].add(new EC_Ghost(&rm->spr_ghosts, (float)(RANDOM_INT(smw->ScreenWidth)), (float)RANDOM_INT(100), velx, 8, 2, velx < 0.0f ? 64 : 0, iGhostSrcY, 32, 32));
             }
         }
 
         //Leaves
         if (g_map->eyecandy[iEyeCandyLayer] & 4) {
             for (i = 0; i < 15; i++)
-                eyecandy[iEyeCandyLayer].add(new EC_Leaf(&rm->spr_leaves, (float)(RNGMAX(smw->ScreenWidth)), (float)RNGMAX(smw->ScreenHeight)));
+                eyecandy[iEyeCandyLayer].add(new EC_Leaf(&rm->spr_leaves, (float)(RANDOM_INT(smw->ScreenWidth)), (float)RANDOM_INT(smw->ScreenHeight)));
         }
 
         //Snow
         if (g_map->eyecandy[iEyeCandyLayer] & 8) {
             for (i = 0; i < 15; i++)
-                eyecandy[iEyeCandyLayer].add(new EC_Snow(&rm->spr_snow, (float)(RNGMAX(smw->ScreenWidth)), (float)RNGMAX(smw->ScreenHeight), 0));
+                eyecandy[iEyeCandyLayer].add(new EC_Snow(&rm->spr_snow, (float)(RANDOM_INT(smw->ScreenWidth)), (float)RANDOM_INT(smw->ScreenHeight), 0));
         }
 
         //Fish
@@ -362,12 +362,12 @@ void GameplayState::initEyeCandy()
         short iFishSettings[][4] = { {0, 0, 64, 44}, {0, 44, 64, 44}, {0, 44, 48, 44}, {32, 32, 16, 12}, {32, 44, 16, 12}, {32, 16, 16, 28}, {32, 0, 32, 28}, {32, 44, 32, 28}};
         if (g_map->eyecandy[iEyeCandyLayer] & 16) {
             for (i = 0; i < 8; i++) {
-                float velx = (short)(RNGMAX(41) - 20) / 10.0f;
+                float velx = (short)(RANDOM_INT(41) - 20) / 10.0f;
                 velx = velx < 0.5f && velx > -0.5f ? 1.0f : velx; //Keep fish from moving too slowly
 
                 short srcx = iFishSettings[0][0], srcy = iFishSettings[0][1], w = iFishSettings[0][2], h = iFishSettings[0][3];
 
-                short iRandomFish = RNGMAX(100);
+                short iRandomFish = RANDOM_INT(100);
 
                 short iFishWeightCount = 0;
                 for (short iFish = 0; iFish < 8; iFish++) {
@@ -384,21 +384,21 @@ void GameplayState::initEyeCandy()
 
                 //add cloud to eyecandy array
                 short iPossibleY = (smw->ScreenHeight - h) / 10;
-                float dDestY = (float)(RNGMAX(iPossibleY) + iPossibleY * i);
-                eyecandy[iEyeCandyLayer].add(new EC_Cloud(&rm->spr_fish, (float)(RNGMAX(smw->ScreenWidth)), dDestY, velx, srcx + (velx > 0.0f ? 64 : 0), srcy, w, h));
+                float dDestY = (float)(RANDOM_INT(iPossibleY) + iPossibleY * i);
+                eyecandy[iEyeCandyLayer].add(new EC_Cloud(&rm->spr_fish, (float)(RANDOM_INT(smw->ScreenWidth)), dDestY, velx, srcx + (velx > 0.0f ? 64 : 0), srcy, w, h));
             }
         }
 
         //Rain
         if (g_map->eyecandy[iEyeCandyLayer] & 32) {
             for (i = 0; i < 20; i++)
-                eyecandy[iEyeCandyLayer].add(new EC_Rain(&rm->spr_rain, (float)(RNGMAX(smw->ScreenWidth)), RNGMAX(smw->ScreenHeight)));
+                eyecandy[iEyeCandyLayer].add(new EC_Rain(&rm->spr_rain, (float)(RANDOM_INT(smw->ScreenWidth)), RANDOM_INT(smw->ScreenHeight)));
         }
 
         //Bubbles
         if (g_map->eyecandy[iEyeCandyLayer] & 64) {
             for (i = 0; i < 10; i++)
-                eyecandy[iEyeCandyLayer].add(new EC_Bubble(&rm->spr_rain, (float)(RNGMAX(smw->ScreenWidth)), RNGMAX(smw->ScreenHeight)));
+                eyecandy[iEyeCandyLayer].add(new EC_Bubble(&rm->spr_rain, (float)(RANDOM_INT(smw->ScreenWidth)), RANDOM_INT(smw->ScreenHeight)));
         }
     }
 }
@@ -567,16 +567,16 @@ void checkWindEvent(short& iWindTimer, float& dNextWind)
             game_values.gamewindx += 0.02f;
 
             if (game_values.gamewindx >= dNextWind)
-                iWindTimer = (RNGMAX(60)) + 30;
+                iWindTimer = (RANDOM_INT(60)) + 30;
         } else if (game_values.gamewindx >= dNextWind) {
             game_values.gamewindx -= 0.02f;
 
             if (game_values.gamewindx <= dNextWind)
-                iWindTimer = (RNGMAX(60)) + 30;
+                iWindTimer = (RANDOM_INT(60)) + 30;
         }
     } else {
         if (--iWindTimer <= 0) {
-            dNextWind = (float)((RNGMAX(41)) - 20) / 4.0f;
+            dNextWind = (float)((RANDOM_INT(41)) - 20) / 4.0f;
         }
     }
 }
@@ -665,7 +665,7 @@ void shakeScreen()
 
         //Randomize the order in which the players are killed (so that game modes where order matters is fair)
         if (iNumKillPlayers > 0) {
-            short iRandPlayer = RNGMAX( iNumKillPlayers);
+            short iRandPlayer = RANDOM_INT( iNumKillPlayers);
             for (short iPlayer = 0; iPlayer < iNumKillPlayers; iPlayer++) {
                 PlayerKilledPlayer(game_values.screenshakeplayerid, pKillPlayers[iRandPlayer], death_style_jump, kill_style_pow, false, false);
 
@@ -1479,7 +1479,7 @@ void LoadMapObjects(bool fPreview)
 
         //Randomly choose boxes to put 5 coins in
         for (short iItem = 0; iItem < 5 && iItem < iThrowBoxCount; iItem++) {
-            short iBoxIndex = RNGMAX(iThrowBoxCount);
+            short iBoxIndex = RANDOM_INT(iThrowBoxCount);
 
             while (fBoxHasCoin[iBoxIndex]) {
                 if (++iBoxIndex >= iThrowBoxCount)
@@ -1520,18 +1520,18 @@ void LoadMapObjects(bool fPreview)
                 if (game_values.gamemode->gamemode == game_mode_boxes_minigame) {
                     if (fBoxHasCoin[iAddThrowBoxIndex])
                         iItem = MINIGAME_COIN;
-                } else if (game_values.gamemode->gamemode == game_mode_health && RNGMAX(100) < game_values.gamemodesettings.health.percentextralife) {
+                } else if (game_values.gamemode->gamemode == game_mode_health && RANDOM_INT(100) < game_values.gamemodesettings.health.percentextralife) {
                     iItem = HEALTH_POWERUP;
-                } else if ((game_values.gamemode->gamemode == game_mode_timelimit && RNGMAX(100) < game_values.gamemodesettings.time.percentextratime) ||
-                          (game_values.gamemode->gamemode == game_mode_star && RNGMAX(100) < game_values.gamemodesettings.star.percentextratime)) {
+                } else if ((game_values.gamemode->gamemode == game_mode_timelimit && RANDOM_INT(100) < game_values.gamemodesettings.time.percentextratime) ||
+                          (game_values.gamemode->gamemode == game_mode_star && RANDOM_INT(100) < game_values.gamemodesettings.star.percentextratime)) {
                     iItem = TIME_POWERUP;
-                } else if ((game_values.gamemode->gamemode == game_mode_coins && RNGMAX(100) < game_values.gamemodesettings.coins.percentextracoin) ||
-                          (game_values.gamemode->gamemode == game_mode_greed && RNGMAX(100) < game_values.gamemodesettings.greed.percentextracoin)) {
+                } else if ((game_values.gamemode->gamemode == game_mode_coins && RANDOM_INT(100) < game_values.gamemodesettings.coins.percentextracoin) ||
+                          (game_values.gamemode->gamemode == game_mode_greed && RANDOM_INT(100) < game_values.gamemodesettings.greed.percentextracoin)) {
                     iItem = COIN_POWERUP;
-                } else if (game_values.gamemode->gamemode == game_mode_jail && (RNGMAX(100)) < game_values.gamemodesettings.jail.percentkey) {
+                } else if (game_values.gamemode->gamemode == game_mode_jail && (RANDOM_INT(100)) < game_values.gamemodesettings.jail.percentkey) {
                     iItem = JAIL_KEY_POWERUP;
-                } else if (iCountWeight > 0 && (RNGMAX(100)) < 40) {
-                    int iRandPowerup = RNGMAX( iCountWeight )+ 1;
+                } else if (iCountWeight > 0 && (RANDOM_INT(100)) < 40) {
+                    int iRandPowerup = RANDOM_INT( iCountWeight )+ 1;
                     iItem = 0;
 
                     int iPowerupWeightCount = game_values.powerupweights[iItem];
@@ -1838,8 +1838,8 @@ void GameplayState::update()
 
 
     iWindTimer = 0;
-    dNextWind = (float)(RNGMAX(41) - 20) / 4.0f;
-    game_values.gamewindx = (float)((RNGMAX(41)) - 20) / 4.0f;
+    dNextWind = (float)(RANDOM_INT(41) - 20) / 4.0f;
+    game_values.gamewindx = (float)((RANDOM_INT(41)) - 20) / 4.0f;
 
     //Initialize players after game init has finished
     for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++)
@@ -1878,7 +1878,7 @@ void GameplayState::update()
     */
 #ifdef _DEBUG
 
-    static short endgametimer = (short)(RNGMAX(200));
+    static short endgametimer = (short)(RANDOM_INT(200));
     if (g_fAutoTest && !game_values.swapplayers) {
         for (short k = 0; k < list_players_cnt; k++) {
             if (list_players[k]->isready()) {
@@ -1990,7 +1990,7 @@ void GameplayState::update()
         //Automatically run menus
         if (game_values.showscoreboard) {
             if (--endgametimer < 0) {
-                endgametimer = (short)(RNGMAX(200));
+                endgametimer = (short)(RANDOM_INT(200));
 
                 if (game_values.matchtype != MATCH_TYPE_SINGLE_GAME && game_values.matchtype != MATCH_TYPE_QUICK_GAME && game_values.matchtype != MATCH_TYPE_MINIGAME)
                     UpdateScoreBoard();
@@ -2074,11 +2074,11 @@ void GameplayState::update()
                         list_players[k]->die(0, false, false);
                 }
             } else if (event.key.keysym.sym == SDLK_x) {
-                short iplayer = RNGMAX(list_players_cnt);
+                short iplayer = RANDOM_INT(list_players_cnt);
                 list_players[iplayer]->makefrozen(300);
             } else if (event.key.keysym.sym == SDLK_c) {
-                short iplayer = RNGMAX(list_players_cnt);
-                list_players[iplayer]->shield = RNGMAX(3) + 1;
+                short iplayer = RANDOM_INT(list_players_cnt);
+                list_players[iplayer]->shield = RANDOM_INT(3) + 1;
                 list_players[iplayer]->shieldtimer = 620;
             } else if (event.key.keysym.sym == SDLK_1) {
                 if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
@@ -2124,7 +2124,7 @@ void GameplayState::update()
                     objectcontainer[0].add(new PU_FirePowerup(&rm->spr_firepowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1));
             } else if (event.key.keysym.sym == SDLK_7) {
                 if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                    objectcontainer[1].add(new CO_ThrowBox(&rm->spr_throwbox, list_players[0]->ix + 32, list_players[0]->iy, (RNGMAX(NUM_POWERUPS) + 3) - 3));
+                    objectcontainer[1].add(new CO_ThrowBox(&rm->spr_throwbox, list_players[0]->ix + 32, list_players[0]->iy, (RANDOM_INT(NUM_POWERUPS) + 3) - 3));
                 else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
                     objectcontainer[1].add(new CO_Shell(3, list_players[0]->ix + 32, list_players[0]->iy, false, true, false, false));
                 else
@@ -2216,9 +2216,9 @@ void GameplayState::update()
                         game_values.bulletbilltimer[iPlayer]--;
 
                         if (--game_values.bulletbillspawntimer[iPlayer] <= 0) {
-                            game_values.bulletbillspawntimer[iPlayer] = (short)(RNGMAX(20) + 25);
-                            float speed = ((float)(RNGMAX(21) + 20)) / 10.0f;
-                            objectcontainer[2].add(new MO_BulletBill(&rm->spr_bulletbill, &rm->spr_bulletbilldead, 0, (short)(RNGMAX(448)), (RNGMAX(2) ? speed : -speed), iPlayer, false));
+                            game_values.bulletbillspawntimer[iPlayer] = (short)(RANDOM_INT(20) + 25);
+                            float speed = ((float)(RANDOM_INT(21) + 20)) / 10.0f;
+                            objectcontainer[2].add(new MO_BulletBill(&rm->spr_bulletbill, &rm->spr_bulletbilldead, 0, (short)(RANDOM_INT(448)), (RANDOM_INT(2) ? speed : -speed), iPlayer, false));
                             ifSoundOnPlay(rm->sfx_bulletbillsound);
                         }
                     }
@@ -2419,7 +2419,7 @@ bool SwapPlayers(short iUsingPlayerID)
         }
     }
 
-    short iIncrement = RNGMAX (iNumAvailablePlayers - 1);
+    short iIncrement = RANDOM_INT (iNumAvailablePlayers - 1);
 
     MysteryMushroomTempPlayer spots[4];
     for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {

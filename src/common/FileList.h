@@ -194,7 +194,7 @@ public:
     void next();
     void prev();
     void random() {
-        currentIndex = RNGMAX(entries.size());
+        currentIndex = RANDOM_INT(entries.size());
     };
 
     void UpdateEntriesWithOverrides();
@@ -250,7 +250,7 @@ public:
     void next();
     void prev();
     void random() {
-        currentIndex = RNGMAX(entries.size());
+        currentIndex = RANDOM_INT(entries.size());
     }
 
     int GetCount() {

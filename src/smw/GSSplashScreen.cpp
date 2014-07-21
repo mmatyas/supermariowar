@@ -145,7 +145,7 @@ bool SplashScreenState::init()
 //
 //	for (int k = 0; k < NUM_CONTRIBUTORS; k++)
 //	{
-//		int index = RNGMAX(NUM_CONTRIBUTORS);
+//		int index = RANDOM_INT(NUM_CONTRIBUTORS);
 //
 //		while (contributorUsed[index])
 //		{

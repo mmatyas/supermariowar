@@ -730,7 +730,7 @@ MenuCodeEnum MI_TeamSelect::SendInput(CPlayerInput * playerInput)
                 if (playerKeys->menu_up.fPressed) {
                     do {
                         if (playerKeys->menu_down.fDown) {
-                            game_values.skinids[iPlayer] = RNGMAX(skinlist->GetCount());
+                            game_values.skinids[iPlayer] = RANDOM_INT(skinlist->GetCount());
                         } else {
                             if (--game_values.skinids[iPlayer] < 0)
                                 game_values.skinids[iPlayer] = (short)skinlist->GetCount() - 1;
@@ -756,7 +756,7 @@ MenuCodeEnum MI_TeamSelect::SendInput(CPlayerInput * playerInput)
                 if (playerKeys->menu_down.fPressed) {
                     do {
                         if (playerKeys->menu_up.fDown) {
-                            game_values.skinids[iPlayer] = RNGMAX( skinlist->GetCount());
+                            game_values.skinids[iPlayer] = RANDOM_INT( skinlist->GetCount());
                         } else {
                             if (++game_values.skinids[iPlayer] >= skinlist->GetCount())
                                 game_values.skinids[iPlayer] = 0;
@@ -794,7 +794,7 @@ MenuCodeEnum MI_TeamSelect::SendInput(CPlayerInput * playerInput)
                     game_values.randomskin[iPlayer] = !game_values.randomskin[iPlayer];
                 } else if (!game_values.randomskin[iPlayer]) {
                     do {
-                        game_values.skinids[iPlayer] = RNGMAX(skinlist->GetCount());
+                        game_values.skinids[iPlayer] = RANDOM_INT(skinlist->GetCount());
                     } while (!rm->LoadMenuSkin(iPlayer, game_values.skinids[iPlayer], game_values.colorids[iPlayer], false));
                 }
             }
@@ -2399,39 +2399,39 @@ void MI_TournamentScoreboard::Update()
     if (uiMenu) {
         if (iTournamentWinner != -1) { //Single tournament winning team
             if (--iFireworksCounter < 0 && iTournamentWinner >= 0) {
-                iFireworksCounter = (short)(RNGMAX(30) + 10);
+                iFireworksCounter = (short)(RANDOM_INT(30) + 10);
 
                 if (--iExplosionCounter < 0) {
-                    iExplosionCounter = (short)(RNGMAX(6) + 5);
+                    iExplosionCounter = (short)(RANDOM_INT(6) + 5);
 
                     ifSoundOnPlay(rm->sfx_bobombsound);
 
                     float dAngle = 0.0f;
-                    short iRandX = (short)(RNGMAX(440) + 100);
-                    short iRandY = (short)(RNGMAX(280) + 100);
+                    short iRandX = (short)(RANDOM_INT(440) + 100);
+                    short iRandY = (short)(RANDOM_INT(280) + 100);
 
                     for (short iBlock = 0; iBlock < 28; iBlock++) {
                         float dVel = 7.0f + ((iBlock % 2) * 5.0f);
                         float dVelX = dVel * cos(dAngle);
                         float dVelY = dVel * sin(dAngle);
 
-                        short iRandomColor = (short)RNGMAX(iTeamCounts[iTournamentWinner]);
+                        short iRandomColor = (short)RANDOM_INT(iTeamCounts[iTournamentWinner]);
                         uiMenu->AddEyeCandy(new EC_FallingObject(&rm->spr_bonus, iRandX, iRandY, dVelX, dVelY, 4, 2, 0, game_values.colorids[iTeamIDs[iTournamentWinner][iRandomColor]] << 4, 16, 16));
                         dAngle -= (float)PI / 14;
                     }
                 } else {
                     ifSoundOnPlay(rm->sfx_cannon);
 
-                    short iRandX = (short)(RNGMAX(576));
-                    short iRandY = (short)(RNGMAX(416));
-                    short iRandomColor = (short)RNGMAX(iTeamCounts[iTournamentWinner]);
+                    short iRandX = (short)(RANDOM_INT(576));
+                    short iRandY = (short)(RANDOM_INT(416));
+                    short iRandomColor = (short)RANDOM_INT(iTeamCounts[iTournamentWinner]);
 
                     uiMenu->AddEyeCandy(new EC_SingleAnimation(&rm->spr_fireworks, iRandX, iRandY, 8, 4, 0, game_values.colorids[iTeamIDs[iTournamentWinner][iRandomColor]] << 6, 64, 64));
                 }
             }
 
             if (--iWinnerTextCounter < 0) {
-                iWinnerTextCounter = (short)(RNGMAX(35) + 15);
+                iWinnerTextCounter = (short)(RANDOM_INT(35) + 15);
 
                 char szWinnerText[64];
                 if (iTournamentWinner == -2)
@@ -2442,8 +2442,8 @@ void MI_TournamentScoreboard::Update()
                     sprintf(szWinnerText, "Team %d Wins!", iTournamentWinner + 1);
 
                 short iStringWidth = (short)rm->menu_font_large.getWidth(szWinnerText);
-                short iRandX = (short)(RNGMAX(smw->ScreenWidth - iStringWidth) + (iStringWidth >> 1));
-				short iRandY = (short)(RNGMAX(smw->ScreenHeight - 100) + 100);
+                short iRandX = (short)(RANDOM_INT(smw->ScreenWidth - iStringWidth) + (iStringWidth >> 1));
+				short iRandY = (short)(RANDOM_INT(smw->ScreenHeight - 100) + 100);
 
                 uiMenu->AddEyeCandy(new EC_GravText(&rm->menu_font_large, iRandX, iRandY, szWinnerText, -VELJUMP));
             }
@@ -2790,7 +2790,7 @@ void MI_TournamentScoreboard::RefreshTournamentScores(short gameWinner)
                 iSwirlIconTeam = iTeam;
                 iSwirlIconGame = iGame;
 
-                miIconImages[iTeam][iGame]->SetSwirl(true, 250.0f, (float)(RNGMAX(1000)) * TWO_PI / 1000.0f, 3.0f, 0.1f);
+                miIconImages[iTeam][iGame]->SetSwirl(true, 250.0f, (float)(RANDOM_INT(1000)) * TWO_PI / 1000.0f, 3.0f, 0.1f);
             }
 
             miIconImages[iTeam][iGame]->SetPulse(false);
@@ -2926,7 +2926,7 @@ void MI_BonusWheel::Update()
 
         if (iSelectionSpeedTimer > 0) {
             if (--iSelectionSpeedTimer <= 0) {
-                dSelectionSpeedGoal = (float)(RNGMAX(100) + 200) * 0.0005f;
+                dSelectionSpeedGoal = (float)(RANDOM_INT(100) + 200) * 0.0005f;
                 iSelectionSpeedTimer = 0;
             }
         }
@@ -2939,14 +2939,14 @@ void MI_BonusWheel::Update()
 
                 if (dSelectionSpeed >= dSelectionSpeedGoal) {
                     dSelectionSpeed = dSelectionSpeedGoal;
-                    iSelectionSpeedTimer = RNGMAX(60) + 30;
+                    iSelectionSpeedTimer = RANDOM_INT(60) + 30;
                 }
             } else if (dSelectionSpeed > dSelectionSpeedGoal) {
                 dSelectionSpeed -= 0.0005f;
 
                 if (dSelectionSpeed <= dSelectionSpeedGoal) {
                     dSelectionSpeed = dSelectionSpeedGoal;
-                    iSelectionSpeedTimer = RNGMAX(60) + 30;
+                    iSelectionSpeedTimer = RANDOM_INT(60) + 30;
                 }
             }
         }
@@ -3036,13 +3036,13 @@ void MI_BonusWheel::Reset(bool fTournament)
         iCountWeight += game_values.powerupweights[iPowerup];
 
     //Always have at least 1 poison mushroom to try to avoid
-    short iPoisonMushroom = RNGMAX(NUMBONUSITEMSONWHEEL);
+    short iPoisonMushroom = RANDOM_INT(NUMBONUSITEMSONWHEEL);
 
     for (short iPowerup = 0; iPowerup < NUMBONUSITEMSONWHEEL; iPowerup++) {
         int iChoosePowerup = 0;
 
         if (iCountWeight > 0 && iPoisonMushroom != iPowerup) {
-            int iRandPowerup = RNGMAX(iCountWeight + 1);
+            int iRandPowerup = RANDOM_INT(iCountWeight + 1);
             int iPowerupWeightCount = game_values.powerupweights[iChoosePowerup];
 
             while (iPowerupWeightCount < iRandPowerup)
@@ -3082,9 +3082,9 @@ void MI_BonusWheel::Reset(bool fTournament)
     iSelectorAnimationCounter = 0;
 
     //Figure out the initial position and speed of the selector
-    dSelectionSpeed = (float)(RNGMAX(100) + 200) * 0.0005f;
-    dSelectionAngle = (float)RNGMAX(NUMBONUSITEMSONWHEEL) * TWO_PI / (float)(NUMBONUSITEMSONWHEEL);
-    dSelectionSpeedGoal = (float)(RNGMAX(100) + 200) * 0.0005f;
+    dSelectionSpeed = (float)(RANDOM_INT(100) + 200) * 0.0005f;
+    dSelectionAngle = (float)RANDOM_INT(NUMBONUSITEMSONWHEEL) * TWO_PI / (float)(NUMBONUSITEMSONWHEEL);
+    dSelectionSpeedGoal = (float)(RANDOM_INT(100) + 200) * 0.0005f;
     iSelectionSpeedTimer = 0;
 
     for (short iSector = 0; iSector < NUMBONUSITEMSONWHEEL; iSector++) {
@@ -3793,7 +3793,7 @@ void MI_World::Init()
 void MI_World::SetControllingTeam(short iWinningTeam)
 {
     iControllingTeam = iWinningTeam;
-    iControllingPlayerId = game_values.teamids[iControllingTeam][RNGMAX(game_values.teamcounts[iControllingTeam])];
+    iControllingPlayerId = game_values.teamids[iControllingTeam][RANDOM_INT(game_values.teamcounts[iControllingTeam])];
     g_worldmap.SetPlayerSprite(iControllingPlayerId);
 
     fNoInterestingMoves = false;
@@ -4553,7 +4553,7 @@ bool MI_World::UsePowerup(short iPlayer, short iTeam, short iIndex, bool fPopupI
         ifSoundOnPlay(rm->sfx_collectpowerup);
         fUsedItem = true;
     } else if (iPowerup == NUM_POWERUPS) { //Music Box (put vehicles to sleep)
-        iSleepTurns = RNGMAX(4) + 2;
+        iSleepTurns = RANDOM_INT(4) + 2;
         fUsedItem = true;
         ifSoundOnPlay(rm->sfx_collectpowerup);
 

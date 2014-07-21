@@ -208,12 +208,12 @@ void EC_Leaf::update()
 
     if (vely > 0.0f && iy >= smw->ScreenHeight) {
         dy = -16.0f;
-        dx = RNGMAX(smw->ScreenWidth);
+        dx = RANDOM_INT(smw->ScreenWidth);
 
         NextLeaf();
     } else if (vely < 0.0f && iy < -16) {
         dy = smw->ScreenHeight;
-        dx = RNGMAX(smw->ScreenWidth);
+        dx = RANDOM_INT(smw->ScreenWidth);
 
         NextLeaf();
     }
@@ -224,7 +224,7 @@ void EC_Leaf::update()
 
 void EC_Leaf::NextLeaf()
 {
-    short iRand = RNGMAX(20);
+    short iRand = RANDOM_INT(20);
     if (iRand < 12)
         iAnimationY = 0;
     else if (iRand < 15)
@@ -234,12 +234,12 @@ void EC_Leaf::NextLeaf()
     else
         iAnimationY = 48;
 
-    velx = RNGMAX(9) / 4.0f;
-    vely = RNGMAX(9) / 4.0f + 1.0f;
+    velx = RANDOM_INT(9) / 4.0f;
+    vely = RANDOM_INT(9) / 4.0f + 1.0f;
 
     fForward = RANDOM_BOOL();
-    iAnimationFrame = (RNGMAX(3) + (fForward ? 0 : 1)) * iAnimationW;
-    iAnimationTimer = RNGMAX(16);
+    iAnimationFrame = (RANDOM_INT(3) + (fForward ? 0 : 1)) * iAnimationW;
+    iAnimationTimer = RANDOM_INT(16);
 }
 
 //------------------------------------------------------------------------------
@@ -251,8 +251,8 @@ EC_Snow::EC_Snow(gfxSprite *nspr, float nx, float ny, short type) :
     dx = nx;
     dy = ny;
 
-    velx = RNGMAX(9) / 4.0f;
-    vely = RNGMAX(9) / 4.0f + 1.0f;
+    velx = RANDOM_INT(9) / 4.0f;
+    vely = RANDOM_INT(9) / 4.0f + 1.0f;
 }
 
 void EC_Snow::update()
@@ -267,10 +267,10 @@ void EC_Snow::update()
 
     if (vely > 0.0f && iy >= smw->ScreenHeight) {
         dy = -16.0f;
-        dx = RNGMAX(smw->ScreenWidth);
+        dx = RANDOM_INT(smw->ScreenWidth);
     } else if (vely < 0.0f && iy < -16) {
         dy = smw->ScreenHeight;
-        dx = RNGMAX(smw->ScreenWidth);
+        dx = RANDOM_INT(smw->ScreenWidth);
     }
 
     ix = (short)dx;
@@ -308,13 +308,13 @@ void EC_Rain::update()
 
 void EC_Rain::NextRainDrop()
 {
-    velx = -5.0f + RNGMAX(5) / 4.0f;
-    vely = 4.0f + RNGMAX(5) / 4.0f;
+    velx = -5.0f + RANDOM_INT(5) / 4.0f;
+    vely = 4.0f + RANDOM_INT(5) / 4.0f;
 
     dy = -16.0f;
-    dx = RNGMAX(smw->ScreenWidth);
+    dx = RANDOM_INT(smw->ScreenWidth);
 
-    iSrcX = RNGMAX(8) * 10;
+    iSrcX = RANDOM_INT(8) * 10;
 }
 
 
@@ -352,13 +352,13 @@ void EC_Bubble::update()
 
 void EC_Bubble::NextBubble()
 {
-    velx = -1.0f + RNGMAX(9) / 4.0f;
-    vely = -4.0f + RNGMAX(9) / 4.0f;
+    velx = -1.0f + RANDOM_INT(9) / 4.0f;
+    vely = -4.0f + RANDOM_INT(9) / 4.0f;
 
     dy = smw->ScreenHeight;
-    dx = RNGMAX(smw->ScreenWidth);
+    dx = RANDOM_INT(smw->ScreenWidth);
 
-    iAnimationFrame = RNGMAX(4) << 4;
+    iAnimationFrame = RANDOM_INT(4) << 4;
 }
 
 //------------------------------------------------------------------------------
@@ -913,7 +913,7 @@ void EC_SoulsAward::update()
         float addangle = QUARTER_PI / 20.0f;
         float startangle = -HALF_PI;
 
-        float angle = (float)(RNGMAX(21) - 10) * addangle + startangle;
+        float angle = (float)(RANDOM_INT(21) - 10) * addangle + startangle;
         float velx = speed * cos(angle);
         float vely = speed * sin(angle);
 

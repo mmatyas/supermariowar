@@ -2947,7 +2947,7 @@ void CMap::predrawbackground(gfxSprite &background, gfxSprite &mapspr)
     	dest.w = (spawnareas[iType][m].width << 5) + TILESIZE;
     	dest.h = (spawnareas[iType][m].height << 5) + TILESIZE;
 
-    	//int color = 0x00 << 24 | RNGMAX(256) << 16 | RNGMAX(256) << 8 | RNGMAX(256);
+        //int color = 0x00 << 24 | RANDOM_INT(256) << 16 | RANDOM_INT(256) << 8 | RANDOM_INT(256);
     	int color = 0x128 << 24 | 0x255 << 8;
 
     	SDL_FillRect(mapspr.getSurface(), &dest, color);		//fill empty area with black
@@ -3253,7 +3253,7 @@ WarpExit * CMap::getRandomWarpExit(int connection, int currentID)
     if (numIndices == 0)
         return currentWarp;
 
-    return &warpexits[indices[RNGMAX( numIndices)]];
+    return &warpexits[indices[RANDOM_INT( numIndices)]];
 }
 
 void CMap::clearWarpLocks()
@@ -3317,12 +3317,12 @@ void CMap::update()
 bool CMap::findspawnpoint(short iType, short * x, short * y, short width, short height, bool tilealigned)
 {
     if (totalspawnsize[iType] <= 0) {
-		*x = RNGMAX(smw->ScreenWidth);
-		*y = RNGMAX(smw->ScreenHeight * 0.87f);
+		*x = RANDOM_INT(smw->ScreenWidth);
+		*y = RANDOM_INT(smw->ScreenHeight * 0.87f);
         return true;
     }
 
-    int spawnarea = RNGMAX(totalspawnsize[iType]);
+    int spawnarea = RANDOM_INT(totalspawnsize[iType]);
 
     int currentsize = 0;
     for (int m = 0; m < numspawnareas[iType]; m++) {
@@ -3342,10 +3342,10 @@ bool CMap::findspawnpoint(short iType, short * x, short * y, short width, short 
             short yoffset = spawnareas[iType][m].height;
 
             if (xoffset > 0)
-                xoffset = (short)RNGMAX(xoffset);
+                xoffset = (short)RANDOM_INT(xoffset);
 
             if (yoffset > 0)
-                yoffset = (short)RNGMAX(yoffset);
+                yoffset = (short)RANDOM_INT(yoffset);
 
             *x = (xoffset << 5) + (spawnareas[iType][m].left << 5) + (TILESIZE >> 1) - (width >> 1);
             *y = (yoffset << 5) + (spawnareas[iType][m].top << 5) + (TILESIZE >> 1) - (height >> 1);
@@ -3354,10 +3354,10 @@ bool CMap::findspawnpoint(short iType, short * x, short * y, short width, short 
             short yoffset = areaheight - height - 2;
 
             if (xoffset > 0)
-                xoffset = (short)RNGMAX(xoffset) + 1;
+                xoffset = (short)RANDOM_INT(xoffset) + 1;
 
             if (yoffset > 0)
-                yoffset = (short)RNGMAX(yoffset) + 1;
+                yoffset = (short)RANDOM_INT(yoffset) + 1;
 
             *x = xoffset + (spawnareas[iType][m].left << 5);
             *y = yoffset + (spawnareas[iType][m].top << 5);
