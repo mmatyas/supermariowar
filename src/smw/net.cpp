@@ -337,8 +337,7 @@ void NetClient::handleRoomCreatedMessage(const uint8_t* data, size_t dataLength)
 
 void NetClient::sendJoinRoomMessage()
 {
-    if (netplay.selectedRoomIndex >= netplay.currentRooms.size())
-        return;
+    assert(netplay.selectedRoomIndex < netplay.currentRooms.size());
 
     // TODO: implement password
     Net_JoinRoomPackage msg(netplay.currentRooms.at(netplay.selectedRoomIndex).roomID, "");
@@ -391,6 +390,25 @@ void NetClient::handleRoomChangedMessage(const uint8_t* data, size_t dataLength)
     }
 
     netplay.currentMenuChanged = true;
+}
+
+void NetClient::sendChatMessage(const char* message)
+{
+    assert(message);
+    assert(strlen(message) > 0);
+    assert(strlen(message) <= NET_MAX_CHAT_MSG_LENGTH);
+
+    Net_RoomChatMsgPackage pkg(remotePlayerNumber, message);
+    sendMessageToLobbyServer(&pkg, sizeof(Net_RoomChatMsgPackage));
+}
+
+void NetClient::handleRoomChatMessage(const uint8_t* data, size_t dataLength)
+{
+    Net_RoomChatMsgPackage pkg;
+    memcpy(&pkg, data, sizeof(Net_RoomChatMsgPackage));
+
+    printf("Not implemented: [net] <%s>[%d]: %s\n",
+        netplay.currentRoom.playerNames[pkg.senderNum], pkg.senderNum, pkg.message);
 }
 
 /****************************
@@ -519,6 +537,10 @@ void NetClient::onReceive(NetPeer& client, const uint8_t* data, size_t dataLengt
 
         case NET_NOTICE_ROOM_CHANGED:
             handleRoomChangedMessage(data, dataLength);
+            break;
+
+        case NET_NOTICE_ROOM_CHAT_MSG:
+            handleRoomChatMessage(data, dataLength);
             break;
 
         //

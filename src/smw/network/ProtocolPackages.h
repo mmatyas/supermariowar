@@ -105,6 +105,25 @@ struct Net_JoinRoomPackage : Net_MessageHeader {
     }
 };
 
+struct Net_RoomChatMsgPackage : Net_MessageHeader {
+    uint8_t     senderNum;
+    char        message[NET_MAX_CHAT_MSG_LENGTH];
+
+    Net_RoomChatMsgPackage() : Net_MessageHeader()
+    {
+        memset(message, 0, NET_MAX_CHAT_MSG_LENGTH);
+    }
+
+    Net_RoomChatMsgPackage(uint8_t playerNum, const char* msg)
+        : Net_MessageHeader(NET_NOTICE_ROOM_CHAT_MSG)
+    {
+        senderNum = playerNum;
+        memset(message, 0, NET_MAX_CHAT_MSG_LENGTH);
+        memcpy(message, msg, NET_MAX_CHAT_MSG_LENGTH);
+        message[NET_MAX_CHAT_MSG_LENGTH - 1] = '\0';
+    }
+};
+
 struct Net_LeaveRoomPackage : Net_MessageHeader {
     Net_LeaveRoomPackage() : Net_MessageHeader(NET_REQUEST_LEAVE_ROOM) {}
 };

@@ -521,7 +521,7 @@ void MenuState::CreateMenu()
     miNetRoomMapPlaceholder = new MI_ChatMessageBox(smw->ScreenWidth / 2, 70, smw->ScreenWidth / 2 - 40, 5);
 
     miNetRoomMessageField = new MI_TextField(&rm->menu_plain_field, 26, 432, "Say", 464 - 36, 60);
-    miNetRoomMessageField->SetData(netplay.mychatmessage, NET_MAX_ROOM_PASSWORD_LENGTH);
+    miNetRoomMessageField->SetData(netplay.mychatmessage, NET_MAX_CHAT_MSG_LENGTH);
 
     miNetRoomSendButton = new MI_Button(&rm->spr_selectfield, 464, 432, "Send", 80, 1);
     miNetRoomSendButton->SetCode(MENU_CODE_NET_CHAT_SEND);
@@ -3248,6 +3248,11 @@ void MenuState::update()
             } else if (MENU_CODE_TO_NET_NEW_ROOM_SETTINGS_MENU == code) {
                 mCurrentMenu = &mNetNewRoom;
                 mCurrentMenu->ResetMenu();
+            } else if (MENU_CODE_NET_CHAT_SEND == code) {
+                if (strlen(netplay.mychatmessage) > 0)
+                    netplay.client.sendChatMessage(netplay.mychatmessage);
+                else
+                    code = MENU_CODE_TO_NET_ROOM_MENU;
             } else if (MENU_CODE_TO_NET_ROOM_MENU == code) {
                 mCurrentMenu = &mNetRoom;
                 mCurrentMenu->ResetMenu();

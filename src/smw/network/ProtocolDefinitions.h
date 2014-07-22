@@ -32,6 +32,7 @@
 #define NET_RESPONSE_JOIN_OK                32
 #define NET_RESPONSE_ROOM_FULL              33
 #define NET_NOTICE_ROOM_CHANGED             34
+#define NET_NOTICE_ROOM_CHAT_MSG            35
 
 #define NET_REQUEST_CREATE_ROOM             40
 #define NET_RESPONSE_CREATE_OK              41

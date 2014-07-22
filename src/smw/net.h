@@ -131,6 +131,7 @@ class NetClient : public NetworkEventHandler
         void sendCreateRoomMessage();
         void sendJoinRoomMessage();
         void sendLeaveRoomMessage();
+        void sendChatMessage(const char*);
 
         // P3. Play
         void sendLocalInput();
@@ -166,6 +167,7 @@ class NetClient : public NetworkEventHandler
         void handleNewRoomListEntry(const uint8_t*, size_t);
         void handleRoomCreatedMessage(const uint8_t*, size_t);
         void handleRoomChangedMessage(const uint8_t*, size_t);
+        void handleRoomChatMessage(const uint8_t*, size_t);
 
         void handleRemoteGameState(const uint8_t*, size_t);
 
