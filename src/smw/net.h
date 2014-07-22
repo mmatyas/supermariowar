@@ -95,10 +95,10 @@ class NetGameHost : public NetworkEventHandler
         NetPeer* foreign_lobbyserver;
 
         // P3. Play
-        void handleRemoteInput(const uint8_t* data, size_t dataLength);
+        void handleRemoteInput(const uint8_t*, size_t);
         void sendCurrentGameState();
 
-        bool sendMessageToMyPeers(const void* data, int dataLength);
+        bool sendMessageToMyPeers(const void*, size_t);
 
         void setAsLastSentMessage(uint8_t packageType);
         void setAsLastReceivedMessage(uint8_t packageType);

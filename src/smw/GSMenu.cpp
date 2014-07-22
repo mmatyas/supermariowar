@@ -3134,25 +3134,26 @@ void MenuState::update()
 
         if (netplay.active) {
 
+            LastMessage lastSent = netplay.client.lastSentMessage;
+            LastMessage lastRecv = netplay.client.lastReceivedMessage;
+
             // Override menu code if response has arrived
-            if (netplay.operationInProgress) {
+            if (netplay.operationInProgress &&
+                lastSent.timestamp < lastRecv.timestamp) // ensure that the incoming message arrived after the request
+            {
                 MenuCodeEnum previousCode = code;
 
-                uint8_t lastSendType = netplay.client.lastSentMessage.packageType;
-                uint8_t lastRecvType = netplay.client.lastReceivedMessage.packageType;
-
-                //printf("\rlastSendType: %d, lastRecvType: %d", lastSendType, lastRecvType);
-
-                if (lastSendType == NET_REQUEST_CONNECT
-                        && lastRecvType == NET_RESPONSE_CONNECT_OK)
+                //printf("\rlastSendType: %d, lastRecvType: %d", lastSent.packageType, lastRecv.packageType);
+                if (lastSent.packageType == NET_REQUEST_CONNECT
+                        && lastRecv.packageType == NET_RESPONSE_CONNECT_OK)
                     code = MENU_CODE_TO_NET_LOBBY_MENU;
 
-                else if (lastSendType == NET_REQUEST_JOIN_ROOM
-                        && lastRecvType == NET_RESPONSE_JOIN_OK)
+                else if (lastSent.packageType == NET_REQUEST_JOIN_ROOM
+                        && lastRecv.packageType == NET_NOTICE_ROOM_CHANGED)
                     code = MENU_CODE_TO_NET_ROOM_MENU;
 
-                else if (lastSendType == NET_REQUEST_CREATE_ROOM
-                        && lastRecvType == NET_RESPONSE_CREATE_OK)
+                else if (lastSent.packageType == NET_REQUEST_CREATE_ROOM
+                        && lastRecv.packageType == NET_RESPONSE_CREATE_OK)
                     code = MENU_CODE_TO_NET_ROOM_MENU;
 
                 // ide a hibakezelést
@@ -3175,8 +3176,10 @@ void MenuState::update()
             } else if (MENU_CODE_NET_SERVERLIST_EXIT == code || MENU_CODE_NET_CONNECT_ABORT == code) {
                 if (MENU_CODE_NET_SERVERLIST_EXIT == code)
                     netplay.currentMenuChanged = true;
-                else
+                else {
+                    net_startSession(); // release & restart socket
                     netplay.operationInProgress = false;
+                }
 
                 miNetServersScroll->Show(false);
                 miNetServersConnectingDialogImage->Show(false);
@@ -3311,7 +3314,8 @@ void MenuState::update()
                 mNetNewRoom.RestoreCurrent();
                 iDisplayError = DISPLAY_ERROR_NONE;
             } else if (MENU_CODE_TO_NET_ROOM_START_IN_PROGRESS == code) {
-                netplay.client.local_gamehost.sendStartRoomMessage();
+                if (netplay.theHostIsMe)
+                    netplay.client.local_gamehost.sendStartRoomMessage();
                 netplay.operationInProgress = true;
 
                 miNetRoomStartingDialogImage->Show(true);

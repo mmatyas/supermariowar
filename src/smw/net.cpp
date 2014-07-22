@@ -39,7 +39,6 @@ bool net_init()
     if (!netplay.client.init())
         return false;
 
-
     netplay.active = false;
     netplay.connectSuccessful = false;
     netplay.joinSuccessful = false;
@@ -357,6 +356,7 @@ void NetClient::sendLeaveRoomMessage()
 
 void NetClient::handleRoomChangedMessage(const uint8_t* data, size_t dataLength)
 {
+    //printf("ROOM CHANGED\n");
     Net_CurrentRoomPackage pkg;
     memcpy(&pkg, data, sizeof(Net_CurrentRoomPackage));
 
@@ -385,8 +385,10 @@ void NetClient::handleRoomChangedMessage(const uint8_t* data, size_t dataLength)
     netplay.theHostIsMe = false;
     netplay.currentRoom.hostPlayerNumber = pkg.hostPlayerNumber;
     remotePlayerNumber = pkg.remotePlayerNumber;
-    if (remotePlayerNumber == pkg.hostPlayerNumber)
+    if (remotePlayerNumber == pkg.hostPlayerNumber) {
         netplay.theHostIsMe = true;
+        local_gamehost.start(foreign_lobbyserver);
+    }
 
     netplay.currentMenuChanged = true;
 }
@@ -424,11 +426,11 @@ void NetClient::handleRemoteGameState(const uint8_t* data, size_t dataLength) //
 ****************/
 
 // This client sucesfully connected to a host
-void NetClient::onConnect(NetPeer* server)
+void NetClient::onConnect(NetPeer* newServer)
 {
-    assert(server != NULL);
+    assert(newServer);
     assert(foreign_lobbyserver == NULL);
-    foreign_lobbyserver = server;
+    foreign_lobbyserver = newServer;
 
     Net_ClientConnectionPackage message(netplay.myPlayerName);
     sendMessageToLobbyServer(&message, sizeof(Net_ClientConnectionPackage));
@@ -441,6 +443,9 @@ void NetClient::onDisconnect(NetPeer& client)
 
 void NetClient::onReceive(NetPeer& client, const uint8_t* data, size_t dataLength)
 {
+    assert(data);
+    assert(dataLength >= 3);
+
     uint8_t protocolMajor = data[0];
     uint8_t protocolMinor = data[1];
     uint8_t packageType = data[2];
@@ -558,8 +563,8 @@ void NetClient::onReceive(NetPeer& client, const uint8_t* data, size_t dataLengt
 
         default:
             printf("Unknown: ");
-            /*for (int a = 0; a < udpIncomingPacket->len; a++)
-                printf("%3d ", incomingData[a]);*/
+            for (int a = 0; a < dataLength; a++)
+                printf("%3d ", data[a]);
             printf("\n");
             return; // do not set as last message
     }
@@ -585,9 +590,8 @@ bool NetClient::openConnection(const char* hostname, const uint16_t port)
 bool NetClient::sendTo(NetPeer*& peer, const void* data, int dataLength)
 {
     assert(peer);
-
-    if (dataLength < 3)
-        return false;
+    assert(data);
+    assert(dataLength >= 3);
 
     if (!peer->send(data, dataLength))
         return false;
@@ -643,15 +647,18 @@ bool NetGameHost::init()
     return true;
 }
 
-bool NetGameHost::start(NetPeer* &lobbyserver)
+bool NetGameHost::start(NetPeer*& lobbyserver)
 {
-    assert(!active);
     assert(lobbyserver);
 
-    //printf("NetGameHost::start\n");
-    if (active)
-        return false;
+    if (active) {
+        assert(lobbyserver == foreign_lobbyserver);
+        return true;
+    }
 
+    assert(!foreign_lobbyserver);
+
+    //printf("NetGameHost::start\n");
     foreign_lobbyserver = lobbyserver;
 
     if (!networkHandler.gamehost_restart())
@@ -663,19 +670,16 @@ bool NetGameHost::start(NetPeer* &lobbyserver)
 
 void NetGameHost::update()
 {
-    assert(active);
     if (active)
         networkHandler.gamehost_listen(*this);
 }
 
 void NetGameHost::stop()
 {
-    assert(active);
-    //printf("NetGameHost::stop\n");
     if (!active)
         return;
 
-    active = false;
+    //printf("NetGameHost::stop\n");
 
     foreign_lobbyserver = NULL; // client may be still connected
     for (short p = 0; p < 3; p++) {
@@ -686,6 +690,7 @@ void NetGameHost::stop()
     }
 
     networkHandler.gamehost_shutdown();
+    active = false;
 }
 
 void NetGameHost::cleanup()
@@ -707,6 +712,9 @@ void NetGameHost::onDisconnect(NetPeer& player)
 
 void NetGameHost::onReceive(NetPeer& player, const uint8_t* data, size_t dataLength)
 {
+    assert(data);
+    assert(dataLength >= 3);
+
     uint8_t protocolMajor = data[0];
     uint8_t protocolMinor = data[1];
     uint8_t packageType = data[2];
@@ -747,8 +755,11 @@ void NetGameHost::sendCurrentGameState()
     }
 }
 
-bool NetGameHost::sendMessageToMyPeers(const void* data, int dataLength)
+bool NetGameHost::sendMessageToMyPeers(const void* data, size_t dataLength)
 {
+    assert(data);
+    assert(dataLength >= 3);
+
     for (int c = 0; c < 3; c++) {
         if (clients[c])
             clients[c]->send(data, dataLength);
