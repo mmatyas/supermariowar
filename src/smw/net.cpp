@@ -367,6 +367,8 @@ void NetClient::handleRoomChangedMessage(const uint8_t* data, size_t dataLength)
     for (uint8_t p = 0; p < 4; p++) {
         memcpy(netplay.currentRoom.playerNames[p], pkg.playerName[p], NET_MAX_PLAYER_NAME_LENGTH);
         printf("  player %d: %s", p+1, netplay.currentRoom.playerNames[p]);
+        if (p == pkg.remotePlayerNumber)
+            printf(" (me)");
         if (p == pkg.hostPlayerNumber)
             printf(" (HOST)");
         printf("\n");
@@ -407,8 +409,8 @@ void NetClient::handleRoomChatMessage(const uint8_t* data, size_t dataLength)
     Net_RoomChatMsgPackage pkg;
     memcpy(&pkg, data, sizeof(Net_RoomChatMsgPackage));
 
-    printf("Not implemented: [net] <%s>[%d]: %s\n",
-        netplay.currentRoom.playerNames[pkg.senderNum], pkg.senderNum, pkg.message);
+    printf("Not implemented: [net] %s: %s\n",
+        netplay.currentRoom.playerNames[pkg.senderNum], pkg.message);
 }
 
 /****************************
@@ -687,6 +689,7 @@ bool NetGameHost::start(NetPeer*& lobbyserver)
         return false;
 
     active = true;
+    printf("[net] GameHost started.\n");
     return true;
 }
 
@@ -713,6 +716,7 @@ void NetGameHost::stop()
 
     networkHandler.gamehost_shutdown();
     active = false;
+    printf("[net] GameHost stopped.\n");
 }
 
 void NetGameHost::cleanup()

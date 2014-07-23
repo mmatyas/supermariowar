@@ -3262,6 +3262,11 @@ void MenuState::update()
                 // Restore Room layout
                     miNetRoomStartingDialogImage->Show(false);
                     miNetRoomStartingDialogText->Show(false);
+                    /*if (netplay.client.theHostIsMe)
+                        miNetRoomStartButton->SetName("Start");
+                    else
+                        miNetRoomStartButton->SetName("---");*/
+
                     mNetRoom.SetHeadControl(miNetRoomMessageField);
                     mNetRoom.SetCancelCode(MENU_CODE_TO_NET_LOBBY_MENU);
 
@@ -3306,7 +3311,7 @@ void MenuState::update()
                     mNetNewRoom.ResetMenu();
                 }
                 else
-                    printf("Room name is too short!\n");
+                    printf("[net] Room name is too short!\n"); // TODO: dialog box
 
             } else if (MENU_CODE_TO_NET_NEW_ROOM_CREATE_ABORT == code) {
                 miNetNewRoomCreatingDialogImage->Show(false);
@@ -3319,18 +3324,20 @@ void MenuState::update()
                 mNetNewRoom.RestoreCurrent();
                 iDisplayError = DISPLAY_ERROR_NONE;
             } else if (MENU_CODE_TO_NET_ROOM_START_IN_PROGRESS == code) {
-                if (netplay.theHostIsMe)
+                if (netplay.theHostIsMe) {
                     netplay.client.local_gamehost.sendStartRoomMessage();
-                netplay.operationInProgress = true;
+                    netplay.operationInProgress = true;
 
-                miNetRoomStartingDialogImage->Show(true);
-                miNetRoomStartingDialogText->Show(true);
-                mNetRoom.RememberCurrent();
+                    miNetRoomStartingDialogImage->Show(true);
+                    miNetRoomStartingDialogText->Show(true);
+                    mNetRoom.RememberCurrent();
 
-                mNetRoom.SetHeadControl(miNetRoomStartingDialogText);
-                //mNetRoom.SetCancelCode(MENU_CODE_NET_START_ABORT);
-                mNetRoom.SetCancelCode(MENU_CODE_NONE);
-                mNetRoom.ResetMenu();
+                    mNetRoom.SetHeadControl(miNetRoomStartingDialogText);
+                    //mNetRoom.SetCancelCode(MENU_CODE_NET_START_ABORT);
+                    //mNetRoom.SetCancelCode(MENU_CODE_NONE);
+                    mNetRoom.SetCancelCode(MENU_CODE_TO_NET_ROOM_MENU);
+                    mNetRoom.ResetMenu();
+                }
             } else if (MENU_CODE_NET_ROOM_GO == code) {
                 netplay.operationInProgress = false;
                 game_values.matchtype = MATCH_TYPE_NET_GAME;
@@ -3365,6 +3372,10 @@ void MenuState::update()
                 miNetRoomHeaderText->SetText(netplay.currentRoom.name);
                 for (uint8_t p = 0; p < 4; p++)
                     miNetRoomPlayerName[p]->SetText(netplay.currentRoom.playerNames[p]);
+                if (netplay.theHostIsMe)
+                    miNetRoomStartButton->SetName("Start");
+                else
+                    miNetRoomStartButton->SetName("---");
 
                 netplay.currentMenuChanged = false;
             }
