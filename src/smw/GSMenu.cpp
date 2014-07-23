@@ -514,7 +514,7 @@ void MenuState::CreateMenu()
     for (short p = 0; p < 4; p++)
         mNetRoom.AddNonControl(miNetRoomPlayerName[p]);
 
-    miNetRoomStartButton = new MI_Button(&rm->spr_selectfield, smw->ScreenWidth / 2, 300, "Start", smw->ScreenWidth / 2 - 40, 1);
+    miNetRoomStartButton = new MI_Button(&rm->spr_selectfield, smw->ScreenWidth / 2, 300, "---", smw->ScreenWidth / 2 - 40, 1);
     miNetRoomStartButton->SetCode(MENU_CODE_TO_NET_ROOM_START_IN_PROGRESS);
 
     miNetRoomMessages = new MI_ChatMessageBox(20, 432 - 100, smw->ScreenWidth - 2 * 26, 1);
@@ -3324,7 +3324,7 @@ void MenuState::update()
                 mNetNewRoom.RestoreCurrent();
                 iDisplayError = DISPLAY_ERROR_NONE;
             } else if (MENU_CODE_TO_NET_ROOM_START_IN_PROGRESS == code) {
-                if (netplay.theHostIsMe) {
+                if (netplay.theHostIsMe && netplay.currentRoom.playerCount() > 1) {
                     netplay.client.local_gamehost.sendStartRoomMessage();
                     netplay.operationInProgress = true;
 
@@ -3372,7 +3372,7 @@ void MenuState::update()
                 miNetRoomHeaderText->SetText(netplay.currentRoom.name);
                 for (uint8_t p = 0; p < 4; p++)
                     miNetRoomPlayerName[p]->SetText(netplay.currentRoom.playerNames[p]);
-                if (netplay.theHostIsMe)
+                if (netplay.theHostIsMe && netplay.currentRoom.playerCount() > 1)
                     miNetRoomStartButton->SetName("Start");
                 else
                     miNetRoomStartButton->SetName("---");

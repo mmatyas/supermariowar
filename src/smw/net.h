@@ -55,6 +55,15 @@ struct Room {
         for (uint8_t p = 0; p < 4; p++)
             playerNames[p][0] = '\0';
     }
+
+    uint8_t playerCount() {
+        uint8_t sum = 0;
+        for (uint8_t p = 0; p < 4; p++)
+            if (strcmp(playerNames[p], "(empty)")) // != 0
+                sum++;
+
+        return sum;
+    }
 };
 
 
