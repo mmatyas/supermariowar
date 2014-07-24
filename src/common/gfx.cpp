@@ -101,35 +101,35 @@ bool gfx_init(int w, int h, bool fullscreen)
 
 
 #ifdef USE_SDL2
-    window = SDL_CreateWindow("smw",
+    sdl2_window = SDL_CreateWindow("smw",
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
         w, h, fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
-        if ( window == NULL ) {
+        if (!sdl2_window) {
             printf("Couldn't create %dx%d window: %s\n", w, h, SDL_GetError());
             return false;
         }
 
-    renderer = SDL_CreateRenderer(window, -1,
+    sdl2_renderer = SDL_CreateRenderer(sdl2_window, -1,
         SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
-        if ( renderer == NULL ) {
+        if (!sdl2_renderer) {
             printf("Couldn't create renderer: %s\n", SDL_GetError());
             return false;
         }
 
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_SetRenderDrawColor(sdl2_renderer, 0, 0, 0, 255);
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
-        SDL_RenderSetLogicalSize(renderer, w, h);
+        SDL_RenderSetLogicalSize(sdl2_renderer, w, h);
 
     screen = SDL_CreateRGBSurface(0, w, h, 32,
         0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
-        if ( screen == NULL ) {
+        if (!screen) {
             printf("Couldn't create video buffer: %s\n", SDL_GetError());
             return false;
         }
 
-    screenAsTexture = SDL_CreateTexture(renderer,
+    sdl2_screenAsTexture = SDL_CreateTexture(sdl2_renderer,
         SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, w, h);
-        if ( screenAsTexture == NULL ) {
+        if (!sdl2_screenAsTexture) {
             printf("Couldn't create video texture: %s\n", SDL_GetError());
             return false;
         }
@@ -246,23 +246,22 @@ bool gfx_loadpalette()
 void gfx_setresolution(int w, int h, bool fullscreen)
 {
 #ifdef USE_SDL2
-    assert(window);
-    assert(renderer);
-    assert(screen);
-    assert(screenAsTexture);
+    assert(sdl2_window);
+    assert(sdl2_renderer);
+    assert(sdl2_screen);
+    assert(sdl2_screenAsTexture);
 
     if (fullscreen) {
-        SDL_DestroyWindow(window);
-        window = SDL_CreateWindow("smw",
+        SDL_DestroyWindow(sdl2_window);
+        sdl2_window = SDL_CreateWindow("smw",
             SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
             w, h, SDL_WINDOW_FULLSCREEN_DESKTOP);
     }
     else
-        SDL_SetWindowSize(window, w, h);
-
-        if ( window == NULL ) {
+        SDL_SetWindowSize(sdl2_window, w, h);
+        if (!sdl2_window) {
             printf("Couldn't set video mode %dx%d: %s\n", w, h, SDL_GetError());
-            //return false;
+            return;
         }
 
     // on some systems there's a mouse input bug after re-creating the window
@@ -298,10 +297,10 @@ void gfx_close()
                 delete [] colorschemes[j][k][i];
     }
 #ifdef USE_SDL2
-    SDL_DestroyTexture(screenAsTexture);
+    SDL_DestroyTexture(sdl2_screenAsTexture);
     SDL_FreeSurface(screen);
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
+    SDL_DestroyRenderer(sdl2_renderer);
+    SDL_DestroyWindow(sdl2_window);
 #endif
 }
 
@@ -995,7 +994,8 @@ bool gfxSprite::init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b, Uin
 
 #ifdef USE_SDL2
     printf("%d\n", screen->format);
-    SDL_Surface *temp = SDL_DisplayFormatAlpha(m_picture, screen);
+    //SDL_Surface *temp = SDL_DisplayFormatAlpha(m_picture, screen);
+    SDL_Surface *temp = SDL_ConvertSurface(m_picture, screen->format, 0);
 #else
     SDL_Surface *temp = SDL_DisplayFormatAlpha(m_picture);
 #endif

@@ -67,6 +67,7 @@
 
 
 //------ system stuff ------
+extern SDL_Window* sdl2_window;
 SDL_Surface		*screen;		//for gfx (maybe the gfx system should be improved -> resource manager)
 SDL_Surface		*blitdest;		//the destination surface for all drawing (can be swapped from screen to another surface)
 
@@ -253,7 +254,7 @@ int main(int argc, char *argv[])
     char title[128];
     sprintf(title, "%s %s", TITLESTRING, VERSIONNUMBER);
 #ifdef USE_SDL2
-    SDL_SetWindowTitle(window, title);
+    SDL_SetWindowTitle(sdl2_window, title);
     SDL_SetRelativeMouseMode(SDL_TRUE);
 #else
     SDL_WM_SetCaption(title, "smw.ico");
