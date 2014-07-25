@@ -67,7 +67,9 @@
 
 
 //------ system stuff ------
-extern SDL_Window* sdl2_window;
+#ifdef USE_SDL2
+    extern SDL_Window* sdl2_window;
+#endif
 SDL_Surface		*screen;		//for gfx (maybe the gfx system should be improved -> resource manager)
 SDL_Surface		*blitdest;		//the destination surface for all drawing (can be swapped from screen to another surface)
 
