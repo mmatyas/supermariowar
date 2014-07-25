@@ -355,7 +355,10 @@ void MenuState::CreateMenu()
 
     miNetServersSelectButton = new MI_Button(&rm->spr_selectfield, 70, 200, "Selected Server", smw->ScreenWidth - 2 * 70, 0);
     miNetServersSelectButton->SetCode(MENU_CODE_TO_NET_SERVERLIST);
-    miNetServersSelectedHostText = new MI_Text(netplay.savedServers[netplay.selectedServerIndex].hostname.c_str(), smw->ScreenWidth - 90, 205, 0, 2, 2);
+    if (netplay.savedServers.size() > 0)
+        miNetServersSelectedHostText = new MI_Text(netplay.savedServers[netplay.selectedServerIndex].hostname.c_str(), smw->ScreenWidth - 90, 205, 0, 2, 2);
+    else
+        miNetServersSelectedHostText = new MI_Text("(disabled)", smw->ScreenWidth - 90, 205, 0, 2, 2);
 
     miNetServersConnectButton = new MI_Button(&rm->spr_selectfield, 70, 240, "Connect", smw->ScreenWidth - 2 * 70, 1);
     miNetServersConnectButton->SetCode(MENU_CODE_NET_CONNECT_IN_PROGRESS);
@@ -3365,8 +3368,10 @@ void MenuState::update()
                 //printf("menuChanged\n");
 
                 // Servers screen
-                const char* nethostname = netplay.savedServers[netplay.selectedServerIndex].hostname.c_str();
-                miNetServersSelectedHostText->SetText(nethostname);
+                if (netplay.savedServers.size() > 0) {
+                    const char* nethostname = netplay.savedServers[netplay.selectedServerIndex].hostname.c_str();
+                    miNetServersSelectedHostText->SetText(nethostname);
+                }
 
                 // Room screen
                 miNetRoomHeaderText->SetText(netplay.currentRoom.name);

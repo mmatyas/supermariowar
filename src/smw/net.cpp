@@ -8,13 +8,18 @@
 
 #include "network/ProtocolPackages.h"
 
+//define disabled platform here
+#ifdef __EMSCRIPTEN__
+#define NETWORK_DISABLED
+#endif
+
 // define platform guards here
-#ifndef __EMSCRIPTEN__
-    #include "platform/network/enet/NetworkLayerENet.h"
-    #define NetworkHandler NetworkLayerENet
-#else
+#ifdef NETWORK_DISABLED
     #include "platform/network/null/NetworkLayerNULL.h"
     #define NetworkHandler NetworkLayerNULL
+#else
+    #include "platform/network/enet/NetworkLayerENet.h"
+    #define NetworkHandler NetworkLayerENet
 #endif
 
 #include <cassert>

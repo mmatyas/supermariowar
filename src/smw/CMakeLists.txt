@@ -5,9 +5,11 @@ set(SMW_SRCS ai.cpp gamemodes.cpp GSMenu.cpp
            GSGameplay.cpp ObjectContainer.cpp main.cpp
 )
 
-# disable networking in emscripten build for now...
-if(NOT USE_EMSCRIPTEN)
-	LIST(APPEND SMW_SRCS platform/network/enet/NetworkLayerENet.cpp)
+if(NOT NO_NETWORK)
+	# disable networking in emscripten build for now...
+	if(NOT USE_EMSCRIPTEN)
+		LIST(APPEND SMW_SRCS platform/network/enet/NetworkLayerENet.cpp)
+	endif()
 endif()
 
 #add_executable(smw ${COMMON_SRCS} ${SMW_SRCS} ../common/global.h)
@@ -15,9 +17,9 @@ add_executable(smw ../common/movingplatform.cpp ../common/uicontrol.cpp ../commo
 target_link_libraries(smw CommonFiles)
 
 # add .bc extension when building with emscripten
-if(USE_EMSCRIPTEN)
-	set_target_properties(smw PROPERTIES SUFFIX ".bc")
-endif()
+#if(USE_EMSCRIPTEN)
+#	set_target_properties(smw PROPERTIES SUFFIX ".bc")
+#endif()
 
 # emscripten uses its own SDL
 if(NOT USE_EMSCRIPTEN)
@@ -29,5 +31,7 @@ if(NOT USE_EMSCRIPTEN)
 		target_link_libraries(smw ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLIMAGE_LIBRARY} ${SDLNET_LIBRARY} SDLmain)
 	endif()
 
-	target_link_libraries(smw enet)
+	if(NOT NO_NETWORK)
+		target_link_libraries(smw enet)
+	endif()
 endif()

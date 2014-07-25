@@ -27,19 +27,19 @@ The game uses artwork and sounds from Nintendo games. We hope that this noncomme
 - Windows
 - XBox (?)
 - Mac OS X (?)
-- asm.js/emscripten
+- asm.js
 
 ## Building instructions
 
 ### Requirements
 
 - cmake
-- SDL 1.2 (preferred) or 2.0, with
+- SDL 1.2 or 2.0, with
     - SDL_image
     - SDL_mixer
-    - SDL_net
+- ENet (optional)
 
-On Linux, this usually means the following packages: `cmake libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-net1.2-dev`
+On Linux, this usually means the following packages: `cmake libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libenet-dev`
 
 For other systems, you can download the development files manually from:
 
@@ -47,7 +47,7 @@ For other systems, you can download the development files manually from:
 - http://www.libsdl.org/download-1.2.php
 - http://www.libsdl.org/projects/SDL_image/release-1.2.html
 - http://www.libsdl.org/projects/SDL_mixer/release-1.2.html
-- http://www.libsdl.org/projects/SDL_net/release-1.2.html
+- http://enet.bespin.org/Downloads.html
 
 ### Linux
 
@@ -70,7 +70,7 @@ To compile with debugging symbols, enable the relative option:
 ```sh
 $ cd Build && cmake -DDEBUG=ON .. && make -j5
 $ gdb Binaries/smw
-gdb> run ../data_full
+gdb> run ../data
 ```
 
 ### Windows
@@ -105,11 +105,14 @@ Then build with:
 ```sh
 $ emmake make
 $ emcc Binaries/smw.bc -o smw.html -O3 -v --preload-file data -s OUTLINING_LIMIT=60000 -s ALLOW_MEMORY_GROWTH=1
+$ emcc Binaries/leveledit.bc -o leveledit.html -O3 -v --preload-file data -s OUTLINING_LIMIT=60000 -s ALLOW_MEMORY_GROWTH=1
+$ emcc Binaries/worldedit.bc -o worldedit.html -O3 -v --preload-file data -s OUTLINING_LIMIT=60000 -s ALLOW_MEMORY_GROWTH=1
 ```
 
 ### Compilation options
 
-Open CMakeLists.txt to see what options are available, they are described on the beginning the file. You can also use `cmake-gui`.
+To set build options you can use `cmake-gui`.
+Alternatively, open CMakeLists.txt to see what options are available, they are described on the beginning the file.
 
 ## How to play
 

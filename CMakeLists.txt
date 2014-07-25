@@ -13,6 +13,7 @@ option(USE_PNG_SAVE "Enable PNG save feature" OFF)
 
 option(USE_EMSCRIPTEN "Output asm.js code using emscripten" OFF)
 option(USE_SDL2_LIBS "Use SDL2 instead of SDL 1.x" OFF)
+option(NO_NETWORK "Disable all network communication" OFF)
 
 # version number
 set(SMW_VERSION_MAJOR "2")
@@ -177,6 +178,10 @@ add_definitions(-D_GNU_SOURCE=1 -D_REENTRANT)
 if(WIN32)
 #	enable_precompiled_headers(Src/stdafx.h Src/stdafx.cpp SRCS)
 endif(WIN32)
+
+if(NO_NETWORK)
+	add_definitions(-DNETWORK_DISABLED)
+endif()
 
 if(USE_SDL2_LIBS)
 	add_definitions(-DUSE_SDL2)
