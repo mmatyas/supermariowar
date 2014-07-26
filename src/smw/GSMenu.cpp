@@ -517,7 +517,7 @@ void MenuState::CreateMenu()
     for (short p = 0; p < 4; p++)
         mNetRoom.AddNonControl(miNetRoomPlayerName[p]);
 
-    miNetRoomStartButton = new MI_Button(&rm->spr_selectfield, smw->ScreenWidth / 2, 300, "---", smw->ScreenWidth / 2 - 40, 1);
+    miNetRoomStartButton = new MI_Button(&rm->spr_selectfield, smw->ScreenWidth / 2, 300, "(waiting)", smw->ScreenWidth / 2 - 40, 1);
     miNetRoomStartButton->SetCode(MENU_CODE_TO_NET_ROOM_START_IN_PROGRESS);
 
     miNetRoomMessages = new MI_ChatMessageBox(20, 432 - 100, smw->ScreenWidth - 2 * 26, 1);
@@ -3268,7 +3268,7 @@ void MenuState::update()
                     /*if (netplay.client.theHostIsMe)
                         miNetRoomStartButton->SetName("Start");
                     else
-                        miNetRoomStartButton->SetName("---");*/
+                        miNetRoomStartButton->SetName("(waiting)");*/
 
                     mNetRoom.SetHeadControl(miNetRoomMessageField);
                     mNetRoom.SetCancelCode(MENU_CODE_TO_NET_LOBBY_MENU);
@@ -3380,7 +3380,7 @@ void MenuState::update()
                 if (netplay.theHostIsMe && netplay.currentRoom.playerCount() > 1)
                     miNetRoomStartButton->SetName("Start");
                 else
-                    miNetRoomStartButton->SetName("---");
+                    miNetRoomStartButton->SetName("(waiting)");
 
                 netplay.currentMenuChanged = false;
             }
