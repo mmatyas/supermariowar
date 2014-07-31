@@ -3,6 +3,7 @@ set(SMW_SRCS ai.cpp gamemodes.cpp GSMenu.cpp
            objectgame.cpp modeoptionsmenu.cpp objecthazard.cpp
            net.cpp FPSLimiter.cpp GSSplashScreen.cpp
            GSGameplay.cpp ObjectContainer.cpp main.cpp
+           objects/blocks/PowerupBlock.cpp
 )
 
 if(NOT NO_NETWORK)
