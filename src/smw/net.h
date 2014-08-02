@@ -5,6 +5,7 @@
 #include "network/NetworkInterface.h"
 #include "network/ProtocolDefinitions.h"
 
+#include <list>
 #include <string>
 #include <vector>
 
@@ -71,6 +72,8 @@ struct Room {
 
 class NetGameHost : public NetworkEventHandler
 {
+    friend class NetClient;
+
     public:
         NetGameHost();
         ~NetGameHost();
@@ -91,6 +94,9 @@ class NetGameHost : public NetworkEventHandler
         // P2. Join room
         void sendStartRoomMessage();
 
+        // P3. Game
+        void sendCurrentGameState();
+
 
         LastMessage lastSentMessage;
         LastMessage lastReceivedMessage;
@@ -103,9 +109,36 @@ class NetGameHost : public NetworkEventHandler
         NetPeer* clients[3];
         NetPeer* foreign_lobbyserver;
 
+        struct RawPlayerAddress {
+            uint32_t host;
+            uint16_t port;
+            bool sync_ok;
+
+            RawPlayerAddress() { reset(); }
+            void reset() { host = 0; port = 0; sync_ok = false; }
+
+            bool operator==(const RawPlayerAddress& other) const {
+                if (host == other.host && port == other.port)
+                    return true;
+                return false;
+            }
+
+            bool operator!=(const RawPlayerAddress& other) const {
+                return !(*this == other);
+            }
+        };
+
+        RawPlayerAddress expected_clients[3];
+        uint8_t expected_client_count;
+        uint8_t next_free_client_slot;
+
+        // P2.5. Pre-game
+        void sendStartGameMessage();
+        void handleSyncOKMessage(const NetPeer&, const uint8_t*, size_t);
+        void setExpectedPlayers(uint8_t count, uint32_t* hosts, uint16_t* ports);
+
         // P3. Play
-        void handleRemoteInput(const uint8_t*, size_t);
-        void sendCurrentGameState();
+        void handleRemoteInput(const NetPeer&, const uint8_t*, size_t);
 
         bool sendMessageToMyPeers(const void*, size_t);
 
@@ -115,6 +148,8 @@ class NetGameHost : public NetworkEventHandler
 
 class NetClient : public NetworkEventHandler
 {
+    friend class NetGameHost;
+
     public:
         NetClient();
         ~NetClient();
@@ -144,6 +179,7 @@ class NetClient : public NetworkEventHandler
 
         // P3. Play
         void sendLocalInput();
+        void sendLeaveGameMessage();
 
 
         LastMessage lastSentMessage;
@@ -162,25 +198,31 @@ class NetClient : public NetworkEventHandler
         uint8_t remotePlayerNumber;
 
 
-        bool openConnection(const char* hostname, const uint16_t port = NET_SERVER_PORT);
-        void closeConnection();
+        bool connectLobby(const char* hostname, const uint16_t port = NET_SERVER_PORT);
+        bool connectGameHost(const char* hostname, const uint16_t port = NET_SERVER_PORT + 1);
 
         bool sendMessageToLobbyServer(const void* data, int dataLength);
         bool sendMessageToGameHost(const void* data, int dataLength);
         bool sendTo(NetPeer*& peer, const void* data, int dataLength);
 
-        //void setAsLastSentMessage(const void* data, int dataLength);
-        //void setAsLastReceivedMessage();
-
+        // P1. Connect
         void handleServerinfoAndClose(const uint8_t*, size_t);
+
+        // P2. Join room
         void handleNewRoomListEntry(const uint8_t*, size_t);
         void handleRoomCreatedMessage(const uint8_t*, size_t);
         void handleRoomChangedMessage(const uint8_t*, size_t);
         void handleRoomChatMessage(const uint8_t*, size_t);
 
+        // P2.5. Pre-game
+        void handleRoomStartMessage(const uint8_t*, size_t);
+        void handleExpectedClientsMessage(const uint8_t*, size_t);
+        void handleStartSyncMessage(const uint8_t*, size_t);
+        void handleGameStartMessage();
+
+        // P3. Game
         void handleRemoteGameState(const uint8_t*, size_t);
 
-        void sendSyncOKMessage();
         void sendGoodbye();
 
         void setAsLastSentMessage(uint8_t packageType);
@@ -193,6 +235,14 @@ enum NetworkState {
     CONNECTED,
     JOINED,
     PLAYING
+};
+
+struct Net_GameplayState {
+    float          player_x[4];
+    float          player_y[4];
+    float          player_xvel[4];
+    float          player_yvel[4];
+    COutputControl player_input[4];
 };
 
 struct Networking {
@@ -230,6 +280,7 @@ struct Networking {
     // In-game
     bool theHostIsMe;
     CPlayerInput netPlayerInput;
+    std::list<Net_GameplayState> gamestate_buffer;
 };
 
 extern Networking netplay;

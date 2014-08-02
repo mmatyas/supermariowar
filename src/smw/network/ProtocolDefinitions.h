@@ -39,9 +39,11 @@
 #define NET_RESPONSE_CREATE_ERROR           42 // TODO: What kind of error?
 
 #define NET_G2L_START_ROOM                  50 // Game Host -> Server: "OK, we're ready to go!"
-#define NET_NOTICE_GAMEHOST_INFO            51 // Server -> Normal Players: "Connect to this guy to play"
-#define NET_P2G_SYNC_OK                     52 // Normal Player -> Game Host: "I'm ready!"
-#define NET_G2P_GAME_START                  53 // Game Host -> Everyone: "Everybody connected successfully!"
+#define NET_L2P_GAMEHOST_INFO               51 // Server -> Normal Players: "Connect to this guy to play"
+#define NET_L2G_CLIENTS_INFO                52 // Server -> Game Host: "These players want to connect you"
+#define NET_G2P_SYNC                        53 // (after everyone connected) Game Host -> Players: "Prepare gameplay with this data (eg. RNG seed)"
+#define NET_P2G_SYNC_OK                     54 // Normal Player -> Game Host: "I'm ready!"
+#define NET_G2E_GAME_START                  55 // Game Host -> Everyone: "Everybody connected successfully!"
 
 #define NET_P2G_LOCAL_KEYS                  60 // Normal players -> Game host
 #define NET_P2G_LEAVE_GAME                  61 // Normal players -> Game host

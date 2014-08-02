@@ -116,10 +116,20 @@ CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamI
     if (pPlayerAI)
         pPlayerAI->SetPlayer(this);
 
-    if (netplay.active)
-        playerKeys = &netplay.netPlayerInput.outputControls[iGlobalID];
-    else
+    // TODO: remove unnecessary branches
+    if (netplay.active) {
+        if (netplay.theHostIsMe && iGlobalID == 0) {
+            playerKeys = &game_values.playerInput.outputControls[iGlobalID];
+            printf("[net] Player %d reads local input.\n", iGlobalID);
+        } else {
+            playerKeys = &netplay.netPlayerInput.outputControls[iGlobalID];
+            printf("[net] Player %d reads network input.\n", iGlobalID);
+        }
+    }
+    else {
         playerKeys = &game_values.playerInput.outputControls[iGlobalID];
+        printf("[net] Player %d reads local input.\n", iGlobalID);
+    }
     playerDevice = game_values.playerInput.inputControls[globalID]->iDevice;
 
     score = nscore;

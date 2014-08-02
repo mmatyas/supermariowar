@@ -14,10 +14,13 @@ class NetPeerENet : public NetPeer
         bool send(const void*, size_t);
         void disconnect();
 
+        uint32_t addressHost();
+        uint16_t addressPort();
+
         std::string addressAsString();
 
+        bool operator==(const NetPeer&) const;
         bool operator==(const NetPeer*&) const;
-        bool operator!=(const NetPeer*&) const;
 
     private:
         ENetPeer* foreign_peer;

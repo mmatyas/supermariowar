@@ -1848,21 +1848,34 @@ void GameplayState::update()
     if (netplay.active) {
         netplay.client.update();
 
+        // TODO: Move this to update().
         // The host sends the game state to clients
         // Everyone send input to everyone
-        //
-        //
-        //
-        // WIP/TODO/FIXME
-        //
-        //
-        //
-        /*if (netplay.theHostIsMe)
-            netplay.client.sendCurrentGameState();
-        if (netplay.gameRunning && previous_playerKeys != *current_playerKeys) {
+        if (netplay.theHostIsMe)
+            netplay.client.local_gamehost.sendCurrentGameState();
+        else
+        {
+            if (netplay.gamestate_buffer.size() > 0)
+            {
+                Net_GameplayState currect_state = netplay.gamestate_buffer.front();
+                netplay.gamestate_buffer.pop_front();
+                for (unsigned short p = 0; p < list_players_cnt; p++) {
+                    list_players[p]->fx = currect_state.player_x[p];
+                    list_players[p]->fy = currect_state.player_y[p];
+                    list_players[p]->velx = currect_state.player_xvel[p];
+                    list_players[p]->vely = currect_state.player_yvel[p];
+                    netplay.netPlayerInput.outputControls[p] = currect_state.player_input[p];
+                }
+            }
+            else {
+                printf("[] GameStateBuffer size = 0\n");
+            }
+        }
+
+        if (previous_playerKeys != *current_playerKeys) {
             netplay.client.sendLocalInput();
             previous_playerKeys = *current_playerKeys;
-        }*/
+        }
     }
 
     //printf("[%d;%d]\n", current_playerKeys->keys[0].fDown, current_playerKeys->keys[0].fPressed);
@@ -2177,6 +2190,8 @@ void GameplayState::update()
     }
 
     if (updateExitPause(iCountDownState)) {
+        if (netplay.active)
+            netplay.client.sendLeaveGameMessage();
         GameStateManager::instance().changeStateTo(&MenuState::instance());
         return;
     }

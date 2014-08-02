@@ -2503,12 +2503,13 @@ void MenuState::update()
     if (GS_MENU == game_values.gamestate) {
         MenuCodeEnum code = mCurrentMenu->SendInput(&game_values.playerInput);
 
+        // Shortcut to game start
         if (netplay.active) {
             uint8_t lastSendType = netplay.client.lastSentMessage.packageType;
             uint8_t lastRecvType = netplay.client.lastReceivedMessage.packageType;
 
             if (lastSendType == NET_P2G_SYNC_OK
-                && lastRecvType == NET_G2P_GAME_START)
+                && lastRecvType == NET_G2E_GAME_START)
             code = MENU_CODE_NET_ROOM_GO;
         }
 

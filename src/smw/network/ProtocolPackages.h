@@ -105,6 +105,16 @@ struct Net_JoinRoomPackage : Net_MessageHeader {
     }
 };
 
+struct Net_CurrentRoomPackage : Net_MessageHeader {
+    uint32_t    roomID;
+    char        name[NET_MAX_ROOM_NAME_LENGTH];
+    char        playerName[4][NET_MAX_PLAYER_NAME_LENGTH];
+    uint8_t     hostPlayerNumber; //  1-4
+    uint8_t     remotePlayerNumber; // of the receiving client
+
+    // Response package
+};
+
 struct Net_RoomChatMsgPackage : Net_MessageHeader {
     uint8_t     senderNum;
     char        message[NET_MAX_CHAT_MSG_LENGTH];
@@ -132,22 +142,57 @@ struct Net_StartRoomPackage : Net_MessageHeader {
     Net_StartRoomPackage() : Net_MessageHeader(NET_G2L_START_ROOM) {}
 };
 
-struct Net_SyncOKPackage : Net_MessageHeader {
-    Net_SyncOKPackage() : Net_MessageHeader(NET_P2G_SYNC_OK) {}
+
+/*
+
+    Pre-game packages
+
+*/
+
+struct Net_GameHostInfoPkg : Net_MessageHeader {
+    uint32_t host;
+
+    Net_GameHostInfoPkg(uint32_t gh_host)
+        : Net_MessageHeader(NET_L2P_GAMEHOST_INFO)
+        , host(gh_host)
+    { }
 };
 
-struct Net_CurrentRoomPackage : Net_MessageHeader {
-    uint32_t    roomID;
-    char        name[NET_MAX_ROOM_NAME_LENGTH];
-    char        playerName[4][NET_MAX_PLAYER_NAME_LENGTH];
-    uint8_t     hostPlayerNumber; //  1-4
-    uint8_t     remotePlayerNumber; // of the receiving client
+struct Net_PlayerInfoPkg : Net_MessageHeader {
+    uint32_t host[3]; // 3 clients for a game host
+    uint16_t port[3];
 
-    // Response package
+    Net_PlayerInfoPkg()
+        : Net_MessageHeader(NET_L2G_CLIENTS_INFO)
+    {
+        memset(host, 0, sizeof(uint32_t) * 3);
+        memset(port, 0, sizeof(uint32_t) * 3);
+    }
+
+    void setPlayer(uint8_t playerNum, uint32_t p_host, uint16_t p_port)
+    {
+        assert(playerNum < 3);
+
+        host[playerNum] = p_host;
+        port[playerNum] = p_port;
+    }
 };
 
 struct Net_StartSyncPackage : Net_MessageHeader {
     uint32_t    commonRandomSeed;
+
+    Net_StartSyncPackage(uint32_t seed)
+        : Net_MessageHeader(NET_G2P_SYNC)
+        , commonRandomSeed(seed)
+    { }
+};
+
+struct Net_SyncOKPackage : Net_MessageHeader {
+    Net_SyncOKPackage() : Net_MessageHeader(NET_P2G_SYNC_OK) {}
+};
+
+struct Net_StartGamePackage : Net_MessageHeader {
+    Net_StartGamePackage() : Net_MessageHeader(NET_G2E_GAME_START) {}
 };
 
 
@@ -157,6 +202,9 @@ struct Net_StartSyncPackage : Net_MessageHeader {
 
 */
 
+struct Net_LeaveGamePackage : Net_MessageHeader {
+    Net_LeaveGamePackage() : Net_MessageHeader(NET_P2G_LEAVE_GAME) {}
+};
 
 // 2 byte bit field instead of 8*2, but you can't use arrays :(
 struct Net_RawInput {
@@ -179,19 +227,25 @@ struct Net_RawInput {
     }
 };
 
-struct Net_LocalInputPackage : Net_MessageHeader {
+struct Net_ClientInputPackage : Net_MessageHeader {
     Net_RawInput    input;
 
-    Net_LocalInputPackage(const COutputControl* playerControl)
+    Net_ClientInputPackage(const COutputControl* playerControl)
         : Net_MessageHeader(NET_P2G_LOCAL_KEYS)
     {
         assert(playerControl);
         for (uint8_t k = 0; k < 8; k++)
             input.setPlayerKey(k, playerControl->keys[k].fDown, playerControl->keys[k].fPressed);
     }
+
+    void readKeys(COutputControl* playerControl) {
+        assert(playerControl);
+        for (uint8_t k = 0; k < 8; k++)
+            input.getPlayerKey(k, playerControl->keys[k].fDown, playerControl->keys[k].fPressed);
+    }
 };
 
-struct Net_RemoteInputPackage : Net_MessageHeader {
+/*struct Net_RemoteInputPackage : Net_MessageHeader {
     uint8_t         playerNumber;
     Net_RawInput    input;
 
@@ -202,7 +256,7 @@ struct Net_RemoteInputPackage : Net_MessageHeader {
         for (uint8_t k = 0; k < 8; k++)
             input.getPlayerKey(k, playerControl->keys[k].fDown, playerControl->keys[k].fPressed);
     }
-};
+};*/
 
 struct Net_GameStatePackage : Net_MessageHeader {
     float           player_x[4];

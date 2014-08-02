@@ -24,6 +24,8 @@
 
 #include <cassert>
 #include <cstring>
+#include <ctime>
+#include <string>
 
 NetworkHandler networkHandler;
 Networking netplay;
@@ -38,12 +40,6 @@ short backup_playercontrol[4];
 
 bool net_init()
 {
-    if (!networkHandler.init())
-        return false;
-
-    if (!netplay.client.init())
-        return false;
-
     netplay.active = false;
     netplay.connectSuccessful = false;
     netplay.joinSuccessful = false;
@@ -58,6 +54,12 @@ bool net_init()
     netplay.newroom_name[0] = '\0';
     netplay.newroom_password[0] = '\0';
     netplay.mychatmessage[0] = '\0';
+
+    if (!networkHandler.init())
+        return false;
+
+    if (!netplay.client.init())
+        return false;
 
     /*ServerAddress none;
     none.hostname = "(none)";
@@ -246,7 +248,7 @@ void NetClient::setRoomListUIControl(MI_NetworkListScroll* control)
 bool NetClient::sendConnectRequestToSelectedServer()
 {
     ServerAddress* selectedServer = &netplay.savedServers[netplay.selectedServerIndex];
-    if (!openConnection(selectedServer->hostname.c_str()))
+    if (!connectLobby(selectedServer->hostname.c_str()))
         return false;
     
     netplay.operationInProgress = true;
@@ -394,6 +396,8 @@ void NetClient::handleRoomChangedMessage(const uint8_t* data, size_t dataLength)
     if (remotePlayerNumber == pkg.hostPlayerNumber) {
         netplay.theHostIsMe = true;
         local_gamehost.start(foreign_lobbyserver);
+    } else {
+        local_gamehost.stop();
     }
 
     netplay.currentMenuChanged = true;
@@ -419,19 +423,131 @@ void NetClient::handleRoomChatMessage(const uint8_t* data, size_t dataLength)
 }
 
 /****************************
+    Phase 2.5: Pre-game
+****************************/
+
+// This package goes to normal players
+void NetClient::handleRoomStartMessage(const uint8_t* data, size_t dataLength)
+{
+    Net_GameHostInfoPkg pkg(0);
+    memcpy(&pkg, data, sizeof(Net_GameHostInfoPkg));
+
+    char host_str[32];
+    sprintf(host_str, "%d.%d.%d.%d",
+        pkg.host & 0xFF, (pkg.host & 0xFF00) >> 8,
+        (pkg.host & 0xFF0000) >> 16, (pkg.host & 0xFF000000) >> 24);
+
+    printf("[net] Connecting to game host... [%s:%d]\n", host_str, NET_SERVER_PORT + 1);
+    if (!connectGameHost(host_str)) {
+        printf("[net][error] Could not connect to game host.\n");
+        return;
+    }
+
+    netplay.operationInProgress = true;
+}
+
+// This package goes to the game host player
+void NetClient::handleExpectedClientsMessage(const uint8_t* data, size_t dataLength)
+{
+    Net_PlayerInfoPkg pkg;
+    memcpy(&pkg, data, sizeof(Net_PlayerInfoPkg));
+
+    uint8_t playerCount = 0;
+    uint32_t hosts[3];
+    uint16_t ports[3];
+
+    for (uint8_t p = 0; p < 3; p++) {
+        if (pkg.host[p]) { // this is 0 for empty player slots
+            hosts[playerCount] = pkg.host[p];
+            ports[playerCount] = pkg.port[p];
+            playerCount++;
+            printf("[net] Client %d is %u:%u\n", p, pkg.host[p], pkg.port[p]);
+        }
+    }
+
+    local_gamehost.setExpectedPlayers(playerCount, hosts, ports);
+}
+
+void NetClient::handleStartSyncMessage(const uint8_t* data, size_t dataLength)
+{
+    // read
+    Net_StartSyncPackage pkg(0);
+    memcpy(&pkg, data, sizeof(Net_StartSyncPackage));
+
+    // apply
+    printf("reseed: %d\n", pkg.commonRandomSeed);
+    RandomNumberGenerator::generator().reseed(pkg.commonRandomSeed);
+
+    // respond
+    if (netplay.theHostIsMe)
+        setAsLastSentMessage(NET_P2G_SYNC_OK);
+    else {
+        Net_SyncOKPackage respond_pkg;
+        sendMessageToGameHost(&respond_pkg, sizeof(Net_SyncOKPackage));
+    }
+}
+
+void NetClient::handleGameStartMessage()
+{
+    printf("[net] Game start!\n");
+    netplay.gameRunning = true;
+}
+
+/****************************
     Phase 3: Play
 ****************************/
 
-void NetClient::sendSyncOKMessage()
+void NetClient::sendLeaveGameMessage()
 {
-    Net_SyncOKPackage msg;
-    sendMessageToGameHost(&msg, sizeof(Net_SyncOKPackage));
+    // FIXME: make this function better
+
+    Net_LeaveGamePackage pkg;
+    if (netplay.theHostIsMe) {
+        // disconnect all players
+        local_gamehost.sendMessageToMyPeers(&pkg, sizeof(Net_LeaveGamePackage));
+        local_gamehost.update();
+        // stop game host
+        local_gamehost.stop();
+
+        //apply to local client
+        setAsLastReceivedMessage(pkg.packageType);
+    } else {
+        // diconnect from foreign game host
+        sendMessageToGameHost(&pkg, sizeof(Net_LeaveGamePackage));
+        assert(!local_gamehost.active);
+    }
+
+    //state change
+    //...
+    netplay.gameRunning = false;
 }
 
 void NetClient::sendLocalInput()
 {
-    Net_LocalInputPackage pkg(&netplay.netPlayerInput.outputControls[0]);
-    sendMessageToGameHost(&pkg, sizeof(Net_LocalInputPackage));
+    if (netplay.theHostIsMe)
+        return;
+
+    Net_ClientInputPackage pkg(&game_values.playerInput.outputControls[0]);
+    sendMessageToGameHost(&pkg, sizeof(Net_ClientInputPackage));
+
+    //game_values.playerInput.outputControls[iGlobalID];
+    printf("INPUT %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d\n",
+        game_values.playerInput.outputControls[0].keys[0].fDown,
+        game_values.playerInput.outputControls[0].keys[0].fPressed,
+        game_values.playerInput.outputControls[0].keys[1].fDown,
+        game_values.playerInput.outputControls[0].keys[1].fPressed,
+        game_values.playerInput.outputControls[0].keys[2].fDown,
+        game_values.playerInput.outputControls[0].keys[2].fPressed,
+        game_values.playerInput.outputControls[0].keys[3].fDown,
+        game_values.playerInput.outputControls[0].keys[3].fPressed,
+        game_values.playerInput.outputControls[0].keys[4].fDown,
+        game_values.playerInput.outputControls[0].keys[4].fPressed,
+        game_values.playerInput.outputControls[0].keys[5].fDown,
+        game_values.playerInput.outputControls[0].keys[5].fPressed,
+        game_values.playerInput.outputControls[0].keys[6].fDown,
+        game_values.playerInput.outputControls[0].keys[6].fPressed,
+        game_values.playerInput.outputControls[0].keys[7].fDown,
+        game_values.playerInput.outputControls[0].keys[7].fPressed);
 }
 
 void NetClient::handleRemoteGameState(const uint8_t* data, size_t dataLength) // for other clients
@@ -439,11 +555,20 @@ void NetClient::handleRemoteGameState(const uint8_t* data, size_t dataLength) //
     Net_GameStatePackage pkg;
     memcpy(&pkg, data, sizeof(Net_GameStatePackage));
 
+    Net_GameplayState state;
     for (uint8_t p = 0; p < list_players_cnt; p++) {
+        pkg.getPlayerCoord(p, state.player_x[p], state.player_y[p]);
+        pkg.getPlayerVel(p, state.player_xvel[p], state.player_yvel[p]);
+        pkg.getPlayerKeys(p, &state.player_input[p]);
+    }
+    netplay.gamestate_buffer.push_back(state);
+    /*for (uint8_t p = 0; p < list_players_cnt; p++) {
         pkg.getPlayerCoord(p, list_players[p]->fx, list_players[p]->fy);
         pkg.getPlayerVel(p, list_players[p]->velx, list_players[p]->vely);
         pkg.getPlayerKeys(p, &netplay.netPlayerInput.outputControls[p]);
-    }
+
+        assert(state.player_input[p] == netplay.netPlayerInput.outputControls[p]);
+    }*/
 }
 
 /****************
@@ -451,19 +576,39 @@ void NetClient::handleRemoteGameState(const uint8_t* data, size_t dataLength) //
 ****************/
 
 // This client sucesfully connected to a host
-void NetClient::onConnect(NetPeer* newServer)
+void NetClient::onConnect(NetPeer* newPeer)
 {
-    assert(newServer);
-    assert(foreign_lobbyserver == NULL);
-    foreign_lobbyserver = newServer;
+    assert(newPeer);
 
-    Net_ClientConnectionPackage message(netplay.myPlayerName);
-    sendMessageToLobbyServer(&message, sizeof(Net_ClientConnectionPackage));
+    // TODO: add state checks
+    if (!foreign_lobbyserver) {
+        foreign_lobbyserver = newPeer;
+
+        Net_ClientConnectionPackage message(netplay.myPlayerName);
+        sendMessageToLobbyServer(&message, sizeof(Net_ClientConnectionPackage));
+    }
+    else if (!foreign_gamehost) {
+        foreign_gamehost = newPeer;
+    }
+    else {
+        // The client must not have more than 2 connections
+        newPeer->disconnect();
+        assert(0);
+    }
 }
 
 void NetClient::onDisconnect(NetPeer& client)
 {
-    // ...
+    // Beware of the null pointers
+    if (foreign_gamehost) {
+        if (client == *foreign_gamehost) {
+            printf("[net] Disconnected from game host.\n");
+            return;
+        }
+    }
+
+    assert(client == *foreign_lobbyserver);
+    printf("[net] Disconnected from lobby server.\n");
 }
 
 void NetClient::onReceive(NetPeer& client, const uint8_t* data, size_t dataLength)
@@ -477,6 +622,7 @@ void NetClient::onReceive(NetPeer& client, const uint8_t* data, size_t dataLengt
     if (protocolMajor != NET_PROTOCOL_VERSION_MAJOR)
         return;
 
+    // TODO: Add state checks too.
     switch (packageType)
     {
         //
@@ -562,25 +708,27 @@ void NetClient::onReceive(NetPeer& client, const uint8_t* data, size_t dataLengt
             break;
 
         //
+        // Pre-game
+        //
+        case NET_L2P_GAMEHOST_INFO:
+            handleRoomStartMessage(data, dataLength);
+            break;
+
+        case NET_L2G_CLIENTS_INFO:
+            handleExpectedClientsMessage(data, dataLength);
+            break;
+
+        case NET_G2P_SYNC:
+            handleStartSyncMessage(data, dataLength);
+            break;
+
+        case NET_G2E_GAME_START:
+            handleGameStartMessage();
+            break;
+
+        //
         // Game
         //
-
-        case NET_NOTICE_GAMEHOST_INFO:
-            printf("Not fully implemented: NET_RECV_GAMEHOST_INFO\n");
-            {
-                Net_StartSyncPackage pkg;
-                memcpy(&pkg, data, sizeof(Net_StartSyncPackage));
-
-                //printf("reseed: %d\n", pkg.commonRandomSeed);
-                RandomNumberGenerator::generator().reseed(pkg.commonRandomSeed);
-            }
-            sendSyncOKMessage();
-            break;
-
-        case NET_G2P_GAME_START:
-            printf("NET_RECV_GAMEHOST_GAME_STARTED\n");
-            netplay.gameRunning = true;
-            break;
 
         case NET_G2P_GAME_STATE:
             handleRemoteGameState(data, dataLength);
@@ -592,7 +740,7 @@ void NetClient::onReceive(NetPeer& client, const uint8_t* data, size_t dataLengt
 
         default:
             printf("Unknown: ");
-            for (int a = 0; a < dataLength; a++)
+            for (unsigned a = 0; a < dataLength; a++)
                 printf("%3d ", data[a]);
             printf("\n");
             return; // do not set as last message
@@ -605,7 +753,7 @@ void NetClient::onReceive(NetPeer& client, const uint8_t* data, size_t dataLengt
     Network Communication
 ****************************/
 
-bool NetClient::openConnection(const char* hostname, const uint16_t port)
+bool NetClient::connectLobby(const char* hostname, const uint16_t port)
 {
     netplay.connectSuccessful = false;
     if (!networkHandler.connectToLobbyServer(hostname, port))
@@ -614,6 +762,17 @@ bool NetClient::openConnection(const char* hostname, const uint16_t port)
     return true;
     // now we wait for CONNECT_OK
     // connectSuccessful will be set to 'true' there
+}
+
+bool NetClient::connectGameHost(const char* hostname, const uint16_t port)
+{
+    netplay.connectSuccessful = false;
+    if (!networkHandler.connectToForeignGameHost(hostname, port))
+        return false;
+
+    return true;
+
+    // now we wait for sync package
 }
 
 bool NetClient::sendTo(NetPeer*& peer, const void* data, int dataLength)
@@ -648,7 +807,7 @@ void NetClient::setAsLastSentMessage(uint8_t packageType)
 
 void NetClient::setAsLastReceivedMessage(uint8_t packageType)
 {
-    printf("setAsLastReceivedMessage: %d.\n", packageType);
+    //printf("setAsLastReceivedMessage: %d.\n", packageType);
     lastReceivedMessage.packageType = packageType;
     lastReceivedMessage.timestamp = SDL_GetTicks();
 }
@@ -660,8 +819,13 @@ void NetClient::setAsLastReceivedMessage(uint8_t packageType)
 NetGameHost::NetGameHost()
     : active(false)
     , foreign_lobbyserver(NULL)
+    , next_free_client_slot(0)
+    , expected_client_count(0)
 {
     //printf("NetGameHost::ctor\n");
+    for (short p = 0; p < 3; p++) {
+        clients[p] = NULL;
+    }
 }
 
 NetGameHost::~NetGameHost()
@@ -711,12 +875,15 @@ void NetGameHost::stop()
 
     //printf("NetGameHost::stop\n");
 
-    foreign_lobbyserver = NULL; // client may be still connected
+    foreign_lobbyserver = NULL; // NetClient may still be connected
+    next_free_client_slot = 0;
+    expected_client_count = 0;
     for (short p = 0; p < 3; p++) {
         if (clients[p]) {
             clients[p]->disconnect();
             clients[p] = NULL;
         }
+        expected_clients[p].reset();
     }
 
     networkHandler.gamehost_shutdown();
@@ -733,12 +900,61 @@ void NetGameHost::cleanup()
 // A client connected to this host
 void NetGameHost::onConnect(NetPeer* new_player)
 {
+    // GameHost must start after setExpectedPlayers
+    assert(expected_client_count > 0);
+    assert(clients[0] != new_player);
+    assert(clients[1] != new_player);
+    assert(clients[2] != new_player);
 
+    if (next_free_client_slot >= 3) {
+        new_player->disconnect();
+        printf("[warning] More than 3 players want to join.\n");
+    }
+
+    // Validation
+    // Is this one of the clients we're expecting to join?
+    RawPlayerAddress incoming;
+    incoming.host = new_player->addressHost();
+    incoming.port = new_player->addressPort();
+
+    bool valid_address = false;
+    for (unsigned short c = 0; c < expected_client_count && !valid_address; c++) {
+        if (incoming == expected_clients[c])
+            valid_address = true;
+    }
+
+    // Intruder alert
+    if (!valid_address) {
+        printf("[warning] An unexpected client wants to join the game.\n");
+        new_player->disconnect();
+        return;
+    }
+
+    // Succesful connection
+    assert(clients[next_free_client_slot] == NULL);
+    clients[next_free_client_slot] = new_player;
+
+    next_free_client_slot++; // placing this before printf makes the log nicer
+    printf("%d/%d player connected.\n", next_free_client_slot, expected_client_count);
+
+    // When all players connected,
+    // sychronize them (eg. same RNG seed)
+    if (next_free_client_slot == expected_client_count)
+    {
+        // send syncronization package
+        RandomNumberGenerator::generator().reseed(time(0));
+        Net_StartSyncPackage pkg(RANDOM_INT(32767 /* RAND_MAX */));
+        sendMessageToMyPeers(&pkg, sizeof(pkg));
+
+        // apply syncronization package on local client
+        netplay.client.handleStartSyncMessage((uint8_t*)&pkg, sizeof(pkg));
+        netplay.client.setAsLastReceivedMessage(pkg.packageType);
+    }
 }
 
 void NetGameHost::onDisconnect(NetPeer& player)
 {
-
+    printf("onDisconnect!\n");
 }
 
 void NetGameHost::onReceive(NetPeer& player, const uint8_t* data, size_t dataLength)
@@ -754,11 +970,20 @@ void NetGameHost::onReceive(NetPeer& player, const uint8_t* data, size_t dataLen
 
     switch (packageType)
     {
+        case NET_P2G_SYNC_OK:
+            handleSyncOKMessage(player, data, dataLength);
+            break;
 
         case NET_P2G_LOCAL_KEYS:
-            //printf("NET_NOTICE_REMOTE_KEYS\n");
-            handleRemoteInput(data, dataLength);
+            handleRemoteInput(player, data, dataLength);
             break;
+
+        default:
+            printf("GH Unknown: ");
+            for (unsigned a = 0; a < dataLength; a++)
+                printf("%3d ", data[a]);
+            printf("\n");
+            return; // do not set as last message
     }
 }
 
@@ -766,8 +991,60 @@ void NetGameHost::sendStartRoomMessage()
 {
     assert(foreign_lobbyserver);
 
-    Net_StartRoomPackage msg;
-    foreign_lobbyserver->send(&msg, sizeof(Net_StartRoomPackage));
+    Net_StartRoomPackage pkg;
+    foreign_lobbyserver->send(&pkg, sizeof(Net_StartRoomPackage));
+    setAsLastSentMessage(pkg.packageType);
+}
+
+void NetGameHost::sendStartGameMessage()
+{
+    assert(foreign_lobbyserver);
+    assert(clients[0] || clients[1] || clients[2]);
+
+    Net_StartGamePackage pkg;
+    foreign_lobbyserver->send(&pkg, sizeof(Net_StartGamePackage));
+    sendMessageToMyPeers(&pkg, sizeof(Net_StartGamePackage));
+
+    netplay.client.handleGameStartMessage();
+    netplay.client.setAsLastReceivedMessage(pkg.packageType);
+}
+
+void NetGameHost::handleSyncOKMessage(const NetPeer& player, const uint8_t* data, size_t dataLength)
+{
+    assert(player == *clients[0] || player == *clients[1] || player == *clients[2]);
+
+    uint8_t readyPlayerCount = 0;
+    for (unsigned short c = 0; c < expected_client_count; c++)
+    {
+        if (player == *clients[c]) {
+            expected_clients[0].sync_ok = true;
+            printf("Client %d OK.\n", c);
+        }
+
+        if (expected_clients[c].sync_ok)
+            readyPlayerCount++;
+    }
+
+    if (readyPlayerCount == expected_client_count) {
+        sendStartGameMessage();
+    }
+}
+
+void NetGameHost::setExpectedPlayers(uint8_t count, uint32_t* hosts, uint16_t* ports)
+{
+    assert(count);
+    assert(hosts);
+    assert(ports);
+
+    expected_client_count = count;
+    for (unsigned short c = 0; c < count; c++) {
+        assert(hosts[c]);
+        assert(ports[c]);
+        expected_clients[c].host = hosts[c];
+        expected_clients[c].port = ports[c];
+    }
+
+    printf("Game starts soon, waiting for %d players.\n", expected_client_count);
 }
 
 void NetGameHost::sendCurrentGameState()
@@ -786,6 +1063,41 @@ void NetGameHost::sendCurrentGameState()
     }
 }
 
+void NetGameHost::handleRemoteInput(const NetPeer& player, const uint8_t* data, size_t dataLength) // only for room host
+{
+    assert(player == *clients[0] || player == *clients[1] || player == *clients[2]);
+
+    Net_ClientInputPackage* pkg = (Net_ClientInputPackage*) data; // TODO: check size!
+
+    for (unsigned short c = 0; c < expected_client_count; c++) {
+        if (player == *clients[c]) {
+            printf("yey\n");
+            pkg->readKeys(&netplay.netPlayerInput.outputControls[c + 1]); // 0 = local player
+
+
+            printf("INPUT %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d\n",
+                netplay.netPlayerInput.outputControls[c + 1].keys[0].fDown,
+                netplay.netPlayerInput.outputControls[c + 1].keys[0].fPressed,
+                netplay.netPlayerInput.outputControls[c + 1].keys[1].fDown,
+                netplay.netPlayerInput.outputControls[c + 1].keys[1].fPressed,
+                netplay.netPlayerInput.outputControls[c + 1].keys[2].fDown,
+                netplay.netPlayerInput.outputControls[c + 1].keys[2].fPressed,
+                netplay.netPlayerInput.outputControls[c + 1].keys[3].fDown,
+                netplay.netPlayerInput.outputControls[c + 1].keys[3].fPressed,
+                netplay.netPlayerInput.outputControls[c + 1].keys[4].fDown,
+                netplay.netPlayerInput.outputControls[c + 1].keys[4].fPressed,
+                netplay.netPlayerInput.outputControls[c + 1].keys[5].fDown,
+                netplay.netPlayerInput.outputControls[c + 1].keys[5].fPressed,
+                netplay.netPlayerInput.outputControls[c + 1].keys[6].fDown,
+                netplay.netPlayerInput.outputControls[c + 1].keys[6].fPressed,
+                netplay.netPlayerInput.outputControls[c + 1].keys[7].fDown,
+                netplay.netPlayerInput.outputControls[c + 1].keys[7].fPressed);
+
+            return;
+        }
+    }
+}
+
 bool NetGameHost::sendMessageToMyPeers(const void* data, size_t dataLength)
 {
     assert(data);
@@ -798,15 +1110,6 @@ bool NetGameHost::sendMessageToMyPeers(const void* data, size_t dataLength)
 
     setAsLastSentMessage(((uint8_t*)data)[2]);
     return true;
-}
-
-void NetGameHost::handleRemoteInput(const uint8_t* data, size_t dataLength) // only for room host
-{
-    Net_RemoteInputPackage pkg;
-    memcpy(&pkg, data, sizeof(Net_RemoteInputPackage));
-
-    // TODO: Remove/check player number field.
-    pkg.readKeys(&netplay.netPlayerInput.outputControls[pkg.playerNumber]);
 }
 
 void NetGameHost::setAsLastSentMessage(uint8_t packageType)

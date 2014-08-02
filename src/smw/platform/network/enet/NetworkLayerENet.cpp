@@ -46,6 +46,24 @@ void NetPeerENet::disconnect()
     // Note: do NOT null out foreign_peer!
 }
 
+uint32_t NetPeerENet::addressHost()
+{
+    // ENet stores host in network byte order
+    if (foreign_peer)
+        return foreign_peer->address.host;
+
+    return 0;
+}
+
+uint16_t NetPeerENet::addressPort()
+{
+    // ENet stores port in host byte order -> convert it
+    if (foreign_peer)
+        return foreign_peer->address.port; // TODO/FIXME: check on other platforms
+
+    return 0;
+}
+
 std::string NetPeerENet::addressAsString()
 {
     char buf[23]; // 4*4 octets with dots + 1 port separator + 5 port digits + 1 null
@@ -59,15 +77,21 @@ std::string NetPeerENet::addressAsString()
 
 bool NetPeerENet::operator==(const NetPeer*& peer) const
 {
+    if (!peer)
+        return false;
+
     if (this->foreign_peer == ((NetPeerENet*)peer)->foreign_peer)
         return true;
 
     return false;
 }
 
-bool NetPeerENet::operator!=(const NetPeer*& peer) const
+bool NetPeerENet::operator==(const NetPeer& peer) const
 {
-    return !(this == peer);
+    if (this->foreign_peer == ((NetPeerENet*)&peer)->foreign_peer)
+        return true;
+
+    return false;
 }
 
 
@@ -107,10 +131,10 @@ bool NetworkLayerENet::client_restart()
     client_shutdown();
 
     // no bind
-    // one connection (to lobby server)
+    // two connections (lobby server and game host)
     // one channel
     // no up/down speed limit
-    local_client = enet_host_create(NULL, 1, 1, 0, 0);
+    local_client = enet_host_create(NULL, 2, 1, 0, 0);
     if (!local_client) {
         fprintf(stderr, "[error][net] Could not open client connection port.\n");
         return false;
