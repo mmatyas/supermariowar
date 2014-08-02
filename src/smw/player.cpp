@@ -2248,6 +2248,8 @@ bool CPlayer::isstomping(CPlayer * o)
 {
     //printf("ID: %d  Stomp old: %d <= %d  new: %d >= %d  vely: %.2f\n", globalID, oldy + PH, o->oldy, iy + PH, o->iy, vely);
 
+    printf("if (fOldY + PH <= o->fOldY && iy + PH >= o->iy) {\n");
+    printf("if (%f <= %f && %f >= %f)\n", fOldY + PH, o->fOldY, iy + PH, o->iy);
     if (fOldY + PH <= o->fOldY && iy + PH >= o->iy) {
         //don't reposition if player is warping when he kills the other player
         if (state == player_ready) {

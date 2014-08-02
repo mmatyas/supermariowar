@@ -531,7 +531,7 @@ void NetClient::sendLocalInput()
     sendMessageToGameHost(&pkg, sizeof(Net_ClientInputPackage));
 
     //game_values.playerInput.outputControls[iGlobalID];
-    printf("INPUT %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d\n",
+    /*printf("INPUT %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d\n",
         game_values.playerInput.outputControls[0].keys[0].fDown,
         game_values.playerInput.outputControls[0].keys[0].fPressed,
         game_values.playerInput.outputControls[0].keys[1].fDown,
@@ -547,7 +547,7 @@ void NetClient::sendLocalInput()
         game_values.playerInput.outputControls[0].keys[6].fDown,
         game_values.playerInput.outputControls[0].keys[6].fPressed,
         game_values.playerInput.outputControls[0].keys[7].fDown,
-        game_values.playerInput.outputControls[0].keys[7].fPressed);
+        game_values.playerInput.outputControls[0].keys[7].fPressed);*/
 }
 
 void NetClient::handleRemoteGameState(const uint8_t* data, size_t dataLength) // for other clients
@@ -557,8 +557,8 @@ void NetClient::handleRemoteGameState(const uint8_t* data, size_t dataLength) //
 
     Net_GameplayState state;
     for (uint8_t p = 0; p < list_players_cnt; p++) {
-        pkg.getPlayerCoord(p, state.player_x[p], state.player_y[p]);
-        pkg.getPlayerVel(p, state.player_xvel[p], state.player_yvel[p]);
+        pkg.getPlayerCoord(p, state.player_coords[p].x, state.player_coords[p].y);
+        pkg.getPlayerVel(p, state.player_coords[p].xvel, state.player_coords[p].yvel);
         pkg.getPlayerKeys(p, &state.player_input[p]);
     }
     netplay.gamestate_buffer.push_back(state);
@@ -569,6 +569,20 @@ void NetClient::handleRemoteGameState(const uint8_t* data, size_t dataLength) //
 
         assert(state.player_input[p] == netplay.netPlayerInput.outputControls[p]);
     }*/
+}
+
+void NetClient::handleP2PCollision(const uint8_t* data, size_t dataLength)
+{
+    Net_P2PCollisionEventPackage pkg(0,1);
+    memcpy(&pkg, data, sizeof(Net_P2PCollisionEventPackage));
+
+    Net_P2PCollisionEvent event(pkg.player_id[0], pkg.player_id[1]);
+    assert(event.player_id[0] < 4);
+    assert(event.player_id[1] < 4);
+    event.player_coords[0] = pkg.player_coords[0];
+    event.player_coords[1] = pkg.player_coords[1];
+
+    netplay.p2pcollision_buffer.push_back(event);
 }
 
 /****************
@@ -734,6 +748,10 @@ void NetClient::onReceive(NetPeer& client, const uint8_t* data, size_t dataLengt
             handleRemoteGameState(data, dataLength);
             break;
 
+        case NET_G2P_P2P_COLLISION_EVENT:
+            handleP2PCollision(data, dataLength);
+            break;
+
         //
         // Default
         //
@@ -888,6 +906,7 @@ void NetGameHost::stop()
 
     networkHandler.gamehost_shutdown();
     active = false;
+    netplay.theHostIsMe = false;
     printf("[net] GameHost stopped.\n");
 }
 
@@ -1057,10 +1076,7 @@ void NetGameHost::sendCurrentGameState()
         pkg.setPlayerKeys(p, &netplay.netPlayerInput.outputControls[p]);
     }
 
-    for (int c = 0; c < 3; c++) {
-        if (clients[c])
-            clients[c]->send(&pkg, sizeof(Net_GameStatePackage));
-    }
+    sendMessageToMyPeers(&pkg, sizeof(Net_GameStatePackage));
 }
 
 void NetGameHost::handleRemoteInput(const NetPeer& player, const uint8_t* data, size_t dataLength) // only for room host
@@ -1071,11 +1087,11 @@ void NetGameHost::handleRemoteInput(const NetPeer& player, const uint8_t* data, 
 
     for (unsigned short c = 0; c < expected_client_count; c++) {
         if (player == *clients[c]) {
-            printf("yey\n");
+            //printf("yey\n");
             pkg->readKeys(&netplay.netPlayerInput.outputControls[c + 1]); // 0 = local player
 
 
-            printf("INPUT %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d\n",
+            /*printf("INPUT %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d\n",
                 netplay.netPlayerInput.outputControls[c + 1].keys[0].fDown,
                 netplay.netPlayerInput.outputControls[c + 1].keys[0].fPressed,
                 netplay.netPlayerInput.outputControls[c + 1].keys[1].fDown,
@@ -1091,17 +1107,28 @@ void NetGameHost::handleRemoteInput(const NetPeer& player, const uint8_t* data, 
                 netplay.netPlayerInput.outputControls[c + 1].keys[6].fDown,
                 netplay.netPlayerInput.outputControls[c + 1].keys[6].fPressed,
                 netplay.netPlayerInput.outputControls[c + 1].keys[7].fDown,
-                netplay.netPlayerInput.outputControls[c + 1].keys[7].fPressed);
+                netplay.netPlayerInput.outputControls[c + 1].keys[7].fPressed);*/
 
             return;
         }
     }
 }
 
+void NetGameHost::sendP2PCollision(const CPlayer& first, const CPlayer& second)
+{
+    assert(active);
+    Net_P2PCollisionEventPackage pkg(first.globalID, second.globalID);
+    pkg.setCoords(first.fx, first.fy, second.fx, second.fy);
+    pkg.setVelocities(first.velx, first.vely, second.velx, second.vely);
+
+    sendMessageToMyPeers(&pkg, sizeof(Net_P2PCollisionEventPackage));
+}
+
 bool NetGameHost::sendMessageToMyPeers(const void* data, size_t dataLength)
 {
     assert(data);
     assert(dataLength >= 3);
+    assert(clients[0] || clients[1] || clients[2]);
 
     for (int c = 0; c < 3; c++) {
         if (clients[c])

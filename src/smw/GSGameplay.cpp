@@ -17,6 +17,7 @@
 #include "Score.h"
 #include "sfx.h"
 
+#include <cassert>
 #include <cmath>
 
 extern SDL_Surface* screen;
@@ -760,8 +761,15 @@ void handleP2PCollisions()
             for (j = i + 1; j < list_players_cnt; j++) {
                 CPlayer * player2 = list_players[j];
                 if (player2->state > player_dead) {
-                    if (coldec_player2player(player1, player2)) {
-                        printf("P2P collision\n");
+                    if (coldec_player2player(player1, player2))
+                    {
+                        printf("P2P collision: %d -> %d\n", i, j);
+                        if (netplay.active) {
+                            assert(netplay.theHostIsMe);
+                            // TODO: use references in handleP2PCollisions()
+                            netplay.client.local_gamehost.sendP2PCollision(*player1, *player2);
+                        }
+
                         collisionhandler_p2p(player1, player2);
 
                         //if player was killed by another player, continue with next player for collision detection
@@ -770,6 +778,67 @@ void handleP2PCollisions()
                     }
                 }
             }
+        }
+    }
+}
+
+void handleNetworkP2PCollisions()
+{
+    // Unit testing would be nice
+    assert(netplay.active);
+    assert(!netplay.theHostIsMe);
+
+    // TODO: Do not copy memory
+    while (!netplay.p2pcollision_buffer.empty()) {
+        Net_P2PCollisionEvent collevent = netplay.p2pcollision_buffer.front();
+        netplay.p2pcollision_buffer.pop_front();
+
+        CPlayer& player1 = *list_players[collevent.player_id[0]];
+        CPlayer& player2 = *list_players[collevent.player_id[1]];
+
+        if (player1.state > player_dead && player2.state > player_dead) {
+            printf("[net] P2P collision: %d -> %d\n", collevent.player_id[0], collevent.player_id[1]);
+
+            float p1_coords_backup[4];
+            float p2_coords_backup[4];
+
+            // TODO: Consider stack push/pop
+
+            // Backup original position
+            p1_coords_backup[0] = player1.fx;
+            p1_coords_backup[1] = player1.fy;
+            p1_coords_backup[2] = player1.velx;
+            p1_coords_backup[3] = player1.vely;
+
+            p2_coords_backup[0] = player2.fx;
+            p2_coords_backup[1] = player2.fy;
+            p2_coords_backup[2] = player2.velx;
+            p2_coords_backup[3] = player2.vely;
+
+            // Set collision position
+            player1.fx = collevent.player_coords[0].x;
+            player1.fy = collevent.player_coords[0].y;
+            player1.velx = collevent.player_coords[0].xvel;
+            player1.vely = collevent.player_coords[0].yvel;
+
+            player2.fx = collevent.player_coords[1].x;
+            player2.fy = collevent.player_coords[1].y;
+            player2.velx = collevent.player_coords[1].xvel;
+            player2.vely = collevent.player_coords[1].yvel;
+
+            // Collide
+            collisionhandler_p2p(&player1, &player2);
+
+            // Restore position
+            player1.fx = p1_coords_backup[0];
+            player1.fy = p1_coords_backup[1];
+            player1.velx = p1_coords_backup[2];
+            player1.vely = p1_coords_backup[3];
+
+            player2.fx = p2_coords_backup[0];
+            player2.fy = p2_coords_backup[1];
+            player2.velx = p2_coords_backup[2];
+            player2.vely = p2_coords_backup[3];
         }
     }
 }
@@ -2015,39 +2084,6 @@ void GameplayState::update()
     for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++)
         list_players[iPlayer]->Init();
 
-    if (netplay.active) {
-        netplay.client.update();
-
-        // TODO: Move this to update().
-        // The host sends the game state to clients
-        // Everyone send input to everyone
-        if (netplay.theHostIsMe)
-            netplay.client.local_gamehost.sendCurrentGameState();
-        else
-        {
-            if (netplay.gamestate_buffer.size() > 0)
-            {
-                Net_GameplayState currect_state = netplay.gamestate_buffer.front();
-                netplay.gamestate_buffer.pop_front();
-                for (unsigned short p = 0; p < list_players_cnt; p++) {
-                    list_players[p]->fx = currect_state.player_x[p];
-                    list_players[p]->fy = currect_state.player_y[p];
-                    list_players[p]->velx = currect_state.player_xvel[p];
-                    list_players[p]->vely = currect_state.player_yvel[p];
-                    netplay.netPlayerInput.outputControls[p] = currect_state.player_input[p];
-                }
-            }
-            else {
-                printf("[] GameStateBuffer size = 0\n");
-            }
-        }
-
-        if (previous_playerKeys != *current_playerKeys) {
-            netplay.client.sendLocalInput();
-            previous_playerKeys = *current_playerKeys;
-        }
-    }
-
     //printf("[%d;%d]\n", current_playerKeys->keys[0].fDown, current_playerKeys->keys[0].fPressed);
     //printf("%d -> %f\n", list_players[0]->ix, list_players[0]->fx);
 
@@ -2197,7 +2233,45 @@ void GameplayState::update()
 
 #endif
 
+
     handleInput();
+
+    if (netplay.active) {
+        netplay.client.update();
+    }
+
+    if (netplay.active) {
+
+        if (previous_playerKeys != *current_playerKeys) {
+            netplay.client.sendLocalInput();
+            previous_playerKeys = *current_playerKeys;
+        }
+
+        // TODO: Move this to update()?
+        // The host sends the game state to clients,
+        // Players send input to game host
+        if (netplay.theHostIsMe) {
+            netplay.client.local_gamehost.sendCurrentGameState();
+        }
+        else
+        {
+            if (netplay.gamestate_buffer.size() > 0)
+            {
+                Net_GameplayState currect_state = netplay.gamestate_buffer.front();
+                netplay.gamestate_buffer.pop_front();
+                for (unsigned short p = 0; p < list_players_cnt; p++) {
+                    list_players[p]->fx = currect_state.player_coords[p].x;
+                    list_players[p]->fy = currect_state.player_coords[p].y;
+                    list_players[p]->velx = currect_state.player_coords[p].xvel;
+                    list_players[p]->vely = currect_state.player_coords[p].yvel;
+                    netplay.netPlayerInput.outputControls[p] = currect_state.player_input[p];
+                }
+            }
+            else {
+                printf("[] GameStateBuffer size = 0\n");
+            }
+        }
+    }
 
     if (updateExitPause(iCountDownState)) {
         if (netplay.active)
@@ -2268,7 +2342,11 @@ void GameplayState::update()
                 if (++game_values.cputurn > 3)
                     game_values.cputurn = 0;
 
-                handleP2PCollisions();
+                // Only handle collisions locally if playing offline or being game host.
+                if (!netplay.active || (netplay.active && netplay.theHostIsMe))
+                    handleP2PCollisions();
+                else
+                    handleNetworkP2PCollisions();
 
                 //Move platforms
                 g_map->updatePlatforms();
@@ -2315,6 +2393,10 @@ void GameplayState::update()
 
                 g_map->update();
 
+                /*if (netplay.active && netplay.theHostIsMe) {
+                    netplay.client.local_gamehost.sendCurrentGameState();
+                }*/
+
                 updateScreenShake();
 
                 updateScoreboardAnimation();
@@ -2328,6 +2410,9 @@ SWAPBREAK:
                 list_players[i]->updateswap();
             }
         }
+
+        /*if (netplay.active && netplay.theHostIsMe)
+            netplay.client.local_gamehost.sendCurrentGameState();*/
 
         if (game_values.screenfade == 255) {
             if (game_values.gamestate == GS_START_GAME) {

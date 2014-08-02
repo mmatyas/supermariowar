@@ -259,54 +259,91 @@ struct Net_ClientInputPackage : Net_MessageHeader {
 };*/
 
 struct Net_GameStatePackage : Net_MessageHeader {
-    float           player_x[4];
-    float           player_y[4];
-    float           player_xvel[4];
-    float           player_yvel[4];
-    Net_RawInput    input[4];
+    Net_PlayerCoords player_coords[4];
+    Net_RawInput     player_input[4];
 
     Net_GameStatePackage() : Net_MessageHeader(NET_G2P_GAME_STATE) {}
 
     // SEND
     void setPlayerCoord(uint8_t playerNum, float x, float y) {
         assert(playerNum < 4);
-        player_x[playerNum] = x;
-        player_y[playerNum] = y;
+        player_coords[playerNum].x = x;
+        player_coords[playerNum].y = y;
     }
 
     void setPlayerVel(uint8_t playerNum, float xvel, float yvel) {
         assert(playerNum < 4);
-        player_xvel[playerNum] = xvel;
-        player_yvel[playerNum] = yvel;
+        player_coords[playerNum].xvel = xvel;
+        player_coords[playerNum].yvel = yvel;
     }
 
     void setPlayerKeys(uint8_t playerNum, const COutputControl* playerControl) {
         assert(playerNum < 4);
         assert(playerControl);
         for (uint8_t k = 0; k < 8; k++)
-            input[playerNum].setPlayerKey(playerNum,
+            player_input[playerNum].setPlayerKey(playerNum,
                 playerControl->keys[k].fDown, playerControl->keys[k].fPressed);
     }
 
     // RECEIVE
     void getPlayerCoord(uint8_t playerNum, float& x, float& y) {
         assert(playerNum < 4);
-        x = player_x[playerNum];
-        y = player_y[playerNum];
+        x = player_coords[playerNum].x;
+        y = player_coords[playerNum].y;
     }
 
     void getPlayerVel(uint8_t playerNum, float& xvel, float& yvel) {
         assert(playerNum < 4);
-        xvel = player_xvel[playerNum];
-        yvel = player_yvel[playerNum];
+        xvel = player_coords[playerNum].xvel;
+        yvel = player_coords[playerNum].yvel;
     }
 
     void getPlayerKeys(uint8_t playerNum, COutputControl* playerControl) {
         assert(playerNum < 4);
         assert(playerControl);
         for (uint8_t k = 0; k < 8; k++)
-            input[playerNum].getPlayerKey(playerNum,
+            player_input[playerNum].getPlayerKey(playerNum,
                 playerControl->keys[k].fDown, playerControl->keys[k].fPressed);
+    }
+};
+
+//struct Net_GameplayEvent
+struct Net_P2PCollisionEventPackage : Net_MessageHeader {
+    uint8_t player_id[2];
+    Net_PlayerCoords player_coords[2]; // player position and vector at the moment of collision
+
+    Net_P2PCollisionEventPackage(uint8_t firstID, uint8_t secondID)
+        : Net_MessageHeader(NET_G2P_P2P_COLLISION_EVENT)
+    {
+        player_id[0] = firstID;
+        player_id[1] = secondID;
+
+        assert(player_id[0] < 4);
+        assert(player_id[1] < 4);
+        assert(player_id[0] != player_id[1]);
+
+        player_coords[0].x = 0.0f;
+        player_coords[0].y = 0.0f;
+        player_coords[1].x = 0.0f;
+        player_coords[1].y = 0.0f;
+        player_coords[0].xvel = 0.0f;
+        player_coords[0].yvel = 0.0f;
+        player_coords[1].xvel = 0.0f;
+        player_coords[1].yvel = 0.0f;
+    }
+
+    void setCoords(float p1_x, float p1_y, float p2_x, float p2_y) {
+        player_coords[0].x = p1_x;
+        player_coords[0].y = p1_y;
+        player_coords[1].x = p2_x;
+        player_coords[1].y = p2_y;
+    }
+
+    void setVelocities(float p1_xvel, float p1_yvel, float p2_xvel, float p2_yvel) {
+        player_coords[0].xvel = p1_xvel;
+        player_coords[0].yvel = p1_yvel;
+        player_coords[1].xvel = p2_xvel;
+        player_coords[1].yvel = p2_yvel;
     }
 };
 

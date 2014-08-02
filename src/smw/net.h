@@ -24,6 +24,7 @@ void net_loadServerList();
 bool net_startSession();
 void net_endSession();
 
+class CPlayer; // FIXME: Try to remove this dependency?
 class MI_NetworkListScroll;
 //union COutputControl;
 
@@ -96,6 +97,7 @@ class NetGameHost : public NetworkEventHandler
 
         // P3. Game
         void sendCurrentGameState();
+        void sendP2PCollision(const CPlayer&, const CPlayer&);
 
 
         LastMessage lastSentMessage;
@@ -222,6 +224,7 @@ class NetClient : public NetworkEventHandler
 
         // P3. Game
         void handleRemoteGameState(const uint8_t*, size_t);
+        void handleP2PCollision(const uint8_t*, size_t);
 
         void sendGoodbye();
 
@@ -238,11 +241,18 @@ enum NetworkState {
 };
 
 struct Net_GameplayState {
-    float          player_x[4];
-    float          player_y[4];
-    float          player_xvel[4];
-    float          player_yvel[4];
+    Net_PlayerCoords player_coords[4];
     COutputControl player_input[4];
+};
+
+struct Net_P2PCollisionEvent {
+    uint8_t player_id[2];
+    Net_PlayerCoords player_coords[2];
+
+    Net_P2PCollisionEvent(uint8_t first, uint8_t second) {
+        player_id[0] = first;
+        player_id[1] = second;
+    }
 };
 
 struct Networking {
@@ -281,6 +291,7 @@ struct Networking {
     bool theHostIsMe;
     CPlayerInput netPlayerInput;
     std::list<Net_GameplayState> gamestate_buffer;
+    std::list<Net_P2PCollisionEvent> p2pcollision_buffer;
 };
 
 extern Networking netplay;

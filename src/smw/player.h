@@ -414,6 +414,7 @@ class CPlayer
 			friend void shakeScreen();
 			friend void handleP2PCollisions();
 			friend void handleP2ObjCollisions();
+			friend void handleNetworkP2PCollisions();
 			friend void drawScoreboard(short int*);
 			friend void drawPlayerSwap();
 

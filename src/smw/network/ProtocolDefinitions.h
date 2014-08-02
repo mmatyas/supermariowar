@@ -45,9 +45,20 @@
 #define NET_P2G_SYNC_OK                     54 // Normal Player -> Game Host: "I'm ready!"
 #define NET_G2E_GAME_START                  55 // Game Host -> Everyone: "Everybody connected successfully!"
 
-#define NET_P2G_LOCAL_KEYS                  60 // Normal players -> Game host
-#define NET_P2G_LEAVE_GAME                  61 // Normal players -> Game host
-#define NET_G2P_GAME_STATE                  62 // GH -> Players
-#define NET_G2L_GAME_RESULTS                63 // GH -> Server
+#define NET_P2G_LEAVE_GAME                  60 // Normal players -> Game host
+#define NET_P2G_LOCAL_KEYS                  61 // Normal players -> Game host
+#define NET_G2P_GAME_STATE                  62 // GH -> Players (positions)
+#define NET_G2P_P2P_COLLISION_EVENT         63 // GH -> Players (one collision)
+
+#define NET_G2L_GAME_RESULTS                70 // GH -> Server
+
+
+// FIXME: Move this to somewhere else.
+struct Net_PlayerCoords {
+    float x;
+    float y;
+    float xvel;
+    float yvel;
+};
 
 #endif // NETWORK_PROTOCOL_DEFINITIONS_H
