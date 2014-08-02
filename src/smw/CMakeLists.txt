@@ -18,9 +18,9 @@ add_executable(smw ../common/movingplatform.cpp ../common/uicontrol.cpp ../commo
 target_link_libraries(smw CommonFiles)
 
 # add .bc extension when building with emscripten
-#if(USE_EMSCRIPTEN)
-#	set_target_properties(smw PROPERTIES SUFFIX ".bc")
-#endif()
+if(USE_EMSCRIPTEN)
+	set_target_properties(smw PROPERTIES SUFFIX ".bc")
+endif()
 
 # emscripten uses its own SDL
 if(NOT USE_EMSCRIPTEN)
