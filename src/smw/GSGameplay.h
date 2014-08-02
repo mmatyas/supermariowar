@@ -23,13 +23,13 @@ class GameplayState : public GameState
         void initScoreDisplayPosition();
         void initEyeCandy();
         void initRunGame();
-        void SpinScreen();
         void CleanDeadPlayers();
 
         void drawFrontLayer();
         void drawBackLayer();
         void drawMiddleLayer();
 
+        void spinScreen();
         void drawScreenFade();
         void drawPlayerSwap();
         void drawScreenShakeBackground();

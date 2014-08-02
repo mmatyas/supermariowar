@@ -187,46 +187,6 @@ short GetModeIconIndexFromMode(short iMode)
     return iMode;
 }
 
-//Move the screen in a small circle
-void GameplayState::SpinScreen()
-{
-    if (spindirection == 0 || spindirection == 2) {
-        if (++spintimer >= 300) {
-            spindirection++;
-            spintimer = 0;
-        }
-    } else if (spindirection == 1) {
-        spinspeed += 0.0008f;
-
-        if (spinspeed >= 0.05f) {
-            spinspeed = 0.05f;
-            spindirection++;
-        }
-    } else {
-        spinspeed -= 0.0008f;
-
-        if (spinspeed <= -0.05f) {
-            spinspeed = -0.05f;
-            spindirection = 0;
-        }
-    }
-
-    spinangle += spinspeed;
-
-    if (spinangle >= TWO_PI) {
-        spinangle -= TWO_PI;
-    } else if (spinangle < 0.0f) {
-        spinangle += TWO_PI;
-    }
-
-    float shakey = spinspeed * smw->ScreenWidth * sin(spinangle);
-    if (shakey < 0.0f)
-        shakey -= 1.0f;
-
-    x_shake = (short)(spinspeed * smw->ScreenWidth * cos(spinangle));
-    y_shake = (short)(shakey);
-}
-
 //
 // INIT
 //
@@ -615,135 +575,179 @@ void animateDuringCountdown()
 
 void shakeScreen()
 {
-    if (game_values.screenshaketimer > 0) {
-        game_values.screenshaketimer--;
-
-        static bool shakeleft = false;
-        if (shakeleft) {
-            x_shake -= 2;
-            if (x_shake <= -2) {
-                shakeleft = false;
-            }
-        } else {
-            x_shake += 2;
-            if (x_shake >= 2) {
-                shakeleft = true;
-            }
-        }
-
-        //Kill players touching the ground (or in air for MOd blocks)
-        short iNumKillPlayers = 0;
-        CPlayer * pKillPlayers[4];
-
-        CPlayer * killer1 = GetPlayerFromGlobalID(game_values.screenshakeplayerid);
-
-        for (short k = 0; k < list_players_cnt; k++) {
-            CPlayer * player = list_players[k];
-
-            //Don't kill the player that triggered the POW/MOd
-            if (player->globalID == game_values.screenshakeplayerid)
-                continue;
-
-            //Don't kill players on his team either (if friendly fire is off)
-            if (game_values.teamcollision != 2 && game_values.screenshaketeamid == player->teamID)
-                continue;
-
-            //Kill other players
-            if (!player->invincible && player->shield == 0 && player->iKuriboShoe == 0 && player->isready()) {
-                if (game_values.screenshakekillinair == player->inair) {
-                    pKillPlayers[iNumKillPlayers++] = player;
-
-                    if (killer1) {
-                        game_values.screenshakekillscount++;
-
-                        if (killer1->inair)
-                            killer1->killsinrowinair--;  //Don't want to give both shake and in air award
-                    }
-                }
-            }
-        }
-
-        //Randomize the order in which the players are killed (so that game modes where order matters is fair)
-        if (iNumKillPlayers > 0) {
-            short iRandPlayer = RANDOM_INT( iNumKillPlayers);
-            for (short iPlayer = 0; iPlayer < iNumKillPlayers; iPlayer++) {
-                PlayerKilledPlayer(game_values.screenshakeplayerid, pKillPlayers[iRandPlayer], death_style_jump, kill_style_pow, false, false);
-
-                if (++iRandPlayer >= iNumKillPlayers)
-                    iRandPlayer = 0;
-            }
-        }
-
-        //Kill goombas and koopas
-        for (short k = 0; k < objectcontainer[0].list_end; k++) {
-            CObject * object = objectcontainer[0].list[k];
-            if (object->getObjectType() == object_moving) {
-                IO_MovingObject * movingobject = (IO_MovingObject *)object;
-                MovingObjectType type = movingobject->getMovingObjectType();
-
-                if ((type == movingobject_goomba || type == movingobject_koopa || type == movingobject_buzzybeetle || type == movingobject_spiny)
-                        && game_values.screenshakekillinair == movingobject->inair) {
-                    CPlayer * killer = GetPlayerFromGlobalID(game_values.screenshakeplayerid);
-
-                    if (killer) {
-                        if (!game_values.gamemode->gameover)
-                            killer->score->AdjustScore(1);
-
-                        ifSoundOnPlay(rm->sfx_kicksound);
-                        ((MO_WalkingEnemy*)movingobject)->DieAndDropShell(true, true);
-
-                        game_values.screenshakekillscount++;
-
-                        if (killer->inair)
-                            killer->killsinrowinair--;  //Don't want to give both shake and in air award
-                    }
-                }
-            }
-        }
-
-        //Destroy throw blocks and flip shells over
-        for (short k = 0; k < objectcontainer[1].list_end; k++) {
-            CObject * object = objectcontainer[1].list[k];
-            if (object->getObjectType() == object_moving) {
-                IO_MovingObject * movingobject = (IO_MovingObject *)object;
-
-                if (game_values.screenshakekillinair == movingobject->inair) {
-                    if (movingobject->getMovingObjectType() == movingobject_shell) {
-                        CO_Shell * shell = (CO_Shell*)movingobject;
-                        if (shell->frozen || !shell->owner || shell->owner->inair == game_values.screenshakekillinair)
-                            shell->Flip();  //also breaks shells if frozen
-                    } else if (movingobject->getMovingObjectType() == movingobject_throwblock) {
-                        CO_ThrowBlock * throwblock = (CO_ThrowBlock*)movingobject;
-                        if (throwblock->frozen || !throwblock->owner || throwblock->owner->inair == game_values.screenshakekillinair)
-                            throwblock->Die();
-                    } else if (movingobject->getMovingObjectType() == movingobject_throwbox) {
-                        CO_ThrowBox * throwbox = (CO_ThrowBox*)movingobject;
-                        if (throwbox->frozen)
-                            throwbox->Die();
-                    } else if (movingobject->getMovingObjectType() == movingobject_pirhanaplant) {
-                        MO_PirhanaPlant * plant = (MO_PirhanaPlant*)movingobject;
-                        plant->KillPlant();
-                    } else if (movingobject->getMovingObjectType() == movingobject_bulletbill) {
-                        MO_BulletBill * bulletbill = (MO_BulletBill*)movingobject;
-                        bulletbill->Die();
-                    }
-                }
-            }
-        }
-
-        //Add kills in row for kills from pow and mod
-        if (game_values.screenshakekillscount > 1 && game_values.awardstyle != award_style_none) {
-            game_values.screenshakekillscount = 0;
-
-            CPlayer * killer2 = GetPlayerFromGlobalID(game_values.screenshakeplayerid);
-
-            if (killer2)
-                killer2->AddKillsInRowInAirAward();
-        }
-    } else {
+    if (game_values.screenshaketimer <= 0) {
         //Make sure we zero out the shake value after it is done
         x_shake = 0;
+        return;
     }
+
+    game_values.screenshaketimer--;
+
+    static bool shakeleft = false;
+    if (shakeleft) {
+        x_shake -= 2;
+        if (x_shake <= -2) {
+            shakeleft = false;
+        }
+    } else {
+        x_shake += 2;
+        if (x_shake >= 2) {
+            shakeleft = true;
+        }
+    }
+
+    //Kill players touching the ground (or in air for MOd blocks)
+    short iNumKillPlayers = 0;
+    CPlayer * pKillPlayers[4];
+
+    CPlayer * killer1 = GetPlayerFromGlobalID(game_values.screenshakeplayerid);
+
+    for (short k = 0; k < list_players_cnt; k++) {
+        CPlayer * player = list_players[k];
+
+        //Don't kill the player that triggered the POW/MOd
+        if (player->globalID == game_values.screenshakeplayerid)
+            continue;
+
+        //Don't kill players on his team either (if friendly fire is off)
+        if (game_values.teamcollision != 2 && game_values.screenshaketeamid == player->teamID)
+            continue;
+
+        //Kill other players
+        if (!player->invincible && player->shield == 0 && player->iKuriboShoe == 0 && player->isready()) {
+            if (game_values.screenshakekillinair == player->inair) {
+                pKillPlayers[iNumKillPlayers++] = player;
+
+                if (killer1) {
+                    game_values.screenshakekillscount++;
+
+                    if (killer1->inair)
+                        killer1->killsinrowinair--;  //Don't want to give both shake and in air award
+                }
+            }
+        }
+    }
+
+    //Randomize the order in which the players are killed (so that game modes where order matters is fair)
+    if (iNumKillPlayers > 0) {
+        short iRandPlayer = RANDOM_INT( iNumKillPlayers);
+        for (short iPlayer = 0; iPlayer < iNumKillPlayers; iPlayer++) {
+            PlayerKilledPlayer(game_values.screenshakeplayerid, pKillPlayers[iRandPlayer], death_style_jump, kill_style_pow, false, false);
+
+            if (++iRandPlayer >= iNumKillPlayers)
+                iRandPlayer = 0;
+        }
+    }
+
+    //Kill goombas and koopas
+    for (short k = 0; k < objectcontainer[0].list_end; k++) {
+        CObject * object = objectcontainer[0].list[k];
+        if (object->getObjectType() == object_moving) {
+            IO_MovingObject * movingobject = (IO_MovingObject *)object;
+            MovingObjectType type = movingobject->getMovingObjectType();
+
+            if ((type == movingobject_goomba || type == movingobject_koopa || type == movingobject_buzzybeetle || type == movingobject_spiny)
+                    && game_values.screenshakekillinair == movingobject->inair) {
+                CPlayer * killer = GetPlayerFromGlobalID(game_values.screenshakeplayerid);
+
+                if (killer) {
+                    if (!game_values.gamemode->gameover)
+                        killer->score->AdjustScore(1);
+
+                    ifSoundOnPlay(rm->sfx_kicksound);
+                    ((MO_WalkingEnemy*)movingobject)->DieAndDropShell(true, true);
+
+                    game_values.screenshakekillscount++;
+
+                    if (killer->inair)
+                        killer->killsinrowinair--;  //Don't want to give both shake and in air award
+                }
+            }
+        }
+    }
+
+    //Destroy throw blocks and flip shells over
+    for (short k = 0; k < objectcontainer[1].list_end; k++) {
+        CObject * object = objectcontainer[1].list[k];
+        if (object->getObjectType() == object_moving) {
+            IO_MovingObject * movingobject = (IO_MovingObject *)object;
+
+            if (game_values.screenshakekillinair == movingobject->inair) {
+                if (movingobject->getMovingObjectType() == movingobject_shell) {
+                    CO_Shell * shell = (CO_Shell*)movingobject;
+                    if (shell->frozen || !shell->owner || shell->owner->inair == game_values.screenshakekillinair)
+                        shell->Flip();  //also breaks shells if frozen
+                } else if (movingobject->getMovingObjectType() == movingobject_throwblock) {
+                    CO_ThrowBlock * throwblock = (CO_ThrowBlock*)movingobject;
+                    if (throwblock->frozen || !throwblock->owner || throwblock->owner->inair == game_values.screenshakekillinair)
+                        throwblock->Die();
+                } else if (movingobject->getMovingObjectType() == movingobject_throwbox) {
+                    CO_ThrowBox * throwbox = (CO_ThrowBox*)movingobject;
+                    if (throwbox->frozen)
+                        throwbox->Die();
+                } else if (movingobject->getMovingObjectType() == movingobject_pirhanaplant) {
+                    MO_PirhanaPlant * plant = (MO_PirhanaPlant*)movingobject;
+                    plant->KillPlant();
+                } else if (movingobject->getMovingObjectType() == movingobject_bulletbill) {
+                    MO_BulletBill * bulletbill = (MO_BulletBill*)movingobject;
+                    bulletbill->Die();
+                }
+            }
+        }
+    }
+
+    //Add kills in row for kills from pow and mod
+    if (game_values.screenshakekillscount > 1 && game_values.awardstyle != award_style_none) {
+        game_values.screenshakekillscount = 0;
+
+        CPlayer * killer2 = GetPlayerFromGlobalID(game_values.screenshakeplayerid);
+
+        if (killer2)
+            killer2->AddKillsInRowInAirAward();
+    }
+}
+
+//Move the screen in a small circle
+void GameplayState::spinScreen()
+{
+    if (!game_values.spinscreen)
+        return;
+
+    if (spindirection == 0 || spindirection == 2) {
+        if (++spintimer >= 300) {
+            spindirection++;
+            spintimer = 0;
+        }
+    } else if (spindirection == 1) {
+        spinspeed += 0.0008f;
+
+        if (spinspeed >= 0.05f) {
+            spinspeed = 0.05f;
+            spindirection++;
+        }
+    } else {
+        spinspeed -= 0.0008f;
+
+        if (spinspeed <= -0.05f) {
+            spinspeed = -0.05f;
+            spindirection = 0;
+        }
+    }
+
+    spinangle += spinspeed;
+
+    if (spinangle >= TWO_PI) {
+        spinangle -= TWO_PI;
+    } else if (spinangle < 0.0f) {
+        spinangle += TWO_PI;
+    }
+
+    float shakey = spinspeed * smw->ScreenWidth * sin(spinangle);
+    if (shakey < 0.0f)
+        shakey -= 1.0f;
+
+    x_shake = (short)(spinspeed * smw->ScreenWidth * cos(spinangle));
+    y_shake = (short)(shakey);
 }
 
 void handleP2PCollisions()
@@ -757,6 +761,7 @@ void handleP2PCollisions()
                 CPlayer * player2 = list_players[j];
                 if (player2->state > player_dead) {
                     if (coldec_player2player(player1, player2)) {
+                        printf("P2P collision\n");
                         collisionhandler_p2p(player1, player2);
 
                         //if player was killed by another player, continue with next player for collision detection
@@ -2221,10 +2226,7 @@ void GameplayState::update()
                 //Shake screen
 
                 shakeScreen();
-
-                if (game_values.spinscreen) {
-                    SpinScreen();
-                }
+                spinScreen();
 
                 for (short iPlayer = 0; iPlayer < 4; iPlayer++) {
                     if (game_values.bulletbilltimer[iPlayer] > 0) {
