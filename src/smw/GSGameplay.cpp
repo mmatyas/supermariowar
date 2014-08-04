@@ -2098,6 +2098,40 @@ void GameplayState::update()
     for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++)
         list_players[iPlayer]->Init();
 
+    if (netplay.active) {
+        netplay.client.update();
+
+        if (previous_playerKeys != *current_playerKeys) {
+            netplay.client.sendLocalInput();
+            previous_playerKeys = *current_playerKeys;
+        }
+
+        // TODO: Move this to update()?
+        // The host sends the game state to clients,
+        // Players send input to game host
+        if (netplay.theHostIsMe) {
+            netplay.client.local_gamehost.sendCurrentGameState();
+        }
+        else
+        {
+            if (netplay.gamestate_buffer.size() > 0)
+            {
+                Net_GameplayState currect_state = netplay.gamestate_buffer.front();
+                netplay.gamestate_buffer.pop_front();
+                for (unsigned short p = 0; p < list_players_cnt; p++) {
+                    list_players[p]->fx = currect_state.player_coords[p].x;
+                    list_players[p]->fy = currect_state.player_coords[p].y;
+                    list_players[p]->velx = currect_state.player_coords[p].xvel;
+                    list_players[p]->vely = currect_state.player_coords[p].yvel;
+                    netplay.netPlayerInput.outputControls[p] = currect_state.player_input[p];
+                }
+            }
+            else {
+                printf("[] GameStateBuffer size = 0\n");
+            }
+        }
+    }
+
     //printf("[%d;%d]\n", current_playerKeys->keys[0].fDown, current_playerKeys->keys[0].fPressed);
     //printf("%d -> %f\n", list_players[0]->ix, list_players[0]->fx);
 
@@ -2286,6 +2320,7 @@ void GameplayState::update()
             }
         }
     }
+
 
     if (updateExitPause(iCountDownState)) {
         if (netplay.active)
