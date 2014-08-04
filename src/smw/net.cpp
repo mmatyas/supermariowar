@@ -581,6 +581,10 @@ void NetClient::handleP2PCollision(const uint8_t* data, size_t dataLength)
     assert(event.player_id[1] < 4);
     event.player_coords[0] = pkg.player_coords[0];
     event.player_coords[1] = pkg.player_coords[1];
+    event.oldX[0] = pkg.oldX[0];
+    event.oldX[1] = pkg.oldX[1];
+    event.oldY[0] = pkg.oldY[0];
+    event.oldY[1] = pkg.oldY[1];
 
     netplay.p2pcollision_buffer.push_back(event);
 }
@@ -1120,6 +1124,7 @@ void NetGameHost::sendP2PCollision(const CPlayer& first, const CPlayer& second)
     Net_P2PCollisionEventPackage pkg(first.globalID, second.globalID);
     pkg.setCoords(first.fx, first.fy, second.fx, second.fy);
     pkg.setVelocities(first.velx, first.vely, second.velx, second.vely);
+    pkg.setOldXY(first.fOldX, first.fOldY, second.fOldX, second.fOldY);
 
     sendMessageToMyPeers(&pkg, sizeof(Net_P2PCollisionEventPackage));
 }

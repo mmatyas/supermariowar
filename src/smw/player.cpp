@@ -2251,20 +2251,27 @@ bool CPlayer::isstomping(CPlayer * o)
     printf("if (fOldY + PH <= o->fOldY && iy + PH >= o->iy) {\n");
     printf("if (%f <= %f && %f >= %f)\n", fOldY + PH, o->fOldY, iy + PH, o->iy);
     if (fOldY + PH <= o->fOldY && iy + PH >= o->iy) {
+        printf("|  stomping\n");
         //don't reposition if player is warping when he kills the other player
         if (state == player_ready) {
+            printf("|  state == player_ready\n");
             setYi(o->iy - PH);		//set new position to top of other player
             collision_detection_checktop();
             platform = NULL;
         }
 
         bool fKillPotential = false;
-        if (vely > 1.0f && o->shield == 0)
+        if (vely > 1.0f && o->shield == 0) {
+            printf("|  vely > 1.0f && o->shield == 0\n");
             fKillPotential = true;
+        }
+
+        printf("|  fKillPotential = %s\n", fKillPotential ? "true" : "false");
 
         bouncejump();
 
         if (fKillPotential) {
+            printf("|    fKillPotential!\n");
             killstyle style = kill_style_stomp;
             if (flying)
                 style = kill_style_pwings;
@@ -2275,8 +2282,10 @@ bool CPlayer::isstomping(CPlayer * o)
             else if (extrajumps > 0)
                 style = kill_style_feather;
 
+            printf("|    PlayerKilledPlayer\n");
             PlayerKilledPlayer(this, o, death_style_squish, style, false, false);
         } else {
+            printf("|    nincs fKillPotential\n");
             if (game_values.gamemode->gamemode == game_mode_tag)
                 TransferTag(o, this);
 
@@ -2287,9 +2296,11 @@ bool CPlayer::isstomping(CPlayer * o)
             iSuicideCreditTimer = 20;
         }
 
+        printf("return true\n");
         return true;
     }
 
+    printf("return false\n");
     return false;
 }
 

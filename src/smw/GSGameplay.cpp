@@ -801,6 +801,8 @@ void handleNetworkP2PCollisions()
 
             float p1_coords_backup[4];
             float p2_coords_backup[4];
+            float p1_oldXY[2];
+            float p2_oldXY[2];
 
             // TODO: Consider stack push/pop
 
@@ -809,22 +811,30 @@ void handleNetworkP2PCollisions()
             p1_coords_backup[1] = player1.fy;
             p1_coords_backup[2] = player1.velx;
             p1_coords_backup[3] = player1.vely;
+            p1_oldXY[0] = player1.fOldX;
+            p1_oldXY[0] = player1.fOldY;
 
             p2_coords_backup[0] = player2.fx;
             p2_coords_backup[1] = player2.fy;
             p2_coords_backup[2] = player2.velx;
             p2_coords_backup[3] = player2.vely;
+            p2_oldXY[1] = player2.fOldX;
+            p2_oldXY[1] = player2.fOldY;
 
             // Set collision position
             player1.fx = collevent.player_coords[0].x;
             player1.fy = collevent.player_coords[0].y;
             player1.velx = collevent.player_coords[0].xvel;
             player1.vely = collevent.player_coords[0].yvel;
+            player1.fOldX = collevent.oldX[0];
+            player1.fOldY = collevent.oldY[0];
 
             player2.fx = collevent.player_coords[1].x;
             player2.fy = collevent.player_coords[1].y;
             player2.velx = collevent.player_coords[1].xvel;
             player2.vely = collevent.player_coords[1].yvel;
+            player2.fOldX = collevent.oldX[1];
+            player2.fOldY = collevent.oldY[1];
 
             // Collide
             collisionhandler_p2p(&player1, &player2);
@@ -834,11 +844,15 @@ void handleNetworkP2PCollisions()
             player1.fy = p1_coords_backup[1];
             player1.velx = p1_coords_backup[2];
             player1.vely = p1_coords_backup[3];
+            player1.fOldX = p1_oldXY[0];
+            player1.fOldY = p1_oldXY[0];
 
             player2.fx = p2_coords_backup[0];
             player2.fy = p2_coords_backup[1];
             player2.velx = p2_coords_backup[2];
             player2.vely = p2_coords_backup[3];
+            player2.fOldX = p2_oldXY[1];
+            player2.fOldY = p2_oldXY[1];
         }
     }
 }

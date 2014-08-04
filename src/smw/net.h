@@ -240,6 +240,9 @@ enum NetworkState {
     PLAYING
 };
 
+
+// TODO: These packages shouldn't be necessary
+
 struct Net_GameplayState {
     Net_PlayerCoords player_coords[4];
     COutputControl player_input[4];
@@ -248,6 +251,8 @@ struct Net_GameplayState {
 struct Net_P2PCollisionEvent {
     uint8_t player_id[2];
     Net_PlayerCoords player_coords[2];
+    float oldX[2];
+    float oldY[2];
 
     Net_P2PCollisionEvent(uint8_t first, uint8_t second) {
         player_id[0] = first;

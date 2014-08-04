@@ -311,6 +311,8 @@ struct Net_GameStatePackage : Net_MessageHeader {
 struct Net_P2PCollisionEventPackage : Net_MessageHeader {
     uint8_t player_id[2];
     Net_PlayerCoords player_coords[2]; // player position and vector at the moment of collision
+    float oldX[2];
+    float oldY[2];
 
     Net_P2PCollisionEventPackage(uint8_t firstID, uint8_t secondID)
         : Net_MessageHeader(NET_G2P_P2P_COLLISION_EVENT)
@@ -344,6 +346,13 @@ struct Net_P2PCollisionEventPackage : Net_MessageHeader {
         player_coords[0].yvel = p1_yvel;
         player_coords[1].xvel = p2_xvel;
         player_coords[1].yvel = p2_yvel;
+    }
+
+    void setOldXY(float p1_oldx, float p1_oldy, float p2_oldx, float p2_oldy) {
+        oldX[0] = p1_oldx;
+        oldY[0] = p1_oldy;
+        oldX[1] = p2_oldx;
+        oldY[1] = p2_oldy;
     }
 };
 
