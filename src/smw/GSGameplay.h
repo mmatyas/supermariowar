@@ -25,6 +25,8 @@ class GameplayState : public GameState
         void initRunGame();
         void CleanDeadPlayers();
 
+        void handleInput();
+
         void drawFrontLayer();
         void drawBackLayer();
         void drawMiddleLayer();

@@ -1835,6 +1835,171 @@ void GameplayState::onEnterState()
 #endif
 }
 
+void GameplayState::handleInput()
+{
+    game_values.playerInput.ClearPressedKeys(game_values.exitinggame ? 1 : 0);
+    netplay.netPlayerInput.ClearPressedKeys(game_values.exitinggame ? 1 : 0);
+    //handle messages
+
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        switch (event.type) {
+#ifndef _XBOX
+        case SDL_QUIT: {
+            CleanUp();
+            game_values.gamestate = GS_QUIT;
+            return;
+        }
+        break;
+#endif
+        case SDL_KEYDOWN: {
+#ifndef _XBOX
+            if (event.key.keysym.mod & (KMOD_LALT | KMOD_RALT)) {
+                if (event.key.keysym.sym == SDLK_F4) {
+                    CleanUp();
+                    game_values.gamestate = GS_QUIT;
+                    return;
+                } else if (event.key.keysym.sym == SDLK_RETURN) {
+                    game_values.fullscreen = !game_values.fullscreen;
+                    gfx_setresolution(smw->ScreenWidth, smw->ScreenHeight, game_values.fullscreen);
+                    blitdest = screen;
+
+                    MenuState::instance().miFullscreenField->SetKey(game_values.fullscreen ? 1 : 0);
+
+                    //Continue with input -> don't feed this event to the input
+                    //otherwise it will pause the game when switching to full/windowed screen
+                    continue;
+                }
+            }
+#endif
+            if (event.key.keysym.sym == SDLK_F1) {
+                game_values.showfps = !game_values.showfps;
+            } else if (event.key.keysym.sym == SDLK_ESCAPE) {
+                game_values.playerInput.outputControls[0].game_cancel.fPressed = true;
+            } else if (event.key.keysym.sym == SDLK_TAB) {
+                PlayNextMusicTrack();
+            }
+#ifdef _DEBUG
+            else if (event.key.keysym.sym == SDLK_LEFTBRACKET) {
+                game_values.framelimiter++;
+            } else if (event.key.keysym.sym == SDLK_RIGHTBRACKET) {
+                if (game_values.framelimiter > 0)
+                    game_values.framelimiter--;
+            } else if (event.key.keysym.sym == SDLK_F2) {
+                game_values.frameadvance = !game_values.frameadvance;
+            } else if (event.key.keysym.sym == SDLK_F5) {
+                game_values.autokill = !game_values.autokill;
+            } else if (event.key.keysym.sym == SDLK_z) {
+                for (short k = 0; k < list_players_cnt; k++) {
+                    list_players[k]->DeathAwards();
+
+                    if (game_values.gamemode->playerkilledself(*(list_players[k]), kill_style_environment) == player_kill_normal)
+                        list_players[k]->die(0, false, false);
+                }
+            } else if (event.key.keysym.sym == SDLK_x) {
+                short iplayer = RANDOM_INT(list_players_cnt);
+                list_players[iplayer]->makefrozen(300);
+            } else if (event.key.keysym.sym == SDLK_c) {
+                short iplayer = RANDOM_INT(list_players_cnt);
+                list_players[iplayer]->shield = RANDOM_INT(3) + 1;
+                list_players[iplayer]->shieldtimer = 620;
+            } else if (event.key.keysym.sym == SDLK_1) {
+                if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
+                    objectcontainer[0].add(new PU_IceWandPowerup(&rm->spr_icewandpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, 0, 30, 30, 1, 1));
+                else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
+                    objectcontainer[0].add(new PU_BobombPowerup(&rm->spr_bobombpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));
+                else
+                    objectcontainer[0].add(new PU_StarPowerup(&rm->spr_starpowerup, list_players[0]->ix + 32, list_players[0]->iy, 4, true, 2, 30, 30, 1, 1));
+            } else if (event.key.keysym.sym == SDLK_2) {
+                if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
+                    objectcontainer[0].add(new PU_BombPowerup(&rm->spr_bombpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, 0, 30, 30, 1, 1));
+                else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
+                    objectcontainer[0].add(new PU_PowPowerup(&rm->spr_powpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 8, true, 8, 30, 30, 1, 1));
+                else
+                    objectcontainer[0].add(new PU_ExtraGuyPowerup(&rm->spr_1uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1, 1));
+            } else if (event.key.keysym.sym == SDLK_3) {
+                if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
+                    objectcontainer[0].add(new PU_PodoboPowerup(&rm->spr_podobopowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, 0, 30, 30, 1, 1));
+                else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
+                    objectcontainer[0].add(new PU_BulletBillPowerup(&rm->spr_bulletbillpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));
+                else
+                    objectcontainer[0].add(new PU_ExtraGuyPowerup(&rm->spr_2uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1, 2));
+            } else if (event.key.keysym.sym == SDLK_4) {
+                if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
+                    objectcontainer[0].add(new PU_Tanooki(list_players[0]->ix + 32, list_players[0]->iy));
+                else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
+                    objectcontainer[1].add(new CO_Shell(0, list_players[0]->ix + 32, list_players[0]->iy, true, true, true, false));
+                else
+                    objectcontainer[0].add(new PU_ExtraGuyPowerup(&rm->spr_3uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1, 3));
+            } else if (event.key.keysym.sym == SDLK_5) {
+                if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
+                    objectcontainer[0].add(new PU_PWingsPowerup(&rm->spr_pwingspowerup, list_players[0]->ix + 32, list_players[0]->iy));
+                else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
+                    objectcontainer[1].add(new CO_Shell(1, list_players[0]->ix + 32, list_players[0]->iy, false, true, true, false));
+                else
+                    objectcontainer[0].add(new PU_ExtraGuyPowerup(&rm->spr_5uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1, 5));
+            } else if (event.key.keysym.sym == SDLK_6) {
+                if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
+                    objectcontainer[1].add(new CO_Spring(&rm->spr_spring, list_players[0]->ix + 32, list_players[0]->iy, true));
+                else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
+                    objectcontainer[1].add(new CO_Shell(2, list_players[0]->ix + 32, list_players[0]->iy, false, false, true, true));
+                else
+                    objectcontainer[0].add(new PU_FirePowerup(&rm->spr_firepowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1));
+            } else if (event.key.keysym.sym == SDLK_7) {
+                if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
+                    objectcontainer[1].add(new CO_ThrowBox(&rm->spr_throwbox, list_players[0]->ix + 32, list_players[0]->iy, (RANDOM_INT(NUM_POWERUPS) + 3) - 3));
+                else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
+                    objectcontainer[1].add(new CO_Shell(3, list_players[0]->ix + 32, list_players[0]->iy, false, true, false, false));
+                else
+                    objectcontainer[0].add(new PU_HammerPowerup(&rm->spr_hammerpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1));
+            } else if (event.key.keysym.sym == SDLK_8) {
+                if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
+                    objectcontainer[1].add(new CO_Spike(&rm->spr_spike, list_players[0]->ix + 32, list_players[0]->iy));
+                else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
+                    objectcontainer[0].add(new PU_ModPowerup(&rm->spr_modpowerup, list_players[0]->ix + 32, list_players[0]->iy, 8, true, 8, 30, 30, 1, 1));
+                else
+                    objectcontainer[0].add(new PU_PoisonPowerup(&rm->spr_poisonpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1));
+            } else if (event.key.keysym.sym == SDLK_9) {
+                if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
+                    objectcontainer[1].add(new CO_KuriboShoe(&rm->spr_kuriboshoe, list_players[0]->ix + 32, list_players[0]->iy, true));
+                else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
+                    objectcontainer[0].add(new PU_FeatherPowerup(&rm->spr_featherpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, 0, 30, 30, 1, 1));
+                else
+                    objectcontainer[0].add(new PU_ClockPowerup(&rm->spr_clockpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));
+            } else if (event.key.keysym.sym == SDLK_0) {
+                if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
+                    objectcontainer[0].add(new PU_LeafPowerup(&rm->spr_leafpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, 0, 30, 30, 1, 1));
+                else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
+                    objectcontainer[0].add(new PU_BoomerangPowerup(&rm->spr_boomerangpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));
+                else
+                    objectcontainer[0].add(new PU_MysteryMushroomPowerup(&rm->spr_mysterymushroompowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));
+            } else if (event.key.keysym.sym == SDLK_INSERT) {
+                g_fAutoTest = !g_fAutoTest;
+            }
+#endif
+            break;
+        }
+
+#ifdef _XBOX
+        case SDL_JOYBUTTONDOWN: {
+            if (event.jbutton.state == SDL_PRESSED && event.jbutton.button == 5) {
+                PlayNextMusicTrack();
+            }
+
+            break;
+        }
+#endif
+
+        default:
+            break;
+        }
+
+        //Feed the player control structures with input data
+        //Use menu controls when exit game dialog is up
+        game_values.playerInput.Update(event, (game_values.exitinggame ? 1 : 0));
+    }
+}
+
 void GameplayState::update()
 {
     for (short iTeam = 0; iTeam < score_cnt; iTeam++) {
@@ -2032,167 +2197,7 @@ void GameplayState::update()
 
 #endif
 
-    game_values.playerInput.ClearPressedKeys(game_values.exitinggame ? 1 : 0);
-    netplay.netPlayerInput.ClearPressedKeys(game_values.exitinggame ? 1 : 0);
-    //handle messages
-
-    SDL_Event event;
-    while (SDL_PollEvent(&event)) {
-        switch (event.type) {
-#ifndef _XBOX
-        case SDL_QUIT: {
-            CleanUp();
-            game_values.gamestate = GS_QUIT;
-            return;
-        }
-        break;
-#endif
-        case SDL_KEYDOWN: {
-#ifndef _XBOX
-            if (event.key.keysym.mod & (KMOD_LALT | KMOD_RALT)) {
-                if (event.key.keysym.sym == SDLK_F4) {
-                    CleanUp();
-                    game_values.gamestate = GS_QUIT;
-                    return;
-                } else if (event.key.keysym.sym == SDLK_RETURN) {
-                    game_values.fullscreen = !game_values.fullscreen;
-                    gfx_setresolution(smw->ScreenWidth, smw->ScreenHeight, game_values.fullscreen);
-                    blitdest = screen;
-
-                    MenuState::instance().miFullscreenField->SetKey(game_values.fullscreen ? 1 : 0);
-
-                    //Continue with input -> don't feed this event to the input
-                    //otherwise it will pause the game when switching to full/windowed screen
-                    continue;
-                }
-            }
-#endif
-            if (event.key.keysym.sym == SDLK_F1) {
-                game_values.showfps = !game_values.showfps;
-            } else if (event.key.keysym.sym == SDLK_ESCAPE) {
-                game_values.playerInput.outputControls[0].game_cancel.fPressed = true;
-            } else if (event.key.keysym.sym == SDLK_TAB) {
-                PlayNextMusicTrack();
-            }
-#ifdef _DEBUG
-            else if (event.key.keysym.sym == SDLK_LEFTBRACKET) {
-                game_values.framelimiter++;
-            } else if (event.key.keysym.sym == SDLK_RIGHTBRACKET) {
-                if (game_values.framelimiter > 0)
-                    game_values.framelimiter--;
-            } else if (event.key.keysym.sym == SDLK_F2) {
-                game_values.frameadvance = !game_values.frameadvance;
-            } else if (event.key.keysym.sym == SDLK_F5) {
-                game_values.autokill = !game_values.autokill;
-            } else if (event.key.keysym.sym == SDLK_z) {
-                for (short k = 0; k < list_players_cnt; k++) {
-                    list_players[k]->DeathAwards();
-
-                    if (game_values.gamemode->playerkilledself(*(list_players[k]), kill_style_environment) == player_kill_normal)
-                        list_players[k]->die(0, false, false);
-                }
-            } else if (event.key.keysym.sym == SDLK_x) {
-                short iplayer = RANDOM_INT(list_players_cnt);
-                list_players[iplayer]->makefrozen(300);
-            } else if (event.key.keysym.sym == SDLK_c) {
-                short iplayer = RANDOM_INT(list_players_cnt);
-                list_players[iplayer]->shield = RANDOM_INT(3) + 1;
-                list_players[iplayer]->shieldtimer = 620;
-            } else if (event.key.keysym.sym == SDLK_1) {
-                if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                    objectcontainer[0].add(new PU_IceWandPowerup(&rm->spr_icewandpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, 0, 30, 30, 1, 1));
-                else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                    objectcontainer[0].add(new PU_BobombPowerup(&rm->spr_bobombpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));
-                else
-                    objectcontainer[0].add(new PU_StarPowerup(&rm->spr_starpowerup, list_players[0]->ix + 32, list_players[0]->iy, 4, true, 2, 30, 30, 1, 1));
-            } else if (event.key.keysym.sym == SDLK_2) {
-                if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                    objectcontainer[0].add(new PU_BombPowerup(&rm->spr_bombpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, 0, 30, 30, 1, 1));
-                else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                    objectcontainer[0].add(new PU_PowPowerup(&rm->spr_powpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 8, true, 8, 30, 30, 1, 1));
-                else
-                    objectcontainer[0].add(new PU_ExtraGuyPowerup(&rm->spr_1uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1, 1));
-            } else if (event.key.keysym.sym == SDLK_3) {
-                if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                    objectcontainer[0].add(new PU_PodoboPowerup(&rm->spr_podobopowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, 0, 30, 30, 1, 1));
-                else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                    objectcontainer[0].add(new PU_BulletBillPowerup(&rm->spr_bulletbillpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));
-                else
-                    objectcontainer[0].add(new PU_ExtraGuyPowerup(&rm->spr_2uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1, 2));
-            } else if (event.key.keysym.sym == SDLK_4) {
-                if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                    objectcontainer[0].add(new PU_Tanooki(list_players[0]->ix + 32, list_players[0]->iy));
-                else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                    objectcontainer[1].add(new CO_Shell(0, list_players[0]->ix + 32, list_players[0]->iy, true, true, true, false));
-                else
-                    objectcontainer[0].add(new PU_ExtraGuyPowerup(&rm->spr_3uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1, 3));
-            } else if (event.key.keysym.sym == SDLK_5) {
-                if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                    objectcontainer[0].add(new PU_PWingsPowerup(&rm->spr_pwingspowerup, list_players[0]->ix + 32, list_players[0]->iy));
-                else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                    objectcontainer[1].add(new CO_Shell(1, list_players[0]->ix + 32, list_players[0]->iy, false, true, true, false));
-                else
-                    objectcontainer[0].add(new PU_ExtraGuyPowerup(&rm->spr_5uppowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1, 5));
-            } else if (event.key.keysym.sym == SDLK_6) {
-                if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                    objectcontainer[1].add(new CO_Spring(&rm->spr_spring, list_players[0]->ix + 32, list_players[0]->iy, true));
-                else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                    objectcontainer[1].add(new CO_Shell(2, list_players[0]->ix + 32, list_players[0]->iy, false, false, true, true));
-                else
-                    objectcontainer[0].add(new PU_FirePowerup(&rm->spr_firepowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1));
-            } else if (event.key.keysym.sym == SDLK_7) {
-                if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                    objectcontainer[1].add(new CO_ThrowBox(&rm->spr_throwbox, list_players[0]->ix + 32, list_players[0]->iy, (RANDOM_INT(NUM_POWERUPS) + 3) - 3));
-                else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                    objectcontainer[1].add(new CO_Shell(3, list_players[0]->ix + 32, list_players[0]->iy, false, true, false, false));
-                else
-                    objectcontainer[0].add(new PU_HammerPowerup(&rm->spr_hammerpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1));
-            } else if (event.key.keysym.sym == SDLK_8) {
-                if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                    objectcontainer[1].add(new CO_Spike(&rm->spr_spike, list_players[0]->ix + 32, list_players[0]->iy));
-                else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                    objectcontainer[0].add(new PU_ModPowerup(&rm->spr_modpowerup, list_players[0]->ix + 32, list_players[0]->iy, 8, true, 8, 30, 30, 1, 1));
-                else
-                    objectcontainer[0].add(new PU_PoisonPowerup(&rm->spr_poisonpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, true, 0, 30, 30, 1, 1));
-            } else if (event.key.keysym.sym == SDLK_9) {
-                if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                    objectcontainer[1].add(new CO_KuriboShoe(&rm->spr_kuriboshoe, list_players[0]->ix + 32, list_players[0]->iy, true));
-                else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                    objectcontainer[0].add(new PU_FeatherPowerup(&rm->spr_featherpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, 0, 30, 30, 1, 1));
-                else
-                    objectcontainer[0].add(new PU_ClockPowerup(&rm->spr_clockpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));
-            } else if (event.key.keysym.sym == SDLK_0) {
-                if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
-                    objectcontainer[0].add(new PU_LeafPowerup(&rm->spr_leafpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, 0, 30, 30, 1, 1));
-                else if (event.key.keysym.mod & (KMOD_LSHIFT | KMOD_RSHIFT))
-                    objectcontainer[0].add(new PU_BoomerangPowerup(&rm->spr_boomerangpowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));
-                else
-                    objectcontainer[0].add(new PU_MysteryMushroomPowerup(&rm->spr_mysterymushroompowerup, list_players[0]->ix + 32, list_players[0]->iy - 1, 1, true, 0, 30, 30, 1, 1));
-            } else if (event.key.keysym.sym == SDLK_INSERT) {
-                g_fAutoTest = !g_fAutoTest;
-            }
-#endif
-            break;
-        }
-
-#ifdef _XBOX
-        case SDL_JOYBUTTONDOWN: {
-            if (event.jbutton.state == SDL_PRESSED && event.jbutton.button == 5) {
-                PlayNextMusicTrack();
-            }
-
-            break;
-        }
-#endif
-
-        default:
-            break;
-        }
-
-        //Feed the player control structures with input data
-        //Use menu controls when exit game dialog is up
-        game_values.playerInput.Update(event, (game_values.exitinggame ? 1 : 0));
-    }
+    handleInput();
 
     if (updateExitPause(iCountDownState)) {
         if (netplay.active)
