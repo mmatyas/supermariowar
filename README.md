@@ -34,7 +34,7 @@ The game uses artwork and sounds from Nintendo games. We hope that this noncomme
 ### Requirements
 
 - cmake
-- SDL 1.2 or 2.0, with
+- SDL (1.2 or 2.0), with
     - SDL_image
     - SDL_mixer
 - ENet (optional)
@@ -51,31 +51,19 @@ For other systems, you can download the development files manually from:
 
 ### Linux
 
-Enter the build directory, run cmake, then make and finally you can use the binary smw in Build/Binaries directories.
+Create a build directory and run cmake there. Then simply call make every time you want to build. The binaries will be generated in ./Build/Binaries.
 
 ```sh
-$ mkdir Build
-$ cd Build && cmake .. && make -j5
-$ Binaries/smw ../data_full
+$ mkdir Build && cd Build && cmake ..
+$ make -j4 # -jN = build on N threads
+$ Binaries/smw ../data
 ```
 
-If you have troubles at compiling you might want to use instead:
-
-```sh
-$ VERBOSE=1 make -j5
-```
-
-To compile with debugging symbols, enable the relative option:
-
-```sh
-$ cd Build && cmake -DDEBUG=ON .. && make -j5
-$ gdb Binaries/smw
-gdb> run ../data
-```
+For more settings, please see the *Build configuration* chapter.
 
 ### Windows
 
-Note: You can use MinGW and MinGW Shell/Cygwin for compiling too.
+Note: You can use MinGW + MinGW Shell or Cygwin for building too.
 
 Visual Studio:
 
@@ -89,7 +77,7 @@ Visual Studio:
 ### ASM.JS
 
 SMW can be build to run in your browser. For this, you need
-emscripten with the special LLVM backend, and clang.
+emscripten with the special LLVM backend, and Clang.
 See [here](https://github.com/kripken/emscripten/wiki/LLVM-Backend) for more information.
 
 You can prepare a build directory with the following commands:
@@ -104,15 +92,15 @@ Then build with:
 
 ```sh
 $ emmake make
-$ emcc Binaries/smw.bc -o smw.html -O3 -v --preload-file data -s OUTLINING_LIMIT=60000 -s ALLOW_MEMORY_GROWTH=1
-$ emcc Binaries/leveledit.bc -o leveledit.html -O3 -v --preload-file data -s OUTLINING_LIMIT=60000 -s ALLOW_MEMORY_GROWTH=1
-$ emcc Binaries/worldedit.bc -o worldedit.html -O3 -v --preload-file data -s OUTLINING_LIMIT=60000 -s ALLOW_MEMORY_GROWTH=1
+$ BUILDPARAMS="-O3 -v --preload-file data -s OUTLINING_LIMIT=60000 -s ALLOW_MEMORY_GROWTH=1"
+$ emcc Binaries/smw.bc -o smw.html $BUILDPARAMS
+$ emcc Binaries/leveledit.bc -o leveledit.html $BUILDPARAMS
+$ emcc Binaries/worldedit.bc -o worldedit.html $BUILDPARAMS
 ```
 
-### Compilation options
+### Build configuration
 
-To set build options you can use `cmake-gui`.
-Alternatively, open CMakeLists.txt to see what options are available, they are described on the beginning the file.
+You can change the bild setting by setting various CMake flags. The simplest way to do this is by running `cmake-gui ..` from the Build directory. You can read a short description of an element by hovering the mouse on its name.
 
 ## How to play
 
