@@ -59,11 +59,19 @@ $ make -j4 # -jN = build on N threads
 $ Binaries/smw ../data
 ```
 
-For more settings, please see the *Build configuration* chapter.
+Currently, the following separate build targets are defined for `make`:
+
+- smw
+- leveleditor
+- worldeditor
+
+If you prefer to work within an IDE (like CodeBlocks), you can also generate project files using CMake.
+
+You can find more information in *Build configuration*.
 
 ### Windows
 
-Note: You can use MinGW + MinGW Shell or Cygwin for building too.
+On Windows, you can follow the Linux guide using environments like MinGW + MinGW Shell and Cygwin, or generate a project file with CMake for your IDE.
 
 Visual Studio:
 
@@ -78,7 +86,7 @@ Visual Studio:
 
 SMW can be build to run in your browser. For this, you need
 emscripten with the special LLVM backend, and Clang.
-See [here](https://github.com/kripken/emscripten/wiki/LLVM-Backend) for more information.
+See [here](https://kripken.github.io/emscripten-site/docs/building_from_source/LLVM-Backend.html) for more information.
 
 You can prepare a build directory with the following commands:
 
@@ -100,7 +108,9 @@ $ emcc Binaries/worldedit.bc -o worldedit.html $BUILDPARAMS
 
 ### Build configuration
 
-You can change the bild setting by setting various CMake flags. The simplest way to do this is by running `cmake-gui ..` from the Build directory. You can read a short description of an element by hovering the mouse on its name.
+You can change the build setting by setting various CMake flags. The simplest way to do this is by running `cmake-gui ..` from the Build directory. You can read a short description of an element by hovering the mouse on its name.
+
+Alternatively, you can pass the options directly to CMake as `-DFLAGNAME=VALUE` (eg. `cmake .. -DUSE_SDL2_LIBS=1`).
 
 ## How to play
 
