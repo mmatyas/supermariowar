@@ -223,7 +223,7 @@ struct Net_RawInput {
     void getPlayerKey(uint8_t keyNum, bool& down, bool& pressed) {
         assert(keyNum < 8);
         down = (flags & (1 << (keyNum << 1)));
-        pressed = (flags & (1 << (keyNum << 1)));
+        pressed = (flags & (1 << ((keyNum << 1) + 1)));
     }
 };
 
