@@ -225,6 +225,8 @@ class NetClient : public NetworkEventHandler
         // P3. Game
         void handleRemoteGameState(const uint8_t*, size_t);
         void handleP2PCollision(const uint8_t*, size_t);
+        void handleP2OCollision(const uint8_t*, size_t);
+        void handleO2OCollision(const uint8_t*, size_t);
 
         void sendGoodbye();
 
@@ -244,13 +246,13 @@ enum NetworkState {
 // TODO: These packages shouldn't be necessary
 
 struct Net_GameplayState {
-    Net_PlayerCoords player_coords[4];
+    Net_ObjectPosition player_coords[4];
     COutputControl player_input[4];
 };
 
 struct Net_P2PCollisionEvent {
     uint8_t player_id[2];
-    Net_PlayerCoords player_coords[2];
+    Net_ObjectPosition player_coords[2];
     float oldX[2];
     float oldY[2];
 
@@ -258,6 +260,16 @@ struct Net_P2PCollisionEvent {
         player_id[0] = first;
         player_id[1] = second;
     }
+};
+
+struct Net_P2OCollisionEvent {
+    uint8_t player_id;
+    uint8_t object_id;
+    uint8_t object_layer;
+    Net_ObjectPosition player_coords; // player position and vector at the moment of collision
+    Net_ObjectPosition object_coords;
+    float player_oldX;
+    float player_oldY;
 };
 
 struct Networking {
@@ -297,6 +309,7 @@ struct Networking {
     CPlayerInput netPlayerInput;
     std::list<Net_GameplayState> gamestate_buffer;
     std::list<Net_P2PCollisionEvent> p2pcollision_buffer;
+    std::list<Net_P2OCollisionEvent> p2o_collision_buffer;
 };
 
 extern Networking netplay;

@@ -259,7 +259,7 @@ struct Net_ClientInputPackage : Net_MessageHeader {
 };*/
 
 struct Net_GameStatePackage : Net_MessageHeader {
-    Net_PlayerCoords player_coords[4];
+    Net_ObjectPosition player_coords[4];
     Net_RawInput     player_input[4];
 
     Net_GameStatePackage() : Net_MessageHeader(NET_G2P_GAME_STATE) {}
@@ -310,7 +310,7 @@ struct Net_GameStatePackage : Net_MessageHeader {
 //struct Net_GameplayEvent
 struct Net_P2PCollisionEventPackage : Net_MessageHeader {
     uint8_t player_id[2];
-    Net_PlayerCoords player_coords[2]; // player position and vector at the moment of collision
+    Net_ObjectPosition player_coords[2]; // player position and vector at the moment of collision
     float oldX[2];
     float oldY[2];
 
@@ -353,6 +353,55 @@ struct Net_P2PCollisionEventPackage : Net_MessageHeader {
         oldY[0] = p1_oldy;
         oldX[1] = p2_oldx;
         oldY[1] = p2_oldy;
+    }
+};
+
+struct Net_P2OCollisionEventPackage : Net_MessageHeader {
+    uint8_t player_id;
+    uint8_t object_id;
+    uint8_t object_layer;
+    Net_ObjectPosition player_coords; // player position and vector at the moment of collision
+    Net_ObjectPosition object_coords;
+    float player_oldX;
+    float player_oldY;
+
+    Net_P2OCollisionEventPackage(uint8_t playerID, uint8_t objectID, uint8_t objectLayer)
+        : Net_MessageHeader(NET_G2P_P2O_COLLISION_EVENT)
+    {
+        player_id = playerID;
+        object_id = objectID;
+        object_layer = objectLayer;
+
+        assert(player_id < 4);
+        assert(object_layer < 3);
+
+        player_coords.x = 0.0f;
+        player_coords.y = 0.0f;
+        object_coords.x = 0.0f;
+        object_coords.y = 0.0f;
+        player_coords.xvel = 0.0f;
+        player_coords.yvel = 0.0f;
+        object_coords.xvel = 0.0f;
+        object_coords.yvel = 0.0f;
+    }
+
+    void setCoords(float p_x, float p_y, float o_x, float o_y) {
+        player_coords.x = p_x;
+        player_coords.y = p_y;
+        object_coords.x = o_x;
+        object_coords.y = o_y;
+    }
+
+    void setVelocities(float p_xvel, float p_yvel, float o_xvel, float o_yvel) {
+        player_coords.xvel = p_xvel;
+        player_coords.yvel = p_yvel;
+        object_coords.xvel = o_xvel;
+        object_coords.yvel = o_yvel;
+    }
+
+    void setOldXY(float p_oldx, float p_oldy) {
+        player_oldX = p_oldx;
+        player_oldY = p_oldy;
     }
 };
 

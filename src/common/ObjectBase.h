@@ -93,6 +93,7 @@ class CObject
 	friend void RunGame();
 		friend void shakeScreen();
 		friend void handleP2ObjCollisions();
+		friend void handleNetworkP2ObjCollisions();
 	friend class CO_Shell;
 	friend class B_BreakableBlock;
 	friend class B_WeaponBreakableBlock;

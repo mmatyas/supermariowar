@@ -49,12 +49,14 @@
 #define NET_P2G_LOCAL_KEYS                  61 // Normal players -> Game host
 #define NET_G2P_GAME_STATE                  62 // GH -> Players (positions)
 #define NET_G2P_P2P_COLLISION_EVENT         63 // GH -> Players (one collision)
+#define NET_G2P_P2O_COLLISION_EVENT         64
+#define NET_G2P_O2O_COLLISION_EVENT         65
 
 #define NET_G2L_GAME_RESULTS                70 // GH -> Server
 
 
 // FIXME: Move this to somewhere else.
-struct Net_PlayerCoords {
+struct Net_ObjectPosition {
     float x;
     float y;
     float xvel;

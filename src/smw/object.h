@@ -102,6 +102,7 @@ class IO_MovingObject : public CObject
 	friend void RunGame();
 		friend void shakeScreen();
 		friend void handleP2ObjCollisions();
+		friend void handleNetworkP2ObjCollisions();
 };
 
 class IO_OverMapObject : public CObject

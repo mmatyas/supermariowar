@@ -589,6 +589,25 @@ void NetClient::handleP2PCollision(const uint8_t* data, size_t dataLength)
     netplay.p2pcollision_buffer.push_back(event);
 }
 
+void NetClient::handleP2OCollision(const uint8_t* data, size_t dataLength)
+{
+    Net_P2OCollisionEventPackage pkg(0,0,0);
+    memcpy(&pkg, data, sizeof(Net_P2OCollisionEventPackage));
+
+    Net_P2OCollisionEvent event;
+    event.player_id = pkg.player_id;
+    event.object_id = pkg.object_id;
+    event.object_layer = pkg.object_layer;
+    assert(event.player_id < 4);
+    assert(event.object_layer < 3);
+    event.player_coords = pkg.player_coords;
+    event.object_coords = pkg.object_coords;
+    event.player_oldX = pkg.player_oldX;
+    event.player_oldY = pkg.player_oldY;
+
+    netplay.p2o_collision_buffer.push_back(event);
+}
+
 /****************
     Listening
 ****************/
@@ -754,6 +773,14 @@ void NetClient::onReceive(NetPeer& client, const uint8_t* data, size_t dataLengt
 
         case NET_G2P_P2P_COLLISION_EVENT:
             handleP2PCollision(data, dataLength);
+            break;
+
+        case NET_G2P_P2O_COLLISION_EVENT:
+            handleP2OCollision(data, dataLength);
+            break;
+
+        case NET_G2P_O2O_COLLISION_EVENT:
+            //handleO2OCollision(data, dataLength);
             break;
 
         //

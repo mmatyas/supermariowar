@@ -753,7 +753,9 @@ void GameplayState::spinScreen()
 
 void handleP2PCollisions()
 {
-    //Player to player collisions
+    // Use handleNetworkP2PCollisions for netplay
+    assert(!netplay.active);
+
     short i, j;
     for (i = 0; i < list_players_cnt; i++) {
         CPlayer * player1 = list_players[i];
@@ -764,11 +766,11 @@ void handleP2PCollisions()
                     if (coldec_player2player(player1, player2))
                     {
                         printf("P2P collision: %d -> %d\n", i, j);
-                        if (netplay.active) {
+                        /*if (netplay.active) {
                             assert(netplay.theHostIsMe);
                             // TODO: use references in handleP2PCollisions()
                             netplay.client.local_gamehost.sendP2PCollision(*player1, *player2);
-                        }
+                        }*/
 
                         collisionhandler_p2p(player1, player2);
 
@@ -840,7 +842,7 @@ void handleNetworkP2PCollisions()
             collisionhandler_p2p(&player1, &player2);
 
             // Restore position
-            player1.fx = p1_coords_backup[0];
+            /*player1.fx = p1_coords_backup[0];
             player1.fy = p1_coords_backup[1];
             player1.velx = p1_coords_backup[2];
             player1.vely = p1_coords_backup[3];
@@ -852,7 +854,7 @@ void handleNetworkP2PCollisions()
             player2.velx = p2_coords_backup[2];
             player2.vely = p2_coords_backup[3];
             player2.fOldX = p2_oldXY[1];
-            player2.fOldY = p2_oldXY[1];
+            player2.fOldY = p2_oldXY[1];*/
         }
     }
 }
@@ -871,7 +873,14 @@ void handleP2ObjCollisions()
                 CObject * object = objectcontainer[iLayer].list[iObject];
 
                 if (!object->GetDead()) {
-                    if (coldec_player2obj(player, object)) {
+                    if (coldec_player2obj(player, object))
+                    {
+                        printf("P2O collision\n");
+                        if (netplay.active) {
+                            assert(netplay.theHostIsMe);
+                            //netplay.client.local_gamehost.sendP2PCollision(*player1, *player2);
+                        }
+
                         if (collisionhandler_p2o(player, object))
                             break;
                     }
@@ -885,6 +894,60 @@ void handleP2ObjCollisions()
             //If player collided with a swap mushroom, the break from colliding with everything else
             if (game_values.swapplayers)
                 return;
+        }
+    }
+}
+
+void handleNetworkP2ObjCollisions()
+{
+    assert(netplay.active);
+    assert(!netplay.theHostIsMe);
+
+    // TODO: Do not copy memory
+    while (!netplay.p2o_collision_buffer.empty()) {
+        Net_P2OCollisionEvent collevent = netplay.p2o_collision_buffer.front();
+        netplay.p2o_collision_buffer.pop_front();
+
+        CPlayer& player = *list_players[collevent.player_id];
+        CObject& object = *objectcontainer[collevent.object_layer].list[collevent.object_id];
+
+        if (player.state == player_ready && !object.GetDead()) {
+            printf("NetP2O collision\n");
+
+            float p_coords_backup[4];
+            float o_coords_backup[4];
+            float p_oldX;
+            float p_oldY;
+
+            // TODO: Consider stack push/pop
+
+            // Backup original position
+            p_coords_backup[0] = player.fx;
+            p_coords_backup[1] = player.fy;
+            p_coords_backup[2] = player.velx;
+            p_coords_backup[3] = player.vely;
+            p_oldX = player.fOldX;
+            p_oldY = player.fOldY;
+
+            o_coords_backup[0] = object.fx;
+            o_coords_backup[1] = object.fy;
+            o_coords_backup[2] = object.velx;
+            o_coords_backup[3] = object.vely;
+
+            // Set collision position
+            player.fx = collevent.player_coords.x;
+            player.fy = collevent.player_coords.y;
+            player.velx = collevent.player_coords.xvel;
+            player.vely = collevent.player_coords.yvel;
+            player.fOldX = collevent.player_oldX;
+            player.fOldY = collevent.player_oldY;
+
+            object.fx = collevent.object_coords.x;
+            object.fy = collevent.object_coords.y;
+            object.velx = collevent.object_coords.xvel;
+            object.vely = collevent.object_coords.yvel;
+
+            collisionhandler_p2o(&player, &object);
         }
     }
 }
@@ -924,10 +987,20 @@ void handleObj2ObjCollisions()
                     MovingObjectType iType2 = movingobject2->getMovingObjectType();
                     if (g_iCollisionMap[iType1][iType2]) {
                         if (coldec_obj2obj(movingobject1, movingobject2)) {
+                            printf("O2O collision A\n");
+                            if (netplay.active) {
+                                assert(netplay.theHostIsMe);
+                                //netplay.client.local_gamehost.sendP2PCollision(*player1, *player2);
+                            }
                             collisionhandler_o2o(movingobject1, movingobject2);
                         }
                     } else if (g_iCollisionMap[iType2][iType1]) {
                         if (coldec_obj2obj(movingobject2, movingobject1)) {
+                            printf("O2O collision B\n");
+                            if (netplay.active) {
+                                assert(netplay.theHostIsMe);
+                                //netplay.client.local_gamehost.sendP2PCollision(*player1, *player2);
+                            }
                             collisionhandler_o2o(movingobject2, movingobject1);
                         }
                     }
@@ -2083,16 +2156,21 @@ void GameplayState::handleInput()
     }
 }
 
+extern unsigned rng_use_counter;
+
 void GameplayState::update()
 {
+    //printf(":: Frame start\n");
+    //rng_use_counter = 0;
+
     for (short iTeam = 0; iTeam < score_cnt; iTeam++) {
         iScoreTextOffset[iTeam] = 34 * game_values.teamcounts[iTeam] + 1;
     }
 
 
     iWindTimer = 0;
-    dNextWind = (float)(RANDOM_INT(41) - 20) / 4.0f;
-    game_values.gamewindx = (float)((RANDOM_INT(41)) - 20) / 4.0f;
+    //////dNextWind = (float)(RANDOM_INT(41) - 20) / 4.0f;
+    //////game_values.gamewindx = (float)((RANDOM_INT(41)) - 20) / 4.0f;
 
     //Initialize players after game init has finished
     for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++)
@@ -2101,7 +2179,7 @@ void GameplayState::update()
     if (netplay.active) {
         netplay.client.update();
 
-        if (previous_playerKeys != *current_playerKeys) {
+        /*if (previous_playerKeys != *current_playerKeys) {
             netplay.client.sendLocalInput();
             previous_playerKeys = *current_playerKeys;
         }
@@ -2129,13 +2207,13 @@ void GameplayState::update()
             else {
                 printf("[] GameStateBuffer size = 0\n");
             }
-        }
+        }*/
     }
 
     //printf("[%d;%d]\n", current_playerKeys->keys[0].fDown, current_playerKeys->keys[0].fPressed);
     //printf("%d -> %f\n", list_players[0]->ix, list_players[0]->fx);
 
-    checkWindEvent(iWindTimer, dNextWind);
+    //////checkWindEvent(iWindTimer, dNextWind);
 
     /*
     #ifdef _XBOX
@@ -2285,11 +2363,6 @@ void GameplayState::update()
     handleInput();
 
     if (netplay.active) {
-        netplay.client.update();
-    }
-
-    if (netplay.active) {
-
         if (previous_playerKeys != *current_playerKeys) {
             netplay.client.sendLocalInput();
             previous_playerKeys = *current_playerKeys;
@@ -2298,7 +2371,7 @@ void GameplayState::update()
         // TODO: Move this to update()?
         // The host sends the game state to clients,
         // Players send input to game host
-        if (netplay.theHostIsMe) {
+        /*if (netplay.theHostIsMe) {
             netplay.client.local_gamehost.sendCurrentGameState();
         }
         else
@@ -2318,9 +2391,8 @@ void GameplayState::update()
             else {
                 printf("[] GameStateBuffer size = 0\n");
             }
-        }
+        }*/
     }
-
 
     if (updateExitPause(iCountDownState)) {
         if (netplay.active)
@@ -2391,11 +2463,35 @@ void GameplayState::update()
                 if (++game_values.cputurn > 3)
                     game_values.cputurn = 0;
 
+                if (netplay.active) {
+                    if (netplay.theHostIsMe) {
+                        netplay.client.local_gamehost.sendCurrentGameState();
+                    }
+                    else
+                    {
+                        if (netplay.gamestate_buffer.size() > 0)
+                        {
+                            Net_GameplayState currect_state = netplay.gamestate_buffer.front();
+                            netplay.gamestate_buffer.pop_front();
+                            for (unsigned short p = 0; p < list_players_cnt; p++) {
+                                list_players[p]->fx = currect_state.player_coords[p].x;
+                                list_players[p]->fy = currect_state.player_coords[p].y;
+                                list_players[p]->velx = currect_state.player_coords[p].xvel;
+                                list_players[p]->vely = currect_state.player_coords[p].yvel;
+                                netplay.netPlayerInput.outputControls[p] = currect_state.player_input[p];
+                            }
+                        }
+                        else {
+                            printf("[] GameStateBuffer size = 0\n");
+                        }
+                    }
+                }
+
                 // Only handle collisions locally if playing offline or being game host.
-                if (!netplay.active || (netplay.active && netplay.theHostIsMe))
+                /*if (!netplay.active || (netplay.active && netplay.theHostIsMe))
                     handleP2PCollisions();
                 else
-                    handleNetworkP2PCollisions();
+                    handleNetworkP2PCollisions();*/
 
                 //Move platforms
                 g_map->updatePlatforms();
@@ -2404,9 +2500,12 @@ void GameplayState::update()
                 game_values.playinvinciblesound = false;
                 game_values.playflyingsound = false;
 
-                for (i = 0; i < list_players_cnt; i++)
+                for (i = 0; i < list_players_cnt; i++) {
+                    //printf("player %d :: ", i);
                     list_players[i]->move();    //move all objects before doing object-object collision detection in
+                }
                 //->think(), so we test against the new position after object-map collision detection
+
 
                 playSFX();
 
@@ -2415,7 +2514,11 @@ void GameplayState::update()
                 objectcontainer[1].update();
                 objectcontainer[2].update();
 
-                handleP2ObjCollisions();
+                if (!netplay.active || (netplay.active && netplay.theHostIsMe))
+                    handleP2ObjCollisions();
+                else
+                    handleNetworkP2ObjCollisions();
+
                 if (game_values.swapplayers)
                     goto SWAPBREAK;
 
