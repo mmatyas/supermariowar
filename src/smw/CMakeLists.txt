@@ -36,3 +36,5 @@ if(NOT USE_EMSCRIPTEN)
 		target_link_libraries(smw enet)
 	endif()
 endif()
+
+install(FILES "${PROJECT_BINARY_DIR}/Binaries/Release/smw" DESTINATION ${bindir})

@@ -1,6 +1,6 @@
 set (WORLDEDIT_SRCS worldeditor.cpp)
 
-add_executable (worldedit
+add_executable (smw-worldedit
 	../common/movingplatform.cpp
 	../smw/world.cpp
 	../smw/object.cpp
@@ -11,13 +11,15 @@ add_executable (worldedit
 	../common/uimenu.cpp
 	${WORLDEDIT_SRCS}
 )
-target_link_libraries (worldedit CommonFiles)
+target_link_libraries (smw-worldedit CommonFiles)
 
 # add .bc extension when building with emscripten
 if(USE_EMSCRIPTEN)
-	set_target_properties(worldedit PROPERTIES SUFFIX ".bc")
+	set_target_properties(smw-worldedit PROPERTIES SUFFIX ".bc")
 endif()
 
 if(NOT USE_EMSCRIPTEN)
-	target_link_libraries (worldedit ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLIMAGE_LIBRARY} SDLmain)
+	target_link_libraries (smw-worldedit ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLIMAGE_LIBRARY} SDLmain)
 endif()
+
+install(FILES "${PROJECT_BINARY_DIR}/Binaries/Release/smw-worldedit" DESTINATION ${bindir})

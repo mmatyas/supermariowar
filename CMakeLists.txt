@@ -1,38 +1,36 @@
-########################################
-# General setup for smw
-# by neagix - 2013
+#-----------------------------------------------------------------------------
 #
+# Super Mario War project configuration file
+#
+#-----------------------------------------------------------------------------
+
 cmake_minimum_required(VERSION 2.6)
 
 project(smw)
 
-option(DEBUG "Compile with debugging information" OFF)
-
-## currently working only with 1.2
-option(USE_PNG_SAVE "Enable PNG save feature" OFF)
-
-option(USE_EMSCRIPTEN "Output asm.js code using emscripten" OFF)
-option(USE_SDL2_LIBS "Use SDL2 instead of SDL 1.x" OFF)
-option(NO_NETWORK "Disable all network communication" OFF)
-
-# version number
 set(SMW_VERSION_MAJOR "2")
 set(SMW_VERSION_MINOR "0")
 set(SMW_VERSION_PATCH "0")
 
-# user settings directory
+# Options for customizing builds
+option(DEBUG "Compile with debugging information" OFF)
+option(USE_PNG_SAVE "Enable PNG save feature" OFF) # currently working only with 1.2 ?
+option(USE_EMSCRIPTEN "Output asm.js code using emscripten" OFF) # TODO: change this to a build type maybe?
+option(USE_SDL2_LIBS "Use SDL2 instead of SDL 1.x" OFF) # only smw ported yet
+option(NO_NETWORK "Disable all network communication" OFF)
+
+# User settings directory
 set(userdir ".smw" CACHE STRING "User directory")
 add_definitions(-DUSER_DIR="${userdir}")
 
-# Set where the binary files will be built.  The program will not execute from
-# here.  You must run "make install" to install these to the proper location
-# as defined above.
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/Binaries)
 
-
-########################################
-# Optional Targets
+#-----------------------------------------------------------------------------
 #
+# Platform-specific settings
+#
+#-----------------------------------------------------------------------------
+# TODO: Review and test this section
+
 
 # option(UNITTESTS "Build unittests" OFF)
 
@@ -55,9 +53,9 @@ if((${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
 	# Redirect the installation to a build directory where it does no harm.
 	set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install-dummy)
 else()
-	set(bindir  ${CMAKE_INSTALL_PREFIX}/bin               CACHE PATH "bindir")
+	set(bindir  ${CMAKE_INSTALL_PREFIX}/games/bin       CACHE PATH "bindir")
 	## data dir will contain the default pack
-	set(datadir ${CMAKE_INSTALL_PREFIX}/share/smw CACHE PATH "datadir")
+	set(datadir ${CMAKE_INSTALL_PREFIX}/share/games/smw CACHE PATH "datadir")
 	add_definitions(-DDATA_DIR="${datadir}/")
 endif()
 
@@ -105,19 +103,21 @@ if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "^arm")
 endif()
 
 
-########################################
+#-----------------------------------------------------------------------------
+#
 # Compiler flags
 #
+#-----------------------------------------------------------------------------
 
-# Debugging CFLAGS.  Turn optimizations off; turn debugging symbols on.
+# Debugging CFLAGS. Turn optimizations off; turn debugging symbols on.
 if(DEBUG)
   add_definitions(-DDEBUG -D_DEBUG -DPNG_DEBUG=1)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -g -O0")
 else()
   add_definitions(-DNDEBUG)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -O3")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -s")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -O3 -s")
 endif(DEBUG)
 
 # Set these next two lines to test generic
@@ -160,7 +160,6 @@ if(NOT MSVC)
 
 endif(NOT MSVC)
 
-
 ##TODO: test this please, coming from smw Makefile
 add_definitions(-D_GNU_SOURCE=1 -D_REENTRANT)
 
@@ -170,22 +169,35 @@ add_definitions(-D_GNU_SOURCE=1 -D_REENTRANT)
 #add_definitions(-Wno-shadow)
 #add_definitions(-std=gnu++0x)
 
-
-########################################
-# Dependencies
+#
+# Game-related flags
 #
 
-if(WIN32)
-#	enable_precompiled_headers(Src/stdafx.h Src/stdafx.cpp SRCS)
-endif(WIN32)
-
-if(NO_NETWORK)
-	add_definitions(-DNETWORK_DISABLED)
+# Set where the binary files will be built.
+if (DEBUG)
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/Binaries/Debug)
+else()
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/Binaries/Release)
 endif()
 
 if(USE_SDL2_LIBS)
 	add_definitions(-DUSE_SDL2)
 endif()
+
+if(NO_NETWORK)
+	add_definitions(-DNETWORK_DISABLED)
+endif()
+
+
+#-----------------------------------------------------------------------------
+#
+# Dependencies
+#
+#-----------------------------------------------------------------------------
+
+if(WIN32)
+#	enable_precompiled_headers(Src/stdafx.h Src/stdafx.cpp SRCS)
+endif(WIN32)
 
 # emscripten uses its own SDL, no need to include or link
 if(NOT USE_EMSCRIPTEN)
@@ -345,28 +357,12 @@ if (APPLE)
 	#echo 'COMMON_OBJS:=$(COMMON_OBJS) build/linfunc.o build/SDLMain.o' >> configuration
 endif()
 
-########################################
-# Setup include directories (and make sure they are preferred over the Externals)
+
+#-----------------------------------------------------------------------------
 #
-
-########################################
-# Install shared data files
+# Ready to build!
 #
-if((NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
-	install(DIRECTORY Data/User/ DESTINATION ${datadir}/user PATTERN)
-	install(DIRECTORY Data/Sys/ DESTINATION ${datadir}/sys PATTERN)
-endif()
-
-if((NOT ${CMAKE_SYSTEM_NAME} MATCHES "Linux|FreeBSD|Darwin"))
-	install(FILES Data/license.txt DESTINATION ${datadir})
-endif()
-
-if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-	# Install the application icon and menu item
-	##TODO: restore these
-#	install(FILES src/cpack/smw.xpm DESTINATION ${CMAKE_INSTALL_PREFIX}/share/pixmaps RENAME smw.xpm)
-#	install(FILES src/cpack/smw.desktop DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
-endif()
+#-----------------------------------------------------------------------------
 
 # Dump some information
 message("    SYSTEM:      ${CMAKE_SYSTEM_NAME} ${CMAKE_SYSTEM_PROCESSOR}")
@@ -376,58 +372,99 @@ message("    CXX:         ${CMAKE_CXX_COMPILER}")
 message("    C_FLAGS:     ${CMAKE_C_FLAGS}")
 message("    CXX_FLAGS:   ${CMAKE_CXX_FLAGS}")
 
-
-########################################
-# Project files
+#
+# Go through every sub-project
 #
 
-## Here the actual magic happens
 include_directories(src/common)
-add_subdirectory(src/common)
-
-#set(COMMON_SRCS ../common/FileIO.cpp ../common/FileList.cpp ../common/MapList.cpp
-#           ../common/SFont.c ../common/TilesetManager.cpp ../common/dirlist.cpp
-#           #../common/eyecandy.cpp ../common/gfx.cpp ../common/global.cpp
-#           ../common/gfx.cpp #../common/global.cpp
-#           ../common/input.cpp ../common/RandomNumberGenerator.cpp
-#           #../common/map.cpp ../common/movingplatform.cpp ../common/path.cpp
-#           ../common/map.cpp ../common/path.cpp
-#           ../common/Game.cpp ../common/sfx.cpp ../common/ResourceManager.cpp
-#           #../common/uicontrol.cpp ../common/uimenu.cpp ../common/linfunc.cpp
-#           ../common/linfunc.cpp
-#           ../common/GameValues.cpp ../common/GameModeSettings.cpp
-#           ../common/global.cpp
-#)
-
 include_directories(src/smw)
+
+add_subdirectory(src/common)
 add_subdirectory(src/smw)
-
-include_directories(src/leveleditor)
 add_subdirectory(src/leveleditor)
-
-include_directories(src/worldeditor)
 add_subdirectory(src/worldeditor)
 
-# packaging information
+
+#-----------------------------------------------------------------------------
+#
+# Installation and packaging
+#
+#-----------------------------------------------------------------------------
+
+#
+# Data directory install location
+#
+
+if((NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
+	install(DIRECTORY data DESTINATION ${datadir})
+endif()
+
+if((NOT ${CMAKE_SYSTEM_NAME} MATCHES "Linux|FreeBSD|Darwin"))
+#	install(FILES Data/license.txt DESTINATION ${datadir})
+endif()
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	# Install the application icon and menu item
+	##TODO: restore these
+#	install(FILES src/cpack/smw.xpm DESTINATION ${CMAKE_INSTALL_PREFIX}/share/pixmaps RENAME smw.xpm)
+#	install(FILES src/cpack/smw.desktop DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
+endif()
+
+#
+# Package settings
+#
+
 set(CPACK_PACKAGE_NAME "smw")
 set(CPACK_PACKAGE_VENDOR "72dpiarmy")
 set(CPACK_PACKAGE_VERSION_MAJOR ${SMW_VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${SMW_VERSION_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH ${SMW_VERSION_PATCH})
-set(CPACK_PACKAGE_DESCRIPTION_FILE ${PROJECT_SOURCE_DIR}/src/cpack/package_description.txt)
+set(CPACK_PACKAGE_DESCRIPTION_FILE ${PROJECT_SOURCE_DIR}/src/resources/package_description.txt)
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Super Mario War, arcade platform multiplayer game")
 
+set(CPACK_SET_DESTDIR ON)
+set(CPACK_SOURCE_IGNORE_FILES  "\\\\.#;/#;.*~;\\\\.swp;/\\\\.git")
+list(APPEND CPACK_SOURCE_IGNORE_FILES "${CMAKE_BINARY_DIR}")
+
+set(CPACK_GENERATOR "TGZ;DEB;RPM")
+set(CPACK_SOURCE_GENERATOR "TGZ;TBZ2;ZIP")
+
+#
+# Debian
+#
+set(CPACK_DEBIAN_PACKAGE_SECTION Games)
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "nobody")
+if(USE_SDL2_LIBS)
+	set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsdl2-2.0-0, libsdl2-mixer-2.0-0, libsdl2-image-2.0-0")
+else()
+	set(CPACK_DEBIAN_PACKAGE_DEPENDS "libsdl1.2debian, libsdl-mixer1.2, libsdl-image1.2")
+endif()
+if(NOT NO_NETWORK)
+	set(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, libenet2a")
+endif()
+
+#
+# RPM
+#
 set(CPACK_RPM_PACKAGE_GROUP Amusements/Games)
 set(CPACK_RPM_PACKAGE_LICENSE GPL-2.0)
+
+if(USE_SDL2_LIBS)
+	set(CPACK_RPM_PACKAGE_REQUIRES "SDL2, SDL2_image, SDL2_mixer")
+else()
+	set(CPACK_RPM_PACKAGE_REQUIRES "SDL, SDL_image, SDL_mixer")
+endif()
+if(NOT NO_NETWORK)
+	set(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, enet")
+endif()
+
+#
+# OSX, Windows: TODO
+#
 set(CPACK_RESOURCE_FILE_README ${PROJECT_SOURCE_DIR}/README.md)
 # TODO: CPACK_RESOURCE_FILE_WELCOME
 set(CPACK_PACKAGE_ICON ${PROJECT_SOURCE_DIR}/src/resources/smw.ico)
 # TODO: CPACK_NSIS_*
-
-set(CPACK_SET_DESTDIR ON)
-set(CPACK_SOURCE_GENERATOR "TGZ;TBZ2;ZIP")
-set(CPACK_SOURCE_IGNORE_FILES  "\\\\.#;/#;.*~;\\\\.swp;/\\\\.git")
-list(APPEND CPACK_SOURCE_IGNORE_FILES "${CMAKE_BINARY_DIR}")
 
 # CPack must be included after the CPACK_* variables are set in order for those
 # variables to take effect.
