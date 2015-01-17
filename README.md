@@ -29,17 +29,19 @@ The game uses artwork and sounds from Nintendo games. We hope that this noncomme
 - Mac OS X (?)
 - asm.js
 
+
+
 ## Building instructions
 
 ### Requirements
 
-- cmake
+- CMake
 - SDL (1.2 or 2.0), with
     - SDL_image
     - SDL_mixer
 - ENet (optional)
 
-On Linux, this usually means the following packages: `cmake libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libenet-dev`
+On Linux, this usually means the following packages: `cmake libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libenet-dev`.
 
 For other systems, you can download the development files manually from:
 
@@ -51,27 +53,27 @@ For other systems, you can download the development files manually from:
 
 ### Linux
 
-Create a build directory and run cmake there. Then simply call make every time you want to build. The binaries will be generated in ./Build/Binaries.
+Create a build directory and run CMake there to configure the project. Then simply call `make` every time you want to build. The binaries will be generated in ./Build/Binaries/Release by default.
 
 ```sh
 $ mkdir Build && cd Build && cmake ..
 $ make -j4 # -jN = build on N threads
-$ Binaries/smw ../data
+$ ./Binaries/Release/smw ../data
 ```
 
 Currently, the following separate build targets are defined for `make`:
 
 - smw
-- leveleditor
-- worldeditor
+- smw-leveleditor
+- smw-worldeditor
 
-If you prefer to work within an IDE (like CodeBlocks), you can also generate project files using CMake.
+If you prefer to work within an IDE (CodeBlocks, Eclipse, ...), you can also generate project files using CMake. You can find more information in *Build configuration*.
 
-You can find more information in *Build configuration*.
+To create installable packages, simply run `make packages`. This will create TGZ, DEB and RPM archives.
 
 ### Windows
 
-On Windows, you can follow the Linux guide using environments like MinGW + MinGW Shell and Cygwin, or generate a project file with CMake for your IDE.
+On Windows, you can follow the Linux guide using environments like MinGW Shell/MSYS and Cygwin, or generate a project file with CMake for your IDE.
 
 Visual Studio:
 
@@ -85,7 +87,7 @@ Visual Studio:
 ### ASM.JS
 
 SMW can be build to run in your browser. For this, you need
-emscripten with the special LLVM backend, and Clang.
+Emscripten with the special LLVM backend, and Clang.
 See [here](https://kripken.github.io/emscripten-site/docs/building_from_source/LLVM-Backend.html) for more information.
 
 You can prepare a build directory with the following commands:
@@ -102,16 +104,17 @@ Then build with:
 $ emmake make
 $ BUILDPARAMS="-O3 -v --preload-file data -s OUTLINING_LIMIT=60000 -s ALLOW_MEMORY_GROWTH=1"
 $ emcc Binaries/smw.bc -o smw.html $BUILDPARAMS
-$ emcc Binaries/leveledit.bc -o leveledit.html $BUILDPARAMS
-$ emcc Binaries/worldedit.bc -o worldedit.html $BUILDPARAMS
+$ emcc Binaries/smw-leveledit.bc -o leveledit.html $BUILDPARAMS
+$ emcc Binaries/smw-worldedit.bc -o worldedit.html $BUILDPARAMS
 ```
-
 ### Build configuration
 
-You can change the build setting by setting various CMake flags. The simplest way to do this is by running `cmake-gui ..` from the Build directory. You can read a short description of an element by hovering the mouse on its name.
+You can change the build configuration by setting various CMake flags. The simplest way to do this is by running `cmake-gui ..` from the Build directory. You can read a short description of an element by hovering the mouse on its name too.
 
-Alternatively, you can pass the options directly to CMake as `-DFLAGNAME=VALUE` (eg. `cmake .. -DUSE_SDL2_LIBS=1`).
+Alternatively, you can pass these options directly to CMake as `-DFLAGNAME=VALUE` (eg. `cmake .. -DUSE_SDL2_LIBS=1`).
+
+
 
 ## How to play
 
-Please see documentation in docs/ directory.
+Please see documentation in the docs/ directory.
