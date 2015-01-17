@@ -7,6 +7,7 @@
 #include "player.h"
 
 #include "objects/blocks/PowerupBlock.h"
+#include "objects/blocks/BreakableBlock.h"
 
 class B_ViewBlock : public B_PowerupBlock
 {
@@ -32,37 +33,6 @@ class B_ViewBlock : public B_PowerupBlock
 		bool fNoPowerupsSelected;
 		short iCountWeight;
 };
-
-class B_BreakableBlock : public IO_Block
-{
-	public:
-		B_BreakableBlock(gfxSprite *nspr, short x, short y, short iNumSpr, short aniSpeed);
-		~B_BreakableBlock(){};
-
-    BlockType getBlockType() {
-        return block_breakable;
-    }
-
-		void draw();
-		void update();
-
-		bool hittop(CPlayer * player, bool useBehavior);
-		bool hitbottom(CPlayer * player, bool useBehavior);
-
-		bool hittop(IO_MovingObject * object);
-		bool hitright(IO_MovingObject * object);
-		bool hitleft(IO_MovingObject * object);
-
-		void triggerBehavior();
-
-	private:
-		short iNumSprites;
-		short animationSpeed;
-		short drawFrame;
-		short animationTimer;
-		short animationWidth;
-};
-
 
 class B_NoteBlock : public IO_Block
 {
