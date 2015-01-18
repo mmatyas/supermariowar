@@ -184,6 +184,369 @@ void CPlayer::Init()
         pPlayerAI->Init();
 }
 
+void CPlayer::updateKuriboShoe()
+{
+    if (iKuriboShoe > 0 && state == player_ready && !frozen) {
+        static const int iExitKuriboShoeCode[4] = {4, 8, 4, 8};
+
+        if (iKuriboShoeExitIndex > 0) {
+            if (++iKuriboShoeExitTimer >= 32) {
+                iKuriboShoeExitIndex = 0;
+                iKuriboShoeExitTimer = 0;
+            }
+        }
+
+        if (keymask & iExitKuriboShoeCode[iKuriboShoeExitIndex]) {
+            iKuriboShoeExitIndex++;
+        } else if (keymask & ~iExitKuriboShoeCode[iKuriboShoeExitIndex]) {
+            iKuriboShoeExitIndex = 0;
+            iKuriboShoeExitTimer = 0;
+        }
+
+        if (iKuriboShoeExitIndex == 4 && iKuriboShoeExitTimer < 32) {
+            CO_KuriboShoe * shoe = new CO_KuriboShoe(&rm->spr_kuriboshoe, ix - PWOFFSET, iy - PHOFFSET - 2, iKuriboShoe == 2);
+            shoe->collision_detection_checksides();
+            objectcontainer[1].add(shoe);
+            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
+
+            iKuriboShoeExitIndex = 0;
+            iKuriboShoeExitTimer = 0;
+            ifSoundOnPlay(rm->sfx_transform);
+            iKuriboShoe = 0;
+
+            fSuperStomp = false;
+            iSuperStompTimer = 0;
+            iSuperStompExitTimer = 0;
+            superstomp_lock = false;
+        }
+    }
+}
+
+void CPlayer::updateTanookiStatus()
+{
+    if (tanooki && state == player_ready) {
+        // If the down key is ever released, manually untransform by releasing the down key
+        if (!playerKeys->game_down.fDown && statue_timer) {
+            // Untransform from statue
+            statue_timer = 1;
+        }
+
+        // Become the tanooki
+        else if (playerKeys->game_turbo.fPressed && playerKeys->game_down.fDown && !statue_lock && !lockfire && powerupused == -1
+                 && iKuriboShoe == 0 && iTailState == 0) {
+            // set the amount of time you get to remain in statue form
+            statue_timer = 123;
+
+            // perform tansformation effects
+            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
+            ifSoundOnPlay(rm->sfx_transform);
+
+            // Neutralize lateral velocity
+            const float tv = 1.6f;
+            if (velx > tv)
+                velx = tv;
+            else if (velx < -tv)
+                velx = -tv;
+
+            // Cause statue to super stomp to ground
+            if (inair && !fSuperStomp && iSuperStompTimer <= 0 && !superstomp_lock) {
+                iSuperStompTimer = 8;
+                lockfall = true;
+
+                // Become soft shielded (with stomp ability)
+                shield = 2;
+
+                // Stop player from super stomping twice before touching the ground
+                superstomp_lock = true;
+            }
+
+            // Prevent you from shooting
+            lockfire = true;
+
+            // Prevent you from falling through solid-on-top blocks
+            lockfall = true;
+
+            // Prevent you from becoming the statue twice before touching the ground
+            statue_lock = true;
+
+            //If we were flying or spinning when we became the statue, clear those states
+            ClearPowerupStates();
+        }
+
+        if (!fSuperStomp && iSuperStompTimer <= 0) {
+            // Count down the statue timer, which leads to a forced detransformation
+            if (statue_timer == 1) {
+                // Untransform from statue
+                statue_timer = 0;
+
+                // Release invincibility
+                shield = 0;
+
+                // Slight upward velocity to escape spikes / lava
+                if (!inair)
+                    vely = -8.0;
+
+                // perform transformation effects
+                eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
+                ifSoundOnPlay(rm->sfx_transform);
+
+                //Decrease the amount of tanooki uses, if feature is turned on
+                if (game_values.tanookilimit > 0 || tanookilimit > 0) {
+                    if (--tanookilimit <= 0) {
+                        tanooki = false;
+                        tanookilimit = 0;
+                        ifSoundOnPlay(rm->sfx_powerdown);
+                    }
+                }
+            }
+
+            // Player is a statue
+            else if (statue_timer > 0) {
+                // Prevent player from shooting while a statue
+                lockfire = true;
+
+                // Prevent player from jumping
+                lockjump = true;
+
+                // Don't fall through passable platforms
+                fallthrough = false;
+
+                // Decrement statue timer3
+                statue_timer--;
+
+                // Become soft shielded (with stomp ability)
+                shield = 2;
+
+                statue_lock = true;
+            }
+        }
+    }
+}
+
+void CPlayer::updateCardCollection()
+{
+    if (game_values.gamemode->gamemode == game_mode_collection) {
+        if (iDumpCollectionCardIndex > 0) {
+            if (++iDumpCollectionCardTimer >= 32) {
+                iDumpCollectionCardIndex = 0;
+                iDumpCollectionCardTimer = 0;
+            }
+        }
+
+        if (keymask & 16) {
+            iDumpCollectionCardIndex++;
+        } else if (keymask & ~16) {
+            iDumpCollectionCardIndex = 0;
+            iDumpCollectionCardTimer = 0;
+        }
+
+        if (iDumpCollectionCardIndex == 3 && iDumpCollectionCardTimer < 32) {
+            iDumpCollectionCardTimer = 0;
+            iDumpCollectionCardIndex = 0;
+
+            ((CGM_Collection*)game_values.gamemode)->ReleaseCard(*this);
+        }
+    }
+}
+
+void CPlayer::updateSuperStomp()
+{
+    if (!inair) {
+        //If the player is touching the ground, then free the lock on super stomping
+        superstomp_lock = false;
+
+        //If they are touching the ground and they are not the statue, allow them to become the statue again
+        if (statue_timer <= 0)
+            statue_lock = false;
+
+        //If they were super stomping and they are not in the air anymore (i.e. on the ground), then create the
+        //super stomp attack zone, play the sound and show the stomp gfx
+        if (fSuperStomp) {
+            eyecandy[2].add(new EC_SuperStompExplosion(&rm->spr_superstomp, ix + HALFPW, iy + PH, 4));
+            ifSoundOnPlay(rm->sfx_bobombsound);
+            fSuperStomp = false;
+
+            objectcontainer[1].add(new MO_AttackZone(globalID, teamID, ix - 32, iy + 10, 32, 15, 8, kill_style_kuriboshoe, false));
+            objectcontainer[1].add(new MO_AttackZone(globalID, teamID, ix + PW, iy + 10, 32, 15, 8, kill_style_kuriboshoe, false));
+        }
+    }
+}
+
+void CPlayer::updateInvincibility()
+{
+    if (invincible) {
+        animationtimer++;
+
+        if ((animationtimer > 3 && invincibletimer < smw->ScreenHeight) || animationtimer > 6) {
+            animationtimer = 0;
+
+            animationstate += 32;
+            if (animationstate > 96)
+                animationstate = 0;
+        }
+
+        if (++invincibletimer > 580) {
+            animationstate = 0;
+            animationtimer = 0;
+            invincibletimer = 0;
+            invincible = false;
+        }
+    }
+}
+
+void CPlayer::updateKuriboShoeAnimation()
+{
+    if (iKuriboShoe > 0) {
+        if (++iKuriboShoeAnimationTimer > 7) {
+            iKuriboShoeAnimationTimer = 0;
+            iKuriboShoeAnimationFrame += 32;
+
+            if (iKuriboShoeAnimationFrame > 32)
+                iKuriboShoeAnimationFrame = 0;
+        }
+    }
+}
+
+void CPlayer::updateFrozenStatus()
+{
+    if (frozen) {
+        if ((~(spr & 0x1) && (keymask & 4)) || ((spr & 0x1) && (keymask & 8)))
+            frozentimer -= 5;
+
+        if (--frozentimer <= 0) {
+            frozentimer = 0;
+            frozen = false;
+
+            //Shield the player after becoming unfrozen to protect against being frozen again
+            shield = game_values.shieldstyle > 0 ? game_values.shieldstyle : 1;
+            shieldtimer = 60;
+
+            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
+        }
+    }
+}
+
+void CPlayer::accelerateRight()
+{
+    if (onice)
+        velx += VELMOVINGADDICE;
+    else
+        velx += VELMOVINGADD;       //move right
+
+    float maxVel = 0.0f;
+    if (!frozen) {
+        if ((game_values.slowdownon != -1 && game_values.slowdownon != teamID) || jailtimer > 0)
+            maxVel = VELSLOWMOVING;
+        else if (playerKeys->game_turbo.fDown)
+            maxVel = VELTURBOMOVING + (game_values.gamemode->tagged == this ? TAGGEDBOOST : 0.0f);
+        else
+            maxVel = VELMOVING + (game_values.gamemode->tagged == this ? TAGGEDBOOST : 0.0f);
+    }
+
+    if (velx > maxVel)
+        velx = maxVel;
+
+    if (!inair) {
+        //Make player hop or stick to ground in Kuribo's shoe
+        if (iKuriboShoe > 0) {
+            //This makes the shoe stick to the ground (for sticky shoes)
+            if (iKuriboShoe == 2) {
+                velx = 0.0f;
+            } else {
+                //only allow the player to jump in the air from kuribo's shoe if we aren't bouncing on a note block
+                if (superjumptimer <= 0) {
+                    Jump(lrn, 1.0f, true);
+
+                    superjumptype = 3;
+                    superjumptimer = 16;
+                }
+            }
+        } else if (velx < 0.0f)
+            game_values.playskidsound = true;
+
+        //If rain candy is tyrned on
+        if ((g_map->eyecandy[0] & 32 || g_map->eyecandy[1] & 32 || g_map->eyecandy[2] & 32) && velx > VELMOVINGADD && ++rainsteptimer > 7) {
+            rainsteptimer = 0;
+            eyecandy[1].add(new EC_SingleAnimation(&rm->spr_frictionsmoke, ix, iy + PH - 14, 5, 3, 0, 16, 16, 16));
+        }
+    }
+}
+
+void CPlayer::accelerateLeft()
+{
+    if (onice)
+        velx -= VELMOVINGADDICE;
+    else
+        velx -= VELMOVINGADD;       //move left
+
+    float maxVel = 0.0f;
+    if (!frozen) {
+        if ((game_values.slowdownon != -1 && game_values.slowdownon != teamID) || jailtimer > 0)
+            maxVel = -VELSLOWMOVING;
+        else if (playerKeys->game_turbo.fDown)
+            maxVel = -VELTURBOMOVING - (game_values.gamemode->tagged == this ? TAGGEDBOOST : 0.0f);
+        else
+            maxVel = -VELMOVING - (game_values.gamemode->tagged == this ? TAGGEDBOOST : 0.0f);
+    }
+
+    if (velx < maxVel)
+        velx = maxVel;
+
+    if (!inair) {
+        //Make player hop or stick to ground in Kuribo's shoe
+        if (iKuriboShoe > 0) {
+            //This will make the shoe sticky
+            if (iKuriboShoe == 2) {
+                velx = 0.0f;
+            } else {
+                //only allow the player to jump in the air from kuribo's shoe if we aren't bouncing on a note block
+                if (superjumptimer <= 0) {
+                    Jump(lrn, 1.0f, true);
+
+                    superjumptype = 3;
+                    superjumptimer = 16;
+                }
+            }
+        } else if (velx > 0.0f)
+            game_values.playskidsound = true;
+
+        if ((g_map->eyecandy[0] & 32 || g_map->eyecandy[1] & 32 || g_map->eyecandy[2] & 32) && velx < -VELMOVINGADD && ++rainsteptimer > 7) {
+            rainsteptimer = 0;
+            eyecandy[1].add(new EC_SingleAnimation(&rm->spr_frictionsmoke, ix, iy + PH - 14, 5, 3, 0, 16, 16, 16));
+        }
+    }
+}
+
+void CPlayer::decreaseVelocity()
+{
+    //Add air/ground friction
+    if (velx > 0.0f) {
+        if (inair)
+            velx -= VELAIRFRICTION;
+        else if (onice)
+            velx -= VELICEFRICTION;
+        else
+            velx -= VELMOVINGFRICTION;
+
+        if (velx < 0.0f)
+            velx = 0.0f;
+    } else if (velx < 0.0f) {
+        if (inair)
+            velx += VELAIRFRICTION;
+        else if (onice)
+            velx += VELICEFRICTION;
+        else
+            velx += VELMOVINGFRICTION;
+
+        if (velx > 0.0f)
+            velx = 0.0f;
+    }
+
+    //Stop ground velocity when wearing the sticky shoe
+    if (!inair && iKuriboShoe == 2)
+        velx = 0.0f;
+}
+
 void CPlayer::move()
 {
     //Call the AI if cpu controlled
@@ -563,184 +926,13 @@ void CPlayer::move()
         }
     }
 
-    //Free player from the kuribo shoe
-    if (iKuriboShoe > 0 && state == player_ready && !frozen) {
-        static const int iExitKuriboShoeCode[4] = {4, 8, 4, 8};
+    updateKuriboShoe(); //Free player from the kuribo shoe
 
-        if (iKuriboShoeExitIndex > 0) {
-            if (++iKuriboShoeExitTimer >= 32) {
-                iKuriboShoeExitIndex = 0;
-                iKuriboShoeExitTimer = 0;
-            }
-        }
+    updateCardCollection();
 
-        if (keymask & iExitKuriboShoeCode[iKuriboShoeExitIndex]) {
-            iKuriboShoeExitIndex++;
-        } else if (keymask & ~iExitKuriboShoeCode[iKuriboShoeExitIndex]) {
-            iKuriboShoeExitIndex = 0;
-            iKuriboShoeExitTimer = 0;
-        }
+    updateTanookiStatus();
 
-        if (iKuriboShoeExitIndex == 4 && iKuriboShoeExitTimer < 32) {
-            CO_KuriboShoe * shoe = new CO_KuriboShoe(&rm->spr_kuriboshoe, ix - PWOFFSET, iy - PHOFFSET - 2, iKuriboShoe == 2);
-            shoe->collision_detection_checksides();
-            objectcontainer[1].add(shoe);
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
-
-            iKuriboShoeExitIndex = 0;
-            iKuriboShoeExitTimer = 0;
-            ifSoundOnPlay(rm->sfx_transform);
-            iKuriboShoe = 0;
-
-            fSuperStomp = false;
-            iSuperStompTimer = 0;
-            iSuperStompExitTimer = 0;
-            superstomp_lock = false;
-        }
-    }
-
-    //Free player from the kuribo shoe
-    if (game_values.gamemode->gamemode == game_mode_collection) {
-        if (iDumpCollectionCardIndex > 0) {
-            if (++iDumpCollectionCardTimer >= 32) {
-                iDumpCollectionCardIndex = 0;
-                iDumpCollectionCardTimer = 0;
-            }
-        }
-
-        if (keymask & 16) {
-            iDumpCollectionCardIndex++;
-        } else if (keymask & ~16) {
-            iDumpCollectionCardIndex = 0;
-            iDumpCollectionCardTimer = 0;
-        }
-
-        if (iDumpCollectionCardIndex == 3 && iDumpCollectionCardTimer < 32) {
-            iDumpCollectionCardTimer = 0;
-            iDumpCollectionCardIndex = 0;
-
-            ((CGM_Collection*)game_values.gamemode)->ReleaseCard(*this);
-        }
-    }
-
-
-    if (tanooki && state == player_ready) {
-        // If the down key is ever released, manually untransform by releasing the down key
-        if (!playerKeys->game_down.fDown && statue_timer) {
-            // Untransform from statue
-            statue_timer = 1;
-        }
-
-        // Become the tanooki
-        else if (playerKeys->game_turbo.fPressed && playerKeys->game_down.fDown && !statue_lock && !lockfire && powerupused == -1
-                 && iKuriboShoe == 0 && iTailState == 0) {
-            // set the amount of time you get to remain in statue form
-            statue_timer = 123;
-
-            // perform tansformation effects
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
-            ifSoundOnPlay(rm->sfx_transform);
-
-            // Neutralize lateral velocity
-            const float tv = 1.6f;
-            if (velx > tv)
-                velx = tv;
-            else if (velx < -tv)
-                velx = -tv;
-
-            // Cause statue to super stomp to ground
-            if (inair && !fSuperStomp && iSuperStompTimer <= 0 && !superstomp_lock) {
-                iSuperStompTimer = 8;
-                lockfall = true;
-
-                // Become soft shielded (with stomp ability)
-                shield = 2;
-
-                // Stop player from super stomping twice before touching the ground
-                superstomp_lock = true;
-            }
-
-            // Prevent you from shooting
-            lockfire = true;
-
-            // Prevent you from falling through solid-on-top blocks
-            lockfall = true;
-
-            // Prevent you from becoming the statue twice before touching the ground
-            statue_lock = true;
-
-            //If we were flying or spinning when we became the statue, clear those states
-            ClearPowerupStates();
-        }
-
-        if (!fSuperStomp && iSuperStompTimer <= 0) {
-            // Count down the statue timer, which leads to a forced detransformation
-            if (statue_timer == 1) {
-                // Untransform from statue
-                statue_timer = 0;
-
-                // Release invincibility
-                shield = 0;
-
-                // Slight upward velocity to escape spikes / lava
-                if (!inair)
-                    vely = -8.0;
-
-                // perform transformation effects
-                eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
-                ifSoundOnPlay(rm->sfx_transform);
-
-                //Decrease the amount of tanooki uses, if feature is turned on
-                if (game_values.tanookilimit > 0 || tanookilimit > 0) {
-                    if (--tanookilimit <= 0) {
-                        tanooki = false;
-                        tanookilimit = 0;
-                        ifSoundOnPlay(rm->sfx_powerdown);
-                    }
-                }
-            }
-
-            // Player is a statue
-            else if (statue_timer > 0) {
-                // Prevent player from shooting while a statue
-                lockfire = true;
-
-                // Prevent player from jumping
-                lockjump = true;
-
-                // Don't fall through passable platforms
-                fallthrough = false;
-
-                // Decrement statue timer3
-                statue_timer--;
-
-                // Become soft shielded (with stomp ability)
-                shield = 2;
-
-                statue_lock = true;
-            }
-        }
-    }
-
-    if (!inair) {
-        //If the player is touching the ground, then free the lock on super stomping
-        superstomp_lock = false;
-
-        //If they are touching the ground and they are not the statue, allow them to become the statue again
-        if (statue_timer <= 0)
-            statue_lock = false;
-
-        //If they were super stomping and they are not in the air anymore (i.e. on the ground), then create the
-        //super stomp attack zone, play the sound and show the stomp gfx
-        if (fSuperStomp) {
-            eyecandy[2].add(new EC_SuperStompExplosion(&rm->spr_superstomp, ix + HALFPW, iy + PH, 4));
-            ifSoundOnPlay(rm->sfx_bobombsound);
-            fSuperStomp = false;
-
-            objectcontainer[1].add(new MO_AttackZone(globalID, teamID, ix - 32, iy + 10, 32, 15, 8, kill_style_kuriboshoe, false));
-            objectcontainer[1].add(new MO_AttackZone(globalID, teamID, ix + PW, iy + 10, 32, 15, 8, kill_style_kuriboshoe, false));
-        }
-    }
+    updateSuperStomp();
 
     if (hammertimer > 0)
         hammertimer--;
@@ -1045,51 +1237,11 @@ void CPlayer::move()
         }
     }
 
-    //Animate invincibility
-    if (invincible) {
-        animationtimer++;
+    updateInvincibility(); // Animate invincibility
 
-        if ((animationtimer > 3 && invincibletimer < smw->ScreenHeight) || animationtimer > 6) {
-            animationtimer = 0;
+    updateFrozenStatus();
 
-            animationstate += 32;
-            if (animationstate > 96)
-                animationstate = 0;
-        }
-
-        if (++invincibletimer > 580) {
-            animationstate = 0;
-            animationtimer = 0;
-            invincibletimer = 0;
-            invincible = false;
-        }
-    }
-
-    if (frozen) {
-        if ((~(spr & 0x1) && (keymask & 4)) || ((spr & 0x1) && (keymask & 8)))
-            frozentimer -= 5;
-
-        if (--frozentimer <= 0) {
-            frozentimer = 0;
-            frozen = false;
-
-            //Shield the player after becoming unfrozen to protect against being frozen again
-            shield = game_values.shieldstyle > 0 ? game_values.shieldstyle : 1;
-            shieldtimer = 60;
-
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
-        }
-    }
-
-    if (iKuriboShoe > 0) {
-        if (++iKuriboShoeAnimationTimer > 7) {
-            iKuriboShoeAnimationTimer = 0;
-            iKuriboShoeAnimationFrame += 32;
-
-            if (iKuriboShoeAnimationFrame > 32)
-                iKuriboShoeAnimationFrame = 0;
-        }
-    }
+    updateKuriboShoeAnimation();
 
     //if player is warping or spawning don't pay attention to controls
     if (state == player_ready) {
@@ -1375,117 +1527,11 @@ void CPlayer::move()
         }
 
         if (lrn == 1) {
-            if (onice)
-                velx += VELMOVINGADDICE;
-            else
-                velx += VELMOVINGADD;		//move right
-
-            float maxVel = 0.0f;
-            if (!frozen) {
-                if ((game_values.slowdownon != -1 && game_values.slowdownon != teamID) || jailtimer > 0)
-                    maxVel = VELSLOWMOVING;
-                else if (playerKeys->game_turbo.fDown)
-                    maxVel = VELTURBOMOVING + (game_values.gamemode->tagged == this ? TAGGEDBOOST : 0.0f);
-                else
-                    maxVel = VELMOVING + (game_values.gamemode->tagged == this ? TAGGEDBOOST : 0.0f);
-            }
-
-            if (velx > maxVel)
-                velx = maxVel;
-
-            if (!inair) {
-                //Make player hop or stick to ground in Kuribo's shoe
-                if (iKuriboShoe > 0) {
-                    //This makes the shoe stick to the ground (for sticky shoes)
-                    if (iKuriboShoe == 2) {
-                        velx = 0.0f;
-                    } else {
-                        //only allow the player to jump in the air from kuribo's shoe if we aren't bouncing on a note block
-                        if (superjumptimer <= 0) {
-                            Jump(lrn, 1.0f, true);
-
-                            superjumptype = 3;
-                            superjumptimer = 16;
-                        }
-                    }
-                } else if (velx < 0.0f)
-                    game_values.playskidsound = true;
-
-                //If rain candy is tyrned on
-                if ((g_map->eyecandy[0] & 32 || g_map->eyecandy[1] & 32 || g_map->eyecandy[2] & 32) && velx > VELMOVINGADD && ++rainsteptimer > 7) {
-                    rainsteptimer = 0;
-                    eyecandy[1].add(new EC_SingleAnimation(&rm->spr_frictionsmoke, ix, iy + PH - 14, 5, 3, 0, 16, 16, 16));
-                }
-            }
+            accelerateRight();
         } else if (lrn == -1) {
-            if (onice)
-                velx -= VELMOVINGADDICE;
-            else
-                velx -= VELMOVINGADD;		//move left
-
-            float maxVel = 0.0f;
-            if (!frozen) {
-                if ((game_values.slowdownon != -1 && game_values.slowdownon != teamID) || jailtimer > 0)
-                    maxVel = -VELSLOWMOVING;
-                else if (playerKeys->game_turbo.fDown)
-                    maxVel = -VELTURBOMOVING - (game_values.gamemode->tagged == this ? TAGGEDBOOST : 0.0f);
-                else
-                    maxVel = -VELMOVING - (game_values.gamemode->tagged == this ? TAGGEDBOOST : 0.0f);
-            }
-
-            if (velx < maxVel)
-                velx = maxVel;
-
-            if (!inair) {
-                //Make player hop or stick to ground in Kuribo's shoe
-                if (iKuriboShoe > 0) {
-                    //This will make the shoe sticky
-                    if (iKuriboShoe == 2) {
-                        velx = 0.0f;
-                    } else {
-                        //only allow the player to jump in the air from kuribo's shoe if we aren't bouncing on a note block
-                        if (superjumptimer <= 0) {
-                            Jump(lrn, 1.0f, true);
-
-                            superjumptype = 3;
-                            superjumptimer = 16;
-                        }
-                    }
-                } else if (velx > 0.0f)
-                    game_values.playskidsound = true;
-
-                if ((g_map->eyecandy[0] & 32 || g_map->eyecandy[1] & 32 || g_map->eyecandy[2] & 32) && velx < -VELMOVINGADD && ++rainsteptimer > 7) {
-                    rainsteptimer = 0;
-                    eyecandy[1].add(new EC_SingleAnimation(&rm->spr_frictionsmoke, ix, iy + PH - 14, 5, 3, 0, 16, 16, 16));
-                }
-            }
+            accelerateLeft();
         } else {
-            //Add air/ground friction
-            if (velx > 0.0f) {
-                if (inair)
-                    velx -= VELAIRFRICTION;
-                else if (onice)
-                    velx -= VELICEFRICTION;
-                else
-                    velx -= VELMOVINGFRICTION;
-
-                if (velx < 0.0f)
-                    velx = 0.0f;
-            } else if (velx < 0.0f) {
-                if (inair)
-                    velx += VELAIRFRICTION;
-                else if (onice)
-                    velx += VELICEFRICTION;
-                else
-                    velx += VELMOVINGFRICTION;
-
-                if (velx > 0.0f)
-                    velx = 0.0f;
-            }
-
-            //Stop ground velocity when wearing the sticky shoe
-            if (!inair && iKuriboShoe == 2)
-                velx = 0.0f;
+            decreaseVelocity();
         }
 
         if (!inair) {
