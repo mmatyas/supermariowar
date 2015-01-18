@@ -184,7 +184,7 @@ void CPlayer::Init()
         pPlayerAI->Init();
 }
 
-void CPlayer::updateKuriboShoe()
+void CPlayer::updateKuriboShoe(int keymask)
 {
     if (iKuriboShoe > 0 && state == player_ready && !frozen) {
         static const int iExitKuriboShoeCode[4] = {4, 8, 4, 8};
@@ -323,7 +323,7 @@ void CPlayer::updateTanookiStatus()
     }
 }
 
-void CPlayer::updateCardCollection()
+void CPlayer::updateCardCollection(int keymask)
 {
     if (game_values.gamemode->gamemode == game_mode_collection) {
         if (iDumpCollectionCardIndex > 0) {
@@ -407,7 +407,7 @@ void CPlayer::updateKuriboShoeAnimation()
     }
 }
 
-void CPlayer::updateFrozenStatus()
+void CPlayer::updateFrozenStatus(int keymask)
 {
     if (frozen) {
         if ((~(spr & 0x1) && (keymask & 4)) || ((spr & 0x1) && (keymask & 8)))
@@ -455,7 +455,7 @@ void CPlayer::accelerateRight()
             } else {
                 //only allow the player to jump in the air from kuribo's shoe if we aren't bouncing on a note block
                 if (superjumptimer <= 0) {
-                    Jump(lrn, 1.0f, true);
+                    Jump(1, 1.0f, true);
 
                     superjumptype = 3;
                     superjumptimer = 16;
@@ -501,7 +501,7 @@ void CPlayer::accelerateLeft()
             } else {
                 //only allow the player to jump in the air from kuribo's shoe if we aren't bouncing on a note block
                 if (superjumptimer <= 0) {
-                    Jump(lrn, 1.0f, true);
+                    Jump(-1, 1.0f, true);
 
                     superjumptype = 3;
                     superjumptimer = 16;
@@ -926,9 +926,9 @@ void CPlayer::move()
         }
     }
 
-    updateKuriboShoe(); //Free player from the kuribo shoe
+    updateKuriboShoe(keymask); //Free player from the kuribo shoe
 
-    updateCardCollection();
+    updateCardCollection(keymask);
 
     updateTanookiStatus();
 
@@ -1239,7 +1239,7 @@ void CPlayer::move()
 
     updateInvincibility(); // Animate invincibility
 
-    updateFrozenStatus();
+    updateFrozenStatus(keymask);
 
     updateKuriboShoeAnimation();
 

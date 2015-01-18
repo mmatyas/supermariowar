@@ -79,6 +79,17 @@ class CPlayer
 		void AddKillsInRowInAirAward();
 		void SetupNewPlayer();
 
+		void updateKuriboShoe(int keymask);
+		void updateTanookiStatus();
+		void updateCardCollection(int keymask);
+		void updateSuperStomp();
+		void updateInvincibility();
+		void updateKuriboShoeAnimation();
+		void updateFrozenStatus(int keymask);
+		void accelerateRight();
+		void accelerateLeft();
+		void decreaseVelocity();
+
     short getGlobalID() {
         return globalID;
     }
