@@ -195,6 +195,8 @@ endif()
 #
 #-----------------------------------------------------------------------------
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
+
 if(WIN32)
 #	enable_precompiled_headers(Src/stdafx.h Src/stdafx.cpp SRCS)
 endif(WIN32)
@@ -202,32 +204,30 @@ endif(WIN32)
 # emscripten uses its own SDL, no need to include or link
 if(NOT USE_EMSCRIPTEN)
 	if(USE_SDL2_LIBS)
-		INCLUDE(FindPkgConfig)
-		## add all SDL dependencies
-		## case sensitive!
-		#TODO: Create SDL2 modules
-		PKG_SEARCH_MODULE ( SDL2 REQUIRED sdl2 )
-		PKG_SEARCH_MODULE ( SDL2_mixer REQUIRED SDL2_mixer )
-		PKG_SEARCH_MODULE ( SDL2_image REQUIRED SDL2_image )
-		#Include(FindENet) #TODO: Create enet module
+		# add all SDL2 dependencies
+		find_package(SDL2 REQUIRED)
+		find_package(SDL2_mixer REQUIRED)
+		find_package(SDL2_image REQUIRED)
 
-		#include_directories(${SDL2_INCLUDE_DIR})
-		#include_directories(pkg-config --cflags sdl2)
-		include_directories("/usr/include/SDL2")
+		# location of SDL headers
+		include_directories(${SDL2_INCLUDE_DIR})
+		include_directories(${SDL2_IMAGE_INCLUDE_DIRS})
+		include_directories(${SDL2_MIXER_INCLUDE_DIRS})
 	else()
-		## add all SDL dependencies
-		Include(FindSDL)
-		Include(FindSDL_image)
-		Include(FindSDL_mixer)
-		#Include(FindENet) #TODO: Create enet module
+		# add all SDL dependencies
+		find_package(SDL REQUIRED)
+		find_package(SDL_mixer REQUIRED)
+		find_package(SDL_image REQUIRED)
 
-		find_package ( SDL REQUIRED )
-		find_package ( SDL_mixer REQUIRED )
-		find_package ( SDL_image REQUIRED )
-		#find_package ( enet REQUIRED )
-
+		# location of SDL headers
 		include_directories(${SDL_INCLUDE_DIR})
+		include_directories(${SDL_IMAGE_INCLUDE_DIRS})
+		include_directories(${SDL_MIXER_INCLUDE_DIRS})
 	endif()
+endif()
+
+if(NOT NO_NETWORK)
+	find_package(ENet REQUIRED)
 endif()
 
 ## the optional libpng package
@@ -240,8 +240,6 @@ if(USE_PNG_SAVE)
 
 	LIST(APPEND COMMON_SRCS src/savepng.cpp)
 endif()
-
-## end of SDL dependencies
 
 check_and_add_flag(VISIBILITY_INLINES_HIDDEN -fvisibility-inlines-hidden)
 
