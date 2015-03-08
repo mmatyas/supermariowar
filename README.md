@@ -56,6 +56,7 @@ For other systems, you can download the development files manually from:
 Create a build directory and run CMake there to configure the project. Then simply call `make` every time you want to build. The binaries will be generated in ./Build/Binaries/Release by default.
 
 ```sh
+$ unzip data.zip
 $ mkdir Build && cd Build && cmake ..
 $ make -j4 # -jN = build on N threads
 $ ./Binaries/Release/smw ../data
