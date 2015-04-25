@@ -67,6 +67,7 @@ Currently, the following separate build targets are defined for `make`:
 - smw
 - smw-leveleditor
 - smw-worldeditor
+- smw-server
 
 If you prefer to work within an IDE (CodeBlocks, Eclipse, ...), you can also generate project files using CMake. You can find more information in *Build configuration*.
 

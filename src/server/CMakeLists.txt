@@ -11,4 +11,4 @@ set (SERVER_SRCS
 )
 
 add_executable (smw-server ${SERVER_SRCS})
-target_link_libraries(smw-server enet)
+target_link_libraries (smw-server enet)

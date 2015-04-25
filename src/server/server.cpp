@@ -79,7 +79,7 @@ void SMWServer::readConfig()
                     }
                 }
 
-                // TODO: jelszó implemetáció
+                // TODO: implement password
             }
         }
     }
