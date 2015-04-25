@@ -97,17 +97,17 @@ You can prepare a build directory with the following commands:
 ```sh
 $ mkdir build-js && cd build-js
 $ ln -s ../data data
-$ emconfigure cmake .. -DUSE_EMSCRIPTEN=1
+$ emconfigure cmake .. -DUSE_EMSCRIPTEN=1 -DNO_NETWORK=1
 ```
 
 Then build with:
 
 ```sh
 $ emmake make
-$ BUILDPARAMS="-O3 -v --preload-file data -s OUTLINING_LIMIT=60000 -s ALLOW_MEMORY_GROWTH=1"
-$ emcc Binaries/smw.bc -o smw.html $BUILDPARAMS
-$ emcc Binaries/smw-leveledit.bc -o leveledit.html $BUILDPARAMS
-$ emcc Binaries/smw-worldedit.bc -o worldedit.html $BUILDPARAMS
+$ BUILDPARAMS="-O3 -v --preload-file data -s OUTLINING_LIMIT=60000 -s ALLOW_MEMORY_GROWTH=1 -s ASSERTIONS=1"
+$ emcc Binaries/Release/smw.bc -o smw.html $BUILDPARAMS
+$ emcc Binaries/Release/smw-leveledit.bc -o leveledit.html $BUILDPARAMS
+$ emcc Binaries/Release/smw-worldedit.bc -o worldedit.html $BUILDPARAMS
 ```
 ### Build configuration
 
