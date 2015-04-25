@@ -381,6 +381,7 @@ add_subdirectory(src/common)
 add_subdirectory(src/smw)
 add_subdirectory(src/leveleditor)
 add_subdirectory(src/worldeditor)
+add_subdirectory(src/server)
 
 
 #-----------------------------------------------------------------------------

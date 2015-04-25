@@ -1,0 +1,6 @@
+# SMW Server configuration
+
+port 12521
+name Server
+maxplayers 10
+password passwd
