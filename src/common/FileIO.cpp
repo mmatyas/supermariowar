@@ -1,6 +1,7 @@
 #include "FileIO.h"
 #include "path.h"
 
+#include <stdint.h>
 
 FILE * OpenFile(const char * filename, const char * options)
 {
@@ -120,13 +121,13 @@ void ReadString(char * szString, short size, FILE * inFile)
 
 void WriteByteFromShort(short out, FILE * outFile)
 {
-	char b = (char)out;
+	int8_t b = (int8_t)out;
 	fwrite(&b, sizeof(Uint8), 1, outFile);
 }
 
 short ReadByteAsShort(FILE * inFile)
 {
-	char b;
+	int8_t b;
 	fread(&b, sizeof(Uint8), 1, inFile);
 
 	return (short)b;
