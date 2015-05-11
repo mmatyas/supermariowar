@@ -80,17 +80,6 @@ class MenuState : public GameState
 
 		UI_MainMenu mMainMenu;
 
-		//Team Options Menu
-		UI_Menu mTeamOptionsMenu;
-		MI_SelectField * miTeamKillsField;
-		MI_SelectField * miTeamColorsField;
-		MI_SelectField * miTournamentControlField;
-		MI_Button * miTeamOptionsMenuBackButton;
-
-		MI_Image * miTeamOptionsMenuLeftHeaderBar;
-		MI_Image * miTeamOptionsMenuRightHeaderBar;
-		MI_Text * miTeamOptionsMenuHeaderText;
-
 		//Powerup Weight Selection
 		UI_Menu mPowerupSelectionMenu;
 		MI_PowerupSelection * miPowerupSelection;
