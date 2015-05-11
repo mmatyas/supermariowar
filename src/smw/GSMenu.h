@@ -4,6 +4,8 @@
 #include "modeoptionsmenu.h"
 #include "uicustomcontrol.h"
 
+#include "menu/MainMenu.h"
+
 #include "GameState.h"
 
 #ifdef _DEBUG
@@ -76,23 +78,7 @@ class MenuState : public GameState
 
 		UI_Menu * mCurrentMenu;
 
-		//Main Menu
-		UI_Menu mMainMenu;
-
-		MI_Image * miSMWTitle;
-		MI_Image * miSMWVersion;
-		//MI_Text * miSMWVersionText;
-
-		MI_Button * miMainStartButton;
-		MI_Button * miQuickGameButton;
-		MI_Button * miMultiplayerButton;
-
-		MI_PlayerSelect * miPlayerSelect;
-
-		MI_Button * miOptionsButton;
-		MI_Button * miControlsButton;
-
-		MI_Button * miExitButton;
+		UI_MainMenu mMainMenu;
 
 
 		//Player Controls Select Menu

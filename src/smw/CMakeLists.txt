@@ -13,6 +13,13 @@ LIST(APPEND SMW_SRCS
 	objects/blocks/BreakableBlock.cpp
 )
 
+#
+# Menu screens
+#
+LIST(APPEND SMW_SRCS
+	menu/MainMenu.cpp
+)
+
 if(NOT NO_NETWORK)
 	# disable networking in emscripten build for now...
 	if(NOT USE_EMSCRIPTEN)
