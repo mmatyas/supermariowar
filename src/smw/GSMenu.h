@@ -80,23 +80,6 @@ class MenuState : public GameState
 
 		UI_MainMenu mMainMenu;
 
-		//Gameplay Options Menu
-		UI_Menu mGameplayOptionsMenu;
-		MI_SelectField * miRespawnField;
-		MI_SelectField * miShieldStyleField;
-		MI_SelectField * miShieldTimeField;
-		MI_SelectField * miBoundsTimeField;
-		MI_SelectField * miSuicideTimeField;
-		MI_SelectField * miWarpLockStyleField;
-		MI_SelectField * miWarpLockTimeField;
-		MI_SelectField * miBotsField;
-		MI_SelectField * miPointSpeedField;
-		MI_Button * miGameplayOptionsMenuBackButton;
-
-		MI_Image * miGameplayOptionsMenuLeftHeaderBar;
-		MI_Image * miGameplayOptionsMenuRightHeaderBar;
-		MI_Text * miGameplayOptionsMenuHeaderText;
-
 		//Team Options Menu
 		UI_Menu mTeamOptionsMenu;
 		MI_SelectField * miTeamKillsField;
