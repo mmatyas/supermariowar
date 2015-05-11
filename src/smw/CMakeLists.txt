@@ -20,6 +20,7 @@ LIST(APPEND SMW_SRCS
 	menu/MainMenu.cpp
 	menu/PlayerControlsSelectMenu.cpp
 	menu/PlayerControlsMenu.cpp
+	menu/OptionsMenu.cpp
 )
 
 if(NOT NO_NETWORK)

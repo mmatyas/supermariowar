@@ -3,7 +3,6 @@
 
 #include "uimenu.h"
 #include "uicontrol.h"
-#include "uicustomcontrol.h"
 
 /*
 	This menu leads to the control settings of player 1-4.

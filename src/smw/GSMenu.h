@@ -4,11 +4,9 @@
 #include "modeoptionsmenu.h"
 #include "uicustomcontrol.h"
 
-#include "menu/MainMenu.h"
-#include "menu/PlayerControlsSelectMenu.h"
-#include "menu/PlayerControlsMenu.h"
-
 #include "GameState.h"
+
+#include "menu/MainMenu.h"
 
 #ifdef _DEBUG
 class ScriptOperation
@@ -81,31 +79,6 @@ class MenuState : public GameState
 		UI_Menu * mCurrentMenu;
 
 		UI_MainMenu mMainMenu;
-
-		//Options Menu
-		UI_Menu mOptionsMenu;
-		MI_Button * miGameplayOptionsMenuButton;
-		MI_Button * miTeamOptionsMenuButton;
-		MI_Button * miPowerupOptionsMenuButton;
-		MI_Button * miProjectilesOptionsMenuButton;
-		MI_Button * miProjectilesLimitsMenuButton;
-		MI_Button * miPowerupSettingsMenuButton;
-		MI_Button * miGraphicsOptionsMenuButton;
-		MI_Button * miEyeCandyOptionsMenuButton;
-		MI_Button * miSoundOptionsMenuButton;
-		MI_Button * miGenerateMapThumbsButton;
-
-		MI_Button * miOptionsMenuBackButton;
-
-		MI_Image * miOptionsMenuLeftHeaderBar;
-		MI_Image * miOptionsMenuRightHeaderBar;
-		MI_Text * miOptionsMenuHeaderText;
-
-		MI_Image * miGenerateThumbsDialogImage;
-		MI_Text * miGenerateThumbsDialogAreYouText;
-		MI_Text * miGenerateThumbsDialogSureText;
-		MI_Button * miGenerateThumbsDialogYesButton;
-		MI_Button * miGenerateThumbsDialogNoButton;
 
 		//Gameplay Options Menu
 		UI_Menu mGameplayOptionsMenu;

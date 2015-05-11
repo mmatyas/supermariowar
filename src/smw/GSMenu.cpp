@@ -12,6 +12,11 @@
 #include "ResourceManager.h"
 #include "Score.h"
 
+#include "menu/MainMenu.h"
+#include "menu/OptionsMenu.h"
+#include "menu/PlayerControlsMenu.h"
+#include "menu/PlayerControlsSelectMenu.h"
+
 #include <cmath>
 #include <cstdlib> // atoi()
 
@@ -470,93 +475,6 @@ void MenuState::CreateMenu()
 
     mNetRoom.SetHeadControl(miNetRoomMessageField);
     mNetRoom.SetCancelCode(MENU_CODE_TO_NET_LOBBY_MENU);
-
-
-    //***********************
-    // Options Menu
-    //***********************
-
-    miGameplayOptionsMenuButton = new MI_Button(&rm->spr_selectfield, 120, 40, "Gameplay", 400, 1);
-    miGameplayOptionsMenuButton->SetCode(MENU_CODE_TO_GAMEPLAY_OPTIONS_MENU);
-
-    miTeamOptionsMenuButton = new MI_Button(&rm->spr_selectfield, 120, 80, "Team", 400, 1);
-    miTeamOptionsMenuButton->SetCode(MENU_CODE_TO_TEAM_OPTIONS_MENU);
-
-    miPowerupOptionsMenuButton = new MI_Button(&rm->spr_selectfield, 120, 120, "Item Selection", 400, 1);
-    miPowerupOptionsMenuButton->SetCode(MENU_CODE_TO_POWERUP_SELECTION_MENU);
-
-    miPowerupSettingsMenuButton = new MI_Button(&rm->spr_selectfield, 120, 160, "Item Settings", 400, 1);
-    miPowerupSettingsMenuButton->SetCode(MENU_CODE_TO_POWERUP_SETTINGS_MENU);
-
-    miProjectilesOptionsMenuButton = new MI_Button(&rm->spr_selectfield, 120, 200, "Weapons & Projectiles", 400, 1);
-    miProjectilesOptionsMenuButton->SetCode(MENU_CODE_TO_PROJECTILES_OPTIONS_MENU);
-
-    miProjectilesLimitsMenuButton = new MI_Button(&rm->spr_selectfield, 120, 240, "Weapon Use Limits", 400, 1);
-    miProjectilesLimitsMenuButton->SetCode(MENU_CODE_TO_PROJECTILES_LIMITS_MENU);
-
-    miGraphicsOptionsMenuButton = new MI_Button(&rm->spr_selectfield, 120, 280, "Graphics", 400, 1);
-    miGraphicsOptionsMenuButton->SetCode(MENU_CODE_TO_GRAPHICS_OPTIONS_MENU);
-
-    miEyeCandyOptionsMenuButton = new MI_Button(&rm->spr_selectfield, 120, 320, "Eye Candy", 400, 1);
-    miEyeCandyOptionsMenuButton->SetCode(MENU_CODE_TO_EYECANDY_OPTIONS_MENU);
-
-    miSoundOptionsMenuButton = new MI_Button((game_values.soundcapable ? &rm->spr_selectfield : &rm->spr_selectfielddisabled), 120, 360, "Music & Sound", 400, 1);
-
-    if (game_values.soundcapable)
-        miSoundOptionsMenuButton->SetCode(MENU_CODE_TO_SOUND_OPTIONS_MENU);
-
-    miGenerateMapThumbsButton = new MI_Button(&rm->spr_selectfield, 120, 400, "Refresh Maps", 400, 1);
-    miGenerateMapThumbsButton->SetCode(MENU_CODE_SAVE_ALL_MAP_THUMBNAILS);
-
-    miOptionsMenuBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
-    miOptionsMenuBackButton->SetCode(MENU_CODE_TO_MAIN_MENU);
-
-    miOptionsMenuLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
-    miOptionsMenuRightHeaderBar = new MI_Image(&rm->menu_plain_field, smw->ScreenWidth/2, 0, 192, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
-    miOptionsMenuHeaderText = new MI_Text("Options Menu", smw->ScreenWidth/2, 5, 0, 2, 1);
-
-    miGenerateThumbsDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
-    miGenerateThumbsDialogAreYouText = new MI_Text("Are You", smw->ScreenWidth/2, 195, 0, 2, 1);
-    miGenerateThumbsDialogSureText = new MI_Text("Sure?", smw->ScreenWidth/2, 220, 0, 2, 1);
-    miGenerateThumbsDialogYesButton = new MI_Button(&rm->spr_selectfield, 235, 250, "Yes", 80, 1);
-    miGenerateThumbsDialogNoButton = new MI_Button(&rm->spr_selectfield, 325, 250, "No", 80, 1);
-
-    miGenerateThumbsDialogYesButton->SetCode(MENU_CODE_GENERATE_THUMBS_RESET_YES);
-    miGenerateThumbsDialogNoButton->SetCode(MENU_CODE_GENERATE_THUMBS_RESET_NO);
-
-    miGenerateThumbsDialogImage->Show(false);
-    miGenerateThumbsDialogAreYouText->Show(false);
-    miGenerateThumbsDialogSureText->Show(false);
-    miGenerateThumbsDialogYesButton->Show(false);
-    miGenerateThumbsDialogNoButton->Show(false);
-
-    mOptionsMenu.AddControl(miGameplayOptionsMenuButton, miOptionsMenuBackButton, miTeamOptionsMenuButton, NULL, miOptionsMenuBackButton);
-    mOptionsMenu.AddControl(miTeamOptionsMenuButton, miGameplayOptionsMenuButton, miPowerupOptionsMenuButton, NULL, miOptionsMenuBackButton);
-    mOptionsMenu.AddControl(miPowerupOptionsMenuButton, miTeamOptionsMenuButton, miPowerupSettingsMenuButton, NULL, miOptionsMenuBackButton);
-    mOptionsMenu.AddControl(miPowerupSettingsMenuButton, miPowerupOptionsMenuButton, miProjectilesOptionsMenuButton, NULL, miOptionsMenuBackButton);
-    mOptionsMenu.AddControl(miProjectilesOptionsMenuButton, miPowerupSettingsMenuButton, miProjectilesLimitsMenuButton, NULL, miOptionsMenuBackButton);
-    mOptionsMenu.AddControl(miProjectilesLimitsMenuButton, miProjectilesOptionsMenuButton, miGraphicsOptionsMenuButton, NULL, miOptionsMenuBackButton);
-    mOptionsMenu.AddControl(miGraphicsOptionsMenuButton, miProjectilesLimitsMenuButton, miEyeCandyOptionsMenuButton, NULL, miOptionsMenuBackButton);
-    mOptionsMenu.AddControl(miEyeCandyOptionsMenuButton, miGraphicsOptionsMenuButton, miSoundOptionsMenuButton, NULL, miOptionsMenuBackButton);
-    mOptionsMenu.AddControl(miSoundOptionsMenuButton, miEyeCandyOptionsMenuButton, miGenerateMapThumbsButton, NULL, miOptionsMenuBackButton);
-    mOptionsMenu.AddControl(miGenerateMapThumbsButton, miSoundOptionsMenuButton, miOptionsMenuBackButton, NULL, miOptionsMenuBackButton);
-
-    mOptionsMenu.AddControl(miOptionsMenuBackButton, miGenerateMapThumbsButton, miGameplayOptionsMenuButton, miGenerateMapThumbsButton, NULL);
-
-    mOptionsMenu.AddNonControl(miOptionsMenuLeftHeaderBar);
-    mOptionsMenu.AddNonControl(miOptionsMenuRightHeaderBar);
-    mOptionsMenu.AddNonControl(miOptionsMenuHeaderText);
-
-    mOptionsMenu.AddNonControl(miGenerateThumbsDialogImage);
-    mOptionsMenu.AddNonControl(miGenerateThumbsDialogAreYouText);
-    mOptionsMenu.AddNonControl(miGenerateThumbsDialogSureText);
-
-    mOptionsMenu.AddControl(miGenerateThumbsDialogYesButton, NULL, NULL, NULL, miGenerateThumbsDialogNoButton);
-    mOptionsMenu.AddControl(miGenerateThumbsDialogNoButton, NULL, NULL, miGenerateThumbsDialogYesButton, NULL);
-
-    mOptionsMenu.SetHeadControl(miGameplayOptionsMenuButton);
-    mOptionsMenu.SetCancelCode(MENU_CODE_TO_MAIN_MENU);
-
 
     //***********************
     // Graphics Options
@@ -2472,10 +2390,10 @@ void MenuState::update()
         } else if (MENU_CODE_WORLD_MAP_CHANGED == code) {
             miWorldPreviewDisplay->SetWorld();
         } else if (MENU_CODE_TO_OPTIONS_MENU == code) {
-            mCurrentMenu = &mOptionsMenu;
+            mCurrentMenu = new UI_OptionsMenu();
             mCurrentMenu->ResetMenu();
         } else if (MENU_CODE_BACK_TO_OPTIONS_MENU == code) {
-            mCurrentMenu = &mOptionsMenu;
+            mCurrentMenu = new UI_OptionsMenu();
         } else if (MENU_CODE_BACK_TO_GRAPHIC_OPTIONS_MENU == code) {
             mCurrentMenu = &mGraphicsOptionsMenu;
         } else if (MENU_CODE_TO_CONTROLS_MENU == code) {
@@ -3008,28 +2926,10 @@ void MenuState::update()
             mCurrentMenu = &mMapFilterEditMenu;
             mCurrentMenu->ResetMenu();
         } else if (MENU_CODE_SAVE_ALL_MAP_THUMBNAILS == code) {
-            miGenerateThumbsDialogImage->Show(true);
-            miGenerateThumbsDialogAreYouText->Show(true);
-            miGenerateThumbsDialogSureText->Show(true);
-            miGenerateThumbsDialogYesButton->Show(true);
-            miGenerateThumbsDialogNoButton->Show(true);
-
-            mOptionsMenu.RememberCurrent();
-
-            mOptionsMenu.SetHeadControl(miGenerateThumbsDialogNoButton);
-            mOptionsMenu.SetCancelCode(MENU_CODE_GENERATE_THUMBS_RESET_NO);
-            mOptionsMenu.ResetMenu();
+            ((UI_OptionsMenu*) mCurrentMenu)->showThumbnailsPopup();
+            mCurrentMenu->ResetMenu();
         } else if (MENU_CODE_GENERATE_THUMBS_RESET_YES == code || MENU_CODE_GENERATE_THUMBS_RESET_NO == code) {
-            miGenerateThumbsDialogImage->Show(false);
-            miGenerateThumbsDialogAreYouText->Show(false);
-            miGenerateThumbsDialogSureText->Show(false);
-            miGenerateThumbsDialogYesButton->Show(false);
-            miGenerateThumbsDialogNoButton->Show(false);
-
-            mOptionsMenu.SetHeadControl(miGameplayOptionsMenuButton);
-            mOptionsMenu.SetCancelCode(MENU_CODE_TO_MAIN_MENU);
-
-            mOptionsMenu.RestoreCurrent();
+            ((UI_OptionsMenu*) mCurrentMenu)->hideThumbnailsPopup();
 
             if (MENU_CODE_GENERATE_THUMBS_RESET_YES == code) {
                 fGenerateMapThumbs = true;
