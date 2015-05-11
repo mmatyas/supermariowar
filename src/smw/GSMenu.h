@@ -5,6 +5,7 @@
 #include "uicustomcontrol.h"
 
 #include "menu/MainMenu.h"
+#include "menu/PlayerControlsSelectMenu.h"
 
 #include "GameState.h"
 
@@ -79,21 +80,7 @@ class MenuState : public GameState
 		UI_Menu * mCurrentMenu;
 
 		UI_MainMenu mMainMenu;
-
-
-		//Player Controls Select Menu
-		UI_Menu mPlayerControlsSelectMenu;
-
-		MI_Button * miPlayer1ControlsButton;
-		MI_Button * miPlayer2ControlsButton;
-		MI_Button * miPlayer3ControlsButton;
-		MI_Button * miPlayer4ControlsButton;
-
-		MI_Button * miPlayerControlsBackButton;
-
-		MI_Image * miPlayerControlsLeftHeaderBar;
-		MI_Image * miPlayerControlsMenuRightHeaderBar;
-		MI_Text * miPlayerControlsMenuHeaderText;
+		UI_PlayerControlsSelectMenu mPlayerControlsSelectMenu;
 
 
 		//Player Controls Menu

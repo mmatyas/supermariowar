@@ -235,47 +235,7 @@ void MenuState::CreateMenu()
     //Create the mode options menus
     modeOptionsMenu.CreateMenu();
 
-    //***********************
-    // Main Menu
-    //***********************
-
     mCurrentMenu = &mMainMenu;
-
-    //***********************
-    // Player Control Select Menu
-    //***********************
-
-    miPlayer1ControlsButton = new MI_Button(&rm->spr_selectfield, 120, 140, "Player 1", 400, 1);
-    miPlayer1ControlsButton->SetCode(MENU_CODE_TO_PLAYER_1_CONTROLS);
-
-    miPlayer2ControlsButton = new MI_Button(&rm->spr_selectfield, 120, 180, "Player 2", 400, 1);
-    miPlayer2ControlsButton->SetCode(MENU_CODE_TO_PLAYER_2_CONTROLS);
-
-    miPlayer3ControlsButton = new MI_Button(&rm->spr_selectfield, 120, 220, "Player 3", 400, 1);
-    miPlayer3ControlsButton->SetCode(MENU_CODE_TO_PLAYER_3_CONTROLS);
-
-    miPlayer4ControlsButton = new MI_Button(&rm->spr_selectfield, 120, 260, "Player 4", 400, 1);
-    miPlayer4ControlsButton->SetCode(MENU_CODE_TO_PLAYER_4_CONTROLS);
-
-    miPlayerControlsBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
-    miPlayerControlsBackButton->SetCode(MENU_CODE_TO_MAIN_MENU);
-
-    miPlayerControlsLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
-    miPlayerControlsMenuRightHeaderBar = new MI_Image(&rm->menu_plain_field, smw->ScreenWidth/2, 0, 192, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
-    miPlayerControlsMenuHeaderText = new MI_Text("Player Controls Menu", smw->ScreenWidth/2, 5, 0, 2, 1);
-
-    mPlayerControlsSelectMenu.AddControl(miPlayer1ControlsButton, miPlayerControlsBackButton, miPlayer2ControlsButton, NULL, miPlayerControlsBackButton);
-    mPlayerControlsSelectMenu.AddControl(miPlayer2ControlsButton, miPlayer1ControlsButton, miPlayer3ControlsButton, NULL, miPlayerControlsBackButton);
-    mPlayerControlsSelectMenu.AddControl(miPlayer3ControlsButton, miPlayer2ControlsButton, miPlayer4ControlsButton, NULL, miPlayerControlsBackButton);
-    mPlayerControlsSelectMenu.AddControl(miPlayer4ControlsButton, miPlayer3ControlsButton, miPlayerControlsBackButton, NULL, miPlayerControlsBackButton);
-    mPlayerControlsSelectMenu.AddControl(miPlayerControlsBackButton, miPlayer4ControlsButton, miPlayer1ControlsButton, miPlayer1ControlsButton, NULL);
-
-    mPlayerControlsSelectMenu.AddNonControl(miPlayerControlsLeftHeaderBar);
-    mPlayerControlsSelectMenu.AddNonControl(miPlayerControlsMenuRightHeaderBar);
-    mPlayerControlsSelectMenu.AddNonControl(miPlayerControlsMenuHeaderText);
-
-    mPlayerControlsSelectMenu.SetHeadControl(miPlayer1ControlsButton);
-    mPlayerControlsSelectMenu.SetCancelCode(MENU_CODE_TO_MAIN_MENU);
 
     //***********************
     // Player Controls Menu
