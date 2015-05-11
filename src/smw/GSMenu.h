@@ -6,6 +6,7 @@
 
 #include "menu/MainMenu.h"
 #include "menu/PlayerControlsSelectMenu.h"
+#include "menu/PlayerControlsMenu.h"
 
 #include "GameState.h"
 
@@ -80,12 +81,6 @@ class MenuState : public GameState
 		UI_Menu * mCurrentMenu;
 
 		UI_MainMenu mMainMenu;
-		UI_PlayerControlsSelectMenu mPlayerControlsSelectMenu;
-
-
-		//Player Controls Menu
-		UI_Menu mPlayerControlsMenu;
-		MI_InputControlContainer * miInputContainer;
 
 		//Options Menu
 		UI_Menu mOptionsMenu;

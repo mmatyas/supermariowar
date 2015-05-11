@@ -238,17 +238,6 @@ void MenuState::CreateMenu()
     mCurrentMenu = &mMainMenu;
 
     //***********************
-    // Player Controls Menu
-    //***********************
-
-    miInputContainer = new MI_InputControlContainer(&rm->menu_plain_field, 94, 10, 0);
-    miInputContainer->SetAutoModify(true);
-
-    mPlayerControlsMenu.AddControl(miInputContainer, NULL, NULL, NULL, NULL);
-    mPlayerControlsMenu.SetHeadControl(miInputContainer);
-    mPlayerControlsMenu.SetCancelCode(MENU_CODE_BACK_TO_CONTROLS_MENU);
-
-    //***********************
     // Multiplayer Menu
     //***********************
 
@@ -2490,29 +2479,25 @@ void MenuState::update()
         } else if (MENU_CODE_BACK_TO_GRAPHIC_OPTIONS_MENU == code) {
             mCurrentMenu = &mGraphicsOptionsMenu;
         } else if (MENU_CODE_TO_CONTROLS_MENU == code) {
-            mCurrentMenu = &mPlayerControlsSelectMenu;
+            mCurrentMenu = new UI_PlayerControlsSelectMenu();
             mCurrentMenu->ResetMenu();
         } else if (MENU_CODE_BACK_TO_CONTROLS_MENU == code) {
-            mCurrentMenu = &mPlayerControlsSelectMenu;
+            mCurrentMenu = new UI_PlayerControlsSelectMenu(); // TODO: pop
         } else if (MENU_CODE_TO_NET_SERVERS_MENU == code) {
             mCurrentMenu = &mNetServers;
             mCurrentMenu->ResetMenu();
             net_startSession();
         } else if (MENU_CODE_TO_PLAYER_1_CONTROLS == code) {
-            miInputContainer->SetPlayer(0);
-            mCurrentMenu = &mPlayerControlsMenu;
+            mCurrentMenu = new UI_PlayerControlsMenu(0);
             mCurrentMenu->ResetMenu();
         } else if (MENU_CODE_TO_PLAYER_2_CONTROLS == code) {
-            miInputContainer->SetPlayer(1);
-            mCurrentMenu = &mPlayerControlsMenu;
+            mCurrentMenu = new UI_PlayerControlsMenu(1);
             mCurrentMenu->ResetMenu();
         } else if (MENU_CODE_TO_PLAYER_3_CONTROLS == code) {
-            miInputContainer->SetPlayer(2);
-            mCurrentMenu = &mPlayerControlsMenu;
+            mCurrentMenu = new UI_PlayerControlsMenu(2);
             mCurrentMenu->ResetMenu();
         } else if (MENU_CODE_TO_PLAYER_4_CONTROLS == code) {
-            miInputContainer->SetPlayer(3);
-            mCurrentMenu = &mPlayerControlsMenu;
+            mCurrentMenu = new UI_PlayerControlsMenu(3);
             mCurrentMenu->ResetMenu();
         }
 #ifdef _XBOX
