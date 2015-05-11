@@ -162,26 +162,6 @@ class MenuState : public GameState
 		MI_Image * miProjectilesOptionsMenuRightHeaderBar;
 		MI_Text * miProjectilesOptionsMenuHeaderText;
 
-		//Graphics Options Menu
-		UI_Menu mGraphicsOptionsMenu;
-		MI_SelectField * miTopLayerField;
-		MI_SelectField * miFrameLimiterField;
-
-#ifdef _XBOX
-		MI_Button * miScreenSettingsButton;
-#else
-		MI_SelectField * miFullscreenField;
-#endif //_XBOX
-
-		MI_PacksField * miMenuGraphicsPackField;
-		MI_PacksField * miWorldGraphicsPackField;
-		MI_PacksField * miGameGraphicsPackField;
-		MI_Button * miGraphicsOptionsMenuBackButton;
-
-		MI_Image * miGraphicsOptionsMenuLeftHeaderBar;
-		MI_Image * miGraphicsOptionsMenuRightHeaderBar;
-		MI_Text * miGraphicsOptionsMenuHeaderText;
-
 		//Eye Candy Options Menu
 		UI_Menu mEyeCandyOptionsMenu;
 		MI_SelectField * miSpawnStyleField;

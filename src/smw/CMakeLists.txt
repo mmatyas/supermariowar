@@ -22,6 +22,7 @@ LIST(APPEND SMW_SRCS
 	menu/PlayerControlsMenu.cpp
 	menu/OptionsMenu.cpp
 	menu/options/GameplayOptionsMenu.cpp
+	menu/options/GraphicsOptionsMenu.cpp
 	menu/options/TeamOptionsMenu.cpp
 )
 
