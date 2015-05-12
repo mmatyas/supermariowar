@@ -8,7 +8,7 @@
     Description.
 */
 
-class UI_GraphicsOptionsMenu : public UI_Menu
+class UI_XXX : public UI_Menu
 {
 public:
     UI_XXX();
