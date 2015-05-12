@@ -80,27 +80,6 @@ class MenuState : public GameState
 
 		UI_MainMenu mMainMenu;
 
-		//Powerup Settings Menu
-		UI_Menu mPowerupSettingsMenu;
-		MI_SelectField * miStoredPowerupDelayField;
-		MI_SelectField * miItemRespawnField;
-		MI_SelectField * miSwapStyleField;
-		MI_SelectField * miBonusWheelField;
-		MI_SelectField * miKeepPowerupField;
-		MI_SelectField * miHiddenBlockRespawnField;
-		MI_StoredPowerupResetButton * miStoredPowerupResetButton;
-		MI_Button * miPowerupSettingsMenuBackButton;
-
-		MI_Image * miPowerupSettingsMenuLeftHeaderBar;
-		MI_Image * miPowerupSettingsMenuRightHeaderBar;
-		MI_Text * miPowerupSettingsMenuHeaderText;
-
-		MI_Image * miPowerupSelectionDialogImage;
-		MI_Text * miPowerupSelectionDialogExitText;
-		MI_Text * miPowerupSelectionDialogTournamentText;
-		MI_Button * miPowerupSelectionDialogYesButton;
-		MI_Button * miPowerupSelectionDialogNoButton;
-
 		//Weapons Use Limits Menu
 		UI_Menu mProjectilesLimitsMenu;
 		MI_SelectField * miFireballLimitField;
