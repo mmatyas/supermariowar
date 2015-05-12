@@ -18,6 +18,7 @@
 #include "menu/PlayerControlsSelectMenu.h"
 #include "menu/options/GameplayOptionsMenu.h"
 #include "menu/options/GraphicsOptionsMenu.h"
+#include "menu/options/PowerupDropRatesMenu.h"
 #include "menu/options/TeamOptionsMenu.h"
 
 #include <cmath>
@@ -1467,27 +1468,6 @@ void MenuState::CreateMenu()
     mBonusWheelMenu.SetHeadControl(miBonusWheel);
     mBonusWheelMenu.SetCancelCode(MENU_CODE_BONUS_DONE);
 
-
-    //***********************
-    // Powerup Selection Menu
-    //***********************
-
-	miPowerupSelection = new MI_PowerupSelection(50, 44, smw->ScreenWidth, 8);
-    miPowerupSelection->SetAutoModify(true);
-
-    miPowerupSelectionLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
-    miPowerupSelectionMenuRightHeaderBar = new MI_Image(&rm->menu_plain_field, smw->ScreenWidth/2, 0, 192, 0, 320, 32, 1, 1, 0);
-    miPowerupSelectionMenuHeaderText = new MI_Text("Item Selection Menu", smw->ScreenWidth/2, 5, 0, 2, 1);
-
-    mPowerupSelectionMenu.AddControl(miPowerupSelection, NULL, NULL, NULL, NULL);
-
-    mPowerupSelectionMenu.AddNonControl(miPowerupSelectionLeftHeaderBar);
-    mPowerupSelectionMenu.AddNonControl(miPowerupSelectionMenuRightHeaderBar);
-    mPowerupSelectionMenu.AddNonControl(miPowerupSelectionMenuHeaderText);
-
-    mPowerupSelectionMenu.SetHeadControl(miPowerupSelection);
-    mPowerupSelectionMenu.SetCancelCode(MENU_CODE_BACK_TO_OPTIONS_MENU);
-
     //***********************
     // Powerup Settings Menu
     //***********************
@@ -2481,7 +2461,7 @@ void MenuState::update()
                 }
             }
         } else if (MENU_CODE_TO_POWERUP_SELECTION_MENU == code) {
-            mCurrentMenu = &mPowerupSelectionMenu;
+            mCurrentMenu = new UI_PowerupDropRatesMenu();
             mCurrentMenu->ResetMenu();
         } else if (MENU_CODE_TO_POWERUP_SETTINGS_MENU == code) {
             mCurrentMenu = &mPowerupSettingsMenu;

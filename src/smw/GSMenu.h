@@ -80,18 +80,6 @@ class MenuState : public GameState
 
 		UI_MainMenu mMainMenu;
 
-		//Powerup Weight Selection
-		UI_Menu mPowerupSelectionMenu;
-		MI_PowerupSelection * miPowerupSelection;
-
-		//MI_PowerupSlider * miPowerupSlider[NUM_POWERUPS];
-		//MI_Button * miPowerupSelectionBackButton;
-		//MI_Button * miPowerupSelectionRestoreDefaultsButton;
-
-		MI_Image * miPowerupSelectionLeftHeaderBar;
-		MI_Image * miPowerupSelectionMenuRightHeaderBar;
-		MI_Text * miPowerupSelectionMenuHeaderText;
-
 		//Powerup Settings Menu
 		UI_Menu mPowerupSettingsMenu;
 		MI_SelectField * miStoredPowerupDelayField;

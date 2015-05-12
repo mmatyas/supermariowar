@@ -23,6 +23,7 @@ LIST(APPEND SMW_SRCS
 	menu/OptionsMenu.cpp
 	menu/options/GameplayOptionsMenu.cpp
 	menu/options/GraphicsOptionsMenu.cpp
+	menu/options/PowerupDropRatesMenu.cpp
 	menu/options/TeamOptionsMenu.cpp
 )
 
