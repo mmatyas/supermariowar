@@ -25,6 +25,7 @@ LIST(APPEND SMW_SRCS
 	menu/options/GraphicsOptionsMenu.cpp
 	menu/options/PowerupDropRatesMenu.cpp
 	menu/options/PowerupSettingsMenu.cpp
+	menu/options/ProjectileLimitsMenu.cpp
 	menu/options/TeamOptionsMenu.cpp
 )
 

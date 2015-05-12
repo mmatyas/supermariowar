@@ -80,24 +80,6 @@ class MenuState : public GameState
 
 		UI_MainMenu mMainMenu;
 
-		//Weapons Use Limits Menu
-		UI_Menu mProjectilesLimitsMenu;
-		MI_SelectField * miFireballLimitField;
-		MI_SelectField * miHammerLimitField;
-		MI_SelectField * miBoomerangLimitField;
-		MI_SelectField * miFeatherLimitField;
-		MI_SelectField * miLeafLimitField;
-		MI_SelectField * miPwingsLimitField;
-		MI_SelectField * miTanookiLimitField;
-		MI_SelectField * miBombLimitField;
-		MI_SelectField * miWandLimitField;
-
-		MI_Button * miProjectilesLimitsMenuBackButton;
-
-		MI_Image * miProjectilesLimitsMenuLeftHeaderBar;
-		MI_Image * miProjectilesLimitsMenuRightHeaderBar;
-		MI_Text * miProjectilesLimitsMenuHeaderText;
-
 		//Weapons & Projectiles Options Menu
 		UI_Menu mProjectilesOptionsMenu;
 
