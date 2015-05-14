@@ -554,6 +554,10 @@ void MenuState::update()
             mCurrentMenu->ResetMenu();
         } else if (MENU_CODE_BACK_TO_OPTIONS_MENU == code) {
             mCurrentMenu = &mOptionsMenu;
+        } else if (MENU_CODE_TO_NET_SERVERS_MENU == code) {
+            mCurrentMenu = &mNetServersMenu;
+            mCurrentMenu->ResetMenu();
+            net_startSession();
         } else if (MENU_CODE_BACK_TO_GRAPHIC_OPTIONS_MENU == code) {
             mCurrentMenu = &mGraphicsOptionsMenu;
         } else if (MENU_CODE_TO_CONTROLS_MENU == code) {
