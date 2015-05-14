@@ -1,5 +1,5 @@
-#ifndef MENU_YYY_H
-#define MENU_YYY_H
+#ifndef MENU_PROJECTILELIMITS_H
+#define MENU_PROJECTILELIMITS_H
 
 #include "uimenu.h"
 #include "uicontrol.h"
@@ -33,4 +33,4 @@ private:
     MI_Text * miProjectilesLimitsMenuHeaderText;
 };
 
-#endif // MENU_YYY_H
+#endif // MENU_PROJECTILELIMITS_H

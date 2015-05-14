@@ -13,8 +13,10 @@
 class UI_PlayerControlsMenu : public UI_Menu
 {
 public:
-	UI_PlayerControlsMenu(unsigned playerID);
+	UI_PlayerControlsMenu();
 	~UI_PlayerControlsMenu();
+
+	void SetPlayer(short playerID);
 
 private:
 	MI_InputControlContainer * miInputContainer;

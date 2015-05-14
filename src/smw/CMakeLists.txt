@@ -18,15 +18,33 @@ LIST(APPEND SMW_SRCS
 #
 LIST(APPEND SMW_SRCS
 	menu/MainMenu.cpp
-	menu/PlayerControlsSelectMenu.cpp
-	menu/PlayerControlsMenu.cpp
+	menu/BonusWheelMenu.cpp
+	menu/GameSettingsMenu.cpp
+	menu/MapFilterEditMenu.cpp
+	menu/MatchSelectionMenu.cpp
 	menu/OptionsMenu.cpp
+	menu/PlayerControlsMenu.cpp
+	menu/PlayerControlsSelectMenu.cpp
+	menu/TeamSelectMenu.cpp
+	menu/TournamentScoreboardMenu.cpp
+	menu/TourStopMenu.cpp
+	menu/WorldMenu.cpp
+
+	menu/options/EyeCandyOptionsMenu.cpp
 	menu/options/GameplayOptionsMenu.cpp
 	menu/options/GraphicsOptionsMenu.cpp
 	menu/options/PowerupDropRatesMenu.cpp
 	menu/options/PowerupSettingsMenu.cpp
 	menu/options/ProjectileLimitsMenu.cpp
+	menu/options/ProjectileOptionsMenu.cpp
+	menu/options/SoundOptionsMenu.cpp
 	menu/options/TeamOptionsMenu.cpp
+
+	menu/network/NetLobbyMenu.cpp
+	menu/network/NetNewLevelMenu.cpp
+	menu/network/NetNewRoomMenu.cpp
+	menu/network/NetRoomMenu.cpp
+	menu/network/NetServersMenu.cpp
 )
 
 if(NOT NO_NETWORK)
