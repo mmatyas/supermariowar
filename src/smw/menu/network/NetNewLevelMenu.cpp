@@ -5,21 +5,14 @@
 
 extern CResourceManager* rm;
 
-UI_NetNewLevelMenu::UI_NetNewLevelMenu() : UI_Menu()
-{
-};
-
-UI_NetNewLevelMenu::~UI_NetNewLevelMenu() {
-}
-
-void UI_NetNewLevelMenu::PostInitBind(UI_GameSettingsMenu &gsm)
+UI_NetNewLevelMenu::UI_NetNewLevelMenu(const UI_GameSettingsMenu* gsm) : UI_Menu()
 {
     miNetNewLevelContinueButton = new MI_Button(&rm->spr_selectfield, 70, 45, "Continue", 500, 0);
     miNetNewLevelContinueButton->SetCode(MENU_CODE_TO_NET_NEW_ROOM_SETTINGS_MENU);
 
-    miNetNewLevelModeField = new MI_ImageSelectField(*gsm.miModeField);
+    miNetNewLevelModeField = new MI_ImageSelectField(*(gsm->miModeField));
     for (short iGoalField = 0; iGoalField < GAMEMODE_LAST; iGoalField++)
-        miNetNewLevelGoalField[iGoalField] = new MI_SelectField(*gsm.miGoalField[iGoalField]);
+        miNetNewLevelGoalField[iGoalField] = new MI_SelectField(*(gsm->miGoalField[iGoalField]));
 
     miNetNewLevelMapField = new MI_MapField(&rm->spr_selectfield, 70, 165, "Map", 400, 120, true);
     //szCurrentMapName = miNetNewLevelMapField->GetMapName(); //FIXME
@@ -59,4 +52,7 @@ void UI_NetNewLevelMenu::PostInitBind(UI_GameSettingsMenu &gsm)
 
     SetHeadControl(miNetNewLevelContinueButton);
     SetCancelCode(MENU_CODE_TO_NET_LOBBY_MENU);
+}
+
+UI_NetNewLevelMenu::~UI_NetNewLevelMenu() {
 }

@@ -113,43 +113,43 @@ class MenuState : public GameState
 		ModeOptionsMenu modeOptionsMenu;
 
 		UI_Menu * mCurrentMenu;
-		UI_MainMenu mMainMenu;
+		UI_MainMenu* mMainMenu;
 
 		// Options menu
-		UI_OptionsMenu mOptionsMenu;
-		UI_GameplayOptionsMenu mGameplayOptionsMenu;
-		UI_TeamOptionsMenu mTeamOptionsMenu;
-		UI_PowerupDropRatesMenu mPowerupDropRatesMenu;
-		UI_PowerupSettingsMenu mPowerupSettingsMenu;
-		UI_ProjectileLimitsMenu mProjectileLimitsMenu;
-		UI_ProjectileOptionsMenu mProjectileOptionsMenu;
-		UI_GraphicsOptionsMenu mGraphicsOptionsMenu;
-		UI_EyeCandyOptionsMenu mEyeCandyOptionsMenu;
-		UI_SoundOptionsMenu mSoundOptionsMenu;
+		UI_OptionsMenu* mOptionsMenu;
+		UI_GameplayOptionsMenu* mGameplayOptionsMenu;
+		UI_TeamOptionsMenu* mTeamOptionsMenu;
+		UI_PowerupDropRatesMenu* mPowerupDropRatesMenu;
+		UI_PowerupSettingsMenu* mPowerupSettingsMenu;
+		UI_ProjectileLimitsMenu* mProjectileLimitsMenu;
+		UI_ProjectileOptionsMenu* mProjectileOptionsMenu;
+		UI_GraphicsOptionsMenu* mGraphicsOptionsMenu;
+		UI_EyeCandyOptionsMenu* mEyeCandyOptionsMenu;
+		UI_SoundOptionsMenu* mSoundOptionsMenu;
 #ifdef _XBOX
-		UI_ScreenSettingsMenu mScreenSettingsMenu;
-		UI_ScreenResizeMenu mScreenResizeMenu;
+		UI_ScreenSettingsMenu* mScreenSettingsMenu;
+		UI_ScreenResizeMenu* mScreenResizeMenu;
 #endif
 		// Controls menu
-		UI_PlayerControlsSelectMenu mPlayerControlsSelectMenu;
-		UI_PlayerControlsMenu mPlayerControlsMenu;
+		UI_PlayerControlsSelectMenu* mPlayerControlsSelectMenu;
+		UI_PlayerControlsMenu* mPlayerControlsMenu;
 
 		// Gameplay menus
-		UI_MatchSelectionMenu mMatchSelectionMenu;
-		UI_GameSettingsMenu mGameSettingsMenu;
-		UI_MapFilterEditMenu mMapFilterEditMenu;
-		UI_TourStopMenu mTourStopMenu;
-		UI_WorldMenu mWorldMenu;
-		UI_TeamSelectMenu mTeamSelectMenu;
-		UI_TournamentScoreboardMenu mTournamentScoreboardMenu;
-		UI_BonusWheelMenu mBonusWheelMenu;
+		UI_MatchSelectionMenu* mMatchSelectionMenu;
+		UI_GameSettingsMenu* mGameSettingsMenu;
+		UI_MapFilterEditMenu* mMapFilterEditMenu;
+		UI_TourStopMenu* mTourStopMenu;
+		UI_WorldMenu* mWorldMenu;
+		UI_TeamSelectMenu* mTeamSelectMenu;
+		UI_TournamentScoreboardMenu* mTournamentScoreboardMenu;
+		UI_BonusWheelMenu* mBonusWheelMenu;
 
 		// Multiplayer menu
-		UI_NetServersMenu mNetServersMenu;
-		UI_NetLobbyMenu mNetLobbyMenu;
-		UI_NetNewLevelMenu mNetNewLevelMenu;
-		UI_NetNewRoomMenu mNetNewRoomMenu;
-		UI_NetRoomMenu mNetRoomMenu;
+		UI_NetServersMenu* mNetServersMenu;
+		UI_NetLobbyMenu* mNetLobbyMenu;
+		UI_NetNewLevelMenu* mNetNewLevelMenu;
+		UI_NetNewRoomMenu* mNetNewRoomMenu;
+		UI_NetRoomMenu* mNetRoomMenu;
 
 		DisplayError iDisplayError;
 		short iDisplayErrorTimer;

@@ -13,10 +13,8 @@
 class UI_NetNewLevelMenu : public UI_Menu
 {
 public:
-    UI_NetNewLevelMenu();
+    UI_NetNewLevelMenu(const UI_GameSettingsMenu*);
     ~UI_NetNewLevelMenu();
-
-    void PostInitBind(UI_GameSettingsMenu &gsm);
 
 private:
     MI_ImageSelectField * miNetNewLevelModeField;

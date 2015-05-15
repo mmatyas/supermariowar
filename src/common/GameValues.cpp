@@ -369,8 +369,9 @@ void CGameValues::ReadBinaryConfig() {
 
             fread_or_exception(&gamemodemenusettings, sizeof(GameModeSettings), 1, fp);
 
-            fread_or_exception(&teamcounts, sizeof(short), 4, fp);
-            fread_or_exception(&teamids, sizeof(short), 12, fp);
+            // FIXME: See WriteConfig
+            //fread_or_exception(&teamcounts, sizeof(short), 4, fp);
+            //fread_or_exception(&teamids, sizeof(short), 12, fp);
             fread_or_exception(&skinids, sizeof(short), 4, fp);
             fread_or_exception(&randomskin, sizeof(bool), 4, fp);
             fread_or_exception(&playercontrol, sizeof(short), 4, fp);
