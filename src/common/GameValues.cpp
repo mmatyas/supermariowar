@@ -4,6 +4,7 @@
 #include "FileList.h"
 #include "GameMode.h"
 #include "GlobalConstants.h"
+#include "MapList.h" // req. only by WriteConfig
 #include "sfx.h"
 
 #include <stdio.h>
@@ -13,6 +14,7 @@
 extern CGameMode * gamemodes[GAMEMODE_LAST];
 
 extern FiltersList *filterslist;
+extern MapList *maplist;
 extern SkinList *skinlist;
 extern AnnouncerList *announcerlist;
 extern MusicList *musiclist;
@@ -367,8 +369,9 @@ void CGameValues::ReadBinaryConfig() {
 
             fread_or_exception(&gamemodemenusettings, sizeof(GameModeSettings), 1, fp);
 
-            fread_or_exception(&teamcounts, sizeof(short), 4, fp);
-            fread_or_exception(&teamids, sizeof(short), 12, fp);
+            // FIXME: See WriteConfig
+            //fread_or_exception(&teamcounts, sizeof(short), 4, fp);
+            //fread_or_exception(&teamids, sizeof(short), 12, fp);
             fread_or_exception(&skinids, sizeof(short), 4, fp);
             fread_or_exception(&randomskin, sizeof(bool), 4, fp);
             fread_or_exception(&playercontrol, sizeof(short), 4, fp);
@@ -401,4 +404,124 @@ void CGameValues::ReadBinaryConfig() {
       fclose(fp);
     }
 
+}
+
+void CGameValues::WriteConfig()
+{
+    FILE * fp = OpenFile("options.bin", "wb");
+
+    if (fp != NULL) {
+        fwrite_or_exception(g_iVersion, sizeof(int), 4, fp);
+
+#ifdef _XBOX
+
+        fwrite_or_exception(&flickerfilter, sizeof(short), 1, fp);
+        fwrite_or_exception(&hardwarefilter, sizeof(short), 1, fp);
+        fwrite_or_exception(&softfilter, sizeof(short), 1, fp);
+        fwrite_or_exception(&aspectratio10x11, sizeof(bool), 1, fp);
+
+        fwrite_or_exception(&screenResizeX, sizeof(float), 1, fp);
+        fwrite_or_exception(&screenResizeY, sizeof(float), 1, fp);
+        fwrite_or_exception(&screenResizeW, sizeof(float), 1, fp);
+        fwrite_or_exception(&screenResizeH, sizeof(float), 1, fp);
+#endif
+
+        unsigned char abyte[35];
+        abyte[0] = (unsigned char) spawnstyle;
+        abyte[1] = (unsigned char) awardstyle;
+        abyte[2] = (unsigned char) announcerlist->GetCurrentIndex();
+        abyte[3] = (unsigned char) teamcollision;
+        abyte[4] = (unsigned char) screencrunch;
+        abyte[5] = (unsigned char) toplayer;
+        abyte[6] = (unsigned char) scoreboardstyle;
+        abyte[7] = (unsigned char) teamcolors;
+        abyte[8] = (unsigned char) sound;
+        abyte[9] = (unsigned char) music;
+        abyte[10] = (unsigned char) musicvolume;
+        abyte[11] = (unsigned char) soundvolume;
+        abyte[12] = (unsigned char) respawn;
+        abyte[13] = (unsigned char) musiclist->GetCurrentIndex();
+        abyte[14] = (unsigned char) worldmusiclist->GetCurrentIndex();
+        abyte[15] = (unsigned char) outofboundstime;
+        abyte[16] = (unsigned char) cpudifficulty;
+        abyte[17] = (unsigned char) menugraphicspacklist->GetCurrentIndex();
+        abyte[18] = (unsigned char) soundpacklist->GetCurrentIndex();
+        abyte[19] = (unsigned char) framelimiter;
+        abyte[20] = (unsigned char) bonuswheel;
+        abyte[21] = (unsigned char) keeppowerup;
+        abyte[22] = (unsigned char) showwinningcrown;
+        abyte[23] = (unsigned char) playnextmusic;
+        abyte[24] = (unsigned char) pointspeed;
+        abyte[25] = (unsigned char) swapstyle;
+        abyte[26] = (unsigned char) gamegraphicspacklist->GetCurrentIndex();
+        abyte[28] = (unsigned char) overridepowerupsettings;
+        abyte[29] = (unsigned char) minigameunlocked;
+        abyte[30] = (unsigned char) startgamecountdown;
+        abyte[31] = (unsigned char) deadteamnotice;
+        abyte[32] = (unsigned char) worldgraphicspacklist->GetCurrentIndex();
+        abyte[33] = (unsigned char) tournamentcontrolstyle;
+        abyte[34] = (unsigned char) startmodedisplay;
+        fwrite_or_exception(abyte, sizeof(unsigned char), 35, fp);
+
+        fwrite_or_exception(&shieldtime, sizeof(short), 1, fp);
+        fwrite_or_exception(&shieldstyle, sizeof(short), 1, fp);
+        fwrite_or_exception(&itemrespawntime, sizeof(short), 1, fp);
+        fwrite_or_exception(&hiddenblockrespawn, sizeof(short), 1, fp);
+        fwrite_or_exception(&fireballttl, sizeof(short), 1, fp);
+        fwrite_or_exception(&fireballlimit, sizeof(short), 1, fp);
+        fwrite_or_exception(&hammerdelay, sizeof(short), 1, fp);
+        fwrite_or_exception(&hammerttl, sizeof(short), 1, fp);
+        fwrite_or_exception(&hammerpower, sizeof(bool), 1, fp);
+        fwrite_or_exception(&hammerlimit, sizeof(short), 1, fp);
+        fwrite_or_exception(&boomerangstyle, sizeof(short), 1, fp);
+        fwrite_or_exception(&boomeranglife, sizeof(short), 1, fp);
+        fwrite_or_exception(&boomeranglimit, sizeof(short), 1, fp);
+        fwrite_or_exception(&featherjumps, sizeof(short), 1, fp);
+        fwrite_or_exception(&featherlimit, sizeof(short), 1, fp);
+        fwrite_or_exception(&leaflimit, sizeof(short), 1, fp);
+        fwrite_or_exception(&pwingslimit, sizeof(short), 1, fp);
+        fwrite_or_exception(&tanookilimit, sizeof(short), 1, fp);
+        fwrite_or_exception(&bombslimit, sizeof(short), 1, fp);
+        fwrite_or_exception(&wandfreezetime, sizeof(short), 1, fp);
+        fwrite_or_exception(&wandlimit, sizeof(short), 1, fp);
+        fwrite_or_exception(&shellttl, sizeof(short), 1, fp);
+        fwrite_or_exception(&blueblockttl, sizeof(short), 1, fp);
+        fwrite_or_exception(&redblockttl, sizeof(short), 1, fp);
+        fwrite_or_exception(&grayblockttl, sizeof(short), 1, fp);
+        fwrite_or_exception(&storedpowerupdelay, sizeof(short), 1, fp);
+        fwrite_or_exception(&warplockstyle, sizeof(short), 1, fp);
+        fwrite_or_exception(&warplocktime, sizeof(short), 1, fp);
+        fwrite_or_exception(&suicidetime, sizeof(short), 1, fp);
+
+        fwrite_or_exception(&poweruppreset, sizeof(short), 1, fp);
+        fwrite_or_exception(&g_iCurrentPowerupPresets, sizeof(short), NUM_POWERUP_PRESETS * NUM_POWERUPS, fp);
+
+        fwrite_or_exception(inputConfiguration, sizeof(CInputPlayerControl), 8, fp);
+
+        for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
+            fwrite_or_exception(&playerInput.inputControls[iPlayer]->iDevice, sizeof(short), 1, fp);
+        }
+
+#ifndef _XBOX
+        fwrite_or_exception(&fullscreen, sizeof(bool), 1, fp);
+#endif
+        //Write out game mode goals
+        for (short k = 0; k < GAMEMODE_LAST; k++)
+            fwrite_or_exception(&gamemodes[k]->goal, sizeof(short), 1, fp);
+
+        fwrite_or_exception(&gamemodemenusettings, sizeof(GameModeSettings), 1, fp);
+
+        // FIXME
+        //fwrite_or_exception(&miTeamSelect->iTeamCounts, sizeof(short), 4, fp);
+        //fwrite_or_exception(&miTeamSelect->iTeamIDs, sizeof(short), 12, fp);
+
+        fwrite_or_exception(&skinids, sizeof(short), 4, fp);
+        fwrite_or_exception(&randomskin, sizeof(bool), 4, fp);
+        fwrite_or_exception(&playercontrol, sizeof(short), 4, fp);
+
+        fclose(fp);
+    }
+
+    maplist->WriteFilters();
+    maplist->WriteMapSummaryCache();
 }

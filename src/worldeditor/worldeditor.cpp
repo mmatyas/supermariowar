@@ -24,7 +24,7 @@
 #include "GameValues.h"
 #include "map.h"
 #include "MapList.h"
-#include "modeoptionsmenu.h"
+#include "menu/ModeOptionsMenu.h"
 #include "objectgame.h"
 #include "ResourceManager.h"
 #include "sfx.h"
@@ -399,7 +399,7 @@ MI_SelectField * miVehicleBoundaryField;
 MI_Button * miVehicleCreateButton;
 MI_Text * miTitleText;
 
-ModeOptionsMenu modeOptionsMenu;
+UI_ModeOptionsMenu* mModeOptionsMenu;
 
 gfxSprite menu_dialog;
 
@@ -829,7 +829,7 @@ int main(int argc, char *argv[])
 
 	mBonusItemPicker.SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 
-	modeOptionsMenu.CreateMenu();
+	mModeOptionsMenu = new UI_ModeOptionsMenu();
 
 	g_wvVehicleStamp.iDrawSprite = 0;
 	g_wvVehicleStamp.iActionId = 0;
@@ -3971,7 +3971,7 @@ int editor_stage()
 
 							code = MENU_CODE_MODE_CHANGED;
 
-							modeOptionsMenu.Refresh();
+							mModeOptionsMenu->Refresh();
 						}
 					}
 
@@ -4038,7 +4038,7 @@ int editor_stage()
 
 								code = MENU_CODE_MODE_CHANGED;
 
-								modeOptionsMenu.Refresh();
+								mModeOptionsMenu->Refresh();
 							}
 						}
 					}
@@ -4138,7 +4138,7 @@ int editor_stage()
 				bool fModeFound = false;
                 for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
                     if (miGoalField[iGameMode]->IsVisible()) {
-						mCurrentMenu = modeOptionsMenu.GetOptionsMenu(iGameMode);
+						mCurrentMenu = mModeOptionsMenu->GetOptionsMenu(iGameMode);
 						mCurrentMenu->ResetMenu();
 						fModeFound = true;
 						break;
@@ -4148,14 +4148,14 @@ int editor_stage()
 				//Look to see if this is the boss mode and go to boss settings
                 if (!fModeFound) {
                     if (miSpecialGoalField[1]->IsVisible()) {
-						mCurrentMenu = modeOptionsMenu.GetBossOptionsMenu();
+						mCurrentMenu = mModeOptionsMenu->GetBossOptionsMenu();
 						mCurrentMenu->ResetMenu();
 					}
 				}
             } else if (MENU_CODE_HEALTH_MODE_START_LIFE_CHANGED == code) {
-				modeOptionsMenu.HealthModeStartLifeChanged();
+				mModeOptionsMenu->HealthModeStartLifeChanged();
             } else if (MENU_CODE_HEALTH_MODE_MAX_LIFE_CHANGED == code) {
-				modeOptionsMenu.HealthModeMaxLifeChanged();
+				mModeOptionsMenu->HealthModeMaxLifeChanged();
             } else if (MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS == code) {
 				mCurrentMenu = &mStageSettingsMenu;
 				mCurrentMenu->ResetMenu();

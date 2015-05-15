@@ -1,6 +1,6 @@
 set(SMW_SRCS ai.cpp gamemodes.cpp GSMenu.cpp
            object.cpp player.cpp world.cpp uicustomcontrol.cpp
-           objectgame.cpp modeoptionsmenu.cpp objecthazard.cpp
+           objectgame.cpp objecthazard.cpp
            net.cpp FPSLimiter.cpp GSSplashScreen.cpp
            GSGameplay.cpp ObjectContainer.cpp main.cpp
 )
@@ -11,6 +11,41 @@ set(SMW_SRCS ai.cpp gamemodes.cpp GSMenu.cpp
 LIST(APPEND SMW_SRCS
 	objects/blocks/PowerupBlock.cpp
 	objects/blocks/BreakableBlock.cpp
+)
+
+#
+# Menu screens
+#
+LIST(APPEND SMW_SRCS
+	menu/MainMenu.cpp
+	menu/BonusWheelMenu.cpp
+	menu/GameSettingsMenu.cpp
+	menu/ModeOptionsMenu.cpp
+	menu/MapFilterEditMenu.cpp
+	menu/MatchSelectionMenu.cpp
+	menu/OptionsMenu.cpp
+	menu/PlayerControlsMenu.cpp
+	menu/PlayerControlsSelectMenu.cpp
+	menu/TeamSelectMenu.cpp
+	menu/TournamentScoreboardMenu.cpp
+	menu/TourStopMenu.cpp
+	menu/WorldMenu.cpp
+
+	menu/options/EyeCandyOptionsMenu.cpp
+	menu/options/GameplayOptionsMenu.cpp
+	menu/options/GraphicsOptionsMenu.cpp
+	menu/options/PowerupDropRatesMenu.cpp
+	menu/options/PowerupSettingsMenu.cpp
+	menu/options/ProjectileLimitsMenu.cpp
+	menu/options/ProjectileOptionsMenu.cpp
+	menu/options/SoundOptionsMenu.cpp
+	menu/options/TeamOptionsMenu.cpp
+
+	menu/network/NetLobbyMenu.cpp
+	menu/network/NetNewLevelMenu.cpp
+	menu/network/NetNewRoomMenu.cpp
+	menu/network/NetRoomMenu.cpp
+	menu/network/NetServersMenu.cpp
 )
 
 if(NOT NO_NETWORK)

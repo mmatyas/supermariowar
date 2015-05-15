@@ -1864,8 +1864,6 @@ void GameplayState::handleInput()
                     gfx_setresolution(smw->ScreenWidth, smw->ScreenHeight, game_values.fullscreen);
                     blitdest = screen;
 
-                    MenuState::instance().miFullscreenField->SetKey(game_values.fullscreen ? 1 : 0);
-
                     //Continue with input -> don't feed this event to the input
                     //otherwise it will pause the game when switching to full/windowed screen
                     continue;

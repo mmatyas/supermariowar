@@ -159,6 +159,7 @@ class CGameValues : public CGameConfig
 public:
     void init();
     void ReadBinaryConfig();
+    void WriteConfig();
     void SetupDefaultGameModeSettings();
 
     bool		frameadvance;
