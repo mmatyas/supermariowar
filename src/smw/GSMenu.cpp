@@ -110,11 +110,6 @@ bool MenuState::init()
 
 void MenuState::CreateMenu()
 {
-    char szTemp[256];
-
-    //Create the mode options menus
-    modeOptionsMenu.CreateMenu();
-
     mMainMenu = new UI_MainMenu();
 
     mOptionsMenu = new UI_OptionsMenu();
@@ -130,6 +125,8 @@ void MenuState::CreateMenu()
 
     mPlayerControlsSelectMenu = new UI_PlayerControlsSelectMenu();
     mPlayerControlsMenu = new UI_PlayerControlsMenu();
+
+    mModeOptionsMenu = new UI_ModeOptionsMenu();
     mMatchSelectionMenu = new UI_MatchSelectionMenu();
     mGameSettingsMenu = new UI_GameSettingsMenu();
     mMapFilterEditMenu = new UI_MapFilterEditMenu();
@@ -480,7 +477,7 @@ void MenuState::update()
 
                 mGameSettingsMenu->miGoalField[currentgamemode]->SetKey(gamemodes[currentgamemode]->goal);
 
-                modeOptionsMenu.SetRandomGameModeSettings(game_values.gamemode->gamemode);
+                mModeOptionsMenu->SetRandomGameModeSettings(game_values.gamemode->gamemode);
 
                 iTournamentAITimer = 60;
             } else if (iTournamentAIStep == 4) {
@@ -943,7 +940,7 @@ void MenuState::update()
         } else if (MENU_CODE_TO_MODE_SETTINGS_MENU == code) {
             for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++) {
                 if (mGameSettingsMenu->miGoalField[iGameMode]->IsVisible()) {
-                    mCurrentMenu = modeOptionsMenu.GetOptionsMenu(iGameMode);
+                    mCurrentMenu = mModeOptionsMenu->GetOptionsMenu(iGameMode);
                     mCurrentMenu->ResetMenu();
                     break;
                 }
@@ -1052,9 +1049,9 @@ void MenuState::update()
                 fGenerateMapThumbs = true;
             }
         } else if (MENU_CODE_HEALTH_MODE_START_LIFE_CHANGED == code) {
-            modeOptionsMenu.HealthModeStartLifeChanged();
+            mModeOptionsMenu->HealthModeStartLifeChanged();
         } else if (MENU_CODE_HEALTH_MODE_MAX_LIFE_CHANGED == code) {
-            modeOptionsMenu.HealthModeMaxLifeChanged();
+            mModeOptionsMenu->HealthModeMaxLifeChanged();
         }
 
         if (netplay.active) {
@@ -1235,10 +1232,10 @@ void MenuState::update()
     if (game_values.screenfade == 255) {
         if (GS_START_GAME == game_values.gamestate) {
             if (game_values.matchtype == MATCH_TYPE_QUICK_GAME)
-                modeOptionsMenu.SetRandomGameModeSettings(game_values.gamemode->gamemode);
+                mModeOptionsMenu->SetRandomGameModeSettings(game_values.gamemode->gamemode);
             else if (game_values.matchtype == MATCH_TYPE_NET_GAME)
                 // TODO: set from network
-                modeOptionsMenu.SetRandomGameModeSettings(game_values.gamemode->gamemode);
+                mModeOptionsMenu->SetRandomGameModeSettings(game_values.gamemode->gamemode);
             else
                 SetGameModeSettingsFromMenu();
 
@@ -1541,7 +1538,7 @@ void MenuState::SetControllingTeamForSettingsMenu(short iControlTeam, bool fDisp
 {
     mGameSettingsMenu->SetControllingTeam(iControlTeam);
 
-    modeOptionsMenu.SetControllingTeam(iControlTeam);
+    mModeOptionsMenu->SetControllingTeam(iControlTeam);
 
     mGameSettingsMenu->miMapFilterScroll->SetControllingTeam(iControlTeam);
     mMapFilterEditMenu->miMapBrowser->SetControllingTeam(iControlTeam);

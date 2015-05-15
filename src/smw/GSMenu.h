@@ -110,7 +110,6 @@ class MenuState : public GameState
 		void SetControllingTeamForSettingsMenu(short iControlTeam, bool fDisplayMessage);
 		void DisplayControllingTeamMessage(short iControlTeam);
 
-		ModeOptionsMenu modeOptionsMenu;
 
 		UI_Menu * mCurrentMenu;
 		UI_MainMenu* mMainMenu;
@@ -135,6 +134,7 @@ class MenuState : public GameState
 		UI_PlayerControlsMenu* mPlayerControlsMenu;
 
 		// Gameplay menus
+		UI_ModeOptionsMenu* mModeOptionsMenu;
 		UI_MatchSelectionMenu* mMatchSelectionMenu;
 		UI_GameSettingsMenu* mGameSettingsMenu;
 		UI_MapFilterEditMenu* mMapFilterEditMenu;

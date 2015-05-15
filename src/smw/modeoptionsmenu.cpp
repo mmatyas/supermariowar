@@ -8,7 +8,7 @@ extern CGameValues game_values;
 extern CResourceManager* rm;
 
 
-void ModeOptionsMenu::CreateMenu()
+UI_ModeOptionsMenu::UI_ModeOptionsMenu() : UI_Menu()
 {
 
     //***********************
@@ -1368,13 +1368,13 @@ void ModeOptionsMenu::CreateMenu()
     mBossSettingsMenu.SetCancelCode(MENU_CODE_BACK_TO_GAME_SETUP_MENU_FROM_MODE_SETTINGS);
 }
 
-void ModeOptionsMenu::SetControllingTeam(short iControlTeam)
+void UI_ModeOptionsMenu::SetControllingTeam(short iControlTeam)
 {
     for (short iMode = 0; iMode < GAMEMODE_LAST; iMode++)
         mModeSettingsMenu[iMode].SetControllingTeam(iControlTeam);
 }
 
-void ModeOptionsMenu::SetRandomGameModeSettings(short iMode)
+void UI_ModeOptionsMenu::SetRandomGameModeSettings(short iMode)
 {
     if (iMode == game_mode_classic) { //classic
         game_values.gamemodesettings.classic.style = miClassicModeStyleField->GetRandomShortValue();
@@ -1477,7 +1477,7 @@ void ModeOptionsMenu::SetRandomGameModeSettings(short iMode)
     }
 }
 
-void ModeOptionsMenu::HealthModeStartLifeChanged()
+void UI_ModeOptionsMenu::HealthModeStartLifeChanged()
 {
     short iMaxLife = miHealthModeMaxLife->GetShortValue();
     if (miHealthModeStartLife->GetShortValue() > iMaxLife) {
@@ -1485,7 +1485,7 @@ void ModeOptionsMenu::HealthModeStartLifeChanged()
     }
 }
 
-void ModeOptionsMenu::HealthModeMaxLifeChanged()
+void UI_ModeOptionsMenu::HealthModeMaxLifeChanged()
 {
     short iStartLife = miHealthModeStartLife->GetShortValue();
     if (miHealthModeMaxLife->GetShortValue() < iStartLife) {
@@ -1493,7 +1493,7 @@ void ModeOptionsMenu::HealthModeMaxLifeChanged()
     }
 }
 
-void ModeOptionsMenu::Refresh()
+void UI_ModeOptionsMenu::Refresh()
 {
     for (short iMode = 0; iMode < GAMEMODE_LAST; iMode++) {
         mModeSettingsMenu[iMode].Refresh();

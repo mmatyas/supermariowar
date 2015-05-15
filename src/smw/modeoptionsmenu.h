@@ -1,26 +1,24 @@
-#ifndef MODEOPTIONSMENU_H
-#define MODEOPTIONSMENU_H
+#ifndef MENU_MODEOPTIONS_H
+#define MENU_MODEOPTIONS_H
 
 #include "uimenu.h"
 #include "uicontrol.h"
 
-class ModeOptionsMenu
+class UI_ModeOptionsMenu: public UI_Menu
 {
 	public:
-		ModeOptionsMenu() {}
-		~ModeOptionsMenu() {}
-
-		void CreateMenu();
+		UI_ModeOptionsMenu();
+		~UI_ModeOptionsMenu() {}
 
 		void SetRandomGameModeSettings(short iMode);
 		void SetControllingTeam(short iControlTeam);
 
-    UI_Menu * GetOptionsMenu(short iMode) {
-        return &mModeSettingsMenu[iMode];
-    }
-    UI_Menu * GetBossOptionsMenu() {
-        return &mBossSettingsMenu;
-    }
+        UI_Menu * GetOptionsMenu(short iMode) {
+            return &mModeSettingsMenu[iMode];
+        }
+        UI_Menu * GetBossOptionsMenu() {
+            return &mBossSettingsMenu;
+        }
 
 		void HealthModeStartLifeChanged();
 		void HealthModeMaxLifeChanged();
@@ -258,4 +256,4 @@ class ModeOptionsMenu
 		MI_Text * miBossModeHeaderText;
 };
 
-#endif // MODEOPTIONSMENU_H
+#endif // MENU_MODEOPTIONS_H
