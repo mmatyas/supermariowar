@@ -15,9 +15,11 @@ public:
     UI_TeamSelectMenu();
     ~UI_TeamSelectMenu();
 
-    MI_TeamSelect * miTeamSelect;
+    void ResetTeamSelect();
+    short GetTeamCount();
 
 private:
+    MI_TeamSelect * miTeamSelect;
 
     MI_Image * miTeamSelectLeftHeaderBar;
     MI_Image * miTeamSelectRightHeaderBar;

@@ -570,7 +570,7 @@ void MenuState::update()
             else
                 game_values.matchtype = mMatchSelectionMenu->GetSelectedMatchType();
 
-            mTeamSelectMenu->miTeamSelect->Reset();
+            mTeamSelectMenu->ResetTeamSelect();
             mCurrentMenu = mTeamSelectMenu;
             mCurrentMenu->ResetMenu();
             printf("Hello\n");
@@ -642,7 +642,7 @@ void MenuState::update()
         else if (MENU_CODE_TO_GAME_SETUP_MENU == code) {
             printf("MENU_CODE_TO_GAME_SETUP_MENU\n");
             //Moves teams to the first arrays in the list and counts the number of teams
-            score_cnt = mTeamSelectMenu->miTeamSelect->OrganizeTeams();
+            score_cnt = mTeamSelectMenu->GetTeamCount();
             iDisplayError = DISPLAY_ERROR_NONE;
             iDisplayErrorTimer = 0;
             bool fErrorReadingTourFile = false;
@@ -1156,9 +1156,9 @@ void MenuState::update()
                 netplay.operationInProgress = false;
                 game_values.matchtype = MATCH_TYPE_NET_GAME;
 
-                mTeamSelectMenu->miTeamSelect->Reset();
+                mTeamSelectMenu->ResetTeamSelect();
                 mTeamSelectMenu->ResetMenu();
-                score_cnt = mTeamSelectMenu->miTeamSelect->OrganizeTeams();
+                score_cnt = mTeamSelectMenu->GetTeamCount();
 
                 game_values.tournamentcontrolteam = -1;
                 game_values.tournamentwinner = -1;

@@ -1,7 +1,6 @@
 #include "TeamSelectMenu.h"
 
 #include "ResourceManager.h"
-
 extern CResourceManager* rm;
 
 UI_TeamSelectMenu::UI_TeamSelectMenu() : UI_Menu()
@@ -24,4 +23,14 @@ UI_TeamSelectMenu::UI_TeamSelectMenu() : UI_Menu()
 };
 
 UI_TeamSelectMenu::~UI_TeamSelectMenu() {
+}
+
+void UI_TeamSelectMenu::ResetTeamSelect()
+{
+    miTeamSelect->Reset();
+}
+
+short UI_TeamSelectMenu::GetTeamCount()
+{
+    return miTeamSelect->OrganizeTeams();
 }
