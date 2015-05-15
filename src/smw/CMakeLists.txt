@@ -1,6 +1,6 @@
 set(SMW_SRCS ai.cpp gamemodes.cpp GSMenu.cpp
            object.cpp player.cpp world.cpp uicustomcontrol.cpp
-           objectgame.cpp modeoptionsmenu.cpp objecthazard.cpp
+           objectgame.cpp objecthazard.cpp
            net.cpp FPSLimiter.cpp GSSplashScreen.cpp
            GSGameplay.cpp ObjectContainer.cpp main.cpp
 )
@@ -20,6 +20,7 @@ LIST(APPEND SMW_SRCS
 	menu/MainMenu.cpp
 	menu/BonusWheelMenu.cpp
 	menu/GameSettingsMenu.cpp
+	menu/ModeOptionsMenu.cpp
 	menu/MapFilterEditMenu.cpp
 	menu/MatchSelectionMenu.cpp
 	menu/OptionsMenu.cpp

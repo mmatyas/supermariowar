@@ -1,7 +1,6 @@
 #ifndef GAMESTATE_MENU_H
 #define GAMESTATE_MENU_H
 
-#include "modeoptionsmenu.h"
 #include "uicustomcontrol.h"
 
 #include "GameState.h"
@@ -11,6 +10,7 @@
 #include "menu/MainMenu.h"
 #include "menu/MapFilterEditMenu.h"
 #include "menu/MatchSelectionMenu.h"
+#include "menu/ModeOptionsMenu.h"
 #include "menu/OptionsMenu.h"
 #include "menu/PlayerControlsMenu.h"
 #include "menu/PlayerControlsSelectMenu.h"

@@ -6,7 +6,7 @@ add_executable (smw-worldedit
 	../smw/object.cpp
     ../smw/ObjectContainer.cpp
     ../smw/objecthazard.cpp
-	../smw/modeoptionsmenu.cpp
+	../smw/menu/ModeOptionsMenu.cpp
 	../common/uicontrol.cpp
 	../common/uimenu.cpp
 	${WORLDEDIT_SRCS}

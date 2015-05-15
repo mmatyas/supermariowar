@@ -1,4 +1,4 @@
-#include "modeoptionsmenu.h"
+#include "ModeOptionsMenu.h"
 
 #include "GameValues.h"
 #include "GameMode.h"
