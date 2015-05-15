@@ -116,6 +116,11 @@ void UI_MatchSelectionMenu::SelectionChanged()
         miMatchSelectionDisplayImage->SetImage(0, 240 * game_values.matchtype, 320, 240);
 }
 
+void UI_MatchSelectionMenu::WorldMapChanged()
+{
+    miWorldPreviewDisplay->SetWorld();
+}
+
 void UI_MatchSelectionMenu::ActivateMinigameField()
 {
     miMatchSelectionField->HideItem(MATCH_TYPE_MINIGAME, false);
@@ -134,4 +139,9 @@ void UI_MatchSelectionMenu::ActivateMinigameField()
 short UI_MatchSelectionMenu::GetMinigameID()
 {
      return miMinigameField->GetShortValue();
+}
+
+short UI_MatchSelectionMenu::GetSelectedMatchType()
+{
+    return miMatchSelectionField->GetShortValue();
 }

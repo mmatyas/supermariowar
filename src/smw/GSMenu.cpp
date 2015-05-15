@@ -557,7 +557,7 @@ void MenuState::update()
             mCurrentMenu = mMatchSelectionMenu;
             iUnlockMinigameOptionIndex = 0;
         } else if (MENU_CODE_TO_MATCH_SELECTION_MENU == code) {
-            mMatchSelectionMenu->miWorldPreviewDisplay->SetWorld();
+            mMatchSelectionMenu->WorldMapChanged();
 
             mCurrentMenu = mMatchSelectionMenu;
             mCurrentMenu->ResetMenu();
@@ -568,7 +568,7 @@ void MenuState::update()
             if (MENU_CODE_QUICK_GAME_START == code)
                 game_values.matchtype = MATCH_TYPE_QUICK_GAME;
             else
-                game_values.matchtype = mMatchSelectionMenu->miMatchSelectionField->GetShortValue();
+                game_values.matchtype = mMatchSelectionMenu->GetSelectedMatchType();
 
             mTeamSelectMenu->miTeamSelect->Reset();
             mCurrentMenu = mTeamSelectMenu;
@@ -582,7 +582,7 @@ void MenuState::update()
         } else if (MENU_CODE_MATCH_SELECTION_MATCH_CHANGED == code) {
             mMatchSelectionMenu->SelectionChanged();
         } else if (MENU_CODE_WORLD_MAP_CHANGED == code) {
-            mMatchSelectionMenu->miWorldPreviewDisplay->SetWorld();
+            mMatchSelectionMenu->WorldMapChanged();
         } else if (MENU_CODE_TO_OPTIONS_MENU == code) {
             mCurrentMenu = mOptionsMenu;
             mCurrentMenu->ResetMenu();

@@ -15,20 +15,21 @@ public:
     UI_MatchSelectionMenu();
     ~UI_MatchSelectionMenu();
 
-    void ActivateMinigameField();
     void SelectionChanged();
+    void WorldMapChanged();
+    void ActivateMinigameField();
     short GetMinigameID();
-
-    MI_WorldPreviewDisplay * miWorldPreviewDisplay;
-    MI_SelectField * miMatchSelectionField;
+    short GetSelectedMatchType();
 
 private:
     MI_Image * miMatchSelectionDisplayImage;
 
+    MI_SelectField * miMatchSelectionField;
     MI_SelectField * miTournamentField;
     MI_SelectField * miTourField;
     MI_SelectField * miWorldField;
     MI_SelectField * miMinigameField;
+    MI_WorldPreviewDisplay * miWorldPreviewDisplay;
 
     MI_Button * miMatchSelectionStartButton;
 
