@@ -41,12 +41,12 @@ UI_NetServersMenu::UI_NetServersMenu() : UI_Menu()
     miNetServersAddRemoveButton->SetCode(MENU_CODE_TO_NET_ADDREMOVE_SERVER_MENU);
 
     miNetServersConnectingDialogImage = new MI_Image(&rm->spr_dialog, 224, 176, 0, 0, 192, 128, 1, 1, 0);
-    miNetServersConnectingDialogText = new MI_Text("Connecting...", 640 / 2, smw->ScreenHeight / 2 - 12, 0, 2, 1);
+    miNetServersConnectingDialogText = new MI_Text("Connecting...", 640 / 2, 240 - 12, 0, 2, 1);
 
     miNetServersConnectingDialogImage->Show(false);
     miNetServersConnectingDialogText->Show(false);
 
-    //miNetServersConnectionDetector = new MI_NetworkStatusDetector(&rm->spr_selectfield, 320, smw->ScreenHeight/2 - 10, "Connecting...", 80, 1);
+    //miNetServersConnectionDetector = new MI_NetworkStatusDetector(&rm->spr_selectfield, 320, 240 - 10, "Connecting...", 80, 1);
     /*miNetServersConnectionDetector = new MI_NetworkStatusDetector(0, 0);
     miNetServersConnectingDialogImage->Show(false);
     miNetServersConnectionDetector->Show(false);*/

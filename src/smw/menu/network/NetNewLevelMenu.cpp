@@ -40,9 +40,9 @@ UI_NetNewLevelMenu::UI_NetNewLevelMenu(const UI_GameSettingsMenu* gsm) : UI_Menu
     AddControl(miNetNewLevelMapField, miNetNewLevelGoalField[GAMEMODE_LAST - 1], miNetNewLevelContinueButton, NULL, NULL);
 
 
-    miNetNewLevelLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
-    miNetNewLevelRightHeaderBar = new MI_Image(&rm->menu_plain_field, smw->ScreenWidth/2, 0, 192, 0, smw->ScreenWidth/2, 32, 1, 1, 0);
-    miNetNewLevelHeaderText = new MI_Text("Multiplayer Level Select Menu", smw->ScreenWidth/2, 5, 0, 2, 1);
+    miNetNewLevelLeftHeaderBar = new MI_Image(&rm->menu_plain_field, 0, 0, 0, 0, 320, 32, 1, 1, 0);
+    miNetNewLevelRightHeaderBar = new MI_Image(&rm->menu_plain_field, 320, 0, 192, 0, 320, 32, 1, 1, 0);
+    miNetNewLevelHeaderText = new MI_Text("Multiplayer Level Select Menu", 320, 5, 0, 2, 1);
 
     AddNonControl(miNetNewLevelLeftHeaderBar);
     AddNonControl(miNetNewLevelRightHeaderBar);
