@@ -363,44 +363,6 @@ void GameplayState::initEyeCandy()
     }
 }
 
-void initGameplaySettings()
-{
-    y_shake = 0;
-    x_shake = 0;
-
-    game_values.pausegame = false;
-    game_values.exitinggame = false;
-    game_values.exityes = false;
-    game_values.teamdeadcounter = 0;
-    game_values.screenshaketimer = 0;
-    game_values.slowdownon = -1;
-    game_values.slowdowncounter = 0;
-    game_values.showscoreboard = false;
-    game_values.scorepercentmove = 0.0f;
-    game_values.playskidsound = false;
-    game_values.playinvinciblesound = false;
-    game_values.playflyingsound = false;
-    game_values.swapplayers = false;
-    game_values.swapplayersposition = 0.0f;
-    game_values.swapplayersblink = false;
-    game_values.swapplayersblinkcount = 0;
-    game_values.screenfade = 255;
-    game_values.screenfadespeed = -8;
-    game_values.noexit = false;
-    game_values.noexittimer = 0;
-    game_values.forceexittimer = 0;
-    game_values.gamewindx = 0.0f;
-    game_values.gamewindy = 0.0f;
-
-    game_values.windaffectsplayers = false;
-    game_values.spinscreen = false;
-    game_values.reversewalk = false;
-    game_values.spotlights = false;
-
-    //Initialize game mode
-    game_values.gamemode->init();
-}
-
 void resetSecretCounters()
 {
     //Reset Secret Counters
@@ -426,6 +388,9 @@ void resetSecretCounters()
 
 void GameplayState::initRunGame()
 {
+    y_shake = 0;
+    x_shake = 0;
+
     //Reset the screen spin variables
     spinangle = 0.0f;
     spinspeed = 0.0f;
@@ -439,7 +404,7 @@ void GameplayState::initRunGame()
 
 
     createPlayers();
-    initGameplaySettings();
+    game_values.resetGameplaySettings();
     initScoreDisplayPosition();
     initEyeCandy();
 }

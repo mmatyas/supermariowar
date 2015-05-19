@@ -161,6 +161,7 @@ public:
     void ReadBinaryConfig();
     void WriteConfig();
     void SetupDefaultGameModeSettings();
+    void resetGameplaySettings();
 
     bool		frameadvance;
     bool		autokill;
