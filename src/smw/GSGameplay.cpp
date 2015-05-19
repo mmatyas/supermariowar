@@ -1637,6 +1637,23 @@ void updateScreenShake()
     }
 }
 
+// updates the bullet bills spawned by a powerup
+void updateBulletBillPowerup()
+{
+    for (short iPlayer = 0; iPlayer < 4; iPlayer++) {
+        if (game_values.bulletbilltimer[iPlayer] > 0) {
+            game_values.bulletbilltimer[iPlayer]--;
+
+            if (--game_values.bulletbillspawntimer[iPlayer] <= 0) {
+                game_values.bulletbillspawntimer[iPlayer] = (short)(RANDOM_INT(20) + 25);
+                float speed = ((float)(RANDOM_INT(21) + 20)) / 10.0f;
+                objectcontainer[2].add(new MO_BulletBill(&rm->spr_bulletbill, &rm->spr_bulletbilldead, 0, (short)(RANDOM_INT(448)), (RANDOM_INT(2) ? speed : -speed), iPlayer, false));
+                ifSoundOnPlay(rm->sfx_bulletbillsound);
+            }
+        }
+    }
+}
+
 void updateScoreboardAnimation() // scrolling to center at the end of game
 {
     if (game_values.showscoreboard) {
@@ -1756,6 +1773,20 @@ void secretBoss()
     ///////////////////
 }
 */
+
+#ifdef _DEBUG
+void debugAutoKillEveryone()
+{
+    if (game_values.autokill) {
+        for (short k = 0; k < list_players_cnt; k++) {
+            list_players[k]->DeathAwards();
+
+            if (!game_values.gamemode->playerkilledself(*(list_players[k]), kill_style_environment))
+                list_players[k]->die(0, false, false);
+        }
+    }
+}
+#endif
 
 void GameplayState::onEnterState()
 {
@@ -2172,25 +2203,13 @@ void GameplayState::update()
             if (iCountDownState > COUNTDOWN_START_INDEX) {
                 animateDuringCountdown();
             } else {
-                //Shake screen
-
                 shakeScreen();
                 spinScreen();
+                updateBulletBillPowerup();
 
-                for (short iPlayer = 0; iPlayer < 4; iPlayer++) {
-                    if (game_values.bulletbilltimer[iPlayer] > 0) {
-                        game_values.bulletbilltimer[iPlayer]--;
-
-                        if (--game_values.bulletbillspawntimer[iPlayer] <= 0) {
-                            game_values.bulletbillspawntimer[iPlayer] = (short)(RANDOM_INT(20) + 25);
-                            float speed = ((float)(RANDOM_INT(21) + 20)) / 10.0f;
-                            objectcontainer[2].add(new MO_BulletBill(&rm->spr_bulletbill, &rm->spr_bulletbilldead, 0, (short)(RANDOM_INT(448)), (RANDOM_INT(2) ? speed : -speed), iPlayer, false));
-                            ifSoundOnPlay(rm->sfx_bulletbillsound);
-                        }
-                    }
-                }
-
-                if (game_values.matchtype == MATCH_TYPE_WORLD && game_values.gamemode->gameover && game_values.forceexittimer <= 0) {
+                if (game_values.matchtype == MATCH_TYPE_WORLD &&
+                    game_values.gamemode->gameover &&
+                    game_values.forceexittimer <= 0) {
                     if (--game_values.noexittimer <= 0)
                         game_values.noexit = false;
                 }
@@ -2198,14 +2217,7 @@ void GameplayState::update()
                 //------------- update objects -----------------------
 
 #ifdef _DEBUG
-                if (game_values.autokill) {
-                    for (short k = 0; k < list_players_cnt; k++) {
-                        list_players[k]->DeathAwards();
-
-                        if (!game_values.gamemode->playerkilledself(*(list_players[k]), kill_style_environment))
-                            list_players[k]->die(0, false, false);
-                    }
-                }
+                debugAutoKillEveryone();
 #endif
 
                 //Advance the cpu's turn (AI only calculates player's actions 1 out of 4 frames)
