@@ -1947,9 +1947,11 @@ void GameplayState::update()
     }
 
 
-    iWindTimer = 0;
-    dNextWind = (float)(RANDOM_INT(41) - 20) / 4.0f;
-    game_values.gamewindx = (float)((RANDOM_INT(41)) - 20) / 4.0f;
+    if (!netplay.active) {
+        iWindTimer = 0;
+        dNextWind = (float)(RANDOM_INT(41) - 20) / 4.0f;
+        game_values.gamewindx = (float)((RANDOM_INT(41)) - 20) / 4.0f;
+    }
 
     //Initialize players after game init has finished
     for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++)
@@ -1991,7 +1993,9 @@ void GameplayState::update()
     //printf("[%d;%d]\n", current_playerKeys->keys[0].fDown, current_playerKeys->keys[0].fPressed);
     //printf("%d -> %f\n", list_players[0]->ix, list_players[0]->fx);
 
-    checkWindEvent(iWindTimer, dNextWind);
+    if (!netplay.active) {
+        checkWindEvent(iWindTimer, dNextWind);
+    }
 
     /*
     #ifdef _XBOX
