@@ -363,29 +363,6 @@ void GameplayState::initEyeCandy()
     }
 }
 
-void resetSecretCounters()
-{
-    //Reset Secret Counters
-    for (short iPlayer = 0; iPlayer < 4; iPlayer++)
-        game_values.unlocksecret1part1[iPlayer] = false;
-
-    game_values.unlocksecret1part2 = 0;
-    game_values.unlocksecret2part1 = false;
-    game_values.unlocksecret2part2 = 0;
-    game_values.unlocksecret3part1[0] = 0;
-    game_values.unlocksecret3part1[1] = 0;
-    game_values.unlocksecret3part1[2] = 0;
-    game_values.unlocksecret3part1[3] = 0;
-    game_values.unlocksecret3part2[0] = 0;
-    game_values.unlocksecret3part2[1] = 0;
-    game_values.unlocksecret3part2[2] = 0;
-    game_values.unlocksecret3part2[3] = 0;
-    game_values.unlocksecretunlocked[0] = false;
-    game_values.unlocksecretunlocked[1] = false;
-    game_values.unlocksecretunlocked[2] = false;
-    game_values.unlocksecretunlocked[3] = false;
-}
-
 void GameplayState::initRunGame()
 {
     y_shake = 0;
@@ -397,7 +374,7 @@ void GameplayState::initRunGame()
     spindirection = 1;
     spintimer = 0;
 
-    resetSecretCounters();
+    game_values.resetSecretCounters();
 
     //Reset the keys each time we switch from menu to game and back
     game_values.playerInput.ResetKeys();

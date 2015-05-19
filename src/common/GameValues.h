@@ -158,10 +158,13 @@ class CGameValues : public CGameConfig
 {
 public:
     void init();
+
     void ReadBinaryConfig();
     void WriteConfig();
+
     void SetupDefaultGameModeSettings();
     void resetGameplaySettings();
+    void resetSecretCounters();
 
     bool		frameadvance;
     bool		autokill;

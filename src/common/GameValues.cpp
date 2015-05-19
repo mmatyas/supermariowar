@@ -286,6 +286,29 @@ void CGameValues::resetGameplaySettings()
     gamemode->init();
 }
 
+void CGameValues::resetSecretCounters()
+{
+    //Reset Secret Counters
+    for (short iPlayer = 0; iPlayer < 4; iPlayer++)
+        unlocksecret1part1[iPlayer] = false;
+
+    unlocksecret1part2 = 0;
+    unlocksecret2part1 = false;
+    unlocksecret2part2 = 0;
+    unlocksecret3part1[0] = 0;
+    unlocksecret3part1[1] = 0;
+    unlocksecret3part1[2] = 0;
+    unlocksecret3part1[3] = 0;
+    unlocksecret3part2[0] = 0;
+    unlocksecret3part2[1] = 0;
+    unlocksecret3part2[2] = 0;
+    unlocksecret3part2[3] = 0;
+    unlocksecretunlocked[0] = false;
+    unlocksecretunlocked[1] = false;
+    unlocksecretunlocked[2] = false;
+    unlocksecretunlocked[3] = false;
+}
+
 void CGameValues::ReadBinaryConfig() {
     //Read saved settings from disk
     FILE * fp = OpenFile("options.bin", "rb");
