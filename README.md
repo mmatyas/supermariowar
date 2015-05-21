@@ -1,5 +1,14 @@
 # Super Mario War
 
+- [About](#about)
+- [Building](#building-instructions)
+	- [Requirements](#requirements)
+	- [Linux](#linux)
+	- [Windows](#windows)
+	- [Asm.js](#asmjs)
+	- [Build configuration](#build-configuration)
+- [How to play](#how-to-play)
+
 ## About
 
 Super Mario War is a Super Mario multiplayer game.
@@ -27,7 +36,7 @@ The game uses artwork and sounds from Nintendo games. We hope that this noncomme
 - Windows
 - XBox (?)
 - Mac OS X (?)
-- asm.js
+- asm.js (experimental)
 
 
 
