@@ -7,6 +7,9 @@
 #include "Score.h"
 #include "PlayerKillStyles.h"
 
+#include "player_components/PlayerSpinStatus.h"
+#include "player_components/PlayerTail.h"
+
 enum PlayerState {
 	player_wait,
     player_spawning,
@@ -41,12 +44,11 @@ class Spotlight;
 struct Warp;
 
 
-enum deathstyle{
+enum deathstyle {
 	death_style_jump = 0,
     death_style_squish = 1,
     death_style_shatter = 2
 };
-
 
 //the player class - a lot of optimization can be done here
 //(especially the collision detection stuff in collision_detection_map())
@@ -170,12 +172,6 @@ class CPlayer
 		void SpinCape();
 		void DrawCape();
 
-		void SpinPlayer();
-
-		void ShakeTail();
-		void SpinTail();
-		void DrawTail();
-
 		void DrawWings();
 
 		void ClearPowerupStates();
@@ -267,12 +263,8 @@ class CPlayer
 		bool flying;
 		short flyingtimer;
 
-		short iTailTimer;
-		short iTailState;
-		short iTailFrame;
-
-		short iSpinTimer;
-		short iSpinState;
+		PlayerTail tail;
+		PlayerSpinStatus spin;
 
 		short iWingsTimer;
 		short iWingsFrame;
@@ -291,7 +283,7 @@ class CPlayer
 		short animationstate;
 		short animationtimer;
 
-		short spr;
+		uint8_t spr;
 		short sprswitch;
 
 		short invincibletimer;
@@ -548,6 +540,9 @@ class CPlayer
 		friend class NetGameHost;
 
 		friend class GameplayState;
+
+		friend struct PlayerSpinStatus;
+		friend struct PlayerTail;
 };
 
 

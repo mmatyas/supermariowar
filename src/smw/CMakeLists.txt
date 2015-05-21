@@ -14,6 +14,14 @@ LIST(APPEND SMW_SRCS
 )
 
 #
+# Player components
+#
+LIST(APPEND SMW_SRCS
+	player_components/PlayerSpinStatus.cpp
+	player_components/PlayerTail.cpp
+)
+
+#
 # Menu screens
 #
 LIST(APPEND SMW_SRCS

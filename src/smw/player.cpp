@@ -233,7 +233,7 @@ void CPlayer::updateTanookiStatus()
 
         // Become the tanooki
         else if (playerKeys->game_turbo.fPressed && playerKeys->game_down.fDown && !statue_lock && !lockfire && powerupused == -1
-                 && iKuriboShoe == 0 && iTailState == 0) {
+                 && iKuriboShoe == 0 && !tail.isInUse()) {
             // set the amount of time you get to remain in statue form
             statue_timer = 123;
 
@@ -937,19 +937,7 @@ void CPlayer::move()
     if (hammertimer > 0)
         hammertimer--;
 
-    if (iSpinState > 0) {
-        if (++iSpinTimer > 3) {
-            iSpinTimer = 0;
-            iSpinState++;
-            if (iSpinState == 6 || iSpinState == 12) {
-                iSpinState = 0;
-
-                if (powerup == 3 && game_values.featherlimit > 0)
-                    DecreaseProjectileLimit();
-
-            }
-        }
-    }
+    spin.update(*this);
 
     if (throw_star > 0)
         throw_star--;
@@ -1276,10 +1264,7 @@ void CPlayer::move()
         }
 
         //If player is shaking tail, slow decent
-        if (iTailState == 1) {
-            if (vely > 1.5f)
-                vely = 1.5f;
-        }
+        tail.slowDescent(*this);
 
         //If player is shielded, count down that timer
         if (shieldtimer > 0 && --shieldtimer == 0)
@@ -1396,10 +1381,9 @@ void CPlayer::move()
                         extrajumps++;
                     }
                     //This must come last or gliding chickens can't use powerups before this statement
-                    else if ((powerup == 7 || (powerup == -1 && game_values.gamemode->chicken == this && game_values.gamemodesettings.chicken.glide)) && iKuriboShoe == 0 && iSpinState == 0) {
+                    else if ((powerup == 7 || (powerup == -1 && game_values.gamemode->chicken == this && game_values.gamemodesettings.chicken.glide)) && iKuriboShoe == 0 && !spin.isSpinInProgress()) {
                         if (game_values.leaflimit == 0 || projectilelimit > 0 || (game_values.gamemode->chicken == this && game_values.gamemodesettings.chicken.glide && powerup == -1)) {
-                            ShakeTail();
-                            lockjump = true;
+                            tail.shake(*this);
                         }
                     }
                 }
@@ -1459,7 +1443,7 @@ void CPlayer::move()
                             if (game_values.hammerlimit == 0 || projectilelimit > 0) {
                                 action = player_action_hammer;
                             }
-                        } else if (powerup == 3 && iSpinState == 0 && iKuriboShoe == 0) {
+                        } else if (powerup == 3 && !spin.isSpinInProgress() && iKuriboShoe == 0) {
                             if (game_values.featherlimit == 0 || projectilelimit > 0) {
                                 action = player_action_spincape;
                             }
@@ -1475,7 +1459,7 @@ void CPlayer::move()
                             if (game_values.bombslimit == 0 || projectilelimit > 0) {
                                 action = player_action_bomb;
                             }
-                        } else if (powerup == 7 && iSpinState == 0 && iKuriboShoe == 0) { //Racoon tail spin
+                        } else if (powerup == 7 && !spin.isSpinInProgress() && iKuriboShoe == 0) { //Racoon tail spin
                             if (game_values.leaflimit == 0 || projectilelimit > 0) {
                                 action = player_action_spintail;
                             }
@@ -1685,7 +1669,7 @@ void CPlayer::CommitAction()
     } else if (player_action_spincape == action) {
         SpinCape();
     } else if (player_action_spintail == action) {
-        SpinTail();
+        tail.spin(*this);
     }
 
     if (action == player_action_fireball) {
@@ -1720,13 +1704,8 @@ void CPlayer::SetSprite()
         }
 
         //lockjump is true when we are in the air (even if we fell of an edge)
-        if (iSpinState > 0) {
-            static int iStateToSprite[12] = {PGFX_JUMPING_R, PGFX_STOPPING_R, PGFX_STOPPING_L, PGFX_STANDING_L, PGFX_STOPPING_L, PGFX_STOPPING_R, PGFX_JUMPING_L, PGFX_STOPPING_L, PGFX_STOPPING_R, PGFX_STANDING_R, PGFX_STOPPING_R, PGFX_STOPPING_L};
-
-            if (game_values.reversewalk)
-                spr = iStateToSprite[iSpinState] & 0x1 ? iStateToSprite[iSpinState] - 1 : iStateToSprite[iSpinState] + 1;
-            else
-                spr = iStateToSprite[iSpinState];
+        if (spin.isSpinInProgress()) {
+            spr = spin.toSpriteID();
         } else if (state == player_spawning) {
             if (!(spr & 0x1))
                 spr = PGFX_JUMPING_R + iReverseSprite;
@@ -2268,7 +2247,7 @@ bool CPlayer::isstomping(CPlayer * o)
                 style = kill_style_pwings;
             else if (iKuriboShoe > 0)
                 style = kill_style_kuriboshoe;
-            else if (iTailState > 0)
+            else if (tail.isInUse())
                 style = kill_style_leaf;
             else if (extrajumps > 0)
                 style = kill_style_feather;
@@ -2910,7 +2889,7 @@ void CPlayer::draw()
             DrawWings();
         //This has to come last otherwise chickens with glide option won't be able to use cape or wings
         else if (powerup == 7 || (powerup == -1 && game_values.gamemode->chicken == this && game_values.gamemodesettings.chicken.glide))
-            DrawTail();
+            tail.draw(*this);
     }
 
     //Draw the player sprite above the shoe
@@ -3013,7 +2992,7 @@ void CPlayer::SpinCape()
 
     iCapeTimer = 4; //Add one extra frame to sync with spinning player sprite
 
-    SpinPlayer();
+    spin.spin(*this);
 
     objectcontainer[1].add(new MO_SpinAttack(globalID, teamID,  kill_style_feather, IsPlayerFacingRight(), 24));
 }
@@ -3021,9 +3000,8 @@ void CPlayer::SpinCape()
 void CPlayer::DrawCape()
 {
     if (++iCapeTimer > 3) {
-        if (iSpinState > 0) {
-            static short iSpinStateToCapeSprite[12] = {0, 32, 32, 0, 32, 32, 0, 32, 32, 0, 32, 32};
-            iCapeFrameX = iSpinStateToCapeSprite[iSpinState];
+        if (spin.isSpinInProgress()) {
+            iCapeFrameX = spin.toCapeFrameX();
             iCapeFrameY = 32;
             iCapeYOffset = -8;
         } else if ((!inair && velx != 0.0f) || (inair && vely < 1.0f)) {
@@ -3058,8 +3036,8 @@ void CPlayer::DrawCape()
     }
 
     bool fPlayerFacingRight = !game_values.reversewalk;
-    if (iSpinState > 0) {
-        if ((iSpinState >= 2 && iSpinState <= 4) || iSpinState == 7 || iSpinState == 11)
+    if (spin.isSpinInProgress()) {
+        if (spin.isReverseWalking())
             fPlayerFacingRight = game_values.reversewalk;
     } else {
         fPlayerFacingRight = IsPlayerFacingRight();
@@ -3069,104 +3047,6 @@ void CPlayer::DrawCape()
         rm->spr_cape.draw(ix - PWOFFSET + (fPlayerFacingRight ? - 18 : 18), iy - PHOFFSET + 4 + iCapeYOffset, (fPlayerFacingRight ? 128 : 0) + iCapeFrameX, iCapeFrameY, 32, 32, (short)state %4, warpplane);
     else
         rm->spr_cape.draw(ix - PWOFFSET + (fPlayerFacingRight ? - 18 : 18), iy - PHOFFSET + 4 + iCapeYOffset, (fPlayerFacingRight ? 128 : 0) + iCapeFrameX, iCapeFrameY, 32, 32);
-}
-
-void CPlayer::SpinPlayer()
-{
-    iSpinState = IsPlayerFacingRight() ? (game_values.reversewalk ? 7 : 1) : (game_values.reversewalk ? 1 : 7);
-    iSpinTimer = 0;
-}
-
-void CPlayer::ShakeTail()
-{
-    ifsoundonstop(rm->sfx_tailspin);
-    ifSoundOnPlay(rm->sfx_tailspin);
-    lockjump = true;
-
-    iTailState = 1; //cause tail to shake
-    iTailTimer = 0;
-    iTailFrame = 110;
-}
-
-void CPlayer::SpinTail()
-{
-    ifSoundOnPlay(rm->sfx_tailspin);
-
-    iTailState = 2; //cause tail to shake
-    iTailTimer = -1; //Add one extra frame to sync with spinning player sprite
-    iTailFrame = 22;
-
-    SpinPlayer();
-
-    objectcontainer[1].add(new MO_SpinAttack(globalID, teamID, kill_style_leaf, IsPlayerFacingRight(), 13));
-}
-
-void CPlayer::DrawTail()
-{
-    short iOffsetY = 0;
-    if (iTailState == 1) {
-        if (++iTailTimer >= 4) {
-            iTailTimer = 0;
-            iTailFrame -= 22;
-
-            if (iTailFrame < 66) {
-                iTailState = 0;
-
-                if (powerup == 7 && game_values.leaflimit > 0)
-                    DecreaseProjectileLimit();
-            }
-        }
-    } else if (iTailState == 2) {
-        iOffsetY = 52;
-        if (++iTailTimer >= 4) {
-            iTailTimer = 0;
-            iTailFrame += 22;
-            if (iTailFrame > 110) {
-                iTailState = 0;
-                iTailFrame = 66;
-
-                if (powerup == 7 && game_values.leaflimit > 0)
-                    DecreaseProjectileLimit();
-            }
-        }
-    }
-
-    //Draw tail will be called by the chicken if he is allowed to glide
-    //but we don't want to draw the actual tail for the chicken
-    if (powerup == 7) {
-        if (iTailState == 0) {
-            if (++iTailTimer >= 4) {
-                iTailTimer = 0;
-
-                if (!inair && velx != 0.0f) {
-                    iTailFrame += 22;
-                    if (iTailFrame > 66)
-                        iTailFrame = 22;
-                } else if (!inair) {
-                    iTailFrame = 22;
-                } else if (inair) {
-                    if (vely <= 0.0f)
-                        iTailFrame = 66;
-                    else
-                        iTailFrame = 110;
-                }
-            }
-        }
-
-        bool fPlayerFacingRight = !game_values.reversewalk;
-        if (iTailState == 2) {
-            if ((iSpinState >= 2 && iSpinState <= 4) || iSpinState == 7 || iSpinState == 11)
-                fPlayerFacingRight = game_values.reversewalk;
-        } else {
-            fPlayerFacingRight = IsPlayerFacingRight();
-        }
-
-        if (iswarping())
-            rm->spr_tail.draw(ix + (fPlayerFacingRight ? - 18 : 18), iy + 6, iTailFrame, (fPlayerFacingRight ? 0 : 26) + iOffsetY, 22, 26, (short)state %4, warpplane);
-        else
-            rm->spr_tail.draw(ix + (fPlayerFacingRight ? - 18 : 18), iy + 6, iTailFrame, (fPlayerFacingRight ? 0 : 26) + iOffsetY, 22, 26);
-
-    }
 }
 
 void CPlayer::DrawWings()
@@ -4428,12 +4308,8 @@ void CPlayer::SetStoredPowerup(short iPowerup)
 
 void CPlayer::ClearPowerupStates()
 {
-    iTailTimer = 0;
-    iTailState = 0;
-    iTailFrame = 0;
-
-    iSpinTimer = 0;
-    iSpinState = 0;
+    tail.reset();
+    spin.reset();
 
     iWingsTimer = 0;
     iWingsFrame = 0;
