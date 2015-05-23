@@ -5,6 +5,7 @@
 	- [Requirements](#requirements)
 	- [Linux](#linux)
 	- [Windows](#windows)
+	- [ARM / Raspberry Pi](#arm-devices)
 	- [Asm.js](#asmjs)
 	- [Build configuration](#build-configuration)
 - [How to play](#how-to-play)
@@ -34,6 +35,7 @@ The game uses artwork and sounds from Nintendo games. We hope that this noncomme
 
 - Linux
 - Windows
+- Raspberry Pi / ARM devices
 - XBox (?)
 - Mac OS X (?)
 - asm.js (experimental)
@@ -65,13 +67,14 @@ For other systems, you can download the development files manually from:
 Create a build directory and run CMake there to configure the project. Then simply call `make` every time you want to build. The binaries will be generated in ./Build/Binaries/Release by default.
 
 ```sh
-$ unzip data.zip
-$ mkdir Build && cd Build && cmake ..
-$ make -j4 # -jN = build on N threads
-$ ./Binaries/Release/smw ../data
+unzip data.zip
+mkdir Build && cd Build
+cmake ..
+make -j4 # -jN = build on N threads
+./Binaries/Release/smw ../data
 ```
 
-Currently, the following separate build targets are defined for `make`:
+Currently, the following valid build targets are defined for `make`:
 
 - smw
 - smw-leveleditor
@@ -94,6 +97,42 @@ Visual Studio:
 - on the same group, go to Linker and add your lib directory there
 - change also system to WINDOWS (not console)
 - now it will compile and smw.exe can be found in build\Binaries\Debug\smw.exe. make sure you copy the necessary SDL dlls along with smw.exe, otherwise it won't work
+
+### ARM devices
+
+You can build SMW on various ARM devices, like the Raspberry Pi, following the Linux instructions. Some boards may require different compiler flags hovewer, in this case you might want to manually edit `cmake/PlatformArm.cmake`.
+
+If you know how to do it, you can also cross-compile the usual way, by emulating your device or setting up a toolchain. In case your processor is not detected correctly (eg. in a rootfs), you can override it by adding the ARM_OVERRIDE_ARCH flag to CMake, eg. `-DARM_OVERRIDE_ARCH=armv6`.
+
+For example, here is how to set up a simple build environment for the Raspbery Pi on Ubuntu 14.04:
+
+```sh
+sudo apt-get install qemu-user-static debootstrap
+
+# Set up a Raspbian rootfs in the 'raspberry' directory
+sudo qemu-debootstrap --arch armhf wheezy raspberry http://archive.raspbian.org/raspbian
+
+# Mount some file systems in the rootfs
+sudo mount -o bind /dev  raspberry/dev
+sudo mount -o bind /proc raspberry/proc
+sudo mount -o bind /sys  raspberry/sys
+sudo cp /etc/resolv.conf raspberry/etc/resolv.conf
+
+# Enter
+sudo chroot raspberry /bin/bash
+```
+
+Then:
+
+```sh
+echo "deb http://archive.raspbian.org/raspbian wheezy main" >> /etc/apt/sources.list
+wget http://archive.raspbian.org/raspbian.public.key -O - | apt-key add -
+apt-get update
+apt-get install build-essential git \
+    cmake libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libenet-dev
+```
+
+Now you can continue with cloning the repository (eg. in `/root`) and following the Linux instructions. If you want to build for the first-gen Raspberry, you might want to call CMake as `cmake .. -DARM_OVERRIDE_ARCH=armv6l` to avoid linking errors. For other devices, you might need to edit the compiler flags as described above.
 
 ### ASM.JS
 
