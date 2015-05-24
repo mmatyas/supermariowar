@@ -16,7 +16,6 @@ set(SMW_VERSION_PATCH "0")
 # Options for customizing builds
 #
 
-option(DEBUG "Compile with debugging information" OFF)
 option(USE_PNG_SAVE "Enable PNG save feature" OFF) # currently working only with 1.2 ?
 option(USE_EMSCRIPTEN "Output asm.js code using emscripten" OFF) # TODO: change this to a build type maybe?
 option(USE_SDL2_LIBS "Use SDL2 instead of SDL 1.x" OFF) # only smw ported yet
@@ -50,7 +49,7 @@ endif()
 #
 
 # Set where the binary files will be built.
-if (DEBUG)
+if (CMAKE_BUILD_TYPE STREQUAL Debug)
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/Binaries/Debug)
 else()
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/Binaries/Release)
@@ -102,7 +101,7 @@ set(bindir  ${CMAKE_INSTALL_PREFIX}/games/bin       CACHE PATH "bindir")
 #-----------------------------------------------------------------------------
 
 # Debugging CFLAGS. Turn optimizations off; turn debugging symbols on.
-if(DEBUG)
+if(CMAKE_BUILD_TYPE STREQUAL Debug)
   add_definitions(-DDEBUG -D_DEBUG -DPNG_DEBUG=1)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -g -O0")
@@ -110,7 +109,7 @@ else()
   add_definitions(-DNDEBUG)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -s")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -O3 -s")
-endif(DEBUG)
+endif()
 
 # Set these next two lines to test generic
 #set(CPU_ARM 1)
