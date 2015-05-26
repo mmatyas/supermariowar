@@ -1667,7 +1667,7 @@ void CPlayer::CommitAction()
         if (game_values.bombslimit > 0)
             DecreaseProjectileLimit();
     } else if (player_action_spincape == action) {
-        SpinCape();
+        cape.spin(*this);
     } else if (player_action_spintail == action) {
         tail.spin(*this);
     }
@@ -2092,11 +2092,7 @@ void CPlayer::SetupNewPlayer()
 
     sSpotlight = NULL;
 
-    iCapeTimer = 0;
-    iCapeFrameX = 0;
-    iCapeFrameY = 0;
-    fCapeUp = false;
-    iCapeYOffset = 0;
+    cape.reset();
 
     frictionslidetimer = 0;
     bobombsmoketimer = 0;
@@ -2884,7 +2880,7 @@ void CPlayer::draw()
     //Don't allow cape, tail, wings to be used with shoe
     if (iKuriboShoe == 0) {
         if (powerup == 3)
-            DrawCape();
+            cape.draw(*this);
         else if (powerup == 8)
             wings.draw(*this);
         //This has to come last otherwise chickens with glide option won't be able to use cape or wings
@@ -2984,69 +2980,6 @@ void CPlayer::draw()
                 rm->spr_storedpowerupsmall.draw(powerupX, powerupY, powerupused * 16, 0, 16, 16);
         }
     }
-}
-
-void CPlayer::SpinCape()
-{
-    ifSoundOnPlay(rm->sfx_tailspin);
-
-    iCapeTimer = 4; //Add one extra frame to sync with spinning player sprite
-
-    spin.spin(*this);
-
-    objectcontainer[1].add(new MO_SpinAttack(globalID, teamID,  kill_style_feather, IsPlayerFacingRight(), 24));
-}
-
-void CPlayer::DrawCape()
-{
-    if (++iCapeTimer > 3) {
-        if (spin.isSpinInProgress()) {
-            iCapeFrameX = spin.toCapeFrameX();
-            iCapeFrameY = 32;
-            iCapeYOffset = -8;
-        } else if ((!inair && velx != 0.0f) || (inair && vely < 1.0f)) {
-            iCapeFrameX += 32;
-            if (iCapeFrameX > 96)
-                iCapeFrameX = 0;
-
-            iCapeFrameY = 0;
-            fCapeUp = true;
-            iCapeYOffset = 0;
-        } else if (!inair) {
-            if (fCapeUp) {
-                fCapeUp = false;
-                iCapeFrameX = 0;
-            } else {
-                iCapeFrameX = 32;
-            }
-
-            iCapeFrameY = 96;
-            iCapeYOffset = 0;
-        } else if (inair) {
-            iCapeFrameX += 32;
-            if (iCapeFrameX > 64)
-                iCapeFrameX = 0;
-
-            iCapeFrameY = 64;
-            fCapeUp = true;
-            iCapeYOffset = -18;
-        }
-
-        iCapeTimer = 0;
-    }
-
-    bool fPlayerFacingRight = !game_values.reversewalk;
-    if (spin.isSpinInProgress()) {
-        if (spin.isReverseWalking())
-            fPlayerFacingRight = game_values.reversewalk;
-    } else {
-        fPlayerFacingRight = IsPlayerFacingRight();
-    }
-
-    if (iswarping())
-        rm->spr_cape.draw(ix - PWOFFSET + (fPlayerFacingRight ? - 18 : 18), iy - PHOFFSET + 4 + iCapeYOffset, (fPlayerFacingRight ? 128 : 0) + iCapeFrameX, iCapeFrameY, 32, 32, (short)state %4, warpplane);
-    else
-        rm->spr_cape.draw(ix - PWOFFSET + (fPlayerFacingRight ? - 18 : 18), iy - PHOFFSET + 4 + iCapeYOffset, (fPlayerFacingRight ? 128 : 0) + iCapeFrameX, iCapeFrameY, 32, 32);
 }
 
 void CPlayer::drawarrows()
@@ -4270,7 +4203,7 @@ void CPlayer::SetPowerup(short iPowerup)
 
     //Minor fix for becoming caped to draw animation correctly
     if (iPowerup == 3)
-        iCapeTimer = 4;
+        cape.restart_animation();
 }
 
 void CPlayer::SetStoredPowerup(short iPowerup)

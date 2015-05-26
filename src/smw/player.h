@@ -7,6 +7,7 @@
 #include "Score.h"
 #include "PlayerKillStyles.h"
 
+#include "player_components/PlayerCape.h"
 #include "player_components/PlayerSpinStatus.h"
 #include "player_components/PlayerTail.h"
 #include "player_components/PlayerWings.h"
@@ -170,9 +171,6 @@ class CPlayer
 		void SetSprite();
 		void Jump(short iMove, float jumpModifier, bool fKuriboBounce);
 
-		void SpinCape();
-		void DrawCape();
-
 		void ClearPowerupStates();
 
     void setXf(float xf) {
@@ -326,11 +324,7 @@ class CPlayer
 
 		bool bobomb;
 
-		short iCapeTimer;
-		short iCapeFrameX;
-		short iCapeFrameY;
-		short fCapeUp;
-		short iCapeYOffset;
+		PlayerCape cape;
 
 		PlayerState state;
 		float spawnradius;
@@ -538,6 +532,7 @@ class CPlayer
 
 		friend class GameplayState;
 
+		friend struct PlayerCape;
 		friend struct PlayerSpinStatus;
 		friend struct PlayerTail;
 		friend struct PlayerWings;
