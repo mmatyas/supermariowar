@@ -2886,7 +2886,7 @@ void CPlayer::draw()
         if (powerup == 3)
             DrawCape();
         else if (powerup == 8)
-            DrawWings();
+            wings.draw(*this);
         //This has to come last otherwise chickens with glide option won't be able to use cape or wings
         else if (powerup == 7 || (powerup == -1 && game_values.gamemode->chicken == this && game_values.gamemodesettings.chicken.glide))
             tail.draw(*this);
@@ -3047,27 +3047,6 @@ void CPlayer::DrawCape()
         rm->spr_cape.draw(ix - PWOFFSET + (fPlayerFacingRight ? - 18 : 18), iy - PHOFFSET + 4 + iCapeYOffset, (fPlayerFacingRight ? 128 : 0) + iCapeFrameX, iCapeFrameY, 32, 32, (short)state %4, warpplane);
     else
         rm->spr_cape.draw(ix - PWOFFSET + (fPlayerFacingRight ? - 18 : 18), iy - PHOFFSET + 4 + iCapeYOffset, (fPlayerFacingRight ? 128 : 0) + iCapeFrameX, iCapeFrameY, 32, 32);
-}
-
-void CPlayer::DrawWings()
-{
-    if (flying) {
-        if (++iWingsTimer >= 8) {
-            iWingsTimer = 0;
-            iWingsFrame += 26;
-
-            if (iWingsFrame > 26)
-                iWingsFrame = 0;
-        }
-    } else {
-        iWingsFrame = 26;
-    }
-
-    bool fPlayerFacingRight = IsPlayerFacingRight();
-    if (iswarping())
-        rm->spr_wings.draw(ix + (fPlayerFacingRight ? - 19 : 15), iy - 10, iWingsFrame, fPlayerFacingRight ? 0 : 32, 26, 32, (short)state %4, warpplane);
-    else
-        rm->spr_wings.draw(ix + (fPlayerFacingRight ? - 19 : 15), iy - 10, iWingsFrame, fPlayerFacingRight ? 0 : 32, 26, 32);
 }
 
 void CPlayer::drawarrows()
@@ -4310,9 +4289,7 @@ void CPlayer::ClearPowerupStates()
 {
     tail.reset();
     spin.reset();
-
-    iWingsTimer = 0;
-    iWingsFrame = 0;
+    wings.reset();
 
     flying = false;
     flyingtimer = 0;

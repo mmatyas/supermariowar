@@ -9,6 +9,7 @@
 
 #include "player_components/PlayerSpinStatus.h"
 #include "player_components/PlayerTail.h"
+#include "player_components/PlayerWings.h"
 
 enum PlayerState {
 	player_wait,
@@ -172,8 +173,6 @@ class CPlayer
 		void SpinCape();
 		void DrawCape();
 
-		void DrawWings();
-
 		void ClearPowerupStates();
 
     void setXf(float xf) {
@@ -265,9 +264,7 @@ class CPlayer
 
 		PlayerTail tail;
 		PlayerSpinStatus spin;
-
-		short iWingsTimer;
-		short iWingsFrame;
+		PlayerWings wings;
 
 		short superjumptimer;		//this is true when a player is able to do a super jump off a note block
 		short superjumptype;		//type of the note block they hit
@@ -543,6 +540,7 @@ class CPlayer
 
 		friend struct PlayerSpinStatus;
 		friend struct PlayerTail;
+		friend struct PlayerWings;
 };
 
 
