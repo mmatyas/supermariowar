@@ -289,7 +289,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
                     if (pPlayer->tanooki) {
                         playerKeys->game_turbo.fPressed = true;
                         pPlayer->lockfire = false;
-                    } else if (pPlayer->iKuriboShoe > 0) { //else if the player has the shoe then stomp
+                    } else if (pPlayer->kuriboshoe.is_on()) { //else if the player has the shoe then stomp
                         playerKeys->game_down.fPressed = true;
                         playerKeys->game_jump.fPressed = true;
                     }
@@ -419,7 +419,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
                     if (pPlayer->tanooki) {
                         playerKeys->game_turbo.fPressed = true;
                         pPlayer->lockfire = false;
-                    } else if (pPlayer->iKuriboShoe > 0) { //else if the player has the shoe then stomp
+                    } else if (pPlayer->kuriboshoe.is_on()) { //else if the player has the shoe then stomp
                         playerKeys->game_down.fPressed = true;
                         playerKeys->game_jump.fPressed = true;
                     }

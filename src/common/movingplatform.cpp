@@ -895,7 +895,7 @@ void MovingPlatform::collide(CPlayer * player)
                                               (!(t1 & tile_flag_solid) && (t2 & tile_flag_super_or_player_death_top));
 
             if (fSolidTileUnderPlayer && !fSuperDeathTileUnderPlayer &&
-                    (!fDeathTileUnderPlayer || player->invincible || player->shield > 0 || player->iKuriboShoe > 0 || player->shyguy)) {
+                    (!fDeathTileUnderPlayer || player->invincible || player->shield > 0 || player->kuriboshoe.is_on() || player->shyguy)) {
                 //on ground
 
                 if (player->iVerticalPlatformCollision == 0) {

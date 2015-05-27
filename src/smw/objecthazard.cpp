@@ -787,7 +787,7 @@ bool MO_PirhanaPlant::collide(CPlayer * player)
 
     bool fHitPlayerTop = fOldY + collisionHeight <= player->fOldY && iy + collisionHeight >= player->iy;
 
-    if (player->invincible || player->statue_timer || (player->iKuriboShoe > 0 && !fHitPlayerTop)) {
+    if (player->invincible || player->statue_timer || (player->kuriboshoe.is_on() && !fHitPlayerTop)) {
         KillPlant();
     } else if (player->shield == 0 && !player->shyguy) {
         return player->KillPlayerMapHazard(false, kill_style_environment, false) != player_kill_nonkill;

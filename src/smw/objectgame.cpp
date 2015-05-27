@@ -6079,10 +6079,10 @@ void MO_Spiny::update()
 bool MO_Spiny::hittop(CPlayer * player)
 {
     //Kill player here
-    if (player->isready() && player->shield == 0 && !player->invincible && player->iKuriboShoe == 0)
+    if (player->isready() && player->shield == 0 && !player->invincible && !player->kuriboshoe.is_on())
         return player->KillPlayerMapHazard(false, kill_style_environment, false) != player_kill_nonkill;
 
-    if (player->iKuriboShoe > 0) {
+    if (player->kuriboshoe.is_on()) {
         player->setYi(iy - PH - 1);
         player->bouncejump();
         player->collision_detection_checktop();
@@ -6880,7 +6880,7 @@ bool CO_Shell::collide(CPlayer * player)
 
 bool CO_Shell::HitTop(CPlayer * player)
 {
-    if (player->invincible || player->iKuriboShoe > 0 || player->shyguy) {
+    if (player->invincible || player->kuriboshoe.is_on() || player->shyguy) {
         Die();
         fSmoking = false;
         return false;
@@ -8050,7 +8050,7 @@ CO_Spike::CO_Spike(gfxSprite *nspr, short iX, short iY) :
 
 void CO_Spike::hittop(CPlayer * player)
 {
-    if (player->isready() && player->shield == 0 && !player->invincible && player->iKuriboShoe == 0 && !player->shyguy)
+    if (player->isready() && player->shield == 0 && !player->invincible && !player->kuriboshoe.is_on() && !player->shyguy)
         player->KillPlayerMapHazard(false, kill_style_environment, false);
 }
 
@@ -8076,9 +8076,9 @@ CO_KuriboShoe::CO_KuriboShoe(gfxSprite *nspr, short iX, short iY, bool sticky) :
 
 void CO_KuriboShoe::hittop(CPlayer * player)
 {
-    if (player->iKuriboShoe == 0 && player->statue_timer == 0) {
+    if (!player->kuriboshoe.is_on() && player->statue_timer == 0) {
         dead = true;
-        player->SetKuriboShoe(fSticky ? 2 : 1);
+        player->SetKuriboShoe(fSticky ? STICKY : NORMAL);
         ifSoundOnPlay(rm->sfx_transform);
         eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, player->ix + HALFPW - 16, player->iy + HALFPH - 16, 3, 8));
     }

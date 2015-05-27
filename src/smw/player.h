@@ -8,6 +8,7 @@
 #include "PlayerKillStyles.h"
 
 #include "player_components/PlayerCape.h"
+#include "player_components/PlayerKuriboShoe.h"
 #include "player_components/PlayerSpinStatus.h"
 #include "player_components/PlayerTail.h"
 #include "player_components/PlayerWings.h"
@@ -112,7 +113,7 @@ class CPlayer
 		bool IsPlayerFacingRight();
 
     bool IsAcceptingItem() {
-        return fAcceptingItem && statue_timer == 0 && iKuriboShoe == 0;
+        return fAcceptingItem && statue_timer == 0 && !kuriboshoe.is_on();
     }
     bool PressedAcceptItemKey() {
         return fPressedAcceptItem;
@@ -139,9 +140,9 @@ class CPlayer
         return state == player_dead;
     }
 
-		void SetKuriboShoe(short iType);
+		void SetKuriboShoe(KuriboShoeType type);
     bool IsInvincibleOnBottom() {
-        return invincible || shield || iKuriboShoe;
+        return invincible || shield || kuriboshoe.is_on();
     }
     bool IsSuperStomping() {
         return fSuperStomp;
@@ -288,11 +289,7 @@ class CPlayer
 		bool frozen;
 		short frozentimer;
 
-		short iKuriboShoe;
-		short iKuriboShoeAnimationTimer;
-		short iKuriboShoeAnimationFrame;
-		short iKuriboShoeExitTimer;
-		short iKuriboShoeExitIndex;
+		PlayerKuriboShoe kuriboshoe;
 
 		short iSecretCodeTimer;
 		short iSecretCodeIndex;
@@ -532,7 +529,8 @@ class CPlayer
 
 		friend class GameplayState;
 
-		friend struct PlayerCape;
+		friend class PlayerCape;
+		friend class PlayerKuriboShoe;
 		friend struct PlayerSpinStatus;
 		friend struct PlayerTail;
 		friend struct PlayerWings;
