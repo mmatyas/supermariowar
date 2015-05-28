@@ -37,6 +37,7 @@
 #include "player.h"
 void CPlayer::flipsidesifneeded() {}
 short CPlayer::KillPlayerMapHazard(bool, killstyle, bool, short) { return 0; }
+bool PlayerKuriboShoe::is_on() { return false; }
 void IO_MovingObject::flipsidesifneeded() {}
 void IO_MovingObject::KillObjectMapHazard(short playerID) {}
 void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead) {}
