@@ -24,7 +24,7 @@
 int g_iVersion[] = {2, 0, 0, 0};
 
 // main game directory, read from command line argument
-char *RootDataDirectory = "data";
+std::string RootDataDirectory = "data";
 
 CGame *smw;
 CResourceManager *rm;

@@ -123,7 +123,7 @@ extern SoundsList* soundpacklist;
 extern TourList* tourlist;
 extern WorldList* worldlist;
 
-extern char *RootDataDirectory;
+extern std::string RootDataDirectory;
 extern CGameValues game_values;
 extern CResourceManager* rm;
 
@@ -189,7 +189,7 @@ int main(int argc, char *argv[])
 
 
     // this instance will contain the other relevant objects
-    smw = new CGame(RootDataDirectory);
+    smw = new CGame(RootDataDirectory.c_str());
 	rm = new CResourceManager();
 #pragma warning ("delete these or use boost GC shared_ptr")
 

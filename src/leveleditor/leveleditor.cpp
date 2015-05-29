@@ -90,7 +90,7 @@ extern short g_iDefaultPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
 extern short g_iCurrentPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
 
 extern CResourceManager* rm;
-
+extern std::string RootDataDirectory;
 
 enum {EDITOR_EDIT, EDITOR_TILES, EDITOR_QUIT, SAVE_AS, FIND, CLEAR_MAP, EDITOR_BLOCKS, NEW_MAP, SAVE, EDITOR_WARP, EDITOR_EYECANDY, DISPLAY_HELP, EDITOR_PLATFORM, EDITOR_TILETYPE, EDITOR_BACKGROUNDS, EDITOR_MAPITEMS, EDITOR_ANIMATION, EDITOR_PROPERTIES, EDITOR_MODEITEMS, EDITOR_MAPHAZARDS};
 
@@ -368,7 +368,7 @@ int main(int argc, char *argv[])
 	if (argc >= 2)
 		RootDataDirectory = argv[1];
 
-	smw = new CGame(RootDataDirectory);
+	smw = new CGame(RootDataDirectory.c_str());
 	rm = new CResourceManager();
 	g_map = new CMap();
 	g_tilesetmanager = new CTilesetManager();

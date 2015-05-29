@@ -6,7 +6,7 @@
 class CGame
 {
 public:
-    CGame(char *);
+    CGame(const char *);
     ~CGame(void);
 
 	int ScreenWidth;

@@ -17,10 +17,10 @@
 #endif
 
 
-extern char *RootDataDirectory;
+extern std::string RootDataDirectory;
 
 using namespace std;
-char SMW_Root_Data_Dir[PATH_MAX + 2] = "";
+std::string SMW_Root_Data_Dir;
 
 std::string	GetHomeDirectory()
 {
@@ -61,9 +61,8 @@ bool File_Exists (const std::string fileName)
 /* Call this when your application launches */
 void Initialize_Paths()
 {
-    if (SMW_Root_Data_Dir[0] != 0) {
+    if (!SMW_Root_Data_Dir.empty())
 		return;
-	}
 
 #ifdef APPBUNDLE
     UInt8 temp[PATH_MAX];
@@ -83,17 +82,11 @@ void Initialize_Paths()
         return;
     }
 
-	strlcat(SMW_Root_Data_Dir, (char*)temp, PATH_MAX);
-	int i = strlen(SMW_Root_Data_Dir) -1;
-	while (SMW_Root_Data_Dir[i] !='/'){
-	   SMW_Root_Data_Dir[i] = 0;
-	   --i;
-	}
-	SMW_Root_Data_Dir[i] = 0;
+    SMW_Root_Data_Dir = getFileFromPath(std::string((char*)temp));
 
     CFRelease(dirURL);
 #else
-	strlcat(SMW_Root_Data_Dir, "./", 4);
+	SMW_Root_Data_Dir = "./";
 #endif
 	cout << "Located data folder at: " << SMW_Root_Data_Dir << endl;
 }
@@ -122,7 +115,7 @@ const string convertPath(const string& source)
 
     if (!are_paths_initialized) {
 //		#ifdef PREFIXPATH
-			strcpy(SMW_Root_Data_Dir, RootDataDirectory);
+			SMW_Root_Data_Dir = RootDataDirectory;
 //		#endif
 
 		#ifdef __MACOSX__
@@ -130,10 +123,10 @@ const string convertPath(const string& source)
 		#endif
 
 		#ifndef _WIN32
-			strcat(SMW_Root_Data_Dir, "/");
+			SMW_Root_Data_Dir + "/";
 		#else
-			if (SMW_Root_Data_Dir[strlen(SMW_Root_Data_Dir)-1] != '\\')
-				strcat(SMW_Root_Data_Dir, "\\");
+			if (*myStr.rbegin() != '\\')
+				SMW_Root_Data_Dir + "\\";
 		#endif
 
 		are_paths_initialized = true;

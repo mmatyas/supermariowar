@@ -6,7 +6,7 @@
 #include <windows.h>
 #endif
 
-CGame::CGame(char *rootDirectory)
+CGame::CGame(const char *rootDirectory)
 {
     // make sure that the .smw directory is created
     std::string smwHome = GetHomeDirectory();
