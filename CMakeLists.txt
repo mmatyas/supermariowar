@@ -17,7 +17,7 @@ set(SMW_VERSION_PATCH "0")
 #
 
 option(USE_PNG_SAVE "Enable PNG save feature" OFF) # currently working only with 1.2 ?
-option(USE_EMSCRIPTEN "Output asm.js code using emscripten" OFF) # TODO: change this to a build type maybe?
+option(TARGET_EMSCRIPTEN "Output asm.js code using emscripten" OFF) # TODO: change this to a build type maybe?
 option(USE_SDL2_LIBS "Use SDL2 instead of SDL 1.x" OFF) # only smw ported yet
 option(NO_NETWORK "Disable all network communication" OFF)
 
@@ -115,7 +115,7 @@ endif()
 #set(CPU_ARM 1)
 #add_definitions(-DCPU_ARM=1)
 # Various compile flags
-if(NOT CPU_ARM AND NOT USE_EMSCRIPTEN)
+if(NOT CPU_ARM AND NOT TARGET_EMSCRIPTEN)
 	add_definitions(-msse2)
 endif()
 
@@ -181,7 +181,7 @@ add_definitions(-D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE)
 #-----------------------------------------------------------------------------
 
 # emscripten uses its own SDL, no need to include or link
-if(NOT USE_EMSCRIPTEN)
+if(NOT TARGET_EMSCRIPTEN)
 	if(USE_SDL2_LIBS)
 		# add all SDL2 dependencies
 		find_package(SDL2 REQUIRED)

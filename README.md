@@ -64,7 +64,7 @@ For other systems, you can download the development files manually from:
 
 ### Linux
 
-Create a build directory and run CMake there to configure the project. Then simply call `make` every time you want to build. The binaries will be generated in ./Build/Binaries/Release by default.
+Create a build directory and run CMake there to configure the project. Then simply call `make` every time you want to build. The binaries will be generated in `./Build/Binaries/Release` by default.
 
 ```sh
 unzip data.zip
@@ -145,7 +145,7 @@ You can prepare a build directory with the following commands:
 ```sh
 $ mkdir build-js && cd build-js
 $ ln -s ../data data
-$ emconfigure cmake .. -DUSE_EMSCRIPTEN=1 -DNO_NETWORK=1
+$ emconfigure cmake .. -DTARGET_EMSCRIPTEN=1 -DNO_NETWORK=1
 ```
 
 Then build with:
@@ -159,7 +159,7 @@ $ emcc Binaries/Release/smw-worldedit.bc -o worldedit.html $BUILDPARAMS
 ```
 ### Build configuration
 
-You can change the build configuration by setting various CMake flags. The simplest way to do this is by running `cmake-gui ..` from the Build directory. You can read a short description of an element by hovering the mouse on its name too.
+You can change the build configuration by setting various CMake flags. The simplest way to do this is by running `cmake-gui ..` from the `Build` directory. You can read a short description of an element by hovering the mouse on its name too.
 
 Alternatively, you can pass these options directly to CMake as `-DFLAGNAME=VALUE` (eg. `cmake .. -DUSE_SDL2_LIBS=1`).
 

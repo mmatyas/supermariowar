@@ -139,7 +139,7 @@ if [ ! -d data ]; then
 	fi
 fi
 
-emconfigure cmake -D CMAKE_BUILD_TYPE:STRING=Release -D DEBUG:BOOL=ON -D USE_EMSCRIPTEN:BOOL=ON -G "Unix Makefiles" ../..
+emconfigure cmake -D CMAKE_BUILD_TYPE:STRING=Release -D DEBUG:BOOL=ON -D TARGET_EMSCRIPTEN:BOOL=ON -G "Unix Makefiles" ../..
 if [ $? -gt 0 ]; then
     echo "Test failed: Configure error."
     exit 1
@@ -181,7 +181,7 @@ if [ ! -d data ]; then
 	fi
 fi
 
-emconfigure cmake -D CMAKE_BUILD_TYPE:STRING=Debug -D USE_EMSCRIPTEN:BOOL=ON -G "Unix Makefiles" ../..
+emconfigure cmake -D CMAKE_BUILD_TYPE:STRING=Debug -D TARGET_EMSCRIPTEN:BOOL=ON -G "Unix Makefiles" ../..
 if [ $? -gt 0 ]; then
     echo "Test failed: Configure error."
     exit 1

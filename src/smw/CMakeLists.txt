@@ -61,7 +61,7 @@ LIST(APPEND SMW_SRCS
 
 if(NOT NO_NETWORK)
 	# disable networking in emscripten build for now...
-	if(NOT USE_EMSCRIPTEN)
+	if(NOT TARGET_EMSCRIPTEN)
 		LIST(APPEND SMW_SRCS platform/network/enet/NetworkLayerENet.cpp)
 	endif()
 endif()
@@ -71,12 +71,12 @@ add_executable(smw ../common/movingplatform.cpp ../common/uicontrol.cpp ../commo
 target_link_libraries(smw CommonFiles)
 
 # add .bc extension when building with emscripten
-if(USE_EMSCRIPTEN)
+if(TARGET_EMSCRIPTEN)
 	set_target_properties(smw PROPERTIES SUFFIX ".bc")
 endif()
 
 # emscripten uses its own SDL
-if(NOT USE_EMSCRIPTEN)
+if(NOT TARGET_EMSCRIPTEN)
 	target_link_libraries(smw ${CMAKE_THREAD_LIBS_INIT})
 
 	if(USE_SDL2_LIBS)

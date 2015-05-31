@@ -14,11 +14,11 @@ add_executable (smw-worldedit
 target_link_libraries (smw-worldedit CommonFiles)
 
 # add .bc extension when building with emscripten
-if(USE_EMSCRIPTEN)
+if(TARGET_EMSCRIPTEN)
 	set_target_properties(smw-worldedit PROPERTIES SUFFIX ".bc")
 endif()
 
-if(NOT USE_EMSCRIPTEN)
+if(NOT TARGET_EMSCRIPTEN)
 	target_link_libraries (smw-worldedit ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLIMAGE_LIBRARY} SDLmain)
 endif()
 
