@@ -790,7 +790,7 @@ void CGM_Chicken::think()
 
         static short counter = 0;
 
-        if (chicken->isready() && chicken->statue_timer == 0) {
+        if (chicken->isready() && chicken->tanookisuit.notStatue()) {
             if (++counter >= game_values.pointspeed) {
                 counter = 0;
                 chicken->score->AdjustScore(1);
@@ -3013,7 +3013,7 @@ void CGM_Chase::think()
     if (keyholder) {
         static short counter = 0;
 
-        if (keyholder->isready() && keyholder->statue_timer == 0) {
+        if (keyholder->isready() && keyholder->tanookisuit.notStatue()) {
             if (++counter >= game_values.pointspeed) {
                 counter = 0;
                 keyholder->score->AdjustScore(1);

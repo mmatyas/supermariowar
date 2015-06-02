@@ -4852,7 +4852,7 @@ OMO_Area::OMO_Area(gfxSprite *nspr, short iNumAreas) :
 
 bool OMO_Area::collide(CPlayer * player)
 {
-    if (player->statue_timer == 0 && !player->isdead()) {
+    if (player->tanookisuit.notStatue() && !player->isdead()) {
         totalTouchingPlayers++;
 
         if (totalTouchingPlayers == 1) {
@@ -4970,7 +4970,7 @@ OMO_KingOfTheHillZone::OMO_KingOfTheHillZone(gfxSprite *nspr) :
 
 bool OMO_KingOfTheHillZone::collide(CPlayer * player)
 {
-    if (player->statue_timer == 0) {
+    if (player->tanookisuit.notStatue()) {
         playersTouching[player->teamID] = player;
         playersTouchingCount[player->teamID]++;
         totalTouchingPlayers++;
@@ -5196,7 +5196,7 @@ OMO_RaceGoal::OMO_RaceGoal(gfxSprite *nspr, short id) :
 
 bool OMO_RaceGoal::collide(CPlayer * player)
 {
-    if (game_values.gamemode->getgamemode() == game_mode_race && player->statue_timer == 0) {
+    if (game_values.gamemode->getgamemode() == game_mode_race && player->tanookisuit.notStatue()) {
         CGM_Race * gamemode = (CGM_Race*)game_values.gamemode;
 
         if (tagged[player->teamID] != player->colorID && gamemode->getNextGoal(player->teamID) >= goalID) {
@@ -6868,7 +6868,7 @@ bool CO_Shell::collide(CPlayer * player)
         }
     }
 
-    if (player->statue_timer == 0) {
+    if (player->tanookisuit.notStatue()) {
         if (player->fOldY + PH <= iy && player->iy + PH >= iy)
             return HitTop(player);
         else
@@ -8076,7 +8076,7 @@ CO_KuriboShoe::CO_KuriboShoe(gfxSprite *nspr, short iX, short iY, bool sticky) :
 
 void CO_KuriboShoe::hittop(CPlayer * player)
 {
-    if (!player->kuriboshoe.is_on() && player->statue_timer == 0) {
+    if (!player->kuriboshoe.is_on() && player->tanookisuit.notStatue()) {
         dead = true;
         player->SetKuriboShoe(fSticky ? STICKY : NORMAL);
         ifSoundOnPlay(rm->sfx_transform);

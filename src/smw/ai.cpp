@@ -286,7 +286,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 
                 if (!pPlayer->superstomp_lock) {
                     //If the player is tanooki, then try to super stomp on them
-                    if (pPlayer->tanooki) {
+                    if (pPlayer->tanookisuit.isOn()) {
                         playerKeys->game_turbo.fPressed = true;
                         pPlayer->lockfire = false;
                     } else if (pPlayer->kuriboshoe.is_on()) { //else if the player has the shoe then stomp
@@ -416,7 +416,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
 
                 if (!pPlayer->superstomp_lock) {
                     //If the player is tanooki, then try to super stomp on them
-                    if (pPlayer->tanooki) {
+                    if (pPlayer->tanookisuit.isOn()) {
                         playerKeys->game_turbo.fPressed = true;
                         pPlayer->lockfire = false;
                     } else if (pPlayer->kuriboshoe.is_on()) { //else if the player has the shoe then stomp
@@ -603,7 +603,7 @@ ExitDeathCheck:
                   (iStoredPowerup == 6 && !pPlayer->invincible) || //Use star
                   (iStoredPowerup == 8 && !pPlayer->bobomb) || //use bob-omb
                   (iStoredPowerup >= 12 && iStoredPowerup <= 15 && !carriedItem) || //Use shell
-                  (iStoredPowerup == 20 && !pPlayer->tanooki)) { //use tanooki
+                  (iStoredPowerup == 20 && !pPlayer->tanookisuit.isOn())) { //use tanooki
             playerKeys->game_powerup.fDown = true;
         } else if (iStoredPowerup == 18) { //mystery mushroom
             //See if another player has a powerup

@@ -895,7 +895,7 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
                             rm->spr_storedpowerupsmall.draw(iScoreOffsetX, iScoreOffsetY + 16, g_iPowerupToIcon[player->powerup - 1], 0, 16, 16);
 
                         //Display tanooki powerup if player has it
-                        if (player->tanooki)
+                        if (player->tanookisuit.isOn())
                             rm->spr_storedpowerupsmall.draw(iScoreOffsetX + 16, iScoreOffsetY + 16, smw->ScreenWidth/2, 0, 16, 16);
                     } else {
                         rm->spr_player[globalID][iScoreboardSprite]->draw(score[i]->x + scoreoffsets[k], score[i]->y + 2, 0, 0, 32, 32);

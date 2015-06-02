@@ -11,6 +11,7 @@
 #include "player_components/PlayerKuriboShoe.h"
 #include "player_components/PlayerSpinStatus.h"
 #include "player_components/PlayerTail.h"
+#include "player_components/PlayerTanookiSuit.h"
 #include "player_components/PlayerWings.h"
 
 enum PlayerState {
@@ -85,7 +86,6 @@ class CPlayer
 		void SetupNewPlayer();
 
 		void updateKuriboShoe(int keymask);
-		void updateTanookiStatus();
 		void updateCardCollection(int keymask);
 		void updateSuperStomp();
 		void updateInvincibility();
@@ -113,7 +113,7 @@ class CPlayer
 		bool IsPlayerFacingRight();
 
     bool IsAcceptingItem() {
-        return fAcceptingItem && statue_timer == 0 && !kuriboshoe.is_on();
+        return fAcceptingItem && tanookisuit.notStatue() && !kuriboshoe.is_on();
     }
     bool PressedAcceptItemKey() {
         return fPressedAcceptItem;
@@ -218,9 +218,7 @@ class CPlayer
 		short playerDevice;
 
         // tanooki
-        bool tanooki;
-        bool statue_lock;
-        int statue_timer;
+        PlayerTanookiSuit tanookisuit;
 
 		CScore *score;
 		short killsinrow;
@@ -317,7 +315,6 @@ class CPlayer
 		short powerup;
 		short projectilelimit;
 		int projectiles;
-		short tanookilimit;
 
 		bool bobomb;
 
@@ -531,6 +528,7 @@ class CPlayer
 
 		friend class PlayerCape;
 		friend class PlayerKuriboShoe;
+		friend class PlayerTanookiSuit;
 		friend struct PlayerSpinStatus;
 		friend struct PlayerTail;
 		friend struct PlayerWings;

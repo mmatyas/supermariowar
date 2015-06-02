@@ -166,6 +166,7 @@ bool CPlayer::bouncejump()
     return false;
 }
 bool PlayerKuriboShoe::is_on() { return false; }
+bool PlayerTanookiSuit::isStatue() { return false; }
 
 void B_WeaponBreakableBlock::triggerBehavior(short iPlayerID, short iTeamID) {}
 

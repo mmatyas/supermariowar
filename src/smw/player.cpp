@@ -185,107 +185,6 @@ void CPlayer::Init()
         pPlayerAI->Init();
 }
 
-void CPlayer::updateTanookiStatus()
-{
-    if (tanooki && state == player_ready) {
-        // If the down key is ever released, manually untransform by releasing the down key
-        if (!playerKeys->game_down.fDown && statue_timer) {
-            // Untransform from statue
-            statue_timer = 1;
-        }
-
-        // Become the tanooki
-        else if (playerKeys->game_turbo.fPressed && playerKeys->game_down.fDown && !statue_lock && !lockfire && powerupused == -1
-                 && !kuriboshoe.is_on() && !tail.isInUse()) {
-            // set the amount of time you get to remain in statue form
-            statue_timer = 123;
-
-            // perform tansformation effects
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
-            ifSoundOnPlay(rm->sfx_transform);
-
-            // Neutralize lateral velocity
-            const float tv = 1.6f;
-            if (velx > tv)
-                velx = tv;
-            else if (velx < -tv)
-                velx = -tv;
-
-            // Cause statue to super stomp to ground
-            if (inair && !fSuperStomp && iSuperStompTimer <= 0 && !superstomp_lock) {
-                iSuperStompTimer = 8;
-                lockfall = true;
-
-                // Become soft shielded (with stomp ability)
-                shield = 2;
-
-                // Stop player from super stomping twice before touching the ground
-                superstomp_lock = true;
-            }
-
-            // Prevent you from shooting
-            lockfire = true;
-
-            // Prevent you from falling through solid-on-top blocks
-            lockfall = true;
-
-            // Prevent you from becoming the statue twice before touching the ground
-            statue_lock = true;
-
-            //If we were flying or spinning when we became the statue, clear those states
-            ClearPowerupStates();
-        }
-
-        if (!fSuperStomp && iSuperStompTimer <= 0) {
-            // Count down the statue timer, which leads to a forced detransformation
-            if (statue_timer == 1) {
-                // Untransform from statue
-                statue_timer = 0;
-
-                // Release invincibility
-                shield = 0;
-
-                // Slight upward velocity to escape spikes / lava
-                if (!inair)
-                    vely = -8.0;
-
-                // perform transformation effects
-                eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
-                ifSoundOnPlay(rm->sfx_transform);
-
-                //Decrease the amount of tanooki uses, if feature is turned on
-                if (game_values.tanookilimit > 0 || tanookilimit > 0) {
-                    if (--tanookilimit <= 0) {
-                        tanooki = false;
-                        tanookilimit = 0;
-                        ifSoundOnPlay(rm->sfx_powerdown);
-                    }
-                }
-            }
-
-            // Player is a statue
-            else if (statue_timer > 0) {
-                // Prevent player from shooting while a statue
-                lockfire = true;
-
-                // Prevent player from jumping
-                lockjump = true;
-
-                // Don't fall through passable platforms
-                fallthrough = false;
-
-                // Decrement statue timer3
-                statue_timer--;
-
-                // Become soft shielded (with stomp ability)
-                shield = 2;
-
-                statue_lock = true;
-            }
-        }
-    }
-}
-
 void CPlayer::updateCardCollection(int keymask)
 {
     if (game_values.gamemode->gamemode == game_mode_collection) {
@@ -319,8 +218,8 @@ void CPlayer::updateSuperStomp()
         superstomp_lock = false;
 
         //If they are touching the ground and they are not the statue, allow them to become the statue again
-        if (statue_timer <= 0)
-            statue_lock = false;
+        if (tanookisuit.notStatue())
+            tanookisuit.allowStatue();
 
         //If they were super stomping and they are not in the air anymore (i.e. on the ground), then create the
         //super stomp attack zone, play the sound and show the stomp gfx
@@ -880,7 +779,7 @@ void CPlayer::move()
 
     updateCardCollection(keymask);
 
-    updateTanookiStatus();
+    tanookisuit.update(*this);
 
     updateSuperStomp();
 
@@ -1120,12 +1019,7 @@ void CPlayer::move()
                 break;
             }
             case 20: { //tanooki
-                ifSoundOnPlay(rm->sfx_collectpowerup);
-                tanooki = true;
-
-                if (game_values.tanookilimit > 0)
-                    tanookilimit = game_values.tanookilimit;
-
+                tanookisuit.onPickup();
                 break;
             }
             case 21: { //ice wand
@@ -1226,7 +1120,7 @@ void CPlayer::move()
 
         if (!frozen) {
             //Determine move direction pressed
-            if (!statue_timer && !fSuperStomp) {
+            if (tanookisuit.notStatue() && !fSuperStomp) {
                 if (playerKeys->game_right.fDown)
                     lrn++;
 
@@ -1236,7 +1130,7 @@ void CPlayer::move()
 
             //jump pressed?
             if (playerKeys->game_jump.fDown) {
-                if (!lockjump && !statue_timer && !fSuperStomp) {
+                if (!lockjump && tanookisuit.notStatue() && !fSuperStomp) {
                     if (!inair && superjumptimer == 0) {
                         //only if on the ground and the jump key was released somewhen after it was pressed the last time
 
@@ -1360,7 +1254,7 @@ void CPlayer::move()
             }
 
             //POWERUP RELEASE
-            if (playerKeys->game_powerup.fDown && statue_timer == 0 && game_values.gamemode->gamemode != game_mode_bonus) {
+            if (playerKeys->game_powerup.fDown && tanookisuit.notStatue() && game_values.gamemode->gamemode != game_mode_bonus) {
                 if (game_values.gamepowerups[globalID] > 0 && !shyguy) { //Don't allow usage of the poison powerup, it sticks with you and don't allow shyguys to use powerups
                     powerupused = game_values.gamepowerups[globalID];
                     game_values.gamepowerups[globalID] = -1;
@@ -2111,9 +2005,7 @@ void CPlayer::StripPowerups()
     bobomb = false;
     powerup	= -1;
 
-    tanooki = false;
-    statue_lock = false;
-    statue_timer = 0;
+    tanookisuit.reset();
 
     invincible = false;
     invincibletimer = 0;
@@ -2781,7 +2673,7 @@ void CPlayer::draw()
     //Draw player
     pScoreboardSprite = sprites;
 
-    if (statue_timer) {
+    if (tanookisuit.isStatue()) {
         //Make sure the scoreboard still accurately represents the player
         if (bobomb)
             pScoreboardSprite = rm->spr_bobomb[colorID];
@@ -2791,7 +2683,7 @@ void CPlayer::draw()
             pScoreboardSprite = rm->spr_shyguy[colorID];
 
         //Blink the statue if the time is almost up
-        if (isready() && (statue_timer < 50) && (statue_timer / 3 % 2))
+        if (isready() && tanookisuit.isBlinking())
             return;
 
         //Draw the statue
@@ -4030,7 +3922,7 @@ bool CPlayer::IsPlayerFacingRight()
 
 bool CPlayer::AcceptItem(MO_CarriedObject * item)
 {
-    if (fAcceptingItem && statue_timer == 0 && (!kuriboshoe.is_on() || item->IsCarriedByKuriboShoe())) {
+    if (fAcceptingItem && tanookisuit.notStatue() && (!kuriboshoe.is_on() || item->IsCarriedByKuriboShoe())) {
         action = player_action_none;
 
         carriedItem = item;
@@ -4059,15 +3951,10 @@ void CPlayer::SetPowerup(short iPowerup)
             bobomb = true;
         }
     } else if (iPowerup == 9) {
-        if (tanooki)
+        if (tanookisuit.isOn())
             SetStoredPowerup(20);
-        else {
-            ifSoundOnPlay(rm->sfx_collectpowerup);
-            tanooki = true;
-
-            if (game_values.tanookilimit > 0)
-                tanookilimit = game_values.tanookilimit;
-        }
+        else
+            tanookisuit.onPickup();
     } else if (iPowerup >= 10) {
         if (iPowerup == 10)
             SetStoredPowerup(9);   //POW
