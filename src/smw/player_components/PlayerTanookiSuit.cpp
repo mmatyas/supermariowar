@@ -32,22 +32,11 @@ bool PlayerTanookiSuit::canTurnIntoStatue(CPlayer &player) {
         && !player.tail.isInUse();
 }
 
-bool PlayerTanookiSuit::canSuperStomp(CPlayer &player) {
-    return player.inair
-        && !player.fSuperStomp
-        && player.iSuperStompTimer <= 0
-        && !player.superstomp_lock;
-}
-
 void PlayerTanookiSuit::startSuperStomping(CPlayer &player) {
-    player.iSuperStompTimer = 8;
-    player.lockfall = true;
+    player.superstomp.startSuperStomping(player);
 
     // Become soft shielded (with stomp ability)
     player.shield = 2;
-
-    // Stop player from super stomping twice before touching the ground
-    player.superstomp_lock = true;
 }
 
 void PlayerTanookiSuit::update(CPlayer &player)
@@ -78,7 +67,7 @@ void PlayerTanookiSuit::update(CPlayer &player)
             player.velx = -tv;
 
         // Cause statue to super stomp to ground
-        if (canSuperStomp(player)) {
+        if (player.canSuperStomp()) {
             startSuperStomping(player);
         }
 
@@ -96,7 +85,7 @@ void PlayerTanookiSuit::update(CPlayer &player)
     }
 
     // If not super stomping currently
-    if (!player.fSuperStomp && player.iSuperStompTimer <= 0) {
+    if (!player.superstomp.isInSuperStompState()) {
         // Count down the statue timer, which leads to a forced detransformation
         if (statue_timer == 1) {
             // Untransform from statue

@@ -284,7 +284,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
                 playerKeys->game_jump.fDown = true;
                 playerKeys->game_down.fDown = true;
 
-                if (!pPlayer->superstomp_lock) {
+                if (!pPlayer->superstomp.isInSuperStompState()) {
                     //If the player is tanooki, then try to super stomp on them
                     if (pPlayer->tanookisuit.isOn()) {
                         playerKeys->game_turbo.fPressed = true;
@@ -414,7 +414,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
                 playerKeys->game_jump.fDown = true;
                 playerKeys->game_down.fDown = true;
 
-                if (!pPlayer->superstomp_lock) {
+                if (!pPlayer->superstomp.isInSuperStompState()) {
                     //If the player is tanooki, then try to super stomp on them
                     if (pPlayer->tanookisuit.isOn()) {
                         playerKeys->game_turbo.fPressed = true;

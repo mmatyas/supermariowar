@@ -26,6 +26,7 @@ public:
 private:
 	void update_gettingOutOfTheShoe(CPlayer &player, uint8_t keymask);
 	void update_animation();
+	void update_SuperStomp(CPlayer &player);
 
 	KuriboShoeType type;
 	uint8_t animationTimer;

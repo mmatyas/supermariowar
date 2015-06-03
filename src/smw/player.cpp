@@ -211,29 +211,6 @@ void CPlayer::updateCardCollection(int keymask)
     }
 }
 
-void CPlayer::updateSuperStomp()
-{
-    if (!inair) {
-        //If the player is touching the ground, then free the lock on super stomping
-        superstomp_lock = false;
-
-        //If they are touching the ground and they are not the statue, allow them to become the statue again
-        if (tanookisuit.notStatue())
-            tanookisuit.allowStatue();
-
-        //If they were super stomping and they are not in the air anymore (i.e. on the ground), then create the
-        //super stomp attack zone, play the sound and show the stomp gfx
-        if (fSuperStomp) {
-            eyecandy[2].add(new EC_SuperStompExplosion(&rm->spr_superstomp, ix + HALFPW, iy + PH, 4));
-            ifSoundOnPlay(rm->sfx_bobombsound);
-            fSuperStomp = false;
-
-            objectcontainer[1].add(new MO_AttackZone(globalID, teamID, ix - 32, iy + 10, 32, 15, 8, kill_style_kuriboshoe, false));
-            objectcontainer[1].add(new MO_AttackZone(globalID, teamID, ix + PW, iy + 10, 32, 15, 8, kill_style_kuriboshoe, false));
-        }
-    }
-}
-
 void CPlayer::updateInvincibility()
 {
     if (invincible) {
@@ -394,6 +371,19 @@ void CPlayer::decreaseVelocity()
     //Stop ground velocity when wearing the sticky shoe
     if (!inair && kuriboshoe.getType() == STICKY)
         velx = 0.0f;
+}
+
+bool CPlayer::canSuperStomp() {
+    return inair && isready() && !superstomp.isInSuperStompState();
+}
+
+bool CPlayer::wantsToSuperStomp() {
+    return (playerKeys->game_down.fPressed && playerDevice == DEVICE_KEYBOARD)
+        || (playerKeys->game_jump.fPressed && playerKeys->game_down.fDown);
+}
+
+bool CPlayer::highJumped() {
+    return (superjumptype != 3 || superjumptimer <= 0);
 }
 
 void CPlayer::move()
@@ -781,7 +771,7 @@ void CPlayer::move()
 
     tanookisuit.update(*this);
 
-    updateSuperStomp();
+    superstomp.update_onGroundHit(*this);
 
     if (hammertimer > 0)
         hammertimer--;
@@ -1076,34 +1066,7 @@ void CPlayer::move()
     //if player is warping or spawning don't pay attention to controls
     if (state == player_ready) {
         //Super stomp
-        if (kuriboshoe.is_on() && inair && !fSuperStomp && !superstomp_lock && ((playerKeys->game_down.fPressed && playerDevice == DEVICE_KEYBOARD) ||
-                (playerKeys->game_jump.fPressed && playerKeys->game_down.fDown))) {
-            if ((superjumptype != 3 || superjumptimer <= 0) &&
-                    inair && !fSuperStomp && !superstomp_lock && iSuperStompTimer <= 0) {
-                iSuperStompTimer = 8;
-                lockfall = true;
-
-                superstomp_lock = true;
-            }
-        }
-
-        //Hold super stomping player in mid air then accelerate them downwards
-        if (iSuperStompTimer > 0) {
-            if (--iSuperStompTimer <= 0) {
-                fSuperStomp = true;
-                iSuperStompExitTimer = 40;
-                vely = VELSUPERSTOMP;
-
-                lockfall = true;
-            } else {
-                velx = 0.0f;
-                vely = 0.0f;
-            }
-        }
-
-        if (fSuperStomp && --iSuperStompExitTimer <= 0) {
-            fSuperStomp = false;
-        }
+        superstomp.update(*this);
 
         //If player is shaking tail, slow decent
         tail.slowDescent(*this);
@@ -1120,7 +1083,7 @@ void CPlayer::move()
 
         if (!frozen) {
             //Determine move direction pressed
-            if (tanookisuit.notStatue() && !fSuperStomp) {
+            if (tanookisuit.notStatue() && !superstomp.isStomping()) {
                 if (playerKeys->game_right.fDown)
                     lrn++;
 
@@ -1130,7 +1093,7 @@ void CPlayer::move()
 
             //jump pressed?
             if (playerKeys->game_jump.fDown) {
-                if (!lockjump && tanookisuit.notStatue() && !fSuperStomp) {
+                if (!lockjump && tanookisuit.notStatue() && !superstomp.isStomping()) {
                     if (!inair && superjumptimer == 0) {
                         //only if on the ground and the jump key was released somewhen after it was pressed the last time
 
@@ -1975,10 +1938,7 @@ void CPlayer::SetupNewPlayer()
     iDumpCollectionCardTimer = 0;
     iDumpCollectionCardIndex = 0;
 
-    fSuperStomp = false;
-    iSuperStompTimer = 0;
-    iSuperStompExitTimer = 0;
-    superstomp_lock = false;
+    superstomp.reset();
 
     suicidetimer = 0;
     suicidecounttimer = 0;
@@ -2042,10 +2002,7 @@ void CPlayer::spawnText(const char * szText)
 
 bool CPlayer::bouncejump()
 {
-    fSuperStomp = false;
-    iSuperStompTimer = 0;
-    iSuperStompExitTimer = 0;
-    superstomp_lock = false;
+    superstomp.reset();
 
     if (playerKeys->game_jump.fDown) {
         lockjump = true;
@@ -2645,10 +2602,7 @@ void BounceAssistPlayer(CPlayer * o1, CPlayer * o2)
         o1->platform = NULL;
         o1->vely = -VELSUPERJUMP;
 
-        o1->fSuperStomp = false;
-        o1->iSuperStompTimer = 0;
-        o1->iSuperStompExitTimer = 0;
-        o1->superstomp_lock = false;
+        o1->superstomp.reset();
 
         ifSoundOnPlay(rm->sfx_superspring);
     }

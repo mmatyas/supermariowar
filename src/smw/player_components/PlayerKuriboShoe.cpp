@@ -44,6 +44,7 @@ void PlayerKuriboShoe::setType(KuriboShoeType newtype)
 void PlayerKuriboShoe::update(CPlayer &player, uint8_t keymask)
 {
     update_gettingOutOfTheShoe(player, keymask);
+    update_SuperStomp(player);
     update_animation();
 }
 
@@ -76,10 +77,15 @@ void PlayerKuriboShoe::update_gettingOutOfTheShoe(CPlayer &player, uint8_t keyma
             ifSoundOnPlay(rm->sfx_transform);
             type = NONE;
 
-            player.fSuperStomp = false;
-            player.iSuperStompTimer = 0;
-            player.iSuperStompExitTimer = 0;
-            player.superstomp_lock = false;
+            player.superstomp.reset();
+        }
+    }
+}
+
+void PlayerKuriboShoe::update_SuperStomp(CPlayer &player) {
+    if (is_on() && player.canSuperStomp() && player.wantsToSuperStomp()) {
+        if (player.highJumped()) {
+            player.superstomp.startSuperStomping(player);
         }
     }
 }

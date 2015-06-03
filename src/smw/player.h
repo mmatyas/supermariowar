@@ -12,6 +12,7 @@
 #include "player_components/PlayerSpinStatus.h"
 #include "player_components/PlayerTail.h"
 #include "player_components/PlayerTanookiSuit.h"
+#include "player_components/PlayerSuperStomp.h"
 #include "player_components/PlayerWings.h"
 
 enum PlayerState {
@@ -87,7 +88,6 @@ class CPlayer
 
 		void updateKuriboShoe(int keymask);
 		void updateCardCollection(int keymask);
-		void updateSuperStomp();
 		void updateInvincibility();
 		void updateKuriboShoeAnimation();
 		void updateFrozenStatus(int keymask);
@@ -145,7 +145,7 @@ class CPlayer
         return invincible || shield || kuriboshoe.is_on();
     }
     bool IsSuperStomping() {
-        return fSuperStomp;
+        return superstomp.isStomping();
     }
 
     void decreaseProjectilesCount() {
@@ -213,6 +213,10 @@ class CPlayer
 		void chooseWarpExit();
 		void increasewarpcounter(short iGoal);
 		void decreasewarpcounter();
+
+		bool canSuperStomp();
+		bool wantsToSuperStomp();
+		bool highJumped();
 
 		COutputControl * playerKeys;
 		short playerDevice;
@@ -295,10 +299,7 @@ class CPlayer
 		short iDumpCollectionCardTimer;
 		short iDumpCollectionCardIndex;
 
-		bool fSuperStomp;
-		short iSuperStompTimer;
-		short iSuperStompExitTimer;
-		bool superstomp_lock;
+		PlayerSuperStomp superstomp;
 
 		short burnuptimer;
 		short burnupstarttimer;
@@ -529,6 +530,7 @@ class CPlayer
 		friend class PlayerCape;
 		friend class PlayerKuriboShoe;
 		friend class PlayerTanookiSuit;
+		friend class PlayerSuperStomp;
 		friend struct PlayerSpinStatus;
 		friend struct PlayerTail;
 		friend struct PlayerWings;

@@ -22,6 +22,7 @@ LIST(APPEND SMW_SRCS
 	player_components/PlayerSpinStatus.cpp
 	player_components/PlayerTail.cpp
 	player_components/PlayerTanookiSuit.cpp
+	player_components/PlayerSuperStomp.cpp
 	player_components/PlayerWings.cpp
 )
 
