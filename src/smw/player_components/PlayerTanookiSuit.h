@@ -1,8 +1,6 @@
 #ifndef PLAYER_TANOOKISUIT
 #define PLAYER_TANOOKISUIT
 
-#include <stdint.h>
-
 class CPlayer;
 
 class PlayerTanookiSuit
@@ -21,15 +19,14 @@ public:
     void allowStatue();
 
 private:
-    bool tanooki;
+    bool tanooki_on; // player is wearing the tanooki suit
     bool statue_lock;
-    int statue_timer;
-    short tanookilimit;
+    unsigned short statue_timer;
+    unsigned short statue_uses_left;
 
     bool canTurnIntoStatue(CPlayer &player);
     bool canSuperStomp(CPlayer &player);
     void startSuperStomping(CPlayer &player);
-
 };
 
 #endif // PLAYER_TANOOKISUIT

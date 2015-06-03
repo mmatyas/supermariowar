@@ -16,9 +16,10 @@ PlayerTanookiSuit::PlayerTanookiSuit() {
 }
 
 void PlayerTanookiSuit::reset() {
-    tanooki = false;
+    tanooki_on = false;
     statue_lock = false;
     statue_timer = 0;
+    statue_uses_left = 0;
 }
 
 bool PlayerTanookiSuit::canTurnIntoStatue(CPlayer &player) {
@@ -51,7 +52,7 @@ void PlayerTanookiSuit::startSuperStomping(CPlayer &player) {
 
 void PlayerTanookiSuit::update(CPlayer &player)
 {
-    if (!tanooki || !player.isready())
+    if (!tanooki_on || !player.isready())
         return;
 
     // If the down key is ever released, manually untransform by releasing the down key
@@ -113,10 +114,10 @@ void PlayerTanookiSuit::update(CPlayer &player)
             ifSoundOnPlay(rm->sfx_transform);
 
             //Decrease the amount of tanooki uses, if feature is turned on
-            if (game_values.tanookilimit > 0 || tanookilimit > 0) {
-                if (--tanookilimit <= 0) {
-                    tanooki = false;
-                    tanookilimit = 0;
+            if (game_values.tanookilimit > 0 || statue_uses_left > 0) {
+                if (--statue_uses_left == 0) {
+                    tanooki_on = false;
+                    statue_uses_left = 0;
                     ifSoundOnPlay(rm->sfx_powerdown);
                 }
             }
@@ -145,7 +146,7 @@ void PlayerTanookiSuit::update(CPlayer &player)
 }
 
 bool PlayerTanookiSuit::isOn() {
-    return tanooki;
+    return tanooki_on;
 }
 
 bool PlayerTanookiSuit::isStatue() {
@@ -158,10 +159,10 @@ bool PlayerTanookiSuit::notStatue() {
 
 void PlayerTanookiSuit::onPickup() {
     ifSoundOnPlay(rm->sfx_collectpowerup);
-    tanooki = true;
+    tanooki_on = true;
 
     if (game_values.tanookilimit > 0)
-        tanookilimit = game_values.tanookilimit;
+        statue_uses_left = game_values.tanookilimit;
 }
 
 bool PlayerTanookiSuit::isBlinking() {
