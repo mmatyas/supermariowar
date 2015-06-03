@@ -43,7 +43,7 @@ void PlayerKuriboShoe::setType(KuriboShoeType newtype)
 
 void PlayerKuriboShoe::update(CPlayer &player, uint8_t keymask)
 {
-    update_gettingOutOfTheShoe(player, keymask);
+    update_gettingOutOfTheShoe(player, keymask); //Free player from the kuribo shoe
     update_SuperStomp(player);
     update_animation();
 }
@@ -51,7 +51,7 @@ void PlayerKuriboShoe::update(CPlayer &player, uint8_t keymask)
 // Free player from the kuribo shoe
 void PlayerKuriboShoe::update_gettingOutOfTheShoe(CPlayer &player, uint8_t keymask)
 {
-    if (type > 0 && player.isready() && !player.frozen) {
+    if (is_on() && player.isready() && !player.frozen) {
         if (exitIndex > 0) {
             if (++exitTimer >= 32) {
                 exitIndex = 0;

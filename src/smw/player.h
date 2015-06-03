@@ -9,10 +9,11 @@
 
 #include "player_components/PlayerCape.h"
 #include "player_components/PlayerKuriboShoe.h"
+#include "player_components/PlayerSecretCode.h"
 #include "player_components/PlayerSpinStatus.h"
+#include "player_components/PlayerSuperStomp.h"
 #include "player_components/PlayerTail.h"
 #include "player_components/PlayerTanookiSuit.h"
-#include "player_components/PlayerSuperStomp.h"
 #include "player_components/PlayerWings.h"
 
 enum PlayerState {
@@ -86,10 +87,8 @@ class CPlayer
 		void AddKillsInRowInAirAward();
 		void SetupNewPlayer();
 
-		void updateKuriboShoe(int keymask);
 		void updateCardCollection(int keymask);
 		void updateInvincibility();
-		void updateKuriboShoeAnimation();
 		void updateFrozenStatus(int keymask);
 		void accelerateRight();
 		void accelerateLeft();
@@ -292,9 +291,7 @@ class CPlayer
 		short frozentimer;
 
 		PlayerKuriboShoe kuriboshoe;
-
-		short iSecretCodeTimer;
-		short iSecretCodeIndex;
+		PlayerSecretCode secretcode;
 
 		short iDumpCollectionCardTimer;
 		short iDumpCollectionCardIndex;

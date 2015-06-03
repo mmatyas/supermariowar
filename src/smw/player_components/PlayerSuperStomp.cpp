@@ -15,7 +15,7 @@ extern CResourceManager* rm;
 extern CEyecandyContainer eyecandy[3];
 extern CObjectContainer objectcontainer[3];
 
-static const unsigned SSTOMP_STRENGTH_TIMER = 40;
+static const unsigned short SSTOMP_STRENGTH_TIMER = 40;
 
 PlayerSuperStomp::PlayerSuperStomp() {
     reset();

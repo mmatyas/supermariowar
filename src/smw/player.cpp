@@ -741,36 +741,12 @@ void CPlayer::move()
     	}
     }
 #endif
-    if (state == player_ready) {
-        static const int iSecretCode[18] = {4, 8, 4, 8, 1, 1, 4, 8, 4, 8, 1, 1, 4, 8, 4, 8, 1, 1};
-
-        if (iSecretCodeIndex > 0) {
-            if (++iSecretCodeTimer >= 186) {
-                iSecretCodeIndex = 0;
-                iSecretCodeTimer = 0;
-            }
-        }
-
-        if (keymask & iSecretCode[iSecretCodeIndex]) {
-            iSecretCodeIndex++;
-        } else if (keymask & ~iSecretCode[iSecretCodeIndex]) {
-            iSecretCodeIndex = 0;
-            iSecretCodeTimer = 0;
-        }
-
-        if (iSecretCodeIndex == 18 && iSecretCodeTimer < 186) {
-            iSecretCodeIndex = 0;
-            iSecretCodeTimer = 0;
-            CheckSecret(3);
-        }
-    }
-
-    kuriboshoe.update(*this, keymask); //Free player from the kuribo shoe
+    secretcode.update(*this, keymask);
+    kuriboshoe.update(*this, keymask);
 
     updateCardCollection(keymask);
 
     tanookisuit.update(*this);
-
     superstomp.update_onGroundHit(*this);
 
     if (hammertimer > 0)
@@ -1931,9 +1907,7 @@ void CPlayer::SetupNewPlayer()
     shieldtimer = 0;
 
     kuriboshoe.reset();
-
-    iSecretCodeTimer = 0;
-    iSecretCodeIndex = 0;
+    secretcode.reset();
 
     iDumpCollectionCardTimer = 0;
     iDumpCollectionCardIndex = 0;
