@@ -25,6 +25,7 @@ LIST(APPEND SMW_SRCS
 	player_components/PlayerTanookiSuit.cpp
 	player_components/PlayerSecretCode.cpp
 	player_components/PlayerSuperStomp.cpp
+	player_components/PlayerWarpStatus.cpp
 	player_components/PlayerWings.cpp
 )
 

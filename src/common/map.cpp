@@ -490,7 +490,7 @@ void CMap::clearMap()
             mapdatatop[i][j].iFlags = tile_flag_nonsolid;
 
             objectdata[i][j].iType = -1;
-            warpdata[i][j].direction = -1;
+            warpdata[i][j].direction = WARP_UNDEFINED;
             warpdata[i][j].connection = -1;
 
             for (short iSpawn = 0; iSpawn < NUMSPAWNAREATYPES; iSpawn++)
@@ -738,7 +738,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
                     mapdatatop[i][j].iFlags = tile_flag_nonsolid;
                 }
 
-                warpdata[i][j].direction = (short)ReadInt(mapfile);
+                warpdata[i][j].direction = (WarpEnterDirection)ReadInt(mapfile);
                 warpdata[i][j].connection = (short)ReadInt(mapfile);
                 warpdata[i][j].id = (short)ReadInt(mapfile);
 
@@ -766,7 +766,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 
         numwarpexits = (short)ReadInt(mapfile);
         for (i = 0; i < numwarpexits && i < MAXWARPS; i++) {
-            warpexits[i].direction = (short)ReadInt(mapfile);
+            warpexits[i].direction = (WarpExitDirection)ReadInt(mapfile);
             warpexits[i].connection = (short)ReadInt(mapfile);
             warpexits[i].id = (short)ReadInt(mapfile);
             warpexits[i].x = (short)ReadInt(mapfile);
@@ -1021,7 +1021,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
                     mapdatatop[i][j].iFlags = tile_flag_nonsolid;
                 }
 
-                warpdata[i][j].direction = (short)ReadInt(mapfile);
+                warpdata[i][j].direction = (WarpEnterDirection)ReadInt(mapfile);
                 warpdata[i][j].connection = (short)ReadInt(mapfile);
                 warpdata[i][j].id = (short)ReadInt(mapfile);
 
@@ -1044,7 +1044,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 
         numwarpexits = (short)ReadInt(mapfile);
         for (i = 0; i < numwarpexits && i < MAXWARPS; i++) {
-            warpexits[i].direction = (short)ReadInt(mapfile);
+            warpexits[i].direction = (WarpExitDirection)ReadInt(mapfile);
             warpexits[i].connection = (short)ReadInt(mapfile);
             warpexits[i].id = (short)ReadInt(mapfile);
             warpexits[i].x = (short)ReadInt(mapfile);
@@ -1212,7 +1212,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
                         objectdata[i][j].iSettings[iSetting] = g_iDefaultPowerupPresets[0][iSetting];
                 }
 
-                warpdata[i][j].direction = (short)ReadInt(mapfile);
+                warpdata[i][j].direction = (WarpEnterDirection)ReadInt(mapfile);
                 warpdata[i][j].connection = (short)ReadInt(mapfile);
                 warpdata[i][j].id = (short)ReadInt(mapfile);
 
@@ -1238,7 +1238,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 
         numwarpexits = (short)ReadInt(mapfile);
         for (i = 0; i < numwarpexits && i < MAXWARPS; i++) {
-            warpexits[i].direction = (short)ReadInt(mapfile);
+            warpexits[i].direction = (WarpExitDirection)ReadInt(mapfile);
             warpexits[i].connection = (short)ReadInt(mapfile);
             warpexits[i].id = (short)ReadInt(mapfile);
             warpexits[i].x = (short)ReadInt(mapfile);
@@ -1744,7 +1744,7 @@ void CMap::saveMap(const std::string& file)
                         warpdata[currentx][currenty].id = numWarpExits;
                     } else {
                         warpdata[currentx][currenty].connection = -1;
-                        warpdata[currentx][currenty].direction = -1;
+                        warpdata[currentx][currenty].direction = WARP_UNDEFINED;
                     }
 
                     currentx += movex;
@@ -3445,8 +3445,11 @@ bool CMap::checkforwarp(short iData1, short iData2, short iData3, short iDirecti
         warp2 = &warpdata[iData1][iData3];
     }
 
-    return warp1->direction == warp2->direction && warp1->id == warp2->id && warp1->direction == iDirection &&
-           !warplocked[warp1->connection] && warpexits[warp1->id].locktimer <= 0;
+    return warp1->direction == warp2->direction
+        && warp1->id == warp2->id
+        && warp1->direction == iDirection
+        && !warplocked[warp1->connection]
+        && warpexits[warp1->id].locktimer <= 0;
 }
 
 void CMap::optimize()

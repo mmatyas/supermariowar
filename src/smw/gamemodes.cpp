@@ -805,7 +805,7 @@ void CGM_Chicken::draw_foreground()
     //Draw the chicken indicator around the chicken
     if (game_values.gamemodesettings.chicken.usetarget && !gameover && chicken) {
         if (chicken->iswarping())
-            rm->spr_chicken.draw(chicken->ix - PWOFFSET - 16, chicken->iy - PHOFFSET - 16, 0, 0, 64, 64, (short)chicken->state % 4, chicken->warpplane);
+            rm->spr_chicken.draw(chicken->ix - PWOFFSET - 16, chicken->iy - PHOFFSET - 16, 0, 0, 64, 64, (short)chicken->state % 4, chicken->GetWarpPlane());
         else if (chicken->isready())
             rm->spr_chicken.draw(chicken->ix + HALFPW - 32, chicken->iy + HALFPH - 32);
     }

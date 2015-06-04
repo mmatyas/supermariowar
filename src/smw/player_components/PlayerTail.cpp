@@ -119,7 +119,7 @@ void PlayerTail::draw(CPlayer& player) {
                 (fPlayerFacingRight ? 0 : 26) + iOffsetY,
                 22,
                 26,
-                (short)player.state %4, player.warpplane);
+                (short)player.state %4, player.GetWarpPlane());
         else
             rm->spr_tail.draw(player.ix + (fPlayerFacingRight ? - 18 : 18),
                 player.iy + 6,

@@ -15,6 +15,7 @@
 #include "player_components/PlayerSuperStomp.h"
 #include "player_components/PlayerTail.h"
 #include "player_components/PlayerTanookiSuit.h"
+#include "player_components/PlayerWarpStatus.h"
 #include "player_components/PlayerWings.h"
 
 enum PlayerState {
@@ -107,7 +108,7 @@ class CPlayer
 		bool bouncejump();
 
     short GetWarpPlane() {
-        return warpplane;
+        return warpstatus.getWarpPlane();
     }
 		bool IsPlayerFacingRight();
 
@@ -207,11 +208,6 @@ class CPlayer
 		void addrocketawards();
 
 		short KillPlayerMapHazard(bool fForce, killstyle ks, bool fKillCarriedItem, short iPlayerId = -1);
-
-        void enterwarp(Warp * warp);
-		void chooseWarpExit();
-		void increasewarpcounter(short iGoal);
-		void decreasewarpcounter();
 
 		bool canSuperStomp();
 		bool wantsToSuperStomp();
@@ -324,10 +320,7 @@ class CPlayer
 		short waittimer;
 		short * respawncounter;
 
-		short warpcounter;
-		short warpconnection;
-		short warpid;
-		short warpplane;
+		PlayerWarpStatus warpstatus;
 
 		short powerupused;
 		float powerupradius;
@@ -529,6 +522,7 @@ class CPlayer
 		friend class PlayerSuperStomp;
 		friend struct PlayerSpinStatus;
 		friend struct PlayerTail;
+		friend class PlayerWarpStatus;
 		friend struct PlayerWings;
 };
 

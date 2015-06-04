@@ -812,36 +812,8 @@ void CPlayer::move()
                         eyecandy[2].add(new EC_SingleAnimation(&rm->spr_spawnsmoke, ixoffset + g_iSwirlSpawnLocations[iSwirl][0][swirlindex], iyoffset + g_iSwirlSpawnLocations[iSwirl][1][swirlindex], 4, 4, 0, iColorIdOffset, 32, 32));
                 }
             }
-        } else if (iswarping()) {
-            fOldY = fy;
-            fOldX = fx;
-
-            if (state == player_entering_warp_left) {
-                setXi(ix - 1);
-                increasewarpcounter(PW + PWOFFSET);
-            } else if (state == player_entering_warp_right) {
-                setXi(ix + 1);
-                increasewarpcounter(PW + PWOFFSET);
-            } else if (state == player_entering_warp_up) {
-                setYi(iy - 1);
-                increasewarpcounter(TILESIZE - PHOFFSET);
-            } else if (state == player_entering_warp_down) {
-                setYi(iy + 1);
-                increasewarpcounter(PH + PHOFFSET);
-            } else if (state == player_exiting_warp_left) {
-                setXi(ix - 1);
-                decreasewarpcounter();
-            } else if (state == player_exiting_warp_right) {
-                setXi(ix + 1);
-                decreasewarpcounter();
-            } else if (state == player_exiting_warp_up) {
-                setYi(iy - 1);
-                decreasewarpcounter();
-            } else if (state == player_exiting_warp_down) {
-                setYi(iy + 1);
-                decreasewarpcounter();
-            }
-        }
+        } else if (iswarping())
+            warpstatus.update(*this);
     } else if (powerupused > -1) {
         powerupradius -= (float)game_values.storedpowerupdelay / 2.0f;
         powerupangle += 0.05f;
@@ -1606,125 +1578,6 @@ void CPlayer::Jump(short iMove, float jumpModifier, bool fKuriboBounce)
     //printf("Player Jumped!\n");
 }
 
-void CPlayer::increasewarpcounter(short iGoal)
-{
-    if (++warpcounter > iGoal) {
-        warpcounter = iGoal;
-        chooseWarpExit();
-    }
-}
-
-void CPlayer::decreasewarpcounter()
-{
-    if (--warpcounter < 0) {
-        warpcounter = 0;
-        state = player_ready;
-    }
-}
-
-void CPlayer::chooseWarpExit()
-{
-    WarpExit * exit = g_map->getRandomWarpExit(warpconnection, warpid);
-    setXi(exit->x);
-    setYi(exit->y);
-    fOldX = fx;
-    fOldY = fy;
-
-    lockjump = false;
-    ClearPowerupStates();
-
-    if (exit->direction == 0) {
-        state = player_exiting_warp_up;
-        warpcounter = PH + PHOFFSET;
-        velx = 0.0f;
-        oldvelx = velx;
-        vely = -4.0f;
-        warpplane = exit->warpy << 5;
-
-        //Trigger block that we warp into
-        short iCol = ix / TILESIZE;
-        short iRow = iy / TILESIZE;
-
-        if (iRow - 1 >= 0) {
-            IO_Block * block = g_map->block(iCol, iRow - 1);
-
-            if (block && !block->isTransparent() && !block->isHidden())
-                block->triggerBehavior();
-        }
-    } else if (exit->direction == 1) {
-        state = player_exiting_warp_right;
-        warpcounter = PW + PWOFFSET;
-        velx = 1.0f;
-        oldvelx = velx;
-        vely = 1.0f;
-        warpplane = (exit->warpx << 5) + TILESIZE;
-
-        //Trigger block that we warp into
-        short iCol = ix / TILESIZE;
-        short iRow = iy / TILESIZE;
-
-        if (iCol + 1 >= 20)
-            iCol -= 20;
-
-        IO_Block * block = g_map->block(iCol + 1, iRow);
-
-        if (block && !block->isTransparent() && !block->isHidden())
-            block->triggerBehavior();
-    } else if (exit->direction == 2) {
-        state = player_exiting_warp_down;
-        warpcounter = TILESIZE - PHOFFSET;
-        velx = 0.0f;
-        oldvelx = velx;
-        vely = 1.1f;
-        inair = true;
-        warpplane = (exit->warpy << 5) + TILESIZE;
-
-        //Trigger block that we warp into
-        short iCol = ix / TILESIZE;
-        short iRow = iy / TILESIZE;
-
-        if (iRow + 1 < 15) {
-            IO_Block * block = g_map->block(iCol, iRow + 1);
-
-            if (block && !block->isTransparent() && !block->isHidden())
-                block->triggerBehavior();
-        }
-    } else if (exit->direction == 3) {
-        state = player_exiting_warp_left;
-        warpcounter = PW + PWOFFSET;
-        velx = -1.0f;
-        oldvelx = velx;
-        vely = 1.0f;
-        warpplane = (exit->warpx << 5);
-
-        //Trigger block that we warp into
-        short iCol = ix / TILESIZE;
-        short iRow = iy / TILESIZE;
-
-        if (iCol - 1 < 0)
-            iCol += 20;
-
-        IO_Block * block = g_map->block(iCol - 1, iRow);
-
-        if (block && !block->isTransparent() && !block->isHidden())
-            block->triggerBehavior();
-    }
-
-    //Make player shielded when exiting the warp (if that option is turned on)
-    if (game_values.shieldstyle > 0) {
-        if (shield == 0 || shieldtimer < game_values.shieldtime) {
-            shieldtimer = game_values.shieldtime;
-            shield = game_values.shieldstyle;
-        }
-    }
-
-    //Lock the warp (if that option is turned on)
-    if (game_values.warplocktime > 0) {
-        if (game_values.warplockstyle == 1 || game_values.warplockstyle == 2) //Lock the warp exit
-            exit->locktimer = game_values.warplocktime;
-    }
-}
-
 void CPlayer::cpu_think()
 {
     pPlayerAI->Think(playerKeys);
@@ -1867,8 +1720,6 @@ void CPlayer::SetupNewPlayer()
 
     outofarenatimer = 0;
     outofarenadisplaytimer = game_values.outofboundstime - 1;
-
-    warpcounter = 0;
 
     platform = NULL;
     iHorizontalPlatformCollision = -1;
@@ -2586,7 +2437,7 @@ void CPlayer::draw()
 
         //Draw the statue
         if (iswarping())
-            rm->spr_statue.draw(ix - PWOFFSET, iy - 31, colorID << 5, 0, 32, 58, (short)state % 4, warpplane);
+            rm->spr_statue.draw(ix - PWOFFSET, iy - 31, colorID << 5, 0, 32, 58, (short)state % 4, GetWarpPlane());
         else
             rm->spr_statue.draw(ix - PWOFFSET, iy - 31, colorID << 5, 0, 32, 58);
 
@@ -2608,7 +2459,7 @@ void CPlayer::draw()
 
     if (ownerPlayerID > -1) {
         if (iswarping())
-            rm->spr_ownedtags.draw(ix - PWOFFSET - 8, iy - PHOFFSET - 8, ownerColorOffsetX, 0, 48, 48, (short)state % 4, warpplane);
+            rm->spr_ownedtags.draw(ix - PWOFFSET - 8, iy - PHOFFSET - 8, ownerColorOffsetX, 0, 48, 48, (short)state % 4, GetWarpPlane());
         else
             rm->spr_ownedtags.draw(ix - PWOFFSET - 8, iy - PHOFFSET - 8, ownerColorOffsetX, 0, 48, 48);
     }
@@ -2632,7 +2483,7 @@ void CPlayer::draw()
     //Don't draw the player if he is frozen in a shoe
     if (!frozen || !kuriboshoe.is_on()) {
         if (state > player_ready) //warping
-            pScoreboardSprite[spr]->draw(ix - PWOFFSET, iy - PHOFFSET - iPlayerKuriboOffsetY, iSrcOffsetX, 0, 32, 32, (short)state % 4, warpplane);
+            pScoreboardSprite[spr]->draw(ix - PWOFFSET, iy - PHOFFSET - iPlayerKuriboOffsetY, iSrcOffsetX, 0, 32, 32, (short)state % 4, GetWarpPlane());
         else
             pScoreboardSprite[spr]->draw(ix - PWOFFSET, iy - PHOFFSET - iPlayerKuriboOffsetY, iSrcOffsetX, 0, 32, 32);
     }
@@ -2643,7 +2494,7 @@ void CPlayer::draw()
     //Draw the crown on the player
     if (game_values.showwinningcrown && g_iWinningPlayer == teamID) {
         if (state > player_ready) //warping
-            rm->spr_crown.draw(ix + HALFPW - (IsPlayerFacingRight() ? 4 : 10), iy - 10 - (kuriboshoe.is_on() ? 16 : 0), 0, 0, 14, 14, (short)state % 4, warpplane);
+            rm->spr_crown.draw(ix + HALFPW - (IsPlayerFacingRight() ? 4 : 10), iy - 10 - (kuriboshoe.is_on() ? 16 : 0), 0, 0, 14, 14, (short)state % 4, GetWarpPlane());
         else
             rm->spr_crown.draw(ix + HALFPW - (IsPlayerFacingRight() ? 4 : 10), iy - 10 - (kuriboshoe.is_on() ? 16 : 0));
     }
@@ -2653,14 +2504,14 @@ void CPlayer::draw()
 
     if (frozen) {
         if (iswarping())
-            rm->spr_iceblock.draw(ix - PWOFFSET, iy - PHOFFSET, 0, 0, 32, 32, (short)state % 4, warpplane);
+            rm->spr_iceblock.draw(ix - PWOFFSET, iy - PHOFFSET, 0, 0, 32, 32, (short)state % 4, GetWarpPlane());
         else
             rm->spr_iceblock.draw(ix - PWOFFSET, iy - PHOFFSET, 0, 0, 32, 32);
     }
 
     if (jailtimer > 0) {
         if (state > player_ready) //warping
-            rm->spr_jail.draw(ix - PWOFFSET - 6, iy - PHOFFSET - 6, (jailcolor + 1) * 44, 0, 44, 44, (short)state % 4, warpplane);
+            rm->spr_jail.draw(ix - PWOFFSET - 6, iy - PHOFFSET - 6, (jailcolor + 1) * 44, 0, 44, 44, (short)state % 4, GetWarpPlane());
         else
             rm->spr_jail.draw(ix - PWOFFSET - 6, iy - PHOFFSET - 6, (jailcolor + 1) * 44, 0, 44, 44);
     }
@@ -2687,7 +2538,7 @@ void CPlayer::draw()
             short awardy = yoffset + (short)(30.0f * sin(angle));
 
             if (state > player_ready) //warping
-                rm->spr_award.draw(awardx, awardy, awards[k] * 16, 0, 16, 16, (short)state % 4, warpplane);
+                rm->spr_award.draw(awardx, awardy, awards[k] * 16, 0, 16, 16, (short)state % 4, GetWarpPlane());
             else
                 rm->spr_award.draw(awardx, awardy, awards[k] * 16, 0, 16, 16);
         }
@@ -2706,7 +2557,7 @@ void CPlayer::draw()
             displayangle += addangle;
 
             if (state > player_ready) //warping
-                rm->spr_storedpowerupsmall.draw(powerupX, powerupY, powerupused * 16, 0, 16, 16, (short)state %4, warpplane);
+                rm->spr_storedpowerupsmall.draw(powerupX, powerupY, powerupused * 16, 0, 16, 16, (short)state %4, GetWarpPlane());
             else
                 rm->spr_storedpowerupsmall.draw(powerupX, powerupY, powerupused * 16, 0, 16, 16);
         }
@@ -2878,8 +2729,7 @@ void CPlayer::collision_detection_map()
             //first check to see if player hit a warp
             if (playerKeys->game_right.fDown && !frozen && g_map->checkforwarp(tx, ty, ty2, 3)) {
                 setXf((float)((tx << 5) - PW) - 0.2f);
-                enterwarp(g_map->warp(tx, ty2));
-                warpplane = ix + PW + 1;
+                warpstatus.enterWarp(*this, g_map->warp(tx, ty2));
 
                 if (iy - PHOFFSET < (ty << 5))
                     setYi((ty << 5) + PHOFFSET);
@@ -2959,8 +2809,7 @@ void CPlayer::collision_detection_map()
             //first check to see if player hit a warp
             if (playerKeys->game_left.fDown && !frozen && g_map->checkforwarp(tx, ty, ty2, 1)) {
                 setXf((float)((tx << 5) + TILESIZE) + 0.2f);
-                enterwarp(g_map->warp(tx, ty2));
-                warpplane = ix;
+                warpstatus.enterWarp(*this, g_map->warp(tx, ty2));
 
                 if (iy - PHOFFSET < (ty << 5))
                     setYi((ty << 5) + PHOFFSET);
@@ -3068,8 +2917,7 @@ void CPlayer::collision_detection_map()
 
         if (playerKeys->game_jump.fDown && !frozen && g_map->checkforwarp(alignedBlockX, unAlignedBlockX, ty, 2)) {
             setYf((float)((ty << 5) + TILESIZE) + 0.2f);
-            enterwarp(g_map->warp(unAlignedBlockX, ty));
-            warpplane = iy;
+            warpstatus.enterWarp(*this, g_map->warp(unAlignedBlockX, ty));
 
             if (ix - PWOFFSET < (txl << 5) + 1)
                 setXi((txl << 5) + PHOFFSET + 1);
@@ -3165,8 +3013,7 @@ void CPlayer::collision_detection_map()
 
         if (playerKeys->game_down.fDown && !frozen && g_map->checkforwarp(txl, txr, ty, 0)) {
             setYf((float)((ty << 5) - PH) - 0.2f);
-            enterwarp(g_map->warp(txr,ty));
-            warpplane = iy + PH + 1;
+            warpstatus.enterWarp(*this, g_map->warp(txr,ty));
 
             fallthrough = false;
             platform = NULL;
@@ -3688,45 +3535,6 @@ void CPlayer::collision_detection_checksides()
     default:
         break;
     }
-}
-
-void CPlayer::enterwarp(Warp * warp)
-{
-    if (warp->direction == 0) {
-        state = player_entering_warp_down;
-        vely = 0.0f;
-        velx = 0.0f;
-        oldvelx = velx;
-    } else if (warp->direction == 1) {
-        state = player_entering_warp_left;
-        vely = 0.0f;
-        velx = -1.0f;
-        oldvelx = velx;
-    } else if (warp->direction == 2) {
-        state = player_entering_warp_up;
-        vely = 0.0f;
-        velx = 0.0f;
-        oldvelx = velx;
-    } else if (warp->direction == 3) {
-        state = player_entering_warp_right;
-        vely = 0.0f;
-        velx = 1.0f;
-        oldvelx = velx;
-    }
-
-    warpconnection = warp->connection;
-    warpid = warp->id;
-
-    if (game_values.warplocktime > 0) {
-        if (game_values.warplockstyle == 0 || game_values.warplockstyle == 2) //Lock the entrance
-            g_map->warpexits[warp->id].locktimer = game_values.warplocktime;
-        else if (game_values.warplockstyle == 3) //Lock the connection
-            g_map->lockconnection(warpconnection);
-        else if (game_values.warplockstyle == 4) //Lock all warps
-            g_map->lockconnection(-1);
-    }
-
-    ifSoundOnPlay(rm->sfx_pipe);
 }
 
 void CPlayer::flipsidesifneeded()

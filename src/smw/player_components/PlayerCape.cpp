@@ -91,7 +91,7 @@ void PlayerCape::draw(CPlayer &player)
             player.ix - PWOFFSET + (fPlayerFacingRight ? - 18 : 18), player.iy - PHOFFSET + 4 + iCapeYOffset,
             (fPlayerFacingRight ? 128 : 0) + iCapeFrameX, iCapeFrameY,
             32, 32,
-            (short)player.state %4, player.warpplane);
+            (short)player.state %4, player.GetWarpPlane());
     else
         rm->spr_cape.draw(
             player.ix - PWOFFSET + (fPlayerFacingRight ? - 18 : 18), player.iy - PHOFFSET + 4 + iCapeYOffset,

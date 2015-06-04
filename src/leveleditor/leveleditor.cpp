@@ -1185,7 +1185,7 @@ int editor_edit()
 									}
 								}
                         } else if (edit_mode == 2) { //warps
-								g_map->warpdata[iClickX][iClickY].direction = set_direction;
+								g_map->warpdata[iClickX][iClickY].direction = (WarpEnterDirection)set_direction;
 								g_map->warpdata[iClickX][iClickY].connection = set_connection;
                         } else if (edit_mode == 3) { //move tiles
                             if (move_mode == 3) {
@@ -1279,7 +1279,7 @@ int editor_edit()
 								if (fNeedUpdate)
 									UpdateTileType(iClickX, iClickY);
                         } else if (edit_mode == 2) {
-								g_map->warpdata[iClickX][iClickY].direction = -1;
+								g_map->warpdata[iClickX][iClickY].direction = WARP_UNDEFINED;
 								g_map->warpdata[iClickX][iClickY].connection = -1;
                         } else if (edit_mode == 3) {
                             if (move_mode == 3) {
@@ -1345,7 +1345,7 @@ int editor_edit()
 									}
 								}
                         } else if (edit_mode == 2) {
-								g_map->warpdata[iClickX][iClickY].direction = set_direction;
+								g_map->warpdata[iClickX][iClickY].direction = (WarpEnterDirection)set_direction;
 								g_map->warpdata[iClickX][iClickY].connection = set_connection;
                         } else if (edit_mode == 3) {
                             if (move_mode == 0) {
@@ -1385,7 +1385,7 @@ int editor_edit()
 								if (fNeedUpdate)
 									UpdateTileType(iClickX, iClickY);
                         } else if (edit_mode == 2) {
-								g_map->warpdata[iClickX][iClickY].direction = -1;
+								g_map->warpdata[iClickX][iClickY].direction = WARP_UNDEFINED;
 								g_map->warpdata[iClickX][iClickY].connection = -1;
                         } else if (edit_mode == 3) {
 								if (move_mode == 0)
@@ -4966,7 +4966,7 @@ void clearselectedmaptiles()
 					g_map->objectdata[j][k].iType = -1;
 
 					g_map->warpdata[j][k].connection = -1;
-					g_map->warpdata[j][k].direction = -1;
+					g_map->warpdata[j][k].direction = WARP_UNDEFINED;
 					g_map->warpdata[j][k].id = -1;
 
 					for (short iType = 0; iType < NUMSPAWNAREATYPES; iType++)
@@ -5048,7 +5048,7 @@ void pasteselectedtiles(int movex, int movey)
 						replacetile(&g_map->objectdata[iNewX][iNewY], &copiedtiles[j][k].block);
 
 						replacetile(&g_map->warpdata[iNewX][iNewY].connection, copiedtiles[j][k].warp.connection, copiedtiles[j][k].warp.connection != -1);
-						replacetile(&g_map->warpdata[iNewX][iNewY].direction, copiedtiles[j][k].warp.direction, copiedtiles[j][k].warp.connection != -1);
+						replacetile((short*)&g_map->warpdata[iNewX][iNewY].direction, (short)copiedtiles[j][k].warp.direction, copiedtiles[j][k].warp.connection != -1);
 						replacetile(&g_map->warpdata[iNewX][iNewY].id, copiedtiles[j][k].warp.id, copiedtiles[j][k].warp.connection != -1);
 
 						if (move_replace)

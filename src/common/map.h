@@ -45,14 +45,30 @@ struct ScreenPoint {
 	short x, y;
 };
 
+enum WarpEnterDirection {
+	WARP_DOWN = 0,
+	WARP_LEFT = 1,
+	WARP_UP = 2,
+	WARP_RIGHT = 3,
+	WARP_UNDEFINED
+};
+
+enum WarpExitDirection {
+	WARP_EXIT_UP = 0,
+	WARP_EXIT_RIGHT = 1,
+	WARP_EXIT_DOWN = 2,
+	WARP_EXIT_LEFT = 3,
+	WARP_EXIT_UNDEFINED
+};
+
 struct Warp {
-	short direction;
+	WarpEnterDirection direction;
 	short connection;
 	short id;
 };
 
 struct WarpExit {
-	short direction;
+	WarpExitDirection direction;
 	short connection;
 	short id;
 
@@ -359,6 +375,7 @@ class CMap
 		friend class MapList;
 		friend class MI_MapField;
 		friend class CPlayer;
+		friend class PlayerWarpStatus;
 
 		friend class MO_FlagBase;
 		friend class OMO_RaceGoal;

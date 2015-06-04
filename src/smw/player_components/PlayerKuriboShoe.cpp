@@ -111,7 +111,7 @@ void PlayerKuriboShoe::draw(CPlayer &player)
                 player.ix - PWOFFSET, player.iy - PHOFFSET,
                 animationFrame + (type == STICKY ? 64 : 0), (player.spr & 0x1) == 0 ? 0 : 32,
                 32, 32,
-                (short)player.state % 4, player.warpplane);
+                (short)player.state % 4, player.GetWarpPlane());
         else
             rm->spr_kuriboshoe.draw(
                 player.ix - PWOFFSET, player.iy - PHOFFSET,
