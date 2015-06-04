@@ -8,6 +8,7 @@
 #include "PlayerKillStyles.h"
 
 #include "player_components/PlayerCape.h"
+#include "player_components/PlayerCardCollection.h"
 #include "player_components/PlayerKuriboShoe.h"
 #include "player_components/PlayerSecretCode.h"
 #include "player_components/PlayerSpinStatus.h"
@@ -87,7 +88,6 @@ class CPlayer
 		void AddKillsInRowInAirAward();
 		void SetupNewPlayer();
 
-		void updateCardCollection(int keymask);
 		void updateInvincibility();
 		void updateFrozenStatus(int keymask);
 		void accelerateRight();
@@ -292,9 +292,7 @@ class CPlayer
 
 		PlayerKuriboShoe kuriboshoe;
 		PlayerSecretCode secretcode;
-
-		short iDumpCollectionCardTimer;
-		short iDumpCollectionCardIndex;
+		PlayerCardCollection cardcollection;
 
 		PlayerSuperStomp superstomp;
 
@@ -525,6 +523,7 @@ class CPlayer
 		friend class GameplayState;
 
 		friend class PlayerCape;
+		friend class PlayerCardCollection;
 		friend class PlayerKuriboShoe;
 		friend class PlayerTanookiSuit;
 		friend class PlayerSuperStomp;

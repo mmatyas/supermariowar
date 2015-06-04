@@ -185,32 +185,6 @@ void CPlayer::Init()
         pPlayerAI->Init();
 }
 
-void CPlayer::updateCardCollection(int keymask)
-{
-    if (game_values.gamemode->gamemode == game_mode_collection) {
-        if (iDumpCollectionCardIndex > 0) {
-            if (++iDumpCollectionCardTimer >= 32) {
-                iDumpCollectionCardIndex = 0;
-                iDumpCollectionCardTimer = 0;
-            }
-        }
-
-        if (keymask & 16) {
-            iDumpCollectionCardIndex++;
-        } else if (keymask & ~16) {
-            iDumpCollectionCardIndex = 0;
-            iDumpCollectionCardTimer = 0;
-        }
-
-        if (iDumpCollectionCardIndex == 3 && iDumpCollectionCardTimer < 32) {
-            iDumpCollectionCardTimer = 0;
-            iDumpCollectionCardIndex = 0;
-
-            ((CGM_Collection*)game_values.gamemode)->ReleaseCard(*this);
-        }
-    }
-}
-
 void CPlayer::updateInvincibility()
 {
     if (invincible) {
@@ -743,9 +717,7 @@ void CPlayer::move()
 #endif
     secretcode.update(*this, keymask);
     kuriboshoe.update(*this, keymask);
-
-    updateCardCollection(keymask);
-
+    cardcollection.update(*this, keymask);
     tanookisuit.update(*this);
     superstomp.update_onGroundHit(*this);
 
@@ -1908,9 +1880,7 @@ void CPlayer::SetupNewPlayer()
 
     kuriboshoe.reset();
     secretcode.reset();
-
-    iDumpCollectionCardTimer = 0;
-    iDumpCollectionCardIndex = 0;
+    cardcollection.reset();
 
     superstomp.reset();
 
