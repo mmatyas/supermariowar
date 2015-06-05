@@ -73,7 +73,6 @@ class CPlayer
 
 		void draw();
 		void drawarrows();
-		void drawsuicidetimer();
 		void updateswap();
 		void drawswap();
 		void move();
@@ -95,15 +94,9 @@ class CPlayer
 		void accelerateLeft();
 		void decreaseVelocity();
 
-    short getGlobalID() {
-        return globalID;
-    }
-    short getTeamID() {
-        return teamID;
-    }
-    short getColorID() {
-        return colorID;
-    }
+	    short getGlobalID() { return globalID; }
+	    short getTeamID()   { return teamID;   }
+	    short getColorID()  { return colorID;  }
 
 		bool bouncejump();
 
@@ -157,7 +150,7 @@ class CPlayer
             projectiles += amount;
     }
 
-    void SetStoredPowerup(short iPowerup);
+        void SetStoredPowerup(short iPowerup);
 		void StripPowerups();
 
 		short shield;
@@ -167,6 +160,7 @@ class CPlayer
 		short globalID;
 		short teamID;
 	private:
+		void drawsuicidetimer();
 
 		void ResetSuicideTime();
 		void SetSprite();
@@ -203,6 +197,7 @@ class CPlayer
 		void makefrozen(short iTime);
 		void turnslowdownon();
 		bool isstomping(CPlayer * o);
+
 		void explodeawards();
 		void addswirlingawards();
 		void addrocketawards();
