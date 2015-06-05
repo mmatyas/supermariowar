@@ -7,6 +7,7 @@
 #include "Score.h"
 #include "PlayerKillStyles.h"
 
+#include "player_components/PlayerAwardEffects.h"
 #include "player_components/PlayerCape.h"
 #include "player_components/PlayerCardCollection.h"
 #include "player_components/PlayerKuriboShoe.h"
@@ -85,6 +86,7 @@ class CPlayer
 
 		void spawnText(const char * szText);
 		void DeathAwards();
+		void AddKillerAward(CPlayer* killed, killstyle style);
 		void AddKillsInRowInAirAward();
 		void SetupNewPlayer();
 
@@ -198,9 +200,7 @@ class CPlayer
 		void turnslowdownon();
 		bool isstomping(CPlayer * o);
 
-		void explodeawards();
-		void addswirlingawards();
-		void addrocketawards();
+		PlayerAwardEffects awardeffects;
 
 		short KillPlayerMapHazard(bool fForce, killstyle ks, bool fKillCarriedItem, short iPlayerId = -1);
 
@@ -217,9 +217,6 @@ class CPlayer
 		CScore *score;
 		short killsinrow;
 		short killsinrowinair;
-
-		float awardangle;
-		short awards[MAXAWARDS];
 
 		short localID;
 		short subTeamID;
@@ -367,7 +364,6 @@ class CPlayer
 		friend short PlayerKilledPlayer(short iKiller, CPlayer * killed, short deathstyle, killstyle style, bool fForce, bool fKillCarriedItem);
 		friend short PlayerKilledPlayer(CPlayer * killer, CPlayer * killed, short deathstyle, killstyle style, bool fForce, bool fKillCarriedItem);
 
-		friend void AddAwardKill(CPlayer * killer, CPlayer * killed, killstyle style);
 		friend void RemovePlayersButHighestScoring();
 		friend void RemovePlayersButTeam(short teamID);
 		friend bool RemoveTeam(short teamid);
@@ -510,6 +506,7 @@ class CPlayer
 
 		friend class GameplayState;
 
+		friend class PlayerAwardEffects;
 		friend class PlayerCape;
 		friend class PlayerCardCollection;
 		friend class PlayerKuriboShoe;

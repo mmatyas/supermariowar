@@ -250,7 +250,7 @@ bool MO_BulletBill::collide(CPlayer * player)
     }
 
     if (player->invincible || player->shyguy) {
-        AddAwardKill(player, NULL, kill_style_bulletbill);
+        player->AddKillerAward(NULL, kill_style_bulletbill);
         ifSoundOnPlay(rm->sfx_kicksound);
 
         Die();
@@ -272,7 +272,7 @@ bool MO_BulletBill::hittop(CPlayer * player)
     player->collision_detection_checktop();
     player->platform = NULL;
 
-    AddAwardKill(player, NULL, kill_style_bulletbill);
+    player->AddKillerAward(NULL, kill_style_bulletbill);
 
     ifSoundOnPlay(rm->sfx_mip);
 

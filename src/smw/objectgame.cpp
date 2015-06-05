@@ -20,7 +20,6 @@
 extern short iKingOfTheHillZoneLimits[4][4];
 extern void PlayerKilledPlayer(short iKiller, CPlayer * killed, short deathstyle, short killstyle, bool fForce, bool fKillCarriedItem);
 extern void PlayerKilledPlayer(CPlayer * killer, CPlayer * killed, short deathstyle, short killstyle, bool fForce, bool fKillCarriedItem);
-extern void AddAwardKill(CPlayer * killer, CPlayer * killed, killstyle style);
 extern bool SwapPlayers(short iUsingPlayerID);
 extern short scorepowerupoffsets[3][3];
 
@@ -514,7 +513,7 @@ void IO_Block::BounceMovingObject(IO_MovingObject * object)
             CPlayer * player = GetPlayerFromGlobalID(iBumpPlayerID);
 
             if (player) {
-                AddAwardKill(player, NULL, style);
+                player->AddKillerAward(NULL, style);
                 player->score->AdjustScore(1);
             }
         }
@@ -5685,7 +5684,7 @@ bool MO_WalkingEnemy::collide(CPlayer * player)
         return false;
 
     if (player->invincible || frozen) {
-        AddAwardKill(player, NULL, killStyle);
+        player->AddKillerAward(NULL, killStyle);
 
         if (game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover)
             player->score->AdjustScore(1);
@@ -5738,7 +5737,7 @@ void MO_WalkingEnemy::collide(IO_MovingObject * object)
                 CPlayer * killer = GetPlayerFromGlobalID(object->iPlayerID);
 
                 if (killer) {
-                    AddAwardKill(killer, NULL, killStyle);
+                    killer->AddKillerAward(NULL, killStyle);
                     killer->score->AdjustScore(1);
 
                     if (type == movingobject_shell)
@@ -5876,7 +5875,7 @@ bool MO_Goomba::hittop(CPlayer * player)
     } else {
         dead = true;
 
-        AddAwardKill(player, NULL, killStyle);
+        player->AddKillerAward(NULL, killStyle);
 
         eyecandy[0].add(new EC_Corpse(&rm->spr_goombadead, (float)(ix - collisionOffsetX), (float)(iy + collisionHeight - 32), 0));
     }
@@ -5952,7 +5951,7 @@ bool MO_Koopa::hittop(CPlayer * player)
     } else {
         dead = true;
 
-        AddAwardKill(player, NULL, kill_style_koopa);
+        player->AddKillerAward(NULL, kill_style_koopa);
 
         DropShell(false, false);
     }
@@ -6020,7 +6019,7 @@ bool MO_BuzzyBeetle::hittop(CPlayer * player)
     player->platform = NULL;
     dead = true;
 
-    AddAwardKill(player, NULL, kill_style_buzzybeetle);
+    player->AddKillerAward(NULL, kill_style_buzzybeetle);
 
     if (game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover)
         player->score->AdjustScore(1);
@@ -6090,7 +6089,7 @@ bool MO_Spiny::hittop(CPlayer * player)
 
         dead = true;
 
-        AddAwardKill(player, NULL, kill_style_spiny);
+        player->AddKillerAward(NULL, kill_style_spiny);
 
         if (game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover)
             player->score->AdjustScore(1);
@@ -6184,7 +6183,7 @@ void MO_CheepCheep::draw()
 bool MO_CheepCheep::collide(CPlayer * player)
 {
     if (player->invincible || frozen) {
-        AddAwardKill(player, NULL, kill_style_cheepcheep);
+        player->AddKillerAward(NULL, kill_style_cheepcheep);
 
         if (game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover)
             player->score->AdjustScore(1);
@@ -6213,7 +6212,7 @@ bool MO_CheepCheep::hittop(CPlayer * player)
     player->collision_detection_checktop();
     player->platform = NULL;
 
-    AddAwardKill(player, NULL, kill_style_cheepcheep);
+    player->AddKillerAward(NULL, kill_style_cheepcheep);
 
     if (game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover)
         player->score->AdjustScore(1);
@@ -6253,7 +6252,7 @@ void MO_CheepCheep::collide(IO_MovingObject * object)
                 CPlayer * killer = GetPlayerFromGlobalID(object->iPlayerID);
 
                 if (killer) {
-                    AddAwardKill(killer, NULL, kill_style_cheepcheep);
+                    killer->AddKillerAward(NULL, kill_style_cheepcheep);
                     killer->score->AdjustScore(1);
 
                     if (type == movingobject_shell)

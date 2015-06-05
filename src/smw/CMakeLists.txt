@@ -17,6 +17,7 @@ LIST(APPEND SMW_SRCS
 # Player components
 #
 LIST(APPEND SMW_SRCS
+	player_components/PlayerAwardEffects.cpp
 	player_components/PlayerCape.cpp
 	player_components/PlayerCardCollection.cpp
 	player_components/PlayerKuriboShoe.cpp
