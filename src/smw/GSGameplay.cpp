@@ -704,7 +704,7 @@ void handleP2PCollisions()
                 if (player2->state > player_dead) {
                     if (coldec_player2player(player1, player2)) {
                         printf("P2P collision\n");
-                        collisionhandler_p2p(player1, player2);
+                        player1->collidesWith(player2);
 
                         //if player was killed by another player, continue with next player for collision detection
                         if (player1->state <= player_dead)
@@ -731,7 +731,7 @@ void handleP2ObjCollisions()
 
                 if (!object->GetDead()) {
                     if (coldec_player2obj(player, object)) {
-                        if (collisionhandler_p2o(player, object))
+                        if (player->collidesWith(object))
                             break;
                     }
                 }

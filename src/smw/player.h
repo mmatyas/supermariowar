@@ -10,6 +10,7 @@
 #include "player_components/PlayerAwardEffects.h"
 #include "player_components/PlayerCape.h"
 #include "player_components/PlayerCardCollection.h"
+#include "player_components/PlayerCollisions.h"
 #include "player_components/PlayerKuriboShoe.h"
 #include "player_components/PlayerSecretCode.h"
 #include "player_components/PlayerSpinStatus.h"
@@ -80,6 +81,9 @@ class CPlayer
 		void mapcollisions();
 		void cpu_think();
 
+		bool collidesWith(CPlayer*);
+		bool collidesWith(CObject*);
+
 		void CommitAction();
 
 		void die(short deathStyle, bool fTeamRemoved, bool fKillCarriedItem);
@@ -122,18 +126,10 @@ class CPlayer
 
 		void DecreaseProjectileLimit();
 
-    bool isready() {
-        return state == player_ready;
-    }
-    bool isspawning() {
-        return state == player_spawning;
-    }
-    bool iswarping() {
-        return state > player_ready;
-    }
-    bool isdead() {
-        return state == player_dead;
-    }
+    bool isready() { return state == player_ready; }
+    bool isspawning() { return state == player_spawning; }
+    bool iswarping() { return state > player_ready; }
+    bool isdead() { return state == player_dead; }
 
 		void SetKuriboShoe(KuriboShoeType type);
     bool IsInvincibleOnBottom() {
@@ -189,17 +185,13 @@ class CPlayer
 
 		bool FindSpawnPoint();
 		void collision_detection_map();
-		bool collision_detection_checktop();
-		bool collision_detection_checkleft();
-		bool collision_detection_checkright();
-		void collision_detection_checksides();
 		void flipsidesifneeded();
-		void fliptopifneeded();
 		void makeinvincible();
 		void makefrozen(short iTime);
 		void turnslowdownon();
 		bool isstomping(CPlayer * o);
 
+		PlayerCollisions collisions;
 		PlayerAwardEffects awardeffects;
 
 		short KillPlayerMapHazard(bool fForce, killstyle ks, bool fKillCarriedItem, short iPlayerId = -1);
@@ -350,19 +342,16 @@ class CPlayer
 
 		Spotlight * sSpotlight;
 
+		void TransferTag(CPlayer * o2);
+		void TransferShyGuy(CPlayer * o2);
+		void BounceAssistPlayer(CPlayer * o2);
+
 		friend bool coldec_player2player(CPlayer * o1, CPlayer * o2);
-		friend void collisionhandler_p2p(CPlayer * o1, CPlayer * o2);
-		friend void _collisionhandler_p2p_pushback(CPlayer * o1, CPlayer * o2);
-
-		friend void TransferTag(CPlayer * o1, CPlayer * o2);
-		friend void TransferShyGuy(CPlayer * o1, CPlayer * o2);
-		friend void BounceAssistPlayer(CPlayer * o1, CPlayer * o2);
-
 		friend bool coldec_player2obj(CPlayer * o1, CObject * o2);
 		friend bool collisionhandler_p2o(CPlayer * o1, CObject * o2);
 
 		friend short PlayerKilledPlayer(short iKiller, CPlayer * killed, short deathstyle, killstyle style, bool fForce, bool fKillCarriedItem);
-		friend short PlayerKilledPlayer(CPlayer * killer, CPlayer * killed, short deathstyle, killstyle style, bool fForce, bool fKillCarriedItem);
+		short KilledPlayer(CPlayer * killed, short deathstyle, killstyle style, bool fForce, bool fKillCarriedItem);
 
 		friend void RemovePlayersButHighestScoring();
 		friend void RemovePlayersButTeam(short teamID);
@@ -507,6 +496,7 @@ class CPlayer
 		friend class GameplayState;
 
 		friend class PlayerAwardEffects;
+		friend class PlayerCollisions;
 		friend class PlayerCape;
 		friend class PlayerCardCollection;
 		friend class PlayerKuriboShoe;
@@ -517,13 +507,5 @@ class CPlayer
 		friend class PlayerWarpStatus;
 		friend struct PlayerWings;
 };
-
-
-void collisionhandler_p2p(CPlayer * o1, CPlayer * o2);
-void _collisionhandler_p2p__pushback(CPlayer * o1, CPlayer * o2);
-
-void TransferTag(CPlayer * o1, CPlayer * o2);
-void TransferShyGuy(CPlayer * o1, CPlayer * o2);
-void BounceAssistPlayer(CPlayer * o1, CPlayer * o2);
 
 #endif // PLAYER_H

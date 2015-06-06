@@ -269,7 +269,7 @@ bool MO_BulletBill::hittop(CPlayer * player)
 {
     player->setYi(iy - PH - 1);
     player->bouncejump();
-    player->collision_detection_checktop();
+    player->collisions.checktop(*player);
     player->platform = NULL;
 
     player->AddKillerAward(NULL, kill_style_bulletbill);

@@ -158,7 +158,7 @@ short CPlayer::KillPlayerMapHazard(bool fForce, killstyle style, bool fKillCarri
 {
     return 0;
 }
-bool CPlayer::collision_detection_checktop()
+bool PlayerCollisions::checktop(CPlayer&)
 {
     return false;
 }

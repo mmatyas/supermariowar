@@ -147,6 +147,7 @@ void IO_MovingObject::applyfriction()
     }
 }
 
+// TODO / FIXME: The collision code is almost the same as in CPlayer
 void IO_MovingObject::collision_detection_map()
 {
     setXf(fx + velx);

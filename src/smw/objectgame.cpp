@@ -5848,7 +5848,7 @@ bool MO_Goomba::hittop(CPlayer * player)
 {
     player->setYi(iy - PH - 1);
     player->bouncejump();
-    player->collision_detection_checktop();
+    player->collisions.checktop(*player);
     player->platform = NULL;
 
     if (game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover)
@@ -5934,7 +5934,7 @@ bool MO_Koopa::hittop(CPlayer * player)
 {
     player->setYi(iy - PH - 1);
     player->bouncejump();
-    player->collision_detection_checktop();
+    player->collisions.checktop(*player);
     player->platform = NULL;
 
     if (game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover)
@@ -6015,7 +6015,7 @@ bool MO_BuzzyBeetle::hittop(CPlayer * player)
 {
     player->setYi(iy - PH - 1);
     player->bouncejump();
-    player->collision_detection_checktop();
+    player->collisions.checktop(*player);
     player->platform = NULL;
     dead = true;
 
@@ -6084,7 +6084,7 @@ bool MO_Spiny::hittop(CPlayer * player)
     if (player->kuriboshoe.is_on()) {
         player->setYi(iy - PH - 1);
         player->bouncejump();
-        player->collision_detection_checktop();
+        player->collisions.checktop(*player);
         player->platform = NULL;
 
         dead = true;
@@ -6209,7 +6209,7 @@ bool MO_CheepCheep::hittop(CPlayer * player)
 {
     player->setYi(iy - PH - 1);
     player->bouncejump();
-    player->collision_detection_checktop();
+    player->collisions.checktop(*player);
     player->platform = NULL;
 
     player->AddKillerAward(NULL, kill_style_cheepcheep);
@@ -6902,7 +6902,7 @@ bool CO_Shell::HitTop(CPlayer * player)
 
         player->setYi(iy - PH - 1);
         player->bouncejump();
-        player->collision_detection_checktop();
+        player->collisions.checktop(*player);
         player->platform = NULL;
     } else if (state == 3) { //Holding
         if (player != owner && (game_values.teamcollision == 2|| player->teamID != owner->teamID)) {
@@ -6914,7 +6914,7 @@ bool CO_Shell::HitTop(CPlayer * player)
 
             player->setYi(iy - PH - 1);
             player->bouncejump();
-            player->collision_detection_checktop();
+            player->collisions.checktop(*player);
             player->platform = NULL;
         }
     }
@@ -7387,7 +7387,7 @@ bool CO_ThrowBlock::HitTop(CPlayer * player)
 
                 player->setYi(iy - PH - 1);
                 player->bouncejump();
-                player->collision_detection_checktop();
+                player->collisions.checktop(*player);
                 player->platform = NULL;
             }
         }
@@ -7962,7 +7962,7 @@ void CO_Spring::hittop(CPlayer * player)
     drawframe += iw;
 
     player->setYi(iy - PH - 1);
-    player->collision_detection_checktop();
+    player->collisions.checktop(*player);
     player->platform = NULL;
     player->inair = false;
     player->fallthrough = false;

@@ -752,7 +752,7 @@ void CPlayer::move()
 
                 if (FindSpawnPoint()) {
                     //Make sure spawn point isn't inside a tile
-                    collision_detection_checksides();
+                    collisions.checksides(*this);
 
                     state = player_spawning;
 
@@ -1784,53 +1784,6 @@ bool CPlayer::bouncejump()
     }
 }
 
-bool CPlayer::isstomping(CPlayer * o)
-{
-    //printf("ID: %d  Stomp old: %d <= %d  new: %d >= %d  vely: %.2f\n", globalID, oldy + PH, o->oldy, iy + PH, o->iy, vely);
-
-    if (fOldY + PH <= o->fOldY && iy + PH >= o->iy) {
-        //don't reposition if player is warping when he kills the other player
-        if (state == player_ready) {
-            setYi(o->iy - PH);		//set new position to top of other player
-            collision_detection_checktop();
-            platform = NULL;
-        }
-
-        bool fKillPotential = false;
-        if (vely > 1.0f && o->shield == 0)
-            fKillPotential = true;
-
-        bouncejump();
-
-        if (fKillPotential) {
-            killstyle style = kill_style_stomp;
-            if (flying)
-                style = kill_style_pwings;
-            else if (kuriboshoe.is_on())
-                style = kill_style_kuriboshoe;
-            else if (tail.isInUse())
-                style = kill_style_leaf;
-            else if (extrajumps > 0)
-                style = kill_style_feather;
-
-            PlayerKilledPlayer(this, o, death_style_squish, style, false, false);
-        } else {
-            if (game_values.gamemode->gamemode == game_mode_tag)
-                TransferTag(o, this);
-
-            if (game_values.gamemode->gamemode == game_mode_shyguytag)
-                TransferShyGuy(o, this);
-
-            iSuicideCreditPlayerID = o->globalID;
-            iSuicideCreditTimer = 20;
-        }
-
-        return true;
-    }
-
-    return false;
-}
-
 void CPlayer::AddKillerAward(CPlayer* killed, killstyle style) {
     awardeffects.addKillerAward(*this, killed, style);
 }
@@ -1848,7 +1801,7 @@ short PlayerKilledPlayer(short iKiller, CPlayer * killed, short deathstyle, kill
     CPlayer * killer = GetPlayerFromGlobalID(iKiller);
 
     if (killer && killer->globalID != killed->globalID) {
-        return PlayerKilledPlayer(killer, killed, deathstyle, style, fForce, fKillCarriedItem);
+        return killer->KilledPlayer(killed, deathstyle, style, fForce, fKillCarriedItem);
     } else {
         killed->DeathAwards();
 
@@ -1868,8 +1821,10 @@ short PlayerKilledPlayer(short iKiller, CPlayer * killed, short deathstyle, kill
     }
 }
 
-short PlayerKilledPlayer(CPlayer * killer, CPlayer * killed, short deathstyle, killstyle style, bool fForce, bool fKillCarriedItem)
+short CPlayer::KilledPlayer(CPlayer * killed, short deathstyle, killstyle style, bool fForce, bool fKillCarriedItem)
 {
+    CPlayer * killer = this;
+
     //If this player is already dead, then don't kill him again
     if (killed->state != player_ready)
         return player_kill_none;
@@ -1912,232 +1867,11 @@ short PlayerKilledPlayer(CPlayer * killer, CPlayer * killed, short deathstyle, k
     return iKillType;
 }
 
-//this is no member of CPlayer, but can only be used with CPlayer
-//and it belongs to the context p2p collision detection + response (CPlayer->isstomping, collisionhandler, ...)
 
-//handles a collision between two players (is being called if o1, o2 collide)
-void collisionhandler_p2p(CPlayer * o1, CPlayer * o2)
+void CPlayer::TransferTag(CPlayer* o2)
 {
-    //If teams tag each other
-    if (o1->teamID == o2->teamID) {
-        //Free teammates that are jailed
-        if (game_values.gamemode->gamemode == game_mode_jail && game_values.gamemodesettings.jail.tagfree) {
-            if (o1->jailtimer > 0) {
-                eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, o1->ix + HALFPW - 16, o1->iy + HALFPH - 16, 3, 8));
-                ifSoundOnPlay(rm->sfx_transform);
-                o1->jailtimer = 0;
-            }
+    CPlayer * o1 = this;
 
-            if (o2->jailtimer > 0) {
-                eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, o2->ix + HALFPW - 16, o2->iy + HALFPH - 16, 3, 8));
-                ifSoundOnPlay(rm->sfx_transform);
-                o2->jailtimer = 0;
-            }
-        }
-
-        //Transfer tag if assist is on
-        if ((game_values.gamemode->gamemode == game_mode_tag && game_values.teamcollision == 1) || game_values.gamemodesettings.tag.tagontouch)
-            TransferTag(o1, o2);
-
-        //Don't collision detect players on same team if friendly fire is turned off
-        if (game_values.teamcollision == 0)
-            return;
-
-        //Team assist is enabled so allow powerup trading and super jumping
-        if (game_values.teamcollision == 1) {
-            BounceAssistPlayer(o1, o2);
-            BounceAssistPlayer(o2, o1);
-
-            //Allow players on team to swap stored items
-            if (o1->playerKeys->game_powerup.fPressed || o2->playerKeys->game_powerup.fPressed) {
-                short iTempPowerup = game_values.gamepowerups[o1->globalID];
-                game_values.gamepowerups[o1->globalID] = game_values.gamepowerups[o2->globalID];
-                game_values.gamepowerups[o2->globalID] = iTempPowerup;
-
-                ifSoundOnPlay(rm->sfx_storepowerup);
-
-                o1->playerKeys->game_powerup.fPressed = false;
-                o1->playerKeys->game_powerup.fDown = false;
-                o2->playerKeys->game_powerup.fPressed = false;
-                o2->playerKeys->game_powerup.fDown = false;
-            }
-
-            return;
-        }
-    }
-
-    //Quit checking collision if either player is soft shielded
-    if (o1->shield == 1 || o2->shield == 1) {
-        //Do tag transfer if there is one to do
-        if (game_values.gamemode->gamemode == game_mode_tag && game_values.gamemodesettings.tag.tagontouch)
-            TransferTag(o1, o2);
-
-        if (game_values.gamemode->gamemode == game_mode_shyguytag && game_values.gamemodesettings.shyguytag.tagtransfer != 1)
-            TransferShyGuy(o1, o2);
-
-        return;
-    }
-
-    //--- 1. kill frozen players ---
-    bool fFrozenDeath = false;
-    if (o1->frozen && o1->shield == 0 && !o1->invincible) {
-        PlayerKilledPlayer(o2, o1, death_style_shatter, kill_style_iceblast, true, false);
-        fFrozenDeath = true;
-    }
-
-    if (o2->frozen && o2->shield == 0 && !o2->invincible) {
-        PlayerKilledPlayer(o1, o2, death_style_shatter, kill_style_iceblast, true, false);
-        fFrozenDeath = true;
-    }
-
-    if (fFrozenDeath)
-        return;
-
-    //--- 2. is player invincible? ---
-    if (o1->invincible && o2->shield == 0 && !o2->invincible) {
-        PlayerKilledPlayer(o1, o2, death_style_jump, kill_style_star, false, false);
-        return;
-    }
-
-    if (o2->invincible && o1->shield == 0 && !o1->invincible) {
-        PlayerKilledPlayer(o2, o1, death_style_jump, kill_style_star, false, false);
-        return;
-    }
-
-    //If both players are warping, ignore collision
-    if (o1->iswarping() && o2->iswarping())
-        return;
-
-    //--- 3. stomping other player? ---
-    if ((o2->shield == 0 || o2->shield == 3) && !o2->invincible && o1->isstomping(o2))
-        return;
-    if ((o1->shield == 0 || o1->shield == 3) && !o1->invincible  && o2->isstomping(o1))
-        return;
-
-
-    //Quit checking collision if either player is hard shielded
-    if (o1->shield == 2 || o2->shield == 2) {
-        //Do tag transfer if there is one to do
-        if (game_values.gamemode->gamemode == game_mode_tag && game_values.gamemodesettings.tag.tagontouch)
-            TransferTag(o1, o2);
-
-        if (game_values.gamemode->gamemode == game_mode_shyguytag && game_values.gamemodesettings.shyguytag.tagtransfer != 1)
-            TransferShyGuy(o1, o2);
-
-        return;
-    }
-
-    //--- 4. push back (horizontal) ---
-    if (o1->ix < o2->ix)				//o1 is left -> o1 pushback left, o2 pushback right
-        _collisionhandler_p2p_pushback(o1, o2);
-    else
-        _collisionhandler_p2p_pushback(o2, o1);
-}
-
-//handles a collision between a player and an object
-bool collisionhandler_p2o(CPlayer * o1, CObject * o2)
-{
-    return o2->collide(o1);
-}
-
-//calculates the new positions for both players when they are pushing each other
-void _collisionhandler_p2p_pushback(CPlayer * o1, CPlayer * o2)
-{
-    //o1 is left to o2
-    //  |o1||o2|
-    //-----------
-
-    //Transfer tag on touching other players
-    if (game_values.gamemode->gamemode == game_mode_tag && game_values.gamemodesettings.tag.tagontouch)
-        TransferTag(o1, o2);
-
-    if (game_values.gamemode->gamemode == game_mode_shyguytag && game_values.gamemodesettings.shyguytag.tagtransfer != 1)
-        TransferShyGuy(o1, o2);
-
-    bool overlapcollision = false;
-    if (o1->ix + PW < 320 && o2->ix > 320)
-        overlapcollision = true;
-
-    if (/*(o1->velx == 0 && o2->iswarping() && o2->velx != 0) ||*/ o1->iswarping()) {
-        if (overlapcollision) {
-            //o2 reposition to the right side of o1, o1 stays
-            o2->setXi(o1->ix - PW + smw->ScreenWidth - 1);
-            o2->collision_detection_checkleft();
-        } else {
-            o2->setXi(o1->ix + PW + 1);
-            o2->collision_detection_checkright();
-        }
-
-        return;
-    } else if (/*(o2->velx == 0 && o1->iswarping() && o1->velx != 0) ||*/ o2->iswarping()) {
-        if (overlapcollision) {
-            //o1 reposition to the left side of o2, o2 stays
-            o1->setXi(o2->ix + PW - smw->ScreenWidth - 1);
-            o1->collision_detection_checkright();
-        } else {
-            o1->setXi(o2->ix - PW - 1);
-            o1->collision_detection_checkleft();
-        }
-
-        return;
-    } else if (!o1->iswarping() && !o2->iswarping()) {
-        //both objects moving - calculate middle and set both objects
-
-        if (overlapcollision) {
-            short middle = o2->ix - smw->ScreenWidth + ((o1->ix + PW) - o2->ix - smw->ScreenWidth) / 2;		//no ABS needed (o1->x < o2->x -> o1->x+w > o2->x !)
-            o1->setXi(middle + 1);	//o1 is left
-            o2->setXi(middle - PW + smw->ScreenWidth - 1);		//o2 is right
-
-            o1->collision_detection_checkright();
-            o2->collision_detection_checkleft();
-        } else {
-            short middle = o2->ix + ((o1->ix + PW) - o2->ix) / 2;		//no ABS needed (o1->x < o2->x -> o1->x+w > o2->x !)
-            //printf("hlf:%f, o1x:%f, o2x:%f\n", hlf, o1->x, o2->x);
-            o1->setXi(middle - PW - 1);	//o1 is left
-            o2->setXi(middle + 1);		//o2 is right
-
-            o1->collision_detection_checkleft();
-            o2->collision_detection_checkright();
-        }
-    }
-
-    float absv1 = 0.0f;
-    float absv2 = 0.0f;
-
-    float dPlayer1Pushback = 1.5f;
-    float dPlayer2Pushback = 1.5f;
-
-    if (o1->kuriboshoe.is_on() && !o2->kuriboshoe.is_on()) {
-        dPlayer1Pushback = 0.5f;
-        dPlayer2Pushback = 2.5f;
-    } else if (!o1->kuriboshoe.is_on() && o2->kuriboshoe.is_on()) {
-        dPlayer1Pushback = 2.5f;
-        dPlayer2Pushback = 0.5f;
-    }
-
-    if (overlapcollision) {
-        absv1 = ( o1->velx < 0 ? o1->velx : -1.0f ) * dPlayer2Pushback;	//o1 is on the left side (only positive velx counts)
-        absv2 = ( o2->velx > 0 ? o2->velx : 1.0f ) * dPlayer1Pushback;	//o2 right (only negative velx counts)
-    } else {
-        absv1 = ( o1->velx > 0 ? o1->velx : 1.0f ) * dPlayer2Pushback;	//o1 is on the left side (only positive velx counts)
-        absv2 = ( o2->velx < 0 ? o2->velx : -1.0f ) * dPlayer1Pushback;	//o2 right (only negative velx counts)
-    }
-
-    if (o1->state == player_ready) {
-        o1->velx = CapSideVelocity(absv2);
-        o1->iSuicideCreditPlayerID = o2->globalID;
-        o1->iSuicideCreditTimer = 62;
-    }
-
-    if (o2->state == player_ready) {
-        o2->velx = CapSideVelocity(absv1);
-        o2->iSuicideCreditPlayerID = o1->globalID;
-        o2->iSuicideCreditTimer = 62;
-    }
-}
-
-void TransferTag(CPlayer * o1, CPlayer * o2)
-{
     if (game_values.gamemode->gamemode != game_mode_tag)
         return;
 
@@ -2161,8 +1895,10 @@ void TransferTag(CPlayer * o1, CPlayer * o2)
     }
 }
 
-void TransferShyGuy(CPlayer * o1, CPlayer * o2)
+void CPlayer::TransferShyGuy(CPlayer* o2)
 {
+    CPlayer * o1 = this;
+
     //Don't shyguy tag if this isn't shyguy tag mode or if tag transfers is set to kills only
     if (game_values.gamemode->gamemode != game_mode_shyguytag || game_values.gamemodesettings.shyguytag.tagtransfer == 1)
         return;
@@ -2179,11 +1915,13 @@ void TransferShyGuy(CPlayer * o1, CPlayer * o2)
     }
 }
 
-void BounceAssistPlayer(CPlayer * o1, CPlayer * o2)
+void CPlayer::BounceAssistPlayer(CPlayer* o2)
 {
+    CPlayer * o1 = this;
+
     if (o1->state == player_ready && o1->fOldY + PH <= o2->fOldY && o1->iy + PH >= o2->iy && o1->playerKeys->game_jump.fDown) {
         o1->setYi(o2->iy - PH);		//set new position to top of other player
-        o1->collision_detection_checktop();
+        o1->collisions.checktop(*o1);
         o1->platform = NULL;
         o1->vely = -VELSUPERJUMP;
 
@@ -2965,361 +2703,27 @@ short CPlayer::KillPlayerMapHazard(bool fForce, killstyle style, bool fKillCarri
     }
 }
 
-bool CPlayer::collision_detection_checktop()
+bool CPlayer::collidesWith(CPlayer* other)
 {
-    if (iy < 0.0f)
-        return false;
-
-    short ty = iy / TILESIZE;
-
-    if (ty < 0 || ty >= MAPHEIGHT)
-        return false;
-
-    short txl = ix / TILESIZE;
-
-    if (txl < 0 || txl >= MAPWIDTH)
-        return false;
-
-    short txr = -1;
-    if (ix + PW >= smw->ScreenWidth)
-        txr = (ix + PW - smw->ScreenWidth) / TILESIZE;
-    else
-        txr = (ix + PW) / TILESIZE;
-
-    if (txr < 0 || txr >= MAPWIDTH)
-        return false;
-
-    int leftTile = g_map->map(txl, ty);
-    int rightTile = g_map->map(txr, ty);
-    IO_Block * leftBlock = g_map->block(txl, ty);
-    IO_Block * rightBlock = g_map->block(txr, ty);
-
-    if ((leftTile & tile_flag_solid) || (rightTile & tile_flag_solid) ||
-            (leftBlock && !leftBlock->isTransparent() && !leftBlock->isHidden()) ||
-            (rightBlock && !rightBlock->isTransparent() && !rightBlock->isHidden())) {
-        setYf((float)((ty << 5) + TILESIZE) + 0.2f);
-        return true;
-    }
-
-    return false;
+    collisions.handle_p2p(this, other);
 }
 
-bool CPlayer::collision_detection_checkleft()
+bool CPlayer::collidesWith(CObject* object)
 {
-    if (fy < 0.0f)
-        return false;
-
-    short ty = (short)fy / TILESIZE;
-
-    if (ty < 0 || ty >= MAPHEIGHT)
-        return false;
-
-    short ty2 = ((short)fy + PH) / TILESIZE;
-
-    if (ty2 < 0 || ty2 >= MAPHEIGHT)
-        return false;
-
-    short tx = ix / TILESIZE;
-
-    if (tx < 0 || tx >= MAPWIDTH)
-        return false;
-
-    int topTile = g_map->map(tx, ty);
-    int bottomTile = g_map->map(tx, ty2);
-    IO_Block * topBlock = g_map->block(tx, ty);
-    IO_Block * bottomBlock = g_map->block(tx, ty2);
-
-    if ((topTile & tile_flag_solid) || (bottomTile & tile_flag_solid) ||
-            (topBlock && !topBlock->isTransparent() && !topBlock->isHidden()) ||
-            (bottomBlock && !bottomBlock->isTransparent() && !bottomBlock->isHidden())) {
-        setXf((float)((tx << 5) + TILESIZE) + 0.2f);
-        flipsidesifneeded();
-        return true;
-    }
-
-    return false;
-}
-
-bool CPlayer::collision_detection_checkright()
-{
-    if (fy < 0.0f)
-        return false;
-
-    short ty = (short)fy / TILESIZE;
-
-    if (ty < 0 || ty >= MAPHEIGHT)
-        return false;
-
-    short ty2 = ((short)fy + PH) / TILESIZE;
-
-    if (ty2 < 0 || ty2 >= MAPHEIGHT)
-        return false;
-
-    short tx = -1;
-
-    if (ix + PW >= smw->ScreenWidth)
-        tx = (ix + PW - smw->ScreenWidth) / TILESIZE;
-    else
-        tx = (ix + PW) / TILESIZE;
-
-    if (tx < 0 || tx >= MAPWIDTH)
-        return false;
-
-    int topTile = g_map->map(tx, ty);
-    int bottomTile = g_map->map(tx, ty2);
-    IO_Block * topBlock = g_map->block(tx, ty);
-    IO_Block * bottomBlock = g_map->block(tx, ty2);
-
-    if ((topTile & tile_flag_solid) || (bottomTile & tile_flag_solid) ||
-            (topBlock && !topBlock->isTransparent() && !topBlock->isHidden()) ||
-            (bottomBlock && !bottomBlock->isTransparent() && !bottomBlock->isHidden())) {
-        setXf((float)((tx << 5) - PW) - 0.2f);
-        flipsidesifneeded();
-        return true;
-    }
-
-    return false;
-}
-
-void CPlayer::collision_detection_checksides()
-{
-    //First figure out where the corners of this object are touching
-    Uint8 iCase = 0;
-
-    short txl = ix >> 5;
-
-    short txr = -1;
-    if (ix + PW >= smw->ScreenWidth)
-        txr = (ix + PW - smw->ScreenWidth) >> 5;
-    else
-        txr = (ix + PW) >> 5;
-
-    short ty = iy >> 5;
-    short ty2 = (iy + PH) >> 5;
-
-    if (iy >= 0) {
-        if (ty < MAPHEIGHT) {
-            if (txl >= 0 && txl < MAPWIDTH) {
-                IO_Block * block = g_map->block(txl, ty);
-
-                if ((block && !block->isTransparent() && !block->isHidden()) || (g_map->map(txl, ty) & tile_flag_solid)) {
-                    iCase |= 0x01;
-                }
-            }
-
-            if (txr >= 0 && txr < MAPWIDTH) {
-                IO_Block * block = g_map->block(txr, ty);
-
-                if ((block && !block->isTransparent() && !block->isHidden()) || (g_map->map(txr, ty) & tile_flag_solid)) {
-                    iCase |= 0x02;
-                }
-            }
-        }
-
-    }
-
-    if (iy + PW >= 0.0f) {
-        if (ty2 < MAPHEIGHT) {
-            if (txl >= 0 && txl < MAPWIDTH) {
-                IO_Block * block = g_map->block(txl, ty2);
-
-                if ((block && !block->isTransparent() && !block->isHidden()) || (g_map->map(txl, ty2) & tile_flag_solid)) {
-                    iCase |= 0x04;
-                }
-            }
-
-            if (txr >= 0 && txr < MAPWIDTH) {
-                IO_Block * block = g_map->block(txr, ty2);
-
-                if ((block && !block->isTransparent() && !block->isHidden()) || (g_map->map(txr, ty2) & tile_flag_solid)) {
-                    iCase |= 0x08;
-                }
-            }
-        }
-    }
-
-    //Then determine which way is the best way to move this object out of the solid map areas
-    switch (iCase) {
-        //Do nothing
-        //[ ][ ]
-        //[ ][ ]
-    case 0:
-        break;
-
-        //[X][ ]
-        //[ ][ ]
-    case 1: {
-        if (ix + (PW >> 1) > (txl << 5) + TILESIZE) {
-            setXf((float)((txl << 5) + TILESIZE) + 0.2f);
-            flipsidesifneeded();
-        } else {
-            setYf((float)((ty << 5) + TILESIZE) + 0.2f);
-        }
-
-        break;
-    }
-
-    //[ ][X]
-    //[ ][ ]
-    case 2: {
-        if (ix + (PW >> 1) < (txr << 5)) {
-            setXf((float)((txr << 5) - PW) - 0.2f);
-            flipsidesifneeded();
-        } else {
-            setYf((float)((ty << 5) + TILESIZE) + 0.2f);
-        }
-
-        break;
-    }
-
-    //[X][X]
-    //[ ][ ]
-    case 3: {
-        setYf((float)((ty << 5) + TILESIZE) + 0.2f);
-        break;
-    }
-
-    //[ ][ ]
-    //[X][ ]
-    case 4: {
-        if (ix + (PW >> 1) > (txl << 5) + TILESIZE) {
-            setXf((float)((txl << 5) + TILESIZE) + 0.2f);
-            flipsidesifneeded();
-        } else {
-            setYf((float)((ty2 << 5) - PH) - 0.2f);
-        }
-
-        break;
-    }
-
-    //[X][ ]
-    //[X][ ]
-    case 5: {
-        setXf((float)((txl << 5) + TILESIZE) + 0.2f);
-        flipsidesifneeded();
-        break;
-    }
-
-    //[ ][X]
-    //[X][ ]
-    case 6: {
-        if (ix + (PW >> 1) > (txl << 5) + TILESIZE) {
-            setYf((float)((ty << 5) + TILESIZE) + 0.2f);
-            setXf((float)((txl << 5) + TILESIZE) + 0.2f);
-            flipsidesifneeded();
-        } else {
-            setYf((float)((ty2 << 5) - PH) - 0.2f);
-            setXf((float)((txr << 5) - PW) - 0.2f);
-            flipsidesifneeded();
-        }
-
-        break;
-    }
-
-    //[X][X]
-    //[X][ ]
-    case 7: {
-        setYf((float)((ty << 5) + TILESIZE) + 0.2f);
-        setXf((float)((txl << 5) + TILESIZE) + 0.2f);
-        flipsidesifneeded();
-        break;
-    }
-
-    //[ ][ ]
-    //[ ][X]
-    case 8: {
-        if (ix + (PW >> 1) < (txr << 5)) {
-            setXf((float)((txr << 5) - PW) - 0.2f);
-            flipsidesifneeded();
-        } else {
-            setYf((float)((ty2 << 5) - PH) - 0.2f);
-        }
-
-        break;
-    }
-
-    //[X][ ]
-    //[ ][X]
-    case 9: {
-        if (ix + (PW >> 1) > (txl << 5) + TILESIZE) {
-            setYf((float)((ty2 << 5) - PH) - 0.2f);
-            setXf((float)((txl << 5) + TILESIZE) + 0.2f);
-            flipsidesifneeded();
-        } else {
-            setYf((float)((ty << 5) + TILESIZE) + 0.2f);
-            setXf((float)((txr << 5) - PW) - 0.2f);
-            flipsidesifneeded();
-        }
-
-        break;
-    }
-
-    //[ ][X]
-    //[ ][X]
-    case 10: {
-        setXf((float)((txr << 5) - PW) - 0.2f);
-        flipsidesifneeded();
-        break;
-    }
-
-    //[X][X]
-    //[ ][X]
-    case 11: {
-        setYf((float)((ty << 5) + TILESIZE) + 0.2f);
-        setXf((float)((txr << 5) - PW) - 0.2f);
-        flipsidesifneeded();
-        break;
-    }
-
-    //[ ][ ]
-    //[X][X]
-    case 12: {
-        setYf((float)((ty2 << 5) - PH) - 0.2f);
-        break;
-    }
-
-    //[X][ ]
-    //[X][X]
-    case 13: {
-        setYf((float)((ty2 << 5) - PH) - 0.2f);
-        setXf((float)((txl << 5) + TILESIZE) + 0.2f);
-        flipsidesifneeded();
-        break;
-    }
-
-    //[ ][X]
-    //[X][X]
-    case 14: {
-        setYf((float)((ty2 << 5) - PH) - 0.2f);
-        setXf((float)((txr << 5) - PW) - 0.2f);
-        flipsidesifneeded();
-        break;
-    }
-
-    //If object is completely inside a block, default to moving it down
-    //[X][X]
-    //[X][X]
-    case 15: {
-        setYf((float)((ty2 << 5) + TILESIZE) + 0.2f);
-        break;
-    }
-
-    default:
-        break;
-    }
+    collisions.handle_p2o(this, object);
 }
 
 void CPlayer::flipsidesifneeded()
 {
-    //Use ix here to avoid rounding issues (can crash if txr evals to over the right side of screen)
+    //Use ix here to avoid rounding issues (can crash if tile_x_right evals to over the right side of screen)
     if (ix < 0 || fx < 0.0f) {
         //This avoids rounding errors
-        setXf(fx + smw->ScreenWidth);
-        fOldX += smw->ScreenWidth;
+        setXf(fx + 640);
+        fOldX += 640;
         //printf("Flipped Left\n");
-    } else if (ix >= smw->ScreenWidth || fx >= smw->ScreenWidth) {
-        setXf(fx - smw->ScreenWidth);
-        fOldX -= smw->ScreenWidth;
+    } else if (ix >= 640 || fx >= 640) {
+        setXf(fx - 640);
+        fOldX -= 640;
         //printf("Flipped Right\n");
     }
 }
