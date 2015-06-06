@@ -122,12 +122,9 @@ const string convertPath(const string& source)
 			Initialize_Paths();
 		#endif
 
-		#ifndef _WIN32
-			SMW_Root_Data_Dir + "/";
-		#else
-			if (*myStr.rbegin() != '\\')
-				SMW_Root_Data_Dir + "\\";
-		#endif
+        size_t last_slash_pos = SMW_Root_Data_Dir.find_last_of("/");
+        if (last_slash_pos != SMW_Root_Data_Dir.length() - 1)
+            SMW_Root_Data_Dir += "/";
 
 		are_paths_initialized = true;
     }

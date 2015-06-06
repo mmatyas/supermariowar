@@ -237,7 +237,7 @@ extern CTilesetManager* g_tilesetmanager;
 
 extern CResourceManager* rm;
 extern CGame* smw;
-extern char *RootDataDirectory;
+extern std::string RootDataDirectory;
 
 gfxSprite		spr_hazard_fireball[3];
 gfxSprite		spr_hazard_rotodisc[3];
@@ -455,7 +455,7 @@ int main(int argc, char *argv[])
 	if (argc >= 2)
 		RootDataDirectory = argv[1];
 
-    smw = new CGame(RootDataDirectory);
+    smw = new CGame(RootDataDirectory.c_str());
     rm = new CResourceManager();
 
 	g_map = new CMap();

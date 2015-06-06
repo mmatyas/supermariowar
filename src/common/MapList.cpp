@@ -246,22 +246,15 @@ void MapList::add(const char * name)
 
 bool MapList::find(const char * name)
 {
-    char * szLookForName = lowercaseDup(name);
     bool fFound = false;
 
     std::map<std::string, MapListNode*>::iterator oldCurrent = current;
     do {
         next(false);	//sets us to the beginning if we hit the end -> loop through the maps
 
-        char * szCurrentName = lowercaseDup((*current).second->filename.c_str());
-
-        if (strstr(szCurrentName, szLookForName))	//compare names after
+        if (strstr((*current).second->filename.c_str(), name))	//compare names after
             fFound = true;
-
-        free(szCurrentName);
     } while (current != oldCurrent && !fFound);
-
-    free(szLookForName);
 
     return fFound;
 }

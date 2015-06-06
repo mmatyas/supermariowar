@@ -265,22 +265,15 @@ void SimpleFileList::add(const char * name)
 
 bool SimpleFileList::find(const char * name)
 {
-    char * szLookForName = lowercaseDup(name);
     bool fFound = false;
 
     int oldCurrent = currentIndex;
     do {
         next(); //sets us to the beginning if we hit the end -> loop through the maps
 
-        char * szCurrentName = lowercaseDup(filelist[currentIndex].c_str());
-
-        if (strstr(szCurrentName, szLookForName))   //compare names after
+        if (strCiCompare(filelist[currentIndex].c_str(), name))   //compare names after
             fFound = true;
-
-        free(szCurrentName);
     } while (currentIndex != oldCurrent && !fFound);
-
-    free(szLookForName);
 
     return fFound;
 }
