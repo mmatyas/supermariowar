@@ -87,9 +87,9 @@ To create installable packages, simply run `make packages`. This will create TGZ
 
 ### Windows
 
-On Windows, you can follow the Linux guide using environments like MinGW Shell/MSYS and Cygwin, or generate a project file with CMake for your IDE.
+If you're using MinGW Shell/MSYS or Cygwin environments, you can follow the Linux guide. You can also generate a project file with CMake for various IDEs, such as CodeBlocks, Eclipse or Viual Studio.
 
-Visual Studio:
+Visual Studio: (TODO: check this section)
 
 - make sure you have CMake in your PATH
 - go to Build directory and issue `cmake ..`
