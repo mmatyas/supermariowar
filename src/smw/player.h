@@ -164,6 +164,11 @@ class CPlayer
 		void SetSprite();
 		void Jump(short iMove, float jumpModifier, bool fKuriboBounce);
 
+		void update_waitingForRespawn();
+		void update_respawning();
+		void update_usePowerup();
+
+
 		void ClearPowerupStates();
 
     void setXf(float xf) {

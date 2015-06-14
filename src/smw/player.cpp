@@ -337,6 +337,546 @@ bool CPlayer::highJumped() {
     return (superjumptype != 3 || superjumptimer <= 0);
 }
 
+#if 0
+void reference_code() {
+    if (game_values.secrets)
+    {
+        for (short bossType = 0; bossType < 3; bossType++)
+        {
+            if (game_values.bosspeeking == bossType)
+            {
+                static const int boss_code[3][7] = { {2,1,4,8,16,16,32},
+                                                     {1,1,4,8,2,2,32},
+                                                     {4,8,4,8,16,16,0} };
+
+                static const int boss_code_length[3] = {7, 7, 6};
+
+                if (keymask & boss_code[bossType][boss_index[bossType]])
+                    boss_index[bossType]++;
+                else if (keymask & ~boss_code[bossType][boss_index[bossType]])
+                    boss_index[bossType] = 0;
+
+                if (boss_index[bossType] == boss_code_length[bossType])
+                {
+                    boss_index[bossType] = 0;
+                    EnterBossMode(bossType);
+                }
+            }
+            else
+            {
+                boss_index[bossType] = 0;
+            }
+        }
+
+        if (konamiIndex < 11)
+        {
+            static const int konami_code[11] = {1,1,2,2,4,8,4,8,48,48,48};
+
+            if (keymask & konami_code[konamiIndex])
+                konamiIndex++;
+            else if (keymask & ~konami_code[konamiIndex])
+                konamiIndex = 0;
+
+            extern int g_tanookiFlag;
+            if (konamiIndex == 11)
+            {
+                ifSoundOnPlay(rm->sfx_transform);
+                g_tanookiFlag++;
+            }
+        }
+
+        //Super kick shells and BTBs
+        if (keymask & 2)
+            superKickIndex++;
+        else if (keymask & ~2)
+            superKickIndex = 0;
+
+        int keymaskdown =
+            (playerKeys->game_jump.fDown?1:0) |
+            (playerKeys->game_down.fDown?2:0) |
+            (playerKeys->game_left.fDown?4:0) |
+            (playerKeys->game_right.fDown?8:0) |
+            (playerKeys->game_turbo.fDown?16:0) |
+            (playerKeys->game_powerup.fDown?32:0);
+
+        //Invincible Dash
+        if (invincible)
+        {
+            if (keymask & 4)
+                dashLeftIndex++;
+            else if (keymask & ~4)
+                dashLeftIndex = 0;
+
+            if (dashLeftIndex >= 3 && keymaskdown == 20)
+            {
+                dashLeftIndex = 0;
+                dashLeft = true;
+            }
+
+            if (keymaskdown != 20)
+                dashLeft = false;
+
+
+            if (keymask & 8)
+                dashRightIndex++;
+            else if (keymask & ~8)
+                dashRightIndex = 0;
+
+            if (dashRightIndex >= 3 && keymaskdown == 24)
+            {
+                dashRightIndex = 0;
+                dashRight = true;
+            }
+
+            if (keymaskdown != 24)
+                dashRight = false;
+        }
+        else
+        {
+            dashLeft = false;
+            dashRight = false;
+        }
+
+        //Keep this code -> good for items that destroy blocks on the map
+
+        //Active Super POW destroys and triggers blocks
+        if (super_pow && (game_values.screenshaketimer > 0 || powerupused == 9))
+        {
+            if (game_values.screenshaketimer > 0)
+            {
+                if (++super_pow_timer >= 60)
+                {
+                    game_values.screenshaketimer = 0;
+                    super_pow_timer = 0;
+                    super_pow = false;
+                }
+
+                if (keymask & 16)
+                {
+                    game_values.screenshaketimer += 10;
+
+                    IO_Block * block = (IO_Block*)noncolcontainer.getRandomObject();
+
+                    if (block)
+                        block->triggerBehavior();
+                }
+            }
+        }
+        else
+        {
+            super_pow = false;
+            super_pow_timer = 0;
+        }
+
+        //Active Super MOd Destroys and triggers blocks
+        if (super_mod && (game_values.screenshaketimer > 0 || powerupused == 16))
+        {
+            if (game_values.screenshaketimer > 0)
+            {
+                if (++super_mod_timer >= 60)
+                {
+                    game_values.screenshaketimer = 0;
+                    super_mod_timer = 0;
+                    super_mod = false;
+                }
+
+                if (keymask & 16)
+                {
+                    game_values.screenshaketimer += 10;
+
+                    IO_Block * block = (IO_Block*)noncolcontainer.getRandomObject();
+
+                    if (block)
+                        block->triggerBehavior();
+                }
+            }
+        }
+        else
+        {
+            super_mod = false;
+            super_mod_timer = 0;
+        }
+
+        //Super Pow
+        if (game_values.gamepowerups[globalID] == 9)
+        {
+            static const int super_pow_code[3] = {2, 2, 32};
+
+            if (keymask & super_pow_code[super_pow_index])
+                super_pow_index++;
+            else if (keymask & ~super_pow_code[super_pow_index])
+                super_pow_index = 0;
+
+            if (super_pow_index >= 3)
+            {
+                super_pow_index = 0;
+                ifSoundOnPlay(rm->sfx_transform);
+                super_pow = true;
+            }
+        }
+
+        //Super Mod
+        if (game_values.gamepowerups[globalID] == 16)
+        {
+            static const int super_mod_code[3] = {1, 1, 32};
+
+            if (keymask & super_mod_code[super_mod_index])
+                super_mod_index++;
+            else if (keymask & ~super_mod_code[super_mod_index])
+                super_mod_index = 0;
+
+            if (super_mod_index >= 3)
+            {
+                super_mod_index = 0;
+                ifSoundOnPlay(rm->sfx_transform);
+                super_mod = true;
+            }
+        }
+        if (game_values.gamemode->gamemode == game_mode_stomp && !game_values.redkoopas)
+        {
+            if (redKoopaIndex < 7)
+            {
+                static const int red_koopa_code[7] = {2,2,4,2,8,2,1};
+
+                if (keymask & red_koopa_code[redKoopaIndex])
+                    redKoopaIndex++;
+                else if (keymask & ~red_koopa_code[redKoopaIndex])
+                    redKoopaIndex = 0;
+
+                if (redKoopaIndex == 7)
+                {
+                    ifSoundOnPlay(rm->sfx_transform);
+                    game_values.redkoopas = true;
+                }
+            }
+        }
+
+        if (!game_values.redthrowblocks)
+        {
+            if (redThrowBlockIndex < 8)
+            {
+                static const int red_throw_block_code[8] = {1,2,1,2,8,4,1,2};
+
+                if (keymask & red_throw_block_code[redThrowBlockIndex])
+                    redThrowBlockIndex++;
+                else if (keymask & ~red_throw_block_code[redThrowBlockIndex])
+                    redThrowBlockIndex = 0;
+
+                if (redThrowBlockIndex == 8)
+                {
+                    ifSoundOnPlay(rm->sfx_transform);
+                    game_values.redthrowblocks = true;
+
+                    for (short iBlock = 0; iBlock < noncolcontainer.list_end; iBlock++)
+                    {
+                        if (((IO_Block*)noncolcontainer.list[iBlock])->getBlockType() == block_throw)
+                        {
+                            ((B_ThrowBlock*)noncolcontainer.list[iBlock])->SetType(true);
+                        }
+                    }
+                }
+            }
+        }
+
+
+        //Keep this code for later reference:
+        //It is good code to swap out blocks on the fly
+        if (!game_values.viewblocks)
+        {
+            if (viewBlockIndex < 7)
+            {
+                static const int view_block_code[7] = {8,2,4,2,1,1,1};
+
+                if (keymask & view_block_code[viewBlockIndex])
+                    viewBlockIndex++;
+                else if (keymask & ~view_block_code[viewBlockIndex])
+                    viewBlockIndex = 0;
+
+                if (viewBlockIndex == 7)
+                {
+                    ifSoundOnPlay(rm->sfx_transform);
+                    game_values.viewblocks = true;
+
+                    for (short iBlock = 0; iBlock < noncolcontainer.list_end; iBlock++)
+                    {
+                        IO_Block * block = (IO_Block*)noncolcontainer.list[iBlock];
+                        if (block->getBlockType() == block_powerup)
+                        {
+                            block->dead = true;
+                            B_ViewBlock * viewBlock = new B_ViewBlock(&rm->spr_viewblock, block->col << 5, block->row << 5);
+
+                            if (block->state != 0)
+                            {
+                                viewBlock->state = 3;
+                                viewBlock->timer = ((B_PowerupBlock*)block)->timer;
+                            }
+
+                            g_map->blockdata[block->col][block->row] = viewBlock;
+                            noncolcontainer.add(viewBlock);
+                        }
+                    }
+                }
+            }
+        }
+
+        if (secret_spring_index < 9)
+        {
+            static const int secret_spring_code[9] = {2,1,2,1,2,1,2,2,16};
+
+            if (keymask & secret_spring_code[secret_spring_index])
+                secret_spring_index++;
+            else if (keymask & ~secret_spring_code[secret_spring_index])
+                secret_spring_index = 0;
+
+            if (secret_spring_index == 9)
+            {
+                ifSoundOnPlay(rm->sfx_transform);
+                objectcontainer[1].add(new CO_Spring(&rm->spr_spring));
+            }
+        }
+
+        if (secret_spike_index < 6)
+        {
+            static const int secret_spike_code[6] = {16,2,4,8,1,16};
+
+            if (keymask & secret_spike_code[secret_spike_index])
+                secret_spike_index++;
+            else if (keymask & ~secret_spike_code[secret_spike_index])
+                secret_spike_index = 0;
+
+            if (secret_spike_index == 6)
+            {
+                ifSoundOnPlay(rm->sfx_transform);
+                objectcontainer[1].add(new CO_Spike(&rm->spr_spike));
+            }
+        }
+    }
+}
+#endif
+
+void CPlayer::update_waitingForRespawn()
+{
+    assert(state == player_wait);
+
+    //use 31 frames to do 0.5 second increments
+    if (*respawncounter > 0 && ++waittimer >= 31) {
+        waittimer = 0;
+        (*respawncounter)--;
+    }
+
+    if (*respawncounter <= 0) {
+        *respawncounter = 0;
+
+        if (FindSpawnPoint()) {
+            //Make sure spawn point isn't inside a tile
+            collisions.checksides(*this);
+
+            state = player_spawning;
+
+            if (game_values.spawnstyle == 0) {
+                eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
+            } else if (game_values.spawnstyle == 1) {
+                eyecandy[0].add(new EC_Door(&rm->spr_spawndoor, sprites[spr], ix + HALFPW - 16, iy + HALFPH - 16, 1, iSrcOffsetX, colorID));
+            }
+        }
+    }
+}
+
+void CPlayer::update_respawning()
+{
+    assert(isspawning());
+
+    if (game_values.spawnstyle == 0) {
+        state = player_ready;
+    } else if (game_values.spawnstyle == 1) {
+        //Wait for door eyecandy to open to let mario out (20 frames for door to appear and 16 frames to open)
+        if (++spawntimer > 36) {
+            spawntimer = 0;
+            state = player_ready;
+        }
+    } else if (game_values.spawnstyle == 2) {
+        if (++spawntimer >= 50) {
+            state = player_ready;
+        } else if (spawntimer % 2) {
+            short swirlindex = spawntimer >> 1;
+            short ixoffset = ix - PWOFFSET;
+            short iyoffset = iy - PHOFFSET;
+            short iColorIdOffset = colorID << 5;
+
+            for (short iSwirl = 0; iSwirl < 4; iSwirl++)
+                eyecandy[2].add(new EC_SingleAnimation(&rm->spr_spawnsmoke, ixoffset + g_iSwirlSpawnLocations[iSwirl][0][swirlindex], iyoffset + g_iSwirlSpawnLocations[iSwirl][1][swirlindex], 4, 4, 0, iColorIdOffset, 32, 32));
+        }
+    }
+}
+
+void CPlayer::update_usePowerup()
+{
+    assert(powerupused > -1);
+
+    powerupradius -= (float)game_values.storedpowerupdelay / 2.0f;
+    powerupangle += 0.05f;
+
+    if (powerupradius < 0.0f) {
+        switch (powerupused) {
+        case 1: {
+            game_values.gamemode->playerextraguy(*this, 1);
+            ifSoundOnPlay(rm->sfx_extraguysound);
+            break;
+        }
+        case 2: {
+            game_values.gamemode->playerextraguy(*this, 2);
+            ifSoundOnPlay(rm->sfx_extraguysound);
+            break;
+        }
+        case 3: {
+            game_values.gamemode->playerextraguy(*this, 3);
+            ifSoundOnPlay(rm->sfx_extraguysound);
+            break;
+        }
+        case 4: {
+            game_values.gamemode->playerextraguy(*this, 5);
+            ifSoundOnPlay(rm->sfx_extraguysound);
+            break;
+        }
+        case 5: {
+            powerup = -1;
+            SetPowerup(1);
+            break;
+        }
+        case 6: {
+            makeinvincible();
+            break;
+        }
+        case 7: {
+            turnslowdownon();
+
+            outofarenatimer = 0;
+            outofarenadisplaytimer = game_values.outofboundstime - 1;
+
+            break;
+        }
+        case 8: {
+            powerup = -1;
+            bobomb = false;
+            SetPowerup(0);
+            break;
+        }
+        case 9: {
+            ifSoundOnPlay(rm->sfx_thunder);
+            game_values.screenshaketimer = 20;
+            game_values.screenshakeplayerid = globalID;
+            game_values.screenshaketeamid = teamID;
+            game_values.screenshakekillinair = false;
+            game_values.screenshakekillscount = 0;
+            break;
+        }
+        case 10: {
+            game_values.bulletbilltimer[globalID] = 400;
+            game_values.bulletbillspawntimer[globalID] = 0;
+            break;
+        }
+        case 11: {
+            powerup = -1;
+            SetPowerup(2);
+            break;
+        }
+        case 12: {
+            CO_Shell * shell = new CO_Shell(0, 0, 0, true, true, true, false);
+            objectcontainer[1].add(shell);
+            shell->UsedAsStoredPowerup(this);
+            break;
+        }
+        case 13: {
+            CO_Shell * shell = new CO_Shell(1, 0, 0, false, true, true, false);
+            objectcontainer[1].add(shell);
+            shell->UsedAsStoredPowerup(this);
+            break;
+        }
+        case 14: {
+            CO_Shell * shell = new CO_Shell(2, 0, 0, false, false, true, true);
+            objectcontainer[1].add(shell);
+            shell->UsedAsStoredPowerup(this);
+            break;
+        }
+        case 15: {
+            CO_Shell * shell = new CO_Shell(3, 0, 0, false, true, false, false);
+            objectcontainer[1].add(shell);
+            shell->UsedAsStoredPowerup(this);
+            break;
+        }
+        case 16: {
+            ifSoundOnPlay(rm->sfx_thunder);
+            game_values.screenshaketimer = 20;
+            game_values.screenshakeplayerid = globalID;
+            game_values.screenshaketeamid = teamID;
+            game_values.screenshakekillinair = true;
+            break;
+        }
+        case 17: {
+            powerup = -1;
+            SetPowerup(3);
+            break;
+        }
+        case 18: {
+            SwapPlayers(localID);
+            break;
+        }
+        case 19: {
+            powerup = -1;
+            SetPowerup(4);
+            break;
+        }
+        case 20: { //tanooki
+            tanookisuit.onPickup();
+            break;
+        }
+        case 21: { //ice wand
+            powerup = -1;
+            SetPowerup(5);
+            break;
+        }
+        case 22: { //golden podobo
+            short numPodobos = RANDOM_INT(6) + 10;
+            for (short iPodobo = 0; iPodobo < numPodobos; iPodobo++) {
+                objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, (short)RANDOM_INT(smw->ScreenWidth * 0.95f), smw->ScreenHeight, -(float(RANDOM_INT(9)) / 2.0f) - 9.0f, globalID, teamID, colorID, false));
+            }
+            ifSoundOnPlay(rm->sfx_thunder);
+            break;
+        }
+        case 23: { //bombs
+            powerup = -1;
+            SetPowerup(6);
+            break;
+        }
+        case 24: { //leaf
+            powerup = -1;
+            SetPowerup(7);
+            break;
+        }
+        case 25: { //pwings
+            powerup = -1;
+            SetPowerup(8);
+            break;
+        }
+        case 26: { //jail key
+            if (jailtimer > 0) {
+                jailtimer = 0;
+                jail = -1;
+
+                eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
+                ifSoundOnPlay(rm->sfx_transform);
+            } else {
+                ifSoundOnPlay(rm->sfx_hit);
+            }
+
+            break;
+        }
+        }
+
+        powerupused = -1;
+    }
+}
+
 void CPlayer::move()
 {
     //Call the AI if cpu controlled
@@ -379,319 +919,9 @@ void CPlayer::move()
         ResetSuicideTime();
 
 #if	0
-    if (game_values.secrets)
-    {
-        for (short bossType = 0; bossType < 3; bossType++)
-    	{
-    		if (game_values.bosspeeking == bossType)
-    		{
-    			static const int boss_code[3][7] = { {2,1,4,8,16,16,32},
-    												 {1,1,4,8,2,2,32},
-    												 {4,8,4,8,16,16,0} };
-
-    			static const int boss_code_length[3] = {7, 7, 6};
-
-    			if (keymask & boss_code[bossType][boss_index[bossType]])
-    				boss_index[bossType]++;
-    			else if (keymask & ~boss_code[bossType][boss_index[bossType]])
-    				boss_index[bossType] = 0;
-
-    			if (boss_index[bossType] == boss_code_length[bossType])
-    			{
-    				boss_index[bossType] = 0;
-    				EnterBossMode(bossType);
-    			}
-    		}
-    		else
-    		{
-    			boss_index[bossType] = 0;
-    		}
-    	}
-
-    	if (konamiIndex < 11)
-    	{
-    		static const int konami_code[11] = {1,1,2,2,4,8,4,8,48,48,48};
-
-    		if (keymask & konami_code[konamiIndex])
-    			konamiIndex++;
-    		else if (keymask & ~konami_code[konamiIndex])
-    			konamiIndex = 0;
-
-    		extern int g_tanookiFlag;
-    		if (konamiIndex == 11)
-    		{
-    			ifSoundOnPlay(rm->sfx_transform);
-    			g_tanookiFlag++;
-    		}
-    	}
-
-    	//Super kick shells and BTBs
-    	if (keymask & 2)
-    		superKickIndex++;
-    	else if (keymask & ~2)
-    		superKickIndex = 0;
-
-    	int keymaskdown =
-    		(playerKeys->game_jump.fDown?1:0) |
-    		(playerKeys->game_down.fDown?2:0) |
-    		(playerKeys->game_left.fDown?4:0) |
-    		(playerKeys->game_right.fDown?8:0) |
-    		(playerKeys->game_turbo.fDown?16:0) |
-    		(playerKeys->game_powerup.fDown?32:0);
-
-    	//Invincible Dash
-    	if (invincible)
-    	{
-    		if (keymask & 4)
-    			dashLeftIndex++;
-    		else if (keymask & ~4)
-    			dashLeftIndex = 0;
-
-    		if (dashLeftIndex >= 3 && keymaskdown == 20)
-    		{
-    			dashLeftIndex = 0;
-    			dashLeft = true;
-    		}
-
-    		if (keymaskdown != 20)
-    			dashLeft = false;
-
-
-    		if (keymask & 8)
-    			dashRightIndex++;
-    		else if (keymask & ~8)
-    			dashRightIndex = 0;
-
-    		if (dashRightIndex >= 3 && keymaskdown == 24)
-    		{
-    			dashRightIndex = 0;
-    			dashRight = true;
-    		}
-
-    		if (keymaskdown != 24)
-    			dashRight = false;
-    	}
-    	else
-    	{
-    		dashLeft = false;
-    		dashRight = false;
-    	}
-
-    	//Keep this code -> good for items that destroy blocks on the map
-
-    	//Active Super POW destroys and triggers blocks
-    	if (super_pow && (game_values.screenshaketimer > 0 || powerupused == 9))
-    	{
-    		if (game_values.screenshaketimer > 0)
-    		{
-    			if (++super_pow_timer >= 60)
-    			{
-    				game_values.screenshaketimer = 0;
-    				super_pow_timer = 0;
-    				super_pow = false;
-    			}
-
-    			if (keymask & 16)
-    			{
-    				game_values.screenshaketimer += 10;
-
-    				IO_Block * block = (IO_Block*)noncolcontainer.getRandomObject();
-
-    				if (block)
-    					block->triggerBehavior();
-    			}
-    		}
-    	}
-    	else
-    	{
-    		super_pow = false;
-    		super_pow_timer = 0;
-    	}
-
-    	//Active Super MOd Destroys and triggers blocks
-    	if (super_mod && (game_values.screenshaketimer > 0 || powerupused == 16))
-    	{
-    		if (game_values.screenshaketimer > 0)
-    		{
-    			if (++super_mod_timer >= 60)
-    			{
-    				game_values.screenshaketimer = 0;
-    				super_mod_timer = 0;
-    				super_mod = false;
-    			}
-
-    			if (keymask & 16)
-    			{
-    				game_values.screenshaketimer += 10;
-
-    				IO_Block * block = (IO_Block*)noncolcontainer.getRandomObject();
-
-    				if (block)
-    					block->triggerBehavior();
-    			}
-    		}
-    	}
-    	else
-    	{
-    		super_mod = false;
-    		super_mod_timer = 0;
-    	}
-
-    	//Super Pow
-    	if (game_values.gamepowerups[globalID] == 9)
-    	{
-    		static const int super_pow_code[3] = {2, 2, 32};
-
-    		if (keymask & super_pow_code[super_pow_index])
-    			super_pow_index++;
-    		else if (keymask & ~super_pow_code[super_pow_index])
-    			super_pow_index = 0;
-
-    		if (super_pow_index >= 3)
-    		{
-    			super_pow_index = 0;
-    			ifSoundOnPlay(rm->sfx_transform);
-    			super_pow = true;
-    		}
-    	}
-
-    	//Super Mod
-    	if (game_values.gamepowerups[globalID] == 16)
-    	{
-    		static const int super_mod_code[3] = {1, 1, 32};
-
-    		if (keymask & super_mod_code[super_mod_index])
-    			super_mod_index++;
-    		else if (keymask & ~super_mod_code[super_mod_index])
-    			super_mod_index = 0;
-
-    		if (super_mod_index >= 3)
-    		{
-    			super_mod_index = 0;
-    			ifSoundOnPlay(rm->sfx_transform);
-    			super_mod = true;
-    		}
-    	}
-    	if (game_values.gamemode->gamemode == game_mode_stomp && !game_values.redkoopas)
-    	{
-    		if (redKoopaIndex < 7)
-    		{
-    			static const int red_koopa_code[7] = {2,2,4,2,8,2,1};
-
-    			if (keymask & red_koopa_code[redKoopaIndex])
-    				redKoopaIndex++;
-    			else if (keymask & ~red_koopa_code[redKoopaIndex])
-    				redKoopaIndex = 0;
-
-    			if (redKoopaIndex == 7)
-    			{
-    				ifSoundOnPlay(rm->sfx_transform);
-    				game_values.redkoopas = true;
-    			}
-    		}
-    	}
-
-    	if (!game_values.redthrowblocks)
-    	{
-    		if (redThrowBlockIndex < 8)
-    		{
-    			static const int red_throw_block_code[8] = {1,2,1,2,8,4,1,2};
-
-    			if (keymask & red_throw_block_code[redThrowBlockIndex])
-    				redThrowBlockIndex++;
-    			else if (keymask & ~red_throw_block_code[redThrowBlockIndex])
-    				redThrowBlockIndex = 0;
-
-    			if (redThrowBlockIndex == 8)
-    			{
-    				ifSoundOnPlay(rm->sfx_transform);
-    				game_values.redthrowblocks = true;
-
-                    for (short iBlock = 0; iBlock < noncolcontainer.list_end; iBlock++)
-    				{
-    					if (((IO_Block*)noncolcontainer.list[iBlock])->getBlockType() == block_throw)
-    					{
-    						((B_ThrowBlock*)noncolcontainer.list[iBlock])->SetType(true);
-    					}
-    				}
-    			}
-    		}
-    	}
-
-
-    	//Keep this code for later reference:
-    	//It is good code to swap out blocks on the fly
-    	if (!game_values.viewblocks)
-    	{
-    		if (viewBlockIndex < 7)
-    		{
-    			static const int view_block_code[7] = {8,2,4,2,1,1,1};
-
-    			if (keymask & view_block_code[viewBlockIndex])
-    				viewBlockIndex++;
-    			else if (keymask & ~view_block_code[viewBlockIndex])
-    				viewBlockIndex = 0;
-
-    			if (viewBlockIndex == 7)
-    			{
-    				ifSoundOnPlay(rm->sfx_transform);
-    				game_values.viewblocks = true;
-
-                    for (short iBlock = 0; iBlock < noncolcontainer.list_end; iBlock++)
-    				{
-    					IO_Block * block = (IO_Block*)noncolcontainer.list[iBlock];
-    					if (block->getBlockType() == block_powerup)
-    					{
-    						block->dead = true;
-    						B_ViewBlock * viewBlock = new B_ViewBlock(&rm->spr_viewblock, block->col << 5, block->row << 5);
-
-    						if (block->state != 0)
-    						{
-    							viewBlock->state = 3;
-    							viewBlock->timer = ((B_PowerupBlock*)block)->timer;
-    						}
-
-    						g_map->blockdata[block->col][block->row] = viewBlock;
-    						noncolcontainer.add(viewBlock);
-    					}
-    				}
-    			}
-    		}
-    	}
-
-    	if (secret_spring_index < 9)
-    	{
-    		static const int secret_spring_code[9] = {2,1,2,1,2,1,2,2,16};
-
-    		if (keymask & secret_spring_code[secret_spring_index])
-    			secret_spring_index++;
-    		else if (keymask & ~secret_spring_code[secret_spring_index])
-    			secret_spring_index = 0;
-
-    		if (secret_spring_index == 9)
-    		{
-    			ifSoundOnPlay(rm->sfx_transform);
-    			objectcontainer[1].add(new CO_Spring(&rm->spr_spring));
-    		}
-    	}
-
-    	if (secret_spike_index < 6)
-    	{
-    		static const int secret_spike_code[6] = {16,2,4,8,1,16};
-
-    		if (keymask & secret_spike_code[secret_spike_index])
-    			secret_spike_index++;
-    		else if (keymask & ~secret_spike_code[secret_spike_index])
-    			secret_spike_index = 0;
-
-    		if (secret_spike_index == 6)
-    		{
-    			ifSoundOnPlay(rm->sfx_transform);
-    			objectcontainer[1].add(new CO_Spike(&rm->spr_spike));
-    		}
-    	}
-    }
+    reference_code();
 #endif
+
     secretcode.update(*this, keymask);
     kuriboshoe.update(*this, keymask);
     cardcollection.update(*this, keymask);
@@ -741,219 +971,16 @@ void CPlayer::move()
 
     if (state != player_ready) {
         if (state == player_wait) {
-            //use 31 frames to do 0.5 second increments
-            if (*respawncounter > 0 && ++waittimer >= 31) {
-                waittimer = 0;
-                (*respawncounter)--;
-            }
-
-            if (*respawncounter <= 0) {
-                *respawncounter = 0;
-
-                if (FindSpawnPoint()) {
-                    //Make sure spawn point isn't inside a tile
-                    collisions.checksides(*this);
-
-                    state = player_spawning;
-
-                    if (game_values.spawnstyle == 0) {
-                        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
-                    } else if (game_values.spawnstyle == 1) {
-                        eyecandy[0].add(new EC_Door(&rm->spr_spawndoor, sprites[spr], ix + HALFPW - 16, iy + HALFPH - 16, 1, iSrcOffsetX, colorID));
-                    }
-                }
-            }
-
+            update_waitingForRespawn();
             return;
         }
 
-        if (state == player_spawning) {
-            if (game_values.spawnstyle == 0) {
-                state = player_ready;
-            } else if (game_values.spawnstyle == 1) {
-                //Wait for door eyecandy to open to let mario out (20 frames for door to appear and 16 frames to open)
-                if (++spawntimer > 36) {
-                    spawntimer = 0;
-                    state = player_ready;
-                }
-            } else if (game_values.spawnstyle == 2) {
-                if (++spawntimer >= 50) {
-                    state = player_ready;
-                } else if (spawntimer % 2) {
-                    short swirlindex = spawntimer >> 1;
-                    short ixoffset = ix - PWOFFSET;
-                    short iyoffset = iy - PHOFFSET;
-                    short iColorIdOffset = colorID << 5;
-
-                    for (short iSwirl = 0; iSwirl < 4; iSwirl++)
-                        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_spawnsmoke, ixoffset + g_iSwirlSpawnLocations[iSwirl][0][swirlindex], iyoffset + g_iSwirlSpawnLocations[iSwirl][1][swirlindex], 4, 4, 0, iColorIdOffset, 32, 32));
-                }
-            }
-        } else if (iswarping())
+        if (isspawning())
+            update_respawning();
+        else if (iswarping())
             warpstatus.update(*this);
     } else if (powerupused > -1) {
-        powerupradius -= (float)game_values.storedpowerupdelay / 2.0f;
-        powerupangle += 0.05f;
-
-        if (powerupradius < 0.0f) {
-            switch (powerupused) {
-            case 1: {
-                game_values.gamemode->playerextraguy(*this, 1);
-                ifSoundOnPlay(rm->sfx_extraguysound);
-                break;
-            }
-            case 2: {
-                game_values.gamemode->playerextraguy(*this, 2);
-                ifSoundOnPlay(rm->sfx_extraguysound);
-                break;
-            }
-            case 3: {
-                game_values.gamemode->playerextraguy(*this, 3);
-                ifSoundOnPlay(rm->sfx_extraguysound);
-                break;
-            }
-            case 4: {
-                game_values.gamemode->playerextraguy(*this, 5);
-                ifSoundOnPlay(rm->sfx_extraguysound);
-                break;
-            }
-            case 5: {
-                powerup = -1;
-                SetPowerup(1);
-                break;
-            }
-            case 6: {
-                makeinvincible();
-                break;
-            }
-            case 7: {
-                turnslowdownon();
-
-                outofarenatimer = 0;
-                outofarenadisplaytimer = game_values.outofboundstime - 1;
-
-                break;
-            }
-            case 8: {
-                powerup = -1;
-                bobomb = false;
-                SetPowerup(0);
-                break;
-            }
-            case 9: {
-                ifSoundOnPlay(rm->sfx_thunder);
-                game_values.screenshaketimer = 20;
-                game_values.screenshakeplayerid = globalID;
-                game_values.screenshaketeamid = teamID;
-                game_values.screenshakekillinair = false;
-                game_values.screenshakekillscount = 0;
-                break;
-            }
-            case 10: {
-                game_values.bulletbilltimer[globalID] = 400;
-                game_values.bulletbillspawntimer[globalID] = 0;
-                break;
-            }
-            case 11: {
-                powerup = -1;
-                SetPowerup(2);
-                break;
-            }
-            case 12: {
-                CO_Shell * shell = new CO_Shell(0, 0, 0, true, true, true, false);
-                objectcontainer[1].add(shell);
-                shell->UsedAsStoredPowerup(this);
-                break;
-            }
-            case 13: {
-                CO_Shell * shell = new CO_Shell(1, 0, 0, false, true, true, false);
-                objectcontainer[1].add(shell);
-                shell->UsedAsStoredPowerup(this);
-                break;
-            }
-            case 14: {
-                CO_Shell * shell = new CO_Shell(2, 0, 0, false, false, true, true);
-                objectcontainer[1].add(shell);
-                shell->UsedAsStoredPowerup(this);
-                break;
-            }
-            case 15: {
-                CO_Shell * shell = new CO_Shell(3, 0, 0, false, true, false, false);
-                objectcontainer[1].add(shell);
-                shell->UsedAsStoredPowerup(this);
-                break;
-            }
-            case 16: {
-                ifSoundOnPlay(rm->sfx_thunder);
-                game_values.screenshaketimer = 20;
-                game_values.screenshakeplayerid = globalID;
-                game_values.screenshaketeamid = teamID;
-                game_values.screenshakekillinair = true;
-                break;
-            }
-            case 17: {
-                powerup = -1;
-                SetPowerup(3);
-                break;
-            }
-            case 18: {
-                SwapPlayers(localID);
-                break;
-            }
-            case 19: {
-                powerup = -1;
-                SetPowerup(4);
-                break;
-            }
-            case 20: { //tanooki
-                tanookisuit.onPickup();
-                break;
-            }
-            case 21: { //ice wand
-                powerup = -1;
-                SetPowerup(5);
-                break;
-            }
-            case 22: { //golden podobo
-                short numPodobos = RANDOM_INT(6) + 10;
-                for (short iPodobo = 0; iPodobo < numPodobos; iPodobo++) {
-                    objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, (short)RANDOM_INT(smw->ScreenWidth * 0.95f), smw->ScreenHeight, -(float(RANDOM_INT(9)) / 2.0f) - 9.0f, globalID, teamID, colorID, false));
-                }
-                ifSoundOnPlay(rm->sfx_thunder);
-                break;
-            }
-            case 23: { //bombs
-                powerup = -1;
-                SetPowerup(6);
-                break;
-            }
-            case 24: { //leaf
-                powerup = -1;
-                SetPowerup(7);
-                break;
-            }
-            case 25: { //pwings
-                powerup = -1;
-                SetPowerup(8);
-                break;
-            }
-            case 26: { //jail key
-                if (jailtimer > 0) {
-                    jailtimer = 0;
-                    jail = -1;
-
-                    eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
-                    ifSoundOnPlay(rm->sfx_transform);
-                } else {
-                    ifSoundOnPlay(rm->sfx_hit);
-                }
-
-                break;
-            }
-            }
-
-            powerupused = -1;
-        }
+        update_usePowerup();
     }
 
     updateInvincibility(); // Animate invincibility
