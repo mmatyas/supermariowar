@@ -617,7 +617,7 @@ ExitDeathCheck:
                 }
             }
         } else if (iStoredPowerup == 26) { //jail key
-            if (pPlayer->jailtimer > 0)
+            if (pPlayer->jail.isActive())
                 playerKeys->game_powerup.fDown = true;
         }
     }
@@ -991,7 +991,7 @@ void CPlayerAI::GetNearestObjects()
 
         //Find players in jail on own team to tag
         if (game_values.gamemode->gamemode == game_mode_jail) {
-            if (list_players[iPlayer]->jailtimer > 0 && list_players[iPlayer]->teamID == iTeamID) {
+            if (list_players[iPlayer]->jail.isActive() && list_players[iPlayer]->teamID == iTeamID) {
                 DistanceToPlayer(list_players[iPlayer], &nearestObjects.teammate, &nearestObjects.teammatedistance, &nearestObjects.teammatewrap);
             }
         }

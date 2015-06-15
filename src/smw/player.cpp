@@ -123,10 +123,6 @@ CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamI
     ownerPlayerID = -1;
     ownerColorOffsetX = 0;
 
-    jail = -1;
-    jailcolor = 0;
-    jailtimer = 0;
-
     shyguy = false;
 
     spawntext = 20;  //set it to 20 so there is an immediate text spawned upon winning
@@ -212,7 +208,7 @@ void CPlayer::accelerateRight()
 
     float maxVel = 0.0f;
     if (!frozen) {
-        if ((game_values.slowdownon != -1 && game_values.slowdownon != teamID) || jailtimer > 0)
+        if ((game_values.slowdownon != -1 && game_values.slowdownon != teamID) || jail.isActive())
             maxVel = VELSLOWMOVING;
         else if (playerKeys->game_turbo.fDown)
             maxVel = VELTURBOMOVING + (game_values.gamemode->tagged == this ? TAGGEDBOOST : 0.0f);
@@ -258,7 +254,7 @@ void CPlayer::accelerateLeft()
 
     float maxVel = 0.0f;
     if (!frozen) {
-        if ((game_values.slowdownon != -1 && game_values.slowdownon != teamID) || jailtimer > 0)
+        if ((game_values.slowdownon != -1 && game_values.slowdownon != teamID) || jail.isActive())
             maxVel = -VELSLOWMOVING;
         else if (playerKeys->game_turbo.fDown)
             maxVel = -VELTURBOMOVING - (game_values.gamemode->tagged == this ? TAGGEDBOOST : 0.0f);
@@ -859,16 +855,7 @@ void CPlayer::update_usePowerup()
             break;
         }
         case 26: { //jail key
-            if (jailtimer > 0) {
-                jailtimer = 0;
-                jail = -1;
-
-                eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, ix + HALFPW - 24, iy + HALFPH - 24, 4, 5));
-                ifSoundOnPlay(rm->sfx_transform);
-            } else {
-                ifSoundOnPlay(rm->sfx_hit);
-            }
-
+            jail.escape(*this);
             break;
         }
         }
@@ -1304,14 +1291,7 @@ void CPlayer::move()
         }
 
         //Deal with release from jail timer
-        if (jailtimer > 0 && game_values.gamemodesettings.jail.timetofree > 1) {
-            if (--jailtimer <= 0) {
-                jailtimer = 0;
-                jail = -1;
-                eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
-                ifSoundOnPlay(rm->sfx_transform);
-            }
-        }
+        jail.update(*this);
     }
 
     SetSprite();
@@ -1546,7 +1526,7 @@ void CPlayer::Jump(short iMove, float jumpModifier, bool fKuriboBounce)
 {
     if (fKuriboBounce)
         vely = -VELKURIBOBOUNCE;
-    else if ((game_values.slowdownon != -1 && game_values.slowdownon != teamID) || jailtimer > 0)
+    else if ((game_values.slowdownon != -1 && game_values.slowdownon != teamID) || jail.isActive())
         vely = -VELSLOWJUMP * jumpModifier;
     else if (ABS(velx) > VELMOVING && iMove != 0 && playerKeys->game_turbo.fDown)
         vely = -VELTURBOJUMP * jumpModifier;
@@ -2048,12 +2028,7 @@ void CPlayer::draw()
             rm->spr_iceblock.draw(ix - PWOFFSET, iy - PHOFFSET, 0, 0, 32, 32);
     }
 
-    if (jailtimer > 0) {
-        if (state > player_ready) //warping
-            rm->spr_jail.draw(ix - PWOFFSET - 6, iy - PHOFFSET - 6, (jailcolor + 1) * 44, 0, 44, 44, (short)state % 4, GetWarpPlane());
-        else
-            rm->spr_jail.draw(ix - PWOFFSET - 6, iy - PHOFFSET - 6, (jailcolor + 1) * 44, 0, 44, 44);
-    }
+    jail.draw(*this);
 
     if (suicidetimer > game_values.suicidetime)
         drawsuicidetimer();

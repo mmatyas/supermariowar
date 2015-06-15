@@ -12,6 +12,7 @@
 #include "player_components/PlayerCape.h"
 #include "player_components/PlayerCardCollection.h"
 #include "player_components/PlayerCollisions.h"
+#include "player_components/PlayerJail.h"
 #include "player_components/PlayerKuriboShoe.h"
 #include "player_components/PlayerSecretCode.h"
 #include "player_components/PlayerSpinStatus.h"
@@ -331,9 +332,7 @@ class CPlayer
 		short ownerColorOffsetX;
 
 		//If greater than 0, the player is jailed and moves slowly for Jail mode
-		short jail;
-		short jailcolor;
-		short jailtimer;
+		PlayerJail jail;
 
 
 		bool fallthrough;
@@ -505,6 +504,7 @@ class CPlayer
 		friend class PlayerCollisions;
 		friend class PlayerCape;
 		friend class PlayerCardCollection;
+		friend class PlayerJail;
 		friend class PlayerKuriboShoe;
 		friend class PlayerTanookiSuit;
 		friend class PlayerSuperStomp;

@@ -410,17 +410,8 @@ void PlayerCollisions::handle_p2p(CPlayer* o1, CPlayer* o2)
     if (o1->teamID == o2->teamID) {
         //Free teammates that are jailed
         if (game_values.gamemode->gamemode == game_mode_jail && game_values.gamemodesettings.jail.tagfree) {
-            if (o1->jailtimer > 0) {
-                eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, o1->ix + HALFPW - 16, o1->iy + HALFPH - 16, 3, 8));
-                ifSoundOnPlay(rm->sfx_transform);
-                o1->jailtimer = 0;
-            }
-
-            if (o2->jailtimer > 0) {
-                eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, o2->ix + HALFPW - 16, o2->iy + HALFPH - 16, 3, 8));
-                ifSoundOnPlay(rm->sfx_transform);
-                o2->jailtimer = 0;
-            }
+            o1->jail.free_by_teammate(*o1);
+            o2->jail.free_by_teammate(*o2);
         }
 
         //Transfer tag if assist is on

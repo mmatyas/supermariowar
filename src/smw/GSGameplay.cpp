@@ -887,8 +887,8 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
                         player->GetScoreboardSprite()[iScoreboardSprite]->draw(iScoreOffsetX, iScoreOffsetY, player->iSrcOffsetX, 0, 32, 32);
 
                         //Display jail if player is jailed
-                        if (player->jailtimer > 0)
-                            rm->spr_jail.draw(iScoreOffsetX - 6, iScoreOffsetY - 6, (player->jailcolor + 1) * 44, 0, 44, 44);
+                        if (player->jail.isActive())
+                            rm->spr_jail.draw(iScoreOffsetX - 6, iScoreOffsetY - 6, (player->jail.getColor() + 1) * 44, 0, 44, 44);
 
                         //Display current powerup if player is using one
                         if (player->powerup > 0)
