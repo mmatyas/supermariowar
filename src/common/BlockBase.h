@@ -1,12 +1,8 @@
 #ifndef BLOCK_BASE_H
 #define BLOCK_BASE_H
 
-#include "gfx.h"
 #include "BlockTypes.h"
 #include "ObjectBase.h"
-
-class CPlayer;
-class IO_MovingObject;
 
 class IO_Block : public CObject
 {
