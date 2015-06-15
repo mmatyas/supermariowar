@@ -877,6 +877,35 @@ void CPlayer::update_usePowerup()
     }
 }
 
+void CPlayer::update_spriteColor()
+{
+    iSrcOffsetX = 0;
+
+    bool fColorChosen = false;
+    if (invincible) {
+        iSrcOffsetX = animationstate;
+        fColorChosen = true;
+    } else {
+        if (game_values.gamemode->gamemode == game_mode_star) {
+            CGM_Star * starmode = (CGM_Star*) game_values.gamemode;
+            short starmodetype = starmode->getcurrentmodetype();
+            if (starmodetype != 2 && starmode->isplayerstar(this)) {
+                iSrcOffsetX = starmodetype ? 224 : 192;
+                fColorChosen = true;
+            }
+        }
+    }
+
+    if (!fColorChosen) {
+        if (game_values.gamemode->tagged == this)
+            iSrcOffsetX = 160;
+        else if (frozen)
+            iSrcOffsetX = 256;
+        else if (shield > 0)
+            iSrcOffsetX = 128;
+    }
+}
+
 void CPlayer::move()
 {
     //Call the AI if cpu controlled
@@ -939,31 +968,7 @@ void CPlayer::move()
         }
     }
 
-    iSrcOffsetX = 0;
-
-    bool fColorChosen = false;
-    if (invincible) {
-        iSrcOffsetX = animationstate;
-        fColorChosen = true;
-    } else {
-        if (game_values.gamemode->gamemode == game_mode_star) {
-            CGM_Star * starmode = (CGM_Star*) game_values.gamemode;
-            short starmodetype = starmode->getcurrentmodetype();
-            if (starmodetype != 2 && starmode->isplayerstar(this)) {
-                iSrcOffsetX = starmodetype ? 224 : 192;
-                fColorChosen = true;
-            }
-        }
-    }
-
-    if (!fColorChosen) {
-        if (game_values.gamemode->tagged == this)
-            iSrcOffsetX = 160;
-        else if (frozen)
-            iSrcOffsetX = 256;
-        else if (shield > 0)
-            iSrcOffsetX = 128;
-    }
+    update_spriteColor();
 
     if (state != player_ready) {
         if (state == player_wait) {

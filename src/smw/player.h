@@ -168,6 +168,7 @@ class CPlayer
 		void update_waitingForRespawn();
 		void update_respawning();
 		void update_usePowerup();
+		void update_spriteColor();
 
 
 		void ClearPowerupStates();
