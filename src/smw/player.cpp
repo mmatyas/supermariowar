@@ -995,7 +995,7 @@ void CPlayer::move()
         if (shieldtimer > 0 && --shieldtimer == 0)
             shield = 0;
 
-        short lrn = 0;	//move left-right-no: -1.. left 0 no 1 ... right
+        short movement_direction = 0;	//move left-right-no: -1.. left 0 no 1 ... right
 
         //Used for bouncing off of note blocks
         if (superjumptimer > 0)
@@ -1005,10 +1005,10 @@ void CPlayer::move()
             //Determine move direction pressed
             if (tanookisuit.notStatue() && !superstomp.isStomping()) {
                 if (playerKeys->game_right.fDown)
-                    lrn++;
+                    movement_direction = 1;
 
                 if (playerKeys->game_left.fDown)
-                    lrn--;
+                    movement_direction = -1;
             }
 
             //jump pressed?
@@ -1061,14 +1061,14 @@ void CPlayer::move()
                             lockfall = true;
                             fallthrough = true;
                         } else {
-                            Jump(lrn, 1.0f, false);
+                            Jump(movement_direction, 1.0f, false);
                             ifSoundOnPlay(rm->sfx_jump);
                         }
 
                         lockjump = true;
                     } else if (superjumptimer > 0) {
                         if (superjumptype == 3) { //Kuribo's Shoe Jump
-                            Jump(lrn, 1.0f, false);
+                            Jump(movement_direction, 1.0f, false);
                             ifSoundOnPlay(rm->sfx_jump);
                         }
                         if (superjumptype == 2) {
@@ -1087,7 +1087,7 @@ void CPlayer::move()
                         if (extrajumps < game_values.featherjumps) {
                             if (game_values.featherlimit == 0 || projectilelimit > 0) {
                                 if (extrajumps < game_values.featherjumps) {
-                                    Jump(lrn, 0.8f, false);
+                                    Jump(movement_direction, 0.8f, false);
                                     ifSoundOnPlay(rm->sfx_capejump);
                                     lockjump = true;
                                 }
@@ -1235,9 +1235,9 @@ void CPlayer::move()
             }
         }
 
-        if (lrn == 1) {
+        if (movement_direction == 1) {
             accelerateRight();
-        } else if (lrn == -1) {
+        } else if (movement_direction == -1) {
             accelerateLeft();
         } else {
             decreaseVelocity();
