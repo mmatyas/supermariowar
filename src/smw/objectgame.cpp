@@ -8730,8 +8730,8 @@ void MysteryMushroomTempPlayer::SetPlayer(CPlayer * player, short iPowerup)
     //bobomb = player->bobomb;
     //powerup = player->powerup;
 
-    burnupstarttimer = player->burnupstarttimer;
-    burnuptimer = player->burnuptimer;
+    burnupstarttimer = player->burnup.starttimer;
+    burnuptimer = player->burnup.timer;
 
     inair = player->inair;
     onice = player->onice;
@@ -8767,8 +8767,8 @@ void MysteryMushroomTempPlayer::GetPlayer(CPlayer * player, short * iPowerup)
     //player->bobomb = bobomb;
     //player->powerup = powerup;
 
-    player->burnupstarttimer = burnupstarttimer;
-    player->burnuptimer = burnuptimer;
+    player->burnup.starttimer = burnupstarttimer;
+    player->burnup.timer = burnuptimer;
 
     player->inair = inair;
     player->onice = onice;

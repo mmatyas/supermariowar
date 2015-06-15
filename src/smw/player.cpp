@@ -1267,24 +1267,7 @@ void CPlayer::move()
     //Player can be killed by map so only do this code if he is still living
     if (state == player_ready) {
         //Deal with terminal burnup velocity
-        if (vely >= MAXVELY) {
-            if (!invincible && shield == 0) {
-                if (++burnupstarttimer >= 20) {
-                    if (burnupstarttimer == 20)
-                        ifSoundOnPlay(rm->sfx_burnup);
-
-                    if (++burnuptimer > 80) {
-                        if (player_kill_nonkill != KillPlayerMapHazard(true, kill_style_environment, false))
-                            return;
-                    } else {
-                        eyecandy[0].add(new EC_SingleAnimation(&rm->spr_burnup, ix + HALFPW - 16, iy + HALFPH - 16, 5, 4));
-                    }
-                }
-            }
-        } else {
-            burnuptimer = 0;
-            burnupstarttimer = 0;
-        }
+        burnup.update(*this);
 
         //Kill the player if he is standing still for too long
         if (game_values.gamemode->gameover || game_values.singleplayermode >= 0)
@@ -1713,9 +1696,6 @@ void CPlayer::SetupNewPlayer()
     fallthrough = false;
     diedas = 0;
     iSrcOffsetX = 0;
-
-    burnuptimer = 0;
-    burnupstarttimer = 0;
 
     outofarenatimer = 0;
     outofarenadisplaytimer = game_values.outofboundstime - 1;

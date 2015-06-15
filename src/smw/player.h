@@ -8,6 +8,7 @@
 #include "PlayerKillStyles.h"
 
 #include "player_components/PlayerAwardEffects.h"
+#include "player_components/PlayerBurnupTimer.h"
 #include "player_components/PlayerCape.h"
 #include "player_components/PlayerCardCollection.h"
 #include "player_components/PlayerCollisions.h"
@@ -280,9 +281,7 @@ class CPlayer
 		PlayerCardCollection cardcollection;
 
 		PlayerSuperStomp superstomp;
-
-		short burnuptimer;
-		short burnupstarttimer;
+		PlayerBurnupTimer burnup;
 
 		short outofarenatimer;
 		short outofarenadisplaytimer;
@@ -501,6 +500,7 @@ class CPlayer
 		friend class GameplayState;
 
 		friend class PlayerAwardEffects;
+		friend class PlayerBurnupTimer;
 		friend class PlayerCollisions;
 		friend class PlayerCape;
 		friend class PlayerCardCollection;
