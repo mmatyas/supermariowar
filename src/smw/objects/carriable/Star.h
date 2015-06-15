@@ -1,5 +1,10 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_CO_Star_H
-#define SMW_GAMEOBJECT_BLOCK_CO_Star_H
+#ifndef SMW_GAMEOBJECT_CO_STAR_H
+#define SMW_GAMEOBJECT_CO_STAR_H
+
+#include "objects/moving/CarriedObject.h"
+
+class CPlayer;
+class gfxSprite;
 
 class CO_Star : public MO_CarriedObject
 {
@@ -13,12 +18,12 @@ class CO_Star : public MO_CarriedObject
 
 		void placeStar();
 
-    short getType() {
-        return iType;
-    }
-    void setPlayerColor(short iColor) {
-        iOffsetY = 64 + (iColor << 5);
-    }
+		short getType() {
+			return iType;
+		}
+		void setPlayerColor(short iColor) {
+			iOffsetY = 64 + (iColor << 5);
+		}
 
 	private:
 		short timer;
@@ -31,5 +36,4 @@ class CO_Star : public MO_CarriedObject
 	friend class CGM_Star;
 };
 
-//Declaring class for use in MO_FlagBase (some compilers complain if this isn't here)
-#endif // SMW_GAMEOBJECT_BLOCK_CO_Star_H
+#endif // SMW_GAMEOBJECT_CO_STAR_H

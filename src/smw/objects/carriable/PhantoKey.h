@@ -1,5 +1,10 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_CO_PhantoKey_H
-#define SMW_GAMEOBJECT_BLOCK_CO_PhantoKey_H
+#ifndef SMW_GAMEOBJECT_CO_PHANTOKEY_H
+#define SMW_GAMEOBJECT_CO_PHANTOKEY_H
+
+#include "objects/moving/CarriedObject.h"
+
+class CPlayer;
+class gfxSprite;
 
 class CO_PhantoKey : public MO_CarriedObject
 {
@@ -23,4 +28,4 @@ class CO_PhantoKey : public MO_CarriedObject
 };
 
 
-#endif // SMW_GAMEOBJECT_BLOCK_CO_PhantoKey_H
+#endif // SMW_GAMEOBJECT_CO_PHANTOKEY_H

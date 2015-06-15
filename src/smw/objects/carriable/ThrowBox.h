@@ -1,5 +1,11 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_CO_ThrowBox_H
-#define SMW_GAMEOBJECT_BLOCK_CO_ThrowBox_H
+#ifndef SMW_GAMEOBJECT_CO_THROWBOX_H
+#define SMW_GAMEOBJECT_CO_THROWBOX_H
+
+#include "objects/moving/CarriedObject.h"
+
+class CPlayer;
+class gfxSprite;
+class Spotlight;
 
 class CO_ThrowBox : public MO_CarriedObject
 {
@@ -52,4 +58,4 @@ class CO_ThrowBox : public MO_CarriedObject
 		friend void shakeScreen();
 };
 
-#endif // SMW_GAMEOBJECT_BLOCK_CO_ThrowBox_H
+#endif // SMW_GAMEOBJECT_CO_THROWBOX_H

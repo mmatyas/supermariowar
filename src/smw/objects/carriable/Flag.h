@@ -1,5 +1,11 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_CO_Flag_H
-#define SMW_GAMEOBJECT_BLOCK_CO_Flag_H
+#ifndef SMW_GAMEOBJECT_CO_FLAG_H
+#define SMW_GAMEOBJECT_CO_FLAG_H
+
+#include "objects/moving/CarriedObject.h"
+
+class CPlayer;
+class gfxSprite;
+class MO_FlagBase;
 
 class CO_Flag : public MO_CarriedObject
 {
@@ -16,12 +22,8 @@ class CO_Flag : public MO_CarriedObject
 		void placeFlag();
 		void Drop();
 
-    bool GetInBase() {
-        return fInBase;
-    }
-    short GetTeamID() {
-        return teamID;
-    }
+		bool GetInBase() { return fInBase; }
+		short GetTeamID() { return teamID; }
 
 	private:
 		short timer;
@@ -38,4 +40,4 @@ class CO_Flag : public MO_CarriedObject
 	friend class MO_FlagBase;
 };
 
-#endif // SMW_GAMEOBJECT_BLOCK_CO_Flag_H
+#endif // SMW_GAMEOBJECT_CO_FLAG_H

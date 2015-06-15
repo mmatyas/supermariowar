@@ -1,5 +1,10 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_CO_Egg_H
-#define SMW_GAMEOBJECT_BLOCK_CO_Egg_H
+#ifndef SMW_GAMEOBJECT_CO_EGG_H
+#define SMW_GAMEOBJECT_CO_EGG_H
+
+#include "objects/moving/CarriedObject.h"
+
+class CPlayer;
+class gfxSprite;
 
 class CO_Egg : public MO_CarriedObject
 {
@@ -14,9 +19,7 @@ class CO_Egg : public MO_CarriedObject
 		void placeEgg();
 		void Drop();
 
-    short getColor() {
-        return color;
-    }
+		short getColor() { return color; }
 
 	private:
 		short relocatetimer;
@@ -37,4 +40,4 @@ class CO_Egg : public MO_CarriedObject
 	friend class CGM_Eggs;
 };
 
-#endif // SMW_GAMEOBJECT_BLOCK_CO_Egg_H
+#endif // SMW_GAMEOBJECT_CO_EGG_H

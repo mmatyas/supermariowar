@@ -1,5 +1,11 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_CO_Bomb_H
-#define SMW_GAMEOBJECT_BLOCK_CO_Bomb_H
+#ifndef SMW_GAMEOBJECT_CO_BOMB_H
+#define SMW_GAMEOBJECT_CO_BOMB_H
+
+#include "objects/moving/CarriedObject.h"
+
+class CPlayer;
+class gfxSprite;
+class Spotlight;
 
 class CO_Bomb : public MO_CarriedObject
 {
@@ -26,4 +32,4 @@ class CO_Bomb : public MO_CarriedObject
 };
 
 
-#endif // SMW_GAMEOBJECT_BLOCK_CO_Bomb_H
+#endif // SMW_GAMEOBJECT_CO_BOMB_H

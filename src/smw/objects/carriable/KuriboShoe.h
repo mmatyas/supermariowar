@@ -1,5 +1,7 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_CO_KuriboShoe_H
-#define SMW_GAMEOBJECT_BLOCK_CO_KuriboShoe_H
+#ifndef SMW_GAMEOBJECT_CO_KURIBOSHOE_H
+#define SMW_GAMEOBJECT_CO_KURIBOSHOE_H
+
+#include "Spring.h"
 
 class CO_KuriboShoe : public CO_Spring
 {
@@ -8,10 +10,9 @@ class CO_KuriboShoe : public CO_Spring
 		~CO_KuriboShoe(){};
 
 	private:
-
 		void hittop(CPlayer * player);
 
 		bool fSticky;
 };
 
-#endif // SMW_GAMEOBJECT_BLOCK_CO_KuriboShoe_H
+#endif // SMW_GAMEOBJECT_CO_KURIBOSHOE_H

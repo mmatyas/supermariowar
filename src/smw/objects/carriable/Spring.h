@@ -1,5 +1,10 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_CO_Spring_H
-#define SMW_GAMEOBJECT_BLOCK_CO_Spring_H
+#ifndef SMW_GAMEOBJECT_CO_SPRING_H
+#define SMW_GAMEOBJECT_CO_SPRING_H
+
+#include "objects/moving/CarriedObject.h"
+
+class CPlayer;
+class gfxSprite;
 
 class CO_Spring : public MO_CarriedObject
 {
@@ -24,4 +29,4 @@ class CO_Spring : public MO_CarriedObject
 	friend class CPlayer;
 };
 
-#endif // SMW_GAMEOBJECT_BLOCK_CO_Spring_H
+#endif // SMW_GAMEOBJECT_CO_SPRING_H

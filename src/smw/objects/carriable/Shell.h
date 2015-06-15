@@ -1,5 +1,11 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_CO_Shell_H
-#define SMW_GAMEOBJECT_BLOCK_CO_Shell_H
+#ifndef SMW_GAMEOBJECT_CO_SHELL_H
+#define SMW_GAMEOBJECT_CO_SHELL_H
+
+#include "objects/moving/CarriedObject.h"
+
+class CPlayer;
+class gfxSprite;
+class Spotlight;
 
 class CO_Shell : public MO_CarriedObject
 {
@@ -28,9 +34,9 @@ class CO_Shell : public MO_CarriedObject
 		void SideBounce(bool fRightSide);
 		void AddMovingKill(CPlayer * killer);
 
-    bool IsThreat() {
-        return state == 1 || state == 3;
-    }
+		bool IsThreat() {
+			return state == 1 || state == 3;
+		}
 
 		void Flip();
 
@@ -86,4 +92,4 @@ class CO_Shell : public MO_CarriedObject
 		friend void shakeScreen();
 };
 
-#endif // SMW_GAMEOBJECT_BLOCK_CO_Shell_H
+#endif // SMW_GAMEOBJECT_CO_SHELL_H
