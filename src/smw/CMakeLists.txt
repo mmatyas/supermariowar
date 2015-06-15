@@ -1,5 +1,5 @@
 set(SMW_SRCS ai.cpp gamemodes.cpp GSMenu.cpp
-           object.cpp player.cpp world.cpp uicustomcontrol.cpp
+           player.cpp world.cpp uicustomcontrol.cpp
            objectgame.cpp objecthazard.cpp
            net.cpp FPSLimiter.cpp GSSplashScreen.cpp
            GSGameplay.cpp ObjectContainer.cpp main.cpp
@@ -9,8 +9,13 @@ set(SMW_SRCS ai.cpp gamemodes.cpp GSMenu.cpp
 # Game objects
 #
 LIST(APPEND SMW_SRCS
+	objects/blocks/IO_Block.cpp
 	objects/blocks/PowerupBlock.cpp
 	objects/blocks/BreakableBlock.cpp
+
+	objects/moving/MovingObject.cpp
+
+	objects/overmap/OverMapObject.cpp
 )
 
 #

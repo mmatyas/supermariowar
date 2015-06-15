@@ -3,7 +3,8 @@ set (WORLDEDIT_SRCS worldeditor.cpp)
 add_executable (smw-worldedit
 	../common/movingplatform.cpp
 	../smw/world.cpp
-	../smw/object.cpp
+	../smw/objects/moving/MovingObject.cpp
+	../smw/objects/overmap/OverMapObject.cpp
     ../smw/ObjectContainer.cpp
     ../smw/objecthazard.cpp
 	../smw/menu/ModeOptionsMenu.cpp
