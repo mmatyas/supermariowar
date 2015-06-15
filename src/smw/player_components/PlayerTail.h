@@ -11,12 +11,9 @@ enum PlayerTailState {
     TAIL_SPIN_AND_SHAKE = 2
 };
 
-struct PlayerTail
+class PlayerTail
 {
-    int8_t iTailTimer;
-    uint16_t iTailFrame;
-    PlayerTailState iTailState;
-
+public:
     void reset();
     void shake(CPlayer& player);
     void spin(CPlayer& player);
@@ -26,6 +23,11 @@ struct PlayerTail
 
     bool isInUse();
     void draw(CPlayer& player);
+
+private:
+    int8_t iTailTimer;
+    uint16_t iTailFrame;
+    PlayerTailState iTailState;
 };
 
 #endif // PLAYER_TAIL

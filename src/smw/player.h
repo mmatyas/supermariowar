@@ -508,10 +508,10 @@ class CPlayer
 		friend class PlayerKuriboShoe;
 		friend class PlayerTanookiSuit;
 		friend class PlayerSuperStomp;
-		friend struct PlayerSpinStatus;
-		friend struct PlayerTail;
+		friend class PlayerSpinStatus;
+		friend class PlayerTail;
 		friend class PlayerWarpStatus;
-		friend struct PlayerWings;
+		friend class PlayerWings;
 };
 
 #endif // PLAYER_H

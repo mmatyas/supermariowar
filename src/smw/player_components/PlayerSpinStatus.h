@@ -5,11 +5,9 @@
 
 class CPlayer;
 
-struct PlayerSpinStatus
+class PlayerSpinStatus
 {
-    int8_t timer;
-    uint8_t state;
-
+public:
     void reset();
     void update(CPlayer& player);
     void spin(CPlayer& player);
@@ -19,6 +17,10 @@ struct PlayerSpinStatus
 
     uint8_t toSpriteID();
     uint8_t toCapeFrameX();
+
+private:
+    int8_t timer;
+    uint8_t state;
 };
 
 #endif // PLAYER_SPIN_STATUS
