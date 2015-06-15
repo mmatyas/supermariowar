@@ -1,11 +1,16 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_MO_Coin_H
-#define SMW_GAMEOBJECT_BLOCK_MO_Coin_H
+#ifndef SMW_GAMEOBJECT_MO_COIN_H
+#define SMW_GAMEOBJECT_MO_COIN_H
+
+#include "MovingObject.h"
+
+class gfxSprite;
+class CPlayer;
 
 class MO_Coin : public IO_MovingObject
 {
 	public:
 		MO_Coin(gfxSprite *nspr, float velx, float vely, short ix, short iy, short color, short team, short type, short uncollectabletime, bool placecoin);
-		~MO_Coin(){};
+		~MO_Coin() {};
 
 		void update();
 		void draw();
@@ -22,4 +27,4 @@ class MO_Coin : public IO_MovingObject
 		short iUncollectableTime;
 };
 
-#endif // SMW_GAMEOBJECT_BLOCK_MO_Coin_H
+#endif // SMW_GAMEOBJECT_MO_COIN_H
