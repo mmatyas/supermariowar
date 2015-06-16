@@ -17,7 +17,7 @@ void PlayerSecretCode::reset() {
     index = 0;
 }
 
-void PlayerSecretCode::update(CPlayer &player, const uint8_t keymask) {
+void PlayerSecretCode::update(CPlayer& player, const uint8_t keymask) {
     if (!player.isready())
         return;
 

@@ -38,37 +38,37 @@ void PlayerWarpStatus::update(CPlayer& player) {
     player.fOldY = player.fy;
     player.fOldX = player.fx;
 
-    switch(player.state) {
+    switch (player.state) {
         case player_entering_warp_left:
-            player.setXi(player.ix - 1);
+            player.setXi(player.leftX() - 1);
             increasewarpcounter(player, PW + PWOFFSET);
             break;
         case player_entering_warp_right:
-            player.setXi(player.ix + 1);
+            player.setXi(player.leftX() + 1);
             increasewarpcounter(player, PW + PWOFFSET);
             break;
         case player_entering_warp_up:
-            player.setYi(player.iy - 1);
+            player.setYi(player.topY() - 1);
             increasewarpcounter(player, TILESIZE - PHOFFSET);
             break;
         case player_entering_warp_down:
-            player.setYi(player.iy + 1);
+            player.setYi(player.topY() + 1);
             increasewarpcounter(player, PH + PHOFFSET);
             break;
         case player_exiting_warp_left:
-            player.setXi(player.ix - 1);
+            player.setXi(player.leftX() - 1);
             decreasewarpcounter(player);
             break;
         case player_exiting_warp_right:
-            player.setXi(player.ix + 1);
+            player.setXi(player.leftX() + 1);
             decreasewarpcounter(player);
             break;
         case player_exiting_warp_up:
-            player.setYi(player.iy - 1);
+            player.setYi(player.topY() - 1);
             decreasewarpcounter(player);
             break;
         case player_exiting_warp_down:
-            player.setYi(player.iy + 1);
+            player.setYi(player.topY() + 1);
             decreasewarpcounter(player);
             break;
         default:
@@ -85,25 +85,25 @@ void PlayerWarpStatus::enterWarp(CPlayer& player, Warp* warp)
             player.state = player_entering_warp_down;
             player.vely = 0.0f;
             player.velx = 0.0f;
-            warpplane = player.iy + PH + 1;
+            warpplane = player.bottomY() + 1;
             break;
         case WARP_LEFT:
             player.state = player_entering_warp_left;
             player.vely = 0.0f;
             player.velx = -1.0f;
-            warpplane = player.ix;
+            warpplane = player.leftX();
             break;
         case WARP_UP:
             player.state = player_entering_warp_up;
             player.vely = 0.0f;
             player.velx = 0.0f;
-            warpplane = player.iy;
+            warpplane = player.topY();
             break;
         case WARP_RIGHT:
             player.state = player_entering_warp_right;
             player.vely = 0.0f;
             player.velx = 1.0f;
-            warpplane = player.ix + PW + 1;
+            warpplane = player.rightX() + 1;
             break;
     }
     player.oldvelx = player.velx;
@@ -136,8 +136,8 @@ void PlayerWarpStatus::chooseWarpExit(CPlayer& player)
     player.ClearPowerupStates();
 
     //Trigger block that we warp into
-    short iCol = player.ix / TILESIZE;
-    short iRow = player.iy / TILESIZE;
+    short iCol = player.leftX() / TILESIZE;
+    short iRow = player.topY() / TILESIZE;
     IO_Block* block = NULL;
 
     assert(exit->direction != WARP_EXIT_UNDEFINED);

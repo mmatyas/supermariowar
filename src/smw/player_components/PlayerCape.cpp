@@ -35,7 +35,7 @@ void PlayerCape::spin(CPlayer &player)
 
     player.spin.spin(player);
 
-    objectcontainer[1].add(new MO_SpinAttack(player.globalID, player.teamID,  kill_style_feather, player.IsPlayerFacingRight(), 24));
+    objectcontainer[1].add(new MO_SpinAttack(player.getGlobalID(), player.getTeamID(),  kill_style_feather, player.IsPlayerFacingRight(), 24));
 }
 
 void PlayerCape::draw(CPlayer &player)
@@ -88,13 +88,13 @@ void PlayerCape::draw(CPlayer &player)
 
     if (player.iswarping())
         rm->spr_cape.draw(
-            player.ix - PWOFFSET + (fPlayerFacingRight ? - 18 : 18), player.iy - PHOFFSET + 4 + iCapeYOffset,
+            player.leftX() - PWOFFSET + (fPlayerFacingRight ? - 18 : 18), player.topY() - PHOFFSET + 4 + iCapeYOffset,
             (fPlayerFacingRight ? 128 : 0) + iCapeFrameX, iCapeFrameY,
             32, 32,
             (short)player.state %4, player.GetWarpPlane());
     else
         rm->spr_cape.draw(
-            player.ix - PWOFFSET + (fPlayerFacingRight ? - 18 : 18), player.iy - PHOFFSET + 4 + iCapeYOffset,
+            player.leftX() - PWOFFSET + (fPlayerFacingRight ? - 18 : 18), player.topY() - PHOFFSET + 4 + iCapeYOffset,
             (fPlayerFacingRight ? 128 : 0) + iCapeFrameX, iCapeFrameY,
             32, 32);
 }

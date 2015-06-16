@@ -48,15 +48,15 @@ void PlayerAwardEffects::drawRingAward(CPlayer& player)
     short numawards = (player.killsinrow > MAXAWARDS ? MAXAWARDS : player.killsinrow);
     float addangle = TWO_PI / (float)numawards;
 
-    short xoffset = player.ix + HALFPW - 8;
-    short yoffset = player.iy + HALFPH - 8;
+    short xoffset = player.centerX() - 8;
+    short yoffset = player.centerY() - 8;
 
     for (short k = 0; k < numawards; k++) {
         float angle = (float)k * addangle + awardangle;
         short awardx = xoffset + (short)(30.0f * cos(angle));
         short awardy = yoffset + (short)(30.0f * sin(angle));
 
-        if (player.state > player_ready) //warping
+        if (player.iswarping())
             rm->spr_award.draw(awardx, awardy, awards[k] * 16, 0, 16, 16, (short)player.state % 4, player.GetWarpPlane());
         else
             rm->spr_award.draw(awardx, awardy, awards[k] * 16, 0, 16, 16);
@@ -78,8 +78,8 @@ void PlayerAwardEffects::addExploding(CPlayer& player)
         float cosangle = cos(angle);
         float sinangle = sin(angle);
 
-        short awardx = player.ix + HALFPW - 8 + (short)(30.0f * cosangle);
-        short awardy = player.iy + HALFPH - 8 + (short)(30.0f * sinangle);
+        short awardx = player.centerX() - 8 + (short)(30.0f * cosangle);
+        short awardy = player.centerY() - 8 + (short)(30.0f * sinangle);
 
         float awardvelx = 7.0f * cosangle;
         float awardvely = 7.0f * sinangle;
@@ -102,9 +102,9 @@ void PlayerAwardEffects::addSwirling(CPlayer& player)
         float angle = (float)k * addangle + awardangle;
 
         if (numawards == MAXAWARDS)
-            eyecandy[2].add(new EC_SwirlingAward(&rm->spr_awardkillsinrow, player.ix + HALFPW - 8, player.iy + HALFPH - 8, angle, 30.0f, 0.05f, 60, 10, player.colorID, 16, 16, 4, 4));
+            eyecandy[2].add(new EC_SwirlingAward(&rm->spr_awardkillsinrow, player.centerX() - 8, player.centerY() - 8, angle, 30.0f, 0.05f, 60, 10, player.getColorID(), 16, 16, 4, 4));
         else
-            eyecandy[2].add(new EC_SwirlingAward(&rm->spr_awardkillsinrow, player.ix + HALFPW - 8, player.iy + HALFPH - 8, angle, 30.0f, 0.05f, 60, numawards - 1, player.colorID, 16, 16));
+            eyecandy[2].add(new EC_SwirlingAward(&rm->spr_awardkillsinrow, player.centerX() - 8, player.centerY() - 8, angle, 30.0f, 0.05f, 60, numawards - 1, player.getColorID(), 16, 16));
     }
 }
 
@@ -126,9 +126,9 @@ void PlayerAwardEffects::addRocket(CPlayer& player)
         float awardvely = 9.0f * sin(angle);
 
         if (numawards == MAXAWARDS)
-            eyecandy[2].add(new EC_RocketAward(&rm->spr_awardkillsinrow, player.ix + HALFPW - 8, player.iy + HALFPH - 8, awardvelx, awardvely, 80, 10, player.colorID, 16, 16, 4, 4));
+            eyecandy[2].add(new EC_RocketAward(&rm->spr_awardkillsinrow, player.centerX() - 8, player.centerY() - 8, awardvelx, awardvely, 80, 10, player.getColorID(), 16, 16, 4, 4));
         else
-            eyecandy[2].add(new EC_RocketAward(&rm->spr_awardkillsinrow, player.ix + HALFPW - 8, player.iy + HALFPH - 8, awardvelx, awardvely, 80, numawards - 1, player.colorID, 16, 16));
+            eyecandy[2].add(new EC_RocketAward(&rm->spr_awardkillsinrow, player.centerX() - 8, player.centerY() - 8, awardvelx, awardvely, 80, numawards - 1, player.getColorID(), 16, 16));
     }
 }
 
@@ -139,7 +139,7 @@ void PlayerAwardEffects::addDeathAward(CPlayer& player)
     else if (game_values.awardstyle == award_style_souls && player.killsinrow >= MINAWARDSNEEDED)
         eyecandy[2].add(new EC_SoulsAward(&rm->spr_awardsouls,
             &rm->spr_awardsoulspawn,
-            player.ix + HALFPW, player.iy + HALFPH,
+            player.centerX(), player.centerY(),
             60, 9.0f,
             player.killsinrow, awards));
 
@@ -204,7 +204,7 @@ void PlayerAwardEffects::addKillerAward(CPlayer& killer, CPlayer* killed, killst
             killer.awardeffects.awards[(killer.killsinrow - 1) % MAXAWARDS] = (short)style;
         else if (game_values.awardstyle == award_style_souls) {
             if (killed)
-                killer.awardeffects.awards[(killer.killsinrow - 1) % MAXAWARDS] = killed->colorID;
+                killer.awardeffects.awards[(killer.killsinrow - 1) % MAXAWARDS] = killed->getColorID();
             else if (style == kill_style_goomba)
                 killer.awardeffects.awards[(killer.killsinrow - 1) % MAXAWARDS] = 4; //soul id for goomba
             else if (style == kill_style_bulletbill)
@@ -232,7 +232,7 @@ void PlayerAwardEffects::addKillerAward(CPlayer& killer, CPlayer* killed, killst
                 sprintf(text, "%d - %s", killer.killsinrow, awardtexts[awardIndex].name);
 
                 //now add the eyecandy
-                eyecandy[2].add(new EC_GravText(awardtexts[awardIndex].font, killer.ix + HALFPW, killer.iy+PH, text, -VELJUMP));
+                eyecandy[2].add(new EC_GravText(awardtexts[awardIndex].font, killer.centerX(), killer.bottomY(), text, -VELJUMP));
             }
 
             //if we stopped the other players run show another award
@@ -241,7 +241,7 @@ void PlayerAwardEffects::addKillerAward(CPlayer& killer, CPlayer* killed, killst
                 char text[128];
                 sprintf(text, "%s Stopped!",  awardtexts[a].name);
 
-                eyecandy[2].add(new EC_GravText(awardtexts[a].font, killed->ix + HALFPW, killed->iy+PH, text, -VELJUMP*1.3f));
+                eyecandy[2].add(new EC_GravText(awardtexts[a].font, killed->centerX(), killed->bottomY(), text, -VELJUMP*1.3f));
             }
         }
     }
@@ -256,13 +256,15 @@ void PlayerAwardEffects::addKillsInRowInAirAward(CPlayer& player)
         float awardvely = vel * sin(angle);
 
         eyecandy[2].add(new EC_FallingObject(&rm->spr_bonus,
-            player.ix + HALFPW - 8, player.iy + HALFPH - 8,
+            player.centerX() - 8,
+            player.centerY() - 8,
             awardvelx, awardvely,
-            4, 2, 0, player.colorID * 16, 16, 16));
+            4, 2, 0,
+            player.getColorID() * 16, 16, 16));
         angle -= (float)PI / 14;
     }
 
     //Track to unlock secret
-    game_values.unlocksecret1part1[player.globalID] = true;
+    game_values.unlocksecret1part1[player.getGlobalID()] = true;
     CheckSecret(0);
 }

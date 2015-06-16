@@ -16,24 +16,24 @@ extern CResourceManager* rm;
 
 bool PlayerCollisions::checktop(CPlayer& player)
 {
-    if (player.iy < 0.0f)
+    if (player.topY() < 0.0f)
         return false;
 
-    short tile_y = player.iy / TILESIZE;
+    short tile_y = player.topY() / TILESIZE;
 
     if (tile_y < 0 || tile_y >= MAPHEIGHT)
         return false;
 
-    short tile_x_left = player.ix / TILESIZE;
+    short tile_x_left = player.leftX() / TILESIZE;
 
     if (tile_x_left < 0 || tile_x_left >= MAPWIDTH)
         return false;
 
     short tile_x_right = -1;
-    if (player.ix + PW >= 640)
-        tile_x_right = (player.ix + PW - 640) / TILESIZE;
+    if (player.rightX() >= 640)
+        tile_x_right = (player.rightX() - 640) / TILESIZE;
     else
-        tile_x_right = (player.ix + PW) / TILESIZE;
+        tile_x_right = player.rightX() / TILESIZE;
 
     if (tile_x_right < 0 || tile_x_right >= MAPWIDTH)
         return false;
@@ -106,10 +106,10 @@ bool PlayerCollisions::checkright(CPlayer& player)
 
     short tile_x = -1;
 
-    if (player.ix + PW >= 640)
-        tile_x = (player.ix + PW - 640) / TILESIZE;
+    if (player.rightX() >= 640)
+        tile_x = (player.rightX() - 640) / TILESIZE;
     else
-        tile_x = (player.ix + PW) / TILESIZE;
+        tile_x = player.rightX() / TILESIZE;
 
     if (tile_x < 0 || tile_x >= MAPWIDTH)
         return false;
@@ -135,18 +135,18 @@ void PlayerCollisions::checksides(CPlayer& player)
     //First figure out where the corners of this object are touching
     Uint8 iCase = 0;
 
-    short tile_x_left = player.ix >> 5;
+    short tile_x_left = player.leftX() >> 5;
 
     short tile_x_right = -1;
-    if (player.ix + PW >= 640)
-        tile_x_right = (player.ix + PW - 640) >> 5;
+    if (player.rightX() >= 640)
+        tile_x_right = (player.rightX() - 640) >> 5;
     else
-        tile_x_right = (player.ix + PW) >> 5;
+        tile_x_right = player.rightX() >> 5;
 
-    short tile_y = player.iy >> 5;
-    short tile_y2 = (player.iy + PH) >> 5;
+    short tile_y = player.topY() >> 5;
+    short tile_y2 = player.bottomY() >> 5;
 
-    if (player.iy >= 0) {
+    if (player.topY() >= 0) {
         if (tile_y < MAPHEIGHT) {
             if (tile_x_left >= 0 && tile_x_left < MAPWIDTH) {
                 IO_Block * block = g_map->block(tile_x_left, tile_y);
@@ -167,7 +167,8 @@ void PlayerCollisions::checksides(CPlayer& player)
 
     }
 
-    if (player.iy + PW >= 0.0f) {
+    // TODO: is this correct?
+    if (player.topY() + PW >= 0.0f) {
         if (tile_y2 < MAPHEIGHT) {
             if (tile_x_left >= 0 && tile_x_left < MAPWIDTH) {
                 IO_Block * block = g_map->block(tile_x_left, tile_y2);
@@ -198,7 +199,7 @@ void PlayerCollisions::checksides(CPlayer& player)
         //[X][ ]
         //[ ][ ]
     case 1: {
-        if (player.ix + (PW >> 1) > (tile_x_left << 5) + TILESIZE) {
+        if (player.leftX() + (PW >> 1) > (tile_x_left << 5) + TILESIZE) {
             player.setXf((float)((tile_x_left << 5) + TILESIZE) + 0.2f);
             player.flipsidesifneeded();
         } else {
@@ -211,7 +212,7 @@ void PlayerCollisions::checksides(CPlayer& player)
     //[ ][X]
     //[ ][ ]
     case 2: {
-        if (player.ix + (PW >> 1) < (tile_x_right << 5)) {
+        if (player.leftX() + (PW >> 1) < (tile_x_right << 5)) {
             player.setXf((float)((tile_x_right << 5) - PW) - 0.2f);
             player.flipsidesifneeded();
         } else {
@@ -231,7 +232,7 @@ void PlayerCollisions::checksides(CPlayer& player)
     //[ ][ ]
     //[X][ ]
     case 4: {
-        if (player.ix + (PW >> 1) > (tile_x_left << 5) + TILESIZE) {
+        if (player.leftX() + (PW >> 1) > (tile_x_left << 5) + TILESIZE) {
             player.setXf((float)((tile_x_left << 5) + TILESIZE) + 0.2f);
             player.flipsidesifneeded();
         } else {
@@ -252,7 +253,7 @@ void PlayerCollisions::checksides(CPlayer& player)
     //[ ][X]
     //[X][ ]
     case 6: {
-        if (player.ix + (PW >> 1) > (tile_x_left << 5) + TILESIZE) {
+        if (player.leftX() + (PW >> 1) > (tile_x_left << 5) + TILESIZE) {
             player.setYf((float)((tile_y << 5) + TILESIZE) + 0.2f);
             player.setXf((float)((tile_x_left << 5) + TILESIZE) + 0.2f);
             player.flipsidesifneeded();
@@ -277,7 +278,7 @@ void PlayerCollisions::checksides(CPlayer& player)
     //[ ][ ]
     //[ ][X]
     case 8: {
-        if (player.ix + (PW >> 1) < (tile_x_right << 5)) {
+        if (player.leftX() + (PW >> 1) < (tile_x_right << 5)) {
             player.setXf((float)((tile_x_right << 5) - PW) - 0.2f);
             player.flipsidesifneeded();
         } else {
@@ -290,7 +291,7 @@ void PlayerCollisions::checksides(CPlayer& player)
     //[X][ ]
     //[ ][X]
     case 9: {
-        if (player.ix + (PW >> 1) > (tile_x_left << 5) + TILESIZE) {
+        if (player.leftX() + (PW >> 1) > (tile_x_left << 5) + TILESIZE) {
             player.setYf((float)((tile_y2 << 5) - PH) - 0.2f);
             player.setXf((float)((tile_x_left << 5) + TILESIZE) + 0.2f);
             player.flipsidesifneeded();
@@ -360,7 +361,7 @@ void PlayerCollisions::checksides(CPlayer& player)
 
 bool PlayerCollisions::is_stomping(CPlayer& player, CPlayer& other)
 {
-    if (player.fOldY + PH <= other.fOldY && player.iy + PH >= other.iy) {
+    if (player.fOldY + PH <= other.fOldY && player.bottomY() >= other.topY()) {
         //don't reposition if player is warping when he kills the other player
         if (player.isready()) {
             player.setYi(other.iy - PH);      //set new position to top of other player

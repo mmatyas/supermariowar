@@ -42,7 +42,7 @@ void PlayerTail::spin(CPlayer& player)
 
     player.spin.spin(player);
 
-    objectcontainer[1].add(new MO_SpinAttack(player.globalID, player.teamID, kill_style_leaf, player.IsPlayerFacingRight(), 13));
+    objectcontainer[1].add(new MO_SpinAttack(player.getGlobalID(), player.getTeamID(), kill_style_leaf, player.IsPlayerFacingRight(), 13));
 }
 
 //If player is shaking tail, slow decent
@@ -113,16 +113,16 @@ void PlayerTail::draw(CPlayer& player) {
         }
 
         if (player.iswarping())
-            rm->spr_tail.draw(player.ix + (fPlayerFacingRight ? - 18 : 18),
-                player.iy + 6,
+            rm->spr_tail.draw(player.leftX() + (fPlayerFacingRight ? - 18 : 18),
+                player.topY() + 6,
                 iTailFrame,
                 (fPlayerFacingRight ? 0 : 26) + iOffsetY,
                 22,
                 26,
                 (short)player.state %4, player.GetWarpPlane());
         else
-            rm->spr_tail.draw(player.ix + (fPlayerFacingRight ? - 18 : 18),
-                player.iy + 6,
+            rm->spr_tail.draw(player.leftX() + (fPlayerFacingRight ? - 18 : 18),
+                player.topY() + 6,
                 iTailFrame,
                 (fPlayerFacingRight ? 0 : 26) + iOffsetY,
                 22, 26);

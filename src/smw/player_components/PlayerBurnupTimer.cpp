@@ -19,18 +19,17 @@ PlayerBurnupTimer::PlayerBurnupTimer()
 void PlayerBurnupTimer::update(CPlayer& player)
 {
     if (player.vely >= MAXVELY) {
-        if (!player.invincible && player.shield == 0) {
+        if (!player.isInvincible() && !player.isShielded()) {
             if (++starttimer >= 20) {
                 if (starttimer == 20)
                     ifSoundOnPlay(rm->sfx_burnup);
 
-                if (++timer > 80) {
-                    if (player_kill_nonkill != player.KillPlayerMapHazard(true, kill_style_environment, false))
-                        return;
-                } else {
+                if (++timer > 80)
+                    player.KillPlayerMapHazard(true, kill_style_environment, false);
+                else {
                     eyecandy[0].add(new EC_SingleAnimation(&rm->spr_burnup,
-                        player.ix + HALFPW - 16,
-                        player.iy + HALFPH - 16,
+                        player.centerX() - 16,
+                        player.centerY() - 16,
                         5, 4));
                 }
             }

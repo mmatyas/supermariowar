@@ -11,7 +11,7 @@ void PlayerCardCollection::reset() {
     index = 0;
 }
 
-void PlayerCardCollection::update(CPlayer &player, const uint8_t keymask)
+void PlayerCardCollection::update(CPlayer& player, const uint8_t keymask)
 {
     if (game_values.gamemode->gamemode == game_mode_collection) {
         if (index > 0) {

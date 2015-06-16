@@ -56,7 +56,7 @@ void PlayerTanookiSuit::update(CPlayer &player)
         statue_timer = 123;
 
         // perform tansformation effects
-        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, player.ix + HALFPW - 24, player.iy + HALFPH - 24, 4, 5));
+        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, player.centerX() - 24, player.centerY() - 24, 4, 5));
         ifSoundOnPlay(rm->sfx_transform);
 
         // Neutralize lateral velocity
@@ -99,7 +99,7 @@ void PlayerTanookiSuit::update(CPlayer &player)
                 player.vely = -8.0;
 
             // perform transformation effects
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, player.ix + HALFPW - 24, player.iy + HALFPH - 24, 4, 5));
+            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, player.centerX() - 24, player.centerY() - 24, 4, 5));
             ifSoundOnPlay(rm->sfx_transform);
 
             //Decrease the amount of tanooki uses, if feature is turned on

@@ -70,7 +70,7 @@ void PlayerKuriboShoe::update_gettingOutOfTheShoe(CPlayer &player, uint8_t keyma
             CO_KuriboShoe * shoe = new CO_KuriboShoe(&rm->spr_kuriboshoe, player.ix - PWOFFSET, player.iy - PHOFFSET - 2, type == STICKY);
             shoe->collision_detection_checksides();
             objectcontainer[1].add(shoe);
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, player.ix + HALFPW - 16, player.iy + HALFPH - 16, 3, 8));
+            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, player.centerX() - 16, player.centerY() - 16, 3, 8));
 
             exitIndex = 0;
             exitTimer = 0;
@@ -106,15 +106,15 @@ void PlayerKuriboShoe::update_animation()
 void PlayerKuriboShoe::draw(CPlayer &player)
 {
     if (type > 0) {
-        if (player.state > player_ready) //warping
+        if (player.iswarping())
             rm->spr_kuriboshoe.draw(
-                player.ix - PWOFFSET, player.iy - PHOFFSET,
+                player.leftX() - PWOFFSET, player.topY() - PHOFFSET,
                 animationFrame + (type == STICKY ? 64 : 0), (player.spr & 0x1) == 0 ? 0 : 32,
                 32, 32,
                 (short)player.state % 4, player.GetWarpPlane());
         else
             rm->spr_kuriboshoe.draw(
-                player.ix - PWOFFSET, player.iy - PHOFFSET,
+                player.leftX() - PWOFFSET, player.topY() - PHOFFSET,
                 animationFrame + (type == STICKY ? 64 : 0), (player.spr & 0x1) == 0 ? 0 : 32,
                 32, 32);
     }

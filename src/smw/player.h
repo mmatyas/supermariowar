@@ -84,6 +84,16 @@ class CPlayer
 		void mapcollisions();
 		void cpu_think();
 
+        short leftX() { return ix; }
+        short rightX() { return ix + PW; }
+        short centerX() { return ix + HALFPW; }
+        short topY() { return iy; }
+        short bottomY() { return iy + PH; }
+        short centerY() { return iy + HALFPH; }
+
+        bool isInvincible() { return invincible; }
+        bool isShielded() { return shield; }
+
 		bool collidesWith(CPlayer*);
 		bool collidesWith(CObject*);
 
@@ -175,22 +185,22 @@ class CPlayer
 
 		void ClearPowerupStates();
 
-    void setXf(float xf) {
-        fx = xf;
-        ix = (short)fx;
-    }
-    void setXi(short xi) {
-        ix = xi;
-        fx = (float)ix;
-    }
-    void setYf(float yf) {
-        fy = yf;
-        iy = (short)fy;
-    }
-    void setYi(short yi) {
-        iy = yi;
-        fy = (float)iy;
-    }
+        void setXf(float xf) {
+            fx = xf;
+            ix = (short)fx;
+        }
+        void setXi(short xi) {
+            ix = xi;
+            fx = (float)ix;
+        }
+        void setYf(float yf) {
+            fy = yf;
+            iy = (short)fy;
+        }
+        void setYi(short yi) {
+            iy = yi;
+            fy = (float)iy;
+        }
 
 		bool FindSpawnPoint();
 		void collision_detection_map();
@@ -502,7 +512,6 @@ class CPlayer
 		friend class PlayerBurnupTimer;
 		friend class PlayerCollisions;
 		friend class PlayerCape;
-		friend class PlayerCardCollection;
 		friend class PlayerJail;
 		friend class PlayerKuriboShoe;
 		friend class PlayerTanookiSuit;

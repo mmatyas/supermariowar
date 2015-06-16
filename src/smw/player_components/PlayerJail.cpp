@@ -51,8 +51,8 @@ void PlayerJail::escape(CPlayer& player)
         owner_teamID = -1;
 
         eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof,
-            player.ix + HALFPW - 24,
-            player.iy + HALFPH - 24,
+            player.centerX() - 24,
+            player.centerY() - 24,
             4, 5));
         ifSoundOnPlay(rm->sfx_transform);
     } else {
@@ -65,8 +65,8 @@ void PlayerJail::free_by_teammate(CPlayer& player)
     if (isActive()) {
         timer = 0;
         eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion,
-            player.ix + HALFPW - 16,
-            player.iy + HALFPH - 16,
+            player.centerX() - 16,
+            player.centerY() - 16,
             3, 8));
         ifSoundOnPlay(rm->sfx_transform);
     }
@@ -79,8 +79,8 @@ void PlayerJail::update(CPlayer& player)
             timer = 0;
             owner_teamID = -1;
             eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion,
-                player.ix + HALFPW - 16,
-                player.iy + HALFPH - 16,
+                player.centerX() - 16,
+                player.centerY() - 16,
                 3, 8));
             ifSoundOnPlay(rm->sfx_transform);
         }
@@ -92,15 +92,15 @@ void PlayerJail::draw(CPlayer& player)
     if (isActive()) {
         if (player.iswarping())
             rm->spr_jail.draw(
-                player.ix - PWOFFSET - 6,
-                player.iy - PHOFFSET - 6,
+                player.leftX() - PWOFFSET - 6,
+                player.topY() - PHOFFSET - 6,
                 (color + 1) * 44,
                 0, 44, 44,
                 (short)player.state % 4, player.GetWarpPlane());
         else
             rm->spr_jail.draw(
-                player.ix - PWOFFSET - 6,
-                player.iy - PHOFFSET - 6,
+                player.leftX() - PWOFFSET - 6,
+                player.topY() - PHOFFSET - 6,
                 (color + 1) * 44,
                 0, 44, 44);
     }

@@ -1257,6 +1257,8 @@ void CPlayer::move()
     if (state == player_ready) {
         //Deal with terminal burnup velocity
         burnup.update(*this);
+        if (isdead())
+            return;
 
         //Kill the player if he is standing still for too long
         if (game_values.gamemode->gameover || game_values.singleplayermode >= 0)
@@ -1275,6 +1277,8 @@ void CPlayer::move()
 
         //Deal with out of arena timer
         outofarena.update(*this);
+        if (isdead())
+            return;
 
         //Deal with release from jail timer
         jail.update(*this);

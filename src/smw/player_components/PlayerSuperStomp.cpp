@@ -43,12 +43,12 @@ void PlayerSuperStomp::update_onGroundHit(CPlayer &player)
     //If they were super stomping and they are not in the air anymore (i.e. on the ground), then create the
     //super stomp attack zone, play the sound and show the stomp gfx
     if (is_stomping) {
-        eyecandy[2].add(new EC_SuperStompExplosion(&rm->spr_superstomp, player.ix + HALFPW, player.iy + PH, 4));
+        eyecandy[2].add(new EC_SuperStompExplosion(&rm->spr_superstomp, player.centerX(), player.centerY(), 4));
         ifSoundOnPlay(rm->sfx_bobombsound);
         is_stomping = false;
 
-        objectcontainer[1].add(new MO_AttackZone(player.globalID, player.teamID, player.ix - 32, player.iy + 10, 32, 15, 8, kill_style_kuriboshoe, false));
-        objectcontainer[1].add(new MO_AttackZone(player.globalID, player.teamID, player.ix + PW, player.iy + 10, 32, 15, 8, kill_style_kuriboshoe, false));
+        objectcontainer[1].add(new MO_AttackZone(player.getGlobalID(), player.getTeamID(), player.leftX() - 32, player.topY() + 10, 32, 15, 8, kill_style_kuriboshoe, false));
+        objectcontainer[1].add(new MO_AttackZone(player.getGlobalID(), player.getTeamID(), player.rightX(), player.topY() + 10, 32, 15, 8, kill_style_kuriboshoe, false));
     }
 }
 
