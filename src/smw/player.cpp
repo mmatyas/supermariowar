@@ -1013,26 +1013,23 @@ void CPlayer::move()
                         bool fFellThrough = false;
                         if (playerKeys->game_down.fDown) {
                             //Check to see what the player is standing on
-
-                            short txl = ix / TILESIZE;
-                            short txr;
-
                             fPrecalculatedY = fy + vely;
+                            short under_tile_y = ((short)fPrecalculatedY + PH) / TILESIZE;
 
-                            short ty = ((short)fPrecalculatedY + PH) / TILESIZE;
+                            short left_tile_x = ix / TILESIZE;
+                            if (left_tile_x < 0)
+                                left_tile_x += MAPWIDTH;
+                            else if (left_tile_x >= MAPWIDTH)
+                                left_tile_x -= MAPWIDTH;
 
-                            if (txl < 0)
-                                txl += 20;
-                            else if (txl > 19)
-                                txl -= 20;
-
-                            if (ix + PW >= smw->ScreenWidth)
-                                txr = (ix + PW - smw->ScreenWidth) / TILESIZE;
+                            short right_tile_x;
+                            if (rightX() >= smw->ScreenWidth)
+                                right_tile_x = (rightX() - smw->ScreenWidth) / TILESIZE;
                             else
-                                txr = (ix + PW) / TILESIZE;
+                                right_tile_x = rightX() / TILESIZE;
 
-                            int lefttile = g_map->map(txl, ty);
-                            int righttile = g_map->map(txr, ty);
+                            int lefttile = g_map->map(left_tile_x, under_tile_y);
+                            int righttile = g_map->map(right_tile_x, under_tile_y);
 
                             if (((lefttile & tile_flag_solid_on_top) && (righttile & tile_flag_solid_on_top || righttile == tile_flag_nonsolid || righttile == tile_flag_gap)) ||
                                     ((righttile & tile_flag_solid_on_top) && (lefttile & tile_flag_solid_on_top || lefttile == tile_flag_nonsolid || lefttile == tile_flag_gap))) {
