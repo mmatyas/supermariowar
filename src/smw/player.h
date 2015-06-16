@@ -181,6 +181,7 @@ class CPlayer
 		void update_usePowerup();
 		void update_spriteColor();
 
+		void tryFallingThroughPlatform();
 
 		void ClearPowerupStates();
 

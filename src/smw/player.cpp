@@ -890,6 +890,57 @@ void CPlayer::update_spriteColor()
     }
 }
 
+void CPlayer::tryFallingThroughPlatform()
+{
+    //only if on the ground and the jump key was released somewhen after it was pressed the last time
+    bool fFellThrough = false;
+    if (playerKeys->game_down.fDown) {
+        //Check to see what the player is standing on
+        fPrecalculatedY = fy + vely;
+        short under_tile_y = ((short)fPrecalculatedY + PH) / TILESIZE;
+
+        short left_tile_x = ix / TILESIZE;
+        if (left_tile_x < 0)
+            left_tile_x += MAPWIDTH;
+        else if (left_tile_x >= MAPWIDTH)
+            left_tile_x -= MAPWIDTH;
+
+        short right_tile_x;
+        if (rightX() >= smw->ScreenWidth)
+            right_tile_x = (rightX() - smw->ScreenWidth) / TILESIZE;
+        else
+            right_tile_x = rightX() / TILESIZE;
+
+        int lefttile = g_map->map(left_tile_x, under_tile_y);
+        int righttile = g_map->map(right_tile_x, under_tile_y);
+
+        if (((lefttile & tile_flag_solid_on_top) && (righttile & tile_flag_solid_on_top || righttile == tile_flag_nonsolid || righttile == tile_flag_gap)) ||
+                ((righttile & tile_flag_solid_on_top) && (lefttile & tile_flag_solid_on_top || lefttile == tile_flag_nonsolid || lefttile == tile_flag_gap))) {
+            fFellThrough = true;
+        }
+
+        if (!fFellThrough && platform) {
+            fPrecalculatedY += platform->fOldVelY;
+            platform->GetTileTypesFromPlayer(this, &lefttile, &righttile);
+
+            if (((lefttile & tile_flag_solid_on_top) && (righttile & tile_flag_solid_on_top || righttile == tile_flag_nonsolid || righttile == tile_flag_gap)) ||
+                    ((righttile & tile_flag_solid_on_top) && (lefttile & tile_flag_solid_on_top || lefttile == tile_flag_nonsolid || lefttile == tile_flag_gap))) {
+                fFellThrough = true;
+            }
+        }
+    }
+
+    if (fFellThrough) {
+        lockfall = true;
+        fallthrough = true;
+    } else {
+        Jump(movement_direction, 1.0f, false);
+        ifSoundOnPlay(rm->sfx_jump);
+    }
+
+    lockjump = true;
+}
+
 void CPlayer::move()
 {
     //Call the AI if cpu controlled
@@ -1008,54 +1059,7 @@ void CPlayer::move()
             if (playerKeys->game_jump.fDown) {
                 if (!lockjump && tanookisuit.notStatue() && !superstomp.isStomping()) {
                     if (!inair && superjumptimer == 0) {
-                        //only if on the ground and the jump key was released somewhen after it was pressed the last time
-
-                        bool fFellThrough = false;
-                        if (playerKeys->game_down.fDown) {
-                            //Check to see what the player is standing on
-                            fPrecalculatedY = fy + vely;
-                            short under_tile_y = ((short)fPrecalculatedY + PH) / TILESIZE;
-
-                            short left_tile_x = ix / TILESIZE;
-                            if (left_tile_x < 0)
-                                left_tile_x += MAPWIDTH;
-                            else if (left_tile_x >= MAPWIDTH)
-                                left_tile_x -= MAPWIDTH;
-
-                            short right_tile_x;
-                            if (rightX() >= smw->ScreenWidth)
-                                right_tile_x = (rightX() - smw->ScreenWidth) / TILESIZE;
-                            else
-                                right_tile_x = rightX() / TILESIZE;
-
-                            int lefttile = g_map->map(left_tile_x, under_tile_y);
-                            int righttile = g_map->map(right_tile_x, under_tile_y);
-
-                            if (((lefttile & tile_flag_solid_on_top) && (righttile & tile_flag_solid_on_top || righttile == tile_flag_nonsolid || righttile == tile_flag_gap)) ||
-                                    ((righttile & tile_flag_solid_on_top) && (lefttile & tile_flag_solid_on_top || lefttile == tile_flag_nonsolid || lefttile == tile_flag_gap))) {
-                                fFellThrough = true;
-                            }
-
-                            if (!fFellThrough && platform) {
-                                fPrecalculatedY += platform->fOldVelY;
-                                platform->GetTileTypesFromPlayer(this, &lefttile, &righttile);
-
-                                if (((lefttile & tile_flag_solid_on_top) && (righttile & tile_flag_solid_on_top || righttile == tile_flag_nonsolid || righttile == tile_flag_gap)) ||
-                                        ((righttile & tile_flag_solid_on_top) && (lefttile & tile_flag_solid_on_top || lefttile == tile_flag_nonsolid || lefttile == tile_flag_gap))) {
-                                    fFellThrough = true;
-                                }
-                            }
-                        }
-
-                        if (fFellThrough) {
-                            lockfall = true;
-                            fallthrough = true;
-                        } else {
-                            Jump(movement_direction, 1.0f, false);
-                            ifSoundOnPlay(rm->sfx_jump);
-                        }
-
-                        lockjump = true;
+                        tryFallingThroughPlatform();
                     } else if (superjumptimer > 0) {
                         if (superjumptype == 3) { //Kuribo's Shoe Jump
                             Jump(movement_direction, 1.0f, false);
