@@ -556,7 +556,7 @@ void shakeScreen()
             continue;
 
         //Kill other players
-        if (!player->invincible && player->shield == 0 && !player->kuriboshoe.is_on() && player->isready()) {
+        if (!player->IsInvincibleOnBottom() && player->isready()) {
             if (game_values.screenshakekillinair == player->inair) {
                 pKillPlayers[iNumKillPlayers++] = player;
 

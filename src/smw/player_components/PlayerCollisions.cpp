@@ -460,12 +460,12 @@ void PlayerCollisions::handle_p2p(CPlayer* o1, CPlayer* o2)
 
     //--- 1. kill frozen players ---
     bool fFrozenDeath = false;
-    if (o1->frozen && o1->shield == 0 && !o1->invincible) {
+    if (o1->frozen && o1->shield == 0 && !o1->isInvincible()) {
         o2->KilledPlayer(o1, death_style_shatter, kill_style_iceblast, true, false);
         fFrozenDeath = true;
     }
 
-    if (o2->frozen && o2->shield == 0 && !o2->invincible) {
+    if (o2->frozen && o2->shield == 0 && !o2->isInvincible()) {
         o1->KilledPlayer(o2, death_style_shatter, kill_style_iceblast, true, false);
         fFrozenDeath = true;
     }
@@ -474,12 +474,12 @@ void PlayerCollisions::handle_p2p(CPlayer* o1, CPlayer* o2)
         return;
 
     //--- 2. is player invincible? ---
-    if (o1->invincible && o2->shield == 0 && !o2->invincible) {
+    if (o1->isInvincible() && o2->shield == 0 && !o2->isInvincible()) {
         o1->KilledPlayer(o2, death_style_jump, kill_style_star, false, false);
         return;
     }
 
-    if (o2->invincible && o1->shield == 0 && !o1->invincible) {
+    if (o2->isInvincible() && o1->shield == 0 && !o1->isInvincible()) {
         o2->KilledPlayer(o1, death_style_jump, kill_style_star, false, false);
         return;
     }
@@ -489,9 +489,9 @@ void PlayerCollisions::handle_p2p(CPlayer* o1, CPlayer* o2)
         return;
 
     //--- 3. stomping other player? ---
-    if ((o2->shield == 0 || o2->shield == 3) && !o2->invincible && is_stomping(*o1, *o2))
+    if ((o2->shield == 0 || o2->shield == 3) && !o2->isInvincible() && is_stomping(*o1, *o2))
         return;
-    if ((o1->shield == 0 || o1->shield == 3) && !o1->invincible  && is_stomping(*o2, *o1))
+    if ((o1->shield == 0 || o1->shield == 3) && !o1->isInvincible()  && is_stomping(*o2, *o1))
         return;
 
 

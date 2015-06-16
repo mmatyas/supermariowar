@@ -36,6 +36,7 @@
 #include "object.h"
 #include "player.h"
 void CPlayer::flipsidesifneeded() {}
+bool CPlayer::isInvincible() { return false; }
 short CPlayer::KillPlayerMapHazard(bool, killstyle, bool, short) { return 0; }
 bool PlayerKuriboShoe::is_on() { return false; }
 void IO_MovingObject::flipsidesifneeded() {}

@@ -12,6 +12,7 @@
 #include "player_components/PlayerCape.h"
 #include "player_components/PlayerCardCollection.h"
 #include "player_components/PlayerCollisions.h"
+#include "player_components/PlayerInvincibility.h"
 #include "player_components/PlayerJail.h"
 #include "player_components/PlayerKuriboShoe.h"
 #include "player_components/PlayerOutOfArenaTimer.h"
@@ -92,7 +93,7 @@ class CPlayer
         short bottomY() { return iy + PH; }
         short centerY() { return iy + HALFPH; }
 
-        bool isInvincible() { return invincible; }
+        bool isInvincible();
         bool isShielded() { return shield; }
         bool isFrozen() { return frozen; }
 
@@ -109,7 +110,6 @@ class CPlayer
 		void AddKillsInRowInAirAward();
 		void SetupNewPlayer();
 
-		void updateInvincibility();
 		void updateFrozenStatus(int keymask);
 		void accelerateRight();
 		void accelerateLeft();
@@ -148,7 +148,7 @@ class CPlayer
 
 		void SetKuriboShoe(KuriboShoeType type);
     bool IsInvincibleOnBottom() {
-        return invincible || shield || kuriboshoe.is_on();
+        return isInvincible() || shield || kuriboshoe.is_on();
     }
     bool IsSuperStomping() {
         return superstomp.isStomping();
@@ -169,7 +169,6 @@ class CPlayer
 		short shield;
 		//if true, the player is a shyguy in shyguy mode
 		bool shyguy;
-		bool invincible;
 		short globalID;
 		short teamID;
 	private:
@@ -181,7 +180,7 @@ class CPlayer
 		void update_usePowerup();
 		void update_spriteColor();
 
-		void tryFallingThroughPlatform();
+		void tryFallingThroughPlatform(short);
 
 		void ClearPowerupStates();
 
@@ -282,7 +281,7 @@ class CPlayer
 		uint8_t spr;
 		short sprswitch;
 
-		short invincibletimer;
+		PlayerInvincibility invincibility;
 
 		short shieldtimer;
 
@@ -519,6 +518,7 @@ class CPlayer
 		friend class PlayerTail;
 		friend class PlayerWarpStatus;
 		friend class PlayerWings;
+		friend class PlayerInvincibility;
 };
 
 #endif // PLAYER_H

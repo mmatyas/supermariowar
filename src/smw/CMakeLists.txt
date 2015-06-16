@@ -27,6 +27,7 @@ LIST(APPEND SMW_SRCS
 	player_components/PlayerCollisions.cpp
 	player_components/PlayerCape.cpp
 	player_components/PlayerCardCollection.cpp
+	player_components/PlayerInvincibility.cpp
 	player_components/PlayerJail.cpp
 	player_components/PlayerKuriboShoe.cpp
 	player_components/PlayerOutOfArenaTimer.cpp

@@ -158,28 +158,6 @@ void CPlayer::Init()
         pPlayerAI->Init();
 }
 
-void CPlayer::updateInvincibility()
-{
-    if (invincible) {
-        animationtimer++;
-
-        if ((animationtimer > 3 && invincibletimer < smw->ScreenHeight) || animationtimer > 6) {
-            animationtimer = 0;
-
-            animationstate += 32;
-            if (animationstate > 96)
-                animationstate = 0;
-        }
-
-        if (++invincibletimer > 580) {
-            animationstate = 0;
-            animationtimer = 0;
-            invincibletimer = 0;
-            invincible = false;
-        }
-    }
-}
-
 void CPlayer::updateFrozenStatus(int keymask)
 {
     if (frozen) {
@@ -331,6 +309,10 @@ bool CPlayer::wantsToSuperStomp() {
 
 bool CPlayer::highJumped() {
     return (superjumptype != 3 || superjumptimer <= 0);
+}
+
+bool CPlayer::isInvincible() {
+    return invincibility.is_on();
 }
 
 #if 0
@@ -740,7 +722,7 @@ void CPlayer::update_usePowerup()
             break;
         }
         case 6: {
-            makeinvincible();
+            invincibility.turn_on(*this);
             break;
         }
         case 7: {
@@ -866,7 +848,7 @@ void CPlayer::update_spriteColor()
     iSrcOffsetX = 0;
 
     bool fColorChosen = false;
-    if (invincible) {
+    if (isInvincible()) {
         iSrcOffsetX = animationstate;
         fColorChosen = true;
     } else {
@@ -890,7 +872,7 @@ void CPlayer::update_spriteColor()
     }
 }
 
-void CPlayer::tryFallingThroughPlatform()
+void CPlayer::tryFallingThroughPlatform(short movement_direction)
 {
     //only if on the ground and the jump key was released somewhen after it was pressed the last time
     bool fFellThrough = false;
@@ -956,7 +938,7 @@ void CPlayer::move()
         }
     }
 
-    if (invincible)
+    if (isInvincible())
         game_values.playinvinciblesound = true;
 
     if (flying)
@@ -1023,7 +1005,7 @@ void CPlayer::move()
         update_usePowerup();
     }
 
-    updateInvincibility(); // Animate invincibility
+    invincibility.update(*this); // Animate invincibility
 
     updateFrozenStatus(keymask);
 
@@ -1059,7 +1041,7 @@ void CPlayer::move()
             if (playerKeys->game_jump.fDown) {
                 if (!lockjump && tanookisuit.notStatue() && !superstomp.isStomping()) {
                     if (!inair && superjumptimer == 0) {
-                        tryFallingThroughPlatform();
+                        tryFallingThroughPlatform(movement_direction);
                     } else if (superjumptimer > 0) {
                         if (superjumptype == 3) { //Kuribo's Shoe Jump
                             Jump(movement_direction, 1.0f, false);
@@ -1698,9 +1680,7 @@ void CPlayer::StripPowerups()
     powerup	= -1;
 
     tanookisuit.reset();
-
-    invincible = false;
-    invincibletimer = 0;
+    invincibility.reset();
 
     powerupused = -1;
 }
@@ -1840,14 +1820,14 @@ void CPlayer::TransferTag(CPlayer* o2)
     if (!o1->isready() || !o2->isready())
         return;
 
-    if (game_values.gamemode->tagged == o1 && o2->shield == 0 && !o2->invincible) {
+    if (game_values.gamemode->tagged == o1 && o2->shield == 0 && !o2->isInvincible()) {
         game_values.gamemode->tagged = o2;
         o1->shield = game_values.shieldstyle > 0 ? game_values.shieldstyle : 1;
         o1->shieldtimer = 60;
         eyecandy[2].add(new EC_GravText(&rm->game_font_large, game_values.gamemode->tagged->ix + HALFPW, game_values.gamemode->tagged->iy + PH, "Tagged!", -VELJUMP*1.5));
         eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, game_values.gamemode->tagged->ix + HALFPW - 16, game_values.gamemode->tagged->iy + HALFPH - 16, 3, 8));
         ifSoundOnPlay(rm->sfx_transform);
-    } else if (game_values.gamemode->tagged == o2 && o1->shield == 0 && !o1->invincible) {
+    } else if (game_values.gamemode->tagged == o2 && o1->shield == 0 && !o1->isInvincible()) {
         game_values.gamemode->tagged = o1;
         o2->shield = game_values.shieldstyle > 0 ? game_values.shieldstyle : 1;
         o2->shieldtimer = 60;
@@ -1870,9 +1850,9 @@ void CPlayer::TransferShyGuy(CPlayer* o2)
 
     CGM_ShyGuyTag * sgt = (CGM_ShyGuyTag*)game_values.gamemode;
 
-    if (o1->shyguy && !o2->shyguy && o2->shield == 0 && !o2->invincible) {
+    if (o1->shyguy && !o2->shyguy && o2->shield == 0 && !o2->isInvincible()) {
         sgt->SetShyGuy(o2->getTeamID());
-    } else if (o2->shyguy && !o1->shyguy && o1->shield == 0 && !o1->invincible) {
+    } else if (o2->shyguy && !o1->shyguy && o1->shield == 0 && !o1->isInvincible()) {
         sgt->SetShyGuy(o1->getTeamID());
     }
 }
@@ -2206,7 +2186,7 @@ void CPlayer::collision_detection_map()
                     bottomblock->collide(this, 1, true);
                     flipsidesifneeded();
                 }
-            } else if (fSuperDeathTileToLeft || (fDeathTileToLeft && !invincible && shield == 0 && !shyguy)) {
+            } else if (fSuperDeathTileToLeft || (fDeathTileToLeft && !isInvincible() && shield == 0 && !shyguy)) {
                 if (player_kill_nonkill != KillPlayerMapHazard(fSuperDeathTileToLeft, kill_style_environment, false))
                     return;
             }
@@ -2286,7 +2266,7 @@ void CPlayer::collision_detection_map()
                     bottomblock->collide(this, 3, true);
                     flipsidesifneeded();
                 }
-            } else if (fSuperDeathTileToRight || (fDeathTileToRight && !invincible && shield == 0 && !shyguy)) {
+            } else if (fSuperDeathTileToRight || (fDeathTileToRight && !isInvincible() && shield == 0 && !shyguy)) {
                 if (player_kill_nonkill != KillPlayerMapHazard(fSuperDeathTileToRight, kill_style_environment, false))
                     return;
             } else if ((toptile & tile_flag_solid) || (bottomtile & tile_flag_solid)) { // collide with solid, ice, death and all sides death
@@ -2395,7 +2375,7 @@ void CPlayer::collision_detection_map()
 
         int alignedTileType = g_map->map(alignedBlockX, ty);
         if ((alignedTileType & tile_flag_solid) && !(alignedTileType & tile_flag_super_or_player_death_bottom) &&
-                (!(alignedTileType & tile_flag_death_on_bottom) || invincible || shield > 0 || shyguy)) {
+                (!(alignedTileType & tile_flag_death_on_bottom) || isInvincible() || shield > 0 || shyguy)) {
             setYf((float)((ty << 5) + TILESIZE) + 0.2f);
             fOldY = fy - 1.0f;
 
@@ -2434,7 +2414,7 @@ void CPlayer::collision_detection_map()
         //or if the player is invincible and hits death or death on bottom
         int unalignedTileType = g_map->map(unAlignedBlockX, ty);
         if ((unalignedTileType & tile_flag_solid) && !(unalignedTileType & tile_flag_super_or_player_death_bottom) &&
-                (!(unalignedTileType & tile_flag_death_on_bottom) || invincible || shield > 0 || shyguy)) {
+                (!(unalignedTileType & tile_flag_death_on_bottom) || isInvincible() || shield > 0 || shyguy)) {
             setXf(unAlignedBlockFX);
             fOldX = fx;
 
@@ -2571,7 +2551,7 @@ void CPlayer::collision_detection_map()
                                           (!(lefttile & tile_flag_solid) && (righttile & tile_flag_super_or_player_death_top));
 
         if (fSolidTileUnderPlayer && !fSuperDeathTileUnderPlayer &&
-                (!fDeathTileUnderPlayer || invincible || shield > 0 || kuriboshoe.is_on() || shyguy) ) {
+                (!fDeathTileUnderPlayer || isInvincible() || shield > 0 || kuriboshoe.is_on() || shyguy) ) {
             //on ground
 
             setYf((float)((ty << 5) - PH) - 0.2f);
@@ -2669,23 +2649,7 @@ void CPlayer::flipsidesifneeded()
 
 void CPlayer::makeinvincible()
 {
-    invincible = true;
-    invincibletimer = 0;
-    animationstate = 0;
-    animationtimer = 0;
-    shield = 0;
-    shieldtimer = 0;
-
-    //Stop the invincible music if a player is already invincible
-    //(we don't want two invincible music sounds playing at the same time)
-    ifsoundonstop(rm->sfx_invinciblemusic);
-
-    if (!game_values.gamemode->gameover) {
-        game_values.playinvinciblesound = true;
-
-        if (game_values.music && game_values.sound)
-            rm->backgroundmusic[0].stop();
-    }
+    invincibility.turn_on(*this);
 }
 
 void CPlayer::makefrozen(short iTime)

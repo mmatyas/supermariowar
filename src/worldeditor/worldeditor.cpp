@@ -153,6 +153,7 @@ short			y_shake = 0;
 extern CGameValues game_values;
 
 void CPlayer::flipsidesifneeded() {}
+bool CPlayer::isInvincible() { return false; }
 void CPlayer::AddKillerAward(CPlayer*, killstyle) {}
 short CPlayer::KillPlayerMapHazard(bool fForce, killstyle style, bool fKillCarriedItem, short iPlayerId)
 {

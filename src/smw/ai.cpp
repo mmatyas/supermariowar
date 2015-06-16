@@ -260,11 +260,11 @@ void CPlayerAI::Think(COutputControl * playerKeys)
                         }
                     }
                 }
-            } else if (game_values.gamemode->tagged == player || player->invincible || player->shyguy || game_values.gamemode->chicken == pPlayer) {
+            } else if (game_values.gamemode->tagged == player || player->isInvincible() || player->shyguy || game_values.gamemode->chicken == pPlayer) {
                 *moveAway = true;
-            } else if (pPlayer->invincible || pPlayer->shyguy  || pPlayer->bobomb || game_values.gamemode->tagged == pPlayer) {
+            } else if (pPlayer->isInvincible() || pPlayer->shyguy  || pPlayer->bobomb || game_values.gamemode->tagged == pPlayer) {
                 *moveToward = true;
-            } else if (player->iy >= iy && !player->invincible && !player->bobomb) {
+            } else if (player->iy >= iy && !player->isInvincible() && !player->bobomb) {
                 *moveToward = true;
             } else {
                 if (nearestObjects.playerdistance < 8100)	//else if player is near but higher, run away (left)
@@ -396,7 +396,7 @@ void CPlayerAI::Think(COutputControl * playerKeys)
                 moveAway = &playerKeys->game_left.fDown;
             }
 
-            if (stomp->iy > iy + PH || pPlayer->shyguy || pPlayer->invincible ||
+            if (stomp->iy > iy + PH || pPlayer->shyguy || pPlayer->isInvincible() ||
                     (carriedItem && (carriedItem->getMovingObjectType() == movingobject_shell || carriedItem->getMovingObjectType() == movingobject_throwblock))) {
                 //if true stomp target is lower or at the same level, run toward
                 *moveToward = true;
@@ -600,7 +600,7 @@ ExitDeathCheck:
             playerKeys->game_powerup.fDown = true;
         } else if (((iStoredPowerup == 5 || iStoredPowerup == 11 || iStoredPowerup == 17 || iStoredPowerup == 19 || iStoredPowerup == 21 || iStoredPowerup == 23 || iStoredPowerup == 24 || iStoredPowerup == 25) &&
                    pPlayer->powerup == -1) || //Use fireflower, hammer, feather, boomerang, cape, wings, sledge, bombs
-                  (iStoredPowerup == 6 && !pPlayer->invincible) || //Use star
+                  (iStoredPowerup == 6 && !pPlayer->isInvincible()) || //Use star
                   (iStoredPowerup == 8 && !pPlayer->bobomb) || //use bob-omb
                   (iStoredPowerup >= 12 && iStoredPowerup <= 15 && !carriedItem) || //Use shell
                   (iStoredPowerup == 20 && !pPlayer->tanookisuit.isOn())) { //use tanooki
@@ -628,7 +628,7 @@ void CPlayerAI::GetNearestObjects()
     nearestObjects.Reset();
 
     MO_CarriedObject * carriedItem = pPlayer->carriedItem;
-    bool fInvincible = pPlayer->invincible || pPlayer->shield || pPlayer->shyguy;
+    bool fInvincible = pPlayer->isInvincible() || pPlayer->shield || pPlayer->shyguy;
     short iTeamID = pPlayer->teamID;
 
     std::map<int, AttentionObject*>::iterator lim = attentionObjects.end();
