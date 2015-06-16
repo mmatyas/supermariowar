@@ -801,6 +801,8 @@ void handleObj2ObjCollisions()
 
 void GameplayState::drawScoreboard(short iScoreTextOffset[4])
 {
+    g_iWinningPlayer = -1;
+
     //Draw scoreboards for all games (except special cases where we have a single player walking the map)
     short i;
     if (game_values.singleplayermode == -1) {
@@ -1130,36 +1132,48 @@ void GameplayState::drawFrontLayer()
     g_map->drawPlatforms(4);
 }
 
+void GameplayState::drawWindMeter()
+{
+    if (game_values.windaffectsplayers) {
+        short iDisplayWindMeterY = game_values.scoreboardstyle == 1 ? 8 : 440;
+        rm->spr_windmeter.draw(210, iDisplayWindMeterY, 0, 0, 220, 32);
+        rm->spr_windmeter.draw((short)(game_values.gamewindx * 20.0f) + smw->ScreenWidth/2, iDisplayWindMeterY + 6, 220, 0, 12, 20);
+    }
+}
+
+void GameplayState::drawCountdown()
+{
+    //Draw countdown start timer
+    if (iCountDownState > 0 && game_values.screenfade == 0) {
+        SDL_Rect * rects = iCountDownNumbers[iCountDownRectGroup[28 - iCountDownState]][iCountDownRectSize[28 - iCountDownState]];
+        rm->spr_countdown_numbers.draw(rects[1].x, rects[1].y, rects[0].x, rects[0].y, rects[0].w, rects[0].h);
+    }
+}
+
+void GameplayState::drawSpotlights()
+{
+    if (game_values.spotlights)
+        spotlightManager.DrawSpotlights();
+}
+
+void GameplayState::drawOutOfScreenIndicators()
+{
+    //draw arrows for being above the top of the screen
+    for (short i = 0; i < list_players_cnt; i++)
+        list_players[i]->drawarrows();
+}
+
 void GameplayState::drawEverything(short iCountDownState, short iScoreTextOffset[4])
 {
     drawBackLayer();
     drawMiddleLayer();
     drawFrontLayer();
 
-
-    if (game_values.spotlights)
-        spotlightManager.DrawSpotlights();
-
-    g_iWinningPlayer = -1;
-
+    drawSpotlights();
     drawScoreboard(iScoreTextOffset);
-
-    if (game_values.windaffectsplayers) {
-        short iDisplayWindMeterY = game_values.scoreboardstyle == 1 ? 8 : 440;
-        rm->spr_windmeter.draw(210, iDisplayWindMeterY, 0, 0, 220, 32);
-        rm->spr_windmeter.draw((short)(game_values.gamewindx * 20.0f) + smw->ScreenWidth/2, iDisplayWindMeterY + 6, 220, 0, 12, 20);
-    }
-
-    //draw arrows for being above the top of the screen
-    for (short i = 0; i < list_players_cnt; i++)
-        list_players[i]->drawarrows();
-
-    //Draw countdown start timer
-    if (iCountDownState > 0 && game_values.screenfade == 0) {
-        SDL_Rect * rects = iCountDownNumbers[iCountDownRectGroup[28 - iCountDownState]][iCountDownRectSize[28 - iCountDownState]];
-        rm->spr_countdown_numbers.draw(rects[1].x, rects[1].y, rects[0].x, rects[0].y, rects[0].w, rects[0].h);
-    }
-
+    drawWindMeter();
+    drawOutOfScreenIndicators();
+    drawCountdown();
     drawScreenFade();
     drawPlayerSwap();
     drawScreenShakeBackground();
