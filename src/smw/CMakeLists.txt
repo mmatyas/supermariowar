@@ -29,12 +29,13 @@ LIST(APPEND SMW_SRCS
 	player_components/PlayerCardCollection.cpp
 	player_components/PlayerJail.cpp
 	player_components/PlayerKuriboShoe.cpp
-	player_components/PlayerSpinStatus.cpp
-	player_components/PlayerTail.cpp
-	player_components/PlayerTanookiSuit.cpp
 	player_components/PlayerOutOfArenaTimer.cpp
 	player_components/PlayerSecretCode.cpp
+	player_components/PlayerSpinStatus.cpp
+	player_components/PlayerSuicideTimer.cpp
 	player_components/PlayerSuperStomp.cpp
+	player_components/PlayerTail.cpp
+	player_components/PlayerTanookiSuit.cpp
 	player_components/PlayerWarpStatus.cpp
 	player_components/PlayerWings.cpp
 )

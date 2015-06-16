@@ -925,7 +925,7 @@ void CPlayer::move()
 
     //If any key was pressed, reset the suicide timer
     if (keymask || (keymaskdown && (velx < -1.0f || velx > 1.0f)))
-        ResetSuicideTime();
+        suicidetimer.reset();
 
 #if	0
     reference_code();
@@ -1261,19 +1261,9 @@ void CPlayer::move()
             return;
 
         //Kill the player if he is standing still for too long
-        if (game_values.gamemode->gameover || game_values.singleplayermode >= 0)
-            ResetSuicideTime();
-
-        if (!invincible && !frozen && game_values.suicidetime > 0 && ++suicidetimer > game_values.suicidetime) {
-            if (++suicidecounttimer > 62) {
-                suicidecounttimer = 0;
-
-                if (--suicidedisplaytimer < 0) {
-                    if (player_kill_nonkill != KillPlayerMapHazard(true, kill_style_environment, false))
-                        return;
-                }
-            }
-        }
+        suicidetimer.update(*this);
+        if (isdead())
+            return;
 
         //Deal with out of arena timer
         outofarena.update(*this);
@@ -1363,13 +1353,6 @@ void CPlayer::CommitAction()
     }
 
     action = player_action_none;
-}
-
-void CPlayer::ResetSuicideTime()
-{
-    suicidetimer = 0;
-    suicidecounttimer = 0;
-    suicidedisplaytimer = 2;
 }
 
 void CPlayer::SetSprite()
@@ -1686,10 +1669,7 @@ void CPlayer::SetupNewPlayer()
     secretcode.reset();
     cardcollection.reset();
     superstomp.reset();
-
-    suicidetimer = 0;
-    suicidecounttimer = 0;
-    suicidedisplaytimer = 2;
+    suicidetimer.reset();
 
     if (game_values.gamemode->getgamemode() == game_mode_survival) {
         if (game_values.gamemodesettings.survival.shield) {
@@ -2018,9 +1998,7 @@ void CPlayer::draw()
     }
 
     jail.draw(*this);
-
-    if (suicidetimer > game_values.suicidetime)
-        drawsuicidetimer();
+    suicidetimer.draw(*this);
 
     //Draw the Ring awards
     if (game_values.awardstyle == award_style_halo && killsinrow >= MINAWARDSNEEDED)
@@ -2049,11 +2027,6 @@ void CPlayer::draw()
 void CPlayer::drawOutOfScreenIndicators()
 {
     outofarena.draw(*this);
-}
-
-void CPlayer::drawsuicidetimer()
-{
-    rm->spr_awardkillsinrow.draw(ix - PWOFFSET + 8, iy - PHOFFSET + 8, suicidedisplaytimer << 4, colorID << 4, 16, 16);
 }
 
 void CPlayer::updateswap()

@@ -17,6 +17,7 @@
 #include "player_components/PlayerOutOfArenaTimer.h"
 #include "player_components/PlayerSecretCode.h"
 #include "player_components/PlayerSpinStatus.h"
+#include "player_components/PlayerSuicideTimer.h"
 #include "player_components/PlayerSuperStomp.h"
 #include "player_components/PlayerTail.h"
 #include "player_components/PlayerTanookiSuit.h"
@@ -93,6 +94,7 @@ class CPlayer
 
         bool isInvincible() { return invincible; }
         bool isShielded() { return shield; }
+        bool isFrozen() { return frozen; }
 
 		bool collidesWith(CPlayer*);
 		bool collidesWith(CObject*);
@@ -171,9 +173,6 @@ class CPlayer
 		short globalID;
 		short teamID;
 	private:
-		void drawsuicidetimer();
-
-		void ResetSuicideTime();
 		void SetSprite();
 		void Jump(short iMove, float jumpModifier, bool fKuriboBounce);
 
@@ -296,10 +295,7 @@ class CPlayer
 		PlayerSuperStomp superstomp;
 		PlayerBurnupTimer burnup;
 		PlayerOutOfArenaTimer outofarena;
-
-		short suicidetimer;
-		short suicidecounttimer;
-		short suicidedisplaytimer;
+		PlayerSuicideTimer suicidetimer;
 
 		short action;
 
@@ -516,8 +512,9 @@ class CPlayer
 		friend class PlayerKuriboShoe;
 		friend class PlayerTanookiSuit;
 		friend class PlayerOutOfArenaTimer;
-		friend class PlayerSuperStomp;
 		friend class PlayerSpinStatus;
+		friend class PlayerSuicideTimer;
+		friend class PlayerSuperStomp;
 		friend class PlayerTail;
 		friend class PlayerWarpStatus;
 		friend class PlayerWings;
