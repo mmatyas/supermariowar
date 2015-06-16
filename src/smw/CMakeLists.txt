@@ -32,6 +32,7 @@ LIST(APPEND SMW_SRCS
 	player_components/PlayerSpinStatus.cpp
 	player_components/PlayerTail.cpp
 	player_components/PlayerTanookiSuit.cpp
+	player_components/PlayerOutOfArenaTimer.cpp
 	player_components/PlayerSecretCode.cpp
 	player_components/PlayerSuperStomp.cpp
 	player_components/PlayerWarpStatus.cpp

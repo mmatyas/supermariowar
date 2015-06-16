@@ -745,10 +745,7 @@ void CPlayer::update_usePowerup()
         }
         case 7: {
             turnslowdownon();
-
-            outofarenatimer = 0;
-            outofarenadisplaytimer = game_values.outofboundstime - 1;
-
+            outofarena.reset();
             break;
         }
         case 8: {
@@ -1277,18 +1274,7 @@ void CPlayer::move()
         }
 
         //Deal with out of arena timer
-        if (iy < 0) {
-            if ((iy + PH < -1 || (iy + PH <= 1 && vely <= 0.8f)) && game_values.outofboundstime > 0 && !invincible) {
-                if (++outofarenatimer > 62) {
-                    outofarenatimer = 0;
-
-                    if (--outofarenadisplaytimer < 0) {
-                        if (player_kill_nonkill != KillPlayerMapHazard(false, kill_style_environment, false))
-                            return;
-                    }
-                }
-            }
-        }
+        outofarena.update(*this);
 
         //Deal with release from jail timer
         jail.update(*this);
@@ -1682,8 +1668,7 @@ void CPlayer::SetupNewPlayer()
     diedas = 0;
     iSrcOffsetX = 0;
 
-    outofarenatimer = 0;
-    outofarenadisplaytimer = game_values.outofboundstime - 1;
+    outofarena.reset();
 
     platform = NULL;
     iHorizontalPlatformCollision = -1;
@@ -2057,20 +2042,9 @@ void CPlayer::draw()
     }
 }
 
-void CPlayer::drawarrows()
+void CPlayer::drawOutOfScreenIndicators()
 {
-    if (state != player_ready)
-        return;
-
-    if (iy < 0) {
-        if (iy + PH < -1 || (iy + PH <= 0 && vely <= 1)) {
-            rm->spr_abovearrows.draw(ix - PWOFFSET, 0, colorID * 32, 0, 32, 26);
-
-            //This displays the out of arena timer before the player is killed
-            if (game_values.outofboundstime > 0 && outofarenadisplaytimer >= 0)
-                rm->spr_awardkillsinrow.draw(ix - PWOFFSET + 8, 18, outofarenadisplaytimer << 4, colorID << 4, 16, 16);
-        }
-    }
+    outofarena.draw(*this);
 }
 
 void CPlayer::drawsuicidetimer()

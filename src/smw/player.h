@@ -14,6 +14,7 @@
 #include "player_components/PlayerCollisions.h"
 #include "player_components/PlayerJail.h"
 #include "player_components/PlayerKuriboShoe.h"
+#include "player_components/PlayerOutOfArenaTimer.h"
 #include "player_components/PlayerSecretCode.h"
 #include "player_components/PlayerSpinStatus.h"
 #include "player_components/PlayerSuperStomp.h"
@@ -76,7 +77,7 @@ class CPlayer
 		void Init();
 
 		void draw();
-		void drawarrows();
+		void drawOutOfScreenIndicators();
 		void updateswap();
 		void drawswap();
 		void move();
@@ -284,9 +285,7 @@ class CPlayer
 
 		PlayerSuperStomp superstomp;
 		PlayerBurnupTimer burnup;
-
-		short outofarenatimer;
-		short outofarenadisplaytimer;
+		PlayerOutOfArenaTimer outofarena;
 
 		short suicidetimer;
 		short suicidecounttimer;
@@ -507,6 +506,7 @@ class CPlayer
 		friend class PlayerJail;
 		friend class PlayerKuriboShoe;
 		friend class PlayerTanookiSuit;
+		friend class PlayerOutOfArenaTimer;
 		friend class PlayerSuperStomp;
 		friend class PlayerSpinStatus;
 		friend class PlayerTail;

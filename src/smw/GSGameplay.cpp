@@ -1160,7 +1160,7 @@ void GameplayState::drawOutOfScreenIndicators()
 {
     //draw arrows for being above the top of the screen
     for (short i = 0; i < list_players_cnt; i++)
-        list_players[i]->drawarrows();
+        list_players[i]->drawOutOfScreenIndicators();
 }
 
 void GameplayState::drawEverything(short iCountDownState, short iScoreTextOffset[4])
