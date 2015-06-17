@@ -169,9 +169,7 @@ void CPlayer::updateFrozenStatus(int keymask)
             frozen = false;
 
             //Shield the player after becoming unfrozen to protect against being frozen again
-            shield = game_values.shieldstyle > 0 ? game_values.shieldstyle : 1;
-            shieldtimer = 60;
-
+            shield.turn_on();
             eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
         }
     }
@@ -313,6 +311,18 @@ bool CPlayer::highJumped() {
 
 bool CPlayer::isInvincible() {
     return invincibility.is_on();
+}
+
+bool CPlayer::isShielded() {
+    return shield.is_on();
+}
+
+bool CPlayer::IsInvincibleOnBottom() {
+    return isInvincible() || isShielded() || kuriboshoe.is_on();
+}
+
+bool CPlayer::IsSuperStomping() {
+    return superstomp.isStomping();
 }
 
 #if 0
@@ -867,7 +877,7 @@ void CPlayer::update_spriteColor()
             iSrcOffsetX = 160;
         else if (frozen)
             iSrcOffsetX = 256;
-        else if (shield > 0)
+        else if (isShielded())
             iSrcOffsetX = 128;
     }
 }
@@ -1017,9 +1027,7 @@ void CPlayer::move()
         //If player is shaking tail, slow decent
         tail.slowDescent(*this);
 
-        //If player is shielded, count down that timer
-        if (shieldtimer > 0 && --shieldtimer == 0)
-            shield = 0;
+        shield.update();
 
         short movement_direction = 0;	//move left-right-no: -1.. left 0 no 1 ... right
 
@@ -1649,24 +1657,12 @@ void CPlayer::SetupNewPlayer()
     iVerticalPlatformCollision = -1;
     iPlatformCollisionPlayerId = -1;
 
-    shield = 0;
-    shieldtimer = 0;
-
+    shield.reset();
     kuriboshoe.reset();
     secretcode.reset();
     cardcollection.reset();
     superstomp.reset();
     suicidetimer.reset();
-
-    if (game_values.gamemode->getgamemode() == game_mode_survival) {
-        if (game_values.gamemodesettings.survival.shield) {
-            shieldtimer = game_values.shieldtime;
-            shield = game_values.shieldstyle;
-        }
-    } else if (game_values.shieldstyle > 0) {
-        shieldtimer = game_values.shieldtime;
-        shield = game_values.shieldstyle;
-    }
 
     throw_star = 0;
 
@@ -1820,17 +1816,15 @@ void CPlayer::TransferTag(CPlayer* o2)
     if (!o1->isready() || !o2->isready())
         return;
 
-    if (game_values.gamemode->tagged == o1 && o2->shield == 0 && !o2->isInvincible()) {
+    if (game_values.gamemode->tagged == o1 && !o2->isShielded() && !o2->isInvincible()) {
         game_values.gamemode->tagged = o2;
-        o1->shield = game_values.shieldstyle > 0 ? game_values.shieldstyle : 1;
-        o1->shieldtimer = 60;
+        o1->shield.turn_on();
         eyecandy[2].add(new EC_GravText(&rm->game_font_large, game_values.gamemode->tagged->ix + HALFPW, game_values.gamemode->tagged->iy + PH, "Tagged!", -VELJUMP*1.5));
         eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, game_values.gamemode->tagged->ix + HALFPW - 16, game_values.gamemode->tagged->iy + HALFPH - 16, 3, 8));
         ifSoundOnPlay(rm->sfx_transform);
-    } else if (game_values.gamemode->tagged == o2 && o1->shield == 0 && !o1->isInvincible()) {
+    } else if (game_values.gamemode->tagged == o2 && !o1->isShielded() && !o1->isInvincible()) {
         game_values.gamemode->tagged = o1;
-        o2->shield = game_values.shieldstyle > 0 ? game_values.shieldstyle : 1;
-        o2->shieldtimer = 60;
+        o2->shield.turn_on();
         eyecandy[2].add(new EC_GravText(&rm->game_font_large, game_values.gamemode->tagged->ix + HALFPW, game_values.gamemode->tagged->iy + PH, "Tagged!", -VELJUMP*1.5));
         eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, game_values.gamemode->tagged->ix + HALFPW - 16, game_values.gamemode->tagged->iy + HALFPH - 16, 3, 8));
         ifSoundOnPlay(rm->sfx_transform);
@@ -1850,9 +1844,9 @@ void CPlayer::TransferShyGuy(CPlayer* o2)
 
     CGM_ShyGuyTag * sgt = (CGM_ShyGuyTag*)game_values.gamemode;
 
-    if (o1->shyguy && !o2->shyguy && o2->shield == 0 && !o2->isInvincible()) {
+    if (o1->shyguy && !o2->shyguy && !o2->isShielded() && !o2->isInvincible()) {
         sgt->SetShyGuy(o2->getTeamID());
-    } else if (o2->shyguy && !o1->shyguy && o1->shield == 0 && !o1->isInvincible()) {
+    } else if (o2->shyguy && !o1->shyguy && !o1->isShielded() && !o1->isInvincible()) {
         sgt->SetShyGuy(o1->getTeamID());
     }
 }
@@ -2186,7 +2180,7 @@ void CPlayer::collision_detection_map()
                     bottomblock->collide(this, 1, true);
                     flipsidesifneeded();
                 }
-            } else if (fSuperDeathTileToLeft || (fDeathTileToLeft && !isInvincible() && shield == 0 && !shyguy)) {
+            } else if (fSuperDeathTileToLeft || (fDeathTileToLeft && !isInvincible() && !isShielded() && !shyguy)) {
                 if (player_kill_nonkill != KillPlayerMapHazard(fSuperDeathTileToLeft, kill_style_environment, false))
                     return;
             }
@@ -2266,7 +2260,7 @@ void CPlayer::collision_detection_map()
                     bottomblock->collide(this, 3, true);
                     flipsidesifneeded();
                 }
-            } else if (fSuperDeathTileToRight || (fDeathTileToRight && !isInvincible() && shield == 0 && !shyguy)) {
+            } else if (fSuperDeathTileToRight || (fDeathTileToRight && !isInvincible() && !isShielded() && !shyguy)) {
                 if (player_kill_nonkill != KillPlayerMapHazard(fSuperDeathTileToRight, kill_style_environment, false))
                     return;
             } else if ((toptile & tile_flag_solid) || (bottomtile & tile_flag_solid)) { // collide with solid, ice, death and all sides death
@@ -2375,7 +2369,7 @@ void CPlayer::collision_detection_map()
 
         int alignedTileType = g_map->map(alignedBlockX, ty);
         if ((alignedTileType & tile_flag_solid) && !(alignedTileType & tile_flag_super_or_player_death_bottom) &&
-                (!(alignedTileType & tile_flag_death_on_bottom) || isInvincible() || shield > 0 || shyguy)) {
+                (!(alignedTileType & tile_flag_death_on_bottom) || isInvincible() || isShielded() || shyguy)) {
             setYf((float)((ty << 5) + TILESIZE) + 0.2f);
             fOldY = fy - 1.0f;
 
@@ -2414,7 +2408,7 @@ void CPlayer::collision_detection_map()
         //or if the player is invincible and hits death or death on bottom
         int unalignedTileType = g_map->map(unAlignedBlockX, ty);
         if ((unalignedTileType & tile_flag_solid) && !(unalignedTileType & tile_flag_super_or_player_death_bottom) &&
-                (!(unalignedTileType & tile_flag_death_on_bottom) || isInvincible() || shield > 0 || shyguy)) {
+                (!(unalignedTileType & tile_flag_death_on_bottom) || isInvincible() || isShielded() || shyguy)) {
             setXf(unAlignedBlockFX);
             fOldX = fx;
 
@@ -2551,7 +2545,7 @@ void CPlayer::collision_detection_map()
                                           (!(lefttile & tile_flag_solid) && (righttile & tile_flag_super_or_player_death_top));
 
         if (fSolidTileUnderPlayer && !fSuperDeathTileUnderPlayer &&
-                (!fDeathTileUnderPlayer || isInvincible() || shield > 0 || kuriboshoe.is_on() || shyguy) ) {
+                (!fDeathTileUnderPlayer || IsInvincibleOnBottom() || shyguy) ) {
             //on ground
 
             setYf((float)((ty << 5) - PH) - 0.2f);

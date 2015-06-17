@@ -370,7 +370,7 @@ bool PlayerCollisions::is_stomping(CPlayer& player, CPlayer& other)
         }
 
         bool fKillPotential = false;
-        if (player.vely > 1.0f && other.shield == 0)
+        if (player.vely > 1.0f && !other.isShielded())
             fKillPotential = true;
 
         player.bouncejump();
@@ -447,7 +447,7 @@ void PlayerCollisions::handle_p2p(CPlayer* o1, CPlayer* o2)
     }
 
     //Quit checking collision if either player is soft shielded
-    if (o1->shield == 1 || o2->shield == 1) {
+    if (o1->shield.getType() == SOFT || o2->shield.getType() == SOFT) {
         //Do tag transfer if there is one to do
         if (game_values.gamemode->gamemode == game_mode_tag && game_values.gamemodesettings.tag.tagontouch)
             o1->TransferTag(o2);
@@ -460,12 +460,12 @@ void PlayerCollisions::handle_p2p(CPlayer* o1, CPlayer* o2)
 
     //--- 1. kill frozen players ---
     bool fFrozenDeath = false;
-    if (o1->frozen && o1->shield == 0 && !o1->isInvincible()) {
+    if (o1->frozen && !o1->isShielded() && !o1->isInvincible()) {
         o2->KilledPlayer(o1, death_style_shatter, kill_style_iceblast, true, false);
         fFrozenDeath = true;
     }
 
-    if (o2->frozen && o2->shield == 0 && !o2->isInvincible()) {
+    if (o2->frozen && !o2->isShielded() && !o2->isInvincible()) {
         o1->KilledPlayer(o2, death_style_shatter, kill_style_iceblast, true, false);
         fFrozenDeath = true;
     }
@@ -474,12 +474,12 @@ void PlayerCollisions::handle_p2p(CPlayer* o1, CPlayer* o2)
         return;
 
     //--- 2. is player invincible? ---
-    if (o1->isInvincible() && o2->shield == 0 && !o2->isInvincible()) {
+    if (o1->isInvincible() && !o2->isShielded() && !o2->isInvincible()) {
         o1->KilledPlayer(o2, death_style_jump, kill_style_star, false, false);
         return;
     }
 
-    if (o2->isInvincible() && o1->shield == 0 && !o1->isInvincible()) {
+    if (o2->isInvincible() && !o1->isShielded() && !o1->isInvincible()) {
         o2->KilledPlayer(o1, death_style_jump, kill_style_star, false, false);
         return;
     }
@@ -489,14 +489,14 @@ void PlayerCollisions::handle_p2p(CPlayer* o1, CPlayer* o2)
         return;
 
     //--- 3. stomping other player? ---
-    if ((o2->shield == 0 || o2->shield == 3) && !o2->isInvincible() && is_stomping(*o1, *o2))
+    if ((o2->shield.getType() == OFF || o2->shield.getType() == HARD) && !o2->isInvincible() && is_stomping(*o1, *o2))
         return;
-    if ((o1->shield == 0 || o1->shield == 3) && !o1->isInvincible()  && is_stomping(*o2, *o1))
+    if ((o1->shield.getType() == OFF || o1->shield.getType() == HARD) && !o1->isInvincible() && is_stomping(*o2, *o1))
         return;
 
 
     //Quit checking collision if either player is hard shielded
-    if (o1->shield == 2 || o2->shield == 2) {
+    if (o1->shield.getType() == SOFT_WITH_STOMP || o2->shield.getType() == SOFT_WITH_STOMP) {
         //Do tag transfer if there is one to do
         if (game_values.gamemode->gamemode == game_mode_tag && game_values.gamemodesettings.tag.tagontouch)
             o1->TransferTag(o2);

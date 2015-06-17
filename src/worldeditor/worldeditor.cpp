@@ -154,6 +154,7 @@ extern CGameValues game_values;
 
 void CPlayer::flipsidesifneeded() {}
 bool CPlayer::isInvincible() { return false; }
+bool CPlayer::isShielded() { return false; }
 void CPlayer::AddKillerAward(CPlayer*, killstyle) {}
 short CPlayer::KillPlayerMapHazard(bool fForce, killstyle style, bool fKillCarriedItem, short iPlayerId)
 {

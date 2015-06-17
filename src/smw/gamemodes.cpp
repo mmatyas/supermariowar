@@ -479,10 +479,7 @@ short CGM_Frag::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle
 
     if (game_values.gamemode->gamemode == game_mode_frag && game_values.gamemodesettings.frag.style == 1) {
         ifSoundOnPlay(rm->sfx_powerdown);
-
-        other.shield = game_values.shieldstyle;
-        other.shieldtimer = 60;
-
+        other.shield.reset();
         return player_kill_nonkill;
     }
 
@@ -498,10 +495,7 @@ short CGM_Frag::playerkilledself(CPlayer &player, killstyle style)
 
         if (game_values.gamemode->gamemode == game_mode_frag && game_values.gamemodesettings.frag.style == 1) {
             ifSoundOnPlay(rm->sfx_powerdown);
-
-            player.shield = game_values.shieldstyle;
-            player.shieldtimer = 60;
-
+            player.shield.reset();
             return player_kill_nonkill;
         }
     }
@@ -596,10 +590,7 @@ short CGM_TimeLimit::playerkilledplayer(CPlayer &inflictor, CPlayer &other, kill
 
         if (game_values.gamemode->gamemode == game_mode_timelimit && game_values.gamemodesettings.time.style == 1) {
             ifSoundOnPlay(rm->sfx_powerdown);
-
-            other.shield = game_values.shieldstyle;
-            other.shieldtimer = 60;
-
+            other.shield.reset();
             return player_kill_nonkill;
         }
     }
@@ -690,10 +681,7 @@ short CGM_Classic::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killst
 
     if (game_values.gamemode->gamemode == game_mode_classic && game_values.gamemodesettings.classic.style == 1) {
         ifSoundOnPlay(rm->sfx_powerdown);
-
-        other.shield = game_values.shieldstyle;
-        other.shieldtimer = 60;
-
+        other.shield.reset();
         return player_kill_nonkill;
     }
 
@@ -741,10 +729,7 @@ short CGM_Classic::playerkilledself(CPlayer &player, killstyle style)
 
         if (game_values.gamemode->gamemode == game_mode_classic && game_values.gamemodesettings.classic.style == 1) {
             ifSoundOnPlay(rm->sfx_powerdown);
-
-            player.shield = game_values.shieldstyle;
-            player.shieldtimer = 60;
-
+            player.shield.reset();
             return player_kill_nonkill;
         }
     }
@@ -962,8 +947,7 @@ short CGM_Tag::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle 
 {
     if (&inflictor == tagged) {
         tagged = &other;
-        inflictor.shield = game_values.shieldstyle;
-        inflictor.shieldtimer = 60;
+        inflictor.shield.reset();
         eyecandy[2].add(new EC_GravText(&rm->game_font_large, other.ix + (HALFPW), other.iy + PH, "Tagged!", -VELJUMP*1.5));
         eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, other.ix + (HALFPW) - 16, other.iy + (HALFPH) - 16, 3, 8));
         ifSoundOnPlay(rm->sfx_transform);
@@ -2458,8 +2442,7 @@ CPlayer * CGM_Star::swapplayer(short id, CPlayer * player)
     CPlayer * oldstar = NULL;
     if (starPlayer[id]) {
         oldstar = starPlayer[id];
-        oldstar->shield = game_values.shieldstyle == 0 ? 1 : game_values.shieldstyle;
-        oldstar->shieldtimer = 60;
+        oldstar->shield.turn_on();
         eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, oldstar->ix + (HALFPW) - 16, oldstar->iy + (HALFPH) - 16, 3, 8));
     }
 
@@ -2675,8 +2658,7 @@ short CGM_Greed::ReleaseCoins(CPlayer &player, killstyle style)
 {
     ifSoundOnPlay(rm->sfx_cannon);
 
-    player.shield = game_values.shieldstyle == 0 ? 1 : game_values.shieldstyle;
-    player.shieldtimer = 60;
+    player.shield.turn_on();
 
     short iDamage = g_iKillStyleDamage[style] * game_values.gamemodesettings.greed.multiplier / 2;
 
@@ -2768,9 +2750,7 @@ short CGM_Health::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killsty
         return iRet;
     } else {
         ifSoundOnPlay(rm->sfx_powerdown);
-
-        other.shield = game_values.shieldstyle;
-        other.shieldtimer = 60;
+        other.shield.reset();
     }
 
     return player_kill_nonkill;
@@ -2796,9 +2776,7 @@ short CGM_Health::playerkilledself(CPlayer &player, killstyle style)
         return iRet;
     } else {
         ifSoundOnPlay(rm->sfx_powerdown);
-
-        player.shield = game_values.shieldstyle;
-        player.shieldtimer = 60;
+        player.shield.reset();
     }
 
     return player_kill_nonkill;

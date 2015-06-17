@@ -20,8 +20,7 @@ void PlayerInvincibility::turn_on(CPlayer& player)
     timer = 0;
     player.animationstate = 0;
     player.animationtimer = 0;
-    player.shield = 0;
-    player.shieldtimer = 0;
+    player.shield.abort();
 
     //Stop the invincible music if a player is already invincible
     //(we don't want two invincible music sounds playing at the same time)

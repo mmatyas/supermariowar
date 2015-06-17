@@ -17,6 +17,7 @@
 #include "player_components/PlayerKuriboShoe.h"
 #include "player_components/PlayerOutOfArenaTimer.h"
 #include "player_components/PlayerSecretCode.h"
+#include "player_components/PlayerShield.h"
 #include "player_components/PlayerSpinStatus.h"
 #include "player_components/PlayerSuicideTimer.h"
 #include "player_components/PlayerSuperStomp.h"
@@ -94,7 +95,7 @@ class CPlayer
         short centerY() { return iy + HALFPH; }
 
         bool isInvincible();
-        bool isShielded() { return shield; }
+        bool isShielded();
         bool isFrozen() { return frozen; }
 
 		bool collidesWith(CPlayer*);
@@ -147,12 +148,8 @@ class CPlayer
     bool isdead() { return state == player_dead; }
 
 		void SetKuriboShoe(KuriboShoeType type);
-    bool IsInvincibleOnBottom() {
-        return isInvincible() || shield || kuriboshoe.is_on();
-    }
-    bool IsSuperStomping() {
-        return superstomp.isStomping();
-    }
+        bool IsInvincibleOnBottom();
+        bool IsSuperStomping();
 
     void decreaseProjectilesCount() {
         if (projectiles > 0)
@@ -166,7 +163,6 @@ class CPlayer
         void SetStoredPowerup(short iPowerup);
 		void StripPowerups();
 
-		short shield;
 		//if true, the player is a shyguy in shyguy mode
 		bool shyguy;
 		short globalID;
@@ -282,8 +278,7 @@ class CPlayer
 		short sprswitch;
 
 		PlayerInvincibility invincibility;
-
-		short shieldtimer;
+		PlayerShield shield;
 
 		bool frozen;
 		short frozentimer;

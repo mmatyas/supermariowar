@@ -36,7 +36,7 @@ void PlayerTanookiSuit::startSuperStomping(CPlayer &player) {
     player.superstomp.startSuperStomping(player);
 
     // Become soft shielded (with stomp ability)
-    player.shield = 2;
+    player.shield.setType(SOFT_WITH_STOMP);
 }
 
 void PlayerTanookiSuit::update(CPlayer &player)
@@ -92,7 +92,7 @@ void PlayerTanookiSuit::update(CPlayer &player)
             statue_timer = 0;
 
             // Release invincibility
-            player.shield = 0;
+            player.shield.setType(OFF);
 
             // Slight upward velocity to escape spikes / lava
             if (!player.inair)
@@ -127,7 +127,7 @@ void PlayerTanookiSuit::update(CPlayer &player)
             statue_timer--;
 
             // Become soft shielded (with stomp ability)
-            player.shield = 2;
+            player.shield.setType(SOFT_WITH_STOMP);
 
             statue_lock = true;
         }

@@ -100,7 +100,7 @@ void OMO_OrbitHazard::update()
 
 bool OMO_OrbitHazard::collide(CPlayer * player)
 {
-    if (!player->isInvincible() && player->shield == 0 && !player->shyguy) {
+    if (!player->isInvincible() && !player->isShielded() && !player->shyguy) {
         return player->KillPlayerMapHazard(false, kill_style_environment, false) != player_kill_nonkill;
     }
 
@@ -145,7 +145,7 @@ void OMO_StraightPathHazard::update()
 
 bool OMO_StraightPathHazard::collide(CPlayer * player)
 {
-    if (player->shield == 0) {
+    if (!player->isShielded()) {
         eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + (iw >> 2) - 16, iy + (ih >> 2) - 16, 3, 8));
         dead = true;
 
@@ -283,7 +283,7 @@ bool MO_BulletBill::hittop(CPlayer * player)
 
 bool MO_BulletBill::hitother(CPlayer * player)
 {
-    if (player->shield > 0 || player->globalID == iPlayerID)
+    if (player->isShielded() || player->globalID == iPlayerID)
         return false;
 
     if (game_values.teamcollision != 2 && iTeamID == player->teamID)
@@ -403,7 +403,7 @@ MO_Explosion::MO_Explosion(gfxSprite *nspr, short x, short y, short iNumSpr, sho
 
 bool MO_Explosion::collide(CPlayer * player)
 {
-    if (player->globalID != iPlayerID && (game_values.teamcollision == 2 || iTeamID != player->teamID) && !player->isInvincible() && player->shield == 0 && !player->shyguy) {
+    if (player->globalID != iPlayerID && (game_values.teamcollision == 2 || iTeamID != player->teamID) && !player->isInvincible() && !player->isShielded() && !player->shyguy) {
         //Find the player that made this explosion so we can attribute a kill
         PlayerKilledPlayer(iPlayerID, player, death_style_jump, iStyle, false, false);
         return true;
@@ -557,7 +557,7 @@ void IO_FlameCannon::draw(short iOffsetX, short iOffsetY)
 
 bool IO_FlameCannon::collide(CPlayer * player)
 {
-    if (state == 2 && !player->isInvincible() && player->shield == 0 && !player->shyguy)
+    if (state == 2 && !player->isInvincible() && !player->isShielded() && !player->shyguy)
         return player->KillPlayerMapHazard(false, kill_style_environment, false) != player_kill_nonkill;
 
     return false;
@@ -789,7 +789,7 @@ bool MO_PirhanaPlant::collide(CPlayer * player)
 
     if (player->isInvincible() || player->tanookisuit.isStatue() || (player->kuriboshoe.is_on() && !fHitPlayerTop)) {
         KillPlant();
-    } else if (player->shield == 0 && !player->shyguy) {
+    } else if (!player->isShielded() && !player->shyguy) {
         return player->KillPlayerMapHazard(false, kill_style_environment, false) != player_kill_nonkill;
     }
 

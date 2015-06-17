@@ -1886,8 +1886,8 @@ void GameplayState::handleInput()
                 list_players[iplayer]->makefrozen(300);
             } else if (event.key.keysym.sym == SDLK_c) {
                 short iplayer = RANDOM_INT(list_players_cnt);
-                list_players[iplayer]->shield = RANDOM_INT(3) + 1;
-                list_players[iplayer]->shieldtimer = 620;
+                list_players[iplayer]->shield.type = (PlayerShieldType)(RANDOM_INT(3) + 1);
+                list_players[iplayer]->shield.timer = 620;
             } else if (event.key.keysym.sym == SDLK_1) {
                 if (event.key.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
                     objectcontainer[0].add(new PU_IceWandPowerup(&rm->spr_icewandpowerup, list_players[0]->ix + 32, list_players[0]->iy, 1, 0, 30, 30, 1, 1));

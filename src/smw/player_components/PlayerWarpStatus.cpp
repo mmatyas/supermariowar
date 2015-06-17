@@ -206,9 +206,8 @@ void PlayerWarpStatus::chooseWarpExit(CPlayer& player)
 
     //Make player shielded when exiting the warp (if that option is turned on)
     if (game_values.shieldstyle > 0) {
-        if (player.shield == 0 || player.shieldtimer < game_values.shieldtime) {
-            player.shieldtimer = game_values.shieldtime;
-            player.shield = game_values.shieldstyle;
+        if (!player.isShielded() || player.shield.time_left() < game_values.shieldtime) {
+            player.shield.reset();
         }
     }
 

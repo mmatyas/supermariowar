@@ -628,7 +628,7 @@ void CPlayerAI::GetNearestObjects()
     nearestObjects.Reset();
 
     MO_CarriedObject * carriedItem = pPlayer->carriedItem;
-    bool fInvincible = pPlayer->isInvincible() || pPlayer->shield || pPlayer->shyguy;
+    bool fInvincible = pPlayer->isInvincible() || pPlayer->isShielded() || pPlayer->shyguy;
     short iTeamID = pPlayer->teamID;
 
     std::map<int, AttentionObject*>::iterator lim = attentionObjects.end();

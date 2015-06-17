@@ -32,6 +32,7 @@ LIST(APPEND SMW_SRCS
 	player_components/PlayerKuriboShoe.cpp
 	player_components/PlayerOutOfArenaTimer.cpp
 	player_components/PlayerSecretCode.cpp
+	player_components/PlayerShield.cpp
 	player_components/PlayerSpinStatus.cpp
 	player_components/PlayerSuicideTimer.cpp
 	player_components/PlayerSuperStomp.cpp
