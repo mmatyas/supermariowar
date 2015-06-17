@@ -61,7 +61,7 @@ class CObject
     short GetState() {
         return state;
     }
-    bool GetDead() {
+    bool isDead() {
         return dead;
     }
 

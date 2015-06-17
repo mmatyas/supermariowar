@@ -729,7 +729,7 @@ void handleP2ObjCollisions()
             for (short iObject = 0; iObject < objectcontainer[iLayer].list_end; iObject++) {
                 CObject * object = objectcontainer[iLayer].list[iObject];
 
-                if (!object->GetDead()) {
+                if (!object->isDead()) {
                     if (coldec_player2obj(player, object)) {
                         if (player->collidesWith(object))
                             break;
@@ -776,7 +776,7 @@ void handleObj2ObjCollisions()
                     //if (iLayer1 == iLayer2 && iObject1 == iObject2)
                     //  continue;
 
-                    if (object2->GetDead())
+                    if (object2->isDead())
                         continue;
 
                     MovingObjectType iType1 = movingobject1->getMovingObjectType();
@@ -791,7 +791,7 @@ void handleObj2ObjCollisions()
                         }
                     }
 
-                    if (object1->GetDead())
+                    if (object1->isDead())
                         return; // CONTINUEOBJECT1
                 }
             }

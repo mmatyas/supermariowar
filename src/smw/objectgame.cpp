@@ -5469,7 +5469,7 @@ void MO_WalkingEnemy::collide(IO_MovingObject * object)
     if (state == 0)
         return;
 
-    if (!object->GetDead()) {
+    if (!object->isDead()) {
         removeifprojectile(object, false, false);
 
         MovingObjectType type = object->getMovingObjectType();
@@ -5985,7 +5985,7 @@ bool MO_CheepCheep::hitother(CPlayer * player)
 
 void MO_CheepCheep::collide(IO_MovingObject * object)
 {
-    if (!object->GetDead()) {
+    if (!object->isDead()) {
         removeifprojectile(object, false, false);
 
         MovingObjectType type = object->getMovingObjectType();
@@ -6454,7 +6454,7 @@ bool MO_SledgeBrother::hit(CPlayer * player)
 
 void MO_SledgeBrother::collide(IO_MovingObject * object)
 {
-    if (object->GetDead())
+    if (object->isDead())
         return;
 
     MovingObjectType type = object->getMovingObjectType();
@@ -6758,7 +6758,7 @@ void CO_Shell::AddMovingKill(CPlayer * killer)
 
 void CO_Shell::collide(IO_MovingObject * object)
 {
-    if (object->GetDead())
+    if (object->isDead())
         return;
 
     //Don't allow shells to die if they are warping
@@ -7190,7 +7190,7 @@ bool CO_ThrowBlock::KillPlayer(CPlayer * player)
 
 void CO_ThrowBlock::collide(IO_MovingObject * object)
 {
-    if (object->GetDead())
+    if (object->isDead())
         return;
 
     removeifprojectile(object, false, false);
@@ -7495,7 +7495,7 @@ bool CO_ThrowBox::KillPlayer(CPlayer * player)
 
 void CO_ThrowBox::collide(IO_MovingObject * object)
 {
-    if (object->GetDead())
+    if (object->isDead())
         return;
 
     removeifprojectile(object, false, false);
