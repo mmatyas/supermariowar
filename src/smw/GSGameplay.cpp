@@ -463,6 +463,10 @@ void GameplayState::CleanDeadPlayers()
 
 void checkWindEvent(short& iWindTimer, float& dNextWind)
 {
+    iWindTimer = 0;
+    dNextWind = (float)(RANDOM_INT(41) - 20) / 4.0f;
+    game_values.gamewindx = (float)((RANDOM_INT(41)) - 20) / 4.0f;
+
     if (iWindTimer <= 0) {
         //Then trigger next wind event
         if (game_values.gamewindx < dNextWind) {
@@ -1987,17 +1991,6 @@ void GameplayState::handleInput()
 
 void GameplayState::update()
 {
-    for (short iTeam = 0; iTeam < score_cnt; iTeam++) {
-        iScoreTextOffset[iTeam] = 34 * game_values.teamcounts[iTeam] + 1;
-    }
-
-
-    if (!netplay.active) {
-        iWindTimer = 0;
-        dNextWind = (float)(RANDOM_INT(41) - 20) / 4.0f;
-        game_values.gamewindx = (float)((RANDOM_INT(41)) - 20) / 4.0f;
-    }
-
     //Initialize players after game init has finished
     for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++)
         list_players[iPlayer]->Init();
@@ -2040,6 +2033,10 @@ void GameplayState::update()
 
     if (!netplay.active) {
         checkWindEvent(iWindTimer, dNextWind);
+    }
+
+    for (short iTeam = 0; iTeam < score_cnt; iTeam++) {
+        iScoreTextOffset[iTeam] = 34 * game_values.teamcounts[iTeam] + 1;
     }
 
     /*
