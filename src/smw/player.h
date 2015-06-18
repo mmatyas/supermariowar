@@ -214,6 +214,10 @@ class CPlayer
 		bool wantsToSuperStomp();
 		bool highJumped();
 
+        void draw_spotlight();
+        void draw_powerupRing();
+        void draw_winnerCrown();
+
 		COutputControl * playerKeys;
 		short playerDevice;
 

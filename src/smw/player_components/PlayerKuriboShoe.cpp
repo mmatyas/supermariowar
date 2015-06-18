@@ -41,7 +41,7 @@ void PlayerKuriboShoe::setType(KuriboShoeType newtype)
     type = newtype;
 }
 
-void PlayerKuriboShoe::update(CPlayer &player, uint8_t keymask)
+void PlayerKuriboShoe::update(CPlayer& player, uint8_t keymask)
 {
     update_gettingOutOfTheShoe(player, keymask); //Free player from the kuribo shoe
     update_SuperStomp(player);
@@ -49,7 +49,7 @@ void PlayerKuriboShoe::update(CPlayer &player, uint8_t keymask)
 }
 
 // Free player from the kuribo shoe
-void PlayerKuriboShoe::update_gettingOutOfTheShoe(CPlayer &player, uint8_t keymask)
+void PlayerKuriboShoe::update_gettingOutOfTheShoe(CPlayer& player, uint8_t keymask)
 {
     if (is_on() && player.isready() && !player.frozen) {
         if (exitIndex > 0) {
@@ -82,7 +82,7 @@ void PlayerKuriboShoe::update_gettingOutOfTheShoe(CPlayer &player, uint8_t keyma
     }
 }
 
-void PlayerKuriboShoe::update_SuperStomp(CPlayer &player) {
+void PlayerKuriboShoe::update_SuperStomp(CPlayer& player) {
     if (is_on() && player.canSuperStomp() && player.wantsToSuperStomp()) {
         if (player.highJumped()) {
             player.superstomp.startSuperStomping(player);
@@ -103,7 +103,7 @@ void PlayerKuriboShoe::update_animation()
     }
 }
 
-void PlayerKuriboShoe::draw(CPlayer &player)
+void PlayerKuriboShoe::draw(CPlayer& player)
 {
     if (type > 0) {
         if (player.iswarping())

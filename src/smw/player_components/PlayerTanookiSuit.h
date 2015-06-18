@@ -18,6 +18,8 @@ public:
 
     void allowStatue();
 
+    void drawStatue(CPlayer&);
+
 private:
     bool tanooki_on; // player is wearing the tanooki suit
     bool statue_lock;

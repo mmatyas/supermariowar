@@ -1357,7 +1357,7 @@ void CPlayer::updateSprite()
     //Use correct sprite (and animate)
     if (!game_values.pausegame && !game_values.exitinggame && !game_values.swapplayers) {
         //if player is warping from below, set them in the air
-        if (state > player_ready) {
+        if (iswarping()) {
             if (state == player_exiting_warp_down || state == player_entering_warp_up)
                 inair = true;
             else
@@ -1867,12 +1867,8 @@ void CPlayer::BounceAssistPlayer(CPlayer* o2)
     }
 }
 
-void CPlayer::draw()
+void CPlayer::draw_spotlight()
 {
-    //Don't draw a player that is waiting to respawn
-    if (state == player_wait)
-        return;
-
     if (game_values.spotlights && state != player_dead) {
         if (!sSpotlight) {
             sSpotlight = spotlightManager.AddSpotlight(ix + HALFPW, iy + HALFPH, 7);
@@ -1882,6 +1878,46 @@ void CPlayer::draw()
             sSpotlight->UpdatePosition(ix + HALFPW, iy + HALFPH);
         }
     }
+}
+
+void CPlayer::draw_powerupRing()
+{
+    if (powerupused > -1) {
+        short numeyecandy = 8;
+        float addangle = TWO_PI / numeyecandy;
+        float displayangle = powerupangle;
+
+        for (short k = 0; k < numeyecandy; k++) {
+            short powerupX = ix + HALFPW - 8 + (short)(powerupradius * cos(displayangle));
+            short powerupY = iy + HALFPH - 8 + (short)(powerupradius * sin(displayangle));
+
+            displayangle += addangle;
+
+            if (iswarping())
+                rm->spr_storedpowerupsmall.draw(powerupX, powerupY, powerupused * 16, 0, 16, 16, (short)state %4, GetWarpPlane());
+            else
+                rm->spr_storedpowerupsmall.draw(powerupX, powerupY, powerupused * 16, 0, 16, 16);
+        }
+    }
+}
+
+void CPlayer::draw_winnerCrown()
+{
+    if (game_values.showwinningcrown && g_iWinningPlayer == teamID) {
+        if (iswarping())
+            rm->spr_crown.draw(ix + HALFPW - (IsPlayerFacingRight() ? 4 : 10), iy - 10 - (kuriboshoe.is_on() ? 16 : 0), 0, 0, 14, 14, (short)state % 4, GetWarpPlane());
+        else
+            rm->spr_crown.draw(ix + HALFPW - (IsPlayerFacingRight() ? 4 : 10), iy - 10 - (kuriboshoe.is_on() ? 16 : 0));
+    }
+}
+
+void CPlayer::draw()
+{
+    //Don't draw a player that is waiting to respawn
+    if (state == player_wait)
+        return;
+
+    draw_spotlight();
 
     if (state == player_spawning)
         return;
@@ -1898,15 +1934,7 @@ void CPlayer::draw()
         else if (shyguy)
             pScoreboardSprite = rm->spr_shyguy[colorID];
 
-        //Blink the statue if the time is almost up
-        if (isready() && tanookisuit.isBlinking())
-            return;
-
-        //Draw the statue
-        if (iswarping())
-            rm->spr_statue.draw(ix - PWOFFSET, iy - 31, colorID << 5, 0, 32, 58, (short)state % 4, GetWarpPlane());
-        else
-            rm->spr_statue.draw(ix - PWOFFSET, iy - 31, colorID << 5, 0, 32, 58);
+        tanookisuit.drawStatue(*this);
 
         return;
     } else if (bobomb) { //draw him as bob-omb
@@ -1949,7 +1977,7 @@ void CPlayer::draw()
 
     //Don't draw the player if he is frozen in a shoe
     if (!frozen || !kuriboshoe.is_on()) {
-        if (state > player_ready) //warping
+        if (iswarping())
             pScoreboardSprite[sprite_state]->draw(ix - PWOFFSET, iy - PHOFFSET - iPlayerKuriboOffsetY, iSrcOffsetX, 0, 32, 32, (short)state % 4, GetWarpPlane());
         else
             pScoreboardSprite[sprite_state]->draw(ix - PWOFFSET, iy - PHOFFSET - iPlayerKuriboOffsetY, iSrcOffsetX, 0, 32, 32);
@@ -1959,12 +1987,7 @@ void CPlayer::draw()
     kuriboshoe.draw(*this);
 
     //Draw the crown on the player
-    if (game_values.showwinningcrown && g_iWinningPlayer == teamID) {
-        if (state > player_ready) //warping
-            rm->spr_crown.draw(ix + HALFPW - (IsPlayerFacingRight() ? 4 : 10), iy - 10 - (kuriboshoe.is_on() ? 16 : 0), 0, 0, 14, 14, (short)state % 4, GetWarpPlane());
-        else
-            rm->spr_crown.draw(ix + HALFPW - (IsPlayerFacingRight() ? 4 : 10), iy - 10 - (kuriboshoe.is_on() ? 16 : 0));
-    }
+    draw_winnerCrown();
 
     if (state < player_ready)
         return;
@@ -1984,23 +2007,7 @@ void CPlayer::draw()
         awardeffects.drawRingAward(*this);
 
     //Draw the powerup ring when a powerup is being used
-    if (powerupused > -1) {
-        short numeyecandy = 8;
-        float addangle = TWO_PI / numeyecandy;
-        float displayangle = powerupangle;
-
-        for (short k = 0; k < numeyecandy; k++) {
-            short powerupX = ix + HALFPW - 8 + (short)(powerupradius * cos(displayangle));
-            short powerupY = iy + HALFPH - 8 + (short)(powerupradius * sin(displayangle));
-
-            displayangle += addangle;
-
-            if (state > player_ready) //warping
-                rm->spr_storedpowerupsmall.draw(powerupX, powerupY, powerupused * 16, 0, 16, 16, (short)state %4, GetWarpPlane());
-            else
-                rm->spr_storedpowerupsmall.draw(powerupX, powerupY, powerupused * 16, 0, 16, 16);
-        }
-    }
+    draw_powerupRing();
 }
 
 void CPlayer::drawOutOfScreenIndicators()

@@ -6,6 +6,8 @@
 #include "player.h"
 #include "ResourceManager.h"
 
+#include <cassert>
+
 extern CGameValues game_values;
 extern CResourceManager* rm;
 
@@ -22,7 +24,7 @@ void PlayerTanookiSuit::reset() {
     statue_uses_left = 0;
 }
 
-bool PlayerTanookiSuit::canTurnIntoStatue(CPlayer &player) {
+bool PlayerTanookiSuit::canTurnIntoStatue(CPlayer& player) {
     return player.playerKeys->game_turbo.fPressed
         && player.playerKeys->game_down.fDown
         && !statue_lock
@@ -32,14 +34,14 @@ bool PlayerTanookiSuit::canTurnIntoStatue(CPlayer &player) {
         && !player.tail.isInUse();
 }
 
-void PlayerTanookiSuit::startSuperStomping(CPlayer &player) {
+void PlayerTanookiSuit::startSuperStomping(CPlayer& player) {
     player.superstomp.startSuperStomping(player);
 
     // Become soft shielded (with stomp ability)
     player.shield.setType(SOFT_WITH_STOMP);
 }
 
-void PlayerTanookiSuit::update(CPlayer &player)
+void PlayerTanookiSuit::update(CPlayer& player)
 {
     if (!tanooki_on || !player.isready())
         return;
@@ -160,4 +162,28 @@ bool PlayerTanookiSuit::isBlinking() {
 
 void PlayerTanookiSuit::allowStatue() {
     statue_lock = false;
+}
+
+void PlayerTanookiSuit::drawStatue(CPlayer& player)
+{
+    assert(isStatue());
+
+    //Blink the statue if the time is almost up
+    if (player.isready() && isBlinking())
+        return;
+
+    //Draw the statue
+    if (player.iswarping())
+        rm->spr_statue.draw(
+            player.leftX() - PWOFFSET,
+            player.topY() - 31,
+            player.getColorID() << 5,
+            0, 32, 58,
+            (short)player.state % 4, player.GetWarpPlane());
+    else
+        rm->spr_statue.draw(
+            player.leftX() - PWOFFSET,
+            player.topY() - 31,
+            player.getColorID() << 5,
+            0, 32, 58);
 }
