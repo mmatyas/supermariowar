@@ -168,7 +168,7 @@ class CPlayer
 		short globalID;
 		short teamID;
 	private:
-		void SetSprite();
+		void updateSprite();
 		void Jump(short iMove, float jumpModifier, bool fKuriboBounce);
 
 		void update_waitingForRespawn();
@@ -274,7 +274,7 @@ class CPlayer
 		short animationstate;
 		short animationtimer;
 
-		uint8_t spr;
+		uint8_t sprite_state;
 		short sprswitch;
 
 		PlayerInvincibility invincibility;

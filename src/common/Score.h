@@ -4,7 +4,7 @@
 class CScore
 {
 	public:
-    CScore(short iPlace) {
+		CScore(short iPlace) {
 			place = iPlace;
 			displayorder = iPlace;
 
@@ -29,7 +29,7 @@ class CScore
 
 		void AdjustScore(short iValue);
 
-    void SetScore(short iValue) {
+		void SetScore(short iValue) {
 			score = iValue;
 			SetDigitCounters();
 		}
@@ -61,7 +61,7 @@ class CScore
 
 	private:
 
-    void SetDigitCounters() {
+		void SetDigitCounters() {
 			short iDigits = score;
 			while (iDigits > 999)
 				iDigits -= 1000;

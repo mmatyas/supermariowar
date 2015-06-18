@@ -112,7 +112,7 @@ CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamI
 
     score = nscore;
 
-    spr = PGFX_JUMPING_R;
+    sprite_state = PGFX_JUMPING_R;
 
     for (short i = 0; i < PGFX_LAST; i++)
         sprites[i] = nsprites[i];
@@ -161,7 +161,7 @@ void CPlayer::Init()
 void CPlayer::updateFrozenStatus(int keymask)
 {
     if (frozen) {
-        if ((~(spr & 0x1) && (keymask & 4)) || ((spr & 0x1) && (keymask & 8)))
+        if ((~(sprite_state & 0x1) && (keymask & 4)) || ((sprite_state & 0x1) && (keymask & 8)))
             frozentimer -= 5;
 
         if (--frozentimer <= 0) {
@@ -664,7 +664,7 @@ void CPlayer::update_waitingForRespawn()
             if (game_values.spawnstyle == 0) {
                 eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + HALFPW - 16, iy + HALFPH - 16, 3, 8));
             } else if (game_values.spawnstyle == 1) {
-                eyecandy[0].add(new EC_Door(&rm->spr_spawndoor, sprites[spr], ix + HALFPW - 16, iy + HALFPH - 16, 1, iSrcOffsetX, colorID));
+                eyecandy[0].add(new EC_Door(&rm->spr_spawndoor, sprites[sprite_state], ix + HALFPW - 16, iy + HALFPH - 16, 1, iSrcOffsetX, colorID));
             }
         }
     }
@@ -1269,7 +1269,7 @@ void CPlayer::move()
         jail.update(*this);
     }
 
-    SetSprite();
+    updateSprite();
 }
 
 void CPlayer::CommitAction()
@@ -1350,7 +1350,7 @@ void CPlayer::CommitAction()
     action = player_action_none;
 }
 
-void CPlayer::SetSprite()
+void CPlayer::updateSprite()
 {
     int iReverseSprite = game_values.reversewalk ? 1 : 0;
 
@@ -1366,24 +1366,24 @@ void CPlayer::SetSprite()
 
         //lockjump is true when we are in the air (even if we fell of an edge)
         if (spin.isSpinInProgress()) {
-            spr = spin.toSpriteID();
+            sprite_state = spin.toSpriteID();
         } else if (state == player_spawning) {
-            if (!(spr & 0x1))
-                spr = PGFX_JUMPING_R + iReverseSprite;
+            if (!(sprite_state & 0x1))
+                sprite_state = PGFX_JUMPING_R + iReverseSprite;
             else
-                spr = PGFX_JUMPING_L - iReverseSprite;
+                sprite_state = PGFX_JUMPING_L - iReverseSprite;
         } else if (inair) {
             frictionslidetimer = 0;
             rainsteptimer = 0;
 
             if (IsPlayerFacingRight())
-                spr = PGFX_JUMPING_R;
+                sprite_state = PGFX_JUMPING_R;
             else
-                spr = PGFX_JUMPING_L;
+                sprite_state = PGFX_JUMPING_L;
         } else {
             if (velx > 0.0f) {
                 if (playerKeys->game_left.fDown && !playerKeys->game_right.fDown && state == player_ready) {
-                    spr = PGFX_STOPPING_R + iReverseSprite;
+                    sprite_state = PGFX_STOPPING_R + iReverseSprite;
 
                     if (++frictionslidetimer > 3) {
                         frictionslidetimer = 0;
@@ -1391,19 +1391,19 @@ void CPlayer::SetSprite()
                     }
                 } else {
                     if (onice && !playerKeys->game_right.fDown && !playerKeys->game_left.fDown)
-                        spr = PGFX_STANDING_R + iReverseSprite;
+                        sprite_state = PGFX_STANDING_R + iReverseSprite;
                     else {
                         if (--sprswitch < 1) {
                             if (game_values.reversewalk) {
-                                if (spr == PGFX_STANDING_L)
-                                    spr = PGFX_RUNNING_L;
+                                if (sprite_state == PGFX_STANDING_L)
+                                    sprite_state = PGFX_RUNNING_L;
                                 else
-                                    spr = PGFX_STANDING_L;
+                                    sprite_state = PGFX_STANDING_L;
                             } else {
-                                if (spr == PGFX_STANDING_R)
-                                    spr = PGFX_RUNNING_R;
+                                if (sprite_state == PGFX_STANDING_R)
+                                    sprite_state = PGFX_RUNNING_R;
                                 else
-                                    spr = PGFX_STANDING_R;
+                                    sprite_state = PGFX_STANDING_R;
                             }
 
                             sprswitch = 4;
@@ -1411,18 +1411,18 @@ void CPlayer::SetSprite()
                             //If animation timer hasn't fired, make sure we're facing the correct direction
 
                             if (game_values.reversewalk) {
-                                if (!(spr & 0x1))
-                                    spr = PGFX_STANDING_L;
+                                if (!(sprite_state & 0x1))
+                                    sprite_state = PGFX_STANDING_L;
                             } else {
-                                if (spr & 0x1)
-                                    spr = PGFX_STANDING_R;
+                                if (sprite_state & 0x1)
+                                    sprite_state = PGFX_STANDING_R;
                             }
                         }
                     }
                 }
             } else if (velx < 0.0f) {
                 if (playerKeys->game_right.fDown && !playerKeys->game_left.fDown && state == player_ready) {
-                    spr = PGFX_STOPPING_L - iReverseSprite;
+                    sprite_state = PGFX_STOPPING_L - iReverseSprite;
 
                     if (++frictionslidetimer > 3) {
                         frictionslidetimer = 0;
@@ -1430,30 +1430,30 @@ void CPlayer::SetSprite()
                     }
                 } else {
                     if (onice && !playerKeys->game_right.fDown && !playerKeys->game_left.fDown)
-                        spr = PGFX_STANDING_L - iReverseSprite;
+                        sprite_state = PGFX_STANDING_L - iReverseSprite;
                     else {
                         if (--sprswitch < 1) {
                             if (game_values.reversewalk) {
-                                if (spr == PGFX_STANDING_R)
-                                    spr = PGFX_RUNNING_R;
+                                if (sprite_state == PGFX_STANDING_R)
+                                    sprite_state = PGFX_RUNNING_R;
                                 else
-                                    spr = PGFX_STANDING_R;
+                                    sprite_state = PGFX_STANDING_R;
                             } else {
-                                if (spr == PGFX_STANDING_L)
-                                    spr = PGFX_RUNNING_L;
+                                if (sprite_state == PGFX_STANDING_L)
+                                    sprite_state = PGFX_RUNNING_L;
                                 else
-                                    spr = PGFX_STANDING_L;
+                                    sprite_state = PGFX_STANDING_L;
                             }
 
                             sprswitch = 4;
                         } else {
                             //If animation timer hasn't fired, make sure we're facing the correct direction
                             if (game_values.reversewalk) {
-                                if (spr & 0x1)
-                                    spr = PGFX_STANDING_R;
+                                if (sprite_state & 0x1)
+                                    sprite_state = PGFX_STANDING_R;
                             } else {
-                                if (!(spr & 0x1))
-                                    spr = PGFX_STANDING_L;
+                                if (!(sprite_state & 0x1))
+                                    sprite_state = PGFX_STANDING_L;
                             }
                         }
                     }
@@ -1462,14 +1462,14 @@ void CPlayer::SetSprite()
             } else {
                 //standing
                 if (playerKeys->game_left.fDown)
-                    spr = PGFX_STANDING_L - iReverseSprite;
+                    sprite_state = PGFX_STANDING_L - iReverseSprite;
                 else if (playerKeys->game_right.fDown)
-                    spr = PGFX_STANDING_R + iReverseSprite;
+                    sprite_state = PGFX_STANDING_R + iReverseSprite;
                 else {
-                    if (spr & 0x1)
-                        spr = PGFX_STANDING_L;
+                    if (sprite_state & 0x1)
+                        sprite_state = PGFX_STANDING_L;
                     else
-                        spr = PGFX_STANDING_R;
+                        sprite_state = PGFX_STANDING_R;
                 }
             }
         }
@@ -1480,10 +1480,10 @@ void CPlayer::SetSprite()
             iSpriteDirection = 1;
 
         if (--sprswitch < 1) {
-            if (spr == PGFX_STANDING_R + iSpriteDirection)
-                spr = PGFX_RUNNING_R + iSpriteDirection;
+            if (sprite_state == PGFX_STANDING_R + iSpriteDirection)
+                sprite_state = PGFX_RUNNING_R + iSpriteDirection;
             else
-                spr = PGFX_STANDING_R + iSpriteDirection;
+                sprite_state = PGFX_STANDING_R + iSpriteDirection;
 
             sprswitch = 4;
         }
@@ -1950,9 +1950,9 @@ void CPlayer::draw()
     //Don't draw the player if he is frozen in a shoe
     if (!frozen || !kuriboshoe.is_on()) {
         if (state > player_ready) //warping
-            pScoreboardSprite[spr]->draw(ix - PWOFFSET, iy - PHOFFSET - iPlayerKuriboOffsetY, iSrcOffsetX, 0, 32, 32, (short)state % 4, GetWarpPlane());
+            pScoreboardSprite[sprite_state]->draw(ix - PWOFFSET, iy - PHOFFSET - iPlayerKuriboOffsetY, iSrcOffsetX, 0, 32, 32, (short)state % 4, GetWarpPlane());
         else
-            pScoreboardSprite[spr]->draw(ix - PWOFFSET, iy - PHOFFSET - iPlayerKuriboOffsetY, iSrcOffsetX, 0, 32, 32);
+            pScoreboardSprite[sprite_state]->draw(ix - PWOFFSET, iy - PHOFFSET - iPlayerKuriboOffsetY, iSrcOffsetX, 0, 32, 32);
     }
 
     //Draw Kuribo's Shoe
@@ -2033,7 +2033,7 @@ void CPlayer::drawswap()
     }
 
     if (game_values.swapstyle != 1)
-        SetSprite();
+        updateSprite();
 
     draw();
 
@@ -2689,11 +2689,11 @@ bool CPlayer::IsPlayerFacingRight()
         }
     }
 
-    if (spr == PGFX_STOPPING_R)
+    if (sprite_state == PGFX_STOPPING_R)
         return false;
-    else if (spr == PGFX_STOPPING_L)
+    else if (sprite_state == PGFX_STOPPING_L)
         return true;
-    else if (!(spr & 0x1))
+    else if (!(sprite_state & 0x1))
         return true;
 
     return false;
