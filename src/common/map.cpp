@@ -11,6 +11,7 @@
 #include "ResourceManager.h"
 #include "TilesetManager.h"
 
+#include "SDL_image.h"
 #include "sdl12wrapper.h"
 
 #include <cmath>

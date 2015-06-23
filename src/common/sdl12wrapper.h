@@ -4,6 +4,8 @@
 #include "SDL.h"
 
 #ifdef USE_SDL2
+    extern SDL_Surface * screen;
+
     inline int SDL_SETCOLORKEY(SDL_Surface * surf, SDL_bool RLE, Uint32 keycolor)
     {
         int result = SDL_SetColorKey(surf, SDL_TRUE, keycolor);

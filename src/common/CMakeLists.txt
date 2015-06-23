@@ -7,6 +7,10 @@ add_library ( CommonFiles
     GameModeSettings.cpp
     GameValues.cpp
     gfx.cpp
+    gfx/gfxFont.cpp
+    gfx/gfxPalette.cpp
+    gfx/gfxSDL.cpp
+    gfx/gfxSprite.cpp
     global.cpp
     input.cpp
     linfunc.cpp

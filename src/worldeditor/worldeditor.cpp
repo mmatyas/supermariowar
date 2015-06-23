@@ -38,6 +38,8 @@
 	#endif
 #endif
 
+#include "SDL_image.h"
+
 #include <cstdlib>
 #include <string.h>
 #include <ctype.h>

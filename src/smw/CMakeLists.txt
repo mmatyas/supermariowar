@@ -98,9 +98,9 @@ if(NOT TARGET_EMSCRIPTEN)
 	target_link_libraries(smw ${CMAKE_THREAD_LIBS_INIT})
 
 	if(USE_SDL2_LIBS)
-		target_link_libraries(smw SDL2 SDL2_mixer SDL2_image SDL2_net SDL2main)
+		target_link_libraries(smw SDL2 SDL2_mixer SDL2_image SDL2main)
 	else()
-		target_link_libraries(smw ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLIMAGE_LIBRARY} ${SDLNET_LIBRARY} SDLmain)
+		target_link_libraries(smw ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLIMAGE_LIBRARY} SDLmain)
 	endif()
 
 	if(NOT NO_NETWORK)

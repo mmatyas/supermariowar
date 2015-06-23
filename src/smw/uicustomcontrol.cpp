@@ -1,5 +1,7 @@
 #include "uicustomcontrol.h"
 
+#include "SDL_image.h"
+
 #include "FileList.h"
 #include "Game.h"
 #include "GameMode.h"

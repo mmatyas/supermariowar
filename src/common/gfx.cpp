@@ -1,8 +1,11 @@
 #include "gfx.h"
 
-#include "FileList.h"
-#include "path.h"
+#include "SDL_image.h"
 #include "sdl12wrapper.h"
+
+#include "FileList.h"
+#include "gfx/gfxSDL.h"
+#include "path.h"
 
 #include <cassert>
 #include <iostream>
@@ -10,300 +13,33 @@
 
 using namespace std;
 
-#ifdef _WIN32
-    #pragma comment(lib, "SDL_image.lib")
-
-    #ifndef _XBOX
-        #pragma comment(lib, "SDL.lib")
-        #pragma comment(lib, "SDLmain.lib")
-    #endif
-#endif
-
-#ifdef USE_SDL2
-    SDL_Window   * sdl2_window;           //the window
-    SDL_Renderer * sdl2_renderer;         //screen -> texture -> renderer -> window
-    SDL_Texture  * sdl2_screenAsTexture;
-#endif
-
 extern SDL_Surface * blitdest;
-extern SDL_Surface * screen;
-
-extern GraphicsList *gamegraphicspacklist;
 
 extern short x_shake;
 extern short y_shake;
 
-#define GFX_BPP		16
-#ifdef _XBOX
-#define GFX_FLAGS	SDL_SWSURFACE | SDL_HWACCEL
-#else
-#define GFX_FLAGS	SDL_SWSURFACE | SDL_HWACCEL
-#endif
+GraphicsSDL gfx;
 
-//[colorcomponents][numcolors]
-Uint8 * colorcodes[3];
-
-#define NUM_SCHEMES 9
-
-//[numplayers][colorscheme][colorcomponents][numcolors]
-Uint8 * colorschemes[4][NUM_SCHEMES][3];
-short numcolors = 0;
-
-//gfx_init
-bool gfx_init(int w, int h, bool fullscreen)
-{
-    // show SDL version
-    SDL_version ver_compiled;
-    SDL_version ver_current;
-    SDL_VERSION(&ver_compiled);
-#ifdef USE_SDL2
-    SDL_GetVersion(&ver_current);
-#else
-    const SDL_version * constptr_ver_current = SDL_Linked_Version(); // dyn. linked version
-    ver_current = *constptr_ver_current;
-#endif
-    printf("[gfx] Initializing SDL %d.%d.%d (compiled with %d.%d.%d) ... ",
-        ver_current.major, ver_current.minor, ver_current.patch,
-        ver_compiled.major, ver_compiled.minor, ver_compiled.patch);
-
-    // init SDL
-    if ( SDL_Init(SDL_INIT_VIDEO) < 0 ) {
-        printf("error: %s\n", SDL_GetError());
-        return false;
-    } else
-        printf("ok\n");
-
-    // Clean up on exit
-    atexit(SDL_Quit);
-
-
-#ifndef __EMSCRIPTEN__
-    // show SDL_image version
-    const SDL_version * ver_img_current = IMG_Linked_Version();
-    SDL_IMAGE_VERSION(&ver_compiled);
-    printf("[gfx] Initializing SDL image %d.%d.%d (compiled with %d.%d.%d) ... ",
-        ver_img_current->major, ver_img_current->minor, ver_img_current->patch,
-        ver_compiled.major, ver_compiled.minor, ver_compiled.patch);
-#endif
-
-    // init SDL_image
-    int img_flags = IMG_INIT_JPG | IMG_INIT_PNG;
-    if ((IMG_Init(img_flags) & img_flags) != img_flags) {
-        printf("error: %s\n", IMG_GetError());
-        return false;
-    } else
-        printf("ok\n");
-
-#ifndef __EMSCRIPTEN__
-    // Clean up on exit
-    atexit(IMG_Quit);
-#endif
-
-
-#ifdef USE_SDL2
-    sdl2_window = SDL_CreateWindow("smw",
-        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-        w, h, fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
-        if (!sdl2_window) {
-            printf("Couldn't create %dx%d window: %s\n", w, h, SDL_GetError());
-            return false;
-        }
-
-    sdl2_renderer = SDL_CreateRenderer(sdl2_window, -1,
-        SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
-        if (!sdl2_renderer) {
-            printf("Couldn't create renderer: %s\n", SDL_GetError());
-            return false;
-        }
-
-        SDL_SetRenderDrawColor(sdl2_renderer, 0, 0, 0, 255);
-        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
-        SDL_RenderSetLogicalSize(sdl2_renderer, w, h);
-
-    screen = SDL_CreateRGBSurface(0, w, h, 32,
-        0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
-        if (!screen) {
-            printf("Couldn't create video buffer: %s\n", SDL_GetError());
-            return false;
-        }
-
-    sdl2_screenAsTexture = SDL_CreateTexture(sdl2_renderer,
-        SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, w, h);
-        if (!sdl2_screenAsTexture) {
-            printf("Couldn't create video texture: %s\n", SDL_GetError());
-            return false;
-        }
-
-
-#else
-    if (fullscreen)
-        screen = SDL_SetVideoMode(w, h, GFX_BPP, GFX_FLAGS | SDL_FULLSCREEN);
-    else
-        screen = SDL_SetVideoMode(w, h, GFX_BPP, GFX_FLAGS);
-
-    if ( screen == NULL ) {
-        printf("Couldn't set video mode %dx%d: %s\n", w, h, SDL_GetError());
-        return false;
-    }
-#endif
-
-    printf("[gfx] Running at %dx%d %dbpp\n", w, h, screen->format->BitsPerPixel);
-
-    for (int k = 0; k < 3; k++) {
-        colorcodes[k] = NULL;
-
-        for (int i = 0; i < 4; i++)
-            for (int j = 0; j < NUM_SCHEMES; j++)
-                colorschemes[i][j][k] = NULL;
-    }
-
-    return true;
+bool gfx_init(int w, int h, bool fullscreen) {
+    return gfx.Init(fullscreen);
 }
 
-void gfx_flipscreen()
-{
-#ifdef USE_SDL2
-    SDL_UpdateTexture(sdl2_screenAsTexture, NULL, screen->pixels, screen->pitch);
-    SDL_RenderClear(sdl2_renderer);
-    SDL_RenderCopy(sdl2_renderer, sdl2_screenAsTexture, NULL, NULL);
-    SDL_RenderPresent(sdl2_renderer);
-#else
-    SDL_Flip(screen);
-#endif
+void gfx_setresolution(int w, int h, bool fullscreen) {
+    gfx.RecreateWindow(fullscreen);
 }
 
-void gfx_freepalette()
-{
-    for (int k = 0; k < 3; k++) {
-        delete [] colorcodes[k];
-
-        for (int i = 0; i < 4; i++)
-            for (int j = 0; j < NUM_SCHEMES; j++)
-                delete [] colorschemes[i][j][k];
-    }
+void gfx_flipscreen() {
+    gfx.FlipScreen();
 }
 
-bool gfx_loadpalette()
-{
-    gfx_freepalette();
-
-    SDL_Surface * palette = IMG_Load(convertPathCP("gfx/packs/palette.bmp", gamegraphicspacklist->current_name()));
-
-    if ( palette == NULL ) {
-        printf("Couldn't load color palette: %s\n", SDL_GetError());
-        return false;
-    }
-
-    numcolors = (short)palette->w;
-
-    for (int k = 0; k < 3; k++) {
-        colorcodes[k] = new Uint8[numcolors];
-
-        for (int i = 0; i < 4; i++)
-            for (int j = 0; j < NUM_SCHEMES; j++)
-                colorschemes[i][j][k] = new Uint8[numcolors];
-    }
-
-    if (SDL_MUSTLOCK(palette))
-        SDL_LockSurface(palette);
-
-    int counter = 0;
-
-    Uint8 * pixels = (Uint8*)palette->pixels;
-
-    short iRedIndex = palette->format->Rshift >> 3;
-    short iGreenIndex = palette->format->Gshift >> 3;
-    short iBlueIndex = palette->format->Bshift >> 3;
-
-    for (int k = 0; k < numcolors; k++) {
-        colorcodes[iRedIndex][k] = pixels[counter++];
-        colorcodes[iGreenIndex][k] = pixels[counter++];
-        colorcodes[iBlueIndex][k] = pixels[counter++];
-    }
-
-    counter += palette->pitch - palette->w * 3;
-
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < NUM_SCHEMES; j++) {
-            for (int m = 0; m < numcolors; m++) {
-                colorschemes[i][j][iRedIndex][m] = pixels[counter++];
-                colorschemes[i][j][iGreenIndex][m] = pixels[counter++];
-                colorschemes[i][j][iBlueIndex][m] = pixels[counter++];
-            }
-
-            counter += palette->pitch - palette->w * 3;
-        }
-    }
-
-    if (SDL_MUSTLOCK(palette))
-        SDL_UnlockSurface(palette);
-
-    SDL_FreeSurface(palette);
-
-    return true;
+void gfx_settitle(const char* title) {
+    gfx.setTitle(title);
 }
 
-void gfx_setresolution(int w, int h, bool fullscreen)
-{
-#ifdef USE_SDL2
-    assert(sdl2_window);
-    assert(sdl2_renderer);
-    assert(sdl2_screen);
-    assert(sdl2_screenAsTexture);
-
-    if (fullscreen) {
-        SDL_DestroyWindow(sdl2_window);
-        sdl2_window = SDL_CreateWindow("smw",
-            SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-            w, h, SDL_WINDOW_FULLSCREEN_DESKTOP);
-    }
-    else
-        SDL_SetWindowSize(sdl2_window, w, h);
-        if (!sdl2_window) {
-            printf("Couldn't set video mode %dx%d: %s\n", w, h, SDL_GetError());
-            return;
-        }
-
-    // on some systems there's a mouse input bug after re-creating the window
-    if (SDL_GetRelativeMouseMode()) {
-        SDL_SetRelativeMouseMode(SDL_FALSE);
-        SDL_SetRelativeMouseMode(SDL_TRUE);
-    }
-#else
-    Uint32 flags = GFX_FLAGS;
-    if (fullscreen)
-        flags |= SDL_FULLSCREEN;
-
-    #ifdef _XBOX
-
-        if (game_values.aspectratio10x11)
-            flags |= SDL_10X11PIXELASPECTRATIO;
-
-        screen = SDL_SetVideoModeWithFlickerFilter(w, h, GFX_BPP, flags, game_values.flickerfilter, game_values.softfilter);
-
-    #else
-        screen = SDL_SetVideoMode(w, h, GFX_BPP, flags);
-    #endif
-#endif
+void gfx_close() {}
+bool gfx_loadpalette(const std::string& palette_path) {
+    gfx.getPalette().load(palette_path.c_str());
 }
-
-void gfx_close()
-{
-    for (int i = 0; i < 3; i++) {
-        delete [] colorcodes[i];
-
-        for (int j = 0; j < 4; j++)
-            for (int k = 0; k < NUM_SCHEMES; k++)
-                delete [] colorschemes[j][k][i];
-    }
-#ifdef USE_SDL2
-    SDL_DestroyTexture(sdl2_screenAsTexture);
-    SDL_FreeSurface(screen);
-    SDL_DestroyRenderer(sdl2_renderer);
-    SDL_DestroyWindow(sdl2_window);
-#endif
-}
-
 
 bool ValidSkinSurface(SDL_Surface * skin)
 {
@@ -329,7 +65,12 @@ bool ValidSkinSurface(SDL_Surface * skin)
  * @param  reverse
  * @return              skin frame surface
  */
-SDL_Surface * gfx_createskinsurface(SDL_Surface * skin, short spriteindex, Uint8 r, Uint8 g, Uint8 b, short colorScheme, bool expand, bool reverse)
+SDL_Surface * gfx_createskinsurface(
+    SDL_Surface * skin,
+    short spriteindex,
+    Uint8 r, Uint8 g, Uint8 b,
+    unsigned short colorScheme,
+    bool expand, bool reverse)
 {
     int loops = 1;
     if (expand)
@@ -373,12 +114,15 @@ SDL_Surface * gfx_createskinsurface(SDL_Surface * skin, short spriteindex, Uint8
             Uint8 iColorByte3 = pixels[skincounter + iBlueOffset];
 
             bool fFoundColor = false;
-            for (int m = 0; m < numcolors; m++) {
-                if (iColorByte1 == colorcodes[0][m] && iColorByte2 == colorcodes[1][m] && iColorByte3 == colorcodes[2][m]) {
-                    for (int k = 0; k < loops; k++) {
-                        temppixels[tempcounter + k * byteperframe + reverseoffset + iRedOffset] = colorschemes[colorScheme][k][0][m];
-                        temppixels[tempcounter + k * byteperframe + reverseoffset + iGreenOffset] = colorschemes[colorScheme][k][1][m];
-                        temppixels[tempcounter + k * byteperframe + reverseoffset + iBlueOffset] = colorschemes[colorScheme][k][2][m];
+            for (unsigned short m = 0; m < gfx.getPalette().colorCount(); m++) {
+                if (gfx.getPalette().matchesColorAtID(m, iColorByte1, iColorByte2, iColorByte3)) {
+                    for (unsigned short k = 0; k < loops; k++) {
+                        unsigned short base = tempcounter + k * byteperframe + reverseoffset;
+                        gfx.getPalette().copyColorSchemeTo(
+                            colorScheme, k, m,
+                            temppixels[base + iRedOffset],
+                            temppixels[base + iGreenOffset],
+                            temppixels[base + iBlueOffset]);
                     }
 
                     fFoundColor = true;
@@ -561,25 +305,30 @@ SDL_Surface * gfx_createteamcoloredsurface(SDL_Surface * sImage, short iColor, U
     short iGreenOffset = sImage->format->Gshift >> 3;
     short iBlueOffset = sImage->format->Bshift >> 3;
 
-    for (int j = 0; j < sImage->w; j++) {
-        for (int i = 0; i < sImage->h; i++) {
+    for (unsigned short j = 0; j < sImage->w; j++) {
+        for (unsigned short i = 0; i < sImage->h; i++) {
             Uint8 iColorByte1 = pixels[iSrcPixelCounter + iRedOffset];
             Uint8 iColorByte2 = pixels[iSrcPixelCounter + iGreenOffset];
             Uint8 iColorByte3 = pixels[iSrcPixelCounter + iBlueOffset];
 
             bool fFoundColor = false;
-            for (int m = 0; m < numcolors; m++) {
-                if (iColorByte1 == colorcodes[0][m] && iColorByte2 == colorcodes[1][m] && iColorByte3 == colorcodes[2][m]) {
+            for (unsigned short m = 0; m < gfx.getPalette().colorCount(); m++) {
+                if (gfx.getPalette().matchesColorAtID(m, iColorByte1, iColorByte2, iColorByte3)) {
                     if (iColor < 0) {
-                        for (short iTeam = 0; iTeam < 4; iTeam++) {
-                            temppixels[iDstPixelCounter + iRedOffset + iNextImageOffset * iTeam] = colorschemes[iTeam][0][0][m];
-                            temppixels[iDstPixelCounter + iGreenOffset + iNextImageOffset * iTeam] = colorschemes[iTeam][0][1][m];
-                            temppixels[iDstPixelCounter + iBlueOffset + iNextImageOffset * iTeam] = colorschemes[iTeam][0][2][m];
+                        for (unsigned short iTeam = 0; iTeam < 4; iTeam++) {
+                            unsigned short base = iDstPixelCounter + iNextImageOffset * iTeam;
+                            gfx.getPalette().copyColorSchemeTo(
+                                iTeam, 0, m,
+                                temppixels[base + iRedOffset],
+                                temppixels[base + iGreenOffset],
+                                temppixels[base + iBlueOffset]);
                         }
                     } else {
-                        temppixels[iDstPixelCounter + iRedOffset] = colorschemes[iColor][0][0][m];
-                        temppixels[iDstPixelCounter + iGreenOffset] = colorschemes[iColor][0][1][m];
-                        temppixels[iDstPixelCounter + iBlueOffset] = colorschemes[iColor][0][2][m];
+                        gfx.getPalette().copyColorSchemeTo(
+                            iColor, 0, m,
+                            temppixels[iDstPixelCounter + iRedOffset],
+                            temppixels[iDstPixelCounter + iGreenOffset],
+                            temppixels[iDstPixelCounter + iBlueOffset]);
                     }
 
                     fFoundColor = true;
@@ -791,7 +540,14 @@ bool gfx_adjusthiddenrects(SDL_Rect * srcRect, SDL_Rect * dstRect, short iHidden
     return false;
 }
 
-void gfx_drawpreview(SDL_Surface * surface, short dstX, short dstY, short srcX, short srcY, short iw, short ih, short clipX, short clipY, short clipW, short clipH, bool wrap, short hiddenDirection, short hiddenPlane)
+void gfx_drawpreview(
+    SDL_Surface * surface,
+    short dstX, short dstY,
+    short srcX, short srcY,
+    short iw, short ih,
+    short clipX, short clipY, short clipW, short clipH,
+    bool wrap,
+    short hiddenDirection, short hiddenPlane)
 {
     //need to set source rect before each blit so it can be clipped correctly
     SDL_Rect rSrcRect = {srcX, srcY, iw, ih};
@@ -860,12 +616,7 @@ bool gfx_loadimagenocolorkey(gfxSprite * gSprite, const std::string& f)
 
 bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, bool fWrap, bool fUseAccel)
 {
-    bool fRet = gSprite->init(f, 255, 0, 255, fUseAccel);
-
-    if (fRet)
-        gSprite->SetWrap(fWrap);
-
-    return fRet;
+    return gfx_loadimage(gSprite, f, 255, 0, 255, fWrap, fUseAccel);
 }
 
 bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, Uint8 alpha, bool fWrap, bool fUseAccel)
@@ -886,419 +637,4 @@ bool gfx_loadimage(gfxSprite * gSprite, const std::string& f, Uint8 r, Uint8 g, 
         gSprite->SetWrap(fWrap);
 
     return fRet;
-}
-
-
-//gfxSprite
-
-gfxSprite::gfxSprite()
-{
-    clearSurface();
-    iWrapSize = 640; // TODO: Get it from a global setting.
-}
-
-gfxSprite::~gfxSprite()
-{
-    //free the allocated surface
-    freeSurface();
-}
-
-void gfxSprite::clearSurface()
-{
-    m_bltrect.x = 0;
-    m_bltrect.y = 0;
-    m_bltrect.w = 0;
-    m_bltrect.h = 0;
-    m_picture = NULL;
-
-    fHiddenPlane = false;
-    iHiddenDirection = 0;
-    iHiddenValue = 0;
-
-    fWrap = false;
-}
-
-bool gfxSprite::init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b, bool fUseAccel)
-{
-    cout << "loading sprite (mode 1) " << filename << "...";
-
-    if (m_picture) {
-        SDL_FreeSurface(m_picture);
-        m_picture = NULL;
-    }
-
-    // Load the BMP file into a surface
-    m_picture = IMG_Load(filename.c_str());
-    if (!m_picture) {
-        cout << endl << " ERROR: Couldn't load " << filename << ": " << IMG_GetError() << endl;
-        return false;
-    }
-
-    if ( SDL_SETCOLORKEY(m_picture, fUseAccel ? SDL_TRUE : SDL_FALSE, SDL_MapRGB(m_picture->format, r, g, b)) < 0) {
-        cout << endl << " ERROR: Couldn't set ColorKey + RLE for "
-             << filename << ": " << SDL_GetError() << endl;
-        return false;
-    }
-
-#ifdef __EMSCRIPTEN__
-    SDL_Surface * temp = SDL_DisplayFormatAlpha(m_picture);
-#else
-    SDL_Surface * temp = SDL_DisplayFormat(m_picture);
-#endif
-
-    if (!temp) {
-        cout << endl << " ERROR: Couldn't convert "
-             << filename << " to the display's pixel format: " << SDL_GetError()
-             << endl;
-        return false;
-    }
-
-    SDL_FreeSurface(m_picture);
-    m_picture = temp;
-
-    m_bltrect.w = (Uint16)m_picture->w;
-    m_bltrect.h = (Uint16)m_picture->h;
-
-    cout << "done" << endl;
-    return true;
-}
-
-bool gfxSprite::init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b, Uint8 a, bool fUseAccel)
-{
-    cout << "Loading sprite (mode 2) " << filename << " ...";
-
-    if (m_picture) {
-        SDL_FreeSurface(m_picture);
-        m_picture = NULL;
-    }
-
-    // Load the BMP file into a surface
-    m_picture = IMG_Load(filename.c_str());
-    if (!m_picture) {
-        cout << endl << " ERROR: Couldn't load "
-             << filename << ": " << SDL_GetError() << endl;
-        return false;
-    }
-
-    if ( SDL_SETCOLORKEY(m_picture, fUseAccel ? SDL_TRUE : SDL_FALSE, SDL_MapRGB(m_picture->format, r, g, b)) < 0) {
-        cout << endl << " ERROR: Couldn't set ColorKey + RLE for "
-             << filename << ": " << SDL_GetError() << endl;
-        return false;
-    }
-
-    if ( (SDL_SETALPHABYTE(m_picture, fUseAccel ? SDL_TRUE : SDL_FALSE, a)) < 0) {
-        cout << endl << " ERROR: Couldn't set per-surface alpha on "
-             << filename << ": " << SDL_GetError() << endl;
-        return false;
-    }
-
-#ifdef USE_SDL2
-    printf("%d\n", screen->format);
-    //SDL_Surface *temp = SDL_DisplayFormatAlpha(m_picture, screen);
-    SDL_Surface *temp = SDL_ConvertSurface(m_picture, screen->format, 0);
-#else
-    SDL_Surface *temp = SDL_DisplayFormatAlpha(m_picture);
-#endif
-
-    if (!temp) {
-        cout << endl << " ERROR: Couldn't convert "
-             << filename << " to the display's pixel format: " << SDL_GetError()
-             << endl;
-        return false;
-    }
-    SDL_FreeSurface(m_picture);
-    m_picture = temp;
-
-    m_bltrect.w = (Uint16)m_picture->w;
-    m_bltrect.h = (Uint16)m_picture->h;
-
-    cout << "done" << endl;
-    return true;
-}
-
-bool gfxSprite::init(const std::string& filename)
-{
-    cout << "loading sprite (mode 3) " << filename << "...";
-
-    if (m_picture) {
-        SDL_FreeSurface(m_picture);
-        m_picture = NULL;
-    }
-
-    // Load the BMP file into a surface
-    m_picture = IMG_Load(filename.c_str());
-
-    if (!m_picture) {
-        cout << endl << " ERROR: Couldn't load "
-             << filename << ": " << SDL_GetError() << endl;
-        return false;
-    }
-
-#ifdef __EMSCRIPTEN__
-    SDL_Surface * temp = SDL_DisplayFormatAlpha(m_picture);
-#else
-    SDL_Surface * temp = SDL_DisplayFormat(m_picture);
-#endif
-
-    if (!temp) {
-        cout << endl << " ERROR: Couldn't convert "
-             << filename << " to the display's pixel format: " << SDL_GetError()
-             << endl;
-        return false;
-    }
-
-    SDL_FreeSurface(m_picture);
-    m_picture = temp;
-
-    m_bltrect.w = (Uint16)m_picture->w;
-    m_bltrect.h = (Uint16)m_picture->h;
-
-    m_srcrect.x = 0;
-    m_srcrect.y = 0;
-    m_srcrect.w = (Uint16)m_picture->w;
-    m_srcrect.h = (Uint16)m_picture->h;
-
-    cout << "done" << endl;
-    return true;
-}
-
-bool gfxSprite::draw(short x, short y)
-{
-    m_bltrect.x = x + x_shake;
-    m_bltrect.y = y + y_shake;
-
-    if (SDL_BlitSurface(m_picture, NULL, blitdest, &m_bltrect) < 0) {
-        fprintf(stderr, "BlitSurface error: %s\n", SDL_GetError());
-        return false;
-    }
-
-    if (fWrap) {
-        if (x + m_picture->w >= iWrapSize) {
-            m_bltrect.x = x - iWrapSize + x_shake;
-            m_bltrect.y = y + y_shake;
-
-            if (SDL_BlitSurface(m_picture, NULL, blitdest, &m_bltrect) < 0) {
-                fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
-                return false;
-            }
-        } else if (x < 0) {
-            m_bltrect.x = x + iWrapSize + x_shake;
-            m_bltrect.y = y + y_shake;
-
-            if (SDL_BlitSurface(m_picture, NULL, blitdest, &m_bltrect) < 0) {
-                fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
-                return false;
-            }
-        }
-    }
-
-    return true;
-}
-
-//TODO Perf Optimization: Set w/h once when sprite is initialized, set srcx/srcy just when animation frame advance happens
-bool gfxSprite::draw(short x, short y, short srcx, short srcy, short w, short h, short sHiddenDirection, short sHiddenValue)
-{
-    m_bltrect.x = x + x_shake;
-    m_bltrect.y = y + y_shake;
-    m_bltrect.w = w;
-    m_bltrect.h = h;
-
-    m_srcrect.x = srcx;
-    m_srcrect.y = srcy;
-    m_srcrect.w = w;
-    m_srcrect.h = h;
-
-    if (sHiddenDirection > -1) {
-        if (gfx_adjusthiddenrects(&m_srcrect, &m_bltrect, sHiddenDirection, sHiddenValue))
-            return true;
-    }
-
-    // Blit onto the screen surface
-    if (SDL_BlitSurface(m_picture, &m_srcrect, blitdest, &m_bltrect) < 0) {
-        fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
-        return false;
-    }
-
-    if (fWrap) {
-        if (x + w >= iWrapSize) {
-            gfx_setrect(&m_srcrect, srcx, srcy, w, h);
-            gfx_setrect(&m_bltrect, x - iWrapSize + x_shake, y + y_shake, w, h);
-
-            if (sHiddenDirection > -1) {
-                if (gfx_adjusthiddenrects(&m_srcrect, &m_bltrect, sHiddenDirection, sHiddenValue))
-                    return true;
-            }
-
-            if (SDL_BlitSurface(m_picture, &m_srcrect, blitdest, &m_bltrect) < 0) {
-                fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
-                return false;
-            }
-        } else if (x < 0) {
-            gfx_setrect(&m_srcrect, srcx, srcy, w, h);
-            gfx_setrect(&m_bltrect, x + iWrapSize + x_shake, y + y_shake, w, h);
-
-            if (sHiddenDirection > -1) {
-                if (gfx_adjusthiddenrects(&m_srcrect, &m_bltrect, sHiddenDirection, sHiddenValue))
-                    return true;
-            }
-
-            if (SDL_BlitSurface(m_picture, &m_srcrect, blitdest, &m_bltrect) < 0) {
-                fprintf(stderr, "SDL_BlitSurface error: %s\n", SDL_GetError());
-                return false;
-            }
-        }
-    }
-
-    return true;
-}
-
-bool gfxSprite::drawStretch(short x, short y, short w, short h, short srcx, short srcy, short srcw, short srch)
-{
-    m_bltrect.x = x + x_shake;
-    m_bltrect.y = y + y_shake;
-    m_bltrect.w = w;
-    m_bltrect.h = h;
-
-    m_srcrect.x = srcx;
-    m_srcrect.y = srcy;
-    m_srcrect.w = srcw;
-    m_srcrect.h = srch;
-
-    // Looks like SoftStretch doesn't respect transparent colors
-    // I need to look into the actual SDL code to see if I can fix this
-    if (SDL_SCALEBLIT(m_picture, &m_srcrect, blitdest, &m_bltrect) < 0) {
-        fprintf(stderr, "SDL_SoftStretch error: %s\n", SDL_GetError());
-        return false;
-    }
-
-    return true;
-}
-
-void gfxSprite::setalpha(Uint8 alpha)
-{
-    assert(m_picture != NULL);
-
-    if ( (SDL_SETALPHABYTE(m_picture, SDL_TRUE, alpha)) < 0) {
-        printf("\n ERROR: couldn't set alpha on sprite: %s\n", SDL_GetError());
-    }
-}
-
-void gfxSprite::freeSurface()
-{
-    if (m_picture) {
-        SDL_FreeSurface(m_picture);
-        m_picture = NULL;
-    }
-}
-
-
-// gfxFont
-gfxFont::gfxFont()
-{
-    m_font = NULL;
-}
-
-gfxFont::~gfxFont()
-{
-    if (m_font)
-        SFont_FreeFont(m_font);
-};
-
-bool gfxFont::init(const std::string& filename)
-{
-    if (m_font)
-        SFont_FreeFont(m_font);
-
-    cout << "loading font " << filename << " ... ";
-
-    SDL_Surface *fontsurf = IMG_Load(filename.c_str());
-    if (fontsurf == NULL) {
-        cout << endl << " ERROR: Couldn't load file "
-             << filename << ": " << SDL_GetError() << endl;
-        return false;
-    }
-
-    m_font = SFont_InitFont(fontsurf);
-    if (!m_font) {
-        cout << endl << " ERROR: an error occurre while loading the font." << endl;
-        return false;
-    }
-
-    cout << "done" << endl;
-    return true;
-}
-
-void gfxFont::draw(int x, int y, const std::string& s)
-{
-    //if (y + getHeight() < 0)
-    //	return;
-
-    SFont_Write(blitdest, m_font, x, y, s.c_str());
-}
-
-void gfxFont::drawChopRight(int x, int y, int width, const char *s)
-{
-    //if (y + getHeight() < 0)
-    //	return;
-
-    SFont_WriteChopRight(blitdest, m_font, x, y, width, s);
-}
-
-void gfxFont::drawChopLeft(int x, int y, int width, const char *s)
-{
-    //if (y + getHeight() < 0)
-    //	return;
-
-    SFont_WriteChopLeft(blitdest, m_font, x, y, width, s);
-}
-
-void gfxFont::drawCentered(int x, int y, const char *text)
-{
-    //if (y + getHeight() < 0)
-    //	return;
-
-    SFont_WriteCenter(blitdest, m_font, x, y, text);
-};
-
-void gfxFont::drawChopCentered(int x, int y, int width, const char *text)
-{
-    //if (y + getHeight() < 0)
-    //	return;
-
-    SFont_WriteChopCenter(blitdest, m_font, x, y, width, text);
-};
-
-void gfxFont::drawRightJustified(int x, int y, const char *s, ...)
-{
-    char buffer[256];
-
-    va_list zeiger;
-    va_start(zeiger, s);
-    vsprintf(buffer, s, zeiger);
-    va_end(zeiger);
-
-    //if (y + getHeight() < 0)
-    //	return;
-
-    SFont_WriteRight(blitdest, m_font, x, y, buffer);
-};
-
-
-void gfxFont::drawf(int x, int y, const char *s, ...)
-{
-    char buffer[256];
-
-    va_list zeiger;
-    va_start(zeiger, s);
-    vsprintf(buffer, s, zeiger);
-    va_end(zeiger);
-
-    draw(x,y,buffer);
-}
-
-void gfxFont::setalpha(Uint8 alpha)
-{
-    if ( (SDL_SETALPHABYTE(m_font->Surface, SDL_TRUE, alpha)) < 0) {
-        printf("\n ERROR: couldn't set alpha on sprite: %s\n", SDL_GetError());
-    }
 }

@@ -67,9 +67,6 @@
 
 
 //------ system stuff ------
-#ifdef USE_SDL2
-    extern SDL_Window* sdl2_window;
-#endif
 SDL_Surface		*screen;		//for gfx (maybe the gfx system should be improved -> resource manager)
 SDL_Surface		*blitdest;		//the destination surface for all drawing (can be swapped from screen to another surface)
 
@@ -255,13 +252,7 @@ int main(int argc, char *argv[])
     //setting the icon isn't implemented in sdl ->  i'll ask on the mailing list
     char title[128];
     sprintf(title, "%s %s", TITLESTRING, VERSIONNUMBER);
-#ifdef USE_SDL2
-    SDL_SetWindowTitle(sdl2_window, title);
-    SDL_SetRelativeMouseMode(SDL_TRUE);
-#else
-    SDL_WM_SetCaption(title, "smw.ico");
-    SDL_ShowCursor(SDL_DISABLE);
-#endif
+    gfx_settitle(title);
 
     printf("\n---------------- loading ----------------\n");
 
@@ -363,7 +354,7 @@ int main(int argc, char *argv[])
     }
 
     //Load the gfx color palette
-    gfx_loadpalette();
+    gfx_loadpalette(convertPathCP("gfx/packs/palette.bmp", gamegraphicspacklist->current_name()));
 
     //Call to setup input optimization
     game_values.playerInput.CheckIfMouseUsed();

@@ -44,6 +44,8 @@ void IO_MovingObject::flipsidesifneeded() {}
 void IO_MovingObject::KillObjectMapHazard(short playerID) {}
 void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead) {}
 
+#include "SDL.h"
+#include "SDL_image.h"
 #include "sdl12wrapper.h"
 
 #ifdef PNG_SAVE_FORMAT
@@ -71,8 +73,6 @@ void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead
 
     #endif
 #endif
-
-#include "SDL.h"
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
