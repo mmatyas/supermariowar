@@ -12,6 +12,7 @@ class NetPeer
         virtual ~NetPeer() {}
 
         virtual bool send(const void*, size_t) = 0;
+        virtual bool sendReliable(const void*, size_t) = 0;
         virtual void disconnect() = 0;
 
         // get address host and port in network byte order

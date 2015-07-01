@@ -12,6 +12,7 @@ class NetPeerENet : public NetPeer
         ~NetPeerENet();
 
         bool send(const void*, size_t);
+        bool sendReliable(const void*, size_t);
         void disconnect();
 
         uint32_t addressHost();

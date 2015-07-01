@@ -7,6 +7,8 @@
 #include <cstring>
 
 #define CONNECTION_TIMEOUT_MS 5000
+#define UNRELIABLE_CHANNEL 0
+#define RELIABLE_CHANNEL 1
 
 NetPeerENet::NetPeerENet(ENetPeer* peer)
     : NetPeer()
@@ -28,11 +30,27 @@ bool NetPeerENet::send(const void* data, size_t length)
     if (!foreign_peer || !data || length <= 0)
         return false;
 
+    ENetPacket* packet = enet_packet_create(data, length, 0x0);
+    if (!packet)
+        return false;
+
+    if (enet_peer_send(foreign_peer, UNRELIABLE_CHANNEL, packet) < 0)
+        return false;
+
+    return true;
+}
+
+bool NetPeerENet::sendReliable(const void* data, size_t length)
+{
+    assert(foreign_peer);
+    if (!foreign_peer || !data || length <= 0)
+        return false;
+
     ENetPacket* packet = enet_packet_create(data, length, ENET_PACKET_FLAG_RELIABLE);
     if (!packet)
         return false;
 
-    if (enet_peer_send(foreign_peer, 0, packet) < 0)
+    if (enet_peer_send(foreign_peer, RELIABLE_CHANNEL, packet) < 0)
         return false;
 
     return true;
@@ -120,8 +138,10 @@ bool NetworkLayerENet::init()
     }
 
     ENetVersion version = enet_linked_version();
-    printf("[net] ENet %u.%u.%u initialized.\n", ENET_VERSION_GET_MAJOR(version),
-        ENET_VERSION_GET_MINOR(version), ENET_VERSION_GET_PATCH(version));
+    printf("[net] ENet %u.%u.%u initialized.\n",
+        ENET_VERSION_GET_MAJOR(version),
+        ENET_VERSION_GET_MINOR(version),
+        ENET_VERSION_GET_PATCH(version));
 
     return true;
 }
@@ -132,9 +152,9 @@ bool NetworkLayerENet::client_restart()
 
     // no bind
     // two connections (lobby server and game host)
-    // one channel
+    // two channels (a reliable and an unreliable)
     // no up/down speed limit
-    local_client = enet_host_create(NULL, 2, 1, 0, 0);
+    local_client = enet_host_create(NULL, 2, 2, 0, 0);
     if (!local_client) {
         fprintf(stderr, "[error][net] Could not open client connection port.\n");
         return false;
@@ -152,9 +172,9 @@ bool NetworkLayerENet::gamehost_restart()
 
     // bind address
     // max. 3 connections
-    // one channel
+    // two channels (a reliable and an unreliable)
     // no up/down speed limit
-    local_gamehost = enet_host_create(&local_gamehost_address, 3, 1, 0, 0);
+    local_gamehost = enet_host_create(&local_gamehost_address, 3, 2, 0, 0);
     if (!local_gamehost) {
         fprintf(stderr, "[error][net] Could not open game host connection port.\n");
         return false;
@@ -190,11 +210,11 @@ bool NetworkLayerENet::openConnection(const char* hostname, const uint16_t port)
     target_address.port = port;
 
     // Initiate connection
-    // client_host connects
+    // local_client connects
     // to target_address
-    // on one channel
-    // without any data
-    ENetPeer* target_host = enet_host_connect(local_client, &target_address, 1, 0x0);
+    // on two channels
+    // without any initial data
+    ENetPeer* target_host = enet_host_connect(local_client, &target_address, 2, 0x0);
     if (!target_host) {
         printf("[net] Could not initiate connection to this address.\n");
         return false;

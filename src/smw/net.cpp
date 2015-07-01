@@ -250,7 +250,7 @@ bool NetClient::sendConnectRequestToSelectedServer()
     ServerAddress* selectedServer = &netplay.savedServers[netplay.selectedServerIndex];
     if (!connectLobby(selectedServer->hostname.c_str()))
         return false;
-    
+
     netplay.operationInProgress = true;
     return true;
 }
