@@ -392,8 +392,8 @@ void NetClient::handleRoomChangedMessage(const uint8_t* data, size_t dataLength)
 
     netplay.theHostIsMe = false;
     netplay.currentRoom.hostPlayerNumber = pkg.hostPlayerNumber;
-    remotePlayerNumber = pkg.remotePlayerNumber;
-    if (remotePlayerNumber == pkg.hostPlayerNumber) {
+    netplay.remotePlayerNumber = pkg.remotePlayerNumber;
+    if (netplay.remotePlayerNumber == pkg.hostPlayerNumber) {
         netplay.theHostIsMe = true;
         local_gamehost.start(foreign_lobbyserver);
     } else {
@@ -409,7 +409,7 @@ void NetClient::sendChatMessage(const char* message)
     assert(strlen(message) > 0);
     assert(strlen(message) <= NET_MAX_CHAT_MSG_LENGTH);
 
-    Net_RoomChatMsgPackage pkg(remotePlayerNumber, message);
+    Net_RoomChatMsgPackage pkg(netplay.remotePlayerNumber, message);
     sendMessageToLobbyServer(&pkg, sizeof(Net_RoomChatMsgPackage));
 }
 
@@ -532,7 +532,7 @@ void NetClient::sendLocalInput()
     sendMessageToGameHost(&pkg, sizeof(Net_ClientInputPackage));
 
     //game_values.playerInput.outputControls[iGlobalID];
-    printf("INPUT %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d\n",
+    /*printf("INPUT %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d\n",
         game_values.playerInput.outputControls[0].keys[0].fDown,
         game_values.playerInput.outputControls[0].keys[0].fPressed,
         game_values.playerInput.outputControls[0].keys[1].fDown,
@@ -548,7 +548,7 @@ void NetClient::sendLocalInput()
         game_values.playerInput.outputControls[0].keys[6].fDown,
         game_values.playerInput.outputControls[0].keys[6].fPressed,
         game_values.playerInput.outputControls[0].keys[7].fDown,
-        game_values.playerInput.outputControls[0].keys[7].fPressed);
+        game_values.playerInput.outputControls[0].keys[7].fPressed);*/
 }
 
 void NetClient::handleRemoteGameState(const uint8_t* data, size_t dataLength) // for other clients
@@ -1080,11 +1080,11 @@ void NetGameHost::handleRemoteInput(const NetPeer& player, const uint8_t* data, 
 
     for (unsigned short c = 0; c < expected_client_count; c++) {
         if (player == *clients[c]) {
-            printf("yey\n");
+            //printf("yey\n");
             pkg->readKeys(&netplay.netPlayerInput.outputControls[c + 1]); // 0 = local player
 
 
-            printf("INPUT %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d\n",
+            /*printf("INPUT %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d\n",
                 netplay.netPlayerInput.outputControls[c + 1].keys[0].fDown,
                 netplay.netPlayerInput.outputControls[c + 1].keys[0].fPressed,
                 netplay.netPlayerInput.outputControls[c + 1].keys[1].fDown,
@@ -1100,7 +1100,7 @@ void NetGameHost::handleRemoteInput(const NetPeer& player, const uint8_t* data, 
                 netplay.netPlayerInput.outputControls[c + 1].keys[6].fDown,
                 netplay.netPlayerInput.outputControls[c + 1].keys[6].fPressed,
                 netplay.netPlayerInput.outputControls[c + 1].keys[7].fDown,
-                netplay.netPlayerInput.outputControls[c + 1].keys[7].fPressed);
+                netplay.netPlayerInput.outputControls[c + 1].keys[7].fPressed);*/
 
             return;
         }

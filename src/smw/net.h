@@ -195,9 +195,6 @@ class NetClient : public NetworkEventHandler
 
         //uint8_t incomingData[NET_MAX_MESSAGE_SIZE];
 
-        uint8_t remotePlayerNumber;
-
-
         bool connectLobby(const char* hostname, const uint16_t port = NET_SERVER_PORT);
         bool connectGameHost(const char* hostname, const uint16_t port = NET_SERVER_PORT + 1);
 
@@ -281,8 +278,9 @@ struct Networking {
 
     // In-game
     bool theHostIsMe;
+    uint8_t remotePlayerNumber;
     CPlayerInput netPlayerInput;
-    //std::list<Net_GameplayState> gamestate_buffer;
+
     bool gamestate_changed;
     Net_GameplayState latest_gamestate;
 };
