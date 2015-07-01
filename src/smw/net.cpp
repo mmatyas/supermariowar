@@ -524,8 +524,9 @@ void NetClient::sendLeaveGameMessage()
 
 void NetClient::sendLocalInput()
 {
-    if (netplay.theHostIsMe)
-        return;
+    assert(netplay.theHostIsMe);
+    /*if (netplay.theHostIsMe)
+        return;*/
 
     Net_ClientInputPackage pkg(&game_values.playerInput.outputControls[0]);
     sendMessageToGameHost(&pkg, sizeof(Net_ClientInputPackage));
@@ -561,7 +562,11 @@ void NetClient::handleRemoteGameState(const uint8_t* data, size_t dataLength) //
         pkg.getPlayerVel(p, state.player_xvel[p], state.player_yvel[p]);
         pkg.getPlayerKeys(p, &state.player_input[p]);
     }
-    netplay.gamestate_buffer.push_back(state);
+    //netplay.gamestate_buffer.push_back(state);
+
+    netplay.latest_gamestate = state;
+    netplay.gamestate_changed = true;
+
     /*for (uint8_t p = 0; p < list_players_cnt; p++) {
         pkg.getPlayerCoord(p, list_players[p]->fx, list_players[p]->fy);
         pkg.getPlayerVel(p, list_players[p]->velx, list_players[p]->vely);
@@ -810,6 +815,20 @@ void NetClient::setAsLastReceivedMessage(uint8_t packageType)
     //printf("setAsLastReceivedMessage: %d.\n", packageType);
     lastReceivedMessage.packageType = packageType;
     lastReceivedMessage.timestamp = SDL_GetTicks();
+}
+
+
+
+
+void Net_GameplayState::copyFromLocal()
+{
+    for (uint8_t p = 0; p < list_players_cnt; p++) {
+        player_x[p] = list_players[p]->fx;
+        player_y[p] = list_players[p]->fy;
+        player_xvel[p] = list_players[p]->velx;
+        player_yvel[p] = list_players[p]->vely;
+        player_input[p] = game_values.playerInput.outputControls[p];
+    }
 }
 
 

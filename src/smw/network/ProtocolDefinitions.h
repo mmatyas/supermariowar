@@ -38,6 +38,10 @@
 #define NET_RESPONSE_CREATE_OK              41
 #define NET_RESPONSE_CREATE_ERROR           42 // TODO: What kind of error?
 
+// L: lobby server
+// G: game host player
+// P: regular players
+
 #define NET_G2L_START_ROOM                  50 // Game Host -> Server: "OK, we're ready to go!"
 #define NET_L2P_GAMEHOST_INFO               51 // Server -> Normal Players: "Connect to this guy to play"
 #define NET_L2G_CLIENTS_INFO                52 // Server -> Game Host: "These players want to connect you"
@@ -45,8 +49,8 @@
 #define NET_P2G_SYNC_OK                     54 // Normal Player -> Game Host: "I'm ready!"
 #define NET_G2E_GAME_START                  55 // Game Host -> Everyone: "Everybody connected successfully!"
 
-#define NET_P2G_LOCAL_KEYS                  60 // Normal players -> Game host
-#define NET_P2G_LEAVE_GAME                  61 // Normal players -> Game host
+#define NET_P2G_LEAVE_GAME                  60 // Normal players -> Game host
+#define NET_P2G_LOCAL_KEYS                  61 // Normal players -> Game host
 #define NET_G2P_GAME_STATE                  62 // GH -> Players
 #define NET_G2L_GAME_RESULTS                63 // GH -> Server
 

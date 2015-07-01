@@ -224,6 +224,9 @@ void GameplayState::createPlayers()
         game_values.bulletbilltimer[iPlayer] = 0;
         game_values.bulletbillspawntimer[iPlayer] = 0;
     }
+
+    //netplay.gamestate_changed = false;
+    //netplay.latest_gamestate.copyFromLocal();
 }
 
 void GameplayState::initScoreDisplayPosition()
@@ -1987,6 +1990,9 @@ void GameplayState::handleInput()
         //Use menu controls when exit game dialog is up
         game_values.playerInput.Update(event, (game_values.exitinggame ? 1 : 0));
     }
+
+    if (netplay.active && !netplay.theHostIsMe)
+        netplay.client.sendLocalInput();
 }
 
 void GameplayState::update()
@@ -1996,16 +2002,18 @@ void GameplayState::update()
         list_players[iPlayer]->Init();
 
     if (netplay.active) {
+        // React to network events
+        // The host receives remote input
+        netplay.gamestate_changed = false;
         netplay.client.update();
 
-        // TODO: Move this to update().
-        // The host sends the game state to clients
-        // Everyone send input to everyone
         if (netplay.theHostIsMe)
+            // The host sends the game state to clients
             netplay.client.local_gamehost.sendCurrentGameState();
-        else
+        else if (netplay.gamestate_changed)
         {
-            if (netplay.gamestate_buffer.size() > 0)
+            // The players receive the game state
+            /*if (netplay.gamestate_buffer.size() > 0)
             {
                 Net_GameplayState currect_state = netplay.gamestate_buffer.front();
                 netplay.gamestate_buffer.pop_front();
@@ -2019,11 +2027,18 @@ void GameplayState::update()
             }
             else {
                 printf("[] GameStateBuffer size = 0\n");
+            }*/
+            for (unsigned short p = 0; p < list_players_cnt; p++) {
+                list_players[p]->fx = netplay.latest_gamestate.player_x[p];
+                list_players[p]->fy = netplay.latest_gamestate.player_y[p];
+                list_players[p]->velx = netplay.latest_gamestate.player_xvel[p];
+                list_players[p]->vely = netplay.latest_gamestate.player_yvel[p];
+                netplay.netPlayerInput.outputControls[p] = netplay.latest_gamestate.player_input[p];
             }
         }
 
         if (previous_playerKeys != *current_playerKeys) {
-            netplay.client.sendLocalInput();
+            //netplay.client.sendLocalInput();
             previous_playerKeys = *current_playerKeys;
         }
     }
@@ -2294,6 +2309,12 @@ SWAPBREAK:
             for (i = 0; i < list_players_cnt; i++) {
                 list_players[i]->updateswap();
             }
+        }
+
+        if (netplay.active && netplay.theHostIsMe) {
+            // The host sends the game state to clients
+            netplay.client.local_gamehost.sendCurrentGameState();
+            netplay.client.update();
         }
 
         if (game_values.screenfade == 255) {

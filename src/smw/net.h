@@ -243,6 +243,8 @@ struct Net_GameplayState {
     float          player_xvel[4];
     float          player_yvel[4];
     COutputControl player_input[4];
+
+    void copyFromLocal();
 };
 
 struct Networking {
@@ -280,7 +282,9 @@ struct Networking {
     // In-game
     bool theHostIsMe;
     CPlayerInput netPlayerInput;
-    std::list<Net_GameplayState> gamestate_buffer;
+    //std::list<Net_GameplayState> gamestate_buffer;
+    bool gamestate_changed;
+    Net_GameplayState latest_gamestate;
 };
 
 extern Networking netplay;

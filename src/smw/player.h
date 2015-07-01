@@ -500,6 +500,7 @@ class CPlayer
 
 		friend class NetClient;
 		friend class NetGameHost;
+		friend class Net_GameplayState;
 
 		friend class GameplayState;
 
