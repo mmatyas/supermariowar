@@ -524,7 +524,7 @@ void NetClient::sendLeaveGameMessage()
 
 void NetClient::sendLocalInput()
 {
-    assert(netplay.theHostIsMe);
+    assert(!netplay.theHostIsMe);
     /*if (netplay.theHostIsMe)
         return;*/
 

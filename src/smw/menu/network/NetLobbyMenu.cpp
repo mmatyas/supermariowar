@@ -70,7 +70,6 @@ void UI_NetLobbyMenu::JoinInProgress()
     miNetLobbyJoiningDialogImage->Show(true);
     miNetLobbyJoiningDialogText->Show(true);
 
-    RememberCurrent();
     SetHeadControl(miNetLobbyJoiningDialogText);
     SetCancelCode(MENU_CODE_NET_JOIN_ROOM_ABORT);
     ResetMenu();
@@ -88,5 +87,4 @@ void UI_NetLobbyMenu::Restore()
     miNetLobbyJoiningDialogText->Show(false);
     SetHeadControl(miNetLobbyNewRoomButton);
     SetCancelCode(MENU_CODE_TO_NET_SERVERS_MENU);
-    RestoreCurrent();
 }
