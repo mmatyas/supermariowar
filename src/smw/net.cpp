@@ -556,24 +556,13 @@ void NetClient::handleRemoteGameState(const uint8_t* data, size_t dataLength) //
     Net_GameStatePackage pkg;
     memcpy(&pkg, data, sizeof(Net_GameStatePackage));
 
-    Net_GameplayState state;
     for (uint8_t p = 0; p < list_players_cnt; p++) {
-        pkg.getPlayerCoord(p, state.player_x[p], state.player_y[p]);
-        pkg.getPlayerVel(p, state.player_xvel[p], state.player_yvel[p]);
-        pkg.getPlayerKeys(p, &state.player_input[p]);
+        pkg.getPlayerCoord(p, netplay.latest_gamestate.player_x[p], netplay.latest_gamestate.player_y[p]);
+        pkg.getPlayerVel(p, netplay.latest_gamestate.player_xvel[p], netplay.latest_gamestate.player_yvel[p]);
+        pkg.getPlayerKeys(p, &netplay.latest_gamestate.player_input[p]);
     }
-    //netplay.gamestate_buffer.push_back(state);
 
-    netplay.latest_gamestate = state;
     netplay.gamestate_changed = true;
-
-    /*for (uint8_t p = 0; p < list_players_cnt; p++) {
-        pkg.getPlayerCoord(p, list_players[p]->fx, list_players[p]->fy);
-        pkg.getPlayerVel(p, list_players[p]->velx, list_players[p]->vely);
-        pkg.getPlayerKeys(p, &netplay.netPlayerInput.outputControls[p]);
-
-        assert(state.player_input[p] == netplay.netPlayerInput.outputControls[p]);
-    }*/
 }
 
 /****************
@@ -1074,6 +1063,7 @@ void NetGameHost::sendCurrentGameState()
         pkg.setPlayerCoord(p, list_players[p]->fx, list_players[p]->fy);
         pkg.setPlayerVel(p, list_players[p]->velx, list_players[p]->vely);
         pkg.setPlayerKeys(p, &netplay.netPlayerInput.outputControls[p]);
+        //pkg.setPlayerKeys(p, &game_values.playerInput.outputControls[p]);
     }
 
     for (int c = 0; c < 3; c++) {

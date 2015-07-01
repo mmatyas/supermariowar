@@ -2010,30 +2010,14 @@ void GameplayState::update()
         if (netplay.theHostIsMe)
             // The host sends the game state to clients
             netplay.client.local_gamehost.sendCurrentGameState();
-        else if (netplay.gamestate_changed)
-        {
-            // The players receive the game state
-            /*if (netplay.gamestate_buffer.size() > 0)
-            {
-                Net_GameplayState currect_state = netplay.gamestate_buffer.front();
-                netplay.gamestate_buffer.pop_front();
-                for (unsigned short p = 0; p < list_players_cnt; p++) {
-                    list_players[p]->fx = currect_state.player_x[p];
-                    list_players[p]->fy = currect_state.player_y[p];
-                    list_players[p]->velx = currect_state.player_xvel[p];
-                    list_players[p]->vely = currect_state.player_yvel[p];
-                    netplay.netPlayerInput.outputControls[p] = currect_state.player_input[p];
-                }
-            }
-            else {
-                printf("[] GameStateBuffer size = 0\n");
-            }*/
+        else if (netplay.gamestate_changed) {
             for (unsigned short p = 0; p < list_players_cnt; p++) {
                 list_players[p]->fx = netplay.latest_gamestate.player_x[p];
                 list_players[p]->fy = netplay.latest_gamestate.player_y[p];
                 list_players[p]->velx = netplay.latest_gamestate.player_xvel[p];
                 list_players[p]->vely = netplay.latest_gamestate.player_yvel[p];
                 netplay.netPlayerInput.outputControls[p] = netplay.latest_gamestate.player_input[p];
+                //game_values.playerInput.outputControls[p] = netplay.latest_gamestate.player_input[p];
             }
         }
 
