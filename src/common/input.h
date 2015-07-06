@@ -77,6 +77,7 @@ class CPlayerInput
 
 		//Clears key pressed states
 		void ClearPressedKeys(short iGameState);
+		void ClearGameActionKeys();
 		void ResetKeys();
 		//Updates what commands the user is sending
 		void Update(SDL_Event event, short iGameState);

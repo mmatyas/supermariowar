@@ -1063,7 +1063,6 @@ void NetGameHost::sendCurrentGameState()
         pkg.setPlayerCoord(p, list_players[p]->fx, list_players[p]->fy);
         pkg.setPlayerVel(p, list_players[p]->velx, list_players[p]->vely);
         pkg.setPlayerKeys(p, &netplay.netPlayerInput.outputControls[p]);
-        //pkg.setPlayerKeys(p, &game_values.playerInput.outputControls[p]);
     }
 
     for (int c = 0; c < 3; c++) {

@@ -78,6 +78,22 @@ void CPlayerInput::ClearPressedKeys(short iGameState)
 	iPressedKey = 0;
 }
 
+void CPlayerInput::ClearGameActionKeys()
+{
+    for (int iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
+		CInputControl * inputControl = &inputControls[iPlayer]->inputGameControls[0];
+		COutputControl * outputControl = &outputControls[iPlayer];
+
+		// 0-3: direction keys, 4: turbo
+        for (int iKey = 5; iKey < NUM_KEYS; iKey++) {
+			outputControl->keys[iKey].fPressed = false;
+			outputControl->keys[iKey].fDown = false;
+		}
+	}
+
+	iPressedKey = 0;
+}
+
 //Clear all button pushed and down states
 //Call this when switching from menu to game
 void CPlayerInput::ResetKeys()

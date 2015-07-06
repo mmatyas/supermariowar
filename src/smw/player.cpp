@@ -81,7 +81,8 @@ CPlayer * GetPlayerFromGlobalID(short iGlobalID)
     return NULL;
 }
 
-CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamID, short iColorID, gfxSprite * nsprites[PGFX_LAST], CScore *nscore, short * sRespawnCounter, CPlayerAI * ai)
+CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamID, short iColorID,
+    gfxSprite * nsprites[PGFX_LAST], CScore *nscore, short * sRespawnCounter, CPlayerAI * ai)
 {
     globalID = iGlobalID;
     localID = iLocalID;
@@ -94,10 +95,9 @@ CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamI
     if (pPlayerAI)
         pPlayerAI->SetPlayer(this);
 
-    // TODO: remove unnecessary branches
     if (netplay.active) {
-        if (netplay.theHostIsMe && iGlobalID == 0) {
-            playerKeys = &game_values.playerInput.outputControls[iGlobalID];
+        if (iGlobalID == netplay.remotePlayerNumber) {
+            playerKeys = &game_values.playerInput.outputControls[0];
             printf("[net] Player %d reads local input.\n", iGlobalID);
         } else {
             playerKeys = &netplay.netPlayerInput.outputControls[iGlobalID];
@@ -105,9 +105,9 @@ CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamI
         }
     }
     else {
-        playerKeys = &game_values.playerInput.outputControls[iGlobalID];
-        printf("[net] Player %d reads local input.\n", iGlobalID);
+        playerKeys = &game_values.playerInput.outputControls[globalID];
     }
+
     playerDevice = game_values.playerInput.inputControls[globalID]->iDevice;
 
     score = nscore;

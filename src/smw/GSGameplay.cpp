@@ -1832,8 +1832,7 @@ void GameplayState::onEnterState()
 void GameplayState::handleInput()
 {
     game_values.playerInput.ClearPressedKeys(game_values.exitinggame ? 1 : 0);
-    netplay.netPlayerInput.ClearPressedKeys(game_values.exitinggame ? 1 : 0);
-    //handle messages
+    netplay.netPlayerInput.ClearGameActionKeys();
 
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
@@ -1989,6 +1988,7 @@ void GameplayState::handleInput()
         //Feed the player control structures with input data
         //Use menu controls when exit game dialog is up
         game_values.playerInput.Update(event, (game_values.exitinggame ? 1 : 0));
+        // net player inputs are not updated intentionally
     }
 
     if (netplay.active && !netplay.theHostIsMe)
@@ -2017,7 +2017,6 @@ void GameplayState::update()
                 list_players[p]->velx = netplay.latest_gamestate.player_xvel[p];
                 list_players[p]->vely = netplay.latest_gamestate.player_yvel[p];
                 netplay.netPlayerInput.outputControls[p] = netplay.latest_gamestate.player_input[p];
-                //game_values.playerInput.outputControls[p] = netplay.latest_gamestate.player_input[p];
             }
         }
 
