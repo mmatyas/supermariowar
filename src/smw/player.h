@@ -111,11 +111,6 @@ class CPlayer
 		void AddKillsInRowInAirAward();
 		void SetupNewPlayer();
 
-		void updateFrozenStatus(int keymask);
-		void accelerateRight();
-		void accelerateLeft();
-		void decreaseVelocity();
-
 	    short getGlobalID() { return globalID; }
 	    short getTeamID()   { return teamID;   }
 	    short getColorID()  { return colorID;  }
@@ -175,6 +170,7 @@ class CPlayer
 		void update_respawning();
 		void update_usePowerup();
 		void update_spriteColor();
+		void updateFrozenStatus(int keymask);
 
 		void tryFallingThroughPlatform(short);
 
@@ -196,6 +192,11 @@ class CPlayer
             iy = yi;
             fy = (float)iy;
         }
+
+		void accelerate(float);
+		void accelerateRight();
+		void accelerateLeft();
+		void decreaseVelocity();
 
 		bool FindSpawnPoint();
 		void collision_detection_map();

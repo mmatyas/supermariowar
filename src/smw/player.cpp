@@ -175,12 +175,17 @@ void CPlayer::updateFrozenStatus(int keymask)
     }
 }
 
-void CPlayer::accelerateRight()
+void CPlayer::accelerate(float direction)
 {
+    // direction is
+    //  1 on moving right
+    // -1 on moving left
+    assert(direction == 1.0 || direction == -1.0);
+
     if (onice)
-        velx += VELMOVINGADDICE;
+        velx += VELMOVINGADDICE * direction;
     else
-        velx += VELMOVINGADD;       //move right
+        velx += VELMOVINGADD * direction;       //move right
 
     float maxVel = 0.0f;
     if (!frozen) {
@@ -191,9 +196,10 @@ void CPlayer::accelerateRight()
         else
             maxVel = VELMOVING + (game_values.gamemode->tagged == this ? TAGGEDBOOST : 0.0f);
     }
+    assert(maxVel >= 0.0);
 
-    if (velx > maxVel)
-        velx = maxVel;
+    if (abs(velx) > maxVel)
+        velx = maxVel * direction;
 
     if (!inair) {
         //Make player hop or stick to ground in Kuribo's shoe
@@ -204,66 +210,33 @@ void CPlayer::accelerateRight()
             } else {
                 //only allow the player to jump in the air from kuribo's shoe if we aren't bouncing on a note block
                 if (superjumptimer <= 0) {
-                    Jump(1, 1.0f, true);
+                    Jump(direction, 1.0f, true);
 
                     superjumptype = 3;
                     superjumptimer = 16;
                 }
             }
-        } else if (velx < 0.0f)
+        }
+        // If the player suddently moved to the other direction, play skid sound
+        else if (direction > 0.0f ? velx < 0.0f : velx > 0.0f)
             game_values.playskidsound = true;
 
-        //If rain candy is tyrned on
-        if ((g_map->eyecandy[0] & 32 || g_map->eyecandy[1] & 32 || g_map->eyecandy[2] & 32) && velx > VELMOVINGADD && ++rainsteptimer > 7) {
+        //If rain candy is turned on
+        if ((g_map->eyecandy[0] & 32 || g_map->eyecandy[1] & 32 || g_map->eyecandy[2] & 32) && abs(velx) > VELMOVINGADD && ++rainsteptimer > 7) {
             rainsteptimer = 0;
             eyecandy[1].add(new EC_SingleAnimation(&rm->spr_frictionsmoke, ix, iy + PH - 14, 5, 3, 0, 16, 16, 16));
         }
     }
 }
 
+void CPlayer::accelerateRight()
+{
+    accelerate(1.0);
+}
+
 void CPlayer::accelerateLeft()
 {
-    if (onice)
-        velx -= VELMOVINGADDICE;
-    else
-        velx -= VELMOVINGADD;       //move left
-
-    float maxVel = 0.0f;
-    if (!frozen) {
-        if ((game_values.slowdownon != -1 && game_values.slowdownon != teamID) || jail.isActive())
-            maxVel = -VELSLOWMOVING;
-        else if (playerKeys->game_turbo.fDown)
-            maxVel = -VELTURBOMOVING - (game_values.gamemode->tagged == this ? TAGGEDBOOST : 0.0f);
-        else
-            maxVel = -VELMOVING - (game_values.gamemode->tagged == this ? TAGGEDBOOST : 0.0f);
-    }
-
-    if (velx < maxVel)
-        velx = maxVel;
-
-    if (!inair) {
-        //Make player hop or stick to ground in Kuribo's shoe
-        if (kuriboshoe.is_on()) {
-            //This will make the shoe sticky
-            if (kuriboshoe.getType() == STICKY) {
-                velx = 0.0f;
-            } else {
-                //only allow the player to jump in the air from kuribo's shoe if we aren't bouncing on a note block
-                if (superjumptimer <= 0) {
-                    Jump(-1, 1.0f, true);
-
-                    superjumptype = 3;
-                    superjumptimer = 16;
-                }
-            }
-        } else if (velx > 0.0f)
-            game_values.playskidsound = true;
-
-        if ((g_map->eyecandy[0] & 32 || g_map->eyecandy[1] & 32 || g_map->eyecandy[2] & 32) && velx < -VELMOVINGADD && ++rainsteptimer > 7) {
-            rainsteptimer = 0;
-            eyecandy[1].add(new EC_SingleAnimation(&rm->spr_frictionsmoke, ix, iy + PH - 14, 5, 3, 0, 16, 16, 16));
-        }
-    }
+    accelerate(-1.0);
 }
 
 void CPlayer::decreaseVelocity()
