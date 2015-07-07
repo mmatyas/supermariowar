@@ -178,8 +178,9 @@ class NetClient : public NetworkEventHandler
         void sendChatMessage(const char*);
 
         // P3. Play
-        void sendLocalInput();
         void sendLeaveGameMessage();
+        void sendLocalInput();
+        void sendPowerupTrigger();
 
 
         LastMessage lastSentMessage;

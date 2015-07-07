@@ -551,6 +551,10 @@ void NetClient::sendLocalInput()
         game_values.playerInput.outputControls[0].keys[7].fPressed);*/
 }
 
+void NetClient::sendPowerupTrigger()
+{
+}
+
 void NetClient::handleRemoteGameState(const uint8_t* data, size_t dataLength) // for other clients
 {
     Net_GameStatePackage pkg;

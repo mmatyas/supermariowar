@@ -672,6 +672,155 @@ void CPlayer::update_respawning()
     }
 }
 
+void CPlayer::triggerPowerup()
+{
+    switch (powerupused) {
+    case 1: {
+        game_values.gamemode->playerextraguy(*this, 1);
+        ifSoundOnPlay(rm->sfx_extraguysound);
+        break;
+    }
+    case 2: {
+        game_values.gamemode->playerextraguy(*this, 2);
+        ifSoundOnPlay(rm->sfx_extraguysound);
+        break;
+    }
+    case 3: {
+        game_values.gamemode->playerextraguy(*this, 3);
+        ifSoundOnPlay(rm->sfx_extraguysound);
+        break;
+    }
+    case 4: {
+        game_values.gamemode->playerextraguy(*this, 5);
+        ifSoundOnPlay(rm->sfx_extraguysound);
+        break;
+    }
+    case 5: {
+        powerup = -1;
+        SetPowerup(1);
+        break;
+    }
+    case 6: {
+        invincibility.turn_on(*this);
+        break;
+    }
+    case 7: {
+        turnslowdownon();
+        outofarena.reset();
+        break;
+    }
+    case 8: {
+        powerup = -1;
+        bobomb = false;
+        SetPowerup(0);
+        break;
+    }
+    case 9: {
+        ifSoundOnPlay(rm->sfx_thunder);
+        game_values.screenshaketimer = 20;
+        game_values.screenshakeplayerid = globalID;
+        game_values.screenshaketeamid = teamID;
+        game_values.screenshakekillinair = false;
+        game_values.screenshakekillscount = 0;
+        break;
+    }
+    case 10: {
+        game_values.bulletbilltimer[globalID] = 400;
+        game_values.bulletbillspawntimer[globalID] = 0;
+        break;
+    }
+    case 11: {
+        powerup = -1;
+        SetPowerup(2);
+        break;
+    }
+    case 12: {
+        CO_Shell * shell = new CO_Shell(0, 0, 0, true, true, true, false);
+        objectcontainer[1].add(shell);
+        shell->UsedAsStoredPowerup(this);
+        break;
+    }
+    case 13: {
+        CO_Shell * shell = new CO_Shell(1, 0, 0, false, true, true, false);
+        objectcontainer[1].add(shell);
+        shell->UsedAsStoredPowerup(this);
+        break;
+    }
+    case 14: {
+        CO_Shell * shell = new CO_Shell(2, 0, 0, false, false, true, true);
+        objectcontainer[1].add(shell);
+        shell->UsedAsStoredPowerup(this);
+        break;
+    }
+    case 15: {
+        CO_Shell * shell = new CO_Shell(3, 0, 0, false, true, false, false);
+        objectcontainer[1].add(shell);
+        shell->UsedAsStoredPowerup(this);
+        break;
+    }
+    case 16: {
+        ifSoundOnPlay(rm->sfx_thunder);
+        game_values.screenshaketimer = 20;
+        game_values.screenshakeplayerid = globalID;
+        game_values.screenshaketeamid = teamID;
+        game_values.screenshakekillinair = true;
+        break;
+    }
+    case 17: {
+        powerup = -1;
+        SetPowerup(3);
+        break;
+    }
+    case 18: {
+        SwapPlayers(localID);
+        break;
+    }
+    case 19: {
+        powerup = -1;
+        SetPowerup(4);
+        break;
+    }
+    case 20: { //tanooki
+        tanookisuit.onPickup();
+        break;
+    }
+    case 21: { //ice wand
+        powerup = -1;
+        SetPowerup(5);
+        break;
+    }
+    case 22: { //golden podobo
+        short numPodobos = RANDOM_INT(6) + 10;
+        for (short iPodobo = 0; iPodobo < numPodobos; iPodobo++) {
+            objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, (short)RANDOM_INT(smw->ScreenWidth * 0.95f), smw->ScreenHeight, -(float(RANDOM_INT(9)) / 2.0f) - 9.0f, globalID, teamID, colorID, false));
+        }
+        ifSoundOnPlay(rm->sfx_thunder);
+        break;
+    }
+    case 23: { //bombs
+        powerup = -1;
+        SetPowerup(6);
+        break;
+    }
+    case 24: { //leaf
+        powerup = -1;
+        SetPowerup(7);
+        break;
+    }
+    case 25: { //pwings
+        powerup = -1;
+        SetPowerup(8);
+        break;
+    }
+    case 26: { //jail key
+        jail.escape(*this);
+        break;
+    }
+    }
+
+    powerupused = -1;
+}
+
 void CPlayer::update_usePowerup()
 {
     assert(powerupused > -1);
@@ -679,153 +828,11 @@ void CPlayer::update_usePowerup()
     powerupradius -= (float)game_values.storedpowerupdelay / 2.0f;
     powerupangle += 0.05f;
 
-    if (powerupradius < 0.0f) {
-        switch (powerupused) {
-        case 1: {
-            game_values.gamemode->playerextraguy(*this, 1);
-            ifSoundOnPlay(rm->sfx_extraguysound);
-            break;
-        }
-        case 2: {
-            game_values.gamemode->playerextraguy(*this, 2);
-            ifSoundOnPlay(rm->sfx_extraguysound);
-            break;
-        }
-        case 3: {
-            game_values.gamemode->playerextraguy(*this, 3);
-            ifSoundOnPlay(rm->sfx_extraguysound);
-            break;
-        }
-        case 4: {
-            game_values.gamemode->playerextraguy(*this, 5);
-            ifSoundOnPlay(rm->sfx_extraguysound);
-            break;
-        }
-        case 5: {
-            powerup = -1;
-            SetPowerup(1);
-            break;
-        }
-        case 6: {
-            invincibility.turn_on(*this);
-            break;
-        }
-        case 7: {
-            turnslowdownon();
-            outofarena.reset();
-            break;
-        }
-        case 8: {
-            powerup = -1;
-            bobomb = false;
-            SetPowerup(0);
-            break;
-        }
-        case 9: {
-            ifSoundOnPlay(rm->sfx_thunder);
-            game_values.screenshaketimer = 20;
-            game_values.screenshakeplayerid = globalID;
-            game_values.screenshaketeamid = teamID;
-            game_values.screenshakekillinair = false;
-            game_values.screenshakekillscount = 0;
-            break;
-        }
-        case 10: {
-            game_values.bulletbilltimer[globalID] = 400;
-            game_values.bulletbillspawntimer[globalID] = 0;
-            break;
-        }
-        case 11: {
-            powerup = -1;
-            SetPowerup(2);
-            break;
-        }
-        case 12: {
-            CO_Shell * shell = new CO_Shell(0, 0, 0, true, true, true, false);
-            objectcontainer[1].add(shell);
-            shell->UsedAsStoredPowerup(this);
-            break;
-        }
-        case 13: {
-            CO_Shell * shell = new CO_Shell(1, 0, 0, false, true, true, false);
-            objectcontainer[1].add(shell);
-            shell->UsedAsStoredPowerup(this);
-            break;
-        }
-        case 14: {
-            CO_Shell * shell = new CO_Shell(2, 0, 0, false, false, true, true);
-            objectcontainer[1].add(shell);
-            shell->UsedAsStoredPowerup(this);
-            break;
-        }
-        case 15: {
-            CO_Shell * shell = new CO_Shell(3, 0, 0, false, true, false, false);
-            objectcontainer[1].add(shell);
-            shell->UsedAsStoredPowerup(this);
-            break;
-        }
-        case 16: {
-            ifSoundOnPlay(rm->sfx_thunder);
-            game_values.screenshaketimer = 20;
-            game_values.screenshakeplayerid = globalID;
-            game_values.screenshaketeamid = teamID;
-            game_values.screenshakekillinair = true;
-            break;
-        }
-        case 17: {
-            powerup = -1;
-            SetPowerup(3);
-            break;
-        }
-        case 18: {
-            SwapPlayers(localID);
-            break;
-        }
-        case 19: {
-            powerup = -1;
-            SetPowerup(4);
-            break;
-        }
-        case 20: { //tanooki
-            tanookisuit.onPickup();
-            break;
-        }
-        case 21: { //ice wand
-            powerup = -1;
-            SetPowerup(5);
-            break;
-        }
-        case 22: { //golden podobo
-            short numPodobos = RANDOM_INT(6) + 10;
-            for (short iPodobo = 0; iPodobo < numPodobos; iPodobo++) {
-                objectcontainer[2].add(new MO_Podobo(&rm->spr_podobo, (short)RANDOM_INT(smw->ScreenWidth * 0.95f), smw->ScreenHeight, -(float(RANDOM_INT(9)) / 2.0f) - 9.0f, globalID, teamID, colorID, false));
-            }
-            ifSoundOnPlay(rm->sfx_thunder);
-            break;
-        }
-        case 23: { //bombs
-            powerup = -1;
-            SetPowerup(6);
-            break;
-        }
-        case 24: { //leaf
-            powerup = -1;
-            SetPowerup(7);
-            break;
-        }
-        case 25: { //pwings
-            powerup = -1;
-            SetPowerup(8);
-            break;
-        }
-        case 26: { //jail key
-            jail.escape(*this);
-            break;
-        }
-        }
+    if (netplay.active)
+        return;
 
-        powerupused = -1;
-    }
+    if (powerupradius < 0.0f)
+        triggerPowerup();
 }
 
 void CPlayer::update_spriteColor()
@@ -996,6 +1003,9 @@ void CPlayer::tryReleasingPowerup()
     powerupangle = (float)(RANDOM_INT(1000) * 0.00628f);
 
     ifSoundOnPlay(rm->sfx_storedpowerupsound);
+
+    if (netplay.active)
+        netplay.client.sendPowerupTrigger();
 }
 
 void CPlayer::useSpecialPowerup()

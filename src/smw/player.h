@@ -233,6 +233,8 @@ class CPlayer
         void draw_powerupRing();
         void draw_winnerCrown();
 
+        void triggerPowerup();
+
 		COutputControl * playerKeys;
 		short playerDevice;
 
