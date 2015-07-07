@@ -136,6 +136,8 @@ Now you can continue with cloning the repository (eg. in `/root`) and following 
 
 ### ASM.JS
 
+(TODO: Update this part)
+
 SMW can be build to run in your browser. For this, you need
 Emscripten with the special LLVM backend, and Clang.
 See [here](https://kripken.github.io/emscripten-site/docs/building_from_source/LLVM-Backend.html) for more information.
