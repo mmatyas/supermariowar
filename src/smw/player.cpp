@@ -241,6 +241,12 @@ void CPlayer::accelerateLeft()
 
 void CPlayer::decreaseVelocity()
 {
+    //Stop ground velocity when wearing the sticky shoe
+    if (!inair && kuriboshoe.getType() == STICKY) {
+        velx = 0.0f;
+        return;
+    }
+
     //Add air/ground friction
     if (velx > 0.0f) {
         if (inair)
@@ -263,10 +269,6 @@ void CPlayer::decreaseVelocity()
         if (velx > 0.0f)
             velx = 0.0f;
     }
-
-    //Stop ground velocity when wearing the sticky shoe
-    if (!inair && kuriboshoe.getType() == STICKY)
-        velx = 0.0f;
 }
 
 bool CPlayer::canSuperStomp() {
