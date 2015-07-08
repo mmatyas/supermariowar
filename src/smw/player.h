@@ -206,6 +206,10 @@ class CPlayer
 		void turnslowdownon();
 		bool isstomping(CPlayer * o);
 
+		void mapcolldet_handlePlatformVelocity(float &fPlatformVelX, float &fPlatformVelY);
+		bool mapcolldet_handleOutOfScreen();
+		void mapcolldet_moveHorizontally(short direction);
+
 		PlayerCollisions collisions;
 		PlayerAwardEffects awardeffects;
 

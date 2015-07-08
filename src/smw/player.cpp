@@ -2023,18 +2023,8 @@ void CPlayer::drawswap()
         carriedItem->draw();
 }
 
-void CPlayer::collision_detection_map()
+void CPlayer::mapcolldet_handlePlatformVelocity(float &fPlatformVelX, float &fPlatformVelY)
 {
-    setXf(fx + velx);
-    flipsidesifneeded();
-
-    fPrecalculatedY = fy + vely;  //Fixes weird float rounding error.  Must be computed here before casting to int.  Otherwise, this will miss the bottom collision, but then hit the side collision and the player can slide out of 1x1 spaces.
-
-    float fPlatformVelX = 0.0f;
-    float fPlatformVelY = 0.0f;
-
-    float fTempY = fy;
-
     if (platform) {
         fPlatformVelX = platform->fVelX;
         setXf(fx + fPlatformVelX);
@@ -2047,18 +2037,10 @@ void CPlayer::collision_detection_map()
 
         fPrecalculatedY += platform->fOldVelY;
     }
+}
 
-    iHorizontalPlatformCollision = -1;
-    iVerticalPlatformCollision = -1;
-    iPlatformCollisionPlayerId = -1;
-
-    g_map->movingPlatformCollision(this);
-
-    if (state != player_ready)
-        return;
-
-    fy = fTempY;
-
+bool CPlayer::mapcolldet_handleOutOfScreen()
+{
     if (fPrecalculatedY + PH < 0.0f) {
         // on top outside of the screen
         setYf(fPrecalculatedY);
@@ -2071,8 +2053,8 @@ void CPlayer::collision_detection_map()
             fallthrough = false;
         }
 
-        return;
-    } else if (fPrecalculatedY + PH >= smw->ScreenHeight) {
+        return true;
+    } else if (fPrecalculatedY + PH >= 480) {
         //on ground outside of the screen?
         setYi(-PH);
         fOldY = (float)(-PH - 1);
@@ -2086,8 +2068,16 @@ void CPlayer::collision_detection_map()
             platform = NULL;
         }
 
-        return;
+        return true;
     }
+
+    return false;
+}
+
+void CPlayer::mapcolldet_moveHorizontally(short direction)
+{
+    assert(direction == 1 || direction == 3);
+    short counter_direction = abs(direction - 2);
 
     //Could be optimized with bit shift >> 5
     short ty = (short)fy / TILESIZE;
@@ -2096,179 +2086,169 @@ void CPlayer::collision_detection_map()
 
     //printf("Before X - ix: %d\tiy: %d\toldx: %.2f\toldy: %.2f\tty: %d\tty2: %d\ttxl: %d\ttxr: %d\tfx: %.2f\tfy: %.2f\tvelx: %.2f\tvely: %.2f\n", ix, iy, fOldX, fOldY, ty, ty2, ix/TILESIZE, (ix+PW)/TILESIZE, fx, fy, velx, vely);
 
+    bool isMoveKeyDown;
+    if (direction == 1)
+        isMoveKeyDown = playerKeys->game_left.fDown;
+    else
+        isMoveKeyDown = playerKeys->game_right.fDown;
+
+    if (direction == 1) {
+        //moving left
+        tx = (short)fx / TILESIZE;
+    }
+    else {
+        //moving right
+        if (fx + PW >= smw->ScreenWidth) {
+            tx = (short)(fx + PW - smw->ScreenWidth) / TILESIZE;
+            fOldX -= smw->ScreenWidth;
+        } else
+            tx = ((short)fx + PW) / TILESIZE;
+    }
+
+    //Just in case tx out of bounds and flipsidesifneeded wasn't called
+    if (tx < 0)
+        tx += 20;
+    else if (tx > 19)
+        tx -= 20;
+
+    IO_Block * topblock = g_map->block(tx, ty);
+    IO_Block * bottomblock = g_map->block(tx, ty2);
+
+    int toptile = g_map->map(tx, ty);
+    int bottomtile = g_map->map(tx, ty2);
+
+    bool deathTileAhead;
+    bool superDeathTileAhead;
+    if (direction == 1) {
+        deathTileAhead = ((toptile & tile_flag_death_on_left) && (bottomtile & tile_flag_death_on_left)) ||
+                         ((toptile & tile_flag_death_on_left) && !(bottomtile & tile_flag_solid)) ||
+                         (!(toptile & tile_flag_solid) && (bottomtile & tile_flag_death_on_left));
+
+        superDeathTileAhead = ((toptile & tile_flag_super_or_player_death_left) && (bottomtile & tile_flag_super_or_player_death_left)) ||
+                              ((toptile & tile_flag_super_or_player_death_left) && !(bottomtile & tile_flag_solid)) ||
+                              (!(toptile & tile_flag_solid) && (bottomtile & tile_flag_super_or_player_death_left));
+    }
+    else {
+        deathTileAhead = ((toptile & tile_flag_death_on_right) && (bottomtile & tile_flag_death_on_right)) ||
+                         ((toptile & tile_flag_death_on_right) && !(bottomtile & tile_flag_solid)) ||
+                         (!(toptile & tile_flag_solid) && (bottomtile & tile_flag_death_on_right));
+
+        superDeathTileAhead = ((toptile & tile_flag_super_or_player_death_right) && (bottomtile & tile_flag_super_or_player_death_right)) ||
+                              ((toptile & tile_flag_super_or_player_death_right) && !(bottomtile & tile_flag_solid)) ||
+                              (!(toptile & tile_flag_solid) && (bottomtile & tile_flag_super_or_player_death_right));
+    }
+
+    bool fTopBlockSolid = topblock && !topblock->isTransparent() && !topblock->isHidden();
+    bool fBottomBlockSolid = bottomblock && !bottomblock->isTransparent() && !bottomblock->isHidden();
+
+    //first check to see if player hit a warp
+    if (isMoveKeyDown && !frozen && g_map->checkforwarp(tx, ty, ty2, direction)) {
+        if (direction == 1)
+            setXf((float)((tx << 5) + TILESIZE) + 0.2f); // move to the edge of the tile
+        else
+            setXf((float)((tx << 5) - PW) - 0.2f);       // move to the edge of the tile (tile on the right -> mind the player width)
+
+        warpstatus.enterWarp(*this, g_map->warp(tx, ty2));
+
+        if (iy - PHOFFSET < (ty << 5))
+            setYi((ty << 5) + PHOFFSET);
+        else if (iy + PH > (ty2 << 5) + TILESIZE - 3)
+            setYi((ty2 << 5) + TILESIZE - PH - 3);
+
+        return;
+    } else if (fTopBlockSolid || fBottomBlockSolid) {
+        if (fTopBlockSolid) { //collide with top block
+            if (iHorizontalPlatformCollision == direction) {
+                KillPlayerMapHazard(true, kill_style_environment, true, iPlatformCollisionPlayerId);
+                return;
+            }
+
+            topblock->collide(this, counter_direction, true);
+            flipsidesifneeded();
+        }
+
+        if (fBottomBlockSolid) { //then bottom
+            if (iHorizontalPlatformCollision == direction) {
+                KillPlayerMapHazard(true, kill_style_environment, true, iPlatformCollisionPlayerId);
+                return;
+            }
+
+            bottomblock->collide(this, counter_direction, true);
+            flipsidesifneeded();
+        }
+    } else if (superDeathTileAhead || (deathTileAhead && !isInvincible() && !isShielded() && !shyguy)) {
+        if (player_kill_nonkill != KillPlayerMapHazard(superDeathTileAhead, kill_style_environment, false))
+            return;
+    }
+    //collision on the right side.
+    else if ((toptile & tile_flag_solid) || (bottomtile & tile_flag_solid)) { //collide with solid, ice, and death and all sides death
+        if (iHorizontalPlatformCollision == direction) {
+            KillPlayerMapHazard(true, kill_style_environment, true, iPlatformCollisionPlayerId);
+            return;
+        }
+
+        if (direction == 1)
+            setXf((float)((tx << 5) + TILESIZE) + 0.2f); // move to the edge of the tile
+        else
+            setXf((float)((tx << 5) - PW) - 0.2f);       // move to the edge of the tile (tile on the right -> mind the player width)
+        fOldX = fx;
+
+        if (abs(velx) > 0.0f)
+            velx = 0.0f;
+
+        if (abs(oldvelx) > 0.0f)
+            oldvelx = 0.0f;
+
+        flipsidesifneeded();
+    }
+}
+
+void CPlayer::collision_detection_map()
+{
+    setXf(fx + velx);
+    flipsidesifneeded();
+
+    fPrecalculatedY = fy + vely;  //Fixes weird float rounding error.  Must be computed here before casting to int.  Otherwise, this will miss the bottom collision, but then hit the side collision and the player can slide out of 1x1 spaces.
+
+    float fPlatformVelX = 0.0f;
+    float fPlatformVelY = 0.0f;
+
+    float fTempY = fy;
+
+    mapcolldet_handlePlatformVelocity(fPlatformVelX, fPlatformVelY);
+
+    iHorizontalPlatformCollision = -1;
+    iVerticalPlatformCollision = -1;
+    iPlatformCollisionPlayerId = -1;
+
+    g_map->movingPlatformCollision(this);
+
+    if (state != player_ready)
+        return;
+
+    fy = fTempY;
+
+    if (mapcolldet_handleOutOfScreen())
+        return;
+
     //-----------------------------------------------------------------
     //  x axis (--)
     //-----------------------------------------------------------------
     if (fy + PH >= 0.0f) {
-        if (velx + fPlatformVelX > 0.01f || iHorizontalPlatformCollision == 3) {
-            //moving right
-            if (fx + PW >= smw->ScreenWidth) {
-                tx = (short)(fx + PW - smw->ScreenWidth) / TILESIZE;
-                fOldX -= smw->ScreenWidth;
-            } else
-                tx = ((short)fx + PW) / TILESIZE;
+        if (velx + fPlatformVelX > 0.01f || iHorizontalPlatformCollision == 3)
+            mapcolldet_moveHorizontally(3);
+        else if (velx + fPlatformVelX < -0.01f || iHorizontalPlatformCollision == 1)
+            mapcolldet_moveHorizontally(1);
 
-            //Just in case tx out of bounds and flipsidesifneeded wasn't called
-            if (tx < 0)
-                tx += 20;
-            else if (tx > 19)
-                tx -= 20;
-
-            IO_Block * topblock = g_map->block(tx, ty);
-            IO_Block * bottomblock = g_map->block(tx, ty2);
-
-            int toptile = g_map->map(tx, ty);
-            int bottomtile = g_map->map(tx, ty2);
-
-            bool fDeathTileToLeft = ((toptile & tile_flag_death_on_left) && (bottomtile & tile_flag_death_on_left)) ||
-                                    ((toptile & tile_flag_death_on_left) && !(bottomtile & tile_flag_solid)) ||
-                                    (!(toptile & tile_flag_solid) && (bottomtile & tile_flag_death_on_left));
-
-            bool fSuperDeathTileToLeft = ((toptile & tile_flag_super_or_player_death_left) && (bottomtile & tile_flag_super_or_player_death_left)) ||
-                                         ((toptile & tile_flag_super_or_player_death_left) && !(bottomtile & tile_flag_solid)) ||
-                                         (!(toptile & tile_flag_solid) && (bottomtile & tile_flag_super_or_player_death_left));
-
-            bool fTopBlockSolid = topblock && !topblock->isTransparent() && !topblock->isHidden();
-            bool fBottomBlockSolid = bottomblock && !bottomblock->isTransparent() && !bottomblock->isHidden();
-
-            //first check to see if player hit a warp
-            if (playerKeys->game_right.fDown && !frozen && g_map->checkforwarp(tx, ty, ty2, 3)) {
-                setXf((float)((tx << 5) - PW) - 0.2f);
-                warpstatus.enterWarp(*this, g_map->warp(tx, ty2));
-
-                if (iy - PHOFFSET < (ty << 5))
-                    setYi((ty << 5) + PHOFFSET);
-                else if (iy + PH > (ty2 << 5) + TILESIZE - 3)
-                    setYi((ty2 << 5) + TILESIZE - PH - 3);
-
-                return;
-            } else if (fTopBlockSolid || fBottomBlockSolid) {
-                if (fTopBlockSolid) { //collide with top block
-                    if (iHorizontalPlatformCollision == 3) {
-                        KillPlayerMapHazard(true, kill_style_environment, true, iPlatformCollisionPlayerId);
-                        return;
-                    }
-
-                    topblock->collide(this, 1, true);
-                    flipsidesifneeded();
-                }
-
-                if (fBottomBlockSolid) { //then bottom
-                    if (iHorizontalPlatformCollision == 3) {
-                        KillPlayerMapHazard(true, kill_style_environment, true, iPlatformCollisionPlayerId);
-                        return;
-                    }
-
-                    bottomblock->collide(this, 1, true);
-                    flipsidesifneeded();
-                }
-            } else if (fSuperDeathTileToLeft || (fDeathTileToLeft && !isInvincible() && !isShielded() && !shyguy)) {
-                if (player_kill_nonkill != KillPlayerMapHazard(fSuperDeathTileToLeft, kill_style_environment, false))
-                    return;
-            }
-            //collision on the right side.
-            else if ((toptile & tile_flag_solid) || (bottomtile & tile_flag_solid)) { //collide with solid, ice, and death and all sides death
-                if (iHorizontalPlatformCollision == 3) {
-                    KillPlayerMapHazard(true, kill_style_environment, true, iPlatformCollisionPlayerId);
-                    return;
-                }
-
-                setXf((float)((tx << 5) - PW) - 0.2f);			//move to the edge of the tile (tile on the right -> mind the player width)
-                fOldX = fx;
-
-                if (velx > 0.0f)
-                    velx = 0.0f;
-
-                if (oldvelx > 0.0f)
-                    oldvelx = 0.0f;
-
-                flipsidesifneeded();
-            }
-        } else if (velx + fPlatformVelX < -0.01f || iHorizontalPlatformCollision == 1) {
-            //moving left
-            tx = (short)fx / TILESIZE;
-
-            //Just in case tx out of bounds and flipsidesifneeded wasn't called
-            if (tx < 0)
-                tx += 20;
-            else if (tx > 19)
-                tx -= 20;
-
-            IO_Block * topblock = g_map->block(tx, ty);
-            IO_Block * bottomblock = g_map->block(tx, ty2);
-
-            int toptile = g_map->map(tx, ty);
-            int bottomtile = g_map->map(tx, ty2);
-
-            bool fDeathTileToRight = ((toptile & tile_flag_death_on_right) && (bottomtile & tile_flag_death_on_right)) ||
-                                     ((toptile & tile_flag_death_on_right) && !(bottomtile & tile_flag_solid)) ||
-                                     (!(toptile & tile_flag_solid) && (bottomtile & tile_flag_death_on_right));
-
-            bool fSuperDeathTileToRight = ((toptile & tile_flag_super_or_player_death_right) && (bottomtile & tile_flag_super_or_player_death_right)) ||
-                                          ((toptile & tile_flag_super_or_player_death_right) && !(bottomtile & tile_flag_solid)) ||
-                                          (!(toptile & tile_flag_solid) && (bottomtile & tile_flag_super_or_player_death_right));
-
-            bool fTopBlockSolid = topblock && !topblock->isTransparent() && !topblock->isHidden();
-            bool fBottomBlockSolid = bottomblock && !bottomblock->isTransparent() && !bottomblock->isHidden();
-
-            //first check to see if player hit a warp
-            if (playerKeys->game_left.fDown && !frozen && g_map->checkforwarp(tx, ty, ty2, 1)) {
-                setXf((float)((tx << 5) + TILESIZE) + 0.2f);
-                warpstatus.enterWarp(*this, g_map->warp(tx, ty2));
-
-                if (iy - PHOFFSET < (ty << 5))
-                    setYi((ty << 5) + PHOFFSET);
-                else if (iy + PH > (ty2 << 5) + TILESIZE - 3)
-                    setYi((ty2<< 5) + TILESIZE - PH - 3);
-
-                return;
-            } else if (fTopBlockSolid || fBottomBlockSolid) {
-                if (fTopBlockSolid) { //collide with top block
-                    if (iHorizontalPlatformCollision == 1) {
-                        KillPlayerMapHazard(true, kill_style_environment, true, iPlatformCollisionPlayerId);
-                        return;
-                    }
-
-                    topblock->collide(this, 3, true);
-                    flipsidesifneeded();
-                }
-
-                if (fBottomBlockSolid) { //then bottom
-                    if (iHorizontalPlatformCollision == 1) {
-                        KillPlayerMapHazard(true, kill_style_environment, true, iPlatformCollisionPlayerId);
-                        return;
-                    }
-
-                    bottomblock->collide(this, 3, true);
-                    flipsidesifneeded();
-                }
-            } else if (fSuperDeathTileToRight || (fDeathTileToRight && !isInvincible() && !isShielded() && !shyguy)) {
-                if (player_kill_nonkill != KillPlayerMapHazard(fSuperDeathTileToRight, kill_style_environment, false))
-                    return;
-            } else if ((toptile & tile_flag_solid) || (bottomtile & tile_flag_solid)) { // collide with solid, ice, death and all sides death
-                if (iHorizontalPlatformCollision == 1) {
-                    KillPlayerMapHazard(true, kill_style_environment, true, iPlatformCollisionPlayerId);
-                    return;
-                }
-
-                setXf((float)((tx << 5) + TILESIZE) + 0.2f);			//move to the edge of the tile
-                fOldX = fx;
-
-                if (velx < 0.0f)
-                    velx = 0.0f;
-
-                if (oldvelx < 0.0f)
-                    oldvelx = 0.0f;
-
-                flipsidesifneeded();
-            }
-        }
+        if (isdead())
+            return;
     }
 
     //-----------------------------------------------------------------
     //  then y axis (|)
     //-----------------------------------------------------------------
 
+    short ty = (short)fy / TILESIZE;
     short txl = 0, txr = 0, txc = 0;
     short iPlayerL = ix, iPlayerC = ix + HALFPW, iPlayerR = ix + PW;
 
