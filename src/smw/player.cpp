@@ -986,7 +986,7 @@ void CPlayer::tryReleasingPowerup()
         return;
 
     // Don't allow usage of the poison powerup, it sticks with you and don't allow shyguys to use powerups
-    if (game_values.gamepowerups[globalID] == 0 || shyguy)
+    if (game_values.gamepowerups[globalID] <= 0 || shyguy)
         return;
 
     powerupused = game_values.gamepowerups[globalID];
@@ -2140,7 +2140,7 @@ bool CPlayer::mapcolldet_handleOutOfScreen()
 void CPlayer::mapcolldet_moveHorizontally(short direction)
 {
     assert(direction == 1 || direction == 3);
-    short counter_direction = abs(direction - 2);
+    short counter_direction = (direction == 1) ? 3 : 1;
 
     //Could be optimized with bit shift >> 5
     short ty = (short)fy / TILESIZE;
@@ -2149,7 +2149,7 @@ void CPlayer::mapcolldet_moveHorizontally(short direction)
 
     //printf("Before X - ix: %d\tiy: %d\toldx: %.2f\toldy: %.2f\tty: %d\tty2: %d\ttxl: %d\ttxr: %d\tfx: %.2f\tfy: %.2f\tvelx: %.2f\tvely: %.2f\n", ix, iy, fOldX, fOldY, ty, ty2, ix/TILESIZE, (ix+PW)/TILESIZE, fx, fy, velx, vely);
 
-    bool isMoveKeyDown;
+    bool isMoveKeyDown = false;
     if (direction == 1)
         isMoveKeyDown = playerKeys->game_left.fDown;
     else
@@ -2180,25 +2180,25 @@ void CPlayer::mapcolldet_moveHorizontally(short direction)
     int toptile = g_map->map(tx, ty);
     int bottomtile = g_map->map(tx, ty2);
 
-    bool deathTileAhead;
-    bool superDeathTileAhead;
+    bool deathTileBehind;
+    bool superDeathTileBehind;
     if (direction == 1) {
-        deathTileAhead = ((toptile & tile_flag_death_on_left) && (bottomtile & tile_flag_death_on_left)) ||
-                         ((toptile & tile_flag_death_on_left) && !(bottomtile & tile_flag_solid)) ||
-                         (!(toptile & tile_flag_solid) && (bottomtile & tile_flag_death_on_left));
+        deathTileBehind = ((toptile & tile_flag_death_on_right) && (bottomtile & tile_flag_death_on_right)) ||
+                          ((toptile & tile_flag_death_on_right) && !(bottomtile & tile_flag_solid)) ||
+                          (!(toptile & tile_flag_solid) && (bottomtile & tile_flag_death_on_right));
 
-        superDeathTileAhead = ((toptile & tile_flag_super_or_player_death_left) && (bottomtile & tile_flag_super_or_player_death_left)) ||
-                              ((toptile & tile_flag_super_or_player_death_left) && !(bottomtile & tile_flag_solid)) ||
-                              (!(toptile & tile_flag_solid) && (bottomtile & tile_flag_super_or_player_death_left));
+        superDeathTileBehind = ((toptile & tile_flag_super_or_player_death_right) && (bottomtile & tile_flag_super_or_player_death_right)) ||
+                               ((toptile & tile_flag_super_or_player_death_right) && !(bottomtile & tile_flag_solid)) ||
+                               (!(toptile & tile_flag_solid) && (bottomtile & tile_flag_super_or_player_death_right));
     }
     else {
-        deathTileAhead = ((toptile & tile_flag_death_on_right) && (bottomtile & tile_flag_death_on_right)) ||
-                         ((toptile & tile_flag_death_on_right) && !(bottomtile & tile_flag_solid)) ||
-                         (!(toptile & tile_flag_solid) && (bottomtile & tile_flag_death_on_right));
+        deathTileBehind = ((toptile & tile_flag_death_on_left) && (bottomtile & tile_flag_death_on_left)) ||
+                          ((toptile & tile_flag_death_on_left) && !(bottomtile & tile_flag_solid)) ||
+                          (!(toptile & tile_flag_solid) && (bottomtile & tile_flag_death_on_left));
 
-        superDeathTileAhead = ((toptile & tile_flag_super_or_player_death_right) && (bottomtile & tile_flag_super_or_player_death_right)) ||
-                              ((toptile & tile_flag_super_or_player_death_right) && !(bottomtile & tile_flag_solid)) ||
-                              (!(toptile & tile_flag_solid) && (bottomtile & tile_flag_super_or_player_death_right));
+        superDeathTileBehind = ((toptile & tile_flag_super_or_player_death_left) && (bottomtile & tile_flag_super_or_player_death_left)) ||
+                               ((toptile & tile_flag_super_or_player_death_left) && !(bottomtile & tile_flag_solid)) ||
+                               (!(toptile & tile_flag_solid) && (bottomtile & tile_flag_super_or_player_death_left));
     }
 
     bool fTopBlockSolid = topblock && !topblock->isTransparent() && !topblock->isHidden();
@@ -2239,11 +2239,11 @@ void CPlayer::mapcolldet_moveHorizontally(short direction)
             bottomblock->collide(this, counter_direction, true);
             flipsidesifneeded();
         }
-    } else if (superDeathTileAhead || (deathTileAhead && !isInvincible() && !isShielded() && !shyguy)) {
-        if (player_kill_nonkill != KillPlayerMapHazard(superDeathTileAhead, kill_style_environment, false))
+    } else if (superDeathTileBehind || (deathTileBehind && !isInvincible() && !isShielded() && !shyguy)) {
+        if (player_kill_nonkill != KillPlayerMapHazard(superDeathTileBehind, kill_style_environment, false))
             return;
     }
-    //collision on the right side.
+    //collision on the side.
     else if ((toptile & tile_flag_solid) || (bottomtile & tile_flag_solid)) { //collide with solid, ice, and death and all sides death
         if (iHorizontalPlatformCollision == direction) {
             KillPlayerMapHazard(true, kill_style_environment, true, iPlatformCollisionPlayerId);
@@ -2254,6 +2254,7 @@ void CPlayer::mapcolldet_moveHorizontally(short direction)
             setXf((float)((tx << 5) + TILESIZE) + 0.2f); // move to the edge of the tile
         else
             setXf((float)((tx << 5) - PW) - 0.2f);       // move to the edge of the tile (tile on the right -> mind the player width)
+
         fOldX = fx;
 
         if (abs(velx) > 0.0f)
