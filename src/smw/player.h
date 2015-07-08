@@ -193,6 +193,16 @@ class CPlayer
             fy = (float)iy;
         }
 
+        void trySuperJumping(short movement_direction);
+		void tryCapeDoubleJump(short movement_direction);
+		void tryStartFlying();
+		void tryShakingTail();
+		void tryReleasingPowerup();
+		void useSpecialPowerup();
+		void releaseCarriedItem();
+		void updateFlyingStatus();
+		void enableFreeFall();
+
 		void accelerate(float);
 		void accelerateRight();
 		void accelerateLeft();

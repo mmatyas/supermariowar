@@ -908,6 +908,200 @@ void CPlayer::tryFallingThroughPlatform(short movement_direction)
     lockjump = true;
 }
 
+void CPlayer::trySuperJumping(short movement_direction)
+{
+    assert(superjumptype > 0);
+
+    if (superjumptype == 3) { //Kuribo's Shoe Jump
+        Jump(movement_direction, 1.0f, false);
+        ifSoundOnPlay(rm->sfx_jump);
+    }
+    if (superjumptype == 2) {
+        vely = -VELSUPERJUMP;
+        inair = true;
+        ifSoundOnPlay(rm->sfx_superspring);
+    } else if (superjumptype == 1) {
+        vely = -VELTURBOJUMP;
+        inair = true;
+        ifSoundOnPlay(rm->sfx_springjump);
+    }
+
+    superjumptimer = 0;
+    lockjump = true;
+}
+
+void CPlayer::tryCapeDoubleJump(short movement_direction)
+{
+    assert(powerup == 3);
+    if (kuriboshoe.is_on())
+        return;
+
+    if (extrajumps < game_values.featherjumps) {
+        if (game_values.featherlimit == 0 || projectilelimit > 0) {
+            if (extrajumps < game_values.featherjumps) {
+                Jump(movement_direction, 0.8f, false);
+                ifSoundOnPlay(rm->sfx_capejump);
+                lockjump = true;
+            }
+
+            extrajumps++;
+        }
+
+        if (game_values.featherlimit > 0)
+            DecreaseProjectileLimit();
+    }
+}
+
+void CPlayer::tryStartFlying()
+{
+    assert(powerup == 8);
+    if (kuriboshoe.is_on() || flying || extrajumps != 0)
+        return;
+
+    flying = true;
+    game_values.playflyingsound = true;
+
+    lockjump = true;
+    extrajumps++;
+}
+
+void CPlayer::tryShakingTail()
+{
+    if (kuriboshoe.is_on() || spin.isSpinInProgress())
+        return;
+
+    bool isGlidingChicken = game_values.gamemode->chicken == this
+                            && game_values.gamemodesettings.chicken.glide
+                            && powerup == -1;
+
+    if (powerup == 7 || isGlidingChicken) {
+        if (game_values.leaflimit == 0 || projectilelimit > 0)
+            tail.shake(*this);
+    }
+}
+
+void CPlayer::tryReleasingPowerup()
+{
+    if (tanookisuit.isStatue() || game_values.gamemode->gamemode == game_mode_bonus)
+        return;
+
+    // Don't allow usage of the poison powerup, it sticks with you and don't allow shyguys to use powerups
+    if (game_values.gamepowerups[globalID] == 0 || shyguy)
+        return;
+
+    powerupused = game_values.gamepowerups[globalID];
+    game_values.gamepowerups[globalID] = -1;
+
+    powerupradius = 100.0f;
+    powerupangle = (float)(RANDOM_INT(1000) * 0.00628f);
+
+    ifSoundOnPlay(rm->sfx_storedpowerupsound);
+}
+
+void CPlayer::useSpecialPowerup()
+{
+    fAcceptingItem = carriedItem == NULL;
+
+    if (!lockfire) {
+        if (bobomb) { //If we're a bob-omb, explode
+            action = player_action_bobomb;
+        } else {
+            if (powerup == 1 && projectiles < 2) {
+                if (game_values.fireballlimit == 0 || projectilelimit > 0) {
+                    action = player_action_fireball;
+                }
+            } else if (powerup == 2 && projectiles < 2 && hammertimer == 0) {
+                if (game_values.hammerlimit == 0 || projectilelimit > 0) {
+                    action = player_action_hammer;
+                }
+            } else if (powerup == 3 && !spin.isSpinInProgress() && !kuriboshoe.is_on()) {
+                if (game_values.featherlimit == 0 || projectilelimit > 0) {
+                    action = player_action_spincape;
+                }
+            } else if (powerup == 4 && projectiles < 1) { //only allow one boomerang
+                if (game_values.boomeranglimit == 0 || projectilelimit > 0) {
+                    action = player_action_boomerang;
+                }
+            } else if (powerup == 5 && projectiles < 1) {
+                if (game_values.wandlimit == 0 || projectilelimit > 0) {
+                    action = player_action_iceblast;
+                }
+            } else if (powerup == 6 && projectiles < 2 && hammertimer == 0) {
+                if (game_values.bombslimit == 0 || projectilelimit > 0) {
+                    action = player_action_bomb;
+                }
+            } else if (powerup == 7 && !spin.isSpinInProgress() && !kuriboshoe.is_on()) { //Racoon tail spin
+                if (game_values.leaflimit == 0 || projectilelimit > 0) {
+                    action = player_action_spintail;
+                }
+            }
+        }
+
+        lockfire = true;
+    }
+}
+
+void CPlayer::releaseCarriedItem()
+{
+    lockfire = false;
+    fAcceptingItem = false;
+
+    if (carriedItem) {
+        if (playerKeys->game_down.fDown)
+            carriedItem->Drop();
+        else {
+            //Make sure the owner of the object we are kicking is this player
+            carriedItem->owner = this;
+
+            //Make sure the shell/block is out in front of player before kicking it
+            if (carriedItem->getMovingObjectType() == movingobject_shell || carriedItem->getMovingObjectType() == movingobject_throwblock)
+                carriedItem->MoveToOwner();
+
+            carriedItem->Kick();
+        }
+
+        carriedItem = NULL;
+    }
+}
+
+void CPlayer::updateFlyingStatus()
+{
+    if (flying) {
+        //If they player was frozen while flying, cause them to stop flying
+        //or if they have been flying for a while, stop them flying
+        if (frozen || ++flyingtimer > 200) {
+            flyingtimer = 0;
+            flying = false;
+
+            if (game_values.pwingslimit > 0)
+                DecreaseProjectileLimit();
+        } else { //otherwise allow them to rise and swoop while flying
+            if (playerKeys->game_down.fDown && vely < 1.0f) {
+                vely += 1.0f;
+            } else if (!playerKeys->game_down.fDown && vely > -1.0f) {
+                vely -= 1.5f;
+                inair = true;
+            }
+        }
+    }
+}
+
+void CPlayer::enableFreeFall()
+{
+    lockjump = false; //the jump key is not pressed: the player may jump again if he is on the ground
+
+    if (vely < -VELSTOPJUMP)
+        vely = -VELSTOPJUMP;
+
+    if (flying) {
+        flying = false;
+        flyingtimer = 0;
+
+        if (game_values.pwingslimit > 0)
+            DecreaseProjectileLimit();
+    }
+}
+
 void CPlayer::move()
 {
     //Call the AI if cpu controlled
@@ -976,7 +1170,7 @@ void CPlayer::move()
 
     update_spriteColor();
 
-    if (state != player_ready) {
+    if (!isready()) {
         if (state == player_wait) {
             update_waitingForRespawn();
             return;
@@ -986,16 +1180,16 @@ void CPlayer::move()
             update_respawning();
         else if (iswarping())
             warpstatus.update(*this);
-    } else if (powerupused > -1) {
-        update_usePowerup();
     }
+    else if (powerupused > -1)
+        update_usePowerup();
 
     invincibility.update(*this); // Animate invincibility
 
     updateFrozenStatus(keymask);
 
     //if player is warping or spawning don't pay attention to controls
-    if (state == player_ready) {
+    if (isready()) {
         //Super stomp
         superstomp.update(*this);
 
@@ -1026,65 +1220,19 @@ void CPlayer::move()
                     if (!inair && superjumptimer == 0) {
                         tryFallingThroughPlatform(movement_direction);
                     } else if (superjumptimer > 0) {
-                        if (superjumptype == 3) { //Kuribo's Shoe Jump
-                            Jump(movement_direction, 1.0f, false);
-                            ifSoundOnPlay(rm->sfx_jump);
-                        }
-                        if (superjumptype == 2) {
-                            vely = -VELSUPERJUMP;
-                            inair = true;
-                            ifSoundOnPlay(rm->sfx_superspring);
-                        } else if (superjumptype == 1) {
-                            vely = -VELTURBOJUMP;
-                            inair = true;
-                            ifSoundOnPlay(rm->sfx_springjump);
-                        }
-
-                        superjumptimer = 0;
-                        lockjump = true;
-                    } else if (powerup == 3 && !kuriboshoe.is_on()) {
-                        if (extrajumps < game_values.featherjumps) {
-                            if (game_values.featherlimit == 0 || projectilelimit > 0) {
-                                if (extrajumps < game_values.featherjumps) {
-                                    Jump(movement_direction, 0.8f, false);
-                                    ifSoundOnPlay(rm->sfx_capejump);
-                                    lockjump = true;
-                                }
-
-                                extrajumps++;
-                            }
-
-                            if (game_values.featherlimit > 0)
-                                DecreaseProjectileLimit();
-                        }
-                    } else if (powerup == 8 && !kuriboshoe.is_on() && !flying && extrajumps == 0) { //Start pwings flight
-                        flying = true;
-                        game_values.playflyingsound = true;
-
-                        lockjump = true;
-                        extrajumps++;
+                        trySuperJumping(movement_direction);
+                    } else if (powerup == 3) {
+                        tryCapeDoubleJump(movement_direction);
+                    } else if (powerup == 8) { //Start pwings flight
+                        tryStartFlying();
                     }
                     //This must come last or gliding chickens can't use powerups before this statement
-                    else if ((powerup == 7 || (powerup == -1 && game_values.gamemode->chicken == this && game_values.gamemodesettings.chicken.glide)) && !kuriboshoe.is_on() && !spin.isSpinInProgress()) {
-                        if (game_values.leaflimit == 0 || projectilelimit > 0 || (game_values.gamemode->chicken == this && game_values.gamemodesettings.chicken.glide && powerup == -1)) {
-                            tail.shake(*this);
-                        }
+                    else {
+                        tryShakingTail();
                     }
                 }
-            } else {
-                lockjump = false;		//the jump key is not pressed: the player may jump again if he is on the ground
-
-                if (vely < -VELSTOPJUMP)
-                    vely = -VELSTOPJUMP;
-
-                if (flying) {
-                    flying = false;
-                    flyingtimer = 0;
-
-                    if (game_values.pwingslimit > 0)
-                        DecreaseProjectileLimit();
-                }
-            }
+            } else
+                enableFreeFall();
 
             if (playerKeys->game_down.fDown) {
                 if (!lockfall && !inair && playerDevice == DEVICE_KEYBOARD) {
@@ -1096,111 +1244,26 @@ void CPlayer::move()
             }
 
             //POWERUP RELEASE
-            if (playerKeys->game_powerup.fDown && tanookisuit.notStatue() && game_values.gamemode->gamemode != game_mode_bonus) {
-                if (game_values.gamepowerups[globalID] > 0 && !shyguy) { //Don't allow usage of the poison powerup, it sticks with you and don't allow shyguys to use powerups
-                    powerupused = game_values.gamepowerups[globalID];
-                    game_values.gamepowerups[globalID] = -1;
-
-                    powerupradius = 100.0f;
-                    powerupangle = (float)(RANDOM_INT(1000) * 0.00628f);
-
-                    ifSoundOnPlay(rm->sfx_storedpowerupsound);
-                }
-            }
+            if (playerKeys->game_powerup.fDown)
+                tryReleasingPowerup();
 
             fPressedAcceptItem = playerKeys->game_turbo.fPressed;
 
             //Projectiles
             if (playerKeys->game_turbo.fDown) {
-                fAcceptingItem = carriedItem == NULL;
-
-                if (!lockfire) {
-                    if (bobomb) { //If we're a bob-omb, explode
-                        action = player_action_bobomb;
-                    } else {
-
-                        if (powerup == 1 && projectiles < 2) {
-                            if (game_values.fireballlimit == 0 || projectilelimit > 0) {
-                                action = player_action_fireball;
-                            }
-                        } else if (powerup == 2 && projectiles < 2 && hammertimer == 0) {
-                            if (game_values.hammerlimit == 0 || projectilelimit > 0) {
-                                action = player_action_hammer;
-                            }
-                        } else if (powerup == 3 && !spin.isSpinInProgress() && !kuriboshoe.is_on()) {
-                            if (game_values.featherlimit == 0 || projectilelimit > 0) {
-                                action = player_action_spincape;
-                            }
-                        } else if (powerup == 4 && projectiles < 1) { //only allow one boomerang
-                            if (game_values.boomeranglimit == 0 || projectilelimit > 0) {
-                                action = player_action_boomerang;
-                            }
-                        } else if (powerup == 5 && projectiles < 1) {
-                            if (game_values.wandlimit == 0 || projectilelimit > 0) {
-                                action = player_action_iceblast;
-                            }
-                        } else if (powerup == 6 && projectiles < 2 && hammertimer == 0) {
-                            if (game_values.bombslimit == 0 || projectilelimit > 0) {
-                                action = player_action_bomb;
-                            }
-                        } else if (powerup == 7 && !spin.isSpinInProgress() && !kuriboshoe.is_on()) { //Racoon tail spin
-                            if (game_values.leaflimit == 0 || projectilelimit > 0) {
-                                action = player_action_spintail;
-                            }
-                        }
-                    }
-
-                    lockfire = true;
-                }
-            } else {
-                lockfire = false;
-                fAcceptingItem = false;
-
-                if (carriedItem) {
-                    if (playerKeys->game_down.fDown)
-                        carriedItem->Drop();
-                    else {
-                        //Make sure the owner of the object we are kicking is this player
-                        carriedItem->owner = this;
-
-                        //Make sure the shell/block is out in front of player before kicking it
-                        if (carriedItem->getMovingObjectType() == movingobject_shell || carriedItem->getMovingObjectType() == movingobject_throwblock)
-                            carriedItem->MoveToOwner();
-
-                        carriedItem->Kick();
-                    }
-
-                    carriedItem = NULL;
-                }
-            }
+                useSpecialPowerup();
+            } else
+                releaseCarriedItem();
         }
 
-        if (flying) {
-            //If they player was frozen while flying, cause them to stop flying
-            //or if they have been flying for a while, stop them flying
-            if (frozen || ++flyingtimer > 200) {
-                flyingtimer = 0;
-                flying = false;
+        updateFlyingStatus();
 
-                if (game_values.pwingslimit > 0)
-                    DecreaseProjectileLimit();
-            } else { //otherwise allow them to rise and swoop while flying
-                if (playerKeys->game_down.fDown && vely < 1.0f) {
-                    vely += 1.0f;
-                } else if (!playerKeys->game_down.fDown && vely > -1.0f) {
-                    vely -= 1.5f;
-                    inair = true;
-                }
-            }
-        }
-
-        if (movement_direction == 1) {
+        if (movement_direction == 1)
             accelerateRight();
-        } else if (movement_direction == -1) {
+        else if (movement_direction == -1)
             accelerateLeft();
-        } else {
+        else
             decreaseVelocity();
-        }
 
         if (!inair) {
             if (game_values.unlocksecret3part2[globalID] > 0)
@@ -1224,7 +1287,7 @@ void CPlayer::move()
     }
 
     //Player can be killed by map so only do this code if he is still living
-    if (state == player_ready) {
+    if (isready()) {
         //Deal with terminal burnup velocity
         burnup.update(*this);
         if (isdead())
