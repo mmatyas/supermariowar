@@ -17,8 +17,9 @@ class NetPeerENet : public NetPeer
 
         uint32_t addressHost();
         uint16_t addressPort();
-
         std::string addressAsString();
+
+        uint32_t averageRTT() const;
 
         bool operator==(const NetPeer&) const;
         bool operator==(const NetPeer*&) const;

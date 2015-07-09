@@ -18,8 +18,9 @@ class NetPeer
         // get address host and port in network byte order
         virtual uint32_t addressHost() = 0;
         virtual uint16_t addressPort() = 0;
-
         virtual std::string addressAsString() = 0;
+
+        virtual uint32_t averageRTT() const = 0;
 
         virtual bool operator==(const NetPeer&) const = 0;
         virtual bool operator==(const NetPeer*&) const = 0;

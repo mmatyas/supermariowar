@@ -93,6 +93,11 @@ std::string NetPeerENet::addressAsString()
     return std::string(buf);
 }
 
+uint32_t NetPeerENet::averageRTT() const
+{
+    return foreign_peer->roundTripTime;
+}
+
 bool NetPeerENet::operator==(const NetPeer*& peer) const
 {
     if (!peer)
