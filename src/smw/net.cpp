@@ -1,6 +1,7 @@
 #include "net.h"
 
 #include "FileIO.h"
+#include "GlobalConstants.h"
 #include "GameValues.h"
 #include "GSMenu.h"
 #include "RandomNumberGenerator.h"
@@ -483,7 +484,7 @@ void NetClient::handleStartSyncMessage(const uint8_t* data, size_t dataLength)
         setAsLastSentMessage(NET_P2G_SYNC_OK);
     else {
         Net_SyncOKPackage respond_pkg;
-        sendMessageToGameHost(&respond_pkg, sizeof(Net_SyncOKPackage));
+        sendMessageToGameHostReliable(&respond_pkg, sizeof(Net_SyncOKPackage));
     }
 }
 
@@ -513,7 +514,7 @@ void NetClient::sendLeaveGameMessage()
         setAsLastReceivedMessage(pkg.packageType);
     } else {
         // diconnect from foreign game host
-        sendMessageToGameHost(&pkg, sizeof(Net_LeaveGamePackage));
+        sendMessageToGameHostReliable(&pkg, sizeof(Net_LeaveGamePackage));
         assert(!local_gamehost.active);
     }
 
@@ -553,6 +554,49 @@ void NetClient::sendLocalInput()
 
 void NetClient::sendPowerupTrigger()
 {
+    Net_RequestPowerupPackage pkg;
+    sendMessageToGameHostReliable(&pkg, sizeof(Net_RequestPowerupPackage));
+}
+
+void NetClient::handlePowerupStart(const uint8_t* data, size_t dataLength)
+{
+    Net_StartPowerupPackage pkg(0xFF, 0, 0);
+    memcpy(&pkg, data, sizeof(Net_StartPowerupPackage));
+
+    assert(pkg.player_id < 4);
+    if (pkg.player_id > 3)
+        return;
+
+    if (pkg.player_id == netplay.remotePlayerNumber)
+        return;
+
+    list_players[pkg.player_id]->powerupused = pkg.powerup_id;
+    unsigned missed_frames = (pkg.delay + foreign_gamehost->averageRTT() / 2) / WAITTIME;
+    // TODO: make this nicer
+    // TODO: this might be overriden by a late packet, in tryReleasingPowerup()
+    list_players[pkg.player_id]->powerupradius = 100.0f;
+    for (; missed_frames > 0; missed_frames--) {
+        list_players[pkg.player_id]->powerupradius -= (float)game_values.storedpowerupdelay / 2.0f;
+    }
+}
+
+void NetClient::handlePowerupTrigger(const uint8_t* data, size_t dataLength)
+{
+    Net_TriggerPowerupPackage pkg(0xFF, 0, 0, 0);
+    memcpy(&pkg, data, sizeof(Net_TriggerPowerupPackage));
+
+    assert(pkg.player_id < 4);
+    if (pkg.player_id > 3)
+        return;
+
+    float temp_px = list_players[pkg.player_id]->fx;
+    float temp_py = list_players[pkg.player_id]->fy;
+    list_players[pkg.player_id]->powerupused = pkg.powerup_id;
+    list_players[pkg.player_id]->setXf(pkg.player_x);
+    list_players[pkg.player_id]->setYf(pkg.player_y);
+    list_players[pkg.player_id]->triggerPowerup();
+    list_players[pkg.player_id]->setXf(temp_px);
+    list_players[pkg.player_id]->setYf(temp_py);
 }
 
 void NetClient::handleRemoteGameState(const uint8_t* data, size_t dataLength) // for other clients
@@ -732,6 +776,14 @@ void NetClient::onReceive(NetPeer& client, const uint8_t* data, size_t dataLengt
             handleRemoteGameState(data, dataLength);
             break;
 
+        case NET_G2P_START_POWERUP:
+            handlePowerupStart(data, dataLength);
+            break;
+
+        case NET_G2P_TRIGGER_POWERUP:
+            handlePowerupTrigger(data, dataLength);
+            break;
+
         //
         // Default
         //
@@ -773,14 +825,20 @@ bool NetClient::connectGameHost(const char* hostname, const uint16_t port)
     // now we wait for sync package
 }
 
-bool NetClient::sendTo(NetPeer*& peer, const void* data, int dataLength)
+bool NetClient::sendTo(NetPeer*& peer, const void* data, int dataLength, bool reliable)
 {
     assert(peer);
     assert(data);
     assert(dataLength >= 3);
 
-    if (!peer->send(data, dataLength))
-        return false;
+    if (reliable) {
+        if (!peer->send(data, dataLength))
+            return false;
+    }
+    else {
+        if (!peer->sendReliable(data, dataLength))
+            return false;
+    }
 
     setAsLastSentMessage(((uint8_t*)data)[2]);
     return true;
@@ -788,12 +846,17 @@ bool NetClient::sendTo(NetPeer*& peer, const void* data, int dataLength)
 
 bool NetClient::sendMessageToLobbyServer(const void* data, int dataLength)
 {
-    return sendTo(foreign_lobbyserver, data, dataLength);
+    return sendTo(foreign_lobbyserver, data, dataLength, true);
 }
 
 bool NetClient::sendMessageToGameHost(const void* data, int dataLength)
 {
     return sendTo(foreign_gamehost, data, dataLength);
+}
+
+bool NetClient::sendMessageToGameHostReliable(const void* data, int dataLength)
+{
+    return sendTo(foreign_gamehost, data, dataLength, true);
 }
 
 void NetClient::setAsLastSentMessage(uint8_t packageType)
@@ -990,6 +1053,10 @@ void NetGameHost::onReceive(NetPeer& player, const uint8_t* data, size_t dataLen
             handleRemoteInput(player, data, dataLength);
             break;
 
+        case NET_P2G_REQ_POWERUP:
+            handlePowerupRequest(player, data, dataLength);
+            break;
+
         default:
             printf("GH Unknown: ");
             for (unsigned a = 0; a < dataLength; a++)
@@ -1004,7 +1071,7 @@ void NetGameHost::sendStartRoomMessage()
     assert(foreign_lobbyserver);
 
     Net_StartRoomPackage pkg;
-    foreign_lobbyserver->send(&pkg, sizeof(Net_StartRoomPackage));
+    foreign_lobbyserver->sendReliable(&pkg, sizeof(Net_StartRoomPackage));
     setAsLastSentMessage(pkg.packageType);
 }
 
@@ -1014,7 +1081,7 @@ void NetGameHost::sendStartGameMessage()
     assert(clients[0] || clients[1] || clients[2]);
 
     Net_StartGamePackage pkg;
-    foreign_lobbyserver->send(&pkg, sizeof(Net_StartGamePackage));
+    foreign_lobbyserver->sendReliable(&pkg, sizeof(Net_StartGamePackage));
     sendMessageToMyPeers(&pkg, sizeof(Net_StartGamePackage));
 
     netplay.client.handleGameStartMessage();
@@ -1084,7 +1151,9 @@ void NetGameHost::handleRemoteInput(const NetPeer& player, const uint8_t* data, 
     for (unsigned short c = 0; c < expected_client_count; c++) {
         if (player == *clients[c]) {
             //printf("yey\n");
-            pkg->readKeys(&netplay.netPlayerInput.outputControls[c + 1]); // 0 = local player
+
+            // TODO: does this work if GH leaves?
+            pkg->readKeys(&netplay.netPlayerInput.outputControls[c + 1]);
 
 
             /*printf("INPUT %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d %d:%d\n",
@@ -1110,6 +1179,34 @@ void NetGameHost::handleRemoteInput(const NetPeer& player, const uint8_t* data, 
     }
 }
 
+// A player wants to use a stored powerup
+void NetGameHost::handlePowerupRequest(const NetPeer& player, const uint8_t* data, size_t dataLength)
+{
+    assert(player == *clients[0] || player == *clients[1] || player == *clients[2]);
+
+    // Net_RequestPowerupPackage* in_pkg = (Net_RequestPowerupPackage*) data; // TODO: check size!
+
+    uint8_t playerID = 0xFF;
+    for (unsigned short c = 0; c < expected_client_count; c++) {
+        if (player != *clients[c]) {
+            // TODO: does this work if GH leaves?
+            playerID = c + 1;
+            break;
+        }
+    }
+
+    assert(list_players[playerID]->powerupused >= 0);
+    if (list_players[playerID]->powerupused < 0)
+        return;
+
+    Net_StartPowerupPackage pkg(playerID, list_players[playerID]->powerupused, player.averageRTT() / 2);
+    for (unsigned short c = 0; c < expected_client_count; c++) {
+        if (clients[c] && player != *clients[c]) {
+            clients[c]->sendReliable(&pkg, sizeof(Net_StartPowerupPackage));
+        }
+    }
+}
+
 bool NetGameHost::sendMessageToMyPeers(const void* data, size_t dataLength)
 {
     assert(data);
@@ -1117,7 +1214,7 @@ bool NetGameHost::sendMessageToMyPeers(const void* data, size_t dataLength)
 
     for (int c = 0; c < 3; c++) {
         if (clients[c])
-            clients[c]->send(data, dataLength);
+            clients[c]->sendReliable(data, dataLength);
     }
 
     setAsLastSentMessage(((uint8_t*)data)[2]);

@@ -139,6 +139,7 @@ class NetGameHost : public NetworkEventHandler
 
         // P3. Play
         void handleRemoteInput(const NetPeer&, const uint8_t*, size_t);
+        void handlePowerupRequest(const NetPeer&, const uint8_t*, size_t);
 
         bool sendMessageToMyPeers(const void*, size_t);
 
@@ -201,7 +202,8 @@ class NetClient : public NetworkEventHandler
 
         bool sendMessageToLobbyServer(const void* data, int dataLength);
         bool sendMessageToGameHost(const void* data, int dataLength);
-        bool sendTo(NetPeer*& peer, const void* data, int dataLength);
+        bool sendMessageToGameHostReliable(const void* data, int dataLength);
+        bool sendTo(NetPeer*& peer, const void* data, int dataLength, bool reliable = false);
 
         // P1. Connect
         void handleServerinfoAndClose(const uint8_t*, size_t);
@@ -220,6 +222,8 @@ class NetClient : public NetworkEventHandler
 
         // P3. Game
         void handleRemoteGameState(const uint8_t*, size_t);
+        void handlePowerupStart(const uint8_t*, size_t);
+        void handlePowerupTrigger(const uint8_t*, size_t);
 
         void sendGoodbye();
 
