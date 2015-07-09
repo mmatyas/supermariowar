@@ -35,7 +35,7 @@ bool NetClientENet::sendData(const void* data, size_t length)
     if (!packet)
         return false;
 
-    if (enet_peer_send(foreign_peer, 0, packet) < 0)
+    if (enet_peer_send(foreign_peer, 1, packet) < 0)
         return false;
 
     return true;
@@ -99,9 +99,9 @@ bool NetworkLayerENet::init(uint64_t max_players)
 
     // bind address
     // multiple incoming connections
-    // one channel
+    // two channels
     // no up/down speed limit
-    server_host = enet_host_create(&server_address, max_players, 1, 0, 0);
+    server_host = enet_host_create(&server_address, max_players, 2, 0, 0);
     if (!server_host) {
         log("[error][net] Could not open connection port.\n");
         return false;
