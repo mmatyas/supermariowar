@@ -310,4 +310,44 @@ struct Net_GameStatePackage : Net_MessageHeader {
     }
 };
 
+struct Net_RequestPowerupPackage : Net_MessageHeader {
+    Net_RequestPowerupPackage() : Net_MessageHeader(NET_P2G_REQ_POWERUP) {}
+};
+
+struct Net_StartPowerupPackage : Net_MessageHeader {
+    uint8_t player_id;
+    uint8_t powerup_id;
+    uint32_t delay; // time between source player and game host
+
+    Net_StartPowerupPackage(uint8_t playerID, uint8_t powerupID, uint32_t delay)
+        : Net_MessageHeader(NET_G2P_START_POWERUP)
+        , player_id(playerID)
+        , powerup_id(powerupID)
+        , delay(delay)
+    {
+        assert(playerID < 4);
+        assert(powerupID < 128);
+    }
+};
+
+struct Net_TriggerPowerupPackage : Net_MessageHeader {
+    uint8_t player_id;
+    uint8_t powerup_id;
+    float player_x;
+    float player_y;
+
+    Net_TriggerPowerupPackage(uint8_t playerID, uint8_t powerupID, float playerX, float playerY)
+        : Net_MessageHeader(NET_G2P_TRIGGER_POWERUP)
+        , player_id(playerID)
+        , powerup_id(powerupID)
+        , player_x(playerX)
+        , player_y(playerY)
+    {
+        // TODO: reduce bit count
+        assert(playerID < 4);
+        assert(powerupID < 128);
+    }
+};
+
+
 #endif // NETWORK_PROTOCOL_PACKAGES_H
