@@ -325,7 +325,7 @@ struct Net_StartPowerupPackage : Net_MessageHeader {
         , powerup_id(powerupID)
         , delay(delay)
     {
-        assert(playerID < 4);
+        assert(playerID < 4 || playerID == 0xFF /* error value */);
         assert(powerupID < 128);
     }
 };

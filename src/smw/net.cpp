@@ -552,8 +552,11 @@ void NetClient::sendLocalInput()
         game_values.playerInput.outputControls[0].keys[7].fPressed);*/
 }
 
-void NetClient::sendPowerupTrigger()
+// A client wants to use powerup, so asks the boss for validation
+void NetClient::sendPowerupRequest()
 {
+    assert(!netplay.theHostIsMe);
+
     Net_RequestPowerupPackage pkg;
     sendMessageToGameHostReliable(&pkg, sizeof(Net_RequestPowerupPackage));
 }
@@ -861,7 +864,7 @@ bool NetClient::sendMessageToGameHostReliable(const void* data, int dataLength)
 
 void NetClient::setAsLastSentMessage(uint8_t packageType)
 {
-    printf("setAsLastSentMessage: %d.\n", packageType);
+    //printf("setAsLastSentMessage: %d.\n", packageType);
     lastSentMessage.packageType = packageType;
     lastSentMessage.timestamp = SDL_GetTicks();
 }
@@ -1179,6 +1182,18 @@ void NetGameHost::handleRemoteInput(const NetPeer& player, const uint8_t* data, 
     }
 }
 
+// The boss wants to use powerup, so notifies the clients
+void NetGameHost::sendPowerupStart()
+{
+    assert(netplay.theHostIsMe);
+    assert(list_players[netplay.remotePlayerNumber]->powerupused >= 0);
+
+    Net_StartPowerupPackage pkg(netplay.remotePlayerNumber,
+        list_players[netplay.remotePlayerNumber]->powerupused, 0);
+    sendMessageToMyPeers(&pkg, sizeof(Net_StartPowerupPackage));
+    printf("[net] P%d (host) used powerup #%d\n", pkg.player_id, pkg.powerup_id);
+}
+
 // A player wants to use a stored powerup
 void NetGameHost::handlePowerupRequest(const NetPeer& player, const uint8_t* data, size_t dataLength)
 {
@@ -1212,7 +1227,7 @@ bool NetGameHost::sendMessageToMyPeers(const void* data, size_t dataLength)
     assert(data);
     assert(dataLength >= 3);
 
-    for (int c = 0; c < 3; c++) {
+    for (unsigned short c = 0; c < 3; c++) {
         if (clients[c])
             clients[c]->sendReliable(data, dataLength);
     }

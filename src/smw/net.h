@@ -96,6 +96,7 @@ class NetGameHost : public NetworkEventHandler
 
         // P3. Game
         void sendCurrentGameState();
+        void sendPowerupStart();
 
 
         LastMessage lastSentMessage;
@@ -181,7 +182,7 @@ class NetClient : public NetworkEventHandler
         // P3. Play
         void sendLeaveGameMessage();
         void sendLocalInput();
-        void sendPowerupTrigger();
+        void sendPowerupRequest();
 
 
         LastMessage lastSentMessage;
