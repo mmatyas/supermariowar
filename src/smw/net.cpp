@@ -570,6 +570,7 @@ void NetClient::handlePowerupStart(const uint8_t* data, size_t dataLength)
     if (pkg.player_id > 3)
         return;
 
+    // if the source of this event was me
     if (pkg.player_id == netplay.remotePlayerNumber)
         return;
 
@@ -1203,14 +1204,15 @@ void NetGameHost::handlePowerupRequest(const NetPeer& player, const uint8_t* dat
 
     uint8_t playerID = 0xFF;
     for (unsigned short c = 0; c < expected_client_count; c++) {
-        if (player != *clients[c]) {
+        if (player == *clients[c]) {
             // TODO: does this work if GH leaves?
             playerID = c + 1;
             break;
         }
     }
 
-    assert(list_players[playerID]->powerupused >= 0);
+    assert(playerID < 4);
+    assert(list_players[playerID]);
     if (list_players[playerID]->powerupused < 0)
         return;
 
@@ -1219,6 +1221,13 @@ void NetGameHost::handlePowerupRequest(const NetPeer& player, const uint8_t* dat
         if (clients[c] && player != *clients[c]) {
             clients[c]->sendReliable(&pkg, sizeof(Net_StartPowerupPackage));
         }
+    }
+
+    // FIXME: this is almost the same as in the regular client code
+    unsigned missed_frames = pkg.delay / WAITTIME;
+    list_players[pkg.player_id]->powerupradius = 100.0f;
+    for (; missed_frames > 0; missed_frames--) {
+        list_players[pkg.player_id]->powerupradius -= (float)game_values.storedpowerupdelay / 2.0f;
     }
 }
 
