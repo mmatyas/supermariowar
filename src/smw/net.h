@@ -287,6 +287,8 @@ struct Networking {
     uint8_t remotePlayerNumber;
     CPlayerInput netPlayerInput;
 
+    bool waitingForPowerupTrigger;
+
     bool gamestate_changed;
     Net_GameplayState latest_gamestate;
 };

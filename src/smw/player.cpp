@@ -828,11 +828,8 @@ void CPlayer::update_usePowerup()
     powerupradius -= (float)game_values.storedpowerupdelay / 2.0f;
     powerupangle += 0.05f;
 
-    if (netplay.active) {
-        /*if (netplay.theHostIsMe)
-            netplay.client.local_gamehost.sendPowerupTriggerIfReady(*this);*/
+    if (netplay.active && netplay.waitingForPowerupTrigger)
         return;
-    }
 
     if (powerupradius < 0.0f)
         triggerPowerup();
@@ -1007,6 +1004,7 @@ void CPlayer::tryReleasingPowerup()
 
     ifSoundOnPlay(rm->sfx_storedpowerupsound);
 
+    netplay.waitingForPowerupTrigger = true;
     if (netplay.active) {
         if (netplay.theHostIsMe)
             netplay.client.local_gamehost.sendPowerupStart();
