@@ -2657,14 +2657,14 @@ short CPlayer::KillPlayerMapHazard(bool fForce, killstyle style, bool fKillCarri
     }
 }
 
-bool CPlayer::collidesWith(CPlayer* other)
+void CPlayer::collidesWith(CPlayer* other)
 {
     collisions.handle_p2p(this, other);
 }
 
 bool CPlayer::collidesWith(CObject* object)
 {
-    collisions.handle_p2o(this, object);
+    return collisions.handle_p2o(this, object);
 }
 
 void CPlayer::flipsidesifneeded()

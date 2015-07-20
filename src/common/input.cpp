@@ -81,7 +81,6 @@ void CPlayerInput::ClearPressedKeys(short iGameState)
 void CPlayerInput::ClearGameActionKeys()
 {
     for (int iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
-		CInputControl * inputControl = &inputControls[iPlayer]->inputGameControls[0];
 		COutputControl * outputControl = &outputControls[iPlayer];
 
 		// 0-3: direction keys, 4: turbo

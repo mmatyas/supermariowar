@@ -12,7 +12,7 @@ NetworkLayerENet netLayer;
 
 
 SMWServer::SMWServer()
-    : serverInfo("SMW Server", 0, maxPlayerCount)
+    : serverInfo("SMW Server", 0, 20 /* maxPlayerCount */)
     , maxPlayerCount(20)
     , roomCreateID(1)
 {

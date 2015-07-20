@@ -1056,7 +1056,7 @@ int main(int argc, char *argv[])
 		fwrite(&draw_offset_col, sizeof(int), 1, fp);
 		fwrite(&draw_offset_row, sizeof(int), 1, fp);
 		fwrite(&g_fFullScreen, sizeof(bool), 1, fp);
-        fprintf(fp, worldlist->current_name());
+        fprintf(fp, "%s", worldlist->current_name());
 		fclose(fp);
 	}
 

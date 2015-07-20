@@ -82,8 +82,8 @@ DominationGameModeSettings::DominationGameModeSettings()
     : loseondeath(true)
     , stealondeath(false)
     , relocateondeath(false)
-    , quantity(13) 					//# Players + 1 = 13
     , relocationfrequency(1240)  	//Relocate after 20 seconds = 1240
+    , quantity(13) 					//# Players + 1 = 13
 {}
 
 KingOfTheHillModeSettings::KingOfTheHillModeSettings()

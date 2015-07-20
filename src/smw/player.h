@@ -98,7 +98,7 @@ class CPlayer
         bool isShielded();
         bool isFrozen() { return frozen; }
 
-		bool collidesWith(CPlayer*);
+		void collidesWith(CPlayer*);
 		bool collidesWith(CObject*);
 
 		void CommitAction();

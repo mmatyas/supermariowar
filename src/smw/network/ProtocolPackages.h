@@ -3,6 +3,7 @@
 
 #include "ProtocolDefinitions.h"
 
+#include <stdint.h>
 #include <cassert>
 
 

@@ -269,6 +269,9 @@ void NetworkLayerENet::listen(ENetHost* host, ENetEvent& last_host_event, Networ
                 listener.onDisconnect(peer);
             }
             break;
+
+            default:
+            break;
         }
     }
 }

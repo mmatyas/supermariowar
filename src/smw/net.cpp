@@ -306,6 +306,7 @@ void NetClient::handleNewRoomListEntry(const uint8_t* data, size_t dataLength)
     netplay.currentRooms.push_back(newRoom);
 
     if (uiRoomList) {
+        // TODO: strings would be better
         char playerCountString[4] = {'0' + roomInfo.currentPlayerCount, '/', '4', '\0'};
         uiRoomList->Add(newRoom.name, playerCountString);
     }
@@ -903,8 +904,8 @@ void Net_GameplayState::copyFromLocal()
 NetGameHost::NetGameHost()
     : active(false)
     , foreign_lobbyserver(NULL)
-    , next_free_client_slot(0)
     , expected_client_count(0)
+    , next_free_client_slot(0)
 {
     //printf("NetGameHost::ctor\n");
     for (short p = 0; p < 3; p++) {

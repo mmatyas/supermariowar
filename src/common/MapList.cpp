@@ -609,7 +609,7 @@ void MapList::WriteMapSummaryCache()
     std::map<std::string, MapListNode*>::iterator itr = maps.begin(), lim = maps.end();
 
     while (itr != lim) {
-        fprintf(fp, itr->first.c_str());
+        fprintf(fp, "%s", itr->first.c_str());
 
         for (short iFilter = 0; iFilter < NUM_AUTO_FILTERS; iFilter++)
             fprintf(fp, ",%d", itr->second->pfFilters[iFilter]);

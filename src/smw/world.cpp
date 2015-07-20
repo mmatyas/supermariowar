@@ -950,7 +950,7 @@ bool WorldMap::Save(const char * szPath)
     for (short iStage = 0; iStage < game_values.tourstoptotal; iStage++) {
         char szLine[4096];
         WriteTourStopLine(game_values.tourstops[iStage], szLine, true);
-        fprintf(file, szLine);
+        fprintf(file, "%s", szLine);
     }
     fprintf(file, "\n");
 

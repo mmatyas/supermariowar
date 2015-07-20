@@ -652,7 +652,7 @@ void gameloop_frame()
 
     if (fp) {
 		fwrite(&g_fFullScreen, sizeof(bool), 1, fp);
-		fprintf(fp, maplist->currentFilename());
+		fprintf(fp, "%s", maplist->currentFilename());
 		fclose(fp);
 	}
 

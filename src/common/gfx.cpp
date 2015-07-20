@@ -38,7 +38,7 @@ void gfx_settitle(const char* title) {
 
 void gfx_close() {}
 bool gfx_loadpalette(const std::string& palette_path) {
-    gfx.getPalette().load(palette_path.c_str());
+    return gfx.getPalette().load(palette_path.c_str());
 }
 
 bool ValidSkinSurface(SDL_Surface * skin)
