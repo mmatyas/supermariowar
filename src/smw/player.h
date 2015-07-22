@@ -219,6 +219,8 @@ class CPlayer
 		void mapcolldet_handlePlatformVelocity(float &fPlatformVelX, float &fPlatformVelY);
 		bool mapcolldet_handleOutOfScreen();
 		void mapcolldet_moveHorizontally(short direction);
+		void mapcolldet_moveUpward(short, short, short, short, short, float);
+		void mapcolldet_moveDownward(short, short, short, short, short, float);
 
 		PlayerCollisions collisions;
 		PlayerAwardEffects awardeffects;

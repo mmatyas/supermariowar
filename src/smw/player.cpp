@@ -2282,6 +2282,272 @@ void CPlayer::mapcolldet_moveHorizontally(short direction)
     }
 }
 
+void CPlayer::mapcolldet_moveUpward(short txl, short txc, short txr,
+    short alignedBlockX, short unAlignedBlockX, float unAlignedBlockFX)
+{
+    // moving up
+    fallthrough = false;
+
+    short ty = (short)(fPrecalculatedY) / TILESIZE;
+
+    IO_Block * leftblock = g_map->block(txl, ty);
+    IO_Block * centerblock = g_map->block(txc, ty);
+    IO_Block * rightblock = g_map->block(txr, ty);
+
+    if (playerKeys->game_jump.fDown && !frozen && g_map->checkforwarp(alignedBlockX, unAlignedBlockX, ty, 2)) {
+        setYf((float)((ty << 5) + TILESIZE) + 0.2f);
+        warpstatus.enterWarp(*this, g_map->warp(unAlignedBlockX, ty));
+
+        if (ix - PWOFFSET < (txl << 5) + 1)
+            setXi((txl << 5) + PHOFFSET + 1);
+        else if (ix + PW + PWOFFSET > (txr << 5) + TILESIZE)
+            setXi((txr << 5) + TILESIZE - PW - PWOFFSET);
+
+        return;
+    }
+
+    if (centerblock && !centerblock->isTransparent()) {
+        if (!centerblock->collide(this, 0, true)) {
+            if (iVerticalPlatformCollision == 2 && !centerblock->isHidden())
+                KillPlayerMapHazard(true, kill_style_environment, true, iPlatformCollisionPlayerId);
+
+            return;
+        }
+    }
+
+    //Player hit a solid, ice or death on top
+    //or if the player is invincible and hits death or death on bottom
+
+    //There is a known issue where where if a death on bottom tile and a super death on bottom tile
+    //are next to each other and the player hits from below and aligns with the super death on bottom
+    //the player will then shift over and fully hit the super death on bottom and die even if shielded
+    //or invincible.
+
+    int alignedTileType = g_map->map(alignedBlockX, ty);
+    if ((alignedTileType & tile_flag_solid) && !(alignedTileType & tile_flag_super_or_player_death_bottom) &&
+            (!(alignedTileType & tile_flag_death_on_bottom) || isInvincible() || isShielded() || shyguy)) {
+        setYf((float)((ty << 5) + TILESIZE) + 0.2f);
+        fOldY = fy - 1.0f;
+
+        if (vely < 0.0f)
+            vely = -vely * BOUNCESTRENGTH;
+
+        if (iVerticalPlatformCollision == 2)
+            KillPlayerMapHazard(true, kill_style_environment, true, iPlatformCollisionPlayerId);
+
+        return;
+    }
+
+    if (leftblock && !leftblock->isTransparent()) { //then left
+        bool useBehavior = alignedBlockX == txl || rightblock == NULL || rightblock->isTransparent() || rightblock->isHidden();
+
+        if (!leftblock->collide(this, 0, useBehavior)) {
+            if (iVerticalPlatformCollision == 2 && !leftblock->isHidden())
+                KillPlayerMapHazard(true, kill_style_environment, true, iPlatformCollisionPlayerId);
+
+            return;
+        }
+    }
+
+    if (rightblock && !rightblock->isTransparent()) { //then right
+        bool useBehavior = alignedBlockX == txr || leftblock == NULL || leftblock->isTransparent() || leftblock->isHidden();
+
+        if (!rightblock->collide(this, 0, useBehavior)) {
+            if (iVerticalPlatformCollision == 2 && !rightblock->isHidden())
+                KillPlayerMapHazard(true, kill_style_environment, true, iPlatformCollisionPlayerId);
+
+            return;
+        }
+    }
+
+    //Player squeezed around the block, ice or death on top
+    //or if the player is invincible and hits death or death on bottom
+    int unalignedTileType = g_map->map(unAlignedBlockX, ty);
+    if ((unalignedTileType & tile_flag_solid) && !(unalignedTileType & tile_flag_super_or_player_death_bottom) &&
+            (!(unalignedTileType & tile_flag_death_on_bottom) || isInvincible() || isShielded() || shyguy)) {
+        setXf(unAlignedBlockFX);
+        fOldX = fx;
+
+        setYf(fPrecalculatedY);
+        vely += GRAVITATION;
+    } else if ((alignedTileType & tile_flag_player_or_death_on_bottom) || (unalignedTileType & tile_flag_player_or_death_on_bottom)) {
+        bool fRespawnPlayer = ((alignedTileType & tile_flag_super_or_player_death_bottom) && (unalignedTileType & tile_flag_super_or_player_death_bottom)) ||
+                              ((alignedTileType & tile_flag_super_or_player_death_bottom) &&  !(unalignedTileType & tile_flag_solid)) ||
+                              ((alignedTileType & tile_flag_solid) && !(unalignedTileType & tile_flag_super_or_player_death_bottom));
+
+        if (player_kill_nonkill != KillPlayerMapHazard(fRespawnPlayer, kill_style_environment, false))
+            return;
+    } else {
+        setYf(fPrecalculatedY);
+        vely += GRAVITATION;
+    }
+
+    if (!platform) {
+        inair = true;
+        onice = false;
+    }
+}
+
+void CPlayer::mapcolldet_moveDownward(short txl, short txc, short txr,
+    short alignedBlockX, short unAlignedBlockX, float unAlignedBlockFX)
+{
+    // moving down / on ground
+    short ty = ((short)fPrecalculatedY + PH) / TILESIZE;
+
+    if (playerKeys->game_down.fDown && !frozen && g_map->checkforwarp(txl, txr, ty, 0)) {
+        setYf((float)((ty << 5) - PH) - 0.2f);
+        warpstatus.enterWarp(*this, g_map->warp(txr,ty));
+
+        fallthrough = false;
+        platform = NULL;
+
+        if (ix - PWOFFSET < (txl << 5) + 1)
+            setXi((txl << 5) + PHOFFSET + 1);
+        else if (ix + PW + PWOFFSET > (txr << 5) + TILESIZE)
+            setXi((txr << 5) + TILESIZE - PW - PWOFFSET);
+
+        return;
+    }
+
+    IO_Block * leftblock = g_map->block(txl, ty);
+    IO_Block * rightblock = g_map->block(txr, ty);
+
+    bool fLeftBlockSolid = leftblock && !leftblock->isTransparent() && !leftblock->isHidden();
+    bool fRightBlockSolid = rightblock && !rightblock->isTransparent() && !rightblock->isHidden();
+
+    if (fLeftBlockSolid || fRightBlockSolid) {
+        bool collisionresult = true;
+        if (fLeftBlockSolid) { //collide with left block
+            collisionresult &= leftblock->collide(this, 2, alignedBlockX == txl || rightblock == NULL || rightblock->isTransparent() || rightblock->isHidden());
+
+            //If player was bumped and killed then return
+            if (state != player_ready)
+                return;
+        }
+
+        if (fRightBlockSolid) { //then right
+            collisionresult &= rightblock->collide(this, 2, alignedBlockX == txr || leftblock == NULL || leftblock->isTransparent() || leftblock->isHidden());
+
+            //If player was bumped and killed then return
+            if (state != player_ready)
+                return;
+        }
+
+        if (!collisionresult) {
+            platform = NULL;
+            onice = false;
+
+            if (iVerticalPlatformCollision == 0)
+                KillPlayerMapHazard(true, kill_style_environment, true, iPlatformCollisionPlayerId);
+
+            return;
+        }
+    }
+
+    int lefttile = g_map->map(txl, ty);
+    int righttile = g_map->map(txr, ty);
+
+    bool fGapSupport = (velx >= VELTURBOMOVING || velx <= -VELTURBOMOVING) && (lefttile == tile_flag_gap || righttile == tile_flag_gap);
+
+    bool fSolidTileUnderPlayer = (lefttile & tile_flag_solid)  || (righttile & tile_flag_solid);
+
+    if ((lefttile & tile_flag_solid_on_top || righttile & tile_flag_solid_on_top || fGapSupport) && fOldY + PH <= (ty << 5)) {
+        //on ground
+        //Deal with player down jumping through solid on top tiles
+
+        if (!platform)
+            onice = false;
+
+        if (fallthrough && !fSolidTileUnderPlayer) {
+            setYf((float)((ty << 5) - PH) + 0.2f);
+
+            if (!platform) {
+                inair = true;
+            }
+        } else {
+            //we were above the tile in the previous frame
+            setYf((float)((ty << 5) - PH) - 0.2f);
+            vely = GRAVITATION;
+
+            if (!platform) {
+                int alignedtile = g_map->map(alignedBlockX, ty);
+
+                if (alignedtile & tile_flag_ice || ((alignedtile == tile_flag_nonsolid || alignedtile == tile_flag_gap) && g_map->map(unAlignedBlockX, ty) & tile_flag_ice))
+                    onice = true;
+                else
+                    onice = false;
+
+                inair = false;
+                extrajumps = 0;
+                killsinrowinair = 0;
+            }
+        }
+
+        fOldY = fy - GRAVITATION;
+
+        if (!platform)
+            fallthrough = false;
+
+        platform = NULL;
+
+        if (iVerticalPlatformCollision == 0)
+            KillPlayerMapHazard(true, kill_style_environment, true, iPlatformCollisionPlayerId);
+
+        return;
+    }
+
+    bool fDeathTileUnderPlayer = ((lefttile & tile_flag_death_on_top) && (righttile & tile_flag_death_on_top)) ||
+                                 ((lefttile & tile_flag_death_on_top) && !(righttile & tile_flag_solid)) ||
+                                 (!(lefttile & tile_flag_solid) && (righttile & tile_flag_death_on_top));
+
+    bool fSuperDeathTileUnderPlayer = ((lefttile & tile_flag_super_or_player_death_top) && (righttile & tile_flag_super_or_player_death_top)) ||
+                                      ((lefttile & tile_flag_super_or_player_death_top) && !(righttile & tile_flag_solid)) ||
+                                      (!(lefttile & tile_flag_solid) && (righttile & tile_flag_super_or_player_death_top));
+
+    if (fSolidTileUnderPlayer && !fSuperDeathTileUnderPlayer &&
+            (!fDeathTileUnderPlayer || IsInvincibleOnBottom() || shyguy) ) {
+        //on ground
+
+        setYf((float)((ty << 5) - PH) - 0.2f);
+        vely = GRAVITATION;				//1 so we test against the ground again int the next frame (0 would test against the ground in the next+1 frame)
+
+        if (!platform) {
+            int alignedtile = g_map->map(alignedBlockX, ty);
+
+            if (alignedtile & tile_flag_ice || ((alignedtile == tile_flag_nonsolid || alignedtile == tile_flag_gap) && g_map->map(unAlignedBlockX, ty) & tile_flag_ice))
+                onice = true;
+            else
+                onice = false;
+
+            inair = false;
+            extrajumps = 0;
+            killsinrowinair = 0;
+        }
+
+        platform = NULL;
+
+        if (iVerticalPlatformCollision == 0) {
+            KillPlayerMapHazard(true, kill_style_environment, true, iPlatformCollisionPlayerId);
+            return;
+        }
+    } else if (fDeathTileUnderPlayer || fSuperDeathTileUnderPlayer) {
+        if (player_kill_nonkill != KillPlayerMapHazard(fSuperDeathTileUnderPlayer, kill_style_environment, false))
+            return;
+    } else {
+        //falling (in air)
+        setYf(fPrecalculatedY);
+        vely = CapFallingVelocity(GRAVITATION + vely);
+
+        if (!platform) {
+            //If we're not hopping with kuribo's shoe, then zero out our super jump timer
+            if (superjumptype != 3)
+                superjumptimer = 0;
+
+            inair = true;
+        }
+    }
+}
+
 void CPlayer::collision_detection_map()
 {
     setXf(fx + velx);
@@ -2327,7 +2593,6 @@ void CPlayer::collision_detection_map()
     //  then y axis (|)
     //-----------------------------------------------------------------
 
-    short ty = (short)fy / TILESIZE;
     short txl = 0, txr = 0, txc = 0;
     short iPlayerL = ix, iPlayerC = ix + HALFPW, iPlayerR = ix + PW;
 
@@ -2371,262 +2636,10 @@ void CPlayer::collision_detection_map()
 
     if (fMovingUp < -0.01f) {
         //moving up
-        fallthrough = false;
-
-        ty = (short)(fPrecalculatedY) / TILESIZE;
-
-        IO_Block * leftblock = g_map->block(txl, ty);
-        IO_Block * centerblock = g_map->block(txc, ty);
-        IO_Block * rightblock = g_map->block(txr, ty);
-
-        if (playerKeys->game_jump.fDown && !frozen && g_map->checkforwarp(alignedBlockX, unAlignedBlockX, ty, 2)) {
-            setYf((float)((ty << 5) + TILESIZE) + 0.2f);
-            warpstatus.enterWarp(*this, g_map->warp(unAlignedBlockX, ty));
-
-            if (ix - PWOFFSET < (txl << 5) + 1)
-                setXi((txl << 5) + PHOFFSET + 1);
-            else if (ix + PW + PWOFFSET > (txr << 5) + TILESIZE)
-                setXi((txr << 5) + TILESIZE - PW - PWOFFSET);
-
-            return;
-        }
-
-        if (centerblock && !centerblock->isTransparent()) {
-            if (!centerblock->collide(this, 0, true)) {
-                if (iVerticalPlatformCollision == 2 && !centerblock->isHidden())
-                    KillPlayerMapHazard(true, kill_style_environment, true, iPlatformCollisionPlayerId);
-
-                return;
-            }
-        }
-
-        //Player hit a solid, ice or death on top
-        //or if the player is invincible and hits death or death on bottom
-
-        //There is a known issue where where if a death on bottom tile and a super death on bottom tile
-        //are next to each other and the player hits from below and aligns with the super death on bottom
-        //the player will then shift over and fully hit the super death on bottom and die even if shielded
-        //or invincible.
-
-        int alignedTileType = g_map->map(alignedBlockX, ty);
-        if ((alignedTileType & tile_flag_solid) && !(alignedTileType & tile_flag_super_or_player_death_bottom) &&
-                (!(alignedTileType & tile_flag_death_on_bottom) || isInvincible() || isShielded() || shyguy)) {
-            setYf((float)((ty << 5) + TILESIZE) + 0.2f);
-            fOldY = fy - 1.0f;
-
-            if (vely < 0.0f)
-                vely = -vely * BOUNCESTRENGTH;
-
-            if (iVerticalPlatformCollision == 2)
-                KillPlayerMapHazard(true, kill_style_environment, true, iPlatformCollisionPlayerId);
-
-            return;
-        }
-
-        if (leftblock && !leftblock->isTransparent()) { //then left
-            bool useBehavior = alignedBlockX == txl || rightblock == NULL || rightblock->isTransparent() || rightblock->isHidden();
-
-            if (!leftblock->collide(this, 0, useBehavior)) {
-                if (iVerticalPlatformCollision == 2 && !leftblock->isHidden())
-                    KillPlayerMapHazard(true, kill_style_environment, true, iPlatformCollisionPlayerId);
-
-                return;
-            }
-        }
-
-        if (rightblock && !rightblock->isTransparent()) { //then right
-            bool useBehavior = alignedBlockX == txr || leftblock == NULL || leftblock->isTransparent() || leftblock->isHidden();
-
-            if (!rightblock->collide(this, 0, useBehavior)) {
-                if (iVerticalPlatformCollision == 2 && !rightblock->isHidden())
-                    KillPlayerMapHazard(true, kill_style_environment, true, iPlatformCollisionPlayerId);
-
-                return;
-            }
-        }
-
-        //Player squeezed around the block, ice or death on top
-        //or if the player is invincible and hits death or death on bottom
-        int unalignedTileType = g_map->map(unAlignedBlockX, ty);
-        if ((unalignedTileType & tile_flag_solid) && !(unalignedTileType & tile_flag_super_or_player_death_bottom) &&
-                (!(unalignedTileType & tile_flag_death_on_bottom) || isInvincible() || isShielded() || shyguy)) {
-            setXf(unAlignedBlockFX);
-            fOldX = fx;
-
-            setYf(fPrecalculatedY);
-            vely += GRAVITATION;
-        } else if ((alignedTileType & tile_flag_player_or_death_on_bottom) || (unalignedTileType & tile_flag_player_or_death_on_bottom)) {
-            bool fRespawnPlayer = ((alignedTileType & tile_flag_super_or_player_death_bottom) && (unalignedTileType & tile_flag_super_or_player_death_bottom)) ||
-                                  ((alignedTileType & tile_flag_super_or_player_death_bottom) &&  !(unalignedTileType & tile_flag_solid)) ||
-                                  ((alignedTileType & tile_flag_solid) && !(unalignedTileType & tile_flag_super_or_player_death_bottom));
-
-            if (player_kill_nonkill != KillPlayerMapHazard(fRespawnPlayer, kill_style_environment, false))
-                return;
-        } else {
-            setYf(fPrecalculatedY);
-            vely += GRAVITATION;
-        }
-
-        if (!platform) {
-            inair = true;
-            onice = false;
-        }
+        mapcolldet_moveUpward(txl, txc, txr, alignedBlockX, unAlignedBlockX, unAlignedBlockFX);
     } else {
         //moving down / on ground
-        ty = ((short)fPrecalculatedY + PH) / TILESIZE;
-
-        if (playerKeys->game_down.fDown && !frozen && g_map->checkforwarp(txl, txr, ty, 0)) {
-            setYf((float)((ty << 5) - PH) - 0.2f);
-            warpstatus.enterWarp(*this, g_map->warp(txr,ty));
-
-            fallthrough = false;
-            platform = NULL;
-
-            if (ix - PWOFFSET < (txl << 5) + 1)
-                setXi((txl << 5) + PHOFFSET + 1);
-            else if (ix + PW + PWOFFSET > (txr << 5) + TILESIZE)
-                setXi((txr << 5) + TILESIZE - PW - PWOFFSET);
-
-            return;
-        }
-
-        IO_Block * leftblock = g_map->block(txl, ty);
-        IO_Block * rightblock = g_map->block(txr, ty);
-
-        bool fLeftBlockSolid = leftblock && !leftblock->isTransparent() && !leftblock->isHidden();
-        bool fRightBlockSolid = rightblock && !rightblock->isTransparent() && !rightblock->isHidden();
-
-        if (fLeftBlockSolid || fRightBlockSolid) {
-            bool collisionresult = true;
-            if (fLeftBlockSolid) { //collide with left block
-                collisionresult &= leftblock->collide(this, 2, alignedBlockX == txl || rightblock == NULL || rightblock->isTransparent() || rightblock->isHidden());
-
-                //If player was bumped and killed then return
-                if (state != player_ready)
-                    return;
-            }
-
-            if (fRightBlockSolid) { //then right
-                collisionresult &= rightblock->collide(this, 2, alignedBlockX == txr || leftblock == NULL || leftblock->isTransparent() || leftblock->isHidden());
-
-                //If player was bumped and killed then return
-                if (state != player_ready)
-                    return;
-            }
-
-            if (!collisionresult) {
-                platform = NULL;
-                onice = false;
-
-                if (iVerticalPlatformCollision == 0)
-                    KillPlayerMapHazard(true, kill_style_environment, true, iPlatformCollisionPlayerId);
-
-                return;
-            }
-        }
-
-        int lefttile = g_map->map(txl, ty);
-        int righttile = g_map->map(txr, ty);
-
-        bool fGapSupport = (velx >= VELTURBOMOVING || velx <= -VELTURBOMOVING) && (lefttile == tile_flag_gap || righttile == tile_flag_gap);
-
-        bool fSolidTileUnderPlayer = (lefttile & tile_flag_solid)  || (righttile & tile_flag_solid);
-
-        if ((lefttile & tile_flag_solid_on_top || righttile & tile_flag_solid_on_top || fGapSupport) && fOldY + PH <= (ty << 5)) {
-            //on ground
-            //Deal with player down jumping through solid on top tiles
-
-            if (!platform)
-                onice = false;
-
-            if (fallthrough && !fSolidTileUnderPlayer) {
-                setYf((float)((ty << 5) - PH) + 0.2f);
-
-                if (!platform) {
-                    inair = true;
-                }
-            } else {
-                //we were above the tile in the previous frame
-                setYf((float)((ty << 5) - PH) - 0.2f);
-                vely = GRAVITATION;
-
-                if (!platform) {
-                    int alignedtile = g_map->map(alignedBlockX, ty);
-
-                    if (alignedtile & tile_flag_ice || ((alignedtile == tile_flag_nonsolid || alignedtile == tile_flag_gap) && g_map->map(unAlignedBlockX, ty) & tile_flag_ice))
-                        onice = true;
-                    else
-                        onice = false;
-
-                    inair = false;
-                    extrajumps = 0;
-                    killsinrowinair = 0;
-                }
-            }
-
-            fOldY = fy - GRAVITATION;
-
-            if (!platform)
-                fallthrough = false;
-
-            platform = NULL;
-
-            if (iVerticalPlatformCollision == 0)
-                KillPlayerMapHazard(true, kill_style_environment, true, iPlatformCollisionPlayerId);
-
-            return;
-        }
-
-        bool fDeathTileUnderPlayer = ((lefttile & tile_flag_death_on_top) && (righttile & tile_flag_death_on_top)) ||
-                                     ((lefttile & tile_flag_death_on_top) && !(righttile & tile_flag_solid)) ||
-                                     (!(lefttile & tile_flag_solid) && (righttile & tile_flag_death_on_top));
-
-        bool fSuperDeathTileUnderPlayer = ((lefttile & tile_flag_super_or_player_death_top) && (righttile & tile_flag_super_or_player_death_top)) ||
-                                          ((lefttile & tile_flag_super_or_player_death_top) && !(righttile & tile_flag_solid)) ||
-                                          (!(lefttile & tile_flag_solid) && (righttile & tile_flag_super_or_player_death_top));
-
-        if (fSolidTileUnderPlayer && !fSuperDeathTileUnderPlayer &&
-                (!fDeathTileUnderPlayer || IsInvincibleOnBottom() || shyguy) ) {
-            //on ground
-
-            setYf((float)((ty << 5) - PH) - 0.2f);
-            vely = GRAVITATION;				//1 so we test against the ground again int the next frame (0 would test against the ground in the next+1 frame)
-
-            if (!platform) {
-                int alignedtile = g_map->map(alignedBlockX, ty);
-
-                if (alignedtile & tile_flag_ice || ((alignedtile == tile_flag_nonsolid || alignedtile == tile_flag_gap) && g_map->map(unAlignedBlockX, ty) & tile_flag_ice))
-                    onice = true;
-                else
-                    onice = false;
-
-                inair = false;
-                extrajumps = 0;
-                killsinrowinair = 0;
-            }
-
-            platform = NULL;
-
-            if (iVerticalPlatformCollision == 0) {
-                KillPlayerMapHazard(true, kill_style_environment, true, iPlatformCollisionPlayerId);
-                return;
-            }
-        } else if (fDeathTileUnderPlayer || fSuperDeathTileUnderPlayer) {
-            if (player_kill_nonkill != KillPlayerMapHazard(fSuperDeathTileUnderPlayer, kill_style_environment, false))
-                return;
-        } else {
-            //falling (in air)
-            setYf(fPrecalculatedY);
-            vely = CapFallingVelocity(GRAVITATION + vely);
-
-            if (!platform) {
-                //If we're not hopping with kuribo's shoe, then zero out our super jump timer
-                if (superjumptype != 3)
-                    superjumptimer = 0;
-
-                inair = true;
-            }
-        }
+        mapcolldet_moveDownward(txl, txc, txr, alignedBlockX, unAlignedBlockX, unAlignedBlockFX);
     }
 
     if (!platform) {
