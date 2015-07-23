@@ -1,5 +1,7 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_B_ThrowBlock_H
-#define SMW_GAMEOBJECT_BLOCK_B_ThrowBlock_H
+#ifndef SMW_GAMEOBJECT_BLOCK_THROW_H
+#define SMW_GAMEOBJECT_BLOCK_THROW_H
+
+#include "BlockBase.h"
 
 class B_ThrowBlock : public IO_Block
 {
@@ -30,5 +32,4 @@ class B_ThrowBlock : public IO_Block
 		short iType;
 };
 
-
-#endif // SMW_GAMEOBJECT_BLOCK_B_ThrowBlock_H
+#endif // SMW_GAMEOBJECT_BLOCK_THROW_H

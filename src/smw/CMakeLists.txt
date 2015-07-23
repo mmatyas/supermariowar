@@ -19,6 +19,7 @@ LIST(APPEND SMW_SRCS
 	objects/blocks/PowerupBlock.cpp
 	objects/blocks/ViewBlock.cpp
 	objects/blocks/SwitchBlock.cpp
+	objects/blocks/ThrowBlock.cpp
 
 	objects/moving/MovingObject.cpp
 
