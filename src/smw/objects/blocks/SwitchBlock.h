@@ -1,5 +1,7 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_B_SwitchBlock_H
-#define SMW_GAMEOBJECT_BLOCK_B_SwitchBlock_H
+#ifndef SMW_GAMEOBJECT_BLOCK_SWITCH_H
+#define SMW_GAMEOBJECT_BLOCK_SWITCH_H
+
+#include "BlockBase.h"
 
 class B_SwitchBlock : public IO_Block
 {
@@ -33,4 +35,4 @@ class B_SwitchBlock : public IO_Block
 		short iSrcX;
 };
 
-#endif // SMW_GAMEOBJECT_BLOCK_B_SwitchBlock_H
+#endif // SMW_GAMEOBJECT_BLOCK_SWITCH_H
