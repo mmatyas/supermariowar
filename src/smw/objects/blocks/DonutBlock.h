@@ -1,5 +1,7 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_B_DonutBlock_H
-#define SMW_GAMEOBJECT_BLOCK_B_DonutBlock_H
+#ifndef SMW_GAMEOBJECT_BLOCK_B_DONUT_H
+#define SMW_GAMEOBJECT_BLOCK_B_DONUT_H
+
+#include "BlockBase.h"
 
 class B_DonutBlock : public IO_Block
 {
@@ -24,4 +26,4 @@ class B_DonutBlock : public IO_Block
 		short jigglecounter;
 };
 
-#endif // SMW_GAMEOBJECT_BLOCK_B_DonutBlock_H
+#endif // SMW_GAMEOBJECT_BLOCK_B_DONUT_H
