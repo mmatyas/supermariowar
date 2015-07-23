@@ -1,5 +1,7 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_B_FlipBlock_H
-#define SMW_GAMEOBJECT_BLOCK_B_FlipBlock_H
+#ifndef SMW_GAMEOBJECT_BLOCK_FLIP_H
+#define SMW_GAMEOBJECT_BLOCK_FLIP_H
+
+#include "BlockBase.h"
 
 class B_FlipBlock : public IO_Block
 {
@@ -44,4 +46,4 @@ class B_FlipBlock : public IO_Block
 		short animationWidth;
 };
 
-#endif // SMW_GAMEOBJECT_BLOCK_B_FlipBlock_H
+#endif // SMW_GAMEOBJECT_BLOCK_FLIP_H
