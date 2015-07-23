@@ -1,5 +1,7 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_B_ViewBlock_H
-#define SMW_GAMEOBJECT_BLOCK_B_ViewBlock_H
+#ifndef SMW_GAMEOBJECT_BLOCK_VIEW_H
+#define SMW_GAMEOBJECT_BLOCK_VIEW_H
+
+#include "PowerupBlock.h"
 
 class B_ViewBlock : public B_PowerupBlock
 {
@@ -26,4 +28,4 @@ class B_ViewBlock : public B_PowerupBlock
 		short iCountWeight;
 };
 
-#endif // SMW_GAMEOBJECT_BLOCK_B_ViewBlock_H
+#endif // SMW_GAMEOBJECT_BLOCK_VIEW_H
