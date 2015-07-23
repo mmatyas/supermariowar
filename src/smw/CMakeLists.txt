@@ -14,6 +14,7 @@ LIST(APPEND SMW_SRCS
 	objects/blocks/DonutBlock.cpp
 	objects/blocks/FlipBlock.cpp
 	objects/blocks/NoteBlock.cpp
+	objects/blocks/OnOffSwitchBlock.cpp
 	objects/blocks/PowerupBlock.cpp
 	objects/blocks/ViewBlock.cpp
 

@@ -1,5 +1,7 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_B_OnOffSwitchBlock_H
-#define SMW_GAMEOBJECT_BLOCK_B_OnOffSwitchBlock_H
+#ifndef SMW_GAMEOBJECT_BLOCK_ONOFFSWITCH_H
+#define SMW_GAMEOBJECT_BLOCK_ONOFFSWITCH_H
+
+#include "BlockBase.h"
 
 class B_OnOffSwitchBlock : public IO_Block
 {
@@ -32,4 +34,4 @@ class B_OnOffSwitchBlock : public IO_Block
 		short iSrcX;
 };
 
-#endif // SMW_GAMEOBJECT_BLOCK_B_OnOffSwitchBlock_H
+#endif // SMW_GAMEOBJECT_BLOCK_ONOFFSWITCH_H
