@@ -1,5 +1,7 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_B_BounceBlock_H
-#define SMW_GAMEOBJECT_BLOCK_B_BounceBlock_H
+#ifndef SMW_GAMEOBJECT_BLOCK_BOUNCE_H
+#define SMW_GAMEOBJECT_BLOCK_BOUNCE_H
+
+#include "BlockBase.h"
 
 class B_BounceBlock : public IO_Block
 {
@@ -26,4 +28,4 @@ class B_BounceBlock : public IO_Block
 		void triggerBehavior();
 };
 
-#endif // SMW_GAMEOBJECT_BLOCK_B_BounceBlock_H
+#endif // SMW_GAMEOBJECT_BLOCK_BOUNCE_H

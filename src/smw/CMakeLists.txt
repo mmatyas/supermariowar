@@ -10,6 +10,7 @@ set(SMW_SRCS ai.cpp gamemodes.cpp GSMenu.cpp
 #
 LIST(APPEND SMW_SRCS
 	objects/blocks/IO_Block.cpp
+	objects/blocks/BounceBlock.cpp
 	objects/blocks/BreakableBlock.cpp
 	objects/blocks/DonutBlock.cpp
 	objects/blocks/FlipBlock.cpp
