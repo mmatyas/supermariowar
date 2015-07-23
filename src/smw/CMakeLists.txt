@@ -12,6 +12,7 @@ LIST(APPEND SMW_SRCS
 	objects/blocks/IO_Block.cpp
 	objects/blocks/PowerupBlock.cpp
 	objects/blocks/BreakableBlock.cpp
+	objects/blocks/NoteBlock.cpp
 
 	objects/moving/MovingObject.cpp
 

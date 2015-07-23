@@ -1,5 +1,7 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_B_NoteBlock_H
-#define SMW_GAMEOBJECT_BLOCK_B_NoteBlock_H
+#ifndef SMW_GAMEOBJECT_BLOCK_NOTE_H
+#define SMW_GAMEOBJECT_BLOCK_NOTE_H
+
+#include "BlockBase.h"
 
 class B_NoteBlock : public IO_Block
 {
@@ -35,4 +37,4 @@ class B_NoteBlock : public IO_Block
 		short iTypeOffsetY;
 };
 
-#endif // SMW_GAMEOBJECT_BLOCK_B_NoteBlock_H
+#endif // SMW_GAMEOBJECT_BLOCK_NOTE_H
