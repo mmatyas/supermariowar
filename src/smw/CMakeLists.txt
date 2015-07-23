@@ -20,6 +20,7 @@ LIST(APPEND SMW_SRCS
 	objects/blocks/ViewBlock.cpp
 	objects/blocks/SwitchBlock.cpp
 	objects/blocks/ThrowBlock.cpp
+    objects/blocks/WeaponBreakableBlock.cpp
 
 	objects/moving/MovingObject.cpp
 

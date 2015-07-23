@@ -1,5 +1,7 @@
-#ifndef SMW_GAMEOBJECT_BLOCK_B_WeaponBreakableBlock_H
-#define SMW_GAMEOBJECT_BLOCK_B_WeaponBreakableBlock_H
+#ifndef SMW_GAMEOBJECT_BLOCK_WEAPONBREAKABLE_H
+#define SMW_GAMEOBJECT_BLOCK_WEAPONBREAKABLE_H
+
+#include "BlockBase.h"
 
 class B_WeaponBreakableBlock : public IO_Block
 {
@@ -37,4 +39,4 @@ class B_WeaponBreakableBlock : public IO_Block
 	friend class MO_Explosion;
 };
 
-#endif // SMW_GAMEOBJECT_BLOCK_B_WeaponBreakableBlock_H
+#endif // SMW_GAMEOBJECT_BLOCK_WEAPONBREAKABLE_H
