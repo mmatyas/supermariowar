@@ -1,7 +1,7 @@
 #ifndef SMW_GAMEOBJECT_BLOCK_ONOFFSWITCH_H
 #define SMW_GAMEOBJECT_BLOCK_ONOFFSWITCH_H
 
-#include "BlockBase.h"
+#include "IO_Block.h"
 
 class B_OnOffSwitchBlock : public IO_Block
 {

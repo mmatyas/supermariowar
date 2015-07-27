@@ -1,7 +1,7 @@
 #ifndef SMW_GAMEOBJECT_BLOCK_WEAPONBREAKABLE_H
 #define SMW_GAMEOBJECT_BLOCK_WEAPONBREAKABLE_H
 
-#include "BlockBase.h"
+#include "IO_Block.h"
 
 class B_WeaponBreakableBlock : public IO_Block
 {

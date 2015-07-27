@@ -1,7 +1,7 @@
 #ifndef SMW_GAMEOBJECT_BLOCK_NOTE_H
 #define SMW_GAMEOBJECT_BLOCK_NOTE_H
 
-#include "BlockBase.h"
+#include "IO_Block.h"
 
 class B_NoteBlock : public IO_Block
 {

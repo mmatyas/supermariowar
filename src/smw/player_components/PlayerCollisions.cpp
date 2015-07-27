@@ -1,6 +1,6 @@
 #include "PlayerCollisions.h"
 
-#include "BlockBase.h"
+#include "IO_Block.h"
 #include "eyecandy.h"
 #include "gamemodes.h"
 #include "GameValues.h"

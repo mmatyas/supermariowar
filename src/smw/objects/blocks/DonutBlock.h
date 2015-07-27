@@ -1,7 +1,7 @@
 #ifndef SMW_GAMEOBJECT_BLOCK_B_DONUT_H
 #define SMW_GAMEOBJECT_BLOCK_B_DONUT_H
 
-#include "BlockBase.h"
+#include "IO_Block.h"
 
 class B_DonutBlock : public IO_Block
 {

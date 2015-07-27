@@ -1,7 +1,7 @@
 #ifndef SMW_GAMEOBJECT_BLOCK_FLIP_H
 #define SMW_GAMEOBJECT_BLOCK_FLIP_H
 
-#include "BlockBase.h"
+#include "IO_Block.h"
 
 class B_FlipBlock : public IO_Block
 {

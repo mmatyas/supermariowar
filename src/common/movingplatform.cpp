@@ -1,6 +1,6 @@
 #include "movingplatform.h"
 
-#include "BlockBase.h"
+#include "IO_Block.h"
 #include "Game.h"
 #include "GameValues.h"
 #include "map.h"

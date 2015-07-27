@@ -1,6 +1,6 @@
 #include "map.h"
 
-#include "BlockBase.h"
+#include "IO_Block.h"
 #include "GameValues.h"
 #include "gfx.h"
 #include "GlobalConstants.h"

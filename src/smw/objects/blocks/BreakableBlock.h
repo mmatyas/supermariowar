@@ -1,7 +1,7 @@
 #ifndef SMW_GAMEOBJECT_BLOCK_BREAKABLE_H
 #define SMW_GAMEOBJECT_BLOCK_BREAKABLE_H
 
-#include "BlockBase.h"
+#include "IO_Block.h"
 #include "GlobalConstants.h"
 
 class gfxSprite;

@@ -1,7 +1,7 @@
 #ifndef SMW_GAMEOBJECT_BLOCK_POWERUP_H
 #define SMW_GAMEOBJECT_BLOCK_POWERUP_H
 
-#include "BlockBase.h"
+#include "IO_Block.h"
 #include "GlobalConstants.h"
 
 class gfxSprite;

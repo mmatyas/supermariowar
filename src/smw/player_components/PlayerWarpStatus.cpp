@@ -1,6 +1,6 @@
 #include "PlayerWarpStatus.h"
 
-#include "BlockBase.h"
+#include "IO_Block.h"
 #include "GameValues.h"
 #include "map.h"
 #include "player.h"

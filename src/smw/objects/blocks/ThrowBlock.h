@@ -1,7 +1,7 @@
 #ifndef SMW_GAMEOBJECT_BLOCK_THROW_H
 #define SMW_GAMEOBJECT_BLOCK_THROW_H
 
-#include "BlockBase.h"
+#include "IO_Block.h"
 
 class B_ThrowBlock : public IO_Block
 {

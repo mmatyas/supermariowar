@@ -1,6 +1,6 @@
 #include "MovingObject.h"
 
-#include "BlockBase.h"
+#include "IO_Block.h"
 #include "eyecandy.h"
 #include "GameValues.h"
 #include "gamemodes.h"

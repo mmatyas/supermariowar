@@ -1,7 +1,7 @@
 #ifndef OBJECTGAME_H
 #define OBJECTGAME_H
 
-#include "BlockBase.h"
+#include "IO_Block.h"
 #include "eyecandy.h"
 #include "object.h"
 #include "player.h"
