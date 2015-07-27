@@ -53,8 +53,9 @@
 #define NET_P2G_LOCAL_KEYS                  61 // Normal players -> Game host
 #define NET_G2P_GAME_STATE                  62 // GH -> Players
 #define NET_P2G_REQ_POWERUP                 63 // Player wants to use powerup
-#define NET_G2P_START_POWERUP               65 // Another player wants to use powerup
-#define NET_G2P_TRIGGER_POWERUP             64 // Trigger powerup effect
+#define NET_G2P_START_POWERUP               64 // Another player wants to use powerup
+#define NET_G2P_TRIGGER_POWERUP             65 // Trigger powerup effect
+#define NET_G2P_TRIGGER_MAPCOLL             66 // Trigger map collision for clients
 
 #define NET_G2L_GAME_RESULTS                70 // GH -> Server
 

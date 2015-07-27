@@ -350,5 +350,23 @@ struct Net_TriggerPowerupPackage : Net_MessageHeader {
     }
 };
 
+struct Net_MapCollisionPackage : Net_MessageHeader {
+    uint8_t player_id;
+    float player_x;
+    float player_y;
+    float player_xvel;
+    float player_yvel;
+
+    Net_MapCollisionPackage(): Net_MessageHeader(NET_G2P_TRIGGER_MAPCOLL) {}
+
+    Net_MapCollisionPackage(CPlayer& player)
+        : Net_MessageHeader(NET_G2P_TRIGGER_MAPCOLL)
+        , player_id(player.getGlobalID())
+        , player_x(player.fx)
+        , player_y(player.fy)
+        , player_xvel(player.velx)
+        , player_yvel(player.vely)
+    {}
+};
 
 #endif // NETWORK_PROTOCOL_PACKAGES_H

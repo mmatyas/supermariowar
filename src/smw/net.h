@@ -26,7 +26,7 @@ void net_endSession();
 
 class MI_NetworkListScroll;
 //union COutputControl;
-
+class CPlayer;
 
 // Local structures
 
@@ -97,6 +97,7 @@ class NetGameHost : public NetworkEventHandler
         // P3. Game
         void sendCurrentGameState();
         void sendPowerupStart();
+        void sendMapCollisionEvent(CPlayer&);
 
 
         LastMessage lastSentMessage;
@@ -225,6 +226,7 @@ class NetClient : public NetworkEventHandler
         void handleRemoteGameState(const uint8_t*, size_t);
         void handlePowerupStart(const uint8_t*, size_t);
         void handlePowerupTrigger(const uint8_t*, size_t);
+        void handleMapCollision(const uint8_t*, size_t);
 
         void sendGoodbye();
 
@@ -288,6 +290,7 @@ struct Networking {
     CPlayerInput netPlayerInput;
 
     bool waitingForPowerupTrigger;
+    bool allowMapCollisionEvent;
 
     bool gamestate_changed;
     Net_GameplayState latest_gamestate;

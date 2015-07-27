@@ -56,6 +56,7 @@ bool net_init()
     netplay.newroom_password[0] = '\0';
     netplay.mychatmessage[0] = '\0';
     netplay.waitingForPowerupTrigger = false;
+    netplay.allowMapCollisionEvent = false;
     netplay.gamestate_changed = false;
 
     if (!networkHandler.init())
@@ -577,6 +578,10 @@ void NetClient::handlePowerupStart(const uint8_t* data, size_t dataLength)
     if (pkg.player_id == netplay.remotePlayerNumber)
         return;
 
+    assert(list_players[pkg.player_id]);
+    if (!list_players[pkg.player_id])
+        return;
+
     list_players[pkg.player_id]->powerupused = pkg.powerup_id;
     unsigned missed_frames = (pkg.delay + foreign_gamehost->averageRTT() / 2) / WAITTIME;
     // TODO: make this nicer
@@ -608,6 +613,33 @@ void NetClient::handlePowerupStart(const uint8_t* data, size_t dataLength)
     list_players[pkg.player_id]->setXf(temp_px);
     list_players[pkg.player_id]->setYf(temp_py);
 }*/
+
+void NetClient::handleMapCollision(const uint8_t* data, size_t dataLength)
+{
+    Net_MapCollisionPackage pkg;
+    memcpy(&pkg, data, sizeof(Net_MapCollisionPackage));
+
+    assert(pkg.player_id < 4);
+    if (pkg.player_id > 3)
+        return;
+
+    assert(list_players[pkg.player_id]);
+    if (!list_players[pkg.player_id])
+        return;
+
+    //printf("[net] Map collision triggered for P%d.\n", pkg.player_id);
+    float temp_px = list_players[pkg.player_id]->fx;
+    float temp_py = list_players[pkg.player_id]->fy;
+    list_players[pkg.player_id]->setXf(pkg.player_x);
+    list_players[pkg.player_id]->setYf(pkg.player_y);
+
+    netplay.allowMapCollisionEvent = true;
+    list_players[pkg.player_id]->collision_detection_map();
+    netplay.allowMapCollisionEvent = false;
+
+    list_players[pkg.player_id]->setXf(temp_px);
+    list_players[pkg.player_id]->setYf(temp_py);
+}
 
 void NetClient::handleRemoteGameState(const uint8_t* data, size_t dataLength) // for other clients
 {
@@ -793,6 +825,10 @@ void NetClient::onReceive(NetPeer& client, const uint8_t* data, size_t dataLengt
         /*case NET_G2P_TRIGGER_POWERUP:
             handlePowerupTrigger(data, dataLength);
             break;*/
+
+        case NET_G2P_TRIGGER_MAPCOLL:
+            handleMapCollision(data, dataLength);
+            break;
 
         //
         // Default
@@ -1200,7 +1236,7 @@ void NetGameHost::sendPowerupStart()
     sendMessageToMyPeers(&pkg, sizeof(Net_StartPowerupPackage));
 
     netplay.waitingForPowerupTrigger = false;
-    printf("[net] P%d (host) used powerup #%d\n", pkg.player_id, pkg.powerup_id);
+    //printf("[net] P%d (host) used powerup #%d\n", pkg.player_id, pkg.powerup_id);
 }
 
 // A player wants to use a stored powerup
@@ -1244,6 +1280,16 @@ void NetGameHost::handlePowerupRequest(const NetPeer& player, const uint8_t* dat
     assert(netplay.theHostIsMe);
     assert(list_players[netplay.remotePlayerNumber]->powerupused >= 0);
 }*/
+
+void NetGameHost::sendMapCollisionEvent(CPlayer& player)
+{
+    assert(netplay.theHostIsMe);
+
+    Net_MapCollisionPackage pkg(player);
+    sendMessageToMyPeers(&pkg, sizeof(Net_MapCollisionPackage));
+
+    printf("[net] P%d collided with a map block\n", pkg.player_id);
+}
 
 bool NetGameHost::sendMessageToMyPeers(const void* data, size_t dataLength)
 {
