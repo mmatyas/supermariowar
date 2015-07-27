@@ -88,6 +88,7 @@ LIST(APPEND SMW_SRCS
 	menu/options/SoundOptionsMenu.cpp
 	menu/options/TeamOptionsMenu.cpp
 
+	menu/network/NetEditServersMenu.cpp
 	menu/network/NetLobbyMenu.cpp
 	menu/network/NetNewLevelMenu.cpp
 	menu/network/NetNewRoomMenu.cpp

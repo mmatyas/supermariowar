@@ -5,7 +5,7 @@
 #include "uicontrol.h"
 
 /*
-    Description.
+    TODO: Description.
 */
 
 class UI_XXX : public UI_Menu
