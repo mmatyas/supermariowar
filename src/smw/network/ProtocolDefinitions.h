@@ -48,6 +48,7 @@
 #define NET_G2P_SYNC                        53 // (after everyone connected) Game Host -> Players: "Prepare gameplay with this data (eg. RNG seed)"
 #define NET_P2G_SYNC_OK                     54 // Normal Player -> Game Host: "I'm ready!"
 #define NET_G2E_GAME_START                  55 // Game Host -> Everyone: "Everybody connected successfully!"
+#define NET_G2L_GAME_RESULTS                56 // GH -> Server
 
 #define NET_P2G_LEAVE_GAME                  60 // Normal players -> Game host
 #define NET_P2G_LOCAL_KEYS                  61 // Normal players -> Game host
@@ -56,7 +57,6 @@
 #define NET_G2P_START_POWERUP               64 // Another player wants to use powerup
 #define NET_G2P_TRIGGER_POWERUP             65 // Trigger powerup effect
 #define NET_G2P_TRIGGER_MAPCOLL             66 // Trigger map collision for clients
-
-#define NET_G2L_GAME_RESULTS                70 // GH -> Server
+#define NET_G2P_TRIGGER_P2PCOLL             67 // Trigger player-to-player collision for clients
 
 #endif // NETWORK_PROTOCOL_DEFINITIONS_H

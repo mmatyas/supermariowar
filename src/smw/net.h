@@ -98,6 +98,7 @@ class NetGameHost : public NetworkEventHandler
         void sendCurrentGameState();
         void sendPowerupStart();
         void sendMapCollisionEvent(CPlayer&);
+        void sendP2PCollisionEvent(CPlayer&, CPlayer&);
 
 
         LastMessage lastSentMessage;
@@ -227,6 +228,7 @@ class NetClient : public NetworkEventHandler
         void handlePowerupStart(const uint8_t*, size_t);
         void handlePowerupTrigger(const uint8_t*, size_t);
         void handleMapCollision(const uint8_t*, size_t);
+        void handleP2PCollision(const uint8_t*, size_t);
 
         void sendGoodbye();
 

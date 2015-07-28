@@ -521,6 +521,7 @@ class CPlayer
 		friend class NetGameHost;
 		friend class Net_GameplayState;
 		friend struct Net_MapCollisionPackage;
+		friend struct Net_P2PCollisionPackage;
 
 		friend class GameplayState;
 

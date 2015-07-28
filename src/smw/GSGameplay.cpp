@@ -18,6 +18,7 @@
 #include "sfx.h"
 
 #include <cmath>
+#include <cassert>
 
 extern SDL_Surface* screen;
 extern SDL_Surface* blitdest;
@@ -704,13 +705,17 @@ void handleP2PCollisions()
     //Player to player collisions
     short i, j;
     for (i = 0; i < list_players_cnt; i++) {
-        CPlayer * player1 = list_players[i];
+        CPlayer* player1 = list_players[i];
+        assert(player1);
         if (player1->state > player_dead) {
             for (j = i + 1; j < list_players_cnt; j++) {
-                CPlayer * player2 = list_players[j];
+                CPlayer* player2 = list_players[j];
+                assert(player2);
                 if (player2->state > player_dead) {
                     if (coldec_player2player(player1, player2)) {
-                        printf("P2P collision\n");
+                        if (netplay.active)
+                            netplay.client.local_gamehost.sendP2PCollisionEvent(*player1, *player2);
+
                         player1->collidesWith(player2);
 
                         //if player was killed by another player, continue with next player for collision detection
@@ -2233,7 +2238,8 @@ void GameplayState::update()
                 if (++game_values.cputurn > 3)
                     game_values.cputurn = 0;
 
-                handleP2PCollisions();
+                if (!netplay.active || (netplay.active && netplay.theHostIsMe))
+                    handleP2PCollisions();
 
                 //Move platforms
                 g_map->updatePlatforms();

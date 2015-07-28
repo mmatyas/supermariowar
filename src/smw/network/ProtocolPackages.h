@@ -369,4 +369,33 @@ struct Net_MapCollisionPackage : Net_MessageHeader {
     {}
 };
 
+struct Net_P2PCollisionPackage : Net_MessageHeader {
+    uint8_t player_id[2];
+    float player_x[2];
+    float player_y[2];
+    float player_xvel[2];
+    float player_yvel[2];
+    float player_oldy[2]; // used by stomp detection
+
+    Net_P2PCollisionPackage(): Net_MessageHeader(NET_G2P_TRIGGER_P2PCOLL) {}
+
+    Net_P2PCollisionPackage(CPlayer& p1, CPlayer& p2)
+        : Net_MessageHeader(NET_G2P_TRIGGER_P2PCOLL)
+    {
+        player_id[0] = p1.getGlobalID();
+        player_x[0] = p1.fx;
+        player_y[0] = p1.fy;
+        player_xvel[0] = p1.velx;
+        player_yvel[0] = p1.vely;
+        player_oldy[0] = p1.fOldY;
+
+        player_id[1] = p2.getGlobalID();
+        player_x[1] = p2.fx;
+        player_y[1] = p2.fy;
+        player_xvel[1] = p2.velx;
+        player_yvel[1] = p2.vely;
+        player_oldy[1] = p2.fOldY;
+    }
+};
+
 #endif // NETWORK_PROTOCOL_PACKAGES_H

@@ -642,6 +642,45 @@ void NetClient::handleMapCollision(const uint8_t* data, size_t dataLength)
 
     list_players[pkg.player_id]->setXf(temp_px);
     list_players[pkg.player_id]->setYf(temp_py);
+
+    printf("[net] Map block collision!\n");
+}
+
+void NetClient::handleP2PCollision(const uint8_t * data, size_t dataLength)
+{
+    Net_P2PCollisionPackage pkg;
+    memcpy(&pkg, data, sizeof(Net_P2PCollisionPackage));
+
+    assert(pkg.player_id[0] < 4);
+    assert(pkg.player_id[1] < 4);
+    if (pkg.player_id[0] > 3 || pkg.player_id[1] > 3)
+        return;
+
+    assert(list_players[pkg.player_id[0]]);
+    assert(list_players[pkg.player_id[1]]);
+    if (!list_players[pkg.player_id[0]] || !list_players[pkg.player_id[1]])
+        return;
+
+    CPlayer* player1 = list_players[pkg.player_id[0]];
+    CPlayer* player2 = list_players[pkg.player_id[1]];
+
+    // float temp_p1x = player1.fx;
+    // float temp_p1y = player1.fy;
+    player1->setXf(pkg.player_x[0]);
+    player1->setYf(pkg.player_y[0]);
+    player1->fOldY = pkg.player_oldy[0];
+
+    // float temp_p2x = player2.fx;
+    // float temp_p2y = player2.fy;
+    player2->setXf(pkg.player_x[1]);
+    player2->setYf(pkg.player_y[1]);
+    player2->fOldY = pkg.player_oldy[1];
+
+    player1->collidesWith(player2);
+
+    // TODO: restore position?
+
+    printf("P%d collided with P%d!\n", pkg.player_id[0], pkg.player_id[1]);
 }
 
 void NetClient::handleRemoteGameState(const uint8_t* data, size_t dataLength) // for other clients
@@ -831,6 +870,10 @@ void NetClient::onReceive(NetPeer& client, const uint8_t* data, size_t dataLengt
 
         case NET_G2P_TRIGGER_MAPCOLL:
             handleMapCollision(data, dataLength);
+            break;
+
+        case NET_G2P_TRIGGER_P2PCOLL:
+            handleP2PCollision(data, dataLength);
             break;
 
         //
@@ -1292,6 +1335,18 @@ void NetGameHost::sendMapCollisionEvent(CPlayer& player)
     sendMessageToMyPeers(&pkg, sizeof(Net_MapCollisionPackage));
 
     printf("[net] P%d collided with a map block\n", pkg.player_id);
+}
+
+void NetGameHost::sendP2PCollisionEvent(CPlayer& p1, CPlayer& p2)
+{
+    assert(netplay.theHostIsMe);
+    assert(!p1.isdead());
+    assert(!p2.isdead());
+
+    Net_P2PCollisionPackage pkg(p1, p2);
+    sendMessageToMyPeers(&pkg, sizeof(Net_P2PCollisionPackage));
+
+    printf("[net] P%d collided with P%d\n", p1.getGlobalID(), p2.getGlobalID());
 }
 
 bool NetGameHost::sendMessageToMyPeers(const void* data, size_t dataLength)
