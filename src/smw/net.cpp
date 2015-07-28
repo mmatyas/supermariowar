@@ -637,6 +637,9 @@ void NetClient::handleMapCollision(const uint8_t* data, size_t dataLength)
     list_players[pkg.player_id]->collision_detection_map();
     netplay.allowMapCollisionEvent = false;
 
+    if (list_players[pkg.player_id]->isdead())
+        return;
+
     list_players[pkg.player_id]->setXf(temp_px);
     list_players[pkg.player_id]->setYf(temp_py);
 }
