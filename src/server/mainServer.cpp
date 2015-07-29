@@ -44,6 +44,8 @@ int main(int argc, char* argv[])
         sigaction(SIGINT, &interruptHandler, NULL);
     #endif
 
+    printf("Ready!\n");
+
     //
     // Main loop
     //

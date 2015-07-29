@@ -10,7 +10,7 @@ Room::Room()
     visible = true;
     playerCount = 0;
     for (uint8_t p = 0; p < 4; p++)
-        players[p] = 0;
+        players[p] = NULL;
 }
 
 Room::Room(uint32_t roomID, const char* name, const char* password, Player* host)
@@ -28,7 +28,7 @@ Room::Room(uint32_t roomID, const char* name, const char* password, Player* host
 
     players[0] = host;
     for (uint8_t p = 1; p < 4; p++)
-        players[p] = 0;
+        players[p] = NULL;
 
     this->roomID = roomID;
     createTime = TIME_NOW();
@@ -50,7 +50,7 @@ void Room::tryAddingPlayer(Player* player)
             players[p] = player;
             player->currentRoomID = roomID;
             playerCount++;
-            assert(playerCount >= 0 && playerCount <= 4);
+            assert(playerCount <= 4);
         }
         else
             printf("  R-%u: slot %d foglalt: %p\n", roomID, p, players[p]);
@@ -64,7 +64,7 @@ void Room::removePlayer(Player* player)
         if (players[p] == player) {
             players[p] = NULL;
             playerCount--;
-            assert(playerCount >= 0 && playerCount <= 4);
+            assert(playerCount <= 4);
             searching = false;
 
             // if this player was the host and there are players in the room

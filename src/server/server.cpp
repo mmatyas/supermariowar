@@ -104,12 +104,12 @@ void SMWServer::onConnect(NetClient* new_client)
 
     if (maxPlayerCount <= players.size()) {
         sendCode(new_client, NET_RESPONSE_CONNECT_SERVERFULL);
-        log("Server full...\n");
+        log("[warning] Server full...");
         // TODO: disconnect
     }
     else {
         players[new_client->getPlayerID()].setClient(new_client);
-        log("New connection from %s\n", new_client->addressAsString().c_str());
+        log("[info] New connection from %s", new_client->addressAsString().c_str());
     }
 }
 
@@ -119,7 +119,9 @@ void SMWServer::onDisconnect(NetClient& client)
     uint64_t playerID = client.getPlayerID();
     if (players.count(playerID)) {
         playerLeavesRoom(playerID);
-        log("%s disconnected.", players[playerID].name.c_str());
+        log("[info] %s@%s disconnected.",
+            players[playerID].name.c_str(),
+            players[playerID].network_client->addressAsString().c_str());
         players.erase(playerID);
     }
     else
@@ -183,26 +185,12 @@ void SMWServer::onReceive(NetClient& client, const uint8_t* data, size_t dataLen
             // Room start
             //
             case NET_G2L_START_ROOM:
-                log("NET_G2L_START_ROOM!");
                 playerStartsRoom(playerID);
                 break;
 
             /*case NET_NOTICE_GAME_SYNC_OK:
                 log("NET_NOTICE_GAME_SYNC_OK!");
                 startRoomIfEveryoneReady(playerID);
-                break;*/
-
-            //
-            // Gameplay-related
-            //
-            /*case NET_NOTICE_LOCAL_KEYS:
-                //printf("local keys\n");
-                sendInputToHost(playerID);
-                break;
-
-            case NET_NOTICE_HOST_STATE:
-                //printf("local keys\n");
-                sendHostStateToOtherPlayers(playerID);
                 break;*/
 
             default:
@@ -259,7 +247,7 @@ void SMWServer::playerConnectsServer(uint64_t playerID, const void* data)
     players[playerID].name = package.playerName;
     players[playerID].sendConnectOK();
 
-    log("%s : <%s> connected.\n",
+    log("%s : <%s> connected.",
         players[playerID].network_client->addressAsString().c_str(),
         package.playerName);
 }
@@ -455,6 +443,7 @@ void SMWServer::playerStartsRoom(uint64_t playerID)
 
     rooms[roomID].sendStartSignal();
     player->lastActivityTime = TIME_NOW();
+    log("[info] Room #%d starting.", roomID);
 }
 
 void SMWServer::startRoomIfEveryoneReady(uint64_t playerID)
@@ -474,71 +463,6 @@ void SMWServer::startRoomIfEveryoneReady(uint64_t playerID)
 
     Room* room = &rooms[player->currentRoomID];
     room->startGameIfEverybodyReady();*/
-}
-
-void SMWServer::sendInputToHost(uint64_t playerID)
-{
-    /*if (!players.count(playerID))
-        return;
-
-    Player* player = &players[playerID];
-    if (!player->currentRoomID || !player->isPlaying)
-        return;
-
-    if (!rooms.count(player->currentRoomID))
-        return;
-
-    Room* room = &rooms[player->currentRoomID];
-
-    LocalInputPackage pkg_in;
-    memcpy(&pkg_in, udpIncomingPacket->data, sizeof(LocalInputPackage));
-
-    RemoteInputPackage pkg_out;
-    pkg_out.protocolVersion = NET_PROTOCOL_VERSION;
-    pkg_out.packageType = NET_NOTICE_REMOTE_KEYS;
-    pkg_out.playerNumber = 127;
-
-    // get player's number in the room
-    for (uint8_t p = 0; p < 4 && pkg_out.playerNumber == 127; p++) {
-        if (room->players[p] == player)
-            pkg_out.playerNumber = p;
-    }
-    if (pkg_out.playerNumber == 127) // TODO: Hiba!!
-        return;
-
-    // copy input
-    memcpy(&pkg_out.input, &pkg_in.input, sizeof(RawInput));
-
-    sendPackage(room->players[room->hostPlayerNumber]->address, &pkg_out, sizeof(RemoteInputPackage));
-    */
-}
-
-void SMWServer::sendHostStateToOtherPlayers(uint64_t playerID)
-{
-    /*if (!players.count(playerID)) // Player doesn't exists
-        return;
-
-    Player* player = &players[playerID];
-    if (!player->currentRoomID || !player->isPlaying) // Player is not in the state to send such message
-        return;
-
-    if (!rooms.count(player->currentRoomID)) // Room doesn't exists
-        return;
-
-    Room* room = &rooms[player->currentRoomID];
-    if (room->players[room->hostPlayerNumber] != player) // This isn't the host player
-        return;
-
-    GameStatePackage pkg;
-    memcpy(&pkg, udpIncomingPacket->data, sizeof(GameStatePackage));
-
-    for (uint8_t p = 0; p < 4; p++) {
-        if (room->players[p]) {
-            if (p != room->hostPlayerNumber) {
-                sendPackage(room->players[p]->address, &pkg, sizeof(GameStatePackage));
-            }
-        }
-    }*/
 }
 
 void SMWServer::cleanup()

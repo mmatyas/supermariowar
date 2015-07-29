@@ -84,12 +84,12 @@ NetworkLayerENet::~NetworkLayerENet()
 bool NetworkLayerENet::init(uint64_t max_players)
 {
     if (enet_initialize() != 0) {
-        log("[error][net] Could not initialize network system.\n");
+        log("[error] Could not initialize network system.");
         return false;
     }
 
     ENetVersion version = enet_linked_version();
-    log("[net] ENet %u.%u.%u initialized.\n", ENET_VERSION_GET_MAJOR(version),
+    log_silently("[info] ENet %u.%u.%u initialized.\n", ENET_VERSION_GET_MAJOR(version),
         ENET_VERSION_GET_MINOR(version), ENET_VERSION_GET_PATCH(version));
 
 
@@ -103,7 +103,7 @@ bool NetworkLayerENet::init(uint64_t max_players)
     // no up/down speed limit
     server_host = enet_host_create(&server_address, max_players, 2, 0, 0);
     if (!server_host) {
-        log("[error][net] Could not open connection port.\n");
+        log("[error] Could not open connection port.");
         return false;
     }
 
