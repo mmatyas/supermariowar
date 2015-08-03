@@ -593,6 +593,7 @@ void NetClient::handlePowerupStart(const uint8_t* data, size_t dataLength)
 
     // TODO: replace this eventually with the powerup trigger package
     netplay.waitingForPowerupTrigger = false;
+    printf("[net] P%d used powerup %d\n", pkg.player_id, pkg.powerup_id);
 }
 
 /*void NetClient::handlePowerupTrigger(const uint8_t* data, size_t dataLength)
@@ -1282,7 +1283,7 @@ void NetGameHost::sendPowerupStart()
     sendMessageToMyPeers(&pkg, sizeof(Net_StartPowerupPackage));
 
     netplay.waitingForPowerupTrigger = false;
-    //printf("[net] P%d (host) used powerup #%d\n", pkg.player_id, pkg.powerup_id);
+    printf("[net] P%d (host) used powerup %d\n", pkg.player_id, pkg.powerup_id);
 }
 
 // A player wants to use a stored powerup
@@ -1319,6 +1320,8 @@ void NetGameHost::handlePowerupRequest(const NetPeer& player, const uint8_t* dat
     for (; missed_frames > 0; missed_frames--) {
         list_players[pkg.player_id]->powerupradius -= (float)game_values.storedpowerupdelay / 2.0f;
     }
+
+    printf("[net] P%d used powerup %d\n", pkg.player_id, pkg.powerup_id);
 }
 
 /*void NetGameHost::sendPowerupTriggerIfReady()
