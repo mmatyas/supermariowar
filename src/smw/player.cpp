@@ -1000,7 +1000,10 @@ void CPlayer::tryReleasingPowerup()
     game_values.gamepowerups[globalID] = -1;
 
     powerupradius = 100.0f;
-    powerupangle = (float)(RANDOM_INT(1000) * 0.00628f);
+    if (netplay.active)
+        powerupangle = 0.0f;
+    else
+        powerupangle = (float)(RANDOM_INT(1000) * 0.00628f);
 
     ifSoundOnPlay(rm->sfx_storedpowerupsound);
 
