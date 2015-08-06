@@ -1335,7 +1335,7 @@ void CPlayer::CommitAction()
         objectcontainer[2].add(new MO_Explosion(&rm->spr_explosion, ix + HALFPW - 96, iy + HALFPH - 64, 2, 4, globalID, teamID, kill_style_bobomb));
         ifSoundOnPlay(rm->sfx_bobombsound);
     } else if (player_action_fireball == action) {
-        objectcontainer[0].add(new MO_Fireball(&rm->spr_fireball, ix + 6, iy, 4, IsPlayerFacingRight(), 5, globalID, teamID, colorID));
+        objectcontainer[0].add(new MO_Fireball(&rm->spr_fireball, ix + 6, iy, 4, isFacingRight(), 5, globalID, teamID, colorID));
         ifSoundOnPlay(rm->sfx_fireball);
 
         projectiles++;
@@ -1343,7 +1343,7 @@ void CPlayer::CommitAction()
         if (game_values.fireballlimit > 0)
             DecreaseProjectileLimit();
     } else if (player_action_hammer == action) {
-        if (IsPlayerFacingRight())
+        if (isFacingRight())
             objectcontainer[2].add(new MO_Hammer(&rm->spr_hammer, ix + 8, iy, 6, (game_values.reversewalk ? -velx : velx) + 2.0f, -HAMMERTHROW, 5, globalID, teamID, colorID, false));
         else
             objectcontainer[2].add(new MO_Hammer(&rm->spr_hammer, ix - 14, iy, 6, (game_values.reversewalk ? -velx : velx) - 2.0f, -HAMMERTHROW, 5, globalID, teamID, colorID, false));
@@ -1356,13 +1356,13 @@ void CPlayer::CommitAction()
         if (game_values.hammerlimit > 0)
             DecreaseProjectileLimit();
     } else if (player_action_boomerang == action) {
-        objectcontainer[2].add(new MO_Boomerang(&rm->spr_boomerang, ix, iy + HALFPH - 16, 4, IsPlayerFacingRight(), 5, globalID, teamID, colorID));
+        objectcontainer[2].add(new MO_Boomerang(&rm->spr_boomerang, ix, iy + HALFPH - 16, 4, isFacingRight(), 5, globalID, teamID, colorID));
         projectiles++;
 
         if (game_values.boomeranglimit > 0)
             DecreaseProjectileLimit();
     } else if (player_action_iceblast == action) {
-        if (IsPlayerFacingRight())
+        if (isFacingRight())
             objectcontainer[2].add(new MO_IceBlast(&rm->spr_iceblast, ix + HALFPW - 2, iy + HALFPH - 16, 5.0f, globalID, teamID, colorID));
         else
             objectcontainer[2].add(new MO_IceBlast(&rm->spr_iceblast, ix + HALFPW - 30, iy + HALFPH - 16, -5.0f, globalID, teamID, colorID));
@@ -1374,7 +1374,7 @@ void CPlayer::CommitAction()
         if (game_values.wandlimit > 0)
             DecreaseProjectileLimit();
     } else if (player_action_bomb == action) {
-        CO_Bomb * bomb = new CO_Bomb(&rm->spr_bomb, ix + HALFPW - 14, iy - 8, IsPlayerFacingRight() ? 3.0f : -3.0f, -3.0f, 4, globalID, teamID, colorID, RANDOM_INT(120) + 120);
+        CO_Bomb * bomb = new CO_Bomb(&rm->spr_bomb, ix + HALFPW - 14, iy - 8, isFacingRight() ? 3.0f : -3.0f, -3.0f, 4, globalID, teamID, colorID, RANDOM_INT(120) + 120);
 
         if (AcceptItem(bomb)) {
             bomb->owner = this;
@@ -1432,7 +1432,7 @@ void CPlayer::updateSprite()
             frictionslidetimer = 0;
             rainsteptimer = 0;
 
-            if (IsPlayerFacingRight())
+            if (isFacingRight())
                 sprite_state = PGFX_JUMPING_R;
             else
                 sprite_state = PGFX_JUMPING_L;
@@ -1961,9 +1961,9 @@ void CPlayer::draw_winnerCrown()
 {
     if (game_values.showwinningcrown && g_iWinningPlayer == teamID) {
         if (iswarping())
-            rm->spr_crown.draw(ix + HALFPW - (IsPlayerFacingRight() ? 4 : 10), iy - 10 - (kuriboshoe.is_on() ? 16 : 0), 0, 0, 14, 14, (short)state % 4, GetWarpPlane());
+            rm->spr_crown.draw(ix + HALFPW - (isFacingRight() ? 4 : 10), iy - 10 - (kuriboshoe.is_on() ? 16 : 0), 0, 0, 14, 14, (short)state % 4, GetWarpPlane());
         else
-            rm->spr_crown.draw(ix + HALFPW - (IsPlayerFacingRight() ? 4 : 10), iy - 10 - (kuriboshoe.is_on() ? 16 : 0));
+            rm->spr_crown.draw(ix + HALFPW - (isFacingRight() ? 4 : 10), iy - 10 - (kuriboshoe.is_on() ? 16 : 0));
     }
 }
 
@@ -2750,7 +2750,7 @@ void CPlayer::turnslowdownon()
 }
 
 //Returns true if player facing right, false if left
-bool CPlayer::IsPlayerFacingRight()
+bool CPlayer::isFacingRight()
 {
     bool fLeft = game_values.reversewalk;
     bool fRight = !fLeft;

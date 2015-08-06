@@ -2406,7 +2406,7 @@ void MO_CarriedObject::draw()
 void MO_CarriedObject::MoveToOwner()
 {
     if (owner) {
-        setXi(owner->ix + (owner->IsPlayerFacingRight() ? iOwnerRightOffset : iOwnerLeftOffset));
+        setXi(owner->ix + (owner->isFacingRight() ? iOwnerRightOffset : iOwnerLeftOffset));
         setYi(owner->iy + PH - iOwnerUpOffset + collisionOffsetY);
     }
 }
@@ -2424,7 +2424,7 @@ void MO_CarriedObject::Drop()
 void MO_CarriedObject::Kick()
 {
     if (owner) {
-        velx = owner->velx + (owner->IsPlayerFacingRight() ? dKickX : -dKickX);
+        velx = owner->velx + (owner->isFacingRight() ? dKickX : -dKickX);
         vely = -dKickY;
         ifSoundOnPlay(rm->sfx_kicksound);
     }
@@ -2969,7 +2969,7 @@ void CO_Flag::MoveToOwner()
     MO_CarriedObject::MoveToOwner();
 
     if (owner)
-        fLastFlagDirection = owner->IsPlayerFacingRight();
+        fLastFlagDirection = owner->isFacingRight();
 }
 
 void CO_Flag::placeFlag()
@@ -5478,12 +5478,12 @@ void CO_Shell::Drop()
 {
     if (owner) {
         owner->carriedItem = NULL;
-        setXi(owner->ix + (owner->IsPlayerFacingRight() ? PW + 1: -31));
+        setXi(owner->ix + (owner->isFacingRight() ? PW + 1: -31));
     }
 
     if (collision_detection_checksides()) {
         //Move back to where it was before checking sides, then kill it
-        setXi(owner->ix + (owner->IsPlayerFacingRight() ? PW + 1: -31));
+        setXi(owner->ix + (owner->isFacingRight() ? PW + 1: -31));
         setYi(owner->iy + PH - 32 + collisionOffsetY);
         Die();
     } else {
@@ -5504,7 +5504,7 @@ void CO_Shell::Kick()
     */
 
     float fVel, fPlayerBonusVel = owner->velx / 2.0f;
-    if (owner->IsPlayerFacingRight()) {
+    if (owner->isFacingRight()) {
         fVel = 5.0f;
         if (fPlayerBonusVel > 0.0f)
             fVel += fPlayerBonusVel;
@@ -5866,7 +5866,7 @@ void CO_ThrowBlock::Kick()
     iDeathTime = 0;
 
     float fVel, fPlayerBonusVel = owner->velx / 2.0f;
-    if (owner->IsPlayerFacingRight()) {
+    if (owner->isFacingRight()) {
         fVel = 6.5f;
         if (fPlayerBonusVel > 0.0f)
             fVel += fPlayerBonusVel;

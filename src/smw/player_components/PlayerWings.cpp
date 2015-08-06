@@ -25,7 +25,7 @@ void PlayerWings::draw(CPlayer &player)
         iWingsFrame = 26;
     }
 
-    bool fPlayerFacingRight = player.IsPlayerFacingRight();
+    bool fPlayerFacingRight = player.isFacingRight();
     if (player.iswarping())
         rm->spr_wings.draw(
             player.ix + (fPlayerFacingRight ? - 19 : 15), player.iy - 10,

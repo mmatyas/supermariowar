@@ -93,7 +93,7 @@ public:
     short topY() { return iy; }
     short bottomY() { return iy + PH; }
     short centerY() { return iy + HALFPH; }
-    bool IsPlayerFacingRight();
+    bool isFacingRight();
 
     bool isready() { return state == player_ready; }
     bool isspawning() { return state == player_spawning; }

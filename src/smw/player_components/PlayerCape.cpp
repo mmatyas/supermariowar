@@ -35,7 +35,7 @@ void PlayerCape::spin(CPlayer &player)
 
     player.spin.spin(player);
 
-    objectcontainer[1].add(new MO_SpinAttack(player.getGlobalID(), player.getTeamID(),  kill_style_feather, player.IsPlayerFacingRight(), 24));
+    objectcontainer[1].add(new MO_SpinAttack(player.getGlobalID(), player.getTeamID(),  kill_style_feather, player.isFacingRight(), 24));
 }
 
 void PlayerCape::draw(CPlayer &player)
@@ -83,7 +83,7 @@ void PlayerCape::draw(CPlayer &player)
         if (player.spin.isReverseWalking())
             fPlayerFacingRight = game_values.reversewalk;
     } else {
-        fPlayerFacingRight = player.IsPlayerFacingRight();
+        fPlayerFacingRight = player.isFacingRight();
     }
 
     if (player.iswarping())

@@ -27,7 +27,7 @@ void PlayerSpinStatus::update(CPlayer& player) {
 }
 
 void PlayerSpinStatus::spin(CPlayer& player) {
-    state = player.IsPlayerFacingRight() ? (game_values.reversewalk ? 7 : 1) : (game_values.reversewalk ? 1 : 7);
+    state = player.isFacingRight() ? (game_values.reversewalk ? 7 : 1) : (game_values.reversewalk ? 1 : 7);
     timer = 0;
 }
 

@@ -42,7 +42,7 @@ void PlayerTail::spin(CPlayer& player)
 
     player.spin.spin(player);
 
-    objectcontainer[1].add(new MO_SpinAttack(player.getGlobalID(), player.getTeamID(), kill_style_leaf, player.IsPlayerFacingRight(), 13));
+    objectcontainer[1].add(new MO_SpinAttack(player.getGlobalID(), player.getTeamID(), kill_style_leaf, player.isFacingRight(), 13));
 }
 
 //If player is shaking tail, slow decent
@@ -109,7 +109,7 @@ void PlayerTail::draw(CPlayer& player) {
             if (player.spin.isReverseWalking())
                 fPlayerFacingRight = game_values.reversewalk;
         } else {
-            fPlayerFacingRight = player.IsPlayerFacingRight();
+            fPlayerFacingRight = player.isFacingRight();
         }
 
         if (player.iswarping())
