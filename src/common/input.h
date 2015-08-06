@@ -47,6 +47,12 @@ struct COutputControl {
 		CKeyState keys[NUM_KEYS];
 	};
 
+    void copyFrom(const COutputControl& other) {
+        for (uint8_t k = 0; k < NUM_KEYS; k++) {
+            keys[k] = other.keys[k];
+        }
+    }
+
 	bool operator == (const COutputControl& control) const {
 		for (uint8_t k = 0; k < NUM_KEYS; k++)
 			if (this->keys[k].fDown != control.keys[k].fDown

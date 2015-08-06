@@ -1993,7 +1993,8 @@ void GameplayState::handleInput()
         //Feed the player control structures with input data
         //Use menu controls when exit game dialog is up
         game_values.playerInput.Update(event, (game_values.exitinggame ? 1 : 0));
-        // net player inputs are not updated intentionally
+        // net player inputs are not updated here,
+        // it is handled in update()
     }
 
     if (netplay.active && !netplay.theHostIsMe)
@@ -2021,7 +2022,7 @@ void GameplayState::update()
                 list_players[p]->fy = netplay.latest_gamestate.player_y[p];
                 list_players[p]->velx = netplay.latest_gamestate.player_xvel[p];
                 list_players[p]->vely = netplay.latest_gamestate.player_yvel[p];
-                netplay.netPlayerInput.outputControls[p] = netplay.latest_gamestate.player_input[p];
+                netplay.netPlayerInput.outputControls[p].copyFrom(netplay.latest_gamestate.player_input[p]);
             }
         }
 

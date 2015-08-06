@@ -1232,7 +1232,7 @@ void NetGameHost::sendCurrentGameState()
     for (uint8_t p = 0; p < list_players_cnt; p++) {
         pkg.setPlayerCoord(p, list_players[p]->fx, list_players[p]->fy);
         pkg.setPlayerVel(p, list_players[p]->velx, list_players[p]->vely);
-        pkg.setPlayerKeys(p, &netplay.netPlayerInput.outputControls[p]);
+        pkg.setPlayerKeys(p, list_players[p]->playerKeys);
     }
 
     for (int c = 0; c < 3; c++) {
