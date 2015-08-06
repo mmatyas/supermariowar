@@ -27,7 +27,7 @@
 #include "player_components/PlayerWings.h"
 
 enum PlayerState {
-	player_wait,
+    player_wait,
     player_spawning,
     player_dead,
     player_ready,
@@ -42,7 +42,7 @@ enum PlayerState {
 };
 
 enum PlayerAction {
-	player_action_none,
+    player_action_none,
     player_action_bobomb,
     player_action_fireball,
     player_action_hammer,
@@ -61,108 +61,110 @@ struct Warp;
 
 
 enum deathstyle {
-	death_style_jump = 0,
+    death_style_jump = 0,
     death_style_squish = 1,
     death_style_shatter = 2
 };
 
 //the player class - a lot of optimization can be done here
 //(especially the collision detection stuff in collision_detection_map())
+// TODO: check if this could be a child of CObject
 class CPlayer
 {
-	public:
-		CPlayer(short iGlobalID, short iLocalID, short iTeamID,
-			short iSubTeamID, short iTeamColorID,
-			gfxSprite * nsprites[PGFX_LAST],
-			CScore *nscore, short * respawnCounter, CPlayerAI * ai);
-		~CPlayer();
+public:
+    CPlayer(short iGlobalID, short iLocalID,
+            short iTeamID, short iSubTeamID, short iTeamColorID,
+            gfxSprite * nsprites[PGFX_LAST],
+            CScore *nscore, short * respawnCounter, CPlayerAI * ai);
+    ~CPlayer();
 
-		void Init();
+    void Init();
+    void SetupNewPlayer();
 
-		void draw();
-		void drawOutOfScreenIndicators();
-		void updateswap();
-		void drawswap();
-		void move();
-		void mapcollisions();
-		void cpu_think();
+    /* Player info */
 
-        short leftX() { return ix; }
-        short rightX() { return ix + PW; }
-        short centerX() { return ix + HALFPW; }
-        short topY() { return iy; }
-        short bottomY() { return iy + PH; }
-        short centerY() { return iy + HALFPH; }
+    short getGlobalID() { return globalID; }
+    short getTeamID()   { return teamID;   }
+    short getColorID()  { return colorID;  }
 
-        bool isInvincible();
-        bool isShielded();
-        bool isFrozen() { return frozen; }
-
-		void collidesWith(CPlayer*);
-		bool collidesWith(CObject*);
-
-		void CommitAction();
-
-		void die(short deathStyle, bool fTeamRemoved, bool fKillCarriedItem);
-
-		void spawnText(const char * szText);
-		void DeathAwards();
-		void AddKillerAward(CPlayer* killed, killstyle style);
-		void AddKillsInRowInAirAward();
-		void SetupNewPlayer();
-
-	    short getGlobalID() { return globalID; }
-	    short getTeamID()   { return teamID;   }
-	    short getColorID()  { return colorID;  }
-
-		bool bouncejump();
-
-    short GetWarpPlane() {
-        return warpstatus.getWarpPlane();
-    }
-		bool IsPlayerFacingRight();
-
-    bool IsAcceptingItem() {
-        return fAcceptingItem && tanookisuit.notStatue() && !kuriboshoe.is_on();
-    }
-    bool PressedAcceptItemKey() {
-        return fPressedAcceptItem;
-    }
-		bool AcceptItem(MO_CarriedObject * item);
-
-		void SetPowerup(short iPowerup);
-    gfxSprite ** GetScoreboardSprite() {
-        return pScoreboardSprite;
-    }
-
-		void DecreaseProjectileLimit();
+    short leftX() { return ix; }
+    short rightX() { return ix + PW; }
+    short centerX() { return ix + HALFPW; }
+    short topY() { return iy; }
+    short bottomY() { return iy + PH; }
+    short centerY() { return iy + HALFPH; }
+    bool IsPlayerFacingRight();
 
     bool isready() { return state == player_ready; }
     bool isspawning() { return state == player_spawning; }
     bool iswarping() { return state > player_ready; }
     bool isdead() { return state == player_dead; }
 
-		void SetKuriboShoe(KuriboShoeType type);
-        bool IsInvincibleOnBottom();
-        bool IsSuperStomping();
+    bool isInvincible();
+    bool isShielded();
+    bool isFrozen() { return frozen; }
+    short GetWarpPlane() { return warpstatus.getWarpPlane(); }
+    bool IsInvincibleOnBottom();
+    bool IsSuperStomping();
 
+    /* Drawing */
+
+    void draw();
+    void drawOutOfScreenIndicators();
+    void drawswap();
+
+    /* Actions */
+
+    void updateswap();
+    void move();
+
+    void CommitAction();
+    bool bouncejump();
+
+    void collidesWith(CPlayer*);
+    bool collidesWith(CObject*);
+
+    void die(short deathStyle, bool fTeamRemoved, bool fKillCarriedItem);
+
+    /* Award effects and score */
+
+    void spawnText(const char * szText);
+    void DeathAwards();
+    void AddKillerAward(CPlayer* killed, killstyle style);
+    void AddKillsInRowInAirAward();
+    gfxSprite ** GetScoreboardSprite() { return pScoreboardSprite; }
+
+    /* Map elements */
+
+    bool PressedAcceptItemKey() { return fPressedAcceptItem; }
+    bool IsAcceptingItem() { return fAcceptingItem && tanookisuit.notStatue() && !kuriboshoe.is_on(); }
+    bool AcceptItem(MO_CarriedObject* item);
+
+    void SetKuriboShoe(KuriboShoeType type);
+
+    /* Powerup related */
+
+    void SetPowerup(short iPowerup);
+    void SetStoredPowerup(short iPowerup);
+    void StripPowerups();
+
+    void DecreaseProjectileLimit();
     void decreaseProjectilesCount() {
         if (projectiles > 0)
             projectiles--;
     }
-
-    void increaseProjectilesCount(int amount) {
-            projectiles += amount;
+    void increaseProjectilesCount(unsigned amount) {
+        projectiles += amount;
     }
 
-        void SetStoredPowerup(short iPowerup);
-		void StripPowerups();
+    bool shyguy; //if true, the player is a shyguy in shyguy mode
 
-		//if true, the player is a shyguy in shyguy mode
-		bool shyguy;
-		short globalID;
-		short teamID;
-	private:
+private:
+    short globalID;
+    short teamID;
+
+    void cpu_think();
+
 		void updateSprite();
 		void Jump(short iMove, float jumpModifier, bool fKuriboBounce);
 

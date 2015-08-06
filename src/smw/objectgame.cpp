@@ -1315,7 +1315,7 @@ void MO_Fireball::update()
 
 bool MO_Fireball::collide(CPlayer * player)
 {
-    if (iPlayerID != player->globalID && (game_values.teamcollision == 2|| iTeamID != player->teamID)) {
+    if (iPlayerID != player->getGlobalID() && (game_values.teamcollision == 2|| iTeamID != player->getTeamID())) {
         if (!player->isShielded()) {
             removeifprojectile(this, false, false);
 
