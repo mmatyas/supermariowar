@@ -78,5 +78,4 @@ void UI_NetNewRoomMenu::Restore()
     miNetNewRoomCreatingDialogText->Show(false);
     SetHeadControl(miNetNewRoomNameField);
     SetCancelCode(MENU_CODE_TO_NET_NEW_ROOM_LEVEL_SELECT_MENU);
-    RestoreCurrent();
 }
