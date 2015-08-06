@@ -7,11 +7,11 @@ extern CResourceManager* rm;
 
 UI_NetRoomMenu::UI_NetRoomMenu() : UI_Menu()
 {
-    miNetRoomName = new MI_Text("Room name here", 40, 50, 0, 2, 0);
-    miNetRoomPlayerName[0] = new MI_Text("P1 name here", 40, 80, 0, 2, 0);
-    miNetRoomPlayerName[1] = new MI_Text("P2 name here", 40, 140, 0, 2, 0);
-    miNetRoomPlayerName[2] = new MI_Text("P3 name here", 40, 200, 0, 2, 0);
-    miNetRoomPlayerName[3] = new MI_Text("P4 name here", 40, 260, 0, 2, 0);
+    miNetRoomName = new MI_Text("" /* Room name here */, 40, 50, 0, 2, 0);
+    miNetRoomPlayerName[0] = new MI_Text("" /* P1 name here */, 40, 80, 0, 2, 0);
+    miNetRoomPlayerName[1] = new MI_Text("" /* P2 name here */, 40, 140, 0, 2, 0);
+    miNetRoomPlayerName[2] = new MI_Text("" /* P3 name here */, 40, 200, 0, 2, 0);
+    miNetRoomPlayerName[3] = new MI_Text("" /* P4 name here */, 40, 260, 0, 2, 0);
 
     //AddNonControl(miNetRoomName);
     for (short p = 0; p < 4; p++)
@@ -69,10 +69,10 @@ UI_NetRoomMenu::~UI_NetRoomMenu() {
 
 void UI_NetRoomMenu::Refresh()
 {
-    miNetRoomHeaderText->SetText(netplay.currentRoom.name);
+    miNetRoomHeaderText->SetText(netplay.currentRoom.name.c_str());
 
     for (uint8_t p = 0; p < 4; p++)
-        miNetRoomPlayerName[p]->SetText(netplay.currentRoom.playerNames[p]);
+        miNetRoomPlayerName[p]->SetText(netplay.currentRoom.playerNames[p].c_str());
 
     if (netplay.theHostIsMe && netplay.currentRoom.playerCount() > 1)
         miNetRoomStartButton->SetName("Start");
@@ -109,11 +109,4 @@ void UI_NetRoomMenu::Restore()
 
     SetHeadControl(miNetRoomMessageField);
     SetCancelCode(MENU_CODE_TO_NET_LOBBY_MENU);
-
-    // Temp.: Set dummy values to room fields.
-        netplay.currentRoom.name[0] = '\0';
-        netplay.currentRoom.playerNames[0][0] = '\0';
-        netplay.currentRoom.playerNames[1][0] = '\0';
-        netplay.currentRoom.playerNames[2][0] = '\0';
-        netplay.currentRoom.playerNames[3][0] = '\0';
 }

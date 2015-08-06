@@ -47,20 +47,20 @@ struct RoomListEntry {
 
 struct Room {
     uint32_t       roomID;
-    char           name[NET_MAX_ROOM_NAME_LENGTH];
-    char           playerNames[4][NET_MAX_PLAYER_NAME_LENGTH];
+    std::string    name; // NET_MAX_ROOM_NAME_LENGTH
+    std::string    playerNames[4]; // NET_MAX_PLAYER_NAME_LENGTH
     uint8_t        hostPlayerNumber; // 1-4
 
     Room() {
         name[0] = '\0';
         for (uint8_t p = 0; p < 4; p++)
-            playerNames[p][0] = '\0';
+            playerNames[p] = "";
     }
 
     uint8_t playerCount() {
         uint8_t sum = 0;
         for (uint8_t p = 0; p < 4; p++)
-            if (strcmp(playerNames[p], "(empty)")) // != 0
+            if (playerNames[p].compare("(empty)")) // != 0
                 sum++;
 
         return sum;

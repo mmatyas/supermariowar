@@ -326,13 +326,16 @@ void NetClient::handleRoomCreatedMessage(const uint8_t* data, size_t dataLength)
     Net_NewRoomCreatedPackage pkg;
     memcpy(&pkg, data, sizeof(Net_NewRoomCreatedPackage));
 
+    assert(strlen(netplay.myPlayerName) <= NET_MAX_PLAYER_NAME_LENGTH);
+    assert(strlen(netplay.newroom_name) <= NET_MAX_ROOM_NAME_LENGTH);
+
     netplay.currentRoom.roomID = pkg.roomID;
     netplay.currentRoom.hostPlayerNumber = 0;
-    memcpy(netplay.currentRoom.name, netplay.newroom_name, NET_MAX_ROOM_NAME_LENGTH);
-    memcpy(netplay.currentRoom.playerNames[0], netplay.myPlayerName, NET_MAX_PLAYER_NAME_LENGTH);
-    memcpy(netplay.currentRoom.playerNames[1], "(empty)", NET_MAX_PLAYER_NAME_LENGTH);
-    memcpy(netplay.currentRoom.playerNames[2], "(empty)", NET_MAX_PLAYER_NAME_LENGTH);
-    memcpy(netplay.currentRoom.playerNames[3], "(empty)", NET_MAX_PLAYER_NAME_LENGTH);
+    netplay.currentRoom.name = netplay.newroom_name;
+    netplay.currentRoom.playerNames[0] = netplay.myPlayerName;
+    netplay.currentRoom.playerNames[1] = "(empty)";
+    netplay.currentRoom.playerNames[2] = "(empty)";
+    netplay.currentRoom.playerNames[3] = "(empty)";
 
     //printf("Room created, ID: %u, %d\n", pkg.roomID, pkg.roomID);
     netplay.currentMenuChanged = true;
@@ -371,14 +374,16 @@ void NetClient::handleRoomChangedMessage(const uint8_t* data, size_t dataLength)
     Net_CurrentRoomPackage pkg;
     memcpy(&pkg, data, sizeof(Net_CurrentRoomPackage));
 
+    assert(strlen(pkg.name) <= NET_MAX_ROOM_NAME_LENGTH);
     netplay.currentRoom.roomID = pkg.roomID;
-    memcpy(netplay.currentRoom.name, pkg.name, NET_MAX_ROOM_NAME_LENGTH);
+    netplay.currentRoom.name = pkg.name;
 
     printf("Room %u (%s) changed:\n", pkg.roomID, pkg.name);
-    printf("host: %d\n", pkg.hostPlayerNumber);
+    printf("  host: %d\n", pkg.hostPlayerNumber);
     for (uint8_t p = 0; p < 4; p++) {
-        memcpy(netplay.currentRoom.playerNames[p], pkg.playerName[p], NET_MAX_PLAYER_NAME_LENGTH);
-        printf("  player %d: %s", p+1, netplay.currentRoom.playerNames[p]);
+        assert(strlen(pkg.playerName[p]) <= NET_MAX_PLAYER_NAME_LENGTH);
+        netplay.currentRoom.playerNames[p] = pkg.playerName[p];
+        printf("  player %d: %s", p+1, netplay.currentRoom.playerNames[p].c_str());
         if (p == pkg.remotePlayerNumber)
             printf(" (me)");
         if (p == pkg.hostPlayerNumber)
@@ -386,7 +391,7 @@ void NetClient::handleRoomChangedMessage(const uint8_t* data, size_t dataLength)
         printf("\n");
 
 
-        if (strcmp(netplay.currentRoom.playerNames[p], "(empty)") == 0)
+        if (netplay.currentRoom.playerNames[p].compare("(empty)") == 0)
             game_values.playercontrol[p] = 0;
         //else if (strcmp(netplay.currentRoom.playerNames[p], "(bot)") == 0)
         //    game_values.playercontrol[p] = 2;
@@ -423,8 +428,9 @@ void NetClient::handleRoomChatMessage(const uint8_t* data, size_t dataLength)
     Net_RoomChatMsgPackage pkg;
     memcpy(&pkg, data, sizeof(Net_RoomChatMsgPackage));
 
+    assert(pkg.senderNum < 4);
     printf("Not implemented: [net] %s: %s\n",
-        netplay.currentRoom.playerNames[pkg.senderNum], pkg.message);
+        netplay.currentRoom.playerNames[pkg.senderNum].c_str(), pkg.message);
 }
 
 /****************************
