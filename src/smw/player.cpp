@@ -1406,12 +1406,20 @@ void CPlayer::CommitAction()
     action = player_action_none;
 }
 
+bool shouldUpdateSprite()
+{
+    if (netplay.active)
+        return true;
+
+    return !game_values.pausegame && !game_values.exitinggame && !game_values.swapplayers;
+}
+
 void CPlayer::updateSprite()
 {
     int iReverseSprite = game_values.reversewalk ? 1 : 0;
 
     //Use correct sprite (and animate)
-    if (!game_values.pausegame && !game_values.exitinggame && !game_values.swapplayers) {
+    if (shouldUpdateSprite()) {
         //if player is warping from below, set them in the air
         if (iswarping()) {
             if (state == player_exiting_warp_down || state == player_entering_warp_up)

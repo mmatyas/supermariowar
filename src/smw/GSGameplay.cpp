@@ -2001,6 +2001,17 @@ void GameplayState::handleInput()
         netplay.client.sendLocalInput();
 }
 
+bool shouldUpdate()
+{
+    if (netplay.active)
+        return true;
+
+    if (game_values.pausegame || game_values.exitinggame)
+        return false;
+
+    return true;
+}
+
 void GameplayState::update()
 {
     //Initialize players after game init has finished
@@ -2196,7 +2207,7 @@ void GameplayState::update()
         return;
     }
 
-    if (!game_values.pausegame && !game_values.exitinggame) {
+    if (shouldUpdate()) {
         if (!game_values.swapplayers && game_values.screenfade == 0) {
             //Count down start timer before each game
             if (iCountDownState > 0 && --iCountDownTimer <= 0) {
@@ -2334,7 +2345,9 @@ SWAPBREAK:
 
         //--------------- draw everything ----------------------
         drawEverything(iCountDownState, iScoreTextOffset);
-    } else {
+    }
+
+    if (game_values.pausegame || game_values.exitinggame) {
         drawExitPause();
     }
 
