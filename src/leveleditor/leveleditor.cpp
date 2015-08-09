@@ -2176,7 +2176,7 @@ int editor_properties(short iBlockCol, short iBlockRow)
 
 //SDL_Rect r;
 SDL_Rect rNewButton[2];
-SDL_Rect rTypeButton[3][4];
+SDL_Rect rTypeButton[8][4];
 
 const char * szPathNames[3] = {"Line Segment", "Continuous", "Ellipse"};
 
