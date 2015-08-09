@@ -2018,7 +2018,7 @@ int editor_properties(short iBlockCol, short iBlockRow)
 						int iMouseX, iMouseY;
 						SDL_GetMouseState(&iMouseX, &iMouseY);
 
-						short iSettingIndex;
+						short iSettingIndex = 0;
 						short * piSetting = GetBlockProperty(iMouseX, iMouseY, iBlockCol, iBlockRow, &iSettingIndex);
 
 						//If shift is held, set all powerups to this setting
