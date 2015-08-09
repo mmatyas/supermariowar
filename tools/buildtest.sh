@@ -1,207 +1,120 @@
 #! /bin/bash
 
-echo "SMW Build test system"
+echo -e "SMW Build test system\n\n"
+
+set -e # exit on error
+set -x # show commands
 
 if [ ! -d ./tools ]; then
-	echo "Please run this tool from the root directory."
-	exit 1
-fi
-
-#rm -rf build-test && mkdir build-test
-if [ $? -gt 0 ]; then
-    echo "Error: Could not create build-test directory."
+    echo -e "Please run this tool from the root directory."
     exit 1
 fi
 
+rm -rf build-test
+mkdir build-test
 cd build-test
-if [ $? -gt 0 ]; then
-    echo "Error: build-test directory not exists."
-    exit 1
-fi
 
 #
 # Test native release build
-# 
+#
 
-echo "Test 1: Native release build."
+echo -e "###\n\nTest 1: Native release build.\n\n###"
 
-mkdir -p native && cd native
-if [ $? -gt 0 ]; then
-    echo "Test failed: Could not create build directory."
-    exit 1
-fi
+mkdir -p native
+cd native
 
-cmake -D CMAKE_BUILD_TYPE:STRING=Release -D DEBUG:BOOL=OFF -G "Unix Makefiles" ../..
-if [ $? -gt 0 ]; then
-    echo "Test failed: Configure error."
-    exit 1
-fi
-
-make -j2 && cd ..
-if [ $? -gt 0 ]; then
-    echo "Test failed: Build error."
-    exit 1
-fi
-
+cmake -D CMAKE_BUILD_TYPE:STRING=Release -G "Unix Makefiles" ../.. > /dev/null
+make -j2 > /dev/null
+cd ..
 
 #
 # Test native debug build
-# 
+#
 
-echo "Test 2: Native debug build."
+echo -e "###\n\nTest 2: Native debug build.\n\n###"
 
-mkdir -p native-debug && cd native-debug
-if [ $? -gt 0 ]; then
-    echo "Test failed: Could not create build directory."
-    exit 1
-fi
+mkdir -p native-debug
+cd native-debug
 
-cmake -D CMAKE_BUILD_TYPE:STRING=Debug -D DEBUG:BOOL=ON -G "Unix Makefiles" ../..
-if [ $? -gt 0 ]; then
-    echo "Test failed: Configure error."
-    exit 1
-fi
-
-make -j2 && cd ..
-if [ $? -gt 0 ]; then
-    echo "Test failed: Build error."
-    exit 1
-fi
-
+cmake -D CMAKE_BUILD_TYPE:STRING=Debug -G "Unix Makefiles" ../.. > /dev/null
+make -j2 > /dev/null
+cd ..
 
 #
 # Test SDL2 (only smw yet)
-# 
+#
 
-echo "Test 3: SDL2 release build."
+echo -e "###\n\nTest 3: SDL2 release build.\n\n###"
 
-mkdir -p native-sdl2 && cd native-sdl2
-if [ $? -gt 0 ]; then
-    echo "Test failed: Could not create build directory."
-    exit 1
-fi
+mkdir -p native-sdl2
+cd native-sdl2
 
-cmake -D CMAKE_BUILD_TYPE:STRING=Release -D USE_SDL2_LIBS:BOOL=ON -G "Unix Makefiles" ../..
-if [ $? -gt 0 ]; then
-    echo "Test failed: Configure error."
-    exit 1
-fi
-
-make -j2 smw && cd ..
-if [ $? -gt 0 ]; then
-    echo "Test failed: Build error."
-    exit 1
-fi
-
+cmake -D CMAKE_BUILD_TYPE:STRING=Release -D USE_SDL2_LIBS:BOOL=ON -G "Unix Makefiles" ../.. > /dev/null
+make -j2 smw > /dev/null
+cd ..
 
 #
 # Test disabled networking
-# 
+#
 
-echo "Test 4: Release build without networking."
+echo -e "###\n\nTest 4: Release build without networking.\n\n###"
 
-mkdir -p native-nullnet && cd native-nullnet
-if [ $? -gt 0 ]; then
-    echo "Test failed: Could not create build directory."
-    exit 1
-fi
+mkdir -p native-nullnet
+cd native-nullnet
 
-cmake -D CMAKE_BUILD_TYPE:STRING=Release -D NO_NETWORK:BOOL=ON -G "Unix Makefiles" ../..
-if [ $? -gt 0 ]; then
-    echo "Test failed: Configure error."
-    exit 1
-fi
-
-make -j2 && cd ..
-if [ $? -gt 0 ]; then
-    echo "Test failed: Build error."
-    exit 1
-fi
-
+cmake -D CMAKE_BUILD_TYPE:STRING=Release -D NO_NETWORK:BOOL=ON -G "Unix Makefiles" ../.. > /dev/null
+make -j2 > /dev/null
+cd ..
 
 #
 # Test JavaScript release build
-# 
+#
 
-echo "Test 5: JavaScript/asm.js release build."
+echo -e "###\n\nTest 5: JavaScript/asm.js release build.\n\n###"
 
-mkdir -p js && cd js
-if [ $? -gt 0 ]; then
-    echo "Test failed: Could not create build directory."
-    exit 1
-fi
+mkdir -p js
+cd js
 
-if [ ! -d data ]; then
-	ln -s ../../data data
-	if [ $? -gt 0 ]; then
-	    echo "Test failed: Could not create build directory."
-	    exit 1
-	fi
-fi
-
-emconfigure cmake -D CMAKE_BUILD_TYPE:STRING=Release -D DEBUG:BOOL=ON -D TARGET_EMSCRIPTEN:BOOL=ON -G "Unix Makefiles" ../..
-if [ $? -gt 0 ]; then
-    echo "Test failed: Configure error."
-    exit 1
-fi
-
-emmake make -j2
-if [ $? -gt 0 ]; then
-    echo "Test failed: Build error."
-    exit 1
-fi
+ln -s ../../data data
+emconfigure cmake \
+    -D CMAKE_BUILD_TYPE:STRING=Release \
+    -D TARGET_EMSCRIPTEN:BOOL=ON \
+    -D NO_NETWORK:BOOL=ON \
+    -G "Unix Makefiles" ../.. > /dev/null
+emmake make -j2 > /dev/null
 
 EMCC_PARAMS="-O3 -v --preload-file data -s OUTLINING_LIMIT=60000 -s ALLOW_MEMORY_GROWTH=1 -s ASSERTIONS=1"
-emcc Binaries/smw.bc -o smw.html $EMCC_PARAMS && emcc Binaries/leveledit.bc -o leveledit.html $EMCC_PARAMS && emcc Binaries/worldedit.bc -o worldedit.html $EMCC_PARAMS
-if [ $? -gt 0 ]; then
-    echo "Test failed: Build error."
-    exit 1
-fi
-
+emcc Binaries/smw.bc -o smw.html $EMCC_PARAMS > /dev/null
+emcc Binaries/leveledit.bc -o leveledit.html $EMCC_PARAMS > /dev/null
+emcc Binaries/worldedit.bc -o worldedit.html $EMCC_PARAMS > /dev/null
 cd ..
-
 
 #
 # Test JavaScript debug build
-# 
+#
 
-echo "Test 6: JavaScript/asm.js debug build."
+echo -e "###\n\nTest 6: JavaScript/asm.js debug build.\n\n###"
 
-mkdir -p js-debug && cd js-debug
-if [ $? -gt 0 ]; then
-    echo "Test failed: Could not create build directory."
-    exit 1
-fi
+mkdir -p js-debug
+cd js-debug
 
-if [ ! -d data ]; then
-	ln -s ../../data data
-	if [ $? -gt 0 ]; then
-	    echo "Test failed: Could not create build directory."
-	    exit 1
-	fi
-fi
-
-emconfigure cmake -D CMAKE_BUILD_TYPE:STRING=Debug -D TARGET_EMSCRIPTEN:BOOL=ON -G "Unix Makefiles" ../..
-if [ $? -gt 0 ]; then
-    echo "Test failed: Configure error."
-    exit 1
-fi
-
-emmake make -j2
-if [ $? -gt 0 ]; then
-    echo "Test failed: Build error."
-    exit 1
-fi
+ln -s ../../data data
+emconfigure cmake \
+    -D CMAKE_BUILD_TYPE:STRING=Debug \
+    -D TARGET_EMSCRIPTEN:BOOL=ON \
+    -D NO_NETWORK:BOOL=ON \
+    -G "Unix Makefiles" ../.. > /dev/null
+emmake make -j2 > /dev/null
 
 EMCC_PARAMS="-O0 -v --preload-file data -s OUTLINING_LIMIT=60000 -s ALLOW_MEMORY_GROWTH=1 -s ASSERTIONS=1 -s SAFE_HEAP=1 -s ALIASING_FUNCTION_POINTERS=0 --js-opts 0 -g4"
-emcc Binaries/smw.bc -o smw.html $EMCC_PARAMS && emcc Binaries/leveledit.bc -o leveledit.html $EMCC_PARAMS && emcc Binaries/worldedit.bc -o worldedit.html $EMCC_PARAMS
-if [ $? -gt 0 ]; then
-    echo "Test failed: Build error."
-    exit 1
-fi
-
+emcc Binaries/smw.bc -o smw.html $EMCC_PARAMS > /dev/null
+emcc Binaries/leveledit.bc -o leveledit.html $EMCC_PARAMS > /dev/null
+emcc Binaries/worldedit.bc -o worldedit.html $EMCC_PARAMS > /dev/null
 cd ..
 
+#
+# End
+#
 
-echo "Test completed successfully."
+echo -e "###\n\nTests completed successfully."
 cd ..
