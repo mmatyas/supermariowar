@@ -5,6 +5,7 @@
 
 #include <stdint.h>
 #include <cassert>
+#include <cstring>
 
 
 struct Net_MessageHeader {
@@ -167,7 +168,7 @@ struct Net_PlayerInfoPkg : Net_MessageHeader {
         : Net_MessageHeader(NET_L2G_CLIENTS_INFO)
     {
         memset(host, 0, sizeof(uint32_t) * 3);
-        memset(port, 0, sizeof(uint32_t) * 3);
+        memset(port, 0, sizeof(uint16_t) * 3);
     }
 
     void setPlayer(uint8_t playerNum, uint32_t p_host, uint16_t p_port)
