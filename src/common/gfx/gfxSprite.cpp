@@ -116,8 +116,6 @@ bool gfxSprite::init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b, Uin
     }
 
 #ifdef USE_SDL2
-    printf("%d\n", screen->format);
-    //SDL_Surface *temp = SDL_DisplayFormatAlpha(m_picture, screen);
     SDL_Surface *temp = SDL_ConvertSurface(m_picture, screen->format, 0);
 #else
     SDL_Surface *temp = SDL_DisplayFormatAlpha(m_picture);
