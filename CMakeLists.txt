@@ -209,7 +209,7 @@ if(NOT NO_NETWORK)
 	find_package(ENet REQUIRED)
 endif()
 
-## the optional libpng package
+# the optional libpng package
 if(USE_PNG_SAVE)
 	find_package(PNG REQUIRED)
 
@@ -217,6 +217,11 @@ if(USE_PNG_SAVE)
 	target_link_libraries(smw ${PNG_LIBRARY})
 endif()
 
+# Build custom dependencies
+include_directories(dependencies/yaml-cpp-noboost/include)
+set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "YAML: Build testing and parse tools" FORCE)
+set(YAML_CPP_BUILD_CONTRIB OFF CACHE BOOL "YAML: Build contrib stuff in library" FORCE)
+add_subdirectory(dependencies/yaml-cpp-noboost)
 
 #-----------------------------------------------------------------------------
 #

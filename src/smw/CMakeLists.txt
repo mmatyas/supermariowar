@@ -105,6 +105,7 @@ endif()
 # emscripten uses its own SDL
 if(NOT TARGET_EMSCRIPTEN)
 	target_link_libraries(smw ${CMAKE_THREAD_LIBS_INIT})
+	target_link_libraries(smw yaml-cpp)
 
 	if(USE_SDL2_LIBS)
 		target_link_libraries(smw SDL2 SDL2_mixer SDL2_image SDL2main)
