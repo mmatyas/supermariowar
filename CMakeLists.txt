@@ -20,6 +20,7 @@ option(USE_PNG_SAVE "Enable PNG save feature" OFF) # currently working only with
 option(TARGET_EMSCRIPTEN "Output asm.js code using emscripten" OFF) # TODO: change this to a build type maybe?
 option(USE_SDL2_LIBS "Use SDL2 instead of SDL 1.x" OFF) # only smw ported yet
 option(NO_NETWORK "Disable all network communication" OFF)
+option(BUILD_STATIC_LIBS "Build and link certain dependencies statically (Enet, yaml-cpp)" ON)
 
 if(USE_SDL2_LIBS)
 	add_definitions(-DUSE_SDL2)
@@ -125,8 +126,12 @@ if(NOT TARGET_EMSCRIPTEN)
 endif()
 
 if(NOT NO_NETWORK)
-	include_directories(dependencies/enet/include)
-	add_subdirectory(dependencies/enet)
+	if (BUILD_STATIC_LIBS)
+		include_directories(dependencies/enet/include)
+		add_subdirectory(dependencies/enet)
+	else()
+		find_package(ENet REQUIRED)
+	endif()
 endif()
 
 # the optional libpng package
@@ -137,11 +142,15 @@ if(USE_PNG_SAVE)
 	target_link_libraries(smw ${PNG_LIBRARY})
 endif()
 
-# Build custom dependencies
-include_directories(dependencies/yaml-cpp-noboost/include)
-set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "YAML: Build testing and parse tools" FORCE)
-set(YAML_CPP_BUILD_CONTRIB OFF CACHE BOOL "YAML: Build contrib stuff in library" FORCE)
-add_subdirectory(dependencies/yaml-cpp-noboost)
+# Use YAML for game config files
+if (BUILD_STATIC_LIBS)
+	include_directories(dependencies/yaml-cpp-noboost/include)
+	set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "YAML: Build testing and parse tools" FORCE)
+	set(YAML_CPP_BUILD_CONTRIB OFF CACHE BOOL "YAML: Build contrib stuff in library" FORCE)
+	add_subdirectory(dependencies/yaml-cpp-noboost)
+else()
+	find_package(yaml-cpp REQUIRED)
+endif()
 
 #-----------------------------------------------------------------------------
 #
