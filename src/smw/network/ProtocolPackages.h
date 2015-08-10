@@ -218,8 +218,8 @@ struct Net_RawInput {
 
     void setPlayerKey(uint8_t keyNum, bool down, bool pressed) {
         assert(keyNum < 8);
-        flags |= ((down ? 1 : 0) << (keyNum << 1));
-        flags |= ((pressed ? 1 : 0) << ((keyNum << 1) + 1));
+        flags |= (down ? 1 << (keyNum << 1) : 0);
+        flags |= (pressed ? 1 << ((keyNum << 1) + 1) : 0);
     }
 
     void getPlayerKey(uint8_t keyNum, bool& down, bool& pressed) {
