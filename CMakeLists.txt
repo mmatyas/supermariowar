@@ -206,7 +206,8 @@ if(NOT TARGET_EMSCRIPTEN)
 endif()
 
 if(NOT NO_NETWORK)
-	find_package(ENet REQUIRED)
+	include_directories(dependencies/enet/include)
+	add_subdirectory(dependencies/enet)
 endif()
 
 # the optional libpng package

@@ -1,3 +1,6 @@
 [submodule "dependencies/yaml-cpp-noboost"]
 	path = dependencies/yaml-cpp-noboost
 	url = https://github.com/blair1618/yaml-cpp.git
+[submodule "dependencies/enet"]
+	path = dependencies/enet
+	url = https://github.com/lsalzman/enet.git
