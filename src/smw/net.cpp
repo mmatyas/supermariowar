@@ -9,11 +9,6 @@
 
 #include "network/ProtocolPackages.h"
 
-//define disabled platform here
-#ifdef __EMSCRIPTEN__
-#define NETWORK_DISABLED
-#endif
-
 // define platform guards here
 #ifdef NETWORK_DISABLED
     #include "platform/network/null/NetworkLayerNULL.h"
@@ -379,7 +374,7 @@ void NetClient::handleRoomChangedMessage(const uint8_t* data, size_t dataLength)
     netplay.currentRoom.name = pkg.name;
 
     printf("Room %u (%s) changed:\n", pkg.roomID, pkg.name);
-    printf("  host: %d\n", pkg.hostPlayerNumber);
+    // printf("  host: %d\n", pkg.hostPlayerNumber);
     for (uint8_t p = 0; p < 4; p++) {
         assert(strlen(pkg.playerName[p]) <= NET_MAX_PLAYER_NAME_LENGTH);
         netplay.currentRoom.playerNames[p] = pkg.playerName[p];
