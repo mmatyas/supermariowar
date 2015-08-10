@@ -286,8 +286,9 @@ struct Net_GameStatePackage : Net_MessageHeader {
         assert(playerNum < 4);
         assert(playerControl);
         for (uint8_t k = 0; k < 8; k++)
-            input[playerNum].setPlayerKey(playerNum,
-                playerControl->keys[k].fDown, playerControl->keys[k].fPressed);
+            input[playerNum].setPlayerKey(k,
+                playerControl->keys[k].fDown,
+                playerControl->keys[k].fPressed);
     }
 
     // RECEIVE
@@ -307,8 +308,9 @@ struct Net_GameStatePackage : Net_MessageHeader {
         assert(playerNum < 4);
         assert(playerControl);
         for (uint8_t k = 0; k < 8; k++)
-            input[playerNum].getPlayerKey(playerNum,
-                playerControl->keys[k].fDown, playerControl->keys[k].fPressed);
+            input[playerNum].getPlayerKey(k,
+                playerControl->keys[k].fDown,
+                playerControl->keys[k].fPressed);
     }
 };
 
