@@ -93,6 +93,55 @@ set(userdir ".smw" CACHE STRING "User directory") # User settings directory
 set(datadir ${CMAKE_INSTALL_PREFIX}/share/games/smw CACHE PATH "datadir") # data dir will contain the default pack
 set(bindir  ${CMAKE_INSTALL_PREFIX}/games/bin       CACHE PATH "bindir")
 
+#-----------------------------------------------------------------------------
+#
+# Dependencies
+#
+#-----------------------------------------------------------------------------
+
+# emscripten uses its own SDL, no need to include or link
+if(NOT TARGET_EMSCRIPTEN)
+	if(USE_SDL2_LIBS)
+		# add all SDL2 dependencies
+		find_package(SDL2 REQUIRED)
+		find_package(SDL2_mixer REQUIRED)
+		find_package(SDL2_image REQUIRED)
+
+		# location of SDL headers
+		include_directories(${SDL2_INCLUDE_DIR})
+		include_directories(${SDL2_IMAGE_INCLUDE_DIRS})
+		include_directories(${SDL2_MIXER_INCLUDE_DIRS})
+	else()
+		# add all SDL dependencies
+		find_package(SDL REQUIRED)
+		find_package(SDL_mixer REQUIRED)
+		find_package(SDL_image REQUIRED)
+
+		# location of SDL headers
+		include_directories(${SDL_INCLUDE_DIR})
+		include_directories(${SDL_IMAGE_INCLUDE_DIRS})
+		include_directories(${SDL_MIXER_INCLUDE_DIRS})
+	endif()
+endif()
+
+if(NOT NO_NETWORK)
+	include_directories(dependencies/enet/include)
+	add_subdirectory(dependencies/enet)
+endif()
+
+# the optional libpng package
+if(USE_PNG_SAVE)
+	find_package(PNG REQUIRED)
+
+	include_directories(${PNG_INCLUDE_DIR})
+	target_link_libraries(smw ${PNG_LIBRARY})
+endif()
+
+# Build custom dependencies
+include_directories(dependencies/yaml-cpp-noboost/include)
+set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "YAML: Build testing and parse tools" FORCE)
+set(YAML_CPP_BUILD_CONTRIB OFF CACHE BOOL "YAML: Build contrib stuff in library" FORCE)
+add_subdirectory(dependencies/yaml-cpp-noboost)
 
 #-----------------------------------------------------------------------------
 #
@@ -172,57 +221,6 @@ endif()
 
 ##TODO: test this
 add_definitions(-D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE)
-
-
-#-----------------------------------------------------------------------------
-#
-# Dependencies
-#
-#-----------------------------------------------------------------------------
-
-# emscripten uses its own SDL, no need to include or link
-if(NOT TARGET_EMSCRIPTEN)
-	if(USE_SDL2_LIBS)
-		# add all SDL2 dependencies
-		find_package(SDL2 REQUIRED)
-		find_package(SDL2_mixer REQUIRED)
-		find_package(SDL2_image REQUIRED)
-
-		# location of SDL headers
-		include_directories(${SDL2_INCLUDE_DIR})
-		include_directories(${SDL2_IMAGE_INCLUDE_DIRS})
-		include_directories(${SDL2_MIXER_INCLUDE_DIRS})
-	else()
-		# add all SDL dependencies
-		find_package(SDL REQUIRED)
-		find_package(SDL_mixer REQUIRED)
-		find_package(SDL_image REQUIRED)
-
-		# location of SDL headers
-		include_directories(${SDL_INCLUDE_DIR})
-		include_directories(${SDL_IMAGE_INCLUDE_DIRS})
-		include_directories(${SDL_MIXER_INCLUDE_DIRS})
-	endif()
-endif()
-
-if(NOT NO_NETWORK)
-	include_directories(dependencies/enet/include)
-	add_subdirectory(dependencies/enet)
-endif()
-
-# the optional libpng package
-if(USE_PNG_SAVE)
-	find_package(PNG REQUIRED)
-
-	include_directories(${PNG_INCLUDE_DIR})
-	target_link_libraries(smw ${PNG_LIBRARY})
-endif()
-
-# Build custom dependencies
-include_directories(dependencies/yaml-cpp-noboost/include)
-set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "YAML: Build testing and parse tools" FORCE)
-set(YAML_CPP_BUILD_CONTRIB OFF CACHE BOOL "YAML: Build contrib stuff in library" FORCE)
-add_subdirectory(dependencies/yaml-cpp-noboost)
 
 #-----------------------------------------------------------------------------
 #
