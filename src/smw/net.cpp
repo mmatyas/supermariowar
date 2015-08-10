@@ -733,6 +733,7 @@ void NetClient::onConnect(NetPeer* newPeer)
 void NetClient::onDisconnect(NetPeer& client)
 {
     // Beware of the null pointers
+
     if (foreign_gamehost) {
         if (client == *foreign_gamehost) {
             printf("[net] Disconnected from game host.\n");
@@ -740,8 +741,10 @@ void NetClient::onDisconnect(NetPeer& client)
         }
     }
 
-    assert(client == *foreign_lobbyserver);
-    printf("[net] Disconnected from lobby server.\n");
+    if (foreign_lobbyserver) {
+        assert(client == *foreign_lobbyserver);
+        printf("[net] Disconnected from lobby server.\n");
+    }
 }
 
 void NetClient::onReceive(NetPeer& client, const uint8_t* data, size_t dataLength)

@@ -98,12 +98,12 @@ uint32_t NetPeerENet::averageRTT() const
     return foreign_peer->roundTripTime;
 }
 
-bool NetPeerENet::operator==(const NetPeer*& peer) const
+bool NetPeerENet::operator==(const NetPeer* peer) const
 {
     if (!peer)
         return false;
 
-    if (this->foreign_peer == ((NetPeerENet*)peer)->foreign_peer)
+    if (this->foreign_peer == static_cast<const NetPeerENet*>(peer)->foreign_peer)
         return true;
 
     return false;
@@ -111,7 +111,7 @@ bool NetPeerENet::operator==(const NetPeer*& peer) const
 
 bool NetPeerENet::operator==(const NetPeer& peer) const
 {
-    if (this->foreign_peer == ((NetPeerENet*)&peer)->foreign_peer)
+    if (this->foreign_peer == static_cast<const NetPeerENet&>(peer).foreign_peer)
         return true;
 
     return false;

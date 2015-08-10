@@ -22,7 +22,7 @@ class NetPeerENet : public NetPeer
         uint32_t averageRTT() const;
 
         bool operator==(const NetPeer&) const;
-        bool operator==(const NetPeer*&) const;
+        bool operator==(const NetPeer*) const;
 
     private:
         ENetPeer* foreign_peer;
