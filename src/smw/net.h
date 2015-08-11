@@ -244,7 +244,7 @@ enum NetworkState {
     PLAYING
 };
 
-struct Net_GameplayState {
+struct Net_PlayerData {
     float          player_x[4];
     float          player_y[4];
     float          player_xvel[4];
@@ -295,7 +295,7 @@ struct Networking {
     bool allowMapCollisionEvent;
 
     bool gamestate_changed;
-    Net_GameplayState latest_gamestate;
+    Net_PlayerData latest_playerdata;
 };
 
 extern Networking netplay;

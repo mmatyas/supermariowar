@@ -654,9 +654,9 @@ void NetClient::handleRemoteGameState(const uint8_t* data, size_t dataLength) //
     memcpy(&pkg, data, sizeof(Net_GameStatePackage));
 
     for (uint8_t p = 0; p < list_players_cnt; p++) {
-        pkg.getPlayerCoord(p, netplay.latest_gamestate.player_x[p], netplay.latest_gamestate.player_y[p]);
-        pkg.getPlayerVel(p, netplay.latest_gamestate.player_xvel[p], netplay.latest_gamestate.player_yvel[p]);
-        pkg.getPlayerKeys(p, &netplay.latest_gamestate.player_input[p]);
+        pkg.getPlayerCoord(p, netplay.latest_playerdata.player_x[p], netplay.latest_playerdata.player_y[p]);
+        pkg.getPlayerVel(p, netplay.latest_playerdata.player_xvel[p], netplay.latest_playerdata.player_yvel[p]);
+        pkg.getPlayerKeys(p, &netplay.latest_playerdata.player_input[p]);
     }
 
     netplay.gamestate_changed = true;
@@ -936,7 +936,7 @@ void NetClient::setAsLastReceivedMessage(uint8_t packageType)
 
 
 
-void Net_GameplayState::copyFromLocal()
+void Net_PlayerData::copyFromLocal()
 {
     for (uint8_t p = 0; p < list_players_cnt; p++) {
         player_x[p] = list_players[p]->fx;

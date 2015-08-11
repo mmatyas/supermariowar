@@ -227,7 +227,7 @@ void GameplayState::createPlayers()
     }
 
     //netplay.gamestate_changed = false;
-    //netplay.latest_gamestate.copyFromLocal();
+    //netplay.latest_playerdata.copyFromLocal();
 }
 
 void GameplayState::initScoreDisplayPosition()
@@ -2029,11 +2029,11 @@ void GameplayState::update()
             netplay.client.local_gamehost.sendCurrentGameState();
         else if (netplay.gamestate_changed) {
             for (unsigned short p = 0; p < list_players_cnt; p++) {
-                list_players[p]->fx = netplay.latest_gamestate.player_x[p];
-                list_players[p]->fy = netplay.latest_gamestate.player_y[p];
-                list_players[p]->velx = netplay.latest_gamestate.player_xvel[p];
-                list_players[p]->vely = netplay.latest_gamestate.player_yvel[p];
-                netplay.netPlayerInput.outputControls[p].copyFrom(netplay.latest_gamestate.player_input[p]);
+                list_players[p]->fx = netplay.latest_playerdata.player_x[p];
+                list_players[p]->fy = netplay.latest_playerdata.player_y[p];
+                list_players[p]->velx = netplay.latest_playerdata.player_xvel[p];
+                list_players[p]->vely = netplay.latest_playerdata.player_yvel[p];
+                netplay.netPlayerInput.outputControls[p].copyFrom(netplay.latest_playerdata.player_input[p]);
             }
         }
 

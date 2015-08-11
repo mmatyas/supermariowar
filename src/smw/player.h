@@ -521,7 +521,7 @@ private:
 
 		friend class NetClient;
 		friend class NetGameHost;
-		friend class Net_GameplayState;
+		friend class Net_PlayerData;
 		friend struct Net_MapCollisionPackage;
 		friend struct Net_P2PCollisionPackage;
 
