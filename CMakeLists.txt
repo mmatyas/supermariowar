@@ -161,11 +161,11 @@ endif()
 # Debugging CFLAGS. Turn optimizations off; turn debugging symbols on.
 if(CMAKE_BUILD_TYPE STREQUAL Debug)
   add_definitions(-DDEBUG -D_DEBUG -DPNG_DEBUG=1)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g -O0")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -g -O0")
 else()
   add_definitions(-DNDEBUG)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -s")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3 -s")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -O3 -s")
 endif()
 
@@ -203,6 +203,7 @@ if(NOT MSVC)
 	check_and_add_flag(LOGICAL_OP -Wlogical-op)
 	check_and_add_flag(SHADOW -Wshadow)
 	check_and_add_flag(INIT_SELF -Winit-self)
+	check_and_add_flag(COMPAT_NARROWING_OFF -Wno-narrowing)
 
 	# gcc uses some optimizations which might break stuff without this flag
 	add_definitions(-fno-strict-aliasing -fexceptions -Wno-shadow)
