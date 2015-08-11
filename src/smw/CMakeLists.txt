@@ -3,6 +3,7 @@ set(SMW_SRCS ai.cpp gamemodes.cpp GSMenu.cpp
            objectgame.cpp objecthazard.cpp
            net.cpp FPSLimiter.cpp GSSplashScreen.cpp
            GSGameplay.cpp ObjectContainer.cpp main.cpp
+           network/NetConfigManager.cpp
 )
 
 #
@@ -20,7 +21,7 @@ LIST(APPEND SMW_SRCS
 	objects/blocks/ViewBlock.cpp
 	objects/blocks/SwitchBlock.cpp
 	objects/blocks/ThrowBlock.cpp
-    objects/blocks/WeaponBreakableBlock.cpp
+	objects/blocks/WeaponBreakableBlock.cpp
 
 	objects/moving/MovingObject.cpp
 

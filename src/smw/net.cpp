@@ -1,6 +1,5 @@
 #include "net.h"
 
-#include "FileIO.h"
 #include "GlobalConstants.h"
 #include "GameValues.h"
 #include "GSMenu.h"
@@ -8,6 +7,7 @@
 #include "player.h"
 
 #include "network/ProtocolPackages.h"
+#include "network/NetConfigManager.h"
 
 // define platform guards here
 #ifdef NETWORK_DISABLED
@@ -60,17 +60,9 @@ bool net_init()
     if (!netplay.client.init())
         return false;
 
-    /*ServerAddress none;
+    ServerAddress none;
     none.hostname = "(none)";
-    netplay.savedServers.push_back(none);*/
-
-    ServerAddress localhost;
-    localhost.hostname = "localhost";
-    netplay.savedServers.push_back(localhost);
-
-    /*ServerAddress rpi;
-    rpi.hostname = "192.168.1.103";
-    netplay.savedServers.push_back(rpi);*/
+    netplay.savedServers.push_back(none);
 
     net_loadServerList();
 
@@ -90,43 +82,14 @@ void net_close()
 
 void net_saveServerList()
 {
-    FILE * fp = OpenFile("servers.bin", "wb");
-    if (fp) {
-        fwrite(g_iVersion, sizeof(int), 4, fp);
-
-        // Don't save "(none)"
-        for (unsigned iServer = 1; iServer < netplay.savedServers.size(); iServer++) {
-            ServerAddress* host = &netplay.savedServers[iServer];
-            WriteString(host->hostname.c_str(), fp);
-        }
-        fclose(fp);
-    }
+    NetConfigManager config;
+    config.save();
 }
 
 void net_loadServerList()
 {
-    FILE * fp = OpenFile("servers.bin", "rb");
-    if (fp) {
-        int version[4];
-        if (4 != fread(version, sizeof(int), 4, fp)) {
-            fclose(fp);
-            return; // read error
-        }
-
-        if (VersionIsEqual(g_iVersion, version[0], version[1], version[2], version[3])) {
-            char buffer[128];
-            ReadString(buffer, 128, fp);
-
-            while (!feof(fp) && !ferror(fp)) {
-                ServerAddress host;
-                host.hostname = buffer;
-                netplay.savedServers.push_back(host);
-
-                ReadString(buffer, 128, fp);
-            }
-        }
-        fclose(fp);
-    }
+    NetConfigManager config;
+    config.load();
 }
 
 /****************************
