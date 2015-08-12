@@ -6,20 +6,20 @@
 class CMap;
 enum ReadType: unsigned char;
 
-class MapLoader {
+class MapReader {
 public:
-    MapLoader() {}
-    virtual ~MapLoader() {}
+    MapReader() {}
+    virtual ~MapReader() {}
 
     virtual bool load(CMap&, FILE* /*, const char**/, ReadType) = 0;
 
-    MapLoader* getLoaderByVersion(int (&mapversion)[4]);
+    MapReader* getLoaderByVersion(int (&mapversion)[4]);
 };
 
-class MapLoader1500 : public MapLoader {
+class MapReader1500 : public MapReader {
 public:
-    MapLoader1500() : MapLoader() {}
-    virtual ~MapLoader1500() {}
+    MapReader1500() : MapReader() {}
+    virtual ~MapReader1500() {}
     virtual bool load(CMap&, FILE* /*, const char**/, ReadType);
 
 protected:
@@ -29,10 +29,10 @@ protected:
     virtual void read_music_category(CMap&, FILE*); // compat: music guessed by background
 };
 
-class MapLoader1600 : public MapLoader1500 {
+class MapReader1600 : public MapReader1500 {
 public:
-    MapLoader1600();
-    virtual ~MapLoader1600() {}
+    MapReader1600();
+    virtual ~MapReader1600() {}
     virtual bool load(CMap&, FILE* /*, const char**/, ReadType);
 
 protected:
@@ -46,30 +46,30 @@ private:
     bool parse_nospawn;
     bool fix_spawnareas;
 
-    friend class MapLoader160A;
-    friend class MapLoader1610;
+    friend class MapReader160A;
+    friend class MapReader1610;
 };
 
-class MapLoader160A : public MapLoader1600 {
+class MapReader160A : public MapReader1600 {
 public:
-    MapLoader160A();
-    virtual ~MapLoader160A() {}
+    MapReader160A();
+    virtual ~MapReader160A() {}
     virtual bool load(CMap&, FILE* /*, const char**/, ReadType);
 
 };
 
-class MapLoader1610 : public MapLoader160A {
+class MapReader1610 : public MapReader160A {
 public:
-    MapLoader1610();
-    virtual ~MapLoader1610() {}
+    MapReader1610();
+    virtual ~MapReader1610() {}
     virtual bool load(CMap&, FILE* /*, const char**/, ReadType);
 
 };
 
-class MapLoader1700 : public MapLoader1600 /* ignore 1.6 patches */ {
+class MapReader1700 : public MapReader1600 /* ignore 1.6 patches */ {
 public:
-    MapLoader1700() : MapLoader1600() {}
-    virtual ~MapLoader1700() {}
+    MapReader1700() : MapReader1600() {}
+    virtual ~MapReader1700() {}
     virtual bool load(CMap&, FILE* /*, const char**/, ReadType);
 
 protected:
@@ -80,30 +80,30 @@ protected:
     virtual bool read_spawn_areas(CMap&, FILE*);
 };
 
-class MapLoader1701 : public MapLoader1700 {
+class MapReader1701 : public MapReader1700 {
 public:
-    MapLoader1701() : MapLoader1700() {}
-    virtual ~MapLoader1701() {}
+    MapReader1701() : MapReader1700() {}
+    virtual ~MapReader1701() {}
 
 protected:
     virtual void read_background(CMap&, FILE*); // background by underscore-conversion
     virtual void read_music_category(CMap&, FILE*); // music by category ID
 };
 
-class MapLoader1702 : public MapLoader1701 {
+class MapReader1702 : public MapReader1701 {
 public:
-    MapLoader1702() : MapLoader1701() {}
-    virtual ~MapLoader1702() {}
+    MapReader1702() : MapReader1701() {}
+    virtual ~MapReader1702() {}
 
 protected:
     virtual void read_autofilters(CMap& map, FILE* mapfile); // 9 autofilter support
     virtual void read_background(CMap&, FILE*); // background as string
 };
 
-class MapLoader1800 : public MapLoader1702 {
+class MapReader1800 : public MapReader1702 {
 public:
-    MapLoader1800() : MapLoader1702() {}
-    virtual ~MapLoader1800() {}
+    MapReader1800() : MapReader1702() {}
+    virtual ~MapReader1800() {}
     virtual bool load(CMap&, FILE* /*, const char**/, ReadType);
 
 protected:
@@ -126,10 +126,10 @@ private:
     short* tilesetheights;
 };
 
-class MapLoader1802 : public MapLoader1800 {
+class MapReader1802 : public MapReader1800 {
 public:
-    MapLoader1802() : MapLoader1800() {}
-    virtual ~MapLoader1802() {}
+    MapReader1802() : MapReader1800() {}
+    virtual ~MapReader1802() {}
 
 protected:
     virtual void read_eyecandy(CMap&, FILE*); // 3-layer eyecandy support

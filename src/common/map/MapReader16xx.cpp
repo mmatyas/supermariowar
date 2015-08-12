@@ -11,13 +11,13 @@ extern short g_iTileConversion[];
 extern short g_iTileTypeConversion[NUMTILETYPES];
 extern short g_iDefaultPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
 
-MapLoader1600::MapLoader1600()
-    : MapLoader1500()
+MapReader1600::MapReader1600()
+    : MapReader1500()
     , parse_nospawn(false)
     , fix_spawnareas(false)
 { }
 
-void MapLoader1600::read_tiles(CMap& map, FILE* mapfile)
+void MapReader1600::read_tiles(CMap& map, FILE* mapfile)
 {
     for (unsigned short j = 0; j < MAPHEIGHT; j++) {
         for (unsigned short i = 0; i < MAPWIDTH; i++) {
@@ -81,13 +81,13 @@ void MapLoader1600::read_tiles(CMap& map, FILE* mapfile)
     }
 }
 
-void MapLoader1600::read_eyecandy(CMap& map, FILE* mapfile)
+void MapReader1600::read_eyecandy(CMap& map, FILE* mapfile)
 {
     //Read in eyecandy to use
     map.eyecandy[2] = (short)ReadInt(mapfile);
 }
 
-void MapLoader1600::read_warp_exits(CMap& map, FILE* mapfile)
+void MapReader1600::read_warp_exits(CMap& map, FILE* mapfile)
 {
     map.maxConnection = 0;
 
@@ -120,7 +120,7 @@ void MapLoader1600::read_warp_exits(CMap& map, FILE* mapfile)
         map.numwarpexits = MAXWARPS;
 }
 
-bool MapLoader1600::read_spawn_areas(CMap& map, FILE* mapfile)
+bool MapReader1600::read_spawn_areas(CMap& map, FILE* mapfile)
 {
     //Read spawn areas
     map.totalspawnsize[0] = 0;
@@ -172,7 +172,7 @@ bool MapLoader1600::read_spawn_areas(CMap& map, FILE* mapfile)
     return true;
 }
 
-bool MapLoader1600::read_draw_areas(CMap& map, FILE* mapfile)
+bool MapReader1600::read_draw_areas(CMap& map, FILE* mapfile)
 {
     //Read draw areas (foreground tiles drawing optimization)
     map.numdrawareas = (short)ReadInt(mapfile);
@@ -195,7 +195,7 @@ bool MapLoader1600::read_draw_areas(CMap& map, FILE* mapfile)
     return true;
 }
 
-bool MapLoader1600::load(CMap& map, FILE* mapfile, ReadType readtype)
+bool MapReader1600::load(CMap& map, FILE* mapfile, ReadType readtype)
 {
     read_autofilters(map, mapfile);
 
@@ -217,19 +217,19 @@ bool MapLoader1600::load(CMap& map, FILE* mapfile, ReadType readtype)
     return true;
 }
 
-bool MapLoader160A::load(CMap& map, FILE* mapfile, ReadType readtype)
+bool MapReader160A::load(CMap& map, FILE* mapfile, ReadType readtype)
 {
     fix_spawnareas = true;
 
-    return MapLoader1600::load(map, mapfile, readtype);
+    return MapReader1600::load(map, mapfile, readtype);
 }
 
 
-bool MapLoader1610::load(CMap& map, FILE* mapfile, ReadType readtype)
+bool MapReader1610::load(CMap& map, FILE* mapfile, ReadType readtype)
 {
     parse_nospawn = true;
 
-    if (!MapLoader160A::load(map, mapfile, readtype))
+    if (!MapReader160A::load(map, mapfile, readtype))
         return false;
 
     return read_draw_areas(map, mapfile);

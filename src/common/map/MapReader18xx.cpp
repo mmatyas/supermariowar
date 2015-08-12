@@ -12,7 +12,7 @@ extern short g_iTileTypeConversion[NUMTILETYPES];
 
 using namespace std;
 
-void MapLoader1800::read_autofilters(CMap& map, FILE* mapfile)
+void MapReader1800::read_autofilters(CMap& map, FILE* mapfile)
 {
     // TODO: handle read fail
     int iAutoFilterValues[NUM_AUTO_FILTERS + 1];
@@ -22,7 +22,7 @@ void MapLoader1800::read_autofilters(CMap& map, FILE* mapfile)
         map.fAutoFilter[iFilter] = iAutoFilterValues[iFilter] > 0;
 }
 
-void MapLoader1800::read_tileset(FILE* mapfile)
+void MapReader1800::read_tileset(FILE* mapfile)
 {
     //Load tileset information
 
@@ -61,7 +61,7 @@ void MapLoader1800::read_tileset(FILE* mapfile)
     delete [] translation;
 }
 
-void MapLoader1800::read_tiles(CMap& map, FILE* mapfile)
+void MapReader1800::read_tiles(CMap& map, FILE* mapfile)
 {
     //2. load map data
 
@@ -96,14 +96,14 @@ void MapLoader1800::read_tiles(CMap& map, FILE* mapfile)
     }
 }
 
-void MapLoader1800::read_switches(CMap& map, FILE* mapfile)
+void MapReader1800::read_switches(CMap& map, FILE* mapfile)
 {
     // Read the on/off switch state of the four colors (turned on or off)
     for (short iSwitch = 0; iSwitch < 4; iSwitch++)
         map.iSwitches[iSwitch] = (short)ReadInt(mapfile);
 }
 
-void MapLoader1800::read_items(CMap& map, FILE* mapfile)
+void MapReader1800::read_items(CMap& map, FILE* mapfile)
 {
     //Load map items (like carryable spikes and springs)
     map.iNumMapItems = ReadInt(mapfile);
@@ -115,7 +115,7 @@ void MapLoader1800::read_items(CMap& map, FILE* mapfile)
     }
 }
 
-void MapLoader1800::read_hazards(CMap& map, FILE* mapfile)
+void MapReader1800::read_hazards(CMap& map, FILE* mapfile)
 {
     //Load map hazards (like fireball strings, rotodiscs, pirhana plants)
     map.iNumMapHazards = ReadInt(mapfile);
@@ -133,7 +133,7 @@ void MapLoader1800::read_hazards(CMap& map, FILE* mapfile)
     }
 }
 
-void MapLoader1802::read_eyecandy(CMap& map, FILE* mapfile)
+void MapReader1802::read_eyecandy(CMap& map, FILE* mapfile)
 {
     //Read in eyecandy to use
     //For all layers if the map format supports it
@@ -142,7 +142,7 @@ void MapLoader1802::read_eyecandy(CMap& map, FILE* mapfile)
     map.eyecandy[2] = (short)ReadInt(mapfile);
 }
 
-void MapLoader1800::read_warp_locations(CMap& map, FILE* mapfile)
+void MapReader1800::read_warp_locations(CMap& map, FILE* mapfile)
 {
     for (unsigned short j = 0; j < MAPHEIGHT; j++) {
         for (unsigned short i = 0; i < MAPWIDTH; i++) {
@@ -167,7 +167,7 @@ void MapLoader1800::read_warp_locations(CMap& map, FILE* mapfile)
     }
 }
 
-void MapLoader1800::read_switchable_blocks(CMap& map, FILE* mapfile)
+void MapReader1800::read_switchable_blocks(CMap& map, FILE* mapfile)
 {
     //Read switch block state data
     int iNumSwitchBlockData = ReadInt(mapfile);
@@ -179,7 +179,7 @@ void MapLoader1800::read_switchable_blocks(CMap& map, FILE* mapfile)
     }
 }
 
-bool MapLoader1800::read_spawn_areas(CMap& map, FILE* mapfile)
+bool MapReader1800::read_spawn_areas(CMap& map, FILE* mapfile)
 {
     for (unsigned short i = 0; i < NUMSPAWNAREATYPES; i++) {
         map.totalspawnsize[i] = 0;
@@ -217,7 +217,7 @@ bool MapLoader1800::read_spawn_areas(CMap& map, FILE* mapfile)
     return true;
 }
 
-void MapLoader1800::read_extra_tiledata(CMap& map, FILE* mapfile)
+void MapReader1800::read_extra_tiledata(CMap& map, FILE* mapfile)
 {
     int iNumExtendedDataBlocks = ReadInt(mapfile);
 
@@ -231,7 +231,7 @@ void MapLoader1800::read_extra_tiledata(CMap& map, FILE* mapfile)
     }
 }
 
-void MapLoader1800::read_gamemode_settings(CMap& map, FILE* mapfile)
+void MapReader1800::read_gamemode_settings(CMap& map, FILE* mapfile)
 {
     //read mode item locations like flags and race goals
     map.iNumRaceGoals = (short)ReadInt(mapfile);
@@ -247,7 +247,7 @@ void MapLoader1800::read_gamemode_settings(CMap& map, FILE* mapfile)
     }
 }
 
-bool MapLoader1800::load(CMap& map, FILE* mapfile/*, const char* filename*/, ReadType readtype)
+bool MapReader1800::load(CMap& map, FILE* mapfile/*, const char* filename*/, ReadType readtype)
 {
     read_autofilters(map, mapfile);
 

@@ -12,13 +12,13 @@ extern short g_iMusicCategoryConversion[26];
 extern short g_iTileTypeConversion[NUMTILETYPES];
 extern short g_iDefaultPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
 
-void MapLoader1500::read_autofilters(CMap& map, FILE* mapfile)
+void MapReader1500::read_autofilters(CMap& map, FILE* mapfile)
 {
     for (short iFilter = 0; iFilter < NUM_AUTO_FILTERS; iFilter++)
         map.fAutoFilter[iFilter] = false;
 }
 
-void MapLoader1500::read_tiles(CMap& map, FILE* mapfile)
+void MapReader1500::read_tiles(CMap& map, FILE* mapfile)
 {
     unsigned short i, j;
 
@@ -66,19 +66,19 @@ void MapLoader1500::read_tiles(CMap& map, FILE* mapfile)
     }
 }
 
-void MapLoader1500::read_background(CMap& map, FILE* mapfile)
+void MapReader1500::read_background(CMap& map, FILE* mapfile)
 {
     // Read old background IDs and convert that to a background filename
     map.backgroundID = (short)ReadInt(mapfile);
     strcpy(map.szBackgroundFile, g_szBackgroundConversion[map.backgroundID]);
 }
 
-void MapLoader1500::read_music_category(CMap& map, FILE* mapfile)
+void MapReader1500::read_music_category(CMap& map, FILE* mapfile)
 {
     map.musicCategoryID = g_iMusicCategoryConversion[map.backgroundID];
 }
 
-bool MapLoader1500::load(CMap& map, FILE* mapfile, ReadType readtype)
+bool MapReader1500::load(CMap& map, FILE* mapfile, ReadType readtype)
 {
     read_autofilters(map, mapfile);
 

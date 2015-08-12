@@ -381,14 +381,14 @@ class CMap
 		friend class MO_FlagBase;
 		friend class OMO_RaceGoal;
 
-		friend class MapLoader;
-			friend class MapLoader1500;
-			friend class MapLoader1600;
-			friend class MapLoader1700;
-			friend class MapLoader1701;
-			friend class MapLoader1702;
-			friend class MapLoader1800;
-			friend class MapLoader1802;
+		friend class MapReader;
+			friend class MapReader1500;
+			friend class MapReader1600;
+			friend class MapReader1700;
+			friend class MapReader1701;
+			friend class MapReader1702;
+			friend class MapReader1800;
+			friend class MapReader1802;
 };
 
 #endif // SMW_MAP_H

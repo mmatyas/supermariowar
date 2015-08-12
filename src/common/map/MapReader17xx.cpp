@@ -14,7 +14,7 @@ extern short g_iDefaultPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
 
 using namespace std;
 
-void MapLoader1702::read_autofilters(CMap& map, FILE* mapfile)
+void MapReader1702::read_autofilters(CMap& map, FILE* mapfile)
 {
     int iAutoFilterValues[9];
     ReadIntChunk(iAutoFilterValues, 9, mapfile);
@@ -29,7 +29,7 @@ void MapLoader1702::read_autofilters(CMap& map, FILE* mapfile)
     //int iDensity = iAutoFilterValues[8];
 }
 
-void MapLoader1700::read_tiles(CMap& map, FILE* mapfile)
+void MapReader1700::read_tiles(CMap& map, FILE* mapfile)
 {
     short iClassicTilesetID = g_tilesetmanager->GetIndexFromName("Classic");
 
@@ -66,7 +66,7 @@ void MapLoader1700::read_tiles(CMap& map, FILE* mapfile)
     }
 }
 
-void MapLoader1701::read_background(CMap& map, FILE* mapfile)
+void MapReader1701::read_background(CMap& map, FILE* mapfile)
 {
     //Read in background to use
     ReadString(map.szBackgroundFile, 128, mapfile);
@@ -83,14 +83,14 @@ void MapLoader1701::read_background(CMap& map, FILE* mapfile)
     }
 }
 
-void MapLoader1702::read_background(CMap& map, FILE* mapfile)
+void MapReader1702::read_background(CMap& map, FILE* mapfile)
 {
     //Read in background to use
     ReadString(map.szBackgroundFile, 128, mapfile);
     //printf("Background: %s", szBackgroundFile);
 }
 
-void MapLoader1700::set_preview_switches(CMap& map, FILE* mapfile)
+void MapReader1700::set_preview_switches(CMap& map, FILE* mapfile)
 {
     // if it is a preview, for older maps, set the on/off blocks to on by default
 
@@ -113,7 +113,7 @@ void MapLoader1700::set_preview_switches(CMap& map, FILE* mapfile)
     }
 }
 
-void MapLoader1700::read_switches(CMap& map, FILE* mapfile)
+void MapReader1700::read_switches(CMap& map, FILE* mapfile)
 {
     //Read on/off switches
     for (unsigned short iSwitch = 0; iSwitch < 4; iSwitch++) {
@@ -130,12 +130,12 @@ void MapLoader1700::read_switches(CMap& map, FILE* mapfile)
     }
 }
 
-void MapLoader1701::read_music_category(CMap& map, FILE* mapfile)
+void MapReader1701::read_music_category(CMap& map, FILE* mapfile)
 {
     map.musicCategoryID = ReadInt(mapfile);
 }
 
-void MapLoader1700::read_warp_locations(CMap& map, FILE* mapfile)
+void MapReader1700::read_warp_locations(CMap& map, FILE* mapfile)
 {
     for (unsigned short j = 0; j < MAPHEIGHT; j++) {
         for (unsigned short i = 0; i < MAPWIDTH; i++) {
@@ -164,7 +164,7 @@ void MapLoader1700::read_warp_locations(CMap& map, FILE* mapfile)
     }
 }
 
-bool MapLoader1700::read_spawn_areas(CMap& map, FILE* mapfile)
+bool MapReader1700::read_spawn_areas(CMap& map, FILE* mapfile)
 {
     //Read spawn areas
     for (unsigned short i = 0; i < 6; i += 5) {
@@ -206,7 +206,7 @@ bool MapLoader1700::read_spawn_areas(CMap& map, FILE* mapfile)
     return true;
 }
 
-bool MapLoader1700::load(CMap& map, FILE* mapfile, ReadType readtype)
+bool MapReader1700::load(CMap& map, FILE* mapfile, ReadType readtype)
 {
     read_autofilters(map, mapfile);
 
