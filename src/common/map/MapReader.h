@@ -16,6 +16,10 @@ public:
     static MapReader* getLoaderByVersion(int (&mapversion)[4]);
 };
 
+/*
+    v1.5 reader
+*/
+
 class MapReader1500 : public MapReader {
 public:
     MapReader1500() : MapReader() {}
@@ -28,6 +32,10 @@ protected:
     virtual void read_background(CMap&, FILE*); // background by ID
     virtual void read_music_category(CMap&, FILE*); // compat: music guessed by background
 };
+
+/*
+    v1.6 readers
+*/
 
 class MapReader1600 : public MapReader1500 {
 public:
@@ -62,6 +70,10 @@ public:
     virtual ~MapReader1610() {}
     virtual bool load(CMap&, FILE*, ReadType);
 };
+
+/*
+    v1.7 readers
+*/
 
 class MapReader1700 : public MapReader1600 /* ignore 1.6 patches */ {
 public:
@@ -98,6 +110,10 @@ protected:
     virtual void read_autofilters(CMap& map, FILE* mapfile); // 9 autofilter support
     virtual void read_background(CMap&, FILE*); // background as string
 };
+
+/*
+    v1.8 readers
+*/
 
 class MapReader1800 : public MapReader1702 {
 public:
