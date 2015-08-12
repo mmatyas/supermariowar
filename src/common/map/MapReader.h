@@ -21,13 +21,48 @@ public:
     virtual bool load(CMap&, FILE* /*, const char**/, ReadType);
 
 protected:
-    virtual void read_autofilters(CMap& map, FILE* mapfile); // compat: autofilters disabled
+    virtual void read_autofilters(CMap&, FILE*); // compat: autofilters disabled
     virtual void read_tiles(CMap&, FILE*); // one-tileset mapdata, separately stored objects
     virtual void read_background(CMap&, FILE*); // background by ID
     virtual void read_music_category(CMap&, FILE*); // compat: music guessed by background
 };
 
+class MapLoader1600 : public MapLoader1500 {
+public:
+    MapLoader1600();
+    virtual ~MapLoader1600() {}
+    virtual bool load(CMap&, FILE* /*, const char**/, ReadType);
 
+protected:
+    virtual void read_tiles(CMap&, FILE*); // tiles also contain block and warp data
+    virtual void read_eyecandy(CMap&, FILE*); // simple eyecandy support
+    virtual bool read_spawn_areas(CMap&, FILE*);
+    virtual void read_warp_exits(CMap&, FILE*);
+    virtual bool read_draw_areas(CMap&, FILE*);
+
+private:
+    bool parse_nospawn;
+    bool fix_spawnareas;
+
+    friend class MapLoader160A;
+    friend class MapLoader1610;
+};
+
+class MapLoader160A : public MapLoader1600 {
+public:
+    MapLoader160A();
+    virtual ~MapLoader160A() {}
+    virtual bool load(CMap&, FILE* /*, const char**/, ReadType);
+
+};
+
+class MapLoader1610 : public MapLoader160A {
+public:
+    MapLoader1610();
+    virtual ~MapLoader1610() {}
+    virtual bool load(CMap&, FILE* /*, const char**/, ReadType);
+
+};
 
 class MapLoader1700 : public MapLoader1600 {
 public:
@@ -38,12 +73,9 @@ public:
 protected:
     virtual void read_tiles(CMap&, FILE*); // one-tileset mapdata
     virtual void set_preview_switches(CMap&, FILE*); // compat: switches disabled
-    virtual void read_eyecandy(CMap&, FILE*); // simple eyecandy support
     virtual void read_warp_locations(CMap&, FILE*);
-    virtual void read_warp_exits(CMap&, FILE*);
-    virtual bool read_spawn_areas(CMap&, FILE*);
-    virtual bool read_draw_areas(CMap& map, FILE* mapfile);
     virtual void read_switches(CMap&, FILE*); // switches stored inverted
+    virtual bool read_spawn_areas(CMap&, FILE*);
 };
 
 class MapLoader1701 : public MapLoader1700 {

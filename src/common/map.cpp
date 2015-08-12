@@ -506,6 +506,9 @@ void CMap::clearMap()
     iNumMapItems = 0;
     iNumMapHazards = 0;
 
+    for (short iSwitch = 0; iSwitch < 4; iSwitch++)
+        iSwitches[iSwitch] = 0;
+
     bltrect.w = TILESIZE;
     bltrect.h = TILESIZE;
 }
@@ -597,269 +600,20 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 
 
     } else if (VersionIsEqualOrAfter(version, 1, 6, 0, 0)) {
-        iNumMapItems = 0;
-        iNumMapHazards = 0;
 
-        for (short iFilter = 0; iFilter < NUM_AUTO_FILTERS; iFilter++)
-            fAutoFilter[iFilter] = false;
 
-        if (iReadType == read_type_summary) {
-            fclose(mapfile);
-            return;
-        }
-
-        clearPlatforms();
 
         cout << "loading map " << file;
 
         cout << "[Version " << version[0] << '.' << version[1] << '.'
              << version[2] << '.' << version[3] << " Map Detected]\n";
 
-        //2. load map data
-        for (j = 0; j < MAPHEIGHT; j++) {
-            for (i = 0; i < MAPWIDTH; i++) {
-                for (k = 0; k < MAPLAYERS; k++) {
-                    //This converts from 1.6 tileset to 1.7 tileset
-                    short iTile = (short)ReadInt(mapfile);
 
-                    if (iTile == 300) {
-                        mapdata[i][j][k].iID = TILESETNONE;
-                    } else {
-                        short iTileID = g_iTileConversion[iTile];
 
-                        TilesetTile * tile = &mapdata[i][j][k];
-                        tile->iID = g_tilesetmanager->GetClassicTilesetIndex();
-                        tile->iCol = iTileID % 32;
-                        tile->iRow = iTileID / 32;
-                    }
-                }
 
-                mapdatatop[i][j].iType = tile_nonsolid;
-                mapdatatop[i][j].iFlags = tile_flag_nonsolid;
-
-                for (k = MAPLAYERS - 1; k >= 0; k--) {
-                    TilesetTile * tile = &mapdata[i][j][k];
-                    TileType type = g_tilesetmanager->GetClassicTileset()->GetTileType(tile->iCol, tile->iRow);
-                    if (type != tile_nonsolid) {
-                        if (type >= 0 && type < NUMTILETYPES) {
-                            mapdatatop[i][j].iType = type;
-                            mapdatatop[i][j].iFlags = g_iTileTypeConversion[type];
-                        } else {
-                            mapdatatop[i][j].iType = tile_nonsolid;
-                            mapdatatop[i][j].iFlags = tile_flag_nonsolid;
-                        }
-
-                        break;
-                    }
-                }
-
-                objectdata[i][j].iType = (short)ReadInt(mapfile);
-                if (objectdata[i][j].iType == 6)
-                    objectdata[i][j].iType = -1;
-
-                objectdata[i][j].fHidden = false;
-
-                if (objectdata[i][j].iType == 1) {
-                    for (short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++)
-                        objectdata[i][j].iSettings[iSetting] = g_iDefaultPowerupPresets[0][iSetting];
-                }
-
-                warpdata[i][j].direction = (WarpEnterDirection)ReadInt(mapfile);
-                warpdata[i][j].connection = (short)ReadInt(mapfile);
-                warpdata[i][j].id = (short)ReadInt(mapfile);
-
-                if (VersionIsEqualOrAfter(version, 1, 6, 1, 0)) {
-                    nospawn[0][i][j] = ReadInt(mapfile) == 0 ? false : true;
-
-                    for (short iType = 1; iType < NUMSPAWNAREATYPES; iType++)
-                        nospawn[iType][i][j] = nospawn[0][i][j];
-                }
-            }
-        }
-
-        //Read in background to use
-        backgroundID = (short)ReadInt(mapfile);
-        musicCategoryID = g_iMusicCategoryConversion[backgroundID];
-
-        strcpy(szBackgroundFile, g_szBackgroundConversion[backgroundID]);
-
-        //Read in eyecandy to use
-        eyecandy[2] = (short)ReadInt(mapfile);
-
-        maxConnection = 0;
-
-        numwarpexits = (short)ReadInt(mapfile);
-        for (i = 0; i < numwarpexits && i < MAXWARPS; i++) {
-            warpexits[i].direction = (WarpExitDirection)ReadInt(mapfile);
-            warpexits[i].connection = (short)ReadInt(mapfile);
-            warpexits[i].id = (short)ReadInt(mapfile);
-            warpexits[i].x = (short)ReadInt(mapfile);
-            warpexits[i].y = (short)ReadInt(mapfile);
-
-            warpexits[i].lockx = (short)ReadInt(mapfile);
-            warpexits[i].locky = (short)ReadInt(mapfile);
-
-            warpexits[i].warpx = (short)ReadInt(mapfile);
-            warpexits[i].warpy = (short)ReadInt(mapfile);
-            warpexits[i].numblocks = (short)ReadInt(mapfile);
-
-            if (warpexits[i].connection > maxConnection)
-                maxConnection = warpexits[i].connection;
-        }
-
-        //Ignore any more warps than the max
-        for (i = 0; i < numwarpexits - MAXWARPS; i++) {
-            for (j = 0; j < 10; j++)
-                ReadInt(mapfile);
-        }
-
-        if (numwarpexits > MAXWARPS)
-            numwarpexits = MAXWARPS;
-
-        //Read spawn areas
-        totalspawnsize[0] = 0;
-        numspawnareas[0] = (short)ReadInt(mapfile);
-
-        if (numspawnareas[0] > MAXSPAWNAREAS) {
-            cout << endl << " ERROR: Number of spawn areas (" << numspawnareas[0]
-                 << ") was greater than max allowed (" << MAXSPAWNAREAS << ')'
-                 << endl;
-            return;
-        }
-
-        //Read the only spawn area definition in the file
-        for (int m = 0; m < numspawnareas[0]; m++) {
-            spawnareas[0][m].left = (short)ReadInt(mapfile);
-            spawnareas[0][m].top = (short)ReadInt(mapfile);
-            spawnareas[0][m].width = (short)ReadInt(mapfile);
-            spawnareas[0][m].height = (short)ReadInt(mapfile);
-            spawnareas[0][m].size = (short)ReadInt(mapfile);
-
-            if (VersionIsEqualOrBefore(version, 1, 6, 0, 10)) {
-                spawnareas[0][m].width -= spawnareas[0][m].left;
-                spawnareas[0][m].height -= spawnareas[0][m].top;
-            }
-
-            totalspawnsize[0] += spawnareas[0][m].size;
-        }
-
-        //Then duplicate it for all the other spawn areas
-        for (short i2 = 1; i2 < NUMSPAWNAREATYPES; i2++) {
-            totalspawnsize[i2] = totalspawnsize[0];
-            numspawnareas[i2] = numspawnareas[0];
-
-            //Read the only spawn area definition in the file
-            for (int m = 0; m < numspawnareas[0]; m++) {
-                spawnareas[i2][m].left = spawnareas[0][m].left;
-                spawnareas[i2][m].top = spawnareas[0][m].top;
-                spawnareas[i2][m].width = spawnareas[0][m].width;
-                spawnareas[i2][m].height = spawnareas[0][m].height;
-                spawnareas[i2][m].size = spawnareas[0][m].size;
-
-                if (VersionIsEqualOrBefore(version, 1, 6, 0, 10)) {
-                    spawnareas[i2][m].width -= spawnareas[i2][m].left;
-                    spawnareas[i2][m].height -= spawnareas[i2][m].top;
-                }
-            }
-        }
-
-        if (VersionIsEqualOrAfter(version, 1, 6, 1, 0)) {
-            numdrawareas = (short)ReadInt(mapfile);
-
-            if (numdrawareas > MAXDRAWAREAS) {
-                cout << endl << " ERROR: Number of draw areas (" << numdrawareas
-                     << ") was greater than max allowed (" << MAXDRAWAREAS << ')'
-                     << endl;
-                return;
-            }
-
-            for (int m = 0; m < numdrawareas; m++) {
-                drawareas[m].x = (Sint16)ReadInt(mapfile);
-                drawareas[m].y = (Sint16)ReadInt(mapfile);
-                drawareas[m].w = (Uint16)ReadInt(mapfile);
-                drawareas[m].h = (Uint16)ReadInt(mapfile);
-            }
-        }
-
-        for (short iSwitch = 0; iSwitch < 4; iSwitch++)
-            iSwitches[iSwitch] = 0;
 
     } else { //If the version is unrecognized (1.5 maps didn't have version numbers)
-        iNumMapItems = 0;
-        iNumMapHazards = 0;
 
-        for (short iFilter = 0; iFilter < NUM_AUTO_FILTERS; iFilter++)
-            fAutoFilter[iFilter] = false;
-
-        if (iReadType == read_type_summary) {
-            fclose(mapfile);
-            return;
-        }
-
-        clearPlatforms();
-
-        cout << "loading map " << file;
-        cout << "[Version 1.5 Map Detected]\n";
-
-        //Reset position of read cursor
-        rewind(mapfile);
-
-        //clear map (we won't be reading in all the layers so it needs to be cleared)
-        clearMap();
-
-        //2. load map data
-        for (j = 0; j < MAPHEIGHT; j++) {
-            for (i = 0; i < MAPWIDTH; i++) {
-                //Read everything into layer 1
-                short iTileID = (short)ReadInt(mapfile);
-
-                TilesetTile * tile = &mapdata[i][j][1];
-                tile->iID = g_tilesetmanager->GetClassicTilesetIndex();
-                tile->iCol = iTileID % 32;
-                tile->iRow = iTileID / 32;
-
-                TileType iType = g_tilesetmanager->GetClassicTileset()->GetTileType(tile->iCol, tile->iRow);
-
-                if (iType >= 0 && iType < NUMTILETYPES) {
-                    mapdatatop[i][j].iType = iType;
-                    mapdatatop[i][j].iFlags = g_iTileTypeConversion[iType];
-                } else {
-                    mapdatatop[i][j].iType = tile_nonsolid;
-                    mapdatatop[i][j].iFlags = tile_flag_nonsolid;
-                }
-
-                mapdata[i][j][0].iID = TILESETNONE;
-                mapdata[i][j][2].iID = TILESETNONE;
-                mapdata[i][j][3].iID = TILESETNONE;
-            }
-        }
-
-        //3. load objects data
-        for (j = 0; j < MAPHEIGHT; j++) {
-            for (i = 0; i < MAPWIDTH; i++) {
-                objectdata[i][j].iType = (short)ReadInt(mapfile);
-                if (objectdata[i][j].iType == 6)
-                    objectdata[i][j].iType = -1;
-
-                objectdata[i][j].fHidden = false;
-
-                if (objectdata[i][j].iType == 1) {
-                    for (short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++)
-                        objectdata[i][j].iSettings[iSetting] = g_iDefaultPowerupPresets[0][iSetting];
-                }
-            }
-        }
-
-        backgroundID = (short)ReadInt(mapfile);
-        musicCategoryID = g_iMusicCategoryConversion[backgroundID];
-
-        strcpy(szBackgroundFile, g_szBackgroundConversion[backgroundID]);
-
-        //All 1.5 maps will use cloud eyecandy
-        eyecandy[2] = 1;
-
-        for (short iSwitch = 0; iSwitch < 4; iSwitch++)
-            iSwitches[iSwitch] = 0;
     }
 
     fclose(mapfile);

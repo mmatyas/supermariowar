@@ -68,7 +68,7 @@ void MapLoader1500::read_tiles(CMap& map, FILE* mapfile)
 
 void MapLoader1500::read_background(CMap& map, FILE* mapfile)
 {
-    //Read old background IDs and convert that to a background filename
+    // Read old background IDs and convert that to a background filename
     map.backgroundID = (short)ReadInt(mapfile);
     strcpy(map.szBackgroundFile, g_szBackgroundConversion[map.backgroundID]);
 }

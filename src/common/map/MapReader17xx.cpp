@@ -130,12 +130,6 @@ void MapLoader1700::read_switches(CMap& map, FILE* mapfile)
     }
 }
 
-void MapLoader1700::read_eyecandy(CMap& map, FILE* mapfile)
-{
-    //Read in eyecandy to use
-    map.eyecandy[2] = (short)ReadInt(mapfile);
-}
-
 void MapLoader1701::read_music_category(CMap& map, FILE* mapfile)
 {
     map.musicCategoryID = ReadInt(mapfile);
@@ -168,39 +162,6 @@ void MapLoader1700::read_warp_locations(CMap& map, FILE* mapfile)
 
         }
     }
-}
-
-void MapLoader1700::read_warp_exits(CMap& map, FILE* mapfile)
-{
-    map.maxConnection = 0;
-
-    map.numwarpexits = (short)ReadInt(mapfile);
-    for (unsigned short i = 0; i < map.numwarpexits && i < MAXWARPS; i++) {
-        map.warpexits[i].direction = (WarpExitDirection)ReadInt(mapfile);
-        map.warpexits[i].connection = (short)ReadInt(mapfile);
-        map.warpexits[i].id = (short)ReadInt(mapfile);
-        map.warpexits[i].x = (short)ReadInt(mapfile);
-        map.warpexits[i].y = (short)ReadInt(mapfile);
-
-        map.warpexits[i].lockx = (short)ReadInt(mapfile);
-        map.warpexits[i].locky = (short)ReadInt(mapfile);
-
-        map.warpexits[i].warpx = (short)ReadInt(mapfile);
-        map.warpexits[i].warpy = (short)ReadInt(mapfile);
-        map.warpexits[i].numblocks = (short)ReadInt(mapfile);
-
-        if (map.warpexits[i].connection > map.maxConnection)
-            map.maxConnection = map.warpexits[i].connection;
-    }
-
-    //Ignore any more warps than the max
-    for (unsigned short i = 0; i < map.numwarpexits - MAXWARPS; i++) {
-        for (unsigned short j = 0; j < 10; j++)
-            ReadInt(mapfile);
-    }
-
-    if (map.numwarpexits > MAXWARPS)
-        map.numwarpexits = MAXWARPS;
 }
 
 bool MapLoader1700::read_spawn_areas(CMap& map, FILE* mapfile)
@@ -240,29 +201,6 @@ bool MapLoader1700::read_spawn_areas(CMap& map, FILE* mapfile)
             map.spawnareas[iType][m].height = map.spawnareas[0][m].height;
             map.spawnareas[iType][m].size = map.spawnareas[0][m].size;
         }
-    }
-
-    return true;
-}
-
-bool MapLoader1700::read_draw_areas(CMap& map, FILE* mapfile)
-{
-    //Read draw areas (foreground tiles drawing optimization)
-    map.numdrawareas = (short)ReadInt(mapfile);
-
-    if (map.numdrawareas > MAXDRAWAREAS) {
-        cout << endl << " ERROR: Number of draw areas (" << map.numdrawareas
-             << ") was greater than max allowed (" << MAXDRAWAREAS << ')'
-             << endl;
-        return false;
-    }
-
-    //Load rects to help optimize drawing the foreground
-    for (int m = 0; m < map.numdrawareas; m++) {
-        map.drawareas[m].x = (Sint16)ReadInt(mapfile);
-        map.drawareas[m].y = (Sint16)ReadInt(mapfile);
-        map.drawareas[m].w = (Uint16)ReadInt(mapfile);
-        map.drawareas[m].h = (Uint16)ReadInt(mapfile);
     }
 
     return true;
