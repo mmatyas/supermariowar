@@ -1,6 +1,7 @@
 # Super Mario War
 
 - [About](#about)
+- [Get the code](#get-the-code)
 - [Building](#building-instructions)
 	- [Requirements](#requirements)
 	- [Linux](#linux)
@@ -39,18 +40,35 @@ The game uses artwork and sounds from Nintendo games. We hope that this noncomme
 - asm.js (experimental)
 
 
+## Get the code
+
+You can download the sources the usual way:
+
+`git clone https://github.com/mmatyas/supermariowar.git`
+
+This repository also contains some submodules which you can use in case they are not available for your OS/distro, are outdated or simply don't want to install them on your system. To use these libraries, you have to initialize them after cloning:
+
+`git submodule update --init`
+
+Alternatively, adding `--recursive` to `git clone` also does this for you:
+
+`git clone --recursive https://github.com/mmatyas/supermariowar.git`
+
+If you'd rather use the system libraries, please see the [Build configuration](#build-configuration) section for disabling this feature.
 
 ## Building instructions
 
 ### Requirements
 
+- C++11 suporting compiler
 - CMake
 - SDL (1.2 or 2.0), with
     - SDL_image
     - SDL_mixer
-- ENet (optional)
+- yaml-cpp (included)
+- ENet (optional, included)
 
-On Linux, this usually means the following packages: `cmake libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libenet-dev`.
+On Linux, this usually means the following packages: `cmake libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev`, and optionally `libenet-dev libyaml-cpp-dev`.
 
 For other systems, you can download the development files manually from:
 
@@ -58,7 +76,6 @@ For other systems, you can download the development files manually from:
 - http://www.libsdl.org/download-1.2.php
 - http://www.libsdl.org/projects/SDL_image/release-1.2.html
 - http://www.libsdl.org/projects/SDL_mixer/release-1.2.html
-- http://enet.bespin.org/Downloads.html
 
 ### Linux
 
@@ -158,6 +175,8 @@ $ emcc Binaries/Release/smw-leveledit.bc -o leveledit.html $BUILDPARAMS
 $ emcc Binaries/Release/smw-worldedit.bc -o worldedit.html $BUILDPARAMS
 ```
 ### Build configuration
+
+*TODO: expand this section*
 
 You can change the build configuration by setting various CMake flags. The simplest way to do this is by running `cmake-gui ..` from the `Build` directory. You can read a short description of an element by hovering the mouse on its name too.
 
