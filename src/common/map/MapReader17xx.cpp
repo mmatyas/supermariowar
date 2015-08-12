@@ -7,18 +7,12 @@
 #include <iostream>
 
 extern CTilesetManager* g_tilesetmanager;
-extern const char * g_szBackgroundConversion[26];
+extern const char* g_szBackgroundConversion[26];
+extern short g_iMusicCategoryConversion[26];
 extern short g_iTileTypeConversion[NUMTILETYPES];
 extern short g_iDefaultPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
-extern short g_iMusicCategoryConversion[26];
 
 using namespace std;
-
-void MapLoader1700::read_autofilters(CMap& map, FILE* mapfile)
-{
-    for (short iFilter = 0; iFilter < NUM_AUTO_FILTERS; iFilter++)
-        map.fAutoFilter[iFilter] = false;
-}
 
 void MapLoader1702::read_autofilters(CMap& map, FILE* mapfile)
 {
@@ -35,11 +29,11 @@ void MapLoader1702::read_autofilters(CMap& map, FILE* mapfile)
     //int iDensity = iAutoFilterValues[8];
 }
 
-void MapLoader1700::read_mapdata(CMap& map, FILE* mapfile)
+void MapLoader1700::read_tiles(CMap& map, FILE* mapfile)
 {
     short iClassicTilesetID = g_tilesetmanager->GetIndexFromName("Classic");
 
-    short i, j, k;
+    unsigned short i, j, k;
     for (j = 0; j < MAPHEIGHT; j++) {
         for (i = 0; i < MAPWIDTH; i++) {
             for (k = 0; k < MAPLAYERS; k++) {
@@ -70,13 +64,6 @@ void MapLoader1700::read_mapdata(CMap& map, FILE* mapfile)
             }
         }
     }
-}
-
-void MapLoader1700::read_background(CMap& map, FILE* mapfile)
-{
-    //Read old background IDs and convert that to a background filename
-    map.backgroundID = (short)ReadInt(mapfile);
-    strcpy(map.szBackgroundFile, g_szBackgroundConversion[map.backgroundID]);
 }
 
 void MapLoader1701::read_background(CMap& map, FILE* mapfile)
@@ -147,11 +134,6 @@ void MapLoader1700::read_eyecandy(CMap& map, FILE* mapfile)
 {
     //Read in eyecandy to use
     map.eyecandy[2] = (short)ReadInt(mapfile);
-}
-
-void MapLoader1700::read_music_category(CMap& map, FILE* mapfile)
-{
-    map.musicCategoryID = g_iMusicCategoryConversion[map.backgroundID];
 }
 
 void MapLoader1701::read_music_category(CMap& map, FILE* mapfile)
@@ -288,18 +270,14 @@ bool MapLoader1700::read_draw_areas(CMap& map, FILE* mapfile)
 
 bool MapLoader1700::load(CMap& map, FILE* mapfile, ReadType readtype)
 {
-    map.iNumMapItems = 0;
-    map.iNumMapHazards = 0;
-
     read_autofilters(map, mapfile);
 
-    if (readtype == read_type_summary) {
-        fclose(mapfile);
+    if (readtype == read_type_summary)
         return true;
-    }
 
     map.clearPlatforms();
 
+    // FIXME
     /*cout << "loading map " << filename;
 
     if (readtype == read_type_preview)
@@ -308,7 +286,7 @@ bool MapLoader1700::load(CMap& map, FILE* mapfile, ReadType readtype)
     cout << " [Version " << version[0] << '.' << version[1] << '.'
          << version[2] << '.' << version[3] << " Map Detected]\n";*/
 
-    read_mapdata(map, mapfile);
+    read_tiles(map, mapfile);
     read_background(map, mapfile);
 
 
@@ -326,10 +304,8 @@ bool MapLoader1700::load(CMap& map, FILE* mapfile, ReadType readtype)
     read_music_category(map, mapfile);
     read_warp_locations(map, mapfile);
 
-    if (readtype == read_type_preview) {
-        fclose(mapfile);
+    if (readtype == read_type_preview)
         return true;
-    }
 
     read_warp_exits(map, mapfile);
     read_spawn_areas(map, mapfile);

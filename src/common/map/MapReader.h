@@ -14,19 +14,31 @@ public:
     virtual bool load(CMap&, FILE* /*, const char**/, ReadType) = 0;
 };
 
-class MapLoader1700 : public MapLoader {
+class MapLoader1500 : public MapLoader {
 public:
-    MapLoader1700() : MapLoader() {}
-    virtual ~MapLoader1700() {}
+    MapLoader1500() : MapLoader() {}
+    virtual ~MapLoader1500() {}
     virtual bool load(CMap&, FILE* /*, const char**/, ReadType);
 
 protected:
     virtual void read_autofilters(CMap& map, FILE* mapfile); // compat: autofilters disabled
-    virtual void read_mapdata(CMap&, FILE*); // one-tileset mapdata
+    virtual void read_tiles(CMap&, FILE*); // one-tileset mapdata, separately stored objects
     virtual void read_background(CMap&, FILE*); // background by ID
+    virtual void read_music_category(CMap&, FILE*); // compat: music guessed by background
+};
+
+
+
+class MapLoader1700 : public MapLoader1600 {
+public:
+    MapLoader1700() : MapLoader1600() {}
+    virtual ~MapLoader1700() {}
+    virtual bool load(CMap&, FILE* /*, const char**/, ReadType);
+
+protected:
+    virtual void read_tiles(CMap&, FILE*); // one-tileset mapdata
     virtual void set_preview_switches(CMap&, FILE*); // compat: switches disabled
     virtual void read_eyecandy(CMap&, FILE*); // simple eyecandy support
-    virtual void read_music_category(CMap&, FILE*); // compat: music guessed by background
     virtual void read_warp_locations(CMap&, FILE*);
     virtual void read_warp_exits(CMap&, FILE*);
     virtual bool read_spawn_areas(CMap&, FILE*);
@@ -63,7 +75,7 @@ public:
 protected:
     virtual void read_autofilters(CMap& map, FILE* mapfile); // 13 autofilters
     virtual void read_tileset(FILE*); // custom tileset support
-    virtual void read_mapdata(CMap&, FILE*); // multi-tileset mapdata
+    virtual void read_tiles(CMap&, FILE*); // multi-tileset mapdata
     virtual void read_switches(CMap&, FILE*); // switches stored as-is
     virtual void read_items(CMap&, FILE*); // map item support
     virtual void read_hazards(CMap&, FILE*); // map hazard support

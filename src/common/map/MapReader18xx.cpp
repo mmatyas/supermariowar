@@ -61,11 +61,11 @@ void MapLoader1800::read_tileset(FILE* mapfile)
     delete [] translation;
 }
 
-void MapLoader1800::read_mapdata(CMap& map, FILE* mapfile)
+void MapLoader1800::read_tiles(CMap& map, FILE* mapfile)
 {
     //2. load map data
 
-    short i, j, k;
+    unsigned short i, j, k;
     for (j = 0; j < MAPHEIGHT; j++) {
         for (i = 0; i < MAPWIDTH; i++) {
             for (k = 0; k < MAPLAYERS; k++) {
@@ -251,10 +251,8 @@ bool MapLoader1800::load(CMap& map, FILE* mapfile/*, const char* filename*/, Rea
 {
     read_autofilters(map, mapfile);
 
-    if (readtype == read_type_summary) {
-        fclose(mapfile);
+    if (readtype == read_type_summary)
         return true;
-    }
 
     map.clearPlatforms();
 
@@ -269,7 +267,7 @@ bool MapLoader1800::load(CMap& map, FILE* mapfile/*, const char* filename*/, Rea
 
     read_tileset(mapfile);
 
-    read_mapdata(map, mapfile);
+    read_tiles(map, mapfile);
     read_background(map, mapfile);
     read_switches(map, mapfile);
 
@@ -288,10 +286,8 @@ bool MapLoader1800::load(CMap& map, FILE* mapfile/*, const char* filename*/, Rea
     read_warp_locations(map, mapfile);
     read_switchable_blocks(map, mapfile);
 
-    if (readtype == read_type_preview) {
-        fclose(mapfile);
+    if (readtype == read_type_preview)
         return true;
-    }
 
     read_warp_exits(map, mapfile);
     if (!read_spawn_areas(map, mapfile))
