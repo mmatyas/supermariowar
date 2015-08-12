@@ -12,6 +12,8 @@ public:
     virtual ~MapLoader() {}
 
     virtual bool load(CMap&, FILE* /*, const char**/, ReadType) = 0;
+
+    MapLoader* getLoaderByVersion(int (&mapversion)[4]);
 };
 
 class MapLoader1500 : public MapLoader {
@@ -64,7 +66,7 @@ public:
 
 };
 
-class MapLoader1700 : public MapLoader1600 {
+class MapLoader1700 : public MapLoader1600 /* ignore 1.6 patches */ {
 public:
     MapLoader1700() : MapLoader1600() {}
     virtual ~MapLoader1700() {}
