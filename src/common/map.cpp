@@ -591,30 +591,24 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
 
     ReadIntChunk(version, 4, mapfile);
 
-    if (VersionIsEqualOrAfter(version, 1, 8, 0, 0)) {
-        //Read summary information here
-
-
-    } else if (VersionIsEqualOrAfter(version, 1, 7, 0, 0)) {
-
-
-
-    } else if (VersionIsEqualOrAfter(version, 1, 6, 0, 0)) {
-
-
-
+    if (iReadType != read_type_summary) {
         cout << "loading map " << file;
 
-        cout << "[Version " << version[0] << '.' << version[1] << '.'
-             << version[2] << '.' << version[3] << " Map Detected]\n";
+        if (iReadType == read_type_preview)
+            cout << " (preview)";
 
-
-
-
-
-    } else { //If the version is unrecognized (1.5 maps didn't have version numbers)
-
+        if (VersionIsEqualOrAfter(version, 1, 6, 0, 0)) {
+            cout << " [v" << version[0] << '.' << version[1] << '.'
+                 << version[2] << '.' << version[3] << "]";
+        }
+        else
+            cout << " [v1.5]";
     }
+
+    MapReader* reader = MapReader::getLoaderByVersion(version);
+    reader->load(*this, mapfile, iReadType);
+    delete reader;
+    reader = NULL;
 
     fclose(mapfile);
     clearWarpLocks();

@@ -15,6 +15,11 @@ add_library ( CommonFiles
     input.cpp
     linfunc.cpp
     map.cpp
+    map/MapReader.cpp
+    map/MapReader15xx.cpp
+    map/MapReader16xx.cpp
+    map/MapReader17xx.cpp
+    map/MapReader18xx.cpp
     MapList.cpp
     ObjectBase.cpp
     path.cpp
