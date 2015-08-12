@@ -11,16 +11,16 @@ public:
     MapReader() {}
     virtual ~MapReader() {}
 
-    virtual bool load(CMap&, FILE* /*, const char**/, ReadType) = 0;
+    virtual bool load(CMap&, FILE*, ReadType) = 0;
 
-    MapReader* getLoaderByVersion(int (&mapversion)[4]);
+    static MapReader* getLoaderByVersion(int (&mapversion)[4]);
 };
 
 class MapReader1500 : public MapReader {
 public:
     MapReader1500() : MapReader() {}
     virtual ~MapReader1500() {}
-    virtual bool load(CMap&, FILE* /*, const char**/, ReadType);
+    virtual bool load(CMap&, FILE*, ReadType);
 
 protected:
     virtual void read_autofilters(CMap&, FILE*); // compat: autofilters disabled
@@ -33,7 +33,7 @@ class MapReader1600 : public MapReader1500 {
 public:
     MapReader1600();
     virtual ~MapReader1600() {}
-    virtual bool load(CMap&, FILE* /*, const char**/, ReadType);
+    virtual bool load(CMap&, FILE*, ReadType);
 
 protected:
     virtual void read_tiles(CMap&, FILE*); // tiles also contain block and warp data
@@ -54,23 +54,20 @@ class MapReader160A : public MapReader1600 {
 public:
     MapReader160A();
     virtual ~MapReader160A() {}
-    virtual bool load(CMap&, FILE* /*, const char**/, ReadType);
-
 };
 
 class MapReader1610 : public MapReader160A {
 public:
     MapReader1610();
     virtual ~MapReader1610() {}
-    virtual bool load(CMap&, FILE* /*, const char**/, ReadType);
-
+    virtual bool load(CMap&, FILE*, ReadType);
 };
 
 class MapReader1700 : public MapReader1600 /* ignore 1.6 patches */ {
 public:
-    MapReader1700() : MapReader1600() {}
+    MapReader1700();
     virtual ~MapReader1700() {}
-    virtual bool load(CMap&, FILE* /*, const char**/, ReadType);
+    virtual bool load(CMap&, FILE*, ReadType);
 
 protected:
     virtual void read_tiles(CMap&, FILE*); // one-tileset mapdata
@@ -82,7 +79,7 @@ protected:
 
 class MapReader1701 : public MapReader1700 {
 public:
-    MapReader1701() : MapReader1700() {}
+    MapReader1701();
     virtual ~MapReader1701() {}
 
 protected:
@@ -92,7 +89,7 @@ protected:
 
 class MapReader1702 : public MapReader1701 {
 public:
-    MapReader1702() : MapReader1701() {}
+    MapReader1702();
     virtual ~MapReader1702() {}
 
 protected:
@@ -102,9 +99,9 @@ protected:
 
 class MapReader1800 : public MapReader1702 {
 public:
-    MapReader1800() : MapReader1702() {}
+    MapReader1800();
     virtual ~MapReader1800() {}
-    virtual bool load(CMap&, FILE* /*, const char**/, ReadType);
+    virtual bool load(CMap&, FILE*, ReadType);
 
 protected:
     virtual void read_autofilters(CMap& map, FILE* mapfile); // 13 autofilters
@@ -128,7 +125,7 @@ private:
 
 class MapReader1802 : public MapReader1800 {
 public:
-    MapReader1802() : MapReader1800() {}
+    MapReader1802();
     virtual ~MapReader1802() {}
 
 protected:
