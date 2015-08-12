@@ -75,6 +75,8 @@ protected:
     virtual void read_warp_locations(CMap&, FILE*);
     virtual void read_switches(CMap&, FILE*); // switches stored inverted
     virtual bool read_spawn_areas(CMap&, FILE*);
+
+    unsigned char patch_version;
 };
 
 class MapReader1701 : public MapReader1700 {
@@ -123,7 +125,13 @@ private:
     short* tilesetheights;
 };
 
-class MapReader1802 : public MapReader1800 {
+class MapReader1801 : public MapReader1800 {
+public:
+    MapReader1801();
+    virtual ~MapReader1801() {}
+};
+
+class MapReader1802 : public MapReader1801 {
 public:
     MapReader1802();
     virtual ~MapReader1802() {}

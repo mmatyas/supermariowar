@@ -14,6 +14,24 @@ extern short g_iDefaultPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
 
 using namespace std;
 
+MapReader1700::MapReader1700()
+    : MapReader1600()
+{
+    patch_version = 0;
+}
+
+MapReader1701::MapReader1701()
+    : MapReader1700()
+{
+    patch_version = 1;
+}
+
+MapReader1702::MapReader1702()
+    : MapReader1701()
+{
+    patch_version = 2;
+}
+
 void MapReader1702::read_autofilters(CMap& map, FILE* mapfile)
 {
     int iAutoFilterValues[9];
@@ -215,27 +233,20 @@ bool MapReader1700::load(CMap& map, FILE* mapfile, ReadType readtype)
 
     map.clearPlatforms();
 
-    // FIXME
-    /*cout << "loading map " << filename;
-
-    if (readtype == read_type_preview)
-        cout << " (preview)";
-
-    cout << " [Version " << version[0] << '.' << version[1] << '.'
-         << version[2] << '.' << version[3] << " Map Detected]\n";*/
-
     read_tiles(map, mapfile);
     read_background(map, mapfile);
 
+    // TODO: refactor CMap::loadPlatform to not need this
+    int mapversion[4] = {1, 7, 0, patch_version};
 
-    if (VersionIsEqualOrAfter(version, 1, 7, 0, 1))
+    if (patch_version >= 1)
         read_switches(map, mapfile);
     else if (readtype != read_type_preview)
         set_preview_switches(map, mapfile);
 
-    if (VersionIsEqualOrAfter(version, 1, 7, 0, 2)) {
+    if (patch_version >= 2) {
         //short translationid[1] = {g_tilesetmanager->GetIndexFromName("Classic")};
-        map.loadPlatforms(mapfile, readtype == read_type_preview, version);
+        map.loadPlatforms(mapfile, readtype == read_type_preview, mapversion);
     }
 
     read_eyecandy(map, mapfile);
@@ -250,12 +261,12 @@ bool MapReader1700::load(CMap& map, FILE* mapfile, ReadType readtype)
     if (!read_draw_areas(map, mapfile))
         return false;
 
-    if (VersionIsEqualOrBefore(version, 1, 7, 0, 1)) {
+    if (patch_version <= 1) {
         //short translationid[1] = {g_tilesetmanager->GetIndexFromName("Classic")};
-        map.loadPlatforms(mapfile, readtype == read_type_preview, version);
+        map.loadPlatforms(mapfile, readtype == read_type_preview, mapversion);
     }
 
-    if (VersionIsEqual(version, 1, 7, 0, 0))
+    if (patch_version == 0)
         read_switches(map, mapfile);
 
     return true;

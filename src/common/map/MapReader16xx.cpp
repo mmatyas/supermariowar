@@ -17,6 +17,18 @@ MapReader1600::MapReader1600()
     , fix_spawnareas(false)
 { }
 
+MapReader160A::MapReader160A()
+    : MapReader1600()
+{
+    fix_spawnareas = true;
+}
+
+MapReader1610::MapReader1610()
+    : MapReader160A()
+{
+    parse_nospawn = true;
+}
+
 void MapReader1600::read_tiles(CMap& map, FILE* mapfile)
 {
     for (unsigned short j = 0; j < MAPHEIGHT; j++) {
@@ -40,7 +52,7 @@ void MapReader1600::read_tiles(CMap& map, FILE* mapfile)
             map.mapdatatop[i][j].iType = tile_nonsolid;
             map.mapdatatop[i][j].iFlags = tile_flag_nonsolid;
 
-            for (unsigned short k = MAPLAYERS - 1; k >= 0; k--) {
+            for (short k = MAPLAYERS - 1; k >= 0; k--) {
                 TilesetTile * tile = &map.mapdata[i][j][k];
                 TileType type = g_tilesetmanager->GetClassicTileset()->GetTileType(tile->iCol, tile->iRow);
                 if (type != tile_nonsolid) {
@@ -217,18 +229,8 @@ bool MapReader1600::load(CMap& map, FILE* mapfile, ReadType readtype)
     return true;
 }
 
-bool MapReader160A::load(CMap& map, FILE* mapfile, ReadType readtype)
-{
-    fix_spawnareas = true;
-
-    return MapReader1600::load(map, mapfile, readtype);
-}
-
-
 bool MapReader1610::load(CMap& map, FILE* mapfile, ReadType readtype)
 {
-    parse_nospawn = true;
-
     if (!MapReader160A::load(map, mapfile, readtype))
         return false;
 

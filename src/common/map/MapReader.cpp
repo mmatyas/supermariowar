@@ -9,6 +9,9 @@ MapReader* MapReader::getLoaderByVersion(int (&mapversion)[4])
     if (VersionIsEqualOrAfter(mapversion, 1, 8, 0, 2))
         return new MapReader1802();
 
+    if (VersionIsEqualOrAfter(mapversion, 1, 8, 0, 1))
+        return new MapReader1801();
+
     if (VersionIsEqualOrAfter(mapversion, 1, 8, 0, 0))
         return new MapReader1800();
 

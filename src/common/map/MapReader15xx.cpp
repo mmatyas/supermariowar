@@ -87,8 +87,6 @@ bool MapReader1500::load(CMap& map, FILE* mapfile, ReadType readtype)
 
     map.clearPlatforms();
 
-    std::cout << "loading map " << filename << " [Version 1.5 Map Detected]" << std::endl;
-
     //Reset position of read cursor
     rewind(mapfile);
 
@@ -104,4 +102,6 @@ bool MapReader1500::load(CMap& map, FILE* mapfile, ReadType readtype)
 
     for (short iSwitch = 0; iSwitch < 4; iSwitch++)
         map.iSwitches[iSwitch] = 0;
+
+    return true;
 }

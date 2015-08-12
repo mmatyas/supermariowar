@@ -12,6 +12,24 @@ extern short g_iTileTypeConversion[NUMTILETYPES];
 
 using namespace std;
 
+MapReader1800::MapReader1800()
+    : MapReader1702()
+{
+    patch_version = 0;
+}
+
+MapReader1801::MapReader1801()
+    : MapReader1800()
+{
+    patch_version = 1;
+}
+
+MapReader1802::MapReader1802()
+    : MapReader1801()
+{
+    patch_version = 2;
+}
+
 void MapReader1800::read_autofilters(CMap& map, FILE* mapfile)
 {
     // TODO: handle read fail
@@ -271,7 +289,9 @@ bool MapReader1800::load(CMap& map, FILE* mapfile/*, const char* filename*/, Rea
     read_background(map, mapfile);
     read_switches(map, mapfile);
 
-    map.loadPlatforms(mapfile, readtype == read_type_preview, version, translationid,
+    // TODO: refactor CMap::loadPlatform to not need this
+    int mapversion[4] = {1, 8, 0, patch_version};
+    map.loadPlatforms(mapfile, readtype == read_type_preview, mapversion, translationid,
         tilesetwidths, tilesetheights, iMaxTilesetID);
 
     //All tiles have been loaded so the translation is no longer needed
