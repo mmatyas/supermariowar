@@ -46,11 +46,11 @@ You can download the sources the usual way:
 
 `git clone https://github.com/mmatyas/supermariowar.git`
 
-This repository also contains some submodules which you can use in case they are not available for your OS/distro, are outdated or simply don't want to install them on your system. To use these libraries, you have to initialize them after cloning:
+This repository also contains some submodules which you can use in case the libraries are not available for your OS/distro, are outdated or simply don't want to install them on your system. To use the included modules, you have to initialize them first after cloning:
 
 `git submodule update --init`
 
-Alternatively, adding `--recursive` to `git clone` also does this for you:
+Alternatively, adding `--recursive` to `git clone` also does this for you automatically:
 
 `git clone --recursive https://github.com/mmatyas/supermariowar.git`
 
@@ -66,9 +66,10 @@ If you'd rather use the system libraries, please see the [Build configuration](#
     - SDL_image
     - SDL_mixer
 - yaml-cpp (included)
+- lz4 (>= r129, included)
 - ENet (optional, included)
 
-On Linux, this usually means the following packages: `cmake libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev`, and optionally `libenet-dev libyaml-cpp-dev`.
+On Linux, this usually means the following packages: `cmake libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev`, and optionally `libenet-dev libyaml-cpp-dev libz4-dev`.
 
 For other systems, you can download the development files manually from:
 
