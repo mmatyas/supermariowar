@@ -155,7 +155,7 @@ if (BUILD_STATIC_LIBS)
 	add_subdirectory(dependencies/lz4/cmake_unofficial)
 else()
 	find_package(yaml-cpp REQUIRED)
-	find_package(lz4 REQUIRED)
+	find_package(liblz4 REQUIRED)
 endif()
 
 #-----------------------------------------------------------------------------

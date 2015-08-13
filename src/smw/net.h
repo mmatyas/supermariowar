@@ -112,13 +112,15 @@ class NetGameHost : public NetworkEventHandler
         NetPeer* clients[3];
         NetPeer* foreign_lobbyserver;
 
+        // TODO: This class should be replaced eventually
         struct RawPlayerAddress {
             uint32_t host;
             uint16_t port;
+            bool map_ok;
             bool sync_ok;
 
             RawPlayerAddress() { reset(); }
-            void reset() { host = 0; port = 0; sync_ok = false; }
+            void reset() { host = 0; port = 0; map_ok = false; sync_ok = false; }
 
             bool operator==(const RawPlayerAddress& other) const {
                 if (host == other.host && port == other.port)
@@ -137,6 +139,9 @@ class NetGameHost : public NetworkEventHandler
 
         // P2.5. Pre-game
         void sendStartGameMessage();
+        void sendMapSyncMessages();
+        void handleMapOKMessage(const NetPeer&, const uint8_t*, size_t);
+        void sendSyncMessages();
         void handleSyncOKMessage(const NetPeer&, const uint8_t*, size_t);
         void setExpectedPlayers(uint8_t count, uint32_t* hosts, uint16_t* ports);
 
@@ -220,6 +225,7 @@ class NetClient : public NetworkEventHandler
         // P2.5. Pre-game
         void handleRoomStartMessage(const uint8_t*, size_t);
         void handleExpectedClientsMessage(const uint8_t*, size_t);
+        void handleMapSyncMessage(const uint8_t*, size_t);
         void handleStartSyncMessage(const uint8_t*, size_t);
         void handleGameStartMessage();
 
@@ -285,6 +291,7 @@ struct Networking {
     char newroom_name[NET_MAX_ROOM_NAME_LENGTH];
     char newroom_password[NET_MAX_ROOM_PASSWORD_LENGTH];
     char mychatmessage[NET_MAX_CHAT_MSG_LENGTH];
+    std::string mapfilepath;
 
     // In-game
     bool theHostIsMe;

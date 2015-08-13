@@ -4,6 +4,7 @@ set(SMW_SRCS ai.cpp gamemodes.cpp GSMenu.cpp
            net.cpp FPSLimiter.cpp GSSplashScreen.cpp
            GSGameplay.cpp ObjectContainer.cpp main.cpp
            network/NetConfigManager.cpp
+           network/FileCompressor.cpp
 )
 
 #
@@ -106,7 +107,7 @@ endif()
 # emscripten uses its own SDL
 if(NOT TARGET_EMSCRIPTEN)
 	target_link_libraries(smw ${CMAKE_THREAD_LIBS_INIT})
-	target_link_libraries(smw yaml-cpp)
+	target_link_libraries(smw yaml-cpp liblz4)
 
 	if(USE_SDL2_LIBS)
 		target_link_libraries(smw SDL2 SDL2_mixer SDL2_image SDL2main)

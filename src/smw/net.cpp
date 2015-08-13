@@ -3,9 +3,11 @@
 #include "GlobalConstants.h"
 #include "GameValues.h"
 #include "GSMenu.h"
-#include "RandomNumberGenerator.h"
+#include "path.h"
 #include "player.h"
+#include "RandomNumberGenerator.h"
 
+#include "network/FileCompressor.h"
 #include "network/ProtocolPackages.h"
 #include "network/NetConfigManager.h"
 
@@ -27,10 +29,8 @@ NetworkHandler networkHandler;
 Networking netplay;
 
 extern CGameValues game_values;
-extern int g_iVersion[];
 extern CPlayer* list_players[4];
 extern short list_players_cnt;
-extern bool VersionIsEqual(int iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
 
 short backup_playercontrol[4];
 
@@ -437,6 +437,33 @@ void NetClient::handleExpectedClientsMessage(const uint8_t* data, size_t dataLen
     local_gamehost.setExpectedPlayers(playerCount, hosts, ports);
 }
 
+void NetClient::handleMapSyncMessage(const uint8_t* data, size_t dataLength)
+{
+    // read
+    Net_MessageHeader pkg(0);
+    memcpy(&pkg, data, sizeof(Net_MessageHeader));
+
+    // FIXME: a reminder, make sure to check package sizes
+
+    uint16_t full_size, compressed_size;
+    memcpy(&full_size, data + sizeof(Net_MessageHeader), 2);
+    memcpy(&compressed_size, data + sizeof(Net_MessageHeader) + 2, 2);
+
+    printf("[net] Map arrived (C:%d unC:%d)\n", compressed_size, full_size);
+
+    netplay.mapfilepath = GetHomeDirectory() + "net_last.map";
+    if (!FileCompressor::decompress(data + sizeof(Net_MessageHeader), netplay.mapfilepath))
+        return;
+
+    // respond
+    if (netplay.theHostIsMe)
+        setAsLastSentMessage(NET_P2G_MAP_OK);
+    else {
+        Net_MapSyncOKPackage respond_pkg;
+        sendMessageToGameHostReliable(&respond_pkg, sizeof(Net_MapSyncOKPackage));
+    }
+}
+
 void NetClient::handleStartSyncMessage(const uint8_t* data, size_t dataLength)
 {
     // read
@@ -812,6 +839,10 @@ void NetClient::onReceive(NetPeer& client, const uint8_t* data, size_t dataLengt
             handleExpectedClientsMessage(data, dataLength);
             break;
 
+        case NET_G2P_MAP:
+            handleMapSyncMessage(data, dataLength);
+            break;
+
         case NET_G2P_SYNC:
             handleStartSyncMessage(data, dataLength);
             break;
@@ -1074,16 +1105,8 @@ void NetGameHost::onConnect(NetPeer* new_player)
 
     // When all players connected,
     // sychronize them (eg. same RNG seed)
-    if (next_free_client_slot == expected_client_count)
-    {
-        // send syncronization package
-        RandomNumberGenerator::generator().reseed(time(0));
-        Net_StartSyncPackage pkg(RANDOM_INT(32767 /* RAND_MAX */));
-        sendMessageToMyPeers(&pkg, sizeof(pkg));
-
-        // apply syncronization package on local client
-        netplay.client.handleStartSyncMessage((uint8_t*)&pkg, sizeof(pkg));
-        netplay.client.setAsLastReceivedMessage(pkg.packageType);
+    if (next_free_client_slot == expected_client_count) {
+        sendMapSyncMessages();
     }
 }
 
@@ -1105,6 +1128,10 @@ void NetGameHost::onReceive(NetPeer& player, const uint8_t* data, size_t dataLen
 
     switch (packageType)
     {
+        case NET_P2G_MAP_OK:
+            handleMapOKMessage(player, data, dataLength);
+            break;
+
         case NET_P2G_SYNC_OK:
             handleSyncOKMessage(player, data, dataLength);
             break;
@@ -1135,16 +1162,64 @@ void NetGameHost::sendStartRoomMessage()
     setAsLastSentMessage(pkg.packageType);
 }
 
-void NetGameHost::sendStartGameMessage()
+void NetGameHost::sendMapSyncMessages()
 {
-    assert(foreign_lobbyserver);
+    assert(clients[0] || clients[1] || clients[2]);
+    printf("[net] Sending map: %s\n", netplay.mapfilepath.c_str());
+    assert(netplay.mapfilepath.length() > 4);
+
+    uint8_t* data_buffer = NULL;
+    size_t data_size = 0;
+
+    // NOTE: This is just an alert Make sure you didn't broke something by changing the package headers!
+    // You can safely update this line then.
+    static_assert(sizeof(Net_MessageHeader) == 3, "The size of Net_MessageHeader should be 3");
+
+    if (!FileCompressor::compress(netplay.mapfilepath, data_buffer, data_size, sizeof(Net_MessageHeader)))
+        return;
+
+    assert(data_buffer);
+    assert(data_size > 0);
+
+    Net_MessageHeader header(NET_G2P_MAP);
+    memcpy(data_buffer, &header, sizeof(Net_MessageHeader));
+
+    sendMessageToMyPeers(data_buffer, data_size + sizeof(Net_MessageHeader) + 4);
+}
+
+void NetGameHost::handleMapOKMessage(const NetPeer& player, const uint8_t* data, size_t dataLength)
+{
+    assert(player == *clients[0] || player == *clients[1] || player == *clients[2]);
+
+    uint8_t readyPlayerCount = 0;
+    for (unsigned short c = 0; c < expected_client_count; c++)
+    {
+        if (player == *clients[c]) {
+            expected_clients[0].map_ok = true;
+            printf("  Client %d/%d received the map.\n", c + 1, expected_client_count);
+        }
+
+        if (expected_clients[c].map_ok)
+            readyPlayerCount++;
+    }
+
+    if (readyPlayerCount == expected_client_count) {
+        printf("[net] Prepare launching the game...\n");
+        sendSyncMessages();
+    }
+}
+
+void NetGameHost::sendSyncMessages()
+{
     assert(clients[0] || clients[1] || clients[2]);
 
-    Net_StartGamePackage pkg;
-    foreign_lobbyserver->sendReliable(&pkg, sizeof(Net_StartGamePackage));
-    sendMessageToMyPeers(&pkg, sizeof(Net_StartGamePackage));
+    // send syncronization package
+    RandomNumberGenerator::generator().reseed(time(0));
+    Net_StartSyncPackage pkg(RANDOM_INT(32767 /* RAND_MAX */));
+    sendMessageToMyPeers(&pkg, sizeof(pkg));
 
-    netplay.client.handleGameStartMessage();
+    // apply syncronization package on local client
+    netplay.client.handleStartSyncMessage((uint8_t*)&pkg, sizeof(pkg));
     netplay.client.setAsLastReceivedMessage(pkg.packageType);
 }
 
@@ -1157,7 +1232,7 @@ void NetGameHost::handleSyncOKMessage(const NetPeer& player, const uint8_t* data
     {
         if (player == *clients[c]) {
             expected_clients[0].sync_ok = true;
-            printf("Client %d OK.\n", c);
+            printf("Client %d/%d ready.\n", c + 1, expected_client_count);
         }
 
         if (expected_clients[c].sync_ok)
@@ -1184,6 +1259,19 @@ void NetGameHost::setExpectedPlayers(uint8_t count, uint32_t* hosts, uint16_t* p
     }
 
     printf("Game starts soon, waiting for %d players.\n", expected_client_count);
+}
+
+void NetGameHost::sendStartGameMessage()
+{
+    assert(foreign_lobbyserver);
+    assert(clients[0] || clients[1] || clients[2]);
+
+    Net_StartGamePackage pkg;
+    foreign_lobbyserver->sendReliable(&pkg, sizeof(Net_StartGamePackage));
+    sendMessageToMyPeers(&pkg, sizeof(Net_StartGamePackage));
+
+    netplay.client.handleGameStartMessage();
+    netplay.client.setAsLastReceivedMessage(pkg.packageType);
 }
 
 void NetGameHost::sendCurrentGameState()

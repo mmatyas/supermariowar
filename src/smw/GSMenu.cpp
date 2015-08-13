@@ -14,6 +14,7 @@
 
 #include <cmath>
 #include <cstdlib> // atoi()
+#include <cassert>
 
 #ifdef _XBOX
 #include <xtl.h>
@@ -1004,7 +1005,12 @@ void MenuState::update()
             for (short iPlayer = 0; iPlayer < 4; iPlayer++)
                 game_values.storedpowerups[iPlayer] = -1;
         } else if (MENU_CODE_MAP_CHANGED == code) {
-            if (game_values.matchtype != MATCH_TYPE_TOUR)
+            if (mCurrentMenu == mNetNewLevelMenu) {
+                assert(netplay.active);
+                netplay.mapfilepath = mNetNewLevelMenu->getCurrentMapPath();
+                printf("%s\n", netplay.mapfilepath.c_str());
+            }
+            else if (game_values.matchtype != MATCH_TYPE_TOUR)
                 szCurrentMapName = mGameSettingsMenu->miMapField->GetMapName();
         } else if (MENU_CODE_MAP_FILTER_EXIT == code) {
             maplist->ApplyFilters(game_values.pfFilters);
@@ -1295,6 +1301,14 @@ void MenuState::update()
                     sShortMapName = stripPathAndExtension(szMapName);
 
                     printf("  State: GS_START_GAME, Match type: MATCH_TYPE_QUICK_GAME\n");
+                } else if (netplay.active) {
+                    // NOTE: for the host, netplay.mapfilepath will be ./data/something
+                    // while for the other players, it's ~/.smw/net_last.map
+                    g_map->loadMap(netplay.mapfilepath, read_type_full);
+                    // TODO: this is used for setting background music, but
+                    // since the filename is always the same, this will fall
+                    // back to a random music in the loaded music category
+                    sShortMapName = stripPathAndExtension(netplay.mapfilepath);
                 } else {
                     g_map->loadMap(maplist->currentFilename(), read_type_full);
                     sShortMapName = maplist->currentShortmapname();

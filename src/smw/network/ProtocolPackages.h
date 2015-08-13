@@ -189,6 +189,10 @@ struct Net_StartSyncPackage : Net_MessageHeader {
     { }
 };
 
+struct Net_MapSyncOKPackage : Net_MessageHeader {
+    Net_MapSyncOKPackage() : Net_MessageHeader(NET_P2G_MAP_OK) {}
+};
+
 struct Net_SyncOKPackage : Net_MessageHeader {
     Net_SyncOKPackage() : Net_MessageHeader(NET_P2G_SYNC_OK) {}
 };
