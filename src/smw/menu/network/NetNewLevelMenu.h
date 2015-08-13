@@ -6,6 +6,8 @@
 
 #include "../GameSettingsMenu.h"
 
+#include <string>
+
 /*
     Description.
 */
@@ -15,6 +17,8 @@ class UI_NetNewLevelMenu : public UI_Menu
 public:
     UI_NetNewLevelMenu(const UI_GameSettingsMenu*);
     ~UI_NetNewLevelMenu();
+
+    std::string getCurrentMapPath();
 
 private:
     MI_ImageSelectField * miNetNewLevelModeField;

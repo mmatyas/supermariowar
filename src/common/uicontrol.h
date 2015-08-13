@@ -677,9 +677,8 @@ public:
     bool SetMap(const char * szMapName, bool fWorld);
     void SetSpecialMap(const char * szMapName, const char * szMapPath);
 
-    const char * GetMapName() {
-        return szMapName;
-    }
+    const char * GetMapName() { return szMapName; }
+    std::string GetMapFilePath();
 
     MenuCodeEnum ChooseRandomMap();
 

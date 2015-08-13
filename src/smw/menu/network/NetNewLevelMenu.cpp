@@ -1,6 +1,7 @@
 #include "NetNewLevelMenu.h"
 
 #include "GameMode.h"
+#include "net.h"
 #include "ResourceManager.h"
 
 extern CResourceManager* rm;
@@ -15,7 +16,7 @@ UI_NetNewLevelMenu::UI_NetNewLevelMenu(const UI_GameSettingsMenu* gsm) : UI_Menu
         miNetNewLevelGoalField[iGoalField] = new MI_SelectField(*(gsm->miGoalField[iGoalField]));
 
     miNetNewLevelMapField = new MI_MapField(&rm->spr_selectfield, 70, 165, "Map", 400, 120, true);
-    //szCurrentMapName = miNetNewLevelMapField->GetMapName(); //FIXME
+    netplay.mapfilepath = getCurrentMapPath();
 
     AddControl(miNetNewLevelContinueButton, miNetNewLevelMapField, miNetNewLevelModeField, NULL, NULL);
     AddControl(miNetNewLevelModeField, miNetNewLevelContinueButton, miNetNewLevelGoalField[0], NULL, NULL);
@@ -55,4 +56,9 @@ UI_NetNewLevelMenu::UI_NetNewLevelMenu(const UI_GameSettingsMenu* gsm) : UI_Menu
 }
 
 UI_NetNewLevelMenu::~UI_NetNewLevelMenu() {
+}
+
+std::string UI_NetNewLevelMenu::getCurrentMapPath()
+{
+    return miNetNewLevelMapField->GetMapFilePath();
 }

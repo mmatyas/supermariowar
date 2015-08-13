@@ -2128,6 +2128,11 @@ void MI_MapField::SetSpecialMap(const char * mapName, const char * szMapPath)
     LoadMap(szMapPath);
 }
 
+std::string MI_MapField::GetMapFilePath()
+{
+    return maplist->currentFilename();
+}
+
 MenuCodeEnum MI_MapField::MouseClick(short iMouseX, short iMouseY)
 {
     if (fDisable)
