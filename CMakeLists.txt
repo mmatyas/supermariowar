@@ -20,7 +20,7 @@ option(USE_PNG_SAVE "Enable PNG save feature" OFF) # currently working only with
 option(TARGET_EMSCRIPTEN "Output asm.js code using emscripten" OFF) # TODO: change this to a build type maybe?
 option(USE_SDL2_LIBS "Use SDL2 instead of SDL 1.x" OFF) # only smw ported yet
 option(NO_NETWORK "Disable all network communication" OFF)
-option(BUILD_STATIC_LIBS "Build and link certain dependencies statically (Enet, yaml-cpp)" ON)
+option(BUILD_STATIC_LIBS "Build and link certain dependencies statically (enet, yaml-cpp, lz4)" ON)
 
 if(USE_SDL2_LIBS)
 	add_definitions(-DUSE_SDL2)
@@ -142,14 +142,20 @@ if(USE_PNG_SAVE)
 	target_link_libraries(smw ${PNG_LIBRARY})
 endif()
 
-# Use YAML for game config files
 if (BUILD_STATIC_LIBS)
+	# Use YAML for game config files
 	include_directories(dependencies/yaml-cpp-noboost/include)
 	set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "YAML: Build testing and parse tools" FORCE)
 	set(YAML_CPP_BUILD_CONTRIB OFF CACHE BOOL "YAML: Build contrib stuff in library" FORCE)
 	add_subdirectory(dependencies/yaml-cpp-noboost)
+
+	# Use LZ4 for compression
+	include_directories(dependencies/lz4/lib)
+	set(BUILD_TOOLS OFF CACHE BOOL "LZ4: Build the command line tools" FORCE)
+	add_subdirectory(dependencies/lz4/cmake_unofficial)
 else()
 	find_package(yaml-cpp REQUIRED)
+	find_package(lz4 REQUIRED)
 endif()
 
 #-----------------------------------------------------------------------------
