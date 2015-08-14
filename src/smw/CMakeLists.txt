@@ -116,6 +116,10 @@ if(NOT TARGET_EMSCRIPTEN)
 
 	if(NOT NO_NETWORK)
 		target_link_libraries(smw enet)
+		if (WIN32)
+			# WinSock2 libs, required by ENet on Windows
+			target_link_libraries(smw ws2_32 winmm)
+		endif()
 	endif()
 endif()
 
