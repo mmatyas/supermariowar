@@ -1,7 +1,7 @@
 #ifndef LINFUNC_H
 #define LINFUNC_H
 
-#ifdef	_WIN32
+#if defined(_WIN32) && defined(_MSC_VER) // MSVC only
 
 #define strCiCompare	_stricmp
 #define	inPlaceLowerCase	_strlwr
