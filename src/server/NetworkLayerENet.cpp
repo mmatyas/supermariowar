@@ -5,7 +5,7 @@
 
 #include <cassert>
 #include <string>
-#include <cstring>
+#include <sstream>
 
 
 NetClientENet::NetClientENet(ENetPeer* peer)
@@ -62,13 +62,12 @@ uint16_t NetClientENet::addressPort()
 
 std::string NetClientENet::addressAsString()
 {
-    char buf[23]; // 4*4 octets with dots + 1 port separator + 5 port digits + 1 null
-
     uint8_t* addr = (uint8_t*)&foreign_peer->address.host;
-    sprintf(buf, "%d.%d.%d.%d:%d",
-        addr[0], addr[1], addr[2], addr[3], foreign_peer->address.port);
 
-    return std::string(buf);
+    std::ostringstream ss;
+    ss << addr[0] <<"."<< addr[1] <<"."<< addr[2] <<"."<< addr[3] <<":"<< foreign_peer->address.port;
+
+    return ss.str();
 }
 
 NetworkLayerENet::NetworkLayerENet()
