@@ -603,6 +603,8 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
         }
         else
             cout << " [v1.5]";
+
+        cout << " ...";
     }
 
     MapReader* reader = MapReader::getLoaderByVersion(version);
@@ -611,8 +613,11 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
     reader = NULL;
 
     fclose(mapfile);
-    clearWarpLocks();
 
+    if (iReadType == read_type_summary)
+        return;
+
+    clearWarpLocks();
     cout << " done" << endl;
 }
 
