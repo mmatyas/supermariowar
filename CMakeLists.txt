@@ -167,12 +167,20 @@ endif()
 # Debugging CFLAGS. Turn optimizations off; turn debugging symbols on.
 if(CMAKE_BUILD_TYPE STREQUAL Debug)
   add_definitions(-DDEBUG -D_DEBUG -DPNG_DEBUG=1)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g -O0")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -g -O0")
 else()
   add_definitions(-DNDEBUG)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3 -s")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -s")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -O3 -s")
+endif()
+
+# Use C++11
+if (WIN32 AND MINGW)
+	# MinGW forces strict-ANSI mode with std=c++11
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
+else()
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 endif()
 
 # Set these next two lines to test generic
@@ -223,7 +231,6 @@ add_definitions(-D_GNU_SOURCE=1 -D_REENTRANT)
 
 ##TODO: clean code to not need this anymore
 #add_definitions(-Wno-shadow)
-#add_definitions(-std=gnu++0x)
 
 check_and_add_flag(VISIBILITY_INLINES_HIDDEN -fvisibility-inlines-hidden)
 
