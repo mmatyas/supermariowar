@@ -10,12 +10,18 @@ endif()
 
 # Select the optimal FPU settings
 # If you get linking errors, try editing these flags
-set(ARM_FLAGS "-marm")
-if (ARM_TARGET_ARCH MATCHES "^armv6")
-	set(ARM_FLAGS "${ARM_FLAGS} -march=armv6 -mfpu=vfp -mfloat-abi=hard")
-elseif (ARM_TARGET_ARCH MATCHES "^armv7")
-	# TODO: test this
-	set(ARM_FLAGS "${ARM_FLAGS} -march=armv7-a -mfpu=neon -mfloat-abi=softfp")
+if (ARM_OVERRIDE_FLAGS)
+	set(ARM_FLAGS "${ARM_OVERRIDE_FLAGS}")
+else()
+	set(ARM_FLAGS "-marm")
+	if (ARM_TARGET_ARCH MATCHES "^armv6")
+		set(ARM_FLAGS "${ARM_FLAGS} -march=armv6")
+	elseif (ARM_TARGET_ARCH MATCHES "^armv7")
+		set(ARM_FLAGS "${ARM_FLAGS} -march=armv7-a")
+	else()
+		message("Unknown ARM device detected; if you have troubles, try using ARM_OVERRIDE_FLAGS")
+	endif()
+	set(ARM_FLAGS "${ARM_FLAGS} -mfpu=vfp -mfloat-abi=hard")
 endif()
 
 # Apply the flags
