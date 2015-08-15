@@ -5,6 +5,7 @@
 
 #include <cassert>
 #include <string>
+#include <cstring>
 
 
 NetClientENet::NetClientENet(ENetPeer* peer)

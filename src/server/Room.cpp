@@ -3,6 +3,7 @@
 #include "ProtocolPackages.h"
 
 #include <cassert>
+#include <cstdio>
 
 Room::Room()
 {

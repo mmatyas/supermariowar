@@ -11,4 +11,9 @@ set (SERVER_SRCS
 )
 
 add_executable (smw-server ${SERVER_SRCS})
+
 target_link_libraries (smw-server enet)
+if (WIN32)
+  # WinSock2 libs, required by ENet on Windows
+  target_link_libraries(smw-server ws2_32 winmm)
+endif()
