@@ -183,6 +183,13 @@ else()
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 endif()
 
+# Link statically on Windows to not need additional DLLs
+if (WIN32)
+	add_definitions(-static-libgcc)
+	# TODO: check if compiler supports this flag, may fail with GCC < 4.8
+	add_definitions(-static-libstdc++)
+endif()
+
 # Set these next two lines to test generic
 #set(CPU_ARM 1)
 #add_definitions(-DCPU_ARM=1)
