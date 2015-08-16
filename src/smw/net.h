@@ -174,7 +174,7 @@ class NetClient : public NetworkEventHandler
         // Listen to network events
         void onConnect(NetPeer*);
         void onReceive(NetPeer&, const uint8_t*, size_t);
-        void onDisconnect(NetPeer& client);
+        void onDisconnect(NetPeer&);
 
         // P1. Connect
         bool sendConnectRequestToSelectedServer();
@@ -223,8 +223,8 @@ class NetClient : public NetworkEventHandler
         void handleRoomChatMessage(const uint8_t*, size_t);
 
         // P2.5. Pre-game
-        void handleRoomStartMessage(const uint8_t*, size_t);
-        void handleExpectedClientsMessage(const uint8_t*, size_t);
+        void handleRoomStartMessage(NetPeer&, const uint8_t*, size_t);
+        void handleExpectedClientsMessage(NetPeer&, const uint8_t*, size_t);
         void handleMapSyncMessage(const uint8_t*, size_t);
         void handleStartSyncMessage(const uint8_t*, size_t);
         void handleGameStartMessage();

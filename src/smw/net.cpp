@@ -398,15 +398,25 @@ void NetClient::handleRoomChatMessage(const uint8_t* data, size_t dataLength)
 ****************************/
 
 // This package goes to normal players
-void NetClient::handleRoomStartMessage(const uint8_t* data, size_t dataLength)
+void NetClient::handleRoomStartMessage(NetPeer& client, const uint8_t* data, size_t dataLength)
 {
     Net_GameHostInfoPkg pkg(0);
     memcpy(&pkg, data, sizeof(Net_GameHostInfoPkg));
 
-    char host_str[32];
+    uint8_t* host_bytes = (uint8_t*) &pkg.host;
+    char host_str[17];
     sprintf(host_str, "%d.%d.%d.%d",
-        pkg.host & 0xFF, (pkg.host & 0xFF00) >> 8,
-        (pkg.host & 0xFF0000) >> 16, (pkg.host & 0xFF000000) >> 24);
+        host_bytes[0], host_bytes[1], host_bytes[2], host_bytes[3]);
+
+    // If the server and a player is on the same machine,
+    // then the player's address will be 127.0.0.1.
+    // Use the server's address in this case.
+    if (strcmp(host_str, "127.0.0.1") == 0) {
+        uint32_t server_host = client.addressHost();
+        host_bytes = (uint8_t*) &server_host;
+        sprintf(host_str, "%d.%d.%d.%d",
+            host_bytes[0], host_bytes[1], host_bytes[2], host_bytes[3]);
+    }
 
     printf("[net] Connecting to game host... [%s:%d]\n", host_str, NET_SERVER_PORT + 1);
     if (!connectGameHost(host_str)) {
@@ -418,7 +428,7 @@ void NetClient::handleRoomStartMessage(const uint8_t* data, size_t dataLength)
 }
 
 // This package goes to the game host player
-void NetClient::handleExpectedClientsMessage(const uint8_t* data, size_t dataLength)
+void NetClient::handleExpectedClientsMessage(NetPeer& client, const uint8_t* data, size_t dataLength)
 {
     Net_PlayerInfoPkg pkg;
     memcpy(&pkg, data, sizeof(Net_PlayerInfoPkg));
@@ -427,12 +437,25 @@ void NetClient::handleExpectedClientsMessage(const uint8_t* data, size_t dataLen
     uint32_t hosts[3];
     uint16_t ports[3];
 
+    printf("[net] Expecting the following clients:\n");
     for (uint8_t p = 0; p < 3; p++) {
         if (pkg.host[p]) { // this is 0 for empty player slots
             hosts[playerCount] = pkg.host[p];
             ports[playerCount] = pkg.port[p];
+
+            // If the server and a player is on the same machine,
+            // then the player's address will be 127.0.0.1.
+            // Use the server's address in this case.
+            if (hosts[playerCount] == 0x100007F)
+                hosts[playerCount] = client.addressHost();
+
+            uint8_t* host_bytes = (uint8_t*) &pkg.host;
+            char host_str[17];
+            sprintf(host_str, "%d.%d.%d.%d",
+                host_bytes[0], host_bytes[1], host_bytes[2], host_bytes[3]);
+
+            printf("  Client %d is %s:%u\n", p, host_str, pkg.port[p]);
             playerCount++;
-            printf("[net] Client %d is %u:%u\n", p, pkg.host[p], pkg.port[p]);
         }
     }
 
@@ -834,11 +857,11 @@ void NetClient::onReceive(NetPeer& client, const uint8_t* data, size_t dataLengt
         // Pre-game
         //
         case NET_L2P_GAMEHOST_INFO:
-            handleRoomStartMessage(data, dataLength);
+            handleRoomStartMessage(client, data, dataLength);
             break;
 
         case NET_L2G_CLIENTS_INFO:
-            handleExpectedClientsMessage(data, dataLength);
+            handleExpectedClientsMessage(client, data, dataLength);
             break;
 
         case NET_G2P_MAP:
