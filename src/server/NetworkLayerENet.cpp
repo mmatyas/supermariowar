@@ -65,7 +65,8 @@ std::string NetClientENet::addressAsString()
     uint8_t* addr = (uint8_t*)&foreign_peer->address.host;
 
     std::ostringstream ss;
-    ss << addr[0] <<"."<< addr[1] <<"."<< addr[2] <<"."<< addr[3] <<":"<< foreign_peer->address.port;
+    ss << (unsigned short)addr[0] <<"."<< (unsigned short)addr[1] <<"."<<
+          (unsigned short)addr[2] <<"."<< (unsigned short)addr[3] <<":"<< foreign_peer->address.port;
 
     return ss.str();
 }
