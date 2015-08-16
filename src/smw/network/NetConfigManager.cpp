@@ -27,8 +27,13 @@ void NetConfigManager::save()
     content << YAML::Key << "servers";
     content << YAML::Value << YAML::BeginSeq;
 
-    // Do not save `(none)` at [0]
-    for (unsigned i = 1; i < netplay.savedServers.size(); i++)
+    // Remove `(none)`
+    if (netplay.savedServers.size() == 1) {
+        if (netplay.savedServers[0].hostname.compare("(none)") == 0)
+            netplay.savedServers.clear();
+    }
+
+    for (unsigned i = 0; i < netplay.savedServers.size(); i++)
         content << netplay.savedServers[i].hostname;
 
     content << YAML::EndSeq;
