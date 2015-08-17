@@ -141,7 +141,7 @@ void SMWServer::onReceive(NetClient& client, const uint8_t* data, size_t dataLen
     uint64_t playerID = client.getPlayerID();
     //printf("    from %lu: %u.%u:%u\n", playerID, versionMajor, versionMinor, messageType);
 
-    if (versionMajor == NET_PROTOCOL_VERSION_MAJOR
+    if (versionMajor != NET_PROTOCOL_VERSION_MAJOR
         || versionMinor != NET_PROTOCOL_VERSION_MINOR) {
         sendCode(client, NET_RESPONSE_BADPROTOCOL);
         return;
