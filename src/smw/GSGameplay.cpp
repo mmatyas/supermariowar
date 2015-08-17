@@ -1195,7 +1195,7 @@ void drawExitPause()
 {
     if (game_values.pausegame) {
         rm->spr_dialog.draw(224, 176);
-        rm->menu_font_large.drawCentered(smw->ScreenHeight/2, 194, "Pause");
+        rm->menu_font_large.drawCentered(smw->ScreenWidth/2, 194, "Pause");
 
         //menu_font_large.drawCentered(smw->ScreenWidth/2, smw->ScreenHeight/2, game_values.gamemode->GetModeName());
         short iMode = GetModeIconIndexFromMode(game_values.gamemode->gamemode);
