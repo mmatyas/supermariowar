@@ -55,6 +55,7 @@ class NetworkLayer
 
         virtual bool connectToLobbyServer(const char*, uint16_t) = 0;
         virtual bool connectToForeignGameHost(const char*, uint16_t) = 0;
+        virtual bool natPunch(uint32_t, uint16_t) = 0;
 };
 
 

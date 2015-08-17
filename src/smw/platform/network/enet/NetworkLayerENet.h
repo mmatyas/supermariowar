@@ -48,6 +48,7 @@ class NetworkLayerENet : public NetworkLayer
 
         bool connectToLobbyServer(const char* hostname, const uint16_t port);
         bool connectToForeignGameHost(const char* hostname, const uint16_t port);
+        bool natPunch(uint32_t host, uint16_t port);
 
     private:
         ENetHost* local_client;

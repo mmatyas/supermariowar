@@ -228,6 +228,29 @@ bool NetworkLayerENet::openConnection(const char* hostname, const uint16_t port)
     return true;
 }
 
+// This is almost the same as openConnection, except it's launched from the game hosting port
+// TODO: refactor maybe?
+// TODO: add router hairpinning support
+bool NetworkLayerENet::natPunch(uint32_t host, uint16_t port)
+{
+    ENetAddress target_address;
+    target_address.host = host;
+    target_address.port = port;
+
+    // Initiate connection
+    // local_gamehost connects
+    // to target_address
+    // on two channels
+    // without any initial data
+    ENetPeer* target_host = enet_host_connect(local_gamehost, &target_address, 2, 0x0);
+    if (!target_host) {
+        printf("[net] Could not initiate connection to a client.\n");
+        return false;
+    }
+
+    return true;
+}
+
 /**************************************
     Communication
 **************************************/

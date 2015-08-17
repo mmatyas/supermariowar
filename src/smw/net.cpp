@@ -1283,7 +1283,10 @@ void NetGameHost::setExpectedPlayers(uint8_t count, uint32_t* hosts, uint16_t* p
         expected_clients[c].port = ports[c];
     }
 
-    printf("Game starts soon, waiting for %d players.\n", expected_client_count);
+    printf("[net] Game starts soon, waiting for %d players.\n", expected_client_count);
+
+    for (unsigned short c = 0; c < expected_client_count; c++)
+        networkHandler.natPunch(expected_clients[c].host, expected_clients[c].port);
 }
 
 void NetGameHost::sendStartGameMessage()
