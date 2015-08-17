@@ -765,8 +765,11 @@ void NetClient::onReceive(NetPeer& client, const uint8_t* data, size_t dataLengt
     uint8_t protocolMajor = data[0];
     uint8_t protocolMinor = data[1];
     uint8_t packageType = data[2];
-    if (protocolMajor != NET_PROTOCOL_VERSION_MAJOR)
+    if (protocolMajor != NET_PROTOCOL_VERSION_MAJOR
+        || protocolMinor != NET_PROTOCOL_VERSION_MINOR) {
+        printf("Not implemented: bad protocol version\n");
         return;
+    }
 
     // TODO: Add state checks too.
     switch (packageType)
@@ -1148,8 +1151,11 @@ void NetGameHost::onReceive(NetPeer& player, const uint8_t* data, size_t dataLen
     uint8_t protocolMajor = data[0];
     uint8_t protocolMinor = data[1];
     uint8_t packageType = data[2];
-    if (protocolMajor != NET_PROTOCOL_VERSION_MAJOR)
+    if (protocolMajor != NET_PROTOCOL_VERSION_MAJOR
+        || protocolMinor != NET_PROTOCOL_VERSION_MINOR) {
+        printf("Not implemented: bad protocol version\n");
         return;
+    }
 
     switch (packageType)
     {
