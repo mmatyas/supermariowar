@@ -403,20 +403,17 @@ void NetClient::handleRoomStartMessage(NetPeer& client, const uint8_t* data, siz
     Net_GameHostInfoPkg pkg(0);
     memcpy(&pkg, data, sizeof(Net_GameHostInfoPkg));
 
+    // If the server and a player is on the same machine,
+    // then the player's address will be 127.0.0.1.
+    // Use the server's address in this case.
+    if (pkg.host == 0x100007F)
+        pkg.host = client.addressHost();
+
+    // pretty print
     uint8_t* host_bytes = (uint8_t*) &pkg.host;
     char host_str[17];
     sprintf(host_str, "%d.%d.%d.%d",
         host_bytes[0], host_bytes[1], host_bytes[2], host_bytes[3]);
-
-    // If the server and a player is on the same machine,
-    // then the player's address will be 127.0.0.1.
-    // Use the server's address in this case.
-    if (strcmp(host_str, "127.0.0.1") == 0) {
-        uint32_t server_host = client.addressHost();
-        host_bytes = (uint8_t*) &server_host;
-        sprintf(host_str, "%d.%d.%d.%d",
-            host_bytes[0], host_bytes[1], host_bytes[2], host_bytes[3]);
-    }
 
     printf("[net] Connecting to game host... [%s:%d]\n", host_str, NET_SERVER_PORT + 1);
     if (!connectGameHost(host_str)) {
