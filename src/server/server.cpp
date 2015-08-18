@@ -299,6 +299,8 @@ void SMWServer::sendVisibleRoomEntries(NetClient& client)
                     if (room->players[p])
                         roomInfo.currentPlayerCount++;
 
+                roomInfo.gamemodeID = room->gamemodeID;
+
                 printf("  room %d: {%s; pass?: %d; players: %d}\n",
                     roomInfo.roomID, roomInfo.name, roomInfo.passwordRequired, roomInfo.currentPlayerCount);
             }
@@ -325,6 +327,7 @@ void SMWServer::playerCreatesRoom(uint64_t playerID, const void* data)
 
     // create
     Room room(roomCreateID, pkg.name, pkg.password, player);
+    room.setGamemode(pkg.gamemodeID, pkg.gamemodeGoal);
     rooms[roomCreateID] = room;
 
     player->currentRoomID = roomCreateID;

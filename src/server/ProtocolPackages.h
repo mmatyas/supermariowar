@@ -60,6 +60,7 @@ struct RoomInfoPackage : MessageHeader {
     char           name[NET_MAX_ROOM_NAME_LENGTH];
     uint8_t        currentPlayerCount;
     bool           passwordRequired;
+    uint8_t        gamemodeID;
 
     // Response package
 };
@@ -67,6 +68,8 @@ struct RoomInfoPackage : MessageHeader {
 struct NewRoomPackage : MessageHeader {
     char           name[NET_MAX_ROOM_NAME_LENGTH];
     char           password[NET_MAX_ROOM_PASSWORD_LENGTH];
+    uint8_t        gamemodeID; // 0 - GAMEMODE_LAST
+    uint16_t       gamemodeGoal;
 #if 0
     NewRoomPackage(const char* name, const char* password)
         : MessageHeader(NET_REQUEST_CREATE_ROOM)
@@ -114,6 +117,8 @@ struct CurrentRoomPackage : MessageHeader {
     char           playerName[4][NET_MAX_PLAYER_NAME_LENGTH];
     uint8_t        hostPlayerNumber; //  1-4
     uint8_t        remotePlayerNumber; // of the receiving client
+    uint8_t        gamemodeID; // 0 - GAMEMODE_LAST
+    uint16_t       gamemodeGoal;
 
     // Response package
     CurrentRoomPackage() : MessageHeader(NET_NOTICE_ROOM_CHANGED)

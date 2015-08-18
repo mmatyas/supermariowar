@@ -1,6 +1,7 @@
 #include "net.h"
 
 #include "GlobalConstants.h"
+#include "GameMode.h"
 #include "GameValues.h"
 #include "GSMenu.h"
 #include "path.h"
@@ -31,6 +32,9 @@ Networking netplay;
 extern CGameValues game_values;
 extern CPlayer* list_players[4];
 extern short list_players_cnt;
+
+extern short currentgamemode;
+extern CGameMode * gamemodes[GAMEMODE_LAST];
 
 short backup_playercontrol[4];
 
@@ -276,6 +280,9 @@ void NetClient::handleNewRoomListEntry(const uint8_t* data, size_t dataLength)
 void NetClient::sendCreateRoomMessage()
 {
     Net_NewRoomPackage msg(netplay.newroom_name, netplay.newroom_password);
+    msg.gamemodeID = currentgamemode;
+    game_values.gamemode = gamemodes[currentgamemode];
+    msg.gamemodeGoal = game_values.gamemode->goal;
 
     sendMessageToLobbyServer(&msg, sizeof(Net_NewRoomPackage));
     netplay.operationInProgress = true;
@@ -359,6 +366,15 @@ void NetClient::handleRoomChangedMessage(const uint8_t* data, size_t dataLength)
         else
             game_values.playercontrol[p] = 1; // valid player
     }
+
+    // set the game mode
+    assert(pkg.gamemodeID < GAMEMODE_LAST);
+    currentgamemode = pkg.gamemodeID;
+    game_values.gamemode = gamemodes[currentgamemode];
+    game_values.gamemode->goal = pkg.gamemodeGoal;
+    printf("  Game mode #%d: %s with %s: %d\n",
+        currentgamemode, gamemodes[currentgamemode]->GetModeName(),
+        gamemodes[currentgamemode]->GetGoalName(), game_values.gamemode->goal);
 
     netplay.theHostIsMe = false;
     netplay.currentRoom.hostPlayerNumber = pkg.hostPlayerNumber;

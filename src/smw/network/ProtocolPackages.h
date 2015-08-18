@@ -69,16 +69,21 @@ struct Net_RoomInfoPackage : Net_MessageHeader {
     char        name[NET_MAX_ROOM_NAME_LENGTH];
     uint8_t     currentPlayerCount;
     bool        passwordRequired;
+    uint8_t     gamemodeID;
 
     // Response package
 };
 
 struct Net_NewRoomPackage : Net_MessageHeader {
-    char    name[NET_MAX_ROOM_NAME_LENGTH];
-    char    password[NET_MAX_ROOM_PASSWORD_LENGTH];
+    char        name[NET_MAX_ROOM_NAME_LENGTH];
+    char        password[NET_MAX_ROOM_PASSWORD_LENGTH];
+    uint8_t     gamemodeID; // 0 - GAMEMODE_LAST
+    uint16_t    gamemodeGoal;
 
     Net_NewRoomPackage(const char* name, const char* password)
         : Net_MessageHeader(NET_REQUEST_CREATE_ROOM)
+        , gamemodeID(0)
+        , gamemodeGoal(10)
     {
         memcpy(this->name, name, NET_MAX_ROOM_NAME_LENGTH);
         this->name[NET_MAX_PLAYER_NAME_LENGTH - 1] = '\0';
@@ -113,6 +118,8 @@ struct Net_CurrentRoomPackage : Net_MessageHeader {
     char        playerName[4][NET_MAX_PLAYER_NAME_LENGTH];
     uint8_t     hostPlayerNumber; //  1-4
     uint8_t     remotePlayerNumber; // of the receiving client
+    uint8_t     gamemodeID; // 0 - GAMEMODE_LAST
+    uint16_t    gamemodeGoal;
 
     // Response package
 };

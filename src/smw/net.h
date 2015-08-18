@@ -49,7 +49,9 @@ struct Room {
     uint32_t       roomID;
     std::string    name; // NET_MAX_ROOM_NAME_LENGTH
     std::string    playerNames[4]; // NET_MAX_PLAYER_NAME_LENGTH
-    uint8_t        hostPlayerNumber; // 1-4
+    uint8_t        hostPlayerNumber; // 1 - 4
+    uint8_t        gamemodeID; // 0 - GAMEMODE_LAST
+    uint16_t       gamemodeGoal;
 
     Room() {
         name[0] = '\0';

@@ -31,6 +31,9 @@ Room::Room(uint32_t roomID, const char* name, const char* password, Player* host
     for (uint8_t p = 1; p < 4; p++)
         players[p] = NULL;
 
+    gamemodeID = 0; // Classic
+    gamemodeGoal = 10; // 10 lives
+
     this->roomID = roomID;
     createTime = TIME_NOW();
     lastActivityTime = createTime;
@@ -83,6 +86,11 @@ void Room::removePlayer(Player* player)
     }
 }
 
+void Room::setGamemode(uint8_t id, uint16_t goal) {
+    gamemodeID = id;
+    gamemodeGoal = goal;
+}
+
 void Room::sendRoomUpdate()
 {
     // TODO: error check
@@ -99,6 +107,9 @@ void Room::sendRoomUpdate()
         else
             memcpy(package.playerName[p], "(empty)", NET_MAX_PLAYER_NAME_LENGTH);
     }
+
+    package.gamemodeID = gamemodeID;
+    package.gamemodeGoal = gamemodeGoal;
 
     // Send every player information about the other players.
     for (uint8_t p = 0; p < 4; p++) {

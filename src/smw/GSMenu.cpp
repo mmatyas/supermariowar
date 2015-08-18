@@ -1167,10 +1167,6 @@ void MenuState::update()
                 game_values.tournamentcontrolteam = -1;
                 game_values.tournamentwinner = -1;
 
-                game_values.gamemode = gamemodes[0]; // TODO
-                SModeOption * options = game_values.gamemode->GetOptions();
-                game_values.gamemode->goal  = options[1].iValue; // TODO
-
                 iDisplayError = DISPLAY_ERROR_NONE;
                 iDisplayErrorTimer = 0;
 

@@ -17,6 +17,9 @@ struct Room {
     uint8_t         hostPlayerNumber; // 0-3 index in players[]
     uint8_t         playerCount;
 
+    uint8_t         gamemodeID;
+    uint16_t        gamemodeGoal;
+
     TimePoint       createTime;
     TimePoint       lastActivityTime;
 
@@ -26,6 +29,8 @@ struct Room {
 
     void tryAddingPlayer(Player* player);
     void removePlayer(Player* player);
+
+    void setGamemode(uint8_t id, uint16_t goal);
 
     void sendChatMessage(Player*, const char*);
     void sendRoomUpdate();
