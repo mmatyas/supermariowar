@@ -839,6 +839,7 @@ void MenuState::update()
         } else if (MENU_CODE_MODE_CHANGED == code) {
             game_values.gamemode = gamemodes[mGameSettingsMenu->GetCurrentGameModeID()];
             mGameSettingsMenu->RefreshGameModeButtons();
+            mNetNewLevelMenu->RefreshGameModeButtons();
         } else if (MENU_CODE_BACK_TEAM_SELECT_MENU == code) {
             if (game_values.matchtype == MATCH_TYPE_WORLD) {
                 mWorldMenu->OpenExitDialog();

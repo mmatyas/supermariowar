@@ -19,6 +19,7 @@ public:
     ~UI_NetNewLevelMenu();
 
     std::string getCurrentMapPath();
+    void RefreshGameModeButtons();
 
 private:
     MI_ImageSelectField * miNetNewLevelModeField;

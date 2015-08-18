@@ -55,6 +55,12 @@ UI_NetNewLevelMenu::UI_NetNewLevelMenu(const UI_GameSettingsMenu* gsm) : UI_Menu
     SetCancelCode(MENU_CODE_TO_NET_LOBBY_MENU);
 }
 
+void UI_NetNewLevelMenu::RefreshGameModeButtons()
+{
+    for (short iMode = 0; iMode < GAMEMODE_LAST; iMode++)
+        miNetNewLevelGoalField[iMode]->Show(miNetNewLevelModeField->GetShortValue() == iMode);
+}
+
 UI_NetNewLevelMenu::~UI_NetNewLevelMenu() {
 }
 

@@ -136,8 +136,10 @@ UI_GameSettingsMenu::~UI_GameSettingsMenu() {
 
 void UI_GameSettingsMenu::RefreshGameModeButtons()
 {
+    // Unhide/hide the settings button
     miModeSettingsButton->Show(miModeField->GetShortValue() != game_mode_owned);
 
+    //Show the approprate goal field
     for (short iMode = 0; iMode < GAMEMODE_LAST; iMode++) {
         miGoalField[iMode]->Show(miModeField->GetShortValue() == iMode);
     }
@@ -203,14 +205,7 @@ void UI_GameSettingsMenu::GameModeChanged(short gmID)
 {
     miModeField->SetKey(gmID);
 
-    //Unhide/hide the settings button
-    if (GetCurrentGameModeID() == game_mode_owned)
-        HideGMSettingsBtn();
-
-    //Show the approprate goal field
-    for (short iMode = 0; iMode < GAMEMODE_LAST; iMode++) {
-        miGoalField[iMode]->Show(GetCurrentGameModeID() == iMode);
-    }
+    RefreshGameModeButtons();
 }
 
 void UI_GameSettingsMenu::HideGMSettingsBtn()
