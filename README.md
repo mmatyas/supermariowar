@@ -48,7 +48,10 @@ You can download the sources the usual way:
 
 This repository also contains some submodules which you can use in case the libraries are not available for your OS/distro, are outdated or simply don't want to install them on your system. To use the included modules, you have to initialize them first after cloning:
 
-`git submodule update --init`
+```sh
+cd supermariowar
+git submodule update --init
+```
 
 Alternatively, adding `--recursive` to `git clone` also does this for you automatically:
 
@@ -60,8 +63,8 @@ If you'd rather use the system libraries, please see the [Build configuration](#
 
 ### Requirements
 
-- C++11 suporting compiler
-- CMake
+- C++11 supporting compiler (eg. gcc-4.8)
+- CMake (>= 2.6)
 - SDL (1.2 or 2.0), with
     - SDL_image
     - SDL_mixer
@@ -141,10 +144,10 @@ sudo chroot raspberry /bin/bash
 Then:
 
 ```sh
-echo "deb http://archive.raspbian.org/raspbian wheezy main" >> /etc/apt/sources.list
+echo "deb http://archive.raspbian.org/raspbian jessie main" >> /etc/apt/sources.list
 wget http://archive.raspbian.org/raspbian.public.key -O - | apt-key add -
 apt-get update
-apt-get install build-essential git \
+apt-get install build-essential g++ git \
     cmake libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libenet-dev
 ```
 
