@@ -1620,7 +1620,11 @@ MenuCodeEnum MI_TextField::SendInput(CPlayerInput * playerInput)
             key == SDLK_SEMICOLON || key == SDLK_QUOTE || key == SDLK_COMMA || key == SDLK_PERIOD || key == SDLK_SLASH) {
         if (iNumChars < iMaxChars - 1) {
             //Take care of holding shift to shift the pressed key to another character
+#if defined(USE_SDL2) || defined(__EMSCRIPTEN__)
+            if (keystate[SDL_SCANCODE_LSHIFT] || keystate[SDL_SCANCODE_RSHIFT]) {
+#else
             if (keystate[SDLK_LSHIFT] || keystate[SDLK_RSHIFT]) {
+#endif
                 if (key >= SDLK_a && key <= SDLK_z) {
                     key -= 32;
                 } else if (key >= SDLK_0 && key <= SDLK_9) {
