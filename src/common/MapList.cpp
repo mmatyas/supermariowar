@@ -128,8 +128,10 @@ MapList::MapList(bool fWorldEditor)
     }
 
     //TODO: add proper test via size
-    if (maps.empty())
-        throw "ERROR: Empty map directory!";
+    if (maps.empty()) {
+        printf("ERROR: Empty map directory!\n");
+        throw std::runtime_error("ERROR: Empty map directory!");
+    }
 
     current = maps.begin();
 
