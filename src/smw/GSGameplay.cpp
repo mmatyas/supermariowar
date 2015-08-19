@@ -849,7 +849,7 @@ void GameplayState::drawScoreboard(short iScoreTextOffset[4])
                 sprintf(gameovertext, "Tie Game");
             }
 
-            rm->game_font_large.drawCentered(smw->ScreenHeight/2, 90, gameovertext);
+            rm->game_font_large.drawCentered(smw->ScreenWidth/2, 90, gameovertext);
 
         }
 
