@@ -17,7 +17,7 @@ class MI_InputControlField : public UI_Control
 {
 	public:
 		MI_InputControlField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent);
-        virtual ~MI_InputControlField() {};
+        virtual ~MI_InputControlField();
 
 		void Draw();
 		MenuCodeEnum SendInput(CPlayerInput * playerInput);

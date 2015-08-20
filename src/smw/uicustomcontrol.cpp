@@ -79,6 +79,11 @@ MI_InputControlField::MI_InputControlField(gfxSprite * nspr, short x, short y, c
     iPlayerIndex = 0;
 }
 
+MI_InputControlField::~MI_InputControlField()
+{
+    delete [] szName;
+}
+
 #ifdef USE_SDL2
     #define Keynames(key) SDL_GetKeyName(key) // FIXME
 #else
@@ -1066,6 +1071,7 @@ MI_PlayerSelect::MI_PlayerSelect(gfxSprite * nspr, short x, short y, const char 
 
 MI_PlayerSelect::~MI_PlayerSelect()
 {
+    delete [] szName;
     delete miModifyImage;
 }
 
@@ -1788,6 +1794,7 @@ MI_AnnouncerField::MI_AnnouncerField(gfxSprite * nspr, short x, short y, const c
 
 MI_AnnouncerField::~MI_AnnouncerField()
 {
+    delete [] szName;
     delete miModifyImageLeft;
     delete miModifyImageRight;
 }
@@ -1927,6 +1934,7 @@ MI_PlaylistField::MI_PlaylistField(gfxSprite * nspr, short x, short y, const cha
 
 MI_PlaylistField::~MI_PlaylistField()
 {
+    delete [] szName;
     delete miModifyImageLeft;
     delete miModifyImageRight;
 }
@@ -2125,6 +2133,10 @@ MI_TourStop::~MI_TourStop()
             delete miBonusBackground[iBonus];
         }
     }
+
+    delete miTourStopLeftHeaderBar;
+    delete miTourStopMenuRightHeaderBar;
+    delete miTourStopMenuHeaderText;
 }
 
 MenuCodeEnum MI_TourStop::Modify(bool fModify)
@@ -2843,6 +2855,8 @@ MI_BonusWheel::MI_BonusWheel(short x, short y) :
 
 MI_BonusWheel::~MI_BonusWheel()
 {
+    delete miContinueButton;
+
     if (miBonusImages) {
         for (int iImage = 0; iImage < NUMBONUSITEMSONWHEEL; iImage++)
             delete miBonusImages[iImage];

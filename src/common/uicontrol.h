@@ -453,7 +453,7 @@ class MI_Button : public UI_Control
 public:
 
     MI_Button(gfxSprite * nspr, short x, short y, const char * name, short width, short justified);
-    ~MI_Button() {}
+    ~MI_Button();
 
     MenuCodeEnum Modify(bool fModify);
 

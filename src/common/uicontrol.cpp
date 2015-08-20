@@ -1233,6 +1233,11 @@ MI_Button::MI_Button(gfxSprite * nspr, short x, short y, const char * name, shor
     iHalfWidth = width >> 1;
 }
 
+MI_Button::~MI_Button()
+{
+    delete [] szName;
+}
+
 MenuCodeEnum MI_Button::Modify(bool)
 {
     if (fDisable)
@@ -1436,7 +1441,9 @@ MI_Text::MI_Text(const char * text, short x, short y, short w, short size, short
 }
 
 MI_Text::~MI_Text()
-{}
+{
+    delete [] szText;
+}
 
 void MI_Text::SetText(const char * text)
 {
