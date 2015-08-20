@@ -125,7 +125,11 @@ void UpdateMusicWithOverrides()
                     override->song = sPath;
                     worldmusicoverrides.push_back(override);
                 }
+                else
+                    delete override;
             }
+            else
+                delete override;
         }
     }
 

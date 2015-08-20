@@ -298,7 +298,7 @@ void MenuState::onEnterState()
 
             case 6: { //Random Losing Team
                 short iNumInPlace = 0;
-                short iInPlace[4];
+                short iInPlace[4] = {0, 0, 0, 0};
                 short iWinner = 0;
 
                 for (short iTeam = 0; iTeam < score_cnt; iTeam++) {

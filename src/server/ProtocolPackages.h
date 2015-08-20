@@ -31,7 +31,8 @@ struct ServerInfoPackage : MessageHeader {
     {
         currentPlayerCount = players_current;
         maxPlayerCount = players_max;
-        strcpy(this->name, name);
+        strncpy(this->name, name, 32);
+        this->name[31] = '\0';
     }
 };
 
@@ -140,8 +141,7 @@ struct Net_RoomChatMsgPackage : MessageHeader {
         : MessageHeader(NET_NOTICE_ROOM_CHAT_MSG)
     {
         this->playerNum = playerNum;
-        memset(message, 0, NET_MAX_CHAT_MSG_LENGTH);
-        memcpy(message, msg, NET_MAX_CHAT_MSG_LENGTH);
+        strncpy(message, msg, NET_MAX_CHAT_MSG_LENGTH);
         message[NET_MAX_CHAT_MSG_LENGTH - 1] = '\0';
     }
 };

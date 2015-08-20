@@ -78,8 +78,9 @@ void MovingPlatformPath::Reset()
 // Straight Path
 //------------------------------------------------------------------------------
 
-StraightPath::StraightPath(float vel, float startX, float startY, float endX, float endY, bool preview) :
-    MovingPlatformPath(vel, startX, startY, endX, endY, preview)
+StraightPath::StraightPath(float vel, float startX, float startY, float endX, float endY, bool preview)
+    : MovingPlatformPath(vel, startX, startY, endX, endY, preview)
+    , iGoalPoint{0, 0}
 {
     iType = 0;
 

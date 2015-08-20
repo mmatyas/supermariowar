@@ -13,8 +13,10 @@ NetworkLayerENet netLayer;
 
 SMWServer::SMWServer()
     : serverInfo("SMW Server", 0, 20 /* maxPlayerCount */)
+    , currentPlayerCount(0)
     , maxPlayerCount(20)
     , roomCreateID(1)
+    , currentRoomCount(0)
 {
     // ...
 }
@@ -68,7 +70,7 @@ void SMWServer::readConfig()
                 if (keyword.compare("name") == 0) {
                     serverName = value;
                     serverName.resize(31);
-                    strcpy(serverInfo.name, serverName.c_str());
+                    strncpy(serverInfo.name, serverName.c_str(), 32);
                 }
                 if (keyword.compare("maxplayers") == 0)
                 {

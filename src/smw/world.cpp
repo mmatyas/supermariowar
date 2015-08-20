@@ -54,10 +54,10 @@ using std::map;
 **********************************/
 
 WorldMovingObject::WorldMovingObject()
+    : iDrawSprite(0)
+    , iDrawDirection(0)
+    , iTileSize(0)
 {
-    iDrawSprite = 0;
-    iDrawDirection = 0;
-
     SetPosition(0, 0);
 }
 

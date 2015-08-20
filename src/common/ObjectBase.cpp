@@ -33,10 +33,12 @@ float CapSideVelocity(float vel)
 // class Object base class
 //------------------------------------------------------------------------------
 CObject::CObject(gfxSprite *nspr1, short x, short y)
+    : iw(0), ih(0)
+    , velx(0.0f), vely(0.0f)
+    , spr(nspr1)
+    , state(0)
+    , dead(false)
 {
-    dead = false;
-
-    spr = nspr1;
     setXi(x);
     setYi(y);
 
@@ -44,11 +46,6 @@ CObject::CObject(gfxSprite *nspr1, short x, short y)
         iw = (short)spr->getWidth();
         ih = (short)spr->getHeight();
     }
-
-    velx = 0.0f;
-    vely = 0.0f;
-
-    state = 0;
 
     collisionWidth = iw;
     collisionHeight = ih;

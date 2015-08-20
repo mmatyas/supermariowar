@@ -1115,7 +1115,8 @@ void NetGameHost::onConnect(NetPeer* new_player)
 
     if (next_free_client_slot >= 3) {
         new_player->disconnect();
-        printf("[warning] More than 3 players want to join.\n");
+        printf("[error] More than 3 players want to join.\n");
+        return;
     }
 
     // Validation
@@ -1406,6 +1407,10 @@ void NetGameHost::handlePowerupRequest(const NetPeer& player, const uint8_t* dat
 
     assert(playerID < 4);
     assert(list_players[playerID]);
+    if (playerID == 0xFF)
+        return;
+    if (!list_players[playerID])
+        return;
     if (list_players[playerID]->powerupused < 0)
         return;
 

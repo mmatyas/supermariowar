@@ -290,8 +290,10 @@ bool MapList::findexact(const char * name, bool fWorld)
             iterateAll++;
         }
 
-        if (fFound)
+        if (fFound) {
+            delete[] szLookForName;
             return true;
+        }
     }
 
     std::map<std::string, MapListNode*>::iterator oldCurrent = current;

@@ -2,8 +2,10 @@
 
 #include "ProtocolPackages.h"
 
+#include <algorithm>
 #include <cassert>
 #include <cstdio>
+#include <cstring>
 
 Room::Room()
 {
@@ -19,9 +21,9 @@ Room::Room(uint32_t roomID, const char* name, const char* password, Player* host
     // TODO
     visible = true;
 
-    memcpy(this->name, name, NET_MAX_ROOM_NAME_LENGTH);
+    strncpy(this->name, name, NET_MAX_ROOM_NAME_LENGTH);
     this->name[NET_MAX_ROOM_NAME_LENGTH - 1] = '\0';
-    memcpy(this->password, password, NET_MAX_ROOM_PASSWORD_LENGTH);
+    strncpy(this->password, password, NET_MAX_ROOM_PASSWORD_LENGTH);
     this->password[NET_MAX_ROOM_PASSWORD_LENGTH - 1] = '\0';
 
     playerCount = 1;
@@ -99,13 +101,16 @@ void Room::sendRoomUpdate()
     CurrentRoomPackage package;
         package.roomID = roomID;
         package.hostPlayerNumber = hostPlayerNumber;
-        memcpy(package.name, name, NET_MAX_ROOM_NAME_LENGTH);
+        strncpy(package.name, name, NET_MAX_ROOM_NAME_LENGTH);
+        package.name[NET_MAX_ROOM_NAME_LENGTH - 1] = '\0';
 
     for (uint8_t p = 0; p < 4; p++) {
         if (players[p])
-            memcpy(package.playerName[p], players[p]->name.c_str(), NET_MAX_PLAYER_NAME_LENGTH);
+            strncpy(package.playerName[p], players[p]->name.c_str(), NET_MAX_PLAYER_NAME_LENGTH);
         else
-            memcpy(package.playerName[p], "(empty)", NET_MAX_PLAYER_NAME_LENGTH);
+            strncpy(package.playerName[p], "(empty)", NET_MAX_PLAYER_NAME_LENGTH);
+
+        package.playerName[p][NET_MAX_PLAYER_NAME_LENGTH - 1] = '\0';
     }
 
     package.gamemodeID = gamemodeID;
