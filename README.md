@@ -44,20 +44,17 @@ The game uses artwork and sounds from Nintendo games. We hope that this noncomme
 
 ## Get the code
 
-You can download the sources the usual way:
+This repository contains some submodules which you can use if the dependencies are not available for your OS, are outdated or you simply don't want to install them on your system. To use the included libraries, do a recursive cloning:
 
-`git clone https://github.com/mmatyas/supermariowar.git`
+`git clone --recursive https://github.com/mmatyas/supermariowar.git`
 
-This repository also contains some submodules which you can use in case the libraries are not available for your OS/distro, are outdated or simply don't want to install them on your system. To use the included modules, you have to initialize them first after cloning:
+Alternatively, you can also initialize the submodules manually:
 
 ```sh
+git clone https://github.com/mmatyas/supermariowar.git
 cd supermariowar
 git submodule update --init
 ```
-
-Alternatively, adding `--recursive` to `git clone` also does this for you automatically:
-
-`git clone --recursive https://github.com/mmatyas/supermariowar.git`
 
 If you'd rather use the system libraries, please see the [Build configuration](#build-configuration) section for disabling this feature.
 
@@ -110,7 +107,7 @@ To create installable packages, simply run `make packages`. This will create TGZ
 
 If you're using MinGW Shell/MSYS or Cygwin environments, you can follow the Linux guide. You can also generate a project file with CMake for various IDEs, such as CodeBlocks, Eclipse or Viual Studio.
 
-Visual Studio: (TODO: check this section)
+Visual Studio: *TODO: check this section*
 
 - make sure you have CMake in your PATH
 - go to Build directory and issue `cmake ..`
@@ -157,7 +154,7 @@ Now you can continue with cloning the repository (eg. in `/root`) and following 
 
 ### ASM.JS
 
-(TODO: Update this part)
+*TODO: Update this part*
 
 SMW can be build to run in your browser. For this, you need
 Emscripten with the special LLVM backend, and Clang.
