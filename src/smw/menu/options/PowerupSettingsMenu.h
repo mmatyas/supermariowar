@@ -30,11 +30,13 @@ private:
     MI_Image * miPowerupSettingsMenuRightHeaderBar;
     MI_Text * miPowerupSettingsMenuHeaderText;
 
+    /*
     MI_Image * miPowerupSelectionDialogImage;
     MI_Text * miPowerupSelectionDialogExitText;
     MI_Text * miPowerupSelectionDialogTournamentText;
     MI_Button * miPowerupSelectionDialogYesButton;
     MI_Button * miPowerupSelectionDialogNoButton;
+    */
 };
 
 #endif // MENU_POWERUPSETTINGS_H

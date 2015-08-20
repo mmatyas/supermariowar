@@ -71,6 +71,7 @@ void SMWServer::readConfig()
                     serverName = value;
                     serverName.resize(31);
                     strncpy(serverInfo.name, serverName.c_str(), 32);
+                    serverInfo.name[31] = '\0';
                 }
                 if (keyword.compare("maxplayers") == 0)
                 {
