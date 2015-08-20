@@ -71,7 +71,17 @@ If you'd rather use the system libraries, please see the [Build configuration](#
 - lz4 (>= r129, included)
 - ENet (optional, included)
 
-On Linux, this usually means the following packages: `cmake libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev`, and optionally `libenet-dev libyaml-cpp-dev libz4-dev`.
+On Debian-based systems, the following command installs the required tools:
+
+    apt-get install cmake libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev
+
+On systems using RPM:
+
+    yum install cmake SDL-devel SDL_image-devel SDL_mixer-devel
+
+On Arch and derivatives:
+
+	pacman -S cmake sdl sdl_image sdl_mixer
 
 For other systems, you can download the development files manually from:
 
