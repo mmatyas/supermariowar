@@ -1,5 +1,7 @@
 # Super Mario War
 
+[![Build Status](https://travis-ci.org/mmatyas/supermariowar.svg?branch=master)](https://travis-ci.org/mmatyas/supermariowar)
+
 - [About](#about)
 - [Get the code](#get-the-code)
 - [Building](#building-instructions)
