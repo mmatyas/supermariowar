@@ -241,33 +241,33 @@ IO_MovingObject * createpowerup(short iType, short ix, short iy, bool side, bool
 
     if (coin) {
         ifSoundOnPlay(rm->sfx_coin);
-        objectcontainer[1].add(coin);
-        return coin;
+        if (objectcontainer[1].add(coin))
+            return coin;
     } else if (powerup) {
-        objectcontainer[0].add(powerup);
+        if (objectcontainer[0].add(powerup)) {
+            if (!spawn) {
+                powerup->nospawn(iy);
+                powerup->collision_detection_checksides();
+            }
 
-        if (!spawn) {
-            powerup->nospawn(iy);
-            powerup->collision_detection_checksides();
+            return powerup;
         }
-
-        return powerup;
     } else if (shell) {
-        objectcontainer[1].add(shell);
+        if (objectcontainer[1].add(shell)) {
+            if (!spawn) {
+                shell->nospawn(iy, true);
+                shell->collision_detection_checksides();
+            }
 
-        if (!spawn) {
-            shell->nospawn(iy, true);
-            shell->collision_detection_checksides();
+            return shell;
         }
-
-        return shell;
     } else if (feather) {
-        objectcontainer[0].add(feather);
+        if (objectcontainer[0].add(feather)) {
+            if (!spawn)
+                feather->nospawn(iy);
 
-        if (!spawn)
-            feather->nospawn(iy);
-
-        return feather;
+            return feather;
+        }
     } else { //If no powerups were selected for this block, then fire out a podobo
         IO_MovingObject * podobo = new MO_Podobo(&rm->spr_podobo, ix + 2, iy, -(float(RANDOM_INT(5)) / 2.0f) - 6.0f, -1, -1, -1, true);
         objectcontainer[2].add(podobo);

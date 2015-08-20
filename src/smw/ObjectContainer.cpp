@@ -34,16 +34,18 @@ void CObjectContainer::clean()
     list_end = 0;
 }
 
-void CObjectContainer::add(CObject *ec)
+bool CObjectContainer::add(CObject* ec)
 {
-    if (list_end < MAXOBJECTS) {
-        list[list_end] = ec;
-        ec->index = list_end;	//save index for removing
-        list_end++;
-    } else {
-        delete ec;	//otherwise memory leak!
+    if (list_end >= MAXOBJECTS) {
         //printf("eyecandy list full!\n");
+        delete ec;	// otherwise memory leak!
+        return false;
     }
+
+    list[list_end] = ec;
+    ec->index = list_end;	// save index for removing
+    list_end++;
+    return true;
 }
 
 void CObjectContainer::update()

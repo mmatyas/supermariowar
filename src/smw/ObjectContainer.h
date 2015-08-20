@@ -12,7 +12,7 @@ class CObjectContainer
         CObjectContainer();
         ~CObjectContainer();
 
-        void add(CObject *cio);
+        bool add(CObject* cio);
         void update();
         void draw();
         void clean();
