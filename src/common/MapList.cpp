@@ -11,6 +11,7 @@
 #include <cstring>
 #include <ctype.h>
 #include <iostream>
+#include <stdexcept>
 
 #ifdef _XBOX
 #include <xtl.h>

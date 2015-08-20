@@ -8,6 +8,7 @@
 #include "sfx.h"
 
 #include <stdio.h>
+#include <stdexcept>
 
 // TODO: Refactor externs
 
