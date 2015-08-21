@@ -319,12 +319,12 @@ int main(int argc, char *argv[])
     }
 
 #ifdef _XBOX
-    gfx_setresolution(smw->ScreenWidth, smw->ScreenHeight, false); //Sets flicker filter
+    gfx_changefullscreen(false); //Sets flicker filter
     SDL_SetHardwareFilter(game_values.hardwarefilter);
     blitdest = screen;
 #else
     if (game_values.fullscreen) {
-        gfx_setresolution(smw->ScreenWidth, smw->ScreenHeight, true);
+        gfx_changefullscreen(true);
         blitdest = screen;
     }
 #endif

@@ -1143,7 +1143,7 @@ int editor_edit()
                     if (event.key.keysym.mod & (KMOD_LALT | KMOD_RALT)) {
                         if (event.key.keysym.sym == SDLK_RETURN) {
 								g_fFullScreen = !g_fFullScreen;
-								gfx_setresolution(640, 480, g_fFullScreen);
+								gfx_changefullscreen(g_fFullScreen);
 								blitdest = screen;
 							}
 						}

@@ -24,8 +24,8 @@ bool gfx_init(int w, int h, bool fullscreen) {
     return gfx.Init(fullscreen);
 }
 
-void gfx_setresolution(int w, int h, bool fullscreen) {
-    gfx.RecreateWindow(fullscreen);
+void gfx_changefullscreen(bool fullscreen) {
+    gfx.ChangeFullScreen(fullscreen);
 }
 
 void gfx_flipscreen() {

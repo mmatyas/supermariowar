@@ -13,6 +13,7 @@ public:
 
     void FlipScreen();
     void RecreateWindow(bool fullscreen);
+    void ChangeFullScreen(bool fullcreen);
     void setTitle(const char*);
 
     bool Init(bool fullscreen);

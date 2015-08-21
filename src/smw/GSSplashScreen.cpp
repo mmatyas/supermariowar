@@ -183,7 +183,7 @@ void SplashScreenState::update()
                 if (loop_event.key.keysym.mod & (KMOD_LALT | KMOD_RALT)) {
 #ifndef _XBOX
                     game_values.fullscreen = !game_values.fullscreen;
-                    gfx_setresolution(smw->ScreenWidth, smw->ScreenHeight, game_values.fullscreen);
+                    gfx_changefullscreen(game_values.fullscreen);
                     blitdest = screen;
 #endif
                 }

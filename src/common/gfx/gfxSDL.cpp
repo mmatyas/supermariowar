@@ -183,6 +183,21 @@ void GraphicsSDL::RecreateWindow(bool fullscreen)
     }*/
 }
 
+void GraphicsSDL::ChangeFullScreen(bool fullscreen)
+{
+    Uint32 flags = SDL_GetWindowFlags(sdl2_window);
+    if (fullscreen)
+        flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+    else
+        flags &= ~SDL_WINDOW_FULLSCREEN_DESKTOP;
+
+    if (SDL_SetWindowFullscreen(sdl2_window, flags) < 0) {
+        fprintf(stderr, "[gfx] Couldn't toggle fullscreen mode: %s\n", SDL_GetError());
+        return;
+    }
+    //SDL_SetWindowSize(sdl2_window, GFX_SCREEN_W, GFX_SCREEN_H);
+}
+
 void GraphicsSDL::Close()
 {
     SDL_DestroyTexture(sdl2_screen_as_texture);
@@ -232,6 +247,11 @@ void GraphicsSDL::RecreateWindow(bool fullscreen)
         printf("[gfx] Couldn't create window: %s\n", SDL_GetError());
         throw E_CREATE_WINDOW;
     }
+}
+
+void GraphicsSDL::ChangeFullScreen(bool fullscreen)
+{
+    RecreateWindow(fullscreen);
 }
 
 void GraphicsSDL::Close()

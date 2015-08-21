@@ -407,7 +407,7 @@ void MenuState::update()
                 } //ALT + Enter = fullscreen/windowed toggle
                 else if (event.key.keysym.sym == SDLK_RETURN) {
                     game_values.fullscreen = !game_values.fullscreen;
-					gfx_setresolution(smw->ScreenWidth, smw->ScreenHeight, game_values.fullscreen);
+					gfx_changefullscreen(game_values.fullscreen);
                     blitdest = screen;
 
                     continue;
@@ -626,14 +626,14 @@ void MenuState::update()
             //Forces HW render so filter is applied
             SDL_XBOX_SetScreenPosition(game_values.screenResizeX, game_values.screenResizeY);
         } else if (MENU_CODE_SCREEN_SETTINGS_CHANGED == code) {
-            gfx_setresolution(smw->ScreenWidth, smw->ScreenHeight, false);
+            gfx_changefullscreen(false);
             blitdest = screen;
         } else if (MENU_CODE_BACK_TO_SCREEN_SETTINGS_MENU == code) {
             mCurrentMenu = mScreenSettingsMenu;
         }
 #else
         else if (MENU_CODE_TOGGLE_FULLSCREEN == code) {
-			gfx_setresolution(smw->ScreenWidth, smw->ScreenHeight, game_values.fullscreen);
+			gfx_changefullscreen(game_values.fullscreen);
             blitdest = screen;
         }
 #endif
