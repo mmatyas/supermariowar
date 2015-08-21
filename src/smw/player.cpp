@@ -83,15 +83,35 @@ CPlayer * GetPlayerFromGlobalID(short iGlobalID)
 
 CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamID, short iColorID,
     gfxSprite * nsprites[PGFX_LAST], CScore *nscore, short * sRespawnCounter, CPlayerAI * ai)
+    : shyguy(false)
+    , globalID(iGlobalID)
+    , teamID(iTeamID)
+    , score(nscore)
+    , localID(iLocalID)
+    , subTeamID(iSubTeamID)
+    , colorID(iColorID)
+    , lockfall(false)
+    , lockfire(false)
+    , pPlayerAI(ai)
+    , sprite_state(PGFX_JUMPING_R)
+    , sprswitch(0)
+    , projectiles(0)
+    , spawnradius(0.0f)
+    , spawnangle(0.0f)
+    , respawncounter(sRespawnCounter)
+    , powerupused(-1)
+    , powerupradius(0.0f)
+    , powerupangle(0.0f)
+    , fAcceptingItem(false)
+    , fPressedAcceptItem(false)
+    , carriedItem(NULL)
+    , ownerPlayerID(-1)
+    , ownerColorOffsetX(0)
+    , spawntext(20)  // set it to 20 so there is an immediate text spawned upon winning
+    , iSuicideCreditPlayerID(-1)
+    , iSuicideCreditTimer(0)
 {
-    globalID = iGlobalID;
-    localID = iLocalID;
-    teamID = iTeamID;
-    subTeamID = iSubTeamID;
-    colorID = iColorID;
-
     //AI stuff
-    pPlayerAI = ai;
     if (pPlayerAI)
         pPlayerAI->SetPlayer(this);
 
@@ -110,38 +130,15 @@ CPlayer::CPlayer(short iGlobalID, short iLocalID, short iTeamID, short iSubTeamI
 
     playerDevice = game_values.playerInput.inputControls[globalID]->iDevice;
 
-    score = nscore;
-
-    sprite_state = PGFX_JUMPING_R;
-
     for (short i = 0; i < PGFX_LAST; i++)
         sprites[i] = nsprites[i];
-
-    sprswitch = 0;
-
-    carriedItem = NULL;
-    ownerPlayerID = -1;
-    ownerColorOffsetX = 0;
-
-    shyguy = false;
-
-    spawntext = 20;  //set it to 20 so there is an immediate text spawned upon winning
-
-    powerupused = -1;
 
     //Do this so we have a valid x,y to say the player is so other items that init with the player will get valid positions
     //The actual choosing of a spawning position happens later
     FindSpawnPoint();
 
-    respawncounter = sRespawnCounter;
     SetupNewPlayer();
     *respawncounter = 0;
-
-    fAcceptingItem = false;
-    fPressedAcceptItem = false;
-
-    iSuicideCreditPlayerID = -1;
-    iSuicideCreditTimer = 0;
 
     game_values.unlocksecret1part1[globalID] = false;
 }
