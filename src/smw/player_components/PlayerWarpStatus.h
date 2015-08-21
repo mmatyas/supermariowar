@@ -7,6 +7,8 @@ struct Warp;
 class PlayerWarpStatus
 {
 public:
+    PlayerWarpStatus();
+
     void update(CPlayer& player);
     void enterWarp(CPlayer& player, Warp* warp);
 

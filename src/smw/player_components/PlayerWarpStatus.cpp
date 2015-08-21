@@ -12,6 +12,13 @@ extern CMap* g_map;
 extern CGameValues game_values;
 extern CResourceManager* rm;
 
+PlayerWarpStatus::PlayerWarpStatus()
+    : warpcounter(0)
+    , warpconnection(0)
+    , warpid(0)
+    , warpplane(0)
+{}
+
 void PlayerWarpStatus::increasewarpcounter(CPlayer& player, short iGoal)
 {
     if (++warpcounter > iGoal) {
@@ -37,6 +44,8 @@ void PlayerWarpStatus::update(CPlayer& player) {
 
     player.fOldY = player.fy;
     player.fOldX = player.fx;
+
+    assert(warpcounter >= 0);
 
     switch (player.state) {
         case player_entering_warp_left:
@@ -72,8 +81,11 @@ void PlayerWarpStatus::update(CPlayer& player) {
             decreasewarpcounter(player);
             break;
         default:
+            assert(false);
             break;
     }
+
+    assert(warpcounter >= 0);
 }
 
 void PlayerWarpStatus::enterWarp(CPlayer& player, Warp* warp)
@@ -105,6 +117,9 @@ void PlayerWarpStatus::enterWarp(CPlayer& player, Warp* warp)
             player.velx = 1.0f;
             warpplane = player.rightX() + 1;
             break;
+        default:
+            assert(false);
+            break;
     }
     player.oldvelx = player.velx;
 
@@ -126,6 +141,7 @@ void PlayerWarpStatus::enterWarp(CPlayer& player, Warp* warp)
 void PlayerWarpStatus::chooseWarpExit(CPlayer& player)
 {
     WarpExit * exit = g_map->getRandomWarpExit(warpconnection, warpid);
+    assert(exit);
     player.setXi(exit->x);
     player.setYi(exit->y);
     player.fOldX = player.fx;
@@ -201,6 +217,9 @@ void PlayerWarpStatus::chooseWarpExit(CPlayer& player)
 
             if (block && !block->isTransparent() && !block->isHidden())
                 block->triggerBehavior();
+            break;
+        default:
+            assert(false);
             break;
     }
 

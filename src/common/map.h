@@ -51,7 +51,7 @@ enum WarpEnterDirection {
 	WARP_LEFT = 1,
 	WARP_UP = 2,
 	WARP_RIGHT = 3,
-	WARP_UNDEFINED
+	WARP_UNDEFINED = -1
 };
 
 enum WarpExitDirection {
@@ -59,7 +59,7 @@ enum WarpExitDirection {
 	WARP_EXIT_RIGHT = 1,
 	WARP_EXIT_DOWN = 2,
 	WARP_EXIT_LEFT = 3,
-	WARP_EXIT_UNDEFINED
+	WARP_EXIT_UNDEFINED = -1
 };
 
 struct Warp {
