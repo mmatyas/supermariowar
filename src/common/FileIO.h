@@ -4,6 +4,9 @@
 #include "SDL.h"
 #include <stdio.h>
 
+void fread_or_exception(void* ptr, size_t size, size_t count, FILE* stream);
+void fwrite_or_exception(const void* ptr, size_t size, size_t count, FILE* stream);
+
 FILE* OpenFile(const char * filename, const char * options);
 void WriteInt(int out, FILE * outFile);
 int ReadInt(FILE * inFile);

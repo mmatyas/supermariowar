@@ -82,22 +82,6 @@ SDL_KEYTYPE controlkeys[2][2][4][NUM_KEYS] = { { { {SDLK_LEFT, SDLK_RIGHT, SDLK_
 };
 #endif
 
-void fread_or_exception(void * ptr, size_t size, size_t count, FILE * stream)
-{
-    if (fread(ptr, size, count, stream) != count) {
-        perror("File read error");
-        throw std::runtime_error("File read error");
-    }
-}
-
-void fwrite_or_exception(const void * ptr, size_t size, size_t count, FILE * stream)
-{
-    if (fwrite(ptr, size, count, stream) != count) {
-        perror("File write error");
-        throw std::runtime_error("File write error");
-    }
-}
-
 void CGameValues::init()
 {
     //set standard game values
