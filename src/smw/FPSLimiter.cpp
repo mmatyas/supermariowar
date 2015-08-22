@@ -10,10 +10,12 @@ extern CGameValues game_values;
 extern CResourceManager* rm;
 
 
-FPSLimiter::FPSLimiter() {
-    realfps = 0;
-    flipfps = 0;
-}
+FPSLimiter::FPSLimiter()
+    : framestart(0)
+    , ticks(0)
+    , realfps(0)
+    , flipfps(0)
+{}
 
 FPSLimiter& FPSLimiter::instance()
 {

@@ -138,6 +138,9 @@ void net_endSession()
  ********************************************************************/
 
 NetClient::NetClient()
+    : foreign_lobbyserver(NULL)
+    , foreign_gamehost(NULL)
+    , uiRoomList(NULL)
 {
     //printf("NetClient::ctor\n");
 }
