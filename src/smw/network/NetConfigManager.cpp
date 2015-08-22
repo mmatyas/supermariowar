@@ -5,6 +5,7 @@
 
 #include <cassert>
 #include <fstream>
+#include <stdexcept>
 #include <string>
 
 void NetConfigManager::save()
@@ -63,8 +64,8 @@ bool NetConfigManager::load_file(YAML::Node& config) {
     catch (YAML::BadFile& error) {
         printf("[net][warning] Could not open servers.yml, using default values.\n");
     }
-    catch (...) {
-        printf("[net][warning] Something's wrong with servers.yml ...");
+    catch (std::runtime_error& error) {
+        printf("[net][warning] servers.yml: %s", error.what());
     }
 
     return false;
@@ -97,9 +98,6 @@ void NetConfigManager::read_playername(YAML::Node& config)
     catch (std::runtime_error& error) {
         printf("[net][warning] servers.yml: %s\n", error.what());
     }
-    catch (...) {
-        printf("[net][warning] Something's wrong with servers.yml ...");
-    }
 }
 
 void NetConfigManager::read_servers(YAML::Node& config)
@@ -127,8 +125,5 @@ void NetConfigManager::read_servers(YAML::Node& config)
     }
     catch (std::runtime_error& error) {
         printf("[net][warning] servers.yml: %s\n", error.what());
-    }
-    catch (...) {
-        printf("[net][warning] Something's wrong with servers.yml ...");
     }
 }
