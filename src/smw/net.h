@@ -54,9 +54,9 @@ struct Room {
     uint16_t       gamemodeGoal;
 
     Room() {
-        name[0] = '\0';
+        name = "";
         for (uint8_t p = 0; p < 4; p++)
-            playerNames[p] = "";
+            playerNames[p] = "(empty)";
     }
 
     uint8_t playerCount() {
