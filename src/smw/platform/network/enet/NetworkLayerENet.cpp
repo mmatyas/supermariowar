@@ -176,10 +176,10 @@ bool NetworkLayerENet::gamehost_restart()
     local_gamehost_address.port = NET_SERVER_PORT + 1;
 
     // bind address
-    // max. 3 connections
+    // max. 3 connections + 3 NAT punch
     // two channels (a reliable and an unreliable)
     // no up/down speed limit
-    local_gamehost = enet_host_create(&local_gamehost_address, 3, 2, 0, 0);
+    local_gamehost = enet_host_create(&local_gamehost_address, 6, 2, 0, 0);
     if (!local_gamehost) {
         fprintf(stderr, "[error][net] Could not open game host connection port.\n");
         return false;

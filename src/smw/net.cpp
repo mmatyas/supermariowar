@@ -758,7 +758,7 @@ void NetClient::onConnect(NetPeer* newPeer)
 
 void NetClient::onDisconnect(NetPeer& client)
 {
-    // Beware of the null pointers
+    // Beware of the null pointers!
 
     if (foreign_gamehost) {
         if (client == *foreign_gamehost) {
@@ -768,9 +768,13 @@ void NetClient::onDisconnect(NetPeer& client)
     }
 
     if (foreign_lobbyserver) {
-        assert(client == *foreign_lobbyserver);
-        printf("[net] Disconnected from lobby server.\n");
+        if (client == *foreign_lobbyserver) {
+            printf("[net] Disconnected from lobby server.\n");
+            return;
+        }
     }
+
+    printf("[net] Client %s disconnected\n", client.addressAsString().c_str());
 }
 
 void NetClient::onReceive(NetPeer& client, const uint8_t* data, size_t dataLength)
@@ -1157,7 +1161,7 @@ void NetGameHost::onConnect(NetPeer* new_player)
 
 void NetGameHost::onDisconnect(NetPeer& player)
 {
-    printf("onDisconnect!\n");
+    printf("[net] Client %s disconnected\n", player.addressAsString().c_str());
 }
 
 void NetGameHost::onReceive(NetPeer& player, const uint8_t* data, size_t dataLength)
@@ -1243,7 +1247,7 @@ void NetGameHost::handleMapOKMessage(const NetPeer& player, const uint8_t* data,
     for (unsigned short c = 0; c < expected_client_count; c++)
     {
         if (player == *clients[c]) {
-            expected_clients[0].map_ok = true;
+            expected_clients[c].map_ok = true;
             printf("  Client %d/%d received the map.\n", c + 1, expected_client_count);
         }
 
@@ -1279,7 +1283,7 @@ void NetGameHost::handleSyncOKMessage(const NetPeer& player, const uint8_t* data
     for (unsigned short c = 0; c < expected_client_count; c++)
     {
         if (player == *clients[c]) {
-            expected_clients[0].sync_ok = true;
+            expected_clients[c].sync_ok = true;
             printf("Client %d/%d ready.\n", c + 1, expected_client_count);
         }
 
