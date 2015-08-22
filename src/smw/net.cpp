@@ -465,7 +465,7 @@ void NetClient::handleExpectedClientsMessage(NetPeer& client, const uint8_t* dat
             if (hosts[playerCount] == 0x100007F)
                 hosts[playerCount] = client.addressHost();
 
-            uint8_t* host_bytes = (uint8_t*) &pkg.host;
+            uint8_t* host_bytes = (uint8_t*) &pkg.host[p];
             char host_str[17];
             sprintf(host_str, "%d.%d.%d.%d",
                 host_bytes[0], host_bytes[1], host_bytes[2], host_bytes[3]);
