@@ -176,14 +176,14 @@ bool gfx_loadmenuskin(gfxSprite ** gSprite, const std::string& filename, Uint8 r
     // Load the BMP file into a surface
     SDL_Surface * skin = IMG_Load(filename.c_str());
 
-    if (!ValidSkinSurface(skin))
-        return false;
-
-    if (skin == NULL) {
+    if (!skin) {
         cout << endl << " ERROR: Couldn't load " << filename << ": "
              << SDL_GetError() << endl;
         return false;
     }
+
+    if (!ValidSkinSurface(skin))
+        return false;
 
     for (short iSprite = 0; iSprite < 2; iSprite++) {
         SDL_Surface * skinSurface = gfx_createskinsurface(skin, iSprite, r, g, b, colorScheme, true, false);
@@ -224,14 +224,14 @@ bool gfx_loadfullskin(gfxSprite ** gSprites, const std::string& filename, Uint8 
     // Load the BMP file into a surface
     SDL_Surface * skin = IMG_Load(filename.c_str());
 
-    if (!ValidSkinSurface(skin))
-        return false;
-
-    if (skin == NULL) {
+    if (!skin) {
         cout << endl << " ERROR: Couldn't load " << filename
              << ": " << SDL_GetError() << endl;
         return false;
     }
+
+    if (!ValidSkinSurface(skin))
+        return false;
 
     for (short k = 0; k < 4; k++) {
         for (short j = 0; j < 2; j++) {
