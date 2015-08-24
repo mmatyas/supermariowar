@@ -4,6 +4,9 @@
 #include <cstdio>
 
 class CMap;
+class MovingPlatformPath;
+struct TilesetTile;
+struct MapTile;
 enum ReadType: unsigned char;
 
 class MapReader {
@@ -88,6 +91,10 @@ protected:
     virtual void read_switches(CMap&, FILE*); // switches stored inverted
     virtual bool read_spawn_areas(CMap&, FILE*);
 
+    virtual void read_platforms(CMap&, FILE*, bool preview);
+    virtual void read_platform_tiles(CMap&, FILE*, short w, short h, TilesetTile**&, MapTile**&);
+    MovingPlatformPath* read_platform_path_details(FILE*, short type, bool preview);
+
     unsigned char patch_version;
 };
 
@@ -133,6 +140,8 @@ protected:
     virtual bool read_spawn_areas(CMap&, FILE*);
     virtual void read_extra_tiledata(CMap&, FILE*);
     virtual void read_gamemode_settings(CMap&, FILE*);
+    virtual void read_platforms(CMap&, FILE*, bool preview);
+    virtual void read_platform_tiles(CMap&, FILE*, short w, short h, TilesetTile**&, MapTile**&);
 
 private:
     short iMaxTilesetID;

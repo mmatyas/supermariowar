@@ -1,6 +1,7 @@
 #include "MapReader.h"
 
 #include "map.h"
+#include "movingplatform.h"
 #include "FileIO.h"
 #include "TilesetManager.h"
 
@@ -14,6 +15,10 @@ using namespace std;
 
 MapReader1800::MapReader1800()
     : MapReader1702()
+    , iMaxTilesetID(-1)
+    , translationid(NULL)
+    , tilesetwidths(NULL)
+    , tilesetheights(NULL)
 {
     patch_version = 0;
 }
@@ -265,6 +270,88 @@ void MapReader1800::read_gamemode_settings(CMap& map, FILE* mapfile)
     }
 }
 
+void MapReader1800::read_platforms(CMap& map, FILE* mapfile, bool fPreview)
+{
+    map.clearPlatforms();
+
+    //Load moving platforms
+    map.iNumPlatforms = (short)ReadInt(mapfile);
+    map.platforms = new MovingPlatform*[map.iNumPlatforms];
+
+    for (short iPlatform = 0; iPlatform < map.iNumPlatforms; iPlatform++) {
+        short iWidth = (short)ReadInt(mapfile);
+        short iHeight = (short)ReadInt(mapfile);
+
+        TilesetTile ** tiles = new TilesetTile*[iWidth];
+        MapTile ** types = new MapTile*[iWidth];
+
+        read_platform_tiles(map, mapfile, iWidth, iHeight, tiles, types);
+
+        short iDrawLayer = 2;
+        if (patch_version >= 1)
+            iDrawLayer = ReadInt(mapfile);
+
+        //printf("Layer: %d\n", iDrawLayer);
+
+        short iPathType = 0;
+        iPathType = ReadInt(mapfile);
+
+        //printf("PathType: %d\n", iPathType);
+
+        MovingPlatformPath* path = NULL;
+        path = read_platform_path_details(mapfile, iPathType, fPreview);
+        if (!path)
+            continue;
+
+        MovingPlatform * platform = new MovingPlatform(tiles, types, iWidth, iHeight, iDrawLayer, path, fPreview);
+        map.platforms[iPlatform] = platform;
+        map.platformdrawlayer[iDrawLayer].push_back(platform);
+    }
+}
+
+void MapReader1800::read_platform_tiles(CMap& map, FILE* mapfile,
+    short iWidth, short iHeight, TilesetTile**& tiles, MapTile**& types)
+{
+    for (short iCol = 0; iCol < iWidth; iCol++) {
+        tiles[iCol] = new TilesetTile[iHeight];
+        types[iCol] = new MapTile[iHeight];
+
+        for (short iRow = 0; iRow < iHeight; iRow++) {
+            TilesetTile * tile = &tiles[iCol][iRow];
+
+            tile->iID = ReadByteAsShort(mapfile);
+            tile->iCol = ReadByteAsShort(mapfile);
+            tile->iRow = ReadByteAsShort(mapfile);
+
+            if (tile->iID >= 0) {
+                if (iMaxTilesetID != -1 && tile->iID > iMaxTilesetID)
+                    tile->iID = 0;
+
+                //Make sure the column and row we read in is within the bounds of the tileset
+                if (tile->iCol < 0 || (tilesetwidths && tile->iCol >= tilesetwidths[tile->iID]))
+                    tile->iCol = 0;
+
+                if (tile->iRow < 0 || (tilesetheights && tile->iRow >= tilesetheights[tile->iID]))
+                    tile->iRow = 0;
+
+                //Convert tileset ids into the current game's tileset's ids
+                if (translationid)
+                    tile->iID = translationid[tile->iID];
+            }
+
+            TileType iType = (TileType)ReadInt(mapfile);
+
+            if (iType >= 0 && iType < NUMTILETYPES) {
+                types[iCol][iRow].iType = iType;
+                types[iCol][iRow].iFlags = g_iTileTypeConversion[iType];
+            } else {
+                types[iCol][iRow].iType = tile_nonsolid;
+                types[iCol][iRow].iFlags = tile_flag_nonsolid;
+            }
+        }
+    }
+}
+
 bool MapReader1800::load(CMap& map, FILE* mapfile/*, const char* filename*/, ReadType readtype)
 {
     read_autofilters(map, mapfile);
@@ -288,11 +375,7 @@ bool MapReader1800::load(CMap& map, FILE* mapfile/*, const char* filename*/, Rea
     read_tiles(map, mapfile);
     read_background(map, mapfile);
     read_switches(map, mapfile);
-
-    // TODO: refactor CMap::loadPlatform to not need this
-    int mapversion[4] = {1, 8, 0, patch_version};
-    map.loadPlatforms(mapfile, readtype == read_type_preview, mapversion, translationid,
-        tilesetwidths, tilesetheights, iMaxTilesetID);
+    read_platforms(map, mapfile, readtype == read_type_preview);
 
     //All tiles have been loaded so the translation is no longer needed
     delete [] translationid;

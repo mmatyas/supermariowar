@@ -1,6 +1,7 @@
 #include "MapReader.h"
 
 #include "map.h"
+#include "movingplatform.h"
 #include "FileIO.h"
 #include "TilesetManager.h"
 
@@ -224,6 +225,119 @@ bool MapReader1700::read_spawn_areas(CMap& map, FILE* mapfile)
     return true;
 }
 
+void MapReader1700::read_platforms(CMap& map, FILE* mapfile, bool fPreview)
+{
+    map.clearPlatforms();
+
+    //Load moving platforms
+    map.iNumPlatforms = (short)ReadInt(mapfile);
+    map.platforms = new MovingPlatform*[map.iNumPlatforms];
+
+    for (short iPlatform = 0; iPlatform < map.iNumPlatforms; iPlatform++) {
+        short iWidth = (short)ReadInt(mapfile);
+        short iHeight = (short)ReadInt(mapfile);
+
+        TilesetTile ** tiles = new TilesetTile*[iWidth];
+        MapTile ** types = new MapTile*[iWidth];
+
+        read_platform_tiles(map, mapfile, iWidth, iHeight, tiles, types);
+
+        short iDrawLayer = 2;
+        //printf("Layer: %d\n", iDrawLayer);
+
+        short iPathType = 0;
+        //printf("PathType: %d\n", iPathType);
+
+        MovingPlatformPath* path = NULL;
+        path = read_platform_path_details(mapfile, iPathType, fPreview);
+        if (!path)
+            continue;
+
+        MovingPlatform * platform = new MovingPlatform(tiles, types, iWidth, iHeight, iDrawLayer, path, fPreview);
+        map.platforms[iPlatform] = platform;
+        map.platformdrawlayer[iDrawLayer].push_back(platform);
+    }
+}
+
+void MapReader1700::read_platform_tiles(CMap& map, FILE* mapfile,
+    short iWidth, short iHeight, TilesetTile**& tiles, MapTile**& types)
+{
+    for (short iCol = 0; iCol < iWidth; iCol++) {
+        tiles[iCol] = new TilesetTile[iHeight];
+        types[iCol] = new MapTile[iHeight];
+
+        for (short iRow = 0; iRow < iHeight; iRow++) {
+            TilesetTile * tile = &tiles[iCol][iRow];
+
+            short iTile = ReadInt(mapfile);
+            TileType type;
+
+            if (iTile == TILESETSIZE) {
+                tile->iID = TILESETNONE;
+                tile->iCol = 0;
+                tile->iRow = 0;
+
+                type = tile_nonsolid;
+            } else {
+                tile->iID = g_tilesetmanager->GetClassicTilesetIndex();
+                tile->iCol = iTile % TILESETWIDTH;
+                tile->iRow = iTile / TILESETWIDTH;
+
+                type = g_tilesetmanager->GetClassicTileset()->GetTileType(tile->iCol, tile->iRow);
+            }
+
+            if (type >= 0 && type < NUMTILETYPES) {
+                types[iCol][iRow].iType = type;
+                types[iCol][iRow].iFlags = g_iTileTypeConversion[type];
+            } else {
+                map.mapdatatop[iCol][iRow].iType = tile_nonsolid;
+                map.mapdatatop[iCol][iRow].iFlags = tile_flag_nonsolid;
+            }
+        }
+    }
+}
+
+MovingPlatformPath* MapReader1700::read_platform_path_details(FILE* mapfile, short iPathType, bool fPreview)
+{
+    MovingPlatformPath* path = NULL;
+    if (iPathType == 0) { //segment path
+        float fStartX = ReadFloat(mapfile);
+        float fStartY = ReadFloat(mapfile);
+        float fEndX = ReadFloat(mapfile);
+        float fEndY = ReadFloat(mapfile);
+        float fVelocity = ReadFloat(mapfile);
+
+        path = new StraightPath(fVelocity, fStartX, fStartY, fEndX, fEndY, fPreview);
+
+        //printf("Read segment path\n");
+        //printf("StartX: %.2f StartY:%.2f EndX:%.2f EndY:%.2f Velocity:%.2f\n", fStartX, fStartY, fEndX, fEndY, fVelocity);
+    } else if (iPathType == 1) { //continuous path
+        float fStartX = ReadFloat(mapfile);
+        float fStartY = ReadFloat(mapfile);
+        float fAngle = ReadFloat(mapfile);
+        float fVelocity = ReadFloat(mapfile);
+
+        path = new StraightPathContinuous(fVelocity, fStartX, fStartY, fAngle, fPreview);
+
+        //printf("Read continuous path\n");
+        //printf("StartX: %.2f StartY:%.2f Angle:%.2f Velocity:%.2f\n", fStartX, fStartY, fAngle, fVelocity);
+    } else if (iPathType == 2) { //elliptical path
+        float fRadiusX = ReadFloat(mapfile);
+        float fRadiusY = ReadFloat(mapfile);
+        float fCenterX = ReadFloat(mapfile);
+        float fCenterY = ReadFloat(mapfile);
+        float fAngle = ReadFloat(mapfile);
+        float fVelocity = ReadFloat(mapfile);
+
+        path = new EllipsePath(fVelocity, fAngle, fRadiusX, fRadiusY, fCenterX, fCenterY, fPreview);
+
+        //printf("Read elliptical path\n");
+        //printf("CenterX: %.2f CenterY:%.2f Angle:%.2f RadiusX: %.2f RadiusY: %.2f Velocity:%.2f\n", fCenterX, fCenterY, fAngle, fRadiusX, fRadiusY, fVelocity);
+    }
+
+    return path;
+}
+
 bool MapReader1700::load(CMap& map, FILE* mapfile, ReadType readtype)
 {
     read_autofilters(map, mapfile);
@@ -236,9 +350,6 @@ bool MapReader1700::load(CMap& map, FILE* mapfile, ReadType readtype)
     read_tiles(map, mapfile);
     read_background(map, mapfile);
 
-    // TODO: refactor CMap::loadPlatform to not need this
-    int mapversion[4] = {1, 7, 0, patch_version};
-
     if (patch_version >= 1)
         read_switches(map, mapfile);
     else if (readtype != read_type_preview)
@@ -246,7 +357,7 @@ bool MapReader1700::load(CMap& map, FILE* mapfile, ReadType readtype)
 
     if (patch_version >= 2) {
         //short translationid[1] = {g_tilesetmanager->GetIndexFromName("Classic")};
-        map.loadPlatforms(mapfile, readtype == read_type_preview, mapversion);
+        read_platforms(map, mapfile, readtype == read_type_preview);
     }
 
     read_eyecandy(map, mapfile);
@@ -263,7 +374,7 @@ bool MapReader1700::load(CMap& map, FILE* mapfile, ReadType readtype)
 
     if (patch_version <= 1) {
         //short translationid[1] = {g_tilesetmanager->GetIndexFromName("Classic")};
-        map.loadPlatforms(mapfile, readtype == read_type_preview, mapversion);
+        read_platforms(map, mapfile, readtype == read_type_preview);
     }
 
     if (patch_version == 0)
