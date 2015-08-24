@@ -837,6 +837,9 @@ void CMap::loadPlatforms(FILE * mapfile, bool fPreview, int version[4], short * 
             //printf("CenterX: %.2f CenterY:%.2f Angle:%.2f RadiusX: %.2f RadiusY: %.2f Velocity:%.2f\n", fCenterX, fCenterY, fAngle, fRadiusX, fRadiusY, fVelocity);
         }
 
+        if (!path)
+            continue;
+
         MovingPlatform * platform = new MovingPlatform(tiles, types, iWidth, iHeight, iDrawLayer, path, fPreview);
         platforms[iPlatform] = platform;
         platformdrawlayer[iDrawLayer].push_back(platform);
