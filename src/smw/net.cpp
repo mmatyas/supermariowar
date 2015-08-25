@@ -663,8 +663,12 @@ void NetClient::handleMapCollision(const uint8_t* data, size_t dataLength)
     //printf("[net] Map collision triggered for P%d.\n", pkg.player_id);
     float temp_px = list_players[pkg.player_id]->fx;
     float temp_py = list_players[pkg.player_id]->fy;
+    float temp_velx = list_players[pkg.player_id]->velx;
+    float temp_vely = list_players[pkg.player_id]->vely;
     list_players[pkg.player_id]->setXf(pkg.player_x);
     list_players[pkg.player_id]->setYf(pkg.player_y);
+    list_players[pkg.player_id]->velx = pkg.player_xvel;
+    list_players[pkg.player_id]->vely = pkg.player_yvel;
 
     netplay.allowMapCollisionEvent = true;
     list_players[pkg.player_id]->collision_detection_map();
@@ -675,6 +679,8 @@ void NetClient::handleMapCollision(const uint8_t* data, size_t dataLength)
 
     list_players[pkg.player_id]->setXf(temp_px);
     list_players[pkg.player_id]->setYf(temp_py);
+    list_players[pkg.player_id]->velx = temp_velx;
+    list_players[pkg.player_id]->vely = temp_vely;
 
     printf("[net] Map block collision!\n");
 }
@@ -1040,12 +1046,16 @@ NetGameHost::NetGameHost()
     for (short p = 0; p < 3; p++) {
         clients[p] = NULL;
     }
+
+    preparedMapCollPkg = new Net_MapCollisionPackage();
 }
 
 NetGameHost::~NetGameHost()
 {
     //printf("NetGameHost::dtor\n");
     cleanup();
+
+    delete preparedMapCollPkg;
 }
 
 bool NetGameHost::init()
@@ -1444,14 +1454,21 @@ void NetGameHost::handlePowerupRequest(const NetPeer& player, const uint8_t* dat
     assert(list_players[netplay.remotePlayerNumber]->powerupused >= 0);
 }*/
 
-void NetGameHost::sendMapCollisionEvent(CPlayer& player)
+void NetGameHost::prepareMapCollisionEvent(CPlayer& player)
 {
     assert(netplay.theHostIsMe);
+    assert(preparedMapCollPkg);
+    preparedMapCollPkg->fill(player);
+}
 
-    Net_MapCollisionPackage pkg(player);
-    sendMessageToMyPeers(&pkg, sizeof(Net_MapCollisionPackage));
+void NetGameHost::sendMapCollisionEvent()
+{
+    assert(netplay.theHostIsMe);
+    assert(preparedMapCollPkg);
 
-    printf("[net] P%d collided with a map block\n", pkg.player_id);
+    sendMessageToMyPeers(preparedMapCollPkg, sizeof(Net_MapCollisionPackage));
+
+    printf("[net] P%d collided with a map block\n", preparedMapCollPkg->player_id);
 }
 
 void NetGameHost::sendP2PCollisionEvent(CPlayer& p1, CPlayer& p2)

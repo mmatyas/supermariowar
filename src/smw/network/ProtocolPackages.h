@@ -381,6 +381,14 @@ struct Net_MapCollisionPackage : Net_MessageHeader {
         , player_xvel(player.velx)
         , player_yvel(player.vely)
     {}
+
+    void fill(CPlayer& player) {
+        player_id = player.getGlobalID();
+        player_x = player.fx;
+        player_y = player.fy;
+        player_xvel = player.velx;
+        player_yvel = player.vely;
+    }
 };
 
 struct Net_P2PCollisionPackage : Net_MessageHeader {

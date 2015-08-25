@@ -27,6 +27,7 @@ void net_endSession();
 class MI_NetworkListScroll;
 //union COutputControl;
 class CPlayer;
+struct Net_MapCollisionPackage;
 
 // Local structures
 
@@ -99,7 +100,8 @@ class NetGameHost : public NetworkEventHandler
         // P3. Game
         void sendCurrentGameState();
         void sendPowerupStart();
-        void sendMapCollisionEvent(CPlayer&);
+        void prepareMapCollisionEvent(CPlayer&);
+        void sendMapCollisionEvent();
         void sendP2PCollisionEvent(CPlayer&, CPlayer&);
 
 
@@ -138,6 +140,10 @@ class NetGameHost : public NetworkEventHandler
         RawPlayerAddress expected_clients[3];
         uint8_t expected_client_count;
         uint8_t next_free_client_slot;
+
+        // Currently collision detection may change player data,
+        // so it has to be saved before
+        Net_MapCollisionPackage* preparedMapCollPkg;
 
         // P2.5. Pre-game
         void sendStartGameMessage();
