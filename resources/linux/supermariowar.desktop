@@ -3,5 +3,6 @@ Type=Application
 Exec=smw
 Terminal=false
 Name=Super Mario War
-Comment=Super Mario War
+Comment=Launch Super Mario War
 Icon=smw
+Categories=Game;
