@@ -124,4 +124,4 @@ if(NOT TARGET_EMSCRIPTEN)
 	endif()
 endif()
 
-install(FILES "${PROJECT_BINARY_DIR}/Binaries/Release/smw" DESTINATION ${bindir})
+install(FILES "${PROJECT_BINARY_DIR}/Binaries/Release/smw" DESTINATION ${SMW_BINDIR})

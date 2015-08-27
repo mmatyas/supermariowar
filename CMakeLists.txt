@@ -56,6 +56,22 @@ else()
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/Binaries/Release)
 endif()
 
+#
+# Install locations
+#
+
+if (WIN32)
+	# CMAKE_INSTALL_PREFIX defaults to `C:/Program Files`
+	set(SMW_BINDIR  "${CMAKE_INSTALL_PREFIX}/Super Mario War" CACHE PATH "Installation location of the game binaries")
+	set(SMW_DATADIR "${CMAKE_INSTALL_PREFIX}/Super Mario War" CACHE PATH "Installation location of the game data")
+else()
+	# CMAKE_INSTALL_PREFIX defaults to `/usr/local`
+	set(SMW_BINDIR  ${CMAKE_INSTALL_PREFIX}/games           CACHE PATH "Installation location of the game binaries")
+	set(SMW_DATADIR ${CMAKE_INSTALL_PREFIX}/share/games/smw CACHE PATH "Installation location of the game data")
+endif()
+# set(SMW_USERDIR ".smw" CACHE STRING "User directory") # User settings directory
+
+add_definitions(-DDATADIR="${SMW_DATADIR}")
 
 #-----------------------------------------------------------------------------
 #
@@ -85,14 +101,6 @@ if(ANDROID)
 	message("Building for Android")
 	add_definitions(-DANDROID)
 endif()
-
-#
-# Install locations
-#
-
-set(userdir ".smw" CACHE STRING "User directory") # User settings directory
-set(datadir ${CMAKE_INSTALL_PREFIX}/share/games/smw CACHE PATH "datadir") # data dir will contain the default pack
-set(bindir  ${CMAKE_INSTALL_PREFIX}/games/bin       CACHE PATH "bindir")
 
 #-----------------------------------------------------------------------------
 #
@@ -294,7 +302,7 @@ endif()
 #
 
 if((NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
-	install(DIRECTORY data DESTINATION ${datadir})
+	install(DIRECTORY data DESTINATION ${SMW_DATADIR})
 endif()
 
 if((NOT ${CMAKE_SYSTEM_NAME} MATCHES "Linux|FreeBSD|Darwin"))
