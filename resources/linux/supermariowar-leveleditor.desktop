@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Exec=smw-leveledit
+Terminal=false
+Name=Super Mario War Level Editor
+Comment=Launch SMW Level Editor
+Icon=smw-leveledit
+Categories=Game;

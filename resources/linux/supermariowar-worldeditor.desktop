@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Exec=smw-worldedit
+Terminal=false
+Name=Super Mario War World Editor
+Comment=Launch SMW World Editor
+Icon=smw-worldedit
+Categories=Game;
