@@ -310,10 +310,22 @@ if((NOT ${CMAKE_SYSTEM_NAME} MATCHES "Linux|FreeBSD|Darwin"))
 endif()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-	# Install the application icon and menu item
-	##TODO: restore these
-#	install(FILES src/cpack/smw.xpm DESTINATION ${CMAKE_INSTALL_PREFIX}/share/pixmaps RENAME smw.xpm)
-#	install(FILES src/cpack/smw.desktop DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
+	# Install desktop items
+	if (NOT XDG_APPS_INSTALL_DIR)
+		set(XDG_APPS_INSTALL_DIR "/usr/share/applications/")
+	endif()
+	install(FILES
+		resources/linux/supermariowar.desktop
+		resources/linux/supermariowar-leveleditor.desktop
+		resources/linux/supermariowar-worldeditor.desktop
+		DESTINATION ${XDG_APPS_INSTALL_DIR})
+
+	# Install icons
+	install(FILES
+		resources/icons/smw.png resources/icons/smw.xpm
+		resources/icons/smw-leveleditor.png resources/icons/smw-leveleditor.xpm
+		resources/icons/smw-worldeditor.png resources/icons/smw-worldeditor.xpm
+		DESTINATION "/usr/share/pixmaps/")
 endif()
 
 #
