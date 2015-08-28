@@ -302,7 +302,7 @@ endif()
 #
 
 if((NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
-	install(DIRECTORY data DESTINATION ${SMW_DATADIR})
+	install(DIRECTORY data/ DESTINATION ${SMW_DATADIR})
 endif()
 
 if((NOT ${CMAKE_SYSTEM_NAME} MATCHES "Linux|FreeBSD|Darwin"))
