@@ -763,10 +763,9 @@ void IO_MovingObject::KillObjectMapHazard(short playerID)
         eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, ix + (iw >> 1) - 16, iy + (ih >> 1) - 16, 3, 4));
 
         if (movingObjectType == movingobject_fireball) {
-        	CPlayer * player = GetPlayerFromGlobalID(playerID);
-
-        	if (player != NULL)
-        		player->decreaseProjectilesCount();
+            CPlayer * player = GetPlayerFromGlobalID(iPlayerID);
+            if (player)
+                player->decreaseProjectilesCount();
 
             ifSoundOnPlay(rm->sfx_hit);
         } else if (movingObjectType == movingobject_egg) {
@@ -782,10 +781,9 @@ void IO_MovingObject::KillObjectMapHazard(short playerID)
             ((CO_Flag*)this)->placeFlag();
             ifSoundOnPlay(rm->sfx_transform);
         } else if (movingObjectType == movingobject_bomb) {
-        	CPlayer * player = GetPlayerFromGlobalID(playerID);
-
-        	if (player != NULL)
-        		player->decreaseProjectilesCount();
+            CPlayer * player = GetPlayerFromGlobalID(iPlayerID);
+            if (player)
+                player->decreaseProjectilesCount();
 
             ifSoundOnPlay(rm->sfx_hit);
         } else if (movingObjectType == movingobject_phantokey) {
