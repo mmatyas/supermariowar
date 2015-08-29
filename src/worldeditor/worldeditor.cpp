@@ -267,8 +267,6 @@ short LookupTeamID(short id)
 gfxSprite		spr_scoretext;
 gfxSprite		spr_poof;
 
-short projectiles[4];
-
 IO_MovingObject * createpowerup(short iType, short ix, short iy, bool side, bool spawn)
 {
     return NULL;

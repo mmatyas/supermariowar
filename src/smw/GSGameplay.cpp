@@ -60,7 +60,6 @@ short GameplayState::g_iPowerupToIcon[8] = {80, 176, 272, 304, 336, 368, 384, 40
 GameplayState::GameplayState()
 {
     for (short p = 0; p < 4; p++) {
-        projectiles[p] = 0;
         respawnCount[p] = 0;
         respawnanimationtimer[p] = 0;
         respawnanimationframe[p] = 0;
@@ -195,7 +194,6 @@ void GameplayState::createPlayers()
 {
     //Create players for this game
     for (short iPlayer = 0; iPlayer < 4; iPlayer++) {
-        projectiles[iPlayer] = 0;
         respawnCount[iPlayer] = 0;
 
         if (game_values.singleplayermode == -1 || game_values.singleplayermode == iPlayer) {

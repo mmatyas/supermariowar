@@ -53,7 +53,6 @@ class GameplayState : public GameState
         float dNextWind;
         short iScoreTextOffset[4];
 
-        short projectiles[4];
         short respawnCount[4];
         short respawnanimationtimer[4];
         short respawnanimationframe[4];
