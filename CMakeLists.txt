@@ -22,15 +22,15 @@ option(USE_SDL2_LIBS "Use SDL2 instead of SDL 1.x" OFF) # only smw ported yet
 option(NO_NETWORK "Disable all network communication" OFF)
 option(BUILD_STATIC_LIBS "Build and link certain dependencies statically (enet, yaml-cpp, lz4)" ON)
 
-if(USE_SDL2_LIBS)
+if (USE_SDL2_LIBS)
 	add_definitions(-DUSE_SDL2)
 endif()
 
-if(NO_NETWORK)
+if (NO_NETWORK)
 	add_definitions(-DNETWORK_DISABLED)
 endif()
 
-if(USE_PNG_SAVE)
+if (USE_PNG_SAVE)
 	add_definitions(-DPNG_SAVE_FORMAT)
 endif()
 
@@ -40,7 +40,7 @@ endif()
 # Additional CMake search path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
-if(NOT CMAKE_BUILD_TYPE)
+if (NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE "Release" CACHE STRING
 		"Build type (Release/Debug/RelWithDebInfo/MinSizeRe)" FORCE)
 endif()
@@ -79,7 +79,7 @@ add_definitions(-DDATADIR="${SMW_DATADIR}")
 #
 #-----------------------------------------------------------------------------
 
-if(APPLE)
+if (APPLE)
 	include(PlatformApple)
 endif()
 
@@ -97,7 +97,7 @@ elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64")
 	include(PlatformArm64)
 endif()
 
-if(ANDROID)
+if (ANDROID)
 	message("Building for Android")
 	add_definitions(-DANDROID)
 endif()
@@ -109,8 +109,8 @@ endif()
 #-----------------------------------------------------------------------------
 
 # emscripten uses its own SDL, no need to include or link
-if(NOT TARGET_EMSCRIPTEN)
-	if(USE_SDL2_LIBS)
+if (NOT TARGET_EMSCRIPTEN)
+	if (USE_SDL2_LIBS)
 		# add all SDL2 dependencies
 		find_package(SDL2 REQUIRED)
 		find_package(SDL2_mixer REQUIRED)
@@ -173,7 +173,7 @@ endif()
 #-----------------------------------------------------------------------------
 
 # Debugging CFLAGS. Turn optimizations off; turn debugging symbols on.
-if(CMAKE_BUILD_TYPE STREQUAL Debug)
+if (CMAKE_BUILD_TYPE STREQUAL Debug)
   add_definitions(-DDEBUG -D_DEBUG -DPNG_DEBUG=1)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -g -O0")
@@ -193,17 +193,15 @@ endif()
 
 # Link statically on Windows to not need additional DLLs
 if (WIN32)
-	add_definitions(-static-libgcc)
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc")
 	# TODO: check if compiler supports this flag, may fail with GCC < 4.8
-	add_definitions(-static-libstdc++)
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libstdc++")
 endif()
 
-# Set these next two lines to test generic
-#set(CPU_ARM 1)
-#add_definitions(-DCPU_ARM=1)
 # Various compile flags
 if(NOT CPU_ARM AND NOT TARGET_EMSCRIPTEN)
-	add_definitions(-msse2)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse2")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -msse2")
 endif()
 
 include(CheckCXXCompilerFlag)
@@ -235,7 +233,8 @@ if(NOT MSVC)
 	check_and_add_flag(COMPAT_NARROWING_OFF -Wno-narrowing)
 
 	# gcc uses some optimizations which might break stuff without this flag
-	add_definitions(-fno-strict-aliasing -fexceptions -Wno-shadow)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-strict-aliasing -fexceptions -Wno-shadow")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-strict-aliasing -fexceptions -Wno-shadow")
 
 endif(NOT MSVC)
 
@@ -244,9 +243,6 @@ add_definitions(-D_GNU_SOURCE=1 -D_REENTRANT)
 
 ## MAIN CONFIG
 
-##TODO: clean code to not need this anymore
-#add_definitions(-Wno-shadow)
-
 check_and_add_flag(VISIBILITY_INLINES_HIDDEN -fvisibility-inlines-hidden)
 
 if(UNIX AND NOT APPLE)
@@ -254,7 +250,8 @@ if(UNIX AND NOT APPLE)
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL Release AND UNIX AND NOT APPLE)
-	add_definitions(-fomit-frame-pointer)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fomit-frame-pointer")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fomit-frame-pointer")
 endif()
 
 ##TODO: test this
