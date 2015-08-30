@@ -61,9 +61,9 @@ endif()
 #
 
 if (WIN32)
-	# CMAKE_INSTALL_PREFIX defaults to `C:/Program Files`
-	set(SMW_BINDIR  "${CMAKE_INSTALL_PREFIX}/Super Mario War" CACHE PATH "Installation location of the game binaries")
-	set(SMW_DATADIR "${CMAKE_INSTALL_PREFIX}/Super Mario War" CACHE PATH "Installation location of the game data")
+	# CMAKE_INSTALL_PREFIX defaults to `C:/Program Files/smw`
+	set(SMW_BINDIR  ${CMAKE_INSTALL_PREFIX}      CACHE PATH "Installation location of the game binaries")
+	set(SMW_DATADIR ${CMAKE_INSTALL_PREFIX}/data CACHE PATH "Installation location of the game data")
 else()
 	# CMAKE_INSTALL_PREFIX defaults to `/usr/local`
 	set(SMW_BINDIR  ${CMAKE_INSTALL_PREFIX}/games           CACHE PATH "Installation location of the game binaries")
