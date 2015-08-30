@@ -320,8 +320,8 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	# Install icons
 	install(FILES
 		resources/icons/smw.png resources/icons/smw.xpm
-		resources/icons/smw-leveleditor.png resources/icons/smw-leveleditor.xpm
-		resources/icons/smw-worldeditor.png resources/icons/smw-worldeditor.xpm
+		resources/icons/smw-leveledit.png resources/icons/smw-leveledit.xpm
+		resources/icons/smw-worldedit.png resources/icons/smw-worldedit.xpm
 		DESTINATION "/usr/share/pixmaps/")
 endif()
 
