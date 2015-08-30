@@ -1,5 +1,9 @@
 set (WORLDEDIT_SRCS worldeditor.cpp)
 
+if (WIN32)
+	LIST(APPEND WORLDEDIT_SRCS "${PROJECT_SOURCE_DIR}/resources/windows/smw-worldedit.rc")
+endif()
+
 add_executable (smw-worldedit
 	../common/movingplatform.cpp
 	../smw/world.cpp

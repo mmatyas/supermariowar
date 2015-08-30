@@ -1,5 +1,9 @@
 set(LEVELEDIT_SRCS leveleditor.cpp)
 
+if (WIN32)
+	LIST(APPEND LEVELEDIT_SRCS "${PROJECT_SOURCE_DIR}/resources/windows/smw-leveledit.rc")
+endif()
+
 add_executable(smw-leveledit ../common/movingplatform.cpp ../smw/FPSLimiter.cpp ${LEVELEDIT_SRCS})
 target_link_libraries(smw-leveledit CommonFiles)
 

@@ -95,6 +95,10 @@ if(NOT NO_NETWORK)
 	endif()
 endif()
 
+if (WIN32)
+	LIST(APPEND SMW_SRCS "${PROJECT_SOURCE_DIR}/resources/windows/smw.rc")
+endif()
+
 #add_executable(smw ${COMMON_SRCS} ${SMW_SRCS} ../common/global.h)
 add_executable(smw ../common/movingplatform.cpp ../common/uicontrol.cpp ../common/uimenu.cpp ${SMW_SRCS})
 target_link_libraries(smw CommonFiles)
