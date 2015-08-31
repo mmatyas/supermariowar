@@ -3037,7 +3037,6 @@ bool MO_Yoshi::collide(CPlayer * player)
 
             placeYoshi();
 
-            CO_Egg * egg = (CO_Egg*)player->carriedItem;
             egg->placeEgg();
 
             ifSoundOnPlay(rm->sfx_yoshi);

@@ -2258,7 +2258,7 @@ void GameplayState::update()
                 game_values.playinvinciblesound = false;
                 game_values.playflyingsound = false;
 
-                for (i = 0; i < list_players_cnt; i++)
+                for (unsigned short i = 0; i < list_players_cnt; i++)
                     list_players[i]->move();    //move all objects before doing object-object collision detection in
                 //->think(), so we test against the new position after object-map collision detection
 
@@ -2277,7 +2277,7 @@ void GameplayState::update()
 
                 //Commit all player actions at this point (after we have collided with any objects
                 //that the player might have picked up)
-                for (i = 0; i < list_players_cnt; i++)
+                for (unsigned short i = 0; i < list_players_cnt; i++)
                     list_players[i]->CommitAction();
 
                 cleanDeadNonPlayerObjects();
@@ -2305,7 +2305,7 @@ void GameplayState::update()
 SWAPBREAK:
 
         if (game_values.swapplayers) {
-            for (i = 0; i < list_players_cnt; i++) {
+            for (unsigned short i = 0; i < list_players_cnt; i++) {
                 list_players[i]->updateswap();
             }
         }

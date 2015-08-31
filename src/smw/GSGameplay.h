@@ -46,7 +46,6 @@ class GameplayState : public GameState
         //...
         //TODO
 
-        short i, j;
         short iCountDownState;
         short iCountDownTimer;
         short iWindTimer;

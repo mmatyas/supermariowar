@@ -77,10 +77,10 @@ void Room::removePlayer(Player* player)
             // TODO: check for upload/download errors
             if (hostPlayerNumber == p && playerCount > 0) {
                 hostPlayerNumber = 0xFF;
-                for (uint8_t p = 0; p < 4 && hostPlayerNumber > 4; p++) {
+                for (uint8_t pnexthost = 0; pnexthost < 4 && hostPlayerNumber > 4; pnexthost++) {
                      // set the first available player as host
-                    if (players[p])
-                        hostPlayerNumber = p;
+                    if (players[pnexthost])
+                        hostPlayerNumber = pnexthost;
                 }
                 assert(hostPlayerNumber < 4);
             }

@@ -48,7 +48,7 @@ bool FileCompressor::compress(const std::string& input_path, unsigned char*& out
 
         // Read uncompressed data to buffer
 
-        char* input_buffer = (char*) malloc(input_size);
+        input_buffer = (char*) malloc(input_size);
         if (!input_buffer) {
             printf("[error] Out of memory\n");
             throw std::exception();
