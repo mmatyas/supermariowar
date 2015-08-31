@@ -143,7 +143,7 @@ const string convertPath(const string& source, const string& pack)
 #ifdef _XBOX
 		const string s = convertPartialPath(pack + trailingdir);  //Hack because pack already has d:\ in it
 #else
-		const string s = convertPath(pack + trailingdir);
+		const string s = pack + trailingdir;
 #endif
 
 		//If the file exists, return the path to it
@@ -160,7 +160,7 @@ const string convertPath(const string& source, const string& pack)
 #ifdef _XBOX
 		const string s = convertPartialPath(pack + trailingdir);  //Hack because pack already has d:\ in it
 #else
-		const string s = convertPath(pack + trailingdir);
+		const string s = pack + trailingdir;
 #endif
 
 		//If the file exists, return the path to it

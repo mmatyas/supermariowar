@@ -952,7 +952,7 @@ void MenuState::update()
             rm->LoadMenuGraphics();
 
             blitdest = rm->menu_backdrop.getSurface();
-            rm->menu_shade.setalpha(smw->MenuTransparency	);
+            rm->menu_shade.setalpha(smw->MenuTransparency);
             rm->menu_shade.draw(0, 0);
             blitdest = screen;
         } else if (MENU_CODE_WORLD_GRAPHICS_PACK_CHANGED == code) {

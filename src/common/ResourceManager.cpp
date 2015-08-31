@@ -36,7 +36,7 @@ bool CResourceManager::LoadFullSkin(gfxSprite ** sprites, short skinID, short co
 }
 
 void CResourceManager::LoadAllSprites() {
-    const char * graphicspack = menugraphicspacklist->current_name();
+    const char * graphicspack = gamegraphicspacklist->current_name();
 
     //Just load menu skins for now (just standing right sprite)
     for (short k = 0; k < MAX_PLAYERS; k++) {
