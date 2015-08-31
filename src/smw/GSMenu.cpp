@@ -359,6 +359,10 @@ void MenuState::onEnterState()
         if (mCurrentMenu == mGameSettingsMenu || mCurrentMenu == mTournamentScoreboardMenu)
             mGameSettingsMenu->miMapField->LoadCurrentMap();
     }
+
+    // On return from a game, refresh room list
+    if (netplay.active)
+        netplay.client.requestRoomList();
 }
 
 void MenuState::update()

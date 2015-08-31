@@ -204,6 +204,8 @@ void Room::sendStartSignal()
 
     gamehost->sendData(&pkg_to_gh, sizeof(Net_PlayerInfoPkg));
 
+    visible = false;
+
 /*
     StartSyncPackage package;
         package.protocolVersion = NET_PROTOCOL_VERSION;
