@@ -159,7 +159,7 @@ void SMWServer::onReceive(NetClient& client, const uint8_t* data, size_t dataLen
             break;
 
         case NET_REQUEST_CONNECT:
-            playerConnectsServer(playerID, data);
+            playerConnectsServer(playerID, data, dataLength);
             break;
 
         case NET_REQUEST_LEAVE_SERVER:
@@ -174,11 +174,11 @@ void SMWServer::onReceive(NetClient& client, const uint8_t* data, size_t dataLen
             break;
 
         case NET_REQUEST_CREATE_ROOM:
-            playerCreatesRoom(playerID, data);
+            playerCreatesRoom(playerID, data, dataLength);
             break;
 
         case NET_REQUEST_JOIN_ROOM:
-            playerJoinsRoom(playerID, data);
+            playerJoinsRoom(playerID, data, dataLength);
             break;
 
         case NET_REQUEST_LEAVE_ROOM:
@@ -186,7 +186,7 @@ void SMWServer::onReceive(NetClient& client, const uint8_t* data, size_t dataLen
             break;
 
         case NET_NOTICE_ROOM_CHAT_MSG:
-            playerSendsChatMsg(playerID, data);
+            playerSendsChatMsg(playerID, data, dataLength);
             break;
 
         //
@@ -202,7 +202,7 @@ void SMWServer::onReceive(NetClient& client, const uint8_t* data, size_t dataLen
             break;*/
 
         default:
-            printf("Unknown:");
+            printf("Unknown: %d", messageType);
             /*for (int a = 0; a < netLayer.lastIncomingDataLength(); a++)
                 printf(" %3d", netLayer.lastIncomingData()[a]);*/
             printf("\n");
@@ -241,13 +241,18 @@ void SMWServer::sendCode(uint64_t playerID, uint8_t code)
     players[playerID].sendCode(code);
 }
 
-void SMWServer::playerConnectsServer(uint64_t playerID, const void* data)
+void SMWServer::playerConnectsServer(uint64_t playerID, const void* data, size_t dataLength)
 {
     if (!players.count(playerID))
         return;
 
+    if (dataLength != sizeof(ClientConnectionPackage)) {
+        printf("[error] Corrupt package arrived from %lu\n", playerID);
+        return;
+    }
+
     ClientConnectionPackage package;
-    memcpy(&package, data, sizeof(ClientConnectionPackage));
+    memcpy(&package, data, dataLength);
 
     players[playerID].name = package.playerName;
     players[playerID].sendConnectOK();
@@ -284,13 +289,9 @@ void SMWServer::sendVisibleRoomEntries(NetClient& client)
         {
             RoomInfoPackage roomInfo;
             {
-                roomInfo.protocolMajorVersion = NET_PROTOCOL_VERSION_MAJOR;
-                roomInfo.protocolMinorVersion = NET_PROTOCOL_VERSION_MINOR;
-                roomInfo.packageType = NET_RESPONSE_ROOM_LIST_ENTRY;
-
                 roomInfo.roomID = room->roomID;
 
-                memcpy(roomInfo.name, room->name, NET_MAX_ROOM_NAME_LENGTH);
+                strncpy(roomInfo.name, room->name, NET_MAX_ROOM_NAME_LENGTH);
                 roomInfo.name[NET_MAX_ROOM_NAME_LENGTH - 1] = '\0';
 
                 roomInfo.passwordRequired = false;
@@ -315,7 +316,7 @@ void SMWServer::sendVisibleRoomEntries(NetClient& client)
     }
 }
 
-void SMWServer::playerCreatesRoom(uint64_t playerID, const void* data)
+void SMWServer::playerCreatesRoom(uint64_t playerID, const void* data, size_t dataLength)
 {
     if (!players.count(playerID))
         return;
@@ -324,9 +325,14 @@ void SMWServer::playerCreatesRoom(uint64_t playerID, const void* data)
     if (player->currentRoomID || player->isPlaying)
         return;
 
+    if (dataLength != sizeof(NewRoomPackage)) {
+        printf("[error] Corrupt package arrived from %lu\n", playerID);
+        return;
+    }
+
     // input
     NewRoomPackage pkg;
-    memcpy(&pkg, data, sizeof(NewRoomPackage));
+    memcpy(&pkg, data, dataLength);
 
     // create
     Room room(roomCreateID, pkg.name, pkg.password, player);
@@ -346,7 +352,7 @@ void SMWServer::playerCreatesRoom(uint64_t playerID, const void* data)
     roomCreateID++; // increase global ID
 }
 
-void SMWServer::playerJoinsRoom(uint64_t playerID, const void* data)
+void SMWServer::playerJoinsRoom(uint64_t playerID, const void* data, size_t dataLength)
 {
     if (!players.count(playerID))
         return;
@@ -355,8 +361,13 @@ void SMWServer::playerJoinsRoom(uint64_t playerID, const void* data)
     if (player->currentRoomID || player->isPlaying)
         return; // TODO: warning
 
+    if (dataLength != sizeof(JoinRoomPackage)) {
+        printf("[error] Corrupt package arrived from %lu\n", playerID);
+        return;
+    }
+
     JoinRoomPackage pkg;
-    memcpy(&pkg, data, sizeof(JoinRoomPackage));
+    memcpy(&pkg, data, dataLength);
 
     printf("%s wants to join room %u\n", player->name.c_str(), pkg.roomID);
 
@@ -408,7 +419,7 @@ void SMWServer::playerLeavesRoom(uint64_t playerID)
     player->lastActivityTime = TIME_NOW();
 }
 
-void SMWServer::playerSendsChatMsg(uint64_t playerID, const void* data)
+void SMWServer::playerSendsChatMsg(uint64_t playerID, const void* data, size_t dataLength)
 {
     if (!players.count(playerID))
         return;
@@ -421,8 +432,13 @@ void SMWServer::playerSendsChatMsg(uint64_t playerID, const void* data)
     if (!rooms.count(roomID))
         return;
 
+    if (dataLength != sizeof(Net_RoomChatMsgPackage)) {
+        printf("[error] Corrupt package arrived from %lu\n", playerID);
+        return;
+    }
+
     Net_RoomChatMsgPackage pkg;
-    memcpy(&pkg, data, sizeof(Net_RoomChatMsgPackage));
+    memcpy(&pkg, data, dataLength);
 
     rooms[roomID].sendChatMessage(player, pkg.message);
     player->lastActivityTime = TIME_NOW();

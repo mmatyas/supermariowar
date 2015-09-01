@@ -64,6 +64,9 @@ struct RoomInfoPackage : MessageHeader {
     uint8_t        gamemodeID;
 
     // Response package
+    RoomInfoPackage() : MessageHeader(NET_RESPONSE_ROOM_LIST_ENTRY) {
+        memset(name, '\0', NET_MAX_ROOM_NAME_LENGTH);
+    }
 };
 
 struct NewRoomPackage : MessageHeader {
