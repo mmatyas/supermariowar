@@ -129,7 +129,8 @@ if(NOT TARGET_EMSCRIPTEN)
 	endif()
 endif()
 
-install(FILES "${PROJECT_BINARY_DIR}/Binaries/Release/smw" DESTINATION ${SMW_BINDIR})
+install(FILES "${PROJECT_BINARY_DIR}/Binaries/Release/smw"
+		DESTINATION ${SMW_BINDIR} COMPONENT runtime)
 
 # install Linux desktop item and icons
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
@@ -137,10 +138,12 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 		"${PROJECT_BINARY_DIR}/supermariowar.desktop" @ONLY)
 
 	install(FILES "${PROJECT_BINARY_DIR}/supermariowar.desktop"
-		DESTINATION ${XDG_APPS_INSTALL_DIR})
+		DESTINATION ${XDG_APPS_INSTALL_DIR}
+		COMPONENT desktop)
 
 	install(FILES
 		"${PROJECT_SOURCE_DIR}/resources/icons/smw.png"
 		"${PROJECT_SOURCE_DIR}/resources/icons/smw.xpm"
-		DESTINATION "/usr/share/pixmaps/")
+		DESTINATION "/usr/share/pixmaps/"
+		COMPONENT desktop)
 endif()

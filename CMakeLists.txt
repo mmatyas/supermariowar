@@ -306,12 +306,17 @@ endif()
 #
 
 if((NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
-	install(DIRECTORY data/ DESTINATION ${SMW_DATADIR})
+	install(DIRECTORY data/ DESTINATION ${SMW_DATADIR} COMPONENT data)
 endif()
 
 if((NOT ${CMAKE_SYSTEM_NAME} MATCHES "Linux|FreeBSD|Darwin"))
 #	install(FILES Data/license.txt DESTINATION ${datadir})
 endif()
+
+# Install by components
+set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
+set(CPACK_COMPONENTS_ALL_IN_ONE_PACKAGE 1)
+set(CPACK_COMPONENTS_ALL runtime data desktop)
 
 #
 # Package settings

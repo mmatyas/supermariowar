@@ -28,7 +28,8 @@ if(NOT TARGET_EMSCRIPTEN)
 	target_link_libraries (smw-worldedit ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLIMAGE_LIBRARY} SDLmain)
 endif()
 
-install(FILES "${PROJECT_BINARY_DIR}/Binaries/Release/smw-worldedit" DESTINATION ${SMW_BINDIR})
+install(FILES "${PROJECT_BINARY_DIR}/Binaries/Release/smw-worldedit"
+		DESTINATION ${SMW_BINDIR} COMPONENT runtime)
 
 # install Linux desktop item and icons
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
@@ -36,10 +37,12 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 		"${PROJECT_BINARY_DIR}/supermariowar-worldeditor.desktop" @ONLY)
 
 	install(FILES "${PROJECT_BINARY_DIR}/supermariowar-worldeditor.desktop"
-		DESTINATION ${XDG_APPS_INSTALL_DIR})
+		DESTINATION ${XDG_APPS_INSTALL_DIR}
+		COMPONENT desktop)
 
 	install(FILES
 		"${PROJECT_SOURCE_DIR}/resources/icons/smw-worldedit.png"
 		"${PROJECT_SOURCE_DIR}/resources/icons/smw-worldedit.xpm"
-		DESTINATION "/usr/share/pixmaps/")
+		DESTINATION "/usr/share/pixmaps/"
+		COMPONENT desktop)
 endif()
