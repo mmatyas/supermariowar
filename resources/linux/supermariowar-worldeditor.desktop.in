@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
-Exec=smw-worldedit
+Exec=smw-worldedit @SMW_DATADIR@
 Terminal=false
 Name=Super Mario War World Editor
 Comment=Launch SMW World Editor

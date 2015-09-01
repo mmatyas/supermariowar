@@ -102,6 +102,13 @@ if (ANDROID)
 	add_definitions(-DANDROID)
 endif()
 
+# For installing Linux desktop items
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	if (NOT XDG_APPS_INSTALL_DIR)
+		set(XDG_APPS_INSTALL_DIR "/usr/share/applications/")
+	endif()
+endif()
+
 #-----------------------------------------------------------------------------
 #
 # Dependencies
@@ -304,25 +311,6 @@ endif()
 
 if((NOT ${CMAKE_SYSTEM_NAME} MATCHES "Linux|FreeBSD|Darwin"))
 #	install(FILES Data/license.txt DESTINATION ${datadir})
-endif()
-
-if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-	# Install desktop items
-	if (NOT XDG_APPS_INSTALL_DIR)
-		set(XDG_APPS_INSTALL_DIR "/usr/share/applications/")
-	endif()
-	install(FILES
-		resources/linux/supermariowar.desktop
-		resources/linux/supermariowar-leveleditor.desktop
-		resources/linux/supermariowar-worldeditor.desktop
-		DESTINATION ${XDG_APPS_INSTALL_DIR})
-
-	# Install icons
-	install(FILES
-		resources/icons/smw.png resources/icons/smw.xpm
-		resources/icons/smw-leveledit.png resources/icons/smw-leveledit.xpm
-		resources/icons/smw-worldedit.png resources/icons/smw-worldedit.xpm
-		DESTINATION "/usr/share/pixmaps/")
 endif()
 
 #
