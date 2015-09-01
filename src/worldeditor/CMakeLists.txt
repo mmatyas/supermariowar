@@ -10,8 +10,8 @@ add_executable (smw-worldedit
 	../smw/world.cpp
 	../smw/objects/moving/MovingObject.cpp
 	../smw/objects/overmap/OverMapObject.cpp
-    ../smw/ObjectContainer.cpp
-    ../smw/objecthazard.cpp
+	../smw/ObjectContainer.cpp
+	../smw/objecthazard.cpp
 	../smw/menu/ModeOptionsMenu.cpp
 	../common/uicontrol.cpp
 	../common/uimenu.cpp
@@ -32,11 +32,11 @@ install(FILES "${PROJECT_BINARY_DIR}/Binaries/Release/smw-worldedit" DESTINATION
 
 # install Linux desktop item and icons
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-    configure_file("${PROJECT_SOURCE_DIR}/resources/linux/supermariowar-worldeditor.desktop.in"
-        "${PROJECT_BINARY_DIR}/supermariowar-worldeditor.desktop" @ONLY)
+	configure_file("${PROJECT_SOURCE_DIR}/resources/linux/supermariowar-worldeditor.desktop.in"
+		"${PROJECT_BINARY_DIR}/supermariowar-worldeditor.desktop" @ONLY)
 
-    install(FILES "${PROJECT_BINARY_DIR}/supermariowar-worldeditor.desktop"
-        DESTINATION ${XDG_APPS_INSTALL_DIR})
+	install(FILES "${PROJECT_BINARY_DIR}/supermariowar-worldeditor.desktop"
+		DESTINATION ${XDG_APPS_INSTALL_DIR})
 
 	install(FILES
 		"${PROJECT_SOURCE_DIR}/resources/icons/smw-worldedit.png"
