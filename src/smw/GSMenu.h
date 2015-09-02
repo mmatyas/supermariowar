@@ -111,8 +111,6 @@ class MenuState : public GameState
 		void DisplayControllingTeamMessage(short iControlTeam);
 
 
-		UI_Menu * mCurrentMenu;
-
 		DisplayError iDisplayError;
 		short iDisplayErrorTimer;
 		bool fNeedMenuMusicReset;

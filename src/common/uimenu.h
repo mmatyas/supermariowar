@@ -179,7 +179,7 @@ class UI_Menu
 
 		void Refresh();
 
-		virtual void OnEnter() { ResetMenu(); } // activates when the menu is opened
+		virtual void OnEnter() { /*ResetMenu();*/ } // activates when the menu is opened
 		virtual void OnPush() {} // activates when the menu opens another menu and becomes inactive
 		virtual void OnPop() {} // activates when the menu reactivates after an onPush
 		virtual void OnLeave() {} // activates when the user leaves the menu

@@ -13,8 +13,8 @@ extern CResourceManager* rm;
 
 UI_NetNewLevelMenu::UI_NetNewLevelMenu() : UI_Menu()
 {
-    assert(MenuScreens::mGameSettingsMenu);
-    const UI_GameSettingsMenu& gsm = static_cast<const UI_GameSettingsMenu&>(*MenuScreens::mGameSettingsMenu);
+    assert(MenuScreens::GameSettings);
+    const UI_GameSettingsMenu& gsm = static_cast<const UI_GameSettingsMenu&>(*MenuScreens::GameSettings);
 
     miNetNewLevelContinueButton = new MI_Button(&rm->spr_selectfield, 70, 45, "Continue", 500, 0);
     miNetNewLevelContinueButton->SetCode(MENU_CODE_TO_NET_NEW_ROOM_SETTINGS_MENU);

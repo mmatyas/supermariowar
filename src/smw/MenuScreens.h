@@ -4,52 +4,82 @@
 #include <stack>
 
 class UI_Menu;
+class UI_MainMenu;
+class UI_OptionsMenu;
+class UI_GameplayOptionsMenu;
+class UI_TeamOptionsMenu;
+class UI_PowerupDropRatesMenu;
+class UI_PowerupSettingsMenu;
+class UI_ProjectileLimitsMenu;
+class UI_ProjectileOptionsMenu;
+class UI_GraphicsOptionsMenu;
+class UI_EyeCandyOptionsMenu;
+class UI_SoundOptionsMenu;
+class UI_ScreenSettingsMenu;
+class UI_ScreenResizeMenu;
+class UI_PlayerControlsSelectMenu;
+class UI_PlayerControlsMenu;
+class UI_ModeOptionsMenu;
+class UI_MatchSelectionMenu;
+class UI_GameSettingsMenu;
+class UI_MapFilterEditMenu;
+class UI_TourStopMenu;
+class UI_WorldMenu;
+class UI_TeamSelectMenu;
+class UI_TournamentScoreboardMenu;
+class UI_BonusWheelMenu;
+class UI_NetServersMenu;
+class UI_NetLobbyMenu;
+class UI_NetNewLevelMenu;
+class UI_NetNewRoomMenu;
+class UI_NetRoomMenu;
 
 struct MenuScreens {
     // Menu state manipulation
     static void PushMenu(UI_Menu*);
     static void PopMenu();
     static UI_Menu* Current();
+    static void RewindToMain();
 
     // The main menu
-    static UI_Menu* mMainMenu;
+    static UI_MainMenu* Main;
 
     // Options menu
-    static UI_Menu* mOptionsMenu;
-    static UI_Menu* mGameplayOptionsMenu;
-    static UI_Menu* mTeamOptionsMenu;
-    static UI_Menu* mPowerupDropRatesMenu;
-    static UI_Menu* mPowerupSettingsMenu;
-    static UI_Menu* mProjectileLimitsMenu;
-    static UI_Menu* mProjectileOptionsMenu;
-    static UI_Menu* mGraphicsOptionsMenu;
-    static UI_Menu* mEyeCandyOptionsMenu;
-    static UI_Menu* mSoundOptionsMenu;
+    static UI_OptionsMenu* Options;
+    static UI_GameplayOptionsMenu* GameplayOptions;
+    static UI_TeamOptionsMenu* TeamOptions;
+    static UI_PowerupDropRatesMenu* PowerupDropRates;
+    static UI_PowerupSettingsMenu* PowerupSettings;
+    static UI_ProjectileLimitsMenu* ProjectileLimits;
+    static UI_ProjectileOptionsMenu* ProjectileOptions;
+    static UI_GraphicsOptionsMenu* GraphicsOptions;
+    static UI_EyeCandyOptionsMenu* EyeCandyOptions;
+    static UI_SoundOptionsMenu* SoundOptions;
 #ifdef _XBOX
-    static UI_Menu* mScreenSettingsMenu;
-    static UI_Menu* mScreenResizeMenu;
+    static UI_ScreenSettingsMenu* ScreenSettings;
+    static UI_ScreenResizeMenu* ScreenResize;
 #endif
     // Controls menu
-    static UI_Menu* mPlayerControlsSelectMenu;
-    static UI_Menu* mPlayerControlsMenu;
+    static UI_PlayerControlsSelectMenu* PlayerControlsSelect;
+    static UI_PlayerControlsMenu* PlayerControls;
 
     // Gameplay menus
-    static UI_Menu* mModeOptionsMenu;
-    static UI_Menu* mMatchSelectionMenu;
-    static UI_Menu* mGameSettingsMenu;
-    static UI_Menu* mMapFilterEditMenu;
-    static UI_Menu* mTourStopMenu;
-    static UI_Menu* mWorldMenu;
-    static UI_Menu* mTeamSelectMenu;
-    static UI_Menu* mTournamentScoreboardMenu;
-    static UI_Menu* mBonusWheelMenu;
+    static UI_ModeOptionsMenu* ModeOptions;
+    static UI_MatchSelectionMenu* MatchSelection;
+    static UI_GameSettingsMenu* GameSettings;
+    static UI_MapFilterEditMenu* MapFilterEdit;
+    static UI_TourStopMenu* TourStop;
+    static UI_WorldMenu* World;
+    static UI_TeamSelectMenu* TeamSelect;
+    static UI_TournamentScoreboardMenu* TournamentScoreboard;
+    static UI_BonusWheelMenu* BonusWheel;
 
     // Multiplayer menu
-    static UI_Menu* mNetServersMenu;
-    static UI_Menu* mNetLobbyMenu;
-    static UI_Menu* mNetNewLevelMenu;
-    static UI_Menu* mNetNewRoomMenu;
-    static UI_Menu* mNetRoomMenu;
+    static UI_NetServersMenu* NetServers;
+    static UI_NetLobbyMenu* NetLobby;
+    static UI_NetNewLevelMenu* NetNewLevel;
+    static UI_NetNewRoomMenu* NetNewRoom;
+    static UI_NetRoomMenu* NetRoom;
 
 private:
     static std::stack<UI_Menu*> menu_stack;
