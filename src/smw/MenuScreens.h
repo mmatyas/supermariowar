@@ -83,6 +83,9 @@ struct MenuScreens {
 
 private:
     static std::stack<UI_Menu*> menu_stack;
+/*#ifdef DEBUG
+    friend bool stack_contains_element(UI_Menu*);
+#endif*/
 };
 
 #endif // MENU_SCREENS_H

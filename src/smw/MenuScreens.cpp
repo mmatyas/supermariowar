@@ -47,9 +47,29 @@ UI_NetRoomMenu* MenuScreens::NetRoom = nullptr;
 // The menu stack
 std::stack<UI_Menu*> MenuScreens::menu_stack;
 
+/*#ifdef DEBUG
+bool stack_contains_element(UI_Menu* needle) {
+    if (MenuScreens::menu_stack.empty())
+        return false;
+
+    UI_Menu* current = MenuScreens::menu_stack.top();
+    if (current == needle)
+        return true;
+
+    MenuScreens::menu_stack.pop();
+    bool result = stack_contains_element(needle);
+    MenuScreens::menu_stack.push(current);
+
+    return result;
+}
+#endif*/
+
 void MenuScreens::PushMenu(UI_Menu* state)
 {
 	assert(state != nullptr);
+/*#ifdef DEBUG
+    assert(!stack_contains_element(state));
+#endif*/
 
     if (MenuScreens::menu_stack.size() > 0)
 		MenuScreens::menu_stack.top()->OnPush();
