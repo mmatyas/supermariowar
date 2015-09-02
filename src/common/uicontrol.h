@@ -6,6 +6,8 @@
 #include "RandomNumberGenerator.h"
 #include "uimenu.h"
 
+#include <functional>
+
 class UI_Menu;
 
 class UI_Control
@@ -468,6 +470,8 @@ public:
 
     MenuCodeEnum MouseClick(short iMouseX, short iMouseY);
 
+    void SetOnPress(std::function<void()>&&);
+
 protected:
 
     gfxSprite * spr;
@@ -489,6 +493,7 @@ protected:
     short iAdjustmentY;
     short iHalfWidth;
 
+    std::function<void()> onPressFn;
 };
 
 class MI_SliderField : public MI_SelectField
