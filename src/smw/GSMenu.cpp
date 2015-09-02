@@ -9,6 +9,7 @@
 #include "net.h"
 #include "map.h"
 #include "MapList.h"
+#include "MenuScreens.h"
 #include "ResourceManager.h"
 #include "Score.h"
 
@@ -111,41 +112,41 @@ bool MenuState::init()
 
 void MenuState::CreateMenu()
 {
-    mMainMenu = new UI_MainMenu();
+    MenuScreens::mMainMenu = new UI_MainMenu();
 
-    mOptionsMenu = new UI_OptionsMenu();
-    mGameplayOptionsMenu = new UI_GameplayOptionsMenu();
-    mTeamOptionsMenu = new UI_TeamOptionsMenu();
-    mPowerupDropRatesMenu = new UI_PowerupDropRatesMenu();
-    mPowerupSettingsMenu = new UI_PowerupSettingsMenu();
-    mProjectileLimitsMenu = new UI_ProjectileLimitsMenu();
-    mProjectileOptionsMenu = new UI_ProjectileOptionsMenu();
-    mGraphicsOptionsMenu = new UI_GraphicsOptionsMenu();
-    mEyeCandyOptionsMenu = new UI_EyeCandyOptionsMenu();
-    mSoundOptionsMenu = new UI_SoundOptionsMenu();
+    MenuScreens::mOptionsMenu = new UI_OptionsMenu();
+    MenuScreens::mGameplayOptionsMenu = new UI_GameplayOptionsMenu();
+    MenuScreens::mTeamOptionsMenu = new UI_TeamOptionsMenu();
+    MenuScreens::mPowerupDropRatesMenu = new UI_PowerupDropRatesMenu();
+    MenuScreens::mPowerupSettingsMenu = new UI_PowerupSettingsMenu();
+    MenuScreens::mProjectileLimitsMenu = new UI_ProjectileLimitsMenu();
+    MenuScreens::mProjectileOptionsMenu = new UI_ProjectileOptionsMenu();
+    MenuScreens::mGraphicsOptionsMenu = new UI_GraphicsOptionsMenu();
+    MenuScreens::mEyeCandyOptionsMenu = new UI_EyeCandyOptionsMenu();
+    MenuScreens::mSoundOptionsMenu = new UI_SoundOptionsMenu();
 
-    mPlayerControlsSelectMenu = new UI_PlayerControlsSelectMenu();
-    mPlayerControlsMenu = new UI_PlayerControlsMenu();
+    MenuScreens::mPlayerControlsSelectMenu = new UI_PlayerControlsSelectMenu();
+    MenuScreens::mPlayerControlsMenu = new UI_PlayerControlsMenu();
 
-    mModeOptionsMenu = new UI_ModeOptionsMenu();
-    mMatchSelectionMenu = new UI_MatchSelectionMenu();
-    mGameSettingsMenu = new UI_GameSettingsMenu();
-    mMapFilterEditMenu = new UI_MapFilterEditMenu();
-    mTourStopMenu = new UI_TourStopMenu();
-    mWorldMenu = new UI_WorldMenu();
-    mTeamSelectMenu = new UI_TeamSelectMenu();
-    mTournamentScoreboardMenu = new UI_TournamentScoreboardMenu();
-    mBonusWheelMenu = new UI_BonusWheelMenu();
+    MenuScreens::mModeOptionsMenu = new UI_ModeOptionsMenu();
+    MenuScreens::mMatchSelectionMenu = new UI_MatchSelectionMenu();
+    MenuScreens::mGameSettingsMenu = new UI_GameSettingsMenu();
+    MenuScreens::mMapFilterEditMenu = new UI_MapFilterEditMenu();
+    MenuScreens::mTourStopMenu = new UI_TourStopMenu();
+    MenuScreens::mWorldMenu = new UI_WorldMenu();
+    MenuScreens::mTeamSelectMenu = new UI_TeamSelectMenu();
+    MenuScreens::mTournamentScoreboardMenu = new UI_TournamentScoreboardMenu();
+    MenuScreens::mBonusWheelMenu = new UI_BonusWheelMenu();
 
-    mNetServersMenu = new UI_NetServersMenu();
-    mNetLobbyMenu = new UI_NetLobbyMenu();
-    mNetNewLevelMenu = new UI_NetNewLevelMenu(mGameSettingsMenu);
-    mNetNewRoomMenu = new UI_NetNewRoomMenu();
-    mNetRoomMenu = new UI_NetRoomMenu();
+    MenuScreens::mNetServersMenu = new UI_NetServersMenu();
+    MenuScreens::mNetLobbyMenu = new UI_NetLobbyMenu();
+    MenuScreens::mNetNewLevelMenu = new UI_NetNewLevelMenu();
+    MenuScreens::mNetNewRoomMenu = new UI_NetNewRoomMenu();
+    MenuScreens::mNetRoomMenu = new UI_NetRoomMenu();
 
 #ifdef _XBOX
-    mScreenSettingsMenu = new UI_ScreenSettingsMenu();
-    mScreenResizeMenu = new UI_ScreenResizeMenu();
+    MenuScreens::mScreenSettingsMenu = new UI_ScreenSettingsMenu();
+    MenuScreens::mScreenResizeMenu = new UI_ScreenResizeMenu();
 #endif
 
     mCurrentMenu = mMainMenu;

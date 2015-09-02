@@ -3,17 +3,25 @@
 #include "GameMode.h"
 #include "net.h"
 #include "ResourceManager.h"
+#include "MenuScreens.h"
+
+#include "../GameSettingsMenu.h"
+
+#include <cassert>
 
 extern CResourceManager* rm;
 
-UI_NetNewLevelMenu::UI_NetNewLevelMenu(const UI_GameSettingsMenu* gsm) : UI_Menu()
+UI_NetNewLevelMenu::UI_NetNewLevelMenu() : UI_Menu()
 {
+    assert(MenuScreens::mGameSettingsMenu);
+    const UI_GameSettingsMenu& gsm = static_cast<const UI_GameSettingsMenu&>(*MenuScreens::mGameSettingsMenu);
+
     miNetNewLevelContinueButton = new MI_Button(&rm->spr_selectfield, 70, 45, "Continue", 500, 0);
     miNetNewLevelContinueButton->SetCode(MENU_CODE_TO_NET_NEW_ROOM_SETTINGS_MENU);
 
-    miNetNewLevelModeField = new MI_ImageSelectField(*(gsm->miModeField));
+    miNetNewLevelModeField = new MI_ImageSelectField(*(gsm.miModeField));
     for (short iGoalField = 0; iGoalField < GAMEMODE_LAST; iGoalField++)
-        miNetNewLevelGoalField[iGoalField] = new MI_SelectField(*(gsm->miGoalField[iGoalField]));
+        miNetNewLevelGoalField[iGoalField] = new MI_SelectField(*(gsm.miGoalField[iGoalField]));
 
     miNetNewLevelMapField = new MI_MapField(&rm->spr_selectfield, 70, 165, "Map", 400, 120, true);
     netplay.mapfilepath = getCurrentMapPath();

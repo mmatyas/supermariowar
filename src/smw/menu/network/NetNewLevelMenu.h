@@ -4,8 +4,6 @@
 #include "uimenu.h"
 #include "uicontrol.h"
 
-#include "../GameSettingsMenu.h"
-
 #include <string>
 
 /*
@@ -15,7 +13,7 @@
 class UI_NetNewLevelMenu : public UI_Menu
 {
 public:
-    UI_NetNewLevelMenu(const UI_GameSettingsMenu*);
+    UI_NetNewLevelMenu();
     ~UI_NetNewLevelMenu();
 
     std::string getCurrentMapPath();
