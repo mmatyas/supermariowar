@@ -1231,6 +1231,8 @@ MI_Button::MI_Button(gfxSprite * nspr, short x, short y, const char * name, shor
 
     iAdjustmentY = width > 256 ? 0 : 128;
     iHalfWidth = width >> 1;
+
+    onPressFn = [](){}; // do nothing
 }
 
 MI_Button::~MI_Button()
@@ -1243,12 +1245,14 @@ MenuCodeEnum MI_Button::Modify(bool)
     if (fDisable)
         return MENU_CODE_UNSELECT_ITEM;
 
+    onPressFn();
     return menuCode;
 }
 
 MenuCodeEnum MI_Button::SendInput(CPlayerInput *)
 {
     //If input is being sent, that means the button is selected i.e. clicked
+    onPressFn();
     return menuCode;
 }
 
@@ -1306,6 +1310,11 @@ MenuCodeEnum MI_Button::MouseClick(short iMouseX, short iMouseY)
     }
 
     return MENU_CODE_NONE;
+}
+
+void MI_Button::SetOnPress(std::function<void()>&& func)
+{
+    onPressFn = func;
 }
 
 /**************************************
