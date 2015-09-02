@@ -57,6 +57,8 @@ LIST(APPEND SMW_SRCS
 # Menu screens
 #
 LIST(APPEND SMW_SRCS
+	MenuScreens.cpp
+
 	menu/MainMenu.cpp
 	menu/BonusWheelMenu.cpp
 	menu/GameSettingsMenu.cpp

@@ -1,9 +1,17 @@
 #ifndef MENU_SCREENS_H
 #define MENU_SCREENS_H
 
+#include <stack>
+
 class UI_Menu;
 
 struct MenuScreens {
+    // Menu state manipulation
+    static void PushMenu(UI_Menu*);
+    static void PopMenu();
+    static UI_Menu* Current();
+
+    // The main menu
     static UI_Menu* mMainMenu;
 
     // Options menu
@@ -42,6 +50,9 @@ struct MenuScreens {
     static UI_Menu* mNetNewLevelMenu;
     static UI_Menu* mNetNewRoomMenu;
     static UI_Menu* mNetRoomMenu;
+
+private:
+    static std::stack<UI_Menu*> menu_stack;
 };
 
 #endif // MENU_SCREENS_H
