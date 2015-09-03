@@ -7,6 +7,9 @@ extern short LookupTeamID(short id);
 
 extern CGameValues game_values;
 
+extern struct MenuScreens;
+extern void MenuScreens::PopMenu();
+
 UI_Menu::UI_Menu()
 {
 	cancelCode = MENU_CODE_NONE;
@@ -158,6 +161,7 @@ MenuCodeEnum UI_Menu::SendInput(CPlayerInput * playerInput)
 		}
 
         if (playerInput->outputControls[iPlayer].menu_cancel.fPressed) {
+			MenuScreens::PopMenu();
 			return cancelCode;
 		}
 	}
