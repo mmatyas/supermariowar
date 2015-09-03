@@ -17,11 +17,11 @@ UI_NetRoomMenu::UI_NetRoomMenu() : UI_Menu()
     for (short p = 0; p < 4; p++)
         AddNonControl(miNetRoomPlayerName[p]);
 
-    miNetRoomStartButton = new MI_Button(&rm->spr_selectfield, 320, 300, "(waiting)", 320 - 40, 1);
+    miNetRoomStartButton = new MI_Button(&rm->spr_selectfield, 300, 310, "(waiting)", 335, 1);
     miNetRoomStartButton->SetCode(MENU_CODE_TO_NET_ROOM_START_IN_PROGRESS);
 
-    miNetRoomMessages = new MI_ChatMessageBox(20, 432 - 100, 640 - 2 * 26, 1);
-    miNetRoomMapPlaceholder = new MI_ChatMessageBox(320, 70, 320 - 40, 5);
+    miNetRoomMessages = new MI_ChatMessageBox(20, 350, 640 - 2 * 26, 1);
+    miNetRoomMapPlaceholder = new MI_ChatMessageBox(295, 32, 345, 7);
 
     miNetRoomMessageField = new MI_TextField(&rm->menu_plain_field, 26, 432, "Say", 464 - 36, 60);
     miNetRoomMessageField->SetData(netplay.mychatmessage, NET_MAX_CHAT_MSG_LENGTH);
@@ -29,7 +29,7 @@ UI_NetRoomMenu::UI_NetRoomMenu() : UI_Menu()
     miNetRoomSendButton = new MI_Button(&rm->spr_selectfield, 464, 432, "Send", 80, 1);
     miNetRoomSendButton->SetCode(MENU_CODE_NET_CHAT_SEND);
 
-    miNetRoomBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Back", 80, 1);
+    miNetRoomBackButton = new MI_Button(&rm->spr_selectfield, 544, 432, "Leave", 80, 1);
     miNetRoomBackButton->SetCode(MENU_CODE_TO_NET_LOBBY_MENU);
 
     AddNonControl(miNetRoomMessages);
