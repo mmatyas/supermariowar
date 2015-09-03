@@ -3,6 +3,7 @@
 
 #include "input.h"
 #include "uicontrol.h"
+#include "ui/MI_MapField.h"
 #include "uimenu.h"
 #include "world.h"
 

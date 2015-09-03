@@ -28,5 +28,6 @@ add_library ( CommonFiles
     SFont.c
     sfx.cpp
     TilesetManager.cpp
+    ui/MI_MapPreview.cpp
     ui/MI_MapField.cpp
 )

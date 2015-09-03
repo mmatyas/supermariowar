@@ -14,6 +14,8 @@ add_executable (smw-worldedit
 	../smw/objecthazard.cpp
 	../smw/menu/ModeOptionsMenu.cpp
 	../common/uicontrol.cpp
+	../common/ui/MI_MapPreview.cpp
+	../common/ui/MI_MapField.cpp
 	../common/uimenu.cpp
 	${WORLDEDIT_SRCS}
 )

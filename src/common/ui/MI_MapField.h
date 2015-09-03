@@ -1,9 +1,9 @@
 #ifndef UI_MAP_FIELD
 #define UI_MAP_FIELD
 
-#include "uicontrol.h"
+#include "MI_MapPreview.h"
 
-class MI_MapField : public UI_Control
+class MI_MapField: public MI_MapPreview
 {
 public:
 
@@ -22,17 +22,6 @@ public:
     //Sends player input to control on every frame
     MenuCodeEnum SendInput(CPlayerInput * playerInput);
 
-    void AdjustIndicators();
-
-    void LoadCurrentMap();
-    void LoadMap(const char * szMapPath);
-
-    bool SetMap(const char * szMapName, bool fWorld);
-    void SetSpecialMap(const char * szMapName, const char * szMapPath);
-
-    const char * GetMapName() { return szMapName; }
-    std::string GetMapFilePath();
-
     MenuCodeEnum ChooseRandomMap();
 
     MenuCodeEnum MouseClick(short iMouseX, short iMouseY);
@@ -46,21 +35,11 @@ protected:
 
     bool Move(bool fNext, bool fScrollFast);
 
-    gfxSprite * spr;
-
-    SDL_Surface * surfaceMapBackground;
-    SDL_Surface * surfaceMapBlockLayer;
-    SDL_Surface * surfaceMapForeground;
-    SDL_Rect rectDst;
-
     char * szName;
-    char szMapName[256];
-    short iWidth, iIndent;
 
     MI_Image * miModifyImageLeft;
     MI_Image * miModifyImageRight;
 
-    short iSlideListOut;
     short iSlideListOutGoal;
 
     std::string sSearchString;
