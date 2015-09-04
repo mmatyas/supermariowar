@@ -24,14 +24,13 @@ extern void LoadMapHazards(bool fPreview);
     inline void smallDelay() {}
 #endif
 
-MI_MapPreview::MI_MapPreview(gfxSprite * nspr, short x, short y, short width, short indent) :
-    UI_Control(x, y)
+MI_MapPreview::MI_MapPreview(gfxSprite * nspr, short x, short y, short width, short indent)
+    : UI_Control(x, y)
+    , spr(nspr)
+    , iWidth(width)
+    , iIndent(indent)
+    , iSlideListOut(0)
 {
-    spr = nspr;
-
-    iWidth = width;
-    iIndent = indent;
-
     surfaceMapBackground = SDL_CreateRGBSurface(0, smw->ScreenWidth/2, smw->ScreenHeight/2, 16, 0, 0, 0, 0);
     surfaceMapBlockLayer = SDL_CreateRGBSurface(0, smw->ScreenWidth/2, smw->ScreenHeight/2, 16, 0, 0, 0, 0);
     surfaceMapForeground = SDL_CreateRGBSurface(0, smw->ScreenWidth/2, smw->ScreenHeight/2, 16, 0, 0, 0, 0);
@@ -41,6 +40,8 @@ MI_MapPreview::MI_MapPreview(gfxSprite * nspr, short x, short y, short width, sh
     rectDst.y = y + 44;
     rectDst.w = smw->ScreenWidth/2;
     rectDst.h = smw->ScreenHeight/2;
+
+    memset(szMapName, 0, sizeof(szMapName));
 }
 
 MI_MapPreview::~MI_MapPreview() {}

@@ -36,10 +36,10 @@ protected:
     SDL_Surface * surfaceMapForeground;
     SDL_Rect rectDst;
 
-    short iSlideListOut;
-
     short iWidth, iIndent;
     char szMapName[256];
+
+    short iSlideListOut;
 };
 
 #endif // UI_MAP_PREVIEW

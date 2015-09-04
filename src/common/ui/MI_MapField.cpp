@@ -20,13 +20,14 @@ extern CObjectContainer objectcontainer[3];
  * MI_MapField Class
  **************************************/
 
-MI_MapField::MI_MapField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent, bool showtags) :
-    MI_MapPreview(nspr, x, y, width, indent)
+MI_MapField::MI_MapField(gfxSprite * nspr, short x, short y, const char * name, short width, short indent, bool showtags)
+    : MI_MapPreview(nspr, x, y, width, indent)
+    , sSearchString("")
+    , iSearchStringTimer(0)
+    , fShowtags(showtags)
 {
     szName = new char[strlen(name) + 1];
     strcpy(szName, name);
-
-    fShowtags = showtags;
 
     miModifyImageLeft = new MI_Image(nspr, ix + indent - 26, iy + 4, 32, 64, 26, 24, 4, 1, 8);
     miModifyImageLeft->Show(false);
@@ -41,9 +42,6 @@ MI_MapField::MI_MapField(gfxSprite * nspr, short x, short y, const char * name, 
         iSlideListOut = 0;
         iSlideListOutGoal = iSlideListOut;
     }
-
-    sSearchString = "";
-    iSearchStringTimer = 0;
 }
 
 MI_MapField::~MI_MapField()
