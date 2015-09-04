@@ -1013,7 +1013,8 @@ void MenuState::update()
             if (mCurrentMenu == mNetNewLevelMenu) {
                 assert(netplay.active);
                 netplay.mapfilepath = mNetNewLevelMenu->getCurrentMapPath();
-                printf("%s\n", netplay.mapfilepath.c_str());
+                printf("[net] Selected map: %s\n", netplay.mapfilepath.c_str());
+                mNetRoomMenu->SetPreviewMapPath(netplay.mapfilepath);
             }
             else if (game_values.matchtype != MATCH_TYPE_TOUR)
                 szCurrentMapName = mGameSettingsMenu->miMapField->GetMapName();

@@ -17,11 +17,11 @@ UI_NetRoomMenu::UI_NetRoomMenu() : UI_Menu()
     for (short p = 0; p < 4; p++)
         AddNonControl(miNetRoomPlayerName[p]);
 
-    miNetRoomStartButton = new MI_Button(&rm->spr_selectfield, 300, 310, "(waiting)", 335, 1);
+    miNetRoomStartButton = new MI_Button(&rm->spr_selectfield, 300, 310, "(waiting)", 331, 1);
     miNetRoomStartButton->SetCode(MENU_CODE_TO_NET_ROOM_START_IN_PROGRESS);
 
     miNetRoomMessages = new MI_ChatMessageBox(20, 350, 640 - 2 * 26, 1);
-    miNetRoomMapPlaceholder = new MI_ChatMessageBox(295, 32, 345, 7);
+    miNetRoomMapPreview = new MI_MapPreview(&rm->spr_selectfield, 264, 2, 400, 120);
 
     miNetRoomMessageField = new MI_TextField(&rm->menu_plain_field, 26, 432, "Say", 464 - 36, 60);
     miNetRoomMessageField->SetData(netplay.mychatmessage, NET_MAX_CHAT_MSG_LENGTH);
@@ -33,7 +33,7 @@ UI_NetRoomMenu::UI_NetRoomMenu() : UI_Menu()
     miNetRoomBackButton->SetCode(MENU_CODE_TO_NET_LOBBY_MENU);
 
     AddNonControl(miNetRoomMessages);
-    AddNonControl(miNetRoomMapPlaceholder);
+    AddNonControl(miNetRoomMapPreview);
 
     // TODO: if IAmTheRoomHost
     // else disable
@@ -109,4 +109,9 @@ void UI_NetRoomMenu::Restore()
 
     SetHeadControl(miNetRoomMessageField);
     SetCancelCode(MENU_CODE_TO_NET_LOBBY_MENU);
+}
+
+void UI_NetRoomMenu::SetPreviewMapPath(std::string& path)
+{
+    miNetRoomMapPreview->LoadMap(path.c_str());
 }

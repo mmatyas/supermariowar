@@ -19,11 +19,13 @@ public:
     void StartInProgress();
     void Restore();
 
+    void SetPreviewMapPath(std::string&);
+
 private:
     MI_Text * miNetRoomName;
     MI_Text * miNetRoomPlayerName[4];
     MI_ChatMessageBox * miNetRoomMessages;
-    MI_ChatMessageBox * miNetRoomMapPlaceholder;
+    MI_MapPreview * miNetRoomMapPreview;
     MI_TextField * miNetRoomMessageField;
     MI_Button * miNetRoomStartButton;
     MI_Button * miNetRoomSendButton;
