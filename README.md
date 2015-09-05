@@ -1,6 +1,6 @@
 # Super Mario War
 
-[![Build status](https://travis-ci.org/mmatyas/supermariowar.svg?branch=master)](https://travis-ci.org/mmatyas/supermariowar)
+[![Travis][travis-img]][travis-link] [![AppVeyor][appveyor-img]][appveyor-link]
 
 - [About](#about)
 - [Get the code](#get-the-code)
@@ -200,3 +200,8 @@ Alternatively, you can pass these options directly to CMake as `-DFLAGNAME=VALUE
 ## How to play
 
 Please see documentation in the docs/ directory.
+
+[travis-img]: https://travis-ci.org/mmatyas/supermariowar.svg?branch=master
+[travis-link]: https://travis-ci.org/mmatyas/supermariowar
+[appveyor-img]: https://ci.appveyor.com/api/projects/status/github/mmatyas/supermariowar?svg=true
+[appveyor-link]: https://ci.appveyor.com/project/mmatyas/supermariowar
