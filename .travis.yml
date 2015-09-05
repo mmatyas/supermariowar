@@ -3,140 +3,44 @@ language: cpp
 sudo: required
 dist: trusty
 
+env:
+  global:
+    # Coverity Scan token
+    - secure: "b0ClZiz7IhJj265vifI7AiEdofPsiP4b7qNrHuLS+B3z0sHhhk5qCDrdR8Lcya531jxTxcyDlVK79s1fpnkSuMYeLXNO2QvJErwwBx26uVHUuRxx1zEaBRifsWpnR/UHCRFpP5YNC/xVi2EegSW+jCogrhBsOnzpiAXGUfbo3gllm3w4LCd8Lkw52WYQ+NkuSq0K0J5miOYLikxP3iVNzXcqhVjM/QUf71CEmzGUNMKKz/oXZ3PIP6HAz51b2v4JkNrpJ8krL6Bccmsfdvrfd2eQLt0rqUuuz1CtI1wboh/0i2n5Ef21N7zTpapwWl0W9q8QTJoJDzxvIAvAvF7e3bV9i++DUyUt+xfVTL8cBCelP5o5vQjsas9uQ6wfpLa3NTnuBhhliiDN4c3gdCgtmnwfP1nzsBOrGOLv6ZZG/DrkGdH4BssgT6g2OHTQMoA5oGyBbqJ6ZDWtqxCDuyEaqbn3CCZQnVirHmLfBGJ2nfZ2+J9RFP7a5rShgU3FC+FafCqWa4v+QgRWm/c99z2kl13D8BF4ulknHvZMrQd9AYk79leyGiO8fKf8WEBCPpEszg9lE40uUNLi0tUluZ248behpr1NSXgqaEOlrk+BCGKgwFFYGHqE9OaBk6Iv4e9NEUl/QItPncY+yWuceylDoPzBi2u06+oCpMbE7zgSsmk="
+
 branches:
   only:
     - master
+    - coverity_scan
 
 matrix:
   include:
-  # Linux desktop builds
   - compiler: gcc
     env: BUILD=native SMW_USE_SDL2=false
-
-  - compiler: gcc
-    env: BUILD=native SMW_USE_SDL2=true
-
-  - compiler: clang
-    env: BUILD=native SMW_USE_SDL2=false
-
-  - compiler: clang
-    env: BUILD=native SMW_USE_SDL2=true
-
-  # OSX SDL1.2 build
-  - os: osx
-    env: BUILD=native SMW_USE_SDL2=false
-    compiler: clang
-    before_script:
-    - brew update
-    - brew install sdl sdl_image sdl_mixer
-
-  # OSX SDL2 build
-  - os: osx
-    env: BUILD=native SMW_USE_SDL2=true
-    compiler: clang
-    before_script:
-    - brew update
-    - brew install sdl2 sdl2_image sdl2_mixer
-
-  # Emscripten
-  - env: BUILD=emscripten
-
-  # Android builds
-  - language: android
-    env: BUILD=android ABILIST='armeabi armeabi-v7a arm64-v8a'
-
-  - language: android
-    env: BUILD=android ABILIST='x86 x86_64'
-
-  - language: android
-    env: BUILD=android ABILIST='mips mips64'
-
 
 before_script:
-  # Native (Linux, OSX)
-  - if [[ "$BUILD" == "native" && "$TRAVIS_OS_NAME" == "linux" ]]; then
-      sudo apt-get -qq update &&
-      sudo apt-get install -y
-        cmake
-        clang
-        gcc-4.8
-        g++-4.8
-        libsdl1.2-dev
-        libsdl-image1.2-dev
-        libsdl-mixer1.2-dev
-        libsdl2-dev
-        libsdl2-image-dev
-        libsdl2-mixer-dev
-    ; fi
-  - if [[ "$BUILD" == "native" ]]; then $CXX --version; fi
-  - if [[ "$BUILD" == "native" ]]; then cmake --version; fi
-  - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "false" ]]; then sdl-config --version; fi
-  - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "true" ]];  then sdl2-config --version; fi
-
-  # Emscripten
-  - if [[ "$BUILD" == "emscripten" && "$TRAVIS_OS_NAME" == "linux" ]]; then
-      wget https://github.com/mmatyas/mmatyas.github.io/releases/download/arm-libs/emscripten_1350.tgz;
-      tar xzf emscripten_1350.tgz;
-      export EM_PATH=$EM_PATH:$(pwd)/emsdk_portable/clang/fastcomp/build_master_64/bin;
-      export EM_PATH=$EM_PATH:$(pwd)/emsdk_portable/node/4.1.1_64bit/bin;
-      export EM_PATH=$EM_PATH:$(pwd)/emsdk_portable/emscripten/master;
-      export PATH=$EM_PATH:$PATH;
-    fi
-  - if [[ "$BUILD" == "emscripten" && "$TRAVIS_OS_NAME" == "linux" ]]; then emcc -v; fi
-
-  # Android SDK + NDK
-  - if [[ "$BUILD" == "android" ]]; then
-      sudo apt-get -qq update &&
-      sudo apt-get install -y
-        ant
-        expect
-        lib32bz2-1.0
-        lib32gcc1
-        lib32ncurses5
-        lib32stdc++6
-        lib32z1
-        openjdk-7-jdk
-    ; fi
-  - if [[ "$BUILD" == "android" ]]; then
-      cd ..;
-      wget http://dl.google.com/android/ndk/android-ndk-r10e-linux-x86_64.bin;
-      chmod +x ./android-ndk-r10e-linux-x86_64.bin;
-      ./android-ndk-r10e-linux-x86_64.bin > /dev/null;
-      export PATH=$PATH:$(pwd)/android-ndk-r10e;
-    fi
+  - $CXX --version
+  - cmake --version
+  - sdl-config --version
 
 script:
-  - if [[ "$BUILD" == "native" ]]; then mkdir build && cd build; fi
-  - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "false" ]]; then
-      cmake ..;
-      make;
-    fi
-  - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "true" ]]; then
-      cmake -D USE_SDL2_LIBS:BOOL=ON ..;
-      make smw;
-    fi
+  - cmake .
+  - make
 
-  # Android
-  - if [[ "$BUILD" == "android" ]]; then
-      git clone --depth=1 https://github.com/mmatyas/supermariowar-android.git;
-      mv supermariowar supermariowar-android/;
-      cd supermariowar-android;
-      ./build.sh --abi=$ABILIST;
-    fi
+addons:
+  apt:
+    packages:
+    # Packages for native Linux build
+    - cmake
+    - libsdl1.2-dev
+    - libsdl-image1.2-dev
+    - libsdl-mixer1.2-dev
 
-  # Emscripten
-  - if [[ "$BUILD" == "emscripten" ]]; then
-      cd dependencies;
-      hg clone https://hg.libsdl.org/SDL_mixer SDL2_mixer;
-      cd ..;
-      sed -i 's|if (BUILD_STATIC_LIBS)|if (BUILD_STATIC_LIBS)\ninclude_directories(dependencies/SDL2_mixer)|' CMakeLists.txt;
-      unzip data.zip > /dev/null;
-      mkdir build_js && cd build_js;
-      emconfigure cmake .. -DNO_NETWORK=1 -DDISABLE_SYSLIB_CHECKS=1 -DUSE_SDL2_LIBS=1;
-      emmake make smw;
-    fi
-
-android:
-  components:
-    - build-tools-23.0.1
-    - android-15
+  coverity_scan:
+    project:
+      name: "mmatyas/supermariowar"
+      description: "Build submitted via Travis CI"
+    notification_email: mmatyas@inf.u-szeged.hu
+    build_command_prepend: "cmake ."
+    build_command: "make"
+    branch_pattern: coverity_scan
