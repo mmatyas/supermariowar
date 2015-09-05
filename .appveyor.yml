@@ -1,0 +1,27 @@
+branches:
+  only:
+    - master
+
+install:
+  - git submodule update --init --recursive
+  - echo Installing dependencies
+  - choco install -y wget 7zip
+  - set PATH="C:\Program Files\7-Zip";C:\MinGW\bin;%PATH%
+  - wget --no-check-certificate https://www.libsdl.org/release/SDL-devel-1.2.15-VC.zip
+  - wget --no-check-certificate https://www.libsdl.org/projects/SDL_image/release/SDL_image-devel-1.2.12-VC.zip
+  - wget --no-check-certificate https://www.libsdl.org/projects/SDL_mixer/release/SDL_mixer-devel-1.2.12-VC.zip
+  - 7z x SDL-devel-1.2.15-VC.zip
+  - 7z x SDL_image-devel-1.2.12-VC.zip
+  - 7z x SDL_mixer-devel-1.2.12-VC.zip
+  - xcopy /S/Y SDL_image-1.2.12 SDL-1.2.15
+  - xcopy /S/Y SDL_mixer-1.2.12 SDL-1.2.15
+  - set SDLDIR=%CD%\SDL-1.2.15
+  - echo SDLDIR set to %SDLDIR%
+
+build_script:
+  - mkdir build
+  - cd build
+  - echo Start configuration in %CD%
+  - cmake ..
+  - echo Start building in %CD%
+  - cmake --build .
