@@ -12,33 +12,37 @@ branches:
   only:
     - master
 
+sudo: false
+
 before_install:
-  - if [[ "$SMW_USE_SDL2" == "true" ]]; then sudo add-apt-repository ppa:zoogie/sdl2-snapshots -y; fi
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq cmake
   - if [[ "$CXX" == "g++" ]]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
-  - if [[ "$SMW_USE_SDL2" == "false" ]]; then sudo apt-get install -qq libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev; fi
-  - if [[ "$SMW_USE_SDL2" == "true" ]];  then sudo apt-get install -qq libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev; fi
 
 before_script:
+  - $CXX --version
+  - cmake --version
+  - if [[ "$SMW_USE_SDL2" == "false" ]]; then sdl-config --version; fi
+  - if [[ "$SMW_USE_SDL2" == "true" ]];  then sdl2-config --version; fi
   - mkdir build
   - cd build
   - if [[ "$SMW_USE_SDL2" == "false" ]]; then cmake ..; fi
   - if [[ "$SMW_USE_SDL2" == "true" ]];  then cmake -D USE_SDL2_LIBS:BOOL=ON ..; fi
 
 script:
-  - $CXX --version
-  - cmake --version
-  - if [[ "$SMW_USE_SDL2" == "false" ]]; then sdl-config --version; fi
   - if [[ "$SMW_USE_SDL2" == "false" ]]; then make; fi
-  - if [[ "$SMW_USE_SDL2" == "true" ]];  then sdl2-config --version; fi
   - if [[ "$SMW_USE_SDL2" == "true" ]];  then make smw; fi
 
 addons:
   apt:
     sources:
     - ubuntu-toolchain-r-test
+    - zoogie/sdl2-snapshots
     packages:
+    - cmake
     - gcc-4.8
     - g++-4.8
-    - clang
+    - libsdl1.2-dev
+    - libsdl-image1.2-dev
+    - libsdl-mixer1.2-dev
+    - libsdl2-dev
+    - libsdl2-image-dev
+    - libsdl2-mixer-dev
