@@ -22,18 +22,18 @@ add_executable (smw-worldedit
 target_link_libraries (smw-worldedit CommonFiles)
 
 # add .bc extension when building with emscripten
-if(TARGET_EMSCRIPTEN)
+if (TARGET_EMSCRIPTEN)
 	set_target_properties(smw-worldedit PROPERTIES SUFFIX ".bc")
 endif()
 
-if(NOT TARGET_EMSCRIPTEN)
-	target_link_libraries (smw-worldedit ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLIMAGE_LIBRARY} SDLmain)
+if (NOT TARGET_EMSCRIPTEN)
+	target_link_libraries(smw-worldedit ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLIMAGE_LIBRARY} ${SDLMAIN_LIBRARY})
 endif()
 
 install(FILES "${PROJECT_BINARY_DIR}/Binaries/Release/smw-worldedit" DESTINATION ${SMW_BINDIR})
 
 # install Linux desktop item and icons
-if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	configure_file("${PROJECT_SOURCE_DIR}/resources/linux/supermariowar-worldeditor.desktop.in"
 		"${PROJECT_BINARY_DIR}/supermariowar-worldeditor.desktop" @ONLY)
 

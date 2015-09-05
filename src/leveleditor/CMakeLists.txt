@@ -14,7 +14,7 @@ if(TARGET_EMSCRIPTEN)
 endif()
 
 if(NOT TARGET_EMSCRIPTEN)
-	target_link_libraries(smw-leveledit ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLIMAGE_LIBRARY} SDLmain)
+	target_link_libraries(smw-leveledit ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLIMAGE_LIBRARY} ${SDLMAIN_LIBRARY})
 endif()
 
 install(FILES "${PROJECT_BINARY_DIR}/Binaries/Release/smw-leveledit" DESTINATION ${SMW_BINDIR})

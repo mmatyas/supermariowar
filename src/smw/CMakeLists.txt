@@ -117,7 +117,7 @@ if(NOT TARGET_EMSCRIPTEN)
 	if(USE_SDL2_LIBS)
 		target_link_libraries(smw SDL2 SDL2_mixer SDL2_image SDL2main)
 	else()
-		target_link_libraries(smw ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLIMAGE_LIBRARY} SDLmain)
+		target_link_libraries(smw ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLIMAGE_LIBRARY} ${SDLMAIN_LIBRARY})
 	endif()
 
 	if(NOT NO_NETWORK)
