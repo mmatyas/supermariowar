@@ -33,4 +33,4 @@ build_script:
       cmake --build ."
 
 artifacts:
-  - path: supermariowar/build/Binaries/Release/*.exe
+  - path: build\Binaries\Release\*.exe
