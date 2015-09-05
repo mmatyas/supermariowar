@@ -2,6 +2,10 @@ branches:
   only:
     - master
 
+platform:
+  - x86
+  - x64
+
 install:
   - git submodule update --init --recursive
   - echo Installing dependencies
@@ -27,3 +31,6 @@ build_script:
       cmake --version;
       cmake .. -G 'MSYS Makefiles';
       cmake --build ."
+
+artifacts:
+  - path: supermariowar/build/Binaries/Release/*.exe
