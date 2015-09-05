@@ -18,7 +18,6 @@ install:
   - xcopy /S/Y SDL_mixer-1.2.12 SDL-1.2.15
   - set SDLDIR=%CD%\SDL-1.2.15
   - echo SDLDIR set to %SDLDIR%
-  #- set PATH="%PATH:C:\Program Files (x86)\Git\bin;=%"
 
 build_script:
   - C:\MinGW\msys\1.0\bin\sh --login -c "
@@ -28,11 +27,3 @@ build_script:
       cmake --version;
       cmake .. -G 'MSYS Makefiles';
       cmake --build ."
-
-#   - mkdir build
-#   - cd build
-#   - echo Start configuration in %CD%
-#   - cmake --version
-#   - cmake .. -G "MinGW Makefiles"
-#   - echo Start building in %CD%
-#   - cmake --build .
