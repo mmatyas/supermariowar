@@ -71,7 +71,7 @@ else()
 endif()
 # set(SMW_USERDIR ".smw" CACHE STRING "User directory") # User settings directory
 
-add_definitions(-DDATADIR="${SMW_DATADIR}")
+add_definitions(-DSMW_DATADIR="${SMW_DATADIR}")
 
 #-----------------------------------------------------------------------------
 #
