@@ -2,74 +2,10 @@
 
 #include "Log.h"
 #include "ProtocolDefinitions.h"
+#include "platform_enet/NetPeerENet.h"
 
 #include <cassert>
-#include <string>
-#include <sstream>
 
-
-NetPeerENet::NetPeerENet(ENetPeer* peer)
-    : NetPeer()
-    , foreign_peer(peer)
-{
-    // Create a player ID based on address
-    playerID = foreign_peer->address.host;
-    playerID <<= sizeof(foreign_peer->address.port) * 8; // no. of bytes * bits
-    playerID += foreign_peer->address.port;
-}
-
-NetPeerENet::~NetPeerENet()
-{
-    // Note: foreign_peer points to an element in ENet's internal
-    // structure. When a player reconnects, the pointer gets the same value
-    // (points to the same computer), so we shouldn't reset/delete it manually.
-    // That will be handled by enet_deinitialize() at exit.
-}
-
-bool NetPeerENet::sendData(const void* data, size_t length)
-{
-    assert(foreign_peer);
-    if (!foreign_peer || !data || length <= 0)
-        return false;
-
-    ENetPacket* packet = enet_packet_create(data, length, ENET_PACKET_FLAG_RELIABLE);
-    if (!packet)
-        return false;
-
-    if (enet_peer_send(foreign_peer, 1, packet) < 0)
-        return false;
-
-    return true;
-}
-
-uint32_t NetPeerENet::addressHost()
-{
-    // ENet stores host in network byte order
-    if (foreign_peer)
-        return foreign_peer->address.host;
-
-    return 0;
-}
-
-uint16_t NetPeerENet::addressPort()
-{
-    // ENet stores port in host byte order -> convert it
-    if (foreign_peer)
-        return foreign_peer->address.port; // TODO/FIXME: check on other platforms
-
-    return 0;
-}
-
-std::string NetPeerENet::addressAsString()
-{
-    uint8_t* addr = (uint8_t*)&foreign_peer->address.host;
-
-    std::ostringstream ss;
-    ss << (unsigned short)addr[0] <<"."<< (unsigned short)addr[1] <<"."<<
-          (unsigned short)addr[2] <<"."<< (unsigned short)addr[3] <<":"<< foreign_peer->address.port;
-
-    return ss.str();
-}
 
 NetworkLayerENet::NetworkLayerENet()
     : NetworkLayer()

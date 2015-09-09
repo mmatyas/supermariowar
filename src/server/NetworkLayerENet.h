@@ -5,25 +5,7 @@
 
 #include <enet/enet.h>
 
-#include <cstddef>      // size_t
 #include <stdint.h>     // uintN_t
-#include <string>
-
-class NetPeerENet : public NetPeer
-{
-    public:
-        NetPeerENet(ENetPeer*);
-        ~NetPeerENet();
-
-        bool sendData(const void*, size_t);
-        uint32_t addressHost();
-        uint16_t addressPort();
-        std::string addressAsString();
-
-    private:
-        ENetPeer* foreign_peer;
-};
-
 
 class NetworkLayerENet : public NetworkLayer
 {

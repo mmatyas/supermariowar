@@ -66,7 +66,7 @@ bool Player::sendData(const void* data, size_t dataLength)
         return false;
 
     lastActivityTime = TIME_NOW();
-    return network_client->sendData(data, dataLength);
+    return network_client->sendReliable(data, dataLength);
 }
 
 bool Player::sendCode(uint8_t code)

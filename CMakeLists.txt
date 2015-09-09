@@ -287,6 +287,7 @@ include_directories(src/common_netplay)
 include_directories(src/smw)
 
 add_subdirectory(src/common)
+add_subdirectory(src/common_netplay)
 add_subdirectory(src/smw)
 add_subdirectory(src/leveleditor)
 add_subdirectory(src/worldeditor)

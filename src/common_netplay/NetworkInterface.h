@@ -22,10 +22,15 @@ class NetPeer
 
         virtual uint32_t averageRTT() const = 0;
 
+        uint64_t getPlayerID() const { return player_id; }
+
         virtual bool operator==(const NetPeer&) const = 0;
         virtual bool operator==(const NetPeer*) const = 0;
         virtual bool operator!=(const NetPeer& peer) const { return !(*this == peer); }
         virtual bool operator!=(const NetPeer* peer) const { return !(this == peer); }
+
+    protected:
+        uint64_t player_id;
 };
 
 class NetworkEventHandler

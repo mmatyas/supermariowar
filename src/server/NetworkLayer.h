@@ -1,7 +1,7 @@
 #ifndef NETWORK_LAYER_H
 #define NETWORK_LAYER_H
 
-#include "NetworkInterface.h"
+#include "NetworkInterface.h" // from the common netplay dir
 
 #include <stdint.h>     // uintN_t
 

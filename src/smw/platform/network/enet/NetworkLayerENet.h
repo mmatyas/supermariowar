@@ -5,28 +5,8 @@
 
 #include <enet/enet.h>
 
-class NetPeerENet : public NetPeer
-{
-    public:
-        NetPeerENet(ENetPeer*);
-        ~NetPeerENet();
+#include <stdint.h>     // uintN_t
 
-        bool send(const void*, size_t);
-        bool sendReliable(const void*, size_t);
-        void disconnect();
-
-        uint32_t addressHost();
-        uint16_t addressPort();
-        std::string addressAsString();
-
-        uint32_t averageRTT() const;
-
-        bool operator==(const NetPeer&) const;
-        bool operator==(const NetPeer*) const;
-
-    private:
-        ENetPeer* foreign_peer;
-};
 
 class NetworkLayerENet : public NetworkLayer
 {

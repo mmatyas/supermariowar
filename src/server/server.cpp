@@ -218,19 +218,19 @@ void SMWServer::onReceive(NetPeer& client, const uint8_t* data, size_t dataLengt
 
 void SMWServer::sendServerInfo(NetPeer& client)
 {
-    client.sendData(&serverInfo, sizeof(ServerInfoPackage));
+    client.sendReliable(&serverInfo, sizeof(ServerInfoPackage));
 }
 
 void SMWServer::sendCode(NetPeer& client, uint8_t code)
 {
     MessageHeader msg(code);
-    client.sendData(&msg, sizeof(MessageHeader));
+    client.sendReliable(&msg, sizeof(MessageHeader));
 }
 
 void SMWServer::sendCode(NetPeer* client, uint8_t code)
 {
     MessageHeader msg(code);
-    client->sendData(&msg, sizeof(MessageHeader));
+    client->sendReliable(&msg, sizeof(MessageHeader));
 }
 
 void SMWServer::sendCode(uint64_t playerID, uint8_t code)
@@ -309,7 +309,7 @@ void SMWServer::sendVisibleRoomEntries(NetPeer& client)
                     roomInfo.roomID, roomInfo.name, roomInfo.passwordRequired, roomInfo.currentPlayerCount);
             }
 
-            client.sendData(&roomInfo, sizeof(RoomInfoPackage));
+            client.sendReliable(&roomInfo, sizeof(RoomInfoPackage));
         }
 
         ++it;

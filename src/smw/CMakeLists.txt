@@ -103,6 +103,9 @@ endif()
 #add_executable(smw ${COMMON_SRCS} ${SMW_SRCS} ../common/global.h)
 add_executable(smw ../common/movingplatform.cpp ../common/uicontrol.cpp ../common/uimenu.cpp ${SMW_SRCS})
 target_link_libraries(smw CommonFiles)
+if(NOT NO_NETWORK)
+	target_link_libraries(smw NetplayFiles)
+endif()
 
 # add .bc extension when building with emscripten
 if(TARGET_EMSCRIPTEN)

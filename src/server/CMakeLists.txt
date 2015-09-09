@@ -11,6 +11,7 @@ set (SERVER_SRCS
 )
 
 add_executable (smw-server ${SERVER_SRCS})
+target_link_libraries(smw-server NetplayFiles)
 
 target_link_libraries (smw-server enet)
 if (WIN32)
