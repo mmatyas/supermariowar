@@ -3,7 +3,7 @@
 
 #include "input.h"
 #include "network/NetworkInterface.h"
-#include "network/ProtocolDefinitions.h"
+#include "ProtocolDefinitions.h"
 
 #include <list>
 #include <string>

@@ -283,6 +283,7 @@ message("    CXX_FLAGS:   ${CMAKE_CXX_FLAGS}")
 #
 
 include_directories(src/common)
+include_directories(src/common_netplay)
 include_directories(src/smw)
 
 add_subdirectory(src/common)

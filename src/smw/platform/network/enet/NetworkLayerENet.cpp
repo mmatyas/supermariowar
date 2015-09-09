@@ -1,6 +1,6 @@
 #include "NetworkLayerENet.h"
 
-#include "network/ProtocolDefinitions.h"
+#include "ProtocolDefinitions.h"
 
 #include <cassert>
 #include <cstdio>
