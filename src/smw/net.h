@@ -2,7 +2,7 @@
 #define NETWORK_H
 
 #include "input.h"
-#include "network/NetworkInterface.h"
+#include "network/NetworkLayer.h"
 #include "ProtocolDefinitions.h"
 
 #include <list>

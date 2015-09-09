@@ -1,7 +1,7 @@
 #ifndef NETWORK_LAYER_NULL_H
 #define NETWORK_LAYER_NULL_H
 
-#include "network/NetworkInterface.h"
+#include "network/NetworkLayer.h"
 
 class NetworkLayerNULL : public NetworkLayer
 {

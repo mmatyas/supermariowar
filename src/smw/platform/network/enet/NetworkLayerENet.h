@@ -1,7 +1,7 @@
 #ifndef NETWORK_LAYER_ENET_H
 #define NETWORK_LAYER_ENET_H
 
-#include "network/NetworkInterface.h"
+#include "network/NetworkLayer.h"
 
 #include <enet/enet.h>
 
