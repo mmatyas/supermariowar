@@ -4,6 +4,7 @@
 #include "platform_enet/NetPeerENet.h"
 
 #include <cassert>
+#include <cstdio>
 
 
 NetworkLayerENet::NetworkLayerENet()
