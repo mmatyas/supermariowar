@@ -24,7 +24,7 @@ Player::~Player()
         delete network_client;
 }
 
-void Player::setClient(NetClient* client)
+void Player::setClient(NetPeer* client)
 {
     assert(network_client == NULL);
     network_client = client;

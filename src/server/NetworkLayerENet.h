@@ -9,11 +9,11 @@
 #include <stdint.h>     // uintN_t
 #include <string>
 
-class NetClientENet : public NetClient
+class NetPeerENet : public NetPeer
 {
     public:
-        NetClientENet(ENetPeer*);
-        ~NetClientENet();
+        NetPeerENet(ENetPeer*);
+        ~NetPeerENet();
 
         bool sendData(const void*, size_t);
         uint32_t addressHost();

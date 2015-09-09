@@ -95,7 +95,7 @@ void SMWServer::update(bool& running)
     netLayer.listen(*this);
 }
 
-void SMWServer::onConnect(NetClient* new_client)
+void SMWServer::onConnect(NetPeer* new_client)
 {
     printf("Connect event [%lu].\n", new_client->getPlayerID());
 
@@ -116,7 +116,7 @@ void SMWServer::onConnect(NetClient* new_client)
     }
 }
 
-void SMWServer::onDisconnect(NetClient& client)
+void SMWServer::onDisconnect(NetPeer& client)
 {
     printf("Disconnect event [%lu].\n", client.getPlayerID());
     uint64_t playerID = client.getPlayerID();
@@ -131,7 +131,7 @@ void SMWServer::onDisconnect(NetClient& client)
         printf("No such player!\n");
 }
 
-void SMWServer::onReceive(NetClient& client, const uint8_t* data, size_t dataLength)
+void SMWServer::onReceive(NetPeer& client, const uint8_t* data, size_t dataLength)
 {
     //printf("Receive event.\n");
     if (!data || dataLength < 3)
@@ -216,18 +216,18 @@ void SMWServer::onReceive(NetClient& client, const uint8_t* data, size_t dataLen
 
 */
 
-void SMWServer::sendServerInfo(NetClient& client)
+void SMWServer::sendServerInfo(NetPeer& client)
 {
     client.sendData(&serverInfo, sizeof(ServerInfoPackage));
 }
 
-void SMWServer::sendCode(NetClient& client, uint8_t code)
+void SMWServer::sendCode(NetPeer& client, uint8_t code)
 {
     MessageHeader msg(code);
     client.sendData(&msg, sizeof(MessageHeader));
 }
 
-void SMWServer::sendCode(NetClient* client, uint8_t code)
+void SMWServer::sendCode(NetPeer* client, uint8_t code)
 {
     MessageHeader msg(code);
     client->sendData(&msg, sizeof(MessageHeader));
@@ -274,7 +274,7 @@ void SMWServer::removeInactivePlayers()
     }
 }
 
-void SMWServer::sendVisibleRoomEntries(NetClient& client)
+void SMWServer::sendVisibleRoomEntries(NetPeer& client)
 {
     if (!rooms.size()) {
         sendCode(client, NET_RESPONSE_NO_ROOMS);

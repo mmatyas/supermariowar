@@ -9,7 +9,7 @@
 
 struct Player {
     std::string     name;
-    NetClient*      network_client;
+    NetPeer*        network_client;
 
     uint32_t        currentRoomID;
     bool            isPlaying;
@@ -22,7 +22,7 @@ struct Player {
     Player();
     ~Player();
 
-    void setClient(NetClient* client);
+    void setClient(NetPeer* client);
     void setName(std::string& name);
 
     bool sendData(const void*, size_t);

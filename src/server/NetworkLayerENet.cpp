@@ -8,8 +8,8 @@
 #include <sstream>
 
 
-NetClientENet::NetClientENet(ENetPeer* peer)
-    : NetClient()
+NetPeerENet::NetPeerENet(ENetPeer* peer)
+    : NetPeer()
     , foreign_peer(peer)
 {
     // Create a player ID based on address
@@ -18,7 +18,7 @@ NetClientENet::NetClientENet(ENetPeer* peer)
     playerID += foreign_peer->address.port;
 }
 
-NetClientENet::~NetClientENet()
+NetPeerENet::~NetPeerENet()
 {
     // Note: foreign_peer points to an element in ENet's internal
     // structure. When a player reconnects, the pointer gets the same value
@@ -26,7 +26,7 @@ NetClientENet::~NetClientENet()
     // That will be handled by enet_deinitialize() at exit.
 }
 
-bool NetClientENet::sendData(const void* data, size_t length)
+bool NetPeerENet::sendData(const void* data, size_t length)
 {
     assert(foreign_peer);
     if (!foreign_peer || !data || length <= 0)
@@ -42,7 +42,7 @@ bool NetClientENet::sendData(const void* data, size_t length)
     return true;
 }
 
-uint32_t NetClientENet::addressHost()
+uint32_t NetPeerENet::addressHost()
 {
     // ENet stores host in network byte order
     if (foreign_peer)
@@ -51,7 +51,7 @@ uint32_t NetClientENet::addressHost()
     return 0;
 }
 
-uint16_t NetClientENet::addressPort()
+uint16_t NetPeerENet::addressPort()
 {
     // ENet stores port in host byte order -> convert it
     if (foreign_peer)
@@ -60,7 +60,7 @@ uint16_t NetClientENet::addressPort()
     return 0;
 }
 
-std::string NetClientENet::addressAsString()
+std::string NetPeerENet::addressAsString()
 {
     uint8_t* addr = (uint8_t*)&foreign_peer->address.host;
 
@@ -131,14 +131,14 @@ void NetworkLayerENet::listen(NetworkEventHandler& server)
         {
             case ENET_EVENT_TYPE_CONNECT:
             {
-                NetClientENet* newClient = new NetClientENet(last_event.peer);
+                NetPeerENet* newClient = new NetPeerENet(last_event.peer);
                 server.onConnect(newClient);
             }
             break;
 
             case ENET_EVENT_TYPE_RECEIVE:
             {
-                NetClientENet client(last_event.peer);
+                NetPeerENet client(last_event.peer);
                 server.onReceive(client, last_event.packet->data, last_event.packet->dataLength);
                 enet_packet_destroy(last_event.packet);
             }
@@ -146,7 +146,7 @@ void NetworkLayerENet::listen(NetworkEventHandler& server)
 
             case ENET_EVENT_TYPE_DISCONNECT:
             {
-                NetClientENet client(last_event.peer);
+                NetPeerENet client(last_event.peer);
                 server.onDisconnect(client);
             }
             break;

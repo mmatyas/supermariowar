@@ -175,7 +175,7 @@ void Room::sendStartSignal()
     printf("  H: %d -> %p\n", hostPlayerNumber, players[hostPlayerNumber]);*/
 
 
-    NetClient* gh_netclient = gamehost->network_client;
+    NetPeer* gh_netclient = gamehost->network_client;
     Net_GameHostInfoPkg pkg_to_players(gh_netclient->addressHost());
 
     printf("  pkg->players: [%u:%u]\n", pkg_to_players.host, NET_SERVER_PORT + 1);
@@ -190,7 +190,7 @@ void Room::sendStartSignal()
             if (players[p])
             {
                 //printf("  %d\n", p);
-                NetClient* client = players[p]->network_client;
+                NetPeer* client = players[p]->network_client;
                 assert(client != gh_netclient);
 
                 pkg_to_gh.setPlayer(playerIndex, client->addressHost(), client->addressPort());

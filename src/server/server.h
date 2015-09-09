@@ -31,10 +31,10 @@ private:
     std::unordered_map<uint32_t, Room> rooms;
 
 
-    void sendServerInfo(NetClient&);
-    void sendConnectOK(NetClient&);
+    void sendServerInfo(NetPeer&);
+    void sendConnectOK(NetPeer&);
     void playerConnectsServer(uint64_t playerID, const void* data, size_t dataLength);
-    void sendVisibleRoomEntries(NetClient&);
+    void sendVisibleRoomEntries(NetPeer&);
     void removeInactivePlayers();
 
     void playerCreatesRoom(uint64_t playerID, const void* data, size_t dataLength);
@@ -50,8 +50,8 @@ private:
 
     void readConfig();
 
-    void sendCode(NetClient&, uint8_t code);
-    void sendCode(NetClient*, uint8_t code);
+    void sendCode(NetPeer&, uint8_t code);
+    void sendCode(NetPeer*, uint8_t code);
     void sendCode(uint64_t playerID, uint8_t code);
 
 public:
@@ -64,9 +64,9 @@ public:
     void update(bool& running);
 
     // NetworkEventHandler methods
-    void onConnect(NetClient*);
-    void onReceive(NetClient&, const uint8_t*, size_t);
-    void onDisconnect(NetClient& client);
+    void onConnect(NetPeer*);
+    void onReceive(NetPeer&, const uint8_t*, size_t);
+    void onDisconnect(NetPeer& client);
 };
 
 #endif // SMWSERVER_H
