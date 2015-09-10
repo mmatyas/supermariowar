@@ -98,7 +98,7 @@ void Room::sendRoomUpdate()
     // TODO: error check
 
     // Crete package
-    CurrentRoomPackage package;
+    NetPkgs::CurrentRoom package;
         package.roomID = roomID;
         package.hostPlayerNumber = hostPlayerNumber;
         strncpy(package.name, name, NET_MAX_ROOM_NAME_LENGTH);
@@ -127,7 +127,7 @@ void Room::sendRoomUpdate()
             printf("  p3: %s\n", package.playerName[2]);
             printf("  p4: %s\n", package.playerName[3]);
             package.remotePlayerNumber = p;
-            players[p]->sendData(&package, sizeof(CurrentRoomPackage));
+            players[p]->sendData(&package, sizeof(NetPkgs::CurrentRoom));
         }
     }
 }
@@ -149,12 +149,12 @@ void Room::sendChatMessage(Player* sender, const char* message)
     }
     assert(senderNum != 255);
 
-    Net_RoomChatMsgPackage package(senderNum, message);
+    NetPkgs::RoomChatMsg package(senderNum, message);
 
     // Send every player information about the other players.
     for (uint8_t p = 0; p < 4; p++) {
         if (players[p]) {
-            players[p]->sendData(&package, sizeof(Net_RoomChatMsgPackage));
+            players[p]->sendData(&package, sizeof(NetPkgs::RoomChatMsg));
         }
     }
 }
@@ -176,12 +176,12 @@ void Room::sendStartSignal()
 
 
     NetPeer* gh_netclient = gamehost->network_client;
-    Net_GameHostInfoPkg pkg_to_players(gh_netclient->addressHost());
+    NetPkgs::GameHostInfo pkg_to_players(gh_netclient->addressHost());
 
     printf("  pkg->players: [%u:%u]\n", pkg_to_players.host, NET_SERVER_PORT + 1);
 
 
-    Net_PlayerInfoPkg pkg_to_gh;
+    NetPkgs::PlayerInfo pkg_to_gh;
     uint8_t playerIndex = 0;
     for (uint8_t p = 0; p < 4; p++)
     {
@@ -194,7 +194,7 @@ void Room::sendStartSignal()
                 assert(client != gh_netclient);
 
                 pkg_to_gh.setPlayer(playerIndex, client->addressHost(), client->addressPort());
-                players[p]->sendData(&pkg_to_players, sizeof(Net_GameHostInfoPkg));
+                players[p]->sendData(&pkg_to_players, sizeof(NetPkgs::GameHostInfo));
                 playerIndex++;
             }
         }
@@ -202,19 +202,19 @@ void Room::sendStartSignal()
             printf("  skip host\n");*/
     }
 
-    gamehost->sendData(&pkg_to_gh, sizeof(Net_PlayerInfoPkg));
+    gamehost->sendData(&pkg_to_gh, sizeof(NetPkgs::PlayerInfo));
 
     visible = false;
 
 /*
-    StartSyncPackage package;
+    NetPkgs::StartSync package;
         package.protocolVersion = NET_PROTOCOL_VERSION;
         package.packageType = NET_NOTICE_GAME_SYNC;
         package.commonRandomSeed = rand();
 
     for (uint8_t p = 0; p < 4; p++) {
         if (players[p])
-            players[p]->sendData(&package, sizeof(StartSyncPackage));
+            players[p]->sendData(&package, sizeof(NetPkgs::StartSync));
     }
 */
 }

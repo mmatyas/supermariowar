@@ -20,7 +20,7 @@ class SMWServer : public NetworkEventHandler
 {
 private:
     std::string serverName;
-    ServerInfoPackage serverInfo;
+    NetPkgs::ServerInfo serverInfo;
 
     uint32_t currentPlayerCount;
     uint32_t maxPlayerCount;

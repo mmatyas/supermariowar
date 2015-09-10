@@ -218,19 +218,19 @@ void SMWServer::onReceive(NetPeer& client, const uint8_t* data, size_t dataLengt
 
 void SMWServer::sendServerInfo(NetPeer& client)
 {
-    client.sendReliable(&serverInfo, sizeof(ServerInfoPackage));
+    client.sendReliable(&serverInfo, sizeof(NetPkgs::ServerInfo));
 }
 
 void SMWServer::sendCode(NetPeer& client, uint8_t code)
 {
-    MessageHeader msg(code);
-    client.sendReliable(&msg, sizeof(MessageHeader));
+    NetPkgs::MessageHeader msg(code);
+    client.sendReliable(&msg, sizeof(NetPkgs::MessageHeader));
 }
 
 void SMWServer::sendCode(NetPeer* client, uint8_t code)
 {
-    MessageHeader msg(code);
-    client->sendReliable(&msg, sizeof(MessageHeader));
+    NetPkgs::MessageHeader msg(code);
+    client->sendReliable(&msg, sizeof(NetPkgs::MessageHeader));
 }
 
 void SMWServer::sendCode(uint64_t playerID, uint8_t code)
@@ -246,12 +246,12 @@ void SMWServer::playerConnectsServer(uint64_t playerID, const void* data, size_t
     if (!players.count(playerID))
         return;
 
-    if (dataLength != sizeof(ClientConnectionPackage)) {
+    if (dataLength != sizeof(NetPkgs::ClientConnection)) {
         printf("[error] Corrupt package arrived from %lu\n", playerID);
         return;
     }
 
-    ClientConnectionPackage package;
+    NetPkgs::ClientConnection package;
     memcpy(&package, data, dataLength);
 
     players[playerID].name = package.playerName;
@@ -287,7 +287,7 @@ void SMWServer::sendVisibleRoomEntries(NetPeer& client)
         Room* room = &it->second;
         if (room->visible)
         {
-            RoomInfoPackage roomInfo;
+            NetPkgs::RoomInfo roomInfo;
             {
                 roomInfo.roomID = room->roomID;
 
@@ -309,7 +309,7 @@ void SMWServer::sendVisibleRoomEntries(NetPeer& client)
                     roomInfo.roomID, roomInfo.name, roomInfo.passwordRequired, roomInfo.currentPlayerCount);
             }
 
-            client.sendReliable(&roomInfo, sizeof(RoomInfoPackage));
+            client.sendReliable(&roomInfo, sizeof(NetPkgs::RoomInfo));
         }
 
         ++it;
@@ -325,13 +325,13 @@ void SMWServer::playerCreatesRoom(uint64_t playerID, const void* data, size_t da
     if (player->currentRoomID || player->isPlaying)
         return;
 
-    if (dataLength != sizeof(NewRoomPackage)) {
+    if (dataLength != sizeof(NetPkgs::NewRoom)) {
         printf("[error] Corrupt package arrived from %lu\n", playerID);
         return;
     }
 
     // input
-    NewRoomPackage pkg;
+    NetPkgs::NewRoom pkg;
     memcpy(&pkg, data, dataLength);
 
     // create
@@ -343,8 +343,8 @@ void SMWServer::playerCreatesRoom(uint64_t playerID, const void* data, size_t da
     player->isPlaying = false;
 
     // output
-    NewRoomCreatedPackage package(roomCreateID);
-    player->sendData(&package, sizeof(NewRoomCreatedPackage));
+    NetPkgs::NewRoomCreated package(roomCreateID);
+    player->sendData(&package, sizeof(NetPkgs::NewRoomCreated));
 
     log("New room by %s : {id: %d; name: %s; pw: %s}",
         player->toString().c_str(), room.roomID, room.name, room.password);
@@ -361,12 +361,12 @@ void SMWServer::playerJoinsRoom(uint64_t playerID, const void* data, size_t data
     if (player->currentRoomID || player->isPlaying)
         return; // TODO: warning
 
-    if (dataLength != sizeof(JoinRoomPackage)) {
+    if (dataLength != sizeof(NetPkgs::JoinRoom)) {
         printf("[error] Corrupt package arrived from %lu\n", playerID);
         return;
     }
 
-    JoinRoomPackage pkg;
+    NetPkgs::JoinRoom pkg;
     memcpy(&pkg, data, dataLength);
 
     printf("%s wants to join room %u\n", player->name.c_str(), pkg.roomID);
@@ -432,12 +432,12 @@ void SMWServer::playerSendsChatMsg(uint64_t playerID, const void* data, size_t d
     if (!rooms.count(roomID))
         return;
 
-    if (dataLength != sizeof(Net_RoomChatMsgPackage)) {
+    if (dataLength != sizeof(NetPkgs::RoomChatMsg)) {
         printf("[error] Corrupt package arrived from %lu\n", playerID);
         return;
     }
 
-    Net_RoomChatMsgPackage pkg;
+    NetPkgs::RoomChatMsg pkg;
     memcpy(&pkg, data, dataLength);
 
     rooms[roomID].sendChatMessage(player, pkg.message);

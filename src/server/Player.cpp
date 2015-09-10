@@ -71,8 +71,8 @@ bool Player::sendData(const void* data, size_t dataLength)
 
 bool Player::sendCode(uint8_t code)
 {
-    MessageHeader msg(code);
-    return sendData(&msg, sizeof(MessageHeader));
+    NetPkgs::MessageHeader msg(code);
+    return sendData(&msg, sizeof(NetPkgs::MessageHeader));
 }
 
 bool Player::sendConnectOK()

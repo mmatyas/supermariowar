@@ -3,9 +3,9 @@
 
 #include "ProtocolDefinitions.h"
 
-#include <stdint.h>
 #include <cassert>
 #include <cstring>
+#include <stdint.h>
 
 
 namespace NetPkgs {

@@ -1,11 +1,14 @@
-#ifndef __NETWORK_PROTOCOL_PACKAGES_H_
-#define __NETWORK_PROTOCOL_PACKAGES_H_
+#ifndef NETWORK_PROTOCOL_PACKAGES_H
+#define NETWORK_PROTOCOL_PACKAGES_H
 
 #include "ProtocolDefinitions.h"
 
 #include <cassert>
 #include <cstring>
 #include <stdint.h>
+
+
+namespace NetPkgs {
 
 struct MessageHeader {
     uint8_t     protocolMajorVersion;
@@ -20,13 +23,13 @@ struct MessageHeader {
     }
 };
 
-struct ServerInfoPackage : MessageHeader {
+struct ServerInfo : MessageHeader {
     char           name[32];
     uint32_t       currentPlayerCount;
     uint32_t       maxPlayerCount;
 
     // Response package
-    ServerInfoPackage(const char* name, uint32_t players_current, uint32_t players_max)
+    ServerInfo(const char* name, uint32_t players_current, uint32_t players_max)
         : MessageHeader(NET_RESPONSE_SERVERINFO)
     {
         currentPlayerCount = players_current;
@@ -36,10 +39,10 @@ struct ServerInfoPackage : MessageHeader {
     }
 };
 
-struct ClientConnectionPackage : MessageHeader {
+struct ClientConnection : MessageHeader {
     char           playerName[NET_MAX_PLAYER_NAME_LENGTH];
 #if 0
-    ClientConnectionPackage(const char* playerName)
+    ClientConnection(const char* playerName)
         : MessageHeader(NET_REQUEST_CONNECT)
     {
         memcpy(this->playerName, playerName, NET_MAX_PLAYER_NAME_LENGTH);
@@ -48,15 +51,15 @@ struct ClientConnectionPackage : MessageHeader {
 #endif
 };
 
-struct ClientDisconnectionPackage : MessageHeader {
-    ClientDisconnectionPackage() : MessageHeader(NET_REQUEST_LEAVE_SERVER) {}
+struct ClientDisconnection : MessageHeader {
+    ClientDisconnection() : MessageHeader(NET_REQUEST_LEAVE_SERVER) {}
 };
 
-struct RoomListPackage : MessageHeader {
-    RoomListPackage() : MessageHeader(NET_REQUEST_ROOM_LIST) {}
+struct RoomList : MessageHeader {
+    RoomList() : MessageHeader(NET_REQUEST_ROOM_LIST) {}
 };
 
-struct RoomInfoPackage : MessageHeader {
+struct RoomInfo : MessageHeader {
     uint32_t       roomID;
     char           name[NET_MAX_ROOM_NAME_LENGTH];
     uint8_t        currentPlayerCount;
@@ -64,18 +67,18 @@ struct RoomInfoPackage : MessageHeader {
     uint8_t        gamemodeID;
 
     // Response package
-    RoomInfoPackage() : MessageHeader(NET_RESPONSE_ROOM_LIST_ENTRY) {
+    RoomInfo() : MessageHeader(NET_RESPONSE_ROOM_LIST_ENTRY) {
         memset(name, '\0', NET_MAX_ROOM_NAME_LENGTH);
     }
 };
 
-struct NewRoomPackage : MessageHeader {
+struct NewRoom : MessageHeader {
     char           name[NET_MAX_ROOM_NAME_LENGTH];
     char           password[NET_MAX_ROOM_PASSWORD_LENGTH];
     uint8_t        gamemodeID; // 0 - GAMEMODE_LAST
     uint16_t       gamemodeGoal;
 #if 0
-    NewRoomPackage(const char* name, const char* password)
+    NewRoom(const char* name, const char* password)
         : MessageHeader(NET_REQUEST_CREATE_ROOM)
     {
         memcpy(this->name, name, NET_MAX_ROOM_NAME_LENGTH);
@@ -87,21 +90,21 @@ struct NewRoomPackage : MessageHeader {
 #endif
 };
 
-struct NewRoomCreatedPackage : MessageHeader {
+struct NewRoomCreated : MessageHeader {
     uint32_t       roomID;
 
     // Response package
-    NewRoomCreatedPackage(uint32_t roomID) : MessageHeader(NET_RESPONSE_CREATE_OK)
+    NewRoomCreated(uint32_t roomID) : MessageHeader(NET_RESPONSE_CREATE_OK)
     {
         this->roomID = roomID;
     }
 };
 
-struct JoinRoomPackage : MessageHeader {
+struct JoinRoom : MessageHeader {
     uint32_t       roomID;
     char           password[NET_MAX_ROOM_PASSWORD_LENGTH];
 #if 0
-    JoinRoomPackage(uint32_t roomID, const char* password)
+    JoinRoom(uint32_t roomID, const char* password)
         : MessageHeader(NET_REQUEST_JOIN_ROOM)
     {
         this->roomID = roomID;
@@ -111,11 +114,11 @@ struct JoinRoomPackage : MessageHeader {
 #endif
 };
 
-struct LeaveRoomPackage : MessageHeader {
-    LeaveRoomPackage() : MessageHeader(NET_REQUEST_LEAVE_ROOM) {}
+struct LeaveRoom : MessageHeader {
+    LeaveRoom() : MessageHeader(NET_REQUEST_LEAVE_ROOM) {}
 };
 
-struct CurrentRoomPackage : MessageHeader {
+struct CurrentRoom : MessageHeader {
     uint32_t       roomID;
     char           name[NET_MAX_ROOM_NAME_LENGTH];
     char           playerName[4][NET_MAX_PLAYER_NAME_LENGTH];
@@ -125,22 +128,22 @@ struct CurrentRoomPackage : MessageHeader {
     uint16_t       gamemodeGoal;
 
     // Response package
-    CurrentRoomPackage() : MessageHeader(NET_NOTICE_ROOM_CHANGED)
+    CurrentRoom() : MessageHeader(NET_NOTICE_ROOM_CHANGED)
     {
         memset(playerName, 0, 4 * NET_MAX_PLAYER_NAME_LENGTH);
     }
 };
 
-struct Net_RoomChatMsgPackage : MessageHeader {
+struct RoomChatMsg : MessageHeader {
     uint8_t     playerNum;
     char        message[NET_MAX_CHAT_MSG_LENGTH];
 
-    Net_RoomChatMsgPackage() : MessageHeader()
+    RoomChatMsg() : MessageHeader()
     {
         memset(message, 0, NET_MAX_CHAT_MSG_LENGTH);
     }
 
-    Net_RoomChatMsgPackage(uint8_t playerNum, const char* msg)
+    RoomChatMsg(uint8_t playerNum, const char* msg)
         : MessageHeader(NET_NOTICE_ROOM_CHAT_MSG)
     {
         this->playerNum = playerNum;
@@ -150,25 +153,25 @@ struct Net_RoomChatMsgPackage : MessageHeader {
 };
 
 
-struct Net_StartRoomPackage : MessageHeader {
-    Net_StartRoomPackage() : MessageHeader(NET_G2L_START_ROOM) {}
+struct StartRoom : MessageHeader {
+    StartRoom() : MessageHeader(NET_G2L_START_ROOM) {}
 };
 
-struct Net_GameHostInfoPkg : MessageHeader {
+struct GameHostInfo : MessageHeader {
     uint32_t host;
     // port is SERVER_PORT + 1
 
-    Net_GameHostInfoPkg(uint32_t gh_host)
+    GameHostInfo(uint32_t gh_host)
         : MessageHeader(NET_L2P_GAMEHOST_INFO)
         , host(gh_host)
     { }
 };
 
-struct Net_PlayerInfoPkg : MessageHeader {
+struct PlayerInfo : MessageHeader {
     uint32_t host[3]; // 3 clients for a game host
     uint16_t port[3];
 
-    Net_PlayerInfoPkg()
+    PlayerInfo()
         : MessageHeader(NET_L2G_CLIENTS_INFO)
     {
         memset(host, 0, sizeof(uint32_t) * 3);
@@ -184,17 +187,19 @@ struct Net_PlayerInfoPkg : MessageHeader {
     }
 };
 
-struct Net_StartSyncPackage : MessageHeader {
+struct StartSync : MessageHeader {
     uint32_t    commonRandomSeed;
 
-    Net_StartSyncPackage(uint32_t seed)
+    StartSync(uint32_t seed)
         : MessageHeader(NET_G2P_SYNC)
         , commonRandomSeed(seed)
     { }
 };
 
-struct Net_SyncOKPackage : MessageHeader {
-    Net_SyncOKPackage() : MessageHeader(NET_P2G_SYNC_OK) {}
+struct SyncOK : MessageHeader {
+    SyncOK() : MessageHeader(NET_P2G_SYNC_OK) {}
 };
 
-#endif // __NETWORK_PROTOCOL_PACKAGES_H_
+} // namespace NetPkgs
+
+#endif // NETWORK_PROTOCOL_PACKAGES_H
