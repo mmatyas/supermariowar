@@ -8,13 +8,15 @@
 #include <cstring>
 
 
-struct Net_MessageHeader {
+namespace NetPkgs {
+
+struct MessageHeader {
     uint8_t     protocolMajorVersion;
     uint8_t     protocolMinorVersion;
     uint8_t     packageType;
     //uint32_t       packageNumber;
 
-    Net_MessageHeader(uint8_t packageType = 0) {
+    MessageHeader(uint8_t packageType = 0) {
         protocolMajorVersion = NET_PROTOCOL_VERSION_MAJOR;
         protocolMinorVersion = NET_PROTOCOL_VERSION_MINOR;
         this->packageType = packageType;
@@ -29,7 +31,7 @@ struct Net_MessageHeader {
 */
 
 
-struct Net_ServerInfoPackage : Net_MessageHeader {
+struct ServerInfo : MessageHeader {
     char        name[32];
     uint32_t    currentPlayerCount;
     uint32_t    maxPlayerCount;
@@ -37,19 +39,19 @@ struct Net_ServerInfoPackage : Net_MessageHeader {
     // Response package
 };
 
-struct Net_ClientConnectionPackage : Net_MessageHeader {
+struct ClientConnection : MessageHeader {
     char    playerName[NET_MAX_PLAYER_NAME_LENGTH];
 
-    Net_ClientConnectionPackage(const char* playerName)
-        : Net_MessageHeader(NET_REQUEST_CONNECT)
+    ClientConnection(const char* playerName)
+        : MessageHeader(NET_REQUEST_CONNECT)
     {
         memcpy(this->playerName, playerName, NET_MAX_PLAYER_NAME_LENGTH);
         this->playerName[NET_MAX_PLAYER_NAME_LENGTH - 1] = '\0';
     }
 };
 
-struct Net_ClientDisconnectionPackage : Net_MessageHeader {
-    Net_ClientDisconnectionPackage() : Net_MessageHeader(NET_REQUEST_LEAVE_SERVER) {}
+struct ClientDisconnection : MessageHeader {
+    ClientDisconnection() : MessageHeader(NET_REQUEST_LEAVE_SERVER) {}
 };
 
 
@@ -60,11 +62,11 @@ struct Net_ClientDisconnectionPackage : Net_MessageHeader {
 */
 
 
-struct Net_RoomListPackage : Net_MessageHeader {
-    Net_RoomListPackage() : Net_MessageHeader(NET_REQUEST_ROOM_LIST) {}
+struct RoomList : MessageHeader {
+    RoomList() : MessageHeader(NET_REQUEST_ROOM_LIST) {}
 };
 
-struct Net_RoomInfoPackage : Net_MessageHeader {
+struct RoomInfo : MessageHeader {
     uint32_t    roomID;
     char        name[NET_MAX_ROOM_NAME_LENGTH];
     uint8_t     currentPlayerCount;
@@ -74,14 +76,14 @@ struct Net_RoomInfoPackage : Net_MessageHeader {
     // Response package
 };
 
-struct Net_NewRoomPackage : Net_MessageHeader {
+struct NewRoom : MessageHeader {
     char        name[NET_MAX_ROOM_NAME_LENGTH];
     char        password[NET_MAX_ROOM_PASSWORD_LENGTH];
     uint8_t     gamemodeID; // 0 - GAMEMODE_LAST
     uint16_t    gamemodeGoal;
 
-    Net_NewRoomPackage(const char* name, const char* password)
-        : Net_MessageHeader(NET_REQUEST_CREATE_ROOM)
+    NewRoom(const char* name, const char* password)
+        : MessageHeader(NET_REQUEST_CREATE_ROOM)
         , gamemodeID(0)
         , gamemodeGoal(10)
     {
@@ -93,18 +95,18 @@ struct Net_NewRoomPackage : Net_MessageHeader {
     }
 };
 
-struct Net_NewRoomCreatedPackage : Net_MessageHeader {
+struct NewRoomCreated : MessageHeader {
     uint32_t    roomID;
 
     // Response package
 };
 
-struct Net_JoinRoomPackage : Net_MessageHeader {
+struct JoinRoom : MessageHeader {
     uint32_t    roomID;
     char        password[NET_MAX_ROOM_PASSWORD_LENGTH];
 
-    Net_JoinRoomPackage(uint32_t roomID, const char* password)
-        : Net_MessageHeader(NET_REQUEST_JOIN_ROOM)
+    JoinRoom(uint32_t roomID, const char* password)
+        : MessageHeader(NET_REQUEST_JOIN_ROOM)
     {
         this->roomID = roomID;
         memcpy(this->password, password, NET_MAX_ROOM_PASSWORD_LENGTH);
@@ -112,7 +114,7 @@ struct Net_JoinRoomPackage : Net_MessageHeader {
     }
 };
 
-struct Net_CurrentRoomPackage : Net_MessageHeader {
+struct CurrentRoom : MessageHeader {
     uint32_t    roomID;
     char        name[NET_MAX_ROOM_NAME_LENGTH];
     char        playerName[4][NET_MAX_PLAYER_NAME_LENGTH];
@@ -124,17 +126,17 @@ struct Net_CurrentRoomPackage : Net_MessageHeader {
     // Response package
 };
 
-struct Net_RoomChatMsgPackage : Net_MessageHeader {
+struct RoomChatMsg : MessageHeader {
     uint8_t     senderNum;
     char        message[NET_MAX_CHAT_MSG_LENGTH];
 
-    Net_RoomChatMsgPackage() : Net_MessageHeader()
+    RoomChatMsg() : MessageHeader()
     {
         memset(message, 0, NET_MAX_CHAT_MSG_LENGTH);
     }
 
-    Net_RoomChatMsgPackage(uint8_t playerNum, const char* msg)
-        : Net_MessageHeader(NET_NOTICE_ROOM_CHAT_MSG)
+    RoomChatMsg(uint8_t playerNum, const char* msg)
+        : MessageHeader(NET_NOTICE_ROOM_CHAT_MSG)
     {
         senderNum = playerNum;
         memset(message, 0, NET_MAX_CHAT_MSG_LENGTH);
@@ -143,12 +145,12 @@ struct Net_RoomChatMsgPackage : Net_MessageHeader {
     }
 };
 
-struct Net_LeaveRoomPackage : Net_MessageHeader {
-    Net_LeaveRoomPackage() : Net_MessageHeader(NET_REQUEST_LEAVE_ROOM) {}
+struct LeaveRoom : MessageHeader {
+    LeaveRoom() : MessageHeader(NET_REQUEST_LEAVE_ROOM) {}
 };
 
-struct Net_StartRoomPackage : Net_MessageHeader {
-    Net_StartRoomPackage() : Net_MessageHeader(NET_G2L_START_ROOM) {}
+struct StartRoom : MessageHeader {
+    StartRoom() : MessageHeader(NET_G2L_START_ROOM) {}
 };
 
 
@@ -158,21 +160,21 @@ struct Net_StartRoomPackage : Net_MessageHeader {
 
 */
 
-struct Net_GameHostInfoPkg : Net_MessageHeader {
+struct GameHostInfo : MessageHeader {
     uint32_t host;
 
-    Net_GameHostInfoPkg(uint32_t gh_host)
-        : Net_MessageHeader(NET_L2P_GAMEHOST_INFO)
+    GameHostInfo(uint32_t gh_host)
+        : MessageHeader(NET_L2P_GAMEHOST_INFO)
         , host(gh_host)
     { }
 };
 
-struct Net_PlayerInfoPkg : Net_MessageHeader {
+struct PlayerInfo : MessageHeader {
     uint32_t host[3]; // 3 clients for a game host
     uint16_t port[3];
 
-    Net_PlayerInfoPkg()
-        : Net_MessageHeader(NET_L2G_CLIENTS_INFO)
+    PlayerInfo()
+        : MessageHeader(NET_L2G_CLIENTS_INFO)
     {
         memset(host, 0, sizeof(uint32_t) * 3);
         memset(port, 0, sizeof(uint16_t) * 3);
@@ -187,25 +189,25 @@ struct Net_PlayerInfoPkg : Net_MessageHeader {
     }
 };
 
-struct Net_StartSyncPackage : Net_MessageHeader {
+struct StartSync : MessageHeader {
     uint32_t    commonRandomSeed;
 
-    Net_StartSyncPackage(uint32_t seed)
-        : Net_MessageHeader(NET_G2P_SYNC)
+    StartSync(uint32_t seed)
+        : MessageHeader(NET_G2P_SYNC)
         , commonRandomSeed(seed)
     { }
 };
 
-struct Net_MapSyncOKPackage : Net_MessageHeader {
-    Net_MapSyncOKPackage() : Net_MessageHeader(NET_P2G_MAP_OK) {}
+struct MapSyncOK : MessageHeader {
+    MapSyncOK() : MessageHeader(NET_P2G_MAP_OK) {}
 };
 
-struct Net_SyncOKPackage : Net_MessageHeader {
-    Net_SyncOKPackage() : Net_MessageHeader(NET_P2G_SYNC_OK) {}
+struct SyncOK : MessageHeader {
+    SyncOK() : MessageHeader(NET_P2G_SYNC_OK) {}
 };
 
-struct Net_StartGamePackage : Net_MessageHeader {
-    Net_StartGamePackage() : Net_MessageHeader(NET_G2E_GAME_START) {}
+struct StartGame : MessageHeader {
+    StartGame() : MessageHeader(NET_G2E_GAME_START) {}
 };
 
 
@@ -215,15 +217,15 @@ struct Net_StartGamePackage : Net_MessageHeader {
 
 */
 
-struct Net_LeaveGamePackage : Net_MessageHeader {
-    Net_LeaveGamePackage() : Net_MessageHeader(NET_P2G_LEAVE_GAME) {}
+struct LeaveGame : MessageHeader {
+    LeaveGame() : MessageHeader(NET_P2G_LEAVE_GAME) {}
 };
 
 // 2 byte bit field instead of 8*2, but you can't use arrays :(
-struct Net_RawInput {
+struct RawInput {
     uint16_t    flags;
 
-    Net_RawInput() {
+    RawInput() {
         flags = 0;
     }
 
@@ -240,11 +242,11 @@ struct Net_RawInput {
     }
 };
 
-struct Net_ClientInputPackage : Net_MessageHeader {
-    Net_RawInput    input;
+struct ClientInput : MessageHeader {
+    RawInput    input;
 
-    Net_ClientInputPackage(const COutputControl* playerControl)
-        : Net_MessageHeader(NET_P2G_LOCAL_KEYS)
+    ClientInput(const COutputControl* playerControl)
+        : MessageHeader(NET_P2G_LOCAL_KEYS)
     {
         assert(playerControl);
         for (uint8_t k = 0; k < 8; k++)
@@ -258,9 +260,9 @@ struct Net_ClientInputPackage : Net_MessageHeader {
     }
 };
 
-/*struct Net_RemoteInputPackage : Net_MessageHeader {
+/*struct RemoteInput : MessageHeader {
     uint8_t         playerNumber;
-    Net_RawInput    input;
+    RawInput    input;
 
     // Response package
 
@@ -271,14 +273,14 @@ struct Net_ClientInputPackage : Net_MessageHeader {
     }
 };*/
 
-struct Net_GameStatePackage : Net_MessageHeader {
+struct GameState : MessageHeader {
     float           player_x[4];
     float           player_y[4];
     float           player_xvel[4];
     float           player_yvel[4];
-    Net_RawInput    input[4];
+    RawInput    input[4];
 
-    Net_GameStatePackage() : Net_MessageHeader(NET_G2P_GAME_STATE) {}
+    GameState() : MessageHeader(NET_G2P_GAME_STATE) {}
 
     // SEND
     void setPlayerCoord(uint8_t playerNum, float x, float y) {
@@ -325,17 +327,17 @@ struct Net_GameStatePackage : Net_MessageHeader {
     }
 };
 
-struct Net_RequestPowerupPackage : Net_MessageHeader {
-    Net_RequestPowerupPackage() : Net_MessageHeader(NET_P2G_REQ_POWERUP) {}
+struct RequestPowerup : MessageHeader {
+    RequestPowerup() : MessageHeader(NET_P2G_REQ_POWERUP) {}
 };
 
-struct Net_StartPowerupPackage : Net_MessageHeader {
+struct StartPowerup : MessageHeader {
     uint8_t player_id;
     uint8_t powerup_id;
     uint32_t delay; // time between source player and game host
 
-    Net_StartPowerupPackage(uint8_t playerID, uint8_t powerupID, uint32_t delay)
-        : Net_MessageHeader(NET_G2P_START_POWERUP)
+    StartPowerup(uint8_t playerID, uint8_t powerupID, uint32_t delay)
+        : MessageHeader(NET_G2P_START_POWERUP)
         , player_id(playerID)
         , powerup_id(powerupID)
         , delay(delay)
@@ -345,14 +347,14 @@ struct Net_StartPowerupPackage : Net_MessageHeader {
     }
 };
 
-struct Net_TriggerPowerupPackage : Net_MessageHeader {
+struct TriggerPowerup : MessageHeader {
     uint8_t player_id;
     uint8_t powerup_id;
     float player_x;
     float player_y;
 
-    Net_TriggerPowerupPackage(uint8_t playerID, uint8_t powerupID, float playerX, float playerY)
-        : Net_MessageHeader(NET_G2P_TRIGGER_POWERUP)
+    TriggerPowerup(uint8_t playerID, uint8_t powerupID, float playerX, float playerY)
+        : MessageHeader(NET_G2P_TRIGGER_POWERUP)
         , player_id(playerID)
         , powerup_id(powerupID)
         , player_x(playerX)
@@ -364,17 +366,17 @@ struct Net_TriggerPowerupPackage : Net_MessageHeader {
     }
 };
 
-struct Net_MapCollisionPackage : Net_MessageHeader {
+struct MapCollision : MessageHeader {
     uint8_t player_id;
     float player_x;
     float player_y;
     float player_xvel;
     float player_yvel;
 
-    Net_MapCollisionPackage(): Net_MessageHeader(NET_G2P_TRIGGER_MAPCOLL) {}
+    MapCollision(): MessageHeader(NET_G2P_TRIGGER_MAPCOLL) {}
 
-    Net_MapCollisionPackage(CPlayer& player)
-        : Net_MessageHeader(NET_G2P_TRIGGER_MAPCOLL)
+    MapCollision(CPlayer& player)
+        : MessageHeader(NET_G2P_TRIGGER_MAPCOLL)
         , player_id(player.getGlobalID())
         , player_x(player.fx)
         , player_y(player.fy)
@@ -391,7 +393,7 @@ struct Net_MapCollisionPackage : Net_MessageHeader {
     }
 };
 
-struct Net_P2PCollisionPackage : Net_MessageHeader {
+struct P2PCollision : MessageHeader {
     uint8_t player_id[2];
     float player_x[2];
     float player_y[2];
@@ -399,10 +401,10 @@ struct Net_P2PCollisionPackage : Net_MessageHeader {
     float player_yvel[2];
     float player_oldy[2]; // used by stomp detection
 
-    Net_P2PCollisionPackage(): Net_MessageHeader(NET_G2P_TRIGGER_P2PCOLL) {}
+    P2PCollision(): MessageHeader(NET_G2P_TRIGGER_P2PCOLL) {}
 
-    Net_P2PCollisionPackage(CPlayer& p1, CPlayer& p2)
-        : Net_MessageHeader(NET_G2P_TRIGGER_P2PCOLL)
+    P2PCollision(CPlayer& p1, CPlayer& p2)
+        : MessageHeader(NET_G2P_TRIGGER_P2PCOLL)
     {
         player_id[0] = p1.getGlobalID();
         player_x[0] = p1.fx;
@@ -419,5 +421,7 @@ struct Net_P2PCollisionPackage : Net_MessageHeader {
         player_oldy[1] = p2.fOldY;
     }
 };
+
+} // namespace NetPkgs
 
 #endif // NETWORK_PROTOCOL_PACKAGES_H

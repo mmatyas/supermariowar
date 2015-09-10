@@ -27,7 +27,7 @@ void net_endSession();
 class MI_NetworkListScroll;
 //union COutputControl;
 class CPlayer;
-struct Net_MapCollisionPackage;
+namespace NetPkgs { struct MapCollision; }
 
 // Local structures
 
@@ -143,7 +143,7 @@ class NetGameHost : public NetworkEventHandler
 
         // Currently collision detection may change player data,
         // so it has to be saved before
-        Net_MapCollisionPackage* preparedMapCollPkg;
+        NetPkgs::MapCollision* preparedMapCollPkg;
 
         // P2.5. Pre-game
         void sendStartGameMessage();

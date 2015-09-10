@@ -26,6 +26,11 @@
 #include "player_components/PlayerWarpStatus.h"
 #include "player_components/PlayerWings.h"
 
+namespace NetPkgs {
+    struct MapCollision;
+    struct P2PCollision;
+}
+
 enum PlayerState {
     player_wait,
     player_spawning,
@@ -521,9 +526,9 @@ private:
 
 		friend class NetClient;
 		friend class NetGameHost;
-		friend class Net_PlayerData;
-		friend struct Net_MapCollisionPackage;
-		friend struct Net_P2PCollisionPackage;
+		friend struct Net_PlayerData;
+		friend struct NetPkgs::MapCollision;
+		friend struct NetPkgs::P2PCollision;
 
 		friend class GameplayState;
 
