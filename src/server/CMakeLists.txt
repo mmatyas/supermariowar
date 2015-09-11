@@ -10,6 +10,8 @@ set (SERVER_SRCS
     mainServer.cpp
 )
 
+add_definitions(-DIS_SERVER=1)
+
 add_executable (smw-server ${SERVER_SRCS})
 target_link_libraries(smw-server NetplayFiles)
 

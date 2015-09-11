@@ -9,7 +9,7 @@
 #include "RandomNumberGenerator.h"
 
 #include "network/FileCompressor.h"
-#include "network/ProtocolPackages.h"
+#include "network/ProtocolGamePackages.h"
 #include "network/NetConfigManager.h"
 
 // define platform guards here
