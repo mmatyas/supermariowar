@@ -103,7 +103,7 @@ struct GameState : MessageHeader {
     float           player_y[4];
     float           player_xvel[4];
     float           player_yvel[4];
-    RawInput    input[4];
+    RawInput        input[4];
 
     GameState() : MessageHeader(NET_G2P_GAME_STATE) {}
 
@@ -200,7 +200,7 @@ struct MapCollision : MessageHeader {
 
     MapCollision(): MessageHeader(NET_G2P_TRIGGER_MAPCOLL) {}
 
-    MapCollision(CPlayer& player)
+    MapCollision(const CPlayer& player)
         : MessageHeader(NET_G2P_TRIGGER_MAPCOLL)
         , player_id(player.getGlobalID())
         , player_x(player.fx)
@@ -228,7 +228,7 @@ struct P2PCollision : MessageHeader {
 
     P2PCollision(): MessageHeader(NET_G2P_TRIGGER_P2PCOLL) {}
 
-    P2PCollision(CPlayer& p1, CPlayer& p2)
+    P2PCollision(const CPlayer& p1, const CPlayer& p2)
         : MessageHeader(NET_G2P_TRIGGER_P2PCOLL)
     {
         player_id[0] = p1.getGlobalID();

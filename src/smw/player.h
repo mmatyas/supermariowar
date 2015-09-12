@@ -88,26 +88,26 @@ public:
 
     /* Player info */
 
-    short getGlobalID() { return globalID; }
-    short getTeamID()   { return teamID;   }
-    short getColorID()  { return colorID;  }
+    short getGlobalID() const { return globalID; }
+    short getTeamID() const   { return teamID;   }
+    short getColorID() const  { return colorID;  }
 
-    short leftX() { return ix; }
-    short rightX() { return ix + PW; }
-    short centerX() { return ix + HALFPW; }
-    short topY() { return iy; }
-    short bottomY() { return iy + PH; }
-    short centerY() { return iy + HALFPH; }
+    short leftX() const { return ix; }
+    short rightX() const { return ix + PW; }
+    short centerX() const { return ix + HALFPW; }
+    short topY() const { return iy; }
+    short bottomY() const { return iy + PH; }
+    short centerY() const { return iy + HALFPH; }
     bool isFacingRight();
 
-    bool isready() { return state == player_ready; }
-    bool isspawning() { return state == player_spawning; }
-    bool iswarping() { return state > player_ready; }
-    bool isdead() { return state == player_dead; }
+    bool isready() const { return state == player_ready; }
+    bool isspawning() const { return state == player_spawning; }
+    bool iswarping() const { return state > player_ready; }
+    bool isdead() const { return state == player_dead; }
 
     bool isInvincible();
     bool isShielded();
-    bool isFrozen() { return frozen; }
+    bool isFrozen() const { return frozen; }
     short GetWarpPlane() { return warpstatus.getWarpPlane(); }
     bool IsInvincibleOnBottom();
     bool IsSuperStomping();
