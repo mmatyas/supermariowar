@@ -4,7 +4,8 @@
 #define NET_PROTOCOL_VERSION_MAJOR          0
 #define NET_PROTOCOL_VERSION_MINOR          2
 #define NET_MAX_MESSAGE_SIZE                128
-#define NET_SERVER_PORT                     12521
+#define NET_LOBBYSERVER_PORT                12521
+#define NET_GAMEHOST_PORT                   12522
 #define NET_MAX_PLAYER_NAME_LENGTH          16
 #define NET_MAX_ROOM_NAME_LENGTH            32
 #define NET_MAX_ROOM_PASSWORD_LENGTH        16

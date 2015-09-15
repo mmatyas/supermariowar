@@ -32,7 +32,7 @@ bool NetworkLayerENet::init(uint64_t max_players)
 
     ENetAddress server_address;
     server_address.host = ENET_HOST_ANY;
-    server_address.port = NET_SERVER_PORT;
+    server_address.port = NET_LOBBYSERVER_PORT;
 
     // bind address
     // multiple incoming connections

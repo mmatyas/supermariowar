@@ -213,8 +213,8 @@ class NetClient : public NetworkEventHandler
 
         //uint8_t incomingData[NET_MAX_MESSAGE_SIZE];
 
-        bool connectLobby(const char* hostname, const uint16_t port = NET_SERVER_PORT);
-        bool connectGameHost(const char* hostname, const uint16_t port = NET_SERVER_PORT + 1);
+        bool connectLobby(const char* hostname, const uint16_t port = NET_LOBBYSERVER_PORT);
+        bool connectGameHost(const char* hostname, const uint16_t port = NET_GAMEHOST_PORT);
 
         bool sendMessageToLobbyServer(const void* data, int dataLength);
         bool sendMessageToGameHost(const void* data, int dataLength);

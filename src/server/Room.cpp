@@ -178,7 +178,7 @@ void Room::sendStartSignal()
     NetPeer* gh_netclient = gamehost->network_client;
     NetPkgs::GameHostInfo pkg_to_players(gh_netclient->addressHost());
 
-    printf("  pkg->players: [%u:%u]\n", pkg_to_players.host, NET_SERVER_PORT + 1);
+    printf("  pkg->players: [%u:%u]\n", pkg_to_players.host, NET_GAMEHOST_PORT);
 
 
     NetPkgs::PlayerInfo pkg_to_gh;

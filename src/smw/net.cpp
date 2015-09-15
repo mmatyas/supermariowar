@@ -434,7 +434,7 @@ void NetClient::handleRoomStartMessage(NetPeer& client, const uint8_t* data, siz
     sprintf(host_str, "%d.%d.%d.%d",
         host_bytes[0], host_bytes[1], host_bytes[2], host_bytes[3]);
 
-    printf("[net] Connecting to game host... [%s:%d]\n", host_str, NET_SERVER_PORT + 1);
+    printf("[net] Connecting to game host... [%s:%d]\n", host_str, NET_GAMEHOST_PORT);
     if (!connectGameHost(host_str)) {
         printf("[net][error] Could not connect to game host.\n");
         return;

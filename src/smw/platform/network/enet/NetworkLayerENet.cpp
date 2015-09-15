@@ -61,7 +61,7 @@ bool NetworkLayerENet::gamehost_restart()
 
     ENetAddress local_gamehost_address;
     local_gamehost_address.host = ENET_HOST_ANY;
-    local_gamehost_address.port = NET_SERVER_PORT + 1;
+    local_gamehost_address.port = NET_GAMEHOST_PORT;
 
     // bind address
     // max. 3 connections + 3 NAT punch
