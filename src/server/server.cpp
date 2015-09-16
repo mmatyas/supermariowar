@@ -181,19 +181,19 @@ void SMWServer::onReceive(NetPeer& client, const uint8_t* data, size_t dataLengt
             playerJoinsRoom(playerID, data, dataLength);
             break;
 
-        case NET_REQUEST_LEAVE_ROOM:
-            playerLeavesRoom(playerID);
+        case NET_G2L_ROOM_CHANGED:
+            hostUpdatesRoom(playerID, data, dataLength);
             break;
 
-        case NET_NOTICE_ROOM_CHAT_MSG:
+        /*case NET_NOTICE_ROOM_CHAT_MSG:
             playerSendsChatMsg(playerID, data, dataLength);
-            break;
+            break;*/
 
         //
         // Room start
         //
         case NET_G2L_START_ROOM:
-            playerStartsRoom(playerID);
+            hostStartsRoom(playerID);
             break;
 
         /*case NET_NOTICE_GAME_SYNC_OK:
@@ -298,11 +298,7 @@ void SMWServer::sendVisibleRoomEntries(NetPeer& client)
                 if (room->password[0] != '\0')
                     roomInfo.passwordRequired = true;
 
-                roomInfo.currentPlayerCount = 0;
-                for (long unsigned p = 0; p < 4; p++)
-                    if (room->players[p])
-                        roomInfo.currentPlayerCount++;
-
+                roomInfo.currentPlayerCount = room->playerCount;
                 roomInfo.gamemodeID = room->gamemodeID;
 
                 printf("  room %d: {%s; pass?: %d; players: %d}\n",
@@ -322,7 +318,7 @@ void SMWServer::playerCreatesRoom(uint64_t playerID, const void* data, size_t da
         return;
 
     Player* player = &players[playerID];
-    if (player->currentRoomID || player->isPlaying)
+    if (player->isPlaying())
         return;
 
     if (dataLength != sizeof(NetPkgs::NewRoom)) {
@@ -335,12 +331,12 @@ void SMWServer::playerCreatesRoom(uint64_t playerID, const void* data, size_t da
     memcpy(&pkg, data, dataLength);
 
     // create
+    assert(roomCreateID != 0);
     Room room(roomCreateID, pkg.name, pkg.password, player);
     room.setGamemode(pkg.gamemodeID, pkg.gamemodeGoal);
     rooms[roomCreateID] = room;
 
     player->currentRoomID = roomCreateID;
-    player->isPlaying = false;
 
     // output
     NetPkgs::NewRoomCreated package(roomCreateID);
@@ -358,7 +354,7 @@ void SMWServer::playerJoinsRoom(uint64_t playerID, const void* data, size_t data
         return;
 
     Player* player = &players[playerID];
-    if (player->currentRoomID || player->isPlaying)
+    if (player->isPlaying())
         return; // TODO: warning
 
     if (dataLength != sizeof(NetPkgs::JoinRoom)) {
@@ -396,7 +392,7 @@ void SMWServer::playerLeavesRoom(uint64_t playerID)
         return;
 
     Player* player = &players[playerID];
-    if (!player->currentRoomID || player->isPlaying)
+    if (!player->isPlaying())
         return;
 
     if (!rooms.count(player->currentRoomID))
@@ -404,89 +400,39 @@ void SMWServer::playerLeavesRoom(uint64_t playerID)
 
     // Search for the room in which the player is
     Room* room = &rooms[player->currentRoomID];
-    room->removePlayer(player);
+    assert(room->playerCount > 0);
+    room->playerCount--;
 
     // If the room is now empty, delete it.
     if (room->playerCount == 0) {
         rooms.erase(player->currentRoomID);
         log("Room %u erased.", player->currentRoomID);
     }
-    else
-        room->sendRoomUpdate();
 
     player->currentRoomID = 0;
-    player->isPlaying = false;
     player->lastActivityTime = TIME_NOW();
 }
 
-void SMWServer::playerSendsChatMsg(uint64_t playerID, const void* data, size_t dataLength)
+void SMWServer::hostStartsRoom(uint64_t playerID)
 {
     if (!players.count(playerID))
         return;
 
     Player* player = &players[playerID];
     uint32_t roomID = player->currentRoomID;
-    if (!roomID || player->isPlaying)
-        return;
-
-    if (!rooms.count(roomID))
-        return;
-
-    if (dataLength != sizeof(NetPkgs::RoomChatMsg)) {
-        printf("[error] Corrupt package arrived from %lu\n", playerID);
-        return;
-    }
-
-    NetPkgs::RoomChatMsg pkg;
-    memcpy(&pkg, data, dataLength);
-
-    rooms[roomID].sendChatMessage(player, pkg.message);
-    player->lastActivityTime = TIME_NOW();
-}
-
-
-void SMWServer::playerStartsRoom(uint64_t playerID)
-{
-    if (!players.count(playerID))
-        return;
-
-    Player* player = &players[playerID];
-    uint32_t roomID = player->currentRoomID;
-    if (!roomID || player->isPlaying)
-        return;
-
     if (!rooms.count(roomID))
         return;
 
     Room* room = &rooms[roomID];
-    assert(room->hostPlayerNumber < 4);
-
-    // only host can start
-    if (room->players[room->hostPlayerNumber] != player)
+    assert(room->gamehost);
+    if(room->gamehost != &players[playerID])
+        return;
+    if (!player->isPlaying())
         return;
 
-    rooms[roomID].sendStartSignal();
+    rooms[roomID].visible = false;
     player->lastActivityTime = TIME_NOW();
     log("[info] Room #%d starting.", roomID);
-}
-
-void SMWServer::startRoomIfEveryoneReady(uint64_t playerID)
-{
-    /*if (!players.count(playerID))
-        return;
-
-    Player* player = &players[playerID];
-    if (!player->currentRoomID || player->isPlaying)
-        return;
-
-    if (!rooms.count(player->currentRoomID))
-        return;
-
-    player->synchOK = true;
-    player->lastActivityTime = TIME_NOW();
-
-    Room* room = &rooms[player->currentRoomID];
-    room->startGameIfEverybodyReady();*/
 }
 
 void SMWServer::cleanup()

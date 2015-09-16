@@ -94,7 +94,7 @@ struct ClientDisconnection : MessageHeader {
 
 /*
 
-    Room packages
+    Room creation packages
 
 */
 
@@ -170,6 +170,14 @@ struct NewRoomCreated : MessageHeader {
     {}
 #endif
 };
+
+
+/*
+
+    Packages connecting players to game host
+
+*/
+
 
 struct JoinRoom : MessageHeader {
     uint32_t    roomID;

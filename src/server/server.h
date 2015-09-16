@@ -40,12 +40,10 @@ private:
     void playerCreatesRoom(uint64_t playerID, const void* data, size_t dataLength);
     void playerJoinsRoom(uint64_t playerID, const void* data, size_t dataLength);
     void playerLeavesRoom(uint64_t playerID);
-    void playerSendsChatMsg(uint64_t playerID, const void* data, size_t dataLength);
+    //void playerSendsChatMsg(uint64_t playerID, const void* data, size_t dataLength);
 
-    void playerStartsRoom(uint64_t playerID);
-    void startRoomIfEveryoneReady(uint64_t playerID);
-    void sendInputToHost(uint64_t playerID);
-    void sendHostStateToOtherPlayers(uint64_t playerID);
+    void hostStartsRoom(uint64_t playerID);
+    //void startRoomIfEveryoneReady(uint64_t playerID);
 
 
     void readConfig();
