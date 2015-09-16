@@ -195,8 +195,40 @@ struct JoinRoom : MessageHeader {
 #endif
 };
 
-struct LeaveRoom : MessageHeader {
-    LeaveRoom() : MessageHeader(NET_REQUEST_LEAVE_ROOM) {}
+struct GameHostInfo : MessageHeader {
+    uint32_t host;
+
+    GameHostInfo()
+        : MessageHeader(NET_L2P_GAMEHOST_INFO)
+        , host(0)
+    {}
+
+#if IS_SERVER
+    GameHostInfo(uint32_t address)
+        : MessageHeader(NET_L2P_GAMEHOST_INFO)
+        , host(address)
+    {}
+#endif
+};
+
+struct PlayerInfo : MessageHeader {
+    uint32_t host;
+
+    PlayerInfo()
+        : MessageHeader(NET_L2P_GAMEHOST_INFO)
+        , host(0)
+    {}
+
+#if IS_SERVER
+    PlayerInfo(uint32_t address)
+        : MessageHeader(NET_L2P_GAMEHOST_INFO)
+        , host(address)
+    {}
+#endif
+};
+
+struct StartRoom : MessageHeader {
+    StartRoom() : MessageHeader(NET_G2L_START_ROOM) {}
 };
 
 struct CurrentRoom : MessageHeader {
@@ -244,6 +276,10 @@ struct RoomChatMsg : MessageHeader {
     }
 };
 
+struct LeaveRoom : MessageHeader {
+    LeaveRoom() : MessageHeader(NET_REQUEST_LEAVE_ROOM) {}
+};
+
 struct StartRoom : MessageHeader {
     StartRoom() : MessageHeader(NET_G2L_START_ROOM) {}
 };
@@ -254,24 +290,6 @@ struct StartRoom : MessageHeader {
     Pre-game packages
 
 */
-
-struct GameHostInfo : MessageHeader {
-    uint32_t host;
-
-    GameHostInfo(uint32_t address)
-        : MessageHeader(NET_L2P_GAMEHOST_INFO)
-        , host(address)
-    {}
-};
-
-struct PlayerInfo : MessageHeader {
-    uint32_t host;
-
-    PlayerInfo(uint32_t address)
-        : MessageHeader(NET_L2G_CLIENT_INFO)
-        , host(address)
-    {}
-};
 
 struct StartSync : MessageHeader {
     uint32_t    commonRandomSeed;
