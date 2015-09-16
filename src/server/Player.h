@@ -12,9 +12,6 @@ struct Player {
     NetPeer*        network_client;
 
     uint32_t        currentRoomID;
-    bool            isPlaying;
-    uint8_t         playerNumberInRoom;
-    bool            synchOK;
 
     TimePoint       joinTime;
     TimePoint       lastActivityTime;
@@ -29,6 +26,7 @@ struct Player {
     bool sendCode(uint8_t);
     bool sendConnectOK();
 
+    bool isPlaying(); // true on currentRoomID > 0
     std::string toString();
     std::string address_to_string();
 };

@@ -5,15 +5,10 @@
 #include <chrono>
 
 Player::Player()
+    : name("Anonymous")
+    , network_client(NULL)
+    , currentRoomID(0)
 {
-    currentRoomID = 0;
-    isPlaying = false;
-    playerNumberInRoom = 0;
-    synchOK = false;
-
-    name = "Anonymous";
-    network_client = NULL;
-
     joinTime = TIME_NOW();
     lastActivityTime = joinTime;
 }
@@ -22,6 +17,11 @@ Player::~Player()
 {
     if (network_client)
         delete network_client;
+}
+
+bool Player::isPlaying()
+{
+    return currentRoomID > 0;
 }
 
 void Player::setClient(NetPeer* client)
