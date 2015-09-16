@@ -257,32 +257,20 @@ struct StartRoom : MessageHeader {
 
 struct GameHostInfo : MessageHeader {
     uint32_t host;
-    // port is SERVER_PORT + 1
 
-    GameHostInfo(uint32_t gh_address)
+    GameHostInfo(uint32_t address)
         : MessageHeader(NET_L2P_GAMEHOST_INFO)
-        , host(gh_address)
+        , host(address)
     {}
 };
 
 struct PlayerInfo : MessageHeader {
-    uint32_t host[3]; // 3 clients for a game host
-    uint16_t port[3];
+    uint32_t host;
 
-    PlayerInfo()
-        : MessageHeader(NET_L2G_CLIENTS_INFO)
-    {
-        memset(host, 0, sizeof(uint32_t) * 3);
-        memset(port, 0, sizeof(uint16_t) * 3);
-    }
-
-    void setPlayer(uint8_t playerNum, uint32_t p_host, uint16_t p_port)
-    {
-        assert(playerNum < 3);
-
-        host[playerNum] = p_host;
-        port[playerNum] = p_port;
-    }
+    PlayerInfo(uint32_t address)
+        : MessageHeader(NET_L2G_CLIENT_INFO)
+        , host(address)
+    {}
 };
 
 struct StartSync : MessageHeader {
