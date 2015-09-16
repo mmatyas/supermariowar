@@ -13,8 +13,7 @@ struct Room {
     char            password[NET_MAX_ROOM_PASSWORD_LENGTH];
     bool            visible;
 
-    Player*         players[4];
-    uint8_t         hostPlayerNumber; // 0-3 index in players[]
+    Player*         gamehost;
     uint8_t         playerCount;
 
     uint8_t         gamemodeID;
@@ -24,18 +23,10 @@ struct Room {
     TimePoint       lastActivityTime;
 
     Room();
-    Room(uint32_t roomID, const char * name, const char * password, Player * host);
+    Room(uint32_t roomID, const char * name, const char * password, Player* host);
     ~Room();
 
-    void tryAddingPlayer(Player* player);
-    void removePlayer(Player* player);
-
     void setGamemode(uint8_t id, uint16_t goal);
-
-    void sendChatMessage(Player*, const char*);
-    void sendRoomUpdate();
-    void sendStartSignal(); // sends start sync
-    void startGameIfEverybodyReady();
 };
 
 #endif // ROOM_H
