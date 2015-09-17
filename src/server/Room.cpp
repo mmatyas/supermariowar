@@ -36,7 +36,14 @@ Room::~Room()
     // Game host player is freed by the server
 }
 
+void Room::changeName(const char* name)
+{
+    strncpy(this->name, name, NET_MAX_ROOM_NAME_LENGTH);
+    this->name[NET_MAX_ROOM_NAME_LENGTH - 1] = '\0';
+}
+
 void Room::setGamemode(uint8_t id, uint16_t goal) {
     gamemodeID = id;
     gamemodeGoal = goal;
+    lastActivityTime = TIME_NOW();
 }

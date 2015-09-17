@@ -404,6 +404,46 @@ void SMWServer::playerLeavesRoom(uint64_t playerID)
     player->lastActivityTime = TIME_NOW();
 }
 
+void SMWServer::hostUpdatesRoom(uint64_t playerID, const void* data, size_t dataLength)
+{
+    // validate player
+    //
+    if (!players.count(playerID))
+        return;
+
+    Player* player = &players[playerID];
+    if (player->isPlaying())
+        return; // TODO: warning
+
+    // validate package
+    //
+    if (dataLength != sizeof(NetPkgs::RoomStatus)) {
+        printf("[error] Corrupt package arrived from %lu\n", playerID);
+        return;
+    }
+
+    // validate room
+    //
+    uint32_t roomID = player->currentRoomID;
+    if (!rooms.count(roomID))
+        return;
+
+    Room* room = &rooms[roomID];
+    assert(room->gamehost);
+    if(room->gamehost != &players[playerID])
+        return;
+
+    // do the update
+    //
+    NetPkgs::RoomStatus pkg;
+    memcpy(&pkg, data, dataLength);
+
+    room->changeName(pkg.name);
+    room->setGamemode(pkg.gamemodeID, pkg.gamemodeGoal);
+
+    // TODO: update players
+}
+
 void SMWServer::hostStartsRoom(uint64_t playerID)
 {
     if (!players.count(playerID))

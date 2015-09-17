@@ -26,6 +26,7 @@ struct Room {
     Room(uint32_t roomID, const char * name, const char * password, Player* host);
     ~Room();
 
+    void changeName(const char* name);
     void setGamemode(uint8_t id, uint16_t goal);
 };
 

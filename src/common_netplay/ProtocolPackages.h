@@ -235,12 +235,12 @@ struct PlayerAddress : MessageHeader {
 #endif
 };
 
-struct CurrentRoom : MessageHeader {
+struct RoomStatus: MessageHeader {
     char           name[NET_MAX_ROOM_NAME_LENGTH];
     uint8_t        gamemodeID;
     uint16_t       gamemodeGoal;
 
-    CurrentRoom()
+    RoomStatus()
         : MessageHeader(NET_G2L_ROOM_CHANGED)
         , gamemodeID(0)
         , gamemodeGoal(10)
@@ -249,7 +249,7 @@ struct CurrentRoom : MessageHeader {
     }
 
 #if IS_GAME
-    CurrentRoom(const char * name, uint8_t mode, uint16_t goal)
+    RoomStatus(const char * name, uint8_t mode, uint16_t goal)
         : MessageHeader(NET_G2L_ROOM_CHANGED)
         , gamemodeID(mode)
         , gamemodeGoal(goal)
