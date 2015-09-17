@@ -128,7 +128,7 @@ struct NewRoom : MessageHeader {
     uint16_t    gamemodeGoal;
 
     NewRoom()
-        : MessageHeader(NET_REQUEST_CREATE_ROOM)
+        : MessageHeader(NET_G2L_CREATE_ROOM)
         , gamemodeID(0)
         , gamemodeGoal(10)
     {
@@ -138,7 +138,7 @@ struct NewRoom : MessageHeader {
 
 #if IS_GAME
     NewRoom(const char* name, const char* password)
-        : MessageHeader(NET_REQUEST_CREATE_ROOM)
+        : MessageHeader(NET_G2L_CREATE_ROOM)
         , gamemodeID(0)
         , gamemodeGoal(10)
     {
@@ -159,13 +159,13 @@ struct NewRoomCreated : MessageHeader {
     uint32_t       roomID;
 
     NewRoomCreated()
-        : MessageHeader(NET_RESPONSE_CREATE_OK)
+        : MessageHeader(NET_L2G_CREATE_OK)
         , roomID(0)
     {}
 
 #if IS_SERVER
     NewRoomCreated(uint32_t roomID)
-        : MessageHeader(NET_RESPONSE_CREATE_OK)
+        : MessageHeader(NET_L2G_CREATE_OK)
         , roomID(roomID)
     {}
 #endif
@@ -203,109 +203,70 @@ struct JoinRoom : MessageHeader {
 #endif
 };
 
-struct GameHostInfo : MessageHeader {
+struct GameHostAddress : MessageHeader {
     uint32_t host;
 
-    GameHostInfo()
-        : MessageHeader(NET_L2P_GAMEHOST_INFO)
+    GameHostAddress()
+        : MessageHeader(NET_L2P_GAMEHOST_ADDRESS)
         , host(0)
     {}
 
 #if IS_SERVER
-    GameHostInfo(uint32_t address)
-        : MessageHeader(NET_L2P_GAMEHOST_INFO)
+    GameHostAddress(uint32_t address)
+        : MessageHeader(NET_L2P_GAMEHOST_ADDRESS)
         , host(address)
     {}
 #endif
 };
 
-struct PlayerInfo : MessageHeader {
+struct PlayerAddress : MessageHeader {
     uint32_t host;
 
-    PlayerInfo()
-        : MessageHeader(NET_L2P_GAMEHOST_INFO)
+    PlayerAddress()
+        : MessageHeader(NET_L2G_CLIENT_ADDRESS)
         , host(0)
     {}
 
 #if IS_SERVER
-    PlayerInfo(uint32_t address)
-        : MessageHeader(NET_L2P_GAMEHOST_INFO)
+    PlayerAddress(uint32_t address)
+        : MessageHeader(NET_L2G_CLIENT_ADDRESS)
         , host(address)
     {}
 #endif
-};
-
-struct StartRoom : MessageHeader {
-    StartRoom() : MessageHeader(NET_G2L_START_ROOM) {}
 };
 
 struct CurrentRoom : MessageHeader {
-    uint32_t       roomID;
     char           name[NET_MAX_ROOM_NAME_LENGTH];
-    char           playerName[4][NET_MAX_PLAYER_NAME_LENGTH];
-    uint8_t        hostPlayerNumber; //  1-4
-    uint8_t        remotePlayerNumber; // of the receiving client
-    uint8_t        gamemodeID; // 0 - GAMEMODE_LAST
+    uint8_t        gamemodeID;
     uint16_t       gamemodeGoal;
 
     CurrentRoom()
-        : MessageHeader(NET_NOTICE_ROOM_CHANGED)
-        , roomID(0)
-        , hostPlayerNumber(0)
-        , remotePlayerNumber(0)
+        : MessageHeader(NET_G2L_ROOM_CHANGED)
         , gamemodeID(0)
         , gamemodeGoal(10)
     {
         memset(name, '\0', NET_MAX_ROOM_NAME_LENGTH);
-        memset(playerName, 0, 4 * NET_MAX_PLAYER_NAME_LENGTH);
     }
-};
 
-struct RoomChatMsg : MessageHeader {
-    uint8_t     senderNum;
-    char        message[NET_MAX_CHAT_MSG_LENGTH];
-
-    RoomChatMsg()
-        : MessageHeader(NET_NOTICE_ROOM_CHAT_MSG)
-        , senderNum(0xFF)
+#if IS_GAME
+    CurrentRoom(const char * name, uint8_t mode, uint16_t goal)
+        : MessageHeader(NET_G2L_ROOM_CHANGED)
+        , gamemodeID(mode)
+        , gamemodeGoal(goal)
     {
-        memset(message, '\0', NET_MAX_CHAT_MSG_LENGTH);
+        assert(name);
+        strncpy(this->name, name, NET_MAX_ROOM_NAME_LENGTH);
+        this->name[NET_MAX_ROOM_NAME_LENGTH - 1] = '\0';
     }
-
-    RoomChatMsg(uint8_t playerNum, const char* msg)
-        : MessageHeader(NET_NOTICE_ROOM_CHAT_MSG)
-        , senderNum(playerNum)
-    {
-        assert(playerNum < 4);
-        assert(msg);
-
-        strncpy(message, msg, NET_MAX_CHAT_MSG_LENGTH);
-        message[NET_MAX_CHAT_MSG_LENGTH - 1] = '\0';
-    }
+#endif
 };
 
-struct LeaveRoom : MessageHeader {
-    LeaveRoom() : MessageHeader(NET_REQUEST_LEAVE_ROOM) {}
+struct PlayerLeftRoom : MessageHeader {
+    PlayerLeftRoom() : MessageHeader(NET_P2L_LEFT_ROOM) {}
 };
 
-struct StartRoom : MessageHeader {
-    StartRoom() : MessageHeader(NET_G2L_START_ROOM) {}
-};
-
-
-/*
-
-    Pre-game packages
-
-*/
-
-struct StartSync : MessageHeader {
-    uint32_t    commonRandomSeed;
-
-    StartSync(uint32_t seed)
-        : MessageHeader(NET_G2P_SYNC)
-        , commonRandomSeed(seed)
-    { }
+struct RoomStarted : MessageHeader {
+    RoomStarted() : MessageHeader(NET_G2L_ROOM_STARTED) {}
 };
 
 } // namespace NetPkgs
