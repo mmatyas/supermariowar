@@ -17,11 +17,11 @@
 #define NET_MAX_CHAT_MSG_LENGTH             100
 
 // Lobby server querying
-#define NET_REQUEST_SERVERINFO              1
-#define NET_RESPONSE_BADPROTOCOL            2
-#define NET_RESPONSE_SERVERINFO             3
-#define NET_RESPONSE_SERVER_MOTD            4 // Message of the Day
-#define NET_NOTICE_SERVER_STOPPED           5
+#define NET_RESPONSE_ERROR                  1 // currently on BADPROTOCOL only
+#define NET_NOTICE_SERVER_STOPPED           2
+#define NET_REQUEST_SERVERINFO              3
+#define NET_RESPONSE_SERVERINFO             4
+#define NET_RESPONSE_SERVER_MOTD            5 // Message of the Day
 
 // Connection to lobby server
 #define NET_REQUEST_CONNECT                 10
@@ -41,10 +41,12 @@
 #define NET_L2G_CREATE_OK                   31
 #define NET_L2G_CREATE_ERROR                32 // TODO: What kind of error?
 #define NET_G2L_ROOM_CHANGED                33 // eg. player count, game mode, ...
+#define NET_G2L_CLIENT_LEFT_ROOM            34
+#define NET_P2L_LEFT_ROOM                   35
 
 #define NET_REQUEST_JOIN_ROOM               80
-#define NET_L2P_GAMEHOST_INFO               81 // Server -> Normal Players: "Connect to this guy to play"
-#define NET_L2G_CLIENT_INFO                 82 // Server -> Game Host: "This player wants to join"
+#define NET_L2P_GAMEHOST_ADDRESS            81 // Server -> Normal Players: "Connect to this guy to play"
+#define NET_L2G_CLIENT_ADDRESS              82 // Server -> Game Host: "This player wants to join"
 #define NET_G2L_ROOM_STARTED                83 // Game Host -> Server: "Our room started!"
 #define NET_G2L_GAME_RESULTS                84 // GH -> Server
 
