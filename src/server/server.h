@@ -42,6 +42,7 @@ private:
     void playerLeavesRoom(uint64_t playerID);
     //void playerSendsChatMsg(uint64_t playerID, const void* data, size_t dataLength);
 
+    void hostUpdatesRoom(uint64_t playerID, const void* data, size_t dataLength);
     void hostStartsRoom(uint64_t playerID);
     //void startRoomIfEveryoneReady(uint64_t playerID);
 

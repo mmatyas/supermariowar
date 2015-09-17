@@ -146,7 +146,7 @@ void SMWServer::onReceive(NetPeer& client, const uint8_t* data, size_t dataLengt
 
     if (versionMajor != NET_PROTOCOL_VERSION_MAJOR
         || versionMinor != NET_PROTOCOL_VERSION_MINOR) {
-        sendCode(client, NET_RESPONSE_BADPROTOCOL);
+        sendCode(client, NET_RESPONSE_ERROR);
         return;
     }
 
@@ -173,33 +173,25 @@ void SMWServer::onReceive(NetPeer& client, const uint8_t* data, size_t dataLengt
             sendVisibleRoomEntries(client);
             break;
 
-        case NET_REQUEST_CREATE_ROOM:
+        case NET_G2L_CREATE_ROOM:
             playerCreatesRoom(playerID, data, dataLength);
-            break;
-
-        case NET_REQUEST_JOIN_ROOM:
-            playerJoinsRoom(playerID, data, dataLength);
             break;
 
         case NET_G2L_ROOM_CHANGED:
             hostUpdatesRoom(playerID, data, dataLength);
             break;
 
-        /*case NET_NOTICE_ROOM_CHAT_MSG:
-            playerSendsChatMsg(playerID, data, dataLength);
-            break;*/
+        case NET_REQUEST_JOIN_ROOM:
+            playerJoinsRoom(playerID, data, dataLength);
+            break;
 
-        //
-        // Room start
-        //
-        case NET_G2L_START_ROOM:
+        case NET_G2L_ROOM_STARTED:
             hostStartsRoom(playerID);
             break;
 
-        /*case NET_NOTICE_GAME_SYNC_OK:
-            log("NET_NOTICE_GAME_SYNC_OK!");
-            startRoomIfEveryoneReady(playerID);
-            break;*/
+        case NET_G2L_GAME_RESULTS:
+            printf("Game results arrived, not implemented yet.\n");
+            break;
 
         default:
             printf("Unknown: %d", messageType);
@@ -372,18 +364,17 @@ void SMWServer::playerJoinsRoom(uint64_t playerID, const void* data, size_t data
         return;
     }
 
-    // Find first empty slot
     Room* room = &rooms[pkg.roomID];    // TODO: Validate
-    room->tryAddingPlayer(player);
 
-    if (player->currentRoomID) {
-        player->sendCode(NET_RESPONSE_JOIN_OK);
-        room->sendRoomUpdate();
-    }
-    else
-        player->sendCode(NET_RESPONSE_ROOM_FULL);
+    assert(room);
+    assert(room->gamehost);
+    assert(room->gamehost->network_client);
+    assert(player->network_client);
+    NetPkgs::PlayerAddress pkg_to_gh(player->network_client->addressHost());
+    NetPkgs::GameHostAddress pkg_to_player(room->gamehost->network_client->addressHost());
 
-    player->isPlaying = false;
+    room->gamehost->sendData(&pkg_to_gh, sizeof(pkg_to_gh));
+    player->sendData(&pkg_to_player, sizeof(pkg_to_player));
 }
 
 void SMWServer::playerLeavesRoom(uint64_t playerID)
@@ -419,6 +410,9 @@ void SMWServer::hostStartsRoom(uint64_t playerID)
         return;
 
     Player* player = &players[playerID];
+    if (!player->isPlaying())
+        return;
+
     uint32_t roomID = player->currentRoomID;
     if (!rooms.count(roomID))
         return;
@@ -426,8 +420,6 @@ void SMWServer::hostStartsRoom(uint64_t playerID)
     Room* room = &rooms[roomID];
     assert(room->gamehost);
     if(room->gamehost != &players[playerID])
-        return;
-    if (!player->isPlaying())
         return;
 
     rooms[roomID].visible = false;
