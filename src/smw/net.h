@@ -94,6 +94,10 @@ class NetGameHost : public NetworkEventHandler
         void onReceive(NetPeer&, const uint8_t*, size_t);
         void onDisconnect(NetPeer& client);
 
+        // Create/update room
+        void sendCreateRoomMessage();
+        void sendUpdateRoomMessage();
+
         // P2. Join room
         void sendStartRoomMessage();
 
@@ -145,13 +149,22 @@ class NetGameHost : public NetworkEventHandler
         // so it has to be saved before
         NetPkgs::MapCollision* preparedMapCollPkg;
 
+        // Create/update room
+        void handleRoomCreatedMessage(const uint8_t*, size_t);
+        // void handleRoomChangedMessage(const uint8_t*, size_t);
+        void handlePlayerAddress(const NetPeer&, const uint8_t*, size_t);
+
         // P2.5. Pre-game
-        void sendStartGameMessage();
+        // In-room
+        void handleChatMessage(const uint8_t*, size_t);
+        void sendSkinSyncMessages();
         void sendMapSyncMessages();
-        void handleMapOKMessage(const NetPeer&, const uint8_t*, size_t);
         void sendSyncMessages();
-        void handleSyncOKMessage(const NetPeer&, const uint8_t*, size_t);
-        void setExpectedPlayers(uint8_t count, uint32_t* hosts, uint16_t* ports);
+            void handleSkinOKMessage(const NetPeer&, const uint8_t*, size_t);
+            void handleMapOKMessage(const NetPeer&, const uint8_t*, size_t);
+            void handleSyncOKMessage(const NetPeer&, const uint8_t*, size_t);
+        void sendStartGameMessage();
+        //void setExpectedPlayers(uint8_t count, uint32_t* hosts, uint16_t* ports);
 
         // P3. Play
         void handleRemoteInput(const NetPeer&, const uint8_t*, size_t);
@@ -185,16 +198,19 @@ class NetClient : public NetworkEventHandler
         void onDisconnect(NetPeer&);
 
         // P1. Connect
+        // Connect/query lobby server
         bool sendConnectRequestToSelectedServer();
 
         // P2. Join room
+        // Room list query
         void requestRoomList();
-        void sendCreateRoomMessage();
         void sendJoinRoomMessage();
+
+        // P3. In room
         void sendLeaveRoomMessage();
         void sendChatMessage(const char*);
 
-        // P3. Play
+        // P4. Play
         void sendLeaveGameMessage();
         void sendLocalInput();
         void sendPowerupRequest();
@@ -211,33 +227,29 @@ class NetClient : public NetworkEventHandler
 
         MI_NetworkListScroll* uiRoomList;
 
-        //uint8_t incomingData[NET_MAX_MESSAGE_SIZE];
-
+        // Basic connection and communication
         bool connectLobby(const char* hostname, const uint16_t port = NET_LOBBYSERVER_PORT);
         bool connectGameHost(const char* hostname, const uint16_t port = NET_GAMEHOST_PORT);
-
         bool sendMessageToLobbyServer(const void* data, int dataLength);
         bool sendMessageToGameHost(const void* data, int dataLength);
         bool sendMessageToGameHostReliable(const void* data, int dataLength);
         bool sendTo(NetPeer*& peer, const void* data, int dataLength, bool reliable = false);
 
-        // P1. Connect
+        // Connect/query lobby server
         void handleServerinfoAndClose(const uint8_t*, size_t);
 
-        // P2. Join room
+        // Room list query
         void handleNewRoomListEntry(const uint8_t*, size_t);
-        void handleRoomCreatedMessage(const uint8_t*, size_t);
-        void handleRoomChangedMessage(const uint8_t*, size_t);
-        void handleRoomChatMessage(const uint8_t*, size_t);
+        void handleGameHostAddress(const NetPeer&, const uint8_t*, size_t);
 
-        // P2.5. Pre-game
-        void handleRoomStartMessage(NetPeer&, const uint8_t*, size_t);
-        void handleExpectedClientsMessage(NetPeer&, const uint8_t*, size_t);
-        void handleMapSyncMessage(const uint8_t*, size_t);
+        // In-room
+        void handleChatMessage(const uint8_t*, size_t);
+        void handleSkinChangeMessage(const uint8_t*, size_t);
+        void handleMapChangeMessage(const uint8_t*, size_t);
         void handleStartSyncMessage(const uint8_t*, size_t);
         void handleGameStartMessage();
 
-        // P3. Game
+        // In-game
         void handleRemoteGameState(const uint8_t*, size_t);
         void handlePowerupStart(const uint8_t*, size_t);
         void handlePowerupTrigger(const uint8_t*, size_t);
