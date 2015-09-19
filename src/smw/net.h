@@ -95,7 +95,6 @@ class NetGameHost : public NetworkEventHandler
         void onDisconnect(NetPeer& client);
 
         // Create/update room
-        void sendCreateRoomMessage();
         void sendUpdateRoomMessage();
 
         // P2. Join room
@@ -205,6 +204,10 @@ class NetClient : public NetworkEventHandler
         // Room list query
         void requestRoomList();
         void sendJoinRoomMessage();
+
+        // Room creating on lobby server
+        // The (NetGameHost) local_gamehost is not connected with the lobby server
+        void sendCreateRoomMessage();
 
         // P3. In room
         void sendLeaveRoomMessage();
