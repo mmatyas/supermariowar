@@ -41,8 +41,8 @@
 #define NET_L2G_CREATE_OK                   31
 #define NET_L2G_CREATE_ERROR                32 // TODO: What kind of error?
 #define NET_G2L_ROOM_CHANGED                33 // eg. player count, game mode, ...
-#define NET_G2L_CLIENT_LEFT_ROOM            34
-#define NET_P2L_LEFT_ROOM                   35
+#define NET_P2L_LEFT_ROOM                   34
+#define NET_G2L_CLIENT_LEFT_ROOM            35
 
 #define NET_REQUEST_JOIN_ROOM               80
 #define NET_L2P_GAMEHOST_ADDRESS            81 // Server -> Normal Players: "Connect to this guy to play"
@@ -54,14 +54,14 @@
 #define NET_P2G_JOIN_ROOM                   40
 #define NET_P2G_LEAVE_ROOM                  41
 #define NET_G2P_JOIN_OK                     42
-#define NET_G2P_ROOM_FULL                   43
-#define NET_G2P_ROOM_CHANGED                44
+#define NET_G2P_JOIN_FULL                   43
+#define NET_G2E_ROOM_CHANGED                44
 #define NET_G2E_ROOM_CHAT_MSG               45
 
 // Pre-game preparations
-#define NET_G2P_MAP_CHANGED                 53 // Game Host -> Players: "Here's the map file"
+#define NET_G2E_MAP_CHANGED                 53 // Game Host -> Players: "Here's the map file"
 #define NET_P2G_MAP_OK                      54 // Normal Player -> Game Host: "Download complete!"
-#define NET_G2P_SYNC                        55 // Game Host -> Players: "Prepare gameplay with this data" (eg. RNG seed)
+#define NET_G2E_SYNC                        55 // Game Host -> Players: "Prepare gameplay with this data" (eg. RNG seed)
 #define NET_P2G_SYNC_OK                     56 // Normal Player -> Game Host: "I'm ready!"
 #define NET_G2E_GAME_START                  57 // Game Host -> Everyone: "Everybody connected successfully!"
 
