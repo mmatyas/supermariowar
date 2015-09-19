@@ -1078,16 +1078,20 @@ void MenuState::update()
                 MenuCodeEnum previousCode = code;
 
                 //printf("\rlastSendType: %d, lastRecvType: %d", lastSent.packageType, lastRecv.packageType);
+
+                // Connecting to lobby server -> OK -> Lobby menu
                 if (lastSent.packageType == NET_REQUEST_CONNECT
                         && lastRecv.packageType == NET_RESPONSE_CONNECT_OK)
                     code = MENU_CODE_TO_NET_LOBBY_MENU;
 
-                else if (lastSent.packageType == NET_REQUEST_JOIN_ROOM
-                        && lastRecv.packageType == NET_NOTICE_ROOM_CHANGED)
+                // Creating room on lobby server -> OK -> Room menu (local)
+                else if (lastSent.packageType == NET_G2L_CREATE_ROOM
+                        && lastRecv.packageType == NET_L2G_CREATE_OK)
                     code = MENU_CODE_TO_NET_ROOM_MENU;
 
-                else if (lastSent.packageType == NET_REQUEST_CREATE_ROOM
-                        && lastRecv.packageType == NET_RESPONSE_CREATE_OK)
+                // Join remote game host -> OK -> Room menu (remote)
+                else if (lastSent.packageType == NET_P2G_JOIN_ROOM
+                        && lastRecv.packageType == NET_G2P_JOIN_OK)
                     code = MENU_CODE_TO_NET_ROOM_MENU;
 
                 // ide a hibakezelést
