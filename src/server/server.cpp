@@ -391,11 +391,11 @@ void SMWServer::playerLeavesRoom(uint64_t playerID)
 
     // Search for the room in which the player is
     Room* room = &rooms[player->currentRoomID];
-    assert(room->playerCount > 0);
-    room->playerCount--;
+    assert(room->players.length() > 0);
+    room->players.remove(player);
 
     // If the room is now empty, delete it.
-    if (room->playerCount == 0) {
+    if (room->players.length() == 0) {
         rooms.erase(player->currentRoomID);
         log("Room %u erased.", player->currentRoomID);
     }
