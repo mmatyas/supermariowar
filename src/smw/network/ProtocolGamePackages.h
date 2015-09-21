@@ -23,10 +23,6 @@ namespace NetPkgs {
 
 */
 
-struct MapSyncOK : MessageHeader {
-    MapSyncOK() : MessageHeader(NET_P2G_MAP_OK) {}
-};
-
 struct SyncOK : MessageHeader {
     SyncOK() : MessageHeader(NET_P2G_SYNC_OK) {}
 };

@@ -2,7 +2,7 @@
 #define NETWORK_PROTOCOL_DEFINITIONS_H
 
 #define NET_PROTOCOL_VERSION_MAJOR          0
-#define NET_PROTOCOL_VERSION_MINOR          2
+#define NET_PROTOCOL_VERSION_MINOR          3
 #define NET_MAX_MESSAGE_SIZE                128
 #define NET_LOBBYSERVER_PORT                12521
 #define NET_GAMEHOST_PORT                   12522
@@ -32,8 +32,10 @@
 #define NET_REQUEST_LEAVE_ROOM              31
 #define NET_RESPONSE_JOIN_OK                32
 #define NET_RESPONSE_ROOM_FULL              33
-#define NET_NOTICE_ROOM_CHANGED             34
-#define NET_NOTICE_ROOM_CHAT_MSG            35
+#define NET_NOTICE_ROOM_CHANGE              34
+#define NET_NOTICE_MAP_CHANGE               35 // (after everyone connected) Game Host -> Players: "Here's the map file"
+#define NET_NOTICE_SKIN_CHANGE              36 // (after everyone connected) Game Host -> Players: "Here's the map file"
+#define NET_NOTICE_ROOM_CHAT_MSG            37
 
 #define NET_REQUEST_CREATE_ROOM             40
 #define NET_RESPONSE_CREATE_OK              41
@@ -46,8 +48,6 @@
 #define NET_G2L_START_ROOM                  50 // Game Host -> Server: "OK, we're ready to go!"
 #define NET_L2P_GAMEHOST_INFO               51 // Server -> Normal Players: "Connect to this guy to play"
 #define NET_L2G_CLIENTS_INFO                52 // Server -> Game Host: "These players want to connect you"
-#define NET_G2P_MAP                         53 // (after everyone connected) Game Host -> Players: "Here's the map file"
-#define NET_P2G_MAP_OK                      54 // Normal Player -> Game Host: "Download complete!"
 #define NET_G2P_SYNC                        55 // Game Host -> Players: "Prepare gameplay with this data (eg. RNG seed)"
 #define NET_P2G_SYNC_OK                     56 // Normal Player -> Game Host: "I'm ready!"
 #define NET_G2E_GAME_START                  57 // Game Host -> Everyone: "Everybody connected successfully!"

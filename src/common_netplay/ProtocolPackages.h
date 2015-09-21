@@ -209,7 +209,7 @@ struct CurrentRoom : MessageHeader {
     uint16_t       gamemodeGoal;
 
     CurrentRoom()
-        : MessageHeader(NET_NOTICE_ROOM_CHANGED)
+        : MessageHeader(NET_NOTICE_ROOM_CHANGE)
         , roomID(0)
         , hostPlayerNumber(0)
         , remotePlayerNumber(0)
