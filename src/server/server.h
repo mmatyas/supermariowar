@@ -40,6 +40,7 @@ private:
     void playerCreatesRoom(uint64_t playerID, const void* data, size_t dataLength);
     void playerJoinsRoom(uint64_t playerID, const void* data, size_t dataLength);
     void playerLeavesRoom(uint64_t playerID);
+    void hostChangesMap(uint64_t playerID, const void* data, size_t dataLength);
     void playerSendsChatMsg(uint64_t playerID, const void* data, size_t dataLength);
 
     void playerStartsRoom(uint64_t playerID);

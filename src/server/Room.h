@@ -7,6 +7,13 @@
 
 #include <stdint.h>
 
+struct Map {
+    uint8_t* data;
+    size_t size;
+
+    Map() : data(0), size(0) {}
+};
+
 struct Room {
     uint32_t        roomID;
     char            name[NET_MAX_ROOM_NAME_LENGTH];
@@ -16,6 +23,8 @@ struct Room {
     Player*         players[4];
     uint8_t         hostPlayerNumber; // 0-3 index in players[]
     uint8_t         playerCount;
+
+    Map             mapPackage;
 
     uint8_t         gamemodeID;
     uint16_t        gamemodeGoal;
@@ -34,6 +43,9 @@ struct Room {
 
     void sendChatMessage(Player*, const char*);
     void sendRoomUpdate();
+    void changeAndSendMap(const void*, size_t);
+    void sendMap();
+    void sendMapTo(uint8_t);
     void sendStartSignal(); // sends start sync
     void startGameIfEverybodyReady();
 };

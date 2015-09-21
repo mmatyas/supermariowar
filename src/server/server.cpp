@@ -185,6 +185,10 @@ void SMWServer::onReceive(NetPeer& client, const uint8_t* data, size_t dataLengt
             playerLeavesRoom(playerID);
             break;
 
+        case NET_NOTICE_MAP_CHANGE:
+            hostChangesMap(playerID, data, dataLength);
+            break;
+
         case NET_NOTICE_ROOM_CHAT_MSG:
             playerSendsChatMsg(playerID, data, dataLength);
             break;
@@ -285,7 +289,8 @@ void SMWServer::sendVisibleRoomEntries(NetPeer& client)
     auto it = rooms.begin();
     while (it != rooms.end()) {
         Room* room = &it->second;
-        if (room->visible)
+        // only visible if public and has valid map
+        if (room->visible && room->mapPackage.data)
         {
             NetPkgs::RoomInfo roomInfo;
             {
@@ -417,6 +422,24 @@ void SMWServer::playerLeavesRoom(uint64_t playerID)
     player->currentRoomID = 0;
     player->isPlaying = false;
     player->lastActivityTime = TIME_NOW();
+}
+
+void SMWServer::hostChangesMap(uint64_t playerID, const void* data, size_t dataLength)
+{
+    printf("hostChangesMap\n");
+    if (!players.count(playerID))
+        return;
+
+    Player* player = &players[playerID];
+    uint32_t roomID = player->currentRoomID;
+    if (!roomID || player->isPlaying)
+        return;
+
+    if (!rooms.count(roomID))
+        return;
+
+    rooms[roomID].changeAndSendMap(data, dataLength);
+    printf("room open!\n");
 }
 
 void SMWServer::playerSendsChatMsg(uint64_t playerID, const void* data, size_t dataLength)

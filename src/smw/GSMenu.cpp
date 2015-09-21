@@ -1072,21 +1072,22 @@ void MenuState::update()
             LastMessage lastRecv = netplay.client.lastReceivedMessage;
 
             // Override menu code if response has arrived
-            if (netplay.operationInProgress &&
-                lastSent.timestamp < lastRecv.timestamp) // ensure that the incoming message arrived after the request
+            if (netplay.operationInProgress)
             {
                 MenuCodeEnum previousCode = code;
 
                 //printf("\rlastSendType: %d, lastRecvType: %d", lastSent.packageType, lastRecv.packageType);
                 if (lastSent.packageType == NET_REQUEST_CONNECT
-                        && lastRecv.packageType == NET_RESPONSE_CONNECT_OK)
+                        && lastRecv.packageType == NET_RESPONSE_CONNECT_OK
+                        && lastSent.timestamp < lastRecv.timestamp) // ensure that the incoming message arrived after the request
                     code = MENU_CODE_TO_NET_LOBBY_MENU;
 
                 else if (lastSent.packageType == NET_REQUEST_JOIN_ROOM
-                        && lastRecv.packageType == NET_NOTICE_ROOM_CHANGED)
+                        && lastRecv.packageType == NET_NOTICE_ROOM_CHANGE
+                        && lastSent.timestamp < lastRecv.timestamp)
                     code = MENU_CODE_TO_NET_ROOM_MENU;
 
-                else if (lastSent.packageType == NET_REQUEST_CREATE_ROOM
+                else if (lastSent.packageType == NET_NOTICE_MAP_CHANGE
                         && lastRecv.packageType == NET_RESPONSE_CREATE_OK)
                     code = MENU_CODE_TO_NET_ROOM_MENU;
 

@@ -293,6 +293,7 @@ void NetClient::sendCreateRoomMessage()
 
 void NetClient::handleRoomCreatedMessage(const uint8_t* data, size_t dataLength)
 {
+    printf("room created!\n");
     NetPkgs::NewRoomCreated pkg;
     memcpy(&pkg, data, sizeof(NetPkgs::NewRoomCreated));
 
@@ -316,6 +317,8 @@ void NetClient::handleRoomCreatedMessage(const uint8_t* data, size_t dataLength)
     game_values.playercontrol[1] = 0;
     game_values.playercontrol[2] = 0;
     game_values.playercontrol[3] = 0;
+
+    sendMapChangeMessage();
 
     local_gamehost.start(foreign_lobbyserver);
 }
@@ -402,6 +405,53 @@ void NetClient::sendChatMessage(const char* message)
     sendMessageToLobbyServer(&pkg, sizeof(NetPkgs::RoomChatMsg));
 }
 
+void NetClient::sendMapChangeMessage()
+{
+    printf("[net] Sending map: %s\n", netplay.mapfilepath.c_str());
+    assert(netplay.mapfilepath.length() > 4);
+
+    uint8_t* data_buffer = NULL;
+    size_t data_size = 0;
+
+    // NOTE: This is just an alert Make sure you didn't broke something by changing the package headers!
+    // You can safely update this line then.
+    static_assert(sizeof(NetPkgs::MessageHeader) == 3, "The size of Net_MessageHeader should be 3");
+
+    if (!FileCompressor::compress(netplay.mapfilepath, data_buffer, data_size, sizeof(NetPkgs::MessageHeader)))
+        return;
+
+    assert(data_buffer);
+    assert(data_size > 0);
+
+    NetPkgs::MessageHeader header(NET_NOTICE_MAP_CHANGE);
+    memcpy(data_buffer, &header, sizeof(NetPkgs::MessageHeader));
+
+    sendMessageToLobbyServer(data_buffer, data_size + sizeof(NetPkgs::MessageHeader) + 4 /* un-/compressed size */);
+}
+
+void NetClient::handleMapChangeMessage(const uint8_t* data, size_t dataLength)
+{
+    // read
+    NetPkgs::MessageHeader pkg(0);
+    memcpy(&pkg, data, sizeof(NetPkgs::MessageHeader));
+
+    if (dataLength <= sizeof(NetPkgs::MessageHeader) + 4 /* un-/compressed size 2*2B */
+        || dataLength > 20000) {
+        printf("[error] Corrupt map arrived\n");
+        return;
+    }
+
+    uint16_t full_size, compressed_size;
+    memcpy(&full_size, data + sizeof(NetPkgs::MessageHeader), 2);
+    memcpy(&compressed_size, data + sizeof(NetPkgs::MessageHeader) + 2, 2);
+
+    printf("[net] Map arrived (C:%d unC:%d)\n", compressed_size, full_size);
+
+    netplay.mapfilepath = GetHomeDirectory() + "net_last.map";
+    if (!FileCompressor::decompress(data + sizeof(NetPkgs::MessageHeader), netplay.mapfilepath))
+        return;
+}
+
 void NetClient::handleRoomChatMessage(const uint8_t* data, size_t dataLength)
 {
     NetPkgs::RoomChatMsg pkg;
@@ -476,33 +526,6 @@ void NetClient::handleExpectedClientsMessage(NetPeer& client, const uint8_t* dat
     }
 
     local_gamehost.setExpectedPlayers(playerCount, hosts, ports);
-}
-
-void NetClient::handleMapSyncMessage(const uint8_t* data, size_t dataLength)
-{
-    // read
-    NetPkgs::MessageHeader pkg(0);
-    memcpy(&pkg, data, sizeof(NetPkgs::MessageHeader));
-
-    // FIXME: a reminder, make sure to check package sizes
-
-    uint16_t full_size, compressed_size;
-    memcpy(&full_size, data + sizeof(NetPkgs::MessageHeader), 2);
-    memcpy(&compressed_size, data + sizeof(NetPkgs::MessageHeader) + 2, 2);
-
-    printf("[net] Map arrived (C:%d unC:%d)\n", compressed_size, full_size);
-
-    netplay.mapfilepath = GetHomeDirectory() + "net_last.map";
-    if (!FileCompressor::decompress(data + sizeof(NetPkgs::MessageHeader), netplay.mapfilepath))
-        return;
-
-    // respond
-    if (netplay.theHostIsMe)
-        setAsLastSentMessage(NET_P2G_MAP_OK);
-    else {
-        NetPkgs::MapSyncOK respond_pkg;
-        sendMessageToGameHostReliable(&respond_pkg, sizeof(NetPkgs::MapSyncOK));
-    }
 }
 
 void NetClient::handleStartSyncMessage(const uint8_t* data, size_t dataLength)
@@ -863,8 +886,16 @@ void NetClient::onReceive(NetPeer& client, const uint8_t* data, size_t dataLengt
             netplay.joinSuccessful = false;
             break;
 
-        case NET_NOTICE_ROOM_CHANGED:
+        case NET_NOTICE_ROOM_CHANGE:
             handleRoomChangedMessage(data, dataLength);
+            break;
+
+        case NET_NOTICE_MAP_CHANGE:
+            handleMapChangeMessage(data, dataLength);
+            break;
+
+        case NET_NOTICE_SKIN_CHANGE:
+            // TODO
             break;
 
         case NET_NOTICE_ROOM_CHAT_MSG:
@@ -891,10 +922,6 @@ void NetClient::onReceive(NetPeer& client, const uint8_t* data, size_t dataLengt
 
         case NET_L2G_CLIENTS_INFO:
             handleExpectedClientsMessage(client, data, dataLength);
-            break;
-
-        case NET_G2P_MAP:
-            handleMapSyncMessage(data, dataLength);
             break;
 
         case NET_G2P_SYNC:
@@ -942,6 +969,8 @@ void NetClient::onReceive(NetPeer& client, const uint8_t* data, size_t dataLengt
     }
 
     setAsLastReceivedMessage(packageType);
+    if (packageType == NET_RESPONSE_CREATE_OK)
+        printf("last: %d, %d\n", lastSentMessage.packageType, lastReceivedMessage.packageType);
 }
 
 /****************************
@@ -1165,7 +1194,7 @@ void NetGameHost::onConnect(NetPeer* new_player)
     // When all players connected,
     // sychronize them (eg. same RNG seed)
     if (next_free_client_slot == expected_client_count) {
-        sendMapSyncMessages();
+        sendSyncMessages();
     }
 }
 
@@ -1190,10 +1219,6 @@ void NetGameHost::onReceive(NetPeer& player, const uint8_t* data, size_t dataLen
 
     switch (packageType)
     {
-        case NET_P2G_MAP_OK:
-            handleMapOKMessage(player, data, dataLength);
-            break;
-
         case NET_P2G_SYNC_OK:
             handleSyncOKMessage(player, data, dataLength);
             break;
@@ -1224,55 +1249,9 @@ void NetGameHost::sendStartRoomMessage()
     setAsLastSentMessage(pkg.packageType);
 }
 
-void NetGameHost::sendMapSyncMessages()
-{
-    assert(clients[0] || clients[1] || clients[2]);
-    printf("[net] Sending map: %s\n", netplay.mapfilepath.c_str());
-    assert(netplay.mapfilepath.length() > 4);
-
-    uint8_t* data_buffer = NULL;
-    size_t data_size = 0;
-
-    // NOTE: This is just an alert Make sure you didn't broke something by changing the package headers!
-    // You can safely update this line then.
-    static_assert(sizeof(NetPkgs::MessageHeader) == 3, "The size of Net_MessageHeader should be 3");
-
-    if (!FileCompressor::compress(netplay.mapfilepath, data_buffer, data_size, sizeof(NetPkgs::MessageHeader)))
-        return;
-
-    assert(data_buffer);
-    assert(data_size > 0);
-
-    NetPkgs::MessageHeader header(NET_G2P_MAP);
-    memcpy(data_buffer, &header, sizeof(NetPkgs::MessageHeader));
-
-    sendMessageToMyPeers(data_buffer, data_size + sizeof(NetPkgs::MessageHeader) + 4);
-}
-
-void NetGameHost::handleMapOKMessage(const NetPeer& player, const uint8_t* data, size_t dataLength)
-{
-    assert(player == *clients[0] || player == *clients[1] || player == *clients[2]);
-
-    uint8_t readyPlayerCount = 0;
-    for (unsigned short c = 0; c < expected_client_count; c++)
-    {
-        if (player == *clients[c]) {
-            expected_clients[c].map_ok = true;
-            printf("  Client %d/%d received the map.\n", c + 1, expected_client_count);
-        }
-
-        if (expected_clients[c].map_ok)
-            readyPlayerCount++;
-    }
-
-    if (readyPlayerCount == expected_client_count) {
-        printf("[net] Prepare launching the game...\n");
-        sendSyncMessages();
-    }
-}
-
 void NetGameHost::sendSyncMessages()
 {
+    printf("[net] Prepare launching the game...\n");
     assert(clients[0] || clients[1] || clients[2]);
 
     // send syncronization package

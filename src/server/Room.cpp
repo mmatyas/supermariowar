@@ -7,36 +7,37 @@
 #include <cstdio>
 #include <cstring>
 
+#define MAPPKG_SIZE_LIMIT 20000 /* bytes in worst case */
+
 Room::Room()
+    : roomID(0)
+    , visible(true)
+    , hostPlayerNumber(0)
+    , playerCount(0)
+    , gamemodeID(0) // Classic
+    , gamemodeGoal(10) // 10 lives
 {
-    roomID = 0;
-    visible = true;
-    playerCount = 0;
     for (uint8_t p = 0; p < 4; p++)
         players[p] = NULL;
 }
 
 Room::Room(uint32_t roomID, const char* name, const char* password, Player* host)
+    : roomID(roomID)
+    , visible(true) // TODO
+    , hostPlayerNumber(0)
+    , playerCount(1)
+    , gamemodeID(0) // Classic
+    , gamemodeGoal(10) // 10 lives
 {
-    // TODO
-    visible = true;
-
     strncpy(this->name, name, NET_MAX_ROOM_NAME_LENGTH);
     this->name[NET_MAX_ROOM_NAME_LENGTH - 1] = '\0';
     strncpy(this->password, password, NET_MAX_ROOM_PASSWORD_LENGTH);
     this->password[NET_MAX_ROOM_PASSWORD_LENGTH - 1] = '\0';
 
-    playerCount = 1;
-    hostPlayerNumber = 0;
-
     players[0] = host;
     for (uint8_t p = 1; p < 4; p++)
         players[p] = NULL;
 
-    gamemodeID = 0; // Classic
-    gamemodeGoal = 10; // 10 lives
-
-    this->roomID = roomID;
     createTime = TIME_NOW();
     lastActivityTime = createTime;
 }
@@ -47,6 +48,9 @@ Room::~Room()
     for (unsigned short p = 0; p < 4; p++) {
         players[p] = NULL;
     }
+
+    delete mapPackage.data;
+    mapPackage.data = NULL;
 }
 
 void Room::tryAddingPlayer(Player* player)
@@ -57,6 +61,8 @@ void Room::tryAddingPlayer(Player* player)
             player->currentRoomID = roomID;
             playerCount++;
             assert(playerCount <= 4);
+
+            sendMapTo(p);
         }
         else
             printf("  R-%u: slot %d foglalt: %p\n", roomID, p, players[p]);
@@ -157,6 +163,49 @@ void Room::sendChatMessage(Player* sender, const char* message)
             players[p]->sendData(&package, sizeof(NetPkgs::RoomChatMsg));
         }
     }
+}
+
+void Room::changeAndSendMap(const void* data, size_t data_length)
+{
+    printf("chageandsend\n");
+    assert(hostPlayerNumber < 4);
+    assert(players[hostPlayerNumber]);
+
+    // Some basic package validation
+    if (data_length <= sizeof(NetPkgs::MessageHeader) + 4 /* un-/compressed size 2*2B */
+        || data_length > MAPPKG_SIZE_LIMIT) {
+        printf("[error] Corrupt map arrived from host in room %u\n", roomID);
+        return;
+    }
+
+    delete mapPackage.data;
+    mapPackage.data = new uint8_t[data_length];
+    memcpy(mapPackage.data, data, data_length);
+    mapPackage.size = data_length;
+
+    sendMap();
+}
+
+void Room::sendMap()
+{
+    for (uint8_t p = 0; p < 4; p++)
+        sendMapTo(p);
+}
+
+void Room::sendMapTo(uint8_t index)
+{
+    printf("  sendMapTo %d\n", index);
+    assert(hostPlayerNumber < 4);
+    assert(index < 4);
+    if (index == hostPlayerNumber)
+        return;
+    if (!players[index])
+        return;
+
+    assert(mapPackage.data);
+    assert(mapPackage.size);
+
+    players[index]->sendData(mapPackage.data, mapPackage.size);
 }
 
 void Room::sendStartSignal()
