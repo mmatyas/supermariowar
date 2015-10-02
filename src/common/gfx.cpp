@@ -43,11 +43,7 @@ bool gfx_loadpalette(const std::string& palette_path) {
 
 bool ValidSkinSurface(SDL_Surface * skin)
 {
-#ifdef __EMSCRIPTEN__
     if (skin->w == 192 && skin->h == 32 && skin->format->BitsPerPixel == 32)
-#else
-    if (skin->w == 192 && skin->h == 32 && skin->format->BitsPerPixel == 24)
-#endif
         return true;
 
     return false;
@@ -86,11 +82,7 @@ SDL_Surface * gfx_createskinsurface(
     if (SDL_MUSTLOCK(skin))
         SDL_LockSurface(skin);
 
-#ifdef __EMSCRIPTEN__
     Uint8 byteperframe = 128;
-#else
-    Uint8 byteperframe = 96;
-#endif
 
     int skincounter = spriteindex * byteperframe;
     int tempcounter = 0;
@@ -100,18 +92,14 @@ SDL_Surface * gfx_createskinsurface(
     Uint8 * pixels = (Uint8*)skin->pixels;
     Uint8 * temppixels = (Uint8*)temp->pixels;
 
-    short iRedOffset = skin->format->Rshift >> 3;
-    short iGreenOffset = skin->format->Gshift >> 3;
-    short iBlueOffset = skin->format->Bshift >> 3;
-
     for (int j = 0; j < 32; j++) {
         for (int i = 0; i < 32; i++) {
             if (reverse)
-                reverseoffset = (31 - (i * 2)) * 3;
+                reverseoffset = (31 - (i * 2)) * 4;
 
-            Uint8 iColorByte1 = pixels[skincounter + iRedOffset];
-            Uint8 iColorByte2 = pixels[skincounter + iGreenOffset];
-            Uint8 iColorByte3 = pixels[skincounter + iBlueOffset];
+            Uint8 iColorByte1 = pixels[skincounter + 0];
+            Uint8 iColorByte2 = pixels[skincounter + 1];
+            Uint8 iColorByte3 = pixels[skincounter + 2];
 
             bool fFoundColor = false;
             for (unsigned short m = 0; m < gfx.getPalette().colorCount(); m++) {
@@ -120,9 +108,9 @@ SDL_Surface * gfx_createskinsurface(
                         unsigned short base = tempcounter + k * byteperframe + reverseoffset;
                         gfx.getPalette().copyColorSchemeTo(
                             colorScheme, k, m,
-                            temppixels[base + iRedOffset],
-                            temppixels[base + iGreenOffset],
-                            temppixels[base + iBlueOffset]);
+                            temppixels[base + 0],
+                            temppixels[base + 1],
+                            temppixels[base + 2]);
                     }
 
                     fFoundColor = true;
@@ -132,19 +120,19 @@ SDL_Surface * gfx_createskinsurface(
 
             if (!fFoundColor) {
                 for (int k = 0; k < loops; k++) {
-                    temppixels[tempcounter + k * byteperframe + reverseoffset + iRedOffset] = iColorByte1;
-                    temppixels[tempcounter + k * byteperframe + reverseoffset + iGreenOffset] = iColorByte2;
-                    temppixels[tempcounter + k * byteperframe + reverseoffset + iBlueOffset] = iColorByte3;
+                    temppixels[tempcounter + k * byteperframe + reverseoffset + 0] = iColorByte1;
+                    temppixels[tempcounter + k * byteperframe + reverseoffset + 1] = iColorByte2;
+                    temppixels[tempcounter + k * byteperframe + reverseoffset + 2] = iColorByte3;
                 }
             }
 
-            skincounter += 3;
-            tempcounter += 3;
+            skincounter += 4;
+            tempcounter += 4;
         }
 
         // 5 * 96 shall be replaced by a better variable expression
-        skincounter += 5 * byteperframe + skin->pitch - (skin->w * 3);
-        tempcounter += byteperframe * (loops - 1) + temp->pitch - (temp->w * 3);
+        skincounter += 5 * byteperframe + skin->pitch - (skin->w * 4);
+        tempcounter += byteperframe * (loops - 1) + temp->pitch - (temp->w * 4);
     }
 
     SDL_UnlockSurface(skin);
@@ -155,11 +143,7 @@ SDL_Surface * gfx_createskinsurface(
         return NULL;
     }
 
-#ifdef __EMSCRIPTEN__
     SDL_Surface * final = SDL_DisplayFormatAlpha(temp);
-#else
-    SDL_Surface * final = SDL_DisplayFormat(temp);
-#endif
     if (!final) {
         printf("\n ERROR: Couldn't create new surface using SDL_DisplayFormat(): %s\n", SDL_GetError());
         return NULL;
