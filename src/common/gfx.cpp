@@ -143,7 +143,7 @@ SDL_Surface * gfx_createskinsurface(
         return NULL;
     }
 
-    SDL_Surface * final = SDL_DisplayFormatAlpha(temp);
+    SDL_Surface * final = SDL_DisplayFormat(temp);
     if (!final) {
         printf("\n ERROR: Couldn't create new surface using SDL_DisplayFormat(): %s\n", SDL_GetError());
         return NULL;
@@ -357,11 +357,7 @@ SDL_Surface * gfx_createteamcoloredsurface(SDL_Surface * sImage, short iColor, U
         }
     }
 
-#ifdef __EMSCRIPTEN__
-    SDL_Surface * sFinalImage = SDL_DisplayFormatAlpha(sTempImage);
-#else
     SDL_Surface * sFinalImage = SDL_DisplayFormat(sTempImage);
-#endif
     if (!sFinalImage) {
         printf("\n ERROR: Couldn't create new surface using SDL_DisplayFormat(): %s\n", SDL_GetError());
         return NULL;
