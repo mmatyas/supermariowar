@@ -1364,11 +1364,7 @@ SDL_Surface * CMap::createThumbnailSurface(bool fUseClassicPack)
         return NULL;
     }
 
-#ifdef __EMSCRIPTEN__
-    SDL_Surface * sBackground = SDL_DisplayFormatAlpha(temp);
-#else
     SDL_Surface * sBackground = SDL_DisplayFormat(temp);
-#endif
     if (!sBackground) {
         printf("ERROR: Couldn't convert thumbnail background to diplay pixel format: %s\n", SDL_GetError());
         return NULL;
