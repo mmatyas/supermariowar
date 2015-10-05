@@ -9,6 +9,7 @@
 	- [Linux](#linux)
 	- [Windows](#windows)
 	- [ARM / Raspberry Pi](#arm-devices)
+	- [Android](#android)
 	- [Asm.js](#asmjs)
 	- [Build configuration](#build-configuration)
 - [How to play](#how-to-play)
@@ -39,6 +40,7 @@ The game uses artwork and sounds from Nintendo games. We hope that this noncomme
 - ARM devices (eg. Raspberry Pi)
 - XBox (?)
 - Mac OS X (?)
+- Android (experimental)
 - asm.js (experimental)
 
 
@@ -161,6 +163,10 @@ apt-get install build-essential g++ git \
 ```
 
 Now you can continue with cloning the repository (eg. in `/root`) and following the Linux instructions. If you want to build for the first-gen Raspberry, you might want to call CMake as `cmake .. -DARM_OVERRIDE_ARCH=armv6l` to avoid linking errors. For other devices, you might need to edit the compiler flags as described above.
+
+### Android
+
+The Android port uses a different build system, you can find more details [here](https://github.com/mmatyas/supermariowar-android).
 
 ### ASM.JS
 
