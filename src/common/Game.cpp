@@ -2,6 +2,8 @@
 
 #include "path.h"
 
+#include <cstdio>
+
 #if _WIN32
 #include <windows.h>
 #endif
