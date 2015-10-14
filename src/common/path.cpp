@@ -24,22 +24,30 @@ std::string SMW_Root_Data_Dir;
 
 std::string	GetHomeDirectory()
 {
-	//NOTE: _WIN32 is also defined on _XBOX
 #ifdef _XBOX
-		return std::string("D:\\.smw\\");
-#elif __MACOSX__
-		char * folder=getenv("HOME");
-			return std::string(folder) + std::string("/Library/Preferences/.smw/");
-#elif	_WIN32
-		 char folder[ MAX_PATH ];
-    if (SHGetFolderPathA( NULL, CSIDL_PROFILE, NULL, 0, folder ) != S_OK) {
-			throw "I could not retrieve the user's home directory!\n";
-		}
+    // NOTE: _WIN32 is also defined on _XBOX
+    return std::string("D:\\.smw\\");
 
-		return std::string(folder) + std::string("\\.smw\\");
+#elif __MACOSX__
+    std::string result("/Library/Preferences/.smw/");
+    char* folder = getenv("HOME");
+    if (folder)
+        result = std::string(folder) + result;
+    return result;
+
+#elif _WIN32
+    std::string result(".smw/");
+    char folder[MAX_PATH];
+    if (SHGetFolderPathA(NULL, CSIDL_PROFILE, NULL, 0, folder) == S_OK)
+        result = std::string(folder) + "/" + result;
+    return result
+
 #else // catch-all for Linux-based systems
-			char * folder=getenv("HOME");
-			return std::string(folder) + std::string("/.smw/");
+    std::string result(".smw/");
+    char* folder = getenv("HOME");
+    if (folder)
+        result = std::string(folder) + "/" + result;
+    return result;
 #endif
 }
 
