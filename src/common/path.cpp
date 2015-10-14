@@ -40,7 +40,7 @@ std::string	GetHomeDirectory()
     char folder[MAX_PATH];
     if (SHGetFolderPathA(NULL, CSIDL_PROFILE, NULL, 0, folder) == S_OK)
         result = std::string(folder) + "/" + result;
-    return result
+    return result;
 
 #else // catch-all for Linux-based systems
     std::string result(".smw/");
