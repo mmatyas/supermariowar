@@ -297,7 +297,7 @@ void SplashScreenState::update()
         rm->menu_smw.draw(smw->ScreenWidth/2 - ((short)rm->menu_smw.getWidth() >> 1), 30);  //smw logo
 
         rm->menu_version.setalpha((Uint8)alpha);
-        rm->menu_version.draw(570, 10); //smw logo
+        rm->menu_version.draw(628 - rm->menu_version.getWidth(), 10); //smw logo
 
         rm->menu_font_large.setalpha((Uint8)alpha);
         rm->menu_font_large.drawRightJustified(smw->ScreenWidth * 0.98f, 45, "WIP");

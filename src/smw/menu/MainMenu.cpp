@@ -6,7 +6,8 @@ extern CResourceManager* rm;
 UI_MainMenu::UI_MainMenu() : UI_Menu()
 {
 	miSMWTitle = new MI_Image(&rm->menu_smw, 320 - ((short)rm->menu_smw.getWidth() >> 1), 30, 0, 0, 372, 140, 1, 1, 0);
-    miSMWVersion = new MI_Image(&rm->menu_version, 640 * 0.89f, 10, 0, 0, 58, 32, 1, 1, 0);
+    miSMWVersion = new MI_Image(&rm->menu_version, 628 - rm->menu_version.getWidth(), 10,
+        0, 0, rm->menu_version.getWidth(), rm->menu_version.getHeight(), 1, 1, 0);
     //miSMWVersionText = new MI_Text("Beta 2", 630, 45, 0, 2, 2);
 
     miMainStartButton = new MI_Button(&rm->spr_selectfield, 120, 210, "Start", 310, 0);
