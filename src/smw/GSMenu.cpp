@@ -1081,14 +1081,18 @@ void MenuState::update()
                 MenuCodeEnum previousCode = code;
 
                 //printf("\rlastSendType: %d, lastRecvType: %d", lastSent.packageType, lastRecv.packageType);
-                if (lastSent.packageType == NET_REQUEST_CONNECT
+
+                // if sent connect request,
+                // received connect_ok
+                // then sent skin change
+                if (lastSent.packageType == NET_NOTICE_SKIN_CHANGE
                         && lastRecv.packageType == NET_RESPONSE_CONNECT_OK
-                        && lastSent.timestamp < lastRecv.timestamp) // ensure that the incoming message arrived after the request
+                        && lastSent.timestamp >= lastRecv.timestamp)
                     code = MENU_CODE_TO_NET_LOBBY_MENU;
 
                 else if (lastSent.packageType == NET_REQUEST_JOIN_ROOM
                         && lastRecv.packageType == NET_NOTICE_ROOM_CHANGE
-                        && lastSent.timestamp < lastRecv.timestamp)
+                        && lastSent.timestamp < lastRecv.timestamp) // ensure that the incoming message arrived after the request
                     code = MENU_CODE_TO_NET_ROOM_MENU;
 
                 else if (lastSent.packageType == NET_NOTICE_MAP_CHANGE

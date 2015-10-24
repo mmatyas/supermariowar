@@ -192,6 +192,8 @@ class NetClient : public NetworkEventHandler
         void sendMapChangeMessage();
         void sendChatMessage(const char*);
 
+        void sendSkinChange();
+
         // P3. Play
         void sendLeaveGameMessage();
         void sendLocalInput();
