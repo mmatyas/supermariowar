@@ -6,6 +6,12 @@
 #include "NetworkLayer.h"
 #include "Clock.h"
 
+struct PlayerSkin {
+    uint8_t* data;
+    size_t size;
+
+    PlayerSkin() : data(0), size(0) {}
+};
 
 struct Player {
     std::string     name;
@@ -16,6 +22,8 @@ struct Player {
     uint8_t         playerNumberInRoom;
     bool            synchOK;
 
+    PlayerSkin      skinPackage;
+
     TimePoint       joinTime;
     TimePoint       lastActivityTime;
 
@@ -24,6 +32,7 @@ struct Player {
 
     void setClient(NetPeer* client);
     void setName(std::string& name);
+    void setSkin(const void*, size_t);
 
     bool sendData(const void*, size_t);
     bool sendCode(uint8_t);

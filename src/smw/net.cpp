@@ -926,6 +926,7 @@ void NetClient::onReceive(NetPeer& client, const uint8_t* data, size_t dataLengt
 
         case NET_NOTICE_SKIN_CHANGE:
             // TODO
+            printf("NET_NOTICE_SKIN_CHANGE\n");
             break;
 
         case NET_NOTICE_ROOM_CHAT_MSG:

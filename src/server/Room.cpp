@@ -63,6 +63,15 @@ void Room::tryAddingPlayer(Player* player)
             assert(playerCount <= 4);
 
             sendMapTo(p);
+
+            // send new player's skin to others
+            shareSkinOf(player);
+            // send skins of others to new player
+            for (uint8_t p = 0; p < 4; p++) {
+                if (players[p] && players[p] != player) {
+                    player->sendData(players[p]->skinPackage.data, players[p]->skinPackage.size);
+                }
+            }
         }
         else
             printf("  R-%u: slot %d foglalt: %p\n", roomID, p, players[p]);
@@ -206,6 +215,24 @@ void Room::sendMapTo(uint8_t index)
     assert(mapPackage.size);
 
     players[index]->sendData(mapPackage.data, mapPackage.size);
+}
+
+void Room::shareSkinOf(Player* sender)
+{
+    assert(sender);
+
+    if (!sender->skinPackage.data)
+        return;
+
+    if (!sender->skinPackage.size)
+        return;
+
+    // TODO: verify
+    for (uint8_t p = 0; p < 4; p++) {
+        if (players[p] && players[p] != sender) {
+            players[p]->sendData(sender->skinPackage.data, sender->skinPackage.size);
+        }
+    }
 }
 
 void Room::sendStartSignal()

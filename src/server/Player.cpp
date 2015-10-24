@@ -4,6 +4,8 @@
 
 #include <chrono>
 
+#define SKINPKG_SIZE_LIMIT 20000 /* bytes in worst case */
+
 Player::Player()
 {
     currentRoomID = 0;
@@ -37,6 +39,21 @@ void Player::setName(std::string& name)
     this->name = name;
 
     lastActivityTime = TIME_NOW();
+}
+
+void Player::setSkin(const void* data, size_t data_length)
+{
+    // Some basic package validation
+    if (data_length <= sizeof(NetPkgs::MessageHeader) + 4 /* un-/compressed size 2*2B */
+        || data_length > SKINPKG_SIZE_LIMIT) {
+        printf("[error] Corrupt skin arrived from %s\n", toString().c_str());
+        return;
+    }
+
+    delete skinPackage.data;
+    skinPackage.data = new uint8_t[data_length];
+    memcpy(skinPackage.data, data, data_length);
+    skinPackage.size = data_length;
 }
 
 // Printing stuff
