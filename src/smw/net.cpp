@@ -435,15 +435,16 @@ void NetClient::sendMapChangeMessage()
 
 void NetClient::handleMapChangeMessage(const uint8_t* data, size_t dataLength)
 {
-    // read
-    NetPkgs::MessageHeader pkg(0);
-    memcpy(&pkg, data, sizeof(NetPkgs::MessageHeader));
-
     if (dataLength <= sizeof(NetPkgs::MessageHeader) + 4 /* un-/compressed size 2*2B */
-        || dataLength > 20000) {
+        || dataLength > 20000
+        || !data) {
         printf("[error] Corrupt map arrived\n");
         return;
     }
+
+    // read
+    NetPkgs::MessageHeader pkg(0);
+    memcpy(&pkg, data, sizeof(NetPkgs::MessageHeader));
 
     uint16_t full_size, compressed_size;
     memcpy(&full_size, data + sizeof(NetPkgs::MessageHeader), 2);
@@ -488,8 +489,39 @@ void NetClient::sendSkinChange()
     memcpy(data_buffer, &header, sizeof(NetPkgs::MessageHeader));
     data_buffer[sizeof(NetPkgs::MessageHeader) + 1] = 0xFF; // the player's id in a room (0-3), or 0xFF
 
-    sendMessageToLobbyServer(data_buffer, data_size + sizeof(NetPkgs::MessageHeader) + 1 /* id */ + 4 /* un-/compressed size */);
+    sendMessageToLobbyServer(data_buffer, data_size + sizeof(NetPkgs::MessageHeader) + 5 /* id + un-/compressed size */);
     free(data_buffer);
+}
+
+void NetClient::handleSkinChangeMessage(const uint8_t* data, size_t dataLength)
+{
+    if (dataLength <= sizeof(NetPkgs::MessageHeader) + 5 /* player num 1B + un-/compressed size 2*2B */
+        || dataLength > 20000
+        || !data) {
+        printf("[error] Corrupt skin arrived\n");
+        return;
+    }
+
+    // read
+    NetPkgs::MessageHeader pkg(0);
+    memcpy(&pkg, data, sizeof(NetPkgs::MessageHeader));
+
+    int playerID = data[3];
+    if (playerID > 3) {
+        printf("[error] Corrupt skin arrived, bad player id\n");
+        return;
+    }
+
+    uint16_t full_size, compressed_size;
+    memcpy(&full_size, data + sizeof(NetPkgs::MessageHeader) + 1, 2);
+    memcpy(&compressed_size, data + sizeof(NetPkgs::MessageHeader) + 3, 2);
+
+    printf("[net] Skin arrived (from: %d, C:%d unC:%d)\n", playerID, compressed_size, full_size);
+
+    std::ostringstream path;
+    path << GetHomeDirectory() << "net_skin" << playerID << ".bmp";
+    if (!FileCompressor::decompress(data + sizeof(NetPkgs::MessageHeader) + 1, path.str()))
+        return;
 }
 
 /****************************
@@ -926,8 +958,7 @@ void NetClient::onReceive(NetPeer& client, const uint8_t* data, size_t dataLengt
             break;
 
         case NET_NOTICE_SKIN_CHANGE:
-            // TODO
-            printf("NET_NOTICE_SKIN_CHANGE %lu, %d\n", dataLength, data[3]);
+            handleSkinChangeMessage(data, dataLength);
             break;
 
         case NET_NOTICE_ROOM_CHAT_MSG:

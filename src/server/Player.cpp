@@ -54,7 +54,7 @@ void Player::setName(std::string& name)
 void Player::setSkin(const void* data, size_t data_length)
 {
     // Some basic package validation
-    if (data_length <= sizeof(NetPkgs::MessageHeader) + 1 /* id */ + 4 /* un-/compressed size 2*2B */
+    if (data_length <= sizeof(NetPkgs::MessageHeader) + 5 /* id 1B + un-/compressed size 2*2B */
         || data_length > SKINPKG_SIZE_LIMIT) {
         printf("[error] Corrupt skin arrived from %s\n", toString().c_str());
         return;

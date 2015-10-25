@@ -145,10 +145,6 @@ bool FileCompressor::decompress(const unsigned char* input_buffer, const std::st
         if (return_value <= 0)
             throw std::exception();
 
-        // TODO: is this check necessary?
-        if (return_value != stored_full_size)
-            throw std::exception();
-
         // Save
 
         // FIXME

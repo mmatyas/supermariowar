@@ -15,6 +15,7 @@
 #include <cmath>
 #include <cstdlib> // atoi()
 #include <cassert>
+#include <sstream>
 
 #ifdef _XBOX
 #include <xtl.h>
@@ -1496,11 +1497,20 @@ void MenuState::StartGame()
     //Load skins for players
     for (int k = 0; k < 4; k++) {
         if (game_values.playercontrol[k] > 0) {
-            if (game_values.randomskin[k]) {
+            if (netplay.active) {
+                std::ostringstream path;
+                path << GetHomeDirectory() << "net_skin" << k << ".bmp";
+                if (!rm->LoadFullSkin(rm->spr_player[k], path.str(), k)) {
+                    printf("[warning] Could not load netplay skin of player %d, using default\n", k);
+                    rm->LoadFullSkin(rm->spr_player[k], game_values.skinids[k], game_values.colorids[k]);
+                }
+            }
+            else if (game_values.randomskin[k]) {
                 do {
                     game_values.skinids[k] = RANDOM_INT( skinlist->GetCount());
                 } while (!rm->LoadFullSkin(rm->spr_player[k], game_values.skinids[k], game_values.colorids[k]));
-            } else {
+            }
+            else {
                 rm->LoadFullSkin(rm->spr_player[k], game_values.skinids[k], game_values.colorids[k]);
             }
         }

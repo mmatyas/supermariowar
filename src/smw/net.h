@@ -229,6 +229,7 @@ class NetClient : public NetworkEventHandler
         void handleRoomCreatedMessage(const uint8_t*, size_t);
         void handleRoomChangedMessage(const uint8_t*, size_t);
         void handleMapChangeMessage(const uint8_t*, size_t);
+        void handleSkinChangeMessage(const uint8_t*, size_t);
         void handleRoomChatMessage(const uint8_t*, size_t);
 
         // P2.5. Pre-game
