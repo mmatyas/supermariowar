@@ -11,6 +11,7 @@ struct PlayerSkin {
     size_t size;
 
     PlayerSkin() : data(0), size(0) {}
+    void setPlayerID(uint8_t id);
 };
 
 struct Player {

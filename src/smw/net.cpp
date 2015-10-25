@@ -478,7 +478,7 @@ void NetClient::sendSkinChange()
     // NOTE: see sendMapChangeMessage() for similar code
     static_assert(sizeof(NetPkgs::MessageHeader) == 3, "The size of Net_MessageHeader should be 3");
 
-    if (!FileCompressor::compress(skinpath, data_buffer, data_size, sizeof(NetPkgs::MessageHeader)))
+    if (!FileCompressor::compress(skinpath, data_buffer, data_size, sizeof(NetPkgs::MessageHeader) + 1))
         return;
 
     assert(data_buffer);
@@ -486,8 +486,9 @@ void NetClient::sendSkinChange()
 
     NetPkgs::MessageHeader header(NET_NOTICE_SKIN_CHANGE);
     memcpy(data_buffer, &header, sizeof(NetPkgs::MessageHeader));
+    data_buffer[sizeof(NetPkgs::MessageHeader) + 1] = 0xFF; // the player's id in a room (0-3), or 0xFF
 
-    sendMessageToLobbyServer(data_buffer, data_size + sizeof(NetPkgs::MessageHeader) + 4 /* un-/compressed size */);
+    sendMessageToLobbyServer(data_buffer, data_size + sizeof(NetPkgs::MessageHeader) + 1 /* id */ + 4 /* un-/compressed size */);
     free(data_buffer);
 }
 
@@ -926,7 +927,7 @@ void NetClient::onReceive(NetPeer& client, const uint8_t* data, size_t dataLengt
 
         case NET_NOTICE_SKIN_CHANGE:
             // TODO
-            printf("NET_NOTICE_SKIN_CHANGE\n");
+            printf("NET_NOTICE_SKIN_CHANGE %lu, %d\n", dataLength, data[3]);
             break;
 
         case NET_NOTICE_ROOM_CHAT_MSG:

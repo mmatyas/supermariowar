@@ -35,6 +35,8 @@ Room::Room(uint32_t roomID, const char* name, const char* password, Player* host
     this->password[NET_MAX_ROOM_PASSWORD_LENGTH - 1] = '\0';
 
     players[0] = host;
+    host->skinPackage.setPlayerID(0);
+
     for (uint8_t p = 1; p < 4; p++)
         players[p] = NULL;
 
@@ -101,6 +103,7 @@ void Room::removePlayer(Player* player)
             }
         }
     }
+    player->skinPackage.setPlayerID(0xFF);
 }
 
 void Room::setGamemode(uint8_t id, uint16_t goal) {
@@ -228,6 +231,16 @@ void Room::shareSkinOf(Player* sender)
         return;
 
     // TODO: verify
+
+    // find out and set player id
+    for (uint8_t p = 0; p < 4; p++) {
+        if (players[p] == sender) {
+            sender->skinPackage.setPlayerID(p);
+            break;
+        }
+    }
+
+    // send the fixed package to others
     for (uint8_t p = 0; p < 4; p++) {
         if (players[p] && players[p] != sender) {
             players[p]->sendData(sender->skinPackage.data, sender->skinPackage.size);
