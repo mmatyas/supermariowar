@@ -34,7 +34,7 @@
 #define NET_RESPONSE_ROOM_FULL              33
 #define NET_NOTICE_ROOM_CHANGE              34
 #define NET_NOTICE_MAP_CHANGE               35 // (after everyone connected) Game Host -> Players: "Here's the map file"
-#define NET_NOTICE_SKIN_CHANGE              36 // (after everyone connected) Game Host -> Players: "Here's the map file"
+#define NET_NOTICE_SKIN_CHANGE              36
 #define NET_NOTICE_ROOM_CHAT_MSG            37
 
 #define NET_REQUEST_CREATE_ROOM             40

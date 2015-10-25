@@ -35,6 +35,8 @@ Room::Room(uint32_t roomID, const char* name, const char* password, Player* host
     this->password[NET_MAX_ROOM_PASSWORD_LENGTH - 1] = '\0';
 
     players[0] = host;
+    host->skinPackage.setPlayerID(0);
+
     for (uint8_t p = 1; p < 4; p++)
         players[p] = NULL;
 
@@ -63,6 +65,15 @@ void Room::tryAddingPlayer(Player* player)
             assert(playerCount <= 4);
 
             sendMapTo(p);
+
+            // send new player's skin to others
+            shareSkinOf(player);
+            // send skins of others to new player
+            for (uint8_t p = 0; p < 4; p++) {
+                if (players[p] && players[p] != player) {
+                    player->sendData(players[p]->skinPackage.data, players[p]->skinPackage.size);
+                }
+            }
         }
         else
             printf("  R-%u: slot %d foglalt: %p\n", roomID, p, players[p]);
@@ -92,6 +103,7 @@ void Room::removePlayer(Player* player)
             }
         }
     }
+    player->skinPackage.setPlayerID(0xFF);
 }
 
 void Room::setGamemode(uint8_t id, uint16_t goal) {
@@ -206,6 +218,34 @@ void Room::sendMapTo(uint8_t index)
     assert(mapPackage.size);
 
     players[index]->sendData(mapPackage.data, mapPackage.size);
+}
+
+void Room::shareSkinOf(Player* sender)
+{
+    assert(sender);
+
+    if (!sender->skinPackage.data)
+        return;
+
+    if (!sender->skinPackage.size)
+        return;
+
+    // TODO: verify
+
+    // find out and set player id
+    for (uint8_t p = 0; p < 4; p++) {
+        if (players[p] == sender) {
+            sender->skinPackage.setPlayerID(p);
+            break;
+        }
+    }
+
+    // send the fixed package to others
+    for (uint8_t p = 0; p < 4; p++) {
+        if (players[p] && players[p] != sender) {
+            players[p]->sendData(sender->skinPackage.data, sender->skinPackage.size);
+        }
+    }
 }
 
 void Room::sendStartSignal()

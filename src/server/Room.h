@@ -43,6 +43,7 @@ struct Room {
 
     void sendChatMessage(Player*, const char*);
     void sendRoomUpdate();
+    void shareSkinOf(Player*);
     void changeAndSendMap(const void*, size_t);
     void sendMap();
     void sendMapTo(uint8_t);

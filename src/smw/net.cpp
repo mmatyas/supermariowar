@@ -4,6 +4,7 @@
 #include "GameMode.h"
 #include "GameValues.h"
 #include "GSMenu.h"
+#include "FileList.h"
 #include "path.h"
 #include "player.h"
 #include "RandomNumberGenerator.h"
@@ -32,6 +33,7 @@ Networking netplay;
 extern CGameValues game_values;
 extern CPlayer* list_players[4];
 extern short list_players_cnt;
+extern SkinList *skinlist;
 
 extern short currentgamemode;
 extern CGameMode * gamemodes[GAMEMODE_LAST];
@@ -413,7 +415,8 @@ void NetClient::sendMapChangeMessage()
     uint8_t* data_buffer = NULL;
     size_t data_size = 0;
 
-    // NOTE: This is just an alert Make sure you didn't broke something by changing the package headers!
+    // NOTE: This is just an alert
+    // Make sure you didn't broke something by changing the package headers!
     // You can safely update this line then.
     static_assert(sizeof(NetPkgs::MessageHeader) == 3, "The size of Net_MessageHeader should be 3");
 
@@ -427,19 +430,21 @@ void NetClient::sendMapChangeMessage()
     memcpy(data_buffer, &header, sizeof(NetPkgs::MessageHeader));
 
     sendMessageToLobbyServer(data_buffer, data_size + sizeof(NetPkgs::MessageHeader) + 4 /* un-/compressed size */);
+    free(data_buffer);
 }
 
 void NetClient::handleMapChangeMessage(const uint8_t* data, size_t dataLength)
 {
-    // read
-    NetPkgs::MessageHeader pkg(0);
-    memcpy(&pkg, data, sizeof(NetPkgs::MessageHeader));
-
     if (dataLength <= sizeof(NetPkgs::MessageHeader) + 4 /* un-/compressed size 2*2B */
-        || dataLength > 20000) {
+        || dataLength > 20000
+        || !data) {
         printf("[error] Corrupt map arrived\n");
         return;
     }
+
+    // read
+    NetPkgs::MessageHeader pkg(0);
+    memcpy(&pkg, data, sizeof(NetPkgs::MessageHeader));
 
     uint16_t full_size, compressed_size;
     memcpy(&full_size, data + sizeof(NetPkgs::MessageHeader), 2);
@@ -460,6 +465,63 @@ void NetClient::handleRoomChatMessage(const uint8_t* data, size_t dataLength)
     assert(pkg.senderNum < 4);
     printf("Not implemented: [net] %s: %s\n",
         netplay.currentRoom.playerNames[pkg.senderNum].c_str(), pkg.message);
+}
+
+void NetClient::sendSkinChange()
+{
+    assert(strlen(skinlist->GetIndex(game_values.skinids[0])) > 4);
+    std::string skinpath(skinlist->GetIndex(game_values.skinids[0]));
+    printf("[net] Sending skin: %s\n", skinpath.c_str());
+
+    uint8_t* data_buffer = NULL;
+    size_t data_size = 0;
+
+    // NOTE: see sendMapChangeMessage() for similar code
+    static_assert(sizeof(NetPkgs::MessageHeader) == 3, "The size of Net_MessageHeader should be 3");
+
+    if (!FileCompressor::compress(skinpath, data_buffer, data_size, sizeof(NetPkgs::MessageHeader) + 1))
+        return;
+
+    assert(data_buffer);
+    assert(data_size > 0);
+
+    NetPkgs::MessageHeader header(NET_NOTICE_SKIN_CHANGE);
+    memcpy(data_buffer, &header, sizeof(NetPkgs::MessageHeader));
+    data_buffer[sizeof(NetPkgs::MessageHeader) + 1] = 0xFF; // the player's id in a room (0-3), or 0xFF
+
+    sendMessageToLobbyServer(data_buffer, data_size + sizeof(NetPkgs::MessageHeader) + 5 /* id + un-/compressed size */);
+    free(data_buffer);
+}
+
+void NetClient::handleSkinChangeMessage(const uint8_t* data, size_t dataLength)
+{
+    if (dataLength <= sizeof(NetPkgs::MessageHeader) + 5 /* player num 1B + un-/compressed size 2*2B */
+        || dataLength > 20000
+        || !data) {
+        printf("[error] Corrupt skin arrived\n");
+        return;
+    }
+
+    // read
+    NetPkgs::MessageHeader pkg(0);
+    memcpy(&pkg, data, sizeof(NetPkgs::MessageHeader));
+
+    int playerID = data[3];
+    if (playerID > 3) {
+        printf("[error] Corrupt skin arrived, bad player id\n");
+        return;
+    }
+
+    uint16_t full_size, compressed_size;
+    memcpy(&full_size, data + sizeof(NetPkgs::MessageHeader) + 1, 2);
+    memcpy(&compressed_size, data + sizeof(NetPkgs::MessageHeader) + 3, 2);
+
+    printf("[net] Skin arrived (from: %d, C:%d unC:%d)\n", playerID, compressed_size, full_size);
+
+    std::ostringstream path;
+    path << GetHomeDirectory() << "net_skin" << playerID << ".bmp";
+    if (!FileCompressor::decompress(data + sizeof(NetPkgs::MessageHeader) + 1, path.str()))
+        return;
 }
 
 /****************************
@@ -844,6 +906,7 @@ void NetClient::onReceive(NetPeer& client, const uint8_t* data, size_t dataLengt
         case NET_RESPONSE_CONNECT_OK:
             //printf("[net] Connection attempt successful.\n");
             netplay.connectSuccessful = true;
+            sendSkinChange();
             break;
 
         case NET_RESPONSE_CONNECT_DENIED:
@@ -895,7 +958,7 @@ void NetClient::onReceive(NetPeer& client, const uint8_t* data, size_t dataLengt
             break;
 
         case NET_NOTICE_SKIN_CHANGE:
-            // TODO
+            handleSkinChangeMessage(data, dataLength);
             break;
 
         case NET_NOTICE_ROOM_CHAT_MSG:
