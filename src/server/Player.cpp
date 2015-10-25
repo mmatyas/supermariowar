@@ -3,6 +3,7 @@
 #include "ProtocolPackages.h"
 
 #include <chrono>
+#include <cstdio>
 
 #define SKINPKG_SIZE_LIMIT 20000 /* bytes in worst case */
 
