@@ -1,6 +1,6 @@
 # Super Mario War
 
-[![Travis][travis-img]][travis-link] [![AppVeyor][appveyor-img]][appveyor-link]
+[![Travis][travis-img]][travis-link] [![AppVeyor][appveyor-img]][appveyor-link] [![Freenode channel][freenode-img]][freenode-link]
 
 - [About](#about)
 - [Get the code](#get-the-code)
@@ -211,3 +211,5 @@ Please see documentation in the docs/ directory.
 [travis-link]: https://travis-ci.org/mmatyas/supermariowar
 [appveyor-img]: https://ci.appveyor.com/api/projects/status/github/mmatyas/supermariowar?svg=true
 [appveyor-link]: https://ci.appveyor.com/project/mmatyas/supermariowar
+[freenode-img]: http://img.shields.io/freenode/%23supermariowar.png
+[freenode-link]: https://webchat.freenode.net/?channels=supermariowar
