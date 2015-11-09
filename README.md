@@ -3,8 +3,8 @@
 [![Travis][travis-img]][travis-link] [![AppVeyor][appveyor-img]][appveyor-link] [![Freenode channel][freenode-img]][freenode-link]
 
 - [About](#about)
-- [Get the code](#get-the-code)
 - [Building](#building-instructions)
+	- [Get the code](#get-the-code)
 	- [Requirements](#requirements)
 	- [Linux](#linux)
 	- [Windows](#windows)
@@ -13,6 +13,7 @@
 	- [Asm.js](#asmjs)
 	- [Build configuration](#build-configuration)
 - [How to play](#how-to-play)
+
 
 ## About
 
@@ -44,22 +45,6 @@ The game uses artwork and sounds from Nintendo games. We hope that this noncomme
 - asm.js (experimental)
 
 
-## Get the code
-
-This repository contains some submodules which you can use if the dependencies are not available for your OS, are outdated or you simply don't want to install them on your system. To use the included libraries, do a recursive cloning:
-
-`git clone --recursive https://github.com/mmatyas/supermariowar.git`
-
-Alternatively, you can also initialize the submodules manually:
-
-```sh
-git clone https://github.com/mmatyas/supermariowar.git
-cd supermariowar
-git submodule update --init
-```
-
-If you'd rather use the system libraries, please see the [Build configuration](#build-configuration) section for disabling this feature.
-
 ## Building instructions
 
 ### Requirements
@@ -77,13 +62,9 @@ On Debian-based systems, the following command installs the required tools:
 
     apt-get install cmake libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev
 
-On systems using RPM:
+On systems using RPM: `yum install cmake SDL-devel SDL_image-devel SDL_mixer-devel`
 
-    yum install cmake SDL-devel SDL_image-devel SDL_mixer-devel
-
-On Arch and derivatives:
-
-	pacman -S cmake sdl sdl_image sdl_mixer
+On Arch and derivatives: `pacman -S cmake sdl sdl_image sdl_mixer`
 
 For other systems, you can download the development files manually from:
 
@@ -91,6 +72,22 @@ For other systems, you can download the development files manually from:
 - http://www.libsdl.org/download-1.2.php
 - http://www.libsdl.org/projects/SDL_image/release-1.2.html
 - http://www.libsdl.org/projects/SDL_mixer/release-1.2.html
+
+### Get the code
+
+This repository contains some submodules which you can use if the dependencies are not available for your OS, are outdated or you simply don't want to install them on your system. To use the included libraries, do a recursive cloning:
+
+`git clone --recursive https://github.com/mmatyas/supermariowar.git`
+
+Alternatively, you can also initialize the submodules manually:
+
+```sh
+git clone https://github.com/mmatyas/supermariowar.git
+cd supermariowar
+git submodule update --init
+```
+
+If you'd rather use the system libraries, please see the [Build configuration](#build-configuration) section for disabling this feature.
 
 ### Linux
 
@@ -117,7 +114,7 @@ To create installable packages, simply run `make packages`. This will create TGZ
 
 ### Windows
 
-If you're using MinGW Shell/MSYS or Cygwin environments, you can follow the Linux guide. You can also generate a project file with CMake for various IDEs, such as CodeBlocks, Eclipse or Viual Studio.
+If you're using MinGW Shell/MSYS or Cygwin, you can follow the Linux guide. You can also generate a project file with CMake for various IDEs, such as CodeBlocks, Eclipse or Viual Studio.
 
 Visual Studio: *TODO: check this section*
 
@@ -206,6 +203,7 @@ Alternatively, you can pass these options directly to CMake as `-DFLAGNAME=VALUE
 ## How to play
 
 Please see documentation in the docs/ directory.
+
 
 [travis-img]: https://travis-ci.org/mmatyas/supermariowar.svg?branch=master
 [travis-link]: https://travis-ci.org/mmatyas/supermariowar
