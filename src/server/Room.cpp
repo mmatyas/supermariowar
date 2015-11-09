@@ -64,6 +64,7 @@ void Room::tryAddingPlayer(Player* player)
             playerCount++;
             assert(playerCount <= 4);
 
+            sendRoomUpdate(); // do this first to set correct remote player IDs
             sendMapTo(p);
 
             // send new player's skin to others
@@ -179,7 +180,7 @@ void Room::sendChatMessage(Player* sender, const char* message)
 
 void Room::changeAndSendMap(const void* data, size_t data_length)
 {
-    printf("chageandsend\n");
+    printf("chageandsendmap\n");
     assert(hostPlayerNumber < 4);
     assert(players[hostPlayerNumber]);
 

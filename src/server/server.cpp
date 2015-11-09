@@ -389,10 +389,8 @@ void SMWServer::playerJoinsRoom(uint64_t playerID, const void* data, size_t data
     Room* room = &rooms[pkg.roomID];    // TODO: Validate
     room->tryAddingPlayer(player);
 
-    if (player->currentRoomID) {
+    if (player->currentRoomID)
         player->sendCode(NET_RESPONSE_JOIN_OK);
-        room->sendRoomUpdate();
-    }
     else
         player->sendCode(NET_RESPONSE_ROOM_FULL);
 

@@ -508,7 +508,7 @@ void NetClient::handleSkinChangeMessage(const uint8_t* data, size_t dataLength)
 
     int playerID = data[3];
     if (playerID > 3) {
-        printf("[error] Corrupt skin arrived, bad player id\n");
+        printf("[error] Corrupt skin arrived: bad player id\n");
         return;
     }
 

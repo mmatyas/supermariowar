@@ -1092,7 +1092,7 @@ void MenuState::update()
                     code = MENU_CODE_TO_NET_LOBBY_MENU;
 
                 else if (lastSent.packageType == NET_REQUEST_JOIN_ROOM
-                        && lastRecv.packageType == NET_NOTICE_ROOM_CHANGE
+                        && lastRecv.packageType == NET_RESPONSE_JOIN_OK
                         && lastSent.timestamp < lastRecv.timestamp) // ensure that the incoming message arrived after the request
                     code = MENU_CODE_TO_NET_ROOM_MENU;
 
@@ -1495,14 +1495,23 @@ void MenuState::StartGame()
     game_values.WriteConfig();
 
     //Load skins for players
+    printf("Loading player skins...\n");
     for (int k = 0; k < 4; k++) {
         if (game_values.playercontrol[k] > 0) {
             if (netplay.active) {
-                std::ostringstream path;
-                path << GetHomeDirectory() << "net_skin" << k << ".bmp";
-                if (!rm->LoadFullSkin(rm->spr_player[k], path.str(), k)) {
-                    printf("[warning] Could not load netplay skin of player %d, using default\n", k);
-                    rm->LoadFullSkin(rm->spr_player[k], game_values.skinids[k], game_values.colorids[k]);
+                if (k == netplay.remotePlayerNumber) { // local player uses local skin
+                    printf("  player %d -> local\n", k);
+                    rm->LoadFullSkin(rm->spr_player[k], game_values.skinids[0], game_values.colorids[k]);
+                }
+                else {
+                    std::ostringstream path;
+                    path << GetHomeDirectory() << "net_skin" << k << ".bmp";
+                    printf("  player %d -> %s\n", k, path.str().c_str());
+
+                    if (!rm->LoadFullSkin(rm->spr_player[k], path.str(), k)) {
+                        printf("[warning] Could not load netplay skin of player %d, using default\n", k);
+                        rm->LoadFullSkin(rm->spr_player[k], game_values.skinids[k], game_values.colorids[k]);
+                    }
                 }
             }
             else if (game_values.randomskin[k]) {
