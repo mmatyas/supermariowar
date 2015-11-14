@@ -4,6 +4,7 @@
 #include "input.h"
 #include "uicontrol.h"
 #include "ui/MI_MapField.h"
+#include "ui_elements/NetworkListScroll.h"
 #include "uimenu.h"
 #include "world.h"
 
@@ -710,66 +711,6 @@ class MI_World : public UI_Control
 
 		short iPressSelectTimer;
 		COutputControl * pressSelectKeys;
-};
-
-class NLS_ListItem
-{
-    public:
-        NLS_ListItem() {
-            sLeft = "";
-            sRight = "";
-        }
-
-        NLS_ListItem(const std::string& left, const std::string& right) {
-            sLeft = left;
-            sRight = right;
-        }
-
-        ~NLS_ListItem() {};
-
-        std::string sLeft;  // Left-aligned text (eg. name)
-        std::string sRight; // Right-aligned text (eg. player count)
-};
-
-class MI_NetworkListScroll : public UI_Control
-{
-    public:
-
-        MI_NetworkListScroll(gfxSprite * nspr, short x, short y, short width, short numlines, const std::string& title, MenuCodeEnum acceptCode, MenuCodeEnum cancelCode);
-        virtual ~MI_NetworkListScroll();
-
-        void Update();
-        void Draw();
-
-        MenuCodeEnum SendInput(CPlayerInput * playerInput);
-        MenuCodeEnum Modify(bool modify);
-
-        void Add(const std::string& left, const std::string& right);
-        void Clear();
-
-        bool MoveNext();
-        bool MovePrev();
-        void RemoteIndex(unsigned short * index);
-
-    protected:
-
-        std::vector<NLS_ListItem> items;
-
-        gfxSprite * spr;
-        MenuCodeEnum iAcceptCode;
-        MenuCodeEnum iCancelCode;
-
-        std::string sTitle;
-        short iNumLines;
-        short iSelectedLine;
-        short iSelectedLineBackup;
-        unsigned short iIndex;
-        unsigned short * iRemoteIndex;
-        short iWidth;
-        short iOffset;
-
-        short iTopStop;
-        short iBottomStop;
 };
 
 class ChatMessage

@@ -53,6 +53,10 @@ LIST(APPEND SMW_SRCS
 	player_components/PlayerWings.cpp
 )
 
+LIST(APPEND SMW_SRCS
+	ui_elements/NetworkListScroll.cpp
+)
+
 #
 # Menu screens
 #
