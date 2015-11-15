@@ -1,21 +1,32 @@
 #include "NetRoomMenu.h"
 
+#include "GameValues.h"
 #include "net.h"
+#include "path.h"
 #include "ResourceManager.h"
 
+#include <sstream>
+
 extern CResourceManager* rm;
+extern CGameValues game_values;
+
+extern short LookupTeamID(short id);
 
 UI_NetRoomMenu::UI_NetRoomMenu() : UI_Menu()
 {
     miNetRoomName = new MI_Text("" /* Room name here */, 40, 50, 0, 2, 0);
-    miNetRoomPlayerName[0] = new MI_Text("" /* P1 name here */, 40, 80, 0, 2, 0);
-    miNetRoomPlayerName[1] = new MI_Text("" /* P2 name here */, 40, 140, 0, 2, 0);
-    miNetRoomPlayerName[2] = new MI_Text("" /* P3 name here */, 40, 200, 0, 2, 0);
-    miNetRoomPlayerName[3] = new MI_Text("" /* P4 name here */, 40, 260, 0, 2, 0);
-
     //AddNonControl(miNetRoomName);
-    for (short p = 0; p < 4; p++)
+
+    for (short p = 0; p < 4; p++) {
+        miNetRoomPlayerName[p] = new MI_Text("" /* Px name here */, 60, 80 + p * 60, 0, 2, 0);
+        miNetRoomPlayerSkin[p] = new MI_Image(rm->spr_player[p][PGFX_STANDING_R],
+            16, 72 + p * 60,
+            0, 0, 32, 32,
+            1, 1, 0);
+
+        AddNonControl(miNetRoomPlayerSkin[p]);
         AddNonControl(miNetRoomPlayerName[p]);
+    }
 
     miNetRoomStartButton = new MI_Button(&rm->spr_selectfield, 300, 310, "(waiting)", 331, 1);
     miNetRoomStartButton->SetCode(MENU_CODE_TO_NET_ROOM_START_IN_PROGRESS);
@@ -71,8 +82,22 @@ void UI_NetRoomMenu::Refresh()
 {
     miNetRoomHeaderText->SetText(netplay.currentRoom.name.c_str());
 
-    for (uint8_t p = 0; p < 4; p++)
+    for (short p = 0; p < 4; p++) {
         miNetRoomPlayerName[p]->SetText(netplay.currentRoom.playerNames[p].c_str());
+
+        // Reload player skins
+        std::ostringstream path;
+        path << GetHomeDirectory() << "net_skin" << p << ".bmp";
+        if (p == netplay.remotePlayerNumber) {
+            printf("  player %d -> local\n", p);
+            rm->LoadMenuSkin(p, game_values.skinids[0], p, false);
+        }
+        else {
+            printf("  player %d -> %s\n", p, path.str().c_str());
+            if (!rm->LoadMenuSkin(p, path.str(), p, false))
+                rm->LoadMenuSkin(p, game_values.skinids[p], p, false);
+        }
+    }
 
     if (netplay.theHostIsMe && netplay.currentRoom.playerCount() > 1)
         miNetRoomStartButton->SetName("Start");

@@ -24,6 +24,7 @@ public:
 private:
     MI_Text * miNetRoomName;
     MI_Text * miNetRoomPlayerName[4];
+    MI_Image * miNetRoomPlayerSkin[4];
     MI_ChatMessageBox * miNetRoomMessages;
     MI_MapPreview * miNetRoomMapPreview;
     MI_TextField * miNetRoomMessageField;
