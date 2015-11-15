@@ -25,6 +25,11 @@ bool CResourceManager::LoadMenuSkin(short playerID, short skinID, short colorID,
     return gfx_loadmenuskin(spr_player[playerID], skinlist->GetIndex(skinID), 255, 0, 255, colorID, fLoadBothDirections);
 }
 
+bool CResourceManager::LoadMenuSkin(short playerID, const std::string& filename, short colorID, bool fLoadBothDirections)
+{
+    return gfx_loadmenuskin(spr_player[playerID], filename, 255, 0, 255, colorID, fLoadBothDirections);
+}
+
 bool CResourceManager::LoadFullSkin(gfxSprite ** sprites, const std::string& filename, short colorID)
 {
     return gfx_loadfullskin(sprites, filename, 255, 0, 255, colorID);

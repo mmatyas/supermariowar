@@ -14,6 +14,7 @@ public:
 
 	bool LoadWorldGraphics();
 	bool LoadMenuSkin(short playerID, short skinID, short colorID, bool fLoadBothDirections);
+	bool LoadMenuSkin(short playerID, const std::string& filename, short colorID, bool fLoadBothDirections);
 	void LoadAllGraphics();
 	bool LoadMenuGraphics();
 	bool LoadGameGraphics();
