@@ -11,9 +11,9 @@ install:
   - echo Installing dependencies
   - choco install -y wget 7zip
   - set PATH="C:\Program Files\7-Zip";C:\MinGW\bin;%PATH%
-  - wget --no-check-certificate https://www.libsdl.org/release/SDL-devel-1.2.15-mingw32.tar.gz
-  - wget --no-check-certificate https://www.libsdl.org/projects/SDL_image/release/SDL_image-devel-1.2.12-VC.zip
-  - wget --no-check-certificate https://www.libsdl.org/projects/SDL_mixer/release/SDL_mixer-devel-1.2.12-VC.zip
+  - appveyor DownloadFile https://www.libsdl.org/release/SDL-devel-1.2.15-mingw32.tar.gz
+  - appveyor DownloadFile https://www.libsdl.org/projects/SDL_image/release/SDL_image-devel-1.2.12-VC.zip
+  - appveyor DownloadFile https://www.libsdl.org/projects/SDL_mixer/release/SDL_mixer-devel-1.2.12-VC.zip
   - 7z x SDL-devel-1.2.15-mingw32.tar.gz
   - 7z x -xr!._\* -xr!man -xr!docs SDL-devel-1.2.15-mingw32.tar
   - 7z x SDL_image-devel-1.2.12-VC.zip
