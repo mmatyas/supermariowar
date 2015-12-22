@@ -1,5 +1,8 @@
 language: cpp
 
+sudo: required
+dist: trusty
+
 compiler:
   - gcc
   - clang
@@ -12,30 +15,20 @@ branches:
   only:
     - master
 
-sudo: false
-
-before_install:
-  - if [[ "$CXX" == "g++" ]]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
-
 before_script:
   - $CXX --version
   - cmake --version
   - if [[ "$SMW_USE_SDL2" == "false" ]]; then sdl-config --version; fi
   - if [[ "$SMW_USE_SDL2" == "true" ]];  then sdl2-config --version; fi
-  - mkdir build
-  - cd build
-  - if [[ "$SMW_USE_SDL2" == "false" ]]; then cmake ..; fi
-  - if [[ "$SMW_USE_SDL2" == "true" ]];  then cmake -D USE_SDL2_LIBS:BOOL=ON ..; fi
 
 script:
-  - if [[ "$SMW_USE_SDL2" == "false" ]]; then make; fi
-  - if [[ "$SMW_USE_SDL2" == "true" ]];  then make smw; fi
+  - mkdir build && cd build
+  - if [[ "$SMW_USE_SDL2" == "false" ]]; then cmake ..; fi
+  - if [[ "$SMW_USE_SDL2" == "true" ]];  then cmake -D USE_SDL2_LIBS:BOOL=ON ..; fi
+  - if [[ "$SMW_USE_SDL2" == "false" ]]; then make; else make smw; fi
 
 addons:
   apt:
-    sources:
-    - ubuntu-toolchain-r-test
-    - zoogie/sdl2-snapshots
     packages:
     - cmake
     - gcc-4.8
