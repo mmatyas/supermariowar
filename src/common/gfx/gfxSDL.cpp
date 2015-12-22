@@ -61,7 +61,7 @@ void GraphicsSDL::init_sdl()
 void GraphicsSDL::init_sdl_img()
 {
     // init SDL_image
-    int img_flags = IMG_INIT_JPG | IMG_INIT_PNG;
+    int img_flags = IMG_INIT_PNG;
     if ((IMG_Init(img_flags) & img_flags) != img_flags) {
         printf("[gfx] SDL_image error: %s\n", IMG_GetError());
         throw E_INIT_SDL_IMG;
