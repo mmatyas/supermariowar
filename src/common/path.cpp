@@ -22,7 +22,7 @@ extern std::string RootDataDirectory;
 using namespace std;
 std::string SMW_Root_Data_Dir;
 
-std::string	GetHomeDirectory()
+const std::string GetHomeDirectory()
 {
 #ifdef _XBOX
     // NOTE: _WIN32 is also defined on _XBOX
@@ -40,6 +40,12 @@ std::string	GetHomeDirectory()
     char folder[MAX_PATH];
     if (SHGetFolderPathA(NULL, CSIDL_PROFILE, NULL, 0, folder) == S_OK)
         result = std::string(folder) + "/" + result;
+    return result;
+
+#elif ANDROID
+    const char* extstorage = getenv("EXTERNAL_STORAGE");
+    std::string result(extstorage ? extstorage: "/mnt/sdcard");
+    result += "/supermariowar/";
     return result;
 
 #else // catch-all for Linux-based systems

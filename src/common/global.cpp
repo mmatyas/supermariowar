@@ -24,7 +24,11 @@
 int g_iVersion[] = {2, 0, 0, 0};
 
 // main game directory, read from command line argument
+#ifdef ANDROID
+std::string RootDataDirectory = GetHomeDirectory() + "data";
+#else
 std::string RootDataDirectory = "data";
+#endif
 
 CGame *smw;
 CResourceManager *rm;
