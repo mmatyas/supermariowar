@@ -29,7 +29,7 @@ build_script:
       mkdir build;
       cd build;
       cmake --version;
-      cmake .. -G 'MSYS Makefiles';
+      CFLAGS=-D_hypot=hypot CXXFLAGS=-D_hypot=hypot cmake .. -G 'MSYS Makefiles';
       cmake --build ."
 
 artifacts:
