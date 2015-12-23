@@ -27,6 +27,33 @@ script:
   - if [[ "$SMW_USE_SDL2" == "true" ]];  then cmake -D USE_SDL2_LIBS:BOOL=ON ..; fi
   - if [[ "$SMW_USE_SDL2" == "false" ]]; then make; else make smw; fi
 
+matrix:
+  include:
+  - env:
+    - SMW_USE_SDL2="none"
+    before_script:
+    - curl -L https://raw.github.com/embarkmobile/android-sdk-installer/version-2/android-sdk-installer | bash /dev/stdin --install=build-tools-23.0.1,android-15
+    - source ~/.android-sdk-installer/env
+    - wget http://dl.google.com/android/ndk/android-ndk-r10e-linux-x86_64.bin
+    - 7z x android-ndk-r10e-linux-x86_64.bin > /dev/null
+    - export PATH=$PATH:$(pwd)/android-ndk-r10e
+    script:
+    - git clone --depth=1 https://github.com/mmatyas/supermariowar-android.git
+    - cd supermariowar-android
+    - ./build.sh
+    addons:
+      apt:
+        packages:
+        - ant
+        - expect
+        - lib32bz2-1.0
+        - lib32gcc1
+        - lib32ncurses5
+        - lib32stdc++6
+        - lib32z1
+        - openjdk-7-jdk
+        - p7zip-full
+
 addons:
   apt:
     packages:
