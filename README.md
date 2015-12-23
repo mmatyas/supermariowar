@@ -9,6 +9,7 @@
 	- [Linux](#linux)
 	- [Windows](#windows)
 	- [ARM / Raspberry Pi](#arm-devices)
+	- [Other devices](#other-devices)
 	- [Android](#android)
 	- [Asm.js](#asmjs)
 	- [Build configuration](#build-configuration)
@@ -101,16 +102,16 @@ make -j4 # -jN = build on N threads
 ./Binaries/Release/smw ../data
 ```
 
-Currently, the following valid build targets are defined for `make`:
+The main build targets for `make` are:
 
 - smw
 - smw-leveleditor
 - smw-worldeditor
 - smw-server
 
-If you prefer to work within an IDE (CodeBlocks, Eclipse, ...), you can also generate project files using CMake. You can find more information in *Build configuration*.
+If you prefer to work within an IDE (CodeBlocks, Eclipse, ...), you can also generate project files for it using CMake. You can find more information in [Build configuration](#build-configuration).
 
-To create installable packages, simply run `make packages`. This will create TGZ, DEB and RPM archives.
+To create installable packages, simply run `make package`. This will create TGZ, DEB and RPM archives.
 
 ### Windows
 
@@ -129,7 +130,7 @@ Visual Studio: *TODO: check this section*
 
 You can build SMW on various ARM devices, like the Raspberry Pi, following the Linux instructions. Some boards may require different compiler flags hovewer, in this case you might want to manually edit `cmake/PlatformArm.cmake`.
 
-If you know how to do it, you can also cross-compile the usual way, by emulating your device or setting up a toolchain. In case your processor is not detected correctly (eg. in a rootfs), you can override it by adding the ARM_OVERRIDE_ARCH flag to CMake, eg. `-DARM_OVERRIDE_ARCH=armv6`.
+If you know how to do it, you can also cross-compile the usual way, by setting up a toolchain or emulating your device. In this case, see the [Other devices](#other-devices) section. If your processor is not detected correctly (eg. in a rootfs), you can override it by adding the ARM_OVERRIDE_ARCH flag to CMake, eg. `-DARM_OVERRIDE_ARCH=armv6`.
 
 For example, here is how to set up a simple build environment for the Raspbery Pi on Ubuntu 14.04:
 
@@ -159,7 +160,23 @@ apt-get install build-essential g++ git \
     cmake libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libenet-dev
 ```
 
-Now you can continue with cloning the repository (eg. in `/root`) and following the Linux instructions. If you want to build for the first-gen Raspberry, you might want to call CMake as `cmake .. -DARM_OVERRIDE_ARCH=armv6l` to avoid linking errors. For other devices, you might need to edit the compiler flags as described above.
+Now you can continue with cloning the repository (eg. in `/root`) and following the Linux instructions. If you want to build for the first-gen Raspberry, you might have to call CMake as `cmake .. -DARM_OVERRIDE_ARCH=armv6l` to avoid linking errors. For other devices, you might need to edit the compiler flags as described above.
+
+### Other devices
+
+You should be able to port SMW to any device where SDL (either 1.2 or 2.0) works. Generally, this involves the following steps:
+
+- get the cross compiler toolchain of your device
+- cross-compile the SDL libs, if they are not included
+  - build SDL
+  - build SDL_image with at least PNG support
+    - requires zlib
+    - requires libpng
+  - build SDL_mixer with at least OGG support
+    - requires libogg
+    - requires libvorbis
+- create a CMake toolchain file and define your compiler and paths
+- build using the toolchain file
 
 ### Android
 
@@ -167,7 +184,7 @@ The Android port uses a different build system, you can find more details [here]
 
 ### ASM.JS
 
-*TODO: Update this part*
+*TODO: Update this part, it's broken with the latest emscripten*
 
 SMW can be build to run in your browser. For this, you need
 Emscripten with the special LLVM backend, and Clang.
@@ -190,6 +207,7 @@ $ emcc Binaries/Release/smw.bc -o smw.html $BUILDPARAMS
 $ emcc Binaries/Release/smw-leveledit.bc -o leveledit.html $BUILDPARAMS
 $ emcc Binaries/Release/smw-worldedit.bc -o worldedit.html $BUILDPARAMS
 ```
+
 ### Build configuration
 
 *TODO: expand this section*
