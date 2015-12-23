@@ -157,7 +157,7 @@ echo "deb http://archive.raspbian.org/raspbian jessie main" >> /etc/apt/sources.
 wget http://archive.raspbian.org/raspbian.public.key -O - | apt-key add -
 apt-get update
 apt-get install build-essential g++ git \
-    cmake libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libenet-dev
+    cmake libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev
 ```
 
 Now you can continue with cloning the repository (eg. in `/root`) and following the Linux instructions. If you want to build for the first-gen Raspberry, you might have to call CMake as `cmake .. -DARM_OVERRIDE_ARCH=armv6l` to avoid linking errors. For other devices, you might need to edit the compiler flags as described above.
