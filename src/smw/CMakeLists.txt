@@ -122,7 +122,7 @@ if(NOT TARGET_EMSCRIPTEN)
 	target_link_libraries(smw yaml-cpp liblz4)
 
 	if(USE_SDL2_LIBS)
-		target_link_libraries(smw SDL2 SDL2_mixer SDL2_image SDL2main)
+		target_link_libraries(smw ${SDL2_LIBRARY} ${SDL2MIXER_LIBRARY} ${SDL2IMAGE_LIBRARY} ${SDL2MAIN_LIBRARY})
 	else()
 		target_link_libraries(smw ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLIMAGE_LIBRARY} ${SDLMAIN_LIBRARY})
 	endif()
