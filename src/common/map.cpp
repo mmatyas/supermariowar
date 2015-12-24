@@ -561,6 +561,8 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
     eyecandy[0] = 0;
     eyecandy[1] = 0;
     eyecandy[2] = 0;
+    iNumMapItems = 0;
+    iNumMapHazards = 0;
 
     FILE * mapfile;
     short i, j, k;
