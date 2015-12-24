@@ -79,9 +79,9 @@ add_definitions(-DSMW_DATADIR="${SMW_DATADIR}")
 #
 #-----------------------------------------------------------------------------
 
-if (APPLE)
-	include(PlatformApple)
-endif()
+#if (APPLE)
+#	include(PlatformApple)
+#endif()
 
 if (MSVC)
 	include(PlatformMSVC)
@@ -244,6 +244,10 @@ if(NOT MSVC)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-strict-aliasing -fexceptions -Wno-shadow")
 
 endif(NOT MSVC)
+
+if (APPLE)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c++11-narrowing")
+endif()
 
 ##TODO: test this please, coming from smw Makefile
 add_definitions(-D_GNU_SOURCE=1 -D_REENTRANT)
