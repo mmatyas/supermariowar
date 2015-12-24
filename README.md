@@ -39,9 +39,9 @@ The game uses artwork and sounds from Nintendo games. We hope that this noncomme
 
 - Linux
 - Windows
+- Mac OS X
 - ARM devices (eg. Raspberry Pi)
 - XBox (?)
-- Mac OS X (?)
 - Android (experimental)
 - asm.js (experimental)
 
