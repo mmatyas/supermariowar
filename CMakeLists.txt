@@ -79,9 +79,9 @@ add_definitions(-DSMW_DATADIR="${SMW_DATADIR}")
 #
 #-----------------------------------------------------------------------------
 
-if (APPLE)
-	include(PlatformApple)
-endif()
+#if (APPLE)
+#	include(PlatformApple)
+#endif()
 
 if (MSVC)
 	include(PlatformMSVC)
@@ -192,8 +192,14 @@ if (CMAKE_BUILD_TYPE STREQUAL Debug)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -g -O0")
 else()
   add_definitions(-DNDEBUG)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -s")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -O3 -s")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -O3")
+
+  # Strip binaries when using GCC
+  if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s")
+      set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -s")
+  endif()
 endif()
 
 # Use C++11
@@ -244,6 +250,10 @@ if(NOT MSVC)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-strict-aliasing -fexceptions -Wno-shadow")
 
 endif(NOT MSVC)
+
+if (APPLE)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c++11-narrowing")
+endif()
 
 ##TODO: test this please, coming from smw Makefile
 add_definitions(-D_GNU_SOURCE=1 -D_REENTRANT)

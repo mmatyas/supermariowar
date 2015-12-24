@@ -27,10 +27,22 @@ script:
   - if [[ "$SMW_USE_SDL2" == "true" ]];  then cmake -D USE_SDL2_LIBS:BOOL=ON ..; fi
   - if [[ "$SMW_USE_SDL2" == "false" ]]; then make; else make smw; fi
 
+addons:
+  apt:
+    packages:
+    - cmake
+    - gcc-4.8
+    - g++-4.8
+    - libsdl1.2-dev
+    - libsdl-image1.2-dev
+    - libsdl-mixer1.2-dev
+    - libsdl2-dev
+    - libsdl2-image-dev
+    - libsdl2-mixer-dev
+
 matrix:
   include:
-  - env:
-    - SMW_USE_SDL2="none"
+  - env: SMW_USE_SDL2="none"
     before_script:
     - curl -L https://raw.github.com/embarkmobile/android-sdk-installer/version-2/android-sdk-installer | bash /dev/stdin --install=build-tools-23.0.1,android-15
     - source ~/.android-sdk-installer/env
@@ -53,16 +65,10 @@ matrix:
         - lib32z1
         - openjdk-7-jdk
         - p7zip-full
-
-addons:
-  apt:
-    packages:
-    - cmake
-    - gcc-4.8
-    - g++-4.8
-    - libsdl1.2-dev
-    - libsdl-image1.2-dev
-    - libsdl-mixer1.2-dev
-    - libsdl2-dev
-    - libsdl2-image-dev
-    - libsdl2-mixer-dev
+  - os: osx
+    env: SMW_USE_SDL2=true
+    compiler: clang
+    before_script:
+    - brew update
+    - brew install sdl2 sdl2_image sdl2_mixer
+    - sed -i.bak 's/check_type_size.*/set(SIZEOF_VOID_P "8")/' dependencies/lz4/cmake_unofficial/CMakeLists.txt
