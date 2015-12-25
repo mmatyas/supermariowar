@@ -564,7 +564,6 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
     iNumMapItems = 0;
     iNumMapHazards = 0;
 
-    FILE * mapfile;
     short i, j, k;
 
     /*
@@ -578,20 +577,19 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
     cout << " ...";
     */
 
-    mapfile = fopen(file.c_str(), "rb");
-    if (mapfile == NULL) {
+    BinaryFile mapfile(file.c_str(), "rb");
+    if (!mapfile.is_open()) {
         cout << endl << " ERROR: Couldn't open map" << endl;
         return;
     }
 
     //Load version number
     int version[4];
-    //version[0] = ReadInt(mapfile); //Major
-    //version[1] = ReadInt(mapfile); //Minor
-    //version[2] = ReadInt(mapfile); //Micro
-    //version[3] = ReadInt(mapfile); //Build
-
-    ReadIntChunk(version, 4, mapfile);
+    //version[0] = mapfile.read_i32(); //Major
+    //version[1] = mapfile.read_i32(); //Minor
+    //version[2] = mapfile.read_i32(); //Micro
+    //version[3] = mapfile.read_i32(); //Build
+    mapfile.read_i32_array(version, 4);
 
     if (iReadType != read_type_summary) {
         cout << "loading map " << file;
@@ -613,8 +611,6 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
     reader->load(*this, mapfile, iReadType);
     delete reader;
     reader = NULL;
-
-    fclose(mapfile);
 
     if (iReadType == read_type_summary)
         return;
@@ -711,23 +707,22 @@ void CMap::SetTileGap(short i, short j)
 
 void CMap::saveMap(const std::string& file)
 {
-    FILE *mapfile;
     int i, j, k;
 
     cout << "saving map " << file << " ... ";
 
-    mapfile = fopen(file.c_str(), "wb");
-    if (mapfile == NULL) {
+    BinaryFile mapfile(file.c_str(), "wb");
+    if (!mapfile.is_open()) {
         cout << endl << " ERROR: couldn't save map" << endl;
         return;
     }
 
     //First write the map compatibility version number
     //(this will allow the map loader to identify if the map needs conversion)
-    WriteInt(g_iVersion[0], mapfile); //Major
-    WriteInt(g_iVersion[1], mapfile); //Minor
-    WriteInt(g_iVersion[2], mapfile); //Micro
-    WriteInt(g_iVersion[3], mapfile); //Build
+    mapfile.write_i32(g_iVersion[0]); //Major
+    mapfile.write_i32(g_iVersion[1]); //Minor
+    mapfile.write_i32(g_iVersion[2]); //Micro
+    mapfile.write_i32(g_iVersion[3]); //Build
 
     //Calculate warp zones
     bool usedtile[MAPWIDTH][MAPHEIGHT];
@@ -862,19 +857,19 @@ void CMap::saveMap(const std::string& file)
     }
 
     //Save summary info for auto map filters (hazards, ice, warps, platforms, bonus blocks, density, etc)
-    WriteInt(iHazardCount, mapfile);
-    WriteInt(iWarpCount, mapfile);
-    WriteInt(iIceCount, mapfile);
-    WriteInt(iPowerupBlockCount, mapfile);
-    WriteInt(iBreakableBlockCount, mapfile);
-    WriteInt(iThrowBlockCount, mapfile);
-    WriteInt(iOnOffBlockCount, mapfile);
-    WriteInt(iPlatformCount, mapfile);
-    WriteInt(iNumMapHazards, mapfile);
-    WriteInt(iItemDestroyableBlockCount, mapfile);
-    WriteInt(iHiddenBlockCount, mapfile);
-    WriteInt(iNumMapItems, mapfile);
-    WriteInt(iDensity, mapfile);
+    mapfile.write_i32(iHazardCount);
+    mapfile.write_i32(iWarpCount);
+    mapfile.write_i32(iIceCount);
+    mapfile.write_i32(iPowerupBlockCount);
+    mapfile.write_i32(iBreakableBlockCount);
+    mapfile.write_i32(iThrowBlockCount);
+    mapfile.write_i32(iOnOffBlockCount);
+    mapfile.write_i32(iPlatformCount);
+    mapfile.write_i32(iNumMapHazards);
+    mapfile.write_i32(iItemDestroyableBlockCount);
+    mapfile.write_i32(iHiddenBlockCount);
+    mapfile.write_i32(iNumMapItems);
+    mapfile.write_i32(iDensity);
 
     //Write tileset names and indexes for translation at load time
     //Number of tilesets used by this map
@@ -911,16 +906,16 @@ void CMap::saveMap(const std::string& file)
             iUsedTilesets++;
     }
 
-    WriteInt(iUsedTilesets, mapfile);
+    mapfile.write_i32(iUsedTilesets);
 
     //Write each of the tileset names with the index that will be used by this mapfile to represent that tileset
     for (short iTileset = 0; iTileset < iTilesetCount; iTileset++) {
         if (fTilesetUsed[iTileset]) {
             //Tileset ID
-            WriteInt(iTileset, mapfile);
+            mapfile.write_i32(iTileset);
 
             //Tileset Name
-            WriteString(g_tilesetmanager->GetTileset(iTileset)->GetName(), mapfile);
+            mapfile.write_string_long(g_tilesetmanager->GetTileset(iTileset)->GetName());
         }
     }
 
@@ -931,7 +926,7 @@ void CMap::saveMap(const std::string& file)
         for (i = 0; i < MAPWIDTH; i++) {
             for (k = 0; k < MAPLAYERS; k++) {
                 //Tile sprites (4 layers)
-                //WriteInt(mapdata[i][j][k], mapfile);
+                //mapfile.write_i32(mapdata[i][j][k]);
 
                 TilesetTile * tile = &mapdata[i][j][k];
 
@@ -944,30 +939,30 @@ void CMap::saveMap(const std::string& file)
                         tile->iRow = 0;
                 }
 
-                WriteByteFromShort(tile->iID, mapfile);
-                WriteByteFromShort(tile->iCol, mapfile);
-                WriteByteFromShort(tile->iRow, mapfile);
+                mapfile.write_i8(tile->iID);
+                mapfile.write_i8(tile->iCol);
+                mapfile.write_i8(tile->iRow);
             }
 
             //Interaction blocks
-            WriteByteFromShort(objectdata[i][j].iType, mapfile);
-            WriteBool(objectdata[i][j].fHidden, mapfile);
+            mapfile.write_i8(objectdata[i][j].iType);
+            mapfile.write_bool(objectdata[i][j].fHidden);
         }
     }
 
     //Write background File
-    WriteString(szBackgroundFile, mapfile);
+    mapfile.write_string_long(szBackgroundFile);
 
     //Save the default on/off switch states
     for (short iSwitch = 0; iSwitch < 4; iSwitch++)
-        WriteInt(iSwitches[iSwitch], mapfile);
+        mapfile.write_i32(iSwitches[iSwitch]);
 
     //Write moving platforms
-    WriteInt(iNumPlatforms, mapfile);
+    mapfile.write_i32(iNumPlatforms);
 
     for (short iPlatform = 0; iPlatform < iNumPlatforms; iPlatform++) {
-        WriteInt(platforms[iPlatform]->iTileWidth, mapfile);
-        WriteInt(platforms[iPlatform]->iTileHeight, mapfile);
+        mapfile.write_i32(platforms[iPlatform]->iTileWidth);
+        mapfile.write_i32(platforms[iPlatform]->iTileHeight);
 
         for (short iCol = 0; iCol < platforms[iPlatform]->iTileWidth; iCol++) {
             for (short iRow = 0; iRow < platforms[iPlatform]->iTileHeight; iRow++) {
@@ -982,89 +977,89 @@ void CMap::saveMap(const std::string& file)
                         tile->iRow = 0;
                 }
 
-                WriteByteFromShort(tile->iID, mapfile);
-                WriteByteFromShort(tile->iCol, mapfile);
-                WriteByteFromShort(tile->iRow, mapfile);
+                mapfile.write_i8(tile->iID);
+                mapfile.write_i8(tile->iCol);
+                mapfile.write_i8(tile->iRow);
 
-                WriteInt(platforms[iPlatform]->iTileType[iCol][iRow].iType, mapfile);
+                mapfile.write_i32(platforms[iPlatform]->iTileType[iCol][iRow].iType);
             }
         }
 
-        WriteInt(platforms[iPlatform]->iDrawLayer, mapfile);
+        mapfile.write_i32(platforms[iPlatform]->iDrawLayer);
 
         short iPathType = platforms[iPlatform]->pPath->iType;
-        WriteInt(iPathType, mapfile);
+        mapfile.write_i32(iPathType);
 
         if (iPathType == 0) {
             StraightPath * path = (StraightPath*)platforms[iPlatform]->pPath;
-            WriteFloat(path->dPathPointX[0], mapfile);
-            WriteFloat(path->dPathPointY[0], mapfile);
-            WriteFloat(path->dPathPointX[1], mapfile);
-            WriteFloat(path->dPathPointY[1], mapfile);
-            WriteFloat(path->dVelocity, mapfile);
+            mapfile.write_float(path->dPathPointX[0]);
+            mapfile.write_float(path->dPathPointY[0]);
+            mapfile.write_float(path->dPathPointX[1]);
+            mapfile.write_float(path->dPathPointY[1]);
+            mapfile.write_float(path->dVelocity);
         } else if (iPathType == 1) {
             StraightPathContinuous * path = (StraightPathContinuous*)platforms[iPlatform]->pPath;
-            WriteFloat(path->dPathPointX[0], mapfile);
-            WriteFloat(path->dPathPointY[0], mapfile);
-            WriteFloat(path->dAngle, mapfile);
-            WriteFloat(path->dVelocity, mapfile);
+            mapfile.write_float(path->dPathPointX[0]);
+            mapfile.write_float(path->dPathPointY[0]);
+            mapfile.write_float(path->dAngle);
+            mapfile.write_float(path->dVelocity);
         } else if (iPathType == 2) { //elliptical path
             EllipsePath * path = (EllipsePath*)platforms[iPlatform]->pPath;
-            WriteFloat(path->dRadiusX, mapfile);
-            WriteFloat(path->dRadiusY, mapfile);
-            WriteFloat(path->dPathPointX[0], mapfile);
-            WriteFloat(path->dPathPointY[0], mapfile);
-            WriteFloat(path->dAngle[0], mapfile);
-            WriteFloat(path->dVelocity, mapfile);
+            mapfile.write_float(path->dRadiusX);
+            mapfile.write_float(path->dRadiusY);
+            mapfile.write_float(path->dPathPointX[0]);
+            mapfile.write_float(path->dPathPointY[0]);
+            mapfile.write_float(path->dAngle[0]);
+            mapfile.write_float(path->dVelocity);
         }
     }
 
     //Write map items (carried springs, spikes, kuribo's shoe, etc)
-    WriteInt(iNumMapItems, mapfile);
+    mapfile.write_i32(iNumMapItems);
 
     for (short iMapItem = 0; iMapItem < iNumMapItems; iMapItem++) {
-        WriteInt(mapitems[iMapItem].itype, mapfile);
-        WriteInt(mapitems[iMapItem].ix, mapfile);  //tile aligned
-        WriteInt(mapitems[iMapItem].iy, mapfile);
+        mapfile.write_i32(mapitems[iMapItem].itype);
+        mapfile.write_i32(mapitems[iMapItem].ix);  //tile aligned
+        mapfile.write_i32(mapitems[iMapItem].iy);
     }
 
     //Write map hazards (fireball strings, rotodiscs, pirhana plants, etc)
-    WriteInt(iNumMapHazards, mapfile);
+    mapfile.write_i32(iNumMapHazards);
 
     for (short iMapHazard = 0; iMapHazard < iNumMapHazards; iMapHazard++) {
-        WriteInt(maphazards[iMapHazard].itype, mapfile);
-        WriteInt(maphazards[iMapHazard].ix, mapfile);
-        WriteInt(maphazards[iMapHazard].iy, mapfile);
+        mapfile.write_i32(maphazards[iMapHazard].itype);
+        mapfile.write_i32(maphazards[iMapHazard].ix);
+        mapfile.write_i32(maphazards[iMapHazard].iy);
 
         for (short iParam = 0; iParam < NUMMAPHAZARDPARAMS; iParam++)
-            WriteInt(maphazards[iMapHazard].iparam[iParam], mapfile);
+            mapfile.write_i32(maphazards[iMapHazard].iparam[iParam]);
 
         for (short iParam = 0; iParam < NUMMAPHAZARDPARAMS; iParam++)
-            WriteFloat(maphazards[iMapHazard].dparam[iParam], mapfile);
+            mapfile.write_float(maphazards[iMapHazard].dparam[iParam]);
     }
 
     //Write eyecandy for all eyecandy layers
-    WriteInt(eyecandy[0], mapfile);
-    WriteInt(eyecandy[1], mapfile);
-    WriteInt(eyecandy[2], mapfile);
+    mapfile.write_i32(eyecandy[0]);
+    mapfile.write_i32(eyecandy[1]);
+    mapfile.write_i32(eyecandy[2]);
 
     //Write music category
-    WriteInt(musicCategoryID, mapfile);
+    mapfile.write_i32(musicCategoryID);
 
     //Write the rest of the map data later so that we can just load part of the map for the preview
     for (j = 0; j < MAPHEIGHT; j++) {
         for (i = 0; i < MAPWIDTH; i++) {
             //Write tile collision types (ice, solid, death, etc.)
-            WriteInt(mapdatatop[i][j].iType, mapfile);
+            mapfile.write_i32(mapdatatop[i][j].iType);
 
             //Write per tile warp data
-            WriteInt(warpdata[i][j].direction, mapfile);
-            WriteInt(warpdata[i][j].connection, mapfile);
-            WriteInt(warpdata[i][j].id, mapfile);
+            mapfile.write_i32(warpdata[i][j].direction);
+            mapfile.write_i32(warpdata[i][j].connection);
+            mapfile.write_i32(warpdata[i][j].id);
 
             //Write per tile allowed spawn types (player, team specific (1-4), item)
             for (short iType = 0; iType < NUMSPAWNAREATYPES; iType++)
-                WriteBool(nospawn[iType][i][j], mapfile);
+                mapfile.write_bool(nospawn[iType][i][j]);
         }
     }
 
@@ -1084,22 +1079,22 @@ void CMap::saveMap(const std::string& file)
     }
 
     //Write out the switch block state
-    WriteInt(iSwitchBlockCount, mapfile);
+    mapfile.write_i32(iSwitchBlockCount);
     for (j = 0; j < MAPHEIGHT; j++) {
         for (i = 0; i < MAPWIDTH; i++) {
             if (objectdata[i][j].iType >= 11 && objectdata[i][j].iType <= 14) {
-                WriteByteFromShort(i, mapfile);
-                WriteByteFromShort(j, mapfile);
-                WriteByteFromShort(objectdata[i][j].iSettings[0], mapfile);
+                mapfile.write_i8(i);
+                mapfile.write_i8(j);
+                mapfile.write_i8(objectdata[i][j].iSettings[0]);
 
                 //TODO: REmove this and comment in the LINE ABOVE
-                //WriteByteFromShort(iSwitches[objectdata[i][j].iType - 11], mapfile);
+                //mapfile.write_i8(iSwitches[objectdata[i][j].iType - 11]);
             }
         }
     }
 
     //Write number of warp exits
-    WriteInt(numWarpExits, mapfile);
+    mapfile.write_i32(numWarpExits);
 
     for (j = 0; j < MAPHEIGHT; j++)
         for (i = 0; i < MAPWIDTH; i++)
@@ -1138,40 +1133,40 @@ void CMap::saveMap(const std::string& file)
                 currentx -= movex;
                 currenty -= movey;
 
-                WriteInt(warpdata[i][j].direction, mapfile);
-                WriteInt(warpdata[i][j].connection, mapfile);
-                WriteInt(warpdata[i][j].id, mapfile);
+                mapfile.write_i32(warpdata[i][j].direction);
+                mapfile.write_i32(warpdata[i][j].connection);
+                mapfile.write_i32(warpdata[i][j].id);
 
                 //Write out warp exit x,y position for player and position for lock icon to display
                 if (warpdata[i][j].direction == 0) {
-                    WriteInt((((currentx << 5) + TILESIZE - (i << 5)) >> 1) + (i << 5) - HALFPW, mapfile);
-                    WriteInt((j << 5) - 1 + PHOFFSET, mapfile);
+                    mapfile.write_i32((((currentx << 5) + TILESIZE - (i << 5)) >> 1) + (i << 5) - HALFPW);
+                    mapfile.write_i32((j << 5) - 1 + PHOFFSET);
 
-                    WriteInt((((currentx << 5) + TILESIZE - (i << 5)) >> 1) + (i << 5) - 16, mapfile);
-                    WriteInt((j << 5), mapfile);
+                    mapfile.write_i32((((currentx << 5) + TILESIZE - (i << 5)) >> 1) + (i << 5) - 16);
+                    mapfile.write_i32((j << 5));
                 } else if (warpdata[i][j].direction == 2) {
-                    WriteInt((((currentx << 5) + TILESIZE - (i << 5)) >> 1) + (i << 5) - HALFPW, mapfile);
-                    WriteInt((j << 5) + 1 + PHOFFSET, mapfile);
+                    mapfile.write_i32((((currentx << 5) + TILESIZE - (i << 5)) >> 1) + (i << 5) - HALFPW);
+                    mapfile.write_i32((j << 5) + 1 + PHOFFSET);
 
-                    WriteInt((((currentx << 5) + TILESIZE - (i << 5)) >> 1) + (i << 5) - 16, mapfile);
-                    WriteInt((j << 5), mapfile);
+                    mapfile.write_i32((((currentx << 5) + TILESIZE - (i << 5)) >> 1) + (i << 5) - 16);
+                    mapfile.write_i32((j << 5));
                 } else if (warpdata[i][j].direction == 1) {
-                    WriteInt((i << 5) + TILESIZE - PW - PWOFFSET, mapfile);
-                    WriteInt((currenty << 5) + TILESIZE - PH - 1, mapfile);
+                    mapfile.write_i32((i << 5) + TILESIZE - PW - PWOFFSET);
+                    mapfile.write_i32((currenty << 5) + TILESIZE - PH - 1);
 
-                    WriteInt((i << 5), mapfile);
-                    WriteInt((((currenty << 5) + TILESIZE - (j << 5)) >> 1) + (j << 5) - 16, mapfile);
+                    mapfile.write_i32((i << 5));
+                    mapfile.write_i32((((currenty << 5) + TILESIZE - (j << 5)) >> 1) + (j << 5) - 16);
                 } else if (warpdata[i][j].direction == 3) {
-                    WriteInt((i << 5) - 1 + PWOFFSET, mapfile);
-                    WriteInt((currenty << 5) + TILESIZE - PH - 1, mapfile);
+                    mapfile.write_i32((i << 5) - 1 + PWOFFSET);
+                    mapfile.write_i32((currenty << 5) + TILESIZE - PH - 1);
 
-                    WriteInt((i << 5), mapfile);
-                    WriteInt((((currenty << 5) + TILESIZE - (j << 5)) >> 1) + (j << 5) - 16, mapfile);
+                    mapfile.write_i32((i << 5));
+                    mapfile.write_i32((((currenty << 5) + TILESIZE - (j << 5)) >> 1) + (j << 5) - 16);
                 }
 
-                WriteInt(i, mapfile);
-                WriteInt(j, mapfile);
-                WriteInt(numblocks, mapfile);
+                mapfile.write_i32(i);
+                mapfile.write_i32(j);
+                mapfile.write_i32(numblocks);
 
             }
         }
@@ -1192,14 +1187,14 @@ void CMap::saveMap(const std::string& file)
 
     //Write spawn areas
     for (i = 0; i < NUMSPAWNAREATYPES; i++) {
-        WriteInt(numspawnareas[i], mapfile);
+        mapfile.write_i32(numspawnareas[i]);
 
         for (int m = 0; m < numspawnareas[i]; m++) {
-            WriteInt(spawnareas[i][m].left, mapfile);
-            WriteInt(spawnareas[i][m].top, mapfile);
-            WriteInt(spawnareas[i][m].width, mapfile);
-            WriteInt(spawnareas[i][m].height, mapfile);
-            WriteInt(spawnareas[i][m].size, mapfile);
+            mapfile.write_i32(spawnareas[i][m].left);
+            mapfile.write_i32(spawnareas[i][m].top);
+            mapfile.write_i32(spawnareas[i][m].width);
+            mapfile.write_i32(spawnareas[i][m].height);
+            mapfile.write_i32(spawnareas[i][m].size);
         }
     }
 
@@ -1274,45 +1269,43 @@ void CMap::saveMap(const std::string& file)
     }
 
     //Write draw areas
-    WriteInt(numdrawareas, mapfile);
+    mapfile.write_i32(numdrawareas);
 
     for (int m = 0; m < numdrawareas; m++) {
-        WriteInt(drawareas[m].x, mapfile);
-        WriteInt(drawareas[m].y, mapfile);
-        WriteInt(drawareas[m].w, mapfile);
-        WriteInt(drawareas[m].h, mapfile);
+        mapfile.write_i32(drawareas[m].x);
+        mapfile.write_i32(drawareas[m].y);
+        mapfile.write_i32(drawareas[m].w);
+        mapfile.write_i32(drawareas[m].h);
     }
 
     //Write the number of blocks we have supplement info for
-    WriteInt(iBlockCount, mapfile);
+    mapfile.write_i32(iBlockCount);
 
     for (j = 0; j < MAPHEIGHT; j++) {
         for (i = 0; i < MAPWIDTH; i++) {
             if (objectdata[i][j].iType == 1 || objectdata[i][j].iType == 15) { //powerup or view block
-                WriteByteFromShort(i, mapfile);
-                WriteByteFromShort(j, mapfile);
+                mapfile.write_i8(i);
+                mapfile.write_i8(j);
 
-                WriteByteFromShort(NUM_BLOCK_SETTINGS, mapfile);
+                mapfile.write_i8(NUM_BLOCK_SETTINGS);
                 for (short iSetting = 0; iSetting < NUM_BLOCK_SETTINGS; iSetting++)
-                    WriteByteFromShort(objectdata[i][j].iSettings[iSetting], mapfile);
+                    mapfile.write_i8(objectdata[i][j].iSettings[iSetting]);
             }
         }
     }
 
     //Write mode item locations like flags and race goals
-    WriteInt(iNumRaceGoals, mapfile);
+    mapfile.write_i32(iNumRaceGoals);
     for (j = 0; j < iNumRaceGoals; j++) {
-        WriteInt(racegoallocations[j].x, mapfile);
-        WriteInt(racegoallocations[j].y, mapfile);
+        mapfile.write_i32(racegoallocations[j].x);
+        mapfile.write_i32(racegoallocations[j].y);
     }
 
-    WriteInt(iNumFlagBases, mapfile);
+    mapfile.write_i32(iNumFlagBases);
     for (j = 0; j < iNumFlagBases; j++) {
-        WriteInt(flagbaselocations[j].x, mapfile);
-        WriteInt(flagbaselocations[j].y, mapfile);
+        mapfile.write_i32(flagbaselocations[j].x);
+        mapfile.write_i32(flagbaselocations[j].y);
     }
-
-    fclose(mapfile);
 
 #if defined(__MACOSX__)
     chmod(file.c_str(), S_IRWXU | S_IRWXG | S_IROTH);

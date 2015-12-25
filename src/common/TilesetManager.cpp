@@ -52,26 +52,23 @@ bool CTileset::ReadTileTypeFile(char * szFile)
 {
 	//Detect if the tiletype file already exists, if not create it
     if (File_Exists(szFile)) {
-		FILE * tsf = fopen(szFile, "rb");
-        if (tsf == NULL) {
+		BinaryFile tsf(szFile, "rb");
+        if (!tsf.is_open()) {
 			printf("ERROR: couldn't open tileset file: %s\n", szFile);
 			return false;
 		}
 
-		iTileTypeSize = ReadInt(tsf);
+		iTileTypeSize = tsf.read_i32();
 
         if (iTileTypeSize <= 0 || iTileTypeSize > 1024) {
-			fclose(tsf);
 			return false;
 		}
 
 		tiletypes = new TileType[iTileTypeSize];
 
         for (short i = 0; i < iTileTypeSize; i++) {
-			tiletypes[i] = (TileType)ReadInt(tsf);
+			tiletypes[i] = (TileType)tsf.read_i32();
 		}
-
-		fclose(tsf);
     } else {
 		iTileTypeSize = iWidth * iHeight;
 		tiletypes = new TileType[iTileTypeSize];
@@ -118,19 +115,17 @@ void CTileset::Draw(SDL_Surface * dstSurface, short iTileSize, SDL_Rect * srcRec
 
 void CTileset::SaveTileset()
 {
-	FILE * tsf = fopen(szTilesetPath, "wb");
-    if (tsf == NULL) {
+	BinaryFile tsf(szTilesetPath, "wb");
+    if (!tsf.is_open()) {
 		printf("ERROR: couldn't open tileset file to save tile types: %s\n", szTilesetPath);
 		return;
 	}
 
-	WriteInt(iTileTypeSize, tsf);
+	tsf.write_i32(iTileTypeSize);
 
     for (short i = 0; i < iTileTypeSize; i++) {
-		WriteInt(tiletypes[i], tsf);
+		tsf.write_i32(tiletypes[i]);
 	}
-
-	fclose(tsf);
 
 #if defined(__MACOSX__)
 	chmod(szTilesetPath, S_IRWXU | S_IRWXG | S_IROTH);

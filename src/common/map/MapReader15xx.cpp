@@ -12,13 +12,13 @@ extern short g_iMusicCategoryConversion[26];
 extern short g_iTileTypeConversion[NUMTILETYPES];
 extern short g_iDefaultPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
 
-void MapReader1500::read_autofilters(CMap& map, FILE* mapfile)
+void MapReader1500::read_autofilters(CMap& map, BinaryFile& mapfile)
 {
     for (short iFilter = 0; iFilter < NUM_AUTO_FILTERS; iFilter++)
         map.fAutoFilter[iFilter] = false;
 }
 
-void MapReader1500::read_tiles(CMap& map, FILE* mapfile)
+void MapReader1500::read_tiles(CMap& map, BinaryFile& mapfile)
 {
     unsigned short i, j;
 
@@ -26,7 +26,7 @@ void MapReader1500::read_tiles(CMap& map, FILE* mapfile)
     for (j = 0; j < MAPHEIGHT; j++) {
         for (i = 0; i < MAPWIDTH; i++) {
             //Read everything into layer 1
-            short iTileID = (short)ReadInt(mapfile);
+            short iTileID = (short)mapfile.read_i32();
 
             TilesetTile * tile = &map.mapdata[i][j][1];
             tile->iID = g_tilesetmanager->GetClassicTilesetIndex();
@@ -52,7 +52,7 @@ void MapReader1500::read_tiles(CMap& map, FILE* mapfile)
     // 3. load objects data
     for (j = 0; j < MAPHEIGHT; j++) {
         for (i = 0; i < MAPWIDTH; i++) {
-            map.objectdata[i][j].iType = (short)ReadInt(mapfile);
+            map.objectdata[i][j].iType = (short)mapfile.read_i32();
             if (map.objectdata[i][j].iType == 6)
                 map.objectdata[i][j].iType = -1;
 
@@ -66,19 +66,19 @@ void MapReader1500::read_tiles(CMap& map, FILE* mapfile)
     }
 }
 
-void MapReader1500::read_background(CMap& map, FILE* mapfile)
+void MapReader1500::read_background(CMap& map, BinaryFile& mapfile)
 {
     // Read old background IDs and convert that to a background filename
-    map.backgroundID = (short)ReadInt(mapfile);
+    map.backgroundID = (short)mapfile.read_i32();
     strcpy(map.szBackgroundFile, g_szBackgroundConversion[map.backgroundID]);
 }
 
-void MapReader1500::read_music_category(CMap& map, FILE* mapfile)
+void MapReader1500::read_music_category(CMap& map, BinaryFile& mapfile)
 {
     map.musicCategoryID = g_iMusicCategoryConversion[map.backgroundID];
 }
 
-bool MapReader1500::load(CMap& map, FILE* mapfile, ReadType readtype)
+bool MapReader1500::load(CMap& map, BinaryFile& mapfile, ReadType readtype)
 {
     read_autofilters(map, mapfile);
 
@@ -88,7 +88,7 @@ bool MapReader1500::load(CMap& map, FILE* mapfile, ReadType readtype)
     map.clearPlatforms();
 
     //Reset position of read cursor
-    rewind(mapfile);
+    mapfile.rewind();
 
     //clear map (we won't be reading in all the layers so it needs to be cleared)
     map.clearMap();

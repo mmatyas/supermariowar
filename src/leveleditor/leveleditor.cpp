@@ -388,13 +388,13 @@ int main(int argc, char *argv[])
 	printf("-------------------------------------------------------------------------------\n");
 	printf("\n---------------- startup ----------------\n");
 
-	FILE * fp = OpenFile("leveleditor.bin", "rt");
-
-    if (fp) {
-		fread(&g_fFullScreen, sizeof(bool), 1, fp);
-		fgets(findstring, FILEBUFSIZE, fp);
-		fclose(fp);
-	}
+    {
+        BinaryFile editor_settings("leveleditor.bin", "rb");
+        if (editor_settings.is_open()) {
+            g_fFullScreen = editor_settings.read_bool();
+            editor_settings.read_string_long(findstring, FILEBUFSIZE);
+        }
+    }
 
 	gfx_init(640,480, g_fFullScreen);
 	blitdest = screen;
@@ -648,13 +648,11 @@ void gameloop_frame()
 
 	save_map(convertPath("maps/ZZleveleditor.map"));
 
-	fp = OpenFile("leveleditor.bin", "wt");
-
-    if (fp) {
-		fwrite(&g_fFullScreen, sizeof(bool), 1, fp);
-		fprintf(fp, "%s", maplist->currentFilename());
-		fclose(fp);
-	}
+    BinaryFile editor_settings("leveleditor.bin", "wb");
+    if (editor_settings.is_open()) {
+        editor_settings.write_bool(g_fFullScreen);
+        editor_settings.write_string_long(maplist->currentFilename());
+    }
 
 	WriteAnimatedTileTypeFile(convertPath("gfx/packs/Classic/tilesets/tile_animation_tileset.tls").c_str());
 	g_tilesetmanager->SaveTilesets();
@@ -5176,8 +5174,8 @@ bool ReadAnimatedTileTypeFile(const char * szFile)
 {
 	//Detect if the tiletype file already exists, if not create it
     if (File_Exists(szFile)) {
-		FILE * tsf = fopen(szFile, "rb");
-        if (tsf == NULL) {
+		BinaryFile tsf(szFile, "rb");
+        if (!tsf.is_open()) {
 			printf("ERROR: couldn't open tileset file: %s\n", szFile);
 			return false;
 		}
@@ -5185,10 +5183,9 @@ bool ReadAnimatedTileTypeFile(const char * szFile)
 		animatedtiletypes = new TileType[256];
 
         for (short i = 0; i < 256; i++) {
-			animatedtiletypes[i] = (TileType)ReadInt(tsf);
+			animatedtiletypes[i] = (TileType)tsf.read_i32();
 		}
 
-		fclose(tsf);
     } else {
 		animatedtiletypes = new TileType[256];
 
@@ -5202,16 +5199,15 @@ bool ReadAnimatedTileTypeFile(const char * szFile)
 
 bool WriteAnimatedTileTypeFile(const char * szFile)
 {
-	FILE * tsf = fopen(szFile, "wb");
-    if (tsf == NULL) {
+	BinaryFile tsf(szFile, "wb");
+    if (!tsf.is_open()) {
 		printf("ERROR: couldn't open tileset file to save tile types: %s\n", szFile);
 		return false;
 	}
 
     for (short i = 0; i < 256; i++) {
-		WriteInt(animatedtiletypes[i], tsf);
+		tsf.write_i32(animatedtiletypes[i]);
 	}
 
-	fclose(tsf);
 	return true;
 }

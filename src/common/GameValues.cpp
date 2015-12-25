@@ -298,275 +298,275 @@ void CGameValues::resetSecretCounters()
     unlocksecretunlocked[3] = false;
 }
 
+// Read saved settings from disk
 void CGameValues::ReadBinaryConfig() {
-    //Read saved settings from disk
-    FILE * fp = OpenFile("options.bin", "rb");
+    std::string options_path(GetHomeDirectory() + "options.bin");
+    BinaryFile options(options_path.c_str(), "rb");
+    if (!options.is_open())
+        return;
 
-    if (fp) {
-      try
-      {
+    try
+    {
         int version[4];
-        fread_or_exception(version, sizeof(int), 4, fp);
+        options.read_i32_array(version, 4);
 
-        if (VersionIsEqual(g_iVersion, version[0], version[1], version[2], version[3])) {
+        if (!VersionIsEqual(g_iVersion, version[0], version[1], version[2], version[3])) {
+            printf("Old options.bin detected. Skipped reading it.\n");
+            return;
+        }
+
 #ifdef _XBOX
-            fread_or_exception(&flickerfilter, sizeof(short), 1, fp);
-            fread_or_exception(&hardwarefilter, sizeof(short), 1, fp);
-            fread_or_exception(&softfilter, sizeof(short), 1, fp);
-            fread_or_exception(&aspectratio10x11, sizeof(bool), 1, fp);
+        flickerfilter = options.read_i16();
+        hardwarefilter = options.read_i16();
+        softfilter = options.read_i16();
+        aspectratio10x11 = options.read_bool();
 
-            fread_or_exception(&screenResizeX, sizeof(float), 1, fp);
-            fread_or_exception(&screenResizeY, sizeof(float), 1, fp);
-            fread_or_exception(&screenResizeW, sizeof(float), 1, fp);
-            fread_or_exception(&screenResizeH, sizeof(float), 1, fp);
+        screenResizeX = options.read_float();
+        screenResizeY = options.read_float();
+        screenResizeW = options.read_float();
+        screenResizeH = options.read_float();
 
-            SDL_XBOX_SetScreenPosition(screenResizeX, screenResizeY);
-            SDL_XBOX_SetScreenStretch(screenResizeW, screenResizeH);
+        SDL_XBOX_SetScreenPosition(screenResizeX, screenResizeY);
+        SDL_XBOX_SetScreenStretch(screenResizeW, screenResizeH);
 #endif
 
-            unsigned char abyte[35];
-            fread_or_exception(abyte, sizeof(unsigned char), 35, fp);
-            spawnstyle = (short) abyte[0];
-            awardstyle = (short) abyte[1];
-            teamcollision = (short)abyte[3];
-            screencrunch = ((short)abyte[4] > 0 ? true : false);
-            toplayer = ((short)abyte[5] > 0 ? true : false);
-            scoreboardstyle = (short)abyte[6];
-            teamcolors = ((short)abyte[7] > 0 ? true : false);
-            sound = ((short)abyte[8] > 0 ? true : false);
-            music = ((short)abyte[9] > 0 ? true : false);
-            musicvolume = (short)abyte[10];
-            soundvolume = (short)abyte[11];
-            respawn = (short)abyte[12];
-            outofboundstime = (short)abyte[15];
-            cpudifficulty = (short)abyte[16];
-            framelimiter = (short)abyte[19];
-            bonuswheel = (short)abyte[20];
-            keeppowerup = ((short)abyte[21] > 0 ? true : false);
-            showwinningcrown = ((short)abyte[22] > 0 ? true : false);
-            playnextmusic = ((short)abyte[23] > 0 ? true : false);
-            pointspeed = (short)abyte[24];
-            swapstyle = (short)abyte[25];
-            overridepowerupsettings = (short)abyte[28];
-            minigameunlocked = ((short)abyte[29] > 0 ? true : false);
-            startgamecountdown = ((short)abyte[30] > 0 ? true : false);
-            deadteamnotice = ((short)abyte[31] > 0 ? true : false);
-            tournamentcontrolstyle = (short)abyte[33];
-            startmodedisplay = ((short)abyte[34] > 0 ? true : false);
+        spawnstyle = options.read_u8();
+        awardstyle = options.read_u8();
+        teamcollision = options.read_u8();
+        screencrunch = options.read_u8();
+        toplayer = options.read_u8();
+        scoreboardstyle = options.read_u8();
+        teamcolors = options.read_u8();
+        sound = options.read_u8();
+        music = options.read_u8();
+        musicvolume = options.read_u8();
+        soundvolume = options.read_u8();
+        respawn = options.read_u8();
+        outofboundstime = options.read_u8();
+        cpudifficulty = options.read_u8();
+        framelimiter = options.read_u8();
+        bonuswheel = options.read_u8();
+        keeppowerup = options.read_u8();
+        showwinningcrown = options.read_u8();
+        playnextmusic = options.read_u8();
+        pointspeed = options.read_u8();
+        swapstyle = options.read_u8();
+        overridepowerupsettings = options.read_u8();
+        minigameunlocked = options.read_u8();
+        startgamecountdown = options.read_u8();
+        deadteamnotice = options.read_u8();
+        tournamentcontrolstyle = options.read_u8();
+        startmodedisplay = options.read_u8();
 
-            fread_or_exception(&shieldtime, sizeof(short), 1, fp);
-            fread_or_exception(&shieldstyle, sizeof(short), 1, fp);
-            fread_or_exception(&itemrespawntime, sizeof(short), 1, fp);
-            fread_or_exception(&hiddenblockrespawn, sizeof(short), 1, fp);
-            fread_or_exception(&fireballttl, sizeof(short), 1, fp);
-            fread_or_exception(&fireballlimit, sizeof(short), 1, fp);
-            fread_or_exception(&hammerdelay, sizeof(short), 1, fp);
-            fread_or_exception(&hammerttl, sizeof(short), 1, fp);
-            fread_or_exception(&hammerpower, sizeof(bool), 1, fp);
-            fread_or_exception(&hammerlimit, sizeof(short), 1, fp);
-            fread_or_exception(&boomerangstyle, sizeof(short), 1, fp);
-            fread_or_exception(&boomeranglife, sizeof(short), 1, fp);
-            fread_or_exception(&boomeranglimit, sizeof(short), 1, fp);
-            fread_or_exception(&featherjumps, sizeof(short), 1, fp);
-            fread_or_exception(&featherlimit, sizeof(short), 1, fp);
-            fread_or_exception(&leaflimit, sizeof(short), 1, fp);
-            fread_or_exception(&pwingslimit, sizeof(short), 1, fp);
-            fread_or_exception(&tanookilimit, sizeof(short), 1, fp);
-            fread_or_exception(&bombslimit, sizeof(short), 1, fp);
-            fread_or_exception(&wandfreezetime, sizeof(short), 1, fp);
-            fread_or_exception(&wandlimit, sizeof(short), 1, fp);
-            fread_or_exception(&shellttl, sizeof(short), 1, fp);
-            fread_or_exception(&blueblockttl, sizeof(short), 1, fp);
-            fread_or_exception(&redblockttl, sizeof(short), 1, fp);
-            fread_or_exception(&grayblockttl, sizeof(short), 1, fp);
-            fread_or_exception(&storedpowerupdelay, sizeof(short), 1, fp);
-            fread_or_exception(&warplockstyle, sizeof(short), 1, fp);
-            fread_or_exception(&warplocktime, sizeof(short), 1, fp);
-            fread_or_exception(&suicidetime, sizeof(short), 1, fp);
+        shieldtime = options.read_i16();
+        shieldstyle = options.read_i16();
+        itemrespawntime = options.read_i16();
+        hiddenblockrespawn = options.read_i16();
+        fireballttl = options.read_i16();
+        fireballlimit = options.read_i16();
+        hammerdelay = options.read_i16();
+        hammerttl = options.read_i16();
+        hammerpower = options.read_i16();
+        hammerlimit = options.read_i16();
+        boomerangstyle = options.read_i16();
+        boomeranglife = options.read_i16();
+        boomeranglimit = options.read_i16();
+        featherjumps = options.read_i16();
+        featherlimit = options.read_i16();
+        leaflimit = options.read_i16();
+        pwingslimit = options.read_i16();
+        tanookilimit = options.read_i16();
+        bombslimit = options.read_i16();
+        wandfreezetime = options.read_i16();
+        wandlimit = options.read_i16();
+        shellttl = options.read_i16();
+        blueblockttl = options.read_i16();
+        redblockttl = options.read_i16();
+        grayblockttl = options.read_i16();
+        storedpowerupdelay = options.read_i16();
+        warplockstyle = options.read_i16();
+        warplocktime = options.read_i16();
+        suicidetime = options.read_i16();
 
-            fread_or_exception(&poweruppreset, sizeof(short), 1, fp);
-            fread_or_exception(&g_iCurrentPowerupPresets, sizeof(short), NUM_POWERUP_PRESETS * NUM_POWERUPS, fp);
+        poweruppreset = options.read_i16();
+        options.read_i16_array((int16_t *)g_iCurrentPowerupPresets, NUM_POWERUP_PRESETS * NUM_POWERUPS);
 
-            //TODO: Need to test what happens when you unplug some controllers from the xbox
-            //and then start up (device index will probably point to a gamepad that isn't in the list)
-            //and this will cause a crash
-            fread_or_exception(inputConfiguration, sizeof(CInputPlayerControl), 8, fp);
+        //TODO: Need to test what happens when you unplug some controllers from the xbox
+        //and then start up (device index will probably point to a gamepad that isn't in the list)
+        //and this will cause a crash
+        options.read_raw(inputConfiguration, sizeof(CInputPlayerControl) * 8);
 
-            //setup player input controls for game
-            for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
-                short iDevice;
-                fread_or_exception(&iDevice, sizeof(short), 1, fp);
+        //setup player input controls for game
+        for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
+            short iDevice = options.read_i16();
 
 #ifdef _XBOX
-                playerInput.inputControls[iPlayer] = &inputConfiguration[iPlayer][1]; //Always use gamepads as input devices on xbox
+            playerInput.inputControls[iPlayer] = &inputConfiguration[iPlayer][1]; //Always use gamepads as input devices on xbox
 #else
-                if (iDevice >= joystickcount)
-                    iDevice = DEVICE_KEYBOARD;
+            if (iDevice >= joystickcount)
+                iDevice = DEVICE_KEYBOARD;
 
-                playerInput.inputControls[iPlayer] = &inputConfiguration[iPlayer][iDevice == DEVICE_KEYBOARD ? 0 : 1];
+            playerInput.inputControls[iPlayer] = &inputConfiguration[iPlayer][iDevice == DEVICE_KEYBOARD ? 0 : 1];
 #endif
-            }
+        }
 
 #ifndef _XBOX
-            fread_or_exception(&fullscreen, sizeof(bool), 1, fp);
+        fullscreen = options.read_bool();
 #endif
 
-            for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++)
-                fread_or_exception(&(gamemodes[iGameMode]->goal), sizeof(short), 1, fp);
+        for (short iGameMode = 0; iGameMode < GAMEMODE_LAST; iGameMode++)
+            gamemodes[iGameMode]->goal = options.read_i16();
 
-            fread_or_exception(&gamemodemenusettings, sizeof(GameModeSettings), 1, fp);
+        options.read_raw(&gamemodemenusettings, sizeof(GameModeSettings));
 
-            // FIXME: See WriteConfig
-            //fread_or_exception(&teamcounts, sizeof(short), 4, fp);
-            //fread_or_exception(&teamids, sizeof(short), 12, fp);
-            fread_or_exception(&skinids, sizeof(short), 4, fp);
-            fread_or_exception(&randomskin, sizeof(bool), 4, fp);
-            fread_or_exception(&playercontrol, sizeof(short), 4, fp);
+        // FIXME: See WriteConfig
+        //fread_or_exception(&teamcounts, sizeof(short), 4, fp);
+        //fread_or_exception(&teamids, sizeof(short), 12, fp);
+        options.read_raw(&skinids, sizeof(short) * 4);
+        options.read_raw(&randomskin, sizeof(bool) * 4);
+        options.read_raw(&playercontrol, sizeof(short) * 4);
 
-            //Load skin/team settings
-            for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
-                if (skinids[iPlayer] >= skinlist->GetCount() || skinids[iPlayer] < 0)
-                    skinids[iPlayer] = 0;
-            }
-
-            announcerlist->SetCurrent((short) abyte[2]);
-            musiclist->SetCurrent((short) abyte[13]);
-            worldmusiclist->SetCurrent((short) abyte[14]);
-            menugraphicspacklist->SetCurrent((short) abyte[17]);
-            worldgraphicspacklist->SetCurrent((short) abyte[32]);
-            gamegraphicspacklist->SetCurrent((short) abyte[26]);
-            soundpacklist->	SetCurrent((short) abyte[18]);
-
-            sfx_setmusicvolume(musicvolume);
-            sfx_setsoundvolume(soundvolume);
-        } else {
-            printf("Old options.bin detected.  Skipped reading it.\n");
+        //Load skin/team settings
+        for (short iPlayer = 0; iPlayer < MAX_PLAYERS; iPlayer++) {
+            if (skinids[iPlayer] >= skinlist->GetCount() || skinids[iPlayer] < 0)
+                skinids[iPlayer] = 0;
         }
-      }
-      catch (char* errormsg)
-      {
-        perror(errormsg);
-      }
 
-      fclose(fp);
+        announcerlist->SetCurrent(options.read_u8());
+        musiclist->SetCurrent(options.read_u8());
+        worldmusiclist->SetCurrent(options.read_u8());
+        soundpacklist->SetCurrent(options.read_u8());
+        menugraphicspacklist->SetCurrent(options.read_u8());
+        worldgraphicspacklist->SetCurrent(options.read_u8());
+        gamegraphicspacklist->SetCurrent(options.read_u8());
+
+        sfx_setmusicvolume(musicvolume);
+        sfx_setsoundvolume(soundvolume);
     }
-
+    catch (char* errormsg)
+    {
+        perror(errormsg);
+    }
 }
 
 void CGameValues::WriteConfig()
 {
-    FILE * fp = OpenFile("options.bin", "wb");
+    std::string options_path(GetHomeDirectory() + "options.bin");
+    BinaryFile options(options_path.c_str(), "wb");
+    if (!options.is_open())
+        return;
 
-    if (fp != NULL) {
-        fwrite_or_exception(g_iVersion, sizeof(int), 4, fp);
+    try {
+        options.write_raw(g_iVersion, sizeof(int) * 4);
 
 #ifdef _XBOX
 
-        fwrite_or_exception(&flickerfilter, sizeof(short), 1, fp);
-        fwrite_or_exception(&hardwarefilter, sizeof(short), 1, fp);
-        fwrite_or_exception(&softfilter, sizeof(short), 1, fp);
-        fwrite_or_exception(&aspectratio10x11, sizeof(bool), 1, fp);
+        options.write_i16(flickerfilter);
+        options.write_i16(hardwarefilter);
+        options.write_i16(softfilter);
+        options.write_bool(aspectratio10x11);
 
-        fwrite_or_exception(&screenResizeX, sizeof(float), 1, fp);
-        fwrite_or_exception(&screenResizeY, sizeof(float), 1, fp);
-        fwrite_or_exception(&screenResizeW, sizeof(float), 1, fp);
-        fwrite_or_exception(&screenResizeH, sizeof(float), 1, fp);
+        options.write_float(screenResizeX);
+        options.write_float(screenResizeY);
+        options.write_float(screenResizeW);
+        options.write_float(screenResizeH);
 #endif
 
-        unsigned char abyte[35];
-        abyte[0] = (unsigned char) spawnstyle;
-        abyte[1] = (unsigned char) awardstyle;
-        abyte[2] = (unsigned char) announcerlist->GetCurrentIndex();
-        abyte[3] = (unsigned char) teamcollision;
-        abyte[4] = (unsigned char) screencrunch;
-        abyte[5] = (unsigned char) toplayer;
-        abyte[6] = (unsigned char) scoreboardstyle;
-        abyte[7] = (unsigned char) teamcolors;
-        abyte[8] = (unsigned char) sound;
-        abyte[9] = (unsigned char) music;
-        abyte[10] = (unsigned char) musicvolume;
-        abyte[11] = (unsigned char) soundvolume;
-        abyte[12] = (unsigned char) respawn;
-        abyte[13] = (unsigned char) musiclist->GetCurrentIndex();
-        abyte[14] = (unsigned char) worldmusiclist->GetCurrentIndex();
-        abyte[15] = (unsigned char) outofboundstime;
-        abyte[16] = (unsigned char) cpudifficulty;
-        abyte[17] = (unsigned char) menugraphicspacklist->GetCurrentIndex();
-        abyte[18] = (unsigned char) soundpacklist->GetCurrentIndex();
-        abyte[19] = (unsigned char) framelimiter;
-        abyte[20] = (unsigned char) bonuswheel;
-        abyte[21] = (unsigned char) keeppowerup;
-        abyte[22] = (unsigned char) showwinningcrown;
-        abyte[23] = (unsigned char) playnextmusic;
-        abyte[24] = (unsigned char) pointspeed;
-        abyte[25] = (unsigned char) swapstyle;
-        abyte[26] = (unsigned char) gamegraphicspacklist->GetCurrentIndex();
-        abyte[28] = (unsigned char) overridepowerupsettings;
-        abyte[29] = (unsigned char) minigameunlocked;
-        abyte[30] = (unsigned char) startgamecountdown;
-        abyte[31] = (unsigned char) deadteamnotice;
-        abyte[32] = (unsigned char) worldgraphicspacklist->GetCurrentIndex();
-        abyte[33] = (unsigned char) tournamentcontrolstyle;
-        abyte[34] = (unsigned char) startmodedisplay;
-        fwrite_or_exception(abyte, sizeof(unsigned char), 35, fp);
+        options.write_u8(spawnstyle);
+        options.write_u8(awardstyle);
+        options.write_u8(teamcollision);
+        options.write_u8(screencrunch);
+        options.write_u8(toplayer);
+        options.write_u8(scoreboardstyle);
+        options.write_u8(teamcolors);
+        options.write_u8(sound);
+        options.write_u8(music);
+        options.write_u8(musicvolume);
+        options.write_u8(soundvolume);
+        options.write_u8(respawn);
+        options.write_u8(outofboundstime);
+        options.write_u8(cpudifficulty);
+        options.write_u8(framelimiter);
+        options.write_u8(bonuswheel);
+        options.write_u8(keeppowerup);
+        options.write_u8(showwinningcrown);
+        options.write_u8(playnextmusic);
+        options.write_u8(pointspeed);
+        options.write_u8(swapstyle);
+        options.write_u8(overridepowerupsettings);
+        options.write_u8(minigameunlocked);
+        options.write_u8(startgamecountdown);
+        options.write_u8(deadteamnotice);
+        options.write_u8(tournamentcontrolstyle);
+        options.write_u8(startmodedisplay);
 
-        fwrite_or_exception(&shieldtime, sizeof(short), 1, fp);
-        fwrite_or_exception(&shieldstyle, sizeof(short), 1, fp);
-        fwrite_or_exception(&itemrespawntime, sizeof(short), 1, fp);
-        fwrite_or_exception(&hiddenblockrespawn, sizeof(short), 1, fp);
-        fwrite_or_exception(&fireballttl, sizeof(short), 1, fp);
-        fwrite_or_exception(&fireballlimit, sizeof(short), 1, fp);
-        fwrite_or_exception(&hammerdelay, sizeof(short), 1, fp);
-        fwrite_or_exception(&hammerttl, sizeof(short), 1, fp);
-        fwrite_or_exception(&hammerpower, sizeof(bool), 1, fp);
-        fwrite_or_exception(&hammerlimit, sizeof(short), 1, fp);
-        fwrite_or_exception(&boomerangstyle, sizeof(short), 1, fp);
-        fwrite_or_exception(&boomeranglife, sizeof(short), 1, fp);
-        fwrite_or_exception(&boomeranglimit, sizeof(short), 1, fp);
-        fwrite_or_exception(&featherjumps, sizeof(short), 1, fp);
-        fwrite_or_exception(&featherlimit, sizeof(short), 1, fp);
-        fwrite_or_exception(&leaflimit, sizeof(short), 1, fp);
-        fwrite_or_exception(&pwingslimit, sizeof(short), 1, fp);
-        fwrite_or_exception(&tanookilimit, sizeof(short), 1, fp);
-        fwrite_or_exception(&bombslimit, sizeof(short), 1, fp);
-        fwrite_or_exception(&wandfreezetime, sizeof(short), 1, fp);
-        fwrite_or_exception(&wandlimit, sizeof(short), 1, fp);
-        fwrite_or_exception(&shellttl, sizeof(short), 1, fp);
-        fwrite_or_exception(&blueblockttl, sizeof(short), 1, fp);
-        fwrite_or_exception(&redblockttl, sizeof(short), 1, fp);
-        fwrite_or_exception(&grayblockttl, sizeof(short), 1, fp);
-        fwrite_or_exception(&storedpowerupdelay, sizeof(short), 1, fp);
-        fwrite_or_exception(&warplockstyle, sizeof(short), 1, fp);
-        fwrite_or_exception(&warplocktime, sizeof(short), 1, fp);
-        fwrite_or_exception(&suicidetime, sizeof(short), 1, fp);
+        options.write_i16(shieldtime);
+        options.write_i16(shieldstyle);
+        options.write_i16(itemrespawntime);
+        options.write_i16(hiddenblockrespawn);
+        options.write_i16(fireballttl);
+        options.write_i16(fireballlimit);
+        options.write_i16(hammerdelay);
+        options.write_i16(hammerttl);
+        options.write_i16(hammerpower);
+        options.write_i16(hammerlimit);
+        options.write_i16(boomerangstyle);
+        options.write_i16(boomeranglife);
+        options.write_i16(boomeranglimit);
+        options.write_i16(featherjumps);
+        options.write_i16(featherlimit);
+        options.write_i16(leaflimit);
+        options.write_i16(pwingslimit);
+        options.write_i16(tanookilimit);
+        options.write_i16(bombslimit);
+        options.write_i16(wandfreezetime);
+        options.write_i16(wandlimit);
+        options.write_i16(shellttl);
+        options.write_i16(blueblockttl);
+        options.write_i16(redblockttl);
+        options.write_i16(grayblockttl);
+        options.write_i16(storedpowerupdelay);
+        options.write_i16(warplockstyle);
+        options.write_i16(warplocktime);
+        options.write_i16(suicidetime);
 
-        fwrite_or_exception(&poweruppreset, sizeof(short), 1, fp);
-        fwrite_or_exception(&g_iCurrentPowerupPresets, sizeof(short), NUM_POWERUP_PRESETS * NUM_POWERUPS, fp);
+        options.write_i16(poweruppreset);
+        options.write_raw(&g_iCurrentPowerupPresets, sizeof(short) * NUM_POWERUP_PRESETS * NUM_POWERUPS);
 
-        fwrite_or_exception(inputConfiguration, sizeof(CInputPlayerControl), 8, fp);
+        options.write_raw(inputConfiguration, sizeof(CInputPlayerControl) * 8);
 
         for (int iPlayer = 0; iPlayer < 4; iPlayer++) {
-            fwrite_or_exception(&playerInput.inputControls[iPlayer]->iDevice, sizeof(short), 1, fp);
+            options.write_i16(playerInput.inputControls[iPlayer]->iDevice);
         }
 
 #ifndef _XBOX
-        fwrite_or_exception(&fullscreen, sizeof(bool), 1, fp);
+        options.write_bool(fullscreen);
 #endif
         //Write out game mode goals
         for (short k = 0; k < GAMEMODE_LAST; k++)
-            fwrite_or_exception(&gamemodes[k]->goal, sizeof(short), 1, fp);
+            options.write_i16(gamemodes[k]->goal);
 
-        fwrite_or_exception(&gamemodemenusettings, sizeof(GameModeSettings), 1, fp);
+        options.write_raw(&gamemodemenusettings, sizeof(GameModeSettings));
 
         // FIXME
         //fwrite_or_exception(&miTeamSelect->iTeamCounts, sizeof(short), 4, fp);
         //fwrite_or_exception(&miTeamSelect->iTeamIDs, sizeof(short), 12, fp);
 
-        fwrite_or_exception(&skinids, sizeof(short), 4, fp);
-        fwrite_or_exception(&randomskin, sizeof(bool), 4, fp);
-        fwrite_or_exception(&playercontrol, sizeof(short), 4, fp);
+        options.write_raw(&skinids, sizeof(short) * 4);
+        options.write_raw(&randomskin, sizeof(bool) * 4);
+        options.write_raw(&playercontrol, sizeof(short) * 4);
 
-        fclose(fp);
+        options.write_u8(announcerlist->GetCurrentIndex());
+        options.write_u8(musiclist->GetCurrentIndex());
+        options.write_u8(worldmusiclist->GetCurrentIndex());
+        options.write_u8(soundpacklist->GetCurrentIndex());
+        options.write_u8(menugraphicspacklist->GetCurrentIndex());
+        options.write_u8(worldgraphicspacklist->GetCurrentIndex());
+        options.write_u8(gamegraphicspacklist->GetCurrentIndex());
+    }
+    catch (char* errormsg)
+    {
+        perror(errormsg);
     }
 
     maplist->WriteFilters();

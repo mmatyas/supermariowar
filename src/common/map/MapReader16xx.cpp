@@ -29,13 +29,13 @@ MapReader1610::MapReader1610()
     parse_nospawn = true;
 }
 
-void MapReader1600::read_tiles(CMap& map, FILE* mapfile)
+void MapReader1600::read_tiles(CMap& map, BinaryFile& mapfile)
 {
     for (unsigned short j = 0; j < MAPHEIGHT; j++) {
         for (unsigned short i = 0; i < MAPWIDTH; i++) {
             for (unsigned short k = 0; k < MAPLAYERS; k++) {
                 //This converts from 1.6 tileset to 1.7 tileset
-                short iTile = (short)ReadInt(mapfile);
+                short iTile = (short)mapfile.read_i32();
 
                 if (iTile == 300) {
                     map.mapdata[i][j][k].iID = TILESETNONE;
@@ -68,7 +68,7 @@ void MapReader1600::read_tiles(CMap& map, FILE* mapfile)
                 }
             }
 
-            map.objectdata[i][j].iType = (short)ReadInt(mapfile);
+            map.objectdata[i][j].iType = (short)mapfile.read_i32();
             if (map.objectdata[i][j].iType == 6)
                 map.objectdata[i][j].iType = -1;
 
@@ -79,12 +79,12 @@ void MapReader1600::read_tiles(CMap& map, FILE* mapfile)
                     map.objectdata[i][j].iSettings[iSetting] = g_iDefaultPowerupPresets[0][iSetting];
             }
 
-            map.warpdata[i][j].direction = (WarpEnterDirection)ReadInt(mapfile);
-            map.warpdata[i][j].connection = (short)ReadInt(mapfile);
-            map.warpdata[i][j].id = (short)ReadInt(mapfile);
+            map.warpdata[i][j].direction = (WarpEnterDirection)mapfile.read_i32();
+            map.warpdata[i][j].connection = (short)mapfile.read_i32();
+            map.warpdata[i][j].id = (short)mapfile.read_i32();
 
             if (parse_nospawn) {
-                map.nospawn[0][i][j] = ReadInt(mapfile) == 0 ? false : true;
+                map.nospawn[0][i][j] = mapfile.read_i32() == 0 ? false : true;
 
                 for (short iType = 1; iType < NUMSPAWNAREATYPES; iType++)
                     map.nospawn[iType][i][j] = map.nospawn[0][i][j];
@@ -93,30 +93,30 @@ void MapReader1600::read_tiles(CMap& map, FILE* mapfile)
     }
 }
 
-void MapReader1600::read_eyecandy(CMap& map, FILE* mapfile)
+void MapReader1600::read_eyecandy(CMap& map, BinaryFile& mapfile)
 {
     //Read in eyecandy to use
-    map.eyecandy[2] = (short)ReadInt(mapfile);
+    map.eyecandy[2] = (short)mapfile.read_i32();
 }
 
-void MapReader1600::read_warp_exits(CMap& map, FILE* mapfile)
+void MapReader1600::read_warp_exits(CMap& map, BinaryFile& mapfile)
 {
     map.maxConnection = 0;
 
-    map.numwarpexits = (short)ReadInt(mapfile);
+    map.numwarpexits = (short)mapfile.read_i32();
     for (unsigned short i = 0; i < map.numwarpexits && i < MAXWARPS; i++) {
-        map.warpexits[i].direction = (WarpExitDirection)ReadInt(mapfile);
-        map.warpexits[i].connection = (short)ReadInt(mapfile);
-        map.warpexits[i].id = (short)ReadInt(mapfile);
-        map.warpexits[i].x = (short)ReadInt(mapfile);
-        map.warpexits[i].y = (short)ReadInt(mapfile);
+        map.warpexits[i].direction = (WarpExitDirection)mapfile.read_i32();
+        map.warpexits[i].connection = (short)mapfile.read_i32();
+        map.warpexits[i].id = (short)mapfile.read_i32();
+        map.warpexits[i].x = (short)mapfile.read_i32();
+        map.warpexits[i].y = (short)mapfile.read_i32();
 
-        map.warpexits[i].lockx = (short)ReadInt(mapfile);
-        map.warpexits[i].locky = (short)ReadInt(mapfile);
+        map.warpexits[i].lockx = (short)mapfile.read_i32();
+        map.warpexits[i].locky = (short)mapfile.read_i32();
 
-        map.warpexits[i].warpx = (short)ReadInt(mapfile);
-        map.warpexits[i].warpy = (short)ReadInt(mapfile);
-        map.warpexits[i].numblocks = (short)ReadInt(mapfile);
+        map.warpexits[i].warpx = (short)mapfile.read_i32();
+        map.warpexits[i].warpy = (short)mapfile.read_i32();
+        map.warpexits[i].numblocks = (short)mapfile.read_i32();
 
         if (map.warpexits[i].connection > map.maxConnection)
             map.maxConnection = map.warpexits[i].connection;
@@ -125,18 +125,18 @@ void MapReader1600::read_warp_exits(CMap& map, FILE* mapfile)
     //Ignore any more warps than the max
     for (unsigned short i = 0; i < map.numwarpexits - MAXWARPS; i++) {
         for (unsigned short j = 0; j < 10; j++)
-            ReadInt(mapfile);
+            mapfile.read_i32();
     }
 
     if (map.numwarpexits > MAXWARPS)
         map.numwarpexits = MAXWARPS;
 }
 
-bool MapReader1600::read_spawn_areas(CMap& map, FILE* mapfile)
+bool MapReader1600::read_spawn_areas(CMap& map, BinaryFile& mapfile)
 {
     //Read spawn areas
     map.totalspawnsize[0] = 0;
-    map.numspawnareas[0] = (short)ReadInt(mapfile);
+    map.numspawnareas[0] = (short)mapfile.read_i32();
 
     if (map.numspawnareas[0] > MAXSPAWNAREAS) {
         std::cout << std::endl << " ERROR: Number of spawn areas (" << map.numspawnareas[0]
@@ -147,11 +147,11 @@ bool MapReader1600::read_spawn_areas(CMap& map, FILE* mapfile)
 
     //Read the only spawn area definition in the file
     for (int m = 0; m < map.numspawnareas[0]; m++) {
-        map.spawnareas[0][m].left = (short)ReadInt(mapfile);
-        map.spawnareas[0][m].top = (short)ReadInt(mapfile);
-        map.spawnareas[0][m].width = (short)ReadInt(mapfile);
-        map.spawnareas[0][m].height = (short)ReadInt(mapfile);
-        map.spawnareas[0][m].size = (short)ReadInt(mapfile);
+        map.spawnareas[0][m].left = (short)mapfile.read_i32();
+        map.spawnareas[0][m].top = (short)mapfile.read_i32();
+        map.spawnareas[0][m].width = (short)mapfile.read_i32();
+        map.spawnareas[0][m].height = (short)mapfile.read_i32();
+        map.spawnareas[0][m].size = (short)mapfile.read_i32();
 
         if (fix_spawnareas) {
             map.spawnareas[0][m].width -= map.spawnareas[0][m].left;
@@ -184,10 +184,10 @@ bool MapReader1600::read_spawn_areas(CMap& map, FILE* mapfile)
     return true;
 }
 
-bool MapReader1600::read_draw_areas(CMap& map, FILE* mapfile)
+bool MapReader1600::read_draw_areas(CMap& map, BinaryFile& mapfile)
 {
     //Read draw areas (foreground tiles drawing optimization)
-    map.numdrawareas = (short)ReadInt(mapfile);
+    map.numdrawareas = (short)mapfile.read_i32();
 
     if (map.numdrawareas > MAXDRAWAREAS) {
         std::cout << std::endl << " ERROR: Number of draw areas (" << map.numdrawareas
@@ -198,16 +198,16 @@ bool MapReader1600::read_draw_areas(CMap& map, FILE* mapfile)
 
     //Load rects to help optimize drawing the foreground
     for (int m = 0; m < map.numdrawareas; m++) {
-        map.drawareas[m].x = (Sint16)ReadInt(mapfile);
-        map.drawareas[m].y = (Sint16)ReadInt(mapfile);
-        map.drawareas[m].w = (Uint16)ReadInt(mapfile);
-        map.drawareas[m].h = (Uint16)ReadInt(mapfile);
+        map.drawareas[m].x = (Sint16)mapfile.read_i32();
+        map.drawareas[m].y = (Sint16)mapfile.read_i32();
+        map.drawareas[m].w = (Uint16)mapfile.read_i32();
+        map.drawareas[m].h = (Uint16)mapfile.read_i32();
     }
 
     return true;
 }
 
-bool MapReader1600::load(CMap& map, FILE* mapfile, ReadType readtype)
+bool MapReader1600::load(CMap& map, BinaryFile& mapfile, ReadType readtype)
 {
     read_autofilters(map, mapfile);
 
@@ -229,7 +229,7 @@ bool MapReader1600::load(CMap& map, FILE* mapfile, ReadType readtype)
     return true;
 }
 
-bool MapReader1610::load(CMap& map, FILE* mapfile, ReadType readtype)
+bool MapReader1610::load(CMap& map, BinaryFile& mapfile, ReadType readtype)
 {
     if (!MapReader160A::load(map, mapfile, readtype))
         return false;

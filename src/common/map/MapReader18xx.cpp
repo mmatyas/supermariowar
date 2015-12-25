@@ -35,33 +35,33 @@ MapReader1802::MapReader1802()
     patch_version = 2;
 }
 
-void MapReader1800::read_autofilters(CMap& map, FILE* mapfile)
+void MapReader1800::read_autofilters(CMap& map, BinaryFile& mapfile)
 {
     // TODO: handle read fail
     int iAutoFilterValues[NUM_AUTO_FILTERS + 1];
-    ReadIntChunk(iAutoFilterValues, NUM_AUTO_FILTERS + 1, mapfile);
+    mapfile.read_i32_array(iAutoFilterValues, NUM_AUTO_FILTERS + 1);
 
     for (short iFilter = 0; iFilter < NUM_AUTO_FILTERS; iFilter++)
         map.fAutoFilter[iFilter] = iAutoFilterValues[iFilter] > 0;
 }
 
-void MapReader1800::read_tileset(FILE* mapfile)
+void MapReader1800::read_tileset(BinaryFile& mapfile)
 {
     //Load tileset information
 
-    short iNumTilesets = ReadInt(mapfile);
+    short iNumTilesets = mapfile.read_i32();
 
     TilesetTranslation * translation = new TilesetTranslation[iNumTilesets];
 
     iMaxTilesetID = 0; //Figure out how big the translation array needs to be
     for (short iTileset = 0; iTileset < iNumTilesets; iTileset++) {
-        short iTilesetID = ReadInt(mapfile);
+        short iTilesetID = mapfile.read_i32();
         translation[iTileset].iID = iTilesetID;
 
         if (iTilesetID > iMaxTilesetID)
             iMaxTilesetID = iTilesetID;
 
-        ReadString(translation[iTileset].szName, 128, mapfile);
+        mapfile.read_string_long(translation[iTileset].szName, 128);
     }
 
     translationid = new short[iMaxTilesetID + 1];
@@ -84,7 +84,7 @@ void MapReader1800::read_tileset(FILE* mapfile)
     delete [] translation;
 }
 
-void MapReader1800::read_tiles(CMap& map, FILE* mapfile)
+void MapReader1800::read_tiles(CMap& map, BinaryFile& mapfile)
 {
     //2. load map data
 
@@ -93,9 +93,9 @@ void MapReader1800::read_tiles(CMap& map, FILE* mapfile)
         for (i = 0; i < MAPWIDTH; i++) {
             for (k = 0; k < MAPLAYERS; k++) {
                 TilesetTile * tile = &map.mapdata[i][j][k];
-                tile->iID = ReadByteAsShort(mapfile);
-                tile->iCol = ReadByteAsShort(mapfile);
-                tile->iRow = ReadByteAsShort(mapfile);
+                tile->iID = mapfile.read_i8();
+                tile->iCol = mapfile.read_i8();
+                tile->iRow = mapfile.read_i8();
 
                 if (tile->iID >= 0) {
                     if (tile->iID > iMaxTilesetID)
@@ -113,63 +113,63 @@ void MapReader1800::read_tiles(CMap& map, FILE* mapfile)
                 }
             }
 
-            map.objectdata[i][j].iType = ReadByteAsShort(mapfile);
-            map.objectdata[i][j].fHidden = ReadBool(mapfile);
+            map.objectdata[i][j].iType = mapfile.read_i8();
+            map.objectdata[i][j].fHidden = mapfile.read_bool();
         }
     }
 }
 
-void MapReader1800::read_switches(CMap& map, FILE* mapfile)
+void MapReader1800::read_switches(CMap& map, BinaryFile& mapfile)
 {
     // Read the on/off switch state of the four colors (turned on or off)
     for (short iSwitch = 0; iSwitch < 4; iSwitch++)
-        map.iSwitches[iSwitch] = (short)ReadInt(mapfile);
+        map.iSwitches[iSwitch] = (short)mapfile.read_i32();
 }
 
-void MapReader1800::read_items(CMap& map, FILE* mapfile)
+void MapReader1800::read_items(CMap& map, BinaryFile& mapfile)
 {
     //Load map items (like carryable spikes and springs)
-    map.iNumMapItems = ReadInt(mapfile);
+    map.iNumMapItems = mapfile.read_i32();
 
     for (short j = 0; j < map.iNumMapItems; j++) {
-        map.mapitems[j].itype = ReadInt(mapfile);
-        map.mapitems[j].ix = ReadInt(mapfile);
-        map.mapitems[j].iy = ReadInt(mapfile);
+        map.mapitems[j].itype = mapfile.read_i32();
+        map.mapitems[j].ix = mapfile.read_i32();
+        map.mapitems[j].iy = mapfile.read_i32();
     }
 }
 
-void MapReader1800::read_hazards(CMap& map, FILE* mapfile)
+void MapReader1800::read_hazards(CMap& map, BinaryFile& mapfile)
 {
     //Load map hazards (like fireball strings, rotodiscs, pirhana plants)
-    map.iNumMapHazards = ReadInt(mapfile);
+    map.iNumMapHazards = mapfile.read_i32();
 
     for (short iMapHazard = 0; iMapHazard < map.iNumMapHazards; iMapHazard++) {
-        map.maphazards[iMapHazard].itype = ReadInt(mapfile);
-        map.maphazards[iMapHazard].ix = ReadInt(mapfile);
-        map.maphazards[iMapHazard].iy = ReadInt(mapfile);
+        map.maphazards[iMapHazard].itype = mapfile.read_i32();
+        map.maphazards[iMapHazard].ix = mapfile.read_i32();
+        map.maphazards[iMapHazard].iy = mapfile.read_i32();
 
         for (short iParam = 0; iParam < NUMMAPHAZARDPARAMS; iParam++)
-            map.maphazards[iMapHazard].iparam[iParam] = ReadInt(mapfile);
+            map.maphazards[iMapHazard].iparam[iParam] = mapfile.read_i32();
 
         for (short iParam = 0; iParam < NUMMAPHAZARDPARAMS; iParam++)
-            map.maphazards[iMapHazard].dparam[iParam] = ReadFloat(mapfile);
+            map.maphazards[iMapHazard].dparam[iParam] = mapfile.read_float();
     }
 }
 
-void MapReader1802::read_eyecandy(CMap& map, FILE* mapfile)
+void MapReader1802::read_eyecandy(CMap& map, BinaryFile& mapfile)
 {
     //Read in eyecandy to use
     //For all layers if the map format supports it
-    map.eyecandy[0] = (short)ReadInt(mapfile);
-    map.eyecandy[1] = (short)ReadInt(mapfile);
-    map.eyecandy[2] = (short)ReadInt(mapfile);
+    map.eyecandy[0] = (short)mapfile.read_i32();
+    map.eyecandy[1] = (short)mapfile.read_i32();
+    map.eyecandy[2] = (short)mapfile.read_i32();
 }
 
-void MapReader1800::read_warp_locations(CMap& map, FILE* mapfile)
+void MapReader1800::read_warp_locations(CMap& map, BinaryFile& mapfile)
 {
     for (unsigned short j = 0; j < MAPHEIGHT; j++) {
         for (unsigned short i = 0; i < MAPWIDTH; i++) {
-            TileType iType = (TileType)ReadInt(mapfile);
+            TileType iType = (TileType)mapfile.read_i32();
 
             if (iType >= 0 && iType < NUMTILETYPES) {
                 map.mapdatatop[i][j].iType = iType;
@@ -179,34 +179,34 @@ void MapReader1800::read_warp_locations(CMap& map, FILE* mapfile)
                 map.mapdatatop[i][j].iFlags = tile_flag_nonsolid;
             }
 
-            map.warpdata[i][j].direction = (WarpEnterDirection)ReadInt(mapfile);
-            map.warpdata[i][j].connection = (short)ReadInt(mapfile);
-            map.warpdata[i][j].id = (short)ReadInt(mapfile);
+            map.warpdata[i][j].direction = (WarpEnterDirection)mapfile.read_i32();
+            map.warpdata[i][j].connection = (short)mapfile.read_i32();
+            map.warpdata[i][j].id = (short)mapfile.read_i32();
 
             for (short sType = 0; sType < NUMSPAWNAREATYPES; sType++)
-                map.nospawn[sType][i][j] = ReadBool(mapfile);
+                map.nospawn[sType][i][j] = mapfile.read_bool();
 
         }
     }
 }
 
-void MapReader1800::read_switchable_blocks(CMap& map, FILE* mapfile)
+void MapReader1800::read_switchable_blocks(CMap& map, BinaryFile& mapfile)
 {
     //Read switch block state data
-    int iNumSwitchBlockData = ReadInt(mapfile);
+    int iNumSwitchBlockData = mapfile.read_i32();
     for (short iBlock = 0; iBlock < iNumSwitchBlockData; iBlock++) {
-        short iCol = ReadByteAsShort(mapfile);
-        short iRow = ReadByteAsShort(mapfile);
+        short iCol = mapfile.read_i8();
+        short iRow = mapfile.read_i8();
 
-        map.objectdata[iCol][iRow].iSettings[0] = ReadByteAsShort(mapfile);
+        map.objectdata[iCol][iRow].iSettings[0] = mapfile.read_i8();
     }
 }
 
-bool MapReader1800::read_spawn_areas(CMap& map, FILE* mapfile)
+bool MapReader1800::read_spawn_areas(CMap& map, BinaryFile& mapfile)
 {
     for (unsigned short i = 0; i < NUMSPAWNAREATYPES; i++) {
         map.totalspawnsize[i] = 0;
-        map.numspawnareas[i] = (short)ReadInt(mapfile);
+        map.numspawnareas[i] = (short)mapfile.read_i32();
 
         if (map.numspawnareas[i] > MAXSPAWNAREAS) {
             cout << endl << " ERROR: Number of spawn areas (" << map.numspawnareas[i]
@@ -216,11 +216,11 @@ bool MapReader1800::read_spawn_areas(CMap& map, FILE* mapfile)
         }
 
         for (int m = 0; m < map.numspawnareas[i]; m++) {
-            map.spawnareas[i][m].left = (short)ReadInt(mapfile);
-            map.spawnareas[i][m].top = (short)ReadInt(mapfile);
-            map.spawnareas[i][m].width = (short)ReadInt(mapfile);
-            map.spawnareas[i][m].height = (short)ReadInt(mapfile);
-            map.spawnareas[i][m].size = (short)ReadInt(mapfile);
+            map.spawnareas[i][m].left = (short)mapfile.read_i32();
+            map.spawnareas[i][m].top = (short)mapfile.read_i32();
+            map.spawnareas[i][m].width = (short)mapfile.read_i32();
+            map.spawnareas[i][m].height = (short)mapfile.read_i32();
+            map.spawnareas[i][m].size = (short)mapfile.read_i32();
 
             map.totalspawnsize[i] += map.spawnareas[i][m].size;
         }
@@ -240,47 +240,47 @@ bool MapReader1800::read_spawn_areas(CMap& map, FILE* mapfile)
     return true;
 }
 
-void MapReader1800::read_extra_tiledata(CMap& map, FILE* mapfile)
+void MapReader1800::read_extra_tiledata(CMap& map, BinaryFile& mapfile)
 {
-    int iNumExtendedDataBlocks = ReadInt(mapfile);
+    int iNumExtendedDataBlocks = mapfile.read_i32();
 
     for (short iBlock = 0; iBlock < iNumExtendedDataBlocks; iBlock++) {
-        short iCol = ReadByteAsShort(mapfile);
-        short iRow = ReadByteAsShort(mapfile);
+        short iCol = mapfile.read_i8();
+        short iRow = mapfile.read_i8();
 
-        short iNumSettings = ReadByteAsShort(mapfile);
+        short iNumSettings = mapfile.read_i8();
         for (short iSetting = 0; iSetting < iNumSettings; iSetting++)
-            map.objectdata[iCol][iRow].iSettings[iSetting] = ReadByteAsShort(mapfile);
+            map.objectdata[iCol][iRow].iSettings[iSetting] = mapfile.read_i8();
     }
 }
 
-void MapReader1800::read_gamemode_settings(CMap& map, FILE* mapfile)
+void MapReader1800::read_gamemode_settings(CMap& map, BinaryFile& mapfile)
 {
     //read mode item locations like flags and race goals
-    map.iNumRaceGoals = (short)ReadInt(mapfile);
+    map.iNumRaceGoals = (short)mapfile.read_i32();
     for (unsigned short j = 0; j < map.iNumRaceGoals; j++) {
-        map.racegoallocations[j].x = (short)ReadInt(mapfile);
-        map.racegoallocations[j].y = (short)ReadInt(mapfile);
+        map.racegoallocations[j].x = (short)mapfile.read_i32();
+        map.racegoallocations[j].y = (short)mapfile.read_i32();
     }
 
-    map.iNumFlagBases = (short)ReadInt(mapfile);
+    map.iNumFlagBases = (short)mapfile.read_i32();
     for (unsigned short j = 0; j < map.iNumFlagBases; j++) {
-        map.flagbaselocations[j].x = (short)ReadInt(mapfile);
-        map.flagbaselocations[j].y = (short)ReadInt(mapfile);
+        map.flagbaselocations[j].x = (short)mapfile.read_i32();
+        map.flagbaselocations[j].y = (short)mapfile.read_i32();
     }
 }
 
-void MapReader1800::read_platforms(CMap& map, FILE* mapfile, bool fPreview)
+void MapReader1800::read_platforms(CMap& map, BinaryFile& mapfile, bool fPreview)
 {
     map.clearPlatforms();
 
     //Load moving platforms
-    map.iNumPlatforms = (short)ReadInt(mapfile);
+    map.iNumPlatforms = (short)mapfile.read_i32();
     map.platforms = new MovingPlatform*[map.iNumPlatforms];
 
     for (short iPlatform = 0; iPlatform < map.iNumPlatforms; iPlatform++) {
-        short iWidth = (short)ReadInt(mapfile);
-        short iHeight = (short)ReadInt(mapfile);
+        short iWidth = (short)mapfile.read_i32();
+        short iHeight = (short)mapfile.read_i32();
 
         TilesetTile ** tiles = new TilesetTile*[iWidth];
         MapTile ** types = new MapTile*[iWidth];
@@ -289,12 +289,12 @@ void MapReader1800::read_platforms(CMap& map, FILE* mapfile, bool fPreview)
 
         short iDrawLayer = 2;
         if (patch_version >= 1)
-            iDrawLayer = ReadInt(mapfile);
+            iDrawLayer = mapfile.read_i32();
 
         //printf("Layer: %d\n", iDrawLayer);
 
         short iPathType = 0;
-        iPathType = ReadInt(mapfile);
+        iPathType = mapfile.read_i32();
 
         //printf("PathType: %d\n", iPathType);
 
@@ -309,7 +309,7 @@ void MapReader1800::read_platforms(CMap& map, FILE* mapfile, bool fPreview)
     }
 }
 
-void MapReader1800::read_platform_tiles(CMap& map, FILE* mapfile,
+void MapReader1800::read_platform_tiles(CMap& map, BinaryFile& mapfile,
     short iWidth, short iHeight, TilesetTile**& tiles, MapTile**& types)
 {
     for (short iCol = 0; iCol < iWidth; iCol++) {
@@ -319,9 +319,9 @@ void MapReader1800::read_platform_tiles(CMap& map, FILE* mapfile,
         for (short iRow = 0; iRow < iHeight; iRow++) {
             TilesetTile * tile = &tiles[iCol][iRow];
 
-            tile->iID = ReadByteAsShort(mapfile);
-            tile->iCol = ReadByteAsShort(mapfile);
-            tile->iRow = ReadByteAsShort(mapfile);
+            tile->iID = mapfile.read_i8();
+            tile->iCol = mapfile.read_i8();
+            tile->iRow = mapfile.read_i8();
 
             if (tile->iID >= 0) {
                 if (iMaxTilesetID != -1 && tile->iID > iMaxTilesetID)
@@ -339,7 +339,7 @@ void MapReader1800::read_platform_tiles(CMap& map, FILE* mapfile,
                     tile->iID = translationid[tile->iID];
             }
 
-            TileType iType = (TileType)ReadInt(mapfile);
+            TileType iType = (TileType)mapfile.read_i32();
 
             if (iType >= 0 && iType < NUMTILETYPES) {
                 types[iCol][iRow].iType = iType;
@@ -352,7 +352,7 @@ void MapReader1800::read_platform_tiles(CMap& map, FILE* mapfile,
     }
 }
 
-bool MapReader1800::load(CMap& map, FILE* mapfile/*, const char* filename*/, ReadType readtype)
+bool MapReader1800::load(CMap& map, BinaryFile& mapfile/*, const char* filename*/, ReadType readtype)
 {
     read_autofilters(map, mapfile);
 

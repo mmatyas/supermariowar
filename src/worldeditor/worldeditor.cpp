@@ -482,16 +482,16 @@ int main(int argc, char *argv[])
 	printf("-------------------------------------------------------------------------------\n");
 	printf("\n---------------- startup ----------------\n");
 
-	FILE * fp = OpenFile("worldeditor.bin", "rt");
-
-	int saved_col = 0, saved_row = 0;
-    if (fp) {
-		fread(&saved_col, sizeof(int), 1, fp);
-		fread(&saved_row, sizeof(int), 1, fp);
-		fread(&g_fFullScreen, sizeof(bool), 1, fp);
-		fgets(findstring, FILEBUFSIZE, fp);
-		fclose(fp);
-	}
+    int saved_col = 0, saved_row = 0;
+    {
+        BinaryFile editor_settings("worldeditor.bin", "rb");
+        if (editor_settings.is_open()) {
+            saved_col = editor_settings.read_i32();
+            saved_row = editor_settings.read_i32();
+            g_fFullScreen = editor_settings.read_bool();
+            editor_settings.read_string_long(findstring, FILEBUFSIZE);
+        }
+    }
 
 	gfx_init(640,480, g_fFullScreen);
 	blitdest = screen;
@@ -1049,15 +1049,15 @@ int main(int argc, char *argv[])
 	WriteWarpsIntoWorld();
 	g_worldmap.Save(convertPath("worlds/ZZworldeditor.txt").c_str());
 
-	fp = OpenFile("worldeditor.bin", "wt");
-
-    if (fp) {
-		fwrite(&draw_offset_col, sizeof(int), 1, fp);
-		fwrite(&draw_offset_row, sizeof(int), 1, fp);
-		fwrite(&g_fFullScreen, sizeof(bool), 1, fp);
-        fprintf(fp, "%s", worldlist->current_name());
-		fclose(fp);
-	}
+    {
+        BinaryFile editor_settings("worldeditor.bin", "wb");
+        if (editor_settings.is_open()) {
+            editor_settings.write_i32(draw_offset_col);
+            editor_settings.write_i32(draw_offset_row);
+            editor_settings.write_bool(g_fFullScreen);
+            editor_settings.write_string_long(worldlist->current_name());
+        }
+    }
 
 	printf("\n---------------- shutdown ----------------\n");
 	return 0;
