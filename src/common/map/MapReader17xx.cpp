@@ -33,10 +33,10 @@ MapReader1702::MapReader1702()
     patch_version = 2;
 }
 
-void MapReader1702::read_autofilters(CMap& map, FILE* mapfile)
+void MapReader1702::read_autofilters(CMap& map, BinaryFile& mapfile)
 {
     int iAutoFilterValues[9];
-    ReadIntChunk(iAutoFilterValues, 9, mapfile);
+    mapfile.read_i32_array(iAutoFilterValues, 9);
 
     for (short iFilter = 0; iFilter < 8; iFilter++)
         map.fAutoFilter[iFilter] = iAutoFilterValues[iFilter] > 0;
@@ -48,7 +48,7 @@ void MapReader1702::read_autofilters(CMap& map, FILE* mapfile)
     //int iDensity = iAutoFilterValues[8];
 }
 
-void MapReader1700::read_tiles(CMap& map, FILE* mapfile)
+void MapReader1700::read_tiles(CMap& map, BinaryFile& mapfile)
 {
     short iClassicTilesetID = g_tilesetmanager->GetIndexFromName("Classic");
 
@@ -56,7 +56,7 @@ void MapReader1700::read_tiles(CMap& map, FILE* mapfile)
     for (j = 0; j < MAPHEIGHT; j++) {
         for (i = 0; i < MAPWIDTH; i++) {
             for (k = 0; k < MAPLAYERS; k++) {
-                short iTileID = (short)ReadInt(mapfile);
+                short iTileID = (short)mapfile.read_i32();
 
                 TilesetTile * tile = &map.mapdata[i][j][k];
 
@@ -71,7 +71,7 @@ void MapReader1700::read_tiles(CMap& map, FILE* mapfile)
                 }
             }
 
-            map.objectdata[i][j].iType = (short)ReadInt(mapfile);
+            map.objectdata[i][j].iType = (short)mapfile.read_i32();
             if (map.objectdata[i][j].iType == 15)
                 map.objectdata[i][j].iType = -1;
 
@@ -85,10 +85,10 @@ void MapReader1700::read_tiles(CMap& map, FILE* mapfile)
     }
 }
 
-void MapReader1701::read_background(CMap& map, FILE* mapfile)
+void MapReader1701::read_background(CMap& map, BinaryFile& mapfile)
 {
     //Read in background to use
-    ReadString(map.szBackgroundFile, 128, mapfile);
+    mapfile.read_string_long(map.szBackgroundFile, 128);
 
     for (short iBackground = 0; iBackground < 26; iBackground++) {
         const char * szFindUnderscore = strstr(g_szBackgroundConversion[iBackground], "_");
@@ -100,16 +100,17 @@ void MapReader1701::read_background(CMap& map, FILE* mapfile)
             strcpy(map.szBackgroundFile, g_szBackgroundConversion[iBackground]);
         }
     }
+    printf("Background2: %s\n", map.szBackgroundFile);
 }
 
-void MapReader1702::read_background(CMap& map, FILE* mapfile)
+void MapReader1702::read_background(CMap& map, BinaryFile& mapfile)
 {
     //Read in background to use
-    ReadString(map.szBackgroundFile, 128, mapfile);
-    //printf("Background: %s", szBackgroundFile);
+    mapfile.read_string_long(map.szBackgroundFile, 128);
+    printf("Background: %s\n", map.szBackgroundFile);
 }
 
-void MapReader1700::set_preview_switches(CMap& map, FILE* mapfile)
+void MapReader1700::set_preview_switches(CMap& map, BinaryFile& mapfile)
 {
     // if it is a preview, for older maps, set the on/off blocks to on by default
 
@@ -132,11 +133,11 @@ void MapReader1700::set_preview_switches(CMap& map, FILE* mapfile)
     }
 }
 
-void MapReader1700::read_switches(CMap& map, FILE* mapfile)
+void MapReader1700::read_switches(CMap& map, BinaryFile& mapfile)
 {
     //Read on/off switches
     for (unsigned short iSwitch = 0; iSwitch < 4; iSwitch++) {
-        map.iSwitches[iSwitch] = 1 - (short)ReadInt(mapfile);
+        map.iSwitches[iSwitch] = 1 - (short)mapfile.read_i32();
     }
 
     //Set all the on/off blocks correctly
@@ -149,16 +150,16 @@ void MapReader1700::read_switches(CMap& map, FILE* mapfile)
     }
 }
 
-void MapReader1701::read_music_category(CMap& map, FILE* mapfile)
+void MapReader1701::read_music_category(CMap& map, BinaryFile& mapfile)
 {
-    map.musicCategoryID = ReadInt(mapfile);
+    map.musicCategoryID = mapfile.read_i32();
 }
 
-void MapReader1700::read_warp_locations(CMap& map, FILE* mapfile)
+void MapReader1700::read_warp_locations(CMap& map, BinaryFile& mapfile)
 {
     for (unsigned short j = 0; j < MAPHEIGHT; j++) {
         for (unsigned short i = 0; i < MAPWIDTH; i++) {
-            TileType iType = (TileType)ReadInt(mapfile);
+            TileType iType = (TileType)mapfile.read_i32();
 
             if (iType >= 0 && iType < NUMTILETYPES) {
                 map.mapdatatop[i][j].iType = iType;
@@ -168,12 +169,12 @@ void MapReader1700::read_warp_locations(CMap& map, FILE* mapfile)
                 map.mapdatatop[i][j].iFlags = tile_flag_nonsolid;
             }
 
-            map.warpdata[i][j].direction = (WarpEnterDirection)ReadInt(mapfile);
-            map.warpdata[i][j].connection = (short)ReadInt(mapfile);
-            map.warpdata[i][j].id = (short)ReadInt(mapfile);
+            map.warpdata[i][j].direction = (WarpEnterDirection)mapfile.read_i32();
+            map.warpdata[i][j].connection = (short)mapfile.read_i32();
+            map.warpdata[i][j].id = (short)mapfile.read_i32();
 
             for (short sType = 0; sType < 6; sType += 5)
-                map.nospawn[sType][i][j] = ReadInt(mapfile) == 0 ? false : true;
+                map.nospawn[sType][i][j] = mapfile.read_i32() == 0 ? false : true;
 
             //Copy player no spawn areas into team no spawn areas
             for (short sType = 1; sType < 5; sType++)
@@ -183,12 +184,12 @@ void MapReader1700::read_warp_locations(CMap& map, FILE* mapfile)
     }
 }
 
-bool MapReader1700::read_spawn_areas(CMap& map, FILE* mapfile)
+bool MapReader1700::read_spawn_areas(CMap& map, BinaryFile& mapfile)
 {
     //Read spawn areas
     for (unsigned short i = 0; i < 6; i += 5) {
         map.totalspawnsize[i] = 0;
-        map.numspawnareas[i] = (short)ReadInt(mapfile);
+        map.numspawnareas[i] = (short)mapfile.read_i32();
 
         if (map.numspawnareas[i] > MAXSPAWNAREAS) {
             cout << endl << " ERROR: Number of spawn areas (" << map.numspawnareas[i]
@@ -198,11 +199,11 @@ bool MapReader1700::read_spawn_areas(CMap& map, FILE* mapfile)
         }
 
         for (int m = 0; m < map.numspawnareas[i]; m++) {
-            map.spawnareas[i][m].left = (short)ReadInt(mapfile);
-            map.spawnareas[i][m].top = (short)ReadInt(mapfile);
-            map.spawnareas[i][m].width = (short)ReadInt(mapfile);
-            map.spawnareas[i][m].height = (short)ReadInt(mapfile);
-            map.spawnareas[i][m].size = (short)ReadInt(mapfile);
+            map.spawnareas[i][m].left = (short)mapfile.read_i32();
+            map.spawnareas[i][m].top = (short)mapfile.read_i32();
+            map.spawnareas[i][m].width = (short)mapfile.read_i32();
+            map.spawnareas[i][m].height = (short)mapfile.read_i32();
+            map.spawnareas[i][m].size = (short)mapfile.read_i32();
 
             map.totalspawnsize[i] += map.spawnareas[i][m].size;
         }
@@ -225,17 +226,17 @@ bool MapReader1700::read_spawn_areas(CMap& map, FILE* mapfile)
     return true;
 }
 
-void MapReader1700::read_platforms(CMap& map, FILE* mapfile, bool fPreview)
+void MapReader1700::read_platforms(CMap& map, BinaryFile& mapfile, bool fPreview)
 {
     map.clearPlatforms();
 
     //Load moving platforms
-    map.iNumPlatforms = (short)ReadInt(mapfile);
+    map.iNumPlatforms = (short)mapfile.read_i32();
     map.platforms = new MovingPlatform*[map.iNumPlatforms];
 
     for (short iPlatform = 0; iPlatform < map.iNumPlatforms; iPlatform++) {
-        short iWidth = (short)ReadInt(mapfile);
-        short iHeight = (short)ReadInt(mapfile);
+        short iWidth = (short)mapfile.read_i32();
+        short iHeight = (short)mapfile.read_i32();
 
         TilesetTile ** tiles = new TilesetTile*[iWidth];
         MapTile ** types = new MapTile*[iWidth];
@@ -259,7 +260,7 @@ void MapReader1700::read_platforms(CMap& map, FILE* mapfile, bool fPreview)
     }
 }
 
-void MapReader1700::read_platform_tiles(CMap& map, FILE* mapfile,
+void MapReader1700::read_platform_tiles(CMap& map, BinaryFile& mapfile,
     short iWidth, short iHeight, TilesetTile**& tiles, MapTile**& types)
 {
     for (short iCol = 0; iCol < iWidth; iCol++) {
@@ -269,7 +270,7 @@ void MapReader1700::read_platform_tiles(CMap& map, FILE* mapfile,
         for (short iRow = 0; iRow < iHeight; iRow++) {
             TilesetTile * tile = &tiles[iCol][iRow];
 
-            short iTile = ReadInt(mapfile);
+            short iTile = mapfile.read_i32();
             TileType type;
 
             if (iTile == TILESETSIZE) {
@@ -297,37 +298,37 @@ void MapReader1700::read_platform_tiles(CMap& map, FILE* mapfile,
     }
 }
 
-MovingPlatformPath* MapReader1700::read_platform_path_details(FILE* mapfile, short iPathType, bool fPreview)
+MovingPlatformPath* MapReader1700::read_platform_path_details(BinaryFile& mapfile, short iPathType, bool fPreview)
 {
     MovingPlatformPath* path = NULL;
     if (iPathType == 0) { //segment path
-        float fStartX = ReadFloat(mapfile);
-        float fStartY = ReadFloat(mapfile);
-        float fEndX = ReadFloat(mapfile);
-        float fEndY = ReadFloat(mapfile);
-        float fVelocity = ReadFloat(mapfile);
+        float fStartX = mapfile.read_float();
+        float fStartY = mapfile.read_float();
+        float fEndX = mapfile.read_float();
+        float fEndY = mapfile.read_float();
+        float fVelocity = mapfile.read_float();
 
         path = new StraightPath(fVelocity, fStartX, fStartY, fEndX, fEndY, fPreview);
 
         //printf("Read segment path\n");
         //printf("StartX: %.2f StartY:%.2f EndX:%.2f EndY:%.2f Velocity:%.2f\n", fStartX, fStartY, fEndX, fEndY, fVelocity);
     } else if (iPathType == 1) { //continuous path
-        float fStartX = ReadFloat(mapfile);
-        float fStartY = ReadFloat(mapfile);
-        float fAngle = ReadFloat(mapfile);
-        float fVelocity = ReadFloat(mapfile);
+        float fStartX = mapfile.read_float();
+        float fStartY = mapfile.read_float();
+        float fAngle = mapfile.read_float();
+        float fVelocity = mapfile.read_float();
 
         path = new StraightPathContinuous(fVelocity, fStartX, fStartY, fAngle, fPreview);
 
         //printf("Read continuous path\n");
         //printf("StartX: %.2f StartY:%.2f Angle:%.2f Velocity:%.2f\n", fStartX, fStartY, fAngle, fVelocity);
     } else if (iPathType == 2) { //elliptical path
-        float fRadiusX = ReadFloat(mapfile);
-        float fRadiusY = ReadFloat(mapfile);
-        float fCenterX = ReadFloat(mapfile);
-        float fCenterY = ReadFloat(mapfile);
-        float fAngle = ReadFloat(mapfile);
-        float fVelocity = ReadFloat(mapfile);
+        float fRadiusX = mapfile.read_float();
+        float fRadiusY = mapfile.read_float();
+        float fCenterX = mapfile.read_float();
+        float fCenterY = mapfile.read_float();
+        float fAngle = mapfile.read_float();
+        float fVelocity = mapfile.read_float();
 
         path = new EllipsePath(fVelocity, fAngle, fRadiusX, fRadiusY, fCenterX, fCenterY, fPreview);
 
@@ -338,7 +339,7 @@ MovingPlatformPath* MapReader1700::read_platform_path_details(FILE* mapfile, sho
     return path;
 }
 
-bool MapReader1700::load(CMap& map, FILE* mapfile, ReadType readtype)
+bool MapReader1700::load(CMap& map, BinaryFile& mapfile, ReadType readtype)
 {
     read_autofilters(map, mapfile);
 
