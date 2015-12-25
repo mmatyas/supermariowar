@@ -7,6 +7,7 @@
 	- [Get the code](#get-the-code)
 	- [Requirements](#requirements)
 	- [Linux](#linux)
+	- [Mac OSX](#mac-osx)
 	- [Windows](#windows)
 	- [ARM / Raspberry Pi](#arm-devices)
 	- [Other devices](#other-devices)
@@ -112,6 +113,10 @@ The main build targets for `make` are:
 If you prefer to work within an IDE (CodeBlocks, Eclipse, ...), you can also generate project files for it using CMake. You can find more information in [Build configuration](#build-configuration).
 
 To create installable packages, simply run `make package`. This will create TGZ, DEB and RPM archives.
+
+### Mac OSX
+
+You'll probably need Xcode and its command line tools; you can install SDL and CMake manually from its site, or you can get them with Homebrew: `brew install cmake sdl2 sdl2_image sdl2_mixer`. Then follow the Linux instructions to build SMW.
 
 ### Windows
 
