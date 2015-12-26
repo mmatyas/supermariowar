@@ -7,10 +7,38 @@
 #include <iostream>
 
 extern CTilesetManager* g_tilesetmanager;
-extern const char* g_szBackgroundConversion[26];
 extern short g_iMusicCategoryConversion[26];
 extern short g_iTileTypeConversion[NUMTILETYPES];
 extern short g_iDefaultPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
+
+const char * g_szBackgroundConversion[26] = {
+    "Land_Classic.png",
+    "Castle_Dungeon.png",
+    "Desert_Pyramids.png",
+    "Ghost_GhostHouse.png",
+    "Underground_Cave.png",
+    "Clouds_AboveTheClouds.png",
+    "Castle_GoombaHall.png",
+    "Platforms_GreenSpottedHills.png",
+    "Snow_SnowTrees.png",
+    "Desert_Desert.png",
+    "Underground_BrownRockWall.png",
+    "Land_CastleWall.png",
+    "Clouds_Clouds.png",
+    "Land_GreenMountains.png",
+    "Land_InTheTrees.png",
+    "Battle_Manor.png",
+    "Platforms_JaggedGreenStones.png",
+    "Underground_RockWallAndPlants.png",
+    "Underground_DarkPipes.png",
+    "Bonus_StarryNight.png",
+    "Platforms_CloudsAndWaterfalls.png",
+    "Battle_GoombaPillars.png",
+    "Bonus_HillsAtNight.png",
+    "Castle_CastlePillars.png",
+    "Land_GreenHillsAndClouds.png",
+    "Platforms_BlueSpottedHills.png"
+};
 
 void MapReader1500::read_autofilters(CMap& map, BinaryFile& mapfile)
 {

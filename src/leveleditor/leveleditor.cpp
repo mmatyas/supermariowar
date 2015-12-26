@@ -324,8 +324,6 @@ MapPlatform g_Platforms[MAX_PLATFORMS];
 
 BackgroundList *backgroundlist;
 extern const char * g_szMusicCategoryNames[MAXMUSICCATEGORY];
-extern char * g_szBackgroundConversion[26];
-extern short g_iMusicCategoryConversion[26];
 short g_musiccategorydisplaytimer = 0;
 
 short g_messagedisplaytimer = 0;

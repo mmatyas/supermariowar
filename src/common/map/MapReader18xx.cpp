@@ -8,7 +8,6 @@
 #include <iostream>
 
 extern CTilesetManager* g_tilesetmanager;
-extern const char * g_szBackgroundConversion[26];
 extern short g_iTileTypeConversion[NUMTILETYPES];
 
 using namespace std;

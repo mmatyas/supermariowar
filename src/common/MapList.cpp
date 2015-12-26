@@ -62,9 +62,6 @@ MapListNode::~MapListNode()
     delete [] pfFilters;
 }
 
-extern const char * g_szMusicCategoryNames[MAXMUSICCATEGORY];
-extern short g_iDefaultMusicCategory[MAXMUSICCATEGORY];
-
 ///////////// MapList ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 MapList::MapList(bool fWorldEditor)
 {

@@ -9,7 +9,6 @@
 
 extern CTilesetManager* g_tilesetmanager;
 extern const char* g_szBackgroundConversion[26];
-extern short g_iMusicCategoryConversion[26];
 extern short g_iTileTypeConversion[NUMTILETYPES];
 extern short g_iDefaultPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
 
@@ -100,14 +99,12 @@ void MapReader1701::read_background(CMap& map, BinaryFile& mapfile)
             strcpy(map.szBackgroundFile, g_szBackgroundConversion[iBackground]);
         }
     }
-    printf("Background2: %s\n", map.szBackgroundFile);
 }
 
 void MapReader1702::read_background(CMap& map, BinaryFile& mapfile)
 {
     //Read in background to use
     mapfile.read_string_long(map.szBackgroundFile, 128);
-    printf("Background: %s\n", map.szBackgroundFile);
 }
 
 void MapReader1700::set_preview_switches(CMap& map, BinaryFile& mapfile)
