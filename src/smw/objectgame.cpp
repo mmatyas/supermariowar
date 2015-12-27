@@ -31,11 +31,9 @@ extern CObjectContainer objectcontainer[3];
 extern CGM_Pipe_MiniGame * pipegamemode;
 
 extern CPlayer* list_players[4];
-extern short list_players_cnt;
 extern short score_cnt;
 
 extern CMap* g_map;
-extern CTilesetManager* g_tilesetmanager;
 extern CEyecandyContainer eyecandy[3];
 
 extern CGameValues game_values;
@@ -4700,7 +4698,6 @@ MO_SledgeBrother::MO_SledgeBrother(gfxSprite *nspr, short platformY, short type)
     last_action_count = 0;
 }
 
-extern short iSledgeBrotherAttribute;
 void MO_SledgeBrother::draw()
 {
     spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, leg_offset_x + arm_offset_x + (face_right ? 0 : 192), hit_offset_y, iw, ih);

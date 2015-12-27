@@ -32,9 +32,6 @@ extern SDL_Surface* blitdest;
 
 extern bool g_fLoadMessages;
 
-extern bool gfx_createmenuskin(gfxSprite ** gSprites, const std::string& filename, Uint8 r, Uint8 g, Uint8 b, short colorScheme, bool fLoadBothDirections);
-extern bool gfx_createfullskin(gfxSprite ** gSprites, const std::string& filename, Uint8 r, Uint8 g, Uint8 b, short colorScheme);
-
 extern CEyecandyContainer eyecandy[3];
 
 extern MapList *maplist;

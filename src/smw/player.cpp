@@ -35,6 +35,9 @@ extern short list_players_cnt;
 extern CGameValues game_values;
 extern CResourceManager* rm;
 
+extern short x_shake;
+extern short y_shake;
+
 
 void CScore::AdjustScore(short iValue)
 {

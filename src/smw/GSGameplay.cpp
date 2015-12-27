@@ -43,6 +43,9 @@ extern MusicList *musiclist;
 extern CGameValues game_values;
 extern CResourceManager* rm;
 
+extern short x_shake;
+extern short y_shake;
+
 CObjectContainer noncolcontainer;
 CObjectContainer objectcontainer[3];
 

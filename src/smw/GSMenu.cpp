@@ -49,8 +49,6 @@ extern bool	g_fAutoTest;
 extern bool g_fRecordTest;
 #endif
 
-extern int g_iVersion[];
-
 extern void SetGameModeSettingsFromMenu();
 extern void LoadMapObjects(bool fPreview);
 extern bool LoadGameSounds();
@@ -58,9 +56,6 @@ extern bool LoadGameSounds();
 extern void UpdateScoreBoard();
 
 extern short LookupTeamID(short id);
-
-extern const char * g_szAutoFilterNames[NUM_AUTO_FILTERS];
-extern short g_iAutoFilterIcons[NUM_AUTO_FILTERS];
 
 extern void ResetTourStops();
 extern WorldMap g_worldmap;
@@ -99,8 +94,6 @@ extern GraphicsList *gamegraphicspacklist;
 extern SoundsList *soundpacklist;
 extern TourList *tourlist;
 extern WorldList *worldlist;
-
-extern short g_iCurrentPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
 
 MenuState& MenuState::instance()
 {

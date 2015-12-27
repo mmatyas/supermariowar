@@ -34,6 +34,9 @@
 #include "SDL.h"
 #include "sdl12wrapper.h"
 
+extern short x_shake;
+extern short y_shake;
+
 static Uint32 GetPixel(SDL_Surface *Surface, Sint32 X, Sint32 Y)
 {
    Uint8  *bits;

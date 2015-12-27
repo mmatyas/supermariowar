@@ -1,19 +1,11 @@
 #include "MI_MapField.h"
 
-#include "GameValues.h"
-#include "map.h"
 #include "MapList.h"
 #include "objecthazard.h"
 #include "ResourceManager.h"
 
-extern CMap* g_map;
 extern MapList *maplist;
-
-extern CGameValues game_values;
 extern CResourceManager* rm;
-
-extern SDL_Surface* blitdest;
-extern CObjectContainer noncolcontainer;
 extern CObjectContainer objectcontainer[3];
 
 /**************************************
