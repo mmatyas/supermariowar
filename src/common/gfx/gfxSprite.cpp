@@ -41,6 +41,17 @@ void gfxSprite::clearSurface()
     fWrap = false;
 }
 
+void gfxSprite::freeSurface()
+{
+    if (m_picture) {
+        SDL_FreeSurface(m_picture);
+        m_picture = NULL;
+    }
+}
+
+//
+// Color keyed without alpha
+//
 bool gfxSprite::init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b, bool fUseAccel)
 {
     cout << "loading sprite (mode 1) " << filename << "...";
@@ -86,6 +97,9 @@ bool gfxSprite::init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b, boo
     return true;
 }
 
+//
+// Color keyed + alpha
+//
 bool gfxSprite::init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b, Uint8 a, bool fUseAccel)
 {
     cout << "Loading sprite (mode 2) " << filename << " ...";
@@ -137,6 +151,9 @@ bool gfxSprite::init(const std::string& filename, Uint8 r, Uint8 g, Uint8 b, Uin
     return true;
 }
 
+//
+// Non color keyed
+//
 bool gfxSprite::init(const std::string& filename)
 {
     cout << "loading sprite (mode 3) " << filename << "...";
@@ -185,6 +202,8 @@ bool gfxSprite::init(const std::string& filename)
 
 bool gfxSprite::draw(short x, short y)
 {
+    assert(m_picture != NULL);
+
     m_bltrect.x = x + x_shake;
     m_bltrect.y = y + y_shake;
 
@@ -219,6 +238,8 @@ bool gfxSprite::draw(short x, short y)
 //TODO Perf Optimization: Set w/h once when sprite is initialized, set srcx/srcy just when animation frame advance happens
 bool gfxSprite::draw(short x, short y, short srcx, short srcy, short w, short h, short sHiddenDirection, short sHiddenValue)
 {
+    assert(m_picture != NULL);
+
     m_bltrect.x = x + x_shake;
     m_bltrect.y = y + y_shake;
     m_bltrect.w = w;
@@ -275,6 +296,8 @@ bool gfxSprite::draw(short x, short y, short srcx, short srcy, short w, short h,
 
 bool gfxSprite::drawStretch(short x, short y, short w, short h, short srcx, short srcy, short srcw, short srch)
 {
+    assert(m_picture != NULL);
+
     m_bltrect.x = x + x_shake;
     m_bltrect.y = y + y_shake;
     m_bltrect.w = w;
@@ -304,10 +327,37 @@ void gfxSprite::setalpha(Uint8 alpha)
     }
 }
 
-void gfxSprite::freeSurface()
+int gfxSprite::getWidth()
 {
-    if (m_picture) {
-        SDL_FreeSurface(m_picture);
-        m_picture = NULL;
-    }
+    return m_picture->w;
+}
+int gfxSprite::getHeight()
+{
+    return m_picture->h;
+}
+
+SDL_Surface* gfxSprite::getSurface()
+{
+    return m_picture;
+}
+
+void gfxSprite::setSurface(SDL_Surface * surface)
+{
+    freeSurface();
+    m_picture = surface;
+    m_bltrect.w = (Uint16)m_picture->w;
+    m_bltrect.h = (Uint16)m_picture->h;
+}
+
+bool gfxSprite::GetWrap() {
+    return fWrap;
+}
+
+void gfxSprite::SetWrap(bool wrap) {
+    fWrap = wrap;
+}
+
+void gfxSprite::SetWrap(bool wrap, short wrapsize) {
+    fWrap = wrap;
+    iWrapSize = wrapsize;
 }
