@@ -11,6 +11,7 @@ add_library ( CommonFiles
     gfx/gfxPalette.cpp
     gfx/gfxSDL.cpp
     gfx/gfxSprite.cpp
+    gfx/SFont.c
     global.cpp
     input.cpp
     linfunc.cpp
@@ -25,7 +26,6 @@ add_library ( CommonFiles
     path.cpp
     RandomNumberGenerator.cpp
     ResourceManager.cpp
-    SFont.c
     sfx.cpp
     TilesetManager.cpp
     ui/MI_MapPreview.cpp
