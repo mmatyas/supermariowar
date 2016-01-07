@@ -11,6 +11,8 @@
 #include <map>
 #include <string>
 
+#define NUMBONUSITEMSONWHEEL    10
+
 class UI_Menu;
 class SimpleFileList;
 class MapListNode;

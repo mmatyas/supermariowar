@@ -20,6 +20,8 @@
 #include <cmath>
 #include <cassert>
 
+#define COUNTDOWN_START_INDEX 4
+
 extern SDL_Surface* screen;
 extern SDL_Surface* blitdest;
 

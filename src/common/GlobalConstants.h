@@ -120,8 +120,6 @@
 #define MAXOBJECTS  300
 #define CORPSESTAY  200
 
-#define MENUSPACING 36
-
 #define WAITTIME        16      //delay between frames (default:16)
 #define MAXAWARDS       10
 #define MINAWARDSNEEDED 3
@@ -131,8 +129,6 @@
 
 #define MAXRACEGOALS        8
 
-#define NUMBONUSITEMSONWHEEL    10
-
 #define ABS(x) (x>0?x:-x)
 
 #define TWO_PI              6.2831853f
@@ -141,36 +137,6 @@
 #define THREE_QUARTER_PI    2.3561945f
 #define HALF_PI             1.5707963f
 #define QUARTER_PI          0.7853982f
-
-#define DEVICE_KEYBOARD     -1
-
-#define JOYSTICK_DEAD_ZONE  16384
-#define MOUSE_X_DEAD_ZONE   0
-#define MOUSE_Y_DEAD_ZONE   5
-
-#define MOUSE_UP            323
-#define MOUSE_DOWN          324
-#define MOUSE_LEFT          325
-#define MOUSE_RIGHT         326
-#define MOUSE_BUTTON_START  327
-
-#define JOY_STICK_1_UP      0
-#define JOY_STICK_1_DOWN    1
-#define JOY_STICK_1_LEFT    2
-#define JOY_STICK_1_RIGHT   3
-
-#define JOY_STICK_2_UP      4
-#define JOY_STICK_2_DOWN    5
-#define JOY_STICK_2_LEFT    6
-#define JOY_STICK_2_RIGHT   7
-
-#define JOY_HAT_UP          8
-#define JOY_HAT_DOWN        9
-#define JOY_HAT_LEFT        10
-#define JOY_HAT_RIGHT       11
-#define JOY_BUTTON_START    12
-
-#define KEY_NONE            -1
 
 #define MENU_ITEM_NEIGHBOR_UP       0
 #define MENU_ITEM_NEIGHBOR_DOWN     1
@@ -196,21 +162,6 @@
 #define NO_POWERUP          -10
 
 #define NUM_AUTO_FILTERS 12
-
-#define WORLD_FOREGROUND_STAGE_OFFSET           200
-#define WORLD_WINNING_TEAM_SPRITE_OFFSET        600
-#define WORLD_BRIDGE_SPRITE_OFFSET              604
-#define WORLD_START_SPRITE_OFFSET               608
-#define WORLD_FOREGROUND_SPRITE_OFFSET          700
-#define WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET 900
-
-#define WORLD_BACKGROUND_SPRITE_SET_SIZE    60
-#define WORLD_PATH_SPRITE_SET_SIZE          20
-
-#define NUM_FRAMES_IN_TILE_ANIMATION        4
-#define NUM_FRAMES_BETWEEN_TILE_ANIMATION   8
-
-#define COUNTDOWN_START_INDEX 4
 
 #define NUMSTOMPENEMIES     9
 #define NUMSURVIVALENEMIES  3

@@ -11,13 +11,44 @@
 //and then to use all the player input, just call
 //CPlayerInput.outputControls.{key}.{presstype} to get the key state you want
 
-#define NUM_KEYS 8
-
 #ifdef USE_SDL2
     #define SDL_KEYTYPE SDL_Keycode
 #else
     #define SDL_KEYTYPE short
 #endif
+
+#define NUM_KEYS 8
+
+#define DEVICE_KEYBOARD     -1
+
+#define JOYSTICK_DEAD_ZONE  16384
+#define MOUSE_X_DEAD_ZONE   0
+#define MOUSE_Y_DEAD_ZONE   5
+
+#define MOUSE_UP            323
+#define MOUSE_DOWN          324
+#define MOUSE_LEFT          325
+#define MOUSE_RIGHT         326
+#define MOUSE_BUTTON_START  327
+
+#define JOY_STICK_1_UP      0
+#define JOY_STICK_1_DOWN    1
+#define JOY_STICK_1_LEFT    2
+#define JOY_STICK_1_RIGHT   3
+
+#define JOY_STICK_2_UP      4
+#define JOY_STICK_2_DOWN    5
+#define JOY_STICK_2_LEFT    6
+#define JOY_STICK_2_RIGHT   7
+
+#define JOY_HAT_UP          8
+#define JOY_HAT_DOWN        9
+#define JOY_HAT_LEFT        10
+#define JOY_HAT_RIGHT       11
+#define JOY_BUTTON_START    12
+
+#define KEY_NONE            -1
+
 
 struct CKeyState {
 	bool fDown;

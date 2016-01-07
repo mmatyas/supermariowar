@@ -9,6 +9,9 @@
 #include <list>
 #include <vector>
 
+#define NUM_FRAMES_IN_TILE_ANIMATION        4
+#define NUM_FRAMES_BETWEEN_TILE_ANIMATION   8
+
 enum TileType{tile_nonsolid = 0, tile_solid = 1, tile_solid_on_top = 2, tile_ice = 3, tile_death = 4, tile_death_on_top = 5, tile_death_on_bottom = 6, tile_death_on_left = 7, tile_death_on_right = 8, tile_ice_on_top = 9, tile_ice_death_on_bottom = 10, tile_ice_death_on_left = 11, tile_ice_death_on_right = 12, tile_super_death = 13, tile_super_death_top = 14, tile_super_death_bottom = 15, tile_super_death_left = 16, tile_super_death_right = 17, tile_player_death = 18, tile_gap = 19};
 enum ReadType: uint8_t {read_type_full = 0, read_type_preview = 1, read_type_summary = 2};
 
