@@ -2,6 +2,7 @@
 
 #include "GameMode.h"
 #include "GameValues.h"
+#include "gfx.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
 #include "FileList.h"
@@ -11,11 +12,6 @@
 
 #include <map>
 #include <queue>
-
-// this function was added to SDL2
-#ifndef USE_SDL2
-    #include "savepng.h"
-#endif
 
 #if defined(__MACOSX__)
 #include <sys/stat.h>

@@ -2,11 +2,13 @@
 #define SMW_MAP_H
 
 #include "GlobalConstants.h"
-#include "gfx.h"
-#include "map/MapReader.h"
 
 #include "SDL.h"
+
+#include "gfx.h"
+
 #include <list>
+#include <string>
 #include <vector>
 
 #define NUM_FRAMES_IN_TILE_ANIMATION        4

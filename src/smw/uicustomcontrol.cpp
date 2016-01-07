@@ -7,7 +7,6 @@
 #include "GameMode.h"
 #include "gamemodes.h"
 #include "GameValues.h"
-#include "GSMenu.h"
 #include "map.h"
 #include "MapList.h"
 #include "RandomNumberGenerator.h"

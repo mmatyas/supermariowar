@@ -5,7 +5,6 @@
 #include "network/NetworkLayer.h"
 #include "ProtocolDefinitions.h"
 
-#include <list>
 #include <string>
 #include <vector>
 

@@ -2,7 +2,7 @@
 
 #include "GameValues.h"
 #include "player.h"
-#include "PlayerKillTypes.h"
+#include "PlayerKillStyles.h"
 #include "ResourceManager.h"
 
 extern CGameValues game_values;

@@ -3,8 +3,6 @@
 
 #include "FileIO.h"
 
-#include <cstdio>
-
 class CMap;
 class MovingPlatformPath;
 struct TilesetTile;

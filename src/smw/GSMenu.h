@@ -5,40 +5,42 @@
 
 #include "GameState.h"
 
-#include "menu/BonusWheelMenu.h"
-#include "menu/GameSettingsMenu.h"
-#include "menu/MainMenu.h"
-#include "menu/MapFilterEditMenu.h"
-#include "menu/MatchSelectionMenu.h"
-#include "menu/ModeOptionsMenu.h"
-#include "menu/OptionsMenu.h"
-#include "menu/PlayerControlsMenu.h"
-#include "menu/PlayerControlsSelectMenu.h"
-#include "menu/TeamSelectMenu.h"
-#include "menu/TournamentScoreboardMenu.h"
-#include "menu/TourStopMenu.h"
-#include "menu/WorldMenu.h"
+class UI_BonusWheelMenu;
+class UI_GameSettingsMenu;
+class UI_MainMenu;
+class UI_MapFilterEditMenu;
+class UI_MatchSelectionMenu;
+class UI_ModeOptionsMenu;
+class UI_OptionsMenu;
+class UI_PlayerControlsMenu;
+class UI_PlayerControlsSelectMenu;
+class UI_TeamSelectMenu;
+class UI_TournamentScoreboardMenu;
+class UI_TourStopMenu;
+class UI_WorldMenu;
 
-#include "menu/options/EyeCandyOptionsMenu.h"
-#include "menu/options/GameplayOptionsMenu.h"
-#include "menu/options/GraphicsOptionsMenu.h"
-#include "menu/options/PowerupDropRatesMenu.h"
-#include "menu/options/PowerupSettingsMenu.h"
-#include "menu/options/ProjectileLimitsMenu.h"
-#include "menu/options/ProjectileOptionsMenu.h"
-#include "menu/options/SoundOptionsMenu.h"
-#include "menu/options/TeamOptionsMenu.h"
+class UI_EyeCandyOptionsMenu;
+class UI_GameplayOptionsMenu;
+class UI_GraphicsOptionsMenu;
+class UI_PowerupDropRatesMenu;
+class UI_PowerupSettingsMenu;
+class UI_ProjectileLimitsMenu;
+class UI_ProjectileOptionsMenu;
+class UI_SoundOptionsMenu;
+class UI_TeamOptionsMenu;
 
-#include "menu/network/NetLobbyMenu.h"
-#include "menu/network/NetNewLevelMenu.h"
-#include "menu/network/NetNewRoomMenu.h"
-#include "menu/network/NetRoomMenu.h"
-#include "menu/network/NetServersMenu.h"
+class UI_NetLobbyMenu;
+class UI_NetNewLevelMenu;
+class UI_NetNewRoomMenu;
+class UI_NetRoomMenu;
+class UI_NetServersMenu;
 
 #ifdef _XBOX
-#include "menu/xbox/ScreenResizeMenu.h"
-#include "menu/xbox/ScreenSettingsMenu.h"
+class UI_ScreenResizeMenu;
+class UI_ScreenSettingsMenu;
 #endif
+
+
 
 #ifdef _DEBUG
 class ScriptOperation

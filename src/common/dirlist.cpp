@@ -19,8 +19,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "dirlist.h"
 
-#include "path.h"
-
 #include <string>
 #include <sys/stat.h>
 #include <sys/types.h>

@@ -6,15 +6,12 @@
 #include "GameValues.h"
 #include "map.h"
 #include "movingplatform.h"
-#include "object.h"
 #include "ObjectContainer.h"
 #include "objecthazard.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"
-#include "TilesetManager.h"
 
 #include <cstdlib> // abs()
-#include <cstring>
 #include <cmath>
 
 extern short iKingOfTheHillZoneLimits[4][4];

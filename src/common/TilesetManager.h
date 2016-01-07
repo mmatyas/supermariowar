@@ -2,7 +2,7 @@
 #define TILESETMANAGER_H
 
 #include "FileList.h"
-#include "gfx.h"
+#include "gfx/gfxSprite.h"
 #include "map.h"
 
 #include "SDL.h"

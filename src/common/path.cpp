@@ -1,7 +1,6 @@
 #include "path.h"
 
 #include <cstring>
-#include <iostream>
 #include <string>
 #include <sys/stat.h>
 
@@ -69,6 +68,7 @@ bool File_Exists (const std::string fileName)
   Mac OS X Application Bundles                              *********/
 
 #ifdef __MACOSX__
+#include <iostream>
 #include <CoreFoundation/CoreFoundation.h>
 
 

@@ -2,7 +2,7 @@
 
 #include "eyecandy.h"
 #include "GameValues.h"
-#include "gfx.h"
+#include "gfx/gfxFont.h"
 #include "object.h"
 #include "ObjectContainer.h"
 #include "objectgame.h"

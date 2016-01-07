@@ -2,10 +2,10 @@
 
 #include "IO_Block.h"
 #include "GameValues.h"
-#include "gfx.h"
 #include "GlobalConstants.h"
 #include "Game.h"
 #include "FileIO.h"
+#include "map/MapReader.h"
 #include "movingplatform.h"
 #include "RandomNumberGenerator.h"
 #include "ResourceManager.h"

@@ -1,9 +1,6 @@
 #include "NetPeerENet.h"
 
-#include "ProtocolDefinitions.h"
-
 #include <cassert>
-#include <cstdio>
 #include <sstream>
 
 #define CONNECTION_TIMEOUT_MS 5000

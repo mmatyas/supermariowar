@@ -5,8 +5,6 @@
 #include <cstdlib>
 #include <ctime>
 
-#include <cstdio>
-
 //
 // ABSTRACT RNG CLASS
 //

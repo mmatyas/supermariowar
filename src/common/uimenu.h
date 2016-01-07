@@ -3,7 +3,6 @@
 
 #include "eyecandy.h"
 
-#include <vector>
 #include <list>
 
 class UI_Control;

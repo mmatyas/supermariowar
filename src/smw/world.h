@@ -15,8 +15,6 @@
 #define WORLD_FOREGROUND_SPRITE_OFFSET          700
 #define WORLD_FOREGROUND_SPRITE_ANIMATED_OFFSET 900
 
-class MI_World;
-
 struct WorldMapTile {
 	//Id is used for searching for AI
 	short iID;

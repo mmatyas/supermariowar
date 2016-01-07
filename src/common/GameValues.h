@@ -13,8 +13,6 @@
 #define ifsoundonpause(x) (game_values.sound ? x.sfx_pause() : void(NULL))
 #define ifmusiconplay(x) (game_values.music ? x.play() : -1)
 
-struct GameModeSettings;
-class FiltersList;
 class CGameMode;
 
 enum CurrentGameState {

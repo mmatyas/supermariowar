@@ -1,7 +1,7 @@
 #ifndef OBJECT_BASE_H
 #define OBJECT_BASE_H
 
-#include "gfx.h"
+#include "gfx/gfxSprite.h"
 
 class CPlayer;
 class IO_Block;

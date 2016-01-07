@@ -3,11 +3,11 @@
 #include "GlobalConstants.h"
 #include "GameMode.h"
 #include "GameValues.h"
-#include "GSMenu.h"
 #include "FileList.h"
 #include "path.h"
 #include "player.h"
 #include "RandomNumberGenerator.h"
+#include "ui/NetworkListScroll.h"
 
 #include "network/FileCompressor.h"
 #include "network/ProtocolGamePackages.h"

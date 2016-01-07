@@ -1,7 +1,6 @@
 #include "MI_MapField.h"
 
 #include "MapList.h"
-#include "objecthazard.h"
 #include "ResourceManager.h"
 
 extern MapList *maplist;

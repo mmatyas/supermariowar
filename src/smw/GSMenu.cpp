@@ -1,6 +1,5 @@
 #include "GSMenu.h"
 
-#include "FileIO.h"
 #include "FileList.h"
 #include "Game.h"
 #include "GameValues.h"
@@ -12,7 +11,41 @@
 #include "ResourceManager.h"
 #include "Score.h"
 
-#include <cmath>
+#include "menu/BonusWheelMenu.h"
+#include "menu/GameSettingsMenu.h"
+#include "menu/MainMenu.h"
+#include "menu/MapFilterEditMenu.h"
+#include "menu/MatchSelectionMenu.h"
+#include "menu/ModeOptionsMenu.h"
+#include "menu/OptionsMenu.h"
+#include "menu/PlayerControlsMenu.h"
+#include "menu/PlayerControlsSelectMenu.h"
+#include "menu/TeamSelectMenu.h"
+#include "menu/TournamentScoreboardMenu.h"
+#include "menu/TourStopMenu.h"
+#include "menu/WorldMenu.h"
+
+#include "menu/options/EyeCandyOptionsMenu.h"
+#include "menu/options/GameplayOptionsMenu.h"
+#include "menu/options/GraphicsOptionsMenu.h"
+#include "menu/options/PowerupDropRatesMenu.h"
+#include "menu/options/PowerupSettingsMenu.h"
+#include "menu/options/ProjectileLimitsMenu.h"
+#include "menu/options/ProjectileOptionsMenu.h"
+#include "menu/options/SoundOptionsMenu.h"
+#include "menu/options/TeamOptionsMenu.h"
+
+#include "menu/network/NetLobbyMenu.h"
+#include "menu/network/NetNewLevelMenu.h"
+#include "menu/network/NetNewRoomMenu.h"
+#include "menu/network/NetRoomMenu.h"
+#include "menu/network/NetServersMenu.h"
+
+#ifdef _XBOX
+#include "menu/xbox/ScreenResizeMenu.h"
+#include "menu/xbox/ScreenSettingsMenu.h"
+#endif
+
 #include <cstdlib> // atoi()
 #include <cassert>
 #include <sstream>

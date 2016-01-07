@@ -1,13 +1,10 @@
 #include "gfx.h"
 
+#include "gfx/gfxSDL.h"
+
 #include "SDL_image.h"
 #include "sdl12wrapper.h"
 
-#include "FileList.h"
-#include "gfx/gfxSDL.h"
-#include "path.h"
-
-#include <cassert>
 #include <iostream>
 #include <string>
 

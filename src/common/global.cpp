@@ -1,6 +1,3 @@
-//#include "global.h"
-
-#include "FileIO.h"
 #include "FileList.h"
 #include "GameValues.h"
 #include "Game.h"
@@ -10,9 +7,6 @@
 #include "MovingObjectTypes.h"
 #include "ResourceManager.h"
 #include "TilesetManager.h"
-
-#include <cassert>
-#include <cmath>
 
 //1.8.0.0 == Release to staff
 //1.8.0.1 == Second release to staff

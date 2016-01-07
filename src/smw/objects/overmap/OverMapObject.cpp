@@ -1,6 +1,6 @@
 #include "OverMapObject.h"
 
-#include "player.h"
+#include "gfx.h"
 
 //------------------------------------------------------------------------------
 // class OverMapObject - moving objects that don't collide with map or objects, just player

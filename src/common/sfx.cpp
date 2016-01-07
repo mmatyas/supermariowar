@@ -1,5 +1,7 @@
 #include "sfx.h"
 
+#include "SDL.h"
+
 #include <iostream>
 #include <string>
 

@@ -1,7 +1,8 @@
 #ifndef RESOURCE_MANAGER_H
 #define RESOURCE_MANAGER_H
 
-#include "gfx.h"
+#include "gfx/gfxFont.h"
+#include "gfx/gfxSprite.h"
 #include "GlobalConstants.h"
 #include "sfx.h"
 

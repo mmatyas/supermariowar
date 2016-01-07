@@ -1,6 +1,6 @@
 #include "IO_Block.h"
 
-#include "gamemodes.h"
+#include "GameMode.h"
 #include "GameValues.h"
 #include "map.h"
 #include "ObjectContainer.h"
