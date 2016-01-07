@@ -3,9 +3,7 @@
 #include "SDL_endian.h"
 
 #include <cassert>
-#include <cstdio>
 #include <stdexcept>
-#include <stdint.h>
 
 BinaryFile::BinaryFile(const char* filename, const char* options)
     : fp(NULL)
@@ -21,18 +19,14 @@ BinaryFile::~BinaryFile()
 
 void BinaryFile::fread_or_exception(void* ptr, size_t size, size_t count)
 {
-    if (fread(ptr, size, count, fp) != count) {
-        perror("File read error");
+    if (fread(ptr, size, count, fp) != count)
         throw std::runtime_error("File read error");
-    }
 }
 
 void BinaryFile::fwrite_or_exception(const void* ptr, size_t size, size_t count)
 {
-    if (fwrite(ptr, size, count, fp) != count) {
-        perror("File write error");
+    if (fwrite(ptr, size, count, fp) != count)
         throw std::runtime_error("File write error");
-    }
 }
 
 bool BinaryFile::is_open()
@@ -129,9 +123,9 @@ void BinaryFile::write_string_long(const char* string)
     fwrite_or_exception(string, sizeof(char), len);
 }
 
-void BinaryFile::write_raw(void* target, size_t size)
+void BinaryFile::write_raw(const void* source, size_t size)
 {
-    fwrite_or_exception(target, size, 1);
+    fwrite_or_exception(source, size, 1);
 }
 
 uint8_t BinaryFile::read_u8()

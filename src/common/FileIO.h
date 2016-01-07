@@ -1,7 +1,7 @@
 #ifndef FILEIO_H
 #define FILEIO_H
 
-#include <stdio.h> // size_t
+#include <stdio.h>
 #include <stdint.h>
 
 class BinaryFile {
@@ -20,7 +20,7 @@ public:
     void write_float(float);
     void write_string(const char*);
     void write_string_long(const char*);
-    void write_raw(void*, size_t);
+    void write_raw(const void*, size_t);
 
     int8_t read_i8();
     uint8_t read_u8();

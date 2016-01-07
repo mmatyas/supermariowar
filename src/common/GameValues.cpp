@@ -441,9 +441,9 @@ void CGameValues::ReadBinaryConfig() {
         sfx_setmusicvolume(musicvolume);
         sfx_setsoundvolume(soundvolume);
     }
-    catch (char* errormsg)
+    catch (std::exception const& error)
     {
-        perror(errormsg);
+        perror(error.what());
     }
 }
 
@@ -562,9 +562,9 @@ void CGameValues::WriteConfig()
         options.write_u8(worldgraphicspacklist->GetCurrentIndex());
         options.write_u8(gamegraphicspacklist->GetCurrentIndex());
     }
-    catch (char* errormsg)
+    catch (std::exception const& error)
     {
-        perror(errormsg);
+        perror(error.what());
     }
 
     maplist->WriteFilters();
