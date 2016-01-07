@@ -54,7 +54,7 @@ LIST(APPEND SMW_SRCS
 )
 
 LIST(APPEND SMW_SRCS
-	ui_elements/NetworkListScroll.cpp
+	ui/NetworkListScroll.cpp
 )
 
 #
