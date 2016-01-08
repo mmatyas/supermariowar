@@ -2,7 +2,11 @@
 #define MENU_PROJECTILELIMITS_H
 
 #include "uimenu.h"
-#include "uicontrol.h"
+
+class MI_Button;
+class MI_Image;
+class MI_SelectField;
+class MI_Text;
 
 /*
     You can set the maximum number of uses of certain

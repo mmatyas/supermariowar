@@ -1,13 +1,17 @@
 #ifndef MENU_TEAMOPTIONS_H
 #define MENU_TEAMOPTIONS_H
 
-#include "uimenu.h"
-#include "uicontrol.h"
-
 /*
     In this menu, you can set team-relates preferences,
     such as friendly collision or team color drawing.
 */
+
+#include "uimenu.h"
+
+class MI_Button;
+class MI_Image;
+class MI_SelectField;
+class MI_Text;
 
 class UI_TeamOptionsMenu : public UI_Menu
 {

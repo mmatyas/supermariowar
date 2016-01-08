@@ -1,12 +1,16 @@
 #ifndef MENU_PROJECTILEOPTIONS_H
 #define MENU_PROJECTILEOPTIONS_H
 
-#include "uimenu.h"
-#include "uicontrol.h"
-
 /*
-    Description.
+    TODO: Description.
 */
+
+#include "uimenu.h"
+
+class MI_Button;
+class MI_Image;
+class MI_SelectField;
+class MI_Text;
 
 class UI_ProjectileOptionsMenu : public UI_Menu
 {

@@ -1,5 +1,8 @@
 #include "ProjectileLimitsMenu.h"
 
+#include "uicontrol.h"
+#include "ui/MI_SelectField.h"
+
 #include "GameValues.h"
 #include "ResourceManager.h"
 

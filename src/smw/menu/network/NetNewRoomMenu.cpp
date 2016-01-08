@@ -1,5 +1,8 @@
 #include "NetNewRoomMenu.h"
 
+#include "uicontrol.h"
+#include "ui/MI_SelectField.h"
+
 #include "net.h"
 #include "ResourceManager.h"
 

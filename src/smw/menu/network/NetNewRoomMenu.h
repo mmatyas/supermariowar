@@ -1,12 +1,17 @@
 #ifndef MENU_NETNEWROOM_H
 #define MENU_NETNEWROOM_H
 
-#include "uimenu.h"
-#include "uicontrol.h"
-
 /*
-    Description.
+    TODO: Description.
 */
+
+#include "uimenu.h"
+
+class MI_Button;
+class MI_Image;
+class MI_SelectField;
+class MI_Text;
+class MI_TextField;
 
 class UI_NetNewRoomMenu : public UI_Menu
 {

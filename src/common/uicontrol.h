@@ -381,6 +381,4 @@ protected:
     char szDisallowedChars[32];
 };
 
-#include "ui/MI_SelectField.h"
-
 #endif // UICONTROL_H
