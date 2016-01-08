@@ -16,6 +16,8 @@ add_executable (smw-worldedit
 	../common/uicontrol.cpp
 	../common/ui/MI_MapPreview.cpp
 	../common/ui/MI_MapField.cpp
+	../smw/ui/MI_PowerupSlider.cpp
+	../smw/ui/MI_FrenzyModeOptions.cpp
 	../common/uimenu.cpp
 	${WORLDEDIT_SRCS}
 )

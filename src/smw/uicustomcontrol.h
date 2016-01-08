@@ -4,6 +4,8 @@
 #include "input.h"
 #include "uicontrol.h"
 #include "ui/MI_MapField.h"
+#include "ui/MI_PowerupSlider.h"
+#include "ui/MI_ImageSelectField.h"
 #include "ui/NetworkListScroll.h"
 #include "uimenu.h"
 #include "world.h"

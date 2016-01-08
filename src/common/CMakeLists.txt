@@ -30,4 +30,7 @@ add_library ( CommonFiles
     TilesetManager.cpp
     ui/MI_MapPreview.cpp
     ui/MI_MapField.cpp
+    ui/MI_SelectField.cpp
+    ui/MI_ImageSelectField.cpp
+    ui/MI_SliderField.cpp
 )

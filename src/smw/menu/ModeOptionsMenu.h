@@ -3,6 +3,8 @@
 
 #include "uimenu.h"
 #include "uicontrol.h"
+#include "ui/MI_PowerupSlider.h"
+#include "ui/MI_FrenzyModeOptions.h"
 
 class UI_ModeOptionsMenu: public UI_Menu
 {
