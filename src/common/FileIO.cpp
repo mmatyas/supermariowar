@@ -242,7 +242,7 @@ void BinaryFile::read_string(char* target, size_t size)
     assert(size > 0);
 
     uint8_t len = read_u8();
-    if (len == 0) {
+    if (len <= 0) {
         target[0] = '\0';
         return;
     }
@@ -266,7 +266,7 @@ void BinaryFile::read_string_long(char* target, size_t size)
     assert(size > 0);
 
     int len = read_i32();
-    if (len == 0) {
+    if (len <= 0) {
         target[0] = '\0';
         return;
     }

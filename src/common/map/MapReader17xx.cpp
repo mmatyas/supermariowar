@@ -5,6 +5,7 @@
 #include "FileIO.h"
 #include "TilesetManager.h"
 
+#include <cassert>
 #include <iostream>
 
 extern CTilesetManager* g_tilesetmanager;
@@ -92,10 +93,13 @@ void MapReader1701::read_background(CMap& map, BinaryFile& mapfile)
     for (short iBackground = 0; iBackground < 26; iBackground++) {
         const char * szFindUnderscore = strstr(g_szBackgroundConversion[iBackground], "_");
 
-        if (szFindUnderscore)
-            szFindUnderscore++;
+        // All items must have an underscore in g_szBackgroundConversion
+        assert(szFindUnderscore);
+
+        szFindUnderscore++;
 
         if (!strcmp(szFindUnderscore, map.szBackgroundFile)) {
+            assert(strlen(g_szBackgroundConversion[iBackground]) <= 128);
             strcpy(map.szBackgroundFile, g_szBackgroundConversion[iBackground]);
         }
     }

@@ -48,7 +48,7 @@ void MapReader1800::read_tileset(BinaryFile& mapfile)
 {
     //Load tileset information
 
-    short iNumTilesets = mapfile.read_i32();
+    short iNumTilesets = (short)mapfile.read_i32();
 
     TilesetTranslation * translation = new TilesetTranslation[iNumTilesets];
 
@@ -288,7 +288,7 @@ void MapReader1800::read_platforms(CMap& map, BinaryFile& mapfile, bool fPreview
 
         short iDrawLayer = 2;
         if (patch_version >= 1)
-            iDrawLayer = mapfile.read_i32();
+            iDrawLayer = (short)mapfile.read_i32();
 
         //printf("Layer: %d\n", iDrawLayer);
 
