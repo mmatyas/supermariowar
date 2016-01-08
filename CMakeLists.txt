@@ -146,15 +146,6 @@ if (NOT TARGET_EMSCRIPTEN)
 	endif()
 endif()
 
-if(NOT NO_NETWORK)
-	if (BUILD_STATIC_LIBS)
-		include_directories(dependencies/enet/include)
-		add_subdirectory(dependencies/enet)
-	else()
-		find_package(ENet REQUIRED)
-	endif()
-endif()
-
 # the optional libpng package
 if(USE_PNG_SAVE)
 	find_package(PNG REQUIRED)
@@ -164,6 +155,12 @@ if(USE_PNG_SAVE)
 endif()
 
 if (BUILD_STATIC_LIBS)
+	# Use ENet for networking
+	if(NOT NO_NETWORK)
+		include_directories(dependencies/enet/include)
+		add_subdirectory(dependencies/enet)
+	endif()
+
 	# Use YAML for game config files
 	include_directories(dependencies/yaml-cpp-noboost/include)
 	set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "YAML: Build testing and parse tools" FORCE)
@@ -175,6 +172,7 @@ if (BUILD_STATIC_LIBS)
 	set(BUILD_TOOLS OFF CACHE BOOL "LZ4: Build the command line tools" FORCE)
 	add_subdirectory(dependencies/lz4/cmake_unofficial)
 else()
+	find_package(ENet REQUIRED)
 	find_package(yaml-cpp REQUIRED)
 	find_package(liblz4 REQUIRED)
 endif()
