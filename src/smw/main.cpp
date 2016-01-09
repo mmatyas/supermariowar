@@ -160,34 +160,11 @@ void gameloop_frame()
 }
 #endif
 
-
-//*************************************
-//  PROGRAM ENTRY POINT
-//*************************************
-
-
-#ifdef	WIN32
-int CALLBACK WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,int nCmdShow)
+void create_globals()
 {
-#ifdef _MSC_VER
-    // this will print important debugging information to debug console
-    _CrtSetReportMode( _CRT_WARN, _CRTDBG_MODE_DEBUG );
-#endif
-
-    if (strlen(lpCmdLine) > 0)
-        RootDataDirectory = lpCmdLine;
-#else
-// ------ MAIN ------
-int main(int argc, char *argv[])
-{
-    if (argc >= 2)
-        RootDataDirectory = argv[1];
-#endif
-
-
     // this instance will contain the other relevant objects
     smw = new CGame(RootDataDirectory.c_str());
-	rm = new CResourceManager();
+    rm = new CResourceManager();
 #pragma warning ("delete these or use boost GC shared_ptr")
 
     g_map = new CMap();
@@ -213,32 +190,17 @@ int main(int argc, char *argv[])
     worldgraphicspacklist = new GraphicsList();
     gamegraphicspacklist = new GraphicsList();
 
-    printf("-------------------------------------------------------------------------------\n");
-    printf(" %s %s\n", TITLESTRING, VERSIONNUMBER);
-    printf("-------------------------------------------------------------------------------\n");
-    printf("\n---------------- startup ----------------\n");
+    announcerlist->SetCurrent(0);
+    musiclist->SetCurrent(0);
+    worldmusiclist->SetCurrent(0);
+    menugraphicspacklist->SetCurrent(0);
+    worldgraphicspacklist->SetCurrent(0);
+    gamegraphicspacklist->SetCurrent(0);
+    soundpacklist->SetCurrent(0);
+}
 
-	gfx_init(smw->ScreenWidth, smw->ScreenHeight, false);		//initialize the graphics (SDL)
-    blitdest = screen;
-
-#if	0
-    //Comment this in to performance test the preview map loading
-    MI_MapField * miMapField = new MI_MapField(&rm->spr_selectfield, 70, 165, "Map", 500, 120);
-
-    for (int k = 0; k < 100; k++) {
-        game_values.playerInput.outputControls[3].menu_right.fPressed = true;
-        miMapField->SendInput(&game_values.playerInput);
-        //printf("Map over-> %s\n", maplist->currentFilename());
-    }
-
-    return 0;
-#endif
-
-    sfx_init();                     //init the sound system
-    net_init();                     //init the networking
-
-
-    //Joystick-Init
+void init_joysticks()
+{
     SDL_InitSubSystem(SDL_INIT_JOYSTICK);
     joystickcount = (short)SDL_NumJoysticks();
     joysticks = new SDL_Joystick*[joystickcount];
@@ -247,37 +209,10 @@ int main(int argc, char *argv[])
         joysticks[i] = SDL_JoystickOpen(i);
 
     SDL_JoystickEventState(SDL_ENABLE);
+}
 
-    //currently this only sets the title, not the icon.
-    //setting the icon isn't implemented in sdl ->  i'll ask on the mailing list
-    char title[128];
-    sprintf(title, "%s %s", TITLESTRING, VERSIONNUMBER);
-    gfx_settitle(title);
-
-    printf("\n---------------- loading ----------------\n");
-
-    for (short iScore = 0; iScore < 4; iScore++)
-        score[iScore] = new CScore(iScore);
-
-    game_values.init();
-
-    //Set the default powerup weights for bonus wheel and [?] boxes
-    for (short iPreset = 0; iPreset < NUM_POWERUP_PRESETS; iPreset++) {
-        for (short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {
-            g_iCurrentPowerupPresets[iPreset][iPowerup] = g_iDefaultPowerupPresets[iPreset][iPowerup];
-        }
-    }
-
-    UpdateMusicWithOverrides();
-
-    announcerlist->SetCurrent(0);
-    musiclist->SetCurrent(0);
-    worldmusiclist->SetCurrent(0);
-    menugraphicspacklist->SetCurrent(0);
-    worldgraphicspacklist->SetCurrent(0);
-    gamegraphicspacklist->SetCurrent(0);
-    soundpacklist->SetCurrent(0);
-
+void create_gamemodes()
+{
     //set game modes
     gamemodes[0] = new CGM_Classic();
     gamemodes[1] = new CGM_Frag();
@@ -310,26 +245,11 @@ int main(int argc, char *argv[])
     pipegamemode = new CGM_Pipe_MiniGame();
     bossgamemode = new CGM_Boss_MiniGame();
     boxesgamemode = new CGM_Boxes_MiniGame();
+}
 
-    game_values.ReadBinaryConfig();
-
-    //Assign the powerup weights to the selected preset
-    for (short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {
-        game_values.powerupweights[iPowerup] = g_iCurrentPowerupPresets[game_values.poweruppreset][iPowerup];
-    }
-
-#ifdef _XBOX
-    gfx_changefullscreen(false); //Sets flicker filter
-    SDL_SetHardwareFilter(game_values.hardwarefilter);
-    blitdest = screen;
-#else
-    if (game_values.fullscreen) {
-        gfx_changefullscreen(true);
-        blitdest = screen;
-    }
-#endif
-
-    //Calculate the swirl spawn effect locations
+void init_spawnlocations()
+{
+        //Calculate the swirl spawn effect locations
     float spawnradius = 100.0f;
     float spawnangle = 0.0f;
 
@@ -352,6 +272,104 @@ int main(int argc, char *argv[])
         spawnradius -= 4.0f;
         spawnangle += 0.1f;
     }
+}
+
+
+//*************************************
+//  PROGRAM ENTRY POINT
+//*************************************
+
+
+#ifdef	WIN32
+int CALLBACK WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,int nCmdShow)
+{
+#ifdef _MSC_VER
+    // this will print important debugging information to debug console
+    _CrtSetReportMode( _CRT_WARN, _CRTDBG_MODE_DEBUG );
+#endif
+
+    if (strlen(lpCmdLine) > 0)
+        RootDataDirectory = lpCmdLine;
+#else
+// ------ MAIN ------
+int main(int argc, char *argv[])
+{
+    if (argc >= 2)
+        RootDataDirectory = argv[1];
+#endif
+
+
+    create_globals();
+
+    printf("-------------------------------------------------------------------------------\n");
+    printf(" %s %s\n", TITLESTRING, VERSIONNUMBER);
+    printf("-------------------------------------------------------------------------------\n");
+    printf("\n---------------- startup ----------------\n");
+
+	gfx_init(smw->ScreenWidth, smw->ScreenHeight, false);		//initialize the graphics (SDL)
+    blitdest = screen;
+
+#if	0
+    //Comment this in to performance test the preview map loading
+    MI_MapField * miMapField = new MI_MapField(&rm->spr_selectfield, 70, 165, "Map", 500, 120);
+
+    for (int k = 0; k < 100; k++) {
+        game_values.playerInput.outputControls[3].menu_right.fPressed = true;
+        miMapField->SendInput(&game_values.playerInput);
+        //printf("Map over-> %s\n", maplist->currentFilename());
+    }
+
+    return 0;
+#endif
+
+    sfx_init();                     //init the sound system
+    net_init();                     //init the networking
+
+    init_joysticks();
+
+    //currently this only sets the title, not the icon.
+    //setting the icon isn't implemented in sdl ->  i'll ask on the mailing list
+    char title[128];
+    sprintf(title, "%s %s", TITLESTRING, VERSIONNUMBER);
+    gfx_settitle(title);
+
+    printf("\n---------------- loading ----------------\n");
+
+    for (short iScore = 0; iScore < 4; iScore++)
+        score[iScore] = new CScore(iScore);
+
+    game_values.init();
+
+    //Set the default powerup weights for bonus wheel and [?] boxes
+    for (short iPreset = 0; iPreset < NUM_POWERUP_PRESETS; iPreset++) {
+        for (short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {
+            g_iCurrentPowerupPresets[iPreset][iPowerup] = g_iDefaultPowerupPresets[iPreset][iPowerup];
+        }
+    }
+
+    UpdateMusicWithOverrides();
+
+    create_gamemodes();
+
+    game_values.ReadBinaryConfig();
+
+    //Assign the powerup weights to the selected preset
+    for (short iPowerup = 0; iPowerup < NUM_POWERUPS; iPowerup++) {
+        game_values.powerupweights[iPowerup] = g_iCurrentPowerupPresets[game_values.poweruppreset][iPowerup];
+    }
+
+#ifdef _XBOX
+    gfx_changefullscreen(false); //Sets flicker filter
+    SDL_SetHardwareFilter(game_values.hardwarefilter);
+    blitdest = screen;
+#else
+    if (game_values.fullscreen) {
+        gfx_changefullscreen(true);
+        blitdest = screen;
+    }
+#endif
+
+    init_spawnlocations();
 
     //Load the gfx color palette
     gfx_loadpalette(convertPathCP("gfx/packs/palette.bmp", gamegraphicspacklist->current_name()));
