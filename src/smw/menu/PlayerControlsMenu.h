@@ -2,8 +2,7 @@
 #define MENU_PLAYERCONTROLSMENU_H
 
 #include "uimenu.h"
-#include "uicontrol.h"
-#include "uicustomcontrol.h"
+#include "ui/MI_InputControlContainer.h"
 
 /*
 	This is where the selected player (from PlayerControlsSelectMenu)

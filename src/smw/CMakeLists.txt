@@ -57,6 +57,7 @@ LIST(APPEND SMW_SRCS
 	ui/NetworkListScroll.cpp
 	ui/MI_PowerupSlider.cpp
 	ui/MI_FrenzyModeOptions.cpp
+	ui/MI_InputControlContainer.cpp
 )
 
 #
