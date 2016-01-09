@@ -37,7 +37,7 @@ MapReader1802::MapReader1802()
 void MapReader1800::read_autofilters(CMap& map, BinaryFile& mapfile)
 {
     // TODO: handle read fail
-    int iAutoFilterValues[NUM_AUTO_FILTERS + 1];
+    int32_t iAutoFilterValues[NUM_AUTO_FILTERS + 1];
     mapfile.read_i32_array(iAutoFilterValues, NUM_AUTO_FILTERS + 1);
 
     for (short iFilter = 0; iFilter < NUM_AUTO_FILTERS; iFilter++)

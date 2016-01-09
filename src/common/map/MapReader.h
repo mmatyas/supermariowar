@@ -18,7 +18,7 @@ public:
 
     virtual bool load(CMap&, BinaryFile&, ReadType) = 0;
 
-    static MapReader* getLoaderByVersion(int (&mapversion)[4]);
+    static MapReader* getLoaderByVersion(int32_t (&mapversion)[4]);
 };
 
 /*

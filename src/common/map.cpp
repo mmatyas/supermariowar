@@ -51,11 +51,11 @@ using std::endl;
 
 extern gfxSprite spr_frontmap[2];
 extern short g_iTileConversion[];
-extern int g_iVersion[];
+extern int32_t g_iVersion[];
 
-extern bool VersionIsEqual(int iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
-extern bool VersionIsEqualOrBefore(int iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
-extern bool VersionIsEqualOrAfter(int iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
+extern bool VersionIsEqual(int32_t iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
+extern bool VersionIsEqualOrBefore(int32_t iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
+extern bool VersionIsEqualOrAfter(int32_t iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
 
 //Converts the tile type into the flags that this tile carries (solid + ice + death, etc)
 short g_iTileTypeConversion[NUMTILETYPES] = {0, 1, 2, 5, 121, 9, 17, 33, 65, 6, 21, 37, 69, 3961, 265, 529, 1057, 2113, 4096};
@@ -614,7 +614,7 @@ void CMap::loadMap(const std::string& file, ReadType iReadType)
     }
 
     //Load version number
-    int version[4];
+    int32_t version[4];
     //version[0] = mapfile.read_i32(); //Major
     //version[1] = mapfile.read_i32(); //Minor
     //version[2] = mapfile.read_i32(); //Micro
