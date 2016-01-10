@@ -15,7 +15,7 @@
 //1.8.0.4 == final
 //1.9.0.0 == neagix work-in-progress, not released
 //2.0.0.0 == fluffypillow netplay code
-int g_iVersion[] = {2, 0, 0, 0};
+int32_t g_iVersion[] = {2, 0, 0, 0};
 
 // main game directory, read from command line argument
 #ifdef ANDROID
@@ -27,12 +27,12 @@ std::string RootDataDirectory = "data";
 CGame *smw;
 CResourceManager *rm;
 
-bool VersionIsEqual(int iVersion[], short iMajor, short iMinor, short iMicro, short iBuild)
+bool VersionIsEqual(int32_t iVersion[], short iMajor, short iMinor, short iMicro, short iBuild)
 {
     return iVersion[0] == iMajor && iVersion[1] == iMinor && iVersion[2] == iMicro && iVersion[3] == iBuild;
 }
 
-bool VersionIsEqualOrBefore(int iVersion[], short iMajor, short iMinor, short iMicro, short iBuild)
+bool VersionIsEqualOrBefore(int32_t iVersion[], short iMajor, short iMinor, short iMicro, short iBuild)
 {
     if (iVersion[0] < iMajor)
         return true;
@@ -54,7 +54,7 @@ bool VersionIsEqualOrBefore(int iVersion[], short iMajor, short iMinor, short iM
     return false;
 }
 
-bool VersionIsEqualOrAfter(int iVersion[], short iMajor, short iMinor, short iMicro, short iBuild)
+bool VersionIsEqualOrAfter(int32_t iVersion[], short iMajor, short iMinor, short iMicro, short iBuild)
 {
     if (iVersion[0] > iMajor)
         return true;

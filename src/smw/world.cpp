@@ -18,17 +18,17 @@
 #endif
 
 void ResetTourStops();
-TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld);
+TourStop * ParseTourStopLine(char * buffer, int32_t iVersion[4], bool fIsWorld);
 void WriteTourStopLine(TourStop * ts, char * buffer, bool fIsWorld);
 
 WorldMap g_worldmap;
 
 extern std::string stripPathAndExtension(const std::string &path);
 
-extern int g_iVersion[];
-extern bool VersionIsEqual(int iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
-extern bool VersionIsEqualOrBefore(int iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
-extern bool VersionIsEqualOrAfter(int iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
+extern int32_t g_iVersion[];
+extern bool VersionIsEqual(int32_t iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
+extern bool VersionIsEqualOrBefore(int32_t iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
+extern bool VersionIsEqualOrAfter(int32_t iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
 
 extern CGameMode * gamemodes[GAMEMODE_LAST];
 
@@ -414,7 +414,7 @@ bool WorldMap::Load(short tilesize)
 
     char buffer[1024];
     short iReadType = 0;
-    int iVersion[4] = {0, 0, 0, 0};
+    int32_t iVersion[4] = {0, 0, 0, 0};
     short iMapTileReadRow = 0;
     short iCurrentStage = 0;
     short iCurrentWarp = 0;
@@ -1750,7 +1750,7 @@ short ReadTourStopSetting(short * iSetting, bool * fSetting, short iDefault, boo
     return 0;
 }
 
-TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld)
+TourStop * ParseTourStopLine(char * buffer, int32_t iVersion[4], bool fIsWorld)
 {
     TourStop * ts = new TourStop();
     ts->fUseSettings = false;

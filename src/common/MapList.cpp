@@ -32,7 +32,7 @@ using std::cout;
 using std::endl;
 using std::string;
 
-extern int g_iVersion[];
+extern int32_t g_iVersion[];
 
 extern CMap* g_map;
 extern FiltersList* filterslist;

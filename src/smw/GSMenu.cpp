@@ -95,7 +95,7 @@ extern WorldMap g_worldmap;
 
 extern void LoadCurrentMapBackground();
 
-extern TourStop * ParseTourStopLine(char * buffer, int iVersion[4], bool fIsWorld);
+extern TourStop * ParseTourStopLine(char * buffer, int32_t iVersion[4], bool fIsWorld);
 
 extern CMap* g_map;
 
@@ -1460,7 +1460,7 @@ bool MenuState::ReadTourFile()
 
     char buffer[256];
     bool fReadVersion = false;
-    int iVersion[4] = {0, 0, 0, 0};
+    int32_t iVersion[4] = {0, 0, 0, 0};
     while (fgets(buffer, 256, fp) && game_values.tourstoptotal < 10) {
         if (buffer[0] == '#' || buffer[0] == '\n' || buffer[0] == ' ' || buffer[0] == '\t')
             continue;

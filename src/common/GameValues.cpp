@@ -28,8 +28,8 @@ extern SoundsList *soundpacklist;
 extern short joystickcount;
 extern short g_iCurrentPowerupPresets[NUM_POWERUP_PRESETS][NUM_POWERUPS];
 
-extern int g_iVersion[];
-extern bool VersionIsEqual(int iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
+extern int32_t g_iVersion[];
+extern bool VersionIsEqual(int32_t iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
 
 
 //[Keyboard/Joystick][Game/Menu][NumPlayers][NumKeys]  left, right, jump, down, turbo, powerup, start, cancel
@@ -305,7 +305,7 @@ void CGameValues::ReadBinaryConfig() {
 
     try
     {
-        int version[4];
+        int32_t version[4];
         options.read_i32_array(version, 4);
 
         if (!VersionIsEqual(g_iVersion, version[0], version[1], version[2], version[3])) {

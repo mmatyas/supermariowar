@@ -1,8 +1,8 @@
 #include "map/MapReader.h"
 
-extern bool VersionIsEqualOrAfter(int iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
+extern bool VersionIsEqualOrAfter(int32_t iVersion[], short iMajor, short iMinor, short iMicro, short iBuild);
 
-MapReader* MapReader::getLoaderByVersion(int (&mapversion)[4])
+MapReader* MapReader::getLoaderByVersion(int32_t (&mapversion)[4])
 {
     /* v1.8.x readers */
 
