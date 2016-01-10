@@ -3,34 +3,72 @@ language: cpp
 sudo: required
 dist: trusty
 
-compiler:
-  - gcc
-  - clang
-
-env:
-  - SMW_USE_SDL2=false
-  - SMW_USE_SDL2=true
-
 branches:
   only:
     - master
 
+matrix:
+  include:
+  # Linux desktop builds
+  - compiler: gcc
+    env: BUILD=native SMW_USE_SDL2=false
+
+  - compiler: gcc
+    env: BUILD=native SMW_USE_SDL2=true
+
+  - compiler: clang
+    env: BUILD=native SMW_USE_SDL2=false
+
+  - compiler: clang
+    env: BUILD=native SMW_USE_SDL2=true
+
+  # OSX SDL2 build
+  - os: osx
+    env: BUILD=native SMW_USE_SDL2=true
+    compiler: clang
+    before_script:
+    - brew update
+    - brew install sdl2 sdl2_image sdl2_mixer
+    - sed -i.bak 's/check_type_size.*/set(SIZEOF_VOID_P "8")/' dependencies/lz4/cmake_unofficial/CMakeLists.txt
+
+  # Android builds
+  - env: BUILD=android ABILIST='armeabi armeabi-v7a arm64-v8a'
+  - env: BUILD=android ABILIST='x86 x86_64'
+  - env: BUILD=android ABILIST='mips mips64'
+
+
 before_script:
-  - $CXX --version
-  - cmake --version
-  - if [[ "$SMW_USE_SDL2" == "false" ]]; then sdl-config --version; fi
-  - if [[ "$SMW_USE_SDL2" == "true" ]];  then sdl2-config --version; fi
+  # Native (Linux, OSX)
+  - if [[ "$BUILD" == "native" ]]; then $CXX --version; fi
+  - if [[ "$BUILD" == "native" ]]; then cmake --version; fi
+  - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "false" ]]; then sdl-config --version; fi
+  - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "true" ]];  then sdl2-config --version; fi
+
+  # Android SDK + NDK
+  - if [[ "$BUILD" == "android" ]]; then curl -L https://raw.github.com/embarkmobile/android-sdk-installer/version-2/android-sdk-installer | bash /dev/stdin --install=build-tools-23.0.1,android-15; fi
+  - if [[ "$BUILD" == "android" ]]; then source ~/.android-sdk-installer/env; fi
+  - if [[ "$BUILD" == "android" ]]; then wget http://dl.google.com/android/ndk/android-ndk-r10e-linux-x86_64.bin; fi
+  - if [[ "$BUILD" == "android" ]]; then chmod +x ./android-ndk-r10e-linux-x86_64.bin; fi
+  - if [[ "$BUILD" == "android" ]]; then ./android-ndk-r10e-linux-x86_64.bin > /dev/null; fi
+  - if [[ "$BUILD" == "android" ]]; then export PATH=$PATH:$(pwd)/android-ndk-r10e; fi
 
 script:
-  - mkdir build && cd build
-  - if [[ "$SMW_USE_SDL2" == "false" ]]; then cmake ..; fi
-  - if [[ "$SMW_USE_SDL2" == "true" ]];  then cmake -D USE_SDL2_LIBS:BOOL=ON ..; fi
-  - if [[ "$SMW_USE_SDL2" == "false" ]]; then make; else make smw; fi
+  - if [[ "$BUILD" == "native" ]]; then mkdir build && cd build; fi
+  - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "false" ]]; then cmake ..; fi
+  - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "false" ]]; then make; fi
+  - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "true" ]];  then cmake -D USE_SDL2_LIBS:BOOL=ON ..; fi
+  - if [[ "$BUILD" == "native" && "$SMW_USE_SDL2" == "true" ]]; then make smw; fi
+  - if [[ "$BUILD" == "android" ]]; then git clone --depth=1 https://github.com/mmatyas/supermariowar-android.git; fi
+  - if [[ "$BUILD" == "android" ]]; then cd supermariowar-android; fi
+  - if [[ "$BUILD" == "android" ]]; then ./build.sh --abi=$ABILIST; fi
+
 
 addons:
   apt:
     packages:
+    # Packages for native Linux build
     - cmake
+    - clang
     - gcc-4.8
     - g++-4.8
     - libsdl1.2-dev
@@ -40,35 +78,12 @@ addons:
     - libsdl2-image-dev
     - libsdl2-mixer-dev
 
-matrix:
-  include:
-  - env: SMW_USE_SDL2="none"
-    before_script:
-    - curl -L https://raw.github.com/embarkmobile/android-sdk-installer/version-2/android-sdk-installer | bash /dev/stdin --install=build-tools-23.0.1,android-15
-    - source ~/.android-sdk-installer/env
-    - wget http://dl.google.com/android/ndk/android-ndk-r10e-linux-x86_64.bin
-    - 7z x android-ndk-r10e-linux-x86_64.bin > /dev/null
-    - export PATH=$PATH:$(pwd)/android-ndk-r10e
-    script:
-    - git clone --depth=1 https://github.com/mmatyas/supermariowar-android.git
-    - cd supermariowar-android
-    - ./build.sh
-    addons:
-      apt:
-        packages:
-        - ant
-        - expect
-        - lib32bz2-1.0
-        - lib32gcc1
-        - lib32ncurses5
-        - lib32stdc++6
-        - lib32z1
-        - openjdk-7-jdk
-        - p7zip-full
-  - os: osx
-    env: SMW_USE_SDL2=true
-    compiler: clang
-    before_script:
-    - brew update
-    - brew install sdl2 sdl2_image sdl2_mixer
-    - sed -i.bak 's/check_type_size.*/set(SIZEOF_VOID_P "8")/' dependencies/lz4/cmake_unofficial/CMakeLists.txt
+    # Packages for Android build
+    - ant
+    - expect
+    - lib32bz2-1.0
+    - lib32gcc1
+    - lib32ncurses5
+    - lib32stdc++6
+    - lib32z1
+    - openjdk-7-jdk
