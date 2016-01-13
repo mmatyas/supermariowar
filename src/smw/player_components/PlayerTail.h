@@ -21,7 +21,7 @@ public:
     //If player is shaking tail, slow decent
     void slowDescent(CPlayer& player);
 
-    bool isInUse();
+    bool isInUse() const;
     void draw(CPlayer& player);
 
 private:

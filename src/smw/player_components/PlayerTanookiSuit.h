@@ -11,10 +11,10 @@ public:
     void update(CPlayer &player);
     void onPickup();
 
-    bool isOn();
-    bool isStatue();
-    bool notStatue();
-    bool isBlinking();
+    bool isOn() const;
+    bool isStatue() const;
+    bool notStatue() const;
+    bool isBlinking() const;
 
     void allowStatue();
 

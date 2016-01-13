@@ -12,7 +12,7 @@ public:
     void update(CPlayer& player);
     void enterWarp(CPlayer& player, Warp* warp);
 
-    short getWarpPlane();
+    short getWarpPlane() const;
 
 private:
     void increasewarpcounter(CPlayer& player, short iGoal);

@@ -12,9 +12,9 @@ public:
     void update(CPlayer& player);
     void draw(CPlayer& player);
 
-    bool isActive();
+    bool isActive() const;
 
-    int8_t getColor();
+    int8_t getColor() const;
     void setColor(int8_t color);
 
     void escape(CPlayer& player);

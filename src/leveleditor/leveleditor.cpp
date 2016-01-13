@@ -36,10 +36,10 @@
 #include "object.h"
 #include "player.h"
 void CPlayer::flipsidesifneeded() {}
-bool CPlayer::isInvincible() { return false; }
-bool CPlayer::isShielded() { return false; }
+bool CPlayer::isInvincible() const { return false; }
+bool CPlayer::isShielded() const { return false; }
 short CPlayer::KillPlayerMapHazard(bool, killstyle, bool, short) { return 0; }
-bool PlayerKuriboShoe::is_on() { return false; }
+bool PlayerKuriboShoe::is_on() const { return false; }
 void IO_MovingObject::flipsidesifneeded() {}
 void IO_MovingObject::KillObjectMapHazard(short playerID) {}
 void removeifprojectile(IO_MovingObject * object, bool playsound, bool forcedead) {}

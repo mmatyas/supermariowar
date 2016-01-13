@@ -83,11 +83,11 @@ void PlayerSuperStomp::update(CPlayer &player) {
 }
 
 // Player is in the stomping phase
-bool PlayerSuperStomp::isStomping() {
+bool PlayerSuperStomp::isStomping() const {
     return is_stomping;
 }
 
 // Player is in any of the SuperStomping phases (floating/stomping/falling)
-bool PlayerSuperStomp::isInSuperStompState() {
+bool PlayerSuperStomp::isInSuperStompState() const {
     return superstomp_lock;
 }

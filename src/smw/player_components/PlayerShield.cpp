@@ -32,11 +32,11 @@ void PlayerShield::abort()
     timer = 0;
 }
 
-bool PlayerShield::is_on() {
+bool PlayerShield::is_on() const {
     return type > OFF;
 }
 
-PlayerShieldType PlayerShield::getType() {
+PlayerShieldType PlayerShield::getType() const {
     return type;
 }
 
@@ -51,7 +51,7 @@ void PlayerShield::update()
         type = OFF;
 }
 
-unsigned short PlayerShield::time_left()
+unsigned short PlayerShield::time_left() const
 {
     return timer;
 }

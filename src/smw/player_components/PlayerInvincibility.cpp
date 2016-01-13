@@ -34,7 +34,7 @@ void PlayerInvincibility::turn_on(CPlayer& player)
     }
 }
 
-bool PlayerInvincibility::is_on()
+bool PlayerInvincibility::is_on() const
 {
     return invincible;
 }

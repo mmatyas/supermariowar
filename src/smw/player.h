@@ -84,7 +84,6 @@ public:
     ~CPlayer();
 
     void Init();
-    void SetupNewPlayer();
 
     /* Player info */
 
@@ -98,19 +97,19 @@ public:
     short topY() const { return iy; }
     short bottomY() const { return iy + PH; }
     short centerY() const { return iy + HALFPH; }
-    bool isFacingRight();
+    bool isFacingRight() const;
 
     bool isready() const { return state == player_ready; }
     bool isspawning() const { return state == player_spawning; }
     bool iswarping() const { return state > player_ready; }
     bool isdead() const { return state == player_dead; }
 
-    bool isInvincible();
-    bool isShielded();
+    bool isInvincible() const;
+    bool isShielded() const;
     bool isFrozen() const { return frozen; }
-    short GetWarpPlane() { return warpstatus.getWarpPlane(); }
-    bool IsInvincibleOnBottom();
-    bool IsSuperStomping();
+    short GetWarpPlane() const { return warpstatus.getWarpPlane(); }
+    bool IsInvincibleOnBottom() const;
+    bool IsSuperStomping() const;
 
     /* Drawing */
 
@@ -141,8 +140,8 @@ public:
 
     /* Map elements */
 
-    bool PressedAcceptItemKey() { return fPressedAcceptItem; }
-    bool IsAcceptingItem() { return fAcceptingItem && tanookisuit.notStatue() && !kuriboshoe.is_on(); }
+    bool PressedAcceptItemKey() const { return fPressedAcceptItem; }
+    bool IsAcceptingItem() const { return fAcceptingItem && tanookisuit.notStatue() && !kuriboshoe.is_on(); }
     bool AcceptItem(MO_CarriedObject* item);
 
     void SetKuriboShoe(KuriboShoeType type);
@@ -167,6 +166,8 @@ public:
 private:
     short globalID;
     short teamID;
+
+    void SetupNewPlayer();
 
     void cpu_think();
 
@@ -234,9 +235,9 @@ private:
 
 		short KillPlayerMapHazard(bool fForce, killstyle ks, bool fKillCarriedItem, short iPlayerId = -1);
 
-		bool canSuperStomp();
-		bool wantsToSuperStomp();
-		bool highJumped();
+		bool canSuperStomp() const;
+		bool wantsToSuperStomp() const;
+		bool highJumped() const;
 
         void draw_spotlight();
         void draw_powerupRing();

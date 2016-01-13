@@ -12,8 +12,8 @@ public:
     void update(CPlayer& player);
     void spin(CPlayer& player);
 
-    bool isReverseWalking();
-    bool isSpinInProgress();
+    bool isReverseWalking() const;
+    bool isSpinInProgress() const;
 
     uint8_t toSpriteID();
     uint8_t toCapeFrameX();

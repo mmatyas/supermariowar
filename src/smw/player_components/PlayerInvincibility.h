@@ -9,7 +9,7 @@ public:
 	void reset();
     void update(CPlayer& player);
 
-    bool is_on();
+    bool is_on() const;
     void turn_on(CPlayer& player);
 
 private:

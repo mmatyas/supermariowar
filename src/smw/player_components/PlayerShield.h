@@ -7,7 +7,7 @@ class CPlayer;
     This changes the way the shield behaves. It can be set to No Shield,
     Soft (pass through players), Soft With Stomp (pass through players,
     but you can stomp them), and Hard (stomp players but you can't pass
-    through them). 
+    through them).
 */
 enum PlayerShieldType {
 	OFF = 0,
@@ -22,14 +22,14 @@ public:
 	void reset();
     void update();
 
-    bool is_on();
+    bool is_on() const;
     void turn_on();
     void abort();
 
-    PlayerShieldType getType();
+    PlayerShieldType getType() const;
     void setType(PlayerShieldType);
 
-    unsigned short time_left();
+    unsigned short time_left() const;
 
 private:
 	PlayerShieldType type;

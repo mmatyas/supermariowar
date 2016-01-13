@@ -31,11 +31,11 @@ void PlayerSpinStatus::spin(CPlayer& player) {
     timer = 0;
 }
 
-bool PlayerSpinStatus::isSpinInProgress() {
+bool PlayerSpinStatus::isSpinInProgress() const {
     return state > 0;
 }
 
-bool PlayerSpinStatus::isReverseWalking() {
+bool PlayerSpinStatus::isReverseWalking() const {
     if ((state >= 2 && state <= 4) || state == 7 || state == 11)
         return true;
 

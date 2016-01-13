@@ -9,8 +9,8 @@ public:
     PlayerSuperStomp();
     void reset();
 
-    bool isStomping();
-    bool isInSuperStompState();
+    bool isStomping() const;
+    bool isInSuperStompState() const;
     void startSuperStomping(CPlayer &player);
 
     void update(CPlayer &player);

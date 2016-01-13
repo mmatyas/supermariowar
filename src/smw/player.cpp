@@ -271,32 +271,32 @@ void CPlayer::decreaseVelocity()
     }
 }
 
-bool CPlayer::canSuperStomp() {
+bool CPlayer::canSuperStomp() const {
     return inair && isready() && !superstomp.isInSuperStompState();
 }
 
-bool CPlayer::wantsToSuperStomp() {
+bool CPlayer::wantsToSuperStomp() const {
     return (playerKeys->game_down.fPressed && playerDevice == DEVICE_KEYBOARD)
         || (playerKeys->game_jump.fPressed && playerKeys->game_down.fDown);
 }
 
-bool CPlayer::highJumped() {
+bool CPlayer::highJumped() const {
     return (superjumptype != 3 || superjumptimer <= 0);
 }
 
-bool CPlayer::isInvincible() {
+bool CPlayer::isInvincible() const {
     return invincibility.is_on();
 }
 
-bool CPlayer::isShielded() {
+bool CPlayer::isShielded() const {
     return shield.is_on();
 }
 
-bool CPlayer::IsInvincibleOnBottom() {
+bool CPlayer::IsInvincibleOnBottom() const {
     return isInvincible() || isShielded() || kuriboshoe.is_on();
 }
 
-bool CPlayer::IsSuperStomping() {
+bool CPlayer::IsSuperStomping() const {
     return superstomp.isStomping();
 }
 
@@ -2767,7 +2767,7 @@ void CPlayer::turnslowdownon()
 }
 
 //Returns true if player facing right, false if left
-bool CPlayer::isFacingRight()
+bool CPlayer::isFacingRight() const
 {
     bool fLeft = game_values.reversewalk;
     bool fRight = !fLeft;

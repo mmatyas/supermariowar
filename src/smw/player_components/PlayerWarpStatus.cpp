@@ -35,7 +35,7 @@ void PlayerWarpStatus::decreasewarpcounter(CPlayer& player)
     }
 }
 
-short PlayerWarpStatus::getWarpPlane() {
+short PlayerWarpStatus::getWarpPlane() const {
     return warpplane;
 }
 

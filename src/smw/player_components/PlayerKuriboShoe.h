@@ -18,9 +18,9 @@ public:
 	void update(CPlayer &player, uint8_t keymask);
 	void draw(CPlayer &player);
 
-	bool is_on();
+	bool is_on() const;
 
-	KuriboShoeType getType();
+	KuriboShoeType getType() const;
 	void setType(KuriboShoeType);
 
 private:

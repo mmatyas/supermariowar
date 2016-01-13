@@ -26,12 +26,12 @@ void PlayerKuriboShoe::reset()
 }
 
 // Return true if the player is inside a shoe
-bool PlayerKuriboShoe::is_on()
+bool PlayerKuriboShoe::is_on() const
 {
     return type > 0;
 }
 
-KuriboShoeType PlayerKuriboShoe::getType()
+KuriboShoeType PlayerKuriboShoe::getType() const
 {
     return type;
 }

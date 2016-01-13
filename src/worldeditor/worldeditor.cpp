@@ -157,8 +157,8 @@ short			y_shake = 0;
 extern CGameValues game_values;
 
 void CPlayer::flipsidesifneeded() {}
-bool CPlayer::isInvincible() { return false; }
-bool CPlayer::isShielded() { return false; }
+bool CPlayer::isInvincible() const { return false; }
+bool CPlayer::isShielded() const { return false; }
 void CPlayer::AddKillerAward(CPlayer*, killstyle) {}
 short CPlayer::KillPlayerMapHazard(bool fForce, killstyle style, bool fKillCarriedItem, short iPlayerId)
 {
@@ -172,8 +172,8 @@ bool CPlayer::bouncejump()
 {
     return false;
 }
-bool PlayerKuriboShoe::is_on() { return false; }
-bool PlayerTanookiSuit::isStatue() { return false; }
+bool PlayerKuriboShoe::is_on() const { return false; }
+bool PlayerTanookiSuit::isStatue() const { return false; }
 
 void B_WeaponBreakableBlock::triggerBehavior(short iPlayerID, short iTeamID) {}
 

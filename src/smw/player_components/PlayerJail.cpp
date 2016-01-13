@@ -17,7 +17,7 @@ PlayerJail::PlayerJail()
     , timer(0)
 {}
 
-bool PlayerJail::isActive()
+bool PlayerJail::isActive() const
 {
     return timer > 0;
 }
@@ -28,7 +28,7 @@ void PlayerJail::setColor(int8_t color)
     this->color = color;
 }
 
-int8_t PlayerJail::getColor()
+int8_t PlayerJail::getColor() const
 {
     return color;
 }

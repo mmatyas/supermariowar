@@ -136,16 +136,20 @@ void PlayerTanookiSuit::update(CPlayer& player)
     }
 }
 
-bool PlayerTanookiSuit::isOn() {
+bool PlayerTanookiSuit::isOn() const {
     return tanooki_on;
 }
 
-bool PlayerTanookiSuit::isStatue() {
+bool PlayerTanookiSuit::isStatue() const {
     return !notStatue();
 }
 
-bool PlayerTanookiSuit::notStatue() {
+bool PlayerTanookiSuit::notStatue() const {
     return statue_timer == 0;
+}
+
+bool PlayerTanookiSuit::isBlinking() const {
+    return (statue_timer < 50) && (statue_timer / 3 % 2);
 }
 
 void PlayerTanookiSuit::onPickup() {
@@ -154,10 +158,6 @@ void PlayerTanookiSuit::onPickup() {
 
     if (game_values.tanookilimit > 0)
         statue_uses_left = game_values.tanookilimit;
-}
-
-bool PlayerTanookiSuit::isBlinking() {
-    return (statue_timer < 50) && (statue_timer / 3 % 2);
 }
 
 void PlayerTanookiSuit::allowStatue() {

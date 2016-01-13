@@ -18,7 +18,7 @@ void PlayerTail::reset() {
     iTailFrame = 0;
 }
 
-bool PlayerTail::isInUse() {
+bool PlayerTail::isInUse() const {
     return iTailState > TAIL_NOT_IN_USE;
 }
 
