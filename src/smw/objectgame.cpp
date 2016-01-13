@@ -1230,7 +1230,7 @@ bool PU_CoinPowerup::collide(CPlayer * player)
     if (state > 0) {
         if (game_values.gamemode->gamemode == game_mode_coins || game_values.gamemode->gamemode == game_mode_greed) {
             if (!game_values.gamemode->gameover) {
-                player->score->AdjustScore(iValue);
+                player->Score().AdjustScore(iValue);
                 game_values.gamemode->CheckWinner(player);
             }
         }
@@ -2125,7 +2125,7 @@ bool MO_Coin::collide(CPlayer * player)
         if (iType == 2)
             player->score->subscore[0]++;
         else
-            player->score->AdjustScore(1);
+            player->Score().AdjustScore(1);
 
         game_values.gamemode->CheckWinner(player);
     }
@@ -2842,7 +2842,7 @@ void MO_FlagBase::scoreFlag(CO_Flag * flag, CPlayer * player)
     } else if (!game_values.gamemodesettings.flag.homescore || homeflag != NULL || game_values.gamemodesettings.flag.centerflag) {
         flag->placeFlag();
         if (!game_values.gamemode->gameover) {
-            player->score->AdjustScore(1);
+            player->Score().AdjustScore(1);
             game_values.gamemode->CheckWinner(player);
         }
 
@@ -3026,7 +3026,7 @@ bool MO_Yoshi::collide(CPlayer * player)
 
         if (egg->color == color) {
             if (!game_values.gamemode->gameover) {
-                player->score->AdjustScore(1);
+                player->Score().AdjustScore(1);
                 game_values.gamemode->CheckWinner(player);
             }
 
@@ -3114,7 +3114,7 @@ void MO_Yoshi::collide(IO_MovingObject * object)
             CPlayer * player = egg->owner_throw;
 
             if (!game_values.gamemode->gameover) {
-                player->score->AdjustScore(1);
+                player->Score().AdjustScore(1);
                 game_values.gamemode->CheckWinner(player);
             }
 
@@ -3182,7 +3182,7 @@ void OMO_Area::update()
     if (iPlayerID != -1 && !game_values.gamemode->gameover) {
         if (++scoretimer >= (game_values.pointspeed << 1)) {
             scoretimer = 0;
-            list_players[iPlayerID]->score->AdjustScore(1);
+            list_players[iPlayerID]->Score().AdjustScore(1);
             game_values.gamemode->CheckWinner(list_players[iPlayerID]);
         }
     }
@@ -3273,9 +3273,9 @@ OMO_KingOfTheHillZone::OMO_KingOfTheHillZone(gfxSprite *nspr) :
 
 bool OMO_KingOfTheHillZone::collide(CPlayer * player)
 {
-    if (player->tanookisuit.notStatue()) {
-        playersTouching[player->teamID] = player;
-        playersTouchingCount[player->teamID]++;
+    if (!player->IsTanookiStatue()) {
+        playersTouching[player->getTeamID()] = player;
+        playersTouchingCount[player->getTeamID()]++;
         totalTouchingPlayers++;
     }
     return false;
@@ -3321,7 +3321,7 @@ void OMO_KingOfTheHillZone::update()
     }
 
     if ((iMax << 1) > totalTouchingPlayers) { //If the max touching player team is greater than the rest of the touching players
-        colorID = playersTouching[iMaxTeam]->colorID;
+        colorID = playersTouching[iMaxTeam]->getColorID();
         iPlayerID = playersTouching[iMaxTeam]->localID;
         frame = ((colorID + 1) << 5) * 3;
     } else {
@@ -3335,7 +3335,7 @@ void OMO_KingOfTheHillZone::update()
 
         if (scoretimer >= game_values.pointspeed) {
             scoretimer = 0;
-            list_players[iPlayerID]->score->AdjustScore(multiplier);
+            list_players[iPlayerID]->Score().AdjustScore(multiplier);
             game_values.gamemode->CheckWinner(list_players[iPlayerID]);
 
             if (game_values.gamemodesettings.kingofthehill.maxmultiplier > 1 && ++multipliertimer >= 5) {
@@ -3991,7 +3991,7 @@ bool MO_WalkingEnemy::collide(CPlayer * player)
         player->AddKillerAward(NULL, killStyle);
 
         if (game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover)
-            player->score->AdjustScore(1);
+            player->Score().AdjustScore(1);
 
         if (frozen) {
             ShatterDie();
@@ -4042,7 +4042,7 @@ void MO_WalkingEnemy::collide(IO_MovingObject * object)
 
                 if (killer) {
                     killer->AddKillerAward(NULL, killStyle);
-                    killer->score->AdjustScore(1);
+                    killer->Score().AdjustScore(1);
 
                     if (type == movingobject_shell)
                         ((CO_Shell*)object)->AddMovingKill(killer);
@@ -4156,7 +4156,7 @@ bool MO_Goomba::hittop(CPlayer * player)
     player->platform = NULL;
 
     if (game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover)
-        player->score->AdjustScore(1);
+        player->Score().AdjustScore(1);
 
     if (fBouncing) {
         fBouncing = false;
@@ -4242,7 +4242,7 @@ bool MO_Koopa::hittop(CPlayer * player)
     player->platform = NULL;
 
     if (game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover)
-        player->score->AdjustScore(1);
+        player->Score().AdjustScore(1);
 
     if (fBouncing) {
         fBouncing = false;
@@ -4326,7 +4326,7 @@ bool MO_BuzzyBeetle::hittop(CPlayer * player)
     player->AddKillerAward(NULL, kill_style_buzzybeetle);
 
     if (game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover)
-        player->score->AdjustScore(1);
+        player->Score().AdjustScore(1);
 
     ifSoundOnPlay(rm->sfx_mip);
 
@@ -4396,7 +4396,7 @@ bool MO_Spiny::hittop(CPlayer * player)
         player->AddKillerAward(NULL, kill_style_spiny);
 
         if (game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover)
-            player->score->AdjustScore(1);
+            player->Score().AdjustScore(1);
 
         DropShell(false, false);
 
@@ -4490,7 +4490,7 @@ bool MO_CheepCheep::collide(CPlayer * player)
         player->AddKillerAward(NULL, kill_style_cheepcheep);
 
         if (game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover)
-            player->score->AdjustScore(1);
+            player->Score().AdjustScore(1);
 
         if (frozen) {
             ShatterDie();
@@ -4519,7 +4519,7 @@ bool MO_CheepCheep::hittop(CPlayer * player)
     player->AddKillerAward(NULL, kill_style_cheepcheep);
 
     if (game_values.gamemode->gamemode == game_mode_stomp && !game_values.gamemode->gameover)
-        player->score->AdjustScore(1);
+        player->Score().AdjustScore(1);
 
     ifSoundOnPlay(rm->sfx_mip);
 
@@ -4557,7 +4557,7 @@ void MO_CheepCheep::collide(IO_MovingObject * object)
 
                 if (killer) {
                     killer->AddKillerAward(NULL, kill_style_cheepcheep);
-                    killer->score->AdjustScore(1);
+                    killer->Score().AdjustScore(1);
 
                     if (type == movingobject_shell)
                         ((CO_Shell*)object)->AddMovingKill(killer);
@@ -6668,18 +6668,18 @@ bool OMO_PipeCoin::collide(CPlayer * player)
     if (!game_values.gamemode->gameover) {
         if (iTeamID != -1) {
             if (player->teamID == iTeamID) {
-                player->score->AdjustScore(1);
+                player->Score().AdjustScore(1);
                 ifSoundOnPlay(rm->sfx_coin);
             }
         } else {
             if (iColorID == 2) {
-                player->score->AdjustScore(1);
+                player->Score().AdjustScore(1);
                 ifSoundOnPlay(rm->sfx_coin);
             } else if (iColorID == 0) {
-                player->score->AdjustScore(-1);
+                player->Score().AdjustScore(-1);
                 ifSoundOnPlay(rm->sfx_stun);
             } else if (iColorID == 1) {
-                player->score->AdjustScore(5);
+                player->Score().AdjustScore(5);
                 ifSoundOnPlay(rm->sfx_extraguysound);
             }
         }
@@ -6923,7 +6923,7 @@ bool OMO_Phanto::collide(CPlayer * player)
                     player->KillPlayerMapHazard(false, kill_style_phanto, false);
 
                     if (!game_values.gamemode->gameover && iType == 1) {
-                        player->score->AdjustScore(-10);
+                        player->Score().AdjustScore(-10);
                         ifSoundOnPlay(rm->sfx_stun);
                     }
 

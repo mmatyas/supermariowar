@@ -64,7 +64,6 @@ class MovingPlatform;
 class Spotlight;
 struct Warp;
 
-
 enum deathstyle {
     death_style_jump = 0,
     death_style_squish = 1,
@@ -99,6 +98,9 @@ public:
     short centerY() const { return iy + HALFPH; }
     bool isFacingRight() const;
 
+    float getVelX() const { return velx; }
+    float getVelY() const { return vely; }
+
     bool isready() const { return state == player_ready; }
     bool isspawning() const { return state == player_spawning; }
     bool iswarping() const { return state > player_ready; }
@@ -108,11 +110,15 @@ public:
     bool isShielded() const;
     bool isFrozen() const { return frozen; }
     short GetWarpPlane() const { return warpstatus.getWarpPlane(); }
+    short GetWarpState() const { return state % 4; }
     bool IsInvincibleOnBottom() const;
     bool IsSuperStomping() const;
     bool IsBobomb() const { return bobomb; }
+    bool IsTanookiStatue() const { return tanookisuit.isStatue(); }
 
     CScore& Score();
+    PlayerJail& Jail() { return jail; }
+    PlayerShield& Shield() { return shield; }
 
     /* Drawing */
 
@@ -405,34 +411,16 @@ private:
 
 		friend class CObjectContainer;
 
-		friend class CGM_Frag;
-		friend class CGM_TimeLimit;
-		friend class CGM_Jail;
-		friend class CGM_Classic;
-		friend class CGM_Chicken;
-		friend class CGM_Tag;
-		friend class CGM_ShyGuyTag;
-		friend class CGM_Coins;
-		friend class CGM_Survival;
-		friend class CGM_Eggs;
-		friend class CGM_Domination;
-		friend class CGM_KingOfTheHill;
-		friend class OMO_KingOfTheHillZone;
-		friend class CGM_Race;
-		friend class CGM_Frenzy;
-		friend class CGM_Owned;
-		friend class CGM_Star;
-		friend class CGM_CaptureTheFlag;
-		friend class CGM_Stomp;
-		friend class CGM_Greed;
-		friend class CGM_Health;
-		friend class CGM_Collection;
-		friend class CGM_Chase;
+		friend class OMO_KingOfTheHillZone; // update()
 
-		friend class CGM_Bonus;
-		friend class CGM_Pipe_MiniGame;
-		friend class CGM_Boss_MiniGame;
-		friend class CGM_Boxes_MiniGame;
+		friend class CGM_CaptureTheFlag; // playerkilledself()
+		friend class CGM_Chase; // think()
+		friend class CGM_Chicken; // think()
+		friend class CGM_Eggs; // playerkilledself()
+		friend class CGM_Frenzy; // think()
+		friend class CGM_Owned; // think()
+		friend class CGM_ShyGuyTag; // init()
+		friend class CGM_Star; // think()
 
 		friend class MI_InputDevice;
 		friend class MI_InputLeft;

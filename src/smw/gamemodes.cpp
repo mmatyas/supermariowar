@@ -33,7 +33,7 @@ extern short CountAliveTeams(short * lastteam);
 void RemovePlayersButTeam(short teamid)
 {
     for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
-        if (list_players[iPlayer]->teamID != teamid) {
+        if (list_players[iPlayer]->getTeamID() != teamid) {
             list_players[iPlayer]->state = player_dead;
         }
     }
@@ -51,7 +51,7 @@ void RemovePlayersButHighestScoring()
 
     //Remove all players that don't have that max score
     for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
-        if (list_players[iPlayer]->score->score < iMaxScore) {
+        if (list_players[iPlayer]->Score().score < iMaxScore) {
             list_players[iPlayer]->state = player_dead;
         }
     }
@@ -152,9 +152,9 @@ bool RemoveTeam(short teamid)
     //kill all players on the dead team
     short iAnnouncementColor = -1;
     for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
-        if (list_players[iPlayer]->teamID == teamid) {
+        if (list_players[iPlayer]->getTeamID() == teamid) {
             if (iAnnouncementColor == -1)
-                iAnnouncementColor = list_players[iPlayer]->colorID;
+                iAnnouncementColor = list_players[iPlayer]->getColorID();
 
             list_players[iPlayer]->state = player_dead;
         }
@@ -469,17 +469,17 @@ short CGM_Frag::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle
     //Don't score if "sumo" style scoring is turned on
     if (game_values.gamemode->gamemode != game_mode_frag || game_values.gamemodesettings.frag.scoring == 0 || style == kill_style_push) {
         //Penalize killing your team mates
-        if (inflictor.teamID == other.teamID)
-            inflictor.score->AdjustScore(-1);
+        if (inflictor.getTeamID() == other.getTeamID())
+            inflictor.Score().AdjustScore(-1);
         else
-            inflictor.score->AdjustScore(1);
+            inflictor.Score().AdjustScore(1);
     }
 
     short iRet = CheckWinner(&inflictor);
 
     if (game_values.gamemode->gamemode == game_mode_frag && game_values.gamemodesettings.frag.style == 1) {
         ifSoundOnPlay(rm->sfx_powerdown);
-        other.shield.reset();
+        other.Shield().reset();
         return player_kill_nonkill;
     }
 
@@ -491,11 +491,11 @@ short CGM_Frag::playerkilledself(CPlayer &player, killstyle style)
     CGameMode::playerkilledself(player, style);
 
     if (!gameover) {
-        player.score->AdjustScore(-1);
+        player.Score().AdjustScore(-1);
 
         if (game_values.gamemode->gamemode == game_mode_frag && game_values.gamemodesettings.frag.style == 1) {
             ifSoundOnPlay(rm->sfx_powerdown);
-            player.shield.reset();
+            player.Shield().reset();
             return player_kill_nonkill;
         }
     }
@@ -506,7 +506,7 @@ short CGM_Frag::playerkilledself(CPlayer &player, killstyle style)
 void CGM_Frag::playerextraguy(CPlayer &player, short iType)
 {
     if (!gameover) {
-        player.score->AdjustScore(iType);
+        player.Score().AdjustScore(iType);
         CheckWinner(&player);
     }
 }
@@ -514,9 +514,9 @@ void CGM_Frag::playerextraguy(CPlayer &player, short iType)
 short CGM_Frag::CheckWinner(CPlayer * player)
 {
     if (goal > -1) {
-        if (player->score->score >= goal) {
-            player->score->SetScore(goal);
-            winningteam = player->teamID;
+        if (player->Score().score >= goal) {
+            player->Score().SetScore(goal);
+            winningteam = player->getTeamID();
             gameover = true;
 
             RemovePlayersButTeam(winningteam);
@@ -524,7 +524,7 @@ short CGM_Frag::CheckWinner(CPlayer * player)
             ShowScoreBoard();
 
             return player_kill_removed;
-        } else if (player->score->score >= goal - 2 && !playedwarningsound) {
+        } else if (player->Score().score >= goal - 2 && !playedwarningsound) {
             playwarningsound();
         }
     }
@@ -582,15 +582,15 @@ short CGM_TimeLimit::playerkilledplayer(CPlayer &inflictor, CPlayer &other, kill
     if (!gameover) {
         if (game_values.gamemode->gamemode != game_mode_timelimit || game_values.gamemodesettings.time.scoring == 0 || style == kill_style_push) {
             //Penalize killing your team mates
-            if (inflictor.teamID == other.teamID)
-                inflictor.score->AdjustScore(-1);
+            if (inflictor.getTeamID() == other.getTeamID())
+                inflictor.Score().AdjustScore(-1);
             else
-                inflictor.score->AdjustScore(1);
+                inflictor.Score().AdjustScore(1);
         }
 
         if (game_values.gamemode->gamemode == game_mode_timelimit && game_values.gamemodesettings.time.style == 1) {
             ifSoundOnPlay(rm->sfx_powerdown);
-            other.shield.reset();
+            other.Shield().reset();
             return player_kill_nonkill;
         }
     }
@@ -602,8 +602,8 @@ short CGM_TimeLimit::playerkilledself(CPlayer &player, killstyle style)
 {
     CGameMode::playerkilledself(player, style);
 
-    if (player.score->score > 0 && !gameover)
-        player.score->AdjustScore(-1);
+    if (player.Score().score > 0 && !gameover)
+        player.Score().AdjustScore(-1);
 
     return player_kill_normal;
 }
@@ -654,14 +654,14 @@ short CGM_Classic::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killst
     //If we are playing classic "sumo" mode, then only score hazard kills
     if (game_values.gamemode->gamemode != game_mode_classic || game_values.gamemodesettings.classic.scoring == 0 || style == kill_style_push) {
         if (fReverseScoring) {
-            other.score->AdjustScore(1);
+            other.Score().AdjustScore(1);
         } else {
-            other.score->AdjustScore(-1);
+            other.Score().AdjustScore(-1);
 
             if (!playedwarningsound) {
                 short countscore = 0;
                 for (short k = 0; k < score_cnt; k++) {
-                    if (inflictor.score == score[k])
+                    if (&inflictor.Score() == score[k])
                         continue;
 
                     countscore += score[k]->score;
@@ -672,8 +672,8 @@ short CGM_Classic::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killst
                 }
             }
 
-            if (other.score->score <= 0) {
-                RemoveTeam(other.teamID);
+            if (other.Score().score <= 0) {
+                RemoveTeam(other.getTeamID());
                 return player_kill_removed;
             }
         }
@@ -681,7 +681,7 @@ short CGM_Classic::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killst
 
     if (game_values.gamemode->gamemode == game_mode_classic && game_values.gamemodesettings.classic.style == 1) {
         ifSoundOnPlay(rm->sfx_powerdown);
-        other.shield.reset();
+        other.Shield().reset();
         return player_kill_nonkill;
     }
 
@@ -694,9 +694,9 @@ short CGM_Classic::playerkilledself(CPlayer &player, killstyle style)
 
     if (!gameover) {
         if (fReverseScoring) {
-            player.score->AdjustScore(1);
+            player.Score().AdjustScore(1);
         } else {
-            player.score->AdjustScore(-1);
+            player.Score().AdjustScore(-1);
 
             if (!playedwarningsound) {
                 short countscore = 0;
@@ -721,15 +721,15 @@ short CGM_Classic::playerkilledself(CPlayer &player, killstyle style)
                     playwarningsound();
             }
 
-            if (player.score->score <= 0) {
-                RemoveTeam(player.teamID);
+            if (player.Score().score <= 0) {
+                RemoveTeam(player.getTeamID());
                 return player_kill_removed;
             }
         }
 
         if (game_values.gamemode->gamemode == game_mode_classic && game_values.gamemodesettings.classic.style == 1) {
             ifSoundOnPlay(rm->sfx_powerdown);
-            player.shield.reset();
+            player.Shield().reset();
             return player_kill_nonkill;
         }
     }
@@ -741,9 +741,9 @@ void CGM_Classic::playerextraguy(CPlayer &player, short iType)
 {
     if (!gameover) {
         if (fReverseScoring)
-            player.score->AdjustScore(-iType);
+            player.Score().AdjustScore(-iType);
         else
-            player.score->AdjustScore(iType);
+            player.Score().AdjustScore(iType);
     }
 }
 
@@ -768,17 +768,17 @@ void CGM_Chicken::think()
     }
 
     if (chicken) {
-        if ( chicken->velx > VELMOVING_CHICKEN )
+        if ( chicken->getVelX() > VELMOVING_CHICKEN )
             chicken->velx = VELMOVING_CHICKEN;
-        else if (chicken->velx < -VELMOVING_CHICKEN)
+        else if (chicken->getVelX() < -VELMOVING_CHICKEN)
             chicken->velx = -VELMOVING_CHICKEN;
 
         static short counter = 0;
 
-        if (chicken->isready() && chicken->tanookisuit.notStatue()) {
+        if (chicken->isready() && !chicken->IsTanookiStatue()) {
             if (++counter >= game_values.pointspeed) {
                 counter = 0;
-                chicken->score->AdjustScore(1);
+                chicken->Score().AdjustScore(1);
                 CheckWinner(chicken);
             }
         }
@@ -790,9 +790,9 @@ void CGM_Chicken::draw_foreground()
     //Draw the chicken indicator around the chicken
     if (game_values.gamemodesettings.chicken.usetarget && !gameover && chicken) {
         if (chicken->iswarping())
-            rm->spr_chicken.draw(chicken->ix - PWOFFSET - 16, chicken->iy - PHOFFSET - 16, 0, 0, 64, 64, (short)chicken->state % 4, chicken->GetWarpPlane());
+            rm->spr_chicken.draw(chicken->leftX() - PWOFFSET - 16, chicken->topY() - PHOFFSET - 16, 0, 0, 64, 64, chicken->GetWarpState(), chicken->GetWarpPlane());
         else if (chicken->isready())
-            rm->spr_chicken.draw(chicken->ix + HALFPW - 32, chicken->iy + HALFPH - 32);
+            rm->spr_chicken.draw(chicken->centerX() - 32, chicken->centerY() - 32);
     }
 }
 
@@ -801,16 +801,16 @@ short CGM_Chicken::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killst
 {
     if (!chicken || &other == chicken) {
         chicken = &inflictor;
-        eyecandy[2].add(new EC_GravText(&rm->game_font_large, inflictor.ix + HALFPW, inflictor.iy + PH, "Chicken!", -VELJUMP*1.5));
-        //eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, inflictor.ix + (HALFPW) - 16, inflictor.iy + (HALFPH) - 16, 3, 8));
-        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, inflictor.ix + HALFPW - 24, inflictor.iy + HALFPH - 24, 4, 5));
+        eyecandy[2].add(new EC_GravText(&rm->game_font_large, inflictor.centerX(), inflictor.bottomY(), "Chicken!", -VELJUMP*1.5));
+        //eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, inflictor.centerX() - 16, inflictor.centerY() - 16, 3, 8));
+        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, inflictor.centerX() - 24, inflictor.centerY() - 24, 4, 5));
         ifSoundOnPlay(rm->sfx_transform);
 
         if (&other == chicken)
             other.SetCorpseType(1); //flag to use chicken corpse sprite
     } else if (&inflictor == chicken) {
         if (!gameover) {
-            inflictor.score->AdjustScore(5);
+            inflictor.Score().AdjustScore(5);
             return CheckWinner(&inflictor);
         }
     }
@@ -835,7 +835,7 @@ short CGM_Chicken::playerkilledself(CPlayer &player, killstyle style)
 void CGM_Chicken::playerextraguy(CPlayer &player, short iType)
 {
     if (!gameover) {
-        player.score->AdjustScore(10 * iType);
+        player.Score().AdjustScore(10 * iType);
         CheckWinner(&player);
     }
 }
@@ -845,16 +845,16 @@ short CGM_Chicken::CheckWinner(CPlayer * player)
     if (goal == -1)
         return player_kill_normal;
 
-    if (player->score->score >= goal) {
-        player->score->SetScore(goal);
-        winningteam = player->teamID;
+    if (player->Score().score >= goal) {
+        player->Score().SetScore(goal);
+        winningteam = player->getTeamID();
         gameover = true;
 
         SetupScoreBoard(false);
         ShowScoreBoard();
         RemovePlayersButTeam(winningteam);
         return player_kill_removed;
-    } else if (player->score->score >= goal * 0.8 && !playedwarningsound) {
+    } else if (player->Score().score >= goal * 0.8 && !playedwarningsound) {
         playwarningsound();
     }
 
@@ -905,9 +905,9 @@ void CGM_Tag::think()
                 counter = 0;
 
                 if (fReverseScoring)
-                    tagged->score->AdjustScore(1);
+                    tagged->Score().AdjustScore(1);
                 else
-                    tagged->score->AdjustScore(-1);
+                    tagged->Score().AdjustScore(-1);
             }
         }
 
@@ -936,8 +936,8 @@ void CGM_Tag::think()
             playwarningsound();
         }
 
-        if (tagged->score->score <= 0) {
-            RemoveTeam(tagged->teamID);
+        if (tagged->Score().score <= 0) {
+            RemoveTeam(tagged->getTeamID());
             tagged = NULL;
         }
     }
@@ -947,23 +947,23 @@ short CGM_Tag::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle 
 {
     if (&inflictor == tagged) {
         tagged = &other;
-        inflictor.shield.reset();
-        eyecandy[2].add(new EC_GravText(&rm->game_font_large, other.ix + (HALFPW), other.iy + PH, "Tagged!", -VELJUMP*1.5));
-        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, other.ix + (HALFPW) - 16, other.iy + (HALFPH) - 16, 3, 8));
+        inflictor.Shield().reset();
+        eyecandy[2].add(new EC_GravText(&rm->game_font_large, other.centerX(), other.bottomY(), "Tagged!", -VELJUMP*1.5));
+        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, other.centerX() - 16, other.centerY() - 16, 3, 8));
         ifSoundOnPlay(rm->sfx_transform);
     }
 
     if (!gameover) {
         if (fReverseScoring) {
-            other.score->AdjustScore(5);
+            other.Score().AdjustScore(5);
             return player_kill_normal;
         } else {
-            other.score->AdjustScore(-5);
+            other.Score().AdjustScore(-5);
         }
 
         short countscore = 0;
         for (short k = 0; k < score_cnt; k++) {
-            if (inflictor.score == score[k])
+            if (&inflictor.Score() == score[k])
                 continue;
 
             countscore += score[k]->score;
@@ -973,10 +973,10 @@ short CGM_Tag::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle 
             playwarningsound();
         }
 
-        if (other.score->score <= 0) {
-            other.score->SetScore(0);
+        if (other.Score().score <= 0) {
+            other.Score().SetScore(0);
 
-            RemoveTeam(other.teamID);
+            RemoveTeam(other.getTeamID());
             return player_kill_removed;
         }
     }
@@ -990,10 +990,10 @@ short CGM_Tag::playerkilledself(CPlayer &player, killstyle style)
 
     if (!gameover) {
         if (fReverseScoring) {
-            player.score->AdjustScore(5);
+            player.Score().AdjustScore(5);
             return player_kill_normal;
         } else {
-            player.score->AdjustScore(-5);
+            player.Score().AdjustScore(-5);
         }
 
         short countscore = 0;
@@ -1018,9 +1018,9 @@ short CGM_Tag::playerkilledself(CPlayer &player, killstyle style)
             playwarningsound();
         }
 
-        if (player.score->score <= 0) {
-            player.score->SetScore(0);
-            RemoveTeam(player.teamID);
+        if (player.Score().score <= 0) {
+            player.Score().SetScore(0);
+            RemoveTeam(player.getTeamID());
             return player_kill_removed;
         }
     }
@@ -1032,9 +1032,9 @@ void CGM_Tag::playerextraguy(CPlayer &player, short iType)
 {
     if (!gameover) {
         if (fReverseScoring)
-            player.score->AdjustScore(-10 * iType);
+            player.Score().AdjustScore(-10 * iType);
         else
-            player.score->AdjustScore(10 * iType);
+            player.Score().AdjustScore(10 * iType);
     }
 }
 
@@ -1115,7 +1115,7 @@ void CGM_ShyGuyTag::think()
                     short iTeam = list_players[iPlayer]->getTeamID();
                     if (!fAlreadyScored[iTeam]) {
                         fAlreadyScored[iTeam] = true;
-                        list_players[iPlayer]->score->AdjustScore(shyguycount);
+                        list_players[iPlayer]->Score().AdjustScore(shyguycount);
 
                         pCheckWinner = list_players[iPlayer];
                     }
@@ -1162,7 +1162,7 @@ short CGM_ShyGuyTag::playerkilledself(CPlayer &player, killstyle style)
 void CGM_ShyGuyTag::playerextraguy(CPlayer &player, short iType)
 {
     if (!gameover) {
-        player.score->AdjustScore(10 * iType);
+        player.Score().AdjustScore(10 * iType);
         CheckWinner(&player);
     }
 }
@@ -1173,8 +1173,8 @@ void CGM_ShyGuyTag::SetShyGuy(short iTeam)
         if (list_players[iPlayer]->getTeamID() == iTeam) {
             CPlayer * player = list_players[iPlayer];
             player->shyguy = true;
-            eyecandy[2].add(new EC_GravText(&rm->game_font_large, player->ix + (HALFPW), player->iy + PH, "Shyguy!", -VELJUMP*1.5));
-            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, player->ix + (HALFPW) - 16, player->iy + (HALFPH) - 16, 3, 8));
+            eyecandy[2].add(new EC_GravText(&rm->game_font_large, player->centerX(), player->bottomY(), "Shyguy!", -VELJUMP*1.5));
+            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, player->centerX() - 16, player->centerY() - 16, 3, 8));
 
             player->StripPowerups();
             player->ClearPowerupStates();
@@ -1191,7 +1191,7 @@ void CGM_ShyGuyTag::FreeShyGuys()
     for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
         CPlayer * player = list_players[iPlayer];
         player->shyguy = false;
-        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, player->ix + (HALFPW) - 16, player->iy + (HALFPH) - 16, 3, 8));
+        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, player->centerX() - 16, player->centerY() - 16, 3, 8));
     }
 }
 
@@ -1200,8 +1200,8 @@ short CGM_ShyGuyTag::CheckWinner(CPlayer * player)
     if (gameover)
         return player_kill_normal;
 
-    if (player->score->score >= goal) {
-        player->score->SetScore(goal);
+    if (player->Score().score >= goal) {
+        player->Score().SetScore(goal);
         SetupScoreBoard(false);
         ShowScoreBoard();
 
@@ -1209,7 +1209,7 @@ short CGM_ShyGuyTag::CheckWinner(CPlayer * player)
         gameover = true;
 
         CountAliveTeams(&winningteam);
-    } else if (!playedwarningsound && goal != -1 && player->score->score >= goal * 0.8) {
+    } else if (!playedwarningsound && goal != -1 && player->Score().score >= goal * 0.8) {
         playwarningsound();
     }
 
@@ -1256,7 +1256,7 @@ short CGM_Coins::playerkilledplayer(CPlayer &player, CPlayer &other, killstyle s
         return player_kill_normal;
 
     if (game_values.gamemodesettings.coins.penalty)
-        other.score->AdjustScore(-1);
+        other.Score().AdjustScore(-1);
 
     return player_kill_normal;
 }
@@ -1267,7 +1267,7 @@ short CGM_Coins::playerkilledself(CPlayer &player, killstyle style)
         return player_kill_normal;
 
     if (game_values.gamemodesettings.coins.penalty)
-        player.score->AdjustScore(-1);
+        player.Score().AdjustScore(-1);
 
     return player_kill_normal;
 }
@@ -1275,7 +1275,7 @@ short CGM_Coins::playerkilledself(CPlayer &player, killstyle style)
 void CGM_Coins::playerextraguy(CPlayer &player, short iType)
 {
     if (!gameover) {
-        player.score->AdjustScore(iType << 1);
+        player.Score().AdjustScore(iType << 1);
         CheckWinner(&player);
     }
 }
@@ -1283,15 +1283,15 @@ void CGM_Coins::playerextraguy(CPlayer &player, short iType)
 short CGM_Coins::CheckWinner(CPlayer * player)
 {
     if (!gameover && goal > -1) {
-        if (player->score->score >= goal) {
-            player->score->SetScore(goal);
-            winningteam = player->teamID;
+        if (player->Score().score >= goal) {
+            player->Score().SetScore(goal);
+            winningteam = player->getTeamID();
             gameover = true;
 
             RemovePlayersButTeam(winningteam);
             SetupScoreBoard(false);
             ShowScoreBoard();
-        } else if (player->score->score >= goal - 5 && !playedwarningsound) {
+        } else if (player->Score().score >= goal - 5 && !playedwarningsound) {
             playwarningsound();
         }
     }
@@ -1366,7 +1366,7 @@ short CGM_Eggs::playerkilledself(CPlayer &player, killstyle style)
 void CGM_Eggs::playerextraguy(CPlayer &player, short iType)
 {
     if (!gameover) {
-        player.score->AdjustScore(iType);
+        player.Score().AdjustScore(iType);
         CheckWinner(&player);
     }
 }
@@ -1374,16 +1374,16 @@ void CGM_Eggs::playerextraguy(CPlayer &player, short iType)
 short CGM_Eggs::CheckWinner(CPlayer * player)
 {
     if (goal > -1) {
-        if (player->score->score >= goal) {
-            player->score->SetScore(goal);
+        if (player->Score().score >= goal) {
+            player->Score().SetScore(goal);
 
-            winningteam = player->teamID;
+            winningteam = player->getTeamID();
             gameover = true;
 
             RemovePlayersButTeam(winningteam);
             SetupScoreBoard(false);
             ShowScoreBoard();
-        } else if (player->score->score >= goal - 2 && !playedwarningsound) {
+        } else if (player->Score().score >= goal - 2 && !playedwarningsound) {
             playwarningsound();
         }
     }
@@ -1446,19 +1446,19 @@ void CGM_Frenzy::think()
 
     if (frenzyowner) {
         if (0 == iSelectedPowerup) {
-            if (!frenzyowner->bobomb)
+            if (!frenzyowner->IsBobomb())
                 frenzyowner = NULL;
         } else if (5 > iSelectedPowerup) {
             if (frenzyowner->powerup != iSelectedPowerup)
                 frenzyowner = NULL;
         } else if (5 == iSelectedPowerup) {
-            if (game_values.gamepowerups[frenzyowner->globalID] != 9)
+            if (game_values.gamepowerups[frenzyowner->getGlobalID()] != 9)
                 frenzyowner = NULL;
         } else if (6 == iSelectedPowerup) {
-            if (game_values.gamepowerups[frenzyowner->globalID] != 16)
+            if (game_values.gamepowerups[frenzyowner->getGlobalID()] != 16)
                 frenzyowner = NULL;
         } else if (7 == iSelectedPowerup) {
-            if (game_values.gamepowerups[frenzyowner->globalID] != 10)
+            if (game_values.gamepowerups[frenzyowner->getGlobalID()] != 10)
                 frenzyowner = NULL;
         }
     }
@@ -1586,7 +1586,7 @@ short CGM_Domination::playerkilledself(CPlayer &player, killstyle style)
 void CGM_Domination::playerextraguy(CPlayer &player, short iType)
 {
     if (!gameover) {
-        player.score->AdjustScore(10 * iType);
+        player.Score().AdjustScore(10 * iType);
         CheckWinner(&player);
     }
 }
@@ -1594,15 +1594,15 @@ void CGM_Domination::playerextraguy(CPlayer &player, short iType)
 short CGM_Domination::CheckWinner(CPlayer * player)
 {
     if (goal > -1) {
-        if (player->score->score >= goal) {
-            player->score->SetScore(goal);
-            winningteam = player->teamID;
+        if (player->Score().score >= goal) {
+            player->Score().SetScore(goal);
+            winningteam = player->getTeamID();
             gameover = true;
 
             SetupScoreBoard(false);
             ShowScoreBoard();
             RemovePlayersButTeam(winningteam);
-        } else if (player->score->score >= goal * 0.8 && !playedwarningsound) {
+        } else if (player->Score().score >= goal * 0.8 && !playedwarningsound) {
             playwarningsound();
         }
     }
@@ -1635,21 +1635,21 @@ void CGM_Owned::think()
                     if (i == k)
                         continue;
 
-                    if (list_players[k]->ownerPlayerID == list_players[i]->globalID)
-                        list_players[i]->score->AdjustScore(1);
+                    if (list_players[k]->ownerPlayerID == list_players[i]->getGlobalID())
+                        list_players[i]->Score().AdjustScore(1);
                 }
 
                 if (goal > -1) {
-                    if (list_players[i]->score->score >= goal) {
-                        list_players[i]->score->SetScore(goal);
+                    if (list_players[i]->Score().score >= goal) {
+                        list_players[i]->Score().SetScore(goal);
 
-                        winningteam = list_players[i]->teamID;
+                        winningteam = list_players[i]->getTeamID();
                         gameover = true;
 
                         RemovePlayersButTeam(winningteam);
                         SetupScoreBoard(false);
                         ShowScoreBoard();
-                    } else if (list_players[i]->score->score >= goal * 0.8 && !playedwarningsound) {
+                    } else if (list_players[i]->Score().score >= goal * 0.8 && !playedwarningsound) {
                         playwarningsound();
                     }
                 }
@@ -1662,20 +1662,20 @@ short CGM_Owned::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyl
 {
     if (!gameover) {
         //Give a bonus to the killer if he already owned this player
-        if (other.ownerPlayerID == inflictor.globalID)
-            inflictor.score->AdjustScore(5);
+        if (other.ownerPlayerID == inflictor.getGlobalID())
+            inflictor.Score().AdjustScore(5);
 
         //Release all players owned by the killed player
         for (short i = 0; i < list_players_cnt; i++) {
-            if (list_players[i]->ownerPlayerID == other.globalID) {
+            if (list_players[i]->ownerPlayerID == other.getGlobalID()) {
                 list_players[i]->ownerPlayerID = -1;
             }
         }
 
         //Assign owned status to the killed player
-        if (other.teamID != inflictor.teamID) {
-            other.ownerPlayerID = inflictor.globalID;
-            other.ownerColorOffsetX = inflictor.colorID * 48;
+        if (other.getTeamID() != inflictor.getTeamID()) {
+            other.ownerPlayerID = inflictor.getGlobalID();
+            other.ownerColorOffsetX = inflictor.getColorID() * 48;
         }
 
         return CheckWinner(&inflictor);
@@ -1689,7 +1689,7 @@ short CGM_Owned::playerkilledself(CPlayer &player, killstyle style)
     CGameMode::playerkilledself(player, style);
 
     for (short i = 0; i < list_players_cnt; i++) {
-        if (list_players[i]->ownerPlayerID == player.globalID) {
+        if (list_players[i]->ownerPlayerID == player.getGlobalID()) {
             list_players[i]->ownerPlayerID = -1;
         }
     }
@@ -1700,7 +1700,7 @@ short CGM_Owned::playerkilledself(CPlayer &player, killstyle style)
 void CGM_Owned::playerextraguy(CPlayer &player, short iType)
 {
     if (!gameover) {
-        player.score->AdjustScore(10 * iType);
+        player.Score().AdjustScore(10 * iType);
         CheckWinner(&player);
     }
 }
@@ -1710,16 +1710,16 @@ short CGM_Owned::CheckWinner(CPlayer * player)
     if (goal == -1)
         return player_kill_normal;
 
-    if (player->score->score >= goal) {
-        player->score->SetScore(goal);
-        winningteam = player->teamID;
+    if (player->Score().score >= goal) {
+        player->Score().SetScore(goal);
+        winningteam = player->getTeamID();
         gameover = true;
 
         SetupScoreBoard(false);
         ShowScoreBoard();
         RemovePlayersButTeam(winningteam);
         return player_kill_removed;
-    } else if (player->score->score >= goal * 0.8 && !playedwarningsound) {
+    } else if (player->Score().score >= goal * 0.8 && !playedwarningsound) {
         playwarningsound();
     }
 
@@ -1741,13 +1741,13 @@ short CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle
 {
     if (!gameover) {
         //Penalize killing your teammates
-        if (inflictor.teamID == other.teamID) {
-            inflictor.score->AdjustScore(-1);
+        if (inflictor.getTeamID() == other.getTeamID()) {
+            inflictor.Score().AdjustScore(-1);
         } else {
-            inflictor.score->AdjustScore(1);
-            inflictor.jail.escape(inflictor);
+            inflictor.Score().AdjustScore(1);
+            inflictor.Jail().escape(inflictor);
 
-            other.jail.lockInBy(inflictor);
+            other.Jail().lockInBy(inflictor);
 
             //Apply rules for "Classic" jail
             if (game_values.gamemodesettings.jail.style == 0) {
@@ -1759,8 +1759,8 @@ short CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle
 
                 //Figure out which teams have been jailed
                 for (i = 0; i < list_players_cnt; i++) {
-                    if (list_players[i]->jail.isActive()) {
-                        jailedteams[list_players[i]->teamID]--;
+                    if (list_players[i]->Jail().isActive()) {
+                        jailedteams[list_players[i]->getTeamID()]--;
                     }
                 }
 
@@ -1784,15 +1784,15 @@ short CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle
 
                     for (short iP = 0; iP < list_players_cnt; iP++) {
                         //If they weren't just the one killed and they were jailed, give them a transform cloud
-                        if (list_players[iP] != &other && list_players[iP]->jail.isActive()) {
-                            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, list_players[iP]->ix + HALFPW - 24, list_players[iP]->iy + HALFPH - 24, 4, 5));
+                        if (list_players[iP] != &other && list_players[iP]->Jail().isActive()) {
+                            eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, list_players[iP]->centerX() - 24, list_players[iP]->centerY() - 24, 4, 5));
                             ifSoundOnPlay(rm->sfx_transform);
                         }
 
-                        if (list_players[iP]->jail.isActive() && list_players[iP]->teamID != iTeamPoint)
+                        if (list_players[iP]->Jail().isActive() && list_players[iP]->getTeamID() != iTeamPoint)
                             numjailedplayers++;
 
-                        list_players[iP]->jail.timer = 0;
+                        list_players[iP]->Jail().timer = 0;
                     }
 
                     //Give extra bonus score for being on the non-jailed team
@@ -1806,16 +1806,16 @@ short CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle
 
                 //Figure out which teams have been jailed
                 for (short i = 0; i < list_players_cnt; i++) {
-                    short * piMarker = &jailedteams[list_players[i]->teamID];
+                    short * piMarker = &jailedteams[list_players[i]->getTeamID()];
 
                     if (*piMarker == -2)
                         continue;
 
-                    if (!list_players[i]->jail.isActive())
+                    if (!list_players[i]->Jail().isActive())
                         *piMarker = -2; //Flag that the team is not completely jailed
                     else if (*piMarker == -1)
-                        *piMarker = list_players[i]->jail.owner_teamID;
-                    else if (*piMarker != list_players[i]->jail.owner_teamID)
+                        *piMarker = list_players[i]->Jail().owner_teamID;
+                    else if (*piMarker != list_players[i]->Jail().owner_teamID)
                         *piMarker = -2; //Flag means team is not completely jailed or jailed by different teams
                 }
 
@@ -1852,7 +1852,7 @@ short CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle
                     short numjailedplayers = 0;
 
                     for (short i = 0; i < list_players_cnt; i++) {
-                        if (list_players[i]->jail.isActive() && list_players[i]->teamID != iTeamPoint)
+                        if (list_players[i]->Jail().isActive() && list_players[i]->getTeamID() != iTeamPoint)
                             numjailedplayers++;
                     }
 
@@ -1863,16 +1863,16 @@ short CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle
                         //Release other teams if a bonus was awarded for locking them up
                         for (short i = 0; i < list_players_cnt; i++) {
                             //Don't release players that were not jailed by this team
-                            if (list_players[i]->jail.owner_teamID != iTeamPoint)
+                            if (list_players[i]->Jail().owner_teamID != iTeamPoint)
                                 continue;
 
                             //If they weren't just the one killed and they were jailed, give them a transform cloud
-                            if (list_players[i] != &other && list_players[i]->jail.isActive()) {
-                                eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, list_players[i]->ix + HALFPW - 24, list_players[i]->iy + HALFPH - 24, 4, 5));
+                            if (list_players[i] != &other && list_players[i]->Jail().isActive()) {
+                                eyecandy[2].add(new EC_SingleAnimation(&rm->spr_poof, list_players[i]->centerX() - 24, list_players[i]->centerY() - 24, 4, 5));
                                 ifSoundOnPlay(rm->sfx_transform);
                             }
 
-                            list_players[i]->jail.timer = 0;
+                            list_players[i]->Jail().timer = 0;
                         }
                     }
                 }
@@ -1883,8 +1883,8 @@ short CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle
         if (goal == -1)
             return player_kill_normal;
 
-        if (inflictor.score->score >= goal) {
-            winningteam = inflictor.teamID;
+        if (inflictor.Score().score >= goal) {
+            winningteam = inflictor.getTeamID();
             gameover = true;
 
             RemovePlayersButTeam(winningteam);
@@ -1893,7 +1893,7 @@ short CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle
             ShowScoreBoard();
 
             return player_kill_removed;
-        } else if (inflictor.score->score >= goal - 3 && !playedwarningsound) {
+        } else if (inflictor.Score().score >= goal - 3 && !playedwarningsound) {
             playwarningsound();
         }
     }
@@ -1904,22 +1904,22 @@ short CGM_Jail::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle
 void CGM_Jail::playerextraguy(CPlayer &player, short iType)
 {
     if (!gameover) {
-        player.score->AdjustScore(iType);
-        player.jail.timer = 0;
+        player.Score().AdjustScore(iType);
+        player.Jail().timer = 0;
 
         //Don't end the game if the goal is infinite
         if (goal == -1)
             return;
 
-        if (player.score->score >= goal) {
-            player.score->SetScore(goal);
-            winningteam = player.teamID;
+        if (player.Score().score >= goal) {
+            player.Score().SetScore(goal);
+            winningteam = player.getTeamID();
             gameover = true;
 
             RemovePlayersButTeam(winningteam);
             SetupScoreBoard(false);
             ShowScoreBoard();
-        } else if (player.score->score >= goal - 3 && !playedwarningsound) {
+        } else if (player.Score().score >= goal - 3 && !playedwarningsound) {
             playwarningsound();
         }
     }
@@ -2011,7 +2011,7 @@ short CGM_Stomp::playerkilledself(CPlayer &player, killstyle style)
 void CGM_Stomp::playerextraguy(CPlayer &player, short iType)
 {
     if (!gameover) {
-        player.score->AdjustScore(iType);
+        player.Score().AdjustScore(iType);
         CheckWinner(&player);
     }
 }
@@ -2026,16 +2026,16 @@ short CGM_Stomp::CheckWinner(CPlayer * player)
     if (goal == -1)
         return player_kill_normal;
 
-    if (player->score->score >= goal) {
-        player->score->SetScore(goal);
-        winningteam = player->teamID;
+    if (player->Score().score >= goal) {
+        player->Score().SetScore(goal);
+        winningteam = player->getTeamID();
         gameover = true;
 
         SetupScoreBoard(false);
         ShowScoreBoard();
         RemovePlayersButTeam(winningteam);
         return player_kill_removed;
-    } else if (player->score->score >= goal - 2 && !playedwarningsound) {
+    } else if (player->Score().score >= goal - 2 && !playedwarningsound) {
         playwarningsound();
     }
 
@@ -2093,21 +2093,21 @@ short CGM_Race::playerkilledself(CPlayer &player, killstyle style)
 void CGM_Race::playerextraguy(CPlayer &player, short iType)
 {
     if (!gameover) {
-        player.score->AdjustScore(1 + (iType == 5 ? 1 : 0));
+        player.Score().AdjustScore(1 + (iType == 5 ? 1 : 0));
 
         //Don't end the game if the goal is infinite
         if (goal == -1)
             return;
 
-        if (player.score->score >= goal) {
-            player.score->SetScore(goal);
-            winningteam = player.teamID;
+        if (player.Score().score >= goal) {
+            player.Score().SetScore(goal);
+            winningteam = player.getTeamID();
             gameover = true;
 
             RemovePlayersButTeam(winningteam);
             SetupScoreBoard(false);
             ShowScoreBoard();
-        } else if (player.score->score >= goal - 1 && !playedwarningsound) {
+        } else if (player.Score().score >= goal - 1 && !playedwarningsound) {
             playwarningsound();
         }
     }
@@ -2146,13 +2146,13 @@ void CGM_Race::setNextGoal(short teamID)
 //Player loses control of his areas
 void CGM_Race::PenalizeRaceGoals(CPlayer &player)
 {
-    objectcontainer[2].removePlayerRaceGoals(player.teamID, nextGoal[player.teamID] - 1);
+    objectcontainer[2].removePlayerRaceGoals(player.getTeamID(), nextGoal[player.getTeamID()] - 1);
 
     if (2 == penalty)
-        nextGoal[player.teamID] = 0;
+        nextGoal[player.getTeamID()] = 0;
     else if (1 == penalty)
-        if (nextGoal[player.teamID] > 0)
-            nextGoal[player.teamID]--;
+        if (nextGoal[player.getTeamID()] > 0)
+            nextGoal[player.getTeamID()]--;
 }
 
 
@@ -2222,7 +2222,7 @@ void CGM_Star::SetupMode()
             starPlayer[iStar] = players[iStar];
 
             starItem[iStar] = new CO_Star(&rm->spr_star, 1, iStar);
-            starItem[iStar]->setPlayerColor(starPlayer[iStar]->colorID);
+            starItem[iStar]->setPlayerColor(starPlayer[iStar]->getColorID());
             objectcontainer[1].add(starItem[iStar]);
         }
     } else { //otherwise, add just a single star
@@ -2250,7 +2250,7 @@ void CGM_Star::think()
 
                 for (short iStar2 = 0; iStar2 < iNumPlayers - 1; iStar2++) {
                     starPlayer[iStar2] = players[iStar2];
-                    starItem[iStar2]->setPlayerColor(starPlayer[iStar2]->colorID);
+                    starItem[iStar2]->setPlayerColor(starPlayer[iStar2]->getColorID());
                     starItem[iStar2]->placeStar();
                 }
 
@@ -2276,16 +2276,16 @@ void CGM_Star::think()
         ifSoundOnPlay(rm->sfx_thunder);
 
         if (iCurrentModeType == 0) {
-            if (score[starPlayer[0]->teamID]->score > 1 || fReverseScoring)
+            if (score[starPlayer[0]->getTeamID()]->score > 1 || fReverseScoring)
                 starPlayer[0]->KillPlayerMapHazard(true, kill_style_environment, false);
 
             if (fReverseScoring) {
-                starPlayer[0]->score->AdjustScore(1);
+                starPlayer[0]->Score().AdjustScore(1);
             } else {
-                starPlayer[0]->score->AdjustScore(-1);
+                starPlayer[0]->Score().AdjustScore(-1);
 
-                if (starPlayer[0]->score->score <= 0) {
-                    fDisplayTimer = !RemoveTeam(starPlayer[0]->teamID);
+                if (starPlayer[0]->Score().score <= 0) {
+                    fDisplayTimer = !RemoveTeam(starPlayer[0]->getTeamID());
                     starPlayer[0] = NULL;
                 }
             }
@@ -2294,19 +2294,19 @@ void CGM_Star::think()
             starItem[0]->placeStar();
         } else if (iCurrentModeType == 1) {
             for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
-                if (starPlayer[0]->teamID == list_players[iPlayer]->teamID)
+                if (starPlayer[0]->getTeamID() == list_players[iPlayer]->getTeamID())
                     continue;
 
                 //Let the cleanup function remove the player on the last kill
-                if (score[list_players[iPlayer]->teamID]->score > 1 || fReverseScoring)
+                if (score[list_players[iPlayer]->getTeamID()]->score > 1 || fReverseScoring)
                     list_players[iPlayer]->KillPlayerMapHazard(true, kill_style_environment, false);
             }
 
             if (fReverseScoring) {
-                starPlayer[0]->score->AdjustScore(1);
+                starPlayer[0]->Score().AdjustScore(1);
             } else {
                 for (short iTeam = 0; iTeam < score_cnt; iTeam++) {
-                    if (starPlayer[0]->teamID == iTeam)
+                    if (starPlayer[0]->getTeamID() == iTeam)
                         continue;
 
                     score[iTeam]->AdjustScore(-1);
@@ -2332,17 +2332,17 @@ void CGM_Star::think()
                 if (fFound)
                     continue;
 
-                if (score[list_players[iPlayer]->teamID]->score > 1 || fReverseScoring)
+                if (score[list_players[iPlayer]->getTeamID()]->score > 1 || fReverseScoring)
                     list_players[iPlayer]->KillPlayerMapHazard(true, kill_style_environment, false);
 
                 bool fNeedRebalance = true;
                 if (fReverseScoring) {
-                    list_players[iPlayer]->score->AdjustScore(1);
+                    list_players[iPlayer]->Score().AdjustScore(1);
                 } else {
-                    list_players[iPlayer]->score->AdjustScore(-1);
+                    list_players[iPlayer]->Score().AdjustScore(-1);
 
-                    if (list_players[iPlayer]->score->score <= 0) {
-                        fDisplayTimer = !RemoveTeam(list_players[iPlayer]->teamID);
+                    if (list_players[iPlayer]->Score().score <= 0) {
+                        fDisplayTimer = !RemoveTeam(list_players[iPlayer]->getTeamID());
 
                         //Don't setup the mode if this is a random game because it will be setup below
                         if (game_values.gamemodesettings.star.shine != 3) {
@@ -2358,7 +2358,7 @@ void CGM_Star::think()
 
                     for (short iStar = 0; iStar < iNumPlayers - 1; iStar++) {
                         starPlayer[iStar] = players[iStar];
-                        starItem[iStar]->setPlayerColor(starPlayer[iStar]->colorID);
+                        starItem[iStar]->setPlayerColor(starPlayer[iStar]->getColorID());
                         starItem[iStar]->placeStar();
                     }
                 }
@@ -2420,7 +2420,7 @@ void CGM_Star::playerextraguy(CPlayer &player, short iType)
 {
     if (!gameover) {
         if (iType == 5) {
-            player.score->AdjustScore(fReverseScoring ? -1 : 1);
+            player.Score().AdjustScore(fReverseScoring ? -1 : 1);
         } else {
             gameClock.AddTime(iType * 10);
         }
@@ -2442,21 +2442,21 @@ CPlayer * CGM_Star::swapplayer(short id, CPlayer * player)
     CPlayer * oldstar = NULL;
     if (starPlayer[id]) {
         oldstar = starPlayer[id];
-        oldstar->shield.turn_on();
-        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, oldstar->ix + (HALFPW) - 16, oldstar->iy + (HALFPH) - 16, 3, 8));
+        oldstar->Shield().turn_on();
+        eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, oldstar->centerX() - 16, oldstar->centerY() - 16, 3, 8));
     }
 
     starPlayer[id] = player;
 
     if (iCurrentModeType == 2)
-        starItem[id]->setPlayerColor(starPlayer[id]->colorID);
+        starItem[id]->setPlayerColor(starPlayer[id]->getColorID());
 
     if (starItem[id]->getType() == 1)
-        eyecandy[2].add(new EC_GravText(&rm->game_font_large, player->ix + HALFPW, player->iy + PH, iCurrentModeType == 2 ? "Star Get!" : "Shine Get!", -VELJUMP*1.5));
+        eyecandy[2].add(new EC_GravText(&rm->game_font_large, player->centerX(), player->bottomY(), iCurrentModeType == 2 ? "Star Get!" : "Shine Get!", -VELJUMP*1.5));
     else
-        eyecandy[2].add(new EC_GravText(&rm->game_font_large, player->ix + HALFPW, player->iy + PH, "Ztarred!", -VELJUMP*1.5));
+        eyecandy[2].add(new EC_GravText(&rm->game_font_large, player->centerX(), player->bottomY(), "Ztarred!", -VELJUMP*1.5));
 
-    eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, player->ix + (HALFPW) - 16, player->iy + (HALFPH) - 16, 3, 8));
+    eyecandy[2].add(new EC_SingleAnimation(&rm->spr_fireballexplosion, player->centerX() - 16, player->centerY() - 16, 3, 8));
     ifSoundOnPlay(rm->sfx_transform);
 
     return oldstar;
@@ -2481,11 +2481,11 @@ void CGM_CaptureTheFlag::init()
     bool fTeamUsed[4] = {false, false, false, false};
 
     for (short iPlayer = 0; iPlayer < list_players_cnt; iPlayer++) {
-        short iTeamID = list_players[iPlayer]->teamID;
+        short iTeamID = list_players[iPlayer]->getTeamID();
         if (!fTeamUsed[iTeamID]) {
             fTeamUsed[iTeamID] = true;
 
-            short iColorID = list_players[iPlayer]->colorID;
+            short iColorID = list_players[iPlayer]->getColorID();
             MO_FlagBase * base = new MO_FlagBase(&rm->spr_flagbases, iTeamID, iColorID);
             objectcontainer[0].add(base);
 
@@ -2524,22 +2524,22 @@ void CGM_CaptureTheFlag::playerextraguy(CPlayer &player, short iType)
     if (gameover)
         return;
 
-    player.score->AdjustScore(iType);
+    player.Score().AdjustScore(iType);
     CheckWinner(&player);
 }
 
 short CGM_CaptureTheFlag::CheckWinner(CPlayer * player)
 {
     if (goal > -1) {
-        if (player->score->score >= goal) {
-            player->score->SetScore(goal);
-            winningteam = player->teamID;
+        if (player->Score().score >= goal) {
+            player->Score().SetScore(goal);
+            winningteam = player->getTeamID();
             gameover = true;
 
             RemovePlayersButTeam(winningteam);
             SetupScoreBoard(false);
             ShowScoreBoard();
-        } else if (player->score->score >= goal - 2 && !playedwarningsound) {
+        } else if (player->Score().score >= goal - 2 && !playedwarningsound) {
             playwarningsound();
         }
     }
@@ -2575,7 +2575,7 @@ short CGM_KingOfTheHill::playerkilledself(CPlayer &player, killstyle style)
 void CGM_KingOfTheHill::playerextraguy(CPlayer &player, short iType)
 {
     if (!gameover) {
-        player.score->AdjustScore(5 * iType);
+        player.Score().AdjustScore(5 * iType);
         CheckWinner(&player);
     }
 }
@@ -2651,26 +2651,26 @@ short CGM_Greed::playerkilledself(CPlayer &player, killstyle style)
 void CGM_Greed::playerextraguy(CPlayer &player, short iType)
 {
     if (!gameover)
-        player.score->AdjustScore(iType * 5);
+        player.Score().AdjustScore(iType * 5);
 }
 
 short CGM_Greed::ReleaseCoins(CPlayer &player, killstyle style)
 {
     ifSoundOnPlay(rm->sfx_cannon);
 
-    player.shield.turn_on();
+    player.Shield().turn_on();
 
     short iDamage = g_iKillStyleDamage[style] * game_values.gamemodesettings.greed.multiplier / 2;
 
     if (goal != -1) {
-        if (player.score->score < iDamage)
-            iDamage = player.score->score;
+        if (player.Score().score < iDamage)
+            iDamage = player.Score().score;
 
-        player.score->AdjustScore(-iDamage);
+        player.Score().AdjustScore(-iDamage);
     }
 
-    short ix = player.ix + HALFPW - 16;
-    short iy = player.iy + HALFPH - 16;
+    short ix = player.centerX() - 16;
+    short iy = player.centerY() - 16;
 
     for (short k = 0; k < iDamage; k++) {
         float vel = 7.0f + ((float)RANDOM_INT(9)) / 2.0f;
@@ -2678,7 +2678,7 @@ short CGM_Greed::ReleaseCoins(CPlayer &player, killstyle style)
         float velx = vel * cos(angle);
         float vely = vel * sin(angle);
 
-        objectcontainer[1].add(new MO_Coin(&rm->spr_coin, velx, vely, ix, iy, player.colorID, player.teamID, 1, 30, false));
+        objectcontainer[1].add(new MO_Coin(&rm->spr_coin, velx, vely, ix, iy, player.getColorID(), player.getTeamID(), 1, 30, false));
     }
 
     //Play warning sound if game is almost over
@@ -2703,8 +2703,8 @@ short CGM_Greed::ReleaseCoins(CPlayer &player, killstyle style)
             playwarningsound();
     }
 
-    if (goal != -1 && player.score->score <= 0) {
-        RemoveTeam(player.teamID);
+    if (goal != -1 && player.Score().score <= 0) {
+        RemoveTeam(player.getTeamID());
         return player_kill_removed;
     }
 
@@ -2736,21 +2736,21 @@ short CGM_Health::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killsty
         return player_kill_normal;
 
     if (style == kill_style_bobomb || style == kill_style_bomb || style == kill_style_iceblast)
-        other.score->subscore[0] -= 2;
+        other.Score().subscore[0] -= 2;
     else
-        other.score->subscore[0]--;
+        other.Score().subscore[0]--;
 
-    if (other.score->subscore[0] <= 0) {
-        other.score->subscore[0] = 0;
+    if (other.Score().subscore[0] <= 0) {
+        other.Score().subscore[0] = 0;
         short iRet = CGM_Classic::playerkilledplayer(inflictor, other, style);
 
         if (iRet == player_kill_normal)
-            other.score->subscore[0] = other.score->subscore[1];
+            other.Score().subscore[0] = other.Score().subscore[1];
 
         return iRet;
     } else {
         ifSoundOnPlay(rm->sfx_powerdown);
-        other.shield.reset();
+        other.Shield().reset();
     }
 
     return player_kill_nonkill;
@@ -2762,21 +2762,21 @@ short CGM_Health::playerkilledself(CPlayer &player, killstyle style)
         return player_kill_normal;
 
     if (style == kill_style_bobomb || style == kill_style_bomb || style == kill_style_environment)
-        player.score->subscore[0] -= 2;
+        player.Score().subscore[0] -= 2;
     else
-        player.score->subscore[0]--;
+        player.Score().subscore[0]--;
 
-    if (player.score->subscore[0] <= 0) {
-        player.score->subscore[0] = 0;
+    if (player.Score().subscore[0] <= 0) {
+        player.Score().subscore[0] = 0;
         short iRet = CGM_Classic::playerkilledself(player, style);
 
         if (iRet == player_kill_normal)
-            player.score->subscore[0] = player.score->subscore[1];
+            player.Score().subscore[0] = player.Score().subscore[1];
 
         return iRet;
     } else {
         ifSoundOnPlay(rm->sfx_powerdown);
-        player.shield.reset();
+        player.Shield().reset();
     }
 
     return player_kill_nonkill;
@@ -2785,10 +2785,10 @@ short CGM_Health::playerkilledself(CPlayer &player, killstyle style)
 void CGM_Health::playerextraguy(CPlayer &player, short iType)
 {
     if (!gameover) {
-        player.score->subscore[0] += iType;
+        player.Score().subscore[0] += iType;
 
-        if (player.score->subscore[0] > player.score->subscore[1])
-            player.score->subscore[0] = player.score->subscore[1];
+        if (player.Score().subscore[0] > player.Score().subscore[1])
+            player.Score().subscore[0] = player.Score().subscore[1];
     }
 }
 
@@ -2888,23 +2888,23 @@ short CGM_Collection::playerkilledself(CPlayer &player, killstyle style)
 
 void CGM_Collection::ReleaseCard(CPlayer &player)
 {
-    if (player.score->subscore[0] > 0) {
-        short ix = player.ix + HALFPW - 16;
-        short iy = player.iy + HALFPH - 16;
+    if (player.Score().subscore[0] > 0) {
+        short ix = player.centerX() - 16;
+        short iy = player.centerY() - 16;
 
         float vel = 7.0f + (float)RANDOM_INT(9) / 2.0f;
         float angle = -(float)RANDOM_INT(314) / 100.0f;
         float velx = vel * cos(angle);
         float vely = vel * sin(angle);
 
-        player.score->subscore[0]--;
+        player.Score().subscore[0]--;
 
-        short iCardMask = 3 << (player.score->subscore[0] << 1);
+        short iCardMask = 3 << (player.Score().subscore[0] << 1);
         short iCardMaskInverted = ~iCardMask;
 
-        short iValue = (player.score->subscore[1] & iCardMask) >> (player.score->subscore[0] << 1);
+        short iValue = (player.Score().subscore[1] & iCardMask) >> (player.Score().subscore[0] << 1);
 
-        player.score->subscore[1] &= iCardMaskInverted;
+        player.Score().subscore[1] &= iCardMaskInverted;
 
         objectcontainer[1].add(new MO_CollectionCard(&rm->spr_collectcards, 1, iValue, 30, velx, vely, ix, iy));
     }
@@ -2913,7 +2913,7 @@ void CGM_Collection::ReleaseCard(CPlayer &player)
 void CGM_Collection::playerextraguy(CPlayer &player, short iType)
 {
     if (!gameover) {
-        player.score->AdjustScore(iType);
+        player.Score().AdjustScore(iType);
         CheckWinner(&player);
     }
 }
@@ -2921,9 +2921,9 @@ void CGM_Collection::playerextraguy(CPlayer &player, short iType)
 short CGM_Collection::CheckWinner(CPlayer * player)
 {
     if (goal > -1) {
-        if (player->score->score >= goal) {
-            player->score->SetScore(goal);
-            winningteam = player->teamID;
+        if (player->Score().score >= goal) {
+            player->Score().SetScore(goal);
+            winningteam = player->getTeamID();
             gameover = true;
 
             SetupScoreBoard(false);
@@ -2935,7 +2935,7 @@ short CGM_Collection::CheckWinner(CPlayer * player)
                 score[iScore]->subscore[1] = 0;
                 score[iScore]->subscore[2] = 0;
             }
-        } else if (player->score->score >= goal * 0.8 && !playedwarningsound) {
+        } else if (player->Score().score >= goal * 0.8 && !playedwarningsound) {
             playwarningsound();
         }
     }
@@ -2979,10 +2979,10 @@ void CGM_Chase::think()
     if (keyholder) {
         static short counter = 0;
 
-        if (keyholder->isready() && keyholder->tanookisuit.notStatue()) {
+        if (keyholder->isready() && !keyholder->IsTanookiStatue()) {
             if (++counter >= game_values.pointspeed) {
                 counter = 0;
-                keyholder->score->AdjustScore(1);
+                keyholder->Score().AdjustScore(1);
                 CheckWinner(keyholder);
             }
         }
@@ -3004,7 +3004,7 @@ short CGM_Chase::playerkilledself(CPlayer &player, killstyle style)
 void CGM_Chase::playerextraguy(CPlayer &player, short iType)
 {
     if (!gameover) {
-        player.score->AdjustScore(5 * iType);
+        player.Score().AdjustScore(5 * iType);
         CheckWinner(&player);
     }
 }
@@ -3014,9 +3014,9 @@ short CGM_Chase::CheckWinner(CPlayer * player)
     if (goal == -1)
         return player_kill_normal;
 
-    if (player->score->score >= goal) {
-        player->score->SetScore(goal);
-        winningteam = player->teamID;
+    if (player->Score().score >= goal) {
+        player->Score().SetScore(goal);
+        winningteam = player->getTeamID();
         gameover = true;
 
         SetupScoreBoard(false);
@@ -3024,7 +3024,7 @@ short CGM_Chase::CheckWinner(CPlayer * player)
         RemovePlayersButTeam(winningteam);
 
         return player_kill_removed;
-    } else if (player->score->score >= goal * 0.8 && !playedwarningsound) {
+    } else if (player->Score().score >= goal * 0.8 && !playedwarningsound) {
         playwarningsound();
     }
 
@@ -3125,7 +3125,7 @@ void CGM_Boss_MiniGame::draw_foreground()
 short CGM_Boss_MiniGame::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyle style)
 {
     if (!gameover) {
-        other.score->AdjustScore(-1);
+        other.Score().AdjustScore(-1);
 
         if (!playedwarningsound) {
             short countscore = 0;
@@ -3136,8 +3136,8 @@ short CGM_Boss_MiniGame::playerkilledplayer(CPlayer &inflictor, CPlayer &other, 
                 playwarningsound();
         }
 
-        if (other.score->score <= 0) {
-            RemoveTeam(other.teamID);
+        if (other.Score().score <= 0) {
+            RemoveTeam(other.getTeamID());
             return player_kill_removed;
         }
     }
@@ -3150,7 +3150,7 @@ short CGM_Boss_MiniGame::playerkilledself(CPlayer &player, killstyle style)
     CGameMode::playerkilledself(player, style);
 
     if (!gameover) {
-        player.score->AdjustScore(-1);
+        player.Score().AdjustScore(-1);
 
         if (!playedwarningsound) {
             short countscore = 0;
@@ -3161,8 +3161,8 @@ short CGM_Boss_MiniGame::playerkilledself(CPlayer &player, killstyle style)
                 playwarningsound();
         }
 
-        if (player.score->score <= 0) {
-            RemoveTeam(player.teamID);
+        if (player.Score().score <= 0) {
+            RemoveTeam(player.getTeamID());
             return player_kill_removed;
         }
     }
@@ -3173,12 +3173,12 @@ short CGM_Boss_MiniGame::playerkilledself(CPlayer &player, killstyle style)
 void CGM_Boss_MiniGame::playerextraguy(CPlayer &player, short iType)
 {
     if (!gameover)
-        player.score->AdjustScore(iType);
+        player.Score().AdjustScore(iType);
 }
 
 bool CGM_Boss_MiniGame::SetWinner(CPlayer * player)
 {
-    winningteam = player->teamID;
+    winningteam = player->getTeamID();
     gameover = true;
 
     RemovePlayersButTeam(winningteam);
@@ -3280,7 +3280,7 @@ void CGM_Bonus::init()
 void CGM_Bonus::draw_background()
 {
     //Draw Toad
-    rm->spr_worldbonushouse.draw(544, 256, list_players[0]->ix > 544 ? 224 : 192, 0, 32, 64);
+    rm->spr_worldbonushouse.draw(544, 256, list_players[0]->leftX() > 544 ? 224 : 192, 0, 32, 64);
 
     //Draw Bonus House Title
     rm->menu_plain_field.draw(0, 0, 0, 0, smw->ScreenWidth/2, 32);
@@ -3369,20 +3369,20 @@ void CGM_Pipe_MiniGame::think()
 
 short CGM_Pipe_MiniGame::playerkilledplayer(CPlayer &player, CPlayer &other, killstyle style)
 {
-    //other.score->AdjustScore(-2);
+    //other.Score().AdjustScore(-2);
     return player_kill_normal;
 }
 
 short CGM_Pipe_MiniGame::playerkilledself(CPlayer &player, killstyle style)
 {
-    //player.score->AdjustScore(-2);
+    //player.Score().AdjustScore(-2);
     return player_kill_normal;
 }
 
 void CGM_Pipe_MiniGame::playerextraguy(CPlayer &player, short iType)
 {
     if (!gameover) {
-        player.score->AdjustScore(iType);
+        player.Score().AdjustScore(iType);
         CheckWinner(&player);
     }
 }
@@ -3390,16 +3390,16 @@ void CGM_Pipe_MiniGame::playerextraguy(CPlayer &player, short iType)
 short CGM_Pipe_MiniGame::CheckWinner(CPlayer * player)
 {
     if (goal > -1) {
-        if (player->score->score >= goal) {
-            player->score->SetScore(goal);
+        if (player->Score().score >= goal) {
+            player->Score().SetScore(goal);
 
-            winningteam = player->teamID;
+            winningteam = player->getTeamID();
             gameover = true;
 
             RemovePlayersButTeam(winningteam);
             SetupScoreBoard(false);
             ShowScoreBoard();
-        } else if (player->score->score >= goal - 5 && !playedwarningsound) {
+        } else if (player->Score().score >= goal - 5 && !playedwarningsound) {
             playwarningsound();
         }
     }
@@ -3473,12 +3473,12 @@ short CGM_Boxes_MiniGame::playerkilledplayer(CPlayer &inflictor, CPlayer &other,
 
     ReleaseCoin(other);
 
-    other.score->AdjustScore(-1);
+    other.Score().AdjustScore(-1);
 
     if (!playedwarningsound) {
         short countscore = 0;
         for (short k = 0; k < score_cnt; k++) {
-            if (inflictor.score == score[k])
+            if (&inflictor.Score() == score[k])
                 continue;
 
             countscore += score[k]->score;
@@ -3489,9 +3489,9 @@ short CGM_Boxes_MiniGame::playerkilledplayer(CPlayer &inflictor, CPlayer &other,
         }
     }
 
-    if (other.score->score <= 0) {
+    if (other.Score().score <= 0) {
         ReleaseAllCoinsFromTeam(other);
-        RemoveTeam(other.teamID);
+        RemoveTeam(other.getTeamID());
         return player_kill_removed;
     }
 
@@ -3505,7 +3505,7 @@ short CGM_Boxes_MiniGame::playerkilledself(CPlayer &player, killstyle style)
 
     ReleaseCoin(player);
 
-    player.score->AdjustScore(-1);
+    player.Score().AdjustScore(-1);
 
     if (!playedwarningsound) {
         short countscore = 0;
@@ -3530,9 +3530,9 @@ short CGM_Boxes_MiniGame::playerkilledself(CPlayer &player, killstyle style)
             playwarningsound();
     }
 
-    if (player.score->score <= 0) {
+    if (player.Score().score <= 0) {
         ReleaseAllCoinsFromTeam(player);
-        RemoveTeam(player.teamID);
+        RemoveTeam(player.getTeamID());
         return player_kill_removed;
     }
 
@@ -3544,21 +3544,21 @@ void CGM_Boxes_MiniGame::playerextraguy(CPlayer &player, short iType)
     if (gameover)
         return;
 
-    player.score->AdjustScore(iType);
+    player.Score().AdjustScore(iType);
 }
 
 short CGM_Boxes_MiniGame::CheckWinner(CPlayer * player)
 {
-    if (player->score->subscore[0] >= 5) {
-        player->score->subscore[0] = 5;
+    if (player->Score().subscore[0] >= 5) {
+        player->Score().subscore[0] = 5;
 
-        winningteam = player->teamID;
+        winningteam = player->getTeamID();
         gameover = true;
 
         RemovePlayersButTeam(winningteam);
         SetupScoreBoard(false);
         ShowScoreBoard();
-    } else if (player->score->subscore[0] >= 4 && !playedwarningsound) {
+    } else if (player->Score().subscore[0] >= 4 && !playedwarningsound) {
         playwarningsound();
     }
 
@@ -3567,11 +3567,11 @@ short CGM_Boxes_MiniGame::CheckWinner(CPlayer * player)
 
 void CGM_Boxes_MiniGame::ReleaseCoin(CPlayer &player)
 {
-    if (player.score->subscore[0] > 0) {
-        player.score->subscore[0]--;
+    if (player.Score().subscore[0] > 0) {
+        player.Score().subscore[0]--;
 
-        short ix = player.ix + HALFPW - 16;
-        short iy = player.iy + HALFPH - 16;
+        short ix = player.centerX() - 16;
+        short iy = player.centerY() - 16;
 
         float vel = 7.0f + (float)RANDOM_INT(9) / 2.0f;
         float angle = -(float)RANDOM_INT(314) / 100.0f;
@@ -3586,6 +3586,6 @@ void CGM_Boxes_MiniGame::ReleaseCoin(CPlayer &player)
 
 void CGM_Boxes_MiniGame::ReleaseAllCoinsFromTeam(CPlayer &player)
 {
-    while (player.score->subscore[0] > 0)
+    while (player.Score().subscore[0] > 0)
         ReleaseCoin(player);
 }
