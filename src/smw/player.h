@@ -422,14 +422,6 @@ private:
 		friend class CGM_ShyGuyTag; // init()
 		friend class CGM_Star; // think()
 
-		friend class MI_InputDevice;
-		friend class MI_InputLeft;
-		friend class MI_InputRight;
-		friend class MI_InputDown;
-		friend class MI_InputJump;
-		friend class MI_InputTurbo;
-		friend class MI_InputPower;
-
 		friend class IO_Block;
 		friend class B_NoteBlock;
 		friend class B_BreakableBlock;
