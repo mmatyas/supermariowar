@@ -305,7 +305,7 @@ void CGameMode::displayplayertext()
 {
     if (winningteam > -1) {
         for (short k = 0; k < list_players_cnt; k++) {
-            if (list_players[k]->teamID == winningteam)
+            if (list_players[k]->getTeamID() == winningteam)
                 list_players[k]->spawnText("Winner!");
         }
     }
@@ -345,10 +345,10 @@ short CGameMode::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyl
 {
     //Penalize killing your team mates
     if (!gameover) {
-        if (inflictor.teamID == other.teamID)
-            inflictor.score->AdjustScore(-1);
+        if (inflictor.getTeamID() == other.getTeamID())
+            inflictor.Score().AdjustScore(-1);
         else
-            inflictor.score->AdjustScore(1);
+            inflictor.Score().AdjustScore(1);
     }
 
     return player_kill_normal;
@@ -356,8 +356,8 @@ short CGameMode::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killstyl
 
 short CGameMode::playerkilledself(CPlayer &player, killstyle style)
 {
-    if (player.bobomb)
-        player.diedas = 2; //flag to use bobomb corpse sprite
+    if (player.IsBobomb())
+        player.SetCorpseType(2); //flag to use bobomb corpse sprite
 
     return player_kill_normal;
 }
@@ -365,7 +365,7 @@ short CGameMode::playerkilledself(CPlayer &player, killstyle style)
 void CGameMode::playerextraguy(CPlayer &player, short iType)
 {
     if (!gameover)
-        player.score->AdjustScore(iType);
+        player.Score().AdjustScore(iType);
 }
 
 CPlayer * CGameMode::GetHighestScorePlayer(bool fGetHighest)
@@ -387,11 +387,11 @@ CPlayer * CGameMode::GetHighestScorePlayer(bool fGetHighest)
     //Loop through all players, comparing scores to find the highest/lowest
     for (i = j + 1; i < list_players_cnt; i++) {
         if (!list_players[i]->isdead()) {
-            if ((!fGetHighest && list_players[i]->score->score < list_players[tiedplayers[0]]->score->score) ||
-                    (fGetHighest && list_players[i]->score->score > list_players[tiedplayers[0]]->score->score)) {
+            if ((!fGetHighest && list_players[i]->Score().score < list_players[tiedplayers[0]]->Score().score) ||
+                    (fGetHighest && list_players[i]->Score().score > list_players[tiedplayers[0]]->Score().score)) {
                 count = 1;
                 tiedplayers[0] = i;
-            } else if (list_players[i]->score->score == list_players[tiedplayers[0]]->score->score) {
+            } else if (list_players[i]->Score().score == list_players[tiedplayers[0]]->Score().score) {
                 tiedplayers[count] = i;
                 count++;
             }
@@ -420,9 +420,9 @@ short CGameMode::GetScoreRankedPlayerList(CPlayer * players[4], bool fGetHighest
         fNeedSwap = false;
         short iRandom = 0;
         for (short iIndex = 0; iIndex < iNumPlayersInList - 1; iIndex++) {
-            if ((fGetHighest && players[iIndex]->score->score < players[iIndex + 1]->score->score) ||
-                    (!fGetHighest && players[iIndex]->score->score > players[iIndex + 1]->score->score) ||
-                    (players[iIndex]->score->score == players[iIndex + 1]->score->score && RANDOM_BOOL() && iRandom++ < 5)) {
+            if ((fGetHighest && players[iIndex]->Score().score < players[iIndex + 1]->Score().score) ||
+                    (!fGetHighest && players[iIndex]->Score().score > players[iIndex + 1]->Score().score) ||
+                    (players[iIndex]->Score().score == players[iIndex + 1]->Score().score && RANDOM_BOOL() && iRandom++ < 5)) {
                 CPlayer * pTemp = players[iIndex];
                 players[iIndex] = players[iIndex + 1];
                 players[iIndex + 1] = pTemp;
@@ -807,7 +807,7 @@ short CGM_Chicken::playerkilledplayer(CPlayer &inflictor, CPlayer &other, killst
         ifSoundOnPlay(rm->sfx_transform);
 
         if (&other == chicken)
-            other.diedas = 1; //flag to use chicken corpse sprite
+            other.SetCorpseType(1); //flag to use chicken corpse sprite
     } else if (&inflictor == chicken) {
         if (!gameover) {
             inflictor.score->AdjustScore(5);
@@ -823,7 +823,7 @@ short CGM_Chicken::playerkilledself(CPlayer &player, killstyle style)
     CGameMode::playerkilledself(player, style);
 
     if (chicken == &player) {
-        player.diedas = 1; //flag to use chocobo corpse sprite
+        player.SetCorpseType(1); //flag to use chocobo corpse sprite
 
         if (!gameover)
             chicken = NULL;

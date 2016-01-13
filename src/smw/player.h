@@ -110,6 +110,9 @@ public:
     short GetWarpPlane() const { return warpstatus.getWarpPlane(); }
     bool IsInvincibleOnBottom() const;
     bool IsSuperStomping() const;
+    bool IsBobomb() const { return bobomb; }
+
+    CScore& Score();
 
     /* Drawing */
 
@@ -129,6 +132,8 @@ public:
     bool collidesWith(CObject*);
 
     void die(short deathStyle, bool fTeamRemoved, bool fKillCarriedItem);
+    void SetCorpseType(short); // see diedas
+    short CorpseType(short) const { return diedas; }
 
     /* Award effects and score */
 
@@ -400,7 +405,6 @@ private:
 
 		friend class CObjectContainer;
 
-		friend class CGameMode;
 		friend class CGM_Frag;
 		friend class CGM_TimeLimit;
 		friend class CGM_Jail;

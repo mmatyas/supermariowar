@@ -300,6 +300,15 @@ bool CPlayer::IsSuperStomping() const {
     return superstomp.isStomping();
 }
 
+CScore& CPlayer::Score() {
+    assert(score);
+    return *score;
+}
+
+void CPlayer::SetCorpseType(short type) {
+    diedas = type;
+}
+
 #if 0
 void reference_code() {
     if (game_values.secrets)
