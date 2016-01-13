@@ -1148,11 +1148,11 @@ bool PU_ExtraHeartPowerup::collide(CPlayer * player)
 {
     if (state > 0) {
         if (game_values.gamemode->gamemode == game_mode_health) {
-            if (player->score->subscore[1] < game_values.gamemodesettings.health.maxlife)
-                player->score->subscore[1]++;
+            if (player->Score().subscore[1] < game_values.gamemodesettings.health.maxlife)
+                player->Score().subscore[1]++;
 
-            if (player->score->subscore[0] < game_values.gamemodesettings.health.maxlife)
-                player->score->subscore[0]++;
+            if (player->Score().subscore[0] < game_values.gamemodesettings.health.maxlife)
+                player->Score().subscore[0]++;
         }
 
         ifSoundOnPlay(rm->sfx_collectpowerup);
@@ -2062,7 +2062,7 @@ void CO_Bomb::update()
 void CO_Bomb::draw()
 {
     if (owner && owner->iswarping())
-        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, iColorOffsetY, iw, ih, (short)owner->state % 4, owner->GetWarpPlane());
+        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, iColorOffsetY, iw, ih, owner->GetWarpState(), owner->GetWarpPlane());
     else
         spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, iColorOffsetY, iw, ih);
 }
@@ -2123,7 +2123,7 @@ bool MO_Coin::collide(CPlayer * player)
 
     if (!game_values.gamemode->gameover) {
         if (iType == 2)
-            player->score->subscore[0]++;
+            player->Score().subscore[0]++;
         else
             player->Score().AdjustScore(1);
 
@@ -2215,7 +2215,7 @@ void OMO_Thwomp::update()
 
 bool OMO_Thwomp::collide(CPlayer * player)
 {
-    if (!player->isInvincible() && !player->isShielded() && (player->score->score > 0 || game_values.gamemode->goal == -1))
+    if (!player->isInvincible() && !player->isShielded() && (player->Score().score > 0 || game_values.gamemode->goal == -1))
         return player->KillPlayerMapHazard(false, kill_style_environment, false) != player_kill_nonkill;
 
     return false;
@@ -2393,7 +2393,7 @@ void MO_CarriedObject::init()
 void MO_CarriedObject::draw()
 {
     if (owner && owner->iswarping())
-        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, animationOffsetY, iw, ih, (short)owner->state % 4, owner->GetWarpPlane());
+        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, animationOffsetY, iw, ih, owner->GetWarpState(), owner->GetWarpPlane());
     else
         spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, animationOffsetY, iw, ih);
 }
@@ -2531,7 +2531,7 @@ void CO_Egg::draw()
     //Display explosion timer
     if (game_values.gamemodesettings.egg.explode > 0 && explosiondrawframe < 5) {
         if (owner && owner->iswarping())
-            rm->spr_eggnumbers.draw(ix - collisionOffsetX, iy - collisionOffsetY, explosiondrawframe << 5, color << 5, 32, 32, (short)owner->state % 4, owner->GetWarpPlane());
+            rm->spr_eggnumbers.draw(ix - collisionOffsetX, iy - collisionOffsetY, explosiondrawframe << 5, color << 5, 32, 32, owner->GetWarpState(), owner->GetWarpPlane());
         else
             rm->spr_eggnumbers.draw(ix - collisionOffsetX, iy - collisionOffsetY, explosiondrawframe << 5, color << 5, 32, 32);
     }
@@ -2661,7 +2661,7 @@ void CO_Star::draw()
 {
     if (owner) {
         if (owner->iswarping())
-            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, iOffsetY, iw, ih, (short)owner->state % 4, owner->GetWarpPlane());
+            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, iOffsetY, iw, ih, owner->GetWarpState(), owner->GetWarpPlane());
         else
             spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, iOffsetY, iw, ih);
     } else {
@@ -2672,7 +2672,7 @@ void CO_Star::draw()
     }
 
     if (owner && owner->iswarping())
-        rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, iType ? 0 : 32, 32, 32, (short)owner->state % 4, owner->GetWarpPlane());
+        rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, iType ? 0 : 32, 32, 32, owner->GetWarpState(), owner->GetWarpPlane());
     else
         rm->spr_shinesparkle.draw(ix - collisionOffsetX, iy - collisionOffsetY, sparkledrawframe, iType ? 0 : 32, 32, 32);
 }
@@ -2951,7 +2951,7 @@ void CO_Flag::draw()
             animationOffsetY = owner->colorID << 6;
 
         if (owner->iswarping())
-            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, animationOffsetY + (fLastFlagDirection ? 32 : 0), iw, ih, (short)owner->state % 4, owner->GetWarpPlane());
+            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, animationOffsetY + (fLastFlagDirection ? 32 : 0), iw, ih, owner->GetWarpState(), owner->GetWarpPlane());
         else
             spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, animationOffsetY + (fLastFlagDirection ? 32 : 0), iw, ih);
     } else {
@@ -3735,15 +3735,15 @@ bool MO_CollectionCard::collide(CPlayer * player)
     ifSoundOnPlay(rm->sfx_areatag);
 
     //Add this card to the team's score
-    if (player->score->subscore[0] < 3) {
-        player->score->subscore[1] |= value << (player->score->subscore[0] << 1);
-        player->score->subscore[0]++;
+    if (player->Score().subscore[0] < 3) {
+        player->Score().subscore[1] |= value << (player->Score().subscore[0] << 1);
+        player->Score().subscore[0]++;
     } else {
-        player->score->subscore[1] &= ~48; //Clear previous card in 3rd slot
-        player->score->subscore[1] |= value << 4; //Set card to newly collected one in 3rd slot
+        player->Score().subscore[1] &= ~48; //Clear previous card in 3rd slot
+        player->Score().subscore[1] |= value << 4; //Set card to newly collected one in 3rd slot
     }
 
-    player->score->subscore[2] = 0;
+    player->Score().subscore[2] = 0;
 
     if (type == 1) {
         dead = true;
@@ -5450,7 +5450,7 @@ void CO_Shell::draw()
         spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, iColorOffsetY, iw, (short)(ih - fy + iDestY));
     } else if (owner) {
         if (owner->iswarping())
-            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, iColorOffsetY + iFlippedOffset, iw, ih, (short)owner->state % 4, owner->GetWarpPlane());
+            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, iColorOffsetY + iFlippedOffset, iw, ih, owner->GetWarpState(), owner->GetWarpPlane());
         else
             spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, 0, iColorOffsetY + iFlippedOffset, iw, ih);
     } else {
@@ -5829,7 +5829,7 @@ void CO_ThrowBlock::update()
 void CO_ThrowBlock::draw()
 {
     if (owner && owner->iswarping())
-        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, iType << 5, iw, ih, (short)owner->state % 4, owner->GetWarpPlane());
+        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, iType << 5, iw, ih, owner->GetWarpState(), owner->GetWarpPlane());
     else
         spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, iType << 5, iw, ih);
 
@@ -6113,7 +6113,7 @@ void CO_ThrowBox::update()
 void CO_ThrowBox::draw()
 {
     if (owner && owner->iswarping())
-        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, 0, iw, ih, (short)owner->state % 4, owner->GetWarpPlane());
+        spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, 0, iw, ih, owner->GetWarpState(), owner->GetWarpPlane());
     else
         spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, drawframe, 0, iw, ih);
 
@@ -6319,7 +6319,7 @@ void CO_Spring::draw()
 {
     if (owner) {
         if (owner->iswarping())
-            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, animationOffsetX, iOffsetY, 32, 32, (short)owner->state % 4, owner->GetWarpPlane());
+            spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, animationOffsetX, iOffsetY, 32, 32, owner->GetWarpState(), owner->GetWarpPlane());
         else
             spr->draw(ix - collisionOffsetX, iy - collisionOffsetY, animationOffsetX, iOffsetY, 32, 32);
     } else {
@@ -7049,8 +7049,8 @@ void MysteryMushroomTempPlayer::SetPlayer(CPlayer * player, short iPowerup)
 
     gamepowerup = iPowerup;
 
-    iOldPowerupX = player->score->x + scorepowerupoffsets[game_values.teamcounts[player->teamID] - 1][player->subTeamID];
-    iOldPowerupY = player->score->y + 25;
+    iOldPowerupX = player->Score().x + scorepowerupoffsets[game_values.teamcounts[player->teamID] - 1][player->subTeamID];
+    iOldPowerupY = player->Score().y + 25;
 }
 
 void MysteryMushroomTempPlayer::GetPlayer(CPlayer * player, short * iPowerup)

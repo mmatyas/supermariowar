@@ -444,12 +444,8 @@ private:
 		friend class PU_TreasureChestBonus;
 		friend class PU_CoinPowerup;
 
-		friend class CO_Egg;
 		friend class CO_Star;
 		friend class CO_Flag;
-
-		friend class MO_Coin;
-		friend class MO_CollectionCard;
 
 		friend class IO_MovingObject;
 
