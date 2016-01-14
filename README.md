@@ -93,11 +93,11 @@ If you'd rather use the system libraries, please see the [Build configuration](#
 
 ### Linux
 
-Create a build directory and run CMake there to configure the project. Then simply call `make` every time you want to build. The binaries will be generated in `./Build/Binaries/Release` by default.
+Create a build directory and run CMake there to configure the project. Then simply call `make` every time you want to build. The binaries will be generated in `./Build/Binaries/Release` by default. In short:
 
 ```sh
 unzip data.zip
-mkdir Build && cd Build
+mkdir build && cd build
 cmake ..
 make -j4 # -jN = build on N threads
 ./Binaries/Release/smw ../data
