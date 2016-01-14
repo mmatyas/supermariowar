@@ -45,6 +45,9 @@ class GameplayState : public GameState
         //..
         //...
         //TODO
+        void read_network();
+        void update_countdown_timer();
+        void update_world();
 
         short iCountDownState;
         short iCountDownTimer;
