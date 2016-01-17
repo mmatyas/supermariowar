@@ -392,8 +392,15 @@ void MenuState::onEnterState()
     }
 
     // On return from a game, refresh room list
-    if (netplay.active)
+    if (netplay.active) {
+        if (netplay.currentRoom.roomID) {
+            netplay.client.sendLeaveRoomMessage();
+            netplay.currentRoom.roomID = 0;
+            netplay.joinSuccessful = false;
+            netplay.gameRunning = false;
+        }
         netplay.client.requestRoomList();
+    }
 }
 
 void MenuState::update()
@@ -1185,6 +1192,7 @@ void MenuState::update()
 
                 mNetRoomMenu->Restore(); // Restore Room layout
                 mNetLobbyMenu->Restore(); // Restore Lobby layout
+                mNetNewRoomMenu->Restore(); // remove 'in progress' dialog
             } else if (MENU_CODE_NET_JOIN_ROOM_IN_PROGRESS == code) {
                 mNetLobbyMenu->JoinInProgress();
             } else if (MENU_CODE_NET_JOIN_ROOM_ABORT == code) {

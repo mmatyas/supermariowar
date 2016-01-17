@@ -259,6 +259,7 @@ void NetClient::requestRoomList()
     NetPkgs::RoomList msg;
     sendMessageToLobbyServer(&msg, sizeof(NetPkgs::RoomList));
 
+    netplay.currentRooms.clear();
     if (uiRoomList)
         uiRoomList->Clear();
 }
@@ -267,13 +268,13 @@ void NetClient::handleNewRoomListEntry(const uint8_t* data, size_t dataLength)
 {
     NetPkgs::RoomInfo roomInfo;
     memcpy(&roomInfo, data, sizeof(NetPkgs::RoomInfo));
-    //printf("  Incoming room entry: [%u] %s (%d/4)\n", roomInfo.roomID, roomInfo.name, roomInfo.currentPlayerCount);
 
     RoomListEntry newRoom;
     newRoom.roomID = roomInfo.roomID;
     newRoom.name = roomInfo.name;
     newRoom.playerCount = roomInfo.currentPlayerCount;
     netplay.currentRooms.push_back(newRoom);
+    printf("  Incoming room entry: [%u] %s (%d/4)\n", newRoom.roomID, newRoom.name.c_str(), newRoom.playerCount);
 
     if (uiRoomList) {
         // TODO: strings would be better
@@ -328,6 +329,13 @@ void NetClient::handleRoomCreatedMessage(const uint8_t* data, size_t dataLength)
 void NetClient::sendJoinRoomMessage()
 {
     assert(netplay.selectedRoomIndex < netplay.currentRooms.size());
+
+    printf("currentRooms[%d] = {id=%d, name='%s', cnt=%d}, össz: %lu\n",
+        netplay.selectedRoomIndex,
+        netplay.currentRooms.at(netplay.selectedRoomIndex).roomID,
+        netplay.currentRooms.at(netplay.selectedRoomIndex).name.c_str(),
+        netplay.currentRooms.at(netplay.selectedRoomIndex).playerCount,
+        netplay.currentRooms.size());
 
     // TODO: implement password
     NetPkgs::JoinRoom msg(netplay.currentRooms.at(netplay.selectedRoomIndex).roomID, "");
