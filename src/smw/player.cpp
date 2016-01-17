@@ -186,7 +186,7 @@ void CPlayer::accelerate(float direction)
     if (onice)
         velx += VELMOVINGADDICE * direction;
     else
-        velx += VELMOVINGADD * direction;       //move right
+        velx += VELMOVINGADD * direction;
 
     float maxVel = 0.0f;
     if (!frozen) {
@@ -199,7 +199,7 @@ void CPlayer::accelerate(float direction)
     }
     assert(maxVel >= 0.0);
 
-    if (abs(velx) > maxVel)
+    if (std::abs(velx) > maxVel)
         velx = maxVel * direction;
 
     if (!inair) {
@@ -2956,4 +2956,82 @@ void CPlayer::DecreaseProjectileLimit()
         powerup = -1;
         ifSoundOnPlay(rm->sfx_powerdown);
     }
+}
+
+DumbPlayer::DumbPlayer(short globalid, short localid, short teamid, short subteamid)
+    : CPlayer(globalid,
+        localid,
+        teamid,
+        subteamid,
+        game_values.colorids[globalid],
+        rm->spr_player[globalid],
+        &fake_score,
+        &fake_respawn_counter,
+        NULL)
+    , fake_score(0)
+{}
+
+DumbPlayer::~DumbPlayer() {}
+
+PlayerNetworkShadow::PlayerNetworkShadow(short globalid, short localid, short teamid, short subteamid)
+{
+    inner_player = new DumbPlayer(globalid,
+        localid,
+        teamid,
+        subteamid);
+}
+
+PlayerNetworkShadow::~PlayerNetworkShadow()
+{
+    delete inner_player;
+}
+
+void PlayerNetworkShadow::apply_input()
+{
+    assert(inner_player);
+    assert(netplay.local_tick >= netplay.last_server_tick);
+    uint32_t tick_difference = netplay.local_tick - netplay.last_server_tick;
+
+    // drop confirmed input
+    printf("local: %d, server: %d, bufsize: %d\n", netplay.local_tick, netplay.last_server_tick, netplay.local_input_buffer.size());
+    while (tick_difference < netplay.local_input_buffer.size()) {
+        netplay.local_input_buffer.pop_front();
+    }
+
+    // replay unconfirmed input
+    auto iter = netplay.local_input_buffer.begin();
+    printf("replay: ");
+    while (iter != netplay.local_input_buffer.end()) {
+        COutputControl current_keys = *iter;
+
+        inner_player->playerKeys = &current_keys;
+        inner_player->move();
+
+        ++iter;
+        printf(".");
+    }
+    printf("\n");
+}
+
+void PlayerNetworkShadow::force_pos(float x, float y)
+{
+    assert(inner_player);
+
+    inner_player->setXf(x);
+    inner_player->setYf(y);
+}
+
+void PlayerNetworkShadow::force_vel(float velx, float vely)
+{
+    assert(inner_player);
+
+    inner_player->velx = velx;
+    inner_player->vely = vely;
+}
+
+void PlayerNetworkShadow::draw()
+{
+    assert(inner_player);
+
+    inner_player->draw();
 }

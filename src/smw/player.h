@@ -80,7 +80,7 @@ public:
             short iTeamID, short iSubTeamID, short iTeamColorID,
             gfxSprite * nsprites[PGFX_LAST],
             CScore *nscore, short * respawnCounter, CPlayerAI * ai);
-    ~CPlayer();
+    virtual ~CPlayer();
 
     void Init();
 
@@ -227,7 +227,7 @@ private:
 		void accelerateLeft();
 		void decreaseVelocity();
 
-		bool FindSpawnPoint();
+		virtual bool FindSpawnPoint();
 		void collision_detection_map();
 		void flipsidesifneeded();
 		void makeinvincible();
@@ -528,6 +528,39 @@ private:
 		friend class PlayerWarpStatus;
 		friend class PlayerWings;
 		friend class PlayerInvincibility;
+
+		friend class PlayerNetworkShadow;
+};
+
+class DumbPlayer: public CPlayer
+{
+	DumbPlayer(short globalid, short localid, short teamid, short subteamid);
+	~DumbPlayer();
+
+private:
+	virtual bool FindSpawnPoint() { printf("DumbPlayer::FindSpawnPoint()\n"); return true; }
+
+	CScore fake_score;
+	short fake_respawn_counter;
+
+friend class PlayerNetworkShadow;
+};
+
+class PlayerNetworkShadow
+{
+public:
+	PlayerNetworkShadow(short globalid, short localid, short teamid, short subteamid);
+	~PlayerNetworkShadow();
+	void apply_input();
+	void draw();
+
+    void force_pos(float x, float y);
+    void force_vel(float velx, float vely);
+
+private:
+	DumbPlayer* inner_player;
+
+friend class GameplayState;
 };
 
 #endif // PLAYER_H

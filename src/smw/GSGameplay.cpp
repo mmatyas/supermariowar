@@ -62,6 +62,8 @@ short scorepowerupoffsets[3][3] = { {  37,  0,    0 },
 short GameplayState::scoreoffsets[3] = {2, 36, 70};
 short GameplayState::g_iPowerupToIcon[8] = {80, 176, 272, 304, 336, 368, 384, 400};
 
+PlayerNetworkShadow* netshadow_p0;
+
 GameplayState::GameplayState()
 {
     for (short p = 0; p < 4; p++) {
@@ -231,6 +233,12 @@ void GameplayState::createPlayers()
 
     //netplay.gamestate_changed = false;
     //netplay.latest_playerdata.copyFromLocal();
+
+    if (netplay.active && !netplay.theHostIsMe) {
+        short teamid, subteamid;
+        LookupTeamID(netplay.remotePlayerNumber, &teamid, &subteamid);
+        netshadow_p0 = new PlayerNetworkShadow(netplay.remotePlayerNumber, netplay.remotePlayerNumber, teamid, subteamid);
+    }
 }
 
 void GameplayState::initScoreDisplayPosition()
@@ -1122,6 +1130,9 @@ void GameplayState::drawMiddleLayer()
     g_map->drawPlatforms(1);
 
     if (!game_values.swapplayers) {
+        /*if (netshadow_p0)
+            netshadow_p0->draw();*/
+
         for (short i = 0; i < list_players_cnt; i++)
             list_players[i]->draw();
     }
@@ -2164,16 +2175,33 @@ void GameplayState::read_network()
     netplay.gamestate_changed = false;
     netplay.client.update();
 
-    if (netplay.theHostIsMe)
-        // The host sends the game state to clients
-        netplay.client.local_gamehost.sendCurrentGameState();
-    else if (netplay.gamestate_changed) {
+    if (!netplay.theHostIsMe && netplay.gamestate_changed) {
         for (unsigned short p = 0; p < list_players_cnt; p++) {
+            if (p == netplay.remotePlayerNumber)
+                continue;
+
             list_players[p]->fx = netplay.latest_playerdata.player_x[p];
             list_players[p]->fy = netplay.latest_playerdata.player_y[p];
             list_players[p]->velx = netplay.latest_playerdata.player_xvel[p];
             list_players[p]->vely = netplay.latest_playerdata.player_yvel[p];
-            netplay.netPlayerInput.outputControls[p].copyFrom(netplay.latest_playerdata.player_input[p]);
+        }
+        // apply stored input to local player's network shadow
+        // TODO: support multiple local players
+        if (netshadow_p0) {
+            netshadow_p0->force_pos(
+                netplay.latest_playerdata.player_x[netplay.remotePlayerNumber],
+                netplay.latest_playerdata.player_y[netplay.remotePlayerNumber]);
+            netshadow_p0->force_vel(
+                netplay.latest_playerdata.player_xvel[netplay.remotePlayerNumber],
+                netplay.latest_playerdata.player_yvel[netplay.remotePlayerNumber]);
+
+            if (!game_values.swapplayers && game_values.screenfade == 0)
+                netshadow_p0->apply_input();
+
+            list_players[netplay.remotePlayerNumber]->fx = netshadow_p0->inner_player->fx;
+            list_players[netplay.remotePlayerNumber]->fy = netshadow_p0->inner_player->fy;
+            list_players[netplay.remotePlayerNumber]->velx = netshadow_p0->inner_player->velx;
+            list_players[netplay.remotePlayerNumber]->vely = netshadow_p0->inner_player->vely;
         }
     }
 
@@ -2189,7 +2217,7 @@ void GameplayState::read_network()
 void network_send_local_input()
 {
     if (netplay.active && !netplay.theHostIsMe) {
-        // netplay.client.storeLocalInput();
+        netplay.client.storeLocalInput();
         netplay.client.sendLocalInput();
     }
 }
